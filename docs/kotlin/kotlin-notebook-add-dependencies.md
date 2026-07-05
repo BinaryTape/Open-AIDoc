@@ -1,5 +1,12 @@
 [//]: # (title: 向您的 Kotlin Notebook 添加依赖项)
 
+> 从 IntelliJ IDEA 2026.2 开始，Kotlin Notebook 将不再随 IDE 捆绑，也不再由 JetBrains 官方支持。
+> 源代码仍可在 [GitHub](https://github.com/Kotlin/kotlin-notebook) 上获取。
+>
+> 请在[博客文章](https://blog.jetbrains.com/idea/2026/06/kotlin-notebook-sunset/)中了解更多信息。
+>
+{style="note"}
+
 <tldr>
    <p>这是<strong> Kotlin Notebook 入门</strong>教程的第三部分。在继续之前，请确保您已完成之前的步骤。</p>
    <p><img src="icon-1-done.svg" width="20" alt="第一步"/> <a href="kotlin-notebook-set-up-env.md">设置环境</a><br/>
@@ -64,11 +71,11 @@
 
 3. 运行代码单元。
 
-    当执行 `%use` 语句时，它会下载库依赖项并将默认导入项添加到您的 notebook 中。
+   当执行 `%use` 语句时，它会下载库依赖项并将默认导入项添加到您的 notebook 中。
 
-    > 请确保在运行任何依赖于该库的其他代码单元之前，先运行包含 `%use libraryName` 行的代码单元。
-    >
-    {style="note"}
+   > 请确保在运行任何依赖于该库的其他代码单元之前，先运行包含 `%use libraryName` 行的代码单元。
+   >
+   {style="note"}
 
 4. 要使用 Kotlin DataFrame 库从 CSV 文件导入数据，请在新的代码单元中使用 `.read()` 函数：
 
@@ -80,14 +87,14 @@
     rawDf
     ```
 
-    > 您可以从 [Kotlin DataFrame 示例 GitHub 仓库](https://github.com/Kotlin/dataframe/blob/master/examples/notebooks/netflix/netflix_titles.csv)下载此示例 CSV 文件。
-    > 将其添加到您的项目目录中。
-    > 
-    {style="tip"}
+   > 您可以从 [Kotlin DataFrame 示例 GitHub 仓库](https://github.com/Kotlin/dataframe/blob/master/examples/notebooks/netflix/netflix_titles.csv)下载此示例 CSV 文件。
+   > 将其添加到您的项目目录中。
+   >
+   {style="tip"}
 
-    ![使用数据帧显示数据](add-dataframe-dependency.png){width=700}
+   ![使用数据帧显示数据](add-dataframe-dependency.png){width=700}
 
-5. 在新的代码单元中，使用 `.plot` 方法直观地展示数据帧中电视节目（TV shows）和电影（Movies）的分布情况：
+5. 在新的代码单元中，使用 `.plot` 方法直观地展示数据帧中电视节目 (TV shows) 和电影 (Movies) 的分布情况：
 
     ```kotlin
     rawDf

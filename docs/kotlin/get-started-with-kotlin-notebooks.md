@@ -1,6 +1,13 @@
 [//]: # (title: Kotlin Notebook 入门)
 
-[Kotlin Notebook](kotlin-notebook-overview.md) 是一个交互式工具，允许你在一个文档中混合代码、可视化效果和 markdown。
+> 从 IntelliJ IDEA 2026.2 开始，Kotlin Notebook 将不再随 IDE 捆绑提供，也不再由 JetBrains 官方提供支持。
+> 源代码仍可在 [GitHub](https://github.com/Kotlin/kotlin-notebook) 上获取。
+>
+> 详细了解请参阅 [博客文章](https://blog.jetbrains.com/idea/2026/06/kotlin-notebook-sunset/)。
+>
+{style="note"}
+
+[Kotlin Notebook](kotlin-notebook-overview.md) 是一款交互式工具，允许你在一个文档中混合代码、可视化效果和 markdown。
 你可以使用 notebook 在被称为 _代码单元_ 的部分中编写并执行代码，立即查看结果并记录你的想法。
 这种设置使其成为快速原型设计、分析和数据科学的绝佳工具。
 

@@ -1,9 +1,14 @@
 [//]: # (title: Kotlin 노트북)
 [//]: # (description: IntelliJ IDEA에서 대화형 Kotlin 노트북을 생성 및 편집하여 코드를 실행하고, 데이터를 시각화하며, 아이디어를 프로토타이핑하고, 결과를 공유하세요.)
 
-Kotlin 노트북(Kotlin Notebook)은 Kotlin의 모든 기능을 활용하여 노트북을 생성하고 편집할 수 있는 대화형 환경을 제공합니다. 
-Kotlin 노트북은 [Kotlin Notebook 플러그인](https://plugins.jetbrains.com/plugin/16340-kotlin-notebook)에 의존하며, 
-이 플러그인은 IntelliJ IDEA에 기본적으로 번들로 포함되어 있고 [활성화되어 있습니다](kotlin-notebook-set-up-env.md).
+> IntelliJ IDEA 2026.2부터 Kotlin 노트북은 더 이상 IDE에 번들로 포함되지 않으며 JetBrains에서 공식적으로 지원하지 않습니다.
+> 소스 코드는 [GitHub](https://github.com/Kotlin/kotlin-notebook)에서 계속 확인할 수 있습니다.
+>
+> [블로그 포스트](https://blog.jetbrains.com/idea/2026/06/kotlin-notebook-sunset/)에서 더 자세히 알아보세요.
+>
+{style="note"}
+
+Kotlin 노트북(Kotlin Notebook)은 Kotlin의 모든 기능을 활용하여 노트북을 생성하고 편집할 수 있는 대화형 환경을 제공합니다.
 
 노트북은 실행 가능한 Kotlin 코드와 텍스트, 결과, 시각화 자료를 혼합할 수 있는 대화형 문서입니다. 
 코드를 셀(cell) 단위로 구성하고, 마크다운(Markdown)으로 문서화하며, 텍스트부터 차트(plot)까지의 출력을 코드를 실행한 즉시 나란히 표시할 수 있는 기능이 확장된 Kotlin REPL이라고 생각하면 됩니다.
@@ -22,14 +27,10 @@ Kotlin Notebook 플러그인은 다음과 같이 개발 프로세스를 향상�
 * 한 줄의 코드로 다양한 라이브러리를 가져오거나 프로젝트에 새 라이브러리 추가
 * 오류 메시지 및 트레이스백(traceback)을 통한 디버깅 인사이트 확보
 
-Kotlin 노트북은 [Jupyter 노트북용 Kotlin 커널(Kotlin Kernel for Jupyter Notebooks)](https://github.com/Kotlin/kotlin-jupyter?tab=readme-ov-file#kotlin-kernel-for-ipythonjupyter)을 기반으로 하므로, 다른 [Kotlin 노트북 솔루션](data-analysis-overview.md#notebooks)과 쉽게 통합할 수 있습니다. 
+Kotlin 노트북은 [Jupyter 노트북용 Kotlin 커널(Kotlin Kernel for Jupyter Notebooks)](https://github.com/Kotlin/kotlin-jupyter?tab=readme-ov-file#kotlin-kernel-for-ipythonjupyter)을 기반으로 하므로, 다른 Kotlin 노트북 솔루션과 쉽게 통합할 수 있습니다. 
 호환성 문제 없이 Kotlin 노트북, [Datalore](https://datalore.jetbrains.com/), 그리고 [Kotlin-Jupyter 노트북](https://github.com/Kotlin/kotlin-jupyter) 간에 작업을 손쉽게 공유할 수 있습니다.
 
 이러한 기능을 통해 간단한 코드 실험부터 포괄적인 데이터 프로젝트에 이르기까지 폭넓은 작업을 시작할 수 있습니다. 
-
-Kotlin 노트북으로 무엇을 성취할 수 있는지 더 자세히 알아보세요!
-
-<a href="get-started-with-kotlin-notebooks.md"><img src="notebook-get-started-button.svg" width="600" alt="Get started with Kotlin Notebook" style="block"/></a>
 
 ## 데이터 분석 및 시각화
 
@@ -87,9 +88,9 @@ Kotlin 노트북은 보편적인 Jupyter 형식을 따르므로, 서로 다른 �
 
 ![notebook-github-gist](notebook-github-gist.png){width=400}
 
-IntelliJ IDEA는 노트북을 사용자의 GitHub 계정에 Gist로 내보내고, 노트북을 공유, 확인 및 다운로드할 수 있는 URL을 제공합니다.
+IntelliJ IDEA는 노트북을 사용자의 GitHub 계정에 Gist로 내보내고, 노트북을 공유, 확인 및 다운로드할 수 있는 URL을 제공합니다. 
 
-Gist는 노트북의 모든 코드, 출력 및 마크다운을 JSON 형식으로 보존하며, GitHub은 이를 미리 보기로 렌더링할 수 있습니다.
+Gist는 노트북의 모든 코드, 출력 및 마크다운을 JSON 형식으로 보존하며, GitHub은 이를 미리 보기로 렌더링할 수 있습니다. 
 
 ## 다음 단계
 

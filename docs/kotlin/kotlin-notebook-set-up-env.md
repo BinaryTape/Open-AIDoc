@@ -1,5 +1,12 @@
 [//]: # (title: 设置环境)
 
+> 从 IntelliJ IDEA 2026.2 开始，Kotlin Notebook 将不再与 IDE 捆绑，也不再由 JetBrains 提供官方支持。
+> 源代码将继续在 [GitHub](https://github.com/Kotlin/kotlin-notebook) 上提供。
+>
+> 在博客文章中了解详情。
+>
+{style="note"}
+
 <tldr>
    <p>这是<strong>Kotlin Notebook 入门</strong>教程的第一部分：</p>
    <p><img src="icon-1.svg" width="20" alt="First step"/> <strong>设置环境</strong><br/>
@@ -12,9 +19,9 @@
 
 ## 设置环境
 
-Kotlin Notebook 依赖于 [Kotlin Notebook 插件](https://plugins.jetbrains.com/plugin/16340-kotlin-notebook)，该插件在 IntelliJ IDEA 中默认内置并启用。
+Kotlin Notebook 依赖于 [Kotlin Notebook 插件](https://plugins.jetbrains.com/plugin/16340-kotlin-notebook)。
 
-要使用 Kotlin Notebook，请下载并安装最新版本的 [IntelliJ IDEA](https://www.jetbrains.com/idea/download/)。
+要使用 Kotlin Notebook，请下载并安装 [IntelliJ IDEA 2026.1 或更早版本](https://www.jetbrains.com/idea/download/other/)。
 
 如果 Kotlin Notebook 功能不可用，请确保插件已启用：
 

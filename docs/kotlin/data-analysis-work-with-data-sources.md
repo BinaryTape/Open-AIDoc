@@ -1,34 +1,38 @@
 [//]: # (title: 从文件获取数据)
 [//]: # (description: 了解如何使用 Kotlin DataFrame 从文件加载数据，包括 CSV、JSON、SQL、Excel 和 Apache Arrow 文件。)
 
-[Kotlin Notebook](kotlin-notebook-overview.md) 结合 [Kotlin DataFrame 库](https://kotlin.github.io/dataframe/home.html)，使您能够处理非结构化和结构化数据。这种组合提供了将非结构化数据（例如 TXT 文件中的数据）转换为结构化数据集的灵活性。
-
-对于数据转换，您可以使用 [`.add()`](https://kotlin.github.io/dataframe/adddf.html)、[`.split()`](https://kotlin.github.io/dataframe/split.html)、[`.convert()`](https://kotlin.github.io/dataframe/convert.html) 和 [`.parse()`](https://kotlin.github.io/dataframe/parse.html) 等方法。此外，该工具集还支持从各种结构化文件格式中获取和操作数据，包括 CSV、JSON、XLS、Parquet 和 Apache Arrow。请参阅 [DataFrame 文档](https://kotlin.github.io/dataframe/data-sources.html)查看所有支持的格式。
+[Kotlin DataFrame 库](https://kotlin.github.io/dataframe/home.html)使您能够处理非结构化和结构化数据。
+对于数据转换，您可以使用 [`.add()`](https://kotlin.github.io/dataframe/adddf.html)、[`.split()`](https://kotlin.github.io/dataframe/split.html)、[`.convert()`](https://kotlin.github.io/dataframe/convert.html) 和 [`.parse()`](https://kotlin.github.io/dataframe/parse.html) 等方法。
+此外，该工具集还支持从各种结构化文件格式中获取和操作数据，包括 CSV、JSON、XLS、Parquet 和 Apache Arrow。
+请参阅 [DataFrame 文档](https://kotlin.github.io/dataframe/data-sources.html)查看所有支持的格式。
 
 在本指南中，您可以通过多个示例学习如何获取、精炼和处理数据。
 
 ## 开始之前
 
-Kotlin Notebook 依赖于 [Kotlin Notebook 插件](https://plugins.jetbrains.com/plugin/16340-kotlin-notebook)，该插件在 IntelliJ IDEA 中默认内置并启用。
-
-如果 Kotlin Notebook 功能不可用，请确保已启用该插件。有关更多信息，请参阅[设置环境](kotlin-notebook-set-up-env.md)。
+> 从 IntelliJ IDEA 2026.2 开始，Kotlin Notebook 将不再与 IDE 捆绑，也不再由 JetBrains 官方支持。
+> 源代码仍可在 [GitHub](https://github.com/Kotlin/kotlin-notebook) 上获得。
+>
+> 详细了解[博客文章](https://blog.jetbrains.com/idea/2026/06/kotlin-notebook-sunset/)。
+>
+{style="note"}
 
 要按照本教程操作：
 
-1. 创建一个[新的 Kotlin Notebook](kotlin-notebook-create.md)。
+1. 选择 **File** | **New** | **Kotlin Notebook**。
 2. 导入 Kotlin DataFrame：
 
    ```kotlin
    %use dataframe
    ```
 
-> 在运行任何其他代码单元之前，请确保先运行包含 `%use dataframe` 行的代码单元，以确保 DataFrame 库及其 API 在笔记本中可用。
-> 
-{style="note"}
+   在运行任何其他代码单元之前，请先运行包含 `%use dataframe` 行的代码单元，以确保 DataFrame 库及其 API 在笔记本中可用。
+
+要按照教程操作，您还可以将 DataFrame 作为 [Gradle](https://kotlin.github.io/dataframe/setupgradle.html) 或 [Maven](https://kotlin.github.io/dataframe/setupmaven.html) 依赖项使用。
 
 ## 获取数据
 
-要在 Kotlin Notebook 中从文件获取数据，请使用 `DataFrame.read()` 函数：
+要从文件获取数据，请使用 `DataFrame.read()` 函数：
 
 ```kotlin
 val movies = DataFrame.read("movies.csv")
@@ -48,7 +52,7 @@ val movies = DataFrame.read("movies.csv", delimiter = ';')
 
 ## 显示数据
 
-一旦在笔记本中拥有数据，您就可以将其显示出来。最简单的方法是将数据存储在变量中，然后将其返回：
+一旦拥有数据，您就可以将其显示出来。最简单的方法是将数据存储在变量中，然后将其返回：
 
 ```kotlin
 val jsonDf = DataFrame.read("jsonFile.json")
@@ -69,7 +73,7 @@ jsonDf
 
 ![架构示例](schema-data-analysis.png){width=700}
 
-通过 Kotlin Notebook，您还可以使用自动补全功能。它可以让您快速访问和操作 DataFrame 的属性。加载数据后，只需输入 DataFrame 变量名后跟一个点 (`.`)，即可查看可用列及其类型的列表。
+您还可以使用自动补全功能。它可以让您快速访问和操作 DataFrame 的属性。加载数据后，只需输入 DataFrame 变量名后跟一个点 (`.`)，即可查看可用列及其类型的列表。
 
 ![可用属性](auto-completion-data-analysis.png){width=700}
 
@@ -80,7 +84,7 @@ Kotlin DataFrame 提供了用于精炼数据集的各种操作。例如，[分�
 例如，让我们看看 `movies.csv` 数据集。它在同一个单元格中存储了电影标题和发行年份。目标是精炼此数据集以便于分析：
 
 1. **加载数据**
-   
+
    使用 `.read()` 函数将文件加载到 `DataFrame` 中：
 
    ```kotlin
@@ -131,7 +135,7 @@ Kotlin DataFrame 提供了用于精炼数据集的各种操作。例如，[分�
    
    newMovies
    ```
-   
+
 5. **移除列**
 
    要移除不需要的列，请使用 `.remove()` 函数：
@@ -158,14 +162,14 @@ Kotlin DataFrame 提供了用于精炼数据集的各种操作。例如，[分�
 
 ## 导出数据
 
-在 Kotlin Notebook 中精炼数据后，您可以轻松导出处理后的数据。
+在精炼数据后，您可以轻松导出处理后的数据。
 
 您可以为此使用各种 [`.write()`](https://kotlin.github.io/dataframe/write.html) 函数。它支持保存为多种格式，包括 CSV、JSON、XLS、XLSX、Apache Arrow，甚至是 HTML 表格。请参阅 [DataFrame 文档](https://kotlin.github.io/dataframe/data-sources.html)查看所有支持的格式。这对于分享您的发现、创建报告或使数据可用于进一步分析特别有用。
 
 例如，我们将结果保存为：
 
 * 使用 [`.writeJson()`](https://kotlin.github.io/dataframe/write.html#writing-to-json) 函数保存为 JSON 文件：
- 
+
   ```kotlin
   refinedMovies.writeJson("movies.json")
   ```
@@ -174,6 +178,7 @@ Kotlin DataFrame 提供了用于精炼数据集的各种操作。例如，[分�
   ```kotlin
   refinedMovies.writeCsv("movies.csv")
   ```
+
 * 使用 `.writeArrowIPC()` 和 `.writeArrowFeather()` 函数保存为 [Apache Arrow 文件](https://kotlin.github.io/dataframe/write.html#writing-to-apache-arrow-formats)：
 
   ```kotlin

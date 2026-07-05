@@ -2,17 +2,20 @@
 
 [Lets-Plot for Kotlin (LPK)](https://lets-plot.org/kotlin/get-started.html) 是一個多平台繪圖程式庫，它將 [R 的 ggplot2 程式庫](https://ggplot2.tidyverse.org/)移植到了 Kotlin。LPK 為 Kotlin 生態系統帶來了功能豐富的 `ggplot2` API，非常適合需要複雜資料視覺化功能的科學家和統計學家。
 
-LPK 針對多種平台，包括 [Kotlin Notebook](data-analysis-overview.md#notebooks)、[Kotlin/JS](js-overview.md)、[JVM 的 Swing](https://docs.oracle.com/javase/8/docs/technotes/guides/swing/)、[JavaFX](https://openjfx.io/) 和 [Compose Multiplatform](https://www.jetbrains.com/lp/compose-multiplatform/)。此外，LPK 與 [IntelliJ](https://www.jetbrains.com/idea/)、[DataGrip](https://www.jetbrains.com/datagrip/)、[DataSpell](https://www.jetbrains.com/dataspell/) 和 [PyCharm](https://www.jetbrains.com/pycharm/) 有著無縫整合。
+LPK 針對多種平台，包括 [Kotlin/JS](js-overview.md)、[JVM 的 Swing](https://docs.oracle.com/javase/8/docs/technotes/guides/swing/)、[JavaFX](https://openjfx.io/) 和 [Compose Multiplatform](https://www.jetbrains.com/lp/compose-multiplatform/)。此外，LPK 與 [IntelliJ](https://www.jetbrains.com/idea/)、[DataGrip](https://www.jetbrains.com/datagrip/)、[DataSpell](https://www.jetbrains.com/dataspell/) 和 [PyCharm](https://www.jetbrains.com/pycharm/) 有著無縫整合。
 
 ![Lets-Plot](lets-plot-overview.png){width=700}
 
-本教學示範如何在 IntelliJ IDEA 的 Kotlin Notebook 中，使用 LPK 和 [Kotlin DataFrame](https://kotlin.github.io/dataframe/home.html) 程式庫建立不同的繪圖類型。
+本教學示範如何在 IntelliJ IDEA 中，使用 LPK 和 [Kotlin DataFrame](https://kotlin.github.io/dataframe/home.html) 程式庫建立不同的繪圖類型。
 
 ## 開始之前
 
-Kotlin Notebook 依賴於 [Kotlin Notebook 外掛程式](https://plugins.jetbrains.com/plugin/16340-kotlin-notebook)，該外掛程式在 IntelliJ IDEA 中已隨附並預設啟用。
-
-如果 Kotlin Notebook 功能不可用，請確保該外掛程式已啟用。如需更多資訊，請參閱[設定環境](kotlin-notebook-set-up-env.md)。
+> 從 IntelliJ IDEA 2026.2 開始，Kotlin Notebook 將不再與 IDE 隨附，也不再由 JetBrains 提供官方支援。
+> 原始碼仍可在 [GitHub](https://github.com/Kotlin/kotlin-notebook) 上取得。
+>
+> 欲了解更多資訊，請參閱[部落格文章](https://blog.jetbrains.com/idea/2026/06/kotlin-notebook-sunset/)。
+>
+{style="note"}
 
 建立一個新的 Kotlin Notebook 以使用 Lets-Plot：
 
@@ -24,11 +27,13 @@ Kotlin Notebook 依賴於 [Kotlin Notebook 外掛程式](https://plugins.jetbrai
     %use dataframe
     ```
 
+若要進行本教學，您也可以將 DataFrame 作為 [Gradle](https://kotlin.github.io/dataframe/setupgradle.html) 或 [Maven](https://kotlin.github.io/dataframe/setupmaven.html) 相依性使用。
+
 ## 準備資料
 
 讓我們建立一個資料框 (DataFrame)，其中儲存了柏林、馬德里和卡拉卡斯三個城市每月平均溫度的模擬數據。
 
-使用 Kotlin DataFrame 程式庫中的 [`dataFrameOf()`](https://kotlin.github.io/dataframe/createdataframe.html#dataframeof) 函式來產生資料框。在您的 Kotlin Notebook 中貼上並執行以下程式碼片段：
+使用 Kotlin DataFrame 程式庫中的 [`dataFrameOf()`](https://kotlin.github.io/dataframe/createdataframe.html#dataframeof) 函式來產生資料框。貼上並執行以下程式碼片段：
 
 ```kotlin
 // months 變數儲存了一個包含一年 12 個月的清單
@@ -68,7 +73,7 @@ val data = df.toMap()
 
 ## 建立散佈圖
 
-讓我們使用 LPK 程式庫在 Kotlin Notebook 中建立一個散佈圖 (scatter plot)。
+讓我們使用 LPK 程式庫建立一個散佈圖 (scatter plot)。
 
 將資料轉換為 `Map` 格式後，使用 LPK 程式庫中的 [`geomPoint()`](https://lets-plot.org/kotlin/api-reference/-lets--plot--kotlin/org.jetbrains.letsPlot.geom/geom-point/index.html) 函式來產生散佈圖。您可以指定 X 軸與 Y 軸的值，並定義類別及其顏色。此外，您還可以根據需求[自訂](https://lets-plot.org/kotlin/aesthetics.html#point-shapes)繪圖的大小和點的形狀：
 
@@ -113,9 +118,6 @@ boxPlot
    @file:DependsOn("org.apache.commons:commons-math3:3.6.1")
    import org.apache.commons.math3.distribution.MultivariateNormalDistribution
    ```
-
-   > 關於將相依性匯入 Kotlin Notebook 的更多資訊，請參閱 [Kotlin Notebook 文件](https://www.jetbrains.com/help/idea/kotlin-notebook.html#add-dependencies)。
-   > {style="tip"}
 
 2. 在您的 Kotlin Notebook 中貼上並執行以下程式碼片段，以建立 2D 資料點集合：
 
@@ -182,6 +184,5 @@ densityPlot
 ## 下一步
 
 * 在 [Lets-Plot for Kotlin 文件](https://lets-plot.org/kotlin/charts.html)中探索更多繪圖範例。
-* 查看 Lets-Plot for Kotlin 的 [API 參考資料](https://lets-plot.org/kotlin/api-reference/)。 
+* 查看 Lets-Plot for Kotlin 的 [API 參考資料](https://lets-plot.org/kotlin/api-reference/)。
 * 在 [Kotlin DataFrame](https://kotlin.github.io/dataframe/info.html) 和 [Kandy](https://kotlin.github.io/kandy/welcome.html) 程式庫文件中了解如何使用 Kotlin 轉換和視覺化資料。
-* 尋找有關 [Kotlin Notebook 用法與主要功能](https://www.jetbrains.com/help/idea/kotlin-notebook.html)的更多資訊。

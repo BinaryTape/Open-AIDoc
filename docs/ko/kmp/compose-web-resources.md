@@ -1,6 +1,6 @@
 [//]: # (title: 웹 리소스 처리)
 
-여기에서는 브라우저 기능과 `preload` API를 사용한 리소스 프리로딩(preloading) 및 웹 리소스 캐싱에 대한 정보를 확인할 수 있습니다.
+여기에서는 브라우저 기능과 `preload` API를 사용한 리소스 프리로딩(preloading), 웹 리소스 캐싱, 그리고 자동 폰트 폴백(fallback)에 대한 정보를 확인할 수 있습니다.
   
 ## 웹 타겟을 위한 리소스 프리로딩
 
@@ -39,71 +39,48 @@
 
 Compose Multiplatform 1.8.0에서는 웹 타겟에서 폰트 및 이미지 리소스를 프리로딩하기 위한 실험적 API인 `preloadFont()`, `preloadImageBitmap()`, `preloadImageVector()`를 도입했습니다.
 
-또한, 이모지와 같은 특수 문자가 필요한 경우 기본 번들 옵션과 다른 폴백(fallback) 폰트를 설정할 수 있습니다. 폴백 폰트를 지정하려면 `FontFamily.Resolver.preload()` 메서드를 사용하세요.
+렌더링 중에 확인되지 않은 문자가 발견되면, 누락된 문자가 포함된 폴백 폰트가 [자동으로 다운로드되므로](#automatic-font-fallback) 이모지와 같은 특수 문자가 기본적으로 지원됩니다.
 
-다음 예제는 프리로딩과 폴백 폰트를 사용하는 방법을 보여줍니다.
+자동 폴백에 의존하는 대신 어떤 폴백 폰트를 사용할지 직접 제어하고 싶다면, `FontFamily.Resolver.preload()` 메서드를 사용하여 수동으로 지정하세요.
+웹 타겟은 TTF, OTF, TTC, 가변(variable) 및 WOFF/WOFF2 폰트 형식을 지원합니다.
+
+다음 예제는 벡터 이미지의 프리로딩을 사용하는 방법을 보여줍니다.
 
 ```kotlin
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.runtime.*
-import androidx.compose.ui.*
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalFontFamilyResolver
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.window.ComposeViewport
-import components.resources.demo.shared.generated.resources.*
-import components.resources.demo.shared.generated.resources.NotoColorEmoji
-import components.resources.demo.shared.generated.resources.Res
-import components.resources.demo.shared.generated.resources.Workbench_Regular
-import components.resources.demo.shared.generated.resources.font_awesome
-import org.jetbrains.compose.resources.ExperimentalResourceApi
-import org.jetbrains.compose.resources.configureWebResources
-import org.jetbrains.compose.resources.demo.shared.UseResources
-import org.jetbrains.compose.resources.preloadFont
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalResourceApi::class)
+@Composable
+fun App() {
+    val icon by preloadImageVector(Res.drawable.heavy_vector_icon)
 
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalResourceApi::class, InternalComposeUiApi::class)
-fun main() {
-    configureWebResources {
-        // 리소스 위치를 재정의합니다
-        resourcePathMapping { path -> "./$path" }
-    }
-    ComposeViewport(viewportContainerId = "composeApplication") {
-        val font1 by preloadFont(Res.font.Workbench_Regular)
-        val font2 by preloadFont(Res.font.font_awesome, FontWeight.Normal, FontStyle.Normal)
-        val emojiFont = preloadFont(Res.font.NotoColorEmoji).value
-        var fontsFallbackInitialized by remember { mutableStateOf(false) }
-
-        // 앱 콘텐츠에 프리로딩된 리소스를 사용합니다
-        UseResources()
-
-        if (font1 != null && font2 != null && emojiFont != null && fontsFallbackInitialized) {
-            println("Fonts are ready")
-        } else {
-            // 로딩 중 FOUT이 발생하거나 앱이 일시적으로 작동하지 않는 문제를 해결하기 위해 프로그레스 인디케이터를 표시합니다
-            Box(modifier = Modifier.fillMaxSize().background(Color.White.copy(alpha = 0.8f)).clickable {  }) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-            }
-            println("Fonts are not ready yet")
-        }
-
-        val fontFamilyResolver = LocalFontFamilyResolver.current
-        LaunchedEffect(fontFamilyResolver, emojiFont) {
-            if (emojiFont != null) {
-                // 번들 폰트에서 지원하지 않는 누락된 글리프를 렌더링하기 위해 이모지가 포함된 폴백 폰트를 프리로딩합니다
-                fontFamilyResolver.preload(FontFamily(listOf(emojiFont)))
-                fontsFallbackInitialized = true
-            }
+    if (icon != null) {
+        MainScreen()
+    } else {
+        Box(modifier = Modifier.fillMaxSize()) {
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
         }
     }
 }
+
+@Composable
+fun MainScreen() {
+    // 아이콘이 캐시에서 로드됩니다
+    Image(painter = painterResource(Res.drawable.heavy_vector_icon), contentDescription = null)
+}
 ```
-{initial-collapse-state="collapsed" collapsible="true" collapsed-title="fontFamilyResolver.preload(FontFamily(listOf(emojiFont)))"}
+{initial-collapse-state="collapsed" collapsible="true" collapsed-title="val icon by preloadImageVector(Res.drawable.heavy_vector_icon)"}
+
+## 자동 폰트 폴백
+<primary-label ref="Experimental"/>
+
+기본적으로 애플리케이션에 로드된 폰트에서 지원하지 않는 문자는 대체 글리프(□, "[토푸(tofu)](https://fonts.google.com/knowledge/glossary/tofu)"라고도 함)로 표시됩니다.
+
+[//]: # (TODO update version for stable release)
+
+버전 1.12.0-beta01부터 Compose Multiplatform은 렌더링 중에 확인되지 않은 문자를 모니터링하고 필요한 Noto 폰트 서브셋을 필요에 따라 다운로드합니다. Noto라는 이름은 "no tofu"의 약자로, 이 폰트들은 토푸 글리프를 없애기 위해 설계되었습니다.
+
+폰트를 사용할 수 있게 되면 해당 텍스트는 리컴포지션(recomposition)됩니다. 다운로드 중에 토푸가 잠시 나타날 수 있습니다.
+
+CJK(한중일: 중국어, 일본어, 한국어) 문자의 경우, 브라우저의 언어 설정에 따라 올바른 폰트 변체가 자동으로 선택됩니다.
 
 ## 웹 리소스 캐싱
 <primary-label ref="Experimental"/>

@@ -675,5 +675,6 @@
   "koog.http-clients": "HTTP 클라이언트",
   "coroutines.flows": "Flow",
   "coroutines.coroutines-flow": "개요",
-  "kmp.kotlin-toolchain": "Kotlin Toolchain"
+  "kmp.kotlin-toolchain": "Kotlin Toolchain",
+  "kmp.whats-new-compose-112": "Compose Multiplatform %org.jetbrains.compose-eap%"
 }

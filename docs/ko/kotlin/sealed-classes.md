@@ -115,7 +115,7 @@ sealed class IOError {
 
 봉인된 클래스와 인터페이스의 직계 하위 클래스는 반드시 동일한 패키지 내에서 선언되어야 합니다. 
 이들은 최상위(top-level)에 있거나 다른 이름이 있는 클래스, 인터페이스, 객체 내부에 중첩될 수 있습니다. 
-하위 클래스는 Kotlin의 일반적인 상속 규칙을 준수하는 한 어떠한 [가시성](visibility-modifiers.md)도 가질 수 있습니다.
+하위 클래스는 Kotlin의 일반적인 상속 규칙을 준수하는 한 어떠한 [가시성](visibility-modifiers.md)도 가질 수 있으며, [프로퍼티 오버라이딩](inheritance.md#overriding-properties)에 대한 규칙도 포함됩니다.
 
 봉인된 클래스의 하위 클래스는 적절한 정규화된 이름(qualified name)을 가져야 합니다. 로컬 객체나 익명 객체는 하위 클래스가 될 수 없습니다.
 
@@ -349,3 +349,8 @@ fun main() {
     val userNotFoundResponse = getUserById("invalidId")
     println(userNotFoundResponse)
 }
+```
+
+## 다음 단계
+
+[Kotlin의 상속](inheritance.md)에 대해 더 자세히 알아보세요.

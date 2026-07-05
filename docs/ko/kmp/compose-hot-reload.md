@@ -146,6 +146,57 @@ Compose Multiplatform 버전을 1.10.0 이상으로 업그레이드하여 별도
 
 축하합니다! Compose Hot Reload가 실제로 작동하는 것을 확인했습니다. 이제 매번 데스크톱 실행 구성을 다시 시작할 필요 없이 텍스트, 이미지, 서식, UI 구조 등을 변경하며 자유롭게 실험해 볼 수 있습니다.
 
+## AI 에이전트를 위한 MCP 서버
+<primary-label ref="Experimental"/>
+
+[//]: # (TODO update version for stable release)
+
+Compose Multiplatform 1.2.0-beta01부터 Compose Hot Reload는 내장된 [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) 서버를 포함합니다. 
+MCP 서버를 통해 AI 코딩 에이전트는 실행 중인 Compose 애플리케이션과 상호작용할 수 있습니다. 예를 들어, Compose Hot Reload를 트리거하고, 렌더링된 UI를 확인하며, 시맨틱(semantic) 구조를 조사하고, 사용자 입력을 시뮬레이션하며, 런타임 로그를 읽을 수 있습니다.
+창이 여러 개인 애플리케이션의 경우, 에이전트는 창 목록을 나열하고 그중 하나를 타겟으로 지정할 수 있습니다.
+
+이 기능은 Compose 코드를 편집할 때 AI 에이전트의 피드백 루프를 완성합니다. 
+에이전트가 매번 편집 후 결과를 수동으로 확인해 주기를 기다리는 대신, 코드를 자율적으로 반복 수정하고 각 변경 사항을 직접 검증할 수 있습니다.
+
+### AI 에이전트 연결하기
+
+AI 에이전트가 Compose 애플리케이션과 상호작용하도록 설정하는 방법은 다음과 같습니다:
+
+1. Gradle 태스크를 사용하여 애플리케이션과 함께 MCP 서버를 시작합니다:
+    ```shell
+    ./gradlew :composeApp:hotMcpServerJvm
+    ```
+   태스크 이름은 표준 명명 규칙인 `hotMcpServer<TargetName>`을 따릅니다.
+   예를 들어, `desktop`이라는 이름의 커스텀 JVM 타겟은 `:composeApp:hotMcpServerDesktop` 태스크를 사용합니다.
+2. AI 에이전트의 MCP 클라이언트 설정에서 해당 Gradle 태스크를 가리키도록 합니다. 예를 들어, `.mcp.json` 파일의 설정은 다음과 같습니다:
+    ```json
+    {
+      "mcpServers": {
+        "compose-hot-reload": {
+          "command": "./gradlew",
+          "args": [
+            "--no-daemon",
+            "--quiet",
+            "--console=plain",
+            "hotMcpServer"
+          ]
+        }
+      }
+    }
+    ```
+
+### 사용 가능한 MCP 도구
+
+MCP 서버는 에이전트가 호출할 수 있는 다음과 같은 다양한 도구를 제공합니다:
+
+* `reload` — 프로젝트를 다시 컴파일하고 변경된 클래스를 핫 리로드합니다.
+* `take_screenshot` — 애플리케이션 창의 현재 상태를 캡처합니다.
+* `get_semantic_tree` — Compose [시맨틱 트리(semantic tree)](compose-accessibility.md#semantic-properties)를 반환하여 에이전트가 UI 구조를 이해할 수 있게 합니다.
+* `get_logs` — 런타임 예외를 포함하여 실행 중인 애플리케이션의 최근 로그 출력을 반환합니다.
+* `click`, `type_text`, `scroll` — 대화형 흐름을 테스트하기 위해 사용자 입력을 시뮬레이션합니다.
+
+전체 MCP 도구 목록과 해당 파라미터에 대한 자세한 내용은 [Compose Hot Reload README](https://github.com/JetBrains/compose-hot-reload#mcp-server-for-ai-agents)를 참조하세요.
+
 ## 도움 받기
 
 Compose Hot Reload 사용 중 문제 발생 시, [GitHub 이슈 생성](https://github.com/JetBrains/compose-hot-reload/issues)을 통해 알려주세요.

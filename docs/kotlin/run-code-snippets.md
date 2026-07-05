@@ -3,7 +3,6 @@
 Kotlin 代码通常被组织成项目，您可以使用 IDE、文本编辑器或其他工具来处理。然而，如果您想快速查看某个函数的工作原理或查找某个表达式的值，则无需创建新项目并进行构建。看看这三种在不同环境中立即运行 Kotlin 代码的便捷方法：
 
 *   IDE 中的 [临时文件](#ide-scratches-and-worksheets)。
-*   IDE 中的 [Kotlin Notebook](#ide-kotlin-notebook)。
 *   浏览器中的 [Kotlin Playground](#browser-kotlin-playground)。
 *   命令行中的 [ki shell](#command-line-ki-shell)。
 
@@ -15,7 +14,7 @@ _临时文件_（或简称 _scratches_）允许您在与项目相同的 IDE 窗�
 
 要创建 Kotlin 临时文件，请点击 **File** | **New** | **Scratch File** 并选择 **Kotlin** 类型。
 
-临时文件中支持语法高亮显示、自动补全以及其他 IntelliJ IDEA 代码编辑功能。无需声明 `main()` 函数 —— 您编写的所有代码都将像在 `main()` 函数体中一样执行。
+临时文件中支持语法高亮显示、代码补全以及其他 IntelliJ IDEA 代码编辑功能。无需声明 `main()` 函数 —— 您编写的所有代码都将像在 `main()` 函数体中一样执行。
 
 在临时文件中完成代码编写后，点击 **Run**。执行结果将出现在代码对应的行中。
 
@@ -36,22 +35,6 @@ IDE 可以自动运行临时文件中的代码。为了在停止输入后立即�
 临时文件使用连接模块的已编译版本。因此，如果您修改了模块的源文件，更改将在您重新构建模块时传播到临时文件。要在每次运行临时文件前自动重新构建模块，请选择 **Make module before Run**。
 
 ![临时文件选择模块](scratch-select-module.png){width=700}
-
-## IDE：Kotlin Notebook
-
-[Kotlin Notebook](kotlin-notebook-overview.md) 是一个交互式编辑器，允许您在一个文档中混合代码、输出、可视化效果和 Markdown。您可以使用 Notebook 在称为 _代码单元_ 的部分中编写和运行代码，并立即查看结果。
-
-![Kotlin Notebook](data-analysis-notebook.gif){width=700}
-
-Kotlin Notebook 在 IntelliJ IDEA 中默认内置并启用。
-
-要开始使用 Kotlin Notebook，请参阅 [Kotlin Notebook 入门](get-started-with-kotlin-notebooks.md)。
-
-### 临时 Kotlin Notebook
-
-您还可以将 Kotlin Notebook 创建为 [临时文件](https://www.jetbrains.com/help/idea/scratches.html)，这允许您在不创建新项目或修改现有项目的情况下测试小段代码。临时 Notebook 可以从任何项目中访问。
-
-[了解如何创建临时 Kotlin Notebook](kotlin-notebook-create.md#create-a-scratch-kotlin-notebook)。
 
 ## 浏览器：Kotlin Playground
 
@@ -146,6 +129,6 @@ shell 运行后，您可以立即开始在终端中编写 Kotlin 代码。输入
 
 除了标准库之外，ki shell 还支持外部依赖项。这让您无需创建整个项目即可在其中尝试第三方库。
 
-要在 ki shell 中添加第三方库，请使用 `:dependsOn` 命令。默认情况下，ki shell 使用 Maven Central，但如果您使用 `:repository` 命令连接其他仓库，也可以使用它们：
+要在 ki shell 中添加第三方库，请使用 `:dependsOn` 命令。默认情况下，ki shell 与 Maven Central 配合使用，但如果您使用 `:repository` 命令连接其他仓库，也可以使用它们：
 
 ![ki shell 外部依赖项](ki-shell-dependency.png){width=700}

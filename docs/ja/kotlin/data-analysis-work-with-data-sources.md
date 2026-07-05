@@ -1,35 +1,38 @@
 [//]: # (title: ファイルからデータを取得する)
 [//]: # (description: Kotlin DataFrame を使用して、CSV、JSON、SQL、Excel、Apache Arrow ファイルなどのファイルからデータを読み込む方法を学びます。)
 
-[Kotlin Notebook](kotlin-notebook-overview.md) は、[Kotlin DataFrame ライブラリ](https://kotlin.github.io/dataframe/home.html)と組み合わせることで、非構造化データと構造化データの両方を扱うことができます。この組み合わせにより、TXT ファイルに含まれるデータなどの非構造化データを、構造化されたデータセットに変換する柔軟性が得られます。
-
-データの変換には、[`.add()`](https://kotlin.github.io/dataframe/adddf.html)、[`.split()`](https://kotlin.github.io/dataframe/split.html)、[`.convert()`](https://kotlin.github.io/dataframe/convert.html)、[`.parse()`](https://kotlin.github.io/dataframe/parse.html) などのメソッドを使用できます。さらに、このツールセットを使用すると、CSV、JSON、XLS、Parquet、Apache Arrow など、さまざまな構造化ファイル形式からデータを取得し、操作することができます。
+[Kotlin DataFrame ライブラリ](https://kotlin.github.io/dataframe/home.html)を使用すると、非構造化データと構造化データの両方を扱うことができます。
+データの変換には、[`.add()`](https://kotlin.github.io/dataframe/adddf.html)、[`.split()`](https://kotlin.github.io/dataframe/split.html)、[`.convert()`](https://kotlin.github.io/dataframe/convert.html)、[`.parse()`](https://kotlin.github.io/dataframe/parse.html) などのメソッドを使用できます。
+さらに、このツールセットを使用すると、CSV、JSON、XLS、Parquet、Apache Arrow など、さまざまな構造化ファイル形式からデータを取得し、操作することができます。
 サポートされているすべての形式については、[DataFrame のドキュメント](https://kotlin.github.io/dataframe/data-sources.html)を参照してください。
 
 このガイドでは、複数の例を通して、データの取得、精製、および処理の方法を学ぶことができます。
 
 ## 始める前に
 
-Kotlin Notebook は、IntelliJ IDEA にデフォルトでバンドルされ、有効になっている [Kotlin Notebook プラグイン](https://plugins.jetbrains.com/plugin/16340-kotlin-notebook)に依存しています。
-
-Kotlin Notebook の機能が利用できない場合は、プラグインが有効になっていることを確認してください。詳細については、「[環境の設定](kotlin-notebook-set-up-env.md)」を参照してください。
+> IntelliJ IDEA 2026.2 以降、Kotlin Notebook は IDE にバンドルされなくなり、JetBrains による公式サポートも終了します。
+> ソースコードは引き続き [GitHub](https://github.com/Kotlin/kotlin-notebook) で公開されます。
+>
+> 詳細は[ブログ記事](https://blog.jetbrains.com/idea/2026/06/kotlin-notebook-sunset/)をご覧ください。
+>
+{style="note"}
 
 このチュートリアルに従うには：
 
-1. [新しい Kotlin Notebook](kotlin-notebook-create.md) を作成します。
+1. **File** | **New** | **Kotlin Notebook** を選択します。
 2. Kotlin DataFrame をインポートします：
 
    ```kotlin
    %use dataframe
    ```
 
-> DataFrame ライブラリとその API をノートブックで確実に利用できるようにするために、他のコードセルを実行する前に `%use dataframe` の行を含むコードセルを実行してください。
-> 
-{style="note"}
+   DataFrame ライブラリとその API をノートブックで確実に利用できるようにするために、他のコードセルを実行する前に `%use dataframe` の行を含むコードセルを実行してください。
+
+このチュートリアルに従うために、DataFrame を [Gradle](https://kotlin.github.io/dataframe/setupgradle.html) または [Maven](https://kotlin.github.io/dataframe/setupmaven.html) の依存関係として使用することもできます。
 
 ## データの取得
 
-Kotlin Notebook でファイルからデータを取得するには、`DataFrame.read()` 関数を使用します。
+ファイルからデータを取得するには、`DataFrame.read()` 関数を使用します。
 
 ```kotlin
 val movies = DataFrame.read("movies.csv")
@@ -49,7 +52,7 @@ val movies = DataFrame.read("movies.csv", delimiter = ';')
 
 ## データの表示
 
-データをノートブックに読み込んだら、それを表示できます。最も簡単な方法は、データを変数に保存してから、その変数を返すことです：
+データを取得したら、それを表示できます。最も簡単な方法は、データを変数に保存してから、その変数を返すことです：
 
 ```kotlin
 val jsonDf = DataFrame.read("jsonFile.json")
@@ -81,7 +84,7 @@ Kotlin DataFrame は、データセットを精製するためのさまざまな
 例として、`movies.csv` データセットを見てみましょう。このデータセットでは、映画のタイトルと同じセルに公開年が保存されています。目標は、分析しやすくするためにこのデータセットを精製することです：
 
 1. **データの読み込み**
-   
+
    `.read()` 関数を使用して、ファイルを `DataFrame` に読み込みます：
 
    ```kotlin
@@ -132,7 +135,7 @@ Kotlin DataFrame は、データセットを精製するためのさまざまな
    
    newMovies
    ```
-   
+
 5. **列の削除**
 
    不要な列を削除するには、`.remove()` 関数を使用します：
@@ -159,7 +162,7 @@ Kotlin DataFrame は、データセットを精製するためのさまざまな
 
 ## データの書き出し
 
-Kotlin Notebook でデータを精製した後、処理済みのデータを簡単にエクスポートできます。
+データを精製した後、簡単にエクスポートできます。
 
 この目的のために、さまざまな [`.write()`](https://kotlin.github.io/dataframe/write.html) 関数を利用できます。CSV、JSON、XLS、XLSX、Apache Arrow、さらには HTML テーブルなど、複数の形式での保存をサポートしています。
 サポートされているすべての形式については、[DataFrame のドキュメント](https://kotlin.github.io/dataframe/data-sources.html)を参照してください。
@@ -168,7 +171,7 @@ Kotlin Notebook でデータを精製した後、処理済みのデータを簡�
 例えば、結果を次のように保存してみましょう：
 
 * [`.writeJson()`](https://kotlin.github.io/dataframe/write.html#writing-to-json) 関数を使用した JSON ファイル：
- 
+
   ```kotlin
   refinedMovies.writeJson("movies.json")
   ```
@@ -177,6 +180,7 @@ Kotlin Notebook でデータを精製した後、処理済みのデータを簡�
   ```kotlin
   refinedMovies.writeCsv("movies.csv")
   ```
+
 * `.writeArrowIPC()` および `.writeArrowFeather()` 関数を使用した [Apache Arrow ファイル](https://kotlin.github.io/dataframe/write.html#writing-to-apache-arrow-formats)：
 
   ```kotlin
@@ -195,5 +199,5 @@ refinedMoviesDf
 ## 次のステップ
 
 * [Kandy ライブラリ](https://kotlin.github.io/kandy/examples.html)を使用したデータの可視化を探索する
-* [Kandy を使用した Kotlin Notebook でのデータの可視化](data-analysis-visualization.md)でデータの可視化に関する追加情報を見つける
+* [Kandy を使用したデータの可視化](data-analysis-visualization.md)でデータの可視化に関する追加情報を見つける
 * Kotlin でのデータサイエンスと分析に利用可能なツールとリソースの広範な概要については、[データ分析用の Kotlin および Java ライブラリ](data-analysis-libraries.md)を参照してください。

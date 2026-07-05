@@ -1,10 +1,16 @@
 [//]: # (title: Kotlin Notebook)
-[//]: # (description: 在 IntelliJ IDEA 中创建和编辑交互式 Kotlin 笔记本，以运行代码、可视化数据、原型设计构思并分享结果。)
+[//]: # (description: 在 IntelliJ IDEA 中创建和编辑交互式 Kotlin 笔记本，以运行代码、可视化数据、原型设计构思并共享结果。)
+
+> 从 IntelliJ IDEA 2026.2 开始，Kotlin Notebook 将不再与 IDE 捆绑，也不再由 JetBrains 官方支持。
+> 源代码仍可在 [GitHub](https://github.com/Kotlin/kotlin-notebook) 上获取。
+>
+> 欲了解更多信息，请参阅[博客文章](https://blog.jetbrains.com/idea/2026/06/kotlin-notebook-sunset/)。
+>
+{style="note"}
 
 Kotlin Notebook 提供了一个交互式环境来创建和编辑笔记本，充分利用了 Kotlin 的全部潜力。
-Kotlin Notebook 依赖于 [Kotlin Notebook 插件](https://plugins.jetbrains.com/plugin/16340-kotlin-notebook)，该插件已捆绑并[在 IntelliJ IDEA 中默认启用](kotlin-notebook-set-up-env.md)。
 
-笔记本是一个交互式文档，您可以在其中混合可执行 Kotlin 代码与文本、结果和可视化内容。
+笔记本是一个交互式文档，您可以在其中将可执行 Kotlin 代码与文本、结果和可视化内容混合在一起。
 您可以将其视为扩展了以下功能的 Kotlin REPL：能够将代码组织到单元格中、使用 Markdown 编写文档，并紧挨着生成代码立即显示输出（从文本到图表）。
 
 准备好享受无缝编码体验吧，您可以在 IntelliJ IDEA 生态系统中开发和试验 Kotlin 代码、接收即时输出，并将代码、视觉效果和文本集成在一起。
@@ -21,14 +27,10 @@ Kotlin Notebook 插件附带了[各种功能](https://www.jetbrains.com/help/ide
 * 通过单行代码导入各种库，甚至可以向项目中添加新库
 * 通过错误消息和回溯获取调试洞察
 
-Kotlin Notebook 基于我们的 [Jupyter Notebook 的 Kotlin 内核](https://github.com/Kotlin/kotlin-jupyter?tab=readme-ov-file#kotlin-kernel-for-ipythonjupyter)，使其易于与其他 [Kotlin 笔记本解决方案](data-analysis-overview.md#notebooks)集成。
+Kotlin Notebook 基于我们的 [Jupyter Notebook 的 Kotlin 内核](https://github.com/Kotlin/kotlin-jupyter?tab=readme-ov-file#kotlin-kernel-for-ipythonjupyter)，使其易于与其他 Kotlin 笔记本解决方案集成。
 无需担心兼容性问题，您可以毫不费力地在 Kotlin Notebook、[Datalore](https://datalore.jetbrains.com/) 和 [Kotlin-Jupyter Notebook](https://github.com/Kotlin/kotlin-jupyter) 之间共享您的工作。
 
-凭借这些功能，您可以开展广泛的任务，从简单的代码试验到全面的数据项目。 
-
-深入探索以发现您可以使用 Kotlin Notebook 实现的目标！
-
-<a href="get-started-with-kotlin-notebooks.md"><img src="notebook-get-started-button.svg" width="600" alt="Get started with Kotlin Notebook" style="block"/></a>
+凭借这些功能，您可以开展广泛的任务，从简单的代码试验到全面的数据项目。
 
 ## 数据分析与可视化
 

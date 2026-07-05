@@ -42,14 +42,14 @@ fun main() {
 
 总的来说，Kotlin 具有以下基本类型：
 
-| **类别**           | **基本类型**                       | **示例代码**                                              |
-|-------------------|------------------------------------|---------------------------------------------------------------|
-| 整数               | `Byte`, `Short`, `Int`, `Long`     | `val year: Int = 2020`                                        |
-| 无符号整数         | `UByte`, `UShort`, `UInt`, `ULong` | `val score: UInt = 100u`                                      |
-| 浮点数             | `Float`, `Double`                  | `val currentTemp: Float = 24.5f`, `val price: Double = 19.99` |
-| 布尔值             | `Boolean`                          | `val isEnabled: Boolean = true`                               |
-| 字符               | `Char`                             | `val separator: Char = ','`                                   |
-| 字符串             | `String`                           | `val message: String = "Hello, world!"`                       |
+| **类别**                                              | **基本类型**                       | **示例代码**                                                  |
+|-----------------------------------------------------------|------------------------------------|-------------------------------------------------------------------|
+| [整数](numbers.md#integer-types)                      | `Byte`, `Short`, `Int`, `Long`     | `val year: Int = 2020`<br/> `val amount: Long = 350_000_000`      |
+| [无符号整数](unsigned-integer-types.md)            | `UByte`, `UShort`, `UInt`, `ULong` | `val score: UInt = 100u`                                          |
+| [浮点数](numbers.md#floating-point-types) | `Float`, `Double`                  | `val currentTemp: Float = 24.5f`<br/> `val price: Double = 19.99` |
+| [布尔值](booleans.md)                                   | `Boolean`                          | `val isEnabled: Boolean = true`                                   |
+| [字符](characters.md)                               | `Char`                             | `val separator: Char = ','`                                       |
+| [字符串](strings.md)                                     | `String`                           | `val message: String = "Hello, world!"`                           |
 
 有关基本类型及其属性的更多信息，请参阅[类型概览](types-overview.md)。
 

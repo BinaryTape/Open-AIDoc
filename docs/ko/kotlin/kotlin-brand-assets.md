@@ -10,7 +10,7 @@
 로고와 마크에는 보호 영역(protective field)이 있습니다. 다른 디자인 요소가 이 영역을 침범하지 않도록 로고를 배치해 주세요.
 보호 영역의 최소 크기는 마크 높이의 절반입니다.
 
-![Kotlin 로고 비율](kotlin-logo-guidelines.png){width=700}
+![Kotlin logo proportions](kotlin-logo-guidelines.png){width=700}
 
 로고 사용과 관련하여 다음 제한 사항에 특히 주의해 주세요:
 
@@ -31,7 +31,6 @@ Kotlin 브랜드 패키지에는 여러 공식 Kotlin 생태계 프로젝트, �
 패키지에는 다음 프로젝트의 로고가 포함되어 있습니다:
 
 * [Kotlin Foundation](https://kotlinfoundation.org)
-* [Kotlin Notebook](kotlin-notebook-overview.md)
 * [Kotlin Multiplatform (KMP)](https://kotlinlang.org/multiplatform/)
 * [Talking Kotlin](https://www.youtube.com/playlist?list=PLlFc5cFwUnmz1TwkP9SKCHU978dqLTANB)
 * [Compose Multiplatform (CMP)](https://kotlinlang.org/compose-multiplatform/)
@@ -48,14 +47,14 @@ Kotlin 브랜드 패키지에는 여러 공식 Kotlin 생태계 프로젝트, �
 Kotlin의 마스코트이자 창의성을 북돋아 주고 영감을 주는 친근한 동반자인 Kodee를 만나보세요.
 사용 시 [간단한 가이드라인](https://resources.jetbrains.com/storage/products/kotlin/docs/Kotlin_Mascot_Guidelines.pdf)을 준수해 주시기 바랍니다.
 
-![Kotlin 마스코트 Kodee 비율](mascot-body-proportions.png){width=700}
+![Kotlin mascot Kodee proportions](mascot-body-proportions.png){width=700}
 
 디지털 및 인쇄물에 Kodee를 사용할 수 있습니다. 이를 위해 다운로드하여 살펴볼 수 있는 다양한 
 Kotlin 마스코트 자산을 준비했습니다.
 
 [모든 자산 다운로드](https://resources.jetbrains.com/storage/products/kotlin/docs/kotlin_mascot_2.zip){:.typo-float-right.kto-button.kto-button_size_m.kto-button_mode_outline}
 
-![활동 중인 Kotlin 마스코트 Kodee](mascot-in-action.png){width=700}
+![Kotlin mascot Kodee in action](mascot-in-action.png){width=700}
 
 ## Kotlin 사용자 그룹 브랜드 자산
 
@@ -76,7 +75,7 @@ Kotlin 사용자 그룹이 쉽게 인식되고 Kotlin과의 연관성을 전달�
 
 새로운 Kotlin 사용자 그룹에 사용자 그룹 로고와 프로필 사진을 제공합니다.
 
-![브랜딩 이미지](kotlin-user-group-logo.png){width=700}
+![Branding image](kotlin-user-group-logo.png){width=700}
 
 이러한 지원을 하는 두 가지 주요 이유는 다음과 같습니다:
 
@@ -92,7 +91,7 @@ Kotlin 사용자 그룹이 쉽게 인식되고 Kotlin과의 연관성을 전달�
 2. **Your City** 텍스트를 사용자 그룹의 이름으로 바꿉니다.
 3. 사진을 다운로드하여 사용자 그룹 자료에 사용합니다.
 
-![벨라루스 Kotlin 사용자 그룹 샘플](kotlin-user-group-avatar.png){width=300}
+![Belarusian Kotlin User Group sample](kotlin-user-group-avatar.png){width=300}
 
 *벨라루스 Kotlin 사용자 그룹 프로필 사진 샘플*
 
@@ -115,7 +114,7 @@ meetup.com용 그룹 로고가 포함된 커버 사진을 만들려면:
    'Replace Image'(이미지 교체)를 선택한 다음 'Upload from Computer'(컴퓨터에서 업로드) 또는 다른 소스를 선택합니다.
 3. 사진을 다운로드하여 [meetup.com](https://meetup.com)의 프로필에 사용합니다.
 
-![사용자 그룹 예시](kotlin-user-group.png){width=700}
+![User Group examples](kotlin-user-group.png){width=700}
 
 ## Kotlin Night 브랜드 자산
 
@@ -130,16 +129,16 @@ Kotlin Night을 즐겁게 만들기 위해 무엇이 준비되어 있는지 확�
 스티커는 Kotlin Night에 필요한 모든 미디어를 브랜딩하는 데 사용할 수 있습니다. 손에 닿는 곳 어디든 붙여보세요. 
 재미있을 거예요!
 
-![커버/로고](kotlin-night-cover.svg){width=700}
+![Cover/Logo](kotlin-night-cover.svg){width=700}
 
-![소셜 커버](kotlin-night-fb.svg){width=700}
+![Cover Social](kotlin-night-fb.svg){width=700}
 
 ### 브랜딩 스티커
 
 스티커는 Kotlin Night용 자산을 브랜딩하는 데 사용할 수 있습니다. 손에 닿는 곳 어디든 붙여보세요. 
 정말 재미있습니다!
 
-![스티커](kotlin-night-stickers.svg){width=700}
+![Stickers](kotlin-night-stickers.svg){width=700}
 
 <!-- ![Stickers usage](kotlin-night-stickers-usage.svg){width=700} -->
 
@@ -147,7 +146,7 @@ Kotlin Night을 즐겁게 만들기 위해 무엇이 준비되어 있는지 확�
 
 잊지 못할 이벤트 사진을 위해 프레스 월을 스티커로 장식할 수 있습니다.
 
-![프레스 월](kotlin-night-press-wall.svg){width=700}
+![Press Wall](kotlin-night-press-wall.svg){width=700}
 
 ### 스티커 이름표(Sticky badges)
 
@@ -157,11 +156,11 @@ Kotlin Night을 즐겁게 만들기 위해 무엇이 준비되어 있는지 확�
 
 또는 게스트가 소감, 피드백, 바람 등을 담은 스티커를 붙일 수 있는 게시판을 마련할 수도 있습니다.
 
-![게시판 팩](kotlin-night-board.svg){width=700}
+![board pack](kotlin-night-board.svg){width=700}
 
 ### 티셔츠
 
 이벤트 게스트는 모임에 대한 소감을 담은 스티커를 게시판에 붙일 수 있습니다. 
 이것이 여러분에게 어떤 의미가 있을까요?
 
-![스티커 팩](kotlin-night-t-shirt.svg){width=700}
+![Sticker pack](kotlin-night-t-shirt.svg){width=700}

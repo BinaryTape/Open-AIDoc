@@ -4,6 +4,10 @@
     "link": "get-started"
   },
   {
+    "text": "kmp.quickstart",
+    "link": "quickstart"
+  },
+  {
     "text": "kmp.kotlin-multiplatform-overview",
     "items": [
       {
@@ -37,10 +41,6 @@
     "collapsed": true
   },
   {
-    "text": "kmp.quickstart",
-    "link": "quickstart"
-  },
-  {
     "text": "kmp.compose-multiplatform-ui-framework",
     "items": [
       {
@@ -55,12 +55,16 @@
             "link": "whats-new-compose-111"
           },
           {
-            "text": "kmp.whats-new-compose-110",
-            "link": "whats-new-compose-110"
+            "text": "kmp.whats-new-compose-112",
+            "link": "whats-new-compose-112"
           },
           {
             "text": "kmp.earlier-versions",
             "items": [
+              {
+                "text": "kmp.whats-new-compose-110",
+                "link": "whats-new-compose-110"
+              },
               {
                 "text": "kmp.whats-new-compose-190",
                 "link": "whats-new-compose-190"

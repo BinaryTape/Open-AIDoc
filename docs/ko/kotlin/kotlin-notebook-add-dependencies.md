@@ -1,5 +1,12 @@
 [//]: # (title: Kotlin Notebook에 종속성 추가하기)
 
+> IntelliJ IDEA 2026.2부터 Kotlin Notebook은 더 이상 IDE에 번들로 제공되지 않으며 JetBrains에서 공식적으로 지원하지 않습니다.
+> 소스 코드는 [GitHub](https://github.com/Kotlin/kotlin-notebook)에서 계속 확인할 수 있습니다.
+>
+> 자세한 내용은 [블로그 포스트](https://blog.jetbrains.com/idea/2026/06/kotlin-notebook-sunset/)를 확인하세요.
+>
+{style="note"}
+
 <tldr>
    <p>이것은 <strong>Kotlin Notebook 시작하기</strong> 튜토리얼의 세 번째 파트입니다. 계속 진행하기 전에 이전 단계를 완료했는지 확인하세요.</p>
    <p><img src="icon-1-done.svg" width="20" alt="First step"/> <a href="kotlin-notebook-set-up-env.md">환경 설정</a><br/>
@@ -63,11 +70,11 @@ Kotlin Notebook에 두 개의 인기 있는 Kotlin 라이브러리 종속성을 
 
 3. 코드 셀을 실행합니다.
 
-    `%use` 문이 실행되면 라이브러리 종속성을 다운로드하고 노트북에 기본 임포트(import)를 추가합니다.
+   `%use` 문이 실행되면 라이브러리 종속성을 다운로드하고 노트북에 기본 임포트(import)를 추가합니다.
 
-    > 라이브러리에 의존하는 다른 코드 셀을 실행하기 전에 `%use libraryName` 줄이 포함된 코드 셀을 먼저 실행해야 합니다.
-    >
-    {style="note"}
+   > 라이브러리에 의존하는 다른 코드 셀을 실행하기 전에 `%use libraryName` 줄이 포함된 코드 셀을 먼저 실행해야 합니다.
+   >
+   {style="note"}
 
 4. Kotlin DataFrame 라이브러리를 사용하여 CSV 파일에서 데이터를 가져오려면 새 코드 셀에서 `.read()` 함수를 사용합니다:
 
@@ -79,11 +86,11 @@ Kotlin Notebook에 두 개의 인기 있는 Kotlin 라이브러리 종속성을 
     rawDf
     ```
 
-    > 이 예제 CSV는 [Kotlin DataFrame 예제 GitHub 저장소](https://github.com/Kotlin/dataframe/blob/master/examples/notebooks/netflix/netflix_titles.csv)에서 다운로드할 수 있습니다. 프로젝트 디렉터리에 추가하세요.
-    > 
-    {style="tip"}
+   > 이 예제 CSV는 [Kotlin DataFrame 예제 GitHub 저장소](https://github.com/Kotlin/dataframe/blob/master/examples/notebooks/netflix/netflix_titles.csv)에서 다운로드할 수 있습니다. 프로젝트 디렉터리에 추가하세요.
+   >
+   {style="tip"}
 
-    ![DataFrame을 사용하여 데이터 표시하기](add-dataframe-dependency.png){width=700}
+   ![DataFrame을 사용하여 데이터 표시하기](add-dataframe-dependency.png){width=700}
 
 5. 새 코드 셀에서 `.plot` 메서드를 사용하여 DataFrame에 있는 TV 프로그램(TV Shows)과 영화(Movies)의 분포를 시각적으로 표현해 보겠습니다:
 

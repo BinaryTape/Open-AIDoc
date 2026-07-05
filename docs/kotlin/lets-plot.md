@@ -2,33 +2,38 @@
 
 [Lets-Plot for Kotlin (LPK)](https://lets-plot.org/kotlin/get-started.html) 是一个多平台绘图库，它将 [R 的 ggplot2 库](https://ggplot2.tidyverse.org/)移植到了 Kotlin。LPK 为 Kotlin 生态系统带来了功能丰富的 ggplot2 API，使其适用于需要复杂数据可视化能力的科学家和统计学家。
 
-LPK 针对各种平台，包括 [Kotlin Notebook](data-analysis-overview.md#notebooks)、[Kotlin/JS](js-overview.md)、[JVM 的 Swing](https://docs.oracle.com/javase/8/docs/technotes/guides/swing/)、[JavaFX](https://openjfx.io/) 以及 [Compose Multiplatform](https://www.jetbrains.com/lp/compose-multiplatform/)。此外，LPK 与 [IntelliJ](https://www.jetbrains.com/idea/)、[DataGrip](https://www.jetbrains.com/datagrip/)、[DataSpell](https://www.jetbrains.com/dataspell/) 和 [PyCharm](https://www.jetbrains.com/pycharm/) 无缝集成。
+LPK 针对各种平台，包括 [Kotlin/JS](js-overview.md)、[JVM 的 Swing](https://docs.oracle.com/javase/8/docs/technotes/guides/swing/)、[JavaFX](https://openjfx.io/) 以及 [Compose Multiplatform](https://www.jetbrains.com/lp/compose-multiplatform/)。此外，LPK 与 [IntelliJ](https://www.jetbrains.com/idea/)、[DataGrip](https://www.jetbrains.com/datagrip/)、[DataSpell](https://www.jetbrains.com/dataspell/) 和 [PyCharm](https://www.jetbrains.com/pycharm/) 无缝集成。
 
 ![Lets-Plot](lets-plot-overview.png){width=700}
 
-本教程演示了如何在 IntelliJ IDEA 中使用 Kotlin Notebook 结合 LPK 和 [Kotlin DataFrame](https://kotlin.github.io/dataframe/home.html) 库创建不同的图表类型。
+本教程演示了如何在 IntelliJ IDEA 中使用 LPK 和 [Kotlin DataFrame](https://kotlin.github.io/dataframe/home.html) 库创建不同的图表类型。
 
 ## 开始之前
 
-Kotlin Notebook 依赖于 [Kotlin Notebook 插件](https://plugins.jetbrains.com/plugin/16340-kotlin-notebook)，该插件在 IntelliJ IDEA 中默认内置并启用。
-
-如果 Kotlin Notebook 功能不可用，请确保已启用该插件。要了解更多信息，请参阅[搭建环境](kotlin-notebook-set-up-env.md)。
+> 从 IntelliJ IDEA 2026.2 开始，Kotlin Notebook 将不再随 IDE 内置，也不再由 JetBrains 提供官方支持。
+> 源代码将继续在 [GitHub](https://github.com/Kotlin/kotlin-notebook) 上提供。
+>
+> 欲了解更多信息，请参阅[博客文章](https://blog.jetbrains.com/idea/2026/06/kotlin-notebook-sunset/)。
+>
+{style="note"}
 
 创建一个新的 Kotlin Notebook 以使用 Lets-Plot：
 
 1. 选择 **File** | **New** | **Kotlin Notebook**。
-2. 在您的 notebook 中，运行以下命令以导入 LPK 和 Kotlin DataFrame 库：
+2. 在您的 notebook 中，通过运行以下命令来导入 LPK 和 Kotlin DataFrame 库：
 
     ```kotlin
     %use lets-plot
     %use dataframe
     ```
 
+要按照本教程进行操作，您还可以将 DataFrame 作为 [Gradle](https://kotlin.github.io/dataframe/setupgradle.html) 或 [Maven](https://kotlin.github.io/dataframe/setupmaven.html) 依赖项使用。
+
 ## 准备数据
 
 让我们创建一个 DataFrame，用于存储柏林 (Berlin)、马德里 (Madrid) 和加拉加斯 (Caracas) 这三个城市的月平均气温模拟数据。
 
-使用 Kotlin DataFrame 库中的 [`dataFrameOf()`](https://kotlin.github.io/dataframe/createdataframe.html#dataframeof) 函数生成 DataFrame。在您的 Kotlin Notebook 中粘贴并运行以下代码片段：
+使用 Kotlin DataFrame 库中的 [`dataFrameOf()`](https://kotlin.github.io/dataframe/createdataframe.html#dataframeof) 函数生成 DataFrame。粘贴并运行以下代码片段：
 
 ```kotlin
 // months 变量存储了包含一年 12 个月的列表
@@ -60,7 +65,7 @@ df.head(4)
 
 ![Dataframe 探索](visualization-dataframe-temperature.png){width=600}
 
-要使用 LPK 库创建图表，您需要将数据 (`df`) 转换为存储键值对数据的 `Map` 类型。您可以使用 [`.toMap()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/to-map.html) 函数轻松地将 DataFrame 转换为 `Map`：
+要使用 LPK 库创建图表，您需要将数据 (`df`) 转换为以键值对形式存储数据的 `Map` 类型。您可以使用 [`.toMap()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/to-map.html) 函数轻松地将 DataFrame 转换为 `Map`：
 
 ```kotlin
 val data = df.toMap()
@@ -68,7 +73,7 @@ val data = df.toMap()
 
 ## 创建散点图
 
-让我们在 Kotlin Notebook 中使用 LPK 库创建一个散点图。
+让我们使用 LPK 库创建一个散点图。
 
 一旦您的数据为 `Map` 格式，请使用 LPK 库中的 [`geomPoint()`](https://lets-plot.org/kotlin/api-reference/-lets--plot--kotlin/org.jetbrains.letsPlot.geom/geom-point/index.html) 函数生成散点图。您可以指定 X 轴和 Y 轴的值，并定义类别及其颜色。此外，您还可以根据需要[自定义](https://lets-plot.org/kotlin/aesthetics.html#point-shapes)图表的大小和点形状：
 
@@ -114,10 +119,7 @@ boxPlot
    import org.apache.commons.math3.distribution.MultivariateNormalDistribution
    ```
 
-   > 要了解有关将依赖项导入 Kotlin Notebook 的更多信息，请参阅 [Kotlin Notebook 文档](https://www.jetbrains.com/help/idea/kotlin-notebook.html#add-dependencies)。
-   > {style="tip"}
-
-2. 在您的 Kotlin Notebook 中粘贴并运行以下代码片段，以创建二维数据点集：
+2. 粘贴并运行以下代码片段，以创建二维数据点集：
 
    ```kotlin
    // 为三个分布定义协方差矩阵
@@ -184,4 +186,3 @@ densityPlot
 * 在 [Lets-Plot for Kotlin 文档](https://lets-plot.org/kotlin/charts.html)中探索更多图表示例。
 * 查看 Lets-Plot for Kotlin 的 [API 参考](https://lets-plot.org/kotlin/api-reference/)。
 * 在 [Kotlin DataFrame](https://kotlin.github.io/dataframe/info.html) 和 [Kandy](https://kotlin.github.io/kandy/welcome.html) 库文档中了解如何使用 Kotlin 转换和可视化数据。
-* 查找有关 [Kotlin Notebook 的用法和主要功能](https://www.jetbrains.com/help/idea/kotlin-notebook.html)的更多信息。

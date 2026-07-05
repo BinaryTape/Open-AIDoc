@@ -2,17 +2,20 @@
 
 [Kotlin용 Lets-Plot (LPK)](https://lets-plot.org/kotlin/get-started.html)은 [R의 ggplot2 라이브러리](https://ggplot2.tidyverse.org/)를 Kotlin으로 이식한 멀티플랫폼 플로팅(plotting) 라이브러리입니다. LPK는 기능이 풍부한 ggplot2 API를 Kotlin 생태계로 가져와, 정교한 데이터 시각화 기능이 필요한 과학자와 통계학자에게 적합한 도구를 제공합니다.
 
-LPK는 [Kotlin 노트북](data-analysis-overview.md#notebooks), [Kotlin/JS](js-overview.md), [JVM의 Swing](https://docs.oracle.com/javase/8/docs/technotes/guides/swing/), [JavaFX](https://openjfx.io/), [Compose Multiplatform](https://www.jetbrains.com/lp/compose-multiplatform/) 등 다양한 플랫폼을 지원합니다. 또한, LPK는 [IntelliJ](https://www.jetbrains.com/idea/), [DataGrip](https://www.jetbrains.com/datagrip/), [DataSpell](https://www.jetbrains.com/dataspell/), [PyCharm](https://www.jetbrains.com/pycharm/)과 원활하게 통합됩니다.
+LPK는 [Kotlin/JS](js-overview.md), [JVM의 Swing](https://docs.oracle.com/javase/8/docs/technotes/guides/swing/), [JavaFX](https://openjfx.io/), [Compose Multiplatform](https://www.jetbrains.com/lp/compose-multiplatform/) 등 다양한 플랫폼을 지원합니다. 또한, LPK는 [IntelliJ](https://www.jetbrains.com/idea/), [DataGrip](https://www.jetbrains.com/datagrip/), [DataSpell](https://www.jetbrains.com/dataspell/), [PyCharm](https://www.jetbrains.com/pycharm/)과 원활하게 통합됩니다.
 
 ![Lets-Plot](lets-plot-overview.png){width=700}
 
-이 튜토리얼에서는 IntelliJ IDEA의 Kotlin Notebook에서 LPK와 [Kotlin DataFrame](https://kotlin.github.io/dataframe/home.html) 라이브러리를 사용하여 다양한 유형의 플롯을 생성하는 방법을 보여줍니다.
+이 튜토리얼에서는 IntelliJ IDEA에서 LPK와 [Kotlin DataFrame](https://kotlin.github.io/dataframe/home.html) 라이브러리를 사용하여 다양한 유형의 플롯을 생성하는 방법을 보여줍니다.
 
 ## 시작하기 전에
 
-Kotlin Notebook은 IntelliJ IDEA에 기본적으로 포함되어 활성화되어 있는 [Kotlin Notebook 플러그인](https://plugins.jetbrains.com/plugin/16340-kotlin-notebook)에 의존합니다.
-
-Kotlin Notebook 기능을 사용할 수 없는 경우, 플러그인이 활성화되어 있는지 확인하세요. 자세한 내용은 [환경 설정](kotlin-notebook-set-up-env.md)을 참조하세요.
+> IntelliJ IDEA 2026.2부터 Kotlin Notebook은 더 이상 IDE에 기본 포함되지 않으며 JetBrains에서 공식적으로 지원하지 않습니다.
+> 소스 코드는 [GitHub](https://github.com/Kotlin/kotlin-notebook)에서 계속 확인할 수 있습니다.
+>
+> 자세한 내용은 [블로그 포스트](https://blog.jetbrains.com/idea/2026/06/kotlin-notebook-sunset/)를 참조하세요.
+>
+{style="note"}
 
 Lets-Plot을 사용하기 위해 새 Kotlin Notebook을 생성합니다.
 
@@ -24,11 +27,13 @@ Lets-Plot을 사용하기 위해 새 Kotlin Notebook을 생성합니다.
     %use dataframe
     ```
 
+이 튜토리얼을 따라 하려면 DataFrame을 [Gradle](https://kotlin.github.io/dataframe/setupgradle.html) 또는 [Maven](https://kotlin.github.io/dataframe/setupmaven.html) 의존성으로 사용할 수도 있습니다.
+
 ## 데이터 준비하기
 
 베를린, 마드리드, 카라카스 세 도시의 월평균 기온 시뮬레이션 데이터를 저장하는 데이터프레임(DataFrame)을 만들어 보겠습니다.
 
-Kotlin DataFrame 라이브러리의 [`dataFrameOf()`](https://kotlin.github.io/dataframe/createdataframe.html#dataframeof) 함수를 사용하여 데이터프레임을 생성합니다. 다음 코드 스니펫을 Kotlin Notebook에 붙여넣고 실행하세요.
+Kotlin DataFrame 라이브러리의 [`dataFrameOf()`](https://kotlin.github.io/dataframe/createdataframe.html#dataframeof) 함수를 사용하여 데이터프레임을 생성합니다. 다음 코드 스니펫을 붙여넣고 실행하세요.
 
 ```kotlin
 // months 변수는 1년 12개월의 리스트를 저장합니다.
@@ -68,9 +73,9 @@ val data = df.toMap()
 
 ## 산점도 생성하기
 
-Kotlin Notebook에서 LPK 라이브러리로 산점도(Scatter plot)를 만들어 보겠습니다.
+LPK 라이브러리로 산점도(Scatter plot)를 만들어 보겠습니다.
 
-데이터가 `Map` 형식으로 준비되면 LPK 라이브러리의 [`geomPoint()`](https://lets-plot.org/kotlin/api-reference/-lets--plot--kotlin/org.jetbrains.letsPlot.geom/geom-point/index.html) 함수를 사용하여 산점도를 생성합니다. 
+데이터가 `Map` 형식으로 준비되면 LPK 라이브러리의 [`geomPoint()`](https://lets-plot.org/kotlin/api-reference/-lets--plot--kotlin/org.jetbrains.letsPlot.geom/geom-point/index.html) 함수를 사용하여 산점도를 생성합니다.
 X축과 Y축의 값을 지정하고, 카테고리와 해당 색상을 정의할 수 있습니다. 또한, 필요에 따라 플롯의 크기와 점의 모양을 [사용자 정의(customize)](https://lets-plot.org/kotlin/aesthetics.html#point-shapes)할 수 있습니다.
 
 ```kotlin
@@ -115,10 +120,7 @@ boxPlot
    import org.apache.commons.math3.distribution.MultivariateNormalDistribution
    ```
 
-   > Kotlin Notebook으로 의존성을 가져오는 방법에 대한 자세한 내용은 [Kotlin Notebook 문서](https://www.jetbrains.com/help/idea/kotlin-notebook.html#add-dependencies)를 참조하세요.
-   > {style="tip"}
-
-2. 다음 코드 스니펫을 Kotlin Notebook에 붙여넣고 실행하여 2D 데이터 포인트 세트를 생성합니다.
+2. 다음 코드 스니펫을 붙여넣고 실행하여 2D 데이터 포인트 세트를 생성합니다.
 
    ```kotlin
    // 세 가지 분포에 대한 공분산 행렬을 정의합니다.
@@ -185,4 +187,3 @@ densityPlot
 * [Lets-Plot for Kotlin 문서](https://lets-plot.org/kotlin/charts.html)에서 더 많은 플롯 예제를 살펴보세요.
 * Lets-Plot for Kotlin의 [API 레퍼런스](https://lets-plot.org/kotlin/api-reference/)를 확인하세요.
 * [Kotlin DataFrame](https://kotlin.github.io/dataframe/info.html) 및 [Kandy](https://kotlin.github.io/kandy/welcome.html) 라이브러리 문서에서 Kotlin을 사용한 데이터 변환 및 시각화에 대해 알아보세요.
-* [Kotlin Notebook의 사용법 및 주요 기능](https://www.jetbrains.com/help/idea/kotlin-notebook.html)에 대한 추가 정보를 찾아보세요.

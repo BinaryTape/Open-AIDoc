@@ -14,6 +14,19 @@ println(readln())
 // Hi, Kotlin!
 ```
 
+複数行の入力を 1 つの文字列として読み込むこともできます。
+行を結合するには、[`joinToString()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.sequences/join-to-string.html) 関数を使用します。
+
+```kotlin
+val input = generateSequence(::readlnOrNull)
+  .joinToString("
+")
+```
+
+> 例外をスローせずに、入力の終わり（EOF）に達するまで入力を読み取るには、`readln()` の代わりに [`readlnOrNull()`](#handle-standard-input-safely) を使用してください。
+> 
+{style="note"}
+
 文字列以外のデータ型を扱う場合は、`.toInt()`、`.toLong()`、`.toDouble()`、`.toFloat()`、`.toBoolean()` などの変換関数を使用して入力を変換できます。
 異なるデータ型の複数の入力を読み取り、それぞれの入力を変数に格納することも可能です。
 

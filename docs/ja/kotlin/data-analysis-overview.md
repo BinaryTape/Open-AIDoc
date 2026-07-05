@@ -5,7 +5,7 @@
 
 データ分析が鍵となるソフトウェア開発の業務について考えてみましょう。デバッグ時にコレクションの中身を分析したり、メモリダンプやデータベースを徹底的に調査したり、REST API を使用する際に大量のデータを含む JSON ファイルを受け取ったりする場合などが挙げられます。
 
-Kotlin の探索的データ解析（EDA: Exploratory Data Analysis）ツールである [Kotlin Notebook](#notebooks)、[Kotlin DataFrame](#kotlin-dataframe)、[Kandy](#kandy) を使用することで、分析スキルを向上させ、さまざまなシナリオで役立つ豊富な機能を利用できます。
+[Kotlin DataFrame](#kotlin-dataframe) や [Kandy](#kandy) などの Kotlin の探索的データ解析（EDA: Exploratory Data Analysis）ツールを使用することで、分析スキルを向上させ、さまざまなシナリオで役立つ豊富な機能を利用できます。
 
 * **さまざまな形式のデータの読み込み、変換、視覚化:** Kotlin EDA ツールを使用すると、データのフィルタリング、ソート、集計などのタスクを実行できます。これらのツールは、CSV、JSON、SQL データベース、Parquet ファイルなど、さまざまなデータソースからのデータを IDE 内でシームレスに読み取ることができます。
 サポートされているすべての形式については、[DataFrame のドキュメント](https://kotlin.github.io/dataframe/data-sources.html)を参照してください。
@@ -15,32 +15,6 @@ Kotlin の探索的データ解析（EDA: Exploratory Data Analysis）ツール�
 * **リレーショナルデータベースに保存されたデータの効率的な分析:** Kotlin DataFrame はデータベースとシームレスに統合され、SQL クエリと同様の機能を提供します。さまざまなデータベースから直接データを取得、操作、視覚化できます。
 
 * **Web API からのリアルタイムおよび動的なデータセットの取得と分析:** EDA ツールの柔軟性により、OpenAPI などのプロトコルを介して外部 API と統合できます。この機能により、Web API からデータを取得し、必要に応じてデータをクリーニングおよび変換できます。
-
-Kotlin のデータ分析ツールを使用すると、データの取り扱いを一貫してスムーズに行うことができます。Kotlin Notebook のシンプルなドラッグ＆ドロップ機能で、データを簡単に取得できます。わずか数行のコードで、データのクリーニング、変換、視覚化が可能です。さらに、数回のクリックで出力したチャートをエクスポートできます。
-
-![Kotlin Notebook](data-analysis-notebook.gif){width=700}
-
-## ノートブック (Notebooks)
-
-ノートブックとは、実行可能な Kotlin コードと、テキスト、視覚化、結果を混在させることができるインタラクティブなドキュメントです。これは、コードをセルに整理し、Markdown でドキュメント化し、出力を生成したコードのすぐ隣に表示（テキストからプロットまで）できるように拡張された Kotlin REPL と考えることができます。
-
-Kotlin は、[Kotlin Notebook](#kotlin-notebook)、[Datalore](#kotlin-notebooks-in-datalore)、[Kotlin-Jupyter Notebook](#jupyter-notebook-with-kotlin-kernel) など、データの取得、変換、探索、モデリングなどに便利な機能を提供するさまざまなノートブックソリューションを提供しています。これらの Kotlin ノートブックソリューションは、[Kotlin カーネル (Kotlin Kernel)](https://github.com/Kotlin/kotlin-jupyter) に基づいています。
-
-Kotlin Notebook、Datalore、Kotlin-Jupyter Notebook の間でコードをシームレスに共有できます。いずれかの Kotlin ノートブックでプロジェクトを作成し、互換性の問題を心配することなく別のノートブックで作業を続けることができます。
-
-![Kotlin Notebook](kotlin-notebook.png){width=700}
-
-### Kotlin Notebook
-
-[Kotlin Notebook](kotlin-notebook-overview.md) は、Kotlin でノートブックを作成できるようにする IntelliJ IDEA 用のプラグインです。一般的なすべての IDE 機能を含む IDE 体験を提供し、リアルタイムのコードインサイトやプロジェクト統合を実現します。
-
-### Datalore における Kotlin ノートブック
-
-[Datalore](https://datalore.jetbrains.com/) を使用すると、追加のインストールなしで、ブラウザですぐに Kotlin を使用できます。また、ノートブックを共有してリモートで実行したり、他の Kotlin ノートブックとリアルタイムで共同作業したり、コードを書く際にスマートなコーディング支援を受けたり、インタラクティブまたは静的なレポートを通じて結果をエクスポートしたりすることもできます。
-
-### Kotlin カーネルを使用した Jupyter Notebook
-
-[Jupyter Notebook](https://jupyter.org/) は、コード、視覚化、Markdown テキストを含むドキュメントを作成および共有できるオープンソースの Web アプリケーションです。[Kotlin-Jupyter](https://github.com/Kotlin/kotlin-jupyter) は、Jupyter 環境内で Kotlin のパワーを活用できるように、Jupyter Notebook に Kotlin サポートをもたらすオープンソースプロジェクトです。
 
 ## Kotlin DataFrame
 
@@ -53,9 +27,7 @@ Kotlin DataFrame ライブラリを使用すると、CSV、JSON、XLS、XLSX を
 
 ## Kandy
 
-[Kandy](https://kotlin.github.io/kandy/welcome.html) は、さまざまな種類のチャートをプロットするための強力で柔軟な DSL を提供するオープンソースの Kotlin ライブラリです。このライブラリは、データを視覚化するためのシンプルで慣用的（イディオマティック）、読みやすく、かつ型安全（type-safe）なツールです。
-
-Kandy は、Kotlin Notebook、Datalore、Kotlin-Jupyter Notebook とシームレスに統合されています。また、Kandy と Kotlin DataFrame ライブラリを簡単に組み合わせて、さまざまなデータ関連のタスクを完了させることもできます。
+[Kandy](https://kotlin.github.io/kandy/welcome.html) は、さまざまな種類のチャートをプロットするための強力で柔軟な DSL を提供するオープンソースの Kotlin ライブラリです。このライブラリは、データを視覚化するためのシンプルで慣用的（イディオマティック）、読みやすく、かつ型安全（type-safe）なツールです。また、Kandy と Kotlin DataFrame ライブラリを簡単に組み合わせて、さまざまなデータ関連のタスクを完了させることもできます。
 
 ![Kandy](data-analysis-kandy-example.png){width=700}
 

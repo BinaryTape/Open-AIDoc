@@ -25,7 +25,7 @@ Kotlin Mavenプロジェクトを扱う際の一般的なワークフローは�
 
 * [`power-assert`プラグイン](power-assert.md#maven)を使用して**デバッグ体験を向上させる**。
 * [`kover-maven-plugin`](https://kotlin.github.io/kotlinx-kover/maven-plugin/)を使用して**テストカバレッジの測定とレポートの生成を行う**。
-* [`kapt`プラグイン](kapt.md#use-in-maven)を使用して**アノテーション処理を設定する**。
+* [`kapt`プラグイン](kapt.md#set-up-in-maven)を使用して**アノテーション処理を設定する**。
 * [Dokkaドキュメントエンジン](dokka-maven.md)を使用して**ドキュメントを生成する**。
   混在言語プロジェクトをサポートしており、標準的なJavadocを含む複数のフォーマットで出力できます。
 * [`kotlin-osgi-bundle`](kotlin-osgi.md#maven)を追加して**OSGiサポートを有効にする**。

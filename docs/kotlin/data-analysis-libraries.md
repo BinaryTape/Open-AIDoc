@@ -45,7 +45,7 @@
       <list>
         <li>强大、可读且类型安全的 DSL，用于绘制各种类型的图表</li>
         <li>为 JVM 编写的 Kotlin 开源库</li>
-        <li>支持 <a href="https://kotlin.github.io/kandy/kandy-in-kotlin-notebook.html">Kotlin Notebook</a>、<a href="https://kotlin.github.io/kandy/kandy-in-datalore.html">Datalore</a> 和 <a href="https://kotlin.github.io/kandy/kandy-in-jupyter-notebook.html">Jupyter Notebook</a></li>
+        <li>支持 <a href="https://kotlin.github.io/kandy/kandy-in-datalore.html">Datalore</a></li>
         <li>与 <a href="https://kotlin.github.io/dataframe/overview.html">Kotlin DataFrame</a> 无缝集成</li>
       </list>
     </td>
@@ -118,7 +118,7 @@
     <td>
       <list>
         <li>用 Kotlin 编写的统计数据绘图</li>
-        <li>支持 <a href="https://plugins.jetbrains.com/plugin/16340-kotlin-notebook">Kotlin Notebook</a>、<a href="https://datalore.jetbrains.com/">Datalore</a> 和 <a href="https://github.com/Kotlin/kotlin-jupyter#readme">带有 Kotlin 内核的 Jupyter</a></li>
+        <li>支持 <a href="https://datalore.jetbrains.com/">Datalore</a></li>
         <li>兼容 JVM、JS 和 Python</li>
         <li>在 <a href="https://www.jetbrains.com/lp/compose-multiplatform/">Compose Multiplatform</a> 应用程序中嵌入图表</li>
       </list>
@@ -157,7 +157,6 @@
       <list>
         <li>表格数据可视化</li>
         <li>受 R 语言的 <a href="https://ggplot2.tidyverse.org/">ggplot</a> 启发</li>
-        <li>支持 <a href="https://github.com/Kotlin/kotlin-jupyter#readme">带有 Kotlin 内核的 Jupyter</a></li>
       </list>
     </td>
   </tr>
@@ -342,7 +341,7 @@
     </td>
     <td>
       <list>
-        <li>适用于 Java 的深度学习库</li>
+        <li>适用于 Java 的深度 learning 库</li>
         <li>导入并重新训练模型（<a href="https://pytorch.org/">Pytorch</a>、<a href="https://www.tensorflow.org/">Tensorflow</a>、<a href="https://keras.io/">Keras</a>）</li>
         <li>部署在 JVM 微服务环境、移动设备、IoT 和 <a href="https://spark.apache.org/">Apache Spark</a> 中</li>
       </list>

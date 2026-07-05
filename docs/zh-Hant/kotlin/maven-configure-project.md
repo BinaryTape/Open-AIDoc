@@ -91,6 +91,7 @@ graph TD
 * 如果既未設定 `kotlin.compiler.jdkRelease` 也未設定 `kotlin.compiler.jvmTarget` 選項，外掛程式將採用 `maven.compiler.release` 版本。
 
   `maven.compiler.release` 版本可以定義為專案屬性，也可以在 `maven-compiler-plugin` 配置中定義。
+* If the Maven release version isn't set, the plugin takes the `maven.compiler.target` version.
 * 如果未設定 Maven 的 release 版本，外掛程式將採用 `maven.compiler.target` 版本。
 
   它可以定義為專案屬性，也可以在 `maven-compiler-plugin` 配置中定義。
@@ -334,15 +335,6 @@ graph TD
 > 目前，配置 `maven-toolchains-plugin` 以使用特定 JDK 版本[不會影響 `kotlin-maven-plugin` 的 `kapt` 與 `test-kapt` 目標](https://youtrack.jetbrains.com/issue/KT-79897)。請改在 `JAVA_HOME` 路徑中設定所需的版本。
 >
 {style="note"}
-
-#### 使用 JDK 17
-
-若要使用 JDK 17，請在您的 `.mvn/jvm.config` 檔案中新增：
-
-```none
---add-opens=java.base/java.lang=ALL-UNNAMED
---add-opens=java.base/java.io=ALL-UNNAMED
-```
 
 ## 接下來要做什麼？
 

@@ -142,6 +142,8 @@ fun main() {
 data class User(val name: String, val id: Int)
 ```
 
+코틀린 컴파일러는 멤버 함수를 생성할 때 [주 생성자(primary constructor)](classes.md#primary-constructor) 내부에 정의된 프로퍼티들만 사용합니다. 데이터 클래스 본문 내에 프로퍼티를 선언하면, 자동으로 생성되는 함수들의 결과에는 해당 프로퍼티들이 포함되지 않습니다.
+
 데이터 클래스의 가장 유용한 미리 정의된 멤버 함수는 다음과 같습니다:
 
 | **함수**             | **설명**                                                              |

@@ -218,7 +218,7 @@
   "kotlin.compose-compiler-options": "コンパイラオプション",
   "kotlin.kotlin-symbol-processing-api": "Kotlin Symbol Processing API",
   "kotlin.ksp-overview": "KSPの概要",
-  "kotlin.ksp-quickstart": "クイックスタート",
+  "kotlin.ksp-quickstart": "クイップスタート",
   "kotlin.ksp-examples": "例",
   "kotlin.ksp-reference": "Javaアノテーションプロセッサ作者向けリファレンス",
   "kotlin.ksp-faq": "FAQ",
@@ -674,5 +674,6 @@
   "koog.http-clients": "HTTPクライアント",
   "coroutines.flows": "Flow",
   "coroutines.coroutines-flow": "概要",
-  "kmp.kotlin-toolchain": "Kotlin Toolchain"
+  "kmp.kotlin-toolchain": "Kotlin Toolchain",
+  "kmp.whats-new-compose-112": "Compose Multiplatform %org.jetbrains.compose-eap%"
 }

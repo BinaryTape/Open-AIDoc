@@ -150,7 +150,7 @@ Maven 根据两个主要因素确定插件执行顺序：
 要控制执行顺序：
 
 * 在 `maven-compiler-plugin` 之前声明 `kotlin-maven-plugin`。
-* 禁用 Java 编译器插件的默认执行。
+* 禁用 Java 编译器插件'的默认执行。
 * 添加自定义执行以显式控制编译阶段。
 
 > 您可以使用 Maven 中特殊的 `none` 阶段来禁用默认执行。
@@ -334,15 +334,6 @@ graph TD
 > 目前，将 `maven-toolchains-plugin` 设置为使用特定 JDK 版本 [不会影响 `kotlin-maven-plugin` 的 `kapt` 和 `test-kapt` 目标](https://youtrack.jetbrains.com/issue/KT-79897)。请改为在 `JAVA_HOME` 路径中设置必要的版本。
 >
 {style="note"}
-
-#### 使用 JDK 17
-
-要在使用 JDK 17 时，在您的 `.mvn/jvm.config` 文件中添加：
-
-```none
---add-opens=java.base/java.lang=ALL-UNNAMED
---add-opens=java.base/java.io=ALL-UNNAMED
-```
 
 ## 下一步？
 

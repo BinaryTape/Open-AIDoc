@@ -73,16 +73,12 @@ Android 개발에 Kotlin을 사용하려면 [Google의 Android 기반 Kotlin 시
 
 데이터 파이프라인 구축부터 머신러닝 모델의 프로덕션화까지, Kotlin은 데이터를 활용하고 최상의 결과를 얻기 위한 훌륭한 선택입니다.
 
-1. **IDE 내에서 노트북을 원활하게 생성하고 편집하기:**
-
-   * [Kotlin Notebook 시작하기](get-started-with-kotlin-notebooks.md)
-
-2. **데이터 탐색 및 실험하기:**
+1. **데이터 탐색 및 실험하기:**
 
    * [DataFrame](https://kotlin.github.io/dataframe/overview.html) – 데이터 분석 및 조작을 위한 라이브러리입니다.
    * [Kandy](https://kotlin.github.io/kandy/welcome.html) – 데이터 시각화를 위한 플로팅 도구입니다.
 
-3. **Twitter에서 Kotlin for Data Analysis 팔로우하기:** [KotlinForData](http://twitter.com/KotlinForData).
+2. **Twitter에서 Kotlin for Data Analysis 팔로우하기:** [KotlinForData](http://twitter.com/KotlinForData).
 
 </tab>
 

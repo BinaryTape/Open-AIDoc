@@ -78,7 +78,7 @@ fun main() {
 
 Kotlin 類別可以有多個建構函式，包括您自己定義的建構函式。若要進一步了解如何宣告多個建構函式，請參閱[建構函式](classes.md#constructors-and-initializer-blocks)。
 
-## 存替屬性
+## 存取屬性
 
 要存取執行個體的屬性，請在執行個體名稱後加上句點 `.`，然後寫上屬性名稱：
 
@@ -141,6 +141,8 @@ Kotlin 擁有**資料類別 (data class)**，這在儲存資料時特別有用�
 ```kotlin
 data class User(val name: String, val id: Int)
 ```
+
+Kotlin 編譯器在產生成員函數時，僅使用在[主建構函數](classes.md#primary-constructor)中定義的屬性。如果您在資料類別主體中宣告屬性，它們將不會包含在產生的函數輸出中。
 
 資料類別最實用的預定義成員函數包括：
 

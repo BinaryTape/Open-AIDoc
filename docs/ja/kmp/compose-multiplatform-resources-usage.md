@@ -12,19 +12,20 @@
 * [生成された `Res` クラスとアクセッサのインポート](#importing-the-generated-class)
 * [アクセッサクラス生成のカスタマイズ](#customizing-accessor-class-generation): 公開設定にする方法、パッケージの割り当て、または無条件に生成する方法。
 * 特定のリソースタイプの操作: 
-  * [ドローアブルリソース](#images): 単純な画像、ラスタライズされた画像、XML ベクターなど
-  * [ベクター Android XML アイコン](#icons): Material Symbols ライブラリから
-  * [文字列](#strings): 単純な文字列、テンプレート、配列、複数形など
-  * [カスタムフォントの保存と読み込み](#fonts)
-  * [Raw ファイル](#raw-files)とバイト配列の画像への変換
-* [文字列 ID でマップされたリソースへのアクセス](#generated-maps-for-resources-and-string-ids)
-* [マルチプラットフォームリソースを Android アセットとして使用する](#compose-multiplatform-resources-as-android-assets)
+  * [ドローアブルリソース](#images): 単純な画像、ラスタライズされた画像、XML ベクターなど。
+  * Material Symbols ライブラリからの[ベクター Android XML アイコン](#icons)。
+  * [文字列](#strings): 単純な文字列、テンプレート、配列、複数形など。
+  * [カスタムフォントの保存と読み込み](#fonts)。
+  * [Raw ファイル](#raw-files)とバイト配列の画像への変換。
+* [文字列 ID でマップされたリソースへのアクセス](#generated-maps-for-resources-and-string-ids)。
+* [マルチプラットフォームリソースを Android アセットとして使用する](#compose-multiplatform-resources-as-android-assets)。
 * Web 固有のリソースの処理:
-  * ブラウザ機能と preload API を使用した[リソースのプリロード](compose-web-resources.md#preloading-of-resources-for-web-targets)
-  * [Web リソースのキャッシング](compose-web-resources.md#caching-web-resources)
+  * ブラウザ機能と preload API を使用した[リソースのプリロード](compose-web-resources.md#preloading-of-resources-for-web-targets)。
+  * 欠落している文字に対する[フォントの自動フォールバック](compose-web-resources.md#automatic-font-fallback)。
+  * [Web リソースのキャッシング](compose-web-resources.md#caching-web-resources)。
 * 外部リソースの操作: 
   [外部ライブラリから](#accessing-multiplatform-resources-from-external-libraries)、
-  [リモートファイル](#remote-files)、および [Java リソース](#using-java-resources)
+  [リモートファイル](#remote-files)、および [Java リソース](#using-java-resources)。
 
 ## 生成されたクラスのインポート
 
@@ -255,7 +256,7 @@ Text(stringResource(Res.string.str_template, 100, "User_name"))
 Text(stringResource(Res.string.str_template, "User_name", 100.1f))
 ```
 
-> プレースホルダーのために `%1$s` や `%2$d` を手動で入力する代わりに、インラインの数字ショートカットを使用できます。
+> プレースホルダーのために `%1$s` や `%2$d` を手動で入力する代わりに、インラインの数字ショートカットを使用できます。 
 > たとえば、文字列値の中で `1` または `1s` と入力すると `%1$s` に展開されます。
 > 同様に、`2d` と入力すると `%2$d` に展開されます。
 > 
@@ -332,7 +333,7 @@ Compose Multiplatform における概念と基本実装は、Android の数量�
 プロジェクトで複数形を使用する場合のベストプラクティスやニュアンスの詳細については、[Android ドキュメント](https://developer.android.com/guide/topics/resources/string-resource#Plurals)を参照してください。
 
 * サポートされているバリアントは、`zero`、`one`、`two`、`few`、`many`、および `other` です。すべてのバリアントがすべての言語で考慮されるわけではないことに注意してください。たとえば、英語では `zero` は 1 以外の他の複数形と同じであるため無視されます。言語が実際にどのような区別を要求するかを知るには、言語の専門家に頼ってください。
-* 多くの場合、「Books: 1」のような数量に依存しない表現を使用することで、数量文字列を回避できます。これによりユーザーエクスペリエンスが悪化しない場合は、その方法を検討してください。
+* 多くの場合、「Books: 1」のような数量に依存しない表現を使用することで、数量文字列を回避できます。これがユーザーエクスペリエンスを悪化させない場合は、その方法を検討してください。
 
 複数形を定義するには、`composeResources/values` ディレクトリにある任意の `.xml` ファイルに `<plurals>` 要素を追加します。
 `plurals` コレクションは、name 属性（XML ファイルの名前ではない）を使用して参照される単純なリソースです。
@@ -403,7 +404,9 @@ coroutineScope.launch {
 
 ### フォント
 
-カスタムフォントは `composeResources/font` ディレクトリに `*.ttf` または `*.otf` ファイルとして保存します。
+カスタムフォントは `composeResources/font` ディレクトリに保存します。
+Compose Multiplatform は、すべてのプラットフォームで TTF、OTF、TTC、およびバリアブルフォント形式をサポートしています。
+WOFF および WOFF2 は Web および macOS でのみ利用可能です。
 
 フォントを `Font` 型としてロードするには、`Font()` コンポーザブル関数を使用します。
 
@@ -454,7 +457,9 @@ private fun InterTypography(): Typography {
 >
 {style="note"}
 
-Web ターゲットで絵文字やアラビア文字などの特殊文字をサポートするには、対応するフォントをリソースに追加し、[フォールバックフォントをプリロード](compose-web-resources.md#preload-resources-using-the-compose-multiplatform-preload-api)する必要があります。
+Web ターゲットでは、[フォントの自動フォールバック](compose-web-resources.md#automatic-font-fallback)を通じて、絵文字やアラビア文字などの特殊文字が自動的にサポートされます。これにより、必要に応じて必要な Noto フォントがダウンロードされます。
+
+使用するフォントを完全に制御する必要がある場合は、特定のフォントをバンドルし、[preload API](compose-web-resources.md#preload-resources-using-the-compose-multiplatform-preload-api) を使用して手動で登録してください。
 
 ### Raw ファイル
 

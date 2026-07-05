@@ -26,7 +26,7 @@ Maven 是一個建構系統，可協助管理僅限 Kotlin 或 Kotlin-Java 混�
 
 * **透過 [`power-assert` 外掛程式](power-assert.md#maven)提升您的偵錯體驗**。
 * **使用 [`kover-maven-plugin`](https://kotlin.github.io/kotlinx-kover/maven-plugin/) 測量測試涵蓋率並產生報告**。
-* **透過 [`kapt` 外掛程式](kapt.md#use-in-maven)配置註解處理**。
+* **透過 [kapt 外掛程式](kapt.md#set-up-in-maven)配置註解處理**。
 * **使用 [Dokka 文件引擎](dokka-maven.md)產生文件**。
   它支援混合語言專案，並能以多種格式產生輸出，包括標準 Javadoc。
 * **透過新增 [`kotlin-osgi-bundle`](kotlin-osgi.md#maven) 啟用 OSGi 支援**。

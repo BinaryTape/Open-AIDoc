@@ -1,7 +1,7 @@
 [//]: # (title: 连接数据库并获取数据)
 [//]: # (description: 了解如何连接到 SQL 数据库、检查表架构，并使用 Kotlin DataFrame 获取数据。)
 
-[Kotlin Notebook](kotlin-notebook-overview.md) 为最常见的 SQL 数据库提供支持：
+[Kotlin DataFrame 库](https://kotlin.github.io/dataframe/home.html)为最常见的 SQL 数据库提供支持：
 
 * [DuckDB](https://kotlin.github.io/dataframe/duckdb.html)
 * [H2](https://kotlin.github.io/dataframe/h2.html)
@@ -11,22 +11,22 @@
 * [PostgreSQL](https://kotlin.github.io/dataframe/postgresql.html)
 * [SQLite](https://kotlin.github.io/dataframe/sqlite.html)
 
-利用 [Kotlin DataFrame 库](https://kotlin.github.io/dataframe/home.html)，Kotlin Notebook 可以建立数据库连接、执行 SQL 查询，并导入结果以进行后续操作。
-
-> 有关详细示例，请探索 [KotlinDataFrame SQL 示例 GitHub 仓库中的 Notebook](https://github.com/zaleslaw/KotlinDataFrame-SQL-Examples/blob/master/notebooks/imdb.ipynb)。
->
-{style="tip"}
+探索 [GitHub 上的 Kotlin DataFrame SQL 示例](https://github.com/zaleslaw/KotlinDataFrame-SQL-Examples/tree/master/src/main/kotlin)。
 
 ## 开始之前
 
-Kotlin Notebook 依赖于 [Kotlin Notebook 插件](https://plugins.jetbrains.com/plugin/16340-kotlin-notebook)，该插件在 IntelliJ IDEA 中默认捆绑并启用。
-
-如果 Kotlin Notebook 功能不可用，请确保已启用该插件。要了解更多信息，请参阅[设置环境](kotlin-notebook-set-up-env.md)。
+> 从 IntelliJ IDEA 2026.2 开始，Kotlin Notebook 将不再与 IDE 捆绑，也不再由 JetBrains 官方支持。
+> 源代码将继续在 [GitHub](https://github.com/Kotlin/kotlin-notebook) 上提供。
+>
+> 在[博客文章](https://blog.jetbrains.com/idea/2026/06/kotlin-notebook-sunset/)中了解更多信息。
+>
+{style="note"}
 
 要学习本教程，请执行以下操作：
-1. [新建 Kotlin Notebook](kotlin-notebook-create.md)。
+
+1. 选择 **File** | **New** | **Kotlin Notebook**。
 2. 在 Notebook 的第一个单元格中为您的数据库添加 Java Database Connectivity (JDBC) 驱动程序依赖项。
-   
+
    例如，要连接到 MariaDB 数据库，请添加：
 
    ```kotlin 
@@ -40,16 +40,16 @@ Kotlin Notebook 依赖于 [Kotlin Notebook 插件](https://plugins.jetbrains.com
    %use dataframe
    ```
 
-> 在运行任何其他代码单元之前，先运行包含 `%use dataframe` 行的代码单元，以确保 DataFrame 库及其 API 在 Notebook 中可用。
->
-{style="note"}
+   在运行任何其他代码单元之前，先运行包含 `%use dataframe` 行的代码单元，以确保 DataFrame 库及其 API 在 Notebook 中可用。
+
+要学习本教程，您还可以将 DataFrame 作为 [Gradle](https://kotlin.github.io/dataframe/setupgradle.html) 或 [Maven](https://kotlin.github.io/dataframe/setupmaven.html) 依赖项使用。
 
 ## 连接数据库
 
 要连接到数据库，请使用 `DbConnectionConfig()` 函数创建连接配置：
 
 1. 导入以下功能：
-   
+
    ```kotlin
    import org.jetbrains.kotlinx.dataframe.io.DbConnectionConfig
    import org.jetbrains.kotlinx.dataframe.schema.DataFrameSchema
@@ -94,7 +94,7 @@ Kotlin DataFrame 提供了两种从数据库加载数据的方法：
 * 直接从表加载数据。
 * 加载自定义 SQL 查询的结果。
 
-这两种方法都会返回一个 DataFrame，您可以在 Kotlin Notebook 中对其进行检查、转换和分析。
+这两种方法都会返回一个 DataFrame，您可以在其中对其进行检查、转换和分析。
 
 ### 从表加载数据
 
@@ -153,7 +153,7 @@ filteredTarantinoMovies
 
 ## 分析数据
 
-使用 [Kotlin Notebook](kotlin-notebook-overview.md) 和 [DataFrame 库](https://kotlin.github.io/dataframe/home.html)对数据进行分组、排序和聚合，以便您可以发现并理解数据中的模式。
+使用 [DataFrame 库](https://kotlin.github.io/dataframe/home.html)对数据进行分组、排序和聚合，以便您可以发现并理解数据中的模式。
 
 例如，让我们从 `actors` 表中读取演员数据并找出 20 个最常见的名字：
 
@@ -177,5 +177,5 @@ val top20ActorNames = actorDf
 ## 下一步
 
 * 使用 [Kandy 库](https://kotlin.github.io/kandy/examples.html)探索数据可视化
-* 在[使用 Kandy 在 Kotlin Notebook 中进行数据可视化](data-analysis-visualization.md)中查找有关数据可视化的更多信息
+* 在[使用 Kandy 进行数据可视化](data-analysis-visualization.md)中查找有关数据可视化的更多信息
 * 有关 Kotlin 中可用于数据科学和分析的工具和资源的广泛概述，请参阅[用于数据分析的 Kotlin 和 Java 库](data-analysis-libraries.md)

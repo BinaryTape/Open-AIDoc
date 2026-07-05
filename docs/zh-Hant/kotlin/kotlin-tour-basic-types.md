@@ -14,7 +14,7 @@
 
 Kotlin 中的每個變數與資料結構都有一個型別。型別非常重要，因為它們會告訴編譯器你被允許對該變數或資料結構執行哪些操作。換句話說，即它具有哪些函式與屬性。
 
-在上一章的範例中，Kotlin 能夠判斷出 `customers` 的型別為 [`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/)。
+在上一章，Kotlin 能夠在先前的範例中判斷出 `customers` 的型別為 [`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/)。
 Kotlin **推論**型別的能力被稱為**型別推論**。`customers` 被指派了一個整數值。由此，Kotlin 推論出 `customers` 具有數值型別 `Int`。因此，編譯器知道你可以對 `customers` 執行算術運算：
 
 ```kotlin
@@ -44,13 +44,13 @@ fun main() {
 總體而言，Kotlin 具有以下基本型別：
 
 | **類別** | **基本型別** | **範例程式碼** |
-|------------------------|------------------------------------|---------------------------------------------------------------|
-| 整數 (Integers) | `Byte`, `Short`, `Int`, `Long` | `val year: Int = 2020` |
-| 無符號整數 (Unsigned integers) | `UByte`, `UShort`, `UInt`, `ULong` | `val score: UInt = 100u` |
-| 浮點數 (Floating-point numbers) | `Float`, `Double` | `val currentTemp: Float = 24.5f`, `val price: Double = 19.99` |
-| 布林值 (Booleans) | `Boolean` | `val isEnabled: Boolean = true` |
-| 字元 (Characters) | `Char` | `val separator: Char = ','` |
-| 字串 (Strings) | `String` | `val message: String = "Hello, world!"` |
+|-----------------------------------------------------------|------------------------------------|-------------------------------------------------------------------|
+| [整數](numbers.md#integer-types) | `Byte`, `Short`, `Int`, `Long` | `val year: Int = 2020`<br/> `val amount: Long = 350_000_000` |
+| [無符號整數](unsigned-integer-types.md) | `UByte`, `UShort`, `UInt`, `ULong` | `val score: UInt = 100u` |
+| [浮點數](numbers.md#floating-point-types) | `Float`, `Double` | `val currentTemp: Float = 24.5f`<br/> `val price: Double = 19.99` |
+| [布林值](booleans.md) | `Boolean` | `val isEnabled: Boolean = true` |
+| [字元](characters.md) | `Char` | `val separator: Char = ','` |
+| [字串](strings.md) | `String` | `val message: String = "Hello, world!"` |
 
 有關基本型別及其屬性的更多資訊，請參閱 [Types overview](types-overview.md)。
 

@@ -78,7 +78,7 @@ Kotlin은 어노테이션 프로세서를 사용하는 두 가지 방법을 지�
    ```
    
    * `compile` 실행 **전**에 `kotlin-maven-plugin`의 `kapt` 골(goal) 실행을 추가합니다.
-   * `aptMode` 옵션을 사용하여 [어노테이션 프로세싱 수준](kapt.md#use-in-maven)을 구성합니다.
+   * `aptMode` 옵션을 사용하여 [어노테이션 프로세싱 모드](kapt.md#set-up-in-maven)를 구성합니다.
 
    </tab>
    <tab title="Gradle Kotlin" group-key="kotlin">

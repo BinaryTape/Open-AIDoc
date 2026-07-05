@@ -23,9 +23,9 @@ Kotlinを使い始めるには、これらのIDEのいずれかをダウンロ�
 
 ここでは、コンソールアプリケーションの開発方法と、Kotlinでのユニットテストの作成方法を学びます。
 
-1. **[IntelliJ IDEAプロジェクトウィザードで基本的なJVMアプリケーションを作成する](jvm-get-started.md)**
+1. **[IntelliJ IDEAプロジェクトウィザードで基本的なJVMアプリケーションを作成する](jvm-get-started.md)**。
 
-2. **[初めてのユニットテストを作成する](jvm-test-using-junit.md)**
+2. **[初めてのユニットテストを作成する](jvm-test-using-junit.md)**。
 
 </tab>
 
@@ -49,7 +49,7 @@ Kotlinを使い始めるには、これらのIDEのいずれかをダウンロ�
 
 ここでは、[Kotlin Multiplatform](https://kotlinlang.org/docs/multiplatform/get-started.html)を使用してクロスプラットフォームアプリケーションを開発する方法を学びます。
 
-1. **[クロスプラットフォーム開発のための環境構築](https://kotlinlang.org/docs/multiplatform/quickstart.html)**
+1. **[クロスプラットフォーム開発のための環境構築](https://kotlinlang.org/docs/multiplatform/quickstart.html)**。
 
 2. **iOSおよびAndroid向けの初めてのアプリケーションを作成する:**
 
@@ -59,7 +59,7 @@ Kotlinを使い始めるには、これらのIDEのいずれかをダウンロ�
    * [既存のAndroidアプリケーションをiOSで動作させる](https://kotlinlang.org/docs/multiplatform/multiplatform-integrate-in-existing-app.html)
    * [KtorとSQLdelightを使用してクロスプラットフォームアプリケーションを作成する](https://kotlinlang.org/docs/multiplatform/multiplatform-ktor-sqldelight.html)
 
-3. **[サンプルプロジェクト](https://kotlinlang.org/docs/multiplatform/multiplatform-samples.html)を探索する**
+3. **[サンプルプロジェクト](https://kotlinlang.org/docs/multiplatform/multiplatform-samples.html)を探索する**。
 
 </tab>
 
@@ -73,16 +73,12 @@ Android開発でKotlinを使い始めるには、Googleの[AndroidでのKotlin�
 
 データパイプラインの構築から機械学習モデルのプロダクション化まで、Kotlinはデータを扱い、その能力を最大限に引き出すための優れた選択肢です。
 
-1. **IDE内でノートブックをシームレスに作成・編集する:**
-
-   * [Kotlin Notebookをはじめよう](get-started-with-kotlin-notebooks.md)
-
-2. **データの探索と実験:**
+1. **データの探索と実験:**
 
    * [DataFrame](https://kotlin.github.io/dataframe/overview.html) – データ分析と操作のためのライブラリ。
    * [Kandy](https://kotlin.github.io/kandy/welcome.html) – データ可視化のためのプロットツール。
 
-3. **TwitterでKotlin for Data Analysisをフォローする:** [KotlinForData](http://twitter.com/KotlinForData)
+2. **TwitterでKotlin for Data Analysisをフォローする:** [KotlinForData](http://twitter.com/KotlinForData)。
 
 </tab>
 

@@ -12,7 +12,7 @@
 * [自訂存取子類別生成](#customizing-accessor-class-generation)：如何將其設為公開 (public)、指派給套件或無條件生成。
 * 處理特定資源型別： 
   * [可繪製 (Drawable) 資源](#images)，例如簡單圖像、點陣化圖像或 XML 向量。
-  * 來自 Material Symbols 程式庫的 [向量 Android XML 圖示](#icons)。
+  * 來自 Material Symbols 程式庫的 [向量 Android XML 圖示](#icons)。 
   * [字串](#strings)，包括簡單字串、範本、陣列和複數 (plurals)。
   * [儲存與載入自訂字型](#fonts)。
   * [原始檔案 (Raw files)](#raw-files) 以及將位元組陣列轉換為圖像。 
@@ -20,6 +20,7 @@
 * [將多平台資源作為 Android assets 使用](#compose-multiplatform-resources-as-android-assets)。
 * 處理 Web 特定資源：
   * 使用瀏覽器功能和預載 API [預載資源](compose-web-resources.md#preloading-of-resources-for-web-targets)。
+  * 針對遺漏字元的 [自動字型備援](compose-web-resources.md#automatic-font-fallback)。
   * [快取 Web 資源](compose-web-resources.md#caching-web-resources)。
 * 使用外部資源： 
   [來自外部程式庫](#accessing-multiplatform-resources-from-external-libraries)、
@@ -402,7 +403,9 @@ coroutineScope.launch {
 
 ### 字型
 
-將自訂字型以 `*.ttf` 或 `*.otf` 檔案的形式儲存在 `composeResources/font` 目錄中。
+將自訂字型儲存在 `composeResources/font` 目錄中。
+Compose Multiplatform 在所有平台上支援 TTF、OTF、TTC 和可變字型格式。
+WOFF 與 WOFF2 僅在 Web 和 macOS 上可用。
 
 要將字型載入為 `Font` 型別，請使用 `Font()` 可組合函式：
 
@@ -453,7 +456,9 @@ private fun InterTypography(): Typography {
 >
 {style="note"}
 
-為了在 Web 目標中支援表情符號或阿拉伯語腳本等特殊字元，您需要將相應的字型新增到資源中並 [預載備援字型](compose-web-resources.md#preload-resources-using-the-compose-multiplatform-preload-api)。
+透過 [自動字型備援](compose-web-resources.md#automatic-font-fallback)，Web 目標會自動支援表情符號或阿拉伯語腳本等特殊字元，該功能會根據需求下載所需的 Noto 字型。
+
+如果您需要完全控制所使用的字型，請組合特定字型並使用 [預載 API](compose-web-resources.md#preload-resources-using-the-compose-multiplatform-preload-api) 手動註冊。
 
 ### 原始檔案 (Raw files)
 

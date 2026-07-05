@@ -1,5 +1,12 @@
 [//]: # (title: 建立您的第一個 Kotlin Notebook)
 
+> 從 IntelliJ IDEA 2026.2 開始，Kotlin Notebook 將不再與 IDE 隨附提供，也不再由 JetBrains 官方提供支援。
+> 原始碼將繼續在 [GitHub](https://github.com/Kotlin/kotlin-notebook) 上提供。
+>
+> 若要了解更多資訊，請參閱 [部落格文章](https://blog.jetbrains.com/idea/2026/06/kotlin-notebook-sunset/)。
+>
+{style="note"}
+
 <tldr>
    <p>這是 <strong>Kotlin Notebook 快速入門</strong>教學的第二部分。在繼續之前，請確保您已完成上一個步驟。</p>
    <p><img src="icon-1-done.svg" width="20" alt="第一步"/> <a href="kotlin-notebook-set-up-env.md">設定環境</a><br/>

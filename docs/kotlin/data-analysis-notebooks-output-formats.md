@@ -1,5 +1,12 @@
 [//]: # (title: Kotlin Notebook 支持的输出格式)
 
+> 从 IntelliJ IDEA 2026.2 开始，Kotlin Notebook 将不再随 IDE 捆绑提供，也不再受 JetBrains 官方支持。
+> 源代码仍可在 [GitHub](https://github.com/Kotlin/kotlin-notebook) 上获取。
+>
+> 在[博客文章](https://blog.jetbrains.com/idea/2026/06/kotlin-notebook-sunset/)中了解更多信息。
+>
+{style="note"}
+
 [Kotlin Notebook](kotlin-notebook-overview.md) 支持多种输出类型，包括文本、HTML 和图像。借助于外部库，你可以扩展输出选项，并使用图表、电子表格等实现数据可视化。
 
 每个输出都是一个 JSON 对象，它将 [Jupyter MIME 类型](https://jupyterlab.readthedocs.io/en/latest/user/file_formats.html)映射到某些数据。Kotlin Notebook 会从该映射中选择其他类型中优先级最高的受支持 MIME 类型，并按如下方式渲染：
@@ -7,7 +14,7 @@
 * [文本](#texts)使用 `text/plain` MIME 类型。
 * [`BufferedImage` 类](#buffered-images)使用映射到 Base64 字符串的 `image/png` MIME 类型。
 * [`Image` 类](#loaded-images)以及 [LaTeX 格式](#math-formulas-and-equations)使用内部带有 `img` 标记的 `text/html` MIME 类型。
-* [Kotlin DataFrame 表格](#data-frames)和 [Kandy 图表](#charts)使用它们自己的内部 MIME 类型，这些类型由静态 HTML 或图像支持。通过这种方式，你可以在 GitHub 上显示它们。
+* [Kotlin DataFrame 数据帧表格](#data-frames)和 [Kandy 图表](#charts)使用它们自己的内部 MIME 类型，这些类型由静态 HTML 或图像支持。通过这种方式，你可以在 GitHub 上显示它们。
 
 你可以手动设置映射，例如，将 Markdown 用作单元格输出：
 
@@ -239,7 +246,7 @@ kotlinMascot
    ```
 
 2. 使用相同的数据帧并在新单元格中运行 `plot()` 函数：
- 
+
    ```kotlin
    val salesPlot = dfSales.groupBy { Product }.plot {
        bars {

@@ -35,6 +35,18 @@ IntelliJ Ktorプラグインを使用すると、Ktorプロジェクトを最新
 </tr>
 
 <tr>
+<td>3.5.1</td><td>2026年6月26日</td><td>
+<p>
+OpenAPIプラグインの改善、認証のKDocドキュメントの拡充、およびKotlin 2.4コンパイラの互換性、HTTPおよびキャッシュの動作、認証、WebRTCの安定性、さらにJVM、Darwin、Android、Windowsにおけるプラットフォーム固有の問題を含む、広範なバグ修正を盛り込んだパッチリリースです。
+</p>
+<var name="version" value="3.5.1"/>
+<p>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+</p>
+</td>
+</tr>
+
+<tr>
 <td>3.5.0</td><td>2026年5月15日</td><td>
 <p>
 RFC 7616 Digest認証のサポート、OkHttpおよびApache5向けのカスタムDNSリゾルバー設定、リクエストパラメータのヘルパー関数、および設定、セッション、JavaScript互換性にわたるその他の改善を導入したマイナーリリースです。

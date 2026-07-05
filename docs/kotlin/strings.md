@@ -1,171 +1,174 @@
-[//]: # (title: 字符串)
+---
+title: 字符串
+description: 了解如何在 Kotlin 中处理字符串，包括字符串字面量、字符串模板、多行字符串以及常用的文本操作。
+---
 
-Kotlin 中的字符串由 [`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/) 类型表示。
+[`String`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/) 类型表示[字符](characters.md)序列。你可以将其用于文本值，例如单词、句子、消息或结构化文本。
 
-> 在 JVM 上，UTF-16 编码的 `String` 对象每个字符大约占用 2 字节。
-> 
-{style="note"}
+`String` 类型是不可变的。在创建一个 `String` 对象后，其内容在其余下的生命周期中保持不变。任何看起来像修改字符串的操作实际上都是创建了一个新字符串。
 
-通常，字符串值是用双引号 (`"`) 引起来的字符序列：
+## 声明字符串
 
-```kotlin
-val str = "abcd 123"
-```
-
-字符串的元素是字符，你可以通过索引操作访问它们：`s[i]`。
-你可以使用 `for` 循环遍历这些字符：
+要声明 `String` 字面量，请将值括在双引号 (`""`) 中。你可以显式指定 `String` 类型，或者让 Kotlin 从值中推断它：
 
 ```kotlin
-fun main() {
-    val str = "abcd" 
-//sampleStart
-    for (c in str) {
-        println(c)
-    }
-//sampleEnd
-}
+val name: String = "Kotlin"
+val message = "Hello, world!" // Kotlin 推断为 String
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
 
-字符串是不可变的。一旦你初始化了一个字符串，就无法更改它的值或为其分配新值。
-所有转换字符串的操作都会在新的 `String` 对象中返回结果，而原始字符串保持不变：
+双引号字符串字面量支持[转义序列](characters.md#escape-sequences)，例如 `
+` 或 `\t`：
 
 ```kotlin
-fun main() {
-//sampleStart
-    val str = "abcd"
-   
-    // 创建并打印一个新的 String 对象
-    println(str.uppercase())
-    // ABCD
-   
-    // 原始字符串保持不变
-    println(str) 
-    // abcd
-//sampleEnd
-}
+val message = "Hello,
+world!"
+val quote = "Kotlin says, \"Hi\"."
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
-
-要串联字符串，请使用 `+` 运算符。这也适用于将字符串与其他类型的值串联，只要表达式中的第一个元素是字符串即可：
-
-```kotlin
-fun main() {
-//sampleStart
-    val s = "abc" + 1
-    println(s + "def")
-    // abc1def    
-//sampleEnd
-}
-```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
-
-> 在大多数情况下，使用[字符串模板](#string-templates)或[多行字符串](#multiline-strings)比字符串串联更好。
-> 
-{style="note"}
-
-## 字符串字面量
-
-Kotlin 有两种类型的字符串字面量：
-
-* [转义字符串](#escaped-strings)
-* [多行字符串](#multiline-strings)
-
-### 转义字符串
-
-*转义字符串*可以包含转义字符。  
-下面是一个转义字符串的示例：
-
-```kotlin
-val s = "Hello, world!
-"
-```
-
-转义采用常规方式，即使用反斜杠 (`\`)。  
-有关支持的转义序列列表，请参阅[字符](characters.md)页面。
 
 ### 多行字符串
 
-*多行字符串*可以包含换行符和任意文本。它由三引号 (`"""`) 分隔，不包含转义，并且可以包含换行符和任何其他字符：
+要存储由多行组成或包含不想转义的引号的文本，请使用括在三引号 (`""" """`) 中的多行字符串：
 
 ```kotlin
 val text = """
-    for (c in "foo")
-        print(c)
-    """
-```
-
-要移除多行字符串的前导空格，请使用 [`trimMargin()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.text/trim-margin.html) 函数：
-
-```kotlin
-val text = """
-    |Tell me and I forget.
-    |Teach me and I remember.
-    |Involve me and I learn.
-    |(Benjamin Franklin)
-    """.trimMargin()
-```
-
-默认情况下，使用管道符号 `|` 作为边界前缀，但你可以选择另一个字符并将其作为参数传递，例如 `trimMargin(">")`。
-
-## 字符串模板
-
-字符串字面量可以包含*模板表达式*——即被求值并将其结果串联到字符串中的代码片段。
-当模板表达式被处理时，Kotlin 会自动在表达式的结果上调用 `.toString()` 函数将其转换为字符串。模板表达式以美元符号 (`$`) 开头，由变量名组成：
-
-```kotlin
-fun main() {
-//sampleStart
-    val i = 10
-    println("i = $i") 
-    // i = 10
-    
-    val letters = listOf("a","b","c","d","e")
-    println("Letters: $letters") 
-    // Letters: [a, b, c, d, e]
-
-//sampleEnd
-}
-```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
-
-或者是花括号中的表达式：
-
-```kotlin
-fun main() {
-//sampleStart
-    val s = "abc"
-    println("$s.length is ${s.length}") 
-    // abc.length is 3
-//sampleEnd
-}
-```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
-
-你可以在多行字符串和转义字符串中使用模板。不过，多行字符串不支持反斜杠转义。
-要在多行字符串中、在任何允许作为[标识符](https://kotlinlang.org/grammar/#identifiers)开头的符号之前插入美元符号 (`$`) 字面字符，请使用以下语法：
-
-```kotlin
-val price = """
-${'$'}9.99
+Hello,
+Kotlin
 """
+
+val quote = """Kotlin says, "Hi"."""
 ```
 
-> 为了避免在字符串中使用 `${'$'}` 序列，你可以使用实验性的[多美元字符串插值功能](#multi-dollar-string-interpolation)。
+> 多行字符串不支持转义序列。
+> Kotlin 将这些字符视为普通文本。
 >
 {style="note"}
 
+多行字符串会保留源代码中所写的换行符和缩进。当你希望运行时值与文件中的文本布局匹配时，此行为非常有用。
+
+在以下示例中，每行之前的空格都是结果字符串的一部分：
+
+```kotlin
+val text = """
+    Hello,
+    Kotlin
+"""
+```
+
+要移除通用的前导缩进，请使用 [`trimIndent()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/trim-indent.html) 函数。它会检测非空行的通用最小缩进并将其移除：
+
+```kotlin
+fun main() {
+//sampleStart
+    val text = """
+        Hello,
+        Kotlin
+    """.trimIndent()
+    
+    println(text)
+//sampleEnd
+}
+```
+{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+
+要更显式地控制缩进移除，请使用 [`trimMargin()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/trim-margin.html) 函数。它会移除每行中边界前缀（包括前缀本身）之前的所有内容：
+
+```kotlin
+fun main() {
+//sampleStart
+    val text = """
+        |Hello,
+        |Kotlin
+    """.trimMargin()
+    
+    println(text)
+//sampleEnd
+}
+```
+{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+
+默认情况下，`trimMargin()` 函数使用管道符号 (`|`) 作为边界前缀，但你可以传递另一个字符作为参数。例如：`trimMargin(">")`。
+
+> 当你使用 `trimIndent()` 或 `trimMargin()` 等函数处理字符串时，无论在什么平台上，结果字符串都仅使用换行符 (`
+`) 作为分隔符。
+>
+{style="note"}
+
+## 字符串模板
+
+字符串模板允许你直接在 `String` 字面量中嵌入变量和表达式。这个过程被称为*插值 (interpolation)*。你可以在普通字符串和多行字符串中使用字符串模板。
+
+要将变量插入字符串中，请使用 `$` 符号：
+
+```kotlin
+fun main() { 
+//sampleStart
+    val name = "Kotlin"
+    println("Hello, $name") 
+    // Hello, Kotlin
+//sampleEnd
+}
+```
+{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+
+要在字符串中插入表达式或将变量直接放置在其他文本旁边，请使用 `${}`：
+
+```kotlin
+fun main() {
+//sampleStart
+    val text = "abc"
+    println("The length of $text is ${text.length}")
+    // The length of abc is 3
+      
+    val language = "Kotlin"
+    println("${language}Lang")
+    // KotlinLang
+//sampleEnd
+}
+```
+{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+
+> 你也可以使用 `+` 运算符连接字符串。但是，字符串模板通常更易读且更符合惯用法。
+>
+{style="tip"}
+
+模板表达式也可以包含不带转义的双引号字符串：
+
+```kotlin
+// 双引号字符串
+val test = "${"test".uppercase()}"
+
+// 多行字符串
+val result = """
+Result: ${"OK".lowercase()}
+"""
+```
+
+### 字符串模板中的可空值
+
+如果插值表达式或变量的求值结果为 `null`，Kotlin 编译器会在结果字符串中插入文本 `"null"`。要将 `null` 替换为另一个值，请使用[空合并运算符](null-safety.md#elvis-operator) (`?:`)：
+
+```kotlin 
+fun main(){
+//sampleStart
+    val text: String? = null
+  
+    println("Hello, $text")
+    // Hello, null
+
+    println("Hello, ${text ?: "Kotlin"}")
+    // Hello, Kotlin
+//sampleEnd
+}
+```
+{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+
 ### 多美元字符串插值
 
-多美元字符串插值允许你指定需要多少个连续的美元符号来触发插值。
-插值是将变量或表达式直接嵌入字符串的过程。
+在普通字符串模板中，单个美元符号 (`$`) 即可开始插值。如果你需要在字符串中包含美元符号字面量，请使用**多美元字符串插值 (multi-dollar string interpolation)**。
 
-虽然你可以为单行字符串[转义字面量](#escaped-strings)，但 Kotlin 中的多行字符串不支持反斜杠转义。
-要包含美元符号 (`$`) 作为字面字符，你必须使用 `${'$'}` 构造来防止字符串插值。
-这种方法会使代码难以阅读，特别是当字符串包含多个美元符号时。
+多美元字符串插值允许你指定需要多少个连续的美元符号来触发插值。少于该数量的美元符号将被视为字面字符。
 
-多美元字符串插值通过让你在单行和多行字符串中将美元符号视为字面字符来简化此操作。
-例如：
+例如，当你在字符串字面量前使用 `$$` 时，插值仅在出现两个连续的美元符号时开始：
 
 ```kotlin
 val KClass<*>.jsonSchema : String
@@ -180,83 +183,308 @@ val KClass<*>.jsonSchema : String
     """
 ```
 
-在这里，`$$` 前缀指定需要两个连续的美元符号来触发字符串插值。
-单个美元符号仍作为字面字符。
+> 如果你使用单美元字符串插值，多美元字符串插值不会影响你的代码。你可以继续使用单个 `$` 并根据需要应用多美元符号。
+>
+{style="tip"}
 
-你可以调整触发插值的美元符号数量。
-例如，使用三个连续的美元符号 (`$$$`) 允许 `$` 和 `$$` 保持为字面量，同时通过 `$$$` 启用插值：
+## 基础字符串操作
+
+Kotlin 提供了一系列用于处理字符串的操作。本节介绍一些最常用的操作。
+
+> 要详细了解所有可用函数，请参阅 [API 参考文档](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/)。
+>
+{style="tip"}
+
+### 获取字符串长度
+
+要获取字符串中的字符数，请使用 [`length`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/length.html) 属性：
+
+```kotlin 
+fun main (){
+//sampleStart
+    val language = "Kotlin"
+    println(language.length)
+    // 6
+//sampleEnd
+}
+```
+{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+
+### 访问字符
+
+你可以通过索引操作符 (`[]`) 访问字符串中的单个字符：
+
+```kotlin 
+fun main (){
+//sampleStart
+    val language = "Kotlin"
+    
+    println(language[0])
+    // K
+    println(language[5])
+    // n
+//sampleEnd
+}
+```
+{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+
+> 字符串索引从零开始。如果你尝试访问有效范围之外的索引，Kotlin 会抛出异常。
+>
+{style="tip"}
+
+你还可以遍历字符串中的字符：
 
 ```kotlin
-val productName = "carrot"
-val requestedData =
-    $$$"""{
-      "currency": "$",
-      "enteredAmount": "42.45 $",
-      "$$serviceField": "none",
-      "product": "$$$productName"
+fun main(){
+//sampleStart
+    for (char in "Kotlin") {
+      println(char)
     }
-    """
-
-println(requestedData)
-//{
-//    "currency": "$",
-//    "enteredAmount": "42.45 $",
-//    "$serviceField": "none",
-//    "product": "carrot"
-//}
+//sampleEnd    
+}
 ```
+{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
 
-在这里，`$$$` 前缀允许字符串包含 `$$` 和 `$`，而不需要使用 `${'$'}` 构造进行转义。
+### 提取字符串的部分内容
 
-多美元字符串插值不会影响使用单美元字符串插值的现有代码。
-你可以像以前一样继续使用单个 `$`，并在需要在字符串中处理字面美元符号时应用多美元符号。
+要提取字符串的部分内容，请使用以下函数之一：
 
-## 字符串格式化
+* [`substring()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/substring.html)：返回包含原始文本选定部分的新字符串。
+* [`subSequence()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/sub-sequence.html)：返回包含原始文本选定部分的 `CharSequence`。
 
-> 使用 `String.format()` 函数进行字符串格式化仅在 Kotlin/JVM 中可用。
->
-{style="note"}
+例如：
 
-要根据你的特定要求格式化字符串，请使用 [`String.format()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.text/format.html) 函数。
+```kotlin
+fun main() {
+//sampleStart    
+    val text = "Kotlin"
+    println(text.substring(1))
+    // otlin
+    println(text.substring(1, 5))
+    // otli
+    println(text.subSequence(1, 5))
+    // otli
+//sampleEnd
+}
+```
+{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
 
-`String.format()` 函数接受一个格式字符串和一个或多个实参。格式字符串包含一个用于给定实参的占位符（由 `%` 指示），后跟格式说明符。
-格式说明符是相应实参的格式化指令，由标志、宽度、精度和转换类型组成。格式说明符共同决定了输出的格式设置。常用的格式说明符包括用于整数的 `%d`，用于浮点数的 `%f`，以及用于字符串的 `%s`。你还可以使用 `argument_index` 语法在格式字符串中以不同的格式多次引用同一个实参。
+由于 `String` 类型是不可变的，这些函数不会修改原始字符串。
 
-> 有关格式说明符的深入理解和完整列表，请参阅 [Java 的 Class Formatter 文档](https://docs.oracle.com/javase/8/docs/api/java/util/Formatter.html#summary)。
->
-{style="note"}
+### 比较字符串
 
-让我们看一个示例：
+你可以使用 `==` 运算符检查两个字符串的内容是否相同：
+
+```kotlin
+fun main(){
+//sampleStart
+    println("kotlin" == "kotlin")
+    // true
+  
+    println("kotlin" == "Kotlin")
+    // false
+//sampleEnd    
+}
+```
+{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+
+你还可以使用 [`compareTo()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/compare-to.html) 函数按字典序（逐个字符）比较字符串。它会扫描两个字符串，直到找到第一对不同的字符，并返回：
+
+* `0`：当字符串相等时。
+* 小于 `0` 的值：当接收者小于实参时。
+* 大于 `0` 的值：当接收者大于实参时。
+
+```kotlin
+fun main() {
+//sampleStart    
+    println("abc".compareTo("abd") < 0)
+    // true
+    
+    println("abc".compareTo("ABC") > 0)
+    // true
+    
+    // 传递 true 以忽略大小写差异
+    println("abc".compareTo("ABC", ignoreCase = true) == 0)
+    // true
+//sampleEnd  
+}
+```
+{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+
+### 处理字符串内容
+
+如果你想更改字符串的内容，请使用 [`.trim()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/trim.html)、[`.replace()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/replace.html)、[`.uppercase()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/uppercase.html) 和 [`.lowercase()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/lowercase.html) 等函数创建一个修改后的副本：
+
+```kotlin
+fun main() {
+//sampleStart
+    val text = "  Hello, Kotlin  "
+
+    println(text.trim())
+    // Hello, Kotlin
+
+    println(text.replace("Kotlin", "world"))
+    //   Hello, world  
+
+    println(text.uppercase())
+    //   HELLO, KOTLIN  
+
+    println(text.lowercase())
+    //   hello, kotlin  
+//sampleEnd    
+}
+```
+{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+
+你还可以使用 [`contains()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/contains.html)、[`startsWith()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/starts-with.html) 和 [`endsWith()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/ends-with.html) 函数检查字符串内容：
 
 ```kotlin
 fun main() { 
 //sampleStart
-    // 格式化一个整数，添加前导零以达到七个字符的长度
-    val integerNumber = String.format("%07d", 31416)
-    println(integerNumber)
-    // 0031416
-
-    // 格式化一个浮点数，显示 + 号并保留四位小数
-    val floatNumber = String.format("%+.4f", 3.141592)
-    println(floatNumber)
-    // +3.1416
-
-    // 将两个字符串格式化为大写，每个占用一个占位符
-    val helloString = String.format("%S %S", "hello", "world")
-    println(helloString)
-    // HELLO WORLD
+    val domain = "kotlinlang.org"
     
-    // 格式化一个负数，使其包含在圆括号内，然后使用 `argument_index` 以不同格式（不带圆括号）重复同一个数字
-    val negativeNumberInParentheses = String.format("%(d means %1\$d", -31416)
-    println(negativeNumberInParentheses)
-    //(31416) means -31416
-//sampleEnd    
+    // 检查字符串是否包含 "."
+    println(domain.contains("."))
+    // true
+    
+    // 检查字符串是否以 "kotlin" 开头
+    println(domain.startsWith("kotlin"))
+    // true
+    
+    // 检查字符串是否以 ".org" 结尾
+    println(domain.endsWith(".org"))
+    // true
+//sampleEnd
+}
+ ```
+{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+
+### 分割字符串
+
+你可以使用 [`split()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/split.html) 函数根据分隔符将字符串分割成多个部分：
+
+```kotlin
+fun main() { 
+//sampleStart
+    val numbers = "one, two, three"
+    println(numbers.split(", "))
+    // [one, two, three]
+//sampleEnd
 }
 ```
-{interpolate-variables="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
 
-`String.format()` 函数提供了与字符串模板类似的功能。然而，`String.format()` 函数更加通用，因为有更多的格式化选项可用。
+如果你想将字符串分割为单独的行，请使用 [`lines()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/lines.html) 函数：
 
-此外，你可以从变量中分配格式字符串。当格式字符串发生变化时，这非常有用，例如在取决于用户区域性的本地化情况下。
+```kotlin
+fun main() { 
+//sampleStart
+    val numbers = "one
+two
+three"
+    println(numbers.lines())
+    // [one, two, three]
+//sampleEnd
+}
+```
+{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
 
-使用 `String.format()` 函数时要小心，因为实参的数量或位置很容易与相应的占位符不匹配。
+### 构建与格式化字符串
+
+> 对于 Kotlin 中的大多数格式化任务，请使用[字符串模板](#字符串模板)。
+>
+{style="tip"}
+
+当你使用 `+` 运算符连接字符串时，Kotlin 会为每次操作创建一个新的 `String` 对象。然而，这种方法在循环中或组装许多碎片时可能并非最佳。为了避免此类问题，你可以使用 `buildString()` 函数或 `StringBuilder`。它们将所有碎片收集在单个可变缓冲区中，最后仅生成一个字符串。
+
+当决定追加内容的逻辑比较复杂时，请使用 [`buildString()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/build-string.html) 函数。例如，当你有多个贡献不同片段的条件时。使用 `buildString()`，你不需要直接处理缓冲区。该函数内部会创建一个 `StringBuilder`，运行你的代码块，并返回结果字符串。
+
+```kotlin
+fun main() {
+//sampleStart
+
+    val hasErrors = true
+    val hasWarnings = true
+    val isComplete = false
+    
+    // buildString 创建一个空缓冲区
+    val status = buildString {
+        // 向缓冲区追加 "Errors found"
+        if (hasErrors) append("Errors found")
+        if (hasWarnings) {
+            // 如果缓冲区不为空，追加 "; "
+            if (isNotEmpty()) append("; ")
+            // 追加 "Warnings found"
+            append("Warnings found")
+        }
+        // isComplete = false，不追加任何内容
+        if (isComplete) {
+            if (isNotEmpty()) append("; ")
+            append("Completed")
+        }
+        // 缓冲区不为空，跳过回退内容
+        if (isEmpty()) append("OK")
+    }
+    
+    println(status)
+    // Errors found; Warnings found
+//sampleEnd
+}
+```
+{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+
+当你需要将缓冲区作为显式值使用时，请使用 [`StringBuilder`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/-string-builder/)。例如，用于更改现有文本：
+
+```kotlin
+fun main() {
+//sampleStart
+    val text = "Hello, Kotlin"
+    val builder = StringBuilder(text)
+
+    builder.replace(7, 13, "world")
+    println(builder.toString()) 
+    // Hello, world
+//sampleEnd
+}
+```
+{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+
+在 JVM 上，你还可以使用 [`String.format()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.text/format.html) 函数来格式化字符串：
+
+```kotlin
+val text = String.format("Hello, %s", "Kotlin") 
+```  
+
+> 仅当你特别需要在 JVM 上使用格式化程序样式的说明符时，才使用 `String.format()` 函数。要详细了解格式说明符，请参阅 [Java Class Formatter 文档](https://docs.oracle.com/javase/8/docs/api/java/util/Formatter.html#summary)。
+>
+{style="note"}
+
+## 字符串转换
+
+你经常可能使用字符串来表示其他类型的值，例如数字、`Boolean` 值或来自输入的标识符。Kotlin 提供了将值转换为字符串以及将字符串解析为其他类型的函数。
+
+要返回值的字符串表示形式，请使用 [`toString()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/to-string.html) 函数：
+
+```kotlin
+val number = 10
+val text = number.toString()
+```
+
+在字符串模板和字符串连接中，Kotlin 会自动将值转换为字符串。
+
+要将字符串转换为另一种类型，请使用相应的解析函数：
+
+* 对于整数值：[`toByte()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/to-byte.html)、[`toShort()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/to-short.html)、[`toInt()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/to-int.html)、[`toLong()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/to-long.html)
+* 对于浮点值：[`toDouble()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/to-double.html)、[`toFloat()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/to-float.html)
+* 对于布尔值：[`toBoolean()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/to-boolean.html)、[`toBooleanStrict()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/to-boolean-strict.html)
+
+如果字符串具有有效的格式，这些函数将返回所请求类型的值。如果输入可能无效，请使用 `OrNull` 变体。这些函数会返回 `null` 而不是抛出异常，这使得它们在处理用户输入或你无法完全控制的数据时更加安全：
+
+```kotlin
+val toInt = "10".toInt() // 10
+
+// 1000000000000 超过了 Int 的最大值
+val toIntInvalid = "1000000000000".toIntOrNull()
+
+val toBoolean = "true".toBooleanStrict() // true
+val toBooleanInvalid = "yes".toBooleanStrictOrNull() // null

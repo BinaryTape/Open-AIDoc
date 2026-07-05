@@ -45,7 +45,7 @@
       <list>
         <li>さまざまなタイプのチャートをプロットするための、強力で読みやすく型安全な DSL</li>
         <li>JVM 向けに Kotlin で書かれたオープンソースライブラリ</li>
-        <li><a href="https://kotlin.github.io/kandy/kandy-in-kotlin-notebook.html">Kotlin Notebook</a>、<a href="https://kotlin.github.io/kandy/kandy-in-datalore.html">Datalore</a>、<a href="https://kotlin.github.io/kandy/kandy-in-jupyter-notebook.html">Jupyter Notebook</a> のサポート</li>
+        <li><a href="https://kotlin.github.io/kandy/kandy-in-datalore.html">Datalore</a> のサポート</li>
         <li><a href="https://kotlin.github.io/dataframe/overview.html">Kotlin DataFrame</a> とのシームレスな統合</li>
       </list>
     </td>
@@ -118,7 +118,7 @@
     <td>
       <list>
         <li>Kotlin で書かれた統計データプロット用ライブラリ</li>
-        <li><a href="https://plugins.jetbrains.com/plugin/16340-kotlin-notebook">Kotlin Notebook</a>、<a href="https://datalore.jetbrains.com/">Datalore</a>、<a href="https://github.com/Kotlin/kotlin-jupyter#readme">Jupyter with Kotlin Kernel</a> のサポート</li>
+        <li><a href="https://datalore.jetbrains.com/">Datalore</a> のサポート</li>
         <li>JVM、JS、Python との互換性</li>
         <li><a href="https://www.jetbrains.com/lp/compose-multiplatform/">Compose Multiplatform</a> アプリケーションへのチャートの埋め込み</li>
       </list>
@@ -157,7 +157,6 @@
       <list>
         <li>表形式データの可視化</li>
         <li>R の <a href="https://ggplot2.tidyverse.org/">ggplot</a> にインスパイアされている</li>
-        <li><a href="https://github.com/Kotlin/kotlin-jupyter#readme">Jupyter with Kotlin Kernel</a> のサポート</li>
       </list>
     </td>
   </tr>
@@ -285,7 +284,7 @@ Kotlin は Java との第一級の相互運用性を提供しているため、K
     </td>
     <td>
       <list>
-        <li>データのクリーニングと処理</li>
+        <li>データクリーニングと処理</li>
         <li>モデル構築</li>
       </list>
     </td>
@@ -326,7 +325,7 @@ Kotlin は Java との第一級の相互運用性を提供しているため、K
     </td>
     <td>
       <list>
-        <li>科学チャート用の <a href="https://openjfx.io/">JavaFX</a> ライブラリ</li>
+        <li><a href="https://openjfx.io/">JavaFX</a> ライブラリによる科学チャート</li>
         <li>対数グラフ、ヒートマップ、力学モデルグラフなどの複雑なチャート</li>
       </list>
     </td>

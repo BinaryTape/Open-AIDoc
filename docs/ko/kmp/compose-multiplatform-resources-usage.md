@@ -20,6 +20,7 @@
 * [멀티플랫폼 리소스를 Android 에셋(assets)으로 사용하기](#compose-multiplatform-resources-as-android-assets).
 * 웹 전용 리소스 처리:
   * 브라우저 기능과 preload API를 사용한 [리소스 프리로딩(Preloading)](compose-web-resources.md#preloading-of-resources-for-web-targets),
+  * 누락된 문자에 대한 [자동 폰트 폴백(Automatic font fallback)](compose-web-resources.md#automatic-font-fallback),
   * [웹 리소스 캐싱](compose-web-resources.md#caching-web-resources).
 * 외부 리소스 작업: 
   [외부 라이브러리에서](#accessing-multiplatform-resources-from-external-libraries), 
@@ -195,7 +196,7 @@ Text(stringResource(Res.string.app_name))
 ```
 
 </TabItem>
-<TabItem title= "비-컴포저블(non-composable) 코드에서">
+<TabItem title= "비-컴포저블 코드에서">
 
 ```kotlin
 suspend fun getString(resource: StringResource): String
@@ -402,7 +403,8 @@ coroutineScope.launch {
 
 ### 폰트 (Fonts)
 
-커스텀 폰트를 `composeResources/font` 디렉터리에 `*.ttf` 또는 `*.otf` 파일로 저장하세요.
+커스텀 폰트를 `composeResources/font` 디렉터리에 저장하세요.
+Compose Multiplatform은 모든 플랫폼에서 TTF, OTF, TTC 및 가변 폰트(variable font) 형식을 지원합니다. WOFF 및 WOFF2는 웹 및 macOS에서만 사용할 수 있습니다.
 
 폰트를 `Font` 타입으로 로드하려면 `Font()` 컴포저블 함수를 사용하세요:
 
@@ -453,7 +455,9 @@ private fun InterTypography(): Typography {
 >
 {style="note"}
 
-웹 타겟에서 이모지나 아랍어 스크립트와 같은 특수 문자를 지원하려면 해당 폰트를 리소스에 추가하고 [폴백(fallback) 폰트를 프리로드](compose-web-resources.md#preload-resources-using-the-compose-multiplatform-preload-api)해야 합니다.
+이모지나 아랍어 스크립트와 같은 특수 문자는 온디맨드 방식으로 필요한 Noto 폰트를 다운로드하는 [자동 폰트 폴백(automatic font fallback)](compose-web-resources.md#automatic-font-fallback)을 통해 웹 타겟에서 자동으로 지원됩니다.
+
+사용되는 폰트를 완전히 제어해야 하는 경우, 특정 폰트를 번들로 묶고 [preload API](compose-web-resources.md#preload-resources-using-the-compose-multiplatform-preload-api)를 사용하여 수동으로 등록하세요.
 
 ### 원시 파일 (Raw files)
 

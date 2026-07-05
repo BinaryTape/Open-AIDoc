@@ -2,11 +2,13 @@
 
 ## Kotlin 標誌
 
-我們的標誌由一個標記與一種字體組成。全彩版本為主標誌，應在絕大多數情況下使用。
+我們的標誌由一個標記與一種字體組成。 
+全彩版本為主標誌，應在絕大多數情況下使用。
 
 [下載所有版本](https://resources.jetbrains.com/storage/products/kotlin/docs/kotlin_logos.zip){:.typo-float-right.kto-button.kto-button_size_m.kto-button_mode_outline}
 
-我們的標誌與標記設有保護區。請放置標誌，確保其他設計元素不會進入框格內。保護區的最小尺寸為標記高度的一半。
+我們的標誌與標記設有保護區。請放置標誌，確保其他設計元素不會進入框格內。
+保護區的最小尺寸為標記高度的一半。
 
 ![Kotlin logo proportions](kotlin-logo-guidelines.png){width=700}
 
@@ -23,12 +25,12 @@
 
 ## Kotlin 生態系統標誌
 
-Kotlin 品牌包還包括幾個官方 Kotlin 生態系統專案、程式庫、架構與技術的標誌。這些資源遵循與 Kotlin 標誌相同的視覺原則，並有助於確保整個生態系統的一致呈現。
+Kotlin 品牌包還包括幾個官方 Kotlin 生態系統專案、程式庫、架構與技術的標誌。
+這些資源遵循與 Kotlin 標誌相同的視覺原則，並有助於確保整個生態系統的一致呈現。
 
 該軟體包包含以下標誌：
 
 * [Kotlin Foundation](https://kotlinfoundation.org)
-* [Kotlin Notebook](kotlin-notebook-overview.md)
 * [Kotlin Multiplatform (KMP)](https://kotlinlang.org/multiplatform/)
 * [Talking Kotlin](https://www.youtube.com/playlist?list=PLlFc5cFwUnmz1TwkP9SKCHU978dqLTANB)
 * [Compose Multiplatform (CMP)](https://kotlinlang.org/compose-multiplatform/)
@@ -42,7 +44,8 @@ Kotlin 品牌包還包括幾個官方 Kotlin 生態系統專案、程式庫、�
 
 ## Kotlin 吉祥物
 
-見見 Kodee，Kotlin 的吉祥物，也是你親切的夥伴，隨時在那裡鼓勵並啟發你的創造力。使用時，我們要求你遵循這些 [簡單準則](https://resources.jetbrains.com/storage/products/kotlin/docs/Kotlin_Mascot_Guidelines.pdf)。
+見見 Kodee，Kotlin 的吉祥物，也是你親切的夥伴，隨時在那裡鼓勵並啟發你的創造力。
+使用時，我們要求你遵循這些 [簡單準則](https://resources.jetbrains.com/storage/products/kotlin/docs/Kotlin_Mascot_Guidelines.pdf)。
 
 ![Kotlin mascot Kodee proportions](mascot-body-proportions.png){width=700}
 

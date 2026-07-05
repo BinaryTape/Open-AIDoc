@@ -1,6 +1,13 @@
 [//]: # (title: 分享您的 Kotlin Notebook)
 
-要分享 [Kotlin Notebook](kotlin-notebook-overview.md)，您可以将其上传到任何 Notebook Web 查看器，因为 [Kotlin Notebook](data-analysis-overview.md#notebooks) 遵循通用的 Jupyter 格式。
+> 从 IntelliJ IDEA 2026.2 开始，Kotlin Notebook 将不再随 IDE 捆绑，也不再由 JetBrains 提供官方支持。
+> 源代码仍可在 [GitHub](https://github.com/Kotlin/kotlin-notebook) 上获取。
+>
+> 在[博客文章](https://blog.jetbrains.com/idea/2026/06/kotlin-notebook-sunset/)中详细了解。
+>
+{style="note"}
+
+要分享 [Kotlin Notebook](kotlin-notebook-overview.md)，您可以直接将其上传到任何 Notebook Web 查看器，因为 Kotlin Notebook 遵循通用的 Jupyter 格式。
 
 我们推荐使用以下平台分享 Kotlin Notebook：
 

@@ -335,15 +335,6 @@ graph TD
 >
 {style="note"}
 
-#### JDK 17 の使用
-
-JDK 17を使用するには、`.mvn/jvm.config` ファイルに以下を追加します：
-
-```none
---add-opens=java.base/java.lang=ALL-UNNAMED
---add-opens=java.base/java.io=ALL-UNNAMED
-```
-
 ## 次のステップ
 
 [Kotlin Mavenプロジェクトでの依存関係の設定](maven-set-dependencies.md)

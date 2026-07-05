@@ -248,6 +248,46 @@ public final User copy(java.lang.String, java.lang.String, boolean)
 
 データクラスに関するもう一つの問題は、コンストラクタ引数の順序を変更すると、非構造化（destructuring）に使用される生成された `componentX` メソッドに影響が及ぶことです。たとえバイナリ互換性が壊れなかったとしても、順序の変更は確実に振る舞いの互換性を壊します。
 
+## アノテーションターゲットの変更を避ける
+
+アノテーションを公開する際は、ライブラリのリリース後に許可されるターゲット（allowed targets）を変更しないようにしてください。これらを変更すると、ユーザーが既存のコードを再コンパイルした際、同じアノテーションが適用される方法に影響を与える可能性があります。
+
+例えば、アノテーションが `AnnotationTarget.FIELD` のみを宣言している場合、プロパティに対する修飾子のないアノテーションは、そのバッキングフィールドに適用されます：
+
+```kotlin
+@Target(AnnotationTarget.FIELD)
+annotation class Example
+
+class User {
+    @Example
+    val name: String = ""
+}
+```
+
+後から `AnnotationTarget.PROPERTY` を追加すると、同じ修飾子のないアノテーションが、代わりにプロパティに適用されるようになります：
+
+```kotlin
+@Target(AnnotationTarget.PROPERTY, AnnotationTarget.FIELD)
+annotation class Example
+
+class User {
+    @Example
+    val name: String = ""
+}
+```
+
+これは、[Kotlinコンパイラが `field` ターゲットよりも先に `property` ターゲットを選択する](annotations.md#defaults-when-no-use-site-targets-are-specified)ためです。`field` ターゲットは、`property` が適用できない場合にのみ使用されます。
+
+これにより、生成された特定の要素にアノテーションがあることを期待するツールやフレームワークにおいて互換性が壊れる可能性があります。特に、`property` ターゲットはJavaからは見えません。
+JavaのリフレクションやJavaアノテーションプロセッサがバッキングフィールド上のアノテーションを見つける必要がある場合、ユーザーは次のように `field` 使用部位ターゲットを明示的に指定する必要があります：
+
+```kotlin
+class User {
+    @field:Example
+    val name: String = ""
+}
+```
+
 ## PublishedApiアノテーションを使用する際の考慮事項
 
 Kotlinでは、インライン関数をライブラリのAPIの一部にすることができます。これらの関数への呼び出しは、ユーザーが記述したクライアントコード内にインライン展開されます。これは互換性の問題を引き起こす可能性があるため、これらの関数が非公開APIの宣言を呼び出すことは許可されていません。

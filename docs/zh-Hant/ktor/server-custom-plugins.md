@@ -6,7 +6,7 @@
 <var name="example_name" value="custom-plugin"/>
 <p>
     <b>程式碼範例</b>：
-    <a href="https://github.com/ktorio/ktor-documentation/tree/%ktor_version%/codeSnippets/snippets/%example_name%">
+    <a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/%example_name%">
         %example_name%
     </a>
 </p>
@@ -135,7 +135,7 @@ val DataTransformationPlugin = createApplicationPlugin(name = "DataTransformatio
     onCallReceive { call ->
         transformBody { data ->
             if (requestedType?.type == Int::class) {
-                val line = data.readUTF8Line() ?: "1"
+                val line = data.readLine() ?: "1"
                 line.toInt() + 1
             } else {
                 data
@@ -148,7 +148,7 @@ val DataTransformationPlugin = createApplicationPlugin(name = "DataTransformatio
 上述程式碼片段中的 `transformBody` 運作方式如下：
 
 1. `TransformBodyContext` 是一個 [Lambda 接收者](https://kotlinlang.org/docs/scope-functions.html#context-object-this-or-it)，它包含有關當前請求的型別資訊。在上面的範例中，`TransformBodyContext.requestedType` 屬性用於檢查請求的資料型別。
-2. `data` 是一個 Lambda 引數，允許您將請求主體接收為 [ByteReadChannel](https://api.ktor.io/ktor-io/io.ktor.utils.io/-byte-read-channel/index.html) 並將其轉換為所需的型別。在上面的範例中，`ByteReadChannel.readUTF8Line` 用於讀取請求主體。
+2. `data` 是一個 Lambda 引數，允許您將請求主體接收為 [ByteReadChannel](https://api.ktor.io/ktor-io/io.ktor.utils.io/-byte-read-channel/index.html) 並將其轉換為所需的型別。在上面的範例中，`ByteReadChannel.readLine()` 用於讀取請求主體。
 3. 最後，您需要轉換並回傳資料。在我們的範例中，將 `1` 加到接收到的整數值中。
 
 您可以在此處找到完整的範例：[DataTransformationPlugin.kt](https://github.com/ktorio/ktor-documentation/blob/%ktor_version%/codeSnippets/snippets/custom-plugin/src/main/kotlin/com/example/plugins/DataTransformationPlugin.kt)。

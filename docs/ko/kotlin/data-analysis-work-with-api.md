@@ -1,58 +1,49 @@
 [//]: # (title: 웹 소스 및 API에서 데이터 가져오기)
 
-[Kotlin Notebook](kotlin-notebook-overview.md)은 다양한 웹 소스와 API의 데이터를 액세스하고 조작할 수 있는 강력한 플랫폼을 제공합니다.
-데이터 추출 및 분석 작업의 모든 단계를 시각화하여 명확하게 확인할 수 있는 반복적인(iterative) 환경을 제공함으로써 작업을 단순화합니다. 이는 특히 익숙하지 않은 API를 탐색할 때 유용합니다.
+[Kotlin DataFrame 라이브러리](https://kotlin.github.io/dataframe/home.html)를 사용하면 다양한 웹 소스 및 API의 데이터를 액세스하고 조작할 수 있습니다. 또한 종합적인 분석 및 시각화를 위해 이 데이터를 재구성(reshaping)하는 데에도 도움을 받을 수 있습니다.
 
-[Kotlin DataFrame 라이브러리](https://kotlin.github.io/dataframe/home.html)와 함께 사용하면, Kotlin Notebook을 통해 API에서 JSON 데이터를 연결하고 가져올 수 있을 뿐만 아니라, 종합적인 분석 및 시각화를 위해 이 데이터를 재구성(reshaping)하는 데에도 도움을 받을 수 있습니다.
-
-> Kotlin Notebook 예제는 [GitHub의 DataFrame 예제](https://github.com/Kotlin/dataframe/blob/master/examples/notebooks/youtube/Youtube.ipynb)를 참조하세요.
-> 
-{style="tip"}
+[GitHub의 DataFrame 예제](https://github.com/Kotlin/dataframe/tree/master/examples/projects)를 살펴보세요.
 
 ## 시작하기 전에
 
-Kotlin Notebook은 IntelliJ IDEA에 기본적으로 포함되어 활성화되어 있는 [Kotlin Notebook 플러그인](https://plugins.jetbrains.com/plugin/16340-kotlin-notebook)에 의존합니다.
-
-Kotlin Notebook 기능을 사용할 수 없는 경우 플러그인이 활성화되어 있는지 확인하세요. 자세한 내용은 [환경 설정](kotlin-notebook-set-up-env.md)을 참조하세요.
+> IntelliJ IDEA 2026.2부터 Kotlin Notebook은 더 이상 IDE에 기본적으로 포함되지 않으며 JetBrains에서 공식적으로 지원하지 않습니다.
+> 소스 코드는 [GitHub](https://github.com/Kotlin/kotlin-notebook)에서 계속 확인할 수 있습니다.
+>
+> 자세한 내용은 [블로그 포스트](https://blog.jetbrains.com/idea/2026/06/kotlin-notebook-sunset/)를 참조하세요.
+>
+{style="note"}
 
 새 Kotlin Notebook을 생성합니다:
 
 1. **File** | **New** | **Kotlin Notebook**을 선택합니다.
 
-2. Kotlin Notebook에서 다음 명령을 실행하여 Kotlin DataFrame 라이브러리를 임포트합니다:
+2. 다음 명령을 실행하여 Kotlin DataFrame 라이브러리를 임포트합니다:
 
    ```kotlin
    %use dataframe
    ```
-   
+이 튜토리얼을 따라 하려면 DataFrame을 [Gradle](https://kotlin.github.io/dataframe/setupgradle.html) 또는 [Maven](https://kotlin.github.io/dataframe/setupmaven.html) 종속성(dependency)으로 사용할 수도 있습니다.
+
 ## API에서 데이터 가져오기
 
-Kotlin DataFrame 라이브러리가 포함된 Kotlin Notebook을 사용하여 API에서 데이터를 가져오는 것은 CSV 또는 JSON과 같은 [파일에서 데이터를 검색](data-analysis-work-with-data-sources.md#retrieve-data)하는 것과 유사한 [`.read()`](https://kotlin.github.io/dataframe/read.html) 함수를 통해 이루어집니다.
+Kotlin DataFrame 라이브러리를 사용하여 API에서 데이터를 가져오는 것은 CSV 또는 JSON과 같은 [파일에서 데이터를 검색](data-analysis-work-with-data-sources.md#retrieve-data)하는 것과 유사한 [`.read()`](https://kotlin.github.io/dataframe/read.html) 함수를 통해 이루어집니다.
 하지만 웹 기반 소스를 다룰 때는 원시(raw) API 데이터를 구조화된 형식으로 변환하기 위해 추가적인 포맷팅이 필요할 수 있습니다.
 
 [YouTube Data API](https://console.cloud.google.com/apis/library/youtube.googleapis.com)에서 데이터를 가져오는 예제를 살펴보겠습니다:
 
-1. Kotlin Notebook 파일(`.ipynb`)을 엽니다.
-
-2. 데이터 조작 작업에 필수적인 Kotlin DataFrame 라이브러리를 임포트합니다. 코드 셀에서 다음 명령을 실행하면 됩니다:
-
-   ```kotlin
-   %use dataframe
-   ```
-
-3. 새 코드 셀에 API 키를 안전하게 추가합니다. 이는 YouTube Data API 요청을 인증하는 데 필요합니다. API 키는 [사용자 인증 정보 탭](https://console.cloud.google.com/apis/credentials)에서 얻을 수 있습니다:
+1. 새 코드 셀에 API 키를 안전하게 추가합니다. 이는 YouTube Data API 요청을 인증하는 데 필요합니다. API 키는 [사용자 인증 정보 탭](https://console.cloud.google.com/apis/credentials)에서 얻을 수 있습니다:
 
    ```kotlin
    val apiKey = "YOUR-API_KEY"
    ```
 
-4. 경로를 문자열로 받아 DataFrame의 `.read()` 함수를 사용하여 YouTube Data API에서 데이터를 가져오는 로드 함수를 생성합니다:
+2. 경로를 문자열로 받아 DataFrame의 `.read()` 함수를 사용하여 YouTube Data API에서 데이터를 가져오는 로드 함수를 생성합니다:
 
    ```kotlin
    fun load(path: String): AnyRow = DataRow.read("https://www.googleapis.com/youtube/v3/$path&key=$apiKey")
    ```
 
-5. 가져온 데이터를 행(row)으로 구성하고 `nextPageToken`을 통해 YouTube API의 페이지네이션(pagination)을 처리합니다. 이를 통해 여러 페이지에 걸친 데이터를 수집할 수 있습니다:
+3. 가져온 데이터를 행(row)으로 구성하고 `nextPageToken`을 통해 YouTube API의 페이지네이션(pagination)을 처리합니다. 이를 통해 여러 페이지에 걸친 데이터를 수집할 수 있습니다:
 
    ```kotlin
    fun load(path: String, maxPages: Int): AnyFrame {
@@ -72,7 +63,7 @@ Kotlin DataFrame 라이브러리가 포함된 Kotlin Notebook을 사용하여 AP
            // 새 토큰을 포함하여 다음 반복을 위한 페이지 경로를 업데이트합니다.
            pagePath = path + "&pageToken=" + next
 
-           // 다음 페이지가 없거나 최대 페이지 수에 도달할 때까지 페이지 로딩을 계속합니다.
+           // 다음 페이지가 없을 때까지 페이지 로딩을 계속합니다.
        } while (next != null && rows.size < maxPages) 
 
        // 로드된 모든 행을 DataFrame으로 결합하여 반환합니다.
@@ -80,14 +71,14 @@ Kotlin DataFrame 라이브러리가 포함된 Kotlin Notebook을 사용하여 AP
    }
    ```
 
-6. 이전에 정의한 `load()` 함수를 사용하여 새 코드 셀에서 데이터를 가져오고 DataFrame을 생성합니다. 이 예제에서는 Kotlin과 관련된 비디오 데이터를 가져오며, 페이지당 최대 50개의 결과로 최대 5페이지까지 가져옵니다. 결과는 `df` 변수에 저장됩니다:
+4. 이전에 정의한 `load()` 함수를 사용하여 새 코드 셀에서 데이터를 가져오고 DataFrame을 생성합니다. 이 예제에서는 Kotlin과 관련된 비디오 데이터를 가져오며, 페이지당 최대 50개의 결과로 최대 5페이지까지 가져옵니다. 결과는 `df` 변수에 저장됩니다:
 
    ```kotlin
    val df = load("search?q=kotlin&maxResults=50&part=snippet", 5)
    df
    ```
 
-7. 마지막으로 DataFrame에서 항목(items)을 추출하고 결합합니다:
+5. 마지막으로 DataFrame에서 항목(items)을 추출하고 결합합니다:
 
    ```kotlin
    val items = df.items.concat()
@@ -96,7 +87,7 @@ Kotlin DataFrame 라이브러리가 포함된 Kotlin Notebook을 사용하여 AP
 
 ## 데이터 정제 및 가공
 
-데이터 정제(Cleaning) 및 가공(Refining)은 분석을 위해 데이터셋을 준비하는 중요한 단계입니다. [Kotlin DataFrame 라이브러리](https://kotlin.github.io/dataframe/home.html)는 이러한 작업을 위한 강력한 기능을 제공합니다. [`move`](https://kotlin.github.io/dataframe/move.html), [`concat`](https://kotlin.github.io/dataframe/concatdf.html), [`select`](https://kotlin.github.io/dataframe/select.html), [`parse`](https://kotlin.github.io/dataframe/parse.html), [`join`](https://kotlin.github.io/dataframe/join.html)과 같은 메서드들은 데이터를 정리하고 변환하는 데 유용합니다.
+데이터 정제(Cleaning) 및 가공(Refining)은 분석을 위해 데이터셋을 준비하는 중요한 단계입니다. [Kotlin DataFrame 라이브러리](https://kotlin.github.io/dataframe/home.html)는 이러한 작업을 위한 강력한 기능을 제공합니다. [`move`](https://kotlin.github.io/dataframe/move.html), [`concat`](https://kotlin.github.io/dataframe/concatdf.html), [`select`](https://kotlin.github.io/dataframe/select.html), [`parse`](https://kotlin.github.io/dataframe/parse.html), [`join`](https://kotlin.github.io/dataframe/join.html)과 같은 메서드들은 데이터를 정리하고 변환하는 데 유용합니다. 
 
 이미 [YouTube Data API를 사용하여 가져온](#api에서-데이터-가져오기) 데이터를 예로 들어보겠습니다. 목표는 심층 분석을 준비하기 위해 데이터셋을 정제하고 재구성하는 것입니다:
 
@@ -139,7 +130,7 @@ Kotlin DataFrame 라이브러리가 포함된 Kotlin Notebook을 사용하여 AP
 
 [Kotlin DataFrame 라이브러리](https://kotlin.github.io/dataframe/home.html)의 함수를 사용하여 성공적으로 [데이터를 가져오고](#api에서-데이터-가져오기) [데이터를 정제 및 가공](#데이터-정제-및-가공)했다면, 다음 단계는 이 준비된 데이터셋을 분석하여 의미 있는 인사이트를 추출하는 것입니다.
 
-데이터 분류를 위한 [`groupBy`](https://kotlin.github.io/dataframe/groupby.html), [요약 통계](https://kotlin.github.io/dataframe/summarystatistics.html)를 위한 [`sum`](https://kotlin.github.io/dataframe/sum.html) 및 [`maxBy`](https://kotlin.github.io/dataframe/maxby.html), 데이터 정렬을 위한 [`sortBy`](https://kotlin.github.io/dataframe/sortby.html)와 같은 메서드들이 특히 유용합니다. 이러한 도구들을 사용하면 복잡한 데이터 분석 작업을 효율적으로 수행할 수 있습니다.
+데이터 분류를 위한 [`groupBy`](https://kotlin.github.io/dataframe/groupby.html), [요약 통계](https://kotlin.github.io/dataframe/summarystatistics.html)를 위한 [`sum`](https://kotlin.github.io/dataframe/sum.html) 및 [`maxBy`](https://kotlin.github.io/dataframe/maxby.html), 데이터 정렬을 위한 [`sortBy`](https://kotlin.github.io/dataframe/sortby.html)와 같은 메서드들이 특히 유용합니다. 이러한 도구들을 사용하면 복잡한 데이터 분석 작업을 효율적으로 수행할 수 있습니다. 
 
 `groupBy`를 사용하여 비디오를 채널별로 분류하고, `sum`을 사용하여 카테고리별 총 조회수를 계산하며, `maxBy`를 사용하여 각 그룹에서 최신 또는 가장 많이 본 비디오를 찾는 예제를 살펴보겠습니다:
 

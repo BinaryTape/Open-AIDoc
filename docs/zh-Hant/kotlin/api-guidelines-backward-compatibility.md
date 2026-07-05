@@ -245,6 +245,45 @@ public final User copy(java.lang.String, java.lang.String, boolean)
 
 資料類別的另一個問題是，更改建構函式引數的順序會影響產生的 `componentX` 方法，這些方法用於解構。即使它不破壞二進制相容性，更改順序也絕對會破壞行為相容性。
 
+## 避免更改註解目標
+
+當你公開一個註解時，避免在發布程式庫後更改其允許的目標。更改目標可能會影響使用者重新編譯現有程式碼時套用相同註解的方式。
+
+例如，如果一個註解僅宣告了 `AnnotationTarget.FIELD`，則對屬性使用不具限定符的註解會套用於其支援欄位：
+
+```kotlin
+@Target(AnnotationTarget.FIELD)
+annotation class Example
+
+class User {
+    @Example
+    val name: String = ""
+}
+```
+
+如果你稍後新增了 `AnnotationTarget.PROPERTY`，則相同的不具限定符註解會改為套用於屬性：
+
+```kotlin
+@Target(AnnotationTarget.PROPERTY, AnnotationTarget.FIELD)
+annotation class Example
+
+class User {
+    @Example
+    val name: String = ""
+}
+```
+
+發生這種情況是因為 [Kotlin 編譯器會優先選擇 `property` 目標而非 `field` 目標](annotations.md#defaults-when-no-use-site-targets-are-specified)。僅當 `property` 不適用時才會使用 `field` 目標。
+
+這可能會破壞預期在特定產生的元素上使用註解的工具和框架的相容性。特別是，`property` 目標對 Java 是不可見的。如果 Java 反射或 Java 註解處理器需要在支援欄位上尋找註解，使用者必須明確指定 `field` 使用位置目標：
+
+```kotlin
+class User {
+    @field:Example
+    val name: String = ""
+}
+```
+
 ## 使用 PublishedApi 註解的考量因素
 
 Kotlin 允許內聯函式成為程式庫 API 的一部分。對這些函式的呼叫將內聯到使用者編寫的用戶端程式碼中。這可能會引入相容性問題，因此不允許這些函式呼叫非公用 API 宣告。
@@ -274,7 +313,7 @@ Kotlin 標準庫 [提供了選擇加入機制](opt-in-requirements.md)，要求�
 如果你選擇使用此機制，我們建議遵循以下最佳實務：
 
 * 使用選擇加入機制為 API 的不同部分提供不同的保證。例如，你可以將特性標記為 _Preview_、_Experimental_ 和 _Delicate_。每個類別都應在文件和 [KDoc 註解](kotlin-doc.md) 中明確說明，並附帶適當的警告訊息。
-* 如果你的程式庫使用實驗性 API，請 [將註解傳播](opt-in-requirements.md#propagate-opt-in-requirements) 給你自己的使用者。這可確保你的使用者意識到你擁有仍在演進中的相依性。
+* If your library uses an experimental API, [將註解傳播](opt-in-requirements.md#propagate-opt-in-requirements) 給你自己的使用者。這可確保你的使用者意識到你擁有仍在演進中的相依性。
 * 避免使用選擇加入機制來棄用程式庫中已存在的宣告。請改用 `@Deprecated`，如 [務實地演進 API](#evolve-apis-pragmatically) 一節所述。
 
 ## 下一步

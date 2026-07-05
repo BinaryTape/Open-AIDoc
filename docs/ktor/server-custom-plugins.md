@@ -6,7 +6,7 @@
 <var name="example_name" value="custom-plugin"/>
 <p>
     <b>代码示例</b>：
-    <a href="https://github.com/ktorio/ktor-documentation/tree/%ktor_version%/codeSnippets/snippets/%example_name%">
+    <a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/%example_name%">
         %example_name%
     </a>
 </p>
@@ -135,7 +135,7 @@ val DataTransformationPlugin = createApplicationPlugin(name = "DataTransformatio
     onCallReceive { call ->
         transformBody { data ->
             if (requestedType?.type == Int::class) {
-                val line = data.readUTF8Line() ?: "1"
+                val line = data.readLine() ?: "1"
                 line.toInt() + 1
             } else {
                 data
@@ -148,7 +148,7 @@ val DataTransformationPlugin = createApplicationPlugin(name = "DataTransformatio
 上述代码段中的 `transformBody` 工作原理如下：
 
 1. `TransformBodyContext` 是一个 [lambda 接收器](https://kotlinlang.org/docs/scope-functions.html#context-object-this-or-it)，包含有关当前请求的类型信息。在上面的示例中，`TransformBodyContext.requestedType` 属性用于检查请求的数据类型。
-2. `data` 是一个 lambda 实参，允许您将请求体接收为 [ByteReadChannel](https://api.ktor.io/ktor-io/io.ktor.utils.io/-byte-read-channel/index.html) 并将其转换为所需的类型。在上面的示例中，`ByteReadChannel.readUTF8Line` 用于读取请求体。
+2. `data` 是一个 lambda 实参，允许您将请求体接收为 [ByteReadChannel](https://api.ktor.io/ktor-io/io.ktor.utils.io/-byte-read-channel/index.html) 并将其转换为所需的类型。在上面的示例中，`ByteReadChannel.readLine()` 用于读取请求体。
 3. 最后，您需要转换并返回数据。在我们的示例中，将接收到的整数值加 `1`。
 
 您可以在此处找到完整的示例：[DataTransformationPlugin.kt](https://github.com/ktorio/ktor-documentation/blob/%ktor_version%/codeSnippets/snippets/custom-plugin/src/main/kotlin/com/example/plugins/DataTransformationPlugin.kt)。
@@ -352,7 +352,7 @@ Ktor 允许您在[配置文件](server-create-and-configure.topic#engine-main)�
    </TabItem>
    </Tabs>
 
-   在我们的示例中，插件设置存储在 `http.custom_header` 组中。
+   在我们的示例中，插件设置存储在 `http.custom_header` group 中。
 
 2. 要访问配置文件属性，请将 `ApplicationConfig` 传递给配置类构造函数。
    `tryGetString` 函数返回指定的属性值：
@@ -388,7 +388,7 @@ Ktor 允许您在[配置文件](server-create-and-configure.topic#engine-main)�
 
 ### 配置 {id="config"}
 
-您可以使用 `applicationConfig` 属性访问您的服务器配置，该属性返回 [ApplicationConfig](https://api.ktor.io/ktor-server-core/io.ktor.server.config/-application-config/index.html) 实例。下面的示例显示了如何获取服务器使用的地址和端口：
+您可以使用 `applicationConfig` 属性访问您的服务器配置，该属性返回 [ApplicationConfig](https://api.ktor.io/ktor-server-core/io.ktor.server.config/-application-config/index.html) 实例。下面的示例显示了如何获取服务器使用的主机和端口：
 
 ```kotlin
 val SimplePlugin = createApplicationPlugin(name = "SimplePlugin") {

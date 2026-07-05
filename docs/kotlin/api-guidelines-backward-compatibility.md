@@ -251,6 +251,46 @@ public final User copy(java.lang.String, java.lang.String, boolean)
 
 `data class` 的另一个问题是，更改构造函数实参的顺序会影响生成的 `componentX` 方法，这些方法用于析构。即使它没有破坏二进制兼容性，更改顺序也肯定会破坏行为兼容性。
 
+## 避免更改注解目标
+
+当你公开一个注解时，请避免在发布库后更改其允许的目标。更改它们可能会影响用户在重新编译现有代码时如何应用相同的注解。
+
+例如，如果一个注解仅声明了 `AnnotationTarget.FIELD`，那么属性上不带限定符的注解将应用于其支持字段：
+
+```kotlin
+@Target(AnnotationTarget.FIELD)
+annotation class Example
+
+class User {
+    @Example
+    val name: String = ""
+}
+```
+
+如果你稍后添加了 `AnnotationTarget.PROPERTY`，那么相同的不带限定符的注解将改为应用于属性：
+
+```kotlin
+@Target(AnnotationTarget.PROPERTY, AnnotationTarget.FIELD)
+annotation class Example
+
+class User {
+    @Example
+    val name: String = ""
+}
+```
+
+这是因为 [Kotlin 编译器在选择 `field` 目标之前会优先选择 `property` 目标](annotations.md#defaults-when-no-use-site-targets-are-specified)。只有在 `property` 不适用时才会使用 `field` 目标。
+
+这可能会破坏依赖于特定生成元素上注解的工具和框架的兼容性。特别地，`property` 目标对 Java 是不可见的。
+如果 Java 反射或 Java 注解处理器需要在支持字段上找到该注解，则用户必须显式指定 `field` 使用点目标：
+
+```kotlin
+class User {
+    @field:Example
+    val name: String = ""
+}
+```
+
 ## 使用 PublishedApi 注解的注意事项
 
 Kotlin 允许内联函数作为库 API 的一部分。对这些函数的调用将被内联到用户编写的客户端代码中。这可能会引入兼容性问题，因此不允许这些函数调用非公共 API 声明。
@@ -288,7 +328,6 @@ Kotlin 标准库[提供了选择入机制](opt-in-requirements.md)，要求用�
 如果你选择使用此机制，我们建议遵循以下最佳做法：
 
 * 使用选择入机制为 API 的不同部分提供不同的保证。例如，你可以将功能标记为 _Preview_、_Experimental_ 和 _Delicate_。每个类别都应在你的文档和 [KDoc 注释](kotlin-doc.md)中明确说明，并附带适当的警告消息。
-* If your library uses an experimental API, [propagate the annotation](opt-in-requirements.md#propagate-opt-in-requirements) to your own users. This ensures your users are aware that you have dependencies which are still evolving.
 * 如果你的库使用了实验性 API，请将[该注解传播](opt-in-requirements.md#propagate-opt-in-requirements)给你自己的用户。这可确保你的用户意识到你具有仍在演进中的依赖项。
 * 避免使用选择入机制来弃用库中已经存在的声明。请改用 `@Deprecated`，如[务实地演进 API](#evolve-apis-pragmatically) 部分所述。
 

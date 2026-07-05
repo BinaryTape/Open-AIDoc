@@ -1,56 +1,48 @@
 [//]: # (title: 从 Web 源和 API 检索数据)
 
-[Kotlin Notebook](kotlin-notebook-overview.md) 为访问和操作来自各种 Web 源及 API 的数据提供了一个强大的平台。它通过提供一个迭代环境，简化了数据提取和分析任务，在其中可以可视化每一步以确保清晰。这在探索不熟悉的 API 时特别有用。
+使用 [Kotlin DataFrame 库](https://kotlin.github.io/dataframe/home.html)，您可以访问和操作来自各种 Web 源及 API 的数据。它还协助重构这些数据，以进行全面的分析和可视化。
 
-当与 [Kotlin DataFrame 库](https://kotlin.github.io/dataframe/home.html)配合使用时，Kotlin Notebook 不仅能让您连接并从 API 获取 JSON 数据，还能协助重构这些数据，以进行全面的分析和可视化。
-
-> 有关 Kotlin Notebook 示例，请参阅 [GitHub 上的 DataFrame 示例](https://github.com/Kotlin/dataframe/blob/master/examples/notebooks/youtube/Youtube.ipynb)。
-> 
-{style="tip"}
+浏览 [GitHub 上的 DataFrame 示例](https://github.com/Kotlin/dataframe/tree/master/examples/projects)。
 
 ## 开始之前
 
-Kotlin Notebook 依赖于 [Kotlin Notebook 插件](https://plugins.jetbrains.com/plugin/16340-kotlin-notebook)，该插件在 IntelliJ IDEA 中默认捆绑并启用。
-
-如果 Kotlin Notebook 功能不可用，请确保该插件已启用。要了解更多信息，请参阅[设置环境](kotlin-notebook-set-up-env.md)。
+> 从 IntelliJ IDEA 2026.2 开始，Kotlin Notebook 将不再与 IDE 捆绑，也不再由 JetBrains 提供官方支持。
+> 源代码将继续在 [GitHub](https://github.com/Kotlin/kotlin-notebook) 上可用。
+>
+> 详细了解[博客文章](https://blog.jetbrains.com/idea/2026/06/kotlin-notebook-sunset/)中的内容。
+>
+{style="note"}
 
 创建一个新的 Kotlin Notebook：
 
 1. 选择 **File** | **New** | **Kotlin Notebook**。
 
-2. 在 Kotlin Notebook 中，通过运行以下命令导入 Kotlin DataFrame 库：
+2. 通过运行以下命令导入 Kotlin DataFrame 库：
 
    ```kotlin
    %use dataframe
    ```
-   
+要跟随本教程，您还可以将 DataFrame 作为 [Gradle](https://kotlin.github.io/dataframe/setupgradle.html) 或 [Maven](https://kotlin.github.io/dataframe/setupmaven.html) 依赖项使用。
+
 ## 从 API 获取数据
 
-使用 Kotlin Notebook 与 Kotlin DataFrame 库从 API 获取数据是通过 [`.read()`](https://kotlin.github.io/dataframe/read.html) 函数实现的，这与[从文件检索数据](data-analysis-work-with-data-sources.md#retrieve-data)（如 CSV 或 JSON）类似。然而，在处理基于 Web 的源时，您可能需要额外的格式设置，以将原始 API 数据转换为结构化格式。
+使用 Kotlin DataFrame 库从 API 获取数据是通过 [`.read()`](https://kotlin.github.io/dataframe/read.html) 函数实现的，这与[从文件检索数据](data-analysis-work-with-data-sources.md#retrieve-data)（如 CSV 或 JSON）类似。然而，在处理基于 Web 的源时，您可能需要额外的格式设置，以将原始 API 数据转换为结构化格式。
 
 让我们来看一个从 [YouTube Data API](https://console.cloud.google.com/apis/library/youtube.googleapis.com) 获取数据的示例：
 
-1. 打开您的 Kotlin Notebook 文件 (`.ipynb`)。
-
-2. 导入对数据操作任务至关重要的 Kotlin DataFrame 库。这可以通过在代码单元格中运行以下命令来完成：
-
-   ```kotlin
-   %use dataframe
-   ```
-
-3. 在新的代码单元格中安全地添加您的 API 密钥，这是对 YouTube Data API 请求进行身份验证所必需的。您可以从[凭据选项卡](https://console.cloud.google.com/apis/credentials)获取您的 API 密钥：
+1. 在新的代码单元格中安全地添加您的 API 密钥，这是对 YouTube Data API 请求进行身份验证所必需的。您可以从[凭据选项卡](https://console.cloud.google.com/apis/credentials)获取您的 API 密钥：
 
    ```kotlin
    val apiKey = "YOUR-API_KEY"
    ```
 
-4. 创建一个 `load` 函数，该函数接收一个字符串路径，并使用 DataFrame 的 `.read()` 函数从 YouTube Data API 获取数据：
+2. 创建一个 `load` 函数，该函数接收一个字符串路径，并使用 DataFrame 的 `.read()` 函数从 YouTube Data API 获取数据：
 
    ```kotlin
    fun load(path: String): AnyRow = DataRow.read("https://www.googleapis.com/youtube/v3/$path&key=$apiKey")
    ```
 
-5. 将获取的数据整理成行，并通过 `nextPageToken` 处理 YouTube API 的分页。这可确保您收集跨多个页面的数据：
+3. 将获取的数据整理成行，并通过 `nextPageToken` 处理 YouTube API 的分页。这可确保您收集跨多个页面的数据：
 
    ```kotlin
    fun load(path: String, maxPages: Int): AnyFrame {
@@ -78,14 +70,14 @@ Kotlin Notebook 依赖于 [Kotlin Notebook 插件](https://plugins.jetbrains.com
    }
    ```
 
-6. 使用先前定义的 `load()` 函数在新的代码单元格中获取数据并创建 DataFrame。本例获取了与 Kotlin 相关的视频数据，每页最多 50 个结果，最多获取 5 页。结果存储在 `df` 变量中：
+4. 使用先前定义的 `load()` 函数在新的代码单元格中获取数据并创建 DataFrame。本例获取了与 Kotlin 相关的视频数据，每页最多 50 个结果，最多获取 5 页。结果存储在 `df` 变量中：
 
    ```kotlin
    val df = load("search?q=kotlin&maxResults=50&part=snippet", 5)
    df
    ```
 
-7. 最后，从 DataFrame 中提取并串联项目：
+5. 最后，从 DataFrame 中提取并串联项目：
 
    ```kotlin
    val items = df.items.concat()
@@ -185,5 +177,5 @@ Kotlin Notebook 依赖于 [Kotlin Notebook 插件](https://plugins.jetbrains.com
 ## 下一步
 
 * 使用 [Kandy 库](https://kotlin.github.io/kandy/examples.html)探索数据可视化
-* 在[使用 Kandy 在 Kotlin Notebook 中进行数据可视化](data-analysis-visualization.md)中查找有关数据可视化的其他信息
+* 在[使用 Kandy 进行数据可视化](data-analysis-visualization.md)中查找有关数据可视化的其他信息
 * 有关 Kotlin 中可用于数据科学和分析的工具和资源的广泛概述，请参阅[用于数据分析的 Kotlin 和 Java 库](data-analysis-libraries.md)

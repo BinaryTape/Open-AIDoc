@@ -1,7 +1,7 @@
 [//]: # (title: 連接資料庫並檢索資料)
 [//]: # (description: 了解如何連接 SQL 資料庫、檢查資料表架構，以及使用 Kotlin DataFrame 檢索資料。)
 
-[Kotlin Notebook](kotlin-notebook-overview.md) 提供對最常用 SQL 資料庫的支援：
+[Kotlin DataFrame 程式庫](https://kotlin.github.io/dataframe/home.html) 提供對最常用 SQL 資料庫的支援：
 
 * [DuckDB](https://kotlin.github.io/dataframe/duckdb.html)
 * [H2](https://kotlin.github.io/dataframe/h2.html)
@@ -11,22 +11,22 @@
 * [PostgreSQL](https://kotlin.github.io/dataframe/postgresql.html)
 * [SQLite](https://kotlin.github.io/dataframe/sqlite.html)
 
-利用 [Kotlin DataFrame 程式庫](https://kotlin.github.io/dataframe/home.html)，Kotlin Notebook 可以建立與資料庫的連線、執行 SQL 查詢，並匯入結果以進行後續操作。
-
-> 如需詳細範例，請參閱 [KotlinDataFrame SQL 範例 GitHub 儲存庫中的 Notebook](https://github.com/zaleslaw/KotlinDataFrame-SQL-Examples/blob/master/notebooks/imdb.ipynb)。
->
-{style="tip"}
+在 GitHub 上探索 [Kotlin DataFrame SQL 範例](https://github.com/zaleslaw/KotlinDataFrame-SQL-Examples/tree/master/src/main/kotlin)。
 
 ## 開始之前
 
-Kotlin Notebook 依賴 [Kotlin Notebook 外掛程式](https://plugins.jetbrains.com/plugin/16340-kotlin-notebook)，該外掛程式預設已在 IntelliJ IDEA 中封裝並啟用。
-
-如果 Kotlin Notebook 功能不可用，請確保已啟用該外掛程式。如需更多資訊，請參閱[設定環境](kotlin-notebook-set-up-env.md)。
+> 從 IntelliJ IDEA 2026.2 開始，Kotlin Notebook 將不再隨 IDE 封裝，也不再由 JetBrains 正式支援。
+> 原始碼仍可在 [GitHub](https://github.com/Kotlin/kotlin-notebook) 上取得。
+>
+> 進一步了解請參閱[部落格文章](https://blog.jetbrains.com/idea/2026/06/kotlin-notebook-sunset/)。
+>
+{style="note"}
 
 若要依照本教學進行：
-1. 建立[新的 Kotlin Notebook](kotlin-notebook-create.md)。
-2. 在 Notebook 的第一個程式碼資料格中，新增適用於您資料庫的 Java 資料庫連接 (JDBC) 驅動程式相依性。
-   
+
+1. 選取 **File** | **New** | **Kotlin Notebook**。
+2. 在 Notebook 的第一個資料格中，新增適用於您資料庫的 Java 資料庫連接 (JDBC) 驅動程式相依性。
+
    例如，若要連接到 MariaDB 資料庫，請新增：
 
    ```kotlin 
@@ -40,16 +40,16 @@ Kotlin Notebook 依賴 [Kotlin Notebook 外掛程式](https://plugins.jetbrains.
    %use dataframe
    ```
 
-> 在執行任何其他程式碼資料格之前，請先執行包含 `%use dataframe` 行的程式碼資料格，以確保 DataFrame 程式庫及其 API 在 Notebook 中可用。
->
-{style="note"}
+   在執行任何其他程式碼資料格之前，請先執行包含 `%use dataframe` 行的程式碼資料格，以確保 DataFrame 程式庫及其 API 在 Notebook 中可用。
+
+若要依照教學進行，您也可以將 DataFrame 作為 [Gradle](https://kotlin.github.io/dataframe/setupgradle.html) 或 [Maven](https://kotlin.github.io/dataframe/setupmaven.html) 相依性使用。
 
 ## 連接到資料庫
 
-若要連接到資料庫，請使用 `DbConnectionConfig()` 函式建立連線組態：
+若要連接到資料庫，請使用 `DbConnectionConfig()` 函式建立連線配置：
 
 1. 匯入以下功能：
-   
+
    ```kotlin
    import org.jetbrains.kotlinx.dataframe.io.DbConnectionConfig
    import org.jetbrains.kotlinx.dataframe.schema.DataFrameSchema
@@ -94,7 +94,7 @@ Kotlin DataFrame 提供兩種從資料庫載入資料的方式：
 * 直接從資料表載入資料。
 * 載入自訂 SQL 查詢的結果。
 
-這兩種方法都會傳回一個 DataFrame，您可以在 Kotlin Notebook 中對其進行檢查、轉換和分析。
+這兩種方法都會傳回一個 DataFrame，您可以在其中進行檢查、轉換和分析。
 
 ### 從資料表載入資料
 
@@ -153,7 +153,7 @@ filteredTarantinoMovies
 
 ## 分析資料
 
-使用 [Kotlin Notebook](kotlin-notebook-overview.md) 和 [DataFrame 程式庫](https://kotlin.github.io/dataframe/home.html)對資料進行分組、排序和聚合，以便發現並理解資料中的模式。
+使用 [DataFrame 程式庫](https://kotlin.github.io/dataframe/home.html)對資料進行分組、排序和聚合，以便發現並理解資料中的模式。
 
 例如，讓我們從 `actors` 資料表中讀取演員資料，並找出 20 個最常見的名字：
 
@@ -177,5 +177,5 @@ val top20ActorNames = actorDf
 ## 後續步驟
 
 * 使用 [Kandy 程式庫](https://kotlin.github.io/kandy/examples.html)探索資料視覺化
-* 在[使用 Kandy 在 Kotlin Notebook 中進行資料視覺化](data-analysis-visualization.md)中尋找關於資料視覺化的更多資訊
+* 在[使用 Kandy 進行資料視覺化](data-analysis-visualization.md)中尋找關於資料視覺化的更多資訊
 * 如需了解 Kotlin 中可用於資料科學和分析之工具與資源的廣泛概述，請參閱 [Kotlin 和 Java 資料分析程式庫](data-analysis-libraries.md)

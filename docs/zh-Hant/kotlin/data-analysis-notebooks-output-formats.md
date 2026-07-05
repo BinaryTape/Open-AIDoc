@@ -1,5 +1,12 @@
 [//]: # (title: Kotlin Notebook 支援的輸出格式)
 
+> 從 IntelliJ IDEA 2026.2 開始，Kotlin Notebook 將不再與 IDE 隨附，也不再由 JetBrains 正式支援。
+> 原始碼將繼續保留在 [GitHub](https://github.com/Kotlin/kotlin-notebook) 上。
+>
+> 若要了解更多，請參閱 [部落格文章](https://blog.jetbrains.com/idea/2026/06/kotlin-notebook-sunset/)。
+>
+{style="note"}
+
 [Kotlin Notebook](kotlin-notebook-overview.md) 支援多種輸出類型，包括文字、HTML 和影像。藉助外部程式庫，您可以擴充輸出選項，並使用圖表、試算表等將資料視覺化。
 
 每個輸出都是一個 JSON 物件，將 [Jupyter MIME 型別](https://jupyterlab.readthedocs.io/en/latest/user/file_formats.html) 對應到某些資料。Kotlin Notebook 會從此對應中選擇在其他型別中具有最高優先級的受支援 MIME 型別，並按如下方式渲染：
@@ -239,7 +246,7 @@ kotlinMascot
    ```
 
 2. 使用相同的資料框並在新資料格中執行 `plot()` 函式：
- 
+
    ```kotlin
    val salesPlot = dfSales.groupBy { Product }.plot {
        bars {

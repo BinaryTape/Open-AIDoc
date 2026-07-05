@@ -1,21 +1,22 @@
----
-title: 使用 Kandy 進行資料視覺化
-description: 了解如何透過建立折線圖、點狀圖和長條圖，使用 Kandy 和 Kotlin DataFrame 進行資料視覺化。
----
+[//]: # (title: 使用 Kandy 進行資料視覺化)
+[//]: # (description: 了解如何透過建立折線圖、點狀圖和長條圖，使用 Kandy 和 Kotlin DataFrame 進行資料視覺化。)
 
 Kotlin 為強大且靈活的資料視覺化提供了一站式解決方案，在深入研究複雜模型之前，提供了一種直觀的方式來呈現和探索資料。
 
-本教學示範如何使用 IntelliJ IDEA 中的 [Kotlin Notebook](kotlin-notebook-overview.md) 配合 [Kandy](https://kotlin.github.io/kandy/welcome.html) 和 [Kotlin DataFrame](https://kotlin.github.io/dataframe/home.html) 程式庫來建立不同的圖表類型。
+本教學示範如何使用 IntelliJ IDEA 配合 [Kandy](https://kotlin.github.io/kandy/welcome.html) 和 [Kotlin DataFrame](https://kotlin.github.io/dataframe/home.html) 程式庫來建立不同的圖表類型。
 
 ## 開始之前
 
-Kotlin Notebook 依賴於 [Kotlin Notebook 外掛程式](https://plugins.jetbrains.com/plugin/16340-kotlin-notebook)，該外掛程式預設在 IntelliJ IDEA 中內建並啟用。
-
-如果 Kotlin Notebook 功能無法使用，請確保已啟用該外掛程式。若要了解更多資訊，請參閱[設定環境](kotlin-notebook-set-up-env.md)。
+> 從 IntelliJ IDEA 2026.2 開始，Kotlin Notebook 將不再隨 IDE 內建，JetBrains 也不再官方支援。
+> 原始碼將繼續保留在 [GitHub](https://github.com/Kotlin/kotlin-notebook) 上。
+>
+> 若要了解更多資訊，請參閱[部落格文章](https://blog.jetbrains.com/idea/2026/06/kotlin-notebook-sunset/)。
+>
+{style="note"}
 
 若要按照本教學進行操作：
 
-1. 建立一個[新的 Kotlin Notebook](kotlin-notebook-create.md)。
+1. 選取 **File** | **New** | **Kotlin Notebook**。
 2. 在您的 notebook 中，匯入 [Kandy](https://kotlin.github.io/kandy/welcome.html) 和 [Kotlin DataFrame](https://kotlin.github.io/dataframe/home.html)：
 
    ```kotlin
@@ -23,9 +24,9 @@ Kotlin Notebook 依賴於 [Kotlin Notebook 外掛程式](https://plugins.jetbrai
    %use dataframe
    ```
 
-> 在執行任何其他程式碼資料格之前，請先執行包含 `%use dataframe` 行的程式碼資料格，以確保 DataFrame 程式庫及其 API 在 notebook 中可用。
->
-{style="note"}
+   在執行任何其他程式碼資料格之前，請先執行包含 `%use dataframe` 行的程式碼資料格，以確保 DataFrame 程式庫及其 API 在 notebook 中可用。
+
+若要按照本教學操作，您也可以將 DataFrame 作為 [Gradle](https://kotlin.github.io/dataframe/setupgradle.html) 或 [Maven](https://kotlin.github.io/dataframe/setupmaven.html) 相依性使用。
 
 ## 建立 DataFrame
 
@@ -76,10 +77,10 @@ df.head(4) // 傳回前四列
 
 ## 建立折線圖
 
-讓我們使用上一節中的 `df` DataFrame 在 Kotlin Notebook 中建立折線圖：
+讓我們使用上一節中的 `df` DataFrame 建立折線圖：
 
-1. 呼叫 Kandy 程式庫中的 `.plot()` 函式。
-2. 套用 `line()` 圖層。
+1. 呼叫 Kandy 程式庫中的 `.plot()` 函式。 
+2. 套用 `line()` 圖層。 
 3. 將 `Month` 和 `Temperature` 欄位分別對應到 `X` 軸和 `Y` 軸。
 4. （選填）自訂顏色和大小。
 
@@ -112,8 +113,8 @@ df.plot {
 
 現在，讓我們在點狀（散佈）圖中視覺化 `df` DataFrame：
 
-1. 呼叫 Kandy 程式庫中的 `.plot()` 函式。
-2. 套用 `points()` 圖層。
+1. 呼叫 Kandy 程式庫中的 `.plot()` 函式。 
+2. 套用 `points()` 圖層。 
 3. 將 `Month` 和 `Temperature` 欄位分別對應到 `X` 軸和 `Y` 軸。
 4. （選填）自訂顏色、軸標籤、點大小和圖表標題。
 
@@ -151,8 +152,8 @@ df.plot {
 
 最後，讓我們為每個城市建立一個長條圖：
 
-1. 使用 `.groupBy()` 函式依 `City` 欄位對 DataFrame 進行分組。
-2. 呼叫 Kandy 程式庫中的 `plot()` 函式。
+1. 使用 `.groupBy()` 函式依 `City` 欄位對 DataFrame 進行分組。 
+2. 呼叫 Kandy 程式庫中的 `plot()` 函式。 
 3. 套用 `bars()` 圖層。
 4. （選填）新增圖表標題，自訂顏色。
 
@@ -185,4 +186,3 @@ df.groupBy { City }.plot {
 * 在 [Kandy 程式庫文件](https://kotlin.github.io/kandy/examples.html)中探索更多圖表範例
 * 在 [Lets-Plot 程式庫文件](lets-plot.md)中探索更多進階繪圖選項
 * 在 [Kotlin DataFrame 程式庫文件](https://kotlin.github.io/dataframe/info.html)中尋找有關建立、探索和管理 DataFrame 的其他資訊
-* 在此 [YouTube 影片](https://www.youtube.com/watch?v=m4Cqz2_P9rI&t=4s)中進一步了解 Kotlin Notebook 中的資料視覺化

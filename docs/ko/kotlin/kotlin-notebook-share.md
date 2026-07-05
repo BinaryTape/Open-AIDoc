@@ -1,6 +1,13 @@
 [//]: # (title: Kotlin Notebook 공유하기)
 
-[Kotlin Notebook](kotlin-notebook-overview.md)을 공유하려면, [Kotlin 노트북](data-analysis-overview.md#notebooks)은 범용 Jupyter 포맷을 따르므로 단순히 모든 노트북 웹 뷰어에 업로드하기만 하면 됩니다.
+> IntelliJ IDEA 2026.2부터 Kotlin Notebook은 더 이상 IDE에 번들로 포함되지 않으며 JetBrains에서 공식적으로 지원하지 않습니다.
+> 소스 코드는 [GitHub](https://github.com/Kotlin/kotlin-notebook)에서 계속 확인할 수 있습니다.
+>
+> 자세한 내용은 [블로그 포스트](https://blog.jetbrains.com/idea/2026/06/kotlin-notebook-sunset/)에서 확인하세요.
+>
+{style="note"}
+
+[Kotlin Notebook](kotlin-notebook-overview.md)을 공유하려면, Kotlin 노트북은 범용 Jupyter 포맷을 따르므로 단순히 모든 노트북 웹 뷰어에 업로드하기만 하면 됩니다.
 
 Kotlin 노트북을 공유할 수 있는 플랫폼으로 다음을 권장합니다:
 

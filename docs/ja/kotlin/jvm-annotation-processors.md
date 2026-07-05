@@ -78,7 +78,7 @@ Kotlin は、アノテーションプロセッサを操作する 2 つの方法�
    ```
    
    * `kotlin-maven-plugin` の `kapt` ゴールの実行を、`compile` 実行の**前**に追加します。
-   * `aptMode` オプションを使用して、[アノテーション処理のレベル](kapt.md#use-in-maven)を設定します。
+   * `aptMode` オプションを使用して、[アノテーション処理のモード](kapt.md#set-up-in-maven)を設定します。
 
    </tab>
    <tab title="Gradle Kotlin" group-key="kotlin">

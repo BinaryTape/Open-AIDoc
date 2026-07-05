@@ -35,6 +35,18 @@ IntelliJ Ktor 插件允许您将 Ktor 项目迁移到最新版本。
 </tr>
 
 <tr>
+<td>3.5.1</td><td>2026 年 6 月 26 日</td><td>
+<p>
+一个修订版本，包含 OpenAPI 插件改进、扩展的身份验证 KDoc 文档，以及广泛的错误修复，涵盖 Kotlin 2.4 编译器兼容性、HTTP 和缓存行为、身份验证、WebRTC 稳定性以及跨 JVM、Darwin、Android 和 Windows 的平台特定问题。
+</p>
+<var name="version" value="3.5.1"/>
+<p>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">在 GitHub 上查看变更日志</a>
+</p>
+</td>
+</tr>
+
+<tr>
 <td>3.5.0</td><td>2026 年 5 月 15 日</td><td>
 <p>
 一个次要版本，引入了 RFC 7616 摘要身份验证支持、针对 OkHttp 和 Apache5 的自定义 DNS 解析器配置、请求参数助手函数，以及在配置、会话和 JavaScript 兼容性方面的其他改进。
@@ -74,7 +86,7 @@ IntelliJ Ktor 插件允许您将 Ktor 项目迁移到最新版本。
 <tr>
 <td>3.4.1</td><td>2026 年 3 月 4 日</td><td>
 <p>
-一个修订版本，包含重要的回归修复，包括解决<a href="whats-new-340.md#use-engine-dispatcher">使用引擎调度器的 HttpStatement 执行问题</a>，并恢复了正确的 <code>StreamResetException</code> 传播。它还包含性能改进、OpenAPI 增强以及跨引擎和平台的多个稳定性修复。
+一个修订版本，包含重要的回归修复，包括解决 <a href="whats-new-340.md#use-engine-dispatcher">使用引擎调度器的 HttpStatement 执行问题</a> 并恢复了正确的 <code>StreamResetException</code> 传播。它还包含性能改进、OpenAPI 增强以及跨引擎和平台的多个稳定性修复。
 </p>
 <var name="version" value="3.4.1"/>
 <p>
@@ -134,7 +146,7 @@ IntelliJ Ktor 插件允许您将 Ktor 项目迁移到最新版本。
 <tr>
 <td>3.3.0</td><td>2025 年 9 月 11 日</td><td>
 <p>
-一个次要版本，引入了主要功能，如实验性 OpenAPI 生成预览、改进的静态内容处理、适用于 Android 和 JS/Wasm 的 WebRTC 客户端，以及向 Jetty、OkHttp 和 Kotlin 2.2 的升级。欲了解更多信息，请参阅 <Links href="/ktor/whats-new-330" summary="undefined">Ktor 3.3.0 最新变化</Links>。
+一个次要版本，引入了主要功能，如实验性 OpenAPI 生成预览、改进的静态内容处理、适用于 Android 和 JS/Wasm 的 WebRTC 客户端，以及向 Jetty、OkHttp 和 Kotlin 2.2 的升级。欲了解更多详情，请参阅 <Links href="/ktor/whats-new-330" summary="undefined">Ktor 3.3.0 最新变化</Links>。
 </p>
 <var name="version" value="3.3.0"/>
 <p>
@@ -182,7 +194,7 @@ IntelliJ Ktor 插件允许您将 Ktor 项目迁移到最新版本。
 <tr>
 <td>3.2.0</td><td>2025 年 6 月 12 日</td><td>
 <p>
-一个次要版本，引入了类型化配置反序列化、新的依赖注入和 HTMX 模块、Gradle 版本目录支持以及挂起模块支持。欲了解更多信息，请参阅 <Links href="/ktor/whats-new-320" summary="undefined">Ktor 3.2.0 最新变化</Links>。
+一个次要版本，引入了类型化配置反序列化、新的依赖注入和 HTMX 模块、Gradle 版本目录支持以及挂起模块支持。欲了解更多详情，请参阅 <Links href="/ktor/whats-new-320" summary="undefined">Ktor 3.2.0 最新变化</Links>。
 </p>
 <var name="version" value="3.2.0"/>
 <p>

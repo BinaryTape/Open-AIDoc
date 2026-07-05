@@ -36,6 +36,18 @@ IntelliJ Ktor 外掛程式允許您將 Ktor 專案遷移到最新版本。
 </tr>
 
 <tr>
+<td>3.5.1</td><td>2026 年 6 月 26 日</td><td>
+<p>
+一個修正版本，包含 OpenAPI 外掛程式改進、擴展的身分驗證 KDoc 文件，以及涵蓋 Kotlin 2.4 編譯器相容性、HTTP 與快取行為、身分驗證、WebRTC 穩定性，以及跨 JVM、Darwin、Android 與 Windows 的平台特定問題等廣泛的錯誤修正。
+</p>
+<var name="version" value="3.5.1"/>
+<p>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">在 GitHub 上查看變更記錄</a>
+</p>
+</td>
+</tr>
+
+<tr>
 <td>3.5.0</td><td>2026 年 5 月 15 日</td><td>
 <p>
 一個次要版本，引入了 RFC 7616 摘要身分驗證支援、適用於 OkHttp 與 Apache5 的自訂 DNS 解析器配置、請求參數輔助函式，以及針對配置、工作階段 (sessions) 與 JavaScript 相容性的其他改進。
@@ -160,7 +172,7 @@ IntelliJ Ktor 外掛程式允許您將 Ktor 專案遷移到最新版本。
 <tr>
 <td>3.2.2</td><td>2025 年 7 月 14 日</td><td>
 <p>
-一個修正版本，改進了 SSE 欄位序列化順序，並解決了多項問題，包括 CORS 預檢處理、測試應用程式串流、配置反序列化錯誤，以及跨平台遺漏標頭的問題——包括影響 wasmJs 和 Darwin 目載的 3.2.1 迴歸問題。
+一個修正版本，改進了 SSE 欄位序列化順序，並解決了多項問題，包括 CORS 預檢處理、測試應用程式串流、配置反序列化錯誤，以及跨平台遺漏標頭的問題——包括影響 wasmJs 和 Darwin 目標的 3.2.1 迴歸問題。
 </p>
 <var name="version" value="3.2.2"/>
 <p>
@@ -195,7 +207,7 @@ IntelliJ Ktor 外掛程式允許您將 Ktor 專案遷移到最新版本。
 
 <tr>
 <td>3.1.3</td><td>2025 年 5 月 5 日</td><td><p>
-一個修正版本，包含效能改進（如更快的位元組操作和多部分處理）以及更安全的權杖重新整理處理。它還修正了計量指標中的記憶體問題、改進了標頭行為，並解決了 WebSockets、OkHttp、Apache5 和 Netty 的錯誤，此外還更新了 JTE 以支援 Kotlin 2.1.0。
+一個修正版本，包含效能改進（如更快的位元組操作和多部分處理）以及更安全的權杖重新整理處理。它還修正了計量指標中的記憶體問題、改進了標header行為，並解決了 WebSockets、OkHttp、Apache5 和 Netty 的錯誤，此外還更新了 JTE 以支援 Kotlin 2.1.0。
 </p>
 <var name="version" value="3.1.3"/>
 <p>

@@ -42,14 +42,14 @@ fun main() {
 
 Kotlinには、主に以下の基本型があります。
 
-| **カテゴリ**           | **基本型**                         | **サンプルコード**                                              |
-|------------------------|------------------------------------|---------------------------------------------------------------|
-| 整数                   | `Byte`, `Short`, `Int`, `Long`     | `val year: Int = 2020`                                        |
-| 符号なし整数           | `UByte`, `UShort`, `UInt`, `ULong` | `val score: UInt = 100u`                                      |
-| 浮動小数点数           | `Float`, `Double`                  | `val currentTemp: Float = 24.5f`, `val price: Double = 19.99` |
-| 論理値                 | `Boolean`                          | `val isEnabled: Boolean = true`                               |
-| 文字                   | `Char`                             | `val separator: Char = ','`                                   |
-| 文字列                 | `String`                           | `val message: String = "Hello, world!"`                       |
+| **カテゴリ**                                              | **基本型**                         | **サンプルコード**                                              |
+|-----------------------------------------------------------|------------------------------------|---------------------------------------------------------------|
+| [整数](numbers.md#integer-types)                      | `Byte`, `Short`, `Int`, `Long`     | `val year: Int = 2020`<br/> `val amount: Long = 350_000_000`      |
+| [符号なし整数](unsigned-integer-types.md)            | `UByte`, `UShort`, `UInt`, `ULong` | `val score: UInt = 100u`                                      |
+| [浮動小数点数](numbers.md#floating-point-types) | `Float`, `Double`                  | `val currentTemp: Float = 24.5f`<br/> `val price: Double = 19.99` |
+| [論理値](booleans.md)                                   | `Boolean`                          | `val isEnabled: Boolean = true`                               |
+| [文字](characters.md)                               | `Char`                             | `val separator: Char = ','`                                   |
+| [文字列](strings.md)                                     | `String`                           | `val message: String = "Hello, world!"`                       |
 
 基本型とそのプロパティの詳細については、[型の概要（Types overview）](types-overview.md)を参照してください。
 

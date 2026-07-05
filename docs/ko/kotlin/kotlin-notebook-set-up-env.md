@@ -1,5 +1,12 @@
 [//]: # (title: 환경 설정하기)
 
+> IntelliJ IDEA 2026.2부터 Kotlin Notebook은 더 이상 IDE에 포함되지 않으며 JetBrains에서 공식적으로 지원하지 않습니다.
+> 소스 코드는 [GitHub](https://github.com/Kotlin/kotlin-notebook)에서 계속 확인할 수 있습니다.
+>
+> 자세한 내용은 블로그 게시물에서 확인하세요.
+>
+{style="note"}
+
 <tldr>
    <p>이 문서는 <strong>Kotlin Notebook 시작하기</strong> 튜토리얼의 첫 번째 파트입니다:</p>
    <p><img src="icon-1.svg" width="20" alt="첫 번째 단계"/> <strong>환경 설정하기</strong><br/>
@@ -12,9 +19,9 @@
 
 ## 환경 설정
 
-Kotlin Notebook은 [Kotlin Notebook 플러그인](https://plugins.jetbrains.com/plugin/16340-kotlin-notebook)을 기반으로 동작하며, 이 플러그인은 IntelliJ IDEA에 기본적으로 포함되어 활성화되어 있습니다.
+Kotlin Notebook은 [Kotlin Notebook 플러그인](https://plugins.jetbrains.com/plugin/16340-kotlin-notebook)을 기반으로 동작합니다.
 
-Kotlin Notebook을 사용하려면 최신 버전의 [IntelliJ IDEA](https://www.jetbrains.com/idea/download/)를 다운로드하여 설치하세요.
+Kotlin Notebook을 사용하려면 [IntelliJ IDEA 2026.1 이전 버전](https://www.jetbrains.com/idea/download/other/)을 다운로드하여 설치하세요.
 
 Kotlin Notebook 기능을 사용할 수 없는 경우, 플러그인이 활성화되어 있는지 확인하세요:
 

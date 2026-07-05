@@ -244,6 +244,47 @@ public final User copy(java.lang.String, java.lang.String, boolean)
 
 데이터 클래스의 또 다른 문제는 생성자 인자의 순서를 변경하면 구조 분해(destructuring)에 사용되는 생성된 `componentX` 메서드에 영향을 미친다는 점입니다. 바이너리 호환성을 깨뜨리지 않더라도 순서를 변경하면 동작 호환성이 반드시 깨집니다.
 
+## 애노테이션 타겟 변경 피하기
+
+애노테이션을 공개할 때는 라이브러리를 배포한 후 허용된 타겟(target)을 변경하지 마십시오. 타겟을 변경하면 사용자가 기존 코드를 다시 컴파일할 때 동일한 애노테이션이 적용되는 방식에 영향을 줄 수 있습니다.
+
+예를 들어, 애노테이션이 `AnnotationTarget.FIELD`만 선언하는 경우, 프로퍼티에 지정된 한정되지 않은 애노테이션은 해당 프로퍼티의 뒷받침하는 필드(backing field)에 적용됩니다.
+
+```kotlin
+@Target(AnnotationTarget.FIELD)
+annotation class Example
+
+class User {
+    @Example
+    val name: String = ""
+}
+```
+
+나중에 `AnnotationTarget.PROPERTY`를 추가하면, 동일한 애노테이션이 필드 대신 프로퍼티에 적용됩니다.
+
+```kotlin
+@Target(AnnotationTarget.PROPERTY, AnnotationTarget.FIELD)
+annotation class Example
+
+class User {
+    @Example
+    val name: String = ""
+}
+```
+
+이는 [Kotlin 컴파일러가 `field` 타겟보다 `property` 타겟을 먼저 선택](annotations.md#defaults-when-no-use-site-targets-are-specified)하기 때문입니다. `field` 타겟은 `property`를 적용할 수 없는 경우에만 사용됩니다.
+
+이는 특정 생성된 요소에 애노테이션이 있을 것으로 기대하는 도구나 프레임워크의 호환성을 깨뜨릴 수 있습니다.
+특히, `property` 타겟은 Java에서 보이지 않습니다.
+Java 리플렉션이나 Java 애노테이션 프로세서가 뒷받침하는 필드에서 애노테이션을 찾아야 하는 경우, 사용자는 다음과 같이 `field` 사용 지점 타겟(use-site target)을 명시적으로 지정해야 합니다.
+
+```kotlin
+class User {
+    @field:Example
+    val name: String = ""
+}
+```
+
 ## PublishedApi 애노테이션 사용 시 고려 사항
 
 Kotlin은 인라인 함수가 라이브러리 API의 일부가 되는 것을 허용합니다. 이러한 함수에 대한 호출은 사용자가 작성한 클라이언트 코드에 인라인으로 삽입됩니다. 이는 호환성 문제를 유발할 수 있으므로, 이러한 함수는 공개 API가 아닌 선언을 호출할 수 없습니다.

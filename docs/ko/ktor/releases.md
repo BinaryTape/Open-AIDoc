@@ -36,6 +36,18 @@ IntelliJ Ktor 플러그인을 사용하여 Ktor 프로젝트를 최신 버전으
 </tr>
 
 <tr>
+<td>3.5.1</td><td>2026년 6월 26일</td><td>
+<p>
+OpenAPI 플러그인 개선 사항, 확장된 인증 KDoc 문서, 그리고 Kotlin 2.4 컴파일러 호환성, HTTP 및 캐싱 동작, 인증, WebRTC 안정성, JVM, Darwin, Android 및 Windows 전반의 플랫폼 특정 문제를 해결한 광범위한 버그 수정을 포함한 패치 릴리스입니다.
+</p>
+<var name="version" value="3.5.1"/>
+<p>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub에서 변경 로그 확인</a>
+</p>
+</td>
+</tr>
+
+<tr>
 <td>3.5.0</td><td>2026년 5월 15일</td><td>
 <p>
 RFC 7616 다이제스트 인증(Digest authentication) 지원, OkHttp 및 Apache5를 위한 커스텀 DNS 리졸버 구성, 요청 파라미터 헬퍼 함수, 그리고 구성, 세션 및 JavaScript 호환성 전반의 기타 개선 사항을 도입한 마이너 릴리스입니다.
@@ -204,7 +216,7 @@ SSE 필드 직렬화 순서를 개선하고 CORS 프리플라이트 처리, 테�
 </tr>
 
 <tr>
-<td>3.1.2</td><td>2025년 March 27, 2025</td><td><p>
+<td>3.1.2</td><td>2025년 3월 27일</td><td><p>
 Kotlin을 2.1.20으로 업데이트하고 Base64 디코딩, 인증 토큰 초기화, Android 서버 시작 오류, WebSocket 헤더 포맷팅 및 SSE 세션 취소를 포함한 다양한 문제를 수정한 패치 릴리스입니다. 
 </p>
 <var name="version" value="3.1.2"/>

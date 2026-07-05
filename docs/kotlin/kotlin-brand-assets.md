@@ -31,7 +31,6 @@ Kotlin 品牌包还包括几个官方 Kotlin 生态系统项目、库、框架�
 该包包含以下内容的徽标：
 
 * [Kotlin Foundation](https://kotlinfoundation.org)
-* [Kotlin Notebook](kotlin-notebook-overview.md)
 * [Kotlin Multiplatform (KMP)](https://kotlinlang.org/multiplatform/)
 * [Talking Kotlin](https://www.youtube.com/playlist?list=PLlFc5cFwUnmz1TwkP9SKCHU978dqLTANB)
 * [Compose Multiplatform (CMP)](https://kotlinlang.org/compose-multiplatform/)
@@ -118,7 +117,7 @@ JetBrains 为 Kotlin Night 活动提供品牌和材料。
 
 ### 社交媒体
 
-贴纸可用于为 Kotlin Night 所需的任何媒体打造品牌。只需将它们贴在您能接触到的任何东西上即可。很有趣！
+贴纸可用于为 Kotlin Night 所需任何媒体打造品牌。只需将它们贴在您能接触到的任何东西上即可。这很有趣！
 
 ![封面/徽标](kotlin-night-cover.svg){width=700}
 

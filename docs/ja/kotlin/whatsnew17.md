@@ -8,7 +8,7 @@
 
 _[リリース日: 2022年6月9日](releases.md#release-history)_
 
-Kotlin 1.7.0 がリリースされました。このバージョンでは、新しい Kotlin/JVM K2 コンパイラの Alpha 版が公開され、言語機能が安定化（Stable）し、JVM、JS、および Native プラットフォームにパフォーマンスの向上がもたらされます。
+Kotlin 1.7.0 がリリースされました。このバージョンでは、新しい Kotlin/JVM K2 コンパイラの Alpha 版が公開され、言語機能が安定化し、JVM、JS、および Native プラットフォームにパフォーマンスの向上がもたらされます。
 
 このバージョンの主なアップデートは以下の通りです。
 
@@ -362,7 +362,7 @@ kotlin {
 
 ## 標準ライブラリ
 
-Kotlin 1.7.0 では、標準ライブラリにさまざまな変更と改善が行われました。新しい機能の導入、試験的機能の安定化、そして Native、JS、および JVM における名前付きキャプチャグループのサポートの統一が行われています。
+Kotlin 1.7.0 では、標準ライブラリにさまざまな変更と改善が行われました。新しい機能の導入、試験的機能の安定化、および Native、JS、および JVM における名前付きキャプチャグループのサポートの統一が行われています。
 
 * [min() および max() コレクション関数が非ヌル型を返すように変更](#min-and-max-collection-functions-return-as-non-nullable)
 * [特定のインデックスでの正規表現マッチング](#regular-expression-matching-at-specific-indices)
@@ -377,7 +377,7 @@ Kotlin 1.7.0 では、標準ライブラリにさまざまな変更と改善が�
 
 [Kotlin 1.4.0](whatsnew14.md) では、`min()` および `max()` コレクション関数を `minOrNull()` および `maxOrNull()` に改名しました。これらの新しい名前は、レシーバーコレクションが空の場合に null を返すという動作をより適切に反映しています。また、Kotlin コレクション API 全体で使用されている命名規則とも一致させることができました。
 
-`minBy()`、`maxBy()`、`minWith()`、`maxWith()` についても同様で、1.4.0 でそれぞれの *OrNull() シノニムが導入されました。この変更の影響を受ける古い関数は、徐々に非推奨（deprecated）となりました。
+`minBy()`、`maxBy()`、`minWith()`、および `maxWith()` についても同様で、1.4.0 でそれぞれの *OrNull() シノニムが導入されました。この変更の影響を受ける古い関数は、徐々に非推奨（deprecated）となりました。
 
 Kotlin 1.7.0 では、元の関数名を再導入しますが、戻り値の型は非ヌル（non-nullable）になります。新しい `min()`、`max()`、`minBy()`、`maxBy()`、`minWith()`、および `maxWith()` 関数は、厳密にコレクション要素を返すか、例外をスローします。
 
@@ -477,7 +477,7 @@ fun main() {
 
 ### デフォルトの時間ソース向けのインラインクラスに基づいたタイムマーク
 
-Kotlin 1.7.0 では、`TimeSource.Monotonic` によって返されるタイムマークをインライン値クラスに変更することで、時間計測機能のパフォーマンスが向上しました。つまり、`markNow()`、`elapsedNow()`、`measureTime()`、`measureTimedValue()` などの関数を呼び出しても、その `TimeMark` インスタンスのためのラッパークラスが割り当てられません。特にホットパスの一部であるコードを計測する場合、計測によるパフォーマンスへの影響を最小限に抑えることができます。
+Kotlin 1.7.0 では、`TimeSource.Monotonic` によって返されるタイムマークをインライン値クラスに変更することで、時間計測機能のパフォーマンスが向上しました。つまり、`markNow()`、`elapsedNow()`、`measureTime()`、および `measureTimedValue()` などの関数を呼び出しても、その `TimeMark` インスタンスのためのラッパークラスが割り当てられません。特にホットパスの一部であるコードを計測する場合、計測によるパフォーマンスへの影響を最小限に抑えることができます。
 
 ```kotlin
 @OptIn(ExperimentalTime::class)
@@ -495,7 +495,7 @@ fun main() {
 
 Kotlin 1.7.0 には、Java の `Optional` クラスの操作を簡素化する新しい便利な関数が含まれています。これらの新しい関数は、JVM 上でオプショナルオブジェクトをアンラップして変換するために使用でき、Java API をより簡潔に扱うのに役立ちます。
 
-`getOrNull()`、`getOrDefault()`、`getOrElse()` 拡張関数を使用すると、`Optional` の値が存在する場合にその値を取得できます。そうでない場合は、それぞれ `null`、デフォルト値、または関数によって返される値を取得します。
+`getOrNull()`、`getOrDefault()`、および `getOrElse()` 拡張関数を使用すると、`Optional` の値が存在する場合にその値を取得できます。そうでない場合は、それぞれ `null`、デフォルト値、または関数によって返される値を取得します。
 
 ```kotlin
 val presentOptional = Optional.of("I'm here!")
@@ -517,7 +517,7 @@ println(absentOptional.getOrElse {
 // "Default value!"
 ```
 
-`toList()`、`toSet()`、`asSequence()` 拡張関数は、存在する `Optional` の値をリスト、セット、またはシーケンスに変換し、存在しない場合は空のコレクションを返します。`toCollection()` 拡張関数は、`Optional` の値を既存の送信先コレクションに追加します。
+`toList()`、`toSet()`、および `asSequence()` 拡張関数は、存在する `Optional` の値をリスト、セット、またはシーケンスに変換し、存在しない場合は空のコレクションを返します。`toCollection()` 拡張関数は、`Optional` の値を既存の送信先コレクションに追加します。
 
 ```kotlin
 val presentOptional = Optional.of("I'm here!")
@@ -761,7 +761,7 @@ plugins {
   kapt.verbose=true
   ```
 
-> [コマンドラインオプション `verbose`](kapt.md#use-in-cli) を介して詳細出力を有効にすることもできます。
+> [コマンドラインオプション `verbose`](kapt.md#cli) を介して詳細出力を有効にすることもできます。
 >
 {style="note"}
 

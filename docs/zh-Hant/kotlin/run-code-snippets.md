@@ -3,7 +3,6 @@
 Kotlin 程式碼通常組織在專案中，您可以在 IDE、文字編輯器或其他工具中進行處理。但是，如果您想快速查看某個函式的運作方式或尋找運算式的值，則無需建立新專案並進行組建。請查看這三種在不同環境中立即執行 Kotlin 程式碼的便捷方法：
 
 *   IDE 中的 [暫存檔 (scratch file)](#ide-scratches-and-worksheets)。
-*   IDE 中的 [Kotlin Notebook](#ide-kotlin-notebook)。
 *   瀏覽器中的 [Kotlin Playground](#browser-kotlin-playground)。
 *   命令列中的 [ki shell](#command-line-ki-shell)。
 
@@ -36,22 +35,6 @@ IDE 可以自動執行暫存檔中的程式碼。要在停止輸入後立即獲�
 暫存檔會使用已連線模組的編譯版本。因此，如果您修改了模組的原始碼檔案，變更將在您重新組建模組時傳播到暫存檔。要在每次執行暫存檔前自動重新組建模組，請選擇 **Make module before Run**。
 
 ![暫存檔選擇模組](scratch-select-module.png){width=700}
-
-## IDE：Kotlin Notebook
-
-[](kotlin-notebook-overview.md) 是一款互動式編輯器，讓您可以在一個文件中混合程式碼、輸出、視覺化內容和 Markdown。您可以使用 Notebook 在稱為 _程式碼資料格_ 的區塊中編寫和執行程式碼，並立即查看結果。
-
-![Kotlin Notebook](data-analysis-notebook.gif){width=700}
-
-Kotlin Notebook 已內建在 IntelliJ IDEA 中，且預設為啟用。
-
-要開始使用 Kotlin Notebook，請參閱 [Kotlin Notebook 入門](get-started-with-kotlin-notebooks.md)。
-
-### 暫存 Kotlin Notebook
-
-您還可以將 Kotlin Notebook 建立為 [暫存檔](https://www.jetbrains.com/help/idea/scratches.html)，這讓您可以測試一小段程式碼，而無需建立新專案或修改現有專案。暫存 Notebook 可以從任何專案中存取。 
-
-[了解如何建立暫存 Kotlin Notebook](kotlin-notebook-create.md#create-a-scratch-kotlin-notebook)。
 
 ## 瀏覽器：Kotlin Playground
 

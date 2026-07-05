@@ -4,7 +4,7 @@ Compose Multiplatform 提供特殊的 `compose-multiplatform-resources` 程式�
 
 在 Compose Multiplatform 中處理資源時，請考慮目前的狀況：
 
-* 幾乎所有資源都是在呼叫者執行緒中同步讀取的。唯一的例外是原始檔案和 Web 資源，它們是非同步讀取的。
+* 幾乎所有資源都是在呼叫者執行緒中同步讀取的。唯一的例外是原始檔案和 [Web 資源](compose-web-resources.md)，它們是非同步讀取的。
 * 目前尚不支援將大型原始檔案（例如長影片）作為串流讀取。請使用 [`getUri()`](compose-multiplatform-resources-usage.md#accessing-multiplatform-resources-from-external-libraries) 函式將個別檔案傳遞給系統 API，例如 [kotlinx-io](https://github.com/Kotlin/kotlinx-io) 程式庫。
 * 從 1.6.10 開始，只要您使用的是 Kotlin 2.0.0 或更新版本，以及 Gradle 7.6 或更新版本，就可以將資源放置在任何模組或原始碼集中。
 

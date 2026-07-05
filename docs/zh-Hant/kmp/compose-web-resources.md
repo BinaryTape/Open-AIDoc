@@ -1,6 +1,6 @@
 [//]: # (title: 處理 Web 資源)
 
-在這裡，您可以找到有關使用瀏覽器特性和 `preload` API 預載資源，以及快取 Web 資源的資訊。
+在這裡，您可以找到有關使用瀏覽器特性和 `preload` API 預載資源、快取 Web 資源以及自動字型備援的資訊。
   
 ## Web 目標的資源預載
 
@@ -37,71 +37,47 @@
 
 Compose Multiplatform 1.8.0 引入了用於在 Web 目標上預載字型和圖片資源的實驗性 API：`preloadFont()`、`preloadImageBitmap()` 和 `preloadImageVector()`。
 
-此外，如果您需要表情符號（emoji）等特殊字元，可以設定與預設組合（bundled）選項不同的備用字型。要指定備用字型，請使用 `FontFamily.Resolver.preload()` 方法。
+當渲染過程中遇到未解決的字元時，系統會[自動下載](#automatic-font-fallback)包含缺失字元的備援字型，因此開箱即支援表情符號（emoji）等特殊字元。
 
-以下範例展示了如何使用預載和備用字型：
+如果您想控制使用哪種備援字型，而不是依賴自動字型，請使用 `FontFamily.Resolver.preload()` 方法手動指定。Web 目標支援 TTF、OTF、TTC、變體字型（variable）以及 WOFF/WOFF2 字型格式。
+
+以下範例展示了如何使用向量圖片的預載：
 
 ```kotlin
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.runtime.*
-import androidx.compose.ui.*
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalFontFamilyResolver
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.window.ComposeViewport
-import components.resources.demo.shared.generated.resources.*
-import components.resources.demo.shared.generated.resources.NotoColorEmoji
-import components.resources.demo.shared.generated.resources.Res
-import components.resources.demo.shared.generated.resources.Workbench_Regular
-import components.resources.demo.shared.generated.resources.font_awesome
-import org.jetbrains.compose.resources.ExperimentalResourceApi
-import org.jetbrains.compose.resources.configureWebResources
-import org.jetbrains.compose.resources.demo.shared.UseResources
-import org.jetbrains.compose.resources.preloadFont
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalResourceApi::class)
+@Composable
+fun App() {
+    val icon by preloadImageVector(Res.drawable.heavy_vector_icon)
 
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalResourceApi::class, InternalComposeUiApi::class)
-fun main() {
-    configureWebResources {
-        // 覆寫資源位置
-        resourcePathMapping { path -> "./$path" }
-    }
-    ComposeViewport(viewportContainerId = "composeApplication") {
-        val font1 by preloadFont(Res.font.Workbench_Regular)
-        val font2 by preloadFont(Res.font.font_awesome, FontWeight.Normal, FontStyle.Normal)
-        val emojiFont = preloadFont(Res.font.NotoColorEmoji).value
-        var fontsFallbackInitialized by remember { mutableStateOf(false) }
-
-        // 為應用程式內容使用預載資源
-        UseResources()
-
-        if (font1 != null && font2 != null && emojiFont != null && fontsFallbackInitialized) {
-            println("Fonts are ready")
-        } else {
-            // 顯示進度指示器，以解決 FOUT 或應用程式在載入期間暫時無法使用的問題
-            Box(modifier = Modifier.fillMaxSize().background(Color.White.copy(alpha = 0.8f)).clickable {  }) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-            }
-            println("Fonts are not ready yet")
-        }
-
-        val fontFamilyResolver = LocalFontFamilyResolver.current
-        LaunchedEffect(fontFamilyResolver, emojiFont) {
-            if (emojiFont != null) {
-                // 預載包含表情符號的備用字型，以渲染組合字型不支援的缺失字符
-                fontFamilyResolver.preload(FontFamily(listOf(emojiFont)))
-                fontsFallbackInitialized = true
-            }
+    if (icon != null) {
+        MainScreen()
+    } else {
+        Box(modifier = Modifier.fillMaxSize()) {
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
         }
     }
 }
+
+@Composable
+fun MainScreen() {
+    // 圖片從快取中載入
+    Image(painter = painterResource(Res.drawable.heavy_vector_icon), contentDescription = null)
+}
 ```
-{initial-collapse-state="collapsed" collapsible="true" collapsed-title="fontFamilyResolver.preload(FontFamily(listOf(emojiFont)))"}
+{initial-collapse-state="collapsed" collapsible="true" collapsed-title="val icon by preloadImageVector(Res.drawable.heavy_vector_icon)"}
+
+## 自動字型備援
+<primary-label ref="Experimental"/>
+
+預設情況下，應用程式已載入字型未涵蓋的字元會顯示為替代字符（□，即所謂的「[tofu](https://fonts.google.com/knowledge/glossary/tofu)」）。
+
+[//]: # (TODO update version for stable release)
+
+從 1.12.0-beta01 版本開始，Compose Multiplatform 會在渲染期間監控未解決的字元，並根據需求下載必要的 Noto 字型子集。Noto 這個名稱是「no tofu」的縮寫，因為這些字型旨在消除 tofu 字符。
+
+一旦字型可用，受影響的文字將會重新組合（recomposed）。請注意，在下載過程中，tofu 可能會短暫出現。
+
+對於 CJK（中文、日文和韓文）字元，系統會根據瀏覽器的語言設定自動選擇正確的字型變體。
 
 ## 快取 Web 資源
 <primary-label ref="Experimental"/>
@@ -114,5 +90,5 @@ Compose Multiplatform 使用 [Web Cache API](https://developer.mozilla.org/en-US
 
 ## 接續步驟
 
-* 進一步了解 [設定資源](compose-multiplatform-resources-setup.md) 以及 [在應用程式中使用資源](compose-multiplatform-resources-usage.md)。
+* 閱讀更多關於 [設定資源](compose-multiplatform-resources-setup.md) 以及 [在應用程式中使用資源](compose-multiplatform-resources-usage.md) 的資訊。
 * 了解如何管理應用程式的 [資源環境](compose-resource-environment.md)，例如應用程式內的主題和語言。

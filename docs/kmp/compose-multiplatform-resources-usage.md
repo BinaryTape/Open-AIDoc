@@ -6,7 +6,7 @@
 
 之后，你可以在代码或外部库中使用生成的类来访问配置的多平台资源。
 
-阅读以下内容了解详细信息：
+阅读以下内容了解这些主题的详细信息：
 
 * [导入生成的 `Res` 类和访问器](#importing-the-generated-class)。
 * [自定义访问器类生成](#customizing-accessor-class-generation)：如何将其设为 public、分配到软件包或无条件生成。
@@ -19,7 +19,8 @@
 * [访问通过字符串 ID 映射的资源](#generated-maps-for-resources-and-string-ids)。
 * [将多平台资源用作 Android 资产](#compose-multiplatform-resources-as-android-assets)。
 * 处理 Web 特有的资源：
-  * 使用浏览器功能和 preload API [预加载资源](compose-web-resources.md#preloading-of-resources-for-web-targets)。
+  * 使用浏览器功能和预加载 API [预加载资源](compose-web-resources.md#preloading-of-resources-for-web-targets)。
+  * 针对缺失字符的 [自动字体回退](compose-web-resources.md#automatic-font-fallback)。
   * [缓存 Web 资源](compose-web-resources.md#caching-web-resources)。
 * 使用外部资源： 
   [来自外部库](#accessing-multiplatform-resources-from-external-libraries)、
@@ -307,7 +308,7 @@ coroutineScope.launch {
 </TabItem>
 </Tabs>
 
-> 你可以使用类 Emmet 的语法快速定义字符串数组。使用 `string-array`、`sa` 或 `>` 运算符生成空的数组模板。对于具有预定义项目数量和起始文本的命名数组，请输入 `test>2{Hello}`并按 **Tab** 键：
+> 你可以使用类 Emmet 的语法快速定义字符串数组。使用 `string-array`、`sa` 或 `>` 运算符生成空的数组模板。对于具有预定义项目数量和起始文本的命名数组，请输入 `test>2{Hello}` 并按 **Tab** 键：
 > ```xml
 > <string-array name="test">
 >    <item>Hello</item>
@@ -386,14 +387,16 @@ coroutineScope.launch {
 > <plurals name="test">
 >     <item quantity="one"></item>
 >     <item quantity="other"></item>
-> </plurals>
-> ```
->
-{style="note"}
+ > </plurals>
+ > ```
+ >
+ {style="note"}
 
 ### 字体
 
-将自定义字体作为 `*.ttf` 或 `*.otf` 文件存储在 `composeResources/font` 目录中。
+将自定义字体存储在 `composeResources/font` 目录中。
+Compose Multiplatform 在所有平台上均支持 TTF、OTF、TTC 和可变字体格式。
+WOFF 和 WOFF2 仅在 Web 和 macOS 上可用。
 
 要将字体作为 `Font` 类型加载，请使用 `Font()` 可组合函数：
 
@@ -444,7 +447,9 @@ private fun InterTypography(): Typography {
 >
 {style="note"}
 
-要在 Web 目标中支持表情符号或阿拉伯文字等特殊字符，你需要将相应的字体添加到资源中并[预加载回退字体](compose-web-resources.md#preload-resources-using-the-compose-multiplatform-preload-api)。
+表情符号和阿拉伯语脚本等特殊字符通过 [自动字体回退](compose-web-resources.md#automatic-font-fallback) 在 Web 目标中自动支持，该功能会按需下载所需的 Noto 字体。
+
+如果你需要完全控制使用的字体，请捆绑特定字体并使用 [预加载 API](compose-web-resources.md#preload-resources-using-the-compose-multiplatform-preload-api) 手动注册。
 
 ### 原始文件
 
@@ -487,7 +492,7 @@ coroutineScope.launch {
 
 如果你读取的文件是位图（JPEG、PNG、BMP、WEBP）或 XML 矢量图像，可以使用以下函数将它们转换为适用于 `Image()` 可组合项的 `ImageBitmap` 或 `ImageVector` 对象。
 
-按照[原始文件](#raw-files)部分所示访问原始文件，然后将结果传递给可组合项：
+按照 [原始文件](#raw-files) 部分所示访问原始文件，然后将结果传递给可组合项：
 
 ```kotlin
 // bytes = Res.readBytes("files/example.png")
@@ -593,7 +598,7 @@ val uri = Res.getUri("files/my_video.mp4")
 
 现在 `uri` 变量包含了文件的绝对路径，任何外部库都可以使用该路径以适合其的方式访问文件。
 
-对于 Android 特定的用途，多平台资源也会[作为 Android 资产打包](#compose-multiplatform-resources-as-android-assets)。
+对于 Android 特定的用途，多平台资源也会 [作为 Android 资产打包](#compose-multiplatform-resources-as-android-assets)。
 
 ### 远程文件
 
@@ -647,5 +652,5 @@ private fun readResourceBytes(resourcePath: String) =
 
 ## 后续步骤
 
-* 查看官方[示例项目](https://github.com/JetBrains/compose-multiplatform/tree/master/components/resources/demo)，该项目展示了如何在针对 iOS、Android 和桌面的 Compose Multiplatform 项目中处理资源。
-* 了解如何管理应用程序的[资源环境](compose-resource-environment.md)，例如应用内主题和语言。
+* 查看官方 [示例项目](https://github.com/JetBrains/compose-multiplatform/tree/master/components/resources/demo)，该项目展示了如何在针对 iOS、Android 和桌面的 Compose Multiplatform 项目中处理资源。
+* 了解如何管理应用程序的 [资源环境](compose-resource-environment.md)，例如应用内主题和语言。

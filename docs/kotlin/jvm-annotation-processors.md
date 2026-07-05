@@ -28,118 +28,118 @@ Kotlin 支持两种使用注解处理器的方式：
 
 下面的示例展示了如何使用 [MapStruct](https://mapstruct.org/) 注解处理器，它可以在编译时生成 Java bean 之间的类型安全映射器实现。
 
-1. 在构建文件中应用 `kapt` 插件并将 MapStruct 添加到 `dependencies` 部分：
+1.  在构建文件中应用 `kapt` 插件并将 MapStruct 添加到 `dependencies` 部分：
 
-   <tabs group="build-tool">
-   <tab title="Maven" group-key="maven">
-   
-   ```xml
-   <properties>
-       <kotlin.compiler.jvmTarget>11</kotlin.compiler.jvmTarget>
-       <mapstruct.version>1.6.3</mapstruct.version>
-   </properties>
-   
-   <dependencies>
-       <dependency>
-           <groupId>org.mapstruct</groupId>
-           <artifactId>mapstruct</artifactId>
-           <version>${mapstruct.version}</version>
-       </dependency>
-   </dependencies>
-   
-   <plugin>
-       <groupId>org.jetbrains.kotlin</groupId>
-       <artifactId>kotlin-maven-plugin</artifactId>
-       <version>${kotlin.version}</version>
-       <extensions>true</extensions>
-       <executions>
-           <execution>
-               <id>kapt</id>
-               <goals>
-                   <goal>kapt</goal>
-               </goals>
-               <configuration>
-                   <sourceDirs>
-                       <sourceDir>src/main/kotlin</sourceDir>
-                       <sourceDir>src/main/java</sourceDir>
-                   </sourceDirs>
-                   <aptMode>stubs</aptMode>
-                   <annotationProcessorPaths>
-                       <annotationProcessorPath>
-                           <groupId>org.mapstruct</groupId>
-                           <artifactId>mapstruct-processor</artifactId>
-                           <version>${mapstruct.version}</version>
-                       </annotationProcessorPath>
-                   </annotationProcessorPaths>
-               </configuration>
-           </execution>
-       </executions>
-   </plugin>
-   ```
-   
-   * 在 `compile` 执行 **之前** 添加 `kotlin-maven-plugin` 的 `kapt` 目标执行。
-   * 使用 `aptMode` 选项配置 [注解处理级别](kapt.md#use-in-maven)。
+    <tabs group="build-tool">
+    <tab title="Maven" group-key="maven">
 
-   </tab>
-   <tab title="Gradle Kotlin" group-key="kotlin">
-   
-   ```kotlin
-   plugins {
-       kotlin("kapt") version "%kotlinVersion%"
-   }
-   
-   dependencies {
-       implementation("org.mapstruct:mapstruct:1.6.3")
-       kapt("org.mapstruct:mapstruct-processor:1.6.3")
-   }
-   ```
-   
-   </tab>
-   <tab title="Gradle Groovy" group-key="groovy">
-   
-   ```groovy
-   plugins {
-       id "org.jetbrains.kotlin.kapt" version "%kotlinVersion%"
-   }
-   
-   dependencies {
-       implementation "org.mapstruct:mapstruct:1.6.3"
-       kapt "org.mapstruct:mapstruct-processor:1.6.3"
-   }
-   ```
-   
-   </tab>
-   </tabs>
+    ```xml
+    <properties>
+        <kotlin.compiler.jvmTarget>11</kotlin.compiler.jvmTarget>
+        <mapstruct.version>1.6.3</mapstruct.version>
+    </properties>
 
-2. 定义你的数据类和映射器接口：
+    <dependencies>
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>${mapstruct.version}</version>
+        </dependency>
+    </dependencies>
 
-   ```kotlin
-   import org.mapstruct.Mapper
-   import org.mapstruct.factory.Mappers
-   
-   data class UserDto(val id: Long, val firstName: String, val lastName: String)
-   
-   data class UserEntity(val id: Long, val firstName: String, val lastName: String)
-   
-   @Mapper
-   interface UserMapper {
-       fun toDto(entity: UserEntity): UserDto
-       fun toEntity(dto: UserDto): UserEntity
-   
-       companion object : UserMapper by Mappers.getMapper(UserMapper::class.java)
-   }
-   ```
+    <plugin>
+        <groupId>org.jetbrains.kotlin</groupId>
+        <artifactId>kotlin-maven-plugin</artifactId>
+        <version>${kotlin.version}</version>
+        <extensions>true</extensions>
+        <executions>
+            <execution>
+                <id>kapt</id>
+                <goals>
+                    <goal>kapt</goal>
+                </goals>
+                <configuration>
+                    <sourceDirs>
+                        <sourceDir>src/main/kotlin</sourceDir>
+                        <sourceDir>src/main/java</sourceDir>
+                    </sourceDirs>
+                    <aptMode>stubs</aptMode>
+                    <annotationProcessorPaths>
+                        <annotationProcessorPath>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>${mapstruct.version}</version>
+                        </annotationProcessorPath>
+                    </annotationProcessorPaths>
+                </configuration>
+            </execution>
+        </executions>
+    </plugin>
+    ```
 
-3. 构建项目。MapStruct 会在生成的源目录中生成 `UserMapperImpl` 类。使用 `UserMapper` 伴生对象来调用生成的实现：
+    *   在 `compile` 执行 **之前** 添加 `kotlin-maven-plugin` 的 `kapt` 目标执行。
+    *   使用 `aptMode` 选项配置 [注解处理模式](kapt.md#set-up-in-maven)。
 
-   ```kotlin
-   fun main() {
-       val entity = UserEntity(id = 1L, firstName = "John", lastName = "Doe")
-       val dto = UserMapper.toDto(entity)
-       println(dto)
-       // UserDto(id=1, firstName=John, lastName=Doe)
-   }
-   ```
+    </tab>
+    <tab title="Gradle Kotlin" group-key="kotlin">
+
+    ```kotlin
+    plugins {
+        kotlin("kapt") version "%kotlinVersion%"
+    }
+
+    dependencies {
+        implementation("org.mapstruct:mapstruct:1.6.3")
+        kapt("org.mapstruct:mapstruct-processor:1.6.3")
+    }
+    ```
+
+    </tab>
+    <tab title="Gradle Groovy" group-key="groovy">
+
+    ```groovy
+    plugins {
+        id "org.jetbrains.kotlin.kapt" version "%kotlinVersion%"
+    }
+
+    dependencies {
+        implementation "org.mapstruct:mapstruct:1.6.3"
+        kapt "org.mapstruct:mapstruct-processor:1.6.3"
+    }
+    ```
+
+    </tab>
+    </tabs>
+
+2.  定义你的数据类和映射器接口：
+
+    ```kotlin
+    import org.mapstruct.Mapper
+    import org.mapstruct.factory.Mappers
+
+    data class UserDto(val id: Long, val firstName: String, val lastName: String)
+
+    data class UserEntity(val id: Long, val firstName: String, val lastName: String)
+
+    @Mapper
+    interface UserMapper {
+        fun toDto(entity: UserEntity): UserDto
+        fun toEntity(dto: UserDto): UserEntity
+
+        companion object : UserMapper by Mappers.getMapper(UserMapper::class.java)
+    }
+    ```
+
+3.  构建项目。MapStruct 会在生成的源目录中生成 `UserMapperImpl` 类。使用 `UserMapper` 伴生对象来调用生成的实现：
+
+    ```kotlin
+    fun main() {
+        val entity = UserEntity(id = 1L, firstName = "John", lastName = "Doe")
+        val dto = UserMapper.toDto(entity)
+        println(dto)
+        // UserDto(id=1, firstName=John, lastName=Doe)
+    }
+    ```
 
 ## 在 Gradle 项目中使用 KSP
 
@@ -151,78 +151,78 @@ Kotlin 支持两种使用注解处理器的方式：
 
 下面的示例展示了如何使用 [Dagger](https://dagger.dev/)，这是一个在编译时生成依赖图连线代码的依赖注入框架。
 
-1. 在你的 `build.gradle(.kts)` 文件中，应用 KSP 插件并将 Dagger 添加到 `dependencies` 块中：
- 
-   <tabs group="build-script">
-   <tab title="Kotlin" group-key="kotlin">
-   
-   ```kotlin
-   // build.gradle.kts
-   
-   plugins {
-       kotlin("jvm") version "%kotlinVersion%"
-       id("com.google.devtools.ksp") version "%kspVersion%"
-   }
-   
-   dependencies {
-       implementation("com.google.dagger:dagger:2.59.2")
-       ksp("com.google.dagger:dagger-compiler:2.59.2")
-   }
-   ```
-   
-   </tab>
-   <tab title="Groovy" group-key="groovy">
-   
-   ```groovy
-   // build.gradle
-   
-   plugins {
-       id 'org.jetbrains.kotlin.jvm' version '%kotlinVersion%'
-       id 'com.google.devtools.ksp' version '%kspVersion%'
-   }
-   
-   dependencies {
-       implementation 'com.google.dagger:dagger:2.59.2'
-       ksp 'com.google.dagger:dagger-compiler:2.59.2'
-   }
-   ```
-   
-   </tab>
-   </tabs>
+1.  在你的 `build.gradle(.kts)` 文件中，应用 KSP 插件并将 Dagger 添加到 `dependencies` 块中：
 
-   > 要查找 KSP 的最新版本，请查看 GitHub [Releases](https://github.com/google/ksp/releases) 页面。
-   >
-   {style="tip"}
+    <tabs group="build-script">
+    <tab title="Kotlin" group-key="kotlin">
 
-2. 使用 Dagger 注解标记你的 Kotlin 类：
+    ```kotlin
+    // build.gradle.kts
 
-   ```kotlin
-   import javax.inject.Inject
-   import javax.inject.Singleton
-   import dagger.Component
-   import dagger.Module
-   import dagger.Provides
-   
-   @Singleton
-   class UserRepository @Inject constructor() {
-       fun getUser(): String = "John Doe"
-   }
-   
-   @Module
-   class AppModule {
-       @Provides
-       @Singleton
-       fun provideUserRepository(): UserRepository = UserRepository()
-   }
-   
-   @Singleton
-   @Component(modules = [AppModule::class])
-   interface AppComponent {
-       fun userRepository(): UserRepository
-   }
-   ```
+    plugins {
+        kotlin("jvm") version "%kotlinVersion%"
+        id("com.google.devtools.ksp") version "%kspVersion%"
+    }
 
-3. 构建项目。Dagger 会在 `build/generated/ksp` 目录中生成实现类，例如 `DaggerAppComponent`。在代码中使用生成的类：
+    dependencies {
+        implementation("com.google.dagger:dagger:2.59.2")
+        ksp("com.google.dagger:dagger-compiler:2.59.2")
+    }
+    ```
+
+    </tab>
+    <tab title="Groovy" group-key="groovy">
+
+    ```groovy
+    // build.gradle
+
+    plugins {
+        id 'org.jetbrains.kotlin.jvm' version '%kotlinVersion%'
+        id 'com.google.devtools.ksp' version '%kspVersion%'
+    }
+
+    dependencies {
+        implementation 'com.google.dagger:dagger:2.59.2'
+        ksp 'com.google.dagger:dagger-compiler:2.59.2'
+    }
+    ```
+
+    </tab>
+    </tabs>
+
+    > 要查找 KSP 的最新版本，请查看 GitHub [Releases](https://github.com/google/ksp/releases) 页面。
+    >
+    {style="tip"}
+
+2.  使用 Dagger 注解标记你的 Kotlin 类：
+
+    ```kotlin
+    import javax.inject.Inject
+    import javax.inject.Singleton
+    import dagger.Component
+    import dagger.Module
+    import dagger.Provides
+
+    @Singleton
+    class UserRepository @Inject constructor() {
+        fun getUser(): String = "John Doe"
+    }
+
+    @Module
+    class AppModule {
+        @Provides
+        @Singleton
+        fun provideUserRepository(): UserRepository = UserRepository()
+    }
+
+    @Singleton
+    @Component(modules = [AppModule::class])
+    interface AppComponent {
+        fun userRepository(): UserRepository
+    }
+    ```
+
+3.  构建项目。Dagger 会在 `build/generated/ksp` 目录中生成实现类，例如 `DaggerAppComponent`。在代码中使用生成的类：
 
     ```kotlin
     fun main() {
@@ -239,14 +239,14 @@ Kotlin 支持两种使用注解处理器的方式：
 
 你可以使用 KSP API 编写自己的注解处理器，以便在编译时生成代码。一个新处理器需要三个模块：
 
-* 一个声明自定义注解的 `annotation` 模块。
-* 一个实现 `SymbolProcessor` 和 `SymbolProcessorProvider` 工厂的 `processor` 模块。`SymbolProcessor` 包含主要逻辑，而 `SymbolProcessorProvider` 负责创建处理器并在 `META-INF/services/` 路径中注册提供者。
-* 一个应用 KSP 插件、依赖于该处理器并使用该注解的 `app` 模块。
+*   一个声明自定义注解的 `annotation` 模块。
+*   一个实现 `SymbolProcessor` 和 `SymbolProcessorProvider` 工厂的 `processor` 模块。`SymbolProcessor` 包含主要逻辑，而 `SymbolProcessorProvider` 负责创建处理器并在 `META-INF/services/` 路径中注册提供者。
+*   一个应用 KSP 插件、依赖于该处理器并使用该注解的 `app` 模块。
 
 有关完整的逐步操作说明，请参阅 [KSP 快速入门](ksp-quickstart.md#create-your-own-processor)。
 
 ## 下一步
 
-* [详细了解 kapt 配置](kapt.md)
-* [开始使用 KSP](ksp-quickstart.md)
-* [了解如何从 kapt 迁移到 KSP](ksp-kapt-migration.md)
+*   [详细了解 kapt 配置](kapt.md)
+*   [开始使用 KSP](ksp-quickstart.md)
+*   [了解如何从 kapt 迁移到 KSP](ksp-kapt-migration.md)

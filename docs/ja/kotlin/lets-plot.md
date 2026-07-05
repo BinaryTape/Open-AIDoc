@@ -2,17 +2,20 @@
 
 [Lets-Plot for Kotlin (LPK)](https://lets-plot.org/kotlin/get-started.html) は、[R の ggplot2 ライブラリ](https://ggplot2.tidyverse.org/) を Kotlin に移植したマルチプラットフォーム・プロットライブラリです。LPK は、機能豊富な ggplot2 の API を Kotlin エコシステムにもたらし、高度なデータ可視化機能を必要とする科学者や統計家に適したツールとなっています。
 
-LPK は、[Kotlin Notebook](data-analysis-overview.md#notebooks)、[Kotlin/JS](js-overview.md)、[JVM の Swing](https://docs.oracle.com/javase/8/docs/technotes/guides/swing/)、[JavaFX](https://openjfx.io/)、および [Compose Multiplatform](https://www.jetbrains.com/lp/compose-multiplatform/) を含む様々なプラットフォームをターゲットとしています。さらに、LPK は [IntelliJ](https://www.jetbrains.com/idea/)、[DataGrip](https://www.jetbrains.com/datagrip/)、[DataSpell](https://www.jetbrains.com/dataspell/)、および [PyCharm](https://www.jetbrains.com/pycharm/) とシームレスに統合されています。
+LPK は、[Kotlin/JS](js-overview.md)、[JVM の Swing](https://docs.oracle.com/javase/8/docs/technotes/guides/swing/)、[JavaFX](https://openjfx.io/)、および [Compose Multiplatform](https://www.jetbrains.com/lp/compose-multiplatform/) を含む様々なプラットフォームをターゲットとしています。さらに、LPK は [IntelliJ](https://www.jetbrains.com/idea/)、[DataGrip](https://www.jetbrains.com/datagrip/)、[DataSpell](https://www.jetbrains.com/dataspell/)、および [PyCharm](https://www.jetbrains.com/pycharm/) とシームレスに統合されています。
 
 ![Lets-Plot](lets-plot-overview.png){width=700}
 
-このチュートリアルでは、IntelliJ IDEA の Kotlin Notebook を使用して、LPK および [Kotlin DataFrame](https://kotlin.github.io/dataframe/home.html) ライブラリで様々な種類のプロットを作成する方法を説明します。
+このチュートリアルでは、IntelliJ IDEA で LPK および [Kotlin DataFrame](https://kotlin.github.io/dataframe/home.html) ライブラリを使用して、様々な種類のプロットを作成する方法を説明します。
 
 ## 開始する前に
 
-Kotlin Notebook は [Kotlin Notebook プラグイン](https://plugins.jetbrains.com/plugin/16340-kotlin-notebook) に依存しており、これは IntelliJ IDEA にデフォルトでバンドルされ、有効になっています。
-
-Kotlin Notebook の機能が利用できない場合は、プラグインが有効になっていることを確認してください。詳細については、[環境のセットアップ](kotlin-notebook-set-up-env.md) を参照してください。
+> IntelliJ IDEA 2026.2 以降、Kotlin Notebook は IDE にバンドルされなくなり、JetBrains による公式サポートも終了します。
+> ソースコードは引き続き [GitHub](https://github.com/Kotlin/kotlin-notebook) で公開されます。
+>
+> 詳細は [ブログ記事](https://blog.jetbrains.com/idea/2026/06/kotlin-notebook-sunset/) を参照してください。
+>
+{style="note"}
 
 Lets-Plot を使用するための新しい Kotlin Notebook を作成します。
 
@@ -24,11 +27,13 @@ Lets-Plot を使用するための新しい Kotlin Notebook を作成します�
     %use dataframe
     ```
 
+このチュートリアルを進めるために、DataFrame を [Gradle](https://kotlin.github.io/dataframe/setupgradle.html) または [Maven](https://kotlin.github.io/dataframe/setupmaven.html) の依存関係として使用することもできます。
+
 ## データの準備
 
 ベルリン、マドリード、カラカスの 3 都市における月平均気温のシミュレーション数値を格納する DataFrame を作成しましょう。
 
-Kotlin DataFrame ライブラリの [`dataFrameOf()`](https://kotlin.github.io/dataframe/createdataframe.html#dataframeof) 関数を使用して DataFrame を生成します。以下のコードスニペットを Kotlin Notebook に貼り付けて実行してください。
+Kotlin DataFrame ライブラリの [`dataFrameOf()`](https://kotlin.github.io/dataframe/createdataframe.html#dataframeof) 関数を使用して DataFrame を生成します。以下のコードスニペットを貼り付けて実行してください。
 
 ```kotlin
 // months 変数は、1年間の12ヶ月のリストを保持します
@@ -68,7 +73,7 @@ val data = df.toMap()
 
 ## 散布図の作成
 
-LPK ライブラリを使用して Kotlin Notebook で散布図（scatter plot）を作成しましょう。
+LPK ライブラリを使用して散布図（scatter plot）を作成しましょう。
 
 データが `Map` 形式になったら、LPK ライブラリの [`geomPoint()`](https://lets-plot.org/kotlin/api-reference/-lets--plot--kotlin/org.jetbrains.letsPlot.geom/geom-point/index.html) 関数を使用して散布図を生成します。X 軸と Y 軸の値を指定したり、カテゴリとその色を定義したりできます。さらに、必要に応じてプロットのサイズや点の形状を[カスタマイズ](https://lets-plot.org/kotlin/aesthetics.html#point-shapes)することも可能です。
 
@@ -85,7 +90,7 @@ scatterPlot
 
 ## 箱ひげ図の作成
 
-[データ](#データの準備)を箱ひげ図（box plot）で可視化してみましょう。LPK ライブラリの [`geomBoxplot()`](https://lets-plot.org/kotlin/api-reference/-lets--plot--kotlin/org.jetbrains.letsPlot.geom/geom-boxplot.html) 関数を使用してプロットを生成し、[`scaleFillManual()`](https://lets-plot.org/kotlin/api-reference/-lets--plot--kotlin/org.jetbrains.letsPlot.scale/scale-fill-manual.html) 関数で色を[カスタマイズ](https://lets-plot.org/kotlin/aesthetics.html#point-shapes)します。
+[データ](#prepare-the-data)を箱ひげ図（box plot）で可視化してみましょう。LPK ライブラリの [`geomBoxplot()`](https://lets-plot.org/kotlin/api-reference/-lets--plot--kotlin/org.jetbrains.letsPlot.geom/geom-boxplot.html) 関数を使用してプロットを生成し、[`scaleFillManual()`](https://lets-plot.org/kotlin/api-reference/-lets--plot--kotlin/org.jetbrains.letsPlot.scale/scale-fill-manual.html) 関数で色を[カスタマイズ](https://lets-plot.org/kotlin/aesthetics.html#point-shapes)します。
 
 ```kotlin
 // X軸とY軸、カテゴリ、プロットサイズ、プロットタイプを指定します
@@ -99,7 +104,7 @@ boxPlot
 
 ![Box plot](box-plot.svg){width=600}
 
-## 2D 密度プロットの作成
+## 2D 密度プロット의作成
 
 次に、ランダムデータの分布と集中度を可視化するために、2D 密度プロット（2D density plot）を作成しましょう。
 
@@ -114,10 +119,7 @@ boxPlot
    import org.apache.commons.math3.distribution.MultivariateNormalDistribution
    ```
 
-   > Kotlin Notebook への依存関係のインポートに関する詳細については、[Kotlin Notebook のドキュメント](https://www.jetbrains.com/help/idea/kotlin-notebook.html#add-dependencies)を参照してください。
-   > {style="tip"}
-
-2. 以下のコードスニペットを Kotlin Notebook に貼り付けて実行し、2D データポイントのセットを作成します。
+2. 以下のコードスニペットを貼り付けて実行し、2D データポイントのセットを作成します。
 
    ```kotlin
    // 3つの分布に対する共分散行列を定義します
@@ -184,4 +186,3 @@ densityPlot
 * [Lets-Plot for Kotlin のドキュメント](https://lets-plot.org/kotlin/charts.html)で、より多くのプロット例を探索してください。
 * Lets-Plot for Kotlin の [API リファレンス](https://lets-plot.org/kotlin/api-reference/)を確認してください。
 * [Kotlin DataFrame](https://kotlin.github.io/dataframe/info.html) および [Kandy](https://kotlin.github.io/kandy/welcome.html) ライブラリのドキュメントで、Kotlin を使用したデータの変換と可視化について学んでください。
-* [Kotlin Notebook の使用方法と主な機能](https://www.jetbrains.com/help/idea/kotlin-notebook.html)に関する追加情報を見つけてください。

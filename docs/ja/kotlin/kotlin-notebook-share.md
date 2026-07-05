@@ -1,6 +1,13 @@
 [//]: # (title: Kotlin Notebookの共有)
 
-[Kotlin Notebook](kotlin-notebook-overview.md)を共有するには、[Kotlinノートブック](data-analysis-overview.md#notebooks)が汎用的なJupyter形式に準拠しているため、任意のノートブックWebビューアにアップロードするだけで共有できます。
+> IntelliJ IDEA 2026.2 以降、Kotlin Notebook は IDE に同梱されなくなり、JetBrains による公式サポートも終了します。
+> ソースコードは引き続き [GitHub](https://github.com/Kotlin/kotlin-notebook) で公開されます。
+>
+> 詳細は[こちらのブログ投稿](https://blog.jetbrains.com/idea/2026/06/kotlin-notebook-sunset/)をご覧ください。
+>
+{style="note"}
+
+[Kotlin Notebook](kotlin-notebook-overview.md)を共有するには、Kotlinノートブックが汎用的なJupyter形式に準拠しているため、任意のノートブックWebビューアにアップロードするだけで共有できます。
 
 Kotlinノートブックを共有するために、以下のプラットフォームを推奨します：
 

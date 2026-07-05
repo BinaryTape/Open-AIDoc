@@ -229,6 +229,32 @@ fun count(): Int {
 ```
 {kotlin-runnable="true"}
 
+您可以在不使用例外執行個體的情況下處理例外。
+例如，您可以在 `catch` 區塊中提供備援值或通用的錯誤訊息。
+
+使用底線 (`_`) 代替例外參數名稱，以表示刻意忽略該例外執行個體：
+
+```kotlin
+import java.io.File
+import java.io.IOException
+
+//sampleStart
+fun main() {
+    val userSettings = try {
+        File("user-settings.json").readText()
+    
+    // 擷取 IOException 而不使用例外執行個體
+    } catch (_: IOException) {
+        // 如果載入檔案失敗，則使用備援值
+        "{}"
+    }
+
+    println(userSettings)
+}
+//sampleEnd
+```
+{kotlin-runnable="true"}
+
 您可以為同一個 `try` 區塊使用多個 `catch` 處理常式。
 您可以根據需要新增任意數量的 `catch` 區塊，以分別處理不同的例外。
 當您有多個 `catch` 區塊時，請務必按照從最具體到最不具體的例外順序排列，並在程式碼中遵循從上到下的順序。

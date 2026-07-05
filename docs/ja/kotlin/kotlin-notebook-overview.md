@@ -1,8 +1,14 @@
 [//]: # (title: Kotlin Notebook)
 [//]: # (description: IntelliJ IDEA内でインタラクティブなKotlinノートブックを作成・編集し、コードの実行、データの視覚化、アイデアのプロトタイピング、結果の共有を行うことができます。)
 
+> IntelliJ IDEA 2026.2以降、Kotlin NotebookはIDEに同梱されなくなり、JetBrainsによる公式サポートも終了します。
+> ソースコードは引き続き[GitHub](https://github.com/Kotlin/kotlin-notebook)で利用可能です。
+>
+> 詳細は[ブログ記事](https://blog.jetbrains.com/idea/2026/06/kotlin-notebook-sunset/)をご覧ください。
+>
+{style="note"}
+
 Kotlin Notebookは、Kotlinの能力を最大限に活用し、ノートブックを作成・編集するためのインタラクティブな環境を提供します。
-Kotlin Notebookは、[Kotlin Notebookプラグイン](https://plugins.jetbrains.com/plugin/16340-kotlin-notebook)を利用しており、このプラグインはIntelliJ IDEAに同梱され、[デフォルトで有効化されています](kotlin-notebook-set-up-env.md)。
 
 ノートブックとは、実行可能なKotlinコードとテキスト、実行結果、視覚化資料を混在させることができるインタラクティブなドキュメントです。
 コードをセル（cell）に整理し、Markdownでドキュメント化し、テキストからプロット（plot）に至るまでの出力を、それらを生成したコードのすぐ横に即座に表示できる機能を備えた、Kotlin REPLの拡張版だと考えてください。
@@ -25,10 +31,6 @@ Kotlin Notebookは、当社の[Jupyter Notebook向けKotlinカーネル（Kotlin
 互換性の問題を心配することなく、Kotlin Notebook、[Datalore](https://datalore.jetbrains.com/)、[Kotlin-Jupyter Notebook](https://github.com/Kotlin/kotlin-jupyter)の間で作業を簡単に共有できます。
 
 これらの機能により、単純なコードの実験から包括的なデータプロジェクトまで、幅広いタスクに取り組むことができます。
-
-Kotlin Notebookで何ができるのか、さらに詳しく見ていきましょう。
-
-<a href="get-started-with-kotlin-notebooks.md"><img src="notebook-get-started-button.svg" width="600" alt="Get started with Kotlin Notebook" style="block"/></a>
 
 ## データ分析と視覚化
 

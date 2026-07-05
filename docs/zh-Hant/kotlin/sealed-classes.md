@@ -16,9 +16,9 @@ _密封 (Sealed)_ 類別與介面為您的類別階層結構提供受控的繼�
 
 密封類別最適合用於以下情境：
 
-*   **需要限制類別繼承：** 您有一組預定義且有限的子類別來擴充某個類別，且這些子類別在編譯時期皆為已知。
-*   **需要型別安全設計：** 安全性與模式配對在您的專案中至關重要。特別是對於狀態管理或處理複雜的條件邏輯。範例請參閱[將密封類別與 when 運算式搭配使用](#use-sealed-classes-with-when-expression)。
-*   **使用封閉式 API：** 您希望為程式庫建立健全且易於維護的公開 API，以確保第三方用戶端依預期方式使用這些 API。
+* **需要限制類別繼承：** 您有一組預定義且有限的子類別來擴充某個類別，且這些子類別在編譯時期皆為已知。
+* **需要型別安全設計：** 安全性與模式配對在您的專案中至關重要。特別是對於狀態管理或處理複雜的條件邏輯。範例請參閱[將密封類別與 when 運算式搭配使用](#use-sealed-classes-with-when-expression)。
+* **使用封閉式 API：** 您希望為程式庫建立健全且易於維護的公開 API，以確保第三方用戶端依預期方式使用這些 API。
 
 如需更詳細的實際應用，請參閱[使用案例情境](#use-case-scenarios)。
 
@@ -106,7 +106,7 @@ sealed class IOError {
     // 密封類別建構函式預設具有 protected 可見性。它在此類別及其子類別內部可見 
     constructor() { /*...*/ }
 
-    // 私有建構函式，僅在此類別內部可見。
+    // 私有建構函式，僅在此類別內部可見。 
     // 在密封類別中使用私有建構函式可以更嚴格地控制具現化，從而在類別內啟用特定的初始化程序。
     private constructor(description: String): this() { /*...*/ }
 
@@ -119,7 +119,7 @@ sealed class IOError {
 
 密封類別與介面的直接子類別必須宣告在同一個套件中。它們可以是頂層宣告，也可以巢狀
 於任意數量的其他具名類別、具名介面或具名物件中。只要符合 Kotlin 的一般繼承規則，
-子類別可以具有任何[可見性](visibility-modifiers.md)。
+包括[覆寫屬性](inheritance.md#overriding-properties)的規則，子類別可以具有任何[可見性](visibility-modifiers.md)。
 
 密封類別的子類別必須具有適當的合格名稱。它們不能是區域物件或匿名物件。
 
@@ -128,7 +128,7 @@ sealed class IOError {
 > ```kotlin
 > sealed interface Error
 > 
-> // 擴充密封介面 Error 的 enum 類別
+> // 實作密封介面 Error 的 enum 類別
 > enum class ErrorType : Error {
 >     FILE_ERROR, DATABASE_ERROR
 > }
@@ -158,15 +158,15 @@ open class CustomError(): Error
 
 如果密封類別在通用原始碼集中宣告為 `expect`，並在平台原始碼集中有 `actual` 實作，
 則 `expect` 與 `actual` 版本都可以在其各自的原始碼集中擁有子類別。此外，如果您使用階層結構，
-您可以在 `expect` 與 `actual` 宣告之間的任何原始碼集中建立子類別。
+您可以在 `expect` 與 `actual` 宣告之間的任何原始碼集中建立子類別。 
 
-[進一步了解多平台專案的階層結構](https://kotlinlang.org/docs/multiplatform/multiplatform-hierarchy.html)。
+[進一步了解多平台專案的階層結構](https://kotlinlang.org/docs/multiplatform/multiplatform-hierarchy.html)。 
 
 ## 將密封類別與 when 運算式搭配使用
 
 使用密封類別的主要好處在於將其應用於 [`when`](control-flow.md#when-expressions-and-statements)
 運算式時。
-當 `when` 運算式搭配密封類別使用時，Kotlin 編譯器能窮舉檢查是否已涵蓋所有可能的情況。
+當 `when` 運算式搭配密封類別使用時，Kotlin 編譯器能窮舉檢查是否已涵蓋所有可能的情況。 
 在這種情況下，您不需要新增 `else` 子句：
 
 ```kotlin
@@ -211,7 +211,7 @@ fun main() {
 如需更多資訊，請參閱 [`when` 運算式中的守衛條件](control-flow.md#guard-conditions-in-when-expressions)。
 
 > 在多平台專案中，如果您在通用程式碼中將帶有 `when` 運算式的密封類別作為 
-> [預期宣告](https://kotlinlang.org/docs/multiplatform/multiplatform-expect-actual.html)，您仍然需要 `else` 分支。
+> [預期宣告](https://kotlinlang.org/docs/multiplatform/multiplatform-expect-actual.html)，您仍然需要 `else` 分支。 
 > 這是因為 `actual` 平台實作的子類別可能會擴充在通用程式碼中未知的密封類別。
 >
 {style="note"}
@@ -222,8 +222,8 @@ fun main() {
 
 ### UI 應用程式中的狀態管理
 
-您可以使用密封類別來表示應用程式中不同的 UI 狀態。
-這種方法允許對 UI 變更進行結構化且安全的處理。
+您可以使用密封類別來表示應用程式中不同的 UI 狀態。 
+這種方法允許對 UI 變更進行結構化且安全的處理。 
 此範例展示了如何管理各種 UI 狀態：
 
 ```kotlin
@@ -265,9 +265,9 @@ fun processPayment(payment: Payment) {
 }
 ```
 
-`Payment` 是一個密封類別，代表電子商務系統中不同的付款方式：
+`Payment` 是一個密封類別，代表電子商務系統中不同的付款方式： 
 `CreditCard`、`PayPal` 與 `Cash`。每個子類別都可以有其特定屬性，例如 `CreditCard` 的 `number` 與 `expiryDate`，
-以及 `PayPal` 的 `email`。
+以及 `PayPal` 的 `email`。 
 
 `processPayment()` 函式展示了如何處理不同的付款方式。
 這種方法確保考慮了所有可能的付款型別，並且系統對於未來新增付款
@@ -275,9 +275,9 @@ fun processPayment(payment: Payment) {
 
 ### API 請求與回應處理
 
-您可以使用密封類別與密封介面來實作一個處理 API 請求與回應的使用者驗證系統。
-該使用者驗證系統具有登入與登出功能。
-`ApiRequest` 密封介面定義了特定的請求型別：用於登入的 `LoginRequest`，以及用於登出操作的 `LogoutRequest`。
+您可以使用密封類別與密封介面來實作一個處理 API 請求與回應的使用者驗證系統。 
+該使用者驗證系統具有登入與登出功能。 
+`ApiRequest` 密封介面定義了特定的請求型別：用於登入的 `LoginRequest`，以及用於登出操作的 `LogoutRequest`。 
 密封類別 `ApiResponse` 封裝了不同的回應情境：帶有使用者資料的 `UserSuccess`、用於使用者不存在情況的 `UserNotFound`，
 以及用於任何失敗情況的 `Error`。`handleRequest` 函式使用 `when` 運算式以型別安全的方式處理這些請求，
 而 `getUserById` 則模擬使用者擷取：
@@ -358,3 +358,8 @@ fun main() {
     val userNotFoundResponse = getUserById("invalidId")
     println(userNotFoundResponse)
 }
+```
+
+## 下一步
+
+進一步了解 [Kotlin 中的繼承](inheritance.md)。

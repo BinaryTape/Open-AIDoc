@@ -14,6 +14,19 @@ println(readln())
 // Hi, Kotlin!
 ```
 
+您还可以将多行输入读取为单个字符串。
+使用 [`joinToString()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.sequences/join-to-string.html) 函数来合并这些行：
+
+```kotlin
+val input = generateSequence(::readlnOrNull)
+  .joinToString("
+")
+```
+
+> 使用 [`readlnOrNull()`](#handle-standard-input-safely) 代替 `readln()` 来读取输入直到输入末尾，而不会抛出异常。
+> 
+{style="note"}
+
 若要处理字符串以外的数据类型，可以使用 `.toInt()`、`.toLong()`、`.toDouble()`、`.toFloat()` 或 `.toBoolean()` 等转换函数对输入进行转换。
 可以读取多个不同数据类型的输入，并将每个输入存储在一个变量中：
 

@@ -41,6 +41,7 @@
 - [Gradle 플러그인] 데이터베이스를 구성하지 않고 플러그인을 적용했을 때 발생하는 IDE 동기화 크래시 수정 (#6088)
 - [PostgreSQL 다이얼렉트] 중첩된 함수 호출을 사용할 때의 JSON 집계 함수 수정 (#6281 by @griffio)
 - [Paging3 확장] 빈 데이터베이스에서 `KeyedQueryPagingSource`가 크래시되는 현상 수정 (#6284 by @woods-marshes)
+- [컴파일러] `COALESCE`와 같은 캡슐화 함수(encapsulating functions)와 함께 뮤테이터 문(mutator statements)을 사용할 때 발생하는 Java 타입 어댑터 문제 수정 (#6292 by @griffio)
 
 ## [2.3.2] - 2026-03-16
 [2.3.2]: https://github.com/sqldelight/sqldelight/releases/tag/2.3.2
@@ -657,11 +658,11 @@ sqldelight {
 - [IDE 플러그인] 임포트 키워드 하이라이트 (by @aperfilyev)
 - [IDE 플러그인] 해결되지 않은 Kotlin 타입 수정 (#1678 by @aperfilyev)
 - [IDE 플러그인] 해결되지 않은 패키지에 대한 하이라이트 수정 (#2543 by @aperfilyev)
-- [IDE 플러그인] 프로젝트 인덱스가 아직 초기화되지 않은 경우 불일치 컬럼을 검사하지 않도록 수정
-- [IDE 플러그인] Gradle 동기화가 발생할 때까지 파일 인덱스를 초기화하지 않도록 수정
-- [IDE 플러그인] Gradle 동기화가 시작되면 SQLDelight 임포트 취소
-- [IDE 플러그인] 실행취소(undo) 액션이 수행되는 스레드 외부에서 데이터베이스 재생성
-- [IDE 플러그인] 참조를 해결할 수 없는 경우 공백 Java 타입 사용
+- [IDE 플러그인] Dont attempt to inspect mismatched columns if the project index is not yet initialized
+- [IDE 플러그인] Dont initialize the file index until a gradle sync has occurred
+- [IDE 플러그인] Cancel the SQLDelight import if a gradle sync begins
+- [IDE 플러그인] Regenerate the database outside of the thread an undo action is performed on
+- [IDE 플러그인] If a reference cannot be resolves use a blank java type
 - [IDE 플러그인] 파일 파싱 중에는 메인 스레드에서 벗어나고 쓰기 시에만 복귀하도록 개선
 - [IDE 플러그인] 구 버전 IntelliJ와의 호환성 개선 (by @3flex)
 - [IDE 플러그인] 더 빠른 어노테이션 API 사용
@@ -968,7 +969,8 @@ sqldelight {
 - [컴파일러] 인덱스 생성 시 누락된 테이블/컬럼에 대해 더 나은 에러 제공 (#1372)
 - [컴파일러] 조인 제약 조건에서 외부 쿼리의 프로젝션 사용 활성화 (#1346)
 - [Native 드라이버] `execute`가 `transationPool`을 사용하도록 수정 (by @benasher44)
-- [JDBC 드라이버] SQLite 대신 JDBC 트랜잭션 API 사용 (#1693)
+- [JDBC 드라이버] JDBC 드라이버가 `autoCommit`을 true로 가정하던 문제 수정 (#2041)
+- [JDBC 드라이버] 예외 발생 시 커넥션을 닫도록 보장 (#2306)
 - [IDE] 가상 파일 참조가 항상 원본 파일이 되도록 보장 (#1782)
 - [IDE] Bugsnag에 에러 보고 시 올바른 throwable 사용 (#1262)
 - [페이징 확장] 누수되는 `DataSource` 수정 (#1628)
@@ -1003,7 +1005,7 @@ sqldelight {
 
 * 수정: [Gradle] Kotlin Native 1.3.60 지원.
 * 수정: [Gradle] #1287 동기화 시 경고 발생.
-* 수정: [컴파일러] #1469 쿼리에 대한 `SynetheticAccessor` 생성.
+* 수정: [컴파일러] #1469 `SynetheticAccessor` 생성.
 * 수정: [JVM 드라이버] 메모리 누수 수정.
 * 참고: 코루틴 확장 아티팩트는 buildscript에 kotlinx bintray maven 저장소 추가가 필요합니다.
 

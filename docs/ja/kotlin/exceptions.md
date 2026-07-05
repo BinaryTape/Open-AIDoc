@@ -226,6 +226,32 @@ fun count(): Int {
 ```
 {kotlin-runnable="true"}
 
+例外インスタンスを使用せずに例外を処理することもできます。
+例えば、`catch` ブロックでフォールバック値や一般的なエラーメッセージを提供できます。
+
+例外インスタンスを意図的に無視することを示すには、例外パラメータ名の代わりにアンダースコア (`_`) を使用します：
+
+```kotlin
+import java.io.File
+import java.io.IOException
+
+//sampleStart
+fun main() {
+    val userSettings = try {
+        File("user-settings.json").readText()
+    
+    // 例外インスタンスを使用せずにIOExceptionをキャッチする
+    } catch (_: IOException) {
+        // ファイルの読み込みに失敗した場合にフォールバック値を使用する
+        "{}"
+    }
+
+    println(userSettings)
+}
+//sampleEnd
+```
+{kotlin-runnable="true"}
+
 同じ `try` ブロックに対して複数の `catch` ハンドラーを使用できます。
 異なる例外を個別に処理するために、必要なだけ `catch` ブロックを追加できます。
 複数の `catch` ブロックがある場合、コードの上から下の順序に従って、最も具体的な例外から最も一般的な例外の順に並べることが重要です。
@@ -444,7 +470,7 @@ fun main() {
 これは、[抽象クラス](classes.md#abstract-classes) または [封印されたクラス（sealed class）](sealed-classes.md#constructors) を共通の例外機能のベースとして使用し、詳細な例外タイプのために具体的なサブクラスを作成することで実現できます。
 さらに、デフォルト値を持つパラメータを含むカスタム例外は柔軟性を提供し、さまざまなメッセージでの初期化を可能にし、よりきめ細かいエラー処理を可能にします。
 
-封印されたクラス `AccountException` を例外階層েরベースとし、デフォルト値を持つパラメータの使用例を示すサブクラス `APIKeyExpiredException` を使用した例を見てみましょう：
+封印されたクラス `AccountException` を例外階層のベースとし、デフォルト値を持つパラメータの使用例を示すサブクラス `APIKeyExpiredException` を使用した例を見てみましょう：
 
 ```kotlin
 //sampleStart
@@ -658,14 +684,14 @@ Exception in thread "main" java.lang.ArithmeticException: This is an arithmetic 
 * スレッド: `main` 
 * 例外メッセージ: `"This is an arithmetic exception!"`
 
-例外の説明の後に `at` で始まる各行がスタックトレースです。1つの行は*スタックトレース要素（stack trace element）*または*スタックフレーム（stack frame）*と呼ばれます：
+例外の説明の後に `at` で始まる各行がスタックトレースです。1つの行は*スタックトレース要素（stack trace element）*または*スタックフレーム（stack frame）*と呼ばります：
 
 * `at MainKt.main (Main.kt:3)`: これはメソッド名 (`MainKt.main`) と、そのメソッドが呼び出されたソースファイルと行番号 (`Main.kt:3`) を示します。
 * `at MainKt.main (Main.kt)`: これは、例外が `Main.kt` ファイルの `main()` 関数で発生したことを示します。
 
 ## Java、Swift、Objective-Cとの例外の相互運用性
 
-Kotlinではすべての例外を非チェック例外として扱うため、チェック例外と非チェック例外を区別する言語からそのような例外が呼び出されると、複雑な事態を招く可能性があります。
+Kotlinではすべての例外を非チェック例外として扱うため、チェック例外と非チェック例外を区分する言語からそのような例外が呼び出されると、複雑な事態を招く可能性があります。
 KotlinとJava、Swift、Objective-Cのような言語間での例外処理のこの差異に対処するために、[`@Throws`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-throws/) アノテーションを使用できます。
 このアノテーションは、発生し得る例外について呼び出し元に警告します。
 詳細については、[JavaからKotlinを呼び出す](java-to-kotlin-interop.md#checked-exceptions) および [Swift/Objective-Cとの相互運用性](native-objc-interop.md#errors-and-exceptions) を参照してください。

@@ -143,6 +143,8 @@ Kotlin 拥有**数据类**，这在存储数据时特别有用。数据类具有
 data class User(val name: String, val id: Int)
 ```
 
+Kotlin 编译器在生成成员函数时，仅使用在 [主构造函数](classes.md#primary-constructor) 中定义的属性。如果在数据类体内声明属性，它们将不会包含在生成的函数输出中。
+
 数据类中最有用的预定义成员函数是：
 
 | **函数**           | **说明**                                                                 |

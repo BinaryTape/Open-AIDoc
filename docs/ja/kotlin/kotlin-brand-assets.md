@@ -31,7 +31,6 @@ Kotlinブランドパッケージには、いくつかの公式Kotlinエコシ�
 このパッケージには、以下のロゴが含まれています：
 
 * [Kotlin Foundation](https://kotlinfoundation.org)
-* [Kotlin Notebook](kotlin-notebook-overview.md)
 * [Kotlin Multiplatform (KMP)](https://kotlinlang.org/multiplatform/)
 * [Talking Kotlin](https://www.youtube.com/playlist?list=PLlFc5cFwUnmz1TwkP9SKCHU978dqLTANB)
 * [Compose Multiplatform (CMP)](https://kotlinlang.org/compose-multiplatform/)

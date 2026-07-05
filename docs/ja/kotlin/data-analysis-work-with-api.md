@@ -1,60 +1,50 @@
 [//]: # (title: ウェブソースや API からデータを取得する)
 
-[Kotlin Notebook](kotlin-notebook-overview.md) は、さまざまなウェブソースや API からデータにアクセスして操作するための強力なプラットフォームを提供します。
-すべてのステップを視覚化して明確にできるイテレーティブ（反復的）な環境を提供することで、データの抽出や分析タスクを簡素化します。これは、馴染みのない API を探索する際に特に役立ちます。
+[Kotlin DataFrame ライブラリ](https://kotlin.github.io/dataframe/home.html)を使用すると、さまざまなウェブソースや API からデータにアクセスして操作できます。また、包括的な分析や視覚化のためにこのデータを再形成するのにも役立ちます。
 
-[Kotlin DataFrame ライブラリ](https://kotlin.github.io/dataframe/home.html)と併用することで、Kotlin Notebook は API から JSON データを接続・取得できるだけでなく、包括的な分析や視覚化のためにデータを再形成する際にも役立ちます。
-
-> Kotlin Notebook の例については、[GitHub の DataFrame の例](https://github.com/Kotlin/dataframe/blob/master/examples/notebooks/youtube/Youtube.ipynb)を参照してください。
-> 
-{style="tip"}
+[GitHub 上の DataFrame の例](https://github.com/Kotlin/dataframe/tree/master/examples/projects)を探索してください。
 
 ## 始める前に
 
-Kotlin Notebook は、IntelliJ IDEA にデフォルトで同梱・有効化されている [Kotlin Notebook プラグイン](https://plugins.jetbrains.com/plugin/16340-kotlin-notebook)に依存しています。
-
-Kotlin Notebook の機能が利用できない場合は、プラグインが有効になっていることを確認してください。詳細については、[環境のセットアップ](kotlin-notebook-set-up-env.md)を参照してください。
+> IntelliJ IDEA 2026.2 以降、Kotlin Notebook は IDE に同梱されなくなり、JetBrains による公式サポートも終了します。
+> ソースコードは引き続き [GitHub](https://github.com/Kotlin/kotlin-notebook) で利用可能です。
+>
+> 詳細は[ブログ投稿](https://blog.jetbrains.com/idea/2026/06/kotlin-notebook-sunset/)を確認してください。
+>
+{style="note"}
 
 新しい Kotlin Notebook を作成します：
 
 1. **File** | **New** | **Kotlin Notebook** を選択します。
 
-2. Kotlin Notebook で、次のコマンドを実行して Kotlin DataFrame ライブラリをインポートします。
+2. 次のコマンドを実行して Kotlin DataFrame ライブラリをインポートします。
 
    ```kotlin
    %use dataframe
    ```
-   
+チュートリアルに従うために、[Gradle](https://kotlin.github.io/dataframe/setupgradle.html) または [Maven](https://kotlin.github.io/dataframe/setupmaven.html) の依存関係として DataFrame を使用することもできます。
+
 ## API からデータを取得する
 
-Kotlin Notebook と Kotlin DataFrame ライブラリを使用して API からデータを取得するには、[`.read()`](https://kotlin.github.io/dataframe/read.html) 関数を使用します。これは、CSV や JSON などの [ファイルからのデータ取得](data-analysis-work-with-data-sources.md#retrieve-data) と同様です。
+Kotlin DataFrame ライブラリを使用して API からデータを取得するには、[`.read()`](https://kotlin.github.io/dataframe/read.html) 関数を使用します。これは、CSV や JSON などの [ファイルからのデータ取得](data-analysis-work-with-data-sources.md#retrieve-data) と同様です。
 ただし、ウェブベースのソースを扱う場合は、生の API データを構造化された形式に変換するために、追加のフォーマットが必要になる場合があります。
 
 [YouTube Data API](https://console.cloud.google.com/apis/library/youtube.googleapis.com) からデータを取得する例を見てみましょう：
 
-1. Kotlin Notebook ファイル (`.ipynb`) を開きます。
-
-2. データ操作タスクに不可欠な Kotlin DataFrame ライブラリをインポートします。
-これを行うには、コードセルで次のコマンドを実行します：
-
-   ```kotlin
-   %use dataframe
-   ```
-
-3. YouTube Data API へのリクエストを認証するために必要な API キーを、新しいコードセルに安全に追加します。
+1. YouTube Data API へのリクエストを認証するために必要な API キーを、新しいコードセルに安全に追加します。
 API キーは [認証情報タブ](https://console.cloud.google.com/apis/credentials) から取得できます：
 
    ```kotlin
    val apiKey = "YOUR-API_KEY"
    ```
 
-4. パスを文字列として受け取り、DataFrame の `.read()` 関数を使用して YouTube Data API からデータを取得する load 関数を作成します：
+2. パスを文字列として受け取り、DataFrame の `.read()` 関数を使用して YouTube Data API からデータを取得する load 関数を作成します：
 
    ```kotlin
    fun load(path: String): AnyRow = DataRow.read("https://www.googleapis.com/youtube/v3/$path&key=$apiKey")
    ```
 
-5. 取得したデータを行に整理し、`nextPageToken` を介して YouTube API のページネーションを処理します。
+3. 取得したデータを行に整理し、`nextPageToken` を介して YouTube API のページネーションを処理します。 
 これにより、複数のページにわたるデータを確実に収集できます：
 
    ```kotlin
@@ -83,7 +73,7 @@ API キーは [認証情報タブ](https://console.cloud.google.com/apis/credent
    }
    ```
 
-6. 以前に定義した `load()` 関数を使用してデータを取得し、新しいコードセルで DataFrame を作成します。
+4. 以前に定義した `load()` 関数を使用してデータを取得し、新しいコードセルで DataFrame を作成します。
 この例では、Kotlin に関連するデータ（この場合は動画）を取得し、1 ページあたり最大 50 件の結果を最大 5 ページまで取得します。
 結果は `df` 変数に格納されます：
 
@@ -92,7 +82,7 @@ API キーは [認証情報タブ](https://console.cloud.google.com/apis/credent
    df
    ```
 
-7. 最後に、DataFrame からアイテムを抽出して結合します：
+5. 最後に、DataFrame からアイテムを抽出して結合します：
 
    ```kotlin
    val items = df.items.concat()
@@ -157,7 +147,7 @@ API キーは [認証情報タブ](https://console.cloud.google.com/apis/credent
    val view by column<Int>()
    ```
 
-2. `groupBy` メソッドを使用して `channel` 列でデータをグループ化し、ソートします。
+2. `groupBy` メソッドを使用して `channel` 列でデータをグループ化し、ソートします。 
 
    ```kotlin
    val channels = joined.groupBy { channel }.sortByCount()
@@ -195,5 +185,5 @@ API キーは [認証情報タブ](https://console.cloud.google.com/apis/credent
 ## 次のステップ
 
 * [Kandy ライブラリ](https://kotlin.github.io/kandy/examples.html) を使用したデータの視覚化を探索する
-* [Kandy を使用した Kotlin Notebook でのデータの視覚化](data-analysis-visualization.md) で、データの視覚化に関する追加情報を見つける
+* [Kandy を使用したデータの視覚化](data-analysis-visualization.md) で、データの視覚化に関する追加情報を見つける
 * Kotlin でのデータサイエンスと分析に利用可能なツールとリソースの広範な概要については、[データ分析用の Kotlin および Java ライブラリ](data-analysis-libraries.md) を参照してください。

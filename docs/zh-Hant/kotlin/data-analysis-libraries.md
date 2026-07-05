@@ -45,7 +45,7 @@
       <list>
         <li>強大、易讀且型別安全的 DSL，用於繪製各種類型的圖表</li>
         <li>為 JVM 編寫的 Kotlin 開源程式庫</li>
-        <li>支援 <a href="https://kotlin.github.io/kandy/kandy-in-kotlin-notebook.html">Kotlin Notebook</a>、<a href="https://kotlin.github.io/kandy/kandy-in-datalore.html">Datalore</a> 與 <a href="https://kotlin.github.io/kandy/kandy-in-jupyter-notebook.html">Jupyter Notebook</a></li>
+        <li>支援 <a href="https://kotlin.github.io/kandy/kandy-in-datalore.html">Datalore</a></li>
         <li>與 <a href="https://kotlin.github.io/dataframe/overview.html">Kotlin DataFrame</a> 無縫整合</li>
       </list>
     </td>
@@ -118,7 +118,7 @@
     <td>
       <list>
         <li>以 Kotlin 編寫的統計資料繪圖</li>
-        <li>支援 <a href="https://plugins.jetbrains.com/plugin/16340-kotlin-notebook">Kotlin Notebook</a>、<a href="https://datalore.jetbrains.com/">Datalore</a> 與 <a href="https://github.com/Kotlin/kotlin-jupyter#readme">帶有 Kotlin 核心的 Jupyter</a></li>
+        <li>支援 <a href="https://datalore.jetbrains.com/">Datalore</a></li>
         <li>相容於 JVM、JS 與 Python</li>
         <li>在 <a href="https://www.jetbrains.com/lp/compose-multiplatform/">Compose Multiplatform</a> 應用程式中嵌入圖表</li>
       </list>
@@ -157,7 +157,6 @@
       <list>
         <li>表格資料視覺化</li>
         <li>受 R 的 <a href="https://ggplot2.tidyverse.org/">ggplot</a> 啟發</li>
-        <li>支援 <a href="https://github.com/Kotlin/kotlin-jupyter#readme">帶有 Kotlin 核心的 Jupyter</a></li>
       </list>
     </td>
   </tr>

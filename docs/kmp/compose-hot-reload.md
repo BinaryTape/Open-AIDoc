@@ -132,6 +132,57 @@ Compose Hot Reload 帮助你在开发 Compose Multiplatform 项目时，实时�
 
 恭喜！你已经见证了 Compose Hot Reload 的实际效果。现在你可以尝试更改文本、图像、格式、 UI 结构等，而无需在每次更改后都重新启动桌面运行配置。
 
+## 适用于 AI 代理的 MCP 服务器
+<primary-label ref="Experimental"/>
+
+[//]: # (TODO update version for stable release)
+
+从 Compose Multiplatform 1.2.0-beta01 开始，Compose Hot Reload 包含一个内置的 [模型上下文协议 (MCP)](https://modelcontextprotocol.io/) 服务器。
+MCP 服务器允许 AI 编码代理与正在运行的 Compose 应用程序进行交互：触发 Compose Hot Reload、查看渲染后的 UI、检查语义结构、模拟用户输入以及读取运行时日志。
+对于包含多个窗口的应用程序，代理可以列出窗口并针对其中任何一个进行操作。
+
+这为 AI 代理在编辑 Compose 代码时闭合了反馈循环。
+代理无需依赖你每次编辑后手动检查结果，而是可以自主地迭代你的代码并验证每项更改。
+
+### 连接 AI 代理
+
+要让 AI 代理与你的 Compose 应用程序交互：
+
+1. 使用 Gradle 任务随应用程序一起启动 MCP 服务器：
+    ```shell
+    ./gradlew :composeApp:hotMcpServerJvm
+    ```
+   任务名称遵循标准命名约定 `hotMcpServer<TargetName>`。
+   例如，名为 `desktop` 的自定义 JVM 目标将使用任务 `:composeApp:hotMcpServerDesktop`。
+2. 将 AI 代理的 MCP 客户端配置指向该 Gradle 任务。例如，在 `.mcp.json` 中：
+    ```json
+    {
+      "mcpServers": {
+        "compose-hot-reload": {
+          "command": "./gradlew",
+          "args": [
+            "--no-daemon",
+            "--quiet",
+            "--console=plain",
+            "hotMcpServer"
+          ]
+        }
+      }
+    }
+    ```
+
+### 可用的 MCP 工具
+
+MCP 服务器公开了一系列代理可以调用的工具，包括：
+
+* `reload` — 重新编译项目并热重载已更改的类。
+* `take_screenshot` — 捕获应用程序窗口的当前状态。
+* `get_semantic_tree` — 返回 Compose [语义树](compose-accessibility.md#semantic-properties)，以便代理理解 UI 结构。
+* `get_logs` — 返回运行中应用程序的最近日志输出，包括运行时异常。
+* `click`、`type_text` 和 `scroll` — 模拟用户输入以测试交互式流程。
+
+有关 MCP 工具及其参数的完整列表，请参阅 [Compose Hot Reload README](https://github.com/JetBrains/compose-hot-reload#mcp-server-for-ai-agents)。
+
 ## 获取帮助
 
 如果你在使用 Compose Hot Reload 时遇到任何问题，请通过[创建 GitHub 问题](https://github.com/JetBrains/compose-hot-reload/issues)告知我们。

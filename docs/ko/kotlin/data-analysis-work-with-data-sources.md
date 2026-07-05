@@ -1,35 +1,43 @@
+---
+title: "파일에서 데이터 가져오기"
+description: "Kotlin DataFrame을 사용하여 CSV, JSON, SQL, Excel, Apache Arrow 파일을 포함한 파일에서 데이터를 로드하는 방법을 알아보세요."
+---
+
 [//]: # (title: 파일에서 데이터 가져오기)
-[//]: # (description: Kotlin DataFrame을 사용하여 CSV, JSON, SQL, Excel, Apache Arrow 파일을 포함한 파일에서 데이터를 로드하는 방법을 알아보세요.)
 
-[Kotlin Notebook](kotlin-notebook-overview.md)은 [Kotlin DataFrame 라이브러리](https://kotlin.github.io/dataframe/home.html)와 결합하여 비정형 및 정형 데이터를 모두 다룰 수 있게 해줍니다. 이러한 조합은 TXT 파일에서 찾을 수 있는 데이터와 같은 비정형 데이터를 정형 데이터셋으로 변환할 수 있는 유연성을 제공합니다. 
-
-데이터 변환을 위해 [`.add()`](https://kotlin.github.io/dataframe/adddf.html), [`.split()`](https://kotlin.github.io/dataframe/split.html), [`.convert()`](https://kotlin.github.io/dataframe/convert.html), [`.parse()`](https://kotlin.github.io/dataframe/parse.html)와 같은 메서드를 사용할 수 있습니다. 또한, 이 툴셋을 사용하면 CSV, JSON, XLS, Parquet, Apache Arrow를 포함한 다양한 정형 파일 형식에서 데이터를 가져오고 조작할 수 있습니다. 
+[Kotlin DataFrame 라이브러리](https://kotlin.github.io/dataframe/home.html)를 사용하면 비정형 및 정형 데이터를 모두 다룰 수 있습니다.
+데이터 변환을 위해 [`.add()`](https://kotlin.github.io/dataframe/adddf.html), [`.split()`](https://kotlin.github.io/dataframe/split.html),
+[`.convert()`](https://kotlin.github.io/dataframe/convert.html), [`.parse()`](https://kotlin.github.io/dataframe/parse.html)와 같은 메서드를 사용할 수 있습니다. 
+또한, 이 툴셋을 사용하면 CSV, JSON, XLS, Parquet, Apache Arrow를 포함한 다양한 정형 파일 형식에서 데이터를 가져오고 조작할 수 있습니다. 
 지원되는 모든 형식은 [DataFrame 문서](https://kotlin.github.io/dataframe/data-sources.html)를 참조하세요.
 
 이 가이드에서는 여러 예제를 통해 데이터를 가져오고, 정제하고, 처리하는 방법을 배울 수 있습니다.
 
 ## 시작하기 전에
 
-Kotlin Notebook은 IntelliJ IDEA에 기본적으로 내장되어 활성화되어 있는 [Kotlin Notebook 플러그인](https://plugins.jetbrains.com/plugin/16340-kotlin-notebook)에 의존합니다.
-
-Kotlin Notebook 기능을 사용할 수 없는 경우 플러그인이 활성화되어 있는지 확인하세요. 자세한 내용은 [환경 설정](kotlin-notebook-set-up-env.md)을 참조하세요.
+> IntelliJ IDEA 2026.2부터 Kotlin Notebook은 더 이상 IDE에 내장되지 않으며 JetBrains에서 공식적으로 지원하지 않습니다.
+> 소스 코드는 [GitHub](https://github.com/Kotlin/kotlin-notebook)에서 계속 이용할 수 있습니다.
+>
+> 자세한 내용은 [블로그 포스트](https://blog.jetbrains.com/idea/2026/06/kotlin-notebook-sunset/)에서 확인하세요.
+>
+{style="note"}
 
 이 튜토리얼을 따라 하려면 다음을 수행하세요:
 
-1. [새 Kotlin Notebook](kotlin-notebook-create.md)을 생성합니다.
+1. **File** | **New** | **Kotlin Notebook**을 선택합니다.
 2. Kotlin DataFrame을 임포트합니다:
 
    ```kotlin
    %use dataframe
    ```
 
-> 노트북에서 DataFrame 라이브러리와 해당 API를 사용할 수 있도록 다른 코드 셀을 실행하기 전에 `%use dataframe` 줄이 포함된 코드 셀을 먼저 실행하세요.
-> 
-{style="note"}
+   노트북에서 DataFrame 라이브러리와 해당 API를 사용할 수 있도록 다른 코드 셀을 실행하기 전에 `%use dataframe` 줄이 포함된 코드 셀을 먼저 실행하세요.
+
+튜토리얼을 따라 하려면 DataFrame을 [Gradle](https://kotlin.github.io/dataframe/setupgradle.html) 또는 [Maven](https://kotlin.github.io/dataframe/setupmaven.html) 의존성으로 사용할 수도 있습니다.
 
 ## 데이터 가져오기
 
-파일의 데이터를 Kotlin Notebook으로 가져오려면 `DataFrame.read()` 함수를 사용하세요:
+파일에서 데이터를 가져오려면 `DataFrame.read()` 함수를 사용하세요:
 
 ```kotlin
 val movies = DataFrame.read("movies.csv")
@@ -37,19 +45,22 @@ val movies = DataFrame.read("movies.csv")
 
 `DataFrame.read()` 함수는 파일 확장자와 내용을 기반으로 입력 형식을 감지합니다.
 
-또한 DataFrame 라이브러리가 입력 데이터를 읽는 방식을 제어하기 위해 추가 인수를 전달할 수도 있습니다. 예를 들어, 다음 코드는 CSV 파일에 대해 커스텀 구분자(`;`)를 지정합니다:
+또한 DataFrame 라이브러리가 입력 데이터를 읽는 방식을 제어하기 위해 추가 인수를 전달할 수도 있습니다.
+예를 들어, 다음 코드는 CSV 파일에 대해 커스텀 구분자(`;`)를 지정합니다:
 
 ```kotlin
 val movies = DataFrame.read("movies.csv", delimiter = ';')
 ```
 
-> 추가적인 파일 형식과 다양한 읽기 함수에 대한 포괄적인 개요는 [Kotlin DataFrame 라이브러리 문서](https://kotlin.github.io/dataframe/read.html)를 참조하세요.
+> 추가적인 파일 형식과 다양한 읽기 함수에 대한 포괄적인 개요는 
+> [Kotlin DataFrame 라이브러리 문서](https://kotlin.github.io/dataframe/read.html)를 참조하세요.
 > 
 {style="tip"}
 
 ## 데이터 표시하기
 
-노트북에 데이터를 가져온 후에는 이를 표시할 수 있습니다. 가장 쉬운 방법은 데이터를 변수에 저장한 다음 해당 변수를 반환하는 것입니다:
+데이터를 가져온 후에는 이를 표시할 수 있습니다. 가장 쉬운 방법은 
+데이터를 변수에 저장한 다음 해당 변수를 반환하는 것입니다:
 
 ```kotlin
 val jsonDf = DataFrame.read("jsonFile.json")
@@ -64,7 +75,8 @@ jsonDf
 
 ## 데이터 구조 검사하기
 
-데이터의 구조나 스키마(schema)에 대한 통찰력을 얻으려면 DataFrame 변수에 [`.schema()`](https://kotlin.github.io/dataframe/schema.html) 함수를 사용하세요. 
+데이터의 구조나 스키마(schema)에 대한 통찰력을 얻으려면 DataFrame 변수에 
+[`.schema()`](https://kotlin.github.io/dataframe/schema.html) 함수를 사용하세요. 
 
 예를 들어, `jsonDf.schema()`를 실행하여 JSON 데이터셋에 있는 각 컬럼의 타입을 나열합니다:
 
@@ -76,12 +88,15 @@ Kotlin Notebook에서는 자동 완성 기능도 사용할 수 있습니다. 이
 
 ## 데이터 정제하기
 
-Kotlin DataFrame은 데이터셋 정제를 위한 다양한 연산을 제공합니다. 예를 들어 [그룹화(grouping)](https://kotlin.github.io/dataframe/group.html), [필터링(filtering)](https://kotlin.github.io/dataframe/filter.html), [업데이트(updating)](https://kotlin.github.io/dataframe/update.html), 또는 [새 컬럼 추가(adding new columns)](https://kotlin.github.io/dataframe/add.html)가 있습니다. 이러한 함수는 데이터 분석에 필수적이며, 데이터를 효과적으로 구성, 정리 및 변환할 수 있게 해줍니다.
+Kotlin DataFrame은 데이터셋 정제를 위한 다양한 연산을 제공합니다. 
+예를 들어 [그룹화(grouping)](https://kotlin.github.io/dataframe/group.html),
+[필터링(filtering)](https://kotlin.github.io/dataframe/filter.html), [업데이트(updating)](https://kotlin.github.io/dataframe/update.html), 또는
+[새 컬럼 추가(adding new columns)](https://kotlin.github.io/dataframe/add.html)가 있습니다. 이러한 함수는 데이터 분석에 필수적이며, 데이터를 효과적으로 구성, 정리 및 변환할 수 있게 해줍니다.
 
 예를 들어, `movies.csv` 데이터셋을 살펴보겠습니다. 이 데이터셋은 영화 제목과 개봉 연도를 동일한 셀에 저장하고 있습니다. 목표는 더 쉬운 분석을 위해 이 데이터셋을 정제하는 것입니다:
 
 1. **데이터 로드**
-   
+
    `.read()` 함수를 사용하여 파일을 `DataFrame`으로 로드합니다:
 
    ```kotlin
@@ -132,7 +147,7 @@ Kotlin DataFrame은 데이터셋 정제를 위한 다양한 연산을 제공합�
    
    newMovies
    ```
-   
+
 5. **컬럼 제거**
 
    필요하지 않은 컬럼을 제거하려면 `.remove()` 함수를 사용하세요:
@@ -168,7 +183,7 @@ Kotlin Notebook에서 데이터를 정제한 후, 처리된 데이터를 쉽게 
 예를 들어, 결과를 다음과 같이 저장해 보겠습니다:
 
 * [`.writeJson()`](https://kotlin.github.io/dataframe/write.html#writing-to-json) 함수를 사용한 JSON 파일:
- 
+
   ```kotlin
   refinedMovies.writeJson("movies.json")
   ```
@@ -177,6 +192,7 @@ Kotlin Notebook에서 데이터를 정제한 후, 처리된 데이터를 쉽게 
   ```kotlin
   refinedMovies.writeCsv("movies.csv")
   ```
+
 * `.writeArrowIPC()` 및 `.writeArrowFeather()` 함수를 사용한 [Apache Arrow 파일](https://kotlin.github.io/dataframe/write.html#writing-to-apache-arrow-formats):
 
   ```kotlin

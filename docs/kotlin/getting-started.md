@@ -73,16 +73,12 @@ Kotlin 是一种现代编程语言，具有简洁、跨平台以及与 Java 和�
 
 从构建数据流水线到将机器学习模型投入生产，Kotlin 是处理数据并充分发挥其价值的绝佳选择。
 
-1. **在 IDE 内无缝创建和编辑 notebook：**
-
-   * [Kotlin Notebook 入门](get-started-with-kotlin-notebooks.md)
-
-2. **探索并实验你的数据：**
+1. **探索并实验你的数据：**
 
    * [DataFrame](https://kotlin.github.io/dataframe/overview.html) – 一个用于数据分析和操作的库。
    * [Kandy](https://kotlin.github.io/kandy/welcome.html) – 一个用于数据可视化的绘图工具。
 
-3. **在 Twitter 上关注 Kotlin 数据分析账号：** [KotlinForData](http://twitter.com/KotlinForData)。
+2. **在 Twitter 上关注 Kotlin 数据分析账号：** [KotlinForData](http://twitter.com/KotlinForData)。
 
 </tab>
 

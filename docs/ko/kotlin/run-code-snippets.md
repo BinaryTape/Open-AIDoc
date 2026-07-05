@@ -3,7 +3,6 @@
 코틀린 코드는 보통 IDE, 텍스트 에디터 또는 다른 도구에서 작업하는 프로젝트로 구성됩니다. 하지만 함수의 작동 방식을 빠르게 확인하거나 표현식의 값을 찾고 싶을 때, 굳이 새 프로젝트를 생성하고 빌드할 필요는 없습니다. 다양한 환경에서 코틀린 코드를 즉석에서 실행할 수 있는 세 가지 유용한 방법을 확인해 보세요:
 
 * IDE의 [스크래치 파일(Scratch files)](#ide-scratches-and-worksheets).
-* IDE의 [Kotlin Notebook](#ide-kotlin-notebook).
 * 브라우저의 [Kotlin Playground](#browser-kotlin-playground).
 * 커맨드라인의 [ki 셸(ki shell)](#command-line-ki-shell).
 
@@ -37,22 +36,6 @@ IDE는 스크래치의 코드를 자동으로 실행할 수 있습니다. 타이
 
 ![Scratch select module](scratch-select-module.png){width=700}
 
-## IDE: Kotlin Notebook
-
-[Kotlin Notebook](kotlin-notebook-overview.md)은 코드, 출력 결과, 시각화 요소 및 Markdown을 하나의 문서에 결합할 수 있는 대화형 에디터입니다. 노트북을 사용하면 _코드 셀(Code cells)_이라고 하는 섹션에서 코드를 작성 및 실행하고 결과를 즉시 확인할 수 있습니다.
-
-![Kotlin Notebook](data-analysis-notebook.gif){width=700}
-
-Kotlin Notebook은 IntelliJ IDEA에 기본적으로 포함되어 활성화되어 있습니다.
-
-Kotlin Notebook 작업을 시작하려면 [Kotlin Notebook 시작하기](get-started-with-kotlin-notebooks.md)를 참조하세요.
-
-### 스크래치 Kotlin Notebook
-
-Kotlin Notebook을 [스크래치 파일(Scratch file)](https://www.jetbrains.com/help/idea/scratches.html)로 생성할 수도 있습니다. 이를 통해 새 프로젝트를 만들거나 기존 프로젝트를 수정하지 않고도 작은 코드 조각을 테스트할 수 있습니다. 스크래치 노트북은 모든 프로젝트에서 액세스할 수 있습니다.
-
-[스크래치 Kotlin Notebook을 생성하는 방법 알아보기](kotlin-notebook-create.md#create-a-scratch-kotlin-notebook).
-
 ## 브라우저: Kotlin Playground
 
 [Kotlin Playground](https://play.kotlinlang.org/)는 브라우저에서 코틀린 코드를 작성, 실행 및 공유할 수 있는 온라인 애플리케이션입니다.
@@ -63,7 +46,7 @@ Playground의 에디터 영역에서는 소스 파일에서와 마찬가지로 �
 * 사용자 정의 클래스, 함수 및 최상위 선언을 임의의 순서로 추가할 수 있습니다.
 * 실행 가능한 부분은 `main()` 함수의 본문에 작성합니다.
 
-일반적인 코틀린 프로젝트와 마찬가지로 Playground의 `main()` 함수는 `args` 파라미터를 가질 수도 있고 파라미터가 없을 수도 있습니다. 실행 시 프로그램 인자를 전달하려면 **Program arguments** 필드에 작성하세요.
+일반적인 코틀린 프로젝트와 마찬가지로 Playground의 `main()` 함수는 `args` 파라미터를 가질 수도 있고 파라미터가 없을 수도 있습니다. 실행 시 프로그램 인자를 전달하려면 **Program arguments** field에 작성하세요.
 
 ![Playground: code completion](playground-completion.png){width=700}
 

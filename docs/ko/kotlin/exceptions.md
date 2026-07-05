@@ -227,6 +227,32 @@ fun count(): Int {
 ```
 {kotlin-runnable="true"}
 
+예외 인스턴스를 사용하지 않고 예외를 처리할 수 있습니다.
+예를 들어, `catch` 블록에서 대체 값이나 일반적인 에러 메시지를 제공할 수 있습니다.
+
+예외 인스턴스를 의도적으로 무시함을 나타내기 위해 예외 매개변수 이름 대신 언더스코어(`_`)를 사용하세요:
+
+```kotlin
+import java.io.File
+import java.io.IOException
+
+//sampleStart
+fun main() {
+    val userSettings = try {
+        File("user-settings.json").readText()
+    
+    // 예외 인스턴스를 사용하지 않고 IOException을 포착합니다.
+    } catch (_: IOException) {
+        // 파일 로드에 실패하면 대체 값을 사용합니다.
+        "{}"
+    }
+
+    println(userSettings)
+}
+//sampleEnd
+```
+{kotlin-runnable="true"}
+
 동일한 `try` 블록에 대해 여러 개의 `catch` 핸들러를 사용할 수 있습니다.
 서로 다른 예외를 별도로 처리하기 위해 필요한 만큼 `catch` 블록을 추가할 수 있습니다.
 여러 개의 `catch` 블록이 있을 때는 코드에서 위에서 아래 방향으로 가장 구체적인 예외부터 가장 덜 구체적인 예외 순으로 배치하는 것이 중요합니다.

@@ -1,5 +1,12 @@
 [//]: # (title: 初めての Kotlin Notebook の作成)
 
+> IntelliJ IDEA 2026.2 以降、Kotlin Notebook は IDE に同梱されなくなり、JetBrains による公式サポートも終了します。
+> ソースコードは引き続き [GitHub](https://github.com/Kotlin/kotlin-notebook) で利用可能です。
+>
+> 詳細は[ブログ記事](https://blog.jetbrains.com/idea/2026/06/kotlin-notebook-sunset/)をご覧ください。
+>
+{style="note"}
+
 <tldr>
    <p>これは <strong>Kotlin Notebook を使い始める</strong> チュートリアルの第 2 部です。続行する前に、前のステップを完了していることを確認してください。</p>
    <p><img src="icon-1-done.svg" width="20" alt="第 1 ステップ"/> <a href="kotlin-notebook-set-up-env.md">環境のセットアップ</a><br/>

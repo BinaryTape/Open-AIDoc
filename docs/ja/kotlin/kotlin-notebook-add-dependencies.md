@@ -1,5 +1,12 @@
 [//]: # (title: Kotlin Notebook に依存関係を追加する)
 
+> IntelliJ IDEA 2026.2 以降、Kotlin Notebook は IDE にバンドルされなくなり、JetBrains による公式サポートも終了します。
+> ソースコードは引き続き [GitHub](https://github.com/Kotlin/kotlin-notebook) で公開されます。
+>
+> 詳細は [ブログ記事](https://blog.jetbrains.com/idea/2026/06/kotlin-notebook-sunset/) をご確認ください。
+>
+{style="note"}
+
 <tldr>
    <p>これは <strong>Kotlin Notebook を使ってみる</strong> チュートリアルの第 3 部です。先に進む前に、前のステップを完了していることを確認してください。</p>
    <p><img src="icon-1-done.svg" width="20" alt="第 1 ステップ"/> <a href="kotlin-notebook-set-up-env.md">環境をセットアップする</a><br/>
@@ -64,11 +71,11 @@ Kotlin Notebook の自動補完機能を使用して、利用可能なライブ�
 
 3. コードセルを実行します。
 
-    `%use` ステートメントを実行すると、ライブラリの依存関係がダウンロードされ、ノートブックにデフォルトのインポートが追加されます。
+   `%use` ステートメントを実行すると、ライブラリの依存関係がダウンロードされ、ノートブックにデフォルトのインポートが追加されます。
 
-    > ライブラリに依存する他のコードセルを実行する前に、`%use libraryName` の行が含まれるコードセルを実行するようにしてください。
-    >
-    {style="note"}
+   > ライブラリに依存する他のコードセルを実行する前に、`%use libraryName` の行が含まれるコードセルを実行するようにしてください。
+   >
+   {style="note"}
 
 4. Kotlin DataFrame ライブラリを使用して CSV ファイルからデータをインポートするには、新しいコードセルで `.read()` 関数を使用します。
 
@@ -80,12 +87,12 @@ Kotlin Notebook の自動補完機能を使用して、利用可能なライブ�
     rawDf
     ```
 
-    > このサンプルの CSV は [Kotlin DataFrame の例の GitHub リポジトリ](https://github.com/Kotlin/dataframe/blob/master/examples/notebooks/netflix/netflix_titles.csv) からダウンロードできます。
-    > プロジェクトディレクトリに追加してください。
-    > 
-    {style="tip"}
+   > このサンプルの CSV は [Kotlin DataFrame の例の GitHub リポジトリ](https://github.com/Kotlin/dataframe/blob/master/examples/notebooks/netflix/netflix_titles.csv) からダウンロードできます。
+   > プロジェクトディレクトリに追加してください。
+   >
+   {style="tip"}
 
-    ![DataFrame を使用してデータを表示する](add-dataframe-dependency.png){width=700}
+   ![DataFrame を使用してデータを表示する](add-dataframe-dependency.png){width=700}
 
 5. 新しいコードセルで `.plot` メソッドを使用して、DataFrame 内の TV 番組と映画の分布を視覚的に表現します。
 

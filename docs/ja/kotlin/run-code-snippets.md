@@ -3,7 +3,6 @@
 Kotlinコードは通常、IDEやテキストエディタ、その他のツールで作業するプロジェクトにまとめられます。しかし、関数の動作を素早く確認したい場合や、式の値を知りたいだけの場合は、新しいプロジェクトを作成してビルドする必要はありません。さまざまな環境でKotlinコードを即座に実行できる、これら3つの便利な方法を確認してください：
 
 * IDEでの [スクラッチファイル](#ide-scratches-and-worksheets)
-* IDEでの [Kotlin Notebook](#ide-kotlin-notebook)
 * ブラウザでの [Kotlin Playground](#browser-kotlin-playground)
 * コマンドラインでの [ki shell](#command-line-ki-shell)
 
@@ -37,22 +36,6 @@ IDEはスクラッチのコードを自動的に実行できます。タイピ�
 スクラッチを実行するたびにモジュールを自動的に再ビルドするには、**Make module before Run** を選択します。
 
 ![Scratch select module](scratch-select-module.png){width=700}
-
-## IDE: Kotlin Notebook
-
-[Kotlin Notebook](kotlin-notebook-overview.md) は、コード、出力、ビジュアル、Markdownを1つのドキュメントに混在させることができるインタラクティブなエディタです。ノートブックを使用して、*コードセル* (code cells) と呼ばれるセクションでコードを記述・実行し、その結果を即座に確認できます。
-
-![Kotlin Notebook](data-analysis-notebook.gif){width=700}
-
-Kotlin Notebookは、IntelliJ IDEAにデフォルトでバンドルされ、有効化されています。
-
-Kotlin Notebookの使用を開始するには、[Kotlin Notebookを始める](get-started-with-kotlin-notebooks.md) を参照してください。
-
-### スクラッチ Kotlin Notebook
-
-Kotlin Notebookを [スクラッチファイル](https://www.jetbrains.com/help/idea/scratches.html) として作成することもできます。これにより、新しいプロジェクトを作成したり既存のプロジェクトを変更したりすることなく、小さなコードの断片をテストできます。スクラッチノートブックは、どのプロジェクトからでもアクセス可能です。
-
-[スクラッチ Kotlin Notebookの作成方法を学ぶ](kotlin-notebook-create.md#create-a-scratch-kotlin-notebook)。
 
 ## ブラウザ: Kotlin Playground
 

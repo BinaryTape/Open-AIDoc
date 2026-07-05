@@ -100,7 +100,7 @@ sealed class IOError {
 
 ## 继承
 
-密封类和接口的直接子类必须在同一个软件包中声明。它们可以是顶层的，也可以嵌套在任何数量的其他命名类、命名接口或命名对象中。只要子类符合 Kotlin 中的常规继承规则，就可以具有任何[可见性](visibility-modifiers.md)。
+密封类和接口的直接子类必须在同一个软件包中声明。它们可以是顶层的，也可以嵌套在任何数量的其他命名类、命名接口或命名对象中。只要子类符合 Kotlin 中的常规继承规则（包括[重写属性](inheritance.md#overriding-properties)的规则），就可以具有任何[可见性](visibility-modifiers.md)。
 
 密封类的子类必须具有正确的限定名称。它们不能是局部对象或匿名对象。
 
@@ -192,7 +192,7 @@ fun main() {
 
 让我们探索一些密封类和接口特别有用的实际场景。
 
-### UI 应用程序中的状态管理
+### UI 应用程序中的状态 management
 
 您可以使用密封类来表示应用程序中不同的 UI 状态。这种方法允许结构化且安全地处理 UI 更改。此示例演示了如何管理各种 UI 状态：
 
@@ -322,3 +322,8 @@ fun main() {
     val userNotFoundResponse = getUserById("invalidId")
     println(userNotFoundResponse)
 }
+```
+
+## 下一步
+
+详细了解 [Kotlin 中的继承](inheritance.md)。

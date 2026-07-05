@@ -6,7 +6,7 @@
 <var name="example_name" value="custom-plugin"/>
 <p>
     <b>コード例</b>:
-    <a href="https://github.com/ktorio/ktor-documentation/tree/%ktor_version%/codeSnippets/snippets/%example_name%">
+    <a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/%example_name%">
         %example_name%
     </a>
 </p>
@@ -135,7 +135,7 @@ val DataTransformationPlugin = createApplicationPlugin(name = "DataTransformatio
     onCallReceive { call ->
         transformBody { data ->
             if (requestedType?.type == Int::class) {
-                val line = data.readUTF8Line() ?: "1"
+                val line = data.readLine() ?: "1"
                 line.toInt() + 1
             } else {
                 data
@@ -148,7 +148,7 @@ val DataTransformationPlugin = createApplicationPlugin(name = "DataTransformatio
 上記のコードスニペットの`transformBody`は次のように動作します。
 
 1. `TransformBodyContext`は、現在のリクエストに関する型情報を含む[ラムダレシーバー](https://kotlinlang.org/docs/scope-functions.html#context-object-this-or-it)です。上記の例では、`TransformBodyContext.requestedType`プロパティを使用して、要求されたデータ型を確認しています。
-2. `data`は、リクエストボディを[ByteReadChannel](https://api.ktor.io/ktor-io/io.ktor.utils.io/-byte-read-channel/index.html)として受信し、必要な型に変換できるラムダ引数です。上記の例では、`ByteReadChannel.readUTF8Line`を使用してリクエストボディを読み取っています。
+2. `data`は、リクエストボディを[ByteReadChannel](https://api.ktor.io/ktor-io/io.ktor.utils.io/-byte-read-channel/index.html)として受信し、必要な型に変換できるラムダ引数です。上記の例では、`ByteReadChannel.readLine()`を使用してリクエストボディを読み取っています。
 3. 最後に、データを変換して返す必要があります。この例では、受信した整数値に`1`が加算されます。
 
 完全な例はこちらにあります: [DataTransformationPlugin.kt](https://github.com/ktorio/ktor-documentation/blob/%ktor_version%/codeSnippets/snippets/custom-plugin/src/main/kotlin/com/example/plugins/DataTransformationPlugin.kt)。

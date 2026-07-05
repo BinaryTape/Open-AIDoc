@@ -41,6 +41,7 @@
 - [Gradleプラグイン] データベースを設定せずにプラグインを適用した場合の IDE 同期時のクラッシュを修正 (#6088)
 - [PostgreSQLダイアレクト] 関数呼び出しをネストして使用する際の JSON 集計関数を修正 (#6281 by @griffio)
 - [Paging3拡張] データベースが空の場合の `KeyedQueryPagingSource` のクラッシュを修正 (#6284 by @woods-marshes)
+- [コンパイラ] `COALESCE` のようなカプセル化関数でミューテータ文が使用される際の Java 型アダプタの問題を修正 (#6292 by @griffio)
 
 ## [2.3.2] - 2026-03-16
 [2.3.2]: https://github.com/sqldelight/sqldelight/releases/tag/2.3.2
@@ -166,7 +167,7 @@
 - [JDBCドライバ] トランザクション終了時の `connectionManager` のメモリリークを修正
 - [JDBCドライバ] ドキュメントに記載されている通り、トランザクション内で SQLite のマイグレーションを実行するように修正 (#5218 by @morki)
 - [JDBCドライバ] トランザクションのコミット/ロールバック後の接続リークを修正 (#5205 by @morki)
-- [Gradleプラグイン] `GenerateSchemaTask` の前に `DriverInitializer` を実行するように修正 (#5562 by @nwagu)
+- [Gradleプラグイン] `DriverInitializer` を `GenerateSchemaTask` の前に実行 (#5562 by @nwagu)
 - [ランタイム] 実際のドライバが非同期の場合の `LogSqliteDriver` におけるクラッシュを修正 (#5723 by @edenman)
 - [ランタイム] `StringBuilder` の容量を修正 (#5192 by @janbina)
 - [PostgreSQLダイアレクト] PostgreSql `CREATE OR REPLACE VIEW` (#5407 by @griffio)
@@ -232,7 +233,7 @@
 - [PostgreSQLダイアレクト] PostgreSQL `CREATE INDEX CONCURRENTLY` のサポートを追加 (#4531 by @griffio)
 - [PostgreSQLダイアレクト] PostgreSQL CTE の補助ステートメントが相互に参照可能になるようサポート (#4493 by @griffio)
 - [PostgreSQLダイアレクト] バイナリ式 (binary expr) および `sum` における PostgreSQL 型のサポートを追加 (#4539 by @Adriel-M)
-- [PostgreSQLダイアレクト] PostgreSQL `SELECT DISTINCT ON` 構文のサポートを追加 (#4584 by @griffio)
+- [PostgreSQLダイアレクト] PostgreSQL `SELECT DISTINCT ON` 構文의サポートを追加 (#4584 by @griffio)
 - [PostgreSQLダイアレクト] `SELECT` 文における PostgreSQL JSON 関数のサポートを追加 (#4590 by @MariusVolkhart)
 - [PostgreSQLダイアレクト] `generate_series` PostgreSQL 関数を追加 (#4717 by @griffio)
 - [PostgreSQLダイアレクト] 追加の Postgres 文字列関数の定義を追加 (#4752 by @MariusVolkhart)
@@ -666,6 +667,7 @@ sqldelight {
 - [IDEプラグイン] 古い IntelliJ バージョンとの互換性を改善 (by @3flex)
 - [IDEプラグイン] より高速なアノテーション API を使用
 - [Gradleプラグイン] JS/Android プラグインランタイム追加時に明示的にサポート (by @ZacSweers)
+- [Gradleプラグイン] `GenerateSchemaTask` の前に `DriverInitializer` を実行するように修正 (#5562 by @nwagu)
 - [Gradleプラグイン] マイグレーションからスキーマを派生させずにマイグレーション出力タスクを登録 (#2744 by @kevincianfarini)
 - [Gradleプラグイン] マイグレーションタスクがクラッシュした場合、クラッシュしたファイルを出力
 - [Gradleプラグイン] 冪等な出力を保証するため、コード生成時にファイルをソート (by @ZacSweers)
@@ -1023,7 +1025,7 @@ SQLDelight のインフラ改善に多大な貢献をした @3flex に感謝し�
 * 新機能: [ランタイム] 実験的な Kotlin Flow API。
 * 修正: [Gradle] Kotlin/Native 1.3.40 互換性。
 * 修正: [Gradle] #1243 Gradle のオンデマンド設定時における SQLDelight の使用に関する修正。
-* 修正: [Gradle] #1385 Fix for usage of SQLDelight with incremental annotation processing.
+* 修正: [Gradle] #1385 漸進的アノテーション処理 (incremental annotation processing) における SQLDelight の使用に関する修正。
 * 修正: [Gradle] Gradle タスクのキャッシュを有効化。
 * 修正: [Gradle] #1274 Kotlin DSL での sqldelight 拡張の使用を有効化。
 * 修正: [コンパイラ] 各クエリに対して一意の ID が決定論的に生成されるように修正。

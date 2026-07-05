@@ -224,6 +224,32 @@ fun count(): Int {
 ```
 {kotlin-runnable="true"}
 
+你可以处理异常而不使用异常实例。
+例如，你可以在 `catch` 块中提供一个回退值或通用错误消息。
+
+使用下划线 (`_`) 代替异常形参名称，以指示有意忽略异常实例：
+
+```kotlin
+import java.io.File
+import java.io.IOException
+
+//sampleStart
+fun main() {
+    val userSettings = try {
+        File("user-settings.json").readText()
+    
+    // 捕获 IOException 而不使用异常实例
+    } catch (_: IOException) {
+        // 如果加载文件失败，则使用回退值
+        "{}"
+    }
+
+    println(userSettings)
+}
+//sampleEnd
+```
+{kotlin-runnable="true"}
+
 你可以为同一个 `try` 块使用多个 `catch` 处理程序。
 你可以根据需要添加任意数量的 `catch` 块，以分别处理不同的异常。
 当有多个 `catch` 块时，务必按照从最具体到最不具体异常的顺序排列它们，即在代码中遵循从上到下的顺序。

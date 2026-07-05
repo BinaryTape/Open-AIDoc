@@ -207,7 +207,7 @@ Kotlin/JVM 编译的默认目标版本为 `1.8`。`1.6` 目标版本已被移除
 
 ## Kotlin/Native
 
-Kotlin 1.7.0 包含对 Objective-C 和 Swift 互操作性的更改，并稳定了之前版本中引入的功能。它还为新内存管理器带来了性能提升以及其他更新：
+Kotlin 1.7.0 包含对 Objective-C 和 Swift 互操作性的更改，并稳定了之前版本中引入的功能格式。它还为新内存管理器带来了性能提升以及其他更新：
 
 * [新内存管理器的性能提升](#performance-improvements-for-the-new-memory-manager)
 * [与 JVM 和 JS IR 后端统一的编译器插件 ABI](#unified-compiler-plugin-abi-with-jvm-and-js-ir-backends)
@@ -263,7 +263,7 @@ binaryOptions["androidProgramType"] = "nativeActivity"
 
 当您从 Swift/Objective-C 代码调用 Kotlin 代码（反之亦然）且此代码抛出异常时，该异常应由发生异常的代码处理，除非您特别允许在语言之间通过适当的转换转发异常（例如，使用 `@Throws` 注解）。
 
-以前，Kotlin 存在另一种非预期的行为，即在某些情况下，未声明的异常可能会从一种语言“泄漏”到另一种语言。Kotlin 1.7.0 修复了该问题，现在此类情况会导致程序终止。
+以前， Kotlin 存在另一种非预期的行为，即在某些情况下，未声明的异常可能会从一种语言“泄漏”到另一种语言。Kotlin 1.7.0 修复了该问题，现在此类情况会导致程序终止。
 
 因此，例如，如果您在 Kotlin 中有一个 `{ throw Exception() }` 的 lambda 表达式并从 Swift 调用它，在 Kotlin 1.7.0 中，一旦异常到达 Swift 代码，它就会终止。在以前的 Kotlin 版本中，此类异常可能会泄漏到 Swift 代码中。
 
@@ -314,7 +314,7 @@ Kotlin/JS 的 [JS IR 编译器后端](js-ir-compiler.md) 正在接受进一步�
 
 ### 使用 IR 时成员名称的缩减
 
-Kotlin/JS IR 编译器现在使用其关于 Kotlin 类和函数关系的内部信息来应用更有效的缩减，从而缩短函数、属性和类的名称。这减小了生成的打包应用程序的大小。
+Kotlin/JS IR 编译器现在使用其关于 Kotlin 类和函数关系的内部信息来应用更有效的缩减（minification），从而缩短函数、属性和类的名称。这减小了生成的打包应用程序的大小。
 
 当您在生产模式下构建 Kotlin/JS 应用程序时，会自动应用此类缩减，且默认启用。要禁用成员名称缩减，请使用 `-Xir-minimized-member-names` 编译器标志：
 
@@ -542,7 +542,7 @@ println(list)
 
 ### JS 和 Native 中对命名捕获组的支持
 
-从 Kotlin 1.7.0 开始，命名捕获组不仅在 JVM 上受支持，在 JS 和 Native 平台上也受支持。
+从 Kotlin 1.7.0 开始，命名捕获组（named capturing groups）不仅在 JVM 上受支持，在 JS 和 Native 平台上也受支持。
 
 要为捕获组命名，请在正则表达式中使用 (`?<name>group`) 语法。要获取由组匹配的文本，请调用新引入的 [`MatchGroupCollection.get()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.text/get.html) 函数并传递组名。
 
@@ -560,7 +560,7 @@ fun main() {
 }
 ```
 
-#### 命名后行引用 (Named backreferencing)
+#### 命名后行引用（Named backreferencing）
 
 现在您还可以在后行引用组时使用组名。后行引用匹配先前由捕获组匹配的相同文本。为此，请在正则表达式中使用 `\k<name>` 语法：
 
@@ -762,7 +762,7 @@ plugins {
   kapt.verbose=true
   ```
 
-> 您还可以通过 [命令行选项 `verbose`](kapt.md#use-in-cli) 启用详细输出。
+> 您还可以通过 [命令行选项 `verbose`](kapt.md#cli) 启用详细输出。
 >
 {style="note"}
 
@@ -793,7 +793,7 @@ kotlin.compiler.execution.strategy=out-of-process
 
 #### 移除 useExperimentalAnnotation 方法
 
-在 Kotlin 1.7.0 中，我们完成了对 `useExperimentalAnnotation` Gradle 方法的弃用周期。请改用 `optIn()` 以在模块中选择性加入 API。
+在 Kotlin 1.7.0 中，我们完成了对 `useExperimentalAnnotation` Gradle 方法的弃用周期。请改用 `optIn()` 以在模块中选择性加入使用 API。
 
 例如，如果您的 Gradle 模块是多平台的：
 
@@ -820,7 +820,7 @@ sourceSets {
 
 #### 移除已弃用的插件
 
-在 Kotlin 1.4.0 中，`kotlin2js` 和 `kotlin-dce-plugin` 插件被弃用，并在本版本中被移除。请使用新的 `org.jetbrains.kotlin.js` 插件来代替 `kotlin2js`。当正确配置 Kotlin/JS Gradle 插件时，死代码消除（DCE）即可工作。
+在 Kotlin 1.4.0 中，`kotlin2js` 和 `kotlin-dce-plugin` 插件被弃用，并在本版本中被移除。请使用新的 `org.jetbrains.kotlin.js` 插件来代替 `kotlin2js`。当正确配置 Kotlin/JS Gradle 插件时，死代码消除 (DCE) 即可工作。
 
 在 Kotlin 1.6.0 中，我们将 `KotlinGradleSubplugin` 类的弃用级别更改为 `ERROR`。开发人员使用此类编写编译器插件。在此版本中，[该类已被移除](https://youtrack.jetbrains.com/issue/KT-48831/)。请改用 `KotlinCompilerPluginSupportPlugin` 类。
 

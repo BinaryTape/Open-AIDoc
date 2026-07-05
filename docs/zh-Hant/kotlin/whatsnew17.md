@@ -233,7 +233,7 @@ Kotlin 1.7.0 包含對 Objective-C 和 Swift 互通性的變更，並穩定了�
 
 ### 與 JVM 和 JS IR 後端統一的編譯器外掛程式 ABI
 
-從 Kotlin 1.7.0 開始，Kotlin Multiplatform Gradle 外掛程式預設為 Kotlin/Native 使用可嵌入的編譯器 jar。此 [功能在 1.6.0 中宣佈](whatsnew16.md#unified-compiler-plugin-abi-with-jvm-and-js-ir-backends) 為實驗性功能，現在已成為穩定版並可供使用。
+從 Kotlin 1.7.0 開始， Kotlin Multiplatform Gradle 外掛程式預設為 Kotlin/Native 使用可嵌入的編譯器 jar。此 [功能在 1.6.0 中宣佈](whatsnew16.md#unified-compiler-plugin-abi-with-jvm-and-js-ir-backends) 為實驗性功能，現在已成為穩定版並可供使用。
 
 這項改進對程式庫作者非常有用，因為它改進了編譯器外掛程式的開發體驗。在此版本之前，您必須為 Kotlin/Native 提供單獨的構件，但現在您可以為 Native 和其他受支援的平台使用相同的編譯器外掛程式構件。
 
@@ -338,7 +338,7 @@ Kotlin/JS 的 IR 編譯器後端現在包含與舊版後端相同的填充功能
 
 在處理 JavaScript 模組時，大多數應用程式使用靜態匯入，其用法已在 [JavaScript 模組整合](js-modules.md) 中涵蓋。然而，Kotlin/JS 缺少一種在應用程式執行時動態載入 JavaScript 模組的機制。
 
-從 Kotlin 1.7.0 開始，`import` 陳述式從 JavaScript 開始在 `js` 區塊中支援，允許您在執行時將套件動態帶入您的應用程式：
+從 Kotlin 1.7.0 開始， `import` 陳述式從 JavaScript 開始在 `js` 區塊中支援，允許您在執行時將套件動態帶入您的應用程式：
 
 ```kotlin
 val myPackage = js("import('my-package')")
@@ -573,7 +573,7 @@ fun backRef() {
 }
 ```
 
-#### 取代運算式中的具名群組
+#### 具名群組在取代運算式中
 
 具名群組參照可用於取代運算式。考慮 [`replace()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.text/-regex/replace.html) 函式，它將輸入中所有指定的正規表示式出現處替換為取代運算式，以及 [`replaceFirst()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.text/-regex/replace-first.html) 函式，它僅交換第一個比對項。
 

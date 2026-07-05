@@ -45,7 +45,7 @@
       <list>
         <li>다양한 유형의 차트를 그리기 위한 강력하고 가독성 좋으며 타입 안전한 DSL</li>
         <li>JVM용 코틀린으로 작성된 오픈 소스 라이브러리</li>
-        <li><a href="https://kotlin.github.io/kandy/kandy-in-kotlin-notebook.html">Kotlin Notebook</a>, <a href="https://kotlin.github.io/kandy/kandy-in-datalore.html">Datalore</a>, <a href="https://kotlin.github.io/kandy/kandy-in-jupyter-notebook.html">Jupyter Notebook</a> 지원</li>
+        <li><a href="https://kotlin.github.io/kandy/kandy-in-datalore.html">Datalore</a> 지원</li>
         <li><a href="https://kotlin.github.io/dataframe/overview.html">Kotlin DataFrame</a>과의 원활한 통합</li>
       </list>
     </td>
@@ -118,7 +118,7 @@
     <td>
       <list>
         <li>코틀린으로 작성된 통계 데이터 플로팅</li>
-        <li><a href="https://plugins.jetbrains.com/plugin/16340-kotlin-notebook">Kotlin Notebook</a>, <a href="https://datalore.jetbrains.com/">Datalore</a>, <a href="https://github.com/Kotlin/kotlin-jupyter#readme">Kotlin 커널이 포함된 Jupyter</a> 지원</li>
+        <li><a href="https://datalore.jetbrains.com/">Datalore</a> 지원</li>
         <li>JVM, JS 및 Python과 호환</li>
         <li>차트를 <a href="https://www.jetbrains.com/lp/compose-multiplatform/">Compose Multiplatform</a> 애플리케이션에 삽입</li>
       </list>
@@ -157,7 +157,6 @@
       <list>
         <li>표 형식 데이터의 시각화</li>
         <li>R의 <a href="https://ggplot2.tidyverse.org/">ggplot</a>에서 영감을 받음</li>
-        <li><a href="https://github.com/Kotlin/kotlin-jupyter#readme">Kotlin 커널이 포함된 Jupyter</a> 지원</li>
       </list>
     </td>
   </tr>

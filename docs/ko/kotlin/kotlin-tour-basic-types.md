@@ -42,14 +42,14 @@ fun main() {
 
 코틀린에는 다음과 같은 기본 타입들이 있습니다.
 
-| **카테고리**           | **기본 타입**                    | **예시 코드**                                              |
-|------------------------|------------------------------------|---------------------------------------------------------------|
-| 정수형 (Integers)      | `Byte`, `Short`, `Int`, `Long`     | `val year: Int = 2020`                                        |
-| 부호 없는 정수형 (Unsigned integers) | `UByte`, `UShort`, `UInt`, `ULong` | `val score: UInt = 100u`                                      |
-| 부동 소수점 수 (Floating-point numbers) | `Float`, `Double`                  | `val currentTemp: Float = 24.5f`, `val price: Double = 19.99` |
-| 불리언 (Booleans)      | `Boolean`                          | `val isEnabled: Boolean = true`                               |
-| 문자 (Characters)      | `Char`                             | `val separator: Char = ','`                                   |
-| 문자열 (Strings)       | `String`                           | `val message: String = "Hello, world!"`                       |
+| **카테고리**                                              | **기본 타입**                    | **예시 코드**                                                  |
+|-----------------------------------------------------------|------------------------------------|-------------------------------------------------------------------|
+| [정수형 (Integers)](numbers.md#integer-types)                      | `Byte`, `Short`, `Int`, `Long`     | `val year: Int = 2020`<br/> `val amount: Long = 350_000_000`      |
+| [부호 없는 정수형 (Unsigned integers)](unsigned-integer-types.md)            | `UByte`, `UShort`, `UInt`, `ULong` | `val score: UInt = 100u`                                          |
+| [부동 소수점 수 (Floating-point numbers)](numbers.md#floating-point-types) | `Float`, `Double`                  | `val currentTemp: Float = 24.5f`<br/> `val price: Double = 19.99` |
+| [불리언 (Booleans)](booleans.md)                                   | `Boolean`                          | `val isEnabled: Boolean = true`                                   |
+| [문자 (Characters)](characters.md)                               | `Char`                             | `val separator: Char = ','`                                       |
+| [문자열 (Strings)](strings.md)                                     | `String`                           | `val message: String = "Hello, world!"`                           |
 
 기본 타입과 그 속성에 대한 자세한 내용은 [타입 개요(Types overview)](types-overview.md)를 참조하세요.
 

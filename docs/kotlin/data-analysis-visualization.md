@@ -3,17 +3,20 @@
 
 Kotlin 提供了一站式的高效且灵活的数据可视化解决方案，在深入研究复杂模型之前，为您提供了一种直观的方式来展示和探索数据。
 
-本教程演示了如何在 IntelliJ IDEA 中结合使用 [Kotlin Notebook](kotlin-notebook-overview.md) 与 [Kandy](https://kotlin.github.io/kandy/welcome.html) 及 [Kotlin 数据帧](https://kotlin.github.io/dataframe/home.html)库来创建不同的图表类型。
+本教程演示了如何在 IntelliJ IDEA 中使用 [Kandy](https://kotlin.github.io/kandy/welcome.html) 和 [Kotlin 数据帧](https://kotlin.github.io/dataframe/home.html)库创建不同的图表类型。
 
 ## 开始之前
 
-Kotlin Notebook 依赖于 [Kotlin Notebook 插件](https://plugins.jetbrains.com/plugin/16340-kotlin-notebook)，该插件在 IntelliJ IDEA 中默认内置并启用。
-
-如果 Kotlin Notebook 功能不可用，请确保已启用该插件。欲了解更多信息，请参阅[设置环境](kotlin-notebook-set-up-env.md)。
+> 从 IntelliJ IDEA 2026.2 开始，Kotlin Notebook 将不再随 IDE 内置，也不再由 JetBrains 提供官方支持。
+> 源代码将继续在 [GitHub](https://github.com/Kotlin/kotlin-notebook) 上提供。
+>
+> 欲了解更多信息，请参阅[博客文章](https://blog.jetbrains.com/idea/2026/06/kotlin-notebook-sunset/)。
+>
+{style="note"}
 
 要按照本教程操作：
 
-1. 创建一个[新的 Kotlin Notebook](kotlin-notebook-create.md)。
+1. 选择 **文件** | **新建** | **Kotlin Notebook**。
 2. 在您的笔记本中，导入 [Kandy](https://kotlin.github.io/kandy/welcome.html) 和 [Kotlin 数据帧](https://kotlin.github.io/dataframe/home.html)：
 
    ```kotlin
@@ -21,9 +24,9 @@ Kotlin Notebook 依赖于 [Kotlin Notebook 插件](https://plugins.jetbrains.com
    %use dataframe
    ```
 
-> 在运行任何其他代码单元之前，请先运行包含 `%use dataframe` 行的代码单元，以确保数据帧库及其 API 在笔记本中可用。
->
-{style="note"}
+   在运行任何其他代码单元之前，请先运行包含 `%use dataframe` 行的代码单元，以确保数据帧库及其 API 在笔记本中可用。
+
+要按照本教程操作，您也可以将数据帧作为 [Gradle](https://kotlin.github.io/dataframe/setupgradle.html) 或 [Maven](https://kotlin.github.io/dataframe/setupmaven.html) 依赖项使用。
 
 ## 创建数据帧
 
@@ -73,7 +76,7 @@ df.head(4) // 返回前四行
 
 ## 创建折线图
 
-让我们使用上一节中的 `df` 数据帧在 Kotlin Notebook 中创建一张折线图：
+让我们使用上一节中的 `df` 数据帧创建一张折线图：
 
 1. 调用 Kandy 库中的 `.plot()` 函数。
 2. 应用 `line()` 图层。
@@ -182,4 +185,3 @@ df.groupBy { City }.plot {
 * 在 [Kandy 库文档](https://kotlin.github.io/kandy/examples.html)中探索更多图表示例
 * 在 [Lets-Plot 库文档](lets-plot.md)中探索更高级的绘图选项
 * 在 [Kotlin 数据帧库文档](https://kotlin.github.io/dataframe/info.html)中查找有关创建、探索和管理数据帧的更多信息
-* 在此 [YouTube 视频]( https://www.youtube.com/watch?v=m4Cqz2_P9rI&t=4s)中了解更多关于 Kotlin Notebook 数据可视化的信息

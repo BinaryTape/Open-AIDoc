@@ -1,6 +1,6 @@
 [//]: # (title: 处理 Web 资源)
 
-在这里，您可以找到有关使用浏览器功能和 `preload` API 预加载资源以及缓存 Web 资源的信息。
+在这里，您可以找到有关使用浏览器功能和 `preload` API 预加载资源、缓存 Web 资源以及自动字体回退的信息。
   
 ## Web 目标的资源预加载
 
@@ -37,71 +37,47 @@
 
 Compose Multiplatform 1.8.0 引入了一个实验性 API，用于在 Web 目标上预加载字体和图片资源：`preloadFont()`、`preloadImageBitmap()` 和 `preloadImageVector()`。
 
-此外，如果您需要表情符号等特殊字符，可以设置不同于默认捆绑选项的回退字体。要指定回退字体，请使用 `FontFamily.Resolver.preload()` 方法。
+当渲染过程中遇到未解析的字符时，包含缺失字符的回退字体会被[自动下载](#automatic-font-fallback)，因此表情符号等特殊字符可以开箱即用。
 
-以下示例演示了如何使用预加载和回退字体：
+如果您想控制使用哪个回退字体而不是依赖自动下载，请使用 `FontFamily.Resolver.preload()` 方法进行手动指定。Web 目标支持 TTF、OTF、TTC、可变字体以及 WOFF/WOFF2 字体格式。
+
+以下示例演示了如何使用矢量图片的预加载：
 
 ```kotlin
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.runtime.*
-import androidx.compose.ui.*
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalFontFamilyResolver
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.window.ComposeViewport
-import components.resources.demo.shared.generated.resources.*
-import components.resources.demo.shared.generated.resources.NotoColorEmoji
-import components.resources.demo.shared.generated.resources.Res
-import components.resources.demo.shared.generated.resources.Workbench_Regular
-import components.resources.demo.shared.generated.resources.font_awesome
-import org.jetbrains.compose.resources.ExperimentalResourceApi
-import org.jetbrains.compose.resources.configureWebResources
-import org.jetbrains.compose.resources.demo.shared.UseResources
-import org.jetbrains.compose.resources.preloadFont
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalResourceApi::class)
+@Composable
+fun App() {
+    val icon by preloadImageVector(Res.drawable.heavy_vector_icon)
 
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalResourceApi::class, InternalComposeUiApi::class)
-fun main() {
-    configureWebResources {
-        // 替代资源位置
-        resourcePathMapping { path -> "./$path" }
-    }
-    ComposeViewport(viewportContainerId = "composeApplication") {
-        val font1 by preloadFont(Res.font.Workbench_Regular)
-        val font2 by preloadFont(Res.font.font_awesome, FontWeight.Normal, FontStyle.Normal)
-        val emojiFont = preloadFont(Res.font.NotoColorEmoji).value
-        var fontsFallbackInitialized by remember { mutableStateOf(false) }
-
-        // 为应用内容使用预加载的资源
-        UseResources()
-
-        if (font1 != null && font2 != null && emojiFont != null && fontsFallbackInitialized) {
-            println("Fonts are ready")
-        } else {
-            // 显示进度指示器以解决 FOUT 或应用在加载期间暂时无法正常运行的问题
-            Box(modifier = Modifier.fillMaxSize().background(Color.White.copy(alpha = 0.8f)).clickable {  }) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-            }
-            println("Fonts are not ready yet")
-        }
-
-        val fontFamilyResolver = LocalFontFamilyResolver.current
-        LaunchedEffect(fontFamilyResolver, emojiFont) {
-            if (emojiFont != null) {
-                // 预加载带有表情符号的回退字体，以渲染捆绑字体不支持的缺失字形
-                fontFamilyResolver.preload(FontFamily(listOf(emojiFont)))
-                fontsFallbackInitialized = true
-            }
+    if (icon != null) {
+        MainScreen()
+    } else {
+        Box(modifier = Modifier.fillMaxSize()) {
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
         }
     }
 }
+
+@Composable
+fun MainScreen() {
+    // 图标从缓存中加载
+    Image(painter = painterResource(Res.drawable.heavy_vector_icon), contentDescription = null)
+}
 ```
-{initial-collapse-state="collapsed" collapsible="true" collapsed-title="fontFamilyResolver.preload(FontFamily(listOf(emojiFont)))"}
+{initial-collapse-state="collapsed" collapsible="true" collapsed-title="val icon by preloadImageVector(Res.drawable.heavy_vector_icon)"}
+
+## 自动字体回退
+<primary-label ref="Experimental"/>
+
+默认情况下，应用程序已加载字体未涵盖的字符将显示为替代字形（□，被称为“[tofu](https://fonts.google.com/knowledge/glossary/tofu)”）。
+
+[//]: # (TODO update version for stable release)
+
+从 1.12.0-beta01 版本开始，Compose Multiplatform 会在渲染期间监控未解析的字符，并根据需要按需下载所需的 Noto 字体子集。Noto 这个名字是“no tofu”的缩写，因为这些字体的设计初衷是消除豆腐块字形。
+
+一旦字体可用，受影响的文本将进行重组。请注意，在下载期间可能会短暂出现豆腐块。
+
+对于 CJK（中文、日文和韩文）字符，将根据浏览器的语言设置自动选择正确的字体变体。
 
 ## 缓存 Web 资源
 <primary-label ref="Experimental"/>

@@ -3,17 +3,20 @@
 
 Kotlin은 강력하고 유연한 데이터 시각화를 위한 올인원 솔루션을 제공하여, 복잡한 모델을 다루기 전에 데이터를 직관적으로 제시하고 탐색할 수 있는 방법을 제공합니다.
 
-이 튜토리얼에서는 [Kotlin Notebook](kotlin-notebook-overview.md)과 [Kandy](https://kotlin.github.io/kandy/welcome.html) 및 [Kotlin DataFrame](https://kotlin.github.io/dataframe/home.html) 라이브러리를 사용하여 IntelliJ IDEA에서 다양한 차트 유형을 만드는 방법을 보여줍니다.
+이 튜토리얼에서는 [Kandy](https://kotlin.github.io/kandy/welcome.html) 및 [Kotlin DataFrame](https://kotlin.github.io/dataframe/home.html) 라이브러리를 사용하여 IntelliJ IDEA에서 다양한 차트 유형을 만드는 방법을 보여줍니다.
 
 ## 시작하기 전에
 
-Kotlin Notebook은 IntelliJ IDEA에 기본적으로 포함되어 활성화되어 있는 [Kotlin Notebook 플러그인](https://plugins.jetbrains.com/plugin/16340-kotlin-notebook)에 의존합니다.
-
-Kotlin Notebook 기능을 사용할 수 없는 경우, 플러그인이 활성화되어 있는지 확인하세요. 자세한 내용은 [환경 설정](kotlin-notebook-set-up-env.md)을 참조하세요.
+> IntelliJ IDEA 2026.2부터 Kotlin Notebook은 더 이상 IDE에 번들로 제공되지 않으며 JetBrains에서 공식적으로 지원하지 않습니다.
+> 소스 코드는 [GitHub](https://github.com/Kotlin/kotlin-notebook)에서 계속 이용할 수 있습니다.
+>
+> 자세한 내용은 [블로그 포스트](https://blog.jetbrains.com/idea/2026/06/kotlin-notebook-sunset/)를 참조하세요.
+>
+{style="note"}
 
 이 튜토리얼을 따라 하려면:
 
-1. [새로운 Kotlin Notebook](kotlin-notebook-create.md)을 생성합니다.
+1. **File** | **New** | **Kotlin Notebook**을 선택합니다.
 2. 노트북에서 [Kandy](https://kotlin.github.io/kandy/welcome.html) 및 [Kotlin DataFrame](https://kotlin.github.io/dataframe/home.html)을 가져옵니다:
 
    ```kotlin
@@ -21,9 +24,9 @@ Kotlin Notebook 기능을 사용할 수 없는 경우, 플러그인이 활성화
    %use dataframe
    ```
 
-> 노트북에서 DataFrame 라이브러리와 해당 API를 사용할 수 있도록 다른 코드 셀보다 먼저 `%use dataframe` 줄이 포함된 코드 셀을 실행하세요.
->
-{style="note"}
+   노트북에서 DataFrame 라이브러리와 해당 API를 사용할 수 있도록 다른 코드 셀보다 먼저 `%use dataframe` 줄이 포함된 코드 셀을 실행하세요.
+
+이 튜토리얼을 따라 하기 위해 DataFrame을 [Gradle](https://kotlin.github.io/dataframe/setupgradle.html) 또는 [Maven](https://kotlin.github.io/dataframe/setupmaven.html) 의존성으로 사용할 수도 있습니다.
 
 ## DataFrame 생성
 
@@ -74,7 +77,7 @@ df.head(4) // 처음 4개 행을 반환합니다.
 
 ## 선형 차트 생성
 
-이전 섹션에서 만든 `df` DataFrame을 사용하여 Kotlin Notebook에서 선형 차트(line chart)를 만들어 보겠습니다:
+이전 섹션에서 만든 `df` DataFrame을 사용하여 선형 차트(line chart)를 만들어 보겠습니다:
 
 1. Kandy 라이브러리의 `.plot()` 함수를 호출합니다.
 2. `line()` 레이어를 적용합니다.
@@ -183,4 +186,3 @@ df.groupBy { City }.plot {
 * [Kandy 라이브러리 문서](https://kotlin.github.io/kandy/examples.html)에서 더 많은 차트 예제를 살펴보세요.
 * [Lets-Plot 라이브러리 문서](lets-plot.md)에서 더 고급 플로팅(plotting) 옵션을 살펴보세요.
 * [Kotlin DataFrame 라이브러리 문서](https://kotlin.github.io/dataframe/info.html)에서 데이터프레임 생성, 탐색 및 관리에 대한 추가 정보를 찾아보세요.
-* 이 [YouTube 비디오](https://www.youtube.com/watch?v=m4Cqz2_P9rI&t=4s)에서 Kotlin Notebook의 데이터 시각화에 대해 자세히 알아보세요.

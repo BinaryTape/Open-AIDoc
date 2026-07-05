@@ -6,7 +6,7 @@
 <var name="example_name" value="custom-plugin"/>
 <p>
     <b>코드 예제</b>:
-    <a href="https://github.com/ktorio/ktor-documentation/tree/%ktor_version%/codeSnippets/snippets/%example_name%">
+    <a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/%example_name%">
         %example_name%
     </a>
 </p>
@@ -135,7 +135,7 @@ val DataTransformationPlugin = createApplicationPlugin(name = "DataTransformatio
     onCallReceive { call ->
         transformBody { data ->
             if (requestedType?.type == Int::class) {
-                val line = data.readUTF8Line() ?: "1"
+                val line = data.readLine() ?: "1"
                 line.toInt() + 1
             } else {
                 data
@@ -148,7 +148,7 @@ val DataTransformationPlugin = createApplicationPlugin(name = "DataTransformatio
 위 코드 스니펫의 `transformBody`는 다음과 같이 작동합니다.
 
 1. `TransformBodyContext`는 현재 요청에 대한 타입 정보를 포함하는 [람다 수신 객체(lambda receiver)](https://kotlinlang.org/docs/scope-functions.html#context-object-this-or-it)입니다. 위 예제에서는 `TransformBodyContext.requestedType` 속성을 사용하여 요청된 데이터 타입을 확인합니다.
-2. `data`는 요청 바디를 [ByteReadChannel](https://api.ktor.io/ktor-io/io.ktor.utils.io/-byte-read-channel/index.html)로 받아 필요한 타입으로 변환할 수 있게 해주는 람다 인자입니다. 위 예제에서는 `ByteReadChannel.readUTF8Line`을 사용하여 요청 바디를 읽습니다.
+2. `data`는 요청 바디를 [ByteReadChannel](https://api.ktor.io/ktor-io/io.ktor.utils.io/-byte-read-channel/index.html)로 받아 필요한 타입으로 변환할 수 있게 해주는 람다 인자입니다. 위 예제에서는 `ByteReadChannel.readLine()`을 사용하여 요청 바디를 읽습니다.
 3. 마지막으로 데이터를 변환하여 반환해야 합니다. 우리 예제에서는 수신된 정수 값에 `1`이 추가됩니다.
 
 전체 예제는 여기에서 확인할 수 있습니다: [DataTransformationPlugin.kt](https://github.com/ktorio/ktor-documentation/blob/%ktor_version%/codeSnippets/snippets/custom-plugin/src/main/kotlin/com/example/plugins/DataTransformationPlugin.kt).
@@ -200,7 +200,7 @@ on(CallSetup) { call->
 }
 ```
 
-> 애플리케이션 시작 또는 종료와 같은 [애플리케이션 이벤트 처리(#handle-app-events)]를 가능하게 하는 `MonitoringEvent` 훅도 있습니다.
+> 애플리케이션 시작 또는 종료와 같은 [애플리케이션 이벤트 처리](#handle-app-events)를 가능하게 하는 `MonitoringEvent` 훅도 있습니다.
 
 ### 콜 상태 공유 {id="call-state"}
 
@@ -279,7 +279,7 @@ val NotFoundEvent: EventDefinition<ApplicationCall> = EventDefinition()
 
 ## 플러그인 구성 제공 {id="plugin-configuration"}
 
-[커스텀 헤더(#custom-header)] 예제는 각 응답에 사전 정의된 커스텀 헤더를 추가하는 플러그인을 만드는 방법을 보여주었습니다. 이 플러그인을 더 유용하게 만들고 필요한 커스텀 헤더 이름/값을 전달하기 위한 구성을 제공해 보겠습니다.
+[커스텀 헤더](#custom-header) 예제는 각 응답에 사전 정의된 커스텀 헤더를 추가하는 플러그인을 만드는 방법을 보여주었습니다. 이 플러그인을 더 유용하게 만들고 필요한 커스텀 헤더 이름/값을 전달하기 위한 구성을 제공해 보겠습니다.
 
 1. 먼저, 구성 클래스를 정의해야 합니다.
 
@@ -449,4 +449,3 @@ val SimplePlugin = createApplicationPlugin(name = "SimplePlugin") {
            database.access(...) // 데이터베이스에 대한 일부 호출
        }
    }
-   ```

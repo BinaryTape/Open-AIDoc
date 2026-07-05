@@ -1,7 +1,7 @@
 [//]: # (title: 데이터베이스 연결 및 데이터 가져오기)
 [//]: # (description: Kotlin DataFrame을 사용하여 SQL 데이터베이스에 연결하고, 테이블 스키마를 검사하며, 데이터를 가져오는 방법을 알아봅니다.)
 
-[Kotlin Notebook](kotlin-notebook-overview.md)은 다음과 같이 가장 일반적인 SQL 데이터베이스들을 지원합니다:
+[Kotlin DataFrame 라이브러리](https://kotlin.github.io/dataframe/home.html)는 다음과 같이 가장 일반적인 SQL 데이터베이스들을 지원합니다:
 
 * [DuckDB](https://kotlin.github.io/dataframe/duckdb.html)
 * [H2](https://kotlin.github.io/dataframe/h2.html)
@@ -11,22 +11,22 @@
 * [PostgreSQL](https://kotlin.github.io/dataframe/postgresql.html)
 * [SQLite](https://kotlin.github.io/dataframe/sqlite.html)
 
-[Kotlin DataFrame 라이브러리](https://kotlin.github.io/dataframe/home.html)를 활용하면 Kotlin Notebook에서 데이터베이스 연결을 설정하고, SQL 쿼리를 실행하며, 이후 작업을 위해 결과를 가져올 수 있습니다.
-
-> 자세한 예제는 [KotlinDataFrame SQL Examples GitHub 저장소의 Notebook](https://github.com/zaleslaw/KotlinDataFrame-SQL-Examples/blob/master/notebooks/imdb.ipynb)을 참조하세요.
->
-{style="tip"}
+[GitHub의 Kotlin DataFrame SQL 예제](https://github.com/zaleslaw/KotlinDataFrame-SQL-Examples/tree/master/src/main/kotlin)를 살펴보세요.
 
 ## 시작하기 전에
 
-Kotlin Notebook은 [Kotlin Notebook 플러그인](https://plugins.jetbrains.com/plugin/16340-kotlin-notebook)에 의존하며, 이 플러그인은 IntelliJ IDEA에 기본적으로 포함되어 활성화되어 있습니다.
-
-Kotlin Notebook 기능을 사용할 수 없는 경우 플러그인이 활성화되어 있는지 확인하세요. 자세한 내용은 [환경 설정](kotlin-notebook-set-up-env.md)을 참조하세요.
+> IntelliJ IDEA 2026.2부터 Kotlin Notebook은 더 이상 IDE에 포함되지 않으며 JetBrains에서 공식적으로 지원하지 않습니다.
+> 소스 코드는 [GitHub](https://github.com/Kotlin/kotlin-notebook)에서 계속 이용 가능합니다.
+>
+> 자세한 내용은 [블로그 포스트](https://blog.jetbrains.com/idea/2026/06/kotlin-notebook-sunset/)를 참조하세요.
+>
+{style="note"}
 
 이 튜토리얼을 따라 하려면 다음 단계를 수행하세요:
-1. [새 Kotlin Notebook을 생성](kotlin-notebook-create.md)합니다.
+
+1. **파일(File)** | **새로 만들기(New)** | **Kotlin Notebook**을 선택합니다.
 2. 노트북의 첫 번째 셀에 데이터베이스용 JDBC(Java Database Connectivity) 드라이버 의존성을 추가합니다.
-   
+
    예를 들어, MariaDB 데이터베이스에 연결하려면 다음과 같이 추가합니다:
 
    ```kotlin 
@@ -40,16 +40,16 @@ Kotlin Notebook 기능을 사용할 수 없는 경우 플러그인이 활성화�
    %use dataframe
    ```
 
-> DataFrame 라이브러리와 관련 API를 노트북에서 사용할 수 있도록 다른 코드 셀보다 먼저 `%use dataframe` 라인이 포함된 코드 셀을 실행하세요.
->
-{style="note"}
+   DataFrame 라이브러리와 관련 API를 노트북에서 사용할 수 있도록 다른 코드 셀보다 먼저 `%use dataframe` 라인이 포함된 코드 셀을 실행하세요.
+
+이 튜토리얼을 따라 하기 위해 DataFrame을 [Gradle](https://kotlin.github.io/dataframe/setupgradle.html) 또는 [Maven](https://kotlin.github.io/dataframe/setupmaven.html) 의존성으로 사용할 수도 있습니다.
 
 ## 데이터베이스 연결
 
 데이터베이스에 연결하려면 `DbConnectionConfig()` 함수를 사용하여 연결 설정을 생성합니다:
 
-1. 다음 기능들을 임포트합니다:
-   
+1. 다음 기능을 임포트합니다:
+
    ```kotlin
    import org.jetbrains.kotlinx.dataframe.io.DbConnectionConfig
    import org.jetbrains.kotlinx.dataframe.schema.DataFrameSchema
@@ -94,7 +94,7 @@ Kotlin DataFrame은 데이터베이스에서 데이터를 로드하는 두 가�
 * 테이블에서 직접 데이터 로드.
 * 커스텀 SQL 쿼리 결과 로드.
 
-두 방법 모두 Kotlin Notebook에서 검사, 변환 및 분석할 수 있는 DataFrame을 반환합니다.
+두 방법 모두 검사, 변환 및 분석할 수 있는 DataFrame을 반환합니다.
 
 ### 테이블에서 데이터 로드
 
@@ -155,7 +155,7 @@ filteredTarantinoMovies
 
 ## 데이터 분석
 
-[Kotlin Notebook](kotlin-notebook-overview.md)과 [DataFrame 라이브러리](https://kotlin.github.io/dataframe/home.html)를 사용하여 데이터를 그룹화, 정렬, 집계함으로써 데이터 내의 패턴을 발견하고 이해할 수 있습니다.
+[DataFrame 라이브러리](https://kotlin.github.io/dataframe/home.html)를 사용하여 데이터를 그룹화, 정렬, 집계함으로써 데이터 내의 패턴을 발견하고 이해할 수 있습니다.
 
 예를 들어, `actors` 테이블에서 배우 데이터를 읽어 가장 흔한 이름(first name) 상위 20개를 찾아보겠습니다:
 
@@ -179,5 +179,5 @@ val top20ActorNames = actorDf
 ## 다음 단계
 
 * [Kandy 라이브러리](https://kotlin.github.io/kandy/examples.html)를 사용한 데이터 시각화 탐색
-* [Data visualization in Kotlin Notebook with Kandy](data-analysis-visualization.md)에서 데이터 시각화에 대한 추가 정보 찾기
+* [Data visualization with Kandy](data-analysis-visualization.md)에서 데이터 시각화에 대한 추가 정보 찾기
 * Kotlin에서 데이터 과학 및 분석에 사용할 수 있는 도구와 리소스에 대한 광범위한 개요는 [Kotlin and Java libraries for data analysis](data-analysis-libraries.md)를 참조하세요.

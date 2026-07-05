@@ -1,5 +1,12 @@
 [//]: # (title: Kotlin Notebook에서 지원하는 출력 형식)
 
+> IntelliJ IDEA 2026.2부터 Kotlin Notebook은 더 이상 IDE에 번들로 제공되지 않으며 JetBrains에서 공식적으로 지원하지 않습니다.
+> 소스 코드는 [GitHub](https://github.com/Kotlin/kotlin-notebook)에서 계속 확인할 수 있습니다.
+>
+> 자세한 내용은 [블로그 포스트](https://blog.jetbrains.com/idea/2026/06/kotlin-notebook-sunset/)를 참고하세요.
+>
+{style="note"}
+
 [Kotlin Notebook](kotlin-notebook-overview.md)은 텍스트, HTML, 이미지를 포함한 다양한 출력 유형을 지원합니다. 외부 라이브러리의 도움을 받아 출력 옵션을 확장하고 차트, 스프레드시트 등으로 데이터를 시각화할 수 있습니다.
 
 각 출력은 [Jupyter MIME 유형](https://jupyterlab.readthedocs.io/en/latest/user/file_formats.html)을 특정 데이터에 매핑하는 JSON 객체입니다. Kotlin Notebook은 이 맵에서 지원되는 MIME 유형 중 다른 유형보다 우선순위가 가장 높은 유형을 선택하여 다음과 같이 렌더링합니다:
@@ -239,7 +246,7 @@ Kotlin Notebook에서 직접 다양한 차트를 생성하여 데이터를 시�
    ```
 
 2. 동일한 데이터 프레임을 사용하고 새 셀에서 `plot()` 함수를 실행합니다:
- 
+
    ```kotlin
    val salesPlot = dfSales.groupBy { Product }.plot {
        bars {

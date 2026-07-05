@@ -1,56 +1,48 @@
 [//]: # (title: 從 Web 來源與 API 獲取資料)
 
-[Kotlin Notebook](kotlin-notebook-overview.md) 提供了一個強大的平台，用於存取和處理來自各種 Web 來源與 API 的資料。它透過提供一個可以視覺化每個步驟以確保清晰度的迭代環境，簡化了資料擷取與分析任務。這在探索您不熟悉的 API 時特別有用。
+透過 [Kotlin DataFrame 程式庫](https://kotlin.github.io/dataframe/home.html)，您可以存取和處理來自各種 Web 來源與 API 的資料。它還能協助重構這些資料，以進行全面的分析與視覺化。
 
-當與 [Kotlin DataFrame 程式庫](https://kotlin.github.io/dataframe/home.html) 配合使用時，Kotlin Notebook 不僅能讓您連線並從 API 獲取 JSON 資料，還能協助重構這些資料以進行全面的分析與視覺化。
-
-> 有關 Kotlin Notebook 範例，請參閱 [GitHub 上的 DataFrame 範例](https://github.com/Kotlin/dataframe/blob/master/examples/notebooks/youtube/Youtube.ipynb)。
-> 
-{style="tip"}
+探索 [GitHub 上的 DataFrame 範例](https://github.com/Kotlin/dataframe/tree/master/examples/projects)。
 
 ## 開始之前
 
-Kotlin Notebook 依賴於 [Kotlin Notebook 外掛程式](https://plugins.jetbrains.com/plugin/16340-kotlin-notebook)，該外掛程式預設在 IntelliJ IDEA 中封裝並啟用。
-
-如果 Kotlin Notebook 功能不可用，請確保外掛程式已啟用。欲了解更多資訊，請參閱[設定環境](kotlin-notebook-set-up-env.md)。
+> 從 IntelliJ IDEA 2026.2 開始，Kotlin Notebook 將不再與 IDE 封裝，也不再由 JetBrains 官方提供支援。
+> 原始碼仍可在 [GitHub](https://github.com/Kotlin/kotlin-notebook) 上獲取。
+>
+> 欲了解更多資訊，請參閱[部落格文章](https://blog.jetbrains.com/idea/2026/06/kotlin-notebook-sunset/)。
+>
+{style="note"}
 
 建立新的 Kotlin Notebook：
 
 1. 選取 **File** | **New** | **Kotlin Notebook**。
 
-2. 在 Kotlin Notebook 中，透過執行以下指令匯入 Kotlin DataFrame 程式庫：
+2. 透過執行以下指令匯入 Kotlin DataFrame 程式庫：
 
    ```kotlin
    %use dataframe
    ```
-   
+若要依照本教學進行，您也可以將 DataFrame 作為 [Gradle](https://kotlin.github.io/dataframe/setupgradle.html) 或 [Maven](https://kotlin.github.io/dataframe/setupmaven.html) 相依性使用。
+
 ## 從 API 獲取資料
 
-使用 Kotlin Notebook 搭配 Kotlin DataFrame 程式庫從 API 獲取資料是透過 [`.read()`](https://kotlin.github.io/dataframe/read.html) 函式完成的，這與[從檔案獲取資料](data-analysis-work-with-data-sources.md#retrieve-data-from-a-file)（如 CSV 或 JSON）類似。然而，在處理基於 Web 的來源時，您可能需要額外的格式化來將原始 API 資料轉換為結構化格式。
+使用 Kotlin DataFrame 程式庫從 API 獲取資料是透過 [`.read()`](https://kotlin.github.io/dataframe/read.html) 函式完成的，這與[從檔案獲取資料](data-analysis-work-with-data-sources.md#retrieve-data)（如 CSV 或 JSON）類似。然而，在處理基於 Web 的來源時，您可能需要額外的格式化來將原始 API 資料轉換為結構化格式。
 
 讓我們看一個從 [YouTube Data API](https://console.cloud.google.com/apis/library/youtube.googleapis.com) 獲取資料的範例：
 
-1. 開啟您的 Kotlin Notebook 檔案 (`.ipynb`)。
-
-2. 匯入 Kotlin DataFrame 程式庫，這對於資料處理任務至關重要。這是在程式碼資料格中執行以下指令來完成的：
-
-   ```kotlin
-   %use dataframe
-   ```
-
-3. 在新的程式碼資料格中安全地加入您的 API 金鑰，這對於驗證 YouTube Data API 的請求是必要的。您可以從[憑據分頁](https://console.cloud.google.com/apis/credentials)獲取您的 API 金鑰：
+1. 在新的程式碼資料格中安全地加入您的 API 金鑰，這對於驗證 YouTube Data API 的請求是必要的。您可以從[憑據分頁](https://console.cloud.google.com/apis/credentials)獲取您的 API 金鑰：
 
    ```kotlin
    val apiKey = "YOUR-API_KEY"
    ```
 
-4. 建立一個 load 函式，該函式接收一個字串形式的路徑，並使用 DataFrame 的 `.read()` 函式從 YouTube Data API 獲取資料：
+2. 建立一個 load 函式，該函式接收一個字串形式的路徑，並使用 DataFrame 的 `.read()` 函式從 YouTube Data API 獲取資料：
 
    ```kotlin
    fun load(path: String): AnyRow = DataRow.read("https://www.googleapis.com/youtube/v3/$path&key=$apiKey")
    ```
 
-5. 將獲取的資料組織成列，並透過 `nextPageToken` 處理 YouTube API 的分頁。這能確保您收集跨多個頁面的資料：
+3. 將獲取的資料組織成列，並透過 `nextPageToken` 處理 YouTube API 的分頁。這能確保您收集跨多個頁面的資料：
 
    ```kotlin
    fun load(path: String, maxPages: Int): AnyFrame {
@@ -78,14 +70,14 @@ Kotlin Notebook 依賴於 [Kotlin Notebook 外掛程式](https://plugins.jetbrai
    }
    ```
 
-6. 使用先前定義的 `load()` 函式獲取資料，並在新的程式碼資料格中建立一個 DataFrame。本範例獲取與 Kotlin 相關的資料（在此案例中為影片），每頁最多 50 個結果，最多 5 頁。結果儲存在 `df` 變數中：
+4. 使用先前定義的 `load()` 函式獲取資料，並在新的程式碼資料格中建立一個 DataFrame。本範例獲取與 Kotlin 相關的資料（在此案例中為影片），每頁最多 50 個結果，最多 5 頁。結果儲存在 `df` 變數中：
 
    ```kotlin
    val df = load("search?q=kotlin&maxResults=50&part=snippet", 5)
    df
    ```
 
-7. 最後，從 DataFrame 中擷取並串接項目：
+5. 最後，從 DataFrame 中擷取並串接項目：
 
    ```kotlin
    val items = df.items.concat()
@@ -131,7 +123,7 @@ Kotlin Notebook 依賴於 [Kotlin Notebook 外掛程式](https://plugins.jetbrai
    joined
    ```
 
-本範例展示了如何使用 Kotlin DataFrame 的各種函式來清理、重新組織和增強您的資料集。每個步驟都旨在精煉資料，使其更適合進行[深入分析](#analyze-data-in-kotlin-notebook)。
+本範例展示了如何使用 Kotlin DataFrame 的各種函式來清理、重新組織和增強您的資料集。每個步驟都旨在精煉資料，使其更適合進行深入分析。
 
 ## 在 Kotlin Notebook 中分析資料
 
@@ -185,5 +177,5 @@ Kotlin Notebook 依賴於 [Kotlin Notebook 外掛程式](https://plugins.jetbrai
 ## 接續步驟
 
 * 探索使用 [Kandy 程式庫](https://kotlin.github.io/kandy/examples.html) 進行資料視覺化
-* 在 [Kotlin Notebook 中使用 Kandy 進行資料視覺化](data-analysis-visualization.md)中尋找有關資料視覺化的額外資訊
+* 在[使用 Kandy 進行資料視覺化](data-analysis-visualization.md)中尋找有關資料視覺化的額外資訊
 * 有關 Kotlin 中可用於資料科學與分析的工具和資源的廣泛概覽，請參閱 [Kotlin 與 Java 資料分析程式庫](data-analysis-libraries.md)

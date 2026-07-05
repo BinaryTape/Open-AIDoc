@@ -699,7 +699,7 @@ Gradle 플러그인 변형을 사용하여 서로 다른 Gradle 버전에 대해
 
 ### Kotlin Gradle 플러그인 API 업데이트
 
-Kotlin Gradle 플러그인 API 아티팩트가 몇 가지 개선되었습니다:
+Kotlin Gradle 플러그 API 아티팩트가 몇 가지 개선되었습니다:
 
 * 사용자가 입력값을 설정할 수 있는 Kotlin/JVM 및 Kotlin/kapt 태스크를 위한 새로운 인터페이스가 추가되었습니다.
 * 모든 Kotlin 플러그인이 상속받는 새로운 `KotlinBasePlugin` 인터페이스가 추가되었습니다. 어떤 Kotlin Gradle 플러그인(JVM, JS, Multiplatform, Native 및 기타 플랫폼)이 적용될 때마다 특정 설정 작업을 트리거하고 싶을 때 이 인터페이스를 사용하세요:
@@ -760,7 +760,7 @@ plugins {
   kapt.verbose=true
   ```
 
-> [명령줄 옵션 `verbose`](kapt.md#use-in-cli)를 통해서도 자세한 출력을 활성화할 수 있습니다.
+> [명령줄 옵션 `verbose`](kapt.md#cli)를 통해서도 자세한 출력을 활성화할 수 있습니다.
 >
 {style="note"}
 

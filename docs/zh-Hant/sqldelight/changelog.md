@@ -41,6 +41,7 @@
 - [Gradle 外掛程式] 修復當套用外掛程式但未配置任何資料庫時，IDE 同步當機的問題（#6088）
 - [PostgreSQL 方言] 修復使用巢狀函式呼叫時的 JSON 聚合函式問題（#6281 由 @griffio 提供）
 - [分頁 3 擴充套件] 修復 `KeyedQueryPagingSource` 在空資料庫上當機的問題（#6284 由 @woods-marshes 提供）
+- [編譯器] 修復當變動器陳述式與 `COALESCE` 等封裝函式搭配使用時的 Java 型別配接器問題（#6292 由 @griffio 提供）
 
 ## [2.3.2] - 2026-03-16
 [2.3.2]: https://github.com/sqldelight/sqldelight/releases/tag/2.3.2
@@ -182,7 +183,7 @@
 - [PostgreSQL 方言] PostgreSql select distinct (#5172 由 @griffio 提供)
 - [分頁 3 擴充套件] 分頁重新整理初始載入修復（#5615 由 @evant 提供）
 - [分頁 3 擴充套件] 新增 MacOS 原生目標（#5324 由 @vitorhugods 提供）
-- [Intellij 外掛程式] K2 支援
+- [IntelliJ 外掛程式] K2 支援
 
 ## [2.0.2] - 2024-04-05
 [2.0.2]: https://github.com/sqldelight/sqldelight/releases/tag/2.0.2
@@ -259,7 +260,7 @@
 - [編譯器] 修復無參數且有傳回值的群組陳述式的編譯（#4699 由 @griffio 提供）
 - [編譯器] 使用 SqlBinaryExpr 繫結引數（#4604 由 @griffio 提供）
 - [IDE 外掛程式] 如果已設定，則使用 IDEA 專案 JDK (#4689 由 @griffio 提供)
-- [IDE 外掛程式] 修復「Unknown element type: TYPE_NAME」錯誤（#4727）
+- [IDE 外掛程式] 修復 IDEA 2023.2 及更高版本中的 「Unknown element type: TYPE_NAME」 錯誤（#4727）
 - [IDE 外掛程式] 修復了一些與 2023.2 的相容性問題
 - [Gradle 外掛程式] 修正 `verifyMigrationTask` Gradle 任務的文件（#4713 由 @joshfriend 提供）
 - [Gradle 外掛程式] 新增 Gradle 任務輸出訊息，以協助使用者在驗證資料庫前先產生資料庫（#4684 由 @jingwei99 提供）
@@ -497,7 +498,7 @@ sqldelight {
 - [執行階段] 開放方言與解析器以支援第三方實作（#3232 由 @hfhbd 提供）
 - [編譯器] 在失敗報告中包含用於編譯的方言 (#3086)
 - [編譯器] 跳過未使用的配接器（#3162 由 @eygraber 提供）
-- [編譯器] 在 PrepareStatement 中使用以零為起始的索引（#3269 由 @hfhbd 提供）
+- [編譯器] 在 PrepareStatement 中使用以 zero 為起始的索引（#3269 由 @hfhbd 提供）
 - [Gradle 外掛程式] 同樣將方言設為適當的 Gradle 相依項，而非字串 (#3085)
 - [Gradle 外掛程式] Gradle 驗證任務：缺少資料庫檔案時拋出錯誤。 (#3126 由 @vanniktech 提供)
 
@@ -585,7 +586,7 @@ sqldelight {
 - [編譯器] 允許在函式運算式中使用 SEPARATOR 關鍵字
 - [編譯器] 無法在 ORDER BY 中存取別名資料表的 ROWID
 - [編譯器] 別名列名在 MySQL 的 HAVING 子句中無法辨識
-- [編譯器] 錯誤的「找到多個列」錯誤
+- [編譯器] 錯誤的 「找到多個列」 錯誤
 - [編譯器] 無法設定 PRAGMA locking_mode = EXCLUSIVE;
 - [PostgreSQL] PostgreSQL 重新命名列
 - [MySQL] UNIX_TIMESTAMP、TO_SECONDS、JSON_ARRAYAGG MySQL 函式無法辨識
@@ -658,7 +659,7 @@ sqldelight {
 - [IDE 外掛程式] 修復未解決的 Kotlin 型別 (#1678 由 @aperfilyev 提供)
 - [IDE 外掛程式] 修復未解決套件的醒目提示 (#2543 由 @aperfilyev 提供)
 - [IDE 外掛程式] 如果專案索引尚未初始化，則不要嘗試檢查不相符的列
-- [IDE 外掛程式] 如果 Gradle 同步發生前，不要 initialize 檔案索引
+- [IDE 外掛程式] 如果 Gradle 同步發生前，不要初始化檔案索引
 - [IDE 外掛程式] 如果 Gradle 同步開始，則取消 SQLDelight 匯入
 - [IDE 外掛程式] 在執行復原操作的執行緒之外重新產生資料庫
 - [IDE 外掛程式] 如果參考無法解析，則使用空白的 Java 型別
@@ -713,8 +714,8 @@ sqldelight {
 ### 變更
 - [Gradle 外掛程式] 明確要求 Gradle 7.0 (#2572 由 @martinbonnin 提供)
 - [Gradle 外掛程式] 讓 `VerifyMigrationTask` 支援 Gradle 的最新檢查 (#2533 由 @3flex 提供)
-- [IDE 外掛程式] 當將可 null 型別與不可為 null 型別聯結時，不要發出「聯結比較兩個不同型別的列」的警告 (#2550 由 @pchmielowski 提供)
-- [IDE 外掛程式] 釐清列型別中小寫「as」的錯誤 (由 @aperfilyev 提供)
+- [IDE 外掛程式] 當將可 null 型別與不可為 null 型別聯結時，不要發出 「聯結比較兩個不同型別的列」 的警告 (#2550 由 @pchmielowski 提供)
+- [IDE 外掛程式] 釐清列型別中小寫 「as」 的錯誤 (由 @aperfilyev 提供)
 
 ### 修復
 - [IDE 外掛程式] 如果專案已處置，則不要在新的方言下重新剖析 (#2609)
@@ -749,11 +750,11 @@ sqldelight {
 - [MySQL 方言] 支援 MySQL 產生的列 (由 @JGulbronson 提供)
 - [原生驅動程式] 新增 watchosX64 支援
 - [IDE 外掛程式] 新增參數型別與註解 (由 @aperfilyev 提供)
-- [IDE 外掛程式] 新增產生「全選」查詢的操作 (由 @aperfilyev 提供)
+- [IDE 外掛程式] 新增產生 「全選」 查詢的操作 (由 @aperfilyev 提供)
 - [IDE 外掛程式] 在自動補全中顯示列型別 (由 @aperfilyev 提供)
 - [IDE 外掛程式] 在自動補全中新增圖示 (由 @aperfilyev 提供)
-- [IDE 外掛程式] 新增產生「依主鍵選擇」查詢的操作 (由 @aperfilyev 提供)
-- [IDE 外掛程式] 新增產生「插入至」查詢的操作 (由 @aperfilyev 提供)
+- [IDE 外掛程式] 新增產生 「依主鍵選擇」 查詢的操作 (由 @aperfilyev 提供)
+- [IDE 外掛程式] 新增產生 「插入至」 查詢的操作 (由 @aperfilyev 提供)
 - [IDE 外掛程式] 為列名、陳述式識別碼、函式名稱新增醒目提示 (由 @aperfilyev 提供)
 - [IDE 外掛程式] 新增剩餘的查詢產生操作 (#489 由 @aperfilyev 提供)
 - [IDE 外掛程式] 從 insert-stmt 顯示參數提示 (由 @aperfilyev 提供)
@@ -798,7 +799,7 @@ sqldelight {
 - [執行階段] 在執行階段中包含一個 API，用於執行帶有回呼的遷移 (#1844)
 
 ### 變更
-- [編譯器] 智慧轉型「IS NOT NULL」查詢 (#867)
+- [編譯器] 智慧轉型 「IS NOT NULL」 查詢 (#867)
 - [編譯器] 防止在執行時會失敗的關鍵字使用 (#1471、#1629)
 - [Gradle 外掛程式] 將 Gradle 外掛程式大小從 60 MB 減少到 13 MB。
 - [Gradle 外掛程式] 正確支援 Android 變體，並移除對 KMM 目標特定 SQL 的支援 (#1039)
@@ -814,9 +815,9 @@ sqldelight {
 - [編譯器] 如果自訂查詢會發生衝突，則使用檔案名稱作為額外的套件後綴 (#1057、#1278)
 - [編譯器] 確保外鍵串聯會導致查詢接聽程式收到通知 (#1325、#1485)
 - [編譯器] 如果聯結兩個相同的型別，則傳回資料表型別 (#1342)
-- [編譯器] 確保 `ifnull` 與 `coalesce` 的參數可以為 null (#1263)
+- [編譯器] 確保 params 到 ifnull 與 coalesce 可以為 null (#1263)
 - [編譯器] 為運算式正確使用查詢施加的可 null 性
-- [MySQL 方言] 支援 MySQL IF 陳述式
+- [MySQL 方言] 支援 MySQL if 陳述式
 - [PostgreSQL 方言] 在 PostgreSQL 中將 NUMERIC 與 DECIMAL 擷取為 Double (#2118)
 - [SQLite 方言] UPSERT 通知應考慮 BEFORE/AFTER UPDATE 觸發器。 (#2198 由 @andersio 提供)
 - [SQLite 驅動程式] 為 `SqliteDriver` 中的執行緒使用多個連線，除非我們在記憶體中 (#1832)
@@ -829,7 +830,7 @@ sqldelight {
 - [IDE 外掛程式] 確保我們不嘗試負數子字串 (#2068)
 - [IDE 外掛程式] 同時確保在執行 Gradle 操作前專案已處置 (#2155)
 - [IDE 外掛程式] 可 null 型別上的算術運算也應為可 null (#1853)
-- [IDE 外掛程式] 讓「展開 * 意圖」可與額外的投影配合使用 (#2173 由 @aperfilyev 提供)
+- [IDE 外掛程式] 讓 「展開 * 意圖」 可與額外的投影配合使用 (#2173 由 @aperfilyev 提供)
 - [IDE 外掛程式] 如果 Kotlin 解析在 GoTo 期間失敗，請勿嘗試前往 SQLDelight 檔案
 - [IDE 外掛程式] 如果 IntelliJ 在 SQLDelight 建立索引期間遇到例外，請勿當機
 - [IDE 外掛程式] 處理在 IDE 中產生程式碼前偵測錯誤時發生的例外
@@ -874,7 +875,7 @@ sqldelight {
 - [IDE 外掛程式] 對於無效型別，優雅地失敗 (#1943)
 - [IDE 外掛程式] 遇到未知運算式時拋出更好的錯誤訊息 (#1958)
 - [Gradle 外掛程式] SQLDelight 將 IntelliJ 相依項流失至 buildscript 類別路徑 (#1998)
-- [Gradle 外掛程式] 在 *.sq 檔案中新增方法文件時出現「找不到 JavadocIntegrationKt」編譯錯誤 (#1982)
+- [Gradle 外掛程式] 在 *.sq 檔案中新增方法文件時出現 「找不到 JavadocIntegrationKt」 編譯錯誤 (#1982)
 - [Gradle 外掛程式] SQLDelight Gradle 外掛程式不支援組態快取 (CoCa)。(#1947 由 @stephanenicolas 提供)
 - [SQLite JDBC 驅動程式] SQLException：資料庫處於自動提交模式 (#1832)
 - [協同程式擴充套件] 修復協同程式擴充套件的 IR 後端 (#1918 由 @dellisd 提供)
@@ -1013,7 +1014,7 @@ sqldelight {
 * 新功能：[執行階段] 穩定的 Flow API。
 * 修復：[Gradle] Kotlin 原生 1.3.50 支援。
 * 修復：[Gradle] #1380 乾淨組建有時會失敗。
-* 修復：[Gradle] #1348 執行驗證任務印出「無法擷取函式」。
+* 修復：[Gradle] #1348 執行驗證任務印出 「無法擷取函式」 。
 * 修復：[編譯器] #1405 如果查詢包含 FTS 資料表聯結，則無法組建專案。
 * 修復：[Gradle] #1266 擁有多個資料庫模組時偶爾會出現 Gradle 組建失敗。
 
@@ -1077,7 +1078,7 @@ sqldelight {
 * 增強：[原生驅動程式] 允許將目錄名稱傳遞給 `DatabaseConfiguration`。
 * 增強：[編譯器] #1173 沒有套件的檔案編譯失敗。
 * 修復：[IDE] 正確向 Square 回報 IDE 錯誤。
-* 修復：[IDE] #1162 同同一套件中的型別顯示為錯誤，但運作正常。
+* 修復：[IDE] #1162 同一同一套件中的型別顯示為錯誤，但運作正常。
 * 修復：[IDE] #1166 重新命名資料表失敗，出現 NPE。
 * 修復：[編譯器] #1167 嘗試剖析帶有 UNION 與 SELECT 的複雜 SQL 陳述式時拋出例外。
 
@@ -1098,8 +1099,8 @@ sqldelight {
  * 新功能：陳述式摺疊於 IDE。
  * 新功能：布林型別現在會自動處理。
  * 修復：從程式碼產生中移除已棄用的編組程式。
- * 修復：修正「avg」SQL 函式型別對應為 REAL。
- * 修復：正確偵測「julianday」SQL 函式。
+ * 修復：修正 「avg」 SQL 函式型別對應為 REAL。
+ * 修復：正確偵測 「julianday」 SQL 函式。
 
 ## [0.6.1] - 2017-03-22
 [0.6.1]: https://github.com/sqldelight/sqldelight/releases/tag/0.6.1
@@ -1187,7 +1188,7 @@ sqldelight {
 
  * 新功能：自動補全與尋找用法現在適用於檢視與別名。
  * 修復：編譯時驗證現在允許在 select 中使用函式。
- * 修復：支援僅宣告預設值的插入陳述式。
+ * 修復：支援插入陳述式僅宣告預設值。
  * 修復：匯入未使用 SQLDelight 的專案時，外掛程式不再當機。
 
 ## [0.3.1] - 2016-04-27
@@ -1199,7 +1200,7 @@ sqldelight {
 ## [0.3.0] - 2016-04-26
 [0.3.0]: https://github.com/sqldelight/sqldelight/releases/tag/0.3.0
 
-  * 新功能：列定義使用 SQLite 型別，並可具有額外的「AS」約束來指定 Java 型別。
+  * 新功能：列定義使用 SQLite 型別，並可具有額外的 「AS」 約束來指定 Java 型別。
   * 新功能：可以從 IDE 傳送錯誤報告。
   * 修復：自動補全功能正常運作。
   * 修復：SQLDelight 模型檔案隨 .sq 檔案編輯而更新。
@@ -1223,7 +1224,7 @@ sqldelight {
 
  * 新功能：為 Marshal 類別新增了複製建構函式。
  * 新功能：更新至 Kotlin 1.0 正式版。
- * 修復：以不導致失敗的方式回報「sqldelight」資料夾結構問題。
+ * 修復：以不導致失敗的方式回報 「sqldelight」 資料夾結構問題。
  * 修復：禁止命名為 `table_name` 的列。其產生的常數會與資料表名稱常數發生衝突。
  * 修復：確保 IDE 外掛程式立即產生模型類別，且不論是否開啟 `.sq` 檔案。
  * 修復：支援 Windows 路徑在於 IDE 與 Gradle 外掛程式。

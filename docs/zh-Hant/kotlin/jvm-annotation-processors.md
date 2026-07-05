@@ -78,7 +78,7 @@ Kotlin 支援兩種使用註解處理器的方法：
    ```
    
    * 在 `compile` 執行 **之前** 加入 `kotlin-maven-plugin` 的 `kapt` goal 執行。
-   * 使用 `aptMode` 選項配置 [註解處理層級](kapt.md#use-in-maven)。
+   * 使用 `aptMode` 選項配置 [註解處理模式](kapt.md#set-up-in-maven)。
 
    </tab>
    <tab title="Gradle Kotlin" group-key="kotlin">
@@ -151,7 +151,7 @@ Kotlin 支援兩種使用註解處理器的方法：
 
 以下範例展示如何使用 [Dagger](https://dagger.dev/)，這是一個編譯時期相依注入架構，可為您的相依圖產生連接程式碼。
 
-1. 在您的 `build.gradle(.kts)` 檔案中，套用 KSP 外掛程式並將 Dagger 加入 `dependencies` 區塊：
+1. 在您的 `build.gradle(.kts)` 檔案中，套用 KSP 外掛程式並將 Dagger 加入 `dependencies` 區段：
  
    <tabs group="build-script">
    <tab title="Kotlin" group-key="kotlin">
@@ -194,7 +194,7 @@ Kotlin 支援兩種使用註解處理器的方法：
    >
    {style="tip"}
 
-2. 使用 Dagger 註解標註您的 Kotlin 類別：
+2. 使用 Dagger 註解標記您的 Kotlin 類別：
 
    ```kotlin
    import javax.inject.Inject
@@ -240,7 +240,7 @@ Kotlin 支援兩種使用註解處理器的方法：
 您可以使用 KSP API 編寫您自己的註解處理器，在編譯時期產生程式碼。一個新的處理器需要三個模組：
 
 * 一個宣告自訂註解的 `annotation` 模組。
-* 一個實作 `SymbolProcessor` 和 `SymbolProcessorProvider` 工廠的 `processor` 模組。`SymbolProcessor` 包含主要邏輯，而 `SymbolProcessorProvider` 則建立處理器並在 `META-INF/services/` 路徑中註冊供應程式。
+* 一個實作 `SymbolProcessor` 和 `SymbolProcessorProvider` 工廠的 `processor` 模組。`SymbolProcessor` 包含主要邏輯，而 `SymbolProcessorProvider` 則建立處理器並在 `META-INF/services/` 路徑中註冊供應商。
 * 一個套用 KSP 外掛程式、相依於該處理器並使用該註解的 `app` 模組。
 
 如需完整的逐步說明，請參閱 [KSP 快速入門](ksp-quickstart.md#create-your-own-processor)。

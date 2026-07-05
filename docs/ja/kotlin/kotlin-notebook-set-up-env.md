@@ -1,5 +1,12 @@
 [//]: # (title: 環境のセットアップ)
 
+> IntelliJ IDEA 2026.2 以降、Kotlin Notebook は IDE にバンドルされなくなり、JetBrains による公式サポートも終了します。
+> ソースコードは引き続き [GitHub](https://github.com/Kotlin/kotlin-notebook) で公開されます。
+>
+> 詳細はブログ記事をご覧ください。
+>
+{style="note"}
+
 <tldr>
    <p>これは<strong>Kotlin Notebook入門</strong>チュートリアルの最初のパートです：</p>
    <p><img src="icon-1.svg" width="20" alt="最初のステップ"/> <strong>環境のセットアップ</strong><br/>
@@ -12,9 +19,9 @@
 
 ## 環境のセットアップ
 
-Kotlin Notebook は [Kotlin Notebook プラグイン](https://plugins.jetbrains.com/plugin/16340-kotlin-notebook)に依存しています。このプラグインは、デフォルトで IntelliJ IDEA にバンドルされ、有効になっています。
+Kotlin Notebook は [Kotlin Notebook プラグイン](https://plugins.jetbrains.com/plugin/16340-kotlin-notebook)に依存しています。
 
-Kotlin Notebook を使用するには、最新バージョンの [IntelliJ IDEA](https://www.jetbrains.com/idea/download/) をダウンロードしてインストールしてください。
+Kotlin Notebook を使用するには、[IntelliJ IDEA 2026.1 以前](https://www.jetbrains.com/idea/download/other/)をダウンロードしてインストールしてください。
 
 Kotlin Notebook の機能が利用できない場合は、プラグインが有効になっていることを確認してください：
 

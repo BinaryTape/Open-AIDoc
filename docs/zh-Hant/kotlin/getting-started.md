@@ -73,16 +73,12 @@ Kotlin 已包含在每個 [IntelliJ IDEA](https://www.jetbrains.com/idea/downloa
 
 從建置資料管線到將機器學習模型投入生產，Kotlin 是處理資料並發揮其最大價值的絕佳選擇。
 
-1. **在 IDE 內無縫建立與編輯筆記本：**
-
-   * [Kotlin Notebook 入門](get-started-with-kotlin-notebooks.md)
-
-2. **探索並實驗您的資料：**
+1. **探索並實驗您的資料：**
 
    * [DataFrame](https://kotlin.github.io/dataframe/overview.html) – 一個用於資料分析與操作的程式庫。
    * [Kandy](https://kotlin.github.io/kandy/welcome.html) – 一個用於資料視覺化的繪圖工具。
 
-3. **在 Twitter 上關注 Kotlin for Data Analysis：** [KotlinForData](http://twitter.com/KotlinForData)。
+2. **在 Twitter 上關注 Kotlin for Data Analysis：** [KotlinForData](http://twitter.com/KotlinForData)。
 
 </tab>
 

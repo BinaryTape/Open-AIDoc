@@ -16,7 +16,15 @@ kapt コンパイラプラグインを使用すると、Kotlin で既存の Java
 
 これにより、[MapStruct](https://mapstruct.org/) や [データバインディング](https://developer.android.com/topic/libraries/data-binding/index.html) などのライブラリに対して、Kotlin プロジェクトで Java ベースのアノテーション処理が可能になります。
 
-## Gradle での使用
+> kapt は IntelliJ のビルドシステムではサポートされていません。IntelliJ IDEA でアノテーション処理を再実行するには、**Maven** ツールウィンドウからビルドを起動してください。
+> 
+{style="warning"}
+
+## プラグインの設定
+
+kapt プラグインは、[Gradle](#set-up-in-gradle)、[Maven](#set-up-in-maven) で構成するか、[コマンドライン](#cli) から使用できます。
+
+### Gradle {id="set-up-in-gradle"}
 
 Gradle で kapt を使用するには、以下の手順に従ってください：
 
@@ -66,11 +74,131 @@ Gradle で kapt を使用するには、以下の手順に従ってください�
    </tab>
    </tabs>
 
-3. 以前にアノテーションプロセッサに [Android サポート](https://developer.android.com/studio/build/gradle-plugin-3-0-0-migration.html#annotationProcessor_config) を使用していた場合は、`annotationProcessor` 構成の使用を `kapt` に置き換えてください。プロジェクトに Java クラスが含まれている場合、`kapt` はそれらも処理します。
+3. 以前にアノテーションプロセッサに [Android サポート](https://developer.android.com/build/annotation-processors) を使用していた場合は、`annotationProcessor` 構成の使用を `kapt` に置き換えてください。プロジェクトに Java クラスが含まれている場合、kapt プラグインはそれらも処理します。
 
    `androidTest` または `test` ソースに対してアノテーションプロセッサを使用する場合、それぞれの `kapt` 構成は `kaptAndroidTest` および `kaptTest` という名前になります。`kaptAndroidTest` と `kaptTest` は `kapt` を継承しているため、`kapt` 依存関係を提供すれば、本番ソースとテストの両方で利用可能になります。
 
-## アノテーションプロセッサの引数
+### Maven {id="set-up-in-maven"}
+
+設定を簡略化するための [`<extensions>` オプション](#automatic-configuration) を使用するか、kapt の実行を完全に制御するために [手動](#manual-configuration) で設定できます。
+
+#### 自動設定
+
+Kotlin Maven プラグインの `<extensions>` オプションを有効にすることで、kapt の設定を簡略化できます。この場合、ゴールやソースディレクトリを含む kapt の `<execution>` セクションを手動で設定する必要はありません。
+
+kapt を自動的に設定するには、`pom.xml` ビルドファイルで `kotlin-maven-plugin` の `<extensions>` オプションを `true` に設定します：
+
+```xml
+<plugin>
+    <groupId>org.jetbrains.kotlin</groupId>
+    <artifactId>kotlin-maven-plugin</artifactId>
+    <version>${kotlin.version}</version>
+    <extensions>true</extensions>
+    <configuration>
+        <annotationProcessorPaths>
+            <!-- ここでアノテーションプロセッサを指定します -->
+            <annotationProcessorPath>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct-processor</artifactId>
+                <version>1.6.3</version>
+            </annotationProcessorPath>
+        </annotationProcessorPaths>
+    </configuration>
+</plugin>
+```
+
+`<extensions>` オプションの詳細については、[自動設定](maven-configure-project.md#automatic-configuration) を参照してください。
+
+#### 手動設定
+
+Kotlin Maven プロジェクトで kapt を手動で設定するには、`compile` 実行の前に `kotlin-maven-plugin` の `kapt` ゴールの実行を追加します：
+
+```xml
+<execution>
+    <id>kapt</id>
+    <goals>
+        <goal>kapt</goal>
+    </goals>
+    <configuration>
+        <sourceDirs>
+            <sourceDir>src/main/kotlin</sourceDir>
+            <sourceDir>src/main/java</sourceDir>
+        </sourceDirs>
+        <annotationProcessorPaths>
+            <!-- ここでアノテーションプロセッサを指定します -->
+            <annotationProcessorPath>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct-processor</artifactId>
+                <version>1.6.3</version>
+            </annotationProcessorPath>
+        </annotationProcessorPaths>
+    </configuration>
+</execution>
+```
+
+##### kapt アノテーション処理の設定
+
+アノテーション処理のモードを設定するには、`<configuration>` ブロックで `<aptMode>` オプションを設定します：
+
+* `stubs` – アノテーション処理に必要なスタブのみを生成します。
+* `apt` – アノテーション処理のみを実行します。
+* `stubsAndApt` – (デフォルト) スタブを生成し、アノテーション処理を実行します。
+
+例：
+
+```xml
+<configuration>
+   ...
+   <aptMode>stubs</aptMode>
+</configuration>
+```
+
+### CLI
+
+kapt コンパイラプラグインは、Kotlin コンパイラのバイナリ配布物に含まれています。
+
+Kotlin コンパイラの `-Xplugin` オプションを使用して JAR ファイルへのパスを指定することで、プラグインをアタッチできます：
+
+```bash
+-Xplugin=$KOTLIN_HOME/lib/kotlin-annotation-processing.jar
+```
+
+利用可能なオプションの一覧は次のとおりです：
+
+* `sources` (*必須*): 生成されたファイルの出力パス。
+* `classes` (*必須*): 生成されたクラスファイルとリソースの出力パス。
+* `stubs` (*必須*): スタブファイルの一時出力パス。
+* `incrementalData`: バイナリスタブの出力パス。
+* `apclasspath` (*繰り返し可能*): アノテーションプロセッサ JAR へのパス。JAR ごとに `apclasspath` オプションを 1 つずつ渡します。
+* `apoptions`: アノテーションプロセッサオプションの Base64 エンコードされたリスト。詳細は [AP/javac オプションのエンコーディング](#ap-javac-options-encoding) を参照してください。
+* `javacArguments`: javac に渡されるオプションの Base64 エンコードされたリスト。詳細は [AP/javac オプションのエンコーディング](#ap-javac-options-encoding) を参照してください。
+* `processors`: アノテーションプロセッサの完全修飾クラス名のカンマ区切りリスト。指定された場合、kapt は `apclasspath` 内のアノテーションプロセッサを検索しません。
+* `verbose`: 詳細な出力を有効にします。
+* `aptMode` (*必須*)
+    * `stubs` – アノテーション処理に必要なスタブのみを生成します。
+    * `apt` – アノテーション処理のみを実行します。
+    * `stubsAndApt` – スタブを生成し、アノテーション処理を実行します。
+* `correctErrorTypes`: 詳細は [存在しない型の補正](#non-existent-type-correction) を参照してください。デフォルトでは無効です。
+* `dumpFileReadHistory`: アノテーション処理中に使用されたクラスのリストをファイルごとにダンプする出力パス。
+
+プラグインオプションの形式は `-P plugin:<plugin id>:<key>=<value>` です。オプションは繰り返すことができます。
+
+例：
+
+```bash
+-P plugin:org.jetbrains.kotlin.kapt3:sources=build/kapt/sources
+-P plugin:org.jetbrains.kotlin.kapt3:classes=build/kapt/classes
+-P plugin:org.jetbrains.kotlin.kapt3:stubs=build/kapt/stubs
+
+-P plugin:org.jetbrains.kotlin.kapt3:apclasspath=lib/ap.jar
+-P plugin:org.jetbrains.kotlin.kapt3:apclasspath=lib/anotherAp.jar
+
+-P plugin:org.jetbrains.kotlin.kapt3:correctErrorTypes=true
+```
+
+## アノテーションプロセッサの構成
+
+### アノテーションプロセッサに引数を渡す
 
 ビルドスクリプトファイル `build.gradle(.kts)` の `arguments {}` ブロックを使用して、アノテーションプロセッサに引数を渡します：
 
@@ -81,6 +209,101 @@ kapt {
     }
 }
 ```
+
+### プロセッサのクラスパスと検出の設定
+
+kapt のプロセッサパスに含まれていないアノテーションプロセッサの検出（discovery）を無効にすることができます。これにより、不要なアノテーションプロセッサをコンパイルクラスパスから除外できます。
+
+#### Gradle {id="classpath-discovery-gradle"}
+
+Gradle は [コンパイル回避（compile avoidance）](https://docs.gradle.org/current/userguide/java_plugin.html#sec:java_compile_avoidance) を使用して、プロジェクトの再ビルド時にアノテーション処理をスキップし、kapt を使用したインクリメンタルビルドの時間を短縮します。特に、次の場合にアノテーション処理がスキップされます：
+
+* プロジェクトのソースファイルが変更されていない場合。
+* 依存関係の変更が [ABI](https://en.wikipedia.org/wiki/Application_binary_interface) 互換である場合。例えば、関数の本体のみが変更された場合。
+
+ただし、コンパイルクラスパスで見つかったアノテーションプロセッサに対してはコンパイル回避を使用できません。それらの内部実装に変更があると、たとえプロセッサの ABI が変更されていなくても、アノテーション処理タスクを実行する必要があるためです。
+
+そのため、コンパイルクラスパスからのアノテーションプロセッサの使用は推奨されません。これらのプロセッサを kapt の処理から除外するには、`gradle.properties` ファイルに `kapt.include.compile.classpath` プロパティを追加します：
+
+```none
+# gradle.properties
+kapt.include.compile.classpath=false
+```
+
+このオプションを `false` に設定すると、プロセッサパス（`kapt*` 構成）に含まれていないアノテーションプロセッサの依存関係は、kapt の処理から除外されます。
+
+#### Maven {id="classpath-discovery-maven"}
+
+kapt のプロセッサパスに含まれていないアノテーションプロセッサを除外するには、kapt プラグインの `<execution>` セクションで `includeCompileClasspath` オプションを `false` に設定します：
+
+```xml
+<execution>
+    <id>kapt</id>
+    <goals>
+        <goal>kapt</goal>
+    </goals>
+    <configuration>
+        <includeCompileClasspath>false</includeCompileClasspath>
+        <sourceDirs>...</sourceDirs>
+        <annotationProcessorPaths>...</annotationProcessorPaths>
+    </configuration>
+</execution>
+```
+
+あるいは、`pom.xml` の `<properties>` セクションで `kapt.include.compile.classpath` プロパティを使用することもできます：
+
+```xml
+<properties>
+    <kapt.include.compile.classpath>false</kapt.include.compile.classpath>
+</properties>
+```
+
+このオプションを `false` に設定すると、`<annotationProcessorPaths>` セクションに含まれていないアノテーションプロセッサは kapt の処理から除外されます。
+
+`includeCompileClasspath` オプションが設定されておらず、kapt がプロセッサパスで明示的に定義されていないアノテーションプロセッサをコンパイルクラスパス上で検出した場合、非推奨の警告（deprecation warning）が表示されます：
+
+```none
+[WARNING] Annotation processors discovery from compile classpath is deprecated.
+Set 'kapt.include.compile.classpath=false' to disable discovery.
+```
+
+> kapt クラスパスに存在しないアノテーションプロセッサの一覧を確認するには、ビルドを `--info` ログレベルオプションを付けて実行してください。
+>
+{style="tip"}
+
+### 親構成からのアノテーションプロセッサの継承
+
+共通のアノテーションプロセッサのセットを別の Gradle 構成で親構成（superconfiguration）として定義し、それをサブプロジェクトの kapt 固有の構成でさらに拡張できます。
+
+例として、[MapStruct](https://mapstruct.org/) を使用するサブプロジェクトの場合、`build.gradle(.kts)` ファイルで次の構成を使用します：
+
+```kotlin
+val commonAnnotationProcessors by configurations.creating
+configurations.named("kapt") { extendsFrom(commonAnnotationProcessors) }
+
+dependencies {
+    implementation("org.mapstruct:mapstruct:1.6.3")
+    commonAnnotationProcessors("org.mapstruct:mapstruct-processor:1.6.3")
+}
+```
+
+この例では、`commonAnnotationProcessors` Gradle 構成は、すべてのプロジェクトで使用したいアノテーション処理用の共通親構成です。[`extendsFrom()`](https://docs.gradle.org/current/dsl/org.gradle.api.artifacts.Configuration.html#org.gradle.api.artifacts.Configuration:extendsFrom) メソッドを使用して、`commonAnnotationProcessors` を親構成として追加します。kapt は、`commonAnnotationProcessors` Gradle 構成が MapStruct アノテーションプロセッサに依存していることを認識します。そのため、kapt はアノテーション処理のための自身の構成に MapStruct アノテーションプロセッサを含めます。
+
+### Java コンパイラのアノテーションプロセッサを保持する
+
+デフォルトでは、kapt はすべてのアノテーションプロセッサを実行し、javac によるアノテーション処理を無効にします。
+しかし、javac のアノテーションプロセッサの一部を動作させる必要がある場合があります（例えば [Lombok](https://projectlombok.org/) など）。
+
+Gradle ビルドファイルで、`keepJavacAnnotationProcessors` オプションを使用します：
+
+```groovy
+kapt {
+    keepJavacAnnotationProcessors = true
+}
+```
+
+Maven を使用する場合は、プラグインを明示的に構成してください。
+[Lombok コンパイラプラグインの設定例](lombok.md#using-with-kapt)を参照してください。
 
 ## Gradle ビルドキャッシュのサポート
 
@@ -160,7 +383,7 @@ kapt.classloaders.cache.disableForProcessors=[annotation processors full names]
 
 ### アノテーションプロセッサのパフォーマンス測定
 
-アノテーションプロセッサの実行に関する統計情報を取得するには、`-Kapt-show-processor-timings` プラグインオプションを使用します。
+アノテーションプロセッサの実行に関するパフォーマンス統計を取得するには、`-Kapt-show-processor-timings` プラグインオプションを使用します。
 出力例：
 
 ```text
@@ -208,7 +431,7 @@ sample/src/main/
    kapt.verbose=true
    ```
 
-> [コマンドラインオプション `verbose`](#cliでの使用) を使用して詳細な出力を有効にすることもできます。
+> [コマンドラインオプション `verbose`](#cli) を使用して詳細な出力を有効にすることもできます。
 >
 {style="note"}
 
@@ -223,67 +446,6 @@ sample/src/main/
 [INFO] org.mapstruct.ap.MappingProcessor: total sources: 2, sources per round: 2, 0, 0
 ```
 
-### コンパイルクラスパスからのアノテーションプロセッサの除外
-
-kapt のプロセッサパスに含まれていないアノテーションプロセッサの検出（discovery）を無効にすることができます。これにより、不要なアノテーションプロセッサをコンパイルクラスパスから効果的に除外できます。
-
-#### Gradle の場合
-
-Gradle は [コンパイル回避（compile avoidance）](https://docs.gradle.org/current/userguide/java_plugin.html#sec:java_compile_avoidance) を使用して、プロジェクトの再ビルド時にアノテーション処理をスキップし、kapt を使用したインクリメンタルビルドの時間を短縮します。特に、次の場合にアノテーション処理がスキップされます：
-
-* プロジェクトのソースファイルが変更されていない場合。
-* 依存関係の変更が [ABI](https://en.wikipedia.org/wiki/Application_binary_interface) 互換である場合（例：メソッドの本体のみが変更された場合）。
-
-ただし、コンパイルクラスパスで見つかったアノテーションプロセッサに対してはコンパイル回避を使用できません。それらの内部実装に変更があると、たとえ ABI が変更されていなくても、アノテーション処理タスクを実行する必要があるためです。
-
-そのため、コンパイルクラスパスからのアノテーションプロセッサの使用は推奨されません。これらのアノテーションを処理から除外するには、`gradle.properties` ファイルに `kapt.include.compile.classpath` プロパティを追加します：
-
-```none
-# gradle.properties
-kapt.include.compile.classpath=false
-```
-
-このオプションを `false` に設定すると、プロセッサパス（`kapt*` 構成）に含まれていないアノテーションプロセッサの依存関係は、kapt の処理から除外されます。
-
-#### Maven の場合
-
-kapt のプロセッサパスに含まれていないアノテーションプロセッサを除外するには、kapt プラグインの `<execution>` セクションで `includeCompileClasspath` オプションを `false` に設定します：
-
-```xml
-<execution>
-    <id>kapt</id>
-    <goals>
-        <goal>kapt</goal>
-    </goals>
-    <configuration>
-        <includeCompileClasspath>false</includeCompileClasspath>
-        <sourceDirs>...</sourceDirs>
-        <annotationProcessorPaths>...</annotationProcessorPaths>
-    </configuration>
-</execution>
-```
-
-あるいは、`pom.xml` の `<properties>` セクションで `kapt.include.compile.classpath` プロパティを使用することもできます：
-
-```xml
-<properties>
-    <kapt.include.compile.classpath>false</kapt.include.compile.classpath>
-</properties>
-```
-
-このオプションを `false` に設定すると、`<annotationProcessorPaths>` セクションに含まれていないアノテーションプロセッサは kapt の処理から除外されます。
-
-`includeCompileClasspath` オプションが設定されておらず、kapt がプロセッサパスで明示的に定義されていないアノテーションプロセッサをコンパイルクラスパス上で検出した場合、非推奨の警告（deprecation warning）が表示されます：
-
-```none
-[WARNING] Annotation processors discovery from compile classpath is deprecated.
-Set 'kapt.include.compile.classpath=false' to disable discovery.
-```
-
-> kapt クラスパスに存在しないアノテーションプロセッサの一覧を確認するには、ビルドを `--info` ログレベルオプションを付けて実行してください。
-> 
-{style="tip"}
-
 ## インクリメンタルアノテーション処理
 
 kapt はデフォルトでインクリメンタルアノテーション処理をサポートしています。
@@ -297,24 +459,6 @@ kapt.incremental.apt=false
 
 インクリメンタルアノテーション処理には、[インクリメンタルコンパイル](gradle-compilation-and-caches.md#incremental-compilation) も有効になっている必要があることに注意してください。
 
-## 親構成からのアノテーションプロセッサの継承
-
-共通のアノテーションプロセッサのセットを別の Gradle 構成で親構成（superconfiguration）として定義し、それをサブプロジェクトの kapt 固有の構成でさらに拡張できます。
-
-例として、[MapStruct](https://mapstruct.org/) を使用するサブプロジェクトの場合、`build.gradle(.kts)` ファイルで次の構成を使用します：
-
-```kotlin
-val commonAnnotationProcessors by configurations.creating
-configurations.named("kapt") { extendsFrom(commonAnnotationProcessors) }
-
-dependencies {
-    implementation("org.mapstruct:mapstruct:1.6.3")
-    commonAnnotationProcessors("org.mapstruct:mapstruct-processor:1.6.3")
-}
-```
-
-この例では、`commonAnnotationProcessors` Gradle 構成は、すべてのプロジェクトで使用したいアノテーション処理用の共通親構成です。[`extendsFrom()`](https://docs.gradle.org/current/dsl/org.gradle.api.artifacts.Configuration.html#org.gradle.api.artifacts.Configuration:extendsFrom) メソッドを使用して、`commonAnnotationProcessors` を親構成として追加します。kapt は、`commonAnnotationProcessors` Gradle 構成が MapStruct アノテーションプロセッサに依存していることを認識します。そのため、kapt はアノテーション処理のための自身の構成に MapStruct アノテーションプロセッサを含めます。
- 
 ## Java コンパイラオプション
 
 kapt はアノテーションプロセッサの実行に Java コンパイラを使用します。
@@ -339,126 +483,6 @@ kapt {
 kapt {
     correctErrorTypes = true
 }
-```
-
-## Maven での使用
-
-### 自動設定
-
-Kotlin Maven プラグインの `<extensions>` オプションを有効にすることで、kapt の設定を簡略化できます。この場合、ゴールやソースディレクトリを含む kapt の `<execution>` セクションを手動で設定する必要はありません。
-
-kapt を自動的に設定するには、`pom.xml` ビルドファイルで `kotlin-maven-plugin` の `<extensions>` オプションを `true` に設定します：
-
-```xml
-<plugin>
-    <groupId>org.jetbrains.kotlin</groupId>
-    <artifactId>kotlin-maven-plugin</artifactId>
-    <version>${kotlin.version}</version>
-    <extensions>true</extensions>
-    <configuration>
-        <annotationProcessorPaths>
-            <!-- ここでアノテーションプロセッサを指定します -->
-            <annotationProcessorPath>
-                <groupId>org.mapstruct</groupId>
-                <artifactId>mapstruct-processor</artifactId>
-                <version>1.6.3</version>
-            </annotationProcessorPath>
-        </annotationProcessorPaths>
-    </configuration>
-</plugin>
-```
-
-`<extensions>` オプションの詳細については、[自動設定](maven-configure-project.md#automatic-configuration) を参照してください。
-
-### 手動設定
-
-Kotlin Maven プロジェクトで kapt を手動で設定するには、`compile` 実行の前に `kotlin-maven-plugin` の `kapt` ゴールの実行を追加します：
-
-```xml
-<execution>
-    <id>kapt</id>
-    <goals>
-        <goal>kapt</goal>
-    </goals>
-    <configuration>
-        <sourceDirs>
-            <sourceDir>src/main/kotlin</sourceDir>
-            <sourceDir>src/main/java</sourceDir>
-        </sourceDirs>
-        <annotationProcessorPaths>
-            <!-- ここでアノテーションプロセッサを指定します -->
-            <annotationProcessorPath>
-                <groupId>org.mapstruct</groupId>
-                <artifactId>mapstruct-processor</artifactId>
-                <version>1.6.3</version>
-            </annotationProcessorPath>
-        </annotationProcessorPaths>
-    </configuration>
-</execution>
-```
-
-### kapt アノテーション処理の設定
-
-アノテーション処理のレベルを設定するには、`<configuration>` ブロックの `aptMode` として次のいずれかを設定します：
-
-* `stubs` – アノテーション処理に必要なスタブのみを生成します。
-* `apt` – アノテーション処理のみを実行します。
-* `stubsAndApt` – (デフォルト) スタブを生成し、アノテーション処理を実行します。
-
-例：
-
-```xml
-<configuration>
-   ...
-   <aptMode>stubs</aptMode>
-</configuration>
-```
-
-## IntelliJ ビルドシステムでの使用
-
-kapt は IntelliJ IDEA 独自のビルドシステムではサポートされていません。アノテーション処理を再実行したい場合は、いつでも「Maven Projects」ツールバーからビルドを起動してください。
-
-## CLI での使用
-
-kapt コンパイラプラグインは、Kotlin コンパイラのバイナリ配布物に含まれています。
-
-`Xplugin` kotlinc オプションを使用して JAR ファイルへのパスを指定することで、プラグインをアタッチできます：
-
-```bash
--Xplugin=$KOTLIN_HOME/lib/kotlin-annotation-processing.jar
-```
-
-利用可能なオプションの一覧は次のとおりです：
-
-* `sources` (*必須*): 生成されたファイルの出力パス。
-* `classes` (*必須*): 生成されたクラスファイルとリソースの出力パス。
-* `stubs` (*必須*): スタブファイルの出力パス。つまり、何らかの一時ディレクトリ。
-* `incrementalData`: バイナリスタブの出力パス。
-* `apclasspath` (*繰り返し可能*): アノテーションプロセッサ JAR へのパス。所有している JAR の数だけ `apclasspath` オプションを渡します。
-* `apoptions`: アノテーションプロセッサオプションの base64 エンコードされたリスト。詳細は [AP/javac オプションのエンコーディング](#ap-javac-オプションのエンコーディング) を参照してください。
-* `javacArguments`: javac に渡されるオプションの base64 エンコードされたリスト。詳細は [AP/javac オプションのエンコーディング](#ap-javac-オプションのエンコーディング) を参照してください。
-* `processors`: アノテーションプロセッサの完全修飾クラス名のカンマ区切りリスト。指定された場合、kapt は `apclasspath` 内のアノテーションプロセッサを検索しません。
-* `verbose`: 詳細な出力を有効にします。
-* `aptMode` (*必須*)
-    * `stubs` – アノテーション処理に必要なスタブのみを生成します。
-    * `apt` – アノテーション処理のみを実行します。
-    * `stubsAndApt` – スタブを生成し、アノテーション処理を実行します。
-* `correctErrorTypes`: 詳細は [存在しない型の補正](#存在しない型の補正) を参照してください。デフォルトでは無効です。
-* `dumpFileReadHistory`: アノテーション処理中に使用されたクラスのリストをファイルごとにダンプする出力パス。
-
-プラグインオプションの形式は `-P plugin:<plugin id>:<key>=<value>` です。オプションは繰り返すことができます。
-
-例：
-
-```bash
--P plugin:org.jetbrains.kotlin.kapt3:sources=build/kapt/sources
--P plugin:org.jetbrains.kotlin.kapt3:classes=build/kapt/classes
--P plugin:org.jetbrains.kotlin.kapt3:stubs=build/kapt/stubs
-
--P plugin:org.jetbrains.kotlin.kapt3:apclasspath=lib/ap.jar
--P plugin:org.jetbrains.kotlin.kapt3:apclasspath=lib/anotherAp.jar
-
--P plugin:org.jetbrains.kotlin.kapt3:correctErrorTypes=true
 ```
 
 ## Kotlin ソースの生成
@@ -487,22 +511,6 @@ fun encodeList(options: Map<String, String>): String {
     return Base64.getEncoder().encodeToString(os.toByteArray())
 }
 ```
-
-## Java コンパイラのアノテーションプロセッサを保持する
-
-デフォルトでは、kapt はすべてのアノテーションプロセッサを実行し、javac によるアノテーション処理を無効にします。
-しかし、javac のアノテーションプロセッサの一部を動作させる必要がある場合があります（例えば [Lombok](https://projectlombok.org/) など）。
-
-Gradle ビルドファイルで、`keepJavacAnnotationProcessors` オプションを使用します：
-
-```groovy
-kapt {
-    keepJavacAnnotationProcessors = true
-}
-```
-
-Maven を使用する場合は、具体的なプラグイン設定を指定する必要があります。
-[Lombok コンパイラプラグインの設定例](lombok.md#using-with-kapt)を参照してください。
 
 ## 次のステップ
 

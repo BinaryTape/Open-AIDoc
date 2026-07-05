@@ -1,7 +1,7 @@
 [//]: # (title: Webリソースの取り扱い)
 
-ここでは、ブラウザ機能や `preload` API を使用したリソースのプリロード、および Web リソースのキャッシュに関する情報について説明します。
-
+ここでは、ブラウザ機能や `preload` API を使用したリソースのプリロード、Web リソースのキャッシュ、およびフォントの自動フォールバックに関する情報について説明します。
+  
 ## Web ターゲット向けリソースのプリロード
 
 フォントや画像などの Web リソースは、[Fetch API](https://developer.mozilla.org/ja/docs/Web/API/Fetch_API) を使用して非同期に読み込まれます。
@@ -32,78 +32,56 @@
 <link rel="preload" href="./composeResources/username.shared.generated.resources/font/FiraMono-Regular.ttf" as="fetch" type="font/ttf" crossorigin/>
 ```
 
-### Compose Multiplatform プリロード API を使用したリソースのプリロード
+### Compose Multiplatform プリロード API を使用したリソース의プリロード
 <primary-label ref="Experimental"/>
 
 ブラウザでリソースをプリロードした場合でも、それらは生のバイトデータとしてキャッシュされており、`FontResource` や `DrawableResource` などのレンダリングに適した形式に変換する必要があります。アプリケーションが初めてリソースを要求したときにこの変換が非同期で行われるため、再びちらつきが発生する可能性があります。ユーザー体験をさらに最適化するために、Compose Multiplatform リソースには、より高レベルな表現のリソースのための独自の内部キャッシュがあり、これもプリロードすることが可能です。
 
 Compose Multiplatform 1.8.0 では、Web ターゲットでフォントおよび画像リソースをプリロードするための実験的な API である `preloadFont()`、`preloadImageBitmap()`、および `preloadImageVector()` が導入されました。
 
-さらに、絵文字などの特殊な文字が必要な場合に、デフォルトのバンドルオプションとは異なるフォールバックフォントを設定できます。フォールバックフォントを指定するには、`FontFamily.Resolver.preload()` メソッドを使用します。
+レンダリング中に解決できない文字が検出されると、不足している文字を含むフォールバックフォントが[自動的にダウンロード](#automatic-font-fallback)されるため、絵文字などの特殊文字もすぐにサポートされます。
 
-以下の例は、プリロードとフォールバックフォントの使用方法を示しています：
+自動ダウンロードに頼らず、使用するフォールバックフォントを制御したい場合は、`FontFamily.Resolver.preload()` メソッドを使用して手動で指定します。
+Web ターゲットでは、TTF、OTF、TTC、バリアブル（variable）、および WOFF/WOFF2 のフォント形式がサポートされています。
+
+以下の例は、ベクター画像のプリロードの使用方法を示しています：
 
 ```kotlin
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.runtime.*
-import androidx.compose.ui.*
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalFontFamilyResolver
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.window.ComposeViewport
-import components.resources.demo.shared.generated.resources.*
-import components.resources.demo.shared.generated.resources.NotoColorEmoji
-import components.resources.demo.shared.generated.resources.Res
-import components.resources.demo.shared.generated.resources.Workbench_Regular
-import components.resources.demo.shared.generated.resources.font_awesome
-import org.jetbrains.compose.resources.ExperimentalResourceApi
-import org.jetbrains.compose.resources.configureWebResources
-import org.jetbrains.compose.resources.demo.shared.UseResources
-import org.jetbrains.compose.resources.preloadFont
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalResourceApi::class)
+@Composable
+fun App() {
+    val icon by preloadImageVector(Res.drawable.heavy_vector_icon)
 
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalResourceApi::class, InternalComposeUiApi::class)
-fun main() {
-    configureWebResources {
-        // リソースの場所を上書きします
-        resourcePathMapping { path -> "./$path" }
-    }
-    ComposeViewport(viewportContainerId = "composeApplication") {
-        val font1 by preloadFont(Res.font.Workbench_Regular)
-        val font2 by preloadFont(Res.font.font_awesome, FontWeight.Normal, FontStyle.Normal)
-        val emojiFont = preloadFont(Res.font.NotoColorEmoji).value
-        var fontsFallbackInitialized by remember { mutableStateOf(false) }
-
-        // アプリのコンテンツにプリロードされたリソースを使用します
-        UseResources()
-
-        if (font1 != null && font2 != null && emojiFont != null && fontsFallbackInitialized) {
-            println("Fonts are ready")
-        } else {
-            // 読み込み中に FOUT が発生したり、アプリが一時的に動作しなくなったりすることに対応するため、プログレスインジケーターを表示します
-            Box(modifier = Modifier.fillMaxSize().background(Color.White.copy(alpha = 0.8f)).clickable {  }) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-            }
-            println("Fonts are not ready yet")
-        }
-
-        val fontFamilyResolver = LocalFontFamilyResolver.current
-        LaunchedEffect(fontFamilyResolver, emojiFont) {
-            if (emojiFont != null) {
-                // バンドルされたフォントでサポートされていない不足しているグリフをレンダリングするために、絵文字を含むフォールバックフォントをプリロードします
-                fontFamilyResolver.preload(FontFamily(listOf(emojiFont)))
-                fontsFallbackInitialized = true
-            }
+    if (icon != null) {
+        MainScreen()
+    } else {
+        Box(modifier = Modifier.fillMaxSize()) {
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
         }
     }
 }
+
+@Composable
+fun MainScreen() {
+    // アイコンはキャッシュから読み込まれます
+    Image(painter = painterResource(Res.drawable.heavy_vector_icon), contentDescription = null)
+}
 ```
-{initial-collapse-state="collapsed" collapsible="true" collapsed-title="fontFamilyResolver.preload(FontFamily(listOf(emojiFont)))"}
+{initial-collapse-state="collapsed" collapsible="true" collapsed-title="val icon by preloadImageVector(Res.drawable.heavy_vector_icon)"}
+
+## フォントの自動フォールバック
+<primary-label ref="Experimental"/>
+
+デフォルトでは、アプリケーションに読み込まれたフォントでカバーされていない文字は、代替グリフ（□、通称「[豆腐](https://fonts.google.com/knowledge/glossary/tofu)」）として表示されます。
+
+[//]: # (TODO update version for stable release)
+
+バージョン 1.12.0-beta01 以降、Compose Multiplatform はレンダリング中に未解決の文字を監視し、必要に応じて要求された Noto フォントのサブセットをダウンロードします。Noto という名前は、豆腐グリフを排除するために設計されたフォントであることから、"no tofu"（豆腐なし）の略です。
+
+フォントが利用可能になると、影響を受けるテキストが再構成（recomposed）されます。
+ダウンロード中に一時的に豆腐が表示される可能性があることに注意してください。
+
+CJK（中国語、日本語、韓国語）文字については、ブラウザの言語設定に基づいて、適切なフォントバリアントが自動的に選択されます。
 
 ## Web リソースのキャッシュ
 <primary-label ref="Experimental"/>

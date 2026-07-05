@@ -3,17 +3,20 @@
 
 Kotlin は、強力で柔軟なデータ視覚化のためのオールインワン・ソリューションを提供しており、複雑なモデルに取り組む前にデータを直感的に提示し、探索するための方法を提供します。
 
-このチュートリアルでは、[Kotlin Notebook](kotlin-notebook-overview.md) を使用して、[Kandy](https://kotlin.github.io/kandy/welcome.html) および [Kotlin DataFrame](https://kotlin.github.io/dataframe/home.html) ライブラリを利用し、IntelliJ IDEA でさまざまなチャートタイプを作成する方法を説明します。
+このチュートリアルでは、[Kandy](https://kotlin.github.io/kandy/welcome.html) および [Kotlin DataFrame](https://kotlin.github.io/dataframe/home.html) ライブラリを使用して、IntelliJ IDEA でさまざまなチャートタイプを作成する方法を説明します。
 
 ## 始める前に
 
-Kotlin Notebook は [Kotlin Notebook プラグイン](https://plugins.jetbrains.com/plugin/16340-kotlin-notebook)に依存しています。このプラグインは、デフォルトで IntelliJ IDEA にバンドルされ、有効になっています。
-
-Kotlin Notebook 機能が利用できない場合は、プラグインが有効になっていることを確認してください。詳細については、[環境のセットアップ](kotlin-notebook-set-up-env.md)を参照してください。
+> IntelliJ IDEA 2026.2 以降、Kotlin Notebook は IDE にバンドルされなくなり、JetBrains による公式サポートも終了します。
+> ソースコードは引き続き [GitHub](https://github.com/Kotlin/kotlin-notebook) で入手可能です。
+>
+> 詳細については、[ブログ記事](https://blog.jetbrains.com/idea/2026/06/kotlin-notebook-sunset/)を参照してください。
+>
+{style="note"}
 
 このチュートリアルを進めるには：
 
-1. [新しい Kotlin Notebook を作成](kotlin-notebook-create.md)します。
+1. **File** | **New** | **Kotlin Notebook** を選択します。
 2. ノートブックで、[Kandy](https://kotlin.github.io/kandy/welcome.html) と [Kotlin DataFrame](https://kotlin.github.io/dataframe/home.html) をインポートします：
 
    ```kotlin
@@ -21,13 +24,13 @@ Kotlin Notebook 機能が利用できない場合は、プラグインが有効�
    %use dataframe
    ```
 
-> 他のどのコードセルよりも前に、`%use dataframe` 行を含むコードセルを実行して、DataFrame ライブラリとその API がノートブックで利用可能であることを確認してください。
->
-{style="note"}
+   他のどのコードセルよりも前に `%use dataframe` 行を含むコードセルを実行して、DataFrame ライブラリとその API がノートブックで利用可能であることを確認してください。
+
+このチュートリアルを進めるには、DataFrame を [Gradle](https://kotlin.github.io/dataframe/setupgradle.html) または [Maven](https://kotlin.github.io/dataframe/setupmaven.html) の依存関係として使用することもできます。
 
 ## DataFrame の作成
 
-まず、視覚化するデータを含む DataFrame を作成しましょう。この DataFrame には、ベルリン、マドリード、カラカスの 3 都市における月間平均気温のシミュレーション数値が格納されます。
+まず、視覚化するデータを含む DataFrame を作成しましょう。この DataFrame には、ベルリン、マドリード、カラカスの 3 都市における月間平均気温のシミュレーション数値が格納されます：
 
 ```kotlin
 // months 変数は、1 年の 12 か月を含むリストを格納します
@@ -73,7 +76,7 @@ df.head(4) // 最初の 4 行を返します
 
 ## 折れ線グラフの作成
 
-前のセクションの `df` DataFrame を使用して、Kotlin Notebook で折れ線グラフ（line chart）を作成しましょう：
+前のセクションの `df` DataFrame を使用して、折れ線グラフ（line chart）を作成しましょう：
 
 1. Kandy ライブラリの `.plot()` 関数を呼び出します。 
 2. `line()` レイヤーを適用します。 
@@ -112,7 +115,7 @@ df.plot {
 1. Kandy ライブラリの `.plot()` 関数を呼び出します。 
 2. `points()` レイヤーを適用します。 
 3. `Month` 列と `Temperature` 列をそれぞれ `X` 軸と `Y` 軸にマッピングします。
-4. (任意) 色、軸ラベル、ポイントのサイズ、チャートの見出しをカスタマイズします。
+4. (任意) 色、軸ラベル、ポイントのサイズ、チャートのタイトルをカスタマイズします。
 
 ```kotlin
 df.plot {
@@ -151,7 +154,7 @@ df.plot {
 1. `.groupBy()` 関数を使用して、DataFrame を `City` 列でグループ化します。 
 2. Kandy ライブラリの `plot()` 関数を呼び出します。 
 3. `bars()` レイヤーを適用します。
-4. (任意) チャートの見出しを追加し、色をカスタマイズします。
+4. (任意) チャートのタイトルを追加し、色をカスタマイズします。
 
 ```kotlin
 df.groupBy { City }.plot {
@@ -182,4 +185,3 @@ df.groupBy { City }.plot {
 * [Kandy ライブラリのドキュメント](https://kotlin.github.io/kandy/examples.html)で、より多くのチャート例を探索する
 * [Lets-Plot ライブラリのドキュメント](lets-plot.md)で、より高度なプロットオプションを探索する
 * [Kotlin DataFrame ライブラリのドキュメント](https://kotlin.github.io/dataframe/info.html)で、データフレームの作成、探索、管理に関する追加情報を見つける
-* この [YouTube ビデオ]( https://www.youtube.com/watch?v=m4Cqz2_P9rI&t=4s)で、Kotlin Notebook でのデータ視覚化について詳しく学ぶ

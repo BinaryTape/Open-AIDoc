@@ -746,40 +746,6 @@
             "link": "data-analysis-overview"
           },
           {
-            "text": "kotlin.kotlin-notebook-overview",
-            "link": "kotlin-notebook-overview"
-          },
-          {
-            "text": "kotlin.get-started-with-kotlin-notebook",
-            "items": [
-              {
-                "text": "kotlin.get-started-with-kotlin-notebooks",
-                "link": "get-started-with-kotlin-notebooks"
-              },
-              {
-                "text": "kotlin.kotlin-notebook-set-up-env",
-                "link": "kotlin-notebook-set-up-env"
-              },
-              {
-                "text": "kotlin.kotlin-notebook-create",
-                "link": "kotlin-notebook-create"
-              },
-              {
-                "text": "kotlin.kotlin-notebook-add-dependencies",
-                "link": "kotlin-notebook-add-dependencies"
-              }
-            ],
-            "collapsed": true
-          },
-          {
-            "text": "kotlin.kotlin-notebook-share",
-            "link": "kotlin-notebook-share"
-          },
-          {
-            "text": "kotlin.data-analysis-notebooks-output-formats",
-            "link": "data-analysis-notebooks-output-formats"
-          },
-          {
             "text": "kotlin.working-with-data-sources",
             "items": [
               {

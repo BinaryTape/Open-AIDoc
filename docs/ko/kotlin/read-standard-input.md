@@ -14,6 +14,19 @@ println(readln())
 // Hi, Kotlin!
 ```
 
+여러 줄의 입력을 하나의 문자열로 읽을 수도 있습니다.
+여러 줄을 결합하려면 [`joinToString()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.sequences/join-to-string.html) 함수를 사용하세요:
+
+```kotlin
+val input = generateSequence(::readlnOrNull)
+  .joinToString("
+")
+```
+
+> 예외를 발생시키지 않고 파일 끝(EOF)까지 입력을 읽으려면 `readln()` 대신 [`readlnOrNull()`](#handle-standard-input-safely)을 사용하세요.
+> 
+{style="note"}
+
 문자열 이외의 데이터 타입을 사용하려면 `.toInt()`, `.toLong()`, `.toDouble()`, `.toFloat()`, 또는 `.toBoolean()`과 같은 변환 함수를 사용하여 입력을 변환할 수 있습니다.
 여러 개의 서로 다른 데이터 타입 입력을 읽어 각각 변수에 저장할 수 있습니다:
 
