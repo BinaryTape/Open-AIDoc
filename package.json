@@ -20,26 +20,27 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
-    "@types/node": "^25.3.0",
     "@google/genai": "^1.42.0",
     "@mdit-vue/shared": "^3.0.2",
+    "@types/node": "^25.3.0",
+    "@vueuse/core": "^14.2.1",
     "execa": "^9.6.0",
+    "express": "^5.1.0",
     "fs-extra": "^11.3.0",
     "glob": "13.0.6",
     "gray-matter": "^4.0.3",
     "js-yaml": "4.1.1",
+    "markdown-it": "14.1.1",
     "markdown-it-container": "^4.0.0",
+    "oxc-minify": "^0.115.0",
     "p-limit": "^7.3.0",
     "shiki": "^3.23.0",
-    "vitepress": "^2.0.0-alpha.16",
-    "xml2js": "^0.6.2",
-    "@vueuse/core": "^14.2.1",
-    "express": "^5.1.0",
-    "markdown-it": "14.1.1",
     "tsx": "^4.19.0",
-    "oxc-minify": "^0.115.0"
+    "vitepress": "^2.0.0-alpha.16",
+    "xml2js": "^0.6.2"
   },
   "dependencies": {
-    "aos": "^2.3.4"
+    "aos": "^2.3.4",
+    "vue": "^3.5.39"
   }
 }

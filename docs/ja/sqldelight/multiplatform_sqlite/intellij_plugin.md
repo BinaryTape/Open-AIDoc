@@ -1,1 +1,1 @@
-{% include 'common/intellij_plugin.md' % Lot }
+{% include 'common/intellij_plugin.md' %}
