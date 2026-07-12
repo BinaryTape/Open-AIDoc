@@ -992,55 +992,71 @@ Compose Multiplatform Gradle 外掛程式包含對 [ProGuard](https://www.guards
 
 在大多數情況下，你不需要任何額外的配置即可獲得縮減後的應用程式。然而，ProGuard 可能無法追蹤位元組碼中的某些用法，例如，當一個類別透過反射使用時。如果你遇到僅在 ProGuard 處理後才發生的問題，你可能需要添加自訂規則。
 
-若要指定自訂組態檔案，請使用 DSL，如下所示：
+你可以使用 Gradle DSL 在 `buildTypes.release.proguard` 區塊中配置 ProGuard，選項如下：
 
-```kotlin
-compose.desktop {
-    application {
-        buildTypes.release.proguard {
-            configurationFiles.from(project.file("compose-desktop.pro"))
+* `configurationFiles` 指定自訂的 ProGuard 組態檔案。
+    ```kotlin
+    compose.desktop {
+        application {
+            buildTypes.release.proguard {
+                configurationFiles.from(project.file("compose-desktop.pro"))
+            }
         }
     }
-}
-```
+    ```
+    {initial-collapse-state="collapsed" collapsible="true" collapsed-title='configurationFiles.from(project.file("compose-desktop.pro"))'}
 
-有關 ProGuard 規則和配置選項的更多資訊，請參閱 Guardsquare [手冊](https://www.guardsquare.com/manual/configuration/usage)。
-
-混淆功能預設是停用的。若要啟用，請透過 Gradle DSL 設定以下屬性：
-
-```kotlin
-compose.desktop {
-    application {
-        buildTypes.release.proguard {
-            obfuscate.set(true)
+* `obfuscate` 啟用程式碼混淆。混淆功能預設是停用的。
+    ```kotlin
+    compose.desktop {
+        application {
+            buildTypes.release.proguard {
+                obfuscate.set(true)
+            }
         }
     }
-}
-```
+    ```
+    {initial-collapse-state="collapsed" collapsible="true" collapsed-title="obfuscate.set(true)"}
 
-ProGuard 的優化功能預設是啟用的。若要停用，請透過 Gradle DSL 設定以下屬性：
-
-```kotlin
-compose.desktop {
-    application {
-        buildTypes.release.proguard {
-            optimize.set(false)
+* `optimize` 控制 ProGuard 優化。優化功能預設是啟用的。
+    ```kotlin
+    compose.desktop {
+        application {
+            buildTypes.release.proguard {
+                optimize.set(false)
+            }
         }
     }
-}
-```
+    ```
+    {initial-collapse-state="collapsed" collapsible="true" collapsed-title="optimize.set(false)"}
 
-產生 Uber JAR 預設是停用的，ProGuard 會為每個輸入的 `.jar` 產生一個對應的 `.jar` 檔案。若要啟用，請透過 Gradle DSL 設定以下屬性：
-
-```kotlin
-compose.desktop {
-    application {
-        buildTypes.release.proguard {
-            joinOutputJars.set(true)
+* `joinOutputJars` 產生單一的 Uber JAR。預設情況下，ProGuard 會為每個輸入的 `.jar` 產生一個對應的 `.jar` 檔案。
+    ```kotlin
+    compose.desktop {
+        application {
+            buildTypes.release.proguard {
+                joinOutputJars.set(true)
+            }
         }
     }
-}
-```
+    ```
+    {initial-collapse-state="collapsed" collapsible="true" collapsed-title="joinOutputJars.set(true)"}
+
+[//]: # (TODO update version for stable release)
+
+* `version` 設定特定的 ProGuard 版本。JDK 25 至少需要 ProGuard 7.8.0，這是從 Compose Multiplatform 1.12.0-beta01 開始的預設版本。如果你使用較早版本的 Compose Multiplatform 並使用 JDK 25 進行建置，請明確將此屬性設為 `7.8.0`：
+    ```kotlin
+    compose.desktop {
+        application {
+            buildTypes.release.proguard {
+                version.set("7.8.0")
+            }
+        }
+    }
+    ```
+    {initial-collapse-state="collapsed" collapsible="true" collapsed-title='version.set("7.8.0")'}
+
+有關 ProGuard 規則和配置選項的完整清單，請參閱 Guardsquare 的 [ProGuard 手冊](https://www.guardsquare.com/manual/configuration/usage)。
 
 ## What's next?
 

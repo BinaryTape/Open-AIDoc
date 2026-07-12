@@ -51,6 +51,50 @@ detailImageView.load("https://example.com/image.jpg") {
 }
 ```
 
+## Compose AnimatedContent
+
+`rememberAsyncImagePainter` と `AnimatedContent` を使用して、プレースホルダーと読み込まれた画像の間のアニメーションを行います。
+
+```kotlin
+val sizeResolver = rememberConstraintsSizeResolver()
+val painter = rememberAsyncImagePainter(
+    model = ImageRequest.Builder(LocalPlatformContext.current)
+        .data("https://example.com/image.jpg")
+        .size(sizeResolver)
+        .build(),
+)
+val state by painter.state.collectAsState()
+
+AnimatedContent(
+    modifier = Modifier.then(sizeResolver),
+    targetState = state,
+    contentKey = { it::class },
+    transitionSpec = { fadeIn() togetherWith fadeOut() },
+) { targetState ->
+    when (targetState) {
+        is AsyncImagePainter.State.Empty,
+        is AsyncImagePainter.State.Loading -> PlaceholderContent()
+        is AsyncImagePainter.State.Success -> {
+            // モデルの変更後に古い画像がアニメーションで消える間も、その画像を表示したままにするために
+            // targetState.painter を使用します。
+            Image(
+                painter = targetState.painter,
+                contentDescription = stringResource(R.string.description),
+            )
+        }
+        is AsyncImagePainter.State.Error -> ErrorContent()
+    }
+}
+```
+
+モデルの変更後に古い画像がアニメーションで消える間もその画像を表示したままにするために、`Image` には `targetState.painter` を渡してください。
+
+最終的な画像サイズは読み込みが完了するまで不明です。スペースを確保するために、固定の制約または既知のアスペクト比を使用してください。
+
+`rememberAsyncImagePainter` は、画像がメモリキャッシュにある場合でも `State.Empty` から開始されます。必要に応じて、メモリキャッシュされた画像のアニメーションをスキップするには `state.result.dataSource` を使用してください。
+
+注意: `AnimatedContent` は Painter のクロスフェードよりもはるかに負荷が高く、アニメーションが終了するまで古い画像をメモリに保持します。Lazy list 内や単純なフェードの場合は、`ImageRequest.Builder.crossfade` を優先してください。
+
 ## 共通要素遷移（Shared Element Transitions）
 
 [共通要素遷移（Shared element transitions）](https://developer.android.com/training/transitions/start-activity) を使用すると、`Activities` と `Fragments` の間でアニメーションを行うことができます。Coilでこれらを動作させるための推奨事項は以下の通りです。

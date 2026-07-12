@@ -17,7 +17,7 @@
 
 外部の依存関係を使用して共通ロジックを実装したので、より複雑なロジックの追加を開始できます。ネットワークリクエストとデータシリアライゼーションは、Kotlin Multiplatformを使用してコードを共有するための[最も一般的なユースケース](https://kotlinlang.org/lp/multiplatform/)です。このオンボーディングジャーニーを完了した後に将来のプロジェクトで使用できるように、最初のアプリケーションでこれらを実装する方法を学びましょう。
 
-更新されたアプリは、インターネット経由で [LaunchLibrary 2](https://lldev.thespacedevs.com/docs) API からデータを取得し、SpaceXロケットの最新の打ち上げ成功日を表示します。
+更新されたアプリは、インターネット経由で [LaunchLibrary 2](https://lldev.thespacedevs.com/docs) API からデータを取得し、最新の宇宙打ち上げの概要を表示します。
 
 > プロジェクトの最終的な状態は、GitHubリポジトリの2つのブランチにあり、それぞれ異なるコルーチンソリューションが含まれています。
 > * [`main`](https://github.com/kotlin-hands-on/get-started-with-kmp/tree/main) ブランチには、KMP-NativeCoroutinesによる実装が含まれています。
@@ -556,7 +556,7 @@ SwiftUI は ViewModel (`ContentView.ViewModel`) をビュー (`ContentView`) に
 `async/await` メカニズムを操作するために必要な KMP-NativeCoroutines Swift パッケージのパーツをインストールします。
 
 1. **File | Open Project in Xcode** に移動します。
-2. Xcode で、左側のメニューにある `iosApp` プロジェクトを右クリックし、**Add Package Dependencies** を選択します。
+2. Xcode で、左側のメニューにある `iosApp` プロジェクトを right-click し、**Add Package Dependencies** を選択します。
 3. 検索バーに、パッケージ名を入力します。
 
      ```none
@@ -648,7 +648,7 @@ plugins {
 
 ループと `await` メカニズムを使用して `Greeting().greet()` Flow を反復処理し、Flow が値をエミットするたびに `greetings` プロパティを更新します。
 
-> IntelliJ IDEA と Android Studio は、SKIE の使用中に Kotlin コードへの呼び出しで Swift エラーを誤って報告することがあります。これはライブラリ의 既知の問題であり、アプリのビルドや実行には影響しません。
+> IntelliJ IDEA と Android Studio は、SKIE の使用中に Kotlin コードへの呼び出しで Swift エラーを誤って報告することがあります。これはライブラリの既知の問題であり、アプリのビルドや実行には影響しません。
 >
 {style="warning"}
 
@@ -690,9 +690,9 @@ IntelliJ IDEA から **iosApp** 構成を実行して、アプリのロジック
 
 ![最終結果](multiplatform-mobile-upgrade-ios.png){width=350}
 
-> プロジェクトの最終的な状態は、GitHub リポジトリの 2 つのブランチにあり、それぞれ異なるコルーチンソリューションが含まれています。
-> * [`main`](https://github.com/kotlin-hands-on/get-started-with-kmp/tree/main) ブランチには、KMP-NativeCoroutines による実装が含まれています。
-> * [`main-skie`](https://github.com/kotlin-hands-on/get-started-with-kmp/tree/main-skie) ブランチには、SKIE による実装が含まれています。
+> プロジェクトの最終的な状態は、GitHubリポジトリの2つのブランチにあり、それぞれ異なるコルーチンソリューションが含まれています。
+> * [`main`](https://github.com/kotlin-hands-on/get-started-with-kmp/tree/main) ブランチには、KMP-NativeCoroutinesによる実装が含まれています。
+> * [`main-skie`](https://github.com/kotlin-hands-on/get-started-with-kmp/tree/main-skie) ブランチには、SKIEによる実装が含まれています。
 >
 {style="note"}
 

@@ -1,18 +1,6 @@
-[//]: # (title: 中级：对象)
+[//]: # (title: 对象)
 
 <no-index/>
-
-<tldr>
-    <p><img src="icon-1-done.svg" width="20" alt="第一步" /> <a href="kotlin-tour-intermediate-extension-functions.md">扩展函数</a><br />
-        <img src="icon-2-done.svg" width="20" alt="第二步" /> <a href="kotlin-tour-intermediate-scope-functions.md">作用域函数</a><br />
-        <img src="icon-3-done.svg" width="20" alt="第三步" /> <a href="kotlin-tour-intermediate-lambdas-receiver.md">带接收者的 Lambda 表达式</a><br /> 
-        <img src="icon-4-done.svg" width="20" alt="第四步" /> <a href="kotlin-tour-intermediate-classes-interfaces.md">类与接口</a><br /> 
-        <img src="icon-5.svg" width="20" alt="第五步" /> <strong>对象</strong><br />
-        <img src="icon-6-todo.svg" width="20" alt="第六步" /> <a href="kotlin-tour-intermediate-open-special-classes.md">Open 类与特殊类</a><br />
-        <img src="icon-7-todo.svg" width="20" alt="第七步" /> <a href="kotlin-tour-intermediate-properties.md">属性</a><br />
-        <img src="icon-8-todo.svg" width="20" alt="第八步" /> <a href="kotlin-tour-intermediate-null-safety.md">空安全</a><br />
-        <img src="icon-9-todo.svg" width="20" alt="第九步" /> <a href="kotlin-tour-intermediate-libraries-and-apis.md">库与 API</a></p>
-</tldr>
 
 在本章节中，你将通过探索对象声明来扩展你对类的理解。这些知识将帮助你在项目中高效地管理行为。
 
@@ -148,7 +136,7 @@ fun main() {
 
 欲了解更多信息，请参阅 [](object-declarations.md#companion-objects)。
 
-## 练习
+## 练习 {completion-point="true"}
 
 ### 习题 1 {initial-collapse-state="collapsed" collapsible="true" id="objects-exercise-1"}
 
@@ -331,6 +319,13 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="示例解决方案" id="kotlin-tour-objects-solution-3"}
 
-## 下一步
+<seealso></seealso>
 
-[中级：Open 类与特殊类](kotlin-tour-intermediate-open-special-classes.md)
+<list columns="2" id="tour-nav">
+  <li>
+    <a as="button" href="kotlin-tour-intermediate-classes-interfaces.md" mode="outline" icon="arrow-left" icon-position="left">上一步</a>
+  </li>
+  <li>
+    <a as="button" href="kotlin-tour-intermediate-open-special-classes.md" mode="classic" icon="arrow-right" icon-position="right">下一步</a>
+  </li>
+</list>

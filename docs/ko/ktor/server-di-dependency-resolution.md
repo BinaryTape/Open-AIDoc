@@ -9,7 +9,7 @@
 <var name="example_name" value="server-di"/>
 <p>
     <b>코드 예제</b>:
-    <a href="https://github.com/ktorio/ktor-documentation/tree/%ktor_version%/codeSnippets/snippets/%example_name%">
+    <a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/%example_name%">
         %example_name%
     </a>
 </p>
@@ -21,7 +21,7 @@
 
 ### 프로퍼티 위임 사용 {id="property-delegation"}
 
-프로퍼티 위임을 사용하면 프로퍼티에 처음 접근할 때 의존성이 지연 해결(resolved lazily)됩니다.
+프로퍼티 위임을 사용하면 의존성은 시작 유효성 검사 단계(startup validation phase) 동안에만 해결됩니다.
 
 ```kotlin
 val service: GreetingService by dependencies

@@ -69,6 +69,48 @@ android {
 }
 ```
 
+## Compose Multiplatform에서 왜 Skiko 버전 경고가 발생하나요?
+
+Compose Multiplatform은 Coil의 Skiko 의존성이 Compose Multiplatform의 의존성보다 이전 버전일 경우 다음과 같은 경고를 출력합니다.
+
+```text
+w: Skiko dependencies' versions are incompatible.
+```
+
+이 경고는 일반적으로 무시해도 안전합니다. Skiko 버전은 보통 바이너리 호환성을 유지하기 때문입니다. Coil 릴리스는 Compose Multiplatform **안정(stable)** 릴리스와 해당 Skiko 버전을 추적하므로, 이 경고가 발생하면 먼저 Coil을 최신 버전으로 업데이트하세요.
+
+**참고**: 원칙적으로 Coil은 Compose Multiplatform의 **알파(alpha)** 및 **베타(beta)** 버전에서 사용하는 Skiko 버전이 최신 Coil 릴리스가 의존하는 버전과 호환되지 않는 경우가 아니면, 단순히 Skiko 버전을 맞추기 위해 새 버전을 릴리스하지 않습니다.
+
+경고가 계속 나타나면 다음 Gradle 속성을 설정하여 무시할 수 있습니다:
+
+```properties
+org.jetbrains.compose.library.compatibility.check.disable=true
+```
+
+하지만 이 Gradle 속성은 Coil뿐만 아니라 모든 라이브러리에 대한 모든 Compose Multiplatform 라이브러리 호환성 검사를 비활성화합니다. Coil과 해당 Skiko 의존성에 대해서만 경고를 비활성화하려면 루트 `build.gradle.kts` 파일에 다음 코드 스니펫을 추가하세요:
+
+```kotlin
+dependencies {
+    components {
+        all {
+            if (id.group == "io.coil-kt.coil3") {
+                allVariants {
+                    withDependencies {
+                        val hadSkikoDependency = removeAll {
+                            it.group == "org.jetbrains.skiko" && it.name == "skiko"
+                        }
+                        if (hadSkikoDependency) {
+                            // `0.150.0`을 사용 중인 Compose Multiplatform 버전의 Skiko 버전으로 교체하세요.
+                            add("org.jetbrains.skiko:skiko:0.150.0")
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
 ## 개발용 스냅샷(snapshot)을 어떻게 받나요?
 
 저장소 목록에 스냅샷 저장소를 추가하세요:

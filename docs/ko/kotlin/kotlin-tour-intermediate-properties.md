@@ -1,18 +1,6 @@
-[//]: # (title: 중급: 프로퍼티)
+[//]: # (title: 프로퍼티)
 
 <no-index/>
-
-<tldr>
-    <p><img src="icon-1-done.svg" width="20" alt="First step" /> <a href="kotlin-tour-intermediate-extension-functions.md">확장 함수</a><br />
-        <img src="icon-2-done.svg" width="20" alt="Second step" /> <a href="kotlin-tour-intermediate-scope-functions.md">범위 함수</a><br />
-        <img src="icon-3-done.svg" width="20" alt="Third step" /> <a href="kotlin-tour-intermediate-lambdas-receiver.md">수신 객체가 있는 람다 식</a><br />
-        <img src="icon-4-done.svg" width="20" alt="Fourth step" /> <a href="kotlin-tour-intermediate-classes-interfaces.md">클래스 및 인터페이스</a><br />
-        <img src="icon-5-done.svg" width="20" alt="Fifth step" /> <a href="kotlin-tour-intermediate-objects.md">객체</a><br />
-        <img src="icon-6-done.svg" width="20" alt="Sixth step" /> <a href="kotlin-tour-intermediate-open-special-classes.md">Open 및 특수 클래스</a><br />
-        <img src="icon-7.svg" width="20" alt="Seventh step" /> <strong>프로퍼티</strong><br />
-        <img src="icon-8-todo.svg" width="20" alt="Eighth step" /> <a href="kotlin-tour-intermediate-null-safety.md">널 안전성</a><br />
-        <img src="icon-9-todo.svg" width="20" alt="Ninth step" /> <a href="kotlin-tour-intermediate-libraries-and-apis.md">라이브러리 및 API</a></p>
-</tldr>
 
 초급 투어에서는 클래스 인스턴스의 특성을 선언하기 위해 프로퍼티가 어떻게 사용되는지, 그리고 프로퍼티에 어떻게 접근하는지 배웠습니다. 이 장에서는 Kotlin에서 프로퍼티가 작동하는 방식을 더 깊이 살펴보고, 코드에서 프로퍼티를 활용할 수 있는 다른 방법들을 탐구합니다.
 
@@ -377,7 +365,7 @@ fun main() {
 
 자세한 내용은 [관찰 가능한 프로퍼티](delegated-properties.md#observable-properties)를 참조하세요.
 
-## 연습 문제
+## 연습 문제 {completion-point="true"}
 
 ### 연습 문제 1 {initial-collapse-state="collapsed" collapsible="true" id="properties-exercise-1"}
 
@@ -612,6 +600,13 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="모범 답안" id="kotlin-tour-properties-solution-4"}
 
-## 다음 단계
+<seealso></seealso>
 
-[중급: 널 안전성](kotlin-tour-intermediate-null-safety.md)
+<list columns="2" id="tour-nav">
+  <li>
+    <a as="button" href="kotlin-tour-intermediate-open-special-classes.md" mode="outline" icon="arrow-left" icon-position="left">이전 단계</a>
+  </li>
+  <li>
+    <a as="button" href="kotlin-tour-intermediate-null-safety.md" mode="classic" icon="arrow-right" icon-position="right">다음 단계</a>
+  </li>
+</list>

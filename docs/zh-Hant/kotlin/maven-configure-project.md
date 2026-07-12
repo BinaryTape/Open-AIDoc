@@ -24,7 +24,7 @@
    ```xml
    <build>
        <plugins>
-           <!-- Kotlin 編譯器外掛程式配置 -->
+           <!-- Kotlin compiler plugin configuration -->
            <plugin>
                <groupId>org.jetbrains.kotlin</groupId>
                <artifactId>kotlin-maven-plugin</artifactId>
@@ -54,6 +54,30 @@
 > 如果有多個建置外掛程式覆寫了預設生命週期，且您也啟用了 `<extensions>` 選項，則 `<build>` 區塊中的最後一個外掛程式在生命週期設定上具有優先權。所有先前對生命週期設定的變更都將被忽略。
 >
 {style="note"}
+
+<anchor name="maven-compiler-extensions-version"/>
+
+目前，與 `<extensions>` 搭配使用的 Maven 編譯器外掛程式預設版本為 **%mavenExtensionsVersion%**。您可以單獨設定不同的版本：
+
+```xml
+<build>
+    <plugins>
+        <!-- Kotlin compiler plugin configuration -->
+        <plugin>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-maven-plugin</artifactId>
+            <version>${kotlin.version}</version>
+            <extensions>true</extensions>
+        </plugin>
+        <!-- 用於 Java 類別的 Maven 編譯器外掛程式配置 -->
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>%mavenPluginVersion%</version>
+        </plugin>
+    </plugins>
+</build>
+```
 
 ### JVM 目標版本
 
@@ -91,7 +115,6 @@ graph TD
 * 如果既未設定 `kotlin.compiler.jdkRelease` 也未設定 `kotlin.compiler.jvmTarget` 選項，外掛程式將採用 `maven.compiler.release` 版本。
 
   `maven.compiler.release` 版本可以定義為專案屬性，也可以在 `maven-compiler-plugin` 配置中定義。
-* If the Maven release version isn't set, the plugin takes the `maven.compiler.target` version.
 * 如果未設定 Maven 的 release 版本，外掛程式將採用 `maven.compiler.target` 版本。
 
   它可以定義為專案屬性，也可以在 `maven-compiler-plugin` 配置中定義。
@@ -106,30 +129,6 @@ graph TD
 > `<extensions>` 選項僅檢查專案級別的屬性與全域 `maven-compiler-plugin` 配置。它不會檢查外掛程式 `<executions>` 區塊中定義的配置。
 >
 {style="note"}
-
-### Maven 編譯器版本
-
-目前，與 `<extensions>` 搭配使用的 Maven 編譯器外掛程式預設版本為 **%mavenExtensionsVersion%**。您可以單獨設定不同的版本：
-
-```xml
-<build>
-    <plugins>
-        <!-- Kotlin 編譯器外掛程式配置 -->
-        <plugin>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-maven-plugin</artifactId>
-            <version>${kotlin.version}</version>
-            <extensions>true</extensions>
-        </plugin>
-        <!-- 用於 Java 類別的 Maven 編譯器外掛程式配置 -->
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <version>%mavenPluginVersion%</version>
-        </plugin>
-    </plugins>
-</build>
-```
 
 ## 手動設定
 
@@ -163,7 +162,7 @@ Maven 根據兩個主要因素決定外掛程式執行順序：
 ```xml
 <build>
     <plugins>
-        <!-- Kotlin 編譯器外掛程式配置 -->
+        <!-- Kotlin compiler plugin configuration -->
         <plugin>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-maven-plugin</artifactId>
@@ -178,7 +177,7 @@ Maven 根據兩個主要因素決定外掛程式執行順序：
                     <configuration>
                         <sourceDirs>
                             <sourceDir>src/main/kotlin</sourceDir>
-                            <!-- 確保 Kotlin 程式碼可以參考 Java 程式碼 -->
+                            <!-- Ensure Kotlin code can reference Java code -->
                             <sourceDir>src/main/java</sourceDir>
                         </sourceDirs>
                     </configuration>
@@ -199,13 +198,13 @@ Maven 根據兩個主要因素決定外掛程式執行順序：
             </executions>
         </plugin>
 
-        <!-- Maven 編譯器外掛程式配置 -->
+        <!-- Maven compiler plugin configuration -->
         <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-compiler-plugin</artifactId>
             <version>3.15.0</version>
             <executions>
-                <!-- 停用預設執行 -->
+                <!-- Disable default executions -->
                 <execution>
                     <id>default-compile</id>
                     <phase>none</phase>
@@ -215,7 +214,7 @@ Maven 根據兩個主要因素決定外掛程式執行順序：
                     <phase>none</phase>
                 </execution>
 
-                <!-- 定義自訂執行 -->
+                <!-- Define custom executions -->
                 <execution>
                     <id>java-compile</id>
                     <phase>compile</phase>

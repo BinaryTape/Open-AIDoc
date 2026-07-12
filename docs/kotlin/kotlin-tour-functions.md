@@ -2,16 +2,6 @@
 
 <no-index/>
 
-<tldr>
-    <p><img src="icon-1-done.svg" width="20" alt="第一步" /> <a href="kotlin-tour-hello-world.md">Hello world</a><br />
-        <img src="icon-2-done.svg" width="20" alt="第二步" /> <a href="kotlin-tour-basic-types.md">基本类型</a><br />
-        <img src="icon-3-done.svg" width="20" alt="第三步" /> <a href="kotlin-tour-collections.md">集合</a><br />
-        <img src="icon-4-done.svg" width="20" alt="第四步" /> <a href="kotlin-tour-control-flow.md">控制流</a><br />
-        <img src="icon-5.svg" width="20" alt="第五步" /> <strong>函数</strong><br />
-        <img src="icon-6-todo.svg" width="20" alt="第六步" /> <a href="kotlin-tour-classes.md">类</a><br />
-        <img src="icon-7-todo.svg" width="20" alt="最后一步" /> <a href="kotlin-tour-null-safety.md">空安全</a></p>
-</tldr>
-
 在 Kotlin 中，你可以使用 `fun` 关键字声明你自己的函数。
 
 ```kotlin
@@ -65,7 +55,7 @@ fun main() {
 
 为了使代码简洁，在调用函数时，你不必包含形参名称。但是，包含形参名称确实会使你的代码更易于阅读。这被称为使用**具名实参**。如果你确实包含了形参名称，那么你可以按任何顺序编写实参。
 
-> 在以下示例中，使用了[字符串模板](strings.md#string-templates)（`$参数名`）来访问形参值，将其转换为 `String` 类型，然后将它们连接成一个字符串进行打印。
+> 在以下示例中，使用了[字符串模板](strings.md#string-templates)（`$形参名`）来访问形参值，将其转换为 `String` 类型，然后将它们连接成一个字符串进行打印。
 > 
 {style="tip"}
 
@@ -527,7 +517,7 @@ fun main() {
 
 我们旅程的下一步是学习 Kotlin 中的[类](kotlin-tour-classes.md)。
 
-## lambda表达式练习
+## lambda表达式练习 {completion-point="true"}
 
 ### 练习 1 {initial-collapse-state="collapsed" collapsible="true" id="lambdas-exercise-1"}
 
@@ -589,6 +579,13 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="示例解法" id="kotlin-tour-lambdas-solution-2"}
 
-## 下一步
+<seealso></seealso>
 
-[类](kotlin-tour-classes.md)
+<list columns="2" id="tour-nav">
+  <li>
+    <a as="button" href="kotlin-tour-control-flow.md" mode="outline" icon="arrow-left" icon-position="left">上一步</a>
+  </li>
+  <li>
+    <a as="button" href="kotlin-tour-classes.md" mode="classic" icon="arrow-right" icon-position="right">下一步</a>
+  </li>
+</list>

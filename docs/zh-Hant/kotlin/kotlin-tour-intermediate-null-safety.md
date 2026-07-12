@@ -1,18 +1,6 @@
-[//]: # (title: 進階：Null 安全)
+[//]: # (title: Null 安全)
 
 <no-index/>
-
-<tldr>
-    <p><img src="icon-1-done.svg" width="20" alt="First step" /> <a href="kotlin-tour-intermediate-extension-functions.md">擴充函式</a><br />
-        <img src="icon-2-done.svg" width="20" alt="Second step" /> <a href="kotlin-tour-intermediate-scope-functions.md">作用域函式</a><br />
-        <img src="icon-3-done.svg" width="20" alt="Third step" /> <a href="kotlin-tour-intermediate-lambdas-receiver.md">帶有接收者的 Lambda 運算式</a><br />
-        <img src="icon-4-done.svg" width="20" alt="Fourth step" /> <a href="kotlin-tour-intermediate-classes-interfaces.md">類別與介面</a><br />
-        <img src="icon-5-done.svg" width="20" alt="Fifth step" /> <a href="kotlin-tour-intermediate-objects.md">物件</a><br />
-        <img src="icon-6-done.svg" width="20" alt="Sixth step" /> <a href="kotlin-tour-intermediate-open-special-classes.md">Open 與特殊類別</a><br />
-        <img src="icon-7-done.svg" width="20" alt="Seventh step" /> <a href="kotlin-tour-intermediate-properties.md">屬性</a><br />
-        <img src="icon-8.svg" width="20" alt="Eighth step" /> <strong>Null 安全</strong><br />
-        <img src="icon-9-todo.svg" width="20" alt="Ninth step" /> <a href="kotlin-tour-intermediate-libraries-and-apis.md">程式庫與 API</a></p>
-</tldr>
 
 在初學者導覽中，您學習了如何在程式碼中處理 `null` 值。本章節將介紹 Null 安全特性的常見使用案例，以及如何充分利用這些特性。
 
@@ -24,8 +12,8 @@ Kotlin 有時可以在沒有顯式宣告的情況下推斷型別。當您告訴 
 
 在探索轉換如何運作之前，讓我們先看看如何檢查物件是否具有特定型別。為此，您可以在 `when` 或 `if` 條件運算式中使用 `is` 和 `!is` 運算子：
 
-* `is` 檢查物件是否為該型別並傳回布林值。
-* `!is` 檢查物件是否 **不是** 該型別並傳回布林值。
+* `is` 檢查物件是否具有該型別並傳回布林值。
+* `!is` 檢查物件是否 **不具有** 該型別並傳回布林值。
 
 例如：
 
@@ -138,7 +126,7 @@ fun calculateTotalStringLength(items: List<Any>): Int {
 
 ## Null 值與集合
 
-在 Kotlin 中，處理集合時通常涉及處理 `null` 值並過濾掉不必要的元素。Kotlin 擁有一些實用的函式，讓您在處理 List、Set、Map 和其他類型的集合時，能夠編寫簡潔、高效且 Null 安全的程式碼。
+在 Kotlin 中，處理集合時通常涉及處理 `null` 值並過濾掉不必要的元素。Kotlin 擁有一些實用的函式，讓您在處理列表、集合 (Set)、Map 和其他類型的集合時，能夠編寫簡潔、高效且 Null 安全的程式碼。
 
 若要從列表中過濾掉 `null` 值，請使用 [`filterNotNull()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/filter-not-null.html) 函式：
 
@@ -156,7 +144,7 @@ fun main() {
 ```
 {kotlin-runnable="true" id="kotlin-tour-null-safety-filternotnull"}
 
-如果您想在建立列表時直接過濾 `null` 值，請使用 [`listOfNotNull()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/list-of-not-null.html) 函式：
+如果您想在建立列表時直接進行 `null` 值的過濾，請使用 [`listOfNotNull()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/list-of-not-null.html) 函式：
 
 ```kotlin
 fun main() {
@@ -330,12 +318,12 @@ fun main() {
 * `getNumberOfFriends()` 函式：
   * 接收一個 `User` 執行個體的 Map 和一個整數形式的使用者 ID。
   * 使用提供的使用者 ID 存取 `User` 執行個體 Map 的值。
-  * 使用 Elvis 運算子，如果 Map 的值為 `null`，則提前傳回 `-1`。
+  * 使用 Elvis 運算子，如果 Map 的值為 `null`，則提前傳回值 `-1`。
   * 將從 Map 中找到的值指派給 `user` 變數。
   * 使用 `size` 屬性傳回該使用者好友列表中的好友數量。
 * `main()` 函式：
-  * 建立三個 `User` 執行個體。
-  * 建立這些 `User` 執行個體的 Map 並將其指派給 `users` 變數。
+  * 建立三個 `User` 執行個體。 
+  * 建立這些 `User` 執行個體的 Map 並將其指派給 `users` 變數。 
   * 在 `users` 變數上呼叫 `getNumberOfFriends()` 函式，傳入 `1` 和 `2` 分別傳回 `"Alice"` 的兩個好友和 `"Bob"` 的一個好友。
   * 在 `users` 變數上呼叫 `getNumberOfFriends()` 函式，傳入 `4`，這會觸發提前傳回並傳回值 `-1`。
 
@@ -353,7 +341,7 @@ fun getNumberOfFriends(users: Map<Int, User>, userId: Int): Int {
 
 有關如何在程式碼中使用 `return` 的更多資訊，請參閱 [傳回與跳轉 (Returns and jumps)](returns.md)。
 
-## 練習
+## 練習 {completion-point="true"}
 
 ### 練習 1 {initial-collapse-state="collapsed" collapsible="true" id="null-safety-exercise-1"}
 
@@ -530,7 +518,7 @@ fun main() {
 
 ### 練習 3 {initial-collapse-state="collapsed" collapsible="true" id="null-safety-exercise-3"}
 
-您正在開發一個社群媒體平台，其中使用者具有使用者名稱 and 帳號狀態。您想要查看目前啟用的使用者名稱列表。完成 `getActiveUsernames()` 函式，使 [`mapNotNull()` 函式](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/map-not-null.html) 具有一個述句，如果該使用者是啟用的則傳回其使用者名稱，否則傳回 `null` 值：
+您正在開發一個社群媒體平台，其中使用者具有使用者名稱與帳號狀態。您想要查看目前啟用的使用者名稱列表。完成 `getActiveUsernames()` 函式，使 [`mapNotNull()` 函式](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/map-not-null.html) 具有一個述句，如果該使用者是啟用的則傳回其使用者名稱，否則傳回 `null` 值：
 
 |--|--|
 
@@ -660,6 +648,13 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="範例解答" id="kotlin-tour-null-safety-solution-4"}
 
-## 下一步
+<seealso></seealso>
 
-[進階：程式庫與 API](kotlin-tour-intermediate-libraries-and-apis.md)
+<list columns="2" id="tour-nav">
+  <li>
+    <a as="button" href="kotlin-tour-intermediate-properties.md" mode="outline" icon="arrow-left" icon-position="left">上一步</a>
+  </li>
+  <li>
+    <a as="button" href="kotlin-tour-intermediate-libraries-and-apis.md" mode="classic" icon="arrow-right" icon-position="right">下一步</a>
+  </li>
+</list>

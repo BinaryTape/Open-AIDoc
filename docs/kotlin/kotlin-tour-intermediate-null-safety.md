@@ -1,18 +1,6 @@
-[//]: # (title: 进阶：Null 安全)
+[//]: # (title: Null 安全)
 
 <no-index/>
-
-<tldr>
-    <p><img src="icon-1-done.svg" width="20" alt="第一步" /> <a href="kotlin-tour-intermediate-extension-functions.md">扩展函数</a><br />
-        <img src="icon-2-done.svg" width="20" alt="第二步" /> <a href="kotlin-tour-intermediate-scope-functions.md">作用域函数</a><br />
-        <img src="icon-3-done.svg" width="20" alt="第三步" /> <a href="kotlin-tour-intermediate-lambdas-receiver.md">带接收者的 Lambda 表达式</a><br />
-        <img src="icon-4-done.svg" width="20" alt="第四步" /> <a href="kotlin-tour-intermediate-classes-interfaces.md">类与接口</a><br />
-        <img src="icon-5-done.svg" width="20" alt="第五步" /> <a href="kotlin-tour-intermediate-objects.md">对象</a><br />
-        <img src="icon-6-done.svg" width="20" alt="第六步" /> <a href="kotlin-tour-intermediate-open-special-classes.md">Open 类与特殊类</a><br />
-        <img src="icon-7-done.svg" width="20" alt="第七步" /> <a href="kotlin-tour-intermediate-properties.md">属性</a><br />
-        <img src="icon-8.svg" width="20" alt="第八步" /> <strong>Null 安全</strong><br />
-        <img src="icon-9-todo.svg" width="20" alt="第九步" /> <a href="kotlin-tour-intermediate-libraries-and-apis.md">库与 API</a></p>
-</tldr>
 
 在初学者教程中，你已经学习了如何在代码中处理 `null` 值。本章将涵盖 Null 安全功能的常见用例，以及如何充分利用这些功能。
 
@@ -130,7 +118,7 @@ fun calculateTotalStringLength(items: List<Any>): Int {
 }
 ```
 
-该示例使用了 [`.sumOf()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/sum-of.html) 扩展函数并提供了一个 lambda 表达式，该表达式：
+该示例使用了 [`.sumOf()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/sum-of.html) 扩展函数并提供了一个 lambda表达式，该表达式：
 
 * 对于列表中的每一项，使用 `as?` 执行向 `String` 的安全转换。
 * 使用安全调用 `?.` 在调用不返回 `null` 值的情况下访问 `length` 属性。
@@ -211,7 +199,7 @@ fun main() {
 >
 {style="note"}
 
-你可以将 [`singleOrNull()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/single-or-null.html) 函数与 lambda 表达式配合使用，以查找符合条件的单个项目。如果不存在该项或存在多个符合条件的项，该函数将返回 `null` 值：
+你可以将 [`singleOrNull()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/single-or-null.html) 函数与 lambda表达式配合使用，以查找符合条件的单个项目。如果不存在该项或存在多个符合条件的项，该函数将返回 `null` 值：
 
 ```kotlin
 fun main() {
@@ -232,9 +220,9 @@ fun main() {
 >
 {style="note"}
 
-某些函数使用 lambda 表达式来转换集合，并在无法实现其目的时返回 `null` 值。
+某些函数使用 lambda表达式来转换集合，并在无法实现其目的时返回 `null` 值。
 
-要使用 lambda 表达式转换集合并返回第一个非 `null` 的值，请使用 [`firstNotNullOfOrNull()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/first-not-null-of-or-null.html) 函数。如果不存在这样的值，该函数将返回 `null` 值：
+要使用 lambda表达式转换集合并返回第一个非 `null` 的值，请使用 [`firstNotNullOfOrNull()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/first-not-null-of-or-null.html) 函数。如果不存在这样的值，该函数将返回 `null` 值：
 
 ```kotlin
 fun main() {
@@ -255,7 +243,7 @@ fun main() {
 ```
 {kotlin-runnable="true" id="kotlin-tour-null-safety-firstnotnullofornull"}
 
-要使用 lambda 表达式按顺序处理每个集合项并创建累加值（或在集合为空时返回 `null` 值），请使用 [`reduceOrNull()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/reduce-or-null.html) 函数：
+要使用 lambda表达式按顺序处理每个集合项并创建累加值（或在集合为空时返回 `null` 值），请使用 [`reduceOrNull()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/reduce-or-null.html) 函数：
 
 ```kotlin
 fun main() {
@@ -349,11 +337,11 @@ fun getNumberOfFriends(users: Map<Int, User>, userId: Int): Int {
 ```
 {validate="false"}
 
-虽然这个示例仅使用 Elvis 运算符检查了一个条件，但你可以添加多个检查来覆盖任何关键的错误路径。带有 Elvis 运算符的提前返回可以防止程序做不必要的工作，并通过在检测到 `null` 值或无效情况时立即停止，使你的代码更安全。
+虽然这个示例仅使用 Elvis 运算符检查了一个条件，但你可以添加多个检查来覆盖任何关键的错误路径。带有 Elvis 运算符的提前返回可以防止程序执行不必要的工作，并通过在检测到 `null` 值或无效情况时立即停止，使你的代码更安全。
 
 有关如何在代码中使用 `return` 的更多信息，请参阅[返回与跳转](returns.md)。
 
-## 练习
+## 练习 {completion-point="true"}
 
 ### 练习 1 {initial-collapse-state="collapsed" collapsible="true" id="null-safety-exercise-1"}
 
@@ -660,6 +648,13 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="示例解法" id="kotlin-tour-null-safety-solution-4"}
 
-## 下一步
+<seealso></seealso>
 
-[进阶：库与 API](kotlin-tour-intermediate-libraries-and-apis.md)
+<list columns="2" id="tour-nav">
+  <li>
+    <a as="button" href="kotlin-tour-intermediate-properties.md" mode="outline" icon="arrow-left" icon-position="left">上一步</a>
+  </li>
+  <li>
+    <a as="button" href="kotlin-tour-intermediate-libraries-and-apis.md" mode="classic" icon="arrow-right" icon-position="right">下一步</a>
+  </li>
+</list>

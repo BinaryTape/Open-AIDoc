@@ -2,16 +2,6 @@
 
 <no-index/>
 
-<tldr>
-    <p><img src="icon-1-done.svg" width="20" alt="第一步" /> <a href="kotlin-tour-hello-world.md">Hello world</a><br />
-        <img src="icon-2-done.svg" width="20" alt="第二步" /> <a href="kotlin-tour-basic-types.md">基本类型</a><br />
-        <img src="icon-3-done.svg" width="20" alt="第三步" /> <a href="kotlin-tour-collections.md">集合</a><br />
-        <img src="icon-4.svg" width="20" alt="第四步" /> <strong>控制流</strong><br />
-        <img src="icon-5-todo.svg" width="20" alt="第五步" /> <a href="kotlin-tour-functions.md">函数</a><br />
-        <img src="icon-6-todo.svg" width="20" alt="第六步" /> <a href="kotlin-tour-classes.md">类</a><br />
-        <img src="icon-7-todo.svg" width="20" alt="最后一步" /> <a href="kotlin-tour-null-safety.md">空安全</a></p>
-</tldr>
-
 与其他编程语言类似，Kotlin 能够根据一段代码的求值结果是否为 true 来做出决策。这类代码被称为 **条件表达式**。Kotlin 还能创建并遍历循环。
 
 ## 条件表达式
@@ -73,7 +63,7 @@ fun main() {
 * 将分支放在花括号 `{}` 内。
 * 在每个分支中使用 `->` 将每次检查与检查成功时要执行的操作分开。
 
-`when` 既可以作为语句使用，也可以作为表达式使用。**语句**（statement）不返回任何内容，而是执行操作。
+`when` 既可以作为语句使用，也可以作为表达式使用。**语句** (statement) 不返回任何内容，而是执行操作。
 
 以下是将 `when` 作为语句使用的示例：
 
@@ -100,7 +90,7 @@ fun main() {
 >
 {style="note"}
 
-**表达式**（expression）返回一个值，供稍后在代码中使用。
+**表达式** (expression) 返回一个值，供稍后在代码中使用。
 
 以下是将 `when` 作为表达式使用的示例。`when` 表达式会立即赋值给一个变量，稍后该变量将用于 `println()` 函数：
 
@@ -254,7 +244,7 @@ fun main() {
 
 ## 区间
 
-在讨论循环之前，了解如何构建供循环遍历的区间（Range）非常有用。
+在讨论循环之前，了解如何构建供循环遍历的区间 (Range) 非常有用。
 
 在 Kotlin 中创建区间最常用的方式是使用 `..` 运算符。例如，`1..4` 等同于 `1, 2, 3, 4`。
 
@@ -265,7 +255,7 @@ fun main() {
 要声明一个增量不是 1 的区间，请使用 [`step`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.ranges/step.html) 和您所需的增量值。
 例如，`1..5 step 2` 等同于 `1, 3, 5`。
 
-您也可以对 `Char`（字符）区间执行相同的操作：
+您也可以对 `Char` (字符) 区间执行相同的操作：
 
 * `'a'..'d'` 等同于 `'a', 'b', 'c', 'd'`
 * `'z' downTo 's' step 2` 等同于 `'z', 'x', 'v', 't'`
@@ -376,7 +366,7 @@ fun main() {
 
 既然您已经了解了 Kotlin 控制流的基础知识，现在是时候学习如何编写自己的[函数](kotlin-tour-functions.md)了。
 
-## 循环练习
+## 循环练习 {completion-point="true"}
 
 ### 练习 1 {initial-collapse-state="collapsed" collapsible="true" id="loops-exercise-1"}
 
@@ -513,6 +503,13 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="示例解法" id="kotlin-tour-control-flow-loops-solution-3"}
 
-## 下一步
+<seealso></seealso>
 
-[函数](kotlin-tour-functions.md)
+<list columns="2" id="tour-nav">
+  <li>
+    <a as="button" href="kotlin-tour-collections.md" mode="outline" icon="arrow-left" icon-position="left">上一步</a>
+  </li>
+  <li>
+    <a as="button" href="kotlin-tour-functions.md" mode="classic" icon="arrow-right" icon-position="right">下一步</a>
+  </li>
+</list>

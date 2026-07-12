@@ -81,7 +81,7 @@
   "sqldelight.sqljs-driver": "sqljs-driver",
   "kotlin.home": "主页",
   "kotlin.getting-started": "入门",
-  "kotlin.kotlin-tour-welcome": "体验 Kotlin 导览",
+  "kotlin.kotlin-tour-welcome": "Kotlin 导览概览",
   "kotlin.kotlin-overview": "Kotlin 概览",
   "kotlin.what-s-new-in-kotlin": "Kotlin 新特性",
   "kotlin.whatsnew22": "Kotlin 2.2.0",
@@ -675,5 +675,9 @@
   "coroutines.flows": "Flows",
   "coroutines.coroutines-flow": "概览",
   "kmp.kotlin-toolchain": "Kotlin Toolchain",
-  "kmp.whats-new-compose-112": "Compose Multiplatform %org.jetbrains.compose-eap%"
+  "kmp.whats-new-compose-112": "Compose Multiplatform %org.jetbrains.compose-eap%",
+  "kotlin.take-kotlin-tour": "参加 Kotlin 导览",
+  "kotlin.beginner": "初学者",
+  "kotlin.intermediate": "中级",
+  "kotlin.immutable-collections-kotlinx-collections-immutable": "不可变集合 (kotlinx.collections.immutable)"
 }

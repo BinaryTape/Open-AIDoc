@@ -2,16 +2,6 @@
 
 <no-index/>
 
-<tldr>
-    <p><img src="icon-1-done.svg" width="20" alt="First step" /> <a href="kotlin-tour-hello-world.md">Hello world</a><br />
-        <img src="icon-2-done.svg" width="20" alt="Second step" /> <a href="kotlin-tour-basic-types.md">기본 타입</a><br />
-        <img src="icon-3-done.svg" width="20" alt="Third step" /> <a href="kotlin-tour-collections.md">컬렉션</a><br />
-        <img src="icon-4-done.svg" width="20" alt="Fourth step" /> <a href="kotlin-tour-control-flow.md">제어 흐름</a><br />
-        <img src="icon-5-done.svg" width="20" alt="Fifth step" /> <a href="kotlin-tour-functions.md">함수</a><br />
-        <img src="icon-6.svg" width="20" alt="Sixth step" /> <strong>클래스</strong><br />
-        <img src="icon-7-todo.svg" width="20" alt="Final step" /> <a href="kotlin-tour-null-safety.md">널 안전성</a></p>
-</tldr>
-
 코틀린은 클래스와 객체를 이용한 객체 지향 프로그래밍을 지원합니다. 객체는 프로그램 내에 데이터를 저장하는 데 유용합니다.
 클래스를 사용하면 객체에 대한 일련의 특성을 선언할 수 있습니다. 클래스로부터 객체를 생성하면 매번 이러한 특성을 선언할 필요가 없어 시간과 노력을 절약할 수 있습니다.
 
@@ -376,6 +366,13 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="모범 답안" id="kotlin-tour-classes-solution-3"}
 
-## 다음 단계
+<seealso></seealso>
 
-[널 안전성](kotlin-tour-null-safety.md)
+<list columns="2" id="tour-nav">
+  <li>
+    <a as="button" href="kotlin-tour-functions.md" mode="outline" icon="arrow-left" icon-position="left">이전 단계</a>
+  </li>
+  <li>
+    <a as="button" href="kotlin-tour-null-safety.md" mode="classic" icon="arrow-right" icon-position="right">다음 단계</a>
+  </li>
+</list>

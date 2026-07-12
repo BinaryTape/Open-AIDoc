@@ -1,18 +1,6 @@
-[//]: # (title: 중급: 오픈 클래스와 특별한 클래스)
+[//]: # (title: 오픈 클래스와 특별한 클래스)
 
 <no-index/>
-
-<tldr>
-    <p><img src="icon-1-done.svg" width="20" alt="첫 번째 단계" /> <a href="kotlin-tour-intermediate-extension-functions.md">확장 함수</a><br />
-        <img src="icon-2-done.svg" width="20" alt="두 번째 단계" /> <a href="kotlin-tour-intermediate-scope-functions.md">스코프 함수</a><br />
-        <img src="icon-3-done.svg" width="20" alt="세 번째 단계" /> <a href="kotlin-tour-intermediate-lambdas-receiver.md">수신 객체가 있는 람다 표현식</a><br />
-        <img src="icon-4-done.svg" width="20" alt="네 번째 단계" /> <a href="kotlin-tour-intermediate-classes-interfaces.md">클래스와 인터페이스</a><br />
-        <img src="icon-5-done.svg" width="20" alt="다섯 번째 단계" /> <a href="kotlin-tour-intermediate-objects.md">객체</a><br />
-        <img src="icon-6.svg" width="20" alt="여섯 번째 단계" /> <strong>오픈 클래스와 특별한 클래스</strong><br />
-        <img src="icon-7-todo.svg" width="20" alt="일곱 번째 단계" /> <a href="kotlin-tour-intermediate-properties.md">프로퍼티</a><br />
-        <img src="icon-8-todo.svg" width="20" alt="여덟 번째 단계" /> <a href="kotlin-tour-intermediate-null-safety.md">널 안정성</a><br />
-        <img src="icon-9-todo.svg" width="20" alt="아홉 번째 단계" /> <a href="kotlin-tour-intermediate-libraries-and-apis.md">라이브러리와 API</a></p>
-</tldr>
 
 이 장에서는 오픈(open) 클래스, 오픈 클래스가 인터페이스와 함께 작동하는 방식, 그리고 Kotlin에서 사용할 수 있는 다른 특별한 유형의 클래스들에 대해 알아봅니다.
 
@@ -361,7 +349,7 @@ fun main() {
 
 인라인 값 클래스에 대한 자세한 정보는 [인라인 값 클래스(Inline value classes)](inline-classes.md)를 참조하세요.
 
-## 연습 문제
+## 연습 문제 {completion-point="true"}
 
 ### 연습 문제 1 {initial-collapse-state="collapsed" collapsible="true" id="special-classes-exercise-1"}
 
@@ -486,7 +474,7 @@ fun main() {
     handleStatus(status1)
     // Network issue
     handleStatus(status2)
-    // Data received: [Data1, [Data2]]
+    // Data received: [Data1, Data2]
 }
 ```
 {validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-special-classes-exercise-2"}
@@ -530,6 +518,13 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="모범 답안" id="kotlin-tour-special-classes-solution-2"}
 
-## 다음 단계
+<seealso></seealso>
 
-[중급: 프로퍼티](kotlin-tour-intermediate-properties.md)
+<list columns="2" id="tour-nav">
+  <li>
+    <a as="button" href="kotlin-tour-intermediate-objects.md" mode="outline" icon="arrow-left" icon-position="left">이전 단계</a>
+  </li>
+  <li>
+    <a as="button" href="kotlin-tour-intermediate-properties.md" mode="classic" icon="arrow-right" icon-position="right">다음 단계</a>
+  </li>
+</list>

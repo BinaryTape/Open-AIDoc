@@ -255,28 +255,33 @@ if (x is String && x.length > 0) {
 }
 ```
 
-オブジェクトの型チェックを `or` 演算子 (`||`) で組み合わせる場合、それらの最も近い共通のスーパータイプにスマートキャストされます。
+コンパイラが複数の `&&` チェックを通じてオブジェクトをスマートキャストする場合、[*交差型（intersection type）*](https://kotlinlang.org/spec/type-system.html#intersection-types)を推論します。これは、チェックされたすべての制約を同時に満たす内部的な型です。
 
 ```kotlin
-interface Status {
-    fun signal() {}
+interface Bird {
+    fun fly()
 }
 
-interface Ok : Status
-interface Postponed : Status
-interface Declined : Status
+interface Fish {
+    fun swim()
+}
 
-fun signalCheck(signalStatus: Any) {
-    if (signalStatus is Postponed || signalStatus is Declined) {
-        // signalStatus は共通のスーパータイプ Status にスマートキャストされる
-        signalStatus.signal()
+fun describe(animal: Any) {
+    // Bird と Fish の両方の型を推論する
+    if (animal is Bird && animal is Fish) {
+        // 追加のチェックやキャストなしで fly() と swim() にアクセスできる
+        animal.fly()
+        animal.swim()
     }
 }
 ```
 
-> 共通のスーパータイプは、[Union type（共用体型）](https://en.wikipedia.org/wiki/Union_type)の**近似**です。Union type は[現在 Kotlin ではサポートされていません](https://youtrack.jetbrains.com/issue/KT-13108/Denotable-union-and-intersection-types)。
->
-{style="note"}
+交差型は直接書き下すことはできません（non-denotable）。これらは型チェック中に型情報を保持するためにコンパイラの内部型システムにのみ存在します。Kotlinコード内で直接記述することはできません。コンパイラのエラーメッセージやIDEのツールチップで、通常 `A & B` と表示される交差型に遭遇することがあるかもしれません。
+唯一の例外は、[確実に null 非許容な型（definitely non-nullable type）](generics.md#definitely-non-nullable-types)を宣言する `T & Any` です。この構文は、型パラメータを `Any` と組み合わせるために特別に予約されています。
+
+```kotlin
+fun <T> T.assertNotNull(): T & Any = this ?: throw IllegalStateException("null value")
+```
 
 ### インライン関数
 
@@ -462,7 +467,7 @@ fun main() {
     // println("Login attempts (unsafe): $unsafeAttempts")
     // Exception in thread "main" java.lang.ClassCastException
 
-    // null 許容の String へのキャストに失敗し、null を返す
+    // null 許容 de String へのキャストに失敗し、null を返す
     val safeAttempts: String? = config["loginAttempts"] as? String
     println("Login attempts (safe): $safeAttempts")
     // Login attempts (safe): null

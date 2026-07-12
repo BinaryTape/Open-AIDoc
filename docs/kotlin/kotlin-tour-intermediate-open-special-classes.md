@@ -1,18 +1,6 @@
-[//]: # (title: 中级：open 类与特殊类)
+[//]: # (title: open 类与特殊类)
 
 <no-index/>
-
-<tldr>
-    <p><img src="icon-1-done.svg" width="20" alt="First step" /> <a href="kotlin-tour-intermediate-extension-functions.md">扩展函数</a><br />
-        <img src="icon-2-done.svg" width="20" alt="Second step" /> <a href="kotlin-tour-intermediate-scope-functions.md">作用域函数</a><br />
-        <img src="icon-3-done.svg" width="20" alt="Third step" /> <a href="kotlin-tour-intermediate-lambdas-receiver.md">带接收者的 lambda 表达式</a><br />
-        <img src="icon-4-done.svg" width="20" alt="Fourth step" /> <a href="kotlin-tour-intermediate-classes-interfaces.md">类与接口</a><br />
-        <img src="icon-5-done.svg" width="20" alt="Fifth step" /> <a href="kotlin-tour-intermediate-objects.md">对象</a><br />
-        <img src="icon-6.svg" width="20" alt="Fourth step" /> <strong>open 类与特殊类</strong><br />
-        <img src="icon-7-todo.svg" width="20" alt="Seventh step" /> <a href="kotlin-tour-intermediate-properties.md">属性</a><br />
-        <img src="icon-8-todo.svg" width="20" alt="Eighth step" /> <a href="kotlin-tour-intermediate-null-safety.md">空安全</a><br />
-        <img src="icon-9-todo.svg" width="20" alt="Ninth step" /> <a href="kotlin-tour-intermediate-libraries-and-apis.md">库与 API</a></p>
-</tldr>
 
 在本章中，您将学习 open 类、它们如何与接口配合使用，以及 Kotlin 中提供的其他特殊类型的类。
 
@@ -315,7 +303,7 @@ fun main() {
 
 ### 内联值类
 
-有时在代码中，您可能希望从类中创建小对象并仅短暂使用它们。这种 approach 可能会对性能产生影响。内联值类是一种特殊类型的类，可以避免这种性能影响。但是，它们只能包含值。
+有时在代码中，您可能希望从类中创建小对象并仅短暂使用它们。这种做法可能会对性能产生影响。内联值类是一种特殊类型的类，可以避免这种性能影响。但是，它们只能包含值。
 
 要创建内联值类，请使用 `value` 关键字和 `@JvmInline` 注解：
 
@@ -361,7 +349,7 @@ fun main() {
 
 有关内联值类的更多信息，请参阅 [内联值类](inline-classes.md)。
 
-## 练习
+## 练习 {completion-point="true"}
 
 ### 练习 1 {initial-collapse-state="collapsed" collapsible="true" id="special-classes-exercise-1"}
 
@@ -530,6 +518,13 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="示例解法" id="kotlin-tour-special-classes-solution-2"}
 
-## 下一步
+<seealso></seealso>
 
-[中级：属性](kotlin-tour-intermediate-properties.md)
+<list columns="2" id="tour-nav">
+  <li>
+    <a as="button" href="kotlin-tour-intermediate-objects.md" mode="outline" icon="arrow-left" icon-position="left">上一步</a>
+  </li>
+  <li>
+    <a as="button" href="kotlin-tour-intermediate-properties.md" mode="classic" icon="arrow-right" icon-position="right">下一步</a>
+  </li>
+</list>

@@ -2,16 +2,6 @@
 
 <no-index/>
 
-<tldr>
-    <p><img src="icon-1-done.svg" width="20" alt="最初のステップ" /> <a href="kotlin-tour-hello-world.md">Hello world</a><br />
-        <img src="icon-2.svg" width="20" alt="2番目のステップ" /> <strong>基本型</strong><br />
-        <img src="icon-3-todo.svg" width="20" alt="3番目のステップ" /> <a href="kotlin-tour-collections.md">コレクション</a><br />
-        <img src="icon-4-todo.svg" width="20" alt="4番目のステップ" /> <a href="kotlin-tour-control-flow.md">制御フロー</a><br />
-        <img src="icon-5-todo.svg" width="20" alt="5番目のステップ" /> <a href="kotlin-tour-functions.md">関数</a><br />
-        <img src="icon-6-todo.svg" width="20" alt="6番目のステップ" /> <a href="kotlin-tour-classes.md">クラス</a><br />
-        <img src="icon-7-todo.svg" width="20" alt="最後のステップ" /> <a href="kotlin-tour-null-safety.md">Null安全性</a></p>
-</tldr>
-
 Kotlinのすべての変数とデータ構造には型があります。型は重要です。なぜなら、その変数やデータ構造に対して何ができるかをコンパイラに伝えるからです。言い換えれば、どのような関数やプロパティを持っているかを示します。
 
 前章の例では、Kotlinは `customers` が [`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/) 型であることを判断できました。Kotlinが型を**推論（infer）**するこの機能は、**型推論（type inference）**と呼ばれます。`customers` には整数値が代入されています。これにより、Kotlinは `customers` が数値型である `Int` であると推論します。その結果、コンパイラは `customers` に対して算術演算を実行できることを認識します。
@@ -94,7 +84,7 @@ fun main() {
 
 基本型の宣言方法がわかったところで、次は[コレクション](kotlin-tour-collections.md)について学びましょう。
 
-## 練習問題
+## 練習問題 {completion-point="true"}
 
 ### エクササイズ {initial-collapse-state="collapsed" collapsible="true"}
 
@@ -128,6 +118,13 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="解答例" id="kotlin-tour-basic-types-solution"}
 
-## 次のステップ
+<seealso></seealso>
 
-[コレクション](kotlin-tour-collections.md)
+<list columns="2" id="tour-nav">
+  <li>
+    <a as="button" href="kotlin-tour-hello-world.md" mode="outline" icon="arrow-left" icon-position="left">前のステップ</a>
+  </li>
+  <li>
+    <a as="button" href="kotlin-tour-collections.md" mode="classic" icon="arrow-right" icon-position="right">次のステップ</a>
+  </li>
+</list>

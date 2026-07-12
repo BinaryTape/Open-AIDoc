@@ -2,18 +2,8 @@
 
 <no-index/>
 
-<tldr>
-    <p><img src="icon-1-done.svg" width="20" alt="第一步" /> <a href="kotlin-tour-hello-world.md">Hello world</a><br />
-        <img src="icon-2-done.svg" width="20" alt="第二步" /> <a href="kotlin-tour-basic-types.md">基本类型</a><br />
-        <img src="icon-3-done.svg" width="20" alt="第三步" /> <a href="kotlin-tour-collections.md">集合</a><br />
-        <img src="icon-4-done.svg" width="20" alt="第四步" /> <a href="kotlin-tour-control-flow.md">控制流</a><br />
-        <img src="icon-5-done.svg" width="20" alt="第五步" /> <a href="kotlin-tour-functions.md">函数</a><br />
-        <img src="icon-6-done.svg" width="20" alt="第六步" /> <a href="kotlin-tour-classes.md">类</a><br />
-        <img src="icon-7.svg" width="20" alt="最后一步" /> <strong>空安全</strong><br /></p>
-</tldr>
-
 在 Kotlin 中，可以使用 `null` 值。Kotlin 在某些内容缺失或尚未设置时使用 `null` 值。
-在 [集合](kotlin-tour-collections.md#kotlin-tour-map-no-key) 章节中，当你尝试使用 map 中不存在的键来访问键值对时，已经看到过 Kotlin 返回 `null` 值的示例。虽然以这种方式使用 `null` 值很有用，但如果你的代码没有做好处理它们的准备，就可能会遇到问题。
+在 [集合](kotlin-tour-collections.md#kotlin-tour-map-no-key) 章节中，当你尝试使用 map 中不存在的键来访问键值对时，已经看到过 Kotlin 返回 `null` 值的示例。虽然以这种方式使用 `null` 值很有用，但如果你的代码没有做好处理它们的准备，就可能会遇到问题。 
 
 为了帮助防止程序中出现 `null` 值相关的问题，Kotlin 具备空安全机制。空安全在编译时而非运行时检测 `null` 值的潜在问题。
 
@@ -143,7 +133,7 @@ fun main() {
 
 有关 Kotlin 中空安全的更多信息，请参阅[空安全](null-safety.md)。
 
-## 练习
+## 练习 {completion-point="true"}
 
 ### 习题 {initial-collapse-state="collapsed" collapsible="true"}
 
@@ -191,6 +181,15 @@ fun main() {
 
 ## 下一步是什么？
 
-恭喜！你已经完成了初级教程，现在可以通过我们的中级教程将你对 Kotlin 的理解提升到新的水平：
+恭喜！既然你已经完成了初级教程，现在可以通过我们的中级教程将你对 Kotlin 的理解提升到新的水平：
 
-<a href="kotlin-tour-intermediate-extension-functions.md"><img src="start-intermediate-tour.svg" width="700" alt="开始 Kotlin 中级教程" style="block"/></a>
+<seealso></seealso>
+
+<list columns="2" id="tour-nav">
+  <li>
+    <a as="button" href="kotlin-tour-classes.md" mode="outline" icon="arrow-left" icon-position="left">上一步</a>
+  </li>
+  <li>
+    <a as="button" href="kotlin-tour-intermediate-extension-functions.md" mode="classic" icon="arrow-right" icon-position="right">开始 Kotlin 中级教程</a>
+  </li>
+</list>

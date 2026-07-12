@@ -2,16 +2,6 @@
 
 <no-index/>
 
-<tldr>
-    <p><img src="icon-1-done.svg" width="20" alt="첫 번째 단계" /> <a href="kotlin-tour-hello-world.md">Hello world</a><br />
-        <img src="icon-2-done.svg" width="20" alt="두 번째 단계" /> <a href="kotlin-tour-basic-types.md">기본 타입</a><br />
-        <img src="icon-3-done.svg" width="20" alt="세 번째 단계" /> <a href="kotlin-tour-collections.md">컬렉션</a><br />
-        <img src="icon-4-done.svg" width="20" alt="네 번째 단계" /> <a href="kotlin-tour-control-flow.md">제어 흐름</a><br />
-        <img src="icon-5-done.svg" width="20" alt="다섯 번째 단계" /> <a href="kotlin-tour-functions.md">함수</a><br />
-        <img src="icon-6-done.svg" width="20" alt="여섯 번째 단계" /> <a href="kotlin-tour-classes.md">클래스</a><br />
-        <img src="icon-7.svg" width="20" alt="마지막 단계" /> <strong>널 안전성</strong><br /></p>
-</tldr>
-
 Kotlin에서는 `null` 값을 가질 수 있습니다. Kotlin은 무언가 누락되었거나 아직 설정되지 않았을 때 `null` 값을 사용합니다.
 이미 [컬렉션](kotlin-tour-collections.md#kotlin-tour-map-no-key) 장에서 맵(map)에 존재하지 않는 키로 키-값 쌍에 접근하려고 했을 때 Kotlin이 `null` 값을 반환하는 예시를 보았습니다. 이런 방식으로 `null` 값을 사용하는 것은 유용하지만, 코드가 이를 처리할 준비가 되어 있지 않다면 문제에 직면할 수 있습니다.
 
@@ -144,7 +134,7 @@ fun main() {
 
 Kotlin의 널 안전성에 대한 더 자세한 정보는 [널 안전성](null-safety.md)을 참조하세요.
 
-## 연습 문제
+## 연습 문제 {completion-point="true"}
 
 ### 실습 {initial-collapse-state="collapsed" collapsible="true"}
 
@@ -194,4 +184,13 @@ fun main() {
 
 축하합니다! 이제 초급 투어를 완료하셨습니다. 중급 투어를 통해 Kotlin에 대한 이해도를 한 단계 더 높여보세요:
 
-<a href="kotlin-tour-intermediate-extension-functions.md"><img src="start-intermediate-tour.svg" width="700" alt="Kotlin 중급 투어 시작하기" style="block"/></a>
+<seealso></seealso>
+
+<list columns="2" id="tour-nav">
+  <li>
+    <a as="button" href="kotlin-tour-classes.md" mode="outline" icon="arrow-left" icon-position="left">이전 단계</a>
+  </li>
+  <li>
+    <a as="button" href="kotlin-tour-intermediate-extension-functions.md" mode="classic" icon="arrow-right" icon-position="right">Kotlin 중급 투어 시작하기</a>
+  </li>
+</list>

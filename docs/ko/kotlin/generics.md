@@ -89,7 +89,7 @@ Joshua Bloch는 그의 저서 [Effective Java, 3rd Edition](http://www.oracle.co
 
 그는 다음과 같은 암기법을 제안합니다: _PECS_는 _Producer-Extends, Consumer-Super_의 약자입니다.
 
-> 만약 `List<? extends Foo>`와 같은 생산자 객체를 사용한다면, 이 객체에서 `add()`나 `set()`을 호출할 수 없지만, 이것이 해당 객체가 _불변(immutable)_임을 의미하지는 않습니다. 예를 들어, `clear()`는 매개변수를 전혀 받지 않으므로 리스트에서 모든 아이템을 제거하기 위해 `clear()`를 호출하는 것을 막을 방법은 없습니다.
+> 만약 `List<? extends Foo>`와 같은 생성자 객체를 사용한다면, 이 객체에서 `add()`나 `set()`을 호출할 수 없지만, 이것이 해당 객체가 _불변(immutable)_임을 의미하지는 않습니다. 예를 들어, `clear()`는 매개변수를 전혀 받지 않으므로 리스트에서 모든 아이템을 제거하기 위해 `clear()`를 호출하는 것을 막을 방법은 없습니다.
 >
 > 와일드카드(또는 다른 유형의 가변성)가 보장하는 유일한 것은 _타입 안전성_입니다. 불변성은 완전히 다른 이야기입니다.
 >
@@ -228,6 +228,40 @@ Kotlin은 이를 위해 소위 _스타 프로젝션(star-projection)_ 구문을 
 > 스타 프로젝션은 Java의 로우 타입(raw types)과 매우 유사하지만 안전합니다.
 >
 {style="note"}
+
+### 캡처된 타입 (Captured types)
+
+`out T` 또는 `in T`와 같은 타입 프로젝션을 사용할 때, 컴파일러는 내부적으로 알려지지 않은 구체적인 타입을 [*캡처된 타입(captured type)*](https://kotlinlang.org/spec/type-system.html#type-capturing)으로 표현합니다. 캡처된 타입은 상위 및 하위 바운드가 알려진 알려지지 않은 타입입니다.
+
+캡처된 타입은 명시적으로 작성할 수 없으므로(non-denotable), Kotlin 코드에서 직접 작성할 수 없습니다. 대신 `CapturedType(out X)`와 같이 컴파일러 진단 메시지에서 가장 자주 볼 수 있습니다. 예를 들어, 다음 타입 불일치 진단 메시지에는 캡처된 타입이 포함되어 있습니다:
+
+```kotlin
+val array: Array<out CharSequence> = arrayOf("str")
+val item: Int = array.get(0)
+// Initializer type mismatch: expected 'Int', actual 'CapturedType(out CharSequence)'
+```
+
+컴파일러는 읽기 작업을 위해 캡처된 타입의 상위 바운드를 사용하고, 쓰기 작업에 어떤 값이 타입 안전한지 결정하기 위해 하위 바운드를 사용합니다.
+
+```kotlin
+// 프로젝션된 타입은 Array<out CharSequence>입니다.
+val array: Array<out CharSequence> = arrayOf("Kotlin")
+
+// get() 읽기 작업은 캡처된 타입의 상위 바운드인 CharSequence를 사용합니다.
+val item = array.get(0)
+
+// set() 쓰기 작업은 캡처된 타입의 하위 바운드인 Nothing을 사용하며,
+// 이는 오류를 발생시킵니다.
+array.set(0, "New value")
+// Receiver type 'Array<out CharSequence>' contains out projection
+// which prohibits the use of 'fun set(index: Int, value: T): Unit'
+```
+
+이 예제에서:
+
+* 변수 `array`는 프로젝션된 타입 `Array<out CharSequence>`를 가집니다. 컴파일러는 프로젝션된 타입 인자 `out CharSequence`를 `CharSequence`를 상위 바운드로, `Nothing`을 하위 바운드로 하는 캡처된 타입으로 표현합니다.
+* `get()` 작업의 경우, 컴파일러는 캡처된 타입을 상위 바운드인 `CharSequence`로 근사하고, `item`의 타입을 `CharSequence`로 추론합니다.
+* `set()` 작업의 경우, 캡처된 타입의 하위 바운드가 `Nothing`입니다. `Nothing`은 인스턴스가 없으므로 프로젝션된 타입에 값을 쓰는 것은 타입 안전하지 않으며 오류가 발생합니다.
 
 ## 제네릭 함수
 
@@ -381,7 +415,7 @@ fun main() {
 
 ### 검사되지 않은 캐스트 (Unchecked casts)
 
-`foo as List<String>`과 같이 구체적인 타입 인자가 있는 제네릭 타입으로의 타입 캐스트는 런타임에 검사할 수 없습니다.
+`foo as List<String>`과 같이 구체적인 타입 인자가 있는 제네릭 타입으로의 타입 캐스트는 런타임에 검사할 수 없습니다.  
 이러한 검사되지 않은 캐스트는 상위 수준의 프로그램 로직에 의해 타입 안전성이 함축되어 있지만 컴파일러가 직접 추론할 수 없을 때 사용될 수 있습니다. 아래 예제를 참조하세요.
 
 ```kotlin

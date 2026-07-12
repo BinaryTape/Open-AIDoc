@@ -1,18 +1,6 @@
-[//]: # (title: 中級: レシーバ付きラムダ式)
+[//]: # (title: レシーバ付きラムダ式)
 
 <no-index/>
-
-<tldr>
-    <p><img src="icon-1-done.svg" width="20" alt="ステップ1" /> <a href="kotlin-tour-intermediate-extension-functions.md">拡張関数</a><br />
-        <img src="icon-2-done.svg" width="20" alt="ステップ2" /> <a href="kotlin-tour-intermediate-scope-functions.md">スコープ関数</a><br />
-        <img src="icon-3.svg" width="20" alt="ステップ3" /> <strong>レシーバ付きラムダ式</strong><br />
-        <img src="icon-4-todo.svg" width="20" alt="ステップ4" /> <a href="kotlin-tour-intermediate-classes-interfaces.md">クラスとインターフェース</a><br />
-        <img src="icon-5-todo.svg" width="20" alt="ステップ5" /> <a href="kotlin-tour-intermediate-objects.md">オブジェクト</a><br />
-        <img src="icon-6-todo.svg" width="20" alt="ステップ6" /> <a href="kotlin-tour-intermediate-open-special-classes.md">Openクラスと特殊なクラス</a><br />
-        <img src="icon-7-todo.svg" width="20" alt="ステップ7" /> <a href="kotlin-tour-intermediate-properties.md">プロパティ</a><br />
-        <img src="icon-8-todo.svg" width="20" alt="ステップ8" /> <a href="kotlin-tour-intermediate-null-safety.md">Null安全</a><br />
-        <img src="icon-9-todo.svg" width="20" alt="ステップ9" /> <a href="kotlin-tour-intermediate-libraries-and-apis.md">ライブラリとAPI</a></p>
-</tldr>
 
 この章では、別の種類の関数であるレシーバ付きラムダ式の使い方と、それがドメイン固有言語（DSL）の作成にどのように役立つかを学びます。
 
@@ -157,7 +145,7 @@ Kotlin のエコシステムには、標準ライブラリの [`buildList()`](ht
 >
 {style="tip"}
 
-## 練習問題
+## 練習問題 {completion-point="true"}
 
 ### 練習問題 1 {initial-collapse-state="collapsed" collapsible="true" id="lambda-receivers-exercise-1"}
 
@@ -304,6 +292,13 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="解答例" id="kotlin-tour-lambda-receivers-solution-3"}
 
-## 次のステップ
+<seealso></seealso>
 
-[中級: クラスとインターフェース](kotlin-tour-intermediate-classes-interfaces.md)
+<list columns="2" id="tour-nav">
+  <li>
+    <a as="button" href="kotlin-tour-intermediate-scope-functions.md" mode="outline" icon="arrow-left" icon-position="left">前のステップ</a>
+  </li>
+  <li>
+    <a as="button" href="kotlin-tour-intermediate-classes-interfaces.md" mode="classic" icon="arrow-right" icon-position="right">次のステップ</a>
+  </li>
+</list>

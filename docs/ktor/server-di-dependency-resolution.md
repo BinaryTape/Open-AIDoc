@@ -9,7 +9,7 @@
 <var name="example_name" value="server-di"/>
 <p>
     <b>代码示例</b>：
-    <a href="https://github.com/ktorio/ktor-documentation/tree/%ktor_version%/codeSnippets/snippets/%example_name%">
+    <a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/%example_name%">
         %example_name%
     </a>
 </p>
@@ -21,7 +21,7 @@
 
 ### 使用属性委托 {id="property-delegation"}
 
-使用属性委托时，依赖项在首次访问属性时延迟解析：
+使用属性委托时，依赖项仅在启动验证阶段解析：
 
 ```kotlin
 val service: GreetingService by dependencies
@@ -208,7 +208,7 @@ val outputStream: OutputStream by dependencies
 
 #### 局限性
 
-虽然 DI 系统支持泛型类型的协变，但目前不支持跨类型参数子类型解析参数化类型。这意味着您无法使用比注册类型更具体或更宽泛的类型来检索依赖项。
+虽然 DI 系统支持泛型类型的协变，但目前不支持跨类型实参子类型解析参数化类型。这意味着您无法使用比注册类型更具体或更宽泛的类型来检索依赖项。
 
 例如，以下代码将无法解析：
 

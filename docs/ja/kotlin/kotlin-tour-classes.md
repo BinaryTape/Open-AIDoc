@@ -2,16 +2,6 @@
 
 <no-index/>
 
-<tldr>
-    <p><img src="icon-1-done.svg" width="20" alt="ステップ1" /> <a href="kotlin-tour-hello-world.md">Hello world</a><br />
-        <img src="icon-2-done.svg" width="20" alt="ステップ2" /> <a href="kotlin-tour-basic-types.md">基本の型</a><br />
-        <img src="icon-3-done.svg" width="20" alt="ステップ3" /> <a href="kotlin-tour-collections.md">コレクション</a><br />
-        <img src="icon-4-done.svg" width="20" alt="ステップ4" /> <a href="kotlin-tour-control-flow.md">制御フロー</a><br />
-        <img src="icon-5-done.svg" width="20" alt="ステップ5" /> <a href="kotlin-tour-functions.md">関数</a><br />
-        <img src="icon-6.svg" width="20" alt="ステップ6" /> <strong>クラス</strong><br />
-        <img src="icon-7-todo.svg" width="20" alt="最終ステップ" /> <a href="kotlin-tour-null-safety.md">Null安全</a></p>
-</tldr>
-
 Kotlinは、クラスとオブジェクトによるオブジェクト指向プログラミングをサポートしています。オブジェクトは、プログラム内でデータを保存するのに便利です。
 クラスを使用すると、オブジェクトの一連の特性を宣言できます。クラスからオブジェクトを作成することで、これらの特性を毎回宣言する必要がなくなるため、時間と手間を節約できます。
 
@@ -241,7 +231,7 @@ fun main() {
 
 このツアーの最後の章は、Kotlinの [Null安全](kotlin-tour-null-safety.md)についてです。
 
-## 練習問題
+## 練習問題 {completion-point="true"}
 
 ### 演習 1 {initial-collapse-state="collapsed" collapsible="true"}
 
@@ -376,6 +366,13 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="解答例" id="kotlin-tour-classes-solution-3"}
 
-## 次のステップ
+<seealso></seealso>
 
-[Null安全](kotlin-tour-null-safety.md)
+<list columns="2" id="tour-nav">
+  <li>
+    <a as="button" href="kotlin-tour-functions.md" mode="outline" icon="arrow-left" icon-position="left">前のステップ</a>
+  </li>
+  <li>
+    <a as="button" href="kotlin-tour-null-safety.md" mode="classic" icon="arrow-right" icon-position="right">次のステップ</a>
+  </li>
+</list>

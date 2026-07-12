@@ -1,18 +1,6 @@
-[//]: # (title: 중급: 확장 함수)
+[//]: # (title: 확장 함수)
 
 <no-index/>
-
-<tldr>
-    <p><img src="icon-1.svg" width="20" alt="First step" /> <strong>확장 함수</strong><br />
-        <img src="icon-2-todo.svg" width="20" alt="Second step" /> <a href="kotlin-tour-intermediate-scope-functions.md">범위 지정 함수</a><br />
-        <img src="icon-3-todo.svg" width="20" alt="Third step" /> <a href="kotlin-tour-intermediate-lambdas-receiver.md">수신 객체 지정 람다</a><br />
-        <img src="icon-4-todo.svg" width="20" alt="Fourth step" /> <a href="kotlin-tour-intermediate-classes-interfaces.md">클래스와 인터페이스</a><br />
-        <img src="icon-5-todo.svg" width="20" alt="Fifth step" /> <a href="kotlin-tour-intermediate-objects.md">객체</a><br />
-        <img src="icon-6-todo.svg" width="20" alt="Sixth step" /> <a href="kotlin-tour-intermediate-open-special-classes.md">Open 클래스와 특수 클래스</a><br />
-        <img src="icon-7-todo.svg" width="20" alt="Seventh step" /> <a href="kotlin-tour-intermediate-properties.md">프로퍼티</a><br />
-        <img src="icon-8-todo.svg" width="20" alt="Eighth step" /> <a href="kotlin-tour-intermediate-null-safety.md">널 안전성</a><br />
-        <img src="icon-9-todo.svg" width="20" alt="Ninth step" /> <a href="kotlin-tour-intermediate-libraries-and-apis.md">라이브러리와 API</a></p>
-</tldr>
 
 이 장에서는 코드를 더 간결하고 읽기 쉽게 만들어 주는 특별한 Kotlin 함수를 살펴봅니다. 효율적인 디자인 패턴을 사용하여 프로젝트를 한 단계 더 발전시키는 방법을 배워보세요.
 
@@ -107,7 +95,7 @@ fun main() {
 
 확장 함수에 대한 자세한 정보는 [확장(Extensions)](extensions.md)을 참조하세요.
 
-## 연습 문제
+## 연습 문제 {completion-point="true"}
 
 ### 연습 문제 1 {initial-collapse-state="collapsed" collapsible="true" id="extension-functions-exercise-1"}
 
@@ -168,6 +156,13 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="모범 답안" id="kotlin-tour-extension-functions-solution-2"}
 
-## 다음 단계
+<seealso></seealso>
 
-[중급: 범위 지정 함수](kotlin-tour-intermediate-scope-functions.md)
+<list columns="2" id="tour-nav">
+  <li>
+    <a as="button" href="kotlin-tour-null-safety.md" mode="outline" icon="arrow-left" icon-position="left">이전 단계</a>
+  </li>
+  <li>
+    <a as="button" href="kotlin-tour-intermediate-scope-functions.md" mode="classic" icon="arrow-right" icon-position="right">다음 단계</a>
+  </li>
+</list>

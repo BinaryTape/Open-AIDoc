@@ -15,6 +15,7 @@
 - [编译器] 在架构中添加了 `allTableNames` 函数 (#6245 由 @edenman 贡献)
 - [PostgreSQL 方言] 添加了对 `ANY` 运算符的支持 (#6253 由 @griffio 贡献)
 - [SQLite 方言] 为 SQLite 3.39 添加了对 `RIGHT JOIN` 和 `FULL JOIN` 的支持 (#6273 由 @griffio 贡献)
+- [PostgreSQL 方言] 添加了对触发器函数中 `RAISE` 语句和 `FOUND` 变量的支持 (#6297 由 @griffio 贡献)
 
 ### 已变更
 - [PostgreSQL 方言] 将 `arrayIntermediateType` 的可见性更改为 public (#5835 由 @griffio 贡献)
@@ -220,8 +221,8 @@
 - [PostgreSQL 方言] 修复了 5032 PostgreSQL `UPDATE FROM` 语句的列相邻性 (#5035 由 @griffio 贡献)
 - [SQLite 方言] 修复了 4897 SQLite 修改表重命名列 (#4899 由 @griffio 贡献)
 - [IDE 插件] 修复了错误处理程序崩溃 (#4988 由 @aperfilyev 贡献)
-- [IDE 插件] BugSnag 在 IDEA 2023.3 中初始化失败 (#由 @aperfilyev 贡献)
-- [IDE 插件] 修复了通过插件在 IntelliJ 中打开 .sq 文件时出现的 `PluginException` (#由 @aperfilyev 贡献)
+- [IDE 插件] BugSnag 在 IDEA 2023.3 中初始化失败 (由 @aperfilyev 贡献)
+- [IDE 插件] 修复了通过插件在 IntelliJ 中打开 .sq 文件时出现的 `PluginException` (由 @aperfilyev 贡献)
 - [IDE 插件] 不要将 Kotlin 库打包到 IntelliJ 插件中，因为它已经是插件依赖项 (#5126)
 - [IDE 插件] 使用扩展数组而不是流 (#5127)
 
@@ -244,7 +245,7 @@
 - [JDBC 驱动程序] 添加了语言注解以提供更愉快的 SQL 编辑体验 (#4602 由 @MariusVolkhart 贡献)
 - [原生驱动程序] 原生驱动程序：添加了对 `linuxArm64` 的支持 (#4792 由 @hfhbd 贡献)
 - [Android 驱动程序] 为 `AndroidSqliteDriver` 添加了 `windowSizeBytes` 形参 (#4804 由 @BoD 贡献)
-- [Paging3 扩展] 已添加：为 `OffsetQueryPagingSource` 添加了 `initialOffset` (#4802 由 @MohamadJaara 贡献)
+- [Paging3 扩展] 添加了：为 `OffsetQueryPagingSource` 添加了 `initialOffset` (#4802 由 @MohamadJaara 贡献)
 
 ### 已变更
 - [编译器] 在适当的情况下优先使用 Kotlin 类型 (#4517 由 @eygraber 贡献)
@@ -307,7 +308,7 @@
 - [MySQL 方言] 为二进制表达式和求和支持 MySQL 类型 (#4254 由 @shellderp 贡献)
 - [MySQL 方言] 支持不带显示宽度的无符号整型 (#4306 由 @shellderp 贡献)
 - [MySQL 方言] 支持 `LOCK IN SHARED MODE`
-- [PostgreSQL 方言] 为 `min` `max` 添加了布尔值和时间戳 (#4245 由 @griffio 贡献)
+- [PostgreSQL 方言] 为 `min` 和 `max` 添加了布尔值和时间戳 (#4245 由 @griffio 贡献)
 - [PostgreSQL 方言] Postgres：添加了窗口函数支持 (#4283 由 @hfhbd 贡献)
 - [运行时] 为运行时添加了 `linuxArm64`、`androidNative` 和 `watchosDeviceArm` 目标 (#4258 由 @hfhbd 贡献)
 - [Paging 扩展] 为 Paging 扩展添加了 `linux` 和 `mingw x64` 目标 (#4280 由 @chippman 贡献)
@@ -384,16 +385,16 @@
 - [PostgreSQL 方言] 支持 PostgreSQL 中的 `UPDATE FROM` (由 @eygraber 贡献)
 
 ### 已变更
-- [R2DBC 驱动程序] 公开连接 (由 @hfhbd 贡献)
+- [RDBC 驱动程序] 公开连接 (由 @hfhbd 贡献)
 - [运行时] 将迁移回调移动到主 `migrate` 函数中
 - [Gradle 插件] 对下游项目隐藏配置
 - [Gradle 插件] 仅着色 IntelliJ (由 @hfhbd 贡献)
 - [Gradle 插件] 支持 Kotlin 1.8.0-Beta 并添加了多版本 Kotlin 测试 (由 @hfhbd 贡献)
 
 ### 已修复
-- [R2DBC 驱动程序] 改为使用 `javaObjectType` (由 @hfhbd 贡献)
-- [R2DBC 驱动程序] 修复了 `bindStatement` 中的基本类型 null 值 (由 @hfhbd 贡献)
-- [R2DBC 驱动程序] 支持 R2DBC 1.0 (由 @hfhbd 贡献)
+- [RDBC 驱动程序] 改为使用 `javaObjectType` (由 @hfhbd 贡献)
+- [RDBC 驱动程序] 修复了 `bindStatement` 中的基本类型 null 值 (由 @hfhbd 贡献)
+- [RDBC 驱动程序] 支持 R2DBC 1.0 (由 @hfhbd 贡献)
 - [PostgreSQL 方言] Postgres：修复了不带类型参数的数组 (由 @hfhbd 贡献)
 - [IDE 插件] 将 IntelliJ 提升至 221.6008.13 (由 @hfhbd 贡献)
 - [编译器] 从纯视图解析递归原始表 (由 @hfhbd 贡献)
@@ -455,7 +456,7 @@
 - [编译器] 不允许 `ABS("foo")` (#3430 由 @hfhbd 贡献)
 - [编译器] 支持从其他参数推断 Kotlin 类型 (#3431 由 @hfhbd 贡献)
 - [编译器] 始终创建数据库实现 (#3540 由 @hfhbd 贡献)
-- [编译器] 放宽 Javadoc 并将其也添加到自定义映射器函数中 (#3554 由 @hfhbd 贡献)
+- [编译器] 放宽 Javadoc 并将其也添加到自定义映射器函数中 (#3554 @hfhbd)
 - [编译器] 修复了绑定中的 `DEFAULT` (由 @hfhbd 贡献)
 - [Paging] 修复了 Paging 3 (#3396)
 - [Paging] 允许使用 `Long` 构造 `OffsetQueryPagingSource` (#3409)
@@ -648,7 +649,7 @@ sqldelight {
 - [JS 驱动程序] 从 `sqljs-driver` 中移除了 `sql.js` 依赖项 (由 @dellisd 贡献)
 - [Paging] 移除了 Android Paging 2 扩展
 - [IDE 插件] 在 SQLDelight 同步期间添加了编辑器横幅 (#2511)
-- [IDE 插件] 支持的最低 IntelliJ 版本为 2021.1
+- [IDE 插件] 最低支持的 IntelliJ 版本为 2021.1
 
 ### 已修复
 - [运行时] 扁平化监听器列表以减少分配和指针追逐。 (由 @andersio 贡献)
@@ -739,7 +740,7 @@ sqldelight {
 - [IDE 插件] 修复了如果未找到表时 `CreateTriggerMixin` 中的异常 (由 @aperfilyev 贡献)
 - [编译器] 对表创建语句进行拓扑排序
 - [编译器] 停止在目录上调用 `forDatabaseFiles` 回调 (#2532)
-- [Gradle 插件] 将 `generateDatabaseInterface` 任务依赖关系传播给潜在的使用者 (#2518 由 @martinbonnin 贡献)
+- [Gradle 插件] 在 `GenerateSchemaTask` 之前执行 `DriverInitializer` 将任务依赖关系传播给潜在的使用者 (#2518 由 @martinbonnin 贡献)
 
 ## [1.5.1] - 2021-07-16
 [1.5.1]: https://github.com/sqldelight/sqldelight/releases/tag/1.5.1
@@ -772,7 +773,7 @@ sqldelight {
 - [RX 扩展] 修复了订阅/销毁竞态泄漏 (#2403 由 @pyricau 贡献)
 - [协程扩展] 确保在通知之前注册查询监听器
 - [编译器] 对 `notifyQueries` 进行排序以获得一致的 Kotlin 输出文件 (由 @thomascjy 贡献)
-- [编译器] 不要使用 `@JvmField` 注解选择查询类属性 (由 @eygraber 贡献)
+- [编译器] 不要为选择查询类属性添加 `@JvmField` 注解 (由 @eygraber 贡献)
 - [IDE 插件] 修复了导入优化器 (#2350 由 @aperfilyev 贡献)
 - [IDE 插件] 修复了未使用的列检查 (由 @aperfilyev 贡献)
 - [IDE 插件] 为导入检查和类注解器添加了嵌套类支持 (由 @aperfilyev 贡献)
@@ -893,7 +894,7 @@ sqldelight {
 - [编译器] 修复了 `Upsert` 语句编译器错误 (#1809 由 @eygraber 贡献)
 - [编译器] 修复了生成无效 Kotlin 代码的问题 (#1925 由 @eygraber 贡献)
 - [编译器] 为未知函数提供了更好的错误消息 (#1843)
-- [编译器] 公开 `string` 作为 `instr` 第二个实参的类型
+- [编译器] 公开 `string` 作为 `instr` 第二个形参的类型
 - [IDE 插件] 修复了 IDE 插件的守护进程膨胀和 UI 线程卡死问题 (#1916)
 - [IDE 插件] 处理空模块的情况 (#1902)
 - [IDE 插件] 在未配置的 sq 文件中，为软件包名称返回空字符串 (#1920)

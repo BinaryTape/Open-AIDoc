@@ -2,16 +2,6 @@
 
 <no-index/>
 
-<tldr>
-    <p><img src="icon-1-done.svg" width="20" alt="最初のステップ" /> <a href="kotlin-tour-hello-world.md">Hello world</a><br />
-        <img src="icon-2-done.svg" width="20" alt="次のステップ" /> <a href="kotlin-tour-basic-types.md">基本型</a><br />
-        <img src="icon-3.svg" width="20" alt="現在のステップ" /> <strong>コレクション</strong><br />
-        <img src="icon-4-todo.svg" width="20" alt="次のステップ" /> <a href="kotlin-tour-control-flow.md">制御フロー</a><br />
-        <img src="icon-5-todo.svg" width="20" alt="次のステップ" /> <a href="kotlin-tour-functions.md">関数</a><br />
-        <img src="icon-6-todo.svg" width="20" alt="次のステップ" /> <a href="kotlin-tour-classes.md">クラス</a><br />
-        <img src="icon-7-todo.svg" width="20" alt="最後のステップ" /> <a href="kotlin-tour-null-safety.md">Null安全</a></p>
-</tldr>
-
 プログラミングにおいて、後で処理するためにデータを構造体にグループ化できると便利です。Kotlinでは、まさにこの目的のためにコレクションを提供しています。
 
 Kotlinには、項目をグループ化するための以下のコレクションがあります：
@@ -59,7 +49,7 @@ fun main() {
 >     val shapes: MutableList<String> = mutableListOf("triangle", "square", "circle")
 >     val shapesLocked: List<String> = shapes
 > ```
-> これは**キャスト（casting）**とも呼ばれます。
+> これは**キャスト（casting）**とも呼ばわれます。
 > 
 {style="tip"}
 
@@ -305,7 +295,7 @@ fun main() {
 > ```
 > {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-map-no-key" validate="false"}
 > 
-> このツアーの後半の [Null安全](kotlin-tour-null-safety.md) の章で null 値について説明します。
+> このツアーでは、後半の [Null安全](kotlin-tour-null-safety.md) の章で null 値について説明します。
 > 
 {style="note"}
 
@@ -414,7 +404,7 @@ fun main() {
 
 基本型とコレクションの管理方法について学んだので、次はプログラムで使用できる [制御フロー](kotlin-tour-control-flow.md) について見ていきましょう。
 
-## 練習問題
+## 練習問題 {completion-point="true"}
 
 ### 演習 1 {initial-collapse-state="collapsed" collapsible="true"}
 
@@ -458,7 +448,8 @@ fun main() {
 
 <deflist collapsible="true" id="kotlin-tour-collections-exercise-2-hint">
     <def title="ヒント">
-        リクエストされたプロトコルを大文字にして確認するようにしてください。これには <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.text/uppercase.html"><code>.uppercase()</code></a> 関数が役立ちます。
+        リクエストされたプロトコルを大文字にして確認するようにしてください。これには <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.text/uppercase.html"><code>.uppercase()</code></a>
+関数が役立ちます。
     </def>
 </deflist>
 
@@ -497,6 +488,13 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="解答例" id="kotlin-tour-collections-solution-3"}
 
-## 次のステップ
+<seealso></seealso>
 
-[制御フロー](kotlin-tour-control-flow.md)
+<list columns="2" id="tour-nav">
+  <li>
+    <a as="button" href="kotlin-tour-basic-types.md" mode="outline" icon="arrow-left" icon-position="left">前のステップ</a>
+  </li>
+  <li>
+    <a as="button" href="kotlin-tour-control-flow.md" mode="classic" icon="arrow-right" icon-position="right">次のステップ</a>
+  </li>
+</list>

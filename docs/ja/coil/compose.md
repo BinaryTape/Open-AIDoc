@@ -166,6 +166,8 @@ Image(
 )
 ```
 
+完全な `AnimatedContent` の例については、[Compose AnimatedContent](/coil/recipes/#compose-animatedcontent) を参照してください。
+
 ## プレビュー (Previews)
 
 `AsyncImage`/`rememberAsyncImagePainter`/`SubcomposeAsyncImage` の Android Studio プレビュー時の動作は、`LocalAsyncImagePreviewHandler` によって制御されます。デフォルトでは、プレビュー環境内でも通常通りリクエストの実行を試みます。プレビュー環境ではネットワークアクセスが無効になっているため、ネットワーク URL は常に失敗します。

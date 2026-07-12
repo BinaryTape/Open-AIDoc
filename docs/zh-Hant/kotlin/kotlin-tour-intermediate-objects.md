@@ -1,30 +1,18 @@
-[//]: # (title: 中階：物件)
+[//]: # (title: 物件)
 
 <no-index/>
-
-<tldr>
-    <p><img src="icon-1-done.svg" width="20" alt="第一步" /> <a href="kotlin-tour-intermediate-extension-functions.md">擴充方法</a><br />
-        <img src="icon-2-done.svg" width="20" alt="第二步" /> <a href="kotlin-tour-intermediate-scope-functions.md">作用域函式</a><br />
-        <img src="icon-3-done.svg" width="20" alt="第三步" /> <a href="kotlin-tour-intermediate-lambdas-receiver.md">具備接收者的 Lambda 運算式</a><br /> 
-        <img src="icon-4-done.svg" width="20" alt="第四步" /> <a href="kotlin-tour-intermediate-classes-interfaces.md">類別與介面</a><br /> 
-        <img src="icon-5.svg" width="20" alt="第四步" /> <strong>物件</strong><br />
-        <img src="icon-6-todo.svg" width="20" alt="第六步" /> <a href="kotlin-tour-intermediate-open-special-classes.md">Open 與特殊類別</a><br />
-        <img src="icon-7-todo.svg" width="20" alt="第七步" /> <a href="kotlin-tour-intermediate-properties.md">屬性</a><br />
-        <img src="icon-8-todo.svg" width="20" alt="第八步" /> <a href="kotlin-tour-intermediate-null-safety.md">空值安全</a><br />
-        <img src="icon-9-todo.svg" width="20" alt="第九步" /> <a href="kotlin-tour-intermediate-libraries-and-apis.md">程式庫與 API</a></p>
-</tldr>
 
 在本章節中，您將透過探索物件宣告來擴展對類別的理解。這些知識將幫助您在專案中高效地管理行為。
 
 ## 物件宣告
 
-在 Kotlin 中，您可以使用 **物件宣告 (object declarations)** 來宣告一個只有單一執行個體的類別。從某種意義上說，您在宣告類別的「同時」也建立了該單一執行個體。當您想要建立一個類別作為程式的單一參考點，或是在系統中協調行為時，物件宣告非常有用。
+在 Kotlin 中，您可以使用 **物件宣告 (object declarations)** 來宣告一個具有單一執行個體的類別。從某種意義上說，您在宣告類別的「同時」也建立了該單一執行個體。當您想要建立一個類別來作為程式的單一參考點，或是在系統中協調行為時，物件宣告非常有用。
 
 > 只有一個易於存取的執行個體之類別稱為 **單例 (singleton)**。
 >
 {style="tip"}
 
-Kotlin 中的物件是 **延遲 (lazy)** 載入的，這意味著它們只有在被存取時才會被建立。Kotlin 還確保所有物件都以執行緒安全的方式建立，因此您無需手動檢查。
+Kotlin 中的物件是 **延遲 (lazy)** 載入的，這代表它們只有在被存取時才會被建立。Kotlin 還確保所有物件都以執行緒安全的方式建立，因此您無需手動檢查。
 
 要建立物件宣告，請使用 `object` 關鍵字：
 
@@ -148,7 +136,7 @@ fun main() {
 
 欲了解更多資訊，請參閱 [](object-declarations.md#companion-objects)。
 
-## 練習
+## 練習 {completion-point="true"}
 
 ### 練習 1 {initial-collapse-state="collapsed" collapsible="true" id="objects-exercise-1"}
 
@@ -331,6 +319,13 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="範例解答" id="kotlin-tour-objects-solution-3"}
 
-## 下一步
+<seealso></seealso>
 
-[中階：Open 與特殊類別](kotlin-tour-intermediate-open-special-classes.md)
+<list columns="2" id="tour-nav">
+  <li>
+    <a as="button" href="kotlin-tour-intermediate-classes-interfaces.md" mode="outline" icon="arrow-left" icon-position="left">上一步</a>
+  </li>
+  <li>
+    <a as="button" href="kotlin-tour-intermediate-open-special-classes.md" mode="classic" icon="arrow-right" icon-position="right">下一步</a>
+  </li>
+</list>

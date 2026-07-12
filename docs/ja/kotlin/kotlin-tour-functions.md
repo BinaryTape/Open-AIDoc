@@ -2,16 +2,6 @@
 
 <no-index/>
 
-<tldr>
-    <p><img src="icon-1-done.svg" width="20" alt="First step" /> <a href="kotlin-tour-hello-world.md">Hello world</a><br />
-        <img src="icon-2-done.svg" width="20" alt="Second step" /> <a href="kotlin-tour-basic-types.md">基本の型 (Basic types)</a><br />
-        <img src="icon-3-done.svg" width="20" alt="Third step" /> <a href="kotlin-tour-collections.md">コレクション (Collections)</a><br />
-        <img src="icon-4-done.svg" width="20" alt="Fourth step" /> <a href="kotlin-tour-control-flow.md">制御フロー (Control flow)</a><br />
-        <img src="icon-5.svg" width="20" alt="Fifth step" /> <strong>関数 (Functions)</strong><br />
-        <img src="icon-6-todo.svg" width="20" alt="Sixth step" /> <a href="kotlin-tour-classes.md">クラス (Classes)</a><br />
-        <img src="icon-7-todo.svg" width="20" alt="Final step" /> <a href="kotlin-tour-null-safety.md">Null安全 (Null safety)</a></p>
-</tldr>
-
 Kotlinでは、`fun`キーワードを使用して独自の関数を宣言できます。
 
 ```kotlin
@@ -65,7 +55,7 @@ fun main() {
 
 コードを簡潔にするために、関数を呼び出す際にパラメータ名を含める必要はありません。しかし、パラメータ名を含めると、コードが読みやすくなります。これは**名前付き引数** (Named arguments) と呼ばれます。パラメータ名を含める場合は、パラメータを任意の順序で記述できます。
 
-> 以下の例では、パラメータの値にアクセスし、それらを `String` 型に変換して、印刷用に文字列として連結するために、[文字列テンプレート](strings.md#string-templates) (`$`) を使用しています。
+> 以下の例では、パラメータの値にアクセスし、それらを `String` 型に変換して、印刷用に文字列として連結するために、[文字列テンプレート](strings.md#string-templates) ( ) を使用しています。
 > 
 {style="tip"}
 
@@ -589,6 +579,13 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="解答例" id="kotlin-tour-lambdas-solution-2"}
 
-## 次のステップ
+<seealso></seealso>
 
-[クラス (Classes)](kotlin-tour-classes.md)
+<list columns="2" id="tour-nav">
+  <li>
+    <a as="button" href="kotlin-tour-control-flow.md" mode="outline" icon="arrow-left" icon-position="left">前のステップ</a>
+  </li>
+  <li>
+    <a as="button" href="kotlin-tour-classes.md" mode="classic" icon="arrow-right" icon-position="right">次のステップ</a>
+  </li>
+</list>

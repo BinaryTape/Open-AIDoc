@@ -259,6 +259,39 @@ Kotlin 為此提供了所謂的*星號投影*語法：
 >
 {style="note"}
 
+### 捕獲型別 (Captured types)
+
+當你使用型別投影（例如 `out T` 或 `in T`）時，編譯器會在內部將未知的具體型別表示為一個 [捕獲型別 (captured type)](https://kotlinlang.org/spec/type-system.html#type-capturing)。捕獲型別是一種具有已知上限和下限的未知型別。
+
+捕獲型別是不可直接表示的 (non-denotable)，因此你無法在 Kotlin 程式碼中直接撰寫它們。相反地，你最常在編譯器診斷資訊中看到捕獲型別，例如 `CapturedType(out X)`。例如，以下型別不符的診斷資訊包含了一個捕獲型別：
+
+```kotlin
+val array: Array<out CharSequence> = arrayOf("str")
+val item: Int = array.get(0)
+// Initializer type mismatch: expected 'Int', actual 'CapturedType(out CharSequence)'
+```
+
+編譯器使用捕獲型別的上限來進行讀取操作，並使用其下限來確定哪些值對於寫入操作是型別安全的：
+
+```kotlin
+// 投影型別為 Array<out CharSequence>
+val array: Array<out CharSequence> = arrayOf("Kotlin")
+
+// get() 讀取操作使用捕獲型別的上限 CharSequence
+val item = array.get(0)
+
+// set() 寫入操作使用捕獲型別的下限 Nothing，這會導致錯誤
+array.set(0, "New value")
+// Receiver type 'Array<out CharSequence>' contains out projection
+// which prohibits the use of 'fun set(index: Int, value: T): Unit'
+```
+
+在此範例中：
+
+* 變數 `array` 具有投影型別 `Array<out CharSequence>`。編譯器將投影型別引數 `out CharSequence` 表示為一個以 `CharSequence` 為上限、`Nothing` 為下限的捕獲型別。
+* 對於 `get()` 操作，編譯器將捕獲型別近似為其上限 `CharSequence`，並將 `item` 的型別推論為 `CharSequence`。
+* 對於 `set()` 操作，捕獲型別的下限為 `Nothing`。由於 `Nothing` 沒有執行個體，因此向投影型別寫入值是不安全的，會導致錯誤。
+
 ## 泛型函式
 
 不僅僅是類別可以擁有型別參數，函式也可以。型別參數放在函式名稱*之前*：

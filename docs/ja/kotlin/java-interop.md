@@ -139,8 +139,13 @@ foo.`is`(bar)
 ## Null安全とプラットフォーム型 (Null-safety and platform types)
 
 Javaのあらゆる参照は `null` になる可能性があるため、Javaから来るオブジェクトに対してKotlinの厳格なNull安全要件を適用するのは現実的ではありません。
-Java宣言の型はKotlinでは特別な方法で扱われ、*プラットフォーム型 (platform types)* と呼ばれます。これらの型についてはNullチェックが緩和されるため、安全性の保証はJavaと同じになります（詳細は[後述](#mapped-types)を参照）。
+Java宣言の型はKotlinでは特別な方法で扱われ、[*プラットフォーム型 (platform types)*](https://kotlinlang.org/spec/type-system.html#platform-types) と呼ばれます。
+プラットフォーム型は *non-denotable（明示的に記述できない）* 型であり、言語内で明示的に書き下ろすことはできません。そのため、プラットフォーム値がKotlinの変数に代入されるとき、以下のことが可能です：
 
+* 型推論に任せる。この場合、変数は推論されたプラットフォーム型になります。
+* 期待する型を選択する。KotlinではNull許容型と非Null型の両方が許可されます。
+
+これら型についてはNullチェックが緩和されるため、安全性の保証はJavaと同じになります（詳細は[後述](#mapped-types)を参照）。
 以下の例を考えてみましょう：
 
 ```kotlin
@@ -156,8 +161,7 @@ val item = list[0] // プラットフォーム型と推論される（通常のJ
 item.substring(1) // 許可されるが、item == null の場合は例外を投げる
 ```
 
-プラットフォーム型は *non-denotable（明示的に記述できない）* 型であり、言語内で明示的に書き下ろすことはできません。
-プラットフォーム値がKotlinの変数に代入されるとき、型推論に任せるか（上の例の `item` のように、変数は推論されたプラットフォーム型になります）、期待する型を選択できます（Null許容型と非Null型の両方が許可されます）：
+プラットフォーム型の値は、Null許容型と非Null型の両方のKotlin変数に代入できます。しかし、そのような値を非Null型の変数に代入し、その値が実行時に実際に `null` であった場合、Kotlinは `NullPointerException` をスローします。これを避けるには、Kotlinコードに明示的なNull許容性を追加してください：
 
 ```kotlin
 val nullable: String? = item // 許可される、常に動作する
@@ -175,6 +179,8 @@ val notNull: String = item // 許可されるが、実行時に失敗する可�
 * `T!` は「`T` または `T?`」を意味します。
 * `(Mutable)Collection<T>!` は「`T` のJavaコレクション。ミュータブルかもしれないし、そうでないかもしれない。Null許容かもしれないし、そうでないかもしれない」を意味します。
 * `Array<(out) T>!` は「`T`（または `T` のサブタイプ）のJava配列。Null許容かもしれないし、そうでないかもしれない」を意味します。
+
+エラーメッセージやIDEのツールチップでこの表記を見た場合は、Kotlinの変数に明示的な型アノテーションを追加してNull安全チェックを復元するか、Null許容性アノテーションを使用してソースレベルでプラットフォーム型を排除してください。
 
 ### Null許容性アノテーション (Nullability annotations)
 
@@ -579,8 +585,8 @@ Javaの配列は[後述](#java-arrays)の通りマップされます：
 | `int[]`       | `kotlin.IntArray!`             |
 | `String[]`    | `kotlin.Array<(out) String!>!` |
 
-> これらのJava型の静的メンバは、Kotlin型の[コンパニオンオブジェクト](object-declarations.md#companion-objects)から直接アクセスすることはできません。それらを呼び出すには、Java型の完全修飾名を使用してください。例：`java.lang.Integer.toHexString(foo)`
-
+> これらのJava型の静的メンバは、Kotlin型の[コンパニオンオブジェクト](object-declarations.md#companion-objects)から直接アクセスすることはできません。それらを呼び出すには、Java型の完全修飾名を使用してください。例：`java.lang.Integer.toHexString(foo)`。
+>
 {style="note"}
 
 ## KotlinにおけるJavaジェネリクス

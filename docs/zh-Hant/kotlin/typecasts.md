@@ -225,7 +225,7 @@ class Cat {
 fun petAnimal(animal: Any) {
     val isCat = animal is Cat
     if (isCat) {
-        // 編編譯器可以存取有關 isCat 的資訊，
+        // 編譯器可以存取有關 isCat 的資訊，
         // 因此它知道 animal 被智慧轉換為 Cat 型別。
         // 因此，可以呼叫 purr() 函式。
         animal.purr()
@@ -255,6 +255,8 @@ if (x is String && x.length > 0) {
 }
 ```
 
+如果您使用 `and` 運算子 (`&&`) 組合多個物件的型別檢查，編譯器會同時將物件智慧轉換為所有已檢查的型別。進一步了解請參閱 [交集型別 (Intersection types)](#intersection-types)。
+
 如果您使用 `or` 運算子 (`||`) 組合多個物件的型別檢查，智慧轉換會將其轉換為最接近的共同父型別：
 
 ```kotlin
@@ -277,6 +279,38 @@ fun signalCheck(signalStatus: Any) {
 > 共同父型別是 [聯合型別 (union type)](https://en.wikipedia.org/wiki/Union_type) 的一種 **近似**。Kotlin [目前不支援聯合型別](https://youtrack.jetbrains.com/issue/KT-13108/Denotable-union-and-intersection-types)。
 >
 {style="note"}
+
+### 交集型別
+
+當編譯器透過多個 `&&` 檢查來智慧轉換物件時，它會推斷出一個 [*交集型別 (intersection type)*](https://kotlinlang.org/spec/type-system.html#intersection-types)。
+這是一種內部型別，同時滿足所有已檢查的約束：
+
+```kotlin
+interface Bird {
+    fun fly()
+}
+
+interface Fish {
+    fun swim()
+}
+
+fun describe(animal: Any) {
+    // 推斷出 Bird 與 Fish 型別
+    if (animal is Bird && animal is Fish) {
+        // 無需額外的檢查或轉換即可存取 fly() 與 swim()
+        animal.fly()
+        animal.swim()
+    }
+}
+```
+
+交集型別是無法直接表示的 (non-denotable)。它們僅存在於編譯器的內部型別系統中，用以在型別檢查期間保留型別資訊。您無法直接在 Kotlin 程式碼中撰寫它們。您可能會在編譯器錯誤訊息和 IDE 工具提示中遇到交集型別，通常顯示為 `A & B`。
+唯一的例外是 `T & Any`，它宣告了一個 [絕對非 null 型別](generics.md#definitely-non-nullable-types)。
+此語法專門用於將型別參數與 `Any` 組合。
+
+```kotlin
+fun  <T> T.assertNotNull(): T & Any = this ?: throw IllegalStateException("null value")
+```
 
 ### 內嵌函式
 

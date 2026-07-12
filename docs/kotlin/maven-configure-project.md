@@ -6,7 +6,7 @@
 
 ## 自动配置
 
-在 Java-Kotlin 混合项目和纯 Kotlin 项目中，您都可以使用 `<extensions>` 扩展程序选项来简化 Maven 配置。这种方法可以节省您的时间，因为您不需要配置 Maven 编译器插件。
+在 Java-Kotlin 混合项目和纯 Kotlin 项目中，您都可以使用 `<extensions>` 选项来简化 Maven 配置。这种方法可以节省您的时间，因为您不需要配置 Maven 编译器插件。
 
 要应用带有 `<extensions>` 的 Kotlin Maven 插件，请按以下方式更新您的 `pom.xml` 构建文件：
 
@@ -55,6 +55,30 @@
 >
 {style="note"}
 
+<anchor name="maven-compiler-extensions-version"/>
+
+目前，与 `<extensions>` 配合使用的 Maven 编译器插件的默认版本为 **%mavenExtensionsVersion%**。您可以单独设置不同的版本：
+
+```xml
+<build>
+    <plugins>
+        <!-- Kotlin 编译器插件配置 -->
+        <plugin>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-maven-plugin</artifactId>
+            <version>${kotlin.version}</version>
+            <extensions>true</extensions>
+        </plugin>
+        <!-- 针对 Java 类的 Maven 编译器插件配置 -->
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>%mavenPluginVersion%</version>
+        </plugin>
+    </plugins>
+</build>
+```
+
 ### JVM 目标版本
 
 `<extensions>` 选项可确保 Kotlin 和 Maven 编译器以相同的字节码版本为目标。
@@ -91,6 +115,7 @@ graph TD
 * 如果既未设置 `kotlin.compiler.jdkRelease` 也未设置 `kotlin.compiler.jvmTarget` 选项，则插件将采用 `maven.compiler.release` 版本。
 
   `maven.compiler.release` 版本既可以定义为项目属性，也可以在 `maven-compiler-plugin` 配置中定义。
+* If the Maven release version isn't set, the plugin takes the `maven.compiler.target` version.
 * 如果未设置 Maven release 版本，则插件将采用 `maven.compiler.target` 版本。
 
   它既可以定义为项目属性，也可以在 `maven-compiler-plugin` 配置中定义。
@@ -105,30 +130,6 @@ graph TD
 > `<extensions>` 选项仅检查项目级属性和全局 `maven-compiler-plugin` 配置。它不会检查插件 `<executions>` 部分中定义的配置。
 >
 {style="note"}
-
-### Maven 编译器版本
-
-目前，与 `<extensions>` 配合使用的 Maven 编译器插件的默认版本为 **%mavenExtensionsVersion%**。您可以单独设置不同的版本：
-
-```xml
-<build>
-    <plugins>
-        <!-- Kotlin 编译器插件配置 -->
-        <plugin>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-maven-plugin</artifactId>
-            <version>${kotlin.version}</version>
-            <extensions>true</extensions>
-        </plugin>
-        <!-- 针对 Java 类的 Maven 编译器插件配置 -->
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <version>%mavenPluginVersion%</version>
-        </plugin>
-    </plugins>
-</build>
-```
 
 ## 手动配置
 
@@ -147,10 +148,11 @@ Maven 根据两个主要因素确定插件执行顺序：
 * `pom.xml` 文件中插件声明的顺序。
 * 内置的默认执行，例如 `default-compile` 和 `default-testCompile`，无论它们在 `pom.xml` 文件中的位置如何，它们始终在用户定义的执行之前运行。
 
+To control the execution order:
 要控制执行顺序：
 
 * 在 `maven-compiler-plugin` 之前声明 `kotlin-maven-plugin`。
-* 禁用 Java 编译器插件'的默认执行。
+* 禁用 Java 编译器插件的默认执行。
 * 添加自定义执行以显式控制编译阶段。
 
 > 您可以使用 Maven 中特殊的 `none` 阶段来禁用默认执行。

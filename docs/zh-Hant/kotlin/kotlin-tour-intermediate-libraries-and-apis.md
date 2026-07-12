@@ -1,22 +1,10 @@
-[//]: # (title: 中階：程式庫與 API)
+[//]: # (title: 程式庫與 API)
 
 <no-index/>
 
-<tldr>
-    <p><img src="icon-1-done.svg" width="20" alt="第一步" /> <a href="kotlin-tour-intermediate-extension-functions.md">擴充函式</a><br />
-        <img src="icon-2-done.svg" width="20" alt="第二步" /> <a href="kotlin-tour-intermediate-scope-functions.md">作用域函式</a><br />
-        <img src="icon-3-done.svg" width="20" alt="第三步" /> <a href="kotlin-tour-intermediate-lambdas-receiver.md">包含接收者的 Lambda 表達式</a><br />
-        <img src="icon-4-done.svg" width="20" alt="第四步" /> <a href="kotlin-tour-intermediate-classes-interfaces.md">類別與介面</a><br />
-        <img src="icon-5-done.svg" width="20" alt="第五步" /> <a href="kotlin-tour-intermediate-objects.md">物件</a><br />
-        <img src="icon-6-done.svg" width="20" alt="第六步" /> <a href="kotlin-tour-intermediate-open-special-classes.md">Open 類別與特殊類別</a><br />
-        <img src="icon-7-done.svg" width="20" alt="第七步" /> <a href="kotlin-tour-intermediate-properties.md">屬性</a><br />
-        <img src="icon-8-done.svg" width="20" alt="第八步" /> <a href="kotlin-tour-intermediate-null-safety.md">Null 安全</a><br />
-        <img src="icon-9.svg" width="20" alt="第九步" /> <strong>程式庫與 API</strong><br /></p>
-</tldr>
-
 為了充分發揮 Kotlin 的優勢，請使用現有的程式庫與 API，這樣您就能將更多時間花在編寫程式碼上，而不是浪費時間在重複造輪子。
 
-程式庫負責散布可重用的程式碼，能簡化常見的任務。在程式庫中，會有套件與物件來對相關的類別、函式及工具進行分組。程式庫將 API (應用程式編程介面) 公開為一組函式、類別或屬性，供開發人員在自己的程式碼中使用。
+程式庫負責散佈可重用的程式碼，能簡化常見的任務。在程式庫中，會有套件與物件來對相關的類別、函式及工具進行分組。程式庫將 API (應用程式編程介面) 公開為一組函式、類別或屬性，供開發人員在自己的程式碼中使用。
 
 ![Kotlin 程式庫與 API](kotlin-library-diagram.svg){width=600}
 
@@ -86,7 +74,7 @@ fun main() {
 
 ## Kotlin 程式庫
 
-標準函式庫涵蓋了許多常見的使用案例，但仍有一些情況未涉及。幸運的是，Kotlin 團隊和社群其他成員開發了各式各樣的程式庫來補充標準函式庫。例如，[`kotlinx-datetime`](https://kotlinlang.org/api/kotlinx-datetime/) 能協助您在不同平台間管理時間。
+標準函式庫涵蓋了許多常見的使用案例，但仍有一些情況未涉及。幸運的是， Kotlin 團隊和社群其他成員開發了各式各樣的程式庫來補充標準函式庫。例如，[`kotlinx-datetime`](https://kotlinlang.org/api/kotlinx-datetime/) 能協助您在不同平台間管理時間。
 
 您可以在我們的[搜尋平台](https://klibs.io/)上找到有用的程式庫。若要使用它們，您需要執行額外的步驟，例如新增相依性或外掛程式。每個程式庫都有一個 GitHub 儲存庫，其中包含如何將其包含在您的 Kotlin 專案中的說明。
 
@@ -159,9 +147,9 @@ fun main() {
 ```
 {kotlin-runnable="true" id="kotlin-tour-libraries-apis"}
 
-這是最簡單的選擇性加入方式，但還有其他方法。若要了解更多，請參閱[選擇性加入需求 (Opt-in requirements)](opt-in-requirements.md)。
+這是最簡單的選擇性加入方式，但還有其他方法。若要了解更多，請參閱[選擇性加入需求](opt-in-requirements.md)。
 
-## 練習
+## 練習 {completion-point="true"}
 
 ### 練習 1 {initial-collapse-state="collapsed" collapsible="true" id="libraries-exercise-1"}
 
@@ -283,9 +271,17 @@ fun main() {
 
 恭喜！您已完成中階導覽！您願意[分享您的意見回饋](https://surveys.hotjar.com/bf4ce865-99ce-4fc1-b107-e9b16bc31592)嗎？
 
-下一步，請查看我們針對熱門 Kotlin 應用程式的教學：
+作為下一步，請查看我們針對熱門 Kotlin 應用程式的教學：
 
 * [使用 Spring Boot 與 Kotlin 建立後端應用程式](jvm-create-project-with-spring-boot.md)
 * 從頭開始為 Android 與 iOS 建立跨平台應用程式，並且：
     * [在保持 UI 原生的同時共用商務邏輯](https://kotlinlang.org/docs/multiplatform/multiplatform-create-first-app.html)
     * [共用商務邏輯與 UI](https://kotlinlang.org/docs/multiplatform/compose-multiplatform-create-first-app.html)
+
+<seealso></seealso>
+
+<list id="tour-nav">
+  <li>
+    <a as="button" href="kotlin-tour-intermediate-null-safety.md" mode="outline" icon="arrow-left" icon-position="left">上一步</a>
+  </li>
+</list>

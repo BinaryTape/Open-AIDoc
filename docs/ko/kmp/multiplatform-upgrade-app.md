@@ -17,7 +17,7 @@
 
 이제 외부 종속성을 사용하여 공통 로직을 구현했으므로, 더 복잡한 로직을 추가하기 시작할 수 있습니다. 네트워크 요청과 데이터 직렬화(serialization)는 Kotlin Multiplatform을 사용하여 코드를 공유하는 [가장 인기 있는 사례](https://kotlinlang.org/lp/multiplatform/)입니다. 첫 번째 애플리케이션에서 이를 구현하는 방법을 배워, 이 온보딩 과정을 마친 후 미래의 프로젝트에서도 활용할 수 있도록 해보세요.
 
-업데이트된 앱은 인터넷을 통해 [LaunchLibrary 2](https://lldev.thespacedevs.com/docs) API로부터 데이터를 가져와 마지막으로 성공한 SpaceX 로켓 발사 날짜를 표시합니다.
+업데이트된 앱은 인터넷을 통해 [LaunchLibrary 2](https://lldev.thespacedevs.com/docs) API로부터 데이터를 가져와 최신 우주 발사에 대한 설명을 표시합니다.
 
 > 서로 다른 코루틴(coroutine) 솔루션이 적용된 프로젝트의 최종 상태를 GitHub 리포지토리의 두 브랜치에서 확인할 수 있습니다.
 > * [`main`](https://github.com/kotlin-hands-on/get-started-with-kmp/tree/main) 브랜치는 KMP-NativeCoroutines 구현을 포함합니다.

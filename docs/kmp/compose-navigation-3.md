@@ -26,7 +26,7 @@ Navigation 3 的关键变化包括：
 
 ```toml
 [versions]
-multiplatform-nav3-ui = "1.0.0-alpha05"
+multiplatform-nav3-ui = "1.1.1"
 
 [libraries]
 jetbrains-navigation3-ui = { module = "org.jetbrains.androidx.navigation3:navigation3-ui", version.ref = "multiplatform-nav3-ui" }
@@ -40,8 +40,8 @@ jetbrains-navigation3-ui = { module = "org.jetbrains.androidx.navigation3:naviga
 对于使用 Material 3 Adaptive 和 ViewModel 库的项目，还需添加以下导航支持构件：
 ```toml
 [versions]
-compose-multiplatform-adaptive = "1.3.0-alpha02"
-compose-multiplatform-lifecycle = "2.10.0-alpha05"
+compose-multiplatform-adaptive = "1.3.0-beta02"
+compose-multiplatform-lifecycle = "2.10.0"
 
 [libraries]
 jetbrains-material3-adaptiveNavigation3 = { module = "org.jetbrains.compose.material3.adaptive:adaptive-navigation3", version.ref = "compose-multiplatform-adaptive" }
@@ -52,13 +52,14 @@ jetbrains-lifecycle-viewmodelNavigation3 = { module = "org.jetbrains.androidx.li
 
 ```toml
 [versions]
-compose-multiplatform-navigation3-browser = "0.2.0"
+compose-multiplatform-navigation3-browser = "1.1.0"
 
 [libraries]
 navigation3-browser = { module = "com.github.terrakok:navigation3-browser", version.ref = "compose-multiplatform-navigation3-browser" }
 ```
 
-预计基础多平台 Navigation 3 库将在 1.1.0 版本中支持浏览器历史记录导航。
+计划在未来的版本中为基础多平台 Navigation 3 库提供浏览器历史记录导航支持。
+请在 [CMP-8924](https://youtrack.jetbrains.com/projects/CMP/issues/CMP-8924/Integrate-Browser-History-with-Nav3) 中跟踪进度。
 
 ## 多平台支持
 

@@ -43,10 +43,6 @@ Kotlin 2.4.0이 출시되었습니다! 주요 하이라이트는 다음과 같�
 * [Maven: Java와 JVM 타겟 버전 간의 자동 정렬](#automatic-alignment-between-java-and-jvm-target-versions)
 * [Maven Toolchains 지원](#support-for-maven-toolchains)
 
-> IntelliJ IDEA에서 `-Xexplicit-backing-fields` 컴파일러 옵션 없이 명시적 백킹 필드를 사용하는 기능은 2026.1.4 버전부터 지원될 예정입니다.
->
-{style = "note"}
-
 ## 새로운 기능 {id=new-experimental-features}
 <primary-label ref="experimental-exp"/>
 
@@ -1090,7 +1086,7 @@ Kotlin 2.4.0은 Kotlin Maven 플러그인에 [Maven Toolchains](https://maven.ap
 ```
 JDK 버전을 설정하는 다양한 방법의 우선순위를 명심하세요:
 
-1. `jdkHome` in the `kotlin-maven-plugin` 구성의 `jdkHome`. 명시적으로 설정된 `jdkHome` 옵션은 항상 툴체인 버전보다 우선합니다. 
+1. `kotlin-maven-plugin` 구성의 `jdkHome`. 명시적으로 설정된 `jdkHome` 옵션은 항상 툴체인 버전보다 우선합니다. 
 2. `maven-toolchains-plugin`의 JDK 버전. Maven Toolchains를 통해 설정된 JDK 버전은 `JAVA_HOME` 경로에 설정된 JDK 버전보다 우선합니다.
 3. `JAVA_HOME` 경로.
 
@@ -1324,7 +1320,7 @@ Kotlin 생태계에서 다음과 같은 문서 변경 사항이 있었습니다:
 * [Navigation 3를 위한 권장 직렬화 접근 방식](https://kotlinlang.org/docs/multiplatform/compose-navigation-3.html#recommended-serialization-approaches) – CMP 애플리케이션의 Navigation 3에서 직렬화를 사용하는 가장 좋은 방법을 찾습니다.
 * [멀티플랫폼 ViewModel](https://kotlinlang.org/docs/multiplatform/compose-viewmodel.html) – 멀티플랫폼 프로젝트에서 ViewModel을 설정하고 작업하는 방법을 알아봅니다.
 * [Kotlin을 사용한 백엔드 개발](server-overview.md) – 백엔드 개발에 사용할 수 있는 다양한 프레임워크를 살펴봅니다.
-* [Spring Boot와 Claude를 사용하여 작업 관리자 앱 만들기](spring-boot-claude.md) – Learn how Claude can help you create an app with Spring Boot from scratch.
+* [Spring Boot와 Claude를 사용하여 작업 관리자 앱 만들기](spring-boot-claude.md) – Claude가 처음부터 Spring Boot로 앱을 만드는 데 어떤 도움을 줄 수 있는지 알아봅니다.
 * [Maven 프로젝트 구성](maven-configure-project.md) – 기존 Java Maven 프로젝트 또는 새로운 Kotlin Maven 프로젝트에서 Kotlin 컴파일을 설정합니다.
 * [Maven으로 Kotlin 프로젝트 테스트](jvm-test-maven.md) – JUnit으로 테스트를 생성하고 Maven 플러그인을 사용하여 단위 및 통합 테스트를 실행하는 방법을 알아봅니다.
 * [Kotlin 프로젝트에서 어노테이션 프로세서 사용](jvm-annotation-processors.md) – 백엔드 프로젝트에서 어노테이션을 처리하기 위해 kapt와 KSP 중 선택합니다.

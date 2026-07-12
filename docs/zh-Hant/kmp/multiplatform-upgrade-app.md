@@ -17,7 +17,7 @@
 
 既然您已經使用外部相依性實作了通用邏輯，現在可以開始加入更複雜的邏輯。網路請求與資料序列化是使用 Kotlin Multiplatform 共享程式碼[最受歡迎的使用案例](https://kotlinlang.org/lp/multiplatform/)。了解如何在您的第一個應用程式中實作這些功能，以便在完成此引導歷程後，將其應用於未來的專案中。
 
-更新後的應用程式將透過網際網路從 [LaunchLibrary 2](https://lldev.thespacedevs.com/docs) API 擷取資料，並顯示 SpaceX 火箭最後一次成功發射的日期。
+更新後的應用程式將透過網際網路從 [LaunchLibrary 2](https://lldev.thespacedevs.com/docs) API 擷取資料，並顯示最新太空發射的說明。
 
 > 您可以在我們 GitHub 存儲庫的兩個分支中找到專案的最終狀態，分別使用了不同的協同程式解決方案：
 > * [`main`](https://github.com/kotlin-hands-on/get-started-with-kmp/tree/main) 分支包含 KMP-NativeCoroutines 實作，

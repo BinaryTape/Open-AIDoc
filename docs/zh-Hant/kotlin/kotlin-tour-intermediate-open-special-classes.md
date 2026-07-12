@@ -1,18 +1,6 @@
-[//]: # (title: 中階：Open 與特殊類別)
+[//]: # (title: Open 與特殊類別)
 
 <no-index/>
-
-<tldr>
-    <p><img src="icon-1-done.svg" width="20" alt="第一步" /> <a href="kotlin-tour-intermediate-extension-functions.md">擴充函式</a><br />
-        <img src="icon-2-done.svg" width="20" alt="第二步" /> <a href="kotlin-tour-intermediate-scope-functions.md">作用域函式</a><br />
-        <img src="icon-3-done.svg" width="20" alt="第三步" /> <a href="kotlin-tour-intermediate-lambdas-receiver.md">帶接收者的 Lambda 運算式</a><br />
-        <img src="icon-4-done.svg" width="20" alt="第四步" /> <a href="kotlin-tour-intermediate-classes-interfaces.md">類別與介面</a><br />
-        <img src="icon-5-done.svg" width="20" alt="第五步" /> <a href="kotlin-tour-intermediate-objects.md">物件</a><br />
-        <img src="icon-6.svg" width="20" alt="第六步" /> <strong>Open 與特殊類別</strong><br />
-        <img src="icon-7-todo.svg" width="20" alt="第七步" /> <a href="kotlin-tour-intermediate-properties.md">屬性</a><br />
-        <img src="icon-8-todo.svg" width="20" alt="第八步" /> <a href="kotlin-tour-intermediate-null-safety.md">可 Null 性安全</a><br />
-        <img src="icon-9-todo.svg" width="20" alt="第九步" /> <a href="kotlin-tour-intermediate-libraries-and-apis.md">程式庫與 API</a></p>
-</tldr>
 
 在本章中，您將了解 open 類別、它們如何與介面搭配運作，以及 Kotlin 中提供的其他特殊類別型別。
 
@@ -170,9 +158,9 @@ class ElectricCar(
 
 ### 密封類別
 
-有時您可能想要限制繼承。您可以使用密封類別（sealed classes）來達成此目的。密封類別是一種特殊型別的[抽象類別](kotlin-tour-intermediate-classes-interfaces.md#abstract-classes)。一旦您宣告類別為 sealed，您只能在同一個軟件包中建立其子類別。在該範圍之外繼承密封類別是不可能的。
+有時您可能想要限制繼承。您可以使用密封類別（sealed classes）來達成此目的。密封類別是一種特殊型別的[抽象類別](kotlin-tour-intermediate-classes-interfaces.md#abstract-classes)。一旦您宣告類別為 sealed，您只能在同一個套件中建立其子類別。在該範圍之外繼承密封類別是不可能的。
 
-> 軟件包是具有相關類別和函式的程式碼集合，通常位於一個目錄中。若要了解更多關於 Kotlin 中軟件包的資訊，請參閱[軟件包與匯入](packages.md)。
+> 套件是具有相關類別和函式的程式碼集合，通常位於一個目錄中。若要了解更多關於 Kotlin 中套件的資訊，請參閱[套件與匯入](packages.md)。
 > 
 {style="tip"}
 
@@ -363,7 +351,7 @@ fun main() {
 
 如需更多關於內嵌值類別的資訊，請參閱[內嵌值類別](inline-classes.md)。
 
-## 練習
+## 練習 {completion-point="true"}
 
 ### 練習 1 {initial-collapse-state="collapsed" collapsible="true" id="special-classes-exercise-1"}
 
@@ -532,6 +520,13 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="範例解法" id="kotlin-tour-special-classes-solution-2"}
 
-## 下一步
+<seealso></seealso>
 
-[中階：屬性](kotlin-tour-intermediate-properties.md)
+<list columns="2" id="tour-nav">
+  <li>
+    <a as="button" href="kotlin-tour-intermediate-objects.md" mode="outline" icon="arrow-left" icon-position="left">上一步</a>
+  </li>
+  <li>
+    <a as="button" href="kotlin-tour-intermediate-properties.md" mode="classic" icon="arrow-right" icon-position="right">下一步</a>
+  </li>
+</list>

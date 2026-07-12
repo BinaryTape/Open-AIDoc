@@ -2,16 +2,6 @@
 
 <no-index/>
 
-<tldr>
-    <p><img src="icon-1-done.svg" width="20" alt="第一步" /> <a href="kotlin-tour-hello-world.md">Hello world</a><br />
-        <img src="icon-2-done.svg" width="20" alt="第二步" /> <a href="kotlin-tour-basic-types.md">基本类型</a><br />
-        <img src="icon-3.svg" width="20" alt="第三步" /> <strong>集合</strong><br />
-        <img src="icon-4-todo.svg" width="20" alt="第四步" /> <a href="kotlin-tour-control-flow.md">控制流</a><br />
-        <img src="icon-5-todo.svg" width="20" alt="第五步" /> <a href="kotlin-tour-functions.md">函数</a><br />
-        <img src="icon-6-todo.svg" width="20" alt="第六步" /> <a href="kotlin-tour-classes.md">类</a><br />
-        <img src="icon-7-todo.svg" width="20" alt="最后一步" /> <a href="kotlin-tour-null-safety.md">null 安全</a></p>
-</tldr>
-
 在编程时，能够将数据分组到结构中以便后续处理是非常有用的。Kotlin 提供的集合正是为了这一目的。
 
 Kotlin 拥有以下用于对项进行分组的集合类型：
@@ -417,7 +407,7 @@ fun main() {
 
 现在你已经了解了基本类型以及如何管理集合，是时候探索可以在程序中使用的[控制流](kotlin-tour-control-flow.md)了。
 
-## 练习
+## 练习 {completion-point="true"}
 
 ### 练习 1 {initial-collapse-state="collapsed" collapsible="true"}
 
@@ -500,6 +490,13 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="示例解法" id="kotlin-tour-collections-solution-3"}
 
-## 下一步
+<seealso></seealso>
 
-[控制流](kotlin-tour-control-flow.md)
+<list columns="2" id="tour-nav">
+  <li>
+    <a as="button" href="kotlin-tour-basic-types.md" mode="outline" icon="arrow-left" icon-position="left">上一步</a>
+  </li>
+  <li>
+    <a as="button" href="kotlin-tour-control-flow.md" mode="classic" icon="arrow-right" icon-position="right">下一步</a>
+  </li>
+</list>

@@ -2,7 +2,7 @@
 
 本页面提供了关于如何使用 Coil 处理一些常见用例的指导。您可能需要修改这些代码以符合您的确切需求，但希望这能为您提供正确的方向！
 
-发现有未涵盖的常见用例？欢迎提交包含新章节的 PR。
+发现有未涵盖的常用用例？欢迎提交包含新章节的拉取请求 (PR)。
 
 ## Palette
 
@@ -50,6 +50,49 @@ detailImageView.load("https://example.com/image.jpg") {
     placeholderMemoryCacheKey(listImageView.result.memoryCacheKey)
 }
 ```
+
+## Compose AnimatedContent
+
+使用 `rememberAsyncImagePainter` 和 `AnimatedContent` 在占位符和加载的图像之间制作动画：
+
+```kotlin
+val sizeResolver = rememberConstraintsSizeResolver()
+val painter = rememberAsyncImagePainter(
+    model = ImageRequest.Builder(LocalPlatformContext.current)
+        .data("https://example.com/image.jpg")
+        .size(sizeResolver)
+        .build(),
+)
+val state by painter.state.collectAsState()
+
+AnimatedContent(
+    modifier = Modifier.then(sizeResolver),
+    targetState = state,
+    contentKey = { it::class },
+    transitionSpec = { fadeIn() togetherWith fadeOut() },
+) { targetState ->
+    when (targetState) {
+        is AsyncImagePainter.State.Empty,
+        is AsyncImagePainter.State.Loading -> PlaceholderContent()
+        is AsyncImagePainter.State.Success -> {
+            // 在模型更改后制作退出动画时，保持旧图像可见。
+            Image(
+                painter = targetState.painter,
+                contentDescription = stringResource(R.string.description),
+            )
+        }
+        is AsyncImagePainter.State.Error -> ErrorContent()
+    }
+}
+```
+
+将 `targetState.painter` 传递给 `Image`，以便在模型更改后制作退出动画时，旧图像保持可见。
+
+在加载完成之前，最终图像尺寸是未知的。请使用固定约束或已知的宽高比来预留空间。
+
+`rememberAsyncImagePainter` 以 `State.Empty` 开始，即使图像在内存缓存中也是如此。如果需要，可以使用 `state.result.dataSource` 来跳过内存缓存图像的动画。
+
+注意：`AnimatedContent` 的开销比 painter 淡入淡出大得多，并且会一直将旧图像保留在内存中，直到动画结束。在延迟列表或简单的淡入淡出效果中，请优先使用 `ImageRequest.Builder.crossfade`。
 
 ## 共享元素转换
 
@@ -100,7 +143,7 @@ imageLoader.enqueue(request)
 
 ## 转换 Painter
 
-`AsyncImage` 和 `AsyncImagePainter` 都有接受 `Painter` 的 `placeholder`/`error`/`fallback` 参数。Painter 的灵活性不如使用组合项，但速度更快，因为 Coil 不需要使用子组合。即便如此，可能仍需要对您的 painter 进行内切、拉伸、着色或转换以获得所需的 UI。要实现这一点，请[将此代码片段 (gist) 复制到您的项目中](https://gist.github.com/colinrtwhite/c2966e0b8584b4cdf0a5b05786b20ae1)并像这样包装 painter：
+`AsyncImage` 和 `AsyncImagePainter` 都有接受 `Painter` 的 `placeholder`/`error`/`fallback` 参数。Painter 的灵活性不如使用组合项，但速度更快，因为 Coil 不需要使用子组合。即便如此，可能仍需要对您的 painter 进行内切、拉伸、着色或转换以获得所需的 UI。要实现这一点，请[将此代码片段 (Gist) 复制到您的项目中](https://gist.github.com/colinrtwhite/c2966e0b8584b4cdf0a5b05786b20ae1)并像这样包装 painter：
 
 ```kotlin
 AsyncImage(

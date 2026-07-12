@@ -2,16 +2,6 @@
 
 <no-index/>
 
-<tldr>
-    <p><img src="icon-1-done.svg" width="20" alt="第一步" /> <a href="kotlin-tour-hello-world.md">Hello world</a><br />
-        <img src="icon-2-done.svg" width="20" alt="第二步" /> <a href="kotlin-tour-basic-types.md">基本型別</a><br />
-        <img src="icon-3-done.svg" width="20" alt="第三步" /> <a href="kotlin-tour-collections.md">集合</a><br />
-        <img src="icon-4-done.svg" width="20" alt="第四步" /> <a href="kotlin-tour-control-flow.md">控制流</a><br />
-        <img src="icon-5-done.svg" width="20" alt="第五步" /> <a href="kotlin-tour-functions.md">函式</a><br />
-        <img src="icon-6.svg" width="20" alt="第六步" /> <strong>類別</strong><br />
-        <img src="icon-7-todo.svg" width="20" alt="最後一步" /> <a href="kotlin-tour-null-safety.md">Null 安全</a></p>
-</tldr>
-
 Kotlin 透過類別與物件支援物件導向程式設計。物件在程式中對於儲存資料非常有用。
 類別允許您為物件宣告一組特性。當您從類別建立物件時，可以節省時間和精力，因為您不必每次都宣告這些特性。
 
@@ -241,7 +231,7 @@ fun main() {
 
 本導覽的最後一章是關於 Kotlin 的 [Null 安全](kotlin-tour-null-safety.md)。
 
-## 練習
+## 練習 {completion-point="true"}
 
 ### 習題 1 {initial-collapse-state="collapsed" collapsible="true"}
 
@@ -376,6 +366,13 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="範例解答" id="kotlin-tour-classes-solution-3"}
 
-## 下一步
+<seealso></seealso>
 
-[Null 安全](kotlin-tour-null-safety.md)
+<list columns="2" id="tour-nav">
+  <li>
+    <a as="button" href="kotlin-tour-functions.md" mode="outline" icon="arrow-left" icon-position="left">上一步</a>
+  </li>
+  <li>
+    <a as="button" href="kotlin-tour-null-safety.md" mode="classic" icon="arrow-right" icon-position="right">下一步</a>
+  </li>
+</list>

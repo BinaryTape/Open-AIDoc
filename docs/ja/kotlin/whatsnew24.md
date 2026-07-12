@@ -43,10 +43,6 @@ Kotlin の最新バージョンは、[IntelliJ IDEA](https://www.jetbrains.com/i
 * [Maven: Java と JVM ターゲットバージョンの自動調整](#automatic-alignment-between-java-and-jvm-target-versions)
 * [Maven Toolchains のサポート](#support-for-maven-toolchains)
 
-> IntelliJ IDEA で `-Xexplicit-backing-fields` コンパイラオプションなしで明示的なバッキングフィールドを使用するためのサポートは、2026.1.4 で利用可能になる予定です。
->
-{style = "note"}
-
 ## 新機能 {id=new-experimental-features}
 <primary-label ref="experimental-exp"/>
 
@@ -1098,7 +1094,7 @@ Kotlin 2.4.0 では、Kotlin Maven plugin に [Maven Toolchains](https://maven.a
 ```
 JDK バージョンを設定するさまざまな方法の優先順位に注意してください。
 
-1. `kotlin-maven-plugin` 構成内の `jdkHome`。明示的に設定された `jdkHome` オプションは、常にツールチェーンバージョンよりも優先されます。
+1. `jdkHome` 在 `kotlin-maven-plugin` 構成内の `jdkHome`。明示的に設定された `jdkHome` オプションは、常にツールチェーンバージョンよりも優先されます。
 2. `maven-toolchains-plugin` 内の JDK バージョン。Maven Toolchains を介して設定された JDK バージョンは、`JAVA_HOME` パスで設定された JDK バージョンを上書きします。
 3. `JAVA_HOME` パス。
 
@@ -1334,7 +1330,7 @@ Kotlin エコシステムにおいて、以下のドキュメント変更を行�
 * [Kotlin によるバックエンド開発](server-overview.md) – バックエンド開発に使用できるさまざまなフレームワークを探索。
 * [Spring Boot と Claude でタスク管理アプリを作成する](spring-boot-claude.md) – Claude が Spring Boot を使用してゼロからアプリを作成するのをどのように支援するかを学ぶ。
 * [Maven プロジェクトを構成する](maven-configure-project.md) – 既存の Java Maven プロジェクトまたは新しい Kotlin Maven プロジェクトで Kotlin コンパイルをセットアップ。
-* [Maven で Kotlin プロジェクトをテストする](jvm-test-maven.md) – JUnit でテストを作成し、Maven プラグインを使用してユニットテストと統合テストを実行する方法を学ぶ。
+* [Maven で Kotlin プロジェクトをテストする](jvm-test-maven.md) – Learn how to create tests with JUnit and use Maven plugins to run unit and integration tests。
 * [Kotlin プロジェクトでアノテーションプロセッサを使用する](jvm-annotation-processors.md) – バックエンドプロジェクトでアノテーションを処理するために kapt と KSP のどちらかを選択。
 * [Kotlin AI スキル](kotlin-ai-skills.md) – エージェントスキルを使用して、Kotlin 固有のタスクの実行を支援。
 * [Kotlin Language Server](kotlin-lsp.md) – JetBrains による公式の Kotlin 用 Language Server Protocol (LSP) 実装について読む。

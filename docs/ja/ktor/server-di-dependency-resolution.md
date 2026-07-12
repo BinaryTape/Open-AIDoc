@@ -9,7 +9,7 @@
 <var name="example_name" value="server-di"/>
 <p>
     <b>コード例</b>:
-    <a href="https://github.com/ktorio/ktor-documentation/tree/%ktor_version%/codeSnippets/snippets/%example_name%">
+    <a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/%example_name%">
         %example_name%
     </a>
 </p>
@@ -21,7 +21,7 @@ DIコンテナから依存関係を明示的に解決するには、[プロパ�
 
 ### プロパティ委譲を使用する {id="property-delegation"}
 
-プロパティ委譲を使用する場合、プロパティに初めてアクセスしたときに依存関係が遅延解決されます。
+プロパティ委譲を使用する場合、依存関係はスタートアップの検証（バリデーション）フェーズ中にのみ解決されます。
 
 ```kotlin
 val service: GreetingService by dependencies

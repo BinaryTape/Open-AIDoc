@@ -1,18 +1,6 @@
-[//]: # (title: 中級：プロパティ)
+[//]: # (title: プロパティ)
 
 <no-index/>
-
-<tldr>
-    <p><img src="icon-1-done.svg" width="20" alt="First step" /> <a href="kotlin-tour-intermediate-extension-functions.md">拡張関数</a><br />
-        <img src="icon-2-done.svg" width="20" alt="Second step" /> <a href="kotlin-tour-intermediate-scope-functions.md">スコープ関数</a><br />
-        <img src="icon-3-done.svg" width="20" alt="Third step" /> <a href="kotlin-tour-intermediate-lambdas-receiver.md">レシーバ付きラムダ式</a><br />
-        <img src="icon-4-done.svg" width="20" alt="Fourth step" /> <a href="kotlin-tour-intermediate-classes-interfaces.md">クラスとインターフェース</a><br />
-        <img src="icon-5-done.svg" width="20" alt="Fifth step" /> <a href="kotlin-tour-intermediate-objects.md">オブジェクト</a><br />
-        <img src="icon-6-done.svg" width="20" alt="Sixth step" /> <a href="kotlin-tour-intermediate-open-special-classes.md">Openクラスと特殊なクラス</a><br />
-        <img src="icon-7.svg" width="20" alt="Seventh step" /> <strong>プロパティ</strong><br />
-        <img src="icon-8-todo.svg" width="20" alt="Eighth step" /> <a href="kotlin-tour-intermediate-null-safety.md">Null安全</a><br />
-        <img src="icon-9-todo.svg" width="20" alt="Ninth step" /> <a href="kotlin-tour-intermediate-libraries-and-apis.md">ライブラリとAPI</a></p>
-</tldr>
 
 初心者向けツアーでは、クラスのインスタンスの特性を宣言するためにプロパティがどのように使用されるか、またそれらにアクセスする方法を学びました。この章では、Kotlinにおけるプロパティの仕組みをさらに深く掘り下げ、コードでプロパティを活用する他の方法について探ります。
 
@@ -377,7 +365,7 @@ Observable プロパティはログ記録やデバッグ目的だけでなく、
 
 詳細については、[Observable プロパティ](delegated-properties.md#observable-properties)を参照してください。
 
-## 練習問題
+## 練習問題 {completion-point="true"}
 
 ### 練習問題 1 {initial-collapse-state="collapsed" collapsible="true" id="properties-exercise-1"}
 
@@ -612,6 +600,13 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="解答例" id="kotlin-tour-properties-solution-4"}
 
-## 次のステップ
+<seealso></seealso>
 
-[中級：Null安全](kotlin-tour-intermediate-null-safety.md)
+<list columns="2" id="tour-nav">
+  <li>
+    <a as="button" href="kotlin-tour-intermediate-open-special-classes.md" mode="outline" icon="arrow-left" icon-position="left">前のステップ</a>
+  </li>
+  <li>
+    <a as="button" href="kotlin-tour-intermediate-null-safety.md" mode="classic" icon="arrow-right" icon-position="right">次のステップ</a>
+  </li>
+</list>

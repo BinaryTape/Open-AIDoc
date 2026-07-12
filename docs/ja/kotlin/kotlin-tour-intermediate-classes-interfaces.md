@@ -1,18 +1,6 @@
-[//]: # (title: 中級：クラスとインターフェース)
+[//]: # (title: クラスとインターフェース)
 
 <no-index/>
-
-<tldr>
-    <p><img src="icon-1-done.svg" width="20" alt="First step" /> <a href="kotlin-tour-intermediate-extension-functions.md">拡張関数</a><br />
-        <img src="icon-2-done.svg" width="20" alt="Second step" /> <a href="kotlin-tour-intermediate-scope-functions.md">スコープ関数</a><br />
-        <img src="icon-3-done.svg" width="20" alt="Third step" /> <a href="kotlin-tour-intermediate-lambdas-receiver.md">レシーバー付きラムダ式</a><br /> 
-        <img src="icon-4.svg" width="20" alt="Fourth step" /> <strong>クラスとインターフェース</strong><br />
-        <img src="icon-5-todo.svg" width="20" alt="Fifth step" /> <a href="kotlin-tour-intermediate-objects.md">オブジェクト</a><br />
-        <img src="icon-6-todo.svg" width="20" alt="Sixth step" /> <a href="kotlin-tour-intermediate-open-special-classes.md">openクラスと特殊なクラス</a><br />
-        <img src="icon-7-todo.svg" width="20" alt="Seventh step" /> <a href="kotlin-tour-intermediate-properties.md">プロパティ</a><br />
-        <img src="icon-8-todo.svg" width="20" alt="Eighth step" /> <a href="kotlin-tour-intermediate-null-safety.md">Null安全</a><br />
-        <img src="icon-9-todo.svg" width="20" alt="Ninth step" /> <a href="kotlin-tour-intermediate-libraries-and-apis.md">ライブラリとAPI</a></p>
-</tldr>
 
 初心者向けツアーでは、データを保存し、コード内で共有できる特性のコレクションを維持するために、クラスやデータクラスを使用する方法を学びました。最終的には、プロジェクト内でコードを効率的に共有するために、階層構造を作成したくなるでしょう。この章では、Kotlinが提供するコード共有のためのオプションと、それらがどのようにコードをより安全にし、メンテナンスを容易にするかについて説明します。
 
@@ -423,7 +411,7 @@ fun main() {
 
 詳細については、[委譲 (Delegation)](delegation.md)を参照してください。
 
-## 練習問題
+## 練習問題 {completion-point="true"}
 
 ### 練習問題 1 {initial-collapse-state="collapsed" collapsible="true" id="classes-interfaces-exercise-1"}
 
@@ -747,6 +735,13 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="解答例" id="kotlin-tour-classes-interfaces-solution-4"}
 
-## 次のステップ
+<seealso></seealso>
 
-[中級：オブジェクト](kotlin-tour-intermediate-objects.md)
+<list columns="2" id="tour-nav">
+  <li>
+    <a as="button" href="kotlin-tour-intermediate-lambdas-receiver.md" mode="outline" icon="arrow-left" icon-position="left">前のステップ</a>
+  </li>
+  <li>
+    <a as="button" href="kotlin-tour-intermediate-objects.md" mode="classic" icon="arrow-right" icon-position="right">次のステップ</a>
+  </li>
+</list>

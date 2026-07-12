@@ -1,18 +1,6 @@
-[//]: # (title: 중급: 널 안전성)
+[//]: # (title: 널 안전성)
 
 <no-index/>
-
-<tldr>
-    <p><img src="icon-1-done.svg" width="20" alt="첫 번째 단계" /> <a href="kotlin-tour-intermediate-extension-functions.md">확장 함수</a><br />
-        <img src="icon-2-done.svg" width="20" alt="두 번째 단계" /> <a href="kotlin-tour-intermediate-scope-functions.md">범위 함수</a><br />
-        <img src="icon-3-done.svg" width="20" alt="세 번째 단계" /> <a href="kotlin-tour-intermediate-lambdas-receiver.md">수신 객체가 있는 람다 식</a><br />
-        <img src="icon-4-done.svg" width="20" alt="네 번째 단계" /> <a href="kotlin-tour-intermediate-classes-interfaces.md">클래스 및 인터페이스</a><br />
-        <img src="icon-5-done.svg" width="20" alt="다섯 번째 단계" /> <a href="kotlin-tour-intermediate-objects.md">객체</a><br />
-        <img src="icon-6-done.svg" width="20" alt="여섯 번째 단계" /> <a href="kotlin-tour-intermediate-open-special-classes.md">Open 클래스 및 특수 클래스</a><br />
-        <img src="icon-7-done.svg" width="20" alt="일곱 번째 단계" /> <a href="kotlin-tour-intermediate-properties.md">프로퍼티</a><br />
-        <img src="icon-8.svg" width="20" alt="여덟 번째 단계" /> <strong>널 안전성</strong><br />
-        <img src="icon-9-todo.svg" width="20" alt="아홉 번째 단계" /> <a href="kotlin-tour-intermediate-libraries-and-apis.md">라이브러리 및 API</a></p>
-</tldr>
 
 초보자 과정에서 코드의 `null` 값을 처리하는 방법을 배웠습니다. 이 장에서는 널 안전성(null safety) 기능의 일반적인 사용 사례와 이를 최대한 활용하는 방법을 다룹니다.
 
@@ -353,7 +341,7 @@ fun getNumberOfFriends(users: Map<Int, User>, userId: Int): Int {
 
 코드에서 `return`을 사용하는 방법에 대한 자세한 내용은 [반환 및 점프(Returns and jumps)](returns.md)를 참조하세요.
 
-## 연습
+## 연습 {completion-point="true"}
 
 ### 연습 문제 1 {initial-collapse-state="collapsed" collapsible="true" id="null-safety-exercise-1"}
 
@@ -660,6 +648,13 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="풀이 예시" id="kotlin-tour-null-safety-solution-4"}
 
-## 다음 단계
+<seealso></seealso>
 
-[중급: 라이브러리 및 API](kotlin-tour-intermediate-libraries-and-apis.md)
+<list columns="2" id="tour-nav">
+  <li>
+    <a as="button" href="kotlin-tour-intermediate-properties.md" mode="outline" icon="arrow-left" icon-position="left">이전 단계</a>
+  </li>
+  <li>
+    <a as="button" href="kotlin-tour-intermediate-libraries-and-apis.md" mode="classic" icon="arrow-right" icon-position="right">다음 단계</a>
+  </li>
+</list>

@@ -1,18 +1,6 @@
-[//]: # (title: 中級：スコープ関数)
+[//]: # (title: スコープ関数)
 
 <no-index/>
-
-<tldr>
-    <p><img src="icon-1-done.svg" width="20" alt="First step" /> <a href="kotlin-tour-intermediate-extension-functions.md">拡張関数</a><br />
-        <img src="icon-2.svg" width="20" alt="Second step" /> <strong>スコープ関数</strong><br />
-        <img src="icon-3-todo.svg" width="20" alt="Third step" /> <a href="kotlin-tour-intermediate-lambdas-receiver.md">レシーバー付きラムダ式</a><br />
-        <img src="icon-4-todo.svg" width="20" alt="Fourth step" /> <a href="kotlin-tour-intermediate-classes-interfaces.md">クラスとインターフェース</a><br />
-        <img src="icon-5-todo.svg" width="20" alt="Fifth step" /> <a href="kotlin-tour-intermediate-objects.md">オブジェクト</a><br />
-        <img src="icon-6-todo.svg" width="20" alt="Sixth step" /> <a href="kotlin-tour-intermediate-open-special-classes.md">openクラスと特殊なクラス</a><br />
-        <img src="icon-7-todo.svg" width="20" alt="Seventh step" /> <a href="kotlin-tour-intermediate-properties.md">プロパティ</a><br />
-        <img src="icon-8-todo.svg" width="20" alt="Eighth step" /> <a href="kotlin-tour-intermediate-null-safety.md">Null安全</a><br />
-        <img src="icon-9-todo.svg" width="20" alt="Ninth step" /> <a href="kotlin-tour-intermediate-libraries-and-apis.md">ライブラリとAPI</a></p>
-</tldr>
 
 この章では、拡張関数の知識を土台として、より慣用的（idiomatic）なコードを書くための「スコープ関数」の使い方を学びます。
 
@@ -400,7 +388,7 @@ fun main() {
 
 スコープ関数の詳細については、[スコープ関数](scope-functions.md)を参照してください。
 
-## 練習問題
+## 練習問題 {completion-point="true"}
 
 ### 練習問題 1 {initial-collapse-state="collapsed" collapsible="true" id="scope-functions-exercise-1"}
 
@@ -519,6 +507,13 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="解答例" id="kotlin-tour-scope-functions-solution-2"}
 
-## 次のステップ
+<seealso></seealso>
 
-[中級：レシーバー付きラムダ式](kotlin-tour-intermediate-lambdas-receiver.md)
+<list columns="2" id="tour-nav">
+  <li>
+    <a as="button" href="kotlin-tour-intermediate-extension-functions.md" mode="outline" icon="arrow-left" icon-position="left">前のステップ</a>
+  </li>
+  <li>
+    <a as="button" href="kotlin-tour-intermediate-lambdas-receiver.md" mode="classic" icon="arrow-right" icon-position="right">次のステップ</a>
+  </li>
+</list>

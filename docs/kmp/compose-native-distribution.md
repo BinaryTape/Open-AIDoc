@@ -20,7 +20,7 @@
 `org.jetbrains.compose` 插件提供了用于基本打包、混淆和 macOS 代码签名的任务。
 
 该插件简化了使用 `jpackage` 将应用程序打包成原生分发并在本地运行应用程序的过程。
-可分发的应用程序是自包含的、可安装的二进制文件，其中包含所有必要的 Java 运行时组件，无需在目标系统上安装 JDK。
+可分发应用程序是自包含的、可安装的二进制文件，其中包含所有必要的 Java 运行时组件，无需在目标系统上安装 JDK。
 
 为了减小软件包大小，Gradle 插件使用 [jlink](https://openjdk.org/jeps/282) 工具，该工具可确保在可分发软件包中仅捆绑必要的 Java 模块。
 但是，您仍然必须配置 Gradle 插件以指定所需的模块。
@@ -1034,55 +1034,71 @@ ProGuard 是一款用于代码压缩和混淆的[开源工具](https://github.co
 但是，ProGuard 可能无法跟踪字节码中的某些用法，例如，当通过反射使用类时。
 如果您遇到仅在 ProGuard 处理后出现的问题，您可能需要添加自定义规则。
 
-要指定自定义配置文件，请按如下方式使用 DSL：
+您可以使用 Gradle DSL 在 `buildTypes.release.proguard` 块中配置 ProGuard，选项如下：
 
-```kotlin
-compose.desktop {
-    application {
-        buildTypes.release.proguard {
-            configurationFiles.from(project.file("compose-desktop.pro"))
+* `configurationFiles` 指定自定义 ProGuard 配置文件。
+    ```kotlin
+    compose.desktop {
+        application {
+            buildTypes.release.proguard {
+                configurationFiles.from(project.file("compose-desktop.pro"))
+            }
         }
     }
-}
-```
+    ```
+    {initial-collapse-state="collapsed" collapsible="true" collapsed-title='configurationFiles.from(project.file("compose-desktop.pro"))'}
 
-有关 ProGuard 规则和配置选项的更多信息，请参阅 Guardsquare [手册](https://www.guardsquare.com/manual/configuration/usage)。
-
-混淆默认是禁用的。要启用它，请通过 Gradle DSL 设置以下属性：
-
-```kotlin
-compose.desktop {
-    application {
-        buildTypes.release.proguard {
-            obfuscate.set(true)
+* `obfuscate` 启用代码混淆。混淆默认是禁用的。
+    ```kotlin
+    compose.desktop {
+        application {
+            buildTypes.release.proguard {
+                obfuscate.set(true)
+            }
         }
     }
-}
-```
+    ```
+    {initial-collapse-state="collapsed" collapsible="true" collapsed-title="obfuscate.set(true)"}
 
-ProGuard 的优化默认是启用的。要禁用它们，请通过 Gradle DSL 设置以下属性：
-
-```kotlin
-compose.desktop {
-    application {
-        buildTypes.release.proguard {
-            optimize.set(false)
+* `optimize` 控制 ProGuard 优化。优化默认是启用的。
+    ```kotlin
+    compose.desktop {
+        application {
+            buildTypes.release.proguard {
+                optimize.set(false)
+            }
         }
     }
-}
-```
+    ```
+    {initial-collapse-state="collapsed" collapsible="true" collapsed-title="optimize.set(false)"}
 
-生成 uber JAR 默认是禁用的，ProGuard 会为每个输入 `.jar` 生成对应的 `.jar` 文件。要启用它，请通过 Gradle DSL 设置以下属性：
-
-```kotlin
-compose.desktop {
-    application {
-        buildTypes.release.proguard {
-            joinOutputJars.set(true)
+* `joinOutputJars` 生成单个 uber-JAR。默认情况下，ProGuard 会为每个输入 `.jar` 生成对应的 `.jar` 文件。
+    ```kotlin
+    compose.desktop {
+        application {
+            buildTypes.release.proguard {
+                joinOutputJars.set(true)
+            }
         }
     }
-}
-```
+    ```
+    {initial-collapse-state="collapsed" collapsible="true" collapsed-title="joinOutputJars.set(true)"}
+
+[//]: # (TODO update version for stable release)
+
+* `version` 设置特定的 ProGuard 版本。JDK 25 至少需要 ProGuard 7.8.0，这是从 Compose Multiplatform 1.12.0-beta01 开始的默认版本。如果您使用较早版本的 Compose Multiplatform 并且使用 JDK 25 进行构建，请将此属性显式设置为 `7.8.0`：
+    ```kotlin
+    compose.desktop {
+        application {
+            buildTypes.release.proguard {
+                version.set("7.8.0")
+            }
+        }
+    }
+    ```
+    {initial-collapse-state="collapsed" collapsible="true" collapsed-title='version.set("7.8.0")'}
+
+有关 ProGuard 规则和配置选项的完整列表，请参阅 Guardsquare 的 [ProGuard 手册](https://www.guardsquare.com/manual/configuration/usage)。
 
 ## 下一步
 

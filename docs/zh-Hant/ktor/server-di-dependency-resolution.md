@@ -9,7 +9,7 @@
 <var name="example_name" value="server-di"/>
 <p>
     <b>程式碼範例</b>：
-    <a href="https://github.com/ktorio/ktor-documentation/tree/%ktor_version%/codeSnippets/snippets/%example_name%">
+    <a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/%example_name%">
         %example_name%
     </a>
 </p>
@@ -21,7 +21,7 @@
 
 ### 使用屬性委託 {id="property-delegation"}
 
-使用屬性委託時，當屬性首次被存取時，相依性會以延遲方式解析：
+使用屬性委託時，相依性僅會在啟動驗證階段被解析：
 
 ```kotlin
 val service: GreetingService by dependencies

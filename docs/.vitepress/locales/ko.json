@@ -81,7 +81,7 @@
   "sqldelight.sqljs-driver": "SQL.js 드라이버",
   "kotlin.home": "홈",
   "kotlin.getting-started": "시작하기",
-  "kotlin.kotlin-tour-welcome": "Kotlin 둘러보기",
+  "kotlin.kotlin-tour-welcome": "Kotlin tour 개요",
   "kotlin.kotlin-overview": "Kotlin 개요",
   "kotlin.what-s-new-in-kotlin": "Kotlin의 새로운 기능",
   "kotlin.whatsnew22": "Kotlin 2.2.0",
@@ -676,5 +676,9 @@
   "coroutines.flows": "Flow",
   "coroutines.coroutines-flow": "개요",
   "kmp.kotlin-toolchain": "Kotlin Toolchain",
-  "kmp.whats-new-compose-112": "Compose Multiplatform %org.jetbrains.compose-eap%"
+  "kmp.whats-new-compose-112": "Compose Multiplatform %org.jetbrains.compose-eap%",
+  "kotlin.take-kotlin-tour": "Kotlin tour 시작하기",
+  "kotlin.beginner": "초급",
+  "kotlin.intermediate": "중급",
+  "kotlin.immutable-collections-kotlinx-collections-immutable": "불변 컬렉션 (kotlinx.collections.immutable)"
 }

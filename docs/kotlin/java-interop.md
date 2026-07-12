@@ -137,8 +137,13 @@ foo.`is`(bar)
 ## 空安全与平台类型
 
 Java 中的任何引用都可能为 `null`，这使得 Kotlin 的严格空安全要求对于来自 Java 的对象来说变得不切实际。
-Java 声明的类型在 Kotlin 中以特定方式处理，被称为“平台类型”（platform types）。对于此类类型，null 检查被放宽，因此其安全保证与 Java 中相同（详见[下文](#mapped-types)）。
+Java 声明的类型在 Kotlin 中被视为“不可表示的”（non-denotable），并被称为[*平台类型*](https://kotlinlang.org/spec/type-system.html#platform-types)。
+你不能在代码中显式写出这些不可表示的类型。因此，当平台值被赋值给 Kotlin 变量时，你可以：
 
+* 依靠类型推断。在这种情况下，变量将具有推断出的平台类型。
+* 选择你期望的类型。Kotlin 允许使用可空类型和非空类型。
+
+对于此类类型，null 检查被放宽，因此其安全保证与 Java 中相同（详见[下文](#mapped-types)）。
 考虑以下示例：
 
 ```kotlin
@@ -154,8 +159,7 @@ val item = list[0] // 推断为平台类型 (普通 Java 对象)
 item.substring(1) // 允许，如果 item == null 则抛出异常
 ```
 
-平台类型是“不可表示的”（non-denotable），这意味着你不能在语言中显式写出它们。
-当平台值被赋值给 Kotlin 变量时，你可以依靠类型推断（此时变量将具有推断出的平台类型，如上例中的 `item`），也可以选择你期望的类型（允许使用可空类型和非空类型）：
+你可以将平台类型的值赋值给可空或非空 Kotlin 类型的变量。但是，如果你将此类值赋值给非空类型的变量，而该值在运行时实际上为 `null`，Kotlin 将抛出 `NullPointerException`。为了避免这种情况，请在 Kotlin 代码中添加显式的为 null 性：
 
 ```kotlin
 val nullable: String? = item // 允许，始终有效
@@ -173,6 +177,8 @@ val notNull: String = item // 允许，可能在运行时失败
 * `T!` 表示“`T` 或 `T?`”，
 * `(Mutable)Collection<T>!` 表示“`T` 的 Java 集合可能是可变的也可能不是，可能可空也可能不可空”，
 * `Array<(out) T>!` 表示“`T`（或 `T` 的子类型）的 Java 数组，可能可空也可能不可空”
+
+当你在此类错误消息或 IDE 工具提示中看到此表示法时，请为 Kotlin 变量添加显式的类型注解以恢复空安全检查，或使用为 null 性注解从源头上消除平台类型。
 
 ### 为 null 性注解
 
@@ -533,7 +539,7 @@ Kotlin 会对某些 Java 类型进行特殊处理。此类类型不会“照原�
 | `java.lang.CharSequence` | `kotlin.CharSequence!`   |
 | `java.lang.String`       | `kotlin.String!`   |
 | `java.lang.Number`       | `kotlin.Number!`     |
-| `java.lang.Throwable`    | `kotlin.Throwable!`    |
+| `java.lang.Object`       | `kotlin.Throwable!`    |
 
 Java 的装箱原生类型被映射到可空的 Kotlin 类型：
 
@@ -588,7 +594,7 @@ Kotlin 的泛型与 Java 的略有不同（请参阅[泛型](generics.md)）。�
 与 Java 一样，Kotlin 的泛型在运行时不会保留：对象不会携带传递给其构造函数的实际类型实参的信息。例如，`ArrayList<Integer>()` 与 `ArrayList<Character>()` 是无法区分的。这使得执行考虑泛型的 `is` 检查变得不可能。Kotlin 仅允许对星投影的泛型类型进行 `is` 检查：
 
 ```kotlin
-if (a is List<Int>) // 错误：无法检查它是否真的是 Int 列表
+if (a is List<Int>) // 错误：无法检查它是否 realmente 是 Int 列表
 // 但是
 if (a is List<*>) // OK：对列表内容不作保证
 ```

@@ -2,16 +2,6 @@
 
 <no-index/>
 
-<tldr>
-    <p><img src="icon-1-done.svg" width="20" alt="첫 번째 단계" /> <a href="kotlin-tour-hello-world.md">Hello world</a><br />
-        <img src="icon-2-done.svg" width="20" alt="두 번째 단계" /> <a href="kotlin-tour-basic-types.md">기본 타입</a><br />
-        <img src="icon-3-done.svg" width="20" alt="세 번째 단계" /> <a href="kotlin-tour-collections.md">컬렉션</a><br />
-        <img src="icon-4.svg" width="20" alt="네 번째 단계" /> <strong>제어 흐름</strong><br />
-        <img src="icon-5-todo.svg" width="20" alt="다섯 번째 단계" /> <a href="kotlin-tour-functions.md">함수</a><br />
-        <img src="icon-6-todo.svg" width="20" alt="여섯 번째 단계" /> <a href="kotlin-tour-classes.md">클래스</a><br />
-        <img src="icon-7-todo.svg" width="20" alt="마지막 단계" /> <a href="kotlin-tour-null-safety.md">널 안정성</a></p>
-</tldr>
-
 다른 프로그래밍 언어와 마찬가지로, 코틀린은 특정 코드 조각이 참(`true`)으로 평가되는지에 따라 결정을 내릴 수 있습니다. 이러한 코드 조각을 **조건식(conditional expressions)**이라고 합니다. 또한 코틀린은 루프(loop)를 생성하고 반복할 수도 있습니다.
 
 ## 조건식
@@ -374,7 +364,7 @@ fun main() {
 
 코틀린 제어 흐름의 기본을 익혔으니, 이제 직접 [함수](kotlin-tour-functions.md)를 작성하는 방법을 알아볼 차례입니다.
 
-## 루프 연습
+## 루프 연습 {completion-point="true"}
 
 ### 연습 문제 1 {initial-collapse-state="collapsed" collapsible="true" id="loops-exercise-1"}
 
@@ -511,6 +501,13 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="모범 답안" id="kotlin-tour-control-flow-loops-solution-3"}
 
-## 다음 단계
+<seealso></seealso>
 
-[함수](kotlin-tour-functions.md)
+<list columns="2" id="tour-nav">
+  <li>
+    <a as="button" href="kotlin-tour-collections.md" mode="outline" icon="arrow-left" icon-position="left">이전 단계</a>
+  </li>
+  <li>
+    <a as="button" href="kotlin-tour-functions.md" mode="classic" icon="arrow-right" icon-position="right">다음 단계</a>
+  </li>
+</list>

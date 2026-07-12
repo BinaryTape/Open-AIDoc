@@ -9,12 +9,12 @@
 通过我们的教程快速学习 Kotlin 编程语言的核心知识。通过初学者教程掌握基础知识。通过中级教程深化您的理解。
 
 <p></p> <!-- workaround for MRK057: Paragraph can only contain inline elements-->
-<list columns="2">
+<list columns="2" id="kotlin-tour-starting-page">
     <li>
-        <a href="kotlin-tour-hello-world.md"><img src="kotlin-tour-beginner.svg" alt="开始初学者 Kotlin 教程" type="block"/></a>
+        <a href="kotlin-tour-hello-world.md" as="button" icon="arrow-right" icon-position="right">初学者</a>
     </li>
     <li>
-        <a href="kotlin-tour-intermediate-extension-functions.md"><img src="kotlin-tour-intermediate.svg" alt="开始中级 Kotlin 教程" type="block"/></a>
+        <a href="kotlin-tour-intermediate-extension-functions.md" as="button" icon="arrow-right" icon-position="right">中级</a>
     </li>
     <li>
         <p><img src="icon-1.svg" width="20" /> <a href="kotlin-tour-hello-world.md">Hello world</a></p>

@@ -15,6 +15,7 @@
 - [컴파일러] 스키마에 `allTableNames` 함수 추가 (#6245 by @edenman)
 - [PostgreSQL 다이얼렉트] `ANY` 연산자 지원 추가 (#6253 by @griffio)
 - [SQLite 다이얼렉트] SQLite 3.39 `RIGHT JOIN` 및 `FULL JOIN` 지원 추가 (#6273 by @griffio)
+- [PostgreSQL 다이얼렉트] 트리거 함수에서의 `RAISE` 문 및 `FOUND` 변수 지원 추가 (#6297 by @griffio)
 
 ### 변경됨
 - [PostgreSQL 다이얼렉트] `arrayIntermediateType` 가시성을 public으로 변경 (#5835 by @griffio)
@@ -446,7 +447,7 @@
 - [IDE 플러그인] IDEA: `UnusedQueryInspection` - `ArrayIndexOutOfBoundsException` 수정. (#3427 by @vanniktech)
 - [IDE 플러그인] 이전 Kotlin 플러그인 참조를 위해 리플렉션 사용
 - [컴파일러] 확장 함수가 있는 커스텀 다이얼렉트가 임포트를 생성하지 않는 문제 수정 (#3338 by @hfhbd)
-- [컴파일러] `CodeBlock.of("${CodeBlock.toString()}")` 이스케이프 수정 (#3338 by @hfhbd)
+- [컴파일러] `CodeBlock.of("${CodeBlock.toString()}")` 이스케이프 수정 (#3340 by @hfhbd)
 - [컴파일러] 마이그레이션에서의 비동기 실행 문 대기 (#3352)
 - [컴파일러] `AS` 수정 (#3370 by @hfhbd)
 - [컴파일러] `getObject` 메서드가 실제 타입의 자동 채우기를 지원함. (#3401 by @robxyy)
@@ -658,11 +659,11 @@ sqldelight {
 - [IDE 플러그인] 임포트 키워드 하이라이트 (by @aperfilyev)
 - [IDE 플러그인] 해결되지 않은 Kotlin 타입 수정 (#1678 by @aperfilyev)
 - [IDE 플러그인] 해결되지 않은 패키지에 대한 하이라이트 수정 (#2543 by @aperfilyev)
-- [IDE 플러그인] Dont attempt to inspect mismatched columns if the project index is not yet initialized
-- [IDE 플러그인] Dont initialize the file index until a gradle sync has occurred
-- [IDE 플러그인] Cancel the SQLDelight import if a gradle sync begins
-- [IDE 플러그인] Regenerate the database outside of the thread an undo action is performed on
-- [IDE 플러그인] If a reference cannot be resolves use a blank java type
+- [IDE 플러그인] 프로젝트 인덱스가 아직 초기화되지 않은 경우 일치하지 않는 컬럼을 검사하지 않음
+- [IDE 플러그인] Gradle 동기화가 발생할 때까지 파일 인덱스를 초기화하지 않음
+- [IDE 플러그인] Gradle 동기화가 시작되면 SQLDelight 임포트 취소
+- [IDE 플러그인] 실행 취소(undo) 동작이 수행되는 스레드 외부에서 데이터베이스 재생성
+- [IDE 플러그인] 참조를 해결할 수 없는 경우 빈 Java 타입 사용
 - [IDE 플러그인] 파일 파싱 중에는 메인 스레드에서 벗어나고 쓰기 시에만 복귀하도록 개선
 - [IDE 플러그인] 구 버전 IntelliJ와의 호환성 개선 (by @3flex)
 - [IDE 플러그인] 더 빠른 어노테이션 API 사용
@@ -1027,7 +1028,7 @@ sqldelight {
 * 수정: [Gradle] #1243 Gradle 'configure on demand'와 함께 SQLDelight 사용 시 수정.
 * 수정: [Gradle] #1385 증분 어노테이션 처리(incremental annotation processing)와 함께 SQLDelight 사용 시 수정.
 * 수정: [Gradle] Gradle 태스크 캐싱 활성화.
-* 수정: [Gradle] #1274 Kotlin DSL과 함께 sqldelight 확장 사용 활성화.
+* 수정: [Gradle] #1274 Enable usage of sqldelight extension with kotlin dsl.
 * 수정: [컴파일러] 각 쿼리에 대해 고유 ID가 결정론적으로 생성됨.
 * 수정: [컴파일러] 트랜잭션이 완료되었을 때만 리스닝 쿼리에 통지.
 * 수정: [JVM 드라이버] #1370 `JdbcSqliteDriver` 사용자가 DB URL을 제공하도록 강제.

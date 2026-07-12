@@ -15,6 +15,7 @@
 - [コンパイラ] スキーマに `allTableNames` 関数を追加 (#6245 by @edenman)
 - [PostgreSQLダイアレクト] ANY 演算子のサポートを追加 (#6253 by @griffio)
 - [SQLiteダイアレクト] SQLite 3.39 の `RIGHT JOIN` および `FULL JOIN` のサポートを追加 (#6273 by @griffio)
+- [PostgreSQLダイアレクト] トリガー関数における `RAISE` 文および `FOUND` 変数のサポートを追加 (#6297 by @griffio)
 
 ### Changed
 - [PostgreSQLダイアレクト] `arrayIntermediateType` の可視性を public に変更 (#5835 by @griffio)
@@ -233,7 +234,7 @@
 - [PostgreSQLダイアレクト] PostgreSQL `CREATE INDEX CONCURRENTLY` のサポートを追加 (#4531 by @griffio)
 - [PostgreSQLダイアレクト] PostgreSQL CTE の補助ステートメントが相互に参照可能になるようサポート (#4493 by @griffio)
 - [PostgreSQLダイアレクト] バイナリ式 (binary expr) および `sum` における PostgreSQL 型のサポートを追加 (#4539 by @Adriel-M)
-- [PostgreSQLダイアレクト] PostgreSQL `SELECT DISTINCT ON` 構文의サポートを追加 (#4584 by @griffio)
+- [PostgreSQLダイアレクト] PostgreSQL `SELECT DISTINCT ON` 構文のサポートを追加 (#4584 by @griffio)
 - [PostgreSQLダイアレクト] `SELECT` 文における PostgreSQL JSON 関数のサポートを追加 (#4590 by @MariusVolkhart)
 - [PostgreSQLダイアレクト] `generate_series` PostgreSQL 関数を追加 (#4717 by @griffio)
 - [PostgreSQLダイアレクト] 追加の Postgres 文字列関数の定義を追加 (#4752 by @MariusVolkhart)
@@ -313,7 +314,7 @@
 - [Paging拡張] Paging 拡張に linux と mingw x64 ターゲットを追加 (#4280 by @chippman)
 
 ### Changed
-- [Gradleプラグイン] Android API 34 に対する自動ダイアレクトサポートを追加 (#4251)
+- [Gradleプラグイン] Android API 34 に対する automatic dialect サポートを追加 (#4251)
 - [Paging拡張] `QueryPagingSource` における `SuspendingTransacter` のサポートを追加 (#4292 by @daio)
 - [ランタイム] `addListener` API を改善 (#4244 by @hfhbd)
 - [ランタイム] マイグレーションバージョンとして `Long` を使用するように変更 (#4297 by @hfhbd)
@@ -667,7 +668,6 @@ sqldelight {
 - [IDEプラグイン] 古い IntelliJ バージョンとの互換性を改善 (by @3flex)
 - [IDEプラグイン] より高速なアノテーション API を使用
 - [Gradleプラグイン] JS/Android プラグインランタイム追加時に明示的にサポート (by @ZacSweers)
-- [Gradleプラグイン] `GenerateSchemaTask` の前に `DriverInitializer` を実行するように修正 (#5562 by @nwagu)
 - [Gradleプラグイン] マイグレーションからスキーマを派生させずにマイグレーション出力タスクを登録 (#2744 by @kevincianfarini)
 - [Gradleプラグイン] マイグレーションタスクがクラッシュした場合、クラッシュしたファイルを出力
 - [Gradleプラグイン] 冪等な出力を保証するため、コード生成時にファイルをソート (by @ZacSweers)
@@ -740,7 +740,7 @@ sqldelight {
 - [IDEプラグイン] テーブルが見つからない場合の `CreateTriggerMixin` における例外を修正 (by @aperfilyev)
 - [コンパイラ] テーブル作成文をトポロジカルソート
 - [コンパイラ] ディレクトリに対して `forDatabaseFiles` コールバックを呼び出すのを停止 (#2532)
-- [Gradleプラグイン] `generateDatabaseInterface` タスクの依存関係を潜在的な消費者に伝搬 (#2518 by @martinbonnin)
+- [Gradleプラグイン] `generateDatabaseInterface` タスク of 依存関係を潜在的な消費者に伝搬 (#2518 by @martinbonnin)
 
 ## [1.5.1] - 2021-07-16
 [1.5.1]: https://github.com/sqldelight/sqldelight/releases/tag/1.5.1

@@ -81,7 +81,7 @@
   "sqldelight.sqljs-driver": "sqljs-driver",
   "kotlin.home": "ホーム",
   "kotlin.getting-started": "はじめに",
-  "kotlin.kotlin-tour-welcome": "Kotlinツアーを見る",
+  "kotlin.kotlin-tour-welcome": "Kotlinツアーの概要",
   "kotlin.kotlin-overview": "Kotlinの概要",
   "kotlin.what-s-new-in-kotlin": "Kotlinの新機能",
   "kotlin.whatsnew22": "Kotlin 2.2.0",
@@ -675,5 +675,9 @@
   "coroutines.flows": "Flow",
   "coroutines.coroutines-flow": "概要",
   "kmp.kotlin-toolchain": "Kotlin Toolchain",
-  "kmp.whats-new-compose-112": "Compose Multiplatform %org.jetbrains.compose-eap%"
+  "kmp.whats-new-compose-112": "Compose Multiplatform %org.jetbrains.compose-eap%",
+  "kotlin.take-kotlin-tour": "Kotlinツアーに参加する",
+  "kotlin.beginner": "初級",
+  "kotlin.intermediate": "中級",
+  "kotlin.immutable-collections-kotlinx-collections-immutable": "不変コレクション (kotlinx.collections.immutable)"
 }

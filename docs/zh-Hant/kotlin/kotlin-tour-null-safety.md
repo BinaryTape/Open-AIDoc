@@ -2,16 +2,6 @@
 
 <no-index/>
 
-<tldr>
-    <p><img src="icon-1-done.svg" width="20" alt="第一步" /> <a href="kotlin-tour-hello-world.md">Hello world</a><br />
-        <img src="icon-2-done.svg" width="20" alt="第二步" /> <a href="kotlin-tour-basic-types.md">基本型別</a><br />
-        <img src="icon-3-done.svg" width="20" alt="第三步" /> <a href="kotlin-tour-collections.md">集合</a><br />
-        <img src="icon-4-done.svg" width="20" alt="第四步" /> <a href="kotlin-tour-control-flow.md">控制流</a><br />
-        <img src="icon-5-done.svg" width="20" alt="第五步" /> <a href="kotlin-tour-functions.md">函式</a><br />
-        <img src="icon-6-done.svg" width="20" alt="第六步" /> <a href="kotlin-tour-classes.md">類別</a><br />
-        <img src="icon-7.svg" width="20" alt="最後一步" /> <strong>空值安全</strong><br /></p>
-</tldr>
-
 在 Kotlin 中，變數是有可能包含 `null` 值的。當某些內容缺失或尚未設定時，Kotlin 會使用 `null` 值。
 你已經在[集合](kotlin-tour-collections.md#kotlin-tour-map-no-key)章節看過 Kotlin 傳回 `null` 值的範例：當你嘗試使用 Map 中不存在的鍵（key）來存取鍵值對時。雖然以這種方式使用 `null` 值很有用，但如果你的程式碼沒有準備好處理它們，就可能會遇到問題。
 
@@ -32,31 +22,31 @@ Kotlin 支援可為 null 的型別（nullable types），這讓宣告的型別�
 
 ```kotlin
 fun main() {
-    // neverNull 為 String 型別
+    // neverNull has String type
     var neverNull: String = "This can't be null"
 
-    // 拋出編譯器錯誤
+    // Throws a compiler error
     neverNull = null
 
-    // nullable 為可為 null 的 String 型別
+    // nullable has nullable String type
     var nullable: String? = "You can keep a null here"
 
-    // 這樣是可以的
+    // This is OK
     nullable = null
 
-    // 預設情況下，不接受 null 值
+    // By default, null values aren't accepted
     var inferredNonNull = "The compiler assumes non-nullable"
 
-    // 拋出編譯器錯誤
+    // Throws a compiler error
     inferredNonNull = null
 
-    // notNull 不接受 null 值
+    // notNull doesn't accept null values
     fun strLength(notNull: String): Int {                 
         return notNull.length
     }
 
     println(strLength(neverNull)) // 18
-    println(strLength(nullable))  // 拋出編譯器錯誤
+    println(strLength(nullable))  // Throws a compiler error
 }
 ```
 {kotlin-runnable="true" validate="false" kotlin-min-compiler-version="1.3" id="kotlin-tour-nullable-type"}
@@ -111,7 +101,7 @@ fun main() {
 >
 {style="tip"}
 
-安全呼叫運算子也可以用來安全地呼叫擴充函式或成員函式。在這種情況下，會在呼叫函式之前執行 `null` 檢查。如果檢查偵測到 `null` 值，則會跳過該呼叫並傳回 `null`。
+安全呼叫運算子也可以用來安全地呼叫擴充函式或成員函數。在這種情況下，會在呼叫函式之前執行 `null` 檢查。如果檢查偵測到 `null` 值，則會跳過該呼叫並傳回 `null`。
 
 在以下範例中，`nullString` 為 `null`，因此跳過了 [`.uppercase()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.text/uppercase.html) 的調用並傳回 `null`：
 
@@ -144,7 +134,7 @@ fun main() {
 
 如需更多關於 Kotlin 中空值安全的資訊，請參閱[空值安全](null-safety.md)。
 
-## 練習
+## 練習 {completion-point="true"}
 
 ### 練習 {initial-collapse-state="collapsed" collapsible="true"}
 
@@ -194,4 +184,13 @@ fun main() {
 
 恭喜！現在你已經完成了初學者導覽，透過我們的進階導覽將你對 Kotlin 的理解提升到下一個層次：
 
-<a href="kotlin-tour-intermediate-extension-functions.md"><img src="start-intermediate-tour.svg" width="700" alt="開始 Kotlin 進階導覽" style="block"/></a>
+<seealso></seealso>
+
+<list columns="2" id="tour-nav">
+  <li>
+    <a as="button" href="kotlin-tour-classes.md" mode="outline" icon="arrow-left" icon-position="left">上一步</a>
+  </li>
+  <li>
+    <a as="button" href="kotlin-tour-intermediate-extension-functions.md" mode="classic" icon="arrow-right" icon-position="right">開始 Kotlin 進階導覽</a>
+  </li>
+</list>

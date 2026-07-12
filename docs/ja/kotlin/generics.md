@@ -231,6 +231,40 @@ Kotlinは、このためにいわゆる*スター投影*構文を提供してい
 >
 {style="note"}
 
+### キャプチャされた型 (Captured types)
+
+`out T` や `in T` のような型投影を使用する場合、コンパイラは内部的に未知の具体的な型を「[キャプチャされた型（captured type）](https://kotlinlang.org/spec/type-system.html#type-capturing)」として表現します。キャプチャされた型は、既知の上界と下界を持つ未知の型です。
+
+キャプチャされた型は記述不可能（non-denotable）であるため、Kotlinのコード内で直接記述することはできません。代わりに、`CapturedType(out X)` のようなコンパイラの診断メッセージで目にすることが最も多いでしょう。例えば、次の型不一致の診断メッセージにはキャプチャされた型が含まれています。
+
+```kotlin
+val array: Array<out CharSequence> = arrayOf("str")
+val item: Int = array.get(0)
+// 初期化子の型不一致: 期待されるのは 'Int'、実際は 'CapturedType(out CharSequence)'
+```
+
+コンパイラは、読み取り操作にはキャプチャされた型の上界を使用し、書き込み操作にどの値が型安全であるかを判断するためにはその下界を使用します。
+
+```kotlin
+// 投影された型は Array<out CharSequence>
+val array: Array<out CharSequence> = arrayOf("Kotlin")
+
+// get() の読み取り操作は、キャプチャされた型の上界である CharSequence を使用します
+val item = array.get(0)
+
+// set() の書き込み操作は、キャプチャされた型の下界である Nothing を使用します。
+// Nothing のインスタンスは存在しないため、これはエラーになります。
+array.set(0, "New value")
+// レシーバー型 'Array<out CharSequence>' は out 投影を含んでいるため、
+// 'fun set(index: Int, value: T): Unit' の使用は禁止されています
+```
+
+この例では：
+
+* 変数 `array` は投影された型 `Array<out CharSequence>` を持っています。コンパイラは投影された型引数 `out CharSequence` を、上界が `CharSequence` で下界が `Nothing` であるキャプチャされた型として表現します。
+* `get()` 操作において、コンパイラはキャプチャされた型をその上界である `CharSequence` に近似し、`item` の型を `CharSequence` と推論します。
+* `set()` 操作において、キャプチャされた型は下界として `Nothing` を持ちます。`Nothing` にはインスタンスが存在しないため、投影された型への値の書き込みは型安全ではなく、エラーになります。
+
 ## ジェネリック関数
 
 クラスだけでなく、関数も型パラメータを持つことができます。型パラメータは関数の名前の*前*に置かれます。
@@ -295,7 +329,7 @@ fun <T> copyWhenGreater(list: List<T>, threshold: T): List<String>
 
 ジェネリック型 `T` を明示的な非 null 型として宣言するには、型を `& Any` で宣言します。例: `T & Any`。
 
-明示的な非 null 型は、null 許容な[上界](#上界-upper-bounds)を持っている必要があります。
+明示的な non-nullable 型は、null 許容な[上界](#上界-upper-bounds)を持っている必要があります。
 
 明示的な非 null 型を宣言する最も一般的なユースケースは、引数に `@NotNull` を含む Java メソッドをオーバーライドする場合です。例えば、次の `load()` メソッドを考えてみましょう。
 
@@ -351,7 +385,7 @@ fun handleStrings(list: MutableList<String>) {
 
 ジェネリック関数の呼び出しの型引数も、コンパイル時にのみチェックされます。関数本体の内部では、型パラメータを型チェックに使用することはできず、型パラメータへの型キャスト（`foo as T`）はチェックされません。
 唯一の例外は、[実体化された型パラメータ](inline-functions.md#reified-type-parameters)（reified type parameters）を持つインライン関数です。これらは各呼び出し箇所で実際の型引数がインライン化されます。これにより、型パラメータに対する型チェックとキャストが可能になります。
-ただし、チェックやキャストの内部で使用されるジェネリック型のインスタンスには、前述의 制限が依然として適用されます。
+ただし、チェックやキャストの内部で使用されるジェネリック型のインスタンスには、前述の制限が依然として適用されます。
 例えば、型チェック `arg is T` において、`arg` 自体がジェネリック型のインスタンスである場合、その型引数は依然として消去されています。
 
 ```kotlin

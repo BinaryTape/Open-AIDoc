@@ -1,20 +1,8 @@
-[//]: # (title: 中級：帶接收者的 Lambda 運算式)
+[//]: # (title: 帶接收者的 Lambda 運算式)
 
 <no-index/>
 
-<tldr>
-    <p><img src="icon-1-done.svg" width="20" alt="第一步" /> <a href="kotlin-tour-intermediate-extension-functions.md">擴充方法</a><br />
-        <img src="icon-2-done.svg" width="20" alt="第二步" /> <a href="kotlin-tour-intermediate-scope-functions.md">作用域函式</a><br />
-        <img src="icon-3.svg" width="20" alt="第三步" /> <strong>帶接收者的 Lambda 運算式</strong><br />
-        <img src="icon-4-todo.svg" width="20" alt="第四步" /> <a href="kotlin-tour-intermediate-classes-interfaces.md">類別與介面</a><br />
-        <img src="icon-5-todo.svg" width="20" alt="第五步" /> <a href="kotlin-tour-intermediate-objects.md">物件</a><br />
-        <img src="icon-6-todo.svg" width="20" alt="第六步" /> <a href="kotlin-tour-intermediate-open-special-classes.md">Open 與特殊類別</a><br />
-        <img src="icon-7-todo.svg" width="20" alt="第七步" /> <a href="kotlin-tour-intermediate-properties.md">屬性</a><br />
-        <img src="icon-8-todo.svg" width="20" alt="第八步" /> <a href="kotlin-tour-intermediate-null-safety.md">Null 安全性</a><br />
-        <img src="icon-9-todo.svg" width="20" alt="第九步" /> <a href="kotlin-tour-intermediate-libraries-and-apis.md">程式庫與 API</a></p>
-</tldr>
-
-在本章節中，您將學習如何將接收者與另一種函式類型——Lambda 運算式結合使用，以及它們如何幫助您建立領域特定語言 (DSL)。
+在本章節中，您將學習如何將接收者與另一種函式型別——Lambda 運算式結合使用，以及它們如何幫助您建立領域特定語言 (DSL)。
 
 ## 帶接收者的 Lambda 運算式
 
@@ -149,7 +137,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-intermediate-tour-lambda-expression-with-receiver-dsl"}
 
-如您所見，使用帶接收者的 Lambda 運算式大大簡化了建立菜單所需的程式碼。Lambda 運算式不僅對於設定和建立很有用，對於配置也很有幫助。它們常用於建置 API、UI 架構和配置建置器（configuration builder）的 DSL，以產出流暢的程式碼，讓您能更輕鬆地專注於底層的程式碼結構與邏輯。
+如您所見，使用帶接收者的 Lambda 運算式大大簡化了建立菜單所需的程式碼。Lambda 運算式不僅對於設定和建立很有用，對於配置也很有幫助。它們常用於建置 API、UI 架構和配置建置器的 DSL，以產出流暢的程式碼，讓您能更輕鬆地專注於底層的程式碼結構與邏輯。
 
 Kotlin 生態系統中有許多此設計模式的範例，例如標準函式庫中的 [`buildList()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/build-list.html) 和 [`buildString()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.text/build-string.html) 函式。
 
@@ -157,7 +145,7 @@ Kotlin 生態系統中有許多此設計模式的範例，例如標準函式庫�
 >
 {style="tip"}
 
-## 練習
+## 練習 {completion-point="true"}
 
 ### 練習 1 {initial-collapse-state="collapsed" collapsible="true" id="lambda-receivers-exercise-1"}
 
@@ -304,6 +292,13 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="範例解答" id="kotlin-tour-lambda-receivers-solution-3"}
 
-## 下一步
+<seealso></seealso>
 
-[中級：類別與介面](kotlin-tour-intermediate-classes-interfaces.md)
+<list columns="2" id="tour-nav">
+  <li>
+    <a as="button" href="kotlin-tour-intermediate-scope-functions.md" mode="outline" icon="arrow-left" icon-position="left">上一步</a>
+  </li>
+  <li>
+    <a as="button" href="kotlin-tour-intermediate-classes-interfaces.md" mode="classic" icon="arrow-right" icon-position="right">下一步</a>
+  </li>
+</list>

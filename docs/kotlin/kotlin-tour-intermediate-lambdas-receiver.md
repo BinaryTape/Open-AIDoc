@@ -1,18 +1,6 @@
-[//]: # (title: 中级：带接收者的 lambda 表达式)
+[//]: # (title: 带接收者的 lambda 表达式)
 
 <no-index/>
-
-<tldr>
-    <p><img src="icon-1-done.svg" width="20" alt="第一步" /> <a href="kotlin-tour-intermediate-extension-functions.md">扩展函数</a><br />
-        <img src="icon-2-done.svg" width="20" alt="第二步" /> <a href="kotlin-tour-intermediate-scope-functions.md">作用域函数</a><br />
-        <img src="icon-3.svg" width="20" alt="第三步" /> <strong>带接收者的 lambda 表达式</strong><br />
-        <img src="icon-4-todo.svg" width="20" alt="第四步" /> <a href="kotlin-tour-intermediate-classes-interfaces.md">类与接口</a><br />
-        <img src="icon-5-todo.svg" width="20" alt="第五步" /> <a href="kotlin-tour-intermediate-objects.md">对象</a><br />
-        <img src="icon-6-todo.svg" width="20" alt="第六步" /> <a href="kotlin-tour-intermediate-open-special-classes.md">Open 类与特殊类</a><br />
-        <img src="icon-7-todo.svg" width="20" alt="第七步" /> <a href="kotlin-tour-intermediate-properties.md">属性</a><br />
-        <img src="icon-8-todo.svg" width="20" alt="第八步" /> <a href="kotlin-tour-intermediate-null-safety.md">空安全</a><br />
-        <img src="icon-9-todo.svg" width="20" alt="第九步" /> <a href="kotlin-tour-intermediate-libraries-and-apis.md">库与 API</a></p>
-</tldr>
 
 在本章中，你将学习如何将接收者与其他类型的函数（即 lambda 表达式）结合使用，以及它们如何帮助你创建领域专用语言 (DSL)。
 
@@ -33,9 +21,9 @@ MutableList<Int>.() -> Unit
 
 此函数类型具有：
 
-*   作为接收者的 `MutableList<Int>`。
-*   圆括号 `()` 内没有函数参数。
-*   没有返回值：`Unit`。
+* 作为接收者的 `MutableList<Int>`。
+* 圆括号 `()` 内没有函数参数。
+* 没有返回值：`Unit`。
 
 考虑这个在画布上绘制形状的示例：
 
@@ -66,14 +54,14 @@ fun main() {
 
 在此示例中：
 
-*   `Canvas` 类有两个模拟绘制圆形或正方形的函数。
-*   `render()` 函数接受一个 `block` 参数，并返回 `Canvas` 类的一个实例。
-*   `block` 参数是一个带接收者的 lambda 表达式，其中 `Canvas` 类是接收者。
-*   `render()` 函数创建 `Canvas` 类的一个实例，并在 `canvas` 实例上调用 `block()` lambda 表达式，将其作为接收者。
-*   `main()` 函数使用一个传递给 `block` 参数的 lambda 表达式来调用 `render()` 函数。
-*   在传递给 `render()` 函数的 lambda 内部，程序在 `Canvas` 类的实例上调用 `drawCircle()` 和 `drawSquare()` 函数。
+* `Canvas` 类有两个模拟绘制圆形或正方形的函数。
+* `render()` 函数接受一个 `block` 参数，并返回 `Canvas` 类的一个实例。
+* `block` 参数是一个带接收者的 lambda 表达式，其中 `Canvas` 类是接收者。
+* `render()` 函数创建 `Canvas` 类的一个实例，并在 `canvas` 实例上调用 `block()` lambda 表达式，将其作为接收者。
+* `main()` 函数使用一个传递给 `block` 参数的 lambda 表达式来调用 `render()` 函数。
+* 在传递给 `render()` 函数的 lambda 内部，程序在 `Canvas` 类的实例上调用 `drawCircle()` 和 `drawSquare()` 函数。
 
-    由于 `drawCircle()` 和 `drawSquare()` 函数是在带接收者的 lambda 表达式中调用的，因此可以直接调用它们，就像它们位于 `Canvas` 类内部一样。
+  由于 `drawCircle()` 和 `drawSquare()` 函数是在带接收者的 lambda 表达式中调用的，因此可以直接调用它们，就像它们位于 `Canvas` 类内部一样。
 
 带接收者的 lambda 表达式在你想创建领域专用语言 (DSL) 时非常有用。由于你可以在不显式引用接收者的情况下访问其成员函数和属性，因此你的代码会变得更加精简。
 
@@ -157,7 +145,7 @@ Kotlin 生态系统中有许多此设计模式的示例，例如标准库中的 
 >
 {style="tip"}
 
-## 练习
+## 练习 {completion-point="true"}
 
 ### 练习 1 {initial-collapse-state="collapsed" collapsible="true" id="lambda-receivers-exercise-1"}
 
@@ -304,6 +292,13 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="示例解决方案" id="kotlin-tour-lambda-receivers-solution-3"}
 
-## 下一步
+<seealso></seealso>
 
-[中级：类与接口](kotlin-tour-intermediate-classes-interfaces.md)
+<list columns="2" id="tour-nav">
+  <li>
+    <a as="button" href="kotlin-tour-intermediate-scope-functions.md" mode="outline" icon="arrow-left" icon-position="left">上一步</a>
+  </li>
+  <li>
+    <a as="button" href="kotlin-tour-intermediate-classes-interfaces.md" mode="classic" icon="arrow-right" icon-position="right">下一步</a>
+  </li>
+</list>

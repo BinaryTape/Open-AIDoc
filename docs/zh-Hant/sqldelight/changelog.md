@@ -15,6 +15,7 @@
 - [編譯器] 為架構新增 `allTableNames` 函式（#6245 由 @edenman 提供）
 - [PostgreSQL 方言] 新增對 ANY 運算子的支援（#6253 由 @griffio 提供）
 - [SQLite 方言] 為 SQLite 3.39 新增 RIGHT JOIN 與 FULL JOIN 支援（#6273 由 @griffio 提供）
+- [PostgreSQL 方言] 新增對觸發器函式中 `RAISE` 陳述式與 `FOUND` 變數的支援（#6297 由 @griffio 提供）
 
 ### 變更
 - [PostgreSQL 方言] 將 `arrayIntermediateType` 的可見性變更為 public（#5835 由 @griffio 提供）
@@ -160,7 +161,7 @@
 - [編譯器] 修復 SqlDelightModule 型別解析器（#5625 由 @griffio 提供）
 - [編譯器] 修復 5501 插入物件逸出列（#5503 由 @griffio 提供）
 - [編譯器] 編譯器：改進錯誤訊息，使路徑連結可點擊並具有正確的行與字元位置。（#5604 由 @vanniktech 提供）
-- [編譯器] 修復問題 5298：允許將關鍵字用作資料表名稱
+- [編譯器] 修復問題 5298：允許關鍵字用作資料表名稱
 - [編譯器] 修復具名執行並新增測試
 - [編譯器] 在排序初始化陳述式時考慮外鍵資料表約束（#5325 由 @TheMrMilchmann 提供）
 - [編譯器] 當涉及製表符時，正確對齊錯誤底線（#5224 由 @drewd 提供）
@@ -218,7 +219,7 @@
 - [PostgreSQL 方言] 修復 5040 的 JSON 運算子繫結（#5100 由 @griffio 提供）
 - [PostgreSQL 方言] 修復 5082 tsvector (#5104 由 @griffio 提供)
 - [PostgreSQL 方言] 修復 5032 PostgreSql UPDATE FROM 陳述式的列相鄰性（#5035 由 @griffio 提供）
-- [SQLite 方言] 修復 4897 SQLite 重新命名列（#4899 由 @griffio 提供）
+- [SQLite 方言] 修復 SQLite 重新命名列 (#4897) (#4899 由 @griffio 提供)
 - [IDE 外掛程式] 修復錯誤處理常式當機（#4988 由 @aperfilyev 提供）
 - [IDE 外掛程式] BugSnag 無法在 IDEA 2023.3 中初始化（由 @aperfilyev 提供）
 - [IDE 外掛程式] 透過外掛程式在 IntelliJ 中開啟 .sq 檔案時出現 PluginException（由 @aperfilyev 提供）
@@ -457,9 +458,9 @@
 - [編譯器] 一律建立資料庫實作（#3540 由 @hfhbd 提供）
 - [編譯器] 放寬 javaDoc 並將其也新增至自訂對應函式（#3554 由 @hfhbd 提供）
 - [編譯器] 修復繫結中的 DEFAULT (由 @hfhbd 提供)
-- [分頁 3 擴充套件] 修復分頁 3 (#3396)
-- [分頁 3 擴充套件] 允許使用 Long 建構 `OffsetQueryPagingSource` (#3409)
-- [分頁 3 擴充套件] 不要靜態切換 `Dispatchers.Main` (#3428)
+- [分頁] 修復分頁 3 (#3396)
+- [分頁] 允許使用 Long 建構 `OffsetQueryPagingSource` (#3409)
+- [分頁] 不要靜態切換 `Dispatchers.Main` (#3428)
 
 ## [2.0.0-alpha03] - 2022-06-17
 [2.0.0-alpha03]: https://github.com/sqldelight/sqldelight/releases/tag/2.0.0-alpha03
@@ -991,7 +992,7 @@ sqldelight {
 ## [1.2.2] - 2020-01-22
 [1.2.2]: https://github.com/sqldelight/sqldelight/releases/tag/1.2.2
 
-* 新功能：[執行階段] 支援 Windows (mingw)、tvOS、watchOS 與 macOS 架構。
+* 新功能：[執行階段] 支援 Windows (mingW)、tvOS、watchOS 與 macOS 架構。
 * 修復：[編譯器] `sum()` 的傳回型別應為可 null。
 * 修復：[分頁擴充套件] 將 Transacter 傳入 `QueryDataSourceFactory` 以避免競態條件。
 * 修復：[IntelliJ 外掛程式] 尋找檔案套件名稱時不要搜尋相依項。

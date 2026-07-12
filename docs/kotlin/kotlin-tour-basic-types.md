@@ -2,16 +2,6 @@
 
 <no-index/>
 
-<tldr>
-    <p><img src="icon-1-done.svg" width="20" alt="First step" /> <a href="kotlin-tour-hello-world.md">Hello world</a><br />
-        <img src="icon-2.svg" width="20" alt="Second step" /> <strong>基本类型</strong><br />
-        <img src="icon-3-todo.svg" width="20" alt="Third step" /> <a href="kotlin-tour-collections.md">集合</a><br />
-        <img src="icon-4-todo.svg" width="20" alt="Fourth step" /> <a href="kotlin-tour-control-flow.md">控制流</a><br />
-        <img src="icon-5-todo.svg" width="20" alt="Fifth step" /> <a href="kotlin-tour-functions.md">函数</a><br />
-        <img src="icon-6-todo.svg" width="20" alt="Sixth step" /> <a href="kotlin-tour-classes.md">类</a><br />
-        <img src="icon-7-todo.svg" width="20" alt="Final step" /> <a href="kotlin-tour-null-safety.md">空安全</a></p>
-</tldr>
-
 Kotlin 中的每个变量和数据结构都有一个类型。类型非常重要，因为它们会告知编译器你被允许对该变量或数据结构执行的操作。换句话说，即它拥有哪些函数和属性。
 
 在上一章中，Kotlin 在之前的示例中能够判断出 `customers` 的类型为 [`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/)。Kotlin **推断**类型的能力被称为**类型推断**。`customers` 被分配了一个整数值。由此，Kotlin 推断出 `customers` 具有数值类型 `Int`。因此，编译器知道你可以对 `customers` 执行算术运算：
@@ -92,9 +82,9 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-basic-types-no-initialization" validate="false"}
 
-既然你已经了解了如何声明基本类型，现在是时候学习 [集合](kotlin-tour-collections.md) 了。
+既然你已经了解了如何声明基本类型，现在是时候学习[集合](kotlin-tour-collections.md)了。
 
-## 练习
+## 练习 {completion-point="true"}
 
 ### 习题 {initial-collapse-state="collapsed" collapsible="true"}
 
@@ -128,6 +118,13 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="示例解答" id="kotlin-tour-basic-types-solution"}
 
-## 下一步
+<seealso></seealso>
 
-[集合](kotlin-tour-collections.md)
+<list columns="2" id="tour-nav">
+  <li>
+    <a as="button" href="kotlin-tour-hello-world.md" mode="outline" icon="arrow-left" icon-position="left">上一步</a>
+  </li>
+  <li>
+    <a as="button" href="kotlin-tour-collections.md" mode="classic" icon="arrow-right" icon-position="right">下一步</a>
+  </li>
+</list>

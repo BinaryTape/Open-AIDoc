@@ -263,6 +263,39 @@ Kotlin 为此提供了所谓的*星号投影*语法：
 >
 {style="note"}
 
+### 捕获类型
+
+当你使用类型投影（如 `out T` 或 `in T`）时，编译器在内部会将未知的具体类型表示为[捕获类型](https://kotlinlang.org/spec/type-system.html#type-capturing)。捕获类型是具有已知上界和下界的未知类型。
+
+捕获类型是不可表示的，因此你无法在 Kotlin 代码中直接编写它们。相反，你最常在编译器诊断信息中看到捕获类型，例如 `CapturedType(out X)`。例如，以下类型不匹配诊断信息包含一个捕获类型：
+
+```kotlin
+val array: Array<out CharSequence> = arrayOf("str")
+val item: Int = array.get(0)
+// 初始值设定项类型不匹配：预期为 'Int'，实际为 'CapturedType(out CharSequence)'
+```
+
+编译器对读取操作使用捕获类型的上界，并使用其下界来确定哪些值对于写入操作是类型安全的：
+
+```kotlin
+// 投影类型为 Array<out CharSequence>
+val array: Array<out CharSequence> = arrayOf("Kotlin")
+
+// get() 读取操作使用捕获类型的上界 CharSequence
+val item = array.get(0)
+
+// set() 写入操作使用捕获类型的下界 Nothing，这会导致错误
+array.set(0, "New value")
+// 接收器类型 'Array<out CharSequence>' 包含 out 投影，
+// 这禁止使用 'fun set(index: Int, value: T): Unit'
+```
+
+在此示例中：
+
+* 变量 `array` 的投影类型为 `Array<out CharSequence>`。编译器将投影类型实参 `out CharSequence` 表示为以 `CharSequence` 为上界、以 `Nothing` 为下界的捕获类型。
+* 对于 `get()` 操作，编译器将捕获类型近似为其上界 `CharSequence`，并推断 `item` 的类型为 `CharSequence`。
+* 对于 `set()` 操作，捕获类型的下界为 `Nothing`。由于 `Nothing` 没有实例，因此向投影类型写入值不是类型安全的，会导致错误。
+
 ## 泛型函数
 
 不仅类可以拥有类型形参，函数也可以。类型形参放在函数名称*之前*：

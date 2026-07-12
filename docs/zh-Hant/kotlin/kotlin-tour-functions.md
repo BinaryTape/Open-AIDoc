@@ -2,16 +2,6 @@
 
 <no-index/>
 
-<tldr>
-    <p><img src="icon-1-done.svg" width="20" alt="第一步" /> <a href="kotlin-tour-hello-world.md">Hello world</a><br />
-        <img src="icon-2-done.svg" width="20" alt="第二步" /> <a href="kotlin-tour-basic-types.md">基本型別</a><br />
-        <img src="icon-3-done.svg" width="20" alt="第三步" /> <a href="kotlin-tour-collections.md">集合</a><br />
-        <img src="icon-4-done.svg" width="20" alt="第四步" /> <a href="kotlin-tour-control-flow.md">控制流</a><br />
-        <img src="icon-5.svg" width="20" alt="第五步" /> <strong>函式</strong><br />
-        <img src="icon-6-todo.svg" width="20" alt="第六步" /> <a href="kotlin-tour-classes.md">類別</a><br />
-        <img src="icon-7-todo.svg" width="20" alt="最後一步" /> <a href="kotlin-tour-null-safety.md">Null 安全性</a></p>
-</tldr>
-
 您可以使用 `fun` 關鍵字在 Kotlin 中宣告自己的函式。
 
 ```kotlin
@@ -512,7 +502,7 @@ fun main() {
 ```kotlin
 fun main() {
     //sampleStart
-    // 初始值為零。
+    // 初始值為零。 
     // 該操作將初始值與列表中的每個項目累計求和。
     println(listOf(1, 2, 3).fold(0, { x, item -> x + item })) // 6
 
@@ -527,7 +517,7 @@ fun main() {
 
 我們導覽的下一步是了解 Kotlin 中的 [類別](kotlin-tour-classes.md)。
 
-## Lambda 運算式練習
+## Lambda 運算式練習 {completion-point="true"}
 
 ### 練習 1 {initial-collapse-state="collapsed" collapsible="true" id="lambdas-exercise-1"}
 
@@ -589,6 +579,13 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="範例解答" id="kotlin-tour-lambdas-solution-2"}
 
-## 下一步
+<seealso></seealso>
 
-[類別](kotlin-tour-classes.md)
+<list columns="2" id="tour-nav">
+  <li>
+    <a as="button" href="kotlin-tour-control-flow.md" mode="outline" icon="arrow-left" icon-position="left">上一步</a>
+  </li>
+  <li>
+    <a as="button" href="kotlin-tour-classes.md" mode="classic" icon="arrow-right" icon-position="right">下一步</a>
+  </li>
+</list>

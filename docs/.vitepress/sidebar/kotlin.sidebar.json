@@ -8,8 +8,90 @@
     "link": "getting-started"
   },
   {
-    "text": "kotlin.kotlin-tour-welcome",
-    "link": "kotlin-tour-welcome"
+    "text": "kotlin.take-kotlin-tour",
+    "items": [
+      {
+        "text": "kotlin.kotlin-tour-welcome",
+        "link": "kotlin-tour-welcome"
+      },
+      {
+        "text": "kotlin.beginner",
+        "items": [
+          {
+            "text": "kotlin.kotlin-tour-hello-world",
+            "link": "kotlin-tour-hello-world"
+          },
+          {
+            "text": "kotlin.kotlin-tour-basic-types",
+            "link": "kotlin-tour-basic-types"
+          },
+          {
+            "text": "kotlin.kotlin-tour-collections",
+            "link": "kotlin-tour-collections"
+          },
+          {
+            "text": "kotlin.kotlin-tour-control-flow",
+            "link": "kotlin-tour-control-flow"
+          },
+          {
+            "text": "kotlin.kotlin-tour-functions",
+            "link": "kotlin-tour-functions"
+          },
+          {
+            "text": "kotlin.kotlin-tour-classes",
+            "link": "kotlin-tour-classes"
+          },
+          {
+            "text": "kotlin.kotlin-tour-null-safety",
+            "link": "kotlin-tour-null-safety"
+          }
+        ],
+        "collapsed": true
+      },
+      {
+        "text": "kotlin.intermediate",
+        "items": [
+          {
+            "text": "kotlin.kotlin-tour-intermediate-extension-functions",
+            "link": "kotlin-tour-intermediate-extension-functions"
+          },
+          {
+            "text": "kotlin.kotlin-tour-intermediate-scope-functions",
+            "link": "kotlin-tour-intermediate-scope-functions"
+          },
+          {
+            "text": "kotlin.kotlin-tour-intermediate-lambdas-receiver",
+            "link": "kotlin-tour-intermediate-lambdas-receiver"
+          },
+          {
+            "text": "kotlin.kotlin-tour-intermediate-classes-interfaces",
+            "link": "kotlin-tour-intermediate-classes-interfaces"
+          },
+          {
+            "text": "kotlin.kotlin-tour-intermediate-objects",
+            "link": "kotlin-tour-intermediate-objects"
+          },
+          {
+            "text": "kotlin.kotlin-tour-intermediate-open-special-classes",
+            "link": "kotlin-tour-intermediate-open-special-classes"
+          },
+          {
+            "text": "kotlin.kotlin-tour-intermediate-properties",
+            "link": "kotlin-tour-intermediate-properties"
+          },
+          {
+            "text": "kotlin.kotlin-tour-intermediate-null-safety",
+            "link": "kotlin-tour-intermediate-null-safety"
+          },
+          {
+            "text": "kotlin.kotlin-tour-intermediate-libraries-and-apis",
+            "link": "kotlin-tour-intermediate-libraries-and-apis"
+          }
+        ],
+        "collapsed": true
+      }
+    ],
+    "collapsed": true
   },
   {
     "text": "kotlin.what-s-new-in-kotlin",
@@ -962,6 +1044,10 @@
       {
         "text": "kotlin.date-and-time-kotlinx-datetime",
         "href": "https://kotlinlang.org/api/kotlinx-datetime/"
+      },
+      {
+        "text": "kotlin.immutable-collections-kotlinx-collections-immutable",
+        "href": "https://kotlinlang.org/api/kotlinx.collections.immutable/"
       },
       {
         "text": "kotlin.jvm-metadata-kotlinx-metadata-jvm",

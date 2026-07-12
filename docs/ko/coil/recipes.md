@@ -51,6 +51,49 @@ detailImageView.load("https://example.com/image.jpg") {
 }
 ```
 
+## Compose AnimatedContent
+
+`rememberAsyncImagePainter`와 `AnimatedContent`를 사용하여 플레이스홀더와 로드된 이미지 사이의 애니메이션을 적용할 수 있습니다.
+
+```kotlin
+val sizeResolver = rememberConstraintsSizeResolver()
+val painter = rememberAsyncImagePainter(
+    model = ImageRequest.Builder(LocalPlatformContext.current)
+        .data("https://example.com/image.jpg")
+        .size(sizeResolver)
+        .build(),
+)
+val state by painter.state.collectAsState()
+
+AnimatedContent(
+    modifier = Modifier.then(sizeResolver),
+    targetState = state,
+    contentKey = { it::class },
+    transitionSpec = { fadeIn() togetherWith fadeOut() },
+) { targetState ->
+    when (targetState) {
+        is AsyncImagePainter.State.Empty,
+        is AsyncImagePainter.State.Loading -> PlaceholderContent()
+        is AsyncImagePainter.State.Success -> {
+            // 모델이 변경된 후 이전 이미지가 애니메이션과 함께 사라지는 동안 계속 표시되도록 합니다.
+            Image(
+                painter = targetState.painter,
+                contentDescription = stringResource(R.string.description),
+            )
+        }
+        is AsyncImagePainter.State.Error -> ErrorContent()
+    }
+}
+```
+
+`targetState.painter`를 `Image`에 전달하면 모델이 변경된 후 이전 이미지가 애니메이션을 통해 사라질 때까지 계속 표시됩니다.
+
+최종 이미지 크기는 로딩이 완료될 때까지 알 수 없습니다. 공간을 미리 확보하려면 고정된 제약 조건(constraints)이나 미리 알고 있는 가로세로 비율(aspect ratio)을 사용하세요.
+
+`rememberAsyncImagePainter`는 이미지가 메모리 캐시에 있는 경우에도 `State.Empty`로 시작합니다. 필요한 경우 `state.result.dataSource`를 사용하여 메모리 캐시된 이미지에 대한 애니메이션을 건너뛰도록 처리하세요.
+
+참고: `AnimatedContent`는 Painter 크로스페이드보다 훨씬 비용이 많이 들며 애니메이션이 끝날 때까지 이전 이미지를 메모리에 유지합니다. 지연 목록(lazy lists)이나 단순한 페이드 효과에는 `ImageRequest.Builder.crossfade`를 사용하는 것이 좋습니다.
+
 ## 공유 요소 전환 (Shared Element Transitions)
 
 [공유 요소 전환(Shared element transitions)](https://developer.android.com/training/transitions/start-activity)을 사용하면 `Activity`와 `Fragment` 간에 애니메이션을 적용할 수 있습니다. Coil과 함께 작동하도록 하기 위한 몇 가지 권장 사항은 다음과 같습니다:

@@ -26,7 +26,7 @@ Navigation 3 のマルチプラットフォーム実装を試すには、以下�
 
 ```toml
 [versions]
-multiplatform-nav3-ui = "1.0.0-alpha05"
+multiplatform-nav3-ui = "1.1.1"
 
 [libraries]
 jetbrains-navigation3-ui = { module = "org.jetbrains.androidx.navigation3:navigation3-ui", version.ref = "multiplatform-nav3-ui" }
@@ -40,8 +40,8 @@ jetbrains-navigation3-ui = { module = "org.jetbrains.androidx.navigation3:naviga
 Material 3 Adaptive および ViewModel ライブラリを使用しているプロジェクトの場合は、以下のナビゲーションサポートアーティファクトも追加してください。
 ```toml
 [versions]
-compose-multiplatform-adaptive = "1.3.0-alpha02"
-compose-multiplatform-lifecycle = "2.10.0-alpha05"
+compose-multiplatform-adaptive = "1.3.0-beta02"
+compose-multiplatform-lifecycle = "2.10.0"
 
 [libraries]
 jetbrains-material3-adaptiveNavigation3 = { module = "org.jetbrains.compose.material3.adaptive:adaptive-navigation3", version.ref = "compose-multiplatform-adaptive" }
@@ -52,18 +52,19 @@ jetbrains-lifecycle-viewmodelNavigation3 = { module = "org.jetbrains.androidx.li
 
 ```toml
 [versions]
-compose-multiplatform-navigation3-browser = "0.2.0"
+compose-multiplatform-navigation3-browser = "1.1.0"
 
 [libraries]
 navigation3-browser = { module = "com.github.terrakok:navigation3-browser", version.ref = "compose-multiplatform-navigation3-browser" }
 ```
 
-ブラウザ履歴ナビゲーションは、バージョン 1.1.0 でベースのマルチプラットフォーム Navigation 3 ライブラリによってサポートされる予定です。
+ブラウザ履歴ナビゲーションのサポートは、将来のリリースでベースのマルチプラットフォーム Navigation 3 ライブラリによって提供される予定です。
+進捗状況は [CMP-8924](https://youtrack.jetbrains.com/projects/CMP/issues/CMP-8924/Integrate-Browser-History-with-Nav3) で確認できます。
 
 ## マルチプラットフォーム対応
 
 Navigation 3 は Compose と密接に連携しているため、Android のナビゲーション実装を最小限の変更で共通の Compose Multiplatform コードで動作させることができます。
-ウェブや iOS などの非 JVM プラットフォームをサポートするために必要なのは、[デスティネーションキーのポリモーフィックなシリアル化](#polymorphic-serialization-for-destination-keys) を実装することだけです。
+ウェブや iOS などの非 JVM プラットフォームをサポートするために必要なのは、[デスティネーションキーのポリモーフィックなシリアル化](#デスティネーションキーのポリモーフィックなシリアル化) を実装することだけです。
 
 GitHub で、Navigation 3 を使用した Android 専用アプリとマルチプラットフォームアプリの広範な例を比較できます：
 * [Navigation 3 レシピが含まれるオリジナルの Android リポジトリ](https://github.com/android/nav3-recipes)

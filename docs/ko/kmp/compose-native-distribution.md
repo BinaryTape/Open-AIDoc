@@ -1040,55 +1040,72 @@ Compose Multiplatform Gradle 플러그인에는 [ProGuard](https://www.guardsqua
 하지만 ProGuard는 바이트코드의 특정 사용 사례(예: 리플렉션을 통해 클래스를 사용하는 경우)를 추적하지 못할 수 있습니다. 
 ProGuard 처리 후에만 발생하는 문제가 있다면 커스텀 규칙을 추가해야 할 수도 있습니다.
 
-커스텀 구성 파일을 지정하려면 다음과 같이 DSL을 사용하세요:
+다음 옵션들을 사용하여 `buildTypes.release.proguard` 블록 내의 Gradle DSL로 ProGuard를 구성할 수 있습니다:
 
-```kotlin
-compose.desktop {
-    application {
-        buildTypes.release.proguard {
-            configurationFiles.from(project.file("compose-desktop.pro"))
+* `configurationFiles`: 커스텀 ProGuard 구성 파일을 지정합니다.
+    ```kotlin
+    compose.desktop {
+        application {
+            buildTypes.release.proguard {
+                configurationFiles.from(project.file("compose-desktop.pro"))
+            }
         }
     }
-}
-```
+    ```
+    {initial-collapse-state="collapsed" collapsible="true" collapsed-title='configurationFiles.from(project.file("compose-desktop.pro"))'}
 
-ProGuard 규칙 및 구성 옵션에 대한 자세한 내용은 Guardsquare [매뉴얼](https://www.guardsquare.com/manual/configuration/usage)을 참조하세요.
-
-난독화는 기본적으로 비활성화되어 있습니다. 활성화하려면 Gradle DSL을 통해 다음 속성을 설정하세요:
-
-```kotlin
-compose.desktop {
-    application {
-        buildTypes.release.proguard {
-            obfuscate.set(true)
+* `obfuscate`: 코드 난독화를 활성화합니다. 난독화는 기본적으로 비활성화되어 있습니다.
+    ```kotlin
+    compose.desktop {
+        application {
+            buildTypes.release.proguard {
+                obfuscate.set(true)
+            }
         }
     }
-}
-```
+    ```
+    {initial-collapse-state="collapsed" collapsible="true" collapsed-title="obfuscate.set(true)"}
 
-ProGuard의 최적화는 기본적으로 활성화되어 있습니다. 비활성화하려면 Gradle DSL을 통해 다음 속성을 설정하세요:
-
-```kotlin
-compose.desktop {
-    application {
-        buildTypes.release.proguard {
-            optimize.set(false)
+* `optimize`: ProGuard 최적화를 제어합니다. 최적화는 기본적으로 활성화되어 있습니다.
+    ```kotlin
+    compose.desktop {
+        application {
+            buildTypes.release.proguard {
+                optimize.set(false)
+            }
         }
     }
-}
-```
+    ```
+    {initial-collapse-state="collapsed" collapsible="true" collapsed-title="optimize.set(false)"}
 
-우버(uber) JAR 생성은 기본적으로 비활성화되어 있으며, ProGuard는 모든 입력 `.jar`에 대해 해당하는 `.jar` 파일을 생성합니다. 활성화하려면 Gradle DSL을 통해 다음 속성을 설정하세요:
-
-```kotlin
-compose.desktop {
-    application {
-        buildTypes.release.proguard {
-            joinOutputJars.set(true)
+* `joinOutputJars`: 단일 우버(uber) JAR를 생성합니다. 기본적으로 ProGuard는 각 입력 `.jar`에 대해 별도의 `.jar` 파일을 생성합니다.
+    ```kotlin
+    compose.desktop {
+        application {
+            buildTypes.release.proguard {
+                joinOutputJars.set(true)
+            }
         }
     }
-}
-```
+    ```
+    {initial-collapse-state="collapsed" collapsible="true" collapsed-title="joinOutputJars.set(true)"}
+
+[//]: # (TODO update version for stable release)
+
+* `version`: 특정 ProGuard 버전을 설정합니다. JDK 25에는 최소 ProGuard 7.8.0이 필요하며, 이는 Compose Multiplatform 1.12.0-beta01부터 기본값으로 사용됩니다.
+  이전 버전의 Compose Multiplatform을 사용하면서 JDK 25로 빌드하는 경우, 이 속성을 명시적으로 `7.8.0`으로 설정하세요:
+    ```kotlin
+    compose.desktop {
+        application {
+            buildTypes.release.proguard {
+                version.set("7.8.0")
+            }
+        }
+    }
+    ```
+    {initial-collapse-state="collapsed" collapsible="true" collapsed-title='version.set("7.8.0")'}
+
+ProGuard 규칙 및 구성 옵션의 전체 목록은 Guardsquare의 [ProGuard 매뉴얼](https://www.guardsquare.com/manual/configuration/usage)을 참조하세요.
 
 ## 다음 단계는 무엇인가요? (What's next?)
 

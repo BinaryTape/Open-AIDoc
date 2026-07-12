@@ -1,18 +1,6 @@
-[//]: # (title: 中級：Null安全)
+[//]: # (title: Null安全)
 
 <no-index/>
-
-<tldr>
-    <p><img src="icon-1-done.svg" width="20" alt="ステップ1" /> <a href="kotlin-tour-intermediate-extension-functions.md">拡張関数</a><br />
-        <img src="icon-2-done.svg" width="20" alt="ステップ2" /> <a href="kotlin-tour-intermediate-scope-functions.md">スコープ関数</a><br />
-        <img src="icon-3-done.svg" width="20" alt="ステップ3" /> <a href="kotlin-tour-intermediate-lambdas-receiver.md">レシーバー付きラムダ式</a><br />
-        <img src="icon-4-done.svg" width="20" alt="ステップ4" /> <a href="kotlin-tour-intermediate-classes-interfaces.md">クラスとインターフェース</a><br />
-        <img src="icon-5-done.svg" width="20" alt="ステップ5" /> <a href="kotlin-tour-intermediate-objects.md">オブジェクト</a><br />
-        <img src="icon-6-done.svg" width="20" alt="ステップ6" /> <a href="kotlin-tour-intermediate-open-special-classes.md">openクラスと特殊なクラス</a><br />
-        <img src="icon-7-done.svg" width="20" alt="ステップ7" /> <a href="kotlin-tour-intermediate-properties.md">プロパティ</a><br />
-        <img src="icon-8.svg" width="20" alt="ステップ8" /> <strong>Null安全</strong><br />
-        <img src="icon-9-todo.svg" width="20" alt="ステップ9" /> <a href="kotlin-tour-intermediate-libraries-and-apis.md">ライブラリとAPI</a></p>
-</tldr>
 
 初級編のツアーでは、コード内で `null` 値を扱う方法を学びました。この章では、Null安全機能の一般的なユースケースと、それらを最大限に活用する方法について説明します。
 
@@ -353,7 +341,7 @@ fun getNumberOfFriends(users: Map<Int, User>, userId: Int): Int {
 
 コードで `return` を使用する方法の詳細については、[リターンとジャンプ](returns.md) を参照してください。
 
-## 練習問題
+## 練習問題 {completion-point="true"}
 
 ### 練習問題 1 {initial-collapse-state="collapsed" collapsible="true" id="null-safety-exercise-1"}
 
@@ -661,6 +649,13 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="解答例" id="kotlin-tour-null-safety-solution-4"}
 
-## 次のステップ
+<seealso></seealso>
 
-[中級：ライブラリとAPI](kotlin-tour-intermediate-libraries-and-apis.md)
+<list columns="2" id="tour-nav">
+  <li>
+    <a as="button" href="kotlin-tour-intermediate-properties.md" mode="outline" icon="arrow-left" icon-position="left">前のステップ</a>
+  </li>
+  <li>
+    <a as="button" href="kotlin-tour-intermediate-libraries-and-apis.md" mode="classic" icon="arrow-right" icon-position="right">次のステップ</a>
+  </li>
+</list>

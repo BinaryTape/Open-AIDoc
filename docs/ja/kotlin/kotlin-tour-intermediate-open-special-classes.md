@@ -1,18 +1,6 @@
-[//]: # (title: 中級：オープンクラスと特殊なクラス)
+[//]: # (title: オープンクラスと特殊なクラス)
 
 <no-index/>
-
-<tldr>
-    <p><img src="icon-1-done.svg" width="20" alt="ステップ1" /> <a href="kotlin-tour-intermediate-extension-functions.md">拡張関数</a><br />
-        <img src="icon-2-done.svg" width="20" alt="ステップ2" /> <a href="kotlin-tour-intermediate-scope-functions.md">スコープ関数</a><br />
-        <img src="icon-3-done.svg" width="20" alt="ステップ3" /> <a href="kotlin-tour-intermediate-lambdas-receiver.md">レシーバ付きラムダ式</a><br />
-        <img src="icon-4-done.svg" width="20" alt="ステップ4" /> <a href="kotlin-tour-intermediate-classes-interfaces.md">クラスとインターフェース</a><br />
-        <img src="icon-5-done.svg" width="20" alt="ステップ5" /> <a href="kotlin-tour-intermediate-objects.md">オブジェクト</a><br />
-        <img src="icon-6.svg" width="20" alt="ステップ6" /> <strong>オープンクラスと特殊なクラス</strong><br />
-        <img src="icon-7-todo.svg" width="20" alt="ステップ7" /> <a href="kotlin-tour-intermediate-properties.md">プロパティ</a><br />
-        <img src="icon-8-todo.svg" width="20" alt="ステップ8" /> <a href="kotlin-tour-intermediate-null-safety.md">Null安全</a><br />
-        <img src="icon-9-todo.svg" width="20" alt="ステップ9" /> <a href="kotlin-tour-intermediate-libraries-and-apis.md">ライブラリとAPI</a></p>
-</tldr>
 
 この章では、オープンクラス（open classes）、それらがインターフェースとどのように連携するか、そしてKotlinで利用可能なその他の特殊な型のクラスについて学びます。
 
@@ -349,7 +337,7 @@ fun main() {
 ```
 {kotlin-runnable="true" id="kotlin-tour-inline-value-class"}
 
-この例では：
+In the example:
 
 * `Email` は、クラスヘッダーに `address` という1つのプロパティを持つインライン値クラスです。
 * `sendEmail()` 関数は `Email` 型のオブジェクトを受け取り、標準出力に文字列を出力します。
@@ -361,7 +349,7 @@ fun main() {
 
 インライン値クラスの詳細については、[インライン値クラス](inline-classes.md)を参照してください。
 
-## 演習
+## 演習 {completion-point="true"}
 
 ### 演習 1 {initial-collapse-state="collapsed" collapsible="true" id="special-classes-exercise-1"}
 
@@ -530,6 +518,13 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="解答例" id="kotlin-tour-special-classes-solution-2"}
 
-## 次のステップ
+<seealso></seealso>
 
-[中級：プロパティ](kotlin-tour-intermediate-properties.md)
+<list columns="2" id="tour-nav">
+  <li>
+    <a as="button" href="kotlin-tour-intermediate-objects.md" mode="outline" icon="arrow-left" icon-position="left">前のステップ</a>
+  </li>
+  <li>
+    <a as="button" href="kotlin-tour-intermediate-properties.md" mode="classic" icon="arrow-right" icon-position="right">次のステップ</a>
+  </li>
+</list>

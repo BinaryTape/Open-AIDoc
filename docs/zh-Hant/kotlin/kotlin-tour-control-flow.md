@@ -2,21 +2,11 @@
 
 <no-index/>
 
-<tldr>
-    <p><img src="icon-1-done.svg" width="20" alt="第一步" /> <a href="kotlin-tour-hello-world.md">Hello world</a><br />
-        <img src="icon-2-done.svg" width="20" alt="第二步" /> <a href="kotlin-tour-basic-types.md">基本型別</a><br />
-        <img src="icon-3-done.svg" width="20" alt="第三步" /> <a href="kotlin-tour-collections.md">集合</a><br />
-        <img src="icon-4.svg" width="20" alt="第四步" /> <strong>控制流程</strong><br />
-        <img src="icon-5-todo.svg" width="20" alt="第五步" /> <a href="kotlin-tour-functions.md">函式</a><br />
-        <img src="icon-6-todo.svg" width="20" alt="第六步" /> <a href="kotlin-tour-classes.md">類別</a><br />
-        <img src="icon-7-todo.svg" width="20" alt="最後一步" /> <a href="kotlin-tour-null-safety.md">空值安全</a></p>
-</tldr>
-
 如同其他程式語言，Kotlin 能夠根據一段程式碼的求值結果是否為 true 來做出決策。這類程式碼被稱為**條件運算式**（conditional expression）。Kotlin 也能夠建立並疊代迴圈。
 
 ## 條件運算式
 
-Kotlin 提供 `if` 與 `when` 來檢查條件運算式。
+Kotlin 提供 `if` 與 `when` 來檢查條件運算式。 
 
 > 如果您必須在 `if` 與 `when` 之間做出選擇，我們建議使用 `when`，因為它：
 > 
@@ -374,7 +364,7 @@ fun main() {
 
 現在您已經了解 Kotlin 控制流程的基礎知識，是時候學習如何編寫您自己的 [函式](kotlin-tour-functions.md) 了。
 
-## 迴圈練習
+## 迴圈練習 {completion-point="true"}
 
 ### 練習 1 {initial-collapse-state="collapsed" collapsible="true" id="loops-exercise-1"}
 
@@ -512,6 +502,13 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="範例解答" id="kotlin-tour-control-flow-loops-solution-3"}
 
-## 下一步
+<seealso></seealso>
 
-[函式](kotlin-tour-functions.md)
+<list columns="2" id="tour-nav">
+  <li>
+    <a as="button" href="kotlin-tour-collections.md" mode="outline" icon="arrow-left" icon-position="left">上一步</a>
+  </li>
+  <li>
+    <a as="button" href="kotlin-tour-functions.md" mode="classic" icon="arrow-right" icon-position="right">下一步</a>
+  </li>
+</list>

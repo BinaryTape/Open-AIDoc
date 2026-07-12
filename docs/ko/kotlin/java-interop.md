@@ -139,8 +139,13 @@ foo.`is`(bar)
 ## Null 안정성 및 플랫폼 타입
 
 Java의 모든 참조는 `null`이 될 수 있으므로, Java에서 오는 객체에 대해 Kotlin의 엄격한 null 안정성(null-safety) 요구 사항을 적용하는 것은 실용적이지 않습니다.
-Java 선언의 타입은 Kotlin에서 특정한 방식으로 처리되며 이를 *플랫폼 타입(platform types)*이라고 부릅니다. 이러한 타입에 대해서는 null 체크가 완화되므로, 안전성 보장은 Java와 동일합니다([아래](#매핑된-타입)를 참조하세요).
+Java 선언의 타입은 Kotlin에서 [플랫폼 타입(platform types)](https://kotlinlang.org/spec/type-system.html#platform-types)이라고 불리며, 이는 명시적으로 표기할 수 없는(non-denotable) 타입으로 처리됩니다.
+코드에서 이러한 타입을 명시적으로 적을 수 없습니다. 따라서 플랫폼 값이 Kotlin 변수에 할당될 때 다음과 같은 작업을 할 수 있습니다.
 
+* 타입 추론에 의존합니다. 이 경우 변수는 추론된 플랫폼 타입을 갖게 됩니다.
+* 기대하는 타입을 선택합니다. Kotlin은 nullable과 non-nullable 타입 모두를 허용합니다.
+
+이러한 타입에 대해서는 null 체크가 완화되므로, 안전성 보장은 Java와 동일합니다([아래](#매핑된-타입)를 참조하세요).
 다음 예시를 살펴보세요.
 
 ```kotlin
@@ -156,8 +161,7 @@ val item = list[0] // 플랫폼 타입으로 추론됨 (일반 Java 객체)
 item.substring(1) // 허용되지만, item == null인 경우 예외 발생
 ```
 
-플랫폼 타입은 *명시적으로 표기할 수 없는(non-denotable)* 타입입니다. 즉, 언어에서 이를 명시적으로 적을 수 없습니다.
-플랫폼 값이 Kotlin 변수에 할당될 때, 타입 추론에 의존하거나(위 예제의 `item`처럼 변수가 추론된 플랫폼 타입을 갖게 됨) 원하는 타입을 선택할 수 있습니다(nullable과 non-nullable 타입 모두 허용됨).
+플랫폼 타입 값을 nullable 및 non-nullable Kotlin 타입 변수 모두에 할당할 수 있습니다. 그러나 이러한 값을 non-nullable 타입 변수에 할당했는데 실제 값이 실행 시점에 `null`인 경우, Kotlin은 `NullPointerException`을 발생시킵니다. 이를 방지하려면 Kotlin 코드에 명시적인 null 허용 여부를 추가하세요.
 
 ```kotlin
 val nullable: String? = item // 허용되며 항상 작동함
@@ -169,12 +173,14 @@ val notNull: String = item // 허용되지만 실행 시점에 실패할 수 있
 
 ### 플랫폼 타입 표기법
 
-위에서 언급했듯이 플랫폼 타입은 프로그램에서 명시적으로 언급할 수 없으므로 언어상에 구문이 존재하지 않습니다.
+이전 섹션에서 언급했듯이 플랫폼 타입은 프로그램에서 명시적으로 언급할 수 없으므로 언어상에 구문이 존재하지 않습니다.
 그럼에도 불구하고 컴파일러와 IDE는 때때로 이를 표시해야 할 필요가 있으므로(예: 에러 메시지나 파라미터 정보), 이를 위한 기억하기 쉬운 표기법이 있습니다.
 
 * `T!`는 "`T` 또는 `T?`"를 의미합니다.
 * `(Mutable)Collection<T>!`는 "Java 컬렉션 `T`는 가변일 수도 있고 아닐 수도 있으며, null일 수도 있고 아닐 수도 있음"을 의미합니다.
 * `Array<(out) T>!`는 "Java 배열 `T`(또는 `T`의 하위 타입)는 null일 수도 있고 아닐 수도 있음"을 의미합니다.
+
+에러 메시지나 IDE 툴팁에서 이 표기법을 본다면, Kotlin 변수에 명시적인 타입 어노테이션을 추가하여 null 안정성 체크를 복구하거나, 소스에서 null 허용 여부 어노테이션을 사용하여 플랫폼 타입을 제거하세요.
 
 ### Null 허용 여부 어노테이션(Nullability annotations)
 
@@ -212,7 +218,9 @@ null 허용 여부 어노테이션이 있는 Java 타입은 플랫폼 타입이 
 
 ### 가변성 어노테이션(Mutability annotations)
 
-Java 선언에 가변성 어노테이션을 달아 반환된 컬렉션이 Kotlin에서 읽기 전용인지 가변인지 지정할 수 있습니다. 가변성이 다른 컬렉션 타입에 값을 할당하면 컴파일러가 타입 불일치를 보고합니다. 진단 수준은 특정 가변성 어노테이션에 따라 달라집니다.
+Java 선언에 가변성 어노테이션을 달아 반환된 컬렉션이 Kotlin에서 읽기 전용인지 가변인지 지정할 수 있습니다.
+가변성이 다른 컬렉션 타입에 값을 할당하면 컴파일러가 타입 불일치를 보고합니다.
+진단 수준은 특정 가변성 어노테이션에 따라 달라집니다.
 
 컴파일러는 다음과 같은 여러 가변성 어노테이션을 지원합니다.
 
@@ -414,7 +422,7 @@ interface A {
 * `ElementType.FIELD`: 필드
 * `ElementType.TYPE_USE`: 타입 인자, 타입 파라미터의 상한 및 와일드카드 타입을 포함한 모든 타입
 
-기본 null 허용 여부는 타입 자체에 null 허용 여부 어노테이션이 없고, 타입 사용법과 일치하는 `ElementType`을 가진 타입 한정자 기본 어노테이션이 달린 가장 안쪽의 감싸는 요소에 의해 기본값이 결정될 때 사용됩니다.
+기본 null 허용 여부는 타입 자체가 null 허용 여부 어노테이션이 없고, 타입 사용법과 일치하는 `ElementType`을 가진 타입 한정자 기본 어노테이션이 달린 가장 안쪽의 감싸는 요소에 의해 기본값이 결정될 때 사용됩니다.
 
 ```java
 @Nonnull
@@ -693,7 +701,7 @@ fun render(list: List<*>, to: Appendable) {
 Java 타입이 Kotlin으로 임포트될 때 `java.lang.Object` 타입의 모든 참조는 `Any`로 바뀝니다.
 `Any`는 플랫폼에 구속되지 않으므로 멤버로 `toString()`, `hashCode()`, `equals()`만 선언하고 있습니다. 따라서 `java.lang.Object`의 다른 멤버를 사용할 수 있도록 Kotlin은 [확장 함수(extension functions)](extensions.md)를 사용합니다.
 
-### wait() 및 notify()
+### `wait()` 및 `notify()`
 
 `wait()` 및 `notify()` 메서드는 `Any` 타입의 참조에서 사용할 수 없습니다. 일반적으로 `java.util.concurrent`를 대신 사용하는 것이 권장됩니다.
 
@@ -744,7 +752,7 @@ class SimpleBlockingQueue<T>(private val capacity: Int) {
 (foo as java.lang.Object).wait()
 ```
 
-### getClass()
+### `getClass()`
 
 객체의 Java 클래스를 검색하려면 [클래스 참조(class reference)](reflection.md#class-references)에서 `java` 확장 프로퍼티를 사용하세요.
 
@@ -758,7 +766,7 @@ val fooClass = foo::class.java
 val fooClass = foo.javaClass
 ```
 
-### clone()
+### `clone()`
 
 `clone()`을 오버라이드하려면 클래스가 `kotlin.Cloneable`을 상속받아야 합니다.
 
@@ -770,7 +778,7 @@ class Example : Cloneable {
 
 [Effective Java, 3rd Edition](https://www.oracle.com/technetwork/java/effectivejava-136174.html)의 Item 13: *clone 재정의는 신중히 하라*를 잊지 마세요.
 
-### finalize()
+### `finalize()`
 
 `finalize()`를 오버라이드하려면 `override` 키워드를 사용하지 않고 단순히 선언하기만 하면 됩니다.
 
@@ -809,8 +817,8 @@ Java 리플렉션은 Kotlin 클래스에서 작동하며 그 반대도 마찬가
 
 ## SAM 변환
 
-Kotlin은 Java와 [Kotlin 인터페이스](fun-interfaces.md) 모두에 대해 SAM 변환을 지원합니다.
-Java에 대한 이 지원은 인터페이스 메서드의 파라미터 타입이 Kotlin 함수의 파라미터 타입과 일치하는 한, 단일 추상 메서드(single non-default method)가 있는 Java 인터페이스의 구현으로 Kotlin 함수 리터럴이 자동으로 변환될 수 있음을 의미합니다.
+Kotlin은 Java와 [Kotlin 인터페이스](fun-interfaces.md) 모두에 대해 SAM 변환을 지원합니다. 
+Java에 대한 이 지원은 인터페이스 메서드의 파라미터 타입이 Kotlin 함수의 파라미터 타입과 일치하는 한, 단일 비디폴트 메서드(single non-default method)가 있는 Java 인터페이스의 구현으로 Kotlin 함수 리터럴이 자동으로 변환될 수 있음을 의미합니다.
 
 SAM 인터페이스의 인스턴스를 생성하는 데 이를 사용할 수 있습니다.
 

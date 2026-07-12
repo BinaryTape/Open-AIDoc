@@ -255,6 +255,8 @@ if (x is String && x.length > 0) {
 }
 ```
 
+如果你使用 `and` 操作符 (`&&`) 组合对象的类型检查，编译器会同时将对象智能转换为所有已检查的类型。欲了解更多信息，请参阅[交叉类型](#intersection-types)。
+
 如果你使用 `or` 操作符 (`||`) 组合对象的类型检查，则会智能转换为它们最近的公共父类型：
 
 ```kotlin
@@ -277,6 +279,36 @@ fun signalCheck(signalStatus: Any) {
 > 公共父类型是 [联合类型](https://en.wikipedia.org/wiki/Union_type) 的一种**近似**。联合类型[目前在 Kotlin 中暂不受支持](https://youtrack.jetbrains.com/issue/KT-13108/Denotable-union-and-intersection-types)。
 >
 {style="note"}
+
+### 交叉类型
+
+当编译器通过多个 `&&` 检查对一个对象进行智能转换时，它会推断出一个[*交叉类型*](https://kotlinlang.org/spec/type-system.html#intersection-types)。这是一种内部类型，它同时满足所有已检查的约束：
+
+```kotlin
+interface Bird {
+    fun fly()
+}
+
+interface Fish {
+    fun swim()
+}
+
+fun describe(animal: Any) {
+    // 推断出 Bird 和 Fish 类型
+    if (animal is Bird && animal is Fish) {
+        // 无需额外检查或转换即可访问 fly() 和 swim()
+        animal.fly()
+        animal.swim()
+    }
+}
+```
+
+交叉类型是不可表示的。它们仅存在于编译器的内部类型系统中，用于在类型检查期间保留类型信息。你无法在 Kotlin 代码中直接编写它们。你可能会在编译器错误消息和 IDE 工具提示中遇到交叉类型，通常显示为 `A & B`。
+唯一的例外是 `T & Any`，它声明了一个[绝对不可为空类型](generics.md#definitely-non-nullable-types)。此语法专门预留用于将类型参数与 `Any` 结合。
+
+```kotlin
+fun  <T> T.assertNotNull(): T & Any = this ?: throw IllegalStateException("null value")
+```
 
 ### 内联函数
 

@@ -1,18 +1,6 @@
-[//]: # (title: 중급: 라이브러리와 API)
+[//]: # (title: 라이브러리와 API)
 
 <no-index/>
-
-<tldr>
-    <p><img src="icon-1-done.svg" width="20" alt="첫 번째 단계" /> <a href="kotlin-tour-intermediate-extension-functions.md">확장 함수</a><br />
-        <img src="icon-2-done.svg" width="20" alt="두 번째 단계" /> <a href="kotlin-tour-intermediate-scope-functions.md">범위 지정 함수</a><br />
-        <img src="icon-3-done.svg" width="20" alt="세 번째 단계" /> <a href="kotlin-tour-intermediate-lambdas-receiver.md">수신 객체 지정 람다 식</a><br />
-        <img src="icon-4-done.svg" width="20" alt="네 번째 단계" /> <a href="kotlin-tour-intermediate-classes-interfaces.md">클래스와 인터페이스</a><br />
-        <img src="icon-5-done.svg" width="20" alt="다섯 번째 단계" /> <a href="kotlin-tour-intermediate-objects.md">객체</a><br />
-        <img src="icon-6-done.svg" width="20" alt="여섯 번째 단계" /> <a href="kotlin-tour-intermediate-open-special-classes.md">Open 클래스와 특수 클래스</a><br />
-        <img src="icon-7-done.svg" width="20" alt="일곱 번째 단계" /> <a href="kotlin-tour-intermediate-properties.md">프로퍼티</a><br />
-        <img src="icon-8-done.svg" width="20" alt="여덟 번째 단계" /> <a href="kotlin-tour-intermediate-null-safety.md">널 안전성</a><br />
-        <img src="icon-9.svg" width="20" alt="아홉 번째 단계" /> <strong>라이브러리와 API</strong><br /></p>
-</tldr>
 
 Kotlin을 최대한 활용하려면 기존 라이브러리와 API를 사용하여 바퀴를 다시 발명하는 시간을 줄이고 코딩에 더 많은 시간을 투자하세요.
 
@@ -162,7 +150,7 @@ fun main() {
 
 이것이 옵트인하는 가장 쉬운 방법이지만 다른 방법도 있습니다. 자세히 알아보려면 [옵트인 요구 사항](opt-in-requirements.md)을 참조하세요.
 
-## 연습 문제
+## 연습 문제 {completion-point="true"}
 
 ### 연습 문제 1 {initial-collapse-state="collapsed" collapsible="true" id="libraries-exercise-1"}
 
@@ -290,3 +278,11 @@ fun main() {
 * Android 및 iOS용 크로스 플랫폼 애플리케이션을 처음부터 만들기:
     * [UI는 네이티브로 유지하면서 비즈니스 로직 공유하기](https://kotlinlang.org/docs/multiplatform/multiplatform-create-first-app.html)
     * [비즈니스 로직과 UI 모두 공유하기](https://kotlinlang.org/docs/multiplatform/compose-multiplatform-create-first-app.html)
+
+<seealso></seealso>
+
+<list id="tour-nav">
+  <li>
+    <a as="button" href="kotlin-tour-intermediate-null-safety.md" mode="outline" icon="arrow-left" icon-position="left">이전 단계</a>
+  </li>
+</list>

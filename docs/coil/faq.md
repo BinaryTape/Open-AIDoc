@@ -69,6 +69,48 @@ android {
 }
 ```
 
+## 为什么我会收到 Compose 多平台的 Skiko 版本警告？
+
+如果 Coil 的 Skiko 依赖版本早于 Compose 多平台的版本，Compose 多平台将打印如下警告：
+
+```text
+w: Skiko dependencies' versions are incompatible.
+```
+
+此警告通常可以安全忽略，因为 Skiko 版本通常保持二进制兼容性。Coil 的发布版本会跟踪 Compose 多平台的 **stable**（稳定）版本及其 Skiko 版本，因此如果你遇到此警告，请首先将 Coil 更新到最新版本。
+
+**注意**：通常情况下，Coil 不会仅为了匹配 Compose 多平台的 **alpha** 和 **beta** 版本所使用的 Skiko 版本而发布新版本，除非这些 Skiko 版本与最新 Coil 版本所依赖的版本不兼容。
+
+如果警告仍然存在，你可以通过设置以下 Gradle 属性来忽略它：
+
+```properties
+org.jetbrains.compose.library.compatibility.check.disable=true
+```
+
+但是，该 Gradle 属性会禁用所有库的所有 Compose 多平台库兼容性检查，而不仅仅是针对 Coil。要仅针对 Coil 及其 Skiko 依赖禁用该警告，请将以下代码段添加到根 `build.gradle.kts` 文件中：
+
+```kotlin
+dependencies {
+    components {
+        all {
+            if (id.group == "io.coil-kt.coil3") {
+                allVariants {
+                    withDependencies {
+                        val hadSkikoDependency = removeAll {
+                            it.group == "org.jetbrains.skiko" && it.name == "skiko"
+                        }
+                        if (hadSkikoDependency) {
+                            // 将 `0.150.0` 替换为你的 Compose 多平台版本所使用的 Skiko 版本。
+                            add("org.jetbrains.skiko:skiko:0.150.0")
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
 ## 如何获取开发快照？
 
 将快照仓库添加到你的仓库列表中：

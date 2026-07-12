@@ -55,6 +55,30 @@ Java와 Kotlin 혼합 프로젝트의 경우, 이 구성은 다음을 보장합�
 >
 {style="note"}
 
+<anchor name="maven-compiler-extensions-version"/>
+
+현재 `<extensions>`와 함께 사용되는 Maven 컴파일러 플러그인의 기본 버전은 **%mavenExtensionsVersion%**입니다. 다음과 같이 다른 버전을 별도로 설정할 수 있습니다.
+
+```xml
+<build>
+    <plugins>
+        <!-- Kotlin 컴파일러 플러그인 구성 -->
+        <plugin>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-maven-plugin</artifactId>
+            <version>${kotlin.version}</version>
+            <extensions>true</extensions>
+        </plugin>
+        <!-- Java 클래스를 위한 Maven 컴파일러 플러그인 구성 -->
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>%mavenPluginVersion%</version>
+        </plugin>
+    </plugins>
+</build>
+```
+
 ### JVM 대상 버전
 
 `<extensions>` 옵션은 Kotlin과 Maven 컴파일러가 동일한 바이트코드 버전을 대상으로 하도록 보장합니다.
@@ -105,30 +129,6 @@ Maven 컴파일러의 `target`과 `release` 옵션은 서로 다르게 동작한
 > `<extensions>` 옵션은 프로젝트 수준의 속성과 전역 `maven-compiler-plugin` 구성만 확인합니다. 플러그인의 `<executions>` 섹션에 정의된 구성은 확인하지 않습니다.
 >
 {style="note"}
-
-### Maven 컴파일러 버전
-
-현재 `<extensions>`와 함께 사용되는 Maven 컴파일러 플러그인의 기본 버전은 **%mavenExtensionsVersion%**입니다. 다음과 같이 다른 버전을 별도로 설정할 수 있습니다.
-
-```xml
-<build>
-    <plugins>
-        <!-- Kotlin 컴파일러 플러그인 구성 -->
-        <plugin>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-maven-plugin</artifactId>
-            <version>${kotlin.version}</version>
-            <extensions>true</extensions>
-        </plugin>
-        <!-- Java 클래스를 위한 Maven 컴파일러 플러그인 구성 -->
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <version>%mavenPluginVersion%</version>
-        </plugin>
-    </plugins>
-</build>
-```
 
 ## 수동 구성
 

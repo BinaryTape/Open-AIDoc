@@ -2,16 +2,6 @@
 
 <no-index/>
 
-<tldr>
-    <p><img src="icon-1.svg" width="20" alt="第一步" /> <strong>Hello world</strong><br />
-        <img src="icon-2-todo.svg" width="20" alt="第二步" /> <a href="kotlin-tour-basic-types.md">基本型別</a><br />
-        <img src="icon-3-todo.svg" width="20" alt="第三步" /> <a href="kotlin-tour-collections.md">集合</a><br />
-        <img src="icon-4-todo.svg" width="20" alt="第四步" /> <a href="kotlin-tour-control-flow.md">控制流程</a><br />
-        <img src="icon-5-todo.svg" width="20" alt="第五步" /> <a href="kotlin-tour-functions.md">函式</a><br />
-        <img src="icon-6-todo.svg" width="20" alt="第六步" /> <a href="kotlin-tour-classes.md">類別</a><br />
-        <img src="icon-7-todo.svg" width="20" alt="最終步" /> <a href="kotlin-tour-null-safety.md">Null 安全性</a></p>
-</tldr>
-
 這是一個印出 "Hello, world!" 的簡單程式：
 
 ```kotlin
@@ -98,7 +88,7 @@ fun main() {
 
 您會注意到變數並沒有宣告任何型別。Kotlin 已自行推論出型別：`Int`。本導覽將在[下一章節](kotlin-tour-basic-types.md)介紹不同的 Kotlin 基本型別以及如何宣告它們。
 
-## 練習
+## 練習 {completion-point="true"}
 
 ### 練習 {initial-collapse-state="collapsed" collapsible="true"}
 
@@ -124,6 +114,10 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="範例解法" id="kotlin-tour-hello-world-solution"}
 
-## 下一步
+<seealso></seealso>
 
-[基本型別](kotlin-tour-basic-types.md)
+<list id="tour-nav">
+  <li>
+    <a as="button" href="kotlin-tour-basic-types.md" mode="classic" icon="arrow-right" icon-position="right">下一步</a>
+  </li>
+</list>

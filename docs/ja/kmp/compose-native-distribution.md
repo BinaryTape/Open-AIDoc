@@ -244,7 +244,7 @@ compose.desktop {
         <td>
             <ul>
                 <li><code>MAJOR</code> は 255 以下の非負の整数</li>
-                <li><code>MINOR</code> は 255 以下の非負의 整数</li>
+                <li><code>MINOR</code> は 255 以下の非負の整数</li>
                 <li><code>BUILD</code> は 65535 以下の非負の整数</li>
             </ul>
         </td>
@@ -518,7 +518,7 @@ compose.desktop {
 }
 ``` 
 
-Kotlin [JVM ターゲット](multiplatform-dsl-reference.md#targets) を使用する場合:
+Using a Kotlin [JVM ターゲット](multiplatform-dsl-reference.md#targets) を使用する場合:
 
 ``` kotlin
 plugins {
@@ -763,7 +763,8 @@ compose.desktop {
             JVM ランタイムの署名時に使用されるエンタイトルメントを含むファイルへのパスを指定します。カスタムファイルを提供するときは、
             Java アプリケーションに必要なエンタイトルメントを追加してください。デフォルトのファイルについては 
             <a href="https://github.com/openjdk/jdk/blob/master/src/jdk.jpackage/macosx/classes/jdk/jpackage/internal/resources/sandbox.plist">
-                sandbox.plist</a> を参照してください。詳細は 
+                sandbox.plist</a> を参照してください。ファイルが指定されていない場合、プラグインは <code>jpackage</code> によって提供されるデフォルトのエンタイトルメントを使用します。
+            詳細は 
             <a href="https://github.com/JetBrains/compose-multiplatform/tree/master/tutorials/Signing_and_notarization_on_macOS">
                macOS 用の配布物の署名と公証</a> チュートリアルを参照してください。
         </td>
@@ -1046,55 +1047,71 @@ ProGuard は、コードのミニファイ（縮小化）と難読化のため�
 ただし、ProGuard はバイトコード内の一部の使用箇所を追跡できない場合があります（例：リフレクションを介してクラスが使用される場合）。
 ProGuard 処理後にのみ発生する問題に遭遇した場合は、カスタムルールを追加する必要があるかもしれません。
 
-カスタム設定ファイルを指定するには、以下のように DSL を使用します。
+`buildTypes.release.proguard` ブロック内で Gradle DSL を使用し、以下のオプションで ProGuard を設定できます。
 
-```kotlin
-compose.desktop {
-    application {
-        buildTypes.release.proguard {
-            configurationFiles.from(project.file("compose-desktop.pro"))
+* `configurationFiles` はカスタム ProGuard 設定ファイルを指定します。
+    ```kotlin
+    compose.desktop {
+        application {
+            buildTypes.release.proguard {
+                configurationFiles.from(project.file("compose-desktop.pro"))
+            }
         }
     }
-}
-```
+    ```
+    {initial-collapse-state="collapsed" collapsible="true" collapsed-title='configurationFiles.from(project.file("compose-desktop.pro"))'}
 
-ProGuard ルールと構成オプションの詳細については、Guardsquare の [マニュアル](https://www.guardsquare.com/manual/configuration/usage) を参照してください。
-
-難読化はデフォルトで無効になっています。有効にするには、Gradle DSL を介して以下のプロパティを設定します。
-
-```kotlin
-compose.desktop {
-    application {
-        buildTypes.release.proguard {
-            obfuscate.set(true)
+* `obfuscate` はコードの難読化を有効にします。デフォルトでは無効になっています。
+    ```kotlin
+    compose.desktop {
+        application {
+            buildTypes.release.proguard {
+                obfuscate.set(true)
+            }
         }
     }
-}
-```
+    ```
+    {initial-collapse-state="collapsed" collapsible="true" collapsed-title="obfuscate.set(true)"}
 
-ProGuard の最適化はデフォルトで有効になっています。無効にするには、Gradle DSL を介して以下のプロパティを設定します。
-
-```kotlin
-compose.desktop {
-    application {
-        buildTypes.release.proguard {
-            optimize.set(false)
+* `optimize` は ProGuard の最適化を制御します。デフォルトでは有効になっています。
+    ```kotlin
+    compose.desktop {
+        application {
+            buildTypes.release.proguard {
+                optimize.set(false)
+            }
         }
     }
-}
-```
+    ```
+    {initial-collapse-state="collapsed" collapsible="true" collapsed-title="optimize.set(false)"}
 
-uber JAR の生成はデフォルトで無効になっており、ProGuard は入力された各 `.jar` に対して対応する `.jar` ファイルを生成します。これを有効にするには、Gradle DSL を介して以下のプロパティを設定します。
-
-```kotlin
-compose.desktop {
-    application {
-        buildTypes.release.proguard {
-            joinOutputJars.set(true)
+* `joinOutputJars` は単一の uber-JAR を生成します。デフォルトでは、ProGuard は入力された各 `.jar` に対して個別の `.jar` ファイルを生成します。
+    ```kotlin
+    compose.desktop {
+        application {
+            buildTypes.release.proguard {
+                joinOutputJars.set(true)
+            }
         }
     }
-}
-```
+    ```
+    {initial-collapse-state="collapsed" collapsible="true" collapsed-title="joinOutputJars.set(true)"}
+
+[//]: # (TODO update version for stable release)
+
+* `version` は特定の ProGuard バージョンを設定します。JDK 25 には少なくとも ProGuard 7.8.0 が必要で、これは Compose Multiplatform 1.12.0-beta01 以降のデフォルトです。それ以前のバージョンの Compose Multiplatform を使用し、JDK 25 でビルドする場合は、このプロパティを明示的に `7.8.0` に設定してください。
+    ```kotlin
+    compose.desktop {
+        application {
+            buildTypes.release.proguard {
+                version.set("7.8.0")
+            }
+        }
+    }
+    ```
+    {initial-collapse-state="collapsed" collapsible="true" collapsed-title='version.set("7.8.0")'}
+
+ProGuard ルールと設定オプションの完全なリストについては、Guardsquare の [ProGuard マニュアル](https://www.guardsquare.com/manual/configuration/usage) を参照してください。
 
 ## 次のステップ
 

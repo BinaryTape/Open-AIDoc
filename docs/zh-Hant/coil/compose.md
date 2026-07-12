@@ -166,6 +166,8 @@ Image(
 )
 ```
 
+請參閱 [Compose AnimatedContent](/coil/recipes/#compose-animatedcontent) 以獲取完整的 `AnimatedContent` 範例。
+
 ## 預覽 (Previews)
 
 Android Studio 對於 `AsyncImage`/`rememberAsyncImagePainter`/`SubcomposeAsyncImage` 的預覽行為是由 `LocalAsyncImagePreviewHandler` 控制的。預設情況下，它會嘗試在預覽環境中正常執行請求。預覽環境中停用了網路存取，因此網路 URL 將始終失敗。

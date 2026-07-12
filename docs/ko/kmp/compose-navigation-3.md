@@ -26,7 +26,7 @@
 
 ```toml
 [versions]
-multiplatform-nav3-ui = "1.0.0-alpha05"
+multiplatform-nav3-ui = "1.1.1"
 
 [libraries]
 jetbrains-navigation3-ui = { module = "org.jetbrains.androidx.navigation3:navigation3-ui", version.ref = "multiplatform-nav3-ui" }
@@ -40,8 +40,8 @@ jetbrains-navigation3-ui = { module = "org.jetbrains.androidx.navigation3:naviga
 Material 3 Adaptive 및 ViewModel 라이브러리를 사용하는 프로젝트의 경우, 다음 네비게이션 지원 아티팩트도 추가하세요:
 ```toml
 [versions]
-compose-multiplatform-adaptive = "1.3.0-alpha02"
-compose-multiplatform-lifecycle = "2.10.0-alpha05"
+compose-multiplatform-adaptive = "1.3.0-beta02"
+compose-multiplatform-lifecycle = "2.10.0"
 
 [libraries]
 jetbrains-material3-adaptiveNavigation3 = { module = "org.jetbrains.compose.material3.adaptive:adaptive-navigation3", version.ref = "compose-multiplatform-adaptive" }
@@ -52,13 +52,14 @@ jetbrains-lifecycle-viewmodelNavigation3 = { module = "org.jetbrains.androidx.li
 
 ```toml
 [versions]
-compose-multiplatform-navigation3-browser = "0.2.0"
+compose-multiplatform-navigation3-browser = "1.1.0"
 
 [libraries]
 navigation3-browser = { module = "com.github.terrakok:navigation3-browser", version.ref = "compose-multiplatform-navigation3-browser" }
 ```
 
-브라우저 기록 네비게이션은 버전 1.1.0에서 기본 멀티플랫폼 네비게이션 3 라이브러리에 의해 지원될 예정입니다.
+브라우저 기록 네비게이션 지원은 향후 릴리스에서 기본 멀티플랫폼 네비게이션 3 라이브러리에 포함될 예정입니다.
+진행 상황은 [CMP-8924](https://youtrack.jetbrains.com/projects/CMP/issues/CMP-8924/Integrate-Browser-History-with-Nav3)에서 확인할 수 있습니다.
 
 ## 멀티플랫폼 지원
 

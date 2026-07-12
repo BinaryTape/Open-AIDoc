@@ -63,13 +63,13 @@ _No preview versions are currently available._
         </td>
     </tr>
     <tr>
-        <td><strong>2.4.10-RC</strong>
-            <p>출시일: <strong>2026년 6월 25일</strong></p>
-            <p><a href="https://github.com/JetBrains/kotlin/releases/tag/v2.4.10-RC" target="_blank">GitHub에서 릴리스 보기</a></p>
+        <td><strong>2.4.10-RC2</strong>
+            <p>출시일: <strong>2026년 7월 7일</strong></p>
+            <p><a href="https://github.com/JetBrains/kotlin/releases/tag/v2.4.10-RC2" target="_blank">GitHub에서 릴리스 보기</a></p>
         </td>
         <td>
             <p>Kotlin 2.4.0에 대한 성능 개선이 포함된 버그 수정 릴리스입니다.</p>
-            <p>자세한 내용은 <a href="https://github.com/JetBrains/kotlin/releases/tag/v2.4.10-RC">변경 로그(changelog)</a>를 참고하세요.</p>
+            <p>자세한 내용은 <a href="https://github.com/JetBrains/kotlin/releases/tag/v2.4.10-RC2">변경 로그(changelog)</a>를 참고하세요.</p>
         </td>
     </tr>
 </table>

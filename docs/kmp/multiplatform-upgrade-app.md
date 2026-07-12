@@ -17,7 +17,7 @@
 
 既然您已经使用外部依赖项实现了通用逻辑，现在可以开始添加更复杂的逻辑了。网络请求和数据序列化是使用 Kotlin Multiplatform 共享代码的[最热门用例](https://kotlinlang.org/lp/multiplatform/)。了解如何在您的第一个应用中实现这些功能，以便在完成此入门之旅后，可以在未来的项目中使用它们。
 
-更新后的应用将通过互联网从 [LaunchLibrary 2](https://lldev.thespacedevs.com/docs) API 获取数据，并显示 SpaceX 火箭最后一次成功发射的日期。
+更新后的应用将通过互联网从 [LaunchLibrary 2](https://lldev.thespacedevs.com/docs) API 获取数据，并显示最新航天发射的描述。
 
 > 您可以在我们的 GitHub 仓库的两个分支中找到项目的最终状态，分别包含不同的协程解决方案：
 > * [`main`](https://github.com/kotlin-hands-on/get-started-with-kmp/tree/main) 分支包含 KMP-NativeCoroutines 实现，
@@ -99,7 +99,7 @@ kotlin {
 
 ### 创建数据模型
 
-在 `sharedLogic/src/commonMain/.../greetingkmp` 目录中，创建一个新的 `RocketLaunch.kt` 文件，并添加一个存储 SpaceX API 数据的类：
+在 `sharedLogic/src/commonMain/.../greetingkmp` 目录中，创建一个新的 `RocketLaunch.kt` 文件，并添加一个存储来自 SpaceX API 数据的类：
 
 ```kotlin
 import kotlinx.serialization.SerialName
@@ -138,7 +138,7 @@ data class LaunchListResponse(
 ### 连接 HTTP 客户端
 
 1. 在 `sharedLogic/src/commonMain/.../greetingkmp` 目录中，创建一个新的 `RocketComponent` 类。
-2. 添加 `httpClient` 属性，通过 HTTP GET 请求检索火箭发射信息：
+2. 添加 `httpClient` 属性，以便通过 HTTP GET 请求检索火箭发射信息：
 
     ```kotlin
     import io.ktor.client.HttpClient
@@ -289,7 +289,7 @@ data class LaunchListResponse(
 
 ### 引入 ViewModel
 
-ViewModel 是 Android 开发中一种热门的模式，有助于管理数据和其他应在 [Android activity](https://developer.android.com/guide/components/activities/intro-activities) 生命周期中保持持久的应用组件。现在应用变得越来越复杂，是时候在我们的应用中也引入 ViewModel 了。它将存储从 SpaceX API 接收的数据并将其提供给 UI。
+ViewModel 是 Android 开发中一种热门的模式，有助于管理数据和其他应在 [Android Activity](https://developer.android.com/guide/components/activities/intro-activities) 生命周期中保持持久的应用组件。现在应用变得越来越复杂，是时候在我们的应用中也引入 ViewModel 了。它将存储从 SpaceX API 接收的数据并将其提供给 UI。
 
 在 Android 平台代码中创建 ViewModel 类：
 
@@ -415,7 +415,7 @@ ViewModel 是 Android 开发中一种热门的模式，有助于管理数据和�
 
 ## 更新原生 iOS UI
 
-对于项目的 iOS 部分，您将利用 [Model–view–viewmodel](https://en.wikipedia.org/wiki/Model–view–viewmodel) 模式（就像您在 Android 应用中所做的那样）将 UI 连接到 `sharedLogic` 模块。
+对于项目的 iOS 部分，您将利用 [Model–view–viewmodel (MVVM)](https://en.wikipedia.org/wiki/Model–view–viewmodel) 模式（就像您在 Android 应用中所做的那样）将 UI 连接到 `sharedLogic` 模块。
 
 该模块已经通过 `import SharedLogic` 声明导入到 `ContentView.swift` 文件中。
 

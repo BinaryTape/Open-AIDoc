@@ -166,6 +166,8 @@ Image(
 )
 ```
 
+전체 `AnimatedContent` 예시는 [Compose AnimatedContent](/coil/recipes/#compose-animatedcontent)를 참조하세요.
+
 ## Previews
 
 `AsyncImage`/`rememberAsyncImagePainter`/`SubcomposeAsyncImage`에 대한 Android Studio 프리뷰 동작은 `LocalAsyncImagePreviewHandler`에 의해 제어됩니다. 기본적으로 프리뷰 환경 내에서 일반적인 요청을 수행하려고 시도합니다. 프리뷰 환경에서는 네트워크 액세스가 비활성화되어 있으므로 네트워크 URL은 항상 실패합니다.

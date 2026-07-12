@@ -47,7 +47,7 @@
   "sqldelight.sqljs-driver": "sqljs-driver",
   "kotlin.home": "Home",
   "kotlin.getting-started": "Get started",
-  "kotlin.kotlin-tour-welcome": "Take Kotlin tour",
+  "kotlin.kotlin-tour-welcome": "Kotlin tour overview",
   "kotlin.kotlin-overview": "Kotlin overview",
   "kotlin.what-s-new-in-kotlin": "What's new in Kotlin",
   "kotlin.whatsnew22": "Kotlin 2.2.0",
@@ -643,5 +643,9 @@
   "coroutines.flows": "Flows",
   "coroutines.coroutines-flow": "Overview",
   "kmp.kotlin-toolchain": "Kotlin Toolchain",
-  "kmp.whats-new-compose-112": "Compose Multiplatform %org.jetbrains.compose-eap%"
+  "kmp.whats-new-compose-112": "Compose Multiplatform %org.jetbrains.compose-eap%",
+  "kotlin.take-kotlin-tour": "Take Kotlin tour",
+  "kotlin.beginner": "Beginner",
+  "kotlin.intermediate": "Intermediate",
+  "kotlin.immutable-collections-kotlinx-collections-immutable": "Immutable collections (kotlinx.collections.immutable)"
 }

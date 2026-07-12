@@ -6,15 +6,15 @@
 > 
 { style = "note" }
 
-투어를 통해 Kotlin 프로그래밍 언어의 핵심을 빠르게 배워보세요. 초급 투어로 기초를 다지고, 중급 투어로 이해를 넓힐 수 있습니다.
+투어를 통해 Kotlin 프로그래밍 언어의 핵심을 빠르게 배워보세요. 초급(Beginner) 투어로 기초를 다지고, 중급(Intermediate) 투어로 이해를 넓힐 수 있습니다.
 
 <p></p> <!-- workaround for MRK057: Paragraph can only contain inline elements-->
-<list columns="2">
+<list columns="2" id="kotlin-tour-starting-page">
     <li>
-        <a href="kotlin-tour-hello-world.md"><img src="kotlin-tour-beginner.svg" alt="Kotlin 초급 투어 시작하기" type="block"/></a>
+        <a href="kotlin-tour-hello-world.md" as="button" icon="arrow-right" icon-position="right">초급(Beginner)</a>
     </li>
     <li>
-        <a href="kotlin-tour-intermediate-extension-functions.md"><img src="kotlin-tour-intermediate.svg" alt="Kotlin 중급 투어 시작하기" type="block"/></a>
+        <a href="kotlin-tour-intermediate-extension-functions.md" as="button" icon="arrow-right" icon-position="right">중급(Intermediate)</a>
     </li>
     <li>
         <p><img src="icon-1.svg" width="20" /> <a href="kotlin-tour-hello-world.md">Hello world</a></p>

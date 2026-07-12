@@ -27,7 +27,7 @@ Navigation 3 的主要變更包括：
 
 ```toml
 [versions]
-multiplatform-nav3-ui = "1.0.0-alpha05"
+multiplatform-nav3-ui = "1.1.1"
 
 [libraries]
 jetbrains-navigation3-ui = { module = "org.jetbrains.androidx.navigation3:navigation3-ui", version.ref = "multiplatform-nav3-ui" }
@@ -41,8 +41,8 @@ jetbrains-navigation3-ui = { module = "org.jetbrains.androidx.navigation3:naviga
 對於使用 Material 3 Adaptive 和 ViewModel 程式庫的專案，還需新增以下導覽支援構件：
 ```toml
 [versions]
-compose-multiplatform-adaptive = "1.3.0-alpha02"
-compose-multiplatform-lifecycle = "2.10.0-alpha05"
+compose-multiplatform-adaptive = "1.3.0-beta02"
+compose-multiplatform-lifecycle = "2.10.0"
 
 [libraries]
 jetbrains-material3-adaptiveNavigation3 = { module = "org.jetbrains.compose.material3.adaptive:adaptive-navigation3", version.ref = "compose-multiplatform-adaptive" }
@@ -53,13 +53,14 @@ jetbrains-lifecycle-viewmodelNavigation3 = { module = "org.jetbrains.androidx.li
 
 ```toml
 [versions]
-compose-multiplatform-navigation3-browser = "0.2.0"
+compose-multiplatform-navigation3-browser = "1.1.0"
 
 [libraries]
 navigation3-browser = { module = "com.github.terrakok:navigation3-browser", version.ref = "compose-multiplatform-navigation3-browser" }
 ```
 
-瀏覽器歷程導覽預計將在 1.1.0 版本中由基礎多平台 Navigation 3 程式庫支援。
+瀏覽器歷程導覽預計將在未來版本的基礎多平台 Navigation 3 程式庫中支援。
+請在 [CMP-8924](https://youtrack.jetbrains.com/projects/CMP/issues/CMP-8924/Integrate-Browser-History-with-Nav3) 中追蹤進度。
 
 ## 多平台支援
 
@@ -73,7 +74,7 @@ Navigation 3 與 Compose 緊密結合，允許 Android 導覽實作在通用 Com
 ### 目的地金鑰的多型序列化
 
 在 Android 上，Navigation 3 依賴基於反射的序列化，這在針對 iOS 等非 JVM 平台時是不可用的。
-為了考慮到這一點，程式庫為 `rememberNavBackStack()` 函式提供了兩個多載：
+為了處理此限制，程式庫為 `rememberNavBackStack()` 函式提供了兩個多載：
 
 * [第一個多載](https://developer.android.com/reference/kotlin/androidx/navigation3/runtime/package-summary#rememberNavBackStack(kotlin.Array))僅接受一組 `NavKey` 參考，並需要基於反射的序列化器。
 * [第二個多載](https://developer.android.com/reference/kotlin/androidx/navigation3/runtime/package-summary#rememberNavBackStack(androidx.savedstate.serialization.SavedStateConfiguration,kotlin.Array))還接受一個 `SavedStateConfiguration` 參數，允許您提供 `SerializersModule` 並在所有平台上正確處理開放式多型。

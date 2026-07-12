@@ -43,10 +43,6 @@ Kotlin 2.4.0 正式發佈！以下是主要的亮點：
 * [Maven：Java 與 JVM 目標版本自動對齊](#automatic-alignment-between-java-and-jvm-target-versions)
 * [支援 Maven Toolchains](#support-for-maven-toolchains)
 
-> 在不使用 `-Xexplicit-backing-fields` 編譯器選項的情況下，在 IntelliJ IDEA 中使用明確支援欄位的支援將於 2026.1.4 提供。
->
-{style = "note"}
-
 ## 新特性 {id=new-experimental-features}
 <primary-label ref="experimental-exp"/>
 
@@ -363,7 +359,8 @@ fun handleNullablePackageName(packageName: String?, builder: StringBuilder) {
 }
 ```
 
-未使用傳回值檢查器是 [Experimental](components-stability.md#stability-levels-explained) 的，且必須啟用才能報告未使用的傳回值。有關啟用和配置檢查器的更多資訊，請參閱 [未使用傳回值檢查器](unused-return-value-checker.md#configure-the-unused-return-value-checker)。
+未使用傳回值檢查器是 [Experimental](components-stability.md#stability-levels-explained) 的，且必須啟用才能報告未使用的傳回值。
+有關啟用和配置檢查器的更多資訊，請參閱 [未使用傳回值檢查器](unused-return-value-checker.md#configure-the-unused-return-value-checker)。
 
 #### 如何啟用 {id=how-to-enable-unused-return-value-checker}
 
@@ -970,7 +967,8 @@ interface Identity {
 
 ## Gradle
 
-Kotlin 2.4.0 與 Gradle 7.6.3 至 9.5.0 完全相容。您也可以使用最高至最新發佈版本的 Gradle。但請注意，這樣做可能會導致棄用警告，且某些新的 Gradle 特性可能無法運作。Kotlin 2.4.0 還帶來了諸多改進，例如跨平台的一致預設模組名稱，以及將 Kotlin/JVM 的編譯器訊息寫入 Problems API。
+Kotlin 2.4.0 與 Gradle 7.6.3 至 9.5.0 完全相容。您也可以使用最高至最新發佈版本的 Gradle。但請注意，這樣做可能會導致棄用警告，且某些新的 Gradle 特性可能無法運作。
+Kotlin 2.4.0 還帶來了諸多改進，例如跨平台的一致預設模組名稱，以及將 Kotlin/JVM 的編譯器訊息寫入 Problems API。
 
 ### 最低受支援 AGP 版本提升至 8.5.2
 <secondary-label ref="gradle"/>
@@ -1272,7 +1270,7 @@ Kotlin 2.4.0 加入了對註解處理器探索的 `includeCompileClasspath` 配�
 
 Kotlin 2.4.0 透過新的執行時程式庫，使 Power-assert 相關函式更容易被發現且更容易配置。
 
-以前，採用 Power-assert 需要複雜的建置組態 and 函式參數慣例。從此版本開始，具有 Power-assert 能力的函式可以使用新的執行時程式庫直接與編譯器外掛程式轉換整合。
+以前，採用 Power-assert 需要複雜的建置組態以及函式參數慣例。從此版本開始，具有 Power-assert 能力的函式可以使用新的執行時程式庫直接與編譯器外掛程式轉換整合。
 
 這為外掛程式使用者和程式庫作者帶來了重大改進：
 

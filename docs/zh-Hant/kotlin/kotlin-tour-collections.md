@@ -2,17 +2,7 @@
 
 <no-index/>
 
-<tldr>
-    <p><img src="icon-1-done.svg" width="20" alt="First step" /> <a href="kotlin-tour-hello-world.md">Hello world</a><br />
-        <img src="icon-2-done.svg" width="20" alt="Second step" /> <a href="kotlin-tour-basic-types.md">基本型別</a><br />
-        <img src="icon-3.svg" width="20" alt="Third step" /> <strong>集合</strong><br />
-        <img src="icon-4-todo.svg" width="20" alt="Fourth step" /> <a href="kotlin-tour-control-flow.md">控制流</a><br />
-        <img src="icon-5-todo.svg" width="20" alt="Fifth step" /> <a href="kotlin-tour-functions.md">函式</a><br />
-        <img src="icon-6-todo.svg" width="20" alt="Sixth step" /> <a href="kotlin-tour-classes.md">類別</a><br />
-        <img src="icon-7-todo.svg" width="20" alt="Final step" /> <a href="kotlin-tour-null-safety.md">Null 安全性</a></p>
-</tldr>
-
-在進行程式設計時，能夠將資料分組到結構中以便稍後處理是非常有用的。Kotlin 正是為了這個目的而提供了集合（collections）。
+在編寫程式時，能夠將資料分組到結構中以便稍後處理是非常有用的。Kotlin 正是為了這個目的而提供了集合（collections）。
 
 Kotlin 具有以下用於將項目分組的集合型別：
 
@@ -223,7 +213,7 @@ fun main() {
 
 ## Map
 
-Map 以鍵值對的形式儲存項目。您可以透過引用鍵（key）來存取值（value）。您可以將 Map 想像成菜單。您可以透過找到想吃的食物（鍵）來找到對應的價格（值）。如果您想在不使用數字索引（如 List）的情況下查找值，Map 就非常有用。
+Map 以鍵值對的形式儲存項目。您可以透過引用鍵（key）來存取值（value）。您可以將 Map 想像成菜單。您可以透過找到想吃的食物（鍵）來找到對應的價格（值）。如果您想在不使用數字索引（如 List）的情況下查找值， Map 就非常有用。
 
 > * Map 中的每個鍵都必須是唯一的，這樣 Kotlin 才能識別您想要取得哪個值。 
 > * Map 中可以有重複的值。
@@ -396,7 +386,7 @@ fun main() {
 
 現在您已經了解基本型別以及如何管理集合，接下來是時候探索可以在程式中使用的 [控制流](kotlin-tour-control-flow.md) 了。
 
-## 練習
+## 練習 {completion-point="true"}
 
 ### 練習 1 {initial-collapse-state="collapsed" collapsible="true"}
 
@@ -425,7 +415,7 @@ fun main() {
 
 ### 練習 2 {initial-collapse-state="collapsed" collapsible="true"}
 
-您有一組伺服器支援的通訊協定（protocols）。使用者請求使用特定通訊協定。完成程式以檢查所請求的通訊協定是否受支援（`isSupported` 必須為布林值）。
+您有一組伺服器支援的通訊協定。使用者請求使用特定通訊協定。完成程式以檢查所請求的通訊協定是否受支援（`isSupported` 必須為布林值）。
 
 |---|---|
 ```kotlin
@@ -479,6 +469,13 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="範例解答" id="kotlin-tour-collections-solution-3"}
 
-## 下一步
+<seealso></seealso>
 
-[控制流](kotlin-tour-control-flow.md)
+<list columns="2" id="tour-nav">
+  <li>
+    <a as="button" href="kotlin-tour-basic-types.md" mode="outline" icon="arrow-left" icon-position="left">上一步</a>
+  </li>
+  <li>
+    <a as="button" href="kotlin-tour-control-flow.md" mode="classic" icon="arrow-right" icon-position="right">下一步</a>
+  </li>
+</list>

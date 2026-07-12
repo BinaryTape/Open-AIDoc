@@ -2,16 +2,6 @@
 
 <no-index/>
 
-<tldr>
-    <p><img src="icon-1-done.svg" width="20" alt="First step" /> <a href="kotlin-tour-hello-world.md">Hello world</a><br />
-        <img src="icon-2-done.svg" width="20" alt="Second step" /> <a href="kotlin-tour-basic-types.md">기본 타입(Basic types)</a><br />
-        <img src="icon-3.svg" width="20" alt="Third step" /> <strong>컬렉션(Collections)</strong><br />
-        <img src="icon-4-todo.svg" width="20" alt="Fourth step" /> <a href="kotlin-tour-control-flow.md">제어 흐름(Control flow)</a><br />
-        <img src="icon-5-todo.svg" width="20" alt="Fifth step" /> <a href="kotlin-tour-functions.md">함수(Functions)</a><br />
-        <img src="icon-6-todo.svg" width="20" alt="Sixth step" /> <a href="kotlin-tour-classes.md">클래스(Classes)</a><br />
-        <img src="icon-7-todo.svg" width="20" alt="Final step" /> <a href="kotlin-tour-null-safety.md">널 안전성(Null safety)</a></p>
-</tldr>
-
 프로그래밍을 할 때, 나중에 처리하기 위해 데이터를 구조로 그룹화할 수 있다면 유용합니다. 코틀린은 정확히 이 목적을 위해 컬렉션(collections)을 제공합니다.
 
 코틀린에는 아이템을 그룹화하기 위한 다음과 같은 컬렉션 타입이 있습니다:
@@ -292,7 +282,7 @@ fun main() {
 > ```
 > {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-map-no-key" validate="false"}
 > 
-> 이 튜토리얼은 나중에 [널 안전성(Null safety)](kotlin-tour-null-safety.md) 챕터에서 널(null) 값에 대해 설명합니다.
+> 이 투어는 나중에 [널 안전성(Null safety)](kotlin-tour-null-safety.md) 챕터에서 널(null) 값에 대해 설명합니다.
 > 
 {style="note"}
 
@@ -396,7 +386,7 @@ fun main() {
 
 기본 타입과 컬렉션을 관리하는 방법을 익혔으니, 이제 프로그램에서 사용할 수 있는 [제어 흐름(control flow)](kotlin-tour-control-flow.md)을 살펴볼 차례입니다.
 
-## 연습 문제
+## 연습 문제 {completion-point="true"}
 
 ### 연습 문제 1 {initial-collapse-state="collapsed" collapsible="true"}
 
@@ -464,7 +454,7 @@ fun main() {
 fun main() {
     val number2word = // 여기에 코드를 작성하세요
     val n = 2
-    println("$n is spelt as '${<여기에 코드를 작성하세요 >}'")
+    println("$n is spelled as '${<여기에 코드를 작성하세요 >}'")
 }
 ```
 {validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-collections-exercise-3"}
@@ -479,6 +469,13 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="해설 예시" id="kotlin-tour-collections-solution-3"}
 
-## 다음 단계
+<seealso></seealso>
 
-[제어 흐름(Control flow)](kotlin-tour-control-flow.md)
+<list columns="2" id="tour-nav">
+  <li>
+    <a as="button" href="kotlin-tour-basic-types.md" mode="outline" icon="arrow-left" icon-position="left">이전 단계</a>
+  </li>
+  <li>
+    <a as="button" href="kotlin-tour-control-flow.md" mode="classic" icon="arrow-right" icon-position="right">다음 단계</a>
+  </li>
+</list>

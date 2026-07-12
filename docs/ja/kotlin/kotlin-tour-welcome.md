@@ -9,12 +9,12 @@
 本ツアーを通じて、Kotlinプログラミング言語の要点を素早く学びましょう。初心者向けツアーで基礎を把握し、中級者向けツアーで理解を深めてください。
 
 <p></p> <!-- workaround for MRK057: Paragraph can only contain inline elements-->
-<list columns="2">
+<list columns="2" id="kotlin-tour-starting-page">
     <li>
-        <a href="kotlin-tour-hello-world.md"><img src="kotlin-tour-beginner.svg" alt="Kotlin初心者向けツアーを開始する" type="block"/></a>
+        <a href="kotlin-tour-hello-world.md" as="button" icon="arrow-right" icon-position="right">初心者向け</a>
     </li>
     <li>
-        <a href="kotlin-tour-intermediate-extension-functions.md"><img src="kotlin-tour-intermediate.svg" alt="Kotlin中級者向けツアーを開始する" type="block"/></a>
+        <a href="kotlin-tour-intermediate-extension-functions.md" as="button" icon="arrow-right" icon-position="right">中級者向け</a>
     </li>
     <li>
         <p><img src="icon-1.svg" width="20" /> <a href="kotlin-tour-hello-world.md">Hello world</a></p>

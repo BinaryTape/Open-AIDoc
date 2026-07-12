@@ -2,16 +2,6 @@
 
 <no-index/>
 
-<tldr>
-    <p><img src="icon-1-done.svg" width="20" alt="最初のステップ" /> <a href="kotlin-tour-hello-world.md">Hello world</a><br />
-        <img src="icon-2-done.svg" width="20" alt="第2ステップ" /> <a href="kotlin-tour-basic-types.md">基本型</a><br />
-        <img src="icon-3-done.svg" width="20" alt="第3ステップ" /> <a href="kotlin-tour-collections.md">コレクション</a><br />
-        <img src="icon-4-done.svg" width="20" alt="第4ステップ" /> <a href="kotlin-tour-control-flow.md">制御フロー</a><br />
-        <img src="icon-5-done.svg" width="20" alt="第5ステップ" /> <a href="kotlin-tour-functions.md">関数</a><br />
-        <img src="icon-6-done.svg" width="20" alt="第6ステップ" /> <a href="kotlin-tour-classes.md">クラス</a><br />
-        <img src="icon-7.svg" width="20" alt="最終ステップ" /> <strong>Null 安全性</strong><br /></p>
-</tldr>
-
 Kotlin では、`null` 値を持つことが可能です。Kotlin は、何かが欠落している場合や、まだ設定されていない場合に `null` 値を使用します。
 [コレクション](kotlin-tour-collections.md#kotlin-tour-map-no-key)の章で、マップに存在しないキーを使用してキーと値のペアにアクセスしようとしたときに、Kotlin が `null` 値を返す例を既に見ました。このように `null` 値を使用することは便利ですが、コードがそれらを処理するように準備されていない場合、問題が発生する可能性があります。
 
@@ -86,7 +76,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-check-nulls"}
 
-## 安全呼び出し (Safe calls)
+## 安全呼び出しの使用
 
 `null` 値を含んでいる可能性のあるオブジェクトのプロパティに安全にアクセスするには、安全呼び出し演算子 `?.` を使用します。安全呼び出し演算子は、オブジェクトまたはアクセスされたプロパティのいずれかが `null` の場合に `null` を返します。これは、`null` 値の存在によってコード内でエラーが発生するのを避けたい場合に便利です。
 
@@ -124,7 +114,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-safe-call-function"}
 
-## エルビス演算子 (Elvis operator) の使用
+## エルビス演算子の使用
 
 `null` 値が検出されたときに返すデフォルト値を指定するには、**エルビス演算子** (Elvis operator) `?:` を使用します。
 
@@ -144,7 +134,7 @@ fun main() {
 
 Kotlin の Null 安全性に関する詳細については、[Null 安全性](null-safety.md)を参照してください。
 
-## 練習問題
+## 練習問題 {completion-point="true"}
 
 ### 演習 {initial-collapse-state="collapsed" collapsible="true"}
 
@@ -194,4 +184,13 @@ fun main() {
 
 おめでとうございます！初級ツアーを完了しました。次は中級ツアーで Kotlin の理解をさらに深めましょう：
 
-<a href="kotlin-tour-intermediate-extension-functions.md"><img src="start-intermediate-tour.svg" width="700" alt="Kotlin 中級ツアーを開始する" style="block"/></a>
+<seealso></seealso>
+
+<list columns="2" id="tour-nav">
+  <li>
+    <a as="button" href="kotlin-tour-classes.md" mode="outline" icon="arrow-left" icon-position="left">前のステップ</a>
+  </li>
+  <li>
+    <a as="button" href="kotlin-tour-intermediate-extension-functions.md" mode="classic" icon="arrow-right" icon-position="right">Kotlin 中級ツアーを開始する</a>
+  </li>
+</list>

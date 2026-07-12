@@ -1,18 +1,6 @@
-[//]: # (title: 中級：拡張関数)
+[//]: # (title: 拡張関数)
 
 <no-index/>
-
-<tldr>
-    <p><img src="icon-1.svg" width="20" alt="First step" /> <strong>拡張関数</strong><br />
-        <img src="icon-2-todo.svg" width="20" alt="Second step" /> <a href="kotlin-tour-intermediate-scope-functions.md">スコープ関数</a><br />
-        <img src="icon-3-todo.svg" width="20" alt="Third step" /> <a href="kotlin-tour-intermediate-lambdas-receiver.md">レシーバー付きラムダ式</a><br />
-        <img src="icon-4-todo.svg" width="20" alt="Fourth step" /> <a href="kotlin-tour-intermediate-classes-interfaces.md">クラスとインターフェース</a><br />
-        <img src="icon-5-todo.svg" width="20" alt="Fifth step" /> <a href="kotlin-tour-intermediate-objects.md">オブジェクト</a><br />
-        <img src="icon-6-todo.svg" width="20" alt="Sixth step" /> <a href="kotlin-tour-intermediate-open-special-classes.md">openなクラスと特殊なクラス</a><br />
-        <img src="icon-7-todo.svg" width="20" alt="Seventh step" /> <a href="kotlin-tour-intermediate-properties.md">プロパティ</a><br />
-        <img src="icon-8-todo.svg" width="20" alt="Eighth step" /> <a href="kotlin-tour-intermediate-null-safety.md">Null安全</a><br />
-        <img src="icon-9-todo.svg" width="20" alt="Ninth step" /> <a href="kotlin-tour-intermediate-libraries-and-apis.md">ライブラリとAPI</a></p>
-</tldr>
 
 この章では、コードをより簡潔で読みやすくするKotlinの特殊な関数について学習します。プロジェクトを次のレベルに引き上げるために、効率的なデザインパターンを使用するのにこれらがどのように役立つかを学びましょう。
 
@@ -105,7 +93,7 @@ fun main() {
 
 拡張関数の詳細については、[Extensions](extensions.md) を参照してください。
 
-## 練習問題
+## 練習問題 {completion-point="true"}
 
 ### 練習問題 1 {initial-collapse-state="collapsed" collapsible="true" id="extension-functions-exercise-1"}
 
@@ -140,7 +128,7 @@ fun main() {
 <deflist collapsible="true">
     <def title="ヒント">
         <code>String</code> 型の <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.text/lowercase.html"> <code>.lowercase()</code>
-        </a> 関数を使用してください。
+        </a> 関数を使用してください。 
     </def>
 </deflist>
 
@@ -166,6 +154,13 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="解答例" id="kotlin-tour-extension-functions-solution-2"}
 
-## 次のステップ
+<seealso></seealso>
 
-[中級：スコープ関数](kotlin-tour-intermediate-scope-functions.md)
+<list columns="2" id="tour-nav">
+  <li>
+    <a as="button" href="kotlin-tour-null-safety.md" mode="outline" icon="arrow-left" icon-position="left">前のステップ</a>
+  </li>
+  <li>
+    <a as="button" href="kotlin-tour-intermediate-scope-functions.md" mode="classic" icon="arrow-right" icon-position="right">次のステップ</a>
+  </li>
+</list>

@@ -1,18 +1,6 @@
-[//]: # (title: 中階：屬性)
+[//]: # (title: 屬性)
 
 <no-index/>
-
-<tldr>
-    <p><img src="icon-1-done.svg" width="20" alt="First step" /> <a href="kotlin-tour-intermediate-extension-functions.md">擴充函式</a><br />
-        <img src="icon-2-done.svg" width="20" alt="Second step" /> <a href="kotlin-tour-intermediate-scope-functions.md">作用域函式</a><br />
-        <img src="icon-3-done.svg" width="20" alt="Third step" /> <a href="kotlin-tour-intermediate-lambdas-receiver.md">帶接收者的 Lambda 運算式</a><br />
-        <img src="icon-4-done.svg" width="20" alt="Fourth step" /> <a href="kotlin-tour-intermediate-classes-interfaces.md">類別與介面</a><br />
-        <img src="icon-5-done.svg" width="20" alt="Fifth step" /> <a href="kotlin-tour-intermediate-objects.md">物件</a><br />
-        <img src="icon-6-done.svg" width="20" alt="Sixth step" /> <a href="kotlin-tour-intermediate-open-special-classes.md">Open 與特殊類別</a><br />
-        <img src="icon-7.svg" width="20" alt="Seventh step" /> <strong>屬性</strong><br />
-        <img src="icon-8-todo.svg" width="20" alt="Eighth step" /> <a href="kotlin-tour-intermediate-null-safety.md">空值安全</a><br />
-        <img src="icon-9-todo.svg" width="20" alt="Ninth step" /> <a href="kotlin-tour-intermediate-libraries-and-apis.md">程式庫與 API</a></p>
-</tldr>
 
 在初學者導覽中，您學習了如何使用屬性來宣告類別執行個體的特性，以及如何存取它們。本章節將深入探討 Kotlin 中屬性的運作方式，並探索您可以在程式碼中使用的其他方式。
 
@@ -212,7 +200,7 @@ class CachedStringDelegate {
 }
 ```
 
-`getValue()` 函式檢查 `cachedValue` 屬性是否為 `null`。如果是，則函式會指派 `"Default value"` 並列印一個字串以便記錄。如果 `cachedValue` 屬性已經計算過，則屬性不為 `null`。在這種情況下，會列印另一個字串以便記錄。最後，函式使用 Elvis 運算子傳回快取值，如果值為 `null` 則傳回 `"Unknown"`。
+`getValue()` 函式檢查 `cachedValue` 屬性是否為 `null`。如果是，則函式會指派 `"Default Value"` 並列印一個字串以便記錄。如果 `cachedValue` 屬性已經計算過，則屬性不為 `null`。在這種情況下，會列印另一個字串以便記錄。最後，函式使用 Elvis 運算子傳回快取值，如果值為 `null` 則傳回 `"Unknown"`。
 
 現在，您可以將您想要快取的屬性 (`val displayName`) 委派給 `CachedStringDelegate` 類別的執行個體：
 
@@ -313,13 +301,13 @@ fun main() {
 * `connect()` 函式將字串列印到主控台，而 `query()` 函式接受 SQL 查詢並傳回一個清單。
 * 有一個 `databaseConnection` 屬性，它是一個延遲載入屬性。
 * 提供給 `lazy()` 函式的 Lambda 運算式：
-    * 建立了 `Database` 類別的執行個體。
-    * 在此執行個體 (`db`) 上呼叫 `connect()` 成員函式。
-    * 傳回該執行個體。
+  * 建立了 `Database` 類別的執行個體。
+  * 在此執行個體 (`db`) 上呼叫 `connect()` 成員函式。
+  * 傳回該執行個體。
 * 有一個 `fetchData()` 函式：
-    * 透過在 `databaseConnection` 屬性上呼叫 `query()` 函式來建立 SQL 查詢。
-    * 將 SQL 查詢指派給 `data` 變數。
-    * 將 `data` 變數列印到主控台。
+  * 透過在 `databaseConnection` 屬性上呼叫 `query()` 函式來建立 SQL 查詢。
+  * 將 SQL 查詢指派給 `data` 變數。
+  * 將 `data` 變數列印到主控台。
 * `main()` 函式呼叫 `fetchData()` 函式。第一次呼叫時，延遲載入屬性會被初始化。第二次呼叫時，傳回與第一次呼叫相同的結果。
 
 延遲載入屬性不僅在初始化資源密集時很有用，在程式碼中可能不會使用到該屬性時也很有用。此外，延遲載入屬性預設是執行緒安全的，這在您於並行環境中工作時特別有益。
@@ -363,21 +351,21 @@ fun main() {
 * 有一個 `Thermostat` 類別，包含一個可觀察屬性：`temperature`。
 * `observable()` 函式接受 `20.0` 作為參數，並用它來初始化屬性。
 * 提供給 `observable()` 函式的 Lambda 運算式：
-    * 具有三個參數：
-        * `_`：指的是屬性本身。
-        * `old`：屬性的舊值。
-        * `new`：屬性的新值。
-    * 檢查 `new` 參數是否大於 `25`，並根據結果將字串列印到主控台。
+  * 具有三個參數：
+    * `_`：指的是屬性本身。
+    * `old`：屬性的舊值。
+    * `new`：屬性的新值。
+  * 檢查 `new` 參數是否大於 `25`，並根據結果將字串列印到主控台。
 * `main()` 函式：
-    * 建立了一個名為 `thermostat` 的 `Thermostat` 類別執行個體。
-    * 將該執行個體的 `temperature` 屬性值更新為 `22.5`，這會觸發包含溫度更新的列印陳述式。
-    * 將該執行個體的 `temperature` 屬性值更新為 `27.0`，這會觸發包含警告的列印陳述式。
+  * 建立了一個名為 `thermostat` 的 `Thermostat` 類別執行個體。
+  * 將該執行個體的 `temperature` 屬性值更新為 `22.5`，這會觸發包含溫度更新的列印陳述式。
+  * 將該執行個體的 `temperature` 屬性值更新為 `27.0`，這會觸發包含警告的列印陳述式。
 
 可觀察屬性不僅對日誌記錄和偵錯有用。您還可以用於像是更新 UI 或執行額外檢查（例如驗證資料有效性）等使用案例。
 
 欲了解更多資訊，請參閱 [可觀察屬性](delegated-properties.md#observable-properties)。
 
-## 練習
+## 練習 {completion-point="true"}
 
 ### 練習 1 {initial-collapse-state="collapsed" collapsible="true" id="properties-exercise-1"}
 
@@ -612,6 +600,13 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="範例解答" id="kotlin-tour-properties-solution-4"}
 
-## 下一步
+<seealso></seealso>
 
-[中階：空值安全](kotlin-tour-intermediate-null-safety.md)
+<list columns="2" id="tour-nav">
+  <li>
+    <a as="button" href="kotlin-tour-intermediate-open-special-classes.md" mode="outline" icon="arrow-left" icon-position="left">上一步</a>
+  </li>
+  <li>
+    <a as="button" href="kotlin-tour-intermediate-null-safety.md" mode="classic" icon="arrow-right" icon-position="right">下一步</a>
+  </li>
+</list>

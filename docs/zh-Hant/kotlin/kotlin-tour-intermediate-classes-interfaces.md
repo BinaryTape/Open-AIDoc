@@ -1,24 +1,12 @@
-[//]: # (title: 進階：類別與介面)
+[//]: # (title: 類別與介面)
 
 <no-index/>
 
-<tldr>
-    <p><img src="icon-1-done.svg" width="20" alt="第一步" /> <a href="kotlin-tour-intermediate-extension-functions.md">擴充方法</a><br />
-        <img src="icon-2-done.svg" width="20" alt="第二步" /> <a href="kotlin-tour-intermediate-scope-functions.md">作用域函式</a><br />
-        <img src="icon-3-done.svg" width="20" alt="第三步" /> <a href="kotlin-tour-intermediate-lambdas-receiver.md">帶接收者的 Lambda 運算式</a><br /> 
-        <img src="icon-4.svg" width="20" alt="第四步" /> <strong>類別與介面</strong><br />
-        <img src="icon-5-todo.svg" width="20" alt="第五步" /> <a href="kotlin-tour-intermediate-objects.md">物件</a><br />
-        <img src="icon-6-todo.svg" width="20" alt="第六步" /> <a href="kotlin-tour-intermediate-open-special-classes.md">Open 與特殊類別</a><br />
-        <img src="icon-7-todo.svg" width="20" alt="第七步" /> <a href="kotlin-tour-intermediate-properties.md">屬性</a><br />
-        <img src="icon-8-todo.svg" width="20" alt="第八步" /> <a href="kotlin-tour-intermediate-null-safety.md">Null 安全性</a><br />
-        <img src="icon-9-todo.svg" width="20" alt="第九步" /> <a href="kotlin-tour-intermediate-libraries-and-apis.md">程式庫與 API</a></p>
-</tldr>
-
-在入門導覽中，您學習了如何使用類別和資料類別來儲存資料，並維護可以在程式碼中共享的一組特性。最終，您會想要建立一個階層來更有效率地在專案中共享程式碼。本章節將說明 Kotlin 提供的程式碼共享選項，以及它們如何讓您的程式碼更安全、更容易維護。
+在入門導覽中，您學習了如何使用類別與資料類別來儲存資料，並維護一組可在程式碼中共享的特性。最終，您會想要建立一個階層，以便在專案中高效率地共享程式碼。本章節將說明 Kotlin 為共享程式碼提供的選項，以及它們如何讓您的程式碼更安全且更容易維護。
 
 ## 類別繼承
 
-在前一個章節中，我們介紹了如何在不修改原始原始碼的情況下，使用擴充方法來擴充類別。但如果您正在處理一些複雜的內容，需要在類別**之間**共享程式碼呢？在這種情況下，您可以使用類別繼承。
+在之前的章節中，我們介紹了如何使用擴充方法在不修改原始原始碼的情況下擴充類別。但如果您正在處理一些複雜的內容，且在類別**之間**共享程式碼很有幫助呢？在這種情況下，您可以使用類別繼承。
 
 預設情況下，Kotlin 中的類別是不可以被繼承的。Kotlin 這樣設計是為了防止意外的繼承，並讓您的類別更容易維護。
 
@@ -421,7 +409,7 @@ fun main() {
 
 如需更多資訊，請參閱[委託](delegation.md)。
 
-## 練習
+## 練習 {completion-point="true"}
 
 ### 練習 1 {initial-collapse-state="collapsed" collapsible="true" id="classes-interfaces-exercise-1"}
 
@@ -745,6 +733,13 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="範例解答" id="kotlin-tour-classes-interfaces-solution-4"}
 
-## 下一步
+<seealso></seealso>
 
-[進階：物件](kotlin-tour-intermediate-objects.md)
+<list columns="2" id="tour-nav">
+  <li>
+    <a as="button" href="kotlin-tour-intermediate-lambdas-receiver.md" mode="outline" icon="arrow-left" icon-position="left">上一步</a>
+  </li>
+  <li>
+    <a as="button" href="kotlin-tour-intermediate-objects.md" mode="classic" icon="arrow-right" icon-position="right">下一步</a>
+  </li>
+</list>

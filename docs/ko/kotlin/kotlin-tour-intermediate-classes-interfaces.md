@@ -1,18 +1,6 @@
-[//]: # (title: 중급: 클래스와 인터페이스)
+[//]: # (title: 클래스와 인터페이스)
 
 <no-index/>
-
-<tldr>
-    <p><img src="icon-1-done.svg" width="20" alt="첫 번째 단계" /> <a href="kotlin-tour-intermediate-extension-functions.md">확장 함수</a><br />
-        <img src="icon-2-done.svg" width="20" alt="두 번째 단계" /> <a href="kotlin-tour-intermediate-scope-functions.md">범위 함수</a><br />
-        <img src="icon-3-done.svg" width="20" alt="세 번째 단계" /> <a href="kotlin-tour-intermediate-lambdas-receiver.md">수신 객체가 있는 람다 식</a><br /> 
-        <img src="icon-4.svg" width="20" alt="네 번째 단계" /> <strong>클래스와 인터페이스</strong><br />
-        <img src="icon-5-todo.svg" width="20" alt="다섯 번째 단계" /> <a href="kotlin-tour-intermediate-objects.md">객체</a><br />
-        <img src="icon-6-todo.svg" width="20" alt="여섯 번째 단계" /> <a href="kotlin-tour-intermediate-open-special-classes.md">Open 및 특수 클래스</a><br />
-        <img src="icon-7-todo.svg" width="20" alt="일곱 번째 단계" /> <a href="kotlin-tour-intermediate-properties.md">프로퍼티</a><br />
-        <img src="icon-8-todo.svg" width="20" alt="여덟 번째 단계" /> <a href="kotlin-tour-intermediate-null-safety.md">Null 안전성</a><br />
-        <img src="icon-9-todo.svg" width="20" alt="아홉 번째 단계" /> <a href="kotlin-tour-intermediate-libraries-and-apis.md">라이브러리 및 API</a></p>
-</tldr>
 
 초급 투어에서는 클래스와 데이터 클래스를 사용하여 데이터를 저장하고 코드에서 공유할 수 있는 일련의 특성을 유지하는 방법을 배웠습니다. 결국 프로젝트 내에서 코드를 효율적으로 공유하기 위해 계층 구조를 만들고 싶을 것입니다. 이 장에서는 코드를 공유하기 위해 코틀린이 제공하는 옵션과 이러한 옵션이 코드를 더 안전하고 유지 관리하기 쉽게 만드는 방법을 설명합니다.
 
@@ -421,7 +409,7 @@ fun main() {
 
 더 자세한 정보는 [Delegation](delegation.md)을 참조하세요.
 
-## 연습 문제
+## 연습 문제 {completion-point="true"}
 
 ### 연습 문제 1 {initial-collapse-state="collapsed" collapsible="true" id="classes-interfaces-exercise-1"}
 
@@ -745,6 +733,13 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="모범 답안" id="kotlin-tour-classes-interfaces-solution-4"}
 
-## 다음 단계
+<seealso></seealso>
 
-[중급: 객체](kotlin-tour-intermediate-objects.md)
+<list columns="2" id="tour-nav">
+  <li>
+    <a as="button" href="kotlin-tour-intermediate-lambdas-receiver.md" mode="outline" icon="arrow-left" icon-position="left">이전 단계</a>
+  </li>
+  <li>
+    <a as="button" href="kotlin-tour-intermediate-objects.md" mode="classic" icon="arrow-right" icon-position="right">다음 단계</a>
+  </li>
+</list>

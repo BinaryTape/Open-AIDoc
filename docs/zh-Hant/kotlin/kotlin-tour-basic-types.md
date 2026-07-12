@@ -2,16 +2,6 @@
 
 <no-index/>
 
-<tldr>
-    <p><img src="icon-1-done.svg" width="20" alt="第一步" /> <a href="kotlin-tour-hello-world.md">Hello world</a><br />
-        <img src="icon-2.svg" width="20" alt="第二步" /> <strong>基本型別</strong><br />
-        <img src="icon-3-todo.svg" width="20" alt="第三步" /> <a href="kotlin-tour-collections.md">集合</a><br />
-        <img src="icon-4-todo.svg" width="20" alt="第四步" /> <a href="kotlin-tour-control-flow.md">控制流</a><br />
-        <img src="icon-5-todo.svg" width="20" alt="第五步" /> <a href="kotlin-tour-functions.md">函式</a><br />
-        <img src="icon-6-todo.svg" width="20" alt="第六步" /> <a href="kotlin-tour-classes.md">類別</a><br />
-        <img src="icon-7-todo.svg" width="20" alt="最後一步" /> <a href="kotlin-tour-null-safety.md">Null 安全</a></p>
-</tldr>
-
 Kotlin 中的每個變數與資料結構都有一個型別。型別非常重要，因為它們會告訴編譯器你被允許對該變數或資料結構執行哪些操作。換句話說，即它具有哪些函式與屬性。
 
 在上一章，Kotlin 能夠在先前的範例中判斷出 `customers` 的型別為 [`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/)。
@@ -43,14 +33,14 @@ fun main() {
 
 總體而言，Kotlin 具有以下基本型別：
 
-| **類別** | **基本型別** | **範例程式碼** |
+| **類別**                                              | **基本型別**                    | **範例程式碼**                                                  |
 |-----------------------------------------------------------|------------------------------------|-------------------------------------------------------------------|
-| [整數](numbers.md#integer-types) | `Byte`, `Short`, `Int`, `Long` | `val year: Int = 2020`<br/> `val amount: Long = 350_000_000` |
-| [無符號整數](unsigned-integer-types.md) | `UByte`, `UShort`, `UInt`, `ULong` | `val score: UInt = 100u` |
-| [浮點數](numbers.md#floating-point-types) | `Float`, `Double` | `val currentTemp: Float = 24.5f`<br/> `val price: Double = 19.99` |
-| [布林值](booleans.md) | `Boolean` | `val isEnabled: Boolean = true` |
-| [字元](characters.md) | `Char` | `val separator: Char = ','` |
-| [字串](strings.md) | `String` | `val message: String = "Hello, world!"` |
+| [整數](numbers.md#integer-types)                      | `Byte`, `Short`, `Int`, `Long`     | `val year: Int = 2020`<br/> `val amount: Long = 350_000_000`      |
+| [無符號整數](unsigned-integer-types.md)            | `UByte`, `UShort`, `UInt`, `ULong` | `val score: UInt = 100u`                                          |
+| [浮點數](numbers.md#floating-point-types) | `Float`, `Double`                  | `val currentTemp: Float = 24.5f`<br/> `val price: Double = 19.99` |
+| [布林值](booleans.md)                                   | `Boolean`                          | `val isEnabled: Boolean = true`                                   |
+| [字元](characters.md)                               | `Char`                             | `val separator: Char = ','`                                       |
+| [字串](strings.md)                                     | `String`                           | `val message: String = "Hello, world!"`                           |
 
 有關基本型別及其屬性的更多資訊，請參閱 [Types overview](types-overview.md)。
 
@@ -95,7 +85,7 @@ fun main() {
 
 現在你已經知道如何宣告基本型別，接著該來學習[集合](kotlin-tour-collections.md)了。
 
-## 練習
+## 練習 {completion-point="true"}
 
 ### 練習題 {initial-collapse-state="collapsed" collapsible="true"}
 
@@ -129,6 +119,13 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="範例解答" id="kotlin-tour-basic-types-solution"}
 
-## 下一步
+<seealso></seealso>
 
-[集合](kotlin-tour-collections.md)
+<list columns="2" id="tour-nav">
+  <li>
+    <a as="button" href="kotlin-tour-hello-world.md" mode="outline" icon="arrow-left" icon-position="left">上一步</a>
+  </li>
+  <li>
+    <a as="button" href="kotlin-tour-collections.md" mode="classic" icon="arrow-right" icon-position="right">下一步</a>
+  </li>
+</list>

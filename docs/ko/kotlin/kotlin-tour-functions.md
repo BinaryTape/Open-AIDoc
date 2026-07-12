@@ -2,16 +2,6 @@
 
 <no-index/>
 
-<tldr>
-    <p><img src="icon-1-done.svg" width="20" alt="첫 번째 단계" /> <a href="kotlin-tour-hello-world.md">Hello world</a><br />
-        <img src="icon-2-done.svg" width="20" alt="두 번째 단계" /> <a href="kotlin-tour-basic-types.md">기본 타입(Basic types)</a><br />
-        <img src="icon-3-done.svg" width="20" alt="세 번째 단계" /> <a href="kotlin-tour-collections.md">컬렉션(Collections)</a><br />
-        <img src="icon-4-done.svg" width="20" alt="네 번째 단계" /> <a href="kotlin-tour-control-flow.md">제어 흐름(Control flow)</a><br />
-        <img src="icon-5.svg" width="20" alt="다섯 번째 단계" /> <strong>함수(Functions)</strong><br />
-        <img src="icon-6-todo.svg" width="20" alt="여섯 번째 단계" /> <a href="kotlin-tour-classes.md">클래스(Classes)</a><br />
-        <img src="icon-7-todo.svg" width="20" alt="마지막 단계" /> <a href="kotlin-tour-null-safety.md">널 안전성(Null safety)</a></p>
-</tldr>
-
 Kotlin에서는 `fun` 키워드를 사용하여 자신만의 함수를 선언할 수 있습니다.
 
 ```kotlin
@@ -527,7 +517,7 @@ fun main() {
 
 투어의 다음 단계는 Kotlin의 [클래스(classes)](kotlin-tour-classes.md)에 대해 배우는 것입니다.
 
-## 람다 표현식 연습 문제
+## 람다 표현식 연습 문제 {completion-point="true"}
 
 ### 연습 문제 1 {initial-collapse-state="collapsed" collapsible="true" id="lambdas-exercise-1"}
 
@@ -589,6 +579,13 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="모범 답안" id="kotlin-tour-lambdas-solution-2"}
 
-## 다음 단계
+<seealso></seealso>
 
-[클래스](kotlin-tour-classes.md)
+<list columns="2" id="tour-nav">
+  <li>
+    <a as="button" href="kotlin-tour-control-flow.md" mode="outline" icon="arrow-left" icon-position="left">이전 단계</a>
+  </li>
+  <li>
+    <a as="button" href="kotlin-tour-classes.md" mode="classic" icon="arrow-right" icon-position="right">다음 단계</a>
+  </li>
+</list>

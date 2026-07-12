@@ -16,6 +16,16 @@
 * [`Nothing`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-nothing.html)
 * [`Unit`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/)
 
+Kotlin 也有不可表示型別 (non-denotable types)。這些型別無法直接在 Kotlin 程式碼中撰寫。相反地，編譯器會在內部使用它們，例如為了與其他語言的互通性。Kotlin 建立不可表示型別來表示比 Kotlin 原始碼語法所允許的更精確的型別資訊。
+
+雖然您無法自行宣告不可表示型別，但您可能會在編譯器診斷、IDE 工具提示或推論型別顯示中遇到它們。進一步了解不可表示型別：
+
+* [平台型別](java-interop.md#null-safety-and-platform-types)
+* [](typecasts.md#intersection-types)
+* [](numbers.md#integer-literal-types)
+* [](generics.md#captured-types)
+* [Kotlin 語言規範：型別系統](https://kotlinlang.org/spec/type-system.html)
+
 > [了解如何在 Kotlin 中進行型別檢查與轉換](typecasts.md)。
 >
 {style="tip"}

@@ -1,18 +1,6 @@
-[//]: # (title: 中階：擴充函式)
+[//]: # (title: 擴充函式)
 
 <no-index/>
-
-<tldr>
-    <p><img src="icon-1.svg" width="20" alt="第一步" /> <strong>擴充函式</strong><br />
-        <img src="icon-2-todo.svg" width="20" alt="第二步" /> <a href="kotlin-tour-intermediate-scope-functions.md">作用域函式</a><br />
-        <img src="icon-3-todo.svg" width="20" alt="第三步" /> <a href="kotlin-tour-intermediate-lambdas-receiver.md">帶接收者的 Lambda 運算式</a><br />
-        <img src="icon-4-todo.svg" width="20" alt="第四步" /> <a href="kotlin-tour-intermediate-classes-interfaces.md">類別與介面</a><br />
-        <img src="icon-5-todo.svg" width="20" alt="第五步" /> <a href="kotlin-tour-intermediate-objects.md">物件</a><br />
-        <img src="icon-6-todo.svg" width="20" alt="第六步" /> <a href="kotlin-tour-intermediate-open-special-classes.md">Open 與特殊類別</a><br />
-        <img src="icon-7-todo.svg" width="20" alt="第七步" /> <a href="kotlin-tour-intermediate-properties.md">屬性</a><br />
-        <img src="icon-8-todo.svg" width="20" alt="第八步" /> <a href="kotlin-tour-intermediate-null-safety.md">Null 安全性</a><br />
-        <img src="icon-9-todo.svg" width="20" alt="第九步" /> <a href="kotlin-tour-intermediate-libraries-and-apis.md">函式庫與 API</a></p>
-</tldr>
 
 在本章中，你將探索特殊的 Kotlin 函式，它們能讓你的程式碼更簡潔且易讀。了解它們如何幫助你使用高效的設計模式，將你的專案提升到新的境界。
 
@@ -105,7 +93,7 @@ fun main() {
 
 有關擴充函式的更多資訊，請參閱 [擴充](extensions.md)。
 
-## 練習
+## 練習 {completion-point="true"}
 
 ### 練習 1 {initial-collapse-state="collapsed" collapsible="true" id="extension-functions-exercise-1"}
 
@@ -166,6 +154,13 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="範例解答" id="kotlin-tour-extension-functions-solution-2"}
 
-## 下一步
+<seealso></seealso>
 
-[中階：作用域函式](kotlin-tour-intermediate-scope-functions.md)
+<list columns="2" id="tour-nav">
+  <li>
+    <a as="button" href="kotlin-tour-null-safety.md" mode="outline" icon="arrow-left" icon-position="left">上一步</a>
+  </li>
+  <li>
+    <a as="button" href="kotlin-tour-intermediate-scope-functions.md" mode="classic" icon="arrow-right" icon-position="right">下一步</a>
+  </li>
+</list>

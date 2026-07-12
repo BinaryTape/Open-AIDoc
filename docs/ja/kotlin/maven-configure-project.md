@@ -55,6 +55,30 @@ JavaとKotlinの混合プロジェクトの場合、この設定により以下�
 >
 {style="note"}
 
+<anchor name="maven-compiler-extensions-version"/>
+
+現在、`<extensions>`で使用されるMavenコンパイラプラグインのデフォルトバージョンは **%mavenExtensionsVersion%** です。別のバージョンを個別に設定することもできます：
+
+```xml
+<build>
+    <plugins>
+        <!-- Kotlinコンパイラプラグインの設定 -->
+        <plugin>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-maven-plugin</artifactId>
+            <version>${kotlin.version}</version>
+            <extensions>true</extensions>
+        </plugin>
+        <!-- Javaクラス用のMavenコンパイラプラグインの設定 -->
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>%mavenPluginVersion%</version>
+        </plugin>
+    </plugins>
+</build>
+```
+
 ### JVMターゲットバージョン
 
 `<extensions>`オプションは、KotlinコンパイラとMavenコンパイラが同じバイトコードバージョンをターゲットにすることを保証します。
@@ -105,30 +129,6 @@ Mavenコンパイラの `target` オプションと `release` オプションの
 > `<extensions>` オプションは、プロジェクトレベルのプロパティとグローバルな `maven-compiler-plugin` 設定のみをチェックします。プラグインの `<executions>` セクション内で定義された設定はチェックしません。
 >
 {style="note"}
-
-### Mavenコンパイラのバージョン
-
-現在、`<extensions>`で使用されるMavenコンパイラプラグインのデフォルトバージョンは **%mavenExtensionsVersion%** です。別のバージョンを個別に設定することもできます：
-
-```xml
-<build>
-    <plugins>
-        <!-- Kotlinコンパイラプラグインの設定 -->
-        <plugin>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-maven-plugin</artifactId>
-            <version>${kotlin.version}</version>
-            <extensions>true</extensions>
-        </plugin>
-        <!-- Javaクラス用のMavenコンパイラプラグインの設定 -->
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <version>%mavenPluginVersion%</version>
-        </plugin>
-    </plugins>
-</build>
-```
 
 ## 手動設定
 

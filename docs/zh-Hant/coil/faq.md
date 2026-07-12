@@ -69,9 +69,51 @@ android {
 }
 ```
 
+## 為什麼我在使用 Compose Multiplatform 時會收到 Skiko 版本警告？
+
+如果 Coil 的 Skiko 相依性版本比 Compose Multiplatform 舊，Compose Multiplatform 將會印出如下警告：
+
+```text
+w: Skiko dependencies' versions are incompatible.
+```
+
+此警告通常可以安全忽略，因為 Skiko 版本通常會保持二進制相容性。Coil 版本會追蹤 Compose Multiplatform 的**穩定**發佈版本及其 Skiko 版本，因此如果你遇到此警告，請先將 Coil 更新至最新版本。
+
+**注意**：原則上，Coil 不會僅為了符合 Compose Multiplatform 的 **alpha** 或 **beta** 版本所使用的 Skiko 版本而發佈新版本，除非這些 Skiko 版本與最新 Coil 版本所依賴的版本不相容。
+
+如果警告仍然存在，你可以透過設定以下 Gradle 屬性來忽略它：
+
+```properties
+org.jetbrains.compose.library.compatibility.check.disable=true
+```
+
+然而，該 Gradle 屬性會停用所有程式庫的 Compose Multiplatform 程式庫相容性檢查，而不僅僅是 Coil。若要僅針對 Coil 及其 Skiko 相依性停用警告，請將此程式碼片段新增至你的根目錄 `build.gradle.kts` 檔案中：
+
+```kotlin
+dependencies {
+    components {
+        all {
+            if (id.group == "io.coil-kt.coil3") {
+                allVariants {
+                    withDependencies {
+                        val hadSkikoDependency = removeAll {
+                            it.group == "org.jetbrains.skiko" && it.name == "skiko"
+                        }
+                        if (hadSkikoDependency) {
+                            // 將 `0.150.0` 替換為你的 Compose Multiplatform 版本所使用的 Skiko 版本。
+                            add("org.jetbrains.skiko:skiko:0.150.0")
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
 ## 我該如何取得開發版快照？
 
-將快照存儲庫新增至你的存儲庫清單中：
+將快照儲存庫新增至你的儲存庫清單中：
 
 Gradle (`.gradle`):
 

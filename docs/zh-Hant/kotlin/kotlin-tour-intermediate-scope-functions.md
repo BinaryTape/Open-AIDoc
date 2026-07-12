@@ -1,18 +1,6 @@
-[//]: # (title: 進階：作用域函式)
+[//]: # (title: 作用域函式)
 
 <no-index/>
-
-<tldr>
-    <p><img src="icon-1-done.svg" width="20" alt="第一步" /> <a href="kotlin-tour-intermediate-extension-functions.md">擴充方法</a><br />
-        <img src="icon-2.svg" width="20" alt="第二步" /> <strong>作用域函式</strong><br />
-        <img src="icon-3-todo.svg" width="20" alt="第三步" /> <a href="kotlin-tour-intermediate-lambdas-receiver.md">具有接收器的 Lambda 運算式</a><br />
-        <img src="icon-4-todo.svg" width="20" alt="第四步" /> <a href="kotlin-tour-intermediate-classes-interfaces.md">類別與介面</a><br />
-        <img src="icon-5-todo.svg" width="20" alt="第五步" /> <a href="kotlin-tour-intermediate-objects.md">物件</a><br />
-        <img src="icon-6-todo.svg" width="20" alt="第六步" /> <a href="kotlin-tour-intermediate-open-special-classes.md">Open 與特殊類別</a><br />
-        <img src="icon-7-todo.svg" width="20" alt="第七步" /> <a href="kotlin-tour-intermediate-properties.md">屬性</a><br />
-        <img src="icon-8-todo.svg" width="20" alt="第八步" /> <a href="kotlin-tour-intermediate-null-safety.md">Null safety</a><br />
-        <img src="icon-9-todo.svg" width="20" alt="第九步" /> <a href="kotlin-tour-intermediate-libraries-and-apis.md">程式庫與 API</a></p>
-</tldr>
 
 在本章節中，你將基於對擴充方法的理解，學習如何使用作用域函式（scope functions）來撰寫更道地的程式碼。
 
@@ -62,7 +50,7 @@ fun main() {
 * `sendNotification()`：具有一個函式參數 `recipientAddress` 並傳回一個字串。
 * `getNextAddress()`：沒有函式參數並傳回一個字串。
 
-該範例建立了一個變數 `address`，其型別為可為 null 的 `String`。但在呼叫 `sendNotification()` 函式時會出現問題，因為該函式不預期 `address` 可能是 `null` 值。結果編譯器會報告錯誤：
+該範例建立了一個變數 `address`，其型別為可為 null 的 `String`。但在呼叫 `sendNotification()` 函式時會出現問題，因為該函式不預期 `address` 可能是 `null` 值。結果編譯器會報告錯誤： 
 
 ```text
 Argument type mismatch: actual type is 'String?', but 'String' was expected.
@@ -399,11 +387,11 @@ fun main() {
 
 有關作用域函式的更多資訊，請參閱[作用域函式](scope-functions.md)。
 
-## 練習
+## 練習 {completion-point="true"}
 
 ### 練習 1 {initial-collapse-state="collapsed" collapsible="true" id="scope-functions-exercise-1"}
 
-將 `.getPriceInEuros()` 函式改寫為使用安全呼叫運算子 `?.` 和 `let` 作用域函式的單運算式函式（single-expression function）。
+將 `.getPriceInEuros()` 函式改寫為使用安全呼叫運算子 `?.` 和 `let` 作用域函式的單運算式函式。
 
 <deflist collapsible="true">
     <def title="提示">
@@ -518,6 +506,13 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="範例解答" id="kotlin-tour-scope-functions-solution-2"}
 
-## 下一步
+<seealso></seealso>
 
-[進階：具有接收器的 Lambda 運算式](kotlin-tour-intermediate-lambdas-receiver.md)
+<list columns="2" id="tour-nav">
+  <li>
+    <a as="button" href="kotlin-tour-intermediate-extension-functions.md" mode="outline" icon="arrow-left" icon-position="left">上一步</a>
+  </li>
+  <li>
+    <a as="button" href="kotlin-tour-intermediate-lambdas-receiver.md" mode="classic" icon="arrow-right" icon-position="right">下一步</a>
+  </li>
+</list>

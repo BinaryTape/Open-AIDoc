@@ -2,16 +2,6 @@
 
 <no-index/>
 
-<tldr>
-    <p><img src="icon-1-done.svg" width="20" alt="ステップ1" /> <a href="kotlin-tour-hello-world.md">Hello world</a><br />
-        <img src="icon-2-done.svg" width="20" alt="ステップ2" /> <a href="kotlin-tour-basic-types.md">基本の型</a><br />
-        <img src="icon-3-done.svg" width="20" alt="ステップ3" /> <a href="kotlin-tour-collections.md">コレクション</a><br />
-        <img src="icon-4.svg" width="20" alt="ステップ4" /> <strong>コントロールフロー</strong><br />
-        <img src="icon-5-todo.svg" width="20" alt="ステップ5" /> <a href="kotlin-tour-functions.md">関数</a><br />
-        <img src="icon-6-todo.svg" width="20" alt="ステップ6" /> <a href="kotlin-tour-classes.md">クラス</a><br />
-        <img src="icon-7-todo.svg" width="20" alt="最終ステップ" /> <a href="kotlin-tour-null-safety.md">Null安全</a></p>
-</tldr>
-
 他のプログラミング言語と同様に、Kotlinはコードの一部が真（true）と評価されるかどうかに基づいて決定を下すことができます。このようなコードの一部を**条件式 (conditional expressions)**と呼びます。また、Kotlinはループを作成して反復処理を行うこともできます。
 
 ## 条件式
@@ -374,7 +364,7 @@ fun main() {
 
 Kotlin のコントロールフローの基本を学んだので、次は自分自身の[関数](kotlin-tour-functions.md)を書く方法を学びましょう。
 
-## ループの練習
+## ループの練習 {completion-point="true"}
 
 ### 演習 1 {initial-collapse-state="collapsed" collapsible="true" id="loops-exercise-1"}
 
@@ -511,6 +501,13 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="解答例" id="kotlin-tour-control-flow-loops-solution-3"}
 
-## 次のステップ
+<seealso></seealso>
 
-[関数](kotlin-tour-functions.md)
+<list columns="2" id="tour-nav">
+  <li>
+    <a as="button" href="kotlin-tour-collections.md" mode="outline" icon="arrow-left" icon-position="left">前のステップ</a>
+  </li>
+  <li>
+    <a as="button" href="kotlin-tour-functions.md" mode="classic" icon="arrow-right" icon-position="right">次のステップ</a>
+  </li>
+</list>

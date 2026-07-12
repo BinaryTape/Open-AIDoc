@@ -37,7 +37,7 @@ imageView.load("https://example.com/image.jpg") {
     </video>
 </p>
 
-*清單中的影像刻意以極低細節載入，且淡入淡出（crossfade）被減慢以突顯視覺效果。*
+*清單中的影像刻意以極低細節載入，且淡入淡出 (crossfade) 被減慢以突顯視覺效果。*
 
 要達成此效果，請將第一個請求的 `MemoryCache.Key` 作為第二個請求的 `ImageRequest.placeholderMemoryCacheKey`。範例如下：
 
@@ -50,6 +50,49 @@ detailImageView.load("https://example.com/image.jpg") {
     placeholderMemoryCacheKey(listImageView.result.memoryCacheKey)
 }
 ```
+
+## Compose AnimatedContent
+
+使用 `rememberAsyncImagePainter` 和 `AnimatedContent` 在占位符號與載入的影像之間製作動畫：
+
+```kotlin
+val sizeResolver = rememberConstraintsSizeResolver()
+val painter = rememberAsyncImagePainter(
+    model = ImageRequest.Builder(LocalPlatformContext.current)
+        .data("https://example.com/image.jpg")
+        .size(sizeResolver)
+        .build(),
+)
+val state by painter.state.collectAsState()
+
+AnimatedContent(
+    modifier = Modifier.then(sizeResolver),
+    targetState = state,
+    contentKey = { it::class },
+    transitionSpec = { fadeIn() togetherWith fadeOut() },
+) { targetState ->
+    when (targetState) {
+        is AsyncImagePainter.State.Empty,
+        is AsyncImagePainter.State.Loading -> PlaceholderContent()
+        is AsyncImagePainter.State.Success -> {
+            // 在 model 變更後，讓舊影像在淡出動畫期間保持可見。
+            Image(
+                painter = targetState.painter,
+                contentDescription = stringResource(R.string.description),
+            )
+        }
+        is AsyncImagePainter.State.Error -> ErrorContent()
+    }
+}
+```
+
+將 `targetState.painter` 傳遞給 `Image`，以便在 `model` 變更後，舊影像在淡出動畫期間保持可見。
+
+在載入完成之前，最終的影像尺寸是未知的。請使用固定約束 (fixed constraints) 或已知的長寬比 (aspect ratio) 來預留空間。
+
+`rememberAsyncImagePainter` 會從 `State.Empty` 開始，即使影像已在記憶體快取中也是如此。如果需要，可以使用 `state.result.dataSource` 來跳過記憶體快取影像的動畫。
+
+注意：`AnimatedContent` 的開銷比 painter 淡入淡出 (crossfade) 高得多，且會將舊影像保留在記憶體中直到動畫結束。在延遲列表 (lazy lists) 中或對於簡單的淡入淡出，建議優先使用 `ImageRequest.Builder.crossfade`。
 
 ## 共享元素過渡
 
@@ -100,7 +143,7 @@ imageLoader.enqueue(request)
 
 ## 轉換 Painter
 
-`AsyncImage` 和 `AsyncImagePainter` 都有接受 `Painter` 的 `placeholder`/`error`/`fallback` 引數。Painter 比起使用 composable 的彈性較低，但速度更快，因為 Coil 不需要使用子組合（subcomposition）。即便如此，為了獲得所需的 UI，可能仍需要對 Painter 進行內切（inset）、拉伸、著色或轉換。要達成此目的，請[將此 Gist 複製到您的專案中](https://gist.github.com/colinrtwhite/c2966e0b8584b4cdf0a5b05786b20ae1)並像這樣包裝 Painter：
+`AsyncImage` 和 `AsyncImagePainter` 都有接受 `Painter` 的 `placeholder`/`error`/`fallback` 引數。Painter 比起使用 composable 的彈性較低，但速度更快，因為 Coil 不需要使用子組合 (subcomposition)。即便如此，為了獲得所需的 UI，可能仍需要對 Painter 進行內切 (inset)、拉伸、著色或轉換。要達成此目的，請[將此 Gist 複製到您的專案中](https://gist.github.com/colinrtwhite/c2966e0b8584b4cdf0a5b05786b20ae1)並像這樣包裝 Painter：
 
 ```kotlin
 AsyncImage(

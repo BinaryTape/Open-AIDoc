@@ -69,6 +69,48 @@ android {
 }
 ```
 
+## Compose MultiplatformでSkikoのバージョン警告が表示されるのはなぜですか？
+
+Coilが依存しているSkikoのバージョンがCompose Multiplatformのものより古い場合、Compose Multiplatformは次のような警告を表示します。
+
+```text
+w: Skiko dependencies' versions are incompatible.
+```
+
+Skikoのバージョンは通常、バイナリ互換性を維持しているため、この警告は一般的に無視しても安全です。Coilのリリースは、Compose Multiplatformの**安定版 (stable)** リリースとそのSkikoバージョンを追跡しています。そのため、この警告が表示された場合は、まずCoilを最新バージョンにアップデートしてください。
+
+**注意**: 原則として、最新のCoilリリースが依存しているバージョンと互換性がない場合を除き、Compose Multiplatformの**アルファ版 (alpha)** や**ベータ版 (beta)** で使用されているSkikoバージョンに合わせるためだけの新しいリリースは行われません。
+
+それでも警告が表示される場合は、以下のGradleプロパティを設定することで無視できます。
+
+```properties
+org.jetbrains.compose.library.compatibility.check.disable=true
+```
+
+ただし、このGradleプロパティは、Coilだけでなくすべてのライブラリに対してCompose Multiplatformライブラリの互換性チェックを無効にします。CoilとそのSkiko依存関係に対してのみ警告を無効にするには、ルートの `build.gradle.kts` ファイルに以下のコードスニペットを追加してください。
+
+```kotlin
+dependencies {
+    components {
+        all {
+            if (id.group == "io.coil-kt.coil3") {
+                allVariants {
+                    withDependencies {
+                        val hadSkikoDependency = removeAll {
+                            it.group == "org.jetbrains.skiko" && it.name == "skiko"
+                        }
+                        if (hadSkikoDependency) {
+                            // `0.150.0` を使用しているCompose Multiplatformのバージョンに合わせたSkikoバージョンに置き換えてください。
+                            add("org.jetbrains.skiko:skiko:0.150.0")
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
 ## 開発スナップショットを取得するにはどうすればよいですか？
 
 リポジトリの一覧にスナップショットリポジトリを追加します。

@@ -63,13 +63,13 @@ _現在、プレビューバージョンは利用できません。_
         </td>
     </tr>
     <tr>
-        <td><strong>2.4.10-RC</strong>
-            <p>リリース日: <strong>2026年6月25日</strong></p>
-            <p><a href="https://github.com/JetBrains/kotlin/releases/tag/v2.4.10-RC" target="_blank">GitHub でのリリース</a></p>
+        <td><strong>2.4.10-RC2</strong>
+            <p>リリース日: <strong>2026年7月7日</strong></p>
+            <p><a href="https://github.com/JetBrains/kotlin/releases/tag/v2.4.10-RC2" target="_blank">GitHub でのリリース</a></p>
         </td>
         <td>
             <p>Kotlin 2.4.0 向けのパフォーマンス向上を含むバグ修正リリースです。</p>
-            <p>詳細については、<a href="https://github.com/JetBrains/kotlin/releases/tag/v2.4.10-RC">チェンジログ</a> を参照してください。</p>
+            <p>詳細については、<a href="https://github.com/JetBrains/kotlin/releases/tag/v2.4.10-RC2">チェンジログ</a> を参照してください。</p>
         </td>
     </tr>
 </table>

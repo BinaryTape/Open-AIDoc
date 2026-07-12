@@ -255,6 +255,8 @@ if (x is String && x.length > 0) {
 }
 ```
 
+`&&` 연산자로 객체에 대한 타입 검사를 결합하면, 컴파일러는 객체를 체크된 모든 타입으로 동시에 스마트 캐스트합니다. 자세한 내용은 [교차 타입(Intersection types)](#intersection-types)을 참고하세요.
+
 객체에 대한 타입 검사를 `or` 연산자(`||`)와 결합하면, 가장 가까운 공통 상위 타입으로 스마트 캐스트가 이루어집니다.
 
 ```kotlin
@@ -277,6 +279,36 @@ fun signalCheck(signalStatus: Any) {
 > 공통 상위 타입은 [합집합 타입(union type)](https://en.wikipedia.org/wiki/Union_type)의 **근사치**입니다. 합집합 타입은 [현재 Kotlin에서 지원되지 않습니다](https://youtrack.jetbrains.com/issue/KT-13108/Denotable-union-and-intersection-types).
 >
 {style="note"}
+
+### 교차 타입(Intersection types)
+
+컴파일러가 여러 `&&` 검사를 통해 객체를 스마트 캐스트할 때, [*교차 타입(intersection type)*](https://kotlinlang.org/spec/type-system.html#intersection-types)을 추론합니다. 이는 체크된 모든 제약 조건을 동시에 충족하는 내부 타입입니다.
+
+```kotlin
+interface Bird {
+    fun fly()
+}
+
+interface Fish {
+    fun swim()
+}
+
+fun describe(animal: Any) {
+    // Bird 및 Fish 타입을 추론함
+    if (animal is Bird && animal is Fish) {
+        // 추가 검사나 캐스트 없이 fly() 및 swim()에 접근 가능
+        animal.fly()
+        animal.swim()
+    }
+}
+```
+
+교차 타입은 명시적으로 표현할 수 없습니다(non-denotable). 타입 검사 중에 타입 정보를 보존하기 위해 컴파일러의 내부 타입 시스템에만 존재합니다. Kotlin 코드에서 이를 직접 작성할 수는 없습니다. 컴파일러 에러 메시지나 IDE 툴팁에서 일반적으로 `A & B` 형태로 표시되는 교차 타입을 볼 수도 있습니다.
+한 가지 예외는 [명확히 널이 될 수 없는 타입(definitely non-nullable types)](generics.md#definitely-non-nullable-types)을 선언하는 `T & Any`입니다. 이 구문은 타입 파라미터와 `Any`를 결합하기 위해 특별히 예약되어 있습니다.
+
+```kotlin
+fun  <T> T.assertNotNull(): T & Any = this ?: throw IllegalStateException("null value")
+```
 
 ### 인라인 함수
 

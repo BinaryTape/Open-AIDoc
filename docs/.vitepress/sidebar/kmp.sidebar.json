@@ -19,7 +19,8 @@
         "link": "supported-platforms"
       },
       {
-        "text": "kmp.case-studies"
+        "text": "kmp.case-studies",
+        "href": "https://kotlinlang.org/case-studies/?type=multiplatform"
       },
       {
         "text": "kmp.multiplatform-samples",

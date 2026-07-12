@@ -2,16 +2,6 @@
 
 <no-index/>
 
-<tldr>
-    <p><img src="icon-1.svg" width="20" alt="첫 번째 단계" /> <strong>Hello world</strong><br />
-        <img src="icon-2-todo.svg" width="20" alt="두 번째 단계" /> <a href="kotlin-tour-basic-types.md">기본 타입(Basic types)</a><br />
-        <img src="icon-3-todo.svg" width="20" alt="세 번째 단계" /> <a href="kotlin-tour-collections.md">컬렉션(Collections)</a><br />
-        <img src="icon-4-todo.svg" width="20" alt="네 번째 단계" /> <a href="kotlin-tour-control-flow.md">제어 흐름(Control flow)</a><br />
-        <img src="icon-5-todo.svg" width="20" alt="다섯 번째 단계" /> <a href="kotlin-tour-functions.md">함수(Functions)</a><br />
-        <img src="icon-6-todo.svg" width="20" alt="여섯 번째 단계" /> <a href="kotlin-tour-classes.md">클래스(Classes)</a><br />
-        <img src="icon-7-todo.svg" width="20" alt="마지막 단계" /> <a href="kotlin-tour-null-safety.md">널 안전성(Null safety)</a></p>
-</tldr>
-
 다음은 "Hello, world!"를 출력하는 간단한 프로그램입니다:
 
 ```kotlin
@@ -76,6 +66,8 @@ fun main() {
 
 변수의 내용을 표준 출력으로 출력하는 방법을 알아두면 유용합니다. 이는 **문자열 템플릿(string templates)**을 사용하여 수행할 수 있습니다. 템플릿 표현식을 사용하면 변수나 다른 객체에 저장된 데이터에 접근하여 문자열로 변환할 수 있습니다. 문자열 값은 큰따옴표 `"` 안에 있는 문자들의 시퀀스입니다. 템플릿 표현식은 항상 달러 기호 `$`로 시작합니다.
 
+.
+
 템플릿 표현식 내에서 코드 조각을 평가하려면, 달러 기호 `$` 뒤의 중괄호 `{}` 안에 코드를 넣으세요.
 
 예를 들어:
@@ -98,9 +90,9 @@ fun main() {
 
 변수에 대해 타입이 선언되지 않은 것을 보셨을 것입니다. Kotlin은 타입을 직접 `Int`로 추론했습니다. 이 투어의 [다음 장](kotlin-tour-basic-types.md)에서 Kotlin의 다양한 기본 타입과 선언 방법을 설명합니다.
 
-## 연습 문제
+## 연습 문제(Practice) {completion-point="true"}
 
-### 연습 문제 {initial-collapse-state="collapsed" collapsible="true"}
+### 연습 문제(Exercise) {initial-collapse-state="collapsed" collapsible="true"}
 
 프로그램이 표준 출력으로 `"Mary is 20 years old"`를 출력하도록 코드를 완성하세요:
 
@@ -122,8 +114,12 @@ fun main() {
     println("$name is $age years old")
 }
 ```
-{initial-collapse-state="collapsed" collapsible="true" collapsed-title="예시 솔루션" id="kotlin-tour-hello-world-solution"}
+{initial-collapse-state="collapsed" collapsible="true" collapsed-title="예시 솔루션(Example solution)" id="kotlin-tour-hello-world-solution"}
 
-## 다음 단계
+<seealso></seealso>
 
-[기본 타입(Basic types)](kotlin-tour-basic-types.md)
+<list id="tour-nav">
+  <li>
+    <a as="button" href="kotlin-tour-basic-types.md" mode="classic" icon="arrow-right" icon-position="right">다음 단계</a>
+  </li>
+</list>

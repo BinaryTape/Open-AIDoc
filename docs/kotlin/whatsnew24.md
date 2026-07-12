@@ -24,14 +24,14 @@ Kotlin 2.4.0 正式发布！以下是主要亮点：
 
 最新版本的 Kotlin 已包含在最新版本的 [IntelliJ IDEA](https://www.jetbrains.com/idea/download/) 和 [Android Studio](https://developer.android.com/studio) 中。
 
-要更新到新的 Kotlin 版本，请确保您的 IDE 已更新到最新版本，并在构建脚本中将 [Kotlin 版本更改](releases.md#update-to-a-new-kotlin-version)为 2.4.0。
+要更新到新的 Kotlin 版本，请确保您的 IDE 已更新到最新版本，并在构建脚本中将 [Kotlin 版本更改](releases.md#update-to-a-new-kotlin-version) 为 2.4.0。
 
 ## 新功能 {id=new-stable-features}
 <primary-label ref="stable"/>
 
 在之前的 Kotlin 版本中，有几项新功能作为 Experimental（实验性）引入。以下功能现在在 Kotlin 2.4.0 中已晋升为 [Stable](components-stability.md#stability-levels-explained)（稳定版），因此您不再需要选择加入（opt-in）即可使用它们：
 
-* [上下文参数](context-parameters.md)，除了 [显式上下文实参](#explicit-context-arguments-for-context-parameters) 和 [可调用引用](https://github.com/Kotlin/KEEP/blob/context-parameters/proposals/context-parameters.md#callable-references)
+* [上下文参数](context-parameters.md)，除了 [上下文实参](#explicit-context-arguments-for-context-parameters) 和 [可调用引用](https://github.com/Kotlin/KEEP/blob/context-parameters/proposals/context-parameters.md#callable-references)
 * [属性的 `@all` 元目标](annotations.md#all-meta-target)
 * [未指定使用处目标时注解的新默认规则](annotations.md#defaults-when-no-use-site-targets-are-specified)
 * [显式支持字段](properties.md#explicit-backing-fields)
@@ -42,10 +42,6 @@ Kotlin 2.4.0 正式发布！以下是主要亮点：
 * [内联 JS 代码时支持 ES2015 功能](#support-for-es2015-features-when-inlining-js-code)
 * [Maven：Java 和 JVM 目标版本之间的自动对齐](#automatic-alignment-between-java-and-jvm-target-versions)
 * [支持 Maven Toolchains](#support-for-maven-toolchains)
-
-> 在 IntelliJ IDEA 中，无需 `-Xexplicit-backing-fields` 编译器选项即可使用显式支持字段的功能将在 2026.1.4 版本中提供。
->
-{style = "note"}
 
 ## 新功能 {id=new-experimental-features}
 <primary-label ref="experimental-exp"/>
@@ -69,7 +65,7 @@ Kotlin 2.4.0 将上下文参数、显式支持字段和注解使用处目标功�
 
 Kotlin 2.2.0 和 2.3.0 引入了一些作为 [Experimental](components-stability.md#stability-levels-explained) 的语言功能。我们很高兴地宣布，以下语言功能在此版本中已达到 [Stable](components-stability.md#stability-levels-explained)：
 
-* [上下文参数](whatsnew22.md#preview-of-context-parameters)，除了 [显式上下文实参](#explicit-context-arguments-for-context-parameters) 和 [可调用引用](https://github.com/Kotlin/KEEP/blob/context-parameters/proposals/context-parameters.md#callable-references)
+* [上下文参数](whatsnew22.md#preview-of-context-parameters)，除了 [上下文实参](#explicit-context-arguments-for-context-parameters) 和 [可调用引用](https://github.com/Kotlin/KEEP/blob/context-parameters/proposals/context-parameters.md#callable-references)
 * [属性的 `@all` 元目标](annotations.md#all-meta-target)
 * [未指定使用处目标时注解的新默认规则](annotations.md#defaults-when-no-use-site-targets-are-specified)
 * [显式支持字段](properties.md#explicit-backing-fields)
@@ -706,7 +702,7 @@ let msg = try await hello()
 
 以前，从 [`kotlinx.coroutines.flow`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/-flow/) 向 Swift 公开 `Flow` 接口的唯一方法是通过第三方解决方案。现在，您可以将 flow 开箱即用地导出到 Swift 的惯用对应版本：[`AsyncSequence`](https://developer.apple.com/documentation/Swift/AsyncSequence)。
 
-此功能默认启用。您可以向 Swift 导出任何带有 `Flow` 类型的公共 API，同时保留类型信息。例如：
+此功能默认启用。您可以向 Swift 导出任何带有 `Flow` 类型的公共 API，同时保留类型信息。示例如下：
 
 ```kotlin
 // Kotlin
@@ -1118,7 +1114,7 @@ Kotlin 2.4.0 对构建工具 API (BTA) 进行了多项改进。BTA：
 
   默认情况下，限制设置为特定于 Kotlin 编译器版本的值。若要不设限制，构建工具必须将选项设置为 `null`。
 
-  构建系统可以在配置 [执行策略](https://github.com/JetBrains/kotlin/blob/2.4.0/compiler/build-tools/kotlin-build-tools-api/src/main/kotlin/org/jetbrains/kotlin/buildtools/api/ExecutionPolicy.kt) 时设置该选项：
+  构建系统可以在配置执行策略时设置该选项：
 
   ```kotlin
   val executionPolicy = kotlinToolchains.daemonExecutionPolicy {
@@ -1312,7 +1308,7 @@ Kotlin 2.4.0 推进了已达到稳定并现已默认启用的实验性功能标�
 本节重点介绍重要的破坏性变更和弃用。有关完整概述，请参阅我们的 [兼容性指南](compatibility-guide-24.md)。
 
 * 从 Kotlin 2.4.0 开始，编译器不再支持 `-language-version=1.9`。因此，K1 编译器不再受支持。
-* Kotlin 2.4.0 精简了 Kotlin Gradle 插件中用于二进制兼容性验证的 DSL，并弃用了一些部分。有关最新的 DSL，请参阅 [Kotlin Gradle 插件中的二进制兼容性验证](gradle-binary-compatibility-validation.md)。
+* Kotlin 2.4.0 精简了 Kotlin Gradle 插件中用于二进制兼容性验证的 DSL，并弃用了一些部分 Tracker。有关最新的 DSL，请参阅 [Kotlin Gradle 插件中的二进制兼容性验证](gradle-binary-compatibility-validation.md)。
 * [通过 `KotlinScriptMojo` Maven 插件执行 Kotlin 脚本的支持已被移除](compatibility-guide-22.md#deprecations-to-kotlin-scripting)。
 
 ## 文档更新
