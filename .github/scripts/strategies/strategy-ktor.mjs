@@ -12,7 +12,7 @@ export const ktorStrategy = {
     /**
      * @override
      */
-    getDocPatterns: () => ["topics/*.md"],
+    getDocPatterns: () => ["topics/*.md", "topics/*.topic"],
 
     postSync: async (repoPath) => {},
 
