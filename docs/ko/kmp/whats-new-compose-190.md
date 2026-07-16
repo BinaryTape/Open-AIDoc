@@ -56,7 +56,7 @@ Compose Multiplatform 1.9.0에서는 Jetpack Compose의 새로운 섀도우 프�
 이러한 새로운 그림자를 UI 컴포넌트에 적용하려면 `dropShadow` 또는 `innerShadow` 수정자로 그림자 효과를 설정하세요:
 
 <list columns="2">
-   <li><code-block lang="kotlin" code="        Box(&#10;            Modifier.size(120.dp)&#10;                .dropShadow(&#10;                    RectangleShape,&#10;                    DropShadow(12.dp)&#10;                )&#10;                .background(Color.White)&#10;        )&#10;        Box(&#10;            Modifier.size(120.dp)&#10;                .innerShadow(&#10;                    RectangleShape,&#10;                    InnerShadow(12.dp)&#10;                )&#10;        )"/></li>
+   <li><code-block lang="kotlin" code="        Box(&#10;            Modifier.size(120.dp)&#10;                .dropShadow(&#10;                    RectangleShape,&#10;                    DropShadow(12.dp)&#10;                )&#10;                .background(Color.White)&#10;        )&#10;        Box(&#10;            Modifier.size(120.dp)&#10;                .innerShadow(&#10;                    RectangleShape,&#10;                    InnerShadow(12.dp)&#10;                )&#10;        )"></code-block></li>
    <li><img src="compose-advanced-shadows.png" type="inline" alt="Customizable shadows" width="200"/></li>
 </list>
 

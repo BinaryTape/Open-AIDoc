@@ -97,7 +97,7 @@ LLM 클라이언트를 사용하여 프롬프트를 실행하려면 다음 단�
         .build();
 
     // 프롬프트 실행
-    List<Message.Response> response = client.execute(prompt, OpenAIModels.Chat.GPT4o, Collections.emptyList());
+    `List<Message.Response>` response = client.execute(prompt, OpenAIModels.Chat.GPT4o, Collections.emptyList());
     // 응답 출력
     System.out.println(response);
 
@@ -290,7 +290,7 @@ Tool call: " + toolCall.getName());
     );
 
     for (int i = 0; i < choices.size(); i++) {
-        List<Message.Response> choice = choices.get(i);
+        `List<Message.Response>` choice = choices.get(i);
         StringBuilder text = new StringBuilder();
         for (Message.Response msg : choice) {
             text.append(msg.getContent()).append(" ");
@@ -321,7 +321,7 @@ LLM 클라이언트가 지원하는 사용 가능한 모델 ID 목록을 가져�
         val apiKey = System.getenv("OPENAI_API_KEY")
         val client = OpenAILLMClient(apiKey)
 
-        val models: List<LLModel> = client.models()
+        val models: `List<LLModel>` = client.models()
         models.forEach { println(it.id) }
     }
     ```
@@ -339,7 +339,7 @@ LLM 클라이언트가 지원하는 사용 가능한 모델 ID 목록을 가져�
     String apiKey = System.getenv("OPENAI_API_KEY");
     OpenAILLMClient client = new OpenAILLMClient(apiKey);
 
-    List<LLModel> models = client.models();
+    `List<LLModel>` models = client.models();
     for (LLModel model : models) {
         System.out.println(model.getId());
     }

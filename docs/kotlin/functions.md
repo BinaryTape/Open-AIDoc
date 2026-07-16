@@ -395,7 +395,7 @@ fun getDisplayNameOrDefault(userId: String?): String =
 在函数内部，你可以将 `T` 类型的 `vararg` 形参用作 `T` 的数组：
 
 ```kotlin
-fun <T> asList(vararg ts: T): List<T> {
+fun <T> asList(vararg ts: T): `List<T>` {
     val result = ArrayList<T>()
     for (t in ts) // ts 是一个 Array
         result.add(t)
@@ -406,7 +406,7 @@ fun <T> asList(vararg ts: T): List<T> {
 然后你可以向该函数传递可变数量的实参：
 
 ```kotlin
-fun <T> asList(vararg ts: T): List<T> {
+fun <T> asList(vararg ts: T): `List<T>` {
     val result = ArrayList<T>()
     for (t in ts) // ts 是一个 Array
         result.add(t)
@@ -432,7 +432,7 @@ fun main() {
 请使用[扩展运算符](arrays.md#pass-variable-number-of-arguments-to-a-function)，在数组名称前加 `*`：
 
 ```kotlin
-fun <T> asList(vararg ts: T): List<T> {
+fun <T> asList(vararg ts: T): `List<T>` {
     val result = ArrayList<T>()
     for (t in ts)
         result.add(t)
@@ -627,7 +627,7 @@ Stream().read()
 你可以通过在函数名称之前使用尖括号 `<>` 来为函数指定泛型形参：
 
 ```kotlin
-fun <T> singletonList(item: T): List<T> { /*...*/ }
+fun <T> singletonList(item: T): `List<T>` { /*...*/ }
 ```
 
 有关泛型函数的更多信息，请参阅[泛型](generics.md)。

@@ -179,7 +179,7 @@ fun main(args: Array<String>) {
    </def>
    <def title="プログラムの開始点 – main()">
       <p><a href="basic-syntax.md#program-entry-point"><code>main()</code></a> 関数は、アプリケーションの開始点（エントリーポイント）です。</p>
-      <p>これは <code>DemoApplication</code> クラスの外側で <a href="functions.md#function-scope">トップレベル関数</a> として宣言されています。<code>main()</code> 関数はSpringの <code>runApplication(*args)</code> 関数を呼び出し、Spring Frameworkでアプリケーションを開始します。</p>
+      <p>これは <code>DemoApplication</code> クラスの外側で <a href="functions.md#function-scope">トップレベル関数</a> として宣言されています。<code>main()</code> 関数はSpringの `runApplication(*args)` 関数を呼び出し、Spring Frameworkでアプリケーションを開始します。</p>
    </def>
    <def title="可変長引数 – args: Array&lt;String&gt;">
       <p><code>runApplication()</code> 関数の宣言を確認すると、関数のパラメータに <a href="functions.md#variable-number-of-arguments-varargs"><code>vararg</code> 修飾子</a> が付いていることがわかります（<code>vararg args: String</code>）。

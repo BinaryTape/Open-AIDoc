@@ -255,15 +255,15 @@ JavaScript의 `JsArray<T>`를 Kotlin의 기본 `Array` 또는 `List` 타입으�
 다음은 제네릭 타입 간 변환의 예입니다.
 
 ```kotlin
-val list: List<JsString> =
+val list: `List<JsString>` =
     listOf("Kotlin", "Wasm").map { it.toJsString() }
 
 // .toJsArray()를 사용하여 List나 Array를 JsArray로 변환
 val jsArray: JsArray<JsString> = list.toJsArray()
 
 // .toArray() 및 .toList()를 사용하여 다시 Kotlin 타입으로 변환
-val kotlinArray: Array<JsString> = jsArray.toArray()
-val kotlinList: List<JsString> = jsArray.toList()
+val kotlinArray: `Array<JsString>` = jsArray.toArray()
+val kotlinList: `List<JsString>` = jsArray.toList()
 ```
 
 타입화된 배열(typed arrays)을 대응하는 Kotlin 배열(예: `IntArray` 및 `Int32Array`)로 변환하기 위한 유사한 어댑터 함수들도 제공됩니다. 자세한 정보와 구현 내용은 [`kotlinx-browser` 리포지토리](https://github.com/Kotlin/kotlinx-browser/blob/dfbdceed314567983c98f1d66e8c2e10d99c5a55/src/wasmJsMain/kotlin/arrayCopy.kt)를 참조하세요.

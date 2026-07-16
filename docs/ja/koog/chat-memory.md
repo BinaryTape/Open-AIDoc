@@ -136,7 +136,7 @@ windowSize(10)
 
 ```kotlin
 class RedactEmailsPreProcessor : ChatMemoryPreProcessor {
-    override fun preprocess(messages: List<Message>): List<Message> {
+    override fun preprocess(messages: List<Message>): `List<Message>` {
         return messages.map { message ->
             // メッセージ内容に含まれるメールアドレスを置換
             Message.User(message.content.replace(Regex("[\\w.]+@[\\w.]+"), "[REDACTED]"))
@@ -164,7 +164,7 @@ class DatabaseChatHistoryProvider(private val db: Database) : ChatHistoryProvide
         db.saveMessages(conversationId, messages)
     }
 
-    override suspend fun load(conversationId: String): List<Message> {
+    override suspend fun load(conversationId: String): `List<Message>` {
         return db.loadMessages(conversationId) ?: emptyList()
     }
 }

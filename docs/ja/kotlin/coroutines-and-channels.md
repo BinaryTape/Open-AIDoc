@@ -88,7 +88,7 @@ interface GitHubService {
     fun loadContributorsBlocking(
         service: GitHubService,
         req: RequestData
-    ): List<User> {
+    ): `List<User>` {
         val repos = service
             .getOrgReposCall(req.org)   // #1
             .execute()                  // #2
@@ -114,7 +114,7 @@ interface GitHubService {
 2. `.body() ?: emptyList()` の繰り返しを避けるために、拡張関数 `bodyList()` が宣言されています：
 
     ```kotlin
-    fun <T> Response<List<T>>.bodyList(): List<T> {
+    fun <T> Response<List<T>>.bodyList(): `List<T>` {
         return body() ?: emptyList()
     }
     ```  
@@ -175,7 +175,7 @@ interface GitHubService {
 3. 結果のリストを降順でソートします：
 
     ```kotlin
-    fun List<User>.aggregate(): List<User> =
+    fun List<User>.aggregate(): `List<User>` =
         groupBy { it.login }
             .map { (login, group) -> User(login, group.sumOf { it.contributions }) }
             .sortedByDescending { it.contributions }
@@ -427,7 +427,7 @@ interface GitHubService {
 `.getOrgReposCall(req.org).execute()` を `.getOrgRepos(req.org)` に置き換え、2番目の "contributors" リクエストについても同じ置き換えを繰り返します：
 
 ```kotlin
-suspend fun loadContributorsSuspend(service: GitHubService, req: RequestData): List<User> {
+suspend fun loadContributorsSuspend(service: GitHubService, req: RequestData): `List<User>` {
     val repos = service
         .getOrgRepos(req.org)
         .also { logRepos(req, it) }
@@ -581,7 +581,7 @@ fun main() = runBlocking {
 suspend fun loadContributorsConcurrent(
     service: GitHubService,
     req: RequestData
-): List<User> = coroutineScope {
+): `List<User>` = coroutineScope {
     // ...
 }
 ```
@@ -607,7 +607,7 @@ deferreds.awaitAll() // List<List<User>>
     suspend fun loadContributorsConcurrent(
         service: GitHubService, 
         req: RequestData
-    ): List<User> = coroutineScope {
+    ): `List<User>` = coroutineScope {
         val repos = service
             .getOrgRepos(req.org)
             .also { logRepos(req, it) }
@@ -743,7 +743,7 @@ fun main() = runBlocking { /* this: CoroutineScope */
    suspend fun loadContributorsConcurrent(
        service: GitHubService, 
        req: RequestData
-   ): List<User> = coroutineScope {
+   ): `List<User>` = coroutineScope {
        // ...
        async {
            log("starting loading for ${repo.name}")
@@ -763,7 +763,7 @@ fun main() = runBlocking { /* this: CoroutineScope */
     suspend fun loadContributorsNotCancellable(
         service: GitHubService,
         req: RequestData
-    ): List<User> {   // #1
+    ): `List<User>` {   // #1
         // ...
         GlobalScope.async {   // #2
             log("starting loading for ${repo.name}")
@@ -870,7 +870,7 @@ launch(Dispatchers.Default) {  // 外側のスコープ
 ```kotlin
 suspend fun loadContributorsConcurrent(
     service: GitHubService, req: RequestData
-): List<User> = coroutineScope {
+): `List<User>` = coroutineScope {
     // このスコープは外側のスコープからコンテキストを継承する
     // ...
     async {   // ネストされたコルーチンは継承されたコンテキストで開始される

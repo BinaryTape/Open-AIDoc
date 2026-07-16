@@ -443,7 +443,7 @@ Agent 持久化功能提供了用于处理检查点的便捷扩展函数：
     -->
     ```kotlin
     class MyCustomStorageProvider<MyFilterType> : PersistenceStorageProvider<MyFilterType> {
-        override suspend fun getCheckpoints(sessionId: String, filter: MyFilterType?): List<AgentCheckpointData> {
+        override suspend fun getCheckpoints(sessionId: String, filter: MyFilterType?): `List<AgentCheckpointData>` {
             TODO("尚未实现")
         }
 
@@ -501,7 +501,7 @@ Agent 持久化功能提供了用于处理检查点的便捷扩展函数：
     import ai.koog.prompt.executor.llms.all.simpleOllamaAIExecutor
     import ai.koog.prompt.executor.ollama.client.OllamaModels
     class MyCustomStorageProvider<MyFilterType> : PersistenceStorageProvider<MyFilterType> {
-        override suspend fun getCheckpoints(sessionId: String, filter: MyFilterType?): List<AgentCheckpointData> {
+        override suspend fun getCheckpoints(sessionId: String, filter: MyFilterType?): `List<AgentCheckpointData>` {
             TODO("尚未实现")
         }
         override suspend fun saveCheckpoint(sessionId: String, agentCheckpointData: AgentCheckpointData) {

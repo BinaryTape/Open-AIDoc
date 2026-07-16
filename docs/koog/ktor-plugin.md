@@ -27,7 +27,7 @@ dependencies {
 
 1) 配置提供者（在 `application.yaml` 或 `application.conf` 中）
 
-使用 `koog.<provider>` 下的嵌套键。插件会自动获取它们。
+使用 `koog.&lt;provider&gt;` 下的嵌套键。插件会自动获取它们。
 
 ```yaml
 # application.yaml (Ktor 配置)
@@ -217,7 +217,7 @@ install(Koog) {
 注意
 
 - 对于 OpenAI，您必须包含类别 (chat, reasoning, costoptimized, audio, embeddings, moderation)。
-- 对于 Ollama，同时支持 ollama.model 和 ollama.<maker>.<model>。
+- 对于 Ollama，同时支持 ollama.model 和 ollama.&lt;maker&gt;.&lt;model&gt;。
 
 ## MCP 工具（仅限 JVM）
 

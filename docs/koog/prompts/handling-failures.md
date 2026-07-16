@@ -53,7 +53,7 @@
     RetryingLLMClient resilientClient = new RetryingLLMClient(client);
 
     // 现在，所有操作都将在发生瞬态错误时自动进行重试
-    List<Message.Response> response = resilientClient.execute(prompt, OpenAIModels.Chat.GPT4o);
+    `List<Message.Response>` response = resilientClient.execute(prompt, OpenAIModels.Chat.GPT4o);
     ```
     <!--- KNIT example-handling-failures-java-01.java -->
 
@@ -510,7 +510,7 @@ val stream = client.executeStreaming(prompt, OpenAIModels.Chat.GPT4o)
     Runnable useDefaultResponse = () -> { /* 实现 */ };
 
     try {
-        List<Message.Response> response = promptExecutor.execute(prompt, OpenAIModels.Chat.GPT4o);
+        `List<Message.Response>` response = promptExecutor.execute(prompt, OpenAIModels.Chat.GPT4o);
         processResponse.accept(response);
     } catch (Exception e) {
         logger.error("LLM operation failed", e);

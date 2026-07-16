@@ -117,7 +117,7 @@ interface ResolutionExtension {
 
 ```kotlin
 class ExternalInstanceProvider : ResolutionExtension {
-    private val externalInstances = mutableMapOf<KClass<*>, Any>()
+    private val externalInstances = mutableMapOf<`KClass<*>`, Any>()
 
     override val name: String = "external-provider"
 
@@ -158,7 +158,7 @@ startKoin {
 @OptIn(KoinExperimentalAPI::class)
 fun resolutionExtensionExample() {
     val resolutionExtension = object : ResolutionExtension {
-        val instanceMap = mapOf<KClass<*>, Any>(
+        val instanceMap = mapOf<`KClass<*>`, Any>(
             ComponentA::class to ComponentA()
         )
 

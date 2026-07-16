@@ -184,7 +184,7 @@ fun copy(from: Array<Any>, to: Array<Any>) {
 이 함수는 한 배열에서 다른 배열로 아이템을 복사하기 위한 것입니다. 실제로 적용해 봅시다:
 
 ```kotlin
-val ints: Array<Int> = arrayOf(1, 2, 3)
+val ints: `Array<Int>` = arrayOf(1, 2, 3)
 val any = Array<Any>(3) { "" } 
 copy(ints, any)
 //   ^ 타입은 Array<Int>이지만 Array<Any>를 기대했습니다.
@@ -234,7 +234,7 @@ Kotlin은 이를 위해 소위 _스타 프로젝션(star-projection)_ 구문을 
 클래스만이 타입 매개변수를 가질 수 있는 선언은 아닙니다. 함수도 가질 수 있습니다. 타입 매개변수는 함수 이름 _앞_에 위치합니다:
 
 ```kotlin
-fun <T> singletonList(item: T): List<T> {
+fun <T> singletonList(item: T): `List<T>` {
     // ...
 }
 
@@ -407,7 +407,7 @@ val intsDictionary: Map<String, Int> = readDictionary(intsFile) as Map<String, I
 inline fun <reified T> List<*>.asListOfType(): List<T>? =
     if (all { it is T })
         @Suppress("UNCHECKED_CAST")
-        this as List<T> else
+        this as `List<T>` else
         null
 ```
 

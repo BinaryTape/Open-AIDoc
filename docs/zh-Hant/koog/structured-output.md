@@ -265,7 +265,7 @@ val structuredResponse = promptExecutor.executeStructured<WeatherForecast>(
 |----------------|------------------------|----------|---------------|-------------------------------------------------------------------------------------------------|
 | `prompt` | Prompt | 是 | | 要執行的 prompt。若要了解更多資訊，請參閱 [Prompts](prompts/index.md)。 |
 | `model` | LLModel | 是 | | 執行 prompt 的主要模型。 |
-| `examples` | List<T> | 否 | `emptyList()` | 選填的範例清單，可幫助模型理解預期格式。 |
+| `examples` | `List<T>` | 否 | `emptyList()` | 選填的範例清單，可幫助模型理解預期格式。 |
 | `fixingParser` | StructureFixingParser? | 否 | `null` | 選填的剖析器，透過使用輔助 LLM 智慧地修復剖析錯誤來處理格式錯誤的回應。提供時，會自動對剖析失敗進行錯誤修正並重試。 |
 
 此方法會傳回一個 `Result<StructuredResponse<T>>`，其中包含成功剖析的結構化資料或錯誤。

@@ -59,7 +59,7 @@ fun main() {
 fun main() {
 //sampleStart
     // 建立一個值為 [null, null, null] 的陣列
-    val nullArray: Array<Int?> = arrayOfNulls(3)
+    val nullArray: `Array<Int?>` = arrayOfNulls(3)
     println(nullArray.joinToString())
     // null, null, null
 //sampleEnd
@@ -79,7 +79,7 @@ fun main() {
 > ```Kotlin
 > var exampleArray = emptyArray<String>()
 > 
-> var exampleArray: Array<String> = emptyArray()
+> var exampleArray: `Array<String>` = emptyArray()
 >```
 >
 {style="note"}
@@ -89,7 +89,7 @@ fun main() {
 ```kotlin
 fun main() {
 //sampleStart
-    // 建立一個 Array<Int> 並以零 [0, 0, 0] 進行初始化
+    // 建立一個 `Array<Int>` 並以零 [0, 0, 0] 進行初始化
     val initArray = Array<Int>(3) { 0 }
     println(initArray.joinToString())
     // 0, 0, 0

@@ -217,14 +217,14 @@ LLM 호출의 시작을 나타냅니다. 다음 필드를 포함합니다:
 | `runId`         | String              | 예      |         | LLM 실행의 고유 식별자입니다. |
 | `prompt`        | Prompt              | 예      |         | 모델에 전송되는 프롬프트입니다. 자세한 내용은 [Prompt](#prompt)를 참조하세요. |
 | `model`         | ModelInfo           | 예      |         | 모델 정보입니다. [ModelInfo](#modelinfo)를 참조하세요. |
-| `tools`         | List<String>        | 예      |         | 모델이 호출할 수 있는 도구 목록입니다. |
+| `tools`         | `List<String>`        | 예      |         | 모델이 호출할 수 있는 도구 목록입니다. |
 
 <a id="prompt"></a>
 `Prompt` 클래스는 프롬프트를 위한 데이터 구조로, 메시지 목록, 고유 식별자 및 언어 모델 설정을 위한 선택적 매개변수로 구성됩니다. 다음 필드를 포함합니다:
 
 | 이름 | 데이터 타입 | 필수 여부 | 기본값 | 설명 |
 |------------|---------------------|----------|-------------|--------------------------------------------------------------|
-| `messages` | List<Message>       | 예      |             | 프롬프트를 구성하는 메시지 목록입니다. |
+| `messages` | `List<Message>`       | 예      |             | 프롬프트를 구성하는 메시지 목록입니다. |
 | `id`       | String              | 예      |             | 프롬프트의 고유 식별자입니다. |
 | `params`   | LLMParams           | 아니요   | LLMParams() | LLM이 콘텐츠를 생성하는 방식을 제어하는 설정입니다. |
 
@@ -250,7 +250,7 @@ LLM 호출의 종료를 나타냅니다. 다음 필드를 포함합니다:
 | `runId`              | String                 | 예      |         | LLM 실행의 고유 식별자입니다. |
 | `prompt`             | Prompt                 | 예      |         | 호출에 사용된 프롬프트입니다. |
 | `model`              | ModelInfo              | 예      |         | 모델 정보입니다. [ModelInfo](#modelinfo)를 참조하세요. |
-| `responses`          | List<Message.Response> | 예      |         | 모델에서 반환된 하나 이상의 응답입니다. |
+| `responses`          | `List<Message.Response>` | 예      |         | 모델에서 반환된 하나 이상의 응답입니다. |
 | `moderationResponse` | ModerationResult       | 아니요   | null    | 모더레이션(moderation) 응답이 있는 경우의 응답입니다. |
 
 ### LLM 스트리밍 이벤트
@@ -266,7 +266,7 @@ LLM 스트리밍 호출의 시작을 나타냅니다. 다음 필드를 포함합
 | `runId`         | String              | 예      |         | LLM 실행의 고유 식별자입니다. |
 | `prompt`        | Prompt              | 예      |         | 모델에 전송되는 프롬프트입니다. |
 | `model`         | ModelInfo           | 예      |         | 모델 정보입니다. [ModelInfo](#modelinfo)를 참조하세요. |
-| `tools`         | List<String>        | 예      |         | 모델이 호출할 수 있는 도구 목록입니다. |
+| `tools`         | `List<String>`        | 예      |         | 모델이 호출할 수 있는 도구 목록입니다. |
 
 #### LLMStreamingFrameReceivedEvent
 
@@ -305,7 +305,7 @@ LLM 스트리밍 호출의 종료를 나타냅니다. 다음 필드를 포함합
 | `runId`         | String              | 예      |         | LLM 실행의 고유 식별자입니다. |
 | `prompt`        | Prompt              | 예      |         | 모델에 전송되는 프롬프트입니다. |
 | `model`         | ModelInfo           | 예      |         | 모델 정보입니다. [ModelInfo](#modelinfo)를 참조하세요. |
-| `tools`         | List<String>        | 예      |         | 모델이 호출할 수 있는 도구 목록입니다. |
+| `tools`         | `List<String>`        | 예      |         | 모델이 호출할 수 있는 도구 목록입니다. |
 
 ### 도구 실행 이벤트
 

@@ -60,15 +60,15 @@
    如果 pod 和對應的 Swift 套件提供完全相同的 API，您應該只需要更新 Kotlin 匯入指示詞，例如：
 
     <compare type="top-bottom">
-        <code-block lang="kotlin" code="            import cocoapods.FirebaseAnalytics.FIRAnalytics"/>
-        <code-block lang="kotlin" code="            import swiftPMImport.org.example.package.FIRAnalytics"/>
+        <code-block lang="kotlin" code="            import cocoapods.FirebaseAnalytics.FIRAnalytics"></code-block>
+        <code-block lang="kotlin" code="            import swiftPMImport.org.example.package.FIRAnalytics"></code-block>
     </compare>
 
 5. 如果您在建置指令碼中使用了 `cocoapods.framework {}` 區塊，請將該配置移至 `binaries.framework {}` 區塊，例如：
 
    <compare type="left-right">
-   <code-block lang="kotlin" code="   kotlin {&#10;       iosArm64()&#10;       iosSimulatorArm64()&#10;       iosX64()&#10;&#10;       cocoapods {&#10;           framework {&#10;               baseName = &quot;Shared&quot;&#10;               isStatic = true&#10;           }&#10;       }&#10;   }"/>
-   <code-block lang="kotlin" code="   kotlin {&#10;       listOf(&#10;           iosArm64(),&#10;           iosSimulatorArm64(),&#10;           iosX64(),&#10;       ).forEach { iosTarget -&gt;&#10;           iosTarget.binaries.framework {&#10;               baseName = &quot;Shared&quot;&#10;               isStatic = true&#10;           }&#10;       }&#10;   }"/>
+   <code-block lang="kotlin" code="   kotlin {&#10;       iosArm64()&#10;       iosSimulatorArm64()&#10;       iosX64()&#10;&#10;       cocoapods {&#10;           framework {&#10;               baseName = &quot;Shared&quot;&#10;               isStatic = true&#10;           }&#10;       }&#10;   }"></code-block>
+   <code-block lang="kotlin" code="   kotlin {&#10;       listOf(&#10;           iosArm64(),&#10;           iosSimulatorArm64(),&#10;           iosX64(),&#10;       ).forEach { iosTarget -&gt;&#10;           iosTarget.binaries.framework {&#10;               baseName = &quot;Shared&quot;&#10;               isStatic = true&#10;           }&#10;       }&#10;   }"></code-block>
    </compare>
 
 ## 重新配置您的 Xcode 專案

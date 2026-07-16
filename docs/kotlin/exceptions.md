@@ -64,7 +64,7 @@ Kotlin 提供了使用前置条件函数自动抛出异常的其他方式。前�
 如果 `require()` 中的条件未满足，它将抛出 [`IllegalArgumentException`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-illegal-argument-exception/)：
 
 ```kotlin
-fun getIndices(count: Int): List<Int> {
+fun getIndices(count: Int): `List<Int>` {
     require(count >= 0) { "Count must be non-negative. You set count to $count." }
     return List(count) { it + 1 }
 }

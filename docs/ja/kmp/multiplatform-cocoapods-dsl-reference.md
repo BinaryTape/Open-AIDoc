@@ -128,7 +128,7 @@ kotlin {
 | `version` | ライブラリのバージョン。ライブラリの最新バージョンを使用するには、パラメータを省略します。 |
 | `source` | Pod の取得元を設定します：<list><li>`git()` を使用した Git リポジトリ。`git()` の後のブロックで、特定のコミットを使用するための `commit`、特定のタグを使用するための `tag`、リポジトリの特定のブランチを使用するための `branch` を指定できます。</li><li>`path()` を使用したローカルリポジトリ</li></list> |
 | `packageName` | パッケージ名を指定します。 |
-| `extraOpts` | Pod ライブラリのオプションのリストを指定します。例えば、特定のフラグなどです：<code-block lang="Kotlin" code="extraOpts = listOf(&quot;-compiler-option&quot;)"/> |
+| `extraOpts` | Pod ライブラリのオプションのリストを指定します。例えば、特定のフラグなどです：<code-block lang="Kotlin" code="extraOpts = listOf(&quot;-compiler-option&quot;)"></code-block> |
 | `linkOnly` | cinterop バインディングを生成せずに、動的フレームワークを持つ Pod 依存関係を使用するように CocoaPods プラグインに指示します。静的フレームワークで使用された場合、このオプションは Pod 依存関係を完全に削除します。 |
 | `interopBindingDependencies` | 他の Pod への依存関係のリストが含まれます。このリストは、新しい Pod 用の Kotlin バインディングをビルドするときに使用されます。 |
 | `useInteropBindingFrom()` | 依存関係として使用される既存の Pod の名前を指定します。この Pod は、この関数の実行前に宣言されている必要があります。この関数は、新しい Pod のバインディングをビルドするときに、既存の Pod の Kotlin バインディングを使用するように CocoaPods プラグインに指示します。 |

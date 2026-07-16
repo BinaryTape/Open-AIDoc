@@ -351,7 +351,7 @@ Koog 提供兩種主要的內容審查方法：直接在 `LLMClient` 執行個�
          *
          * 用於識別在受審查內容中發現的特定違規類型。
          */
-        public val violatedCategories: List<ModerationCategory> = categories.filter { it.value.detected }.keys.toList()
+        public val violatedCategories: `List<ModerationCategory>` = categories.filter { it.value.detected }.keys.toList()
 
         /**
          * 表示為內容審查提供的輸入類型。

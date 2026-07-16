@@ -169,7 +169,7 @@
 
 Coil 3.0.0 は、[Compose Multiplatform](https://www.jetbrains.com/compose-multiplatform/) をフルサポートした次のメジャーリリースです。
 
-[3.0.0 における改善点と重要な変更の全リストについては、アップグレードガイドを確認してください](https://coil-kt.github.io/coil/upgrading_to_coil3/)。
+[3.0.0 における改善点と重要な変更の全リストについては、アップグレードガイドを確認してください](/coil/migrating_to_coil3/)。
 
 `3.0.0-rc02` からの変更点:
 
@@ -177,7 +177,7 @@ Coil 3.0.0 は、[Compose Multiplatform](https://www.jetbrains.com/compose-multi
 
 ## [3.0.0-rc02] - 2024年10月28日
 
-[3.x における改善点と重要な変更の全リストについては、アップグレードガイドを確認してください](https://coil-kt.github.io/coil/upgrading_to_coil3/)。 `3.0.0-rc01` からの変更点:
+[3.x における改善点と重要な変更の全リストについては、アップグレードガイドを確認してください](/coil/migrating_to_coil3/)。 `3.0.0-rc01` からの変更点:
 
 - `BlackholeDecoder` を追加しました。これにより、[ディスクキャッシュのみのプリロード](https://coil-kt.github.io/coil/faq/#how-do-i-preload-an-image) が簡素化されます。
 - `ConstraintsSizeResolver` と `DrawScopeSizeResolver` のための `remember` 関数を追加しました。
@@ -192,7 +192,7 @@ Coil 3.0.0 は、[Compose Multiplatform](https://www.jetbrains.com/compose-multi
 
 ## [3.0.0-rc01] - 2024年10月8日
 
-[3.x における改善点と重要な変更の全リストについては、アップグレードガイドを確認してください](https://coil-kt.github.io/coil/upgrading_to_coil3/)。 `3.0.0-alpha10` からの変更点:
+[3.x における改善点と重要な変更の全リストについては、アップグレードガイドを確認してください](/coil/migrating_to_coil3/)。 `3.0.0-alpha10` からの変更点:
 
 - **破壊的変更**: `addLastModifiedToFileCacheKey` をデフォルトで無効にし、リクエストごとに設定できるようにしました。この動作は同じフラグで再度有効にできます。
 - **新機能**: [`Cache-Control` ヘッダー](https://developer.mozilla.org/ja/docs/Web/HTTP/Headers/Cache-Control) のサポートを実装した新しい `coil-network-cache-control` アーティファクトを導入しました。
@@ -276,12 +276,12 @@ AsyncImage(
 - Update Compose to 1.6.11.
 - Update Okio to 3.9.0.
 - Update Skiko to 0.8.4.
-- [3.x における重要な変更の全リストについては、アップグレードガイドを確認してください。](https://coil-kt.github.io/coil/upgrading_to_coil3/)
+- [3.x における重要な変更の全リストについては、アップグレードガイドを確認してください。](/coil/migrating_to_coil3/)
 
 ## [3.0.0-alpha06] - 2024年2月29日
 
 - Skiko を 0.7.93 にダウングレードしました。
-- [3.x における重要な変更の全リストについては、アップグレードガイドを確認してください。](https://coil-kt.github.io/coil/upgrading_to_coil3/)
+- [3.x における重要な変更の全リストについては、アップグレードガイドを確認してください。](/coil/migrating_to_coil3/)
 
 ## [3.0.0-alpha05] - 2024年2月28日
 
@@ -295,7 +295,7 @@ AsyncImage(
 - Update Coroutines to 1.8.0.
 - Update Okio to 3.8.0.
 - Update Skiko to 0.7.94.
-- [3.x における重要な変更の全リストについては、アップグレードガイドを確認してください。](https://coil-kt.github.io/coil/upgrading_to_coil3/)
+- [3.x における重要な変更の全リストについては、アップグレードガイドを確認してください。](/coil/migrating_to_coil3/)
 
 ## [2.6.0] - 2024年2月23日
 
@@ -317,7 +317,7 @@ AsyncImage(
 - `OkHttpNetworkFetcherFactory` において、`OkHttpClient` ではなく `Call.Factory` を公開するようにしました。
 - `NetworkResponseBody` が `ByteString` をラップするように変更しました。
 - Compose を 1.5.12 にダウングレードしました。
-- [重要な変更の全リストについては、アップグレードガイドを確認してください。](https://coil-kt.github.io/coil/upgrading_to_coil3/)
+- [重要な変更の全リストについては、アップグレードガイドを確認してください。](/coil/migrating_to_coil3/)
 
 ## [3.0.0-alpha03] - 2024年1月20日
 
@@ -325,7 +325,7 @@ AsyncImage(
     - インポートするアーティファクトに応じて、`KtorNetworkFetcherFactory` または `OkHttpNetworkFetcherFactory` を使用して手動で `Fetcher.Factory` を参照できます。
 - Apple プラットフォームでの `NSUrl` の読み込みをサポートしました。
 - `AsyncImage` に `clipToBounds` パラメータを追加しました。
-- [重要な変更の全リストについては、アップグレードガイドを確認してください。](https://coil-kt.github.io/coil/upgrading_to_coil3/)
+- [重要な変更の全リストについては、アップグレードガイドを確認してください。](/coil/migrating_to_coil3/)
 
 ## [3.0.0-alpha02] - 2024年1月10日
 
@@ -338,14 +338,14 @@ AsyncImage(
 - **新機能**: すべてのプラットフォームで `coil-svg` をサポートしました。Android では [AndroidSVG](https://bigbadaboom.github.io/androidsvg/) が、非 Android プラットフォームでは [SVGDOM](https://api.skia.org/classSkSVGDOM.html) がバックエンドとして使用されます。
 - Coil は内部的に Android の [`ImageDecoder`](https://developer.android.com/reference/android/graphics/ImageDecoder) API を使用するようになりました。これにより、ファイル、リソース、またはコンテンツ URI から直接デコードする際のパフォーマンスが向上します。
 - 修正: 複数の `coil3.Uri` パースの修正。
-- [重要な変更の全リストについては、アップグレードガイドを確認してください。](https://coil-kt.github.io/coil/upgrading_to_coil3/)
+- [重要な変更の全リストについては、アップグレードガイドを確認してください。](/coil/migrating_to_coil3/)
 
 ## [3.0.0-alpha01] - 2023年12月30日
 
 - **新機能**: [Compose Multiplatform](https://www.jetbrains.com/lp/compose-multiplatform/) をサポートしました。Coil は Android、JVM、iOS、macOS、Javascript をサポートする Kotlin Multiplatform ライブラリになりました。
 - Coil の Maven 座標を `io.coil-kt.coil3` に、インポートを `coil3` に更新しました。これにより、バイナリ互換性の問題を発生させることなく、Coil 3 を Coil 2 と共存させることができます。例えば、`io.coil-kt:coil:[version]` は `io.coil-kt.coil3:coil:[version]` になりました。
 - `coil-base` および `coil-compose-base` アーティファクトを、Coroutines、Ktor、AndroidX で使用されている命名規則に合わせて、それぞれ `coil-core` および `coil-compose-core` に改名しました。
-- [重要な変更の全リストについては、アップグレードガイドを確認してください。](https://coil-kt.github.io/coil/upgrading_to_coil3/)
+- [重要な変更の全リストについては、アップグレードガイドを確認してください。](/coil/migrating_to_coil3/)
 
 ## [2.5.0] - 2023年10月30日
 
@@ -441,7 +441,7 @@ AsyncImage(
 
 ## [2.0.0] - 2022年5月10日
 
-Coil 2.0.0 はライブラリのメジャーアップデートであり、破壊的変更が含まれています。アップグレード方法については [アップグレードガイド](https://coil-kt.github.io/coil/upgrading/) を確認してください。
+Coil 2.0.0 はライブラリのメジャーアップデートであり、破壊的変更が含まれています。アップグレード方法については [アップグレードガイド](/coil/migrating) を確認してください。
 
 - **新機能**: `coil-compose` に `AsyncImage` を導入しました。詳細は [ドキュメント](https://coil-kt.github.io/coil/compose/) を確認してください。
 
@@ -467,7 +467,7 @@ AsyncImage(
 
 - **新機能**: パブリックな `DiskCache` API を導入しました。
     - ディスクキャッシュを設定するには `ImageLoader.Builder.diskCache` と `DiskCache.Builder` を使用します。
-    - Coil 2.0 では OkHttp の `Cache` を使用すべきではありません。詳細は [こちら](https://coil-kt.github.io/coil/upgrading_to_coil2/#disk-cache) を参照してください。
+    - Coil 2.0 では OkHttp の `Cache` を使用すべきではありません。詳細は [こちら](/coil/migrating_to_coil2/#disk-cache) を参照してください。
     - `Cache-Control` やその他のキャッシュヘッダーは引き続きサポートされます（キャッシュは URL の一致のみをチェックするため `Vary` ヘッダーは除きます）。また、レスポンスコードが [200..300) の範囲内のレスポンスのみがキャッシュされます。
     - 既存のディスクキャッシュは 2.0 へのアップグレード時にクリアされます。
 - サポートされる最小 API が 21 になりました。
@@ -484,7 +484,7 @@ AsyncImage(
 - 実行時の非 null アサーションの生成を無効にしました。
     - Java を使用している場合、非 null アノテーションが付与された引数に null を渡しても、即座に `NullPointerException` がスローされなくなりました。Kotlin のコンパイル時の null 安全性により、これが防止されます。
     - この変更により、ライブラリのサイズを小さくすることができます。
-- `Size` は、幅と高さの 2 つの `Dimension` 値で構成されるようになりました。`Dimension` は正のピクセル値または `Dimension.Undefined` のいずれかになります。詳細は [こちら](https://coil-kt.github.io/coil/upgrading/#size-refactor) を参照してください。
+- `Size` は、幅と高さの 2 つの `Dimension` 値で構成されるようになりました。`Dimension` は正のピクセル値または `Dimension.Undefined` のいずれかになります。詳細は [こちら](/coil/migrating#size-refactor) を参照してください。
 - `BitmapPool` と `PoolableViewTarget` をライブラリから削除しました。
 - `VideoFrameFileFetcher` と `VideoFrameUriFetcher` をライブラリから削除しました。すべてのデータソースをサポートする `VideoFrameDecoder` を代わりに使用してください。
 - [`BlurTransformation`](https://github.com/coil-kt/coil/blob/845f39383f332428077c666e3567b954675ce248/coil-core/src/main/java/coil/transform/BlurTransformation.kt) および [`GrayscaleTransformation`](https://github.com/coil-kt/coil/blob/845f39383f332428077c666e3567b954675ce248/coil-core/src/main/java/coil/transform/GrayscaleTransformation.kt) はライブラリから削除されました。使用している場合は、コードをプロジェクトにコピーしてください。
@@ -1222,7 +1222,7 @@ Coil 2.0.0 はライブラリの次のメジャーアップデートであり、
 
 ---
 
-- **新機能**: カスタムトランジションをサポートしました。[詳細はこちら](https://coil-kt.github.io/coil/transitions/)。API が検討中であるため、トランジションは実験的（experimental）としてマークされています。
+- **新機能**: カスタムトランジションをサポートしました。[詳細はこちら](/coil/compose)。API が検討中であるため、トランジションは実験的（experimental）としてマークされています。
 - **新機能**: `LoadRequest` の進行中に suspend できるよう `RequestDisposable.await` を追加しました。
 - **新機能**: リクエストデータが null の際に `fallback` ドローアブルを設定できるようサポートしました。
 - **新機能**: `Precision` を追加しました。これにより、スケーリングをサポートするターゲット（例：`ImageViewTarget`）に対してスケーリングの最適化を可能にしつつ、出力 `Drawable` のサイズを正確にします。詳細は [ドキュメント](https://github.com/coil-kt/coil/blob/main/coil-core/src/main/java/coil/size/Precision.kt) を参照してください。

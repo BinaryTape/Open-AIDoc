@@ -385,7 +385,7 @@ val baseDir = Path("/base")
 val subDir = baseDir / "subdirectory"
 
 // 列出目錄中的檔案
-val kotlinFiles: List<Path> = Path("/home/user").listDirectoryEntries("*.kt")
+val kotlinFiles: `List<Path>` = Path("/home/user").listDirectoryEntries("*.kt")
 ```
 
 [進一步了解 Path API](whatsnew1420.md#extensions-for-java-nio-file-path)。

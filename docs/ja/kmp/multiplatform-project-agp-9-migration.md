@@ -146,15 +146,15 @@ Android アプリモジュール (`androidApp`) を作成するには：
    * Gradle プラグインへの参照を変更します。
 
        <compare type="top-bottom">
-          <code-block lang="kotlin" code="              alias(libs.plugins.androidApplication)"/>
-          <code-block lang="kotlin" code="              alias(libs.plugins.androidLibrary)"/>
+          <code-block lang="kotlin" code="              alias(libs.plugins.androidApplication)"></code-block>
+          <code-block lang="kotlin" code="              alias(libs.plugins.androidLibrary)"></code-block>
        </compare>
    
     * `android.defaultConfig {}` ブロックからアプリケーションプロパティの行を削除します。
 
       <compare type="top-bottom">
-          <code-block lang="kotlin" code="              defaultConfig {&#10;                  applicationId = &quot;com.jetbrains.demo&quot;&#10;                  minSdk = libs.versions.android.minSdk.get().toInt()&#10;                  targetSdk = libs.versions.android.targetSdk.get().toInt()&#10;                  versionCode = 1&#10;                  versionName = &quot;1.0&quot;&#10;              }"/>
-          <code-block lang="kotlin" code="              defaultConfig {&#10;                  minSdk = libs.versions.android.minSdk.get().toInt()&#10;              }"/>
+          <code-block lang="kotlin" code="              defaultConfig {&#10;                  applicationId = &quot;com.jetbrains.demo&quot;&#10;                  minSdk = libs.versions.android.minSdk.get().toInt()&#10;                  targetSdk = libs.versions.android.targetSdk.get().toInt()&#10;                  versionCode = 1&#10;                  versionName = &quot;1.0&quot;&#10;              }"></code-block>
+          <code-block lang="kotlin" code="              defaultConfig {&#10;                  minSdk = libs.versions.android.minSdk.get().toInt()&#10;              }"></code-block>
        </compare>
    
 8. メインメニューで **Build | Sync Project with Gradle Files** を選択するか、エディタで Gradle のリフレッシュボタンをクリックします。
@@ -195,8 +195,8 @@ Android アプリモジュール (`androidApp`) を作成するには：
 2. `composeApp/build.gradle.kts` ファイルで、古い Android ライブラリプラグインを新しいものに置き換えます。
 
     <compare type="top-bottom">
-        <code-block lang="kotlin" code="            alias(libs.plugins.androidLibrary)"/>
-        <code-block lang="kotlin" code="            alias(libs.plugins.androidMultiplatformLibrary)"/>
+        <code-block lang="kotlin" code="            alias(libs.plugins.androidLibrary)"></code-block>
+        <code-block lang="kotlin" code="            alias(libs.plugins.androidMultiplatformLibrary)"></code-block>
     </compare>
 3. ルートの `build.gradle.kts` ファイルに次の行を追加して、プラグイン適用時の競合を回避します。
 

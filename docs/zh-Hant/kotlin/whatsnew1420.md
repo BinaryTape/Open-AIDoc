@@ -270,7 +270,7 @@ val baseDir = Path("/base")
 val subDir = baseDir / "subdirectory" 
 
 // 列出目錄中的檔案
-val kotlinFiles: List<Path> = Path("/home/user").listDirectoryEntries("*.kt")
+val kotlinFiles: `List<Path>` = Path("/home/user").listDirectoryEntries("*.kt")
 ```
 
 這些擴充功能在 `kotlin-stdlib-jdk7` 模組的 `kotlin.io.path` 套件中提供。要使用這些擴充功能，請 [選擇性啟用](opt-in-requirements.md) 實驗性註解 `@ExperimentalPathApi`。

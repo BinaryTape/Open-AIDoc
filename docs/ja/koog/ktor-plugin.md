@@ -27,7 +27,7 @@ dependencies {
 
 1) プロバイダーの設定 (`application.yaml` または `application.conf`)
 
-`koog.<provider>` の下のネストされたキーを使用します。プラグインが自動的にこれらを読み込みます。
+`koog.&lt;provider&gt;` の下のネストされたキーを使用します。プラグインが自動的にこれらを読み込みます。
 
 ```yaml
 # application.yaml (Ktor 設定)
@@ -217,7 +217,7 @@ YAML/CONF で `llm.fallback` を設定する際は、以下の識別子形式を
 注意
 
 - OpenAI の場合、カテゴリ（chat, reasoning, costoptimized, audio, embeddings, moderation）を含める必要があります。
-- Ollama の場合、`ollama.model` と `ollama.<maker>.<model>` の両方がサポートされています。
+- Ollama の場合、`ollama.model` と `ollama.&lt;maker&gt;.&lt;model&gt;` の両方がサポートされています。
 
 ## MCP ツール (JVM 限定)
 

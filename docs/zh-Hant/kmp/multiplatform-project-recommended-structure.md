@@ -528,8 +528,8 @@
     重新匯入正確路徑下的 `Res` 物件和所有可繪製資源，例如：
 
     <compare type="top-bottom">
-    <code-block lang="kotlin" code="        import demo.composeapp.generated.resources.mx"/>
-    <code-block lang="kotlin" code="        import demo.sharedui.generated.resources.mx"/>
+    <code-block lang="kotlin" code="        import demo.composeapp.generated.resources.mx"></code-block>
+    <code-block lang="kotlin" code="        import demo.sharedui.generated.resources.mx"></code-block>
     </compare>
 11. 要使依賴新的 `App()` 可組合項的應用程式模組入口點能夠存取它，請在對應的 `build.gradle.kts` 檔案中新增相依性：
 

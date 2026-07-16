@@ -2,7 +2,7 @@
 
 Coil 3 是 Coil 的下一个主要版本，包含多项重大改进：
 
-- 完全支持 [Compose Multiplatform](https://www.jetbrains.com/lp/compose-multiplatform/)，包括所有主要目标平台（Android、iOS、JVM、JS 和 [WASM](https://coil-kt.github.io/coil/sample/)）。
+- 完全支持 [Compose Multiplatform](https://www.jetbrains.com/lp/compose-multiplatform/)，包括所有主要目标平台（Android、iOS、JVM、JS 和 [WASM](/coil/overview)）。
 - 支持多种网络库（Ktor 和 OkHttp）。或者，如果您只需要加载本地/静态文件，可以在没有网络依赖的情况下使用 Coil。
 - 改进了 Compose `@Preview` 渲染，并通过 `LocalAsyncImagePreviewHandler` 支持自定义预览行为。
 - 修复了需要破坏现有行为的重要错误（如下文所述）。

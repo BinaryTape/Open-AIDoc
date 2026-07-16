@@ -184,7 +184,7 @@ _[언어의 현대성 유지](kotlin-evolution-principles.md)_ 및 _[편안한 �
 > <configuration>
 >     <args>
 >         <arg>-Xuse-old-backend</arg>
-     </args>
+ >     </args>
 > </configuration>
 > ```
 >
@@ -229,7 +229,7 @@ _[언어의 현대성 유지](kotlin-evolution-principles.md)_ 및 _[편안한 �
 > <configuration>
 >     <args>
 >         <arg>-Xuse-old-backend</arg>
->     </args>
+> >     </args>
 > </configuration>
 > ```
 >

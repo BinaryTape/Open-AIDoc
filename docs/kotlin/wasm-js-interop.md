@@ -248,15 +248,15 @@ external class User : JsAny {
 以下是泛型类型之间转换的示例：
 
 ```kotlin
-val list: List<JsString> =
+val list: `List<JsString>` =
     listOf("Kotlin", "Wasm").map { it.toJsString() }
 
 // 使用 .toJsArray() 将 List 或 Array 转换为 JsArray
 val jsArray: JsArray<JsString> = list.toJsArray()
 
 // 使用 .toArray() 和 .toList() 将其转回 Kotlin 类型 
-val kotlinArray: Array<JsString> = jsArray.toArray()
-val kotlinList: List<JsString> = jsArray.toList()
+val kotlinArray: `Array<JsString>` = jsArray.toArray()
+val kotlinList: `List<JsString>` = jsArray.toList()
 ```
 
 类似的适配器函数也可用于将类型化数组转换为其 Kotlin 等效项（例如 `IntArray` 和 `Int32Array`）。有关详细信息和实现，请参阅 [`kotlinx-browser` 仓库](https://github.com/Kotlin/kotlinx-browser/blob/dfbdceed314567983c98f1d66e8c2e10d99c5a55/src/wasmJsMain/kotlin/arrayCopy.kt)。

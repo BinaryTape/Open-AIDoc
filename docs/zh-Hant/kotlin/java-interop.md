@@ -425,7 +425,7 @@ interface A {
     String bar(String x, @Nullable String y); // fun bar(x: String, y: String?): String
 
     // 由於 `@NullableApi` 具有 `TYPE_USE` 元素型別，
-    // List<String> 型別引數被視為可 null：
+    // `List<String>` 型別引數被視為可 null：
     String baz(List<String> x); // fun baz(List<String?>?): String?
 
     // x 參數的型別保持為平台型別，因為存在明確的

@@ -37,10 +37,10 @@ Application 플러그인은 애플리케이션을 패키징하는 다양한 방�
    
    <Tabs group="os">
    <TabItem title="Linux/macOS" group-key="unix">
-   <code-block code="./gradlew installDist"/>
+   <code-block code="./gradlew installDist"></code-block>
    </TabItem>
    <TabItem title="Windows" group-key="windows">
-   <code-block code="gradlew.bat installDist"/>
+   <code-block code="gradlew.bat installDist"></code-block>
    </TabItem>
    </Tabs>
 
@@ -54,10 +54,10 @@ Application 플러그인은 애플리케이션을 패키징하는 다양한 방�
    <snippet id="run_executable">
    <Tabs group="os">
    <TabItem title="Linux/macOS" group-key="unix">
-   <code-block code="./ktor-sample"/>
+   <code-block code="./ktor-sample"></code-block>
    </TabItem>
    <TabItem title="Windows" group-key="windows">
-   <code-block code="ktor-sample.bat"/>
+   <code-block code="ktor-sample.bat"></code-block>
    </TabItem>
    </Tabs>
    </snippet>

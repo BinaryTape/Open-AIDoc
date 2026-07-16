@@ -57,7 +57,7 @@ fun main() {
 > 
 > ```kotlin
 >     val shapes: MutableList<String> = mutableListOf("triangle", "square", "circle")
->     val shapesLocked: List<String> = shapes
+>     val shapesLocked: `List<String>` = shapes
 > ```
 > これは**キャスト（casting）**とも呼ばれます。
 > 

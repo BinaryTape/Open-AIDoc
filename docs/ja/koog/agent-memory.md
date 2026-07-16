@@ -532,11 +532,11 @@ class MyCustomMemoryProvider : AgentMemoryProvider {
         // ファクトを保存するための実装
     }
 
-    override suspend fun load(concept: Concept, subject: MemorySubject, scope: MemoryScope): List<Fact> {
+    override suspend fun load(concept: Concept, subject: MemorySubject, scope: MemoryScope): `List<Fact>` {
         // コンセプトごとにファクトを読み込むための実装
     }
 
-    override suspend fun loadAll(subject: MemorySubject, scope: MemoryScope): List<Fact> {
+    override suspend fun loadAll(subject: MemorySubject, scope: MemoryScope): `List<Fact>` {
         // すべてのファクトを読み込むための実装
     }
 
@@ -544,7 +544,7 @@ class MyCustomMemoryProvider : AgentMemoryProvider {
         description: String,
         subject: MemorySubject,
         scope: MemoryScope
-    ): List<Fact> {
+    ): `List<Fact>` {
         // 説明ごとにファクトを読み込むための実装
     }
 }

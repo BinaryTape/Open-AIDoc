@@ -66,7 +66,7 @@ Kotlinでは、事前条件関数（precondition functions）を使用して自�
 `require()` 内の条件が満たされない場合、[`IllegalArgumentException`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-illegal-argument-exception/) をスローします：
 
 ```kotlin
-fun getIndices(count: Int): List<Int> {
+fun getIndices(count: Int): `List<Int>` {
     require(count >= 0) { "Count must be non-negative. You set count to $count." }
     return List(count) { it + 1 }
 }

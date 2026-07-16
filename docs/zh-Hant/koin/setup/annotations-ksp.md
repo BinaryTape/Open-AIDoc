@@ -248,7 +248,7 @@ KSP 註解將在未來的 Koin 版本中移除。我們建議儘快遷移。
 ## 協助
 
 如果您在遷移過程中遇到問題：
-- 檢查 [疑難排解](/docs/reference/troubleshooting)
+- 檢查 [疑難排解](/docs/reference/koin-core/troubleshooting)
 - 在 [Slack](https://kotlinlang.slack.com/messages/koin/) 上詢問
 - 在 [GitHub](https://github.com/InsertKoinIO/koin) 上提交問題 (issue)
 

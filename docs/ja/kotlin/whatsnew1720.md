@@ -278,7 +278,7 @@ Kotlin 1.7.20 では、[ビルダー型推論の使用](using-builders-with-buil
     fun <T: Any> buildList(
         first: MutableList<T>.() -> Unit, 
         second: MutableList<T>.() -> Unit
-    ): List<T> {
+    ): `List<T>` {
         val list = mutableListOf<T>()
         list.first()
         list.second()

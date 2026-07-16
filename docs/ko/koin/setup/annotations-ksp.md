@@ -248,7 +248,7 @@ KSP 어노테이션은 향후 Koin 버전에서 삭제될 예정입니다. 가�
 ## 도움말
 
 마이그레이션 중 문제에 부딪히면 다음을 확인하세요:
-- [트러블슈팅](/docs/reference/troubleshooting) 확인
+- [트러블슈팅](/docs/reference/koin-core/troubleshooting) 확인
 - [Slack](https://kotlinlang.slack.com/messages/koin/)에서 질문하기
 - [GitHub](https://github.com/InsertKoinIO/koin)에 이슈 등록
 

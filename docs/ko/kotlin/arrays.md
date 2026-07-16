@@ -60,7 +60,7 @@ fun main() {
 fun main() {
 //sampleStart
     // [null, null, null] 값을 가진 배열을 생성합니다.
-    val nullArray: Array<Int?> = arrayOfNulls(3)
+    val nullArray: `Array<Int?>` = arrayOfNulls(3)
     println(nullArray.joinToString())
     // null, null, null
 //sampleEnd
@@ -80,7 +80,7 @@ fun main() {
 > ```Kotlin
 > var exampleArray = emptyArray<String>()
 > 
-> var exampleArray: Array<String> = emptyArray()
+> var exampleArray: `Array<String>` = emptyArray()
 >```
 >
 {style="note"}

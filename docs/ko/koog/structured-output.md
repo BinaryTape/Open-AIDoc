@@ -265,7 +265,7 @@ val structuredResponse = promptExecutor.executeStructured<WeatherForecast>(
 | :--- | :--- | :--- | :--- | :--- |
 | `prompt` | Prompt | 예 | | 실행할 프롬프트입니다. 자세한 내용은 [Prompts](prompts/index.md)를 참조하세요. |
 | `model` | LLModel | 예 | | 프롬프트를 실행할 기본 모델입니다. |
-| `examples` | List<T> | 아니요 | `emptyList()` | 모델이 예상 형식을 이해하는 데 도움이 되는 선택적 예시 리스트입니다. |
+| `examples` | `List<T>` | 아니요 | `emptyList()` | 모델이 예상 형식을 이해하는 데 도움이 되는 선택적 예시 리스트입니다. |
 | `fixingParser` | StructureFixingParser? | 아니요 | `null` | 보조 LLM을 사용하여 파싱 오류를 지능적으로 수정함으로써 잘못된 형식의 응답을 처리하는 선택적 파서입니다. 제공된 경우, 오류 수정과 함께 실패한 파싱을 자동으로 재시도합니다. |
 
 이 메서드는 성공적으로 파싱된 구조화된 데이터 또는 오류를 포함하는 `Result<StructuredResponse<T>>`를 반환합니다.

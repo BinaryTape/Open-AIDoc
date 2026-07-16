@@ -263,7 +263,7 @@ the predefined executors will return a PromptExecutor instance configured with a
         .build();
 
     // 프롬프트 실행
-    List<Message.Response> response = promptExecutor.execute(prompt, OpenAIModels.Chat.GPT4o);
+    `List<Message.Response>` response = promptExecutor.execute(prompt, OpenAIModels.Chat.GPT4o);
     ```
     <!--- KNIT example-prompt-executors-java-05.java -->
 
@@ -353,10 +353,10 @@ the predefined executors will return a PromptExecutor instance configured with a
         .build();
 
     // OpenAI 모델로 프롬프트 실행; 프롬프트 실행기가 자동으로 OpenAI 클라이언트로 전환함
-    List<Message.Response> openAIResult = promptExecutor.execute(prompt, OpenAIModels.Chat.GPT4o);
+    `List<Message.Response>` openAIResult = promptExecutor.execute(prompt, OpenAIModels.Chat.GPT4o);
 
     // Anthropic 모델로 프롬프트 실행; 프롬프트 실행기가 자동으로 Anthropic 클라이언트로 전환함
-    List<Message.Response> anthropicResult = promptExecutor.execute(prompt, AnthropicModels.Sonnet_4_5);
+    `List<Message.Response>` anthropicResult = promptExecutor.execute(prompt, AnthropicModels.Sonnet_4_5);
     ```
     <!--- KNIT example-prompt-executors-java-06.java -->
 
@@ -470,7 +470,7 @@ the predefined executors will return a PromptExecutor instance configured with a
         .build();
 
     // Google 모델을 전달하면 Google 클라이언트가 포함되어 있지 않으므로 프롬프트 실행기는 폴백 모델을 사용합니다
-    List<Message.Response> response = multiExecutor.execute(p, GoogleModels.Gemini2_5Pro);
+    `List<Message.Response>` response = multiExecutor.execute(p, GoogleModels.Gemini2_5Pro);
     ```
     <!--- KNIT example-prompt-executors-java-08.java -->
 

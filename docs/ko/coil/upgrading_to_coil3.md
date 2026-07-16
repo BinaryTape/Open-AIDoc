@@ -2,7 +2,7 @@
 
 Coil 3는 다음과 같은 여러 주요 개선 사항을 포함하는 Coil의 차세대 주요 버전입니다:
 
-- 모든 주요 타겟(Android, iOS, JVM, JS 및 [WASM](https://coil-kt.github.io/coil/sample/))을 포함한 [Compose Multiplatform](https://www.jetbrains.com/lp/compose-multiplatform/)의 전체 지원.
+- 모든 주요 타겟(Android, iOS, JVM, JS 및 [WASM](/coil/overview))을 포함한 [Compose Multiplatform](https://www.jetbrains.com/lp/compose-multiplatform/)의 전체 지원.
 - 여러 네트워킹 라이브러리(Ktor 및 OkHttp) 지원. 또는 로컬/정적 파일만 로드하면 되는 경우 네트워크 의존성 없이 Coil을 사용할 수 있습니다.
 - 개선된 Compose `@Preview` 렌더링 및 `LocalAsyncImagePreviewHandler`를 통한 커스텀 프리뷰 동작 지원.
 - 기존 동작을 변경해야 했던(breaking) 버그들에 대한 중요한 수정 사항(아래에 요약됨).

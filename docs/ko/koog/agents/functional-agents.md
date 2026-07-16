@@ -259,14 +259,14 @@ Koog에서는 이러한 기능을 [도구(tools)](../tools-overview.md)로 노�
             .toolRegistry(toolRegistry)
             .functionalStrategy("mathWithTools", (AIAgentFunctionalContext context, String input) -> {
                 // 사용자 입력을 LLM에 보냅니다.
-                List<Message.Response> responses = context.requestLLMMultiple(input);
+                `List<Message.Response>` responses = context.requestLLMMultiple(input);
 
                 // LLM이 도구를 요청하는 동안에만 루프를 돕니다.
                 while (context.containsToolCalls(responses)) {
                     // 응답에서 도구 호출을 추출합니다.
-                    List<Message.Tool.Call> pendingCalls = context.extractToolCalls(responses);
+                    `List<Message.Tool.Call>` pendingCalls = context.extractToolCalls(responses);
                     // 도구를 실행하고 결과를 반환합니다.
-                    List<ReceivedToolResult> results = context.executeMultipleTools(pendingCalls, false);
+                    `List<ReceivedToolResult>` results = context.executeMultipleTools(pendingCalls, false);
                     // 도구 결과를 다시 LLM에 보냅니다.
                     responses = context.sendMultipleToolResults(results);
                 }

@@ -28,7 +28,7 @@ import org.springframework.jdbc.core.JdbcTemplate
 
 @Service
 class MessageService(private val db: JdbcTemplate) {
-    fun findMessages(): List<Message> = db.query("select * from messages") { response, _ ->
+    fun findMessages(): `List<Message>` = db.query("select * from messages") { response, _ ->
         Message(response.getString("id"), response.getString("text"))
     }
 
@@ -139,7 +139,7 @@ import java.util.UUID
 
 @Service
 class MessageService(private val db: JdbcTemplate) {
-    fun findMessages(): List<Message> = db.query("select * from messages") { response, _ ->
+    fun findMessages(): `List<Message>` = db.query("select * from messages") { response, _ ->
         Message(response.getString("id"), response.getString("text"))
     }
 
@@ -276,7 +276,7 @@ ID별로 개별 메시지를 조회하도록 애플리케이션의 기능을 확
     
     @Service
     class MessageService(private val db: JdbcTemplate) {
-        fun findMessages(): List<Message> = db.query("select * from messages") { response, _ ->
+        fun findMessages(): `List<Message>` = db.query("select * from messages") { response, _ ->
             Message(response.getString("id"), response.getString("text"))
         }
     
@@ -404,7 +404,7 @@ import java.util.*
 
 @Service
 class MessageService(private val db: JdbcTemplate) {
-    fun findMessages(): List<Message> = db.query("select * from messages") { response, _ ->
+    fun findMessages(): `List<Message>` = db.query("select * from messages") { response, _ ->
         Message(response.getString("id"), response.getString("text"))
     }
 

@@ -212,7 +212,7 @@ ai:
                         .user(request.message())
                         .build();
 
-                List<Message.Response> result = anthropicExecutor.execute(prompt, AnthropicModels.Haiku_4_5);
+                `List<Message.Response>` result = anthropicExecutor.execute(prompt, AnthropicModels.Haiku_4_5);
                 return ResponseEntity.ok(new ChatResponse(result.get(0).getContent()));
             } catch (Exception e) {
                 return ResponseEntity.internalServerError()
@@ -298,7 +298,7 @@ Spring Framework 透過 bean 名稱 (`anthropicExecutor`) 注入了 Anthropic �
     public class RobustAIService {
         private static final Logger logger = LoggerFactory.getLogger(RobustAIService.class);
 
-        private final List<LLModel> llms = List.of(OpenAIModels.Chat.GPT4oMini, AnthropicModels.Haiku_4_5, OpenRouterModels.Claude3Haiku);
+        private final `List<LLModel>` llms = List.of(OpenAIModels.Chat.GPT4oMini, AnthropicModels.Haiku_4_5, OpenRouterModels.Claude3Haiku);
 
         private final MultiLLMPromptExecutor multiLLMPromptExecutor;
 
@@ -314,7 +314,7 @@ Spring Framework 透過 bean 名稱 (`anthropicExecutor`) 注入了 Anthropic �
 
             for (LLModel llm : llms) {
                 try {
-                    List<Message.Response> result = multiLLMPromptExecutor.execute(prompt, llm);
+                    `List<Message.Response>` result = multiLLMPromptExecutor.execute(prompt, llm);
                     return result.get(0).getContent();
                 } catch (Exception e) {
                     logger.warn("{} executor failed, trying next: {}", llm.getId(), e.getMessage());

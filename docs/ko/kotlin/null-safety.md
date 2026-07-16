@@ -350,7 +350,7 @@ data class Person(val name: String)
 fun main() {
 //sampleStart
     // 널 허용 문자열 리스트를 선언합니다.
-    val listWithNulls: List<String?> = listOf("Kotlin", null)
+    val listWithNulls: `List<String?>` = listOf("Kotlin", null)
 
     // 리스트의 각 아이템을 반복합니다.
     for (item in listWithNulls) {
@@ -399,10 +399,10 @@ fun main() {
 fun main() {
 //sampleStart
     // 일부 null 및 null이 아닌 정수 값을 포함하는 리스트를 선언합니다.
-    val nullableList: List<Int?> = listOf(1, 2, null, 4)
+    val nullableList: `List<Int?>` = listOf(1, 2, null, 4)
 
     // null 값을 필터링하여 널이 아닌 정수 리스트를 생성합니다.
-    val intList: List<Int> = nullableList.filterNotNull()
+    val intList: `List<Int>` = nullableList.filterNotNull()
   
     println(intList)
     // [1, 2, 4]

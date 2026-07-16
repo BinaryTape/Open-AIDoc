@@ -15,7 +15,7 @@ Koin 編譯器外掛程式是一個**原生 Kotlin 編譯器外掛程式 (K2)**�
 - 同時支援 DSL 和註解 (Annotations)
 - 不會產生任何可見檔案
 
-請參閱 [Koin 編譯器外掛程式簡介](/docs/intro/koin-compiler-plugin) 以了解功能與優點的詳細資訊。
+請參閱 [Koin 編譯器外掛程式簡介](/docs/setup/compiler-plugin) 以了解功能與優點的詳細資訊。
 
 ## 系統需求
 
@@ -351,7 +351,7 @@ import org.koin.dsl.*
 2. 將匯入更新為 `org.koin.plugin.module.dsl.*`
 3. 將 `single { Class(get() ...) }` 或 `singleOf(::Class)` 替換為 `single<Class>()`
 
-請參閱 [從 DSL 遷移至編譯器外掛程式](/docs/migration/from-dsl-to-compiler-plugin)。
+請參閱 [從 DSL 遷移至編譯器外掛程式](/docs/migration/from-ksp-to-compiler-plugin)。
 
 ### 從 KSP 註解遷移
 
@@ -364,6 +364,6 @@ import org.koin.dsl.*
 
 ## 下一步
 
-- **[DSL 參考](/docs/reference/dsl-reference)** — 完整的 DSL 文件
-- **[註解參考](/docs/reference/annotations-reference)** — 完整的註解文件
+- **[DSL 參考](/docs/reference/koin-core/modules)** — 完整的 DSL 文件
+- **[註解參考](/docs/reference/koin-annotations/modules)** — 完整的註解文件
 - **[啟動 Koin](/docs/reference/koin-core/starting-koin)** — 配置您的應用程式

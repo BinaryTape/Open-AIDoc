@@ -155,7 +155,7 @@ install(LongTermMemory) {
 class MyVectorDbStorage : RetrievalStorage, IngestionStorage {
     override suspend fun search(
         request: SearchRequest, namespace: String?
-    ): List<SearchResult> {
+    ): `List<SearchResult>` {
         // 벡터 DB 쿼리
     }
 

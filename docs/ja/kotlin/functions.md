@@ -384,7 +384,7 @@ fun getDisplayNameOrDefault(userId: String?): String =
 関数内では、型 `T` の `vararg` パラメータを `T` の配列として使用できます：
 
 ```kotlin
-fun <T> asList(vararg ts: T): List<T> {
+fun <T> asList(vararg ts: T): `List<T>` {
     val result = ArrayList<T>()
     for (t in ts) // ts は Array です
         result.add(t)
@@ -395,7 +395,7 @@ fun <T> asList(vararg ts: T): List<T> {
 その後、関数に可変の数の引数を渡すことができます：
 
 ```kotlin
-fun <T> asList(vararg ts: T): List<T> {
+fun <T> asList(vararg ts: T): `List<T>` {
     val result = ArrayList<T>()
     for (t in ts) // ts は Array です
         result.add(t)
@@ -420,7 +420,7 @@ fun main() {
 すでに配列を持っていて、その内容を `vararg` パラメータとして、またはその一部として関数に渡したい場合は、配列名の前に `*` を付ける[スプレッド演算子](arrays.md#関数に可変引数を渡す)を使用します：
 
 ```kotlin
-fun <T> asList(vararg ts: T): List<T> {
+fun <T> asList(vararg ts: T): `List<T>` {
     val result = ArrayList<T>()
     for (t in ts)
         result.add(t)
@@ -614,7 +614,7 @@ Stream().read()
 関数の名前の前に山括弧 `<>` を使用して、関数のジェネリックパラメータを指定できます：
 
 ```kotlin
-fun <T> singletonList(item: T): List<T> { /*...*/ }
+fun <T> singletonList(item: T): `List<T>` { /*...*/ }
 ```
 
 ジェネリック関数の詳細については、[ジェネリクス](generics.md)を参照してください。

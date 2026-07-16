@@ -544,7 +544,7 @@ fun unboxBase(box: Box<@JvmSuppressWildcards Base>): Base = box.value
 [`Nothing`](exceptions.md#the-nothing-type) 型は、Javaに自然な対応物がないため特殊です。実際、`java.lang.Void` を含むすべてのJavaの参照型は値として `null` を受け入れますが、`Nothing` はそれさえ受け入れません。したがって、この型をJavaの世界で正確に表現することはできません。これが、Kotlinが `Nothing` 型の引数が使用される場所に raw 型を生成する理由です：
 
 ```kotlin
-fun emptyList(): List<Nothing> = listOf()
+fun emptyList(): `List<Nothing>` = listOf()
 // 次のように翻訳されます
 // List emptyList() { ... }
 ```

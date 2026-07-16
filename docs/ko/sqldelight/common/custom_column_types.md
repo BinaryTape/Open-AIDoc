@@ -7,7 +7,7 @@ import kotlin.String;
 import kotlin.collections.List;
 
 CREATE TABLE hockeyPlayer (
-  cup_wins TEXT AS List<String> NOT NULL
+  cup_wins TEXT AS `List<String>` NOT NULL
 );
 ```
 

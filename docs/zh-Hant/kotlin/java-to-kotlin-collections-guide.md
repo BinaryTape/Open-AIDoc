@@ -107,7 +107,7 @@
 ```java
 // Java
 // 此清單是可變的！
-public List<Customer> getCustomers() { ... }
+public `List<Customer>` getCustomers() { ... }
 ```
 {id="mutability-java"}
 
@@ -161,7 +161,7 @@ class Shape {}
 class Rectangle extends Shape {}
 
 public void doSthWithShapes(List<? extends Shape> shapes) {
-/* 如果只使用 List<Shape>，當使用 List<Rectangle> 作為引數呼叫此函式時，
+/* 如果只使用 List<Shape>，當使用 `List<Rectangle>` 作為引數呼叫此函式時，
 如下所示，程式碼將無法編譯 */
 }
 

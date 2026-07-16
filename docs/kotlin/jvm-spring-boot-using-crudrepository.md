@@ -70,7 +70,7 @@ _CrudRepository_ 是一个 Spring Data 接口，用于对特定类型的仓库�
     
     @Service
     class MessageService(private val db: MessageRepository) {
-        fun findMessages(): List<Message> = db.findAll().toList()
+        fun findMessages(): `List<Message>` = db.findAll().toList()
     
         fun findMessageById(id: String): Message? = db.findByIdOrNull(id)
     
@@ -160,7 +160,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class MessageService(private val db: MessageRepository) {
-    fun findMessages(): List<Message> = db.findAll().toList()
+    fun findMessages(): `List<Message>` = db.findAll().toList()
 
     fun findMessageById(id: String): Message? = db.findByIdOrNull(id)
 

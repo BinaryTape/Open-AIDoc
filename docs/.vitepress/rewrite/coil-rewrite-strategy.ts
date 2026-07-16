@@ -21,7 +21,10 @@ export function coilRewriteHref(env: any, href: string): string {
     const isCoilMDFile = href.startsWith('https://coil-kt.github.io/')
     if (isCoilMDFile) {
         const coilMDUrl = new URL(href);
-        const coilMDPath = coilMDUrl.pathname;
+        let coilMDPath = coilMDUrl.pathname;
+        if (coilMDPath.endsWith('/')) {
+            coilMDPath = coilMDPath.slice(0, -1);
+        }
         rewriteHref = `${localePath}${coilMDPath}`
     }
     const rewriteAssetsHref = rewriteAssets(href);

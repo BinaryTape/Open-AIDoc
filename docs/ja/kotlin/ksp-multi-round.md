@@ -9,7 +9,7 @@ KSPは「複数ラウンドの処理（multiple round processing）」、つま�
 以下のサンプルコードは、バリデーションチェックを使用して無効なシンボルを遅延させる方法を示しています。
 
 ```kotlin
-override fun process(resolver: Resolver): List<KSAnnotated> {
+override fun process(resolver: Resolver): `List<KSAnnotated>` {
     val symbols = resolver.getSymbolsWithAnnotation("com.example.annotation.Builder")
     val result = symbols.filter { !it.validate() }
     symbols

@@ -7,7 +7,7 @@ Koin では設定モジュールを検証することができ、実行時に依
 :::info 将来：コンパイル時の安全性
 `verify()` と `checkModules()` API は、Koin Compiler Plugin による**ネイティブなコンパイル時の安全性**に置き換えられる予定です。これにより、ビルド時に設定全体が検証され、実行前にエラーをキャッチできるようになります。
 
-詳細は [Koin Compiler Plugin](/docs/intro/koin-compiler-plugin) を参照してください。
+詳細は [Koin Compiler Plugin](/docs/setup/compiler-plugin) を参照してください。
 :::
 
 ## Verify API - JVM 限定 [3.3+]

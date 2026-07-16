@@ -190,7 +190,7 @@ dependencies {
 }
 
 // 由於支援型別參數協變，這將可行
-val stringList: List<CharSequence> by dependencies
+val stringList: `List<CharSequence>` by dependencies
 // 這也將可行
 val stringCollection: Collection<CharSequence> by dependencies
 ```

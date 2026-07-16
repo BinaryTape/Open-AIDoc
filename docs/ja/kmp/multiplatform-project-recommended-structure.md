@@ -532,8 +532,8 @@ Gradle 設定で調整が必要な唯一のこと（エントリポイントモ�
     正しいパスで `Res` オブジェクトとすべての描画可能リソースを再インポートします。例：
 
     <compare type="top-bottom">
-    <code-block lang="kotlin" code="        import demo.composeapp.generated.resources.mx"/>
-    <code-block lang="kotlin" code="        import demo.sharedui.generated.resources.mx"/>
+    <code-block lang="kotlin" code="        import demo.composeapp.generated.resources.mx"></code-block>
+    <code-block lang="kotlin" code="        import demo.sharedui.generated.resources.mx"></code-block>
     </compare>
 11. 新しい `App()` コンポーザブルを、それに依存するアプリモジュールのエントリポイントで使用できるようにするために、対応する `build.gradle.kts` ファイルに依存関係を追加します：
 

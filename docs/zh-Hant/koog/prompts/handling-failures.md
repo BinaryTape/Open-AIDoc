@@ -53,7 +53,7 @@
     RetryingLLMClient resilientClient = new RetryingLLMClient(client);
 
     // 現在所有作業在遇到暫時性錯誤時都會自動重試
-    List<Message.Response> response = resilientClient.execute(prompt, OpenAIModels.Chat.GPT4o);
+    `List<Message.Response>` response = resilientClient.execute(prompt, OpenAIModels.Chat.GPT4o);
     ```
     <!--- KNIT example-handling-failures-java-01.java -->
 
@@ -513,7 +513,7 @@ Kotlin 和 Java 中的所有 LLM 用戶端都支援逾時配置，以防止請�
     Runnable useDefaultResponse = () -> { /* 實作 */ };
 
     try {
-        List<Message.Response> response = promptExecutor.execute(prompt, OpenAIModels.Chat.GPT4o);
+        `List<Message.Response>` response = promptExecutor.execute(prompt, OpenAIModels.Chat.GPT4o);
         processResponse.accept(response);
     } catch (Exception e) {
         logger.error("LLM 作業失敗", e);

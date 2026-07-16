@@ -685,7 +685,7 @@ fun main() {
 #### when 엔트리 {initial-collapse-state="collapsed" collapsible="true"}
 
 ```kotlin
-fun isReferenceApplicable(myReference: KClass<*>) = when (myReference) {
+fun isReferenceApplicable(myReference: `KClass<*>`) = when (myReference) {
     Comparable::class,
     Iterable::class,
     String::class, // 후행 쉼표
@@ -819,7 +819,7 @@ println("$name has ${children.size} children")
 달러 기호(`$`) 문자를 문자열 리터럴로 취급하려면 [멀티 달러 문자열 보간(Multi-dollar string interpolation)](strings.md#multi-dollar-string-interpolation)을 사용하세요:
 
 ```kotlin
-val KClass<*>.jsonSchema : String
+val `KClass<*>`.jsonSchema : String
     get() = $"""
         {
             "$schema": "https://json-schema.org/draft/2020-12/schema",

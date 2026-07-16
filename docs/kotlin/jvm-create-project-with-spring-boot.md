@@ -177,7 +177,7 @@ fun main(args: Array<String>) {
    </def>
    <def title="程序入口点 – main()">
       <p><a href="basic-syntax.md#program-entry-point"><code>main()</code></a> 函数是应用程序的入口点。</p>
-      <p>它被声明为 <code>DemoApplication</code> 类之外的 <a href="functions.md#function-scope">顶层函数</a>。<code>main()</code> 函数调用 Spring 的 <code>runApplication(*args)</code> 函数，以便通过 Spring 框架启动应用程序。</p>
+      <p>它被声明为 <code>DemoApplication</code> 类之外的 <a href="functions.md#function-scope">顶层函数</a>。<code>main()</code> 函数调用 Spring 的 `runApplication(*args)` 函数，以便通过 Spring 框架启动应用程序。</p>
    </def>
    <def title="可变数量参数 – args: Array&lt;String&gt;">
       <p>如果您查看 <code>runApplication()</code> 函数的声明，会发现该函数的形参被标记了 <a href="functions.md#variable-number-of-arguments-varargs"><code>vararg</code> 修饰符</a>：<code>vararg args: String</code>。这意味着您可以向该函数传递可变数量的 String 实参。</p>

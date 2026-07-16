@@ -15,7 +15,7 @@ Koinコンパイラプラグインは、以下の特徴を持つ**ネイティ�
 - DSLとアノテーションの両方で動作
 - 可視ファイルの生成なし
 
-機能とメリットの詳細については、[Koinコンパイラプラグインの導入](/docs/intro/koin-compiler-plugin)を参照してください。
+機能とメリットの詳細については、[Koinコンパイラプラグインの導入](/docs/setup/compiler-plugin)を参照してください。
 
 ## 要件
 
@@ -351,7 +351,7 @@ import org.koin.dsl.*
 2. インポートを `org.koin.plugin.module.dsl.*` に更新する
 3. `single { Class(get() ...) }` または `singleOf(::Class)` を `single<Class>()` に置き換える
 
-[DSLからコンパイラプラグインへの移行](/docs/migration/from-dsl-to-compiler-plugin)を参照してください。
+[DSLからコンパイラプラグインへの移行](/docs/migration/from-ksp-to-compiler-plugin)を参照してください。
 
 ### KSPアノテーションからの移行
 
@@ -364,6 +364,6 @@ import org.koin.dsl.*
 
 ## 次のステップ
 
-- **[DSLリファレンス](/docs/reference/dsl-reference)** - DSLの詳細ドキュメント
-- **[アノテーションリファレンス](/docs/reference/annotations-reference)** - アノテーションの詳細ドキュメント
+- **[DSLリファレンス](/docs/reference/koin-core/modules)** - DSLの詳細ドキュメント
+- **[アノテーションリファレンス](/docs/reference/koin-annotations/modules)** - アノテーションの詳細ドキュメント
 - **[Koinの開始](/docs/reference/koin-core/starting-koin)** - アプリケーションの設定

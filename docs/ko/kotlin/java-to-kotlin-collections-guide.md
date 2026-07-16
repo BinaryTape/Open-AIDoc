@@ -107,7 +107,7 @@ Java에는 가변 컬렉션이 있습니다.
 ```java
 // Java
 // 이 리스트는 가변적입니다!
-public List<Customer> getCustomers() { ... }
+public `List<Customer>` getCustomers() { ... }
 ```
 {id="mutability-java"}
 

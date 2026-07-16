@@ -59,7 +59,7 @@ fun handleAnimal(animal: Animal) {
 }
 //sampleEnd
 fun main() {
-    val pets: List<Animal> = listOf(
+    val pets: `List<Animal>` = listOf(
         Dog("Buddy"),
         Cat("Whiskers"),
         Dog("Rex")

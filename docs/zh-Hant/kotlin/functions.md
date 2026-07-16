@@ -396,7 +396,7 @@ fun getDisplayNameOrDefault(userId: String?): String =
 在函式內部，您可以使用型別為 `T` 的 `vararg` 參數作為 `T` 的陣列：
 
 ```kotlin
-fun <T> asList(vararg ts: T): List<T> {
+fun <T> asList(vararg ts: T): `List<T>` {
     val result = ArrayList<T>()
     for (t in ts) // ts 是一個 Array
         result.add(t)
@@ -407,7 +407,7 @@ fun <T> asList(vararg ts: T): List<T> {
 接著您可以將可變數量的引數傳遞給該函式：
 
 ```kotlin
-fun <T> asList(vararg ts: T): List<T> {
+fun <T> asList(vararg ts: T): `List<T>` {
     val result = ArrayList<T>()
     for (t in ts) // ts 是一個 Array
         result.add(t)
@@ -433,7 +433,7 @@ fun main() {
 請使用 [展開運算子](arrays.md#pass-variable-number-of-arguments-to-a-function)，即在陣列名稱前加上 `*`：
 
 ```kotlin
-fun <T> asList(vararg ts: T): List<T> {
+fun <T> asList(vararg ts: T): `List<T>` {
     val result = ArrayList<T>()
     for (t in ts)
         result.add(t)
@@ -628,7 +628,7 @@ Stream().read()
 您可以透過在函式名稱前使用尖括號 `<>` 來指定函式的泛型參數：
 
 ```kotlin
-fun <T> singletonList(item: T): List<T> { /*...*/ }
+fun <T> singletonList(item: T): `List<T>` { /*...*/ }
 ```
 
 有關泛型函式的更多資訊，請參閱 [泛型](generics.md)。

@@ -174,7 +174,7 @@ data class RocketLaunch (
        // ...
        
        private suspend fun getDateOfLastSuccessfulLaunch(): String {
-           val rockets: List<RocketLaunch> = httpClient.get("https://api.spacexdata.com/v4/launches").body()
+           val rockets: `List<RocketLaunch>` = httpClient.get("https://api.spacexdata.com/v4/launches").body()
        }
    }
    ```
@@ -189,7 +189,7 @@ data class RocketLaunch (
        // ...
        
        private suspend fun getDateOfLastSuccessfulLaunch(): String {
-           val rockets: List<RocketLaunch> = httpClient.get("https://api.spacexdata.com/v4/launches").body()
+           val rockets: `List<RocketLaunch>` = httpClient.get("https://api.spacexdata.com/v4/launches").body()
            val lastSuccessLaunch = rockets.last { it.launchSuccess == true }
        }
    }
@@ -209,7 +209,7 @@ data class RocketLaunch (
        // ...
        
        private suspend fun getDateOfLastSuccessfulLaunch(): String {
-           val rockets: List<RocketLaunch> =
+           val rockets: `List<RocketLaunch>` =
                httpClient.get("https://api.spacexdata.com/v4/launches").body()
            val lastSuccessLaunch = rockets.last { it.launchSuccess == true }
            val date = Instant.parse(lastSuccessLaunch.launchDateUTC)
@@ -434,7 +434,7 @@ struct ContentView: View {
 extension ContentView {
     @MainActor
     class ViewModel: ObservableObject {
-        @Published var greetings: Array<String> = []
+        @Published var greetings: `Array<String>` = []
         
         func startObserving() {
             // ...
@@ -588,7 +588,7 @@ struct ListView: View {
     extension ContentView {
         @MainActor
         class ViewModel: ObservableObject {
-            @Published var greetings: Array<String> = []
+            @Published var greetings: `Array<String>` = []
     
             func startObserving() async {
                 do {

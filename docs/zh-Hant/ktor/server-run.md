@@ -87,10 +87,10 @@ Ktor 允許你直接在應用程式中透過所需的引擎（例如 Netty、Jet
 
    <Tabs group="os">
    <TabItem title="Linux/macOS" group-key="unix">
-   <code-block code="./ktor-sample"/>
+   <code-block code="./ktor-sample"></code-block>
    </TabItem>
    <TabItem title="Windows" group-key="windows">
-   <code-block code="ktor-sample.bat"/>
+   <code-block code="ktor-sample.bat"></code-block>
    </TabItem>
    </Tabs>
   

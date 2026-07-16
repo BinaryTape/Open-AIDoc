@@ -33,7 +33,7 @@ RS256 是 RSA 加密算法的一部分，它利用 SHA-256 进行哈希处理，
 
 在新的终端窗口中，运行以下命令：
 
-<code-block lang="shell" code="openssl genpkey -algorithm rsa -pkeyopt rsa_keygen_bits:2048 &amp;gt; ktor.pk8"/>
+<code-block lang="shell" code="openssl genpkey -algorithm rsa -pkeyopt rsa_keygen_bits:2048 &amp;gt; ktor.pk8"></code-block>
 
 [openssl genpkey](https://www.openssl.org/docs/man3.0/man1/openssl-genpkey.html) 命令使用 RSA 算法生成一个私有的 2048 位密钥，并将其存储在指定的文件中，此处为 `ktor.pk8`。该文件的内容是 [Base64](https://en.wikipedia.org/wiki/Base64) 编码的，因此在派生公钥之前需要对其进行解码。
 
@@ -53,7 +53,7 @@ RS256 是 RSA 加密算法的一部分，它利用 SHA-256 进行哈希处理，
 
 要使用 OpenSSL 执行此操作，请运行以下命令：
 
-<code-block lang="shell" code="openssl rsa -in ktor.pk8 -pubout | tee ktor.spki"/>
+<code-block lang="shell" code="openssl rsa -in ktor.pk8 -pubout | tee ktor.spki"></code-block>
 
 * `openssl rsa`：这是用于处理 RSA 密钥的 `OpenSSL` 命令。在此上下文中，它用于执行与 RSA 密钥相关的操作。
 * `-in ktor.pk8`：此选项指定输入文件 (`ktor.pk8`)，OpenSSL 应从中读取 RSA 私钥。
@@ -72,7 +72,7 @@ RS256 是 RSA 加密算法的一部分，它利用 SHA-256 进行哈希处理，
 
 要使用 OpenSSL 执行此操作，请运行以下命令：
 
-<code-block lang="shell" code="openssl pkey -in ktor.spki -pubin -noout -text"/>
+<code-block lang="shell" code="openssl pkey -in ktor.spki -pubin -noout -text"></code-block>
 
 * `pkey`：这是用于处理私钥和公钥的 OpenSSL 命令行实用程序。
 * `-in ktor.spki`：指定包含 PEM 格式公钥的输入文件。在这种情况下，输入文件是 `ktor.spki`。
@@ -108,7 +108,7 @@ Exponent: 65537 (0x10001)
 
 指数属性的十六进制值为 `0x10001`。要将该值转换为 Base64URL，请使用以下命令：
 
-<code-block lang="shell" code="echo 010001 | xxd -p -r | base64 "/>
+<code-block lang="shell" code="echo 010001 | xxd -p -r | base64 "></code-block>
 
 * `echo 010001`：命令的这一部分使用 `echo` 命令将字符串 "010001"（代表 RSA 密钥的公共指数 (e)）输出到标准输出。
 * `|`：`|` 字符是一个管道，它获取前一个命令的输出并将其作为输入传递给后一个命令。
@@ -136,7 +136,7 @@ AQAB
 
 <code-block lang="shell" code="echo &quot;b5:f2:5a:2e:bc:d7:20:b5:20:d5:4d:cd:d4:a5:&#10;    7c:c8:9a:fd:d8:61:e7:e4:eb:58:65:1e:ea:5a:4d:&#10;    4c:73:87:32:e0:91:a3:92:56:2e:a7:bc:1e:32:30:&#10;    43:f5:fd:db:05:5a:08:b2:25:15:5f:ac:4d:71:82:&#10;    2b:d0:87:b4:01&quot; | tr -d &quot;: 
 &quot; | xxd -p -r | base64 | tr +/ -_ | tr -d &quot;=
-&quot;"/>
+&quot;"></code-block>
 
 <note>
 <p>

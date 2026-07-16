@@ -72,7 +72,7 @@ class KtorMuseumApi(private val client: HttpClient) : MuseumApi {
         const val API_URL = "https://raw.githubusercontent.com/Kotlin/KMP-App-Template/main/list.json"
     }
 
-    override suspend fun getData(): List<MuseumObject> {
+    override suspend fun getData(): `List<MuseumObject>` {
         return try {
             client.get(API_URL).body()
         } catch (e: Exception) {

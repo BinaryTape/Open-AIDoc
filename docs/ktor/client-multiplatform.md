@@ -23,10 +23,10 @@ Ktor 客户端可用于多平台项目，并支持 Android、JavaScript 和 Nati
    <var name="artifact_name" value="ktor-client-core"/>
    <Tabs group="languages">
        <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-           <code-block lang="Kotlin" code="               val %platform_name%Main by getting {&#10;                   dependencies {&#10;                       implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)&#10;                   }&#10;               }"/>
+           <code-block lang="Kotlin" code="               val %platform_name%Main by getting {&#10;                   dependencies {&#10;                       implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)&#10;                   }&#10;               }"></code-block>
        </TabItem>
        <TabItem title="Gradle (Groovy)" group-key="groovy">
-           <code-block lang="Groovy" code="               %platform_name%Main {&#10;                   dependencies {&#10;                       implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;&#10;                   }&#10;               }"/>
+           <code-block lang="Groovy" code="               %platform_name%Main {&#10;                   dependencies {&#10;                       implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;&#10;                   }&#10;               }"></code-block>
        </TabItem>
    </Tabs>
 2. 为所需平台向相应的源集添加[引擎依赖项](client-engines.md#dependencies)。对于 Android，您可以将 [Android](client-engines.md#android) 引擎依赖项添加到 `androidMain` 源集中：
@@ -34,10 +34,10 @@ Ktor 客户端可用于多平台项目，并支持 Android、JavaScript 和 Nati
    <var name="artifact_name" value="ktor-client-android"/>
    <Tabs group="languages">
        <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-           <code-block lang="Kotlin" code="               val %platform_name%Main by getting {&#10;                   dependencies {&#10;                       implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)&#10;                   }&#10;               }"/>
+           <code-block lang="Kotlin" code="               val %platform_name%Main by getting {&#10;                   dependencies {&#10;                       implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)&#10;                   }&#10;               }"></code-block>
        </TabItem>
        <TabItem title="Gradle (Groovy)" group-key="groovy">
-           <code-block lang="Groovy" code="               %platform_name%Main {&#10;                   dependencies {&#10;                       implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;&#10;                   }&#10;               }"/>
+           <code-block lang="Groovy" code="               %platform_name%Main {&#10;                   dependencies {&#10;                       implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;&#10;                   }&#10;               }"></code-block>
        </TabItem>
    </Tabs>
    
@@ -46,10 +46,10 @@ Ktor 客户端可用于多平台项目，并支持 Android、JavaScript 和 Nati
    <var name="artifact_name" value="ktor-client-darwin"/>
    <Tabs group="languages">
        <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-           <code-block lang="Kotlin" code="               val %platform_name%Main by getting {&#10;                   dependencies {&#10;                       implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)&#10;                   }&#10;               }"/>
+           <code-block lang="Kotlin" code="               val %platform_name%Main by getting {&#10;                   dependencies {&#10;                       implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)&#10;                   }&#10;               }"></code-block>
        </TabItem>
        <TabItem title="Gradle (Groovy)" group-key="groovy">
-           <code-block lang="Groovy" code="               %platform_name%Main {&#10;                   dependencies {&#10;                       implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;&#10;                   }&#10;               }"/>
+           <code-block lang="Groovy" code="               %platform_name%Main {&#10;                   dependencies {&#10;                       implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;&#10;                   }&#10;               }"></code-block>
        </TabItem>
    </Tabs>
    

@@ -35,7 +35,7 @@ ktor:
 <def>
 <title><code>Default</code></title>
 使用默认组合：
-<code-block code="Supertypes * Nullables * OutTypeArgumentsSupertypes * RawTypes"/>
+<code-block code="Supertypes * Nullables * OutTypeArgumentsSupertypes * RawTypes"></code-block>
 </def>
 <def>
 <title><code>Supertypes</code></title>

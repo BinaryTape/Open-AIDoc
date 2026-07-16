@@ -258,14 +258,14 @@ To calculate the product of 12 and 9, we multiply these two numbers together.
             .toolRegistry(toolRegistry)
             .functionalStrategy("mathWithTools", (AIAgentFunctionalContext context, String input) -> {
                 // 將使用者輸入傳送至 LLM
-                List<Message.Response> responses = context.requestLLMMultiple(input);
+                `List<Message.Response>` responses = context.requestLLMMultiple(input);
 
                 // 僅在 LLM 要求工具時進行迴圈
                 while (context.containsToolCalls(responses)) {
                     // 從回應中提取工具呼叫
-                    List<Message.Tool.Call> pendingCalls = context.extractToolCalls(responses);
+                    `List<Message.Tool.Call>` pendingCalls = context.extractToolCalls(responses);
                     // 執行工具並傳回結果
-                    List<ReceivedToolResult> results = context.executeMultipleTools(pendingCalls, false);
+                    `List<ReceivedToolResult>` results = context.executeMultipleTools(pendingCalls, false);
                     // 將工具結果傳送回 LLM
                     responses = context.sendMultipleToolResults(results);
                 }

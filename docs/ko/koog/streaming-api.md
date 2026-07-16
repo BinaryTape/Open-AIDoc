@@ -363,8 +363,8 @@ Complete reasoning: ${frame.text.joinToString("")}")
         });
 
         Flow.Publisher<StreamFrame> stream = session.requestLLMStreaming();
-        List<String> reasoningSteps = new ArrayList<>();
-        List<String> summarySteps = new ArrayList<>();
+        `List<String>` reasoningSteps = new ArrayList<>();
+        `List<String>` summarySteps = new ArrayList<>();
 
         stream.subscribe(new Flow.Subscriber<StreamFrame>() {
             @Override

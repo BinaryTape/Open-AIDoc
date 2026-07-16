@@ -122,8 +122,8 @@ Weave 익스포터는 Koog의 일반 OpenTelemetry 통합과 동일한 활동을
 캡처된 스팬(spans)의 전체 목록과 LLM 프롬프트 및 응답 내용을 포함하는 방법은 [트레이스 대상(What gets traced)](index.md#what-gets-traced) 섹션을 참조하세요.
 
 W&B Weave에서 시각화하면 트레이스는 다음과 같이 나타납니다.
-![W&B Weave traces](../../img/opentelemetry-weave-exporter-light.png#only-light)
-![W&B Weave traces](../../img/opentelemetry-weave-exporter-dark.png#only-dark)
+![W&B Weave traces](/koog/opentelemetry-weave-exporter-light.png#only-light)
+![W&B Weave traces](/koog/opentelemetry-weave-exporter-dark.png#only-dark)
 
 자세한 내용은 공식 [Weave OpenTelemetry 문서](https://weave-docs.wandb.ai/guides/tracking/otel/)를 참조하세요.
 

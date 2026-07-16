@@ -83,7 +83,7 @@ object JsonNull : JsonElement
 
 ```kotlin
 fun main() {
-    fun demo(vararg input: String): Array<out String> = input
+    fun demo(vararg input: String): `Array<out String>` = input
 
     val originalArray = arrayOf("one", "two", "three", "four")
     val newArray = demo(*originalArray)

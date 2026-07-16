@@ -88,7 +88,7 @@ interface GitHubService {
     fun loadContributorsBlocking(
         service: GitHubService,
         req: RequestData
-    ): List<User> {
+    ): `List<User>` {
         val repos = service
             .getOrgReposCall(req.org)   // #1
             .execute()                  // #2
@@ -114,7 +114,7 @@ interface GitHubService {
 2. 為了避免重複寫 `.body() ?: emptyList()`，宣告了一個擴充函式 `bodyList()`：
 
     ```kotlin
-    fun <T> Response<List<T>>.bodyList(): List<T> {
+    fun <T> Response<List<T>>.bodyList(): `List<T>` {
         return body() ?: emptyList()
     }
     ```  
@@ -175,7 +175,7 @@ interface GitHubService {
 3. 對產生的列表進行降冪排序：
 
     ```kotlin
-    fun List<User>.aggregate(): List<User> =
+    fun List<User>.aggregate(): `List<User>` =
         groupBy { it.login }
             .map { (login, group) -> User(login, group.sumOf { it.contributions }) }
             .sortedByDescending { it.contributions }
@@ -427,7 +427,7 @@ interface GitHubService {
 將 `.getOrgReposCall(req.org).execute()` 替換為 `.getOrgRepos(req.org)`，並對第二個 "contributors" 請求重複相同的替換：
 
 ```kotlin
-suspend fun loadContributorsSuspend(service: GitHubService, req: RequestData): List<User> {
+suspend fun loadContributorsSuspend(service: GitHubService, req: RequestData): `List<User>` {
     val repos = service
         .getOrgRepos(req.org)
         .also { logRepos(req, it) }
@@ -581,7 +581,7 @@ fun main() = runBlocking {
 suspend fun loadContributorsConcurrent(
     service: GitHubService,
     req: RequestData
-): List<User> = coroutineScope {
+): `List<User>` = coroutineScope {
     // ...
 }
 ```
@@ -607,7 +607,7 @@ deferreds.awaitAll() // List<List<User>>
     suspend fun loadContributorsConcurrent(
         service: GitHubService, 
         req: RequestData
-    ): List<User> = coroutineScope {
+    ): `List<User>` = coroutineScope {
         val repos = service
             .getOrgRepos(req.org)
             .also { logRepos(req, it) }
@@ -742,7 +742,7 @@ fun main() = runBlocking { /* this: CoroutineScope */
    suspend fun loadContributorsConcurrent(
        service: GitHubService, 
        req: RequestData
-   ): List<User> = coroutineScope {
+   ): `List<User>` = coroutineScope {
        // ...
        async {
            log("starting loading for ${repo.name}")
@@ -762,7 +762,7 @@ fun main() = runBlocking { /* this: CoroutineScope */
     suspend fun loadContributorsNotCancellable(
         service: GitHubService,
         req: RequestData
-    ): List<User> {   // #1
+    ): `List<User>` {   // #1
         // ...
         GlobalScope.async {   // #2
             log("starting loading for ${repo.name}")
@@ -869,7 +869,7 @@ launch(Dispatchers.Default) {  // 外部作用域
 ```kotlin
 suspend fun loadContributorsConcurrent(
     service: GitHubService, req: RequestData
-): List<User> = coroutineScope {
+): `List<User>` = coroutineScope {
     // 此作用域繼承了來自外部作用域的上下文
     // ...
     async {   // 以繼承的上下文啟動嵌套協同程式

@@ -351,7 +351,7 @@ Koog 提供了两种主要的内容审核方法：直接在 `LLMClient` 实例�
          *
          * 用于识别在被审核内容中发现的特定违规类型。
          */
-        public val violatedCategories: List<ModerationCategory> = categories.filter { it.value.detected }.keys.toList()
+        public val violatedCategories: `List<ModerationCategory>` = categories.filter { it.value.detected }.keys.toList()
 
         /**
          * 表示为内容审核提供的输入类型。

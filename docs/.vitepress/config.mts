@@ -23,7 +23,10 @@ export default defineConfig({
   // Basic configuration
   cleanUrls: true,
   lastUpdated: false,
-  ignoreDeadLinks: true,
+  ignoreDeadLinks: [
+    /^http:\/\/localhost/,
+    /^\/api\/coil-/,
+  ],
   metaChunk: true,
   lang: 'zh-Hans',
   title: 'Open AIDoc',

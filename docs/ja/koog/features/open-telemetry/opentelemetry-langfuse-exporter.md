@@ -164,8 +164,8 @@ Langfuseエクスポーターは、Koogの一般的なOpenTelemetry統合と同�
 キャプチャされるスパンの完全なリスト、およびLLMのプロンプトとレスポンスの内容を含める方法については、[トレースされる内容](index.md#what-gets-traced)を参照してください。
 
 Langfuseで視覚化すると、トレースは次のように表示されます：
-![Langfuse traces](../../img/opentelemetry-langfuse-exporter-light.png#only-light)
-![Langfuse traces](../../img/opentelemetry-langfuse-exporter-dark.png#only-dark)
+![Langfuse traces](/koog/opentelemetry-langfuse-exporter-light.png#only-light)
+![Langfuse traces](/koog/opentelemetry-langfuse-exporter-dark.png#only-dark)
 
 Langfuse OpenTelemetryトレースの詳細については、以下を参照してください：  
 [Langfuse OpenTelemetry Docs](https://langfuse.com/integrations/native/opentelemetry#opentelemetry-endpoint).

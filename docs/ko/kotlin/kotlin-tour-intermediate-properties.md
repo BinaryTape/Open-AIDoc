@@ -278,7 +278,7 @@ class Database {
         println("Connecting to the database...")
     }
 
-    fun query(sql: String): List<String> {
+    fun query(sql: String): `List<String>` {
         return listOf("Data1", "Data2", "Data3")
     }
 }
@@ -400,7 +400,7 @@ fun main() {
 |--|--|
 
 ```kotlin
-fun findOutOfStockBooks(inventory: List<Int>): List<Int> {
+fun findOutOfStockBooks(inventory: List<Int>): `List<Int>` {
     // 여기에 코드를 작성하세요
 }
 
@@ -414,7 +414,7 @@ fun main() {
 
 |---|---|
 ```kotlin
-fun findOutOfStockBooks(inventory: List<Int>): List<Int> {
+fun findOutOfStockBooks(inventory: List<Int>): `List<Int>` {
     val outOfStockIndices = mutableListOf<Int>()
     for (index in inventory.indices) {
         if (inventory[index] == 0) {
@@ -434,7 +434,7 @@ fun main() {
 
 |---|---|
 ```kotlin
-fun findOutOfStockBooks(inventory: List<Int>): List<Int> = buildList {
+fun findOutOfStockBooks(inventory: List<Int>): `List<Int>` = buildList {
     for (index in inventory.indices) {
         if (inventory[index] == 0) {
             add(index)

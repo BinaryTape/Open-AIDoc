@@ -1200,7 +1200,7 @@ Kotlin 2.2.20 では、[実験的 (Experimental)](components-stability.md#stabil
 
 ```kotlin
 @OptIn(ExperimentalStdlibApi::class)
-fun inspect(klass: KClass<*>) {
+fun inspect(klass: `KClass<*>`) {
     // インターフェースの場合は true を出力
     println(klass.isInterface)
 }
@@ -1270,9 +1270,9 @@ Kotlin 2.2.20 では、[`copyOf()`](https://kotlinlang.org/api/core/kotlin-stdli
 ```kotlin
 @OptIn(ExperimentalStdlibApi::class)
 fun main() {
-    val row1: Array<String> = arrayOf("one", "two")
+    val row1: `Array<String>` = arrayOf("one", "two")
     // 配列をリサイズし、ラムダを使用して新しい要素を埋める
-    val row2: Array<String> = row1.copyOf(4) { "default" }
+    val row2: `Array<String>` = row1.copyOf(4) { "default" }
     println(row2.contentToString())
     // [one, two, default, default]
 }

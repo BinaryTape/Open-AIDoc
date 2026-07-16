@@ -60,15 +60,15 @@ CocoaPods 의존성이 있는 KMP 모듈이 있고, [SwiftPM import](multiplatfo
    팟과 해당 Swift 패키지가 정확히 동일한 API를 제공한다면, 다음과 같이 Kotlin import 지시문만 업데이트하면 됩니다:
 
     <compare type="top-bottom">
-        <code-block lang="kotlin" code="            import cocoapods.FirebaseAnalytics.FIRAnalytics"/>
-        <code-block lang="kotlin" code="            import swiftPMImport.org.example.package.FIRAnalytics"/>
+        <code-block lang="kotlin" code="            import cocoapods.FirebaseAnalytics.FIRAnalytics"></code-block>
+        <code-block lang="kotlin" code="            import swiftPMImport.org.example.package.FIRAnalytics"></code-block>
     </compare>
 
 5. 빌드 스크립트에서 `cocoapods.framework {}` 블록을 사용 중이라면, 해당 설정을 `binaries.framework {}` 블록으로 이동하세요. 예시:
 
    <compare type="left-right">
-   <code-block lang="kotlin" code="   kotlin {&#10;       iosArm64()&#10;       iosSimulatorArm64()&#10;       iosX64()&#10;&#10;       cocoapods {&#10;           framework {&#10;               baseName = &quot;Shared&quot;&#10;               isStatic = true&#10;           }&#10;       }&#10;   }"/>
-   <code-block lang="kotlin" code="   kotlin {&#10;       listOf(&#10;           iosArm64(),&#10;           iosSimulatorArm64(),&#10;           iosX64(),&#10;       ).forEach { iosTarget -&gt;&#10;           iosTarget.binaries.framework {&#10;               baseName = &quot;Shared&quot;&#10;               isStatic = true&#10;           }&#10;       }&#10;   }"/>
+   <code-block lang="kotlin" code="   kotlin {&#10;       iosArm64()&#10;       iosSimulatorArm64()&#10;       iosX64()&#10;&#10;       cocoapods {&#10;           framework {&#10;               baseName = &quot;Shared&quot;&#10;               isStatic = true&#10;           }&#10;       }&#10;   }"></code-block>
+   <code-block lang="kotlin" code="   kotlin {&#10;       listOf(&#10;           iosArm64(),&#10;           iosSimulatorArm64(),&#10;           iosX64(),&#10;       ).forEach { iosTarget -&gt;&#10;           iosTarget.binaries.framework {&#10;               baseName = &quot;Shared&quot;&#10;               isStatic = true&#10;           }&#10;       }&#10;   }"></code-block>
    </compare>
 
 ## Xcode 프로젝트 재구성

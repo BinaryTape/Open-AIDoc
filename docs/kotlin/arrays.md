@@ -59,7 +59,7 @@ fun main() {
 fun main() {
 //sampleStart
     // 创建一个值为 [null, null, null] 的数组
-    val nullArray: Array<Int?> = arrayOfNulls(3)
+    val nullArray: `Array<Int?>` = arrayOfNulls(3)
     println(nullArray.joinToString())
     // null, null, null
 //sampleEnd
@@ -79,7 +79,7 @@ fun main() {
 > ```Kotlin
 > var exampleArray = emptyArray<String>()
 > 
-> var exampleArray: Array<String> = emptyArray()
+> var exampleArray: `Array<String>` = emptyArray()
 >```
 >
 {style="note"}

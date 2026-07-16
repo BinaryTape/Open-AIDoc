@@ -279,7 +279,7 @@ Kotlin 1.7.20은 코드에 영향을 줄 수 있는 [빌더 타입 추론 사용
     fun <T: Any> buildList(
         first: MutableList<T>.() -> Unit, 
         second: MutableList<T>.() -> Unit
-    ): List<T> {
+    ): `List<T>` {
         val list = mutableListOf<T>()
         list.first()
         list.second()

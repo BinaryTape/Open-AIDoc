@@ -11,7 +11,7 @@ Kotlinでは、[collections] を使用して複数の値を表現できます。
 例えば、3つの数値の [List] を返す `simple` 関数を用意し、[forEach] を使用してそれらすべてを出力できます。
 
 ```kotlin
-fun simple(): List<Int> = listOf(1, 2, 3)
+fun simple(): `List<Int>` = listOf(1, 2, 3)
  
 fun main() {
     simple().forEach { value -> println(value) } 
@@ -72,7 +72,7 @@ fun main() {
 import kotlinx.coroutines.*                 
                            
 //sampleStart
-suspend fun simple(): List<Int> {
+suspend fun simple(): `List<Int>` {
     delay(1000) // ここで何か非同期なことをしているふり
     return listOf(1, 2, 3)
 }

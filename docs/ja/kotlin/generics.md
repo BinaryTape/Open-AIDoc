@@ -185,10 +185,10 @@ fun copy(from: Array<Any>, to: Array<Any>) {
 この関数は、ある配列から別の配列へアイテムをコピーすることを目的としています。これを実際に適用してみましょう。
 
 ```kotlin
-val ints: Array<Int> = arrayOf(1, 2, 3)
+val ints: `Array<Int>` = arrayOf(1, 2, 3)
 val any = Array<Any>(3) { "" } 
 copy(ints, any)
-//   ^ 型は Array<Int> ですが、Array<Any> が期待されています
+//   ^ 型は `Array<Int>` ですが、Array<Any> が期待されています
 ```
 
 ここで、おなじみの問題に直面します。`Array<T>` は `T` に対して*不変*であるため、`Array<Int>` と `Array<Any>` のどちらも他方のサブタイプではありません。なぜでしょうか？繰り返しになりますが、それは `copy` が予期しない動作をする可能性があるからです。例えば、`from` に `String` を書き込もうとするかもしれません。もしそこに実際に `Int` の配列を渡していたら、後で `ClassCastException` がスローされることになります。
@@ -236,7 +236,7 @@ Kotlinは、このためにいわゆる*スター投影*構文を提供してい
 クラスだけでなく、関数も型パラメータを持つことができます。型パラメータは関数の名前の*前*に置かれます。
 
 ```kotlin
-fun <T> singletonList(item: T): List<T> {
+fun <T> singletonList(item: T): `List<T>` {
     // ...
 }
 
@@ -409,7 +409,7 @@ val intsDictionary: Map<String, Int> = readDictionary(intsFile) as Map<String, I
 inline fun <reified T> List<*>.asListOfType(): List<T>? =
     if (all { it is T })
         @Suppress("UNCHECKED_CAST")
-        this as List<T> else
+        this as `List<T>` else
         null
 ```
 

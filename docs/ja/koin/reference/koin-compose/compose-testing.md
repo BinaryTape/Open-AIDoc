@@ -152,7 +152,7 @@ fun searchFiltersUsers() {
 @Test
 fun showsLoadingIndicator() {
     val loadingRepository = object : UserRepository {
-        override suspend fun getUsers(): List<User> {
+        override suspend fun getUsers(): `List<User>` {
             delay(Long.MAX_VALUE) // 完了しない
             return emptyList()
         }
@@ -177,7 +177,7 @@ fun showsLoadingIndicator() {
 @Test
 fun showsErrorMessage() {
     val errorRepository = object : UserRepository {
-        override suspend fun getUsers(): List<User> {
+        override suspend fun getUsers(): `List<User>` {
             throw IOException("Network error")
         }
     }
@@ -267,7 +267,7 @@ class FakeUserRepository : UserRepository {
     private val users = mutableListOf<User>()
     var shouldFail = false
 
-    override suspend fun getUsers(): List<User> {
+    override suspend fun getUsers(): `List<User>` {
         if (shouldFail) throw IOException("Fake error")
         return users.toList()
     }

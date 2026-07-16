@@ -141,7 +141,7 @@ class UserViewModel : ViewModel(), KoinComponent {
 Koin 的设计理念以**简单和易于设置**为中心，同时允许在必要时进行复杂的配置。通过使用 Koin，开发者可以有效地管理依赖项，在大多数场景下，DI 是推荐且首选的方法。
 
 :::info
-**了解详情**：请参阅 [依赖项注入基础](/docs/intro/what-is-dependency-injection) 以获取 DI 概念的完整指南。
+**了解详情**：请参阅 [依赖项注入基础](/docs/setup/why) 以获取 DI 概念的完整指南。
 :::
 
 ---
@@ -246,7 +246,7 @@ module {
 - [Ktor 后端](/docs/quickstart/ktor) - 构建服务器应用程序
 
 ### 核心概念
-- [依赖项注入基础](/docs/intro/what-is-dependency-injection) - 基础 DI 概念
+- [依赖项注入基础](/docs/setup/why) - 基础 DI 概念
 - [核心功能](/docs/reference/koin-core/dsl) - Koin DSL 与模块系统
 - [Android 集成](/docs/reference/koin-android/start) - Android 特定功能
 

@@ -148,15 +148,15 @@ Android 앱 모듈(`androidApp`)을 생성하려면 다음을 수행하세요:
    * Gradle 플러그인 참조를 변경합니다:
 
        <compare type="top-bottom">
-          <code-block lang="kotlin" code="              alias(libs.plugins.androidApplication)"/>
-          <code-block lang="kotlin" code="              alias(libs.plugins.androidLibrary)"/>
+          <code-block lang="kotlin" code="              alias(libs.plugins.androidApplication)"></code-block>
+          <code-block lang="kotlin" code="              alias(libs.plugins.androidLibrary)"></code-block>
        </compare>
    
     * `android.defaultConfig {}` 블록에서 애플리케이션 프로퍼티 라인을 제거합니다:
 
       <compare type="top-bottom">
-          <code-block lang="kotlin" code="              defaultConfig {&#10;                  applicationId = &quot;com.jetbrains.demo&quot;&#10;                  minSdk = libs.versions.android.minSdk.get().toInt()&#10;                  targetSdk = libs.versions.android.targetSdk.get().toInt()&#10;                  versionCode = 1&#10;                  versionName = &quot;1.0&quot;&#10;              }"/>
-          <code-block lang="kotlin" code="              defaultConfig {&#10;                  minSdk = libs.versions.android.minSdk.get().toInt()&#10;              }"/>
+          <code-block lang="kotlin" code="              defaultConfig {&#10;                  applicationId = &quot;com.jetbrains.demo&quot;&#10;                  minSdk = libs.versions.android.minSdk.get().toInt()&#10;                  targetSdk = libs.versions.android.targetSdk.get().toInt()&#10;                  versionCode = 1&#10;                  versionName = &quot;1.0&quot;&#10;              }"></code-block>
+          <code-block lang="kotlin" code="              defaultConfig {&#10;                  minSdk = libs.versions.android.minSdk.get().toInt()&#10;              }"></code-block>
        </compare>
    
 8. 메인 메뉴에서 **Build | Sync Project with Gradle Files**를 선택하거나 에디터에서 Gradle 새로고침 버튼을 클릭합니다.
@@ -195,8 +195,8 @@ Android 앱 모듈(`androidApp`)을 생성하려면 다음을 수행하세요:
 2. `composeApp/build.gradle.kts` 파일에서 기존 Android 라이브러리 플러그인을 새 플러그인으로 교체합니다:
 
     <compare type="top-bottom">
-        <code-block lang="kotlin" code="            alias(libs.plugins.androidLibrary)"/>
-        <code-block lang="kotlin" code="            alias(libs.plugins.androidMultiplatformLibrary)"/>
+        <code-block lang="kotlin" code="            alias(libs.plugins.androidLibrary)"></code-block>
+        <code-block lang="kotlin" code="            alias(libs.plugins.androidMultiplatformLibrary)"></code-block>
     </compare>
 3. 루트 `build.gradle.kts` 파일에 다음 줄을 추가하여 플러그인 적용 시 충돌을 방지합니다:
 

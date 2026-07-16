@@ -56,7 +56,7 @@ Compose Multiplatform 1.9.0 では、Jetpack Compose の新しいシャドウプ
 これらの新しいシャドウを UI コンポーネントに適用するには、`dropShadow` または `innerShadow` 修飾子を使用してシャドウ効果を構成します：
 
 <list columns="2">
-   <li><code-block lang="kotlin" code="        Box(&#10;            Modifier.size(120.dp)&#10;                .dropShadow(&#10;                    RectangleShape,&#10;                    DropShadow(12.dp)&#10;                )&#10;                .background(Color.White)&#10;        )&#10;        Box(&#10;            Modifier.size(120.dp)&#10;                .innerShadow(&#10;                    RectangleShape,&#10;                    InnerShadow(12.dp)&#10;                )&#10;        )"/></li>
+   <li><code-block lang="kotlin" code="        Box(&#10;            Modifier.size(120.dp)&#10;                .dropShadow(&#10;                    RectangleShape,&#10;                    DropShadow(12.dp)&#10;                )&#10;                .background(Color.White)&#10;        )&#10;        Box(&#10;            Modifier.size(120.dp)&#10;                .innerShadow(&#10;                    RectangleShape,&#10;                    InnerShadow(12.dp)&#10;                )&#10;        )"></code-block></li>
    <li><img src="compose-advanced-shadows.png" type="inline" alt="Customizable shadows" width="200"/></li>
 </list>
 

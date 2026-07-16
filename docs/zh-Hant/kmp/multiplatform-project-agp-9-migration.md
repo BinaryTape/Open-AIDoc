@@ -162,15 +162,15 @@ branch of the sample repository. -->
    * 更改對 Gradle 外掛程式的引用：
 
        <compare type="top-bottom">
-          <code-block lang="kotlin" code="              alias(libs.plugins.androidApplication)"/>
-          <code-block lang="kotlin" code="              alias(libs.plugins.androidLibrary)"/>
+          <code-block lang="kotlin" code="              alias(libs.plugins.androidApplication)"></code-block>
+          <code-block lang="kotlin" code="              alias(libs.plugins.androidLibrary)"></code-block>
        </compare>
    
     * 從 `android.defaultConfig {}` 區塊中移除應用程式屬性行：
 
       <compare type="top-bottom">
-          <code-block lang="kotlin" code="              defaultConfig {&#10;                  applicationId = &quot;com.jetbrains.demo&quot;&#10;                  minSdk = libs.versions.android.minSdk.get().toInt()&#10;                  targetSdk = libs.versions.android.targetSdk.get().toInt()&#10;                  versionCode = 1&#10;                  versionName = &quot;1.0&quot;&#10;              }"/>
-          <code-block lang="kotlin" code="              defaultConfig {&#10;                  minSdk = libs.versions.android.minSdk.get().toInt()&#10;              }"/>
+          <code-block lang="kotlin" code="              defaultConfig {&#10;                  applicationId = &quot;com.jetbrains.demo&quot;&#10;                  minSdk = libs.versions.android.minSdk.get().toInt()&#10;                  targetSdk = libs.versions.android.targetSdk.get().toInt()&#10;                  versionCode = 1&#10;                  versionName = &quot;1.0&quot;&#10;              }"></code-block>
+          <code-block lang="kotlin" code="              defaultConfig {&#10;                  minSdk = libs.versions.android.minSdk.get().toInt()&#10;              }"></code-block>
        </compare>
    
 8. 在主功能表中選擇 **Build | Sync Project with Gradle Files**，或點擊編輯器中的 Gradle 重新整理按鈕。
@@ -214,8 +214,8 @@ branch of the sample repository. -->
 2. 在 `composeApp/build.gradle.kts` 檔案中，將舊的 Android 程式庫外掛程式更換為新的：
 
     <compare type="top-bottom">
-        <code-block lang="kotlin" code="            alias(libs.plugins.androidLibrary)"/>
-        <code-block lang="kotlin" code="            alias(libs.plugins.androidMultiplatformLibrary)"/>
+        <code-block lang="kotlin" code="            alias(libs.plugins.androidLibrary)"></code-block>
+        <code-block lang="kotlin" code="            alias(libs.plugins.androidMultiplatformLibrary)"></code-block>
     </compare>
 3. 在根目錄的 `build.gradle.kts` 檔案中，加入以下行以避免套用外掛程式時發生衝突：
 

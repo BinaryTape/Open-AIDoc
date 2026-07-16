@@ -190,7 +190,7 @@ dependencies {
 }
 
 // 型パラメータの共変性サポートにより、これは動作します
-val stringList: List<CharSequence> by dependencies
+val stringList: `List<CharSequence>` by dependencies
 // これも動作します
 val stringCollection: Collection<CharSequence> by dependencies
 ```

@@ -67,7 +67,7 @@ Kotlin은 전제 조건(precondition) 함수를 사용하여 자동으로 예외
 `require()`의 조건이 충족되지 않으면 [`IllegalArgumentException`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-illegal-argument-exception/)을 던집니다:
 
 ```kotlin
-fun getIndices(count: Int): List<Int> {
+fun getIndices(count: Int): `List<Int>` {
     require(count >= 0) { "Count must be non-negative. You set count to $count." }
     return List(count) { it + 1 }
 }

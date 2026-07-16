@@ -53,7 +53,7 @@ LLM 제공업체를 이용할 때 레이트 리밋(rate limit)이나 일시적�
     RetryingLLMClient resilientClient = new RetryingLLMClient(client);
 
     // 이제 모든 작업이 일시적인 오류 발생 시 자동으로 재시도됩니다.
-    List<Message.Response> response = resilientClient.execute(prompt, OpenAIModels.Chat.GPT4o);
+    `List<Message.Response>` response = resilientClient.execute(prompt, OpenAIModels.Chat.GPT4o);
     ```
     <!--- KNIT example-handling-failures-java-01.java -->
 
@@ -509,7 +509,7 @@ val stream = client.executeStreaming(prompt, OpenAIModels.Chat.GPT4o)
     Runnable useDefaultResponse = () -> { /* 구현부 */ };
 
     try {
-        List<Message.Response> response = promptExecutor.execute(prompt, OpenAIModels.Chat.GPT4o);
+        `List<Message.Response>` response = promptExecutor.execute(prompt, OpenAIModels.Chat.GPT4o);
         processResponse.accept(response);
     } catch (Exception e) {
         logger.error("LLM operation failed", e);

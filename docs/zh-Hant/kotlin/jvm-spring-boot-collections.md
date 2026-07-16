@@ -19,7 +19,7 @@ Kotlin 集合提供了一組用於從集合中檢索單一元素的函式。可�
 
 ```kotlin
 @GetMapping("/firstAndLast")
-fun firstAndLast(): List<Message> {
+fun firstAndLast(): `List<Message>` {
     val messages = service.findMessages()
     return listOf(messages.first(), messages.last())
 }
@@ -58,7 +58,7 @@ fun firstMessageOrNull(): Message {
 
 ```kotlin
 @GetMapping("/filterMessagesLongerThan10")
-fun filterMessagesLongerThan10(): List<Message> {
+fun filterMessagesLongerThan10(): `List<Message>` {
     val messages = service.findMessages()
     return messages.filter { it.text.length > 10 }
 }
@@ -74,7 +74,7 @@ fun filterMessagesLongerThan10(): List<Message> {
 
 ```kotlin
 @GetMapping("/sortByLastLetter")
-fun sortByLastLetter(): List<Message> {
+fun sortByLastLetter(): `List<Message>` {
     val messages = service.findMessages()
     return messages.sortedBy { it.text.last() }
 }
@@ -110,7 +110,7 @@ fun groups(): Map<String, List<Message>> {
 
 ```kotlin
 @GetMapping("/transformMessagesToListOfStrings")
-fun transformMessagesToListOfStrings(): List<String> {
+fun transformMessagesToListOfStrings(): `List<String>` {
     val messages = service.findMessages()
     return messages.map { "${it.id} ${it.text}" }
 }

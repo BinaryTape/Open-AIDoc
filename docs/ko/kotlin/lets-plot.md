@@ -122,17 +122,17 @@ boxPlot
 
    ```kotlin
    // 세 가지 분포에 대한 공분산 행렬을 정의합니다.
-   val cov0: Array<DoubleArray> = arrayOf(
+   val cov0: `Array<DoubleArray>` = arrayOf(
        doubleArrayOf(1.0, -.8),
        doubleArrayOf(-.8, 1.0)
    )
    
-   val cov1: Array<DoubleArray> = arrayOf(
+   val cov1: `Array<DoubleArray>` = arrayOf(
        doubleArrayOf(1.0, .8),
        doubleArrayOf(.8, 1.0)
    )
    
-   val cov2: Array<DoubleArray> = arrayOf(
+   val cov2: `Array<DoubleArray>` = arrayOf(
        doubleArrayOf(10.0, .1),
        doubleArrayOf(.1, .1)
    )

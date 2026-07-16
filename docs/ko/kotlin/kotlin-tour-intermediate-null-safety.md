@@ -145,7 +145,7 @@ fun calculateTotalStringLength(items: List<Any>): Int {
 ```kotlin
 fun main() {
 //sampleStart
-    val emails: List<String?> = listOf("alice@example.com", null, "bob@example.com", null, "carol@example.com")
+    val emails: `List<String?>` = listOf("alice@example.com", null, "bob@example.com", null, "carol@example.com")
 
     val validEmails = emails.filterNotNull()
 
@@ -388,7 +388,7 @@ fun getNumberOfFriends(users: Map<Int, User>, userId: Int): Int {
 ```kotlin
 data class User(val name: String?)
 
-fun getNotificationPreferences(user: Any, emailEnabled: Boolean, smsEnabled: Boolean): List<String> {
+fun getNotificationPreferences(user: Any, emailEnabled: Boolean, smsEnabled: Boolean): `List<String>` {
     val validUser = // 여기에 코드를 작성하세요
     val userName = // 여기에 코드를 작성하세요
 
@@ -415,7 +415,7 @@ fun main() {
 ```kotlin
 data class User(val name: String?)
 
-fun getNotificationPreferences(user: Any, emailEnabled: Boolean, smsEnabled: Boolean): List<String> {
+fun getNotificationPreferences(user: Any, emailEnabled: Boolean, smsEnabled: Boolean): `List<String>` {
     val validUser = user as? User ?: return emptyList()
     val userName = validUser.name ?: "Guest"
 
@@ -537,7 +537,7 @@ fun main() {
 ```kotlin
 data class User(val username: String, val isActive: Boolean)
 
-fun getActiveUsernames(users: List<User>): List<String> {
+fun getActiveUsernames(users: List<User>): `List<String>` {
     return users.mapNotNull { /* 여기에 코드를 작성하세요 */ }
 }
 
@@ -565,7 +565,7 @@ fun main() {
 ```kotlin
 data class User(val username: String, val isActive: Boolean)
 
-fun getActiveUsernames(users: List<User>): List<String> {
+fun getActiveUsernames(users: List<User>): `List<String>` {
     return users.mapNotNull { user ->
         if (user.isActive) user.username else null
     }
@@ -589,7 +589,7 @@ fun main() {
 ```kotlin
 data class User(val username: String, val isActive: Boolean)
 
-fun getActiveUsernames(users: List<User>): List<String> =
+fun getActiveUsernames(users: List<User>): `List<String>` =
     users.mapNotNull { user -> user.username.takeIf { user.isActive } }
 
 fun main() {

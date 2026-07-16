@@ -274,7 +274,7 @@ class MyVectorDbStorage : SearchStorage<TextDocument, SearchRequest>, WriteStora
 
     override suspend fun add(
         records: List<TextDocument>, namespace: String?
-    ): List<String> {
+    ): `List<String>` {
         // ベクトルDBにアップサートを実行し、追加されたレコードのIDを返します
     }
 }

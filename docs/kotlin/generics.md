@@ -209,10 +209,10 @@ fun copy(from: Array<Any>, to: Array<Any>) {
 该函数旨在将项从一个数组复制到另一个数组。让我们尝试在实践中应用它：
 
 ```kotlin
-val ints: Array<Int> = arrayOf(1, 2, 3)
+val ints: `Array<Int>` = arrayOf(1, 2, 3)
 val any = Array<Any>(3) { "" } 
 copy(ints, any)
-//   ^ 类型为 Array<Int> 但预期为 Array<Any>
+//   ^ 类型为 `Array<Int>` 但预期为 Array<Any>
 ```
 
 在这里你遇到了同样熟悉的问题：`Array<T>` 在 `T` 上是*不变的*，因此 `Array<Int>` 和 `Array<Any>`
@@ -268,7 +268,7 @@ Kotlin 为此提供了所谓的*星号投影*语法：
 不仅类可以拥有类型形参，函数也可以。类型形参放在函数名称*之前*：
 
 ```kotlin
-fun <T> singletonList(item: T): List<T> {
+fun <T> singletonList(item: T): `List<T>` {
     // ...
 }
 
@@ -458,7 +458,7 @@ val intsDictionary: Map<String, Int> = readDictionary(intsFile) as Map<String, I
 inline fun <reified T> List<*>.asListOfType(): List<T>? =
     if (all { it is T })
         @Suppress("UNCHECKED_CAST")
-        this as List<T> else
+        this as `List<T>` else
         null
 ```
 

@@ -343,10 +343,10 @@ Kotlin 1.6.20부터 Kotlin 툴체인의 기본 동작에 이러한 속성들이 
     
 <tr>
 <td>
-<code-block lang="kotlin" code="kotlin {&#10;    targets {&#10;        fromPreset(presets.iosArm64, 'ios')&#10;    }&#10;}"/>
+<code-block lang="kotlin" code="kotlin {&#10;    targets {&#10;        fromPreset(presets.iosArm64, 'ios')&#10;    }&#10;}"></code-block>
 </td>
 <td>
-<code-block lang="kotlin" code="kotlin {&#10;    iosArm64()&#10;}"/>
+<code-block lang="kotlin" code="kotlin {&#10;    iosArm64()&#10;}"></code-block>
 </td>
 </tr>
 
@@ -858,10 +858,10 @@ Gradle에 의해 자동 생성된 타겟 접근자(target accessors)를 더 이�
     
 <tr>
 <td>
-<code-block lang="kotlin" code="kotlin {&#10;    targets {&#10;        configure(['windows',&#10;            'linux']) {&#10;        }&#10;    }&#10;}"/>
+<code-block lang="kotlin" code="kotlin {&#10;    targets {&#10;        configure(['windows',&#10;            'linux']) {&#10;        }&#10;    }&#10;}"></code-block>
 </td>
 <td>
-<code-block lang="kotlin" code="kotlin {&#10;    targets {&#10;        configure([findByName('windows'),&#10;            findByName('linux')]) {&#10;        }&#10;    }&#10;}"/>
+<code-block lang="kotlin" code="kotlin {&#10;    targets {&#10;        configure([findByName('windows'),&#10;            findByName('linux')]) {&#10;        }&#10;    }&#10;}"></code-block>
 </td>
 </tr>
 
@@ -922,20 +922,20 @@ Kotlin 1.7.20부터 입력을 사용할 수 없고, 출력이 교체되며, `cla
 <tr>
 <td rowspan="2"><code>jvmMain</code> 컴파일의 종속성</td>
 <td>
-<code-block lang="kotlin" code="jvm&lt;Scope&gt;"/>
+<code-block lang="kotlin" code="jvm&lt;Scope&gt;"></code-block>
 </td>
 <td>
-<code-block lang="kotlin" code="jvmCompilation&lt;Scope&gt;"/>
+<code-block lang="kotlin" code="jvmCompilation&lt;Scope&gt;"></code-block>
 </td>
 </tr>
 
     
 <tr>
 <td>
-<code-block lang="kotlin" code="dependencies {&#10;    add(&quot;jvmImplementation&quot;,&#10;        &quot;foo.bar.baz:1.2.3&quot;)&#10;}"/>
+<code-block lang="kotlin" code="dependencies {&#10;    add(&quot;jvmImplementation&quot;,&#10;        &quot;foo.bar.baz:1.2.3&quot;)&#10;}"></code-block>
 </td>
 <td>
-<code-block lang="kotlin" code="dependencies {&#10;    add(&quot;jvmCompilationImplementation&quot;,&#10;        &quot;foo.bar.baz:1.2.3&quot;)&#10;}"/>
+<code-block lang="kotlin" code="dependencies {&#10;    add(&quot;jvmCompilationImplementation&quot;,&#10;        &quot;foo.bar.baz:1.2.3&quot;)&#10;}"></code-block>
 </td>
 </tr>
 
@@ -943,7 +943,7 @@ Kotlin 1.7.20부터 입력을 사용할 수 없고, 출력이 교체되며, `cla
 <tr>
 <td><code>jvmMain</code> 소스 세트의 종속성</td>
 <td colspan="2">
-<code-block lang="kotlin" code="jvmMain&lt;Scope&gt;"/>
+<code-block lang="kotlin" code="jvmMain&lt;Scope&gt;"></code-block>
 </td>
 </tr>
 
@@ -951,10 +951,10 @@ Kotlin 1.7.20부터 입력을 사용할 수 없고, 출력이 교체되며, `cla
 <tr>
 <td><code>jvmTest</code> 컴파일의 종속성</td>
 <td>
-<code-block lang="kotlin" code="jvmTest&lt;Scope&gt;"/>
+<code-block lang="kotlin" code="jvmTest&lt;Scope&gt;"></code-block>
 </td>
 <td>
-<code-block lang="kotlin" code="jvmTestCompilation&lt;Scope&gt;"/>
+<code-block lang="kotlin" code="jvmTestCompilation&lt;Scope&gt;"></code-block>
 </td>
 </tr>
 
@@ -962,7 +962,7 @@ Kotlin 1.7.20부터 입력을 사용할 수 없고, 출력이 교체되며, `cla
 <tr>
 <td><code>jvmTest</code> 소스 세트의 종속성</td>
 <td colspan="2">
-<code-block lang="kotlin" code="jvmTest&lt;Scope&gt;"/>
+<code-block lang="kotlin" code="jvmTest&lt;Scope&gt;"></code-block>
 </td>
 </tr>
 

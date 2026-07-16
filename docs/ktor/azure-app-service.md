@@ -130,10 +130,10 @@ Azure Web 应用部署插件使用的身份验证方式是 Azure CLI。如果您
 
 <Tabs group="os">
 <TabItem title="Linux/macOS" group-key="unix">
-<code-block code="./gradlew :embedded-server:azureWebAppDeploy"/>
+<code-block code="./gradlew :embedded-server:azureWebAppDeploy"></code-block>
 </TabItem>
 <TabItem title="Windows" group-key="windows">
-<code-block code="gradlew.bat :embedded-server:azureWebAppDeploy"/>
+<code-block code="gradlew.bat :embedded-server:azureWebAppDeploy"></code-block>
 </TabItem>
 </Tabs>
 
@@ -163,10 +163,10 @@ Application url: https://your-webapp-name.azurewebsites.net
 
 <Tabs group="os">
 <TabItem title="Linux/macOS" group-key="unix">
-<code-block code="./gradlew :embedded-server:buildFatJar"/>
+<code-block code="./gradlew :embedded-server:buildFatJar"></code-block>
 </TabItem>
 <TabItem title="Windows" group-key="windows">
-<code-block code="gradlew.bat :embedded-server:buildFatJar"/>
+<code-block code="gradlew.bat :embedded-server:buildFatJar"></code-block>
 </TabItem>
 </Tabs>
 

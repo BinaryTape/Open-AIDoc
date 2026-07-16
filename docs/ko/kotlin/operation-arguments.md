@@ -21,7 +21,7 @@ class MultiMap<K, V> {
         }
     }
 
-    fun get(key: K): List<V> = map[key] ?: emptyList()
+    fun get(key: K): `List<V>` = map[key] ?: emptyList()
 }
 ```
 
@@ -57,7 +57,7 @@ class MultiMap<K, V> {
            }
        }
 
-       fun get(key: K): List<V> = map[key] ?: emptyList()
+       fun get(key: K): `List<V>` = map[key] ?: emptyList()
    }
    
    @Param(name = "key", gen = IntGen::class, conf = "1:2")

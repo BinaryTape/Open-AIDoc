@@ -139,7 +139,7 @@ val result = buildList {
 val result = buildList {
     val x = get(0)
     val y: String = x
-} // result 推論出 List<String> 型別
+} // result 推論出 `List<String>` 型別
 ```
 
 在延遲型別變數被指派給 `String` 型別的變數後，產生器型別推論會獲得 `x` 是 `String` 的子型別的資訊。此指派是產生器 Lambda 中的最後一個陳述式，因此產生器型別推論分析結束，並將型別引數 `E` 推論為 `String`。
@@ -154,14 +154,14 @@ val result = buildList {
   val result = buildList {
       // 根據傳遞的 "value" 引數，型別引數被推論為 String
       add("value")
-  } // result 推論出 List<String> 型別
+  } // result 推論出 `List<String>` 型別
   ```
 * 為傳回型別參數型別的呼叫指定預期型別
   ```kotlin
   val result = buildList {
       // 根據預期型別，型別引數被推論為 Float
       val x: Float = get(0)
-  } // result 具有 List<Float> 型別
+  } // result 具有 `List<Float>` 型別
   ```
   ```kotlin
   class Foo<T> {
@@ -172,7 +172,7 @@ val result = buildList {
 
   fun main() {
       val result = myBuilder {
-          val x: List<CharSequence> = items
+          val x: `List<CharSequence>` = items
           // ...
       } // result 具有 Foo<CharSequence> 型別
   }
@@ -189,17 +189,17 @@ val result = buildList {
       val result1 = buildList {
           val x = get(0)
           takeMyLong(x)
-      } // result1 具有 List<Long> 型別
+      } // result1 具有 `List<Long>` 型別
 
       val result2 = buildList {
           val x = get(0)
           val isLong = x.isMoreThat3()
       // ...
-      } // result2 具有 List<String> 型別
+      } // result2 具有 `List<String>` 型別
   
       val result3 = buildList {
           takeListOfStrings(this)
-      } // result3 具有 List<String> 型別
+      } // result3 具有 `List<String>` 型別
   }
   ```
 * 取得 Lambda 接收者成員的可呼叫參照
@@ -207,7 +207,7 @@ val result = buildList {
   fun main() {
       val result = buildList {
           val x: KFunction1<Int, Float> = ::get
-      } // result 具有 List<Float> 型別
+      } // result 具有 `List<Float>` 型別
   }
   ```
   ```kotlin
@@ -216,7 +216,7 @@ val result = buildList {
   fun main() {
       val result = buildList {
           takeFunction(::get)
-      } // result 具有 List<Float> 型別
+      } // result 具有 `List<Float>` 型別
   }
   ```
 
@@ -229,7 +229,7 @@ val result = buildList { // 推論延遲型別變數 E
     // 考慮 E 為 Int 或 Int 的父型別
     add(1)
     // E 被推論為 Int
-} // result 具有 List<Int> 型別
+} // result 具有 `List<Int>` 型別
 ```
 
 結果型別是與分析期間收集的型別資訊相對應的最具體型別。如果給定的型別資訊互相矛盾且無法合併，編譯器將回報錯誤。

@@ -179,7 +179,7 @@ fun main(args: Array<String>) {
    </def>
    <def title="프로그램 진입점 – main()">
       <p><a href="basic-syntax.md#program-entry-point"><code>main()</code></a> 함수는 애플리케이션의 진입점입니다.</p>
-      <p>이 함수는 <code>DemoApplication</code> 클래스 외부의 <a href="functions.md#function-scope">최상위 함수(top-level function)</a>로 선언되었습니다. <code>main()</code> 함수는 Spring의 <code>runApplication(*args)</code> 함수를 호출하여 Spring Framework로 애플리케이션을 시작합니다.</p>
+      <p>이 함수는 <code>DemoApplication</code> 클래스 외부의 <a href="functions.md#function-scope">최상위 함수(top-level function)</a>로 선언되었습니다. <code>main()</code> 함수는 Spring의 `runApplication(*args)` 함수를 호출하여 Spring Framework로 애플리케이션을 시작합니다.</p>
    </def>
    <def title="가변 인자 – args: Array&lt;String&gt;">
       <p><code>runApplication()</code> 함수의 선언을 확인해 보면, 함수의 파라미터가 <a href="functions.md#variable-number-of-arguments-varargs"><code>vararg</code> 변경자</a>로 표시된 것을 볼 수 있습니다: <code>vararg args: String</code>.

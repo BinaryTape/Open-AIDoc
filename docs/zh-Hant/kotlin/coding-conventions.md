@@ -690,7 +690,7 @@ fun main() {
 #### when 項目 {initial-collapse-state="collapsed" collapsible="true"}
 
 ```kotlin
-fun isReferenceApplicable(myReference: KClass<*>) = when (myReference) {
+fun isReferenceApplicable(myReference: `KClass<*>`) = when (myReference) {
     Comparable::class,
     Iterable::class,
     String::class, // 尾隨逗號
@@ -824,7 +824,7 @@ println("$name has ${children.size} children")
 使用 [多錢符號字串插值](strings.md#multi-dollar-string-interpolation) 將錢符號字元視為字串常值：
 
 ```kotlin
-val KClass<*>.jsonSchema : String
+val `KClass<*>`.jsonSchema : String
     get() = $"""
         {
             "$schema": "https://json-schema.org/draft/2020-12/schema",

@@ -254,15 +254,15 @@ JavaScript の `JsArray<T>` を Kotlin のネイティブな `Array` または `
 ジェネリック型間の変換例は以下の通りです：
 
 ```kotlin
-val list: List<JsString> =
+val list: `List<JsString>` =
     listOf("Kotlin", "Wasm").map { it.toJsString() }
 
 // .toJsArray() を使用して List または Array を JsArray に変換する
 val jsArray: JsArray<JsString> = list.toJsArray()
 
 // .toArray() および .toList() を使用して Kotlin 型に戻す 
-val kotlinArray: Array<JsString> = jsArray.toArray()
-val kotlinList: List<JsString> = jsArray.toList()
+val kotlinArray: `Array<JsString>` = jsArray.toArray()
+val kotlinList: `List<JsString>` = jsArray.toList()
 ```
 
 型付き配列を対応する Kotlin の配列（例：`IntArray` と `Int32Array`）に変換するための同様のアダプター関数も用意されています。詳細な情報と実装については、[`kotlinx-browser` リポジトリ](https://github.com/Kotlin/kotlinx-browser/blob/dfbdceed314567983c98f1d66e8c2e10d99c5a55/src/wasmJsMain/kotlin/arrayCopy.kt) を参照してください。

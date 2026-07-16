@@ -130,10 +130,10 @@ Azure Web App Deploy 플러그인에서 사용하는 인증 방식은 Azure CLI�
 
 <Tabs group="os">
 <TabItem title="Linux/macOS" group-key="unix">
-<code-block code="./gradlew :embedded-server:azureWebAppDeploy"/>
+<code-block code="./gradlew :embedded-server:azureWebAppDeploy"></code-block>
 </TabItem>
 <TabItem title="Windows" group-key="windows">
-<code-block code="gradlew.bat :embedded-server:azureWebAppDeploy"/>
+<code-block code="gradlew.bat :embedded-server:azureWebAppDeploy"></code-block>
 </TabItem>
 </Tabs>
 
@@ -163,10 +163,10 @@ Azure App Service에 기존 Java 웹 앱이 이미 있는 경우, 먼저 [Ktor �
 
 <Tabs group="os">
 <TabItem title="Linux/macOS" group-key="unix">
-<code-block code="./gradlew :embedded-server:buildFatJar"/>
+<code-block code="./gradlew :embedded-server:buildFatJar"></code-block>
 </TabItem>
 <TabItem title="Windows" group-key="windows">
-<code-block code="gradlew.bat :embedded-server:buildFatJar"/>
+<code-block code="gradlew.bat :embedded-server:buildFatJar"></code-block>
 </TabItem>
 </Tabs>
 

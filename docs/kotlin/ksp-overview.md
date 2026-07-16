@@ -39,7 +39,7 @@ KSP API 以符合 Kotlin 习惯的方式处理 Kotlin 程序。KSP 能够理解 
 KSFile
   packageName: KSName
   fileName: String
-  annotations: List<KSAnnotation>  (文件注解)
+  annotations: `List<KSAnnotation>`  (文件注解)
   declarations: List<KSDeclaration>
     KSClassDeclaration // 类、接口、对象
       simpleName: KSName
@@ -94,7 +94,7 @@ interface SymbolProcessorProvider {
 
 ```kotlin
 interface SymbolProcessor {
-    fun process(resolver: Resolver): List<KSAnnotated> // 让我们关注这里
+    fun process(resolver: Resolver): `List<KSAnnotated>` // 让我们关注这里
     fun finish() {}
     fun onError() {}
 }

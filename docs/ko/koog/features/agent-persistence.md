@@ -444,7 +444,7 @@ Koog Persistence를 사용하면 `Persistence` 기능 설정에 `RollbackToolReg
     -->
     ```kotlin
     class MyCustomStorageProvider<MyFilterType> : PersistenceStorageProvider<MyFilterType> {
-        override suspend fun getCheckpoints(sessionId: String, filter: MyFilterType?): List<AgentCheckpointData> {
+        override suspend fun getCheckpoints(sessionId: String, filter: MyFilterType?): `List<AgentCheckpointData>` {
             TODO("아직 구현되지 않음")
         }
 
@@ -502,7 +502,7 @@ Koog Persistence를 사용하면 `Persistence` 기능 설정에 `RollbackToolReg
     import ai.koog.prompt.executor.llms.all.simpleOllamaAIExecutor
     import ai.koog.prompt.executor.ollama.client.OllamaModels
     class MyCustomStorageProvider<MyFilterType> : PersistenceStorageProvider<MyFilterType> {
-        override suspend fun getCheckpoints(sessionId: String, filter: MyFilterType?): List<AgentCheckpointData> {
+        override suspend fun getCheckpoints(sessionId: String, filter: MyFilterType?): `List<AgentCheckpointData>` {
             TODO("아직 구현되지 않음")
         }
         override suspend fun saveCheckpoint(sessionId: String, agentCheckpointData: AgentCheckpointData) {

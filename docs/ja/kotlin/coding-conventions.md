@@ -688,7 +688,7 @@ fun main() {
 #### whenのエントリ {initial-collapse-state="collapsed" collapsible="true"}
 
 ```kotlin
-fun isReferenceApplicable(myReference: KClass<*>) = when (myReference) {
+fun isReferenceApplicable(myReference: `KClass<*>`) = when (myReference) {
     Comparable::class,
     Iterable::class,
     String::class, // 末尾のカンマ
@@ -822,7 +822,7 @@ println("$name has ${children.size} children")
 ドル記号 `$` を文字列リテラルとして扱うには、[マルチドル文字列補間（multi-dollar string interpolation）](strings.md#multi-dollar-string-interpolation) を使用してください。
 
 ```kotlin
-val KClass<*>.jsonSchema : String
+val `KClass<*>`.jsonSchema : String
     get() = $"""
         {
             "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -852,7 +852,7 @@ fun validateValue(actualValue: String, allowedValues: Set<String>) { ... }
 // 悪い例：arrayListOf() は可変コレクション型である ArrayList<T> を返す
 val allowedValues = arrayListOf("a", "b", "c")
 
-// 良い例：listOf() は List<T> を返す
+// 良い例：listOf() は `List<T>` を返す
 val allowedValues = listOf("a", "b", "c")
 ```
 

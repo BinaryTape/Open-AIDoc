@@ -285,7 +285,7 @@ import ai.koog.agents.snapshot.providers.PersistenceStorageProvider
 -->
 ```kotlin
 class MyCustomStorageProvider<MyFilterType> : PersistenceStorageProvider<MyFilterType> {
-    override suspend fun getCheckpoints(sessionId: String, filter: MyFilterType?): List<AgentCheckpointData> {
+    override suspend fun getCheckpoints(sessionId: String, filter: MyFilterType?): `List<AgentCheckpointData>` {
         TODO("未実装")
     }
 
@@ -313,7 +313,7 @@ import ai.koog.prompt.executor.llms.all.simpleOllamaAIExecutor
 import ai.koog.prompt.executor.ollama.client.OllamaModels
 
 class MyCustomStorageProvider<MyFilterType> : PersistenceStorageProvider<MyFilterType> {
-    override suspend fun getCheckpoints(sessionId: String, filter: MyFilterType?): List<AgentCheckpointData> {
+    override suspend fun getCheckpoints(sessionId: String, filter: MyFilterType?): `List<AgentCheckpointData>` {
         TODO("未実装")
     }
 

@@ -10,7 +10,7 @@
 在 Kotlin 中可以使用 [集合][collections] 來表示多個值。例如，我們可以有一個 `simple` 函式，它傳回一個包含三個數字的 [List]，然後使用 [forEach] 將它們全部列印出來：
 
 ```kotlin
-fun simple(): List<Int> = listOf(1, 2, 3)
+fun simple(): `List<Int>` = listOf(1, 2, 3)
  
 fun main() {
     simple().forEach { value -> println(value) } 
@@ -70,7 +70,7 @@ fun main() {
 import kotlinx.coroutines.*                 
                            
 //sampleStart
-suspend fun simple(): List<Int> {
+suspend fun simple(): `List<Int>` {
     delay(1000) // 模擬我們正在這裡執行某些非同步操作
     return listOf(1, 2, 3)
 }

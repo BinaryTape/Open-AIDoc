@@ -164,8 +164,8 @@ Langfuse 익스포터는 Koog의 일반 OpenTelemetry 연동과 동일한 활동
 캡처되는 스팬의 전체 목록과 LLM 프롬프트 및 응답 내용을 포함하는 방법은 [트레이스 대상](index.md#what-gets-traced)을 참조하세요.
 
 Langfuse에서 시각화하면 트레이스는 다음과 같이 나타납니다:
-![Langfuse traces](../../img/opentelemetry-langfuse-exporter-light.png#only-light)
-![Langfuse traces](../../img/opentelemetry-langfuse-exporter-dark.png#only-dark)
+![Langfuse traces](/koog/opentelemetry-langfuse-exporter-light.png#only-light)
+![Langfuse traces](/koog/opentelemetry-langfuse-exporter-dark.png#only-dark)
 
 Langfuse OpenTelemetry 트레이싱에 대한 자세한 내용은 다음을 참조하세요:  
 [Langfuse OpenTelemetry 문서](https://langfuse.com/integrations/native/opentelemetry#opentelemetry-endpoint).

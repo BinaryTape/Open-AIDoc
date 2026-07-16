@@ -148,7 +148,7 @@ fun main() {
 fun main() {
 //sampleStart 
     val sourceList = mutableListOf(1, 2, 3)
-    val referenceList: List<Int> = sourceList
+    val referenceList: `List<Int>` = sourceList
     //referenceList.add(4)            // 컴파일 에러
     sourceList.add(4)
     println(referenceList) // sourceList의 현재 상태를 보여줌

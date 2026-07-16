@@ -280,7 +280,7 @@ Kotlin 1.7.20 对 [构造器类型推断的使用](using-builders-with-builder-i
     fun <T: Any> buildList(
         first: MutableList<T>.() -> Unit, 
         second: MutableList<T>.() -> Unit
-    ): List<T> {
+    ): `List<T>` {
         val list = mutableListOf<T>()
         list.first()
         list.second()

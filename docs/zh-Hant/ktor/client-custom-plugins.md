@@ -303,7 +303,7 @@
 例如，如果一個請求導致了重新導向，<code>onRequest</code> 處理常式將僅針對原始請求執行，而 <code>on(SendingRequest)</code> 將針對原始請求和重新導向的請求都執行。
 同樣地，如果您使用 <code>on(Send)</code> 啟動了額外請求，處理常式的順序將如下：
 </p>
-<code-block lang="Console" code="--&gt; onRequest&#10;--&gt; on(Send)&#10;--&gt; on(SendingRequest)&#10;&lt;-- onResponse&#10;--&gt; on(SendingRequest)&#10;&lt;-- onResponse"/>
+<code-block lang="Console" code="--&gt; onRequest&#10;--&gt; on(Send)&#10;--&gt; on(SendingRequest)&#10;&lt;-- onResponse&#10;--&gt; on(SendingRequest)&#10;&lt;-- onResponse"></code-block>
 <p>
 <emphasis>
 範例：<a href="#example-log-headers">記錄標頭</a>、<a href="#example-response-time">回應時間</a>

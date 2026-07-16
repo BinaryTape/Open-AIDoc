@@ -469,5 +469,5 @@ class MyService(private val repo: UserRepository)
 ## 下一步
 
 - **[作用域](/docs/reference/koin-core/scopes)** - 管理依赖项生命周期
-- **[Android 版 Koin](/docs/integrations/android/index)** - Android 特定的注入
-- **[Compose 版 Koin](/docs/integrations/compose/index)** - Compose 注入
+- **[Android 版 Koin](/docs/reference/koin-android/start)** - Android 特定的注入
+- **[Compose 版 Koin](/docs/reference/koin-compose/compose)** - Compose 注入

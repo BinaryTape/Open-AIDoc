@@ -432,7 +432,7 @@ interface A {
     @NotNullApi // 重写来自接口的默认设置
     String bar(String x, @Nullable String y); // fun bar(x: String, y: String?): String
 
-    // List<String> 类型实参被视为可空，因为 `@NullableApi`
+    // `List<String>` 类型实参被视为可空，因为 `@NullableApi`
     // 具有 `TYPE_USE` 元素类型：
     String baz(List<String> x); // fun baz(List<String?>?): String?
 

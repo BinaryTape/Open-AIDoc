@@ -510,8 +510,8 @@ install(Sessions) {
 要迁移您的应用程序，请确保您的代码未引用旧类，并使用最新的 Ktor 版本进行编译。以下是更新异常检查的方法：
 
 <compare type="top-bottom" first-title="2.x.x" second-title="3.0.x">
-    <code-block lang="kotlin" code="    if (exception is io.ktor.client.network.sockets.SocketTimeoutException) { ... }"/>
-    <code-block lang="kotlin" code="    if (exception is java.net.SocketTimeoutException) { ... }"/>
+    <code-block lang="kotlin" code="    if (exception is io.ktor.client.network.sockets.SocketTimeoutException) { ... }"></code-block>
+    <code-block lang="kotlin" code="    if (exception is java.net.SocketTimeoutException) { ... }"></code-block>
 </compare>
 
 ## 共享模块

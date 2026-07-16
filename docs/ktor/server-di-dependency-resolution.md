@@ -190,7 +190,7 @@ dependencies {
 }
 
 // 由于支持类型形参协变，这将可以工作
-val stringList: List<CharSequence> by dependencies
+val stringList: `List<CharSequence>` by dependencies
 // 这也可以工作
 val stringCollection: Collection<CharSequence> by dependencies
 ```

@@ -370,7 +370,7 @@ SQLDelight 提供了 SQLite 驱动程序的多个平台特定实现，因此您�
     internal class Database(databaseDriverFactory: DatabaseDriverFactory) {
         // ...
     
-        internal fun getAllLaunches(): List<RocketLaunch> {
+        internal fun getAllLaunches(): `List<RocketLaunch>` {
             return dbQuery.selectAllLaunchesInfo(::mapLaunchSelecting).executeAsList()
         }
     
@@ -473,7 +473,7 @@ SQLDelight 提供了 SQLite 驱动程序的多个平台特定实现，因此您�
     class SpaceXApi {
         // ...
         
-        suspend fun getAllLaunches(): List<RocketLaunch> {
+        suspend fun getAllLaunches(): `List<RocketLaunch>` {
             return httpClient.get("https://api.spacexdata.com/v5/launches").body()
         }
     }
@@ -516,7 +516,7 @@ SQLDelight 提供了 SQLite 驱动程序的多个平台特定实现，因此您�
         // ...
    
         @Throws(Exception::class)
-        suspend fun getLaunches(forceReload: Boolean): List<RocketLaunch> {
+        suspend fun getLaunches(forceReload: Boolean): `List<RocketLaunch>` {
             val cachedLaunches = database.getAllLaunches()
             return if (cachedLaunches.isNotEmpty() && !forceReload) {
                 cachedLaunches
@@ -664,7 +664,7 @@ Koin SQL 注入允许您声明可在不同上下文中使用的模块（组件�
     
    data class RocketLaunchScreenState(
        val isLoading: Boolean = false,
-       val launches: List<RocketLaunch> = emptyList()
+       val launches: `List<RocketLaunch>` = emptyList()
    )
    ```
 
@@ -942,7 +942,7 @@ IntelliJ IDEA 会生成一个已连接到共享模块的 iOS 项目。Kotlin 模
     class KoinHelper : KoinComponent {
         private val sdk: SpaceXSDK by inject<SpaceXSDK>()
 
-        suspend fun getLaunches(forceReload: Boolean): List<RocketLaunch> {
+        suspend fun getLaunches(forceReload: Boolean): `List<RocketLaunch>` {
             return sdk.getLaunches(forceReload = forceReload)
         }
     }

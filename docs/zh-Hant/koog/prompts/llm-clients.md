@@ -97,7 +97,7 @@ LLM 用戶端旨在與 LLM 供應商進行直接互動。
         .build();
 
     // 執行 prompt
-    List<Message.Response> response = client.execute(prompt, OpenAIModels.Chat.GPT4o, Collections.emptyList());
+    `List<Message.Response>` response = client.execute(prompt, OpenAIModels.Chat.GPT4o, Collections.emptyList());
     // 印出回應
     System.out.println(response);
 
@@ -283,14 +283,14 @@ Tool call: " + toolCall.getName());
         .build()
         .withParams(params);
 
-    // LLMChoice 是 List<Message.Response> 的型別別名
+    // LLMChoice 是 `List<Message.Response>` 的型別別名
     List<List<Message.Response>> choices = client.executeMultipleChoices(
         prompt, 
         OpenAIModels.Chat.GPT4o
     );
 
     for (int i = 0; i < choices.size(); i++) {
-        List<Message.Response> choice = choices.get(i);
+        `List<Message.Response>` choice = choices.get(i);
         StringBuilder text = new StringBuilder();
         for (Message.Response msg : choice) {
             text.append(msg.getContent()).append(" ");
@@ -321,7 +321,7 @@ Tool call: " + toolCall.getName());
         val apiKey = System.getenv("OPENAI_API_KEY")
         val client = OpenAILLMClient(apiKey)
 
-        val models: List<LLModel> = client.models()
+        val models: `List<LLModel>` = client.models()
         models.forEach { println(it.id) }
     }
     ```
@@ -339,7 +339,7 @@ Tool call: " + toolCall.getName());
     String apiKey = System.getenv("OPENAI_API_KEY");
     OpenAILLMClient client = new OpenAILLMClient(apiKey);
 
-    List<LLModel> models = client.models();
+    `List<LLModel>` models = client.models();
     for (LLModel model : models) {
         System.out.println(model.getId());
     }

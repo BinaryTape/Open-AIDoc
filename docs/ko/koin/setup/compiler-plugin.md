@@ -15,7 +15,7 @@ Koin 컴파일러 플러그인은 다음과 같은 기능을 제공하는 **네�
 - DSL 및 어노테이션(Annotations) 모두와 함께 작동
 - 별도의 가시적인 파일을 생성하지 않음
 
-기능과 장점에 대한 자세한 내용은 [Koin 컴파일러 플러그인 소개](/docs/intro/koin-compiler-plugin)를 참조하세요.
+기능과 장점에 대한 자세한 내용은 [Koin 컴파일러 플러그인 소개](/docs/setup/compiler-plugin)를 참조하세요.
 
 ## 요구 사항
 
@@ -351,7 +351,7 @@ import org.koin.dsl.*
 2. 임포트를 `org.koin.plugin.module.dsl.*`로 업데이트합니다.
 3. `single { Class(get() ...) }` 또는 `singleOf(::Class)`를 `single<Class>()`로 교체합니다.
 
-[DSL에서 컴파일러 플러그인으로 마이그레이션하기](/docs/migration/from-dsl-to-compiler-plugin)를 참조하세요.
+[DSL에서 컴파일러 플러그인으로 마이그레이션하기](/docs/migration/from-ksp-to-compiler-plugin)를 참조하세요.
 
 ### KSP 어노테이션에서 마이그레이션
 
@@ -364,6 +364,6 @@ import org.koin.dsl.*
 
 ## 다음 단계
 
-- **[DSL 레퍼런스](/docs/reference/dsl-reference)** - 전체 DSL 문서
-- **[어노테이션 레퍼런스](/docs/reference/annotations-reference)** - 전체 어노테이션 문서
+- **[DSL 레퍼런스](/docs/reference/koin-core/modules)** - 전체 DSL 문서
+- **[어노테이션 레퍼런스](/docs/reference/koin-annotations/modules)** - 전체 어노테이션 문서
 - **[Koin 시작하기](/docs/reference/koin-core/starting-koin)** - 애플리케이션 구성하기

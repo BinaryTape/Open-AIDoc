@@ -270,7 +270,7 @@ fun main() {
 모든 요소가 1씩 증가된 정수 리스트의 복사본을 만드는 함수를 작성하세요. `List<Int>`를 `incremented` 함수로 확장하는 제공된 함수 스켈레톤을 사용하세요.
 
 ```kotlin
-fun List<Int>.incremented(): List<Int> {
+fun List<Int>.incremented(): `List<Int>` {
     val originalList = this
     return buildList {
         // 여기에 코드를 작성하세요
@@ -288,7 +288,7 @@ fun main() {
 
 |---|---|
 ```kotlin
-fun List<Int>.incremented(): List<Int> {
+fun List<Int>.incremented(): `List<Int>` {
     val originalList = this
     return buildList {
         for (n in originalList) add(n + 1)

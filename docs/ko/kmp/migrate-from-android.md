@@ -76,7 +76,7 @@ Jetcaster의 경우, 해당 라이브러리 목록은 다음과 같았습니다.
   Koin은 신뢰할 수 있는 멀티플랫폼 DI 프레임워크입니다. Koin이 요구 사항을 충족하지 못하거나 코드 재작성 범위가 너무 넓다면 다른 솔루션도 있습니다.
   [Metro](https://zacsweers.github.io/metro/latest/) 프레임워크도 멀티플랫폼을 지원합니다.
   Metro는 Dagger 및 Kotlin Inject를 포함한 [다른 어노테이션과의 상호 운용성](https://zacsweers.github.io/metro/latest/interop/)을 지원하여 마이그레이션을 용이하게 할 수 있습니다.
-* 이미지 로딩 라이브러리인 Coil 2 ([버전 3에서 멀티플랫폼이 됨](https://coil-kt.github.io/coil/upgrading_to_coil3/)).
+* 이미지 로딩 라이브러리인 Coil 2 ([버전 3에서 멀티플랫폼이 됨](/coil/migrating_to_coil3/)).
 * RSS 프레임워크인 ROME (멀티플랫폼용 [RSS Parser](https://github.com/prof18/RSS-Parser)로 교체됨).
 * 테스트 프레임워크인 JUnit ([kotlin-test](https://kotlinlang.org/api/core/kotlin-test/)로 교체됨).
 

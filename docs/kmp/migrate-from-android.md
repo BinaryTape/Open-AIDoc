@@ -89,7 +89,7 @@ Compose Multiplatform 框架适配到跨平台应用中。
   过于广泛，还有其他解决方案。
   [Metro](https://zacsweers.github.io/metro/latest/) 框架也是多平台的。
   它可以通过支持[与其他注解的互操作](https://zacsweers.github.io/metro/latest/interop/)（包括 Dagger 和 Kotlin Inject）来帮助简化迁移。
-* Coil 2，一个图像加载库（在 [第 3 版中已变为多平台](https://coil-kt.github.io/coil/upgrading_to_coil3/)）。
+* Coil 2，一个图像加载库（在 [第 3 版中已变为多平台](/coil/migrating_to_coil3/)）。
 * ROME，一个 RSS 框架（替换为多平台的 [RSS Parser](https://github.com/prof18/RSS-Parser)）。
 * JUnit，一个测试框架（替换为 [kotlin-test](https://kotlinlang.org/api/core/kotlin-test/)）。
 

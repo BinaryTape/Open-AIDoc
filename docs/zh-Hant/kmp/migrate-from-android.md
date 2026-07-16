@@ -73,7 +73,7 @@
 
   Koin 是一個可靠的多平台 DI 架構。如果它不符合您的需求或所需的重寫工作量太大，還有其他解決方案。
   [Metro](https://zacsweers.github.io/metro/latest/) 架構也是多平台的。它透過支援[與其他註解的互通性](https://zacsweers.github.io/metro/latest/interop/)（包括 Dagger 與 Kotlin Inject）來協助減輕遷移負擔。
-* Coil 2：一個圖片載入程式庫（在[第 3 版中變為多平台](https://coil-kt.github.io/coil/upgrading_to_coil3/)）。
+* Coil 2：一個圖片載入程式庫（在[第 3 版中變為多平台](/coil/migrating_to_coil3/)）。
 * ROME：一個 RSS 架構（替換為多平台的 [RSS Parser](https://github.com/prof18/RSS-Parser)）。
 * JUnit：一個測試架構（替換為 [kotlin-test](https://kotlinlang.org/api/core/kotlin-test/)）。
 

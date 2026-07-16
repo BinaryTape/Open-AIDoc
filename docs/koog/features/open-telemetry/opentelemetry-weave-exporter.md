@@ -122,8 +122,8 @@ Weave 导出器捕获的内容与 Koog 的通用 OpenTelemetry 集成相同。
 有关捕获的 span 的完整列表以及如何包含 LLM 提示词和响应内容，请参阅[跟踪的内容](index.md#what-gets-traced)。
 
 在 W&B Weave 中进行可视化时，跟踪显示如下：
-![W&B Weave 跟踪](../../img/opentelemetry-weave-exporter-light.png#only-light)
-![W&B Weave 跟踪](../../img/opentelemetry-weave-exporter-dark.png#only-dark)
+![W&B Weave 跟踪](/koog/opentelemetry-weave-exporter-light.png#only-light)
+![W&B Weave 跟踪](/koog/opentelemetry-weave-exporter-dark.png#only-dark)
 
 有关更多详细信息，请参阅官方 [Weave OpenTelemetry 文档](https://weave-docs.wandb.ai/guides/tracking/otel/)。
 

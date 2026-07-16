@@ -437,7 +437,7 @@ interface A {
     String bar(String x, @Nullable String y); // fun bar(x: String, y: String?): String
 
     // `@NullableApi` が `TYPE_USE` 要素型を持っているため、
-    // List<String> 型引数は Null許容とみなされる：
+    // `List<String>` 型引数は Null許容とみなされる：
     String baz(List<String> x); // fun baz(List<String?>?): String?
 
     // 明示的な UNKNOWN マークの Null許容性アノテーションがあるため、

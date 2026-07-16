@@ -130,10 +130,10 @@ Azure Web App Deploy 外掛程式使用的身分驗證方法是透過 Azure CLI�
 
 <Tabs group="os">
 <TabItem title="Linux/macOS" group-key="unix">
-<code-block code="./gradlew :embedded-server:azureWebAppDeploy"/>
+<code-block code="./gradlew :embedded-server:azureWebAppDeploy"></code-block>
 </TabItem>
 <TabItem title="Windows" group-key="windows">
-<code-block code="gradlew.bat :embedded-server:azureWebAppDeploy"/>
+<code-block code="gradlew.bat :embedded-server:azureWebAppDeploy"></code-block>
 </TabItem>
 </Tabs>
 
@@ -163,10 +163,10 @@ Application url: https://your-webapp-name.azurewebsites.net
 
 <Tabs group="os">
 <TabItem title="Linux/macOS" group-key="unix">
-<code-block code="./gradlew :embedded-server:buildFatJar"/>
+<code-block code="./gradlew :embedded-server:buildFatJar"></code-block>
 </TabItem>
 <TabItem title="Windows" group-key="windows">
-<code-block code="gradlew.bat :embedded-server:buildFatJar"/>
+<code-block code="gradlew.bat :embedded-server:buildFatJar"></code-block>
 </TabItem>
 </Tabs>
 

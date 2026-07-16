@@ -147,7 +147,7 @@ Kotlin 中的字符串插值使用单个美元符号。
 以下是使用多美元符插值生成带占位符的 JSON 架构多行字符串的示例：
 
 ```kotlin
-val KClass<*>.jsonSchema : String
+val `KClass<*>`.jsonSchema : String
     get() = $$"""
     {
       "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -927,15 +927,15 @@ Binaryen 选项现在被认为对于所有 Kotlin/Wasm 项目都是安全的，�
 以下是泛型类型之间转换的示例：Kotlin `List<T>` 和 `Array<T>` 转换为 JavaScript `JsArray<T>`。
 
 ```kotlin
-val list: List<JsString> =
+val list: `List<JsString>` =
     listOf("Kotlin", "Wasm").map { it.toJsString() }
 
 // 使用 .toJsArray() 将 List 或 Array 转换为 JsArray
 val jsArray: JsArray<JsString> = list.toJsArray()
 
 // 使用 .toArray() 和 .toList() 将其转换回 Kotlin 类型 
-val kotlinArray: Array<JsString> = jsArray.toArray()
-val kotlinList: List<JsString> = jsArray.toList()
+val kotlinArray: `Array<JsString>` = jsArray.toArray()
+val kotlinList: `List<JsString>` = jsArray.toList()
 ```
 
 类似的转换方法也适用于将类型化数组转换为其 Kotlin 等效项

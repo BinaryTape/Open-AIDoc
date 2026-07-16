@@ -511,8 +511,8 @@ install(Sessions) {
 若要遷移您的應用程式，請確保您的程式碼未引用舊類別，並且使用最新的 Ktor 版本進行編譯。以下是更新例外檢查的方法：
 
 <compare type="top-bottom" first-title="2.x.x" second-title="3.0.x">
-    <code-block lang="kotlin" code="    if (exception is io.ktor.client.network.sockets.SocketTimeoutException) { ... }"/>
-    <code-block lang="kotlin" code="    if (exception is java.net.SocketTimeoutException) { ... }"/>
+    <code-block lang="kotlin" code="    if (exception is io.ktor.client.network.sockets.SocketTimeoutException) { ... }"></code-block>
+    <code-block lang="kotlin" code="    if (exception is java.net.SocketTimeoutException) { ... }"></code-block>
 </compare>
 
 ## 共用模組 (Shared modules)

@@ -918,7 +918,7 @@ Kotlin 2.0.0 为 Kotlin/JS 项目输出引入了一个新的粒度选项。您�
 @JsExport
 data class User(
     val name: String,
-    val friends: List<User> = emptyList()
+    val friends: `List<User>` = emptyList()
 )
 
 @JsExport

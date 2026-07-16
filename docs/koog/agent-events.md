@@ -217,14 +217,14 @@ Koog 提供了可在自定义消息处理器中使用的预定义事件类型。
 | `runId`         | String              | 是      |         | LLM 运行的唯一标识符。 |
 | `prompt`        | Prompt              | 是      |         | 发送给模型的提示词。有关更多信息，请参阅 [Prompt](#prompt)。 |
 | `model`         | ModelInfo           | 是      |         | 模型信息。请参阅 [ModelInfo](#modelinfo)。 |
-| `tools`         | List<String>        | 是      |         | 模型可以调用的工具列表。 |
+| `tools`         | `List<String>`        | 是      |         | 模型可以调用的工具列表。 |
 
 <a id="prompt"></a>
 `Prompt` 类表示提示词的数据结构，由消息列表、唯一标识符和语言模型设置的可选形参组成。包含以下字段：
 
 | 名称 | 数据类型 | 必填 | 默认值 | 描述 |
 |------------|---------------------|----------|-------------|--------------------------------------------------------------|
-| `messages` | List<Message>       | 是      |             | 组成提示词的消息列表。 |
+| `messages` | `List<Message>`       | 是      |             | 组成提示词的消息列表。 |
 | `id`       | String              | 是      |             | 提示词的唯一标识符。 |
 | `params`   | LLMParams           | 否       | LLMParams() | 控制 LLM 生成内容方式的设置。 |
 
@@ -250,7 +250,7 @@ Koog 提供了可在自定义消息处理器中使用的预定义事件类型。
 | `runId`              | String                 | 是      |         | LLM 运行的唯一标识符。 |
 | `prompt`             | Prompt                 | 是      |         | 调用中使用的提示词。 |
 | `model`              | ModelInfo              | 是      |         | 模型信息。请参阅 [ModelInfo](#modelinfo)。 |
-| `responses`          | List<Message.Response> | 是      |         | 模型返回的一个或多个响应。 |
+| `responses`          | `List<Message.Response>` | 是      |         | 模型返回的一个或多个响应。 |
 | `moderationResponse` | ModerationResult       | 否       | null    | 审核响应（如果有）。 |
 
 ### LLM 流式传输事件
@@ -266,7 +266,7 @@ Koog 提供了可在自定义消息处理器中使用的预定义事件类型。
 | `runId`         | String              | 是      |         | LLM 运行的唯一标识符。 |
 | `prompt`        | Prompt              | 是      |         | 发送给模型的提示词。 |
 | `model`         | ModelInfo           | 是      |         | 模型信息。请参阅 [ModelInfo](#modelinfo)。 |
-| `tools`         | List<String>        | 是      |         | 模型可以调用的工具列表。 |
+| `tools`         | `List<String>`        | 是      |         | 模型可以调用的工具列表。 |
 
 #### LLMStreamingFrameReceivedEvent
 
@@ -305,7 +305,7 @@ Koog 提供了可在自定义消息处理器中使用的预定义事件类型。
 | `runId`         | String              | 是      |         | LLM 运行的唯一标识符。 |
 | `prompt`        | Prompt              | 是      |         | 发送给模型的提示词。 |
 | `model`         | ModelInfo           | 是      |         | 模型信息。请参阅 [ModelInfo](#modelinfo)。 |
-| `tools`         | List<String>        | 是      |         | 模型可以调用的工具列表。 |
+| `tools`         | `List<String>`        | 是      |         | 模型可以调用的工具列表。 |
 
 ### 工具执行事件
 

@@ -329,7 +329,7 @@ class FeatureManager : KoinComponent {
     private val api: ApiClient by inject()
     private val cache: Cache by inject()
 
-    suspend fun loadFeatures(): List<Feature> {
+    suspend fun loadFeatures(): `List<Feature>` {
         return cache.get() ?: api.fetchFeatures().also { cache.set(it) }
     }
 }

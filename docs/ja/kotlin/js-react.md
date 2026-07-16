@@ -732,12 +732,12 @@ Reactでは、stateは常に親から子へと流れます。そのため、子�
    ```kotlin
    val App = FC<Props> {
        var currentVideo: Video? by useState(null)
-       var unwatchedVideos: List<Video> by useState(listOf(
+       var unwatchedVideos: `List<Video>` by useState(listOf(
            Video(1, "Opening Keynote", "Andrey Breslav", "https://youtu.be/PsaFVLr8t4E"),
            Video(2, "Dissecting the stdlib", "Huyen Tue Dao", "https://youtu.be/Fzt_9I733Yg"),
            Video(3, "Kotlin and Spring Boot", "Nicolas Frankel", "https://youtu.be/pSiZVAeReeg")
        ))
-       var watchedVideos: List<Video> by useState(listOf(
+       var watchedVideos: `List<Video>` by useState(listOf(
            Video(4, "Creating Internal DSLs in Kotlin", "Venkat Subramaniam", "https://youtu.be/JzTeAM8N1-o")
        ))
 
@@ -1009,7 +1009,7 @@ suspend fun fetchVideo(id: Int): Video {
 1. `App.kt` に次の実装を追加します。
 
    ```kotlin
-   suspend fun fetchVideos(): List<Video> = coroutineScope {
+   suspend fun fetchVideos(): `List<Video>` = coroutineScope {
        (1..25).map { id ->
            async {
                fetchVideo(id)
@@ -1027,8 +1027,8 @@ suspend fun fetchVideo(id: Int): Video {
    
    val App = FC<Props> {
        var currentVideo: Video? by useState(null)
-       var unwatchedVideos: List<Video> by useState(emptyList())
-       var watchedVideos: List<Video> by useState(emptyList())
+       var unwatchedVideos: `List<Video>` by useState(emptyList())
+       var watchedVideos: `List<Video>` by useState(emptyList())
    
        useEffectOnce {
            mainScope.launch {

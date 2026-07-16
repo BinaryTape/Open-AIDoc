@@ -307,7 +307,7 @@
 类似地，如果您使用 <code>on(Send)</code> 发起了一个额外的请求，
 处理程序的排序将如下：
 </p>
-<code-block lang="Console" code="--&gt; onRequest&#10;--&gt; on(Send)&#10;--&gt; on(SendingRequest)&#10;&lt;-- onResponse&#10;--&gt; on(SendingRequest)&#10;&lt;-- onResponse"/>
+<code-block lang="Console" code="--&gt; onRequest&#10;--&gt; on(Send)&#10;--&gt; on(SendingRequest)&#10;&lt;-- onResponse&#10;--&gt; on(SendingRequest)&#10;&lt;-- onResponse"></code-block>
 <p>
 <emphasis>
 示例：<a href="#example-log-headers">记录标头</a>、<a href="#example-response-time">响应时间</a>

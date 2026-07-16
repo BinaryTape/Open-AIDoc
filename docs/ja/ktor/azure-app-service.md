@@ -130,10 +130,10 @@ Azure Web App Deploy プラグインで使用される認証方法には Azure C
 
 <Tabs group="os">
 <TabItem title="Linux/macOS" group-key="unix">
-<code-block code="./gradlew :embedded-server:azureWebAppDeploy"/>
+<code-block code="./gradlew :embedded-server:azureWebAppDeploy"></code-block>
 </TabItem>
 <TabItem title="Windows" group-key="windows">
-<code-block code="gradlew.bat :embedded-server:azureWebAppDeploy"/>
+<code-block code="gradlew.bat :embedded-server:azureWebAppDeploy"></code-block>
 </TabItem>
 </Tabs>
 
@@ -163,10 +163,10 @@ Azure App Service に既存の Java Web アプリがすでにある場合は、�
 
 <Tabs group="os">
 <TabItem title="Linux/macOS" group-key="unix">
-<code-block code="./gradlew :embedded-server:buildFatJar"/>
+<code-block code="./gradlew :embedded-server:buildFatJar"></code-block>
 </TabItem>
 <TabItem title="Windows" group-key="windows">
-<code-block code="gradlew.bat :embedded-server:buildFatJar"/>
+<code-block code="gradlew.bat :embedded-server:buildFatJar"></code-block>
 </TabItem>
 </Tabs>
 

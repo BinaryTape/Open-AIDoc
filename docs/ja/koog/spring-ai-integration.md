@@ -290,7 +290,7 @@ koog.spring.ai.embedding.dispatcher.type=AUTO
     @Service
     class MyEmbeddingService(private val embeddingProvider: LLMEmbeddingProvider) {
 
-        suspend fun getEmbedding(text: String): List<Double> {
+        suspend fun getEmbedding(text: String): `List<Double>` {
             return embeddingProvider.embed(
                 text,
                 OpenAIModels.Embeddings.TextEmbedding3Small
@@ -315,7 +315,7 @@ koog.spring.ai.embedding.dispatcher.type=AUTO
             this.embeddingProvider = embeddingProvider;
         }
 
-        public List<Double> getEmbedding(String text) {
+        public `List<Double>` getEmbedding(String text) {
             return embeddingProvider.embed(
                     text,
                     OpenAIModels.Embeddings.TextEmbedding3Small
@@ -569,7 +569,7 @@ koog.spring.ai.vectorstore.dispatcher.type=AUTO
         private val vectorStore: KoogVectorStore,
     ) {
 
-        suspend fun ingest(text: String): List<String> {
+        suspend fun ingest(text: String): `List<String>` {
             return vectorStore.add(
                 listOf(
                     DocumentWithMetadata(

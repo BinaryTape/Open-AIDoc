@@ -350,7 +350,7 @@ data class Person(val name: String)
 fun main() {
 //sampleStart
     // 声明一个包含可空字符串的列表
-    val listWithNulls: List<String?> = listOf("Kotlin", null)
+    val listWithNulls: `List<String?>` = listOf("Kotlin", null)
 
     // 遍历列表中的每一项
     for (item in listWithNulls) {
@@ -399,10 +399,10 @@ fun main() {
 fun main() {
 //sampleStart
     // 声明一个包含一些 null 和非空整数值的列表
-    val nullableList: List<Int?> = listOf(1, 2, null, 4)
+    val nullableList: `List<Int?>` = listOf(1, 2, null, 4)
 
     // 过滤掉 null 值，得到一个由非空整数组成的列表
-    val intList: List<Int> = nullableList.filterNotNull()
+    val intList: `List<Int>` = nullableList.filterNotNull()
   
     println(intList)
     // [1, 2, 4]

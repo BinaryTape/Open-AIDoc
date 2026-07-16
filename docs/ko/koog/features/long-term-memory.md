@@ -274,7 +274,7 @@ class MyVectorDbStorage : SearchStorage<TextDocument, SearchRequest>, WriteStora
 
     override suspend fun add(
         records: List<TextDocument>, namespace: String?
-    ): List<String> {
+    ): `List<String>` {
         // 벡터 DB에 데이터 삽입/업데이트(Upsert)하고 추가된 레코드의 ID를 반환합니다.
     }
 }

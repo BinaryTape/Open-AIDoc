@@ -20,7 +20,7 @@ Kotlin 컬렉션은 컬렉션에서 단일 요소를 조회하기 위한 일련�
 
 ```kotlin
 @GetMapping("/firstAndLast")
-fun firstAndLast(): List<Message> {
+fun firstAndLast(): `List<Message>` {
     val messages = service.findMessages()
     return listOf(messages.first(), messages.last())
 }
@@ -64,7 +64,7 @@ fun firstMessageOrNull(): Message {
 
 ```kotlin
 @GetMapping("/filterMessagesLongerThan10")
-fun filterMessagesLongerThan10(): List<Message> {
+fun filterMessagesLongerThan10(): `List<Message>` {
     val messages = service.findMessages()
     return messages.filter { it.text.length > 10 }
 }
@@ -84,7 +84,7 @@ Kotlin 표준 라이브러리는 자연 순서(natural order), 커스텀 순서,
 
 ```kotlin
 @GetMapping("/sortByLastLetter")
-fun sortByLastLetter(): List<Message> {
+fun sortByLastLetter(): `List<Message>` {
     val messages = service.findMessages()
     return messages.sortedBy { it.text.last() }
 }
@@ -125,7 +125,7 @@ fun groups(): Map<String, List<Message>> {
 
 ```kotlin
 @GetMapping("/transformMessagesToListOfStrings")
-fun transformMessagesToListOfStrings(): List<String> {
+fun transformMessagesToListOfStrings(): `List<String>` {
     val messages = service.findMessages()
     return messages.map { "${it.id} ${it.text}" }
 }

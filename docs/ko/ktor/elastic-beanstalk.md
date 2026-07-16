@@ -71,10 +71,10 @@ Fat JAR를 빌드하려면 터미널을 열고 [Ktor 플러그인](#configure-kt
 
 <Tabs group="os">
 <TabItem title="Linux/macOS" group-key="unix">
-<code-block code="./gradlew :aws-elastic-beanstalk:buildFatJar"/>
+<code-block code="./gradlew :aws-elastic-beanstalk:buildFatJar"></code-block>
 </TabItem>
 <TabItem title="Windows" group-key="windows">
-<code-block code="gradlew.bat :aws-elastic-beanstalk:buildFatJar"/>
+<code-block code="gradlew.bat :aws-elastic-beanstalk:buildFatJar"></code-block>
 </TabItem>
 </Tabs>
 

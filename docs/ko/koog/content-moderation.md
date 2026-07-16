@@ -351,7 +351,7 @@ Koog은 콘텐츠 검토를 위한 두 가지 주요 접근 방식, 즉 `LLMClie
          *
          * 검토된 콘텐츠에서 발견된 특정 유형의 위반 사항을 식별하는 데 사용됩니다.
          */
-        public val violatedCategories: List<ModerationCategory> = categories.filter { it.value.detected }.keys.toList()
+        public val violatedCategories: `List<ModerationCategory>` = categories.filter { it.value.detected }.keys.toList()
 
         /**
          * 콘텐츠 검토를 위해 제공된 입력 유형을 나타냅니다.

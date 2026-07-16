@@ -60,7 +60,7 @@ fun main() {
 fun main() {
 //sampleStart
     // 値 [null, null, null] を持つ配列を作成します
-    val nullArray: Array<Int?> = arrayOfNulls(3)
+    val nullArray: `Array<Int?>` = arrayOfNulls(3)
     println(nullArray.joinToString())
     // null, null, null
 //sampleEnd
@@ -80,7 +80,7 @@ fun main() {
 > ```Kotlin
 > var exampleArray = emptyArray<String>()
 > 
-> var exampleArray: Array<String> = emptyArray()
+> var exampleArray: `Array<String>` = emptyArray()
 >```
 >
 {style="note"}
@@ -90,12 +90,12 @@ fun main() {
 ```kotlin
 fun main() {
 //sampleStart
-    // ゼロ [0, 0, 0] で初期化される Array<Int> を作成します
+    // ゼロ [0, 0, 0] で初期化される `Array<Int>` を作成します
     val initArray = Array<Int>(3) { 0 }
     println(initArray.joinToString())
     // 0, 0, 0
 
-    // 値 ["0", "1", "4", "9", "16"] を持つ Array<String> を作成します
+    // 値 ["0", "1", "4", "9", "16"] を持つ `Array<String>` を作成します
     val asc = Array(5) { i -> (i * i).toString() }
     asc.forEach { print(it) }
     // 014916

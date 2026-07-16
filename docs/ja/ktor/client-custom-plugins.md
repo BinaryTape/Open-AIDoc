@@ -307,7 +307,7 @@ v2.2.0以降、Ktorはカスタムクライアント[プラグイン](client-plu
 たとえば、リクエストによってリダイレクトが発生した場合、<code>onRequest</code>ハンドラーは元のリクエストに対してのみ実行されますが、<code>on(SendingRequest)</code>は元のリクエストとリダイレクトされたリクエストの両方に対して実行されます。
 同様に、<code>on(Send)</code>を使用して追加のリクエストを開始した場合、ハンドラーは次のように順序付けられます。
 </p>
-<code-block lang="Console" code="--&gt; onRequest&#10;--&gt; on(Send)&#10;--&gt; on(SendingRequest)&#10;&lt;-- onResponse&#10;--&gt; on(SendingRequest)&#10;&lt;-- onResponse"/>
+<code-block lang="Console" code="--&gt; onRequest&#10;--&gt; on(Send)&#10;--&gt; on(SendingRequest)&#10;&lt;-- onResponse&#10;--&gt; on(SendingRequest)&#10;&lt;-- onResponse"></code-block>
 <p>
 <emphasis>
 例: <a href="#example-log-headers">ヘッダーのログ記録</a>、<a href="#example-response-time">レスポンス時間</a>

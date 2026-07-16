@@ -248,15 +248,15 @@ external class User : JsAny {
 以下是泛型型別之間轉換的範例：
 
 ```kotlin
-val list: List<JsString> =
+val list: `List<JsString>` =
     listOf("Kotlin", "Wasm").map { it.toJsString() }
 
 // 使用 .toJsArray() 將 List 或 Array 轉換為 JsArray
 val jsArray: JsArray<JsString> = list.toJsArray()
 
 // 使用 .toArray() 和 .toList() 將其轉換回 Kotlin 型別 
-val kotlinArray: Array<JsString> = jsArray.toArray()
-val kotlinList: List<JsString> = jsArray.toList()
+val kotlinArray: `Array<JsString>` = jsArray.toArray()
+val kotlinList: `List<JsString>` = jsArray.toList()
 ```
 
 類似的配接器函式也可用於將型別陣列轉換為其對應的 Kotlin 型別（例如 `IntArray` 和 `Int32Array`）。如需詳細資訊與實作，請參閱 [`kotlinx-browser` 存儲庫](https://github.com/Kotlin/kotlinx-browser/blob/dfbdceed314567983c98f1d66e8c2e10d99c5a55/src/wasmJsMain/kotlin/arrayCopy.kt)。

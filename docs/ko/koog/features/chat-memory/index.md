@@ -127,7 +127,7 @@ class MyDatabaseChatHistoryProvider(private val db: Database) : ChatHistoryProvi
         db.saveMessages(conversationId, messages)
     }
 
-    override suspend fun load(conversationId: String): List<Message> {
+    override suspend fun load(conversationId: String): `List<Message>` {
         return db.loadMessages(conversationId) ?: emptyList()
     }
 }
@@ -166,7 +166,7 @@ windowSize(10)
 
 ```kotlin
 class RedactEmailsPreProcessor : ChatMemoryPreProcessor {
-    override fun preprocess(messages: List<Message>): List<Message> {
+    override fun preprocess(messages: List<Message>): `List<Message>` {
         return messages.map { message ->
             // 메시지 내용에서 이메일 주소를 대체합니다.
             Message.User(message.content.replace(Regex("[\\w.]+@[\\w.]+"), "[REDACTED]"))

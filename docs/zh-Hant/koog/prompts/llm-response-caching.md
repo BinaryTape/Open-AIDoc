@@ -88,7 +88,7 @@
     // 第一次執行快取提示詞執行器
     // 這將執行實際的 LLM 請求
     long start1 = System.nanoTime();
-    List<Message.Response> firstResponse = cachedExecutor.execute(prompt, OllamaModels.Meta.LLAMA_3_2);
+    `List<Message.Response>` firstResponse = cachedExecutor.execute(prompt, OllamaModels.Meta.LLAMA_3_2);
     long firstTimeMs = (System.nanoTime() - start1) / 1_000_000L;
     System.out.println("First response: " + firstResponse.getFirst().getContent());
     System.out.println("First execution took: " + firstTimeMs + "ms");
@@ -96,7 +96,7 @@
     // 第二次執行快取提示詞執行器
     // 這將立即從快取傳回結果
     long start2 = System.nanoTime();
-    List<Message.Response> secondResponse = cachedExecutor.execute(prompt, OllamaModels.Meta.LLAMA_3_2);
+    `List<Message.Response>` secondResponse = cachedExecutor.execute(prompt, OllamaModels.Meta.LLAMA_3_2);
     long secondTimeMs = (System.nanoTime() - start2) / 1_000_000L;
     System.out.println("Second response: " + secondResponse.getFirst().getContent());
     System.out.println("Second execution took: " + secondTimeMs + "ms");

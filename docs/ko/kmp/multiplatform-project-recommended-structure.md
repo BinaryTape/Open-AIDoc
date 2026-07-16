@@ -529,8 +529,8 @@
     `Res` 객체와 모든 drawable 리소스를 올바른 경로로 다시 가져옵니다. 예:
 
     <compare type="top-bottom">
-    <code-block lang="kotlin" code="        import demo.composeapp.generated.resources.mx"/>
-    <code-block lang="kotlin" code="        import demo.sharedui.generated.resources.mx"/>
+    <code-block lang="kotlin" code="        import demo.composeapp.generated.resources.mx"></code-block>
+    <code-block lang="kotlin" code="        import demo.sharedui.generated.resources.mx"></code-block>
     </compare>
 11. 이에 의존하는 앱 모듈의 진입점에서 새 `App()` 컴포저블을 사용할 수 있도록 해당 `build.gradle.kts` 파일에 의존성을 추가합니다:
 

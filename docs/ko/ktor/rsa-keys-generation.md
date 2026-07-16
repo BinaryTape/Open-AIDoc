@@ -33,7 +33,7 @@ RSA 암호화 알고리즘의 일부인 RS256은 해싱을 위해 SHA-256을 사
 
 새 터미널 창에서 다음 명령을 실행합니다.
 
-<code-block lang="shell" code="openssl genpkey -algorithm rsa -pkeyopt rsa_keygen_bits:2048 &amp;gt; ktor.pk8"/>
+<code-block lang="shell" code="openssl genpkey -algorithm rsa -pkeyopt rsa_keygen_bits:2048 &amp;gt; ktor.pk8"></code-block>
 
 [openssl genpkey](https://www.openssl.org/docs/man3.0/man1/openssl-genpkey.html) 명령은 RSA 알고리즘을 사용하여 2048비트 개인 키를 생성하고 지정된 파일(여기서는 `ktor.pk8`)에 저장합니다. 파일의 내용은 [Base64](https://en.wikipedia.org/wiki/Base64)로 인코딩되어 있으므로 공개 키를 파생시키기 전에 디코딩해야 합니다.
 
@@ -51,7 +51,7 @@ RSA 암호화 알고리즘의 일부인 RS256은 해싱을 위해 SHA-256을 사
 
 OpenSSL을 사용하여 이 작업을 수행하려면 다음 명령을 실행하십시오.
 
-<code-block lang="shell" code="openssl rsa -in ktor.pk8 -pubout | tee ktor.spki"/>
+<code-block lang="shell" code="openssl rsa -in ktor.pk8 -pubout | tee ktor.spki"></code-block>
 
 * `openssl rsa`: RSA 키 작업을 위한 `OpenSSL` 명령입니다. 이 문맥에서는 RSA 키와 관련된 작업을 수행하는 데 사용됩니다.
 * `-in ktor.pk8`: OpenSSL이 RSA 개인 키를 읽어올 입력 파일(`ktor.pk8`)을 지정합니다.
@@ -70,7 +70,7 @@ OpenSSL을 사용하여 이 작업을 수행하려면 다음 명령을 실행하
 
 OpenSSL을 사용하여 이 작업을 수행하려면 다음 명령을 실행하십시오.
 
-<code-block lang="shell" code="openssl pkey -in ktor.spki -pubin -noout -text"/>
+<code-block lang="shell" code="openssl pkey -in ktor.spki -pubin -noout -text"></code-block>
 
 * `pkey`: 개인 키 및 공개 키를 처리하기 위한 OpenSSL 명령줄 유틸리티입니다.
 * `-in ktor.spki`: PEM 형식의 공개 키가 포함된 입력 파일을 지정합니다. 이 경우 입력 파일은 `ktor.spki`입니다.
@@ -106,7 +106,7 @@ Exponent: 65537 (0x10001)
 
 지수 속성의 16진수 값은 `0x10001`입니다. 이 값을 Base64URL로 변환하려면 다음 명령을 사용하십시오.
 
-<code-block lang="shell" code="echo 010001 | xxd -p -r | base64 "/>
+<code-block lang="shell" code="echo 010001 | xxd -p -r | base64 "></code-block>
 
 * `echo 010001`: 명령의 이 부분은 RSA 키의 공개 지수(e)를 나타내는 문자열 "010001"을 표준 출력으로 보냅니다.
 * `|`: `|` 문자는 이전 명령의 출력을 가져와 다음 명령의 입력으로 전달하는 파이프입니다.
@@ -134,7 +134,7 @@ AQAB
 
 <code-block lang="shell" code="echo &quot;b5:f2:5a:2e:bc:d7:20:b5:20:d5:4d:cd:d4:a5:&#10;    7c:c8:9a:fd:d8:61:e7:e4:eb:58:65:1e:ea:5a:4d:&#10;    4c:73:87:32:e0:91:a3:92:56:2e:a7:bc:1e:32:30:&#10;    43:f5:fd:db:05:5a:08:b2:25:15:5f:ac:4d:71:82:&#10;    2b:d0:87:b4:01&quot; | tr -d &quot;: 
 &quot; | xxd -p -r | base64 | tr +/ -_ | tr -d &quot;=
-&quot;"/>
+&quot;"></code-block>
 
 <note>
 <p>

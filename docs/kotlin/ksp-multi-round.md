@@ -9,7 +9,7 @@ KSP 支持 *多轮处理*，即跨多轮处理文件。这意味着后续轮次�
 以下示例代码展示了如何通过使用验证检查来延迟无效符号：
 
 ```kotlin
-override fun process(resolver: Resolver): List<KSAnnotated> {
+override fun process(resolver: Resolver): `List<KSAnnotated>` {
     val symbols = resolver.getSymbolsWithAnnotation("com.example.annotation.Builder")
     val result = symbols.filter { !it.validate() }
     symbols

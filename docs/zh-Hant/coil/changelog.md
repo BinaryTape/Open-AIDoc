@@ -169,7 +169,7 @@
 
 Coil 3.0.0 是下一個主要版本，完整支援 [Compose Multiplatform](https://www.jetbrains.com/compose-multiplatform/)。
 
-[關於 3.0.0 的完整改進清單與重要變更，請查看升級指南](https://coil-kt.github.io/coil/upgrading_to_coil3/)。
+[關於 3.0.0 的完整改進清單與重要變更，請查看升級指南](/coil/migrating_to_coil3/)。
 
 自 `3.0.0-rc02` 以來的變更：
 
@@ -177,7 +177,7 @@ Coil 3.0.0 是下一個主要版本，完整支援 [Compose Multiplatform](https
 
 ## [3.0.0-rc02] - 2024 年 10 月 28 日
 
-[關於 3.x 的完整改進清單與重要變更，請查看升級指南](https://coil-kt.github.io/coil/upgrading_to_coil3/)。自 `3.0.0-rc01` 以來的變更：
+[關於 3.x 的完整改進清單與重要變更，請查看升級指南](/coil/migrating_to_coil3/)。自 `3.0.0-rc01` 以來的變更：
 
 - 加入 `BlackholeDecoder`。這簡化了[僅限磁碟快取的預先載入](https://coil-kt.github.io/coil/faq/#how-do-i-preload-an-image)。
 - 為 `ConstraintsSizeResolver` 與 `DrawScopeSizeResolver` 加入 `remember` 函式。
@@ -192,7 +192,7 @@ Coil 3.0.0 是下一個主要版本，完整支援 [Compose Multiplatform](https
 
 ## [3.0.0-rc01] - 2024 年 10 月 8 日
 
-[關於 3.x 的完整改進清單與重要變更，請查看升級指南](https://coil-kt.github.io/coil/upgrading_to_coil3/)。自 `3.0.0-alpha10` 以來的變更：
+[關於 3.x 的完整改進清單與重要變更，請查看升級指南](/coil/migrating_to_coil3/)。自 `3.0.0-alpha10` 以來的變更：
 
 - **破壞性變更**：預設停用 `addLastModifiedToFileCacheKey` 並允許按請求設定。可使用相同旗標重新啟用該行為。
 - **新增**：引入新的 `coil-network-cache-control` 構件，實作了 [`Cache-Control` 標頭](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control) 支援。
@@ -276,12 +276,12 @@ AsyncImage(
 - 更新 Compose 至 1.6.11。
 - 更新 Okio 至 3.9.0。
 - 更新 Skiko 至 0.8.4。
-- [關於 3.x 的重要變更完整清單，請查看升級指南。](https://coil-kt.github.io/coil/upgrading_to_coil3/)
+- [關於 3.x 的重要變更完整清單，請查看升級指南。](/coil/migrating_to_coil3/)
 
 ## [3.0.0-alpha06] - 2024 年 2 月 29 日
 
 - 將 Skiko 降級至 0.7.93。
-- [關於 3.x 的重要變更完整清單，請查看升級指南。](https://coil-kt.github.io/coil/upgrading_to_coil3/)
+- [關於 3.x 的重要變更完整清單，請查看升級指南。](/coil/migrating_to_coil3/)
 
 ## [3.0.0-alpha05] - 2024 年 2 月 28 日
 
@@ -295,7 +295,7 @@ AsyncImage(
 - 更新協同程式至 1.8.0。
 - 更新 Okio 至 3.8.0。
 - 更新 Skiko 至 0.7.94。
-- [關於 3.x 的重要變更完整清單，請查看升級指南。](https://coil-kt.github.io/coil/upgrading_to_coil3/)
+- [關於 3.x 的重要變更完整清單，請查看升級指南。](/coil/migrating_to_coil3/)
 
 ## [2.6.0] - 2024 年 2 月 23 日
 
@@ -317,7 +317,7 @@ AsyncImage(
 - 在 `OkHttpNetworkFetcherFactory` 中公開 `Call.Factory` 而非 `OkHttpClient`。
 - 將 `NetworkResponseBody` 轉換為封裝 `ByteString`。
 - 將 Compose 降級至 1.5.12。
-- [關於重要變更的完整清單，請查看升級指南。](https://coil-kt.github.io/coil/upgrading_to_coil3/)
+- [關於重要變更的完整清單，請查看升級指南。](/coil/migrating_to_coil3/)
 
 ## [3.0.0-alpha03] - 2024 年 1 月 20 日
 
@@ -325,7 +325,7 @@ AsyncImage(
     - 根據您匯入的構件，您可以使用 `KtorNetworkFetcherFactory` 或 `OkHttpNetworkFetcherFactory` 手動參照 `Fetcher.Factory`。
 - 支援在 Apple 平台上載入 `NSUrl`。
 - 為 `AsyncImage` 加入 `clipToBounds` 參數。
-- [關於重要變更的完整清單，請查看升級指南。](https://coil-kt.github.io/coil/upgrading_to_coil3/)
+- [關於重要變更的完整清單，請查看升級指南。](/coil/migrating_to_coil3/)
 
 ## [3.0.0-alpha02] - 2024 年 1 月 10 日
 
@@ -338,14 +338,14 @@ AsyncImage(
 - **新增**：在所有平台上支援 `coil-svg`。它在 Android 上由 [AndroidSVG](https://bigbadaboom.github.io/androidsvg/) 支援，在非 Android 平台上由 [SVGDOM](https://api.skia.org/classSkSVGDOM.html) 支援。
 - Coil 現在在內部使用 Android 的 [`ImageDecoder`](https://developer.android.com/reference/android/graphics/ImageDecoder) API，在直接從檔案、資源或內容 URI 解碼時具有效能優勢。
 - 修正：多個 `coil3.Uri` 剖析修正。
-- [關於重要變更的完整清單，請查看升級指南。](https://coil-kt.github.io/coil/upgrading_to_coil3/)
+- [關於重要變更的完整清單，請查看升級指南。](/coil/migrating_to_coil3/)
 
 ## [3.0.0-alpha01] - 2023 年 12 月 30 日
 
 - **新增**：[Compose Multiplatform](https://www.jetbrains.com/lp/compose-multiplatform/) 支援。Coil 現在是一個支援 Android、JVM、iOS、macOS 與 Javascript 的 Kotlin 多平台程式庫。
 - Coil 的 Maven 座標已更新為 `io.coil-kt.coil3`，其匯入已更新為 `coil3`。這允許 Coil 3 與 Coil 2 並行執行而不會有二進位相容性問題。例如，`io.coil-kt:coil:[version]` 現在改為 `io.coil-kt.coil3:coil:[version]`。
 - `coil-base` 與 `coil-compose-base` 構件分別重新命名為 `coil-core` 與 `coil-compose-core`，以符合協同程式、Ktor 與 AndroidX 使用的命名慣例。
-- [關於重要變更的完整清單，請查看升級指南。](https://coil-kt.github.io/coil/upgrading_to_coil3/)
+- [關於重要變更的完整清單，請查看升級指南。](/coil/migrating_to_coil3/)
 
 ## [2.5.0] - 2023 年 10 月 30 日
 
@@ -441,7 +441,7 @@ AsyncImage(
 
 ## [2.0.0] - 2022 年 5 月 10 日
 
-Coil 2.0.0 是程式庫的一個重大疊代版本，包含破壞性變更。關於如何升級，請查看[升級指南](https://coil-kt.github.io/coil/upgrading/)。
+Coil 2.0.0 是程式庫的一個重大疊代版本，包含破壞性變更。關於如何升級，請查看[升級指南](/coil/migrating)。
 
 - **新增**：在 `coil-compose` 中引入 `AsyncImage`。更多資訊請查看[文件](https://coil-kt.github.io/coil/compose/)。
 
@@ -467,7 +467,7 @@ AsyncImage(
 
 - **新增**：引入公開的 `DiskCache` API。
     - 使用 `ImageLoader.Builder.diskCache` 與 `DiskCache.Builder` 配置磁碟快取。
-    - 您不應將 OkHttp 的 `Cache` 與 Coil 2.0 一起使用。詳情請見[此處](https://coil-kt.github.io/coil/upgrading_to_coil2/#disk-cache)。
+    - 您不應將 OkHttp 的 `Cache` 與 Coil 2.0 一起使用。詳情請見[此處](/coil/migrating_to_coil2/#disk-cache)。
     - 仍支援 `Cache-Control` 與其他快取標頭——除了 `Vary` 標頭，因為快取僅檢查 URL 是否相符。此外，僅快取回應代碼在 [200..300) 範圍內的回應。
     - 升級至 2.0 時，現有的磁碟快取將被清除。
 - 最低支援的 API 現在為 21。
@@ -484,7 +484,7 @@ AsyncImage(
 - 停用產生執行階段非 Null 斷言。
     - 若您使用 Java，將 null 作為加上非 Null 註解的引數傳遞給函式時，將不再立即拋出 `NullPointerException`。Kotlin 的編譯時期 Null 安全性可防止這種情況發生。
     - 此變更有助於縮小程式庫的大小。
-- `Size` 現在由寬度與高度的兩個 `Dimension` 值組成。`Dimension` 可以是正像素值或 `Dimension.Undefined`。詳情請見[此處](https://coil-kt.github.io/coil/upgrading/#size-refactor)。
+- `Size` 現在由寬度與高度的兩個 `Dimension` 值組成。`Dimension` 可以是正像素值或 `Dimension.Undefined`。詳情請見[此處](/coil/migrating#size-refactor)。
 - 已從程式庫中移除 `BitmapPool` 與 `PoolableViewTarget`。
 - 已從程式庫中移除 `VideoFrameFileFetcher` 與 `VideoFrameUriFetcher`。請改用支援所有資料來源的 `VideoFrameDecoder`。
 - 已從程式庫中移除 [`BlurTransformation`](https://github.com/coil-kt/coil/blob/845f39383f332428077c666e3567b954675ce248/coil-core/src/main/java/coil/transform/BlurTransformation.kt) 與 [`GrayscaleTransformation`](https://github.com/coil-kt/coil/blob/845f39383f332428077c666e3567b954675ce248/coil-core/src/main/java/coil/transform/GrayscaleTransformation.kt)。若您仍需使用它們，可以將其程式碼複製到您的專案中。
@@ -1222,7 +1222,7 @@ Coil 2.0.0 是程式庫的下一個主要疊代版本，包含新功能、效能
 
 ---
 
-- **新增**：支援自訂過渡。 [詳情請見此處](https://coil-kt.github.io/coil/transitions/)。由於 API 尚在醞釀中，過渡功能被標記為實驗性。
+- **新增**：支援自訂過渡。 [詳情請見此處](/coil/compose)。由於 API 尚在醞釀中，過渡功能被標記為實驗性。
 - **新增**：加入 `RequestDisposable.await` 以支援在 `LoadRequest` 進行時暫停。
 - **新增**：支援在請求資料為 null 時設定 `fallback` 可繪製對象。
 - **新增**：加入 `Precision`。這使得輸出 `Drawable` 的大小精確，同時為支援縮放的目標（例如 `ImageViewTarget`）啟用縮放最佳化。詳情請見[其文件](https://github.com/coil-kt/coil/blob/main/coil-core/src/main/java/coil/size/Precision.kt)。

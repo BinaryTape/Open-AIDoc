@@ -314,7 +314,7 @@
     
     @Composable
     @Preview
-    fun App(countries: List<Country> = countries()) {
+    fun App(countries: `List<Country>` = countries()) {
         MaterialTheme {
             var showCountries by remember { mutableStateOf(false) }
             var timeAtLocation by remember { mutableStateOf("No location selected") }
@@ -430,7 +430,7 @@ Compose 跨平台提供了一个库，用于通过所有平台的公共代码访
 
     @Composable
     @Preview
-    fun App(countries: List<Country> = defaultCountries) {
+    fun App(countries: `List<Country>` = defaultCountries) {
         MaterialTheme {
             var showCountries by remember { mutableStateOf(false) }
             var timeAtLocation by remember { mutableStateOf("No location selected") }

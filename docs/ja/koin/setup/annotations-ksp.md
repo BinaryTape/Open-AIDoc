@@ -248,7 +248,7 @@ KSP アノテーションは将来の Koin バージョンで削除される予�
 ## ヘルプ
 
 移行中に問題が発生した場合は：
-- [トラブルシューティング](/docs/reference/troubleshooting) を確認
+- [トラブルシューティング](/docs/reference/koin-core/troubleshooting) を確認
 - [Slack](https://kotlinlang.slack.com/messages/koin/) で質問
 - [GitHub](https://github.com/InsertKoinIO/koin) で issue を作成
 

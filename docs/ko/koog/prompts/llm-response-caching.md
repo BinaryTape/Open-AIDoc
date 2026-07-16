@@ -88,7 +88,7 @@ Kotlin 또는 Java에서 캐싱된 프롬프트 실행기를 생성하려면 다
     // 캐싱된 프롬프트 실행기를 처음으로 실행
     // 이 과정에서 실제 LLM 요청이 수행됩니다.
     long start1 = System.nanoTime();
-    List<Message.Response> firstResponse = cachedExecutor.execute(prompt, OllamaModels.Meta.LLAMA_3_2);
+    `List<Message.Response>` firstResponse = cachedExecutor.execute(prompt, OllamaModels.Meta.LLAMA_3_2);
     long firstTimeMs = (System.nanoTime() - start1) / 1_000_000L;
     System.out.println("First response: " + firstResponse.getFirst().getContent());
     System.out.println("First execution took: " + firstTimeMs + "ms");
@@ -96,7 +96,7 @@ Kotlin 또는 Java에서 캐싱된 프롬프트 실행기를 생성하려면 다
     // 캐싱된 프롬프트 실행기를 두 번째로 실행
     // 캐시에서 즉시 결과를 반환합니다.
     long start2 = System.nanoTime();
-    List<Message.Response> secondResponse = cachedExecutor.execute(prompt, OllamaModels.Meta.LLAMA_3_2);
+    `List<Message.Response>` secondResponse = cachedExecutor.execute(prompt, OllamaModels.Meta.LLAMA_3_2);
     long secondTimeMs = (System.nanoTime() - start2) / 1_000_000L;
     System.out.println("Second response: " + secondResponse.getFirst().getContent());
     System.out.println("Second execution took: " + secondTimeMs + "ms");

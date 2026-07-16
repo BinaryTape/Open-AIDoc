@@ -39,7 +39,7 @@ KSP를 바라보는 또 다른 관점은 코틀린 프로그램의 전처리기(
 KSFile
   packageName: KSName
   fileName: String
-  annotations: List<KSAnnotation>  (파일 어노테이션)
+  annotations: `List<KSAnnotation>`  (파일 어노테이션)
   declarations: List<KSDeclaration>
     KSClassDeclaration // 클래스, 인터페이스, 객체(object)
       simpleName: KSName
@@ -94,7 +94,7 @@ interface SymbolProcessorProvider {
 
 ```kotlin
 interface SymbolProcessor {
-    fun process(resolver: Resolver): List<KSAnnotated> // 여기에 집중해 봅시다
+    fun process(resolver: Resolver): `List<KSAnnotated>` // 여기에 집중해 봅시다
     fun finish() {}
     fun onError() {}
 }

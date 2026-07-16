@@ -532,11 +532,11 @@ class MyCustomMemoryProvider : AgentMemoryProvider {
         // 팩트 저장을 위한 구현
     }
 
-    override suspend fun load(concept: Concept, subject: MemorySubject, scope: MemoryScope): List<Fact> {
+    override suspend fun load(concept: Concept, subject: MemorySubject, scope: MemoryScope): `List<Fact>` {
         // 컨셉별 팩트 로드를 위한 구현
     }
 
-    override suspend fun loadAll(subject: MemorySubject, scope: MemoryScope): List<Fact> {
+    override suspend fun loadAll(subject: MemorySubject, scope: MemoryScope): `List<Fact>` {
         // 모든 팩트 로드를 위한 구현
     }
 
@@ -544,7 +544,7 @@ class MyCustomMemoryProvider : AgentMemoryProvider {
         description: String,
         subject: MemorySubject,
         scope: MemoryScope
-    ): List<Fact> {
+    ): `List<Fact>` {
         // 설명을 통한 팩트 로드를 위한 구현
     }
 }

@@ -351,7 +351,7 @@ Koogは、コンテンツモデレーションに対して2つの主なアプロ
          *
          * モデレートされたコンテンツで見つかった特定の違反タイプを特定するために使用されます。
          */
-        public val violatedCategories: List<ModerationCategory> = categories.filter { it.value.detected }.keys.toList()
+        public val violatedCategories: `List<ModerationCategory>` = categories.filter { it.value.detected }.keys.toList()
 
         /**
          * コンテンツモデレーションに提供される入力のタイプを表します。

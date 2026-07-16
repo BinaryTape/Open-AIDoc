@@ -140,7 +140,7 @@ val result = buildList {
 val result = buildList {
     val x = get(0)
     val y: String = x
-} // result は List<String> 型と推論されます
+} // result は `List<String>` 型と推論されます
 ```
 
 遅延型変数が `String` 型の変数に代入された後、ビルダー推論は `x` が `String` のサブタイプであるという情報を得ます。この代入がビルダーラムダ内の最後のステートメントであるため、ビルダー推論分析は型引数 `E` を `String` に推論して終了します。
@@ -155,14 +155,14 @@ val result = buildList {
   val result = buildList {
       // 渡された "value" 引数に基づいて、型引数は String と推論される
       add("value")
-  } // result は List<String> 型と推論される
+  } // result は `List<String>` 型と推論される
   ```
 * 型パラメータの型を返す呼び出しに対して、期待される型を指定する
   ```kotlin
   val result = buildList {
       // 期待される型に基づいて、型引数は Float と推論される
       val x: Float = get(0)
-  } // result は List<Float> 型になる
+  } // result は `List<Float>` 型になる
   ```
   ```kotlin
   class Foo<T> {
@@ -173,7 +173,7 @@ val result = buildList {
 
   fun main() {
       val result = myBuilder {
-          val x: List<CharSequence> = items
+          val x: `List<CharSequence>` = items
           // ...
       } // result は Foo<CharSequence> 型になる
   }
@@ -190,17 +190,17 @@ val result = buildList {
       val result1 = buildList {
           val x = get(0)
           takeMyLong(x)
-      } // result1 は List<Long> 型になる
+      } // result1 は `List<Long>` 型になる
 
       val result2 = buildList {
           val x = get(0)
           val isLong = x.isMoreThat3()
       // ...
-      } // result2 は List<String> 型になる
+      } // result2 は `List<String>` 型になる
   
       val result3 = buildList {
           takeListOfStrings(this)
-      } // result3 は List<String> 型になる
+      } // result3 は `List<String>` 型になる
   }
   ```
 * ラムダレシーバーのメンバーへの呼び出し可能参照（callable reference）を取得する
@@ -208,7 +208,7 @@ val result = buildList {
   fun main() {
       val result = buildList {
           val x: KFunction1<Int, Float> = ::get
-      } // result は List<Float> 型になる
+      } // result は `List<Float>` 型になる
   }
   ```
   ```kotlin
@@ -217,7 +217,7 @@ val result = buildList {
   fun main() {
       val result = buildList {
           takeFunction(::get)
-      } // result は List<Float> 型になる
+      } // result は `List<Float>` 型になる
   }
   ```
 
@@ -230,7 +230,7 @@ val result = buildList { // 遅延型変数 E を推論
     // E が Int または Int のスーパータイプであると考慮
     add(1)
     // E は Int と推論される
-} // result は List<Int> 型になる
+} // result は `List<Int>` 型になる
 ```
 
 最終的な型は、分析中に収集された型情報に対応する、最も具体的な型（most specific type）になります。提供された型情報が矛盾しておりマージできない場合、コンパイラはエラーを報告します。

@@ -264,7 +264,7 @@ the predefined executors will return a PromptExecutor instance configured with a
         .build();
 
     // Run the prompt
-    List<Message.Response> response = promptExecutor.execute(prompt, OpenAIModels.Chat.GPT4o);
+    `List<Message.Response>` response = promptExecutor.execute(prompt, OpenAIModels.Chat.GPT4o);
     ```
     <!--- KNIT example-prompt-executors-java-05.java -->
 
@@ -358,10 +358,10 @@ the predefined executors will return a PromptExecutor instance configured with a
         .build();
 
     // Run the prompt with an OpenAI model; the prompt executor automatically switches to the OpenAI client
-    List<Message.Response> openAIResult = promptExecutor.execute(prompt, OpenAIModels.Chat.GPT4o);
+    `List<Message.Response>` openAIResult = promptExecutor.execute(prompt, OpenAIModels.Chat.GPT4o);
 
     // Run the prompt with an Anthropic model; the prompt executor automatically switches to the Anthropic client
-    List<Message.Response> anthropicResult = promptExecutor.execute(prompt, AnthropicModels.Sonnet_4_5);
+    `List<Message.Response>` anthropicResult = promptExecutor.execute(prompt, AnthropicModels.Sonnet_4_5);
     ```
     <!--- KNIT example-prompt-executors-java-06.java -->
 
@@ -477,7 +477,7 @@ Prompt 執行器將會使用備援模型：
         .build();
 
     // If you pass a Google model, the prompt executor will use the fallback model, as the Google client is not included
-    List<Message.Response> response = multiExecutor.execute(p, GoogleModels.Gemini2_5Pro);
+    `List<Message.Response>` response = multiExecutor.execute(p, GoogleModels.Gemini2_5Pro);
     ```
     <!--- KNIT example-prompt-executors-java-08.java -->
 

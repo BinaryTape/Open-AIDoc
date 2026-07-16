@@ -263,7 +263,7 @@ the predefined executors will return a PromptExecutor instance configured with a
         .build();
 
     // 运行提示
-    List<Message.Response> response = promptExecutor.execute(prompt, OpenAIModels.Chat.GPT4o);
+    `List<Message.Response>` response = promptExecutor.execute(prompt, OpenAIModels.Chat.GPT4o);
     ```
     <!--- KNIT example-prompt-executors-java-05.java -->
 
@@ -353,10 +353,10 @@ the predefined executors will return a PromptExecutor instance configured with a
         .build();
 
     // 使用 OpenAI 模型运行提示；提示执行器会自动切换到 OpenAI 客户端
-    List<Message.Response> openAIResult = promptExecutor.execute(prompt, OpenAIModels.Chat.GPT4o);
+    `List<Message.Response>` openAIResult = promptExecutor.execute(prompt, OpenAIModels.Chat.GPT4o);
 
     // 使用 Anthropic 模型运行提示；提示执行器会自动切换到 Anthropic 客户端
-    List<Message.Response> anthropicResult = promptExecutor.execute(prompt, AnthropicModels.Sonnet_4_5);
+    `List<Message.Response>` anthropicResult = promptExecutor.execute(prompt, AnthropicModels.Sonnet_4_5);
     ```
     <!--- KNIT example-prompt-executors-java-06.java -->
 
@@ -470,7 +470,7 @@ the predefined executors will return a PromptExecutor instance configured with a
         .build();
 
     // 如果您传递一个 Google 模型，提示执行器将使用回退模型，因为不包含 Google 客户端
-    List<Message.Response> response = multiExecutor.execute(p, GoogleModels.Gemini2_5Pro);
+    `List<Message.Response>` response = multiExecutor.execute(p, GoogleModels.Gemini2_5Pro);
     ```
     <!--- KNIT example-prompt-executors-java-08.java -->
 

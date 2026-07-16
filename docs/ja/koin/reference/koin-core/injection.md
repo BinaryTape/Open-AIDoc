@@ -469,5 +469,5 @@ class MyService(private val repo: UserRepository)
 ## 次のステップ
 
 - **[スコープ (Scopes)](/docs/reference/koin-core/scopes)** - 依存関係のライフサイクル管理
-- **[Android 向け Koin](/docs/integrations/android/index)** - Android 特有の注入
-- **[Compose 向け Koin](/docs/integrations/compose/index)** - Compose での注入
+- **[Android 向け Koin](/docs/reference/koin-android/start)** - Android 特有の注入
+- **[Compose 向け Koin](/docs/reference/koin-compose/compose)** - Compose での注入

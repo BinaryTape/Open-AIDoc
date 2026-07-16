@@ -27,7 +27,7 @@ dependencies {
 
 1) 제공자 설정 (`application.yaml` 또는 `application.conf`)
 
-`koog.<provider>` 아래의 중첩된 키를 사용하세요. 플러그인이 자동으로 이를 인식합니다.
+`koog.&lt;provider&gt;` 아래의 중첩된 키를 사용하세요. 플러그인이 자동으로 이를 인식합니다.
 
 ```yaml
 # application.yaml (Ktor 설정)
@@ -217,7 +217,7 @@ YAML/CONF에서 `llm.fallback`을 설정할 때 다음 식별자 형식을 사�
 참고
 
 - OpenAI의 경우 반드시 카테고리(`chat`, `reasoning`, `costoptimized`, `audio`, `embeddings`, `moderation`)를 포함해야 합니다.
-- Ollama의 경우 `ollama.model` 및 `ollama.<maker>.<model>` 형식을 모두 지원합니다.
+- Ollama의 경우 `ollama.model` 및 `ollama.&lt;maker&gt;.&lt;model&gt;` 형식을 모두 지원합니다.
 
 ## MCP 도구 (JVM 전용)
 

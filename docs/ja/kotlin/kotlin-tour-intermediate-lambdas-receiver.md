@@ -270,7 +270,7 @@ fun main() {
 整数のリストのコピーを作成し、各要素を 1 ずつインクリメントする関数を記述してください。提供されている、`List<Int>` を `incremented` 関数で拡張する関数のスケルトンを使用してください。
 
 ```kotlin
-fun List<Int>.incremented(): List<Int> {
+fun List<Int>.incremented(): `List<Int>` {
     val originalList = this
     return buildList {
         // ここにコードを書いてください
@@ -288,7 +288,7 @@ fun main() {
 
 |---|---|
 ```kotlin
-fun List<Int>.incremented(): List<Int> {
+fun List<Int>.incremented(): `List<Int>` {
     val originalList = this
     return buildList {
         for (n in originalList) add(n + 1)

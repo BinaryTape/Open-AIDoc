@@ -55,7 +55,7 @@ fun main() {
 > 
 > ```kotlin
 >     val shapes: MutableList<String> = mutableListOf("triangle", "square", "circle")
->     val shapesLocked: List<String> = shapes
+>     val shapesLocked: `List<String>` = shapes
 > ```
 > 這也被稱為**轉換**（casting）。
 > 

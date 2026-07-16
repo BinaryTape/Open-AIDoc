@@ -122,8 +122,8 @@ Weave エクスポーターは、Koog の一般的な OpenTelemetry 統合と同
 キャプチャされるスパンの全リスト、および LLM のプロンプトとレスポンスの内容を含める方法については、[トレースされる内容](index.md#what-gets-traced)を参照してください。
 
 W&B Weave で可視化すると、トレースは次のように表示されます：
-![W&B Weave traces](../../img/opentelemetry-weave-exporter-light.png#only-light)
-![W&B Weave traces](../../img/opentelemetry-weave-exporter-dark.png#only-dark)
+![W&B Weave traces](/koog/opentelemetry-weave-exporter-light.png#only-light)
+![W&B Weave traces](/koog/opentelemetry-weave-exporter-dark.png#only-dark)
 
 詳細については、公式の [Weave OpenTelemetry ドキュメント](https://weave-docs.wandb.ai/guides/tracking/otel/)を参照してください。
 

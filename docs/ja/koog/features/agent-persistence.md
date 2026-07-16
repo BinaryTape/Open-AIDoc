@@ -444,7 +444,7 @@ Agentの永続化機能は、チェックポイントを操作するための便
     -->
     ```kotlin
     class MyCustomStorageProvider<MyFilterType> : PersistenceStorageProvider<MyFilterType> {
-        override suspend fun getCheckpoints(sessionId: String, filter: MyFilterType?): List<AgentCheckpointData> {
+        override suspend fun getCheckpoints(sessionId: String, filter: MyFilterType?): `List<AgentCheckpointData>` {
             TODO("まだ実装されていません")
         }
 
@@ -502,7 +502,7 @@ Agentの永続化機能は、チェックポイントを操作するための便
     import ai.koog.prompt.executor.llms.all.simpleOllamaAIExecutor
     import ai.koog.prompt.executor.ollama.client.OllamaModels
     class MyCustomStorageProvider<MyFilterType> : PersistenceStorageProvider<MyFilterType> {
-        override suspend fun getCheckpoints(sessionId: String, filter: MyFilterType?): List<AgentCheckpointData> {
+        override suspend fun getCheckpoints(sessionId: String, filter: MyFilterType?): `List<AgentCheckpointData>` {
             TODO("まだ実装されていません")
         }
         override suspend fun saveCheckpoint(sessionId: String, agentCheckpointData: AgentCheckpointData) {

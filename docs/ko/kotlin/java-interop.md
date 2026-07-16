@@ -434,7 +434,7 @@ interface A {
     @NotNullApi // 인터페이스의 기본값을 재정의함
     String bar(String x, @Nullable String y); // fun bar(x: String, y: String?): String
 
-    // List<String> 타입 인자는 `TYPE_USE` 엘리먼트 타입을 가진 
+    // `List<String>` 타입 인자는 `TYPE_USE` 엘리먼트 타입을 가진 
     // `@NullableApi` 때문에 nullable로 간주됨:
     String baz(List<String> x); // fun baz(List<String?>?): String?
 

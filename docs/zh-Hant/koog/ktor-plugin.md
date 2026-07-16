@@ -27,7 +27,7 @@ dependencies {
 
 1) 配置提供者（在 `application.yaml` 或 `application.conf` 中）
 
-使用 `koog.<provider>` 下的巢狀鍵值。外掛程式會自動取得這些設定。
+使用 `koog.&lt;provider&gt;` 下的巢狀鍵值。外掛程式會自動取得這些設定。
 
 ```yaml
 # application.yaml (Ktor 配置)
@@ -217,7 +217,7 @@ install(Koog) {
 備註
 
 - 對於 OpenAI，您必須包含類別（`chat`、`reasoning`、`costoptimized`、`audio`、`embeddings`、`moderation`）。
-- 對於 Ollama，同時支援 `ollama.model` 和 `ollama.<maker>.<model>`。
+- 對於 Ollama，同時支援 `ollama.model` 和 `ollama.&lt;maker&gt;.&lt;model&gt;`。
 
 ## MCP 工具（僅限 JVM）
 

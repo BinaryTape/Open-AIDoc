@@ -164,8 +164,8 @@ Langfuse 导出器捕获的内容与 Koog 的常规 OpenTelemetry 集成相同�
 有关捕获的 span 的完整列表以及如何包含 LLM 提示词和响应内容，请参阅 [跟踪的内容](index.md#what-gets-traced)。
 
 在 Langfuse 中可视化时，跟踪显示如下：
-![Langfuse traces](../../img/opentelemetry-langfuse-exporter-light.png#only-light)
-![Langfuse traces](../../img/opentelemetry-langfuse-exporter-dark.png#only-dark)
+![Langfuse traces](/koog/opentelemetry-langfuse-exporter-light.png#only-light)
+![Langfuse traces](/koog/opentelemetry-langfuse-exporter-dark.png#only-dark)
 
 有关 Langfuse OpenTelemetry 跟踪的更多详细信息，请参阅：  
 [Langfuse OpenTelemetry 文档](https://langfuse.com/integrations/native/opentelemetry#opentelemetry-endpoint)。

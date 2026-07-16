@@ -528,8 +528,8 @@
     重新导入 `Res` 对象和所有具有正确路径的可绘制资源，例如：
 
     <compare type="top-bottom">
-    <code-block lang="kotlin" code="        import demo.composeapp.generated.resources.mx"/>
-    <code-block lang="kotlin" code="        import demo.sharedui.generated.resources.mx"/>
+    <code-block lang="kotlin" code="        import demo.composeapp.generated.resources.mx"></code-block>
+    <code-block lang="kotlin" code="        import demo.sharedui.generated.resources.mx"></code-block>
     </compare>
 11. 为了让依赖它的应用模块入口点可以使用新的 `App()` Composable 函数，请在相应的 `build.gradle.kts` 文件中添加依赖项：
 

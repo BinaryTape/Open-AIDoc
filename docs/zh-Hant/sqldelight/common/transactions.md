@@ -17,7 +17,7 @@ database.playerQueries.transaction {
 若要從交易傳回值，請使用 `transactionWithResult` 函式。
 
 ```kotlin
-val players: List<Player> = database.playerQueries.transactionWithResult {
+val players: `List<Player>` = database.playerQueries.transactionWithResult {
   database.playerQueries.selectAll().executeAsList()
 }
 ```

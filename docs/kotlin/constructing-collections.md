@@ -123,7 +123,7 @@ fun main() {
 fun main() {
 //sampleStart 
     val sourceList = mutableListOf(1, 2, 3)
-    val referenceList: List<Int> = sourceList
+    val referenceList: `List<Int>` = sourceList
     //referenceList.add(4)            // 编译错误
     sourceList.add(4)
     println(referenceList) // 显示 sourceList 的当前状态

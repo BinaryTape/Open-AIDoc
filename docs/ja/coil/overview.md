@@ -1,4 +1,4 @@
-![Coil](logo.svg)
+![Coil](coil_logo_colored.svg)
 
 [Android](https://www.android.com/) および [Compose Multiplatform](https://www.jetbrains.com/lp/compose-multiplatform/) のための画像読み込みライブラリです。Coil の特徴は以下の通りです：
 

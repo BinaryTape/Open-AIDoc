@@ -270,7 +270,7 @@ val baseDir = Path("/base")
 val subDir = baseDir / "subdirectory" 
 
 // 디렉토리의 파일 나열
-val kotlinFiles: List<Path> = Path("/home/user").listDirectoryEntries("*.kt")
+val kotlinFiles: `List<Path>` = Path("/home/user").listDirectoryEntries("*.kt")
 ```
 
 이 확장 기능은 `kotlin-stdlib-jdk7` 모듈의 `kotlin.io.path` 패키지에서 사용할 수 있습니다. 이 확장을 사용하려면 실험적 어노테이션인 `@ExperimentalPathApi`에 [옵트인](opt-in-requirements.md)하세요.

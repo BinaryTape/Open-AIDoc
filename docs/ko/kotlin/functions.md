@@ -379,7 +379,7 @@ fun getDisplayNameOrDefault(userId: String?): String =
 함수 내부에서 `T` 타입의 `vararg` 파라미터는 `T`의 배열로 사용할 수 있습니다:
 
 ```kotlin
-fun <T> asList(vararg ts: T): List<T> {
+fun <T> asList(vararg ts: T): `List<T>` {
     val result = ArrayList<T>()
     for (t in ts) // ts는 Array입니다.
         result.add(t)
@@ -390,7 +390,7 @@ fun <T> asList(vararg ts: T): List<T> {
 그런 다음 가변 개수의 인자를 함수에 전달할 수 있습니다:
 
 ```kotlin
-fun <T> asList(vararg ts: T): List<T> {
+fun <T> asList(vararg ts: T): `List<T>` {
     val result = ArrayList<T>()
     for (t in ts) // ts는 Array입니다.
         result.add(t)
@@ -415,7 +415,7 @@ fun main() {
 이미 배열이 있고 그 내용을 `vararg` 파라미터로 또는 그 일부로 함수에 전달하려는 경우, 배열 이름 앞에 `*`를 붙여 [스프레드 연산자(spread operator)](arrays.md#pass-variable-number-of-arguments-to-a-function)를 사용합니다:
 
 ```kotlin
-fun <T> asList(vararg ts: T): List<T> {
+fun <T> asList(vararg ts: T): `List<T>` {
     val result = ArrayList<T>()
     for (t in ts)
         result.add(t)
@@ -608,7 +608,7 @@ Stream().read()
 함수 이름 앞에 꺾쇠괄호 `<>`를 사용하여 함수의 제네릭 파라미터를 지정할 수 있습니다:
 
 ```kotlin
-fun <T> singletonList(item: T): List<T> { /*...*/ }
+fun <T> singletonList(item: T): `List<T>` { /*...*/ }
 ```
 
 제네릭 함수에 대한 자세한 내용은 [제네릭(Generics)](generics.md)을 참조하세요.

@@ -16,7 +16,7 @@
 
 想要尝试我们的 Kotlin 数据分析工具吗？
 
-<a href="get-started-with-kotlin-notebooks.md"><img src="kotlin-notebook-button.svg" width="600" alt="Get started with Kotlin Notebook" style="block"/></a>
+<a href="get-started-with-kotlin-notebooks.md"><img src="kotlin-notebooks-button.svg" width="600" alt="Get started with Kotlin Notebook" style="block"/></a>
 
 我们的 Kotlin 数据分析工具让你能够从始至终顺畅地处理数据。在我们的 Kotlin Notebook 中，通过简单的拖放功能即可毫不费力地检索数据。只需几行代码即可对其进行清理、转换和可视化。此外，只需点击几下即可导出输出的图表。
 

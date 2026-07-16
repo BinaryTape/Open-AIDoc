@@ -46,13 +46,13 @@ class FrameLoggerExtension(val logger: Logger) : WebSocketExtension<FrameLogger.
 
 ```kotlin
     /** 在用戶端請求中發送以進行協商的協定清單 **/
-    override val protocols: List<WebSocketExtensionHeader> = emptyList()
+    override val protocols: `List<WebSocketExtensionHeader>` = emptyList()
    
     /** 
       * 此方法將在伺服器端呼叫，並處理來自用戶端的 `requestedProtocols`。
       * 結果會傳回伺服器同意使用的擴充套件清單。
       */
-    override fun serverNegotiation(requestedProtocols: List<WebSocketExtensionHeader>): List<WebSocketExtensionHeader> {
+    override fun serverNegotiation(requestedProtocols: List<WebSocketExtensionHeader>): `List<WebSocketExtensionHeader>` {
         logger.log("Server negotiation")
         return emptyList()
     }

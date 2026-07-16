@@ -532,11 +532,11 @@ class MyCustomMemoryProvider : AgentMemoryProvider {
         // 保存事实的实现
     }
 
-    override suspend fun load(concept: Concept, subject: MemorySubject, scope: MemoryScope): List<Fact> {
+    override suspend fun load(concept: Concept, subject: MemorySubject, scope: MemoryScope): `List<Fact>` {
         // 按概念加载事实的实现
     }
 
-    override suspend fun loadAll(subject: MemorySubject, scope: MemoryScope): List<Fact> {
+    override suspend fun loadAll(subject: MemorySubject, scope: MemoryScope): `List<Fact>` {
         // 加载所有事实的实现
     }
 
@@ -544,7 +544,7 @@ class MyCustomMemoryProvider : AgentMemoryProvider {
         description: String,
         subject: MemorySubject,
         scope: MemoryScope
-    ): List<Fact> {
+    ): `List<Fact>` {
         // 按描述加载事实的实现
     }
 }

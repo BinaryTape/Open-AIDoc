@@ -39,7 +39,7 @@ KSP の概要については、こちらの動画（英語）でもご確認い�
 KSFile
   packageName: KSName
   fileName: String
-  annotations: List<KSAnnotation>  (ファイルの注釈)
+  annotations: `List<KSAnnotation>`  (ファイルの注釈)
   declarations: List<KSDeclaration>
     KSClassDeclaration // クラス、インターフェース、オブジェクト
       simpleName: KSName
@@ -94,7 +94,7 @@ interface SymbolProcessorProvider {
 
 ```kotlin
 interface SymbolProcessor {
-    fun process(resolver: Resolver): List<KSAnnotated> // これに注目します
+    fun process(resolver: Resolver): `List<KSAnnotated>` // これに注目します
     fun finish() {}
     fun onError() {}
 }

@@ -88,7 +88,7 @@ KotlinまたはJavaでキャッシュされたプロンプトエグゼキュー�
     // キャッシュされたプロンプトエグゼキューターを初めて実行する
     // これは実際のLLMリクエストを実行します
     long start1 = System.nanoTime();
-    List<Message.Response> firstResponse = cachedExecutor.execute(prompt, OllamaModels.Meta.LLAMA_3_2);
+    `List<Message.Response>` firstResponse = cachedExecutor.execute(prompt, OllamaModels.Meta.LLAMA_3_2);
     long firstTimeMs = (System.nanoTime() - start1) / 1_000_000L;
     System.out.println("First response: " + firstResponse.getFirst().getContent());
     System.out.println("First execution took: " + firstTimeMs + "ms");
@@ -96,7 +96,7 @@ KotlinまたはJavaでキャッシュされたプロンプトエグゼキュー�
     // キャッシュされたプロンプトエグゼキューターを2回目に実行する
     // これはキャッシュから即座に結果を返します
     long start2 = System.nanoTime();
-    List<Message.Response> secondResponse = cachedExecutor.execute(prompt, OllamaModels.Meta.LLAMA_3_2);
+    `List<Message.Response>` secondResponse = cachedExecutor.execute(prompt, OllamaModels.Meta.LLAMA_3_2);
     long secondTimeMs = (System.nanoTime() - start2) / 1_000_000L;
     System.out.println("Second response: " + secondResponse.getFirst().getContent());
     System.out.println("Second execution took: " + secondTimeMs + "ms");

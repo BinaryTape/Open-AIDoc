@@ -205,10 +205,10 @@ fun copy(from: Array<Any>, to: Array<Any>) {
 這個函式應該是將項目從一個陣列複製到另一個陣列。讓我們嘗試在實作中應用它：
 
 ```kotlin
-val ints: Array<Int> = arrayOf(1, 2, 3)
+val ints: `Array<Int>` = arrayOf(1, 2, 3)
 val any = Array<Any>(3) { "" } 
 copy(ints, any)
-//   ^ 型別為 Array<Int> 但預期為 Array<Any>
+//   ^ 型別為 `Array<Int>` 但預期為 Array<Any>
 ```
 
 在這裡，你遇到了同樣熟悉的問題：`Array<T>` 在 `T` 上是*不變的*，因此 `Array<Int>` 和 `Array<Any>`
@@ -264,7 +264,7 @@ Kotlin 為此提供了所謂的*星號投影*語法：
 不僅僅是類別可以擁有型別參數，函式也可以。型別參數放在函式名稱*之前*：
 
 ```kotlin
-fun <T> singletonList(item: T): List<T> {
+fun <T> singletonList(item: T): `List<T>` {
     // ...
 }
 
@@ -453,7 +453,7 @@ val intsDictionary: Map<String, Int> = readDictionary(intsFile) as Map<String, I
 inline fun <reified T> List<*>.asListOfType(): List<T>? =
     if (all { it is T })
         @Suppress("UNCHECKED_CAST")
-        this as List<T> else
+        this as `List<T>` else
         null
 ```
 

@@ -11,7 +11,7 @@ Kotlin에서 여러 값은 [컬렉션(collections)][collections]을 사용하여
 예를 들어, 세 개의 숫자가 담긴 [List]를 반환하는 `simple` 함수를 만들고, [forEach]를 사용하여 모든 숫자를 출력할 수 있습니다.
 
 ```kotlin
-fun simple(): List<Int> = listOf(1, 2, 3)
+fun simple(): `List<Int>` = listOf(1, 2, 3)
  
 fun main() {
     simple().forEach { value -> println(value) } 
@@ -73,7 +73,7 @@ fun main() {
 import kotlinx.coroutines.*                 
                            
 //sampleStart
-suspend fun simple(): List<Int> {
+suspend fun simple(): `List<Int>` {
     delay(1000) // 여기서 비동기적인 작업을 수행한다고 가정
     return listOf(1, 2, 3)
 }

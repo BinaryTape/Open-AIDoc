@@ -183,7 +183,7 @@ dependencies {
 
     class HelloWorldProcessor(val codeGenerator: CodeGenerator) : SymbolProcessor {
         // 1️⃣ process() 函式
-        override fun process(resolver: Resolver): List<KSAnnotated> {
+        override fun process(resolver: Resolver): `List<KSAnnotated>` {
             resolver
                 .getSymbolsWithAnnotation("com.example.annotations.HelloWorldAnnotation")
                 .filter { it.validate() }

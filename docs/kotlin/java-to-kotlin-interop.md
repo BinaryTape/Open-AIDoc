@@ -544,7 +544,7 @@ fun unboxBase(box: Box<@JvmSuppressWildcards Base>): Base = box.value
 [`Nothing`](exceptions.md#the-nothing-type) 类型很特殊，因为它在 Java 中没有自然的对应物。实际上，每个 Java 引用类型（包括 `java.lang.Void`）都接受 `null` 作为值，而 `Nothing` 甚至不接受该值。因此，此类型无法在 Java 世界中准确表示。这就是为什么 Kotlin 在使用 `Nothing` 类型实参的地方生成原始类型（raw type）的原因：
 
 ```kotlin
-fun emptyList(): List<Nothing> = listOf()
+fun emptyList(): `List<Nothing>` = listOf()
 // 转换为
 // List emptyList() { ... }
 ```

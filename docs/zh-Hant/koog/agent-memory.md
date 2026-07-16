@@ -532,11 +532,11 @@ class MyCustomMemoryProvider : AgentMemoryProvider {
         // Implementation for saving facts
     }
 
-    override suspend fun load(concept: Concept, subject: MemorySubject, scope: MemoryScope): List<Fact> {
+    override suspend fun load(concept: Concept, subject: MemorySubject, scope: MemoryScope): `List<Fact>` {
         // Implementation for loading facts by concept
     }
 
-    override suspend fun loadAll(subject: MemorySubject, scope: MemoryScope): List<Fact> {
+    override suspend fun loadAll(subject: MemorySubject, scope: MemoryScope): `List<Fact>` {
         // Implementation for loading all facts
     }
 
@@ -544,7 +544,7 @@ class MyCustomMemoryProvider : AgentMemoryProvider {
         description: String,
         subject: MemorySubject,
         scope: MemoryScope
-    ): List<Fact> {
+    ): `List<Fact>` {
         // Implementation for loading facts by description
     }
 }

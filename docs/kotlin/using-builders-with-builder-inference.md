@@ -139,7 +139,7 @@ val result = buildList {
 val result = buildList {
     val x = get(0)
     val y: String = x
-} // result 推断为 List<String> 类型
+} // result 推断为 `List<String>` 类型
 ```
 
 在将推迟类型变量赋值给 `String` 类型的变量后，构建器推断获得信息：`x` 是 `String` 的子类型。此赋值是构建器 lambda 中的最后一条语句，因此构建器推断分析结束，将类型实参 `E` 推断为 `String`。
@@ -154,7 +154,7 @@ val result = buildList {
   val result = buildList {
       // 根据传递的 "value" 实参，类型实参被推断为 String
       add("value")
-  } // result 推断为 List<String> 类型
+  } // result 推断为 `List<String>` 类型
   ```
 * 为返回类型形参类型的调用指定预期类型
   ```kotlin
@@ -172,7 +172,7 @@ val result = buildList {
 
   fun main() {
       val result = myBuilder {
-          val x: List<CharSequence> = items
+          val x: `List<CharSequence>` = items
           // ...
       } // result 类型为 Foo<CharSequence>
   }

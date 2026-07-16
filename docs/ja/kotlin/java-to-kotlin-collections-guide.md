@@ -107,7 +107,7 @@ Javaには、ミュータブル（可変）なコレクションがあります�
 ```java
 // Java
 // このリストはミュータブルです！
-public List<Customer> getCustomers() { ... }
+public `List<Customer>` getCustomers() { ... }
 ```
 {id="mutability-java"}
 
@@ -161,7 +161,7 @@ class Shape {}
 class Rectangle extends Shape {}
 
 public void doSthWithShapes(List<? extends Shape> shapes) {
-/* 単に List<Shape> を使用すると、後述のように List<Rectangle> を
+/* 単に `List<Shape>` を使用すると、後述のように `List<Rectangle>` を
 引数としてこの関数を呼び出すときにコードがコンパイルされません */
 }
 

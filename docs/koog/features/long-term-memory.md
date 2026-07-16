@@ -274,7 +274,7 @@ class MyVectorDbStorage : SearchStorage<TextDocument, SearchRequest>, WriteStora
 
     override suspend fun add(
         records: List<TextDocument>, namespace: String?
-    ): List<String> {
+    ): `List<String>` {
         // 更新或插入到您的向量数据库并返回已添加记录的 ID
     }
 }

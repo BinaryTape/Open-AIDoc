@@ -9,7 +9,7 @@ KSP 支援**多輪處理** (multiple round processing)，即透過多個輪次�
 以下範例程式碼顯示如何透過驗證檢查來延遲無效符號：
 
 ```kotlin
-override fun process(resolver: Resolver): List<KSAnnotated> {
+override fun process(resolver: Resolver): `List<KSAnnotated>` {
     val symbols = resolver.getSymbolsWithAnnotation("com.example.annotation.Builder")
     val result = symbols.filter { !it.validate() }
     symbols

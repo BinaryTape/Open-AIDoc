@@ -363,8 +363,8 @@ Koog 的**流式传输 API** 允许您以 Kotlin 中的 `Flow<StreamFrame>` 或 
         });
 
         Flow.Publisher<StreamFrame> stream = session.requestLLMStreaming();
-        List<String> reasoningSteps = new ArrayList<>();
-        List<String> summarySteps = new ArrayList<>();
+        `List<String>` reasoningSteps = new ArrayList<>();
+        `List<String>` summarySteps = new ArrayList<>();
 
         stream.subscribe(new Flow.Subscriber<StreamFrame>() {
             @Override

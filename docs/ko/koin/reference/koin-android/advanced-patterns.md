@@ -162,7 +162,7 @@ val cart = shoppingScope.get<ShoppingCart>()
 @Singleton
 class FeatureRegistry(private val config: AppConfig) : KoinComponent {
 
-    fun getEnabledFeatures(): List<Feature> {
+    fun getEnabledFeatures(): `List<Feature>` {
         return config.enabledFeatures.mapNotNull { name ->
             getKoin().getOrNull<Feature>(named(name))
         }

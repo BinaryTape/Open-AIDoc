@@ -97,7 +97,7 @@ LLMクライアントを使用してプロンプトを実行するには、以�
         .build();
 
     // プロンプトを実行する
-    List<Message.Response> response = client.execute(prompt, OpenAIModels.Chat.GPT4o, Collections.emptyList());
+    `List<Message.Response>` response = client.execute(prompt, OpenAIModels.Chat.GPT4o, Collections.emptyList());
     // レスポンスを出力する
     System.out.println(response);
 
@@ -283,14 +283,14 @@ Tool call: " + toolCall.getName());
         .build()
         .withParams(params);
 
-    // LLMChoiceは List<Message.Response> の型エイリアスです
+    // LLMChoiceは `List<Message.Response>` の型エイリアスです
     List<List<Message.Response>> choices = client.executeMultipleChoices(
         prompt, 
         OpenAIModels.Chat.GPT4o
     );
 
     for (int i = 0; i < choices.size(); i++) {
-        List<Message.Response> choice = choices.get(i);
+        `List<Message.Response>` choice = choices.get(i);
         StringBuilder text = new StringBuilder();
         for (Message.Response msg : choice) {
             text.append(msg.getContent()).append(" ");
@@ -321,7 +321,7 @@ LLMクライアントがサポートする利用可能なモデルIDの一覧を
         val apiKey = System.getenv("OPENAI_API_KEY")
         val client = OpenAILLMClient(apiKey)
 
-        val models: List<LLModel> = client.models()
+        val models: `List<LLModel>` = client.models()
         models.forEach { println(it.id) }
     }
     ```
@@ -339,7 +339,7 @@ LLMクライアントがサポートする利用可能なモデルIDの一覧を
     String apiKey = System.getenv("OPENAI_API_KEY");
     OpenAILLMClient client = new OpenAILLMClient(apiKey);
 
-    List<LLModel> models = client.models();
+    `List<LLModel>` models = client.models();
     for (LLModel model : models) {
         System.out.println(model.getId());
     }

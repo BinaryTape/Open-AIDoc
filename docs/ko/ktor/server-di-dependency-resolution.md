@@ -190,7 +190,7 @@ dependencies {
 }
 
 // 타입 파라미터 공변성 지원 덕분에 작동합니다.
-val stringList: List<CharSequence> by dependencies
+val stringList: `List<CharSequence>` by dependencies
 // 이 또한 작동합니다.
 val stringCollection: Collection<CharSequence> by dependencies
 ```

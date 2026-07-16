@@ -916,7 +916,7 @@ Kotlin 2.0.0 為 Kotlin/JS 專案輸出引入了新的細粒度選項。您現�
 @JsExport
 data class User(
     val name: String,
-    val friends: List<User> = emptyList()
+    val friends: `List<User>` = emptyList()
 )
 
 @JsExport

@@ -365,7 +365,7 @@ SQLDelightはSQLiteドライバーの複数のプラットフォーム固有の�
     internal class Database(databaseDriverFactory: DatabaseDriverFactory) {
         // ...
     
-        internal fun getAllLaunches(): List<RocketLaunch> {
+        internal fun getAllLaunches(): `List<RocketLaunch>` {
             return dbQuery.selectAllLaunchesInfo(::mapLaunchSelecting).executeAsList()
         }
     
@@ -468,7 +468,7 @@ SQLDelightはSQLiteドライバーの複数のプラットフォーム固有の�
     class SpaceXApi {
         // ...
         
-        suspend fun getAllLaunches(): List<RocketLaunch> {
+        suspend fun getAllLaunches(): `List<RocketLaunch>` {
             return httpClient.get("https://api.spacexdata.com/v5/launches").body()
         }
     }
@@ -511,7 +511,7 @@ iOSおよびAndroidアプリケーションは、共有モジュールを通じ�
         // ...
    
         @Throws(Exception::class)
-        suspend fun getLaunches(forceReload: Boolean): List<RocketLaunch> {
+        suspend fun getLaunches(forceReload: Boolean): `List<RocketLaunch>` {
             val cachedLaunches = database.getAllLaunches()
             return if (cachedLaunches.isNotEmpty() && !forceReload) {
                 cachedLaunches
@@ -660,7 +660,7 @@ Jetpack ComposeとMaterial 3を使用してAndroidのUIを実装します。ま�
     
    data class RocketLaunchScreenState(
        val isLoading: Boolean = false,
-       val launches: List<RocketLaunch> = emptyList()
+       val launches: `List<RocketLaunch>` = emptyList()
    )
    ```
 
@@ -937,7 +937,7 @@ SwiftコードでKoinのクラスや関数を使用するために、特別な `
     class KoinHelper : KoinComponent {
         private val sdk: SpaceXSDK by inject<SpaceXSDK>()
 
-        suspend fun getLaunches(forceReload: Boolean): List<RocketLaunch> {
+        suspend fun getLaunches(forceReload: Boolean): `List<RocketLaunch>` {
             return sdk.getLaunches(forceReload = forceReload)
         }
     }

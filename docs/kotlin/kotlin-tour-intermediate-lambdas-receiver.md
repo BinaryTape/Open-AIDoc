@@ -270,7 +270,7 @@ fun main() {
 编写一个函数，创建一个整数列表的副本，其中每个元素都增加 1。使用提供的函数骨架，通过 `incremented` 函数扩展 `List<Int>`。
 
 ```kotlin
-fun List<Int>.incremented(): List<Int> {
+fun List<Int>.incremented(): `List<Int>` {
     val originalList = this
     return buildList {
         // 在此处编写你的代码
@@ -288,7 +288,7 @@ fun main() {
 
 |---|---|
 ```kotlin
-fun List<Int>.incremented(): List<Int> {
+fun List<Int>.incremented(): `List<Int>` {
     val originalList = this
     return buildList {
         for (n in originalList) add(n + 1)

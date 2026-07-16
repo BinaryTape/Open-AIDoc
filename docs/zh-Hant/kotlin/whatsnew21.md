@@ -187,7 +187,7 @@ Kotlin 中的字串插值使用單個錢符號。
 以下是使用多錢符號插值產生帶有占位符號的 JSON 架構多行字串的範例：
 
 ```kotlin
-val KClass<*>.jsonSchema : String
+val `KClass<*>`.jsonSchema : String
     get() = $"""
     {
       "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -963,15 +963,15 @@ val wasmJsMain by getting {
 以下是泛型型別之間轉換的範例：將 Kotlin `List<T>` 和 `Array<T>` 轉換為 JavaScript `JsArray<T>`。
 
 ```kotlin
-val list: List<JsString> =
+val list: `List<JsString>` =
     listOf("Kotlin", "Wasm").map { it.toJsString() }
 
 // 使用 .toJsArray() 將 List 或 Array 轉換為 JsArray
 val jsArray: JsArray<JsString> = list.toJsArray()
 
 // 使用 .toArray() 和 .toList() 將其轉回 Kotlin 型別 
-val kotlinArray: Array<JsString> = jsArray.toArray()
-val kotlinList: List<JsString> = jsArray.toList()
+val kotlinArray: `Array<JsString>` = jsArray.toArray()
+val kotlinList: `List<JsString>` = jsArray.toList()
 ```
 
 對於將型別化陣列轉換為其對應的 Kotlin 型別（例如 `IntArray` 和 `Int32Array`），也有類似的方法。 

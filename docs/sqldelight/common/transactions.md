@@ -17,7 +17,7 @@ database.playerQueries.transaction {
 要从事务中返回值，请使用 `transactionWithResult` 函数。
 
 ```kotlin
-val players: List<Player> = database.playerQueries.transactionWithResult {
+val players: `List<Player>` = database.playerQueries.transactionWithResult {
   database.playerQueries.selectAll().executeAsList()
 }
 ```

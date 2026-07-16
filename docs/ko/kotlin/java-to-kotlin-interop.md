@@ -544,7 +544,7 @@ fun unboxBase(box: Box<@JvmSuppressWildcards Base>): Base = box.value
 [`Nothing`](exceptions.md#the-nothing-type) 타입은 Java에 자연스러운 대응물이 없기 때문에 특별합니다. 실제로 `java.lang.Void`를 포함한 모든 Java 참조 타입은 값으로 `null`을 허용하지만, `Nothing`은 그것조차 허용하지 않습니다. 따라서 이 타입은 Java 세계에서 정확하게 표현될 수 없습니다. 이것이 Kotlin이 `Nothing` 타입의 인자가 사용되는 곳에 로우 타입(raw type)을 생성하는 이유입니다:
 
 ```kotlin
-fun emptyList(): List<Nothing> = listOf()
+fun emptyList(): `List<Nothing>` = listOf()
 // 다음과 같이 번역됨
 // List emptyList() { ... }
 ```

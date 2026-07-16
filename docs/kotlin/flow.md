@@ -11,7 +11,7 @@
 例如，我们可以编写一个 `simple` 函数，它返回一个包含三个数字的 [List]，然后使用 [forEach] 将它们全部打印出来：
 
 ```kotlin
-fun simple(): List<Int> = listOf(1, 2, 3)
+fun simple(): `List<Int>` = listOf(1, 2, 3)
  
 fun main() {
     simple().forEach { value -> println(value) } 
@@ -73,7 +73,7 @@ fun main() {
 import kotlinx.coroutines.*                 
                            
 //sampleStart
-suspend fun simple(): List<Int> {
+suspend fun simple(): `List<Int>` {
     delay(1000) // 假装我们在进行异步操作
     return listOf(1, 2, 3)
 }

@@ -469,5 +469,5 @@ class MyService(private val repo: UserRepository)
 ## 다음 단계
 
 - **[Scopes](/docs/reference/koin-core/scopes)** - 의존성 생명주기 관리
-- **[Koin for Android](/docs/integrations/android/index)** - 안드로이드 전용 주입
-- **[Koin for Compose](/docs/integrations/compose/index)** - 컴포즈 주입
+- **[Koin for Android](/docs/reference/koin-android/start)** - 안드로이드 전용 주입
+- **[Koin for Compose](/docs/reference/koin-compose/compose)** - 컴포즈 주입

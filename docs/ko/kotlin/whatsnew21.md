@@ -9,7 +9,7 @@ Kotlin의 문자열 보간은 단일 달러 기호를 사용합니다.
 다음은 멀티 달러 보간을 사용하여 자리표시자가 있는 JSON 스키마 멀티라인 문자열을 생성하는 예시입니다.
 
 ```kotlin
-val KClass<*>.jsonSchema : String
+val `KClass<*>`.jsonSchema : String
     get() = $"""
     {
       "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -679,15 +679,15 @@ Kotlin/Wasm의 표준 라이브러리는 JavaScript 배열을 위해 `JsArray<T>
 다음은 제네릭 타입인 Kotlin `List<T>` 및 `Array<T>`와 JavaScript `JsArray<T>` 간의 변환 예시입니다.
 
 ```kotlin
-val list: List<JsString> =
+val list: `List<JsString>` =
     listOf("Kotlin", "Wasm").map { it.toJsString() }
 
 // .toJsArray()를 사용하여 List나 Array를 JsArray로 변환
 val jsArray: JsArray<JsString> = list.toJsArray()
 
 // .toArray()와 .toList()를 사용하여 다시 Kotlin 타입으로 변환 
-val kotlinArray: Array<JsString> = jsArray.toArray()
-val kotlinList: List<JsString> = jsArray.toList()
+val kotlinArray: `Array<JsString>` = jsArray.toArray()
+val kotlinList: `List<JsString>` = jsArray.toList()
 ```
 
 타입이 지정된 배열(예: `IntArray` 및 `Int32Array`)을 해당 Kotlin 배열로 변환하는 유사한 메서드도 사용할 수 있습니다. 자세한 정보 및 구현은 [`kotlinx-browser` 저장소]( https://github.com/Kotlin/kotlinx-browser/blob/dfbdceed314567983c98f1d66e8c2e10d99c5a55/src/wasmJsMain/kotlin/arrayCopy.kt)를 참조하세요.

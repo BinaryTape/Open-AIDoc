@@ -412,6 +412,6 @@ class CheckoutActivity : AppCompatActivity(), AndroidScopeComponent {
 
 ## 下一步
 
-- **[Android 版 Koin](/docs/integrations/android/android-scopes)** - Android 特定的 scope
-- **[Compose 版 Koin](/docs/integrations/compose/compose-modules)** - Compose 中的 scope
-- **[最佳實務](/docs/best-practices/custom-scopes)** - Scope 模式
+- **[Android 版 Koin](/docs/reference/koin-android/scope)** - Android 特定的 scope
+- **[Compose 版 Koin](/docs/reference/koin-compose/compose-modules)** - Compose 中的 scope
+- **[最佳實務](/docs/reference/koin-core/scopes)** - Scope 模式

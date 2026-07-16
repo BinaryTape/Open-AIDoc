@@ -56,7 +56,7 @@ Compose Multiplatform 中的 `@Preview` 注解现在包含额外的参数，用�
 要将这些新阴影应用于 UI 组件，请使用 `dropShadow` 或 `innerShadow` 修饰符配置阴影效果：
 
 <list columns="2">
-   <li><code-block lang="kotlin" code="        Box(&#10;            Modifier.size(120.dp)&#10;                .dropShadow(&#10;                    RectangleShape,&#10;                    DropShadow(12.dp)&#10;                )&#10;                .background(Color.White)&#10;        )&#10;        Box(&#10;            Modifier.size(120.dp)&#10;                .innerShadow(&#10;                    RectangleShape,&#10;                    InnerShadow(12.dp)&#10;                )&#10;        )"/></li>
+   <li><code-block lang="kotlin" code="        Box(&#10;            Modifier.size(120.dp)&#10;                .dropShadow(&#10;                    RectangleShape,&#10;                    DropShadow(12.dp)&#10;                )&#10;                .background(Color.White)&#10;        )&#10;        Box(&#10;            Modifier.size(120.dp)&#10;                .innerShadow(&#10;                    RectangleShape,&#10;                    InnerShadow(12.dp)&#10;                )&#10;        )"></code-block></li>
    <li><img src="compose-advanced-shadows.png" type="inline" alt="Customizable shadows" width="200"/></li>
 </list>
 

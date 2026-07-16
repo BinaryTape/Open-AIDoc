@@ -1331,7 +1331,7 @@ Kotlin 2.2.20 在 Kotlin/JS 标准库中添加了 [实验性](components-stabili
 
 ```kotlin
 @OptIn(ExperimentalStdlibApi::class)
-fun inspect(klass: KClass<*>) {
+fun inspect(klass: `KClass<*>`) {
     // 对接口打印 true
     println(klass.isInterface)
 }
@@ -1406,9 +1406,9 @@ Kotlin 2.2.20 为 [`copyOf()`](https://kotlinlang.org/api/core/kotlin-stdlib/kot
 ```kotlin
 @OptIn(ExperimentalStdlibApi::class)
 fun main() {
-    val row1: Array<String> = arrayOf("one", "two")
+    val row1: `Array<String>` = arrayOf("one", "two")
     // 调整数组大小并使用 Lambda 填充新元素
-    val row2: Array<String> = row1.copyOf(4) { "default" }
+    val row2: `Array<String>` = row1.copyOf(4) { "default" }
     println(row2.contentToString())
     // [one, two, default, default]
 }

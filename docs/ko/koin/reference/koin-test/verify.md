@@ -7,7 +7,7 @@ Koin을 사용하면 설정 모듈을 검증할 수 있어, 런타임에 의존�
 :::info 미래: 컴파일 타임 안정성 (Compile-Time Safety)
 `verify()`와 `checkModules()` API는 모두 Koin 컴파일러 플러그인의 **네이티브 컴파일 타임 안정성(native compile-time safety)** 기능으로 대체될 예정입니다. 이를 통해 빌드 타임에 전체 설정을 검증하고, 런타임 전에 에러를 발견할 수 있습니다.
 
-자세한 내용은 [Koin 컴파일러 플러그인](/docs/intro/koin-compiler-plugin)을 참조하세요.
+자세한 내용은 [Koin 컴파일러 플러그인](/docs/setup/compiler-plugin)을 참조하세요.
 :::
 
 ## Verify API - JVM 전용 [3.3+]

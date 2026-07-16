@@ -306,7 +306,7 @@ v2.2.0부터 Ktor는 커스텀 클라이언트 [플러그인](client-plugins.md)
 예를 들어, 요청 결과로 리다이렉트가 발생하면 <code>onRequest</code> 핸들러는 원본 요청에 대해서만 실행되지만, <code>on(SendingRequest)</code>는 원본 요청과 리다이렉트된 요청 모두에 대해 실행됩니다.
 마찬가지로, <code>on(Send)</code>를 사용하여 추가 요청을 시작한 경우 핸들러는 다음과 같은 순서로 실행됩니다.
 </p>
-<code-block lang="Console" code="--&gt; onRequest&#10;--&gt; on(Send)&#10;--&gt; on(SendingRequest)&#10;&lt;-- onResponse&#10;--&gt; on(SendingRequest)&#10;&lt;-- onResponse"/>
+<code-block lang="Console" code="--&gt; onRequest&#10;--&gt; on(Send)&#10;--&gt; on(SendingRequest)&#10;&lt;-- onResponse&#10;--&gt; on(SendingRequest)&#10;&lt;-- onResponse"></code-block>
 <p>
 <emphasis>
 예제: <a href="#example-log-headers">헤더 로깅</a>, <a href="#example-response-time">응답 시간</a>

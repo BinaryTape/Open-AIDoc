@@ -141,7 +141,7 @@ class UserViewModel : ViewModel(), KoinComponent {
 Koin의 디자인 철학은 단순함과 설정의 용이성에 중점을 두면서도, 필요할 때 복잡한 구성이 가능하도록 하는 것입니다. Koin을 사용하면 개발자는 의존성을 효과적으로 관리할 수 있으며, 대부분의 시나리오에서 DI가 권장되는 선호 방식입니다.
 
 :::info
-**더 알아보기**: DI 개념에 대한 전체 가이드는 [의존성 주입 기초](/docs/intro/what-is-dependency-injection)를 참조하세요.
+**더 알아보기**: DI 개념에 대한 전체 가이드는 [의존성 주입 기초](/docs/setup/why)를 참조하세요.
 :::
 
 ---
@@ -246,7 +246,7 @@ module {
 - [Ktor 백엔드](/docs/quickstart/ktor) - 서버 애플리케이션 빌드
 
 ### 핵심 개념
-- [의존성 주입 기초](/docs/intro/what-is-dependency-injection) - 기본적인 DI 개념
+- [의존성 주입 기초](/docs/setup/why) - 기본적인 DI 개념
 - [핵심 기능](/docs/reference/koin-core/dsl) - Koin DSL 및 모듈 시스템
 - [안드로이드 통합](/docs/reference/koin-android/start) - 안드로이드 전용 기능
 

@@ -284,7 +284,7 @@ Text(stringResource(Res.string.str_template, "User_name", 100.1f))
 
 ```kotlin
 @Composable
-fun stringArrayResource(resource: StringArrayResource): List<String> {...}
+fun stringArrayResource(resource: StringArrayResource): `List<String>` {...}
 ```
 
 例：

@@ -314,7 +314,7 @@
     
     @Composable
     @Preview
-    fun App(countries: List<Country> = countries()) {
+    fun App(countries: `List<Country>` = countries()) {
         MaterialTheme {
             var showCountries by remember { mutableStateOf(false) }
             var timeAtLocation by remember { mutableStateOf("No location selected") }
@@ -430,7 +430,7 @@ Compose Multiplatform은 모든 플랫폼의 공통 코드를 통해 리소스�
 
     @Composable
     @Preview
-    fun App(countries: List<Country> = defaultCountries) {
+    fun App(countries: `List<Country>` = defaultCountries) {
         MaterialTheme {
             var showCountries by remember { mutableStateOf(false) }
             var timeAtLocation by remember { mutableStateOf("No location selected") }

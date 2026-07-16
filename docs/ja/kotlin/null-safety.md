@@ -351,7 +351,7 @@ data class Person(val name: String)
 fun main() {
 //sampleStart
     // nullableな文字列のリストを宣言
-    val listWithNulls: List<String?> = listOf("Kotlin", null)
+    val listWithNulls: `List<String?>` = listOf("Kotlin", null)
 
     // リストの各項目に対して反復処理
     for (item in listWithNulls) {
@@ -400,10 +400,10 @@ nullableな要素のコレクションがあり、非nullの要素だけを保�
 fun main() {
 //sampleStart
     // nullと非nullの整数値を含むリストを宣言
-    val nullableList: List<Int?> = listOf(1, 2, null, 4)
+    val nullableList: `List<Int?>` = listOf(1, 2, null, 4)
 
     // null値をフィルタリングし、結果として非nullの整数のリストを得る
-    val intList: List<Int> = nullableList.filterNotNull()
+    val intList: `List<Int>` = nullableList.filterNotNull()
   
     println(intList)
     // [1, 2, 4]

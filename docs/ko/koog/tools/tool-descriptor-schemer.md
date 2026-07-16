@@ -102,7 +102,7 @@ fun generate(toolDescriptor: ToolDescriptor): JsonObject
                 } else if (t instanceof ToolParameterType.Enum) {
                     prop.put("type", JsonPrimitive("string"));
                     String[] entries = ((ToolParameterType.Enum) t).getEntries();
-                    List<JsonElement> enumVals = new ArrayList<>();
+                    `List<JsonElement>` enumVals = new ArrayList<>();
                     for (String e : entries) enumVals.add(JsonPrimitive(e));
                     prop.put("enum", new JsonArray(enumVals));
                 } else {
@@ -114,7 +114,7 @@ fun generate(toolDescriptor: ToolDescriptor): JsonObject
             root.put("properties", new JsonObject(props));
 
             // required array
-            List<JsonElement> required = new ArrayList<>();
+            `List<JsonElement>` required = new ArrayList<>();
             for (ToolParameterDescriptor p : toolDescriptor.getRequiredParameters()) {
                 required.add(JsonPrimitive(p.getName()));
             }
@@ -123,8 +123,8 @@ fun generate(toolDescriptor: ToolDescriptor): JsonObject
             return new JsonObject(root);
         }
 
-        private static List<ToolParameterDescriptor> concat(List<ToolParameterDescriptor> a, List<ToolParameterDescriptor> b) {
-            List<ToolParameterDescriptor> res = new ArrayList<>(a.size() + b.size());
+        private static `List<ToolParameterDescriptor>` concat(List<ToolParameterDescriptor> a, `List<ToolParameterDescriptor>` b) {
+            `List<ToolParameterDescriptor>` res = new ArrayList<>(a.size() + b.size());
             res.addAll(a);
             res.addAll(b);
             return res;
@@ -232,7 +232,7 @@ fun generate(toolDescriptor: ToolDescriptor): JsonObject
         .user("Hello")
         .build();
 
-    List<Message.Response> responses = client.execute(prompt, OpenAIModels.Chat.GPT4o, java.util.List.of(getUserTool));
+    `List<Message.Response>` responses = client.execute(prompt, OpenAIModels.Chat.GPT4o, java.util.List.of(getUserTool));
     ```
     <!--- KNIT example-tool-descriptor-schemer-java-02.java -->
 

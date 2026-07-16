@@ -270,7 +270,7 @@ fun main() {
 編寫一個函式，建立整數清單的副本，其中每個元素都增加 1。請使用提供的函式架構，該架構使用 `incremented` 函式擴充了 `List<Int>`。
 
 ```kotlin
-fun List<Int>.incremented(): List<Int> {
+fun List<Int>.incremented(): `List<Int>` {
     val originalList = this
     return buildList {
         // 在此編寫您的程式碼
@@ -288,7 +288,7 @@ fun main() {
 
 |---|---|
 ```kotlin
-fun List<Int>.incremented(): List<Int> {
+fun List<Int>.incremented(): `List<Int>` {
     val originalList = this
     return buildList {
         for (n in originalList) add(n + 1)

@@ -1,6 +1,10 @@
 export function koogRewriteHref(env: any, href: string): string {
     let rewriteHref = href;
 
+    if (href.startsWith('http://') || href.startsWith('https://')) {
+        return href;
+    }
+
     if (href.includes('.md')) {
         href = href.replace('.md', '')
         rewriteHref = `./${href}`

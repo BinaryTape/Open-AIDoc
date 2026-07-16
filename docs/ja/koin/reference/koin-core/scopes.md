@@ -412,6 +412,6 @@ class CheckoutActivity : AppCompatActivity(), AndroidScopeComponent {
 
 ## 次のステップ
 
-- **[Koin for Android](/docs/integrations/android/android-scopes)** - Android 特有のスコープ
-- **[Koin for Compose](/docs/integrations/compose/compose-modules)** - Compose でのスコープ
-- **[ベストプラクティス](/docs/best-practices/custom-scopes)** - スコープのパターン
+- **[Koin for Android](/docs/reference/koin-android/scope)** - Android 特有のスコープ
+- **[Koin for Compose](/docs/reference/koin-compose/compose-modules)** - Compose でのスコープ
+- **[ベストプラクティス](/docs/reference/koin-core/scopes)** - スコープのパターン

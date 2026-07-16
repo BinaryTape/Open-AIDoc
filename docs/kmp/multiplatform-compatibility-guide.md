@@ -341,10 +341,10 @@ Kotlin 团队非常乐意帮助生态系统进行迁移，因此如果您遇到�
     
 <tr>
 <td>
-<code-block lang="kotlin" code="kotlin {&#10;    targets {&#10;        fromPreset(presets.iosArm64, 'ios')&#10;    }&#10;}"/>
+<code-block lang="kotlin" code="kotlin {&#10;    targets {&#10;        fromPreset(presets.iosArm64, 'ios')&#10;    }&#10;}"></code-block>
 </td>
 <td>
-<code-block lang="kotlin" code="kotlin {&#10;    iosArm64()&#10;}"/>
+<code-block lang="kotlin" code="kotlin {&#10;    iosArm64()&#10;}"></code-block>
 </td>
 </tr>
 
@@ -857,10 +857,10 @@ dependencies {
     
 <tr>
 <td>
-<code-block lang="kotlin" code="kotlin {&#10;    targets {&#10;        configure(['windows',&#10;            'linux']) {&#10;        }&#10;    }&#10;}"/>
+<code-block lang="kotlin" code="kotlin {&#10;    targets {&#10;        configure(['windows',&#10;            'linux']) {&#10;        }&#10;    }&#10;}"></code-block>
 </td>
 <td>
-<code-block lang="kotlin" code="kotlin {&#10;    targets {&#10;        configure([findByName('windows'),&#10;            findByName('linux')]) {&#10;        }&#10;    }&#10;}"/>
+<code-block lang="kotlin" code="kotlin {&#10;    targets {&#10;        configure([findByName('windows'),&#10;            findByName('linux')]) {&#10;        }&#10;    }&#10;}"></code-block>
 </td>
 </tr>
 
@@ -921,20 +921,20 @@ Kotlin Multiplatform 项目中的一个目标有两个默认编译：`main` 和 
 <tr>
 <td rowspan="2"><code>jvmMain</code> 编译的依赖项</td>
 <td>
-<code-block lang="kotlin" code="jvm&lt;Scope&gt;"/>
+<code-block lang="kotlin" code="jvm&lt;Scope&gt;"></code-block>
 </td>
 <td>
-<code-block lang="kotlin" code="jvmCompilation&lt;Scope&gt;"/>
+<code-block lang="kotlin" code="jvmCompilation&lt;Scope&gt;"></code-block>
 </td>
 </tr>
 
     
 <tr>
 <td>
-<code-block lang="kotlin" code="dependencies {&#10;    add(&quot;jvmImplementation&quot;,&#10;        &quot;foo.bar.baz:1.2.3&quot;)&#10;}"/>
+<code-block lang="kotlin" code="dependencies {&#10;    add(&quot;jvmImplementation&quot;,&#10;        &quot;foo.bar.baz:1.2.3&quot;)&#10;}"></code-block>
 </td>
 <td>
-<code-block lang="kotlin" code="dependencies {&#10;    add(&quot;jvmCompilationImplementation&quot;,&#10;        &quot;foo.bar.baz:1.2.3&quot;)&#10;}"/>
+<code-block lang="kotlin" code="dependencies {&#10;    add(&quot;jvmCompilationImplementation&quot;,&#10;        &quot;foo.bar.baz:1.2.3&quot;)&#10;}"></code-block>
 </td>
 </tr>
 
@@ -942,7 +942,7 @@ Kotlin Multiplatform 项目中的一个目标有两个默认编译：`main` 和 
 <tr>
 <td><code>jvmMain</code> 源集的依赖项</td>
 <td colspan="2">
-<code-block lang="kotlin" code="jvmMain&lt;Scope&gt;"/>
+<code-block lang="kotlin" code="jvmMain&lt;Scope&gt;"></code-block>
 </td>
 </tr>
 
@@ -950,10 +950,10 @@ Kotlin Multiplatform 项目中的一个目标有两个默认编译：`main` 和 
 <tr>
 <td><code>jvmTest</code> 编译的依赖项</td>
 <td>
-<code-block lang="kotlin" code="jvmTest&lt;Scope&gt;"/>
+<code-block lang="kotlin" code="jvmTest&lt;Scope&gt;"></code-block>
 </td>
 <td>
-<code-block lang="kotlin" code="jvmTestCompilation&lt;Scope&gt;"/>
+<code-block lang="kotlin" code="jvmTestCompilation&lt;Scope&gt;"></code-block>
 </td>
 </tr>
 
@@ -961,7 +961,7 @@ Kotlin Multiplatform 项目中的一个目标有两个默认编译：`main` 和 
 <tr>
 <td><code>jvmTest</code> 源集的依赖项</td>
 <td colspan="2">
-<code-block lang="kotlin" code="jvmTest&lt;Scope&gt;"/>
+<code-block lang="kotlin" code="jvmTest&lt;Scope&gt;"></code-block>
 </td>
 </tr>
 

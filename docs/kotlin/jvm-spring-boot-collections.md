@@ -20,7 +20,7 @@ Kotlin 集合提供了一组用于从集合中获取单个元素的函数。
 
 ```kotlin
 @GetMapping("/firstAndLast")
-fun firstAndLast(): List<Message> {
+fun firstAndLast(): `List<Message>` {
     val messages = service.findMessages()
     return listOf(messages.first(), messages.last())
 }
@@ -65,7 +65,7 @@ fun firstMessageOrNull(): Message {
 
 ```kotlin
 @GetMapping("/filterMessagesLongerThan10")
-fun filterMessagesLongerThan10(): List<Message> {
+fun filterMessagesLongerThan10(): `List<Message>` {
     val messages = service.findMessages()
     return messages.filter { it.text.length > 10 }
 }
@@ -85,7 +85,7 @@ Kotlin 标准库提供了许多以各种方式进行排序的函数：自然顺�
 
 ```kotlin
 @GetMapping("/sortByLastLetter")
-fun sortByLastLetter(): List<Message> {
+fun sortByLastLetter(): `List<Message>` {
     val messages = service.findMessages()
     return messages.sortedBy { it.text.last() }
 }
@@ -126,7 +126,7 @@ fun groups(): Map<String, List<Message>> {
 
 ```kotlin
 @GetMapping("/transformMessagesToListOfStrings")
-fun transformMessagesToListOfStrings(): List<String> {
+fun transformMessagesToListOfStrings(): `List<String>` {
     val messages = service.findMessages()
     return messages.map { "${it.id} ${it.text}" }
 }

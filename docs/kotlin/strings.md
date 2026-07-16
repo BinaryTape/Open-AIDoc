@@ -168,7 +168,7 @@ ${'$'}9.99
 例如：
 
 ```kotlin
-val KClass<*>.jsonSchema : String
+val `KClass<*>`.jsonSchema : String
     get() = $$"""
     {
       "$schema": "https://json-schema.org/draft/2020-12/schema",

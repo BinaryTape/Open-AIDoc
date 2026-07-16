@@ -262,7 +262,7 @@ Anthropicモデルへのリクエストは、ラウンドロビンがプロバ�
         .build();
 
     // プロンプトを実行する
-    List<Message.Response> response = promptExecutor.execute(prompt, OpenAIModels.Chat.GPT4o);
+    `List<Message.Response>` response = promptExecutor.execute(prompt, OpenAIModels.Chat.GPT4o);
     ```
     <!--- KNIT example-prompt-executors-java-05.java -->
 
@@ -356,10 +356,10 @@ Anthropicモデルへのリクエストは、ラウンドロビンがプロバ�
         .build();
 
     // OpenAIモデルでプロンプトを実行する。プロンプトエグゼキューターは自動的にOpenAIクライアントに切り替わる
-    List<Message.Response> openAIResult = promptExecutor.execute(prompt, OpenAIModels.Chat.GPT4o);
+    `List<Message.Response>` openAIResult = promptExecutor.execute(prompt, OpenAIModels.Chat.GPT4o);
 
     // Anthropicモデルでプロンプトを実行する。プロンプトエグゼキューターは自動的にAnthropicクライアントに切り替わる
-    List<Message.Response> anthropicResult = promptExecutor.execute(prompt, AnthropicModels.Sonnet_4_5);
+    `List<Message.Response>` anthropicResult = promptExecutor.execute(prompt, AnthropicModels.Sonnet_4_5);
     ```
     <!--- KNIT example-prompt-executors-java-06.java -->
 
@@ -474,7 +474,7 @@ Anthropicモデルへのリクエストは、ラウンドロビンがプロバ�
         .build();
 
     // Googleモデルを渡すと、Googleクライアントが含まれていないため、プロンプトエグゼキューターはフォールバックモデルを使用する
-    List<Message.Response> response = multiExecutor.execute(p, GoogleModels.Gemini2_5Pro);
+    `List<Message.Response>` response = multiExecutor.execute(p, GoogleModels.Gemini2_5Pro);
     ```
     <!--- KNIT example-prompt-executors-java-08.java -->
 

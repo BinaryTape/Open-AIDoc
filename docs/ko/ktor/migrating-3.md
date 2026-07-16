@@ -508,8 +508,8 @@ Ktor 3.0.0 이전에는 [`HttpResponse`](https://api.ktor.io/ktor-client-core/io
 애플리케이션을 마이그레이션하려면 코드가 이전 클래스를 참조하지 않는지 확인하고 최신 Ktor 버전으로 컴파일하세요. 예외 확인 코드를 업데이트하는 방법은 다음과 같습니다:
 
 <compare type="top-bottom" first-title="2.x.x" second-title="3.0.x">
-    <code-block lang="kotlin" code="    if (exception is io.ktor.client.network.sockets.SocketTimeoutException) { ... }"/>
-    <code-block lang="kotlin" code="    if (exception is java.net.SocketTimeoutException) { ... }"/>
+    <code-block lang="kotlin" code="    if (exception is io.ktor.client.network.sockets.SocketTimeoutException) { ... }"></code-block>
+    <code-block lang="kotlin" code="    if (exception is java.net.SocketTimeoutException) { ... }"></code-block>
 </compare>
 
 ## 공유 모듈

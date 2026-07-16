@@ -87,10 +87,10 @@ Gradle 또는 Maven을 사용하여 Ktor 애플리케이션을 실행하려면 �
 
    <Tabs group="os">
    <TabItem title="Linux/macOS" group-key="unix">
-   <code-block code="./ktor-sample"/>
+   <code-block code="./ktor-sample"></code-block>
    </TabItem>
    <TabItem title="Windows" group-key="windows">
-   <code-block code="ktor-sample.bat"/>
+   <code-block code="ktor-sample.bat"></code-block>
    </TabItem>
    </Tabs>
   

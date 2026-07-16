@@ -60,15 +60,15 @@ CocoaPods 依存関係を持つ KMP モジュールがあり、[SwiftPM イン�
    pod と対応する Swift パッケージが全く同じ API を提供している場合、Kotlin のインポートディレクティブを更新するだけで済むはずです。例：
 
     <compare type="top-bottom">
-        <code-block lang="kotlin" code="            import cocoapods.FirebaseAnalytics.FIRAnalytics"/>
-        <code-block lang="kotlin" code="            import swiftPMImport.org.example.package.FIRAnalytics"/>
+        <code-block lang="kotlin" code="            import cocoapods.FirebaseAnalytics.FIRAnalytics"></code-block>
+        <code-block lang="kotlin" code="            import swiftPMImport.org.example.package.FIRAnalytics"></code-block>
     </compare>
 
 5. ビルドスクリプトで `cocoapods.framework {}` ブロックを使用している場合は、その設定を `binaries.framework {}` ブロックに移動します。例：
 
    <compare type="left-right">
-   <code-block lang="kotlin" code="   kotlin {&#10;       iosArm64()&#10;       iosSimulatorArm64()&#10;       iosX64()&#10;&#10;       cocoapods {&#10;           framework {&#10;               baseName = &quot;Shared&quot;&#10;               isStatic = true&#10;           }&#10;       }&#10;   }"/>
-   <code-block lang="kotlin" code="   kotlin {&#10;       listOf(&#10;           iosArm64(),&#10;           iosSimulatorArm64(),&#10;           iosX64(),&#10;       ).forEach { iosTarget -&gt;&#10;           iosTarget.binaries.framework {&#10;               baseName = &quot;Shared&quot;&#10;               isStatic = true&#10;           }&#10;       }&#10;   }"/>
+   <code-block lang="kotlin" code="   kotlin {&#10;       iosArm64()&#10;       iosSimulatorArm64()&#10;       iosX64()&#10;&#10;       cocoapods {&#10;           framework {&#10;               baseName = &quot;Shared&quot;&#10;               isStatic = true&#10;           }&#10;       }&#10;   }"></code-block>
+   <code-block lang="kotlin" code="   kotlin {&#10;       listOf(&#10;           iosArm64(),&#10;           iosSimulatorArm64(),&#10;           iosX64(),&#10;       ).forEach { iosTarget -&gt;&#10;           iosTarget.binaries.framework {&#10;               baseName = &quot;Shared&quot;&#10;               isStatic = true&#10;           }&#10;       }&#10;   }"></code-block>
    </compare>
 
 ## Xcode プロジェクトを再構成する

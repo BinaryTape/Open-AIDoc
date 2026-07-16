@@ -7,7 +7,7 @@ Koin 允許您驗證您的配置模組，避免在執行時才發現相依注入
 :::info 未來：編譯期安全
 `verify()` 與 `checkModules()` API 將被 Koin 編譯器外掛程式中的 **原生編譯期安全** 功能取代。這將在建置時期驗證您的整個配置，並在執行之前擷取錯誤。
 
-若要了解更多，請參閱 [Koin 編譯器外掛程式](/docs/intro/koin-compiler-plugin)。
+若要了解更多，請參閱 [Koin 編譯器外掛程式](/docs/setup/compiler-plugin)。
 :::
 
 ## Verify API - 僅限 JVM [3.3+]

@@ -511,8 +511,8 @@ Ktor 3.0.0 より前は、[`HttpResponse`](https://api.ktor.io/ktor-client-core/
 アプリケーションを移行するには、コードが古いクラスを参照しておらず、最新の Ktor バージョンでコンパイルされていることを確認してください。例外チェックの更新方法は以下の通りです。
 
 <compare type="top-bottom" first-title="2.x.x" second-title="3.0.x">
-    <code-block lang="kotlin" code="    if (exception is io.ktor.client.network.sockets.SocketTimeoutException) { ... }"/>
-    <code-block lang="kotlin" code="    if (exception is java.net.SocketTimeoutException) { ... }"/>
+    <code-block lang="kotlin" code="    if (exception is io.ktor.client.network.sockets.SocketTimeoutException) { ... }"></code-block>
+    <code-block lang="kotlin" code="    if (exception is java.net.SocketTimeoutException) { ... }"></code-block>
 </compare>
 
 ## 共有モジュール

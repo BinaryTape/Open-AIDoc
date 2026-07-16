@@ -139,7 +139,7 @@ val result = buildList {
 val result = buildList {
     val x = get(0)
     val y: String = x
-} // result는 List<String> 타입으로 추론됩니다.
+} // result는 `List<String>` 타입으로 추론됩니다.
 ```
 
 지연된 타입 변수가 `String` 타입의 변수에 할당된 후, 빌더 추론은 `x`가 `String`의 하위 타입이라는 정보를 얻습니다. 이 할당문은 빌더 람다의 마지막 문장이므로, 빌더 추론 분석은 타입 인자 `E`를 `String`으로 추론하며 종료됩니다.
@@ -154,14 +154,14 @@ val result = buildList {
   val result = buildList {
       // 전달된 "value" 인자를 바탕으로 타입 인자가 String으로 추론됩니다.
       add("value")
-  } // result는 List<String> 타입으로 추론됩니다.
+  } // result는 `List<String>` 타입으로 추론됩니다.
   ```
 * 타입 파라미터의 타입을 반환하는 호출에 대해 예상되는 타입(expected type) 지정
   ```kotlin
   val result = buildList {
       // 예상되는 타입을 바탕으로 타입 인자가 Float로 추론됩니다.
       val x: Float = get(0)
-  } // result는 List<Float> 타입을 가집니다.
+  } // result는 `List<Float>` 타입을 가집니다.
   ```
   ```kotlin
   class Foo<T> {
@@ -172,7 +172,7 @@ val result = buildList {
 
   fun main() {
       val result = myBuilder {
-          val x: List<CharSequence> = items
+          val x: `List<CharSequence>` = items
           // ...
       } // result는 Foo<CharSequence> 타입을 가집니다.
   }
@@ -189,17 +189,17 @@ val result = buildList {
       val result1 = buildList {
           val x = get(0)
           takeMyLong(x)
-      } // result1은 List<Long> 타입을 가집니다.
+      } // result1은 `List<Long>` 타입을 가집니다.
 
       val result2 = buildList {
           val x = get(0)
           val isLong = x.isMoreThat3()
       // ...
-      } // result2은 List<String> 타입을 가집니다.
+      } // result2은 `List<String>` 타입을 가집니다.
   
       val result3 = buildList {
           takeListOfStrings(this)
-      } // result3은 List<String> 타입을 가집니다.
+      } // result3은 `List<String>` 타입을 가집니다.
   }
   ```
 * 람다 수신 객체 멤버의 호출 가능 참조(callable reference) 가져오기
@@ -207,7 +207,7 @@ val result = buildList {
   fun main() {
       val result = buildList {
           val x: KFunction1<Int, Float> = ::get
-      } // result는 List<Float> 타입을 가집니다.
+      } // result는 `List<Float>` 타입을 가집니다.
   }
   ```
   ```kotlin
@@ -216,7 +216,7 @@ val result = buildList {
   fun main() {
       val result = buildList {
           takeFunction(::get)
-      } // result는 List<Float> 타입을 가집니다.
+      } // result는 `List<Float>` 타입을 가집니다.
   }
   ```
 
@@ -229,7 +229,7 @@ val result = buildList { // 지연된 타입 변수 E를 추론합니다.
     // E가 Int 또는 Int의 상위 타입이라고 고려합니다.
     add(1)
     // E는 Int로 추론됩니다.
-} // result는 List<Int> 타입을 가집니다.
+} // result는 `List<Int>` 타입을 가집니다.
 ```
 
 결과 타입은 분석 중에 수집된 타입 정보에 부합하는 가장 구체적인 타입(most specific type)입니다. 주어진 타입 정보가 모순되어 병합할 수 없는 경우 컴파일러는 오류를 보고합니다.

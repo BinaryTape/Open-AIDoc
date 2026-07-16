@@ -467,11 +467,11 @@ Kotlin 2.3.20부터 이러한 어노테이션이 달린 Java 선언에서 반환
 ```java
 // Java
 public class Java {
-    public static @UnmodifiableView List<Object> unmodifiableView() {
+    public static @UnmodifiableView `List<Object>` unmodifiableView() {
         return List.of();
     }
 
-    public static @Unmodifiable List<Object> unmodifiable() {
+    public static @Unmodifiable `List<Object>` unmodifiable() {
         return List.of();
     }
 }
@@ -849,7 +849,7 @@ import java.nio.file.Path
 val toolchains: KotlinToolchains = ...
 val jvmToolchain: JvmPlatformToolchain = toolchains.jvm
 val operation: JvmCompilationOperation.Builder = jvmToolchain.jvmCompilationOperationBuilder(...)
-val noArgPluginClasspath: List<Path> = ...
+val noArgPluginClasspath: `List<Path>` = ...
 operation.compilerArguments[COMPILER_PLUGINS] = listOf(
     CompilerPlugin(
         pluginId = "org.jetbrains.kotlin.noarg",

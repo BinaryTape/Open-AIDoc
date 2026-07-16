@@ -88,7 +88,7 @@
     // 第一次运行缓存的 prompt executor
     // 这将执行实际的 LLM 请求
     long start1 = System.nanoTime();
-    List<Message.Response> firstResponse = cachedExecutor.execute(prompt, OllamaModels.Meta.LLAMA_3_2);
+    `List<Message.Response>` firstResponse = cachedExecutor.execute(prompt, OllamaModels.Meta.LLAMA_3_2);
     long firstTimeMs = (System.nanoTime() - start1) / 1_000_000L;
     System.out.println("First response: " + firstResponse.getFirst().getContent());
     System.out.println("First execution took: " + firstTimeMs + "ms");
@@ -96,7 +96,7 @@
     // 第二次运行缓存的 prompt executor
     // 这将立即从缓存中返回结果
     long start2 = System.nanoTime();
-    List<Message.Response> secondResponse = cachedExecutor.execute(prompt, OllamaModels.Meta.LLAMA_3_2);
+    `List<Message.Response>` secondResponse = cachedExecutor.execute(prompt, OllamaModels.Meta.LLAMA_3_2);
     long secondTimeMs = (System.nanoTime() - start2) / 1_000_000L;
     System.out.println("Second response: " + secondResponse.getFirst().getContent());
     System.out.println("Second execution took: " + secondTimeMs + "ms");

@@ -73,7 +73,7 @@ Jetcasterでは、これらのライブラリのリストは以下の通りで�
 
   Koinは信頼性の高いマルチプラットフォームDIフレームワークです。ニーズに合わない場合や、必要な書き換えが大規模すぎる場合は、他のソリューションもあります。
   [Metro](https://zacsweers.github.io/metro/latest/) フレームワークもマルチプラットフォーム対応です。DaggerやKotlin Injectを含む[他のアノテーションとの相互運用](https://zacsweers.github.io/metro/latest/interop/)をサポートしているため、移行を容易にする可能性があります。
-* Coil 2：画像読み込みライブラリ（[バージョン3でマルチプラットフォーム化](https://coil-kt.github.io/coil/upgrading_to_coil3/)）
+* Coil 2：画像読み込みライブラリ（[バージョン3でマルチプラットフォーム化](/coil/migrating_to_coil3/)）
 * ROME：RSSフレームワーク（マルチプラットフォームの [RSS Parser](https://github.com/prof18/RSS-Parser) に置き換え）
 * JUnit：テストフレームワーク（[kotlin-test](https://kotlinlang.org/api/core/kotlin-test/)に置き換え）
 

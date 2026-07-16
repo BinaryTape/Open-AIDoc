@@ -15,7 +15,7 @@ Koin 编译器插件是一个**原生 Kotlin 编译器插件 (K2)**，它可以�
 - 同时支持 DSL 和注解
 - 不生成可见文件
 
-有关功能和优势的详细信息，请参阅 [Koin 编译器插件简介](/docs/intro/koin-compiler-plugin)。
+有关功能和优势的详细信息，请参阅 [Koin 编译器插件简介](/docs/setup/compiler-plugin)。
 
 ## 要求
 
@@ -351,7 +351,7 @@ import org.koin.dsl.*
 2. 将导入更新为 `org.koin.plugin.module.dsl.*`
 3. 将 `single { Class(get() ...) }` 或 `singleOf(::Class)` 替换为 `single<Class>()`
 
-请参阅[从 DSL 迁移到编译器插件](/docs/migration/from-dsl-to-compiler-plugin)。
+请参阅[从 DSL 迁移到编译器插件](/docs/migration/from-ksp-to-compiler-plugin)。
 
 ### 从 KSP 注解迁移
 
@@ -364,6 +364,6 @@ import org.koin.dsl.*
 
 ## 后续步骤
 
-- **[DSL 参考](/docs/reference/dsl-reference)** —— 完整的 DSL 文档
-- **[注解参考](/docs/reference/annotations-reference)** —— 完整的注解文档
+- **[DSL 参考](/docs/reference/koin-core/modules)** —— 完整的 DSL 文档
+- **[注解参考](/docs/reference/koin-annotations/modules)** —— 完整的注解文档
 - **[启动 Koin](/docs/reference/koin-core/starting-koin)** —— 配置您的应用程序

@@ -17,7 +17,7 @@ database.playerQueries.transaction {
 트랜잭션에서 값을 반환하려면 `transactionWithResult` 함수를 사용하세요.
 
 ```kotlin
-val players: List<Player> = database.playerQueries.transactionWithResult {
+val players: `List<Player>` = database.playerQueries.transactionWithResult {
   database.playerQueries.selectAll().executeAsList()
 }
 ```

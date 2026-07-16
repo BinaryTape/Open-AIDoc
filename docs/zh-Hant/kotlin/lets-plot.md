@@ -121,17 +121,17 @@ boxPlot
 
    ```kotlin
    // 為三個分佈定義共變異數矩陣
-   val cov0: Array<DoubleArray> = arrayOf(
+   val cov0: `Array<DoubleArray>` = arrayOf(
        doubleArrayOf(1.0, -.8),
        doubleArrayOf(-.8, 1.0)
    )
    
-   val cov1: Array<DoubleArray> = arrayOf(
+   val cov1: `Array<DoubleArray>` = arrayOf(
        doubleArrayOf(1.0, .8),
        doubleArrayOf(.8, 1.0)
    )
    
-   val cov2: Array<DoubleArray> = arrayOf(
+   val cov2: `Array<DoubleArray>` = arrayOf(
        doubleArrayOf(10.0, .1),
        doubleArrayOf(.1, .1)
    )

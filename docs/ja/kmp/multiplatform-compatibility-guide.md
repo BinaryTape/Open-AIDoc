@@ -339,10 +339,10 @@ Kotlin 1.6.20 以降、Kotlin ツールチェーンのデフォルトの動作�
     
 <tr>
 <td>
-<code-block lang="kotlin" code="kotlin {&#10;    targets {&#10;        fromPreset(presets.iosArm64, 'ios')&#10;    }&#10;}"/>
+<code-block lang="kotlin" code="kotlin {&#10;    targets {&#10;        fromPreset(presets.iosArm64, 'ios')&#10;    }&#10;}"></code-block>
 </td>
 <td>
-<code-block lang="kotlin" code="kotlin {&#10;    iosArm64()&#10;}"/>
+<code-block lang="kotlin" code="kotlin {&#10;    iosArm64()&#10;}"></code-block>
 </td>
 </tr>
 
@@ -854,10 +854,10 @@ Gradle によって自動生成されるターゲットアクセサ（accessors�
     
 <tr>
 <td>
-<code-block lang="kotlin" code="kotlin {&#10;    targets {&#10;        configure(['windows',&#10;            'linux']) {&#10;        }&#10;    }&#10;}"/>
+<code-block lang="kotlin" code="kotlin {&#10;    targets {&#10;        configure(['windows',&#10;            'linux']) {&#10;        }&#10;    }&#10;}"></code-block>
 </td>
 <td>
-<code-block lang="kotlin" code="kotlin {&#10;    targets {&#10;        configure([findByName('windows'),&#10;            findByName('linux')]) {&#10;        }&#10;    }&#10;}"/>
+<code-block lang="kotlin" code="kotlin {&#10;    targets {&#10;        configure([findByName('windows'),&#10;            findByName('linux')]) {&#10;        }&#10;    }&#10;}"></code-block>
 </td>
 </tr>
 
@@ -918,20 +918,20 @@ Kotlin Multiplatform プロジェクトのターゲットには、`main` と `te
 <tr>
 <td rowspan="2"><code>jvmMain</code> コンパイルの依存関係</td>
 <td>
-<code-block lang="kotlin" code="jvm&lt;Scope&gt;"/>
+<code-block lang="kotlin" code="jvm&lt;Scope&gt;"></code-block>
 </td>
 <td>
-<code-block lang="kotlin" code="jvmCompilation&lt;Scope&gt;"/>
+<code-block lang="kotlin" code="jvmCompilation&lt;Scope&gt;"></code-block>
 </td>
 </tr>
 
     
 <tr>
 <td>
-<code-block lang="kotlin" code="dependencies {&#10;    add(&quot;jvmImplementation&quot;,&#10;        &quot;foo.bar.baz:1.2.3&quot;)&#10;}"/>
+<code-block lang="kotlin" code="dependencies {&#10;    add(&quot;jvmImplementation&quot;,&#10;        &quot;foo.bar.baz:1.2.3&quot;)&#10;}"></code-block>
 </td>
 <td>
-<code-block lang="kotlin" code="dependencies {&#10;    add(&quot;jvmCompilationImplementation&quot;,&#10;        &quot;foo.bar.baz:1.2.3&quot;)&#10;}"/>
+<code-block lang="kotlin" code="dependencies {&#10;    add(&quot;jvmCompilationImplementation&quot;,&#10;        &quot;foo.bar.baz:1.2.3&quot;)&#10;}"></code-block>
 </td>
 </tr>
 
@@ -939,7 +939,7 @@ Kotlin Multiplatform プロジェクトのターゲットには、`main` と `te
 <tr>
 <td><code>jvmMain</code> ソースセットの依存関係</td>
 <td colspan="2">
-<code-block lang="kotlin" code="jvmMain&lt;Scope&gt;"/>
+<code-block lang="kotlin" code="jvmMain&lt;Scope&gt;"></code-block>
 </td>
 </tr>
 
@@ -947,10 +947,10 @@ Kotlin Multiplatform プロジェクトのターゲットには、`main` と `te
 <tr>
 <td><code>jvmTest</code> コンパイルの依存関係</td>
 <td>
-<code-block lang="kotlin" code="jvmTest&lt;Scope&gt;"/>
+<code-block lang="kotlin" code="jvmTest&lt;Scope&gt;"></code-block>
 </td>
 <td>
-<code-block lang="kotlin" code="jvmTestCompilation&lt;Scope&gt;"/>
+<code-block lang="kotlin" code="jvmTestCompilation&lt;Scope&gt;"></code-block>
 </td>
 </tr>
 
@@ -958,7 +958,7 @@ Kotlin Multiplatform プロジェクトのターゲットには、`main` と `te
 <tr>
 <td><code>jvmTest</code> ソースセットの依存関係</td>
 <td colspan="2">
-<code-block lang="kotlin" code="jvmTest&lt;Scope&gt;"/>
+<code-block lang="kotlin" code="jvmTest&lt;Scope&gt;"></code-block>
 </td>
 </tr>
 

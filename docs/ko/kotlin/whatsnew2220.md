@@ -1198,7 +1198,7 @@ Kotlin 2.2.20은 Kotlin/JS 표준 라이브러리에 [실험적(Experimental)](c
 
 ```kotlin
 @OptIn(ExperimentalStdlibApi::class)
-fun inspect(klass: KClass<*>) {
+fun inspect(klass: `KClass<*>`) {
     // 인터페이스인 경우 true 출력
     println(klass.isInterface)
 }
@@ -1268,9 +1268,9 @@ Kotlin 2.2.20은 [`copyOf()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotl
 ```kotlin
 @OptIn(ExperimentalStdlibApi::class)
 fun main() {
-    val row1: Array<String> = arrayOf("one", "two")
+    val row1: `Array<String>` = arrayOf("one", "two")
     // 배열의 크기를 조정하고 람다를 사용하여 새 요소를 채움
-    val row2: Array<String> = row1.copyOf(4) { "default" }
+    val row2: `Array<String>` = row1.copyOf(4) { "default" }
     println(row2.contentToString())
     // [one, two, default, default]
 }

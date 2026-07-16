@@ -37,10 +37,10 @@ Application 插件提供了多种打包应用程序的方式，例如，`install
    
    <Tabs group="os">
    <TabItem title="Linux/macOS" group-key="unix">
-   <code-block code="./gradlew installDist"/>
+   <code-block code="./gradlew installDist"></code-block>
    </TabItem>
    <TabItem title="Windows" group-key="windows">
-   <code-block code="gradlew.bat installDist"/>
+   <code-block code="gradlew.bat installDist"></code-block>
    </TabItem>
    </Tabs>
 
@@ -54,10 +54,10 @@ Application 插件提供了多种打包应用程序的方式，例如，`install
    <snippet id="run_executable">
    <Tabs group="os">
    <TabItem title="Linux/macOS" group-key="unix">
-   <code-block code="./ktor-sample"/>
+   <code-block code="./ktor-sample"></code-block>
    </TabItem>
    <TabItem title="Windows" group-key="windows">
-   <code-block code="ktor-sample.bat"/>
+   <code-block code="ktor-sample.bat"></code-block>
    </TabItem>
    </Tabs>
    </snippet>

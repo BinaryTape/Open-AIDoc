@@ -55,7 +55,7 @@ fun main() {
 > 
 > ```kotlin
 >     val shapes: MutableList<String> = mutableListOf("triangle", "square", "circle")
->     val shapesLocked: List<String> = shapes
+>     val shapesLocked: `List<String>` = shapes
 > ```
 > 이를 **캐스팅(casting)**이라고도 합니다.
 > 

@@ -177,7 +177,7 @@ fun main(args: Array<String>) {
    </def>
    <def title="程式進入點 – main()">
       <p><a href="basic-syntax.md#program-entry-point"><code>main()</code></a> 函式是應用程式的進入點。</p>
-      <p>它被宣告為 <code>DemoApplication</code> 類別之外的 <a href="functions.md#function-scope">頂層函式</a>。<code>main()</code> 函式會調用 Spring 的 <code>runApplication(*args)</code> 函式，以透過 Spring Framework 啟動應用程式。</p>
+      <p>它被宣告為 <code>DemoApplication</code> 類別之外的 <a href="functions.md#function-scope">頂層函式</a>。<code>main()</code> 函式會調用 Spring 的 `runApplication(*args)` 函式，以透過 Spring Framework 啟動應用程式。</p>
    </def>
    <def title="可變參數 – args: Array&lt;String&gt;">
       <p>如果您查看 <code>runApplication()</code> 函式的宣告，會發現該函式的參數標有 <a href="functions.md#variable-number-of-arguments-varargs"><code>vararg</code> 修飾詞</a>：<code>vararg args: String</code>。這意味著您可以向該函式傳遞可變數量的字串引數。</p>

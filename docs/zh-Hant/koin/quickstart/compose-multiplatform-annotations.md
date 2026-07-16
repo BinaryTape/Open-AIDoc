@@ -85,7 +85,7 @@ interface MuseumApi {
 
 @Single
 class KtorMuseumApi(private val client: HttpClient) : MuseumApi {
-    override suspend fun getData(): List<MuseumObject> {
+    override suspend fun getData(): `List<MuseumObject>` {
         return try {
             client.get(API_URL).body()
         } catch (e: Exception) {

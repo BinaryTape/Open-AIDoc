@@ -9,7 +9,7 @@ KSP는 다중 라운드 처리(multiple round processing), 즉 여러 라운드�
 다음 샘플 코드는 유효성 검사(validation check)를 사용하여 유효하지 않은 심볼을 지연시키는 방법을 보여줍니다.
 
 ```kotlin
-override fun process(resolver: Resolver): List<KSAnnotated> {
+override fun process(resolver: Resolver): `List<KSAnnotated>` {
     val symbols = resolver.getSymbolsWithAnnotation("com.example.annotation.Builder")
     val result = symbols.filter { !it.validate() }
     symbols

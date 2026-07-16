@@ -917,7 +917,7 @@ JavaScript で Kotlin コレクションを使用するには、まず必要な�
 @JsExport
 data class User(
     val name: String,
-    val friends: List<User> = emptyList()
+    val friends: `List<User>` = emptyList()
 )
 
 @JsExport
