@@ -152,7 +152,7 @@ Finally in numbers
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
-fun main() = runBlocking<Unit> {
+fun main() = runBlocking<Unit> { 
 //sampleStart         
     val sum = (1..5).asFlow()
         .map { it * it } // 1 到 5 的平方                           
@@ -317,7 +317,7 @@ Collected in 758 ms
 
 ### 处理最新值
 
-当发射器和收集器都很慢时，合并（Conflation）是加速处理的一种方法。它通过丢弃发射的值来实现。另一种方法是取消缓慢的收集器，并在每次发射新值时重新启动它。有一系列 `xxxLatest` 运算符，它们执行与 `xxx` 运算符相同的基本逻辑，但在有新值时会取消其块中的代码。让我们尝试在前面的示例中将 [conflate] 更改为 [collectLatest]：
+合并（Conflation）是加速处理的一种方法。它通过丢弃发射的值来实现。另一种方法是取消缓慢的收集器，并在每次发射新值时重新启动它。有一系列 `xxxLatest` 运算符，它们执行与 `xxx` 运算符相同的基本逻辑，但在有新值时会取消其块中的代码。让我们尝试在前面的示例中将 [conflate] 更改为 [collectLatest]：
 
 ```kotlin
 import kotlinx.coroutines.*

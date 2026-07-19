@@ -269,7 +269,7 @@ Collected in 1071 ms
 >
 {style="note"}
 
-### Conflation
+### 合併 (Conflation)
 
 當 Flow 表示操作的局部結果或操作狀態更新時，可能不需要處理每個值，而是只需處理最近的值。在這種情況下，當收集器處理速度太慢而無法處理所有值時，可以使用 [conflate] 運算子來跳過中間值。以前面的範例為基礎：
 
@@ -317,7 +317,7 @@ Collected in 758 ms
 
 ### 處理最新值
 
-當發送端和收集端都很慢時，Conflation 是加速處理的一種方式。它是透過捨棄發出的值來實現的。另一種方式是取消慢速收集器，並在每次發出新值時重新啟動它。有一系列 `xxxLatest` 運算子執行與 `xxx` 運算子相同的核心邏輯，但在新值出現時會取消其區塊中的程式碼。讓我們嘗試在前面的範例中將 [conflate] 更改為 [collectLatest]：
+當發送端和收集端都很慢時，合併是加速處理的一種方式。它是透過捨棄發出的值來實現的。另一種方式是取消慢速收集器，並在每次發出新值時重新啟動它。有一系列 `xxxLatest` 運算子執行與 `xxx` 運算子相同的核心邏輯，但在新值出現時會取消其區塊中的程式碼。讓我們嘗試在前面的範例中將 [conflate] 更改為 [collectLatest]：
 
 ```kotlin
 import kotlinx.coroutines.*
@@ -402,7 +402,7 @@ fun main() = runBlocking<Unit> {
 
 ### Combine
 
-當 Flow 表示變數或操作的最新值時（另請參閱關於 [Conflation](#conflation) 的相關章節），可能需要執行依賴於對應 Flow 最新值的計算，並在任何上游 Flow 發出值時重新計算。對應的運算子系列稱為 [combine]。
+當 Flow 表示變數或操作的最新值時（另請參閱關於 [合併](#合併) 的相關章節），可能需要執行依賴於對應 Flow 最新值的計算，並在任何上游 Flow 發出值時重新計算。對應的運算子系列稱為 [combine]。
 
 例如，如果上一個範例中的數字每 300 ms 更新一次，但字串每 400 ms 更新一次，那麼使用 [zip] 運算子對它們進行 zip 操作仍會產生相同的結果，儘管結果是每 400 ms 印出一次：
 
@@ -592,7 +592,7 @@ fun main() = runBlocking<Unit> {
 
 ### flatMapLatest
 
-與 ["處理最新值"](#processing-the-latest-value) 章節中描述的 [collectLatest] 運算子類似，存在對應的 "Latest" 展平模式，一旦發出新的 Flow，就會取消對上一個 Flow 的收集。它是由 [flatMapLatest] 運算子實作的。
+與 ["處理最新值"](#處理最新值) 章節中描述的 [collectLatest] 運算子類似，存在對應的 "Latest" 展平模式，一旦發出新的 Flow，就會取消對上一個 Flow 的收集。它是由 [flatMapLatest] 運算子實作的。
 
 ```kotlin
 import kotlinx.coroutines.*

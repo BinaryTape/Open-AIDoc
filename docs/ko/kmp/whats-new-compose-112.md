@@ -53,13 +53,13 @@ AI 에이전트가 사용할 수 있는 MCP 도구의 전체 목록과 연결 �
 
 | 라이브러리 | Maven 좌표 | Jetpack 버전 기반 |
 |--------------------|------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------|
-| Runtime            | `org.jetbrains.compose.runtime:runtime*:1.12.0-beta01`                 | [Runtime 1.12.0-beta01](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.12.0-beta01)                     |
-| UI                 | `org.jetbrains.compose.ui:ui*:1.12.0-beta01`                           | [UI 1.12.0-beta01](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.12.0-beta01)                               |
-| Foundation         | `org.jetbrains.compose.foundation:foundation*:1.12.0-beta01`           | [Foundation 1.12.0-beta01](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.12.0-beta01)               |
-| Material           | `org.jetbrains.compose.material:material*:1.12.0-beta01`               | [Material 1.12.0-beta01](https://developer.android.com/jetpack/androidx/releases/compose-material#1.12.0-beta01)                   |
+| Runtime            | `org.jetbrains.compose.runtime:runtime*:1.12.0-beta02`                 | [Runtime 1.12.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.12.0-beta02)                     | 
+| UI                 | `org.jetbrains.compose.ui:ui*:1.12.0-beta02`                           | [UI 1.12.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.12.0-beta02)                               | 
+| Foundation         | `org.jetbrains.compose.foundation:foundation*:1.12.0-beta02`           | [Foundation 1.12.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.12.0-beta02)               |
+| Material           | `org.jetbrains.compose.material:material*:1.12.0-beta02`               | [Material 1.12.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-material#1.12.0-beta02)                   | 
 | Material3          | `org.jetbrains.compose.material3:material3*:1.12.0-alpha03`            | [Material3 1.5.0-alpha22](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.5.0-alpha22)                 |
 | Material3 Adaptive | `org.jetbrains.compose.material3.adaptive:adaptive*:1.3.0-beta02`      | [Material3 Adaptive 1.3.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.3.0-beta02) |
-| Lifecycle          | `org.jetbrains.androidx.lifecycle:lifecycle-*:2.11.0-rc01`             | [Lifecycle 2.11.0](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.11.0)                                       |
+| Lifecycle          | `org.jetbrains.androidx.lifecycle:lifecycle-*:2.11.0`                  | [Lifecycle 2.11.0](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.11.0)                                       | 
 | Navigation         | `org.jetbrains.androidx.navigation:navigation-*:2.10.0-alpha02`        | [Navigation 2.10.0-alpha05](https://developer.android.com/jetpack/androidx/releases/navigation#2.10.0-alpha05)                     |
 | Navigation3        | `org.jetbrains.androidx.navigation3:navigation3-*:1.2.0-alpha02`       | [Navigation3 1.2.0-alpha04](https://developer.android.com/jetpack/androidx/releases/navigation3#1.2.0-alpha04)                     |
 | Navigation Event   | `org.jetbrains.androidx.navigationevent:navigationevent-compose:1.1.0` | [Navigation Event 1.1.1](https://developer.android.com/jetpack/androidx/releases/navigationevent#1.1.1)                            |

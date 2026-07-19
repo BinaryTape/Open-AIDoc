@@ -19,7 +19,7 @@ Kotlin 当前的稳定版本为 %kotlinVersion%。请注意特定变更相对于
 
 | Kotlin Multiplatform 插件版本 | Gradle                                | Android Gradle 插件                               | Xcode   |
 |-------------------------------------|---------------------------------------|-----------------------------------------------------|---------|
-| 2.4.0                               | %minGradleVersion%–%maxGradleVersion% | %minAndroidGradleVersion%–%maxAndroidGradleVersion% | %xcode% |
+| 2.4.0-2.4.10                        | %minGradleVersion%–%maxGradleVersion% | %minAndroidGradleVersion%–%maxAndroidGradleVersion% | %xcode% |
 | 2.3.20–2.3.21                       | 7.6.3–9.3.0                           | 8.2.2–9.0.0                                         | 26.0    |
 | 2.3.10                              | 7.6.3–9.0.0                           | 8.2.2–9.0.0                                         | 26.0    |
 | 2.3.0                               | 7.6.3–9.0.0                           | 8.2.2–8.13.0                                        | 26.0    |
@@ -538,7 +538,7 @@ kotlin {
 2. 将您的源文件从 `main` 和 `test` 文件夹移动到同一目录下的 `jsMain` 和 `jsTest` 文件夹中。
 3. 调整依赖项声明：
 
-   * 我们建议使用 `sourceSets {}` 块并配置相应源集的依赖项，`jsMain {}` 用于生产依赖项，`jsTest {}` 用于测试依赖项。详情请参阅[添加依赖项](multiplatform-add-dependencies.md)。
+   * 我们建议使用 `sourceSets {}` block 并配置相应源集的依赖项，`jsMain {}` 用于生产依赖项，`jsTest {}` 用于测试依赖项。详情请参阅[添加依赖项](multiplatform-add-dependencies.md)。
    * 但是，如果您想在顶级块中声明依赖项，请将声明从 `api("group:artifact:1.0")` 更改为 `add("jsMainApi", "group:artifact:1.0")` 等。
 
      > 在这种情况下，请确保顶级 `dependencies {}` 块位于 `kotlin {}` 块**之后**。否则，您将收到错误“未找到配置 (Configuration not found)”。
@@ -761,7 +761,7 @@ JetBrains 团队改进了 Kotlin 中前向声明的处理方式，使其行为�
 
 我们此前在 Kotlin Multiplatform 中使用了一些权宜之计来帮助集成 Java 生态系统插件。然而，这些变通方法从未真正解决兼容性问题，且自 Gradle 8.8 发布以来，这些变通方法已不再可行。有关更多信息，请参阅我们的 [YouTrack 问题](https://youtrack.jetbrains.com/issue/KT-66542/Gradle-JVM-target-with-withJava-produces-a-deprecation-warning)。
 
-虽然我们尚不确定如何解决此兼容性问题，但我们致力于在 Kotlin Multiplatform 项目中继续支持某种形式投的 Java 源代码编译。至少我们将支持 Java 源代码的编译，并支持在您的多平台项目中使用 Gradle 的 [`java-base`](https://docs.gradle.org/current/javadoc/org/gradle/api/plugins/JavaBasePlugin.html) 插件。
+虽然我们尚不确定如何解决此兼容性问题，但我们致力于在 Kotlin Multiplatform 项目中继续支持某种形式的 Java 源代码编译。至少我们将支持 Java 源代码的编译，并支持在您的多平台项目中使用 Gradle 的 [`java-base`](https://docs.gradle.org/current/javadoc/org/gradle/api/plugins/JavaBasePlugin.html) 插件。
 
 **现在的最佳做法是什么？**
 

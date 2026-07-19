@@ -46,20 +46,19 @@ Compose Hot Reload 现在附带了一个实验性的 [Model Context Protocol (MC
 
 在此之前，当 AI 代理编辑 Compose 代码时，没有可靠的方法来验证结果：代理无法确认热重载是否成功，无法看到渲染后的 UI，也无法读取运行时日志或异常。通过 MCP 服务器，代理可以触发重载、拍摄屏幕截图、检查语义树、模拟点击和输入，以及读取应用程序日志，而无需您的人工干预。
 
-要在启动应用程序的同时启动 MCP 服务器，请运行 `hotMcpServerJvm` Gradle 任务。
 有关 AI 代理可用的 MCP 工具完整列表以及如何连接它的信息，请参阅 [AI 代理的 MCP 服务器](compose-hot-reload.md#mcp-server-for-ai-agents)。
 
 ## 依赖项
 
 | 库 | Maven 坐标 | 基于 Jetpack 版本 |
 |--------------------|------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------|
-| Runtime | `org.jetbrains.compose.runtime:runtime*:1.12.0-beta01` | [Runtime 1.12.0-beta01](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.12.0-beta01) |
-| UI | `org.jetbrains.compose.ui:ui*:1.12.0-beta01` | [UI 1.12.0-beta01](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.12.0-beta01) |
-| Foundation | `org.jetbrains.compose.foundation:foundation*:1.12.0-beta01` | [Foundation 1.12.0-beta01](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.12.0-beta01) |
-| Material | `org.jetbrains.compose.material:material*:1.12.0-beta01` | [Material 1.12.0-beta01](https://developer.android.com/jetpack/androidx/releases/compose-material#1.12.0-beta01) |
+| Runtime | `org.jetbrains.compose.runtime:runtime*:1.12.0-beta02` | [Runtime 1.12.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.12.0-beta02) |
+| UI | `org.jetbrains.compose.ui:ui*:1.12.0-beta02` | [UI 1.12.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.12.0-beta02) |
+| Foundation | `org.jetbrains.compose.foundation:foundation*:1.12.0-beta02` | [Foundation 1.12.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.12.0-beta02) |
+| Material | `org.jetbrains.compose.material:material*:1.12.0-beta02` | [Material 1.12.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-material#1.12.0-beta02) |
 | Material3 | `org.jetbrains.compose.material3:material3*:1.12.0-alpha03` | [Material3 1.5.0-alpha22](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.5.0-alpha22) |
 | Material3 Adaptive | `org.jetbrains.compose.material3.adaptive:adaptive*:1.3.0-beta02` | [Material3 Adaptive 1.3.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.3.0-beta02) |
-| Lifecycle | `org.jetbrains.androidx.lifecycle:lifecycle-*:2.11.0-rc01` | [Lifecycle 2.11.0](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.11.0) |
+| Lifecycle | `org.jetbrains.androidx.lifecycle:lifecycle-*:2.11.0` | [Lifecycle 2.11.0](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.11.0) |
 | Navigation | `org.jetbrains.androidx.navigation:navigation-*:2.10.0-alpha02` | [Navigation 2.10.0-alpha05](https://developer.android.com/jetpack/androidx/releases/navigation#2.10.0-alpha05) |
 | Navigation3 | `org.jetbrains.androidx.navigation3:navigation3-*:1.2.0-alpha02` | [Navigation3 1.2.0-alpha04](https://developer.android.com/jetpack/androidx/releases/navigation3#1.2.0-alpha04) |
 | Navigation Event | `org.jetbrains.androidx.navigationevent:navigationevent-compose:1.1.0` | [Navigation Event 1.1.1](https://developer.android.com/jetpack/androidx/releases/navigationevent#1.1.1) |

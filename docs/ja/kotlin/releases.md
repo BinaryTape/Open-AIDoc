@@ -4,7 +4,7 @@
 
 <tldr>
     <p>Kotlinの最新バージョン: <strong>%kotlinVersion%</strong></p>
-    <p><a href="%kotlinLatestWhatsnew%">Kotlin 2.4.0の新機能</a>を参照してください。</p>
+    <p><a href="%kotlinLatestWhatsnew%">Kotlin 2.4.0の新機能</a>を参照してください。また、バグ修正の詳細は<a href="%kotlinLatestUrl%">変更履歴</a>で確認できます。</p>
 </tldr>
 
 このページでは、Kotlinのリリースサイクルと、提供している各種リリースタイプについて説明します。また、過去および今後のKotlinリリースに関する詳細と、特定のリリースにアップデートする方法についても記載しています。
@@ -141,7 +141,7 @@ JVM向けのKotlin標準ライブラリに影響を与えるセキュリティ�
             <p>2027年12月3日</p>
         </td>
         <td>
-            <p>利用可能なものはありません</p>
+            <p>2.4.10</p>
         </td>
     </tr>
 </table>
@@ -162,6 +162,16 @@ JVM向けのKotlin標準ライブラリに影響を与えるセキュリティ�
     <tr>
         <th>ビルド情報</th>
         <th>ビルドのハイライト</th>
+    </tr>
+    <tr>
+        <td><strong>2.4.10</strong>
+            <p>リリース日: <strong>2026年7月14日</strong></p>
+            <p><a href="https://github.com/JetBrains/kotlin/releases/tag/v2.4.10" target="_blank">GitHubでのリリース</a></p>
+        </td>
+        <td>
+            <p>Kotlin 2.4.0のバグ修正リリースです。</p>
+            <p>詳細は<a href="https://github.com/JetBrains/kotlin/releases/tag/v2.4.10">変更履歴</a>を参照してください。</p>
+        </td>
     </tr>
     <tr>
         <td><strong>2.4.0</strong>
@@ -770,7 +780,7 @@ JVM向けのKotlin標準ライブラリに影響を与えるセキュリティ�
     </tr>
     <tr>
         <td><strong>1.4.0</strong>
-            <p>リリース日: <strong>2020年8月17日</strong></p>
+            <p> リリース日: <strong>2020年8月17日</strong></p>
             <p><a href="https://github.com/JetBrains/kotlin/releases/tag/v1.4.0" target="_blank">GitHubでのリリース</a></p>
         </td>
         <td>
@@ -786,12 +796,12 @@ JVM向けのKotlin標準ライブラリに影響を与えるセキュリティ�
     </tr>
     <tr>
         <td><strong>1.3.72</strong>
-            <p>リリース日: <strong>2020年4月15日</strong></p>
+            <p> リリース日: <strong>2020年4月15日</strong></p>
             <p><a href="https://github.com/JetBrains/kotlin/releases/tag/v1.3.72" target="_blank">GitHubでのリリース</a></p>
         </td>
         <td>
             <p>Kotlin 1.3.70 のバグ修正リリースです。</p>
-            <p><a href="https://blog.jetbrains.com/kotlin/2020/03/kotlin-1-3-70-released/" target="_blank">Kotlin 1.3.70</a>についての詳細。</p>
+            <p>詳細は<a href="https://blog.jetbrains.com/kotlin/2020/03/kotlin-1-3-70-released/" target="_blank">Kotlin 1.3.70</a>についての記事を参照してください。</p>
         </td>
     </tr>
 </table>

@@ -17,7 +17,7 @@ kapt는 Kotlin 소스 코드에서 스텁(stub) 파일을 생성한 다음, 해�
 이를 통해 Kotlin 프로젝트에서 [MapStruct](https://mapstruct.org/)나 [Data Binding](https://developer.android.com/topic/libraries/data-binding/index.html)과 같은 라이브러리를 위한 Java 기반 어노테이션 처리가 가능해집니다.
 
 > kapt는 IntelliJ 빌드 시스템에서 지원되지 않습니다. IntelliJ IDEA에서 어노테이션 처리를 다시 실행하려면 **Maven** 도구 창에서 빌드를 시작하세요.
-> 
+>
 {style="warning"}
 
 ## 플러그인 설정하기
@@ -305,25 +305,13 @@ kapt {
 Maven을 사용하는 경우 플러그인 설정을 명시적으로 구성해야 합니다.
 이 [Lombok 컴파일러 플러그인 설정 예시](lombok.md#using-with-kapt)를 참고하세요.
 
-## Gradle 빌드 캐시 지원
-
-kapt 어노테이션 처리 작업은 기본적으로 [Gradle에서 캐시](https://guides.gradle.org/using-build-cache/)됩니다.
-하지만 어노테이션 프로세서는 임의의 코드를 실행할 수 있으며, 이는 작업 입력을 출력으로 신뢰성 있게 변환하지 못하거나 Gradle이 추적하지 않는 파일에 접근하고 수정할 수 있습니다.
-빌드에 사용된 어노테이션 프로세서가 제대로 캐시될 수 없는 경우, 빌드 스크립트에서 `useBuildCache` 속성을 지정하여 kapt의 캐싱을 완전히 비활성화할 수 있습니다. 이는 kapt 작업에 대한 잘못된 캐시 히트(false-positive cache hits)를 방지하는 데 도움이 됩니다:
-
-```groovy
-kapt {
-    useBuildCache = false
-}
-```
-
-## kapt를 사용하는 빌드 속도 향상시키기
+## kapt 빌드 최적화
 
 ### kapt 작업을 병렬로 실행하기
 
-kapt를 사용하는 빌드 속도를 높이기 위해 kapt 작업에 [Gradle Worker API](https://guides.gradle.org/using-the-worker-api/)를 활성화할 수 있습니다. Worker API를 사용하면 Gradle이 단일 프로젝트 내의 독립적인 어노테이션 처리 작업을 병렬로 실행할 수 있으며, 이는 일부 경우에 실행 시간을 크게 단축시킵니다.
+kapt는 [Gradle Worker API](https://docs.gradle.org/current/userguide/worker_api.html)를 사용하여 어노테이션 처리 작업을 실행합니다. Worker API를 사용하면 Gradle이 단일 프로젝트 내의 독립적인 어노테이션 처리 작업을 병렬로 실행할 수 있으며, 이는 일부 경우에 실행 시간을 크게 단축시킵니다.
 
-Kotlin Gradle 플러그인에서 [커스텀 JDK home](gradle-configure-project.md#gradle-java-toolchains-support) 기능을 사용하는 경우, kapt 작업 워커(worker)는 [프로세스 격리 모드(process isolation mode)](https://docs.gradle.org/current/userguide/worker_api.html#changing_the_isolation_mode)만 사용합니다. 이때 `kapt.workers.isolation` 속성은 무시됩니다.
+Kotlin Gradle 플러그인에서 [커스텀 JDK 버전](gradle-configure-project.md#gradle-java-toolchains-support)을 설정하는 경우, kapt 작업 워커(worker)는 [`processIsolation()`](https://docs.gradle.org/current/userguide/worker_api.html#step_3_change_the_isolation_mode) 모드만 사용합니다.
 
 kapt 워커 프로세스에 추가 JVM 인수를 제공하려면 `KaptWithoutKotlincTask`의 입력값인 `kaptProcessJvmArgs`를 사용하세요:
 
@@ -349,6 +337,18 @@ tasks.withType(org.jetbrains.kotlin.gradle.internal.KaptWithoutKotlincTask.class
 
 </tab>
 </tabs>
+
+### Gradle 빌드 캐시 안전하게 사용하기
+
+kapt 어노테이션 처리 작업은 기본적으로 [Gradle에서 캐시](https://docs.gradle.org/current/userguide/build_cache_use_cases.html)됩니다. 하지만 어노테이션 프로세서는 임의의 코드를 실행할 수 있습니다. 이는 작업 입력을 출력으로 불필요하게 변환하거나 Gradle이 추적하지 않는 파일에 접근하고 수정하는 결과를 초래할 수 있습니다.
+
+빌드에 사용된 어노테이션 프로세서가 제대로 캐시될 수 없는 경우, kapt 작업에 대한 잘못된 캐시 히트(false-positive hits)를 방지하기 위해 캐싱을 비활성화할 수 있습니다. 이를 위해 빌드 스크립트에서 `useBuildCache` 속성을 사용하세요:
+
+```groovy
+kapt {
+    useBuildCache = false
+}
+```
 
 ### 어노테이션 프로세서 클래스 로더 캐싱
 
@@ -377,8 +377,25 @@ kapt.classloaders.cache.disableForProcessors=[어노테이션 프로세서 전�
 ```
 
 > 이 기능과 관련하여 문제가 발생하면 [YouTrack](https://youtrack.jetbrains.com/issue/KT-28901)에 피드백을 남겨 주시면 감사하겠습니다.
-> 
+>
 {style="note"}
+
+### 증분 어노테이션 처리 사용하기
+
+kapt는 기본적으로 증분 어노테이션 처리를 지원합니다.
+
+현재 증분 어노테이션 처리는 다음과 같은 경우에만 작동합니다:
+
+* [증분 컴파일](gradle-compilation-and-caches.md#incremental-compilation)이 활성화되어 있어야 합니다.
+* 빌드에 사용된 모든 어노테이션 프로세서가 증분형(incremental)이어야 합니다.
+
+증분 어노테이션 처리를 비활성화하려면 `gradle.properties` 파일에 다음 라인을 추가하세요:
+
+```none
+kapt.incremental.apt=false
+```
+
+## 성능 분석
 
 ### 어노테이션 프로세서 성능 측정
 
@@ -405,7 +422,7 @@ plugin:org.jetbrains.kotlin.kapt3:dumpProcessorTimings=ap-perf-report.file \
 sample/src/main/
 ```
 
-### 어노테이션 프로세서로 생성된 파일 수 측정
+### 생성된 파일 수 추적
 
 `kapt` Gradle 플러그인은 각 어노테이션 프로세서에 대해 생성된 파일 수에 대한 통계를 보고할 수 있습니다.
 
@@ -441,19 +458,6 @@ sample/src/main/
 [INFO] Generated files report:
 [INFO] org.mapstruct.ap.MappingProcessor: total sources: 2, sources per round: 2, 0, 0
 ```
-
-## 증분 어노테이션 처리
-
-kapt는 기본적으로 증분 어노테이션 처리를 지원합니다.
-현재 어노테이션 처리는 사용 중인 모든 어노테이션 프로세서가 증분형(incremental)인 경우에만 증분 방식으로 작동할 수 있습니다.
-
-증분 어노테이션 처리를 비활성화하려면 `gradle.properties` 파일에 다음 라인을 추가하세요:
-
-```none
-kapt.incremental.apt=false
-```
-
-증분 어노테이션 처리를 위해서는 [증분 컴파일](gradle-compilation-and-caches.md#incremental-compilation)도 활성화되어 있어야 합니다.
 
 ## Java 컴파일러 옵션
 

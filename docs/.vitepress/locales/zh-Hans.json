@@ -653,7 +653,6 @@
   "kotlin.backend-development": "后端开发",
   "kotlin.running-ksp-from-the-command-line": "从命令行运行 KSP",
   "koog.datadog-exporter": "Datadog Exporter",
-  "kotlin.maven-set-dependencies": "设置仓库与依赖项",
   "kotlin.maven-kotlin-compiler": "配置 Kotlin 编译器",
   "kmp.build-ios-android-app": "如何构建 Android 与 iOS 应用",
   "koog.cache-control": "缓存控制",
@@ -679,5 +678,6 @@
   "kotlin.take-kotlin-tour": "参加 Kotlin 导览",
   "kotlin.beginner": "初学者",
   "kotlin.intermediate": "中级",
-  "kotlin.immutable-collections-kotlinx-collections-immutable": "不可变集合 (kotlinx.collections.immutable)"
+  "kotlin.immutable-collections-kotlinx-collections-immutable": "不可变集合 (kotlinx.collections.immutable)",
+  "kotlin.jvm-code-analysis": "使用代码分析工具"
 }

@@ -46,20 +46,19 @@ Compose Hot Reload に、実験的な [Model Context Protocol (MCP)](https://mod
 
 これまでは、AI エージェントが Compose コードを編集しても、その結果を検証する信頼できる方法がありませんでした。エージェントはホットリロード（hot reload）が成功したことを確認できず、レンダリングされた UI を見ることもできず、実行時のログや例外を読み取ることもできませんでした。MCP サーバーを使用すると、エージェントは手動の介入を必要とせずに、リロードのトリガー、スクリーンショットの撮影、セマンティックツリー（semantic tree）の検査、クリックや入力のシミュレート、およびアプリケーションログの読み取りを行うことができます。
 
-アプリケーションと一緒に MCP サーバーを起動するには、`hotMcpServerJvm` Gradle タスクを実行してください。
 AI エージェントが利用可能な MCP ツールの完全なリストと接続方法については、[AI エージェント向けの MCP サーバー](compose-hot-reload.md#mcp-server-for-ai-agents)を参照してください。
 
 ## 依存関係
 
 | ライブラリ | Maven 座標 | ベースとなる Jetpack バージョン |
 |--------------------|------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------|
-| Runtime            | `org.jetbrains.compose.runtime:runtime*:1.12.0-beta01`                 | [Runtime 1.12.0-beta01](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.12.0-beta01)                     |
-| UI                 | `org.jetbrains.compose.ui:ui*:1.12.0-beta01`                           | [UI 1.12.0-beta01](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.12.0-beta01)                               |
-| Foundation         | `org.jetbrains.compose.foundation:foundation*:1.12.0-beta01`           | [Foundation 1.12.0-beta01](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.12.0-beta01)               |
-| Material           | `org.jetbrains.compose.material:material*:1.12.0-beta01`               | [Material 1.12.0-beta01](https://developer.android.com/jetpack/androidx/releases/compose-material#1.12.0-beta01)                   |
+| Runtime            | `org.jetbrains.compose.runtime:runtime*:1.12.0-beta02`                 | [Runtime 1.12.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.12.0-beta02)                     |
+| UI                 | `org.jetbrains.compose.ui:ui*:1.12.0-beta02`                           | [UI 1.12.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.12.0-beta02)                               |
+| Foundation         | `org.jetbrains.compose.foundation:foundation*:1.12.0-beta02`           | [Foundation 1.12.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.12.0-beta02)               |
+| Material           | `org.jetbrains.compose.material:material*:1.12.0-beta02`               | [Material 1.12.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-material#1.12.0-beta02)                   |
 | Material3          | `org.jetbrains.compose.material3:material3*:1.12.0-alpha03`            | [Material3 1.5.0-alpha22](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.5.0-alpha22)                 |
 | Material3 Adaptive | `org.jetbrains.compose.material3.adaptive:adaptive*:1.3.0-beta02`      | [Material3 Adaptive 1.3.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.3.0-beta02) |
-| Lifecycle          | `org.jetbrains.androidx.lifecycle:lifecycle-*:2.11.0-rc01`             | [Lifecycle 2.11.0](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.11.0)                                       |
+| Lifecycle          | `org.jetbrains.androidx.lifecycle:lifecycle-*:2.11.0`                  | [Lifecycle 2.11.0](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.11.0)                                       |
 | Navigation         | `org.jetbrains.androidx.navigation:navigation-*:2.10.0-alpha02`        | [Navigation 2.10.0-alpha05](https://developer.android.com/jetpack/androidx/releases/navigation#2.10.0-alpha05)                     |
 | Navigation3        | `org.jetbrains.androidx.navigation3:navigation3-*:1.2.0-alpha02`       | [Navigation3 1.2.0-alpha04](https://developer.android.com/jetpack/androidx/releases/navigation3#1.2.0-alpha04)                     |
 | Navigation Event   | `org.jetbrains.androidx.navigationevent:navigationevent-compose:1.1.0` | [Navigation Event 1.1.1](https://developer.android.com/jetpack/androidx/releases/navigationevent#1.1.1)                            |

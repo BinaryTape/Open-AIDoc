@@ -97,10 +97,10 @@ kotlinc hello.kt -d hello.jar
 
 이 방식으로 컴파일된 바이너리는 Kotlin 런타임에 의존하므로, 컴파일된 라이브러리가 사용될 때마다 클래스패스(classpath)에 런타임이 존재하는지 확인해야 합니다.
 
-`kotlin` 스크립트를 사용하여 Kotlin 컴파일러가 생성한 바이너리를 실행할 수도 있습니다:
+`kotlinr` 스크립트를 사용하여 Kotlin 컴파일러가 생성한 바이너리를 실행할 수도 있습니다:
 
 ```bash
-kotlin -classpath hello.jar HelloKt
+kotlinr -classpath hello.jar HelloKt
 ```
 
 `HelloKt`는 `hello.kt`라는 파일에 대해 Kotlin 컴파일러가 생성하는 메인 클래스 이름입니다.
@@ -140,7 +140,7 @@ Kotlin은 외부 속성 추가, 정적 또는 동적 종속성 제공 등과 같
 스크립트 파일 확장자는 적절한 정의를 선택하는 데 사용됩니다.
 [Kotlin 커스텀 스크립팅](custom-script-deps-tutorial.md)에 대해 자세히 알아보세요.
 
-적절하게 준비된 스크립트 정의는 컴파일 클래스패스에 적절한 jar가 포함되어 있을 때 자동으로 감지되고 적용됩니다. 또는 컴파일러에 `-script-templates` 옵션을 전달하여 수동으로 정의를 지정할 수 있습니다:
+적절하게 준비된 스크립트 정의는 적절한 jar가 컴파일 클래스패스에 포함되어 있을 때 자동으로 감지되고 적용됩니다. 또는 컴파일러에 `-script-templates` 옵션을 전달하여 수동으로 정의를 지정할 수 있습니다:
 
 ```bash
 kotlinc -script-templates org.example.CustomScriptDefinition -script custom.script1.kts

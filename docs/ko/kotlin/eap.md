@@ -1,7 +1,7 @@
 [//]: # (title: Kotlin 조기 액세스 프리뷰(EAP) 참여하기)
 
 <tldr>
-    <!-- <p>현재 사용 가능한 프리뷰 버전이 없습니다.</p> -->
+    <!-- <p>No preview versions are currently available.</p> -->
     <p>최신 Kotlin EAP 릴리스: <strong>%kotlinEapVersion%</strong></p>
 </tldr>
 
@@ -60,16 +60,6 @@ _No preview versions are currently available._
         <td>
             <p>성능 개선, 버그 수정 및 도구 업데이트가 포함된 도구(tooling) 릴리스입니다.</p>
             <p>자세한 내용은 <a href="https://github.com/JetBrains/kotlin/releases/tag/v2.4.20-Beta1">변경 로그(changelog)</a> 또는 <a href="whatsnew-eap.md">Kotlin 2.4.20-Beta1의 새로운 기능</a>을 참고하세요.</p>
-        </td>
-    </tr>
-    <tr>
-        <td><strong>2.4.10-RC2</strong>
-            <p>출시일: <strong>2026년 7월 7일</strong></p>
-            <p><a href="https://github.com/JetBrains/kotlin/releases/tag/v2.4.10-RC2" target="_blank">GitHub에서 릴리스 보기</a></p>
-        </td>
-        <td>
-            <p>Kotlin 2.4.0에 대한 성능 개선이 포함된 버그 수정 릴리스입니다.</p>
-            <p>자세한 내용은 <a href="https://github.com/JetBrains/kotlin/releases/tag/v2.4.10-RC2">변경 로그(changelog)</a>를 참고하세요.</p>
         </td>
     </tr>
 </table>

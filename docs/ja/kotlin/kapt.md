@@ -17,7 +17,7 @@ kapt コンパイラプラグインを使用すると、Kotlin で既存の Java
 これにより、[MapStruct](https://mapstruct.org/) や [データバインディング](https://developer.android.com/topic/libraries/data-binding/index.html) などのライブラリに対して、Kotlin プロジェクトで Java ベースのアノテーション処理が可能になります。
 
 > kapt は IntelliJ のビルドシステムではサポートされていません。IntelliJ IDEA でアノテーション処理を再実行するには、**Maven** ツールウィンドウからビルドを起動してください。
-> 
+>
 {style="warning"}
 
 ## プラグインの設定
@@ -305,26 +305,13 @@ kapt {
 Maven を使用する場合は、プラグインを明示的に構成してください。
 [Lombok コンパイラプラグインの設定例](lombok.md#using-with-kapt)を参照してください。
 
-## Gradle ビルドキャッシュのサポート
-
-kapt のアノテーション処理タスクは、デフォルトで [Gradle でキャッシュ](https://guides.gradle.org/using-build-cache/) されます。
-しかし、アノテーションプロセッサは任意のコードを実行できるため、タスクの入力を出力に確実に変換できない場合や、Gradle が追跡していないファイルにアクセスして変更する場合があります。
-ビルドで使用されるアノテーションプロセッサを適切にキャッシュできない場合は、ビルドスクリプトで `useBuildCache` プロパティを指定することで、kapt のキャッシュを完全に無効にできます。
-これにより、kapt タスクに対する誤ったキャッシュヒット（false-positive cache hits）を防ぐことができます。
-
-```groovy
-kapt {
-    useBuildCache = false
-}
-```
-
-## kapt を使用するビルド速度の改善
+## kapt ビルドの最適化
 
 ### kapt タスクを並列で実行する
 
-kapt を使用するビルドの速度を向上させるために、kapt タスクに対して [Gradle Worker API](https://guides.gradle.org/using-the-worker-api/) を有効にできます。Worker API を使用すると、Gradle は単一のプロジェクトから独立したアノテーション処理タスクを並列で実行でき、場合によっては実行時間を大幅に短縮できます。
+kapt は [Gradle Worker API](https://docs.gradle.org/current/userguide/worker_api.html) を使用してアノテーション処理タスクを実行します。Worker API を使用すると、Gradle は単一のプロジェクトから独立したアノテーション処理タスクを並列で実行でき、場合によっては実行時間を大幅に短縮できます。
 
-Kotlin Gradle プラグインで [カスタム JDK ホーム](gradle-configure-project.md#gradle-java-toolchains-support) 機能を使用する場合、kapt タスクのワーカーは [プロセス分離モード](https://docs.gradle.org/current/userguide/worker_api.html#changing_the_isolation_mode)（process isolation mode）のみを使用します。`kapt.workers.isolation` プロパティは無視されることに注意してください。
+Kotlin Gradle プラグインで [カスタム JDK バージョン](gradle-configure-project.md#gradle-java-toolchains-support) を設定する場合、kapt タスクのワーカーは [`processIsolation()`](https://docs.gradle.org/current/userguide/worker_api.html#step_3_change_the_isolation_mode) モードのみを使用します。
 
 kapt ワーカープロセスに追加の JVM 引数を提供したい場合は、`KaptWithoutKotlincTask` の入力 `kaptProcessJvmArgs` を使用します：
 
@@ -350,6 +337,19 @@ tasks.withType(org.jetbrains.kotlin.gradle.internal.KaptWithoutKotlincTask.class
 
 </tab>
 </tabs>
+
+### Gradle ビルドキャッシュの安全な使用
+
+Gradle は [デフォルトで](https://docs.gradle.org/current/userguide/build_cache_use_cases.html) kapt のアノテーション処理タスクをキャッシュします。
+しかし、アノテーションプロセッサは任意のコードを実行できるため、タスクの入力を出力に不必要に変換したり、Gradle が追跡していないファイルにアクセスして変更したりする場合があります。
+
+ビルドで使用されるアノテーションプロセッサを適切にキャッシュできない場合は、kapt タスクに対する誤ったキャッシュヒットを防ぐためにキャッシュを無効にできます。これを行うには、ビルドスクリプトで `useBuildCache` プロパティを使用します：
+
+```groovy
+kapt {
+    useBuildCache = false
+}
+```
 
 ### アノテーションプロセッサのクラスローダーのキャッシュ
 
@@ -378,8 +378,25 @@ kapt.classloaders.cache.disableForProcessors=[annotation processors full names]
 ```
 
 > この機能に関する問題が発生した場合は、[YouTrack](https://youtrack.jetbrains.com/issue/KT-28901) までフィードバックをお寄せください。
-> 
+>
 {style="note"}
+
+### インクリメンタルアノテーション処理の使用
+
+kapt はデフォルトでインクリメンタルアノテーション処理をサポートしています。
+
+現在、インクリメンタルアノテーション処理が機能するのは、次の場合のみです：
+
+* [インクリメンタルコンパイル](gradle-compilation-and-caches.md#incremental-compilation) が有効である。
+* ビルド内のすべてのアノテーションプロセッサがインクリメンタルである。
+
+インクリメンタルアノテーション処理を無効にするには、`gradle.properties` ファイルに次の行を追加します：
+
+```none
+kapt.incremental.apt=false
+```
+
+## パフォーマンスの分析
 
 ### アノテーションプロセッサのパフォーマンス測定
 
@@ -407,11 +424,12 @@ plugin:org.jetbrains.kotlin.kapt3:dumpProcessorTimings=ap-perf-report.file \
 sample/src/main/
 ```
 
-### アノテーションプロセッサで生成されたファイル数の測定
+### 生成されたファイル数の追跡
 
 `kapt` Gradle プラグインは、各アノテーションプロセッサによって生成されたファイル数に関する統計を報告できます。
 
-これにより、未使用のアノテーションプロセッサがビルドに含まれていないかどうかを追跡できます。生成されたレポートを使用して、不要なアノテーションプロセッサをトリガーしているモジュールを見つけ、それを回避するようにモジュールを更新できます。
+これにより、未使用のアノテーションプロセッサがビルドに含まれていないかどうかを追跡できます。
+生成されたレポートを使用して、不要なアノテーションプロセッサをトリガーしているモジュールを見つけ、それを回避するようにモジュールを更新できます。
 
 統計レポートを有効にするには：
 
@@ -445,19 +463,6 @@ sample/src/main/
 [INFO] Generated files report:
 [INFO] org.mapstruct.ap.MappingProcessor: total sources: 2, sources per round: 2, 0, 0
 ```
-
-## インクリメンタルアノテーション処理
-
-kapt はデフォルトでインクリメンタルアノテーション処理をサポートしています。
-現在、アノテーション処理をインクリメンタルにできるのは、使用されているすべてのアノテーションプロセッサがインクリメンタルである場合のみです。
-
-インクリメンタルアノテーション処理を無効にするには、`gradle.properties` ファイルに次の行を追加します：
-
-```none
-kapt.incremental.apt=false
-```
-
-インクリメンタルアノテーション処理には、[インクリメンタルコンパイル](gradle-compilation-and-caches.md#incremental-compilation) も有効になっている必要があることに注意してください。
 
 ## Java コンパイラオプション
 

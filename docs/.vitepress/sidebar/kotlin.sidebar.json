@@ -408,6 +408,10 @@
             "link": "jvm-annotation-processors"
           },
           {
+            "text": "kotlin.jvm-code-analysis",
+            "link": "jvm-code-analysis"
+          },
+          {
             "text": "kotlin.create-a-web-app-with-kotlin-and-spring-boot",
             "items": [
               {

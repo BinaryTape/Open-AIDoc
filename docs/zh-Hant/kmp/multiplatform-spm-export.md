@@ -1,7 +1,7 @@
 [//]: # (title: Swift 套件匯出設定)
 
 <tldr>
-   這是一項遠端整合方法。適用於以下情況：<br/>
+   這是一項遠端整合方法。如果您符合以下情況，它可能適合您：<br/>
 
    * 您希望將最終應用程式的程式碼庫與通用程式碼庫分開。
    * 您已經在本機電腦上設定了以 iOS 為目標的 Kotlin Multiplatform 專案。
@@ -83,15 +83,14 @@
   
    產生的架構將建立在專案目錄中的 `shared/build/XCFrameworks/release/Shared.xcframework` 目錄。
 
-   > 若您使用的是 Compose Multiplatform 專案，請使用以下 Gradle 任務：
+   > 如果您的專案取用 SwiftPM 相依性，從 Kotlin %kotlinEapVersion% 開始，該任務還會在 XCFramework 旁邊產生一組與 SwiftPM 相關的檔案。
+   > 如[下文](#prepare-the-xcframework-and-the-swift-package-manifest)所述，
+   > 您可以將產生的 `Package.swift` 與架構一起分發，而無需從頭開始編寫資訊清單。
    >
-   > ```shell
-   > ./gradlew :sharedUI:assembleSharedXCFramework
-   > ```
-   >
-   > 接著您可以在 `sharedUI/build/XCFrameworks/release/Shared.xcframework` 目錄中找到產生的架構。
-   >
-   {style="tip"}
+   {style="note"} 
+
+3. 如果您有多個模組包含想要匯出的共享程式碼（例如，一個共享邏輯模組和一個共享 UI 模組），
+   請[將它們組合到一個新的模組中](#exporting-multiple-modules-as-an-xcframework)並改為分佈此傘狀模組。
 
 ### 準備 XCFramework 與 Swift 套件資訊清單
 
@@ -127,7 +126,10 @@
     curl <上傳的 XCFramework ZIP 檔案下載連結>
     ```
 
-4. 選擇任一目錄並在本機建立一個包含以下程式碼的 `Package.swift` 檔案：
+4. 如果您的專案取用 SwiftPM 相依性，從 Kotlin %kotlinEapVersion% 開始，
+   `assembleSharedXCFramework` Gradle 任務會在 XCFramework 旁邊產生一個 `Package.swift` 檔案。
+
+   如果情況並非如此，您可以手動建立一個 `Package.swift` 檔案，使用以下範本：
 
    ```Swift
    // swift-tools-version:5.3
@@ -150,7 +152,10 @@
    )
    ```
    
-5. 在 `url` 欄位中，指定指向包含 XCFramework 的 ZIP 封存檔連結。
+5. 指定缺失的欄位：
+   * 在 `url` 欄位中，指定指向包含 XCFramework 的 ZIP 封存檔連結。
+   * 在 `checksum` 欄位中，指定稍早為該 ZIP 檔案計算的校驗碼。
+
 6. [建議] 若要驗證產生的清單，您可以在包含 `Package.swift` 檔案的目錄中執行以下命令列指令：
 
     ```shell
@@ -271,6 +276,6 @@
     ./gradlew :together:assembleTogetherReleaseXCFramework
     ```
 
-5. 按照 [上一節](#prepare-the-xcframework-and-the-swift-package-manifest) 的步驟準備 `together.xcframework`：將其封存、計算校驗碼、將封存的 XCFramework 上傳到檔案存儲空間、建立並推送 `Package.swift` 檔案。
+5. 按照[上一節](#prepare-the-xcframework-and-the-swift-package-manifest)的步驟準備 `together.xcframework`：將其封存、計算校驗碼、將封存的 XCFramework 上傳到檔案存儲空間、建立並推送 `Package.swift` 檔案。
 
 現在，您可以將該相依性匯入到 Xcode 專案中。加入 `import together` 指示詞後，您應該可以在 Swift 程式碼中匯入來自 `network` 和 `database` 模組的類別。

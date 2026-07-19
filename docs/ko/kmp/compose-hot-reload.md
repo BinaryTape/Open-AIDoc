@@ -52,7 +52,7 @@ Compose Multiplatform 버전을 1.10.0 이상으로 업그레이드하여 별도
 
 1. 데스크톱 타겟 도입: `desktopApp` 디렉토리를 생성하고, `main()` 함수를 정의하며,
    `actual` 구현을 제공합니다.
-   이미 프로젝트에 데스크톱 타겟이 포함되어 있다면 이 단계를 건너뛸 수 있습니다.
+   이미 프로젝트에 데스크톱 타겟이 포함되어 있다면 이 단계를 건너끌 수 있습니다.
    참고를 위해 [JVM 진입점 추가](migrate-from-android.md#optional-add-a-jvm-entry-point)의 샘플을 확인하세요.
  
 2. 최신 버전의 Compose Hot Reload로 버전 카탈로그를 업데이트합니다([릴리스](https://github.com/JetBrains/compose-hot-reload/releases) 참조).
@@ -160,30 +160,23 @@ MCP 서버를 통해 AI 코딩 에이전트는 실행 중인 Compose 애플리�
 
 ### AI 에이전트 연결하기
 
-AI 에이전트가 Compose 애플리케이션과 상호작용하도록 설정하는 방법은 다음과 같습니다:
+AI 에이전트를 연결하려면 에이전트의 MCP 클라이언트 설정이 `hotMcpServer` Gradle 태스크를 가리키도록 하세요. 예를 들어, `.mcp.json` 파일의 설정은 다음과 같습니다:
 
-1. Gradle 태스크를 사용하여 애플리케이션과 함께 MCP 서버를 시작합니다:
-    ```shell
-    ./gradlew :composeApp:hotMcpServerJvm
-    ```
-   태스크 이름은 표준 명명 규칙인 `hotMcpServer<TargetName>`을 따릅니다.
-   예를 들어, `desktop`이라는 이름의 커스텀 JVM 타겟은 `:composeApp:hotMcpServerDesktop` 태스크를 사용합니다.
-2. AI 에이전트의 MCP 클라이언트 설정에서 해당 Gradle 태스크를 가리키도록 합니다. 예를 들어, `.mcp.json` 파일의 설정은 다음과 같습니다:
-    ```json
-    {
-      "mcpServers": {
-        "compose-hot-reload": {
-          "command": "./gradlew",
-          "args": [
-            "--no-daemon",
-            "--quiet",
-            "--console=plain",
-            "hotMcpServer"
-          ]
-        }
-      }
+```json
+{
+  "mcpServers": {
+    "compose-hot-reload": {
+      "command": "./gradlew",
+      "args": [
+        "--no-daemon",
+        "--quiet",
+        "--console=plain",
+        "hotMcpServer"
+      ]
     }
-    ```
+  }
+}
+```
 
 ### 사용 가능한 MCP 도구
 

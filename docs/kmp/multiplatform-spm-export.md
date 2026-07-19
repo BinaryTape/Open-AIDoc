@@ -20,7 +20,7 @@
 
 为了使您的框架可供使用，您需要上传两个文件：
 
-* 包含 XCFramework 的 ZIP 归档。您需要将其上传到具有直接访问权限的便捷文件存储中（例如，创建一个附带归档文件的 GitHub release，使用 Amazon S3 或 Maven）。
+* 包含 XCFramework 的 ZIP 归档。您需要将其上传到具有直接访问权限的便捷文件存储中（例如：创建一个附带归档文件的 GitHub release，使用 Amazon S3 或 Maven）。
   选择最易于集成到您的工作流中的选项。
 * 描述软件包的 `Package.swift` 文件。您需要将其推送到一个单独的 Git 仓库。
 
@@ -83,15 +83,15 @@
   
    生成的框架将在您的项目目录中创建为 `shared/build/XCFrameworks/release/Shared.xcframework` 文件夹。
 
-   > 如果您使用的是 Compose Multiplatform 项目，请使用以下 Gradle 任务：
+   > 如果您的项目使用 SwiftPM 依赖项，从 Kotlin %kotlinEapVersion% 开始，
+   > 该任务还会在 XCFramework 旁边生成一组与 SwiftPM 相关的文件。
+   > 正如[下文](#准备-xcframework-和-swift-软件包清单)所述，
+   > 您可以将生成的 `Package.swift` 随框架一起分发，而无需从头编写清单。
    >
-   > ```shell
-   > ./gradlew :sharedUI:assembleSharedXCFramework
-   > ```
-   >
-   > 然后，您可以在 `sharedUI/build/XCFrameworks/release/Shared.xcframework` 文件夹中找到生成的框架。
-   >
-   {style="tip"}
+   {style="note"} 
+
+3. 如果您有多个想要导出的包含共享代码的模块（例如，一个共享逻辑模块和一个共享 UI 模块），
+   请[将它们组合成一个新的模块](#将多个模块导出为-xcframework)并改为分发该伞形模块。
 
 ### 准备 XCFramework 和 Swift 软件包清单
 
@@ -127,7 +127,10 @@
     curl <指向已上传 XCFramework ZIP 文件的可下载链接>
     ```
 
-4. 选择任意目录，并在本地创建一个包含以下代码的 `Package.swift` 文件：
+4. 如果您的项目使用 SwiftPM 依赖项，从 Kotlin %kotlinEapVersion% 开始，
+   `assembleSharedXCFramework` Gradle 任务会在 XCFramework 旁边生成一个 `Package.swift` 文件。
+
+   如果情况并非如此，您可以手动创建一个 `Package.swift` 文件，使用以下模板：
 
    ```Swift
    // swift-tools-version:5.3
@@ -150,7 +153,10 @@
    )
    ```
    
-5. 在 `url` 字段中，指定指向包含 XCFramework 的 ZIP 归档的链接。
+5. 指定缺失的字段：
+   * 在 `url` 字段中，指定指向包含 XCFramework 的 ZIP 归档的链接。
+   * 在 `checksum` 字段中，指定之前为该 ZIP 文件计算的校验和。
+
 6. [推荐] 要验证生成的清单，您可以在包含 `Package.swift` 文件的目录中运行以下 shell 命令：
 
     ```shell
@@ -269,6 +275,6 @@
     ./gradlew :together:assembleTogetherReleaseXCFramework
     ```
 
-5. 按照[上一节](#prepare-the-xcframework-and-the-swift-package-manifest)中的步骤准备 `together.xcframework`：将其归档、计算校验和、将归档后的 XCFramework 上传到文件存储、创建并推送 `Package.swift` 文件。
+5. 按照[上一节](#准备-xcframework-和-swift-软件包清单)中的步骤准备 `together.xcframework`：将其归档、计算校验和、将归档后的 XCFramework 上传到文件存储、创建并推送 `Package.swift` 文件。
 
 现在，您可以将依赖项导入 Xcode 项目。添加 `import together` 指令后，您应该可以在 Swift 代码中导入来自 `network` 和 `database` 模块的类。

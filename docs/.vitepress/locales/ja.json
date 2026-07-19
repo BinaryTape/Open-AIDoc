@@ -679,5 +679,6 @@
   "kotlin.take-kotlin-tour": "Kotlinツアーに参加する",
   "kotlin.beginner": "初級",
   "kotlin.intermediate": "中級",
-  "kotlin.immutable-collections-kotlinx-collections-immutable": "不変コレクション (kotlinx.collections.immutable)"
+  "kotlin.immutable-collections-kotlinx-collections-immutable": "不変コレクション (kotlinx.collections.immutable)",
+  "kotlin.jvm-code-analysis": "コード解析ツールを使用する"
 }

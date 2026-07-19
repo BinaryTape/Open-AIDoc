@@ -29,7 +29,7 @@ Kotlin言語とツールセットは、JVM、JS、Nativeターゲット向けの
 **Stable** は「最も保守的なシナリオでも使用してください」を意味します：
 * 完成しています。私たちは、厳格な[後方互換性ルール](https://kotlinfoundation.org/language-committee-guidelines/)に従って進化させていきます。
 
-安定性レベルは、そのコンポーネントがどれくらい早く Stable としてリリースされるかについては何も示していません。同様に、リリースまでにコンポーネントがどれほど変更されるかを示すものでもありません。それらは単に、コンポーネントがどれほど速く変化しているか、そしてユーザーがアップデートに関する問題のリスクをどれほど負っているかを示すものです。
+安定性レベルは、そのコンポーネントがどれくらい早く Stable としてリリースされるかについては何も示していません。同様に、リリースまでにコンポーネントがどれほど変更されるかを示すものでもありません。それらは単に、コンポーネントがどれほど速く変化しているか、およびユーザーがアップデートに関する問題のリスクをどれほど負っているかを示すものです。
 
 ## KotlinコンポーネントのGitHubバッジ
 
@@ -89,14 +89,15 @@ Kotlin言語とツールセットは、JVM、JS、Nativeターゲット向けの
 ### Kotlinライブラリ
 
 | **コンポーネント** | **ステータス** | **バージョン以降のステータス** | **コメント** |
-|-----------------------|------------|--------------------------|--------------|
-| kotlin-stdlib (JVM)   | Stable     | 1.0.0                    |              |
-| kotlinx-coroutines    | Stable     | 1.3.0                    |              |
-| kotlinx-serialization | Stable     | 1.0.0                    |              |
-| kotlin-metadata-jvm   | Stable     | 2.0.0                    |              |
-| kotlin-reflect (JVM)  | Beta       | 1.0.0                    |              |
-| kotlinx-datetime      | Alpha      | 0.2.0                    |              |
-| kotlinx-io            | Alpha      | 0.2.0                    |              |
+|-------------------------------|------------|--------------------------|--------------|
+| kotlin-stdlib (JVM)           | Stable     | 1.0.0                    |              |
+| kotlinx-coroutines            | Stable     | 1.3.0                    |              |
+| kotlinx-serialization         | Stable     | 1.0.0                    |              |
+| kotlin-metadata-jvm           | Stable     | 2.0.0                    |              |
+| kotlin-reflect (JVM)          | Beta       | 1.0.0                    |              |
+| kotlinx-datetime              | Alpha      | 0.2.0                    |              |
+| kotlinx-io                    | Alpha      | 0.2.0                    |              |
+| kotlinx-collections-immutable | Alpha      | 0.3.5                    |              |
 
 ### Kotlinマルチプラットフォーム
 
@@ -116,6 +117,13 @@ Kotlin言語とツールセットは、JVM、JS、Nativeターゲット向けの
 | CocoaPodsインテグレーション                  | Stable     | 1.9.20                   |                                                                                                                               |
 
 さまざまなターゲットのサポートレベルの詳細については、[](native-target-support.md) を参照してください。
+
+### ビルドツール
+
+| **コンポーネント** | **ステータス** | **バージョン以降のステータス** | **コメント** |
+|-----------------------------------------------------|------------|--------------------------|-----------------------------------------------------------------------------------------------------------------------|
+| [Kotlin Gradle プラグイン](gradle-configure-project.md) | Stable     | 1.1.1                    | [Kotlin Multiplatform Gradle プラグイン](https://kotlinlang.org/docs/multiplatform/multiplatform-dsl-reference.html#id-and-version) は Kotlin 1.9.20 から安定しています。 |
+| [Kotlin Maven プラグイン](maven-configure-project.md)   | Stable     | 1.0.0                    |                                                                                                                       |
 
 ### 言語ツール
 

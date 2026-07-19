@@ -4,7 +4,7 @@
 
 <tldr>
     <p>最新 Kotlin 版本：<strong>%kotlinVersion%</strong></p>
-    <p>参见 <a href="%kotlinLatestWhatsnew%">Kotlin 2.4.0 最新变化</a><!--并在 <a href="%kotlinLatestUrl%">变更日志</a> 中查看缺陷修复详情-->。</p>
+    <p>参见 <a href="%kotlinLatestWhatsnew%">Kotlin 2.4.0 最新变化</a> 并在 <a href="%kotlinLatestUrl%">变更日志</a> 中查看缺陷修复详情。</p>
 </tldr>
 
 本页面说明了 Kotlin 的发布周期以及我们交付的不同发布类型。其中还包括有关过去和未来 Kotlin 发布的信息，以及如何更新至特定发布的说明。
@@ -141,7 +141,7 @@ Kotlin 在 [IntelliJ IDEA](https://www.jetbrains.com/idea/download/) 和 [Androi
             <p>2027 年 12 月 3 日</p>
         </td>
         <td>
-            <p>暂无可用</p>
+            <p>2.4.10</p>
         </td>
     </tr>
 </table>
@@ -162,6 +162,16 @@ Kotlin 在 [IntelliJ IDEA](https://www.jetbrains.com/idea/download/) 和 [Androi
     <tr>
         <th>构建信息</th>
         <th>构建亮点</th>
+    </tr>
+    <tr>
+        <td><strong>2.4.10</strong>
+            <p>发布日期：<strong>2026 年 7 月 14 日</strong></p>
+            <p><a href="https://github.com/JetBrains/kotlin/releases/tag/v2.4.10" target="_blank">GitHub 上的发布</a></p>
+        </td>
+        <td>
+            <p>针对 Kotlin 2.4.0 的缺陷修复发布。</p>
+            <p>欲了解更多详情，请参考 <a href="https://github.com/JetBrains/kotlin/releases/tag/v2.4.10">变更日志</a>。</p>
+        </td>
     </tr>
     <tr>
         <td><strong>2.4.0</strong>
@@ -289,7 +299,7 @@ Kotlin 在 [IntelliJ IDEA](https://www.jetbrains.com/idea/download/) 和 [Androi
             <p><a href="https://github.com/JetBrains/kotlin/releases/tag/v2.1.0" target="_blank">GitHub 上的发布</a></p>
         </td>
         <td>
-            <p>一个引入新语言功能的功能发布。</p>
+            <p>一个语言发布，引入了新的语言功能。</p>
             <p>在 <a href="whatsnew21.md" target="_blank">Kotlin 2.1.0 最新变化</a> 中了解更多关于 Kotlin 2.1.0 的信息。</p>
         </td>
     </tr>

@@ -680,5 +680,6 @@
   "kotlin.take-kotlin-tour": "Kotlin tour 시작하기",
   "kotlin.beginner": "초급",
   "kotlin.intermediate": "중급",
-  "kotlin.immutable-collections-kotlinx-collections-immutable": "불변 컬렉션 (kotlinx.collections.immutable)"
+  "kotlin.immutable-collections-kotlinx-collections-immutable": "불변 컬렉션 (kotlinx.collections.immutable)",
+  "kotlin.jvm-code-analysis": "코드 분석 도구 사용"
 }

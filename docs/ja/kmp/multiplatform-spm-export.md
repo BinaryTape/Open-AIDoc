@@ -79,15 +79,12 @@ XCFramework の公開を設定するには：
   
    生成されたフレームワークは、プロジェクトディレクトリ内の `shared/build/XCFrameworks/release/Shared.xcframework` フォルダとして作成されます。
 
-   > Compose Multiplatform プロジェクトを使用している場合は、次の Gradle タスクを使用してください：
+   > プロジェクトで SwiftPM 依存関係を利用している場合、Kotlin %kotlinEapVersion% 以降、このタスクは XCFramework の隣に一連の SwiftPM 関連ファイルも生成します。
+   > [以下](#xcframework-と-swift-パッケージマニフェストの準備)で説明するように、マニフェストを一から作成する代わりに、生成された `Package.swift` をフレームワークと一緒に配布できます。
    >
-   > ```shell
-   > ./gradlew :sharedUI:assembleSharedXCFramework
-   > ```
-   >
-   > 生成されたフレームワークは `sharedUI/build/XCFrameworks/release/Shared.xcframework` フォルダにあります。
-   >
-   {style="tip"}
+   {style="note"} 
+
+3. エクスポートしたい共有コードを持つモジュールが複数ある場合（例：共有ロジックモジュールと共有 UI モジュール）、それらを[単一の新しいモジュールに統合](#複数のモジュールを-xcframework-としてエクスポートする)し、代わりにこのアンブレラ (umbrella) モジュールを配布してください。
 
 ### XCFramework と Swift パッケージマニフェストの準備
 
@@ -123,7 +120,9 @@ XCFramework の公開を設定するには：
     curl <アップロードされた XCFramework ZIP ファイルへのダウンロード可能なリンク>
     ```
 
-4. 任意のディレクトリを選択し、ローカルに以下のコードを含む `Package.swift` ファイルを作成します：
+4. プロジェクトで SwiftPM 依存関係を利用している場合、Kotlin %kotlinEapVersion% 以降、`assembleSharedXCFramework` Gradle タスクは XCFramework の隣に `Package.swift` ファイルを生成します。
+
+   そうでない場合は、以下のテンプレートを使用して手動で `Package.swift` ファイルを作成できます：
 
    ```Swift
    // swift-tools-version:5.3
@@ -146,7 +145,10 @@ XCFramework の公開を設定するには：
    )
    ```
    
-5. `url` フィールドに、XCFramework を含む ZIP アーカイブへのリンクを指定します。
+5. 不足しているフィールドを指定します：
+   * `url` フィールドに、XCFramework を含む ZIP アーカイブへのリンクを指定します。
+   * `checksum` フィールドに、先ほど ZIP ファイルに対して計算したチェックサムを指定します。
+
 6. [推奨] 生成されたマニフェストを検証するには、`Package.swift` ファイルがあるディレクトリで次のシェルコマンドを実行します：
 
     ```shell
@@ -265,6 +267,6 @@ XCFramework の公開を設定するには：
     ./gradlew :together:assembleTogetherReleaseXCFramework
     ```
 
-5. [前のセクション](#prepare-the-xcframework-and-the-swift-package-manifest)の手順に従って `together.xcframework` を準備します：アーカイブの作成、チェックサムの計算、アーカイブされた XCFramework のファイルストレージへのアップロード、`Package.swift` ファイルの作成とプッシュを行います。
+5. [前のセクション](#xcframework-と-swift-パッケージマニフェストの準備)の手順に従って `together.xcframework` を準備します：アーカイブの作成、チェックサムの計算、アーカイブされた XCFramework のファイルストレージへのアップロード、`Package.swift` ファイルの作成とプッシュを行います。
 
 これで、Xcode プロジェクトに依存関係をインポートできます。`import together` ディレクティブを追加すると、Swift コードで `network` モジュールと `database` モジュールの両方のクラスをインポートして利用できるようになります。

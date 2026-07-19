@@ -647,5 +647,6 @@
   "kotlin.take-kotlin-tour": "Take Kotlin tour",
   "kotlin.beginner": "Beginner",
   "kotlin.intermediate": "Intermediate",
-  "kotlin.immutable-collections-kotlinx-collections-immutable": "Immutable collections (kotlinx.collections.immutable)"
+  "kotlin.immutable-collections-kotlinx-collections-immutable": "Immutable collections (kotlinx.collections.immutable)",
+  "kotlin.jvm-code-analysis": "Use code analysis tools"
 }

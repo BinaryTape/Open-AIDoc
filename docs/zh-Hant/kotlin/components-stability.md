@@ -88,15 +88,16 @@ Kotlin 語言與工具集被劃分為許多元件，例如 JVM、JS 與 Native �
 
 ### Kotlin 程式庫
 
-| **元件**              | **狀態** | **自該版本起的狀態** | **備註** |
-|-----------------------|------------|--------------------------|--------------|
-| kotlin-stdlib (JVM)   | 穩定 (Stable) | 1.0.0                    |              |
-| kotlinx-coroutines    | 穩定 (Stable) | 1.3.0                    |              |
-| kotlinx-serialization | 穩定 (Stable) | 1.0.0                    |              |
-| kotlin-metadata-jvm   | 穩定 (Stable) | 2.0.0                    |              |
-| kotlin-reflect (JVM)  | Beta       | 1.0.0                    |              |
-| kotlinx-datetime      | Alpha      | 0.2.0                    |              |
-| kotlinx-io            | Alpha      | 0.2.0                    |              |
+| **元件**                      | **狀態** | **自該版本起的狀態** | **備註** |
+|-------------------------------|------------|--------------------------|--------------|
+| kotlin-stdlib (JVM)           | 穩定 (Stable) | 1.0.0                    |              |
+| kotlinx-coroutines            | 穩定 (Stable) | 1.3.0                    |              |
+| kotlinx-serialization         | 穩定 (Stable) | 1.0.0                    |              |
+| kotlin-metadata-jvm           | 穩定 (Stable) | 2.0.0                    |              |
+| kotlin-reflect (JVM)          | Beta       | 1.0.0                    |              |
+| kotlinx-datetime              | Alpha      | 0.2.0                    |              |
+| kotlinx-io                    | Alpha      | 0.2.0                    |              |
+| kotlinx-collections-immutable | Alpha      | 0.3.5                    |              |
 
 ### Kotlin Multiplatform
 
@@ -116,6 +117,13 @@ Kotlin 語言與工具集被劃分為許多元件，例如 JVM、JS 與 Native �
 | CocoaPods 整合                               | 穩定 (Stable) | 1.9.20                   |                                                                                                                               |
 
 有關不同目標支援層級的更多資訊，請參閱 [](native-target-support.md)。
+
+### 建置工具
+
+| **元件**                                            | **狀態** | **自該版本起的狀態** | **備註**                                                                                                          |
+|---------------------------------------------------|------------|--------------------------|-------------------------------------------------------------------------------------------------------------------|
+| [Kotlin Gradle 外掛程式](gradle-configure-project.md) | 穩定 (Stable) | 1.1.1                    | [Kotlin Multiplatform Gradle 外掛程式](https://kotlinlang.org/docs/multiplatform/multiplatform-dsl-reference.html#id-and-version) 自 Kotlin 1.9.20 起已穩定。 |
+| [Kotlin Maven 外掛程式](maven-configure-project.md)   | 穩定 (Stable) | 1.0.0                    |                                                                                                                   |
 
 ### 語言工具
 

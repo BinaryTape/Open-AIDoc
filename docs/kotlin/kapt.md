@@ -17,7 +17,7 @@ kapt 编译器插件允许你在 Kotlin 中使用现有的 Java 注解处理器�
 这使得在你的 Kotlin 项目中可以为 [MapStruct](https://mapstruct.org/) 和 [数据绑定](https://developer.android.com/topic/libraries/data-binding/index.html) 等库启用基于 Java 的注解处理。
 
 > IntelliJ 构建系统不支持 kapt。要在 IntelliJ IDEA 中重新运行注解处理，请从 **Maven** 工具窗口启动构建。
-> 
+>
 {style="warning"}
 
 ## 设置插件
@@ -76,7 +76,7 @@ kapt 编译器插件允许你在 Kotlin 中使用现有的 Java 注解处理器�
 
 3. 如果你之前使用 [Android 支持](https://developer.android.com/build/annotation-processors) 来处理注解处理器，请将 `annotationProcessor` 配置的用法替换为 `kapt`。如果你的项目包含 Java 类，kapt 插件也会处理它们。
 
-   如果你为 `androidTest` 或 `test` 源码使用注解处理器，相应的 `kapt` 配置分别命名为 `kaptAndroidTest` 和 `kaptTest`。注意 `kaptAndroidTest` 和 `kaptTest` 继承自 `kapt`，因此你可以提供 `kapt` 依赖项，它将同时用于生产源码和测试。
+   如果你为 `androidTest` 或 `test` 源使用注解处理器，相应的 `kapt` 配置分别命名为 `kaptAndroidTest` 和 `kaptTest`。注意 `kaptAndroidTest` 和 `kaptTest` 继承自 `kapt`，因此你可以提供 `kapt` 依赖项，它将同时用于生产源码和测试。
 
 ### Maven {id="set-up-in-maven"}
 
@@ -84,7 +84,7 @@ kapt 编译器插件允许你在 Kotlin 中使用现有的 Java 注解处理器�
 
 #### 自动配置
 
-你可以通过为 Kotlin Maven 插件启用 `<extensions>` 选项来简化 kapt 配置。在这种情况下，你不需要手动设置带有目标（goals）或源目录的 kapt `<execution>` 部分。
+你可以通过为 Kotlin Maven 插件启用 `<extensions>` 选项来简化 kapt 配置。在这种情况下，你不需要手动设置带有目标 (goals) 或源目录的 kapt `<execution>` 部分。
 
 要自动配置 kapt，请在你的 `pom.xml` 构建文件中为 `kotlin-maven-plugin` 将 `<extensions>` 选项设置为 `true`：
 
@@ -170,8 +170,8 @@ kapt 编译器插件在 Kotlin 编译器的二进制分发版中可用。
 * `stubs`（*必填*）：存根文件的临时输出路径。
 * `incrementalData`：二进制存根的输出路径。
 * `apclasspath`（*可重复*）：注解处理器 JAR 的路径。为每个 JAR 传递一个 `apclasspath` 选项。
-* `apoptions`：Base64 编码的注解处理器选项列表。有关更多信息，请参阅 [AP/javac 选项编码](#ap-javac-选项编码)。
-* `javacArguments`：Base64 编码的传递给 javac 的选项列表。有关更多信息，请参阅 [AP/javac 选项编码](#ap-javac-选项编码)。
+* `apoptions`：Base64 编码的注解处理器选项列表。有关更多信息，请参阅 [AP/javac 选项编码](#ap-javac-options-encoding)。
+* `javacArguments`：Base64 编码的传递给 javac 的选项列表。有关更多信息，请参阅 [AP/javac 选项编码](#ap-javac-options-encoding)。
 * `processors`：逗号分隔的注解处理器完全限定类名列表。如果指定了此项，kapt 将不会尝试在 `apclasspath` 中查找注解处理器。
 * `verbose`：启用详细输出。
 * `aptMode`（*必填*）
@@ -198,9 +198,9 @@ kapt 编译器插件在 Kotlin 编译器的二进制分发版中可用。
 
 ## 配置注解处理器
 
-### 向注解处理器传递参数
+### 向注解处理器传递实参
 
-在你的构建脚本文件 `build.gradle(.kts)` 中使用 `arguments {}` 代码块向注解处理器传递参数：
+在你的构建脚本文件 `build.gradle(.kts)` 中使用 `arguments {}` 代码块向注解处理器传递实参：
 
 ```kotlin
 kapt {
@@ -220,7 +220,7 @@ kapt {
 Gradle 利用 [编译回避](https://docs.gradle.org/current/userguide/java_plugin.html#sec:java_compile_avoidance) 在重新构建项目时跳过注解处理，从而缩短使用 kapt 的增量构建时间。特别是，在以下情况下会跳过注解处理：
 
 * 项目的源文件未更改。
-* 依赖项中的更改是 [ABI](https://en.wikipedia.org/wiki/Application_binary_interface) 兼容的。例如，只有方法体发生更改时。
+* 依赖项中的更改是 [ABI](https://en.wikipedia.org/wiki/Application_binary_interface) 兼容的。例如，只有函数体发生更改时。
 
 然而，对于在编译类路径上发现的注解处理器，无法使用编译回避，因为即使处理器的 ABI 保持不变，其内部实现的更改也需要运行注解处理任务。
 
@@ -306,28 +306,15 @@ kapt {
 如果你使用 Maven，则需要显式配置该插件。
 参见这个 [Lombok 编译器插件设置示例](lombok.md#using-with-kapt)。
 
-## Gradle 构建缓存支持
-
-kapt 注解处理任务默认在 [Gradle 中缓存](https://guides.gradle.org/using-build-cache/)。
-然而，注解处理器可以运行任意代码，这些代码可能无法可靠地将任务输入转换为输出，或者可能会访问和修改 Gradle 无法跟踪的文件。
-如果构建中使用的注解处理器无法被正确缓存，你可以通过在构建脚本中指定 `useBuildCache` 属性来完全禁用 kapt 的缓存。
-这有助于防止 kapt 任务出现误报的缓存命中：
-
-```groovy
-kapt {
-    useBuildCache = false
-}
-```
-
-## 提高使用 kapt 的构建速度
+## 优化 kapt 构建
 
 ### 并行运行 kapt 任务
 
-为了提高使用 kapt 的构建速度，你可以为 kapt 任务启用 [Gradle Worker API](https://guides.gradle.org/using-the-worker-api/)。使用 Worker API 让 Gradle 能够并行运行来自单个项目的独立注解处理任务，在某些情况下，这会显著减少执行时间。
+kapt 使用 [Gradle Worker API](https://docs.gradle.org/current/userguide/worker_api.html) 来运行注解处理任务。使用 Worker API 让 Gradle 能够并行运行来自单个项目的独立注解处理任务，在某些情况下，这会显著减少执行时间。
 
-当你在 Kotlin Gradle 插件中使用 [自定义 JDK 路径](gradle-configure-project.md#gradle-java-toolchains-support) 功能时，kapt 任务工作程序仅使用 [进程隔离模式](https://docs.gradle.org/current/userguide/worker_api.html#changing_the_isolation_mode)。请注意，`kapt.workers.isolation` 属性会被忽略。
+如果你在 Kotlin Gradle 插件中设置了[自定义 JDK 版本](gradle-configure-project.md#gradle-java-toolchains-support)，kapt 任务工作程序仅使用 [`processIsolation()`](https://docs.gradle.org/current/userguide/worker_api.html#step_3_change_the_isolation_mode) 模式。
 
-如果你想为 kapt 工作进程提供额外的 JVM 参数，请使用 `KaptWithoutKotlincTask` 的输入 `kaptProcessJvmArgs`：
+如果你想为 kapt 工作进程提供额外的 JVM 实参，请使用 `KaptWithoutKotlincTask` 的输入 `kaptProcessJvmArgs`：
 
 <tabs group="build-script">
 <tab title="Kotlin" group-key="kotlin">
@@ -351,6 +338,18 @@ tasks.withType(org.jetbrains.kotlin.gradle.internal.KaptWithoutKotlincTask.class
 
 </tab>
 </tabs>
+
+### 安全使用 Gradle 构建缓存
+
+kapt 注解处理任务[默认在 Gradle 中缓存](https://docs.gradle.org/current/userguide/build_cache_use_cases.html)。然而，注解处理器可以运行任意代码。这可能导致任务输入到输出的不必要转换，或者访问和修改 Gradle 无法跟踪的文件。
+
+如果构建中使用的注解处理器无法被正确缓存，你可以禁用缓存以防止 kapt 任务出现误报的缓存命中。为此，请在构建脚本中使用 `useBuildCache` 属性：
+
+```groovy
+kapt {
+    useBuildCache = false
+}
+```
 
 ### 为注解处理器的类加载器启用缓存
 
@@ -379,8 +378,25 @@ kapt.classloaders.cache.disableForProcessors=[annotation processors full names]
 ```
 
 > 如果你遇到该功能的任何问题，我们非常感谢你在 [YouTrack](https://youtrack.jetbrains.com/issue/KT-28901) 中提供反馈。
-> 
+>
 {style="note"}
+
+### 使用增量注解处理
+
+kapt 默认支持增量注解处理。
+
+目前，只有在以下情况下，增量注解处理才能工作：
+
+* 启用了[增量编译](gradle-compilation-and-caches.md#incremental-compilation)。
+* 构建中使用的所有注解处理器都是增量式的。
+
+要禁用增量注解处理，请在你的 `gradle.properties` 文件中添加这一行：
+
+```none
+kapt.incremental.apt=false
+```
+
+## 分析性能
 
 ### 衡量注解处理器的性能
 
@@ -406,7 +422,7 @@ plugin:org.jetbrains.kotlin.kapt3:dumpProcessorTimings=ap-perf-report.file \
 sample/src/main/
 ```
 
-### 统计使用注解处理器生成的文件数量
+### 统计生成的文件数量
 
 `kapt` Gradle 插件可以报告每个注解处理器生成文件数量的统计信息。
 
@@ -442,18 +458,6 @@ sample/src/main/
 [INFO] Generated files report:
 [INFO] org.mapstruct.ap.MappingProcessor: total sources: 2, sources per round: 2, 0, 0
 ```
-
-## 增量注解处理
-
-kapt 默认支持增量注解处理。目前，只有在使用中的所有注解处理器都是增量的情况下，注解处理才能是增量的。
-
-要禁用增量注解处理，请在你的 `gradle.properties` 文件中添加这一行：
-
-```none
-kapt.incremental.apt=false
-```
-
-请注意，增量注解处理还要求同时启用 [增量编译](gradle-compilation-and-caches.md#incremental-compilation)。
 
 ## Java 编译器选项
 

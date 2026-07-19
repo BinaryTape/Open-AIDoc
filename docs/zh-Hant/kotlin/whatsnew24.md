@@ -4,6 +4,10 @@
 
 <web-summary>閱讀 Kotlin 2.4.0 版本說明，涵蓋新語言特性、Kotlin Multiplatform、JVM、Native、JS 和 Wasm 的更新，以及 Gradle 和 Maven 的建置工具支援。</web-summary>
 
+<tldr>
+    <p>有關錯誤修正版本 2.4.10 的詳細資訊，請參閱 <a href="https://github.com/JetBrains/kotlin/releases/tag/v2.4.10">變更日誌</a></p>
+</tldr>
+
 Kotlin 2.4.0 正式發佈！以下是主要的亮點：
 
 * **語言：** [上下文參數、明確支援欄位趨於穩定，以及多項註解使用位址目標特性](#stable-features)
@@ -31,7 +35,7 @@ Kotlin 2.4.0 正式發佈！以下是主要的亮點：
 
 在之前的 Kotlin 版本中，有幾項新特性是以實驗性 (Experimental) 身份引入的。以下特性現在在 Kotlin 2.4.0 中已晉升為 [Stable (穩定)](components-stability.md#stability-levels-explained)，因此您不再需要選擇性加入 (opt-in) 即可使用它們：
 
-* [上下文參數 (Context parameters)](context-parameters.md)，除了 [明確上下文引數](#explicit-context-arguments-for-context-parameters) 和 [可呼叫參照](https://github.com/Kotlin/KEEP/blob/context-parameters/proposals/context-parameters.md#callable-references)
+* [上下文參數 (Context parameters)](context-parameters.md)，除了 [上下文引數](#explicit-context-arguments-for-context-parameters) 和 [可呼叫參照](https://github.com/Kotlin/KEEP/blob/context-parameters/proposals/context-parameters.md#callable-references)
 * [屬性的 `@all` 元目標](annotations.md#all-meta-target)
 * [使用位址註解目標的新預設規則](annotations.md#defaults-when-no-use-site-targets-are-specified)
 * [明確支援欄位](properties.md#explicit-backing-fields)
@@ -65,7 +69,7 @@ Kotlin 2.4.0 將上下文參數、明確支援欄位和註解使用位址目標�
 
 Kotlin 2.2.0 和 2.3.0 以 [Experimental](components-stability.md#stability-levels-explained) 身份引入了幾項語言特性。我們很高興地宣佈，以下語言特性在此版本中已達到 [Stable](components-stability.md#stability-levels-explained)：
 
-* [上下文參數](whatsnew22.md#preview-of-context-parameters)，除了 [明確上下文引數](#explicit-context-arguments-for-context-parameters) 和 [可呼叫參照](https://github.com/Kotlin/KEEP/blob/context-parameters/proposals/context-parameters.md#callable-references)
+* [上下文參數](whatsnew22.md#preview-of-context-parameters)，除了 [上下文引數](#explicit-context-arguments-for-context-parameters) 和 [可呼叫參照](https://github.com/Kotlin/KEEP/blob/context-parameters/proposals/context-parameters.md#callable-references)
 * [屬性的 `@all` 元目標](annotations.md#all-meta-target)
 * [使用位址註解目標的新預設規則](annotations.md#defaults-when-no-use-site-targets-are-specified)
 * [明確支援欄位](properties.md#explicit-backing-fields)
@@ -1016,7 +1020,7 @@ Kotlin 2.4.0 透過支援 Maven Toolchains 以及 Java 與 JVM 目標版本的�
 
 這可確保 Kotlin 和 Maven 編譯器針對相同的位元組碼版本，從而避免 Kotlin 產生的位元組碼與專案其餘部分或預期部署環境不相容的問題。
 
-啟用 `<extensions>` 選項後，您無需設定 `kotlin.compiler.jvmTarget` 或 `kotlin.compiler.jdkRelease` 選項。如果兩者都未定義，Kotlin Maven 外掛程式會按以下順序自動解析 JVM 目標版本：
+啟用 `<extensions>` 選項後，您無需設定 `kotlin.compiler.jvmTarget` 或 `kotlin.compiler.jdkRelease` 選項。如果兩者都未定義， Kotlin Maven 外掛程式會按以下順序自動解析 JVM 目標版本：
 
 1. 作為在專案屬性中或在 `maven-compiler-plugin` 配置中定義的 `maven.compiler.release` 版本。
 

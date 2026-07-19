@@ -30,7 +30,7 @@
 在基於 UNIX 的系統（如 macOS、Linux、Cygwin、FreeBSD 和 Solaris）上安裝 Kotlin 的更簡單方法是
 [SDKMAN!](https://sdkman.io)。它也可以在 Bash 和 ZSH shell 中運作。[了解如何安裝 SDKMAN!](https://sdkman.io/install)。
 
-若要透過 SDKMAN! 安裝 Kotlin 編譯器，請在終端中執行以下指令：
+若要透過 SDKMAN! 安裝 Kotlin 編譯器，請在終端機中執行以下指令：
 
 ```bash
 sdk install kotlin
@@ -55,7 +55,7 @@ sudo snap install --classic kotlin
 
 ## 建立並執行應用程式
 
-1. 在 Kotlin 中建立一個顯示 `"Hello, World!"` 的簡單主控台 JVM 應用程式。
+1. 在 Kotlin 中建立一個顯示 `"Hello, World!"` 的簡單主控台 JVM 應用程式。 
    在程式碼編輯器中，建立一個名為 `hello.kt` 的新檔案，並包含以下程式碼：
 
    ```kotlin
@@ -99,10 +99,10 @@ kotlinc hello.kt -d hello.jar
 
 由於以此方式編譯的二進位檔案相依於 Kotlin 執行階段，因此您應確保在每次使用編譯後的程式庫時，classpath 中都存在該執行階段。
 
-您也可以使用 `kotlin` 指令碼來執行 Kotlin 編譯器產生的二進位檔案：
+您也可以使用 `kotlinr` 指令碼來執行 Kotlin 編譯器產生的二進位檔案：
 
 ```bash
-kotlin -classpath hello.jar HelloKt
+kotlinr -classpath hello.jar HelloKt
 ```
 
 `HelloKt` 是 Kotlin 編譯器為名為 `hello.kt` 的檔案產生的主類別名稱。

@@ -49,7 +49,7 @@ plugins {
 
 | KGP 버전      | Gradle 최소 및 최대 버전               | AGP 최소 및 최대 버전                               |
 |---------------|---------------------------------------|-----------------------------------------------------|
-| 2.4.0         | %minGradleVersion%–%maxGradleVersion% | %minAndroidGradleVersion%–%maxAndroidGradleVersion% |
+| 2.4.0-2.4.10  | %minGradleVersion%–%maxGradleVersion% | %minAndroidGradleVersion%–%maxAndroidGradleVersion% |
 | 2.3.20–2.3.21 | 7.6.3–9.3.0                           | 8.2.2–9.0.0                                         |
 | 2.3.10        | 7.6.3–9.0.0                           | 8.2.2–9.0.0                                         |
 | 2.3.0         | 7.6.3–9.0.0                           | 8.2.2–8.13.0                                        |
@@ -571,7 +571,7 @@ tasks.jar(type: Jar) {
 
 [멀티플랫폼 프로젝트](https://kotlinlang.org/docs/multiplatform/get-started.html)라고 불리는 [여러 플랫폼](https://kotlinlang.org/docs/multiplatform/multiplatform-dsl-reference.html#targets)을 타겟으로 하는 프로젝트에는 `kotlin-multiplatform` 플러그인이 필요합니다.
 
->`kotlin-multiplatform` 플러그인은 Gradle %minGradleVersion% 이상에서 작동합니다.
+> `kotlin-multiplatform` 플러그인은 Gradle %minGradleVersion% 이상에서 작동합니다.
 >
 {style="note"}
 

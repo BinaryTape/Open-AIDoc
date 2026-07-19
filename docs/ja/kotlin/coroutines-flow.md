@@ -7,7 +7,7 @@
 
 フローを使用して、データを段階的にロードしたり、イベントストリームに反応したり、サブスクリプション形式のAPIをモデリングしたりする「フローパイプライン（Flow pipelines）」を作成できます。
 
-フローパイプラインは、以下の役割を含む一連のオペレーション（操作）で構成されます。
+フローパイプラインは、以下の役割を含む一連の操作（オペレーション）で構成されます。
 
 *   **エミッター (Emitter)**: 値を生成します。
 *   **中間演算子 (Intermediate operators) (任意)**: フローから値を受け取り、それらに演算を適用して、別のフローを返します。
@@ -904,7 +904,7 @@ class Chatroom {
         replay = MESSAGES_TO_REMEMBER
     )
 
-    // 読み取り専用の SharedFlow をサブスクライバーに公開する
+    // 読み取り専用 of SharedFlow をサブスクライバーに公開する
     val messages: SharedFlow<Message>
         get() = _messages.asSharedFlow()
 
@@ -1397,10 +1397,10 @@ suspend fun main() {
 
 組み込みの `.shareIn()` 関数を使用するには、以下の引数を指定します。
 
-*   アップストリームのフローがコレクトされるコルーチンスコープ。
-*   アップストリームのコレクションがいつ開始および停止するかを制御する [`SharingStarted`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/-sharing-started/) 戦略。
-    例えば、[`SharingStarted.Eagerly`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/-sharing-started/-companion/-eagerly.html) は、サブスクライバーが現れる前に、提供されたスコープで即座にアップストリームのコレクションを開始します。
-*   新しいサブスクライバーが受け取る過去のエミッションの数を制御する、オプションの `replay` 値。
+* アップストリームのフローがコレクトされるコルーチンスコープ。
+* アップストリームのコレクションがいつ開始および停止するかを制御する [`SharingStarted`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/-sharing-started/) 戦略。
+   例えば、[`SharingStarted.Eagerly`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/-sharing-started/-companion/-eagerly.html) は、サブスクライバーが現れる前に、提供されたスコープで即座にアップストリームのコレクションを開始します。
+* 新しいサブスクライバーが受け取る過去のエミッションの数を制御する、オプションの `replay` 値。
 
 `.shareIn()` 関数は提供されたコルーチンスコープでアップストリームのフローをコレクトし、そのエミッションをサブスクライバーにブロードキャストします。
 
@@ -1580,7 +1580,6 @@ class Chatroom {
 
 //sampleStart
 suspend fun main() {
-    val nUsers = 3
     val chatroom = Chatroom()
     withContext(Dispatchers.Default) {
         // 現在実行中のコルーチンの子スコープを作成する

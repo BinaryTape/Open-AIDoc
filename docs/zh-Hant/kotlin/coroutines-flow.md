@@ -132,7 +132,7 @@ suspend fun main() {
 ```
 {kotlin-runnable="true"}
 
-每次呼叫 `collect()` 都會從頭開始執行整個冷 Flow。如果多個收集器收集同一個冷 Flow，每個收集器都會觸發其專屬的收集過程：
+每次呼叫 `collect()` 都會從頭開始執行整個冷 Flow。如果多個收集器收集同一個 cold flow，每個收集器都會觸發其專屬的收集過程：
 
 ```kotlin
 import kotlinx.coroutines.*
@@ -772,8 +772,8 @@ suspend fun main() {
 
 Kotlin 提供兩種熱 Flow 類型：
 
-* [`SharedFlow`](#create-a-sharedflow)：向多個訂閱者廣播數值。當您需要廣播隨時間發生的事件（如訊息或通知）時，請使用它。
-* [`StateFlow`](#create-a-stateflow)：是一種專門的 `SharedFlow`，始終持有最新的狀態值。當您需要表示隨時間變化的狀態（如 UI 狀態）時，請使用它。
+* [`SharedFlow`](#create-a-sharedflow) 向多個訂閱者廣播數值。當您需要廣播隨時間發生的事件（如訊息或通知）時，請使用它。
+* [`StateFlow`](#create-a-stateflow) 是一種專門的 `SharedFlow`，始終持有最新的狀態值。當您需要表示隨時間變化的狀態（如 UI 狀態）時，請使用它。
 
 ### 建立 `SharedFlow`
 
@@ -783,7 +783,7 @@ Kotlin 提供兩種熱 Flow 類型：
 
 `MutableSharedFlow` 公開了用於發送數值的函式。如果您直接公開它，類別外部的程式碼也能向 Flow 發送數值。
 
-為了防止這種情況，請將可變 Flow 存儲在私有 [支援欄位 (backing property)](properties.md#backing-properties) 中，並透過 [`.asSharedFlow()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/as-shared-flow.html) 函式公開一個唯讀的 `SharedFlow`。若要向訂閱者發送數值，請對 `MutableSharedFlow` 使用 `emit()` 函式：
+為了防止這種情況，請將可變 Flow 存儲在私有 [支援屬性 (backing property)](properties.md#backing-properties) 中，並透過 [`.asSharedFlow()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/as-shared-flow.html) 函式公開一個唯讀的 `SharedFlow`。若要向訂閱者發送數值，請對 `MutableSharedFlow` 使用 `emit()` 函式：
 
 ```kotlin
 data class Message(
@@ -1338,7 +1338,7 @@ suspend fun main() {
 
 如果上游 Flow 拋出例外，此收集協同程式將會失敗。在共享 Flow 之前，請使用 `.catch()` 或 `.retry()` 等運算子在收集協同程式失敗前 [處理上游例外](#handle-exceptions-in-hot-flows)。
 
-內建的 [`.shareIn()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/share-in.html) 函式提供了這種模式，且不需要您自行建立 `MutableSharedFlow`。它還提供了控制上游收集何時開始和停止，以及新訂閱者接收多少個先前發送內容的選項。
+內建的 [`.shareIn()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/share-in.html) 函式提供了這種模式，且不需要您自行建立 `MutableSharedFlow` 自身。它還提供了控制上游收集何時開始和停止，以及新訂閱者接收多少個先前發送內容的選項。
 
 要使用內建的 `.shareIn()` 函式，請提供以下引數：
 
@@ -1433,7 +1433,7 @@ suspend fun main() {
         }
         // 延遲以確保使用者有足夠的時間接收更新
         delay(100.milliseconds)
-        // 取消讀取器，因為 SharedFlow 收集不會自行結束
+        // 取召讀取器，因為 SharedFlow 收集不會自行結束
         messageReaders.forEach { it.cancel() }
         // 取消執行衍生熱 Flow 的作用域
         derivedFlowsScope.cancel()
@@ -1521,7 +1521,6 @@ class Chatroom {
 
 //sampleStart
 suspend fun main() {
-    val nUsers = 3
     val chatroom = Chatroom()
     withContext(Dispatchers.Default) {
         // 建立目前執行中協同程式的子作用域
@@ -1562,7 +1561,7 @@ suspend fun main() {
 
 ### 處理熱 Flow 中的例外
 
-在[冷 Flow](#handle-exceptions-in-flows) 中，除非您先使用 `.catch()` 等運算子處理上游例外，否則例外會傳遞給 `collect()` 的呼叫者。
+在 [冷 Flow](#handle-exceptions-in-flows) 中，除非您先使用 `.catch()` 等運算子處理上游例外，否則例外會傳遞給 `collect()` 的呼叫者。
 
 熱 Flow 不會將例外從生產者傳播給訂閱者。如果發送到 `MutableSharedFlow` 或更新 `MutableStateFlow` 的程式碼拋出例外，請在執行該程式碼的協同程式中處理它。如果訂閱者在收集時拋出例外，請在收集協同程式中處理它。
 

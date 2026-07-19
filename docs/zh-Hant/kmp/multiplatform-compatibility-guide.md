@@ -19,7 +19,7 @@ Kotlin 目前的穩定版本為 %kotlinVersion%。請注意特定變更相對於
 
 | Kotlin Multiplatform 外掛程式版本 | Gradle                                | Android Gradle 外掛程式                             | Xcode   |
 |-------------------------------------|---------------------------------------|-----------------------------------------------------|---------|
-| 2.4.0                               | %minGradleVersion%–%maxGradleVersion% | %minAndroidGradleVersion%–%maxAndroidGradleVersion% | %xcode% |
+| 2.4.0-2.4.10                        | %minGradleVersion%–%maxGradleVersion% | %minAndroidGradleVersion%–%maxAndroidGradleVersion% | %xcode% |
 | 2.3.20–2.3.21                       | 7.6.3–9.3.0                           | 8.2.2–9.0.0                                         | 26.0    |
 | 2.3.10                              | 7.6.3–9.0.0                           | 8.2.2–9.0.0                                         | 26.0    |
 | 2.3.0                               | 7.6.3–9.0.0                           | 8.2.2–8.13.0                                        | 26.0    |
@@ -238,7 +238,7 @@ kotlin {
     }
     ```
 
-雖然這種方法在初始設定上需要更多工作，但它不使用 Gradle 和 Kotlin Gradle 外掛程式的任何低階實體，使得產出的組建更易於使用和維護。
+雖然這種方法在初始設定上需要更多工作，但它不使用 Gradle 和 Kotlin Gradle 外掛程式的任何低階實體，使得產出的組建更易於使用 and 維護。
 
 > 遺憾的是，我們無法為每種情況提供詳細的遷移步驟。如果上述指令對您不適用，請在此 [YouTrack 問題](https://youtrack.jetbrains.com/issue/KT-59316)中描述您的使用案例。
 >
@@ -376,7 +376,7 @@ undefined
 
 **現在的最佳實務是什麼？**
 
-Kotlin Gradle 外掛程式現在提供了一個內建的階層結構模板。自 Kotlin 1.9.20 起，它預設啟用，並包含為常見使用案例預定義的中間原始碼集。
+Kotlin Gradle 外掛程式 now 提供了一個內建的階層結構模板。自 Kotlin 1.9.20 起，它預設啟用，並包含為常見使用案例預定義的中間原始碼集。
 
 您應該指定目標清單，而不是使用快速鍵，外掛程式隨後會根據此清單自動設定中間原始碼集。
 
@@ -708,7 +708,7 @@ JetBrains 團隊重新設計了 Kotlin 中前向宣告的方法，以使其行�
 * 考慮兩個 objcinterop 程式庫：一個使用 `objcnames.protocols.ForwardDeclaredProtocolProtocol`，另一個則有實際定義：
 
   ```ObjC
-  // 第一個 objcinterop 程式庫
+  // 第一个 objcinterop 库
   #import <Foundation/Foundation.h>
   
   @protocol ForwardDeclaredProtocol;

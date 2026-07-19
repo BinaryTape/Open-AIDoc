@@ -4,6 +4,10 @@
 
 <web-summary>Kotlin 2.4.0 のリリースノートを読み、新しい言語機能、Kotlin Multiplatform、JVM、Native、JS、Wasm のアップデート、および Gradle と Maven のビルドツールサポートについて確認してください。</web-summary>
 
+<tldr>
+    <p>バグ修正リリース 2.4.10 の詳細については、<a href="https://github.com/JetBrains/kotlin/releases/tag/v2.4.10">変更ログ（changelog）</a>を参照してください。</p>
+</tldr>
+
 Kotlin 2.4.0 がリリースされました！主なハイライトは以下の通りです。
 
 * **言語:** [安定したコンテキストパラメータ、明示的なバッキングフィールド、およびアノテーションの使用箇所ターゲットに関する複数の機能](#stable-features)
@@ -1094,7 +1098,7 @@ Kotlin 2.4.0 では、Kotlin Maven plugin に [Maven Toolchains](https://maven.a
 ```
 JDK バージョンを設定するさまざまな方法の優先順位に注意してください。
 
-1. `jdkHome` 在 `kotlin-maven-plugin` 構成内の `jdkHome`。明示的に設定された `jdkHome` オプションは、常にツールチェーンバージョンよりも優先されます。
+1. `jdkHome`：`kotlin-maven-plugin` 構成内の `jdkHome`。明示的に設定された `jdkHome` オプションは、常にツールチェーンバージョンよりも優先されます。
 2. `maven-toolchains-plugin` 内の JDK バージョン。Maven Toolchains を介して設定された JDK バージョンは、`JAVA_HOME` パスで設定された JDK バージョンを上書きします。
 3. `JAVA_HOME` パス。
 
@@ -1330,7 +1334,7 @@ Kotlin エコシステムにおいて、以下のドキュメント変更を行�
 * [Kotlin によるバックエンド開発](server-overview.md) – バックエンド開発に使用できるさまざまなフレームワークを探索。
 * [Spring Boot と Claude でタスク管理アプリを作成する](spring-boot-claude.md) – Claude が Spring Boot を使用してゼロからアプリを作成するのをどのように支援するかを学ぶ。
 * [Maven プロジェクトを構成する](maven-configure-project.md) – 既存の Java Maven プロジェクトまたは新しい Kotlin Maven プロジェクトで Kotlin コンパイルをセットアップ。
-* [Maven で Kotlin プロジェクトをテストする](jvm-test-maven.md) – Learn how to create tests with JUnit and use Maven plugins to run unit and integration tests。
+* [Maven で Kotlin プロジェクトをテストする](jvm-test-maven.md) – JUnit でテストを作成し、Maven プラグインを使用してユニットテストおよび統合テストを実行する方法を学ぶ。
 * [Kotlin プロジェクトでアノテーションプロセッサを使用する](jvm-annotation-processors.md) – バックエンドプロジェクトでアノテーションを処理するために kapt と KSP のどちらかを選択。
 * [Kotlin AI スキル](kotlin-ai-skills.md) – エージェントスキルを使用して、Kotlin 固有のタスクの実行を支援。
 * [Kotlin Language Server](kotlin-lsp.md) – JetBrains による公式の Kotlin 用 Language Server Protocol (LSP) 実装について読む。

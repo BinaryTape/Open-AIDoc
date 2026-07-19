@@ -2,10 +2,10 @@
 
 [//]: # (title: 流)
 
-流 (Flow) 代表异步产生的连续数值流。
+流 (Flow) 代表可以异步产生的连续数值流。
 与返回单个值的挂起函数不同，您可以使用流随着时间的推移处理多个连续值。
 
-您可以使用流来创建加载渐进式数据、响应事件流以及建模订阅式 API 的 *流流水线*。
+您可以使用流来创建 *流流水线*，用于渐进式加载数据、响应事件流以及建模订阅式 API。
 
 流流水线是涉及以下角色的操作序列：
 
@@ -34,7 +34,7 @@ suspend fun main() {
 ```
 {kotlin-runnable="true"}
 
-在流中，数值从发射器移向收集器，从 *上游* 移向 *下游*。
+在流中，数值从发射器移向收集器，从 *上游 (upstream)* 移向 *下游 (downstream)*。
 中间操作符收集上游流，对其数值应用操作，并返回一个新的下游流。
 该下游流可以成为下一个收集器的上游流。
 
@@ -42,8 +42,7 @@ suspend fun main() {
 
 Kotlin 提供以下流类型：
 
-* [**冷流 (Cold flow)**](#cold-flows)：在收集时开始产生数值。
-  每个收集器都会触发流的一次新的、独立的执行。
+* [**冷流 (Cold flow)**](#cold-flows)：在收集时开始产生数值。每个收集器都会触发流的一次新的、独立的执行。
 * [**热流 (Hot flow)**](#hot-flows)：独立于收集器发射数值，并与所有收集器共享相同的数值流。
 
 > 您可以使用 [Turbine 库](https://github.com/cashapp/turbine) 来测试 Kotlin 流。
@@ -493,7 +492,7 @@ suspend fun main() {
 {kotlin-runnable="true"}
 
 由于 `collect()` lambda 在 `.catch()` 之后运行，您不能使用 `.catch()` 处理从中抛出的异常。
-要使用 `.catch()` 处理为每个发射值运行的代码中的异常，请将该代码放在 `.catch()` 之前的 [.onEach()](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/on-each.html) 中。
+要使用 `.catch()` 处理为每个发射值运行的代码中的异常，请将该代码放在 [.onEach()](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/on-each.html) 中，且位于 `.catch()` 之前。
 
 `.onEach()` 操作符在每个数值发射到下游之前运行其 lambda。
 如果 `.catch()` 处理了来自 `.onEach()` 的异常，流将完成且不会发射下一个数值：
@@ -1540,7 +1539,8 @@ val lastUpdateFlow: StateFlow<Instant?> =
 
 热流本身没有取消操作。要取消热流，请取消产生其数值的协程或作用域。
 
-使用 `.shareIn()` 或 `.stateIn()` 扩展函数创建的热流将继续收集上游流，直到共享协程被取消。要停止从上游流收集，请取消运行共享协程的作用域。
+使用 `.shareIn()` 或 `.stateIn()` 扩展函数创建的热流将继续收集上游流，直到共享协程被取消。
+要停止从上游流收集，请取消运行共享协程的作用域。
 
 > 您还可以使用 [`SharingStarted.WhileSubscribed()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/-sharing-started/-companion/-while-subscribed.html) 在没有订阅者时自动停止上游收集。
 > 
@@ -1582,7 +1582,6 @@ class Chatroom {
 
 //sampleStart
 suspend fun main() {
-    val nUsers = 3
     val chatroom = Chatroom()
     withContext(Dispatchers.Default) {
         // 创建当前运行协程的子作用域
@@ -1630,7 +1629,8 @@ suspend fun main() {
 如果发射到 `MutableSharedFlow` 或更新 `MutableStateFlow` 的代码抛出异常，请在运行该代码的协程中处理它。
 如果订阅者在收集时抛出异常，请在收集协程中处理它。
 
-使用 `.shareIn()` 或 `.stateIn()` 扩展函数创建的热流在共享协程中从上游流收集数据。如果上游流抛出异常，该异常会取消共享协程：
+使用 `.shareIn()` 或 `.stateIn()` 扩展函数创建的热流在共享协程中从上游流收集数据。
+如果上游流抛出异常，该异常会取消共享协程：
 
 ```kotlin
 import kotlinx.coroutines.flow.*

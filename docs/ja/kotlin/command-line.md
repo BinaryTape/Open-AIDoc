@@ -97,10 +97,10 @@ kotlinc hello.kt -d hello.jar
 
 この方法でコンパイルされたバイナリはKotlinランタイムに依存するため、コンパイルされたライブラリが使用される際には、クラスパスにランタイムが存在することを確認する必要があります。
 
-また、`kotlin` スクリプトを使用して、Kotlinコンパイラによって生成されたバイナリを実行することもできます。
+また、`kotlinr` スクリプトを使用して、Kotlinコンパイラによって生成されたバイナリを実行することもできます。
 
 ```bash
-kotlin -classpath hello.jar HelloKt
+kotlinr -classpath hello.jar HelloKt
 ```
 
 `HelloKt` は、`hello.kt` という名前のファイルに対してKotlinコンパイラが生成するメインクラス名です。

@@ -14,10 +14,10 @@ Kotlin 언어와 툴셋은 JVM, JS, Native 대상을 위한 컴파일러, 표준
 **Experimental**은 "토이 프로젝트(toy projects)에서만 사용하세요"라는 의미입니다.
 * 아이디어와 그 실현 가능성을 테스트하는 단계입니다. 일부 사용자들이 이를 시도하고 피드백을 공유해주기를 바랍니다. 범위가 최소화되어 있으며, 기능은 언제든지 변경되거나 사라질 수 있습니다. 안정성이나 호환성을 보장하지 않습니다.
 
-**Alpha**는 "이 기능이 제품화될 수 있을지 테스트하는 중입니다"라는 의미입니다.
+**Alpha**은 "이 기능이 제품화될 수 있을지 테스트하는 중입니다"라는 의미입니다.
 * 이 기능을 제품화할 계획이며, 최종 형태를 갖추기 위해 사용자 가치와 시장 적합성을 검증하고 있습니다. 기능 세트가 아직 불완전하며, 파괴적 변경(breaking changes)이 예상됩니다. 가설이 유효하지 않다면 기능을 대폭 변경하거나 중단할 수 있습니다.
 
-**Beta**는 "사용 가능하며, 마이그레이션 문제를 최소화하기 위해 최선을 다하겠습니다"라는 의미입니다.
+**Beta**은 "사용 가능하며, 마이그레이션 문제를 최소화하기 위해 최선을 다하겠습니다"라는 의미입니다.
 * 거의 완성된 단계이며, 현재 사용자 피드백이 특히 중요합니다.
 * 다만 아직 100% 완료된 것은 아니므로, 사용자 피드백 등에 기반한 변경 사항이 발생할 수 있습니다.
 * 원활한 업데이트를 위해 미리 지원 중단(deprecation) 경고를 확인하세요.
@@ -41,8 +41,8 @@ Kotlin 언어와 툴셋은 JVM, JS, Native 대상을 위한 컴파일러, 표준
 * **Stability(안정성)** 상태. 각 프로젝트가 얼마나 빠르게 발전하고 있으며 사용자가 도입 시 어느 정도의 위험을 감수해야 하는지를 보여줍니다.
   안정성 상태는 [Kotlin 언어 기능 및 컴포넌트의 안정성 수준](#안정성-수준-설명)과 완전히 일치합니다.
     * ![Experimental stability level](https://kotl.in/badges/experimental.svg){type="joined"} 은 **Experimental**을 의미합니다.
-    * ![Alpha stability level](https://kotl.in/badges/alpha.svg){type="joined"} 은 **Alpha**를 의미합니다.
-    * ![Beta stability level](https://kotl.in/badges/beta.svg){type="joined"} 은 **Beta**를 의미합니다.
+    * ![Alpha stability level](https://kotl.in/badges/alpha.svg){type="joined"} 은 **Alpha**을 의미합니다.
+    * ![Beta stability level](https://kotl.in/badges/beta.svg){type="joined"} 은 **Beta**을 의미합니다.
     * ![Stable stability level](https://kotl.in/badges/stable.svg){type="joined"} 은 **Stable**을 의미합니다.
 
 * **Support(지원)** 상태. 프로젝트를 유지 관리하고 사용자의 문제 해결을 돕겠다는 우리의 약속을 보여줍니다.
@@ -88,15 +88,16 @@ Kotlin 언어와 툴셋은 JVM, JS, Native 대상을 위한 컴파일러, 표준
 
 ### Kotlin 라이브러리
 
-| **컴포넌트**         | **상태** | **상태 적용 버전** | **비고** |
-|-----------------------|------------|--------------------------|--------------|
-| kotlin-stdlib (JVM)   | Stable     | 1.0.0                    |              |
-| kotlinx-coroutines    | Stable     | 1.3.0                    |              |
-| kotlinx-serialization | Stable     | 1.0.0                    |              |
-| kotlin-metadata-jvm   | Stable     | 2.0.0                    |              |
-| kotlin-reflect (JVM)  | Beta       | 1.0.0                    |              |
-| kotlinx-datetime      | Alpha      | 0.2.0                    |              |
-| kotlinx-io            | Alpha      | 0.2.0                    |              |
+| **컴포넌트**                 | **상태** | **상태 적용 버전** | **비고** |
+|-------------------------------|------------|--------------------------|--------------|
+| kotlin-stdlib (JVM)           | Stable     | 1.0.0                    |              |
+| kotlinx-coroutines            | Stable     | 1.3.0                    |              |
+| kotlinx-serialization         | Stable     | 1.0.0                    |              |
+| kotlin-metadata-jvm           | Stable     | 2.0.0                    |              |
+| kotlin-reflect (JVM)          | Beta       | 1.0.0                    |              |
+| kotlinx-datetime              | Alpha      | 0.2.0                    |              |
+| kotlinx-io                    | Alpha      | 0.2.0                    |              |
+| kotlinx-collections-immutable | Alpha      | 0.3.5                    |              |
 
 ### Kotlin 멀티플랫폼 (Kotlin Multiplatform)
 
@@ -116,6 +117,13 @@ Kotlin 언어와 툴셋은 JVM, JS, Native 대상을 위한 컴파일러, 표준
 | CocoaPods 통합                        | Stable     | 1.9.20                   |                                                                                                                               |
 
 다양한 타겟에 대한 지원 수준에 관한 자세한 내용은 [](native-target-support.md)를 참조하세요.
+
+### 빌드 도구 (Build tools)
+
+| **컴포넌트**                                       | **상태** | **상태 적용 버전** | **비고**                                                                                                          |
+|-----------------------------------------------------|------------|--------------------------|-----------------------------------------------------------------------------------------------------------------------|
+| [Kotlin Gradle 플러그인](gradle-configure-project.md) | Stable     | 1.1.1                    | [Kotlin 멀티플랫폼 Gradle 플러그인](https://kotlinlang.org/docs/multiplatform/multiplatform-dsl-reference.html#id-and-version)은 Kotlin 1.9.20부터 Stable 상태입니다. |
+| [Kotlin Maven 플러그인](maven-configure-project.md)   | Stable     | 1.0.0                    |                                                                                                                       |
 
 ### 언어 도구
 

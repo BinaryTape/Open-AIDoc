@@ -19,7 +19,7 @@
 
 | Kotlin Multiplatform プラグインのバージョン | Gradle                                | Android Gradle プラグイン                               | Xcode   |
 |-------------------------------------|---------------------------------------|-----------------------------------------------------|---------|
-| 2.4.0                               | %minGradleVersion%–%maxGradleVersion% | %minAndroidGradleVersion%–%maxAndroidGradleVersion% | %xcode% |
+| 2.4.0-2.4.10                        | %minGradleVersion%–%maxGradleVersion% | %minAndroidGradleVersion%–%maxAndroidGradleVersion% | %xcode% |
 | 2.3.20–2.3.21                       | 7.6.3–9.3.0                           | 8.2.2–9.0.0                                         | 26.0    |
 | 2.3.10                              | 7.6.3–9.0.0                           | 8.2.2–9.0.0                                         | 26.0    |
 | 2.3.0                               | 7.6.3–9.0.0                           | 8.2.2–8.13.0                                        | 26.0    |
@@ -633,7 +633,7 @@ Kotlin 1.9.0 以降、`kotlin-js` Gradle プラグインは非推奨になりま
 * 1.9.20: この警告をエラーに引き上げ
 * &gt;1.9.20: `targetPresets.jvmWithJava` API を削除。これを使用しようとするとビルドスクリプトのコンパイルが失敗します
 
-> `targetPresets` API 全体が非推奨になっていますが、`jvmWithJava` プリセットには異なる非推奨タイムラインがあります。
+> `targetPresets` API 全体が非推奨になっていますが、`jvmWithJava` プリセットには異なる non-deprecated タイムラインがあります。
 >
 {style="note"}
 

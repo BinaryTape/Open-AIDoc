@@ -62,14 +62,4 @@ _現在、プレビューバージョンは利用できません。_
             <p>詳細については、<a href="https://github.com/JetBrains/kotlin/releases/tag/v2.4.20-Beta1">チェンジログ</a> または <a href="whatsnew-eap.md">Kotlin 2.4.20-Beta1 の新機能</a> を参照してください。</p>
         </td>
     </tr>
-    <tr>
-        <td><strong>2.4.10-RC2</strong>
-            <p>リリース日: <strong>2026年7月7日</strong></p>
-            <p><a href="https://github.com/JetBrains/kotlin/releases/tag/v2.4.10-RC2" target="_blank">GitHub でのリリース</a></p>
-        </td>
-        <td>
-            <p>Kotlin 2.4.0 向けのパフォーマンス向上を含むバグ修正リリースです。</p>
-            <p>詳細については、<a href="https://github.com/JetBrains/kotlin/releases/tag/v2.4.10-RC2">チェンジログ</a> を参照してください。</p>
-        </td>
-    </tr>
 </table>

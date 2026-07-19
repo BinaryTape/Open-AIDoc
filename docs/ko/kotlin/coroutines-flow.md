@@ -1138,7 +1138,7 @@ fun loadBlob(url: String): StateFlow<LoadingState> {
     return result.asStateFlow()
 }
 
-// 데이터를 비공개적으로 다운로드하는 콜백 기반 API 정의
+// 데이터를 비동기적으로 다운로드하는 콜백 기반 API 정의
 object DownloadManager {
     // url 로딩을 비동기적으로 시작합니다
     fun startLoading(
@@ -1561,7 +1561,6 @@ class Chatroom {
 
 //sampleStart
 suspend fun main() {
-    val nUsers = 3
     val chatroom = Chatroom()
     withContext(Dispatchers.Default) {
         // 현재 실행 중인 코루틴의 자식 스코프를 생성합니다

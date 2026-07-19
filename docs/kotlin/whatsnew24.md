@@ -4,6 +4,10 @@
 
 <web-summary>阅读 Kotlin 2.4.0 版本说明，了解新的语言功能、Kotlin Multiplatform、JVM、Native、JS 和 Wasm 的更新，以及 Gradle 和 Maven 的构建工具支持。</web-summary>
 
+<tldr>
+    <p> 有关错误修复版本 2.4.10 的详细信息，请参阅 <a href="https://github.com/JetBrains/kotlin/releases/tag/v2.4.10">更改列表</a></p>
+</tldr>
+
 Kotlin 2.4.0 正式发布！以下是主要亮点：
 
 * **语言：** [上下文参数已稳定、显式支持字段，以及针对注解使用处目标的多个功能](#stable-features)
@@ -11,7 +15,7 @@ Kotlin 2.4.0 正式发布！以下是主要亮点：
 * **Kotlin/JVM：** [支持 Java 26](#support-for-java-26) 并且 [默认启用元数据中的注解](#annotations-in-metadata-enabled-by-default)
 * **Kotlin/Native：** [支持将 Swift 软件包作为依赖项、Swift 导出更新，以及默认启用 CMS GC](#kotlin-native)
 * **Kotlin/Wasm：** [默认启用增量编译并支持 WebAssembly 组件模型](#kotlin-wasm)
-* **Kotlin/JS：** [支持值类导出以及在 JS 代码内联中使用 ES2015 功能](#kotlin-js)
+* **Kotlin/JS**：[支持值类导出以及在 JS 代码内联中使用 ES2015 功能](#kotlin-js)
 * **Gradle：** [兼容 Gradle 9.5.0](#gradle)
 * **Maven：** [Java 和 JVM 目标版本之间的自动对齐](#maven)
 * **Kotlin 编译器：** [在 `.klib` 编译期间更加一致的内联函数行为](#consistent-intra-module-function-inlining-during-klib-compilation)
@@ -1308,7 +1312,7 @@ Kotlin 2.4.0 推进了已达到稳定并现已默认启用的实验性功能标�
 本节重点介绍重要的破坏性变更和弃用。有关完整概述，请参阅我们的 [兼容性指南](compatibility-guide-24.md)。
 
 * 从 Kotlin 2.4.0 开始，编译器不再支持 `-language-version=1.9`。因此，K1 编译器不再受支持。
-* Kotlin 2.4.0 精简了 Kotlin Gradle 插件中用于二进制兼容性验证的 DSL，并弃用了一些部分 Tracker。有关最新的 DSL，请参阅 [Kotlin Gradle 插件中的二进制兼容性验证](gradle-binary-compatibility-validation.md)。
+* Kotlin 2.4.0 精简了 Kotlin Gradle 插件中用于二进制兼容性验证的 DSL，并弃用了一些部分。有关最新的 DSL，请参阅 [Kotlin Gradle 插件中的二进制兼容性验证](gradle-binary-compatibility-validation.md)。
 * [通过 `KotlinScriptMojo` Maven 插件执行 Kotlin 脚本的支持已被移除](compatibility-guide-22.md#deprecations-to-kotlin-scripting)。
 
 ## 文档更新

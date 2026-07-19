@@ -1,7 +1,7 @@
 [//]: # (title: Compose Hot Reload)
 
 Compose Hot Reload 帮助你在开发 Compose Multiplatform 项目时，实时查看并尝试 UI 更改。
-与标准的 [Compose previews](compose-previews.md)（适用于使用测试数据查看独立组件）不同，Compose Hot Reload 会直接将你的代码更改应用到运行中的应用程序。
+与标准的 [Compose 预览](compose-previews.md)（适用于使用测试数据查看独立组件）不同，Compose Hot Reload 会直接将你的代码更改应用到运行中的应用程序。
 
 捆绑的 Compose Hot Reload Gradle 插件需要 Kotlin 2.1.20+ 以及与 Java 21 或更早版本兼容的 JVM 目标。
 为了使用 Compose Hot Reload 的完整功能，我们建议安装 [Kotlin Multiplatform IDE 插件](https://plugins.jetbrains.com/plugin/14936-kotlin-multiplatform)，该插件适用于 IntelliJ IDEA 2025.2.2 及以上版本，以及 Android Studio Otter 2025.2.1 及以上版本。
@@ -146,30 +146,23 @@ MCP 服务器允许 AI 编码代理与正在运行的 Compose 应用程序进行
 
 ### 连接 AI 代理
 
-要让 AI 代理与你的 Compose 应用程序交互：
+要连接 AI 代理，请将代理的 MCP 客户端配置指向 `hotMcpServer` Gradle 任务。例如，在 `.mcp.json` 中：
 
-1. 使用 Gradle 任务随应用程序一起启动 MCP 服务器：
-    ```shell
-    ./gradlew :composeApp:hotMcpServerJvm
-    ```
-   任务名称遵循标准命名约定 `hotMcpServer<TargetName>`。
-   例如，名为 `desktop` 的自定义 JVM 目标将使用任务 `:composeApp:hotMcpServerDesktop`。
-2. 将 AI 代理的 MCP 客户端配置指向该 Gradle 任务。例如，在 `.mcp.json` 中：
-    ```json
-    {
-      "mcpServers": {
-        "compose-hot-reload": {
-          "command": "./gradlew",
-          "args": [
-            "--no-daemon",
-            "--quiet",
-            "--console=plain",
-            "hotMcpServer"
-          ]
-        }
-      }
+```json
+{
+  "mcpServers": {
+    "compose-hot-reload": {
+      "command": "./gradlew",
+      "args": [
+        "--no-daemon",
+        "--quiet",
+        "--console=plain",
+        "hotMcpServer"
+      ]
     }
-    ```
+  }
+}
+```
 
 ### 可用的 MCP 工具
 

@@ -33,7 +33,7 @@ iOS 타겟이 있는 Kotlin Multiplatform 프로젝트를 가정해 보겠습니
 * `Package.swift` 파일을 Kotlin Multiplatform 코드 옆에 둡니다. 이는 더 간단한 방식이지만, 이 경우 Swift 패키지와 코드가 동일한 버저닝을 사용하게 된다는 점에 유의하세요. SwiftPM은 패키지 버저닝을 위해 Git 태그를 사용하며, 이는 프로젝트에서 사용하는 태그와 충돌할 수 있습니다.
 * `Package.swift` 파일을 소비자(consumer) 프로젝트의 저장소 내에 저장합니다. 이는 버저닝 및 유지 관리 문제를 피하는 데 도움이 됩니다. 하지만 이 방식은 소비자 프로젝트의 멀티 저장소 SwiftPM 설정 및 추가 자동화에서 문제를 일으킬 수 있습니다:
 
-  * 멀티 패키지 프로젝트에서는 (프로젝트 내의 의존성 충돌을 피하기 위해) 하나의 소비자 패키지만 외부 모듈에 의존할 수 있습니다. 따라서 Kotlin Multiplatform 모듈에 의존하는 모든 로직은 특정 소비자 패키지에 캡슐화되어야 합니다.
+  * 멀티 패키지 프로젝트에서는 (프로젝트 내의 의존성 충돌을 피하기 위해) 하나의 소비자 패키만 외부 모듈에 의존할 수 있습니다. 따라서 Kotlin Multiplatform 모듈에 의존하는 모든 로직은 특정 소비자 패키지에 캡슐화되어야 합니다.
   * 자동 CI 프로세스를 사용하여 Kotlin Multiplatform 프로젝트를 게시하는 경우, 이 프로세스에 업데이트된 `Package.swift` 파일을 소비자 저장소에 게시하는 과정이 포함되어야 합니다. 이는 소비자 저장소의 업데이트 충돌로 이어질 수 있으므로 CI의 이러한 단계는 유지 관리가 어려울 수 있습니다.
 
 ### 멀티플랫폼 프로젝트 구성
@@ -79,15 +79,12 @@ XCFramework 게시를 설정하려면:
   
    결과물인 프레임워크는 프로젝트 디렉토리의 `shared/build/XCFrameworks/release/Shared.xcframework` 폴더에 생성됩니다.
 
-   > Compose Multiplatform 프로젝트에서 작업하는 경우 다음 Gradle 태스크를 사용하세요:
+   > 프로젝트에서 SwiftPM 의존성을 사용하는 경우, Kotlin %kotlinEapVersion%부터 태스크가 XCFramework 옆에 일련의 SwiftPM 관련 파일도 생성합니다.
+   > [아래](#xcframework-및-swift-패키지-매니페스트-준비) 설명된 대로, 매니페스트를 처음부터 작성하는 대신 생성된 `Package.swift`를 프레임워크와 함께 배포할 수 있습니다.
    >
-   > ```shell
-   > ./gradlew :sharedUI:assembleSharedXCFramework
-   > ```
-   >
-   > 결과 프레임워크는 `sharedUI/build/XCFrameworks/release/Shared.xcframework` 폴더에서 찾을 수 있습니다.
-   >
-   {style="tip"}
+   {style="note"} 
+
+3. 내보내고 싶은 공통 코드가 포함된 모듈이 둘 이상인 경우(예: 공통 로직 모듈과 공통 UI 모듈), [이를 하나의 새로운 모듈로 결합](#여러-모듈을-xcframework로-내보내기)하고 대신 이 엄브렐러(umbrella) 모듈을 배포하세요.
 
 ### XCFramework 및 Swift 패키지 매니페스트 준비
 
@@ -123,7 +120,9 @@ XCFramework 게시를 설정하려면:
     curl <업로드된 XCFramework ZIP 파일의 다운로드 가능한 링크>
     ```
 
-4. 임의의 디렉토리를 선택하고 다음 코드가 포함된 `Package.swift` 파일을 로컬에 생성합니다:
+4. 프로젝트에서 SwiftPM 의존성을 사용하는 경우, Kotlin %kotlinEapVersion%부터 `assembleSharedXCFramework` Gradle 태스크가 XCFramework 옆에 `Package.swift` 파일을 생성합니다.
+
+   그렇지 않은 경우, 다음 템플릿을 사용하여 `Package.swift` 파일을 수동으로 생성할 수 있습니다:
 
    ```Swift
    // swift-tools-version:5.3
@@ -146,7 +145,10 @@ XCFramework 게시를 설정하려면:
    )
    ```
    
-5. `url` 필드에 XCFramework가 포함된 ZIP 아카이브의 링크를 지정합니다.
+5. 누락된 필드를 지정합니다:
+   * `url` 필드에 XCFramework가 포함된 ZIP 아카이브의 링크를 지정합니다.
+   * `checksum` 필드에 이전에 ZIP 파일에 대해 계산된 체크섬을 지정합니다.
+
 6. [권장] 결과 매니페스트를 검증하려면 `Package.swift` 파일이 있는 디렉토리에서 다음 셸 명령을 실행할 수 있습니다:
 
     ```shell

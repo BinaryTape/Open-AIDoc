@@ -49,7 +49,7 @@ plugins {
 
 | KGP 版本      | Gradle 最小和最大版本                 | AGP 最小和最大版本                                  |
 |---------------|---------------------------------------|-----------------------------------------------------|
-| 2.4.0         | %minGradleVersion%–%maxGradleVersion% | %minAndroidGradleVersion%–%maxAndroidGradleVersion% |
+| 2.4.0-2.4.10  | %minGradleVersion%–%maxGradleVersion% | %minAndroidGradleVersion%–%maxAndroidGradleVersion% |
 | 2.3.20–2.3.21 | 7.6.3–9.3.0                           | 8.2.2–9.0.0                                         |
 | 2.3.10        | 7.6.3–9.0.0                           | 8.2.2–9.0.0                                         |
 | 2.3.0         | 7.6.3–9.0.0                           | 8.2.2–8.13.0                                        |
@@ -216,7 +216,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile>().configureEa
 
 ```groovy
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile.class).configureEach {
-    jvmTargetValidationMode = org.jetbrains.kotlin.gradle.dsl.jvm.JvmTargetValidationMode.WARNING
+    jvmTargetValidationMode = org.jetbrains.kotlin.gradle.dsl.jvm.JvmTargetValidationMode.WARNING)
 }
 ```
 
@@ -951,7 +951,9 @@ kotlin.stdlib.jdk.variants.version.alignment=false
   </tab>
   </tabs>
 
-* 如果您没有为某个标准库版本添加依赖项，但您有两个不同的依赖项，它们传递地引入了不同旧版本的 Kotlin 标准库，那么您可以显式要求这些传递库的 `%kotlinVersion%` 版本：
+* If you don't add a dependency for a standard library version, but you have two different dependencies that transitively
+  bring different old versions of the Kotlin standard library, then you can explicitly require `%kotlinVersion%`
+  versions of these transitive libraries:
 
   <tabs group="build-script">
   <tab title="Kotlin" group-key="kotlin">

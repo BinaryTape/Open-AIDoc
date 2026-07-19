@@ -49,7 +49,7 @@ plugins {
 
 | KGP バージョン | Gradle の最小および最大バージョン | AGP の最小および最大バージョン |
 |---------------|---------------------------------------|-----------------------------------------------------|
-| 2.4.0         | %minGradleVersion%–%maxGradleVersion% | %minAndroidGradleVersion%–%maxAndroidGradleVersion% |
+| 2.4.0-2.4.10  | %minGradleVersion%–%maxGradleVersion% | %minAndroidGradleVersion%–%maxAndroidGradleVersion% |
 | 2.3.20–2.3.21 | 7.6.3–9.3.0                           | 8.2.2–9.0.0                                         |
 | 2.3.10        | 7.6.3–9.0.0                           | 8.2.2–9.0.0                                         |
 | 2.3.0         | 7.6.3–9.0.0                           | 8.2.2–8.13.0                                        |

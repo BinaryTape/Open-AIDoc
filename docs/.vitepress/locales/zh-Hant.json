@@ -420,7 +420,7 @@
   "ktor.monitoring": "監控",
   "ktor.server-call-id": "追蹤請求",
   "ktor.administration": "管理",
-  "ktor.running-and-debugging": "執行與偵錯",
+  "ktor.running-and-debugging": "執行與偵側",
   "ktor.server-testing": "測試",
   "ktor.packaging": "打包",
   "ktor.creating-fat-jars": "建立 Fat JAR",
@@ -600,7 +600,7 @@
   "kotlin.maven-compile-package": "封裝您的專案",
   "kotlin.kotlin-2-2-x": "Kotlin 2.2.x",
   "kotlin.compatibility-guide-22": "相容性指南",
-  "kmp.compose-navigation-3": "Compose 中的導航 3",
+  "kmp.compose-navigation-3": "Compose 中的導覽 3",
   "koog.planner-agents": "規劃代理",
   "koog.structured-prompts": "結構化提示",
   "koog.multimodal-inputs": "多模態輸入",
@@ -682,5 +682,6 @@
   "kotlin.take-kotlin-tour": "開始 Kotlin 之旅",
   "kotlin.beginner": "初學者",
   "kotlin.intermediate": "中級",
-  "kotlin.immutable-collections-kotlinx-collections-immutable": "不可變集合 (kotlinx.collections.immutable)"
+  "kotlin.immutable-collections-kotlinx-collections-immutable": "不可變集合 (kotlinx.collections.immutable)",
+  "kotlin.jvm-code-analysis": "使用程式碼分析工具"
 }

@@ -4,7 +4,7 @@
 
 <tldr>
     <p>最新 Kotlin 版本：<strong>%kotlinVersion%</strong></p>
-    <p>參閱 <a href="%kotlinLatestWhatsnew%">Kotlin 2.4.0 的新功能</a><!--and find the bug fix details in the <a href="%kotlinLatestUrl%">changelog</a>-->。</p>
+    <p>參閱 <a href="%kotlinLatestWhatsnew%">Kotlin 2.4.0 的新功能</a>，並在 <a href="%kotlinLatestUrl%">變更日誌</a> 中查看錯誤修正詳情。</p>
 </tldr>
 
 本頁面說明了 Kotlin 的發佈週期以及我們提供的不同發佈類型。其中也包含了過去與未來 Kotlin 發佈版本的詳細資訊，以及如何更新至特定版本的說明。
@@ -141,7 +141,7 @@ Kotlin 在 [IntelliJ IDEA](https://www.jetbrains.com/idea/download/) 和 [Androi
             <p>2027 年 12 月 3 日</p>
         </td>
         <td>
-            <p>暫無</p>
+            <p>2.4.10</p>
         </td>
     </tr>
 </table>
@@ -162,6 +162,16 @@ Kotlin 在 [IntelliJ IDEA](https://www.jetbrains.com/idea/download/) 和 [Androi
     <tr>
         <th>組建資訊</th>
         <th>組建重點</th>
+    </tr>
+    <tr>
+        <td><strong>2.4.10</strong>
+            <p>發佈日期：<strong>2026 年 7 月 14 日</strong></p>
+            <p><a href="https://github.com/JetBrains/kotlin/releases/tag/v2.4.10" target="_blank">在 GitHub 上查看版本</a></p>
+        </td>
+        <td>
+            <p>Kotlin 2.4.0 的錯誤修正發佈。</p>
+            <p>如需更多詳細資訊，請參閱 <a href="https://github.com/JetBrains/kotlin/releases/tag/v2.4.10">變更日誌</a>。</p>
+        </td>
     </tr>
     <tr>
         <td><strong>2.4.0</strong>
@@ -260,7 +270,7 @@ Kotlin 在 [IntelliJ IDEA](https://www.jetbrains.com/idea/download/) 和 [Androi
         </td>
         <td>
             <p>Kotlin 2.1.20 的錯誤修正發佈。</p>
-            <p>如需更多詳細資訊，請參閱 <a href="https://github.com/JetBrains/kotlin/releases/tag/v2.1.21">變更日誌</a>。</p>
+            <p>如需更多詳細資訊，請參閱 <a href="https://github.com/JetBrains/kotlin/releases/tag/v2.1.21">變改日誌</a>。</p>
         </td>
     </tr> 
    <tr>
@@ -652,7 +662,7 @@ Kotlin 在 [IntelliJ IDEA](https://www.jetbrains.com/idea/download/) 和 [Androi
             <list>
                 <li>JVM 上預設透過 <code>invokedynamic</code> 進行字串連接</li>
                 <li>對 Lombok 的改進支援以及對 JSpecify 的支援</li>
-                <li>Kotlin/Native：匯出 KDoc 至 Objective-C 標頭，以及單一陣列內更快的 <code>Array.copyInto()</code> 內同一陣列</li>
+                <li>Kotlin/Native：匯出 KDoc 至 Objective-C 標頭，以及單一陣列內更快的 <code>Array.copyInto()</code></li>
                 <li>Gradle：註解處理器類別載入器的快取，以及對 <code>--parallel</code> Gradle 屬性的支援</li>
                 <li>對齊跨平台 stdlib 函式的行為</li>
             </list>

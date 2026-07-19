@@ -17,7 +17,7 @@ kapt 編譯器外掛程式允許您在 Kotlin 中使用現有的 Java 註解處�
 這讓您在 Kotlin 專案中能針對 [MapStruct](https://mapstruct.org/) 和 [資料繫結](https://developer.android.com/topic/libraries/data-binding/index.html) 等程式庫啟用基於 Java 的註解處理。
 
 > IntelliJ 組建系統不支援 kapt。若要在 IntelliJ IDEA 中重新執行註解處理，請從 **Maven** 工具視窗啟動組建。
-> 
+>
 {style="warning"}
 
 ## 設定外掛程式
@@ -268,7 +268,7 @@ Set 'kapt.include.compile.classpath=false' to disable discovery.
 ```
 
 > 若要查看不在 kapt 類別路徑上的註解處理器列表，請使用 `--info` 記錄層級選項執行組建。
-> 
+>
 {style="tip"}
 
 ### 從父配置繼承註解處理器
@@ -303,23 +303,13 @@ kapt {
 
 如果您使用 Maven，則需要明確配置外掛程式。請參閱這份 [Lombok 編譯器外掛程式設定範例](lombok.md#using-with-kapt)。
 
-## Gradle 組建快取支援
-
-預設情況下，kapt 註解處理任務會在 [Gradle 中快取](https://guides.gradle.org/using-build-cache/)。然而，註解處理器可以執行任意程式碼，這可能無法可靠地將任務輸入轉換為輸出，或者可能會存取及修改 Gradle 未追蹤的檔案。如果組建中使用的註解處理器無法正確快取，您可以透過在建置指令碼中指定 `useBuildCache` 屬性來完全停用 kapt 的快取。這有助於防止 kapt 任務出現錯誤的快取命中：
-
-```groovy
-kapt {
-    useBuildCache = false
-}
-```
-
-## 提高使用 kapt 的組建速度
+## 優化 kapt 組建
 
 ### 並行執行 kapt 任務
 
-為了提高使用 kapt 的組建速度，您可以為 kapt 任務啟用 [Gradle Worker API](https://guides.gradle.org/using-the-worker-api/)。使用 Worker API 讓 Gradle 能從單一專案中並行執行獨立的註解處理任務，在某些情況下可以顯著減少執行時間。
+kapt 使用 [Gradle Worker API](https://docs.gradle.org/current/userguide/worker_api.html) 來執行註解處理任務。使用 Worker API 讓 Gradle 能從單一專案中並行執行獨立的註解處理任務，在某些情況下可以顯著減少執行時間。
 
-當您在 Kotlin Gradle 外掛程式中使用 [自訂 JDK home](gradle-configure-project.md#gradle-java-toolchains-support) 功能時，kapt 任務的 worker 僅使用 [處理序隔離模式](https://docs.gradle.org/current/userguide/worker_api.html#changing_the_isolation_mode)。請注意，`kapt.workers.isolation` 屬性會被忽略。
+如果您在 Kotlin Gradle 外掛程式中設定了 [自訂 JDK 版本](gradle-configure-project.md#gradle-java-toolchains-support)，kapt 任務的 worker 僅使用 [`processIsolation()`](https://docs.gradle.org/current/userguide/worker_api.html#step_3_change_the_isolation_mode) 模式。
 
 如果您想為 kapt worker 處理序提供額外的 JVM 引數，請使用 `KaptWithoutKotlincTask` 的輸入 `kaptProcessJvmArgs`：
 
@@ -345,6 +335,18 @@ tasks.withType(org.jetbrains.kotlin.gradle.internal.KaptWithoutKotlincTask.class
 
 </tab>
 </tabs>
+
+### 安全地使用 Gradle 組建快取
+
+預設情況下，kapt 註解處理任務會在 [Gradle 中快取](https://docs.gradle.org/current/userguide/build_cache_use_cases.html)。然而，註解處理器可以執行任意程式碼，這可能導致任務輸入向輸出的不必要轉換，或者可能會存取及修改 Gradle 未追蹤的檔案。
+
+當組建中使用的註解處理器無法正確快取時，您可以停用快取以防止 kapt 任務出現錯誤的快取命中。若要執行此操作，請在建置指令碼中使用 `useBuildCache` 屬性：
+
+```groovy
+kapt {
+    useBuildCache = false
+}
+```
 
 ### 為註解處理器的類別載入器提供快取
 
@@ -372,9 +374,26 @@ kapt.include.compile.classpath=false
 kapt.classloaders.cache.disableForProcessors=[註解處理器完整名稱]
 ```
 
-> 如果您在使用此功能時遇到任何問題，歡迎在 [YouTrack](https://youtrack.jetbrains.com/issue/KT-28901) 中向我們提供回饋。
-> 
+> 如果您在該功能方面遇到任何問題，歡迎在 [YouTrack](https://youtrack.jetbrains.com/issue/KT-28901) 中向我們提供回饋。
+>
 {style="note"}
+
+### 使用增量註解處理
+
+kapt 預設支援增量註解處理。
+
+目前，增量註解處理僅在以下情況運作：
+
+* 已啟用 [增量編譯](gradle-compilation-and-caches.md#incremental-compilation)。
+* 組建中所有的註解處理器都是增量的。
+
+若要停用增量註解處理，請在您的 `gradle.properties` 檔案中加入此行：
+
+```none
+kapt.incremental.apt=false
+```
+
+## 分析效能
 
 ### 評估註解處理器的效能
 
@@ -437,21 +456,10 @@ sample/src/main/
 [INFO] org.mapstruct.ap.MappingProcessor: total sources: 2, sources per round: 2, 0, 0
 ```
 
-## 增量註解處理
-
-kapt 預設支援增量註解處理。目前，只有當所有使用的註解處理器都是增量的，註解處理才具備增量性。
-
-若要停用增量註解處理，請在您的 `gradle.properties` 檔案中加入此行：
-
-```none
-kapt.incremental.apt=false
-```
-
-請注意，增量註解處理也需要啟用 [增量編譯](gradle-compilation-and-caches.md#incremental-compilation)。
-
 ## Java 編譯器選項
 
-kapt 使用 Java 編譯器來執行註解處理器。以下是您傳遞任意選項給 javac 的方式：
+kapt 使用 Java 編譯器來執行註解處理器。  
+以下是您傳遞任意選項給 javac 的方式：
 
 ```groovy
 kapt {
@@ -481,7 +489,8 @@ kapt 可以產生 Kotlin 原始碼。只需將產生的 Kotlin 原始碼檔案�
 
 ## AP/Javac 選項編碼
 
-`apoptions` 和 `javacArguments` 命令列選項接受一個編碼後的選項對照表。以下是您可以自行編碼選項的方式：
+`apoptions` 和 `javacArguments` CLI 選項接受一個編碼後的選項對照表。  
+以下是您可以自行編碼選項的方式：
 
 ```kotlin
 fun encodeList(options: Map<String, String>): String {

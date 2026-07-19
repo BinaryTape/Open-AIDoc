@@ -149,30 +149,23 @@ MCP サーバーを使用すると、AI コーディングエージェントが�
 
 ### AI エージェントの接続
 
-AI エージェントを Compose アプリケーションと対話させるには、以下の手順に従います。
+AI エージェントを接続するには、エージェントの MCP クライアント設定で `hotMcpServer` Gradle タスクを指定します。たとえば、`.mcp.json` では以下のようになります。
 
-1. Gradle タスクを使用して、アプリケーションと一緒に MCP サーバーを起動します。
-    ```shell
-    ./gradlew :composeApp:hotMcpServerJvm
-    ```
-   タスク名は標準的な命名規則 `hotMcpServer<TargetName>` に従います。
-   たとえば、`desktop` という名前のカスタム JVM ターゲットの場合、タスクは `:composeApp:hotMcpServerDesktop` になります。
-2. AI エージェントの MCP クライアント設定で Gradle タスクを指定します。たとえば、`.mcp.json` では以下のようになります。
-    ```json
-    {
-      "mcpServers": {
-        "compose-hot-reload": {
-          "command": "./gradlew",
-          "args": [
-            "--no-daemon",
-            "--quiet",
-            "--console=plain",
-            "hotMcpServer"
-          ]
-        }
-      }
+```json
+{
+  "mcpServers": {
+    "compose-hot-reload": {
+      "command": "./gradlew",
+      "args": [
+        "--no-daemon",
+        "--quiet",
+        "--console=plain",
+        "hotMcpServer"
+      ]
     }
-    ```
+  }
+}
+```
 
 ### 利用可能な MCP ツール
 
@@ -182,7 +175,7 @@ MCP サーバーは、エージェントが呼び出すことができる一連�
 * `take_screenshot` — アプリケーションウィンドウの現在の状態をキャプチャします。
 * `get_semantic_tree` — Compose の[セマンティックツリー](compose-accessibility.md#semantic-properties)を返し、エージェントが UI 構造を理解できるようにします。
 * `get_logs` — 実行中のアプリケーションからの最近のログ出力（実行時例外を含む）を返します。
-* `click`、`type_text`、`scroll` — ユーザー入力をシミュレートし、インタラクティブなフローをテストします。
+* `click`、`type_text`、および `scroll` — ユーザー入力をシミュレートし、インタラクティブなフローをテストします。
 
 MCP ツールとそのパラメータの完全なリストについては、[Compose Hot Reload の README](https://github.com/JetBrains/compose-hot-reload#mcp-server-for-ai-agents) を参照してください。
 

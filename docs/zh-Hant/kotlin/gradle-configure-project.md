@@ -49,7 +49,7 @@ plugins {
 
 | KGP 版本       | Gradle 最小與最大版本                 | AGP 最小與最大版本                                  |
 |---------------|---------------------------------------|-----------------------------------------------------|
-| 2.4.0         | %minGradleVersion%–%maxGradleVersion% | %minAndroidGradleVersion%–%maxAndroidGradleVersion% |
+| 2.4.0-2.4.10  | %minGradleVersion%–%maxGradleVersion% | %minAndroidGradleVersion%–%maxAndroidGradleVersion% |
 | 2.3.20–2.3.21 | 7.6.3–9.3.0                           | 8.2.2–9.0.0                                         |
 | 2.3.10        | 7.6.3–9.0.0                           | 8.2.2–9.0.0                                         |
 | 2.3.0         | 7.6.3–9.0.0                           | 8.2.2–8.13.0                                        |
@@ -693,7 +693,7 @@ plugins {
 根據您的需求，您可以鎖定以下目標：
 
 * **`wasmJs`**: 用於在瀏覽器或 Node.js 中執行
-* **`wasmWasi`**: 用於在支援 [WASI (WebAssembly System Interface)](https://wasi.dev/) 的 Wasm 環境中執行，例如 Wasmtime、WasmEdge 等。
+* **`wasmWasi`**: 用於在支援 [WASI (WebAssembly System Interface)](https://wasi.dev/) 的 Wasm環境中執行，例如 Wasmtime、WasmEdge 等。
 
 為 Web 瀏覽器或 Node.js 配置 `wasmJs` 目標：
 
@@ -940,7 +940,9 @@ kotlin.stdlib.jdk.variants.version.alignment=false
   </tab>
   </tabs>
 
-* 如果您沒有為標準程式庫版本新增相依性，但您有兩個不同的相依性，它們傳遞性地帶來了不同舊版本的 Kotlin 標準程式庫，那麼您可以顯式要求這些傳遞性程式庫的 `%kotlinVersion%` 版本：
+* If you don't add a dependency for a standard library version, but you have two different dependencies that transitively
+  bring different old versions of the Kotlin standard library, then you can explicitly require `%kotlinVersion%`
+  versions of these transitive libraries:
 
   <tabs group="build-script">
   <tab title="Kotlin" group-key="kotlin">
@@ -1287,7 +1289,7 @@ dependencyResolutionManagement {
 </tab>
 <tab title="Groovy" group-key="groovy">
 
-```kotlin
+```groovy
 dependencyResolutionManagement {
     repositories {
         mavenCentral()
