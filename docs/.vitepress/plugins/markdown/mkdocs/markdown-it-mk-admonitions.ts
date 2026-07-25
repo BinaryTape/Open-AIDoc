@@ -10,10 +10,10 @@ export default function markdownItMkAdmonition(md) {
     // Regex to find the start of an MKDocs admonition
     // ^(\s*)!!!             - Start of line, optional leading whitespace (capture 1), then !!!
     // \s+                   - One or more spaces
-    // (\w+)                 - The admonition type (e.g., note, warning) (capture 2)
+    // (\S+)                 - The admonition type (non-whitespace characters) (capture 2)
     // (?:\s+"([^"]*)")?     - Optional: space, then a quoted title (capture 3 is the title content)
     // \s*$                  - Optional trailing whitespace, end of line
-    const admonitionStartRegex = /^(\s*)!!!\s+(\w+)(?:\s+"([^"]*)")?\s*$/;
+    const admonitionStartRegex = /^(\s*)!!!\s+(\S+)(?:\s+"([^"]*)")?\s*$/;
 
     while (i < lines.length) {
       const currentLine = lines[i];
@@ -21,8 +21,18 @@ export default function markdownItMkAdmonition(md) {
 
       if (match) {
         const leadingWhitespace = match[1] || ''; // Whitespace before !!!
-        const type = match[2];
-        const title = match[3] || ''; // Title content, or empty string if not present
+        let type = match[2];
+        let title = match[3] || ''; // Title content, or empty string if not present
+
+        // Handle Chinese '注意' mapping
+        if (type === '注意') {
+          type = 'note';
+          if (!title) {
+            title = '注意';
+          }
+        } else {
+          type = type.toLowerCase();
+        }
 
         const content = [];
         let admonitionContentStartIndex = i + 1;
@@ -59,6 +69,25 @@ export default function markdownItMkAdmonition(md) {
           admonitionContentStartIndex = j + 1; // Update line counter
         }
 
+
+        // Fix for dangling code fences (e.g., incorrect indentation in original MD)
+        // If content has an odd number of code fences, and the last line is a fence, remove it.
+        let fenceCount = 0;
+        for (const line of content) {
+          if (line.trim().startsWith('```') || line.trim().startsWith('~~~')) {
+            fenceCount++;
+          }
+        }
+
+        if (fenceCount % 2 !== 0 && content.length > 0) {
+          const lastLineIndex = content.length - 1;
+          const lastLine = content[lastLineIndex].trim();
+          if (lastLine.startsWith('```') || lastLine.startsWith('~~~')) {
+            // Remove the dangling fence
+            content.splice(lastLineIndex, 1);
+          }
+        }
+
         if (hasActualContent) {
           // Construct VitePress container
           newLines.push(`${leadingWhitespace}::: ${type}${title ? ' ' + title.trim() : ''}`);
@@ -67,6 +96,7 @@ export default function markdownItMkAdmonition(md) {
           }));
           newLines.push(`${leadingWhitespace}:::`);
           i = admonitionContentStartIndex; // Move master index past processed admonition
+
         } else {
           // No valid content found, treat as regular line
           newLines.push(currentLine);
