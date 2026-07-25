@@ -1,49 +1,82 @@
-import {DOCS_TYPES} from "../docs.config";
-import {SITE_LOCALES} from "../locales.config";
+import {
+    isExternalOrFragment,
+    localDocExists,
+    localizedDocRoute,
+    resolveRelativeDocTarget,
+    splitHref
+} from './rewrite-utils'
 
 export function coilRewriteHref(env: any, href: string): string {
-    const parts = env.relativePath.split('/')
-    const docType = parts.find(p => DOCS_TYPES.includes(p))
-    const locale = parts.find(p => SITE_LOCALES.includes(p))
+    const readmeHref = rewriteReadme(href)
+    if (readmeHref) return readmeHref
 
-    const readmeHref = rewriteReadme(href);
-    if (readmeHref) {
-        return readmeHref;
-    }
-    const localePath = locale === undefined ? '' : `/${locale}`
-    let rewriteHref = href;
+    const isOfficialCoilLink = href.startsWith('https://coil-kt.github.io/')
+    if (isExternalOrFragment(href) && !isOfficialCoilLink) return href
+
     if (href.startsWith('https://coil-kt.github.io/coil/api')) {
         return href
     }
-    if (href.startsWith("/coil/api")) {
-        return "https://coil-kt.github.io" + href
+    if (href.startsWith('/coil/api')) {
+        return `https://coil-kt.github.io${href}`
     }
-    const isCoilMDFile = href.startsWith('https://coil-kt.github.io/')
-    if (isCoilMDFile) {
-        const coilMDUrl = new URL(href);
-        const coilMDPath = coilMDUrl.pathname;
-        rewriteHref = `${localePath}${coilMDPath}`
+    if (href.startsWith('/api/')) {
+        return `https://coil-kt.github.io/coil${href}`
     }
-    const rewriteAssetsHref = rewriteAssets(href);
-    if (rewriteAssetsHref) {
-        return rewriteAssetsHref;
+    if (href.startsWith('api/')) {
+        return `https://coil-kt.github.io/coil/${href}`
     }
-    return rewriteHref;
+    if (href === 'https://coil-kt.github.io/coil/sample/') {
+        return 'https://github.com/coil-kt/coil/tree/3.x/samples/compose'
+    }
+
+    const legacyTarget = legacyCoilTarget(href)
+    if (legacyTarget) {
+        return localizedDocRoute(env, 'coil', legacyTarget, splitHref(href).suffix)
+    }
+
+    if (isOfficialCoilLink) {
+        const officialUrl = new URL(href)
+        const target = officialUrl.pathname.replace(/^\/coil\/?/, '')
+        if (localDocExists(env, 'coil', target)) {
+            return localizedDocRoute(env, 'coil', target, officialUrl.hash)
+        }
+        return href
+    }
+
+    const { pathname, suffix } = splitHref(href)
+    if (pathname.startsWith('/coil/')) {
+        const target = resolveRelativeDocTarget(env, 'coil', pathname)
+        if (localDocExists(env, 'coil', target)) {
+            return localizedDocRoute(env, 'coil', target, suffix)
+        }
+    }
+
+    const assetHref = rewriteAsset(href)
+    return assetHref || href
 }
 
-function rewriteAssets(href: string): string {
-    if(href.startsWith("../images/")) {
-        return href.replace("../images/", "/coil/");
+function rewriteAsset(href: string) {
+    if (href.startsWith('/')) return href
+    if (href.startsWith('../images/')) {
+        return href.replace('../images/', '/coil/')
     }
-
-    if (href.endsWith('.png') || href.endsWith('.svg') || href.endsWith('.jpeg') || href.endsWith('.jpg') || href.endsWith('.gif')) {
+    if (/\.(?:png|svg|jpe?g|gif)(?:[?#].*)?$/i.test(href)) {
         return `/coil/${href}`
     }
+    return ''
 }
 
 function rewriteReadme(href: string) {
-    const originalMdHref = href.replace(/\.md$/, '');  // 去掉.md结尾
-    if (href.startsWith('README')) {
-        return `https://coil-kt.github.io/coil/${originalMdHref}/`
+    if (!href.startsWith('README')) return ''
+    return `https://coil-kt.github.io/coil/${href.replace(/\.md$/, '')}/`
+}
+
+function legacyCoilTarget(href: string) {
+    if (href.startsWith('https://coil-kt.github.io/coil/upgrading/')) {
+        return 'upgrading_to_coil2'
     }
+    if (href.startsWith('https://coil-kt.github.io/coil/transitions/')) {
+        return 'compose'
+    }
+    return ''
 }

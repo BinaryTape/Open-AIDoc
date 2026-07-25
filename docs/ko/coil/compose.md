@@ -166,7 +166,7 @@ Image(
 )
 ```
 
-전체 `AnimatedContent` 예시는 [Compose AnimatedContent](/coil/recipes/#compose-animatedcontent)를 참조하세요.
+전체 `AnimatedContent` 예시는 [Compose AnimatedContent](/coil/recipes#compose-animatedcontent)를 참조하세요.
 
 ## Previews
 

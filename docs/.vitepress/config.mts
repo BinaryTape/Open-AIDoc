@@ -9,6 +9,7 @@ import {
   markdownItMkLiquidCondition,
   shikiRemoveDiffMarker
 } from './config/markdown.config'
+import { applySeoMetadata } from './config/seo.config'
 
 // ===== Vite plugins =====
 import liquidIncludePlugin from "./plugins/vite/vite-liquid-include"
@@ -23,10 +24,16 @@ export default defineConfig({
   // Basic configuration
   cleanUrls: true,
   lastUpdated: false,
-  ignoreDeadLinks: true,
+  // Localhost URLs are runnable examples, not public-site routes. All other
+  // dead links remain build-breaking.
+  ignoreDeadLinks: 'localhostLinks',
   metaChunk: true,
   lang: 'zh-Hans',
   title: 'Open AIDoc',
+  description: '开发者友好的多语言技术文档中心',
+  sitemap: {
+    hostname: 'https://openaidoc.org'
+  },
 
   // Head configuration
   head: [
@@ -61,6 +68,10 @@ export default defineConfig({
 
   // All locale configurations are now generated automatically
   locales: generateAllLocales(),
+
+  transformPageData(pageData) {
+    applySeoMetadata(pageData)
+  },
 
   // Markdown configuration
   markdown: {

@@ -1,5 +1,7 @@
 // @ts-ignore - no type declarations available
 import markdownItContainer from 'markdown-it-container'
+// @ts-ignore - no type declarations available
+import markdownItFootnote from 'markdown-it-footnote'
 
 // ===== Writerside plugins =====
 import markdownItWsContainer from "../plugins/markdown/writerside/markdown-it-ws-container"
@@ -59,6 +61,10 @@ function createContainer(md: any, name: string, className: string, defaultTitle:
  * @param md - The markdown-it instance
  */
 export function registerMarkdownPlugins(md: any) {
+  // CommonMark-style footnotes must be registered before the source-specific
+  // link rewriters so definitions are not mistaken for URL reference targets.
+  md.use(markdownItFootnote)
+
   // Writerside plugins
   md.use(markdownItWsClassstyles)
   md.use(markdownItRewriteLinks)

@@ -11,6 +11,8 @@ import {
   shikiRemoveDiffMarker
 } from '../../../docs/.vitepress/config/markdown.config'
 import liquidIncludePlugin from '../../../docs/.vitepress/plugins/vite/vite-liquid-include'
+import { installKotlinCnLinkRewrite } from './kotlin-cn-link-rewrite'
+import { applyKotlinCnMetadata } from './kotlin-cn-metadata'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const repoRoot = resolve(__dirname, '../../..')
@@ -93,15 +95,38 @@ function buildSidebar(type: string, sourceDir: string, base: string): SidebarNod
 }
 
 function localizeNode(node: SidebarNode, type: string, sourceDir: string, base: string): SidebarNode | null {
-  const includedItems = node.include ? buildSidebar(node.include, sourceDir, base) : undefined
+  const includedSidebarPath = node.include
+    ? resolve(sidebarRoot, `${node.include}.sidebar.json`)
+    : undefined
+  const fallbackDocPath = node.include
+    ? resolve(sourceDir, `${node.include}.md`)
+    : undefined
+  const includedItems = includedSidebarPath && existsSync(includedSidebarPath)
+    ? buildSidebar(node.include!, sourceDir, base)
+    : undefined
   const childItems = node.items?.map((child) => localizeNode(child, type, sourceDir, base)).filter(Boolean) as SidebarNode[] | undefined
   const text = localizeText(node, sourceDir)
 
   if (!text && !node.link && !node.href && !includedItems?.length && !childItems?.length) return null
 
+  if (node.include && !includedItems?.length && !fallbackDocPath) {
+    throw new Error(`Sidebar "${type}" includes missing sidebar "${node.include}".`)
+  }
+
+  if (node.include && !includedItems?.length && fallbackDocPath && !existsSync(fallbackDocPath)) {
+    throw new Error(
+      `Sidebar "${type}" includes missing sidebar "${node.include}" ` +
+      `and no fallback document exists at "${fallbackDocPath}".`
+    )
+  }
+
   const out: SidebarNode = {
     text,
-    link: node.link ? normalizeDocLink(base, node.link) : undefined,
+    link: node.link
+      ? normalizeDocLink(base, node.link)
+      : node.include && !includedItems?.length
+        ? normalizeDocLink(base, node.include)
+        : undefined,
     href: node.href,
     collapsed: node.collapsed
   }
@@ -267,7 +292,9 @@ export default defineConfig({
   description: '社区维护的 Kotlin 中文官方网站',
   cleanUrls: true,
   lastUpdated: false,
-  ignoreDeadLinks: true,
+  // Localhost URLs are runnable examples. Every other internal link must
+  // resolve after the satellite route mapping pass.
+  ignoreDeadLinks: 'localhostLinks',
   metaChunk: true,
   head: [
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/assets/kotlin-mark.svg' }],
@@ -292,6 +319,9 @@ export default defineConfig({
     homeMeta: buildHomeMeta(),
     communityDocs: buildCommunityDocs()
   },
+  transformPageData(pageData) {
+    applyKotlinCnMetadata(pageData)
+  },
   markdown: {
     attrs: {
       leftDelimiter: '{',
@@ -309,6 +339,7 @@ export default defineConfig({
     ],
     config: (md) => {
       registerMarkdownPlugins(md)
+      installKotlinCnLinkRewrite(md)
       installKotlinCnMarkdownEnvAlias(md)
     }
   }

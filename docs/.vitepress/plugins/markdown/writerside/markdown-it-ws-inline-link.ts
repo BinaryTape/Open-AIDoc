@@ -13,67 +13,22 @@ const rewiteOptions: RewriteLinkOptions = {
   rewriteHref: (env, href) => {
     const parts = env.relativePath.split('/')
     const docType = parts.find(p => DOCS_TYPES.includes(p))
-    const docRewriteHref = DocsTypeConfig[docType].rewriteHref?.(env, href)
-    if (docRewriteHref) {
-      return docRewriteHref
+    if (!docType) return href
+
+    const rewriteForDocType = DocsTypeConfig[docType].rewriteHref
+    if (rewriteForDocType) {
+      return rewriteForDocType(env, href)
     }
-    // 如果链接以 https:// 开头，则不进行处理
-    if (href.startsWith('https://') || href.startsWith('http://')) {
+
+    if (/^(?:https?:|mailto:|tel:|data:|\/\/)/i.test(href) ||
+      href.startsWith('/') ||
+      href.startsWith('#')) {
       return href
-    }
-
-    // 处理特殊链接，如 mailto: 链接
-    if (href.startsWith('mailto:')) {
-      return href
-    }
-
-    // 检查是否为 Kotlin 文档以及链接是否以 .png 或 .svg 结尾
-    if (docType === 'kotlin' && (href.endsWith('.png') || href.endsWith('.svg') || href.endsWith('.jpeg') || href.endsWith('.jpg') || href.endsWith('.gif'))) {
-      // 提取文件名
-
-      const fileName = path.basename(href)
-      return `/kotlin/${fileName}`
     }
 
     if (docType === 'sqldelight' && (href.endsWith('.png') || href.endsWith('.svg') || href.endsWith('.gif'))) {
       const fileName = path.basename(href)
       return `/sqldelight/${fileName}`
-    }
-
-    // 处理相对路径链接
-    if (docType === 'koin' && (href.startsWith('./') || href.startsWith('../'))) {
-      // 获取当前文档的目录路径
-      const currentDir = env.relativePath.split('/')
-      currentDir.pop() // 移除文件名
-
-      let pathSegments = []
-
-      if (href.startsWith('./')) {
-        // 同级目录下的文件
-        pathSegments = [...currentDir]
-        href = href.substring(2) // 移除 ./ 前缀
-      } else if (href.startsWith('../')) {
-        // 上一级目录的文件
-        currentDir.pop() // 上移一级目录
-        pathSegments = [...currentDir]
-        href = href.substring(3) // 移除 ../ 前缀
-      }
-
-      // 构建完整路径
-      return `/${pathSegments.join('/')}/${href}`
-    }
-
-    if (docType === 'koin' && href.startsWith('/docs')) {
-      href = href.replace('/docs', '')
-    }
-
-    if ((docType === 'kotlin') && href.includes('.md')) {
-      href = href.replace('.md', '')
-      href = `/${href}`
-    }
-
-    if ((docType === 'kotlin' || docType === 'sqldelight' || docType === 'ktor') && href.startsWith('#')) {
-      return href
     }
 
     if (docType === 'sqldelight') {
@@ -101,7 +56,6 @@ const rewiteOptions: RewriteLinkOptions = {
         return `/${currentDir.join('/')}/${href}.md`;
       }
     }
-    // 原有的链接处理逻辑（用于非相对路径的链接）
     const locale = parts.find(p => SITE_LOCALES.includes(p))
     const config = { locale, docType }
     const localePath = locale === undefined ? '' : `/${config.locale}`
@@ -146,8 +100,8 @@ export function markdownItRewriteLinks(md: MarkdownIt) {
         token.content = token.content.replace(
           /<a\s+([^>]*?)href\s*=\s*["']([^"']+)["']([^>]*?)>/gi,
           (match, beforeHref, hrefValue, afterHref) => {
-            // 不处理已经以/或http开头的路径
-            if (hrefValue.startsWith('/') || hrefValue.startsWith('http')) {
+            // External URLs do not need site-local rewriting.
+            if (hrefValue.startsWith('http')) {
               return match
             }
 
@@ -201,8 +155,8 @@ function rewriteHtmlAttributes(content, attrNames, rewriteFn) {
       "gi"
     ),
     (match, before, value) => {
-      // 不处理已经以 / 或 http 开头的路径
-      if (/^(?:\/|https?:)/i.test(value)) {
+      // External URLs do not need site-local rewriting.
+      if (/^https?:/i.test(value)) {
         return match
       }
       const newValue = rewriteFn(value)

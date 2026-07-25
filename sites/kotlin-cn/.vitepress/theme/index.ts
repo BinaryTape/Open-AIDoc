@@ -33,7 +33,7 @@ import YouTubeVideo from '../../../../docs/.vitepress/component/YouTubeVideo.vue
 export default {
   extends: DefaultTheme,
   Layout: KotlinLayout,
-  enhanceApp({ app, router }) {
+  enhanceApp({ app }) {
     app.component('deflist', Deflist)
     app.component('def', Def)
     app.component('list', List)
@@ -72,81 +72,5 @@ export default {
     app.component('tip', Tip)
     app.component('YouTubeVideo', YouTubeVideo)
 
-    router.onAfterRouteChange = () => {
-      normalizeRenderedLinks()
-    }
-
-    if (typeof window !== 'undefined') {
-      window.requestAnimationFrame(normalizeRenderedLinks)
-      document.addEventListener('click', interceptLegacyDocLinks, true)
-    }
   }
 } satisfies Theme
-
-function interceptLegacyDocLinks(event: MouseEvent) {
-  const target = event.target as HTMLElement | null
-  const link = target?.closest?.('a') as HTMLAnchorElement | null
-  if (!link) return
-
-  const nextHref = mapLegacyHref(link.getAttribute('href') || '')
-  if (!nextHref || nextHref === link.getAttribute('href')) return
-
-  event.preventDefault()
-  event.stopPropagation()
-  window.location.href = nextHref
-}
-
-function normalizeRenderedLinks() {
-  if (typeof document === 'undefined') return
-
-  document.querySelectorAll<HTMLAnchorElement>('a[href]').forEach((link) => {
-    const nextHref = mapLegacyHref(link.getAttribute('href') || '')
-    if (nextHref) link.setAttribute('href', nextHref)
-  })
-}
-
-function mapLegacyHref(href: string): string | null {
-  if (!href || href.startsWith('#') || href.startsWith('mailto:')) return null
-
-  const url = new URL(href, window.location.origin)
-  const isLocal = url.origin === window.location.origin
-  const isKotlinLang = url.hostname === 'kotlinlang.org'
-
-  if (!isLocal && !isKotlinLang) return null
-
-  let pathname = url.pathname.replace(/\.html$/, '')
-
-  if (isKotlinLang && pathname.startsWith('/docs/multiplatform/')) {
-    pathname = pathname.replace(/^\/docs\/multiplatform\//, '/docs/multiplatform/')
-  } else if (isKotlinLang && pathname.startsWith('/docs/')) {
-    pathname = pathname.replace(/^\/docs\//, '/docs/language/')
-  }
-
-  pathname = pathname
-    .replace(/^\/docs\/kotlin\//, '/docs/language/')
-    .replace(/^\/kotlin\//, '/docs/language/')
-    .replace(/^\/docs\/kmp\//, '/docs/multiplatform/')
-    .replace(/^\/kmp\//, '/docs/multiplatform/')
-    .replace(/^\/koog\//, '/docs/koog/')
-
-  const currentSection = getCurrentSectionBase()
-  if (
-    currentSection &&
-    isLocal &&
-    /^\/[A-Za-z0-9][A-Za-z0-9_.-]*$/.test(pathname) &&
-    !pathname.startsWith('/assets')
-  ) {
-    pathname = `${currentSection}${pathname.slice(1)}`
-  }
-
-  const next = `${pathname}${url.search}${url.hash}`
-  return next === href ? null : next
-}
-
-function getCurrentSectionBase() {
-  const pathname = window.location.pathname
-  if (pathname.startsWith('/docs/language/')) return '/docs/language/'
-  if (pathname.startsWith('/docs/multiplatform/')) return '/docs/multiplatform/'
-  if (pathname.startsWith('/docs/koog/')) return '/docs/koog/'
-  return ''
-}
