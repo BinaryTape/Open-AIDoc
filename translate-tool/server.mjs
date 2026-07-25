@@ -745,7 +745,7 @@ app.get('/{*path}', (req, res) => {
 // ─── Start ──────────────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 3456;
 app.listen(PORT, () => {
-  console.log(`\n  🌐 Open-Docs 翻译平台已启动`);
+  console.log(`\n  🌐 Open AIDoc 翻译平台已启动`);
   console.log(`  📍 地址: http://localhost:${PORT}`);
   console.log(`  🔑 API Key: ${currentApiKey ? '已设置 ✅' : '未设置 ❌ (可在界面中设置)'}`);
   console.log(`  🐙 GitHub Token: ${process.env.GITHUB_TOKEN ? '已设置 ✅ (5000 req/hr)' : '未设置 (60 req/hr)'}\n`);

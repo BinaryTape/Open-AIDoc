@@ -4,7 +4,7 @@ import {
   localizedDocRoute,
   resolveRelativeDocTarget,
   splitHref
-} from './rewrite-utils'
+} from './link-rewrite-utils'
 
 const LEGACY_ROUTES: Record<string, string> = {
   'topics/coroutines-basics': 'coroutines-basics',

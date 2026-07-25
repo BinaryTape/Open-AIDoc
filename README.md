@@ -1,2 +1,12 @@
-# Open-Docs
-Open Docs is a project for public interest. It's powered by Gemini that tracks and translates docs of popular open-source libraries into Simplified/Traditional Chinese, Japanese, Korean, etc.
+# Open AIDoc
+
+Open AIDoc is a public-interest multi-language documentation hub. It tracks upstream docs of popular open-source libraries and translates them with Gemini into Simplified/Traditional Chinese, Japanese, Korean, and more.
+
+## Quick start
+
+```bash
+pnpm i
+pnpm docs:dev          # main site
+pnpm kotlin-cn:dev     # Kotlin CN satellite
+pnpm translate         # local translation helper UI
+```

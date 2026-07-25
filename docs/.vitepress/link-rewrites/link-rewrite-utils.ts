@@ -1,3 +1,10 @@
+/**
+ * Shared helpers for LinkRewrite modules (docs/.vitepress/link-rewrites/).
+ *
+ * LinkRewrite runs at VitePress Markdown compile time and rewrites in-doc
+ * hrefs to local routes. It is separate from SyncStrategy under
+ * .github/scripts/strategies/, which only runs in the sync/translate pipeline.
+ */
 import { existsSync } from 'node:fs'
 import { dirname, posix, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'

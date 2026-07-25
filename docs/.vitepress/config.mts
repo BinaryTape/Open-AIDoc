@@ -59,7 +59,7 @@ export default defineConfig({
     outline: [2, 3],
     logo: '/img/logo.png',
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/BinaryTape/Open-Docs' }
+      { icon: 'github', link: 'https://github.com/BinaryTape/Open-AIDoc' }
     ],
     footer: {
       copyright: 'Copyright © 2026 Open AIDoc.'

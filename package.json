@@ -18,10 +18,8 @@
     "kotlin-cn:preview": "pnpm kotlin-cn:prepare && vitepress preview sites/kotlin-cn",
     "translate": "node --import tsx --watch translate-tool/server.mjs"
   },
-  "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
   "devDependencies": {
     "@google/genai": "^2.13.0",
     "@mdit-vue/shared": "^3.0.2",

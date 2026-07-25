@@ -1,15 +1,16 @@
-import { coilRewriteHref } from "./rewrite/coil-rewrite-strategy";
-import {koinRewriteHref} from "./rewrite/koin-rewrite-strategy";
-import {kotlinRewriteHref} from "./rewrite/kotlin-rewrite-strategy";
-import {koogRewriteHref} from "./rewrite/koog-rewrite-strategy";
-import {ktorRewriteHref} from "./rewrite/ktor-rewrite-strategy";
-import {kmpRewriteHref} from "./rewrite/kmp-rewrite-strategy";
+import { coilRewriteHref } from "./link-rewrites/coil.link-rewrite";
+import { koinRewriteHref } from "./link-rewrites/koin.link-rewrite";
+import { kotlinRewriteHref } from "./link-rewrites/kotlin.link-rewrite";
+import { koogRewriteHref } from "./link-rewrites/koog.link-rewrite";
+import { ktorRewriteHref } from "./link-rewrites/ktor.link-rewrite";
+import { kmpRewriteHref } from "./link-rewrites/kmp.link-rewrite";
 
 export type DocsItemConfig = {
     type: "koin" | "kotlin" | "sqldelight" | "ktor" | "kmp" | "koog" |  "coil";
     title: string;
     path: string;
     framework: "Docusaurus" | "Writerside" | "MKDocs";
+    /** Build-time LinkRewrite: map upstream/in-doc hrefs to local routes. */
     rewriteHref?: (env: any, href: string) => string;
 }
 export const DocsTypeConfig: { [key: string]: DocsItemConfig } = {

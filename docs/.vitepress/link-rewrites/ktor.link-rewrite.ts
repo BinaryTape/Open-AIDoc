@@ -4,7 +4,7 @@ import {
     localizedDocRoute,
     resolveRelativeDocTarget,
     splitHref
-} from './rewrite-utils'
+} from './link-rewrite-utils'
 
 export function ktorRewriteHref(env: any, href: string): string {
     if (isExternalOrFragment(href)) {

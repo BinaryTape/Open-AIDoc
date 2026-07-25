@@ -1,3 +1,10 @@
+/**
+ * Default SyncStrategy for the docs pipeline.
+ *
+ * SyncStrategy runs during sync/detect/translate (CI or local pipeline).
+ * It is not used at site-build time — link rewriting lives under
+ * docs/.vitepress/link-rewrites/ (LinkRewrite).
+ */
 export const defaultStrategy = {
   /**
    * Gets the glob patterns for the document files to be processed.

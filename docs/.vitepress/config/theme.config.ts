@@ -41,5 +41,5 @@ export const THEME_TRANSLATIONS: Record<string, {
  * @returns GitHub edit link pattern
  */
 export function getEditLinkPattern(): string {
-  return 'https://github.com/BinaryTape/Open-Docs/blob/main/docs/:path'
+  return 'https://github.com/BinaryTape/Open-AIDoc/blob/main/docs/:path'
 }

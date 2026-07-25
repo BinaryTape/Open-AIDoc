@@ -4,7 +4,7 @@ import {
     localizedDocRoute,
     resolveRelativeDocTarget,
     splitHref
-} from './rewrite-utils'
+} from './link-rewrite-utils'
 
 export function coilRewriteHref(env: any, href: string): string {
     const readmeHref = rewriteReadme(href)
