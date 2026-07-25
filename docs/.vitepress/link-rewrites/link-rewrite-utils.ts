@@ -8,13 +8,18 @@
 import { existsSync } from 'node:fs'
 import { dirname, posix, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { SITE_LOCALES } from '../locales.config'
+import {
+  findLocaleInPath,
+  localeFsPrefix,
+  normalizePosixPath,
+  toContentUrl,
+} from '../../../shared/content-paths'
+import { CONTENT_LOCALES } from '../../../shared/locales'
 
 const docsRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
 
 export function getPageLocale(env: any) {
-  const parts = normalizePath(env.relativePath).split('/')
-  return parts.find((part) => SITE_LOCALES.includes(part))
+  return findLocaleInPath(env.relativePath, CONTENT_LOCALES)
 }
 
 export function splitHref(href: string) {
@@ -35,7 +40,7 @@ export function isExternalOrFragment(href: string) {
 }
 
 export function normalizeDocTarget(target: string, docType: string) {
-  let normalized = normalizePath(target)
+  let normalized = normalizePosixPath(target)
     .replace(new RegExp(`^/${docType}/?`), '')
     .replace(/^\/+/, '')
     .replace(/\.(?:md|topic)$/, '')
@@ -54,7 +59,7 @@ export function resolveRelativeDocTarget(
     return normalizeDocTarget(target, docType)
   }
 
-  const relativePath = normalizePath(env.relativePath)
+  const relativePath = normalizePosixPath(env.relativePath)
   const parts = relativePath.split('/')
   const docTypeIndex = parts.indexOf(docType)
   const currentDirectory = docTypeIndex === -1
@@ -73,7 +78,7 @@ export function localDocExists(env: any, docType: string, target: string) {
 
 export function localDocKind(env: any, docType: string, target: string) {
   const locale = getPageLocale(env)
-  const localePrefix = locale ? `${locale}/` : ''
+  const localePrefix = localeFsPrefix(locale)
   const normalizedTarget = normalizeDocTarget(target, docType)
   const directFile = normalizedTarget
     ? resolve(docsRoot, `${localePrefix}${docType}/${normalizedTarget}.md`)
@@ -95,16 +100,18 @@ export function localizedDocRoute(
   suffix = ''
 ) {
   const locale = getPageLocale(env)
-  const localePrefix = locale ? `/${locale}` : ''
   const normalizedTarget = normalizeDocTarget(target, docType)
-  const routeSuffix = !normalizedTarget
-    ? '/'
+  const isIndex = !normalizedTarget
+    ? true
     : localDocKind(env, docType, normalizedTarget) === 'index'
-      ? `/${normalizedTarget}/`
-      : `/${normalizedTarget}`
-  return `${localePrefix}/${docType}${routeSuffix}${suffix}`
-}
 
-function normalizePath(value: string) {
-  return value.replaceAll('\\', '/')
+  // Directory index for empty target → trailing slash on docType root
+  if (!normalizedTarget) {
+    return toContentUrl(locale, docType, '', { suffix })
+  }
+
+  return toContentUrl(locale, docType, normalizedTarget, {
+    index: isIndex,
+    suffix,
+  })
 }

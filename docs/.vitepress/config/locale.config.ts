@@ -6,6 +6,8 @@ import { THEME_TRANSLATIONS, getEditLinkPattern } from './theme.config'
 import generateSidebar from './sidebar.config'
 import { SiteLocaleConfig } from '../locales.config'
 import { DocsTypeConfig, DOCS_TYPES } from '../docs.config'
+import { DEFAULT_LOCALE } from '../../../shared/locales'
+import { localeUrlPrefix } from '../../../shared/content-paths'
 
 /**
  * Locale mapping configuration
@@ -13,7 +15,7 @@ import { DocsTypeConfig, DOCS_TYPES } from '../docs.config'
  * Value: Corresponding language key used in locale files
  */
 const LOCALE_MAPPING: Record<string, string> = {
-  'root': 'zh-Hans',
+  'root': DEFAULT_LOCALE,
   'zh-Hant': 'zh-Hant',
   'ja': 'ja',
   'ko': 'ko',
@@ -25,8 +27,7 @@ const LOCALE_MAPPING: Record<string, string> = {
  * @returns Sidebar configuration object
  */
 function generateSidebarConfig(localeKey: string): DefaultTheme.Sidebar {
-  const isRoot = localeKey === 'zh-Hans'
-  const prefix = isRoot ? '' : `/${localeKey}`
+  const prefix = localeUrlPrefix(localeKey)
   const localeConfig = SiteLocaleConfig[localeKey]
 
   const sidebar: DefaultTheme.Sidebar = {}
@@ -77,7 +78,7 @@ function generateSingleLocale(viteLocaleKey: string, localeKey: string): LocaleC
   const siteLocale = SiteLocaleConfig[localeKey]
 
   return {
-    ...(isRoot ? {} : { link: `/${localeKey}/` }),
+    ...(isRoot ? {} : { link: `${localeUrlPrefix(localeKey)}/` }),
     lang: siteLocale.lang,
     label: siteLocale.label,
     title: siteLocale.title,

@@ -28,6 +28,7 @@ export default defineConfig({
   // dead links remain build-breaking.
   ignoreDeadLinks: 'localhostLinks',
   metaChunk: true,
+  // Default content locale is zh-Hans (root; no URL prefix). See shared/locales.ts.
   lang: 'zh-Hans',
   title: 'Open AIDoc',
   description: '开发者友好的多语言技术文档中心',

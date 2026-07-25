@@ -11,6 +11,10 @@
     "allowImportingTsExtensions": true,
     "types": ["node"]
   },
-  "include": ["docs/.vitepress/**/*.ts", "docs/.vitepress/**/*.mts"],
+  "include": [
+    "docs/.vitepress/**/*.ts",
+    "docs/.vitepress/**/*.mts",
+    "shared/**/*.ts"
+  ],
   "exclude": ["node_modules", "dist"]
 }

@@ -3,6 +3,7 @@ import path from "path";
 import { GoogleGenAI } from "@google/genai";
 import { fileURLToPath } from "url";
 import pLimit from "p-limit";
+import { toContentRelPath } from "../../shared/content-paths.ts";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -48,18 +49,12 @@ export function getTerminologyForLang(targetLang) {
   return JSON.stringify(terms);
 }
 
-// Calculate target file path
+// Calculate target file path under docs/ (default locale has no language prefix)
 function getTargetPath(filePath, targetLang) {
-  // baseDir/[language]/koin/relativePath
   const baseDir = "./docs";
   const docType = process.env.DOC_TYPE;
   const relativePath = path.relative(process.env.DOC_PATH, filePath);
-
-  if (targetLang === "zh-Hans") {
-    return path.join(baseDir, docType, relativePath);
-  } else {
-    return path.join(baseDir, targetLang, docType, relativePath);
-  }
+  return path.join(baseDir, toContentRelPath(targetLang, docType, relativePath));
 }
 
 // Load previously translated related files as reference

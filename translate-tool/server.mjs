@@ -4,6 +4,7 @@ import fs from 'fs';
 import crypto from 'crypto';
 import { fileURLToPath } from 'url';
 import { GoogleGenAI } from '@google/genai';
+import { toContentRelPath } from '../shared/content-paths.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -390,12 +391,11 @@ function getDefaultPrompt(targetLang) {
  */
 function loadPreviousTranslation(projectName, fileName, targetLang) {
   try {
-    let targetPath;
-    if (targetLang === 'zh-Hans') {
-      targetPath = path.join(ROOT, 'docs', projectName, fileName);
-    } else {
-      targetPath = path.join(ROOT, 'docs', targetLang, projectName, fileName);
-    }
+    const targetPath = path.join(
+      ROOT,
+      'docs',
+      toContentRelPath(targetLang, projectName, fileName)
+    );
     if (fs.existsSync(targetPath)) {
       const content = fs.readFileSync(targetPath, 'utf8');
       return `\n### 先前翻译版本\n\`\`\`\n${content}\n\`\`\`\n`;
@@ -413,10 +413,7 @@ function loadPreviousTranslation(projectName, fileName, targetLang) {
  * @param {string} targetLang
  */
 function calculateTargetPath(projectName, fileName, targetLang) {
-  if (targetLang === 'zh-Hans') {
-    return `${projectName}/${fileName}`;
-  }
-  return `${targetLang}/${projectName}/${fileName}`;
+  return toContentRelPath(targetLang, projectName, fileName);
 }
 
 // ─── SSE Clients ────────────────────────────────────────────────────────────

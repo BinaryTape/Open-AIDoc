@@ -2,6 +2,7 @@ import zh_Hans from './locales/zh-Hans.json'
 import zh_Hant from './locales/zh-Hant.json'
 import ja from './locales/ja.json'
 import ko from './locales/ko.json'
+import { DEFAULT_LOCALE } from '../../shared/locales'
 
 export type SideLocaleConfig = {
     lang: string
@@ -14,8 +15,8 @@ export type SideLocaleConfig = {
 }
 
 export const SiteLocaleConfig: { [key: string]: SideLocaleConfig } = {
-    'zh-Hans': {
-        lang: 'zh-Hans',
+    [DEFAULT_LOCALE]: {
+        lang: DEFAULT_LOCALE,
         label: '简体中文',
         title: 'Open AIDoc',
         description: '开发者友好的多语言技术文档中心',

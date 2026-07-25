@@ -1,6 +1,7 @@
-import { DocsTypeConfig } from '../docs.config';
+import { DocsTypeConfig, DOCS_TYPES } from '../docs.config';
 import { SiteLocaleConfig } from '../locales.config';
 import generateSidebar from '../config/sidebar.config';
+import { splitLocalePath } from '../../../shared/content-paths';
 
 /**
  * 根据相对路径获取侧栏标题
@@ -10,52 +11,22 @@ import generateSidebar from '../config/sidebar.config';
 export function getSidebarTitle(relativePath: string): string | undefined {
   if (!relativePath) return undefined;
 
-  // 确定当前文档所属的区域和语言
-  let locale = 'zh-Hans';
-  let section = '';
-  let pathWithoutExt = relativePath.replace(/\.md$/, '');
+  const { locale, contentPath } = splitLocalePath(relativePath);
+  const pathWithoutExt = contentPath.replace(/\.md$/, '');
+  const parts = pathWithoutExt.split('/').filter(Boolean);
 
-  const parts = pathWithoutExt.split('/');
-  
-  // 确定语言区域
-  if (parts.length > 0) {
-    if (Object.keys(SiteLocaleConfig).includes(parts[0])) {
-      locale = parts[0];
-      parts.shift(); // 移除语言部分
-      pathWithoutExt = parts.join('/');
-    }
-  }
+  const section = parts[0];
+  if (!section || !DOCS_TYPES.includes(section)) return undefined;
 
-  // 确定文档区域（koin、kotlin或sqldelight）
-  if (parts.length > 0) {
-    if (['koin', 'kotlin', 'sqldelight'].includes(parts[0])) {
-      section = parts[0];
-    }
-  }
+  const docType = DocsTypeConfig[section];
+  if (!docType) return undefined;
 
-  if (!section) return undefined;
+  const localeConfig = SiteLocaleConfig[locale];
+  if (!localeConfig) return undefined;
 
-  // 根据区域选择对应的DocsTypeConfig
-  let docType;
-  switch (section) {
-    case 'koin':
-      docType = DocsTypeConfig.koin;
-      break;
-    case 'kotlin':
-      docType = DocsTypeConfig.kotlin;
-      break;
-    case 'sqldelight':
-      docType = DocsTypeConfig.sqldelight;
-      break;
-    default:
-      return undefined;
-  }
-
-  // 获取对应语言和区域的侧栏配置
-  const sidebarConfig = generateSidebar(SiteLocaleConfig[locale], docType);
-  
-  // 在侧栏配置中查找匹配的项
-  return findTitleInSidebar(sidebarConfig, pathWithoutExt.substring(section.length + 1));
+  const sidebarConfig = generateSidebar(localeConfig, docType);
+  const rest = parts.slice(1).join('/');
+  return findTitleInSidebar(sidebarConfig, rest);
 }
 
 /**

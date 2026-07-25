@@ -1,8 +1,9 @@
 import { ref, computed, reactive } from 'vue'
 import { SiteLocaleConfig, SITE_LOCALES } from '../locales.config'
+import { DEFAULT_LOCALE } from '../../../shared/locales'
 
 // Create a reactive state for the current locale
-const currentLocale = ref('zh-Hans')
+const currentLocale = ref(DEFAULT_LOCALE)
 
 // Create a computed property for the current messages
 const messages = computed(() => {

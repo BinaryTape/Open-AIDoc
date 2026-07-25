@@ -4,7 +4,8 @@
   "main": "index.js",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "docs:dev": "vitepress dev docs",
     "docs:build": "node --max-old-space-size=8192 node_modules/vitepress/bin/vitepress.js build docs",
     "docs:verify": "node scripts/verify-site-output.mjs",
@@ -37,6 +38,7 @@
     "shiki": "^3.23.0",
     "tsx": "^4.23.1",
     "vitepress": "^2.0.0-alpha.18",
+    "vitest": "^3.2.7",
     "xml2js": "^0.6.2"
   },
   "dependencies": {
