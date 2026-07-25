@@ -11,6 +11,7 @@ permissions:
 jobs:
   docs-update:
     runs-on: ubuntu-latest
+    timeout-minutes: 360
     steps:
       - name: Checkout main repository
         uses: actions/checkout@v4
@@ -20,9 +21,8 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 10
+          version: 11
           run_install: false
-          standalone: true
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -33,6 +33,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # Sync may commit/push even when the tree would fail tests.
       - name: Run Update and Translation Script
         env:
           GIT_AUTHOR_NAME: "github-actions[bot]"
@@ -41,6 +42,37 @@ jobs:
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
         run: pnpm pipeline:run
 
-      - name: Create Summary
+      # Report-only: never block the sync commit/push.
+      - name: Post-sync unit tests (report only)
+        id: unit_tests
+        continue-on-error: true
+        run: pnpm test
+
+      - name: Post-sync docs check (report only)
+        id: docs_check
+        continue-on-error: true
+        run: pnpm docs:check
+
+      - name: Write post-sync test summary
         if: always()
-        run: echo "Workflow finished. Check logs for details." >> $GITHUB_STEP_SUMMARY
+        env:
+          UNIT_OUTCOME: ${{ steps.unit_tests.outcome }}
+          DOCS_OUTCOME: ${{ steps.docs_check.outcome }}
+        run: |
+          {
+            echo "## Docs update summary"
+            echo ""
+            echo "| Step | Result |"
+            echo "| --- | --- |"
+            echo "| Pipeline (sync/translate/commit) | ${{ job.status }} |"
+            echo "| \`pnpm test\` | ${UNIT_OUTCOME} |"
+            echo "| \`pnpm docs:check\` | ${DOCS_OUTCOME} |"
+            echo ""
+            if [ "$UNIT_OUTCOME" = "success" ] && [ "$DOCS_OUTCOME" = "success" ]; then
+              echo "✅ All post-sync tests passed."
+            else
+              echo "⚠️ Post-sync tests reported failures. Sync commit is **not** blocked."
+              echo ""
+              echo "Open the failed steps above for full logs. Fix via a follow-up PR (CI will require green tests)."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
