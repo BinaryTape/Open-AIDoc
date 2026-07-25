@@ -1,5 +1,5 @@
 /**
- * Default SyncStrategy for the docs pipeline.
+ * Default SyncStrategy for the docs pipeline (tools/pipeline/sync-strategies/).
  *
  * SyncStrategy runs during sync/detect/translate (CI or local pipeline).
  * It is not used at site-build time — link rewriting lives under

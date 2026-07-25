@@ -17,7 +17,8 @@
     "kotlin-cn:verify": "node scripts/verify-kotlin-cn-output.mjs",
     "kotlin-cn:check": "pnpm kotlin-cn:build && pnpm kotlin-cn:verify",
     "kotlin-cn:preview": "pnpm kotlin-cn:prepare && vitepress preview sites/kotlin-cn",
-    "translate": "node --import tsx --watch translate-tool/server.mjs"
+    "translate": "node --import tsx --watch translate-tool/server.mjs",
+    "pipeline:run": "node --import tsx tools/pipeline/docs-pipeline.mjs"
   },
   "author": "",
   "license": "ISC",
@@ -26,6 +27,7 @@
     "@mdit-vue/shared": "^3.0.2",
     "@types/node": "^25.9.5",
     "@vueuse/core": "^14.3.0",
+    "execa": "^9.6.1",
     "express": "^5.2.1",
     "fs-extra": "^11.4.0",
     "glob": "13.0.6",

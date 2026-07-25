@@ -28,7 +28,7 @@ export const coilStrategy = {
    */
   postDetect: async (repoConfig, task) => {
     console.log("  Running Coil postDetect: Copying root markdown files...");
-    const repoPath = repoConfig.path;
+    const repoPath = repoConfig.cloneDir;
     const mappedFiles = await Promise.all(
       task.files.map(async (file) => {
         if (extraFilesMapping.has(file)) {
@@ -62,7 +62,7 @@ export const coilStrategy = {
   postTranslate: async (context, repoConfig) => {
     console.log("  Handling Coil assets: Copying images...");
     const { src, dest } = repoConfig.assets;
-    const srcPath = path.join(repoConfig.path, src);
+    const srcPath = path.join(repoConfig.cloneDir, src);
     if (await fs.pathExists(srcPath)) {
       await fs.ensureDir(dest);
       await fs.copy(srcPath, dest, { overwrite: true });

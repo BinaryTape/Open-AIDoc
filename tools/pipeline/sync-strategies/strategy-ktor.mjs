@@ -20,7 +20,7 @@ export const ktorStrategy = {
      * @override
      */
     postDetect: async (repoConfig, task) => {
-        const repoPath = repoConfig.path;
+        const repoPath = repoConfig.cloneDir;
         const docsPath = path.join(repoPath, "topics");
         const docs = await fs.readdir(docsPath);
 
@@ -55,7 +55,7 @@ export const ktorStrategy = {
 
         console.log(`  Running Ktor postSync: Generate sidebar - ${repoPath}...`);
         const sidebarPath = path.join(repoPath, "ktor.tree");
-        const docType = repoPath.replace("-repo", "");
+        const docType = repoConfig.sidebarId;
         if (await fs.pathExists(sidebarPath)) {
             await generateSidebar(sidebarPath, docType);
         }
@@ -67,16 +67,16 @@ export const ktorStrategy = {
      */
     postTranslate: async (context, repoConfig) => {
         console.log(`  Copying Ktor version file... `);
-        const versionFile = `variables/${repoConfig.path}/v.list`;
+        const versionFile = `variables/${repoConfig.cloneDir}/v.list`;
         if (await fs.pathExists(versionFile)) {
             await fs.copy(versionFile, "docs/.vitepress/variables/ktor.v.list", { overwrite: true });
             context.gitAddPaths.add("docs/.vitepress/variables/ktor.v.list")
-            console.log(`  Copying Ktor version file finished - ${repoConfig.path}`);
+            console.log(`  Copying Ktor version file finished - ${repoConfig.cloneDir}`);
         }
 
-        console.log(`  Handling Ktor assets: Copying images - ${repoConfig.path}... `);
+        console.log(`  Handling Ktor assets: Copying images - ${repoConfig.cloneDir}... `);
         const { src, dest } = repoConfig.assets;
-        const srcPath = path.join(repoConfig.path, src);
+        const srcPath = path.join(repoConfig.cloneDir, src);
         if (await fs.pathExists(srcPath)) {
             await fs.ensureDir(dest);
             await copyFlatten(srcPath, dest);

@@ -17,10 +17,10 @@ export const koogStrategy = {
      * @override
      */
     postDetect: async (repoConfig, task) => {
-        const repoPath = repoConfig.path;
+        const repoPath = repoConfig.cloneDir;
         console.log(`  Running Koog postSync: Generate sidebar - ${repoPath}...`);
         const sidebarPath = path.join(repoPath, 'docs/mkdocs.yml');
-        const docType = repoPath.replace("-repo", "");
+        const docType = repoConfig.sidebarId;
         if (await fs.pathExists(sidebarPath)) {
             await generateSidebar(sidebarPath, docType);
         }
@@ -31,9 +31,9 @@ export const koogStrategy = {
      * @override
      */
     postTranslate: async (context, repoConfig) => {
-        console.log(`  Handling Koog assets: Copying images - ${repoConfig.path}... `);
+        console.log(`  Handling Koog assets: Copying images - ${repoConfig.cloneDir}... `);
         const {src, dest} = repoConfig.assets;
-        const srcPath = path.join(repoConfig.path, src);
+        const srcPath = path.join(repoConfig.cloneDir, src);
         if (await fs.pathExists(srcPath)) {
             await fs.ensureDir(dest);
             await fs.copy(srcPath, dest, { overwrite: true });

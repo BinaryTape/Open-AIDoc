@@ -3,7 +3,7 @@ import {parseStringPromise} from 'xml2js';
 import path from 'node:path';
 import {slugify} from "@mdit-vue/shared";
 import yaml from 'js-yaml';
-const {SITE_LOCALES} = await import("../../../docs/.vitepress/locales.config");
+import { CONTENT_LOCALES } from '../../../shared/locales.ts';
 
 /** 读 JSON，若不存在返回 {} */
 async function readJson(file) {
@@ -63,7 +63,7 @@ async function generateLocaleJson(translateKeys) {
     await writeJson(enFile, enDict);
 
     /* ---------- ② 更新其他语言 ---------- */
-    for (const lang of SITE_LOCALES) {
+    for (const lang of CONTENT_LOCALES) {
         const file = path.join(LOCALE_DIR, `${lang}.json`);
         const dict = await readJson(file);
 

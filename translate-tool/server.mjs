@@ -32,7 +32,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // ─── Config ─────────────────────────────────────────────────────────────────
 const config = JSON.parse(
-  fs.readFileSync(path.join(ROOT, '.github/scripts/translate-config.json'), 'utf8')
+  fs.readFileSync(path.join(ROOT, 'tools/pipeline/translate-config.json'), 'utf8')
 );
 
 // Raw terminology content for preview; per-language selection uses getTerminologyForLang()
@@ -42,7 +42,7 @@ try {
 } catch { terminologyContentRaw = ''; }
 
 // ─── Projects: GitHub repos with doc paths ──────────────────────────────────
-// Mirrors docs-repo-config.mjs — branches strip "origin/", docPaths from strategy.getDocPatterns()
+// Mirrors tools/pipeline/repos.config.mjs — branches strip "origin/", docPaths from patterns
 const PROJECTS = [
   {
     name: 'kotlin', displayName: 'Kotlin',
@@ -259,7 +259,7 @@ function buildTreeFromFiles(allFiles, docPaths) {
   return tree;
 }
 
-// ─── Pre-processing（直接复用 .github/scripts/processors） ──────────────────
+// ─── Pre-processing（直接复用 tools/pipeline/processors） ──────────────────
 //
 // extractTopicContent        — 提取 <topic> 内容 + Writerside XML 标签处理 + 清理空行 + frontmatter
 // processFullMarkdownContent — Writerside XML 标签处理 + Markdown 特殊语法处理（完整流水线）
@@ -268,10 +268,10 @@ function buildTreeFromFiles(allFiles, docPaths) {
 //
 import {
   extractTopicContent,
-} from '../.github/scripts/processors/TopicProcessor.mjs';
+} from '../tools/pipeline/processors/TopicProcessor.mjs';
 import {
   processFullMarkdownContent,
-} from '../.github/scripts/processors/MarkdownProcessor.mjs';
+} from '../tools/pipeline/processors/MarkdownProcessor.mjs';
 import {
   cleanupTranslation,
   getPromptTemplate,
@@ -279,7 +279,7 @@ import {
   getLangDisplayName,
   fillPromptTemplate,
   getTerminologyForLang,
-} from '../.github/scripts/translate.mjs';
+} from '../tools/pipeline/translate.mjs';
 
 /**
  * 预处理内容。根据 preprocessMode 选择处理方式:

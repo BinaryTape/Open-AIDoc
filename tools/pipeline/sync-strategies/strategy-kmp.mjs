@@ -20,7 +20,7 @@ export const kmpStrategy = {
      * @override
      */
     postDetect: async (repoConfig, task) => {
-        const repoPath = repoConfig.path
+        const repoPath = repoConfig.cloneDir
 
         console.log(`  Running KMP postDetect: Flattening directory - ${repoPath}...`);
         const docsPath = path.join(repoPath, "topics");
@@ -76,7 +76,7 @@ export const kmpStrategy = {
 
         console.log(`  Running KMP postDetect: Generate sidebar - ${repoPath}...`);
         const sidebarPath = path.join(repoPath, "mpd.tree");
-        const docType = repoPath.replace("-repo", "");
+        const docType = repoConfig.sidebarId;
         if (await fs.pathExists(sidebarPath)) {
             await generateSidebar(sidebarPath, docType);
         }
@@ -88,16 +88,16 @@ export const kmpStrategy = {
      */
     postTranslate: async (context, repoConfig) => {
         console.log(`  Copying KMP version file... `);
-        const versionFile = `variables/${repoConfig.path}/v.list`;
+        const versionFile = `variables/${repoConfig.cloneDir}/v.list`;
         if (await fs.pathExists(versionFile)) {
             await fs.copy(versionFile, "docs/.vitepress/variables/kmp.v.list", {overwrite: true});
             context.gitAddPaths.add("docs/.vitepress/variables/kmp.v.list")
-            console.log(`  Copying Kotlin version file finished - ${repoConfig.path}`);
+            console.log(`  Copying Kotlin version file finished - ${repoConfig.cloneDir}`);
         }
 
-        console.log(`  Handling KMP assets: Copying images - ${repoConfig.path}... `);
+        console.log(`  Handling KMP assets: Copying images - ${repoConfig.cloneDir}... `);
         const {src, dest} = repoConfig.assets;
-        const srcPath = path.join(repoConfig.path, src);
+        const srcPath = path.join(repoConfig.cloneDir, src);
         if (await fs.pathExists(srcPath)) {
             await fs.ensureDir(dest);
             await copyFlatten(srcPath, dest);

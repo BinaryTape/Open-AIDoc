@@ -2,7 +2,7 @@ import { execa } from "execa";
 import fs from "fs-extra";
 import { glob } from "glob";
 import { translateFiles, translateLocaleFiles } from "./translate.mjs";
-import { REPOS } from "./docs-repo-config.mjs";
+import { REPOS, validateRepos } from "./repos.config.mjs";
 
 const Logger = {
   info: (message) => console.log(`\n✅ ${message}`),
@@ -48,20 +48,24 @@ const files = {
 async function sync(context) {
   Logger.step("STAGE 1: Setting up repositories...");
   for (const repoConfig of context.repos) {
-    console.log(`\n--- Processing repository: ${repoConfig.name} ---`);
-    const repoExists = await fs.pathExists(repoConfig.path);
+    console.log(`\n--- Processing repository: ${repoConfig.id} (${repoConfig.docType}) ---`);
+    const repoExists = await fs.pathExists(repoConfig.cloneDir);
     const repoUrl = `https://github.com/${repoConfig.repo}.git`;
 
     if (!repoExists) {
       console.log(`Cloning full history of ${repoConfig.repo}...`);
-      await git.clone(repoUrl, repoConfig.path);
+      await git.clone(repoUrl, repoConfig.cloneDir);
     } else {
       console.log(
         `Repository ${repoConfig.repo} already exists, fetching latest changes...`
       );
-      await git.update(repoConfig.path, repoConfig.branch);
+      await git.update(repoConfig.cloneDir, repoConfig.branch);
     }
-    await repoConfig.strategy.postSync(repoConfig.path, context, repoConfig);
+    await repoConfig.syncStrategy.postSync(
+      repoConfig.cloneDir,
+      context,
+      repoConfig
+    );
   }
 }
 
@@ -72,9 +76,9 @@ async function detect(context) {
   Logger.step("STAGE 2: Detecting changes...");
   for (const repoConfig of context.repos) {
     const lastSha = await files.getLastCommitSha(repoConfig.lastCheckFile);
-    const currentSha = await git.getCurrentSha(repoConfig.path);
+    const currentSha = await git.getCurrentSha(repoConfig.cloneDir);
 
-    Logger.info(`Checking: ${repoConfig.name}`);
+    Logger.info(`Checking: ${repoConfig.id}`);
     Logger.dim(`Current SHA: ${currentSha}`);
     Logger.dim(`Last checked SHA: ${lastSha || "N/A"}`);
 
@@ -87,12 +91,12 @@ async function detect(context) {
           ? "First run, processing all doc files."
           : "Repository has changed, finding changed doc files."
       );
-      const docPatterns = repoConfig.strategy.getDocPatterns();
-      const allDocs = await files.find(repoConfig.path, docPatterns);
+      const docPatterns = repoConfig.syncStrategy.getDocPatterns();
+      const allDocs = await files.find(repoConfig.cloneDir, docPatterns);
       const changedDocs = isFirstRun
         ? allDocs
-        : (await git.getChangedFiles(repoConfig.path, lastSha)).filter((f) =>
-            allDocs.includes(f)
+        : (await git.getChangedFiles(repoConfig.cloneDir, lastSha)).filter(
+            (f) => allDocs.includes(f)
           );
 
       if (changedDocs.length > 0) {
@@ -103,7 +107,7 @@ async function detect(context) {
           files: changedDocs,
           newSha: currentSha,
         };
-        await repoConfig.strategy.postDetect(repoConfig, task);
+        await repoConfig.syncStrategy.postDetect(repoConfig, task);
         context.tasks.push(task);
       } else {
         Logger.dim("No relevant documents changed, updating checkpoint.");
@@ -128,17 +132,17 @@ async function translate(context) {
 
   for (const task of context.tasks) {
     const { repoConfig, files: filesToTranslate } = task;
-    Logger.info(`Processing task for: ${repoConfig.name}`);
+    Logger.info(`Processing task for: ${repoConfig.id}`);
 
     console.log("\n--- Starting translation process ---");
     console.log(
-      `Translating ${filesToTranslate} files for ${repoConfig.name}...`
+      `Translating ${filesToTranslate.length} files for ${repoConfig.id} (${repoConfig.docType})...`
     );
 
     const translatedPaths = await translateFiles(repoConfig, filesToTranslate);
     translatedPaths.forEach((p) => context.gitAddPaths.add(p));
 
-    await repoConfig.strategy.postTranslate(context, repoConfig);
+    await repoConfig.syncStrategy.postTranslate(context, repoConfig);
 
     await fs.outputFile(repoConfig.lastCheckFile, task.newSha);
     context.gitAddPaths.add(repoConfig.lastCheckFile);
@@ -184,7 +188,7 @@ async function commit(context) {
     return;
   }
 
-  const updatedRepos = context.tasks.map((t) => t.repoConfig.name).join(", ");
+  const updatedRepos = context.tasks.map((t) => t.repoConfig.id).join(", ");
   const commitMessage = `docs: [${updatedRepos}] Sync and translate upstream documentation`;
 
   await execa("git", [
@@ -206,6 +210,8 @@ async function commit(context) {
 
 async function main() {
   Logger.info("Starting Documentation Synchronization Workflow...");
+  validateRepos(REPOS);
+
   const context = {
     repos: REPOS,
     tasks: [],

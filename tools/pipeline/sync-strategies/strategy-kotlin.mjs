@@ -21,7 +21,7 @@ export const kotlinStrategy = {
      * @override
      */
     postDetect: async (repoConfig, task) => {
-        const repoPath = repoConfig.path;
+        const repoPath = repoConfig.cloneDir;
 
         console.log(`  Running Kotlin postDetect: Flattening directory - ${repoPath}...`);
         const originDocsPath = path.join(repoPath, "docs/topics");
@@ -68,13 +68,13 @@ export const kotlinStrategy = {
         console.log(`  Running Kotlin postDetect: Generate sidebar - ${repoPath}...`);
         const sidebarFile = docs.filter(doc => doc.endsWith(".tree"));
         const sidebarPath = path.join(docsPath, sidebarFile[0]);
-        const docType = repoPath.replace("-repo", "");
+        const docType = repoConfig.sidebarId;
         if (await fs.pathExists(sidebarPath)) {
             await generateSidebar(sidebarPath, docType);
         }
         console.log(`  Generate sidebar finished - ${repoPath}`);
 
-        if (repoPath === "kotlin-repo") {
+        if (repoConfig.id === "kotlin-web-site") {
             console.log(`  Running Kotlin postDetect: Resolve includes`);
             const includeMD = path.join(docsPath, "kotlin-language-features-and-proposals.md");
             let content = await fs.readFile(includeMD, "utf8");
@@ -100,9 +100,9 @@ export const kotlinStrategy = {
     postTranslate: async (context, repoConfig) => {
         await copyKotlinVersionFile(context, repoConfig);
 
-        console.log(`  Handling Kotlin assets: Copying images - ${repoConfig.path}... `);
+        console.log(`  Handling Kotlin assets: Copying images - ${repoConfig.cloneDir}... `);
         const {src, dest} = repoConfig.assets;
-        const srcPath = path.join(repoConfig.path, src);
+        const srcPath = path.join(repoConfig.cloneDir, src);
         if (await fs.pathExists(srcPath)) {
             await fs.ensureDir(dest);
             await copyFlatten(srcPath, dest);
@@ -116,12 +116,12 @@ export const kotlinStrategy = {
 };
 
 async function copyKotlinVersionFile(context, repoConfig) {
-    if (!context || repoConfig?.path !== "kotlin-repo") return;
+    if (!context || repoConfig?.id !== "kotlin-web-site") return;
 
     console.log(`  Copying Kotlin version file...`);
     const versionFileCandidates = [
-        "kotlin-repo/docs/v.list",
-        "kotlin-repo/docs/variables/v.list",
+        `${repoConfig.cloneDir}/docs/v.list`,
+        `${repoConfig.cloneDir}/docs/variables/v.list`,
     ];
     const versionFile = versionFileCandidates.find((candidate) => fs.pathExistsSync(candidate));
     if (!versionFile) {
@@ -131,5 +131,5 @@ async function copyKotlinVersionFile(context, repoConfig) {
 
     await fs.copy(versionFile, "docs/.vitepress/variables/kotlin.v.list", {overwrite: true});
     context.gitAddPaths.add("docs/.vitepress/variables/kotlin.v.list");
-    console.log(`  Copying Kotlin version file finished - ${repoConfig.path}`);
+    console.log(`  Copying Kotlin version file finished - ${repoConfig.cloneDir}`);
 }

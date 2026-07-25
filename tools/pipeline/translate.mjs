@@ -688,12 +688,12 @@ async function retry(fn, attempts = 3) {
 }
 
 export async function translateFiles(repoConfig, files) {
-  console.log(`Translating ${files.length} files for ${repoConfig.name}...`);
+  console.log(`Translating ${files.length} files for ${repoConfig.id} (${repoConfig.docType})...`);
 
   // Set environment variables
-  process.env.DOC_TYPE = repoConfig.name;
-  process.env.REPO_PATH = repoConfig.path;
-  process.env.DOC_PATH = repoConfig.docPath;
+  process.env.DOC_TYPE = repoConfig.docType;
+  process.env.REPO_PATH = repoConfig.cloneDir;
+  process.env.DOC_PATH = repoConfig.sourceDocRoot;
 
   const limit = pLimit(10);
   const translationTasks = files.map((file) =>
