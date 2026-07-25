@@ -65,7 +65,7 @@ onMounted(() => {
         transformers: [
           {
             pre(node) {
-              node.properties.class += ' shiki-themes vp-code'
+              node.properties.class += ' shiki-themes'
               node.properties.style = null
               return node
             }
@@ -79,7 +79,7 @@ onMounted(() => {
         transformers: [
           {
             pre(node) {
-              node.properties.class += ' shiki-themes vp-code'
+              node.properties.class += ' shiki-themes'
               node.properties.style = null
               return node
             }
@@ -92,7 +92,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div :class="`language-${lang} vp-adaptive-theme`">
+  <div :class="`language-${lang}`">
     <button title="复制代码" class="copy"></button>
     <span class="lang">{{ lang }}</span>
     <div v-html="highlightedCode"/>

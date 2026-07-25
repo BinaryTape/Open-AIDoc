@@ -185,7 +185,7 @@ em {
  * Component: code
  * -------------------------------------------------------------------------- */
 
-.vp-code {
+.vp-doc .shiki {
   scrollbar-width: thin;
 }
 
