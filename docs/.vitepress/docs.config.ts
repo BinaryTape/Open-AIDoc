@@ -1,4 +1,6 @@
 import { coilRewriteHref } from "./rewrite/coil-rewrite-strategy";
+import {koinRewriteHref} from "./rewrite/koin-rewrite-strategy";
+import {kotlinRewriteHref} from "./rewrite/kotlin-rewrite-strategy";
 import {koogRewriteHref} from "./rewrite/koog-rewrite-strategy";
 import {ktorRewriteHref} from "./rewrite/ktor-rewrite-strategy";
 import {kmpRewriteHref} from "./rewrite/kmp-rewrite-strategy";
@@ -15,13 +17,15 @@ export const DocsTypeConfig: { [key: string]: DocsItemConfig } = {
         type: "koin",
         title: "Koin",
         path: "/koin/",
-        framework: "Docusaurus"
+        framework: "Docusaurus",
+        rewriteHref: koinRewriteHref
     },
     kotlin: {
         type: "kotlin",
         title: "Kotlin",
         path: "/kotlin/",
-        framework: "Writerside"
+        framework: "Writerside",
+        rewriteHref: kotlinRewriteHref
     },
     ktor: {
         type: "ktor",

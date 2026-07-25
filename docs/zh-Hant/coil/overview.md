@@ -1,4 +1,4 @@
-![Coil](logo.svg)
+![Coil](/coil/coil_full_colored.svg)
 
 專為 [Android](https://www.android.com/) 與 [Compose Multiplatform](https://www.jetbrains.com/lp/compose-multiplatform/) 設計的圖片載入程式庫。Coil 具有以下特點：
 

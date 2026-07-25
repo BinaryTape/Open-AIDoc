@@ -1,35 +1,53 @@
-<script setup lang="ts">
+<script lang="ts">
+import { defineComponent, h, type VNode } from 'vue'
+import TopicTitle from './TopicTitle.vue'
 
-import {useSlots, type VNode} from "vue";
-import TopicTitle from "./TopicTitle.vue";
+export default defineComponent({
+  name: 'WritersideTopic',
+  props: {
+    title: {
+      type: String,
+      required: true
+    }
+  },
+  setup(props, { slots }) {
+    return () => {
+      let isStartingPage = false
+      let labelRef = ''
+      const contentNodes = (slots.default?.() ?? []).filter((vnode: VNode) => {
+        if (isComponentNamed(vnode, 'Page', 'SectionStartingPage')) {
+          isStartingPage = true
+        }
+        if (isHtmlElement(vnode, 'primary-label')) {
+          labelRef = vnode.props?.ref?.toString() ?? ''
+        }
 
-const slots = useSlots()
+        // Writerside sometimes emits a direct <title> child in addition to the
+        // topic title attribute. It is metadata, not valid page-body HTML.
+        return !isHtmlElement(vnode, 'title')
+      })
 
-const props = defineProps({
-  title: {
-    type: String,
-    required: true
+      return [
+        isStartingPage
+          ? null
+          : h(TopicTitle, { labelRef, title: props.title }),
+        ...contentNodes
+      ]
+    }
   }
 })
 
-let isStartingPage = false
-let ref = ''
+function isHtmlElement(vnode: VNode, name: string) {
+  return typeof vnode.type === 'string' &&
+    vnode.type.toLowerCase() === name.toLowerCase()
+}
 
-slots.default?.()?.forEach((vnode: VNode) => {
-  if (typeof vnode.type === 'object' && vnode.type.__name === 'Page') {
-    isStartingPage = true;
+function isComponentNamed(vnode: VNode, ...names: string[]) {
+  if (typeof vnode.type !== 'object' && typeof vnode.type !== 'function') {
+    return false
   }
-  if (typeof vnode.type === 'string' && vnode.type.toLowerCase() === 'primary-label') {
-    ref = vnode.props['ref'].toString()
-  }
-})
+
+  const component = vnode.type as { name?: string; __name?: string }
+  return names.includes(component.name ?? '') || names.includes(component.__name ?? '')
+}
 </script>
-
-<template>
-  <TopicTitle v-if="!isStartingPage" :labelRef="ref" :title="props.title"/>
-  <slot/>
-</template>
-
-<style scoped>
-
-</style>

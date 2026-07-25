@@ -1,22 +1,25 @@
-<script setup lang="ts">
-import { useSlots, type VNode } from 'vue'
+<script lang="ts">
+import { defineComponent, h, type VNode } from 'vue'
 
-const slots = useSlots()
+export default defineComponent({
+  name: 'SectionStartingPage',
+  setup(_, { slots }) {
+    return () => {
+      let titleContent = ''
+      const contentNodes = (slots.default?.() ?? []).filter((vnode: VNode) => {
+        if (typeof vnode.type !== 'string' || vnode.type.toLowerCase() !== 'title') {
+          return true
+        }
 
-let titleContent = ''
+        titleContent = typeof vnode.children === 'string' ? vnode.children : ''
+        return false
+      })
 
-slots.default?.()?.forEach((vnode: VNode) => {
-  const children = vnode.children
-
-  if (typeof vnode.type === 'string' && vnode.type.toLowerCase() === 'title') {
-    titleContent = typeof children === 'string' ? children : ''
+      return h('div', { class: 'page' }, [
+        titleContent ? h('h1', { class: 'page-title' }, titleContent) : null,
+        ...contentNodes
+      ])
+    }
   }
 })
 </script>
-
-<template>
-  <div class="page">
-    <h1 v-if="titleContent" class="page-title">{{ titleContent }}</h1>
-    <slot/>
-  </div>
-</template>

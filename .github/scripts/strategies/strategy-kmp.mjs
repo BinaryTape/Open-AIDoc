@@ -45,6 +45,19 @@ export const kmpStrategy = {
             await processTopicFileAsync(topicPath, docsPath)
             await fs.remove(topicPath);
         }
+
+        // Empty Markdown destinations become a misleading self-link (`./index`)
+        // in VitePress. Retain placeholder labels as text until upstream
+        // supplies a real destination.
+        const processedDocs = await fs.readdir(docsPath);
+        for (const doc of processedDocs.filter(file => file.endsWith(".md"))) {
+            const docPath = path.join(docsPath, doc);
+            const content = await fs.readFile(docPath, "utf8");
+            const withoutEmptyLinks = content.replace(/\[([^\]]+)]\(\)/g, "$1");
+            if (withoutEmptyLinks !== content) {
+                await fs.writeFile(docPath, withoutEmptyLinks, "utf8");
+            }
+        }
         console.log(`  Convert topic files finished - ${repoPath}`);
 
         console.log(` Running KMP postDetect: Change detected path - ${repoPath}`);

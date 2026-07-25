@@ -1,53 +1,63 @@
-<script setup lang="ts">
-import { useSlots, type VNode } from 'vue'
-import Card from "./Card.vue";
+<script lang="ts">
+import { defineComponent, h, type VNode } from 'vue'
+import Card from './Card.vue'
 
-const slots = useSlots()
+export default defineComponent({
+  name: 'TopicCardSection',
+  setup(_, { slots }) {
+    return () => {
+      let titleContent = ''
+      const links: Array<{
+        summary?: string
+        content: string
+        href?: string
+      }> = []
 
-export interface SectionLink {
-  summary?: string
-  content?: string
-  href?: string
-}
+      const contentNodes = (slots.default?.() ?? []).filter((vnode: VNode) => {
+        if (typeof vnode.type !== 'string') return true
 
-const links: SectionLink[] = []
+        const elementName = vnode.type.toLowerCase()
+        if (elementName === 'title') {
+          titleContent = textContent(vnode.children)
+          return false
+        }
 
-let titleContent = ''
+        if (elementName === 'a') {
+          links.push({
+            summary: vnode.props?.summary,
+            href: vnode.props?.href,
+            content: textContent(vnode.children)
+          })
+          return false
+        }
 
-slots.default?.()?.forEach((vnode: VNode) => {
-  const props = vnode.props as Record<string, any>
-  const children = vnode.children
+        return true
+      })
 
-  if (typeof vnode.type === 'string' && vnode.type.toLowerCase() === 'title') {
-    titleContent = typeof children === 'string' ? children : ''
-  }
+      const cards = links.length > 0
+        ? links.map((link) => h(
+            Card,
+            { href: link.href, summary: link.summary },
+            { default: () => link.content }
+          ))
+        : contentNodes
 
-  if (typeof vnode.type === 'string' && vnode.type.toLowerCase() === 'a') {
-    links.push({
-      summary: props?.summary,
-      href: props?.href,
-      content: typeof children === 'string'
-          ? children
-          : Array.isArray(children)
-              ? children.map(c => typeof c === 'string' ? c : '').join('')
-              : ''
-    })
+      return h('div', { class: 'ws-section' }, [
+        titleContent
+          ? h('h2', { class: 'ws-section-title' }, titleContent)
+          : null,
+        h('div', { class: 'ws-row' }, cards)
+      ])
+    }
   }
 })
+
+function textContent(children: VNode['children']) {
+  if (typeof children === 'string') return children
+  if (!Array.isArray(children)) return ''
+  return children.map((child) => typeof child === 'string' ? child : '').join('')
+}
 </script>
-
-
-<template>
-  <div class="ws-section">
-    <h2 v-if="titleContent" class="ws-section-title">{{ titleContent }}</h2>
-    <div class="ws-row">
-      <template v-if="links.length > 0" v-for="(link, index) in links">
-        <Card :href="link.href" :summary="link.summary"> {{ link.content }} </Card>
-      </template>
-      <slot v-else/>
-    </div>
-  </div>
-</template>
 
 <style scoped>
 .ws-section {
@@ -76,5 +86,4 @@ slots.default?.()?.forEach((vnode: VNode) => {
 .ws-row > :nth-of-type(2n) {
   margin-left: 16px;
 }
-
 </style>

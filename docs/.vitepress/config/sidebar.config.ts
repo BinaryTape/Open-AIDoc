@@ -12,7 +12,8 @@ export default function generateSidebar(localeConfig: SideLocaleConfig, docsConf
 }
 
 function generateSidebarNode(lang: string, framework: string, type: string, sidebarPrefixDir: string, relativePrefixDir: string) {
-    const sidebar = JSON.parse(fs.readFileSync(`docs/.vitepress/sidebar/${type}.sidebar.json`, 'utf8'));
+    const sidebarPath = `docs/.vitepress/sidebar/${type}.sidebar.json`;
+    const sidebar = JSON.parse(fs.readFileSync(sidebarPath, 'utf8'));
     const locale: Record<string, string> = JSON.parse(fs.readFileSync(`docs/.vitepress/locales/${lang}.json`, 'utf8'));
 
     const localizeNode = (node): any => {
@@ -28,7 +29,25 @@ function generateSidebarNode(lang: string, framework: string, type: string, side
         };
 
         if (node.include) {
-            out.items = generateSidebarNode(lang, framework, node.include, sidebarPrefixDir, relativePrefixDir);
+            const includedSidebarPath = `docs/.vitepress/sidebar/${node.include}.sidebar.json`;
+            const fallbackDocPath = path.join(relativePrefixDir, `${node.include}.md`);
+
+            if (fs.existsSync(includedSidebarPath)) {
+                out.items = generateSidebarNode(lang, framework, node.include, sidebarPrefixDir, relativePrefixDir);
+            } else if (fs.existsSync(fallbackDocPath)) {
+                // Some upstream Writerside trees reference an optional child
+                // documentation set that is not part of this repository. Keep
+                // the existing local overview page reachable instead of
+                // making the whole site configuration fail to load.
+                out.link = `${sidebarPrefixDir}${node.include}`;
+                delete out.include;
+                delete out.items;
+            } else {
+                throw new Error(
+                    `Sidebar "${type}" includes missing sidebar "${node.include}" ` +
+                    `and no fallback document exists at "${fallbackDocPath}".`
+                );
+            }
         } else if (Array.isArray(node.items)) {
             out.items = node.items.map(localizeNode);
         } else {

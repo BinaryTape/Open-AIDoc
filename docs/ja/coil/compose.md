@@ -166,7 +166,7 @@ Image(
 )
 ```
 
-完全な `AnimatedContent` の例については、[Compose AnimatedContent](/coil/recipes/#compose-animatedcontent) を参照してください。
+完全な `AnimatedContent` の例については、[Compose AnimatedContent](/coil/recipes#compose-animatedcontent) を参照してください。
 
 ## プレビュー (Previews)
 

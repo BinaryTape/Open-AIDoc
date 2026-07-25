@@ -37,6 +37,17 @@ export const coilStrategy = {
           //'coil-repo\\docs\\videos.md'
           const dest = path.join(repoPath, extraFilesMapping.get(file));
           await fs.copy(src, dest);
+
+          let content = await fs.readFile(dest, "utf8");
+          if (file === "README.md") {
+            content = content.replace(
+                /(!\[[^\]]*]\()logo\.svg(\))/,
+                "$1/coil/coil_full_colored.svg$2"
+              );
+          }
+          content = content.replaceAll("/coil/recipes/#", "/coil/recipes#");
+          await fs.writeFile(dest, content, "utf8");
+
           return extraFilesMapping.get(file);
         }
         return file;

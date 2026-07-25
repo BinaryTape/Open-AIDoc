@@ -1,4 +1,4 @@
-![Coil](logo.svg)
+![Coil](/coil/coil_full_colored.svg)
 
 [Android](https://www.android.com/) 및 [Compose Multiplatform](https://www.jetbrains.com/lp/compose-multiplatform/)을 위한 이미지 로딩 라이브러리입니다. Coil은 다음과 같은 특징이 있습니다:
 

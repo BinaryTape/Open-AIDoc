@@ -166,7 +166,7 @@ Image(
 )
 ```
 
-有关完整的 `AnimatedContent` 示例，请参阅 [Compose AnimatedContent](/coil/recipes/#compose-animatedcontent)。
+有关完整的 `AnimatedContent` 示例，请参阅 [Compose AnimatedContent](/coil/recipes#compose-animatedcontent)。
 
 ## 预览
 
