@@ -18,38 +18,31 @@
     "kotlin-cn:preview": "pnpm kotlin-cn:prepare && vitepress preview sites/kotlin-cn",
     "translate": "node --import tsx --watch translate-tool/server.mjs"
   },
-  "pnpm": {
-    "overrides": {
-      "vite": "npm:rolldown-vite@latest"
-    }
-  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "devDependencies": {
-    "@google/genai": "^1.42.0",
+    "@google/genai": "^2.13.0",
     "@mdit-vue/shared": "^3.0.2",
-    "@types/node": "^25.3.0",
-    "@vueuse/core": "^14.2.1",
-    "execa": "^9.6.0",
-    "express": "^5.1.0",
-    "fs-extra": "^11.3.0",
+    "@types/node": "^25.9.5",
+    "@vueuse/core": "^14.3.0",
+    "express": "^5.2.1",
+    "fs-extra": "^11.4.0",
     "glob": "13.0.6",
     "gray-matter": "^4.0.3",
     "js-yaml": "4.1.1",
-    "markdown-it": "14.1.1",
+    "markdown-it": "14.3.0",
     "markdown-it-container": "^4.0.0",
     "markdown-it-footnote": "^4.0.0",
-    "oxc-minify": "^0.115.0",
-    "p-limit": "^7.3.0",
+    "p-limit": "^7.3.1",
     "shiki": "^3.23.0",
-    "tsx": "^4.19.0",
-    "vitepress": "^2.0.0-alpha.16",
+    "tsx": "^4.23.1",
+    "vitepress": "^2.0.0-alpha.18",
     "xml2js": "^0.6.2"
   },
   "dependencies": {
     "aos": "^2.3.4",
-    "vue": "^3.5.39"
+    "vue": "^3.5.40"
   }
 }

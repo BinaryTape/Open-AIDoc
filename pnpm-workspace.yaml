@@ -1,0 +1,13 @@
+# Single-package repo; settings live here for pnpm 11+
+packages:
+  - '.'
+
+allowBuilds:
+  '@google/genai': true
+  esbuild: true
+  protobufjs: true
+
+onlyBuiltDependencies:
+  - esbuild
+  - protobufjs
+  - '@google/genai'
