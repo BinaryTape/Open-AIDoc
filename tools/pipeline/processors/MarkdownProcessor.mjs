@@ -4,7 +4,8 @@ import {
     getChapterTitle,
     getTopicTitle,
     processTopicContentAsync,
-    replaceAsync
+    replaceAsync,
+    resolveCodeSnippetsDir,
 } from "./TopicProcessor.mjs";
 import path from "node:path";
 
@@ -37,7 +38,7 @@ export async function processMarkdownContent(filePath, content) {
 
                 const include_lines = /include-lines="([^"]+)"/.exec(attr);
                 const ranges = include_lines ? include_lines[1].split(',') : [];
-                const snippetsPath = path.join(filePath.split('/')[0], "codeSnippets");
+                const snippetsPath = resolveCodeSnippetsDir(path.dirname(filePath));
 
                 let code = await fetchSnippet(snippetsPath, src[1], ranges);
                 let lines = code.split("\n");
