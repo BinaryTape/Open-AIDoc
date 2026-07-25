@@ -10,8 +10,8 @@ import {
   splitLocalePath,
   toContentRelPath,
   toContentUrl,
-} from './content-paths'
-import { DEFAULT_LOCALE, isDefaultLocale } from './locales'
+} from '../shared/content-paths'
+import { DEFAULT_LOCALE, isDefaultLocale } from '../shared/locales'
 
 describe('normalizePosixPath', () => {
   it('converts backslashes to forward slashes', () => {
