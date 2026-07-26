@@ -191,15 +191,29 @@ async function commit(context) {
   const updatedRepos = context.tasks.map((t) => t.repoConfig.id).join(", ");
   const commitMessage = `docs: [${updatedRepos}] Sync and translate upstream documentation`;
 
-  await execa("git", [
-    "-c",
-    `user.name=${process.env.GIT_AUTHOR_NAME}`,
-    "-c",
-    `user.email=${process.env.GIT_AUTHOR_EMAIL}`,
-    "commit",
-    "-m",
-    commitMessage,
-  ]);
+  const authorName = process.env.GIT_AUTHOR_NAME;
+  const authorEmail = process.env.GIT_AUTHOR_EMAIL;
+  if (!authorName || !authorEmail) {
+    throw new Error(
+      "GIT_AUTHOR_NAME and GIT_AUTHOR_EMAIL must be set for sync commits"
+    );
+  }
+  const committerName = process.env.GIT_COMMITTER_NAME || authorName;
+  const committerEmail = process.env.GIT_COMMITTER_EMAIL || authorEmail;
+
+  await execa(
+    "git",
+    ["-c", `user.name=${committerName}`, "-c", `user.email=${committerEmail}`, "commit", "-m", commitMessage],
+    {
+      env: {
+        ...process.env,
+        GIT_AUTHOR_NAME: authorName,
+        GIT_AUTHOR_EMAIL: authorEmail,
+        GIT_COMMITTER_NAME: committerName,
+        GIT_COMMITTER_EMAIL: committerEmail,
+      },
+    }
+  );
 
   const branchName = process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME;
   if (!branchName) throw new Error("Could not determine branch to push to.");
