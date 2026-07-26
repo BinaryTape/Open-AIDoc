@@ -37,42 +37,32 @@
     <chapter title="限制" id="limitations">
         自动重载仅适用于特定的模块声明。下表显示了跨版本的支持情况：
         <table>
-            
 <tr>
 <td>模块类型</td>
-                <td>&lt;= 3.2</td>
-                <td>&gt; 3.2</td>
+<td>&lt;= 3.2</td>
+<td>&gt; 3.2</td>
 </tr>
-
-            
 <tr>
 <td>Lambda 初始值设定项</td>
-                <td>❌ 不支持</td>
-                <td>❌ 不支持</td>
+<td>❌ 不支持</td>
+<td>❌ 不支持</td>
 </tr>
-
-            
 <tr>
 <td>阻塞函数引用</td>
-                <td>✅ 支持</td>
-                <td>❌ 不支持</td>
+<td>✅ 支持</td>
+<td>❌ 不支持</td>
 </tr>
-
-            
 <tr>
 <td>挂起函数引用</td>
-                <td>❌ 不支持</td>
-                <td>✅ 支持</td>
+<td>❌ 不支持</td>
+<td>✅ 支持</td>
 </tr>
-
-            
 <tr>
 <td>配置引用</td>
-                <td>✅ 支持</td>
-                <td>✅ 支持</td>
+<td>✅ 支持</td>
+<td>✅ 支持</td>
 </tr>
-
-        </table>
+</table>
         <chapter title="支持" id="supported">
             <code-block lang="kotlin" code="                // 挂起函数引用&#10;                embeddedServer(Netty, port = 8080, module = Application::mySuspendModule)&#10;&#10;                // 配置引用&#10;                ktor {&#10;                    application {&#10;                        modules = [ com.example.ApplicationKt.mySuspendModule ]&#10;                    }&#10;                }"/>
         </chapter>

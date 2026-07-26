@@ -37,42 +37,32 @@
     <chapter title="제한 사항" id="limitations">
         오토 리로드는 특정 모듈 선언에서만 작동합니다. 다음 표는 버전별 지원 여부를 보여줍니다.
         <table>
-            
 <tr>
 <td>모듈 유형</td>
-                <td>&lt;= 3.2</td>
-                <td>&gt; 3.2</td>
+<td>&lt;= 3.2</td>
+<td>&gt; 3.2</td>
 </tr>
-
-            
 <tr>
 <td>람다 초기화(Lambda initializer)</td>
-                <td>❌ 지원되지 않음</td>
-                <td>❌ 지원되지 않음</td>
+<td>❌ 지원되지 않음</td>
+<td>❌ 지원되지 않음</td>
 </tr>
-
-            
 <tr>
 <td>블로킹 함수 참조(Blocking function reference)</td>
-                <td>✅ 지원됨</td>
-                <td>❌ 지원되지 않음</td>
+<td>✅ 지원됨</td>
+<td>❌ 지원되지 않음</td>
 </tr>
-
-            
 <tr>
 <td>서스펜드 함수 참조(Suspend function reference)</td>
-                <td>❌ 지원되지 않음</td>
-                <td>✅ 지원됨</td>
+<td>❌ 지원되지 않음</td>
+<td>✅ 지원됨</td>
 </tr>
-
-            
 <tr>
 <td>설정 참조(Config reference)</td>
-                <td>✅ 지원됨</td>
-                <td>✅ 지원됨</td>
+<td>✅ 지원됨</td>
+<td>✅ 지원됨</td>
 </tr>
-
-        </table>
+</table>
         <chapter title="지원됨" id="supported">
             <code-block lang="kotlin" code="                // Suspend function reference&#10;                embeddedServer(Netty, port = 8080, module = Application::mySuspendModule)&#10;&#10;                // Configuration reference&#10;                ktor {&#10;                    application {&#10;                        modules = [ com.example.ApplicationKt.mySuspendModule ]&#10;                    }&#10;                }"/>
         </chapter>

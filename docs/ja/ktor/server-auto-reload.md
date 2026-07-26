@@ -37,42 +37,32 @@
 <chapter title="制限事項" id="limitations">
     オートリロードは特定のモジュール宣言に対してのみ機能します。以下の表は、バージョンごとのサポート状況を示しています。
     <table>
-        
 <tr>
 <td>モジュールの種類</td>
-            <td>&lt;= 3.2</td>
-            <td>&gt; 3.2</td>
+<td>&lt;= 3.2</td>
+<td>&gt; 3.2</td>
 </tr>
-
-        
 <tr>
 <td>ラムダ初期化子 (Lambda initializer)</td>
-            <td>❌ サポートされていません</td>
-            <td>❌ サポートされていません</td>
+<td>❌ サポートされていません</td>
+<td>❌ サポートされていません</td>
 </tr>
-
-        
 <tr>
 <td>ブロッキング関数の参照</td>
-            <td>✅ サポートされています</td>
-            <td>❌ サポートされていません</td>
+<td>✅ サポートされています</td>
+<td>❌ サポートされていません</td>
 </tr>
-
-        
 <tr>
 <td>サスペンド関数の参照</td>
-            <td>❌ サポートされていません</td>
-            <td>✅ サポートされています</td>
+<td>❌ サポートされていません</td>
+<td>✅ サポートされています</td>
 </tr>
-
-        
 <tr>
 <td>設定の参照 (Config reference)</td>
-            <td>✅ サポートされています</td>
-            <td>✅ サポートされています</td>
+<td>✅ サポートされています</td>
+<td>✅ サポートされています</td>
 </tr>
-
-    </table>
+</table>
     <chapter title="サポートされている形式" id="supported">
         <code-block lang="kotlin" code="                // Suspend function reference&#10;                embeddedServer(Netty, port = 8080, module = Application::mySuspendModule)&#10;&#10;                // Configuration reference&#10;                ktor {&#10;                    application {&#10;                        modules = [ com.example.ApplicationKt.mySuspendModule ]&#10;                    }&#10;                }"/>
     </chapter>

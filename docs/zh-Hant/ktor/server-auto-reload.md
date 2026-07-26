@@ -37,42 +37,32 @@
     <chapter title="限制" id="limitations">
         自動重新載入僅適用於特定的模組宣告。下表顯示了不同版本的支援情況：
         <table>
-            
 <tr>
 <td>模組類型</td>
-                <td>&lt;= 3.2</td>
-                <td>&gt; 3.2</td>
+<td>&lt;= 3.2</td>
+<td>&gt; 3.2</td>
 </tr>
-
-            
 <tr>
 <td>Lambda 初始設定式</td>
-                <td>❌ 不支援</td>
-                <td>❌ 不支援</td>
+<td>❌ 不支援</td>
+<td>❌ 不支援</td>
 </tr>
-
-            
 <tr>
 <td>阻塞函式參考 (Blocking function reference)</td>
-                <td>✅ 已支援</td>
-                <td>❌ 不支援</td>
+<td>✅ 已支援</td>
+<td>❌ 不支援</td>
 </tr>
-
-            
 <tr>
 <td>掛起函式參考 (Suspend function reference)</td>
-                <td>❌ 不支援</td>
-                <td>✅ 已支援</td>
+<td>❌ 不支援</td>
+<td>✅ 已支援</td>
 </tr>
-
-            
 <tr>
 <td>組態參考 (Config reference)</td>
-                <td>✅ 已支援</td>
-                <td>✅ 已支援</td>
+<td>✅ 已支援</td>
+<td>✅ 已支援</td>
 </tr>
-
-        </table>
+</table>
         <chapter title="已支援" id="supported">
             <code-block lang="kotlin" code="                // 掛起函式參考&#10;                embeddedServer(Netty, port = 8080, module = Application::mySuspendModule)&#10;&#10;                // 組態參考&#10;                ktor {&#10;                    application {&#10;                        modules = [ com.example.ApplicationKt.mySuspendModule ]&#10;                    }&#10;                }"/>
         </chapter>
