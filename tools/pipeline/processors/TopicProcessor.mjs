@@ -203,7 +203,7 @@ export async function processTopicContentAsync(currentFilePath, docsPath, topicC
                 ranges = inc[1].split(',');
             }
 
-            const snippetsPath = path.join(docsPath.split('/')[0], 'codeSnippets');
+            const snippetsPath = resolveCodeSnippetsDir(docsPath);
             let codeText = await fetchSnippet(snippetsPath, srcPath, ranges);
 
             codeText = codeText.replace(/^\s*\n/, '').replace(/\n\s*$/, '');
@@ -236,7 +236,7 @@ export async function processTopicContentAsync(currentFilePath, docsPath, topicC
                 const src = /src="([^"]+)"/.exec(rawAttrs);
                 const include_lines = /include-lines="([^"]+)"/.exec(rawAttrs);
                 const ranges = include_lines ? include_lines[1].split(',') : [];
-                const snippetsPath = path.join(docsPath.split('/')[0], "codeSnippets");
+                const snippetsPath = resolveCodeSnippetsDir(docsPath);
                 rawCode = await fetchSnippet(snippetsPath, src[1], ranges);
                 rawAttrs = rawAttrs.replace(/\s+src="[^"]+"/, '')
                     .replace(/\s+include-lines="[^"]+"/, '')
@@ -305,6 +305,14 @@ function removeMinimalIndention(content, indention) {
     lines = lines.map(line => indention + line.slice(minIndent));
 
     return lines.join('\n');
+}
+
+/**
+ * Resolve codeSnippets/ next to the Writerside topics/docs directory.
+ * Works for both absolute and relative paths (unlike path.split('/')[0]).
+ */
+export function resolveCodeSnippetsDir(topicsOrDocsDir) {
+    return path.resolve(topicsOrDocsDir, '..', 'codeSnippets')
 }
 
 export async function fetchSnippet(snippetsPath, srcPath, include_lines) {
