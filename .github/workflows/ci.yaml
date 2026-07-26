@@ -14,10 +14,10 @@ permissions:
   contents: read
 
 jobs:
-  test:
-    name: All tests
+  unit-tests:
+    name: Unit tests
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -37,8 +37,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Unit tests
+      # Sidebar integrity, path/rewrite contracts, REPOS config.
+      # Full site build is handled by Cloudflare Pages.
+      - name: Run unit tests
         run: pnpm test
-
-      - name: Docs build + verify (including internal links)
-        run: pnpm docs:check
