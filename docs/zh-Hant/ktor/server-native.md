@@ -23,30 +23,34 @@ undefined
 
 ## 新增相依性 {id="add-dependencies"}
 
-在 Kotlin/Native 專案中，Ktor 伺服器至少需要兩個相依性：`ktor-server-core` 相依性以及引擎相依性 (CIO)。下方的程式碼片段顯示如何將相依性新增至 `build.gradle.kts` 檔案中的 `nativeMain` 原始碼集：
+在 Kotlin/Native 專案中，Ktor 伺服器至少需要兩個相依性：
+* `ktor-server-core`（核心相依性）
+* `ktor-server-cio`（CIO 引擎）
+
+下方的程式碼片段顯示如何將相依性新增至 <Path>build.gradle.kts</Path> 檔案中的 `nativeMain` 原始碼集：
 
 ```kotlin
-}
-sourceSets {
-    val nativeMain by getting {
-        dependencies {
+kotlin {
+    sourceSets {
+        nativeMain.dependencies {
             implementation("io.ktor:ktor-server-core:$ktor_version")
             implementation("io.ktor:ktor-server-cio:$ktor_version")
         }
     }
+}
 ```
 
 若要[測試](server-testing.md)原生伺服器，請將 `ktor-server-test-host` 構件新增至 `nativeTest` 原始碼集：
 
 ```kotlin
-}
-    }
-    val nativeTest by getting {
-        dependencies {
+kotlin {
+    sourceSets {
+        nativeTest.dependencies {
             implementation(kotlin("test"))
             implementation("io.ktor:ktor-server-test-host:$ktor_version")
         }
     }
+}
 ```
 
 ## 設定原生目標 {id="native-target"}
@@ -54,6 +58,8 @@ sourceSets {
 指定所需的原生目標，並使用 `binaries` 屬性[宣告原生二進位檔](https://kotlinlang.org/docs/mpp-build-native-binaries.html)：
 
 ```kotlin
+kotlin {
+    val hostOs = System.getProperty("os.name")
     val arch = System.getProperty("os.arch")
     val nativeTarget = when {
         hostOs == "Mac OS X" && arch == "x86_64" -> macosX64("native")
@@ -71,10 +77,14 @@ sourceSets {
                 entryPoint = "main"
             }
         }
+    }
+}
 ```
 
-您可以在此處找到完整的範例：[embedded-server-native](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/embedded-server-native)。
+> 有關完整的範例，請參閱 [embedded-server-native](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/embedded-server-native)。
+>
+{style="tip"}
 
-## 建立伺服器 {id="create-server"}
+## 後續步驟 {id="create-server"}
 
-設定完 Gradle 建置指令碼後，您可以按照此處的說明建立 Ktor 伺服器：[建立伺服器](server-create-and-configure.topic)。
+設定完 Gradle 建置指令碼後，您可以繼續[建立 Ktor 伺服器](server-create-and-configure.topic)。

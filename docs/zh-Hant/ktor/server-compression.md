@@ -71,7 +71,7 @@ Ktor 透過 [`Compression`](https://api.ktor.io/ktor-server-compression/io.ktor.
 ## 安裝 %plugin_name% {id="install_plugin"}
 
 <p>
-    要將 <code>%plugin_name%</code> 外掛程式安裝到應用程式，請將其傳遞給指定<Links href="/ktor/server-modules" summary="模組允許您透過分組路由來組織應用程式結構。">模組</Links>中的 <code>install</code> 函式。
+    要將 <code>%plugin_name%</code> 外掛程式<a href="#install">安裝</a>到應用程式，請將其傳遞給指定<Links href="/ktor/server-modules" summary="模組允許您透過分組路由來組織應用程式結構。">模組</Links>中的 <code>install</code> 函式。
     下方的程式碼片段展示了如何安裝 <code>%plugin_name%</code> ...
 </p>
 <list>
@@ -92,8 +92,6 @@ Ktor 透過 [`Compression`](https://api.ktor.io/ktor-server-compression/io.ktor.
 </Tabs>
 
 這會在伺服器上啟用 `gzip`、`deflate` 與 `identity` 編碼器。
-在下一章中，我們將了解如何僅啟用特定的編碼器並設定壓縮資料的條件。
-請注意，如有需要，每個新增的編碼器都將用於解壓縮請求主體。
 
 ## 設定壓縮設定 {id="configure"}
 
@@ -153,7 +151,7 @@ install(Compression) {
 
 ### 設定回應大小 {id="configure_response_size"}
 
-`%plugin_name%` 外掛程式允許您對大小不超過指定值的請求停用壓縮。要執行此操作，請將所需的值（以位元組為單位）傳遞給 `minimumSize` 函式：
+`%plugin_name%` 外掛程式允許您對大小不超過指定值的回應停用壓縮。要執行此操作，請將所需的值（以位元組為單位）傳遞給 `minimumSize` 函式：
 
 ```kotlin
     install(Compression) {
@@ -203,7 +201,20 @@ install(Compression) {
 }
 ```
 
+## 解壓縮 {id="decompression"}
+
+根據預設，`Compression` 外掛程式會壓縮伺服器回應。要啟用請求解壓縮，請將 `mode` 屬性設定為 `CompressionConfig.Mode.DecompressRequest`：
+
+```kotlin
+install(Compression) { 
+    mode = CompressionConfig.Mode.DecompressRequest
+    gzip()
+}
+```
+
+當啟用請求解壓縮時，外掛程式會在請求主體被其他接收轉換（例如反序列化與多部分處理 (multipart processing)）處理之前，使用設定的解碼器來解壓縮請求主體。
+
 ## 實作自訂編碼器 {id="custom_encoder"}
 
-如有必要，您透過實作 [ContentEncoder](https://api.ktor.io/ktor-utils/io.ktor.util/-content-encoder/index.html) 介面來提供自己的編碼器。
+如有必要，您可以透過實作 [ContentEncoder](https://api.ktor.io/ktor-utils/io.ktor.util/-content-encoder/index.html) 介面來提供自己的編碼器。
 請參閱 [GzipEncoder](https://github.com/ktorio/ktor/blob/b5b59ca3ae61601e6175f334e6a1252609638e61/ktor-server/ktor-server-plugins/ktor-server-compression/jvm/src/io/ktor/server/plugins/compression/Encoders.kt#L41) 作為實作範例。

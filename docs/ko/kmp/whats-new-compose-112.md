@@ -46,17 +46,16 @@ Compose Hot Reload에 이제 AI 코딩 에이전트가 실행 중인 Compose 애
 
 지금까지는 AI 에이전트가 Compose 코드를 수정하더라도 결과를 확인할 신뢰할 수 있는 방법이 없었습니다. 에이전트는 핫 리로드(hot reload) 성공 여부를 확인하거나 렌더링된 UI를 볼 수 없었으며, 런타임 로그나 예외를 읽을 수도 없었습니다. MCP 서버를 통해 에이전트는 수동 개입 없이도 리로드를 트리거하고, 스크린샷을 찍고, 시맨틱 트리(semantic tree)를 조사하고, 클릭 및 입력을 시뮬레이션하고, 애플리케이션 로그를 읽을 수 있습니다.
 
-애플리케이션과 함께 MCP 서버를 시작하려면 `hotMcpServerJvm` Gradle 태스크를 실행하세요. 
 AI 에이전트가 사용할 수 있는 MCP 도구의 전체 목록과 연결 방법은 [AI 에이전트를 위한 MCP 서버](compose-hot-reload.md#mcp-server-for-ai-agents)를 참고하세요.
 
 ## 의존성
 
 | 라이브러리 | Maven 좌표 | Jetpack 버전 기반 |
 |--------------------|------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------|
-| Runtime            | `org.jetbrains.compose.runtime:runtime*:1.12.0-beta02`                 | [Runtime 1.12.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.12.0-beta02)                     | 
-| UI                 | `org.jetbrains.compose.ui:ui*:1.12.0-beta02`                           | [UI 1.12.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.12.0-beta02)                               | 
-| Foundation         | `org.jetbrains.compose.foundation:foundation*:1.12.0-beta02`           | [Foundation 1.12.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.12.0-beta02)               |
-| Material           | `org.jetbrains.compose.material:material*:1.12.0-beta02`               | [Material 1.12.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-material#1.12.0-beta02)                   | 
+| Runtime            | `org.jetbrains.compose.runtime:runtime*:1.12.0-beta03`                 | [Runtime 1.12.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.12.0-beta02)                     |
+| UI                 | `org.jetbrains.compose.ui:ui*:1.12.0-beta03`                           | [UI 1.12.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.12.0-beta02)                               |
+| Foundation         | `org.jetbrains.compose.foundation:foundation*:1.12.0-beta03`           | [Foundation 1.12.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.12.0-beta02)               |
+| Material           | `org.jetbrains.compose.material:material*:1.12.0-beta03`               | [Material 1.12.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-material#1.12.0-beta02)                   |
 | Material3          | `org.jetbrains.compose.material3:material3*:1.12.0-alpha03`            | [Material3 1.5.0-alpha22](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.5.0-alpha22)                 |
 | Material3 Adaptive | `org.jetbrains.compose.material3.adaptive:adaptive*:1.3.0-beta02`      | [Material3 Adaptive 1.3.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.3.0-beta02) |
 | Lifecycle          | `org.jetbrains.androidx.lifecycle:lifecycle-*:2.11.0`                  | [Lifecycle 2.11.0](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.11.0)                                       | 

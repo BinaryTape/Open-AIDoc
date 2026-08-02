@@ -53,13 +53,13 @@ _現在、プレビューバージョンは利用できません。_
         <th>ビルドのハイライト</th>
     </tr>
     <tr>
-        <td><strong>2.4.20-Beta1</strong>
-            <p>リリース日: <strong>2026年6月24日</strong></p>
-            <p><a href="https://github.com/JetBrains/kotlin/releases/tag/v2.4.20-Beta1" target="_blank">GitHub でのリリース</a></p>
+        <td><strong>2.4.20-Beta2</strong>
+            <p>リリース日: <strong>2026年7月22日</strong></p>
+            <p><a href="https://github.com/JetBrains/kotlin/releases/tag/v2.4.20-Beta2" target="_blank">GitHub でのリリース</a></p>
         </td>
         <td>
             <p>パフォーマンスの向上、バグ修正、およびツールのアップデートを含むツールリリースです。</p>
-            <p>詳細については、<a href="https://github.com/JetBrains/kotlin/releases/tag/v2.4.20-Beta1">チェンジログ</a> または <a href="whatsnew-eap.md">Kotlin 2.4.20-Beta1 の新機能</a> を参照してください。</p>
+            <p>詳細については、<a href="https://github.com/JetBrains/kotlin/releases/tag/v2.4.20-Beta2">チェンジログ</a> または <a href="whatsnew-eap.md">Kotlin 2.4.20-Beta2 の新機能</a> を参照してください。</p>
         </td>
     </tr>
 </table>

@@ -9,7 +9,7 @@
 プラットフォーム固有の API を使用するコードを書く前に、代わりにマルチプラットフォームライブラリを使用できるかどうかを確認してください。
 このタイプのライブラリは、プラットフォームごとに異なる実装を持つ共通の Kotlin API を提供します。
 
-ネットワーク、ロギング、アナリティクスの実装や、デバイス機能へのアクセスなどに使用できるライブラリがすでに多数存在します。詳細については、[こちらのキュレートされたリスト](https://github.com/terrakok/kmm-awesome)を参照してください。
+ネットワーク、ロギング、アナリティクスの実装や、デバイス機能へのアクセスなどに使用できるライブラリがすでに多数存在します。Kotlin Multiplatform ライブラリの検索プラットフォームである [klibs.io](https://klibs.io) でライブラリを探してみてください。
 
 ## expect と actual による関数とプロパティ
 
@@ -48,7 +48,7 @@ actual fun randomUUID() = UUID.randomUUID().toString()
 ```
 
 ```kotlin
-// ios ソースセット内:
+// iOS ソースセット内:
 import platform.Foundation.NSUUID
 
 actual fun randomUUID(): String = NSUUID().UUIDString()

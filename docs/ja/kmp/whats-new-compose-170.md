@@ -347,6 +347,6 @@ Compose Multiplatform で構築された Kotlin/Wasm アプリケーションに
 `index.html` ファイルからこれを削除することで、アプリのロード時間を改善できます。
 `skiko.js` は、将来のリリースで Kotlin/Wasm 配布物から完全に削除される予定です。
 
-> Kotlin/JS アプリケーションでは、引き続き `skiko.js` ファイルが必要です。
+> `skiko.js` ファイルは、Compose Multiplatform 1.9.0 までは Kotlin/JS アプリケーションで引き続き必要です。いつ変更されたかについては、[Compose Multiplatform 1.9.3 の新機能](whats-new-compose-190.md#skiko-js-is-no-longer-needed) を参照してください。
 > 
 {style="note"}

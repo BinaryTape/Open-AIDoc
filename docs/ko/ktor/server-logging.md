@@ -43,7 +43,7 @@ Ktor는 사용하는 플랫폼에 따라 애플리케이션을 로깅하는 다�
     </TabItem>
 </Tabs>
 
-Log4j를 사용하려면 `org.apache.logging.log4j:log4j-core` 및 `org.apache.logging.log4j:log4j-slf4j-impl` 아티팩트를 추가해야 합니다.
+Log4j를 사용하려면 `org.apache.logging.log4j:log4j-core` 및 `org.apache.logging.log4j:log4j-slf4j2-impl` 아티팩트를 추가해야 합니다.
 
 ### 로거 설정 {id="configure-logger"}
 
@@ -58,7 +58,7 @@ Log4j를 사용하려면 `org.apache.logging.log4j:log4j-core` 및 `org.apache.l
 <configuration>
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{YYYY-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
     <root level="trace">
@@ -76,7 +76,7 @@ Log4j를 사용하려면 `org.apache.logging.log4j:log4j-core` 및 `org.apache.l
         <file>testFile.log</file>
         <append>true</append>
         <encoder>
-            <pattern>%d{YYYY-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
     <root level="trace">

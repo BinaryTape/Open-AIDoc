@@ -469,17 +469,13 @@ Kotlin Gradle プラグインを [Java モジュール (Java Modules)](https://w
 
 <tabs group="build-script">
 <tab title="Kotlin" group-key="kotlin">
-        
-```kotlin
-// Gradle バージョンが 7.0 未満の場合は、次の 3 行を追加してください
-java {
-    modularity.inferModulePath.set(true)
-}
 
+```kotlin
 tasks.named("compileJava", JavaCompile::class.java) {
+    // javac にコンパイル済みの Kotlin クラスを提供します。Java/Kotlin 混合ソースを動作させるために必要です
+    val mainOutput: FileCollection = sourceSets["main"].output
     options.compilerArgumentProviders.add(CommandLineArgumentProvider {
-        // javac にコンパイル済みの Kotlin クラスを提供します。Java/Kotlin 混合ソースを動作させるために必要です
-        listOf("--patch-module", "YOUR_MODULE_NAME=${sourceSets["main"].output.asPath}")
+        listOf("--patch-module", "YOUR_MODULE_NAME=${mainOutput.asPath}")
     })
 }
 ```
@@ -488,17 +484,13 @@ tasks.named("compileJava", JavaCompile::class.java) {
 <tab title="Groovy" group-key="groovy">
 
 ```groovy
-// Gradle バージョンが 7.0 未満の場合は、次の 3 行を追加してください
-java {
-    modularity.inferModulePath = true
-}
-
 tasks.named("compileJava", JavaCompile.class) {
+    // javac にコンパイル済みの Kotlin クラスを提供します。Java/Kotlin 混合ソースを動作させるために必要です
+    FileCollection mainOutput = sourceSets["main"].output
     options.compilerArgumentProviders.add(new CommandLineArgumentProvider() {
         @Override
         Iterable<String> asArguments() {
-            // javac にコンパイル済みの Kotlin クラスを提供します。Java/Kotlin 混合ソースを動作させるために必要です
-            return ["--patch-module", "YOUR_MODULE_NAME=${sourceSets["main"].output.asPath}"]
+            return ["--patch-module", "YOUR_MODULE_NAME=${mainOutput.asPath}"]
         }
     })
 }

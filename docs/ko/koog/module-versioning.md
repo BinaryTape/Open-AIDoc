@@ -1,6 +1,6 @@
 # 버전 관리
 
-Koog는 `X.Y.Z` 형식(예: `1.0.0`)의 [유의적 버전(Semantic Versioning)](https://semver.org/)을 따릅니다.
+Koog는 `X.Y.Z` 형식(예: `1.1.0`)의 [유의적 버전(Semantic Versioning)](https://semver.org/)을 따릅니다.
 
 프레임워크는 API 수준에서 안정적입니다. 공개 API가 한 번 릴리스되면 메이저 버전 업데이트 없이는 변경 사항이 발생하지(broken) 않습니다.
 
@@ -39,7 +39,7 @@ Koog는 `X.Y.Z` 형식(예: `1.0.0`)의 [유의적 버전(Semantic Versioning)](
 
 ## 안정 모듈 및 베타 모듈
 
-일부 모듈은 실험적인 것으로 간주되어 표준 `X.Y.Z` 대신 `-beta` 버전 접미사(예: `1.0.0-beta`)를 붙여 배포됩니다. 모듈이 베타인 이유는 다음과 같습니다.
+일부 모듈은 실험적인 것으로 간주되어 표준 `X.Y.Z` 대신 `-beta` 버전 접미사(예: `1.1.0-beta`)를 붙여 배포됩니다. 모듈이 베타인 이유는 다음과 같습니다.
 
 - **외부 통합 (External integrations)** — 기반 LLM 제공업체 API나 외부 프레임워크(예: Spring AI) 자체가 불안정하거나 잦은 변경이 예상되는 경우.
 - **실험적 기능 (Experimental functionality)** — 해당 기능 영역이 아직 탐색 중이며 API 형태가 진화할 수 있는 경우(예: GOAP 계획 전략).
@@ -52,110 +52,110 @@ Koog는 `X.Y.Z` 형식(예: `1.0.0`)의 [유의적 버전(Semantic Versioning)](
 ### 엄브렐러 모듈 (Umbrella Modules)
 
 | 모듈 | 버전 | 내용 |
-|--------|---------|----------|
-| `koog-agents` | `1.0.0` | 모든 안정 모듈(전이적) — 권장되는 시작 지점 |
-| `koog-agents-additions` | `1.0.0-beta` | 대부분의 베타/실험적 모듈 (독립형 외부 통합 제외) |
+|--------|--------------|----------|
+| `koog-agents` | `1.1.1`      | 모든 안정 모듈(전이적) — 권장되는 시작 지점 |
+| `koog-agents-additions` | `1.1.1-beta` | 대부분의 베타/실험적 모듈 (독립형 외부 통합 제외) |
 
 ### 모듈 버전
 
-=== "안정 모듈 (`1.0.0`)"
+=== "안정 모듈 (`1.1.1`)"
     
     | 모듈 | 버전 |
     |--------|---------|
-    | `agents` | `1.0.0` |
-    | `agents-core` | `1.0.0` |
-    | `agents-features` | `1.0.0` |
-    | `agents-features-chat-history-jdbc` | `1.0.0` |
-    | `agents-features-chat-memory-sql` | `1.0.0` |
-    | `agents-features-event-handler` | `1.0.0` |
-    | `agents-features-memory` | `1.0.0` |
-    | `agents-features-opentelemetry` | `1.0.0` |
-    | `agents-features-persistence-jdbc` | `1.0.0` |
-    | `agents-features-snapshot` | `1.0.0` |
-    | `agents-features-sql` | `1.0.0` |
-    | `agents-features-tokenizer` | `1.0.0` |
-    | `agents-features-trace` | `1.0.0` |
-    | `agents-mcp-metadata` | `1.0.0` |
-    | `agents-test` | `1.0.0` |
-    | `agents-tools` | `1.0.0` |
-    | `agents-utils` | `1.0.0` |
-    | `embeddings` | `1.0.0` |
-    | `embeddings-base` | `1.0.0` |
-    | `embeddings-llm` | `1.0.0` |
-    | `http-client` | `1.0.0` |
-    | `http-client-core` | `1.0.0` |
-    | `http-client-java` | `1.0.0` |
-    | `http-client-ktor` | `1.0.0` |
-    | `http-client-okhttp` | `1.0.0` |
-    | `http-client-test` | `1.0.0` |
-    | `koog-agents` | `1.0.0` |
-    | `koog-spring-ai` | `1.0.0` |
-    | `prompt` | `1.0.0` |
-    | `prompt-cache` | `1.0.0` |
-    | `prompt-cache-files` | `1.0.0` |
-    | `prompt-cache-model` | `1.0.0` |
-    | `prompt-executor` | `1.0.0` |
-    | `prompt-executor-anthropic-client` | `1.0.0` |
-    | `prompt-executor-bedrock-client` | `1.0.0` |
-    | `prompt-executor-cached` | `1.0.0` |
-    | `prompt-executor-clients` | `1.0.0` |
-    | `prompt-executor-model` | `1.0.0` |
-    | `prompt-executor-ollama-client` | `1.0.0` |
-    | `prompt-executor-openai-client` | `1.0.0` |
-    | `prompt-executor-openai-client-base` | `1.0.0` |
-    | `prompt-executor-openrouter-client` | `1.0.0` |
-    | `prompt-llm` | `1.0.0` |
-    | `prompt-markdown` | `1.0.0` |
-    | `prompt-model` | `1.0.0` |
-    | `prompt-processor` | `1.0.0` |
-    | `prompt-structure` | `1.0.0` |
-    | `prompt-tokenizer` | `1.0.0` |
-    | `prompt-xml` | `1.0.0` |
-    | `rag-base` | `1.0.0` |
-    | `serialization` | `1.0.0` |
-    | `serialization-core` | `1.0.0` |
-    | `serialization-jackson` | `1.0.0` |
-    | `serialization-test` | `1.0.0` |
-    | `test-tck` | `1.0.0` |
-    | `test-utils` | `1.0.0` |
-    | `utils` | `1.0.0` |
+    | `agents` | `1.1.1` |
+    | `agents-core` | `1.1.1` |
+    | `agents-features` | `1.1.1` |
+    | `agents-features-chat-history-jdbc` | `1.1.1` |
+    | `agents-features-chat-memory-sql` | `1.1.1` |
+    | `agents-features-event-handler` | `1.1.1` |
+    | `agents-features-memory` | `1.1.1` |
+    | `agents-features-opentelemetry` | `1.1.1` |
+    | `agents-features-persistence-jdbc` | `1.1.1` |
+    | `agents-features-snapshot` | `1.1.1` |
+    | `agents-features-sql` | `1.1.1` |
+    | `agents-features-tokenizer` | `1.1.1` |
+    | `agents-features-trace` | `1.1.1` |
+    | `agents-mcp-metadata` | `1.1.1` |
+    | `agents-test` | `1.1.1` |
+    | `agents-tools` | `1.1.1` |
+    | `agents-utils` | `1.1.1` |
+    | `embeddings` | `1.1.1` |
+    | `embeddings-base` | `1.1.1` |
+    | `embeddings-llm` | `1.1.1` |
+    | `http-client` | `1.1.1` |
+    | `http-client-core` | `1.1.1` |
+    | `http-client-java` | `1.1.1` |
+    | `http-client-ktor` | `1.1.1` |
+    | `http-client-okhttp` | `1.1.1` |
+    | `http-client-test` | `1.1.1` |
+    | `koog-agents` | `1.1.1` |
+    | `koog-spring-ai` | `1.1.1` |
+    | `prompt` | `1.1.1` |
+    | `prompt-cache` | `1.1.1` |
+    | `prompt-cache-files` | `1.1.1` |
+    | `prompt-cache-model` | `1.1.1` |
+    | `prompt-executor` | `1.1.1` |
+    | `prompt-executor-anthropic-client` | `1.1.1` |
+    | `prompt-executor-bedrock-client` | `1.1.1` |
+    | `prompt-executor-cached` | `1.1.1` |
+    | `prompt-executor-clients` | `1.1.1` |
+    | `prompt-executor-model` | `1.1.1` |
+    | `prompt-executor-ollama-client` | `1.1.1` |
+    | `prompt-executor-openai-client` | `1.1.1` |
+    | `prompt-executor-openai-client-base` | `1.1.1` |
+    | `prompt-executor-openrouter-client` | `1.1.1` |
+    | `prompt-llm` | `1.1.1` |
+    | `prompt-markdown` | `1.1.1` |
+    | `prompt-model` | `1.1.1` |
+    | `prompt-processor` | `1.1.1` |
+    | `prompt-structure` | `1.1.1` |
+    | `prompt-tokenizer` | `1.1.1` |
+    | `prompt-xml` | `1.1.1` |
+    | `rag-base` | `1.1.1` |
+    | `serialization` | `1.1.1` |
+    | `serialization-core` | `1.1.1` |
+    | `serialization-jackson` | `1.1.1` |
+    | `serialization-test` | `1.1.1` |
+    | `test-tck` | `1.1.1` |
+    | `test-utils` | `1.1.1` |
+    | `utils` | `1.1.1` |
 
-=== "베타 모듈 (`1.0.0-beta`)"
+=== "베타 모듈 (`1.1.1-beta`)"
     
     | 모듈 | 버전 |
     |--------|---------|
-    | `a2a-client` | `1.0.0-beta` |
-    | `a2a-core` | `1.0.0-beta` |
-    | `a2a-server` | `1.0.0-beta` |
-    | `a2a-test` | `1.0.0-beta` |
-    | `a2a-test-server-tck` | `1.0.0-beta` |
-    | `a2a-transport-client-jsonrpc-http` | `1.0.0-beta` |
-    | `a2a-transport-core-jsonrpc` | `1.0.0-beta` |
-    | `a2a-transport-server-jsonrpc-http` | `1.0.0-beta` |
-    | `agents-ext` | `1.0.0-beta` |
-    | `agents-features-a2a-client` | `1.0.0-beta` |
-    | `agents-features-a2a-core` | `1.0.0-beta` |
-    | `agents-features-a2a-server` | `1.0.0-beta` |
-    | `agents-features-acp` | `1.0.0-beta` |
-    | `agents-features-chat-history-aws` | `1.0.0-beta` |
-    | `agents-features-longterm-memory` | `1.0.0-beta` |
-    | `agents-features-longterm-memory-aws` | `1.0.0-beta` |
-    | `agents-mcp` | `1.0.0-beta` |
-    | `agents-mcp-server` | `1.0.0-beta` |
-    | `agents-planner` | `1.0.0-beta` |
-    | `koog-agents-additions` | `1.0.0-beta` |
-    | `koog-ktor` | `1.0.0-beta` |
-    | `koog-spring-ai-common` | `1.0.0-beta` |
-    | `koog-spring-ai-starter-chat-memory` | `1.0.0-beta` |
-    | `koog-spring-ai-starter-model-chat` | `1.0.0-beta` |
-    | `koog-spring-ai-starter-model-embedding` | `1.0.0-beta` |
-    | `koog-spring-ai-starter-vector-store` | `1.0.0-beta` |
-    | `koog-spring-boot-starter` | `1.0.0-beta` |
-    | `prompt-cache-redis` | `1.0.0-beta` |
-    | `prompt-executor-dashscope-client` | `1.0.0-beta` |
-    | `prompt-executor-deepseek-client` | `1.0.0-beta` |
-    | `prompt-executor-google-client` | `1.0.0-beta` |
-    | `prompt-executor-litert-client` | `1.0.0-beta` |
-    | `prompt-executor-llms-all` | `1.0.0-beta` |
-    | `prompt-executor-mistralai-client` | `1.0.0-beta` |
-    | `rag-vector` | `1.0.0-beta` |
+    | `a2a-client` | `1.1.1-beta` |
+    | `a2a-core` | `1.1.1-beta` |
+    | `a2a-server` | `1.1.1-beta` |
+    | `a2a-test` | `1.1.1-beta` |
+    | `a2a-test-server-tck` | `1.1.1-beta` |
+    | `a2a-transport-client-jsonrpc-http` | `1.1.1-beta` |
+    | `a2a-transport-core-jsonrpc` | `1.1.1-beta` |
+    | `a2a-transport-server-jsonrpc-http` | `1.1.1-beta` |
+    | `agents-ext` | `1.1.1-beta` |
+    | `agents-features-a2a-client` | `1.1.1-beta` |
+    | `agents-features-a2a-core` | `1.1.1-beta` |
+    | `agents-features-a2a-server` | `1.1.1-beta` |
+    | `agents-features-acp` | `1.1.1-beta` |
+    | `agents-features-chat-history-aws` | `1.1.1-beta` |
+    | `agents-features-longterm-memory` | `1.1.1-beta` |
+    | `agents-features-longterm-memory-aws` | `1.1.1-beta` |
+    | `agents-mcp` | `1.1.1-beta` |
+    | `agents-mcp-server` | `1.1.1-beta` |
+    | `agents-planner` | `1.1.1-beta` |
+    | `koog-agents-additions` | `1.1.1-beta` |
+    | `koog-ktor` | `1.1.1-beta` |
+    | `koog-spring-ai-common` | `1.1.1-beta` |
+    | `koog-spring-ai-starter-chat-memory` | `1.1.1-beta` |
+    | `koog-spring-ai-starter-model-chat` | `1.1.1-beta` |
+    | `koog-spring-ai-starter-model-embedding` | `1.1.1-beta` |
+    | `koog-spring-ai-starter-vector-store` | `1.1.1-beta` |
+    | `koog-spring-boot-starter` | `1.1.1-beta` |
+    | `prompt-cache-redis` | `1.1.1-beta` |
+    | `prompt-executor-dashscope-client` | `1.1.1-beta` |
+    | `prompt-executor-deepseek-client` | `1.1.1-beta` |
+    | `prompt-executor-google-client` | `1.1.1-beta` |
+    | `prompt-executor-litert-client` | `1.1.1-beta` |
+    | `prompt-executor-llms-all` | `1.1.1-beta` |
+    | `prompt-executor-mistralai-client` | `1.1.1-beta` |
+    | `rag-vector` | `1.1.1-beta` |

@@ -14,7 +14,7 @@ Kotlin Multiplatform 有助於簡化技術和組織流程：
 * 您可以透過在平台之間共用邏輯和 UI 程式碼，減少重複工作和維護成本。這也讓在多個平台上同步發佈功能成為可能。
 * 團隊協作變得更加容易，因為統一的邏輯存在於共用程式碼中，這使得團隊成員之間的知識傳遞更容易，並減少了專門平台團隊之間的重複勞動。
 
-除了更快的上市時間外，根據 KMP 2024 年第二季調查，有 **55 %** 的使用者表示採用 KMP 後協作得到改善，且有 **65 %** 的團隊表示效能和品質有所提升。
+除了更快的上市時間外，根據 KMP 2024 年第二季調查，有 **55%** 的使用者表示採用 KMP 後協作得到改善，且有 **65%** 的團隊表示效能和品質有所提升。
 
 從新創公司到全球企業，各種規模的組織都在正式環境中使用 KMP。包括 Google、Duolingo、Forbes、Philips、McDonald's、Bolt、H&M、Baidu、Kuaishou 和 Bilibili 在內的公司都採用了 KMP，因為它具有靈活性、原生效能、提供原生使用者體驗的能力、成本效益以及對逐步採用的支援。[進一步了解已採用 KMP 的公司](https://kotlinlang.org/case-studies/?type=multiplatform)。
 
@@ -57,7 +57,6 @@ IntelliJ IDEA 和 Android Studio 透過 [Kotlin Multiplatform IDE 外掛程式](
 
 * 在我們的[案例研究頁面](https://kotlinlang.org/case-studies/?type=multiplatform)了解公司如何成功地在程式碼庫中採用 KMP。
 * 在我們的[精選範例清單](multiplatform-samples.md)和 GitHub 的 [kotlin-multiplatform-sample](https://github.com/topics/kotlin-multiplatform-sample) 主題中查看廣泛的範例應用程式。
-* 在 [klibs.io](https://klibs.io/) 上數以千計的現有庫中搜尋特定的多平台庫。
 
 ## 學習基礎知識
 
@@ -72,10 +71,16 @@ IntelliJ IDEA 和 Android Studio 透過 [Kotlin Multiplatform IDE 外掛程式](
 深入技術細節
 : * 從[基本專案結構](multiplatform-discover-project.md)開始。
   * 了解可用的[程式碼共用機制](multiplatform-share-on-platforms.md)。
-  * 查看 KMP 專案中[相應性如何運作](multiplatform-add-dependencies.md)。
+  * 查看 KMP 專案中[相依性如何運作](multiplatform-add-dependencies.md)。
   * 考慮不同的 [iOS 整合方法](multiplatform-ios-integration-overview.md)。
   * 了解 KMP 如何針對各種目標[編譯程式碼](multiplatform-configure-compilations.md)並[組建二進位檔](multiplatform-build-native-binaries.md)。
-  * 閱讀關於[發佈多平台應用程式](multiplatform-publish-apps.md)或[多平台程式庫](multiplatform-publish-lib-setup.md)的內容。 
+  * 閱讀關於[發佈多平台應用程式](multiplatform-publish-apps.md)或[多平台程式庫](multiplatform-publish-lib-setup.md)的內容。
+
+## 探索 Kotlin Multiplatform 程式庫生態系統
+
+有數以千計的多平台程式庫可用於網路、儲存、相依注入、測試、UI、序列化等。
+
+在 [klibs.io](https://klibs.io) 上瀏覽這些程式庫，這是一個由 JetBrains 維護的搜尋平台。
 
 ## 大規模採用 Kotlin Multiplatform
 

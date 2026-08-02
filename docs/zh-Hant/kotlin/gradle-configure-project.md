@@ -478,17 +478,13 @@ integrationTestCompilation {
 
 <tabs group="build-script">
 <tab title="Kotlin" group-key="kotlin">
-        
-```kotlin
-// 如果您使用的 Gradle 版本低於 7.0，請新增以下三行
-java {
-    modularity.inferModulePath.set(true)
-}
 
+```kotlin
 tasks.named("compileJava", JavaCompile::class.java) {
+    // 向 javac 提供編譯後的 Kotlin 類別 – 這是 Java/Kotlin 混合原始碼運作所需的
+    val mainOutput: FileCollection = sourceSets["main"].output
     options.compilerArgumentProviders.add(CommandLineArgumentProvider {
-        // 向 javac 提供編譯後的 Kotlin 類別 – 這是 Java/Kotlin 混合原始碼運作所需的
-        listOf("--patch-module", "YOUR_MODULE_NAME=${sourceSets["main"].output.asPath}")
+        listOf("--patch-module", "YOUR_MODULE_NAME=${mainOutput.asPath}")
     })
 }
 ```
@@ -497,17 +493,13 @@ tasks.named("compileJava", JavaCompile::class.java) {
 <tab title="Groovy" group-key="groovy">
 
 ```groovy
-// 如果您使用的 Gradle 版本低於 7.0，請新增以下三行
-java {
-    modularity.inferModulePath = true
-}
-
 tasks.named("compileJava", JavaCompile.class) {
+    // 向 javac 提供編譯後的 Kotlin 類別 – 這是 Java/Kotlin 混合原始碼運作所需的
+    FileCollection mainOutput = sourceSets["main"].output
     options.compilerArgumentProviders.add(new CommandLineArgumentProvider() {
         @Override
         Iterable<String> asArguments() {
-            // 向 javac 提供編譯後的 Kotlin 類別 – 這是 Java/Kotlin 混合原始碼運作所需的
-            return ["--patch-module", "YOUR_MODULE_NAME=${sourceSets["main"].output.asPath}"]
+            return ["--patch-module", "YOUR_MODULE_NAME=${mainOutput.asPath}"]
         }
     })
 }
@@ -693,7 +685,7 @@ plugins {
 根據您的需求，您可以鎖定以下目標：
 
 * **`wasmJs`**: 用於在瀏覽器或 Node.js 中執行
-* **`wasmWasi`**: 用於在支援 [WASI (WebAssembly System Interface)](https://wasi.dev/) 的 Wasm環境中執行，例如 Wasmtime、WasmEdge 等。
+* **`wasmWasi`**: 用於在支援 [WASI (WebAssembly System Interface)](https://wasi.dev/) 的 Wasm 環境中執行，例如 Wasmtime、WasmEdge 等。
 
 為 Web 瀏覽器或 Node.js 配置 `wasmJs` 目標：
 
@@ -912,8 +904,8 @@ kotlin.stdlib.default.dependency=false
 
 從 Kotlin 標準程式庫 1.9.20 版本開始，Gradle 會使用標準程式庫中包含的元資料來自動對齊傳遞性的 `kotlin-stdlib-jdk7` 和 `kotlin-stdlib-jdk8` 相依性。
 
-如果您為 1.8.0 – 1.9.10 之間的任何 Kotlin 標準程式庫版本新增相依性，例如：
-`implementation("org.jetbrains.kotlin:kotlin-stdlib:1.8.0")`，則 Kotlin Gradle 外掛程式會將此 Kotlin 版本用於傳遞性的 `kotlin-stdlib-jdk7` 和 `kotlin-stdlib-jdk8` 相依性。這避免了來自不同標準程式庫版本的類別重複。[進一步了解將 `kotlin-stdlib-jdk7` 和 `kotlin-stdlib-jdk8` 合併到 `kotlin-stdlib`](whatsnew18.md#updated-jvm-compilation-target)。您可以透過在 `gradle.properties` 檔案中設定 `kotlin.stdlib.jdk.variants.version.alignment` Gradle 屬性來停用此行為：
+如果您為 1.8.0 – 1.9.10 之間的任何 Kotlin 標準程式庫版本新增相依性，例如： 
+`implementation("org.jetbrains.kotlin:kotlin-stdlib:1.8.0")`，則 Kotlin Gradle 外掛程式會將此 Kotlin 版本用於傳遞性的 `kotlin-stdlib-jdk7` 和 `kotlin-stdlib-jdk8` 相依性。這避免了來自不同標準程式庫版本的類別重複。[進一步了解將 `kotlin-stdlib-jdk7` 和 `kotlin-stdlib-jdk8` 合併到 `kotlin-stdlib`](whatsnew18.md#updated-jvm-compilation-target)。 您可以透過在 `gradle.properties` 檔案中設定 `kotlin.stdlib.jdk.variants.version.alignment` Gradle 屬性來停用此行為：
 
 ```none
 kotlin.stdlib.jdk.variants.version.alignment=false
@@ -921,7 +913,7 @@ kotlin.stdlib.jdk.variants.version.alignment=false
 
 ##### 對齊版本的其他方式 {initial-collapse-state="collapsed" collapsible="true"}
 
-* 如果您在版本對齊方面遇到問題，可以透過 Kotlin [BOM](https://docs.gradle.org/current/userguide/platforms.html#sub:bom_import) 對齊所有版本。在您的組建指令碼中宣告對 `kotlin-bom` 的平台相依性：
+* 如果您在版本對齊方面遇到問題，可以透過 Kotlin [BOM](https://docs.gradle.org/current/userguide/platforms.html#sub:bom_import) 對齊所有版本。 在您的組建指令碼中宣告對 `kotlin-bom` 的平台相依性：
 
   <tabs group="build-script">
   <tab title="Kotlin" group-key="kotlin">
@@ -940,9 +932,7 @@ kotlin.stdlib.jdk.variants.version.alignment=false
   </tab>
   </tabs>
 
-* If you don't add a dependency for a standard library version, but you have two different dependencies that transitively
-  bring different old versions of the Kotlin standard library, then you can explicitly require `%kotlinVersion%`
-  versions of these transitive libraries:
+* 如果您沒有為標準程式庫版本新增相依性，但您有兩個不同的相依性，它們會傳遞性地帶來不同舊版本的 Kotlin 標準程式庫，那麼您可以明確要求這些傳遞性程式庫的 `%kotlinVersion%` 版本：
 
   <tabs group="build-script">
   <tab title="Kotlin" group-key="kotlin">

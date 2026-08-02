@@ -303,6 +303,16 @@
         "collapsed": true
       },
       {
+        "text": "koog.cloud-platform-integrations",
+        "items": [
+          {
+            "text": "koog.amazon-bedrock-agentcore",
+            "link": "amazon-bedrock-agentcore"
+          }
+        ],
+        "collapsed": true
+      },
+      {
         "text": "koog.advanced-usage",
         "items": [
           {

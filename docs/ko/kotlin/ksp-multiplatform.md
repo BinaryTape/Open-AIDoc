@@ -1,45 +1,200 @@
 [//]: # (title: Kotlin 멀티플랫폼에서의 KSP)
+[//]: # (description: Kotlin 멀티플랫폼 프로젝트에 KSP 추가하기)
 
-빠른 시작을 위해 KSP 프로세서를 정의하는 [샘플 Kotlin 멀티플랫폼 프로젝트](https://github.com/google/ksp/tree/main/examples/multiplatform)를 확인하세요.
+여기서는 Kotlin 멀티플랫폼 프로젝트에서 KSP(Kotlin Symbol Processing)를 사용하는 방법을 알아봅니다. 빠른 시작을 위해 [소스 저장소](https://github.com/google/ksp/tree/main/examples/multiplatform)에서 KSP를 사용하는 여러 타겟이 포함된 멀티플랫폼 프로젝트 예시를 확인하세요. 이 예시의 프로세서는 프로젝트에서 사용되는 `Foo` 클래스를 생성합니다.
 
-KSP 1.0.1부터 멀티플랫폼 프로젝트에 KSP를 적용하는 방식은 단일 플랫폼 JVM 프로젝트와 유사합니다. 주요 차이점은 종속성(dependencies)에 `ksp(...)` 구성을 작성하는 대신, 컴파일 전에 어떤 컴파일 대상에 심볼 처리(symbol processing)가 필요한지 지정하기 위해 `add(ksp<Target>)` 또는 `add(ksp<SourceSet>)`를 사용한다는 점입니다.
+## 멀티플랫폼 프로젝트에 KSP 추가하기
 
-```kotlin
-plugins {
-    kotlin("multiplatform")
-    id("com.google.devtools.ksp")
-}
+클라이언트 모듈(프로세서를 사용하는 모듈)의 `build.gradle.kts` 파일에서, 심볼 처리가 필요한 각 타겟에 대해 적절한 KSP 프로세서 종속성(dependency)을 추가하세요.
 
-kotlin {
-    jvm()
-    linuxX64 {
-        binaries {
-            executable()
-        }
-    }
-}
-
+```
 dependencies {
-    add("kspCommonMainMetadata", project(":test-processor"))
-    add("kspJvm", project(":test-processor"))
-    add("kspJvmTest", project(":test-processor")) // JVM용 테스트 소스 세트가 없으므로 아무 작업도 수행하지 않음
-    // kspLinuxX64가 지정되지 않았으므로 Linux x64 메인 소스 세트에 대한 처리가 없음
-    // add("kspLinuxX64Test", project(":test-processor"))
+  add("ksp<Target>", <processor>)
 }
 ```
 
+* `<Target>`은 멀티플랫폼 프로젝트에서 사용되는 타겟 중 하나입니다. 
+
+  > 타겟의 전체 목록은 [멀티플랫폼 Gradle DSL 레퍼런스](https://kotlinlang.org/docs/multiplatform/multiplatform-dsl-reference.html#targets) 및 [Kotlin/Native 지원 타겟](https://kotlinlang.org/docs/native-target-support.html)을 참고하세요.
+  >
+  {style="tip"}
+
+* `<processor>`는 Gradle 프로젝트 경로입니다. 다음과 같을 수 있습니다:
+
+  * 심볼 프로세서 로직이 포함된 프로젝트의 특정 디렉토리:
+
+      ```
+      add("kspJvm", project(":local-processor"))
+      ```
+
+  * Room과 같은 외부 프로세서:
+
+      ```
+      add("kspJvm", "androidx.room:room-compiler:2.6.1")
+      ```
+
+> KSP 2부터 모든 타겟을 포괄하는 `ksp(...)` 구성은 사용이 중단(deprecated)되었습니다. 필요하지 않은 곳에서 프로세서가 실행되는 것을 방지하려면 각 타겟을 명시적으로 구성하세요.
+>
+{style="warning"}
+
+### 한 타겟에서 여러 프로세서 사용하기
+
+하나의 타겟에 둘 이상의 프로세서를 추가할 수 있습니다:
+
+<tabs group="build-script">
+<tab title="Kotlin" group-key="kotlin">
+
+```kotlin
+add("kspAndroid", project(":test-processor"))
+add("kspAndroid", "androidx.room:room-compiler:2.6.1")
+```
+
+</tab>
+<tab title="Groovy" group-key="groovy">
+
+```Groovy
+add('kspAndroid', project(':test-processor'))
+add('kspAndroid', 'androidx.room:room-compiler:2.6.1')
+```
+
+</tab>
+</tabs> 
+
+### 여러 타겟에서 동일한 프로세서 사용하기
+
+동일한 프로세서를 여러 타겟에 추가할 수 있습니다:
+
+<tabs group="build-script">
+<tab title="Kotlin" group-key="kotlin">
+
+```kotlin
+add("kspIosX64", project(":test-processor"))
+add("kspIosArm64", project(":test-processor"))
+add("kspIosSimulatorArm64", project(":test-processor"))
+```
+
+</tab>
+<tab title="Groovy" group-key="groovy">
+
+```Groovy
+add('kspIosX64', project(':test-processor'))
+add('kspIosArm64', project(':test-processor'))
+add('kspIosSimulatorArm64', project(':test-processor'))
+```
+
+</tab>
+</tabs> 
+
+iOS 타겟이 많은 경우, 루프를 사용하여 반복을 피할 수 있습니다:
+
+<tabs group="build-script">
+<tab title="Kotlin" group-key="kotlin">
+
+```kotlin
+kotlin.targets.filter { it.name.startsWith("ios") }.forEach { target ->
+    add(
+        "ksp${target.name.replaceFirstChar { it.uppercaseChar() }}",
+        project(":test-processor")
+    )
+}
+```
+
+</tab>
+<tab title="Groovy" group-key="groovy">
+
+```Groovy
+kotlin.targets.filter { it.name.startsWith("ios") }.forEach { target ->
+    add(
+        "ksp${target.name.replaceFirstChar { it.uppercaseChar() }}",
+        project(":test-processor")
+    )
+}
+```
+
+</tab>
+</tabs>
+
+### 테스트 컴파일을 위한 KSP 구성
+
+테스트 컴파일 중에 KSP를 실행하려면 대응하는 테스트 구성(test configurations)에 프로세서를 추가하세요:
+
+<tabs group="build-script">
+<tab title="Kotlin" group-key="kotlin">
+
+```kotlin
+add("kspJvmTest", project(":test-processor"))
+add("kspJsTest", project(":test-processor"))
+add("kspIosX64Test", project(":test-processor"))
+```
+
+</tab>
+<tab title="Groovy" group-key="groovy">
+
+```Groovy
+add('kspJvmTest', project(':test-processor'))
+add('kspJsTest', project(':test-processor'))
+add('kspIosX64Test', project(':test-processor'))
+```
+
+</tab>
+</tabs> 
+
+Android 호스트 및 디바이스 테스트의 경우, KSP는 대응하는 소스 세트 이름에서 구성 이름을 파생합니다:
+
+<tabs group="build-script">
+<tab title="Kotlin" group-key="kotlin">
+
+```kotlin
+add("kspAndroidHostTest", project(":test-processor"))
+add("kspAndroidDeviceTest", project(":test-processor"))
+```
+
+</tab>
+<tab title="Groovy" group-key="groovy">
+
+```Groovy
+add('kspAndroidHostTest', project(':test-processor'))
+add('kspAndroidDeviceTest', project(':test-processor'))
+```
+
+</tab>
+</tabs>
+
+## KSP 구성 이름 찾기
+
+KSP는 Kotlin 멀티플랫폼 소스 세트에서 구성 이름을 파생합니다. 모듈의 전체 KSP 구성 목록을 보려면 다음을 실행하세요:
+
+```Bash
+./gradlew :<your-module-name>:dependencies | grep ksp
+```
+
+타겟 소스 세트에 대응하는 구성 이름을 찾으세요.
+
 ## 컴파일 및 처리
 
-멀티플랫폼 프로젝트에서는 각 플랫폼에 대해 Kotlin 컴파일이 여러 번(`main`, `test` 또는 기타 빌드 버전) 발생할 수 있습니다. 심볼 처리도 마찬가지입니다. Kotlin 컴파일 태스크가 있고 그에 대응하는 `ksp<Target>` 또는 `ksp<SourceSet>` 구성이 지정될 때마다 심볼 처리 태스크가 생성됩니다.
+멀티플랫폼 프로젝트에서 Kotlin은 `main` 및 `test`와 같은 각 타겟 및 소스 세트에 대해 별도의 [컴파일](https://kotlinlang.org/docs/multiplatform/multiplatform-advanced-project-structure.html#compilations)을 생성합니다. 하나 이상의 KSP 프로세서가 구성된 각 Kotlin 컴파일 태스크에 대해, KSP는 그에 대응하는 심볼 처리 태스크를 생성합니다.
 
-예를 들어, 위의 `build.gradle.kts`에는 4개의 컴파일 태스크(common/metadata, JVM main, Linux x64 main, Linux x64 test)와 3개의 심볼 처리 태스크(common/metadata, JVM main, Linux x64 test)가 있습니다.
+[예시 프로젝트](https://github.com/google/ksp/tree/main/examples/multiplatform)에는 6개의 타겟이 정의되어 있습니다. 각 타겟에는 `main` 및 `test` 컴파일이 있으며, 그 결과 다음과 같은 컴파일 및 심볼 처리 태스크가 생성됩니다:
 
-## KSP 1.0.1+ 버전에서 ksp(...) 구성 지양하기
+* **JVM**: `jvmMain` 및 `jvmTest`
 
-KSP 1.0.1 이전에는 단일화된 `ksp(...)` 구성만 사용할 수 있었습니다. 따라서 프로세서가 모든 컴파일 대상에 적용되거나, 아예 적용되지 않았습니다. 참고로 `ksp(...)` 구성은 기존의 비 멀티플랫폼 프로젝트에서도 메인 소스 세트뿐만 아니라 테스트 소스 세트가 존재하는 경우 해당 세트에도 적용됩니다. 이는 빌드 시간에 불필요한 오버헤드를 초래했습니다.
+* **JS**: `jsMain` 및 `jsTest`
 
-KSP 1.0.1부터는 위의 예시와 같이 타겟별 구성이 제공됩니다. 향후에는 다음과 같이 변경될 예정입니다:
-1. 멀티플랫폼 프로젝트의 경우, `ksp(...)` 구성은 사용 중단(deprecated) 및 삭제될 예정입니다.
-2. 단일 플랫폼 프로젝트의 경우, `ksp(...)` 구성은 기본 메인 컴파일에만 적용됩니다. `test`와 같은 다른 타겟에 프로세서를 적용하려면 `kspTest(...)`를 지정해야 합니다.
+* **LinuxX64**: `linuxX64Main` 및 `linuxX64Test`
 
-KSP 1.0.1부터 더 효율적인 동작으로 전환할 수 있는 얼리 액세스(early access) 플래그 `-DallowAllTargetConfiguration=false`가 제공됩니다. 현재 동작으로 인해 성능 문제가 발생하는 경우 이 플래그를 사용해 보시기 바랍니다. 이 플래그의 기본값은 KSP 2.0에서 `true`에서 `false`로 변경될 예정입니다.
+* **AndroidNativeX64**: `androidNativeX64Main` 및 `androidNativeX64Test`
+
+* **AndroidNativeArm64**: `androidNativeArm64Main` 및 `androidNativeArm64Test`
+
+* **MingwX64**: `mingwX64Main` 및 `mingwX64Test`
+
+예시의 `workload/build.gradle.kts` 파일에서는 다음 구성들에 대해 KSP 종속성이 선언되어 있습니다:
+
+* `kspJvm` 및 `kspJvmTest`
+* `kspJs` 및 `kspJsTest`
+* `kspAndroidNativeX64` 및 `kspAndroidNativeX64Test`
+* `kspAndroidNativeArm64` 및 `kspAndroidNativeArm64Test`
+* `kspLinuxX64`
+* `kspMingwX64`
+
+KSP는 KSP 종속성이 선언된 각 구성에 대해 심볼 처리 태스크를 생성합니다. 이 예시에서 프로젝트는 최소 12개의 Kotlin 컴파일 태스크와 10개의 심볼 처리 태스크를 생성합니다. 나머지 컴파일은 KSP가 구성되지 않았으므로 대응하는 KSP 태스크가 없습니다.

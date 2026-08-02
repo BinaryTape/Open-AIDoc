@@ -3,6 +3,10 @@
 在创建 Kotlin 库时，请考虑在构建和[发布时支持 Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/multiplatform-publish-lib-setup.html)。
 这可以扩大库的目标受众，使其与针对多个平台的项目兼容。
 
+> 您可以在 [klibs.io](https://klibs.io/) 上找到适用于不同用例和目标平台且已有的 Kotlin Multiplatform 库。
+> 
+{style="tip"}
+
 以下章节提供了帮助您有效构建 Kotlin Multiplatform 库的指南。
 
 ## 扩大覆盖范围
@@ -63,6 +67,6 @@ Kotlin Multiplatform 在其支持的目标平台上提供与原生 API 和语言
 
 ## 推广您的库
 
-您的库可以在 [JetBrains 的搜索平台](https://klibs.io/)上展示。该平台旨在让人们能够轻松地根据目标平台查找 Kotlin Multiplatform 库。
+您的库可以在 [klibs.io](https://klibs.io/) 上展示，这是一个让开发者发现和评估 Kotlin Multiplatform 库的搜索平台。
 
-符合标准的库会自动添加。有关如何添加库的更多信息，请参阅[常见问题解答](https://klibs.io/faq)。
+[klibs.io](https://klibs.io/) 会自动列出符合其列出标准的库。要检查您的库是否符合资格，请参阅[常见问题解答](https://klibs.io/faq)。

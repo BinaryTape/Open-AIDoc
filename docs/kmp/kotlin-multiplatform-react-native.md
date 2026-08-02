@@ -9,7 +9,7 @@
     </tip>
     <p>跨平台开发显著改变了团队构建应用程序的方式，使他们能够通过共享代码库为多个平台交付应用。这种方法简化了开发流程，并有助于确保跨设备的一致用户体验。</p>
     <p>以前，为 Android 和 iOS 构建应用意味着维护两个独立的代码库，且通常由不同的团队负责，这导致了重复劳动以及平台间明显的差异。跨平台解决方案加快了上市时间并提高了整体效率。</p>
-    <p>在现有工具中，Kotlin Multiplatform、React Native 和 Flutter 作为三种应用最广泛的选项脱颖而出。在本文中，我们将深入研究前两者，以帮助您为您的产品和团队选择合适的方案。</p>
+    <p>在现有工具中，Kotlin Multiplatform、React Native 和 Flutter 作为三种应用最广泛的选项脱颖出。在本文中，我们将深入研究前两者，以帮助您为您的产品和团队选择合适的方案。</p>
     <chapter title="Kotlin Multiplatform 与 Compose Multiplatform" id="kotlin-multiplatform-and-compose-multiplatform">
         <p><a href="https://www.jetbrains.com/kotlin-multiplatform/">Kotlin Multiplatform (KMP)</a> 是由 JetBrains 开发的一项开源技术，能够跨 Android、iOS、桌面端（Windows、macOS、Linux）、Web 和后端实现代码共享。它允许开发者在多个环境中复用 Kotlin，同时保持原生能力和性能。</p>
         <p>采用率正在稳步上升：在过去两次 <a href="https://www.jetbrains.com/lp/devecosystem-2024/">开发者生态系统调查</a> 的受访者中，Kotlin Multiplatform 的使用率在短短一年内增长了一倍多——从 2024 年的 7% 增加到 2025 年的 18%——这是其发展势头日益增强的明确信号。</p>
@@ -34,7 +34,7 @@
     </chapter>
     <chapter title="React Native" id="react-native">
         <p>React Native 是一个用于构建 Android 和 iOS 应用程序的开源框架，它使用 <a
-                href="https://reactjs.org/">React</a>（一个用于 Web 和原生用户界面的库）以及应用平台的原生能力。React Native 允许开发者使用 JavaScript 访问其平台的 API，并使用 React 组件（可复用、可嵌套的代码包）来描述 UI 的外观 and 行为。</p>
+                href="https://reactjs.org/">React</a>（一个用于 Web 和原生用户界面的库）以及应用平台的原生能力。React Native 允许开发者使用 JavaScript 访问其平台的 API，并使用 React 组件（可复用、可嵌套的代码包）来描述 UI 的外观与行为。</p>
         <p>React Native 最初于 2015 年 1 月在 React.js Conf 上宣布。同年晚些时候，Meta 在 F8 2015 上发布了 React Native，并一直维护至今。</p>
         <p>虽然 Meta 监管 React Native 产品，但 <a
                 href="https://github.com/facebook/react-native/blob/HEAD/ECOSYSTEM.md">React Native 生态系统</a> 由合作伙伴、核心贡献者和活跃的社区组成。如今，该框架得到了全球个人和公司的贡献支持。</p>
@@ -67,7 +67,7 @@
             <tr>
                 <td><b>软件包、依赖项与生态系统</b></td>
                 <td>软件包可从 <a href="https://central.sonatype.com/">Maven Central</a> 和其他仓库获取，包括：
-                    <p><a href="http://klibs.io">klibs.io</a>（Alpha 版本），旨在简化 KMP 库的搜索。</p>
+                    <p><a href="https://klibs.io">klibs.io</a>，旨在简化 KMP 库的搜索。</p>
                     <p>此 <a href="https://github.com/terrakok/kmp-awesome">列表</a> 包含了一些最受欢迎的 KMP 库和工具。</p></td>
                 <td><a href="https://reactnative.dev/docs/libraries">React Native 库</a> 通常使用 Node.js 软件包管理器（如 <a href="https://docs.npmjs.com/cli/npm">npm CLI</a> 或 <a href="https://classic.yarnpkg.com/en/">Yarn Classic</a>）从 <a href="https://www.npmjs.com/">npm 注册表</a> 安装。
                 </td>

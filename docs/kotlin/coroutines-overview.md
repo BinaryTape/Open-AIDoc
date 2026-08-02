@@ -45,7 +45,7 @@ Kotlin 中的协程构建在挂起函数之上，挂起函数允许代码在不�
 * [`CoroutineExceptionHandler`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-coroutine-exception-handler/) 处理未捕获的异常。
 
 这些元素连同其他可能的元素构成了 [_协程上下文_](coroutine-context-and-dispatchers.md)，默认情况下它从协程的父级继承。
-此上下文形成了一个支持结构化并发的层次结构，在其中相关的协程可以被一起 [取消](cancellation-and-timeouts.md) 或作为一个组进行 [异常处理](exception-handling.md)。
+此上下文形成了一个支持结构化并发的层次结构，在其中相关的协程可以被一起 [取消](coroutines-cancellation.md) 或作为一个组进行 [异常处理](exception-handling.md)。
 
 ### 异步流与共享可变状态
 

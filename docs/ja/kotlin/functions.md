@@ -56,7 +56,7 @@ fun powerOf(number: Int, exponent: Int): Int {
 }
 ```
 
-関数パラメータを宣言する際、[末尾のカンマ](coding-conventions.md#trailing-commas)を使用できます：
+関数のパラメータを宣言する際、[末尾のカンマ](coding-conventions.md#trailing-commas)を使用できます：
 
 ```kotlin
 fun powerOf(
@@ -105,7 +105,7 @@ fun main() {
     // 'userId' にデフォルト値の 0 を使用
     greeting(message = "Hello!")
     
-    // エラー: パラメータ 'userId' に値が渡されていません
+    // エラー: パラメータ 'message' に値が渡されていません
     greeting("Hello!")
 }
 ```
@@ -316,7 +316,7 @@ fun double(x: Int) = x * 2
 例えば、`Unit` を返さずに `printHello()` 関数を宣言できます：
 
 ```kotlin
-// 関数型パラメータ ('action') の宣言には依然として
+// 関数型パラメータ ('action') の宣言には依然として 
 // 明示的な戻り値の型が必要です
 fun printHello(name: String?, action: () -> Unit) {
     if (name != null)
@@ -386,7 +386,7 @@ fun getDisplayNameOrDefault(userId: String?): String =
 ```kotlin
 fun <T> asList(vararg ts: T): List<T> {
     val result = ArrayList<T>()
-    for (t in ts) // ts は Array です
+    for (t in ts) // ts は配列です
         result.add(t)
     return result
 }
@@ -397,7 +397,7 @@ fun <T> asList(vararg ts: T): List<T> {
 ```kotlin
 fun <T> asList(vararg ts: T): List<T> {
     val result = ArrayList<T>()
-    for (t in ts) // ts は Array です
+    for (t in ts) // ts は配列です
         result.add(t)
     return result
 }
@@ -621,7 +621,7 @@ fun <T> singletonList(item: T): List<T> { /*...*/ }
 
 ## 末尾再帰関数
 
-Kotlin は、[末尾再帰](https://ja.wikipedia.org/wiki/%E6%9C%AB%E5%B0%BE%E5%86%8D%E5%B1%B0)（tail recursion）として知られる関数型プログラミングのスタイルをサポートしています。
+Kotlin は、[末尾再帰](https://ja.wikipedia.org/wiki/%E6%9C%AB%E5%B0%BE%E5%86%8D%E5%B1%B0) (tail recursion) として知られる関数型プログラミングのスタイルをサポートしています。
 通常ループを使用するようなアルゴリズムの場合、スタックオーバーフローのリスクなしに再帰関数を使用できます。
 関数が `tailrec` 修飾子でマークされ、必要な形式的条件を満たしている場合、コンパイラは再帰を最適化し、高速で効率的なループベースのバージョンに置き換えます：
 

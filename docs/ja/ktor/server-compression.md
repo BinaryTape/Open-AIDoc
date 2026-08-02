@@ -92,8 +92,6 @@ Zstandard圧縮を含めるには、`ktor-server-compression-zstd`の依存関�
 </Tabs>
 
 これにより、サーバー上で`gzip`、`deflate`、および`identity`エンコーダーが有効になります。
-次の章では、特定のエンコーダーのみを有効にし、データの圧縮条件を設定する方法を説明します。
-追加されたすべてのエンコーダーは、必要に応じてリクエストボディの展開に使用されることに注意してください。
 
 ## 圧縮設定の構成 {id="configure"}
 
@@ -202,6 +200,19 @@ install(Compression) {
     zstd(level = 20)
 }
 ```
+
+## 展開 {id="decompression"}
+
+デフォルトでは、`Compression`プラグインはサーバーレスポンスを圧縮します。リクエストの展開を有効にするには、`mode`プロパティを`CompressionConfig.Mode.DecompressRequest`に設定します：
+
+```kotlin
+install(Compression) { 
+    mode = CompressionConfig.Mode.DecompressRequest
+    gzip()
+}
+```
+
+リクエストの展開が有効な場合、プラグインは設定されたデコーダーを使用して、デシリアライズやマルチパート処理などの他の受信変換によって処理される前にリクエストボディを展開します。
 
 ## カスタムエンコーダーの実装 {id="custom_encoder"}
 

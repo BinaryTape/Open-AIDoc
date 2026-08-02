@@ -569,7 +569,7 @@ SwiftUI는 뷰 모델(`ContentView.ViewModel`)과 뷰(`ContentView`)를 연결�
 
 #### KMP-NativeCoroutines 라이브러리를 사용하여 플로우 소비
 
-1. `iosApp/ContentView.swift`에서 `Greeting().greet()` 함수에 대해 KMP-NativeCoroutine의 `asyncSequence()` 함수를 사용하여 플로우를 소비하도록 `startObserving()` 함수를 업데이트합니다.
+1. `iosApp/ContentView.swift`에서 `Greeting().greet()` 함수에 대해 KMP-NativeCoroutine's `asyncSequence()` 함수를 사용하여 플로우를 소비하도록 `startObserving()` 함수를 업데이트합니다.
 
     ```Swift
     func startObserving() async {

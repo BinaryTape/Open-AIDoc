@@ -150,7 +150,7 @@ val result = buildList {
 ### ビルダー推論の結果への寄与
 
 ビルダー推論は、分析結果に寄与するさまざまな種類の型情報を収集できます。以下を考慮します：
-* ラムダのレシーバーに対して、型パラメータの型を使用するメソッドを呼び出す
+* ラムダのレシーバーに対して、型パラメータ의型を使用するメソッドを呼び出す
   ```kotlin
   val result = buildList {
       // 渡された "value" 引数に基づいて、型引数は String と推論される
@@ -182,7 +182,7 @@ val result = buildList {
   ```kotlin
   fun takeMyLong(x: Long) { ... }
 
-  fun String.isMoreThat3() = length > 3
+  fun String.isMoreThan3() = length > 3
 
   fun takeListOfStrings(x: List<String>) { ... }
 
@@ -194,7 +194,7 @@ val result = buildList {
 
       val result2 = buildList {
           val x = get(0)
-          val isLong = x.isMoreThat3()
+          val isLong = x.isMoreThan3()
       // ...
       } // result2 は List<String> 型になる
   

@@ -51,7 +51,7 @@
   "kotlin.kotlin-overview": "Kotlin overview",
   "kotlin.what-s-new-in-kotlin": "What's new in Kotlin",
   "kotlin.whatsnew22": "Kotlin 2.2.0",
-  "kotlin.whatsnew-eap": "Kotlin 2.4.20-Beta1",
+  "kotlin.whatsnew-eap": "Kotlin 2.4.20-Beta2",
   "kotlin.earlier-versions": "Earlier versions",
   "kotlin.whatsnew2120": "Kotlin 2.1.20",
   "kotlin.whatsnew21": "Kotlin 2.1.0",
@@ -648,5 +648,11 @@
   "kotlin.beginner": "Beginner",
   "kotlin.intermediate": "Intermediate",
   "kotlin.immutable-collections-kotlinx-collections-immutable": "Immutable collections (kotlinx.collections.immutable)",
-  "kotlin.jvm-code-analysis": "Use code analysis tools"
+  "kotlin.jvm-code-analysis": "Use code analysis tools",
+  "kotlin.ksp-command-line": "KSP from the command line",
+  "coroutines.coroutines-cancellation": "Cancellation",
+  "lincheck.testing-data-structures": "Testing data structures",
+  "kmp.kmp-for-ios": "Kotlin Multiplatform for iOS",
+  "koog.cloud-platform-integrations": "Cloud platform integrations",
+  "koog.amazon-bedrock-agentcore": "Amazon Bedrock AgentCore"
 }

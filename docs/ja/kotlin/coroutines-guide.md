@@ -14,7 +14,7 @@ Kotlinは、他のライブラリがコルーチンを利用できるように�
 
 * [コルーチンの基本](coroutines-basics.md)
 * [チュートリアル：コルーチンとチャネルの概要](coroutines-and-channels.md)
-* [キャンセルとタイムアウト](cancellation-and-timeouts.md)
+* [キャンセルとタイムアウト](coroutines-cancellation.md)
 * [中断関数の構成](composing-suspending-functions.md)
 * [コルーチンのコンテキストとディスパッチャ](coroutine-context-and-dispatchers.md)
 * [Flow](coroutines-flow.md)

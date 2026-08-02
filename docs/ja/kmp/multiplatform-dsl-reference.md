@@ -866,7 +866,7 @@ kotlin {
 ```groovy
 kotlin {
     jvm {
-        // JVM ターゲットのすべてのコンパイルを設定
+        // JVM ターゲット의 모든 컴파일을 설정합니다
         compilerOptions {
             allWarningsAsErrors = true
         }

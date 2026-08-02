@@ -56,7 +56,7 @@ dependencies {
          <dependency>
              <groupId>org.jetbrains.lincheck</groupId>
              <artifactId>lincheck</artifactId>
-             <version>${lincheck.version}</version>
+             <version>%lincheckVersion%</version>
              <scope>test</scope>
          </dependency>
          <dependency>
@@ -74,10 +74,10 @@ dependencies {
 
 ## 编写您的第一个测试
 
-对于基本的并发测试，请创建一个测试函数，其中描述应在每个线程中执行的操作以及预期的断言。Lincheck 使用[模型检查](testing-strategies.md#how-model-checking-works)探索程序可能的线程交替，并在出现错误行为时提供错误报告。
+对于基本的并发测试，请创建一个测试函数，其中描述应在每个线程中执行的操作以及预期的断言。Lincheck 使用[模型检查](lincheck-testing-strategies.md#model-checking)探索程序可能的线程交替，并在出现错误行为时提供错误报告。
 
 1. 在 `src/test` 目录中，创建一个 `CounterTest.kt` 文件。
-2. 导入 `org.jetbrains.lincheck`、`kotlinx.concurrent` 和 `kotlin.test` 库：
+2. 导入 `org.jetbrains.lincheck`、`kotlinx.concurrent` 和 `kotlin.test` 库： 
     
     ```kotlin
     import org.jetbrains.lincheck.*
@@ -149,7 +149,7 @@ dependencies {
 
 ## 为数据结构编写测试
 
-除了基本的并发测试外，Lincheck 还支持一种声明式的方法来测试并发数据结构。
+除了基本的并发测试外，Lincheck 还支持一种[声明式方法](lincheck-how-to-test-data-structures.md)来测试并发数据结构。
 
 要在 Lincheck 中测试数据结构，您只需要声明该结构的并发方法和测试函数。Lincheck 生成随机并发方案，使用指定的测试策略执行它们，并提供错误报告。
 
@@ -198,7 +198,7 @@ dependencies {
     fun stressTest() = ModelCheckingOptions().check(this::class)
     ```
    
-    > 在[测试策略](testing-strategies.md#how-model-checking-works)文章中了解模型检查的工作原理。
+    > 在[测试策略](lincheck-testing-strategies.md#model-checking)文章中了解模型检查的工作原理。
     > 
     {style=”tip”}
 
@@ -229,4 +229,4 @@ dependencies {
 
 ## 下一步
 
-在[测试策略](testing-strategies.md)文章中详细了解测试数据结构的声明式方法以及支持的测试策略。
+了解 Lincheck 中[测试并发数据结构的声明式方法](lincheck-how-to-test-data-structures.md)。

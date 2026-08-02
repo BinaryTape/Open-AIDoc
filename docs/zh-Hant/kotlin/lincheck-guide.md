@@ -71,7 +71,7 @@ Lincheck 實作了兩種測試策略，以尋找導致錯誤行為的執行排�
 ## 探索 Lincheck
 
 * 在 [Lincheck 快速入門](lincheck-getting-started.md) 中逐步學習 Lincheck 特性。
-* 在 [測試策略](testing-strategies.md) 文章中了解測試並行資料結構的宣告式方法。
+* 了解 Lincheck 中 [測試並行資料結構的宣告式方法](lincheck-how-to-test-data-structures.md)。
 
 ## 了解更多
 

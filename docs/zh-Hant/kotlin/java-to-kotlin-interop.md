@@ -310,7 +310,7 @@ public class BB8 implements Robot {
 ### Default 方法的相容性模式
 
 Kotlin 提供三種模式來控制介面中的函式如何編譯為 JVM default 方法。
-這些模式決定編譯器是否產生相容性橋接 (compatibility bridge) 以及 `DefaultImpls` 類別中的 static 方法。
+這些模式決定編譯器是否產生相容性橋接以及 `DefaultImpls` 類別中的 static 方法。
 
 您可以使用 `-jvm-default` 編譯器選項來控制此行為：
 
@@ -347,10 +347,16 @@ Kotlin 提供三種模式來控制介面中的函式如何編譯為 JVM default 
 Kotlin 可見性修飾詞按以下方式對應至 Java：
 
 * `private` 成員會編譯為 `private` 成員。
-* `private` 頂層宣告會編譯為 `private` 頂層宣告。如果從類別內部存取，也會包含 Package-private 的存取器。
-* `protected` 保持為 `protected`。（請注意，Java 允許從同一套件中的其他類別存取 protected 成員，而 Kotlin 則不允許，因此 Java 類別對程式碼將具有更廣泛的存取權限。）
-* `internal` 宣告在 Java 中變為 `public`。`internal` 類別的成員會經過名稱修飾 (name mangling)，使其難以從 Java 意外使用，並允許為具有相同簽章但在 Kotlin 規則中彼此不可見的成員進行多載。
-* `public` 保持為 `public`。
+* `private` 頂層宣告會編譯為 Java 中的 `private` 頂層宣告。如果從類別內部存取，也會包含 Package-private 的存取器。
+* `protected` 成員保持為 `protected`。
+
+  請注意，Java 允許從同一套件中的其他類別存取 protected 成員，而 Kotlin 則不允許。
+* `internal` 宣告在 Java 中變為 `public`。
+
+  Kotlin 編譯器會對位元組碼中的 `internal` 成員進行名稱修飾 (name mangling)。這可以防止跨模組的意外覆寫（例如從 Java 擴充 Kotlin 類別時），並允許為具有相同簽章的成員進行多載。
+
+  請注意，`internal` 類別的 public 成員名稱不會被修飾，因此仍可從 Java 呼叫。
+* `public` 成員保持為 `public`。
 
 ## KClass
 

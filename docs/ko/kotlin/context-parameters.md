@@ -52,14 +52,18 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="2.4"}
 
-컨텍스트 파라미터 이름으로 `_`를 사용할 수 있습니다. 이 경우 파라미터 값은 해석(resolution)에는 사용될 수 있지만, 블록 내부에서 이름으로 접근할 수는 없습니다:
+파라미터를 직접 참조할 필요가 없는 경우 컨텍스트 파라미터 이름으로 `_`를 사용할 수 있습니다. 익명 컨텍스트 파라미터는 호출된 함수가 요구하는 컨텍스트 파라미터를 여전히 충족할 수 있지만, 이름으로 접근할 수는 없습니다. 그 값을 명시적으로 접근하려면 `contextOf<T>()`를 사용하세요:
 
 ```kotlin
 // "_"를 컨텍스트 파라미터 이름으로 사용합니다
 context(_: UserService)
 fun logWelcome() {
-    // 해석(Resolution)을 통해 UserService에서 적절한 log 함수를 여전히 찾아냅니다
+    // 익명 파라미터는 outputMessage()가 요구하는 
+    // UserService 컨텍스트 파라미터를 충족합니다
     outputMessage("Welcome!")
+
+    // UserService 값을 명시적으로 가져옵니다
+    contextOf<UserService>().log("Hi!")
 }
 ```
 

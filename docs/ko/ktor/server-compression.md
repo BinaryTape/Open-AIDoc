@@ -92,8 +92,6 @@ Zstandard 압축을 포함하려면 `ktor-server-compression-zstd` 의존성을 
 </Tabs>
 
 이렇게 하면 서버에서 `gzip`, `deflate`, `identity` 인코더가 활성화됩니다.
-다음 장에서는 특정 인코더만 활성화하고 데이터 압축 조건을 구성하는 방법을 살펴보겠습니다.
-추가된 모든 인코더는 필요한 경우 요청 본문의 압축을 해제하는 데 사용됩니다.
 
 ## 압축 설정 구성 {id="configure"}
 
@@ -202,6 +200,19 @@ install(Compression) {
     zstd(level = 20)
 }
 ```
+
+## 압축 해제 {id="decompression"}
+
+기본적으로 `Compression` 플러그인은 서버 응답을 압축합니다. 요청 압축 해제를 활성화하려면 `mode` 속성을 `CompressionConfig.Mode.DecompressRequest`로 설정하세요:
+
+```kotlin
+install(Compression) { 
+    mode = CompressionConfig.Mode.DecompressRequest
+    gzip()
+}
+```
+
+요청 압축 해제가 활성화되면, 플러그인은 구성된 디코더를 사용하여 역직렬화(deserialization) 및 멀티파트 처리와 같은 다른 수신 변환(receive transformations)에 의해 처리되기 전에 요청 본문의 압축을 해제합니다.
 
 ## 커스텀 인코더 구현 {id="custom_encoder"}
 

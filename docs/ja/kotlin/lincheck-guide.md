@@ -72,7 +72,7 @@ Lincheckは、誤った動作につながる実行スケジュールを見つけ
 ## Lincheckを探索する
 
 * [Lincheckを使い始める](lincheck-getting-started.md) で、Lincheckの機能をステップバイステップで学習しましょう。
-* 並行データ構造をテストするための宣言的な手法については、[テスト戦略](testing-strategies.md) の記事で詳しく説明しています。
+* Lincheckにおける[並行データ構造をテストするための宣言的な手法](lincheck-how-to-test-data-structures.md)について学びましょう。
 
 ## 詳細情報
 

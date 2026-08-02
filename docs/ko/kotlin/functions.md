@@ -105,7 +105,7 @@ fun main() {
     // 'userId'에 기본값 0을 사용합니다.
     greeting(message = "Hello!")
     
-    // 오류: 'userId' 파라미터에 값이 전달되지 않았습니다.
+    // 오류: 'message' 파라미터에 값이 전달되지 않았습니다.
     greeting("Hello!")
 }
 ```

@@ -19,10 +19,10 @@ exclude: true
     ``` kotlin title="build.gradle.kts"
     dependencies {
         // 稳定版
-        implementation("ai.koog:koog-agents:1.0.0")
+        implementation("ai.koog:koog-agents:1.1.1")
 
         // Beta 版
-        implementation("ai.koog:koog-agents-additions:1.0.0-beta")
+        implementation("ai.koog:koog-agents-additions:1.1.1-beta")
     }
     ```
 
@@ -31,10 +31,10 @@ exclude: true
     ``` groovy title="build.gradle"
     dependencies {
         // 稳定版
-        implementation 'ai.koog:koog-agents:1.0.0'
+        implementation 'ai.koog:koog-agents:1.1.1'
 
         // Beta 版
-        implementation 'ai.koog:koog-agents-additions:1.0.0-beta'
+        implementation 'ai.koog:koog-agents-additions:1.1.1-beta'
     }
     ```
 
@@ -46,14 +46,14 @@ exclude: true
         <dependency>
             <groupId>ai.koog</groupId>
             <artifactId>koog-agents-jvm</artifactId>
-            <version>1.0.0</version>
+            <version>1.1.1</version>
         </dependency>
 
         <!-- Beta 版 -->
         <dependency>
             <groupId>ai.koog</groupId>
             <artifactId>koog-agents-additions-jvm</artifactId>
-            <version>1.0.0-beta</version>
+            <version>1.1.1-beta</version>
         </dependency>
     </dependency>
     ```

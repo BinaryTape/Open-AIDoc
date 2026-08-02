@@ -2,7 +2,7 @@
 <show-structure for="chapter,procedure" depth="3"/>
 
 [기본](multiplatform-discover-project.md) 및 [심화](multiplatform-advanced-project-structure.md) 프로젝트 구조 개념에 대한 개요를 통해 소스 세트와 의존성 관리에 대해 이해하셨을 것입니다.
-그렇다면 소스 세트를 구성하고 의존성을 사용하는 모듈은 어떻게 관리해야 할까요?
+그렇다면 소스 세트를 구성하고 의존성에 의존하는 모듈은 어떻게 관리해야 할까요?
 
 > 이 문서는 특히 KMP 프로젝트에 대해 설명합니다.
 > 모듈화 의사 결정에 대한 일반적인 이해를 원하시면 [Android의 모듈화 소개](https://developer.android.com/topic/modularization)를 참조하세요.
@@ -32,7 +32,7 @@
 
 ## 앱 진입점을 위한 별도 모듈 생성
 
-권장 구조로의 전환을 설명하기 위해 사용할 예제 프로젝트는 [old-project-structure](https://github.com/kotlin-hands-on/get-started-with-cm/tree/old-project-structure) 브랜치에서 찾을 수 있는 이전 Compose Multiplatform 샘플입니다.
+권장 구조로의 전환을 설명하기 위해 사용할 예제 프로젝트는 샘플 저장소의 [old-project-structure](https://github.com/kotlin-hands-on/get-started-with-cm/tree/old-project-structure) 브랜치에서 찾을 수 있는 이전 Compose Multiplatform 샘플입니다.
 
 이 예제는 모든 공유 코드와 KMP 진입점을 포함하는 단일 Gradle 모듈(`composeApp`)과 iOS 프로젝트 코드 및 설정이 포함된 `iosApp` 폴더로 구성되어 있습니다.
 
@@ -119,7 +119,7 @@
 설정이 완료되면 데스크톱 앱의 코드를 새 디렉토리로 이동합니다:
 
 1. `desktopApp/src` 디렉토리에 새 `main` 디렉토리를 생성합니다.
-2. `composeApp/src/jvmMain/kotlin` 디렉토리를 `desktopApp/src/main/` 디렉토리로 이동합니다.
+2. `composeApp/src/jvmMain/kotlin` 디렉토리를 `desktopApp/src/main/` 디렉토리로 이동합니다:
    패키지 좌표가 `compose.desktop {}` 설정과 일치하는지 확인하는 것이 중요합니다.
 3. 모든 것이 올바르게 구성되었다면 `desktopApp/src/main/.../main.kt` 파일의 import가 작동하고 코드가 컴파일됩니다.
 4. 데스크톱 앱을 실행하려면 **composeApp [jvm]** 실행 구성을 수정합니다:
@@ -551,7 +551,7 @@
 
 ### iOS 통합 업데이트
 
-iOS 앱 진입점은 별도의 Gradle 모듈로 빌드되지 않으므로 소스 코드를 모든 모듈에 포함할 수 있습니다. 이 예제에서는 `shared` 내부에 남겨둘 수 있습니다:
+iOS 앱 진입점은 별도의 Gradle 모듈로 빌드되지 않으므로 소스 코드를 어떤 모듈에도 포함할 수 있습니다. 이 예제에서는 `shared` 내부에 남겨둘 수 있습니다:
 
 1. `composeApp/src/iosMain` 디렉토리를 `shared/src` 디렉토리로 이동합니다.
 2. `shared` 모듈에서 생성된 프레임워크를 사용하도록 Xcode 프로젝트를 구성합니다:

@@ -18,7 +18,7 @@
 
 ```kotlin
 suspend fun greet() {
-    println("來自暫停函式的 Hello world")
+    println("Hello world from a suspending function")
 }
 ```
 
@@ -30,13 +30,13 @@ suspend fun main() {
 }
 
 suspend fun showUserInfo() {
-    println("正在載入使用者...")
+    println("Loading user...")
     greet()
-    println("使用者：John Smith")
+    println("User: John Smith")
 }
 
 suspend fun greet() {
-    println("來自暫停函式的 Hello world")
+    println("Hello world from a suspending function")
 }
 ```
 {kotlin-runnable="true"}
@@ -125,7 +125,7 @@ dependencies {
 
     ```kotlin
     suspend fun greet() {
-        println("執行緒上的 greet()：${Thread.currentThread().name}")
+        println("The greet() on the thread: ${Thread.currentThread().name}")
     }
     
     suspend fun main() {}
@@ -141,7 +141,7 @@ dependencies {
 
     ```kotlin
     suspend fun greet() {
-        println("執行緒上的 greet()：${Thread.currentThread().name}")
+        println("The greet() on the thread: ${Thread.currentThread().name}")
         delay(1000L)
     }
    ```
@@ -176,7 +176,7 @@ dependencies {
         withContext(Dispatchers.Default) { // this: CoroutineScope
             // 使用 CoroutineScope.launch() 在作用域內啟動協同程式
             this.launch { greet() }
-            println("執行緒上的 withContext()：${Thread.currentThread().name}")
+            println("The withContext() on the thread: ${Thread.currentThread().name}")
         }
     }
     ```
@@ -192,7 +192,7 @@ dependencies {
 
     // 定義一個暫停函式
     suspend fun greet() {
-        println("執行緒上的 greet()：${Thread.currentThread().name}")
+        println("The greet() on the thread: ${Thread.currentThread().name}")
         // 暫停 1 秒並釋放執行緒
         delay(1.seconds) 
         // 此處的 delay() 函式模擬了一個暫停 API 呼叫
@@ -208,13 +208,13 @@ dependencies {
    
             // 啟動另一個協同程式
             this.launch() {
-                println("執行緒上的 CoroutineScope.launch()：${Thread.currentThread().name}")
+                println("The CoroutineScope.launch() on the thread: ${Thread.currentThread().name}")
                 delay(1.seconds)
                 // 此處的 delay 函式模擬了一個暫停 API 呼叫
                 // 你可以在此處加入暫停 API 呼叫，例如網路請求
             }
     
-            println("執行緒上的 withContext()：${Thread.currentThread().name}")
+            println("The withContext() on the thread: ${Thread.currentThread().name}")
         }
     }
     ```
@@ -267,17 +267,17 @@ suspend fun main() {
         this.launch {
             this.launch {
                 delay(2.seconds)
-                println("內層協同程式的子項已完成")
+                println("Child of the enclosing coroutine completed")
             }
-            println("子協同程式 1 已完成")
+            println("Child coroutine 1 completed")
         }
         this.launch {
             delay(1.seconds)
-            println("子協同程式 2 已完成")
+            println("Child coroutine 2 completed")
         }
     }
     // 僅在 coroutineScope 中的所有子項都完成後執行
-    println("協同程式作用域已完成")
+    println("Coroutine scope completed")
 }
 //sampleEnd
 ```
@@ -308,7 +308,7 @@ suspend fun main() {
 >
 {style="tip"}
 
-`coroutineScope()` 函式接受一個具有 `CoroutineScope` 接收者的 Lambda。在該 Lambda 內部，隱含接收者是一個 `CoroutineScope`，因此像 `CoroutineScope.launch()` 與 [`CoroutineScope.async()`](#coroutinescope-async) 這樣的建構器函式會被解析為該接收者上的 [擴充函式](extensions.md#extension-functions)。
+`coroutineScope()` 函式接受一個具有 `CoroutineScope` 接收者的 Lambda。在該 Lambda 內部，隱含接收者是一個 `CoroutineScope`，因此像 `CoroutineScope.launch()` 與 [`CoroutineScope.async()`](#coroutinescope-async) 這樣的建構器函式會被解析為該接收者上的 [擴充函式](extensions.md#extension-functions) 上。
 
 要將協同程式建構器提取到另一個函式中，該函式必須宣告一個 `CoroutineScope` 接收者，否則會發生編譯錯誤：
 
@@ -376,11 +376,11 @@ suspend fun performBackgroundWork() = coroutineScope { // this: CoroutineScope
     this.launch {
         // 暫停以模擬背景工作
         delay(100.milliseconds)
-        println("在背景發送通知")
+        println("Sending notification in background")
     }
 
     // 主協同程式繼續執行，而前一個協同程式正在暫停中
-    println("作用域繼續執行")
+    println("Scope continues")
 }
 //sampleEnd
 ```
@@ -390,7 +390,7 @@ suspend fun performBackgroundWork() = coroutineScope { // this: CoroutineScope
 
 > `CoroutineScope.launch()` 函式會回傳一個 [`Job`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-job/) 控制代碼。
 > 使用此控制代碼可等待已啟動的協同程式完成。
-> 如需更多資訊，請參閱[取消與逾時](cancellation-and-timeouts.md#cancel-coroutines)。
+> 若要了解更多資訊，請參閱[取消與逾時](coroutines-cancellation.md#cancel-coroutines)。
 > 
 {style="tip"}
 
@@ -409,18 +409,18 @@ suspend fun main() = withContext(Dispatchers.Default) { // this: CoroutineScope
     // 開始下載第一個頁面
     val firstPage = this.async {
         delay(50.milliseconds)
-        "第一頁"
+        "First page"
     }
 
     // 開始平行下載第二個頁面
     val secondPage = this.async {
         delay(100.milliseconds)
-        "第二頁"
+        "Second page"
     }
 
     // 等待兩個結果並進行比較
     val pagesAreEqual = firstPage.await() == secondPage.await()
-    println("頁面是否相同：$pagesAreEqual")
+    println("Pages are equal: $pagesAreEqual")
 }
 //sampleEnd
 ```
@@ -482,7 +482,7 @@ suspend fun myReadItem(): Int {
 ```kotlin
 suspend fun runWithDispatcher() = coroutineScope { // this: CoroutineScope
     this.launch(Dispatchers.Default) {
-        println("執行於 ${Thread.currentThread().name}")
+        println("Running on ${Thread.currentThread().name}")
     }
 }
 ```
@@ -497,31 +497,31 @@ import kotlinx.coroutines.*
 
 //sampleStart
 suspend fun main() = withContext(Dispatchers.Default) { // this: CoroutineScope
-    println("正在 ${Thread.currentThread().name} 上執行 withContext 區塊")
+    println("Running withContext block on ${Thread.currentThread().name}")
 
     val one = this.async {
-        println("第一個計算開始於 ${Thread.currentThread().name}")
+        println("First calculation starting on ${Thread.currentThread().name}")
         val sum = (1L..500_000L).sum()
         delay(200L)
-        println("第一個計算完成於 ${Thread.currentThread().name}")
+        println("First calculation done on ${Thread.currentThread().name}")
         sum
     }
 
     val two = this.async {
-        println("第二個計算開始於 ${Thread.currentThread().name}")
+        println("Second calculation starting on ${Thread.currentThread().name}")
         val sum = (500_001L..1_000_000L).sum()
-        println("第二個計算完成於 ${Thread.currentThread().name}")
+        println("Second calculation done on ${Thread.currentThread().name}")
         sum
     }
 
     // 等待兩個計算並印出結果
-    println("合併總計：${one.await() + two.await()}")
+    println("Combined total: ${one.await() + two.await()}")
 }
 //sampleEnd
 ```
 {kotlin-runnable="true"}
 
-要了解更多關於協同程式分派器及其用途的資訊，包括 [`Dispatchers.IO`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-dispatchers/-i-o.html) 和 [`Dispatchers.Main`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-dispatchers/-main.html) 等其他分派器，請參閱[協同程式上下文與分派器](coroutine-context-and-dispatchers.md)。
+若要了解更多關於協同程式分派器及其用途的資訊，包括 [`Dispatchers.IO`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-dispatchers/-i-o.html) 和 [`Dispatchers.Main`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-dispatchers/-main.html) 等其他分派器，請參閱[協同程式上下文與分派器](coroutine-context-and-dispatchers.md)。
 
 ## 比較協同程式與 JVM 執行緒
 
@@ -583,6 +583,6 @@ fun main() {
 ## 下一步
 
 * 在[組合暫停函式](composing-suspending-functions.md)中探索更多關於結合暫停函式的資訊。
-* 在[取消與逾時](cancellation-and-timeouts.md)中了解如何取消協同程式並處理逾時。
+* 在[取消與逾時](coroutines-cancellation.md)中了解如何取消協同程式並處理逾時。
 * 在[協同程式上下文與分派器](coroutine-context-and-dispatchers.md)中深入研究協同程式的執行與執行緒管理。
 * 了解如何在[非同步流](coroutines-flow.md)中回傳多個非同步計算的值。

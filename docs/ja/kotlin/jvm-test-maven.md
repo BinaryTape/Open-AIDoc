@@ -153,6 +153,119 @@ Surefire とは異なり、Failsafe は `integration-test` フェーズ中にテ
 mvn verify
 ```
 
+## 詳細な失敗メッセージの取得
+
+Kotlin の [Power-assert コンパイラプラグイン](power-assert.md) は、アサーション内の中間値を表示する詳細な失敗メッセージを生成し、コンソール出力に完全な図（ダイアグラム）を表示します。
+
+1. Power-assert を有効にするには、以下の設定をプロジェクトの `pom.xml` に追加します。
+
+    ```xml
+    <properties>
+        <kotlin.version>%kotlinVersion%</kotlin.version>
+        <kotlin.compiler.jdkRelease>17</kotlin.compiler.jdkRelease>
+    </properties>
+    
+    <dependencies>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-test-junit5</artifactId>
+            <version>${kotlin.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-maven-plugin</artifactId>
+                <version>${kotlin.version}</version>
+                <extensions>true</extensions>
+                <executions>
+                    <execution>
+                        <id>compile</id>
+                        <phase>process-sources</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>test-compile</id>
+                        <phase>process-test-sources</phase>
+                        <goals>
+                            <goal>test-compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <!-- Power-assert プラグインを指定 -->
+                    <compilerPlugins>
+                        <plugin>power-assert</plugin>
+                    </compilerPlugins>
+                    <!-- 変換する関数を指定 -->
+                    <pluginOptions>
+                        <option>power-assert:function=kotlin.test.assertEquals</option>
+                        <option>power-assert:function=kotlin.test.assertTrue</option>
+                    </pluginOptions>
+                </configuration>
+                <!-- Power-assert プラグインの依存関係を追加 -->
+                <dependencies>
+                    <dependency>
+                        <groupId>org.jetbrains.kotlin</groupId>
+                        <artifactId>kotlin-maven-power-assert</artifactId>
+                        <version>${kotlin.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+        </plugins>
+    </build>
+    ```
+    {initial-collapse-state="collapsed" collapsible="true" ignore-vars="false" collapsed-title="kotlin-maven-power-assert の設定"}
+    
+    * `<properties>` セクションで、Kotlin のバージョンとターゲット JDK リリースバージョン（例：JDK 17）を設定します。
+    * `<dependencies>` セクションに、テスト実行用の `kotlin-test-junit5` を追加します。
+    * `<build><plugins>` セクションで、`power-assert` コンパイラプラグインを使用して `kotlin-maven-plugin` を設定します。`<pluginOptions>` の下に変換したいアサーション関数をリストし、Power-assert プラグインの依存関係を追加します。
+
+2. テストファイル `UserProfileBackendTest.kt` を `src/test/kotlin` ディレクトリに作成します。
+
+    ```kotlin
+    import kotlin.test.Test
+    import kotlin.test.assertEquals
+    
+    class UserProfileBackendTest {
+    
+        data class UserProfile(val id: Long, val email: String)
+    
+        @Test
+        fun `verify backend entity mapping matches`() {
+            // 期待されるオブジェクトの状態を定義
+            val expectedRecord = UserProfile(id = 451L, email = "admin-dev@company.internal")
+    
+            // 不一致となるバックエンドレスポンスをシミュレート 
+            val actualRecord = UserProfile(id = 451L, email = "admin-prod@company.com")
+    
+            // 標準の kotlin.test アサーションを使用
+            assertEquals(expectedRecord, actualRecord, "Profile configurations out of sync")
+        }
+    }
+    ```
+
+3. テストを実行して出力を確認します。
+
+    ```bash
+    mvn test
+    ```
+
+コンソールには完全な Power-assert の図が表示され、式の各位置における期待値と実際の値の差が示されます。
+
+```text
+Profile configurations out of sync
+assertEquals(expectedRecord, actualRecord, "Profile configurations out of sync")
+             |               |
+             |               UserProfile(id=451, email=admin-prod@company.com)
+             UserProfile(id=451, email=admin-dev@company.internal)
+```
+
 ## その他のテスティングフレームワークの探索
 
 JUnit のほかに、Kotlin のテストをよりイディオマティック（Kotlin らしい書き方）で読みやすくするために、他の人気のあるフレームワークを使用することもできます。
@@ -168,4 +281,4 @@ JUnit のほかに、Kotlin のテストをよりイディオマティック（K
 ## 次のステップ
 
 * [`kotlin.test` ライブラリ](https://kotlinlang.org/api/latest/kotlin.test/kotlin.test/) の機能を探索する。
-* [Kotlin の Power-assert コンパイラプラグイン](power-assert.md) を使用して、テスト出力を改善する。
+* [Power-assert コンパイラプラグイン](power-assert.md) について詳しく学ぶ。

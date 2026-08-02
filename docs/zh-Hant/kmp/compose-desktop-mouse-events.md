@@ -58,7 +58,7 @@ fun main() = singleWindowApplication(title = "Mouse clicks") {
 
 <img src="compose-mouse-click-listeners.animated.gif" alt="Mouse click listeners" width="600" preview-src="compose-mouse-click-listeners.png"/>
 
-`combinedClickable` 修飾符僅支援主要按鈕（滑鼠左鍵）與觸控事件。如果您需要以不同方式處理按鈕，請參閱 [`Modifier.onClick`](#experimental-onclick-handlers) 章節。
+`combinedClickable` 修飾符僅支援主要按鈕（滑鼠左鍵）與觸控事件。如果您需要以不同方式處理按鈕，請參閱 [`Modifier.onClick`](#onclick-handlers) 章節。
 
 ## 移動監聽器
 
@@ -204,7 +204,7 @@ fun main() = singleWindowApplication(title = "Mouse scroll listeners") {
 
 <img src="compose-mouse-scroll-listeners.animated.gif" alt="Mouse scroll listeners" width="600" preview-src="compose-mouse-scroll-listeners.png"/>
 
-## 實驗性 onClick 處理常式
+## 實驗性 onClick 處理常式 {id="onclick-handlers"}
 
 > `onClick` 修飾符目前處於 [實驗性（Experimental）](supported-platforms.md#compose-multiplatform-ui-framework-stability-levels) 階段，且僅在桌面專案中受支援。需明確聲明使用（Opt-in，詳情見下文），且您應僅將其用於評估目的。
 >

@@ -5,6 +5,7 @@
 
 [Liquid Glass](https://developer.apple.com/documentation/TechnologyOverviews/liquid-glass) は、iOS 26 で導入された Apple のビジュアルデザインシステムであり、UI 要素にガラスのような半透明感と流動性をもたらします。
 Compose Multiplatform アプリでこれを採用するには、ネイティブの SwiftUI シェルが必要です。これは、Liquid Glass 効果がネイティブの `TabView`、`NavigationStack`、およびツールバー API を通じてシステムによってレンダリングされるためです。
+SwiftUI がプロジェクトに適さない場合は、[代替アプローチ](#alternative-approaches)を参照してください。
 
 このチュートリアルでは、各画面のコンテンツのレンダリングは Compose に任せたまま、**iOS アプリを完全に Compose 主導のナビゲーションから iOS 26 の Liquid Glass スタイリングを適用したネイティブの SwiftUI ナビゲーションへと移行する**手順を説明します。
 アプリがネイティブの `TabView` および `NavigationStack` ビューを使用すると、システムが自動的に Liquid Glass 効果を適用するため、Liquid Glass 専用のコードを記述する必要はありません。
@@ -31,7 +32,7 @@ Compose Multiplatform アプリでこれを採用するには、ネイティブ�
 UI コードが完全に共有されている Compose Multiplatform の構成では、単一の `ComposeUIViewController` が iOS の UI 全体（タブ、ナビゲーションスタック、戻るジェスチャ、画面コンテンツ）を担当します。
 Compose Multiplatform の iOS 上でのナビゲーション遷移はネイティブのように感じられるよう設計されていますが、iOS 26 の Liquid Glass タブバースタイリングのような一部のプラットフォームレベルの機能は、ネイティブの iOS コンポーネントを通じてのみ利用可能です。
 
-解決策は、ナビゲーションを SwiftUI に引き渡し、システムにタブバーとナビゲーションスタックをネイティブにレンダリングさせつつ、Compose が各画面のコンテンツをレンダリングし続けるようにすることです。
+解決策は、ネイティブの iOS にタブバーとナビゲーションスタックを所有させつつ、Compose が各画面のコンテンツをレンダリングし続けるようにすることです。
 
 **移行前:**
 
@@ -68,7 +69,7 @@ ContentView
 * [ルートにタイトルのメタデータを追加する](#add-title-metadata-to-routes): SwiftUI が Kotlin 側を呼び出さずにナビゲーションバーのタイトルとバックスタックのエントリをレンダリングできるようにします。
 * [iOS エントリポイントにナビゲーションコールバックを追加する](#add-navigation-callbacks-to-the-ios-entry-point): iOS レイヤーがどのタブをアクティブにするかを制御し、ナビゲーションイベントに応答できるようにします。
 * [Compose レベルでナビゲーションをインターセプトする](#intercept-navigation-at-the-compose-level): 詳細ルートが Compose で処理されるのではなく、Swift に転送されるようにします。このチュートリアルでは Navigation 3 の実装を示しますが、別のナビゲーションライブラリを使用している場合はこのステップを調整してください。
-* [iOS 用のスタンドアロン画面レンダラーを構築する](#build-a-standalone-screen-renderer-for-ios): SwiftUI が完全な `App()` の外側で、任意詳細ルートを単独でレンダリングできるようにします。
+* [iOS 用のスタンドアロン画面レンダラーを構築する](#build-a-standalone-screen-renderer-for-ios): SwiftUI が完全な `App()` の外側で、任意の詳細ルートを単独でレンダリングできるようにします。
 * [Compose 内蔵のナビゲーション UI を非表示にする](#hide-compose-s-built-in-navigation-ui): SwiftUI が制御しているときにユーザーに重複したタイトルバーや戻るボタンが表示されないようにします。
 * [新しい iOS エントリポイントを公開する](#expose-new-ios-entry-points): ルートビューコントローラーと個別の画面ビューコントローラーを作成するための関数を公開します。
 
@@ -411,6 +412,58 @@ SwiftUI から新しいナビゲーション構造を構築するために、3 �
 
 完全な実装については、[`main.ios.kt`](https://github.com/JetBrains/kotlinconf-app/blob/3982334f1c3712fb959f0d20b563d6c8b81e9bbd/app/shared/src/iosMain/kotlin/org/jetbrains/kotlinconf/main.ios.kt) を参照してください。
 
+### 代替案: SwiftUI をスキップして Kotlin から UIKit を駆動する {collapsible="true"}
+
+上記のエントリポイントは、SwiftUI の `TabView` および `NavigationStack` 用に設計されています。
+内部的には、SwiftUI は `UITabBarController` と `UINavigationController` を使用してこれらのビューを実装しており、iOS 26 の Liquid Glass は、SwiftUI で宣言するか UIKit で構成するかに関わらず、ネイティブのタブバーおよびナビゲーションバーに適用されます。
+
+新しい iOS エントリポイントをゼロから作成する場合、または維持すべき SwiftUI アプリや `ContentView` がまだない場合は、SwiftUI レイヤーを完全にスキップして Kotlin から直接 UIKit を駆動できます。
+このアプローチでは、このチュートリアルの SwiftUI シェルが必要とする `RouteWrapper` の同一性に関する回避策、Kotlin コールバックからミラーリングされた `@Observable` パス状態、および `UIViewControllerRepresentable` ラッパーを回避できます。
+ナビゲーション状態は Swift と Kotlin に重複することなく、1 か所に保持されます。
+
+ネイティブのナビゲーションバーと共有の Compose 画面コンテンツを取得するには、`commonMain` でナビゲーションコントラクトを `expect class` コーディネーターとして宣言し、各プラットフォームで `actual` 実装を行います。
+
+このチュートリアルの SwiftUI シェルは宣言的です。`TabView` と `NavigationStack` を記述すると、SwiftUI がスタックを管理します。
+UIKit コーディネーターのアプローチは命令的です。`UINavigationController` を所有し、自分自身で `push` および `pop` を呼び出します。
+
+```
+SceneDelegate
+  └── UIWindow.rootViewController = UITabBarController
+        ├── UINavigationController (Schedule)
+        │     ├── ComposeUIViewController  ← タブルート
+        │     └── ComposeUIViewController  ← 詳細、Kotlin 内でプッシュされる
+        └── UINavigationController (Info)
+              └── ...
+```
+
+このチュートリアルの SwiftUI 部分は、UIKit コーディネーターに次のように対応します。
+
+* SwiftUI `TabView` および `NavigationStack` → `UITabBarController` および `UINavigationController`
+* `TabNavigationCoordinator` および `RouteWrapper` → Kotlin の `actual` コーディネーターの `push` および `pop`
+* `NativeNavComposeView` および `DetailComposeView` → コーディネーター内の `ComposeUIViewController { Screen(...) }`
+* `ContentView` SwiftUI シェル → `SceneDelegate` が `window.rootViewController` を設定
+
+```kotlin
+// commonMain
+expect class ScheduleCoordinator() {
+    fun navigateToDetail(route: AppRoute)
+    fun navigateBack()
+    @Composable fun Content()
+}
+```
+
+`iosMain` での `actual` 実装は、`UINavigationController` の `push` と `pop` を呼び出し、`showTopBar` を `false` に設定します。
+iOS では、`SceneDelegate` からコーディネーターを作成し、タブバーコントローラーをウィンドウのルートビューコントローラーとして設定します。SwiftUI の `App` や `ContentView` ラッパーは必要ありません。
+
+Kotlin と Swift の間で作業を分担する方法は 2 つあります。
+
+* **すべて Kotlin の `iosMain` で行う**: UIKit の相互運用機能を使用して、`actual` コーディネーター内で `UITabBarController`、`UINavigationController`、および `ComposeUIViewController` を接続します。
+* **画面ファクトリは Kotlin、組み立ては Swift で行う**: `iosMain` から `MainViewController` と `ScreenViewController` を公開し、ナビゲーションクロージャを持つ `ComposeUIViewController` インスタンスを返します。そして、ネイティブ Swift でタブバーとナビゲーションスタックを構築します。このオプションは、画面コンテンツを Compose で共有したまま、iOS のナビゲーションコードを Swift に留めておきたい場合に適しています。
+
+どちらのオプションでも、SwiftUI や `UIViewControllerRepresentable` を使用せずに、同様のフラットな UIKit 階層が得られます。コーディネーターロジックをどこに置きたいかに基づいて選択してください。
+
+`UITabBarController` 内で Compose を使用する方法の詳細については、[UIKit フレームワークとの統合](compose-uikit-integration.md) を参照してください。
+
 ## SwiftUI ナビゲーションレイヤーを構築する
 
 ここからは移行の iOS 側の作業です。これまでのステップでの Kotlin の変更はすべて、ここで行われることへの準備です。つまり、Compose ビューを遷移先としてホストする、タブごとの `NavigationStack` を備えた SwiftUI の `TabView` を作成します。
@@ -678,8 +731,9 @@ struct ContentView: View {
 
 ## 代替アプローチ
 
-このチュートリアルの移行方法はネイティブの SwiftUI ナビゲーションを優先しており、これにより Liquid Glass やその他のシステム動作をすぐに利用できます。このアプローチがプロジェクトに合わない場合は、以下の代替案を検討してください。
+このチュートリアルでの移行方法はネイティブの SwiftUI ナビゲーションを優先しており、これにより Liquid Glass やその他のシステム動作をすぐに利用できます。このアプローチがプロジェクトに合わない場合は、以下の代替案を検討してください。
 
+* **Kotlin から調整された UIKit ナビゲーション**。`commonMain` でナビゲーションコントラクトを `expect class` コーディネーターとして宣言し、各プラットフォームで `UITabBarController` や `UINavigationController` を命令的に駆動する `actual` 実装を行います。SwiftUI シェルなしで Liquid Glass と単一のナビゲーション状態ソースを取得できますが、UIKit 相互運用コードを書く必要があります。[SwiftUI をスキップして Kotlin から UIKit を駆動する](#alternative-skip-swiftui-and-drive-uikit-from-kotlin) の詳細を参照してください。
 * **ネイティブの相互運用コントロールを使用した Compose 主導のナビゲーション**。ナビゲーションは Compose に残したまま、Liquid Glass スタイリングを含む `UITabBar` や `UINavigationBar` などのネイティブ UI コントロールを埋め込みます。トレードオフは、ネイティブオーバーレイと Compose コンテンツ間の相互運用に関するいくつかの制限です。
 * **アダプティブ UI のためのサードパーティ製ソリューションを使用した Compose 主導のナビゲーション**。[Calf](https://klibs.io/project/MohamedRejeb/Calf) のようなライブラリを使用して、アプリが動作しているプラットフォームにネイティブなアダプティブ UI コンポーネントをレンダリングします。このアプローチにより、プラットフォーム間の差異をご自身で処理する複雑さが軽減され、iOS での Liquid Glass のようなネイティブな動作がそのまま提供されます。
 * **Liquid Glass 効果を模倣した Compose のみのナビゲーション**。すべてを Compose でレンダリングし、Liquid Glass を視覚的に近似させます。例えば、[AndroidLiquidGlass](https://klibs.io/project/Kyant0/AndroidLiquidGlass) や [Liquid](https://klibs.io/project/FletchMcKee/liquid) といったライブラリを使用します。このアプローチでは、すべての UI が Compose 側に保持され、効果は視覚的に似ていますが、システムの Liquid Glass と同一ではありません。

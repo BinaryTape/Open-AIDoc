@@ -13,7 +13,7 @@
 <var name="example_name" value="json-kotlinx-openapi"/>
 <p>
     <b>코드 예제</b>:
-    <a href="https://github.com/ktorio/ktor-documentation/tree/%ktor_version%/codeSnippets/snippets/%example_name%">
+    <a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/%example_name%">
         %example_name%
     </a>
 </p>
@@ -94,15 +94,19 @@ swaggerUI("/swaggerUI") {
 
 ## Swagger UI 구성
 
-예를 들어 커스텀 Swagger UI 버전을 지정하는 등 `swaggerUI {}` 블록 내에서 Swagger UI를 구성할 수 있습니다:
+예를 들어 기본 Swagger UI 버전을 재정의하는 등 `swaggerUI {}` 블록 내에서 Swagger UI를 커스텀할 수 있습니다:
 
 ```kotlin
 routing {
     swaggerUI(path = "swagger", swaggerFile = "openapi/documentation.yaml") {
-        version = "4.15.5"
+        version = "5.31.0"
     }
 }
 ```
+
+> OpenAPI 3.1.x 문서에는 Swagger UI 5.x가 필요하며, Swagger UI 4.x는 OpenAPI 3.0.x만 지원합니다.
+>
+{style="note"}
 
 ## CORS 구성 {id="configure-cors"}
 

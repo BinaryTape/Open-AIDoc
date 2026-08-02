@@ -74,7 +74,7 @@ kotlin {
 
 各オペレーティングシステムには、ディープリンクを処理する独自の方法があります。特定のターゲットのドキュメントを参照するのが最も確実です。
 
-* Android アプリの場合、ディープリンクスキーマは `AndroidManifest.xml` ファイル内のインテントフィルタとして宣言されます。インテントフィルタを正しく設定する方法については、[Android ドキュメント](https://developer.android.com/training/app-links/deep-linking?hl=ja#adding-filters)を参照してください。
+* Android アプリの場合、ディープリンクスキーマは `AndroidManifest.xml` ファイル内のインテントフィルタとして宣言されます。インテントフィルタを正しく設定する方法については、[Android ドキュメント](https://developer.android.com/training/app-links/deep-linking?hl=en#adding-filters)を参照してください。
 * iOS および macOS アプリの場合、ディープリンクスキーマは `Info.plist` ファイルの [CFBundleURLTypes](https://developer.apple.com/documentation/bundleresources/information-property-list/cfbundleurltypes) キーで宣言されます。
 
     > Compose Multiplatform は、macOS アプリの `Info.plist` に値を追加するための [Gradle DSL を提供しています](compose-native-distribution.md#information-property-list-on-macos)。iOS の場合は、KMP プロジェクトでファイルを直接編集するか、[Xcode GUI を使用してスキーマを登録](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app#Register-your-URL-scheme)できます。

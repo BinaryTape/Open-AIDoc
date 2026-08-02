@@ -135,7 +135,7 @@ ViewとComposeの相互運用性を使用することもできますが、Java�
 1. クイックスタートから、[Kotlin Multiplatform環境のセットアップ](quickstart.md#set-up-the-environment)の手順を完了してください。
 
    > iOSアプリケーションをビルドして実行するには、macOSを搭載したMacが必要です。
-   > これはAppleの要件です。
+   > これはAppleの要求事項です。
    >
    {style="note"}
 
@@ -177,7 +177,7 @@ Java専用の呼び出しの簡単な例は `Objects.hash()` で、これをKotl
 [移行結果のコミット](https://github.com/kotlin-hands-on/jetcaster-kmp-migration/commit/29341a430e6c98a4f7deaed1d6863edb98e25659)を参照してください。
 
 しかし、Jetcasterの例でコードを直接共通化（commonizing）することを最も妨げているのは `java.time` パッケージです。
-ポッドキャストアプリでは時間の計算がほぼすべての場所で行われるため、KMP’のコード共有の恩恵を真に受けるには、そのコードを `kotlin.time` と `kotlinx-datetime` に移行する必要があります。
+ポッドキャストアプリでは時間の計算がほぼすべての場所で行われるため、KMPのコード共有の恩恵を真に受けるには、そのコードを `kotlin.time` と `kotlinx-datetime` に移行する必要があります。
 
 時間に関連するすべての書き換えは、[このコミット](https://github.com/kotlin-hands-on/jetcaster-kmp-migration/commit/0cb5b31964991fdfaed7615523bb734b22f9c755)にまとめられています。
 

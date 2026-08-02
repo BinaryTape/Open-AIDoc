@@ -7,11 +7,11 @@
 * [什麼是 Compose Multiplatform Gradle 外掛程式](#gradle-plugin)？
 * [基本任務的詳細資訊](#basic-tasks)，例如在本機執行應用程式，以及[進階任務](#minification-and-obfuscation)（如縮減與混淆）。
 * [如何包含 JDK 模組](#including-jdk-modules)以及如何處理 `ClassNotFoundException`。
-* [如何指定發行屬性](#specifying-distribution-properties)：軟件包版本、JDK 版本、輸出目錄、啟動器屬性與元資料。
+* [如何指定發行屬性](#specifying-distribution-properties)：軟體包版本、JDK 版本、輸出目錄、啟動器屬性與元資料。
 * [如何管理資源](#managing-resources)：使用資源程式庫、JVM 資源載入或將檔案加入封裝後的應用程式。
 * [如何自訂原始碼集](#custom-source-sets)：使用 Gradle 原始碼集、Kotlin JVM 目標或手動配置。
 * [如何指定應用程式圖示](#application-icon)：為每個作業系統指定圖示。
-* [特定平台選項](#platform-specific-options)，例如 Linux 上的軟件包維護者電子郵件，以及 macOS 上 Apple App Store 的應用程式類別。
+* [特定平台選項](#platform-specific-options)，例如 Linux 上的軟體包維護者電子郵件，以及 macOS 上 Apple App Store 的應用程式類別。
 * [macOS 特定配置](#macos-specific-configuration)：簽名、公證與 `Info.plist`。
 
 ## Gradle plugin
@@ -20,7 +20,7 @@
 
 該外掛程式簡化了使用 `jpackage` 將應用程式封裝為原生發行版本並在本機執行應用程式的過程。可發行的應用程式是自包含且可安裝的二進位檔案，其中包含了所有必要的 Java 執行階段元件，不需要在目標系統上安裝 JDK。
 
-為了最小化軟件包大小，Gradle 外掛程式使用 [jlink](https://openjdk.org/jeps/282) 工具，以確保在可發行軟件包中僅綑綁必要的 Java 模組。但是，你仍必須配置 Gradle 外掛程式以指定所需的模組。如需詳細資訊，請參閱 [包含 JDK 模組](#including-jdk-modules)部分。
+為了最小化軟體包大小，Gradle 外掛程式使用 [jlink](https://openjdk.org/jeps/282) 工具，以確保在可發行軟體包中僅綑綁必要的 Java 模組。但是，你仍必須配置 Gradle 外掛程式以指定所需的模組。如需詳細資訊，請參閱 [包含 JDK 模組](#including-jdk-modules)部分。
 
 作為另一種選擇，你可以使用 [Conveyor](https://www.hydraulic.software)，這是一個非 JetBrains 開發的外部工具。Conveyor 支援線上更新、跨平台編譯以及各種其他功能，但對於非開源專案需要[授權](https://hydraulic.software/pricing.html)。如需詳細資訊，請參閱 [Conveyor 文件](https://conveyor.hydraulic.dev/latest/tutorial/hare/jvm)。
 
@@ -138,57 +138,57 @@ compose.desktop {
 
 ### Package version
 
-原生發行軟件包必須具有特定的軟件包版本。若要指定軟件包版本，你可以使用以下 DSL 屬性，按優先級從高到低排列：
+原生發行軟體包必須具有特定的軟體包版本。若要指定軟體包版本，你可以使用以下 DSL 屬性，按優先級從高到低排列：
 
-* `nativeDistributions.<os>.<packageFormat>PackageVersion` 為單一軟件包格式指定版本。
+* `nativeDistributions.<os>.<packageFormat>PackageVersion` 為單一軟體包格式指定版本。
 * `nativeDistributions.<os>.packageVersion` 為單一目標作業系統指定版本。
-* `nativeDistributions.packageVersion` 為所有軟件包指定版本。
+* `nativeDistributions.packageVersion` 為所有軟體包指定版本。
 
 在 macOS 上，你還可以使用以下 DSL 屬性指定組建版本，同樣按優先級從高到低排列：
 
-* `nativeDistributions.macOS.<packageFormat>PackageBuildVersion` 為單一軟件包格式指定組建版本。
-* `nativeDistributions.macOS.packageBuildVersion` 為所有 macOS 軟件包指定組建版本。
+* `nativeDistributions.macOS.<packageFormat>PackageBuildVersion` 為單一軟體包格式指定組建版本。
+* `nativeDistributions.macOS.packageBuildVersion` 為所有 macOS 軟體包指定組建版本。
 
-如果你不指定組建版本，Gradle 將使用軟件包版本。如需了解有關 macOS 版本控制的更多資訊，請參閱 [`CFBundleShortVersionString`](https://developer.apple.com/documentation/bundleresources/information_property_list/cfbundleshortversionstring) 和 [`CFBundleVersion`](https://developer.apple.com/documentation/bundleresources/information_property_list/cfbundleversion) 文件。
+如果你不指定組建版本，Gradle 將使用軟體包版本。如需了解有關 macOS 版本控制的更多資訊，請參閱 [`CFBundleShortVersionString`](https://developer.apple.com/documentation/bundleresources/information_property_list/cfbundleshortversionstring) 和 [`CFBundleVersion`](https://developer.apple.com/documentation/bundleresources/information_property_list/cfbundleversion) 文件。
 
-以下是按優先級順序指定軟件包版本的範本：
+以下是按優先級順序指定軟體包版本的範本：
 
 ```kotlin
 compose.desktop {
     application {
         nativeDistributions {
-            // 所有軟件包的版本
+            // 所有軟體包的版本
             packageVersion = "..." 
           
             macOS {
-              // 所有 macOS 軟件包的版本
+              // 所有 macOS 軟體包的版本
               packageVersion = "..."
-              // 僅限 dmg 軟件包的版本
+              // 僅限 dmg 軟體包的版本
               dmgPackageVersion = "..." 
-              // 僅限 pkg 軟件包的版本
+              // 僅限 pkg 軟體包的版本
               pkgPackageVersion = "..." 
               
-              // 所有 macOS 軟件包的組建版本
+              // 所有 macOS 軟體包的組建版本
               packageBuildVersion = "..."
-              // 僅限 dmg 軟件包的組建版本
+              // 僅限 dmg 軟體包的組建版本
               dmgPackageBuildVersion = "..." 
-              // 僅限 pkg 軟件包的組建版本
+              // 僅限 pkg 軟體包的組建版本
               pkgPackageBuildVersion = "..." 
             }
             windows {
-              // 所有 Windows 軟件包的版本
+              // 所有 Windows 軟體包的版本
               packageVersion = "..."  
-              // 僅限 msi 軟件包的版本
+              // 僅限 msi 軟體包的版本
               msiPackageVersion = "..."
-              // 僅限 exe 軟件包的版本
+              // 僅限 exe 軟體包的版本
               exePackageVersion = "..." 
             }
             linux {
-              // 所有 Linux 軟件包的版本
+              // 所有 Linux 軟體包的版本
               packageVersion = "..."
-              // 僅限 deb 軟件包的版本
+              // 僅限 deb 軟體包的版本
               debPackageVersion = "..."
-              // 僅限 rpm 軟件包的版本
+              // 僅限 rpm 軟體包的版本
               rpmPackageVersion = "..."
             }
         }
@@ -197,7 +197,7 @@ compose.desktop {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="compose.desktop { application { nativeDistributions { packageVersion ="}
 
-要定義軟件包版本，請遵循以下規則：
+要定義軟體包版本，請遵循以下規則：
 
 <table>
     
@@ -425,7 +425,7 @@ compose.desktop {
 
 ### Adding files to packaged application
 
-在某些情況下，從 `.jar` 檔案載入資源可能不太切合實際，例如當你擁有特定平台的資產，且只需要在 macOS 軟件包中包含檔案，而不需要在 Windows 中包含時。
+在某些情況下，從 `.jar` 檔案載入資源可能不太切合實際，例如當你擁有特定平台的資產，且只需要在 macOS 軟體包中包含檔案，而不需要在 Windows 中包含時。
 
 在這些情況下，你可以配置 Gradle 外掛程式以在安裝目錄中包含額外的資源檔案。使用 DSL 指定資源根目錄，如下所示：
 
@@ -448,13 +448,13 @@ compose.desktop {
 Gradle 外掛程式將按以下方式包含來自資源子目錄的檔案：
 
 1. **通用資源：**
-位於 `<RESOURCES_ROOT_DIR>/common` 中的檔案將包含在所有軟件包中，無論目標作業系統或架構為何。
+位於 `<RESOURCES_ROOT_DIR>/common` 中的檔案將包含在所有軟體包中，無論目標作業系統或架構為何。
 
 2. **作業系統特定資源：**
-位於 `<RESOURCES_ROOT_DIR>/<OS_NAME>` 中的檔案將僅包含在為特定作業系統組建的軟件包中。`<OS_NAME>` 的有效值為：`windows`、`macos` 和 `linux`。
+位於 `<RESOURCES_ROOT_DIR>/<OS_NAME>` 中的檔案將僅包含在為特定作業系統組建的軟體包中。`<OS_NAME>` 的有效值為：`windows`、`macos` 和 `linux`。
 
 3. **作業系統與架構特定資源：**
-位於 `<RESOURCES_ROOT_DIR>/<OS_NAME>-<ARCH_NAME>` 中的檔案將僅包含在為作業系統和 CPU 架構特定組合組建的軟件包中。`<ARCH_NAME>` 的有效值為：`x64` 和 `arm64`。例如，`<RESOURCES_ROOT_DIR>/macos-arm64` 中的檔案將僅包含在專為 Apple 晶片 Mac 設計的軟件包中。
+位於 `<RESOURCES_ROOT_DIR>/<OS_NAME>-<ARCH_NAME>` 中的檔案將僅包含在為作業系統和 CPU 架構特定組合組建的軟體包中。`<ARCH_NAME>` 的有效值為：`x64` 和 `arm64`。例如，`<RESOURCES_ROOT_DIR>/macos-arm64` 中的檔案將僅包含在專為 Apple 晶片 Mac 設計的軟體包中。
 
 你可以使用 `compose.application.resources.dir` 系統屬性存取包含的資源：
 
@@ -594,7 +594,7 @@ compose.desktop {
     
 <tr>
 <td><code>packageVersion = "1.0.0"</code></td>
-        <td>設定特定平台的軟件包版本。詳情請參閱<a href="#package-version">軟件包版本</a>部分。</td>
+        <td>設定特定平台的軟體包版本。詳情請參閱<a href="#package-version">軟體包版本</a>部分。</td>
 </tr>
 
     
@@ -613,7 +613,7 @@ compose.desktop {
     
 <tr>
 <td><code>debMaintainer = "maintainer@example.com"</code></td>
-        <td>指定軟件包維護者的電子郵件。</td>
+        <td>指定軟體包維護者的電子郵件。</td>
 </tr>
 
     
@@ -625,31 +625,31 @@ compose.desktop {
     
 <tr>
 <td><code>appRelease = "1"</code></td>
-        <td>為 rpm 軟件包設定發佈 (release) 值，或為 deb 軟件包設定修訂 (revision) 值。</td>
+        <td>為 rpm 軟體包設定發佈 (release) 值，或為 deb 軟體包設定修訂 (revision) 值。</td>
 </tr>
 
     
 <tr>
 <td><code>appCategory = "CATEGORY"</code></td>
-        <td>為 rpm 軟件包分配群組值，或為 deb 軟件包分配區段值。</td>
+        <td>為 rpm 軟體包分配群組值，或為 deb 軟體包分配區段值。</td>
 </tr>
 
     
 <tr>
 <td><code>rpmLicenseType = "TYPE_OF_LICENSE"</code></td>
-        <td>指示 rpm 軟件包的授權類型。</td>
+        <td>指示 rpm 軟體包的授權類型。</td>
 </tr>
 
     
 <tr>
 <td><code>debPackageVersion = "DEB_VERSION"</code></td>
-        <td>設定 deb 特定的軟件包版本。詳情請參閱<a href="#package-version">軟件包版本</a>部分。</td>
+        <td>設定 deb 特定的軟體包版本。詳情請參閱<a href="#package-version">軟體包版本</a>部分。</td>
 </tr>
 
     
 <tr>
 <td><code>rpmPackageVersion = "RPM_VERSION"</code></td>
-        <td>設定 rpm 特定的軟件包版本。詳情請參閱<a href="#package-version">軟件包版本</a>部分。</td>
+        <td>設定 rpm 特定的軟體包版本。詳情請參閱<a href="#package-version">軟體包版本</a>部分。</td>
 </tr>
 
     
@@ -725,7 +725,7 @@ compose.desktop {
 <tr>
 <td><code>dmgPackageVersion = "DMG_VERSION"</code></td>
         <td>
-            設定 DMG 特定的軟件包版本。詳情請參閱<a href="#package-version">軟件包版本</a>部分。
+            設定 DMG 特定的軟體包版本。詳情請參閱<a href="#package-version">軟體包版本</a>部分。
         </td>
 </tr>
 
@@ -733,7 +733,7 @@ compose.desktop {
 <tr>
 <td><code>pkgPackageVersion = "PKG_VERSION"</code></td>
         <td>
-            設定 PKG 特定的軟件包版本。詳情請參閱<a href="#package-version">軟件包版本</a>部分。
+            設定 PKG 特定的軟體包版本。詳情請參閱<a href="#package-version">軟體包版本</a>部分。
         </td>
 </tr>
 
@@ -741,7 +741,7 @@ compose.desktop {
 <tr>
 <td><code>packageBuildVersion = "DMG_VERSION"</code></td>
         <td>
-            設定軟件包組建版本。詳情請參閱<a href="#package-version">軟件包版本</a>部分。
+            設定軟體包組建版本。詳情請參閱<a href="#package-version">軟體包版本</a>部分。
         </td>
 </tr>
 
@@ -749,7 +749,7 @@ compose.desktop {
 <tr>
 <td><code>dmgPackageBuildVersion = "DMG_VERSION"</code></td>
         <td>
-            設定 DMG 特定的軟件包組建版本。詳情請參閱<a href="#package-version">軟件包版本</a>部分。
+            設定 DMG 特定的軟體包組建版本。詳情請參閱<a href="#package-version">軟體包版本</a>部分。
         </td>
 </tr>
 
@@ -757,7 +757,7 @@ compose.desktop {
 <tr>
 <td><code>pkgPackageBuildVersion = "PKG_VERSION"</code></td>
         <td>
-            設定 PKG 特定的軟件包組建版本。詳情請參閱<a href="#package-version">軟件包版本</a>部分。
+            設定 PKG 特定的軟體包組建版本。詳情請參閱<a href="#package-version">軟體包版本</a>部分。
         </td>
 </tr>
 
@@ -801,13 +801,13 @@ compose.desktop {
         
 <tr>
 <td><code>msiPackageVersion = "MSI_VERSION"</code></td>
-            <td>設定 MSI 特定的軟件包版本。詳情請參閱<a href="#package-version">軟件包版本</a>部分。</td>
+            <td>設定 MSI 特定的軟體包版本。詳情請參閱<a href="#package-version">軟體包版本</a>部分。</td>
 </tr>
 
         
 <tr>
 <td><code>exePackageVersion = "EXE_VERSION"</code></td>
-            <td>設定 EXE 特定的軟件包版本。詳情請參閱<a href="#package-version">軟件包版本</a>部分。</td>
+            <td>設定 EXE 特定的軟體包版本。詳情請參閱<a href="#package-version">軟體包版本</a>部分。</td>
 </tr>
 
 </table>
@@ -822,14 +822,14 @@ compose.desktop {
 
 ### Information property list on macOS
 
-雖然 DSL 支援基本的特定平台自訂，但仍可能存在超出所提供功能的情況。如果你需要指定 DSL 中未表示的 `Info.plist` 值，可以包含一段原始 XML 作為暫時解決方法。此 XML 將被附加到應用程式的 `Info.plist` 中。
+雖然 DSL 支援基本的特定平台自訂，但仍可能存在超出所提供功能的情況。如果你需要指定 DSL 中未表示的 `Info.plist` 值，可以包含一段原始 XML 作為暫時解決方法。此 XML 將被附加到應用程式發行的 `Info.plist` 中。
 
 #### Example: Deep linking
 
 1. 在 `build.gradle.kts` 檔案中定義自訂 URL 配置 (scheme)：
 
-  ``` kotlin
-  compose.desktop {
+    ``` kotlin
+    compose.desktop {
       application {
           mainClass = "MainKt"
           nativeDistributions {
@@ -843,9 +843,9 @@ compose.desktop {
               }
           }
       }
-  }
-  
-  val macExtraPlistKeys: String
+    }
+    
+    val macExtraPlistKeys: String
       get() = """
         <key>CFBundleURLTypes</key>
         <array>
@@ -859,23 +859,23 @@ compose.desktop {
           </dict>
         </array>
       """
-  ```
-  {initial-collapse-state="collapsed" collapsible="true" collapsed-title="infoPlist { extraKeysRawXml = macExtraPlistKeys"}
+    ```
+    {initial-collapse-state="collapsed" collapsible="true" collapsed-title="infoPlist { extraKeysRawXml = macExtraPlistKeys"}
 
 2. 在 `src/main/main.kt` 檔案中使用 `java.awt.Desktop` 類別設置 URI 處理常式：
 
-  ``` kotlin 
-  import androidx.compose.material.MaterialTheme
-  import androidx.compose.material.Text
-  import androidx.compose.runtime.getValue
-  import androidx.compose.runtime.mutableStateOf
-  import androidx.compose.runtime.setValue
-  import androidx.compose.ui.window.singleWindowApplication
-  import java.awt.Desktop
-  
-  fun main() {
+    ``` kotlin 
+    import androidx.compose.material.MaterialTheme
+    import androidx.compose.material.Text
+    import androidx.compose.runtime.getValue
+    import androidx.compose.runtime.mutableStateOf
+    import androidx.compose.runtime.setValue
+    import androidx.compose.ui.window.singleWindowApplication
+    import java.awt.Desktop
+    
+    fun main() {
       var text by mutableStateOf("Hello, World!")
-  
+    
       try {
           Desktop.getDesktop().setOpenURIHandler { event ->
               text = "Open URI: " + event.uri
@@ -883,15 +883,15 @@ compose.desktop {
       } catch (e: UnsupportedOperationException) {
           println("setOpenURIHandler is unsupported")
       }
-  
+    
       singleWindowApplication {
           MaterialTheme {
               Text(text)
           }
       }
-  }
-  ```
-  {initial-collapse-state="collapsed" collapsible="true" collapsed-title="Desktop.getDesktop().setOpenURIHandler { event ->"}
+    }
+    ```
+    {initial-collapse-state="collapsed" collapsible="true" collapsed-title="Desktop.getDesktop().setOpenURIHandler { event ->"}
 
 3. 執行 `runDistributable` 任務：`./gradlew runDistributable`。
 

@@ -10,7 +10,8 @@
 
 ## 프로젝트 생성
 
-IntelliJ IDEA에서 기존 Kotlin 프로젝트를 열거나 [새 프로젝트를 생성](https://kotlinlang.org/docs/jvm-get-started.html)하세요.
+IntelliJ IDEA에서 기존 Kotlin 프로젝트를 열거나
+[새 프로젝트를 생성](https://kotlinlang.org/docs/jvm-get-started.html)하세요.
 
 ## 의존성 추가
 
@@ -56,7 +57,7 @@ dependencies {
          <dependency>
              <groupId>org.jetbrains.lincheck</groupId>
              <artifactId>lincheck</artifactId>
-             <version>${lincheck.version}</version>
+             <version>%lincheckVersion%</version>
              <scope>test</scope>
          </dependency>
          <dependency>
@@ -74,7 +75,7 @@ dependencies {
 
 ## 첫 번째 테스트 작성하기
 
-기본적인 동시성 테스트를 위해, 각 스레드에서 실행되어야 할 연산과 기대되는 단언(assertion)을 설명하는 테스트 함수를 만듭니다. Lincheck은 [모델 검사(model checking)](testing-strategies.md#how-model-checking-works)를 사용하여 프로그램의 가능한 스레드 인터리빙(thread interleavings)을 탐색하고, 잘못된 동작이 발생할 경우 오류 보고서를 제공합니다.
+기본적인 동시성 테스트를 위해, 각 스레드에서 실행되어야 할 연산과 기대되는 단언(assertion)을 설명하는 테스트 함수를 만듭니다. Lincheck은 [모델 검사(model checking)](lincheck-testing-strategies.md#model-checking)를 사용하여 프로그램의 가능한 스레드 인터리빙(thread interleavings)을 탐색하고, 잘못된 동작이 발생할 경우 오류 보고서를 제공합니다.
 
 1. `src/test` 디렉토리에 `CounterTest.kt` 파일을 생성합니다.
 2. `org.jetbrains.lincheck`, `kotlinx.concurrent`, `kotlin.test` 라이브러리를 임포트합니다: 
@@ -149,7 +150,7 @@ dependencies {
 
 ## 자료 구조 테스트 작성하기
 
-기본적인 동시성 테스트 외에도, Lincheck은 동시성 자료 구조를 테스트하기 위한 선언적 접근 방식(declarative approach)을 지원합니다.
+기본적인 동시성 테스트 외에도, Lincheck은 동시성 자료 구조를 테스트하기 위한 [선언적 접근 방식(declarative approach)](lincheck-how-to-test-data-structures.md)을 지원합니다.
 
 Lincheck에서 자료 구조를 테스트하려면 구조의 동시성 메서드와 테스트 함수만 선언하면 됩니다. Lincheck은 무작위 동시성 시나리오를 생성하고, 지정된 테스트 전략을 사용하여 이를 실행하며, 오류 보고서를 제공합니다.
 
@@ -198,7 +199,7 @@ Lincheck에서 자료 구조를 테스트하려면 구조의 동시성 메서드
     fun stressTest() = ModelCheckingOptions().check(this::class)
     ```
    
-    > 모델 검사가 어떻게 작동하는지는 [테스트 전략](testing-strategies.md#how-model-checking-works) 문서에서 자세히 알아보세요.
+    > 모델 검사가 어떻게 작동하는지는 [테스트 전략](lincheck-testing-strategies.md#model-checking) 문서에서 자세히 알아보세요.
     > 
     {style=”tip”}
 
@@ -229,4 +230,4 @@ Lincheck에서 자료 구조를 테스트하려면 구조의 동시성 메서드
 
 ## 다음 단계
 
-자료 구조 테스트에 대한 선언적 접근 방식과 지원되는 테스트 전략에 대해 [테스트 전략](testing-strategies.md) 문서에서 더 자세히 읽어보세요.
+Lincheck에서 [동시성 자료 구조를 테스트하기 위한 선언적 접근 방식](lincheck-how-to-test-data-structures.md)에 대해 알아보세요.

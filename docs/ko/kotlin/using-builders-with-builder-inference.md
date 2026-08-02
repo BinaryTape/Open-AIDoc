@@ -44,7 +44,7 @@ fun addEntryToMap(baseMap: Map<String, Number>, additionalEntry: Pair<String, In
        fun addItem(x: T) {
            items.add(x)
        }
-
+ 
        fun getLastItem(): T? = items.lastOrNull()
    }
    
@@ -71,7 +71,7 @@ fun addEntryToMap(baseMap: Map<String, Number>, additionalEntry: Pair<String, In
 
 ### 지원되는 기능들
 
-빌더 추론은 다음 기능들을 지원합니다:
+빌더 추론은 다음 기능들을 지원합니다: 
 * 여러 개의 타입 인자 추론
   ```kotlin
   fun <K, V> myBuilder(builder: MutableMap<K, V>.() -> Unit): Map<K, V> { ... }
@@ -181,7 +181,7 @@ val result = buildList {
   ```kotlin
   fun takeMyLong(x: Long) { ... }
 
-  fun String.isMoreThat3() = length > 3
+  fun String.isMoreThan3() = length > 3
 
   fun takeListOfStrings(x: List<String>) { ... }
 
@@ -193,7 +193,7 @@ val result = buildList {
 
       val result2 = buildList {
           val x = get(0)
-          val isLong = x.isMoreThat3()
+          val isLong = x.isMoreThan3()
       // ...
       } // result2은 List<String> 타입을 가집니다.
   

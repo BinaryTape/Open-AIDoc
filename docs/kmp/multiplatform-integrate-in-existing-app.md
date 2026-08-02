@@ -419,7 +419,7 @@ Android Studio 和 IntelliJ IDEA 都提供了用于创建 Kotlin Multiplatform �
 
    ![移动 Run Script 阶段](xcode-run-script-phase-3.png){width=700}
 
-8. 在 **Build Settings** 选项卡上，禁用 **Build Options** 下的 **User Script Sandboxing** 选项：
+8. 在 **Build Settings** 选项开上，禁用 **Build Options** 下的 **User Script Sandboxing** 选项：
 
    ![用户脚本沙箱化](disable-sandboxing-in-xcode-project-settings.png){width=700}
 

@@ -1,3 +1,4 @@
+```xml
 <topic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xsi:noNamespaceSchemaLocation="https://resources.jetbrains.com/writerside/1.0/topic.v2.xsd"
    id="kotlin-multiplatform-react-native"
@@ -69,7 +70,7 @@
         <tr>
             <td><b>パッケージ、依存関係、およびエコシステム</b></td>
             <td>パッケージは <a href="https://central.sonatype.com/">Maven Central</a> やその他のリポジトリから入手できます。これには以下が含まれます。
-                <p>KMP ライブラリの検索を簡素化するように設計された <a href="http://klibs.io">klibs.io</a> (アルファ版)。</p>
+                <p>KMP ライブラリの検索を簡素化するように設計された <a href="https://klibs.io">klibs.io</a>。</p>
                 <p>この<a href="https://github.com/terrakok/kmp-awesome">リスト</a>には、最も人気のある KMP ライブラリとツールの一部が含まれています。</p></td>
             <td><a href="https://reactnative.dev/docs/libraries">React Native ライブラリ</a>は、通常、<a href="https://docs.npmjs.com/cli/npm">npm CLI</a> や <a href="https://classic.yarnpkg.com/en/">Yarn Classic</a> などの Node.js パッケージマネージャーを使用して <a href="https://www.npmjs.com/">npm レジストリ</a>からインストールされます。
             </td>
@@ -103,7 +104,7 @@
             <td><b>ネイティブ API との通信</b></td>
             <td>Kotlin の Swift/Objective-C および JavaScript 両方との相互運用性により、Kotlin コードからネイティブ API に直接アクセスできます。
             </td>
-            <td>React Native は、ネイティブコードを JavaScript アプリケーションコードに接続するための一連の API（ネイティブモジュールとネイティブコンポーネント）を公開しています。New Architecture では、同様の結果を得るために <a
+            <td>React Native は、ネイティブコードを JavaScript アプリケーションコードに接続するための一連 API（ネイティブモジュールとネイティブコンポーネント）を公開しています。New Architecture では、同様の結果を得るために <a
                         href="https://github.com/reactwg/react-native-new-architecture/blob/main/docs/turbo-modules.md">Turbo Native Module</a> と <a
                         href="https://github.com/reactwg/react-native-new-architecture/blob/main/docs/fabric-native-components.md">Fabric Native Components</a> を使用します。
             </td>
@@ -151,7 +152,7 @@
          id="choosing-the-right-cross-platform-technology-for-your-project">
     <p>クロスプラットフォームフレームワークを決定することは、万能な解決策を見つけることではなく、プロジェクトの目標、技術的要件、およびチームの専門知識に最適なものを選択することです。複雑な UI を備えた機能豊富な製品を構築しているのか、既存のスキルで迅速に立ち上げることを目指しているのかに関わらず、適切な選択は特定の優先順位によって決まります。UI のカスタマイズをどの程度制御する必要があるか、長期的な安定性がどれほど重要か、およびどのプラットフォームをサポートする予定かを考慮してください。</p>
     <p>JavaScript の経験が豊富なチームにとって、特に迅速なプロトタイピングにおいては、React Native が実用的な選択肢となるでしょう。一方、Kotlin Multiplatform は異なるレベルの統合を提供します。完全にネイティブな Android アプリを生成し、iOS ではネイティブバイナリにコンパイルされ、ネイティブ API へのシームレスなアクセスが可能です。UI は完全にネイティブにすることも、高性能なグラフィックスエンジンを使用して美しくレンダリングする Compose Multiplatform 経由で共有することもできます。これにより、コード共有の恩恵を受けつつ、ネイティブなルックアンドフィール、メンテナンス性、およびパフォーマンスを優先するチームにとって、KMP は特に魅力的なものとなっています。</p>
-    <p>次のプロジェクトに最適な<a href="cross-platform-frameworks.md">クロスプラットフォーム開発フレームワーク</a>を選択する方法についての詳細な記事で、さらなるガイダンスを見つけることができます。</p>
+    <p>次のプロジェクトに最適な<a href="cross-platform-frameworks.topic">クロスプラットフォーム開発フレームワーク</a>を選択する方法についての詳細な記事で、さらなるガイダンスを見つけることができます。</p>
 </chapter>
 <chapter title="よくある質問" id="frequently-asked-questions">
     <p>

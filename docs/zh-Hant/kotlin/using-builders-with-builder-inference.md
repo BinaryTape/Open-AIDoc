@@ -44,7 +44,7 @@ fun addEntryToMap(baseMap: Map<String, Number>, additionalEntry: Pair<String, In
        fun addItem(x: T) {
            items.add(x)
        }
-
+ 
        fun getLastItem(): T? = items.lastOrNull()
    }
    
@@ -71,7 +71,7 @@ fun addEntryToMap(baseMap: Map<String, Number>, additionalEntry: Pair<String, In
 
 ### 支援的特性
 
-產生器型別推論支援：
+產生器型別推論支援： 
 * 推論多個型別引數
   ```kotlin
   fun <K, V> myBuilder(builder: MutableMap<K, V>.() -> Unit): Map<K, V> { ... }
@@ -181,7 +181,7 @@ val result = buildList {
   ```kotlin
   fun takeMyLong(x: Long) { ... }
 
-  fun String.isMoreThat3() = length > 3
+  fun String.isMoreThan3() = length > 3
 
   fun takeListOfStrings(x: List<String>) { ... }
 
@@ -193,7 +193,7 @@ val result = buildList {
 
       val result2 = buildList {
           val x = get(0)
-          val isLong = x.isMoreThat3()
+          val isLong = x.isMoreThan3()
       // ...
       } // result2 具有 List<String> 型別
   

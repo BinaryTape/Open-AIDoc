@@ -265,7 +265,7 @@ Jetcaster 使用 [Room](https://developer.android.com/training/data-storage/room
 #### 配置與遷移 :core:designsystem
 
 在只剩下 UI 程式碼需要遷移的情況下，我們開始轉換包含字體資源與排版的 `:core:designsystem` 模組。
-除了配置 KMP 模組與建立 `commonMain` 原始碼集外，我們還將 `MaterialExpressiveTheme` 的 `JetcasterTypography` 引數改為一個 composable，封裝了對多平台字體的呼叫。
+除了配置 KMP 模組與建立 `commonMain` 原始碼集外，我們還將 `JetcasterTypography` 引數改為一個 composable，封裝了對多平台字體的呼叫。
 
 > 參見[產出的提交](https://github.com/kotlin-hands-on/jetcaster-kmp-migration/commit/4aa92e3f38d06aa64444163d865753e47e9b2a97)。
 

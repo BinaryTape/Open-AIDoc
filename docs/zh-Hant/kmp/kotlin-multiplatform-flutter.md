@@ -2,7 +2,7 @@
 
 <web-summary>本文探討 Kotlin Multiplatform 與 Flutter，協助您了解它們的功能並為您的跨平台專案選擇合適的方案。</web-summary> 
 
-在快速發展的技術領域中，開發者不斷尋求高效的架構與工具來協助建置高品質的應用程式。然而，在可用的選項中進行選擇時，重要的是避免過度強調尋找所謂的「最佳」選項，因為這種方法並不總是能導向最合適的選擇。
+在快速發展的技術領域中，開發人員不斷尋求高效的架構與工具來協助建置高品質的應用程式。然而，在可用的選項中進行選擇時，重要的是避免過度強調尋找所謂的「最佳」選項，因為這種方法並不總是能導向最合適的選擇。
 
 每個專案都是獨特的且有特定的需求。本文旨在協助您引導選擇，並更深入了解哪種技術（如 Kotlin Multiplatform 或 Flutter）最適合您的專案，以便您做出明智的決定。
 
@@ -10,7 +10,7 @@
 
 跨平台開發提供了一種方式，可以使用單一程式碼庫建置可在多個平台上執行的應用程式，消除了為每個系統重寫相同功能的必要性。雖然通常與[行動開發](cross-platform-mobile-development.topic)（針對 Android 和 iOS）相關聯，但這種方法遠不止於行動裝置，還涵蓋了 Web、桌面甚至伺服器端環境。
 
-核心概念是極大化程式碼重複使用，同時確保在必要時仍可實作平台特定的功能，從而簡化開發過程並減少維護工作。團隊可以加速開發週期、降低成本並確保跨平台的一致性，使跨平台開發成為當今日益多樣化的應用程式環境中的明智選擇。
+核心概念是極大化程式碼重複使用，同時確保在必要時仍可實作平台特定的特性，從而簡化開發過程並減少維護工作。團隊可以加速開發週期、降低成本並確保跨平台的一致性，使跨平台開發成為當今日益多樣化的應用程式環境中的明智選擇。
 
 ## Kotlin Multiplatform 與 Flutter：簡化跨平台開發
 
@@ -20,13 +20,13 @@ Flutter 和 Kotlin Multiplatform 是兩種流行的跨平台技術，可簡化�
 
 [Flutter](https://flutter.dev/) 是一個開源架構，用於從單一程式碼庫建置原生編譯的多平台應用程式。它允許您在 Android、iOS、Web、桌面 (Windows, macOS, Linux) 和嵌入式系統中建立豐富的應用程式體驗——這一切都來自單一、共用的應用程式程式碼庫。Flutter 應用程式使用 Dart 程式語言編寫。Flutter 由 Google 支援並使用。
 
-Flutter 最初於 2014 年以 Sky 的名稱推出，[Flutter 1.0](https://developers.googleblog.com/en/flutter-10-googles-portable-ui-toolkit/) 於 2018 年 12 月在 Flutter Live 期間正式發佈。
+最初於 2014 年以 Sky 的名稱推出，[Flutter 1.0](https://developers.googleblog.com/en/flutter-10-googles-portable-ui-toolkit/) 於 2018 年 12 月在 Flutter Live 期間正式發佈。
 
-Flutter 開發者社群規模龐大且高度活躍，提供持續的改進與支援。Flutter 允許使用由 Flutter 和 Dart 生態系統中的開發者貢獻的共用軟件包。
+Flutter 開發人員社群規模龐大且高度活躍，提供持續的改進與支援。Flutter 允許使用由 Flutter 和 Dart 生態系統中的開發人員貢獻的共用軟件包。
 
 ### Kotlin Multiplatform
 
-[Kotlin Multiplatform](https://www.jetbrains.com/kotlin-multiplatform/) (KMP) 是由 JetBrains 開發的開源技術，允許開發者為 Android、iOS、Web、桌面 (Windows, macOS, Linux) 和伺服器端建立應用程式，使他們能夠在這些平台間高效地重複使用 Kotlin 程式碼，同時保留原生程式設計的優點。
+[Kotlin Multiplatform](https://www.jetbrains.com/kotlin-multiplatform/) (KMP) 是由 JetBrains 開發的開源技術，允許開發人員為 Android、iOS、Web、桌面 (Windows, macOS, Linux) 和伺服器端建立應用程式，使他們能夠在這些平台間高效地重複使用 Kotlin 程式碼，同時保留原生程式設計的優點。
 
 透過 Kotlin Multiplatform，您有各種選擇：您可以共用除應用程式入口點以外的所有程式碼、共用單一邏輯部分（如網路或資料庫模組），或在保持 UI 原生的同時共用商務邏輯。
 
@@ -83,7 +83,7 @@ Compose Multiplatform 目前[在 iOS 上已穩定](https://blog.jetbrains.com/ko
 <tr>
 <td><b>軟件包、相依性與生態系統</b></td>
         <td>軟件包可從 <a href="https://central.sonatype.com/">Maven Central</a> 和其他存儲庫獲取，包括
-            <p><a href="http://klibs.io">klibs.io</a> (Alpha 版本)，旨在簡化對 KMP 程式庫的搜尋。</p>
+            <p><a href="https://klibs.io">klibs.io</a>，旨在簡化對 KMP 程式庫的搜尋。</p>
             <p>此<a href="https://github.com/terrakok/kmp-awesome">清單</a>包含了一些最受歡迎的 KMP 程式庫與工具。</p> </td>
         <td>軟件包可從 <a href="https://pub.dev/">Pub.dev.</a> 獲取。</td>
 </tr>
@@ -105,16 +105,16 @@ Compose Multiplatform 目前[在 iOS 上已穩定](https://blog.jetbrains.com/ko
     
 <tr>
 <td><b>編譯</b></td>
-        <td>針對桌面與 Android 編譯為 JVM 位元組碼，在 Web 上編譯為 JavaScript 或 Wasm，並針對原生平台編譯為平台特定的二進位檔案</td>
+        <td>針對桌面與 Android 編譯為 JVM 位元組碼，在 Web 上編譯為 JavaScript 或 Wasm，並針對原生平台編譯為平台特定的二進制檔案</td>
         <td>偵錯組建在虛擬機中執行 Dart 程式碼。
-        <p>發行組建針對原生平台輸出平台特定的二進位檔案，針對 Web 則輸出 JavaScript/Wasm。</p>
+        <p>發行組建針對原生平台輸出平台特定的二進制檔案，針對 Web 則輸出 JavaScript/Wasm。</p>
         </td>
 </tr>
 
     
 <tr>
 <td><b>與原生 API 的通訊</b></td>
-        <td>原生 API 可使用 <Links href="/kmp/multiplatform-expect-actual" summary="undefined">expect/actual 宣告。</Links></td>
+        <td>原生 API 可使用 <Links href="/kmp/multiplatform-expect-actual" summary="undefined">expect/actual 宣告</Links> 直接從 Kotlin 程式碼存取。</td>
         <td>與主機平台的通訊可使用 <a href="https://docs.flutter.dev/platform-integration/platform-channels">platform channels</a> 進行。</td>
 </tr>
 
@@ -144,7 +144,7 @@ Compose Multiplatform 目前[在 iOS 上已穩定](https://blog.jetbrains.com/ko
 
 [![探索來自全球公司使用 Kotlin Multiplatform 進行跨平台開發的真實案例。](kmp-use-cases-1.svg){width="500"}](https://www.jetbrains.com/help/kotlin-multiplatform-dev/case-studies.html)
 
-您也可以查看 Google 的部落格文章：[讓開發者更輕鬆地進行跨平台開發](https://developers.googleblog.com/en/making-development-across-platforms-easier-for-developers/)，該文章為您的專案選擇合適的技術堆疊提供了指引。
+您也可以查看 Google 的部落格文章：[讓開發人員更輕鬆地進行跨平台開發](https://developers.googleblog.com/en/making-development-across-platforms-easier-for-developers/)，該文章為您的專案選擇合適的技術堆疊提供了指引。
 
 如果您正在尋找 Kotlin Multiplatform 與 Flutter 之間的額外比較，也可以觀看 Philipp Lackner 的 [KMP vs. Flutter 影片](https://www.youtube.com/watch?v=dzog64ENKG0)。在此影片中，他在程式碼共用、UI 渲染、效能以及這兩項技術的未來方面分享了一些有趣的觀察。
 

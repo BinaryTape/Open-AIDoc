@@ -101,6 +101,15 @@ bitcode の埋め込みは Xcode 14 で非推奨となり、Xcode 15 ですべ�
 
 古いバージョンの Xcode を使用しており、かつ Kotlin 2.0.20 以降にアップグレードしたい場合は、Xcode プロジェクトで bitcode の埋め込みを無効にしてください。
 
+## iOS でより良いクラッシュレポートを取得するにはどうすればよいですか？
+
+ハンドルされていない Kotlin の例外が iOS コードに達すると、例外がスローされた実際のコード行ではなく、Kotlin/Native 内部の問題を示す曖昧なレポートがクラッシュレポートツールに表示されることがあります。これは、クラッシュが記録されるまでに元の Kotlin スタックトレースが失われるために発生します。
+
+この問題は、[NSExceptionKt](https://github.com/rickclephas/NSExceptionKt) のようなサードパーティ製のソリューションで回避できます。これは、キャッチされなかった Kotlin の例外を `NSException` インスタンスに変換し、クラッシュレポートツールが正しいスタックトレースをキャプチャできるようにするものです。主要なクラッシュレポートツール向けに専用の統合機能を提供しています：
+
+* [Bugsnag](https://github.com/rickclephas/NSExceptionKt/blob/master/NSExceptionKtBugsnag/README.md)
+* [Firebase Crashlytics](https://github.com/rickclephas/NSExceptionKt/blob/master/NSExceptionKtCrashlytics/README.md)
+
 ## 異なるコルーチンから安全にオブジェクトを参照するにはどうすればよいですか？
 
 Kotlin/Native で複数のコルーチン間でオブジェクトを安全にアクセスまたは更新するには、`@Volatile` や `AtomicReference` などの並行性セーフな構成要素の使用を検討してください。

@@ -1,5 +1,6 @@
 [//]: # (title: Kotlin プロジェクトにおけるコード品質ツール)
-[//]: # (description: ktlint、detekt、SonarQube、SonarCloud、Kover などのコード品質ツールを Kotlin バックエンドプロジェクトに統合する方法を学びます。)
+
+<web-summary>ktlint、detekt、SonarQube、SonarCloud、Kover などのコード品質ツールを Kotlin バックエンドプロジェクトに統合する方法を学びます。</web-summary>
 
 コード品質ツールは、コーディング標準の適用、バグの早期検出、テストカバレッジの測定、および Kotlin プロジェクト全体のコード品質の維持に役立ちます。このガイドでは、[ktlint](https://ktlint.github.io/ktlint/latest/)、[detekt](https://detekt.dev/)、[SonarQube](https://www.sonarsource.com/products/sonarqube/)、[SonarCloud](https://www.sonarsource.com/products/sonarcloud/)、[Kover](https://kotlin.github.io/kotlinx-kover/) などの一般的なツールを、Maven または Gradle を使用したバックエンドプロジェクトに統合する方法を紹介します。
 

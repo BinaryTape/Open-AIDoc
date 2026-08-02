@@ -160,7 +160,7 @@ kotlin {
 
 [SQLDelight](https://github.com/cashapp/sqldelight)など、Kotlin Multiplatform技術を採用しているライブラリへの依存関係を追加できます。これらのライブラリの作者は通常、プロジェクトに依存関係を追加するためのガイドを提供しています。
 
-> Kotlin Multiplatformライブラリについては、[JetBrainsの検索プラットフォーム](https://klibs.io/)で探してみてください。
+> [klibs.io](https://klibs.io/)で利用可能なKotlin Multiplatformライブラリを探してみてください。
 >
 {style="tip"}
 

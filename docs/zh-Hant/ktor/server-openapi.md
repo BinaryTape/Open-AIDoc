@@ -13,7 +13,7 @@
 <var name="example_name" value="json-kotlinx-openapi"/>
 <p>
     <b>程式碼範例</b>：
-    <a href="https://github.com/ktorio/ktor-documentation/tree/%ktor_version%/codeSnippets/snippets/%example_name%">
+    <a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/%example_name%">
         %example_name%
     </a>
 </p>
@@ -117,6 +117,10 @@ routing {
 ## 設定 OpenAPI {id="configure-openapi"}
 
 預設情況下，文件會使用 `StaticHtml2Codegen` 進行算繪。您可以在 `openAPI {}` 區塊中自訂算繪器：
+
+> `StaticHtmlCodegen` 與 `StaticHtml2Codegen` 僅支援 OpenAPI 3.0.x 文件。將其用於 OpenAPI 3.1 文件可能會產生不完整或不正確的 HTML。對於 OpenAPI 3.1，請搭配 Swagger UI 5.x 使用 [`swaggerUI()`](server-swagger-ui.md) 函式。如果您需要繼續使用 OpenAPI 外掛程式的 HTML 算繪器，請將規格保持在 OpenAPI 3.0.3。
+>
+{style="note"}
 
 ```kotlin
 routing {

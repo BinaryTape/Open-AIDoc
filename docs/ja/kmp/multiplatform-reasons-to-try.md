@@ -56,7 +56,7 @@ Kotlin Multiplatform の主な利点の 1 つは、さまざまなプラット�
 
 Quizlet チームは JavaScript、React Native、C++、Rust、Go などのテクノロジーを試しましたが、パフォーマンス、安定性、プラットフォームごとの実装の違いなど、さまざまな課題に直面しました。最終的に、彼らは Android、iOS、Web に Kotlin Multiplatform を選択しました。KMP の使用が Quizlet チームにどのようにもたらした利点は以下の通りです。
 
-* オブジェクトのマーシャリング時のより型安全な API。
+* オブジェクトのマーシャリング（marshaling）時のより型安全な API。
 * iOS での採点アルゴリズムが JavaScript と比較して 25% 高速化。
 * Android アプリのサイズが 18 MB から 10 MB に削減。
 * 開発者体験の向上。
@@ -84,7 +84,7 @@ Kotlin Multiplatform を使用すると、開発者はネイティブ開発か�
 
 Kotlin Multiplatform が登場する前、開発者はすべてをネイティブで書かなければなりませんでした。
 
-![Kotlin Multiplatform 以前：すべてのコードをネイティブで記述](before-kotlin-multiplatform.svg){width=700}
+![Kotlin Multiplatform 以前：すべてのコードをネイティブで記述](kmp-before-new.svg){width=700}
 
 Kotlin Multiplatform では、プロジェクトに適したコード共有のレベルを選択できます。
 
@@ -94,7 +94,7 @@ Kotlin Multiplatform では、プロジェクトに適したコード共有の�
 
 3) [ロジックの小さな一部を共有する](multiplatform-ktor-sqldelight.md)：Kotlin Multiplatform は、バリデーション、ドメイン計算、認証フローなどの特定のロジックのサブセットを共有することから段階的に導入することもできます。このオプションは、大規模なアーキテクチャの変更を行わずに、プラットフォーム間の一貫性と安定性を向上させたい場合に適しています。
 
-![Kotlin Multiplatform と Compose Multiplatform を使用：開発者はビジネスロジック、プレゼンテーションロジック、さらには UI ロジックも共有できます](with-compose-multiplatform.svg){width=700}
+![Kotlin Multiplatform と Compose Multiplatform を使用：開発者はビジネスロジック、プレゼンテーションロジック、さらには UI ロジックも共有できます](kmp-after-new.svg){width=700}
 
 今では、プラットフォーム固有のコードを除いて、ほとんど何でも共有できます。
 

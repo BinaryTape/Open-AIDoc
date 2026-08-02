@@ -11,7 +11,7 @@
 그러나 이러한 커스터마이징 옵션을 추가적인 함수 매개변수를 통해 도입하면 API의 복잡성이 크게 증가할 수 있습니다.
 
 커스터마이징을 위해 더 많은 매개변수를 추가하는 대신, 서로 다른 동작들을 함께 조합할 수 있도록 API를 설계하는 것이 더 효과적입니다.
-예를 들어, 코루틴 Flow API에서는 [버퍼링](coroutines-flow-operators.md#buffering)과 [합류(conflation)](coroutines-flow-operators.md#conflation)가 모두 별도의 함수로 구현되어 있습니다.
+예를 들어, 코루틴 Flow API에서는 [버퍼링과 합류(conflation)](coroutines-flow-operators.md#concurrent-processing-operators)가 모두 별도의 함수로 구현되어 있습니다.
 이들은 각 기본 연산이 버퍼링과 합류를 제어하는 매개변수를 받는 대신, [`filter`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/filter.html) 및 [`map`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/map.html)과 같은 더 기본적인 연산과 함께 체인으로 연결될 수 있습니다.
 
 또 다른 예로는 [Jetpack Compose의 Modifiers API](https://developer.android.com/develop/ui/compose/modifiers)가 있습니다.

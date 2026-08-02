@@ -939,6 +939,7 @@ Kotlin Multiplatform 문서가 kotlinlang.org로 이동했습니다. 이제 한 
 Kotlin 플러그인은 IntelliJ IDEA 및 Android Studio에 번들 플러그인으로 제공됩니다.
 
 새로운 Kotlin 버전으로 업데이트하려면 빌드 스크립트에서 [Kotlin 버전을 2.3.0으로 변경](releases.md#update-to-a-new-kotlin-version)하세요.
+
 ```kotlin
 plugins {
     kotlin("jvm") version "2.3.0"

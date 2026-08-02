@@ -1,11 +1,11 @@
 # 构建带有记忆功能的聊天智能体
 
-本指南演示如何使用 [ChatMemory](index.md) 功能创建一个对话式命令行聊天应用程序，该程序可以在多次智能体 (agent) 交互中记住之前的消息。
+本指南演示如何使用 [ChatMemory](index.md) 功能创建一个对话式命令行聊天应用程序，该程序可以在多次智能体交互中记住之前的消息。
 
 该命令行 (CLI) 应用程序执行以下循环：
 
 - 从控制台读取输入。
-- 如果输入不是 `/bye` 且不为空，则使用用户输入和指定的会话 ID (session ID) 运行智能体。
+- 如果输入不是 `/bye` 且不为空，则使用用户输入和指定的会话 ID 运行智能体。
 - 智能体首先加载该会话 ID 的历史对话记录，并将其与用户输入一起添加到提示词中。
 - 智能体进行 LLM 交互。
 - 运行结束时，在返回响应之前，智能体会将完整的历史对话记录存储在指定的会话 ID 下，并将大小限制为最近的 20 条消息。
@@ -47,8 +47,8 @@ graph TB
     
         ```kotlin title="build.gradle.kts"
         dependencies {
-            implementation("ai.koog:koog-agents:1.0.0")
-            implementation("ai.koog:agents-features-memory:1.0.0")
+            implementation("ai.koog:koog-agents:1.1.1")
+            implementation("ai.koog:agents-features-memory:1.1.1")
         }
         ```
     
@@ -56,8 +56,8 @@ graph TB
     
         ```groovy title="build.gradle"
         dependencies {
-            implementation 'ai.koog:koog-agents:0.7.0'
-            implementation 'ai.koog:agents-features-memory:0.7.0'
+            implementation 'ai.koog:koog-agents:1.1.1'
+            implementation 'ai.koog:agents-features-memory:1.1.1'
         }
         ```
     
@@ -67,12 +67,12 @@ graph TB
         <dependency>
             <groupId>ai.koog</groupId>
             <artifactId>koog-agents-jvm</artifactId>
-            <version>1.0.0</version>
+            <version>1.1.1</version>
         </dependency>
         <dependency>
             <groupId>ai.koog</groupId>
             <artifactId>agents-features-memory-jvm</artifactId>
-            <version>0.7.0</version>
+            <version>1.1.1</version>
         </dependency>
         ```
 

@@ -113,7 +113,7 @@ Kotlin 2.1.20부터는 빌드 스크립트에서 `withJava()` 함수를 제거�
 
 또한, 이제 Gradle은 Java 소스가 있는 경우에만 Java 컴파일 태스크를 실행하며, 이전에는 실행되지 않았던 JVM 유효성 검사 진단을 트리거합니다. `KotlinJvmCompile` 태스크 또는 `compilerOptions` 내부에서 호환되지 않는 JVM 타겟을 명시적으로 구성한 경우 이 진단이 실패합니다. JVM 타겟 호환성을 보장하는 방법은 [관련 컴파일 태스크의 JVM 타겟 호환성 확인](https://kotlinlang.org/docs/gradle-configure-project.html#check-for-jvm-target-compatibility-of-related-compile-tasks)을 참조하세요.
 
-프로젝트가 8.7보다 높은 버전의 Gradle을 사용하고 [Java](https://docs.gradle.org/current/userguide/java_plugin.html), [Java Library](https://docs.gradle.org/current/userguide/java_library_plugin.html), [Application](https://docs.gradle.org/current/userguide/application_plugin.html)과 같은 Gradle Java 플러그인이나 Gradle Java 플러그인에 의존성이 있는 서드파티 Gradle 플러그인에 의존하지 않는다면 `withJava()` 함수를 제거할 수 있습니다.
+프로젝트가 8.7보다 높은 버전의 Gradle을 사용하고 [Java](https://docs.gradle.org/current/userguide/java_plugin.html), [Java Library](https://docs.gradle.org/current/userguide/java_library_plugin.html) 및 [Application](https://docs.gradle.org/current/userguide/application_plugin.html)과 같은 Gradle Java 플러그인이나 Gradle Java 플러그인에 의존성이 있는 서드파티 Gradle 플러그인에 의존하지 않는다면 `withJava()` 함수를 제거할 수 있습니다.
 
 프로젝트에서 [Application](https://docs.gradle.org/current/userguide/application_plugin.html) Gradle Java 플러그인을 사용하는 경우, [새로운 실험적 DSL](https://kotlinlang.org/docs/whatsnew2120.html#kotlin-multiplatform-new-dsl-to-replace-gradle-s-application-plugin)로 마이그레이션할 것을 권장합니다. Gradle 8.7부터 Application 플러그인은 더 이상 코틀린 멀티플랫폼 Gradle 플러그인과 함께 작동하지 않습니다.
 
@@ -302,7 +302,7 @@ Kotlin 1.6.20부터 계층적 프로젝트 구조 지원이 기본적으로 활�
 
 * `gradle.properties` 및 `local.properties` 파일에서 이러한 속성들을 제거하세요.
 * Gradle 빌드 스크립트나 Gradle 플러그인에서 프로그래밍 방식으로 이를 설정하지 마세요.
-* 빌드에서 사용 중인 일부 서드파티 Gradle 플러그인에 의해 지원 중단된 속성이 설정된 경우, 해당 플러그 유지 관리자에게 이러한 속성을 설정하지 않도록 요청하세요.
+* 빌드에서 사용 중인 일부 서드파티 Gradle 플러그인에 의해 지원 중단된 속성이 설정된 경우, 해당 플러그인 유지 관리자에게 이러한 속성을 설정하지 않도록 요청하세요.
 
 Kotlin 1.6.20부터 Kotlin 툴체인의 기본 동작에 이러한 속성들이 포함되지 않았으므로 심각한 영향은 없을 것으로 예상됩니다. 대부분의 결과는 프로젝트를 다시 빌드한 직후에 확인할 수 있을 것입니다.
 

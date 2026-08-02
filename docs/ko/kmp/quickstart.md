@@ -11,7 +11,7 @@ IDE 및 필요한 플러그인 설치부터 시작하세요:
 1. IDE를 선택하고 설치합니다. Kotlin Multiplatform은 IntelliJ IDEA와 Android Studio에서 완전히 지원됩니다.
     
     IDE를 설치할 때는 [JetBrains Toolbox App](https://www.jetbrains.com/toolbox/app/)을 사용하는 것을 권장합니다.
-    이 앱을 사용하면 [Early Access Program](https://www.jetbrains.com/resources/eap/) (EAP) 및 Nightly 릴리스를 포함하여 여러 제품이나 버전을 관리할 수 있습니다.
+    이 앱을 사용하면 [Early Access Program](https://www.jetbrains.com/resources/eap/) (EAP) 및 Nightly 릴릴스를 포함하여 여러 제품이나 버전을 관리할 수 있습니다.
 
     독립형 설치의 경우, [IntelliJ IDEA](https://www.jetbrains.com/idea/download/) 또는 [Android Studio](https://developer.android.com/studio)용 설치 프로그램을 다운로드하세요.
 

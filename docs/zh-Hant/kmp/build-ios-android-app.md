@@ -25,7 +25,7 @@
     </chapter>
   </chapter>
   <chapter title="適用於 Android 與 iOS 的完全原生開發" id="fully-native-development-for-android-and-ios">
-    <p>完全原生開發涉及建立兩個獨立的應用程式：一個使用 Apple 工具的 iOS 版，另一個使用 Google 工具的 Android 版。每個平台都有自己的程式碼庫、開發管線和發佈流程實際。上，您是在建置兩個解決相同問題但存在於不同生態系統中的產品。</p>
+    <p>完全原生開發涉及建立兩個獨立的應用程式：一個使用 Apple 工具的 iOS 版，另一個使用 Google 工具的 Android 版。每個平台都有自己的程式碼庫、開發管線和發佈流程。實際上，您是在建置兩個解決相同問題但存在於不同生態系統中的產品。</p>
     <p>這種方法的主要好處是 <b>平台忠實度</b>。原生應用程式直接使用平台的 UI 架構、互動模式和無障礙技術，這使得開發在每台裝置上都感覺良好的體驗變得更加容易。由於中間沒有抽象層，動畫、手勢和導航都能如預期運作，且沒有效能額外開銷。</p>
     <p>另一個主要優點是 <b>快速存取平台 API</b>。當 Apple 或 Google 推出新的系統功能、SDK 或硬體能力時，原生應用程式可以立即採用。不需要等待跨平台層趕上並開放這些 API，這對於需要尖端作業系統功能或深度系統整合的產品來說非常重要。</p>
     <chapter title="注意事項" id="native-considerations">
@@ -99,7 +99,7 @@
         <td>需要明確的架構界限和一些跨平台協調</td>
       </tr>
     </table>
-    <p>透過 Kotlin Multiplatform，團隊可以選擇共享什麼以及何時共享。也許您想從小處著手，僅共享業務邏輯或一部分 UI，然後隨著時間推移逐漸整合更多內容。這使得共享成為漸進式且可逆的，而非一次性的賭注，將架構變成一種靈活、演進的決策，而非固定的承諾。</p>
+    <p>透過 Kotlin Multiplatform，團隊可以選擇共享什麼以及何時共享。也許您想從小處著手，僅共享業務邏輯或一部分 UI，然後逐漸整合更多內容。這使得共享成為漸進式且可逆的，而非一次性的賭注，將架構變成一種靈活、演進的決策，而非固定的承諾。</p>
     <p>您可以在這些比較中深入了解 Kotlin Multiplatform：<a href="https://kotlinlang.org/docs/multiplatform/kotlin-multiplatform-flutter.html">Kotlin Multiplatform 與 Flutter</a>，以及 <a href="https://kotlinlang.org/docs/multiplatform/kotlin-multiplatform-react-native.html">Kotlin Multiplatform vs. React Native</a>。</p>
   </chapter>
   <chapter title="如何為 Android 與 iOS 應用程式選擇正確的方法"
@@ -112,7 +112,7 @@
       <p>另一個考量點是所需的邏輯共享程度。某些產品在各個平台上需要相似的業務規則、資料模型和工作流，而其他產品則受益於共享大部分的 UI 層。您與您的團隊需要釐清哪些系統組件必須執行一致，哪些預期會有所不同。這有助於防止共享不足（重複的關鍵邏輯）與過度共享（強加錯誤的同質性）。</p>
     </chapter>
     <chapter title="架構決策的可逆性" id="reversibility-of-architectural-decisions">
-      <p>架構決策的可逆性是另一個重要的考量因素。某些選項會將您鎖定在特定的結構中，以後要更改的代價很高，特別是當 UI 與底層功能密不可分時。允許您逐漸移動通用程式碼與平台特定程式碼之間界限的架構，可以降低未來轉向與重構的成本。</p>
+      <p>架構決策的可逆性是另一種重要的考量因素。某些選項會將您鎖定在特定的結構中，以後要更改的代價很高，特別是當 UI 與底層功能密不可分時。允許您逐漸移動通用程式碼與平台特定程式碼之間界限的架構，可以降低未來轉向與重構的成本。</p>
     </chapter>
     <chapter title="預期的產品壽命與演進" id="expected-product-lifespan-and-evolution">
       <p>最後，考慮產品預期的壽命與演進。將經歷重大變更、增加功能或適應新平台能力的產品，受益於職責清晰分離且依賴有限的設計。目標不是立即實現最大化重用，而是選擇一種隨著產品增長與變化而使變更易於管理的方法。</p>

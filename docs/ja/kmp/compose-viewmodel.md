@@ -7,7 +7,7 @@ Compose Multiplatform を使用すると、共通コードでも ViewModel を�
 
 * [依存関係のセットアップ](#set-up-dependencies)
 * [共通コードでの ViewModel の使用](#using-viewmodel-in-common-code)
-* [ナビゲーションの遷移先に合わせた ViewModel のスコープ設定](#viewmodel-scoping-with-navigation-3)
+* [Navigation 3 での ViewModel のスコープ設定](#viewmodel-scoping-with-navigation-3)
 * [Koin または Metro を使用した依存関係の注入](#viewmodel-and-dependency-injection)
 * [ViewModel と UI コードをどの程度共有するかを選択する](#levels-of-code-sharing):
   完全に共有するアプローチから、リポジトリやデータレイヤーのみを共有する方法まで。
@@ -105,7 +105,7 @@ ViewModel を定義し、Composable に組み込んでみましょう：
           field = MutableStateFlow(OrderUiState())
 
       fun setQuantity(n: Int) {
-          field.update { it.copy(quantity = n, price = "${n * 2}.00") }
+          uiState.update { it.copy(quantity = n, price = "${n * 2}.00") }
       }
    }
    ```

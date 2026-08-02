@@ -67,7 +67,7 @@ Quizlet 團隊曾嘗試過 JavaScript、React Native、C++、Rust 和 Go 等技�
 
 * **易讀性優於簡潔性**。雖然簡潔的程式碼很吸引人，但 Kotlin 明白清晰度至關重要。目標不僅是縮短程式碼，而是消除不必要的樣板程式碼，從而增強易讀性和可維護性。
 
-* **程式碼重用優於純粹的表現力**。這不僅僅是為了解決許多問題，而是為了識別模式並建立可重用的程式庫。藉由利用現有解決方案並提取共通性，Kotlin 讓開發者能夠最大化其程式碼的效率。
+* **程式碼重用優於純粹的表現力**。這不僅僅是為了解決許多問題，而是為了識別模式並建立可重用的程式庫。藉由利用現有解決方案並提取共通性， Kotlin 讓開發者能夠最大化其程式碼的效率。
 
 * **互通性優於原創性**。Kotlin 不再重新發明輪子，而是擁抱與 Java 等成熟語言的相容性。這種互通性不僅允許與廣大的 Java 生態系統無縫整合，還促進了對過往經驗中已證實的實踐和教訓的採用。
 
@@ -81,7 +81,7 @@ Quizlet 團隊曾嘗試過 JavaScript、React Native、C++、Rust 和 Go 等技�
 
 在 Kotlin Multiplatform 出現之前，開發者必須以原生方式編寫所有內容。
 
-![在 Kotlin Multiplatform 之前：以原生方式編寫所有程式碼](before-kotlin-multiplatform.svg){width=700}
+![在 Kotlin Multiplatform 之前：以原生方式編寫所有程式碼](kmp-before-new.svg){width=700}
 
 Kotlin Multiplatform 讓您選擇適合專案的程式碼共用程度。
 
@@ -91,7 +91,7 @@ Kotlin Multiplatform 讓您選擇適合專案的程式碼共用程度。
 
 3) [共用一小部分邏輯](multiplatform-ktor-sqldelight.md)：Kotlin Multiplatform 也可以透過共用特定的邏輯子集 (如驗證、領域計算或驗證流程) 來逐步引入。當您希望在不進行大型架構更改的情況下提高跨平台的一致性和穩定性時，此選項非常有效。
 
-![藉由 Kotlin Multiplatform 和 Compose Multiplatform：開發者可以共用商業邏輯、展示邏輯，甚至 UI 邏輯](with-compose-multiplatform.svg){width=700}
+![藉由 Kotlin Multiplatform 和 Compose Multiplatform：開發者可以共用商業邏輯、展示邏輯，甚至 UI 邏輯](kmp-after-new.svg){width=700}
 
 現在，除了平台特定的程式碼外，您幾乎可以共用任何內容。
 
@@ -152,7 +152,7 @@ Kotlin 和 Kotlin Multiplatform 擁有一個非常具支援性的社群。以下
 * [Kotlin YouTube](https://www.youtube.com/channel/UCP7uiEZIqci43m22KDl0sNw)。我們的 YouTube 頻道為視覺學習者提供實用的教學、與專家的直播以及其他優秀的教育內容。
 * [Kodee's Kotlin Roundup](https://lp.jetbrains.com/subscribe-to-kotlin-news/)。如果您想隨時掌握動態的 Kotlin 和 Kotlin Multiplatform 生態系統的最新更新，請訂閱我們的定期通訊！
 
-Kotlin Multiplatform 生態系統正在蓬勃發展。它受到全球眾多 Kotlin 開發者的熱情培育。為了幫助社群在這個不斷擴張的領域中導航，[klibs.io](http://klibs.io) 提供了一個精選的 Kotlin Multiplatform 程式庫目錄，讓您更容易發現針對常見使用案例的可靠解決方案。
+Kotlin Multiplatform 生態系統正在蓬勃發展。它受到全球眾多 Kotlin 開發者的熱情培育。為了幫助社群在這個不斷擴張的領域中導航， [klibs.io](http://klibs.io) 提供了一個精選的 Kotlin Multiplatform 程式庫目錄，讓您更容易發現針對常見使用案例的可靠解決方案。
 
 以下圖表顯示了每年建立的 Kotlin Multiplatform 程式庫數量：
 
@@ -174,7 +174,7 @@ Kotlin Multiplatform 生態系統正在蓬勃發展。它受到全球眾多 Kotl
 如果您已經決定嘗試 Kotlin Multiplatform，以下是一些有助於您入門的小技巧：
 
 * **從小處著手**。從小的共用組件或常數開始，讓團隊熟悉 Kotlin Multiplatform 的工作流程和優點。
-* **建立計畫**。制定明確的實驗計畫，假設預期結果以及實作 and 分析的方法。定義貢獻共用程式碼的角色，並建立有效分發更改的工作流程。
+* **建立計畫**。制定明確的實驗計畫，假設預期結果以及實作與分析的方法。定義貢獻共用程式碼的角色，並建立有效分發更改的工作流程。
 * **評估並進行回顧**。與您的團隊召開回顧會議，評估實驗的成功程度，並識別任何挑戰或需要改進的地方。如果對您有效，您可能想要擴大範圍並共用更多程式碼。如果沒有，您需要了解該實驗未成功的原因。
 
 [![查看 Kotlin Multiplatform 的實際應用！現在就開始](see-kmp-in-action.svg){width="500"}](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html)

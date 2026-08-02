@@ -171,7 +171,7 @@ composable<Profile> { backStackEntry ->
 與任何其他堆疊一樣，`NavController` 將新項目推送 (push) 到堆疊頂部，並從頂部彈出 (pop) 它們：
 
 * 應用程式啟動時，返回堆疊中出現的第一個項目是在 `NavHost` 中定義的起始目的地。
-* 每個 `NavController.navigate()` 呼景預設都會將給定的目的地推送至堆疊頂部。
+* 每個 `NavController.navigate()` 呼叫預設都會將給定的目的地推送至堆疊頂部。
 * 使用返回手勢、返回按鈕或 `NavController.popBackStack()` 方法會將目前的目的地從堆疊中彈出，並將使用者帶回上一個目的地。
     如果使用者是透過深層連結進入目前目的地的，則彈出堆疊會將他們帶回上一個應用程式。
     或者，`NavController.navigateUp()` 函式僅在 `NavController` 的上下文中引導使用者在應用程式內移動。

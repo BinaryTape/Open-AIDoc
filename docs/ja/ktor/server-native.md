@@ -23,30 +23,34 @@ undefined
 
 ## 依存関係の追加 {id="add-dependencies"}
 
-Kotlin/NativeプロジェクトのKtorサーバーには、少なくとも2つの依存関係が必要です。`ktor-server-core`依存関係とエンジン依存関係（CIO）です。以下のコードスニペットは、`build.gradle.kts`ファイルの`nativeMain`ソースセットに依存関係を追加する方法を示しています。
+Kotlin/NativeプロジェクトのKtorサーバーには、少なくとも2つの依存関係が必要です。
+* `ktor-server-core`（コア依存関係）
+* `ktor-server-cio`（CIOエンジン）
+
+以下のコードスニペットは、`<Path>build.gradle.kts</Path>`ファイルの`nativeMain`ソースセットに依存関係を追加する方法を示しています。
 
 ```kotlin
-}
-sourceSets {
-    val nativeMain by getting {
-        dependencies {
+kotlin {
+    sourceSets {
+        nativeMain.dependencies {
             implementation("io.ktor:ktor-server-core:$ktor_version")
             implementation("io.ktor:ktor-server-cio:$ktor_version")
         }
     }
+}
 ```
 
 Nativeサーバーを[テスト](server-testing.md)するには、`nativeTest`ソースセットに`ktor-server-test-host`アーティファクトを追加します。
 
 ```kotlin
-}
-    }
-    val nativeTest by getting {
-        dependencies {
+kotlin {
+    sourceSets {
+        nativeTest.dependencies {
             implementation(kotlin("test"))
             implementation("io.ktor:ktor-server-test-host:$ktor_version")
         }
     }
+}
 ```
 
 ## Nativeターゲットの設定 {id="native-target"}
@@ -54,6 +58,8 @@ Nativeサーバーを[テスト](server-testing.md)するには、`nativeTest`�
 必要なNativeターゲットを指定し、`binaries`プロパティを使用して[Nativeバイナリを宣言](https://kotlinlang.org/docs/mpp-build-native-binaries.html)します。
 
 ```kotlin
+kotlin {
+    val hostOs = System.getProperty("os.name")
     val arch = System.getProperty("os.arch")
     val nativeTarget = when {
         hostOs == "Mac OS X" && arch == "x86_64" -> macosX64("native")
@@ -71,10 +77,14 @@ Nativeサーバーを[テスト](server-testing.md)するには、`nativeTest`�
                 entryPoint = "main"
             }
         }
+    }
+}
 ```
 
-完全な例はこちらで確認できます: [embedded-server-native](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/embedded-server-native)。
+> 完全な例については、[embedded-server-native](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/embedded-server-native)を参照してください。
+>
+{style="tip"}
 
-## サーバーの作成 {id="create-server"}
+## 次のステップ {id="create-server"}
 
-Gradleビルドスクリプトを設定した後、[サーバーの作成](server-create-and-configure.topic)で説明されているようにKtorサーバーを作成できます。
+Gradleビルドスクリプトを設定した後、[Ktorサーバーの作成](server-create-and-configure.topic)に進むことができます。

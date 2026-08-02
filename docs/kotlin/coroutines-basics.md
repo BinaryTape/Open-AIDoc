@@ -8,7 +8,7 @@
 
 ![比较并行与并发线程](parallelism-and-concurrency.svg){width="700"}
 
-要详细了解协程与线程之间的区别，请参阅[比较协程与 JVM 线程](#comparing-coroutines-and-jvm-threads)。
+有关协程与线程之间区别的更多信息，请参阅[比较协程与 JVM 线程](#comparing-coroutines-and-jvm-threads)。
 
 ## 挂起函数
 
@@ -18,7 +18,7 @@
 
 ```kotlin
 suspend fun greet() {
-    println("来自挂起函数的 Hello world")
+    println("Hello world from a suspending function")
 }
 ```
 
@@ -30,13 +30,13 @@ suspend fun main() {
 }
 
 suspend fun showUserInfo() {
-    println("正在加载用户...")
+    println("Loading user...")
     greet()
-    println("用户：John Smith")
+    println("User: John Smith")
 }
 
 suspend fun greet() {
-    println("来自挂起函数的 Hello world")
+    println("Hello world from a suspending function")
 }
 ```
 {kotlin-runnable="true"}
@@ -363,11 +363,11 @@ suspend fun performBackgroundWork() = coroutineScope { // this: CoroutineScope
     this.launch {
         // 挂起以模拟后台工作
         delay(100.milliseconds)
-        println("正在后台发送通知")
+        println("Sending notification in background")
     }
 
     // 主协程在之前的协程挂起时继续执行
-    println("作用域继续运行")
+    println("Scope continues")
 }
 //sampleEnd
 ```
@@ -375,7 +375,7 @@ suspend fun performBackgroundWork() = coroutineScope { // this: CoroutineScope
 
 运行此示例后，你可以看到 `main()` 函数不会被 `CoroutineScope.launch()` 阻塞，并且在协程于后台工作时会继续运行其他代码。
 
-> `CoroutineScope.launch()` 函数返回一个 [`Job`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-job/) 句柄。使用此句柄可以等待启动的协程完成。有关更多信息，请参阅[取消与超时](cancellation-and-timeouts.md#cancel-coroutines)。
+> `CoroutineScope.launch()` 函数返回一个 [`Job`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-job/) 句柄。使用此句柄可以等待启动的协程完成。有关更多信息，请参阅[取消与超时](coroutines-cancellation.md#cancel-coroutines)。
 > 
 {style="tip"}
 
@@ -394,18 +394,18 @@ suspend fun main() = withContext(Dispatchers.Default) { // this: CoroutineScope
     // 开始下载第一页
     val firstPage = this.async {
         delay(50.milliseconds)
-        "第一页"
+        "First page"
     }
 
     // 并行开始下载第二页
     val secondPage = this.async {
         delay(100.milliseconds)
-        "第二页"
+        "Second page"
     }
 
     // 等待两个结果并进行比较
     val pagesAreEqual = firstPage.await() == secondPage.await()
-    println("页面是否相等：$pagesAreEqual")
+    println("Pages are equal: $pagesAreEqual")
 }
 //sampleEnd
 ```
@@ -464,7 +464,7 @@ suspend fun myReadItem(): Int {
 ```kotlin
 suspend fun runWithDispatcher() = coroutineScope { // this: CoroutineScope
     this.launch(Dispatchers.Default) {
-        println("正在运行在 ${Thread.currentThread().name}")
+        println("Running on ${Thread.currentThread().name}")
     }
 }
 ```
@@ -479,25 +479,25 @@ import kotlinx.coroutines.*
 
 //sampleStart
 suspend fun main() = withContext(Dispatchers.Default) { // this: CoroutineScope
-    println("正在运行 withContext 块在 ${Thread.currentThread().name}")
+    println("Running withContext block on ${Thread.currentThread().name}")
 
     val one = this.async {
-        println("第一个计算开始于 ${Thread.currentThread().name}")
+        println("First calculation starting on ${Thread.currentThread().name}")
         val sum = (1L..500_000L).sum()
         delay(200L)
-        println("第一个计算完成于 ${Thread.currentThread().name}")
+        println("First calculation done on ${Thread.currentThread().name}")
         sum
     }
 
     val two = this.async {
-        println("第二个计算开始于 ${Thread.currentThread().name}")
+        println("Second calculation starting on ${Thread.currentThread().name}")
         val sum = (500_001L..1_000_000L).sum()
-        println("第二个计算完成于 ${Thread.currentThread().name}")
+        println("Second calculation done on ${Thread.currentThread().name}")
         sum
     }
 
     // 等待两个计算并打印结果
-    println("合并总计：${one.await() + two.await()}")
+    println("Combined total: ${one.await() + two.await()}")
 }
 //sampleEnd
 ```
@@ -558,13 +558,13 @@ fun main() {
 ```
 {kotlin-runnable="true" validate="false"}
 
-运行这个版本会消耗更多的内存，因为每个线程都需要自己的内存栈。对于 50,000 个线程，其消耗可能高达 100 GB，而相同数量提协程仅需约 500 MB。
+运行这个版本会消耗更多的内存，因为每个线程都需要自己的内存栈。对于 50,000 个线程，其消耗可能高达 100 GB，而相同数量的协程仅需约 500 MB。
 
 根据你的操作系统、JDK 版本和设置，JVM 线程版本可能会抛出内存不足错误，或者为了避免同时运行过多线程而降低线程创建速度。
 
 ## 下一步
 
 * 在[组合挂起函数](composing-suspending-functions.md)中了解更多关于组合挂起函数的内容。
-* 在[取消与超时](cancellation-and-timeouts.md)中学习如何取消协程以及处理超时。
+* 在[取消与超时](coroutines-cancellation.md)中学习如何取消协程以及处理超时。
 * 在[协程上下文与调度器](coroutine-context-and-dispatchers.md)中深入研究协程执行和线程管理。
-* 在[异步流](flow.md)中学习如何返回多个异步计算出的值。
+* 在[异步流](coroutines-flow.md)中学习如何返回多个异步计算出的值。

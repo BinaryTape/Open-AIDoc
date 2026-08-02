@@ -20,9 +20,9 @@
 
 1. 애플리케이션의 웹 배포판을 빌드합니다.
 
-```console
-   ./gradlew :shared:wasmJsBrowserDistribution
-```
+    ```console
+       ./gradlew :shared:wasmJsBrowserDistribution
+    ```
 
 2. 생성된 `dist` 디렉토리에서 필요한 리소스를 찾아 경로를 저장합니다.
 3. `wasmJsMain/resources/index.html` 파일을 열고 `<head>` 요소 안에 `<link>` 태그를 추가합니다.

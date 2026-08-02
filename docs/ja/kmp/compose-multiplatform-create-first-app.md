@@ -165,7 +165,7 @@ IntelliJ IDEA で実行構成のリストから **iosApp** を選択し、実行
 
 #### 実機の iOS デバイスで実行する {initial-collapse-state="collapsed" collapsible="true"}
 
-実機の iOS デバイスでマルチプラットフォームアプリケーションを実行できます。開始する前に、[Apple ID](https://support.apple.com/ja-jp/HT204316) に関連付けられたチーム ID を設定する必要があります。
+実機の iOS デバイスでマルチプラットフォームアプリケーションを実行できます。開始する前に、[Apple ID](https://support.apple.com/en-us/HT204316) に関連付けられたチーム ID を設定する必要があります。
 
 ##### チーム ID を設定する
 

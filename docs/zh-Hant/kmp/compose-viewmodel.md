@@ -89,7 +89,7 @@ Android [ViewModel](https://developer.android.com/topic/libraries/architecture/v
 Compose Multiplatform 提供了一個通用的 `ViewModelStoreOwner` 實作，因此在通用程式碼中使用 `ViewModel` 類別與 [Android 最佳實務](https://developer.android.com/topic/libraries/architecture/viewmodel#best-practices)並無太大差異。
 
 然而，在非 JVM 平台上存在一個重要的差異，即無法使用型別反射來具現化物件。
-您不能在通用程式碼中呼叫不含參數的 `viewModel()` 函式。
+您不能在通用程式碼中呼稱不含參數的 `viewModel()` 函式。
 每次建立 `ViewModel` 執行個體時，您至少需要提供一個初始設定式作為引數。
 
 如果僅提供初始設定式，Compose Multiplatform 會在底層建立預設工廠（類）。
@@ -107,7 +107,7 @@ Compose Multiplatform 提供了一個通用的 `ViewModelStoreOwner` 實作，�
           field = MutableStateFlow(OrderUiState())
 
       fun setQuantity(n: Int) {
-          field.update { it.copy(quantity = n, price = "${n * 2}.00") }
+          uiState.update { it.copy(quantity = n, price = "${n * 2}.00") }
       }
    }
    ```

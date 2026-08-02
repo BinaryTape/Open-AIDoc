@@ -406,7 +406,7 @@ suspend fun performBackgroundWork() = coroutineScope { // this: CoroutineScope
 
 > `CoroutineScope.launch()` 関数は [`Job`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-job/) ハンドルを返します。
 > このハンドルを使用して、開始されたコルーチンが完了するのを待機できます。
-> 詳細は [キャンセルとタイムアウト](cancellation-and-timeouts.md#cancel-coroutines) を参照してください。
+> 詳細は [キャンセルとタイムアウト](coroutines-cancellation.md#cancel-coroutines) を参照してください。
 > 
 {style="tip"}
 
@@ -613,6 +613,6 @@ fun main() {
 ## 次のステップ
 
 * 中断関数の組み合わせについての詳細は、[中断関数の構成](composing-suspending-functions.md) をご覧ください。
-* コルーチンのキャンセル方法とタイムアウトの処理については、[キャンセルとタイムアウト](cancellation-and-timeouts.md) をご覧ください。
+* コルーチンのキャンセル方法とタイムアウトの処理については、[キャンセルとタイムアウト](coroutines-cancellation.md) をご覧ください。
 * コルーチンの実行とスレッド管理についての詳細は、[コルーチンコンテキストとディスパッチャ](coroutine-context-and-dispatchers.md) をご覧ください。
 * 非同期に計算された複数の値を返す方法については、[非同期フロー](coroutines-flow.md) をご覧ください。

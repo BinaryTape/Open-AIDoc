@@ -4,7 +4,7 @@ KSP는 증분 처리(incremental processing)를 지원합니다. KSP는 하나 �
 
 증분 처리는 기본적으로 활성화되어 있습니다. 문제 해결 시 또는 강제로 전체 재빌드가 필요한 경우 이를 비활성화할 수 있습니다. 비활성화하려면 `gradle.properties` 파일에 다음 줄을 추가하세요:
 
-```
+```properties
 ksp.incremental=false
 ```
 
@@ -167,11 +167,11 @@ KSP는 해석 추적을 통해 이 관계를 추적하고 `B`를 `A`의 의존�
 
 ## 버그 보고
 
-증분 처리가 활성화된 경우에만 발생하는 오류가 발견되면 [GitHub 저장소](https://github.com/google/ksp/issues)에 이슈를 생성하고 관련 로그 파일을 첨부해 주세요.
+증분 처리가 활성화된 경우에만 발생하는 오류가 발견되면 [GitHub 저장소](https://github.com/google/ksp/issues)에 이슈를 생성하고 관련 로그 파일을 붙여해 주세요.
 
 1. `gradle.properties`에 다음 줄을 추가하여 증분 처리 로그를 활성화합니다:
 
-   ```
+   ```properties
    ksp.incremental.log=true
    ```
 
@@ -185,3 +185,22 @@ KSP는 해석 추적을 통해 이 관계를 추적하고 `B`를 `A`의 의존�
 4. 이슈를 유발하는 소스 파일을 수정하고 빌드를 다시 실행합니다.
 
 5. 성공한 빌드와 이슈가 재현된 빌드의 로그 파일을 모두 GitHub 이슈에 첨부합니다.
+
+### 심볼 의존성 그래프 시각화하기
+
+증분 처리 디버깅을 돕기 위해, KSP는 지정된 심볼부터 시작하는 심볼 의존성 그래프를 시각화하는 Graphviz DOT 파일을 생성할 수 있습니다.
+
+증분 로그를 활성화하고 그래프 시각화의 시작점으로 사용할 심볼의 [완전 정규화된 이름(fully qualified name)](https://kotlinlang.org/docs/packages.html#package-headers)을 지정하세요:
+
+```properties
+ksp.incremental.log=true
+ksp.incremental.log.graph.origin=<fully-qualified-name>
+```
+
+명령줄에서 KSP를 사용하는 경우 다음 옵션을 추가하세요:
+
+```bash
+-incremental-log=true -incremental-log.graph.origin=<fully-qualified-name>
+```
+
+DOT 파일은 `logs` 디렉토리에 생성됩니다.

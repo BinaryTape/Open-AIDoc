@@ -23,30 +23,34 @@ undefined
 
 ## 添加依赖项 {id="add-dependencies"}
 
-Kotlin/Native 项目中的 Ktor 服务器至少需要两个依赖项：`ktor-server-core` 依赖项和引擎依赖项 (CIO)。下面的代码段展示了如何在 `build.gradle.kts` 文件中向 `nativeMain` 源集添加依赖项：
+Kotlin/Native 项目中的 Ktor 服务器至少需要两个依赖项：
+* `ktor-server-core`（核心依赖项）
+* `ktor-server-cio`（CIO 引擎）
+
+下面的代码片段展示了如何在 <Path>build.gradle.kts</Path> 文件中向 `nativeMain` 源集添加依赖项：
 
 ```kotlin
-}
-sourceSets {
-    val nativeMain by getting {
-        dependencies {
+kotlin {
+    sourceSets {
+        nativeMain.dependencies {
             implementation("io.ktor:ktor-server-core:$ktor_version")
             implementation("io.ktor:ktor-server-cio:$ktor_version")
         }
     }
+}
 ```
 
 要[测试](server-testing.md)原生服务器，请将 `ktor-server-test-host` 构件添加到 `nativeTest` 源集中：
 
 ```kotlin
-}
-    }
-    val nativeTest by getting {
-        dependencies {
+kotlin {
+    sourceSets {
+        nativeTest.dependencies {
             implementation(kotlin("test"))
             implementation("io.ktor:ktor-server-test-host:$ktor_version")
         }
     }
+}
 ```
 
 ## 配置原生目标 {id="native-target"}
@@ -54,6 +58,8 @@ sourceSets {
 使用 `binaries` 属性指定所需的原生目标并[声明原生二进制文件](https://kotlinlang.org/docs/mpp-build-native-binaries.html)：
 
 ```kotlin
+kotlin {
+    val hostOs = System.getProperty("os.name")
     val arch = System.getProperty("os.arch")
     val nativeTarget = when {
         hostOs == "Mac OS X" && arch == "x86_64" -> macosX64("native")
@@ -71,10 +77,14 @@ sourceSets {
                 entryPoint = "main"
             }
         }
+    }
+}
 ```
 
-您可以在此处找到完整示例：[embedded-server-native](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/embedded-server-native)。
+> 有关完整示例，请参阅 [embedded-server-native](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/embedded-server-native)。
+>
+{style="tip"}
 
-## 创建服务器 {id="create-server"}
+## 后续步骤 {id="create-server"}
 
-在配置好 Gradle 构建脚本后，您可以按照此处所述创建 Ktor 服务器：[创建服务器](server-create-and-configure.topic)。
+在配置好 Gradle 构建脚本后，您可以继续[创建 Ktor 服务器](server-create-and-configure.topic)。

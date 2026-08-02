@@ -23,30 +23,34 @@ undefined
 
 ## 의존성 추가하기 {id="add-dependencies"}
 
-Kotlin/Native 프로젝트에서 Ktor 서버를 사용하려면 최소 두 개의 의존성이 필요합니다: `ktor-server-core` 의존성과 엔진 의존성(CIO)입니다. 아래 코드 스니펫은 `build.gradle.kts` 파일의 `nativeMain` 소스 세트에 의존성을 추가하는 방법을 보여줍니다:
+Kotlin/Native 프로젝트에서 Ktor 서버를 사용하려면 최소 두 개의 의존성이 필요합니다:
+* `ktor-server-core` (핵심 의존성)
+* `ktor-server-cio` (CIO 엔진)
+
+아래 코드 스니펫은 <Path>build.gradle.kts</Path> 파일의 `nativeMain` 소스 세트에 의존성을 추가하는 방법을 보여줍니다:
 
 ```kotlin
-}
-sourceSets {
-    val nativeMain by getting {
-        dependencies {
+kotlin {
+    sourceSets {
+        nativeMain.dependencies {
             implementation("io.ktor:ktor-server-core:$ktor_version")
             implementation("io.ktor:ktor-server-cio:$ktor_version")
         }
     }
+}
 ```
 
 Native 서버를 [테스트](server-testing.md)하려면, `nativeTest` 소스 세트에 `ktor-server-test-host` 아티팩트를 추가하세요:
 
 ```kotlin
-}
-    }
-    val nativeTest by getting {
-        dependencies {
+kotlin {
+    sourceSets {
+        nativeTest.dependencies {
             implementation(kotlin("test"))
             implementation("io.ktor:ktor-server-test-host:$ktor_version")
         }
     }
+}
 ```
 
 ## 네이티브 타겟 구성하기 {id="native-target"}
@@ -54,6 +58,8 @@ Native 서버를 [테스트](server-testing.md)하려면, `nativeTest` 소스 �
 필요한 네이티브 타겟을 지정하고 `binaries` 속성을 사용하여 [네이티브 바이너리를 선언](https://kotlinlang.org/docs/mpp-build-native-binaries.html)합니다:
 
 ```kotlin
+kotlin {
+    val hostOs = System.getProperty("os.name")
     val arch = System.getProperty("os.arch")
     val nativeTarget = when {
         hostOs == "Mac OS X" && arch == "x86_64" -> macosX64("native")
@@ -71,10 +77,14 @@ Native 서버를 [테스트](server-testing.md)하려면, `nativeTest` 소스 �
                 entryPoint = "main"
             }
         }
+    }
+}
 ```
 
-전체 예제는 여기에서 확인할 수 있습니다: [embedded-server-native](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/embedded-server-native).
+> 전체 예제는 여기에서 확인할 수 있습니다: [embedded-server-native](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/embedded-server-native).
+>
+{style="tip"}
 
 ## 서버 생성하기 {id="create-server"}
 
-Gradle 빌드 스크립트를 구성한 후, [서버 생성하기](server-create-and-configure.topic)에 설명된 대로 Ktor 서버를 생성할 수 있습니다.
+Gradle 빌드 스크립트를 구성한 후, 계속해서 [Ktor 서버를 생성](server-create-and-configure.topic)할 수 있습니다.

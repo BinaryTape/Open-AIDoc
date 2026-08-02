@@ -599,7 +599,7 @@ kotlin {
 
 ## 編譯 (Compilations)
 
-一個目標可以有一個或多個編譯，例如用於生產或測試。有一些 [預定義編譯](#predefined-compilations) 會在目標建立時自動加入。您還可以額外建立 [自訂編譯](#custom-compilations)。
+一個目標可以有一個 or 多個編譯，例如用於生產或測試。有一些 [預定義編譯](#predefined-compilations) 會在目標建立時自動加入。您還可以額外建立 [自訂編譯](#custom-compilations)。
 
 要參考目標的所有或某些特定編譯，請使用 `compilations` 物件集合。
 從 `compilations` 中，您可以透過名稱參考編譯。

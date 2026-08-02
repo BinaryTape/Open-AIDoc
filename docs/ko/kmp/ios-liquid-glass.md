@@ -5,6 +5,7 @@
 
 [리퀴드 글래스(Liquid Glass)](https://developer.apple.com/documentation/TechnologyOverviews/liquid-glass)는 iOS 26에서 도입된 Apple의 비주얼 디자인 시스템으로, UI 요소에 유리 같은 반투명함과 유동성을 제공합니다.
 Compose Multiplatform 앱에 이를 도입하려면 네이티브 SwiftUI 쉘(shell)이 필요합니다. 리퀴드 글래스 효과는 네이티브 `TabView`, `NavigationStack`, 그리고 툴바 API를 통해 시스템에 의해 렌더링되기 때문입니다.
+SwiftUI가 프로젝트에 적합하지 않은 경우, [대안 접근 방식](#대안-접근-방식)을 참조하세요.
 
 이 튜토리얼에서는 각 화면의 콘텐츠 렌더링은 Compose가 담당하게 유지하면서, **iOS 앱의 내비게이션을 완전한 Compose 기반에서 iOS 26 리퀴드 글래스 스타일의 네이티브 SwiftUI 내비게이션으로 마이그레이션하는 방법**을 안내합니다.
 앱이 네이티브 `TabView`와 `NavigationStack` 뷰를 사용하면 시스템이 리퀴드 글래스 효과를 자동으로 적용하므로, 리퀴드 글래스 전용 코드를 별도로 작성할 필요는 없습니다.
@@ -414,6 +415,60 @@ SwiftUI에서 새로운 내비게이션 구조를 빌드하기 위해 세 가지
 
 전체 구현은 [`main.ios.kt`](https://github.com/JetBrains/kotlinconf-app/blob/3982334f1c3712fb959f0d20b563d6c8b81e9bbd/app/shared/src/iosMain/kotlin/org/jetbrains/kotlinconf/main.ios.kt)를 참조하세요.
 
+### 대안: SwiftUI를 건너뛰고 Kotlin에서 UIKit 구동하기 {collapsible="true"}
+
+위의 진입점들은 SwiftUI `TabView` 및 `NavigationStack`을 위해 설계되었습니다. 
+내부적으로 SwiftUI는 `UITabBarController`와 `UINavigationController`를 사용하여 이러한 뷰를 구현하며, iOS 26의 리퀴드 글래스는 SwiftUI에서 선언하든 UIKit에서 구성하든 관계없이 네이티브 탭 및 내비게이션 바에 적용됩니다.
+
+새로운 iOS 진입점을 처음부터 시작하거나, 유지해야 할 SwiftUI App 및 `ContentView`가 이미 있는 것이 아니라면, SwiftUI 레이어를 완전히 건너뛰고 Kotlin에서 직접 UIKit을 구동할 수 있습니다. 
+이 접근 방식은 이 튜토리얼의 SwiftUI 쉘에 필요한 `RouteWrapper` 식별 관련 우회 방법, Kotlin 콜백에서 미러링된 `@Observable` 경로 상태, 그리고 `UIViewControllerRepresentable` 래퍼를 피할 수 있게 해줍니다.
+내비게이션 상태가 Swift와 Kotlin에 중복되지 않고 한 곳에서 관리됩니다.
+
+네이티브 내비게이션 바와 공유 Compose 화면 콘텐츠를 얻으려면, `commonMain`에서 내비게이션 계약(contract)을 `expect class` 코디네이터로 선언하고 각 플랫폼에서 `actual` 구현을 작성합니다.
+
+이 튜토리얼의 SwiftUI 쉘은 선언적입니다. `TabView`와 `NavigationStack`을 설명하면 SwiftUI가 스택을 관리합니다.
+UIKit 코디네이터 접근 방식은 명령적입니다. 사용자가 `UINavigationController`를 소유하고 직접 `push` 및 `pop`을 호출합니다.
+
+```
+SceneDelegate
+  └── UIWindow.rootViewController = UITabBarController
+        ├── UINavigationController (Schedule)
+        │     ├── ComposeUIViewController  ← 탭 루트
+        │     └── ComposeUIViewController  ← 상세, Kotlin에서 푸시됨
+        └── UINavigationController (Info)
+              └── ...
+```
+
+이 튜토리얼의 SwiftUI 부분은 UIKit 코디네이터와 다음과 같이 매핑됩니다:
+
+* SwiftUI `TabView` 및 `NavigationStack` → `UITabBarController` 및 `UINavigationController`
+* `TabNavigationCoordinator` 및 `RouteWrapper` → Kotlin `actual` 코디네이터의 `push` 및 `pop`
+* `NativeNavComposeView` 및 `DetailComposeView` → 코디네이터 내부의 `ComposeUIViewController { Screen(...) }`
+* `ContentView` SwiftUI 쉘 → `SceneDelegate`에서 `window.rootViewController` 설정
+
+```kotlin
+// commonMain
+expect class ScheduleCoordinator() {
+    fun navigateToDetail(route: AppRoute)
+    fun navigateBack()
+    @Composable fun Content()
+}
+```
+
+`iosMain`의 `actual` 구현은 `UINavigationController`에서 `push` 및 `pop`을 호출하고 `showTopBar`를 `false`로 설정합니다.
+iOS에서는 `SceneDelegate`에서 코디네이터를 생성하고 탭 바 컨트롤러를 윈도우의 루트 뷰 컨트롤러로 설정합니다.
+SwiftUI `App`이나 `ContentView` 래퍼는 필요하지 않습니다.
+
+Kotlin과 Swift 간의 작업을 두 가지 방식으로 나눌 수 있습니다:
+
+* **전부 Kotlin `iosMain`에서 처리**: UIKit 상호운용성을 사용하여 `actual` 코디네이터에서 `UITabBarController`, `UINavigationController`, `ComposeUIViewController`를 연결합니다.
+* **Kotlin에서는 화면 팩토리, Swift에서 조립**: `iosMain`에서 내비게이션 클로저가 포함된 `ComposeUIViewController` 인스턴스를 반환하는 `MainViewController` 및 `ScreenViewController`를 노출하고, 네이티브 Swift에서 탭 바와 내비게이션 스택을 빌드합니다. 이 옵션은 화면 콘텐츠는 Compose로 공유하되 iOS 내비게이션 코드는 Swift에 유지하고 싶을 때 적합합니다.
+
+두 옵션 모두 SwiftUI나 `UIViewControllerRepresentable` 없이 동일한 평면형 UIKit 계층 구조를 제공합니다.
+팀이 코디네이터 로직을 어디에 두는 것을 선호하느냐에 따라 선택하세요.
+
+`UITabBarController` 내부에서 Compose를 사용하는 방법에 대한 자세한 내용은 [UIKit 프레임워크와의 통합](compose-uikit-integration.md)을 참조하세요.
+
 ## SwiftUI 내비게이션 레이어 구축
 
 이 부분은 마이그레이션의 iOS 측면입니다. 이전 단계의 모든 Kotlin 변경 사항은 여기서 일어날 일을 준비하기 위한 것이었습니다. 즉, Compose 뷰를 대상으로 호스팅하는 각 탭별 `NavigationStack`이 있는 SwiftUI `TabView`를 만드는 것입니다.
@@ -684,6 +739,7 @@ struct ContentView: View {
 
 이 튜토리얼의 마이그레이션 방식은 네이티브 SwiftUI 내비게이션을 선호하며, 이를 통해 리퀴드 글래스 및 기타 시스템 동작을 즉시 사용할 수 있습니다. 이 방식이 프로젝트에 맞지 않는다면 다음 대안 중 하나를 고려해 보세요:
 
+* **Kotlin에서 조정되는 UIKit 내비게이션**: `commonMain`에서 내비게이션 계약을 `expect class` 코디네이터로 선언하고, 각 플랫폼에서 `actual` 구현을 통해 `UITabBarController` 및 `UINavigationController`를 명령적으로 구동합니다. SwiftUI 쉘 없이도 리퀴드 글래스와 단일 내비게이션 상태 소스를 얻을 수 있지만, UIKit 상호운용 코드를 작성해야 합니다. 자세한 내용은 [SwiftUI를 건너뛰고 Kotlin에서 UIKit 구동하기](#대안-swiftui를-건너뛰고-kotlin에서-uikit-구동하기)를 참조하세요.
 * **네이티브 상호운용 컨트롤이 있는 Compose 기반 내비게이션**: 내비게이션은 Compose에 유지하되, `UITabBar` 및 `UINavigationBar`와 같은 네이티브 UI 컨트롤을 리퀴드 글래스 스타일링과 함께 임베딩합니다. 단점은 네이티브 오버레이와 Compose 콘텐츠 간의 일부 상호운용성 제한입니다.
 * **적응형 UI를 위한 서드파티 솔루션을 활용한 Compose 기반 내비게이션**: [Calf](https://klibs.io/project/MohamedRejeb/Calf)와 같은 라이브러리를 사용하여 앱이 실행 중인 플랫폼에 네이티브인 적응형 UI 컴포넌트를 렌더링합니다. 이 방식은 플랫폼 차이를 직접 처리하는 복잡성을 줄여주며 iOS의 리퀴드 글래스와 같은 네이티브 동작을 기본적으로 제공합니다.
 * **리퀴드 글래스 효과를 모방한 Compose 전용 내비게이션**: 모든 것을 Compose에서 렌더링하고 리퀴드 글래스를 시각적으로 근사하게 구현합니다. 예를 들어 [AndroidLiquidGlass](https://klibs.io/project/Kyant0/AndroidLiquidGlass) 또는 [Liquid](https://klibs.io/project/FletchMcKee/liquid)와 같은 라이브러리를 사용할 수 있습니다. 이 방식은 시스템 리퀴드 글래스와 완전히 동일하지는 않지만 시각적으로 유사한 효과를 내면서 모든 UI를 Compose 측에 유지합니다.

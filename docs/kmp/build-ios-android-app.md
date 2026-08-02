@@ -1,4 +1,3 @@
-```xml
 <topic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:noNamespaceSchemaLocation="https://resources.jetbrains.com/writerside/1.0/topic.v2.xsd" id="build-ios-android-app" title="如何开发 Android 与 iOS 应用（以及何时使用 Kotlin Multiplatform）">
   <web-summary>探索如何开发 Android 与 iOS 应用，比较架构和框架，并了解 Kotlin Multiplatform 的适用场景。</web-summary>

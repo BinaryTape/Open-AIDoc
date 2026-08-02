@@ -949,7 +949,7 @@ Kotlin Multiplatform 文件已移至 kotlinlang.org。現在您可以在同一�
 * [類別](classes.md) —— 了解在 Kotlin 中使用類別的基礎知識與最佳實務。
 * [擴充功能](extensions.md) —— 了解如何在 Kotlin 中擴充類別與介面。
 * [協同程式基礎知識](coroutines-basics.md) —— 探索關鍵的協同程式概念，並學習如何建立您的第一個協同程式。
-* [取消與超時](cancellation-and-timeouts.md) —— 了解協同程式取消如何運作，以及如何讓協同程式響應取消。
+* [取消與超時](coroutines-cancellation.md) —— 了解協同程式取消如何運作，以及如何讓協同程式響應取消。
 * [Kotlin/Native 程式庫](native-libraries.md) —— 了解如何產生 `klib` 程式庫產物。
 * [Kotlin Notebook 概覽](kotlin-notebook-overview.md) —— 使用 Kotlin Notebook 外掛程式建立互動式筆記本文件。
 * [將 Kotlin 加入 Java 專案](mixing-java-kotlin-intellij.md) —— 配置 Java 專案以同時使用 Kotlin 與 Java。
@@ -960,4 +960,4 @@ Kotlin Multiplatform 文件已移至 kotlinlang.org。現在您可以在同一�
 
 Kotlin 外掛程式作為隨附外掛程式散佈於 IntelliJ IDEA 與 Android Studio 中。
 
-若要更新至新的 Kotlin 版本，請在您的建置指令碼中[將 Kotlin 版本更改](releases.md#update-to-a-new-kotlin-version)為 2.3.0。
+若要更新至新的 Kotlin 版本，[將 Kotlin 版本更改](releases.md#update-to-a-new-kotlin-version)為 2.3.0 在您的建置指令碼中。

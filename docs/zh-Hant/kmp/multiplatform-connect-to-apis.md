@@ -9,7 +9,7 @@
 在編寫使用平台特定 API 的程式碼之前，請先檢查是否可以使用多平台程式庫代替。
 這類程式庫提供一個通用的 Kotlin API，並針對不同平台有不同的實作。
 
-目前已有許多程式庫可用於實作網路、記錄（logging）和分析，以及存取裝置功能等。如需更多資訊，請參閱[此精選清單](https://github.com/terrakok/kmm-awesome)。
+目前已有許多程式庫可用於實作網路、記錄（logging）和分析，以及存取裝置功能等。你可以在 [klibs.io](https://klibs.io) 上瀏覽程式庫，這是 Kotlin Multiplatform 程式庫的搜尋平台。
 
 ## expect 和 actual 函式與屬性
 

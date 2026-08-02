@@ -71,7 +71,7 @@ Lincheck 实现了两种测试策略来寻找导致错误行为的执行调度�
 ## 探索 Lincheck
 
 * 在 [Lincheck 快速入门](lincheck-getting-started.md) 中逐步学习 Lincheck 功能。
-* 在 [测试策略](testing-strategies.md) 文章中了解测试并发数据结构的声明式方法。
+* 在 Lincheck 中了解[测试并发数据结构的声明式方法](lincheck-how-to-test-data-structures.md)。
 
 ## 了解详情
 

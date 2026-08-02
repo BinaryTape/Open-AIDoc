@@ -677,6 +677,10 @@
       {
         "text": "kmp.programming-languages-cross-platform",
         "link": "programming-languages-cross-platform"
+      },
+      {
+        "text": "kmp.kmp-for-ios",
+        "link": "kmp-for-ios"
       }
     ],
     "collapsed": true

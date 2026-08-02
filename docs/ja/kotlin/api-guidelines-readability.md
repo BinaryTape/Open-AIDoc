@@ -11,7 +11,7 @@
 しかし、これらのカスタマイズオプションを関数の引数を追加することで導入すると、APIの複雑さが大幅に増す可能性があります。
 
 カスタマイズのために引数を増やす代わりに、異なる動作を互いに合成（compose）できるようにAPIを設計する方が効果的です。
-たとえば、コルーチンの Flow API では、[バッファリング](coroutines-flow-operators.md#buffering)と[コンフレーション](coroutines-flow-operators.md#conflation)の両方が個別の関数として実装されています。
+たとえば、コルーチンの Flow API では、[バッファリングとコンフレーション](coroutines-flow-operators.md#concurrent-processing-operators)の両方が個別の関数として実装されています。
 これらは、各基本操作がバッファリングやコンフレーションを制御するための引数を受け取るのではなく、[`filter`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/filter.html) や [`map`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/map.html) のようなより基本的な操作とチェーン（連結）させることができます。
 
 別の例として、[Jetpack Compose の Modifiers API](https://developer.android.com/develop/ui/compose/modifiers) があります。
@@ -63,7 +63,7 @@ fun Application.module() {
 これはアプリケーションをセットアップし、Json シリアル化を使用するように構成された `ContentNegotiation` プラグインをインストールし、アプリケーションがさまざまな `/article` エンドポイントへのリクエストに応答するようにルーティングを設定します。
 
 DSLの作成に関する詳細な説明については、[型安全なビルダー](type-safe-builders.md)を参照してください。
-ライブラリ作成の文脈では、以下の点が注目に値します。
+ライブラリ作成の文ランクでは、以下の点が注目に値します。
 
 * DSLで使用される関数はビルダー関数であり、最後の引数としてレシーバー付きラムダを受け取ります。この設計により、これらの関数を括弧なしで呼び出すことができ、構文がより明確になります。渡されるラムダは、作成されるエンティティを構成するために使用できます。上記の例では、`routing` 関数に渡されるラムダは、ルーティングの詳細を構成するために使用されています。
 * クラスのインスタンスを作成するファクトリ関数は、戻り値の型と同じ名前にし、大文字で始める必要があります。これは、上記のサンプルの `Json` インスタンスの作成で確認できます。これらの関数は、構成のために引き続きラムダ引数を受け取ることができます。詳細については、[コーディング規約](coding-conventions.md#function-names)を参照してください。

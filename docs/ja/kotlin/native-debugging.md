@@ -121,7 +121,7 @@ Process 28473 stopped
   struct ktype:kotlin.Unit &kfun:main(kotlin.Array<kotlin.String>);
   ```
 
-* 名前による指定は**不可**です。なぜなら、`:` が場所によるブレークポイント指定のセパレータとして使用されるためです。
+* 名前による指定は _不可_ です。なぜなら、`:` が場所によるブレークポイント指定のセパレータとして使用されるためです。
 
   ```bash
   (gdb) b kfun:main(kotlin.Array<kotlin.String>)
@@ -236,3 +236,7 @@ kotlin {
 
 * Python バインディングのパフォーマンス。
 * デバッガツールでの式評価（Expression evaluation）はサポートされておらず、現在のところ実装の予定はありません。
+
+## 次のステップ
+
+[iOS コードにおける未処理の Kotlin 例外のクラッシュレポートを改善する方法を学ぶ](native-faq.md#how-do-i-get-better-crash-reports-for-ios)

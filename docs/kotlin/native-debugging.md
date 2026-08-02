@@ -26,7 +26,7 @@ Kotlin/Native 编译器可以生成带有调试信息的二进制文件，还可
 
   这些任务根据二进制文件类型（例如 `linkDebugSharedNative`）或您的目标（例如 `linkDebugExecutableMacosArm64`）而有所不同。
 
-* **使用命令行编译器**。在命令行中，使用 `-g` 选项编译您的 Kotlin/Native 二进制文件：
+* **使用命令行编译器**。在命令行中，使用 `-g` 选项编译您的 Kotlin/Native 二二进制文件：
 
   ```bash
   kotlinc-native hello.kt -g -o terminator
@@ -236,3 +236,7 @@ kotlin {
 
 * Python 绑定的性能。
 * 调试器工具中的表达式计算尚不支持，目前没有实现计划。
+
+## 下一步
+
+[了解如何改进 iOS 代码中未处理的 Kotlin 异常的崩溃报告](native-faq.md#how-do-i-get-better-crash-reports-for-ios)

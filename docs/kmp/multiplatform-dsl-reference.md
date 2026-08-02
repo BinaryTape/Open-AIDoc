@@ -5,7 +5,7 @@ Kotlin 多平台 Gradle 插件是一个用于创建 Kotlin 多平台项目的工
 
 ## ID 与版本
 
-Kotlin 多平台 Gradle 插件的完全限定名称是 `org.jetbrains.kotlin.multiplatform`。
+Kotlin 多平台 Gradle 插件的完全限定名称是 `org.jetbrains.kotlin.multiplatform`。 
 如果你使用 Kotlin Gradle DSL，可以使用 `kotlin("multiplatform")` 来应用该插件。
 插件版本与 Kotlin 发布版本一致。最新版本为 %kotlinVersion%。
 
@@ -381,7 +381,7 @@ kotlin {
                 // 由 cinterop 工具传递给编译器的选项。
                 compilerOpts("-Ipath/to/headers")
 
-                // 用于头文件搜索的目录（类似于 -I<path> 编译器 option）。
+                // 用于头文件搜索的目录（类似于 -I<path> 编译器选项）。
                 includeDirs.allHeaders("path1", "path2")
 
                 // includeDirs.allHeaders 的快捷方式。
@@ -423,7 +423,7 @@ kotlin {
                     // includeDirs.allHeaders 的快捷方式。
                     includeDirs("include/directory", "another/directory")
 
-                    // 要包含在绑定中的头文件。
+                    // Header 文件要包含在绑定中。
                     header("path/to/header.h")
                     headers("path/to/header1.h", "path/to/header2.h")
                 }
@@ -768,7 +768,7 @@ kotlin {
         compilations.main {
             compileTaskProvider.configure {
                 compilerOptions {
-                    // 为 'main' 编译设置 Kotlin 编译器选项：
+                    // 设置 'main' 编译的 Kotlin 编译器选项：
                     jvmTarget = JvmTarget.JVM_1_8
                 }
             }

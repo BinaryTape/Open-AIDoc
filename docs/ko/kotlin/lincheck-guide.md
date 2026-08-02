@@ -72,7 +72,7 @@ Lincheck은 잘못된 동작으로 이어지는 실행 스케줄을 찾기 위�
 ## Lincheck 살펴보기
 
 * [Lincheck 시작하기](lincheck-getting-started.md)에서 Lincheck의 기능을 단계별로 알아보세요.
-* [테스트 전략](testing-strategies.md) 문서에서 동시성 데이터 구조를 테스트하는 선언적 접근 방식에 대해 알아보세요.
+* [테스트 전략](lincheck-how-to-test-data-structures.md) 문서에서 동시성 데이터 구조를 테스트하는 선언적 접근 방식에 대해 알아보세요.
 
 ## 추가 참고 자료
 

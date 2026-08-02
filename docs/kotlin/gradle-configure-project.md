@@ -2,7 +2,7 @@
 
 要使用 [Gradle](https://docs.gradle.org/current/userguide/userguide.html) 构建 Kotlin 项目，
 您需要在构建脚本文件 `build.gradle(.kts)` 中将 [Kotlin Gradle 插件添加](#apply-the-plugin)到构建脚本中，
-并在此处[配置项目的依赖项](#configure-dependencies)。
+并在该文件中[配置项目的依赖项](#configure-dependencies)。
 
 > 要了解有关构建脚本内容的更多信息，
 > 请访问[探索构建脚本](get-started-with-jvm-gradle-project.md#explore-the-build-script)章节。
@@ -216,7 +216,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile>().configureEa
 
 ```groovy
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile.class).configureEach {
-    jvmTargetValidationMode = org.jetbrains.kotlin.gradle.dsl.jvm.JvmTargetValidationMode.WARNING)
+    jvmTargetValidationMode = org.jetbrains.kotlin.gradle.dsl.jvm.JvmTargetValidationMode.WARNING
 }
 ```
 
@@ -484,17 +484,13 @@ integrationTestCompilation {
 
 <tabs group="build-script">
 <tab title="Kotlin" group-key="kotlin">
-        
-```kotlin
-// 如果您使用的 Gradle 版本低于 7.0，请添加以下三行
-java {
-    modularity.inferModulePath.set(true)
-}
 
+```kotlin
 tasks.named("compileJava", JavaCompile::class.java) {
+    // 将编译好的 Kotlin 类提供给 javac – 这是 Java/Kotlin 混合源码工作所必需的
+    val mainOutput: FileCollection = sourceSets["main"].output
     options.compilerArgumentProviders.add(CommandLineArgumentProvider {
-        // 将编译好的 Kotlin 类提供给 javac – 这是 Java/Kotlin 混合源码工作所必需的
-        listOf("--patch-module", "YOUR_MODULE_NAME=${sourceSets["main"].output.asPath}")
+        listOf("--patch-module", "YOUR_MODULE_NAME=${mainOutput.asPath}")
     })
 }
 ```
@@ -503,17 +499,13 @@ tasks.named("compileJava", JavaCompile::class.java) {
 <tab title="Groovy" group-key="groovy">
 
 ```groovy
-// 如果您使用的 Gradle 版本低于 7.0，请添加以下三行
-java {
-    modularity.inferModulePath = true
-}
-
 tasks.named("compileJava", JavaCompile.class) {
+    // 将编译好的 Kotlin 类提供给 javac – 这是 Java/Kotlin 混合源码工作所必需的
+    FileCollection mainOutput = sourceSets["main"].output
     options.compilerArgumentProviders.add(new CommandLineArgumentProvider() {
         @Override
         Iterable<String> asArguments() {
-            // 将编译好的 Kotlin 类提供给 javac – 这是 Java/Kotlin 混合源码工作所必需的
-            return ["--patch-module", "YOUR_MODULE_NAME=${sourceSets["main"].output.asPath}"]
+            return ["--patch-module", "YOUR_MODULE_NAME=${mainOutput.asPath}"]
         }
     })
 }
@@ -951,9 +943,7 @@ kotlin.stdlib.jdk.variants.version.alignment=false
   </tab>
   </tabs>
 
-* If you don't add a dependency for a standard library version, but you have two different dependencies that transitively
-  bring different old versions of the Kotlin standard library, then you can explicitly require `%kotlinVersion%`
-  versions of these transitive libraries:
+* 如果您不手动添加标准库版本的依赖项，但您有两个不同的依赖项传递地引入了不同版本的旧版 Kotlin 标准库，那么您可以显式要求这些传递库的 `%kotlinVersion%` 版本：
 
   <tabs group="build-script">
   <tab title="Kotlin" group-key="kotlin">
@@ -998,8 +988,7 @@ kotlin.stdlib.jdk.variants.version.alignment=false
   </tab>
   </tabs>
   
-* 如果您添加了 Kotlin 标准库版本 `%kotlinVersion%` 的依赖项：`implementation("org.jetbrains.kotlin:kotlin-stdlib:%kotlinVersion%")`，
-  以及旧版本（早于 `1.8.0`）的 Kotlin Gradle 插件，请更新 Kotlin Gradle 插件以匹配标准库版本：
+* 如果您添加了 Kotlin 标准库版本 `%kotlinVersion%` 的依赖项：`implementation("org.jetbrains.kotlin:kotlin-stdlib:%kotlinVersion%")`，以及旧版本（早于 `1.8.0`）的 Kotlin Gradle 插件，请更新 Kotlin Gradle 插件以匹配标准库版本：
 
   
   <tabs group="build-script">
@@ -1187,8 +1176,7 @@ test {
 kotlin.test.infer.jvm.variant=false
 ```
 
-如果您在构建脚本中显式使用了 `kotlin("test")` 的变体，且您的项目构建因兼容性冲突停止工作，
-请参阅[兼容性指南中的此问题](compatibility-guide-15.md#do-not-mix-several-jvm-variants-of-kotlin-test-in-a-single-project)。
+如果您在构建脚本中显式使用了 `kotlin("test")` 的变体，且您的项目构建因兼容性冲突停止工作，请参阅[兼容性指南中的此问题](compatibility-guide-15.md#do-not-mix-several-jvm-variants-of-kotlin-test-in-a-single-project)。
 
 ### 设置对 kotlinx 库的依赖项
 
@@ -1342,11 +1330,9 @@ val generatorTask = project.tasks.register("generator") {
 kotlin.sourceSets.getByName("main").generatedKotlin.srcDir(generatorTask)
 ```
 
-此示例创建了一个新的任务 `generator`，其输出目录为 `"src/main/kotlinGen"`。当任务运行时，
-`doLast {}` 任务操作在输出目录中创建一个 `generated.kt` 文件。最后，该示例将任务的输出注册为生成的源码。
+此示例创建了一个新的任务 `generator`，其输出目录为 `"src/main/kotlinGen"`。当任务运行时，`doLast {}` 任务操作在输出目录中创建一个 `generated.kt` 文件。最后，该示例将任务的输出注册为生成的源码。
 
-如果您正在开发 Gradle 插件，可以使用 [`allKotlinSources`](https://kotlinlang.org/api/kotlin-gradle-plugin/kotlin-gradle-plugin-api/org.jetbrains.kotlin.gradle.plugin/-kotlin-source-set/all-kotlin-sources.html) 属性访问在 [`KotlinSourceSet.kotlin`](https://kotlinlang.org/api/kotlin-gradle-plugin/kotlin-gradle-plugin-api/org.jetbrains.kotlin.gradle.plugin/-kotlin-source-set/kotlin.html) 和 
-`KotlinSourceSet.generatedKotlin` 属性中注册的所有源码。
+如果您正在开发 Gradle 插件，可以使用 [`allKotlinSources`](https://kotlinlang.org/api/kotlin-gradle-plugin/kotlin-gradle-plugin-api/org.jetbrains.kotlin.gradle.plugin/-kotlin-source-set/all-kotlin-sources.html) 属性访问在 [`KotlinSourceSet.kotlin`](https://kotlinlang.org/api/kotlin-gradle-plugin/kotlin-gradle-plugin-api/org.jetbrains.kotlin.gradle.plugin/-kotlin-source-set/kotlin.html) 和 `KotlinSourceSet.generatedKotlin` 属性中注册的所有源码。
 
 ## 下一步是什么？
 

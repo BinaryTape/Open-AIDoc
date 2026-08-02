@@ -69,6 +69,13 @@ dependencies {
 </tab>
 </tabs>
 
+`ksp(...)` 配置仅将处理器应用于应用源代码。要处理测试源代码，请使用 `kspTest(...)` 配置添加处理器。
+
+> `ksp(...)` 配置仅在单平台项目（single-platform projects）中可用。
+> 要了解如何为各个 Kotlin 多平台目标（targets）和编译（compilations）配置处理器，请参阅 [在 Kotlin 多平台中使用 KSP](ksp-multiplatform.md)。
+> 
+{style="note"}
+
 ## 创建您自己的处理器
 
 通过遵循以下步骤，您将创建一个简单的注解处理器，它将生成一个 `helloWorld()` 函数。虽然这在实践中并不是很有用，但它演示了创建您自己的处理器和注解的基础知识。
@@ -364,7 +371,7 @@ dependencies {
     </tab>
     </tabs>
 
-4. 在 `app` 模块中，创建一个 `Main.kt` 文件并添加以下代码：
+4. 在 `app`模块中，创建一个 `Main.kt` 文件并添加以下代码：
 
     ```kotlin
     // app/src/main/kotlin/Main.kt

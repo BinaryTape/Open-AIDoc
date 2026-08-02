@@ -281,7 +281,7 @@ compose.desktop {
 
 ### JDK 版本
 
-该插件使用 `jpackage`，这需要不低于 [JDK 17](https://openjdk.java.net/projects/jdk/17/) 的 JDK 版本。
+该插件使用 `jpackage`，这需要不低于 [JDK 17](https://openjdk.java.net/projects/jdk/17/) 的 JDK 版本。 
 指定 JDK 版本时，请确保至少满足以下要求之一：
 
 * `JAVA_HOME` 环境变量指向兼容的 JDK 版本。
@@ -860,15 +860,15 @@ compose.desktop {
 
 ### macOS 上的信息属性列表
 
-虽然 DSL 支持基本的特定于平台的自定义，但仍可能存在超出所提供功能的情况。
+虽然 DSL 支持基本的特定于平台的自定义，但仍可能存在超出所提供功能的情况。 
 如果您需要指定 DSL 中未体现的 `Info.plist` 值，您可以包含一段原始 XML 作为权宜之计。此 XML 将被附加到应用程序的 `Info.plist` 中。
 
 #### 示例：深度链接
 
 1. 在 `build.gradle.kts` 文件中定义自定义 URL 方案：
 
-  ``` kotlin
-  compose.desktop {
+    ``` kotlin
+    compose.desktop {
       application {
           mainClass = "MainKt"
           nativeDistributions {
@@ -882,9 +882,9 @@ compose.desktop {
               }
           }
       }
-  }
-  
-  val macExtraPlistKeys: String
+    }
+    
+    val macExtraPlistKeys: String
       get() = """
         <key>CFBundleURLTypes</key>
         <array>
@@ -898,23 +898,23 @@ compose.desktop {
           </dict>
         </array>
       """
-  ```
-  {initial-collapse-state="collapsed" collapsible="true" collapsed-title="infoPlist { extraKeysRawXml = macExtraPlistKeys"}
+    ```
+    {initial-collapse-state="collapsed" collapsible="true" collapsed-title="infoPlist { extraKeysRawXml = macExtraPlistKeys"}
 
 2. 使用 `java.awt.Desktop` 类在 `src/main/main.kt` 文件中设置 URI 处理程序：
 
-  ``` kotlin 
-  import androidx.compose.material.MaterialTheme
-  import androidx.compose.material.Text
-  import androidx.compose.runtime.getValue
-  import androidx.compose.runtime.mutableStateOf
-  import androidx.compose.runtime.setValue
-  import androidx.compose.ui.window.singleWindowApplication
-  import java.awt.Desktop
-  
-  fun main() {
+    ``` kotlin 
+    import androidx.compose.material.MaterialTheme
+    import androidx.compose.material.Text
+    import androidx.compose.runtime.getValue
+    import androidx.compose.runtime.mutableStateOf
+    import androidx.compose.runtime.setValue
+    import androidx.compose.ui.window.singleWindowApplication
+    import java.awt.Desktop
+    
+    fun main() {
       var text by mutableStateOf("Hello, World!")
-  
+    
       try {
           Desktop.getDesktop().setOpenURIHandler { event ->
               text = "Open URI: " + event.uri
@@ -922,15 +922,15 @@ compose.desktop {
       } catch (e: UnsupportedOperationException) {
           println("setOpenURIHandler is unsupported")
       }
-  
+    
       singleWindowApplication {
           MaterialTheme {
               Text(text)
           }
       }
-  }
-  ```
-  {initial-collapse-state="collapsed" collapsible="true" collapsed-title="Desktop.getDesktop().setOpenURIHandler { event ->"}
+    }
+    ```
+    {initial-collapse-state="collapsed" collapsible="true" collapsed-title="Desktop.getDesktop().setOpenURIHandler { event ->"}
 
 3. 执行 `runDistributable` 任务：`./gradlew runDistributable`。
 
@@ -938,7 +938,7 @@ compose.desktop {
 
 ## 压缩与混淆
 
-Compose Multiplatform Gradle 插件包含对 [ProGuard](https://www.guardsquare.com/proguard) 的内置支持。
+Compose Multiplatform Gradle 插件包含对 [ProGuard](https://www.guardsquare.com/proguard) 的内置支持。 
 ProGuard 是一款用于代码压缩和混淆的[开源工具](https://github.com/Guardsquare/proguard)。
 
 对于每个*默认*打包任务（不含 ProGuard），Gradle 插件都提供了一个对应的 *release* 任务（包含 ProGuard）：
@@ -1030,8 +1030,8 @@ ProGuard 是一款用于代码压缩和混淆的[开源工具](https://github.co
 * `compose.desktop.application.mainClass` 被用作入口点。
 * 包含了几条 `keep` 规则，以确保 Compose 运行时保持正常功能。
 
-在大多数情况下，您不需要任何额外配置即可获得压缩后的应用程序。
-但是，ProGuard 可能无法跟踪字节码中的某些用法，例如，当通过反射使用类时。
+在大多数情况下，您不需要任何额外配置即可获得压缩后的应用程序。 
+但是，ProGuard 可能无法跟踪字节码中的某些用法，例如，当通过反射使用类时。 
 如果您遇到仅在 ProGuard 处理后出现的问题，您可能需要添加自定义规则。
 
 您可以使用 Gradle DSL 在 `buildTypes.release.proguard` 块中配置 ProGuard，选项如下：
@@ -1072,7 +1072,8 @@ ProGuard 是一款用于代码压缩和混淆的[开源工具](https://github.co
     ```
     {initial-collapse-state="collapsed" collapsible="true" collapsed-title="optimize.set(false)"}
 
-* `joinOutputJars` 生成单个 uber-JAR。默认情况下，ProGuard 会为每个输入 `.jar` 生成对应的 `.jar` 文件。
+* `joinOutputJars` 生成单个 uber-JAR。默认情况下， 
+  ProGuard 会为每个输入 `.jar` 生成对应的 `.jar` 文件。
     ```kotlin
     compose.desktop {
         application {
@@ -1086,7 +1087,9 @@ ProGuard 是一款用于代码压缩和混淆的[开源工具](https://github.co
 
 [//]: # (TODO update version for stable release)
 
-* `version` 设置特定的 ProGuard 版本。JDK 25 至少需要 ProGuard 7.8.0，这是从 Compose Multiplatform 1.12.0-beta01 开始的默认版本。如果您使用较早版本的 Compose Multiplatform 并且使用 JDK 25 进行构建，请将此属性显式设置为 `7.8.0`：
+* `version` 设置特定的 ProGuard 版本。JDK 25 至少需要 ProGuard 7.8.0， 
+  这是从 Compose Multiplatform 1.12.0-beta01 开始的默认版本。
+  如果您使用较早版本的 Compose Multiplatform 并且使用 JDK 25 进行构建，请将此属性显式设置为 `7.8.0`：
     ```kotlin
     compose.desktop {
         application {

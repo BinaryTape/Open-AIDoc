@@ -81,7 +81,7 @@ Quizlet 团队曾尝试过 JavaScript、React Native、C++、Rust 和 Go 等技�
 
 在 Kotlin Multiplatform 出现之前，开发者必须以原生方式编写所有内容。
 
-![在 Kotlin Multiplatform 之前：原生编写所有代码](before-kotlin-multiplatform.svg){width=700}
+![在 Kotlin Multiplatform 之前：原生编写所有代码](kmp-before-new.svg){width=700}
 
 Kotlin Multiplatform 让您可以选择适合项目的代码共享程度。
 
@@ -91,7 +91,7 @@ Kotlin Multiplatform 让您可以选择适合项目的代码共享程度。
 
 3) [共享一小部分逻辑](multiplatform-ktor-sqldelight.md)：Kotlin Multiplatform 也可以通过共享特定的逻辑子集（如验证、领域计算或身份验证流）来逐步引入。当您希望在不进行重大架构更改的情况下提高跨平台的一致性和稳定性时，此选项非常有效。
 
-![通过 Kotlin Multiplatform 和 Compose Multiplatform：开发者可以共享业务逻辑、演示逻辑甚至 UI 逻辑](with-compose-multiplatform.svg){width=700}
+![通过 Kotlin Multiplatform 和 Compose Multiplatform：开发者可以共享业务逻辑、演示逻辑甚至 UI 逻辑](kmp-after-new.svg){width=700}
 
 现在，除了平台特定代码外，您几乎可以共享任何内容。
 

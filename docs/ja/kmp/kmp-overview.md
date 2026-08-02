@@ -43,7 +43,7 @@ Kotlin Multiplatformは [Kotlin/Native](https://kotlinlang.org/docs/native-overv
 
 ### シームレスなツール環境
 
-IntelliJ IDEAとAndroid Studioは、[Kotlin Multiplatform IDEプラグイン](https://plugins.jetbrains.com/plugin/14936-kotlin-multiplatform)によって、共通UIプレビュー、[Compose Multiplatformのホットリロード](compose-hot-reload.md)、言語をまたいだナビゲーション、リファクタリング、そしてKotlinとSwiftコード間のデバッグといった、スマートなIDEサポートをKMPに提供します。
+IntelliJ IDEA and Android Studioは、[Kotlin Multiplatform IDEプラグイン](https://plugins.jetbrains.com/plugin/14936-kotlin-multiplatform)によって、共通UIプレビュー、[Compose Multiplatformのホットリロード](compose-hot-reload.md)、言語をまたいだナビゲーション、リファクタリング、そしてKotlinとSwiftコード間のデバッグといった、スマートなIDEサポートをKMPに提供します。
 
 <video src="https://youtu.be/ACmerPEQAWA" width="700"/>
 
@@ -57,7 +57,6 @@ JetBrainsのAIコーディングエージェントである[Junie](https://jetbr
 
 * [ケーススタディのページ](https://kotlinlang.org/case-studies/?type=multiplatform)で、企業がどのようにKMPを既存のコードベースに正常に導入したかを確認できます。
 * [厳選されたサンプルリスト](multiplatform-samples.md)や、GitHubの [kotlin-multiplatform-sample](https://github.com/topics/kotlin-multiplatform-sample) トピックで、幅広いサンプルアプリをチェックしてください。
-* [klibs.io](https://klibs.io/) ですでに公開されている数千ものマルチプラットフォーム向けライブラリから、特定のライブラリを検索できます。
 
 ## 基本を学ぶ
 
@@ -75,6 +74,12 @@ KMPの動作をすぐに確認するには、[クイックスタート](quicksta
   * さまざまな [iOSとの統合方法](multiplatform-ios-integration-overview.md)を検討してください。
   * KMPがどのように[コードをコンパイル](multiplatform-configure-compilations.md)し、さまざまなターゲット向けに[バイナリをビルド](multiplatform-build-native-binaries.md)するかについて学びます。
   * [マルチプラットフォームアプリの公開](multiplatform-publish-apps.md)または[マルチプラットフォームライブラリの公開](multiplatform-publish-lib-setup.md)について読んでください。
+
+## Kotlin Multiplatformライブラリのエコシステムを探索する
+
+ネットワーク、ストレージ、依存関係注入（DI）、テスト、UI、シリアライズなど、数千ものマルチプラットフォーム向けライブラリが利用可能です。
+
+JetBrainsが運営する検索プラットフォーム [klibs.io](https://klibs.io) で、これらのライブラリを検索できます。
 
 ## Kotlin Multiplatformを大規模に導入する
 

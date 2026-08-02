@@ -60,7 +60,7 @@ fun main() = singleWindowApplication(title = "Mouse clicks") {
 
 <img src="compose-mouse-click-listeners.animated.gif" alt="Mouse click listeners" width="600" preview-src="compose-mouse-click-listeners.png"/>
 
-`combinedClickable` 수정자는 기본 버튼(마우스 왼쪽 버튼)과 터치 이벤트만 지원합니다. 버튼을 다르게 처리해야 하는 경우, [`Modifier.onClick`](#experimental-onclick-handlers) 섹션을 참조하세요.
+`combinedClickable` 수정자는 기본 버튼(마우스 왼쪽 버튼)과 터치 이벤트만 지원합니다. 버튼을 다르게 처리해야 하는 경우, [`Modifier.onClick`](#onclick-handlers) 섹션을 참조하세요.
 
 ## 이동 리스너(Move listeners)
 
@@ -206,7 +206,7 @@ fun main() = singleWindowApplication(title = "Mouse scroll listeners") {
 
 <img src="compose-mouse-scroll-listeners.animated.gif" alt="Mouse scroll listeners" width="600" preview-src="compose-mouse-scroll-listeners.png"/>
 
-## 실험적 onClick 핸들러
+## 실험적 onClick 핸들러 {id="onclick-handlers"}
 
 > `onClick` 수정자는 [실험적(Experimental)](supported-platforms.md#compose-multiplatform-ui-framework-stability-levels)이며 데스크톱 프로젝트에서만 지원됩니다. 옵트인(Opt-in)이 필요하며(아래 세부 정보 참조), 평가 목적으로만 사용해야 합니다.
 >
@@ -218,8 +218,8 @@ fun main() = singleWindowApplication(title = "Mouse scroll listeners") {
 * `matcher`를 사용하면 어떤 마우스 버튼이 클릭 이벤트를 트리거할지 선택할 수 있습니다.
 * `keyboardModifiers`를 사용하면 특정 키를 누른 상태에서 발생하는 포인터 이벤트를 필터링할 수 있습니다.
 
-또한 여러 개의 `onClick` 수정자를 체이닝하여 매처(matcher)와 키보드 수정자의 조건에 따라 서로 다른 클릭을 처리할 수 있습니다. 
-`clickable`과 달리, `onClick`은 기본적으로 `Modifier.indication` 및 `Modifier.semantics`를 포함하지 않으며, <shortcut>Enter</shortcut>를 눌렀을 때 클릭 이벤트를 트리거하지 않습니다. 필요한 경우 이러한 수정자들을 별도로 추가해야 합니다. 
+또한 여러 개의 `onClick` 수정자를 체이닝하여 매처(matcher)와 키보드 수정자의 조건에 따라 서로 다른 클릭을 처리할 수 있습니다.
+`clickable`과 달리, `onClick`은 기본적으로 `Modifier.indication` 및 `Modifier.semantics`를 포함하지 않으며, <shortcut>Enter</shortcut>를 눌렀을 때 클릭 이벤트를 트리거하지 않습니다. 필요한 경우 이러한 수정자들을 별도로 추가해야 합니다.
 이벤트가 올바르게 전파되도록 하려면 가장 일반적인(조건이 가장 적은) `onClick` 핸들러를 다른 핸들러보다 먼저 선언해야 합니다.
 
 ```kotlin

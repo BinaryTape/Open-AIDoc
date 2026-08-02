@@ -7,7 +7,7 @@ undefined
 ## クリックリスナー
 
 クリックリスナーは Compose Multiplatform for Android と Compose Multiplatform for desktop の両方で使用できるため、コードは両方のプラットフォームで動作します。
-例えば、`onClick`、`onDoubleClick`、`onLongClick` モディファイアを使用して、シンプルなクリックリスナーをセットアップする方法は以下の通りです。
+例えば、`onClick`、`onDoubleClick`、`onLongClick` モディファイアを使用して、シンプルなクリックリスナーをセットアップする方法は以下の通りです:
 
 ```kotlin
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -60,15 +60,16 @@ fun main() = singleWindowApplication(title = "Mouse clicks") {
 
 <img src="compose-mouse-click-listeners.animated.gif" alt="Mouse click listeners" width="600" preview-src="compose-mouse-click-listeners.png"/>
 
-`combinedClickable` モディファイアは、プライマリボタン（マウスの左ボタン）とタッチイベントのみをサポートします。ボタンを個別に処理する必要がある場合は、[`Modifier.onClick`](#experimental-onclick-handlers) セクションを参照してください。
+`combinedClickable` モディファイアは、プライマリボタン（マウスの左ボタン）とタッチイベントのみをサポートします。ボタンを個別に処理する必要がある場合は、[`Modifier.onClick`](#onclick-handlers) セクションを参照してください。
 
 ## 移動リスナー
 
-> `onPointerEvent` モディファイアは[試験的（Experimental）](supported-platforms.md#compose-multiplatform-ui-framework-stability-levels)です。オプトインが必要であり（詳細は以下を参照）、評価目的でのみ使用してください。[安定版（Stable）](supported-platforms.md#compose-multiplatform-ui-framework-stability-levels) API については、[`Modifier.pointerInput`](#listening-for-raw-events-in-common-code-via-pointerinput) を参照してください。
+> `onPointerEvent` モディファイアは[試験的（Experimental）](supported-platforms.md#compose-multiplatform-ui-framework-stability-levels)です。オプトインが必要であり（詳細は以下を参照）、評価目的でのみ使用してください。
+> [安定版（Stable）](supported-platforms.md#compose-multiplatform-ui-framework-stability-levels) API については、[`Modifier.pointerInput`](#listening-for-raw-events-in-common-code-via-pointerinput) を参照してください。
 >
 {style="warning"}
 
-マウスポインタの位置に応じてウィンドウの背景色を変更するポインタ移動リスナーを作成するには、次のコードを追加します。
+マウスポインタの位置に応じてウィンドウの背景色を変更するポインタ移動リスナーを作成するには、次のコードを追加します:
 
 ```kotlin
 import androidx.compose.foundation.background
@@ -107,11 +108,12 @@ fun main() = singleWindowApplication(title = "Mouse move listeners") {
 
 ## 入場（Enter）リスナー
 
-> `onPointerEvent` モディファイアは[試験的（Experimental）](supported-platforms.md#compose-multiplatform-ui-framework-stability-levels)です。オプトインが必要であり（詳細は以下を参照）、評価目的でのみ使用してください。[安定版（Stable）](supported-platforms.md#compose-multiplatform-ui-framework-stability-levels) API については、[`Modifier.pointerInput`](#listening-for-raw-events-in-common-code-via-pointerinput) を参照してください。
+> `onPointerEvent` モディファイアは[試験的（Experimental）](supported-platforms.md#compose-multiplatform-ui-framework-stability-levels)です。オプトインが必要であり（詳細は以下を参照）、評価目的でのみ使用してください。
+> [安定版（Stable）](supported-platforms.md#compose-multiplatform-ui-framework-stability-levels) API については、[`Modifier.pointerInput`](#listening-for-raw-events-in-common-code-via-pointerinput) を参照してください。
 >
 {style="warning"}
 
-Compose Multiplatform for desktop は、ポインタが入力領域に入ったときと出たときのハンドラをサポートしています。例えば、以下のコードはホバー時に行のフォントスタイルを変更します。
+Compose Multiplatform for desktop は、ポインタが入力領域に入ったときと出たときのハンドラをサポートしています。例えば、以下のコードはホバー時に行のフォントスタイルを変更します:
 
 ```kotlin
 import androidx.compose.foundation.background
@@ -162,11 +164,12 @@ fun main() = singleWindowApplication(title = "Mouse enter listeners") {
 
 ## スクロールリスナー
 
-> `onPointerEvent` モディファイアは[試験的（Experimental）](supported-platforms.md#compose-multiplatform-ui-framework-stability-levels)です。オプトインが必要であり（詳細は以下を参照）、評価目的でのみ使用してください。[安定版（Stable）](supported-platforms.md#compose-multiplatform-ui-framework-stability-levels) API については、[`Modifier.pointerInput`](#listening-for-raw-events-in-common-code-via-pointerinput) を参照してください。
+> `onPointerEvent` モディファイアは[試験的（Experimental）](supported-platforms.md#compose-multiplatform-ui-framework-stability-levels)です。オプトインが必要であり（詳細は以下を参照）、評価目的でのみ使用してください。
+> [安定版（Stable）](supported-platforms.md#compose-multiplatform-ui-framework-stability-levels) API については、[`Modifier.pointerInput`](#listening-for-raw-events-in-common-code-via-pointerinput) を参照してください。
 >
 {style="warning"}
 
-次のコードサンプルは、マウスのスクロール方向に応じて表示される数値を増減させる方法を示しています。
+次のコードサンプルは、マウスのスクロール方向に応じて表示される数値を増減させる方法を示しています:
 
 ```kotlin
 import androidx.compose.foundation.layout.Box
@@ -203,7 +206,7 @@ fun main() = singleWindowApplication(title = "Mouse scroll listeners") {
 
 <img src="compose-mouse-scroll-listeners.animated.gif" alt="Mouse scroll listeners" width="600" preview-src="compose-mouse-scroll-listeners.png"/>
 
-## 試験的な onClick ハンドラ
+## 試験的な onClick ハンドラ {id="onclick-handlers"}
 
 > `onClick` モディファイアは[試験的（Experimental）](supported-platforms.md#compose-multiplatform-ui-framework-stability-levels)であり、デスクトッププロジェクトでのみサポートされています。オプトインが必要であり（詳細は以下を参照）、評価目的でのみ使用してください。
 >
@@ -211,12 +214,12 @@ fun main() = singleWindowApplication(title = "Mouse scroll listeners") {
 
 `Modifier.onClick` は、クリック、ダブルクリック、ロングクリックに対して独立したコールバックを提供します。これはポインタイベントに由来するクリックのみを処理し、標準でアクセシビリティの `click` イベントを処理することはありません。
 
-`matcher: PointerMatcher` と `keyboardModifiers: PointerKeyboardModifiers.() -> Boolean` を使用して、特定のポインタイベントをターゲットにするように各 `onClick` を構成できます。
-* `matcher` を使用すると、どのマウスボタンでクリックイベントをトリガーするかを選択できます。
+`matcher: PointerMatcher` と `keyboardModifiers: PointerKeyboardModifiers.() -> Boolean` を使用して、特定のポインタイベントをターゲットにするように各 `onClick` を構成できます:
+* `matcher` を使用すると、どのマウスボタンでクリックイベントをトリガーするかを選択できます。 
 * `keyboardModifiers` を使用すると、特定のキーが押されているポインタイベントをフィルタリングできます。
 
-また、複数の `onClick` モディファイアを連鎖させて、マッチャーやキーボード修飾キーの異なる条件下で異なるクリックを処理することもできます。
-`clickable` とは異なり、`onClick` にはデフォルトの `Modifier.indication` や `Modifier.semantics` がなく、<shortcut>Enter</shortcut> キーを押してもクリックイベントはトリガーされません。必要に応じて、これらのモディファイアを個別に追加してください。
+また、複数の `onClick` モディファイアを連鎖させて、マッチャーやキーボード修飾キーの異なる条件下で異なるクリックを処理することもできます。 
+`clickable` とは異なり、`onClick` にはデフォルトの `Modifier.indication` や `Modifier.semantics` がなく、<shortcut>Enter</shortcut> キーを押してもクリックイベントはトリガーされません。必要に応じて、これらのモディファイアを個別に追加してください。 
 イベントが正しく伝播されるように、最も一般的（条件が最も少ない）な `onClick` ハンドラを他のハンドラより前に宣言する必要があります。
 
 ```kotlin
@@ -328,11 +331,13 @@ RMB + Alt") }
 >
 {style="warning"}
 
-`Modifier.onDrag` を使用すると、`matcher: PointerMatcher` を介してドラッグをトリガーするポインタを指定できます。`onClick` と同様に、多くの `onDrag` モディファイアを連鎖させることができます。
+`Modifier.onDrag` を使用すると、`matcher: PointerMatcher` を介してドラッグをトリガーするポインタを指定できます。 
+`onClick` と同様に、多くの `onDrag` モディファイアを連鎖させることができます。
 
-また、キーによってドラッグの動作が変わる場合に備えて、`LocalWindowInfo.current.keyboardModifiers` を介してキーボード修飾キーの状態を確認することもできます。例えば、単純なドラッグでアイテムを移動し、<shortcut>Ctrl</shortcut> を押しながらのドラッグでアイテムをコピー＆ペーストするといった具合です。
+また、キーによってドラッグの動作が変わる場合に備えて、`LocalWindowInfo.current.keyboardModifiers` を介してキーボード修飾キーの状態を確認することもできます。 
+例えば、単純なドラッグでアイテムを移動し、<shortcut>Ctrl</shortcut> を押しながらのドラッグでアイテムをコピー＆ペーストするといった具合です。
 
-次のコードサンプルは、マウスの左右のボタンによってトリガーされるドラッグイベントと、キーボードが関与する場合の処理方法を示しています。
+次のコードサンプルは、マウスの左右のボタンによってトリガーされるドラッグイベントと、キーボードが関与する場合の処理方法を示しています:
 
 ```kotlin
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -413,7 +418,7 @@ try with CTRL",
 
 <img src="compose-ondrag-modifier.animated.gif" alt="Modifier.onDrag" width="600" preview-src="compose-ondrag-modifier.png"/>
 
-また、`suspend fun PointerInputScope.detectDragGestures` を使用して、モディファイア以外の方法でドラッグを処理することもできます。
+また、`suspend fun PointerInputScope.detectDragGestures` を使用して、モディファイア以外の方法でドラッグを処理することもできます:
 
 ```kotlin
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -463,11 +468,12 @@ fun main() = singleWindowApplication(title = "Drag") {
 
 ## Swing 相互運用による生の AWT イベントへのアクセス
 
-> `onPointerEvent` モディファイアは[試験的（Experimental）](supported-platforms.md#compose-multiplatform-ui-framework-stability-levels)です。オプトインが必要であり（詳細は以下を参照）、評価目的でのみ使用してください。[安定版（Stable）](supported-platforms.md#compose-multiplatform-ui-framework-stability-levels) API については、[`Modifier.pointerInput`](#listening-for-raw-events-in-common-code-via-pointerinput) を参照してください。
+> `onPointerEvent` モディファイアは[試験的（Experimental）](supported-platforms.md#compose-multiplatform-ui-framework-stability-levels)です。オプトインが必要であり（詳細は以下を参照）、評価目的でのみ使用してください。
+> [安定版（Stable）](supported-platforms.md#compose-multiplatform-ui-framework-stability-levels) API については、[`Modifier.pointerInput`](#listening-for-raw-events-in-common-code-via-pointerinput) を参照してください。
 >
 {style="warning"}
 
-Compose Multiplatform for desktop は内部で Swing を使用しており、生の AWT イベントにアクセスできます。
+Compose Multiplatform for desktop は内部で Swing を使用しており、生の AWT イベントにアクセスできます:
 
 ```kotlin
 import androidx.compose.foundation.layout.Box
@@ -507,10 +513,10 @@ fun main() = singleWindowApplication(title = "Raw AWT events") {
 
 ## pointerInput を介した共通コードでの生のイベントのリッスン
 
-上記のスニペットでは、ポインタイベントのタイプをサブスクライブするヘルパー関数である `Modifier.onPointerEvent` 関数を使用しています。これは `Modifier.pointerInput` 関数の新しい短縮版です。
+上記のスニペットでは、ポインタイベントのタイプをサブスクライブするヘルパー関数である `Modifier.onPointerEvent` 関数を使用しています。これは `Modifier.pointerInput` 関数の新しい短縮版です。 
 これは現在試験的（Experimental）かつデスクトップ専用であるため、共通コード（common code）では使用できません。
 
-共通コードでイベントをサブスクライブする必要がある場合、または安定した API が必要な場合は、`Modifier.pointerInput` 関数を使用できます。
+共通コードでイベントをサブスクライブする必要がある場合、または安定した API が必要な場合は、`Modifier.pointerInput` 関数を使用できます:
 
 ```kotlin
 import androidx.compose.foundation.layout.Column

@@ -16,7 +16,7 @@
         <p><a href="https://www.jetbrains.com/kotlin-multiplatform/">Kotlin Multiplatform (KMP)</a> 是一項由 JetBrains 開發的開源技術，支援在 Android、iOS、桌面 (Windows、macOS、Linux)、Web 和後端之間共用程式碼。它允許開發人員在多個環境中重複使用 Kotlin，同時保持原生能力和效能。</p>
         <p>採用率正在穩定上升：在過去兩次的 <a href="https://www.jetbrains.com/lp/devecosystem-2024/">開發者生態系統調查</a> 中，Kotlin Multiplatform 的使用率在一年內翻了一倍多 —— 從 2024 年的 7% 增加到 2025 年的 18% —— 這是其發展勢頭日益強勁的明顯標誌。</p>
         <img src="kmp-growth-deveco.svg"
-             alt="在過去兩次的開發者生態系統調查中，KMP 的使用率從 2024 年的 7% 增加到 2025 年的 18%"
+             alt="在過去兩次的開發者生態系統調查中，KMP 的使用率從 2024 年s的 7% 增加到 2025 年的 18%"
              width="700"/>
         <p><a href="https://www.jetbrains.com/kotlin-multiplatform/"><img src="discover-kmp.svg"
                                                                           alt="探索 Kotlin Multiplatform"
@@ -71,9 +71,9 @@
             <tr>
                 <td><b>軟件包、相依性與生態系統</b></td>
                 <td>軟件包可從 <a href="https://central.sonatype.com/">Maven Central</a> 和其他存儲庫獲取，包括
-                    <p><a href="http://klibs.io">klibs.io</a> (Alpha 版本)，旨在簡化 KMP 庫的搜尋。</p>
-                    <p>此 <a href="https://github.com/terrakok/kmp-awesome">清單</a> 包含一些最受歡迎的 KMP 庫和工具。</p></td>
-                <td><a href="https://reactnative.dev/docs/libraries">React Native 庫</a> 通常使用 Node.js 封裝管理員 (例如 <a href="https://docs.npmjs.com/cli/npm">npm CLI</a> 或 <a href="https://classic.yarnpkg.com/en/">Yarn Classic</a>) 從 <a href="https://www.npmjs.com/">npm 註冊表</a> 安裝。
+                    <p><a href="https://klibs.io">klibs.io</a>，旨在簡化 KMP 程式庫的搜尋。</p>
+                    <p>此 <a href="https://github.com/terrakok/kmp-awesome">清單</a> 包含一些最受歡迎的 KMP 程式庫和工具。</p></td>
+                <td><a href="https://reactnative.dev/docs/libraries">React Native 程式庫</a> 通常使用 Node.js 封裝管理員 (例如 <a href="https://docs.npmjs.com/cli/npm">npm CLI</a> 或 <a href="https://classic.yarnpkg.com/en/">Yarn Classic</a>) 從 <a href="https://www.npmjs.com/">npm 註冊表</a> 安裝。
                 </td>
             </tr>
             <tr>

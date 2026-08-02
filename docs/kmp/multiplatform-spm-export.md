@@ -10,7 +10,7 @@
    [选择最适合您的集成方法](multiplatform-ios-integration-overview.md)
 </tldr>
 
-您可以将针对 Apple 目标的 Kotlin/Native 输出设置为供 Swift 软件包管理器 (SwiftPM) 依赖项使用。
+您可以针对 Apple 目标设置 Kotlin/Native 输出，使其作为 Swift 软件包管理器 (SwiftPM) 依赖项使用。
 
 假设有一个包含 iOS 目标的 Kotlin Multiplatform 项目。您可能希望让开发原生 Swift 项目的 iOS 开发者可以将此 iOS 二进制文件作为依赖项使用。利用 Kotlin Multiplatform 工具，您可以提供一个能够与他们的 Xcode 项目无缝集成的构件。
 
@@ -20,8 +20,7 @@
 
 为了使您的框架可供使用，您需要上传两个文件：
 
-* 包含 XCFramework 的 ZIP 归档。您需要将其上传到具有直接访问权限的便捷文件存储中（例如：创建一个附带归档文件的 GitHub release，使用 Amazon S3 或 Maven）。
-  选择最易于集成到您的工作流中的选项。
+* 包含 XCFramework 的 ZIP 归档。您需要将其上传到具有直接访问权限的便捷文件存储中（例如：创建一个附带归档文件的 GitHub release，使用 Amazon S3 或 Maven）。选择最易于集成到您的工作流中的选项。
 * 描述软件包的 `Package.swift` 文件。您需要将其推送到一个单独的 Git 仓库。
 
 #### 项目配置选项 {initial-collapse-state="collapsed" collapsible="true"}
@@ -30,19 +29,16 @@
 
 但是，您可以以不同的方式配置项目。请考虑以下组织 Git 仓库的选项：
 
-* 将 `Package.swift` 文件和应打包到 XCFramework 中的代码存储在不同的 Git 仓库中。
-  这允许独立于文件所描述的项目对 Swift 清单进行版本控制。这是推荐的方法：它允许扩展，并且通常更易于维护。
+* 将 `Package.swift` 文件和应打包到 XCFramework 中的代码存储在不同的 Git 仓库中。这允许独立于文件所描述的项目对 Swift 清单进行版本控制。这是推荐的方法：它允许扩展，并且通常更易于维护。
 * 将 `Package.swift` 文件放在 Kotlin Multiplatform 代码旁边。这是一种更直接的方法，但请记住，在这种情况下，Swift 软件包和代码将使用相同的版本控制。SwiftPM 使用 Git 标签对软件包进行版本控制，这可能会与您项目中使用的标签冲突。
-* 将 `Package.swift` 文件存储在使用者项目的仓库中。这有助于避免版本控制和维护问题。
-  但是，这种方法可能会导致使用者项目的多仓库 SwiftPM 设置和进一步自动化出现问题：
+* 将 `Package.swift` 文件存储在使用者项目的仓库中。这有助于避免版本控制和维护问题。然而，这种方法可能会导致使用者项目的多仓库 SwiftPM 设置和进一步自动化出现问题：
 
   * 在多软件包项目中，只有一个使用者软件包可以依赖外部模块（以避免项目内的依赖项冲突）。因此，所有依赖于您的 Kotlin Multiplatform 模块的逻辑都应封装在一个特定的使用者软件包中。
   * 如果您使用自动化的 CI 流程发布 Kotlin Multiplatform 项目，则该流程需要包括将更新后的 `Package.swift` 文件发布到使用者仓库。这可能会导致使用者仓库的冲突更新，因此 CI 中的此类阶段可能难以维护。
 
 ### 配置您的多平台项目
 
-在以下示例中，Kotlin Multiplatform 项目的共享代码存储在本地的 `shared` 模块中。
-如果您的项目结构不同，请将代码和路径示例中的 "shared" 替换为您的模块名称。
+在以下示例中，Kotlin Multiplatform 项目的共享代码存储在本地的 `shared` 模块中。如果您的项目结构不同，请将代码和路径示例中的 "shared" 替换为您的模块名称。
 
 要设置 XCFramework 的发布：
 
@@ -83,15 +79,11 @@
   
    生成的框架将在您的项目目录中创建为 `shared/build/XCFrameworks/release/Shared.xcframework` 文件夹。
 
-   > 如果您的项目使用 SwiftPM 依赖项，从 Kotlin %kotlinEapVersion% 开始，
-   > 该任务还会在 XCFramework 旁边生成一组与 SwiftPM 相关的文件。
-   > 正如[下文](#准备-xcframework-和-swift-软件包清单)所述，
-   > 您可以将生成的 `Package.swift` 随框架一起分发，而无需从头编写清单。
+   > 如果您的项目使用 SwiftPM 依赖项，从 Kotlin %kotlinEapVersion% 开始，该任务还会在 XCFramework 旁边生成一组与 SwiftPM 相关的文件。正如[下文](#准备-xcframework-和-swift-软件包清单)所述，您可以将生成的 `Package.swift` 随框架一起分发，而无需从头编写清单。
    >
    {style="note"} 
 
-3. 如果您有多个想要导出的包含共享代码的模块（例如，一个共享逻辑模块和一个共享 UI 模块），
-   请[将它们组合成一个新的模块](#将多个模块导出为-xcframework)并改为分发该伞形模块。
+3. 如果您有多个想要导出的包含共享代码的模块（例如，一个共享逻辑模块和一个共享 UI 模块），请[将它们组合成一个单独的新模块](#将多个模块导出为-xcframework)并改为分发该伞形模块。
 
 ### 准备 XCFramework 和 Swift 软件包清单
 
@@ -127,8 +119,7 @@
     curl <指向已上传 XCFramework ZIP 文件的可下载链接>
     ```
 
-4. 如果您的项目使用 SwiftPM 依赖项，从 Kotlin %kotlinEapVersion% 开始，
-   `assembleSharedXCFramework` Gradle 任务会在 XCFramework 旁边生成一个 `Package.swift` 文件。
+4. 如果您的项目使用 SwiftPM 依赖项，从 Kotlin %kotlinEapVersion% 开始，`assembleSharedXCFramework` Gradle 任务会在 XCFramework 旁边生成一个 `Package.swift` 文件。
 
    如果情况并非如此，您可以手动创建一个 `Package.swift` 文件，使用以下模板：
 
@@ -216,7 +207,7 @@
 
 ## 将多个模块导出为 XCFramework
 
-要将来自多个 Kotlin Multiplatform 模块的代码作为 iOS 二进制文件提供，请将这些模块组合在一个伞形模块中。然后，构建并导出该伞形模块的 XCFramework。
+要将来自多个 Kotlin Multiplatform 模块的代码作为 iOS 二进制文件提供，请将这些模块组合在一个单独的伞形模块中。然后，构建并导出该伞形模块的 XCFramework。
 
 例如，您有 `network` 和 `database` 模块，将它们组合在 `together` 模块中：
 

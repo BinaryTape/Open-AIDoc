@@ -90,10 +90,6 @@ Kotlin 2.2.0 および 2.3.0 では、いくつかの言語機能が[実験的�
 
 <secondary-label ref="language"/>
 
-> IntelliJ IDEA でコンテキストパラメータに対して明示的なコンテキスト引数を使用するためのサポートは、2026.2 で利用可能になる予定です。
-> 
-{style="note"}
-
 Kotlin 2.4.0 では、[コンテキストパラメータ](context-parameters.md)に対する明示的なコンテキスト引数が導入されました。
 
 Kotlin 2.3.20 では、[コンテキストパラメータのオーバーロード解決が変更されました](whatsnew2320.md#changes-to-overload-resolution-for-context-parameters)。その結果、コンテキストパラメータのみが異なるオーバーロードの呼び出しがあいまいになる可能性があります。
@@ -1111,12 +1107,13 @@ JDK バージョンを設定するさまざまな方法の優先順位に注意�
 Kotlin Maven プロジェクトの構成に関する詳細は、[ドキュメント](maven-configure-project.md) を参照してください。
 
 ## ビルドツール API
+<secondary-label ref="bta"/>
 
 Kotlin 2.4.0 では、ビルドツール API (Build Tools API, BTA) に多くの改善が加えられました。BTA は以下の通りです。
 
 * ほとんどの JVM および共通コンパイラオプションに対して、新しい型安全な抽象化を導入しました。BTA がクライアントの代わりにフォーマットを処理するようになったため、エラーのリスクが軽減され、追加の支援レイヤーが提供されます。この変更は実行時には後方互換性がありますが、ソースの互換性が損なわれる可能性があります。
 * インクリメンタルコンパイルにおいて、異なる Kotlin バージョンの構成やコンパイラオプションの変更など、ソース以外の変更を追跡できるようになりました。ビルドシステムは `BaseIncrementalCompilationConfiguration.TRACK_CONFIGURATION_INPUTS` オプションを介してこの動作を制御できます。
-* `AbiValidationToolchain` を介して [バイナリ互換性検証（Binary compatibility validation）](gradle-binary-compatibility-validation.md) をサポートするようになり、他のビルドシステムがこの機能を追加しやすくなりました。
+* `AbiValidationToolchain` を介して [バイナリ互換性検証（Binary compatibility validation）](gradle-binary-compatibility-validation.md) をサポートするようなり、他のビルドシステムがこの機能を追加しやすくなりました。
 * ビルドシステムが [`CompilerMessageRenderer`](https://github.com/JetBrains/kotlin/blob/2.4.0/compiler/build-tools/kotlin-build-tools-api/src/main/kotlin/org/jetbrains/kotlin/buildtools/api/CompilerMessageRenderer.kt) インターフェースおよび [`JvmCompilationOperation` ビルダー](https://github.com/JetBrains/kotlin/blob/2.4.0/compiler/build-tools/kotlin-build-tools-api/src/main/kotlin/org/jetbrains/kotlin/buildtools/api/jvm/operations/JvmCompilationOperation.kt#L59) を介してコンパイラメッセージの表示方法をカスタマイズできる新機能を導入しました。
 * [Kotlin デーモン (Kotlin daemon)](kotlin-daemon.md) のロギングを構成するための新しいオプションを導入しました。
   * `LOGS_PATH` — デーモンログファイルのディレクトリ。

@@ -11,7 +11,7 @@
 
 이 튜토리얼은 피보나치(Fibonacci) 수열을 생성하는 함수가 포함된 간단한 라이브러리인 [멀티플랫폼 라이브러리 템플릿(multiplatform library template)](https://github.com/Kotlin/multiplatform-library-template)을 기반으로 합니다.
 
-## 환경 설정
+## 환경 설정 
 
 [필요한 모든 도구를 설치하고 최신 버전으로 업데이트하세요](quickstart.md).
 

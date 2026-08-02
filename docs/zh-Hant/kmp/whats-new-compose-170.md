@@ -28,7 +28,7 @@
 
 ## 重大變更
 
-### 最低 AGP 版本提升至 8.1.0
+### 最底 AGP 版本提升至 8.1.0
 
 Compose Multiplatform 1.7.0 所使用的 Jetpack Compose 1.7.0 與 Lifecycle 2.8.0 均不支援 AGP 7。
 因此，當您更新至 Compose Multiplatform 1.7.3 時，可能也需要升級您的 AGP 相依性。
@@ -357,6 +357,6 @@ Jetpack Compose 已將 `BasicTextField2` 組件設為穩定版並更名為 `Basi
 您可以將其從 `index.html` 檔案中移除，並縮短應用程式的載入時間。
 `skiko.js` 將在未來的版本中從 Kotlin/Wasm 發行版中完全移除。
 
-> `skiko.js` 檔案對於 Kotlin/JS 應用程式仍是必要的。
-> 
+> `skiko.js` 檔案對於 Kotlin/JS 應用程式仍是必要的，直到 Compose Multiplatform 1.9.0 為止。
+> 請參閱 [Compose Multiplatform 1.9.3 新功能](whats-new-compose-190.md#skiko-js-is-no-longer-needed)以了解變更的時間點。
 {style="note"}

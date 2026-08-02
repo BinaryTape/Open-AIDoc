@@ -68,7 +68,7 @@ Caught ArithmeticException
 你無法在 `CoroutineExceptionHandler` 中從例外中恢復。當處理常式被呼叫時，協程已經帶著對應的例外完成了。通常，處理常式用於記錄例外、顯示某種錯誤訊息、終止及/或重啟應用程式。
 
 `CoroutineExceptionHandler` 僅在 **未捕獲** 例外（即未以任何其他方式處理的例外）上被叫用。
-特別是，所有 *子* 協程（在另一個 [Job] 的上下文中建立的協程）都會將其例外的處理委派給其父協程，父協程也會委派給其父協程，依此類推直到根協程，因此安裝在它們上下文中的 `CoroutineExceptionHandler` 永遠不會被使用。
+特別是，所有 *子* 協程（在另一個 [Job] 的上下文中建立的協程）都會將其例外的處理委派給其父協程，父協程也會委派給其父協程，依此類推直到根協程，因此安裝在它們上下文中的 `CoroutineExceptionHandler` 永遠不會被使用。 
 此外， [async] 產生器總是會捕獲所有例外並將其呈現在產生的 [Deferred] 物件中，因此它的 `CoroutineExceptionHandler` 也沒有作用。
 
 > 在監督作用域 (supervision scope) 中執行的協程不會將例外傳播給其父協程，因此不受此規則約束。本文後續的 [監督 (Supervision)](#supervision) 章節提供了更多細節。
@@ -153,7 +153,7 @@ Parent is not cancelled
 
 <!--- TEST-->
 
-如果協程遇到 `CancellationException` 以外的例外，它會使用該例外取消其父協程。
+如果協程遇到 `CancellationException` 以外的例外，它會使用該例外取消其父協程。 
 此行為無法被覆寫，並用於為 [結構化並行 (structured concurrency)](https://github.com/Kotlin/kotlinx.coroutines/blob/master/docs/composing-suspending-functions.md#structured-concurrency-with-async) 提供穩定的協程階層結構。
 子協程不使用 [CoroutineExceptionHandler] 實作。
 
@@ -214,7 +214,7 @@ CoroutineExceptionHandler got java.lang.ArithmeticException
 ## 例外聚合 (Exceptions aggregation)
 
 當一個協程的多個子協程因例外失敗時，一般規則是「第一個例外獲勝」，因此第一個例外會被處理。
-第一個例外之後發生的所有額外例外都會作為被抑制 (suppressed) 的例外附加到第一個例外上。
+第一個例外之後發生的所有額外例外都會作為被抑制 (suppressed) 的例外附加到第一個例外上。 
 
 <!--- INCLUDE
 import kotlinx.coroutines.exceptions.*
@@ -260,7 +260,7 @@ CoroutineExceptionHandler got java.io.IOException with suppressed [java.lang.Ari
 
 <!--- TEST-->
 
-> 請注意，此機制目前僅在 Java 1.7+ 版本上運作。
+> 請注意，此機制目前僅在 Java 1.7+ 版本上運作。 
 > JS 和 Native 的限制是暫時的，未來將會解除。
 >
 {style="note"}
@@ -289,7 +289,7 @@ fun main() = runBlocking {
             innerJob.join()
         } catch (e: CancellationException) {
             println("Rethrowing CancellationException with original cause")
-            throw e // 重新拋出取消例外，但原始的 IOException 仍會到達處理常式
+            throw e // 重新拋出取消例外，但原始的 IOException 仍會到達處理常式  
         }
     }
     job.join()
@@ -313,7 +313,7 @@ CoroutineExceptionHandler got java.io.IOException
 
 ## 監督 (Supervision)
 
-如前所述，取消是一種在整個協程階層中傳播的雙向關係。讓我們來看看需要單向取消的情況。
+如前所述，取消是一種在整個協程階層中傳播的雙向關係。讓我們來看看需要單向取消傳播的情況。 
 
 這種需求的一個好例子是其作用域中定義了 Job 的 UI 元件。如果 UI 的任何子任務失敗，並不總是需要取消（實際上是終止）整個 UI 元件；但如果 UI 元件被銷毀（且其 Job 被取消），則必須取消所有子 Job，因為它們的結果已不再需要。
 
@@ -321,7 +321,7 @@ CoroutineExceptionHandler got java.io.IOException
 
 ### 監督 Job (Supervision job)
 
-[SupervisorJob][SupervisorJob()] 可用於這些目的。
+[SupervisorJob][SupervisorJob()] 可用於這些目的。 
 它類似於一般的 [Job][Job()]，唯一的例外是取消僅向**下**傳播。這可以透過下列範例輕鬆示範：
 
 ```kotlin
@@ -394,7 +394,7 @@ fun main() = runBlocking {
                     println("The child is cancelled")
                 }
             }
-            // 透過 yield 給予子協程執行並列印的機會
+            // 透過 yield 給予子協程執行並列印的機會 
             yield()
             println("Throwing an exception from the scope")
             throw AssertionError()
@@ -427,7 +427,7 @@ Caught an assertion error
 常規 Job 與監督 Job (supervisor jobs) 之間的另一個關鍵區別是例外處理。
 每個子協程都應透過例外處理機制自行處理其例外。
 這種區別源於子協程的失敗不會傳播給父協程。
-這意味著直接在 [supervisorScope][_supervisorScope] 內啟動的協程 *確實* 會以與根協程相同的方式使用安裝在其作用域中的 [CoroutineExceptionHandler]（詳見 [CoroutineExceptionHandler](#coroutineexceptionhandler) 章節）。
+這意味著直接在 [supervisorScope][_supervisorScope] 內啟動的協程 *確實* 會以與根協程相同的方式使用安裝在其作用域中的 [CoroutineExceptionHandler]（詳見 [CoroutineExceptionHandler](#coroutineexceptionhandler) 章節）。 
 
 ```kotlin
 import kotlin.coroutines.*

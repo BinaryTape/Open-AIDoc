@@ -34,6 +34,8 @@ fun greeting() {
 
 예를 들어, `kotlinx.coroutines`는 모든 타겟을 지원하는 코틀린 멀티플랫폼 라이브러리이지만, `kotlinx.coroutines`의 동시성 프리미티브를 `fun CoroutinesDispatcher.asExecutor(): Executor`와 같이 JDK 동시성 프리미티브로 변환하는 플랫폼별 부분도 가지고 있습니다. API의 이 추가 부분은 `commonMain`에서 사용할 수 없습니다.
 
+사용 가능한 코틀린 멀티플랫폼 라이브러리를 탐색하려면 [klibs.io](https://klibs.io)를 확인하세요.
+
 ## 타겟 (Targets)
 
 타겟(Targets)은 코틀린이 공통 코드를 컴파일할 플랫폼을 정의합니다. 예를 들어 JVM, JS, Android, iOS, Linux 등이 타겟이 될 수 있습니다. 이전 예제에서는 공통 코드를 JVM과 네이티브 타겟으로 컴파일했습니다.
@@ -145,7 +147,7 @@ JVM으로 컴파일하는 동안 코틀린은 "JVM" 레이블이 지정된 모�
 
 ![JVM으로 컴파일](compilation-jvm-diagram.svg){width=700}
 
-코틀린이 `commonMain`과 `jvmMain`을 함께 컴파일하기 때문에, 결과 바이너리에는 `commonMain`과 `jvmMain` 모두의 선언이 포함됩니다.
+코틀린이 `commonMain`과 `jvmMain`을 함께 컴파일하기 때문에, 결과 바이너에는 `commonMain`과 `jvmMain` 모두의 선언이 포함됩니다.
 
 멀티플랫폼 프로젝트로 작업할 때 다음 사항을 기억하세요.
 

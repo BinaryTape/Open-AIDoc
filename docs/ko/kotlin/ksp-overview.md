@@ -143,7 +143,7 @@ class HelloFunctionFinderProcessor : SymbolProcessor() {
 * [증분 처리(Incremental processing) 참고 사항](ksp-incremental.md)
 * [다중 라운드 처리(Multiple round processing) 참고 사항](ksp-multi-round.md)
 * [멀티플랫폼 프로젝트에서의 KSP](ksp-multiplatform.md)
-* [커맨드 라인에서 KSP 실행하기](https://github.com/google/ksp/blob/main/docs/ksp2cmdline.md)
+* [커맨드 라인에서 KSP 실행하기](ksp-command-line.md)
 * [자주 묻는 질문(FAQ)](ksp-faq.md)
 
 ## 지원되는 라이브러리

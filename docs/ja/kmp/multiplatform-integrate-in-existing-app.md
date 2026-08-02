@@ -295,7 +295,7 @@ Androidアプリケーションでクロスプラットフォームコードを�
        expect fun randomUUID(): String
        ```
    
-   3. `shared/src/androidMain` ディレクトリの `com.jetbrains.simplelogin.shared` パッケージに `Utils.android.kt` ファイルを作成し、Androidでの `randomUUID()` の `actual` 実装を記述します：
+   3. `shared/src/androidMain` ディレクトリ의 `com.jetbrains.simplelogin.shared` パッケージに `Utils.android.kt` ファイルを作成し、Androidでの `randomUUID()` の `actual` 実装を記述します：
    
        ```kotlin
        package com.jetbrains.simplelogin.shared

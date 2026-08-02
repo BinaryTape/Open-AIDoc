@@ -52,14 +52,18 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="2.4"}
 
-您可以使用 `_` 作為 Context 參數名稱。在這種情況下，該參數的值可用於解析，但在區塊內無法透過名稱存取：
+當您不需要直接參照參數時，可以使用 `_` 作為 Context 參數名稱。匿名 Context 參數仍可滿足所呼叫函式所需的 Context 參數，但您無法透過名稱存取它。若要明確存取其值，請使用 `contextOf<T>()`：
 
 ```kotlin
 // 使用 "_" 作為 Context 參數名稱
 context(_: UserService)
 fun logWelcome() {
-    // 解析仍會從 UserService 中找到適當的 log 函式
+    // 匿名參數滿足了 outputMessage() 
+    // 所需的 UserService Context 參數
     outputMessage("Welcome!")
+
+    // 明確檢索 UserService 的值
+    contextOf<UserService>().log("Hi!")
 }
 ```
 

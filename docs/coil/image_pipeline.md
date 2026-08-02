@@ -2,9 +2,9 @@
 
 Android 开箱即用地支持许多 [图像格式](https://developer.android.com/guide/topics/media/media-formats#image-formats)，但也有许多格式不支持（例如 GIF、SVG、MP4 等）。
 
-幸运的是，[ImageLoader](image_loaders.md) 支持可插拔组件，用于添加新的缓存层、新的数据类型、新的获取行为、新的图像编码，或者重写基础图像加载行为。Coil 的图像流水线由五个主要部分组成，按以下顺序执行：[Interceptor](/api/coil-core/coil3.intercept/-interceptor) (拦截器)、[Mapper](/api/coil-core/coil3.map/-mapper) (映射器)、[Keyer](/api/coil-core/coil3.key/-keyer) (键提取器)、[Fetcher](/api/coil-core/coil3.fetch/-fetcher) (获取器) 和 [Decoder](/api/coil-core/coil3.decode/-decoder) (解码器)。
+幸运的是，[ImageLoader](image_loaders.md) 支持可插拔组件，用于添加新的缓存层、新的数据类型、新的获取行为、新的图像编码，或者重写基础图像加载行为。Coil 的图像流水线由五个主要部分组成，按以下顺序执行：[Interceptor](/coil/api/coil-core/coil3.intercept/-interceptor) (拦截器)、[Mapper](/coil/api/coil-core/coil3.map/-mapper) (映射器)、[Keyer](/coil/api/coil-core/coil3.key/-keyer) (键提取器)、[Fetcher](/coil/api/coil-core/coil3.fetch/-fetcher) (获取器) 和 [Decoder](/coil/api/coil-core/coil3.decode/-decoder) (解码器)。
 
-在构建 `ImageLoader` 时，必须通过其 [ComponentRegistry](/api/coil-core/coil3/-component-registry) 添加自定义组件：
+在构建 `ImageLoader` 时，必须通过其 [ComponentRegistry](/coil/api/coil-core/coil3/-component-registry) 添加自定义组件：
 
 ```kotlin
 val imageLoader = ImageLoader.Builder(context)
@@ -32,19 +32,19 @@ class CustomCacheInterceptor(
         val value = cache.get(chain.request.data.toString())
         if (value != null) {
             return SuccessResult(
-                image = value.bitmap.toImage(),
+                image = value.bitmap.asImage(),
                 request = chain.request,
                 dataSource = DataSource.MEMORY_CACHE,
             )
         }
-        return chain.proceed(chain.request)
+        return chain.proceed()
     }
 }
 ```
 
 Interceptor 是一项高级功能，让你能用自定义逻辑包装 `ImageLoader` 的图像流水线。其设计很大程度上基于 [OkHttp 的 `Interceptor` 接口](https://square.github.io/okhttp/interceptors/#interceptors)。
 
-有关更多信息，请参阅 [Interceptor](/api/coil-core/coil3.intercept/-interceptor)。
+有关更多信息，请参阅 [Interceptor](/coil/api/coil-core/coil3.intercept/-interceptor)。
 
 ## Mapper
 
@@ -77,19 +77,19 @@ val request = ImageRequest.Builder(context)
 imageLoader.enqueue(request)
 ```
 
-有关更多信息，请参阅 [Mapper](/api/coil-core/coil3.map/-mapper)。
+有关更多信息，请参阅 [Mapper](/coil/api/coil-core/coil3.map/-mapper)。
 
 ## Keyer
 
 Keyer 将数据转换为缓存键的一部分。当该请求的输出被写入 `MemoryCache` 时，此值将用作 `MemoryCache.Key.key`。
 
-有关更多信息，请参阅 [Keyer](/api/coil-core/coil3.key/-keyer)。
+有关更多信息，请参阅 [Keyer](/coil/api/coil-core/coil3.key/-keyer)。
 
 ## Fetcher
 
 Fetcher 将数据（例如 URL、URI、文件等）转换为 `ImageSource` 或 `Image`。它们通常将输入数据转换为随后可由 `Decoder` 使用的格式。使用此接口可添加对自定义获取机制的支持（例如 Cronet、自定义 URI 方案等）。
 
-有关更多信息，请参阅 [Fetcher](/api/coil-core/coil3.fetch/-fetcher)。
+有关更多信息，请参阅 [Fetcher](/coil/api/coil-core/coil3.fetch/-fetcher)。
 
 !!! Note
     如果你添加了一个使用自定义数据类型的 `Fetcher`，你还需要提供一个自定义的 `Keyer`，以确保使用该类型的请求结果可以被内存缓存。例如，`Fetcher.Factory<MyDataType>` 将需要添加一个 `Keyer<MyDataType>`。
@@ -98,7 +98,7 @@ Fetcher 将数据（例如 URL、URI、文件等）转换为 `ImageSource` 或 `
 
 Decoder 读取 `ImageSource` 并返回 `Image`。使用此接口可添加对自定义文件格式的支持（例如 GIF、SVG、TIFF 等）。
 
-有关更多信息，请参阅 [Decoder](/api/coil-core/coil3.decode/-decoder)。
+有关更多信息，请参阅 [Decoder](/coil/api/coil-core/coil3.decode/-decoder)。
 
 ## 自定义 ImageLoader 和 ImageRequest 属性
 
@@ -133,10 +133,10 @@ class TimeoutInterceptor : Interceptor {
         val timeout = chain.request.timeout
         if (timeout.isFinite()) {
             return withTimeout(timeout) {
-                chain.proceed(chain.request)
+                chain.proceed()
             }
         } else {
-            return chain.proceed(chain.request)
+            return chain.proceed()
         }
     }
 }
@@ -146,7 +146,7 @@ class TimeoutInterceptor : Interceptor {
 
 ```kotlin
 AsyncImage(
-    model = ImageRequest.Builder(PlatformContext.current)
+    model = ImageRequest.Builder(LocalPlatformContext.current)
         .data("https://example.com/image.jpg")
         .timeout(10.seconds)
         .build(),

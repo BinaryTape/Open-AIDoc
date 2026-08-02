@@ -1,8 +1,8 @@
 # 擴充圖片管線
 
-Android 開箱即用 地支援許多 [圖片格式](https://developer.android.com/guide/topics/media/media-formats#image-formats)，但也有許多它不支援的格式（例如：GIF、SVG、MP4 等）。
+Android [開箱即用](https://developer.android.com/guide/topics/media/media-formats#image-formats)地支援許多圖片格式，但也有許多它不支援的格式（例如：GIF、SVG、MP4 等）。
 
-幸運的是，[ImageLoader](image_loaders.md) 支援可外掛的組建，以新增快取層、新的資料型別、新的擷取行為、新的圖片編碼，或者覆寫基礎圖片載入行為。Coil 的圖片管線由五個主要部分組成，並依以下順序執行：[Interceptor](/coil/api/coil-core/coil3.intercept/-interceptor)、[Mapper](/coil/api/coil-core/coil3.map/-mapper)、[Keyer](/coil/api/coil-core/coil3.key/-keyer)、[Fetcher](/coil/api/coil-core/coil3.fetch/-fetcher) 以及 [Decoder](/coil/api/coil-core/coil3.decode/-decoder)。
+幸運的是，`ImageLoader` 支援可外掛的組建，以新增快取層、新的資料型別、新的擷取行為、新的圖片編碼，或者覆寫基礎圖片載入行為。Coil 的圖片管線由五個主要部分組成，並依以下順序執行：[Interceptor](/coil/api/coil-core/coil3.intercept/-interceptor)、[Mapper](/coil/api/coil-core/coil3.map/-mapper)、[Keyer](/coil/api/coil-core/coil3.key/-keyer)、[Fetcher](/coil/api/coil-core/coil3.fetch/-fetcher) 以及 [Decoder](/coil/api/coil-core/coil3.decode/-decoder)。
 
 自訂組建在透過 [ComponentRegistry](/coil/api/coil-core/coil3/-component-registry) 建構 `ImageLoader` 時必須被加入：
 
@@ -32,12 +32,12 @@ class CustomCacheInterceptor(
         val value = cache.get(chain.request.data.toString())
         if (value != null) {
             return SuccessResult(
-                image = value.bitmap.toImage(),
+                image = value.bitmap.asImage(),
                 request = chain.request,
                 dataSource = DataSource.MEMORY_CACHE,
             )
         }
-        return chain.proceed(chain.request)
+        return chain.proceed()
     }
 }
 ```
@@ -133,10 +133,10 @@ class TimeoutInterceptor : Interceptor {
         val timeout = chain.request.timeout
         if (timeout.isFinite()) {
             return withTimeout(timeout) {
-                chain.proceed(chain.request)
+                chain.proceed()
             }
         } else {
-            return chain.proceed(chain.request)
+            return chain.proceed()
         }
     }
 }
@@ -146,7 +146,7 @@ class TimeoutInterceptor : Interceptor {
 
 ```kotlin
 AsyncImage(
-    model = ImageRequest.Builder(PlatformContext.current)
+    model = ImageRequest.Builder(LocalPlatformContext.current)
         .data("https://example.com/image.jpg")
         .timeout(10.seconds)
         .build(),

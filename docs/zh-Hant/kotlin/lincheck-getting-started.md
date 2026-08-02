@@ -61,7 +61,7 @@ dependencies {
          <dependency>
              <groupId>org.jetbrains.lincheck</groupId>
              <artifactId>lincheck</artifactId>
-             <version>${lincheck.version}</version>
+             <version>%lincheckVersion%</version>
              <scope>test</scope>
          </dependency>
          <dependency>
@@ -79,7 +79,7 @@ dependencies {
 
 ## 撰寫您的第一個測試
 
-對於基本的並行測試，請建立一個測試函式，描述每個執行緒中應執行的操作以及預期的斷言。Lincheck 使用 [model checking](testing-strategies.md#how-model-checking-works) 探索程式可能的執行緒交錯 (interleaving)，並在行為不正確時提供錯誤報告。
+對於基本的並行測試，請建立一個測試函式，描述每個執行緒中應執行的操作以及預期的斷言。Lincheck 使用 [model checking](lincheck-testing-strategies.md#model-checking) 探索程式可能的執行緒交錯 (interleaving)，並在行為不正確時提供錯誤報告。
 
 1. 在 `src/test` 目錄中，建立一個 `CounterTest.kt` 檔案。
 2. 匯入 `org.jetbrains.lincheck`、`kotlinx.concurrent` 和 `kotlin.test` 程式庫： 
@@ -154,7 +154,7 @@ dependencies {
 
 ## 為資料結構撰寫測試
 
-除了基本的並行測試外，Lincheck 還支援以宣告式方法測試並行資料結構。
+除了基本的並行測試外，Lincheck 還支援以[宣告式方法](lincheck-how-to-test-data-structures.md)測試並行資料結構。
 
 要在 Lincheck 中測試資料結構，您只需要宣告結構的並行方法和測試函式。Lincheck 會產生隨機並行案例，使用指定的測試策略執行它們，並提供錯誤報告。
 
@@ -203,7 +203,7 @@ dependencies {
     fun stressTest() = ModelCheckingOptions().check(this::class)
     ```
    
-    > 若要了解 model checking 的運作方式，請參閱[測試策略](testing-strategies.md#how-model-checking-works)文章。
+    > 若要了解 model checking 的運作方式，請參閱[測試策略](lincheck-testing-strategies.md#model-checking)文章。
     > 
     {style=”tip”}
 
@@ -234,4 +234,4 @@ dependencies {
 
 ## 後續步驟
 
-若要進一步了解關於測試資料結構的宣告式方法以及支援的測試策略，請參閱[測試策略](testing-strategies.md)文章。
+進一步了解 Lincheck 中[測試並行資料結構的宣告式方法](lincheck-how-to-test-data-structures.md)。

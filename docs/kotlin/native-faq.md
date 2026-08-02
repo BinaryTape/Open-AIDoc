@@ -81,7 +81,7 @@ kotlin {
 ## 如何重命名 iOS 框架？
 
 iOS 框架的默认名称为 `<项目名称>.framework`。
-要设置自定义名称，请使用 `baseName` 选项。这也会同时设置模块名称。
+要设置自定义名称，请使用 `baseName` option。这也会同时设置模块名称。
 
 ```kotlin
 kotlin {
@@ -101,6 +101,15 @@ Bitcode 嵌入在 Xcode 14 中被弃用，并在 Xcode 15 中针对所有 Apple 
 自 Kotlin 2.0.20 起，Kotlin/Native 编译器不再支持 bitcode 嵌入。
 
 如果您正在使用较早版本的 Xcode 但希望升级到 Kotlin 2.0.20 或更高版本，请在您的 Xcode 项目中禁用 bitcode 嵌入。
+
+## 如何在 iOS 上获取更好的崩溃报告？
+
+当一个未处理的 Kotlin 异常到达 iOS 代码时，崩溃报告工具可能会显示一个模糊的报告，指出是 Kotlin/Native 内部问题，而不是抛出异常的实际代码行。发生这种情况是因为在记录崩溃时原始的 Kotlin 堆栈跟踪已经丢失。
+
+您可以通过第三方解决方案（例如 [NSExceptionKt](https://github.com/rickclephas/NSExceptionKt)）来解决此问题，它将未捕获的 Kotlin 异常转换为 `NSException` 实例，以便您的崩溃报告工具捕获正确的堆栈跟踪。它为流行的崩溃报告工具提供了专门的集成：
+
+* [Bugsnag](https://github.com/rickclephas/NSExceptionKt/blob/master/NSExceptionKtBugsnag/README.md)
+* [Firebase Crashlytics](https://github.com/rickclephas/NSExceptionKt/blob/master/NSExceptionKtCrashlytics/README.md)
 
 ## 如何从不同协程安全地引用对象？
 

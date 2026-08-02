@@ -6,7 +6,7 @@ Compose Multiplatform 将 Jetpack Compose 及其相关 AndroidX 库的全部功�
 
 JetBrains 的 Compose Multiplatform 团队为这些库生产除 Android 以外平台的构件，然后将它们与原始 Android 构件一起发布在单个组 ID (group ID) 下。
 这样，当您向公共源集添加此类多平台依赖项时，应用的 Android 分发版本将使用 Android 构件。
-与此同时，其他目标的发行版将使用为相应平台构建的构件。
+与此同时，其他目标的分发版本将使用为相应平台构建的构件。
 
 以下是该流程的简述：
 

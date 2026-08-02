@@ -341,6 +341,5 @@ Jetpack Compose는 `BasicTextField2` 컴포넌트를 안정화(stable)하고 이
 `index.html` 파일에서 이를 제거하여 앱의 로드 시간을 개선할 수 있습니다.
 향후 릴리스에서는 Kotlin/Wasm 배포판에서 `skiko.js`가 완전히 제거될 예정입니다.
 
-> Kotlin/JS 애플리케이션에서는 여전히 `skiko.js` 파일이 필요합니다.
-> 
+> Kotlin/JS 애플리케이션에서는 Compose Multiplatform 1.9.0까지 여전히 `skiko.js` 파일이 필요합니다. 변경 시점에 대해서는 [Compose Multiplatform 1.9.3의 새로운 기능](whats-new-compose-190.md#skiko-js-is-no-longer-needed)을 참조하세요.
 {style="note"}

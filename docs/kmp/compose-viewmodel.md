@@ -48,7 +48,7 @@ Android [ViewModel](https://developer.android.com/topic/libraries/architecture/v
     ```
     {initial-collapse-state="collapsed" collapsible="true" collapsed-title="implementation(libs.androidx.lifecycle.viewmodel.compose)"}
 
-> 依赖项可能因您的代码共享方式而异。详情请参阅[未定义](#levels-of-code-sharing)。
+> 依赖项可能因您的代码共享方式而异。详情请参阅[代码共享级别](#levels-of-code-sharing)。
 >
 {style="note"}
 
@@ -105,7 +105,7 @@ Compose Multiplatform 提供了一个公共 `ViewModelStoreOwner` 实现，因�
           field = MutableStateFlow(OrderUiState())
 
       fun setQuantity(n: Int) {
-          field.update { it.copy(quantity = n, price = "${n * 2}.00") }
+          uiState.update { it.copy(quantity = n, price = "${n * 2}.00") }
       }
    }
    ```

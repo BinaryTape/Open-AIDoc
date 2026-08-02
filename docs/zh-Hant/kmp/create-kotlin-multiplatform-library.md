@@ -85,7 +85,7 @@ actual val secondElement: Int = 2
 
 ## 新增一個新平台
 
-既然您已熟悉樣板中共享程式碼與 platform-specific 程式碼的運作方式，讓我們透過新增對額外平台的支援來擴充專案。
+既然您已熟悉樣板中共享程式碼與平台特定程式碼的運作方式，讓我們透過新增對額外平台的支援來擴充專案。
 
 透過使用 [`expect`/`actual` 機制](multiplatform-connect-to-apis.md#expected-and-actual-functions-and-properties)來配置對 [Kotlin/Wasm](https://kotlinlang.org/docs/wasm-overview.html) 平台的支援，然後為 `firstElement` 與 `secondElement` 屬性實作平台特定的功能。
 

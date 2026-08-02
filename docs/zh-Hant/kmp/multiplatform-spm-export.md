@@ -268,7 +268,7 @@
     ```
 
 3. 在 `together` 資料夾中建立一個空的 Kotlin 檔案，例如 `together/src/commonMain/kotlin/Together.kt`。
-   這是一個權宜措施，因為如果匯出的模組不包含任何原始碼，Gradle 指令碼目前無法組建架構。
+   這是一個權宜措施，因為如果匯出的模組不包含任何原始碼， Gradle 指令碼目前無法組建架構。
 
 4. 執行組建架構的 Gradle 任務：
 

@@ -563,7 +563,7 @@ Kotlin 2.3.20 提升了字串操作的效能、編譯時間和記憶體使用量
 <secondary-label ref="wasm"/>
 
 Kotlin/Wasm 現在針對 `kotlin.String` 值的操作使用 JS 字串內建功能 (JS String builtins)。
-這讓 Kotlin/Wasm 能從瀏覽器和支援該提案的 Wasm執行環境中的 JavaScript 引擎字串優化中受益。
+這讓 Kotlin/Wasm 能從瀏覽器和支援該提案的 Wasm 執行環境中的 JavaScript 引擎字串優化中受益。
 此優化適用於連接 (concatenation)、插值 (interpolation)、`StringBuilder.append()` 以及數字轉字串等操作。
 
 其結果包括：
@@ -587,7 +587,7 @@ Kotlin 2.3.20 加入了編譯器優化，可顯著降低編譯期間的記憶體
 
 Kotlin 2.3.20 引入了對 `wasmJs` 目標的 `@nativeInvoke` 註解支援。
 此註解允許您將 Kotlin 物件或類別視為 JavaScript 中的函式。
-它旨在將 `external` 宣告（類別或介面）的成員函式標記為 JavaScript 物件的 "invoke 運算子"。
+它旨在將 `external` 宣告（類別或介面）的成員函式標記為 JavaScript 物件的「invoke 運算子」。
 
 當您標註一個函式時，Kotlin 中對該函式的每次呼叫都會被轉換為對 JavaScript 物件本身的直接呼叫：
 
@@ -710,7 +710,7 @@ kotlin {
 將程式碼轉換委託給外部工具，讓我們能減少 Kotlin/JS 編譯器產出的變體數量，並加快編譯器現代化的腳步，僅專注於支援最新的 JavaScript 特性。
 目前最新支援的 ECMAScript 版本仍為 `es2015`。
 
-此外，委託轉譯工作讓我們能改進[內嵌 JavaScript (inlined JavaScript)](js-interop.md#inline-javascript)功能。
+此外，委託轉譯工作讓我們能改進[內嵌 JavaScript (inlined JavaScript)](js-interop.md#inline-javascript) 功能。
 目前它僅支援 ES5 語法（這將在 2.4.0 中更改）。
 針對較舊版本時支援較新語法會具有挑戰性，因為這需要編譯器轉譯內嵌 JS 區塊本身的 JS 程式碼。
 有了 SWC，我們將能添加現代 JS 語法，工具會將程式碼轉譯為終端用戶版本所需的語法。
@@ -749,11 +749,11 @@ Kotlin 2.2.0 首次帶來了 [Kotlin Gradle 外掛程式中的二進制相容性
 首先，二進制相容性驗證 Gradle 任務的名稱中不再包含 "Legacy"。
 我們做出此更改是因為舊的命名慣例困擾了 Kotlin 開發人員：
 
-| 舊名稱 | 新名稱 |
+| 舊名稱           | 新名稱                 |
 |--------------------|--------------------------|
-| `checkLegacyAbi` | `checkKotlinAbi` |
-| `updateLegacyAbi` | `updateKotlinAbi` |
-| `dumpLegacyAbi` | `internalDumpKotlinAbi` |
+| `checkLegacyAbi`   | `checkKotlinAbi`         |
+| `updateLegacyAbi`  | `updateKotlinAbi`        |
+| `dumpLegacyAbi`    | `internalDumpKotlinAbi`  |
 
 舊的任務名稱在 Kotlin 2.3.20 中仍然存在，以簡化過渡到新名稱的過程。
 
@@ -783,6 +783,7 @@ Kotlin 2.3.20 帶來了一項重要變動，讓您的 Maven 專案設定更簡�
 Kotlin 2.3.20 為希望使用建置工具 API (BTA) 將其建置系統與 Kotlin 編譯器整合的開發人員引入了更多變動。
 
 ### 建置操作的改進
+<secondary-label ref="bta"/>
 
 在此版本中，BTA 改進了建置工具管理建置操作的方式。
 建置操作讓建置工具能與 Kotlin 編譯器互動。
@@ -832,6 +833,7 @@ fun prepareBuildOperation(toolchains: KotlinToolchains, sources: List<Path>, des
 ```
 
 ### 各建置工具間一致的指標收集
+<secondary-label ref="bta"/>
 
 在 Kotlin 2.3.20 之前，建置指標 (build metrics) 基礎設施是以 Gradle 為中心的，這影響了部分基礎設施，例如指標名稱。
 此外，並非所有指標都適用於不同的[編譯器執行策略](compiler-execution-strategy.md)。
@@ -858,6 +860,7 @@ operation[BuildOperation.METRICS_COLLECTOR] = object : BuildMetricsCollector {
 ```
 
 ### 建置工具更容易配置編譯器外掛程式
+<secondary-label ref="bta"/>
 
 在 Kotlin 2.3.20 中，BTA 提供了一種全新且更簡單的方式供建置工具配置編譯器外掛程式。
 此方法允許建置工具直接將配置傳遞給其用戶。

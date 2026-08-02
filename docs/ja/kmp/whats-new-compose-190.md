@@ -9,6 +9,7 @@
 * [iOS でのフレームレート設定](#frame-rate-configuration)
 * [Compose Multiplatform for web が Beta に](#compose-multiplatform-for-web-in-beta)
 * [Web ターゲットでのアクセシビリティサポート](#accessibility-support)
+* [Kotlin/JS で skiko.js が不要に](#skiko-js-is-no-longer-needed)
 * [HTML コンテンツ埋め込み用の新しい API](#new-api-for-embedding-html-content)
 
 このリリースの変更点の全リストについては、[GitHub](https://github.com/JetBrains/compose-multiplatform/releases/tag/v1.9.0) を参照してください。
@@ -201,6 +202,12 @@ ComposeViewport(
 }
 ```
 
+### skiko.js は不要になりました
+
+Compose Multiplatform 1.7.0 以降、Kotlin/Wasm アプリケーションでは `skiko.js` が不要になっていました。本リリースより、Kotlin/JS でも同様となりました。Skiko の Web ランタイムが ES モジュールとして提供され、アプリのコンパイル済み JavaScript に直接バンドルされるようになったため、どちらの Web ターゲットでも個別の `skiko.js` スクリプトは不要になりました。
+
+`index.html` ファイルから `<script src="skiko.js">` タグを削除できます。
+
 ### HTML コンテンツ埋め込み用の新しい API
 
 新しい `WebElementView()` コンポーザブル関数を使用すると、Web アプリケーションに HTML 要素をシームレスに統合できます。
@@ -277,7 +284,7 @@ Compose Multiplatform に、新しい `SwingFrame()` および `SwingDialog()` �
 
 ### Material3 バージョンの分離
 
-Material3 ライブラリと Compose Multiplatform Gradle プラグインのバージョンおよび安定レベルを一致させる必要がなくなりました。`compose.material3` DSL エイリアスは Jetpack Compose の安定版リリースからの Material3 1.9.0 を参照しますが、プロジェクトに合わせてプレリリースバージョンを選択することもできます。
+Material3 ライブラリと Compose Multiplatform Gradle プラグイン babysit のバージョンおよび安定レベルを一致させる必要がなくなりました。`compose.material3` DSL エイリアスは Jetpack Compose の安定版リリースからの Material3 1.9.0 を参照しますが、プロジェクトに合わせてプレリリースバージョンを選択することもできます。
 
 Expressive デザインをサポートする Material3 バージョンを使用する場合は、`build.gradle.kts` の Material 3 依存関係を以下に置き換えてください：
 

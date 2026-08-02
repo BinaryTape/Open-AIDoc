@@ -1,5 +1,6 @@
 [//]: # (title: Kotlin 專案中的程式碼品質工具)
-[//]: # (description: 了解如何將 ktlint、detekt、SonarQube、SonarCloud 和 Kover 等程式碼品質工具整合到您的 Kotlin 後端專案中。)
+
+<web-summary>了解如何將 ktlint、detekt、SonarQube、SonarCloud 和 Kover 等程式碼品質工具整合到您的 Kotlin 後端專案中。</web-summary>
 
 程式碼品質工具可協助您強制執行編碼標準、及早發現錯誤、測量測試涵蓋率，並在您的 Kotlin 專案中維護程式碼品質。本指南介紹如何將 [ktlint](https://ktlint.github.io/ktlint/latest/)、[detekt](https://detekt.dev/)、[SonarQube](https://www.sonarsource.com/products/sonarqube/)、[SonarCloud](https://www.sonarsource.com/products/sonarcloud/) 和 [Kover](https://kotlin.github.io/kotlinx-kover/) 等熱門工具整合到適用於 Maven 或 Gradle 的後端專案中。
 

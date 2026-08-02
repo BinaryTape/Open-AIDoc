@@ -57,7 +57,6 @@ IntelliJ IDEA 和 Android Studio 通过 [Kotlin Multiplatform IDE 插件](https:
 
 * 在我们的[案例研究页面](https://kotlinlang.org/case-studies/?type=multiplatform)上了解各公司如何在其代码库中成功采用 KMP。
 * 在我们的[精选示例列表](multiplatform-samples.md)和 GitHub [kotlin-multiplatform-sample](https://github.com/topics/kotlin-multiplatform-sample) 话题中查看各种示例应用。
-* 在 [klibs.io](https://klibs.io/) 上已有的数千个库中搜索特定的多平台库。
 
 ## 学习基础知识
 
@@ -75,7 +74,13 @@ IntelliJ IDEA 和 Android Studio 通过 [Kotlin Multiplatform IDE 插件](https:
   * 了解 KMP 项目中[依赖项的工作原理](multiplatform-add-dependencies.md)。
   * 考虑不同的 [iOS 集成方法](multiplatform-ios-integration-overview.md)。
   * 了解 KMP 如何针对各种目标[编译代码](multiplatform-configure-compilations.md)并[构建原生二进制文件](multiplatform-build-native-binaries.md)。
-  * 阅读关于[发布多平台应用](multiplatform-publish-apps.md)或[多平台库](multiplatform-publish-lib-setup.md)的内容。 
+  * 阅读关于[发布多平台应用](multiplatform-publish-apps.md)或[多平台库](multiplatform-publish-lib-setup.md)的内容。
+
+## 探索 Kotlin Multiplatform 库生态系统
+
+已有数千个多平台库可用于网络、存储、依赖注入、测试、UI、序列化等。
+
+您可以在 [klibs.io](https://klibs.io) 上浏览这些库，这是一个由 JetBrains 维护的搜索平台。
 
 ## 规模化采用 Kotlin Multiplatform
 

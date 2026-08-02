@@ -380,7 +380,7 @@ suspend fun performBackgroundWork() = coroutineScope { // this: CoroutineScope
 
 이 예제를 실행해 보면 `main()` 함수가 `CoroutineScope.launch()`에 의해 블로킹되지 않고, 코루틴이 백그라운드에서 작동하는 동안 다른 코드를 계속 실행하는 것을 볼 수 있습니다.
 
-> `CoroutineScope.launch()` 함수는 [`Job`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-job/) 핸들을 반환합니다. 이 핸들을 사용하여 시작된 코루틴이 완료될 때까지 기다릴 수 있습니다. 자세한 내용은 [취소와 타임아웃](cancellation-and-timeouts.md#cancel-coroutines)을 참조하세요.
+> `CoroutineScope.launch()` 함수는 [`Job`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-job/) 핸들을 반환합니다. 이 핸들을 사용하여 시작된 코루틴이 완료될 때까지 기다릴 수 있습니다. 자세한 내용은 [취소와 타임아웃](coroutines-cancellation.md#cancel-coroutines)을 참조하세요.
 > 
 {style="tip"}
 
@@ -570,6 +570,6 @@ fun main() {
 ## 다음 단계
 
 * [중단 함수 구성하기](composing-suspending-functions.md)에서 중단 함수를 결합하는 방법에 대해 더 알아보세요.
-* [취소와 타임아웃](cancellation-and-timeouts.md)에서 코루틴을 취소하고 타임아웃을 처리하는 방법을 배우세요.
+* [취소와 타임아웃](coroutines-cancellation.md)에서 코루틴을 취소하고 타임아웃을 처리하는 방법을 배우세요.
 * [코루틴 문맥과 디스패처](coroutine-context-and-dispatchers.md)에서 코루틴 실행과 스레드 관리에 대해 더 깊이 알아보세요.
 * [비동기 플로우](coroutines-flow.md)에서 비동기적으로 계산된 여러 값을 반환하는 방법을 배우세요.

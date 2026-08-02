@@ -2,7 +2,7 @@
 <primary-label ref="alpha"/>
 
 <tldr>
-   <p>Swift Package Manager (SwiftPM) 扮演着与 CocoaPods 相同的角色：它可以让您透明地协调 iOS 应用的原生 iOS 依赖项。</p>
+   <p>Swift 软件包管理器 (SwiftPM) 扮演着与 CocoaPods 相同的角色：它可以让您透明地协调 iOS 应用的原生 iOS 依赖项。</p>
    <p>在这里，您可以学习如何在 KMP 项目中设置 SwiftPM 依赖项，以及在必要时如何将 KMP 配置从 CocoaPods 迁移到 SwiftPM。</p>
 </tldr>
 
@@ -215,7 +215,7 @@ kotlin {
 }
 ```
 
-要自定义合并行为，请为每个子项目分配一个非默认组标识符。
+To customize the merge behavior, assign a non-default group identifier to each subproject.
 在以下示例中，子项目 `one` 和 `two` 使用相同的 `custom` 软件包版本集，而子项目 `three` 使用默认集合：
 
 <Tabs>

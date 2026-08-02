@@ -57,7 +57,7 @@ Kotlin/JS 프로젝트는 두 가지 다른 실행 환경을 타겟으로 할 �
 
 Kotlin/JS 프로젝트의 타겟 실행 환경을 정의하려면, `js {}` 블록 내부에 `browser {}` 또는 `nodejs {}`를 추가하세요:
 
-```groovy
+```kotlin
 kotlin {
     js {
         browser {
@@ -73,7 +73,7 @@ kotlin {
 >
 {style="tip"}
 
-Kotlin Multiplatform 플러그인은 선택한 환경에 맞춰 작업 태스크를 자동으로 구성합니다. 여기에는 애플리케이션 실행 및 테스트를 위해 필요한 환경과 의존성을 다운로드하고 설치하는 과정이 포함됩니다. 이를 통해 개발자는 추가 설정 없이 간단한 프로젝트를 빌드하고 실행하며 테스트할 수 있습니다. Node.js를 타겟으로 하는 프로젝트의 경우, 기존에 설치된 Node.js를 사용하는 옵션도 있습니다. [사전 설치된 Node.js 사용하기](#use-pre-installed-node-js) 방법을 알아보세요.
+Kotlin Multiplatform 플러그인은 선택한 환경에 맞춰 작업 태스크를 자동으로 구성합니다. 여기에는 애플리케이션 실행 및 테스트를 위해 필요한 환경과 의존성을 다운로드하고 설치하는 과정이 포함됩니다. 이를 통해 개발자는 추가 설정 없이 간단한 프로젝트를 빌드하고 실행하며 테스트할 수 있습니다. 기존에 설치된 환경을 사용하는 옵션도 있습니다. [사전 설치된 Node.js 사용하기](#use-pre-installed-node-js) 방법을 알아보세요.
 
 ## ES2015 기능 지원
 
@@ -144,30 +144,7 @@ kotlin {
 
 ## 의존성
 
-다른 Gradle 프로젝트와 마찬가지로, Kotlin/JS 프로젝트는 빌드 스크립트의 `dependencies {}` 블록에서 전통적인 Gradle [의존성 선언](https://docs.gradle.org/current/userguide/declaring_dependencies.html)을 지원합니다:
-
-<tabs group="build-script">
-<tab title="Kotlin" group-key="kotlin">
-
-```kotlin
-dependencies {
-    implementation("org.example.myproject", "1.1.0")
-}
-```
-
-</tab>
-<tab title="Groovy" group-key="groovy">
-
-```groovy
-dependencies {
-    implementation 'org.example.myproject:1.1.0'
-}
-```
-
-</tab>
-</tabs>
-
-Kotlin Multiplatform Gradle 플러그인은 빌드 스크립트의 `kotlin {}` 블록 내에서 특정 소스 세트(source sets)에 대한 의존성 선언도 지원합니다:
+의존성을 선언하려면 `build.gradle(.kts)` 파일의 `jsMain` 소스 세트 내에 `dependencies {}` 블록을 사용하세요:
 
 <tabs group="build-script">
 <tab title="Kotlin" group-key="kotlin">
@@ -175,7 +152,7 @@ Kotlin Multiplatform Gradle 플러그인은 빌드 스크립트의 `kotlin {}` �
 ```kotlin
 kotlin {
     sourceSets {
-        val jsMain by getting {
+        jsMain {
             dependencies {
                 implementation("org.example.myproject:1.1.0")
             }
@@ -202,9 +179,13 @@ kotlin {
 </tab>
 </tabs>
 
-> Kotlin 프로그래밍 언어에서 사용할 수 있는 모든 라이브러리를 JavaScript 타겟에서 사용할 수 있는 것은 아닙니다. Kotlin/JS용 아티팩트를 포함하는 라이브러리만 사용할 수 있습니다.
->
-{style="note"}
+Kotlin/JS용 아티팩트를 포함하는 라이브러리만 의존성으로 사용할 수 있습니다. 의존성을 해결하려면 `build.gradle(.kts)` 파일의 `repositories {}` 블록에 Gradle이 의존성을 찾을 저장소를 선언하세요. 예:
+
+```kotlin
+repositories {
+    mavenCentral()
+}
+```
 
 추가하려는 라이브러리에 [npm 패키지](#npm-dependencies)에 대한 의존성이 있는 경우, Gradle은 이러한 전이 의존성(transitive dependencies)도 자동으로 해결합니다.
 
@@ -257,8 +238,14 @@ npm 의존성을 선언하려면 의존성 선언 내의 `npm()` 함수에 이�
 <tab title="Kotlin" group-key="kotlin">
 
 ```kotlin
-dependencies {
-    implementation(npm("react", "> 14.0.0 <=16.9.0"))
+kotlin {
+    sourceSets {
+        jsMain {
+            dependencies {
+                implementation(npm("core-js", "^3.38.1"))
+            }
+        }
+    }
 }
 ```
 
@@ -266,8 +253,14 @@ dependencies {
 <tab title="Groovy" group-key="groovy">
 
 ```groovy
-dependencies {
-    implementation npm('react', '> 14.0.0 <=16.9.0')
+kotlin {
+    sourceSets {
+        jsMain {
+            dependencies {
+                implementation npm('core-js', '^3.38.1')
+            }
+        }
+    }
 }
 ```
 
@@ -330,7 +323,7 @@ Kotlin Multiplatform Gradle 플러그인은 프로젝트를 위한 테스트 인
 
 브라우저 테스트 실행을 위해 플러그인은 기본적으로 [Headless Chrome](https://chromium.googlesource.com/chromium/src/+/lkgr/headless/README.md)을 사용합니다. 빌드 스크립트의 `useKarma {}` 블록 내에 해당 항목을 추가하여 테스트를 실행할 다른 브라우저를 선택할 수도 있습니다:
 
-```groovy
+```kotlin
 kotlin {
     js {
         browser {
@@ -365,7 +358,7 @@ Kotlin Multiplatform Gradle 플러그인이 이러한 브라우저를 자동으�
 
 테스트를 건너뛰려면 `testTask {}`에 `enabled = false` 라인을 추가하세요:
 
-```groovy
+```kotlin
 kotlin {
     js {
         browser {
@@ -387,7 +380,7 @@ kotlin {
 
 Node.js 테스트 러너에서 사용되는 환경 변수를 지정하려면(예: 테스트에 외부 정보를 전달하거나 패키지 확인을 미세 조정하기 위해), 빌드 스크립트의 `testTask {}` 블록 내에서 `environment()` 함수를 키-값 쌍과 함께 사용하세요:
 
-```groovy
+```kotlin
 kotlin {
     js {
         nodejs {
@@ -410,25 +403,15 @@ Karma에서 사용하는 구성을 조정하려면, 프로젝트 루트에 `karm
 
 브라우저 타겟의 경우, Kotlin Multiplatform Gradle 플러그인은 널리 알려진 [webpack](https://webpack.js.org/) 모듈 번들러를 사용합니다.
 
-### webpack 버전 
-
-Kotlin Multiplatform 플러그인은 webpack %webpackMajorVersion%을 사용합니다.
-
-1.5.0 이전 버전의 플러그인으로 생성된 프로젝트가 있는 경우, 프로젝트의 `gradle.properties`에 다음 라인을 추가하여 해당 버전들에서 사용되었던 webpack %webpackPreviousMajorVersion%으로 일시적으로 되돌릴 수 있습니다:
-
-```none
-kotlin.js.webpack.major.version=4
-```
-
 ### webpack 태스크
 
 가장 일반적인 webpack 조정은 Gradle 빌드 파일의 `kotlin.js.browser.webpackTask {}` 구성 블록을 통해 직접 수행할 수 있습니다:
-* `outputFileName` - webpack 출력 파일의 이름입니다. webpack 태스크 실행 후 `<projectDir>/build/dist/<targetName>`에 생성됩니다. 기본값은 프로젝트 이름입니다.
+* `mainOutputFileName` - webpack 출력 파일의 이름입니다. webpack 태스크 실행 후 `<projectDir>/build/kotlin-webpack/<targetName>/<binaryName>`에 생성됩니다. 기본값은 프로젝트 이름입니다.
 * `output.libraryTarget` - webpack 출력의 모듈 시스템입니다. [Kotlin/JS 프로젝트에서 사용 가능한 모듈 시스템](js-modules.md)에 대해 더 자세히 알아보세요. 기본값은 `umd`입니다.
   
 ```groovy
 webpackTask {
-    outputFileName = "mycustomfilename.js"
+    mainOutputFileName = "mycustomfilename.js"
     output.libraryTarget = "commonjs2"
 }
 ```
@@ -457,19 +440,26 @@ config.module.rules.push({
 
 ### 실행 파일 빌드
 
-webpack을 통해 실행 가능한 JavaScript 아티팩트를 빌드하기 위해 Kotlin Multiplatform Gradle 플러그인은 `browserDevelopmentWebpack` 및 `browserProductionWebpack` Gradle 태스크를 포함하고 있습니다.
+webpack을 통해 실행 가능한 JavaScript 아티팩트를 빌드하기 위해 Kotlin Multiplatform Gradle 플러그인은 `jsBrowserDevelopmentWebpack` 및 `jsBrowserProductionWebpack` Gradle 태스크를 포함하고 있습니다.
 
-* `browserDevelopmentWebpack`은 크기는 크지만 생성 시간이 짧은 개발용 아티팩트를 생성합니다. 따라서 활발한 개발 중에는 `browserDevelopmentWebpack` 태스크를 사용하세요.
-
-* `browserProductionWebpack`은 생성된 아티팩트에 데드 코드 제거(dead code elimination)를 적용하고 결과 JavaScript 파일을 축소(minify)합니다. 시간이 더 걸리지만 크기가 작은 실행 파일을 생성합니다. 따라서 프로젝트를 운영 환경에 사용할 준비가 되었을 때 `browserProductionWebpack` 태스크를 사용하세요.
+* `jsBrowserDevelopmentWebpack`은 크기는 크지만 생성 시간이 짧은 개발용 아티팩트를 생성합니다. 따라서 활발한 개발 중에는 `jsBrowserDevelopmentWebpack` 태스크를 사용하세요.
+* `jsBrowserProductionWebpack`은 생성된 아티팩트에 데드 코드 제거(dead code elimination)를 적용하고 결과 JavaScript 파일을 축소(minify)합니다. 시간이 더 걸리지만 크기가 작은 실행 파일을 생성합니다. 따라서 프로젝트를 운영 환경에 사용할 준비가 되었을 때 `jsBrowserProductionWebpack` 태스크를 사용하세요.
  
- 이 중 하나를 실행하여 개발 또는 운영 환경에 맞는 각각의 아티팩트를 얻을 수 있습니다. [별도로 지정](#distribution-target-directory)하지 않는 한 생성된 파일은 `build/dist`에서 확인할 수 있습니다.
+ 이 중 하나를 실행하여 개발 또는 운영 환경에 맞는 각각의 아티팩트를 얻을 수 있습니다. [별도로 지정](#distribution-target-directory)하지 않는 한 생성된 파일은 `build/kotlin-webpack`에서 확인할 수 있습니다.
 
 ```bash
-./gradlew browserProductionWebpack
+./gradlew jsBrowserProductionWebpack
 ```
 
 이러한 태스크는 타겟이 실행 파일을 생성하도록 구성된 경우(`binaries.executable()`을 통해)에만 사용할 수 있습니다.
+
+배포물을 `build/dist/<targetName>/<binaryName>` 디렉토리에 생성하려면 대신 `jsBrowserDistribution` 태스크를 실행하세요:
+
+```bash
+./gradlew jsBrowserDistribution
+```
+
+이 태스크는 프로젝트 리소스를 포함하여 바로 사용할 수 있는 배포물을 생성합니다.
 
 ## CSS
 
@@ -575,21 +565,20 @@ browser {
 
 ## Node.js
 
-Node.js를 타겟으로 하는 Kotlin/JS 프로젝트의 경우, 플러그인이 호스트에 Node.js 환경을 자동으로 다운로드하고 설치합니다.
-이미 설치된 Node.js 인스턴스가 있다면 그것을 사용할 수도 있습니다.
-
-### Node.js 설정 구성하기
+Node.js를 타겟으로 하는 Kotlin/JS 프로젝트의 경우, 플러그인이 호스트에 Node.js 환경을 자동으로 다운로드하고 설치합니다. 이미 설치된 Node.js 인스턴스가 있다면 그것을 사용할 수도 있습니다.
 
 각 하위 프로젝트에 대해 Node.js 설정을 구성하거나 프로젝트 전체에 대해 설정할 수 있습니다.
 
-예를 들어 특정 하위 프로젝트의 Node.js 버전을 설정하려면 `build.gradle(.kts)` 파일의 해당 Gradle 블록에 다음 라인을 추가하세요:
+### Node.js 버전 변경
+
+기본 Node.js 버전은 현재 24.16.0이지만, 특정 하위 프로젝트에 대해 다른 버전을 사용할 수 있습니다. 하위 프로젝트의 `build.gradle(.kts)` 파일에 다음 라인을 추가하세요. 예:
 
 <tabs group="build-script">
 <tab title="Kotlin" group-key="kotlin">
 
 ```kotlin
 project.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsPlugin> {
-    project.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsEnvSpec>().version = "사용할 Node.js 버전"
+    project.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsEnvSpec>().version = "26.2.0"
 }
 ```
 
@@ -598,14 +587,14 @@ project.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsPlu
 
 ```groovy
 project.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsPlugin) {
-    project.extensions.getByType(org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsEnvSpec).version = "사용할 Node.js 버전"
+    project.extensions.getByType(org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsEnvSpec).version = "26.2.0"
 }
 ```
 
 </tab>
 </tabs>
 
-모든 하위 프로젝트를 포함하여 전체 프로젝트의 버전을 설정하려면 `allProjects {}` 블록에 동일한 코드를 적용하세요:
+모든 하위 프로젝트를 포함하여 전체 프로젝트의 버전을 설정하려면 `allprojects {}` 블록에 동일한 코드를 적용하세요. 예:
 
 <tabs group="build-script">
 <tab title="Kotlin" group-key="kotlin">
@@ -613,7 +602,7 @@ project.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsPlu
 ```kotlin
 allprojects {
     project.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsPlugin> {
-        project.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsEnvSpec>().version = "사용할 Node.js 버전"
+        project.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsEnvSpec>().version = "26.2.0"
     }
 }
 ```
@@ -624,16 +613,13 @@ allprojects {
 ```groovy
 allprojects {
     project.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsPlugin) {
-        project.extensions.getByType(org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsEnvSpec).version = "사용할 Node.js 버전"
+        project.extensions.getByType(org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsEnvSpec).version = "26.2.0"
+    }
 }
 ```
 
 </tab>
 </tabs>
-
-> 전체 프로젝트의 Node.js 설정을 구성하기 위해 `NodeJsRootPlugin` 클래스를 사용하는 것은 더 이상 권장되지 않으며(deprecated), 향후 지원이 중단될 예정입니다.
-> 
-{style="note"}
 
 ### 사전 설치된 Node.js 사용하기
 
@@ -692,7 +678,7 @@ Kotlin/JS 프로젝트를 빌드하는 호스트에 이미 Yarn이 설치되어 
 
 ```kotlin
 rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin> {
-    rootProject.the<org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension>().download = false
+    rootProject.the<org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootEnvSpec>().download = false
     // 기본 동작은 "true"입니다.
 }
 ```
@@ -702,7 +688,7 @@ rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlu
 
 ```groovy
 rootProject.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin) {
-    rootProject.extensions.getByType(org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension).download = false
+    rootProject.extensions.getByType(org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootEnvSpec).download = false
 }
  
 ```
@@ -711,10 +697,6 @@ rootProject.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlu
 </tabs>
 
 ### kotlin-js-store를 통한 버전 고정
-
-> `kotlin-js-store`를 통한 버전 고정은 Kotlin 1.6.10부터 사용할 수 있습니다.
->
-{style="note"}
 
 프로젝트 루트의 `kotlin-js-store` 디렉토리는 버전 고정에 필요한 `yarn.lock` 파일을 보관하기 위해 Kotlin Multiplatform Gradle 플러그인에 의해 자동으로 생성됩니다. lock 파일은 Yarn 플러그인에 의해 완전히 관리되며 `kotlinNpmInstall` Gradle 태스크 실행 중에 업데이트됩니다.
 
@@ -801,10 +783,6 @@ rootProject.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlu
 
 ### 기본적으로 --ignore-scripts를 사용하여 npm 의존성 설치
 
-> `--ignore-scripts`를 기본으로 사용하여 npm 의존성 설치하는 기능은 Kotlin 1.6.10부터 사용할 수 있습니다.
->
-{style="note"}
-
 해킹된 npm 패키지로부터 악성 코드가 실행될 가능성을 줄이기 위해, Kotlin Multiplatform Gradle 플러그인은 기본적으로 npm 의존성 설치 중에 [수명 주기 스크립트(lifecycle scripts)](https://docs.npmjs.com/cli/v8/using-npm/scripts#life-cycle-scripts)가 실행되는 것을 방지합니다.
 
 `build.gradle(.kts)`에 다음 라인을 추가하여 수명 주기 스크립트 실행을 명시적으로 활성화할 수 있습니다:
@@ -833,10 +811,6 @@ rootProject.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlu
 ## 배포 타겟 디렉토리
 
 기본적으로 Kotlin/JS 프로젝트 빌드 결과물은 프로젝트 루트 내의 `/build/dist/<targetName>/<binaryName>` 디렉토리에 위치합니다.
-
-> Kotlin 1.9.0 이전의 기본 배포 타겟 디렉토리는 `/build/distributions`였습니다.
->
-{style="note" }
 
 프로젝트 배포 파일의 위치를 다른 곳으로 설정하려면, 빌드 스크립트의 `browser {}` 블록 내부에 `distribution {}` 블록을 추가하고 `set()` 메서드를 사용하여 `outputDirectory` 속성에 값을 할당하세요. 프로젝트 빌드 태스크를 실행하면 Gradle은 이 위치에 프로젝트 리소스와 함께 출력 번들을 저장합니다.
 
@@ -881,9 +855,11 @@ kotlin {
 
 해당 `.js` 및 `.d.ts` 파일을 포함하여 JavaScript *모듈*(이는 `build/js/packages/myModuleName`에 생성됨)의 이름을 조정하려면 `outputModuleName` 옵션을 사용하세요:
 
-```groovy
-js {
-    outputModuleName = "myModuleName"
+```kotlin
+kotlin {
+    js {
+        outputModuleName = "myModuleName"
+    }
 }
 ```
 
@@ -897,13 +873,15 @@ Kotlin Multiplatform Gradle 플러그인은 빌드 시점에 Kotlin/JS 프로젝
 
 기본 패키지 속성 외에도 `package.json`은 실행 가능한 스크립트를 식별하는 것과 같이 JavaScript 프로젝트가 어떻게 동작해야 하는지 정의할 수 있습니다.
 
-Gradle DSL을 통해 프로젝트의 `package.json`에 커스텀 항목을 추가할 수 있습니다. `package.json`에 커스텀 필드를 추가하려면 컴파일 구성의 `packageJson` 블록에서 `customField()` 함수를 사용하세요:
+Gradle DSL을 통해 프로젝트의 `package.json`에 커스텀 항목을 추가할 수 있습니다. `package.json`에 커스텀 필드를 추가하려면 `jsMain` 소스 세트의 `packageJson` 블록에서 `customField()` 함수를 사용하세요:
 
 ```kotlin
 kotlin {
-    js {
-        compilations["main"].packageJson {
-            customField("hello", mapOf("one" to 1, "two" to 2))
+    sourceSets {
+        jsMain {
+            packageJson {
+                customField("hello", mapOf("one" to 1, "two" to 2))
+            }
         }
     }
 }

@@ -1,8 +1,8 @@
 [//]: # (title: 添加多平台库依赖项)
 
-每个程序的成功运行都需要一组库。Kotlin Multiplatform 项目可以依赖于适用于所有目标平台的多平台库、特定于平台的库以及其他多平台项目。
+每个程序的运行都需要一组库。Kotlin Multiplatform 项目可以依赖于适用于所有目标平台的多平台库、特定于平台的库以及其他多平台项目。
 
-要添加库依赖项，请更新包含共享代码的项目目录中的 `build.gradle(.kts)` 文件。在 [`dependencies {}`](multiplatform-dsl-reference.md#dependencies) 块中设置所需 [类型](https://kotlinlang.org/docs/gradle-configure-project.html#dependency-types) 的依赖项（例如 `implementation`）：
+要添加库依赖项，请在包含共享代码的项目目录中更新 `build.gradle(.kts)` 文件。在 [`dependencies {}`](multiplatform-dsl-reference.md#dependencies) 块中设置所需 [类型](https://kotlinlang.org/docs/gradle-configure-project.html#dependency-types) 的依赖项（例如 `implementation`）：
 
 <Tabs group="build-script">
 <TabItem title="Kotlin" group-key="kotlin">
@@ -160,7 +160,7 @@ kotlin {
 
 你可以添加对采用了 Kotlin Multiplatform 技术的库（如 [SQLDelight](https://github.com/cashapp/sqldelight)）的依赖项。这些库的作者通常会提供将依赖项添加到项目中的指南。
 
-> 在 [JetBrains 搜索平台](https://klibs.io/)上查找 Kotlin Multiplatform 库。
+> 在 [klibs.io](https://klibs.io/) 上查找可用的 Kotlin Multiplatform 库。
 >
 {style="tip"}
 

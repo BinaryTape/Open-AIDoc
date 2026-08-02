@@ -748,7 +748,7 @@ Kotlin 1.9.20 以降、対応する C および Objective-C の前方宣言と�
 
 Kotlin Multiplatform Gradle プラグインと、Gradle プラグインである [Java](https://docs.gradle.org/current/userguide/java_plugin.html)、[Java Library](https://docs.gradle.org/current/userguide/java_library_plugin.html)、および [Application](https://docs.gradle.org/current/userguide/application_plugin.html) の間の互換性の問題により、これらのプラグインを同じプロジェクトに適用すると非推奨の警告が表示されるようになりました。この警告は、マルチプラットフォームプロジェクト内の別の Gradle プラグインが Gradle Java プラグインを適用する場合にも表示されます。例えば、[Spring Boot Gradle プラグイン](https://docs.spring.io/spring-boot/gradle-plugin/index.html) は Application プラグインを自動的に適用します。
 
-この非推奨の警告は、Kotlin Multiplatform のプロジェクトモデルと Gradle の Java エコシステムプラグインの間の根本的な互換性の問題のために追加されました。Gradle の Java エコシステムプラグインは現在、他のプラグインが以下を行う可能性があることを考慮していません：
+この非推奨の警告は、Kotlin Multiplatform のプロジェクトモデルと Gradle の Java エコシステムプラグインの間の根本的な互換性の問題のために追加されました。 Gradle の Java エコシステムプラグインは現在、他のプラグインが以下を行う可能性があることを考慮していません：
 
 * Java エコシステムプラグインとは異なる方法で、JVM ターゲット向けに公開またはコンパイルする。
 * 同じプロジェクト内に JVM と Android など、2 つの異なる JVM ターゲットを持つ。

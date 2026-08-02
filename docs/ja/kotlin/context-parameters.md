@@ -52,14 +52,18 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="2.4"}
 
-コンテキストパラメータ名として `_` を使用することもできます。この場合、パラメータの値は解決（resolution）には利用可能ですが、ブロック内で名前を使ってアクセスすることはできません。
+パラメータを直接参照する必要がない場合は、コンテキストパラメータ名として `_` を使用できます。匿名のコンテキストパラメータは、呼び出される関数が必要とするコンテキストパラメータを引き続き満たすことができますが、名前を使ってアクセスすることはできません。その値に明示的にアクセスするには、`contextOf<T>()` を使用します：
 
 ```kotlin
 // コンテキストパラメータ名として "_" を使用します
 context(_: UserService)
 fun logWelcome() {
-    // 解決プロセスにより、UserService から適切な log 関数が引き続き見つけられます
+    // 匿名のパラメータは outputMessage() が必要とする
+    // UserService コンテキストパラメータを満たします
     outputMessage("Welcome!")
+
+    // UserService の値を明示的に取得します
+    contextOf<UserService>().log("Hi!")
 }
 ```
 

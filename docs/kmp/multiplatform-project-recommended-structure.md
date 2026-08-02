@@ -1,14 +1,14 @@
 [//]: # (title: 推荐的 Kotlin Multiplatform 项目结构)
 <show-structure for="chapter,procedure" depth="3"/>
 
-[基础](multiplatform-discover-project.md)与[进阶](multiplatform-advanced-project-structure.md)项目结构概念概览应能让你理解源集和依赖项管理。那么，组织源集并依赖这些依赖项的模块该如何处理呢？
+对[基础](multiplatform-discover-project.md)与[进阶](multiplatform-advanced-project-structure.md)项目结构概念的概览应该已经让你对源集和依赖项管理有了深入的理解。那么，用于组织源集并依赖这些依赖项的模块又该如何处理呢？
 
-> 本文专门讨论 KMP 项目。
+> 本文专门讨论 Kotlin Multiplatform (KMP) 项目。
 > 关于模块化决策的一般性理解，请参阅 [Android 模块化简介](https://developer.android.com/topic/modularization)。
 
 ## 最佳模块结构
 
-最佳模块结构可能会根据你的目标和必要的目标而有所不同。
+最佳模块结构可能会根据你的目标和必要的平台目标而有所不同。
 你可以分析具有不同配置和目标集的 KMP IDE 插件向导的输出，以查看我们默认如何组织项目。
 
 通用方法可以概括如下：
@@ -33,7 +33,7 @@
 
 我们将用来演示向推荐结构过渡的示例项目是一个旧的 Compose Multiplatform 示例，可以在示例仓库的 [old-project-structure](https://github.com/kotlin-hands-on/get-started-with-cm/tree/old-project-structure) 分支中找到。
 
-该示例由一个 Gradle 模块 (`composeApp`) 组成，其中包含所有共享代码 and KMP 入口点，以及包含 iOS 项目代码和配置的 `iosApp` 文件夹。
+该示例由一个 Gradle 模块 (`composeApp`) 组成，其中包含所有共享代码和 KMP 入口点，以及包含 iOS 项目代码和配置的 `iosApp` 文件夹。
 
 要将入口点提取到其自己的模块中，你需要创建该模块、移动代码，并相应地调整新模块和通用代码模块的配置。
 
@@ -221,14 +221,14 @@ undefined
 4. 对 **composeApp [js]** 重复此操作，以便也能够运行 JavaScript 版本。
 5. 启动运行配置以确保应用按预期运行。
 6. 如果一切运行正常：
-    * 删除 `composeApp/src/webMain` 目录真实。
+    * 删除 `composeApp/src/webMain` 目录。
     * 在 `composeApp/build.gradle.kts` 文件中，移除 Web 相关的代码：
         * Kotlin `sourceSets {}` 块内部的 `webMain.dependencies {}` 块，
         * `kotlin {}` 块内部的 `js {}` 和 `wasmJs {}` 目标声明。
 
 ### 配置共享模块
 
-在示例应用中，UI 和业务逻辑代码都是共享的，因此它只需要一个共享模块来保存所有通用代码：你可以直接将 `composeApp` 改作通用代码模块。
+在示例应用中，UI 和业务逻辑代码都是共享的，因此它只需要一个共享模块来保存所有通用代码：你可以直接将 `composeApp` 改用作通用代码模块。
 
 [//]: # (TODO 有关其他项目配置及其处理方式的概述，请参阅我们关于新推荐项目结构的博客文章 [link])
 

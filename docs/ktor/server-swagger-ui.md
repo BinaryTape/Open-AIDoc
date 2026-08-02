@@ -13,7 +13,7 @@
 <var name="example_name" value="json-kotlinx-openapi"/>
 <p>
     <b>代码示例</b>：
-    <a href="https://github.com/ktorio/ktor-documentation/tree/%ktor_version%/codeSnippets/snippets/%example_name%">
+    <a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/%example_name%">
         %example_name%
     </a>
 </p>
@@ -99,10 +99,14 @@ swaggerUI("/swaggerUI") {
 ```kotlin
 routing {
     swaggerUI(path = "swagger", swaggerFile = "openapi/documentation.yaml") {
-        version = "4.15.5"
+        version = "5.31.0"
     }
 }
 ```
+
+> OpenAPI 3.1.x 文档需要 Swagger UI 5.x，而 Swagger UI 4.x 仅支持 OpenAPI 3.0.x。
+>
+{style="note"}
 
 ## 配置 CORS {id="configure-cors"}
 

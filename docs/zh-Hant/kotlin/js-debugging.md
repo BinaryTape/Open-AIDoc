@@ -1,6 +1,6 @@
 [//]: # (title: 偵錯 Kotlin/JS 程式碼)
 
-JavaScript 原始碼對應檔（source maps）提供了由束裝工具或縮減器產生的縮減程式碼與開發人員編寫的實際原始碼之間的對應關係。透過這種方式，原始碼對應檔能在程式碼執行期間支援偵錯功能。
+JavaScript 原始碼對應檔 (source maps) 提供了由束裝工具或縮減器產生的縮減程式碼與開發人員編寫的實際原始碼之間的對應關係。透過這種方式，原始碼對應檔能在程式碼執行期間支援偵錯功能。
 
 Kotlin Multiplatform Gradle 外掛程式會自動為專案組建產生原始碼對應檔，無需任何額外配置即可使用。
 
@@ -10,7 +10,7 @@ Kotlin Multiplatform Gradle 外掛程式會自動為專案組建產生原始碼�
 
 要在瀏覽器中偵錯 Kotlin/JS：
 
-1. 藉由呼叫可用的 *run* Gradle 任務來執行專案，例如在多平台專案中執行 `browserDevelopmentRun` 或 `jsBrowserDevelopmentRun`。
+1. 藉由呼叫可用的 *run* Gradle 任務來執行專案，例如 `jsBrowserDevelopmentRun`。
    [進一步了解執行 Kotlin/JS](running-kotlin-js.md#run-the-browser-target)。
 2. 在瀏覽器中導航至該頁面並啟動其開發者工具（例如透過點擊右鍵並選取 **檢查** 操作）。了解如何在熱門瀏覽器中 [尋找開發者工具](https://balsamiq.com/support/faqs/browserconsole/)。
 3. 如果您的程式正在將資訊記錄到主控台，請導航至 **主控台** 索引標籤以查看此輸出。根據您的瀏覽器，這些記錄可以參照其來源的 Kotlin 原始碼檔案和行號：
@@ -39,11 +39,11 @@ Kotlin Multiplatform Gradle 外掛程式會自動為專案組建產生原始碼�
 
 4. 儲存配置。
 
-進一步了解 [設定 JavaScript 偵錯配置](https://www.jetbrains.com/help/idea/configuring-javascript-debugger.html)。
+若要了解更多，請參閱 [設定 JavaScript 偵錯配置](https://www.jetbrains.com/help/idea/configuring-javascript-debugger.html)。
 
 現在您已準備好偵錯您的專案！
 
-1. 藉由呼叫可用的 *run* Gradle 任務來執行專案，例如在多平台專案中執行 `browserDevelopmentRun` 或 `jsBrowserDevelopmentRun`。
+1. 藉由呼叫可用的 *run* Gradle 任務來執行專案，例如 `jsBrowserDevelopmentRun`。
    [進一步了解執行 Kotlin/JS](running-kotlin-js.md#run-the-browser-target)。
 2. 透過執行您先前建立的 JavaScript 偵錯配置來啟動偵錯工作階段：
 

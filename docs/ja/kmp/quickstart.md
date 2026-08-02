@@ -232,7 +232,7 @@ KMP プロジェクトの構造と共有コードの記述について詳しく�
   * [プロジェクトの構成](multiplatform-project-configuration.md)
   * [マルチプラットフォーム依存関係の操作](https://kotlinlang.org/docs/multiplatform-add-dependencies.html)
 * Compose Multiplatform UI フレームワーク、その基本、およびプラットフォーム固有の機能について学ぶ：
-    [Compose Multiplatform と Jetpack Compose の関係](compose-multiplatform-and-jetpack-compose.md)
+    [Compose Multiplatform と Jetpack Compose の関係](compose-multiplatform-and-jetpack-compose.md).
 
 KMP 用に既に書かれたコードを探す：
 * JetBrains 公式サンプルや、KMP の機能を示す厳選されたプロジェクトリストが掲載されている [Samples](multiplatform-samples.md) ページ。

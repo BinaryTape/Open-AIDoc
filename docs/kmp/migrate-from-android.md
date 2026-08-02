@@ -261,9 +261,9 @@ flowchart TB
 
 1. `:core:data`
 2. `:core:data-testing`
-4. `:core:domain`
-5. `:core:domain-testing`
-1. `:core:designsystem` —— 虽然它没有模块依赖项，但这是一个 UI 辅助模块，
+3. `:core:domain`
+4. `:core:domain-testing`
+5. `:core:designsystem` —— 虽然它没有模块依赖项，但这是一个 UI 辅助模块，
    因此我们仅在准备将 UI 代码移入共享模块时才处理它。 
 
 ### 迁移 :core:data
@@ -282,7 +282,7 @@ Jetcaster 使用 [Room](https://developer.android.com/training/data-storage/room
 > 请参阅[生成的提交](https://github.com/kotlin-hands-on/jetcaster-kmp-migration/commit/ab22fb14e9129087b310a989eb08bcc77b0e12e8)。
 
 * 请注意新的代码结构，包含 `androidMain`、`commonMain`、`iosMain` 和 `jvmMain` 源集。
-* 大多数代码更改是关于为 Room 创建 expect/actual 结构以及相应的 DI 更改。
+* 大多数代码更改是关于为 Room 创建 `expect`/`actual` 结构以及相应的 DI 更改。
 * 有一个新的 `OnlineChecker` 接口，用于涵盖我们仅在 Android 上检查互联网连接
   的事实。在[添加 iOS 应用作为目标](#add-an-ios-entry-point)之前，在线检查器将是一个存根。
 

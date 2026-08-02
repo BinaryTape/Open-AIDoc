@@ -394,7 +394,7 @@ kotlin.native.binary.objcExportBlockExplicitParameterNames=false
 
 ### リリース用タスクのビルド時間短縮
 
-Kotlin/Native 2.3.0 ではいくつかのパフォーマンス改善が行われました。その結果、`linkRelease*`（例：`linkReleaseFrameworkIosArm64`）などのリリース用タスクのビルド時間が短縮されました。
+Kotlin/Native 2.3.0 ではいくつかのパフォーマンス改善が行われました。その結果、`linkRelease*`（例：`linkReleaseFrameworkIosArm64`）などのリリース用タスク의 ビルド時間が短縮されました。
 
 ベンチマークによると、プロジェクトの規模にもよりますが、リリースビルドは最大 40% 高速化されています。これらの改善は、iOS をターゲットとした Kotlin Multiplatform プロジェクトで最も顕著です。
 
@@ -539,7 +539,7 @@ kotlin {
 }
 ```
 
-この機能は [実験的 (Experimental)](components-stability.md#stability-levels-explained) です。イシュートラッカー [YouTrack](https://youtrack.jetbrains.com/issue/KT-79284/Use-BigInt64Array-for-LongArray) でのフィードバックをお待ちしております。
+この機能は [実験적 (Experimental)](components-stability.md#stability-levels-explained) です。イシュートラッカー [YouTrack](https://youtrack.jetbrains.com/issue/KT-79284/Use-BigInt64Array-for-LongArray) でのフィードバックをお待ちしております。
 
 ### JS モジュールシステム間での統一されたコンパニオンオブジェクトアクセス
 
@@ -792,7 +792,7 @@ fun main() {
 
 #### v4 および v7 UUID を生成するための新しい関数
 
-Kotlin 2.3.0 では、UUID を生成するための 2 つের 新しい関数 `Uuid.generateV4()` と `Uuid.generateV7()` が導入されました。
+Kotlin 2.3.0 では、UUID を生成するための 2 つの新しい関数 `Uuid.generateV4()` と `Uuid.generateV7()` が導入されました。
 
 バージョン 4 の UUID を生成するには `Uuid.generateV4()` 関数を、バージョン 7 の UUID を生成するには `Uuid.generateV7()` 関数を使用してください。
 
@@ -875,7 +875,7 @@ java.lang.IllegalStateException: <message>
         ...
 ```
 
-Jetpack Compose 1.10 によってこのモードで生成されるスタックトレースには、まだデオブスキュレート（復元）が必要なグループキーのみが含まれています。これは、Kotlin 2.3.0 リリースの Compose コンパイラ Gradle プラグインによって対処されており、R8 によって生成される ProGuard マッピングファイルにグループキーのエントリが付加されるようになりました。コンパイラが一部の関数のマッピング作成に失敗した場合に新しい警告が表示される場合は、[Google IssueTracker](https://issuetracker.google.com/issues/new?component=610764&template=1424126) に報告してください。
+Jetバック Compose 1.10 によってこのモードで生成されるスタックトレースには、まだデオブスキュレート（復元）が必要なグループキーのみが含まれています。これは、Kotlin 2.3.0 リリースの Compose コンパイラ Gradle プラグインによって対処されており、R8 によって生成される ProGuard マッピングファイルにグループキーのエントリが付加されるようになりました。コンパイラが一部の関数のマッピング作成に失敗した場合に新しい警告が表示される場合は、[Google IssueTracker](https://issuetracker.google.com/issues/new?component=610764&template=1424126) に報告してください。
 
 > Compose コンパイラ Gradle プラグインは、R8 マッピングファイルに依存しているため、ビルドで R8 が有効な場合にのみグループキー・スタックトレース用のデオブスキュレーションマッピングを作成します。
 >
@@ -912,7 +912,7 @@ composeCompiler {
 * Kotlin Multiplatform Gradle プラグインを Android Gradle Plugin (AGP) 9.0.0 以降で Android ターゲットに対して使い続けると、`androidTarget` ブロックの使用時に設定エラーが表示され、移行方法をガイドする診断メッセージが表示されます。このエラーは、AGP 8.x を使用して Kotlin 2.3.10 にアップデートするか、[Google の Android ターゲット用プラグイン](https://kotlinlang.org/docs/multiplatform/multiplatform-compatibility-guide.html#migrate-to-google-s-plugin-for-android-targets) に移行することで回避できます。
 
 * AGP 9.0.0 には [Kotlin の組み込みサポート](https://developer.android.com/build/releases/agp-preview#android-gradle-plugin-built-in-kotlin) が含まれています。
-  Kotlin 2.3.0 以降、[このバージョンの AGP を `kotlin-android` プラグインと一緒に使用すると設定エラーが表示されます](compatibility-guide-23.md#deprecate-kotlin-android-plugin-for-agp-versions-9-0-0-and-later)。このプラグインが不要になったためです。移行を支援するための新しい診断メッセージが用意されています。
+  Kotlin 2.3.0 以降、[このバージョンの AGP を `kotlin-android` プラグインと一緒に使用すると設定エラーが表示されます](compatibility-guide-23.md#deprecate-kotlin-android-plugin-for-agp-versions-9-0-0-and-later)、このプラグインが不要になったためです。移行を支援するための新しい診断メッセージが用意されています。
   古い AGP バージョンを使用している場合は、非推奨の警告が表示されます。
 
 * Ant ビルドシステムのサポートは終了しました。
@@ -920,7 +920,7 @@ composeCompiler {
 ## ドキュメントの更新
 
 Kotlin Multiplatform のドキュメントが kotlinlang.org に移動しました。これにより、Kotlin と KMP のドキュメントを一箇所で切り替えられるようになりました。
-また、言語ガイドの目次を刷新し、新しいナビゲンスを導入しました。
+また、言語ガイドの目次を刷新し、新しいナビゲーションを導入しました。
 
 前回の Kotlin リリース以降のその他の注目すべき変更点：
 
@@ -928,11 +928,11 @@ Kotlin Multiplatform のドキュメントが kotlinlang.org に移動しまし�
 * [Kotlin Multiplatform クイックスタート (Kotlin Multiplatform quickstart)](https://kotlinlang.org/docs/multiplatform/quickstart.html) – KMP IDE プラグインを使用した環境構築方法を学べます。
 * [Compose Multiplatform 1.9.3 の新機能](https://kotlinlang.org/docs/multiplatform/whats-new-compose-190.html) – 
   最新リリースのハイライトについて学べます。
-* [Kotlin/JS を始める](js-get-started.md) – Kotlin/JavaScript を使用してブラウザ用の Web アプリケーションを作成します。
+* [Kotlin/JS を始める (Get started with Kotlin/JS)](js-get-started.md) – Kotlin/JavaScript を使用してブラウザ用の Web アプリケーションを作成します。
 * [クラス (Classes)](classes.md) – Kotlin におけるクラス使用の基本とベストプラクティスを学べます。
 * [拡張 (Extensions)](extensions.md) – Kotlin でクラスやインターフェースを拡張する方法を学べます。
 * [コルーチンの基本 (Coroutines basics)](coroutines-basics.md) – コルーチンの主要な概念を探索し、最初のコルーチンを作成する方法を学びます。
-* [キャンセルとタイムアウト (Cancellation and timeouts)](cancellation-and-timeouts.md) – コルーチンのキャンセルがどのように動作し、コルーチンをキャンセルに対応させる方法を学べます。
+* [キャンセルとタイムアウト (Cancellation and timeouts)](coroutines-cancellation.md) – コルーチンのキャンセルがどのように動作し、コルーチンをキャンセルに対応させる方法を学べます。
 * [Kotlin/Native ライブラリ (Kotlin/Native libraries)](native-libraries.md) – `klib` ライブラリアーティファクトを生成する方法を確認できます。
 * [Kotlin Notebook 概要 (Kotlin Notebook overview)](kotlin-notebook-overview.md) – Kotlin Notebook プラグインを使用して、インタラクティブなノートブックドキュメントを作成できます。
 * [Java プロジェクトに Kotlin を追加する](mixing-java-kotlin-intellij.md) – Kotlin と Java の両方を使用するように Java プロジェクトを構成します。

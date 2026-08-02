@@ -8,7 +8,7 @@
 
 ## 크로스 플랫폼 개발: 현대 애플리케이션 구축을 위한 통합된 접근 방식
 
-크로스 플랫폼 개발은 단일 코드베이스로 여러 플랫폼에서 실행되는 애플리케이션을 구축하는 방법을 제공하며, 각 시스템마다 동일한 기능을 다시 작성할 필요가 없게 해줍니다. 흔히 Android와 iOS를 모두 겨냥하는 [모바일 개발](cross-platform-mobile-development.topic)과 연관되지만, 이 방식은 모바일을 넘어 웹, 데스크톱, 심지어 서버 측 환경까지 광범위하게 적용됩니다.
+크로스 플랫폼 개발은 단일 코드베이스로 여러 플랫폼에서 실행되는 애플리케이션을 구축하는 방법을 제공하며, 각 시스템마다 동일한 기능을 다시 작성할 필요가 없게 해줍니다. 흔히 [모바일 개발](cross-platform-mobile-development.topic)(Android와 iOS 모두 타겟팅)과 연관되지만, 이 방식은 모바일을 넘어 웹, 데스크톱, 심지어 서버 측 환경까지 광범위하게 적용됩니다.
 
 핵심 아이디어는 코드 재사용을 극대화하면서도 필요한 경우 플랫폼별 기능을 여전히 구현할 수 있도록 보장하여, 개발 프로세스를 간소화하고 유지 관리 노력을 줄이는 것입니다. 팀은 개발 주기를 단축하고 비용을 절감하며 플랫폼 간의 일관성을 확보할 수 있으므로, 오늘날처럼 점점 더 다양해지는 애플리케이션 환경에서 크로스 플랫폼 개발은 현명한 선택이 됩니다.
 
@@ -82,8 +82,8 @@ Compose Multiplatform은 현재 [iOS](https://blog.jetbrains.com/kotlin/2025/05/
     
 <tr>
 <td><b>패키지, 의존성 및 에코시스템</b></td>
-        <td>패키지는 <a href="https://central.sonatype.com/">Maven Central</a> 및 다음을 포함한 기타 저장소에서 사용할 수 있습니다:
-            <p><a href="http://klibs.io">klibs.io</a> (알파 버전): KMP 라이브러리 검색을 단순화하도록 설계되었습니다.</p>
+        <td>패키지는 <a href="https://central.sonatype.com/">Maven Central</a> 및 기타 저장소에서 사용할 수 있습니다:
+            <p><a href="https://klibs.io">klibs.io</a>: KMP 라이브러리 검색을 단순화하도록 설계되었습니다.</p>
             <p>이 <a href="https://github.com/terrakok/kmp-awesome">리스트</a>에는 가장 인기 있는 KMP 라이브러리와 도구들이 포함되어 있습니다.</p> </td>
         <td>패키지는 <a href="https://pub.dev/">Pub.dev.</a>에서 사용할 수 있습니다.</td>
 </tr>

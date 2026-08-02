@@ -236,3 +236,7 @@ kotlin {
 
 * Python 繫結的效能。
 * 偵錯工具中不支援運算式求值，目前沒有實作該功能的計畫。
+
+## 下一步
+
+[了解如何改善 iOS 程式碼中未處理 Kotlin 例外狀況的當機報告](native-faq.md#how-do-i-get-better-crash-reports-for-ios)

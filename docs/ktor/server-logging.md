@@ -43,7 +43,7 @@ Ktor 根据所使用的平台提供了不同的应用日志记录方式：
     </TabItem>
 </Tabs>
 
-要使用 Log4j，你需要添加 `org.apache.logging.log4j:log4j-core` 和 `org.apache.logging.log4j:log4j-slf4j-impl` 构件。
+要使用 Log4j，你需要添加 `org.apache.logging.log4j:log4j-core` 和 `org.apache.logging.log4j:log4j-slf4j2-impl` 构件。
 
 ### 配置记录器 {id="configure-logger"}
 
@@ -58,7 +58,7 @@ Ktor 根据所使用的平台提供了不同的应用日志记录方式：
 <configuration>
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{YYYY-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
     <root level="trace">
@@ -76,7 +76,7 @@ Ktor 根据所使用的平台提供了不同的应用日志记录方式：
         <file>testFile.log</file>
         <append>true</append>
         <encoder>
-            <pattern>%d{YYYY-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
     <root level="trace">
@@ -102,7 +102,7 @@ Ktor 根据所使用的平台提供了不同的应用日志记录方式：
 这可以帮助你确定为什么某些路由未被执行。
 
 ## 在代码中访问记录器 {id="access_logger"}
-记录器实例由实现 [Logger](https://api.ktor.io/ktor-utils/io.ktor.util.logging/-logger/index.html) 接口的类表示。你可以使用 [Application.log](https://api.ktor.io/ktor-server-core/io.ktor.server.application/log.html) 属性在 `Application` 内部访问记录器实例。例如，下面的代码片段展示了如何在[模块](server-modules.md)内向日志添加一条消息。
+Logger 实例由实现 [Logger](https://api.ktor.io/ktor-utils/io.ktor.util.logging/-logger/index.html) 接口的类表示。你可以使用 [Application.log](https://api.ktor.io/ktor-server-core/io.ktor.server.application/log.html) 属性在 `Application` 内部访问 Logger 实例。例如，下面的代码片段展示了如何在[模块](server-modules.md)内向日志添加一条消息。
 
 ```kotlin
 import io.ktor.server.application.*

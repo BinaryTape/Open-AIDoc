@@ -20,8 +20,8 @@ JetBrains의 Compose Multiplatform 팀은 이러한 라이브러리에 대해 An
 * `org.jetbrains.androidx.navigation.navigation-runtime-iossimulatorarm64`
 * 기타 등등.
 
-이러한 모든 아티팩트는 다른 플랫폼용 아티팩트 및 원본 Android 라이브러리(`androidx.navigation.navigation-compose`)에 대한 참조와 함께 하나의 그룹으로 배포됩니다.
-이들은 통합된 `org.jetbrains.androidx.navigation.navigation-compose` 의존성을 통해 접근할 수 있습니다.
+이러한 모든 아티팩트는 다른 플랫폼용 아티팩트 및 원본 Android 라이브러리(`androidx.navigation.navigation-compose`)에 대한 참조와 함께 하나의 그룹으로 배포됩니다. 이들은 통합된 
+`org.jetbrains.androidx.navigation.navigation-compose` 의존성을 통해 접근할 수 있습니다.
 Compose Multiplatform Gradle 플러그인은 플랫폼별 아티팩트를 각 배포판에 매핑하는 작업을 처리합니다.
 
 이 접근 방식을 통해, 해당 의존성을 가진 Kotlin Multiplatform(KMP) 프로젝트에서 생성된 Android 앱은 원본 Android Navigation 라이브러리를 사용합니다.

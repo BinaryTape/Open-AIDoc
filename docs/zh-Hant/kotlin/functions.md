@@ -107,7 +107,7 @@ fun main() {
     // 將 0 作為 'userId' 的預設值
     greeting(message = "Hello!")
     
-    // 錯誤：未傳遞參數 'userId' 的值
+    // 錯誤：未傳遞參數 'message' 的值
     greeting("Hello!")
 }
 ```

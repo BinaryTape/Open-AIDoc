@@ -1,7 +1,11 @@
 [//]: # (title: 建置多平台 Kotlin 程式庫)
 
-當建立 Kotlin 程式庫時，請考慮支援 [Kotlin Multiplatform 並進行建置與發佈](https://www.jetbrains.com/help/kotlin-multiplatform-dev/multiplatform-publish-lib-setup.html)。
+建立 Kotlin 程式庫時，請考慮[支援 Kotlin Multiplatform 並進行建置與發佈](https://www.jetbrains.com/help/kotlin-multiplatform-dev/multiplatform-publish-lib-setup.html)。
 這能擴大程式庫的受眾範圍，使其與針對多個平台開發的專案相容。
+
+> 您可以在 [klibs.io](https://klibs.io/) 上找到適用於不同使用案例和目標平台的現成 Kotlin Multiplatform 程式庫。
+> 
+{style="tip"}
 
 以下章節提供的指南可協助您有效地建置 Kotlin Multiplatform 程式庫。
 
@@ -31,10 +35,10 @@
 
 請根據以下優先順序，將 API 放置在最廣泛相關的原始碼集中：
 
-*   **`commonMain` 原始碼集：** `commonMain` 原始碼集中的 API 可用於程式庫支援的所有平台。請致力於將程式庫的大部分 API 放置於此。
-*   **中間原始碼集：** 如果某些平台不支援特定的 API，請使用[中間原始碼集](https://www.jetbrains.com/help/kotlin-multiplatform-dev/multiplatform-discover-project.html#intermediate-source-sets)來針對特定平台。
-    例如，您可以為支援多執行緒的目標建立 `concurrent` 原始碼集，或為所有非 JVM 目標建立 `nonJvm` 原始碼集。
-*   **平台特定原始碼集：** 對於平台特定的 API，請使用如 `androidMain` 之類的原始碼集。
+* **`commonMain` 原始碼集：** `commonMain` 原始碼集中的 API 可用於程式庫支援的所有平台。請致力於將程式庫的大部分 API 放置於此。
+* **中間原始碼集：** 如果某些平台不支援特定的 API，請使用[中間原始碼集](https://www.jetbrains.com/help/kotlin-multiplatform-dev/multiplatform-discover-project.html#intermediate-source-sets)來針對特定平台。
+例如，您可以為支援多執行緒的目標建立 `concurrent` 原始碼集，或為所有非 JVM 目標建立 `nonJvm` 原始碼集。
+* **平台特定原始碼集：** 對於平台特定的 API，請使用如 `androidMain` 之類的原始碼集。
 
 > 若要進一步了解 Kotlin Multiplatform 專案的原始碼集，請參閱[階層式專案結構](https://www.jetbrains.com/help/kotlin-multiplatform-dev/multiplatform-hierarchy.html)。
 >
@@ -82,7 +86,7 @@ Kotlin Multiplatform 在其支援的目標平台上提供與原生 API 和語言
 
 ## 推廣您的程式庫
 
-您的程式庫可以收錄在 [JetBrains 的搜尋平台](https://klibs.io/)。
-該平台旨在讓使用者能根據目標平台輕鬆尋找 Kotlin Multiplatform 程式庫。
+您可以將您的程式庫收錄在 [klibs.io](https://klibs.io/)，這是一個讓開發者尋找與評估 Kotlin Multiplatform 程式庫的搜尋平台。
 
-符合標準的程式庫會自動加入。如需更多關於如何加入您的程式庫的資訊，請參閱[常見問題](https://klibs.io/faq)。
+[klibs.io](https://klibs.io/) 會自動列出符合其收錄標準的程式庫。
+若要檢查您的程式庫是否符合資格，請參閱[常見問題](https://klibs.io/faq)。

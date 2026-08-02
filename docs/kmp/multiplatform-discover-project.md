@@ -34,6 +34,8 @@ Kotlin 编译器将源代码作为输入，并产生一组平台特定的二进�
 
 例如，`kotlinx.coroutines` 是一个支持所有目标的 Kotlin Multiplatform 库，但它也有平台特定的部分，用于将 `kotlinx.coroutines` 并发原语转换为 JDK 并发原语，例如 `fun CoroutinesDispatcher.asExecutor(): Executor`。API 的这部分额外内容在 `commonMain` 中是不可用的。
 
+要探索可用的 Kotlin Multiplatform 库，请访问 [klibs.io](https://klibs.io)。
+
 ## 目标
 
 目标 (Targets) 定义了 Kotlin 将通用代码编译到的平台。例如，这些平台可以是 JVM、JS、Android、iOS 或 Linux。前面的示例将通用代码编译到了 JVM 和原生目标。
@@ -194,7 +196,7 @@ fun randomUuidString(): String {
 
 为了解决这个问题，您可以使用“中间源集” (intermediate source sets)。中间源集是一个 Kotlin 源集，它编译到项目中的部分（而非全部）目标。您也可以看到中间源集被称为分层源集 (hierarchical source sets) 或简称为层次结构 (hierarchies)。
 
-Kotlin 默认会创建一些中间源集。在这种特定情况下，生成的项目结构将如下所示：
+Kotlin 默认会创建 some 中间源集。在这种特定情况下，生成的项目结构将如下所示：
 
 ![中间源集](intermediate-source-sets-diagram.svg){width=700}
 

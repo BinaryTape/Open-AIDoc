@@ -346,11 +346,17 @@ Kotlin은 인터페이스의 함수가 JVM 디폴트 메서드로 컴파일되�
 
 Kotlin 가시성 제어자는 다음과 같은 방식으로 Java에 매핑됩니다:
 
-* `private` 멤버는 `private` 멤버로 컴파일됩니다.
-* `private` 최상위 선언은 `private` 최상위 선언으로 컴파일됩니다. 클래스 내부에서 접근하는 경우 패키지-프라이빗 접근자(accessor)도 포함됩니다.
-* `protected`는 `protected`로 유지됩니다. (Java는 동일한 패키지의 다른 클래스에서 protected 멤버에 접근하는 것을 허용하지만 Kotlin은 그렇지 않으므로, Java 클래스가 코드에 대해 더 넓은 접근 권한을 갖게 됩니다.)
-* `internal` 선언은 Java에서 `public`이 됩니다. `internal` 클래스의 멤버는 Java에서 실수로 사용하는 것을 방지하고, Kotlin 규칙에 따라 서로를 볼 수 없는 동일한 시그니처를 가진 멤버들에 대해 오버로딩을 허용하기 위해 이름 맹글링(name mangling)을 거칩니다.
-* `public`은 `public`으로 유지됩니다.
+* `private` 멤버는 `private` 멤버로 유지됩니다.
+* `private` 최상위 선언은 Java에서 `private` 최상위 선언이 됩니다. 클래스 내부에서 접근하는 경우 패키지-프라이빗 접근자(accessor)도 포함됩니다.
+* `protected` 멤버는 `protected` 멤버로 유지됩니다.
+
+  Java는 동일한 패키지의 다른 클래스에서 protected 멤버에 접근하는 것을 허용하지만 Kotlin은 그렇지 않으므로, Java 클래스가 코드에 대해 더 넓은 접근 권한을 갖게 된다는 점에 유의하세요.
+* `internal` 선언은 Java에서 `public`이 됩니다.
+
+  Kotlin 컴파일러는 바이트코드에서 `internal` 멤버의 이름을 맹글링(mangling)합니다. 이는 예를 들어 Java에서 Kotlin 클래스를 확장할 때 모듈 간의 의도치 않은 오버라이드를 방지하고, 동일한 시그니처를 가진 멤버들에 대해 오버로딩을 허용합니다.
+
+  참고로 `internal` 클래스의 public 멤버 이름은 맹글링되지 않으며 Java에서 계속 호출 가능한 상태로 유지됩니다.
+* `public` 멤버는 `public`으로 유지됩니다.
 
 ## KClass
 

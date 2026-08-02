@@ -168,7 +168,7 @@ kotlin {
    >
    {style="tip"}
 
-2. 위 예시의 `commonMain`에서 `org.jetbrians.kotlinx:kotlinx-coroutines-core:1.7.3`으로의 종속성과 같은 _소스 세트 → 멀티플랫폼 라이브러_ 종속성은 종속성 해결의 중간 상태를 나타냅니다. 해결의 최종 상태는 항상 _소스 세트 → 소스 세트_ 종속성으로 표시됩니다.
+2. 위 예시의 `commonMain`에서 `org.jetbrians.kotlinx:kotlinx-coroutines-core:1.7.3`으로의 종속성과 같은 _소스 세트 → 멀티플랫폼 라이브러리_ 종속성은 종속성 해결의 중간 상태를 나타냅니다. 해결의 최종 상태는 항상 _소스 세트 → 소스 세트_ 종속성으로 표시됩니다.
 
    > 최종 _소스 세트 → 소스 세트_ 종속성은 `dependsOn` 관계가 아닙니다.
    >

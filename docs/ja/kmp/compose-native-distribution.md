@@ -518,7 +518,7 @@ compose.desktop {
 }
 ``` 
 
-Using a Kotlin [JVM ターゲット](multiplatform-dsl-reference.md#targets) を使用する場合:
+Kotlin [JVM ターゲット](multiplatform-dsl-reference.md#targets) を使用する場合:
 
 ``` kotlin
 plugins {
@@ -813,7 +813,7 @@ compose.desktop {
     
 <tr>
 <td><code>infoPlist</code></td>
-        <td><a href="#information-property-list-on-macos">macOS での <code>Info.plist</code></a> セクションを参照してください。</td>
+        <td><a href="#macos-固有の設定-idmacos-specific-configuration">macOS での <code>Info.plist</code></a> セクションを参照してください。</td>
 </tr>
 
         
@@ -880,8 +880,8 @@ DSL で表現されていない `Info.plist` の値を指定する必要があ�
 
 1. `build.gradle.kts` ファイルでカスタム URL スキームを定義します。
 
-  ``` kotlin
-  compose.desktop {
+    ``` kotlin
+    compose.desktop {
       application {
           mainClass = "MainKt"
           nativeDistributions {
@@ -895,9 +895,9 @@ DSL で表現されていない `Info.plist` の値を指定する必要があ�
               }
           }
       }
-  }
-  
-  val macExtraPlistKeys: String
+    }
+    
+    val macExtraPlistKeys: String
       get() = """
         <key>CFBundleURLTypes</key>
         <array>
@@ -911,23 +911,23 @@ DSL で表現されていない `Info.plist` の値を指定する必要があ�
           </dict>
         </array>
       """
-  ```
-  {initial-collapse-state="collapsed" collapsible="true" collapsed-title="infoPlist { extraKeysRawXml = macExtraPlistKeys"}
+    ```
+    {initial-collapse-state="collapsed" collapsible="true" collapsed-title="infoPlist { extraKeysRawXml = macExtraPlistKeys"}
 
 2. `java.awt.Desktop` クラスを使用して、`src/main/main.kt` ファイルに URI ハンドラーをセットアップします。
 
-  ``` kotlin 
-  import androidx.compose.material.MaterialTheme
-  import androidx.compose.material.Text
-  import androidx.compose.runtime.getValue
-  import androidx.compose.runtime.mutableStateOf
-  import androidx.compose.runtime.setValue
-  import androidx.compose.ui.window.singleWindowApplication
-  import java.awt.Desktop
-  
-  fun main() {
+    ``` kotlin 
+    import androidx.compose.material.MaterialTheme
+    import androidx.compose.material.Text
+    import androidx.compose.runtime.getValue
+    import androidx.compose.runtime.mutableStateOf
+    import androidx.compose.runtime.setValue
+    import androidx.compose.ui.window.singleWindowApplication
+    import java.awt.Desktop
+    
+    fun main() {
       var text by mutableStateOf("Hello, World!")
-  
+    
       try {
           Desktop.getDesktop().setOpenURIHandler { event ->
               text = "Open URI: " + event.uri
@@ -935,17 +935,17 @@ DSL で表現されていない `Info.plist` の値を指定する必要があ�
       } catch (e: UnsupportedOperationException) {
           println("setOpenURIHandler is unsupported")
       }
-  
+    
       singleWindowApplication {
           MaterialTheme {
               Text(text)
           }
       }
-  }
-  ```
-  {initial-collapse-state="collapsed" collapsible="true" collapsed-title="Desktop.getDesktop().setOpenURIHandler { event ->"}
+    }
+    ```
+    {initial-collapse-state="collapsed" collapsible="true" collapsed-title="Desktop.getDesktop().setOpenURIHandler { event ->"}
 
-3. `runDistributable` タスクを実行します：`./gradlew runDistributable`
+3. `runDistributable` タスクを実行します：`./gradlew runDistributable`。
 
 その結果、`compose://foo/bar` のようなリンクをブラウザからアプリケーションにリダイレクトできるようになります。
 

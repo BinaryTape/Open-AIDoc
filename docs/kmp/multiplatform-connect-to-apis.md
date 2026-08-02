@@ -9,7 +9,7 @@
 在编写使用平台特定 API 的代码之前，请检查是否可以使用多平台库代替。
 此类库提供通用的 Kotlin API，并针对不同平台有不同的实现。
 
-目前已有许多库可用于实现网络、日志记录和分析，以及访问设备功能等。有关更多信息，请参阅[此精选列表](https://github.com/terrakok/kmm-awesome)。
+目前已有许多库可用于实现网络、日志记录和分析，以及访问设备功能等。您可以在 [klibs.io](https://klibs.io)（Kotlin 多平台库搜索平台）上浏览库。
 
 ## expect 和 actual 函数与属性
 
@@ -227,7 +227,7 @@ actual val platformModule = module {
 
 ![使用依赖注入框架](expect-di-framework.svg){width=700}
 
-这种方法仅在您将实现放在平台模块中时才有效。它的扩展性不是很好，因为您的 Kotlin Multiplatform 模块无法自给自足，您需要在不同的模块中实现公共接口。
+这种方法仅在您将实现放在平台模块中时才有效。它的扩展性不是很好，因为您的 Kotlin Multiplatform 模块无法自给足，您需要在不同的模块中实现公共接口。
 
 <!-- If you're interested in having this functionality expanded to a shared module, please vote for this issue in Youtrack and describe your use case. -->
 

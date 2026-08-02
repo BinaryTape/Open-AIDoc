@@ -85,7 +85,7 @@
   "kotlin.kotlin-overview": "Kotlin 概览",
   "kotlin.what-s-new-in-kotlin": "Kotlin 新特性",
   "kotlin.whatsnew22": "Kotlin 2.2.0",
-  "kotlin.whatsnew-eap": "Kotlin 2.4.20-Beta1",
+  "kotlin.whatsnew-eap": "Kotlin 2.4.20-Beta2",
   "kotlin.earlier-versions": "更早版本",
   "kotlin.whatsnew2120": "Kotlin 2.1.20",
   "kotlin.whatsnew21": "Kotlin 2.1.0",
@@ -679,5 +679,11 @@
   "kotlin.beginner": "初学者",
   "kotlin.intermediate": "中级",
   "kotlin.immutable-collections-kotlinx-collections-immutable": "不可变集合 (kotlinx.collections.immutable)",
-  "kotlin.jvm-code-analysis": "使用代码分析工具"
+  "kotlin.jvm-code-analysis": "使用代码分析工具",
+  "kotlin.ksp-command-line": "KSP 命令行",
+  "coroutines.coroutines-cancellation": "取消",
+  "lincheck.testing-data-structures": "测试数据结构",
+  "kmp.kmp-for-ios": "适用于 iOS 的 Kotlin Multiplatform",
+  "koog.cloud-platform-integrations": "云平台集成",
+  "koog.amazon-bedrock-agentcore": "Amazon Bedrock AgentCore"
 }

@@ -341,7 +341,7 @@ internal fun App(navController: NavHostController = rememberNavController()) = A
 現在您可以看到完整的流程：
 當使用者開啟 `demo://` URI 時，作業系統會將其與註冊的架構進行比對。
 接著：
-  * 如果處理深層連結的應用程式已關閉，單例會接收該 URIbing 將其快取。當主 composable 函式啟動時，它會呼叫單例並導覽至與快取 URI 相符的深層連結。
+  * 如果處理深層連結的應用程式已關閉，單例會接收該 URI 並將其快取。當主 composable 函式啟動時，它會呼叫單例並導覽至與快取 URI 相符的深層連結。
   * 如果處理深層連結的應用程式已開啟，接聽程式已經設定好，因此當單例接收到 URI 時，應用程式會立即導覽至該處。
 
 ## 下一步

@@ -105,7 +105,7 @@ Compose Multiplatform은 공통 `ViewModelStoreOwner` 구현을 제공하므로,
           field = MutableStateFlow(OrderUiState())
 
       fun setQuantity(n: Int) {
-          field.update { it.copy(quantity = n, price = "${n * 2}.00") }
+          uiState.update { it.copy(quantity = n, price = "${n * 2}.00") }
       }
    }
    ```

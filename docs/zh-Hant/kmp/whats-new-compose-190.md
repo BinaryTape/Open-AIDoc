@@ -9,6 +9,7 @@
 * [iOS 上的畫面更新率配置](#frame-rate-configuration)
 * [Compose Multiplatform for Web 進入 Beta 階段](#compose-multiplatform-for-web-in-beta)
 * [Web 目標的輔助功能支援](#accessibility-support)
+* [Kotlin/JS 不再需要 skiko.js](#skiko-js-is-no-longer-needed)
 * [用於內嵌 HTML 內容的新 API](#new-api-for-embedding-html-content)
 
 請參閱 [GitHub](https://github.com/JetBrains/compose-multiplatform/releases/tag/v1.9.0) 以了解此版本的完整變更清單。
@@ -23,7 +24,7 @@
    * [Material3 1.4.0](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.4.0)
 
 * Compose Material3 程式庫 `org.jetbrains.compose.material3:1.9.0`。基於 [Jetpack Material3 1.4.0](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.4.0)。
-  受益於 Compose Multiplatform 與 Material3 的[解耦版本控制](#decoupled-material3-versioning)，您可以為專案選擇較新的預覽版本。
+  受益於 Compose Multiplatform 與 Material3 的[解耦版本](#decoupled-material3-versioning)，您可以為專案選擇較新的預覽版本。
 * Compose Material3 Adaptive 程式庫 `org.jetbrains.compose.material3.adaptive:adaptive*:1.2.0`。基於 [Jetpack Material3 Adaptive 1.2.0](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.2.0)
 * Lifecycle 程式庫 `org.jetbrains.androidx.lifecycle:lifecycle-*:2.9.6`。基於 [Jetpack Lifecycle 2.9.4](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.9.4)
 * Navigation 程式庫 `org.jetbrains.androidx.navigation:navigation-*:2.9.1`。基於 [Jetpack Navigation 2.9.4](https://developer.android.com/jetpack/androidx/releases/navigation#2.9.4)
@@ -210,6 +211,13 @@ ComposeViewport(
 }
 ```
 
+### 不再需要 skiko.js
+
+自 Compose Multiplatform 1.7.0 起，對於 Kotlin/Wasm 應用程式來說 `skiko.js` 已經是冗餘的。
+從此版本開始，對於 Kotlin/JS 也是如此：Skiko 的 Web 執行階段現在作為 ES 模組發布，並直接封裝到您應用程式編譯後的 JavaScript 中，因此不再需要為任何一個 Web 目標單獨提供 `skiko.js` 指令碼。
+
+您可以從 `index.html` 檔案中移除 `<script src="skiko.js">` 標籤。
+
 ### 用於內嵌 HTML 內容的新 API
 
 透過新的 `WebElementView()` Composable 函式，您可以將 HTML 元素無縫整合到 Web 應用程式中。
@@ -277,7 +285,7 @@ LaunchedEffect(Unit) {
 ### 在顯示前配置視窗
 
 Compose Multiplatform 現在包含新的 `SwingFrame()` 和 `SwingDialog()` Composable。
-它們與現有的 `Window()` 和 `DialogWindow()` 函式類似，但包含一個 `init` 區塊。
+它們與現有的 `Window()` and `DialogWindow()` 函式類似，但包含一個 `init` 區塊。
 
 先前，您無法設定某些必須在顯示前配置的視窗屬性。
 新的 `init` 區塊會在您的視窗或對話方塊出現在螢幕上之前執行，允許您配置諸如 `java.awt.Window.setType` 之類的屬性，或新增需要提早準備好的事件接聽程式。

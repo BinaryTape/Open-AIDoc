@@ -113,7 +113,7 @@ kotlin {
 
 此外，現在只有在存在 Java 原始碼時，Gradle 才會執行 Java 編譯任務，這會觸發先前未曾執行的 JVM 驗證診斷。如果您在 `KotlinJvmCompile` 任務中或 `compilerOptions` 內部明確配置了不相容的 JVM 目標，此診斷將失敗。有關確保 JVM 目標相容性的指南，請參閱[檢查相關編譯任務的 JVM 目標相容性](https://kotlinlang.org/docs/gradle-configure-project.html#check-for-jvm-target-compatibility-of-related-compile-tasks)。
 
-如果您的專案使用的 Gradle 版本高於 8.7，且不依賴 Gradle Java 外掛程式（如 [Java](https://docs.gradle.org/current/userguide/java_plugin.html)、[Java Library](https://docs.gradle.org/current/userguide/java_library_plugin.html) 或 [Application](https://docs.gradle.org/current/userguide/application_plugin.html)），或是依賴 Gradle Java 外掛程式的第三方 Gradle 外掛程式，則可以移除 `withJava()` 函式。
+如果您的專案使用的 Gradle 版本高於 8.7且不依賴 Gradle Java 外掛程式（如 [Java](https://docs.gradle.org/current/userguide/java_plugin.html)、[Java Library](https://docs.gradle.org/current/userguide/java_library_plugin.html) 或 [Application](https://docs.gradle.org/current/userguide/application_plugin.html)），或是依賴 Gradle Java 外掛程式的第三方 Gradle 外掛程式，則可以移除 `withJava()` 函式。
 
 如果您的專案使用了 [Application](https://docs.gradle.org/current/userguide/application_plugin.html) Gradle Java 外掛程式，我們建議遷移到[新的實驗性 DSL](https://kotlinlang.org/docs/whatsnew2120.html#kotlin-multiplatform-new-dsl-to-replace-gradle-s-application-plugin)。從 Gradle 8.7 開始，Application 外掛程式將不再與 Kotlin Multiplatform Gradle 外掛程式配合工作。
 
@@ -238,7 +238,7 @@ kotlin {
     }
     ```
 
-雖然這種方法在初始設定上需要更多工作，但它不使用 Gradle 和 Kotlin Gradle 外掛程式的任何低階實體，使得產出的組建更易於使用 and 維護。
+雖然這種方法在初始設定上需要更多工作，但它不使用 Gradle 和 Kotlin Gradle 外掛程式的任何低階實體，使得產出的組建更易於使用與維護。
 
 > 遺憾的是，我們無法為每種情況提供詳細的遷移步驟。如果上述指令對您不適用，請在此 [YouTrack 問題](https://youtrack.jetbrains.com/issue/KT-59316)中描述您的使用案例。
 >
@@ -376,7 +376,7 @@ undefined
 
 **現在的最佳實務是什麼？**
 
-Kotlin Gradle 外掛程式 now 提供了一個內建的階層結構模板。自 Kotlin 1.9.20 起，它預設啟用，並包含為常見使用案例預定義的中間原始碼集。
+Kotlin Gradle 外掛程式現在提供了一個內建的階層結構模板。自 Kotlin 1.9.20 起，它預設啟用，並包含為常見使用案例預定義的中間原始碼集。
 
 您應該指定目標清單，而不是使用快速鍵，外掛程式隨後會根據此清單自動設定中間原始碼集。
 
@@ -703,12 +703,12 @@ JetBrains 團隊重新設計了 Kotlin 中前向宣告的方法，以使其行�
 
 **現在的最佳實務是什麼？**
 
-* 考慮一個帶有 `library.package` 的 C 程式庫，它宣告了一個 `cstructName` 前向宣告。以前，可以直接從程式庫使用 `import library.package.cstructName` 進行匯入。現在，您只能使用特殊的前向宣告套件來執行此操作：`import cnames.structs.cstructName` 對於 `objcnames` 也是如此。
+* 考慮一個帶有 `library.package` 的 C 程式庫，它宣告了一個 `cstructName` 前向宣告。以前，可以直接從程式庫使用 `import library.package.cstructName` 進行匯入。現在，您只能使用特殊的前向宣告套件來執行此操作：`import cnames.structs.cstructName`。對於 `objcnames` 也是如此。
 
 * 考慮兩個 objcinterop 程式庫：一個使用 `objcnames.protocols.ForwardDeclaredProtocolProtocol`，另一個則有實際定義：
 
   ```ObjC
-  // 第一个 objcinterop 库
+  // 第一個 objcinterop 程式庫
   #import <Foundation/Foundation.h>
   
   @protocol ForwardDeclaredProtocol;

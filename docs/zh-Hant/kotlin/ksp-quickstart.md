@@ -69,6 +69,13 @@ dependencies {
 </tab>
 </tabs>
 
+`ksp(...)` 配置僅將處理器套用於應用程式原始碼。若要處理測試原始碼，請使用 `kspTest(...)` 配置新增處理器。
+
+> `ksp(...)` 配置僅可用於單平台專案。
+> 若要了解如何為個別 Kotlin 多平台目標和編譯進行配置，請參閱 [Kotlin 多平台中的 KSP](ksp-multiplatform.md)。
+> 
+{style="note"}
+
 ## 建立你自己的處理器
 
 透過以下步驟，你將建立一個簡單的註解處理器，用以產生 `helloWorld()` 函式。雖然這在實踐中沒什麼用，但它展示了建立你自己的處理器和註解的基礎知識。
@@ -236,7 +243,7 @@ dependencies {
    
     import com.google.devtools.ksp.processing.CodeGenerator
     import com.google.devtools.ksp.processing.Dependencies
-    import com.google.devtools.ksp.processing.Resolver
+    import com.google.devtools.ksp.processing.開源
     import com.google.devtools.ksp.processing.SymbolProcessor
     import com.google.devtools.ksp.symbol.KSAnnotated
     import com.google.devtools.ksp.symbol.KSFunctionDeclaration

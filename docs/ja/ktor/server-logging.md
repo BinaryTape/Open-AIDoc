@@ -43,7 +43,7 @@ Ktor は、使用するプラットフォームに応じて、アプリケーシ
     </TabItem>
 </Tabs>
 
-Log4j を使用するには、`org.apache.logging.log4j:log4j-core` と `org.apache.logging.log4j:log4j-slf4j-impl` アーティファクトを追加する必要があります。
+Log4j を使用するには、`org.apache.logging.log4j:log4j-core` と `org.apache.logging.log4j:log4j-slf4j2-impl` アーティファクトを追加する必要があります。
 
 ### ロガーの設定 {id="configure-logger"}
 
@@ -58,7 +58,7 @@ Log4j を使用するには、`org.apache.logging.log4j:log4j-core` と `org.apa
 <configuration>
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{YYYY-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
     <root level="trace">
@@ -76,7 +76,7 @@ Log4j を使用するには、`org.apache.logging.log4j:log4j-core` と `org.apa
         <file>testFile.log</file>
         <append>true</append>
         <encoder>
-            <pattern>%d{YYYY-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
     <root level="trace">

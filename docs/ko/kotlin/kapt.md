@@ -136,15 +136,7 @@ Kotlin Maven 프로젝트에서 kapt를 수동으로 설정하려면, `compile` 
 </execution>
 ```
 
-##### kapt 어노테이션 처리 구성
-
-어노테이션 처리 모드를 구성하려면 `<configuration>` 블록에서 `<aptMode>` 옵션을 설정하세요:
-
-* `stubs` – 어노테이션 처리에 필요한 스텁만 생성합니다.
-* `apt` – 어노테이션 처리만 실행합니다.
-* `stubsAndApt` – (기본값) 스텁을 생성하고 어노테이션 처리를 실행합니다.
-
-예시:
+어노테이션 처리 모드를 구성하려면 `<configuration>` 블록에서 [`aptMode`](#annotation-processor-configuration) 옵션을 설정하세요. 예시:
 
 ```xml
 <configuration>
@@ -155,60 +147,34 @@ Kotlin Maven 프로젝트에서 kapt를 수동으로 설정하려면, `compile` 
 
 ### CLI
 
-kapt 컴파일러 플러그인은 Kotlin 컴파일러의 바이너리 배포판에 포함되어 있습니다.
+kapt는 Kotlin 컴파일러의 바이너리 배포판에 독립적인 CLI 도구로 포함되어 있습니다.
 
-`-Xplugin` Kotlin 컴파일러 옵션을 사용하여 플러그인의 JAR 파일 경로를 제공함으로써 플러그인을 연결할 수 있습니다:
+커맨드 라인에서 kapt를 실행하려면 다음을 사용하세요:
 
 ```bash
--Xplugin=$KOTLIN_HOME/lib/kotlin-annotation-processing.jar
+kapt <options> <source files>
 ```
-
-다음은 사용 가능한 옵션 목록입니다:
-
-* `sources` (*필수*): 생성된 파일의 출력 경로입니다.
-* `classes` (*필수*): 생성된 클래스 파일 및 리소스의 출력 경로입니다.
-* `stubs` (*필수*): 스텁 파일의 임시 출력 경로입니다.
-* `incrementalData`: 바이너리 스텁의 출력 경로입니다.
-* `apclasspath` (*중복 가능*): 어노테이션 프로세서 JAR의 경로입니다. 각 JAR에 대해 하나의 `apclasspath` 옵션을 전달하세요.
-* `apoptions`: 어노테이션 프로세서 옵션의 Base64 인코딩된 목록입니다. 자세한 내용은 [AP/javac 옵션 인코딩](#ap-javac-options-encoding)을 참고하세요.
-* `javacArguments`: javac에 전달되는 옵션의 Base64 인코딩된 목록입니다. 자세한 내용은 [AP/javac 옵션 인코딩](#ap-javac-options-encoding)을 참고하세요.
-* `processors`: 어노테이션 프로세서의 정규화된 클래스 이름(qualified class names)을 쉼표로 구분한 목록입니다. 지정된 경우 kapt는 `apclasspath`에서 어노테이션 프로세서를 찾으려고 시도하지 않습니다.
-* `verbose`: 상세 출력을 활성화합니다.
-* `aptMode` (*필수*)
-    * `stubs` – 어노테이션 처리에 필요한 스텁만 생성합니다.
-    * `apt` – 어노테이션 처리만 실행합니다.
-    * `stubsAndApt` – 스텁을 생성하고 어노테이션 처리를 실행합니다.
-* `correctErrorTypes`: 자세한 내용은 [존재하지 않는 타입 보정](#non-existent-type-correction)을 참고하세요. 기본적으로 비활성화되어 있습니다.
-* `dumpFileReadHistory`: 어노테이션 처리 중에 사용된 클래스 목록을 각 파일별로 덤프할 출력 경로입니다.
-
-플러그인 옵션 형식은 `-P plugin:<plugin id>:<key>=<value>`입니다. 옵션은 중복될 수 있습니다.
 
 예시:
 
 ```bash
--P plugin:org.jetbrains.kotlin.kapt3:sources=build/kapt/sources
--P plugin:org.jetbrains.kotlin.kapt3:classes=build/kapt/classes
--P plugin:org.jetbrains.kotlin.kapt3:stubs=build/kapt/stubs
-
--P plugin:org.jetbrains.kotlin.kapt3:apclasspath=lib/ap.jar
--P plugin:org.jetbrains.kotlin.kapt3:apclasspath=lib/anotherAp.jar
-
--P plugin:org.jetbrains.kotlin.kapt3:correctErrorTypes=true
+kapt -Kapt-mode=stubsAndApt \
+  -Kapt-sources=build/kapt/sources \
+  -Kapt-classes=build/kapt/classes \
+  -Kapt-stubs=build/kapt/stubs \
+  -Kapt-classpath=lib/ap.jar \
+  -Kapt-classpath=lib/anotherAp.jar \
+  src/main/kotlin
 ```
+
+* [kapt 전용 컴파일러 옵션](#compiler-options) 전체 목록을 확인하세요.
+* 모든 유효한 [Kotlin 컴파일러 옵션](compiler-reference.md)도 전달할 수 있습니다. `kotlinc -help`를 실행하여 확인할 수 있습니다.
 
 ## 어노테이션 프로세서 구성
 
-### 어노테이션 프로세서 인수 전달
+kapt는 프로세서 클래스패스 관리, 공유 구성으로부터 프로세서 상속, javac 전용 프로세서 활성 상태 유지 등 어노테이션 프로세서가 검색, 조직 및 실행되는 방식을 제어하는 옵션을 제공합니다.
 
-빌드 스크립트 파일 `build.gradle(.kts)`의 `arguments {}` 블록을 사용하여 어노테이션 프로세서에 인수를 전달합니다:
-
-```kotlin
-kapt {
-    arguments {
-        arg("key", "value")
-    }
-}
-```
+어노테이션 프로세서 및 javac에 옵션을 전달하는 것과 같은 추가 구성 옵션은 [어노테이션 프로세서 구성](#annotation-processor-configuration)을 참고하세요.
 
 ### 프로세서 클래스패스 및 검색 구성
 
@@ -307,6 +273,10 @@ Maven을 사용하는 경우 플러그인 설정을 명시적으로 구성해야
 
 ## kapt 빌드 최적화
 
+kapt는 작업을 병렬로 실행하거나, 빌드 캐시 활용, 프로세서 클래스 로더 캐싱, 증분 어노테이션 처리 사용 등 어노테이션 처리 시간을 줄이기 위한 몇 가지 Gradle 전용 전략을 제공합니다.
+
+오류 타입 보정, 스텁 메타데이터 제거, 컴파일 클래스패스 스캐닝 등 빌드 동작에 영향을 주는 추가 옵션은 [동작 옵션](#behavioral-options)을 참고하세요.
+
 ### kapt 작업을 병렬로 실행하기
 
 kapt는 [Gradle Worker API](https://docs.gradle.org/current/userguide/worker_api.html)를 사용하여 어노테이션 처리 작업을 실행합니다. Worker API를 사용하면 Gradle이 단일 프로젝트 내의 독립적인 어노테이션 처리 작업을 병렬로 실행할 수 있으며, 이는 일부 경우에 실행 시간을 크게 단축시킵니다.
@@ -382,7 +352,7 @@ kapt.classloaders.cache.disableForProcessors=[어노테이션 프로세서 전�
 
 ### 증분 어노테이션 처리 사용하기
 
-kapt는 기본적으로 증분 어노테이션 처리를 지원합니다.
+Gradle에서 kapt는 기본적으로 증분 어노테이션 처리를 지원하므로 변경된 파일만 다시 처리됩니다.
 
 현재 증분 어노테이션 처리는 다음과 같은 경우에만 작동합니다:
 
@@ -395,12 +365,19 @@ kapt는 기본적으로 증분 어노테이션 처리를 지원합니다.
 kapt.incremental.apt=false
 ```
 
+> 현재 kapt의 증분 어노테이션 처리는 Maven이나 CLI에서는 지원되지 않습니다.
+> 
+{style="note"}
+
 ## 성능 분석
+
+kapt는 어노테이션 처리 성능을 파악하는 데 도움이 되는 내장 진단 기능을 제공합니다. 여기에는 프로세서별 실행 시간 보고서와 사용되지 않는 프로세서를 식별하기 위한 생성된 파일 수 통계가 포함됩니다.
+
+증분 처리 디버깅을 위한 파일 읽기 기록 및 메모리 누수 감지와 같은 더 많은 진단 옵션은 [진단 및 통계 옵션](#diagnostics-and-statistics-options)을 참고하세요.
 
 ### 어노테이션 프로세서 성능 측정
 
-어노테이션 프로세서 실행에 대한 성능 통계를 얻으려면 `-Kapt-show-processor-timings` 플러그인 옵션을 사용하세요.
-출력 예시는 다음과 같습니다:
+어노테이션 프로세서 실행에 대한 성능 통계를 얻으려면 [`showProcessorStats`](#diagnostics-and-statistics-options) 옵션을 사용하세요. 출력 예시는 다음과 같습니다:
 
 ```text
 Kapt Annotation Processing performance report:
@@ -408,47 +385,38 @@ com.example.processor.TestingProcessor: total: 133 ms, init: 36 ms, 2 round(s): 
 com.example.processor.AnotherProcessor: total: 100 ms, init: 6 ms, 1 round(s): 93 ms
 ```
 
-이 보고서를 [`-Kapt-dump-processor-timings` (`org.jetbrains.kotlin.kapt3:dumpProcessorTimings`)](https://github.com/JetBrains/kotlin/pull/4280) 플러그인 옵션을 사용하여 파일로 저장할 수 있습니다. 다음 명령은 kapt를 실행하고 통계를 `ap-perf-report.file` 파일에 저장합니다:
+[`dumpProcessorStats`](#diagnostics-and-statistics-options) 옵션을 사용하여 이 보고서를 파일로 저장할 수 있습니다. 예를 들어, 다음 CLI 명령은 kapt를 실행하고 통계를 `ap-perf-report.file` 파일에 저장합니다:
 
 ```bash
-kotlinc -cp $MY_CLASSPATH \
--Xplugin=kotlin-annotation-processing-SNAPSHOT.jar -P \
-plugin:org.jetbrains.kotlin.kapt3:aptMode=stubsAndApt,\
-plugin:org.jetbrains.kotlin.kapt3:apclasspath=processor/build/libs/processor.jar,\
-plugin:org.jetbrains.kotlin.kapt3:dumpProcessorTimings=ap-perf-report.file \
--Xplugin=$JAVA_HOME/lib/tools.jar \
--d cli-tests/out \
--no-jdk -no-reflect -no-stdlib -verbose \
-sample/src/main/
+kapt -Kapt-mode=stubsAndApt \
+  -Kapt-classpath=processor/build/libs/processor.jar \
+  -Kapt-dump-processor-stats=ap-perf-report.file \
+  sample/src/main/
 ```
 
 ### 생성된 파일 수 추적
 
-`kapt` Gradle 플러그인은 각 어노테이션 프로세서에 대해 생성된 파일 수에 대한 통계를 보고할 수 있습니다.
+kapt 플러그인은 각 어노테이션 프로세서에 대해 생성된 파일 수에 대한 통계를 보고할 수 있습니다.
 
 이를 통해 사용되지 않는 어노테이션 프로세서가 빌드에 포함되어 있는지 추적할 수 있습니다. 생성된 보고서를 사용하여 불필요한 어노테이션 프로세서를 실행하는 모듈을 찾아내고, 이를 방지하도록 모듈을 업데이트할 수 있습니다.
 
 통계 보고를 활성화하려면:
 
-1. `build.gradle(.kts)`에서 `showProcessorStats` 속성 값을 `true`로 설정합니다:
+1. Gradle 빌드 파일에서 `showProcessorStats` 옵션 값을 `true`로 설정합니다:
 
    ```kotlin
-   // build.gradle.kts
+   // build.gradle(.kts)
    kapt {
        showProcessorStats = true
    }
    ```
 
-2. `gradle.properties`에서 `kapt.verbose` Gradle 속성을 `true`로 설정합니다:
+2. `gradle.properties` 파일에서 `verbose` 컴파일러 옵션을 `true`로 설정합니다:
 
-   ```none
+   ```
    # gradle.properties
    kapt.verbose=true
    ```
-
-> [커맨드 라인 옵션 `verbose`](#cli)를 사용하여 상세 출력을 활성화할 수도 있습니다.
->
-{style="note"}
 
 통계는 `info` 레벨의 로그에 나타납니다. `Annotation processor stats:` 라인 다음에 각 어노테이션 프로세서의 실행 시간에 대한 통계가 표시됩니다. 그 후 `Generated files report:` 라인 다음에 각 어노테이션 프로세서가 생성한 파일 수에 대한 통계가 표시됩니다. 예시:
 
@@ -459,59 +427,411 @@ sample/src/main/
 [INFO] org.mapstruct.ap.MappingProcessor: total sources: 2, sources per round: 2, 0, 0
 ```
 
-## Java 컴파일러 옵션
-
-kapt는 Java 컴파일러를 사용하여 어노테이션 프로세서를 실행합니다.
-다음은 javac에 임의의 옵션을 전달하는 방법입니다:
-
-```groovy
-kapt {
-    javacOptions {
-        // 어노테이션 프로세서의 최대 오류 횟수를 늘립니다.
-        // 기본값은 100입니다.
-        option("-Xmaxerrs", 500)
-    }
-}
-```
-
-## 존재하지 않는 타입 보정(Non-existent type correction)
-
-일부 어노테이션 프로세서(`AutoFactory` 등)는 선언 서명(declaration signatures)의 정확한 타입에 의존합니다.
-기본적으로 kapt는 생성된 클래스의 타입을 포함하여 모든 알 수 없는 타입을 `NonExistentClass`로 대체하지만, 이 동작을 변경할 수 있습니다. 스텁(stub)에서 오류 타입 추론을 활성화하려면 `build.gradle(.kts)` 파일에 다음 옵션을 추가하세요:
-
-```groovy
-kapt {
-    correctErrorTypes = true
-}
-```
+> 현재 `showProcessorStats` 및 `verbose` 컴파일러 옵션을 사용한 생성 파일 수 추적은 Maven이나 CLI에서 지원되지 않습니다.
+>
+{style="note"}
 
 ## Kotlin 소스 생성
 
-kapt는 Kotlin 소스를 생성할 수 있습니다. 생성된 Kotlin 소스 파일을 `processingEnv.options["kapt.kotlin.generated"]`에 지정된 디렉토리에 작성하기만 하면, 이 파일들은 메인 소스와 함께 컴파일됩니다.
+kapt는 Kotlin 소스를 생성할 수 있습니다. 생성된 Kotlin 소스 파일을 `processingEnv.options["kapt.kotlin.generated"]`에 지정된 디렉토리에 작성하면, 이 파일들은 메인 소스와 함께 컴파일됩니다.
 
-kapt는 생성된 Kotlin 파일에 대해 다중 라운드(multiple rounds) 처리를 지원하지 않는다는 점에 유의하세요.
+> kapt는 생성된 Kotlin 파일에 대해 다중 라운드(multiple rounds) 처리를 지원하지 않습니다.
+> 
+{style="note"}
 
-## AP/Javac 옵션 인코딩
+## 컴파일러 옵션
 
-`apoptions`와 `javacArguments` CLI 옵션은 인코딩된 옵션 맵을 허용합니다.
-다음은 옵션을 직접 인코딩하는 방법입니다:
+### 어노테이션 프로세서 구성
 
-```kotlin
-fun encodeList(options: Map<String, String>): String {
-    val os = ByteArrayOutputStream()
-    val oos = ObjectOutputStream(os)
+<table>
+    <tr>
+        <td>옵션</td>
+        <td>설명</td>
+        <td>설정 방법</td>
+    </tr>
+    <tr>
+        <td><code>aptMode</code></td>
+        <td>
+            kapt 워크플로 단계의 실행을 제어합니다:
+            <list>
+                <li><code>stubsAndApt</code>: 스텁을 생성하고 어노테이션 처리를 실행합니다 (기본값)</li>
+                <li><code>stubs</code>: Kotlin에서 Java 스텁만 생성합니다</li>
+                <li><code>apt</code>: 어노테이션 프로세서만 실행합니다 (스텁이 이미 존재한다고 가정함)</li>
+            </list>
+        </td>
+        <td>
+            <p><b>Gradle:</b> 직접 사용할 수 없음; Gradle은 스텁 생성과 apt를 별도의 작업으로 실행합니다</p>
+            <p><b>Maven:</b></p>
+                <code-block lang="xml">
+                    <![CDATA[
+<aptMode>stubsAndApt</aptMode>
+                    ]]>
+                </code-block>
+            <p><b>CLI:</b> <code>-Kapt-mode=stubsAndApt</code></p>
+        </td>
+    </tr>
+    <tr>
+        <td><code>classpath</code></td>
+        <td>어노테이션 프로세서가 검색되는 클래스패스 항목입니다.</td>
+        <td>
+            <p><b>Gradle:</b></p>
+                <code-block lang="kotlin">
+                    dependencies {
+                        kapt("com.example:processor:1.0")
+                    }
+                </code-block>
+            <p><b>Maven:</b></p>
+                <code-block lang="xml">
+                    <![CDATA[
+<annotationProcessorPaths>
+    <annotationProcessorPath>...</annotationProcessorPath>
+</annotationProcessorPaths>
+                    ]]>
+                </code-block>
+            <p><b>CLI:</b> <code>-Kapt-classpath=lib/my-processor.jar</code></p>
+        </td>
+    </tr>
+    <tr>
+        <td><code>processors</code></td>
+        <td>검색 과정을 건너뛰고 실행할 프로세서의 정규화된 클래스 이름(쉼표로 구분)입니다.</td>
+        <td>
+            <p><b>Gradle:</b></p>
+                <code-block lang="kotlin">
+                    kapt {
+                        annotationProcessor("com.example.MyProcessor")
+                    }
+                </code-block>
+            <p><b>Maven:</b></p>
+                <code-block lang="xml">
+                    <![CDATA[
+<annotationProcessors>
+    <annotationProcessor>com.example.MyProcessor</annotationProcessor>
+</annotationProcessors>
+                    ]]>
+                </code-block>
+            <p><b>CLI:</b> <code>-Kapt-processors=com.example.MyProcessor</code></p>
+        </td>
+    </tr>
+    <tr>
+        <td><code>apOption</code></td>
+        <td>어노테이션 프로세서에 전달되는 키-값 옵션입니다.</td>
+        <td>
+            <p><b>Gradle:</b></p>
+                <code-block lang="kotlin">
+                    kapt {
+                        arguments {
+                            arg("room.schemaLocation", "$projectDir/schemas")
+                        }
+                    }
+                </code-block>
+            <p><b>Maven:</b></p>
+                <code-block lang="xml">
+                    <![CDATA[
+<annotationProcessorArgs>
+    <annotationProcessorArg>room.schemaLocation=/schemas</annotationProcessorArg>
+</annotationProcessorArgs>
+                    ]]>
+                </code-block>
+            <p><b>CLI:</b> <code>-Kapt-options:room.schemaLocation=/schemas</code></p>
+        </td>
+    </tr>
+    <tr>
+        <td><code>javacOption</code></td>
+        <td>Java 컴파일러에 전달되는 키-값 옵션입니다.</td>
+        <td>
+            <p><b>Gradle:</b></p>
+                <code-block lang="kotlin">
+                    kapt {
+                        javacOptions {
+                            option("-source", "11")
+                        }
+                    }
+                </code-block>
+            <p><b>Maven:</b></p>
+                <code-block lang="xml">
+                    <![CDATA[
+<javacOptions>
+    <javacOption>-source=11</javacOption>
+</javacOptions>
+                    ]]>
+                </code-block>
+            <p><b>CLI:</b> <code>-Kapt-javac-option:-source=11</code></p>
+        </td>
+    </tr>
+    <tr>
+        <td><code>processIncrementally</code></td>
+        <td>증분 어노테이션 처리를 활성화합니다. 변경 사항의 영향을 받는 파일만 다시 처리합니다.</td>
+        <td>
+            <p><b>Gradle:</b></p>
+                <code-block lang="kotlin">
+                    # gradle.properties
+                    kapt.incremental.apt=true
+                </code-block>
+            <p><b>Maven:</b> 현재 지원되지 않음</p>
+            <p><b>CLI:</b> 현재 지원되지 않음</p>
+        </td>
+    </tr>
+</table>
 
-    oos.writeInt(options.size)
-    for ((key, value) in options.entries) {
-        oos.writeUTF(key)
-        oos.writeUTF(value)
-    }
+### 출력 디렉토리 옵션
 
-    oos.flush()
-    return Base64.getEncoder().encodeToString(os.toByteArray())
-}
-```
+<table>
+    <tr>
+        <td>옵션</td>
+        <td>설명</td>
+        <td>설정 방법</td>
+    </tr>
+    <tr>
+        <td><code>sources</code></td>
+        <td>어노테이션 프로세서가 <code>.java</code> 소스 파일을 생성하는 디렉토리입니다.</td>
+        <td>
+            <p><b>Gradle:</b> 자동으로 <code>build/generated/source/kapt/main</code>으로 설정됨</p>
+            <p><b>Maven:</b> 자동으로 <code>target/generated-sources/kapt/</code>로 설정됨</p>
+            <p><b>CLI:</b> <code>-Kapt-sources=build/kapt/sources</code></p>
+        </td>
+    </tr>
+    <tr>
+        <td><code>classes</code></td>
+        <td>생성된 소스에서 컴파일된 <code>.class</code> 파일의 디렉토리입니다.</td>
+        <td>
+            <p><b>Gradle:</b> 자동으로 관리됨</p>
+            <p><b>Maven:</b> 자동으로 관리됨</p>
+            <p><b>CLI:</b> <code>-Kapt-classes=build/kapt/classes</code></p>
+        </td>
+    </tr>
+    <tr>
+        <td><code>stubs</code></td>
+        <td>Kotlin 소스에서 생성된 Java 스텁 파일의 디렉토리로, 어노테이션 프로세서의 입력으로 사용됩니다.</td>
+        <td>
+            <p><b>Gradle:</b> 자동으로 관리됨</p>
+            <p><b>Maven:</b> 자동으로 관리됨</p>
+            <p><b>CLI:</b> <code>-Kapt-stubs=build/kapt/stubs</code></p>
+        </td>
+    </tr>
+    <tr>
+        <td><code>incrementalData</code></td>
+        <td>증분 빌드를 위한 상태를 저장합니다.</td>
+        <td>
+            <p><b>Gradle:</b> 자동으로 관리됨</p>
+            <p><b>Maven:</b> 현재 지원되지 않음</p>
+            <p><b>CLI:</b> 현재 지원되지 않음</p>
+        </td>
+    </tr>
+</table>
+
+### 동작 옵션
+
+<table>
+    <tr>
+        <td>옵션</td>
+        <td>설명</td>
+        <td>설정 방법</td>
+    </tr>
+    <tr>
+        <td><code>correctErrorTypes</code></td>
+        <td>
+            기본적으로 kapt는 생성된 클래스의 타입을 포함하여 모든 알 수 없는 타입을 <code>NonExistentClass</code>로 대체합니다.
+            스텁에서 오류 타입 추론을 활성화하여 해결되지 않은 오류 타입을 생성된 소스의 타입으로 대체할 수 있습니다.
+            <p>기본값: <code>false</code></p>
+        </td>
+        <td>
+            <p><b>Gradle:</b></p>
+                <code-block lang="kotlin">
+                    kapt {
+                        correctErrorTypes = true
+                    }
+                </code-block>
+            <p><b>Maven:</b></p>
+                <code-block lang="xml">
+                    <![CDATA[
+<correctErrorTypes>true</correctErrorTypes>
+                    ]]>
+                </code-block>
+            <p><b>CLI:</b> <code>-Kapt-correct-error-types=true</code></p>
+        </td>
+    </tr>
+    <tr>
+        <td><code>dumpDefaultParameterValues</code></td>
+        <td>
+            생성된 스텁에 필드 값으로 기본 파라미터 초기화 식을 포함합니다.
+            <p>기본값: <code>false</code></p>
+        </td>
+        <td>
+            <p><b>Gradle:</b></p>
+                <code-block lang="kotlin">
+                    kapt {
+                        dumpDefaultParameterValues = true
+                    }
+                </code-block>
+            <p><b>Maven:</b> 사용 불가</p>
+            <p><b>CLI:</b> <code>-Kapt-dump-default-parameter-values=true</code></p>
+        </td>
+    </tr>
+    <tr>
+        <td><code>mapDiagnosticLocations</code></td>
+        <td>
+            스텁 파일의 오류 메시지를 원래의 Kotlin 소스 위치로 매핑합니다.
+            <p>기본값: <code>false</code></p>
+        </td>
+        <td>
+            <p><b>Gradle:</b></p>
+                <code-block lang="kotlin">
+                    kapt {
+                        mapDiagnosticLocations = true
+                    }
+                </code-block>
+            <p><b>Maven:</b></p>
+                <code-block lang="xml">
+                    <![CDATA[
+<mapDiagnosticLocations>true</mapDiagnosticLocations>
+                    ]]>
+                </code-block>
+            <p><b>CLI:</b> <code>-Kapt-map-diagnostic-locations=true</code></p>
+        </td>
+    </tr>
+    <tr>
+        <td><code>strict</code></td>
+        <td>
+            스텁 생성 시 발생하는 비호환성 문제를 경고 대신 오류로 처리합니다.
+            <p>기본값: <code>false</code></p>
+        </td>
+        <td>
+            <p><b>Gradle:</b></p>
+                <code-block lang="kotlin">
+                    kapt {
+                        strictMode = true
+                    }
+                </code-block>
+            <p><b>Maven:</b> 사용 불가</p>
+            <p><b>CLI:</b> <code>-Kapt-strict=true</code></p>
+        </td>
+    </tr>
+    <tr>
+        <td><code>stripMetadata</code></td>
+        <td>
+            생성된 스텁에서 <code>@kotlin.Metadata</code> 어노테이션을 제거하여 스텁 크기를 줄이고 프로세서로부터 Kotlin 전용 정보를 숨깁니다.
+            <p>기본값: <code>false</code></p>
+        </td>
+        <td>
+            <p><b>Gradle:</b></p>
+                <code-block lang="kotlin">
+                    kapt {
+                        stripMetadata = true
+                    }
+                </code-block>
+            <p><b>Maven:</b> 사용 불가</p>
+            <p><b>CLI:</b> <code>-Kapt-strip-metadata=true</code></p>
+        </td>
+    </tr>
+    <tr>
+        <td><code>verbose</code></td>
+        <td>
+            상세한 kapt 로깅을 활성화합니다.
+            <p>기본값: <code>false</code></p>
+        </td>
+        <td>
+            <p><b>Gradle:</b></p>
+                <code-block lang="kotlin">
+                    # gradle.properties
+                    kapt.verbose=true
+                </code-block>
+            <p><b>Maven:</b> 현재 지원되지 않음</p>
+            <p><b>CLI:</b> 현재 지원되지 않음</p>
+        </td>
+    </tr>
+    <tr>
+        <td><code>infoAsWarnings</code></td>
+        <td>
+            kapt의 정보(info) 레벨 메시지를 경고(warning)로 격상합니다.
+            <p>기본값: <code>false</code></p>
+        </td>
+        <td>
+            <p><b>Gradle:</b> 직접 사용할 수 없음</p>
+            <p><b>Maven:</b> 현재 지원되지 않음</p>
+            <p><b>CLI:</b> 현재 지원되지 않음</p>
+        </td>
+    </tr>
+    <tr>
+        <td><code>includeCompileClasspath</code></td>
+        <td>
+            어노테이션 프로세서를 찾기 위해 컴파일 클래스패스를 스캔합니다. 재현성을 위해 <code>false</code>로 설정하는 것이 좋습니다.
+            <p>기본값: <code>true</code></p>
+        </td>
+        <td>
+            <p><b>Gradle:</b></p>
+                <code-block lang="kotlin">
+                    kapt {
+                        includeCompileClasspath = false
+                    }
+                </code-block>
+            <p><b>Maven:</b></p>
+                <code-block lang="xml">
+                    <![CDATA[
+<includeCompileClasspath>false</includeCompileClasspath>
+                    ]]>
+                </code-block>
+            <p><b>CLI:</b> 현재 지원되지 않음</p>
+        </td>
+    </tr>
+</table>
+
+### 진단 및 통계 옵션
+
+<table>
+    <tr>
+        <td>옵션</td>
+        <td>설명</td>
+        <td>설정 방법</td>
+    </tr>
+    <tr>
+        <td><code>showProcessorStats</code></td>
+        <td>프로세서별 실행 시간을 표준 출력(stdout)에 출력합니다.</td>
+        <td>
+            <p><b>Gradle:</b></p>
+                <code-block lang="kotlin">
+                    kapt {
+                        showProcessorStats = true
+                    }
+                </code-block>
+            <p><b>Maven:</b> 사용 불가</p>
+            <p><b>CLI:</b> <code>-Kapt-show-processor-stats=true</code></p>
+        </td>
+    </tr>
+    <tr>
+        <td><code>dumpProcessorStats</code></td>
+        <td>프로세서 타이밍 통계를 파일에 기록합니다.</td>
+        <td>
+            <p><b>Gradle:</b> 사용 불가</p>
+            <p><b>Maven:</b> 사용 불가</p>
+            <p><b>CLI:</b> <code>-Kapt-dump-processor-stats=build/kapt-stats.txt</code></p>
+        </td>
+    </tr>
+    <tr>
+        <td><code>dumpFileReadHistory</code></td>
+        <td>프로세서가 읽은 파일 목록을 파일에 기록합니다. 증분 어노테이션 프로세서 디버깅에 유용합니다.</td>
+        <td>
+            <p><b>Gradle:</b> 사용 불가</p>
+            <p><b>Maven:</b> 사용 불가</p>
+            <p><b>CLI:</b> <code>-Kapt-dump-file-read-history=build/kapt-reads.txt</code></p>
+        </td>
+    </tr>
+    <tr>
+        <td><code>detectMemoryLeaks</code></td>
+        <td>메모리 누수 감지 모드: <code>none</code>, <code>default</code>, 또는 <code>paranoid</code>.</td>
+        <td>
+            <p><b>Gradle:</b></p>
+                <code-block lang="kotlin">
+                    kapt {
+                        detectMemoryLeaks = "paranoid"
+                    }
+                </code-block>
+            <p><b>Maven:</b> 현재 지원되지 않음</p>
+            <p><b>CLI:</b> 현재 지원되지 않음</p>
+        </td>
+    </tr>
+</table>
 
 ## 다음 단계
 
+* [MapStruct 어노테이션 프로세서와 함께 kapt 사용하기](jvm-annotation-processors.md#use-kapt-with-java-annotation-processors)
 * [kapt에서 KSP로 마이그레이션하는 방법 보기](ksp-kapt-migration.md)

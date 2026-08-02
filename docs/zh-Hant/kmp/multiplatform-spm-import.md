@@ -210,7 +210,7 @@ import swiftPMImport.groupName.subproject.FIRApp
 ```kotlin
 kotlin {
     swiftDependencies {
-        // 當未為 `packageResolvedSynchronization` 設定值時，
+        // 當未為 `packageResolvedSynchronization` 設定值時， 
         // 該子專案會被分配一個預設群組識別碼，
         // 就像這樣設定一樣： 
         // packageResolvedSynchronization = identifier("default")
@@ -218,9 +218,9 @@ kotlin {
 }
 ```
 
-To customize the merge behavior, assign a non-default group identifier to each subproject.
-In the following example, subprojects `one` and `two` use the same `custom` set of package versions,
-while the subproject `three` uses the default set:
+要自訂合併行為，請為每個子專案分配一個非預設的群組識別碼。
+在以下範例中，子專案 `one` 和 `two` 使用相同的 `custom` 軟件包 版本集，
+而子專案 `three` 則使用預設集合：
 
 <Tabs>
 <TabItem title="子專案 &quot;one&quot;">

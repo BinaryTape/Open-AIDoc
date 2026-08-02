@@ -20,7 +20,7 @@
 
 如果您使用 [Kotlin Multiplatform IDE 外掛程式](https://plugins.jetbrains.com/plugin/14936-kotlin-multiplatform)，則預設會套用直接整合。
 
-若要了解更多，請參閱 [直接整合](multiplatform-direct-integration.md)。
+若要了解更多資訊，請參閱 [直接整合](multiplatform-direct-integration.md)。
 
 ### 搭配本機套件的 SwiftPM 整合
 
@@ -28,7 +28,7 @@
 
 如果符合以下情況，則此整合方法適用於您：
 
-* 您使用了包含 Swift 套件的 iOS 專案的 Monorepo 設定。
+* 您使用了包含使用 Swift 套件的 iOS 專案的 Monorepo 設定。
 * 您在 Kotlin Multiplatform 專案中沒有不可替代的 CocoaPods 相依性。
 
 若要了解如何將本機 Swift 套件相依性新增至您的專案，請參閱 [將 Swift 套件新增為相依性](multiplatform-spm-import.md#importing-local-swift-packages)。
@@ -39,7 +39,7 @@
 
 如果符合以下情況，則此整合方法適用於您：
 
-* 您使用了包含 CocoaPods 的 iOS 專案的 Monorepo 設定。
+* 您使用了包含使用 CocoaPods 的 iOS 專案的 Monorepo 設定。
 * 您在 Kotlin Multiplatform 專案中匯入了 CocoaPods 相依性。
 
 若要了解如何透過本機 CocoaPods 相依性設定工作流程，請參閱 [CocoaPods 總覽與設定](multiplatform-cocoapods-overview.md)。
@@ -58,4 +58,4 @@
 
 您可以使用 Kotlin CocoaPods Gradle 外掛程式組建 XCFrameworks，然後透過 CocoaPods 將專案的共享部分與行動應用程式分開分發。
 
-若要了解更多，請參閱 [組建最終原生二進位檔案](multiplatform-build-native-binaries.md#build-xcframeworks)。
+若要了解更多資訊，請參閱 [組建最終原生二進位檔案](multiplatform-build-native-binaries.md#build-xcframeworks)。

@@ -90,10 +90,6 @@ Kotlin 2.2.0 和 2.3.0 引入了一些作为 [Experimental](components-stability
 
 <secondary-label ref="language"/>
 
-> 在 IntelliJ IDEA 中使用上下文参数的显式上下文实参的功能将在 2026.2 版本中提供。
-> 
-{style="note"}
-
 Kotlin 2.4.0 为 [上下文参数](context-parameters.md) 引入了显式上下文实参。
 
 Kotlin 2.3.20 [更改了上下文参数的重载解析方式](whatsnew2320.md#changes-to-overload-resolution-for-context-parameters)。因此，仅因上下文参数而不同的重载调用可能会变得模棱两可。
@@ -449,7 +445,7 @@ Kotlin 2.0.20 引入了一个 [用于生成 UUID 的类](whatsnew2020.md#support
 * [从十六进制加连字符格式和纯文本格式解析 UUID](uuids.md#parse-uuids)
 * [在解析无效 UUID 时返回 `null`](whatsnew23.md#support-for-returning-null-when-parsing-invalid-uuids)。
 
-在 Kotlin 2.4.0 中，[`kotlin.uuid.Uuid` API](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.uuid/-uuid/) 变为 [Stable](components-stability.md#stability-levels-explained)。唯一的例外是 [用于生成 V4 和 V7 UUID 的函数](whatsnew23.md#support-for-generating-v7-uuids-for-specific-timestamps)，它们仍保持 [Experimental](components-stability.md#stability-levels-explained) 状态，仍需手动启用。
+在 Kotlin 2.4.0 中，[`kotlin.uuid.Uuid` API](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.uuid/-uuid/) 变为 [Stable](components-stability.md#stability-levels-explained)（稳定版）。唯一的例外是 [用于生成 V4 和 V7 UUID 的函数](whatsnew23.md#support-for-generating-v7-uuids-for-specific-timestamps)，它们仍保持 [Experimental](components-stability.md#stability-levels-explained)（实验性）状态，仍需手动启用。
 
 有关如何使用 UUID 的更多信息，请参阅 [UUID](uuids.md)。
 
@@ -759,7 +755,7 @@ Kotlin 2.4.0 默认启用 Kotlin/Wasm 的增量编译，并引入了对 WebAssem
 ### 默认启用增量编译
 <secondary-label ref="wasm"/>
 
-Kotlin/Wasm 在 Kotlin 2.1.0 中引入了增量编译。从 Kotlin 2.4.0 开始，它已达到 [Stable](components-stability.md#stability-levels-explained) 状态并默认启用。通过此功能，编译器仅重新构建受最近更改影响的文件，从而显著缩短构建时间。
+Kotlin/Wasm 在 Kotlin 2.1.0 中引入了增量编译。从 Kotlin 2.4.0 开始，它已达到 [Stable](components-stability.md#stability-levels-explained)（稳定版）状态并默认启用。通过此功能，编译器仅重新构建受最近更改影响的文件，从而显著缩短构建时间。
 
 要禁用增量编译，请在项目的 `local.properties` 或 `gradle.properties` 文件中添加以下行：
 
@@ -792,7 +788,7 @@ Kotlin/Wasm 在 Kotlin 2.4.0 中更进一步，引入了对 [WebAssembly 组件�
 
 ## Kotlin/JS
 
-Kotlin 2.4.0 进一步改进了向 JavaScript/TypeScript 的导出，包括支持导出值类、接口和类型差异（variance），以及内联 JS 代码时的 ES2015 功能。
+Kotlin 2.4.0 进一步改进了向 JavaScript/TypeScript 的导出，包括支持导出值类、接口和类型差异 (variance)，以及内联 JS 代码时的 ES2015 功能。
 
 ### 支持将值类导出到 JavaScript/TypeScript
 <secondary-label ref="js"/>
@@ -841,9 +837,9 @@ console.log(await auth.login(new Email("not-an-email")));
 
 * `const` 和 `let` 变量声明
 * ES 类
-* 生成器（Generators）
+* 生成器 (Generators)
 * Lambda（[箭头函数](whatsnew21.md#support-for-generating-es2015-arrow-functions)）
-* 展开（Spread）和剩余（Rest）运算符
+* 展开 (Spread) 和剩余 (Rest) 运算符
 * 模板字符串
 
 请记住，`js()` 函数的参数应该是一个字符串常量，因为它是在编译时解析并按原样转换为 JavaScript 代码的。例如，要内联展开运算符，请使用：
@@ -941,7 +937,7 @@ export interface DataProcessor {
 
 * `is` 和 `as` 类型检查。
 * 使用 [`::class` 语法](js-reflection.md) 的类引用。
-* 将接口作为具体化（reified）类型参数传递。
+* 将接口作为具体化 (reified) 类型参数传递。
 
 > 避免对外部接口使用 `@JsNoRuntime` 注解，因为这会导致编译器警告。
 >
@@ -1104,6 +1100,7 @@ Kotlin 2.4.0 为 Kotlin Maven 插件引入了对 [Maven Toolchains](https://mave
 有关配置 Kotlin Maven 项目的更多信息，请参阅我们的 [文档](maven-configure-project.md)。
 
 ## 构建工具 API
+<secondary-label ref="bta"/>
 
 Kotlin 2.4.0 对构建工具 API (BTA) 进行了多项改进。BTA：
 
@@ -1118,7 +1115,7 @@ Kotlin 2.4.0 对构建工具 API (BTA) 进行了多项改进。BTA：
 
   默认情况下，限制设置为特定于 Kotlin 编译器版本的值。若要不设限制，构建工具必须将选项设置为 `null`。
 
-  构建系统可以在配置执行策略时设置该选项：
+  构建系统可以在配置[执行策略](https://github.com/JetBrains/kotlin/blob/2.4.0/compiler/build-tools/kotlin-build-tools-api/src/main/kotlin/org/jetbrains/kotlin/buildtools/api/ExecutionPolicy.kt)时设置该选项：
 
   ```kotlin
   val executionPolicy = kotlinToolchains.daemonExecutionPolicy {

@@ -874,8 +874,8 @@ DSL에 표현되지 않은 `Info.plist` 값을 지정해야 하는 경우, 해�
 
 1. `build.gradle.kts` 파일에 커스텀 URL 스킴을 정의합니다:
 
-  ``` kotlin
-  compose.desktop {
+    ``` kotlin
+    compose.desktop {
       application {
           mainClass = "MainKt"
           nativeDistributions {
@@ -889,9 +889,9 @@ DSL에 표현되지 않은 `Info.plist` 값을 지정해야 하는 경우, 해�
               }
           }
       }
-  }
-  
-  val macExtraPlistKeys: String
+    }
+    
+    val macExtraPlistKeys: String
       get() = """
         <key>CFBundleURLTypes</key>
         <array>
@@ -905,23 +905,23 @@ DSL에 표현되지 않은 `Info.plist` 값을 지정해야 하는 경우, 해�
           </dict>
         </array>
       """
-  ```
-  {initial-collapse-state="collapsed" collapsible="true" collapsed-title="infoPlist { extraKeysRawXml = macExtraPlistKeys"}
+    ```
+    {initial-collapse-state="collapsed" collapsible="true" collapsed-title="infoPlist { extraKeysRawXml = macExtraPlistKeys"}
 
 2. `src/main/main.kt` 파일에서 `java.awt.Desktop` 클래스를 사용하여 URI 핸들러를 설정합니다:
 
-  ``` kotlin 
-  import androidx.compose.material.MaterialTheme
-  import androidx.compose.material.Text
-  import androidx.compose.runtime.getValue
-  import androidx.compose.runtime.mutableStateOf
-  import androidx.compose.runtime.setValue
-  import androidx.compose.ui.window.singleWindowApplication
-  import java.awt.Desktop
-  
-  fun main() {
+    ``` kotlin 
+    import androidx.compose.material.MaterialTheme
+    import androidx.compose.material.Text
+    import androidx.compose.runtime.getValue
+    import androidx.compose.runtime.mutableStateOf
+    import androidx.compose.runtime.setValue
+    import androidx.compose.ui.window.singleWindowApplication
+    import java.awt.Desktop
+    
+    fun main() {
       var text by mutableStateOf("Hello, World!")
-  
+    
       try {
           Desktop.getDesktop().setOpenURIHandler { event ->
               text = "Open URI: " + event.uri
@@ -929,15 +929,15 @@ DSL에 표현되지 않은 `Info.plist` 값을 지정해야 하는 경우, 해�
       } catch (e: UnsupportedOperationException) {
           println("setOpenURIHandler is unsupported")
       }
-  
+    
       singleWindowApplication {
           MaterialTheme {
               Text(text)
           }
       }
-  }
-  ```
-  {initial-collapse-state="collapsed" collapsible="true" collapsed-title="Desktop.getDesktop().setOpenURIHandler { event ->"}
+    }
+    ```
+    {initial-collapse-state="collapsed" collapsible="true" collapsed-title="Desktop.getDesktop().setOpenURIHandler { event ->"}
 
 3. `runDistributable` 태스크를 실행합니다: `./gradlew runDistributable`.
 

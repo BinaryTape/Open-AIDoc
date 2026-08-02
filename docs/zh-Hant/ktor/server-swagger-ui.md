@@ -13,7 +13,7 @@
 <var name="example_name" value="json-kotlinx-openapi"/>
 <p>
     <b>程式碼範例</b>：
-    <a href="https://github.com/ktorio/ktor-documentation/tree/%ktor_version%/codeSnippets/snippets/%example_name%">
+    <a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/%example_name%">
         %example_name%
     </a>
 </p>
@@ -27,7 +27,7 @@ SwaggerUI 外掛程式可讓您為專案產生 Swagger UI。
 </link-summary>
 
 Ktor 讓您能根據 OpenAPI 規格為專案產生並提供 Swagger UI。
-透過 Swagger UI，您可以直接從瀏覽器中將您的 API 端點可視化並進行互動。
+透過 Swagger UI，您可以直接從瀏覽器中將您的 API 端點可視化並進行互動。 
 
 您可以透過以下任一方式提供 OpenAPI 規格：
 
@@ -94,15 +94,19 @@ swaggerUI("/swaggerUI") {
 
 ## 配置 Swagger UI
 
-您可以在 `swaggerUI {}` 區塊內自訂 Swagger UI，例如指定自訂的 Swagger UI 版本：
+您可以在 `swaggerUI {}` 區塊內自訂 Swagger UI，例如覆寫預設的 Swagger UI 版本：
 
 ```kotlin
 routing {
     swaggerUI(path = "swagger", swaggerFile = "openapi/documentation.yaml") {
-        version = "4.15.5"
+        version = "5.31.0"
     }
 }
 ```
+
+> OpenAPI 3.1.x 文件需要 Swagger UI 5.x，而 Swagger UI 4.x 僅支援 OpenAPI 3.0.x。
+>
+{style="note"}
 
 ## 配置 CORS {id="configure-cors"}
 

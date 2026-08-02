@@ -102,6 +102,15 @@ Kotlin/Native 컴파일러는 Kotlin 2.0.20부터 비트코드 임베딩을 지�
 
 이전 버전의 Xcode를 사용 중이지만 Kotlin 2.0.20 이상 버전으로 업그레이드하려는 경우, Xcode 프로젝트에서 비트코드 임베딩을 비활성화하십시오.
 
+## iOS에서 더 나은 크래시 리포트(crash report)를 받으려면 어떻게 해야 하나요?
+
+처리되지 않은(unhandled) Kotlin 예외가 iOS 코드에 도달하면, 크래시 리포팅 도구는 예외가 발생한 실제 코드 줄 대신 Kotlin/Native 내부 문제임을 나타내는 모호한 리포트를 표시할 수 있습니다. 이는 크래시가 기록될 시점에 원래의 Kotlin 스택 트레이스(stack trace)가 유실되기 때문에 발생합니다.
+
+[NSExceptionKt](https://github.com/rickclephas/NSExceptionKt)와 같은 서드파티 솔루션을 사용하여 이 문제를 해결할 수 있습니다. 이 솔루션은 잡히지 않은(uncaught) Kotlin 예외를 `NSException` 인스턴스로 변환하여 크래시 리포팅 도구가 정확한 스택 트레이스를 캡처할 수 있도록 합니다. 다음과 같은 인기 있는 크래시 리포팅 도구에 대해 전용 통합 기능을 제공합니다:
+
+* [Bugsnag](https://github.com/rickclephas/NSExceptionKt/blob/master/NSExceptionKtBugsnag/README.md)
+* [Firebase Crashlytics](https://github.com/rickclephas/NSExceptionKt/blob/master/NSExceptionKtCrashlytics/README.md)
+
 ## 서로 다른 코루틴에서 객체를 안전하게 참조하려면 어떻게 해야 하나요?
 
 Kotlin/Native의 여러 코루틴에서 객체에 안전하게 접근하거나 업데이트하려면 `@Volatile` 및 `AtomicReference`와 같은 동시성 안전 구성 요소(concurrency-safe constructs)를 사용하는 것이 좋습니다.

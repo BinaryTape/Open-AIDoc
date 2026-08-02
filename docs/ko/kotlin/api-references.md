@@ -2,6 +2,7 @@
        xsi:noNamespaceSchemaLocation="https://resources.jetbrains.com/writerside/1.0/topic.v2.xsd"
        id="api-references" title="API 레퍼런스">
     <p>Kotlin API 레퍼런스 페이지에 오신 것을 환영합니다. 여기에서 공식 Kotlin 라이브러리 및 도구에 대한 API 문서 링크를 확인할 수 있습니다.</p>
+    <tip>Kotlin 멀티플랫폼 라이브러리를 찾고 계신다면, <a href="https://klibs.io"><b>klibs.io</b></a>에서 찾아보세요.</tip>
     <list columns="2">
         <li>
             <a href="https://kotlinlang.org/api/core/kotlin-stdlib/"><b>표준 라이브러리 (stdlib)</b></a>

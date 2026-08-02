@@ -13,7 +13,7 @@
 <var name="example_name" value="json-kotlinx-openapi"/>
 <p>
     <b>コード例</b>:
-    <a href="https://github.com/ktorio/ktor-documentation/tree/%ktor_version%/codeSnippets/snippets/%example_name%">
+    <a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/%example_name%">
         %example_name%
     </a>
 </p>
@@ -117,6 +117,10 @@ routing {
 ## OpenAPIの設定 {id="configure-openapi"}
 
 デフォルトでは、ドキュメントは `StaticHtml2Codegen` を使用してレンダリングされます。`openAPI {}` ブロック内でレンダラーをカスタマイズできます。
+
+> `StaticHtmlCodegen` および `StaticHtml2Codegen` は OpenAPI 3.0.x ドキュメントのみをサポートしています。これらを OpenAPI 3.1 ドキュメントで使用すると、不完全または不正確な HTML が生成される可能性があります。OpenAPI 3.1 の場合は、Swagger UI 5.x を備えた [`swaggerUI()`](server-swagger-ui.md) 関数を使用してください。OpenAPI プラグインの HTML レンダラーを引き続き使用する必要がある場合は、仕様を OpenAPI 3.0.3 のままにしてください。
+>
+{style="note"}
 
 ```kotlin
 routing {

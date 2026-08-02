@@ -639,7 +639,7 @@ Foo.bar()
 
 此更改简化了 JS 中的 API 使用，允许在接口上使用静态工厂方法，并消除了类和接口之间的不一致性。
 
-此功能默认启用集。
+此功能默认启用。
 
 ### 允许在单个函数和类中使用 `@JsQualifier` 注解
 
@@ -865,7 +865,7 @@ fun main() {
 
 从 Kotlin 2.3.0 开始，当应用程序由 R8 混淆时，编译器会为 Compose 堆栈跟踪输出 ProGuard 映射。这扩展了以前仅在可调试变体中可用的实验性堆栈跟踪功能。
 
-发布变体的堆栈跟踪包含组密钥（group keys），这些密钥可用于在混淆后的应用中识别组合函数，而无需在运行时记录源信息的开销。组密钥堆栈跟踪要求您的应用使用 Compose runtime 1.10 或更新版本构建。
+发布变体的堆栈跟踪包含组密钥 (group keys)，这些密钥可用于在混淆后的应用中识别组合函数，而无需在运行时记录源信息的开销。组密钥堆栈跟踪要求您的应用使用 Compose runtime 1.10 或更新版本构建。
 
 要启用组密钥堆栈跟踪，请在初始化任何 `@Composable` 内容之前添加以下行：
 
@@ -918,7 +918,7 @@ composeCompiler {
 
 * 如果您继续在 Android Gradle 插件 (AGP) 9.0.0 或更高版本中为 Android 目标使用 Kotlin 多平台 Gradle 插件，您将在使用 `androidTarget` 块时看到配置错误，以及提供迁移指导的诊断消息。您可以通过使用 AGP 8.x 并更新到 Kotlin 2.3.10，或迁移到 [Google 针对 Android 目标的插件](https://kotlinlang.org/docs/multiplatform/multiplatform-compatibility-guide.html#migrate-to-google-s-plugin-for-android-targets)来避免此错误。
 
-* AGP 9.0.0 包含了[对 Kotlin 的内置支持](https://developer.apple.com/build/releases/agp-preview#android-gradle-plugin-built-in-kotlin)。从 Kotlin 2.3.0 开始，[如果您将此版本的 AGP 与 `kotlin-android` 插件一起使用，您将看到配置错误](compatibility-guide-23.md#deprecate-kotlin-android-plugin-for-agp-versions-9-0-0-and-later)，因为该插件不再是必需的。提供了新的诊断消息来帮助您迁移。如果您使用旧版本的 AGP，您将看到弃用警告。
+* AGP 9.0.0 包含了[对 Kotlin 的内置支持](https://developer.android.com/build/releases/agp-preview#android-gradle-plugin-built-in-kotlin)。从 Kotlin 2.3.0 开始，[如果您将此版本的 AGP 与 `kotlin-android` 插件一起使用，您将看到配置错误](compatibility-guide-23.md#deprecate-kotlin-android-plugin-for-agp-versions-9-0-0-and-later)，因为该插件不再是必需的。提供了新的诊断消息来帮助您迁移。如果您使用旧版本的 AGP，您将看到弃用警告。
 
 * 不再支持 Ant 构建系统。
 
@@ -935,7 +935,7 @@ Kotlin 多平台文档已移动到 kotlinlang.org。现在您可以在一处切�
 * [类](classes.md) – 了解在 Kotlin 中使用类的基础知识和最佳实践。
 * [扩展](extensions.md) – 了解如何在 Kotlin 中扩展类和接口。
 * [协程基础知识](coroutines-basics.md) – 探索关键的协程概念并学习如何创建您的第一个协程。
-* [取消与超时](cancellation-and-timeouts.md) – 了解协程取消的工作原理以及如何使协程响应取消。
+* [取消与超时](coroutines-cancellation.md) – 了解协程取消的工作原理以及如何使协程响应取消。
 * [Kotlin/Native 库](native-libraries.md) – 了解如何生成 `klib` 库工件。
 * [Kotlin Notebook 概览](kotlin-notebook-overview.md) – 使用 Kotlin Notebook 插件创建交互式笔记本。
 * [将 Kotlin 添加到 Java 项目中](mixing-java-kotlin-intellij.md) – 配置 Java 项目以同时使用 Kotlin 和 Java。

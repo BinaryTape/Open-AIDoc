@@ -9,6 +9,7 @@
 * [iOS 프레임 레이트 설정](#frame-rate-configuration)
 * [웹용 Compose Multiplatform 베타 출시](#compose-multiplatform-for-web-in-beta)
 * [웹 타겟의 접근성 지원](#accessibility-support)
+* [Kotlin/JS에서 더 이상 필요하지 않은 skiko.js](#skiko-js-is-no-longer-needed)
 * [HTML 콘텐츠 임베딩을 위한 새로운 API](#new-api-for-embedding-html-content)
 
 이 버전에 대한 전체 변경 사항 목록은 [GitHub](https://github.com/JetBrains/compose-multiplatform/releases/tag/v1.9.0)에서 확인할 수 있습니다.
@@ -200,6 +201,12 @@ ComposeViewport(
     Text("Hello, Compose Multiplatform for web")
 }
 ```
+
+### skiko.js가 더 이상 필요하지 않음
+
+Compose Multiplatform 1.7.0부터 `skiko.js`는 Kotlin/Wasm 애플리케이션에서 불필요하게 되었습니다. 이번 출시부터는 Kotlin/JS도 마찬가지입니다. Skiko의 웹 런타임은 이제 ES 모듈로 제공되며 앱의 컴파일된 JavaScript에 직접 포함되므로, 두 웹 타겟 모두에서 별도의 `skiko.js` 스크립트가 더 이상 필요하지 않습니다.
+
+`index.html` 파일에서 `<script src="skiko.js">` 태그를 제거할 수 있습니다.
 
 ### HTML 콘텐츠 임베딩을 위한 새로운 API
 

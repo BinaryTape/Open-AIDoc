@@ -1279,8 +1279,8 @@
             "link": "ksp-multiplatform"
           },
           {
-            "text": "kotlin.running-ksp-from-the-command-line",
-            "href": "https://github.com/google/ksp/blob/main/docs/ksp2cmdline.md"
+            "text": "kotlin.ksp-command-line",
+            "link": "ksp-command-line"
           },
           {
             "text": "kotlin.ksp-faq",

@@ -153,6 +153,120 @@ mvn test
 mvn verify
 ```
 
+## 获取详细的失败消息
+
+Kotlin [Power-assert 编译器插件](power-assert.md)生成详细的失败消息，显示断言中的中间值，在控制台输出中为您提供完整的图表。
+
+1. 要启用 Power-assert，请将以下配置添加到项目的 `pom.xml` 中：
+
+    ```xml
+    <properties>
+        <kotlin.version>%kotlinVersion%</kotlin.version>
+        <kotlin.compiler.jdkRelease>17</kotlin.compiler.jdkRelease>
+    </properties>
+    
+    <dependencies>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-test-junit5</artifactId>
+            <version>${kotlin.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-maven-plugin</artifactId>
+                <version>${kotlin.version}</version>
+                <extensions>true</extensions>
+                <executions>
+                    <execution>
+                        <id>compile</id>
+                        <phase>process-sources</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>test-compile</id>
+                        <phase>process-test-sources</phase>
+                        <goals>
+                            <goal>test-compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <!-- 指定 Power-assert 插件 -->
+                    <compilerPlugins>
+                        <plugin>power-assert</plugin>
+                    </compilerPlugins>
+                    <!-- 指定要转换的函数 -->
+                    <pluginOptions>
+                        <option>power-assert:function=kotlin.test.assertEquals</option>
+                        <option>power-assert:function=kotlin.test.assertTrue</option>
+                    </pluginOptions>
+                </configuration>
+                <!-- 添加 Power-assert 插件依赖项 -->
+                <dependencies>
+                    <dependency>
+                        <groupId>org.jetbrains.kotlin</groupId>
+                        <artifactId>kotlin-maven-power-assert</artifactId>
+                        <version>${kotlin.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+        </plugins>
+    </build>
+    ```
+    {initial-collapse-state="collapsed" collapsible="true" ignore-vars="false" collapsed-title="kotlin-maven-power-assert 配置"}
+    
+    * 在 `<properties>` 部分，设置 Kotlin 版本和目标 JDK 发行版本，例如 JDK 17。
+    * 在 `<dependencies>` 部分，添加 `kotlin-test-junit5` 用于运行测试。
+    * 在 `<build><plugins>` 部分，使用 `power-assert` 编译器插件配置 `kotlin-maven-plugin`。 
+      在 `<pluginOptions>` 下列出您想要转换的断言函数，并添加 Power-assert 插件依赖项。
+
+2. 在 `src/test/kotlin` 目录中创建一个测试文件 `UserProfileBackendTest.kt`：
+
+    ```kotlin
+    import kotlin.test.Test
+    import kotlin.test.assertEquals
+    
+    class UserProfileBackendTest {
+    
+        data class UserProfile(val id: Long, val email: String)
+    
+        @Test
+        fun `verify backend entity mapping matches`() {
+            // 定义预期的对象状态
+            val expectedRecord = UserProfile(id = 451L, email = "admin-dev@company.internal")
+    
+            // 模拟不匹配的后端响应 
+            val actualRecord = UserProfile(id = 451L, email = "admin-prod@company.com")
+    
+            // 使用标准的 kotlin.test 断言
+            assertEquals(expectedRecord, actualRecord, "Profile configurations out of sync")
+        }
+    }
+    ```
+
+3. 运行测试并验证输出：
+
+    ```bash
+    mvn test
+    ```
+
+控制台会显示完整的 Power-assert 图表，显示表达式中每个位置的预期值与实际值之间的差异：
+
+```text
+Profile configurations out of sync
+assertEquals(expectedRecord, actualRecord, "Profile configurations out of sync")
+             |               |
+             |               UserProfile(id=451, email=admin-prod@company.com)
+             UserProfile(id=451, email=admin-dev@company.internal)
+```
+
 ## 探索其他测试框架
 
 除 JUnit 外，您还可以使用其他流行框架使 Kotlin 测试更加惯用且易读：
@@ -168,4 +282,4 @@ mvn verify
 ## 后续步骤
 
 * 探索 [`kotlin.test` 库](https://kotlinlang.org/api/latest/kotlin.test/kotlin.test/)的功能。
-* 使用 [Kotlin 的 Power-assert 编译器插件](power-assert.md)改进您的测试输出。
+* 详细了解 [Power-assert 编译器插件](power-assert.md)。

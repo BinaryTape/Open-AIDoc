@@ -81,7 +81,7 @@ Kotlin Multiplatform을 사용하면 개발자는 더 이상 네이티브 개발
 
 Kotlin Multiplatform 이전에는 개발자가 모든 것을 네이티브로 작성해야 했습니다.
 
-![Kotlin Multiplatform 이전: 모든 코드를 네이티브로 작성](before-kotlin-multiplatform.svg){width=700}
+![Kotlin Multiplatform 이전: 모든 코드를 네이티브로 작성](kmp-before-new.svg){width=700}
 
 Kotlin Multiplatform을 사용하면 프로젝트에 적합한 코드 공유 수준을 선택할 수 있습니다.
 
@@ -91,7 +91,7 @@ Kotlin Multiplatform을 사용하면 프로젝트에 적합한 코드 공유 수
 
 3) [로직의 일부만 공유](multiplatform-ktor-sqldelight.md): 유효성 검사, 도메인 계산 또는 인증 흐름과 같이 특정 로직 하위 집합을 공유함으로써 Kotlin Multiplatform을 점진적으로 도입할 수 있습니다. 이 옵션은 큰 아키텍처 변경 없이 플랫폼 간 일관성과 안정성을 개선하고 싶을 때 유용합니다.
 
-![Kotlin Multiplatform 및 Compose Multiplatform 사용 시: 개발자는 비즈니스 로직, 프레젠테이션 로직 또는 UI 로직까지 공유할 수 있습니다](with-compose-multiplatform.svg){width=700}
+![Kotlin Multiplatform 및 Compose Multiplatform 사용 시: 개발자는 비즈니스 로직, 프레젠테리지 로직 또는 UI 로직까지 공유할 수 있습니다](kmp-after-new.svg){width=700}
 
 이제 플랫폼 전용 코드를 제외하고 거의 모든 것을 공유할 수 있습니다.
 
@@ -122,7 +122,7 @@ Android, iOS, 데스크톱 및 웹에서 실행되며 지도 및 카메라와 �
 상수와 같은 간단한 요소부터 시작하여 이메일 유효성 검사와 같은 공통 유틸리티를 점진적으로 마이그레이션하며 시작할 수 있습니다. 또한 트랜잭션 프로세스나 사용자 인증과 같은 비즈니스 로직을 작성하거나 마이그레이션할 수도 있습니다.
 
 > Google 팀과 협력하여 Jetcaster를 예로 들어 실용적인 마이그레이션 가이드를 만들었습니다. 각 커밋이 작동하는 상태를 나타내는 레포지토리가 포함되어 있습니다.
-> [Android에서 Kotlin Multiplatform으로 점진적으로 이동하는 방법 확인하기](migrate-from-android.md).
+> [Android에서 Kotlin Multiplatform으로 점진적으로 이동하는 방법 확인하기](migrate-android.md).
 {style="note"}
 
 ### 8. Kotlin Multiplatform은 이미 글로벌 기업에서 사용되고 있습니다
@@ -169,7 +169,7 @@ Kotlin Multiplatform이 적합한 선택이 될 수 있는 주요 이유는 다�
 * **훌륭한 도구 지원, 쉬운 사용성**. Kotlin Multiplatform은 Kotlin을 기반으로 하여 개발자에게 훌륭한 도구와 사용 편의성을 제공합니다.
 * **네이티브 프로그래밍**. 네이티브 방식으로 작성하기 쉽습니다. [expected 및 actual 선언](multiplatform-expect-actual.md) 덕분에 멀티플랫폼 앱이 플랫폼별 API에 액세스하도록 할 수 있습니다.
 * **우수한 크로스 플랫폼 성능**. Kotlin으로 작성된 공유 코드는 각 타겟에 맞는 출력 형식(Android용 Java 바이트코드 및 iOS용 네이티브 바이너리)으로 컴파일되어 모든 플랫폼에서 우수한 성능을 보장합니다.
-* **AI 기반 코드 생성**. 공유 코드과 플랫폼 전용 코드 전반에서 효율적인 워크플로우를 지원하는 JetBrains의 코딩 에이전트인 [Junie](https://www.jetbrains.com/junie/)를 통해 멀티플랫폼 개발 속도를 높일 수 있습니다.
+* **AI 기반 코드 생성**. 공유 코드와 플랫폼 전용 코드 전반에서 효율적인 워크플로우를 지원하는 JetBrains의 코딩 에이전트인 [Junie](https://www.jetbrains.com/junie/)를 통해 멀티플랫폼 개발 속도를 높일 수 있습니다.
 
 Kotlin Multiplatform을 시도하기로 결정하셨다면 시작하는 데 도움이 될 몇 가지 팁을 소개합니다.
 

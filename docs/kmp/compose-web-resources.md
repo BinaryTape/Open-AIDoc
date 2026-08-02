@@ -18,9 +18,9 @@
 
 1. 构建应用程序的 Web 分发：
 
-```console
-   ./gradlew :shared:wasmJsBrowserDistribution
-```
+    ```console
+       ./gradlew :shared:wasmJsBrowserDistribution
+    ```
 
 2. 在生成的 `dist` 目录中找到所需的资源并保存路径。
 3. 打开 `wasmJsMain/resources/index.html` 文件，并在 `<head>` 元素内添加一个 `<link>` 标签。

@@ -51,7 +51,7 @@
     </Tabs>
 
 4. 若要建立 iOS 應用程式，您需要一台安裝了 [Xcode](https://apps.apple.com/us/app/xcode/id497799835) 的 macOS 主機。
-    您的 IDE 會在後台執行 Xcode 以建置 iOS 架構。
+    您的 IDE 會在後台執行 Xcode 以建置 iOS 框架。
 
     在開始處理 KMP 專案之前，請務必至少啟動一次 Xcode，使其完成初始設定。
 
@@ -219,7 +219,7 @@ wasmJsBrowserDevelopmentRun
 
 ### Xcode
 
-若您的 iOS 运行配置 報告沒有可執行的虛擬裝置，或預先檢查失敗，請務必啟動 Xcode 並查看 iOS 模擬器是否有任何更新。
+若您的 iOS 运行配置 報告沒有可執行的虛擬裝置，或預先檢查失敗，請務必啟動 Xcodebing 並查看 iOS 模擬器是否有任何更新。
 
 ### 獲取說明
 

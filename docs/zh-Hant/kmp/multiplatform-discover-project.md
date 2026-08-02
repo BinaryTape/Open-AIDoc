@@ -34,6 +34,8 @@ Kotlin 編譯器將原始碼作為輸入，並產生一組平台特定的二進�
 
 例如， `kotlinx.coroutines` 是一個支援所有目標的 Kotlin Multiplatform 程式庫，但它也有一個平台特定部分，可將 `kotlinx.coroutines` 的並行原語轉換為 JDK 的並行原語，例如 `fun CoroutinesDispatcher.asExecutor(): Executor`。API 的這個額外部分在 `commonMain` 中是不可用的。
 
+若要探索可用的 Kotlin Multiplatform 程式庫，請參閱 [klibs.io](https://klibs.io)。
+
 ## 目標 (Targets)
 
 目標定義了 Kotlin 編譯通用程式碼所指向的平台。這些平台可以是 JVM、JS、Android、iOS 或 Linux 等。之前的範例將通用程式碼編譯到了 JVM 和原生目標。
@@ -115,7 +117,7 @@ kotlin {
 
 ### 平台特定原始碼集
 
-雖然只編寫通用程式碼很方便，但並不總是可行。`commonMain` 中的程式碼會編譯到所有宣告的目標，且 Kotlin 不允許在該處使用任何平台特定的 API。
+雖然只編寫通用程式碼很方便，但並不總是可行。`commonMain` 中的程式碼會編譯到所有宣告的目標，且 Kotlin 不允許在該處使用任何 platform-specific APIs。
 
 在具有原生和 JS 目標的多平台專案中， `commonMain` 中的以下程式碼將無法編譯：
 

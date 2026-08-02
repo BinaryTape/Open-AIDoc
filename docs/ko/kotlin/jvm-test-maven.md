@@ -153,6 +153,119 @@ Surefire와 달리 Failsafe는 `integration-test` 단계에서 테스트가 실�
 mvn verify
 ```
 
+## 상세한 실패 메시지 확인하기
+
+Kotlin [Power-assert 컴파일러 플러그인](power-assert.md)은 단언(assertions)의 중간 값을 보여주는 상세한 실패 메시지를 생성하여 콘솔 출력에서 전체 다이어그램을 제공합니다.
+
+1. Power-assert를 활성화하려면 프로젝트의 `pom.xml`에 다음 설정을 추가하세요:
+
+    ```xml
+    <properties>
+        <kotlin.version>%kotlinVersion%</kotlin.version>
+        <kotlin.compiler.jdkRelease>17</kotlin.compiler.jdkRelease>
+    </properties>
+    
+    <dependencies>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-test-junit5</artifactId>
+            <version>${kotlin.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-maven-plugin</artifactId>
+                <version>${kotlin.version}</version>
+                <extensions>true</extensions>
+                <executions>
+                    <execution>
+                        <id>compile</id>
+                        <phase>process-sources</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>test-compile</id>
+                        <phase>process-test-sources</phase>
+                        <goals>
+                            <goal>test-compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <!-- Power-assert 플러그인 지정 -->
+                    <compilerPlugins>
+                        <plugin>power-assert</plugin>
+                    </compilerPlugins>
+                    <!-- 변환할 함수 지정 -->
+                    <pluginOptions>
+                        <option>power-assert:function=kotlin.test.assertEquals</option>
+                        <option>power-assert:function=kotlin.test.assertTrue</option>
+                    </pluginOptions>
+                </configuration>
+                <!-- Power-assert 플러그인 의존성 추가 -->
+                <dependencies>
+                    <dependency>
+                        <groupId>org.jetbrains.kotlin</groupId>
+                        <artifactId>kotlin-maven-power-assert</artifactId>
+                        <version>${kotlin.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+        </plugins>
+    </build>
+    ```
+    {initial-collapse-state="collapsed" collapsible="true" ignore-vars="false" collapsed-title="kotlin-maven-power-assert 설정"}
+    
+    * `<properties>` 섹션에서 Kotlin 버전과 대상 JDK 릴리스 버전(예: JDK 17)을 설정합니다.
+    * `<dependencies>` 섹션에서 테스트 실행을 위한 `kotlin-test-junit5`를 추가합니다.
+    * `<build><plugins>` 섹션에서 `power-assert` 컴파일러 플러그인을 사용하여 `kotlin-maven-plugin`을 구성합니다. `<pluginOptions>` 아래에 변환하려는 단언 함수를 나열하고 Power-assert 플러그인 의존성을 추가합니다.
+
+2. `src/test/kotlin` 디렉토리에 `UserProfileBackendTest.kt` 테스트 파일을 생성하세요:
+
+    ```kotlin
+    import kotlin.test.Test
+    import kotlin.test.assertEquals
+    
+    class UserProfileBackendTest {
+    
+        data class UserProfile(val id: Long, val email: String)
+    
+        @Test
+        fun `verify backend entity mapping matches`() {
+            // 예상되는 객체 상태 정의
+            val expectedRecord = UserProfile(id = 451L, email = "admin-dev@company.internal")
+    
+            // 일치하지 않는 백엔드 응답 시뮬레이션
+            val actualRecord = UserProfile(id = 451L, email = "admin-prod@company.com")
+    
+            // 표준 kotlin.test 단언 사용
+            assertEquals(expectedRecord, actualRecord, "Profile configurations out of sync")
+        }
+    }
+    ```
+
+3. 테스트를 실행하고 출력을 확인하세요:
+
+    ```bash
+    mvn test
+    ```
+
+콘솔에는 전체 Power-assert 다이어그램이 표시되어 표현식의 각 위치에서 예상 값과 실제 값의 차이를 보여줍니다:
+
+```text
+Profile configurations out of sync
+assertEquals(expectedRecord, actualRecord, "Profile configurations out of sync")
+             |               |
+             |               UserProfile(id=451, email=admin-prod@company.com)
+             UserProfile(id=451, email=admin-dev@company.internal)
+```
+
 ## 다른 테스팅 프레임워크 살펴보기
 
 JUnit 외에도 Kotlin 테스트를 더 관용적(idiomatic)이고 읽기 쉽게 만들어주는 다른 인기 있는 프레임워크를 사용할 수 있습니다:
@@ -168,4 +281,4 @@ JUnit 외에도 Kotlin 테스트를 더 관용적(idiomatic)이고 읽기 쉽게
 ## 다음 단계
 
 * [`kotlin.test` 라이브러리](https://kotlinlang.org/api/latest/kotlin.test/kotlin.test/)의 기능을 살펴보세요.
-* [Kotlin의 Power-assert 컴파일러 플러그인](power-assert.md)으로 테스트 출력을 개선해 보세요.
+* [Power-assert 컴파일러 플러그인](power-assert.md)에 대해 자세히 알아보세요.

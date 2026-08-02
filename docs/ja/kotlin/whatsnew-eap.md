@@ -2,6 +2,8 @@
 
 <primary-label ref="eap"/>
 
+<show-structure depth="1"/>
+
 <web-summary>Kotlin Early Access Preview (EAP) のリリースノートを確認し、正式リリース前の最新の実験的 Kotlin 機能を試してみましょう。</web-summary>
 
 _[リリース日: %kotlinEapReleaseDate%](eap.md#build-details)_
@@ -14,11 +16,12 @@ _[リリース日: %kotlinEapReleaseDate%](eap.md#build-details)_
 
 Kotlin %kotlinEapVersion% がリリースされました！この EAP リリースの主な内容は以下の通りです。
 
-* **標準ライブラリ**: [コルーチンのスタックトレース復元のサポート](#standard-library-support-for-coroutine-stack-trace-recovery)
-* **Kotlin/Native**: [`klib` アーティファクトに対するデフォルトのインクリメンタルコンパイル](#kotlin-native-incremental-compilation-enabled-by-default)
-* **Kotlin/Wasm**: [トップレベルの `require()` 呼び出しの変更とコンパニオンオブジェクトの初期化順序の改善](#kotlin-wasm)
-* **Kotlin/JS**: [ブラウザテスト用の新しい DSL](#kotlin-js-new-dsl-for-browser-testing)
-* **ビルドツール API**: [新しいターゲット（Kotlin/JS、Kotlin/Wasm、および Kotlin メタデータ）のサポート](#build-tools-api-support-for-kotlin-js-kotlin-wasm-and-kotlin-metadata)
+* **標準ライブラリ**: [コルーチンのスタックトレース復元のサポートと、コレクション要素の等価性と一意性をチェックするための新機能](#standard-library)
+* **Kotlin/Native**: [`klib` アーティファクトに対するデフォルトのインクリメンタルコンパイルと、新しい Swift export 機能](#kotlin-native)
+* **Kotlin/Wasm**: [`@JsFun` 宣言におけるトップレベルの `require()` 呼び出しの変更、コンパニオンオブジェクトの初期化順序の改善、および Kotlin Gradle プラグインにおける Wasmtime のサポート](#kotlin-wasm)
+* **Kotlin/JS**: [ブラウザテスト用の新しい DSL と、suspend ラムダを async 関数としてエクスポートする機能のサポート](#kotlin-js)
+* **ビルドツール API**: [新しいターゲット（Kotlin/JS、Kotlin/Wasm、および Kotlin メタデータ）のサポート](#build-tools-api)
+* **Kotlin コンパイラ**: [ネイティブイメージの実験的リリース](#kotlin-compiler-native-image)
 
 > Kotlin のリリースサイクルに関する情報は、[Kotlin のリリースプロセス](releases.md)を参照してください。
 >
@@ -30,8 +33,24 @@ Kotlin %kotlinEapVersion% がリリースされました！この EAP リリー�
 
 新しい Kotlin バージョンにアップデートするには、IDE が最新バージョンに更新されていることを確認し、ビルドスクリプト内の [Kotlin バージョンを %kotlinEapVersion% に変更](releases.md#update-to-a-new-kotlin-version)してください。
 
-## 標準ライブラリ: コルーチンのスタックトレース復元のサポート
+## 新機能 {id=new-experimental-features}
+<primary-label ref="experimental-exp"/>
+
+このリリースでは、以下のプレステーブル（pre-stable）機能が利用可能です。これには、[Beta](components-stability.md#stability-levels-explained)、[Alpha](components-stability.md#stability-levels-explained)、および [実験的 (Experimental)](components-stability.md#stability-levels-explained) ステータスの機能が含まれます。
+
+* [標準ライブラリ: コルーチンのスタックトレース復元のサポート](#support-for-coroutine-stack-trace-recovery)
+* [標準ライブラリ: コレクション要素の等価性と一意性をチェックするための新関数](#new-functions-to-check-collection-elements-for-equality-and-uniqueness)
+* [Kotlin/Native: 分離された Kotlin コンパイライメージ](#kotlin-compiler-native-image)
+* [Kotlin/JS: ブラウザテスト用の新しい DSL](#new-dsl-for-browser-testing)
+* [ビルドツール API: Kotlin/JS、Kotlin/Wasm、および Kotlin メタデータのサポート](#build-tools-api)
+
+## 標準ライブラリ
+
+Kotlin %kotlinEapVersion% では、コルーチンのスタックトレース復元のサポートが追加され、コレクション要素の等価性と一意性をチェックするための新しい関数が導入されました。
+
+### コルーチンのスタックトレース復元のサポート
 <primary-label ref="experimental-opt-in"/>
+<secondary-label ref="standard-library"/>
 
 Kotlin %kotlinEapVersion% では、標準ライブラリに `StackTraceRecoverable` インターフェースが追加されました。これにより、`kotlinx.coroutines` への依存関係を追加することなく、スタックトレース復元のための新しい例外インスタンスの作成方法を定義できるようになり、`kotlinx.coroutines` ライブラリとの統合が改善されます。
 
@@ -72,7 +91,7 @@ private constructor(
     // 行番号とメッセージの詳細をコピーします
     override fun copyForStackTraceRecovery(): FileEditException =
         FileEditException(line, detail, this)
-}
+    }
 
 @OptIn(ExperimentalStdlibCoroutineSupportApi::class) 
 fun main() {
@@ -89,9 +108,74 @@ fun main() {
 
 詳細については、この機能の [KEEP](https://github.com/Kotlin/KEEP/blob/main/proposals/stdlib/KEEP-0461-stacktrace-recoverable.md) を参照してください。フィードバックを [YouTrack](https://youtrack.jetbrains.com/issue/KT-86595) でお待ちしております。
 
-## Kotlin/Native: インクリメンタルコンパイルのデフォルト有効化
+### コレクション要素の等価性と一意性をチェックするための新関数
+<primary-label ref="experimental-opt-in"/>
+<secondary-label ref="standard-library"/>
 
-Kotlin %kotlinEapVersion% 以降、`klib` アーティファクトのインクリメンタルコンパイルがデフォルトで有効になりました。
+Kotlin %kotlinEapVersion% より前は、コレクションの要素がすべて異なるか、あるいはすべて等しいかをチェックしたい場合、非効率的なコードパターンを使用する必要がありました。
+
+Kotlin %kotlinEapVersion% では、このギャップを埋めるための実験的な関数が導入されました。
+
+| 関数 | チェック内容 |
+|--------------------|------------------------------------------------------------|
+| `.allDistinct()` | コレクション内のすべての値が一意である。 |
+| `.allDistinctBy()` | すべてのオブジェクトが、選択されたプロパティに対して一意の値を持つ。 |
+| `.allEqual()` | コレクション内のすべての値が同じである。 |
+| `.allEqualBy()` | すべてのオブジェクトが、選択されたプロパティに対して同じ値を持つ。 |
+
+これらの関数はコレクション、シーケンス、および配列で使用できます。他のコレクション操作と同様に、構造的な等価性（structural equality）を使用して要素を比較します。
+
+これらの関数は [実験的 (Experimental)](components-stability.md#stability-levels-explained) であり、`@OptIn(ExperimentalStdlibApi::class)` アノテーションまたは `-opt-in=kotlin.ExperimentalStdlibApi` コンパイラオプションによるオプトインが必要です。
+
+```kotlin
+@OptIn(ExperimentalStdlibApi::class)
+fun main() {
+    data class Response(
+        val participantId: String,
+        val answer: String,
+        val responseDate: String
+    )
+
+    val responses = listOf(
+        Response("P001", "Yes", "2026-07-21"),
+        Response("P002", "Maybe", "2026-07-21"),
+        Response("P003", "No", "2026-07-21")
+    )
+
+    // すべての参加者が同じ回答をしたかどうかをチェックします
+    println(responses.allEqualBy { it.answer })
+    // false
+
+    // 重複した参加者がいないかチェックします
+    println(responses.allDistinctBy { it.participantId })
+    // true
+
+    // すべての回答が同じ日に提出されたかどうかをチェックします
+    println(responses.allEqualBy { it.responseDate })
+    // true
+
+    val answers = responses.map { it.answer }
+
+    // 回答が同一（すべて同じ）かどうかをチェックします
+    println(answers.allEqual())
+    // false
+
+    // 回答がすべて異なるかどうかをチェックします
+    println(answers.allDistinct())
+    // true
+}
+```
+
+これらの関数を使用した感想などのフィードバックを [YouTrack](https://youtrack.jetbrains.com/issue/KT-30270) でお待ちしております。
+
+## Kotlin/Native
+
+Kotlin %kotlinEapVersion% では、`klib` アーティファクトのインクリメンタルコンパイルがデフォルトで有効になり、シールドクラスのサポートや言語を跨いだ継承（cross-language inheritance）を含む新しい Swift export 機能が導入され、Kotlin コンパイラネイティブイメージの最初のリリースが行われました。
+
+### インクリメンタルコンパイルのデフォルト有効化
+<secondary-label ref="native"/>
+
+%kotlinEapVersion% 以降、`klib` アーティファクトのインクリメンタルコンパイルがデフォルトで有効になりました。
 
 インクリメンタルコンパイルを使用すると、プロジェクトモジュールによって生成された `klib` アーティファクトの一部のみが変更された場合、その `klib` の影響を受ける部分のみがさらにバイナリへと再コンパイルされます。
 
@@ -107,11 +191,104 @@ kotlin.incremental.native=false
 
 問題が発生した場合は、イシュートラッカー [YouTrack](https://kotl.in/issue) で報告してください。コンパイル時間の改善に関するその他のヒントについては、[ドキュメント](native-improving-compilation-time.md) を参照してください。
 
+### 新しい Swift export 機能
+<secondary-label ref="native"/>
+
+#### シールドクラス
+
+Kotlin %kotlinEapVersion% では、Swift export にシールドクラス（sealed classes）とインターフェースのサポートが追加されました。
+
+以前は、シールド型に対するすべての `switch` 文において `default` ケースを記述する必要がありました。今回のアップデートにより、Kotlin で定義されたシールド階層が Swift の enum にマッピングされ、Xcode で完全な自動補完を伴う網羅的な（exhaustive） `switch` 文が使用可能になりました。
+
+Swift export は、各シールド型に対して `.sealedType()` メソッドを生成します。このメソッドは、シールド階層の直接のサブクラスと一致するケースを持つ Swift enum を返します。これらの呼び出しを入れ子にすることで、より深い階層に一致させることもできます。
+
+例えば、Kotlin でクラス階層を持つシールドインターフェースを宣言します。
+
+```kotlin
+// Kotlin
+sealed interface Shape
+
+class Circle : Shape {
+   override fun toString(): String = "Circle"
+}
+
+class Rectangle : Shape {
+   override fun toString(): String = "Rectangle"
+}
+
+fun createCircle(): Shape = Circle()
+```
+
+Swift 側では、`default` ケースなしで網羅的な `switch` を使用できます。
+
+```swift
+// Swift
+let shape = createCircle()
+
+let name = switch shape.sealedType() {
+   case let .circle(type): "It's a \(type.value)"
+   case let .rectangle(type): "It's a \(type.value)"
+}
+// name == "It's a Circle"
+```
+
+`switch` が網羅的であるため、シールド階層に新しいサブクラスが追加されるとコンパイラが警告を出します。これにより、`default` ケースに頼るのではなく、すぐに対応することが可能になります。
+
+#### Swift export における言語を跨いだ継承
+
+Kotlin %kotlinEapVersion% では、Swift export に言語を跨いだ継承（cross-language inheritance）のサポートが導入されました。
+
+この機能の一般的なユースケースは、[リバースインポート](native-lib-import-stability.md#swift-library-import) パターンです。これは、Kotlin でコントラクト（規約）を定義し、Swift 側でプラットフォーム固有の実装を提供する場合です。
+
+例えば、Kotlin のインターフェースを宣言し、それを Swift で実装して、そのインターフェースを受け入れる Kotlin 関数に Swift オブジェクトを渡すことができます。これは、Kotlin に直接インポートできない純粋な Swift ライブラリを使用する必要がある場合に特に便利です。
+
+例として、Kotlin インターフェースと、それを受け取る関数を宣言します。
+
+```kotlin
+// Kotlin
+interface CryptoProvider {
+   fun hashMD5(input: String): String
+}
+
+fun processHash(provider: CryptoProvider, input: String): String = provider.hashMD5(input)
+```
+
+Swift 側で、純粋な Swift ライブラリを使用してこのインターフェースを実装し、Kotlin に渡します。
+
+```swift
+// Swift
+import CryptoKit
+
+class IosCryptoProvider: KotlinBase & CryptoProvider {
+   func hashMD5(input: String) -> String {
+       guard let data = input.data(using: .utf8) else { return "failed" }
+       return Insecure.MD5.hash(data: data).description
+   }
+}
+
+let provider = IosCryptoProvider()
+
+// 呼び出しは Swift の実装にディスパッチされます
+print(processHash(provider: provider, input: "Hello, world!"))
+```
+
+Kotlin が Swift オブジェクトを受け取ると、それを通常のインターフェースの実装として扱い、Swift コードを実行します。
+
+Swift export の詳細については、[ドキュメント](native-swift-export.md) を参照してください。
+
+### SwiftPM 依存関係用の Package.swift の生成
+<secondary-label ref="native"/>
+
+SwiftPM パッケージに依存する XCFramework をエクスポートする場合、正しく解決されるように、結果として得られる SwiftPM パッケージを公開する必要があります。これを支援するため、`assembleSharedXCFramework` Gradle タスクは、XCFramework と共に配布される `Package.swift` ファイルを生成するようになりました。
+
+詳細は、[SwiftPM export のページ](https://kotlinlang.org/docs/multiplatform/multiplatform-spm-export.html) を参照してください。
+
 ## Kotlin/Wasm
 
-Kotlin %kotlinEapVersion% では、`@JsFun` 宣言におけるトップレベルの `require()` 呼び出しの処理方法が変更され、コンパニオンオブジェクトの初期化順序が JVM の動作に合わせられました。
+Kotlin %kotlinEapVersion% では、`@JsFun` 宣言におけるトップレベルの `require()` 呼び出しの処理方法が変更され、コンパニオンオブジェクトの初期化順序が JVM の動作に合わせられました。また、Kotlin Gradle プラグインにおいて `wasmWasi` ターゲットのランタイムとして Wasmtime がサポートされました。
 
 ### `@JsFun` 宣言におけるトップレベルの `require()` 呼び出しの変更
+<secondary-label ref="wasm"/>
 
 Kotlin/Wasm は、`@JsFun` 宣言がトップレベルの `require()` 関数を使用している場合にエラーを報告するようになりました。
 
@@ -139,55 +316,74 @@ external interface Module {
 動的なモジュール読み込みには、代わりに `import()` 式を使用してください。webpack が動的インポートを解析するのを防ぐために、`/* webpackIgnore: true */` マジックコメントを追加してください。
 
 ```kotlin
-@JsFun(
-    """
+@JsFun("""
     ((module) => () => module)(
         await import(/* webpackIgnore: true */ "module")
     )
-"""
-)
+""")
 private external fun loadModuleDynamically(): JsAny?
 ```
 
 また、`import()` 式を条件付きで使用することもできます。例えば、Node.js で実行されている場合にのみモジュールを読み込むことができます。
 
 ```kotlin
-@JsFun(
-    """
+@JsFun("""
     ((module) => () => module)(
         ((typeof process !== "undefined") && (process.release.name === "node"))
             ? await import(/* webpackIgnore: true */ "module")
             : null
     )
-"""
-)
+""")
 private external fun loadNodeModule(): JsAny?
 ```
 
 プロジェクトがトップレベルの `require()` 関数を必要とする依存関係に依存している場合は、ワークアラウンドとして `globalThis` のプロパティに追加してください。
 
 ```kotlin
-@JsFun(
-    """
+@JsFun("""
     ((module) => {
         globalThis.require = module.default.createRequire(import.meta.url)
         return () => {}
     })(await import("node:module"))
-"""
-)
+""")
 external fun defineRequire()
 ```
 
 問題が発生した場合は、[イシュートラッカー](https://youtrack.jetbrains.com/projects/KT/issues/KT-86192) でフィードバックを共有してください。
 
 ### コンパニオンオブジェクトの初期化順序の改善
+<secondary-label ref="wasm"/>
 
 Kotlin/Wasm は、JVM の動作に合わせて、サブクラスのコンパニオンオブジェクトよりも先にスーパークラスのコンパニオンオブジェクトを初期化するようになりました。以前は、初期化が逆になる可能性があり、プラットフォーム間で動作が一致していませんでした。
 
 このアップデートにより、クロスプラットフォームの一貫性が向上し、クラス初期化の動作におけるプラットフォーム固有の違いが減少します。また、中間クラスがコンパニオンオブジェクトを宣言していないケースを含む、より深い継承階層におけるコンパニオンオブジェクトの初期化を正しく処理できるようになります。
 
-## Kotlin/JS: ブラウザテスト用の新しい DSL
+### Kotlin Gradle プラグインにおける Wasmtime のサポート
+<secondary-label ref="wasm"/>
+
+Kotlin %kotlinEapVersion% では、Kotlin Gradle プラグインにおいて `wasmWasi` ターゲットのランタイムとして [Wasmtime](https://docs.wasmtime.dev/) のサポートが導入されました。
+
+以前は、`wasmWasi` ターゲットは Node.js ランタイムのみをサポートしており、WASI アプリケーションを実行するには JavaScript のブートストラップが必要でした。Wasmtime のサポートにより、Kotlin/Wasm アプリケーションをスタンドアロンの WebAssembly ランタイムで実行できるようになりました。
+
+`wasmWasi` ターゲットのランタイムとして Wasmtime を使用するには、Gradle ビルドファイルに `wasmtime()` を追加してください。
+
+```kotlin
+kotlin {
+    wasmWasi {
+        wasmtime()
+    }
+}
+```
+
+フィードバックを [YouTrack](https://youtrack.jetbrains.com/issue/KT-86633) でお待ちしております。
+
+## Kotlin/JS
+
+Kotlin %kotlinEapVersion% では、ブラウザテスト用の新しい実験的な DSL が導入され、suspend ラムダを JavaScript の async 関数としてエクスポートする機能のサポートが追加されました。
+
+### ブラウザテスト用の新しい DSL
 <primary-label ref="experimental-opt-in"/>
+<secondary-label ref="js"/>
 
 Kotlin %kotlinEapVersion% では、ブラウザ環境で Kotlin/JS テストを実行するための新しい実験的な DSL が導入されました。
 
@@ -236,10 +432,61 @@ kotlin {
 
 新しい DSL は活発に開発中です。フィードバックを [YouTrack](https://youtrack.jetbrains.com/issue/KT-66897) でお待ちしております。
 
-## ビルドツール API: Kotlin/JS、Kotlin/Wasm、および Kotlin メタデータのサポート
-<primary-label ref="experimental-general"/>
+### suspend ラムダを async 関数としてエクスポートする機能のサポート
+<secondary-label ref="js"/>
 
-[Kotlin 2.2.0](whatsnew22.md#new-experimental-build-tools-api) では、ビルドツール API (BTA) が Kotlin/JVM で利用可能になりました。Kotlin 2.4.20-Beta1 では、新しいターゲット（Kotlin/JS、Kotlin/Wasm、および Kotlin メタデータ）のサポートを追加することで、BTA の安定化に向けた次のステップに進みます。
+Kotlin %kotlinEapVersion% では、suspend ラムダを JavaScript の async 関数としてエクスポートできるようになりました。
+
+以前は、suspend ラムダを含む宣言を Kotlin/JS ライブラリからエクスポートする方法がありませんでした。今回のアップデートにより、Kotlin コンパイラは Kotlin の suspend 関数とネイティブ JavaScript の [async/await](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function) モデルの間のブリッジ（連携）を自動的に処理するようになり、Kotlin と TypeScript が混在するコードベースで便利に使用できます。
+
+この機能を有効にするには、`build.gradle.kts` ファイルに以下のコンパイラオプションを追加してください。
+
+```kotlin
+kotlin {
+    js {
+        compilations.all {
+            compileTaskProvider.configure {
+                compilerOptions {
+                    freeCompilerArgs.add("-Xsuspend-lambda-exporting")
+                }
+            }
+        }
+    }
+}
+```
+
+次に、関連する宣言に `@JsExport` を付与します。
+
+```kotlin
+// Kotlin
+@JsExport
+class TaskRunner {
+    suspend fun runTask(task: suspend () -> String): String {
+        return task()
+    }
+}
+```
+
+TypeScript 側からは、suspend ラムダは通常の async 関数として見えます。
+
+```typescript
+// TypeScript
+import { TaskRunner } from "..."
+
+const runner = new TaskRunner();
+const result = await runner.runTask(async () => "done");
+console.log(result); // "done"
+```
+
+`@JsExport` アノテーションの詳細については、[ドキュメント](js-to-kotlin-interop.md#jsexport-annotation) を参照してください。
+
+## ビルドツール API
+
+### Kotlin/JS、Kotlin/Wasm、および Kotlin メタデータのサポート
+<primary-label ref="experimental-general"/>
+<secondary-label ref="bta"/>
+
+[Kotlin 2.2.0](whatsnew22.md#new-experimental-build-tools-api) では、ビルドツール API (BTA) が Kotlin/JVM で利用可能になりました。Kotlin %kotlinEapVersion% では、新しいターゲット（Kotlin/JS、Kotlin/Wasm、および Kotlin メタデータ）のサポートを追加することで、BTA の安定化に向けた次のステップに進みます。
 
 これにより、Kotlin Gradle プラグインとコンパイラの相互作用がより一貫したものになります。また、一部のケースでは、より高速で安定したコンパイルの恩恵を受けることができます。
 
@@ -259,3 +506,24 @@ Kotlin Gradle プラグインにおける新しいターゲットへの BTA サ�
 * Kotlin 2.5.0 以降、BTA は Kotlin/JS、Kotlin/Wasm、および Kotlin メタデータで再びデフォルトで有効になります。
 
 BTA の提案について詳しく知りたい、またはフィードバックを共有したい場合は、この [KEEP](https://github.com/Kotlin/KEEP/blob/build-tools-api/proposals/extensions/build-tools-api.md) を参照してください。
+
+### Kotlin コンパイラ: ネイティブイメージ
+<primary-label ref="experimental-general"/>
+<secondary-label ref="compiler"/>
+
+Kotlin %kotlinEapVersion% では、Kotlin コンパイラネイティブイメージ（native image）の最初の [実験的 (Experimental)](components-stability.md#stability-levels-explained) リリースが行われました。ネイティブイメージは、標準の `kotlinc` コマンドラインツールをそのまま置き換え可能な（drop-in replacement）ものとして提供され、起動時間の短縮と高いパフォーマンスを実現します。
+
+ネイティブイメージを試すには、[GitHub Releases](https://github.com/JetBrains/kotlin/releases/tag/v%kotlinEapVersion%) からビルドをダウンロードしてください。
+
+ネイティブイメージには、CLI オプションの `-Xplugin` または `-Xcompiler-plugin` で使用できる以下のコンパイラプラグインも同梱されています。
+
+* [Serialization](serialization.md)
+* [Compose コンパイラ](compose-compiler-options.md)
+* [All-open](all-open-plugin.md)
+* [`no-arg`](no-arg-plugin.md)
+* [SAM with receiver](sam-with-receiver-plugin.md)
+* [Assignment](https://plugins.gradle.org/plugin/org.jetbrains.kotlin.plugin.assignment)
+* [Lombok](lombok.md)
+* [Power-assert](power-assert.md)
+
+Kotlin コンパイラネイティブイメージの詳細については、その [README](https://github.com/JetBrains/kotlin/blob/master/prepare/compiler-native-image/README.md) を参照してください。

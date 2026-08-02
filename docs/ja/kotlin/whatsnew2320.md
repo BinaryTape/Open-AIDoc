@@ -796,6 +796,7 @@ Kotlin 2.3.20 では、Maven プロジェクトのセットアップを容易に
 Kotlin 2.3.20 では、ビルドツール API (BTA) を使用して、自身のビルドシステムを Kotlin コンパイラと統合したい開発者のための変更がさらに導入されました。
 
 ### ビルド操作の改善
+<secondary-label ref="bta"/>
 
 本リリースでは、BTA によるビルドツールのビルド操作の管理方法が改善されました。
 ビルド操作（build operations）により、ビルドツールは Kotlin コンパイラと対話できます。
@@ -845,6 +846,7 @@ fun prepareBuildOperation(toolchains: KotlinToolchains, sources: List<Path>, des
 ```
 
 ### ビルドツール間での一貫したメトリクス収集
+<secondary-label ref="bta"/>
 
 Kotlin 2.3.20 以前は、ビルドメトリクスのインフラストラクチャは Gradle 中心であったため、メトリクス名などの一部にその影響が及んでいました。
 また、[コンパイラ実行戦略（compiler execution strategies）](compiler-execution-strategy.md) によっては利用できないメトリクスもありました。
@@ -871,6 +873,7 @@ operation[BuildOperation.METRICS_COLLECTOR] = object : BuildMetricsCollector {
 ```
 
 ### ビルドツールによるコンパイラプラグインの設定の容易化
+<secondary-label ref="bta"/>
 
 Kotlin 2.3.20 では、BTA がビルドツール向けに、コンパイラプラグインを設定するための新しくシンプルな方法を提供します。
 このアプローチにより、ビルドツールは設定をユーザーに直接伝搬させることができます。
@@ -916,7 +919,7 @@ operation.compilerArguments[COMPILER_PLUGINS] = listOf(
 
   [`@EagerInitialization`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-eager-initialization/) アノテーションを使用している場合、モジュール初期化が完了する前に関連コードが実行されると失敗する可能性があります。本当に必要な場合を除き、`@EagerInitialization` アノテーションの使用を避けることをお勧めします。
 * 実験的なコンテキストレシーバー（context receivers）はサポートを終了し、[コンテキストパラメータ（context parameters）](context-parameters.md) に置き換えられました。
-* 本リリースでは、[Intel チップベースの Apple ターゲットの非推奨サイクル](whatsnew2220.md#deprecation-of-x86-64-apple-targets) が次の段階に進みます。Kotlin 2.3.20 以降、`macosX64`、`tvosX64`、および `watchosX64` ターゲットを非推奨にします。次の Kotlin リリースで、これらのターゲットのサポートを完全に削除する予定です。
+* 本リリースでは、[Intel チップベース of Apple ターゲットの非推奨サイクル](whatsnew2220.md#deprecation-of-x86-64-apple-targets) が次の段階に進みます。Kotlin 2.3.20 以降、`macosX64`、`tvosX64`、および `watchosX64` ターゲットを非推奨にします。次の Kotlin リリースで、これらのターゲットのサポートを完全に削除する予定です。
 
   多くのサードパーティライブラリが依然として `iosX64` ターゲットに依存しているため、当面の間、これはサポートティア 3 として維持します。これは、CI テストが保証されず、異なるコンパイラリリース間でのソースおよびバイナリ互換性が提供されない可能性があることを意味します。サポートティアの詳細については、[Kotlin/Native ターゲットサポート](native-target-support.md) を参照してください。
 * Kotlin 2.3.20 では、Kotlin Multiplatform における依存関係マッチングが厳格化されたため、共通ソースセットとプラットフォームソースセットの間で依存関係の解決が異なる場合に、メタデータコンパイルが失敗することがあります。詳細と回避策については、[YouTrack の課題](https://youtrack.jetbrains.com/issue/KT-84533#tldr-workaround) を参照してください。

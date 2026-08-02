@@ -57,7 +57,7 @@ Kotlin/JSプロジェクトは、2つの異なる実行環境をターゲット�
 
 Kotlin/JSプロジェクトのターゲット実行環境を定義するには、`js {}`ブロックの中に`browser {}`または`nodejs {}`を追加します。
 
-```groovy
+```kotlin
 kotlin {
     js {
         browser {
@@ -73,7 +73,7 @@ kotlin {
 >
 {style="tip"}
 
-Kotlin Multiplatformプラグインは、選択した環境で動作するようにタスクを自動的に構成します。これには、アプリケーションの実行とテストに必要な環境と依存関係のダウンロードとインストールが含まれます。これにより、開発者は追加の構成なしでシンプルなプロジェクトをビルド、実行、およびテストできます。Node.jsをターゲットとするプロジェクトの場合、既存のNode.jsインストールを使用するオプションもあります。[プリインストールされたNode.jsの使用](#use-pre-installed-node-js)方法を確認してください。
+Kotlin Multiplatformプラグインは、選択した環境で動作するようにタスクを自動的に構成します。これには、アプリケーションの実行とテストに必要な環境と依存関係のダウンロードとインストールが含まれます。これにより、開発者は追加の構成なしでシンプルなプロジェクトをビルド、実行、およびテストできます。既存のインストールを使用するオプションもあります。[プリインストールされたNode.jsの使用](#use-pre-installed-node-js)方法を確認してください。
 
 ## ES2015機能のサポート
 
@@ -144,30 +144,7 @@ kotlin {
 
 ## 依存関係
 
-他のGradleプロジェクトと同様に、Kotlin/JSプロジェクトはビルドスクリプトの`dependencies {}`ブロックでの伝統的なGradle[依存関係宣言](https://docs.gradle.org/current/userguide/declaring_dependencies.html)をサポートしています。
-
-<tabs group="build-script">
-<tab title="Kotlin" group-key="kotlin">
-
-```kotlin
-dependencies {
-    implementation("org.example.myproject", "1.1.0")
-}
-```
-
-</tab>
-<tab title="Groovy" group-key="groovy">
-
-```groovy
-dependencies {
-    implementation 'org.example.myproject:1.1.0'
-}
-```
-
-</tab>
-</tabs>
-
-Kotlin Multiplatform Gradleプラグインは、ビルドスクリプトの`kotlin {}`ブロック内で特定のソースセットに対する依存関係宣言もサポートしています。
+依存関係を宣言するには、`build.gradle(.kts)`ファイルの`jsMain`ソースセットにある`dependencies {}`ブロックを使用します。
 
 <tabs group="build-script">
 <tab title="Kotlin" group-key="kotlin">
@@ -175,7 +152,7 @@ Kotlin Multiplatform Gradleプラグインは、ビルドスクリプトの`kotl
 ```kotlin
 kotlin {
     sourceSets {
-        val jsMain by getting {
+        jsMain {
             dependencies {
                 implementation("org.example.myproject:1.1.0")
             }
@@ -202,9 +179,13 @@ kotlin {
 </tab>
 </tabs>
 
-> Kotlinプログラミング言語で利用可能なすべてのライブラリがJavaScriptをターゲットにできるわけではありません。Kotlin/JS用のアーティファクトを含むライブラリのみが使用可能です。
->
-{style="note"}
+Kotlin/JS用のアーティファクトを含むライブラリのみが依存関係として使用可能です。依存関係を解決するには、`build.gradle(.kts)`ファイルの`repositories {}`ブロックで、Gradleがそれらを探すリポジトリを宣言します。例：
+
+```kotlin
+repositories {
+    mavenCentral()
+}
+```
 
 追加するライブラリが[npmパッケージ](#npm-dependencies)に依存している場合、Gradleはそれらの推移的依存関係も自動的に解決します。
 
@@ -257,8 +238,14 @@ npm依存関係を宣言するには、依存関係宣言内の`npm()`関数に�
 <tab title="Kotlin" group-key="kotlin">
 
 ```kotlin
-dependencies {
-    implementation(npm("react", "> 14.0.0 <=16.9.0"))
+kotlin {
+    sourceSets {
+        jsMain {
+            dependencies {
+                implementation(npm("core-js", "^3.38.1"))
+            }
+        }
+    }
 }
 ```
 
@@ -266,8 +253,14 @@ dependencies {
 <tab title="Groovy" group-key="groovy">
 
 ```groovy
-dependencies {
-    implementation npm('react', '> 14.0.0 <=16.9.0')
+kotlin {
+    sourceSets {
+        jsMain {
+            dependencies {
+                implementation npm('core-js', '^3.38.1')
+            }
+        }
+    }
 }
 ```
 
@@ -331,7 +324,7 @@ Kotlin Multiplatform Gradleプラグインは、プロジェクトのテスト�
 
 ブラウザテストを実行するために、プラグインはデフォルトで[Headless Chrome](https://chromium.googlesource.com/chromium/src/+/lkgr/headless/README.md)を使用します。ビルドスクリプトの`useKarma {}`ブロック内に対応するエントリを追加することで、テストを実行する別のブラウザを選択することもできます。
 
-```groovy
+```kotlin
 kotlin {
     js {
         browser {
@@ -366,7 +359,7 @@ Kotlin Multiplatform Gradleプラグインは、これらのブラウザを自�
 
 テストをスキップしたい場合は、`testTask {}`に`enabled = false`という行を追加します。
 
-```groovy
+```kotlin
 kotlin {
     js {
         browser {
@@ -388,7 +381,7 @@ kotlin {
 
 Node.jsテストランナーが使用する環境変数を指定するには（例：テストに外部情報を渡す、またはパッケージ解決を微調整するため）、ビルドスクリプトの`testTask {}`ブロック内で`environment()`関数をキーと値のペアで使用します。
 
-```groovy
+```kotlin
 kotlin {
     js {
         nodejs {
@@ -411,25 +404,15 @@ Karmaのすべての構成機能は、Karmaの[ドキュメント](https://karma
 
 ブラウザターゲットの場合、Kotlin Multiplatform Gradleプラグインは広く知られた[webpack](https://webpack.js.org/)モジュールバンドラーを使用します。
 
-### webpackのバージョン 
-
-Kotlin Multiplatformプラグインはwebpack %webpackMajorVersion%を使用します。
-
-バージョン1.5.0より前のプラグインで作成されたプロジェクトがある場合は、プロジェクトの`gradle.properties`に以下の行を追加することで、それらのバージョンで使用されていたwebpack %webpackPreviousMajorVersion%に一時的に戻すことができます。
-
-```none
-kotlin.js.webpack.major.version=4
-```
-
 ### webpackタスク
 
 最も一般的なwebpackの調整は、Gradleビルドファイルの`kotlin.js.browser.webpackTask {}`構成ブロックを介して直接行うことができます。
-* `outputFileName` - webpack出力ファイルの名前。webpackタスクの実行後、`<projectDir>/build/dist/<targetName>`に生成されます。デフォルト値はプロジェクト名です。
+* `mainOutputFileName` - webpack出力ファイルの名前。webpackタスクの実行後、`<projectDir>/build/kotlin-webpack/<targetName>/<binaryName>`に生成されます。デフォルト値はプロジェクト名です。
 * `output.libraryTarget` - webpack出力のモジュールシステム。 [Kotlin/JSプロジェクトで利用可能なモジュールシステム](js-modules.md)の詳細を確認してください。デフォルト値は`umd`です。
   
 ```groovy
 webpackTask {
-    outputFileName = "mycustomfilename.js"
+    mainOutputFileName = "mycustomfilename.js"
     output.libraryTarget = "commonjs2"
 }
 ```
@@ -458,19 +441,26 @@ webpackのすべての構成機能は、その[ドキュメント](https://webpa
 
 ### 実行可能ファイルのビルド
 
-webpackを通じて実行可能なJavaScriptアーティファクトをビルドするために、Kotlin Multiplatform Gradleプラグインには`browserDevelopmentWebpack`および`browserProductionWebpack` Gradleタスクが含まれています。
+webpackを通じて実行可能なJavaScriptアーティファクトをビルドするために、Kotlin Multiplatform Gradleプラグインには`jsBrowserDevelopmentWebpack`および`jsBrowserProductionWebpack` Gradleタスクが含まれています。
 
-* `browserDevelopmentWebpack`は開発用アーティファクトを作成します。これらはサイズは大きいですが、作成にかかる時間は短いです。そのため、活発な開発中には`browserDevelopmentWebpack`タスクを使用してください。
-
-* `browserProductionWebpack`は、生成されたアーティファクトにデッドコード削除（Dead Code Elimination）を適用し、結果のJavaScriptファイルを最小化（minify）します。これには時間がかかりますが、サイズがより小さい実行可能ファイルが生成されます。そのため、本番環境での使用に向けてプロジェクトを準備する際には`browserProductionWebpack`タスクを使用してください。
+* `jsBrowserDevelopmentWebpack`は開発用アーティファクトを作成します。これらはサイズは大きいですが、作成にかかる時間は短いです。そのため、活発な開発中には`jsBrowserDevelopmentWebpack`タスクを使用してください。
+* `jsBrowserProductionWebpack`は、生成されたアーティファクトにデッドコード削除（Dead Code Elimination）を適用し、結果のJavaScriptファイルを最小化（minify）します。これには時間がかかりますが、サイズがより小さい実行可能ファイルが生成されます。そのため、本番環境での使用に向けてプロジェクトを準備する際には`jsBrowserProductionWebpack`タスクを使用してください。
  
- 開発用または本番用のそれぞれのアーティファクトを取得するには、これらのタスクのいずれかを実行します。生成されたファイルは、[別途指定](#distribution-target-directory)しない限り、`build/dist`で利用可能になります。
+ 開発用または本番用のそれぞれのアーティファクトを取得するには、これらのタスクのいずれかを実行します。生成されたファイルは、[別途指定](#distribution-target-directory)しない限り、`build/kotlin-webpack`で利用可能になります。
 
 ```bash
-./gradlew browserProductionWebpack
+./gradlew jsBrowserProductionWebpack
 ```
 
 これらのタスクは、ターゲットが実行可能ファイルを生成するように構成されている（`binaries.executable()`経由）場合にのみ利用可能であることに注意してください。
+
+`build/dist/<targetName>/<binaryName>`ディレクトリに配布物を生成するには、代わりに`jsBrowserDistribution`タスクを実行します。
+
+```bash
+./gradlew jsBrowserDistribution
+```
+
+このタスクは、プロジェクトのリソースを含む、すぐに使用可能な配布物を生成します。
 
 ## CSS
 
@@ -576,21 +566,20 @@ browser {
 
 ## Node.js
 
-Node.jsをターゲットとするKotlin/JSプロジェクトの場合、プラグインはホスト上にNode.js環境を自動的にダウンロードしてインストールします。
-既存のNode.jsインスタンスがある場合は、それを使用することもできます。
-
-### Node.js設定の構成
+Node.jsをターゲットとするKotlin/JSプロジェクトの場合、プラグインはホスト上にNode.js環境を自動的にダウンロードしてインストールします。既存のNode.jsインスタンスがある場合は、それを使用することもできます。
 
 各サブプロジェクトに対してNode.js設定を構成したり、プロジェクト全体に対して設定したりできます。
 
-例えば、特定のサブプロジェクトのNode.jsバージョンを設定するには、`build.gradle(.kts)`ファイルのそのGradleブロックに以下の行を追加します。
+### Node.jsバージョンの変更
+
+デフォルトのNode.jsバージョンは現在24.16.0ですが、特定のサブプロジェクトで別のバージョンを使用できます。サブプロジェクトの`build.gradle(.kts)`ファイルに以下の行を追加します。例：
 
 <tabs group="build-script">
 <tab title="Kotlin" group-key="kotlin">
 
 ```kotlin
 project.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsPlugin> {
-    project.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsEnvSpec>().version = "your Node.js version"
+    project.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsEnvSpec>().version = "26.2.0"
 }
 ```
 
@@ -599,14 +588,14 @@ project.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsPlu
 
 ```groovy
 project.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsPlugin) {
-    project.extensions.getByType(org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsEnvSpec).version = "your Node.js version"
+    project.extensions.getByType(org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsEnvSpec).version = "26.2.0"
 }
 ```
 
 </tab>
 </tabs>
 
-すべてのサブプロジェクトを含むプロジェクト全体に対してバージョンを設定するには、`allProjects {}`ブロックに同じコードを適用します。
+すべてのサブプロジェクトを含むプロジェクト全体に対してバージョンを設定するには、`allprojects {}`ブロックに同じコードを適用します。例：
 
 <tabs group="build-script">
 <tab title="Kotlin" group-key="kotlin">
@@ -614,7 +603,7 @@ project.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsPlu
 ```kotlin
 allprojects {
     project.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsPlugin> {
-        project.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsEnvSpec>().version = "your Node.js version"
+        project.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsEnvSpec>().version = "26.2.0"
     }
 }
 ```
@@ -625,16 +614,13 @@ allprojects {
 ```groovy
 allprojects {
     project.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsPlugin) {
-        project.extensions.getByType(org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsEnvSpec).version = "your Node.js version"
+        project.extensions.getByType(org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsEnvSpec).version = "26.2.0"
+    }
 }
 ```
 
 </tab>
 </tabs>
-
-> `NodeJsRootPlugin`クラスを使用してプロジェクト全体のNode.js設定を構成することは非推奨となり、最終的にサポートが終了します。
-> 
-{style="note"}
 
 ### プリインストールされたNode.jsの使用
 
@@ -693,7 +679,7 @@ Kotlin/JSプロジェクトをビルドするホストにすでにYarnがイン�
 
 ```kotlin
 rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin> {
-    rootProject.the<org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension>().download = false
+    rootProject.the<org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootEnvSpec>().download = false
     // デフォルトの動作にするには "true"
 }
 ```
@@ -703,7 +689,7 @@ rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlu
 
 ```groovy
 rootProject.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin) {
-    rootProject.extensions.getByType(org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension).download = false
+    rootProject.extensions.getByType(org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootEnvSpec).download = false
 }
  
 ```
@@ -712,10 +698,6 @@ rootProject.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlu
 </tabs>
 
 ### kotlin-js-storeによるバージョンロック
-
-> `kotlin-js-store`によるバージョンロックはKotlin 1.6.10以降で利用可能です。
->
-{style="note"}
 
 プロジェクトルートの`kotlin-js-store`ディレクトリは、バージョンロックに必要な`yarn.lock`ファイルを保持するために、Kotlin Multiplatform Gradleプラグインによって自動的に生成されます。ロックファイルはYarnプラグインによって完全に管理され、`kotlinNpmInstall` Gradleタスクの実行中に更新されます。
 
@@ -759,7 +741,7 @@ rootProject.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlu
 Kotlin/JSは、`yarn.lock`ファイルが更新された場合に通知するGradle設定を提供しています。CIビルドプロセス中に`yarn.lock`が密かに変更された場合に通知を受け取りたいときに、これらの設定を使用できます。
 
 * `YarnLockMismatchReport`：`yarn.lock`ファイルへの変更をどのように報告するかを指定します。以下のいずれかの値を使用できます。
-    * `FAIL`：対応するGradleタスクを失敗させます。これがデフォルトです。
+    * `FAIL`：対応する Gradle タスクを失敗させます。これがデフォルトです。
     * `WARNING`：変更に関する情報を警告ログに書き込みます。
     * `NONE`：報告を無効にします。
 * `reportNewYarnLock`：新しく作成された`yarn.lock`ファイルについて明示的に報告します。デフォルトでは、このオプションは無効になっています。初回起動時に新しい`yarn.lock`ファイルを生成するのが一般的だからです。このオプションを使用して、ファイルがリポジトリにコミットされていることを確認できます。
@@ -802,10 +784,6 @@ rootProject.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlu
 
 ### デフォルトで --ignore-scripts を使用してnpm依存関係をインストールする
 
-> デフォルトで`--ignore-scripts`を使用してnpm依存関係をインストールする機能は、Kotlin 1.6.10以降で利用可能です。
->
-{style="note"}
-
 侵害されたnpmパッケージからの悪意のあるコード実行の可能性を減らすために、Kotlin Multiplatform Gradleプラグインは、デフォルトでnpm依存関係のインストール中の[ライフサイクルスクリプト](https://docs.npmjs.com/cli/v8/using-npm/scripts#life-cycle-scripts)の実行を阻止します。
 
 `build.gradle(.kts)`に以下の行を追加することで、ライフサイクルスクリプトの実行を明示的に有効にできます。
@@ -835,11 +813,7 @@ rootProject.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlu
 
 デフォルトでは、Kotlin/JSプロジェクトのビルド結果はプロジェクトルート内の`/build/dist/<targetName>/<binaryName>`ディレクトリに置かれます。
 
-> Kotlin 1.9.0以前は、デフォルトの配信ターゲットディレクトリは`/build/distributions`でした。
->
-{style="note" }
-
-プロジェクトの配信ファイルの別の場所を設定するには、ビルドスクリプトの`browser {}`ブロック内に`distribution {}`ブロックを追加し、`set()`メソッドを使用して`outputDirectory`プロパティに値を割り当てます。
+プロジェクトの配布ファイルの別の場所を設定するには、ビルドスクリプトの`browser {}`ブロック内に`distribution {}`ブロックを追加し、`set()`メソッドを使用して`outputDirectory`プロパティに値を割り当てます。
 プロジェクトのビルドタスクを実行すると、Gradleはプロジェクトリソースとともに出力バンドルをこの場所に保存します。
 
 <tabs group="build-script">
@@ -883,9 +857,11 @@ kotlin {
 
 対応する`.js`および`.d.ts`ファイルを含むJavaScript _モジュール_ （`build/js/packages/myModuleName`に生成される）の名前を調整するには、`outputModuleName`オプションを使用します。
 
-```groovy
-js {
-    outputModuleName = "myModuleName"
+```kotlin
+kotlin {
+    js {
+        outputModuleName = "myModuleName"
+    }
 }
 ```
 
@@ -899,13 +875,15 @@ Kotlin Multiplatform Gradleプラグインは、ビルド中にKotlin/JSプロ�
 
 基本的なパッケージ属性以外に、`package.json`は、実行可能なスクリプトの特定など、JavaScriptプロジェクトの動作方法を定義できます。
 
-Gradle DSLを介してプロジェクトの`package.json`にカスタムエントリを追加できます。`package.json`にカスタムフィールドを追加するには、コンパイルの`packageJson`ブロック内で`customField()`関数を使用します。
+Gradle DSLを介してプロジェクトの`package.json`にカスタムエントリを追加できます。`package.json`にカスタムフィールドを追加するには、`jsMain`ソースセットの`packageJson`ブロック内で`customField()`関数を使用します。
 
 ```kotlin
 kotlin {
-    js {
-        compilations["main"].packageJson {
-            customField("hello", mapOf("one" to 1, "two" to 2))
+    sourceSets {
+        jsMain {
+            packageJson {
+                customField("hello", mapOf("one" to 1, "two" to 2))
+            }
         }
     }
 }

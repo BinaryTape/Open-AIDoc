@@ -3,7 +3,7 @@
 ## 我該如何執行我的程式？
 
 定義一個最上層函式 `fun main(args: Array<String>)`，或者如果您對傳入的引數不感興趣，只需定義 `fun main()`，並請確保它不在任何軟件包中。
-此外，可以使用編譯器切換參數 `-entry`，使任何接收 `Array<String>` 或不接收參數並傳回 `Unit` 的函式作為入口點。
+此外，可以使用編譯器切換參數 `-entry`，使任何接收 `Array<String>` 或不接收引數並傳回 `Unit` 的函式作為入口點。
 
 ## Kotlin/Native 的記憶體管理模型為何？
 
@@ -101,6 +101,15 @@ Bitcode 嵌入已在 Xcode 14 中棄用，並在 Xcode 15 中針對所有 Apple 
 自 Kotlin 2.0.20 起，Kotlin/Native 編譯器不再支援 Bitcode 嵌入。
 
 如果您使用的是較早版本的 Xcode，但希望升級到 Kotlin 2.0.20 或更高版本，請在您的 Xcode 專案中停用 Bitcode 嵌入。
+
+## 我該如何為 iOS 獲取更好的損毀報告？
+
+當一個未處理的 Kotlin 例外傳遞到 iOS 程式碼時，損毀報告工具可能會顯示一個模糊的報告，指出是 Kotlin/Native 內部問題，而不是拋出例外處的實際程式碼行。這是因為在記錄損毀時，原始的 Kotlin 堆疊追蹤已經遺失了。
+
+您可以透過第三方解決方案（如 [NSExceptionKt](https://github.com/rickclephas/NSExceptionKt)）來解決此問題，它會將未捕獲的 Kotlin 例外轉換為 `NSException` 執行個體，以便您的損毀報告工具捕獲正確的堆疊追蹤。它為流行的損毀報告工具提供了專門的整合：
+
+* [Bugsnag](https://github.com/rickclephas/NSExceptionKt/blob/master/NSExceptionKtBugsnag/README.md)
+* [Firebase Crashlytics](https://github.com/rickclephas/NSExceptionKt/blob/master/NSExceptionKtCrashlytics/README.md)
 
 ## 我該如何安全地從不同的協同程式中引用物件？
 

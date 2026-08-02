@@ -160,7 +160,7 @@ kotlin {
 
 [SQLDelight](https://github.com/cashapp/sqldelight)와 같이 코틀린 멀티플랫폼 기술을 채택한 라이브러리에 의존성을 추가할 수 있습니다. 이러한 라이브러리의 작성자는 보통 프로젝트에 의존성을 추가하기 위한 가이드를 제공합니다.
 
-> [JetBrains의 검색 플랫폼](https://klibs.io/)에서 코틀린 멀티플랫폼 라이브러리를 찾아보세요.
+> [klibs.io](https://klibs.io/)에서 사용 가능한 코틀린 멀티플랫폼 라이브러리를 찾아보세요.
 >
 {style="tip"}
 

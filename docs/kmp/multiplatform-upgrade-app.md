@@ -247,7 +247,7 @@ data class LaunchListResponse(
 
 如果您需要产生一系列值，可以使用[流 (Flow)](https://kotlinlang.org/docs/flow.html)，而不是简单地调用挂起函数。流可以在产生值时发出一系列值，而不是像挂起函数那样返回单个值。
 
-1. 打开 `shared/src/commonMain/kotlin` 目录中的 `Greeting.kt` 文件。
+1. 打开 `Greeting.kt` 文件在 `shared/src/commonMain/kotlin` 目录中。
 2. 向 `Greeting` 类添加 `rocketComponent` 属性。该属性将存储包含最后一次成功发射日期的消息：
 
    ```kotlin

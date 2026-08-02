@@ -47,8 +47,8 @@ graph TB
     
         ```kotlin title="build.gradle.kts"
         dependencies {
-            implementation("ai.koog:koog-agents:1.0.0")
-            implementation("ai.koog:agents-features-memory:1.0.0")
+            implementation("ai.koog:koog-agents:1.1.1")
+            implementation("ai.koog:agents-features-memory:1.1.1")
         }
         ```
     
@@ -56,8 +56,8 @@ graph TB
     
         ```groovy title="build.gradle"
         dependencies {
-            implementation 'ai.koog:koog-agents:0.7.0'
-            implementation 'ai.koog:agents-features-memory:0.7.0'
+            implementation 'ai.koog:koog-agents:1.1.1'
+            implementation 'ai.koog:agents-features-memory:1.1.1'
         }
         ```
     
@@ -67,12 +67,12 @@ graph TB
         <dependency>
             <groupId>ai.koog</groupId>
             <artifactId>koog-agents-jvm</artifactId>
-            <version>1.0.0</version>
+            <version>1.1.1</version>
         </dependency>
         <dependency>
             <groupId>ai.koog</groupId>
             <artifactId>agents-features-memory-jvm</artifactId>
-            <version>0.7.0</version>
+            <version>1.1.1</version>
         </dependency>
         ```
 
@@ -155,9 +155,9 @@ graph TB
 
 ## 實作細節
 
-`agent.run()` 的第二個引數是用來識別和區分進行中對話的 [工作階段 ID](index.md#session-ids)。在我們的範例中，它是固定的，因為一次只有一個對話。在實際應用程式中，您可以為與同一個使用者相關的對話設定個別唯一的 ID。
+`agent.run()` 的第二個引數是用來識別和區分進行中對話的 [工作階段 ID](index.md#session-ids)。在我們的範例中，它是固定的，因為一次只有一個對話。在實際應用程式中，您可以例如為與同一個使用者相關的對話設定個別唯一的 ID。
 
-代理使用預設的 [歷程記錄提供者](index.md#history-providers)，它會將對話歷程記錄儲存在記憶體中。這意味著當應用程式結束時，歷程記錄將會遺失。在實際應用程式中，您應該實作自訂的歷程記錄提供者，以便將歷程記錄持久化儲存在資料庫或檔案中。
+代理使用預設的 [歷程記錄提供者](index.md#history-providers)，它會將對話歷程記錄儲存在記憶體中。這意指當應用程式結束時，歷程記錄將會遺失。在實際應用程式中，您應該實作自訂的歷程記錄提供者，以便將歷程記錄持久化儲存在資料庫或檔案中。
 
 `windowSize(20)` [前置處理器](index.md#preprocessors) 可確保限制上下文大小：代理僅儲存最多 20 則最近的訊息。如果沒有這個設定，提示詞的大小可能會超過內容限制。
 

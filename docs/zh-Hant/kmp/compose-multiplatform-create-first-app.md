@@ -21,7 +21,7 @@
 在本教學中，您將建置一個可在 Android、iOS、桌面與 Web 上執行的範例應用程式。為了建立使用者介面，您將使用 Compose Multiplatform 架構並學習其基礎知識：可組合函式（composable function）、主題、版面配置、事件與修飾符（modifier）。
 
 本教學中需要注意的事項：
-* 不需要具備 Compose Multiplatform、Android 或 iOS 的經驗。我們建議您在開始之前先熟悉 [Kotlin 基礎知識](https://kotlinlang.org/docs/getting-started.html)。
+* 不需要具備 Compose Multiplatform、Android 或 iOS 的相關經驗。我們建議您在開始之前先熟悉 [Kotlin 基礎知識](https://kotlinlang.org/docs/getting-started.html)。
 * 要完成本教學，您只需要 IntelliJ IDEA。它允許您嘗試 Android 和桌面平台的多平台開發。對於 iOS，您將需要一台安裝了 Xcode 的 macOS 電腦。這是 iOS 開發的一般限制。
 * 如果您願意，可以只選擇您感興趣的特定平台，並忽略其他平台。
 
@@ -125,14 +125,14 @@ fun App() {
 
 您可以在 Android、iOS、桌面與 Web 上執行應用程式。您不需要按任何特定順序執行應用程式，因此請從您最熟悉的平台開始。
 
-> 提供的运行配置比一般的 Gradle 建置任務更有效率。
-> 运行配置僅會觸發對應目標的建置，而預設的 Gradle 任務會建置所有目標的偵錯版本與發佈版本。
+> 提供的執行配置比一般的 Gradle 建置任務更有效率。
+> 執行配置僅會觸發對應目標的建置，而預設的 Gradle 任務會建置所有目標的偵錯版本與發佈版本。
 >
 {style="tip"}
 
 ### 在 Android 上執行您的應用程式
 
-1. 在运行配置清單中，選取 **androidApp**。
+1. 在執行配置清單中，選取 **androidApp**。
 2. 選擇您的 Android 虛擬裝置，然後按一下 **Run**：如果選取的虛擬裝置已關閉，您的 IDE 會啟動它並執行應用程式。
 
 ![在 Android 上執行 Compose Multiplatform 應用程式](compose-run-android.png){width=352}
@@ -155,7 +155,7 @@ fun App() {
 
 如果您尚未在初始設定中啟動過 Xcode，請在執行 iOS 應用程式之前先啟動。
 
-在 IntelliJ IDEA 中，於运行配置清單中選取 **iosApp**，在运行配置旁選取模擬裝置，然後按一下 **Run**。
+在 IntelliJ IDEA 中，於執行配置清單中選取 **iosApp**，在執行配置旁選取模擬裝置，然後按一下 **Run**。
 
 ![在 iOS 上執行 Compose Multiplatform 應用程式](compose-run-ios.png){width=405}
 
@@ -181,15 +181,15 @@ fun App() {
 
 在 Xcode 中設定好團隊後，您可以在 IntelliJ IDEA 中設定或更改團隊：
 
-1. 編輯 **iosApp** 的运行配置：
+1. 編輯 **iosApp** 的執行配置：
 
-   ![編輯 iOS 运行配置](ios-edit-configurations.png){width=450}
+   ![編輯 iOS 執行配置](ios-edit-configurations.png){width=450}
 
 2. 切換到 **Options** 標籤，在 **Development team** 下拉選單中進行必要的變更，然後按一下 **OK**。
 
 ##### 執行應用程式
 
-使用傳輸線連接您的 iPhone。如果您已經在 Xcode 中註冊過該裝置，IntelliJ IDEA 應該會將其顯示在运行配置清單中。執行對應的 `iosApp` 配置。
+使用傳輸線連接您的 iPhone。如果您已經在 Xcode 中註冊過該裝置，IntelliJ IDEA 應該會將其顯示在執行配置清單中。執行對應的 `iosApp` 配置。
 
 如果您尚未在 Xcode 中註冊您的 iPhone，請遵循 [Apple 建議](https://developer.apple.com/documentation/xcode/running-your-app-in-simulator-or-on-a-device/)。簡而言之，您應該：
 
@@ -199,14 +199,14 @@ fun App() {
 4. 如果您的 iPhone 沒有顯示為已連接，請按一下左下角的加號並選取它。
 5. 按照螢幕上的指示完成配對程序。
 
-在 Xcode 中註冊 iPhone 後，當您選取 **iosApp** 运行配置時，它將出現在 IntelliJ IDEA 的可用裝置清單中。
+在 Xcode 中註冊 iPhone 後，當您選取 **iosApp** 執行配置時，它將出現在 IntelliJ IDEA 的可用裝置清單中。
 
 </snippet>
 
 ### 在桌面上執行您的應用程式
 
-在运行配置清單中選取 **desktopApp [hot] 🔥**，然後按一下 **Run**。
-預設情況下，該运行配置會在自己的作業系統視窗中啟動桌面應用程式，並執行 [Compose 即時重載（Hot Reload）](compose-hot-reload.md)：
+在執行配置清單中選取 **desktopApp [hot] 🔥**，然後按一下 **Run**。
+預設情況下，該執行配置會在自己的作業系統視窗中啟動桌面應用程式，並執行 [Compose 即時重載（Hot Reload）](compose-hot-reload.md)：
 
 ![在桌面上執行 Compose Multiplatform 應用程式](compose-run-desktop.png){width=350}
 
@@ -214,7 +214,7 @@ fun App() {
 
 ### 執行您的 Web 應用程式
 
-1. 在运行配置清單中，選取：
+1. 在執行配置清單中，選取：
 
    * **webApp[js]**: 執行您的 Kotlin/JS 應用程式。
    * **webApp[wasmJs]**: 執行您的 Kotlin/Wasm 應用程式。

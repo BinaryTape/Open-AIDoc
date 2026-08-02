@@ -109,7 +109,7 @@ kotlin {
 
 从 Kotlin 2.1.20 开始，您可以从构建脚本中移除 `withJava()` 函数。
 
-此外， Gradle 现在仅在存在 Java 源代码时才运行 Java 编译任务，从而触发之前未曾运行的 JVM 验证诊断。如果您为 `KotlinJvmCompile` 任务或在 `compilerOptions` 内部显式配置了不兼容的 JVM 目标，该诊断将失败。有关确保 JVM 目标兼容性的指导，请参阅[检查相关编译任务的 JVM 目标兼容性](https://kotlinlang.org/docs/gradle-configure-project.html#check-for-jvm-target-compatibility-of-related-compile-tasks)。
+此外，Gradle 现在仅在存在 Java 源代码时才运行 Java 编译任务，从而触发之前未曾运行的 JVM 验证诊断。如果您为 `KotlinJvmCompile` 任务或在 `compilerOptions` 内部显式配置了不兼容的 JVM 目标，该诊断将失败。有关确保 JVM 目标兼容性的指导，请参阅[检查相关编译任务的 JVM 目标兼容性](https://kotlinlang.org/docs/gradle-configure-project.html#check-for-jvm-target-compatibility-of-related-compile-tasks)。
 
 如果您的项目使用高于 8.7 的 Gradle 版本，且不依赖于 Gradle Java 插件（如 [Java](https://docs.gradle.org/current/userguide/java_plugin.html)、[Java Library](https://docs.gradle.org/current/userguide/java_library_plugin.html) 或 [Application](https://docs.gradle.org/current/userguide/application_plugin.html)），或依赖于 Gradle Java 插件的第三方 Gradle 插件，您可以移除 `withJava()` 函数。
 
@@ -180,7 +180,7 @@ kotlin {
 
 该实现带来了不小的配置复杂度：
 
-* 您必须在 `:shared` 端和每个消费者端设置 Gradle 属性。否则，Gradle 无法解析此类项目中的依赖项，因为在没有额外信息的情况下，不清楚消费者应该接收基于 Ktor 的实现还是基于 OkHttp 的实现。
+* 您必须在 `:shared` 端和每个消费者端设置 Gradle 特性 (attributes)。否则，Gradle 无法解析此类项目中的依赖项，因为在没有额外信息的情况下，不清楚消费者应该接收基于 Ktor 的实现还是基于 OkHttp 的实现。
 * 您必须手动设置 `commonJvmMain` 源集。
 * 配置涉及大量低级别的 Gradle 和 Kotlin Gradle 插件抽象及 API。
 
@@ -538,7 +538,7 @@ kotlin {
 2. 将您的源文件从 `main` 和 `test` 文件夹移动到同一目录下的 `jsMain` 和 `jsTest` 文件夹中。
 3. 调整依赖项声明：
 
-   * 我们建议使用 `sourceSets {}` block 并配置相应源集的依赖项，`jsMain {}` 用于生产依赖项，`jsTest {}` 用于测试依赖项。详情请参阅[添加依赖项](multiplatform-add-dependencies.md)。
+   * 我们建议使用 `sourceSets {}` 块并配置相应源集的依赖项，`jsMain {}` 用于生产依赖项，`jsTest {}` 用于测试依赖项。详情请参阅[添加依赖项](multiplatform-add-dependencies.md)。
    * 但是，如果您想在顶级块中声明依赖项，请将声明从 `api("group:artifact:1.0")` 更改为 `add("jsMainApi", "group:artifact:1.0")` 等。
 
      > 在这种情况下，请确保顶级 `dependencies {}` 块位于 `kotlin {}` 块**之后**。否则，您将收到错误“未找到配置 (Configuration not found)”。
@@ -660,7 +660,7 @@ kotlin {
 
 `commonMain` 和 `commonTest` 源集通常分别代表 `main` 和 `test` 源集层次结构的根。然而，可以通过手动配置这些源集的 `dependsOn` 关系来覆盖这一点。
 
-维护此类配置需要额外的努力，并需要了解多平台构建的内部机制。此外，它还降低了代码的可读性和可重用性，因为您需要阅读特定的构建脚本才能确定 `commonMain` 是否是 `main` 源集层次结构的根。
+维护此类配置需要额外的努力，并需要了解多平台构建的内部机制符。此外，它还降低了代码的可读性和可重用性，因为您需要阅读特定的构建脚本才能确定 `commonMain` 是否是 `main` 源集层次结构的根。
 
 因此，在 `commonMain` 和 `commonTest` 上访问 `dependsOn` 现已弃用。
 
@@ -751,13 +751,13 @@ JetBrains 团队改进了 Kotlin 中前向声明的处理方式，使其行为�
 
 由于 Kotlin Multiplatform Gradle 插件与 Gradle 的 [Java](https://docs.gradle.org/current/userguide/java_plugin.html)、[Java Library](https://docs.gradle.org/current/userguide/java_library_plugin.html) 和 [Application](https://docs.gradle.org/current/userguide/application_plugin.html) 插件之间存在兼容性问题，现在当您在同一个项目中应用这些插件时会发出弃用警告。当多平台项目中的另一个 Gradle 插件应用了 Gradle Java 插件时，该警告也会出现。例如，[Spring Boot Gradle 插件](https://docs.spring.io/spring-boot/gradle-plugin/index.html) 会自动应用 Application 插件。
 
-我们添加此弃用警告是因为 Kotlin Multiplatform 项目模型与 Gradle Java 生态系统插件之间存在根本性的兼容性问题。 Gradle 的 Java 生态系统插件目前没有考虑到其他插件可能：
+我们添加此弃用警告是因为 Kotlin Multiplatform 项目模型与 Gradle Java 生态系统插件之间存在根本性的兼容性问题。Gradle 的 Java 生态系统插件目前没有考虑到其他插件可能：
 
 * 也会以与 Java 生态系统插件不同的方式为 JVM 目标进行发布或编译。
 * 在同一个项目中有两个不同的 JVM 目标，例如 JVM 和 Android。
 * 具有复杂的多平台项目结构，可能包含多个非 JVM 目标。
 
-不幸的是， Gradle 目前没有提供任何 API 来解决这些问题。
+不幸的是，Gradle 目前没有提供任何 API 来解决这些问题。
 
 我们此前在 Kotlin Multiplatform 中使用了一些权宜之计来帮助集成 Java 生态系统插件。然而，这些变通方法从未真正解决兼容性问题，且自 Gradle 8.8 发布以来，这些变通方法已不再可行。有关更多信息，请参阅我们的 [YouTrack 问题](https://youtrack.jetbrains.com/issue/KT-66542/Gradle-JVM-target-with-withJava-produces-a-deprecation-warning)。
 
@@ -905,7 +905,7 @@ Kotlin 编译任务不再继承具有 `sourceCompatibility` 和 `targetCompatibi
 
 由 Kotlin Multiplatform Gradle 插件创建的编译配置获得了新名称。
 
-Kotlin Multiplatform 项目中的一个目标有两个默认编译：`main` 和 `test`。每个编译都有自己的默认源集，例如 `jvmMain` 和 `jvmTest`。以前，测试编译及其默认源集的配置名称相同，这可能会导致名称冲突，从而在包含标记有平台特定属性的配置时产生问题。
+Kotlin Multiplatform 项目中的一个目标有两个默认编译：`main` 和 `test`。每个编译都有自己的默认源集，例如 `jvmMain` 和 `jvmTest`。以前，测试编译及其默认源集的配置名称相同，这可能会导致名称冲突，从而在包含标记有平台特定特性 (attributes) 的配置时产生问题。
 
 现在，编译配置具有额外的 `Compilation` 后缀，而使用旧硬编码配置名称的项目和插件将无法再进行编译。
 

@@ -55,7 +55,7 @@ Kotlin 2.4.0이 출시되었습니다! 주요 하이라이트는 다음과 같�
 * [컴파일 타임 상수 개선](#improved-compile-time-constants)
 * [고차 함수에 대한 미사용 결과 확인 개선](#improved-unused-result-checks-for-higher-order-functions) 
 * [선택적 파라미터에 대한 버전 기반 오버로드를 생성하는 새로운 `@IntroducedAt` 어노테이션](#new-introducedat-annotation-to-generate-version-based-overloads-for-optional-parameters)
-* [`null` 값과 누락된 키를 구분하기 위한 새로운 Map 폴백(fallback) 함수](#new-map-fallback-functions-to-distinguish-null-values-and-missing-keys)
+* [null 값과 누락된 키를 구분하기 위한 새로운 Map 폴백(fallback) 함수](#new-map-fallback-functions-to-distinguish-null-values-and-missing-keys)
 * [Swift 패키지 임포트](#swift-package-import)
 * [동시성 지원이 개선된 Swift export Alpha 단계 진입](#swift-export-goes-alpha-with-improved-concurrency-support)
 * [WebAssembly Component Model 지원](#support-for-the-webassembly-component-model)
@@ -89,10 +89,6 @@ Kotlin 2.2.0 및 2.3.0에서 [실험적(Experimental)](components-stability.md#s
 <primary-label ref="experimental-opt-in"/>
 
 <secondary-label ref="language"/>
-
-> IntelliJ IDEA에서 컨텍스트 파라미터를 위한 명시적 컨텍스트 인자를 사용하는 기능은 2026.2 버전부터 지원될 예정입니다.
-> 
-{style="note"}
 
 Kotlin 2.4.0은 [컨텍스트 파라미터(context parameters)](context-parameters.md)에 대한 명시적 컨텍스트 인자를 도입했습니다.
 
@@ -1103,6 +1099,7 @@ JDK 버전을 설정하는 다양한 방법의 우선순위를 명심하세요:
 Kotlin Maven 프로젝트 구성에 대한 자세한 내용은 [문서](maven-configure-project.md)를 참조하세요.
 
 ## 빌드 도구 API
+<secondary-label ref="bta"/>
 
 Kotlin 2.4.0은 빌드 도구 API(BTA)에 여러 개선 사항을 제공합니다. BTA는 다음과 같은 기능을 제공합니다:
 
@@ -1292,7 +1289,7 @@ Kotlin 2.4.0을 통해 Compose 컴파일러는 더욱 일관된 증분 컴파일
 ### 내부 선언에 대한 일관된 증분 컴파일
 <secondary-label ref="compose-compiler"/>
 
-Starting from Kotlin 2.4.0, the Compose compiler offers more consistent incremental compilation. Stability of internal types across different files is now inferred during runtime. This allows Compose to update inferred stability values even when class usages are not recompiled.
+Kotlin 2.4.0부터 Compose 컴파일러는 더욱 일관된 증분 컴파일을 제공합니다. 이제 서로 다른 파일에 있는 내부 타입의 안정성이 런타임 중에 추론됩니다. 이를 통해 Compose는 클래스 사용 지점이 다시 컴파일되지 않더라도 추론된 안정성 값을 업데이트할 수 있습니다.
 
 부작용으로, `@Composable` 함수가 다른 파일의 `internal` 클래스를 파라미터로 사용할 때마다 아티팩트의 크기가 커질 수 있습니다. 이는 안정성이 런타임 중에 결정되어야 하므로 컴파일러가 안정적(stable)인 경우와 불안정적(unstable)인 경우 모두에 대한 실행 경로를 인코딩하기 때문입니다. 이러한 런타임 안정성의 오버헤드는 전체 앱 최적화를 수행하는 미니파이어(R8 등)에 의해 제거됩니다. 미니파이어는 불필요한 실행 경로를 추론하고 제거할 수 있기 때문입니다.
 
@@ -1312,7 +1309,7 @@ Kotlin 2.4.0은 안정화되어 이제 기본적으로 활성화된 실험적 �
 
 * Kotlin 2.4.0부터 컴파일러는 더 이상 `-language-version=1.9`를 지원하지 않습니다. 결과적으로 K1 컴파일러는 더 이상 지원되지 않습니다.
 * Kotlin 2.4.0은 Kotlin Gradle 플러그인에서 바이너리 호환성 검증을 위한 DSL을 간소화하고 일부 부분을 지원 중단합니다. 최신 DSL은 [Kotlin Gradle 플러그인의 바이너리 호환성 검증](gradle-binary-compatibility-validation.md)을 참조하세요.
-* [`KotlinScriptMojo` Maven 플러그인을 통한 Kotlin 스크립트 실행 지원이 제거되었습니다](compatibility-guide-22.md#deprecations-to-kotlin-scripting).
+* [`KotlinScriptMojo` Maven 플러그인을 통한 Kotlin 스크립트 실행 지원이 제거되었습니다](compatibility-guide-22.md#deprecations-to-kotlin-scripting)。
 
 ## 문서 업데이트
 Kotlin 생태계에서 다음과 같은 문서 변경 사항이 있었습니다:
@@ -1324,9 +1321,9 @@ Kotlin 생태계에서 다음과 같은 문서 변경 사항이 있었습니다:
 * [Navigation 3를 위한 권장 직렬화 접근 방식](https://kotlinlang.org/docs/multiplatform/compose-navigation-3.html#recommended-serialization-approaches) – CMP 애플리케이션의 Navigation 3에서 직렬화를 사용하는 가장 좋은 방법을 찾습니다.
 * [멀티플랫폼 ViewModel](https://kotlinlang.org/docs/multiplatform/compose-viewmodel.html) – 멀티플랫폼 프로젝트에서 ViewModel을 설정하고 작업하는 방법을 알아봅니다.
 * [Kotlin을 사용한 백엔드 개발](server-overview.md) – 백엔드 개발에 사용할 수 있는 다양한 프레임워크를 살펴봅니다.
-* [Spring Boot와 Claude를 사용하여 작업 관리자 앱 만들기](spring-boot-claude.md) – Learn how Claude can help you create an app with Spring Boot from scratch.
+* [Spring Boot와 Claude를 사용하여 작업 관리자 앱 만들기](spring-boot-claude.md) – Claude가 처음부터 Spring Boot로 앱을 만드는 데 어떻게 도움을 줄 수 있는지 알아봅니다.
 * [Maven 프로젝트 구성](maven-configure-project.md) – 기존 Java Maven 프로젝트 또는 새로운 Kotlin Maven 프로젝트에서 Kotlin 컴파일을 설정합니다.
-* [Maven으로 Kotlin 프로젝트 테스트](jvm-test-maven.md) – Learn how to create tests with JUnit and use Maven plugins to run unit and integration tests.
+* [Maven으로 Kotlin 프로젝트 테스트](jvm-test-maven.md) – JUnit으로 테스트를 생성하고 Maven 플러그인을 사용하여 단위 및 통합 테스트를 실행하는 방법을 알아봅니다.
 * [Kotlin 프로젝트에서 어노테이션 프로세서 사용](jvm-annotation-processors.md) – 백엔드 프로젝트에서 어노테이션을 처리하기 위해 kapt와 KSP 중 선택합니다.
 * [Kotlin AI 스킬](kotlin-ai-skills.md) – Kotlin 전용 작업을 수행하는 데 도움이 되는 에이전트 스킬을 사용합니다.
 * [Kotlin Language Server](kotlin-lsp.md) – Kotlin을 위한 JetBrains의 공식 Language Server Protocol(LSP) 구현에 대해 읽어보세요.
@@ -1335,8 +1332,8 @@ Kotlin 생태계에서 다음과 같은 문서 변경 사항이 있었습니다:
 * [kapt에서 KSP로 마이그레이션](ksp-kapt-migration.md) – Kotlin 기능을 최대한 활용하기 위해 어노테이션 프로세서를 마이그레이션합니다.
 * [Lincheck 개요](lincheck-guide.md) – JVM에서 동시성 코드를 테스트하기 위해 Lincheck가 배후에서 어떻게 작동하는지 이해합니다.
 * [Lincheck 시작하기](lincheck-getting-started.md) – 프로젝트를 생성하고 Lincheck로 테스트를 실행합니다.
-* [Lincheck으로 임의의 코드 테스트](lincheck-testing-arbitrary-code.md) – Learn how to test concurrent code with Lincheck.
-* [Lincheck으로 데이터 구조를 테스트하는 방법](lincheck-how-to-test-data-structures.md) – Dive into Lincheck's data structure testing process.
-* [Lincheck을 사용한 테스트 전략](lincheck-testing-strategies.md) – Learn about Lincheck's testing strategies: model checking and stress testing.
-* [Lincheck으로 테스트 전략 구성](lincheck-testing-strategies-options.md) – Explore the different options for Lincheck's testing strategies.
-* [Dokku를 사용하여 Ktor 애플리케이션 배포](https://ktor.io/docs/dokku.html) – Learn about the deployment workflow with Dokku.
+* [Lincheck으로 임의의 코드 테스트](lincheck-testing-arbitrary-code.md) – Lincheck로 동시성 코드를 테스트하는 방법을 알아봅니다.
+* [Lincheck으로 데이터 구조를 테스트하는 방법](lincheck-how-to-test-data-structures.md) – Lincheck의 데이터 구조 테스트 프로세스를 깊이 있게 살펴봅니다.
+* [Lincheck을 사용한 테스트 전략](lincheck-testing-strategies.md) – Lincheck의 테스트 전략인 모델 검사(model checking) 및 스트레스 테스트(stress testing)에 대해 알아봅니다.
+* [Lincheck으로 테스트 전략 구성](lincheck-testing-strategies-options.md) – Lincheck 테스트 전략의 다양한 옵션을 살펴봅니다.
+* [Dokku를 사용하여 Ktor 애플리케이션 배포](https://ktor.io/docs/dokku.html) – Dokku를 사용한 배포 워크플로우에 대해 알아봅니다.

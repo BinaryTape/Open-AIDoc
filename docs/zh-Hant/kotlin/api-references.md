@@ -2,6 +2,7 @@
        xsi:noNamespaceSchemaLocation="https://resources.jetbrains.com/writerside/1.0/topic.v2.xsd"
        id="api-references" title="API 參考">
     <p>歡迎來到 Kotlin API 參考頁面。在這裡，您將找到官方 Kotlin 程式庫與工具的 API 文件連結。</p>
+    <tip>如果您正在尋找 Kotlin Multiplatform 程式庫，請在 <a href="https://klibs.io"><b>klibs.io</b></a> 上瀏覽。</tip>
     <list columns="2">
         <li>
             <a href="https://kotlinlang.org/api/core/kotlin-stdlib/"><b>標準程式庫 (stdlib)</b></a>

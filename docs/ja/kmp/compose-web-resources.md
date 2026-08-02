@@ -4,7 +4,7 @@
   
 ## Web ターゲット向けリソースのプリロード
 
-フォントや画像などの Web リソースは、[Fetch API](https://developer.mozilla.org/ja/docs/Web/API/Fetch_API) を使用して非同期に読み込まれます。
+フォントや画像などの Web リソースは、[Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) を使用して非同期に読み込まれます。
 初回の読み込み時やネットワーク接続が遅い場合、リソースの取得によって [FOUT](https://fonts.google.com/knowledge/glossary/fout)（読み込み前の代替フォントによるちらつき）が発生したり、画像の代わりにプレースホルダーが表示されたりするなど、視覚的な不具合が生じることがあります。
 
 この問題の典型的な例は、`Text()` コンポーネントにカスタムフォントのテキストが含まれているものの、必要なグリフを含むフォントがまだ読み込み中の場合です。この場合、ユーザーには一時的にデフォルトのフォントでテキストが表示されたり、文字の代わりに空のボックスや疑問符が表示されたりすることがあります。同様に、画像やドローアブルの場合も、リソースが完全に読み込まれるまで、空白や黒いボックスなどのプレースホルダーが表示されることがあります。
@@ -13,16 +13,16 @@
 
 ### ブラウザ機能を使用したリソースのプリロード
 
-モダンなブラウザでは、`<link>` タグに [`rel="preload"` 属性](https://developer.mozilla.org/ja/docs/Web/HTML/Attributes/rel/preload) を指定することでリソースをプリロードできます。
+モダンなブラウザでは、`<link>` タグに [`rel="preload"` 属性](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/rel/preload) を指定することでリソースをプリロードできます。
 この属性は、アプリケーションが開始される前にフォントや画像などのリソースのダウンロードとキャッシュを優先的に行うようブラウザに指示し、これらのリソースを早期に利用可能にします。
 
 例えば、ブラウザ内でのフォントのプリロードを有効にするには、以下の手順に従います：
 
 1. アプリケーションの Web 配布物をビルドします：
 
-```console
-   ./gradlew :shared:wasmJsBrowserDistribution
-```
+    ```console
+       ./gradlew :shared:wasmJsBrowserDistribution
+    ```
 
 2. 生成された `dist` ディレクトリから必要なリソースを見つけ、そのパスを保存します。
 3. `wasmJsMain/resources/index.html` ファイルを開き、`<head>` 要素内に `<link>` タグを追加します。
@@ -32,7 +32,7 @@
 <link rel="preload" href="./composeResources/username.shared.generated.resources/font/FiraMono-Regular.ttf" as="fetch" type="font/ttf" crossorigin/>
 ```
 
-### Compose Multiplatform プリロード API を使用したリソース의プリロード
+### Compose Multiplatform プリロード API を使用したリソースのプリロード
 <primary-label ref="Experimental"/>
 
 ブラウザでリソースをプリロードした場合でも、それらは生のバイトデータとしてキャッシュされており、`FontResource` や `DrawableResource` などのレンダリングに適した形式に変換する必要があります。アプリケーションが初めてリソースを要求したときにこの変換が非同期で行われるため、再びちらつきが発生する可能性があります。ユーザー体験をさらに最適化するために、Compose Multiplatform リソースには、より高レベルな表現のリソースのための独自の内部キャッシュがあり、これもプリロードすることが可能です。
@@ -86,7 +86,7 @@ CJK（中国語、日本語、韓国語）文字については、ブラウザ�
 ## Web リソースのキャッシュ
 <primary-label ref="Experimental"/>
 
-Compose Multiplatform は [Web Cache API](https://developer.mozilla.org/ja/docs/Web/API/Cache) を使用して、成功したレスポンスをキャッシュし、ブラウザのデフォルトのキャッシュメカニズムによって通常実行される冗長な HTTP 再検証を回避します。
+Compose Multiplatform は [Web Cache API](https://developer.mozilla.org/en-US/docs/Web/API/Cache) を使用して、成功したレスポンスをキャッシュし、ブラウザのデフォルトのキャッシュメカニズムによって通常実行される冗長な HTTP 再検証を回避します。
 
 キャッシュは、アプリの起動およびページの更新ごとにグローバルにクリアされます。
 この段階でキャッシュをリセットすることで、リソースの整合性が確保されます。

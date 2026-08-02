@@ -46,7 +46,7 @@
 * [`CoroutineExceptionHandler`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-coroutine-exception-handler/)는 포착되지 않은 예외를 처리합니다.
 
 이러한 요소들과 다른 가능한 요소들은 [_코루틴 컨텍스트(coroutine context)_](coroutine-context-and-dispatchers.md)를 구성하며, 이는 기본적으로 부모 코루틴으로부터 상속됩니다.
-이 컨텍스트는 구조화된 동시성을 가능하게 하는 계층 구조를 형성하여, 관련 코루틴들을 함께 [취소](cancellation-and-timeouts.md)하거나 그룹으로 [예외를 처리](exception-handling.md)할 수 있게 합니다.
+이 컨텍스트는 구조화된 동시성을 가능하게 하는 계층 구조를 형성하여, 관련 코루틴들을 함께 [취소](coroutines-cancellation.md)하거나 그룹으로 [예외를 처리](exception-handling.md)할 수 있게 합니다.
 
 ### 비동기 플로우와 공유되는 가변 상태
 

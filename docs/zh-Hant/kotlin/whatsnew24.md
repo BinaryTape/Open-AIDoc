@@ -90,10 +90,6 @@ Kotlin 2.2.0 和 2.3.0 以 [Experimental](components-stability.md#stability-leve
 
 <secondary-label ref="language"/>
 
-> 在 IntelliJ IDEA 中使用上下文參數明確上下文引數的支援將於 2026.2 提供。
-> 
-{style="note"}
-
 Kotlin 2.4.0 為 [上下文參數](context-parameters.md) 引入了明確上下文引數。
 
 Kotlin 2.3.20 [更改了上下文參數的多載解析](whatsnew2320.md#changes-to-overload-resolution-for-context-parameters)。因此，僅在上下文參數上有所不同的多載呼叫可能會變得模糊。
@@ -1105,6 +1101,7 @@ Kotlin 2.4.0 為 Kotlin Maven 外掛程式引入了對 [Maven Toolchains](https:
 有關配置 Kotlin Maven 專案的更多資訊，請參閱我們的 [文件](maven-configure-project.md)。
 
 ## Build tools API
+<secondary-label ref="bta"/>
 
 Kotlin 2.4.0 對 Build tools API (BTA) 進行了多項改進。BTA 現在：
 
@@ -1321,7 +1318,7 @@ Kotlin 2.4.0 推進了已晉升為穩定且現在預設啟用的實驗性特性�
 
 * [Compose Multiplatform 應用程式中的 Liquid Glass](https://kotlinlang.org/docs/multiplatform/ios-liquid-glass.html) – 將 iOS 應用程式從完全由 Compose 驅動的導航遷移到具有 iOS 26 Liquid Glass 樣式的原生 SwiftUI 導航。
 * [將 Swift 套件作為相依性加入 KMP 模組](https://kotlinlang.org/docs/multiplatform/multiplatform-spm-import.html) – 了解如何在您的 KMP 專案中設定 SwiftPM 相依性。
-* 手動 [將 Kotlin Multiplatform 專案從 CocoaPods 切換為 SwiftPM 相依性](https://kotlinlang.org/docs/multiplatform/multiplatform-cocoapods-spm-migration.html) 或 [使用 Junie](https://kotlinlang.org/docs/multiplatform/multiplatform-cocoapods-spm-migration-ai.html) – 了解如何使用 Junie 和 Kotlin AI 技能使遷移更輕鬆。
+* [將 Kotlin Multiplatform 專案從 CocoaPods 切換為 SwiftPM 相依性](https://kotlinlang.org/docs/multiplatform/multiplatform-cocoapods-spm-migration.html) 手動或 [使用 Junie](https://kotlinlang.org/docs/multiplatform/multiplatform-cocoapods-spm-migration-ai.html) – 了解如何使用 Junie 和 Kotlin AI 技能使遷移更輕鬆。
 * [為 KMP 應用程式配置 TeamCity](https://kotlinlang.org/docs/multiplatform/configure-teamcity-for-kmp.html) – 使用 TeamCity 構建、測試和部署您的 KMP 應用程式。
 * [Navigation 3 的推薦序列化方法](https://kotlinlang.org/docs/multiplatform/compose-navigation-3.html#recommended-serialization-approaches) – 尋找在您的 CMP 應用程式中搭配 Navigation 3 使用序列化的最佳方式。
 * [Multiplatform ViewModel](https://kotlinlang.org/docs/multiplatform/compose-viewmodel.html) – 了解如何在多平台專案中設定和使用 ViewModel。

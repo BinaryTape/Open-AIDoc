@@ -3,6 +3,10 @@
 Kotlin 라이브러리를 만들 때는 [Kotlin 멀티플랫폼 지원을 포함하여 구축 및 배포](https://www.jetbrains.com/help/kotlin-multiplatform-dev/multiplatform-publish-lib-setup.html)하는 것을 고려해 보세요.
 이는 라이브러리의 타겟 사용자를 넓혀주며, 여러 플랫폼을 타겟으로 하는 프로젝트와 호환되도록 만들어 줍니다.
 
+> [klibs.io](https://klibs.io/)에서 다양한 사용 사례와 타겟 플랫폼을 위해 이미 사용 가능한 Kotlin 멀티플랫폼 라이브러리를 찾을 수 있습니다.
+> 
+{style="tip"}
+
 다음 섹션에서는 Kotlin 멀티플랫폼 라이브러리를 효과적으로 구축하는 데 도움이 되는 가이드라인을 제공합니다.
 
 ## 도달 범위 극대화하기
@@ -63,6 +67,6 @@ Kotlin 멀티플랫폼은 지원하는 타겟 플랫폼 전반에서 네이티�
 
 ## 라이브러리 홍보하기
 
-여러분의 라이브러리는 [JetBrains의 검색 플랫폼](https://klibs.io/)에 소개될 수 있습니다. 이 플랫폼은 타겟 플랫폼을 기반으로 Kotlin 멀티플랫폼 라이브러리를 쉽게 찾을 수 있도록 설계되었습니다.
+개발자들이 Kotlin 멀티플랫폼 라이브러리를 발견하고 평가하는 검색 플랫폼인 [klibs.io](https://klibs.io/)에 여러분의 라이브러리를 소개할 수 있습니다.
 
-기준을 충족하는 라이브러리는 자동으로 추가됩니다. 라이브러리를 추가하는 방법에 대한 자세한 내용은 [FAQ](https://klibs.io/faq)를 참조하세요.
+[klibs.io](https://klibs.io/)는 등재 기준을 충족하는 라이브러리를 자동으로 목록에 추가합니다. 라이브러리가 자격이 되는지 확인하려면 [FAQ](https://klibs.io/faq)를 참조하세요.

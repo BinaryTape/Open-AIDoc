@@ -1,6 +1,6 @@
 [//]: # (title: 設定 Kotlin/JS 專案)
 
-Kotlin/JS 專案使用 Gradle 作為建置系統。為了讓開發者輕鬆管理其 Kotlin/JS 專案，我們提供了 `kotlin.multiplatform` Gradle 外掛程式，它提供了專案配置工具以及用於自動化 JavaScript 開發典型常式的輔助任務。
+Kotlin/JS 專案使用 Gradle 作為組建系統。為了讓開發人員輕鬆管理其 Kotlin/JS 專案，我們提供了 `kotlin.multiplatform` Gradle 外掛程式，它提供了專案配置工具以及用於自動化 JavaScript 開發典型常式的輔助任務。
 
 該外掛程式會在背景使用 [npm](https://www.npmjs.com/) 或 [Yarn](https://yarnpkg.com/) 封裝管理員下載 npm 相依性，並使用 [webpack](https://webpack.js.org/) 從 Kotlin 專案建置 JavaScript 組合包。相依性管理和配置調整很大程度可以直接從 Gradle 建置檔案中完成，並提供覆寫自動產生的配置以實現完全控制的選項。
 
@@ -57,7 +57,7 @@ Kotlin/JS 專案可以針對兩種不同的執行環境：
 
 要為 Kotlin/JS 專案定義目標執行環境，請在內部加入帶有 `browser {}` 或 `nodejs {}` 的 `js {}` 區塊：
 
-```groovy
+```kotlin
 kotlin {
     js {
         browser {
@@ -73,7 +73,7 @@ kotlin {
 >
 {style="tip"}
 
-Kotlin 多平台外掛程式會自動配置其任務以配合選定的環境。這包括下載和安裝執行與測試應用程式所需的環境與相依性。這讓開發者無需額外配置即可建置、執行和測試簡單專案。對於針對 Node.js 的專案，還可以選擇使用現有的 Node.js 安裝。了解如何[使用預先安裝的 Node.js](#use-pre-installed-node-js)。
+Kotlin 多平台外掛程式會自動配置其任務以配合選定的環境。這包括下載和安裝執行與測試應用程式所需的環境與相依性。這讓開發人員無需額外配置即可建置、執行和測試簡單專案。對於針對 Node.js 的專案，還可以選擇使用現有的安裝。了解如何[使用預先安裝的 Node.js](#use-pre-installed-node-js)。
 
 ## 支援 ES2015 特性
 
@@ -144,30 +144,7 @@ kotlin {
 
 ## 相依性
 
-與任何其他 Gradle 專案一樣，Kotlin/JS 專案支援在建置指令碼的 `dependencies {}` 區塊中進行傳統的 Gradle [相依性宣告](https://docs.gradle.org/current/userguide/declaring_dependencies.html)：
-
-<tabs group="build-script">
-<tab title="Kotlin" group-key="kotlin">
-
-```kotlin
-dependencies {
-    implementation("org.example.myproject", "1.1.0")
-}
-```
-
-</tab>
-<tab title="Groovy" group-key="groovy">
-
-```groovy
-dependencies {
-    implementation 'org.example.myproject:1.1.0'
-}
-```
-
-</tab>
-</tabs>
-
-Kotlin 多平台 Gradle 外掛程式還支援在建置指令碼的 `kotlin {}` 區塊中為特定的原始碼集進行相依性宣告：
+要宣告相依性，請在 `build.gradle(.kts)` 檔案中使用 `jsMain` 原始碼集內的 `dependencies {}` 區塊：
 
 <tabs group="build-script">
 <tab title="Kotlin" group-key="kotlin">
@@ -175,7 +152,7 @@ Kotlin 多平台 Gradle 外掛程式還支援在建置指令碼的 `kotlin {}` �
 ```kotlin
 kotlin {
     sourceSets {
-        val jsMain by getting {
+        jsMain {
             dependencies {
                 implementation("org.example.myproject:1.1.0")
             }
@@ -202,9 +179,13 @@ kotlin {
 </tab>
 </tabs>
 
-> 並非所有適用於 Kotlin 程式語言的程式庫在針對 JavaScript 時都可用：只有包含 Kotlin/JS 構件的程式庫才能使用。
->
-{style="note"}
+只有包含 Kotlin/JS 構件的程式庫才能作為相依性使用。要解決相依性，請在 `build.gradle(.kts)` 檔案的 `repositories {}` 區塊中宣告 Gradle 應在其中尋找它們的存儲庫。例如：
+
+```kotlin
+repositories {
+    mavenCentral()
+}
+```
 
 如果您加入的程式庫相依於 [來自 npm 的套件](#npm-dependencies)，Gradle 也會自動解決這些遞移相依性。
 
@@ -257,8 +238,14 @@ Kotlin 多平台 Gradle 外掛程式讓您可以在 Gradle 建置指令碼中宣
 <tab title="Kotlin" group-key="kotlin">
 
 ```kotlin
-dependencies {
-    implementation(npm("react", "> 14.0.0 <=16.9.0"))
+kotlin {
+    sourceSets {
+        jsMain {
+            dependencies {
+                implementation(npm("core-js", "^3.38.1"))
+            }
+        }
+    }
 }
 ```
 
@@ -266,8 +253,14 @@ dependencies {
 <tab title="Groovy" group-key="groovy">
 
 ```groovy
-dependencies {
-    implementation npm('react', '> 14.0.0 <=16.9.0')
+kotlin {
+    sourceSets {
+        jsMain {
+            dependencies {
+                implementation npm('core-js', '^3.38.1')
+            }
+        }
+    }
 }
 ```
 
@@ -330,7 +323,7 @@ Kotlin 多平台 Gradle 外掛程式會自動為專案設定測試基礎結構�
 
 為了執行瀏覽器測試，外掛程式預設使用 [Headless Chrome](https://chromium.googlesource.com/chromium/src/+/lkgr/headless/README.md)。您也可以透過在建置指令碼的 `useKarma {}` 區塊中加入對應的項目，選擇另一個瀏覽器來執行測試：
 
-```groovy
+```kotlin
 kotlin {
     js {
         browser {
@@ -365,7 +358,7 @@ kotlin.js.browser.karma.browsers=firefox,safari
 
 如果您想跳過測試，請將 `enabled = false` 這一行加入到 `testTask {}` 中：
 
-```groovy
+```kotlin
 kotlin {
     js {
         browser {
@@ -387,7 +380,7 @@ kotlin {
 
 要指定 Node.js 測試執行器使用的環境變數（例如，將外部資訊傳遞給測試，或微調套件解析），請在建置指令碼的 `testTask {}` 區塊內使用帶有鍵值對的 `environment()` 函式：
 
-```groovy
+```kotlin
 kotlin {
     js {
         nodejs {
@@ -409,25 +402,15 @@ Karma 的所有配置功能在 Karma 的 [文件](https://karma-runner.github.io
 
 對於瀏覽器目標，Kotlin 多平台 Gradle 外掛程式使用廣為人知的 [webpack](https://webpack.js.org/) 模組組合器。
 
-### webpack 版本 
-
-Kotlin 多平台外掛程式使用 webpack %webpackMajorVersion%。
-
-如果您有使用 1.5.0 以前版本的外掛程式建立的專案，可以透過在專案的 `gradle.properties` 中加入以下行，暫時切換回這些版本中使用的 webpack %webpackPreviousMajorVersion%：
-
-```none
-kotlin.js.webpack.major.version=4
-```
-
 ### webpack 任務
 
 最常見的 webpack 調整可以透過 Gradle 建置檔案中的 `kotlin.js.browser.webpackTask {}` 配置區塊直接進行：
-* `outputFileName` - webpack 處理後的輸出檔案名稱。執行 webpack 任務後，它將產生在 `<projectDir>/build/dist/<targetName>` 中。預設值為專案名稱。
+* `mainOutputFileName` - webpack 處理後的輸出檔案名稱。執行 webpack 任務後，它將產生在 `<projectDir>/build/kotlin-webpack/<targetName>/<binaryName>` 中。預設值為專案名稱。
 * `output.libraryTarget` - webpack 輸出檔案的模組系統。了解更多關於 [Kotlin/JS 專案可用的模組系統](js-modules.md)。預設值為 `umd`。
   
 ```groovy
 webpackTask {
-    outputFileName = "mycustomfilename.js"
+    mainOutputFileName = "mycustomfilename.js"
     output.libraryTarget = "commonjs2"
 }
 ```
@@ -455,19 +438,26 @@ webpack 的所有配置功能在其 [文件](https://webpack.js.org/concepts/con
 
 ### 建置可執行檔
 
-為了透過 webpack 建置可執行 JavaScript 構件，Kotlin 多平台 Gradle 外掛程式包含 `browserDevelopmentWebpack` 和 `browserProductionWebpack` Gradle 任務。
+為了透過 webpack 建置可執行 JavaScript 構件，Kotlin 多平台 Gradle 外掛程式包含 `jsBrowserDevelopmentWebpack` 和 `jsBrowserProductionWebpack` Gradle 任務。
 
-* `browserDevelopmentWebpack` 建立開發構件，雖然檔案體積較大，但建立所需時間較短。因此，在主動開發期間請使用 `browserDevelopmentWebpack` 任務。
-
-* `browserProductionWebpack` 對產生的構件套用無效程式碼消除，並縮減產生的 JavaScript 檔案，這需要更多時間，但產生的可執行檔體積較小。因此，在準備將專案用於生產環境時，請使用 `browserProductionWebpack` 任務。
+* `jsBrowserDevelopmentWebpack` 建立開發構件，雖然檔案體積較大，但建立所需時間較短。因此，在主動開發期間請使用 `jsBrowserDevelopmentWebpack` 任務。
+* `jsBrowserProductionWebpack` 對產生的構件套用無效程式碼消除，並縮減產生的 JavaScript 檔案，這需要更多時間，但產生的可執行檔體積較小。因此，在準備將專案用於生產環境時，請使用 `jsBrowserProductionWebpack` 任務。
  
- 執行其中任一任務以獲取對應的開發或生產構件。除非[另有指定](#distribution-target-directory)，否則產生的檔案將位於 `build/dist` 中。
+ 執行其中任一任務以獲取對應的開發或生產構件。除非[另有指定](#distribution-target-directory)，否則產生的檔案將位於 `build/kotlin-webpack` 中。
 
 ```bash
-./gradlew browserProductionWebpack
+./gradlew jsBrowserProductionWebpack
 ```
 
 請注意，僅當您的目標配置為產生可執行檔（透過 `binaries.executable()`）時，這些任務才可用。
+
+要將發佈內容產生在 `build/dist/<targetName>/<binaryName>` 目錄中，請改為執行 `jsBrowserDistribution` 任務：
+
+```bash
+./gradlew jsBrowserDistribution
+```
+
+此任務會產生包含專案資源且可供使用的發佈內容。
 
 ## CSS
 
@@ -575,18 +565,18 @@ browser {
 
 對於針對 Node.js 的 Kotlin/JS 專案，該外掛程式會自動在主機上下載並安裝 Node.js 環境。如果您已經安裝了 Node.js 實體，也可以使用它。
 
-### 配置 Node.js 設定
-
 您可以為每個子專案配置 Node.js 設定，也可以為整個專案進行設定。
 
-例如，要為特定子專案設定 Node.js 版本，請在 `build.gradle(.kts)` 檔案中的 Gradle 區塊中加入以下行：
+### 更改 Node.js 版本
+
+預設的 Node.js 版本目前為 24.16.0，但您可以為特定的子專案使用不同的版本。將以下內容加入到您的子專案 `build.gradle(.kts)` 檔案中。例如：
 
 <tabs group="build-script">
 <tab title="Kotlin" group-key="kotlin">
 
 ```kotlin
 project.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsPlugin> {
-    project.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsEnvSpec>().version = "您的 Node.js 版本"
+    project.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsEnvSpec>().version = "26.2.0"
 }
 ```
 
@@ -595,14 +585,14 @@ project.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsPlu
 
 ```groovy
 project.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsPlugin) {
-    project.extensions.getByType(org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsEnvSpec).version = "您的 Node.js 版本"
+    project.extensions.getByType(org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsEnvSpec).version = "26.2.0"
 }
 ```
 
 </tab>
 </tabs>
 
-要為整個專案（包括所有子專案）設定版本，請將相同的程式碼套用到 `allProjects {}` 區塊：
+要為整個專案（包括所有子專案）設定版本，請將相同的程式碼套用到 `allprojects {}` 區塊。例如：
 
 <tabs group="build-script">
 <tab title="Kotlin" group-key="kotlin">
@@ -610,7 +600,7 @@ project.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsPlu
 ```kotlin
 allprojects {
     project.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsPlugin> {
-        project.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsEnvSpec>().version = "您的 Node.js 版本"
+        project.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsEnvSpec>().version = "26.2.0"
     }
 }
 ```
@@ -621,16 +611,13 @@ allprojects {
 ```groovy
 allprojects {
     project.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsPlugin) {
-        project.extensions.getByType(org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsEnvSpec).version = "您的 Node.js 版本"
+        project.extensions.getByType(org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsEnvSpec).version = "26.2.0"
+    }
 }
 ```
 
 </tab>
 </tabs>
-
-> 使用 `NodeJsRootPlugin` 類別來配置整個專案的 Node.js 設定已被棄用，最終將停止支援。
-> 
-{style="note"}
 
 ### 使用預先安裝的 Node.js
 
@@ -688,7 +675,7 @@ registry "http://my.registry/api/npm/"
 
 ```kotlin
 rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin> {
-    rootProject.the<org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension>().download = false
+    rootProject.the<org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootEnvSpec>().download = false
     // "true" 為預設行為
 }
 ```
@@ -698,7 +685,7 @@ rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlu
 
 ```groovy
 rootProject.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin) {
-    rootProject.extensions.getByType(org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension).download = false
+    rootProject.extensions.getByType(org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootEnvSpec).download = false
 }
  
 ```
@@ -707,10 +694,6 @@ rootProject.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlu
 </tabs>
 
 ### 透過 kotlin-js-store 進行版本鎖定
-
-> 透過 `kotlin-js-store` 進行的版本鎖定自 Kotlin 1.6.10 起可用。
->
-{style="note"}
 
 專案根目錄下的 `kotlin-js-store` 目錄由 Kotlin 多平台 Gradle 外掛程式自動產生，用於存放 `yarn.lock` 檔案，這對於版本鎖定是必要的。鎖定檔案完全由 Yarn 外掛程式管理，並在執行 `kotlinNpmInstall` Gradle 任務期間更新。
 
@@ -797,10 +780,6 @@ rootProject.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlu
 
 ### 預設使用 --ignore-scripts 安裝 npm 相依性
 
-> 預設使用 `--ignore-scripts` 安裝 npm 相依性自 Kotlin 1.6.10 起可用。
->
-{style="note"}
-
 為了減少執行來自受損 npm 套件的惡意程式碼的可能性，Kotlin 多平台 Gradle 外掛程式預設在安裝 npm 相依性期間阻止執行 [生命週期指令碼](https://docs.npmjs.com/cli/v8/using-npm/scripts#life-cycle-scripts)。
 
 您可以透過在 `build.gradle(.kts)` 中加入以下行來明確啟用生命週期指令碼執行：
@@ -829,10 +808,6 @@ rootProject.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlu
 ## 發佈目標目錄
 
 預設情況下，Kotlin/JS 專案建置的結果位於專案根目錄內的 `/build/dist/<targetName>/<binaryName>` 目錄中。
-
-> 在 Kotlin 1.9.0 之前，預設發佈目標目錄為 `/build/distributions`。
->
-{style="note" }
 
 要在建置指令碼的 `browser {}` 區塊中為專案發佈檔案設定另一個位置，請加入一個 `distribution {}` 區塊，並使用 `set()` 方法為 `outputDirectory` 屬性指定一個值。一旦您執行專案建置任務，Gradle 將把輸出組合包連同專案資源一起儲存在此位置。
 
@@ -877,9 +852,11 @@ kotlin {
 
 要調整 JavaScript _模組_ 的名稱（該名稱在 `build/js/packages/myModuleName` 中產生），包括對應的 `.js` 和 `.d.ts` 檔案，請使用 `outputModuleName` 選項：
 
-```groovy
-js {
-    outputModuleName = "myModuleName"
+```kotlin
+kotlin {
+    js {
+        outputModuleName = "myModuleName"
+    }
 }
 ```
 
@@ -893,13 +870,15 @@ Kotlin 多平台 Gradle 外掛程式在建置期間會自動為 Kotlin/JS 專案
 
 除了基本套件屬性外，`package.json` 還可以定義 JavaScript 專案的行為方式，例如識別可供執行的指令碼。
 
-您可以透過 Gradle DSL 向專案的 `package.json` 加入自訂項目。要在您的 `package.json` 中加入自訂欄位，請在編譯區塊的 `packageJson` 中使用 `customField()` 函式：
+您可以透過 Gradle DSL 向專案的 `package.json` 加入自訂項目。要在您的 `package.json` 中加入自訂欄位，請在 `jsMain` 原始碼集的 `packageJson` 區塊中使用 `customField()` 函式：
 
 ```kotlin
 kotlin {
-    js {
-        compilations["main"].packageJson {
-            customField("hello", mapOf("one" to 1, "two" to 2))
+    sourceSets {
+        jsMain {
+            packageJson {
+                customField("hello", mapOf("one" to 1, "two" to 2))
+            }
         }
     }
 }

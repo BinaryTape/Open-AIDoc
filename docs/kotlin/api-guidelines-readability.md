@@ -11,11 +11,11 @@
 但是，通过额外的函数参数引入这些自定义选项会显著增加 API 的复杂性。
 
 与其为自定义添加更多参数，不如设计一个可以将不同行为组合在一起的 API，这种方式更为有效。
-例如，在协程 Flow API 中，[缓冲](coroutines-flow-operators.md#buffering)和[合并](coroutines-flow-operators.md#conflation)都是作为独立的函数实现的。
+例如，在协程 Flow API 中，[缓冲和合并](coroutines-flow-operators.md#concurrent-processing-operators)都是作为独立的函数实现的。
 它们可以与 [`filter`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/filter.html) 和 [`map`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/map.html) 等更基础的操作链式结合，而不是让每个基础操作都接受用于控制缓冲和合并的参数。
 
-另一个例子是 [Jetpack Compose 中的 Modifier API](https://developer.android.com/develop/ui/compose/modifiers)。
-它允许 Composable 组件接受单个 `Modifier` 参数，用于处理常见的自定义选项，如内边距 (padding)、尺寸 (sizing) 和背景颜色。
+另一个例子涉及 [Jetpack Compose 中的 Modifier API](https://developer.android.com/develop/ui/compose/modifiers)。
+它允许 Composable 组件接受单个 `Modifier` 参数，用于处理常见的自定义选项，如内边距、尺寸和背景颜色。
 这种方法避免了每个 Composable 组件都需要为这些自定义选项接受单独参数的需求，从而简化了 API 并降低了复杂性。
 
 ```kotlin
@@ -36,7 +36,7 @@ Box(
 
 Kotlin 库可以通过提供构建器 DSL 来显著提高可读性。
 使用 DSL 可以让你简洁地重复领域特定的数据声明。
-例如，参考以下基于 Ktor 的服务器应用程序示例：
+例如，考虑以下基于 Ktor 的服务器应用程序示例：
 
 ```kotlin
 fun Application.module() {
@@ -68,7 +68,7 @@ fun Application.module() {
 * DSL 中使用的函数是构建器函数，它们将带接收者的 lambda 作为最后一个参数。
   这种设计允许在调用这些函数时省略圆括号，使语法更清晰。
   传递的 lambda 可用于配置正在创建的实体。在上面的示例中，传递给 `routing` 函数的 lambda 用于配置路由详情。
-* 创建类实例的工厂函数应与返回类型同名，并以大写字母开头。
+* 创建类实例的工厂函数应与返回值类型同名，并以大写字母开头。
   你可以在上面创建 `Json` 实例的示例中看到这一点。
   这些函数仍可能接受用于配置的 lambda 参数。欲了解更多信息，请参阅[编码规范](coding-conventions.md#function-names)。
 * 由于无法在编译时确保在提供给构建器函数的 lambda 中设置了必需属性，我们建议将必需值作为函数参数传递。

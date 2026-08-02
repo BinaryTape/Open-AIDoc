@@ -173,7 +173,7 @@ Singleton.provider = new Provider();
 `const` として宣言されたプロパティ（クラス内およびトップレベル）は、Javaでは静的フィールドに変換されます：
 
 ```kotlin
-// ファイル example.kt
+// example.kt ファイル
 
 object Obj {
     const val CONST = 1
@@ -344,13 +344,16 @@ Kotlinは、インターフェース内の関数をJVMのデフォルトメソ�
 
 ## 可視性 (Visibility)
 
-Kotlinの可視性修飾子は、以下のようにJavaにマッピングされます：
+Kotlinは、可視性修飾子を以下のようにJavaにマッピングします：
 
-* `private` メンバーは `private` メンバーにコンパイルされます。
-* `private` トップレベル宣言は `private` トップレベル宣言にコンパイルされます。クラス内からアクセスされる場合は、パッケージプライベートなアクセサも含まれます。
-* `protected` は `protected` のままです。（Javaは同じパッケージ内の他のクラスからのprotectedメンバーへのアクセスを許可しますが、Kotlinは許可しないため、Javaクラスの方がコードへのアクセス範囲が広くなることに注意してください。）
-* `internal` 宣言はJavaでは `public` になります。`internal` クラスのメンバーは、Javaから誤って使用されるのを防ぎ、Kotlinの規則に従って互いに見えない同じシグネチャを持つメンバーのオーバーロードを可能にするために、名前のマングリング（name mangling）が行われます。
-* `public` は `public` のままです。
+* `private` メンバーは `private` のままです。
+* `private` トップレベル宣言はJavaでは `private` トップレベル宣言になります。クラス内からアクセスされる場合は、パッケージプライベートなアクセサも含まれます。
+* `protected` メンバーは `protected` のままです。
+  Javaは同じパッケージ内の他のクラスからのprotectedメンバーへのアクセスを許可しますが、Kotlinは許可しないことに注意してください。
+* `internal` 宣言はJavaでは `public` になります。
+  Kotlinコンパイラは、バイトコード内で `internal` メンバーの名前をマングリング（mangle）します。これにより、JavaからKotlinクラスを拡張する場合などにモジュールを越えて誤ってオーバーライドされるのを防ぎ、同じシグネチャを持つメンバーのオーバーロードを可能にします。
+  `internal` クラスのパブリックメンバーの名前はマングリングされず、Javaから呼び出し可能なままであることに注意してください。
+* `public` メンバーは `public` のままです。
 
 ## KClass
 

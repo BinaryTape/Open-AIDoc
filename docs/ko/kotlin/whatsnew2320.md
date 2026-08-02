@@ -758,6 +758,7 @@ Kotlin 2.3.20은 Maven 프로젝트 설정을 더 쉽게 만드는 중요한 변
 Kotlin 2.3.20은 빌드 도구 API(BTA)를 사용하여 자신의 빌드 시스템을 Kotlin 컴파일러와 통합하려는 개발자들을 위한 더 많은 변경 사항을 도입했습니다.
 
 ### 빌드 작업 개선
+<secondary-label ref="bta"/>
 
 이번 릴리스에서 BTA는 빌드 도구가 빌드 작업을 관리하는 방식을 개선했습니다. 빌드 작업을 통해 빌드 도구는 Kotlin 컴파일러와 상호작용할 수 있습니다. 각 빌드 작업은 [`BuildOperation`](https://github.com/JetBrains/kotlin/blob/v2.3.20/compiler/build-tools/kotlin-build-tools-api/src/main/kotlin/org/jetbrains/kotlin/buildtools/api/BuildOperation.kt#L25) 인터페이스의 구현체입니다.
 
@@ -774,7 +775,7 @@ toolchains.createBuildSession().use {
     try {
         it.executeOperation(operation.build())
     } catch (e: OperationCancelledException) {
-        println("빌드 작업이 취소되었습니다.")
+        println("Build operation has been cancelled.")
     }
 }
 
@@ -805,6 +806,7 @@ fun prepareBuildOperation(toolchains: KotlinToolchains, sources: List<Path>, des
 ```
 
 ### 빌드 도구 간 일관된 메트릭 수집
+<secondary-label ref="bta"/>
 
 Kotlin 2.3.20 이전에는 빌드 메트릭 인프라가 Gradle 중심으로 구성되어 있어 메트릭 이름 등 인프라 일부에 영향을 주었습니다. 또한 모든 메트릭이 서로 다른 [컴파일러 실행 전략(compiler execution strategies)](compiler-execution-strategy.md)에서 사용 가능한 것은 아니었습니다.
 
@@ -827,6 +829,7 @@ operation[BuildOperation.METRICS_COLLECTOR] = object : BuildMetricsCollector {
 ```
 
 ### 빌드 도구에 의한 컴파일러 플러그인 구성 간소화
+<secondary-label ref="bta"/>
 
 Kotlin 2.3.20에서 BTA는 빌드 도구가 컴파일러 플러그인을 구성할 수 있는 더 간단한 새로운 방법을 제공합니다. 이 방식을 통해 빌드 도구는 구성을 사용자에게 직접 전달할 수 있습니다.
 

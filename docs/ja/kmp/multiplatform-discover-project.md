@@ -34,6 +34,8 @@ Kotlinコンパイラはソースコードを入力として受け取り、結�
 
 たとえば、 `kotlinx.coroutines` はすべてのターゲットをサポートするKotlin Multiplatformライブラリですが、 `fun CoroutinesDispatcher.asExecutor(): Executor` のように、 `kotlinx.coroutines` の並行処理プリミティブをJDKの並行処理プリミティブに変換するプラットフォーム固有の部分も持っています。このAPIの追加部分は `commonMain` では利用できません。
 
+利用可能なKotlin Multiplatformライブラリを探索するには、[klibs.io](https://klibs.io)を参照してください。
+
 ## ターゲット
 
 ターゲット（Targets）は、Kotlinが共通コードをコンパイルする先のプラットフォームを定義します。これには、たとえば JVM、JS、Android、iOS、Linux などがあります。前の例では、共通コードをJVMとネイティブターゲット向けにコンパイルしました。

@@ -3,6 +3,10 @@
 Kotlinライブラリを作成する際は、[Kotlin Multiplatformのサポートを含めてビルドおよび公開する](https://www.jetbrains.com/help/kotlin-multiplatform-dev/multiplatform-publish-lib-setup.html)ことを検討してください。
 これにより、ライブラリの対象読者が広がり、複数のプラットフォームをターゲットとするプロジェクトとの互換性が生まれます。
 
+> [klibs.io](https://klibs.io/) では、さまざまなユースケースやターゲットプラットフォーム向けに、すでに利用可能なKotlin Multiplatformライブラリを見つけることができます。
+> 
+{style="tip"}
+
 以下のセクションでは、Kotlin Multiplatformライブラリを効果的に構築するためのガイドラインを提供します。
 
 ## リーチを最大化する
@@ -63,6 +67,6 @@ Kotlin Multiplatformは、サポートされているターゲットプラット
 
 ## ライブラリのプロモーション
 
-あなたのライブラリを [JetBrainsの検索プラットフォーム](https://klibs.io/) に掲載できます。これは、ターゲットプラットフォームに基づいてKotlin Multiplatformライブラリを簡単に検索できるように設計されています。
+あなたのライブラリを、開発者がKotlin Multiplatformライブラリを検索・評価するための検索プラットフォームである [klibs.io](https://klibs.io/) に掲載できます。
 
-基準を満たすライブラリは自動的に追加されます。ライブラリの追加方法の詳細については、[FAQ](https://klibs.io/faq)を参照してください。
+[klibs.io](https://klibs.io/) は、掲載基準を満たすライブラリを自動的にリストアップします。あなたのライブラリが該当するかどうかを確認するには、[FAQ](https://klibs.io/faq) を参照してください。

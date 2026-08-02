@@ -48,9 +48,9 @@ XCFramework の公開を設定するには：
    import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
    
    kotlin {
-       // 他の Kotlin Multiplatform ターゲット
+       // Other Kotlin Multiplatform targets
        // ...
-       // 利用側のプロジェクトでインポートされるモジュールの名前
+       // Name of the module to be imported in the consumer project
        val xcframeworkName = "Shared"
        val xcf = XCFramework(xcframeworkName)
    
@@ -61,7 +61,7 @@ XCFramework の公開を設定するには：
            it.binaries.framework {
                baseName = xcframeworkName
                
-               // フレームワークを一意に識別するための CFBundleIdentifier を指定
+               // Specify CFBundleIdentifier to uniquely identify the framework
                binaryOption("bundleId", "org.example.${xcframeworkName}")
                xcf.add(this)
                isStatic = true
@@ -139,8 +139,8 @@ XCFramework の公開を設定するには：
       targets: [
          .binaryTarget(
             name: "Shared",
-            url: "<アップロードされた XCFramework ZIP ファイルへのリンク>",
-            checksum:"<ZIP ファイルに対して計算されたチェックサム>")
+            url: "<link to the uploaded XCFramework ZIP file>",
+            checksum:"<checksum calculated for the ZIP file>")
       ]
    )
    ```

@@ -10,7 +10,7 @@ Kotlin 멀티플랫폼 Gradle 플러그인은 프로젝트 빌드 시 소스 맵
 
 브라우저에서 Kotlin/JS를 디버깅하려면 다음 단계를 따르세요:
 
-1. 사용 가능한 _run_ Gradle 태스크 중 하나를 실행하여 프로젝트를 실행하세요. 예를 들어, 멀티플랫폼 프로젝트에서는 `browserDevelopmentRun` 또는 `jsBrowserDevelopmentRun`을 실행합니다.
+1. 사용 가능한 _run_ Gradle 태스크 중 하나를 실행하여 프로젝트를 실행하세요. 예를 들어, `jsBrowserDevelopmentRun`을 실행합니다.
    [Kotlin/JS 실행](running-kotlin-js.md#run-the-browser-target)에 대해 자세히 알아보세요.
 2. 브라우저에서 해당 페이지로 이동하여 개발자 도구를 실행합니다 (예: 마우스 오른쪽 버튼을 클릭하고 **검사(Inspect)** 동작 선택). 주요 브라우저에서 [개발자 도구를 찾는 방법](https://balsamiq.com/support/faqs/browserconsole/)을 알아보세요.
 3. 프로그램이 콘솔에 정보를 기록하고 있다면, **콘솔(Console)** 탭으로 이동하여 출력을 확인하세요. 브라우저에 따라 이러한 로그는 해당 로그가 생성된 Kotlin 소스 파일과 줄 번호를 참조할 수 있습니다.
@@ -43,7 +43,7 @@ IntelliJ IDEA에서 Kotlin/JS를 디버깅하려면 **JavaScript Debug** 구성�
 
 이제 프로젝트를 디버깅할 준비가 되었습니다!
 
-1. 사용 가능한 _run_ Gradle 태스크 중 하나를 실행하여 프로젝트를 실행하세요. 예를 들어, 멀티플랫폼 프로젝트에서는 `browserDevelopmentRun` 또는 `jsBrowserDevelopmentRun`을 실행합니다.
+1. 사용 가능한 _run_ Gradle 태스크 중 하나를 실행하여 프로젝트를 실행하세요. 예를 들어, `jsBrowserDevelopmentRun`을 실행합니다.
    [Kotlin/JS 실행](running-kotlin-js.md#run-the-browser-target)에 대해 자세히 알아보세요.
 2. 이전에 생성한 JavaScript 디버그 구성을 실행하여 디버깅 세션을 시작합니다:
 
@@ -55,7 +55,7 @@ IntelliJ IDEA에서 Kotlin/JS를 디버깅하려면 **JavaScript Debug** 구성�
 
 4. 오른쪽에 있는 파일 참조를 클릭하여 해당 코드 줄로 이동합니다.
 
-이제 중단점, 스테핑(stepping), 식 평가(expression evaluation) 등 IDE가 제공하는 모든 도구 세트를 사용하여 프로그램을 디버깅할 수 있습니다. [IntelliJ IDEA에서 디버깅하기](https://www.jetbrains.com/help/idea/debugging-javascript-in-chrome.html)에 대해 자세히 알아보세요.
+이제 중단점(breakpoint), 스테핑(stepping), 식 평가(expression evaluation) 등 IDE가 제공하는 모든 도구 세트를 사용하여 프로그램을 디버깅할 수 있습니다. [IntelliJ IDEA에서 디버깅하기](https://www.jetbrains.com/help/idea/debugging-javascript-in-chrome.html)에 대해 자세히 알아보세요.
 
 > 현재 IntelliJ IDEA의 JavaScript 디버거 제약으로 인해, 중단점에서 실행을 멈추게 하려면 JavaScript 디버그를 다시 실행해야 할 수도 있습니다.
 >

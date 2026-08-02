@@ -4,7 +4,7 @@ KSP 支援增量處理（incremental processing）：僅當一個或多個相依
 
 增量處理預設為啟用。您可以在進行疑難排解或需要強制執行完整重新組建時將其停用。若要停用，請在您的 `gradle.properties` 檔案中加入以下行：
 
-```
+```properties
 ksp.incremental=false
 ```
 
@@ -64,9 +64,9 @@ KSP 將產生的輸出分為兩種類型：聚合（aggregating）和隔離（is
 
 KSP 透過以下方式傳播 dirty 狀態：
 
-1.  透過 **解析追蹤（resolution tracing）**：型別解析是從一個檔案巡覽到另一個檔案的唯一方式。當處理器解析型別參照（明確或隱式）時，KSP 會考慮包含該參照的檔案與任何定義了影響該解析之符號的檔案之間的相依性。因此，已解析符號的變更可能會將引用檔案標記為 dirty。
+1. 透過 **解析追蹤（resolution tracing）**：型別解析是從一個檔案巡覽到另一個檔案的唯一方式。當處理器解析型別參照（明確或隱式）時，KSP 會考慮包含該參照的檔案與任何定義了影響該解析之符號的檔案之間的相依性。因此，已解析符號的變更可能會將引用檔案標記為 dirty。
 
-2.  透過 **輸入-輸出對應**：如果原始碼檔案發生變更或受到影響，則與其共享產生輸出的所有其他原始碼檔案也會被標記為受影響。這會根據共享的輸出將相關檔案分組為等價類（equivalence classes）。
+2. 透過 **輸入-輸出對應**：如果原始碼檔案發生變更或受到影響，則與其共享產生輸出的所有其他原始碼檔案也會被標記為受影響。這會根據共享的輸出將相關檔案分組為等價類（equivalence classes）。
 
 > 規則 (1) 和 (2) 可能會反覆觸發。例如，規則 (1) 可以觸發規則 (2)，進而再次觸發規則 (1)。
 >
@@ -78,17 +78,17 @@ KSP 透過以下方式傳播 dirty 狀態：
 
 以下是 KSP 判斷哪些檔案需要重新處理的方式：
 
-*   如果輸入檔案發生變更，它將始終被重新處理。
+* 如果輸入檔案發生變更，它將始終被重新處理。
 
-    **原因：** 如果輸入發生變更，可能會引入新資訊。處理器需要使用該輸入重新執行。
+   **原因：** 如果輸入發生變更，可能會引入新資訊。處理器需要使用該輸入重新執行。
 
-*   如果輸入檔案發生變更且與某個輸出相關聯，則與該相同輸出相關聯的所有其他輸入檔案也將被重新處理。這會反覆發生，直到沒有新的 dirty 檔案為止。
+* 如果輸入檔案發生變更且與某個輸出相關聯，則與該相同輸出相關聯的所有其他輸入檔案也將被重新處理。這會反覆發生，直到沒有新的 dirty 檔案為止。
 
-    **原因：** 一個輸出是由一組輸入組成的。處理器可能需要所有輸入才能重新產生該輸出。
+   **原因：** 一個輸出是由一組輸入組成的。處理器可能需要所有輸入才能重新產生該輸出。
 
-*   如果未變更的輸入檔案不與任何聚合輸出相關聯，它就不會被重新處理。
+* 如果未變更的輸入檔案不與任何聚合輸出相關聯，它就不會被重新處理。
 
-    **原因：** 此檔案無法影響任何輸出，因為它未變更且不與聚合輸出相關聯。除非符合上述規則之一，否則它不會被重新處理。
+   **原因：** 此檔案無法影響任何輸出，因為它未變更且不與聚合輸出相關聯。除非符合上述規則之一，否則它不會被重新處理。
 
 例如，假設一個專案具有以下結構：
 
@@ -104,25 +104,25 @@ KSP 透過以下方式傳播 dirty 狀態：
 
 處理器：
 
-1.  讀取 `sourceA`。
+1. 讀取 `sourceA`。
 
-2.  產生 `outputA`。
+2. 產生 `outputA`。
 
-3.  讀取 `sourceB`。
+3. 讀取 `sourceB`。
 
-4.  產生 `outputB`。
+4. 產生 `outputB`。
 
 當 `sourceA` 變更時：
 
-*   如果 `outputB` 是聚合的，KSP 會同時重新處理 `sourceA` 和 `sourceB`。
+* 如果 `outputB` 是聚合的，KSP 會同時重新處理 `sourceA` 和 `sourceB`。
 
-*   如果 `outputB` 是隔離的，KSP 僅重新處理 `sourceA`。
+* 如果 `outputB` 是隔離的，KSP 僅重新處理 `sourceA`。
 
 如果新增 `sourceC`：
 
-*   如果 `outputB` 是聚合的，KSP 會重新處理 `sourceC` 和 `sourceB`。
+* 如果 `outputB` 是聚合的，KSP 會重新處理 `sourceC` 和 `sourceB`。
 
-*   如果 `outputB` 是隔離的，KSP 僅重新處理 `sourceC`。
+* 如果 `outputB` 是隔離的，KSP 僅重新處理 `sourceC`。
 
 如果移除 `sourceA` 或 `sourceB`，KSP 不需要重新處理任何檔案。
 
@@ -159,9 +159,9 @@ class Example1Processor : SymbolProcessor {
 
 為了產生 `outputForA`，處理器：
 
-1.  透過呼叫 `Resolver.getSymbolsWithAnnotation` 取得 A。
+1. 透過呼叫 `Resolver.getSymbolsWithAnnotation` 取得 A。
 
-2.  透過在 A 上呼叫 `KSClassDeclaration.superTypes` 取得 B。
+2. 透過在 A 上呼叫 `KSClassDeclaration.superTypes` 取得 B。
 
 KSP 透過解析追蹤來追蹤此關係，並自動將 `B` 記錄為 `A` 的相依性。因此，您不需要明確宣告 `B.kt` 為 `outputForA` 的相依性。
 
@@ -169,19 +169,38 @@ KSP 透過解析追蹤來追蹤此關係，並自動將 `B` 記錄為 `A` 的相
 
 如果您遇到僅在啟用增量處理時才發生的任何錯誤，請在 [GitHub 儲存庫](https://github.com/google/ksp/issues) 中建立問題 (issue) 並附上相關的日誌檔案。
 
-1.  在 `gradle.properties` 中加入以下行來啟用增量處理日誌：
+1. 在 `gradle.properties` 中加入以下行來啟用增量處理日誌：
 
-    ```
-    ksp.incremental.log=true
-    ```
+   ```properties
+   ksp.incremental.log=true
+   ```
 
-2.  執行一次成功的乾淨組建（clean build）。
+2. 執行一次成功的乾淨組建（clean build）。
 
-3.  將產生的日誌檔案複製到其他位置以進行儲存：
+3. 將產生的日誌檔案複製到其他位置以進行儲存：
 
-    *   `build/kspCaches/<source set>/logs/kspDirtySet.log`
-    *   `build/kspCaches/<source set>/logs/kspSourceToOutputs.log`
+   * `build/kspCaches/<source set>/logs/kspDirtySet.log`
+   * `build/kspCaches/<source set>/logs/kspSourceToOutputs.log`
 
-4.  修改觸發問題的來源檔案，並再次執行組建。
+4. 修改觸發問題的來源檔案，並再次執行組建。
 
-5.  將成功組建的日誌檔案，以及重現問題之組建的日誌檔案，一併附加到 GitHub 問題中。
+5. 將成功組建的日誌檔案，以及重現問題之組建的日誌檔案，一併附加到 GitHub 問題中。
+
+### 視覺化符號相依圖
+
+為了協助偵錯增量處理，KSP 可以產生一個 Graphviz DOT 檔案，用以視覺化從指定符號開始的符號相依圖。
+
+啟用增量日誌記錄，並指定要作為視覺化圖表起始點之符號的[完全限定名稱](https://kotlinlang.org/docs/packages.html#package-headers)：
+
+```properties
+ksp.incremental.log=true
+ksp.incremental.log.graph.origin=<fully-qualified-name>
+```
+
+如果您是從命令列使用 KSP，請加入以下選項：
+
+```bash
+-incremental-log=true -incremental-log.graph.origin=<fully-qualified-name>
+```
+
+DOT 檔案會產生在 `logs` 目錄中。

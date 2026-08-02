@@ -12,8 +12,8 @@
     "link": "coroutines-and-channels"
   },
   {
-    "text": "coroutines.cancellation-and-timeouts",
-    "link": "cancellation-and-timeouts"
+    "text": "coroutines.coroutines-cancellation",
+    "link": "coroutines-cancellation"
   },
   {
     "text": "coroutines.composing-suspending-functions",

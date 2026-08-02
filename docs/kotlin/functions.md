@@ -106,7 +106,7 @@ fun main() {
     // 使用 0 作为 'userId' 的默认值
     greeting(message = "Hello!")
     
-    // 错误：未为形参 'userId' 传递值
+    // 错误：未为形参 'message' 传递值
     greeting("Hello!")
 }
 ```

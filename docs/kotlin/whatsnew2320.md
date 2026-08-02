@@ -68,7 +68,7 @@ Kotlin 2.3.20 使在 Maven 项目中设置 Kotlin 变得更加容易。现在 Ko
 此处 `<extensions>` 选项的新功能包括：
 
 * 如果 `src/main/kotlin` 和 `src/test/kotlin` 目录已经存在但未在插件配置中指定，则将它们注册为源码根目录。
-* 在未显式定义 `kotlin-stdlib` 依赖项的情况下自动添加该依赖项。
+* 在未显式定义的情况下自动添加 `kotlin-stdlib` 依赖项。
 
 您也可以选择退出自动添加 Kotlin 标准库的功能。为此，请在 `<properties>` 部分添加以下内容：
 
@@ -422,7 +422,7 @@ Kotlin 2.3.20 为 Lombok 和 `kotlin.plugin.jpa` 编译器插件带来了重要�
 
 此更改简化了构建配置，并提升了在 JPA 框架中使用 Kotlin 的开箱即用体验。
 
-> 即将发布的 [IntelliJ IDEA 2026.1](https://www.jetbrains.com/help/idea/whatsnew/) 在项目中设置 Kotlin 时会自动配置 `kotlin.plugin.jpa` 插件。IDE 提供了一个快速修复方案来添加该插件并移除任何冗余的无参构造函数声明。
+> 即将发布的 [IntelliJ IDEA 2026.1](https://www.jetbrains.com/idea/whatsnew/) 在项目中设置 Kotlin 时会自动配置 `kotlin.plugin.jpa` 插件。IDE 提供了一个快速修复方案来添加该插件并移除任何冗余的无参构造函数声明。
 >
 {style="tip"}
 
@@ -589,9 +589,9 @@ Kotlin/Wasm 现在对 `kotlin.String` 值使用 JS 字符串内建函数 (JS Str
 其结果包括：
 
 * 在目标基准测试中，字符串插值速度最高提升了 4.6 倍。
-* 在 [KotlinConf 应用程序](https://github.com/JetBrains/kotlinconf-app)构建中，Wasm 二进制文件减小了约 5%。
-* 在所有 Wasm 基准测试中，中位数提升了约 1%。
-* 在追加密集型工作负载中，`StringBuilder.append()` 和 `kotlin.String` 实例的拼接速度至少提升了 20%。
+* 在 [KotlinConf 应用程序](https://github.com/JetBrains/kotlinconf-app)构建中，Wasm 二进制文件减小了约 5 %。
+* 在所有 Wasm 基准测试中，中位数提升了约 1 %。
+* 在追加密集型工作负载中，`StringBuilder.append()` 和 `kotlin.String` 实例的拼接速度至少提升了 20 %。
 
 ### 改进编译时间并优化内存
 <secondary-label ref="wasm"/>
@@ -599,7 +599,7 @@ Kotlin/Wasm 现在对 `kotlin.String` 值使用 JS 字符串内建函数 (JS Str
 Kotlin 2.3.20 增加了编译器优化，显著减少了编译期间的内存消耗，尤其是在大型项目中。
 这些优化也改善了增量构建性能。
 
-在我们的测试中，我们观察到全量构建时间缩短了 65%，增量构建时间缩短了 21%。
+在我们的测试中，我们观察到全量构建时间缩短了 65 %，增量构建时间缩短了 21 %。
 
 ### 支持 `@nativeInvoke` 注解
 <primary-label ref="experimental-opt-in"/>
@@ -804,6 +804,7 @@ Kotlin 2.3.20 带来了一项重要更改，使设置您的 Maven 项目变得�
 Kotlin 2.3.20 为希望使用构建工具 API (BTA) 将其构建系统与 Kotlin 编译器集成的开发者引入了更多更改。
 
 ### 构建操作的改进
+<secondary-label ref="bta"/>
 
 在此版本中， BTA 改进了构建工具管理构建操作的方式。
 构建操作允许构建工具与 Kotlin 编译器进行交互。
@@ -853,6 +854,7 @@ fun prepareBuildOperation(toolchains: KotlinToolchains, sources: List<Path>, des
 ```
 
 ### 构建工具之间一致的指标收集
+<secondary-label ref="bta"/>
 
 在 Kotlin 2.3.20 之前，构建指标基础设施以 Gradle 为中心，这影响了部分基础设施，如指标名称。
 此外，并非所有指标都适用于不同的[编译器执行策略](compiler-execution-strategy.md)。
@@ -879,6 +881,7 @@ operation[BuildOperation.METRICS_COLLECTOR] = object : BuildMetricsCollector {
 ```
 
 ### 构建工具更容易配置编译器插件
+<secondary-label ref="bta"/>
 
 在 Kotlin 2.3.20 中， BTA 提供了一种新的且更简单的方法供构建工具配置编译器插件。
 这种方法允许构建工具直接向其用户传播配置。

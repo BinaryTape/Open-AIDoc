@@ -5,6 +5,7 @@
 
 [Liquid Glass](https://developer.apple.com/documentation/TechnologyOverviews/liquid-glass) 是 Apple 在 iOS 26 中引入的视觉设计系统，为 UI 元素带来了玻璃般的半透明感和流动感。
 要在 Compose Multiplatform 应用中采用它，您需要一个原生的 SwiftUI 外壳，因为 Liquid Glass 效果是由系统通过原生 `TabView`、`NavigationStack` 和工具栏 API 渲染的。
+如果 SwiftUI 不适合您的项目，请参阅[替代方案](#alternative-approaches)。
 
 本教程将引导您**将 iOS 应用从完全由 Compose 驱动的导航迁移到原生 SwiftUI 导航**，并采用 iOS 26 Liquid Glass 样式，同时保持由 Compose 负责渲染每个页面的内容。
 当应用使用原生 `TabView` 和 `NavigationStack` 视图时，系统会自动应用 Liquid Glass 效果，因此您无需编写任何特定于 Liquid Glass 的代码。
@@ -31,7 +32,7 @@
 在完全共享 UI 代码的 Compose Multiplatform 设置中，单个 `ComposeUIViewController` 负责整个 iOS UI：选项卡、导航堆栈、返回手势和页面内容。
 Compose Multiplatform 在 iOS 上的导航过渡旨在提供原生感，但某些平台级功能（例如 iOS 26 的 Liquid Glass 选项卡栏样式）仅通过原生 iOS 组件提供。
 
-解决方案是将导航移交给 SwiftUI，让系统原生渲染选项卡栏和导航堆栈，而 Compose 继续渲染每个页面的内容。
+解决方案是将导航移交给原生 iOS，让系统渲染选项卡栏和导航堆栈，而 Compose 继续渲染每个页面的内容。
 
 **迁移前：**
 
@@ -327,7 +328,8 @@ CompositionLocalProvider(LocalUseNativeNavigation provides useNativeNavigation) 
 }
 ```
 
-有关完整实现，请参阅 [`NavHost.kt`](https://github.com/JetBrains/kotlinconf-app/blob/3982334f1c3712fb959f0d20b563d6c8b81e9bbd/app/shared/src/commonMain/kotlin/org/jetbrains/kotlinconf/navigation/NavHost.kt) 和 [`SingleScreenApp.kt`](https://github.com/JetBrains/kotlinconf-app/blob/3982334f1c3712fb959f0d20b563d6c8b81e9bbd/app/shared/src/iosMain/kotlin/org/jetbrains/kotlinconf/SingleScreenApp.kt)。
+有关完整实现，请参阅 [`NavHost.kt`](https://github.com/JetBrains/kotlinconf-app/blob/3982334f1c3712fb959f0d20b563d6c8b81e9bbd/app/shared/src/commonMain/kotlin/org/jetbrains/kotlinconf/navigation/NavHost.kt)
+和 [`SingleScreenApp.kt`](https://github.com/JetBrains/kotlinconf-app/blob/3982334f1c3712fb959f0d20b563d6c8b81e9bbd/app/shared/src/iosMain/kotlin/org/jetbrains/kotlinconf/SingleScreenApp.kt)。
 
 ## 隐藏 Compose 内置的导航 UI
 
@@ -381,7 +383,7 @@ if (!useNativeNavigation) {
         App(appGraph, topLevelRoute, onNavigate = onNavigate, onActivate = onActivate)
     }
     ```
-
+  
 * `ScreenViewController`，由 SwiftUI 为每个详情页面调用。通过 `SingleScreenApp` 渲染单个路由，它将 `LocalUseNativeNavigation` 设置为 `true`，从而隐藏 Compose 内置的标题栏和返回按钮。
 
     ```kotlin
@@ -401,6 +403,53 @@ if (!useNativeNavigation) {
     ```
 
 有关完整实现，请参阅 [`main.ios.kt`](https://github.com/JetBrains/kotlinconf-app/blob/3982334f1c3712fb959f0d20b563d6c8b81e9bbd/app/shared/src/iosMain/kotlin/org/jetbrains/kotlinconf/main.ios.kt)。
+
+### 替代方案：跳过 SwiftUI 并从 Kotlin 驱动 UIKit {collapsible="true"}
+
+上述入口点是为 SwiftUI 的 `TabView` 和 `NavigationStack` 设计的。在底层，SwiftUI 使用 `UITabBarController` 和 `UINavigationController` 来实现这些视图，而 iOS 26 上的 Liquid Glass 会应用于原生的选项卡栏和导航栏，无论您是在 SwiftUI 中声明它们还是在 UIKit 中配置它们。
+
+如果您是从头开始构建新的 iOS 入口点，或者还没有需要保留的 SwiftUI App 和 `ContentView`，您可以完全跳过 SwiftUI 层并直接从 Kotlin 驱动 UIKit。这种方法避免了本教程中的 SwiftUI 外壳所需的 `RouteWrapper` 标识变通方案、从 Kotlin 回调镜像的 `@Observable` 路径状态以及 `UIViewControllerRepresentable` 包装器。导航状态位于一处，而不是在 Swift 和 Kotlin 之间重复。
+
+要获得原生导航栏和共享的 Compose 页面内容，请在 `commonMain` 中将导航契约声明为 `expect class` 协调器，并在每个平台上提供 `actual` 实现。
+
+本教程的 SwiftUI 外壳是声明式的：您描述一个 `TabView` 和 `NavigationStack`，由 SwiftUI 管理堆栈。UIKit 协调器方法是命令式的：您拥有一个 `UINavigationController` 并亲自调用 `push` 和 `pop`。
+
+```
+SceneDelegate
+  └── UIWindow.rootViewController = UITabBarController
+        ├── UINavigationController (Schedule)
+        │     ├── ComposeUIViewController  ← 选项卡根页面
+        │     └── ComposeUIViewController  ← 详情页面，在 Kotlin 中推送
+        └── UINavigationController (Info)
+              └── ...
+```
+
+本教程中的 SwiftUI 部件与 UIKit 协调器的映射如下：
+
+* SwiftUI `TabView` 和 `NavigationStack` → `UITabBarController` 和 `UINavigationController`
+* `TabNavigationCoordinator` 和 `RouteWrapper` → Kotlin `actual` 协调器的 `push` 和 `pop`
+* `NativeNavComposeView` 和 `DetailComposeView` → 协调器内部的 `ComposeUIViewController { Screen(...) }`
+* `ContentView` SwiftUI 外壳 → `SceneDelegate` 设置 `window.rootViewController`
+
+```kotlin
+// commonMain
+expect class ScheduleCoordinator() {
+    fun navigateToDetail(route: AppRoute)
+    fun navigateBack()
+    @Composable fun Content()
+}
+```
+
+`iosMain` 中的 `actual` 实现会在 `UINavigationController` 上调用 `push` 和 `pop` 并设置 `showTopBar` 为 `false`。在 iOS 上，从 `SceneDelegate` 创建协调器，并将选项卡栏控制器设置为窗口的根视图控制器。您不需要 SwiftUI `App` 或 `ContentView` 包装器。
+
+您可以通过两种方式在 Kotlin 和 Swift 之间拆分工作：
+
+* **全部在 Kotlin `iosMain` 中**：使用 UIKit 互操作在 `actual` 协调器中连接 `UITabBarController`、`UINavigationController` 和 `ComposeUIViewController`。
+* **Kotlin 负责页面工厂，Swift 负责组装**：从 `iosMain` 暴露 `MainViewController` 和 `ScreenViewController`，它们返回带有导航闭包的 `ComposeUIViewController` 实例，并在原生 Swift 中构建选项卡栏和导航堆栈。当 iOS 导航代码应留在 Swift 中而页面内容保持共享 Compose 时，此选项效果很好。
+
+这两个选项都能为您提供相同的扁平 UIKit 层次结构，而无需 SwiftUI 或 `UIViewControllerRepresentable`。请根据您的团队偏好协调器逻辑存放的位置进行选择。
+
+有关在 `UITabBarController` 中使用 Compose 的详细信息，请参阅[与 UIKit 框架集成](compose-uikit-integration.md)。
 
 ## 构建 SwiftUI 导航层
 
@@ -662,6 +711,7 @@ struct ContentView: View {
 
 本教程中的迁移偏向于使用原生 SwiftUI 导航，这可以让您开箱即用地获得 Liquid Glass 和其他系统行为。如果这种方法不适合您的项目，请考虑以下替代方案之一：
 
+* **从 Kotlin 协调 UIKit 导航**。在 `commonMain` 中将导航契约声明为 `expect class` 协调器，并在每个平台上提供 `actual` 实现，以命令式方式驱动 `UITabBarController` 和 `UINavigationController`。您可以在没有 SwiftUI 外壳的情况下获得 Liquid Glass 和单一的导航状态来源，但您需要编写 UIKit 互操作代码。请参阅[跳过 SwiftUI 并从 Kotlin 驱动 UIKit](#alternative-skip-swiftui-and-drive-uikit-from-kotlin)了解详情。
 * **带有原生互操作控制的 Compose 驱动导航**。在 Compose 中保留导航，但嵌入原生的 UI 控件（如 `UITabBar` 和 `UINavigationBar`），包括 Liquid Glass 样式。权衡之处在于原生叠加层与 Compose 内容之间存在一些互操作限制。
 * **带有第三方自适应 UI 解决方案的 Compose 驱动导航**。使用像 [Calf](https://klibs.io/project/MohamedRejeb/Calf) 这样的库来渲染原生于应用运行平台的自适应 UI 组件。这种方法降低了自行处理平台差异的复杂性，并提供了开箱即用的 iOS 原生行为（如 Liquid Glass）。
 * **带有模拟 Liquid Glass 效果的纯 Compose 导航**。在 Compose 中渲染所有内容并视觉上模拟 Liquid Glass，例如使用 [AndroidLiquidGlass](https://klibs.io/project/Kyant0/AndroidLiquidGlass) 或 [Liquid](https://klibs.io/project/FletchMcKee/liquid) 等库。这种方法将所有 UI 保留在 Compose 侧，效果在视觉上相似，但与系统 Liquid Glass 不完全相同。

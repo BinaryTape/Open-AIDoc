@@ -30,7 +30,7 @@
    
 3. **Project** 뷰로 전환합니다.
 
-   ![Project view](switch-to-project.png){width="513"}
+   ![Project 뷰](switch-to-project.png){width="513"}
 
 ## 코드를 크로스 플랫폼으로 만들기
 

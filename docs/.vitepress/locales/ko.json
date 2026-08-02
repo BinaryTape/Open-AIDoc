@@ -85,7 +85,7 @@
   "kotlin.kotlin-overview": "Kotlin 개요",
   "kotlin.what-s-new-in-kotlin": "Kotlin의 새로운 기능",
   "kotlin.whatsnew22": "Kotlin 2.2.0",
-  "kotlin.whatsnew-eap": "Kotlin 2.4.20-Beta1",
+  "kotlin.whatsnew-eap": "Kotlin 2.4.20-Beta2",
   "kotlin.earlier-versions": "이전 버전",
   "kotlin.whatsnew2120": "Kotlin 2.1.20",
   "kotlin.whatsnew21": "Kotlin 2.1.0",
@@ -681,5 +681,11 @@
   "kotlin.beginner": "초급",
   "kotlin.intermediate": "중급",
   "kotlin.immutable-collections-kotlinx-collections-immutable": "불변 컬렉션 (kotlinx.collections.immutable)",
-  "kotlin.jvm-code-analysis": "코드 분석 도구 사용"
+  "kotlin.jvm-code-analysis": "코드 분석 도구 사용",
+  "kotlin.ksp-command-line": "명령줄에서의 KSP",
+  "coroutines.coroutines-cancellation": "취소",
+  "lincheck.testing-data-structures": "데이터 구조 테스트",
+  "kmp.kmp-for-ios": "iOS용 Kotlin Multiplatform",
+  "koog.cloud-platform-integrations": "클라우드 플랫폼 통합",
+  "koog.amazon-bedrock-agentcore": "Amazon Bedrock AgentCore"
 }

@@ -9,6 +9,7 @@
 * [iOS 上的帧率配置](#frame-rate-configuration)
 * [Compose Multiplatform for web 进入 Beta 阶段](#compose-multiplatform-for-web-in-beta)
 * [Web 目标的无障碍支持](#accessibility-support)
+* [Kotlin/JS 不再需要 skiko.js](#skiko-js-is-no-longer-needed)
 * [用于嵌入 HTML 内容的新 API](#new-api-for-embedding-html-content)
 
 请在 [GitHub](https://github.com/JetBrains/compose-multiplatform/releases/tag/v1.9.0) 上查看此版本的完整更改列表。
@@ -23,7 +24,7 @@
    * [Material3 1.4.0](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.4.0)
 
 * Compose Material3 库 `org.jetbrains.compose.material3:1.9.0`。基于 [Jetpack Material3 1.4.0](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.4.0)。
-  得益于 Compose Multiplatform 和 Material3 的[解耦版本](#decoupled-material3-versioning)，您可以为项目选择更早期的预发布版本。
+  得益于 Compose Multiplatform 和 Material3 的[解耦版本](#decoupled-material3-versioning)，您可以为项目选择更新的预发布版本。
 * Compose Material3 Adaptive 库 `org.jetbrains.compose.material3.adaptive:adaptive*:1.2.0`。基于 [Jetpack Material3 Adaptive 1.2.0](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.2.0)
 * Lifecycle 库 `org.jetbrains.androidx.lifecycle:lifecycle-*:2.9.6`。基于 [Jetpack Lifecycle 2.9.4](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.9.4)
 * Navigation 库 `org.jetbrains.androidx.navigation:navigation-*:2.9.1`。基于 [Jetpack Navigation 2.9.4](https://developer.android.com/jetpack/androidx/releases/navigation#2.9.4)
@@ -207,9 +208,15 @@ ComposeViewport(
 }
 ```
 
+### 不再需要 skiko.js
+
+自 Compose Multiplatform 1.7.0 以来，`skiko.js` 对于 Kotlin/Wasm 应用程序已是冗余的。从该版本开始，对于 Kotlin/JS 也是如此：Skiko 的 web 运行时现在作为 ES 模块发布，并直接捆绑到应用编译后的 JavaScript 中，因此这两个 web 目标都不再需要单独的 `skiko.js` 脚本。
+
+您可以从 `index.html` 文件中移除 `<script src="skiko.js">` 标签。
+
 ### 用于嵌入 HTML 内容的新 API
 
-通过新的 `WebElementView()` 可组合函数，您可以将 HTML 元素无缝集成到您的 Web 应用程序中。
+通过新的 `WebElementView()` 可组合函数，您可以将 HTML 元素无缝集成到您的 web 应用程序中。
 
 嵌入的 HTML 元素会根据您 Compose 代码中定义的尺寸覆盖画布区域。它会拦截该区域内的输入事件，从而防止 Compose Multiplatform 接收这些事件。
 

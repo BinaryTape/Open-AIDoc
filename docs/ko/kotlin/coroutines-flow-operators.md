@@ -1,921 +1,944 @@
-<!--- TEST_NAME FlowGuideTest --> 
 <contribute-url>https://github.com/Kotlin/kotlinx.coroutines/edit/master/docs/topics/</contribute-url>
 
 [//]: # (title: 플로우 연산자)
 
-> 이 페이지는 현재 수정 중입니다. 플로우에 대한 최신 가이드는 [플로우 개요](coroutines-flow.md)에서 확인하세요.
+플로우 연산자를 사용하면 플로우 파이프라인에서 값을 변환하고 처리할 수 있습니다.
+Kotlin은 크게 두 가지 종류의 플로우 연산자를 제공합니다:
+
+* [**중간 연산자(Intermediate operators)**](#intermediate-operators)는 업스트림 플로우에서 값을 소비하고 연산을 적용하여 새로운 다운스트림 플로우를 반환합니다.
+* [**종단 연산자(Terminal operators)**](#terminal-operators)는 업스트림 플로우를 수집하여 플로우 파이프라인의 실행을 트리거합니다. 결과를 반환할 수도 있습니다.
+
+[`kotlinx.coroutines`](https://github.com/Kotlin/kotlinx.coroutines) 라이브러리는 광범위한 플로우 연산자를 제공하지만, 기본 제공 연산자가 제공하지 않는 동작이 필요한 경우 커스텀 연산자를 직접 정의할 수도 있습니다.
+
+> 아래 섹션들에는 해당 내장 연산자와 함께 커스텀 구현 예제가 포함되어 있습니다.
+>
+{style="tip"}
+
+## 중간 연산자
+
+중간 연산자는 업스트림 플로우의 값을 소비하는 새로운 다운스트림 플로우를 반환합니다.
+최종 결과를 수집하기 전에 여러 중간 연산자를 체이닝하여 플로우 파이프라인을 구축할 수 있습니다.
+
+중간 연산자는 목적에 따라 다음과 같은 카테고리로 분류할 수 있습니다:
+
+* [**변환 연산자(Transforming operators)**](#transforming-operators): 값을 다운스트림으로 방출하기 전에 변환합니다.
+* [**필터링 및 크기 제한 연산자(Filtering and size-limiting operators)**](#filtering-and-size-limiting-operators): 어떤 업스트림 값이 다운스트림으로 계속 흐를지 제어합니다.
+* [**동시 처리 연산자(Concurrent processing operators)**](#concurrent-processing-operators): 방출이 수집과 별개로 실행되도록 합니다.
+* [**합성 연산자(Combining operators)**](#combining-operators): 여러 업스트림 플로우에서 값을 수집하여 하나의 다운스트림 플로우로 방출합니다.
+* [**생명 주기 연산자(Lifecycle operators)**](#lifecycle-operators): 수집 시작 또는 업스트림 플로우 완료와 같이 플로우 수집 중 발생하는 특정 이벤트에 대응하여 동작을 실행합니다.
+
+### 변환 연산자
+
+변환 연산자는 업스트림 플로우에서 방출된 값을 변환합니다.
+값을 다른 타입으로 변환하거나, 값을 건너뛰거나, 다운스트림으로 추가 값을 방출하는 데 사용할 수 있습니다.
+
+> 변환 연산자는 일시 중단 람다를 받으므로, 각 방출된 값을 처리하는 동안 람다 내부에서 일시 중단 함수를 호출할 수 있습니다.
+> 플로우 파이프라인이 동시성을 도입하는 연산자를 사용하지 않는 한, 값들은 여전히 순차적으로 처리됩니다.
 >
 {style="note"}
 
-플로우는 컬렉션이나 시퀀스를 변환하는 것과 동일한 방식으로 연산자를 사용하여 변환할 수 있습니다.
-중간 연산자(Intermediate operator)는 업스트림 플로우에 적용되어 다운스트림 플로우를 반환합니다.
-이러한 연산자들은 콜드(cold) 방식으로 동작합니다. 이러한 연산자를 호출하는 것 자체는 일시 중단 함수가 아닙니다. 이는 빠르게 작동하여 새로운 변환된 플로우의 정의를 반환합니다.
+[`.transform()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/transform.html) 연산자는 [`.map()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/map.html)이나 [`.filter()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/filter.html)와 같은 더 구체적인 변환 연산자의 기초로 사용할 수 있는 일반적인 변환 연산자입니다.
 
-기본 연산자들은 [map]이나 [filter]와 같이 익숙한 이름을 가지고 있습니다.
-시퀀스와의 중요한 차이점은 이러한 연산자 내부의 코드 블록에서 일시 중단 함수를 호출할 수 있다는 점입니다.
-
-예를 들어, 들어오는 요청 플로우를 결과 플로우로 매핑할 때, 요청을 수행하는 작업이 일시 중단 함수로 구현된 오래 걸리는 작업이더라도 [map] 연산자를 사용할 수 있습니다.
+다음은 `.transform()` 연산자를 사용하여 각 업스트림 값을 해당 값의 크기만큼 반복해서 방출하는 예제입니다:
 
 ```kotlin
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
-//sampleStart           
-suspend fun performRequest(request: Int): String {
-    delay(1000) // 오래 걸리는 비동기 작업을 흉내냅니다.
-    return "response $request"
+// 기본 .transform() 연산자를 단순화한 커스텀 구현
+inline fun <T, R> Flow<T>.myTransform(
+    // 값을 다운스트림으로 방출할 수 있는 일시 중단 람다를 받습니다.
+    crossinline transform: suspend FlowCollector<R>.(value: T) -> Unit
+): Flow<R> = flow {
+    // 업스트림 플로우에서 값을 수집합니다.
+    this@myTransform.collect { value ->
+        // 변환을 적용하고 다운스트림 플로우로 값을 방출합니다.
+        this@flow.transform(value)
+    }
 }
 
-fun main() = runBlocking<Unit> {
-    (1..3).asFlow() // 요청 플로우
-        .map { request -> performRequest(request) }
-        .collect { response -> println(response) }
-}
-//sampleEnd
-```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
-<!--- KNIT example-flow-01.kt -->
-> 전체 코드는 [여기](https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/test/guide/example-flow-01.kt)에서 확인할 수 있습니다.
->
-{style="note"}
-
-이 코드는 다음과 같이 세 줄을 출력하며, 각 줄은 이전 줄이 나타난 지 1초 후에 나타납니다:
-
-```text                                                                    
-response 1
-response 2
-response 3
-```
-
-<!--- TEST -->
-
-### Transform 연산자
-
-플로우 변환 연산자 중에서 가장 일반적인 것은 [transform]입니다. 이는 [map]이나 [filter]와 같은 단순한 변환을 흉내 내는 것뿐만 아니라, 더 복잡한 변환을 구현하는 데에도 사용할 수 있습니다.
-`transform` 연산자를 사용하면 임의의 값을 임의의 횟수만큼 [방출(emit)][FlowCollector.emit]할 수 있습니다.
-
-예를 들어, `transform`을 사용하여 오래 걸리는 비동기 요청을 수행하기 전에 문자열을 방출하고, 그 뒤에 응답을 방출할 수 있습니다.
-
-```kotlin
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
-
-suspend fun performRequest(request: Int): String {
-    delay(1000) // 오래 걸리는 비동기 작업을 흉내냅니다.
-    return "response $request"
-}
-
-fun main() = runBlocking<Unit> {
-//sampleStart
-    (1..3).asFlow() // 요청 플로우
-        .transform { request ->
-            emit("Making request $request") 
-            emit(performRequest(request)) 
+// 기본 .transform() 연산자를 사용합니다.
+suspend fun main() = withContext(Dispatchers.Default) {
+    val flow = (0..4).asFlow().transform { value ->
+        // 각 값을 해당 값의 크기만큼 방출합니다.
+        repeat(value) {
+            emit(value)
         }
-        .collect { response -> println(response) }
-//sampleEnd
+    }
+    println(flow.toList())
+    // [1, 2, 2, 3, 3, 3, 4, 4, 4, 4]
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
-<!--- KNIT example-flow-02.kt -->
-> 전체 코드는 [여기](https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/test/guide/example-flow-02.kt)에서 확인할 수 있습니다.
->
-{style="note"}
+{kotlin-runnable="true"}
 
-이 코드의 출력은 다음과 같습니다:
+[`.map()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/map.html) 연산자를 사용하면 각 업스트림 값을 하나의 다운스트림 값으로 변환할 수 있습니다.
 
-```text
-Making request 1
-response 1
-Making request 2
-response 2
-Making request 3
-response 3
-```
-
-<!--- TEST -->
-
-### 크기 제한 연산자
-
-[take]와 같은 크기 제한 중간 연산자는 해당 제한에 도달하면 플로우의 실행을 취소합니다. 코루틴에서의 취소는 항상 예외를 던지는 방식으로 수행되므로, 취소 시에도 모든 리소스 관리 함수(예: `try { ... } finally { ... }` 블록)가 정상적으로 작동합니다.
+다음은 `.map()`을 사용하여 각 값에 4를 곱하는 예제입니다:
 
 ```kotlin
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
+// 기본 .map() 연산자를 단순화한 커스텀 구현
+inline fun <T, R> Flow<T>.myMap(
+    crossinline transform: suspend (value: T) -> R
+): Flow<R> = transform { value ->
+    emit(transform(value))
+}
+
 //sampleStart
-fun numbers(): Flow<Int> = flow {
-    try {                          
-        emit(1)
-        emit(2) 
-        println("This line will not execute")
-        emit(3)    
-    } finally {
-        println("Finally in numbers")
+suspend fun main() = withContext(Dispatchers.Default) {
+    // 각 업스트림 값에 4를 곱합니다.
+    val flow = (0..4).asFlow().map { it * 4 }
+    println(flow.toList())
+    // [0, 4, 8, 12, 16]
+}
+//sampleEnd
+```
+{kotlin-runnable="true"}
+
+조건에 맞는 업스트림 값만 방출하려면 [`.filter()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/filter.html) 연산자를 사용하세요.
+
+다음은 `3`으로 나누었을 때 나머지가 `1`인 값만 방출하는 예제입니다:
+
+```kotlin
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
+
+// 기본 .filter() 연산자를 단순화한 커스텀 구현
+inline fun <T> Flow<T>.myFilter(
+    crossinline predicate: suspend (value: T) -> Boolean
+): Flow<T> = transform { value ->
+    // 조건에 맞는 값만 방출합니다.
+    if (predicate(value))
+        emit(value)
+}
+
+//sampleStart
+suspend fun main() = withContext(Dispatchers.Default) {
+    // 3으로 나누었을 때 나머지가 1인 값만 방출합니다.
+    val flow = (0..10).asFlow().filter { it % 3 == 1 }
+    println(flow.toList())
+    // [1, 4, 7, 10]
+}
+//sampleEnd
+```
+{kotlin-runnable="true"}
+
+어떤 연산자들은 값을 변환하면서 조건에 맞는 결과만 방출함으로써 `.map()`과 `.filter()`의 동작을 결합할 수 있습니다.
+
+예를 들어, [`.mapNotNull()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/map-not-null.html)을 사용하면 각 업스트림 값을 변환하고 null이 아닌 결과만 방출할 수 있습니다:
+
+```kotlin
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
+
+// 기본 .mapNotNull() 연산자를 단순화한 커스텀 구현
+inline fun <T, R: Any> Flow<T>.myMapNotNull(
+    crossinline transform: suspend (value: T) -> R?
+): Flow<R> = transform { value ->
+    transform(value)?.let { transformed ->
+        emit(transformed)
     }
 }
 
-fun main() = runBlocking<Unit> {
-    numbers() 
-        .take(2) // 처음 두 개만 가져옵니다.
-        .collect { value -> println(value) }
-}            
+//sampleStart
+suspend fun main() = withContext(Dispatchers.Default) {
+    // 각 문자열을 Double로 변환하고 변환할 수 없는 값은 건너뜁니다.
+    val flow = flowOf("1.2", "10", "11", "error", "0.000")
+        .mapNotNull { it.toDoubleOrNull() }
+    
+    println(flow.toList())
+    // [1.2, 10.0, 11.0, 0.0]
+}
 //sampleEnd
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
-<!--- KNIT example-flow-03.kt -->
-> 전체 코드는 [여기](https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/test/guide/example-flow-03.kt)에서 확인할 수 있습니다.
->
-{style="note"}
+{kotlin-runnable="true"}
 
-이 코드의 출력은 `numbers()` 함수의 `flow { ... }` 바디 실행이 두 번째 숫자를 방출한 후 중단되었음을 명확히 보여줍니다:
+### 필터링 및 크기 제한 연산자
 
-```text       
-1
-2
-Finally in numbers
-```
+필터링 및 크기 제한 연산자는 플로우에서 어떤 값이 다운스트림으로 계속 흐를지 제어합니다.
+반복되는 연속 값을 제거하거나, 플로우 시작 부분의 값을 건너뛰거나, 지정된 개수의 값을 받은 후 수집을 취소하는 데 사용할 수 있습니다.
 
-<!--- TEST -->
-
-## 종단 플로우 연산자
-
-플로우에서의 종단 연산자(Terminal operator)는 플로우 수집(collection)을 시작하는 *일시 중단 함수*입니다.
-[collect] 연산자가 가장 기본적이지만, 작업을 더 쉽게 만들어주는 다른 종단 연산자들도 있습니다.
-
-* [toList] 및 [toSet]과 같이 다양한 컬렉션으로 변환하는 연산자.
-* [first] 값을 가져오거나 플로우가 단 하나의 값만 방출하도록 보장하는 [single] 연산자.
-* [reduce] 및 [fold]를 사용하여 플로우를 하나의 값으로 축소하는 연산자.
-
-예를 들면 다음과 같습니다:
+반복되는 연속 값을 무시하려면 [`.distinctUntilChanged()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/distinct-until-changed.html) 연산자를 사용하세요.
+이 연산자는 이전에 방출된 값과 다를 때만 값을 방출합니다:
 
 ```kotlin
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
-fun main() = runBlocking<Unit> {
-//sampleStart         
-    val sum = (1..5).asFlow()
-        .map { it * it } // 1부터 5까지의 제곱 수                           
-        .reduce { a, b -> a + b } // 합산 (종단 연산자)
-    println(sum)
-//sampleEnd     
-}
-```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
-<!--- KNIT example-flow-04.kt -->
-> 전체 코드는 [여기](https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/test/guide/example-flow-04.kt)에서 확인할 수 있습니다.
->
-{style="note"}
-
-단일 숫자를 출력합니다:
-
-```text
-55
-```
-
-<!--- TEST -->
-
-## 버퍼링 (Buffering)
-
-플로우의 서로 다른 부분을 서로 다른 코루틴에서 실행하는 것은 플로우를 수집하는 데 걸리는 전체 시간 측면에서 도움이 될 수 있으며, 특히 오래 걸리는 비동기 작업이 포함된 경우 더욱 그렇습니다. 예를 들어, `simple` 플로우가 요소를 생산하는 데 100ms가 걸리고 수집기(collector)가 요소를 처리하는 데 300ms가 걸리는 경우를 생각해 봅시다. 세 개의 숫자가 있는 이러한 플로우를 수집하는 데 시간이 얼마나 걸리는지 확인해 보겠습니다:
-
-```kotlin
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
-import kotlin.system.*
-
-//sampleStart
-fun simple(): Flow<Int> = flow {
-    for (i in 1..3) {
-        delay(100) // 100ms 동안 비동기적으로 기다린다고 가정합니다.
-        emit(i) // 다음 값을 방출합니다.
+// 기본 .distinctUntilChanged() 연산자를 단순화한 커스텀 버전
+fun <T> Flow<T>.myDistinctUntilChanged(): Flow<T> = flow {
+    var lastEmitted: Any? = Any() // 자기 자신하고만 같은 값
+    this@myDistinctUntilChanged.collect { value ->
+        if (lastEmitted != value) {
+            this@flow.emit(value)
+            lastEmitted = value
+        }
     }
 }
 
-fun main() = runBlocking<Unit> { 
-    val time = measureTimeMillis {
-        simple().collect { value -> 
-            delay(300) // 300ms 동안 처리한다고 가정합니다.
-            println(value) 
-        } 
-    }   
-    println("Collected in $time ms")
+suspend fun main() = withContext(Dispatchers.Default) {
+    // 업스트림 플로우에서 반복되는 연속 값을 제거합니다.
+    val flow = flowOf(1, 2, 3, 3, 3, 4, 5, 5, 1).distinctUntilChanged()
+    println(flow.toList())
+    // [1, 2, 3, 4, 5, 1]
 }
-//sampleEnd
+
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
-<!--- KNIT example-flow-05.kt -->
-> 전체 코드는 [여기](https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/test/guide/example-flow-05.kt)에서 확인할 수 있습니다.
->
-{style="note"}
+{kotlin-runnable="true"}
 
-전체 수집에 약 1200ms가 걸리며(세 개의 숫자, 각각 400ms 소요) 다음과 같은 결과가 생성됩니다:
-
-```text
-1
-2
-3
-Collected in 1220 ms
-```
-
-<!--- TEST ARBITRARY_TIME -->
-
-플로우에 [buffer] 연산자를 사용하여 `simple` 플로우의 방출 코드와 수집 코드를 순차적으로 실행하는 대신 동시에 실행할 수 있습니다:
+[`.drop()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/drop.html) 연산자를 사용하여 업스트림 플로우에서 방출된 처음 몇 개의 값을 건너뛸 수 있습니다.
+예를 들어, `.drop(2)`는 처음 두 값을 건너뛰고 나머지 값을 다운스트림으로 방출합니다:
 
 ```kotlin
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlin.system.*
 
-fun simple(): Flow<Int> = flow {
-    for (i in 1..3) {
-        delay(100) // 100ms 동안 비동기적으로 기다린다고 가정합니다.
-        emit(i) // 다음 값을 방출합니다.
+// 기본 .drop() 연산자를 단순화한 커스텀 버전
+fun <T> Flow<T>.myDrop(count: Int): Flow<T> = flow {
+    require(count >= 0)
+    var elementsAlreadyDropped = 0
+    this@myDrop.collect { value ->
+        if (elementsAlreadyDropped == count) {
+            this@flow.emit(value)
+        } else {
+            ++elementsAlreadyDropped
+        }
     }
 }
 
-fun main() = runBlocking<Unit> { 
 //sampleStart
-    val time = measureTimeMillis {
-        simple()
-            .buffer() // 방출을 버퍼링하며, 기다리지 않습니다.
-            .collect { value -> 
-                delay(300) // 300ms 동안 처리한다고 가정합니다.
-                println(value) 
-            } 
-    }   
-    println("Collected in $time ms")
-//sampleEnd
+suspend fun main() = withContext(Dispatchers.Default) {
+    // 업스트림 플로우에서 처음 두 값을 건너뜁니다.
+    val flow = flowOf(1, 2, 3, 4, 5).drop(2)
+    println(flow.toList())
+    // [3, 4, 5]
 }
+//sampleEnd
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
-<!--- KNIT example-flow-06.kt -->
-> 전체 코드는 [여기](https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/test/guide/example-flow-06.kt)에서 확인할 수 있습니다.
->
-{style="note"}
+{kotlin-runnable="true"}
 
-효과적으로 처리 파이프라인을 생성했기 때문에 동일한 숫자를 더 빠르게 생성합니다. 첫 번째 숫자를 위해 100ms만 기다리면 되고, 그 후에는 각 숫자를 처리하는 데 300ms만 소요됩니다. 이 방식으로는 약 1000ms가 걸립니다.
-
-```text
-1
-2
-3
-Collected in 1071 ms
-```                    
-
-<!--- TEST ARBITRARY_TIME -->
-
-> [flowOn] 연산자도 [CoroutineDispatcher]를 변경해야 할 때 동일한 버퍼링 메커니즘을 사용하지만, 여기서는 실행 컨텍스트를 변경하지 않고 명시적으로 버퍼링을 요청했습니다.
->
-{style="note"}
-
-### Conflation (결합)
-
-플로우가 연산의 중간 결과나 연산 상태 업데이트를 나타내는 경우, 각 값을 모두 처리할 필요 없이 가장 최근의 값만 처리해도 될 때가 있습니다. 이 경우 [conflate] 연산자를 사용하여 수집기가 너무 느려 처리하지 못할 때 중간 값들을 건너뛸 수 있습니다. 이전 예제를 바탕으로 살펴보겠습니다:
+정해진 개수의 값을 받은 후 수집을 취소하려면 [`.take()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/take.html) 연산자를 사용하세요.
+다음은 `.take()` 연산자를 사용하여 처음 세 개의 값만 수집하는 예제입니다:
 
 ```kotlin
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlin.system.*
-
-fun simple(): Flow<Int> = flow {
-    for (i in 1..3) {
-        delay(100) // 100ms 동안 비동기적으로 기다린다고 가정합니다.
-        emit(i) // 다음 값을 방출합니다.
-    }
-}
-
-fun main() = runBlocking<Unit> { 
-//sampleStart
-    val time = measureTimeMillis {
-        simple()
-            .conflate() // 방출을 결합(conflate)하여 모든 값을 처리하지 않습니다.
-            .collect { value -> 
-                delay(300) // 300ms 동안 처리한다고 가정합니다.
-                println(value) 
-            } 
-    }   
-    println("Collected in $time ms")
-//sampleEnd
-}
-```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
-<!--- KNIT example-flow-07.kt -->
-> 전체 코드는 [여기](https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/test/guide/example-flow-07.kt)에서 확인할 수 있습니다.
->
-{style="note"}
-
-첫 번째 숫자가 여전히 처리되는 동안 두 번째와 세 번째 숫자가 이미 생성되었으므로, 두 번째 숫자는 *결합(conflated)*되고 가장 최근의 값(세 번째 값)만 수집기에 전달되었음을 알 수 있습니다:
-
-```text
-1
-3
-Collected in 758 ms
-```             
-
-<!--- TEST ARBITRARY_TIME -->
-
-### 최신 값 처리
-
-Conflation은 방출기와 수집기 모두 느릴 때 처리를 가속화하는 한 가지 방법입니다. 이는 방출된 값을 떨어뜨림으로써 수행됩니다. 또 다른 방법은 새로운 값이 방출될 때마다 느린 수집기를 취소하고 다시 시작하는 것입니다. `xxx` 연산자와 동일한 필수 로직을 수행하지만 새로운 값이 들어오면 블록 내부의 코드를 취소하는 `xxxLatest` 연산자 군이 있습니다. 이전 예제에서 [conflate]를 [collectLatest]로 변경해 보겠습니다:
-
-```kotlin
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
-import kotlin.system.*
-
-fun simple(): Flow<Int> = flow {
-    for (i in 1..3) {
-        delay(100) // 100ms 동안 비동기적으로 기다린다고 가정합니다.
-        emit(i) // 다음 값을 방출합니다.
-    }
-}
-
-fun main() = runBlocking<Unit> { 
-//sampleStart
-    val time = measureTimeMillis {
-        simple()
-            .collectLatest { value -> // 최신 값에 대해 취소 및 재시작
-                println("Collecting $value") 
-                delay(300) // 300ms 동안 처리한다고 가정합니다.
-                println("Done $value") 
-            } 
-    }   
-    println("Collected in $time ms")
-//sampleEnd
-}
-```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
-<!--- KNIT example-flow-08.kt -->
-> 전체 코드는 [여기](https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/test/guide/example-flow-08.kt)에서 확인할 수 있습니다.
->
-{style="note"}
-
-[collectLatest]의 바디는 300ms가 걸리지만 새로운 값은 100ms마다 방출되므로, 블록은 모든 값에 대해 실행되지만 마지막 값에 대해서만 완료되는 것을 볼 수 있습니다:
-
-```text 
-Collecting 1
-Collecting 2
-Collecting 3
-Done 3
-Collected in 741 ms
-``` 
-
-<!--- TEST ARBITRARY_TIME -->
-
-## 여러 플로우 합성하기
-
-여러 플로우를 합성하는 방법은 매우 많습니다.
-
-### Zip
-
-Kotlin 표준 라이브러리의 [Sequence.zip] 확장 함수와 마찬가지로, 플로우에는 두 플로우의 대응하는 값을 결합하는 [zip] 연산자가 있습니다:
-
-```kotlin
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
-
-fun main() = runBlocking<Unit> { 
-//sampleStart                                                                           
-    val nums = (1..3).asFlow() // 숫자 1..3
-    val strs = flowOf("one", "two", "three") // 문자열 
-    nums.zip(strs) { a, b -> "$a -> $b" } // 단일 문자열로 합성
-        .collect { println(it) } // 수집 및 출력
-//sampleEnd
-}
-```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
-<!--- KNIT example-flow-09.kt -->
-> 전체 코드는 [여기](https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/test/guide/example-flow-09.kt)에서 확인할 수 있습니다.
->
-{style="note"}
-
-이 예제는 다음과 같이 출력합니다:
-
-```text
-1 -> one
-2 -> two
-3 -> three
-```
-
-<!--- TEST -->
-
-### Combine
-
-플로우가 변수나 연산의 가장 최근 값을 나타낼 때([conflation](#conflation) 섹션 참조), 해당 플로우들의 가장 최근 값에 의존하는 계산을 수행하고 업스트림 플로우 중 하나가 값을 방출할 때마다 이를 다시 계산해야 할 수도 있습니다. 이에 해당하는 연산자 군을 [combine]이라고 합니다.
-
-예를 들어, 이전 예제의 숫자들이 300ms마다 업데이트되고 문자열이 400ms마다 업데이트된다면, [zip] 연산자를 사용하여 압축할 경우 결과는 400ms마다 출력되지만 결과는 동일하게 유지됩니다:
-
-> 이 예제에서는 각 요소에 지연을 주고 샘플 플로우를 방출하는 코드를 더 선언적이고 짧게 만들기 위해 [onEach] 중간 연산자를 사용합니다.
->
-{style="note"}
-
-```kotlin
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
-
-fun main() = runBlocking<Unit> { 
-//sampleStart                                                                           
-    val nums = (1..3).asFlow().onEach { delay(300) } // 300ms마다 숫자 1..3
-    val strs = flowOf("one", "two", "three").onEach { delay(400) } // 400ms마다 문자열
-    val startTime = System.currentTimeMillis() // 시작 시간 기록 
-    nums.zip(strs) { a, b -> "$a -> $b" } // "zip"으로 단일 문자열 합성
-        .collect { value -> // 수집 및 출력 
-            println("$value at ${System.currentTimeMillis() - startTime} ms from start") 
-        } 
-//sampleEnd
-}
-```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
-<!--- KNIT example-flow-10.kt -->
-> 전체 코드는 [여기](https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/test/guide/example-flow-10.kt)에서 확인할 수 있습니다.
->
-{style="note"}
-
-<!--- TEST ARBITRARY_TIME
-1 -> one at 437 ms from start
-2 -> two at 837 ms from start
-3 -> three at 1243 ms from start
--->
-
-하지만 여기서 [zip] 대신 [combine] 연산자를 사용하면 다음과 같습니다:
-
-```kotlin
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
-
-fun main() = runBlocking<Unit> { 
-//sampleStart                                                                           
-    val nums = (1..3).asFlow().onEach { delay(300) } // 300ms마다 숫자 1..3
-    val strs = flowOf("one", "two", "three").onEach { delay(400) } // 400ms마다 문자열          
-    val startTime = System.currentTimeMillis() // 시작 시간 기록 
-    nums.combine(strs) { a, b -> "$a -> $b" } // "combine"으로 단일 문자열 합성
-        .collect { value -> // 수집 및 출력 
-            println("$value at ${System.currentTimeMillis() - startTime} ms from start") 
-        } 
-//sampleEnd
-}
-```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
-<!--- KNIT example-flow-11.kt -->
-> 전체 코드는 [여기](https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/test/guide/example-flow-11.kt)에서 확인할 수 있습니다.
->
-{style="note"}
-
-`nums` 또는 `strs` 플로우 중 하나에서 방출이 일어날 때마다 한 줄씩 출력되는 상당히 다른 출력을 얻게 됩니다:
-
-```text 
-1 -> one at 452 ms from start
-2 -> one at 651 ms from start
-2 -> two at 854 ms from start
-3 -> two at 952 ms from start
-3 -> three at 1256 ms from start
-```
-
-<!--- TEST ARBITRARY_TIME -->
-
-## 플로우 플래트닝 (Flattening flows)
-
-플로우는 비동기적으로 수신된 값의 시퀀스를 나타내므로, 각 값이 또 다른 값의 시퀀스에 대한 요청을 트리거하는 상황이 발생하기 쉽습니다. 예를 들어, 500ms 간격으로 두 개의 문자열 플로우를 반환하는 다음과 같은 함수가 있을 수 있습니다:
-
-```kotlin
-fun requestFlow(i: Int): Flow<String> = flow {
-    emit("$i: First") 
-    delay(500) // 500ms 대기
-    emit("$i: Second")    
-}
-```
-
-<!--- CLEAR -->
-
-이제 세 개의 정수 플로우가 있고 각각에 대해 `requestFlow`를 호출하면 다음과 같습니다:
-
-```kotlin
-(1..3).asFlow().map { requestFlow(it) }
-```
-
-<!--- CLEAR -->
-
-그러면 추가 처리를 위해 단일 플로우로 *플래트닝(flattened, 평탄화)*해야 하는 플로우들의 플로우(`Flow<Flow<String>>`)가 생깁니다. 컬렉션과 시퀀스에는 이를 위한 [flatten][Sequence.flatten] 및 [flatMap][Sequence.flatMap] 연산자가 있습니다. 하지만 플로우의 비동기적 특성 때문에 다양한 플래트닝 *모드*가 필요하며, 따라서 플로우에는 플래트닝 연산자 군이 존재합니다.
-
-### flatMapConcat
-
-플로우들의 플로우를 연결(Concatenation)하는 기능은 [flatMapConcat] 및 [flattenConcat] 연산자가 제공합니다. 이들은 해당 시퀀스 연산자와 가장 직접적인 유사체입니다. 다음 예제에서 볼 수 있듯이, 이들은 다음 플로우를 수집하기 전에 내부 플로우가 완료될 때까지 기다립니다:
-
-```kotlin
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
-
-fun requestFlow(i: Int): Flow<String> = flow {
-    emit("$i: First") 
-    delay(500) // 500ms 대기
-    emit("$i: Second")    
-}
-
-fun main() = runBlocking<Unit> { 
-//sampleStart
-    val startTime = System.currentTimeMillis() // 시작 시간 기록 
-    (1..3).asFlow().onEach { delay(100) } // 100ms마다 숫자 방출 
-        .flatMapConcat { requestFlow(it) }                                                                           
-        .collect { value -> // 수집 및 출력 
-            println("$value at ${System.currentTimeMillis() - startTime} ms from start") 
-        } 
-//sampleEnd
-}
-```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
-<!--- KNIT example-flow-12.kt -->
-> 전체 코드는 [여기](https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/test/guide/example-flow-12.kt)에서 확인할 수 있습니다.
->
-{style="note"}
-
-[flatMapConcat]의 순차적인 특성은 출력에서 명확히 확인할 수 있습니다:
-
-```text                      
-1: First at 121 ms from start
-1: Second at 622 ms from start
-2: First at 727 ms from start
-2: Second at 1227 ms from start
-3: First at 1328 ms from start
-3: Second at 1829 ms from start
-```
-
-<!--- TEST ARBITRARY_TIME -->
-
-### flatMapMerge
-
-또 다른 플래트닝 연산은 모든 유입되는 플로우를 동시에 수집하고 그 값들을 단일 플로우로 병합하여 가능한 한 빨리 값이 방출되도록 하는 것입니다. 이는 [flatMapMerge] 및 [flattenMerge] 연산자에 의해 구현됩니다. 두 연산자 모두 동시에 수집되는 동시 플로우의 수를 제한하는 선택적 `concurrency` 파라미터를 허용합니다(기본값은 [DEFAULT_CONCURRENCY]와 같습니다).
-
-```kotlin
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
-
-fun requestFlow(i: Int): Flow<String> = flow {
-    emit("$i: First") 
-    delay(500) // 500ms 대기
-    emit("$i: Second")    
-}
-
-fun main() = runBlocking<Unit> { 
-//sampleStart
-    val startTime = System.currentTimeMillis() // 시작 시간 기록 
-    (1..3).asFlow().onEach { delay(100) } // 100ms마다 숫자 
-        .flatMapMerge { requestFlow(it) }                                                                           
-        .collect { value -> // 수집 및 출력 
-            println("$value at ${System.currentTimeMillis() - startTime} ms from start") 
-        } 
-//sampleEnd
-}
-```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
-<!--- KNIT example-flow-13.kt -->
-> 전체 코드는 [여기](https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/test/guide/example-flow-13.kt)에서 확인할 수 있습니다.
->
-{style="note"}
-
-[flatMapMerge]의 동시 처리(concurrent) 특성은 자명합니다:
-
-```text                      
-1: First at 136 ms from start
-2: First at 231 ms from start
-3: First at 333 ms from start
-1: Second at 639 ms from start
-2: Second at 732 ms from start
-3: Second at 833 ms from start
-```                                               
-
-<!--- TEST ARBITRARY_TIME -->
-
-> [flatMapMerge]는 코드 블록(이 예제에서는 `{ requestFlow(it) }`)을 순차적으로 호출하지만, 결과 플로우들은 동시에 수집한다는 점에 유의하세요. 이는 먼저 순차적으로 `map { requestFlow(it) }`를 수행한 다음 결과에 [flattenMerge]를 호출하는 것과 같습니다.
->
-{style="note"}
-
-### flatMapLatest
-
-["최신 값 처리"](#processing-the-latest-value) 섹션에서 설명한 [collectLatest] 연산자와 유사하게, 새로운 플로우가 방출되는 즉시 이전 플로우의 수집이 취소되는 "Latest" 플래트닝 모드가 있습니다. 이는 [flatMapLatest] 연산자에 의해 구현됩니다.
-
-```kotlin
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
-
-fun requestFlow(i: Int): Flow<String> = flow {
-    emit("$i: First") 
-    delay(500) // 500ms 대기
-    emit("$i: Second")    
-}
-
-fun main() = runBlocking<Unit> { 
-//sampleStart
-    val startTime = System.currentTimeMillis() // 시작 시간 기록 
-    (1..3).asFlow().onEach { delay(100) } // 100ms마다 숫자 
-        .flatMapLatest { requestFlow(it) }                                                                           
-        .collect { value -> // 수집 및 출력 
-            println("$value at ${System.currentTimeMillis() - startTime} ms from start") 
-        } 
-//sampleEnd
-}
-```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
-<!--- KNIT example-flow-14.kt -->
-> 전체 코드는 [여기](https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/test/guide/example-flow-14.kt)에서 확인할 수 있습니다.
->
-{style="note"}
-
-이 예제의 출력은 [flatMapLatest]가 어떻게 작동하는지 잘 보여줍니다:
-
-```text                      
-1: First at 142 ms from start
-2: First at 322 ms from start
-3: First at 425 ms from start
-3: Second at 931 ms from start
-```                                               
-
-<!--- TEST ARBITRARY_TIME -->
-
-> [flatMapLatest]는 새로운 값을 받으면 해당 블록의 모든 코드(이 예제에서는 `{ requestFlow(it) }`)를 취소합니다. 이 예제에서는 `requestFlow` 호출 자체가 빠르고 일시 중단되지 않으며 취소할 수 없기 때문에 큰 차이가 없습니다. 그러나 `requestFlow`에서 `delay`와 같은 일시 중단 함수를 사용한다면 출력의 차이를 확인할 수 있을 것입니다.
->
-{style="note"}
-
-## 플로우 완료
-
-플로우 수집이 완료될 때(정상적으로 또는 예외적으로), 특정 동작을 실행해야 할 수도 있습니다. 이미 눈치채셨겠지만, 이는 명령형(imperative) 또는 선언적(declarative) 두 가지 방식으로 수행할 수 있습니다.
-
-### 명령형 finally 블록
-
-수집기는 `try`/`catch` 외에도 `finally` 블록을 사용하여 `collect` 완료 시 동작을 실행할 수 있습니다.
-
-```kotlin
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
-
-//sampleStart
-fun simple(): Flow<Int> = (1..3).asFlow()
-
-fun main() = runBlocking<Unit> {
+import kotlin.random.*
+import java.io.IOException
+import kotlin.time.Duration.Companion.milliseconds
+
+// 기본 .take() 연산자를 단순화한 커스텀 버전
+fun <T> Flow<T>.myTake(count: Int): Flow<T> = flow {
+    require(count > 0)
+    val cancellationException = CancellationException()
+    var elementsRemaining = count
     try {
-        simple().collect { value -> println(value) }
-    } finally {
-        println("Done")
+        this@myTake.collect {
+            emit(it)
+            --elementsRemaining
+            if (elementsRemaining == 0) {
+                // 요청한 개수의 값을 받은 후 업스트림 플로우를 취소합니다.
+                throw cancellationException
+            }
+        }
+    } catch (e: Throwable) {
+        if (e === cancellationException) {
+            // 업스트림 플로우를 취소하는 데 사용된 CancellationException을 처리합니다.
+            // .myTake()에서 설정한 개수만큼 완료된 후 플로우를 종료합니다.
+        } else {
+            // 예기치 않은 예외는 다시 던집니다.
+            throw e
+        }
     }
-}            
-//sampleEnd
-```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
-<!--- KNIT example-flow-15.kt -->
-> 전체 코드는 [여기](https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/test/guide/example-flow-15.kt)에서 확인할 수 있습니다.
->
-{style="note"}
-
-이 코드는 `simple` 플로우에서 생성된 세 개의 숫자를 출력한 후 "Done" 문자열을 출력합니다:
-
-```text
-1
-2
-3
-Done
-```
-
-<!--- TEST  -->
-
-### 선언적 핸들링
-
-선언적 접근 방식을 위해 플로우에는 플로우가 완전히 수집되었을 때 호출되는 [onCompletion] 중간 연산자가 있습니다.
-
-이전 예제는 [onCompletion] 연산자를 사용하여 다음과 같이 재작성할 수 있으며 동일한 출력을 생성합니다:
-
-```kotlin
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
-
-fun simple(): Flow<Int> = (1..3).asFlow()
-
-fun main() = runBlocking<Unit> {
-//sampleStart
-    simple()
-        .onCompletion { println("Done") }
-        .collect { value -> println(value) }
-//sampleEnd
-}            
-```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
-<!--- KNIT example-flow-16.kt -->
-> 전체 코드는 [여기](https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/test/guide/example-flow-16.kt)에서 확인할 수 있습니다.
->
-{style="note"}
-
-<!--- TEST 
-1
-2
-3
-Done
--->
-
-[onCompletion]의 주요 장점은 람다의 nullable `Throwable` 파라미터를 사용하여 플로우 수집이 정상적으로 완료되었는지 아니면 예외가 발생하여 완료되었는지 판단할 수 있다는 점입니다. 다음 예제에서 `simple` 플로우는 숫자 1을 방출한 후 예외를 던집니다:
-
-```kotlin
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
-
-//sampleStart
-fun simple(): Flow<Int> = flow {
-    emit(1)
-    throw RuntimeException()
 }
 
-fun main() = runBlocking<Unit> {
-    simple()
-        .onCompletion { cause -> if (cause != null) println("Flow completed exceptionally") }
-        .catch { cause -> println("Caught exception") }
-        .collect { value -> println(value) }
-}            
+//sampleStart
+suspend fun main() = withContext(Dispatchers.Default) {
+    // 업스트림 플로우에서 처음 세 개의 값만 수집합니다.
+    val flow = (0..1000).asFlow().take(3)
+
+    println(flow.toList())
+    // [0, 1, 2]
+}
 //sampleEnd
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
-<!--- KNIT example-flow-17.kt -->
-> 전체 코드는 [여기](https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/test/guide/example-flow-17.kt)에서 확인할 수 있습니다.
->
-{style="note"}
+{kotlin-runnable="true"}
 
-예상할 수 있듯이 다음과 같이 출력됩니다:
+### 동시 처리 연산자
 
-```text
-1
-Flow completed exceptionally
-Caught exception
-```
+기본적으로 플로우 파이프라인은 값을 순차적으로 처리합니다.
+업스트림 플로우가 값을 방출하면, 다음 값이 방출되기 전에 수집기가 이를 처리합니다.
 
-<!--- TEST -->
+업스트림 플로우를 다운스트림 수집과 동시에 실행하려면 동시 처리 연산자를 사용하여 버퍼를 도입하세요.
+버퍼는 업스트림 플로우가 방출했지만 수집기가 아직 처리하지 않은 값을 저장합니다.
 
-[onCompletion] 연산자는 [catch]와 달리 예외를 처리하지 않습니다. 위 예제 코드에서 볼 수 있듯이, 예외는 여전히 다운스트림으로 흐릅니다. 예외는 추가적인 `onCompletion` 연산자들에게 전달될 것이며 `catch` 연산자로 처리될 수 있습니다.
-
-### 성공적인 완료
-
-[catch] 연산자와의 또 다른 차이점은 [onCompletion]이 모든 예외를 확인하며, 업스트림 플로우가 (취소나 실패 없이) 성공적으로 완료되었을 때만 `null` 예외를 받는다는 것입니다.
+이러한 버퍼를 도입하는 연산자 중 하나는 [`.buffer()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/buffer.html) 연산자입니다.
+이 연산자를 사용하면 버퍼 용량과 버퍼가 가득 찼을 때의 동작을 설정할 수 있습니다:
 
 ```kotlin
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import kotlin.time.Duration.Companion.milliseconds
 
 //sampleStart
-fun simple(): Flow<Int> = (1..3).asFlow()
-
-fun main() = runBlocking<Unit> {
-    simple()
-        .onCompletion { cause -> println("Flow completed with $cause") }
-        .collect { value ->
-            check(value <= 1) { "Collected $value" }                 
-            println(value) 
+suspend fun main() = withContext(Dispatchers.Default) {
+    flow {
+        repeat(10) {
+            emit(it)
+            println("Emitted $it!")
+        }
+    }
+        // 업스트림 플로우가 수집기보다 최대 4개 더 많은 값을 방출할 수 있게 합니다.
+        .buffer(4)
+        .collect {
+            println("Processed $it!")
+            delay(20.milliseconds)
         }
 }
 //sampleEnd
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
-<!--- KNIT example-flow-18.kt -->
-> 전체 코드는 [여기](https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/test/guide/example-flow-18.kt)에서 확인할 수 있습니다.
+{kotlin-runnable="true"}
+
+수집기가 업스트림 플로우보다 느릴 때, 파이프라인은 수집기가 아직 처리하지 못한 값들을 처리할 방법이 필요합니다.
+
+기본적으로 수집기는 업스트림 플로우에 *백프레셔(backpressure)*를 적용합니다.
+이 전략을 사용하면 버퍼가 가득 찼을 때 업스트림 플로우가 일시 중단되고, 수집기가 공간을 확보하면 다시 재개됩니다.
+
+업스트림 플로우를 일시 중단하는 대신 값을 버리려면 [`onBufferOverflow`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.channels/-buffer-overflow/) 파라미터를 설정하세요:
+
+```kotlin
+import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.*
+import kotlin.time.Duration.Companion.milliseconds
+
+//sampleStart
+suspend fun main() = withContext(Dispatchers.Default) {
+    flow {
+        repeat(10) {
+            emit(it)
+            println("Emitted $it!")
+        }
+    }
+        // 오버플로우 동작을 적용하기 전까지 최대 4개의 값을 저장합니다.
+        // 버퍼가 가득 차면 가장 오래된 버퍼링된 값을 버립니다.
+        .buffer(4, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+        .collect { value ->
+            println("Processed $value!")
+            delay(20.milliseconds)
+        }
+}
+//sampleEnd
+```
+{kotlin-runnable="true"}
+
+`buffer(1, onBufferOverflow = BufferOverflow.DROP_OLDEST)`의 축약형인 [`.conflate()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/conflate.html) 연산자를 사용할 수도 있습니다.
+이전 값을 수집하는 동안 방출된 값들을 건너뛰고 최신 값만 처리하고 싶을 때 사용하세요:
+
+```kotlin
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
+import kotlin.time.Duration.Companion.milliseconds
+
+//sampleStart
+suspend fun main() = withContext(Dispatchers.Default) {
+    flow {
+        repeat(10) {
+            emit(it)
+            println("Emitted $it!")
+        }
+    }.conflate().collect {
+        println("Processed $it!")
+        delay(20.milliseconds)
+    }
+}
+//sampleEnd
+```
+{kotlin-runnable="true"}
+
+`.conflate()` 연산자는 수집기가 어떤 버퍼링된 값을 처리할지에만 영향을 줍니다.
+이미 시작된 처리를 취소하지는 않습니다.
+그렇게 하려면 대신 [`collectLatest()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/collect-latest.html)를 사용하세요.
+
+위의 예제들에서 `.buffer()`와 `.conflate()` 연산자는 코루틴 컨텍스트를 변경하지 않고 별도의 코루틴에서 업스트림 플로우를 동시에 실행합니다.
+
+업스트림 플로우를 다른 코루틴 컨텍스트에서 실행하려면 [`.flowOn()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/flow-on.html) 연산자를 사용하세요.
+만약 디스패처가 변경되면, `.flowOn()`은 별도의 코루틴에서 업스트림 플로우를 수집하고 업스트림 방출과 다운스트림 수집 사이에 버퍼를 사용합니다.
+
+다음은 `.flowOn()`을 사용하여 `Dispatchers.IO`에서 업스트림 플로우를 실행하는 단순화된 예제입니다:
+
+```kotlin
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
+import kotlin.time.Duration.Companion.milliseconds
+
+//sampleStart
+suspend fun main() = withContext(Dispatchers.Default) {
+    flow {
+        repeat(10) {
+            emit(it)
+        }
+        println("Finished emitting!")
+    }.flowOn(Dispatchers.IO).collect {
+        println("Received $it!")
+        delay(10.milliseconds)
+    }
+}
+//sampleEnd
+```
+{kotlin-runnable="true"}
+
+이 예제에서 `.flowOn()` 연산자는 동시 업스트림 처리를 도입할 수 있지만, 버퍼 동작이 명시적으로 구성되지는 않았습니다.
+
+업스트림 플로우의 코루틴 컨텍스트와 버퍼 동작을 모두 구성하려면 `.flowOn()`을 `.buffer()` 또는 `.conflate()`와 결합하세요.
+이러한 연산자들을 함께 사용하면 연산자들이 *연산자 융합(operator fusion)*을 수행하고 단일 버퍼를 공유하게 됩니다.
+
+다음은 `Dispatchers.IO`에서 업스트림 플로우를 실행하기 위해 `.flowOn(Dispatchers.IO)`를 사용하고, 최신 버퍼링된 값을 유지하기 위해 `.conflate()`를 사용하는 예제입니다:
+
+```kotlin
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
+import kotlin.random.Random
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.math.round
+
+//sampleStart
+fun awaitSensorSignal(): SensorSignal {
+    Thread.sleep(10)
+    val reading =
+        round(Random.nextDouble(25.0, 100.0) * 100.0)/100.0
+    println("Measured $reading as the temperature")
+    return SensorSignal(temperatureCelsius = reading)
+}
+
+data class SensorSignal(
+    val temperatureCelsius: Double
+)
+
+suspend fun sendLatestTemperature(temperatureCelsius: Double) {
+    println("Starting to send $temperatureCelsius...")
+    delay(50.milliseconds)
+    println("Sent $temperatureCelsius.")
+}
+
+suspend fun main() = withContext(Dispatchers.Default) {
+    val smartHomeTemperatureFlow = flow {
+        while (true) {
+            val signal = awaitSensorSignal()
+            emit(signal.temperatureCelsius)
+            println("Emitted $signal")
+        }
+    }
+        // Dispatchers.IO에서 업스트림 플로우를 실행합니다.
+        .flowOn(Dispatchers.IO)
+        // 최신 버퍼링된 값을 유지하고 이전 값들은 버립니다.
+        .conflate()
+        // 업스트림 플로우에서 처음 두 개의 값만 수집합니다.
+        .take(2)
+        .collect { temperature ->
+            println("Received $temperature!")
+            sendLatestTemperature(temperature)
+        }
+}
+//sampleEnd
+```
+{kotlin-runnable="true"}
+
+### 합성 연산자
+
+합성 연산자는 여러 업스트림 플로우의 값을 소비하여 하나의 다운스트림 플로우를 반환합니다.
+수집기가 두 개 이상의 플로우에서 오는 값을 필요로 할 때 사용합니다.
+
+두 업스트림 플로우의 값을 쌍으로 맞추려면 [`.zip()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/zip.html) 연산자를 사용하세요.
+이 연산자는 각 플로우의 첫 번째 값들을 결합하고, 그다음 두 번째 값들을 결합하는 방식으로 작동합니다.
+결과 플로우는 업스트림 플로우 중 하나가 완료되는 즉시 완료됩니다.
+
+예제는 다음과 같습니다:
+
+```kotlin
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
+import kotlin.random.Random
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.TimeSource
+
+//sampleStart
+suspend fun main() = withContext(Dispatchers.Default) {
+    // 100밀리초마다 티커 값을 방출합니다.
+    val tickerFlow = flow {
+        while (true) {
+            emit(Unit)
+            delay(100.milliseconds)
+        }
+    }
+
+    val start = TimeSource.Monotonic.markNow()
+    tickerFlow
+        // 각 티커 방출을 다음 숫자와 결합합니다.
+        .zip(flowOf(1, 2, 3)) { _, value ->
+            value
+        }.collect {
+            println("${start.elapsedNow()}: received $it")
+        }
+}
+//sampleEnd
+```
+{kotlin-runnable="true"}
+
+여러 플로우의 최신 값을 결합하려면 [`.combine()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/combine.html) 연산자를 사용하세요.
+어느 업스트림 플로우라도 값을 방출하면, 각 업스트림 플로우의 최신 값을 사용하여 새 값을 방출합니다:
+
+```kotlin
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.TimeSource
+
+//sampleStart
+enum class Theme {
+    Dark,
+    Light,
+}
+
+data class UiState(
+    val messages: List<String>,
+    val theme: Theme,
+)
+
+val messagesFlow = MutableStateFlow(
+    listOf(
+        "Hello!",
+        "Is anyone here?",
+    )
+)
+
+val themeFlow = MutableStateFlow(
+    Theme.Light
+)
+
+// 두 업스트림 플로우의 최신 값을 결합합니다.
+val uiStateFlow = combine(messagesFlow, themeFlow) { messages, theme ->
+    UiState(messages, theme)
+}
+
+suspend fun main() {
+    withContext(Dispatchers.Default) {
+        // 첫 번째 업데이트가 발생하기 전에 구독하기 위해 UNDISPATCHED를 사용합니다.
+        val uiUpdateJob = launch(start = CoroutineStart.UNDISPATCHED) {
+            uiStateFlow.collect {
+                // UI를 그립니다.
+                println(it)
+            }
+        }
+        messagesFlow.update { messages -> messages + "I'll be back!" }
+        delay(100.milliseconds)
+        
+        themeFlow.value = Theme.Dark
+        delay(100.milliseconds)
+        
+        uiUpdateJob.cancel()
+    }
+}
+//sampleEnd
+```
+{kotlin-runnable="true"}
+
+이 예제에서 `combine()`은 `messagesFlow`와 `themeFlow`의 최신 값으로 `uiStateFlow`를 생성합니다.
+두 업스트림 플로우 중 하나를 업데이트하면 최신 메시지와 테마를 포함하는 새로운 `UiState`가 방출됩니다.
+
+여러 플로우의 값을 동시에 수집하여 하나의 다운스트림 플로우로 방출하려면 [`.merge()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/merge.html) 연산자를 사용하세요:
+
+```kotlin
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.TimeSource
+
+//sampleStart
+interface UiEvent
+
+class ClickEvent: UiEvent
+
+class RightClickEvent: UiEvent
+
+suspend fun main() {
+    withContext(Dispatchers.Default) {
+
+        val clickFlow = MutableSharedFlow<ClickEvent>()
+        val rightClickFlow = MutableSharedFlow<RightClickEvent>()
+
+        coroutineScope {
+            // 첫 번째 업데이트가 발생하기 전에 구독하기 위해 UNDISPATCHED를 사용합니다.
+            val collectJob = launch(start = CoroutineStart.UNDISPATCHED) {
+
+                // 두 업스트림 플로우를 동시에 수집하고 그 값을 다운스트림으로 방출합니다.
+                merge(clickFlow, rightClickFlow).collect {
+                    println("Observed an event: $it")
+                }
+            }
+            clickFlow.emit(ClickEvent())
+            delay(100.milliseconds)
+            
+            clickFlow.emit(ClickEvent())
+            delay(100.milliseconds)
+            
+            rightClickFlow.emit(RightClickEvent())
+            delay(100.milliseconds)
+            
+            collectJob.cancel()
+        }
+    }
+}
+//sampleEnd
+```
+{kotlin-runnable="true"}
+
+### 생명 주기 연산자
+
+생명 주기 연산자는 플로우 수집 중 특정 시점에 실행되는 일시 중단 람다를 받습니다.
+플로우가 수집되기 전, 각 값이 방출되기 전, 수집이 완료된 후, 또는 플로우가 아무런 값도 방출하지 않고 완료될 때 실행될 로직을 배치하는 데 사용할 수 있습니다.
+
+[`.onStart()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/on-start.html) 연산자는 업스트림 플로우가 수집되기 전에 람다를 실행합니다.
+각 값이 방출되기 전에 실행되어야 하는 코드는 [`.onEach()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/on-each.html)를 사용하세요.
+
+> `.onStart()`와 유사하게, 핫 플로우(hot flow)의 경우 구독자가 플로우 수집을 시작한 후, 어떤 값이 방출되기 전에 코드를 실행하려면 [`.onSubscription()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/on-subscription.html)을 사용할 수 있습니다.
 >
 {style="note"}
 
-다운스트림 예외로 인해 플로우가 중단되었기 때문에 완료 원인(completion cause)이 null이 아님을 알 수 있습니다:
+다음은 수집이 시작되기 전과 각 값이 다운스트림으로 방출되기 전에 메시지를 출력하기 위해 이 연산자들을 사용하는 예제입니다:
 
-```text 
-1
-Flow completed with java.lang.IllegalStateException: Collected 2
-Exception in thread "main" java.lang.IllegalStateException: Collected 2
+```kotlin
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.TimeSource
+
+// 기본 .onStart() 연산자를 단순화한 커스텀 버전
+fun <T> Flow<T>.myOnStart(
+    action: suspend FlowCollector<T>.() -> Unit
+): Flow<T> = flow {
+    this@flow.action()
+    this@myOnStart.collect(this@flow)
+}
+
+suspend fun main() {
+    withContext(Dispatchers.Default) {
+        flowOf("Page 1", "Page 2", "Page 3").onStart {
+            println("Processing pages!")
+        }.onEach {
+            println("Emitted $it")
+        }.collect {
+            println("Collected $it")
+        }
+    }
+}
 ```
+{kotlin-runnable="true"}
 
-<!--- TEST EXCEPTION -->
+수집이 완료된 후 코드를 실행하려면 [`.onCompletion()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/on-completion.html) 연산자를 사용하세요.
+이 연산자의 람다는 업스트림 플로우가 성공적으로 완료되었을 때 다운스트림으로 추가 값을 방출할 수 있습니다. 예를 들면 다음과 같습니다:
 
-## 플로우 실행하기
+```kotlin
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.TimeSource
 
-어떤 소스로부터 오는 비동기 이벤트를 나타내는 데 플로우를 사용하는 것은 매우 쉽습니다. 이 경우, 들어오는 이벤트에 대한 반응으로 코드 조각을 등록하고 이후 작업을 계속 진행하는 `addEventListener` 함수와 유사한 기능이 필요합니다. [onEach] 연산자가 이 역할을 수행할 수 있습니다. 하지만 `onEach`는 중간 연산자입니다. 플로우를 수집하려면 종단 연산자도 필요합니다. 그렇지 않으면 단순히 `onEach`를 호출하는 것은 아무런 효과가 없습니다.
+// 기본 .onCompletion() 연산자를 단순화한 커스텀 버전
+fun <T> Flow<T>.myOnCompletion(
+    action: suspend FlowCollector<T>.(cause: Throwable?) -> Unit
+): Flow<T> = flow {
+    var exception: Throwable? = null
+    try {
+        this@myOnCompletion.collect(this@flow)
+    } catch (e: Throwable) {
+        // `action`을 실행하되, `action`에서 `emit`을 호출하면 그 안에서 `e`를 던집니다.
+        FlowCollector<T> { throw e }.action(e)
+        throw e
+    }
+    this@flow.action(null)
+}
 
-`onEach` 뒤에 [collect] 종단 연산자를 사용하면, 그 뒤의 코드는 플로우가 수집될 때까지 기다리게 됩니다:
+//sampleStart
+suspend fun main() {
+    withContext(Dispatchers.Default) {
+        flowOf("Page 1", "Page 2", "Page 3").onCompletion {
+            println("Almost done...")
+            // 업스트림 플로우가 완료된 후 추가 값을 방출합니다.
+            emit("Last Page!")
+        }.collect {
+            println("Collected $it")
+        }
+    }
+}
+//sampleEnd
+```
+{kotlin-runnable="true"}
+
+업스트림 플로우가 아무런 값도 방출하지 않고 완료되었을 때 코드를 실행하려면 [`.onEmpty()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/on-empty.html) 연산자를 사용하세요:
+
+```kotlin
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.TimeSource
+
+// 기본 .onEmpty() 연산자를 단순화한 커스텀 버전
+fun <T> Flow<T>.myOnEmpty(
+    action: suspend FlowCollector<T>.() -> Unit
+): Flow<T> = flow {
+    var emittedSomething = false
+    this@myOnEmpty.collect { value ->
+        emittedSomething = true
+        this@flow.emit(value)
+    }
+    if (!emittedSomething) {
+        action()
+    }
+}
+
+//sampleStart
+suspend fun main() {
+    withContext(Dispatchers.Default) {
+        flowOf("Page 1", "Page 2", "Page 3").onEmpty {
+            // 업스트림 플로우가 값을 방출하므로 아무것도 출력되지 않습니다.
+            println("No pages to load!")
+        }.collect()
+        flowOf<Int>().onEmpty {
+            println("No pages to load!")
+            // No pages to load!
+        }.collect()
+    }
+}
+//sampleEnd
+```
+{kotlin-runnable="true"}
+
+## 종단 연산자
+
+종단 연산자는 플로우를 수집합니다.
+방출된 값을 소비하거나, 수집된 값을 기반으로 결과를 반환하거나, [특정 `CoroutineScope`에서 플로우를 수집](#특정-coroutinescope에서-플로우-수집하기)하는 데 사용할 수 있습니다.
+
+플로우를 수집하려면 [`collect()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/collect.html) 연산자를 사용하세요.
+`collect()`에 람다를 전달하면 각 방출된 값을 전달받습니다:
 
 ```kotlin
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
 //sampleStart
-// 이벤트 플로우를 흉내냅니다.
-fun events(): Flow<Int> = (1..3).asFlow().onEach { delay(100) }
-
-fun main() = runBlocking<Unit> {
-    events()
-        .onEach { event -> println("Event: $event") }
-        .collect() // <--- 플로우 수집이 끝날 때까지 기다립니다.
-    println("Done")
-}            
+suspend fun main() {
+    withContext(Dispatchers.Default) {
+        flowOf(1, 2, 3).collect {
+            println("Collected $it!")
+        }
+    }
+}
 //sampleEnd
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
-<!--- KNIT example-flow-19.kt -->
-> 전체 코드는 [여기](https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/test/guide/example-flow-19.kt)에서 확인할 수 있습니다.
->
-{style="note"}
+{kotlin-runnable="true"}
 
-출력은 다음과 같습니다:
-
-```text 
-Event: 1
-Event: 2
-Event: 3
-Done
-```    
-
-<!--- TEST -->
-
-이때 [launchIn] 종단 연산자가 유용하게 쓰입니다. `collect`를 `launchIn`으로 바꾸면 별도의 코루틴에서 플로우 수집을 시작할 수 있으므로, 이후 코드의 실행이 즉시 계속됩니다:
+람다 없이 `collect()`를 호출할 수도 있습니다:
 
 ```kotlin
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
-// 이벤트 플로우를 흉내냅니다.
-fun events(): Flow<Int> = (1..3).asFlow().onEach { delay(100) }
-
 //sampleStart
-fun main() = runBlocking<Unit> {
-    events()
-        .onEach { event -> println("Event: $event") }
-        .launchIn(this) // <--- 별도의 코루틴에서 플로우를 실행합니다.
-    println("Done")
-}            
+suspend fun main() {
+    withContext(Dispatchers.Default) {
+        flowOf(1, 2, 3).onEach {
+            println("Collected $it!")
+        }.collect()
+    }
+}
 //sampleEnd
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
-<!--- KNIT example-flow-20.kt -->
-> 전체 코드는 [여기](https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/test/guide/example-flow-20.kt)에서 확인할 수 있습니다.
->
-{style="note"}
+{kotlin-runnable="true"}
 
-다음과 같이 출력됩니다:
+플로우를 수집하되 새로운 값이 방출될 때 완료되지 않은 작업을 취소하고 싶다면 [`collectLatest()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/collect-latest.html) 연산자를 사용하세요:
 
-```text          
-Done
-Event: 1
-Event: 2
-Event: 3
-```    
+```kotlin
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.TimeSource
 
-<!--- TEST -->
+//sampleStart
+suspend fun main() {
+    withContext(Dispatchers.Default) {
+        flow {
+            println("Emitting Page 1")
+            emit("Page 1")
+            delay(50.milliseconds)
+            println("Emitting Page 2 in quick succession")
+            emit("Page 2")
+            delay(200.milliseconds)
+            println("Emitting Page 3")
+            emit("Page 3")
+        }.flowOn(Dispatchers.IO).collectLatest {
+            println("Starting to process $it!")
+            try {
+                delay(100.milliseconds)
+            } catch (e: CancellationException) {
+                println("Canceled processing $it.")
+                throw e
+            }
+            println("Done processing!")
+        }
+    }
+}
+//sampleEnd
+```
+{kotlin-runnable="true"}
 
-`launchIn`에 필요한 파라미터는 플로우를 수집할 코루틴이 실행될 [CoroutineScope]를 지정해야 합니다. 위 예제에서 이 스코프는 [runBlocking] 코루틴 빌더에서 제공되므로, 플로우가 실행되는 동안 이 [runBlocking] 스코프는 자식 코루틴이 완료될 때까지 기다리며 main 함수가 반환되어 예제가 종료되는 것을 방지합니다.
+일부 종단 연산자는 플로우를 수집하고 수집된 값을 기반으로 결과를 반환합니다.
+예를 들어, [`.first()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/first.html) 연산자를 사용하여 첫 번째 방출된 값을 반환하고 수집을 취소할 수 있습니다:
 
-실제 애플리케이션에서 스코프는 수명이 제한된 엔티티에서 제공될 것입니다. 해당 엔티티의 수명이 종료되는 즉시 대응하는 스코프가 취소되어 해당 플로우의 수집도 취소됩니다. 이런 방식으로 `onEach { ... }.launchIn(scope)` 쌍은 `addEventListener`와 유사하게 작동합니다. 하지만 취소와 구조화된 동시성(structured concurrency)이 이 목적을 달성해주므로, 이에 대응하는 `removeEventListener` 함수는 필요하지 않습니다.
+```kotlin
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.TimeSource
 
-[launchIn]은 또한 [Job]을 반환하며, 이는 전체 스코프를 취소하지 않고 해당 플로우 수집 코루틴만 [취소][Job.cancel]하거나 [대기][Job.join]하는 데 사용할 수 있습니다.
+suspend fun main() { 
+    withContext(Dispatchers.Default) {
+        val firstValue = flowOf(1, 2, 3).first()
 
-<!-- stdlib references -->
+        println(firstValue)
+        // 1
+    }
+}
+```
+{kotlin-runnable="true"}
 
-[collections]: https://kotlinlang.org/docs/reference/collections-overview.html
-[List]: https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/
-[forEach]: https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/for-each.html
-[Sequence]: https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.sequences/
-[Sequence.zip]: https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.sequences/zip.html
-[Sequence.flatten]: https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.sequences/flatten.html
-[Sequence.flatMap]: https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.sequences/flat-map.html
-[exceptions]: https://kotlinlang.org/docs/reference/exceptions.html
+[`.toList()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/to-list.html) 또는 [`.toSet()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/to-set.html) 연산자를 사용하여 방출된 값들을 컬렉션으로 수집할 수 있습니다:
 
-<!--- MODULE kotlinx-coroutines-core -->
-<!--- INDEX kotlinx.coroutines -->
+```kotlin
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 
-[CoroutineDispatcher]: https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-coroutine-dispatcher/index.html
-[CoroutineScope]: https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-coroutine-scope/index.html
-[runBlocking]: https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/run-blocking.html
-[Job]: https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-job/index.html
-[Job.cancel]: https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/cancel.html
-[Job.join]: https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-job/join.html
+// 기본 .toList() 연산자를 단순화한 커스텀 구현
+suspend fun <T> Flow<T>.myToList(): List<T> = buildList {
+    this@myToList.collect { value ->
+        // 각 방출된 값을 결과 리스트에 추가합니다.
+        add(value)
+    }
+}
 
-<!--- INDEX kotlinx.coroutines.flow -->
+//sampleStart
+suspend fun main() {
+    withContext(Dispatchers.Default) {
+        val list = flowOf(1, 2, 3).toList()
+        println(list)
+        // [1, 2, 3]
 
-[map]: https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/map.html
-[filter]: https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/filter.html
-[transform]: https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/transform.html
-[FlowCollector.emit]: https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/-flow-collector/emit.html
-[take]: https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/take.html
-[collect]: https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/collect.html
-[toList]: https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/to-list.html
-[toSet]: https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/to-set.html
-[first]: https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/first.html
-[single]: https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/single.html
-[reduce]: https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/reduce.html
-[fold]: https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/fold.html
-[buffer]: https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/buffer.html
-[flowOn]: https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/flow-on.html
-[conflate]: https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/conflate.html
-[collectLatest]: https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/collect-latest.html
-[zip]: https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/zip.html
-[combine]: https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/combine.html
-[onEach]: https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/on-each.html
-[flatMapConcat]: https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/flat-map-concat.html
-[flattenConcat]: https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/flatten-concat.html
-[flatMapMerge]: https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/flat-map-merge.html
-[flattenMerge]: https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/flatten-merge.html
-[DEFAULT_CONCURRENCY]: https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/-d-e-f-a-u-l-t_-c-o-n-c-u-r-r-e-n-c-y.html
-[flatMapLatest]: https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/flat-map-latest.html
-[onCompletion]: https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/on-completion.html
-[catch]: https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/catch.html
-[launchIn]: https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/launch-in.html
+        val set = flowOf(1, 2, 2, 3).toSet()
+        println(set)
+        // [1, 2, 3]
+    }
+}
+//sampleEnd
+```
+{kotlin-runnable="true"}
 
-<!--- END -->
+방출된 값들을 결합하여 하나의 결과로 만들려면 [`.reduce()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/reduce.html) 또는 [`.fold()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/fold.html) 연산자를 사용하세요.
+`.fold()` 연산자는 사용자가 제공한 값을 시작 값으로 사용하며, `.reduce()` 연산자는 첫 번째 방출된 값을 시작 값으로 사용합니다.
+
+예제는 다음과 같습니다:
+
+```kotlin
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
+
+//sampleStart
+suspend fun main() {
+    withContext(Dispatchers.Default) {
+        // 첫 번째 방출된 값을 시작 값으로 사용합니다.
+        val reduced = flowOf(1, 2, 3).reduce { accumulator, value ->
+            accumulator + value
+        }
+
+        // 제공된 시작 값으로 시작합니다.
+        val folded = flowOf(1, 2, 3).fold(2) { accumulator, value ->
+            accumulator + value
+        }
+
+        println(reduced)
+        // 6
+
+        println(folded)
+        // 8
+    }
+}
+//sampleEnd
+```
+{kotlin-runnable="true"}
+
+### 특정 `CoroutineScope`에서 플로우 수집하기
+
+화면이나 수명이 긴 다른 객체가 플로우의 값을 필요로 할 때, 해당 객체의 `CoroutineScope`에서 수집기를 시작하세요.
+이렇게 하면 객체가 파괴될 때 해당 객체의 `CoroutineScope`를 취소함으로써 수집도 함께 취소되도록 보장할 수 있습니다.
+
+특정 `CoroutineScope`에서 플로우를 수집하려면 [`.launchIn()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/launch-in.html) 종단 연산자를 사용하세요.
+이 연산자는 수집용 코루틴의 `Job`을 반환합니다.
+
+다음은 화면이 `StateFlow`에서 값을 수집하고, 화면이 닫힐 때 수집용 코루틴을 중단하는 예제입니다:
+
+```kotlin
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.TimeSource
+
+// 기본 .launchIn() 연산자를 단순화한 커스텀 버전
+fun <T> Flow<T>.myLaunchIn(scope: CoroutineScope): Job = scope.launch {
+    this@myLaunchIn.collect()
+}
+
+//sampleStart
+data class Coordinate(val x: Int, val y: Int)
+
+class MyScreen(val scope: CoroutineScope) {
+    private val _mousePosition =
+        MutableStateFlow<Coordinate>(Coordinate(0, 0))
+    val mousePosition get() = _mousePosition.asStateFlow()
+
+    init {
+        // 화면의 CoroutineScope에서 StateFlow 수집을 시작합니다.
+        mousePosition.onEach {
+            updateStatusBar()
+        }.launchIn(scope)
+    }
+
+    fun moveMouse(newCoordinate: Coordinate) {
+        _mousePosition.value = newCoordinate
+    }
+
+    private fun updateStatusBar() {
+        println("Mouse is at ${_mousePosition.value}")
+    }
+}
+
+suspend fun main() {
+    withContext(Dispatchers.Default) {
+        val childScope = CoroutineScope(
+            currentCoroutineContext() + Job(currentCoroutineContext()[Job])
+        )
+        val screen = MyScreen(childScope)
+        delay(100.milliseconds)
+        
+        screen.moveMouse(Coordinate(10, 15))
+        delay(100.milliseconds)
+        
+        screen.moveMouse(Coordinate(1, 3))
+        delay(100.milliseconds)
+        
+        childScope.cancel()
+    }
+}
+//sampleEnd
+```
+{kotlin-runnable="true"}

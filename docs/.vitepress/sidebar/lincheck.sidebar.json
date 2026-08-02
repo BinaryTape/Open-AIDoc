@@ -8,23 +8,41 @@
     "link": "lincheck-getting-started"
   },
   {
-    "text": "lincheck.testing-strategies",
-    "link": "testing-strategies"
+    "text": "lincheck.lincheck-testing-arbitrary-code",
+    "link": "lincheck-testing-arbitrary-code"
   },
   {
-    "text": "lincheck.operation-arguments",
-    "link": "operation-arguments"
-  },
-  {
-    "text": "lincheck.constraints",
-    "link": "constraints"
-  },
-  {
-    "text": "lincheck.progress-guarantees",
-    "link": "progress-guarantees"
-  },
-  {
-    "text": "lincheck.sequential-specification",
-    "link": "sequential-specification"
+    "text": "lincheck.testing-data-structures",
+    "items": [
+      {
+        "text": "lincheck.lincheck-how-to-test-data-structures",
+        "link": "lincheck-how-to-test-data-structures"
+      },
+      {
+        "text": "lincheck.lincheck-testing-strategies",
+        "link": "lincheck-testing-strategies"
+      },
+      {
+        "text": "lincheck.lincheck-testing-strategies-options",
+        "link": "lincheck-testing-strategies-options"
+      },
+      {
+        "text": "lincheck.lincheck-argument-generation-constraints",
+        "link": "lincheck-argument-generation-constraints"
+      },
+      {
+        "text": "lincheck.lincheck-operation-execution-options",
+        "link": "lincheck-operation-execution-options"
+      },
+      {
+        "text": "lincheck.lincheck-progress-guarantees",
+        "link": "lincheck-progress-guarantees"
+      },
+      {
+        "text": "lincheck.lincheck-results-validation",
+        "link": "lincheck-results-validation"
+      }
+    ],
+    "collapsed": true
   }
 ]

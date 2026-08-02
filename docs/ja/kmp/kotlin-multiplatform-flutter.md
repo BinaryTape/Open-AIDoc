@@ -34,7 +34,7 @@ Kotlin Multiplatformでは、さまざまなオプションがあります。ア
 
 Kotlin Multiplatformは、2017年にKotlin 1.2の一部として初めて導入されました。2023年11月にKotlin Multiplatformは安定版（Stable）になりました。Google I/O 2024において、GoogleはAndroidとiOS間でビジネスロジックを共有するための[Kotlin Multiplatformへのサポート](https://android-developers.googleblog.com/2024/05/android-support-for-kotlin-multiplatform-to-share-business-logic-across-mobile-web-server-desktop.html)を発表しました。
 
-Kotlin Multiplatformの一般的な方向性について詳しく知りたい場合は、ブログ記事「[What’s Next for Kotlin Multiplatform and Compose Multiplatform](https://blog.jetbrains.com/kotlin/2025/08/kmp-roadmap-aug-2025/)（Kotlin MultiplatformとCompose Multiplatformの今後の展望）」をご覧ください。
+Kotlin Multiplatformの一般的な方向性について詳しく知りたい場合は、ブログ記事「[What’s Next for Kotlin Multiplatform and Compose Multiplatform](https://blog.jetbrains.com/kotlin/2025/08/kmp-roadmap-aug-2025/)」をご覧ください。
 
 [![Discover Kotlin Multiplatform](discover-kmp.svg){width="500"}](https://www.jetbrains.com/kotlin-multiplatform/)
 
@@ -82,8 +82,8 @@ Compose Multiplatformは現在、[iOS](https://blog.jetbrains.com/kotlin/2025/05
     
 <tr>
 <td><b>パッケージ、依存関係、およびエコシステム</b></td>
-        <td>パッケージは<a href="https://central.sonatype.com/">Maven Central</a>やその他のリポジトリから入手可能です。
-            <p><a href="http://klibs.io">klibs.io</a>（Alpha版）は、KMPライブラリの検索を簡素化するために設計されています。</p>
+        <td>パッケージは<a href="https://central.sonatype.com/">Maven Central</a>やその他のリポジトリから入手可能です。これには、
+            <p>KMPライブラリの検索を簡素化するために設計された<a href="https://klibs.io">klibs.io</a>などが含まれます。</p>
             <p>この<a href="https://github.com/terrakok/kmp-awesome">リスト</a>には、最も人気のあるKMPライブラリとツールの一部が含まれています。</p> </td>
         <td>パッケージは<a href="https://pub.dev/">Pub.dev</a>から入手可能です。</td>
 </tr>
@@ -144,7 +144,7 @@ Compose Multiplatformは現在、[iOS](https://blog.jetbrains.com/kotlin/2025/05
 
 [![Kotlin Multiplatformをクロスプラットフォーム開発に活用しているグローバル企業の実際のユースケースをご覧ください。](kmp-use-cases-1.svg){width="500"}](https://www.jetbrains.com/help/kotlin-multiplatform-dev/case-studies.html)
 
-また、プロジェクトに適した技術スタックを選択するためのガイダンスを提供している、Googleのブログ記事「[Making Development Across Platforms Easier for Developers](https://developers.googleblog.com/en/making-development-across-platforms-easier-for-developers/)（プラットフォームを越えた開発をより容易にする）」も併せてご覧ください。
+また、プロジェクトに適した技術スタックを選択するためのガイダンスを提供している、Googleのブログ記事「[Making Development Across Platforms Easier for Developers](https://developers.googleblog.com/en/making-development-across-platforms-easier-for-developers/)」も併せてご覧ください。
 
 Kotlin MultiplatformとFlutterのさらなる比較をお探しの場合は、Philipp Lackner氏による[KMP vs. Flutterのビデオ](https://www.youtube.com/watch?v=dzog64ENKG0)も視聴することをお勧めします。このビデオでは、コード共有、UIレンダリング、パフォーマンス、および両テクノロジーの将来性に関して、興味深い考察が共有されています。
 

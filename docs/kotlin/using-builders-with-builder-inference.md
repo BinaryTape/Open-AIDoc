@@ -44,7 +44,7 @@ fun addEntryToMap(baseMap: Map<String, Number>, additionalEntry: Pair<String, In
        fun addItem(x: T) {
            items.add(x)
        }
-
+ 
        fun getLastItem(): T? = items.lastOrNull()
    }
    
@@ -149,7 +149,7 @@ val result = buildList {
 ### 辅助构建器推断结果
 
 构建器推断可以收集多种对分析结果有贡献的类型信息。它会考虑：
-* 在 lambda 接收者上调用使用类型形参类型的法
+* 在 lambda 接收者上调用使用类型形参类型的函数
   ```kotlin
   val result = buildList {
       // 根据传递的 "value" 实参，类型实参被推断为 String
@@ -181,7 +181,7 @@ val result = buildList {
   ```kotlin
   fun takeMyLong(x: Long) { ... }
 
-  fun String.isMoreThat3() = length > 3
+  fun String.isMoreThan3() = length > 3
 
   fun takeListOfStrings(x: List<String>) { ... }
 
@@ -193,7 +193,7 @@ val result = buildList {
 
       val result2 = buildList {
           val x = get(0)
-          val isLong = x.isMoreThat3()
+          val isLong = x.isMoreThan3()
       // ...
       } // result2 类型为 List<String>
   

@@ -47,7 +47,7 @@ Kotlin 中的協同程式是建立在暫停函式之上的，暫停函式允許�
 * [`CoroutineExceptionHandler`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-coroutine-exception-handler/) 處理未捕獲的例外。
 
 這些元素與其他可能的元素共同構成了 [_協同程式上下文_](coroutine-context-and-dispatchers.md)，該上下文預設從協同程式的父級繼承。
-此上下文形成了一個支援結構化並行的階層結構，相關的協同程式可以被整合地[取消](cancellation-and-timeouts.md)或成組地[處理例外](exception-handling.md)。
+此上下文形成了一個支援結構化並行的階層結構，相關的協同程式可以被整合地[取消](coroutines-cancellation.md)或成組地[處理例外](exception-handling.md)。
 
 ### 非同步流與共用可變狀態
 

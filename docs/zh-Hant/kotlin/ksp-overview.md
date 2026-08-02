@@ -9,7 +9,7 @@ KSP 旨在簡化輕量級編譯器外掛程式的開發。其定義良好的 API
 * 序列化 ([Moshi](https://github.com/square/moshi))
 * 資料庫管理 ([Room](https://developer.android.com/jetpack/androidx/releases/room#2.3.0-beta02))
 
-若要了解如何建立您的第一個基於 KSP 的處理器，請參閱 [KSP 快速入門指南](ksp-quickstart.md)。
+若要了解如何建立您的第一個基於 KSP 的處理器，請參閱 [KSP 快速入門](ksp-quickstart.md)。
 
 ## 總覽
 
@@ -143,7 +143,7 @@ class HelloFunctionFinderProcessor : SymbolProcessor() {
 * [增量處理說明](ksp-incremental.md)
 * [多輪處理說明](ksp-multi-round.md)
 * [多平台專案中的 KSP](ksp-multiplatform.md)
-* [從命令列執行 KSP](https://github.com/google/ksp/blob/main/docs/ksp2cmdline.md)
+* [從命令列執行 KSP](ksp-command-line.md)
 * [常見問題](ksp-faq.md)
 
 ## 支援的程式庫

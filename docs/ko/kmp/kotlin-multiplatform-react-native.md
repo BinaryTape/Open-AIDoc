@@ -70,9 +70,9 @@
             <tr>
                 <td><b>패키지, 의존성 및 생태계</b></td>
                 <td>패키지는 <a href="https://central.sonatype.com/">Maven Central</a> 및 기타 저장소에서 사용할 수 있으며, 다음을 포함합니다.
-                    <p>KMP 라이브러리 검색을 간소화하기 위해 설계된 <a href="http://klibs.io">klibs.io</a>(알파 버전).</p>
+                    <p>KMP 라이브러리 검색을 간소화하기 위해 설계된 <a href="https://klibs.io">klibs.io</a>.</p>
                     <p>이 <a href="https://github.com/terrakok/kmp-awesome">리스트</a>에는 가장 인기 있는 KMP 라이브러리와 도구들이 포함되어 있습니다.</p></td>
-                <td><a href="https://reactnative.dev/docs/libraries">React Native 라이브러리</a>는 일반적으로 <a href="https://docs.npmjs.com/cli/npm">npm CLI</a>나 <a href="https://classic.yarnpkg.com/en/">Yarn Classic</a>과 같은 Node.js 패키지 관리자를 사용하여 <a href="https://www.npmjs.com/">npm 레지스트리</a>에서 설치합니다.
+                <td><a href="https://reactnative.dev/docs/libraries">React Native 라이브러리</a>는 일반적으로 <a href="https://www.npmjs.com/">npm 레지스트리</a>에서 설치하며, <a href="https://docs.npmjs.com/cli/npm">npm CLI</a>나 <a href="https://classic.yarnpkg.com/en/">Yarn Classic</a>과 같은 Node.js 패키지 관리자를 사용합니다.
                 </td>
             </tr>
             <tr>

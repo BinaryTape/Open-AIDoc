@@ -56,7 +56,7 @@ dependencies {
          <dependency>
              <groupId>org.jetbrains.lincheck</groupId>
              <artifactId>lincheck</artifactId>
-             <version>${lincheck.version}</version>
+             <version>%lincheckVersion%</version>
              <scope>test</scope>
          </dependency>
          <dependency>
@@ -74,7 +74,7 @@ dependencies {
 
 ## 最初のテストの記述
 
-基本的な並行テストでは、各スレッドで実行すべき操作と期待されるアサーションを記述するテスト関数を作成します。Lincheck は[モデル検査 (model checking)](testing-strategies.md#how-model-checking-works) を使用してプログラムの考えられるスレッド・インターリービングを探索し、不正な動作が発生した場合にはエラーレポートを提供します。
+基本的な並行テストでは、各スレッドで実行すべき操作と期待されるアサーションを記述するテスト関数を作成します。Lincheck は[モデル検査 (model checking)](lincheck-testing-strategies.md#model-checking) を使用してプログラムの考えられるスレッド・インターリービングを探索し、不正な動作が発生した場合にはエラーレポートを提供します。
 
 1. `src/test` ディレクトリに `CounterTest.kt` ファイルを作成します。
 2. `org.jetbrains.lincheck`、`kotlinx.concurrent`、および `kotlin.test` ライブラリをインポートします： 
@@ -149,7 +149,7 @@ dependencies {
 
 ## データ構造のテストの記述
 
-基本的な並行テストに加えて、Lincheck は並行データ構造をテストするための宣言的アプローチ（declarative approach）をサポートしています。
+基本的な並行テストに加えて、Lincheck は並行データ構造をテストするための[宣言的アプローチ (declarative approach)](lincheck-how-to-test-data-structures.md) をサポートしています。
 
 Lincheck でデータ構造をテストするには、構造の並行メソッドとテスト関数を宣言するだけです。Lincheck はランダムな並行シナリオを生成し、指定されたテスト戦略を使用してそれらを実行し、エラーレポートを提供します。
 
@@ -198,7 +198,7 @@ Lincheck でデータ構造をテストするには、構造の並行メソッ�
     fun stressTest() = ModelCheckingOptions().check(this::class)
     ```
    
-    > モデル検査の仕組みについては、[テスト戦略](testing-strategies.md#how-model-checking-works)の記事で詳しく学んでください。
+    > モデル検査の仕組みについては、[テスト戦略](lincheck-testing-strategies.md#model-checking)の記事で詳しく学んでください。
     > 
     {style=”tip”}
 
@@ -229,4 +229,4 @@ Lincheck でデータ構造をテストするには、構造の並行メソッ�
 
 ## 次のステップ
 
-データ構造をテストするための宣言的アプローチとサポートされているテスト戦略の詳細については、[テスト戦略](testing-strategies.md)の記事を参照してください。
+Lincheck での[並行データ構造をテストするための宣言的アプローチ (declarative approach)](lincheck-how-to-test-data-structures.md) について詳細を学習してください。

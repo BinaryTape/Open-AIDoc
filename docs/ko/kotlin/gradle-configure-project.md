@@ -475,17 +475,13 @@ Kotlin Gradle 플러그인을 [Java 모듈](https://www.oracle.com/corporate/fea
 
 <tabs group="build-script">
 <tab title="Kotlin" group-key="kotlin">
-        
-```kotlin
-// Gradle 7.0 미만 버전을 사용하는 경우 다음 세 줄을 추가하세요
-java {
-    modularity.inferModulePath.set(true)
-}
 
+```kotlin
 tasks.named("compileJava", JavaCompile::class.java) {
+    // javac에 컴파일된 Kotlin 클래스를 제공합니다. Java/Kotlin 혼합 소스가 작동하는 데 필요합니다.
+    val mainOutput: FileCollection = sourceSets["main"].output
     options.compilerArgumentProviders.add(CommandLineArgumentProvider {
-        // javac에 컴파일된 Kotlin 클래스를 제공합니다. Java/Kotlin 혼합 소스가 작동하는 데 필요합니다.
-        listOf("--patch-module", "YOUR_MODULE_NAME=${sourceSets["main"].output.asPath}")
+        listOf("--patch-module", "YOUR_MODULE_NAME=${mainOutput.asPath}")
     })
 }
 ```
@@ -494,17 +490,13 @@ tasks.named("compileJava", JavaCompile::class.java) {
 <tab title="Groovy" group-key="groovy">
 
 ```groovy
-// Gradle 7.0 미만 버전을 사용하는 경우 다음 세 줄을 추가하세요
-java {
-    modularity.inferModulePath = true
-}
-
 tasks.named("compileJava", JavaCompile.class) {
+    // javac에 컴파일된 Kotlin 클래스를 제공합니다. Java/Kotlin 혼합 소스가 작동하는 데 필요합니다.
+    FileCollection mainOutput = sourceSets["main"].output
     options.compilerArgumentProviders.add(new CommandLineArgumentProvider() {
         @Override
         Iterable<String> asArguments() {
-            // javac에 컴파일된 Kotlin 클래스를 제공합니다. Java/Kotlin 혼합 소스가 작동하는 데 필요합니다.
-            return ["--patch-module", "YOUR_MODULE_NAME=${sourceSets["main"].output.asPath}"]
+            return ["--patch-module", "YOUR_MODULE_NAME=${mainOutput.asPath}"]
         }
     })
 }
@@ -687,6 +679,7 @@ plugins {
 
 요구 사항에 따라 다음을 타겟으로 할 수 있습니다:
 
+* **`wasmJs`**: 브라우저 또는 Node.js에서 실행용
 * **`wasmJs`**: 브라우저 또는 Node.js에서 실행용
 * **`wasmWasi`**: Wasmtime, WasmEdge 등과 같이 [WASI (WebAssembly System Interface)](https://wasi.dev/)를 지원하는 Wasm 환경에서 실행용
 

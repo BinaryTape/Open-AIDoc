@@ -136,15 +136,7 @@ kapt 編譯器外掛程式允許您在 Kotlin 中使用現有的 Java 註解處�
 </execution>
 ```
 
-##### 配置 kapt 註解處理
-
-若要配置註解處理的模式，請在 `<configuration>` 區塊中設定 `<aptMode>` 選項：
-
-* `stubs` – 僅產生註解處理所需的虛設常式。
-* `apt` – 僅執行註解處理。
-* `stubsAndApt` – （預設）產生虛設常式並執行註解處理。
-
-例如：
+若要配置註解處理模式，請在 `<configuration>` 區塊中設定 [`aptMode`](#annotation-processor-configuration) 選項。例如：
 
 ```xml
 <configuration>
@@ -155,60 +147,34 @@ kapt 編譯器外掛程式允許您在 Kotlin 中使用現有的 Java 註解處�
 
 ### CLI
 
-kapt 編譯器外掛程式包含在 Kotlin 編譯器的二進位發行版中。
+kapt 在 Kotlin 編譯器的二進位發行版中作為獨立的命令列工具提供。
 
-您可以透過使用 `-Xplugin` Kotlin 編譯器選項提供其 JAR 檔案的路徑來附加該外掛程式：
-
-```bash
--Xplugin=$KOTLIN_HOME/lib/kotlin-annotation-processing.jar
-```
-
-以下是可用選項的列表：
-
-* `sources` (*必填*): 產生檔案的輸出路徑。
-* `classes` (*必填*): 產生的類別檔案和資源的輸出路徑。
-* `stubs` (*必填*): 虛設常式檔案的暫存輸出路徑。
-* `incrementalData`: 二進位虛設常式的輸出路徑。
-* `apclasspath` (*可重複*): 註解處理器 JAR 的路徑。為每個 JAR 傳遞一個 `apclasspath` 選項。
-* `apoptions`: Base64 編碼的註解處理器選項列表。有關更多資訊，請參閱 [AP/javac 選項編碼](#ap-javac-options-encoding)。
-* `javacArguments`: Base64 編碼的傳遞給 javac 的選項列表。有關更多資訊，請參閱 [AP/javac 選項編碼](#ap-javac-options-encoding)。
-* `processors`: 以逗號分隔的註解處理器完整類別名稱列表。如果指定，kapt 將不會嘗試在 `apclasspath` 中尋找註解處理器。
-* `verbose`: 啟用詳細輸出。
-* `aptMode` (*必填*)
-    * `stubs` – 僅產生註解處理所需的虛設常式。
-    * `apt` – 僅執行註解處理。
-    * `stubsAndApt` – 產生虛設常式並執行註解處理。
-* `correctErrorTypes`: 有關更多資訊，請參閱 [不存在的型別校正](#non-existent-type-correction)。預設為停用。
-* `dumpFileReadHistory`: 針對每個檔案傾印註解處理期間使用的類別列表的輸出路徑。
-
-外掛程式選項格式為：`-P plugin:<plugin id>:<key>=<value>`。選項可以重複。
-
-範例：
+若要從命令列執行 kapt，請使用：
 
 ```bash
--P plugin:org.jetbrains.kotlin.kapt3:sources=build/kapt/sources
--P plugin:org.jetbrains.kotlin.kapt3:classes=build/kapt/classes
--P plugin:org.jetbrains.kotlin.kapt3:stubs=build/kapt/stubs
-
--P plugin:org.jetbrains.kotlin.kapt3:apclasspath=lib/ap.jar
--P plugin:org.jetbrains.kotlin.kapt3:apclasspath=lib/anotherAp.jar
-
--P plugin:org.jetbrains.kotlin.kapt3:correctErrorTypes=true
+kapt <options> <source files>
 ```
+
+例如：
+
+```bash
+kapt -Kapt-mode=stubsAndApt \
+  -Kapt-sources=build/kapt/sources \
+  -Kapt-classes=build/kapt/classes \
+  -Kapt-stubs=build/kapt/stubs \
+  -Kapt-classpath=lib/ap.jar \
+  -Kapt-classpath=lib/anotherAp.jar \
+  src/main/kotlin
+```
+
+* 請參閱 [kapt 專用編譯器選項](#compiler-options) 的完整列表。
+* 您也可以傳遞所有有效的 [Kotlin 編譯器選項](compiler-reference.md)。執行 `kotlinc -help` 即可查看。
 
 ## 配置註解處理器
 
-### 傳遞引數給註解處理器
+kapt 提供了用於控制註解處理器如何被探索、組織和執行的選項，包括管理處理器類別路徑、從共享配置繼承處理器，以及保持 javac 專屬處理器的啟用狀態。
 
-在您的建置指令碼檔案 `build.gradle(.kts)` 中使用 `arguments {}` 區塊將引數傳遞給註解處理器：
-
-```kotlin
-kapt {
-    arguments {
-        arg("key", "value")
-    }
-}
-```
+如需更多配置選項（例如將選項傳遞給註解處理器和 javac），請參閱 [註解處理器配置](#annotation-processor-configuration)。
 
 ### 配置處理器類別路徑與探索
 
@@ -273,7 +239,7 @@ Set 'kapt.include.compile.classpath=false' to disable discovery.
 
 ### 從父配置繼承註解處理器
 
-您可以在單獨的 Gradle 配置中定義一組通用的註解處理器作為父配置，並在子專案的 kapt 專屬配置中進一步延伸它。
+您可以在單獨的 Gradle 配置中定義一組通用的註解處理器作為父配置（superconfiguration），並在子專案的 kapt 專屬配置中進一步延伸它。
 
 例如，對於使用 [MapStruct](https://mapstruct.org/) 的子專案，在您的 `build.gradle(.kts)` 檔案中使用以下配置：
 
@@ -293,7 +259,7 @@ dependencies {
 
 預設情況下，kapt 會執行所有註解處理器並停用 javac 的註解處理。但是，您可能需要 javac 執行一些註解處理器（例如 [Lombok](https://projectlombok.org/)）。
 
-在 Gradle 組建檔案中，使用 `keepJavacAnnotationProcessors` 選項：
+在 Gradle 建置檔案中，使用選項 `keepJavacAnnotationProcessors`：
 
 ```groovy
 kapt {
@@ -304,6 +270,10 @@ kapt {
 如果您使用 Maven，則需要明確配置外掛程式。請參閱這份 [Lombok 編譯器外掛程式設定範例](lombok.md#using-with-kapt)。
 
 ## 優化 kapt 組建
+
+kapt 提供了一些 Gradle 專用的策略來縮短註解處理時間，包括並行執行任務、利用組建快取、快取處理器類別載入器，以及使用增量註解處理。
+
+對於影響建置行為的其他選項，例如錯誤型別校正、虛設常式元資料剝離以及編譯類別路徑掃描，請參閱 [行為選項](#behavioral-options)。
 
 ### 並行執行 kapt 任務
 
@@ -380,7 +350,7 @@ kapt.classloaders.cache.disableForProcessors=[註解處理器完整名稱]
 
 ### 使用增量註解處理
 
-kapt 預設支援增量註解處理。
+配合 Gradle，kapt 預設支援增量註解處理，因此僅會重新處理變更的檔案。
 
 目前，增量註解處理僅在以下情況運作：
 
@@ -393,11 +363,19 @@ kapt 預設支援增量註解處理。
 kapt.incremental.apt=false
 ```
 
+> 目前 Maven 或 CLI 不支援 kapt 的增量註解處理。
+> 
+{style="note"}
+
 ## 分析效能
+
+kapt 提供內建診斷功能來協助您了解註解處理效能，包括每個處理器的執行時間報告以及產生的檔案數量，以識別未使用的處理器。
+
+如需更多診斷選項，例如用於偵錯增量處理的檔案讀取歷程記錄以及記憶體洩漏偵測，請參閱 [診斷與統計選項](#diagnostics-and-statistics-options)。
 
 ### 評估註解處理器的效能
 
-若要獲取註解處理器執行的效能統計資料，請使用 `-Kapt-show-processor-timings` 外掛程式選項。輸出範例：
+若要獲取註解處理器執行的效能統計資料，請使用 [`showProcessorStats`](#diagnostics-and-statistics-options) 選項。輸出範例：
 
 ```text
 Kapt Annotation Processing performance report:
@@ -405,47 +383,38 @@ com.example.processor.TestingProcessor: total: 133 ms, init: 36 ms, 2 round(s): 
 com.example.processor.AnotherProcessor: total: 100 ms, init: 6 ms, 1 round(s): 93 ms
 ```
 
-您可以使用外掛程式選項 [`-Kapt-dump-processor-timings` (`org.jetbrains.kotlin.kapt3:dumpProcessorTimings`)](https://github.com/JetBrains/kotlin/pull/4280) 將此報告傾印到檔案中。以下指令將執行 kapt 並將統計資料傾印到 `ap-perf-report.file` 檔案中：
+您可以使用 [`dumpProcessorStats`](#diagnostics-and-statistics-options) 選項將此報告傾印到檔案中。例如，以下 CLI 指令將執行 kapt 並將統計資料傾印到 `ap-perf-report.file` 檔案中：
 
 ```bash
-kotlinc -cp $MY_CLASSPATH \
--Xplugin=kotlin-annotation-processing-SNAPSHOT.jar -P \
-plugin:org.jetbrains.kotlin.kapt3:aptMode=stubsAndApt,\
-plugin:org.jetbrains.kotlin.kapt3:apclasspath=processor/build/libs/processor.jar,\
-plugin:org.jetbrains.kotlin.kapt3:dumpProcessorTimings=ap-perf-report.file \
--Xplugin=$JAVA_HOME/lib/tools.jar \
--d cli-tests/out \
--no-jdk -no-reflect -no-stdlib -verbose \
-sample/src/main/
+kapt -Kapt-mode=stubsAndApt \
+  -Kapt-classpath=processor/build/libs/processor.jar \
+  -Kapt-dump-processor-stats=ap-perf-report.file \
+  sample/src/main/
 ```
 
 ### 評估註解處理器產生的檔案數量
 
-`kapt` Gradle 外掛程式可以報告每個註解處理器產生檔案數量的統計資料。
+kapt 外掛程式可以報告每個註解處理器產生檔案數量的統計資料。
 
 這有助於追蹤組建中是否包含任何未使用的註解處理器。您可以使用產生的報告來尋找觸發不必要註解處理器的模組，並更新模組以避免這種情況。
 
 若要啟用統計報告：
 
-1. 在您的 `build.gradle(.kts)` 中將 `showProcessorStats` 屬性值設定為 `true`：
+1. 在您的 Gradle 建置檔案中，將 `showProcessorStats` 選項設定為 `true`：
 
    ```kotlin
-   // build.gradle.kts
+   // build.gradle(.kts)
    kapt {
        showProcessorStats = true
    }
    ```
 
-2. 在您的 `gradle.properties` 中將 `kapt.verbose` Gradle 屬性設定為 `true`：
+2. 在您的 `gradle.properties` 檔案中，將 `verbose` 編譯器選項設定為 `true`：
 
-   ```none
+   ```
    # gradle.properties
    kapt.verbose=true
    ```
-
-> 您也可以透過 [命令列選項 `verbose`](#cli) 啟用詳細輸出。
->
-{style="note"}
 
 統計資料會以 `info` 層級顯示在日誌中。您可以看到 `Annotation processor stats:` 行，接著是每個註解處理器執行時間的統計資料。在這些行之後，有 `Generated files report:` 行，接著是每個註解處理器產生檔案數量的統計資料。例如：
 
@@ -456,58 +425,411 @@ sample/src/main/
 [INFO] org.mapstruct.ap.MappingProcessor: total sources: 2, sources per round: 2, 0, 0
 ```
 
-## Java 編譯器選項
-
-kapt 使用 Java 編譯器來執行註解處理器。  
-以下是您傳遞任意選項給 javac 的方式：
-
-```groovy
-kapt {
-    javacOptions {
-        // 增加註解處理器的最大錯誤數量。
-        // 預設值為 100。
-        option("-Xmaxerrs", 500)
-    }
-}
-```
-
-## 不存在的型別校正
-
-某些註解處理器（如 `AutoFactory`）依賴宣告簽章中的精確型別。預設情況下，kapt 會將每個未知的型別（包括產生的類別型別）替換為 `NonExistentClass`，但您可以變更此行為。在 `build.gradle(.kts)` 檔案中加入選項，以啟用虛設常式中的錯誤型別推論：
-
-```groovy
-kapt {
-    correctErrorTypes = true
-}
-```
+> 目前 Maven 或 CLI 不支援透過 `showProcessorStats` 和 `verbose` 編譯器選項追蹤產生的檔案數量。
+>
+{style="note"}
 
 ## 產生 Kotlin 原始碼
 
-kapt 可以產生 Kotlin 原始碼。只需將產生的 Kotlin 原始碼檔案寫入 `processingEnv.options["kapt.kotlin.generated"]` 指定的目錄，這些檔案就會與主原始碼一起編譯。
+kapt 可以產生 Kotlin 原始碼。若要執行此操作，請使用 `processingEnv.options["kapt.kotlin.generated"]` 將產生的 Kotlin 原始碼檔案寫入指定的目錄。隨後 Kotlin 原始碼檔案將與主原始碼一起編譯。
 
-請注意，kapt 不支援產生 Kotlin 檔案的多回合處理。
+> kapt 不支援針對產生的 Kotlin 檔案進行多回合註解處理。
+> 
+{style="note"}
 
-## AP/Javac 選項編碼
+## 編譯器選項
 
-`apoptions` 和 `javacArguments` CLI 選項接受一個編碼後的選項對照表。  
-以下是您可以自行編碼選項的方式：
+### 註解處理器配置
 
-```kotlin
-fun encodeList(options: Map<String, String>): String {
-    val os = ByteArrayOutputStream()
-    val oos = ObjectOutputStream(os)
+<table>
+    <tr>
+        <td>選項</td>
+        <td>描述</td>
+        <td>如何設定</td>
+    </tr>
+    <tr>
+        <td><code>aptMode</code></td>
+        <td>
+            控制 kapt 工作流程階段的執行：
+            <list>
+                <li><code>stubsAndApt</code> 產生虛設常式並執行註解處理（預設）</li>
+                <li><code>stubs</code> 僅從 Kotlin 產生 Java 虛設常式</li>
+                <li><code>apt</code> 僅執行註解處理器（假設虛設常式已存在）</li>
+            </list>
+        </td>
+        <td>
+            <p><b>Gradle:</b> 無法直接使用；Gradle 將虛設常式產生和 apt 作為獨立任務執行</p>
+            <p><b>Maven:</b></p>
+                <code-block lang="xml">
+                    <![CDATA[
+<aptMode>stubsAndApt</aptMode>
+                    ]]>
+                </code-block>
+            <p><b>CLI:</b> <code>-Kapt-mode=stubsAndApt</code></p>
+        </td>
+    </tr>
+    <tr>
+        <td><code>classpath</code></td>
+        <td>用於探索註解處理器的類別路徑項目。</td>
+        <td>
+            <p><b>Gradle:</b></p>
+                <code-block lang="kotlin">
+                    dependencies {
+                        kapt("com.example:processor:1.0")
+                    }
+                </code-block>
+            <p><b>Maven:</b></p>
+                <code-block lang="xml">
+                    <![CDATA[
+<annotationProcessorPaths>
+    <annotationProcessorPath>...</annotationProcessorPath>
+</annotationProcessorPaths>
+                    ]]>
+                </code-block>
+            <p><b>CLI:</b> <code>-Kapt-classpath=lib/my-processor.jar</code></p>
+        </td>
+    </tr>
+    <tr>
+        <td><code>processors</code></td>
+        <td>以逗號分隔的要執行的處理器完整限定類名，會繞過自動探索。</td>
+        <td>
+            <p><b>Gradle:</b></p>
+                <code-block lang="kotlin">
+                    kapt {
+                        annotationProcessor("com.example.MyProcessor")
+                    }
+                </code-block>
+            <p><b>Maven:</b></p>
+                <code-block lang="xml">
+                    <![CDATA[
+<annotationProcessors>
+    <annotationProcessor>com.example.MyProcessor</annotationProcessor>
+</annotationProcessors>
+                    ]]>
+                </code-block>
+            <p><b>CLI:</b> <code>-Kapt-processors=com.example.MyProcessor</code></p>
+        </td>
+    </tr>
+    <tr>
+        <td><code>apOption</code></td>
+        <td>傳遞給註解處理器的鍵值對選項。</td>
+        <td>
+            <p><b>Gradle:</b></p>
+                <code-block lang="kotlin">
+                    kapt {
+                        arguments {
+                            arg("room.schemaLocation", "$projectDir/schemas")
+                        }
+                    }
+                </code-block>
+            <p><b>Maven:</b></p>
+                <code-block lang="xml">
+                    <![CDATA[
+<annotationProcessorArgs>
+    <annotationProcessorArg>room.schemaLocation=/schemas</annotationProcessorArg>
+</annotationProcessorArgs>
+                    ]]>
+                </code-block>
+            <p><b>CLI:</b> <code>-Kapt-options:room.schemaLocation=/schemas</code></p>
+        </td>
+    </tr>
+    <tr>
+        <td><code>javacOption</code></td>
+        <td>傳遞給 Java 編譯器的鍵值對選項。</td>
+        <td>
+            <p><b>Gradle:</b></p>
+                <code-block lang="kotlin">
+                    kapt {
+                        javacOptions {
+                            option("-source", "11")
+                        }
+                    }
+                </code-block>
+            <p><b>Maven:</b></p>
+                <code-block lang="xml">
+                    <![CDATA[
+<javacOptions>
+    <javacOption>-source=11</javacOption>
+</javacOptions>
+                    ]]>
+                </code-block>
+            <p><b>CLI:</b> <code>-Kapt-javac-option:-source=11</code></p>
+        </td>
+    </tr>
+    <tr>
+        <td><code>processIncrementally</code></td>
+        <td>啟用增量註解處理；僅重新處理受變更影響的檔案。</td>
+        <td>
+            <p><b>Gradle:</b></p>
+                <code-block lang="kotlin">
+                    # gradle.properties
+                    kapt.incremental.apt=true
+                </code-block>
+            <p><b>Maven:</b> 目前不支援</p>
+            <p><b>CLI:</b> 目前不支援</p>
+        </td>
+    </tr>
+</table>
 
-    oos.writeInt(options.size)
-    for ((key, value) in options.entries) {
-        oos.writeUTF(key)
-        oos.writeUTF(value)
-    }
+### 輸出目錄選項
 
-    oos.flush()
-    return Base64.getEncoder().encodeToString(os.toByteArray())
-}
-```
+<table>
+    <tr>
+        <td>選項</td>
+        <td>描述</td>
+        <td>如何設定</td>
+    </tr>
+    <tr>
+        <td><code>sources</code></td>
+        <td>註解處理器產生 <code>.java</code> 原始碼檔案的目錄。</td>
+        <td>
+            <p><b>Gradle:</b> 自動設定為 <code>build/generated/source/kapt/main</code></p>
+            <p><b>Maven:</b> 自動設定為 <code>target/generated-sources/kapt/</code></p>
+            <p><b>CLI:</b> <code>-Kapt-sources=build/kapt/sources</code></p>
+        </td>
+    </tr>
+    <tr>
+        <td><code>classes</code></td>
+        <td>從產生的原始碼編譯而來的 <code>.class</code> 檔案目錄。</td>
+        <td>
+            <p><b>Gradle:</b> 自動管理</p>
+            <p><b>Maven:</b> 自動管理</p>
+            <p><b>CLI:</b> <code>-Kapt-classes=build/kapt/classes</code></p>
+        </td>
+    </tr>
+    <tr>
+        <td><code>stubs</code></td>
+        <td>從 Kotlin 原始碼產生的 Java 虛設常式檔案目錄，用作註解處理器的輸入。</td>
+        <td>
+            <p><b>Gradle:</b> 自動管理</p>
+            <p><b>Maven:</b> 自動管理</p>
+            <p><b>CLI:</b> <code>-Kapt-stubs=build/kapt/stubs</code></p>
+        </td>
+    </tr>
+    <tr>
+        <td><code>incrementalData</code></td>
+        <td>儲存增量組建的狀態。</td>
+        <td>
+            <p><b>Gradle:</b> 自動管理</p>
+            <p><b>Maven:</b> 目前不支援</p>
+            <p><b>CLI:</b> 目前不支援</p>
+        </td>
+    </tr>
+</table>
+
+### 行為選項
+
+<table>
+    <tr>
+        <td>選項</td>
+        <td>描述</td>
+        <td>如何設定</td>
+    </tr>
+    <tr>
+        <td><code>correctErrorTypes</code></td>
+        <td>
+            預設情況下，kapt 會將每個未知的型別（包括產生的類別型別）替換為 <code>NonExistentClass</code>。
+            您可以啟用虛設常式中的錯誤型別推論，以將尚未解決的錯誤型別替換為來自產生原始碼中的型別。
+            <p>預設為 <code>false</code></p>
+        </td>
+        <td>
+            <p><b>Gradle:</b></p>
+                <code-block lang="kotlin">
+                    kapt {
+                        correctErrorTypes = true
+                    }
+                </code-block>
+            <p><b>Maven:</b></p>
+                <code-block lang="xml">
+                    <![CDATA[
+<correctErrorTypes>true</correctErrorTypes>
+                    ]]>
+                </code-block>
+            <p><b>CLI:</b> <code>-Kapt-correct-error-types=true</code></p>
+        </td>
+    </tr>
+    <tr>
+        <td><code>dumpDefaultParameterValues</code></td>
+        <td>
+            在產生的虛設常式中將預設參數初始值設定項作為欄位值包含在內。
+            <p>預設為 <code>false</code></p>
+        </td>
+        <td>
+            <p><b>Gradle:</b></p>
+                <code-block lang="kotlin">
+                    kapt {
+                        dumpDefaultParameterValues = true
+                    }
+                </code-block>
+            <p><b>Maven:</b> 不可用</p>
+            <p><b>CLI:</b> <code>-Kapt-dump-default-parameter-values=true</code></p>
+        </td>
+    </tr>
+    <tr>
+        <td><code>mapDiagnosticLocations</code></td>
+        <td>
+            將虛設常式檔案中的錯誤訊息對應回其原始 Kotlin 原始碼位置。
+            <p>預設為 <code>false</code></p>
+        </td>
+        <td>
+            <p><b>Gradle:</b></p>
+                <code-block lang="kotlin">
+                    kapt {
+                        mapDiagnosticLocations = true
+                    }
+                </code-block>
+            <p><b>Maven:</b></p>
+                <code-block lang="xml">
+                    <![CDATA[
+<mapDiagnosticLocations>true</mapDiagnosticLocations>
+                    ]]>
+                </code-block>
+            <p><b>CLI:</b> <code>-Kapt-map-diagnostic-locations=true</code></p>
+        </td>
+    </tr>
+    <tr>
+        <td><code>strict</code></td>
+        <td>
+            將虛設常式產生的不相容情況轉化為錯誤而非警告。
+            <p>預設為 <code>false</code></p>
+        </td>
+        <td>
+            <p><b>Gradle:</b></p>
+                <code-block lang="kotlin">
+                    kapt {
+                        strictMode = true
+                    }
+                </code-block>
+            <p><b>Maven:</b> 不可用</p>
+            <p><b>CLI:</b> <code>-Kapt-strict=true</code></p>
+        </td>
+    </tr>
+    <tr>
+        <td><code>stripMetadata</code></td>
+        <td>
+            從產生的虛設常式中移除 <code>@kotlin.Metadata</code> 註解，減少虛設常式大小並對處理器隱藏 Kotlin 專用資訊。
+            <p>預設為 <code>false</code></p>
+        </td>
+        <td>
+            <p><b>Gradle:</b></p>
+                <code-block lang="kotlin">
+                    kapt {
+                        stripMetadata = true
+                    }
+                </code-block>
+            <p><b>Maven:</b> 不可用</p>
+            <p><b>CLI:</b> <code>-Kapt-strip-metadata=true</code></p>
+        </td>
+    </tr>
+    <tr>
+        <td><code>verbose</code></td>
+        <td>
+            啟用詳細的 kapt 記錄。
+            <p>預設為 <code>false</code></p>
+        </td>
+        <td>
+            <p><b>Gradle:</b></p>
+                <code-block lang="kotlin">
+                    # gradle.properties
+                    kapt.verbose=true
+                </code-block>
+            <p><b>Maven:</b> 目前不支援</p>
+            <p><b>CLI:</b> 目前不支援</p>
+        </td>
+    </tr>
+    <tr>
+        <td><code>infoAsWarnings</code></td>
+        <td>
+            將資訊層級的 kapt 訊息提升為警告。
+            <p>預設為 <code>false</code></p>
+        </td>
+        <td>
+            <p><b>Gradle:</b> 無法直接使用</p>
+            <p><b>Maven:</b> 目前不支援</p>
+            <p><b>CLI:</b> 目前不支援</p>
+        </td>
+    </tr>
+    <tr>
+        <td><code>includeCompileClasspath</code></td>
+        <td>
+            掃描編譯類別路徑以尋找註解處理器。為了可重現性，請將其設定為 <code>false</code>。
+            <p>預設為 <code>true</code></p>
+        </td>
+        <td>
+            <p><b>Gradle:</b></p>
+                <code-block lang="kotlin">
+                    kapt {
+                        includeCompileClasspath = false
+                    }
+                </code-block>
+            <p><b>Maven:</b></p>
+                <code-block lang="xml">
+                    <![CDATA[
+<includeCompileClasspath>false</includeCompileClasspath>
+                    ]]>
+                </code-block>
+            <p><b>CLI:</b> 目前不支援</p>
+        </td>
+    </tr>
+</table>
+
+### 診斷與統計選項
+
+<table>
+    <tr>
+        <td>選項</td>
+        <td>描述</td>
+        <td>如何設定</td>
+    </tr>
+    <tr>
+        <td><code>showProcessorStats</code></td>
+        <td>將每個處理器的執行時間列印到 stdout。</td>
+        <td>
+            <p><b>Gradle:</b></p>
+                <code-block lang="kotlin">
+                    kapt {
+                        showProcessorStats = true
+                    }
+                </code-block>
+            <p><b>Maven:</b> 不可用</p>
+            <p><b>CLI:</b> <code>-Kapt-show-processor-stats=true</code></p>
+        </td>
+    </tr>
+    <tr>
+        <td><code>dumpProcessorStats</code></td>
+        <td>將處理器計時統計資料寫入檔案。</td>
+        <td>
+            <p><b>Gradle:</b> 不可用</p>
+            <p><b>Maven:</b> 不可用</p>
+            <p><b>CLI:</b> <code>-Kapt-dump-processor-stats=build/kapt-stats.txt</code></p>
+        </td>
+    </tr>
+    <tr>
+        <td><code>dumpFileReadHistory</code></td>
+        <td>將處理器讀取的檔案列表寫入檔案，這對於偵錯增量註解處理器非常有用。</td>
+        <td>
+            <p><b>Gradle:</b> 不可用</p>
+            <p><b>Maven:</b> 不可用</p>
+            <p><b>CLI:</b> <code>-Kapt-dump-file-read-history=build/kapt-reads.txt</code></p>
+        </td>
+    </tr>
+    <tr>
+        <td><code>detectMemoryLeaks</code></td>
+        <td>記憶體洩漏偵測模式：<code>none</code>、<code>default</code> 或 <code>paranoid</code>。</td>
+        <td>
+            <p><b>Gradle:</b></p>
+                <code-block lang="kotlin">
+                    kapt {
+                        detectMemoryLeaks = "paranoid"
+                    }
+                </code-block>
+            <p><b>Maven:</b> 目前不支援</p>
+            <p><b>CLI:</b> 目前不支援</p>
+        </td>
+    </tr>
+</table>
 
 ## 下一步
 
+* [將 kapt 與 MapStruct 註解處理器搭配使用](jvm-annotation-processors.md#use-kapt-with-java-annotation-processors)
 * [參閱如何從 kapt 遷移到 KSP](ksp-kapt-migration.md)

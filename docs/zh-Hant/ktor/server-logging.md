@@ -43,7 +43,7 @@ Ktor 根據所使用的平台提供不同的方式來記錄您的應用程式：
     </TabItem>
 </Tabs>
 
-要使用 Log4j，您需要新增 `org.apache.logging.log4j:log4j-core` 和 `org.apache.logging.log4j:log4j-slf4j-impl` 構件。
+要使用 Log4j，您需要新增 `org.apache.logging.log4j:log4j-core` 和 `org.apache.logging.log4j:log4j-slf4j2-impl` 構件。
 
 ### 配置記錄器 {id="configure-logger"}
 
@@ -58,7 +58,7 @@ Ktor 根據所使用的平台提供不同的方式來記錄您的應用程式：
 <configuration>
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{YYYY-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
     <root level="trace">
@@ -76,7 +76,7 @@ Ktor 根據所使用的平台提供不同的方式來記錄您的應用程式：
         <file>testFile.log</file>
         <append>true</append>
         <encoder>
-            <pattern>%d{YYYY-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
     <root level="trace">

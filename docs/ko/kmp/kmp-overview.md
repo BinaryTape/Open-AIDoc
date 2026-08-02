@@ -16,7 +16,8 @@ Kotlin Multiplatform은 기술 및 조직 프로세스를 효율화하는 데 �
 
 시장 출시 기간(Time to market)을 단축할 뿐만 아니라, **55%**의 사용자가 KMP 도입 후 협업이 개선되었다고 응답했으며, **65%**의 팀이 성능과 품질이 향상되었다고 보고했습니다(2024년 2분기 KMP 설문조사 기준).
 
-KMP는 스타트업부터 글로벌 기업에 이르기까지 모든 규모의 조직에서 실제 프로덕션에 사용되고 있습니다. Google, Duolingo, Forbes, Philips, McDonald's, Bolt, H&M, Baidu, Kuaishou, Bilibili와 같은 기업들은 유연성, 네이티브 성능, 네이티브 사용자 경험 제공 능력, 비용 효율성 및 점진적 도입 지원 등의 이유로 KMP를 채택했습니다. [KMP를 도입한 기업들에 대해 더 자세히 알아보세요](https://kotlinlang.org/case-studies/?type=multiplatform).
+KMP는 스타트업부터 글로벌 기업에 이르기까지 모든 규모의 조직에서 실제 프로덕션에 사용되고 있습니다. 
+Google, Duolingo, Forbes, Philips, McDonald's, Bolt, H&M, Baidu, Kuaishou, Bilibili와 같은 기업들은 유연성, 네이티브 성능, 네이티브 사용자 경험 제공 능력, 비용 효율성 및 점진적 도입 지원 등의 이유로 KMP를 채택했습니다. [KMP를 도입한 기업들에 대해 더 자세히 알아보세요](https://kotlinlang.org/case-studies/?type=multiplatform).
 
 ### 코드 공유의 유연성
 
@@ -57,7 +58,6 @@ JetBrains의 AI 코딩 에이전트인 [Junie](https://jetbrains.com/junie)가 K
 
 * [케이스 스터디 페이지](https://kotlinlang.org/case-studies/?type=multiplatform)에서 기업들이 기존 코드베이스에 KMP를 성공적으로 도입한 사례를 알아보세요.
 * [엄선된 샘플 목록](multiplatform-samples.md)과 GitHub의 [kotlin-multiplatform-sample](https://github.com/topics/kotlin-multiplatform-sample) 토픽에서 다양한 샘플 앱을 확인해 보세요.
-* [klibs.io](https://klibs.io/)에서 이미 제공되고 있는 수천 개의 멀티플랫폼 라이브러리 중 필요한 라이브러리를 검색해 보세요.
 
 ## 기본 사항 배우기
 
@@ -75,6 +75,12 @@ KMP가 실제로 작동하는 모습을 빠르게 확인하려면 [빠른 시작
   * 다양한 [iOS 통합 방법](multiplatform-ios-integration-overview.md)을 고려해 보세요.
   * KMP가 다양한 타겟에 대해 코드를 [컴파일](multiplatform-configure-compilations.md)하고 [네이티브 바이너리를 빌드](multiplatform-build-native-binaries.md)하는 방법을 알아보세요.
   * [멀티플랫폼 앱 출시](multiplatform-publish-apps.md) 또는 [멀티플랫폼 라이브러리 출시](multiplatform-publish-lib-setup.md)에 대해 읽어보세요. 
+
+## Kotlin Multiplatform 라이브러리 생태계 살펴보기
+
+네트워킹, 스토리지, 의존성 주입(Dependency Injection), 테스트, UI, 직렬화(Serialization) 등을 위한 수천 개의 멀티플랫폼 라이브러리를 사용할 수 있습니다.
+
+JetBrains에서 관리하는 검색 플랫폼인 [klibs.io](https://klibs.io)에서 라이브러리들을 찾아보세요.
 
 ## 대규모 Kotlin Multiplatform 도입
 

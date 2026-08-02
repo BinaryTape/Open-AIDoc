@@ -11,7 +11,7 @@
 Kotlin EAP 构建通常包括以下阶段：
 
 | EAP 构建版本 | 描述 |
-|-----------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|-----------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **Beta1** | 引入第一批即将推出的功能、改进以及其他重大变更。为您提供评估新功能并分享反馈的早期机会。 |
 | **Beta2** | 通常会根据收到的反馈添加更多功能和优化。该版本为功能完备版 (feature-complete)，并继续对即将发布的版本进行预览，进一步完善之前引入的功能。 |
 | **RC**    | 第一个发布候选版本 (release candidate)。重点是稳定 Beta1 和 Beta2 中交付的变更，并修复测试期间发现的回归问题。 |
@@ -53,13 +53,13 @@ _目前没有可用的预览版本。_
         <th>构建亮点</th>
     </tr>
     <tr>
-        <td><strong>2.4.20-Beta1</strong>
-            <p>发布日期：<strong>2026 年 6 月 24 日</strong></p>
-            <p><a href="https://github.com/JetBrains/kotlin/releases/tag/v2.4.20-Beta1" target="_blank">GitHub 上的发布版本</a></p>
+        <td><strong>2.4.20-Beta2</strong>
+            <p>发布日期：<strong>2026 年 7 月 22 日</strong></p>
+            <p><a href="https://github.com/JetBrains/kotlin/releases/tag/v2.4.20-Beta2" target="_blank">GitHub 上的发布版本</a></p>
         </td>
         <td>
             <p>这是一个工具版本，包含性能改进、错误修复和工具更新。</p>
-            <p>有关更多详细信息，请参阅<a href="https://github.com/JetBrains/kotlin/releases/tag/v2.4.20-Beta1">变更日志</a>或<a href="whatsnew-eap.md">Kotlin 2.4.20-Beta1 中的最新变化</a>。</p>
+            <p>有关更多详细信息，请参阅<a href="https://github.com/JetBrains/kotlin/releases/tag/v2.4.20-Beta2">变更日志</a>或<a href="whatsnew-eap.md">Kotlin 2.4.20-Beta2 中的最新变化</a>。</p>
         </td>
     </tr>
 </table>

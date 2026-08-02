@@ -83,7 +83,7 @@ Compose Multiplatform 目前在 [iOS 上已处于稳定状态](https://blog.jetb
 <tr>
 <td><b>软件包、依赖项与生态系统</b></td>
         <td>软件包可从 <a href="https://central.sonatype.com/">Maven Central</a> 和其他仓库获取，包括
-            <p><a href="http://klibs.io">klibs.io</a>（Alpha 版本），旨在简化 KMP 库的搜索。</p>
+            <p><a href="https://klibs.io">klibs.io</a>，旨在简化 KMP 库的搜索。</p>
             <p>此<a href="https://github.com/terrakok/kmp-awesome">列表</a>包含了一些最受欢迎的 KMP 库和工具。</p> </td>
         <td>软件包可从 <a href="https://pub.dev/">Pub.dev</a> 获取。</td>
 </tr>

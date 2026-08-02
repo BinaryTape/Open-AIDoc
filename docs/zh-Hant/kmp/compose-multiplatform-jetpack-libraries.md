@@ -23,9 +23,9 @@ JetBrains 的 Compose Multiplatform 團隊為這些程式庫產出了適用於 A
 * `org.jetbrains.androidx.navigation.navigation-runtime-iossimulatorarm64`
 * 依此類推。
 
-所有這些構件，連同其他平台的構件以及對原始 Android 程式庫 (`androidx.navigation.navigation-compose`) 的參考，
-都作為一個群組發布。它們可以透過統一的 
-`org.jetbrains.androidx.navigation.navigation-compose` 相依性存取。
+All of these artifacts, together with the artifacts for other platforms and a reference to the original Android library (`androidx.navigation.navigation-compose`),
+are published as a group. They are accessible through the unifying 
+`org.jetbrains.androidx.navigation.navigation-compose` dependency.
 Compose Multiplatform Gradle 外掛程式處理平台特定構件到發行版本的對應。
 
 透過這種方法，由包含該相依性的 Kotlin Multiplatform (KMP) 專案產出的 Android 應用程式會使用原始的 Android Navigation 程式庫。

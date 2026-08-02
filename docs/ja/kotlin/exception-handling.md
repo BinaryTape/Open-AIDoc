@@ -456,7 +456,7 @@ fun main() = runBlocking {
 >
 {style="note"}
 
-このコードの出力は次のとおりです。
+このコード의出力は次のとおりです。
 
 ```text
 The scope is completing

@@ -236,3 +236,7 @@ kotlin {
 
 * Python 바인딩의 성능 문제.
 * 디버거 도구에서의 식별자 평가(expression evaluation)는 지원되지 않으며, 현재 이를 구현할 계획은 없습니다.
+
+## 다음 단계
+
+[iOS 코드에서 처리되지 않은 Kotlin 예외에 대한 크래시 리포트를 개선하는 방법 알아보기](native-faq.md#how-do-i-get-better-crash-reports-for-ios)

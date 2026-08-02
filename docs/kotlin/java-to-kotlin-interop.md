@@ -3,15 +3,15 @@
 Kotlin 代码可以从 Java 轻松调用。
 例如，可以在 Java 方法中无缝创建和操作 Kotlin 类的实例。
 然而，在将 Kotlin 代码集成到 Java 时，Java 和 Kotlin 之间存在某些需要注意的差异。
-在本页中，我们将描述定制 Kotlin 代码与其 Java 客户端互操作的方式。
+在本页中，我们将介绍定制 Kotlin 代码与其 Java 客户端互操作的方式。
 
 ## 属性
 
 Kotlin 属性会被编译为以下 Java 元素：
 
- * 一个 getter 方法，名称通过添加 `get` 前缀计算得出。
- * 一个 setter 方法，名称通过添加 `set` 前缀计算得出（仅限 `var` 属性）。
- * 一个私有字段，名称与属性名称相同（仅限带支持字段的属性）。
+ * 一个 getter 方法，其名称通过添加 `get` 前缀计算得出。
+ * 一个 setter 方法，其名称通过添加 `set` 前缀计算得出（仅限 `var` 属性）。
+ * 一个私有字段，其名称与属性名称相同（仅限带支持字段的属性）。
 
 例如，`var firstName: String` 会编译为以下 Java 声明：
 
@@ -102,7 +102,7 @@ org.example.Utils.getDate();
 
 ## 实例字段
 
-如果你需要将 Kotlin 属性公开为 Java 中的字段，请使用 [`@JvmField`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-field/index.html) 注解。
+如果你需要将 Kotlin 属性公开为 Java 中的字段，请为其添加 [`@JvmField`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-field/index.html) 注解。
 该字段的可见性与其底层属性相同。如果满足以下条件，则可以使用 `@JvmField` 注解属性：
 * 具有支持字段
 * 不是私有的
@@ -201,7 +201,7 @@ int version = C.VERSION;
 
 如上所述，Kotlin 将软件包级函数表示为静态方法。
 如果你将函数注解为 [`@JvmStatic`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-static/index.html)，Kotlin 还可以为具名对象或伴生对象中定义的函数生成静态方法。
-如果你使用此注解，编译器既会在对象的封闭类中生成一个静态方法，也会在对象本身中生成一个实例方法。例如：
+如果你使用此注解，编译器既会在该对象的封闭类中生成一个静态方法，也会在对象本身中生成一个实例方法。例如：
 
 ```kotlin
 class C {
@@ -346,11 +346,17 @@ Kotlin 提供了三种模式，用于控制接口中的函数如何编译为 JVM
 
 Kotlin 可见性修饰符以下列方式映射到 Java：
 
-* `private` 成员会被编译为 `private` 成员。
-* `private` 顶层声明会被编译为 `private` 顶层声明。如果从类内部访问，还会包括包级私有访问器。
-* `protected` 保持为 `protected`。（请注意，Java 允许从同一软件包中的其他类访问 protected 成员，而 Kotlin 不允许，因此 Java 类将对代码具有更广泛的访问权限。）
-* `internal` 声明在 Java 中变为 `public`。`internal` 类的成员会经过名称修饰（name mangling），以使其更难从 Java 中意外使用，并允许为根据 Kotlin 规则互不可见但具有相同签名的成员提供重载。
-* `public` 保持为 `public`。
+* `private` 成员保持为 `private`。
+* `private` 顶层声明在 Java 中变为 `private` 顶层声明。如果从类内部访问，还会包括包级私有访问器。
+* `protected` 成员保持为 `protected`。
+
+  请注意，Java 允许从同一软件包中的其他类访问 `protected` 成员，而 Kotlin 不允许。
+* `internal` 声明在 Java 中变为 `public`。
+
+  Kotlin 编译器会在字节码中对 `internal` 成员的名称进行修饰（mangle）。这可以防止跨模块的意外重写，例如，当从 Java 扩展 Kotlin 类时，并允许为具有相同签名的成员提供重载。
+
+  请注意，`internal` 类的公共成员名称不会被修饰，并且在 Java 中仍然可以调用。
+* `public` 成员保持为 `public`。
 
 ## KClass
 

@@ -135,7 +135,7 @@ fun App() {
 ### 在 Android 上运行应用
 
 1. 在运行配置列表中，选择 **androidApp**。
-2. 选择您的 Android 虚拟设备，然后点击 **Run**：如果选定的虚拟设备处于关机状态，IDE 将启动它并运行应用。
+2. 选择您的 Android 虚拟设备，然后点击 **Run**：如果选定的虚拟设备处于关机状态， IDE 将启动它并运行应用。
 
 ![在 Android 上运行 Compose Multiplatform 应用](compose-run-android.png){width=352}
 

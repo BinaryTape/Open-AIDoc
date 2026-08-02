@@ -90,7 +90,7 @@ Ktor 提供了通过使用 [`Compression`](https://api.ktor.io/ktor-server-compr
     </TabItem>
 </Tabs>
 
-这将在服务器上启用 `gzip`、`deflate` 和 `identity` 编码器。在下一章中，我们将了解如何仅启用特定的编码器并配置压缩数据的条件。请注意，如果需要，每个添加的编码器都将用于解压缩请求主体。
+这将在服务器上启用 `gzip`、`deflate` 和 `identity` 编码器。
 
 ## 配置压缩设置 {id="configure"}
 
@@ -198,6 +198,19 @@ install(Compression) {
     zstd(level = 20)
 }
 ```
+
+## 解压缩 {id="decompression"}
+
+默认情况下，`Compression` 插件压缩服务器响应。要启用请求解压缩，请将 `mode` 属性设置为 `CompressionConfig.Mode.DecompressRequest`：
+
+```kotlin
+install(Compression) { 
+    mode = CompressionConfig.Mode.DecompressRequest
+    gzip()
+}
+```
+
+启用请求解压缩后，插件将使用配置的解码器在请求主体被其他接收转换（例如反序列化和多部分处理）处理之前对其进行解压缩。
 
 ## 实现自定义编码器 {id="custom_encoder"}
 

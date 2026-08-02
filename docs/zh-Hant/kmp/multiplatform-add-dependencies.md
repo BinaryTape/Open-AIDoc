@@ -1,8 +1,8 @@
 [//]: # (title: 新增多平台程式庫的相依性)
 
-每個程式都需要一組程式庫才能成功運作。Kotlin 多平台專案可以依賴適用於所有目標平台的多平台庫、平台專屬程式庫，以及其他多平台專案。
+每個程式都需要一組程式庫才能成功運作。Kotlin 多平台專案可以依賴適用於所有目標平台的多平台程式庫、平台專屬程式庫，以及其他多平台專案。
 
-若要新增程式庫的相依性，請更新包含共享程式碼之目錄中的 `build.gradle(.kts)` 檔案。在 [`dependencies {}`](multiplatform-dsl-reference.md#dependencies) 區塊中設定所需[類型](https://kotlinlang.org/docs/gradle-configure-project.html#dependency-types)（例如：`implementation`）的相依性：
+若要新增程式庫的相依性，請更新包含共享程式碼之專案目錄中的 `build.gradle(.kts)` 檔案。在 [`dependencies {}`](multiplatform-dsl-reference.md#dependencies) 區塊中設定所需[類型](https://kotlinlang.org/docs/gradle-configure-project.html#dependency-types)（例如：`implementation`）的相依性：
 
 <Tabs group="build-script">
 <TabItem title="Kotlin" group-key="kotlin">
@@ -47,7 +47,7 @@ kotlin {
 
 了解如何[變更預設行為](https://kotlinlang.org/docs/gradle-configure-project.html#dependency-on-the-standard-library)。
 
-### 測試庫
+### 測試程式庫
 
 對於多平台測試，可以使用 [`kotlin.test`](https://kotlinlang.org/api/latest/kotlin.test/) API。當您建立多平台專案時，可以透過在 `commonTest` 中使用單一相依性，將測試相依性新增至所有原始碼集：
 
@@ -84,7 +84,7 @@ kotlin {
 </TabItem>
 </Tabs>
 
-### kotlinx 庫
+### kotlinx 程式庫
 
 如果您使用多平台程式庫並需要[依賴共享程式碼](#library-shared-for-all-source-sets)，請僅在共享原始碼集中設定一次相依性。使用程式庫基礎構件名稱，例如 `kotlinx-coroutines-core`：
 
@@ -156,11 +156,11 @@ kotlin {
 </TabItem>
 </Tabs>
 
-## Kotlin 多平台庫的相依性
+## Kotlin 多平台程式庫的相依性
 
-您可以新增已採用 Kotlin 多平台技術之庫的相依性，例如 [SQLDelight](https://github.com/cashapp/sqldelight)。這些庫的作者通常會提供將其相依性新增至專案的指南。
+您可以新增已採用 Kotlin 多平台技術之程式庫的相依性，例如 [SQLDelight](https://github.com/cashapp/sqldelight)。這些程式庫的作者通常會提供將其相依性新增至專案的指南。
 
-> 在 [JetBrains 的搜尋平台](https://klibs.io/)上尋找 Kotlin 多平台庫。
+> 在 [klibs.io](https://klibs.io/) 上尋找可用的 Kotlin 多平台程式庫。
 >
 {style="tip"}
 
@@ -168,7 +168,7 @@ kotlin {
 
 如果您想在所有原始碼集中使用某個程式庫，可以僅將其新增至通用原始碼集。Kotlin 多平台 Gradle 外掛程式會自動將對應的部分新增至任何其他原始碼集。
 
-> 您不能在通用原始碼集中設定平台專屬庫的相依性。
+> 您不能在通用原始碼集中設定平台專屬程式庫的相依性。
 >
 {style="warning"}
 
@@ -213,7 +213,7 @@ kotlin {
 </TabItem>
 </Tabs>
 
-> 您也可以在頂層的 `dependencies {}` 區塊中配置通用程式庫。參見[在頂層配置相依性](multiplatform-dsl-reference.md#configure-dependencies-at-the-top-level)。
+> 您也可以在頂層的 `dependencies {}` 區塊中配置通用程式庫。請參閱[在頂層配置相依性](multiplatform-dsl-reference.md#configure-dependencies-at-the-top-level)。
 > 
 {style="tip"}
 
@@ -284,7 +284,7 @@ kotlin {
 
 ## 對另一個多平台專案的相依性
 
-您可以將一個多平台專案作為相依性連接到另一個專案。為此，只需在需要的原始碼集中新增專案相依性即可。如果您想在所有原始碼集中使用該相依性，請將其新增至通用的原始碼集。在這種情況下，其他原始碼集將自動獲取其對應的版本。
+您可以將一個多平台專案作為相依性連接到另一個專案。為此，只需在需要的原始碼集中新增專案相依性即可。如果您想在所有原始碼集中使用該相依性，請將其新增至通用原始碼集。在這種情況下，其他原始碼集將自動獲取其對應的版本。
 
 <Tabs group="build-script">
 <TabItem title="Kotlin" group-key="kotlin">
