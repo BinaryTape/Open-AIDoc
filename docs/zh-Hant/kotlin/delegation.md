@@ -1,6 +1,6 @@
 [//]: # (title: 委派)
 
-[委派模式](https://en.wikipedia.org/wiki/Delegation_pattern)已被證明是實作繼承的一個很好的替代方案，而 Kotlin 原生支援此模式且不需要任何樣板程式碼。
+[委派模式](https://en.wikipedia.org/wiki/Delegation_pattern)已被證明是實作繼承的一個良好替代方案，而 Kotlin 原生支援此模式且不需要任何樣板程式碼。
 
 `Derived` 類別可以透過將其所有公有成員委派給指定物件來實作 `Base` 介面：
 
@@ -17,7 +17,10 @@ class Derived(b: Base) : Base by b
 
 fun main() {
     val base = BaseImpl(10)
-    Derived(base).print()
+    val derived = Derived(base) 
+    
+    derived.print()
+    // 10
 }
 ```
 {kotlin-runnable="true"}
@@ -26,7 +29,7 @@ fun main() {
 
 ## 覆寫透過委派實作的介面成員 {id="overriding-a-member-of-an-interface-implemented-by-delegation"}
 
-[覆寫](inheritance.md#overriding-methods) 的運作方式如你預期：編譯器會使用你的 `override` 實作，而非委派物件中的實作。如果你想在 `Derived` 中加入 `override fun printMessage() { print("abc") }`，當呼叫 `printMessage` 時，程式會印出 *abc* 而非 *10*：
+[覆寫](inheritance.md#overriding-methods)的運作方式如你預期：編譯器會使用你的 `override` 實作，而非委派物件中的實作。如果你想在 `Derived` 中加入 `override fun printMessage() { print("abc") }`，當呼叫 `printMessage` 時，程式會印出 *abc* 而非 *10*：
 
 ```kotlin
 interface Base {
@@ -40,13 +43,17 @@ class BaseImpl(val x: Int) : Base {
 }
 
 class Derived(b: Base) : Base by b {
-    override fun printMessage() { print("abc") }
+    override fun printMessage() { println("abc") }
 }
 
 fun main() {
     val base = BaseImpl(10)
-    Derived(base).printMessage()
-    Derived(base).printMessageLine()
+    val derived = Derived(base)
+
+    derived.printMessage()
+    // abc
+    derived.printMessageLine()
+    // 10
 }
 ```
 {kotlin-runnable="true"}
@@ -65,17 +72,20 @@ class BaseImpl(x: Int) : Base {
 }
 
 class Derived(b: Base) : Base by b {
-    // 此屬性不會從 b 的 print 實作中被存取
+    // 此屬性無法從 b 的 `print()` 實作中存取
     override val message = "Message of Derived"
 }
 
 fun main() {
-    val b = BaseImpl(10)
-    val derived = Derived(b)
+    val base = BaseImpl(10)
+    val derived = Derived(base)
+    
     derived.print()
+    // BaseImpl: x = 10
     println(derived.message)
+    // Message of Derived
 }
 ```
 {kotlin-runnable="true"}
 
-[進一步了解](delegated-properties.md)委派屬性。
+進一步了解[委派屬性](delegated-properties.md)。

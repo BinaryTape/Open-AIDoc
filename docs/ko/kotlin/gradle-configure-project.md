@@ -49,7 +49,8 @@ plugins {
 
 | KGP 버전      | Gradle 최소 및 최대 버전               | AGP 최소 및 최대 버전                               |
 |---------------|---------------------------------------|-----------------------------------------------------|
-| 2.4.0-2.4.10  | %minGradleVersion%–%maxGradleVersion% | %minAndroidGradleVersion%–%maxAndroidGradleVersion% |
+| 2.4.20        | %minGradleVersion%–%maxGradleVersion% | %minAndroidGradleVersion%–%maxAndroidGradleVersion% |
+| 2.4.0-2.4.10  | 7.6.3–9.5.0                           | 8.5.2–9.1.0                                         |
 | 2.3.20–2.3.21 | 7.6.3–9.3.0                           | 8.2.2–9.0.0                                         |
 | 2.3.10        | 7.6.3–9.0.0                           | 8.2.2–9.0.0                                         |
 | 2.3.0         | 7.6.3–9.0.0                           | 8.2.2–8.13.0                                        |
@@ -95,9 +96,9 @@ plugins {
 
 이 동작을 구성하기 위해 프로젝트의 `gradle.properties` 파일에 추가할 수 있는 프로퍼티들이 있습니다:
 
-| Gradle 프로퍼티                                      | 설명                                                                                                                                       |
+| Gradle 프로퍼티                                     | 설명                                                                                                                                      |
 |-----------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------|
-| `kotlin.project.persistent.dir`                     | 프로젝트 수준 데이터가 저장되는 위치를 구성합니다. 기본값: `<project-root-directory>/.kotlin`                                      |
+| `kotlin.project.persistent.dir`                     | 프로젝트 수준 데이터가 저장되는 위치를 구성합니다. 기본값: `<project-root-directory>/.kotlin`                                     |
 | `kotlin.project.persistent.dir.gradle.disableWrite` | `.gradle` 디렉토리에 Kotlin 데이터를 쓰는 것을 비활성화할지 여부를 제어합니다(이전 IDEA 버전과의 하위 호환성을 위해). 기본값: false |
 
 ## JVM 타겟팅 {id="targeting-the-jvm"}
@@ -471,7 +472,7 @@ integrationTestCompilation {
 
 ### Java 모듈(JPMS)이 활성화된 상태로 구성하기 {id="configure-with-java-modules-jpms-enabled"}
 
-Kotlin Gradle 플러그인을 [Java 모듈](https://www.oracle.com/corporate/features/understanding-java-9-modules.html)과 함께 작동하게 하려면 빌드 스크립트에 다음 줄을 추가하고 `YOUR_MODULE_NAME`을 JPMS 모듈 참조(예: `org.company.module`)로 교체하세요:
+Kotlin Gradle 플러그인을 [Java 모듈](https://dev.java/learn/modules/)과 함께 작동하게 하려면 빌드 스크립트에 다음 줄을 추가하고 `YOUR_MODULE_NAME`을 JPMS 모듈 참조(예: `org.company.module`)로 교체하세요:
 
 <tabs group="build-script">
 <tab title="Kotlin" group-key="kotlin">
@@ -561,9 +562,9 @@ tasks.jar(type: Jar) {
 
 ## 멀티플랫폼 타겟팅 {id="targeting-multiple-platforms"}
 
-[멀티플랫폼 프로젝트](https://kotlinlang.org/docs/multiplatform/get-started.html)라고 불리는 [여러 플랫폼](https://kotlinlang.org/docs/multiplatform/multiplatform-dsl-reference.html#targets)을 타겟으로 하는 프로젝트에는 `kotlin-multiplatform` 플러그인이 필요합니다.
+[여러 플랫폼](https://kotlinlang.org/docs/multiplatform/multiplatform-dsl-reference.html#targets)을 타겟으로 하는 프로젝트인 [멀티플랫폼 프로젝트](https://kotlinlang.org/docs/multiplatform/get-started.html)에는 `kotlin-multiplatform` 플러그인이 필요합니다.
 
-> `kotlin-multiplatform` 플러그인은 Gradle %minGradleVersion% 이상에서 작동합니다.
+>`kotlin-multiplatform` 플러그인은 Gradle %minGradleVersion% 이상에서 작동합니다.
 >
 {style="note"}
 
@@ -588,7 +589,8 @@ plugins {
 </tab>
 </tabs>
 
-[다양한 플랫폼을 위한 Kotlin 멀티플랫폼](https://kotlinlang.org/docs/multiplatform/get-started.html) 및 [iOS와 Android를 위한 Kotlin 멀티플랫폼](https://kotlinlang.org/docs/multiplatform/multiplatform-getting-started.html)에 대해 자세히 알아보세요.
+[다양한 플랫폼을 위한 Kotlin 멀티플랫폼](https://kotlinlang.org/docs/multiplatform/get-started.html) 및 
+[iOS와 Android를 위한 Kotlin 멀티플랫폼](https://kotlinlang.org/docs/multiplatform/multiplatform-getting-started.html)에 대해 자세히 알아보세요.
 
 ## Android 타겟팅 {id="targeting-android"}
 
@@ -652,7 +654,8 @@ kotlin {
 
 ### WebAssembly 타겟팅 {id="targeting-webassembly"}
 
-여러 플랫폼에서 로직과 UI를 모두 공유하려면 Kotlin/Wasm을 사용하세요. 자세한 내용은 [웹 개발](web-overview.md#kotlin-wasm)을 참조하세요.
+여러 플랫폼에서 로직과 UI를 모두 공유하려면 Kotlin/Wasm을 사용하세요. 자세한 내용은 
+[웹 개발](web-overview.md#kotlin-wasm)을 참조하세요.
 
 JavaScript와 마찬가지로 WebAssembly(Wasm)를 타겟으로 할 때 `kotlin-multiplatform` 플러그인을 사용합니다:
 
@@ -679,7 +682,7 @@ plugins {
 
 요구 사항에 따라 다음을 타겟으로 할 수 있습니다:
 
-* **`wasmJs`**: 브라우저 또는 Node.js에서 실행용
+* **`wasmJs`**: 웹 브라우저 또는 Node.js에서 실행용
 * **`wasmWasi`**: Wasmtime, WasmEdge 등과 같이 [WASI (WebAssembly System Interface)](https://wasi.dev/)를 지원하는 Wasm 환경에서 실행용
 
 웹 브라우저 또는 Node.js를 위한 `wasmJs` 타겟을 구성합니다:
@@ -694,12 +697,12 @@ kotlin {
 }
 ```
 
-WASI 환경의 경우 `wasmWasi` 타겟을 구성합니다:
+WASI 환경의 경우 Node.js 또는 Wasmtime으로 `wasmWasi` 타겟을 구성합니다:
 
 ```kotlin
 kotlin {
     wasmWasi {
-        nodejs {
+        nodejs { // 또는 wasmtime
             /* ... */
         }
     }
@@ -1270,7 +1273,7 @@ dependencyResolutionManagement {
 </tab>
 <tab title="Groovy" group-key="groovy">
 
-```kotlin
+```groovy
 dependencyResolutionManagement {
     repositories {
         mavenCentral()
@@ -1285,7 +1288,7 @@ dependencyResolutionManagement {
 ## 생성된 소스 등록하기 {id="register-generated-sources"}
 <primary-label ref="experimental-general"/>
 
-IDE, 서브파티 플러그인 및 기타 도구가 생성된 코드와 일반 소스 파일을 구별할 수 있도록 생성된 소스를 등록하세요. 이는 IDE와 같은 도구가 UI에서 생성된 코드를 다르게 강조 표시하고 프로젝트를 가져올 때 생성 태스크를 트리거하는 데 도움이 됩니다. 생성된 소스를 등록하려면 [`KotlinSourceSet`](https://kotlinlang.org/api/kotlin-gradle-plugin/kotlin-gradle-plugin-api/org.jetbrains.kotlin.gradle.plugin/-kotlin-source-set/) 인터페이스를 사용하세요.
+IDE, 서드파티 플러그인 및 기타 도구가 생성된 코드와 일반 소스 파일을 구별할 수 있도록 생성된 소스를 등록하세요. 이는 IDE와 같은 도구가 UI에서 생성된 코드를 다르게 강조 표시하고 프로젝트를 가져올 때 생성 태스크를 트리거하는 데 도움이 됩니다. 생성된 소스를 등록하려면 [`KotlinSourceSet`](https://kotlinlang.org/api/kotlin-gradle-plugin/kotlin-gradle-plugin-api/org.jetbrains.kotlin.gradle.plugin/-kotlin-source-set/) 인터페이스를 사용하세요.
 
 Kotlin 파일이 포함된 디렉토리를 등록하려면 `build.gradle.kts` 파일에서 [`SourceDirectorySet`](https://docs.gradle.org/current/kotlin-dsl/gradle/org.gradle.api.file/-source-directory-set/index.html) 타입의 [`generatedKotlin`](https://kotlinlang.org/api/kotlin-gradle-plugin/kotlin-gradle-plugin-api/org.jetbrains.kotlin.gradle.plugin/-kotlin-source-set/generated-kotlin.html) 프로퍼티를 사용하세요. 예를 들어:
 

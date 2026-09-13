@@ -4,7 +4,7 @@ _[言語をモダンに保つ](kotlin-evolution-principles.md)_ および _[快�
 
 ほとんどの言語変更は、アップデートの変更履歴やコンパイラの警告など、他のチャネルを通じて既に発表されていますが、このドキュメントではそれらすべてを要約し、Kotlin 2.3 から Kotlin 2.4 への移行のための完全なリファレンスを提供します。このドキュメントには、ツールに関連する変更に関する情報も含まれています。
 
-## 基本用語
+## 基本用語 {id="basic-terms"}
 
 このドキュメントでは、いくつかの種類の互換性を紹介します：
 
@@ -14,9 +14,9 @@ _[言語をモダンに保つ](kotlin-evolution-principles.md)_ および _[快�
 
 これらの定義は、純粋な Kotlin に対してのみ適用されることに注意してください。他の言語（Java など）の観点からの Kotlin コードの互換性は、このドキュメントの範囲外です。
 
-## 言語 (Language)
+## 言語 (Language) {id="language"}
 
-### `-language-version=1.9` および K1 コンパイラのサポート終了
+### `-language-version=1.9` および K1 コンパイラのサポート終了 {id="drop-support-for-language-version-1-9-and-the-k1-compiler"}
 
 > **課題**: [KT-80590](https://youtrack.jetbrains.com/issue/KT-80590)
 >
@@ -31,7 +31,7 @@ _[言語をモダンに保つ](kotlin-evolution-principles.md)_ および _[快�
 > - 2.2.0: `-language-version` に 1.9 を使用した場合に警告を報告
 > - 2.4.0: 警告をエラーに格上げ
 
-### Java 型に対するフレキシブルな明示的 Null 許容型引数の禁止
+### Java 型に対するフレキシブルな明示的 Null 許容型引数の禁止 {id="prohibit-flexible-explicit-nullable-type-arguments-for-java-types"}
 
 > **課題**: [KTLC-284](https://youtrack.jetbrains.com/issue/KTLC-284)
 >
@@ -46,7 +46,7 @@ _[言語をモダンに保つ](kotlin-evolution-principles.md)_ および _[快�
 > - 2.2.0: フレキシブルな型として扱われる明示的に指定された Null 許容型引数に対して警告を報告
 > - 2.4.0: 警告をエラーに格上げ
 
-### 明らかに互換性のない型に対する常に false となる `is` チェックの禁止
+### 明らかに互換性のない型に対する常に false となる `is` チェックの禁止 {id="prohibit-always-false-is-checks-for-definitely-incompatible-types"}
 
 > **課題**: [KTLC-365](https://youtrack.jetbrains.com/issue/KTLC-365)
 >
@@ -61,7 +61,7 @@ _[言語をモダンに保つ](kotlin-evolution-principles.md)_ および _[快�
 > - 2.0.0: 明らかに互換性のない型を用いた `is` チェックに対して警告を報告
 > - 2.4.0: 警告をエラーに格上げ
 
-### インライン関数における可視性の低い型および宣言の露出の禁止
+### インライン関数における可視性の低い型および宣言の露出の禁止 {id="prohibit-exposing-types-and-declarations-with-lower-visibility-in-inline-functions"}
 
 > **課題**: [KTLC-283](https://youtrack.jetbrains.com/issue/KTLC-283)
 >
@@ -76,7 +76,7 @@ _[言語をモダンに保つ](kotlin-evolution-principles.md)_ および _[快�
 > - 2.3.0: インライン関数において可視性の低い型および宣言を露出させている場合に警告を報告
 > - 2.4.0: 警告をエラーに格上げ
 
-### アノテーションのデフォルトの使用箇所ターゲット選択の変更
+### アノテーションのデフォルトの使用箇所ターゲット選択の変更 {id="change-default-use-site-target-selection-for-annotations"}
 
 > **課題**: [KTLC-391](https://youtrack.jetbrains.com/issue/KTLC-391)
 >
@@ -86,14 +86,14 @@ _[言語をモダンに保つ](kotlin-evolution-principles.md)_ および _[快�
 >
 > **概要**: Kotlin 2.4.0 では、アノテーションをパラメータ、プロパティ、およびフィールドに伝播させるためのデフォルトルールが更新されました。これは、再コンパイル後のアノテーション処理、リフレクション、およびバイナリメタデータに影響を与える可能性があります。使用箇所ターゲット（use-site target）を指定しない場合、コンパイラは適用可能であれば `param` と `property` を使用し、`property` が適用できない場合にのみ `field` を使用するようになりました。
 >
-> `@param:Annotation` のように、使用箇所ターゲットを明示的に指定することができます。プロジェクト全体で以前のデフォルトルールを使用するには、ビルドファイルに `-Xannotation-default-target=first-only` を追加してください。
+> `@Annotation` の代わりに `@param:Annotation` のように、使用箇所ターゲットを明示的に指定することができます。プロジェクト全体で以前のデフォルトルールを使用するには、ビルドファイルに `-Xannotation-default-target=first-only` を追加してください。
 >  
 > **デプロケーションサイクル**:
 >
 > - 2.2.0: 新しいデフォルトルールによって選択される使用箇所ターゲットが変化する場合に警告を報告
 > - 2.4.0: 新しいデフォルトルールを有効化
 
-### アクセス不能な型への暗黙的な参照の禁止
+### アクセス不能な型への暗黙的な参照の禁止 {id="forbid-implicit-references-to-inaccessible-types"}
 
 > **課題**: [KTLC-384](https://youtrack.jetbrains.com/issue/KTLC-384)
 >
@@ -110,7 +110,7 @@ _[言語をモダンに保つ](kotlin-evolution-principles.md)_ および _[快�
 > - 2.3.0: アクセス不能な型への暗黙的な参照に対して警告を報告
 > - 2.4.0: 警告をエラーに格上げ
 
-### Jakarta Null 許容性アノテーションの強制
+### Jakarta Null 許容性アノテーションの強制 {id="enforce-jakarta-nullability-annotations"}
 
 > **課題**: [KTLC-285](https://youtrack.jetbrains.com/issue/KTLC-285)
 >
@@ -125,7 +125,7 @@ _[言語をモダンに保つ](kotlin-evolution-principles.md)_ および _[快�
 > - 2.2.0: Jakarta Null 許容性アノテーションが付与された Java 宣言における Null 許容性の不一致に対して警告を報告
 > - 2.4.0: 警告をエラーに格上げ
 
-### 呼び出し可能参照の修飾子における不適切な位置の型引数の報告
+### 呼び出し可能参照の修飾子における不適切な位置の型引数の報告 {id="report-misplaced-type-arguments-in-callable-reference-qualifiers"}
 
 > **課題**: [KTLC-388](https://youtrack.jetbrains.com/issue/KTLC-388)
 >
@@ -141,7 +141,7 @@ _[言語をモダンに保つ](kotlin-evolution-principles.md)_ および _[快�
 >
 > - 2.4.0: 呼び出し可能参照の左辺にある型引数が修飾子の別の部分に属している場合に警告を報告
 
-### Null 許容な上限境界を持つ具体化された型パラメータからのクラスリテラルに対するエラー報告
+### Null 許容な上限境界を持つ具体化された型パラメータからのクラスリテラルに対するエラー報告 {id="report-errors-for-class-literals-from-reified-type-parameters-with-nullable-upper-bounds"}
 
 > **課題**: [KTLC-370](https://youtrack.jetbrains.com/issue/KTLC-370)
 >
@@ -156,7 +156,7 @@ _[言語をモダンに保つ](kotlin-evolution-principles.md)_ および _[快�
 > - 2.3.0: Null 許容な上限境界を持つ具体化された型パラメータから型が決定される式に対して `::class` が使用された場合に警告を報告
 > - 2.4.0: 警告をエラーに格上げ
 
-### 匿名オブジェクトにおける宣言前の初期化の禁止
+### 匿名オブジェクトにおける宣言前の初期化の禁止 {id="prohibit-initialization-before-declarations-in-anonymous-objects"}
 
 > **課題**: [KTLC-290](https://youtrack.jetbrains.com/issue/KTLC-290)
 >
@@ -171,7 +171,7 @@ _[言語をモダンに保つ](kotlin-evolution-principles.md)_ および _[快�
 > - 2.2.20: 匿名オブジェクトの `init` ブロックにおいて、プロパティ宣言の前にプロパティを初期化している場合に警告を報告
 > - 2.4.0: 警告をエラーに格上げ
 
-### 非抽象 Java sealed クラスを用いた `when` 式における網羅性の強制
+### 非抽象 Java sealed クラスを用いた `when` 式における網羅性の強制 {id="enforce-exhaustiveness-for-when-expressions-with-non-abstract-java-sealed-classes"}
 
 > **課題**: [KTLC-366](https://youtrack.jetbrains.com/issue/KTLC-366)
 >
@@ -186,7 +186,7 @@ _[言語をモダンに保つ](kotlin-evolution-principles.md)_ および _[快�
 > - 2.3.0: 非抽象 Java sealed クラスを用いた非網羅的な `when` 式に対して警告を報告
 > - 2.4.0: 警告をエラーに格上げ
 
-### パラメータが多すぎる `getValue()` および `setValue()` 関数への `operator` 修飾子の付与禁止
+### パラメータが多すぎる `getValue()` および `setValue()` 関数への `operator` 修飾子の付与禁止 {id="prohibit-operator-modifier-on-getvalue-and-setvalue-functions-with-too-many-parameters"}
 
 > **課題**: [KTLC-289](https://youtrack.jetbrains.com/issue/KTLC-289)
 >
@@ -201,7 +201,7 @@ _[言語をモダンに保つ](kotlin-evolution-principles.md)_ および _[快�
 > - 2.2.20: 値パラメータが多すぎる `operator` `getValue()` および `setValue()` 関数に対して警告を報告
 > - 2.4.0: 警告をエラーに格上げ
 
-### ジェネリック呼び出しにおける一貫性のない型引数の禁止
+### ジェネリック呼び出しにおける一貫性のない型引数の禁止 {id="prohibit-inconsistent-type-arguments-in-generic-calls"}
 
 > **課題**: [KTLC-373](https://youtrack.jetbrains.com/issue/KTLC-373)
 >
@@ -216,7 +216,7 @@ _[言語をモダンに保つ](kotlin-evolution-principles.md)_ および _[快�
 > - 2.3.0: ジェネリック呼び出しにおける明示的な型引数が型パラメータ間の上限境界制約に違反している場合に警告を報告
 > - 2.4.0: 警告をエラーに格上げ
 
-### `javaClass` プロパティへの参照の非推奨化
+### `javaClass` プロパティへの参照の非推奨化 {id="deprecate-references-to-the-javaclass-property"}
 
 > **課題**: [KTLC-375](https://youtrack.jetbrains.com/issue/KTLC-375)
 >
@@ -230,7 +230,7 @@ _[言語をモダンに保つ](kotlin-evolution-principles.md)_ および _[快�
 >
 > - 2.4.0: `javaClass` プロパティへのプロパティ参照に対して警告を報告
 
-### オプトインが必要な暗黙的な列挙型コンストラクタ呼び出しのエラー報告
+### オプトインが必要な暗黙的な列挙型コンストラクタ呼び出しのエラー報告 {id="report-errors-for-implicit-enum-constructor-calls-that-require-opt-in"}
 
 > **課題**: [KTLC-359](https://youtrack.jetbrains.com/issue/KTLC-359)
 >
@@ -245,7 +245,7 @@ _[言語をモダンに保つ](kotlin-evolution-principles.md)_ および _[快�
 > - 2.2.20: 列挙型のエントリがオプトインを必要とする列挙型のプライマリコンストラクタを暗黙的に呼び出している場合に警告を報告
 > - 2.4.0: 警告をエラーに格上げ
 
-### 列挙型エントリにおける `inline` 修飾子の禁止
+### 列挙型エントリにおける `inline` 修飾子の禁止 {id="forbid-inline-modifier-on-enum-entries"}
 
 > **課題**: [KTLC-361](https://youtrack.jetbrains.com/issue/KTLC-361)
 >
@@ -260,7 +260,7 @@ _[言語をモダンに保つ](kotlin-evolution-principles.md)_ および _[快�
 > - 2.3.0: 列挙型のエントリに `inline` 修飾子が使用されている場合に警告を報告
 > - 2.4.0: 警告をエラーに格上げ
 
-### アノテーション呼び出しおよびパラメータのデフォルト値以外での配列リテラルの禁止
+### アノテーション呼び出しおよびパラメータのデフォルト値以外での配列リテラルの禁止 {id="prohibit-array-literals-outside-annotation-calls-and-parameter-defaults"}
 
 > **課題**: [KTLC-369](https://youtrack.jetbrains.com/issue/KTLC-369)
 >
@@ -275,7 +275,7 @@ _[言語をモダンに保つ](kotlin-evolution-principles.md)_ および _[快�
 > - 2.3.0: アノテーション呼び出しおよびアノテーションパラメータのデフォルト値以外での配列リテラル使用に対して警告を報告
 > - 2.4.0: 警告をエラーに格上げ
 
-### CLI コンパイラモードにおける `_root_ide_package_` の禁止
+### CLI コンパイラモードにおける `_root_ide_package_` の禁止 {id="prohibit-rootidepackage-in-cli-compiler-mode"}
 
 > **課題**: [KTLC-378](https://youtrack.jetbrains.com/issue/KTLC-378)
 >
@@ -290,7 +290,7 @@ _[言語をモダンに保つ](kotlin-evolution-principles.md)_ および _[快�
 > - 2.3.20: CLI コンパイラモードにおける `_root_ide_package_` 参照に対して警告を報告
 > - 2.4.0: 警告をエラーに格上げ
 
-### 可変長引数変換を伴う関数参照の等価性の修正
+### 可変長引数変換を伴う関数参照の等価性の修正 {id="correct-equality-for-function-references-with-vararg-conversions"}
 
 > **課題**: [KTLC-385](https://youtrack.jetbrains.com/issue/KTLC-385)
 >
@@ -304,7 +304,7 @@ _[言語をモダンに保つ](kotlin-evolution-principles.md)_ および _[快�
 >
 > - 2.4.0: 新しい動作を導入
 
-### コンパニオンオブジェクトへのアクセスに対するオプトインの強制
+### コンパニオンオブジェクトへのアクセスに対するオプトインの強制 {id="enforce-opt-in-for-companion-object-access"}
 
 > **課題**: [KTLC-386](https://youtrack.jetbrains.com/issue/KTLC-386)
 >
@@ -319,7 +319,7 @@ _[言語をモダンに保つ](kotlin-evolution-principles.md)_ および _[快�
 > - 2.3.20: コンパニオンオブジェクトへのアクセスにオプトインが必要な場合に警告を報告
 > - 2.4.0: `ERROR` レベルのオプトイン要件に対して警告をエラーに格上げ
 
-### ネストされたジェネリック引数を持つスーパータイプからの型不一致の報告
+### ネストされたジェネリック引数を持つスーパータイプからの型不一致の報告 {id="report-type-mismatches-from-supertypes-with-nested-generic-arguments"}
 
 > **課題**: [KTLC-372](https://youtrack.jetbrains.com/issue/KTLC-372)
 >
@@ -327,13 +327,13 @@ _[言語をモダンに保つ](kotlin-evolution-principles.md)_ および _[快�
 >
 > **互換性のない変更の種類**: ソース
 >
-> **概要**: ネストされたジェネリック引数を持つスーパータイプに関連する型の不一致をコンパイラが検出した際に、エラーを報告するようになりました。以前はコンパイラがこの不一致を見逃すことがあり、後に `ClassCastException` で失敗していました。移行するには、レシーバーのジェネリック型に一致する型引数を使用するか、コンパイラが推論できるように明示的な型引数を削除してください。
+> **概要**: ネストされたジェネリック引数を持つスーパータイプに関連する型の不一致をコンパイラが検出した際に、Kotlin がエラーを報告するようになりました。以前はコンパイラがこの不一致を見逃すことがあり、後に `ClassCastException` で失敗していました。移行するには、レシーバーのジェネリック型に一致する型引数を使用するか、コンパイラが推論できるように明示的な型引数を削除してください。
 >
 > **デプロケーションサイクル**:
 >
 > - 2.4.0: ネストされたジェネリック引数を持つスーパータイプに関連する型の不一致に対してエラーを報告
 
-### アクセス不能な宣言を含む推論型の禁止
+### アクセス不能な宣言を含む推論型の禁止 {id="prohibit-inferred-types-with-inaccessible-declarations"}
 
 > **課題**: [KTLC-363](https://youtrack.jetbrains.com/issue/KTLC-363)
 >
@@ -348,9 +348,9 @@ _[言語をモダンに保つ](kotlin-evolution-principles.md)_ および _[快�
 > - 2.3.0: 推論型が現在のスコープでアクセスできない宣言を含んでいる場合に警告を報告
 > - 2.4.0: 警告をエラーに格上げ
 
-## 標準ライブラリ (Standard library)
+## 標準ライブラリ (Standard library) {id="standard-library"}
 
-### `kotlin.io.readLine()` 関数の非推奨化
+### `kotlin.io.readLine()` 関数の非推奨化 {id="deprecate-kotlin-io-readline-function"}
 
 > **課題**: [KTLC-394](https://youtrack.jetbrains.com/issue/KTLC-394)
 >
@@ -364,7 +364,7 @@ _[言語をモダンに保つ](kotlin-evolution-principles.md)_ および _[快�
 >
 > - 2.4.0: `kotlin.io.readLine()` を使用している場合に警告を報告
 
-### `AbstractCoroutineContextKey` および関連 API の非推奨化
+### `AbstractCoroutineContextKey` および関連 API の非推奨化 {id="deprecate-abstractcoroutinecontextkey-and-related-apis"}
 
 > **課題**: [KT-84970](https://youtrack.jetbrains.com/issue/KT-84970)
 >
@@ -378,7 +378,7 @@ _[言語をモダンに保つ](kotlin-evolution-principles.md)_ および _[快�
 >
 > - 2.4.0: 非推奨の API を使用している場合に警告を報告
 
-### 無限の境界に対する `Random.nextDouble()` のコントラクトの変更
+### 無限の境界に対する `Random.nextDouble()` のコントラクトの変更 {id="change-random-nextdouble-contract-for-infinite-bounds"}
 
 > **課題**: [KT-84368](https://youtrack.jetbrains.com/issue/KT-84368)
 >
@@ -392,9 +392,9 @@ _[言語をモダンに保つ](kotlin-evolution-principles.md)_ および _[快�
 >
 > - 2.4.0: 新しい動作を有効化
 
-## ツール (Tools)
+## ツール (Tools) {id="tools"}
 
-### レガシー Kotlin/JS コンパイラ型選択 API の削除
+### レガシー Kotlin/JS コンパイラ型選択 API の削除 {id="deprecate-legacy-kotlin-js-compiler-type-selection-apis"}
 
 > **課題**: [KT-64275](https://youtrack.jetbrains.com/issue/KT-64275), [KT-84753](https://youtrack.jetbrains.com/issue/KT-84753)
 >
@@ -411,7 +411,7 @@ _[言語をモダンに保つ](kotlin-evolution-principles.md)_ および _[快�
 > - 1.8.0: レガシー Kotlin/JS コンパイラ型の定数を非推奨化
 > - 2.4.0: 非推奨のレガシーコンパイラ型 API を削除し、`KotlinJsCompilerType` またはコンパイラ型パラメータを持つ `KotlinProjectExtension.js()` オーバーロードを使用している場合に警告を報告
 
-### Kotlin Android エクステンションにおける `sourceSets` の非推奨化
+### Kotlin Android エクステンションにおける `sourceSets` の非推奨化 {id="deprecate-sourcesets-in-the-kotlin-android-extension"}
 
 > **課題**: [KT-74451](https://youtrack.jetbrains.com/issue/KT-74451)
 >
@@ -425,7 +425,7 @@ _[言語をモダンに保つ](kotlin-evolution-principles.md)_ および _[快�
 >
 > - 2.4.0: `KotlinAndroidProjectExtension` から `sourceSets` にアクセスしている場合に警告を報告
 
-### Kotlin/Native Apple フレームワークの Consumable な構成の削除
+### Kotlin/Native Apple フレームワークの Consumable な構成の削除 {id="remove-consumable-configurations-for-kotlin-native-apple-frameworks"}
 
 > **課題**: [KT-74503](https://youtrack.jetbrains.com/issue/KT-74503), [KT-82230](https://youtrack.jetbrains.com/issue/KT-82230)
 >
@@ -439,7 +439,7 @@ _[言語をモダンに保つ](kotlin-evolution-principles.md)_ および _[快�
 >
 > - 2.4.0: Kotlin/Native Apple フレームワークの Consumable な構成を削除
 
-### Kotlin Gradle プラグインから非推奨のタスク、コンパイル、および DSL API を削除
+### Kotlin Gradle プラグインから非推奨のタスク、コンパイル、および DSL API を削除 {id="remove-deprecated-task-compilation-and-dsl-apis-from-the-kotlin-gradle-plugin"}
 
 > **課題**: [KT-85509](https://youtrack.jetbrains.com/issue/KT-85509)
 >
@@ -485,7 +485,7 @@ _[言語をモダンに保つ](kotlin-evolution-principles.md)_ および _[快�
 >
 > - 2.4.0: 非推奨の API を削除
 
-### 明示的な shrunk クラスパススナップショット設定の非推奨化
+### 明示的な shrunk クラスパススナップショット設定の非推奨化 {id="deprecate-explicit-shrunk-classpath-snapshot-configuration"}
 
 > **課題**: [KT-75837](https://youtrack.jetbrains.com/issue/KT-75837)
 >
@@ -499,7 +499,7 @@ _[言語をモダンに保つ](kotlin-evolution-principles.md)_ および _[快�
 >
 > - 2.4.0: `shrunkClasspathSnapshot` を使用している場合に警告を報告
 
-### 冗長な ABI バリデーション Gradle DSL 要素の削除
+### 冗長な ABI バリデーション Gradle DSL 要素の削除 {id="remove-redundant-abi-validation-gradle-dsl-elements"}
 
 > **課題**: [KT-80685](https://youtrack.jetbrains.com/issue/KT-80685)
 >
@@ -513,7 +513,7 @@ _[言語をモダンに保つ](kotlin-evolution-principles.md)_ および _[快�
 >
 > - 2.4.0: 冗長な ABI バリデーション DSL 要素を削除
 
-### 旧式の Compose コンパイラ Gradle プラグインオプションの非推奨化
+### 旧式の Compose コンパイラ Gradle プラグインオプションの非推奨化 {id="deprecate-obsolete-compose-compiler-gradle-plugin-options"}
 
 > **課題**: [KT-85343](https://youtrack.jetbrains.com/issue/KT-85343)
 >
@@ -539,7 +539,7 @@ _[言語をモダンに保つ](kotlin-evolution-principles.md)_ および _[快�
 > - 2.1.0: `stabilityConfigurationFile` に対して警告を報告
 > - 2.4.0: 警告をエラーに格上げ
 
-### 旧式の Kotlin/Native Gradle タスク API に対するエラー報告
+### 旧式の Kotlin/Native Gradle タスク API に対するエラー報告 {id="report-errors-for-obsolete-kotlin-native-gradle-task-apis"}
 
 > **課題**: [KT-85510](https://youtrack.jetbrains.com/issue/KT-85510)
 >
@@ -585,3 +585,17 @@ _[言語をモダンに保つ](kotlin-evolution-principles.md)_ および _[快�
 > **デプロケーションサイクル**:
 >
 > - 2.4.0: 非推奨の Kotlin/Native Gradle タスク API に対してエラーを報告し、`KotlinNativeLink.compilation` プロパティを削除
+
+### コンパイラ引数の値における大文字・小文字の不一致に対する警告の報告 {id="report-warnings-for-case-mismatches-in-compiler-argument-values"}
+
+> **課題**: [KT-86059](https://youtrack.jetbrains.com/issue/KT-86059)
+>
+> **コンポーネント**: ビルドツール API
+>
+> **互換性のない変更の種類**: ソース
+>
+> **概要**: 固定の値セットを受け入れるコンパイラ引数は、以前は大文字・小文字の扱いが一貫していませんでした。任意の大文字・小文字を受け入れるものもあれば、完全一致を要求するものもありました。[ビルドツール API](build-tools-api.md) は、これらの値に対して任意の大文字・小文字を受け入れるようになりましたが、例えば `Case mismatch for -module-kind: expected 'commonjs', got 'CommonJS'` のように警告を報告します。移行するには、[コンパイラリファレンス](compiler-reference.md)でその引数に対してリストされている大文字・小文字を使用してください。
+>
+> **デプロケーションサイクル**:
+>
+> - 2.4.20: コンパイラ引数の値の大文字・小文字が期待される値と一致しない場合に警告を報告

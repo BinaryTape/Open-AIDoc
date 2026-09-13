@@ -154,10 +154,11 @@ Kotlin/Native는 순수 Swift 라이브러리의 직접 임포트를 지원하�
 
 그러나 대부분의 경우 *역방향 임포트(reverse import)* 방식을 권장합니다. Kotlin 쪽에서 예상되는 동작을 정의하고, Swift 쪽에서 실제 기능을 구현한 다음, 이를 다시 Kotlin으로 전달하는 방식입니다.
 
-예상되는 부분은 다음 두 가지 방법 중 하나로 정의할 수 있습니다:
+예상되는 부분은 다음 세 가지 방법 중 하나로 정의할 수 있습니다:
 
 * 인터페이스 생성. 인터페이스 기반 방식은 다수의 함수를 다루거나 테스트 용이성 면에서 더 확장성이 좋습니다.
 * Swift 클로저 사용. 빠른 프로토타입 제작에는 좋지만, 상태를 유지하지 못하는 등의 한계가 있습니다.
+* [Swift export](native-swift-export.md) 사용. Objective-C 브릿징 없이도 Swift에서 Kotlin 인터페이스를 직접 구현하고 해당 Swift 객체를 다시 Kotlin으로 전달할 수 있습니다.
 
 순수 Swift 라이브러리인 [CryptoKit](https://developer.apple.com/documentation/cryptokit/)을 Kotlin 프로젝트로 역방향 임포트하는 예제를 살펴보겠습니다:
 
@@ -175,36 +176,36 @@ Kotlin/Native는 순수 Swift 라이브러리의 직접 임포트를 지원하�
 
 2. Kotlin 쪽에서 `MainViewController`로부터 플랫폼별 구현체를 전달받은 다음, `App` 컴포저블에서 이를 파라미터로 받아 필요한 곳에서 사용합니다:
 
-    ```kotlin
-    // App.kt
-    @Composable
-    fun App(cryptoProvider: CryptoProvider) {
-        // UI 내부에서의 사용 예시
-        val hashed = cryptoProvider.hashMD5("Hello, world!")
-        androidx.compose.material3.Text("Compose: $hashed")
-    }
-    ```
+   ```kotlin
+   // App.kt
+   @Composable
+   fun App(cryptoProvider: CryptoProvider) {
+       // UI 내부에서의 사용 예시
+       val hashed = cryptoProvider.hashMD5("Hello, world!")
+       androidx.compose.material3.Text("Compose: $hashed")
+   }
+   ```
 
-    ```kotlin
-    // MainViewController.kt
-    fun MainViewController(cryptoProvider: CryptoProvider) = ComposeUIViewController {
-        App(cryptoProvider)
-    }
-    ```
+   ```kotlin
+   // MainViewController.kt
+   fun MainViewController(cryptoProvider: CryptoProvider) = ComposeUIViewController {
+       App(cryptoProvider)
+   }
+   ```
 
 3. Swift 쪽에서 순수 Swift 라이브러리인 CryptoKit을 사용하여 MD5 해싱 기능을 구현합니다:
 
-    ```swift
-    // iosApp/ContentView.swift
-    import CryptoKit
-    
-    class IosCryptoProvider: CryptoProvider {
-        func hashMD5(input: String) -> String {
-            guard let data = input.data(using: .utf8) else { return "failed" }
-            return Insecure.MD5.hash(data: data).description
-        }
-    }
-    ```
+   ```swift
+   // iosApp/ContentView.swift
+   import CryptoKit
+  
+   class IosCryptoProvider: CryptoProvider {
+       func hashMD5(input: String) -> String {
+           guard let data = input.data(using: .utf8) else { return "failed" }
+           return Insecure.MD5.hash(data: data).description
+       }
+   }
+   ```
 
 4. Swift 구현체를 Kotlin 컴포넌트에 전달합니다:
 
@@ -260,6 +261,43 @@ Kotlin/Native는 순수 Swift 라이브러리의 직접 임포트를 지원하�
         func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
     }
     ```
+
+</tab>
+<tab title="Swift export">
+
+1. Kotlin 쪽에서 인터페이스, 이 인터페이스를 받는 함수, 그리고 Swift 구현체에서 상속할 수 있는 `open` 베이스 클래스를 선언합니다:
+
+   ```kotlin
+   // CryptoProvider.kt
+   interface CryptoProvider {
+       fun hashMD5(input: String): String
+   }
+
+   fun processHash(provider: CryptoProvider, input: String): String = provider.hashMD5(input)
+
+   open class SwiftBase
+   ```
+
+2. Swift 쪽에서 익스포트된 `SwiftBase` 클래스를 상속하고, 순수 Swift CryptoKit 라이브러리를 사용하여 인터페이스를 구현한 후, 해당 객체를 다시 Kotlin으로 전달합니다:
+
+   ```swift
+   // iosApp/ContentView.swift
+   import CryptoKit
+
+   final class IosCryptoProvider: SwiftBase, CryptoProvider {
+       func hashMD5(input: String) -> String {
+           guard let data = input.data(using: .utf8) else { return "failed" }
+           return Insecure.MD5.hash(data: data).description
+       }
+   }
+
+   let provider = IosCryptoProvider()
+
+   // Kotlin 함수를 호출하며, 이 함수는 다시 Swift의 hashMD5()를 호출합니다
+   print(processHash(provider: provider, input: "Hello, world!"))
+   ```
+
+Kotlin이 Swift 객체를 받으면 이를 일반적인 Kotlin 인터페이스의 구현체처럼 취급하여 Swift 코드를 직접 호출합니다.
 
 </tab>
 </tabs>

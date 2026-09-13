@@ -693,5 +693,7 @@
   "kotlin.mapping-struct-union-types-from-c": "構造体と共用体",
   "kotlin.mapping-function-pointers-from-c": "関数ポインタ",
   "kotlin.mapping-strings-from-c": "文字列",
-  "kmp.compose-desktop-tabbing": "タブナビゲーション"
+  "kmp.compose-desktop-tabbing": "タブナビゲーション",
+  "kotlin.whatsnew2420": "Kotlin 2.4.20",
+  "coroutines.coroutine-debugging": "コルーチンのデバッグ"
 }

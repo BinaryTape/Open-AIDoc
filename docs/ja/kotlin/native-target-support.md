@@ -42,7 +42,6 @@ Kotlin/Native コンパイラは多くの異なるターゲットをサポート
 | `linuxArm64`            | `aarch64-unknown-linux-gnu`       |               | ARM64 プラットフォーム上の Linux |
 | Apple macOS ホストのみ: |                                   |               |                                                                  |
 | `watchosSimulatorArm64` | `aarch64-apple-watchos-simulator` | ✅             | Apple シリコンプラットフォーム上の Apple watchOS シミュレータ 8.0 以降 |
-| `watchosArm32`          | `armv7k-apple-watchos`            |               | ARM32 プラットフォーム上の Apple watchOS 8.0 以降 |
 | `watchosArm64`          | `arm64_32-apple-watchos`          |               | ILP32 を備えた ARM64 プラットフォーム上の Apple watchOS 8.0 以降 |
 | `tvosSimulatorArm64`    | `aarch64-apple-tvos-simulator`    | ✅             | Apple シリコンプラットフォーム上の Apple tvOS シミュレータ 15.0 以降 |
 | `tvosArm64`             | `aarch64-apple-tvos`              |               | ARM64 プラットフォーム上の Apple tvOS 15.0 以降 |
@@ -66,19 +65,19 @@ Kotlin/Native コンパイラは多くの異なるターゲットをサポート
 | `mingwX64`              | `x86_64-pc-windows-gnu`          | ✅             | [MinGW](https://www.mingw-w64.org) 互換レイヤーを使用した 64 ビット Windows 10 以降 |
 | Apple macOS ホストのみ: |                                  |               |                                                                                          |
 | `watchosDeviceArm64`    | `aarch64-apple-watchos`          |               | ARM64 プラットフォーム上の Apple watchOS 8.0 以降 |
-| `iosX64`                | `x86_64-apple-ios-simulator`     | ✅             | x86-64 プラットフォーム上の Apple iOS シミュレータ 15.0 以降 |
-
-> `linuxArm32Hfp` ターゲットは非推奨であり、将来のリリースで削除される予定です。
-> 
-{style="note"}
+| `iosX64`                | `x86_64-apple-ios-simulator`     |               | x86-64 プラットフォーム上の Apple iOS シミュレータ 15.0 以降 |
 
 ### 非推奨のターゲット {id="deprecated-targets"}
 
-Kotlin 2.3.20 以降、以下のターゲットは非推奨となりました。
+以下のターゲットは非推奨であり、削除が予定されています：
 
-* `macosX64` (x86_64 プラットフォーム上の Apple macOS)
-* `watchosX64` (x86_64 プラットフォーム上の Apple watchOS 64 ビットシミュレータ)
-* `tvosX64` (x86_64 プラットフォーム上の Apple tvOS シミュレータ)
+| ターゲット | 非推奨化の開始 | 説明 |
+|-----------------|-------------------|----------------------------------------------------|
+| `watchosArm32`  | Kotlin 2.4.20     | ARM32 プラットフォーム上の Apple watchOS デバイス |
+| `macosX64`      | Kotlin 2.3.20     | x86_64 プラットフォーム上の Apple macOS |
+| `watchosX64`    | Kotlin 2.3.20     | x86_64 プラットフォーム上の Apple watchOS 64 ビットシミュレータ | 
+| `tvosX64`       | Kotlin 2.3.20     | x86_64 プラットフォーム上の Apple tvOS シミュレータ | 
+| `linuxArm32Hfp` | Kotlin 1.8.20     | ARM32 プラットフォーム上の Linux |
 
 ### より低いバージョンの Apple ターゲットのサポート {id="supporting-lower-apple-target-versions"}
 

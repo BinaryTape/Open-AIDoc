@@ -17,7 +17,10 @@ class Derived(b: Base) : Base by b
 
 fun main() {
     val base = BaseImpl(10)
-    Derived(base).print()
+    val derived = Derived(base) 
+    
+    derived.print()
+    // 10
 }
 ```
 {kotlin-runnable="true"}
@@ -40,13 +43,17 @@ class BaseImpl(val x: Int) : Base {
 }
 
 class Derived(b: Base) : Base by b {
-    override fun printMessage() { print("abc") }
+    override fun printMessage() { println("abc") }
 }
 
 fun main() {
     val base = BaseImpl(10)
-    Derived(base).printMessage()
-    Derived(base).printMessageLine()
+    val derived = Derived(base)
+
+    derived.printMessage()
+    // abc
+    derived.printMessageLine()
+    // 10
 }
 ```
 {kotlin-runnable="true"}
@@ -65,15 +72,19 @@ class BaseImpl(x: Int) : Base {
 }
 
 class Derived(b: Base) : Base by b {
-    // このプロパティは、b の `print` 実装からはアクセスされません
+    // このプロパティは、b の `print()`
+    // 実装からはアクセスできません
     override val message = "Message of Derived"
 }
 
 fun main() {
-    val b = BaseImpl(10)
-    val derived = Derived(b)
+    val base = BaseImpl(10)
+    val derived = Derived(base)
+    
     derived.print()
+    // BaseImpl: x = 10
     println(derived.message)
+    // Message of Derived
 }
 ```
 {kotlin-runnable="true"}

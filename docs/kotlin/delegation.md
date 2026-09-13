@@ -1,6 +1,6 @@
 [//]: # (title: 委托)
 
-[委托模式](https://en.wikipedia.org/wiki/Delegation_pattern)已被证明是实现继承的一个很好的替代方案，Kotlin 原生支持该模式且无需任何样板代码。
+[委托模式](https://en.wikipedia.org/wiki/Delegation_pattern)已被证明是实现继承的一个很好的替代方案，Kotlin 原生支持该模式且无需任何模板代码。
 
 类 `Derived` 可以实现接口 `Base`，通过将其所有的公有成员委托给一个指定对象：
 
@@ -17,7 +17,10 @@ class Derived(b: Base) : Base by b
 
 fun main() {
     val base = BaseImpl(10)
-    Derived(base).print()
+    val derived = Derived(base) 
+    
+    derived.print()
+    // 10
 }
 ```
 {kotlin-runnable="true"}
@@ -26,7 +29,7 @@ fun main() {
 
 ## 重写通过委托实现的接口成员 {id="overriding-a-member-of-an-interface-implemented-by-delegation"}
 
-[重写](inheritance.md#overriding-methods)的工作方式与您预期的一致：编译器将使用您的 `override` 实现，而不是委托对象中的实现。如果您想向 `Derived` 添加 `override fun printMessage() { print("abc") }`，那么在调用 `printMessage` 时，程序将打印 *abc* 而不是 *10*：
+[重写](inheritance.md#overriding-methods)的工作方式与预期一致：编译器将使用你的 `override` 实现，而不是委托对象中的实现。如果你想向 `Derived` 添加 `override fun printMessage() { print("abc") }`，那么在调用 `printMessage` 时，程序将打印 *abc* 而不是 *10*：
 
 ```kotlin
 interface Base {
@@ -40,13 +43,17 @@ class BaseImpl(val x: Int) : Base {
 }
 
 class Derived(b: Base) : Base by b {
-    override fun printMessage() { print("abc") }
+    override fun printMessage() { println("abc") }
 }
 
 fun main() {
     val base = BaseImpl(10)
-    Derived(base).printMessage()
-    Derived(base).printMessageLine()
+    val derived = Derived(base)
+
+    derived.printMessage()
+    // abc
+    derived.printMessageLine()
+    // 10
 }
 ```
 {kotlin-runnable="true"}
@@ -65,15 +72,19 @@ class BaseImpl(x: Int) : Base {
 }
 
 class Derived(b: Base) : Base by b {
-    // 无法从 b 的 `print` 实现中访问此属性
+    // 无法从 b 的 `print()` 实现中
+    // 访问此属性
     override val message = "Message of Derived"
 }
 
 fun main() {
-    val b = BaseImpl(10)
-    val derived = Derived(b)
+    val base = BaseImpl(10)
+    val derived = Derived(base)
+    
     derived.print()
+    // BaseImpl: x = 10
     println(derived.message)
+    // Message of Derived
 }
 ```
 {kotlin-runnable="true"}

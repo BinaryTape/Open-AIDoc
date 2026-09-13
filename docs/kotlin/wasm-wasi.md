@@ -4,13 +4,13 @@
 
 本教程演示如何使用 [WebAssembly 系统接口 (WASI)](https://wasi.dev/) 在各种 WebAssembly 虚拟机中运行简单的 [Kotlin/Wasm](wasm-overview.md) 应用程序。
 
-你可以找到在 [Node.js](https://nodejs.org/en)、[Deno](https://deno.com/) 和 [WasmEdge](https://wasmedge.org/) 虚拟机上运行的应用程序示例。其输出是一个使用标准 WASI API 的简单应用程序。
+你可以找到在 [Node.js](https://nodejs.org/en)、[Wasmtime](https://docs.wasmtime.dev)、[Deno](https://deno.com/) 和 [WasmEdge](https://wasmedge.org/) 虚拟机上运行的应用程序示例。其输出是一个使用标准 WASI API 的简单应用程序。
 
 目前，Kotlin/Wasm 支持 WASI 0.1，也称为 Preview 1。对 WASI 0.2 的支持计划在未来版本中提供。[关注此 YouTrack 问题以获取有关 WASI 0.2 支持的更新](https://youtrack.jetbrains.com/issue/KT-64568)。 
 
-[`wasmWasi`](wasm-overview.md#kotlin-wasm-and-wasi) 目标 [默认使用新的异常处理提案](wasm-configuration.md#exception-handling-proposal)，确保与现代 WebAssembly 运行时更好的兼容性。
+[`wasmWasi`](wasm-overview.md#kotlin-wasm-and-wasi) 目标[默认使用新的异常处理提案](wasm-configuration.md#exception-handling-proposal)，确保与现代 WebAssembly 运行时更好的兼容性。
 
-> Kotlin/Wasm 工具链开箱即用地提供了 Node.js 任务 (`wasmWasiNode*`)。
+> Kotlin/Wasm 工具链开箱即用地提供了 Node.js 任务 (`wasmWasiNode*`) 和 Wasmtime 任务 (`wasmWasiWasmtime*`)。
 > 项目中的其他任务变体（例如利用 Deno 或 WasmEdge 的任务）作为自定义任务包含在内。
 >
 {style="tip"}
@@ -39,9 +39,10 @@
 
 2. 从 **kotlin-wasm-wasi-example** | **Tasks** | **kotlin node** 中，选择并运行以下 Gradle 任务之一：
 
-   * **wasmWasiNodeRun** 在 Node.js 中运行应用程序。
-   * **wasmWasiDenoRun** 在 Deno 中运行应用程序。
-   * **wasmWasiWasmEdgeRun** 在 WasmEdge 中运行应用程序。
+   * **wasmWasiNodeDevelopmentRun** 在 Node.js 中运行应用程序。
+   * **wasmWasiWasmtimeDevelopmentRun** 在 Wasmtime 中运行应用程序。
+   * **wasmWasiDenoDevelopmentRun** 在 Deno 中运行应用程序。
+   * **wasmWasiWasmEdgeDevelopmentRun** 在 WasmEdge 中运行应用程序。
 
      > 在 Windows 平台上使用 Deno 时，请确保已安装 `deno.exe`。要了解更多信息，请参阅 [Deno 的安装文档](https://docs.deno.com/runtime/manual/getting_started/installation)。
      >
@@ -54,19 +55,25 @@
 * 在 Node.js 中运行应用程序：
 
   ```bash
-  ./gradlew wasmWasiNodeRun
+  ./gradlew wasmWasiNodeDevelopmentRun
+  ```
+
+* 在 Wasmtime 中运行应用程序：
+
+  ```bash
+  ./gradlew wasmWasiWasmtimeDevelopmentRun
   ```
 
 * 在 Deno 中运行应用程序：
 
   ```bash
-  ./gradlew wasmWasiDenoRun
+  ./gradlew wasmWasiDenoDevelopmentRun
   ```
 
 * 在 WasmEdge 中运行应用程序：
 
   ```bash
-  ./gradlew wasmWasiWasmEdgeRun
+  ./gradlew wasmWasiWasmEdgeDevelopmentRun
   ```
 
 应用程序构建成功后，终端会显示一条消息：
@@ -80,6 +87,7 @@
 在 Gradle 工具窗口中，从 **kotlin-wasm-wasi-example** | **Tasks** | **verification** 运行以下 Gradle 任务之一：
 
 * **wasmWasiNodeTest** 在 Node.js 中测试应用程序。
+* **wasmWasiWasmtimeTest** 在 Wasmtime 中测试应用程序。
 * **wasmWasiDenoTest** 在 Deno 中测试应用程序。
 * **wasmWasiWasmEdgeTest** 在 WasmEdge 中测试应用程序。
 
@@ -91,6 +99,12 @@
 
   ```bash
   ./gradlew wasmWasiNodeTest
+  ```
+
+* 在 Wasmtime 中测试应用程序：
+
+  ```bash
+  ./gradlew wasmWasiWasmtimeTest
   ```
    
 * 在 Deno 中测试应用程序：
@@ -104,10 +118,6 @@
   ```bash
   ./gradlew wasmWasiWasmEdgeTest
   ```
-
-终端会显示测试结果：
-
-![Kotlin/Wasm 和 WASI 测试](wasm-wasi-tests-results.png){width=600}
 
 ## 下一步 {id="what-s-next"}
 

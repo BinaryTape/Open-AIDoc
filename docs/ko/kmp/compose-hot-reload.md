@@ -21,7 +21,7 @@ Compose Hot Reload는 다음 두 가지 방법으로 추가할 수 있습니다:
 * [IntelliJ IDEA 또는 Android Studio에서 프로젝트를 처음부터 생성](#from-scratch)
 * [기존 프로젝트에 Gradle 플러그인 추가](#to-an-existing-project)
 
-### 처음부터 생성하기 {#from-scratch}
+### 처음부터 생성하기 {id="from-scratch"}
 
 이 섹션에서는 IntelliJ IDEA 및 Android Studio에서 데스크톱 타겟을 포함한 멀티플랫폼 프로젝트를 생성하는 단계를 안내합니다. 프로젝트가 생성되면 Compose Hot Reload가 자동으로 추가됩니다.
 
@@ -32,7 +32,7 @@ Compose Hot Reload는 다음 두 가지 방법으로 추가할 수 있습니다:
 5. **Desktop** 타겟을 선택하고 **Create**를 클릭합니다.
    ![Create multiplatform project with desktop target](create-desktop-project.png){width=600 style="block"}
 
-### 기존 프로젝트에 추가하기 {#to-an-existing-project}
+### 기존 프로젝트에 추가하기 {id="to-an-existing-project"}
 
 Compose Multiplatform 1.10.0부터 
 Compose Hot Reload 플러그인은 [번들로 제공](whats-new-compose-110.md#compose-hot-reload-integration)되며, 
@@ -131,7 +131,7 @@ Compose Multiplatform 버전을 1.10.0 이상으로 업그레이드하여 별도
    ```
 
 4.  `main.kt` 파일을 열고 거터(gutter)에 있는 **Run** 아이콘을 클릭합니다. 
-    Select **Run 'desktopApp' with Compose Hot Reload**.
+    **Run 'desktopApp' with Compose Hot Reload**를 선택합니다.
 
     ![Run Compose Hot Reload from gutter](compose-hot-reload-gutter-run.png){width=350 border-effect="line"}
 
@@ -158,7 +158,8 @@ MCP 서버를 통해 AI 코딩 에이전트는 실행 중인 Compose 애플리�
 
 ### AI 에이전트 연결하기 {id="connect-an-ai-agent"}
 
-AI 에이전트를 연결하려면 에이전트의 MCP 클라이언트 설정이 `hotMcpServer` Gradle 태스크를 가리키도록 하세요. 예를 들어, `.mcp.json` 파일의 설정은 다음과 같습니다:
+AI 에이전트를 연결하려면 MCP 클라이언트가 `hotMcpServer` Gradle 태스크를 실행하도록 구성하세요.
+예를 들어, `.mcp.json` 파일의 설정은 다음과 같습니다:
 
 ```json
 {
@@ -175,6 +176,10 @@ AI 에이전트를 연결하려면 에이전트의 MCP 클라이언트 설정이
   }
 }
 ```
+
+Gradle은 모든 하위 프로젝트에서 태스크를 검색하고, 짧은 이름 `hotMcpServer`를 `hotMcpServerJvm` 또는 `hotMcpServerDesktop`과 같은 타겟별 변형(variant)에 매칭합니다.
+
+모듈에서 여러 JVM 타겟을 정의하는 경우, 모호함을 피하기 위해 `:<module>:hotMcpServer<Target>`과 같이 정규화된 태스크 이름(fully qualified task name)을 지정하세요(예: `:app:hotMcpServerDesktop` 또는 `:composeApp:hotMcpServerJvm`).
 
 ### 사용 가능한 MCP 도구 {id="available-mcp-tools"}
 

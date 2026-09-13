@@ -19,7 +19,8 @@ Kotlin 当前的稳定版本为 %kotlinVersion%。请注意特定变更相对于
 
 | Kotlin Multiplatform 插件版本 | Gradle                                | Android Gradle 插件                               | Xcode   |
 |-------------------------------------|---------------------------------------|-----------------------------------------------------|---------|
-| 2.4.0-2.4.10                        | %minGradleVersion%–%maxGradleVersion% | %minAndroidGradleVersion%–%maxAndroidGradleVersion% | %xcode% |
+| 2.4.20                              | %minGradleVersion%–%maxGradleVersion% | %minAndroidGradleVersion%–%maxAndroidGradleVersion% | %xcode% |
+| 2.4.0-2.4.10                        | 7.6.3–9.5.0                           | 8.5.2–9.1.0                                         | 26.4    |
 | 2.3.20–2.3.21                       | 7.6.3–9.3.0                           | 8.2.2–9.0.0                                         | 26.0    |
 | 2.3.10                              | 7.6.3–9.0.0                           | 8.2.2–9.0.0                                         | 26.0    |
 | 2.3.0                               | 7.6.3–9.0.0                           | 8.2.2–8.13.0                                        | 26.0    |
@@ -44,6 +45,7 @@ Kotlin 当前的稳定版本为 %kotlinVersion%。请注意特定变更相对于
 
 本节涵盖了结束弃用周期并在 Kotlin 2.0.0−%kotlinVersion% 中生效的不兼容变更。
 
+undefined
 ### 迁移到 Google 适用于 Android 目标的插件 {id="migrate-to-google-s-plugin-for-android-targets"}
 
 **发生了什么变化？**
@@ -89,6 +91,7 @@ Bitcode 嵌入在 Xcode 14 中被弃用，并在 Xcode 15 中针对所有 Apple 
 * 2.2.0：警告提升为错误
 * 2.3.0：移除 `embedBitcode` DSL 
 
+undefined
 ### 默认创建的 Java 源集 {id="java-source-sets-created-by-default"}
 
 **发生了什么变化？**
@@ -119,7 +122,7 @@ kotlin {
 
 如果您在 Kotlin 2.1.20 且 Gradle 版本高于 8.7 的情况下使用 [Java 测试装置 (test fixtures)](https://docs.gradle.org/current/userguide/java_testing.html#sec:java_test_fixtures) Gradle 插件，该插件将无法工作。请升级到已解决此问题的 [Kotlin 2.1.21](https://kotlinlang.org/docs/releases.html#release-details)。
 
-如果您遇到任何问题，请在我们的 [问题跟踪器](https://kotl.in/issue) 中报告，或在我们的 [公开 Slack 频道](https://kotlinlang.slack.com/archives/C19FD9681) 中寻求帮助。
+如果您遇到任何问题，请在我们的[问题跟踪器](https://kotl.in/issue)中报告，或在我们的[公开 Slack 频道](https://kotlinlang.slack.com/archives/C19FD9681)中寻求帮助。
 
 **这些变更何时生效？**
 
@@ -129,6 +132,7 @@ kotlin {
 * Gradle 9.0：将此警告提升为错误。
 * 2.1.20：在搭配任何版本的 Gradle 使用 `withJava()` 函数时引入弃用警告。
 
+undefined
 ### 声明多个相似的目标 {id="declaring-several-similar-targets"}
 
 **发生了什么变化？**
@@ -248,6 +252,7 @@ kotlin {
 * 1.9.20：在 Kotlin Multiplatform 项目中使用多个相似目标时引入弃用警告
 * 2.1.0：在此类情况下报告错误，Kotlin/JS 目标除外；要了解有关此例外的更多信息，请参阅 [YouTrack 中的问题](https://youtrack.jetbrains.com/issue/KT-47038/KJS-MPP-Split-JS-target-into-JsBrowser-and-JsNode)
 
+undefined
 ### 弃用对以旧版模式发布的多平台库的支持 {id="deprecated-support-of-multiplatform-libraries-published-in-legacy-mode"}
 
 **发生了什么变化？**
@@ -278,6 +283,7 @@ Kotlin 团队非常乐意帮助生态系统进行迁移，因此如果您遇到�
 * 2.0.0：将对旧版库依赖的警告提升为错误
 * &gt;2.0.0：移除对旧版库依赖的支持；使用此类依赖可能会导致构建失败
 
+undefined
 ### 弃用用于支持层次结构的 Gradle 属性 {id="deprecated-gradle-properties-for-hierarchical-structure-support"}
 
 **发生了什么变化？**
@@ -316,6 +322,7 @@ Kotlin 团队非常乐意帮助生态系统进行迁移，因此如果您遇到�
 
 如果您在移除这些属性后遇到问题（虽然可能性很小），请在 [YouTrack 中创建问题](https://kotl.in/issue)。
 
+undefined
 ### 弃用 target 预设 API {id="deprecated-target-presets-api"}
 
 **发生了什么变化？**
@@ -359,6 +366,7 @@ Kotlin 团队非常乐意帮助生态系统进行迁移，因此如果您遇到�
 * 2.0.0：将此警告提升为错误
 * 2.2.0：从 Kotlin Multiplatform Gradle 插件的公共 API 中移除预设相关 API；仍在使用它的源代码将失败并提示“未解析的引用 (unresolved reference)”错误，二进制文件（例如 Gradle 插件）除非针对最新版本的 Kotlin Gradle 插件重新编译，否则可能会因链接错误而失败
 
+undefined
 ### 弃用 Apple 目标快捷方式 {id="deprecated-apple-target-shortcuts"}
 
 **发生了什么变化？**
@@ -415,6 +423,7 @@ Kotlin Gradle 插件现在提供了一个内置的层次结构模板。自 Kotli
 
 本节涵盖了结束弃用周期并在 Kotlin 1.9.0−1.9.25 中生效的不兼容变更。
 
+undefined
 ### 移除了直接向 Kotlin 编译添加 Kotlin 源集的 API {initial-collapse-state="collapsed" collapsible="true" id="removed-api-for-adding-kotlin-source-sets-directly-to-the-kotlin-compilation"}
 
 **发生了什么变化？**
@@ -441,7 +450,7 @@ kotlin {
 
 **现在的最佳做法是什么？**
 
-要替换 `KotlinCompilation.source(someSourceSet)`，请使用 `.srcDir()` 函数直接将您的源代码添加到适当的源集中。或者，您可以通过添加从 `KotlinCompilation` 的默认源集到 `someSourceSet` 的 `dependsOn` 关系来创建一个新源集。您也可以直接使用 [源集约定](https://kotlinlang.org/api/kotlin-gradle-plugin/kotlin-gradle-plugin-api/org.jetbrains.kotlin.gradle.dsl/-kotlin-multiplatform-source-set-conventions/) 来引用源，这在 IDE 中更加友好，被认为是最稳健的方法。最后，您可以使用 `KotlinCompilation.defaultSourceSet.dependsOn(someSourceSet)`，这在所有情况下都有效。
+要替换 `KotlinCompilation.source(someSourceSet)`，请使用 `.srcDir()` 函数直接将您的源代码添加到适当的源集中。或者，您可以通过添加从 `KotlinCompilation` 的默认源集到 `someSourceSet` 的 `dependsOn` 关系来创建一个新源集。您也可以直接使用[源集约定](https://kotlinlang.org/api/kotlin-gradle-plugin/kotlin-gradle-plugin-api/org.jetbrains.kotlin.gradle.dsl/-kotlin-multiplatform-source-set-conventions/)来引用源，这在 IDE 中更加友好，被认为是最稳健的方法。最后，您可以使用 `KotlinCompilation.defaultSourceSet.dependsOn(someSourceSet)`，这在所有情况下都有效。
 
 您可以通过以下方式之一修改上述代码：
 
@@ -486,6 +495,7 @@ kotlin {
 * 1.9.20：将此警告提升为错误
 * 2.3.0：从 Kotlin Gradle 插件中移除 `KotlinCompilation.source`，尝试使用它会导致在构建脚本编译期间出现“未解析的引用 (unresolved reference)”错误
 
+undefined
 ### 从 `kotlin-js` Gradle 插件迁移到 `kotlin-multiplatform` Gradle 插件 {initial-collapse-state="collapsed" collapsible="true" id="migration-from-kotlin-js-gradle-plugin-to-kotlin-multiplatform-gradle-plugin"}
 
 **发生了什么变化？**
@@ -533,7 +543,7 @@ kotlin {
    </TabItem>
    </Tabs>
 
-   如果您使用不同的插件应用方式，请参阅 [Gradle 文档](https://docs.gradle.org/current/userguide/plugins.html) 获取迁移说明。
+   如果您使用不同的插件应用方式，请参阅 [Gradle 文档](https://docs.gradle.org/current/userguide/plugins.html)获取迁移说明。
 
 2. 将您的源文件从 `main` 和 `test` 文件夹移动到同一目录下的 `jsMain` 和 `jsTest` 文件夹中。
 3. 调整依赖项声明：
@@ -611,6 +621,7 @@ kotlin {
 * 1.9.0：使用 `kotlin-js` 插件时产生弃用警告
 * 2.4.0：[将此警告提升为错误](https://youtrack.jetbrains.com/issue/KT-59305)
 
+undefined
 ### 弃用 `jvmWithJava` 预设 {initial-collapse-state="collapsed" collapsible="true" id="deprecated-jvmwithjava-preset"}
 
 **发生了什么变化？**
@@ -640,11 +651,12 @@ kotlin {
 >
 {style="note"}
 
+undefined
 ### 弃用旧版 Android 源集布局 {initial-collapse-state="collapsed" collapsible="true" id="deprecated-legacy-android-source-set-layout"}
 
 **发生了什么变化？**
 
-自 Kotlin 1.9.0 起，默认使用 [新 Android 源集布局](multiplatform-android-layout.md)。对旧版布局的支持已弃用，使用 `kotlin.mpp.androidSourceSetLayoutVersion` Gradle 属性现在会触发弃用诊断。
+自 Kotlin 1.9.0 起，默认使用[新 Android 源集布局](multiplatform-android-layout.md)。对旧版布局的支持已弃用，使用 `kotlin.mpp.androidSourceSetLayoutVersion` Gradle 属性现在会触发弃用诊断。
 
 **这些变更何时生效？**
 
@@ -652,15 +664,16 @@ kotlin {
 
 * <=1.9.0：在使用 `kotlin.mpp.androidSourceSetLayoutVersion=1` 时报告警告；可以使用 `kotlin.mpp.androidSourceSetLayoutVersion1.nowarn=true` Gradle 属性来抑制该警告
 * 1.9.20：将此警告提升为错误；该错误**无法**被抑制
-* 2.4.0：移除对旧版 Android 源集布局的支持并 [移除 `kotlin.mpp.androidSourceSetLayoutVersion=1` Gradle 属性](https://youtrack.jetbrains.com/issue/KT-82265)
+* 2.4.0：移除对旧版 Android 源集布局的支持并[移除 `kotlin.mpp.androidSourceSetLayoutVersion=1` Gradle 属性](https://youtrack.jetbrains.com/issue/KT-82265)
 
+undefined
 ### 弃用带有自定义 `dependsOn` 的 `commonMain` 和 `commonTest` {initial-collapse-state="collapsed" collapsible="true" id="deprecated-commonmain-and-commontest-with-custom-dependson"}
 
 **发生了什么变化？**
 
 `commonMain` 和 `commonTest` 源集通常分别代表 `main` 和 `test` 源集层次结构的根。然而，可以通过手动配置这些源集的 `dependsOn` 关系来覆盖这一点。
 
-维护此类配置需要额外的努力，并需要了解多平台构建的内部机制符。此外，它还降低了代码的可读性和可重用性，因为您需要阅读特定的构建脚本才能确定 `commonMain` 是否是 `main` 源集层次结构的根。
+维护此类配置需要额外的努力，并需要了解多平台构建的内部机制。此外，它还降低了代码的可读性和可重用性，因为您需要阅读特定的构建脚本才能确定 `commonMain` 是否是 `main` 源集层次结构的根。
 
 因此，在 `commonMain` 和 `commonTest` 上访问 `dependsOn` 现已弃用。
 
@@ -745,11 +758,12 @@ JetBrains 团队改进了 Kotlin 中前向声明的处理方式，使其行为�
 
 本节涵盖了结束弃用周期并在 Kotlin 1.7.0−1.8.22 中生效的不兼容变更。
 
+undefined
 ### 弃用 Kotlin Multiplatform Gradle 插件与 Gradle Java 插件的兼容性 {initial-collapse-state="collapsed" collapsible="true" id="deprecated-compatibility-with-kotlin-multiplatform-gradle-plugin-and-gradle-java-plugins"}
 
 **发生了什么变化？**
 
-由于 Kotlin Multiplatform Gradle 插件与 Gradle 的 [Java](https://docs.gradle.org/current/userguide/java_plugin.html)、[Java Library](https://docs.gradle.org/current/userguide/java_library_plugin.html) 和 [Application](https://docs.gradle.org/current/userguide/application_plugin.html) 插件之间存在兼容性问题，现在当您在同一个项目中应用这些插件时会发出弃用警告。当多平台项目中的另一个 Gradle 插件应用了 Gradle Java 插件时，该警告也会出现。例如，[Spring Boot Gradle 插件](https://docs.spring.io/spring-boot/gradle-plugin/index.html) 会自动应用 Application 插件。
+由于 Kotlin Multiplatform Gradle 插件与 Gradle 的 [Java](https://docs.gradle.org/current/userguide/java_plugin.html)、[Java Library](https://docs.gradle.org/current/userguide/java_library_plugin.html) 和 [Application](https://docs.gradle.org/current/userguide/application_plugin.html) 插件之间存在兼容性问题，现在当您在同一个项目中应用这些插件时会发出弃用警告。当多平台项目中的另一个 Gradle 插件应用了 Gradle Java 插件时，该警告也会出现。例如，[Spring Boot Gradle 插件](https://docs.spring.io/spring-boot/gradle-plugin/index.html)会自动应用 Application 插件。
 
 我们添加此弃用警告是因为 Kotlin Multiplatform 项目模型与 Gradle Java 生态系统插件之间存在根本性的兼容性问题。Gradle 的 Java 生态系统插件目前没有考虑到其他插件可能：
 

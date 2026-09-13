@@ -2,7 +2,7 @@
 
 <primary-label ref="alpha"/>
 
-Swift exportを使用したSwiftとの相互運用性は、現在Alpha版です。Swift exportにより、Kotlinソースを直接エクスポートし、Objective-Cヘッダーを必要とせずに、SwiftからKotlinコードをSwiftらしい方法（idiomatically）で呼び出すことができます。
+Swift exportを使用したKotlinとSwiftとの相互運用性は、現在Alpha版です。Swift exportにより、Kotlinソースを直接エクスポートし、Objective-Cヘッダーを必要とせずに、SwiftからKotlinコードをSwiftらしい方法（idiomatically）で呼び出すことができます。
 
 Swift exportにより、Appleターゲット向けのマルチプラットフォーム開発がより効率的になります。例えば、トップレベル関数を持つKotlinモジュールがある場合、Swift exportを使用することで、Objective-C由来の紛らわしいアンダースコアやマングルされた名前を排除し、クリーンでモジュール固有のインポートが可能になります。
 
@@ -11,18 +11,18 @@ Swift exportにより、Appleターゲット向けのマルチプラットフォ
 * **マルチモジュール対応**。各Kotlinモジュールは個別のSwiftモジュールとしてエクスポートされるため、関数呼び出しが簡素化されます。
 * **パッケージのサポート**。Kotlinのパッケージはエクスポート中も明示的に保持され、生成されたSwiftコード内での名前の衝突を回避します。
 * **型エイリアス**。Kotlinの型エイリアスはエクスポートされSwiftでも保持されるため、可読性が向上します。
-* **プリミティブに対する強化されたNull許容性**。Null許容性を保持するために`Int?`のような型を`KotlinInt`のようなラッパーにボクシングする必要があったObjective-C相互運用とは異なり、Swift exportはNull許容性の情報を直接変換します。
+* **プリミティブに対する強化されたNull許容性**。Null許容性を保持するために`Int?`のような型を`KotlinInt`のようなラッパークラスにボクシングする必要があったObjective-C相互運用とは異なり、Swift exportはNull許容性の情報を直接変換します。
 * **オーバーロード**。Kotlinのオーバーロードされた関数を、曖昧さなくSwiftで呼び出すことができます。
 * **パッケージ構造のフラット化**。KotlinのパッケージをSwiftのenumに変換し、生成されたSwiftコードからパッケージプレフィックスを削除できます。
 * **モジュール名のカスタマイズ**。KotlinプロジェクトのGradle設定で、生成されるSwiftモジュール名をカスタマイズできます。
 * **並行処理のサポート**。SwiftからKotlinの中断コード（suspending code）をシームレスに呼び出すことができ、`kotlinx.coroutines`のFlowをSwiftの`AsyncSequence`としてそのままエクスポートできます。
 
-## Swift exportを有効にする
+## Swift exportを有効にする {id="enable-swift-export"}
 
 Swift exportは現在[Alpha](components-stability.md#stability-levels-explained)版であり、まだ不完全なため、破壊的変更が予想されます。
 試してみるには、Kotlinプロジェクトの[ビルドファイルを設定](#configure-kotlin-project)し、Swift exportを統合するための[Xcodeのセットアップ](#configure-xcode-project)を行ってください。
 
-### Kotlinプロジェクトの設定
+### Kotlinプロジェクトの設定 {id="configure-kotlin-project"}
 
 Swift exportをセットアップするための開始点として、プロジェクトで以下のビルドファイルを使用できます。
 
@@ -63,7 +63,7 @@ Kotlinコンパイラは、必要なすべてのファイル（`swiftmodule`フ�
 >
 {style="tip"}
 
-### Xcodeプロジェクトの設定
+### Xcodeプロジェクトの設定 {id="configure-xcode-project"}
 
 XcodeでプロジェクトにSwift exportを統合するように設定するには：
 
@@ -79,7 +79,7 @@ XcodeでプロジェクトにSwift exportを統合するように設定するに
 
 4. プロジェクトをビルドします。ビルドにより、出力ディレクトリにSwiftモジュールが生成されます。
 
-## 現在の制限事項
+## 現在の制限事項 {id="current-limitations"}
 
 Swift exportは現在、iOSフレームワークをXcodeプロジェクトに接続するために[直接統合（direct integration）](https://kotlinlang.org/docs/multiplatform/multiplatform-direct-integration.html)を使用しているプロジェクトでのみ動作します。
 これは、IntelliJ IDEAのKotlin Multiplatformプラグインや[Webウィザード](https://kmp.jetbrains.com/)で作成されたKotlin Multiplatformプロジェクトの標準的な構成です。
@@ -89,7 +89,6 @@ Swift exportは現在、iOSフレームワークをXcodeプロジェクトに接
 * `List`、`Set`、または`Map`を継承する型は、エクスポート時に無視されます（[KT-80416](https://youtrack.jetbrains.com/issue/KT-80416)）。
 * `List`、`Set`、または`Map`の継承クラスは、Swift側でインスタンス化できません（[KT-80417](https://youtrack.jetbrains.com/issue/KT-80417)）。
 * Swiftにエクスポートされる際、Kotlinのジェネリック型パラメータは、その上限境界（upper bounds）へと型消去（type-erase）されます。
-* 言語を跨いだ継承（Cross-language inheritance）はサポートされていないため、SwiftクラスがKotlinからエクスポートされたクラスやインターフェースを直接継承することはできません。
 * IDEの移行ヒントや自動化は利用できません。
 * オプトイン（opt-in）を必要とする宣言を使用する場合、Gradleビルドファイルで_モジュールレベル_の明示的な`optIn`コンパイラオプションを追加する必要があります。例えば、`kotlinx.datetime`ライブラリの場合は以下のようになります。
 
@@ -109,41 +108,42 @@ Swift exportは現在、iOSフレームワークをXcodeプロジェクトに接
   }
   ```
 
-## マッピング
+## マッピング {id="mappings"}
 
 以下の表は、Kotlinの概念がSwiftにどのようにマッピングされるかを示しています。
 
-| Kotlin                                 | Swift                          |
-|----------------------------------------|--------------------------------|
-| [`class`](#classes)                    | `class`                        |
-| [`object`](#objects)                   | `shared`プロパティを持つ`class` |
-| [`enum class`](#enums)                 | `enum`                         |
-| [`typealias`](#type-aliases)           | `typealias`                    |
-| [関数](#functions)                     | 関数                           |
-| [`suspend fun`](#suspending-functions) | `async`                        |
-| [`kotlinx.coroutines` flows](#flows)   | `AsyncSequence`                |
-| [プロパティ](#properties)              | プロパティ                     |
-| [コンストラクタ](#constructors)        | イニシャライザ                 |
-| [パッケージ](#packages)                | ネストされたenum               |
-| `Boolean`                              | `Bool`                         |
-| `Char`                                 | `Unicode.UTF16.CodeUnit`       |
-| `Byte`                                 | `Int8`                         |
-| `Short`                                | `Int16`                        |
-| `Int`                                  | `Int32`                        |
-| `Long`                                 | `Int64`                        |
-| `UByte`                                | `UInt8`                        |
-| `UShort`                               | `UInt16`                       |
-| `UInt`                                 | `UInt32`                       |
-| `ULong`                                | `UInt64`                       |
-| `Float`                                | `Float`                        |
-| `Double`                               | `Double`                       |
-| `Any`                                  | `KotlinBase` クラス            |
-| `Unit`                                 | `Void`                         |
-| [`Nothing`](#kotlin-nothing)           | `Never`                        |
+| Kotlin                                                            | Swift                          |
+|-------------------------------------------------------------------|--------------------------------|
+| [`class`](#classes)                                               | `class`                        |
+| [`object`](#objects)                                              | `shared`プロパティを持つ`class` |
+| [`enum class`](#enums)                                            | `enum`                         |
+| [`sealed` classes and interfaces](#sealed-classes-and-interfaces) | `enum`                         |
+| [`typealias`](#type-aliases)                                      | `typealias`                    |
+| [関数](#functions)                                                | 関数                           |
+| [`suspend fun`](#suspending-functions)                            | `async`                        |
+| [`kotlinx.coroutines` flows](#flows)                              | `AsyncSequence`                |
+| [プロパティ](#properties)                                         | プロパティ                     |
+| [コンストラクタ](#constructors)                                   | イニシャライザ                 |
+| [パッケージ](#packages)                                           | ネストされたenum               |
+| `Boolean`                                                         | `Bool`                         |
+| `Char`                                                            | `Unicode.UTF16.CodeUnit`       |
+| `Byte`                                                            | `Int8`                         |
+| `Short`                                                           | `Int16`                        |
+| `Int`                                                             | `Int32`                        |
+| `Long`                                                            | `Int64`                        |
+| `UByte`                                                           | `UInt8`                        |
+| `UShort`                                                          | `UInt16`                       |
+| `UInt`                                                            | `UInt32`                       |
+| `ULong`                                                           | `UInt64`                       |
+| `Float`                                                           | `Float`                        |
+| `Double`                                                          | `Double`                       |
+| `Any`                                                             | `KotlinBase` クラス            |
+| `Unit`                                                            | `Void`                         |
+| [`Nothing`](#kotlin-nothing)                                      | `Never`                        |
 
-### 宣言
+### 宣言 {id="declarations"}
 
-#### クラス
+#### クラス {id="classes"}
 
 Swift exportは、`class Foo()`のように、`Any`を直接継承するfinalクラスのみをサポートしています。
 これらは、特別な`KotlinBase`クラスを継承するSwiftクラスに変換されます。
@@ -174,7 +174,7 @@ public class MyClass : KotlinRuntime.KotlinBase {
 }
 ```
 
-#### オブジェクト
+#### オブジェクト {id="objects"}
 
 オブジェクトは、プライベートな`init`とstaticな`shared`アクセサを持つSwiftクラスに変換されます。
 
@@ -197,7 +197,7 @@ public class O : KotlinRuntime.KotlinBase {
 }
 ```
 
-#### 型エイリアス
+#### 型エイリアス {id="type-aliases"}
 
 Kotlinの型エイリアスは、そのままエクスポートされます。
 
@@ -211,7 +211,7 @@ typealias MyInt = Int
 public typealias MyInt = Swift.Int32
 ```
 
-#### Enum
+#### Enum {id="enums"}
 
 Kotlinの`enum class`宣言は、通常のネイティブなSwiftの`enum`型としてエクスポートされます。
 
@@ -235,7 +235,45 @@ public enum Color: Swift.CaseIterable, Swift.LosslessStringConvertible, Swift.Ra
 }
 ```
 
-#### 関数
+#### sealedクラスとインターフェース {id="sealed-classes-and-interfaces"}
+
+Kotlinで定義されたsealed階層はSwiftのenumにマッピングされ、網羅的な（exhaustive）`switch`文が可能になります。
+
+Swift exportは、各sealed型に対して`.sealedType()`メソッドを生成します。このメソッドは、sealed階層の直接のサブクラスに対応するケース（case）を持つSwiftのenumを返します。これらの呼び出しをネストして、階層のより深いレベルに一致させることもできます。
+
+例えば、Kotlinでクラス階層を持つsealedインターフェースを宣言します。
+
+```kotlin
+// Kotlin
+sealed interface Shape
+
+class Circle : Shape {
+    override fun toString(): String = "Circle"
+}
+
+class Rectangle : Shape {
+    override fun toString(): String = "Rectangle"
+}
+
+fun createCircle(): Shape = Circle()
+```
+
+Swift側では、`default`ケースなしで網羅的な`switch`を使用できます。
+
+```swift
+// Swift
+let shape = createCircle()
+
+let name = switch shape.sealedType() {
+    case let .circle(type): "It's a \(type.value)"
+    case let .rectangle(type): "It's a \(type.value)"
+}
+// name == "It's a Circle"
+```
+
+`switch`が網羅的であるため、sealed階層に新しいサブクラスが追加されるとコンパイラが警告を出します。これにより、`switch`の`default`ケースに頼る代わりに、即座に対応することができます。
+
+#### 関数 {id="functions"}
 
 Swift exportは、単純なトップレベル関数とメソッドをサポートしています。
 
@@ -286,7 +324,7 @@ public func log(messages: Swift.String...)
 >
 {style="note"}
 
-#### プロパティ
+#### プロパティ {id="properties"}
 
 Kotlinのプロパティは、Swiftのプロパティに変換されます。
 
@@ -321,7 +359,7 @@ public var c: Swift.Int32 {
 }
 ```
 
-#### コンストラクタ
+#### コンストラクタ {id="constructors"}
 
 コンストラクタは、Swiftのイニシャライザに変換されます。
 
@@ -341,9 +379,9 @@ public class Foo : KotlinRuntime.KotlinBase {
 }
 ```
 
-### 型
+### 型 {id="types"}
 
-#### kotlin.Nothing
+#### kotlin.Nothing {id="kotlin-nothing"}
 
 Kotlinの`Nothing`型は、`Never`型に変換されます。
 
@@ -365,11 +403,11 @@ public func baz(input: Swift.Never) -> Void {
 }
 ```
 
-#### クラシファイア型
+#### クラシファイア型 {id="classifier-types"}
 
 Swift exportは現在、`Any`を直接継承するfinalクラスのみをサポートしています。
 
-### パッケージ
+### パッケージ {id="packages"}
 
 Kotlinのパッケージは、名前の衝突を避けるためにネストされたSwiftのenumに変換されます。
 
@@ -402,9 +440,9 @@ public enum foo {
 }
 ```
 
-### 並行処理
+### 並行処理 {id="concurrency"}
 
-#### 中断関数
+#### 中断関数 {id="suspending-functions"}
 
 SwiftからKotlinの中断コードを呼び出すことができます。Kotlinの[中断関数（suspending functions）](coroutines-basics.md#suspending-functions)および中断関数型は、Swiftの`async`対応としてエクスポートされます。
 
@@ -421,7 +459,7 @@ suspend fun hello(): String {
 let msg = try await hello()
 ```
 
-#### Flow
+#### Flow {id="flows"}
 
 `kotlinx.coroutines`のFlowをSwiftの[`AsyncSequence`](https://developer.apple.com/documentation/Swift/AsyncSequence)としてエクスポートすることもできます。
 
@@ -441,7 +479,7 @@ for try await element in flowOfStrings().asAsyncSequence() {
 }
 ```
 
-#### コルーチンディスパッチャ
+#### コルーチンディスパッチャ {id="coroutine-dispatchers"}
 
 デフォルトでは、SwiftからKotlinの中断関数を呼び出すか、`asAsyncSequence`関数を使用すると、Kotlinは[`Dispatchers.Default`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-dispatchers/-default.html)ディスパッチャを使用するコルーチンコンテキストを作成し、そこでエクスポートされたコードを実行します。
 
@@ -454,7 +492,47 @@ suspend fun runOnMain(): Int = withContext(Dispatchers.Main) {
 }
 ```
 
-## Swift exportの進化
+## 言語を跨いだ継承 {id="cross-language-inheritance"}
+
+Swift exportは言語を跨いだ継承（Cross-language inheritance）をサポートしています。この機能の一般的なユースケースは[リバースインポート（reverse import）](native-lib-import-stability.md#swift-library-import)パターンであり、Kotlinでコントラクトを定義し、Swift側でプラットフォーム固有の実装を提供します。これは、Kotlinに直接インポートできない純粋なSwiftライブラリを使用する必要がある場合に特に役立ちます。
+
+このパターンを実装するには、Swift実装が継承できるKotlinインターフェースとKotlinスーパークラスを宣言する必要があります。その後、Swiftでインターフェースを実装し、そのインターフェースを受け取るKotlin関数にSwiftオブジェクトを渡します。例えば、CryptoKitライブラリの場合は以下のようになります。
+
+1. Kotlin側で、インターフェース、それを受け取る関数、および`open`なベースクラスを宣言します。
+
+    ```kotlin
+    // Kotlin
+    interface CryptoProvider {
+        fun hashMD5(input: String): String
+    }
+
+    fun processHash(provider: CryptoProvider, input: String): String = provider.hashMD5(input)
+
+    open class SwiftBase
+    ```
+
+2. Swift側で、エクスポートされた`SwiftBase`クラスを継承し、純粋なSwiftライブラリを使用してインターフェースを実装し、そのオブジェクトをKotlinに渡します。
+
+    ```swift
+    // Swift
+    import CryptoKit
+
+    final class IosCryptoProvider: SwiftBase, CryptoProvider {
+        func hashMD5(input: String) -> String {
+            guard let data = input.data(using: .utf8) else { return "failed" }
+            return Insecure.MD5.hash(data: data).description
+        }
+    }
+
+    let provider = IosCryptoProvider()
+    
+    // Kotlin関数を呼び出し、それがSwift側のhashMD5()を呼び戻す
+    print(processHash(provider: provider, input: "Hello, world!"))
+    ```
+
+KotlinがSwiftオブジェクトを受け取ると、通常のKotlinインターフェースの実装として扱い、Swiftコードを直接呼び出します。
+
+## Swift exportの進化 {id="evolution-of-swift-export"}
 
 今後のKotlinリリースにおいて、Swift exportを拡大し、徐々に安定化させていく予定です。これによりKotlinとSwift間の相互運用性を向上させます。フィードバックをお寄せください：
 

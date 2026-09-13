@@ -1,7 +1,7 @@
 [//]: # (title: 多平台 Gradle DSL 參考)
 
 Kotlin 多平台 Gradle 外掛程式是用於建立 Kotlin 多平台專案的工具。
-我們在此提供其內容的參考；在為 Kotlin 多平台專案撰寫 Gradle 建置指令碼時，可將其作為提醒。進一步了解 [Kotlin 多平台專案的概念、如何建立與配置它們](multiplatform-discover-project.md)。
+我們在此提供其內容的參考；在為 Kotlin 多平台專案撰寫 Gradle 建置指令碼時，可將其作為提醒。了解 [Kotlin 多平台專案的概念、如何建立與配置它們](multiplatform-discover-project.md)。
 
 ## ID 與版本 {id="id-and-version"}
 
@@ -157,12 +157,13 @@ kotlin {
 
 進一步了解 [配置 Kotlin/JS 專案](https://kotlinlang.org/docs/js-project-setup.html)。
 
-獨立的 `wasmWasi {}` 區塊描述了支援 WASI 系統介面的 Kotlin/Wasm 目標配置。在此處，僅 [`nodejs`](#node-js) 執行環境可用：
+獨立的 `wasmWasi {}` 區塊描述了支援 WASI 系統介面的 Kotlin/Wasm 目標配置。它支援 `nodejs` 和 `wasmtime` 執行環境：
 
 ```kotlin
 kotlin {
     wasmWasi {
         nodejs()
+        wasmtime()
         binaries.executable()
     }
 }
@@ -170,7 +171,7 @@ kotlin {
 
 所有的 Web 目標（`js`、`wasmJs` 和 `wasmWasi`）也支援 `binaries.executable()` 呼叫。它明確指示 Kotlin 編譯器發出可執行檔。如需更多資訊，請參閱 Kotlin/JS 文件中的 [執行環境](https://kotlinlang.org/docs/js-project-setup.html#execution-environments)。
 
-#### 瀏覽器 (Browser) {id="browser"}
+#### Browser {id="browser"}
 
 `browser {}` 可以包含以下配置區塊：
 
@@ -599,7 +600,7 @@ kotlin {
 
 ## 編譯 (Compilations) {id="compilations"}
 
-一個目標可以有一個 or 多個編譯，例如用於生產或測試。有一些 [預定義編譯](#predefined-compilations) 會在目標建立時自動加入。您還可以額外建立 [自訂編譯](#custom-compilations)。
+一個目標可以有一個或多個編譯，例如用於生產或測試。有一些 [預定義編譯](#predefined-compilations) 會在目標建立時自動加入。您還可以額外建立 [自訂編譯](#custom-compilations)。
 
 要參考目標的所有或某些特定編譯，請使用 `compilations` 物件集合。
 從 `compilations` 中，您可以透過名稱參考編譯。

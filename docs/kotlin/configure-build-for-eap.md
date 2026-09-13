@@ -1,9 +1,9 @@
 [//]: # (title: 为抢先体验计划 (EAP) 配置构建)
 
 <tldr>
-    <!--<p>目前没有可用的预览版本。</p> -->
-    <p>最新 Kotlin EAP 版本：<strong>%kotlinEapVersion%</strong></p>
-    <p><a href="eap.md#build-details">探索 Kotlin EAP 发布详情</a></p>
+    <p>目前没有可用的预览版本。</p>
+    <!--<p>最新 Kotlin EAP 版本：<strong>%kotlinEapVersion%</strong></p>
+    <p><a href="eap.md#build-details">探索 Kotlin EAP 发布详情</a></p> -->
 </tldr>
 
 要将构建配置为使用 Kotlin 的抢先体验计划 (EAP) 版本，您需要： 

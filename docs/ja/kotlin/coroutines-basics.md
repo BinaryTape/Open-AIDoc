@@ -230,7 +230,7 @@ OS がスレッドの実行タイミングを決定するため、実行する�
 > コードの出力結果で、スレッド名の隣にコルーチン名を表示して詳細情報を確認することができます。
 > これを行うには、ビルドツールまたは IDE の実行構成で `-Dkotlinx.coroutines.debug` VM オプションを渡します。
 >
-> 詳細は [コルーチンのデバッグ](https://github.com/Kotlin/kotlinx.coroutines/blob/master/docs/topics/debugging.md) を参照してください。
+> 詳細は [コルーチンのデバッグ](coroutines-debugging.md) を参照してください。
 >
 {style="tip"}
 

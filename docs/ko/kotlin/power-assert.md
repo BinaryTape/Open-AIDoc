@@ -56,8 +56,14 @@ plugins {
 
 Power-assert 플러그인은 동작을 커스텀할 수 있는 몇 가지 옵션을 제공합니다:
 
-* **`functions`**: 정규화된 함수 경로(fully-qualified function paths)의 목록입니다. Power-assert 플러그인은 이 함수들에 대한 호출을 변환합니다. 지정하지 않으면 기본적으로 `kotlin.assert()` 호출만 변환됩니다.
-* **`includedSourceSets`**: Power-assert 플러그인이 변환할 Gradle 소스 세트(source sets)의 목록입니다. 지정하지 않으면 기본적으로 모든 *테스트 소스 세트(test source sets)*가 변환됩니다.
+* **`functions`**: Power-assert 플러그인이 호출될 때 변환할 함수의 정규화된 경로(fully-qualified paths) 목록입니다. 지정하지 않으면 플러그인은 `kotlin.assert()` 호출만 변환합니다.
+* **`compilationFilter`**: Power-assert 플러그인이 적용될 Kotlin 컴파일 대상을 제어합니다. 커스텀 필터를 직접 만들거나 사전 정의된 옵션을 사용할 수 있습니다:
+  * `PowerAssertCompilationFilter.TESTS`: 모든 테스트 소스 세트에 적용됩니다 (기본값).
+  * `PowerAssertCompilationFilter.ALL`: 모든 소스 세트에 적용됩니다.
+
+  > `compilationFilter` 옵션은 Power-assert 플러그인이 변환할 Gradle 소스 세트를 나열하던 지원 중단된(deprecated) `includedSourceSets`를 대체합니다. 두 옵션은 상호 배타적입니다. `includedSourceSets`가 지정되면 `compilationFilter`는 무시됩니다.
+  >
+  {style="note"}
 
 동작을 커스텀하려면 빌드 스크립트 파일에 `powerAssert {}` 블록을 추가하세요:
 
@@ -68,7 +74,9 @@ Power-assert 플러그인은 동작을 커스텀할 수 있는 몇 가지 옵션
 // build.gradle.kts
 powerAssert {
     functions = listOf("kotlin.assert", "kotlin.test.assertTrue", "kotlin.test.assertEquals", "kotlin.test.assertNull")
-    includedSourceSets = listOf("commonMain", "jvmMain", "jsMain", "nativeMain")
+    compilationFilter = PowerAssertCompilationFilter {
+        it.name in setOf("commonMain", "jvmMain", "jsMain", "nativeMain")
+    }
 }
 ```
 
@@ -79,7 +87,9 @@ powerAssert {
 // build.gradle
 powerAssert {
     functions = ["kotlin.assert", "kotlin.test.assertTrue", "kotlin.test.assertEquals", "kotlin.test.assertNull"]
-    includedSourceSets = ["commonMain", "jvmMain", "jsMain", "nativeMain"]
+    compilationFilter = PowerAssertCompilationFilter {
+        it.name in ["commonMain", "jvmMain", "jsMain", "nativeMain"]
+    }
 }
 ```
 
@@ -716,7 +726,7 @@ assert(employee.age < 100) { "${employee.name} has an invalid age: ${employee.ag
 
 라이브러리에 Power-assert 지원을 추가하는 방법:
 
-1. 빌드 파일에 [Power-assert 플러그인을 적용](#플러그인-적용하기)합니다.
+1. 빌드 파일에 [Power-assert 플러그인을 적용](#apply-the-plugin)합니다.
 2. Maven의 경우, Power-assert 런타임 라이브러리를 의존성으로 추가합니다:
 
    ```xml

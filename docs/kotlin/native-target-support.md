@@ -21,30 +21,29 @@ Kotlin/Native 编译器支持许多不同的目标，但对它们的支持程度
 
 ### 第 1 层级 {id="tier-1"}
 
-* 该目标在 持续集成 (CI) 上定期进行测试，以确保能够构建和运行。
+* 该目标在 持续集成 (CI) 上定期进行测试，以确保能够编译和运行。
 * 我们提供 [编译器发布版本之间的源代码和二进制兼容性](https://youtrack.jetbrains.com/issue/KT-42293)。
 
 | Gradle 目标名称 | 目标三元组 | 运行测试 | 描述 |
 |-------------------------|-------------------------------|---------------|---------------------------------------------------------------|
 | 仅限 Apple macOS 主机： |                               |               |                                                               |
-| `macosArm64`            | `aarch64-apple-macos`         | ✅             | Apple 芯片 平台上的 Apple macOS 12.0 及更高版本 |
-| `iosSimulatorArm64`     | `aarch64-apple-ios-simulator` | ✅             | Apple 芯片 平台上的 Apple iOS 模拟器 15.0 及更高版本 |
+| `macosArm64`            | `aarch64-apple-macos`         | ✅            | Apple 芯片 平台上的 Apple macOS 12.0 及更高版本 |
+| `iosSimulatorArm64`     | `aarch64-apple-ios-simulator` | ✅            | Apple 芯片 平台上的 Apple iOS 模拟器 15.0 及更高版本 |
 | `iosArm64`              | `aarch64-apple-ios`           |               | ARM64 平台上的 Apple iOS 和 iPadOS 15.0 及更高版本 |
 
 ### 第 2 层级 {id="tier-2"}
 
-* 该目标在 持续集成 (CI) 上定期进行测试，以确保能够构建，但可能不会自动测试其运行能力。
+* 该目标在 持续集成 (CI) 上定期进行测试，以确保能够编译，但可能不会自动测试其运行能力。
 * 我们正尽最大努力提供 [编译器发布版本之间的源代码和二进制兼容性](https://youtrack.jetbrains.com/issue/KT-42293)。
 
 | Gradle 目标名称 | 目标三元组 | 运行测试 | 描述 |
 |-------------------------|-----------------------------------|---------------|------------------------------------------------------------------|
-| `linuxX64`              | `x86_64-unknown-linux-gnu`        | ✅             | x86_64 平台上的 Linux |
+| `linuxX64`              | `x86_64-unknown-linux-gnu`        | ✅            | x86_64 平台上的 Linux |
 | `linuxArm64`            | `aarch64-unknown-linux-gnu`       |               | ARM64 平台上的 Linux |
 | 仅限 Apple macOS 主机： |                                   |               |                                                                  |
-| `watchosSimulatorArm64` | `aarch64-apple-watchos-simulator` | ✅             | Apple 芯片 平台上的 Apple watchOS 模拟器 8.0 及更高版本 |
-| `watchosArm32`          | `armv7k-apple-watchos`            |               | ARM32 平台上的 Apple watchOS 8.0 及更高版本 |
+| `watchosSimulatorArm64` | `aarch64-apple-watchos-simulator` | ✅            | Apple 芯片 平台上的 Apple watchOS 模拟器 8.0 及更高版本 |
 | `watchosArm64`          | `arm64_32-apple-watchos`          |               | 带有 ILP32 的 ARM64 平台上的 Apple watchOS 8.0 及更高版本 |
-| `tvosSimulatorArm64`    | `aarch64-apple-tvos-simulator`    | ✅             | Apple 芯片 平台上的 Apple tvOS 模拟器 15.0 及更高版本 |
+| `tvosSimulatorArm64`    | `aarch64-apple-tvos-simulator`    | ✅            | Apple 芯片 平台上的 Apple tvOS 模拟器 15.0 及更高版本 |
 | `tvosArm64`             | `aarch64-apple-tvos`              |               | ARM64 平台上的 Apple tvOS 15.0 及更高版本 |
 
 ### 第 3 层级 {id="tier-3"}
@@ -63,22 +62,22 @@ Kotlin/Native 编译器支持许多不同的目标，但对它们的支持程度
 | `androidNativeArm64`    | `aarch64-unknown-linux-android`  |               | ARM64 平台上的 [Android NDK](https://developer.android.com/ndk) |
 | `androidNativeX86`      | `i686-unknown-linux-android`     |               | x86 平台上的 [Android NDK](https://developer.android.com/ndk) |
 | `androidNativeX64`      | `x86_64-unknown-linux-android`   |               | x86_64 平台上的 [Android NDK](https://developer.android.com/ndk) |
-| `mingwX64`              | `x86_64-pc-windows-gnu`          | ✅             | 使用 [MinGW](https://www.mingw-w64.org) 兼容层的 64 位 Windows 10 及更高版本 |
+| `mingwX64`              | `x86_64-pc-windows-gnu`          | ✅            | 使用 [MinGW](https://www.mingw-w64.org) 兼容层的 64 位 Windows 10 及更高版本 |
 | 仅限 Apple macOS 主机： |                                  |               |                                                                                          |
 | `watchosDeviceArm64`    | `aarch64-apple-watchos`          |               | ARM64 平台上的 Apple watchOS 8.0 及更高版本 |
-| `iosX64`                | `x86_64-apple-ios-simulator`     | ✅             | x86-64 平台上的 Apple iOS 模拟器 15.0 及更高版本 |
-
-> `linuxArm32Hfp` 目标已被弃用，并将在未来的版本中移除。
-> 
-{style="note"}
+| `iosX64`                | `x86_64-apple-ios-simulator`     |               | x86-64 平台上的 Apple iOS 模拟器 15.0 及更高版本 |
 
 ### 已弃用的目标 {id="deprecated-targets"}
 
-从 Kotlin 2.3.20 开始，以下目标已弃用：
+以下目标已被弃用，并计划移除：
 
-* `macosX64`（x86_64 平台上的 Apple macOS）
-* `watchosX64`（x86_64 平台上的 Apple watchOS 64 位模拟器）
-* `tvosX64`（x86_64 平台上的 Apple tvOS 模拟器）
+| 目标 | 开始弃用版本 | 描述 |
+|-----------------|-------------------|----------------------------------------------------|
+| `watchosArm32`  | Kotlin 2.4.20     | ARM32 平台上的 Apple watchOS 设备 |
+| `macosX64`      | Kotlin 2.3.20     | x86_64 平台上的 Apple macOS |
+| `watchosX64`    | Kotlin 2.3.20     | x86_64 平台上的 Apple watchOS 64 位模拟器 | 
+| `tvosX64`       | Kotlin 2.3.20     | x86_64 平台上的 Apple tvOS 模拟器 | 
+| `linuxArm32Hfp` | Kotlin 1.8.20     | ARM32 平台上的 Linux |
 
 ### 支持较低的 Apple 目标版本 {id="supporting-lower-apple-target-versions"}
 
@@ -120,8 +119,8 @@ Kotlin/Native 编译器支持以下主机：
 |----------------------------------------------------|------------------------------------------------|------------------------------------------------------------------------|
 | 搭载 Apple 芯片 (ARM64) 的 macOS | 任何受支持的目标 | 任何受支持的目标 |
 | 搭载 Intel 芯片 (x86_64) 的 macOS | 任何受支持的目标 | 任何受支持的目标 |
-| 采用 x86_64 架构的 Linux | 任何受支持的目标（Apple 目标除外） | 任何受支持的目标，Apple 目标仅限不带 `cinterop` 依赖项的情况 |
-| 采用 x86_64 架构的 Windows (MinGW 工具链) | 任何受支持的目标（Apple 目标除外） | 任何受支持的目标，Apple 目标仅限不带 `cinterop` 依赖项的情况 |
+| 采用 x86_64 架构的 Linux | 任何受支持的目标（Apple 目标除外） | 任何受支持的目标，Apple 目标仅限不带 cinterop 依赖项的情况 |
+| 采用 x86_64 架构的 Windows (MinGW 工具链) | 任何受支持的目标（Apple 目标除外） | 任何受支持的目标，Apple 目标仅限不带 cinterop 依赖项的情况 |
 
 ### 构建最终二进制文件 {id="building-final-binaries"}
 
@@ -135,7 +134,7 @@ Kotlin/Native 编译器支持以下主机：
 
 然而，在 Linux 和 Windows 上为 Apple 目标生成构件仍然存在一些限制。如果你的项目使用了 [cinterop 依赖项](native-c-interop.md)（包括 [CocoaPods](https://kotlinlang.org/docs/multiplatform/multiplatform-cocoapods-overview.html)），你必须使用 macOS 主机。
 
-例如，只有在没有 `cinterop` 依赖项的情况下，你才能在运行于 x86_64 架构的 Windows 机器上为 `macosArm64` 目标生成 `.klib`。
+例如，只有在没有 cinterop 依赖项的情况下，你才能在运行于 x86_64 架构的 Windows 机器上为 `macosArm64` 目标生成 `.klib`。
 
 ## 下一步 {id="what-s-next"}
 

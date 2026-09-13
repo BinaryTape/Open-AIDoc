@@ -4,7 +4,7 @@
 但總體而言，Kotlin 編譯器會產生一般的 JavaScript 類別、函式和屬性，您可以從 JavaScript 程式碼中自由使用它們。
 不過，您應該記住一些細微之處。
 
-## 在 plain 模式下將宣告隔離在單獨的 JavaScript 物件中
+## 在 plain 模式下將宣告隔離在單獨的 JavaScript 物件中 {id="isolating-declarations-in-a-separate-javascript-object-in-plain-mode"}
 
 如果您已明確將模組種類設定為 `plain`，Kotlin 會建立一個物件，其中包含來自當前模組的所有 Kotlin 宣告。這樣做是為了防止破壞全域物件。這意味著對於一個名為 `myModule` 的模組，所有宣告都可以透過 JavaScript 的 `myModule` 物件來存取。例如：
 
@@ -26,7 +26,7 @@ alert(require('myModule').foo());
 
 有關 JavaScript 模組系統的更多資訊，請參閱 [JavaScript 模組](js-modules.md)。
 
-## 套件結構
+## 套件結構 {id="package-structure"}
 
 對於大多數模組系統（CommonJS、Plain 和 UMD），Kotlin 會將其套件結構暴露給 JavaScript。
 除非您在根套件中定義宣告，否則您必須在 JavaScript 中使用完全限定名稱。例如：
@@ -57,7 +57,7 @@ import { foo } from 'myModule';
 alert(foo());
 ```
 
-### `@JsName` 註解
+### `@JsName` 註解 {id="jsname-annotation"}
 
 在某些情況下（例如為了支援多載），Kotlin 編譯器會重整 JavaScript 程式碼中產生的函式和屬性的名稱。要控制產生的名稱，您可以使用 `@JsName` 註解：
 
@@ -84,7 +84,7 @@ person.hello();                          // 列印 "Hello Dmitry!"
 person.helloWithGreeting("Servus");      // 列印 "Servus Dmitry!"
 ```
 
-如果我們沒有指定 `@JsName` 註解，相應函式的名稱將包含一個根據函式簽章計算出的後綴，例如 `hello_61zpoe`。
+如果我們沒有指定 `@JsName` 註解，相應函式的名稱將包含一個根據函式簽章計算出的後綴，例如 `hello_61zpoe$`。
 
 請注意，在某些情況下 Kotlin 編譯器不會套用名稱重整 (mangling)：
 - `external` 宣告不會被重整。
@@ -99,7 +99,7 @@ person.helloWithGreeting("Servus");      // 列印 "Servus Dmitry!"
 external fun newC()
 ```
 
-### `@JsExport` 註解
+### `@JsExport` 註解 {id="jsexport-annotation"}
 <primary-label ref="experimental-general"/>
 
 透過將 `@JsExport` 註解套用至頂層宣告（如類別、介面或函式），您可以讓 Kotlin 宣告在 JavaScript 或 TypeScript 中可用。此註解會匯出所有具有 Kotlin 中指定名稱的巢狀宣告。
@@ -125,7 +125,7 @@ interface Identity {
 * 與 [`@JsName` 註解](#jsname-annotation)結合使用，以指定產生和匯出的函式名稱。這有助於解決匯出中的歧義（例如同名函式的多載）。
 * 使用 `@file:JsExport` 套用於檔案層級。
 
-#### 支援值類別 (value class) 匯出
+#### 支援值類別 (value class) 匯出 {id="export-value-classes"}
 
 您可以將 Kotlin 的 [內嵌值類別](inline-classes.md) 匯出為一般的 TypeScript 類別。
 
@@ -158,7 +158,50 @@ console.log(await auth.login(new Email("not-an-email")));
 // "Invalid email"
 ```
 
-### `@JsNoRuntime` 註解
+#### 匯出掛起 Lambda {id="export-suspending-lambdas"}
+
+您可以將 Kotlin 的 [掛起 Lambda 運算式](lambdas.md#lambda-expressions-and-anonymous-functions) 匯出為 JavaScript 的 [async 函式](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function)：
+
+1. 要啟用此功能，請將以下編譯器選項新增到您的 `build.gradle.kts` 檔案中：
+
+    ```kotlin
+    kotlin {
+        js {
+            compilations.all {
+                compileTaskProvider.configure {
+                    compilerOptions {
+                        freeCompilerArgs.add("-Xsuspend-lambda-exporting")
+                    }
+                }
+            }
+        }
+    }
+    ```
+
+2. 使用 `@JsExport` 註解標記相關的 Kotlin 宣告：
+
+    ```kotlin
+    // Kotlin
+    @JsExport
+    class TaskRunner {
+        suspend fun runTask(task: suspend () -> String): String {
+            return task()
+        }
+    }
+    ```
+
+3. 在 TypeScript 端，`suspend` Lambda 將被對應為一般的 `async` 函式：
+
+    ```typescript
+    // TypeScript
+    import { TaskRunner } from "..."
+    
+    const runner = new TaskRunner();
+    const result = await runner.runTask(async () => "done");
+    console.log(result); // "done"
+    ```
+
+### `@JsNoRuntime` 註解 {id="jsnoruntime-annotation"}
 
 您可以使用 `@JsNoRuntime` 註解將 Kotlin 介面匯出到 JavaScript/TypeScript。這允許直接對應到一般的 TypeScript 介面。
 
@@ -209,7 +252,7 @@ console.log(await auth.login(new Email("not-an-email")));
 * 使用 [`::class` 語法](js-reflection.md) 的類別參照。
 * 作為 [具體化型別引數 (reified type argument)](inline-functions.md#reified-type-parameters) 傳遞的介面。
 
-### `@JsStatic`
+### `@JsStatic` {id="jsstatic"}
 <primary-label ref="experimental-general"/>
 
 `@JsStatic` 註解指示編譯器為目標宣告產生額外的靜態方法。這有助於您直接在 JavaScript 中使用 Kotlin 程式碼中的靜態成員。
@@ -241,7 +284,7 @@ C.Companion.callNonStatic(); // 這是它能運作的唯一方式
 
 此功能為 [實驗性](components-stability.md#stability-levels-explained)。請在我們的問題追蹤器 [YouTrack](https://youtrack.jetbrains.com/issue/KT-18891/JS-provide-a-way-to-declare-static-members-JsStatic) 中分享您的回饋。
 
-### 使用 `BigInt` 型別來表示 Kotlin 的 `Long` 型別
+### 使用 `BigInt` 型別來表示 Kotlin 的 `Long` 型別 {id="use-bigint-type-to-represent-kotlin-s-long-type"}
 <primary-label ref="experimental-general"/>
 
 當編譯為現代 JavaScript (ES2020) 時，Kotlin/JS 使用 JavaScript 內建的 `BigInt` 型別來表示 Kotlin 的 `Long` 值。
@@ -262,7 +305,7 @@ kotlin {
 
 此功能為 [實驗性](components-stability.md#stability-levels-explained)。請在我們的問題追蹤器 [YouTrack](https://youtrack.jetbrains.com/issue/KT-57128/KJS-Use-BigInt-to-represent-Long-values-in-ES6-mode) 中分享您的回饋。
 
-#### 在匯出的宣告中使用 `Long`
+#### 在匯出的宣告中使用 `Long` {id="use-long-in-exported-declarations"}
 
 由於 Kotlin 的 `Long` 型別可以編譯為 JavaScript 的 `BigInt` 型別，因此 Kotlin/JS 支援將 `Long` 值匯出到 JavaScript。
 
@@ -284,7 +327,7 @@ kotlin {
 
 2. 啟用 `BigInt` 型別。請參閱[使用 `BigInt` 型別來表示 Kotlin 的 `Long` 型別](#use-bigint-type-to-represent-kotlin-s-long-type)以了解如何啟用它。
 
-### 使用 `BigInt64Array` 型別來表示 Kotlin 的 `LongArray` 型別
+### 使用 `BigInt64Array` 型別來表示 Kotlin 的 `LongArray` 型別 {id="use-bigint64array-type-to-represent-kotlin-s-longarray-type"}
 <primary-label ref="experimental-general"/>
 
 當編譯為 JavaScript 時，Kotlin/JS 可以使用 JavaScript 內建的 `BigInt64Array` 型別來表示 Kotlin 的 `LongArray` 值。
@@ -305,7 +348,7 @@ kotlin {
 
 此功能為 [實驗性](components-stability.md#stability-levels-explained)。請在我們的問題追蹤器 [YouTrack](https://youtrack.jetbrains.com/issue/KT-79284/Use-BigInt64Array-for-LongArray) 中分享您的回饋。
 
-## JavaScript 中的 Kotlin 型別
+## JavaScript 中的 Kotlin 型別 {id="kotlin-types-in-javascript"}
 
 了解 Kotlin 型別如何對應到 JavaScript 型別：
 
@@ -349,6 +392,3 @@ kotlin {
   ```
 
 * Kotlin 在 JavaScript 中保留了延遲物件初始化。
-
-    ```kotlin
-    val x by lazy { ... }

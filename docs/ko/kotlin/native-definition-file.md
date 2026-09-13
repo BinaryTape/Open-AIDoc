@@ -13,7 +13,7 @@ Kotlin/Native를 사용하면 C 및 Objective-C 라이브러리를 가져와서 
 2. 생성된 바인딩을 Kotlin 코드에서 사용합니다.
 3. Kotlin/Native 컴파일러를 실행하여 최종 실행 파일을 생성합니다.
 
-## 정의 파일 생성 및 구성
+## 정의 파일 생성 및 구성 {id="create-and-configure-a-definition-file"}
 
 C 라이브러리에 대한 정의 파일을 만들고 바인딩을 생성해 보겠습니다:
 
@@ -51,7 +51,7 @@ C 라이브러리에 대한 정의 파일을 만들고 바인딩을 생성해 �
 > 
 {style="tip"}
 
-## 속성(Properties)
+## 속성(Properties) {id="properties"}
 
 다음은 생성된 바이너리의 내용을 조정하기 위해 정의 파일에서 사용할 수 있는 전체 속성 목록입니다.
 자세한 정보는 아래의 해당 섹션을 참조하세요.
@@ -66,7 +66,7 @@ C 라이브러리에 대한 정의 파일을 만들고 바인딩을 생성해 �
 | [`excludedFunctions`](#ignore-specific-functions)                                   | 무시해야 할 함수 이름의 공백 구분 목록입니다.                                                                                                                                                         |                                              
 | [`staticLibraries`](#include-a-static-library)                                      | [실험적 기능](components-stability.md#stability-levels-explained). 정적 라이브러리를 `.klib`에 포함합니다.                                                                                                              |
 | [`libraryPaths`](#include-a-static-library)                                         | [실험적 기능](components-stability.md#stability-levels-explained). cinterop 도구가 `.klib`에 포함할 라이브러리를 검색할 디렉토리의 공백 구분 목록입니다.                                    |
-| `package`                                                                           | 생성된 Kotlin API의 패키지 접두사입니다.                                                                                                                                                                             |
+| [`package`](#set-the-package-name)                                                  | 생성된 Kotlin API의 패키지 접두사입니다.                                                                                                                                                                             |
 | [`headerFilter`](#filter-headers-by-globs)                                          | 헤더를 글로브(glob)로 필터링하고 라이브러리를 가져올 때 해당 헤더만 포함합니다.                                                                                                                                                |
 | [`excludeFilter`](#exclude-headers)                                                 | 라이브러리를 가져올 때 특정 헤더를 제외하며, `headerFilter`보다 우선순위가 높습니다.                                                                                                                               |
 | [`strictEnums`](#configure-enums-generation)                                        | [Kotlin 열거형(enum)](enum-classes.md)으로 생성되어야 하는 열거형의 공백 구분 목록입니다.                                                                                                                             |
@@ -75,14 +75,14 @@ C 라이브러리에 대한 정의 파일을 만들고 바인딩을 생성해 �
 | `allowedOverloadsForCFunctions`                                                     | 기본적으로 C 함수는 고유한 이름을 가진다고 가정합니다. 여러 함수가 동일한 이름을 가진 경우 하나만 선택됩니다. 그러나 `allowedOverloadsForCFunctions`에 해당 함수들을 지정하여 이를 변경할 수 있습니다. |
 | [`disableDesignatedInitializerChecks`](#allow-calling-a-non-designated-initializer) | 지정되지 않은(non-designated) Objective-C 초기화 메서드를 `super()` 생성자로 호출하는 것을 허용하지 않는 컴파일러 검사를 비활성화합니다.                                                                                              |
 | [`foreignExceptionMode`](#handle-objective-c-exceptions)                            | Objective-C 코드의 예외를 `ForeignException` 유형의 Kotlin 예외로 래핑합니다.                                                                                                                          |
-| [`userSetupHint`](#help-resolve-linker-errors)                                      | 사용자가 링커 오류를 해결하는 데 도움이 되는 사용자 정의 메시지를 추가합니다.                                                                                                                                                 |
+| [`userSetupHint`](#help-resolve-linker-errors)                                      | 예를 들어 사용자가 링커 오류를 해결하는 데 도움이 되는 사용자 정의 메시지를 추가합니다.                                                                                                                                 |
 
 <!-- | `excludedMacros`                                                                    |                                                                                                                                                                                                                          |
 | `objcClassesIncludingCategories`                                                    |                                                                                                                                                                                                                          | -->
 
 속성 목록 외에도 정의 파일에 [사용자 정의 선언(custom declarations)](#add-custom-declarations)을 포함할 수 있습니다.
 
-### 헤더 가져오기(Import headers)
+### 헤더 가져오기(Import headers) {id="import-headers"}
 
 C 라이브러리에 Clang 모듈이 없고 대신 일련의 헤더로 구성된 경우, `headers` 속성을 사용하여 가져올 헤더를 지정합니다:
 
@@ -90,7 +90,7 @@ C 라이브러리에 Clang 모듈이 없고 대신 일련의 헤더로 구성된
 headers = curl/curl.h
 ```
 
-#### 글로브로 헤더 필터링(Filter headers by globs)
+#### 글로브로 헤더 필터링(Filter headers by globs) {id="filter-headers-by-globs"}
 
 `.def` 파일의 필터 속성을 사용하여 글로브(glob)로 헤더를 필터링할 수 있습니다. 헤더의 선언을 포함하려면 `headerFilter` 속성을 사용합니다. 헤더가 글로브 중 하나와 일치하면 해당 선언이 바인딩에 포함됩니다.
 
@@ -102,7 +102,7 @@ headerFilter = SomeLibrary/**
 
 `headerFilter`가 제공되지 않으면 모든 헤더가 포함됩니다. 그러나 가능한 한 정확하게 글로브를 지정하여 `headerFilter`를 사용하는 것이 좋습니다. 이 경우 생성된 라이브러리에는 필요한 선언만 포함됩니다. 이는 개발 환경에서 Kotlin이나 도구를 업그레이드할 때 발생할 수 있는 다양한 문제를 방지하는 데 도움이 될 수 있습니다.
 
-#### 헤더 제외(Exclude headers)
+#### 헤더 제외(Exclude headers) {id="exclude-headers"}
 
 특정 헤더를 제외하려면 `excludeFilter` 속성을 사용합니다. 지정된 헤더의 선언은 바인딩에 포함되지 않으므로, 불필요하거나 문제가 되는 헤더를 제거하고 컴파일을 최적화하는 데 유용할 수 있습니다:
 
@@ -114,7 +114,7 @@ excludeFilter = SomeLibrary/time.h
 >
 {style="note"}
 
-### 모듈 가져오기(Import modules)
+### 모듈 가져오기(Import modules) {id="import-modules"}
 
 Objective-C 라이브러리에 Clang 모듈이 있는 경우, `modules` 속성을 사용하여 가져올 모듈을 지정합니다:
 
@@ -122,7 +122,21 @@ Objective-C 라이브러리에 Clang 모듈이 있는 경우, `modules` 속성�
 modules = UIKit
 ```
 
-### 컴파일러 및 링커 옵션 전달
+### 패키지 이름 설정(Set the package name) {id="set-the-package-name"}
+
+생성된 Kotlin API의 패키지 접두사를 지정하려면 `package` 속성을 사용합니다:
+
+```none
+package = png
+```
+
+이 속성을 지정하지 않으면 컴파일러는 루트(root) 패키지에 선언을 생성합니다.
+
+> `kotlin` 및 `kotlinx.cinterop` 이름은 예약되어 있으므로 패키지 접두사로 사용할 수 없습니다.
+>
+{style="note"}
+
+### 컴파일러 및 링커 옵션 전달 {id="pass-compiler-and-linker-options"}
 
 내부적으로 헤더를 분석하는 데 사용되는 C 컴파일러에 옵션을 전달하려면 `compilerOpts` 속성을 사용합니다. 최종 실행 파일을 링크하는 데 사용되는 링커에 옵션을 전달하려면 `linkerOpts`를 사용합니다. 예를 들어:
 
@@ -141,11 +155,11 @@ compilerOpts.macos_x64 = -DFOO=foo2
 
 이 구성에서 헤더는 Linux에서는 `-DBAR=bar -DFOO=foo1`, macOS에서는 `-DBAR=bar -DFOO=foo2`를 사용하여 분석됩니다. 모든 정의 파일 옵션은 공통 부분과 플랫폼별 부분을 모두 가질 수 있음에 유의하세요.
 
-### 특정 함수 무시(Ignore specific functions)
+### 특정 함수 무시(Ignore specific functions) {id="ignore-specific-functions"}
 
 무시해야 할 함수 이름 목록을 지정하려면 `excludedFunctions` 속성을 사용합니다. 이는 헤더에 선언된 함수가 호출 가능하다고 보장되지 않으며 이를 자동으로 판단하기 어렵거나 불가능한 경우에 유용할 수 있습니다. 상호운용성(interop) 자체의 버그를 우회하기 위해 이 속성을 사용할 수도 있습니다.
 
-### 정적 라이브러리 포함(Include a static library)
+### 정적 라이브러리 포함(Include a static library) {id="include-a-static-library"}
 
 <primary-label ref="experimental-general"/>
 
@@ -161,33 +175,33 @@ libraryPaths = /opt/local/lib /usr/local/opt/curl/lib
 
 프로그램에서 이와 같은 `klib`을 사용하면 라이브러리가 자동으로 링크됩니다.
 
-### 열거형 생성 구성(Configure enums generation)
+### 열거형 생성 구성(Configure enums generation) {id="configure-enums-generation"}
 
 열거형을 Kotlin 열거형으로 생성하려면 `strictEnums` 속성을 사용하고, 정수 값으로 생성하려면 `nonStrictEnums`를 사용합니다. 열거형이 이 두 목록에 모두 포함되지 않은 경우 휴리스틱(heuristics)에 따라 생성됩니다.
 
-### 문자열 변환 설정(Set up string conversion)
+### 문자열 변환 설정(Set up string conversion) {id="set-up-string-conversion"}
 
 `const char*` 함수 매개변수를 Kotlin `String`으로 자동 변환하는 기능을 비활성화하려면 `noStringConversion` 속성을 사용합니다.
 
-### 지정되지 않은 초기화 메서드 호출 허용(Allow calling a non-designated initializer)
+### 지정되지 않은 초기화 메서드 호출 허용(Allow calling a non-designated initializer) {id="allow-calling-a-non-designated-initializer"}
 
 기본적으로 Kotlin/Native 컴파일러는 지정되지 않은(non-designated) Objective-C 초기화 메서드를 `super()` 생성자로 호출하는 것을 허용하지 않습니다. 라이브러리에서 지정된 Objective-C 초기화 메서드가 제대로 표시되지 않은 경우 이 동작이 불편할 수 있습니다. 이러한 컴파일러 검사를 비활성화하려면 `disableDesignatedInitializerChecks` 속성을 사용합니다.
 
-### Objective-C 예외 처리(Handle Objective-C exceptions)
+### Objective-C 예외 처리(Handle Objective-C exceptions) {id="handle-objective-c-exceptions"}
 
 기본적으로 Objective-C 예외가 Objective-C와 Kotlin의 상호운용 경계에 도달하여 Kotlin 코드에 전달되면 프로그램이 중단됩니다.
 
 Objective-C 예외를 Kotlin으로 전파하려면 `foreignExceptionMode = objc-wrap` 속성을 사용하여 래핑을 활성화하세요. 이 경우 Objective-C 예외는 `ForeignException` 유형을 갖는 Kotlin 예외로 변환됩니다.
 
-### 링커 오류 해결 도움(Help resolve linker errors)
+### 링커 오류 해결 도움(Help resolve linker errors) {id="help-resolve-linker-errors"}
 
 Kotlin 라이브러리가 C 또는 Objective-C 라이브러리에 종속된 경우(예: [CocoaPods 통합](https://kotlinlang.org/docs/multiplatform/multiplatform-cocoapods-overview.html) 사용 시), 링커 오류가 발생할 수 있습니다. 종속 라이브러리가 로컬 머신에 설치되어 있지 않거나 프로젝트 빌드 스크립트에 명시적으로 구성되어 있지 않으면 "Framework not found" 오류가 발생합니다.
 
 라이브러리 작성자라면 사용자 정의 메시지를 통해 사용자가 링커 오류를 해결하도록 도울 수 있습니다. 이를 위해 `.def` 파일에 `userSetupHint=message` 속성을 추가하거나 `cinterop`에 `-Xuser-setup-hint` 컴파일러 옵션을 전달하세요.
 
-### 사용자 정의 선언 추가(Add custom declarations)
+### 사용자 정의 선언 추가(Add custom declarations) {id="add-custom-declarations"}
 
-바인딩을 생성하기 전에 라이브러리에 사용자 정의 C 선언을 추가해야 할 때가 있습니다(예: [매크로](native-c-interop.md#macros)의 경우). 이러한 선언을 위해 추가 헤더 파일을 만드는 대신, 구분선인 `---` 시퀀스 뒤에 `.def` 파일 끝에 직접 포함할 수 있습니다.
+바인딩을 생성하기 전에 라이브러리에 사용자 정의 C 선언을 추가해야 할 때가 있습니다(예: [매크로](native-c-interop.md#macros)의 경우). 이러한 선언을 위해 추가 헤더 파일을 만드는 대신, 구분선인 `---` 시퀀스 뒤에 `.def` 파일 끝에 직접 포함할 수 있습니다:
 
 ```none
 headers = errno.h
@@ -200,7 +214,7 @@ static inline int getErrno() {
 
 `.def` 파일의 이 부분은 헤더 파일의 일부로 취급되므로, 본문이 있는 함수는 `static`으로 선언해야 합니다. 선언은 `headers` 목록의 파일을 포함한 후에 파싱됩니다.
 
-## 명령줄을 사용하여 바인딩 생성
+## 명령줄을 사용하여 바인딩 생성 {id="generate-bindings-using-command-line"}
 
 정의 파일 외에도 `cinterop` 호출 시 해당 속성을 옵션으로 전달하여 바인딩에 포함할 내용을 지정할 수 있습니다.
 
@@ -216,7 +230,7 @@ cinterop -def png.def -compiler-option -I/usr/local/include -o png
 * 구성 스크립트가 있는 일반적인 UNIX 라이브러리의 경우, `compilerOpts`에는 `--cflags` 옵션이 있는 구성 스크립트의 출력(정확한 경로 제외)이 포함될 가능성이 높습니다.
 * `--libs`가 있는 구성 스크립트의 출력은 `linkerOpts` 속성에 전달될 수 있습니다.
 
-## 다음 단계
+## 다음 단계 {id="what-s-next"}
 
 * [C 상호운용성을 위한 바인딩](native-c-interop.md#bindings)
 * [Swift/Objective-C와의 상호운용성](native-objc-interop.md)

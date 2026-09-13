@@ -22,7 +22,8 @@ Gradle 7.0 為 Gradle 外掛程式作者引入了一項新功能
 | `gradle86`     | 8.6-8.7                       |
 | `gradle88`     | 8.8-8.10                      |
 | `gradle811`    | 8.11-8.12                     |
-| `gradle813`    | 8.13 and higher               |
+| `gradle813`    | 8.13-8.14                     |
+| `gradle96`     | 9.6-9.7                       |
 
 在未來的 Kotlin 版本中，將會加入更多變體。
 

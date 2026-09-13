@@ -29,7 +29,7 @@ aside: false
         <misc>
             <cards narrow="false">
                 <title>精選主題</title>
-                <a href="whatsnew24.md" summary="新的實驗性與穩定功能、效能改進以及錯誤修復">Kotlin 2.4.0 新功能</a>
+                <a href="whatsnew2420.md" summary="新的實驗性與穩定功能、效能改進以及錯誤修復">Kotlin 2.4.20 新功能</a>
                 <a href="https://kotlinlang.org/api/latest/jvm/stdlib/" summary="Kotlin 日常工作的核心要素：IO、檔案、執行緒、集合等等">標準程式庫 API 參考</a>
                 <a href="gradle.md" summary="了解 Gradle 作為建置工具如何自動化與管理專案建置">Gradle</a>
                 <a href="maven.md" summary="了解 Maven 作為建置工具如何自動化與管理專案建置">Maven</a>

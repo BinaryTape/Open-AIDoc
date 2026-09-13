@@ -29,8 +29,8 @@
 
 以下是即将发布的稳定版 Kotlin 的大致时间表：
 
-* **2.4.20**：计划于 2026 年 9 月
 * **2.5.0**：计划于 2026 年 12 月
+* **2.5.20**：计划于 2027 年 3 月
 
 ## 更新至新的 Kotlin 版本 {id="update-to-a-new-kotlin-version"}
 
@@ -129,7 +129,7 @@ Kotlin 在 [IntelliJ IDEA](https://www.jetbrains.com/idea/download/) 和 [Androi
         <th>Kotlin 发布系列</th>
         <th>发布日期</th>
         <th>支持截止日期</th>
-        <th>最新缺陷修复发布</th>
+        <th>最新发布</th>
     </tr>
     <tr>
         <td><strong>2.4</strong>
@@ -141,7 +141,7 @@ Kotlin 在 [IntelliJ IDEA](https://www.jetbrains.com/idea/download/) 和 [Androi
             <p>2027 年 12 月 3 日</p>
         </td>
         <td>
-            <p>2.4.10</p>
+            <p>2.4.20</p>
         </td>
     </tr>
 </table>
@@ -162,6 +162,16 @@ Kotlin 在 [IntelliJ IDEA](https://www.jetbrains.com/idea/download/) 和 [Androi
     <tr>
         <th>构建信息</th>
         <th>构建亮点</th>
+    </tr>
+    <tr>
+        <td><strong>2.4.20</strong>
+            <p>发布日期：<strong>2026 年 9 月 7 日</strong></p>
+            <p><a href="https://github.com/JetBrains/kotlin/releases/tag/v2.4.20" target="_blank">GitHub 上的发布</a></p>
+        </td>
+        <td>
+            <p>一个工具发布，包含新的实验性功能与稳定功能、性能改进、缺陷修复和工具更新。</p>
+            <p>欲了解更多详情，请参考 <a href="https://github.com/JetBrains/kotlin/releases/tag/v2.4.20">变更日志</a>。</p>
+        </td>
     </tr>
     <tr>
         <td><strong>2.4.10</strong>

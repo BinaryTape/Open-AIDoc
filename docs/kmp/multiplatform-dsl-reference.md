@@ -157,12 +157,13 @@ kotlin {
 
 详细了解 [配置 Kotlin/JS 项目](https://kotlinlang.org/docs/js-project-setup.html)。
 
-一个单独的 `wasmWasi {}` 块描述了支持 WASI 系统接口的 Kotlin/Wasm 目标的配置。在这里，仅 [`nodejs`](#node-js) 执行环境可用：
+一个单独的 `wasmWasi {}` 块描述了支持 WASI 系统接口的 Kotlin/Wasm 目标的配置。它支持 `nodejs` 和 `wasmtime` 执行环境：
 
 ```kotlin
 kotlin {
     wasmWasi {
         nodejs()
+        wasmtime()
         binaries.executable()
     }
 }
@@ -336,7 +337,7 @@ binaries {
 
         // 为此二进制文件禁用编译缓存
         disableNativeCache(
-            version = DisableCacheInKotlinVersion.2_3_0,
+            version = DisableCacheInKotlinVersion .2_3_0,
             reason = 'Cache bug',
             issue = URI('https://youtrack.com/YY-1111')
         )
@@ -423,7 +424,7 @@ kotlin {
                     // includeDirs.allHeaders 的快捷方式。
                     includeDirs("include/directory", "another/directory")
 
-                    // Header 文件要包含在绑定中。
+                    // 要包含在绑定中的头文件。
                     header("path/to/header.h")
                     headers("path/to/header1.h", "path/to/header2.h")
                 }

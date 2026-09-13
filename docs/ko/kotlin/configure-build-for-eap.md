@@ -1,9 +1,9 @@
 [//]: # (title: EAP를 위한 빌드 구성하기)
 
 <tldr>
-    <!--<p>현재 사용 가능한 프리뷰 버전이 없습니다.</p> -->
-    <p>최신 Kotlin EAP 릴리스: <strong>%kotlinEapVersion%</strong></p>
-    <p><a href="eap.md#build-details">Kotlin EAP 릴리스 세부 정보 살펴보기</a></p>
+    <p>현재 사용 가능한 프리뷰 버전이 없습니다.</p>
+    <!--<p>최신 Kotlin EAP 릴리스: <strong>%kotlinEapVersion%</strong></p>
+    <p><a href="eap.md#build-details">Kotlin EAP 릴리스 세부 정보 살펴보기</a></p> -->
 </tldr>
 
 Kotlin의 EAP(Early Access Preview) 버전을 사용하도록 빌드를 구성하려면 다음 단계를 수행해야 합니다: 

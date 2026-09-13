@@ -19,16 +19,24 @@ Kotlin/Native 提供了 [匯入 C](native-c-interop.md) 與 [Objective-C](native
 
 ### 平台庫 {id="platform-libraries"}
 
-[_平台庫_](native-platform-libs.md) 隨 Kotlin/Native 編譯器一起提供。因此，在專案中使用不同版本的 Kotlin 會導致獲得不同版本的平台庫。對於 Apple 目標（如 iOS），平台庫是根據特定編譯器版本支援的 Xcode 版本產生的。
+[_平台庫_](native-platform-libs.md) 隨 Kotlin/Native 編譯器一起提供。
+因此，在專案中使用不同版本的 Kotlin 會導致獲得不同版本的平台庫。
+對於 Apple 目標（如 iOS），平台庫是根據特定編譯器版本支援的 Xcode 版本產生的。
 
-Xcode SDK 隨附的原生庫 API 會隨每個 Xcode 版本而改變。即使這些變更在原生語言中是原始碼與二進位相容的，由於互通性實作的原因，對於 Kotlin 來說它們也可能變成破壞性的。
+Xcode SDK 隨附的原生庫 API 會隨每個 Xcode 版本而改變。
+即使這些變更在原生語言中是原始碼與二進位相容的，
+由於互通性實作的原因，對於 Kotlin 來說它們也可能變成破壞性的。
 
-因此，更新專案中的 Kotlin 版本可能會為平台庫帶來破壞性變更。這在以下兩種情況下可能會有影響：
+因此，更新專案中的 Kotlin 版本可能會為平台庫帶來破壞性變更。
+這在以下兩種情況下可能會有影響：
 
 * 平台庫中存在原始碼破壞性變更，影響了您專案中原始碼的編譯。通常這很容易修正。
-* 平台庫中存在二進位破壞性變更，影響了您的某些相依性。通常沒有簡單的解決方法，您需要等待程式庫開發者在他們端修正此問題，例如透過更新 Kotlin 版本。
+* 平台庫中存在二進位破壞性變更，影響了您的某些相依性。
+  通常沒有簡單的解決方法，您需要等待程式庫開發者在他們端修正此問題，例如透過更新 Kotlin 版本。
 
-  > 此類二進位不相容性表現為連結警告與執行時例外。如果您偏好在編譯時偵測這些問題，請使用 [`-Xpartial-linkage-loglevel=ERROR`](whatsnew19.md#library-linkage-in-kotlin-native) 編譯器選項將警告提升為錯誤。
+  > 此類二進位不相容性表現為連結警告與執行時例外。
+  > 如果您偏好在編譯時偵測這些問題，請使用
+  > [`-Xpartial-linkage-loglevel=ERROR`](whatsnew19.md#library-linkage-in-kotlin-native) 編譯器選項將警告提升為錯誤。
   >
   {style="note"}
 
@@ -40,13 +48,16 @@ Xcode SDK 隨附的原生庫 API 會隨每個 Xcode 版本而改變。即使這�
 
 Kotlin 編譯器不會阻止您使用在部署目標中不可用的 Objective-C 類別。
 
-例如，如果您的部署目標是 iOS 17.0，而您使用了僅在 iOS 18.0 中出現的類別，編譯器不會向您發出警告，且您的應用程式可能會在 iOS 17.0 的裝置上啟動時當機。此外，即使執行過程從未觸及這些用法，也會發生此類當機，因此僅使用版本檢查來保護它們是不夠的。
+例如，如果您的部署目標是 iOS 17.0，而您使用了僅在 iOS 18.0 中出現的類別，編譯器不會向您發出警告，且您的應用程式可能會在 iOS 17.0 的裝置上啟動時當機。
+此外，即使執行過程從未觸及這些用法，也會發生此類當機，因此僅使用版本檢查來保護它們是不夠的。
 
 如需更多詳細資訊，請參閱 [強連結 (Strong linking)](native-objc-interop.md#strong-linking)。
 
 ### 第三方庫 {id="third-party-libraries"}
 
-除了系統平台庫之外，Kotlin/Native 還允許匯入第三方原生庫。例如，您可以使用 [CocoaPods 整合](https://kotlinlang.org/docs/multiplatform/multiplatform-cocoapods-overview.html) 或設定 [cinterops 配置](https://kotlinlang.org/docs/multiplatform/multiplatform-dsl-reference.html#cinterops)。
+除了系統平台庫之外，Kotlin/Native 還允許匯入第三方原生庫。
+例如，您可以使用 [CocoaPods 整合](https://kotlinlang.org/docs/multiplatform/multiplatform-cocoapods-overview.html)
+或設定 [cinterops 配置](https://kotlinlang.org/docs/multiplatform/multiplatform-dsl-reference.html#cinterops)。
 
 #### 匯入 Xcode 版本不符的程式庫 {id="importing-libraries-with-mismatched-xcode-version"}
 
@@ -69,15 +80,19 @@ Kotlin 編譯器不會阻止您使用在部署目標中不可用的 Objective-C 
 通常，Kotlin 與較舊的 Xcode 版本配合良好。可能會偶爾出現問題，最常導致：
 
 * Kotlin API 引用了不存在的型別，如 [KT-71694](https://youtrack.jetbrains.com/issue/KT-71694) 所示。
-* 系統庫中的型別被包含在原生庫的 Kotlin API 中。在這種情況下，專案編譯成功，但系統原生型別被加入到您的原生庫套件中。例如，您隨後可能會在 IDE 自動補全中意外看到該型別。
+* 系統庫中的型別被包含在原生庫的 Kotlin API 中。
+  在這種情況下，專案編譯成功，但系統原生型別被加入到您的原生庫套件中。
+  例如，您隨後可能會在 IDE 自動補全中意外看到該型別。
 
 如果您的 Kotlin 庫使用較舊的 Xcode 版本成功編譯，除非您[在 Kotlin 庫 API 中使用了第三方庫的型別](#using-native-types-in-library-api)，否則可以安全發佈。
 
 #### 使用傳遞性第三方原生相依性 {id="using-a-transitive-third-party-native-dependency"}
 
-當您專案中的某個 Kotlin 庫匯入第三方原生庫作為其編譯實作的一部分時，您的專案也會獲得該原生庫的存取權限。這是因為 Kotlin/Native 不區分 `api` 與 `implementation` 相依性類型，因此原生庫最終總是成為 `api` 相依性。
+當您專案中的某個 Kotlin 庫匯入第三方原生庫作為其編譯實作的一部分時，您的專案也會獲得該原生庫的存取權限。
+這是因為 Kotlin/Native 不區分 `api` 與 `implementation` 相依性類型，因此原生庫最終總是成為 `api` 相依性。
 
-使用此類傳遞性原生相依性容易出現更多相容性問題。例如，Kotlin 庫開發者所做的變更可能會使原生庫的 Kotlin 表示形式不相容，從而在您更新 Kotlin 庫時導致相容性問題。
+使用此類傳遞性原生相依性容易出現更多相容性問題。
+例如，Kotlin 庫開發者所做的變更可能會使原生庫的 Kotlin 表示形式不相容，從而在您更新 Kotlin 庫時導致相容性問題。
 
 因此，請直接為同一個原生庫配置互通性，而不是依賴傳遞相依性。為此，請為該原生庫使用另一個套件名稱，類似於[使用自訂套件名稱](#use-custom-package-name)以防止相容性問題。
 
@@ -85,7 +100,8 @@ Kotlin 編譯器不會阻止您使用在部署目標中不可用的 Objective-C 
 
 如果您發佈 Kotlin 庫，請小心在程式庫 API 中使用原生型別。為了修正相容性與其他問題，預計未來會破壞此類用法，這將影響您的程式庫使用者。
 
-在某些情況下，在程式庫 API 中使用原生型別是必要的，因為這是程式庫用途所要求的，例如，當 Kotlin 庫基本上是為原生庫提供擴充功能時。如果不是這種情況，請避免或限制在程式庫 API 中使用原生型別。
+在某些情況下，在程式庫 API 中使用原生型別是必要的，因為這是程式庫用途所要求的，例如，當 Kotlin 庫基本上是為原生庫提供擴充功能時。
+如果不是這種情況，請避免或限制在程式庫 API 中使用原生型別。
 
 此建議僅適用於程式庫 API 中原生型別的用法，與應用程式程式碼無關。它也不適用於程式庫實作，例如：
 
@@ -136,7 +152,8 @@ public fun getDate(): String = NSDate().toString()
 
 ### 原生庫支援的演進 {id="evolution-of-native-library-support"}
 
-目前，在 Kotlin 專案中使用 C 與 Objective-C 可能會導致相容性問題；本指南列出了其中的一些問題。為了修正這些問題，未來可能需要進行一些破壞性變更，這本身也會導致相容性問題。
+目前，在 Kotlin 專案中使用 C 與 Objective-C 可能會導致相容性問題；本指南列出了其中的一些問題。
+為了修正這些問題，未來可能需要進行一些破壞性變更，這本身也會導致相容性問題。
 
 ## Swift 程式庫匯入 {id="swift-library-import"}
 
@@ -146,10 +163,11 @@ Kotlin/Native 不支援直接匯入純 Swift 庫。但是，有幾種方法可�
 
 然而，在大多數情況下，我們建議使用「反向匯入」方法：您在 Kotlin 端定義預期行為，在 Swift 端實作實際功能，然後將其傳回給 Kotlin。
 
-您可以透過以下兩種方式之一來定義預期部分：
+您可以透過以下幾種方式之一來定義預期部分：
 
 * 建立一個介面。基於介面的方法對於多個函式與可測試性具有更好的擴充性。
 * 使用 Swift 閉包。它們非常適合快速原型開發，但這種方法有其局限性 —— 例如，它不保留狀態。
+* 使用 [Swift 匯出](native-swift-export.md)。您可以直接在 Swift 中實作 Kotlin 介面，並將 Swift 物件傳回給 Kotlin，無需透過 Objective-C 橋接。
 
 請參考這個將 [CryptoKit](https://developer.apple.com/documentation/cryptokit/) Swift 庫反向匯入到 Kotlin 專案中的範例：
 
@@ -167,36 +185,36 @@ Kotlin/Native 不支援直接匯入純 Swift 庫。但是，有幾種方法可�
 
 2. 在 Kotlin 端，從 `MainViewController` 傳遞平台特定的實作，然後在 `App` 可組合項中作為參數接收它，並在需要的地方使用：
 
-    ```kotlin
-    // App.kt
-    @Composable
-    fun App(cryptoProvider: CryptoProvider) {
-        // 在 UI 內部的範例用法
-        val hashed = cryptoProvider.hashMD5("Hello, world!")
-        androidx.compose.material3.Text("Compose: $hashed")
-    }
-    ```
+   ```kotlin
+   // App.kt
+   @Composable
+   fun App(cryptoProvider: CryptoProvider) {
+       // 在 UI 內部的範例用法
+       val hashed = cryptoProvider.hashMD5("Hello, world!")
+       androidx.compose.material3.Text("Compose: $hashed")
+   }
+   ```
 
-    ```kotlin
-    // MainViewController.kt
-    fun MainViewController(cryptoProvider: CryptoProvider) = ComposeUIViewController {
-        App(cryptoProvider)
-    }
-    ```
+   ```kotlin
+   // MainViewController.kt
+   fun MainViewController(cryptoProvider: CryptoProvider) = ComposeUIViewController {
+       App(cryptoProvider)
+   }
+   ```
 
 3. 在 Swift 端，使用純 Swift 庫 CryptoKit 實作 MD5 雜湊功能：
 
-    ```swift
-    // iosApp/ContentView.swift
-    import CryptoKit
-    
-    class IosCryptoProvider: CryptoProvider {
-        func hashMD5(input: String) -> String {
-            guard let data = input.data(using: .utf8) else { return "failed" }
-            return Insecure.MD5.hash(data: data).description
-        }
-    }
-    ```
+   ```swift
+   // iosApp/ContentView.swift
+   import CryptoKit
+  
+   class IosCryptoProvider: CryptoProvider {
+       func hashMD5(input: String) -> String {
+           guard let data = input.data(using: .utf8) else { return "failed" }
+           return Insecure.MD5.hash(data: data).description
+       }
+   }
+   ```
 
 4. 將 Swift 實作傳遞給 Kotlin 組件：
 
@@ -254,6 +272,43 @@ Kotlin/Native 不支援直接匯入純 Swift 庫。但是，有幾種方法可�
     ```
 
 </tab>
+<tab title="Swift 匯出">
+
+1. 在 Kotlin 端，宣告一個介面、一個接受該介面的函式，以及一個可供 Swift 實作繼承的 `open` 基底類別：
+
+   ```kotlin
+   // CryptoProvider.kt
+   interface CryptoProvider {
+       fun hashMD5(input: String): String
+   }
+
+   fun processHash(provider: CryptoProvider, input: String): String = provider.hashMD5(input)
+
+   open class SwiftBase
+   ```
+
+2. 在 Swift 端，繼承導出的 `SwiftBase` 類別，使用純 Swift 的 CryptoKit 庫實作該介面，並將物件傳回給 Kotlin：
+
+   ```swift
+   // iosApp/ContentView.swift
+   import CryptoKit
+
+   final class IosCryptoProvider: SwiftBase, CryptoProvider {
+       func hashMD5(input: String) -> String {
+           guard let data = input.data(using: .utf8) else { return "failed" }
+           return Insecure.MD5.hash(data: data).description
+       }
+   }
+
+   let provider = IosCryptoProvider()
+
+   // 呼叫 Kotlin 函式，該函式會反向呼叫 Swift 中的 hashMD5()
+   print(processHash(provider: provider, input: "Hello, world!"))
+   ```
+
+當 Kotlin 接收到 Swift 物件時，會將其視為一般 Kotlin 介面的實作，直接呼叫 Swift 程式碼。
+
+</tab>
 </tabs>
 
-在更複雜的專案中，使用相鄰注入 (dependency injection) 將 Swift 實作傳回給 Kotlin 會更方便。如需更多資訊，請參閱 [相依注入框架 (Dependency injection framework)](https://kotlinlang.org/docs/multiplatform/multiplatform-connect-to-apis.html#dependency-injection-framework) 或查看 [Koin 框架](https://insert-koin.io/docs/reference/koin-mp/kmp/) 文件。
+在更複雜的專案中，使用相依注入 (dependency injection) 將 Swift 實作傳回給 Kotlin 會更方便。如需更多資訊，請參閱 [相依注入框架 (Dependency injection framework)](https://kotlinlang.org/docs/multiplatform/multiplatform-connect-to-apis.html#dependency-injection-framework) 或查看 [Koin 框架](https://insert-koin.io/docs/reference/koin-mp/kmp/) 文件。

@@ -2,6 +2,10 @@
 
 [//]: # (title: 协程与通道 – 教程)
 
+> 即将发布的更新将对本教程进行修订。与此同时，有关协程入门的最新指南，请参阅[协程基础](coroutines-basics.md)。
+> 
+{style="note"}
+
 在本教程中，您将学习如何在 IntelliJ IDEA 中使用协程来执行网络请求，而无需阻塞底层线程或使用回调。
 
 > 无需具备协程方面的先验知识，但希望您熟悉基本的 Kotlin 语法。
@@ -14,7 +18,7 @@
 * 如何使用协程并发地发送请求。
 * 如何使用通道在不同协程之间共享信息。
 
-对于网络请求，您将需要 [Retrofit](https://square.github.io/retrofit/) 库，但本教程中显示的方法对于任何其他支持协程的库都同样适用。
+对于网络请求，您将需要 [Retrofit](https://square.github.io/retrofit/) 库，但本教程中介绍的方法对于任何其他支持协程的库都同样适用。
 
 > 您可以在[项目仓库](http://github.com/kotlin-hands-on/intro-coroutines)的 `solutions` 分支中找到所有任务的解决方案。
 >
@@ -63,7 +67,7 @@
 
 ## 阻塞请求 {id="blocking-requests"}
 
-您将使用 [Retrofit](https://square.github.io/retrofit/) 库向 GitHub 执行 HTTP 请求。它允许请求给定组织下的仓库列表以及每个仓库的贡献者列表：
+您将使用 [Retrofit](https://square.github.io/retrofit/) 库向 GitHub 发起 HTTP 请求。它允许请求给定组织下的仓库列表以及每个仓库的贡献者列表：
 
 ```kotlin
 interface GitHubService {
@@ -111,7 +115,7 @@ interface GitHubService {
     * 当您收到响应时，通过调用特定的 `logRepos()` 和 `logUsers()` 函数来记录结果 (`#3`)。如果 HTTP 响应包含错误，该错误将在此处记录。
     * 最后，获取响应体，其中包含您需要的数据。在本教程中，如果发生错误，您将使用空列表作为结果，并记录相应的错误 (`#4`)。
 
-2. 为了避免重复调用 `.body() ?: emptyList()`，声明了一个扩展函数 `bodyList()`：
+2. 为了避免重复编写 `.body() ?: emptyList()`，声明了一个扩展函数 `bodyList()`：
 
     ```kotlin
     fun <T> Response<List<T>>.bodyList(): List<T> {
@@ -131,7 +135,7 @@ interface GitHubService {
     * 每行开头的第一个项目是程序启动以来经过的毫秒数，然后是方括号内的线程名称。您可以查看加载请求是从哪个线程调用的。
     * 每行的最后一项是实际消息：加载了多少个仓库或贡献者。
 
-    此日志输出证明所有结果都是从主线程记录的。当您使用 _BLOCKING_ 选项运行代码时，窗口会冻结，在加载完成之前不会响应输入。所有的请求都执行在调用 `loadContributorsBlocking()` 的同一个线程中，即主 UI 线程（在 Swing 中，它是 AWT 事件分发线程）。这个主线程变得阻塞，这就是 UI 冻结的原因：
+    此日志输出证明所有结果都是从主线程记录的。当您使用 _BLOCKING_ 选项运行代码时，窗口会冻结，在加载完成之前不会响应输入。所有的请求都执行在调用 `loadContributorsBlocking()` 的同一个线程中，即主 UI 线程（在 Swing 中，它是 AWT 事件分发线程）。这个主线程被阻塞，这就是 UI 冻结的原因：
 
     ![被阻塞的主线程](blocking.png){width=700}
     
@@ -154,13 +158,13 @@ interface GitHubService {
 
 ### 任务 1 {id="task-1"}
 
-第一个任务帮助您熟悉任务领域。目前，每个贡献者的名字都会重复多次，参与过的每个项目都会出现一次。实现 `aggregate()` 函数来合并用户，使每个贡献者仅添加一次。`User.contributions` 属性应包含给定用户在 _所有_ 项目中的贡献总数。结果列表应根据贡献次数按降序排序。
+第一个任务帮助您熟悉任务领域。目前，每个贡献者的名字都会重复多次，参与过的每个项目都会出现一次。实现 `aggregate()` 函数来合并用户，使每个贡献者仅添加一次。`User.contributions` 属性应包含给定用户在_所有_项目中的贡献总数。结果列表应根据贡献次数按降序排序。
 
 打开 `src/tasks/Aggregation.kt` 并实现 `List<User>.aggregate()` 函数。用户应按其贡献总数进行排序。
 
 相应的测试文件 `test/tasks/AggregationKtTest.kt` 显示了预期结果的示例。
 
-> 您可以使用 [IntelliJ IDEA 快捷键](https://www.jetbrains.com/help/idea/create-tests.html#test-code-navigation) `Ctrl+Shift+T` / `Standard ⌘ T` 在源代码和测试类之间自动跳转。
+> 您可以使用 [IntelliJ IDEA 快捷键](https://www.jetbrains.com/help/idea/create-tests.html#test-code-navigation) `Ctrl+Shift+T` / `⇧ ⌘ T` 在源代码和测试类之间自动跳转。
 >
 {style="tip"}
 
@@ -185,15 +189,15 @@ interface GitHubService {
 
 ## 回调 {id="callbacks"}
 
-之前的解决方案可以工作，但它会阻塞线程并因此冻结 UI。避免这种情况的一种传统方法是使用 _回调_。
+之前的解决方案可以工作，但它会阻塞线程并因此冻结 UI。避免这种情况的一种传统方法是使用_回调_。
 
-您可以将应在操作完成后立即调用的代码提取到单独的回调（通常是 lambda 表达式）中，并将该 lambda 传递给调用者，以便稍后调用，而不是直接调用。
+您可以将应在操作完成后立即调用的代码提取到单独的回调（通常是 lambda 表达式）中，并将该 lambda 传递给调用方，以便稍后调用，而不是直接调用。
 
 为了使 UI 保持响应，您可以将整个计算移动到单独的线程，或者切换到使用回调而不是阻塞调用的 Retrofit API。
 
 ### 使用后台线程 {id="use-a-background-thread"}
 
-1. 打开 `src/tasks/Request2Background.kt` 查看其实现。首先，整个计算被移动到不同的线程。`thread()` 函数会启动一个新线程：
+1. 打开 `src/tasks/Request2Background.kt` 查看其实现。首先，整个计算被移动到了不同的线程。`thread()` 函数会启动一个新线程：
 
     ```kotlin
     thread {
@@ -248,7 +252,7 @@ thread {
 
 在之前的解决方案中，整个加载逻辑被移动到了后台线程，但这仍然不是资源的最佳利用方式。所有的加载请求都是按顺序进行的，线程在等待加载结果时被阻塞，而它本可以处理其他任务。具体来说，该线程可以开始加载另一个请求，以便更早地接收整个结果。
 
-处理每个仓库的数据随后应分为两部分：加载和处理生成的响应。第二部分 _处理_ 应该提取到回调中。
+处理每个仓库的数据随后应分为两部分：加载和处理生成的响应。第二部分_处理_应该提取到回调中。
 
 这样，在接收到前一个仓库的结果（并调用相应的回调）之前，就可以开始加载每个仓库：
 
@@ -395,7 +399,7 @@ interface GitHubService {
 
 ```kotlin
 interface GitHubService {
-    // getOrgReposCall 和 getRepoContributorsCall 声明
+    // getOrgReposCall 与 getRepoContributorsCall 声明
 
     @GET("orgs/{org}/repos?per_page=100")
     suspend fun getOrgRepos(
@@ -470,7 +474,7 @@ launch {
 
 在这里，`launch` 启动了一个新的计算，负责加载数据并显示结果。该计算是可挂起的——在执行网络请求时，它会被挂起并释放底层线程。当网络请求返回结果时，计算将恢复。
 
-这种可挂起的计算被称为 _协程_。因此，在这种情况下，`launch` _启动了一个新的协程_，负责加载数据并显示结果。
+这种可挂起的计算被称为_协程_。因此，在这种情况下，`launch` _启动了一个新的协程_，负责加载数据并显示结果。
 
 协程运行在线程之上，并且可以被挂起。当协程被挂起时，相应的计算会暂停，从线程中移除并存储在内存中。同时，线程可以自由地处理其他任务：
 
@@ -510,9 +514,9 @@ launch {
 
 Kotlin 协程比线程消耗的资源少得多。每当您想异步启动新的计算时，都可以创建一个新协程。
 
-要启动新协程，请使用主要 _协程构建器_ 之一：`launch`、`async` 或 `runBlocking`。不同的库可以定义额外的协程构建器。
+要启动新协程，请使用主要_协程构建器_之一：`launch`、`async` 或 `runBlocking`。不同的库可以定义额外的协程构建器。
 
-`async` 启动一个新协程并返回一个 `Deferred` 对象。`Deferred` 代表一个在其他名称下广为人知的概念，如 `Future` 或 `Promise`。它存储了一个计算，但它 _推迟_ 了您获得最终结果的时刻；它 _承诺_ 在未来的某个时间提供结果。
+`async` 启动一个新协程并返回一个 `Deferred` 对象。`Deferred` 代表一个在其他名称下广为人知的概念，如 `Future` 或 `Promise`。它存储了一个计算，但它_推迟_了您获得最终结果的时刻；它_承诺_在未来的某个时间提供结果。
 
 `async` 和 `launch` 之间的主要区别在于，`launch` 用于启动不期望返回特定结果的计算。`launch` 返回一个代表该协程的 `Job`。可以通过调用 `Job.join()` 来等待它完成。
 
@@ -685,7 +689,7 @@ deferreds.awaitAll() // List<List<User>>
     ```
 
     * `updateResults()` 应在主 UI 线程上调用，因此您在 `Dispatchers.Main` 的上下文下调用它。
-    * `withContext()` 使用指定的协程上下文调用给定代码，挂起直到完成，并返回结果。一种另一种但更冗长的表达方式是启动一个新协程并显式等待（通过挂起）其完成：`launch(context) { ... }.join()`。
+    * `withContext()` 使用指定的协程上下文调用给定代码，挂起直到完成，并返回结果。另一种但更冗长的表达方式是启动一个新协程并显式等待（通过挂起）其完成：`launch(context) { ... }.join()`。
 
 3. 运行代码并确保协程是在线程池的线程上执行的。
 
@@ -724,13 +728,13 @@ fun main() = runBlocking { /* this: CoroutineScope */
 
 您还可以使用 `GlobalScope.async` 或 `GlobalScope.launch` 从全局作用域启动新协程。这将创建一个顶层的 “独立” 协程。
 
-协程结构背后的机制被称为 _结构化并发_。与全局作用域相比，它具有以下优势：
+协程结构背后的机制被称为_结构化并发_。与全局作用域相比，它具有以下优势：
 
-* 作用域通常对子协程负责，子协程的寿命与作用域的寿命相关联。
+* 作用域通常对子协程负责，子协程的生命周期与作用域的生命周期相关联。
 * 如果出现问题或用户改变主意决定撤销操作，作用域可以自动取消子协程。
-* 作用域会自动等待所有子协程完成。因此，如果作用域对应于一个协程，则在在其作用域内启动的所有协程完成之前，父协程不会完成。
+* 作用域会自动等待所有子协程完成。因此，如果作用域对应于一个协程，则在其作用域内启动的所有协程完成之前，父协程不会完成。
 
-使用 `GlobalScope.async` 时，没有将多个协程绑定到较小作用域的结构。从全局作用域启动的协程都是独立的——它们的寿命仅受整个应用程序寿命的限制。可以存储对从全局作用域启动的协程的引用并等待其完成或显式取消它，但这不会像结构化并发那样自动发生。
+使用 `GlobalScope.async` 时，没有将多个协程绑定到较小作用域的结构。从全局作用域启动的协程都是独立的——它们的生命周期仅受整个应用程序生命周期的限制。可以存储对从全局作用域启动的协程的引用并等待其完成或显式取消它，但这不会像结构化并发那样自动发生。
 
 ### 取消加载贡献者 {id="canceling-the-loading-of-contributors"}
 
@@ -969,13 +973,13 @@ suspend fun loadContributorsProgress(
 
 ![并发请求](progress-and-concurrency.png){width=700}
 
-要增加并发，请使用 _通道_。
+要增加并发，请使用_通道_。
 
 ## 通道 {id="channels"}
 
-编写带有共享可变状态的代码相当困难且容易出错（例如使用回调的解决方案）。一种更简单的方法是通过通信而不是使用公共可变状态来共享信息。协程之间可以通过 _通道_ 进行通信。
+编写带有共享可变状态的代码相当困难且容易出错（例如使用回调的解决方案）。一种更简单的方法是通过通信而不是使用公共可变状态来共享信息。协程之间可以通过_通道_进行通信。
 
-通道是允许在协程之间传递数据的通信原语。一个协程可以向通道 _发送 (send)_ 某些信息，而另一个可以从通道 _接收 (receive)_ 该信息：
+通道是允许在协程之间传递数据的通信原语。一个协程可以向通道_发送 (send)_ 某些信息，而另一个可以从通道_接收 (receive)_ 该信息：
 
 ![使用通道](using-channel.png)
 
@@ -985,7 +989,7 @@ suspend fun loadContributorsProgress(
 
 当许多协程从同一个通道接收信息时，每个元素只能由其中一个消费者处理一次。一旦元素被处理，它就会立即从通道中移除。
 
-您可以将通道想象成类似于元素集合，或者更确切地说，类似于队列，元素从一端添加并从另一端接收。但是，有一个重要的区别：与集合不同（即使是它们的同步版本），通道可以 _挂起_ `send()` 和 `receive()` 操作。当通道为空或已满时会发生这种情况。如果通道大小有上限，通道可能会满。
+您可以将通道想象成类似于元素集合，或者更确切地说，类似于队列，元素从一端添加并从另一端接收。但是，有一个重要的区别：与集合不同（即使是它们的同步版本），通道可以_挂起_ `send()` 和 `receive()` 操作。当通道为空或已满时会发生这种情况。如果通道大小有上限，通道可能会满。
 
 `Channel` 由三个不同的接口表示：`SendChannel`、`ReceiveChannel` 和 `Channel`，后者扩展了前两个。您通常创建一个通道并将其作为 `SendChannel` 实例提供给生产者，以便只有它们可以向通道发送信息。
 您将通道作为 `ReceiveChannel` 实例提供给消费者，以便只有它们可以接收。`send` 和 `receive` 方法都被声明为 `suspend`：
@@ -1009,22 +1013,22 @@ interface Channel<E> : SendChannel<E>, ReceiveChannel<E>
 对于所有的通道类型，`receive()` 调用表现相似：如果通道不为空，它就接收一个元素；否则，它将被挂起。
 
 <deflist collapsible="true">
-   <def title="无限制 (Unlimited) 通道" id="unlimited-channel">
-       <p>无限制通道是队列最接近的模拟：生产者可以将元素发送到此通道，它将无限增长。<code>send()</code> 调用永远不会被挂起。如果程序耗尽内存，您将收到 <code>OutOfMemoryException</code>。无限制通道与队列的区别在于，当消费者尝试从空通道接收时，它会被挂起，直到发送了新元素。</p>
+   <def title="Unlimited channel" id="unlimited-channel">
+       <p>无限制 (Unlimited) 通道是队列最接近的模拟：生产者可以将元素发送到此通道，它将无限增长。<code>send()</code> 调用永远不会被挂起。如果程序耗尽内存，您将收到 <code>OutOfMemoryException</code>。无限制通道与队列的区别在于，当消费者尝试从空通道接收时，它会被挂起，直到发送了新元素。</p>
        <img src="unlimited-channel.png" alt="Unlimited channel" width="500"/>
    </def>
-   <def title="缓冲 (Buffered) 通道" id="buffered-channel">
-       <p>缓冲通道的大小由指定的数字约束。生产者可以向此通道发送元素，直到达到大小限制。所有的元素都存储在内部。当通道满时，下一次 <code>send()</code> 调用将被挂起，直到腾出更多空间。</p>
+   <def title="Buffered channel" id="buffered-channel">
+       <p>缓冲 (Buffered) 通道的大小由指定的数字约束。生产者可以向此通道发送元素，直到达到大小限制。所有的元素都存储在内部。当通道满时，下一次 <code>send()</code> 调用将被挂起，直到腾出更多可用空间。</p>
        <img src="buffered-channel.png" alt="Buffered channel" width="500"/>
    </def>
-   <def title="会合 (Rendezvous) 通道" id="rendezvous-channel">
+   <def title="Rendezvous channel" id="rendezvous-channel">
        <p>“会合 (Rendezvous)”通道是一个没有缓冲区的通道，等同于大小为零的缓冲通道。其中一个函数 (<code>send()</code> 或 <code>receive()</code>) 始终被挂起，直到另一个被调用。</p>
        <p>如果调用了 <code>send()</code> 函数且没有准备好处理该元素的被挂起的 <code>receive()</code> 调用，则 <code>send()</code> 将被挂起。类似地，如果调用了 <code>receive()</code> 函数且通道为空，或者换句话说，没有准备好发送元素的被挂起的 <code>send()</code> 调用，则 <code>receive()</code> 调用将被挂起。</p>
        <p>“会合”名称（“在约定时间和地点见面”）指的是 <code>send()</code> 和 <code>receive()</code> 应该 “按时见面” 的事实。</p>
        <img src="rendezvous-channel.png" alt="Rendezvous channel" width="500"/>
    </def>
-   <def title="合并 (Conflated) 通道" id="conflated-channel">
-       <p>发送到合并通道的新元素将覆盖之前发送的元素，因此接收者始终只能获得最新的元素。<code>send()</code> 调用永远不会被挂起。</p>
+   <def title="Conflated channel" id="conflated-channel">
+       <p>发送到合并 (Conflated) 通道的新元素将覆盖之前发送的元素，因此接收者始终只能获得最新的元素。<code>send()</code> 调用永远不会被挂起。</p>
        <img src="conflated-channel.gif" alt="Conflated channel" width="500"/>
    </def>
 </deflist>
@@ -1175,7 +1179,7 @@ repo-3 - 800 毫秒延迟
 
 一个更好的方法是使用特殊框架在多次运行相同代码时测试计时（这会进一步增加总时间），但这学习和设置起来很复杂。
 
-为了解决这些问题并确保提供测试延迟的解决方案表现符合预期（一个比另一个快），请在特殊的测试调度器中使用 _虚拟 (virtual)_ 时间。此调度器会跟踪自启动以来经过的虚拟时间，并立即实时运行所有内容。当您在此调度器上运行协程时，`delay` 将立即返回并推进虚拟时间。
+为了解决这些问题并确保提供测试延迟的解决方案表现符合预期（一个比另一个快），请在特殊的测试调度器中使用_虚拟 (virtual)_ 时间。此调度器会跟踪自启动以来经过的虚拟时间，并立即实时运行所有内容。当您在此调度器上运行协程时，`delay` 将立即返回并推进虚拟时间。
 
 使用此机制的测试运行速度很快，但您仍然可以检查在虚拟时间的不同时刻发生了什么。总运行时间大幅减少：
 
@@ -1191,8 +1195,8 @@ fun testDelayInSuspend() = runTest {
     val virtualStartTime = currentTime
         
     foo()
-    println("${System.currentTimeMillis() - realStartTime} ms") // ~ 6 毫秒
-    println("${currentTime - virtualStartTime} ms")             // 1000 毫秒
+    println("${System.currentTimeMillis() - realStartTime} ms") // ~ 6 ms
+    println("${currentTime - virtualStartTime} ms")             // 1000 ms
 }
 
 suspend fun foo() {
@@ -1215,8 +1219,8 @@ fun testDelayInLaunch() = runTest {
 
     bar()
 
-    println("${System.currentTimeMillis() - realStartTime} ms") // ~ 11 毫秒
-    println("${currentTime - virtualStartTime} ms")             // 1000 毫秒
+    println("${System.currentTimeMillis() - realStartTime} ms") // ~ 11 ms
+    println("${currentTime - virtualStartTime} ms")             // 1000 ms
 }
 
 suspend fun bar() = coroutineScope {
@@ -1231,7 +1235,7 @@ suspend fun bar() = coroutineScope {
 
 只有在 `loadContributorsConcurrent()` 使用继承的上下文启动子协程（而不使用 `Dispatchers.Default` 调度器修改上下文）时，您才能以此方式测试它。
 
-您可以在 _调用_ 函数时而不是在 _定义_ 函数时指定调度器等上下文元素，这提供了更多的灵活性并简化了测试。
+您可以在_调用_函数时而不是在_定义_函数时指定调度器等上下文元素，这提供了更多的灵活性并简化了测试。
 
 > 支持虚拟时间的测试 API 属于[实验性功能 (Experimental)](components-stability.md)，将来可能会发生变化。
 >
@@ -1324,4 +1328,4 @@ fun testChannels() = runTest {
 ## 下一步 {id="what-s-next"}
 
 * 观看 KotlinConf 上的 [Asynchronous Programming with Kotlin](https://kotlinconf.com/workshops/) 工作坊。
-* 了解更多关于使用[虚拟时间和实验性测试包](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-test/)的信息。
+* 详细了解有关使用[虚拟时间和实验性测试包](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-test/)的信息。

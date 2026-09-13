@@ -18,7 +18,7 @@ kotlin.native.binary.latin1Strings=true
 
 `build.gradle.kts` 파일에서 프로젝트의 바이너리 옵션을 설정할 수 있습니다:
 
-*   `binaryOption` 속성을 사용하여 특정 바이너리에 대해 설정합니다. 예를 들면 다음과 같습니다:
+* `binaryOption` 속성을 사용하여 특정 바이너리에 대해 설정합니다. 예를 들면 다음과 같습니다:
 
   ```kotlin
   kotlin {
@@ -32,7 +32,7 @@ kotlin.native.binary.latin1Strings=true
   }
   ```
 
-*   `freeCompilerArgs` 속성에서 `-Xbinary=$option=$value` 컴파일러 옵션으로 설정합니다. 예를 들면 다음과 같습니다:
+* `freeCompilerArgs` 속성에서 `-Xbinary=$option=$value` 컴파일러 옵션으로 설정합니다. 예를 들면 다음과 같습니다:
 
   ```kotlin
   kotlin {
@@ -63,10 +63,21 @@ kotlinc-native main.kt -Xbinary=enableSafepointSignposts=true
 
 <table sticky-header="true">
     <tr>
-        <td width="100">옵션</td>
-        <td width="50">값</td>
-        <td width="150">설명</td>
-        <td width="80">상태</td>
+        <td width="100">Option</td>
+        <td width="50">Values</td>
+        <td width="150">Description</td>
+        <td width="80">Status</td>
+    </tr>
+    <tr>
+        <td><a href="native-improving-compilation-time.md#enable-caches-for-release-binaries"><code>enableReleaseBinaryCache</code></a></td>
+        <td>
+            <list>
+                <li><code>true</code></li>
+                <li><code>false</code> (기본값)</li>
+            </list>
+        </td>
+        <td>컴파일러가 릴리스 모드에서 캐시를 사용하도록 활성화하여, 일부 컴파일러 최적화를 희생하는 대신 빌드 속도를 높입니다.</td>
+        <td>2.4.20부터 실험적(Experimental)</td>
     </tr>
     <tr>
         <td><a href="native-objc-interop.md#explicit-parameter-names-in-objective-c-block-types"><code>objcExportBlockExplicitParameterNames</code></a></td>
@@ -268,10 +279,10 @@ kotlinc-native main.kt -Xbinary=enableSafepointSignposts=true
         <td>
             <list>
                 <li><code>true</code></li>
-                <li><code>false</code> (기본값)</li>
+                <li><code>false</code> (default)</li>
             </list>
         </td>
-        <td>활성화되면 Objective-C 내보내기 중 이름 충돌이 발생하는 경우 경고를 보고합니다.</td>
+        <td>When <code>enabled</code>, reports warnings in case name collisions occur during Objective-C export.</td>
         <td></td>
     </tr>
     <tr>
@@ -279,22 +290,22 @@ kotlinc-native main.kt -Xbinary=enableSafepointSignposts=true
         <td>
             <list>
                 <li><code>true</code></li>
-                <li><code>false</code> (기본값)</li>
+                <li><code>false</code> (default)</li>
             </list>
         </td>
-        <td><code>true</code>인 경우 Objective-C 내보내기 중 이름 충돌이 발생하는 경우 에러를 발생시킵니다.</td>
+        <td>When <code>true</code>, issues errors in case name collisions occur during Objective-C export.</td>
         <td></td>
     </tr>
     <tr>
         <td><code>debugCompilationDir</code></td>
         <td><code>String</code></td>
-        <td>컴파일된 바이너리의 디버그 정보에 사용할 디렉터리 경로를 지정합니다.</td>
+        <td>Specifies the directory path to use for debug information in the compiled binary.</td>
         <td></td>
     </tr>
     <tr>
         <td><code>fixedBlockPageSize</code></td>
         <td><code>UInt</code></td>
-        <td>메모리 할당자에서 고정 메모리 블록의 페이지 크기를 제어합니다. 메모리 할당 성능과 파편화에 영향을 줍니다.</td>
+        <td>Controls the page size for fixed memory blocks in the memory allocator. Affects memory allocation performance and fragmentation.</td>
         <td></td>
     </tr>
     <tr>
@@ -302,16 +313,16 @@ kotlinc-native main.kt -Xbinary=enableSafepointSignposts=true
         <td>
             <list>
                 <li><code>true</code></li>
-                <li><code>false</code> (기본값)</li>
+                <li><code>false</code> (default)</li>
             </list>
         </td>
-        <td>뮤테이터(mutator) 스레드와 가비지 컬렉터 간의 협력을 제어합니다.</td>
+        <td>Controls cooperation between mutator threads and the garbage collector.</td>
         <td></td>
     </tr>
     <tr>
         <td><code>auxGCThreads</code></td>
         <td><code>UInt</code></td>
-        <td>가비지 컬렉션에 사용할 보조 스레드 수를 지정합니다.</td>
+        <td>Specifies the number of auxiliary threads to use for garbage collection.</td>
         <td></td>
     </tr>
     <tr>
@@ -322,8 +333,8 @@ kotlinc-native main.kt -Xbinary=enableSafepointSignposts=true
                 <li><code>thread</code></li>
             </list>
         </td>
-        <td>메모리 오류, 데이터 레이스(data race), 정의되지 않은 동작(undefined behavior)과 같은 다양한 문제를 감지하기 위한 런타임 새니타이저(sanitizer)를 활성화합니다.</td>
-        <td>실험적(Experimental)</td>
+        <td>Enables runtime sanitizers for detecting various issues like memory errors, data races, and undefined behavior.</td>
+        <td>Experimental</td>
     </tr> -->
 </table>
 

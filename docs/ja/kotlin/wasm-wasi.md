@@ -4,13 +4,13 @@
 
 このチュートリアルでは、[WebAssembly System Interface (WASI)](https://wasi.dev/) を使用して、さまざまな WebAssembly 仮想マシンでシンプルな [Kotlin/Wasm](wasm-overview.md) アプリケーションを実行する方法を説明します。
 
-[Node.js](https://nodejs.org/en)、[Deno](https://deno.com/)、および [WasmEdge](https://wasmedge.org/) 仮想マシンで実行されるアプリケーションの例を紹介します。出力は、標準の WASI API を使用するシンプルなアプリケーションです。
+[Node.js](https://nodejs.org/en)、[Wasmtime](https://docs.wasmtime.dev)、[Deno](https://deno.com/)、および [WasmEdge](https://wasmedge.org/) 仮想マシンで実行されるアプリケーションの例を紹介します。出力は、標準の WASI API を使用するシンプルなアプリケーションです。
 
 現在、Kotlin/Wasm は Preview 1 としても知られる WASI 0.1 をサポートしています。WASI 0.2 のサポートは将来のリリースで計画されています。[WASI 0.2 サポートに関する最新情報については、この YouTrack イシューをフォローしてください](https://youtrack.jetbrains.com/issue/KT-64568)。 
 
 [`wasmWasi`](wasm-overview.md#kotlin-wasm-and-wasi) ターゲットは、[デフォルトで新しい例外処理プロポーザル (exception handling proposal) を使用します](wasm-configuration.md#exception-handling-proposal)。これにより、最新の WebAssembly ランタイムとの互換性が向上します。
 
-> Kotlin/Wasm ツールチェーンは、Node.js タスク (`wasmWasiNode*`) を標準で提供しています。Deno や WasmEdge を利用するものなど、プロジェクト内のその他のタスクバリアントは、カスタムタスクとして含まれています。
+> Kotlin/Wasm ツールチェーンは、Node.js タスク (`wasmWasiNode*`) および Wasmtime タスク (`wasmWasiWasmtime*`) を標準で提供しています。Deno や WasmEdge を利用するものなど、プロジェクト内のその他のタスクバリアントは、カスタムタスクとして含まれています。
 >
 {style="tip"}
 
@@ -38,9 +38,10 @@
 
 2. **kotlin-wasm-wasi-example** | **Tasks** | **kotlin node** から、以下のいずれかの Gradle タスクを選択して実行します：
 
-   * **wasmWasiNodeRun**: アプリケーションを Node.js で実行します。
-   * **wasmWasiDenoRun**: アプリケーションを Deno で実行します。
-   * **wasmWasiWasmEdgeRun**: アプリケーションを WasmEdge で実行します。
+   * **wasmWasiNodeDevelopmentRun**: アプリケーションを Node.js で実行します。
+   * **wasmWasiWasmtimeDevelopmentRun**: アプリケーションを Wasmtime で実行します。
+   * **wasmWasiDenoDevelopmentRun**: アプリケーションを Deno で実行します。
+   * **wasmWasiWasmEdgeDevelopmentRun**: アプリケーションを WasmEdge で実行します。
 
      > Windows プラットフォームで Deno を使用する場合は、`deno.exe` がインストールされていることを確認してください。詳細については、[Deno のインストールドキュメント](https://docs.deno.com/runtime/manual/getting_started/installation)を参照してください。
      >
@@ -53,19 +54,25 @@
 * アプリケーションを Node.js で実行する場合：
 
   ```bash
-  ./gradlew wasmWasiNodeRun
+  ./gradlew wasmWasiNodeDevelopmentRun
+  ```
+
+* アプリケーションを Wasmtime で実行する場合：
+
+  ```bash
+  ./gradlew wasmWasiWasmtimeDevelopmentRun
   ```
 
 * アプリケーションを Deno で実行する場合：
 
   ```bash
-  ./gradlew wasmWasiDenoRun
+  ./gradlew wasmWasiDenoDevelopmentRun
   ```
 
 * アプリケーションを WasmEdge で実行する場合：
 
   ```bash
-  ./gradlew wasmWasiWasmEdgeRun
+  ./gradlew wasmWasiWasmEdgeDevelopmentRun
   ```
 
 アプリケーションが正常にビルドされると、ターミナルにメッセージが表示されます：
@@ -79,6 +86,7 @@
 Gradle ツールウィンドウの **kotlin-wasm-wasi-example** | **Tasks** | **verification** から、以下のいずれかの Gradle タスクを実行します：
 
 * **wasmWasiNodeTest**: Node.js でアプリケーションをテストします。
+* **wasmWasiWasmtimeTest**: Wasmtime でアプリケーションをテストします。
 * **wasmWasiDenoTest**: Deno でアプリケーションをテストします。
 * **wasmWasiWasmEdgeTest**: WasmEdge でアプリケーションをテストします。
 
@@ -90,6 +98,12 @@ Gradle ツールウィンドウの **kotlin-wasm-wasi-example** | **Tasks** | **
 
   ```bash
   ./gradlew wasmWasiNodeTest
+  ```
+
+* アプリケーションを Wasmtime でテストする場合：
+
+  ```bash
+  ./gradlew wasmWasiWasmtimeTest
   ```
    
 * アプリケーションを Deno でテストする場合：
@@ -103,10 +117,6 @@ Gradle ツールウィンドウの **kotlin-wasm-wasi-example** | **Tasks** | **
   ```bash
   ./gradlew wasmWasiWasmEdgeTest
   ```
-
-ターミナルにテスト結果が表示されます：
-
-![Kotlin/Wasm and WASI test](wasm-wasi-tests-results.png){width=600}
 
 ## 次のステップ {id="what-s-next"}
 

@@ -7,7 +7,7 @@ Kotlin 언어와 툴셋은 JVM, JS, Native 대상을 위한 컴파일러, 표준
 일부는 아주 초기 단계에 있고, 일부는 더 성숙한 상태입니다.
 각 컴포넌트의 발전 속도와 사용자가 도입 시 감수해야 하는 위험 수준에 따라 **Experimental(실험)**, **Alpha**, **Beta**로 표시합니다.
 
-## 안정성 수준 설명
+## 안정성 수준 설명 {id="stability-levels-explained"}
 
 각 안정성 수준과 그 의미에 대한 빠른 가이드는 다음과 같습니다.
 
@@ -31,7 +31,7 @@ Kotlin 언어와 툴셋은 JVM, JS, Native 대상을 위한 컴파일러, 표준
 
 안정성 수준은 컴포넌트가 얼마나 빨리 Stable로 출시될지를 나타내지 않는다는 점에 유의하세요. 마찬가지로 출시 전에 컴포넌트가 얼마나 많이 변경될지도 나타내지 않습니다. 이는 오직 컴포넌트가 얼마나 빠르게 변화하고 있으며, 사용자가 업데이트 시 겪을 수 있는 이슈에 대한 위험이 어느 정도인지만을 나타냅니다.
 
-## Kotlin 컴포넌트용 GitHub 배지
+## Kotlin 컴포넌트용 GitHub 배지 {id="github-badges-for-kotlin-components"}
 
 [Kotlin GitHub 조직](https://github.com/Kotlin)에는 다양한 Kotlin 관련 프로젝트가 호스팅되어 있습니다.
 일부는 전담하여 개발하는 프로젝트이며, 다른 일부는 사이드 프로젝트입니다.
@@ -49,7 +49,7 @@ Kotlin 언어와 툴셋은 JVM, JS, Native 대상을 위한 컴파일러, 표준
   지원 수준은 모든 JetBrains 제품에 대해 통합되어 있습니다.  
   [자세한 내용은 JetBrains Open Source 문서를 참조하세요](https://github.com/JetBrains#jetbrains-on-github).
 
-## 하위 컴포넌트의 안정성
+## 하위 컴포넌트의 안정성 {id="stability-of-subcomponents"}
 
 안정적인(stable) 컴포넌트가 실험적인(experimental) 하위 컴포넌트를 가질 수 있습니다. 예시:
 * 안정적인 컴파일러가 실험적인 기능을 가질 수 있습니다.
@@ -59,13 +59,13 @@ Kotlin 언어와 툴셋은 JVM, JS, Native 대상을 위한 컴파일러, 표준
 우리는 어떤 하위 컴포넌트가 **Stable** 상태가 아닌지 정확하게 문서화하고 있습니다.
 또한 사용자가 안정적으로 출시되지 않은 기능을 실수로 사용하는 것을 방지하기 위해, 가능한 경우 경고를 표시하고 명시적으로 사용 동의(opt-in)를 하도록 최선을 다하고 있습니다.
 
-## Kotlin 컴포넌트의 현재 안정성
+## Kotlin 컴포넌트의 현재 안정성 {id="current-stability-of-kotlin-components"}
 
 > 기본적으로 모든 새로운 컴포넌트는 Experimental 상태를 가집니다.
 >
 {style="note"}
 
-### Kotlin 컴파일러
+### Kotlin 컴파일러 {id="kotlin-compiler"}
 
 | **컴포넌트**                                                       | **상태** | **상태 적용 버전** | **비고** |
 |---------------------------------------------------------------------|------------|--------------------------|--------------|
@@ -75,7 +75,7 @@ Kotlin 언어와 툴셋은 JVM, JS, Native 대상을 위한 컴파일러, 표준
 | Kotlin/Wasm                                                         | Beta       | 2.2.20                   |              |
 | [Analysis API](https://kotlin.github.io/analysis-api/index_md.html) | Stable     |                          |              |
 
-### 핵심 컴파일러 플러그인
+### 핵심 컴파일러 플러그인 {id="core-compiler-plugins"}
 
 | **컴포넌트**                                    | **상태**   | **상태 적용 버전** | **비고** |
 |--------------------------------------------------|--------------|--------------------------|--------------|
@@ -86,7 +86,7 @@ Kotlin 언어와 툴셋은 JVM, JS, Native 대상을 위한 컴파일러, 표준
 | [Lombok](lombok.md)                              | Alpha        | 2.3.20                   |              |
 | [Power-assert](power-assert.md)                  | Experimental | 2.0.0                    |              |
 
-### Kotlin 라이브러리
+### Kotlin 라이브러리 {id="kotlin-libraries"}
 
 | **컴포넌트**                 | **상태** | **상태 적용 버전** | **비고** |
 |-------------------------------|------------|--------------------------|--------------|
@@ -99,14 +99,14 @@ Kotlin 언어와 툴셋은 JVM, JS, Native 대상을 위한 컴파일러, 표준
 | kotlinx-io                    | Alpha      | 0.2.0                    |              |
 | kotlinx-collections-immutable | Alpha      | 0.3.5                    |              |
 
-### Kotlin 멀티플랫폼 (Kotlin Multiplatform)
+### Kotlin 멀티플랫폼 (Kotlin Multiplatform) {id="kotlin-multiplatform"}
 
 | **컴포넌트**                                  | **상태** | **상태 적용 버전** | **비고**                                                                                                                         |
 |------------------------------------------------|------------|--------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
 | Kotlin Multiplatform                           | Stable     | 1.9.20                   |                                                                                                                                      |
 | Android Studio용 Kotlin Multiplatform 플러그인 | Beta       | 0.8.0                    | [언어와 별도로 버전이 관리됨](https://kotlinlang.org/docs/multiplatform/multiplatform-plugin-releases.html) |
 
-### Kotlin/Native
+### Kotlin/Native {id="kotlin-native"}
 
 | **컴포넌트**                                | **상태** | **상태 적용 버전** | **비고**                                                                                                                  |
 |----------------------------------------------|------------|--------------------------|-------------------------------------------------------------------------------------------------------------------------------|
@@ -118,14 +118,26 @@ Kotlin 언어와 툴셋은 JVM, JS, Native 대상을 위한 컴파일러, 표준
 
 다양한 타겟에 대한 지원 수준에 관한 자세한 내용은 [](native-target-support.md)를 참조하세요.
 
-### 빌드 도구 (Build tools)
+### 빌드 도구 (Build tools) {id="build-tools"}
 
 | **컴포넌트**                                       | **상태** | **상태 적용 버전** | **비고**                                                                                                                                                      |
 |-----------------------------------------------------|------------|--------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [Kotlin Gradle 플러그인](gradle-configure-project.md) | Stable     | 1.1.1                    | [Kotlin 멀티플랫폼 Gradle 플러그인](https://kotlinlang.org/docs/multiplatform/multiplatform-dsl-reference.html#id-and-version)은 Kotlin 1.9.20부터 Stable 상태입니다. |
 | [Kotlin Maven 플러그인](maven-configure-project.md)   | Stable     | 1.0.0                    |                                                                                                                                                                   |
 
-### 언어 도구
+### Build tools API (BTA) {id="build-tools-api-bta"}
+
+| **컴포넌트**  | **상태** | **상태 적용 버전** | **비고** |
+|---------------|------------|--------------------------|--------------|
+| JVM용 BTA     | Beta       | 2.4.20                   |              |
+| JS용 BTA      | Alpha      | 2.4.20                   |              |
+| Wasm용 BTA    | Alpha      | 2.4.20                   |              |
+
+> Build tools API는 현재 Kotlin/Native를 지원하지 않습니다.
+> 
+{style="note"}
+
+### 언어 도구 {id="language-tools"}
 
 | **컴포넌트**                         | **상태**   | **상태 적용 버전** | **비고**                                   |
 |---------------------------------------|--------------|--------------------------|------------------------------------------------|
@@ -134,6 +146,6 @@ Kotlin 언어와 툴셋은 JVM, JS, Native 대상을 위한 컴파일러, 표준
 | 스크립팅 IDE 지원                 | Beta         |                          | IntelliJ IDEA 2023.1 이상 버전부터 사용 가능 |
 | CLI 스크립팅                         | Alpha        | 1.2.0                    |                                                |
 
-## 언어 기능 및 디자인 제안
+## 언어 기능 및 디자인 제안 {id="language-features-and-design-proposals"}
 
 언어 기능 및 새로운 디자인 제안에 대해서는 [](kotlin-language-features-and-proposals.md)를 참조하세요.

@@ -8,11 +8,11 @@ _[保持語言現代化](kotlin-evolution-principles.md)_與 _[舒適更新](kot
 
 在本文件中，我們介紹了幾種相容性：
 
-- _source（原始碼）_：原始碼不相容的變更會導致原本編譯正常的程式碼（無錯誤或警告）無法再編譯。
-- _binary（二進制）_：若兩個二進制產物可以互相替換而不導致載入或連結錯誤，則稱它們為二進制相容。
-- _behavioral（行為）_：若同一程式在套用變更前後表現出不同的行為，則稱該變稱為行為不相容。
+- _source（原始碼）_：原始碼不相容的變更會導致原本編譯正常的程式碼（無錯誤或警告）無法再編譯
+- _binary（二進制）_：若兩個二進制產物可以互相替換而不導致載入或連結錯誤，則稱它們為二進制相容
+- _behavioral（行為）_：若同一程式在套用變更前後表現出不同的行為，則稱該變更為行為不相容
 
-請注意，這些定義僅針對純 Kotlin。從其他語言（例如 Java）角度來看的 Kotlin 程式碼相容性不在本文件的討論範圍內。
+請記住，這些定義僅針對純 Kotlin。從其他語言（例如 Java）角度來看的 Kotlin 程式碼相容性不在本文件的討論範圍內。
 
 ## 語言 (Language) {id="language"}
 
@@ -640,7 +640,7 @@ _[保持語言現代化](kotlin-evolution-principles.md)_與 _[舒適更新](kot
 > - 2.1.20：報告警告
 > - 2.3.0：移除這些屬性
 
-### 棄用 `destinationDir` 在 `CInteropProcess` 中 {id="deprecate-destinationdir-in-cinteropprocess"}
+### 棄用 `CInteropProcess` 中的 `destinationDir` {id="deprecate-destinationdir-in-cinteropprocess"}
 
 > **問題**：[KT-74910](https://youtrack.jetbrains.com/issue/KT-74910)
 >
@@ -657,7 +657,7 @@ _[保持語言現代化](kotlin-evolution-principles.md)_與 _[舒適更新](kot
 > - 2.2.0：將此警告提升為錯誤
 > - 2.3.0：隱藏 `destinationDir` 屬性
 
-### 棄用 `konanVersion` 在 `CInteropProcess` 中 {id="deprecate-konanversion-in-cinteropprocess"}
+### 棄用 `CInteropProcess` 中的 `konanVersion` {id="deprecate-konanversion-in-cinteropprocess"}
 
 > **問題**：[KT-74911](https://youtrack.jetbrains.com/issue/KT-74911)
 >
@@ -754,6 +754,7 @@ _[保持語言現代化](kotlin-evolution-principles.md)_與 _[舒適更新](kot
 > **棄用週期**：
 >
 > - 2.3.20：報告警告
+> - 2.4.20：將警告提升為錯誤
 
 ### 棄用 `kotlin.kmp.isolated-projects.support` Gradle 屬性 {id="deprecate-kotlin-kmp-isolated-projects-support-gradle-property"}
 

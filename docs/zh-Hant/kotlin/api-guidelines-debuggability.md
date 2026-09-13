@@ -4,7 +4,7 @@
 此錯誤解決過程可能會在開發期間透過偵錯工具進行，或是在正式環境中使用日誌與觀測性工具。
 您的程式庫可以遵循以下最佳實務，讓偵錯變得更容易。
 
-## 為具狀態型別提供 toString 方法
+## 為具狀態型別提供 toString 方法 {id="provide-a-tostring-method-for-stateful-types"}
 
 針對每個包含狀態的型別，請提供有意義的 `toString` 實作。
 此實作應傳回該執行個體目前內容的清晰表示，即使是內部型別也是如此。
@@ -117,7 +117,7 @@ override fun toString(): String =
 
 如此一來，您可以立即查看哪些欄位已設定，哪些尚未設定。
 
-## 採用並文件化處理例外的政策
+## 採用並文件化處理例外的政策 {id="adopt-and-document-a-policy-for-handling-exceptions"}
 
 正如 [選擇適當的錯誤處理機制](api-guidelines-consistency.md#choose-the-appropriate-error-handling-mechanism) 章節中所討論的，
 在某些情況下，您的程式庫適合透過拋出例外來發出錯誤訊號。
@@ -130,7 +130,6 @@ override fun toString(): String =
 根據上下文，這些選項都可能是有效的。例如：
 
 * 如果使用者採用程式庫 A 純粹是為了簡化程式庫 B，那麼程式庫 A 在不進行修改的情況下重新拋出程式庫 B 產生的任何例外可能是合適的。
-* If library A adopts library B purely as an internal implementation detail, then library-specific exceptions thrown by library B should never be exposed to users of library A.
 * 如果程式庫 A 採用程式庫 B 純粹是作為內部的實作細節，那麼程式庫 B 拋出的特定程式庫例外絕不應暴露給程式庫 A 的使用者。
 
 您必須採用並文件化一致的例外處理方法，以便使用者能有效地利用您的程式庫。
@@ -141,7 +140,64 @@ override fun toString(): String =
 問題的根本原因。
 一種常見的模式是將底層例外包裝在特定於程式庫的例外中，並透過 `cause` 存取原始例外。
 
-## 下一步
+## 為自訂例外支援協同程式堆疊追蹤復原 {id="support-coroutine-stack-trace-recovery-for-custom-exceptions"}
+<primary-label ref="experimental-general"/>
+
+您可以為程式庫中的自訂例外型別新增協同程式[堆疊追蹤復原](coroutines-debugging.md#stack-trace-recovery)的支援，讓它們更容易偵錯。
+這能提升您的程式庫對 `kotlinx.coroutines` 程式庫及 Kotlin 中其他非同步執行階段的支援。
+
+當一個協同程式透過掛起函式接收到來自另一個協同程式的例外時，堆疊追蹤復原會建立該例外的複本，並附帶指向該函式呼叫的堆疊訊框。
+
+對於建構函式僅接受例外訊息、cause、兩者皆有或不帶引數的例外，`kotlinx.coroutines` 程式庫會自動執行堆疊追蹤復原。
+如果您的程式庫中的例外型別需要額外的建構函式引數（例如行號或錯誤碼），請實作 [`StackTraceRecoverable`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.coroutines.debug/-stack-trace-recoverable/) 介面。
+
+若要實作該介面，請覆寫 [`copyForStackTraceRecovery()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.coroutines.debug/-stack-trace-recoverable/copy-for-stack-trace-recovery.html) 函式。
+在覆寫中，傳回用於堆疊追蹤復原的新例外執行個體，或者如果您不希望 `kotlinx.coroutines` 程式庫複製該例外，則傳回 `null`。
+
+`StackTraceRecoverable` 介面是 Kotlin 標準程式庫的一部分，因此實作它不會增加對 `kotlinx.coroutines` 程式庫的相依性。
+
+以下是一個自訂例外的範例，它在為堆疊追蹤復原建立新執行個體時保留了 `line` 屬性：
+
+```kotlin
+import kotlin.coroutines.ExperimentalStdlibCoroutineSupportApi
+import kotlin.coroutines.debug.StackTraceRecoverable
+
+@OptIn(ExperimentalStdlibCoroutineSupportApi::class)
+class FileEditException
+// 實作需要一個 private 建構函式，
+// 以便將 cause 傳遞給 IllegalStateException 建構函式
+private constructor(
+    val line: Int,
+    private val detail: String,
+    cause: Throwable?,
+) : IllegalStateException("When editing line $line: $detail", cause),
+    // 實作 StackTraceRecoverable 以進行堆疊追蹤復原
+    StackTraceRecoverable<FileEditException> {
+
+    constructor(line: Int, detail: String) : this(line, detail, null)
+
+    // 複製行號與訊息詳細資訊
+    override fun copyForStackTraceRecovery(): FileEditException =
+        FileEditException(line, detail, this)
+    }
+
+fun main() {
+    val original = FileEditException(15, "Unexpected token")
+    
+    // 通常您不需要直接呼叫此函式，除非您正在測試其行為
+    // kotlinx.coroutines 程式庫會在堆疊追蹤復原期間自動叫用它
+    val copy = original.copyForStackTraceRecovery()
+
+    println(copy.message)
+    // When editing line 15: Unexpected token
+
+    println(copy.cause == original)
+    // true
+}
+```
+{kotlin-runnable="true" kotlin-min-compiler-version="2.4.20"}
+
+## 下一步 {id="next-step"}
 
 在指南的下一部分中，您將學習測試便利性。
 

@@ -661,5 +661,7 @@
   "kotlin.mapping-struct-union-types-from-c": "Struct and union types",
   "kotlin.mapping-function-pointers-from-c": "Function pointers",
   "kotlin.mapping-strings-from-c": "Strings",
-  "kmp.compose-desktop-tabbing": "Tab navigation"
+  "kmp.compose-desktop-tabbing": "Tab navigation",
+  "kotlin.whatsnew2420": "Kotlin 2.4.20",
+  "coroutines.coroutine-debugging": "Coroutine debugging"
 }

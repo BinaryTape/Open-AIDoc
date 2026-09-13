@@ -18,16 +18,11 @@
 
 4. 選取 **Gradle** 建構系統。
 5. 從 **JDK** 清單中，選取你想要在專案中使用的 [JDK](https://www.oracle.com/java/technologies/downloads/)。
-    * 如果電腦上已安裝 JDK，但尚未在 IDE 中定義，請選取 **Add JDK**並指定 JDK 根目錄的路徑。
+    * 如果電腦上已安裝 JDK，但尚未在 IDE 中定義，請選取 **Add JDK** 並指定 JDK 根目錄的路徑。
     * 如果電腦上沒有所需的 JDK，請選取 **Download JDK**。
 
-6. 為 Gradle 選取 **Kotlin** DSL。
+6. 為 Gradle DSL 選取 **Kotlin**。
 7. 選取 **Add sample code** 核取方塊，以建立包含範例 `"Hello World!"` 應用程式的檔案。
-
-   > 你也可以啟用 **Generate code with onboarding tips** 選項，為範例程式碼新增一些額外的實用註解。
-   >
-   {style="tip"}
-
 8. 點擊 **Create**。
 
 你已成功使用 Gradle 建立專案！
@@ -55,7 +50,7 @@ plugins {
     kotlin("jvm") version "%kotlinVersion%" // 要使用的 Kotlin 版本
 }
 
-group = "org.example" // 公司名稱，例如 `org.jetbrains`
+group = "org.example" // 公司名稱，例如 `org.jetbrains.kotlin`
 version = "1.0-SNAPSHOT" // 分配給建置構件的版本
 
 repositories { // 相依性來源。參見 1️⃣
@@ -67,18 +62,23 @@ dependencies { // 所有你想要使用的程式庫。參見 3️⃣
     testImplementation(kotlin("test")) // Kotlin 測試程式庫
 }
 
-tasks.test { // 參見 4️⃣
-    useJUnitPlatform() // 用於測試的 JUnitPlatform。參見 5️⃣
+kotlin { // 產生的 JVM 工具鏈配置。參見 4️⃣
+    jvmToolchain(25) // 用於編譯專案的 JDK。
+}
+
+tasks.test { // 測試任務配置。參見 5️⃣ 
+    useJUnitPlatform() // 用於測試的 JUnitPlatform。參見 6️⃣
 }
 ```
 
 * 1️⃣ 進一步了解 [相依性來源](https://docs.gradle.org/current/userguide/declaring_repositories.html)。
 * 2️⃣ [Maven Central 儲存庫](https://central.sonatype.com/)。它也可以是 [Google 的 Maven 儲存庫](https://maven.google.com/) 或你公司的私有儲存庫。
-* 3️⃣ 進一步了解 [宣告相依性](https://docs.gradle.org/current/userguide/declaring_dependencies.html)。 
-* 4️⃣ 進一步了解 [任務](https://docs.gradle.org/current/dsl/org.gradle.api.Task.html)。
-* 5️⃣ [用於測試的 JUnitPlatform](https://docs.gradle.org/current/javadoc/org/gradle/api/tasks/testing/Test.html#useJUnitPlatform)。
+* 3️⃣ 進一步了解 [宣告相依性](https://docs.gradle.org/current/userguide/declaring_dependencies.html)。
+* 4️⃣ 進一步了解 [Java 工具鏈支援](gradle-configure-project.md#gradle-java-toolchains-support)。
+* 5️⃣ 進一步了解 [任務](https://docs.gradle.org/current/dsl/org.gradle.api.Task.html)。
+* 6️⃣ [用於測試的 JUnitPlatform](https://docs.gradle.org/current/javadoc/org/gradle/api/tasks/testing/Test.html#useJUnitPlatform)。
 
-如你所見，Gradle 建置檔案中新增了幾個 Kotlin 特有的構件：
+Gradle 建置檔案中包含幾個 Kotlin 特有的構件：
 
 1. 在 `plugins {}` 區塊中，有 `kotlin("jvm")` 構件。此外掛程式定義了專案中要使用的 Kotlin 版本。
 
@@ -89,9 +89,9 @@ tasks.test { // 參見 4️⃣
 
 1. 透過選取 **View** | **Tool Windows** | **Gradle** 開啟 Gradle 視窗：
 
-   ![包含 main 函式的 Main.kt](jvm-gradle-view-build.png){width=700}
+   ![包含 main 函式的 Main.kt](jvm-gradle-view-build.png){width=450}
 
-2. 執行 `Tasks\build\` 中的 **build** Gradle 任務。在 **Build** 視窗中，會出現 `BUILD SUCCESSFUL`。
+2. 執行 `Tasks/build` 中的 **build** Gradle 任務。在 **Build** 視窗中，會出現 `BUILD SUCCESSFUL`。
    這表示 Gradle 已成功建置應用程式。
 
 3. 在 `src/main/kotlin` 中，開啟 `Main.kt` 檔案：
@@ -104,7 +104,7 @@ tasks.test { // 參見 4️⃣
 
 你可以在 **Run** 工具視窗中查看結果：
 
-![Kotlin 執行輸出](jvm-output-gradle.png){width=600}
+![Kotlin 執行輸出](jvm-output-gradle.png){width=700}
 
 恭喜！你剛剛執行了你的第一個 Kotlin 應用程式。
 

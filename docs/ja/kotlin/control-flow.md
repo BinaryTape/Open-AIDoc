@@ -2,7 +2,7 @@
 
 Kotlinは、プログラムのフローを制御するための柔軟なツールを提供します。`if`、`when`、およびループを使用して、条件に対する明確で表現力豊かなロジックを定義できます。
 
-## If 式
+## If 式 {id="if-expression"}
 
 Kotlinで `if` を使用するには、チェックする条件を括弧 `()` 内に追加し、結果が真（true）の場合に実行するアクションを中括弧 `{}` 内に追加します。追加の分岐やチェックには `else` や `else if` を使用できます。
 
@@ -64,7 +64,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="if-else-blocks-kotlin"}
 
-## When 式と文
+## When 式と文 {id="when-expressions-and-statements"}
 
 `when` は、複数の可能性のある値や条件に基づいてコードを実行する条件式です。これは Java や C、その他の言語における `switch` 文に似ています。`when` はその引数を評価し、いずれかのブランチ条件が満たされるまで、各ブランチと順番に結果を比較します。例えば：
 
@@ -147,7 +147,7 @@ when { ... }
 
 `when` をどのように使用するかによって、ブランチですべての可能なケースをカバーする必要があるかどうかが決まります。すべての可能なケースをカバーすることを、*網羅的（exhaustive）* であると言います。
 
-### 文としての利用
+### 文としての利用 {id="statements"}
 
 `when` を文として使用する場合、すべての可能なケースをカバーする必要はありません。この例では、一部のケースがカバーされていないため、どのブランチも実行されません。しかし、エラーは発生しません。
 
@@ -167,7 +167,7 @@ fun main() {
 
 `if` と同様に、各ブランチはブロックにすることができ、その値はブロック内の最後の式の値となります。
 
-### 式としての利用
+### 式としての利用 {id="expressions"}
 
 `when` を式として使用する場合、すべての可能なケースを **必ず** カバーしなければなりません。最初に一致したブランチの値が、式全体の値になります。すべてのケースをカバーしていない場合、コンパイラはエラーをスローします。
 
@@ -226,7 +226,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-when-no-subject"}
 
-### その他の when の活用方法
+### その他の when の活用方法 {id="other-ways-to-use-when"}
 
 `when` 式と文は、コードを簡略化し、複数の条件を処理し、型チェックを実行するためのさまざまな方法を提供します。
 
@@ -422,7 +422,38 @@ when (animal) {
 }
 ```
 
-## For ループ
+### JVM 上でのバイトコード生成 {id="bytecode-generation-on-the-jvm"}
+
+JVM 21 以降を対象として Kotlin コードをコンパイルする場合、コンパイラは対象となる `when` 式に対して [`invokedynamic`](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/invoke/package-summary.html) 命令を生成します。これにより、Java の `switch` 文で生成されるバイトコードと同様に、よりサイズの小さいバイトコードが生成されます。
+
+以下の条件がすべて満たされる場合、コンパイラは [`SwitchBootstraps.typeSwitch()`](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/runtime/SwitchBootstraps.html) メソッドを伴う `invokedynamic` を使用します：
+
+* `else` 以外のすべての条件が `is` または `null` チェックである。
+* `when` 式に [ガード条件（`if`）](#guard-conditions-in-when-expressions) が含まれていない。
+* 条件に、Kotlin のミュータブルコレクション（`MutableList`）や関数型（`kotlin.Function1`、`kotlin.Function2` など）のような、直接型チェックできない型が含まれていない。
+* `when` 式に `else` 以外の条件が少なくとも2つある。
+* すべてのブランチが `when` 式の同じ対象をチェックしている。
+
+例えば：
+
+```kotlin
+open class Shape
+
+class Circle : Shape()
+class Rectangle : Shape()
+class Triangle : Shape()
+
+fun countCorners(shape: Shape) = when (shape) {
+    is Circle -> 0
+    is Rectangle -> 4
+    is Triangle -> 3
+    else -> -1
+}
+```
+
+ここでの `when (shape)` 式は、バイトコード内で複数の `instanceof` チェックを行う代わりに、単一の `invokedynamic` タイプスイッチにコンパイルされます。
+
+## For ループ {id="for-loops"}
 
 `for` ループを使用して、[コレクション](collections-overview.md)、[配列](arrays.md)、または [範囲（range）](ranges.md) を反復処理します：
 
@@ -449,7 +480,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-for-loop"}
 
-### 範囲 (Ranges)
+### 範囲 (Ranges) {id="ranges"}
 
 数値の範囲を反復処理するには、`..` および `..<` 演算子を使用した [範囲式](ranges.md) を使用します：
 
@@ -481,7 +512,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-for-loop-range"}
 
-### 配列 (Arrays)
+### 配列 (Arrays) {id="arrays"}
 
 配列またはリストをインデックス付きで反復処理したい場合は、`indices` プロパティを使用できます：
 
@@ -517,7 +548,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-for-loop-array-index"}
 
-### イテレータ (Iterators)
+### イテレータ (Iterators) {id="iterators"}
 
 `for` ループは、[イテレータ](iterators.md) を提供するあらゆるものを反復処理します。コレクションはデフォルトでイテレータを提供しますが、範囲と配列はインデックスベースのループにコンパイルされます。
 
@@ -585,7 +616,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-for-loop-iterator-from-scratch"}
 
-## While ループ
+## While ループ {id="while-loops"}
 
 `while` および `do-while` ループは、条件が満たされている間、その本体内のコードを継続的に実行します。
 両者の違いは、条件をチェックするタイミングです：
@@ -636,6 +667,6 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-do-while-loop"}
 
-## ループ内の break と continue
+## ループ内の break と continue {id="break-and-continue-in-loops"}
 
 Kotlinは、ループ内での伝統的な `break` および `continue` 演算子をサポートしています。[リターンとジャンプ](returns.md) を参照してください。

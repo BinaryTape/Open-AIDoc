@@ -2,6 +2,10 @@
 
 [//]: # (title: 協同程式與管道 － 教學)
 
+> 即將推出的更新將會修訂本教學。在此期間，若需了解協同程式入門的最新指南，請參閱[協同程式基礎](coroutines-basics.md)。
+> 
+{style="note"}
+
 在本教學中，您將學習如何在 IntelliJ IDEA 中使用協同程式執行網路請求，而不會阻塞底層執行緒或使用回呼（callback）。
 
 > 不需要具備協同程式的先備知識，但預期您已熟悉基本的 Kotlin 語法。
@@ -23,7 +27,7 @@
 ## 在您開始之前 {id="before-you-start"}
 
 1. 下載並安裝最新版本的 [IntelliJ IDEA](https://www.jetbrains.com/idea/download/index.html)。
-2. 在歡迎畫面選擇 **Get from VCS** 或選取 **File | New | Project from Version Control** 來複製 [專案樣板](http://github.com/kotlin-hands-on/intro-coroutines)。
+2. 在歡迎畫面選擇 **Get from VCS** 或選取 **File | New | Project from Version Control** 來複製[專案樣板](http://github.com/kotlin-hands-on/intro-coroutines)。
 
    您也可以透過命令列複製它：
 
@@ -33,7 +37,7 @@
 
 ### 產生 GitHub 開發者權杖 {id="generate-a-github-developer-token"}
 
-您將在專案中使用 GitHub API。若要獲得存取權限，請提供您的 GitHub 帳戶名稱以及密碼或權杖（token）。如果您啟用了雙重身份驗證，使用權杖就足夠了。
+您將在專案中使用 GitHub API。若要獲得存取權限，請提供您的 GitHub 帳戶名稱以及密碼或權杖（token）。如果您啟用了雙重身分驗證，使用權杖就足夠了。
 
 為[您的帳戶](https://github.com/settings/tokens/new)產生一個新的 GitHub 權杖以使用 GitHub API：
 
@@ -59,7 +63,7 @@
 4. 點擊 _Load contributors_。UI 應該會凍結一段時間，然後顯示貢獻者列表。
 5. 開啟程式輸出以確保資料已載入。每次請求成功後都會記錄貢獻者列表。
 
-實作此邏輯有不同的方式：使用 [阻塞請求](#blocking-requests) 或 [回呼](#callbacks)。您將把這些解決方案與使用 [協同程式](#coroutines) 的解決方案進行比較，並查看如何使用 [管道](#channels) 在不同協同程式之間共享資訊。
+實作此邏輯有不同的方式：使用[阻塞請求](#blocking-requests)或[回呼](#callbacks)。您將把這些解決方案與使用[協同程式](#coroutines)的解決方案進行比較，並查看如何使用[管道](#channels)在不同協同程式之間共享資訊。
 
 ## 阻塞請求 {id="blocking-requests"}
 
@@ -107,7 +111,7 @@ interface GitHubService {
 
     * 首先，您獲取給定組織下的存儲庫列表並將其儲存在 `repos` 列表中。接著針對每個存儲庫請求貢獻者列表，最後將所有列表合併為一個最終的貢獻者列表。
     * `getOrgReposCall()` 與 `getRepoContributorsCall()` 都會回傳 `*Call` 類別的執行個體 (`#1`)。此時尚未發送請求。
-    * 接著調用 `*Call.execute()` 來執行請求 (`#2`)。`execute()` 是一個同步呼叫，會阻塞底層執行緒。
+    * 接著呼叫 `*Call.execute()` 來執行請求 (`#2`)。`execute()` 是一個同步呼叫，會阻塞底層執行緒。
     * 當您收到回應時，會透過呼叫特定的 `logRepos()` 與 `logUsers()` 函式來記錄結果 (`#3`)。如果 HTTP 回應包含錯誤，該錯誤將在此處被記錄。
     * 最後，獲取回應的主體，其中包含您需要的資料。在本教學中，若發生錯誤，您將使用空列表作為結果，並記錄對應的錯誤 (`#4`)。
 
@@ -131,7 +135,7 @@ interface GitHubService {
     * 每行第一個項目是程式啟動後經過的毫秒數，接著是方括號內的執行緒名稱。您可以看到載入請求是從哪個執行緒呼叫的。
     * 每行最後一個項目是實際訊息：載入了多少個存儲庫或貢獻者。
 
-    此日誌輸出說明所有結果都是從主執行緒記錄的。當您使用 _BLOCKING_ 選項執行程式碼時，視窗會凍結且在載入完成前不會對輸入做出反應。所有請求都與呼叫 `loadContributorsBlocking()` 的執行緒在同一個執行緒中執行，即主 UI 執行緒（在 Swing 中是 AWT 事件指派執行緒）。這個主執行緒變得阻塞，這就是 UI 凍結的原因：
+    此記錄輸出說明所有結果都是從主執行緒記錄的。當您使用 _BLOCKING_ 選項執行程式碼時，視窗會凍結且在載入完成前不會對輸入做出反應。所有請求都與呼叫 `loadContributorsBlocking()` 的執行緒在同一個執行緒中執行，即主 UI 執行緒（在 Swing 中是 AWT 事件指派執行緒）。這個主執行緒變得阻塞，這就是 UI 凍結的原因：
 
     ![阻塞的主執行緒](blocking.png){width=700}
     
@@ -226,7 +230,7 @@ interface GitHubService {
 
     透過呼叫 `SwingUtilities.invokeLater`，您可以確保更新結果的 `updateResults()` 呼叫發生在主 UI 執行緒（AWT 事件指派執行緒）上。
 
-然而，如果您嘗試透過 `BACKGROUND` 選項載入貢獻者，您會發現列表雖然更新了，但沒有顯示任何內容。
+然而，如果您嘗試透過 `BACKGROUND` 選項載入貢獻者，您會發現列表雖然更新了，但 UI 沒有顯示任何內容。
 
 ### 任務 2 {id="task-2"}
 
@@ -234,7 +238,7 @@ interface GitHubService {
 
 #### 任務 2 的解答 {initial-collapse-state="collapsed" collapsible="true" id="solution-for-task-2"}
 
-如果您嘗試載入貢獻者，您可以在日誌中看到貢獻者已載入，但結果未顯示。要修正此問題，請對產生的使用者列表呼叫 `updateResults()`：
+如果您嘗試載入貢獻者，您可以在記錄中看到貢獻者已載入，但結果未顯示。要修正此問題，請對產生的使用者列表呼叫 `updateResults()`：
 
 ```kotlin
 thread {
@@ -324,9 +328,9 @@ for ((index, repo) in repos.withIndex()) {   // #1
 
 由於載入請求是並行啟動的，因此無法保證最後一個請求的結果會最後到達。結果可以按任何順序返回。
 
-因此，如果您將目前的索引與 `lastIndex` 比較作為完成條件，您可能會丟失某些存儲庫的結果。
+因此，如果您將目前的索引與 `lastIndex` 比較作為完成條件，您可能會遺失某些存儲庫的結果。
 
-如果處理最後一個存儲庫的請求比之前的一些請求返回得更快（這很可能發生），那麼所有耗時較長的請求結果都將丟失。
+如果處理最後一個存儲庫的請求比之前的一些請求返回得更快（這很可能發生），那麼所有耗時較長的請求結果都將遺失。
 
 修正此問題的一種方法是引入一個索引並檢查是否所有存儲庫都已處理完畢：
 
@@ -367,7 +371,7 @@ updateResults(allUsers.aggregate())
 
 結果接著從主執行緒更新。這比將邏輯委派給子執行緒更直接。
 
-在審查了這三種解決方案嘗試後，您可以看到使用回呼撰寫正確的程式碼是非瑣細且容易出錯的，特別是當涉及多個底層執行緒和同步時。
+在檢視了這三種解決方案嘗試後，您可以看到使用回呼撰寫正確的程式碼是非瑣細且容易出錯的，特別是當涉及多個底層執行緒和同步時。
 
 > 作為額外的練習，您可以使用 RxJava 程式庫透過響應式方法實作相同的邏輯。所有必要的相依性和使用 RxJava 的解決方案都可以在單獨的 `rx` 分支中找到。您也可以完成本教學並實作或檢查建議的 Rx 版本以進行適當的比較。
 >
@@ -375,7 +379,7 @@ updateResults(allUsers.aggregate())
 
 ## 暫停函式 {id="suspending-functions"}
 
-您可以使用暫停函式實作相同的邏輯。定義 API 呼叫為 [暫停函式](composing-suspending-functions.md)，而不是回傳 `Call<List<Repo>>`，如下所示：
+您可以使用暫停函式實作相同的邏輯。定義 API 呼叫為[暫停函式](composing-suspending-functions.md)，而不是回傳 `Call<List<Repo>>`，如下所示：
 
 ```kotlin
 interface GitHubService {
@@ -387,7 +391,7 @@ interface GitHubService {
 ```
 
 * `getOrgRepos()` 被定義為 `suspend` 函式。當您使用暫停函式執行請求時，底層執行緒不會被阻塞。關於其運作方式的更多細節將在稍後的章節中介紹。
-* `getOrgRepos()` 直接回傳結果，而不是回傳 `Call`。如果結果不成功，則會拋出例外。
+* `getOrgRepos()` 直接回傳結果，而不是回傳 `Call`。如果結果不成功，則會擲出例外。
 
 或者，Retrofit 允許回傳包裝在 `Response` 中的結果。在這種情況下，會提供結果主體，並且可以手動檢查錯誤。本教學使用回傳 `Response` 的版本。
 
@@ -486,7 +490,7 @@ launch {
 
 在等待接收回應時，執行緒可以自由地被其他任務佔用。儘管所有請求都在主 UI 執行緒上發生，UI 仍保持回應：
 
-1. 使用 _SUSPEND_ 選項執行程式。日誌確認所有請求都已發送到主 UI 執行緒：
+1. 使用 _SUSPEND_ 選項執行程式。記錄確認所有請求都已發送到主 UI 執行緒：
 
     ```text
     2538 [AWT-EventQueue-0 @coroutine#1] INFO  Contributors - kotlin: loaded 30 repos
@@ -496,11 +500,11 @@ launch {
     11252 [AWT-EventQueue-0 @coroutine#1] INFO  Contributors - kotlin-coroutines-workshop: loaded 1 contributors
     ```
 
-2. 日誌可以顯示對應程式碼是在哪個協同程式上執行的。要啟用它，請開啟 **Run | Edit configurations** 並加入 `-Dkotlinx.coroutines.debug` VM 選項：
+2. 記錄可以顯示對應程式碼是在哪個協同程式上執行的。要啟用它，請開啟 **Run | Edit configurations** 並加入 `-Dkotlinx.coroutines.debug` VM 選項：
 
    ![編輯執行配置](run-configuration.png){width=500}
 
-   使用此選項執行 `main()` 時，協同程式名稱將附加到執行緒名稱。您也可以修改執行所有 Kotlin 檔案的樣板，並預設啟用此選項。
+   使用此選項執行 `main()` 時，協同程式名稱將附加到執行緒名稱。您也可以修改執行所有 Kotlin 檔案的範本，並預設啟用此選項。
 
 現在所有程式碼都在一個協同程式上執行，即上面提到的 "load contributors" 協同程式，標記為 `@coroutine#1`。在等待結果時，您不應重用執行緒來發送其他請求，因為程式碼是循序撰寫的。只有在收到前一個結果時才會發送新請求。
 
@@ -539,7 +543,7 @@ suspend fun loadData(): Int {
 }
 ```
 
-`runBlocking` 被用作正規函式與暫停函式之間，或是阻塞世界與非阻塞世界之間的橋樑。它充當啟動最上層主協同程式的適配器。它主要用於 `main()` 函式和測試中。
+`runBlocking` 被用作正規函式與暫停函式之間，或是阻塞世界與非阻塞世界之間的橋樑。它充當啟動最上層主協同程式的配接器。它主要用於 `main()` 函式和測試中。
 
 > 觀看[此影片](https://www.youtube.com/watch?v=zEZc5AmHQhk)以更深入地了解協同程式。
 >
@@ -624,17 +628,17 @@ deferreds.awaitAll() // List<List<User>>
     }
     ```
 
-2. 執行程式碼並檢查日誌。所有協同程式仍然在主 UI 執行緒上執行，因為尚未採用多執行緒，但您已經可以看到並行執行協同程式的好處。
+2. 執行程式碼並檢查記錄。所有協同程式仍然在主 UI 執行緒上執行，因為尚未採用多執行緒，但您已經可以看到並行執行協同程式的好處。
 3. 若要將此程式碼更改為在通用執行緒池的不同執行緒上執行 "contributors" 協同程式，請指定 `Dispatchers.Default` 作為 `async` 函式的上下文引數：
 
     ```kotlin
     async(Dispatchers.Default) { }
     ```
 
-    * `CoroutineDispatcher` 決定對應的協同程式應在哪些執行緒上執行。如果您不指定一個作為引數，`async` 將使用來自外部作用域的排程器（dispatcher）。
+    * `CoroutineDispatcher` 決定對應的協同程式應在哪些執行緒上執行。如果您不指定一個作為引數，`async` 將使用來自外部作用域的排程器。
     * `Dispatchers.Default` 代表 JVM 上的共用執行緒池。此池提供了一種平行執行的方法。它由與 CPU 核心數一樣多的執行緒組成，但如果只有一個核心，它仍然會有兩個執行緒。
 
-4. 修改 `loadContributorsConcurrent()` 函式中的程式碼，以便在通用執行緒池的不同執行緒上啟動新的協同程式。此外，在發送請求之前加入額外的日誌記錄：
+4. 修改 `loadContributorsConcurrent()` 函式中的程式碼，以便在通用執行緒池的不同執行緒上啟動新的協同程式。此外，在發送請求之前加入額外的記錄：
 
     ```kotlin
     async(Dispatchers.Default) {
@@ -645,7 +649,7 @@ deferreds.awaitAll() // List<List<User>>
     }
     ```
 
-5. 再次執行程式。在日誌中，您可以看到每個協同程式可以在執行緒池中的一個執行緒上啟動，並在另一個執行緒上恢復：
+5. 再次執行程式。在記錄中，您可以看到每個協同程式可以在執行緒池中的一個執行緒上啟動，並在另一個執行緒上恢復：
 
     ```text
     1946 [DefaultDispatcher-worker-2 @coroutine#4] INFO  Contributors - starting loading for kotlin-koans
@@ -657,7 +661,7 @@ deferreds.awaitAll() // List<List<User>>
     2821 [DefaultDispatcher-worker-2 @coroutine#3] INFO  Contributors - ts2kt: loaded 11 contributors
     ```
 
-   例如，在此日誌節選中，`coroutine#4` 在 `worker-2` 執行緒上啟動，並在 `worker-1` 執行緒上繼續。
+   例如，在此記錄節選中，`coroutine#4` 在 `worker-2` 執行緒上啟動，並在 `worker-1` 執行緒上繼續。
 
 在 `src/contributors/Contributors.kt` 中，檢查 _CONCURRENT_ 選項的實作：
 
@@ -670,10 +674,10 @@ deferreds.awaitAll() // List<List<User>>
     ```
 
     * 如果您在主執行緒上啟動新的協同程式時主執行緒正忙，該協同程式將被暫停並排定在該執行緒上執行。協同程式僅在執行緒空閒時才會恢復。
-    * 使用來自外部作用域的排程器被認為是良好的做法，而不是在每個端點上明確指定它。如果您在定義 `loadContributorsConcurrent()` 時不傳遞 `Dispatchers.Default` 作為引數，您可以在任何上下文中呼叫此函式：使用 `Default` 排程器、使用主 UI 執行緒或使用自訂排程器。
+    * 使用來自外部作用域的排程器被視為良好的做法，而不是在每個端點上明確指定它。如果您在定義 `loadContributorsConcurrent()` 時不傳遞 `Dispatchers.Default` 作為引數，您可以在任何上下文中呼叫此函式：使用 `Default` 排程器、使用主 UI 執行緒或使用自訂排程器。
     * 正如您稍後將看到的，從測試中呼叫 `loadContributorsConcurrent()` 時，您可以在帶有 `TestDispatcher` 的上下文中呼叫它，這簡化了測試。這使得該解決方案更加靈活。
 
-2. 要在呼叫端指定排程器，請對專案進行以下更改，同時讓 `loadContributorsConcurrent` 在繼承的上下文中啟動協同程式：
+2. 要在呼叫端指定排程器，請對專案進行以下變更，同時讓 `loadContributorsConcurrent` 在繼承的上下文中啟動協同程式：
 
     ```kotlin
     launch(Dispatchers.Default) {
@@ -730,7 +734,7 @@ fun main() = runBlocking { /* this: CoroutineScope */
 * 如果發生錯誤或使用者改變主意決定撤銷操作，作用域可以自動取消子協同程式。
 * 作用域會自動等待所有子協同程式完成。因此，如果作用域對應於一個協同程式，則父協同程式在其實作作用域中啟動的所有協同程式完成之前不會完成。
 
-使用 `GlobalScope.async` 時，沒有結構將多個協同程式綁定到一個較小的作用域。從全域作用域啟動的協同程式都是獨立的 —— 它們的生命週期僅受整個應用程式生命週期的限制。雖然可以儲存對從全域作用域啟動的協同程式的參照，並等待其完成或明確取消它，但這不會像結構化並行那樣自動發生。
+使用 `GlobalScope.async` 時，沒有結構將多個協同程式繫結到一個較小的作用域。從全域作用域啟動的協同程式都是獨立的 —— 它們的生命週期僅受整個應用程式生命週期的限制。雖然可以儲存對從全域作用域啟動的協同程式的參照，並等待其完成或明確取消它，但這不會像結構化並行那樣自動發生。
 
 ### 取消貢獻者的載入 {id="canceling-the-loading-of-contributors"}
 
@@ -777,7 +781,7 @@ fun main() = runBlocking { /* this: CoroutineScope */
     * 所有 "contributors" 協同程式都在 `GlobalScope` 中啟動，而不是作為協同程式作用域的子項（第 `#2` 行）。
 
 4. 執行程式並選擇 _CONCURRENT_ 選項來載入貢獻者。
-5. 等到所有 "contributors" 協同程式都啟動後，點擊 _Cancel_。日誌顯示沒有新結果，這意味著所有請求確實都被取消了：
+5. 等到所有 "contributors" 協同程式都啟動後，點擊 _Cancel_。記錄顯示沒有新結果，這意味著所有請求確實都被取消了：
 
     ```text
     2896 [AWT-EventQueue-0 @coroutine#1] INFO  Contributors - kotlin: loaded 40 repos
@@ -824,7 +828,7 @@ fun main() = runBlocking { /* this: CoroutineScope */
         private fun Job.setUpCancellation() {
             val loadingJob = this              // #2
     
-            // 如果點擊了 'cancel' 按鈕，則取消載入作業：
+            // 如果點擊了 'cancel' 按鈕，則取消載入工作：
             val listener = ActionListener {
                 loadingJob.cancel()            // #3
                 updateLoadingStatus(CANCELED)
@@ -832,7 +836,7 @@ fun main() = runBlocking { /* this: CoroutineScope */
             // 向 'cancel' 按鈕新增監聽器：
             addCancelListener(listener)
     
-            // 在載入作業完成後更新狀態並移除監聽器
+            // 在載入工作完成後更新狀態並移除監聽器
         }
     }   
     ```
@@ -968,17 +972,17 @@ suspend fun loadContributorsProgress(
 
 ![並行請求](progress-and-concurrency.png){width=700}
 
-若要加入並行，請使用「管道 (channel)」。
+若要加入並行，請使用「管道（channel）」。
 
 ## 管道 {id="channels"}
 
-使用共享可變狀態編寫程式碼非常困難且容易出錯（就像使用回呼的解決方案一樣）。一種更簡單的方法是透過通訊而不是使用共同的可變狀態來共享資訊。協同程式可以透過 **管道 (channels)** 相互通訊。
+使用共享可變狀態編寫程式碼非常困難且容易出錯（就像使用回呼的解決方案一樣）。一種更簡單的方法是透過通訊而不是使用共同的可變狀態來共享資訊。協同程式可以透過 **管道 (channel)** 相互通訊。
 
 管道是通訊原語，允許在協同程式之間傳遞資料。一個協同程式可以向管道 **發送 (send)** 一些資訊，而另一個協同程式可以從中 **接收 (receive)** 這些資訊：
 
 ![使用管道](using-channel.png)
 
-發送（生產）資訊的協同程式通常被稱為 **生產者 (producer)**，而接收（消費）資訊的協同程式被稱為 **消費者 (consumer)**。一個或多個協同程式可以向同一個管道發送資訊，一個或多個協同程式可以從中接收資料：
+發送（生產）資訊的協同程式通常被稱為生產者，而接收（消費）資訊的協同程式被稱為消費者。一個或多個協同程式可以向同一個管道發送資訊，一個或多個協同程式可以從中接收資料：
 
 ![對多個協同程式使用管道](using-channel-many-coroutines.png)
 
@@ -1006,23 +1010,23 @@ interface Channel<E> : SendChannel<E>, ReceiveChannel<E>
 程式庫中定義了幾種型別的管道。它們在內部可以儲存多少元素以及 `send()` 呼叫是否可以被暫停方面有所不同。對於所有管道型別，`receive()` 呼叫的行為都相似：如果管道不為空，它會接收一個元素；否則，它會被暫停。
 
 <deflist collapsible="true">
-   <def title="無限管道 (Unlimited channel)" id="unlimited-channel">
+   <def title="Unlimited channel" id="unlimited-channel">
        <p>無限管道與佇列最為相似：生產者可以向此管道發送元素，它將無限增長。<code>send()</code> 呼叫永遠不會被暫停。如果程式耗盡記憶體，您將收到 <code>OutOfMemoryException</code>。無限管道與佇列的區別在於，當消費者嘗試從空管道接收時，它會被暫停，直到發送了新元素。</p>
-       <img src="unlimited-channel.png" alt="無限管道" width="500"/>
+       <img src="unlimited-channel.png" alt="Unlimited channel" width="500"/>
    </def>
-   <def title="緩衝管道 (Buffered channel)" id="buffered-channel">
+   <def title="Buffered channel" id="buffered-channel">
        <p>緩衝管道的大小受指定數量的限制。生產者可以向此管道發送元素，直到達到大小限制。所有元素都儲存在內部。當管道滿時，下一次 <code>send()</code> 呼叫將被暫停，直到有更多空間可用。</p>
-       <img src="buffered-channel.png" alt="緩衝管道" width="500"/>
+       <img src="buffered-channel.png" alt="Buffered channel" width="500"/>
    </def>
-   <def title="約定管道 (Rendezvous channel)" id="rendezvous-channel">
+   <def title="Rendezvous channel" id="rendezvous-channel">
        <p>「約定 (Rendezvous)」管道是沒有緩衝的管道，與大小為零的緩衝管道相同。其中一個函式 (<code>send()</code> 或 <code>receive()</code>) 始終會被暫停，直到另一個函式被呼叫。</p>
        <p>如果呼叫了 <code>send()</code> 函式，且沒有暫停的 <code>receive()</code> 呼叫準備好處理該元素，則 <code>send()</code> 會被暫停。同樣，如果呼叫了 <code>receive()</code> 函式且管道為空，或者換句話說，沒有暫停的 <code>send()</code> 呼叫準備好發送該元素，則 <code>receive()</code> 呼叫會被暫停。</p>
        <p>「rendezvous」名稱（意為「在約定時間和地點會面」）是指 <code>send()</code> 和 <code>receive()</code> 應該「準時會面」。</p>
-       <img src="rendezvous-channel.png" alt="約定管道" width="500"/>
+       <img src="rendezvous-channel.png" alt="Rendezvous channel" width="500"/>
    </def>
-   <def title="合併管道 (Conflated channel)" id="conflated-channel">
-       <p>發送到合併管道的新元素將覆蓋先前發送的元素，因此接收者將始終只獲得最新的元素。<code>send()</code> 呼叫永遠不會被暫停。</p>
-       <img src="conflated-channel.gif" alt="合併管道" width="500"/>
+   <def title="Conflated channel" id="conflated-channel">
+       <p>發送到合併管道的新元素將覆寫先前發送的元素，因此接收者將始終只獲得最新的元素。<code>send()</code> 呼叫永遠不會被暫停。</p>
+       <img src="conflated-channel.gif" alt="Conflated channel" width="500"/>
    </def>
 </deflist>
 
@@ -1168,7 +1172,7 @@ repo-3 - 800 ms 延遲
 * 這些測試執行時間太長。每個測試大約需要 2 到 4 秒，且您每次都需要等待結果。這不是很有效率。
 * 您不能依賴解決方案執行的精確時間，因為準備和執行程式碼仍需要額外的時間。您可以加入一個常數，但隨後各機器的時間會有所不同。模擬服務的延遲應該高於此常數，以便您能看到差異。如果常數是 0.5 秒，那麼讓延遲為 0.1 秒就不夠了。
 
-更好的方法是使用特殊的框架在多次執行相同程式碼的同時測試時間（這會進一步增加總時間），但這學起來很複雜且設定繁瑣。
+更好的方法是使用特殊的架構在多次執行相同程式碼的同時測試時間（這會進一步增加總時間），但這學起來很複雜且設定繁瑣。
 
 為了解決這些問題並確保具有提供測試延遲的解決方案如預期運作（一個比另一個快），請使用帶有特殊測試排程器的「虛擬 (virtual)」時間。此排程器會追蹤從開始經過的虛擬時間，並即時在實際時間中立即執行所有內容。當您在此排程器上執行協同程式時，`delay` 將立即回傳並推進虛擬時間。
 
@@ -1176,7 +1180,7 @@ repo-3 - 800 ms 延遲
 
 ![總執行時間比較](time-comparison.png){width=700}
 
-要使用虛擬時間，請將 `runBlocking` 調用替換為 `runTest`。`runTest` 接受對 `TestScope` 的延伸 Lambda 作為引數。當您在此特殊作用域內的 `suspend` 函式中呼叫 `delay` 時，`delay` 將增加虛擬時間，而不是在實際時間中延遲：
+要使用虛擬時間，請將 `runBlocking` 呼叫替換為 `runTest`。`runTest` 接受對 `TestScope` 的擴充 Lambda 作為引數。當您在此特殊作用域內的 `suspend` 函式中呼叫 `delay` 時，`delay` 將增加虛擬時間，而不是在實際時間中延遲：
 
 ```kotlin
 @Test
@@ -1221,17 +1225,17 @@ suspend fun bar() = coroutineScope {
 }
 ```
 
-如果在上面的範例中使用 `Dispatchers.Default` 上下文呼叫 `launch`，測試將失敗。您將收到一個例外，指出作業尚未完成。
+如果在上面的範例中使用 `Dispatchers.Default` 上下文呼叫 `launch`，測試將失敗。您將收到一個例外，指出工作尚未完成。
 
 僅當 `loadContributorsConcurrent()` 函式在啟動子協同程式時使用繼承的上下文，而不使用 `Dispatchers.Default` 排程器對其進行修改時，您才能以這種方式測試它。
 
 您可以在「呼叫」函式時指定排程器等上下文元素，而不是在「定義」它時指定，這提供了更大的靈活性且更容易測試。
 
-> 支援虛擬時間的測試 API 是 [實驗性 (Experimental)](components-stability.md) 功能，將來可能會發生變化。
+> 支援虛擬時間的測試 API 是[實驗性 (Experimental)](components-stability.md) 功能，將來可能會發生變化。
 >
 {style="warning"}
 
-預設情況下，如果您使用實驗性測試 API，編譯器會顯示警告。要抑制這些警告，請使用 `@OptIn(ExperimentalCoroutinesApi::class)` 為測試函式或包含測試的整個類別加入註解。加入編譯器引數，指示編譯器您正在使用實驗性 API：
+預設情況下，如果您使用實驗性測試 API，編譯器會顯示警告。要隱藏這些警告，請使用 `@OptIn(ExperimentalCoroutinesApi::class)` 為測試函式或包含測試的整個類別加入註解。加入編譯器引數，指示編譯器您正在使用實驗性 API：
 
 ```kotlin
 compileTestKotlin {
@@ -1256,7 +1260,7 @@ compileTestKotlin {
 
 #### 任務 8 的提示 {initial-collapse-state="collapsed" collapsible="true" id="tip-for-task-8"}
 
-1. 將 `runBlocking` 調用替換為 `runTest`，並將 `System.currentTimeMillis()` 替換為 `currentTime`：
+1. 將 `runBlocking` 呼叫替換為 `runTest`，並將 `System.currentTimeMillis()` 替換為 `currentTime`：
 
     ```kotlin
     @Test
@@ -1268,7 +1272,7 @@ compileTestKotlin {
     }
     ```
 
-2. 取消檢查精確虛擬時間的斷言註解。
+2. 取消檢查精確虛擬時間的判斷提示註解。
 3. 不要忘記加入 `@UseExperimental(ExperimentalCoroutinesApi::class)`。
 
 #### 任務 8 的解答 {initial-collapse-state="collapsed" collapsible="true" id="solution-for-task-8"}
@@ -1283,8 +1287,8 @@ fun testConcurrent() = runTest {
     val totalTime = currentTime - startTime
 
     Assert.assertEquals(
-        "呼叫是並行執行的，因此總虛擬時間應為 2200 ms: " +
-                "1000 用於 repos 請求，加上 max(1000, 1200, 800) = 1200 用於並行貢獻者請求)",
+        "The calls run concurrently, so the total virtual time should be 2200 ms: " +
+                "1000 for repos request plus max(1000, 1200, 800) = 1200 for concurrent contributors requests)",
         expectedConcurrentResults.timeFromStart, totalTime
     )
 }
@@ -1317,4 +1321,4 @@ fun testChannels() = runTest {
 ## 接下來的步驟 {id="what-s-next"}
 
 * 查看 KotlinConf 的 [Asynchronous Programming with Kotlin](https://kotlinconf.com/workshops/) 工作坊。
-* 進一步了解如何使用 [虛擬時間和實驗性測試套件](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-test/)。
+* 進一步了解如何使用[虛擬時間與實驗性測試套件](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-test/)。

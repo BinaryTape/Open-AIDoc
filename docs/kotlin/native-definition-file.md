@@ -13,7 +13,7 @@ Kotlin/Native 允许您使用 C 和 Objective-C 库，让您能够在 Kotlin 中
 2. 在 Kotlin 代码中使用生成的绑定。
 3. 运行 Kotlin/Native 编译器以生成最终的可执行文件。
 
-## 创建并配置定义文件
+## 创建并配置定义文件 {id="create-and-configure-a-definition-file"}
 
 让我们为一个 C 库创建一个定义文件并生成绑定：
 
@@ -60,7 +60,7 @@ Kotlin/Native 允许您使用 C 和 Objective-C 库，让您能够在 Kotlin 中
 > 
 {style="tip"}
 
-## 属性
+## 属性 {id="properties"}
 
 以下是您可以在定义文件中使用的完整属性列表，用于调整生成的二进制文件的内容。
 有关更多信息，请参阅下文的相应章节。
@@ -75,7 +75,7 @@ Kotlin/Native 允许您使用 C 和 Objective-C 库，让您能够在 Kotlin 中
 | [`excludedFunctions`](#忽略特定函数)                                   | 应该忽略的空格分隔的函数名称列表。                                                                                                                                                         |                                              
 | [`staticLibraries`](#包含静态库)                                      | [实验性](components-stability.md#stability-levels-explained)。将静态库包含到 `.klib` 中。                                                                                                              |
 | [`libraryPaths`](#包含静态库)                                         | [实验性](components-stability.md#stability-levels-explained)。`cinterop` 工具在其中搜索要包含在 `.klib` 中的库的空格分隔的目录列表。                                    |
-| `package`                                                                       | 生成的 Kotlin API 的包前缀。                                                                                                                                                                             |
+| [`package`](#设置包名)                                                  | 生成的 Kotlin API 的包前缀。                                                                                                                                                                             |
 | [`headerFilter`](#通过-glob-筛选头文件)                                          | 通过 glob 筛选头文件，并在导入库时仅包含它们。                                                                                                                                                |
 | [`excludeFilter`](#排除头文件)                                                 | 导入库时排除特定的头文件，优先级高于 `headerFilter`。                                                                                                                               |
 | [`strictEnums`](#配置枚举生成)                                        | 应该作为 [Kotlin 枚举](enum-classes.md)生成的空格分隔的枚举列表。                                                                                                                             |
@@ -91,7 +91,7 @@ Kotlin/Native 允许您使用 C 和 Objective-C 库，让您能够在 Kotlin 中
 
 除了属性列表之外，您还可以在定义文件中包含[自定义声明](#添加自定义声明)。
 
-### 导入头文件
+### 导入头文件 {id="import-headers"}
 
 如果 C 库没有 Clang 模块，而是由一组头文件组成，请使用 `headers` 属性指定应导入的头文件：
 
@@ -99,7 +99,7 @@ Kotlin/Native 允许您使用 C 和 Objective-C 库，让您能够在 Kotlin 中
 headers = curl/curl.h
 ```
 
-#### 通过 glob 筛选头文件
+#### 通过 glob 筛选头文件 {id="filter-headers-by-globs"}
 
 您可以使用 `.def` 文件中的筛选属性通过 glob 筛选头文件。要包含头文件中的声明，
 请使用 `headerFilter` 属性。如果头文件与任何 glob 匹配，其声明就会包含在绑定中。
@@ -116,7 +116,7 @@ headerFilter = SomeLibrary/**
 并尽可能精确地指定 glob。在这种情况下，生成的库仅包含必要的声明。
 这有助于避免在升级开发环境中的 Kotlin 或工具时出现各种问题。
 
-#### 排除头文件
+#### 排除头文件 {id="exclude-headers"}
 
 要排除特定的头文件，请使用 `excludeFilter` 属性。这对于删除冗余或有问题的
 头文件并优化编译很有帮助，因为指定头文件中的声明不会包含在绑定中：
@@ -130,7 +130,7 @@ excludeFilter = SomeLibrary/time.h
 >
 {style="note"}
 
-### 导入模块
+### 导入模块 {id="import-modules"}
 
 如果 Objective-C 库具有 Clang 模块，请使用 `modules` 属性指定要导入的模块：
 
@@ -138,7 +138,21 @@ excludeFilter = SomeLibrary/time.h
 modules = UIKit
 ```
 
-### 传递编译器和链接器选项
+### 设置包名 {id="set-the-package-name"}
+
+使用 `package` 属性为生成的 Kotlin API 指定包前缀：
+
+```none
+package = png
+```
+
+如果未指定此属性，编译器将在根包中生成声明。
+
+> `kotlin` 和 `kotlinx.cinterop` 名称已被保留，不能用作包前缀。
+>
+{style="note"}
+
+### 传递编译器和链接器选项 {id="pass-compiler-and-linker-options"}
 
 使用 `compilerOpts` 属性向 C 编译器传递选项，该编译器在后台用于分析头文件。
 要向链接器（用于链接最终的可执行文件）传递选项，请使用 `linkerOpts`。例如：
@@ -159,13 +173,13 @@ compilerOpts.macos_x64 = -DFOO=foo2
 通过此配置，在 Linux 上使用 `-DBAR=bar -DFOO=foo1` 分析头文件，在 macOS 上
 使用 `-DBAR=bar -DFOO=foo2` 分析。请注意，任何定义文件选项都可以同时具有通用部分和特定于平台的部分。
 
-### 忽略特定函数
+### 忽略特定函数 {id="ignore-specific-functions"}
 
 使用 `excludedFunctions` 属性指定应忽略的函数名称列表。如果头文件中声明的
 函数不能保证是可调用的，并且很难或不可能自动确定这一点，则此属性非常有用。
 您还可以使用此属性来解决互操作本身中的错误。
 
-### 包含静态库
+### 包含静态库 {id="include-a-static-library"}
 
 <primary-label ref="experimental-general"/>
 
@@ -183,22 +197,22 @@ libraryPaths = /opt/local/lib /usr/local/opt/curl/lib
 
 在程序中使用这样的 `klib` 时，库会自动链接。
 
-### 配置枚举生成
+### 配置枚举生成 {id="configure-enums-generation"}
 
 使用 `strictEnums` 属性将枚举生成为 Kotlin 枚举，或使用 `nonStrictEnums` 将其生成为整数值。
 如果枚举未包含在这些列表中的任何一个中，则根据启发式方法生成它。
 
-### 设置字符串转换
+### 设置字符串转换 {id="set-up-string-conversion"}
 
 使用 `noStringConversion` 属性禁用将 `const char*` 函数形参自动转换为 Kotlin `String`。
 
-### 允许调用非指定初始化器
+### 允许调用非指定初始化器 {id="allow-calling-a-non-designated-initializer"}
 
 默认情况下，Kotlin/Native 编译器不允许将非指定的 Objective-C 初始化器作为 `super()`
 构造函数调用。如果库中未正确标记指定的 Objective-C 初始化器，此行为可能会带来不便。
 要禁用这些编译器检查，请使用 `disableDesignatedInitializerChecks` 属性。
 
-### 处理 Objective-C 异常
+### 处理 Objective-C 异常 {id="handle-objective-c-exceptions"}
 
 默认情况下，如果 Objective-C 异常达到 Objective-C 与 Kotlin 互操作边界并进入
 Kotlin 代码，程序将会崩溃。
@@ -206,7 +220,7 @@ Kotlin 代码，程序将会崩溃。
 要将 Objective-C 异常传播到 Kotlin，请通过 `foreignExceptionMode = objc-wrap` 属性启用包装。
 在这种情况下，Objective-C 异常会被转换为获得 `ForeignException` 类型的 Kotlin 异常。
 
-### 帮助解决链接器错误
+### 帮助解决链接器错误 {id="help-resolve-linker-errors"}
 
 当 Kotlin 库依赖于 C 或 Objective-C 库时（例如使用
 [CocoaPods 集成](https://kotlinlang.org/docs/multiplatform/multiplatform-cocoapods-overview.html)），可能会发生链接器错误。如果依赖库未在本地计算机上安装或未在项目构建脚本中显式配置，
@@ -216,7 +230,7 @@ Kotlin 代码，程序将会崩溃。
 为此，请在 `.def` 文件中添加 `userSetupHint=message` 属性，或将 `-Xuser-setup-hint` 编译器选项
 传递给 `cinterop`。
 
-### 添加自定义声明
+### 添加自定义声明 {id="add-custom-declarations"}
 
 有时需要在生成绑定之前向库中添加自定义 C 声明（例如用于[宏](native-c-interop.md#macros)）。
 无需为这些声明创建额外的头文件，您可以直接将它们包含在 `.def` 文件的末尾，
@@ -234,7 +248,7 @@ static inline int getErrno() {
 请注意，`.def` 文件的这一部分被视为头文件的一部分，因此带有主体的函数应声明为 `static`。
 这些声明在包含 `headers` 列表中的文件之后进行解析。
 
-## 使用命令行生成绑定
+## 使用命令行生成绑定 {id="generate-bindings-using-command-line"}
 
 除了定义文件之外，您还可以通过在 `cinterop` 调用中将相应属性作为选项传递来指定绑定中包含的内容。
 
@@ -252,7 +266,7 @@ cinterop -def png.def -compiler-option -I/usr/local/include -o png
   配置脚本的输出（可能没有确切路径）。
 * 带有 `--libs` 的配置脚本输出可以传递给 `linkerOpts` 属性。
 
-## 下一步
+## 下一步 {id="what-s-next"}
 
 * [C 互操作性绑定](native-c-interop.md#bindings)
 * [与 Swift/Objective-C 的互操作性](native-objc-interop.md)

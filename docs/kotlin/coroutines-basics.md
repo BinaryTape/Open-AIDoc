@@ -124,7 +124,7 @@ dependencies {
 
     ```kotlin
     suspend fun greet() {
-        println("线程上的 greet()：${Thread.currentThread().name}")
+        println("The greet() on the thread: ${Thread.currentThread().name}")
     }
     
     suspend fun main() {}
@@ -138,7 +138,7 @@ dependencies {
 
     ```kotlin
     suspend fun greet() {
-        println("线程上的 greet()：${Thread.currentThread().name}")
+        println("The greet() on the thread: ${Thread.currentThread().name}")
         delay(1000L)
     }
    ```
@@ -170,7 +170,7 @@ dependencies {
         withContext(Dispatchers.Default) { // this: CoroutineScope
             // 使用 CoroutineScope.launch() 在作用域内启动协程
             this.launch { greet() }
-            println("线程上的 withContext()：${Thread.currentThread().name}")
+            println("The withContext() on the thread: ${Thread.currentThread().name}")
         }
     }
     ```
@@ -186,7 +186,7 @@ dependencies {
 
     // 定义挂起函数
     suspend fun greet() {
-        println("线程上的 greet()：${Thread.currentThread().name}")
+        println("The greet() on the thread: ${Thread.currentThread().name}")
         // 挂起 1 秒并释放线程
         delay(1.seconds) 
         // 这里的 delay() 函数模拟了一个挂起 API 调用
@@ -202,13 +202,13 @@ dependencies {
    
             // 启动另一个协程
             this.launch() {
-                println("线程上的 CoroutineScope.launch()：${Thread.currentThread().name}")
+                println("The CoroutineScope.launch() on the thread: ${Thread.currentThread().name}")
                 delay(1.seconds)
                 // 这里的 delay 函数模拟了一个挂起 API 调用
                 // 你可以在此处添加挂起 API 调用，例如网络请求
             }
     
-            println("线程上的 withContext()：${Thread.currentThread().name}")
+            println("The withContext() on the thread: ${Thread.currentThread().name}")
         }
     }
     ```
@@ -218,7 +218,7 @@ dependencies {
 
 > 你可以在代码输出中的线程名称旁显示协程名称，以获取额外信息。为此，请在构建工具或 IDE 运行配置中传递 `-Dkotlinx.coroutines.debug` VM 选项。
 >
-> 有关更多信息，请参阅[调试协程](https://github.com/Kotlin/kotlinx.coroutines/blob/master/docs/topics/debugging.md)。
+> 有关更多信息，请参阅[调试协程](coroutines-debugging.md)。
 >
 {style="tip"}
 
@@ -255,17 +255,17 @@ suspend fun main() {
         this.launch {
             this.launch {
                 delay(2.seconds)
-                println("封闭协程的子协程已完成")
+                println("Child of the enclosing coroutine completed")
             }
-            println("子协程 1 已完成")
+            println("Child coroutine 1 completed")
         }
         this.launch {
             delay(1.seconds)
-            println("子协程 2 已完成")
+            println("Child coroutine 2 completed")
         }
     }
     // 仅在 coroutineScope 中的所有子协程都完成后运行
-    println("协程作用域已完成")
+    println("Coroutine scope completed")
 }
 //sampleEnd
 ```

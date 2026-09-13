@@ -275,7 +275,7 @@ kotlin.build.report.output=file
 | `single_file` | 將組建報告以物件格式儲存到指定的本機檔案。 |
 | `build_scan` | 將組建報告儲存在 [build scan](https://scans.gradle.com/) 的 `custom values` 區段。請注意，Gradle Enterprise 外掛程式限制了自訂值的數量及其長度。在大型專案中，某些值可能會遺失。 |
 | `http` | 使用 HTTP(S) 發布組建報告。POST 方法以 JSON 格式傳送指標。您可以在 [Kotlin 儲存庫](https://github.com/JetBrains/kotlin/blob/master/libraries/tools/kotlin-gradle-plugin/src/common/kotlin/org/jetbrains/kotlin/gradle/report/data/GradleCompileStatisticsData.kt) 中查看傳送資料的目前版本。您可以在 [這篇部落格文章](https://blog.jetbrains.com/kotlin/2022/06/introducing-kotlin-build-reports/#enable_build_reports) 中找到 HTTP 端點的範例。 |
-| `json` | 將組建報告以 JSON 格式儲存到本機檔案。在 `kotlin.build.report.json.directory` 中設定組建報告的位置（見下文）。預設名稱為 `${project_name}-build-<date-time>-<index>.json`。 |
+| `json` | 將組建報告以 JSON 格式儲存到本機檔案。預設路徑為 `${project_folder}/build/reports/kotlin-build/${project_name}-build-<date-time>-<index>.json`。 |
 
 以下是 `kotlin.build.report` 的可用選項列表：
 
@@ -287,10 +287,7 @@ kotlin.build.report.output=file,single_file,http,build_scan,json
 # 用於取代已棄用的 `kotlin.internal.single.build.metrics.file` 屬性
 kotlin.build.report.single_file=my/directory/path/some_filename
 
-# 如果使用 json 輸出則為必填。報告存放位置 
-kotlin.build.report.json.directory=my/directory/path
-
-# 選填。基於檔案之報告的輸出目錄。預設值：build/reports/kotlin-build/
+# 選填。基於檔案或 JSON 報告的輸出目錄。預設值：build/reports/kotlin-build/
 kotlin.build.report.file.output_dir=kotlin-reports
 
 # 選填。用於標記組建報告的標籤（例如，偵錯參數）
@@ -317,9 +314,9 @@ kotlin.build.report.include_compiler_arguments=true|false
 
 ### 自訂值限制 {id="limit-of-custom-values"}
 
-為了收集組建掃描的統計數據，Kotlin 組建報告使用 [Gradle 的自訂值 (custom values)](https://docs.gradle.org/enterprise/tutorials/extending-build-scans/)。
+為了收集組建掃描的統計數據，Kotlin 組建報告使用 [Gradle 的自訂值 (custom values)](https://docs.gradle.com/enterprise/tutorials/extending-build-scans/)。
 您和不同的 Gradle 外掛程式都可以將資料寫入自訂值。自訂值的數量有限制。
-請在 [Build scan 外掛程式文件](https://docs.gradle.org/enterprise/gradle-plugin/#adding_custom_values) 中查看目前的自訂值數量上限。
+請在 [Build scan 外掛程式文件](https://docs.gradle.com/enterprise/gradle-plugin/#adding_custom_values) 中查看目前的自訂值數量上限。
 
 如果您有一個大型專案，此類自訂值的數量可能會相當多。如果此數量超過限制，您可能會在日誌中看到以下訊息：
 

@@ -5,7 +5,7 @@ Kotlin 멀티플랫폼 Gradle 플러그인은 Kotlin 멀티플랫폼 프로젝�
 
 ## ID 및 버전 {id="id-and-version"}
 
-Kotlin 멀티플랫폼 Gradle 플러그인의 정규화된 이름(Fully qualified name)은 `org.jetbrains.kotlin.multiplatform`입니다.
+Kotlin 멀티플랫폼 Gradle 플러그인의 정규화된 이름(Fully qualified name)은 `org.jetbrains.kotlin.multiplatform`입니다. 
 Kotlin Gradle DSL을 사용하는 경우 `kotlin("multiplatform")`으로 플러그인을 적용할 수 있습니다.
 플러그인 버전은 Kotlin 릴리스 버전과 일치합니다. 최신 버전은 %kotlinVersion%입니다.
 
@@ -156,12 +156,13 @@ kotlin {
 
 [Kotlin/JS 프로젝트 구성](https://kotlinlang.org/docs/js-project-setup.html)에 대해 더 자세히 알아보세요.
 
-별도의 `wasmWasi {}` 블록은 WASI 시스템 인터페이스를 지원하는 Kotlin/Wasm 타겟의 구성을 설명합니다. 여기서는 [`nodejs`](#node-js) 실행 환경만 사용할 수 있습니다.
+별도의 `wasmWasi {}` 블록은 WASI 시스템 인터페이스를 지원하는 Kotlin/Wasm 타겟의 구성을 설명합니다. 이는 `nodejs` 및 `wasmtime` 실행 환경을 지원합니다.
 
 ```kotlin
 kotlin {
     wasmWasi {
         nodejs()
+        wasmtime()
         binaries.executable()
     }
 }
@@ -474,7 +475,7 @@ kotlin {
 사용 가능한 사전 정의된 소스 세트는 다음과 같습니다.
 
 | **이름**                                    | **설명**                                                                                                                                                                                               | 
-|---------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|-----------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `commonMain`                                | 모든 플랫폼 간에 공유되는 코드 및 리소스입니다. 모든 멀티플랫폼 프로젝트에서 사용할 수 있습니다. 프로젝트의 모든 메인 [컴파일](#compilations)에 사용됩니다.                                                        |
 | `commonTest`                                | 모든 플랫폼 간에 공유되는 테스트 코드 및 리소스입니다. 모든 멀티플랫폼 프로젝트에서 사용할 수 있습니다. 프로젝트의 모든 테스트 컴파일에 사용됩니다.                                                                    |
 | _&lt;targetName&gt;&lt;compilationName&gt;_ | 컴파일을 위한 타겟별 소스입니다. _&lt;targetName&gt;_은 사전 정의된 타겟의 이름이고 _&lt;compilationName&gt;_은 이 타겟에 대한 컴파일의 이름입니다. 예: `jsTest`, `jvmMain`. |
@@ -811,7 +812,7 @@ kotlin {
 
 ### 확장 수준 {id="extension-level"}
 
-프로젝트의 모든 타겟에 대해 컴파일러 옵션을 구성하려면 최상위 레벨에서 `compilerOptions {}` 블록을 사용하세요.
+프로젝트의 모든 타겟에 대해 컴파일러 옵션을 구성하려면 최상위 레벨에서 `compilerOptions {}` 블록을 사용하세요:
 
 <Tabs group="build-script">
 <TabItem title="Kotlin" group-key="kotlin">
@@ -842,7 +843,7 @@ kotlin {
 
 ### 타겟 수준 {id="target-level"}
 
-프로젝트의 특정 타겟에 대해 컴파일러 옵션을 구성하려면 타겟 블록 내부에서 `compilerOptions {}` 블록을 사용하세요.
+프로젝트의 특정 타겟에 대해 컴파일러 옵션을 구성하려면 타겟 블록 내부에서 `compilerOptions {}` 블록을 사용하세요:
 
 <Tabs group="build-script">
 <TabItem title="Kotlin" group-key="kotlin">
@@ -877,7 +878,7 @@ kotlin {
 
 ### 컴파일 단위 수준 {id="compilation-unit-level"}
 
-특정 태스크에 대해 컴파일러 옵션을 구성하려면 태스크 내부에서 `compilerOptions {}` 블록을 사용하세요.
+특정 태스크에 대해 컴파일러 옵션을 구성하려면 태스크 내부에서 `compilerOptions {}` 블록을 사용하세요:
 
 <Tabs group="build-script">
 <TabItem title="Kotlin" group-key="kotlin">
@@ -904,7 +905,7 @@ task.named<KotlinJvmCompile>("compileKotlinJvm") {
 </TabItem>
 </Tabs>
 
-특정 컴파일에 대해 컴파일러 옵션을 구성하려면 해당 컴파일의 태스크 프로바이더 내에서 `compilerOptions {}` 블록을 사용하세요.
+특정 컴파일에 대해 컴파일러 옵션을 구성하려면 해당 컴파일의 태스크 프로바이더 내에서 `compilerOptions {}` 블록을 사용하세요:
 
 <Tabs group="build-script">
 <TabItem title="Kotlin" group-key="kotlin">
@@ -1016,7 +1017,7 @@ kotlin {
 
 최상위 `dependencies {}` 블록을 사용하여 공통 의존성을 구성할 수 있습니다. 여기서 선언된 의존성은 `commonMain` 또는 `commonTest` 소스 세트에 추가된 것처럼 작동합니다.
 
-최상위 `dependencies {}` 블록을 사용하려면 블록 앞에 `@OptIn(ExperimentalKotlinGradlePluginApi::class)` 어노테이션을 추가하여 옵트인해야 합니다.
+최상위 `dependencies {}` 블록을 사용하려면 블록 앞에 `@OptIn(ExperimentalKotlinGradlePluginApi::class)` 어노테이션을 추가하여 옵트인해야 합니다:
 
 <Tabs group="build-script">
 <TabItem title="Kotlin" group-key="kotlin">

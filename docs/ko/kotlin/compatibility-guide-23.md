@@ -685,7 +685,7 @@ _[언어의 현대성 유지](kotlin-evolution-principles.md)_ 및 _[편안한 �
 >
 > **호환성 위반 유형**: 소스
 >
-> **요약**: Kotlin 2.2.20에서 [the `getPluginArtifactForNative()` 함수가 지원 중단되었습니다](whatsnew2220.md#reduced-size-of-kotlin-native-distribution). 대신 [`getPluginArtifact()`](https://kotlinlang.org/api/kotlin-gradle-plugin/kotlin-gradle-plugin-api/org.jetbrains.kotlin.gradle.plugin/-kotlin-compiler-plugin-support-plugin/get-plugin-artifact.html) 함수를 사용하십시오.
+> **요약**: Kotlin 2.2.20에서 [`getPluginArtifactForNative()` 함수가 지원 중단되었습니다](whatsnew2220.md#reduced-size-of-kotlin-native-distribution). 대신 [`getPluginArtifact()`](https://kotlinlang.org/api/kotlin-gradle-plugin/kotlin-gradle-plugin-api/org.jetbrains.kotlin.gradle.plugin/-kotlin-compiler-plugin-support-plugin/get-plugin-artifact.html) 함수를 사용하십시오.
 >
 > **지원 중단 주기**:
 >
@@ -735,6 +735,7 @@ _[언어의 현대성 유지](kotlin-evolution-principles.md)_ 및 _[편안한 �
 > **지원 중단 주기**:
 >
 > - 2.3.20: 경고 보고
+> - 2.4.20: 경고를 오류로 격상
 
 ### `kotlin.kmp.isolated-projects.support` Gradle 속성 지원 중단 {id="deprecate-kotlin-kmp-isolated-projects-support-gradle-property"}
 

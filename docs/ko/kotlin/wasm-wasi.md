@@ -4,14 +4,14 @@
 
 이 튜토리얼에서는 다양한 WebAssembly 가상 머신(virtual machines)에서 [WebAssembly System Interface (WASI)](https://wasi.dev/)를 사용하여 간단한 [Kotlin/Wasm](wasm-overview.md) 애플리케이션을 실행하는 방법을 보여줍니다.
 
-[Node.js](https://nodejs.org/en), [Deno](https://deno.com/) 및 [WasmEdge](https://wasmedge.org/) 가상 머신에서 실행되는 애플리케이션 예제를 확인할 수 있습니다. 결과물은 표준 WASI API를 사용하는 간단한 애플리케이션입니다.
+[Node.js](https://nodejs.org/en), [Wasmtime](https://docs.wasmtime.dev), [Deno](https://deno.com/) 및 [WasmEdge](https://wasmedge.org/) 가상 머신에서 실행되는 애플리케이션 예제를 확인할 수 있습니다. 결과물은 표준 WASI API를 사용하는 간단한 애플리케이션입니다.
 
 현재 Kotlin/Wasm은 Preview 1으로도 알려진 WASI 0.1을 지원합니다. WASI 0.2에 대한 지원은 향후 릴리스에서 계획되어 있습니다.
 [WASI 0.2 지원에 대한 업데이트는 이 YouTrack 이슈를 팔로우하세요](https://youtrack.jetbrains.com/issue/KT-64568). 
 
-[`wasmWasi`](wasm-overview.md#kotlin-wasm-and-wasi) 타겟은 [기본적으로 새로운 예외 처리 제안(exception handling proposal)을 사용](wasm-configuration.md#exception-handling-proposal)하여 현대적인 WebAssembly 런타임과의 호환성을 보장합니다.
+[`wasmWasi`](wasm-overview.md#kotlin-wasm-and-wasi) 타겟은 [기본적으로 새로운 예외 처리 제안(exception handling proposal)을 사용](wasm-configuration.md#exception-handling-proposal)하여 현대적인 WebAssembly 런타임과의 더 나은 호환성을 보장합니다.
 
-> Kotlin/Wasm 툴체인은 Node.js 태스크(`wasmWasiNode*`)를 기본적으로 제공합니다.
+> Kotlin/Wasm 툴체인은 Node.js 태스크(`wasmWasiNode*`)와 Wasmtime 태스크(`wasmWasiWasmtime*`)를 기본적으로 제공합니다.
 > Deno 또는 WasmEdge를 활용하는 프로젝트의 다른 태스크 변체들은 커스텀 태스크로 포함되어 있습니다.
 >
 {style="tip"}
@@ -40,9 +40,10 @@
 
 2. **kotlin-wasm-wasi-example** | **Tasks** | **kotlin node**에서 다음 Gradle 태스크 중 하나를 선택하여 실행합니다:
 
-   * Node.js에서 애플리케이션을 실행하려면 **wasmWasiNodeRun**.
-   * Deno에서 애플리케이션을 실행하려면 **wasmWasiDenoRun**.
-   * WasmEdge에서 애플리케이션을 실행하려면 **wasmWasiWasmEdgeRun**.
+   * Node.js에서 애플리케이션을 실행하려면 **wasmWasiNodeDevelopmentRun**.
+   * Wasmtime에서 애플리케이션을 실행하려면 **wasmWasiWasmtimeDevelopmentRun**.
+   * Deno에서 애플리케이션을 실행하려면 **wasmWasiDenoDevelopmentRun**.
+   * WasmEdge에서 애플리케이션을 실행하려면 **wasmWasiWasmEdgeDevelopmentRun**.
 
      > Windows 플랫폼에서 Deno를 사용하는 경우 `deno.exe`가 설치되어 있는지 확인하세요. 자세한 내용은
      > [Deno 설치 문서](https://docs.deno.com/runtime/manual/getting_started/installation)를 참조하세요.
@@ -56,19 +57,25 @@
 * Node.js에서 애플리케이션 실행:
 
   ```bash
-  ./gradlew wasmWasiNodeRun
+  ./gradlew wasmWasiNodeDevelopmentRun
+  ```
+
+* Wasmtime에서 애플리케이션 실행:
+
+  ```bash
+  ./gradlew wasmWasiWasmtimeDevelopmentRun
   ```
 
 * Deno에서 애플리케이션 실행:
 
   ```bash
-  ./gradlew wasmWasiDenoRun
+  ./gradlew wasmWasiDenoDevelopmentRun
   ```
 
 * WasmEdge에서 애플리케이션 실행:
 
   ```bash
-  ./gradlew wasmWasiWasmEdgeRun
+  ./gradlew wasmWasiWasmEdgeDevelopmentRun
   ```
 
 애플리케이션이 성공적으로 빌드되면 터미널에 메시지가 표시됩니다:
@@ -82,6 +89,7 @@
 Gradle 도구 창의 **kotlin-wasm-wasi-example** | **Tasks** | **verification**에서 다음 Gradle 태스크 중 하나를 실행합니다:
 
 * Node.js에서 애플리케이션을 테스트하려면 **wasmWasiNodeTest**.
+* Wasmtime에서 애플리케이션을 테스트하려면 **wasmWasiWasmtimeTest**.
 * Deno에서 애플리케이션을 테스트하려면 **wasmWasiDenoTest**.
 * WasmEdge에서 애플리케이션을 테스트하려면 **wasmWasiWasmEdgeTest**.
 
@@ -93,6 +101,12 @@ Gradle 도구 창의 **kotlin-wasm-wasi-example** | **Tasks** | **verification**
 
   ```bash
   ./gradlew wasmWasiNodeTest
+  ```
+
+* Wasmtime에서 애플리케이션 테스트:
+
+  ```bash
+  ./gradlew wasmWasiWasmtimeTest
   ```
    
 * Deno에서 애플리케이션 테스트:
@@ -106,10 +120,6 @@ Gradle 도구 창의 **kotlin-wasm-wasi-example** | **Tasks** | **verification**
   ```bash
   ./gradlew wasmWasiWasmEdgeTest
   ```
-
-터미널에 테스트 결과가 표시됩니다:
-
-![Kotlin/Wasm 및 WASI 테스트 결과](wasm-wasi-tests-results.png){width=600}
 
 ## 다음 단계는? {id="what-s-next"}
 

@@ -69,6 +69,17 @@ kotlinc-native main.kt -Xbinary=enableSafepointSignposts=true
         <td width="80">狀態</td>
     </tr>
     <tr>
+        <td><a href="native-improving-compilation-time.md#enable-caches-for-release-binaries"><code>enableReleaseBinaryCache</code></a></td>
+        <td>
+            <list>
+                <li><code>true</code></li>
+                <li><code>false</code> (預設)</li>
+            </list>
+        </td>
+        <td>啟用編譯器在發佈模式下使用快取，以犧牲某些編譯器最佳化為代價來加快組建速度。</td>
+        <td>自 2.4.20 起為實驗性</td>
+    </tr>
+    <tr>
         <td><a href="native-objc-interop.md#explicit-parameter-names-in-objective-c-block-types"><code>objcExportBlockExplicitParameterNames</code></a></td>
         <td>
             <list>

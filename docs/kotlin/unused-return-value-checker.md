@@ -46,8 +46,8 @@ fun formatGreeting(name: String): String {
 它具有以下模式：
 
 * `disable` 禁用未使用的返回值检查器（默认）。
-* `check` 启用检查器，并针对来自 [已标记函数](#标记要检查被忽略结果的函数) 的被忽略结果报告警告。
-* `full` 启用检查器，将项目中的所有函数都视为 [已标记](#标记要检查被忽略结果的函数)，并报告被忽略结果的警告。
+* `check` 启用检查器，并针对来自 [已标记函数](#mark-functions-to-check-ignored-results) 的被忽略结果报告警告。
+* `full` 启用检查器，将项目中的所有函数都视为 [已标记](#mark-functions-to-check-ignored-results)，并报告被忽略结果的警告。
 
 > 所有已标记的函数都会按原样传播，如果在使用你代码作为依赖项的项目中启用了该检查器，则会报告被忽略的结果。
 > 
@@ -88,12 +88,12 @@ kotlin {
 
 ## 标记要检查被忽略结果的函数 {id="mark-functions-to-check-ignored-results"}
 
-当你将 [-Xreturn-value-checker 编译器选项](#配置未使用的返回值检查器) 设置为 `check` 时，
+当你将 [-Xreturn-value-checker 编译器选项](#configure-the-unused-return-value-checker) 设置为 `check` 时，
 检查器仅报告来自已标记表达式（例如 Kotlin 标准库中的大多数函数）中被忽略的结果。
 
 要标记你自己的代码， 
-请使用 [`@MustUseReturnValues`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-must-use-return-value/) 注解。
-你可以根据希望检查器覆盖的范围，将其应用于文件、类或函数。
+请使用 [`@MustUseReturnValues`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-must-use-return-values/) 注解。
+你可以根据希望检查器覆盖的作用域，将其应用于文件、类或函数。
 
 例如，你可以标记整个文件：
 
@@ -147,7 +147,7 @@ fun main() {
     // 报告警告：结果被忽略
     computeValue()
 
-    // 仅在调用处通过特殊的未使用变量来抑制警告
+    // 仅在调用站点通过特殊的未使用变量来抑制警告
     val _ = computeValue()
 }
 ```
@@ -157,7 +157,7 @@ fun main() {
 当你重写函数时，重写后的函数会继承基类声明中注解所定义的报告规则。
 这也适用于基类声明属于 Kotlin 标准库或其他库依赖项的情况，因此检查器会针对 `Any.hashCode()` 等函数的重写报告被忽略的结果。
 
-此外，你不能使用一个 [要求必须使用返回值的函数](#标记要检查被忽略结果的函数) 来重写标记了 `@IgnorableReturnValue` 的函数。
+此外，你不能使用一个 [要求必须使用返回值的函数](#mark-functions-to-check-ignored-results) 来重写标记了 `@IgnorableReturnValue` 的函数。
 但是，在标注了 `@MustUseReturnValues` 的类或接口中，如果某个函数的结果可以被安全忽略，你可以为该重写函数标记 `@IgnorableReturnValue`：
 
 ```kotlin
@@ -182,7 +182,7 @@ fun check(g: Greeter) {
 
 ## 在高阶函数中检查未使用的结果 {id="check-for-unused-results-in-higher-order-functions"}
 
-一些高阶函数，例如 `let` 作用域函数，会返回 lambda 的结果。
+一些高阶函数，例如 `let` 作用域函数，会返回 lambda 表达式的结果。
 要检查高阶函数中未使用的 lambda 结果，请将 [实验性](components-stability.md#stability-levels-explained) 的 `returnsResultOf()` 契约添加到该函数的契约中。
 
 > Kotlin 契约是实验性的。要启用它，请在声明带有契约的函数时添加 `@OptIn(ExperimentalContracts::class)` 注解。

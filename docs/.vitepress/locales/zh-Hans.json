@@ -692,5 +692,7 @@
   "kotlin.mapping-struct-union-types-from-c": "结构体与联合体类型",
   "kotlin.mapping-function-pointers-from-c": "函数指针",
   "kotlin.mapping-strings-from-c": "字符串",
-  "kmp.compose-desktop-tabbing": "Tab 键导航"
+  "kmp.compose-desktop-tabbing": "Tab 键导航",
+  "kotlin.whatsnew2420": "Kotlin 2.4.20",
+  "coroutines.coroutine-debugging": "协程调试"
 }

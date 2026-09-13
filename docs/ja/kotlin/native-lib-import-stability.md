@@ -118,7 +118,7 @@ public fun getDate(): String = NSDate().toString()
 
 サードパーティのネイティブライブラリにカスタムパッケージ名を使用すると、互換性の問題を回避できる場合があります。
 
-ネイティブライブラリが Kotlin にインポートされると、Kotlin のパッケージ名が割り当てられます。これが一意でない場合、ライブラリユーザーは衝突（クラス）に遭遇する可能性があります。たとえば、ネイティブライブラリがユーザーのプロジェクトの他の場所や他の依存関係で同じパッケージ名でインポートされている場合、これら 2 つの使用箇所が衝突します。
+ネイティブライブラリが Kotlin にインポートされると、Kotlin のパッケージ名が割り当てられます。これが一意でない場合、ライブラリユーザーは衝突（クラッシュ）に遭遇する可能性があります。たとえば、ネイティブライブラリがユーザーのプロジェクトの他の場所や他の依存関係で同じパッケージ名でインポートされている場合、これら 2 つの使用箇所が衝突します。
 
 そのような場合、コンパイルが `Linking globals named '...': symbol multiply defined!` エラーで失敗する可能性があります。ただし、他のエラーが発生したり、あるいはコンパイルに成功したりすることもあります。
 
@@ -157,10 +157,11 @@ Kotlin/Native は、純粋な Swift ライブラリの直接インポートを�
 
 しかし、ほとんどの場合、**リバースインポート（reverse import）**アプローチを使用することをお勧めします。これは、Kotlin 側で期待される動作を定義し、Swift 側で実際の機能を実装して、それを Kotlin に戻すという方法です。
 
-期待される部分は、次の 2 つのいずれかの方法で定義できます。
+期待される部分は、次のいずれかの方法で定義できます。
 
 * インターフェースを作成する。インターフェースベースのアプローチは、複数の機能やテストのしやすさにおいて、より拡張性があります。
 * Swift のクロージャを使用する。クイックプロトタイプには適していますが、このアプローチには制限があります（たとえば、状態を保持できません）。
+* [Swift エクスポート](native-swift-export.md)を使用する。Objective-C のブリッジなしで、Swift で Kotlin インターフェースを直接実装し、その Swift オブジェクトを Kotlin に戻すことができます。
 
 純粋な Swift ライブラリである [CryptoKit](https://developer.apple.com/documentation/cryptokit/) を Kotlin プロジェクトにリバースインポートする例を考えてみましょう。
 
@@ -178,36 +179,36 @@ Kotlin/Native は、純粋な Swift ライブラリの直接インポートを�
 
 2. Kotlin 側で、`MainViewController` からプラットフォーム固有の実装を渡し、それを `App` コンポーザブルでパラメータとして受け取って、必要な場所で使用します。
 
-    ```kotlin
-    // App.kt
-    @Composable
-    fun App(cryptoProvider: CryptoProvider) {
-        // UI 内での使用例
-        val hashed = cryptoProvider.hashMD5("Hello, world!")
-        androidx.compose.material3.Text("Compose: $hashed")
-    }
-    ```
+   ```kotlin
+   // App.kt
+   @Composable
+   fun App(cryptoProvider: CryptoProvider) {
+       // UI 内での使用例
+       val hashed = cryptoProvider.hashMD5("Hello, world!")
+       androidx.compose.material3.Text("Compose: $hashed")
+   }
+   ```
 
-    ```kotlin
-    // MainViewController.kt
-    fun MainViewController(cryptoProvider: CryptoProvider) = ComposeUIViewController {
-        App(cryptoProvider)
-    }
-    ```
+   ```kotlin
+   // MainViewController.kt
+   fun MainViewController(cryptoProvider: CryptoProvider) = ComposeUIViewController {
+       App(cryptoProvider)
+   }
+   ```
 
 3. Swift 側で、純粋な Swift ライブラリである CryptoKit を使用して、MD5 ハッシュ機能を実装します。
 
-    ```swift
-    // iosApp/ContentView.swift
-    import CryptoKit
-    
-    class IosCryptoProvider: CryptoProvider {
-        func hashMD5(input: String) -> String {
-            guard let data = input.data(using: .utf8) else { return "failed" }
-            return Insecure.MD5.hash(data: data).description
-        }
-    }
-    ```
+   ```swift
+   // iosApp/ContentView.swift
+   import CryptoKit
+  
+   class IosCryptoProvider: CryptoProvider {
+       func hashMD5(input: String) -> String {
+           guard let data = input.data(using: .utf8) else { return "failed" }
+           return Insecure.MD5.hash(data: data).description
+       }
+   }
+   ```
 
 4. Swift の実装を Kotlin コンポーネントに渡します。
 
@@ -263,6 +264,43 @@ Kotlin/Native は、純粋な Swift ライブラリの直接インポートを�
         func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
     }
     ```
+
+</tab>
+<tab title="Swift エクスポート">
+
+1. Kotlin 側で、インターフェース、それを受け取る関数、および Swift の実装が継承できる `open` なベースクラスを宣言します。
+
+   ```kotlin
+   // CryptoProvider.kt
+   interface CryptoProvider {
+       fun hashMD5(input: String): String
+   }
+
+   fun processHash(provider: CryptoProvider, input: String): String = provider.hashMD5(input)
+
+   open class SwiftBase
+   ```
+
+2. Swift 側で、エクスポートされた `SwiftBase` クラスを継承し、純粋な Swift ライブラリである CryptoKit を使用してインターフェースを実装し、そのオブジェクトを Kotlin に戻します。
+
+   ```swift
+   // iosApp/ContentView.swift
+   import CryptoKit
+
+   final class IosCryptoProvider: SwiftBase, CryptoProvider {
+       func hashMD5(input: String) -> String {
+           guard let data = input.data(using: .utf8) else { return "failed" }
+           return Insecure.MD5.hash(data: data).description
+       }
+   }
+
+   let provider = IosCryptoProvider()
+
+   // Swift の hashMD5() を呼び戻す Kotlin 関数を呼び出す
+   print(processHash(provider: provider, input: "Hello, world!"))
+   ```
+
+Kotlin が Swift オブジェクトを受け取ると、通常の Kotlin インターフェースの実装として扱い、Swift コードを直接呼び出します。
 
 </tab>
 </tabs>

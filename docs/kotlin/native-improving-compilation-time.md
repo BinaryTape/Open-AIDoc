@@ -67,16 +67,30 @@ Kotlin/Native 支持两种构建模式：[debug 和 release](https://kotlinlang.
 >
 {style="tip"}
 
-### 减小 release 二进制文件的大小 {id="enable-caches-for-release-binaries"}
+### 为 release 二进制文件启用缓存 {id="enable-caches-for-release-binaries"}
+<primary-label ref="experimental-opt-in"/>
+
+默认情况下，Kotlin/Native 在链接时优化 (LTO) 模式下编译 release 二进制文件：所有模块都会一起编译和优化。这使得 release 二进制文件在运行时的速度更快，但会显著增加编译时间。
+
+如果您希望优先考虑更快的编译速度而非某些编译器优化，可以在 release 模式下启用缓存。要启用缓存，请将以下两个选项添加到您的 `gradle.properties` 文件中：
+
+```properties
+# 允许编译器在 release 模式下使用缓存
+kotlin.native.binary.enableReleaseBinaryCache=true
+# 使 Kotlin Gradle 插件使用 `-Xauto-cache-from` 及相关选项调用编译器
+kotlin.internal.native.enableReleaseBinaryCache=true
+```
+
+> 该功能正在积极开发中，因此运行时性能仍有改进空间。性能改进计划在即将发布的 Kotlin 版本中推出。
+> 
+{style="warning"}
+
+### 减小 release 二进制文件的大小 {id="reduce-the-size-of-release-binaries"}
 <primary-label ref="experimental-opt-in"/>
 
 要减小 release 二进制文件的大小并提高构建时间，请尝试 [启用二进制选项](native-binary-options.md#how-to-enable) `smallBinary`。
 
 它会有效地将 `-Oz` 设置为编译器在 LLVM 编译阶段的默认优化参数。该选项仍处于 [实验性](components-stability.md#stability-levels-explained) 阶段，在某些情况下可能会影响运行时性能。
-
-### 不要禁用 Gradle daemon {id="reduce-the-size-of-release-binaries"}
-
-如果没有充分的理由，请不要禁用 [Gradle daemon](https://docs.gradle.org/current/userguide/gradle_daemon.html)。默认情况下，[Kotlin/Native 在 Gradle daemon 中运行](https://blog.jetbrains.com/kotlin/2020/03/kotlin-1-3-70-released/#kotlin-native)。启用它后，将使用相同的 JVM 进程，无需为每次编译重新预热。
 
 ### 不要使用传递导出 {id="don-t-use-transitive-export"}
 
@@ -105,19 +119,19 @@ Gradle [配置缓存](https://docs.gradle.org/current/userguide/configuration_ca
 
 ### 启用之前禁用的功能 {id="enable-previously-disabled-features"}
 
-有些 Kotlin/Native 属性会禁用 Gradle daemon 和编译器缓存：
+您过去可能为了规避构建问题而禁用了一些 Kotlin/Native 功能。例如：
 
-* `kotlin.native.disableCompilerDaemon=true`
-* Gradle 构建文件 `binaries {}` 块中的 [`disableNativeCache`](https://kotlinlang.org/docs/multiplatform/multiplatform-dsl-reference.html#binaries) DSL。
+* `kotlin.native.disableCompilerDaemon=true` 禁用了 [Gradle daemon](https://docs.gradle.org/current/userguide/gradle_daemon.html)。
+* `disableNativeCache` 禁用了 [编译缓存](https://kotlinlang.org/docs/multiplatform/multiplatform-dsl-reference.html#binaries)。
 
-如果您之前在使用这些功能时遇到问题，并将这些行添加到了 `gradle.properties` 文件或 Gradle 构建文件中，请移除它们并检查构建是否可以成功完成。这些属性可能是之前为了解决已修复的问题而添加的。
+最初需要这些变通方案的问题可能已经得到修复。如果您的 `gradle.properties` 文件或 Gradle 构建文件中包含这些行，请将其移除并检查构建是否可以成功完成。
 
 ### 尝试 klib 工件的增量编译 {id="try-incremental-compilation-of-klib-artifacts"}
-<primary-label ref="experimental-opt-in"/>
+<primary-label ref="beta"/>
 
 使用增量编译，如果项目模块生成的 `klib` 工件只有一部分发生变化，则只有 `klib` 的一部分会被进一步重新编译为二进制文件。
 
-此功能处于 [实验性](components-stability.md#stability-levels-explained) 阶段。要启用它，请将以下选项添加到您的 `gradle.properties` 文件中：
+此功能处于 [Beta](components-stability.md#stability-levels-explained) 阶段。要启用它，请将以下选项添加到您的 `gradle.properties` 文件中：
 
 ```properties
 kotlin.incremental.native=true

@@ -23,11 +23,6 @@
 
 6. 为 Gradle 选择 **Kotlin** DSL。
 7. 勾选 **添加示例代码 (Add sample code)** 复选框，以创建一个带有示例 `"Hello World!"` 应用程序的文件。
-
-   > 您还可以启用 **通过入门提示生成代码 (Generate code with onboarding tips)** 选项，以为您的示例代码添加一些额外的有用注释。
-   >
-   {style="tip"}
-
 8. 点击 **创建 (Create)**。
 
 您已成功使用 Gradle 创建了一个项目！
@@ -55,7 +50,7 @@ plugins {
     kotlin("jvm") version "%kotlinVersion%" // 要使用的 Kotlin 版本
 }
 
-group = "org.example" // 公司名称，例如 `org.jetbrains`
+group = "org.example" // 公司名称，例如 `org.jetbrains.kotlin`
 version = "1.0-SNAPSHOT" // 分配给构建构件的版本
 
 repositories { // 依赖项来源。参见 1️⃣
@@ -67,16 +62,21 @@ dependencies { // 您想要使用的所有库。参见 3️⃣
     testImplementation(kotlin("test")) // Kotlin 测试库
 }
 
-tasks.test { // 参见 4️⃣
-    useJUnitPlatform() // 用于测试的 JUnitPlatform。参见 5️⃣
+kotlin { // 生成的 JVM 工具链配置。参见 4️⃣
+    jvmToolchain(25) // 用于编译项目的 JDK。
+}
+
+tasks.test { // 测试任务配置。参见 5️⃣ 
+    useJUnitPlatform() // 用于测试的 JUnitPlatform。参见 6️⃣
 }
 ```
 
 * 1️⃣ 详细了解 [依赖项来源](https://docs.gradle.org/current/userguide/declaring_repositories.html)。
 * 2️⃣ [Maven 中央仓库](https://central.sonatype.com/)。也可以是 [Google 的 Maven 仓库](https://maven.google.com/) 或您公司的私有仓库。
-* 3️⃣ 详细了解 [声明依赖项](https://docs.gradle.org/current/userguide/declaring_dependencies.html)。 
-* 4️⃣ 详细了解 [任务 (tasks)](https://docs.gradle.org/current/dsl/org.gradle.api.Task.html)。
-* 5️⃣ [用于测试的 JUnitPlatform](https://docs.gradle.org/current/javadoc/org/gradle/api/tasks/testing/Test.html#useJUnitPlatform)。
+* 3️⃣ 详细了解 [声明依赖项](https://docs.gradle.org/current/userguide/declaring_dependencies.html)。
+* 4️⃣ 详细了解 [Java 工具链支持](gradle-configure-project.md#gradle-java-toolchains-support)。
+* 5️⃣ 详细了解 [任务 (tasks)](https://docs.gradle.org/current/dsl/org.gradle.api.Task.html)。
+* 6️⃣ [用于测试的 JUnitPlatform](https://docs.gradle.org/current/javadoc/org/gradle/api/tasks/testing/Test.html#useJUnitPlatform)。
 
 如您所见，Gradle 构建文件中添加了一些 Kotlin 特有的构件：
 
@@ -89,9 +89,9 @@ tasks.test { // 参见 4️⃣
 
 1. 通过选择 **视图 (View)** | **工具窗口 (Tool Windows)** | **Gradle** 打开 Gradle 窗口：
 
-   ![包含 main 函数的 Main.kt](jvm-gradle-view-build.png){width=700}
+   ![包含 main 函数的 Main.kt](jvm-gradle-view-build.png){width=450}
 
-2. 执行 `Tasks\build\` 中的 **build** Gradle 任务。在 **构建 (Build)** 窗口中，会出现 `BUILD SUCCESSFUL`。
+2. 执行 `Tasks/build` 中的 **build** Gradle 任务。在 **构建 (Build)** 窗口中，会出现 `BUILD SUCCESSFUL`。
    这意味着 Gradle 成功构建了应用程序。
 
 3. 在 `src/main/kotlin` 中，打开 `Main.kt` 文件：
@@ -104,7 +104,7 @@ tasks.test { // 参见 4️⃣
 
 您可以在 **运行 (Run)** 工具窗口中查看结果：
 
-![Kotlin 运行输出](jvm-output-gradle.png){width=600}
+![Kotlin 运行输出](jvm-output-gradle.png){width=700}
 
 恭喜！您刚刚运行了您的第一个 Kotlin 应用程序。
 

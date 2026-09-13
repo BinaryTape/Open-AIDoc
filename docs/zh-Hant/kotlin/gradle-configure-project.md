@@ -49,7 +49,8 @@ plugins {
 
 | KGP 版本       | Gradle 最小與最大版本                 | AGP 最小與最大版本                                  |
 |---------------|---------------------------------------|-----------------------------------------------------|
-| 2.4.0-2.4.10  | %minGradleVersion%–%maxGradleVersion% | %minAndroidGradleVersion%–%maxAndroidGradleVersion% |
+| 2.4.20        | %minGradleVersion%–%maxGradleVersion% | %minAndroidGradleVersion%–%maxAndroidGradleVersion% |
+| 2.4.0-2.4.10  | 7.6.3–9.5.0                           | 8.5.2–9.1.0                                         |
 | 2.3.20–2.3.21 | 7.6.3–9.3.0                           | 8.2.2–9.0.0                                         |
 | 2.3.10        | 7.6.3–9.0.0                           | 8.2.2–9.0.0                                         |
 | 2.3.0         | 7.6.3–9.0.0                           | 8.2.2–8.13.0                                        |
@@ -96,10 +97,10 @@ plugins {
 
 您可以將屬性新增到專案的 `gradle.properties` 檔案中來配置此行為：
 
-| Gradle 屬性                                         | 描述                                                                                                                                       |
+| Gradle 屬性                                         | 描述                                                                                                                                              |
 |-----------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
-| `kotlin.project.persistent.dir`                     | 配置儲存專案層級資料的位置。預設值：`<project-root-directory>/.kotlin`                                      |
-| `kotlin.project.persistent.dir.gradle.disableWrite` | 控制是否停用將 Kotlin 資料寫入 `.gradle` 目錄（為了與舊版 IDEA 版本向後相容）。預設值：false |
+| `kotlin.project.persistent.dir`                     | 配置儲存專案層級資料的位置。預設值：`<project-root-directory>/.kotlin`                                                                             |
+| `kotlin.project.persistent.dir.gradle.disableWrite` | 控制是否停用將 Kotlin 資料寫入 `.gradle` 目錄（為了與舊版 IDEA 版本向後相容）。預設值：false                                                      |
 
 ## 以 JVM 為目標 {id="targeting-the-jvm"}
 
@@ -252,11 +253,11 @@ plugins {
 </tab>
 </tabs>
 
-當組建指令碼中沒有關於 `jvmTarget` 值的明確資訊時，其預設值為 `null`，編編譯器將其轉換為預設值 `1.8`。`targetCompatibility` 等於目前 Gradle 的 JDK 版本，這等於您的 JDK 版本（除非您使用 [Java 工具鏈方法](gradle-configure-project.md#gradle-java-toolchains-support)）。假設您的 JDK 版本為 `%jvmLTSVersionSupportedByKotlin%`，您發佈的程式庫構件將 [宣告其與 JDK %jvmLTSVersionSupportedByKotlin%+ 相容](https://docs.gradle.org/current/userguide/publishing_gradle_module_metadata.html)：`org.gradle.jvm.version=%jvmLTSVersionSupportedByKotlin%`，這是錯誤的。在這種情況下，您必須在主專案中使用 Java %jvmLTSVersionSupportedByKotlin% 才能新增此程式庫，即使位元組碼的版本是 `1.8`。請 [配置工具鏈](gradle-configure-project.md#gradle-java-toolchains-support) 來解決此問題。
+當組建指令碼中沒有關於 `jvmTarget` 值的明確資訊時，其預設值為 `null`，編譯器將其轉換為預設值 `1.8`。`targetCompatibility` 等於目前 Gradle 的 JDK 版本，這等於您的 JDK 版本（除非您使用 [Java 工具鏈方法](gradle-configure-project.md#gradle-java-toolchains-support)）。假設您的 JDK 版本為 `%jvmLTSVersionSupportedByKotlin%`，您發佈的程式庫構件將 [宣告其與 JDK %jvmLTSVersionSupportedByKotlin%+ 相容](https://docs.gradle.org/current/userguide/publishing_gradle_module_metadata.html)：`org.gradle.jvm.version=%jvmLTSVersionSupportedByKotlin%`，這是錯誤的。在這種情況下，您必須在主專案中使用 Java %jvmLTSVersionSupportedByKotlin% 才能新增此程式庫，即使位元組碼的版本是 `1.8`。請 [配置工具鏈](gradle-configure-project.md#gradle-java-toolchains-support) 來解決此問題。
 
 ### Gradle Java 工具鏈支援 {id="gradle-java-toolchains-support"}
 
-> 給 Android 使用者的警告。若要使用 Gradle 工具鏈支援，請使用 Android Gradle 外掛程式 (AGP) 8.1.0-alpha09 或更高版本。
+> 給 Android 使用者的警告。若要使用 Gradle 工具鏈支援，請使用 Android Gradle 外掛程式 (AGP) 8.1.0-alpha09 或更高版本。 
 > 
 > Gradle Java 工具鏈支援僅從 AGP 7.4.0 [開始可用](https://issuetracker.google.com/issues/194113162)。
 > 然而，由於 [此問題](https://issuetracker.google.com/issues/260059413)，AGP 在 8.1.0-alpha09 版本之前並未將 `targetCompatibility` 設定為等於工具鏈的 JDK。
@@ -355,7 +356,7 @@ java {
 </tab>
 </tabs>
 
-如果您使用 Gradle 8.0.2 或更高版本，您還需要新增一個 [工具鏈解析器外掛程式](https://docs.gradle.org/current/userguide/toolchains.html#sub:download_repositories)。
+如果您使用 Gradle 8.0.2 或更高版本，您還需要新增一個 [工具鏈解析器外掛程式](https://docs.gradle.org/current/userguide/toolchains.html#sub:download_repositories)。 
 此類型的外掛程式管理要從哪些存儲庫下載工具鏈。例如，將以下外掛程式新增至您的 `settings.gradle(.kts)`：
 
 <tabs group="build-script">
@@ -699,12 +700,12 @@ kotlin {
 }
 ```
 
-對於 WASI 環境，配置 `wasmWasi` 目標：
+對於 WASI 環境，使用 Node.js 或 Wasmtime 配置 `wasmWasi` 目標：
 
 ```kotlin
 kotlin {
     wasmWasi {
-        nodejs {
+        nodejs { // 或 wasmtime
             /* ... */
         }
     }
@@ -905,7 +906,8 @@ kotlin.stdlib.default.dependency=false
 從 Kotlin 標準程式庫 1.9.20 版本開始，Gradle 會使用標準程式庫中包含的元資料來自動對齊傳遞性的 `kotlin-stdlib-jdk7` 和 `kotlin-stdlib-jdk8` 相依性。
 
 如果您為 1.8.0 – 1.9.10 之間的任何 Kotlin 標準程式庫版本新增相依性，例如： 
-`implementation("org.jetbrains.kotlin:kotlin-stdlib:1.8.0")`，則 Kotlin Gradle 外掛程式會將此 Kotlin 版本用於傳遞性的 `kotlin-stdlib-jdk7` 和 `kotlin-stdlib-jdk8` 相依性。這避免了來自不同標準程式庫版本的類別重複。[進一步了解將 `kotlin-stdlib-jdk7` 和 `kotlin-stdlib-jdk8` 合併到 `kotlin-stdlib`](whatsnew18.md#updated-jvm-compilation-target)。 您可以透過在 `gradle.properties` 檔案中設定 `kotlin.stdlib.jdk.variants.version.alignment` Gradle 屬性來停用此行為：
+`implementation("org.jetbrains.kotlin:kotlin-stdlib:1.8.0")`，則 Kotlin Gradle 外掛程式會將此 Kotlin 版本用於傳遞性的 `kotlin-stdlib-jdk7` 和 `kotlin-stdlib-jdk8` 相依性。這避免了來自不同標準程式庫版本的類別重複。[進一步了解將 `kotlin-stdlib-jdk7` 和 `kotlin-stdlib-jdk8` 合併到 `kotlin-stdlib`](whatsnew18.md#updated-jvm-compilation-target)。 
+您可以透過在 `gradle.properties` 檔案中設定 `kotlin.stdlib.jdk.variants.version.alignment` Gradle 屬性來停用此行為：
 
 ```none
 kotlin.stdlib.jdk.variants.version.alignment=false

@@ -19,7 +19,8 @@
 
 | Kotlin Multiplatform プラグインのバージョン | Gradle                                | Android Gradle プラグイン                               | Xcode   |
 |-------------------------------------|---------------------------------------|-----------------------------------------------------|---------|
-| 2.4.0-2.4.10                        | %minGradleVersion%–%maxGradleVersion% | %minAndroidGradleVersion%–%maxAndroidGradleVersion% | %xcode% |
+| 2.4.20                              | %minGradleVersion%–%maxGradleVersion% | %minAndroidGradleVersion%–%maxAndroidGradleVersion% | %xcode% |
+| 2.4.0-2.4.10                        | 7.6.3–9.5.0                           | 8.5.2–9.1.0                                         | 26.4    |
 | 2.3.20–2.3.21                       | 7.6.3–9.3.0                           | 8.2.2–9.0.0                                         | 26.0    |
 | 2.3.10                              | 7.6.3–9.0.0                           | 8.2.2–9.0.0                                         | 26.0    |
 | 2.3.0                               | 7.6.3–9.0.0                           | 8.2.2–8.13.0                                        | 26.0    |
@@ -42,6 +43,7 @@
 
 このセクションでは、非推奨サイクルが終了し、Kotlin 2.0.0−%kotlinVersion% で有効になる互換性のない変更について説明します。
 
+undefined
 ### Android ターゲット用 Google 製プラグインへの移行 {id="migrate-to-google-s-plugin-for-android-targets"}
 
 **何が変更されましたか？**
@@ -87,6 +89,7 @@ Kotlin Multiplatform Gradle プラグインの非推奨サイクルは以下の�
 * 2.2.0: 警告がエラーに引き上げられます
 * 2.3.0: `embedBitcode` DSL が削除されます 
 
+undefined
 ### デフォルトで作成される Java ソースセット {id="java-source-sets-created-by-default"}
 
 **何が変更されましたか？**
@@ -127,6 +130,7 @@ Kotlin 2.1.20 と 8.7 より新しい Gradle バージョンで [Java test fixtu
 * Gradle 9.0: この警告をエラーに引き上げ。
 * 2.1.20: Gradle のバージョンに関わらず、`withJava()` 関数を使用した場合に非推奨の警告を導入。
 
+undefined
 ### 複数の類似ターゲットの宣言 {id="declaring-several-similar-targets"}
 
 **何が変更されましたか？**
@@ -179,7 +183,7 @@ kotlin {
 この実装には、少なからず構成の複雑さが伴います：
 
 * `:shared` 側と各コンシューマー（利用者）側で Gradle 属性（attributes）を設定する必要があります。そうしないと、追加情報なしではコンシューマーが Ktor ベースの実装と OkHttp ベースの実装のどちらを受け取るべきか不明確になり、Gradle はそのようなプロジェクトの依存関係を解決できません。
-* `commonJvmMain` ソートセットを手動で設定する必要があります。
+* `commonJvmMain` ソースセットを手動で設定する必要があります。
 * 構成には、Gradle および Kotlin Gradle プラグインのいくつかの低レベルな抽象化や API が関わります。
 
 **現在のベストプラクティスは何ですか？**
@@ -246,6 +250,7 @@ Ktor ベースと OkHttp ベースの実装が*同じ Gradle プロジェクト�
 * 1.9.20: Kotlin Multiplatform プロジェクトで複数の類似ターゲットが使用された場合に非推奨の警告を導入
 * 2.1.0: このような場合にエラーを報告します（Kotlin/JS ターゲットは例外）。この例外の詳細については、[YouTrack の課題](https://youtrack.jetbrains.com/issue/KT-47038/KJS-MPP-Split-JS-target-into-JsBrowser-and-JsNode)を参照してください。
 
+undefined
 ### レガシーモードで公開されたマルチプラットフォームライブラリのサポート非推奨 {id="deprecated-support-of-multiplatform-libraries-published-in-legacy-mode"}
 
 **何が変更されましたか？**
@@ -276,6 +281,7 @@ Kotlin チームはエコシステムの移行を支援したいと考えてい�
 * 2.0.0: レガシーライブラリへの依存関係に対する警告をエラーに引き上げ
 * &gt;2.0.0: レガシーライブラリへの依存関係のサポートを削除。そのような依存関係を使用するとビルドが失敗する可能性があります
 
+undefined
 ### 階層構造サポートのための非推奨の Gradle プロパティ {id="deprecated-gradle-properties-for-hierarchical-structure-support"}
 
 **何が変更されましたか？**
@@ -314,6 +320,7 @@ Kotlin 1.6.20 以降、Kotlin ツールチェーンのデフォルトの動作�
 
 これらのプロパティを削除した後に万が一問題が発生した場合は、[YouTrack で課題](https://kotl.in/issue)を作成してください。
 
+undefined
 ### ターゲットプリセット API の非推奨 {id="deprecated-target-presets-api"}
 
 **何が変更されましたか？**
@@ -357,6 +364,7 @@ Kotlin 1.6.20 以降、Kotlin ツールチェーンのデフォルトの動作�
 * 2.0.0: この警告をエラーに引き上げ
 * 2.2.0: Kotlin Gradle プラグインのパブリック API からプリセット関連 API を削除。これらを引き続き使用しているソースはビルドスクリプトのコンパイル中に "unresolved reference"（未解決の参照）エラーで失敗し、バイナリ（例：Gradle プラグイン）は、最新バージョンの Kotlin Gradle プラグインに対して再コンパイルされない限り、リンケージエラーで失敗する可能性があります。
 
+undefined
 ### Apple ターゲットのショートカットの非推奨 {id="deprecated-apple-target-shortcuts"}
 
 **何が変更されましたか？**
@@ -412,6 +420,7 @@ Kotlin Gradle プラグインは現在、組み込みの階層テンプレート
 
 このセクションでは、非推奨サイクルが終了し、Kotlin 1.9.0−1.9.25 で有効になる互換性のない変更について説明します。
 
+undefined
 ### Kotlin コンパイルに Kotlin ソースセットを直接追加するための API の削除 {initial-collapse-state="collapsed" collapsible="true" id="removed-api-for-adding-kotlin-source-sets-directly-to-the-kotlin-compilation"}
 
 **何が変更されましたか？**
@@ -483,6 +492,7 @@ kotlin {
 * 1.9.20: この警告をエラーに引き上げ
 * 2.3.0: Kotlin Gradle プラグインから `KotlinCompilation.source` を削除。これを使用しようとすると、ビルドスクリプトのコンパイル中に "unresolved reference" エラーが発生します
 
+undefined
 ### `kotlin-js` Gradle プラグインから `kotlin-multiplatform` Gradle プラグインへの移行 {initial-collapse-state="collapsed" collapsible="true" id="migration-from-kotlin-js-gradle-plugin-to-kotlin-multiplatform-gradle-plugin"}
 
 **何が変更されましたか？**
@@ -608,6 +618,7 @@ Kotlin 1.9.0 以降、`kotlin-js` Gradle プラグインは非推奨になりま
 * 1.9.0: `kotlin-js` プラグインを使用すると非推奨の警告を表示
 * 2.4.0: [この警告をエラーに引き上げ](https://youtrack.jetbrains.com/issue/KT-59305)
 
+undefined
 ### `jvmWithJava` プリセットの非推奨 {initial-collapse-state="collapsed" collapsible="true" id="deprecated-jvmwithjava-preset"}
 
 **何が変更されましたか？**
@@ -633,10 +644,11 @@ Kotlin 1.9.0 以降、`kotlin-js` Gradle プラグインは非推奨になりま
 * 1.9.20: この警告をエラーに引き上げ
 * &gt;1.9.20: `targetPresets.jvmWithJava` API を削除。これを使用しようとするとビルドスクリプトのコンパイルが失敗します
 
-> `targetPresets` API 全体が非推奨になっていますが、`jvmWithJava` プリセットには異なる non-deprecated タイムラインがあります。
+> `targetPresets` API 全体が非推奨になっていますが、`jvmWithJava` プリセットには異なる非推奨タイムラインがあります。
 >
 {style="note"}
 
+undefined
 ### レガシーな Android ソースセットレイアウトの非推奨 {initial-collapse-state="collapsed" collapsible="true" id="deprecated-legacy-android-source-set-layout"}
 
 **何が変更されましたか？**
@@ -651,6 +663,7 @@ Kotlin 1.9.0 以降、[新しい Android ソースセットレイアウト](mult
 * 1.9.20: この警告をエラーに引き上げ。このエラーは抑制**できません**
 * 2.4.0: レガシーな Android ソースセットレイアウトのサポートを削除し、[`kotlin.mpp.androidSourceSetLayoutVersion=1` Gradle プロパティを削除](https://youtrack.jetbrains.com/issue/KT-82265)
 
+undefined
 ### カスタム `dependsOn` を使用した `commonMain` および `commonTest` の非推奨 {initial-collapse-state="collapsed" collapsible="true" id="deprecated-commonmain-and-commontest-with-custom-dependson"}
 
 **何が変更されましたか？**
@@ -742,13 +755,14 @@ Kotlin 1.9.20 以降、対応する C および Objective-C の前方宣言と�
 
 このセクションでは、非推奨サイクルが終了し、Kotlin 1.7.0−1.8.22 で有効になる互換性のない変更について説明します。
 
+undefined
 ### Kotlin Multiplatform Gradle プラグインと Gradle Java プラグインの非推奨の互換性 {initial-collapse-state="collapsed" collapsible="true" id="deprecated-compatibility-with-kotlin-multiplatform-gradle-plugin-and-gradle-java-plugins"}
 
 **何が変更されましたか？**
 
 Kotlin Multiplatform Gradle プラグインと、Gradle プラグインである [Java](https://docs.gradle.org/current/userguide/java_plugin.html)、[Java Library](https://docs.gradle.org/current/userguide/java_library_plugin.html)、および [Application](https://docs.gradle.org/current/userguide/application_plugin.html) の間の互換性の問題により、これらのプラグインを同じプロジェクトに適用すると非推奨の警告が表示されるようになりました。この警告は、マルチプラットフォームプロジェクト内の別の Gradle プラグインが Gradle Java プラグインを適用する場合にも表示されます。例えば、[Spring Boot Gradle プラグイン](https://docs.spring.io/spring-boot/gradle-plugin/index.html) は Application プラグインを自動的に適用します。
 
-この非推奨の警告は、Kotlin Multiplatform のプロジェクトモデルと Gradle の Java エコシステムプラグインの間の根本的な互換性の問題のために追加されました。 Gradle の Java エコシステムプラグインは現在、他のプラグインが以下を行う可能性があることを考慮していません：
+この非推奨の警告は、Kotlin Multiplatform のプロジェクトモデルと Gradle の Java エコシステムプラグインの間の根本的な互換性の問題のために追加されました。Gradle の Java エコシステムプラグインは現在、他のプラグインが以下を行う可能性があることを考慮していません：
 
 * Java エコシステムプラグインとは異なる方法で、JVM ターゲット向けに公開またはコンパイルする。
 * 同じプロジェクト内に JVM と Android など、2 つの異なる JVM ターゲットを持つ。

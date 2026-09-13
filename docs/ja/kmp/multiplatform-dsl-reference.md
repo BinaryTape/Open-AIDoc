@@ -157,12 +157,14 @@ kotlin {
 
 [Kotlin/JS プロジェクトの設定](https://kotlinlang.org/docs/js-project-setup.html) についての詳細をご覧ください。
 
-独立した `wasmWasi {}` ブロックは、WASI システムインターフェースをサポートする Kotlin/Wasm ターゲットの設定を記述します。ここでは、[`nodejs`](#node-js) 実行環境のみが利用可能です。
+独立した `wasmWasi {}` ブロックは、WASI システムインターフェースをサポートする Kotlin/Wasm ターゲットの設定を記述します。
+これは `nodejs` および `wasmtime` 実行環境をサポートしています：
 
 ```kotlin
 kotlin {
     wasmWasi {
         nodejs()
+        wasmtime()
         binaries.executable()
     }
 }
@@ -866,7 +868,7 @@ kotlin {
 ```groovy
 kotlin {
     jvm {
-        // JVM ターゲット의 모든 컴파일을 설정합니다
+        // JVM ターゲットのすべてのコンパイルを設定
         compilerOptions {
             allWarningsAsErrors = true
         }

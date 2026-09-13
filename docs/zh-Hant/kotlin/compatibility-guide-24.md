@@ -4,7 +4,7 @@
 
 雖然大多數語言變更已透過其他管道宣布（如更新日誌或編譯器警告），本文件對其進行了全面總結，為從 Kotlin 2.3 遷移到 Kotlin 2.4 提供完整參考。本文件還包含與工具相關的變更資訊。
 
-## 基本術語
+## 基本術語 {id="basic-terms"}
 
 在本文件中，我們介紹了幾種相容性：
 
@@ -14,9 +14,9 @@
 
 請注意，這些定義僅針對純 Kotlin。從其他語言角度（例如 Java）看 Kotlin 程式碼的相容性不在本文件的討論範圍內。
 
-## 語言
+## 語言 {id="language"}
 
-### 停止支援 `-language-version=1.9` 與 K1 編譯器
+### 停止支援 `-language-version=1.9` 與 K1 編譯器 {id="drop-support-for-language-version-1-9-and-the-k1-compiler"}
 
 > **問題**：[KT-80590](https://youtrack.jetbrains.com/issue/KT-80590)
 >
@@ -31,7 +31,7 @@
 > - 2.2.0：使用 `-language-version` 為 1.9 版時報告警告
 > - 2.4.0：將警告提升為錯誤
 
-### 禁止 Java 型別的彈性顯式可為 null 型別引數
+### 禁止 Java 型別的彈性顯式可為 null 型別引數 {id="prohibit-flexible-explicit-nullable-type-arguments-for-java-types"}
 
 > **問題**：[KTLC-284](https://youtrack.jetbrains.com/issue/KTLC-284)
 >
@@ -46,7 +46,7 @@
 > - 2.2.0：針對被視為彈性型別的顯式指定可為 null 型別引數報告警告
 > - 2.4.0：將警告提升為錯誤
 
-### 禁止針對絕對不相容型別進行恆為假的 `is` 檢查
+### 禁止針對絕對不相容型別進行恆為假的 `is` 檢查 {id="prohibit-always-false-is-checks-for-definitely-incompatible-types"}
 
 > **問題**：[KTLC-365](https://youtrack.jetbrains.com/issue/KTLC-365)
 >
@@ -61,7 +61,7 @@
 > - 2.0.0：針對絕對不相容型別的 `is` 檢查報告警告
 > - 2.4.0：將警告提升為錯誤
 
-### 禁止在內嵌函式中公開具有較低可見性的型別與宣告
+### 禁止在內嵌函式中公開具有較低可見性的型別與宣告 {id="prohibit-exposing-types-and-declarations-with-lower-visibility-in-inline-functions"}
 
 > **問題**：[KTLC-283](https://youtrack.jetbrains.com/issue/KTLC-283)
 >
@@ -76,7 +76,7 @@
 > - 2.3.0：針對在內嵌函式中公開較低可見性的型別與宣告報告警告
 > - 2.4.0：將警告提升為錯誤
 
-### 變更註解的預設使用處目標選取
+### 變更註解的預設使用處目標選取 {id="change-default-use-site-target-selection-for-annotations"}
 
 > **問題**：[KTLC-391](https://youtrack.jetbrains.com/issue/KTLC-391)
 >
@@ -93,7 +93,7 @@
 > - 2.2.0：當新的預設規則改變選定的使用處目標時報告警告
 > - 2.4.0：啟用新的預設規則
 
-### 禁止隱式參照不可存取的型別
+### 禁止隱式參照不可存取的型別 {id="forbid-implicit-references-to-inaccessible-types"}
 
 > **問題**：[KTLC-384](https://youtrack.jetbrains.com/issue/KTLC-384)
 >
@@ -110,7 +110,7 @@
 > - 2.3.0：針對隱式參照不可存取的型別報告警告
 > - 2.4.0：將警告提升為錯誤
 
-### 強制執行 Jakarta 可為 null 性註解
+### 強制執行 Jakarta 可為 null 性註解 {id="enforce-jakarta-nullability-annotations"}
 
 > **問題**：[KTLC-285](https://youtrack.jetbrains.com/issue/KTLC-285)
 >
@@ -125,7 +125,7 @@
 > - 2.2.0：針對帶有 Jakarta 可為 null 性註解的 Java 宣告中的可為 null 性不符報告警告
 > - 2.4.0：將警告提升為錯誤
 
-### 報告可呼叫參照限定詞中位置錯誤的型別引數
+### 報告可呼叫參照限定詞中位置錯誤的型別引數 {id="report-misplaced-type-arguments-in-callable-reference-qualifiers"}
 
 > **問題**：[KTLC-388](https://youtrack.jetbrains.com/issue/KTLC-388)
 >
@@ -141,7 +141,7 @@
 >
 > - 2.4.0：當可呼叫參照左側的型別引數屬於限定詞的其他部分時報告警告
 
-### 針對具有可為 null 上限之具體化型別參數的類別常值報告錯誤
+### 針對具有可為 null 上限之具體化型別參數的類別常值報告錯誤 {id="report-errors-for-class-literals-from-reified-type-parameters-with-nullable-upper-bounds"}
 
 > **問題**：[KTLC-370](https://youtrack.jetbrains.com/issue/KTLC-370)
 >
@@ -156,7 +156,7 @@
 > - 2.3.0：當在型別來自具有可為 null 上限之具體化型別參數的運算式上使用 `::class` 時報告警告
 > - 2.4.0：將警告提升為錯誤
 
-### 禁止在匿名物件宣告前進行初始化
+### 禁止在匿名物件宣告前進行初始化 {id="prohibit-initialization-before-declarations-in-anonymous-objects"}
 
 > **問題**：[KTLC-290](https://youtrack.jetbrains.com/issue/KTLC-290)
 >
@@ -171,7 +171,7 @@
 > - 2.2.20：當匿名物件中的 `init` 區塊在屬性宣告前初始化屬性時報告警告
 > - 2.4.0：將警告提升為錯誤
 
-### 對包含非抽象 Java 密封類別的 `when` 運算式強制執行詳盡性檢查
+### 對包含非抽象 Java 密封類別的 `when` 運算式強制執行詳盡性檢查 {id="enforce-exhaustiveness-for-when-expressions-with-non-abstract-java-sealed-classes"}
 
 > **問題**：[KTLC-366](https://youtrack.jetbrains.com/issue/KTLC-366)
 >
@@ -186,7 +186,7 @@
 > - 2.3.0：針對包含非抽象 Java 密封類別的非詳盡 `when` 運算式報告警告
 > - 2.4.0：將警告提升為錯誤
 
-### 禁止在參數過多的 `getValue()` 與 `setValue()` 函式上使用 `operator` 修飾詞
+### 禁止在參數過多的 `getValue()` 與 `setValue()` 函式上使用 `operator` 修飾詞 {id="prohibit-operator-modifier-on-getvalue-and-setvalue-functions-with-too-many-parameters"}
 
 > **問題**：[KTLC-289](https://youtrack.jetbrains.com/issue/KTLC-289)
 >
@@ -201,7 +201,7 @@
 > - 2.2.20：針對參數過多的 `operator` `getValue()` 與 `setValue()` 函式報告警告
 > - 2.4.0：將警告提升為錯誤
 
-### 禁止泛型呼叫中不一致的型別引數
+### 禁止泛型呼叫中不一致的型別引數 {id="prohibit-inconsistent-type-arguments-in-generic-calls"}
 
 > **問題**：[KTLC-373](https://youtrack.jetbrains.com/issue/KTLC-373)
 >
@@ -216,7 +216,7 @@
 > - 2.3.0：當泛型呼叫中的顯式型別引數違反型別參數間的上限約束時報告警告
 > - 2.4.0：將警告提升為錯誤
 
-### 棄用對 `javaClass` 屬性的參照
+### 棄用對 `javaClass` 屬性的參照 {id="deprecate-references-to-the-javaclass-property"}
 
 > **問題**：[KTLC-375](https://youtrack.jetbrains.com/issue/KTLC-375)
 >
@@ -230,7 +230,7 @@
 >
 > - 2.4.0：針對 `javaClass` 屬性的屬性參照報告警告
 
-### 針對需要選擇性加入的隱式列舉建構函式呼叫報告錯誤
+### 針對需要選擇性加入的隱式列舉建構函式呼叫報告錯誤 {id="report-errors-for-implicit-enum-constructor-calls-that-require-opt-in"}
 
 > **問題**：[KTLC-359](https://youtrack.jetbrains.com/issue/KTLC-359)
 >
@@ -245,7 +245,7 @@
 > - 2.2.20：當列舉成員隱式呼叫需要選擇性加入的列舉主建構函數時報告警告
 > - 2.4.0：將警告提升為錯誤
 
-### 禁止在列舉成員上使用 `inline` 修飾詞
+### 禁止在列舉成員上使用 `inline` 修飾詞 {id="forbid-inline-modifier-on-enum-entries"}
 
 > **問題**：[KTLC-361](https://youtrack.jetbrains.com/issue/KTLC-361)
 >
@@ -260,7 +260,7 @@
 > - 2.3.0：當在列舉成員上使用 `inline` 修飾詞時報告警告
 > - 2.4.0：將警告提升為錯誤
 
-### 禁止在註解呼叫與參數預設值之外使用陣列常值
+### 禁止在註解呼叫與參數預設值之外使用陣列常值 {id="prohibit-array-literals-outside-annotation-calls-and-parameter-defaults"}
 
 > **問題**：[KTLC-369](https://youtrack.jetbrains.com/issue/KTLC-369)
 >
@@ -275,7 +275,7 @@
 > - 2.3.0：針對註解呼叫與註解參數預設值之外的陣列常值報告警告
 > - 2.4.0：將警告提升為錯誤
 
-### 在命令列編譯器模式下禁止使用 `_root_ide_package_`
+### 在命令列編譯器模式下禁止使用 `_root_ide_package_` {id="prohibit-rootidepackage-in-cli-compiler-mode"}
 
 > **問題**：[KTLC-378](https://youtrack.jetbrains.com/issue/KTLC-378)
 >
@@ -290,7 +290,7 @@
 > - 2.3.20：針對命令列編譯器模式下的 `_root_ide_package_` 參照報告警告
 > - 2.4.0：將警告提升為錯誤
 
-### 修正帶有可變參數轉換之函式參照的相等性
+### 修正帶有可變參數轉換之函式參照的相等性 {id="correct-equality-for-function-references-with-vararg-conversions"}
 
 > **問題**：[KTLC-385](https://youtrack.jetbrains.com/issue/KTLC-385)
 >
@@ -304,7 +304,7 @@
 >
 > - 2.4.0：引入新行為
 
-### 對伴隨物件存取強制執行選擇性加入
+### 對伴隨物件存取強制執行選擇性加入 {id="enforce-opt-in-for-companion-object-access"}
 
 > **問題**：[KTLC-386](https://youtrack.jetbrains.com/issue/KTLC-386)
 >
@@ -319,7 +319,7 @@
 > - 2.3.20：當伴隨物件存取需要選擇性加入時報告警告
 > - 2.4.0：針對 `ERROR` 層級的選擇性加入要求將警告提升為錯誤
 
-### 報告來自具有巢狀泛型引數之超型別的型別不符
+### 報告來自具有巢狀泛型引數之超型別的型別不符 {id="report-type-mismatches-from-supertypes-with-nested-generic-arguments"}
 
 > **問題**：[KTLC-372](https://youtrack.jetbrains.com/issue/KTLC-372)
 >
@@ -333,7 +333,7 @@
 >
 > - 2.4.0：針對涉及具有巢狀泛型引數之超型別的型別不符報告錯誤
 
-### 禁止包含不可存取宣告的推論型別
+### 禁止包含不可存取宣告的推論型別 {id="prohibit-inferred-types-with-inaccessible-declarations"}
 
 > **問題**：[KTLC-363](https://youtrack.jetbrains.com/issue/KTLC-363)
 >
@@ -348,9 +348,9 @@
 > - 2.3.0：當推論型別包含在當前作用域內不可存取的宣告時報告警告
 > - 2.4.0：將警告提升為錯誤
 
-## 標準函式庫
+## 標準函式庫 {id="standard-library"}
 
-### 棄用 `kotlin.io.readLine()` 函式
+### 棄用 `kotlin.io.readLine()` 函式 {id="deprecate-kotlin-io-readline-function"}
 
 > **問題**：[KTLC-394](https://youtrack.jetbrains.com/issue/KTLC-394)
 >
@@ -364,7 +364,7 @@
 >
 > - 2.4.0：使用 `kotlin.io.readLine()` 時報告警告
 
-### 棄用 `AbstractCoroutineContextKey` 及相關 API
+### 棄用 `AbstractCoroutineContextKey` 及相關 API {id="deprecate-abstractcoroutinecontextkey-and-related-apis"}
 
 > **問題**：[KT-84970](https://youtrack.jetbrains.com/issue/KT-84970)
 >
@@ -378,7 +378,7 @@
 >
 > - 2.4.0：使用已棄用的 API 時報告警告
 
-### 變更無限邊界下的 `Random.nextDouble()` 契約
+### 變更無限邊界下的 `Random.nextDouble()` 契約 {id="change-random-nextdouble-contract-for-infinite-bounds"}
 
 > **問題**：[KT-84368](https://youtrack.jetbrains.com/issue/KT-84368)
 >
@@ -392,9 +392,9 @@
 >
 > - 2.4.0：啟用新行為
 
-## 工具
+## 工具 {id="tools"}
 
-### 棄用舊版 Kotlin/JS 編譯器類型選取 API
+### 棄用舊版 Kotlin/JS 編譯器類型選取 API {id="deprecate-legacy-kotlin-js-compiler-type-selection-apis"}
 
 > **問題**：[KT-64275](https://youtrack.jetbrains.com/issue/KT-64275), [KT-84753](https://youtrack.jetbrains.com/issue/KT-84753)
 >
@@ -411,7 +411,7 @@
 > - 1.8.0：棄用舊版 Kotlin/JS 編譯器類型常數
 > - 2.4.0：移除已棄用的舊版編譯器類型 API，並在使用 `KotlinJsCompilerType` 或帶有編譯器類型參數的 `KotlinProjectExtension.js()` 多載時報告警告
 
-### 棄用 Kotlin Android 擴充套件中的 `sourceSets`
+### 棄用 Kotlin Android 擴充套件中的 `sourceSets` {id="deprecate-sourcesets-in-the-kotlin-android-extension"}
 
 > **問題**：[KT-74451](https://youtrack.jetbrains.com/issue/KT-74451)
 >
@@ -425,7 +425,7 @@
 >
 > - 2.4.0：從 `KotlinAndroidProjectExtension` 存取 `sourceSets` 時報告警告
 
-### 移除 Kotlin/Native Apple 框架的可取用組態
+### 移除 Kotlin/Native Apple 框架的可取用組態 {id="remove-consumable-configurations-for-kotlin-native-apple-frameworks"}
 
 > **問題**：[KT-74503](https://youtrack.jetbrains.com/issue/KT-74503), [KT-82230](https://youtrack.jetbrains.com/issue/KT-82230)
 >
@@ -439,7 +439,7 @@
 >
 > - 2.4.0：移除 Kotlin/Native Apple 框架的可取用組態
 
-### 從 Kotlin Gradle 外掛程式中移除已棄用的任務、編譯與 DSL API
+### 從 Kotlin Gradle 外掛程式中移除已棄用的任務、編譯與 DSL API {id="remove-deprecated-task-compilation-and-dsl-apis-from-the-kotlin-gradle-plugin"}
 
 > **問題**：[KT-85509](https://youtrack.jetbrains.com/issue/KT-85509)
 >
@@ -485,7 +485,7 @@
 >
 > - 2.4.0：移除已棄用的 API
 
-### 棄用顯式縮減後的類別路徑快照配置
+### 棄用顯式縮減後的類別路徑快照配置 {id="deprecate-explicit-shrunk-classpath-snapshot-configuration"}
 
 > **問題**：[KT-75837](https://youtrack.jetbrains.com/issue/KT-75837)
 >
@@ -499,7 +499,7 @@
 >
 > - 2.4.0：使用 `shrunkClasspathSnapshot` 時報告警告
 
-### 移除多餘的 ABI 驗證 Gradle DSL 元素
+### 移除多餘的 ABI 驗證 Gradle DSL 元素 {id="remove-redundant-abi-validation-gradle-dsl-elements"}
 
 > **問題**：[KT-80685](https://youtrack.jetbrains.com/issue/KT-80685)
 >
@@ -513,7 +513,7 @@
 >
 > - 2.4.0：移除多餘的 ABI 驗證 DSL 元素
 
-### 棄用過時的 Compose 編譯器 Gradle 外掛程式選項
+### 棄用過時的 Compose 編譯器 Gradle 外掛程式選項 {id="deprecate-obsolete-compose-compiler-gradle-plugin-options"}
 
 > **問題**：[KT-85343](https://youtrack.jetbrains.com/issue/KT-85343)
 >
@@ -539,7 +539,7 @@
 > - 2.1.0：針對 `stabilityConfigurationFile` 報告警告
 > - 2.4.0：將警告提升為錯誤
 
-### 針對過時的 Kotlin/Native Gradle 任務 API 報告錯誤
+### 針對過時的 Kotlin/Native Gradle 任務 API 報告錯誤 {id="report-errors-for-obsolete-kotlin-native-gradle-task-apis"}
 
 > **問題**：[KT-85510](https://youtrack.jetbrains.com/issue/KT-85510)
 >
@@ -585,3 +585,17 @@
 > **棄用週期**：
 >
 > - 2.4.0：針對已棄用的 Kotlin/Native Gradle 任務 API 報告錯誤，並移除 `KotlinNativeLink.compilation` 屬性
+
+### 針對編譯器引數值中的大小寫不符報告警告 {id="report-warnings-for-case-mismatches-in-compiler-argument-values"}
+
+> **問題**：[KT-86059](https://youtrack.jetbrains.com/issue/KT-86059)
+>
+> **組建**：建置工具 API
+>
+> **不相容變更類型**：原始碼
+>
+> **簡要摘要**：接受固定值集合的編譯器引數先前在處理字母大小寫時不一致：部分引數接受任意字母大小寫，而其他引數則要求完全相符。[建置工具 API](build-tools-api.md) 現在對這些值接受任意字母大小寫，但會報告警告，例如 `Case mismatch for -module-kind: expected 'commonjs', got 'CommonJS'`。若要遷移，請使用[編譯器參考](compiler-reference.md)中為該引數列出的字母大小寫。
+>
+> **棄用週期**：
+>
+> - 2.4.20：當編譯器引數值的字母大小寫與預期值不符時報告警告

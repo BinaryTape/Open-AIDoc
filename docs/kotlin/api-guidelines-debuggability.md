@@ -4,7 +4,7 @@
 这种错误解决过程可能会在开发期间通过调试器进行，或者在生产环境中使用日志记录和可观测性工具进行。
 你的库可以遵循这些最佳做法，从而使调试更加轻松。
 
-## 为有状态类型提供 toString 方法
+## 为有状态类型提供 toString 方法 {id="provide-a-tostring-method-for-stateful-types"}
 
 对于每一个包含状态的类型，请提供一个有意义的 `toString` 实现。
 该实现应返回实例当前内容的清晰表示，即使是对内部类型也是如此。
@@ -117,7 +117,7 @@ override fun toString(): String =
 
 这样，你可以立即看到哪些字段已设置，哪些未设置。
 
-## 采用并记录处理异常的策略
+## 采用并记录处理异常的策略 {id="adopt-and-document-a-policy-for-handling-exceptions"}
 
 正如[选择合适的错误处理机制](api-guidelines-consistency.md#choose-the-appropriate-error-handling-mechanism)部分所述，
 在某些情况下，你的库适合抛出异常来发出错误信号。
@@ -140,7 +140,64 @@ override fun toString(): String =
 定位问题的根本原因。
 一种常见的模式是将低级异常包装在库特定的异常中，原始异常可通过 `cause` 访问。
 
-## 下一步
+## 支持自定义异常的协程堆栈跟踪恢复 {id="support-coroutine-stack-trace-recovery-for-custom-exceptions"}
+<primary-label ref="experimental-general"/>
+
+你可以为你库中的自定义异常类型添加对协程[堆栈跟踪恢复](coroutines-debugging.md#stack-trace-recovery)的支持，以使它们更易于调试。
+这可以改进你的库对 `kotlinx.coroutines` 库以及 Kotlin 中其他异步运行时的支持。
+
+当协程通过挂起函数从另一个协程接收到异常时，堆栈跟踪恢复会创建该异常的一个副本，其中包含导向该函数调用的堆栈帧。
+
+对于构造函数仅接收异常消息、cause、两者皆有或不接收实参的异常，`kotlinx.coroutines` 库会自动执行堆栈跟踪恢复。
+如果你库中的异常类型需要额外的构造函数实参（例如行号或错误代码），请实现 [`StackTraceRecoverable`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.coroutines.debug/-stack-trace-recoverable/) 接口。
+
+要实现该接口，请重写 [`copyForStackTraceRecovery()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.coroutines.debug/-stack-trace-recoverable/copy-for-stack-trace-recovery.html) 函数。
+在重写中，返回一个用于堆栈跟踪恢复的新异常实例，或者如果你不希望 `kotlinx.coroutines` 库复制该异常，则返回 `null`。
+
+`StackTraceRecoverable` 接口是 Kotlin 标准库的一部分，因此实现它不会增加对 `kotlinx.coroutines` 库的依赖。
+
+以下是一个自定义异常的示例，该异常在为堆栈跟踪恢复创建新实例时会保留 `line` 属性：
+
+```kotlin
+import kotlin.coroutines.ExperimentalStdlibCoroutineSupportApi
+import kotlin.coroutines.debug.StackTraceRecoverable
+
+@OptIn(ExperimentalStdlibCoroutineSupportApi::class)
+class FileEditException
+// 该实现需要一个私有构造函数，
+// 以便将 cause 传递给 IllegalStateException 构造函数
+private constructor(
+    val line: Int,
+    private val detail: String,
+    cause: Throwable?,
+) : IllegalStateException("When editing line $line: $detail", cause),
+    // 实现 StackTraceRecoverable 以支持堆栈跟踪恢复
+    StackTraceRecoverable<FileEditException> {
+
+    constructor(line: Int, detail: String) : this(line, detail, null)
+
+    // 复制行号和消息详情
+    override fun copyForStackTraceRecovery(): FileEditException =
+        FileEditException(line, detail, this)
+    }
+
+fun main() {
+    val original = FileEditException(15, "Unexpected token")
+    
+    // 通常情况下，除非正在测试其行为，否则无需直接调用此函数
+    // kotlinx.coroutines 库会在堆栈跟踪恢复期间自动调用它
+    val copy = original.copyForStackTraceRecovery()
+
+    println(copy.message)
+    // When editing line 15: Unexpected token
+
+    println(copy.cause == original)
+    // true
+}
+```
+{kotlin-runnable="true" kotlin-min-compiler-version="2.4.20"}
+
+## 下一步 {id="next-step"}
 
 在该指南的下一部分中，你将了解可测试性。
 

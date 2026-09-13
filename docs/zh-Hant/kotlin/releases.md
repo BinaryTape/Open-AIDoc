@@ -29,8 +29,8 @@
 
 以下是未來穩定版 Kotlin 發佈的大約時程：
 
-* **2.4.20**：預計於 2026 年 9 月發佈
 * **2.5.0**：預計於 2026 年 12 月發佈
+* **2.5.20**：預計於 2027 年 3 月發佈
 
 ## 更新至新的 Kotlin 版本 {id="update-to-a-new-kotlin-version"}
 
@@ -129,7 +129,7 @@ Kotlin 在 [IntelliJ IDEA](https://www.jetbrains.com/idea/download/) 和 [Androi
         <th>Kotlin 發佈版本系列</th>
         <th>發佈日期</th>
         <th>支援結束</th>
-        <th>最新錯誤修正發佈</th>
+        <th>最新發佈版本</th>
     </tr>
     <tr>
         <td><strong>2.4</strong>
@@ -141,12 +141,12 @@ Kotlin 在 [IntelliJ IDEA](https://www.jetbrains.com/idea/download/) 和 [Androi
             <p>2027 年 12 月 3 日</p>
         </td>
         <td>
-            <p>2.4.10</p>
+            <p>2.4.20</p>
         </td>
     </tr>
 </table>
 
-> 我們隨時歡迎您回饋發現的任何安全問題。若要回報您在 Kotlin 中發現的問題，請直接在我們的 [問題追蹤器](https://youtrack.jetbrains.com/newIssue?project=KT&c=Type%20Security%20Problem) 上發布訊息，或傳送 [電子郵件](mailto:security@jetbrains.org) 給我們。
+> 我們隨時歡迎您回報發現的任何安全問題。若要回報您在 Kotlin 中發現的問題，請直接在我們的 [問題追蹤器](https://youtrack.jetbrains.com/newIssue?project=KT&c=Type%20Security%20Problem) 上發布訊息，或傳送 [電子郵件](mailto:security@jetbrains.org) 給我們。
 > 
 {style="tip"}
 
@@ -162,6 +162,16 @@ Kotlin 在 [IntelliJ IDEA](https://www.jetbrains.com/idea/download/) 和 [Androi
     <tr>
         <th>組建資訊</th>
         <th>組建重點</th>
+    </tr>
+    <tr>
+        <td><strong>2.4.20</strong>
+            <p>發佈日期：<strong>2026 年 9 月 7 日</strong></p>
+            <p><a href="https://github.com/JetBrains/kotlin/releases/tag/v2.4.20" target="_blank">在 GitHub 上查看版本</a></p>
+        </td>
+        <td>
+            <p>工具發佈版本，包含新的實驗性與穩定功能、效能改進、錯誤修正以及工具更新。</p>
+            <p>如需更多詳細資訊，請參閱 <a href="https://github.com/JetBrains/kotlin/releases/tag/v2.4.20">變更日誌</a>。</p>
+        </td>
     </tr>
     <tr>
         <td><strong>2.4.10</strong>
@@ -270,7 +280,7 @@ Kotlin 在 [IntelliJ IDEA](https://www.jetbrains.com/idea/download/) 和 [Androi
         </td>
         <td>
             <p>Kotlin 2.1.20 的錯誤修正發佈。</p>
-            <p>如需更多詳細資訊，請參閱 <a href="https://github.com/JetBrains/kotlin/releases/tag/v2.1.21">變改日誌</a>。</p>
+            <p>如需更多詳細資訊，請參閱 <a href="https://github.com/JetBrains/kotlin/releases/tag/v2.1.21">變更日誌</a>。</p>
         </td>
     </tr> 
    <tr>

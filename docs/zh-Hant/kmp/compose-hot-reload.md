@@ -161,7 +161,7 @@ MCP 伺服器讓 AI 編碼代理與您執行中的 Compose 應用程式互動：
 
 ### 連接 AI 代理 {id="connect-an-ai-agent"}
 
-若要連接 AI 代理，請將代理的 MCP 用戶端配置指向 `hotMcpServer` Gradle 任務。 
+若要連接 AI 代理，請設定 MCP 用戶端以執行 `hotMcpServer` Gradle 任務。
 例如，在 `.mcp.json` 中：
 
 ```json
@@ -179,6 +179,12 @@ MCP 伺服器讓 AI 編碼代理與您執行中的 Compose 應用程式互動：
   }
 }
 ```
+
+Gradle 會在所有子專案中搜尋任務，並將簡短名稱 `hotMcpServer` 與特定目標的變體（例如 `hotMcpServerJvm` 或 `hotMcpServerDesktop`）進行配對。
+
+如果您的模組定義了多個 JVM 目標，
+請指定完全限定任務名稱以避免歧義：`:<module>:hotMcpServer<Target>`，
+例如 `:app:hotMcpServerDesktop` 或 `:composeApp:hotMcpServerJvm`。
 
 ### 可用的 MCP 工具 {id="available-mcp-tools"}
 

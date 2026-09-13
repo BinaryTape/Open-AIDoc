@@ -68,16 +68,30 @@ Kotlin/Nativeは、[デバッグとリリースの2つのビルドモード](htt
 >
 {style="tip"}
 
-### リリースバイナリのサイズを削減する {id="enable-caches-for-release-binaries"}
+### リリースバイナリのキャッシュを有効にする {id="enable-caches-for-release-binaries"}
+<primary-label ref="experimental-opt-in"/>
+
+デフォルトでは、Kotlin/Nativeはリリースバイナリをリンク時最適化（link-time optimization: LTO）モードでコンパイルします。すべてのモジュールが一緒にコンパイルおよび最適化されます。これによりリリースバイナリの実行時パフォーマンスは高速になりますが、コンパイル時間が大幅に増加します。
+
+コンパイラの最適化よりもコンパイルの高速化を優先したい場合は、リリースモードでのキャッシュを有効にできます。キャッシュを有効にするには、以下の両方のオプションを `gradle.properties` ファイルに追加してください。
+
+```properties
+# コンパイラがリリースモードでキャッシュを使用できるようにする
+kotlin.native.binary.enableReleaseBinaryCache=true
+# Kotlin Gradleプラグインが `-Xauto-cache-from` および関連オプションを指定してコンパイラを呼び出すようにする
+kotlin.internal.native.enableReleaseBinaryCache=true
+```
+
+> この機能は現在活発に開発中であるため、実行時のパフォーマンスにはまだ改善の余地があります。今後のKotlinリリースでパフォーマンスの向上が計画されています。
+> 
+{style="warning"}
+
+### リリースバイナリのサイズを削減する {id="reduce-the-size-of-release-binaries"}
 <primary-label ref="experimental-opt-in"/>
 
 リリースバイナリのサイズを削減し、ビルド時間を改善するには、[バイナリオプションを有効にする](native-binary-options.md#how-to-enable) `smallBinary` を試してください。
 
 これにより、LLVMコンパイルフェーズにおいて、コンパイラのデフォルトの最適化引数として `-Oz` が実質的に設定されます。このオプションはまだ[試験的（Experimental）](components-stability.md#stability-levels-explained)であり、場合によっては実行時のパフォーマンスに影響を与える可能性があります。
-
-### Gradleデーモンを無効にしない {id="reduce-the-size-of-release-binaries"}
-
-正当な理由がない限り、[Gradleデーモン](https://docs.gradle.org/current/userguide/gradle_daemon.html)を無効にしないでください。デフォルトでは、[Kotlin/NativeはGradleデーモンから実行されます](https://blog.jetbrains.com/kotlin/2020/03/kotlin-1-3-70-released/#kotlin-native)。これが有効な場合、同じJVMプロセスが使用され、コンパイルごとにウォームアップする必要がありません。
 
 ### 推移的エクスポートを使用しない {id="don-t-use-transitive-export"}
 
@@ -106,19 +120,19 @@ Gradle構成キャッシュを使用するには、`gradle.properties` ファイ
 
 ### 以前に無効にした機能を有効にする {id="enable-previously-disabled-features"}
 
-Gradleデーモンやコンパイラキャッシュを無効にするKotlin/Nativeオプションがあります。
+以前にビルドの問題を回避するために、一部のKotlin/Native機能を無効にしていた可能性があります。例えば：
 
-* `kotlin.native.disableCompilerDaemon=true`
-* Gradleビルドファイルの `binaries {}` ブロックにある [`disableNativeCache`](https://kotlinlang.org/docs/multiplatform/multiplatform-dsl-reference.html#binaries) DSL
+* `kotlin.native.disableCompilerDaemon=true` は [Gradleデーモン](https://docs.gradle.org/current/userguide/gradle_daemon.html) を無効にします。
+* `disableNativeCache` は [コンパイルキャッシュ](https://kotlinlang.org/docs/multiplatform/multiplatform-dsl-reference.html#binaries) を無効にします。
 
-以前にこれらの機能で問題が発生し、これらの行を `gradle.properties` ファイルやGradleビルドファイルに追加していた場合は、それらを削除してビルドが正常に完了するか確認してください。これらのプロパティは、すでに修正された問題を回避するために以前に追加されたものである可能性があります。
+もともとこれらの回避策を必要としていた問題は、すでに修正されている可能性があります。`gradle.properties` ファイルまたはGradleビルドファイルにこれらの行が含まれている場合は、それらを削除してビルドが正常に完了するか確認してください。
 
 ### klibアーティファクトのインクリメンタルコンパイルを試す {id="try-incremental-compilation-of-klib-artifacts"}
-<primary-label ref="experimental-opt-in"/>
+<primary-label ref="beta"/>
 
 インクリメンタルコンパイルを使用すると、プロジェクトモジュールによって生成された `klib` アーティファクトの一部のみが変更された場合、`klib` のその部分だけがバイナリに再コンパイルされます。
 
-この機能はまだ[試験的（Experimental）](components-stability.md#stability-levels-explained)です。有効にするには、`gradle.properties` ファイルに以下のオプションを追加してください：
+この機能は[ベータ版（Beta）](components-stability.md#stability-levels-explained)です。有効にするには、`gradle.properties` ファイルに以下のオプションを追加してください：
 
 ```properties
 kotlin.incremental.native=true

@@ -7,7 +7,7 @@ Kotlin 語言與工具集被劃分為許多元件，例如 JVM、JS 與 Native �
 其中有些處於非常早期階段，有些則較為成熟。
 我們根據每個元件演進的速度以及使用者採用時承擔的風險程度，將其標記為 **實驗性 (Experimental)**、**Alpha** 或 **Beta**。
 
-## 穩定性層級說明
+## 穩定性層級說明 {id="stability-levels-explained"}
 
 以下是這些穩定性層級及其含義的快速指南：
 
@@ -31,7 +31,7 @@ Kotlin 語言與工具集被劃分為許多元件，例如 JVM、JS 與 Native �
 
 請注意，穩定性層級並未說明元件多久會發布為穩定版。同樣地，它們也不代表元件在發布前會發生多少變更。它們僅說明元件變更的速度，以及使用者面臨更新問題的風險程度。
 
-## Kotlin 元件的 GitHub 徽章
+## Kotlin 元件的 GitHub 徽章 {id="github-badges-for-kotlin-components"}
 
 [Kotlin GitHub 組織](https://github.com/Kotlin) 託管了不同的 Kotlin 相關專案。
 其中一些是我們全職開發的，而另一些則是副專案。
@@ -49,7 +49,7 @@ Kotlin 語言與工具集被劃分為許多元件，例如 JVM、JS 與 Native �
   支援層級對於所有 JetBrains 產品都是統一的。  
   [詳情請參閱 JetBrains 開源文件](https://github.com/JetBrains#jetbrains-on-github)。
 
-## 子元件的穩定性
+## 子元件的穩定性 {id="stability-of-subcomponents"}
 
 一個穩定的元件可能包含實驗性的子元件，例如：
 * 穩定的編譯器可能包含實驗性功能；
@@ -59,13 +59,13 @@ Kotlin 語言與工具集被劃分為許多元件，例如 JVM、JS 與 Native �
 我們確保會精確地記錄哪些子元件不是 **穩定 (Stable)** 的。
 我們也會盡力在可能的情況下提醒使用者，並要求明確啟用 (opt-in) 它們，以避免意外使用尚未以穩定版發布的功能。
 
-## Kotlin 元件的當前穩定性
+## Kotlin 元件的當前穩定性 {id="current-stability-of-kotlin-components"}
 
 > 預設情況下，所有新元件均具備實驗性 (Experimental) 狀態。
 >
 {style="note"}
 
-### Kotlin 編譯器
+### Kotlin 編譯器 {id="kotlin-compiler"}
 
 | **元件**                                                            | **狀態** | **自該版本起的狀態** | **備註** |
 |---------------------------------------------------------------------|------------|--------------------------|--------------|
@@ -75,7 +75,7 @@ Kotlin 語言與工具集被劃分為許多元件，例如 JVM、JS 與 Native �
 | Kotlin/Wasm                                                         | Beta       | 2.2.20                   |              |
 | [Analysis API](https://kotlin.github.io/analysis-api/index_md.html) | 穩定 (Stable) |                          |              |
 
-### 核心編譯器外掛程式
+### 核心編譯器外掛程式 {id="core-compiler-plugins"}
 
 | **元件**                                         | **狀態**   | **自該版本起的狀態** | **備註** |
 |--------------------------------------------------|--------------|--------------------------|--------------|
@@ -86,7 +86,7 @@ Kotlin 語言與工具集被劃分為許多元件，例如 JVM、JS 與 Native �
 | [Lombok](lombok.md)                              | Alpha        | 2.3.20                   |              |
 | [Power-assert](power-assert.md)                  | 實驗性 (Experimental) | 2.0.0                    |              |
 
-### Kotlin 程式庫
+### Kotlin 程式庫 {id="kotlin-libraries"}
 
 | **元件**                      | **狀態** | **自該版本起的狀態** | **備註** |
 |-------------------------------|------------|--------------------------|--------------|
@@ -99,14 +99,14 @@ Kotlin 語言與工具集被劃分為許多元件，例如 JVM、JS 與 Native �
 | kotlinx-io                    | Alpha      | 0.2.0                    |              |
 | kotlinx-collections-immutable | Alpha      | 0.3.5                    |              |
 
-### Kotlin Multiplatform
+### Kotlin Multiplatform {id="kotlin-multiplatform"}
 
 | **元件**                                       | **狀態** | **自該版本起的狀態** | **備註**                                                                                                                         |
 |------------------------------------------------|------------|--------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
 | Kotlin Multiplatform                           | 穩定 (Stable) | 1.9.20                   |                                                                                                                                      |
 | 適用於 Android Studio 的 Kotlin Multiplatform 外掛程式 | Beta       | 0.8.0                    | [與語言分開建立版本](https://kotlinlang.org/docs/multiplatform/multiplatform-plugin-releases.html) |
 
-### Kotlin/Native
+### Kotlin/Native {id="kotlin-native"}
 
 | **元件**                                     | **狀態** | **自該版本起的狀態** | **備註**                                                                                                                  |
 |----------------------------------------------|------------|--------------------------|-------------------------------------------------------------------------------------------------------------------------------|
@@ -118,14 +118,26 @@ Kotlin 語言與工具集被劃分為許多元件，例如 JVM、JS 與 Native �
 
 有關不同目標支援層級的更多資訊，請參閱 [](native-target-support.md)。
 
-### 建置工具
+### 建置工具 {id="build-tools"}
 
 | **元件**                                            | **狀態** | **自該版本起的狀態** | **備註**                                                                                                          |
 |---------------------------------------------------|------------|--------------------------|-------------------------------------------------------------------------------------------------------------------|
 | [Kotlin Gradle 外掛程式](gradle-configure-project.md) | 穩定 (Stable) | 1.1.1                    | [Kotlin Multiplatform Gradle 外掛程式](https://kotlinlang.org/docs/multiplatform/multiplatform-dsl-reference.html#id-and-version) 自 Kotlin 1.9.20 起已穩定。 |
 | [Kotlin Maven 外掛程式](maven-configure-project.md)   | 穩定 (Stable) | 1.0.0                    |                                                                                                                   |
 
-### 語言工具
+### 建置工具 API (BTA) {id="build-tools-api-bta"}
+
+| **元件**     | **狀態** | **自該版本起的狀態** | **備註** |
+|--------------|----------|--------------------------|----------|
+| BTA for JVM  | Beta     | 2.4.20                   |          |
+| BTA for JS   | Alpha    | 2.4.20                   |          |
+| BTA for Wasm | Alpha    | 2.4.20                   |          |
+
+> 建置工具 API 目前不支援 Kotlin/Native。
+> 
+{style="note"}
+
+### 語言工具 {id="language-tools"}
 
 | **元件**                              | **狀態**   | **自該版本起的狀態** | **備註**                                   |
 |---------------------------------------|--------------|--------------------------|------------------------------------------------|
@@ -134,6 +146,6 @@ Kotlin 語言與工具集被劃分為許多元件，例如 JVM、JS 與 Native �
 | 指令碼 IDE 支援                       | Beta         |                          | 自 IntelliJ IDEA 2023.1 及更高版本起可用 |
 | CLI 指令碼                             | Alpha        | 1.2.0                    |                                                |
 
-## 語言特性與設計提案
+## 語言特性與設計提案 {id="language-features-and-design-proposals"}
 
 有關語言特性與新的設計提案，請參閱 [](kotlin-language-features-and-proposals.md)。

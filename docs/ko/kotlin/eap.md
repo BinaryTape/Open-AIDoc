@@ -1,8 +1,8 @@
 [//]: # (title: Kotlin 조기 액세스 프리뷰(EAP) 참여하기)
 
 <tldr>
-    <!-- <p>No preview versions are currently available.</p> -->
-    <p>최신 Kotlin EAP 릴리스: <strong>%kotlinEapVersion%</strong></p>
+    <p>현재 사용할 수 있는 프리뷰 버전이 없습니다.</p>
+    <!-- <p>최신 Kotlin EAP 릴리스: <strong>%kotlinEapVersion%</strong></p> -->
 </tldr>
 
 Kotlin 조기 액세스 프리뷰(Early Access Preview, EAP)에 참여하여 최신 Kotlin 기능이 정식 출시되기 전에 미리 사용해 볼 수 있습니다.
@@ -43,11 +43,9 @@ Kotlin EAP 빌드는 일반적으로 다음과 같은 단계를 포함합니다:
 
 ## 빌드 상세 정보 (Build details) {id="build-details"}
 
-<!--
-_No preview versions are currently available._
--->
+_현재 사용할 수 있는 프리뷰 버전이 없습니다._
 
-<table>
+<!--<table>
     <tr>
         <th>빌드 정보 (Build info)</th>
         <th>빌드 주요 내용 (Build highlights)</th>
@@ -62,4 +60,4 @@ _No preview versions are currently available._
             <p>자세한 내용은 <a href="https://github.com/JetBrains/kotlin/releases/tag/v2.4.20-RC3">변경 로그(changelog)</a> 또는 <a href="whatsnew-eap.md">Kotlin 2.4.20-RC3의 새로운 기능</a>을 참고하세요.</p>
         </td>
     </tr>
-</table>
+</table>-->

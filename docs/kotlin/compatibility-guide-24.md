@@ -4,7 +4,7 @@ _[保持语言现代性](kotlin-evolution-principles.md)_和_[舒适更新](kotl
 
 虽然大多数语言变更已经通过其他渠道（如更新日志或编译器警告）发布，但本文档对这些变更进行了汇总，为从 Kotlin 2.3 迁移到 Kotlin 2.4 提供完整的参考。本文档还包含了与工具相关的变更信息。
 
-## 基本术语
+## 基本术语 {id="basic-terms"}
 
 在本文档中，我们引入了几种兼容性：
 
@@ -14,9 +14,9 @@ _[保持语言现代性](kotlin-evolution-principles.md)_和_[舒适更新](kotl
 
 请记住，这些定义仅适用于纯 Kotlin。从其他语言（例如 Java）的角度来看 Kotlin 代码的兼容性不在本文档的讨论范围内。
 
-## 语言
+## 语言 {id="language"}
 
-### 停止支持 `-language-version=1.9` 和 K1 编译器
+### 停止支持 `-language-version=1.9` 和 K1 编译器 {id="drop-support-for-language-version-1-9-and-the-k1-compiler"}
 
 > **问题**：[KT-80590](https://youtrack.jetbrains.com/issue/KT-80590)
 >
@@ -31,7 +31,7 @@ _[保持语言现代性](kotlin-evolution-principles.md)_和_[舒适更新](kotl
 > - 2.2.0：使用 1.9 版本的 `-language-version` 时报告警告
 > - 2.4.0：将该警告提升为错误
 
-### 禁止 Java 类型的灵活显式可空类型实参
+### 禁止 Java 类型的灵活显式可空类型实参 {id="prohibit-flexible-explicit-nullable-type-arguments-for-java-types"}
 
 > **问题**：[KTLC-284](https://youtrack.jetbrains.com/issue/KTLC-284)
 >
@@ -46,7 +46,7 @@ _[保持语言现代性](kotlin-evolution-principles.md)_和_[舒适更新](kotl
 > - 2.2.0：对于被视为灵活类型的显式指定可空类型实参报告警告
 > - 2.4.0：将该警告提升为错误
 
-### 禁止对绝对不兼容的类型进行始终为假的 `is` 检查
+### 禁止对绝对不兼容的类型进行始终为假的 `is` 检查 {id="prohibit-always-false-is-checks-for-definitely-incompatible-types"}
 
 > **问题**：[KTLC-365](https://youtrack.jetbrains.com/issue/KTLC-365)
 >
@@ -61,7 +61,7 @@ _[保持语言现代性](kotlin-evolution-principles.md)_和_[舒适更新](kotl
 > - 2.0.0：对绝对不兼容类型的 `is` 检查报告警告
 > - 2.4.0：将该警告提升为错误
 
-### 禁止在内联函数中暴露具有较低可见性的类型和声明
+### 禁止在内联函数中暴露具有较低可见性的类型和声明 {id="prohibit-exposing-types-and-declarations-with-lower-visibility-in-inline-functions"}
 
 > **问题**：[KTLC-283](https://youtrack.jetbrains.com/issue/KTLC-283)
 >
@@ -76,7 +76,7 @@ _[保持语言现代性](kotlin-evolution-principles.md)_和_[舒适更新](kotl
 > - 2.3.0：对在内联函数中暴露具有较低可见性的类型和声明报告警告
 > - 2.4.0：将该警告提升为错误
 
-### 更改注解的默认使用点目标选择
+### 更改注解的默认使用点目标选择 {id="change-default-use-site-target-selection-for-annotations"}
 
 > **问题**：[KTLC-391](https://youtrack.jetbrains.com/issue/KTLC-391)
 >
@@ -93,7 +93,7 @@ _[保持语言现代性](kotlin-evolution-principles.md)_和_[舒适更新](kotl
 > - 2.2.0：当新的默认规则改变所选的使用点目标时报告警告
 > - 2.4.0：启用新的默认规则
 
-### 禁止对不可访问类型的隐式引用
+### 禁止对不可访问类型的隐式引用 {id="forbid-implicit-references-to-inaccessible-types"}
 
 > **问题**：[KTLC-384](https://youtrack.jetbrains.com/issue/KTLC-384)
 >
@@ -110,7 +110,7 @@ _[保持语言现代性](kotlin-evolution-principles.md)_和_[舒适更新](kotl
 > - 2.3.0：对不可访问类型的隐式引用报告警告
 > - 2.4.0：将该警告提升为错误
 
-### 强制执行 Jakarta 为 null 性注解
+### 强制执行 Jakarta 为 null 性注解 {id="enforce-jakarta-nullability-annotations"}
 
 > **问题**：[KTLC-285](https://youtrack.jetbrains.com/issue/KTLC-285)
 >
@@ -125,7 +125,7 @@ _[保持语言现代性](kotlin-evolution-principles.md)_和_[舒适更新](kotl
 > - 2.2.0：对于带有 Jakarta 为 null 性注解的 Java 声明中的为 null 性不匹配报告警告
 > - 2.4.0：将该警告提升为错误
 
-### 报告可调用引用限定符中位置错误的类型实参
+### 报告可调用引用限定符中位置错误的类型实参 {id="report-misplaced-type-arguments-in-callable-reference-qualifiers"}
 
 > **问题**：[KTLC-388](https://youtrack.jetbrains.com/issue/KTLC-388)
 >
@@ -141,7 +141,7 @@ _[保持语言现代性](kotlin-evolution-principles.md)_和_[舒适更新](kotl
 >
 > - 2.4.0：当可调用引用左侧的类型实参属于限定符的另一部分时报告警告
 
-### 对于具有可空上界的具体化类型形参的类文字报告错误
+### 对于具有可空上界的具体化类型形参的类文字报告错误 {id="report-errors-for-class-literals-from-reified-type-parameters-with-nullable-upper-bounds"}
 
 > **问题**：[KTLC-370](https://youtrack.jetbrains.com/issue/KTLC-370)
 >
@@ -156,7 +156,7 @@ _[保持语言现代性](kotlin-evolution-principles.md)_和_[舒适更新](kotl
 > - 2.3.0：当对类型源自具有可空上界的具体化类型形参的表达式使用 `::class` 时报告警告
 > - 2.4.0：将该警告提升为错误
 
-### 禁止在匿名对象声明之前进行初始化
+### 禁止在匿名对象声明之前进行初始化 {id="prohibit-initialization-before-declarations-in-anonymous-objects"}
 
 > **问题**：[KTLC-290](https://youtrack.jetbrains.com/issue/KTLC-290)
 >
@@ -171,7 +171,7 @@ _[保持语言现代性](kotlin-evolution-principles.md)_和_[舒适更新](kotl
 > - 2.2.20：当匿名对象中的 `init` 块在属性声明之前初始化属性时报告警告
 > - 2.4.0：将该警告提升为错误
 
-### 对包含非抽象 Java 密封类的 `when` 表达式强制执行完备性
+### 对包含非抽象 Java 密封类的 `when` 表达式强制执行完备性 {id="enforce-exhaustiveness-for-when-expressions-with-non-abstract-java-sealed-classes"}
 
 > **问题**：[KTLC-366](https://youtrack.jetbrains.com/issue/KTLC-366)
 >
@@ -186,7 +186,7 @@ _[保持语言现代性](kotlin-evolution-principles.md)_和_[舒适更新](kotl
 > - 2.3.0：对包含非抽象 Java 密封类的非完备 `when` 表达式报告警告
 > - 2.4.0：将该警告提升为错误
 
-### 禁止在参数过多的 `getValue()` 和 `setValue()` 函数上使用 `operator` 修饰符
+### 禁止在参数过多的 `getValue()` 和 `setValue()` 函数上使用 `operator` 修饰符 {id="prohibit-operator-modifier-on-getvalue-and-setvalue-functions-with-too-many-parameters"}
 
 > **问题**：[KTLC-289](https://youtrack.jetbrains.com/issue/KTLC-289)
 >
@@ -201,7 +201,7 @@ _[保持语言现代性](kotlin-evolution-principles.md)_和_[舒适更新](kotl
 > - 2.2.20：对数值实参过多的 `operator` `getValue()` 和 `setValue()` 函数报告警告
 > - 2.4.0：将该警告提升为错误
 
-### 禁止泛型调用中不一致的类型实参
+### 禁止泛型调用中不一致的类型实参 {id="prohibit-inconsistent-type-arguments-in-generic-calls"}
 
 > **问题**：[KTLC-373](https://youtrack.jetbrains.com/issue/KTLC-373)
 >
@@ -216,7 +216,7 @@ _[保持语言现代性](kotlin-evolution-principles.md)_和_[舒适更新](kotl
 > - 2.3.0：当泛型调用中的显式类型实参违反类型形参之间的上界约束时报告警告
 > - 2.4.0：将该警告提升为错误
 
-### 弃用对 `javaClass` 属性的引用
+### 弃用对 `javaClass` 属性的引用 {id="deprecate-references-to-the-javaclass-property"}
 
 > **问题**：[KTLC-375](https://youtrack.jetbrains.com/issue/KTLC-375)
 >
@@ -230,7 +230,7 @@ _[保持语言现代性](kotlin-evolution-principles.md)_和_[舒适更新](kotl
 >
 > - 2.4.0：对 `javaClass` 属性的属性引用报告警告
 
-### 对于需要选择性加入的隐式枚举构造函数调用报告错误
+### 对于需要选择性加入的隐式枚举构造函数调用报告错误 {id="report-errors-for-implicit-enum-constructor-calls-that-require-opt-in"}
 
 > **问题**：[KTLC-359](https://youtrack.jetbrains.com/issue/KTLC-359)
 >
@@ -245,7 +245,7 @@ _[保持语言现代性](kotlin-evolution-principles.md)_和_[舒适更新](kotl
 > - 2.2.20：当枚举项隐式调用需要选择性加入的枚举主构造函数时报告警告
 > - 2.4.0：将该警告提升为错误
 
-### 禁止在枚举项上使用 `inline` 修饰符
+### 禁止在枚举项上使用 `inline` 修饰符 {id="forbid-inline-modifier-on-enum-entries"}
 
 > **问题**：[KTLC-361](https://youtrack.jetbrains.com/issue/KTLC-361)
 >
@@ -260,7 +260,7 @@ _[保持语言现代性](kotlin-evolution-principles.md)_和_[舒适更新](kotl
 > - 2.3.0：在枚举项上使用 `inline` 修饰符时报告警告
 > - 2.4.0：将该警告提升为错误
 
-### 禁止在注解调用和参数默认值之外使用数组字面量
+### 禁止在注解调用和参数默认值之外使用数组字面量 {id="prohibit-array-literals-outside-annotation-calls-and-parameter-defaults"}
 
 > **问题**：[KTLC-369](https://youtrack.jetbrains.com/issue/KTLC-369)
 >
@@ -275,7 +275,7 @@ _[保持语言现代性](kotlin-evolution-principles.md)_和_[舒适更新](kotl
 > - 2.3.0：对注解调用和注解参数默认值之外的数组字面量报告警告
 > - 2.4.0：将该警告提升为错误
 
-### 在 CLI 编译器模式下禁止使用 `_root_ide_package_`
+### 在 CLI 编译器模式下禁止使用 `_root_ide_package_` {id="prohibit-rootidepackage-in-cli-compiler-mode"}
 
 > **问题**：[KTLC-378](https://youtrack.jetbrains.com/issue/KTLC-378)
 >
@@ -290,7 +290,7 @@ _[保持语言现代性](kotlin-evolution-principles.md)_和_[舒适更新](kotl
 > - 2.3.20：对 CLI 编译器模式下的 `_root_ide_package_` 引用报告警告
 > - 2.4.0：将该警告提升为错误
 
-### 修正带有可变数量实参转换的函数引用的相等性
+### 修正带有可变数量实参转换的函数引用的相等性 {id="correct-equality-for-function-references-with-vararg-conversions"}
 
 > **问题**：[KTLC-385](https://youtrack.jetbrains.com/issue/KTLC-385)
 >
@@ -304,7 +304,7 @@ _[保持语言现代性](kotlin-evolution-principles.md)_和_[舒适更新](kotl
 >
 > - 2.4.0：引入新行为
 
-### 强制对伴生对象访问进行选择性加入
+### 强制对伴生对象访问进行选择性加入 {id="enforce-opt-in-for-companion-object-access"}
 
 > **问题**：[KTLC-386](https://youtrack.jetbrains.com/issue/KTLC-386)
 >
@@ -319,7 +319,7 @@ _[保持语言现代性](kotlin-evolution-principles.md)_和_[舒适更新](kotl
 > - 2.3.20：当伴生对象访问需要选择性加入时报告警告
 > - 2.4.0：对于 `ERROR` 级别的选择性加入要求，将其提升为错误
 
-### 报告来自带有嵌套泛型实参的超类型的类型不匹配
+### 报告来自带有嵌套泛型实参的超类型的类型不匹配 {id="report-type-mismatches-from-supertypes-with-nested-generic-arguments"}
 
 > **问题**：[KTLC-372](https://youtrack.jetbrains.com/issue/KTLC-372)
 >
@@ -333,7 +333,7 @@ _[保持语言现代性](kotlin-evolution-principles.md)_和_[舒适更新](kotl
 >
 > - 2.4.0：对涉及带有嵌套泛型实参的超类型的类型不匹配报告错误
 
-### 禁止包含不可访问声明的推断类型
+### 禁止包含不可访问声明的推断类型 {id="prohibit-inferred-types-with-inaccessible-declarations"}
 
 > **问题**：[KTLC-363](https://youtrack.jetbrains.com/issue/KTLC-363)
 >
@@ -348,9 +348,9 @@ _[保持语言现代性](kotlin-evolution-principles.md)_和_[舒适更新](kotl
 > - 2.3.0：当推断类型包含在当前作用域内不可访问的声明时报告警告
 > - 2.4.0：将该警告提升为错误
 
-## 标准库
+## 标准库 {id="standard-library"}
 
-### 弃用 `kotlin.io.readLine()` 函数
+### 弃用 `kotlin.io.readLine()` 函数 {id="deprecate-kotlin-io-readline-function"}
 
 > **问题**：[KTLC-394](https://youtrack.jetbrains.com/issue/KTLC-394)
 >
@@ -364,7 +364,7 @@ _[保持语言现代性](kotlin-evolution-principles.md)_和_[舒适更新](kotl
 >
 > - 2.4.0：使用 `kotlin.io.readLine()` 时报告警告
 
-### 弃用 `AbstractCoroutineContextKey` 及相关 API
+### 弃用 `AbstractCoroutineContextKey` 及相关 API {id="deprecate-abstractcoroutinecontextkey-and-related-apis"}
 
 > **问题**：[KT-84970](https://youtrack.jetbrains.com/issue/KT-84970)
 >
@@ -378,7 +378,7 @@ _[保持语言现代性](kotlin-evolution-principles.md)_和_[舒适更新](kotl
 >
 > - 2.4.0：使用已弃用的 API 时报告警告
 
-### 更改 `Random.nextDouble()` 处理无限边界的契约
+### 更改 `Random.nextDouble()` 处理无限边界的契约 {id="change-random-nextdouble-contract-for-infinite-bounds"}
 
 > **问题**：[KT-84368](https://youtrack.jetbrains.com/issue/KT-84368)
 >
@@ -392,9 +392,9 @@ _[保持语言现代性](kotlin-evolution-principles.md)_和_[舒适更新](kotl
 >
 > - 2.4.0：启用新行为
 
-## 工具
+## 工具 {id="tools"}
 
-### 弃用旧版 Kotlin/JS 编译器类型选择 API
+### 弃用旧版 Kotlin/JS 编译器类型选择 API {id="deprecate-legacy-kotlin-js-compiler-type-selection-apis"}
 
 > **问题**：[KT-64275](https://youtrack.jetbrains.com/issue/KT-64275), [KT-84753](https://youtrack.jetbrains.com/issue/KT-84753)
 >
@@ -411,7 +411,7 @@ _[保持语言现代性](kotlin-evolution-principles.md)_和_[舒适更新](kotl
 > - 1.8.0：弃用旧版 Kotlin/JS 编译器类型常量
 > - 2.4.0：移除已弃用的旧版编译器类型 API，并在使用 `KotlinJsCompilerType` 或带有编译器类型形参的 `KotlinProjectExtension.js()` 重载时报告警告
 
-### 弃用 Kotlin Android 扩展中的 `sourceSets`
+### 弃用 Kotlin Android 扩展中的 `sourceSets` {id="deprecate-sourcesets-in-the-kotlin-android-extension"}
 
 > **问题**：[KT-74451](https://youtrack.jetbrains.com/issue/KT-74451)
 >
@@ -425,7 +425,7 @@ _[保持语言现代性](kotlin-evolution-principles.md)_和_[舒适更新](kotl
 >
 > - 2.4.0：从 `KotlinAndroidProjectExtension` 访问 `sourceSets` 时报告警告
 
-### 移除 Kotlin/Native Apple 框架的可消耗配置
+### 移除 Kotlin/Native Apple 框架的可消耗配置 {id="remove-consumable-configurations-for-kotlin-native-apple-frameworks"}
 
 > **问题**：[KT-74503](https://youtrack.jetbrains.com/issue/KT-74503), [KT-82230](https://youtrack.jetbrains.com/issue/KT-82230)
 >
@@ -433,13 +433,13 @@ _[保持语言现代性](kotlin-evolution-principles.md)_和_[舒适更新](kotl
 >
 > **不兼容变更类型**：源码
 >
-> **简要总结**：Kotlin 2.4.0 移除了将 Kotlin/Native Apple 框架作为外发构件暴露的已生成的 Gradle 可消耗配置 (consumable configurations)。
+> **简要总结**：Kotlin 2.4.0 移除了将 Kotlin/Native Apple 框架作为外发构件暴露的已生成的 Gradle 可消耗配置。
 >
 > **弃用周期**：
 >
 > - 2.4.0：移除 Kotlin/Native Apple 框架的可消耗配置
 
-### 从 Kotlin Gradle 插件中移除已弃用的任务、编译和 DSL API
+### 从 Kotlin Gradle 插件中移除已弃用的任务、编译和 DSL API {id="remove-deprecated-task-compilation-and-dsl-apis-from-the-kotlin-gradle-plugin"}
 
 > **问题**：[KT-85509](https://youtrack.jetbrains.com/issue/KT-85509)
 >
@@ -485,7 +485,7 @@ _[保持语言现代性](kotlin-evolution-principles.md)_和_[舒适更新](kotl
 >
 > - 2.4.0：移除已弃用的 API
 
-### 弃用显式缩减的类路径快照配置
+### 弃用显式缩减的类路径快照配置 {id="deprecate-explicit-shrunk-classpath-snapshot-configuration"}
 
 > **问题**：[KT-75837](https://youtrack.jetbrains.com/issue/KT-75837)
 >
@@ -493,13 +493,13 @@ _[保持语言现代性](kotlin-evolution-principles.md)_和_[舒适更新](kotl
 >
 > **不兼容变更类型**：源码
 >
-> **简要总结**：`ClasspathSnapshotBasedIncrementalCompilationApproachParameters` 中的 `shrunkClasspathSnapshot` 配置参数已弃用。由于缩减的类路径快照是内部增量编译缓存，编译器现在会在增量编译器元数据 `workingDirectory` 下自动创建并管理它。要进行迁移，请使用自动管理的快照文件，而不是向 `shrunkClasspathSnapshot` 传递值。
+> **简要总结**：`ClasspathSnapshotBasedIncrementalCompilationApproachParameters` 中的 `shrunkClasspathSnapshot` 配置参数已弃用。缩减的类路径快照是内部增量编译缓存，因此编译器现在会在增量编译器元数据 `workingDirectory` 下自动创建并管理它。要进行迁移，请使用自动管理的快照文件，而不是向 `shrunkClasspathSnapshot` 传递值。
 >
 > **弃用周期**：
 >
 > - 2.4.0：使用 `shrunkClasspathSnapshot` 时报告警告
 
-### 移除冗余的 ABI 验证 Gradle DSL 元素
+### 移除冗余的 ABI 验证 Gradle DSL 元素 {id="remove-redundant-abi-validation-gradle-dsl-elements"}
 
 > **问题**：[KT-80685](https://youtrack.jetbrains.com/issue/KT-80685)
 >
@@ -513,7 +513,7 @@ _[保持语言现代性](kotlin-evolution-principles.md)_和_[舒适更新](kotl
 >
 > - 2.4.0：移除冗余的 ABI 验证 DSL 元素
 
-### 弃用过时的 Compose 编译器 Gradle 插件选项
+### 弃用过时的 Compose 编译器 Gradle 插件选项 {id="deprecate-obsolete-compose-compiler-gradle-plugin-options"}
 
 > **问题**：[KT-85343](https://youtrack.jetbrains.com/issue/KT-85343)
 >
@@ -539,7 +539,7 @@ _[保持语言现代性](kotlin-evolution-principles.md)_和_[舒适更新](kotl
 > - 2.1.0：对 `stabilityConfigurationFile` 报告警告
 > - 2.4.0：将这些警告提升为错误
 
-### 对过时的 Kotlin/Native Gradle 任务 API 报告错误
+### 对过时的 Kotlin/Native Gradle 任务 API 报告错误 {id="report-errors-for-obsolete-kotlin-native-gradle-task-apis"}
 
 > **问题**：[KT-85510](https://youtrack.jetbrains.com/issue/KT-85510)
 >
@@ -585,3 +585,17 @@ _[保持语言现代性](kotlin-evolution-principles.md)_和_[舒适更新](kotl
 > **弃用周期**：
 >
 > - 2.4.0：对已弃用的 Kotlin/Native Gradle 任务 API 报告错误，移除 `KotlinNativeLink.compilation` 属性
+
+### 对编译器实参值的大小写不匹配报告警告 {id="report-warnings-for-case-mismatches-in-compiler-argument-values"}
+
+> **问题**：[KT-86059](https://youtrack.jetbrains.com/issue/KT-86059)
+>
+> **组件**：构建工具 API
+>
+> **不兼容变更类型**：源码
+>
+> **简要总结**：接受固定值集合的编译器实参以前对字母大小写的处理并不一致：部分实参接受任意字母大小写，而其他实参则要求完全匹配。[构建工具 API](build-tools-api.md) 现在对这些值接受任意字母大小写但会报告警告，例如 `Case mismatch for -module-kind: expected 'commonjs', got 'CommonJS'`。要进行迁移，请使用[编译器参考](compiler-reference.md)中为该实参列出的字母大小写。
+>
+> **弃用周期**：
+>
+> - 2.4.20：当编译器实参值的字母大小写与预期值不匹配时报告警告

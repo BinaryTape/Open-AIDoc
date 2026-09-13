@@ -4,7 +4,7 @@
 このエラー解決プロセスは、開発中のデバッガー内、または本番環境でのロギングやオブザーバビリティ（可観測性）ツールを使用して行われる可能性があります。
 ライブラリで以下のベストプラクティスに従うことで、デバッグをより容易にすることができます。
 
-## 状態を持つ型に toString メソッドを提供する
+## 状態を持つ型に toString メソッドを提供する {id="provide-a-tostring-method-for-stateful-types"}
 
 状態を持つすべての型に対して、意味のある `toString` 実装を提供してください。
 この実装は、内部的な型であっても、インスタンスの現在の内容を理解可能な形式で返す必要があります。
@@ -115,7 +115,7 @@ override fun toString(): String =
 
 これにより、どのフィールドが設定されており、どれが設定されていないかを即座に確認できます。
 
-## 例外処理のポリシーを採用し、文書化する
+## 例外処理のポリシーを採用し、文書化する {id="adopt-and-document-a-policy-for-handling-exceptions"}
 
 「[適切なエラー処理メカニズムを選択する](api-guidelines-consistency.md#choose-the-appropriate-error-handling-mechanism)」セクションで説明したように、ライブラリが例外をスローしてエラーを通知するのが適切な場合があります。この目的のために、独自の例外型を作成することもできます。
 
@@ -131,7 +131,64 @@ override fun toString(): String =
 例外の型はエラーの種類を示す必要があり、例外に含まれるデータはユーザーが問題の根本原因を特定するのに役立つものであるべきです。
 一般的なパターンは、低レベルの例外をライブラリ固有の例外でラップし、元の例外を `cause` としてアクセス可能にすることです。
 
-## 次のステップ
+## カスタム例外でコルーチンのスタックトレース復元をサポートする {id="support-coroutine-stack-trace-recovery-for-custom-exceptions"}
+<primary-label ref="experimental-general"/>
+
+ライブラリ内のカスタム例外型にコルーチンの[スタックトレース復元 (stack trace recovery)](coroutines-debugging.md#stack-trace-recovery)のサポートを追加することで、デバッグをより容易にすることができます。
+これにより、`kotlinx.coroutines` ライブラリや Kotlin のその他の非同期ランタイムに対するライブラリのサポートが向上します。
+
+コルーチンがサスペンド関数を通じて別のコルーチンから例外を受け取ると、スタックトレース復元はその関数呼び出しに至るスタックフレームを含む例外のコピーを作成します。
+
+`kotlinx.coroutines` ライブラリは、例外メッセージのみ、cause（原因）のみ、その両方、または引数を取らないコンストラクタを持つ例外に対して、自動的にスタックトレース復元を実行します。
+ライブラリ内の例外型が行番号やエラーコードなどの追加のコンストラクタ引数を必要とする場合は、[`StackTraceRecoverable`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.coroutines.debug/-stack-trace-recoverable/) インターフェースを実装してください。
+
+このインターフェースを実装するには、[`copyForStackTraceRecovery()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.coroutines.debug/-stack-trace-recoverable/copy-for-stack-trace-recovery.html) 関数をオーバーライドします。
+オーバーライド内では、スタックトレース復元用の新しい例外インスタンスを返すか、`kotlinx.coroutines` ライブラリに例外をコピーさせたくない場合は `null` を返します。
+
+`StackTraceRecoverable` インターフェースは Kotlin 標準ライブラリの一部であるため、これを実装しても `kotlinx.coroutines` ライブラリへの依存関係は追加されません。
+
+以下は、スタックトレース復元のために新しいインスタンスを作成する際に `line` プロパティを保持するカスタム例外の例です。
+
+```kotlin
+import kotlin.coroutines.ExperimentalStdlibCoroutineSupportApi
+import kotlin.coroutines.debug.StackTraceRecoverable
+
+@OptIn(ExperimentalStdlibCoroutineSupportApi::class)
+class FileEditException
+// IllegalStateException のコンストラクタに cause を渡すために
+// プライベートコンストラクタが必要
+private constructor(
+    val line: Int,
+    private val detail: String,
+    cause: Throwable?,
+) : IllegalStateException("When editing line $line: $detail", cause),
+    // スタックトレース復元のために StackTraceRecoverable を実装
+    StackTraceRecoverable<FileEditException> {
+
+    constructor(line: Int, detail: String) : this(line, detail, null)
+
+    // 行番号とメッセージの詳細をコピー
+    override fun copyForStackTraceRecovery(): FileEditException =
+        FileEditException(line, detail, this)
+    }
+
+fun main() {
+    val original = FileEditException(15, "Unexpected token")
+    
+    // 通常、動作をテストする場合を除き、この関数を直接呼び出す必要はありません
+    // kotlinx.coroutines ライブラリがスタックトレース復元時に自動的に呼び出します
+    val copy = original.copyForStackTraceRecovery()
+
+    println(copy.message)
+    // When editing line 15: Unexpected token
+
+    println(copy.cause == original)
+    // true
+}
+```
+{kotlin-runnable="true" kotlin-min-compiler-version="2.4.20"}
+
+## 次のステップ {id="next-step"}
 
 ガイドの次のパートでは、テストのしやすさについて学びます。
 

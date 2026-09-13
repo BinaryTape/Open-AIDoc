@@ -16,7 +16,8 @@ Gradle 7.0 为 Gradle 插件作者引入了一项新功能——[带变体的插
 | `gradle86`     | 8.6-8.7                       |
 | `gradle88`     | 8.8-8.10                      |
 | `gradle811`    | 8.11-8.12                     |
-| `gradle813`    | 8.13 及更高版本               |
+| `gradle813`    | 8.13-8.14                     |
+| `gradle96`     | 9.6-9.7                       |
 
 在未来的 Kotlin 版本中，将会添加更多变体。
 
@@ -78,7 +79,7 @@ dependencies {
 </tab>
 </tabs>
 
-你需要在你的 `customConfiguration` 中添加以下属性：
+你需要向你的 `customConfiguration` 中添加以下属性：
 
 <tabs group="build-script">
 <tab title="Kotlin" group-key="kotlin">

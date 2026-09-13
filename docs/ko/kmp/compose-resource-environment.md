@@ -120,10 +120,6 @@
 5. 웹(web) 플랫폼의 경우, 커스텀 로캘 로직을 도입하기 위해 `window.navigator.languages` 속성의 읽기 전용 제한을 우회합니다:
 
     ```kotlin
-    external object window {
-        var __customLocale: String?
-    }
-    
     actual object LocalAppLocale {
         private val LocalAppLocale = staticCompositionLocalOf { Locale.current }
         actual val current: String
@@ -131,9 +127,21 @@
     
         @Composable
         actual infix fun provides(value: String?): ProvidedValue<*> {
-            window.__customLocale = value?.replace('_', '-')
+            updateCustomLocale(value?.replace('_', '-'))
             return LocalAppLocale.provides(Locale.current)
         }
+    }
+    
+    @OptIn(ExperimentalWasmJsInterop::class)
+    private fun updateCustomLocale(value: String?) {
+        js(
+            """
+            if (window.__customLocale !== value) {
+                window.__customLocale = value;
+                window.dispatchEvent(new Event("languagechange"));
+            }
+            """
+        )
     }
     ```
 

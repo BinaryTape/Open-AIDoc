@@ -3,7 +3,7 @@
 Kotlin で関数を宣言するには：
 * `fun` キーワードを使用します。
 * パラメータを括弧 `()` の中に指定します。
-* 必要に応じて[戻り値の型](#戻り値の型)を含めます。
+* 必要に応じて[戻り値の型](#return-types)を含めます。
 
 例：
 
@@ -48,11 +48,17 @@ Stream().read()
 fun powerOf(number: Int, exponent: Int): Int { /*...*/ }
 ```
 
-関数の本体内では、受け取った引数は読み取り専用です（暗黙的に `val` として宣言されます）：
+関数にオブジェクトを渡すと、コンパイラはそのオブジェクトへの参照のコピーを渡します。
+コピーされた参照は同じオブジェクトを指すため、関数はそのオブジェクトの可変な状態を変更できます。
+
+関数のパラメータは関数本体内では読み取り専用であり（暗黙的に `val` として宣言されます）、再代入することはできません：
 
 ```kotlin
-fun powerOf(number: Int, exponent: Int): Int {
-    number = 2 // エラー: 'val' は再代入できません。
+class Counter(var value: Int)
+
+fun reset(counter: Counter) {
+    counter.value = 0    // 許可: オブジェクトを変更
+    counter = Counter(0) // エラー: 'val' は再代入できません
 }
 ```
 
@@ -93,7 +99,7 @@ fun read(
 ) { /*...*/ }
 ```
 
-デフォルト値を持つパラメータを、デフォルト値を持たないパラメータの**前**に宣言した場合、デフォルト値を使用するには[名前付き引数](#名前付き引数)を使用するしかありません：
+デフォルト値を持つパラメータを、デフォルト値を持たないパラメータの**前**に宣言した場合、デフォルト値を使用するには[名前付き引数](#named-arguments)を使用するしかありません：
 
 ```kotlin
 fun greeting(
@@ -259,7 +265,7 @@ reformat(
 )
 ```
 
-対応する引数名を指定することで、[可変長引数](#可変長引数-varargs) (`vararg`) を渡すことができます。
+対応する引数名を指定することで、[可変長引数](#variable-number-of-arguments-varargs) (`vararg`) を渡すことができます。
 この例では、配列を渡しています：
 
 ```kotlin
@@ -277,11 +283,91 @@ mergeStrings(strings = arrayOf("a", "b", "c"))
 ### 戻り値の型 {id="return-types"}
 
 ブロック本体（波括弧 `{}` 内に命令を記述する形式）を持つ関数を宣言する場合、常に明示的に戻り値の型を指定する必要があります。
-唯一の例外は、`Unit` を返す場合です。[その場合、戻り値の型の指定は任意です](#unit-を返す関数)。
+唯一の例外は、`Unit` を返す場合です。[その場合、戻り値の型の指定は任意です](#unit-returning-functions)。
 
 Kotlin はブロック本体を持つ関数の戻り値の型を推論しません。
 そのような関数の制御フローは複雑になる可能性があり、読み手にとっても、時にはコンパイラにとっても戻り値の型が不明確になるためです。
-ただし、[単一式関数](#単一式関数)の場合は、戻り値の型を指定しなくても Kotlin が推論できます。
+ただし、[単一式関数](#single-expression-functions)の場合は、戻り値の型を指定しなくても Kotlin が推論できます。
+
+Kotlin の関数は単一の値を返しますが、その値に複数のデータを含めることができます。これらの値を表現する方法については、[複数の値を返す](#return-multiple-values)を参照してください。
+
+#### 複数の値を返す {id="return-multiple-values"}
+
+明確に異なる意味を持つ複数の関連する値を返す必要がある場合は、たとえ 1 つの関数でしか使用しないとしても、[データクラス](data-classes.md)を宣言してください：
+
+```kotlin
+data class OrderSummary(
+    val subtotal: Double,
+    val tax: Double,
+)
+
+fun calculateOrderSummary(prices: List<Double>): OrderSummary {
+    val subtotal = prices.sum()
+    val tax = subtotal * 0.2
+    return OrderSummary(subtotal, tax)
+}
+
+fun main() {
+    val summary = calculateOrderSummary(listOf(12.50, 8.00, 4.50))
+
+    println(summary.subtotal)
+    // 25.0
+    println(summary.tax)
+    // 5.0
+}
+```
+{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="return-multiple-values-data-class"}
+
+データクラスは、それぞれ異なる意味を持つ複数の値を返す必要がある場合に適しています。返される値が同じ種類のものであり、それらをグループとして扱いたい場合は、代わりにコレクションを返すことを検討してください：
+
+```kotlin
+data class Person(val name: String)
+
+val friendGroups = listOf(
+    listOf(Person("Alice"), Person("Bob")),
+    listOf(Person("Charlie"), Person("Diana"), Person("Eve")),
+    listOf(Person("Frank"))
+)
+
+fun findLargestGroupOfFriends(): List<Person> {
+    return friendGroups.maxByOrNull { it.size } ?: emptyList()
+}
+
+fun main() {
+    val largestGroup = findLargestGroupOfFriends()
+
+    println(largestGroup.map { it.name })
+    // [Charlie, Diana, Eve]
+}
+```
+{kotlin-runnable="true" kotlin-min-compiler-version="1.4" id="return-multiple-values-list"}
+
+固定の個数の値を返す必要がある場合は、標準ライブラリの [`Pair`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-pair/) または [`Triple`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-triple/) データクラスを使用することもできます。ただし、それらのプロパティには `first`、`second`、`third` のような汎用的な名前が付けられているため、結果が分かりにくくなる可能性があります。
+
+例えば、`calculateOrderTotals()` 関数は `Pair` を返しますが、各 `Double` が何を表しているのかが明確ではありません：
+
+```kotlin
+fun calculateOrderTotals(prices: List<Double>): Pair<Double, Double> {
+    val subtotal = prices.sum()
+    val tax = subtotal * 0.2
+    return Pair(subtotal, tax)
+}
+
+fun main() {
+    val totals = calculateOrderTotals(listOf(12.50, 8.00, 4.50))
+
+    // 'first' は何を意味しているのでしょうか？
+    println(totals.first)
+    // 25.0
+  
+    // 'second' は何を意味しているのでしょうか？
+    println(totals.second)
+    // 5.0
+}
+```
+{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="return-multiple-values-pair"}
+
+異なる意味を持つ結果に対しては、[`OrderSummary` データクラスの例](#return-multiple-values)で示されているように、説明的なプロパティ名を持つデータクラスを優先して使用してください。
 
 ### 単一式関数 {id="single-expression-functions"}
 
@@ -291,7 +377,7 @@ Kotlin はブロック本体を持つ関数の戻り値の型を推論しませ�
 fun double(x: Int): Int = x * 2
 ```
 
-ほとんどの場合、[戻り値の型](#戻り値の型)を明示的に宣言する必要はありません：
+ほとんどの場合、[戻り値の型](#return-types)を明示的に宣言する必要はありません：
 
 ```kotlin
 // コンパイラは関数が Int を返すと推論します
@@ -417,7 +503,7 @@ fun main() {
 パラメータが関数型である場合は、括弧の外にラムダを置くことで値を渡すこともできます。
 
 `vararg` 関数を呼び出す際、`asList(1, 2, 3)` の例のように、引数を個別に渡すことができます。
-すでに配列を持っていて、その内容を `vararg` パラメータとして、またはその一部として関数に渡したい場合は、配列名の前に `*` を付ける[スプレッド演算子](arrays.md#関数に可変引数を渡す)を使用します：
+すでに配列を持っていて、その内容を `vararg` パラメータとして、またはその一部として関数に渡したい場合は、配列名の前に `*` を付ける[スプレッド演算子](arrays.md#pass-variable-number-of-arguments-to-a-function)を使用します：
 
 ```kotlin
 fun <T> asList(vararg ts: T): List<T> {
@@ -441,7 +527,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" validate="false" id="varargs-aslist-with-array"}
 
-[プリミティブ型の配列](arrays.md#プリミティブ型の配列)を `vararg` として渡したい場合は、[`.toTypedArray()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/to-typed-array.html) 関数を使用して、通常の（型付き）配列に変換する必要があります：
+[プリミティブ型の配列](arrays.md#primitive-type-arrays)を `vararg` として渡したい場合は、[`.toTypedArray()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/to-typed-array.html) 関数を使用して、通常の（型付き）配列に変換する必要があります：
 
 ```kotlin
 // 'a' は IntArray（プリミティブ型配列）です
@@ -468,7 +554,7 @@ infix fun Int.shl(x: Int): Int { /*...*/ }
 
 * クラスのメンバ関数または[拡張関数](extensions.md)であること。
 * パラメータが1つだけであること。
-* そのパラメータが[可変長引数](#可変長引数-varargs) (`vararg`) を受け入れず、[デフォルト値](#デフォルト値を持つパラメータ)を持たないこと。
+* そのパラメータが[可変長引数](#variable-number-of-arguments-varargs) (`vararg`) を受け入れず、[デフォルト値](#parameters-with-default-values)を持たないこと。
 
 > 中置関数呼び出しの優先順位は、算術演算子、型キャスト、および `rangeTo` 演算子よりも低くなります。
 > 以下の式はそれぞれ同等です：
@@ -607,7 +693,7 @@ class Sample {
 Stream().read()
 ```
 
-クラスとメンバのオーバーライドの詳細については、[クラス](classes.md)と[継承](classes.md#継承)を参照してください。
+クラスとメンバのオーバーライドの詳細については、[クラス](classes.md)と[継承](classes.md#inheritance)を参照してください。
 
 ## ジェネリック関数 {id="generic-functions"}
 
@@ -621,7 +707,7 @@ fun <T> singletonList(item: T): List<T> { /*...*/ }
 
 ## 末尾再帰関数 {id="tail-recursive-functions"}
 
-Kotlin は、[末尾再帰](https://ja.wikipedia.org/wiki/%E6%9C%AB%E5%B0%BE%E5%86%8D%E5%B1%B0) (tail recursion) として知られる関数型プログラミングのスタイルをサポートしています。
+Kotlin は、[末尾再帰](https://en.wikipedia.org/wiki/Tail_call) (tail recursion) として知られる関数型プログラミングのスタイルをサポートしています。
 通常ループを使用するようなアルゴリズムの場合、スタックオーバーフローのリスクなしに再帰関数を使用できます。
 関数が `tailrec` 修飾子でマークされ、必要な形式的条件を満たしている場合、コンパイラは再帰を最適化し、高速で効率的なループベースのバージョンに置き換えます：
 
@@ -658,7 +744,7 @@ private fun findFixPoint(): Double {
 ```
 
 `tailrec` 修飾子は、関数がその最後の操作として自分自身を呼び出す場合にのみ適用できます。
-再帰呼び出しの後にさらにコードがある場合や、[`try`/`catch`/`finally` ブロック](exceptions.md#try-catch-ブロックを使用して例外を処理する)内、または関数が [open](inheritance.md) である場合には、末尾再帰を使用することはできません。
+再帰呼び出しの後にさらにコードがある場合や、[`try`/`catch`/`finally` ブロック](exceptions.md#handle-exceptions-using-try-catch-blocks)内、または関数が [open](inheritance.md) である場合には、末尾再帰を使用することはできません。
 
 **関連項目**:
 * [インライン関数](inline-functions.md)

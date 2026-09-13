@@ -34,7 +34,7 @@ Kotlin/Native 編譯器支援多種不同的目標，但對這些目標的支援
 ### 第 2 層級 {id="tier-2"}
 
 * 該目標在 CI 上定期進行測試以確保能夠編譯，但可能不會自動測試其是否能夠執行。
-* 我們盡力提供編譯器版本之間的原始碼與 [二進位相規性](https://youtrack.jetbrains.com/issue/KT-42293)。
+* 我們盡力提供編譯器版本之間的原始碼與 [二進位相容性](https://youtrack.jetbrains.com/issue/KT-42293)。
 
 | Gradle 目標名稱 | 目標三元組 | 執行測試 | 說明 |
 |-------------------------|-----------------------------------|---------------|------------------------------------------------------------------|
@@ -42,7 +42,6 @@ Kotlin/Native 編譯器支援多種不同的目標，但對這些目標的支援
 | `linuxArm64` | `aarch64-unknown-linux-gnu` | | ARM64 平台上的 Linux |
 | 僅限 Apple macOS 主機： | | | |
 | `watchosSimulatorArm64` | `aarch64-apple-watchos-simulator` | ✅ | Apple Silicon 平台上的 Apple watchOS 模擬器 8.0 及更高版本 |
-| `watchosArm32` | `armv7k-apple-watchos` | | ARM32 平台上的 Apple watchOS 8.0 及更高版本 |
 | `watchosArm64` | `arm64_32-apple-watchos` | | 使用 ILP32 的 ARM64 平台上的 Apple watchOS 8.0 及更高版本 |
 | `tvosSimulatorArm64` | `aarch64-apple-tvos-simulator` | ✅ | Apple Silicon 平台上的 Apple tvOS 模擬器 15.0 及更高版本 |
 | `tvosArm64` | `aarch64-apple-tvos` | | ARM64 平台上的 Apple tvOS 15.0 及更高版本 |
@@ -52,7 +51,8 @@ Kotlin/Native 編譯器支援多種不同的目標，但對這些目標的支援
 * 不保證該目標會在 CI 上進行測試。
 * 我們無法承諾不同編譯器版本之間的原始碼與二進位相容性，儘管這些目標的此類變更相當罕見。
 
-> 第 3 層級目標並非處於活躍開發狀態，且可能包含破壞性問題。請謹慎使用。
+> 第 3 層級目標並非處於活躍開發狀態，且可能包含破壞性問題。
+> 請謹慎使用。
 > 
 {style="warning"}
 
@@ -65,19 +65,19 @@ Kotlin/Native 編譯器支援多種不同的目標，但對這些目標的支援
 | `mingwX64` | `x86_64-pc-windows-gnu` | ✅ | 使用 [MinGW](https://www.mingw-w64.org) 相容層的 64 位元 Windows 10 及更高版本 |
 | 僅限 Apple macOS 主機： | | | |
 | `watchosDeviceArm64` | `aarch64-apple-watchos` | | ARM64 平台上的 Apple watchOS 8.0 及更高版本 |
-| `iosX64` | `x86_64-apple-ios-simulator` | ✅ | x86-64 平台上的 Apple iOS 模擬器 15.0 及更高版本 |
-
-> `linuxArm32Hfp` 目標已棄用，並將在未來的版本中移除。
-> 
-{style="note"}
+| `iosX64` | `x86_64-apple-ios-simulator` | | x86-64 平台上的 Apple iOS 模擬器 15.0 及更高版本 |
 
 ### 已棄用目標 {id="deprecated-targets"}
 
-從 Kotlin 2.3.20 開始，以下目標已被棄用：
+以下目標已被棄用，並排定於未來移除：
 
-* `macosX64` (x86_64 平台上的 Apple macOS)
-* `watchosX64` (x86_64 平台上的 Apple watchOS 64 位元模擬器)
-* `tvosX64` (x86_64 平台上的 Apple tvOS 模擬器)
+| 目標 | 開始棄用版本 | 說明 |
+|-----------------|-------------------|----------------------------------------------------|
+| `watchosArm32` | Kotlin 2.4.20 | ARM32 平台上的 Apple watchOS 裝置 |
+| `macosX64` | Kotlin 2.3.20 | x86_64 平台上的 Apple macOS |
+| `watchosX64` | Kotlin 2.3.20 | x86_64 平台上的 Apple watchOS 64 位元模擬器 | 
+| `tvosX64` | Kotlin 2.3.20 | x86_64 平台上的 Apple tvOS 模擬器 | 
+| `linuxArm32Hfp` | Kotlin 1.8.20 | ARM32 平台上的 Linux |
 
 ### 支援較舊的 Apple 目標版本 {id="supporting-lower-apple-target-versions"}
 
@@ -117,20 +117,20 @@ Kotlin/Native 編譯器支援以下主機：
 
 | 主機作業系統 | 建置最終執行檔 | 產生 `.klib` 構件 |
 |----------------------------------------------------|------------------------------------------------|------------------------------------------------------------------------|
-| Apple Silicon (ARM64) 上的 macOS | 任何支援的目標 | 任何支援的目標 |
+| Apple 晶片 (ARM64) 上的 macOS | 任何支援的目標 | 任何支援的目標 |
 | Intel 晶片 (x86_64) 上的 macOS | 任何支援的目標 | 任何支援的目標 |
 | x86_64 架構的 Linux | 除 Apple 目標外，任何支援的目標 | 任何支援的目標，Apple 目標僅限無 cinterop 相依性時 |
 | x86_64 架構的 Windows (MinGW 工具鏈) | 除 Apple 目標外，任何支援的目標 | 任何支援的目標，Apple 目標僅限無 cinterop 相依性時 |
 
 ### 建置最終執行檔 {id="building-final-binaries"}
 
-若要產生最終執行檔，您只能在 *支援的主機* 上為 [支援的目標](#target-tiers) 進行編譯。例如，您無法在 FreeBSD 或執行 ARM64 架構的 Linux 電腦上進行編譯。
+若要產生最終執行檔，您只能在 _支援的主機_ 上為 [支援的目標](#target-tiers) 進行編譯。例如，您無法在 FreeBSD 或執行 ARM64 架構的 Linux 電腦上進行編譯。
 
 此外，也無法在 Linux 和 Windows 上為 Apple 目標建置最終執行檔。
 
 ### 產生 `.klib` 構件 {id="producing-klib-artifacts"}
 
-通常，Kotlin/Native 允許任何 *支援的主機* 為支援的目標產生 `.klib` 構件。
+通常，Kotlin/Native 允許任何 _支援的主機_ 為支援的目標產生 `.klib` 構件。
 
 然而，在 Linux 和 Windows 上為 Apple 目標產生構件仍有一些限制。如果您的專案使用 [cinterop 相依性](native-c-interop.md)（包括 [CocoaPods](https://kotlinlang.org/docs/multiplatform/multiplatform-cocoapods-overview.html)），則必須使用 macOS 主機。
 

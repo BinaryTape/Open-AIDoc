@@ -1,7 +1,7 @@
 [//]: # (title: 定義檔)
 
 Kotlin/Native 讓你能夠取用 C 與 Objective-C 程式庫，使你能在 Kotlin 中使用它們的功能。
-一個名為 `cinterop` 的特殊工具會處理 C 或 Objective-C 程式庫並產生對應的 Kotlin 繫結，
+一個名為 cinterop 的特殊工具會處理 C 或 Objective-C 程式庫並產生對應的 Kotlin 繫結，
 以便在你的 Kotlin 程式碼中像往常一樣使用該程式庫的方法。
 
 要產生這些繫結，每個程式庫都需要一個定義檔，通常與該程式庫同名。
@@ -13,7 +13,7 @@ Kotlin/Native 讓你能夠取用 C 與 Objective-C 程式庫，使你能在 Kotl
 2. 在你的 Kotlin 程式碼中使用產生的繫結。
 3. 執行 Kotlin/Native 編譯器以產生最終的可執行檔。
 
-## 建立並設定定義檔
+## 建立並設定定義檔 {id="create-and-configure-a-definition-file"}
 
 讓我們為一個 C 程式庫建立定義檔並產生繫結：
 
@@ -51,7 +51,7 @@ Kotlin/Native 讓你能夠取用 C 與 Objective-C 程式庫，使你能在 Kotl
 > 
 {style="tip"}
 
-## 屬性
+## 屬性 {id="properties"}
 
 以下是可以在定義檔中使用的屬性完整列表，用以調整產生的二進位檔內容。
 如需更多資訊，請參閱下方的對應章節。
@@ -66,7 +66,7 @@ Kotlin/Native 讓你能夠取用 C 與 Objective-C 程式庫，使你能在 Kotl
 | [`excludedFunctions`](#ignore-specific-functions)                                   | 以空格分隔的應忽略函式名稱列表。                                                                                                                                                         |                                              
 | [`staticLibraries`](#include-a-static-library)                                      | [實驗性](components-stability.md#stability-levels-explained)。將靜態程式庫包含到 `.klib` 中。                                                                                                              |
 | [`libraryPaths`](#include-a-static-library)                                         | [實驗性](components-stability.md#stability-levels-explained)。以空格分隔的目錄列表，`cinterop` 工具會在這些目錄中搜尋要包含在 `.klib` 中的程式庫。                                    |
-| `package`                                                                           | 產生的 Kotlin API 的套件前綴。                                                                                                                                                                             |
+| [`package`](#set-the-package-name)                                                  | 產生的 Kotlin API 的套件前綴。                                                                                                                                                                             |
 | [`headerFilter`](#filter-headers-by-globs)                                          | 透過萬用字元篩選標頭，並在匯入程式庫時僅包含它們。                                                                                                                                                |
 | [`excludeFilter`](#exclude-headers)                                                 | 在匯入程式庫時排除特定的標頭，其優先級高於 `headerFilter`。                                                                                                                               |
 | [`strictEnums`](#configure-enums-generation)                                        | 應產生為 [Kotlin 列舉](enum-classes.md) 的以空格分隔的列舉列表。                                                                                                                             |
@@ -82,7 +82,7 @@ Kotlin/Native 讓你能夠取用 C 與 Objective-C 程式庫，使你能在 Kotl
 
 除了屬性列表外，你還可以在定義檔中包含 [自訂宣告](#add-custom-declarations)。
 
-### 匯入標頭
+### 匯入標頭 {id="import-headers"}
 
 如果 C 程式庫沒有 Clang 模組，而是由一組標頭組成，請使用 `headers` 屬性指定應匯入的標頭：
 
@@ -90,7 +90,7 @@ Kotlin/Native 讓你能夠取用 C 與 Objective-C 程式庫，使你能在 Kotl
 headers = curl/curl.h
 ```
 
-#### 透過萬用字元篩選標頭
+#### 透過萬用字元篩選標頭 {id="filter-headers-by-globs"}
 
 你可以使用 `.def` 檔案中的篩選屬性，透過萬用字元來篩選標頭。要包含來自標頭的宣告，請使用 `headerFilter` 屬性。如果標頭符合任何萬用字元，其宣告就會包含在繫結中。
 
@@ -102,7 +102,7 @@ headerFilter = SomeLibrary/**
 
 如果未提供 `headerFilter`，則會包含所有標頭。然而，我們鼓勵你使用 `headerFilter` 並儘可能精確地指定萬用字元。在這種情況下，產生的程式庫僅包含必要的宣告。這有助於在升級 Kotlin 或開發環境中的工具時避免各種問題。
 
-#### 排除標頭
+#### 排除標頭 {id="exclude-headers"}
 
 要排除特定的標頭，請使用 `excludeFilter` 屬性。這對於移除冗餘或有問題的標頭並最佳化編譯很有幫助，因為指定標頭中的宣告將不會包含在繫結中：
 
@@ -114,7 +114,7 @@ excludeFilter = SomeLibrary/time.h
 >
 {style="note"}
 
-### 匯入模組
+### 匯入模組 {id="import-modules"}
 
 如果 Objective-C 程式庫具有 Clang 模組，請使用 `modules` 屬性指定要匯入的模組：
 
@@ -122,7 +122,21 @@ excludeFilter = SomeLibrary/time.h
 modules = UIKit
 ```
 
-### 傳遞編譯器和連結器選項
+### 設定套件名稱 {id="set-the-package-name"}
+
+使用 `package` 屬性為產生的 Kotlin API 指定套件前綴：
+
+```none
+package = png
+```
+
+如果未指定此屬性，編譯器會在根套件中產生宣告。
+
+> `kotlin` 與 `kotlinx.cinterop` 名稱為保留名稱，不能用作套件前綴。
+>
+{style="note"}
+
+### 傳遞編譯器和連結器選項 {id="pass-compiler-and-linker-options"}
 
 使用 `compilerOpts` 屬性將選項傳遞給 C 編譯器，該編譯器在幕後用於分析標頭。要將選項傳遞給用於連結最終可執行檔的連結器，請使用 `linkerOpts`。例如：
 
@@ -141,15 +155,15 @@ compilerOpts.macos_x64 = -DFOO=foo2
 
 在此組態下，標頭在 Linux 上使用 `-DBAR=bar -DFOO=foo1` 進行分析，在 macOS 上則使用 `-DBAR=bar -DFOO=foo2`。請注意，任何定義檔選項都可以同時具有通用部分和平台特定部分。
 
-### 忽略特定函式
+### 忽略特定函式 {id="ignore-specific-functions"}
 
 使用 `excludedFunctions` 屬性指定應忽略的函式名稱列表。如果標頭中宣告的函式無法保證可以呼叫，且難以或無法自動判斷時，這會很有用。你也可以使用此屬性來解決 interop 本身的錯誤。
 
-### 包含靜態程式庫
+### 包含靜態程式庫 {id="include-a-static-library"}
 
 <primary-label ref="experimental-general"/>
 
-有時將靜態程式庫隨你的產品一起交付會比假設使用者環境中已具備該程式庫更為方便。要將靜態程式庫包含到 `.klib` 中，請使用 `staticLibraries` 和 `libraryPaths` 屬性：
+有時將靜態程式庫隨你的產品一起交付會比假設使用者環境中已具備該程式庫更為方便。要將靜態程式庫包含到 `.klib` 中，請使用 `staticLibrary` 和 `libraryPaths` 屬性：
 
 ```none
 headers = foo.h
@@ -161,32 +175,32 @@ libraryPaths = /opt/local/lib /usr/local/opt/curl/lib
 
 在你的程式中使用這樣的 `klib` 時，程式庫會自動連結。
 
-### 設定列舉產生
+### 設定列舉產生 {id="configure-enums-generation"}
 
 使用 `strictEnums` 屬性將列舉產生為 Kotlin 列舉，或使用 `nonStrictEnums` 將其產生為整數值。如果列舉未包含在這些列表中的任何一個，則會根據啟發式方法產生。
 
-### 設定字串轉換
+### 設定字串轉換 {id="set-up-string-conversion"}
 
 使用 `noStringConversion` 屬性來停用將 `const char*` 函式參數自動轉換為 Kotlin `String` 的功能。
 
-### 允許呼叫非指定的初始設定式
+### 允許呼叫非指定的初始設定式 {id="allow-calling-a-non-designated-initializer"}
 
 預設情況下，Kotlin/Native 編譯器不允許將非指定的 Objective-C 初始設定式作為 `super()` 建構函式呼叫。如果程式庫中未正確標記指定的 Objective-C 初始設定式，此行為可能會帶來不便。要停用這些編譯器檢查，請使用 `disableDesignatedInitializerChecks` 屬性。
 
-### 處理 Objective-C 例外狀況
+### 處理 Objective-C 例外狀況 {id="handle-objective-c-exceptions"}
 
 預設情況下，如果 Objective-C 例外狀況到達 Objective-C 與 Kotlin 的 interop 邊界並進入 Kotlin 程式碼，程式將會崩潰。
 
 要將 Objective-C 例外狀況傳遞到 Kotlin，請透過 `foreignExceptionMode = objc-wrap` 屬性啟用封裝。在這種情況下，Objective-C 例外狀況會被轉換為具有 `ForeignException` 型別的 Kotlin 例外狀況。
 
-### 協助解決連結器錯誤
+### 協助解決連結器錯誤 {id="help-resolve-linker-errors"}
 
 當 Kotlin 程式庫相依於 C 或 Objective-C 程式庫時（例如使用 [CocoaPods 整合](https://kotlinlang.org/docs/multiplatform/multiplatform-cocoapods-overview.html)），可能會發生連結器錯誤。如果相依的程式庫未在本機電腦上安裝，或未在專案組建指令碼中明確設定，則會發生 "Framework not found" 錯誤。
 
 如果你是程式庫作者，你可以透過自訂訊息協助你的使用者解決連結器錯誤。
 為此，請在你的 `.def` 檔案中加入 `userSetupHint=message` 屬性，或者將 `-Xuser-setup-hint` 編譯器選項傳遞給 `cinterop`。
 
-### 加入自訂宣告
+### 加入自訂宣告 {id="add-custom-declarations"}
 
 有時需要在產生繫結之前向程式庫加入自訂的 C 宣告（例如為了 [巨集](native-c-interop.md#macros)）。
 你不需要為這些宣告建立額外的標頭檔，而是可以直接將它們包含在 `.def` 檔案的末尾，放在僅包含分隔符序列 `---` 的分隔線之後：
@@ -202,7 +216,7 @@ static inline int getErrno() {
 
 請注意，`.def` 檔案的這一部分被視為標頭檔的一部分，因此帶有主體的函式應宣告為 `static`。宣告會在包含 `headers` 列表中的檔案之後進行解析。
 
-## 使用命令列產生繫結
+## 使用命令列產生繫結 {id="generate-bindings-using-command-line"}
 
 除了定義檔之外，你還可以透過在 `cinterop` 呼叫中將對應的屬性作為選項傳遞，來指定繫結中要包含的內容。
 
@@ -218,7 +232,7 @@ cinterop -def png.def -compiler-option -I/usr/local/include -o png
 * 對於具有組態指令碼的典型 UNIX 程式庫，`compilerOpts` 可能會包含帶有 `--cflags` 選項的組態指令碼輸出（可能不含精確路徑）。
 * 帶有 `--libs` 的組態指令碼輸出可以傳遞給 `linkerOpts` 屬性。
 
-## 下一步
+## 下一步 {id="what-s-next"}
 
 * [C 互通性繫結](native-c-interop.md#bindings)
 * [與 Swift/Objective-C 的互通性](native-objc-interop.md)

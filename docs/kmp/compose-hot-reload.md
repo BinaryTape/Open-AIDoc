@@ -116,12 +116,12 @@ Compose Hot Reload 帮助你在开发 Compose Multiplatform 项目时，实时�
     }
    ```
 
-4.  打开 `main.kt` 文件，点击装订区域中的 **Run** 图标。 
-    选择 **Run 'desktopApp' with Compose Hot Reload**。
+4. 打开 `main.kt` 文件，点击装订区域中的 **Run** 图标。 
+   选择 **Run 'desktopApp' with Compose Hot Reload**。
 
-    ![从装订区域运行 Compose Hot Reload](compose-hot-reload-gutter-run.png){width=350 border-effect="line"}
+   ![从装订区域运行 Compose Hot Reload](compose-hot-reload-gutter-run.png){width=350 border-effect="line"}
 
-    ![桌面应用上的首次 Compose Hot Reload 运行](compose-hot-reload-hello.png){width=500 border-effect="line"}
+   ![桌面应用上的首次 Compose Hot Reload 运行](compose-hot-reload-hello.png){width=500 border-effect="line"}
 
 5. 更新 `greet()` 函数返回的字符串，然后保存所有文件（<shortcut>⌘ S</shortcut> / <shortcut>Ctrl+S</shortcut>），即可看到桌面应用自动更新。
 
@@ -130,12 +130,12 @@ Compose Hot Reload 帮助你在开发 Compose Multiplatform 项目时，实时�
    或者，通过按下指定的快捷键或点击 **Reload UI** 按钮来显式触发热重载。
    你可以在 **Settings | Tools | Compose Hot Reload** 页面修改触发行为。
 
-恭喜！你已经见证了 Compose Hot Reload 的实际效果。现在你可以尝试更改文本、图像、格式、 UI 结构等，而无需在每次更改后都重新启动桌面运行配置。
+恭喜！你已经见证了 Compose Hot Reload 的实际效果。现在你可以尝试更改文本、图像、格式、UI 结构等，而无需在每次更改后都重新启动桌面运行配置。
 
 ## 适用于 AI 代理的 MCP 服务器 {id="mcp-server-for-ai-agents"}
 <primary-label ref="Experimental"/>
 
-从 Compose Multiplatform 1.12.0 开始，Compose Hot Reload 包含一个内置的 [模型上下文协议 (MCP)](https://modelcontextprotocol.io/) 服务器。
+从 Compose Multiplatform 1.12.0 开始，Compose Hot Reload 包含一个内置的[模型上下文协议 (MCP)](https://modelcontextprotocol.io/) 服务器。
 MCP 服务器允许 AI 编码代理与正在运行的 Compose 应用程序进行交互：触发 Compose Hot Reload、查看渲染后的 UI、检查语义结构、模拟用户输入以及读取运行时日志。
 对于包含多个窗口的应用程序，代理可以列出窗口并针对其中任何一个进行操作。
 
@@ -144,7 +144,7 @@ MCP 服务器允许 AI 编码代理与正在运行的 Compose 应用程序进行
 
 ### 连接 AI 代理 {id="connect-an-ai-agent"}
 
-要连接 AI 代理，请将代理的 MCP 客户端配置指向 `hotMcpServer` Gradle 任务。例如，在 `.mcp.json` 中：
+要连接 AI 代理，请配置 MCP 客户端以运行 `hotMcpServer` Gradle 任务。例如，在 `.mcp.json` 中：
 
 ```json
 {
@@ -161,6 +161,10 @@ MCP 服务器允许 AI 编码代理与正在运行的 Compose 应用程序进行
   }
 }
 ```
+
+Gradle 会在所有子项目中搜索任务，并将短名称 `hotMcpServer` 与特定目标变体（例如 `hotMcpServerJvm` 或 `hotMcpServerDesktop`）进行匹配。
+
+如果你的模块定义了多个 JVM 目标，请指定完全限定的任务名称以避免二义性：`:<module>:hotMcpServer<Target>`，例如 `:app:hotMcpServerDesktop` 或 `:composeApp:hotMcpServerJvm`。
 
 ### 可用的 MCP 工具 {id="available-mcp-tools"}
 

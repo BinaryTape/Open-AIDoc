@@ -4,6 +4,8 @@
 
 <web-summary>Kotlin 2.4.0 のリリースノートを読み、新しい言語機能、Kotlin Multiplatform、JVM、Native、JS、Wasm のアップデート、および Gradle と Maven のビルドツールサポートについて確認してください。</web-summary>
 
+_[リリース日: 2026年7月14日](releases.md#release-history)_
+
 <tldr>
     <p>バグ修正リリース 2.4.10 の詳細については、<a href="https://github.com/JetBrains/kotlin/releases/tag/v2.4.10">変更ログ（changelog）</a>を参照してください。</p>
 </tldr>
@@ -1335,7 +1337,7 @@ Kotlin エコシステムにおいて、以下のドキュメント変更を行�
 * [Kotlin によるバックエンド開発](server-overview.md) – バックエンド開発に使用できるさまざまなフレームワークを探索。
 * [Spring Boot と Claude でタスク管理アプリを作成する](spring-boot-claude.md) – Claude が Spring Boot を使用してゼロからアプリを作成するのをどのように支援するかを学ぶ。
 * [Maven プロジェクトを構成する](maven-configure-project.md) – 既存の Java Maven プロジェクトまたは新しい Kotlin Maven プロジェクトで Kotlin コンパイルをセットアップ。
-* [Maven で Kotlin プロジェクトをテストする](jvm-test-maven.md) – Learn how to create tests with JUnit and use Maven plugins to run unit and integration tests。
+* [Maven で Kotlin プロジェクトをテストする](jvm-test-maven.md) – JUnit でテストを作成し、Maven プラグインを使用して単体テストや統合テストを実行する方法を学ぶ。
 * [Kotlin プロジェクトでアノテーションプロセッサを使用する](jvm-annotation-processors.md) – バックエンドプロジェクトでアノテーションを処理するために kapt と KSP のどちらかを選択。
 * [Kotlin AI スキル](kotlin-ai-skills.md) – エージェントスキルを使用して、Kotlin 固有のタスクの実行を支援。
 * [Kotlin Language Server](kotlin-lsp.md) – JetBrains による公式の Kotlin 用 Language Server Protocol (LSP) 実装について読む。

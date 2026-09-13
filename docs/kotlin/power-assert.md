@@ -56,8 +56,14 @@ plugins {
 
 Power-assert 插件提供了几个选项来自定义其行为：
 
-* **`functions`**：完全限定函数路径列表。Power-assert 插件将转换对这些函数的调用。如果未指定，默认情况下仅转换 `kotlin.assert()` 调用。
-* **`includedSourceSets`**：Power-assert 插件将转换的 Gradle 源集列表。如果未指定，默认情况下将转换所有*测试源集*。
+* **`functions`**：列出在调用时由 Power-assert 插件进行转换的完全限定函数路径。如果未指定，默认情况下插件仅转换 `kotlin.assert()` 调用。
+* **`compilationFilter`**：控制 Power-assert 插件应用于哪些 Kotlin 编译任务。您可以创建自己的自定义筛选器，也可以使用预定义的选项：
+  * `PowerAssertCompilationFilter.TESTS`：应用于所有测试源集（默认）。
+  * `PowerAssertCompilationFilter.ALL`：应用于所有源集。
+
+  > `compilationFilter` 选项已取代已弃用的 `includedSourceSets`（后者用于列出 Power-assert 插件转换的 Gradle 源集）。这两个选项互斥：如果指定了 `includedSourceSets`，则 `compilationFilter` 会被忽略。
+  >
+  {style="note"}
 
 要自定义行为，请将 `powerAssert {}` 块添加到您的构建脚本文件中：
 
@@ -68,7 +74,9 @@ Power-assert 插件提供了几个选项来自定义其行为：
 // build.gradle.kts
 powerAssert {
     functions = listOf("kotlin.assert", "kotlin.test.assertTrue", "kotlin.test.assertEquals", "kotlin.test.assertNull")
-    includedSourceSets = listOf("commonMain", "jvmMain", "jsMain", "nativeMain")
+    compilationFilter = PowerAssertCompilationFilter {
+        it.name in setOf("commonMain", "jvmMain", "jsMain", "nativeMain")
+    }
 }
 ```
 
@@ -79,7 +87,9 @@ powerAssert {
 // build.gradle
 powerAssert {
     functions = ["kotlin.assert", "kotlin.test.assertTrue", "kotlin.test.assertEquals", "kotlin.test.assertNull"]
-    includedSourceSets = ["commonMain", "jvmMain", "jsMain", "nativeMain"]
+    compilationFilter = PowerAssertCompilationFilter {
+        it.name in ["commonMain", "jvmMain", "jsMain", "nativeMain"]
+    }
 }
 ```
 
@@ -432,7 +442,7 @@ assert(hello.length == world.substring(1, 4).length) { "Incorrect length" }
                     false
 ```
 
-要获得更完整的错误消息，请始终将变量内联到测试函数参数中。
+要获得更完整的错误消息，请始终将变量内联到测试函数形参中。
 考虑以下测试函数：
 
 ```kotlin
@@ -486,7 +496,7 @@ assert(person.name.startsWith("A") && person.name.length > 3 && person.age > 20 
 ### 除 assert 函数之外 {id="beyond-assert-function"}
 
 Power-assert 插件可以转换除默认转换的 `assert` 之外的各种函数。
-像 `require()`、`check()`、`assertTrue()`、`assertEqual()` 等函数，如果它们的格式允许将 `String` 或 `() -> String` 值作为最后一个参数，也可以被转换。
+像 `require()`、`check()`、`assertTrue()`、`assertEqual()` 等函数，如果它们的格式允许将 `String` 或 `() -> String` 值作为最后一个形参，也可以被转换。
 
 在测试中使用新函数之前，请将该函数添加到您的构建文件中。
 例如 `require()` 函数：
@@ -769,7 +779,7 @@ assert(employee.age < 100) { "${employee.name} has an invalid age: ${employee.ag
 
     * `PowerAssert.explanation` 属性提供对包含调用站点信息的 `CallExplanation` 对象的访问。
     * `toDefaultMessage()` 函数渲染标准的 Power-assert 失败消息。
-    * `message` 参数上的 `@PowerAssert.Ignore` 注解将其从失败消息中排除。
+    * `message` 形参上的 `@PowerAssert.Ignore` 注解将其从失败消息中排除。
 
 编译器插件会检测 `@PowerAssert` 注解并在编译时转换对该函数的调用。
 

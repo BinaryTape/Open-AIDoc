@@ -48,7 +48,7 @@ kotlin {
 * [ターゲットディレクトリ](#distribution-target-directory)および[モジュール名](#module-name)
 * プロジェクトの[`package.json`ファイル](#package-json-customization)
 
-## 実行環境
+## 実行環境 {id="execution-environments"}
 
 Kotlin/JSプロジェクトは、2つの異なる実行環境をターゲットにできます。
 
@@ -75,7 +75,7 @@ kotlin {
 
 Kotlin Multiplatformプラグインは、選択した環境で動作するようにタスクを自動的に構成します。これには、アプリケーションの実行とテストに必要な環境と依存関係のダウンロードとインストールが含まれます。これにより、開発者は追加の構成なしでシンプルなプロジェクトをビルド、実行、およびテストできます。既存のインストールを使用するオプションもあります。[プリインストールされたNode.jsの使用](#use-pre-installed-node-js)方法を確認してください。
 
-## ES2015機能のサポート
+## ES2015機能のサポート {id="support-for-es2015-features"}
 
 Kotlinは、以下を含むES2015機能のサポートを提供しています。
 
@@ -96,7 +96,7 @@ tasks.withType<KotlinJsCompile>().configureEach {
 
 [ES2015 (ECMAScript 2015, ES6) の詳細については、公式ドキュメントを参照してください](https://262.ecma-international.org/6.0/)。
 
-## 出力の粒度の設定
+## 出力の粒度の設定 {id="configure-output-granularity"}
 
 コンパイラがプロジェクト内の`.js`ファイルをどのように出力するかを選択できます。
 
@@ -114,7 +114,7 @@ tasks.withType<KotlinJsCompile>().configureEach {
      kotlin.js.ir.output.granularity=per-file // デフォルトは 'per-module'
      ```
 
-## TypeScript宣言ファイル（`d.ts`）の生成
+## TypeScript宣言ファイル（`d.ts`）の生成 {id="generation-of-typescript-declaration-files-d-ts"}
 <primary-label ref="experimental-opt-in"/>
 
 Kotlin/JSコンパイラは、KotlinコードからTypeScript定義を生成できます。これらの定義は、ハイブリッドアプリケーションを開発する際にJavaScriptツールやIDEによって以下のように使用されます。
@@ -142,7 +142,7 @@ kotlin {
 
 定義ファイルは、`build/js/packages/<package_name>/kotlin`ディレクトリに、対応するwebpack前のJavaScriptコードと一緒に生成されます。
 
-## 依存関係
+## 依存関係 {id="dependencies"}
 
 依存関係を宣言するには、`build.gradle(.kts)`ファイルの`jsMain`ソースセットにある`dependencies {}`ブロックを使用します。
 
@@ -189,7 +189,7 @@ repositories {
 
 追加するライブラリが[npmパッケージ](#npm-dependencies)に依存している場合、Gradleはそれらの推移的依存関係も自動的に解決します。
 
-### Kotlin標準ライブラリ
+### Kotlin標準ライブラリ {id="kotlin-standard-libraries"}
 
 [標準ライブラリ（standard library）](https://kotlinlang.org/api/latest/jvm/stdlib/index.html)への依存関係は自動的に追加されます。標準ライブラリのバージョンは、Kotlin Multiplatformプラグインのバージョンと同じになります。
 
@@ -226,7 +226,7 @@ kotlin {
 </tab>
 </tabs>
 
-### npm依存関係
+### npm依存関係 {id="npm-dependencies"}
 
 JavaScriptの世界で依存関係を管理する最も一般的な方法は[npm](https://www.npmjs.com/)です。これはJavaScriptモジュールの最大のパブリックリポジトリを提供しています。
 
@@ -283,7 +283,7 @@ kotlin.js.yarn=false
 
 npm依存関係がインストールされると、[KotlinからJSを呼び出す](js-interop.md)で説明されているように、そのAPIをコード内で使用できるようになります。
 
-## runタスク
+## runタスク {id="run-task"}
 
 Kotlin Multiplatform Gradleプラグインは、追加の構成なしで純粋なKotlin/JSプロジェクトを実行できる`jsBrowserDevelopmentRun`タスクを提供します。
 
@@ -312,9 +312,11 @@ Node.jsをターゲットとするKotlin/JSプロジェクトを実行するに�
 
 プロジェクトのビルドが成功すると、`webpack-dev-server`がブラウザページを自動的にリフレッシュします。
 
-## testタスク
+## testタスク {id="test-task"}
 
-Kotlin Multiplatform Gradleプラグインは、プロジェクトのテストインフラストラクチャを自動的にセットアップします。ブラウザプロジェクトの場合、[Karma](https://karma-runner.github.io/)テストランナーとその他の必要な依存関係をダウンロードしてインストールします。Node.jsプロジェクトの場合、[Mocha](https://mochajs.org/)テストフレームワークが使用されます。 
+Kotlin Multiplatform Gradleプラグインは、プロジェクトのテストインフラストラクチャを自動的にセットアップします。必要なテストランナーやその他の依存関係をダウンロードしてインストールします。
+
+ブラウザプロジェクトの場合、[Karma](#karma)テストランナーと新しい[ブラウザテスト用DSL](#dsl-for-browser-testing)のいずれかを選択できます。Node.jsプロジェクトの場合、[Mocha](#node-js)テストフレームワークが利用可能です。
 
 このプラグインは、以下のような便利なテスト機能も提供します。
 
@@ -322,7 +324,13 @@ Kotlin Multiplatform Gradleプラグインは、プロジェクトのテスト�
 * テストレポートの生成
 * コンソールでのテスト実行結果の表示
 
-ブラウザテストを実行するために、プラグインはデフォルトで[Headless Chrome](https://chromium.googlesource.com/chromium/src/+/lkgr/headless/README.md)を使用します。ビルドスクリプトの`useKarma {}`ブロック内に対応するエントリを追加することで、テストを実行する別のブラウザを選択することもできます。
+### Karma {id="karma"}
+
+> Karmaプロジェクトは[非推奨（deprecated）](https://github.com/karma-runner/karma#karma)となりました。新機能やバグ修正は予定されていません。ブラウザテストの代替手段として、新しい[ブラウザテスト用DSL](#dsl-for-browser-testing)をお試しください。
+> 
+{style="warning"}
+
+[Karma](https://karma-runner.github.io/)テストランナーを構成するには、`build.gradle(.kts)`ファイルのブラウザの`testTask`内に`useKarma {}`ブロックを追加します。例えば、特定のブラウザに対してテストを実行するには、以下を使用します。
 
 ```kotlin
 kotlin {
@@ -353,33 +361,70 @@ kotlin {
 kotlin.js.browser.karma.browsers=firefox,safari
 ```
 
-このアプローチにより、すべてのモジュールに対してブラウザのリストを定義し、特定のモジュールのビルドスクリプトで特定のブラウザを追加することができます。 
+このアプローチにより、すべてのモジュールに対してブラウザのリストを定義し、特定のモジュールのビルドスクリプトで特定のブラウザを追加することができます。
 
-Kotlin Multiplatform Gradleプラグインは、これらのブラウザを自動的にインストールするわけではなく、実行環境で利用可能なブラウザのみを使用することに注意してください。例えば、継続的インテグレーション（CI）サーバーでKotlin/JSテストを実行している場合は、テスト対象のブラウザがインストールされていることを確認してください。
+Kotlin Multiplatform Gradleプラグインは、ビルド時にKarma構成ファイルを`build/js/packages/projectName-test/karma.conf.js`に自動的に生成します。このファイルには、ビルドファイルの`useKarma {}`ブロックで設定した設定が含まれます。
 
-テストをスキップしたい場合は、`testTask {}`に`enabled = false`という行を追加します。
+プロジェクトのルートにある`karma.config.d`ディレクトリ内に追加の構成ファイルを配置することもできます。このディレクトリ内のすべての`.js`構成ファイルが取得され、ビルド時に生成された`karma.conf.js`に自動的にマージされます。
+
+Karmaの構成に関する詳細については、[Karmaのドキュメント](https://karma-runner.github.io/6.4/config/configuration-file.html)を参照してください。
+
+### ブラウザテスト用DSL {id="dsl-for-browser-testing"}
+<primary-label ref="experimental-opt-in"/>
+
+Kotlinは、ブラウザ環境でKotlin/JSテストを実行するための実験的なDSLを提供しています。これは技術に依存しない（technology-agnostic）ように設計されています。現在の実装には、内部で以下のツールが含まれています。
+
+* [Playwright](https://playwright.dev/)：ブラウザドライバおよびディストリビューションマネージャーとして機能し、Chromium、Firefox、およびWebKit (Safari) ブラウザエンジンをサポートします。
+* [Mocha](https://mochajs.org/)：テストランナーとして機能します。
+* [webpack](https://webpack.js.org/)：バンドラーとして機能します（[今後のリリース](https://youtrack.jetbrains.com/issue/KT-48308/)で[Vite](https://vite.dev/)に置き換えられる予定です）。
+
+新しいブラウザテスト用DSLを試すには、Kotlin/JSターゲットの`browser {}`内にオプトインの`test {}`ブロックを追加します。
 
 ```kotlin
+import org.jetbrains.kotlin.gradle.ExperimentalJsTestDsl
+import kotlin.time.Duration.Companion.seconds
+
 kotlin {
     js {
         browser {
-            testTask {
-                enabled = false
+            @OptIn(ExperimentalJsTestDsl::class)
+            test {
+                // すべてのランナーに対するデフォルトのタイムアウトをkotlin.Durationで構成
+                timeout = 30.seconds
+                // Gradleプロバイダーを使用してヘッドレスモードを構成
+                headless = providers
+                    .environmentVariable("IS_IN_CI")
+                    .map { it.toBoolean() }
+                    .orElse(false)
+                // カスタムChromiumランナーを有効化して構成
+                chromium("chromium-no-webgl2") {
+                    // このランナーのデフォルトタイムアウトをオーバーライド
+                    timeout = 10.seconds
+
+                    // Chromium固有の追加起動引数
+                    launchArgs.add("--disable-webgl2")
+                }
+                // Firefoxランナーを有効化
+                firefox()
+                // WebKit (Safari) テストランナーを有効化
+                webkit()
+                // カスタムWebKitランナーを有効化して構成
+                webkit("headful") {
+                    headless = false
+                }
             }
         }
-        binaries.executable()
-        // ...
     }
 }
 ```
 
-テストを実行するには、標準ライフサイクルの`check`タスクを実行します。
+新しいブラウザテスト用DSLの構成の詳細については、[Kotlin/JSでのテストの実行](js-running-tests.md#advanced-configuration)を参照してください。
 
-```bash
-./gradlew check
-```
+### Node.js {id="node-js-test-task"}
 
-Node.jsテストランナーが使用する環境変数を指定するには（例：テストに外部情報を渡す、またはパッケージ解決を微調整するため）、ビルドスクリプトの`testTask {}`ブロック内で`environment()`関数をキーと値のペアで使用します。
+Node.jsプロジェクトの場合、Kotlin Multiplatform Gradleプラグインは[Mocha](https://mochajs.org/)テストフレームワークを自動的にセットアップします。
+
+Node.jsテストランナーが使用する環境変数を指定するには（例：テストに外部情報を渡す、またはパッケージ解決を微調整するため）、ビルドファイルの`testTask {}`ブロック内で`environment()`関数をキーと値のペアで使用します。
 
 ```kotlin
 kotlin {
@@ -393,18 +438,40 @@ kotlin {
 }
 ```
 
-### Karma構成
+### テストの実行 {id="run-tests"}
 
-Kotlin Multiplatform Gradleプラグインは、ビルド時にKarma構成ファイルを自動的に生成します。これには、`build.gradle(.kts)`の[`kotlin.js.browser.testTask.useKarma {}`ブロック](#test-task)からの設定が含まれます。ファイルは`build/js/packages/projectName-test/karma.conf.js`にあります。 
-Karmaが使用する構成を調整するには、プロジェクトのルートにある`karma.config.d`というディレクトリ内に追加の構成ファイルを配置します。このディレクトリ内のすべての`.js`構成ファイルが取得され、ビルド時に生成された`karma.conf.js`に自動的にマージされます。
+デフォルトでは、Kotlin Multiplatform Gradleプラグインはブラウザテストの実行に[Headless Chrome](https://chromium.googlesource.com/chromium/src/+/lkgr/headless/README.md)を使用します。プラグインにブラウザは同梱されておらず、不足しているブラウザの処理方法はテストランナーによって異なります。
 
-Karmaのすべての構成機能は、Karmaの[ドキュメント](https://karma-runner.github.io/5.0/config/configuration-file.html)で詳しく説明されています。
+* [Karma](#karma)の場合、プラグインがテストの実行に使用できるように、その他のブラウザがあらかじめマシンにインストールされている必要があります。継続的インテグレーション（CI）サーバーでKotlin/JSテストを実行している場合は、テスト対象のブラウザがそこにもインストールされていることを確認してください。
+* 新しい[ブラウザテスト用DSL](#dsl-for-browser-testing)の場合、プラグインは[`playwright install`](https://playwright.dev/docs/browsers#install-browsers)コマンドを使用して初回の実行時に必要なブラウザをインストールします。Playwrightがこれらのブラウザの場所を管理し、ローカルにインストールされたブラウザは使用しません。
 
-## webpackによるバンドル
+テストを実行するには、標準ライフサイクルの`check`タスクを実行します。
+
+```bash
+./gradlew check
+```
+
+テストをスキップしたい場合は、ビルドファイルの`testTask {}`ブロックで無効にします。
+
+```kotlin
+kotlin {
+    js {
+        browser {
+            testTask {
+                enabled.set(false)
+            }
+        }
+        binaries.executable()
+        // ...
+    }
+}
+```
+
+## webpackによるバンドル {id="webpack-bundling"}
 
 ブラウザターゲットの場合、Kotlin Multiplatform Gradleプラグインは広く知られた[webpack](https://webpack.js.org/)モジュールバンドラーを使用します。
 
-### webpackタスク
+### webpackタスク {id="webpack-task"}
 
 最も一般的なwebpackの調整は、Gradleビルドファイルの`kotlin.js.browser.webpackTask {}`構成ブロックを介して直接行うことができます。
 * `mainOutputFileName` - webpack出力ファイルの名前。webpackタスクの実行後、`<projectDir>/build/kotlin-webpack/<targetName>/<binaryName>`に生成されます。デフォルト値はプロジェクト名です。
@@ -419,7 +486,7 @@ webpackTask {
 
 また、`commonWebpackConfig {}`ブロックで、バンドル、実行、およびテストタスクで使用する共通のwebpack設定を構成することもできます。
 
-### webpack構成ファイル 
+### webpack構成ファイル {id="webpack-configuration-file"}
 
 Kotlin Multiplatform Gradleプラグインは、ビルド時に標準のwebpack構成ファイルを自動的に生成します。これは`build/js/packages/projectName/webpack.config.js`にあります。
 
@@ -439,7 +506,7 @@ config.module.rules.push({
 
 webpackのすべての構成機能は、その[ドキュメント](https://webpack.js.org/concepts/configuration/)で詳しく説明されています。
 
-### 実行可能ファイルのビルド
+### 実行可能ファイルのビルド {id="building-executables"}
 
 webpackを通じて実行可能なJavaScriptアーティファクトをビルドするために、Kotlin Multiplatform Gradleプラグインには`jsBrowserDevelopmentWebpack`および`jsBrowserProductionWebpack` Gradleタスクが含まれています。
 
@@ -462,7 +529,7 @@ webpackを通じて実行可能なJavaScriptアーティファクトをビルド
 
 このタスクは、プロジェクトのリソースを含む、すぐに使用可能な配布物を生成します。
 
-## CSS
+## CSS {id="css"}
 
 Kotlin Multiplatform Gradleプラグインは、webpackの[CSS](https://webpack.js.org/loaders/css-loader/)および[style](https://webpack.js.org/loaders/style-loader/)ローダーのサポートも提供します。すべてのオプションは、プロジェクトのビルドに使用される[webpack構成ファイル](#webpack-bundling)を直接変更することで変更できますが、最も頻繁に使用される設定は`build.gradle(.kts)`ファイルから直接利用できます。
 
@@ -564,13 +631,13 @@ browser {
 
 同じプロジェクトで異なるモードを使用するには、`cssSupport.rules`を使用します。ここでは、モードを定義する`KotlinWebpackCssRules`のリストと、[include](https://webpack.js.org/configuration/module/#ruleinclude)および[exclude](https://webpack.js.org/configuration/module/#ruleexclude)パターンを指定できます。
 
-## Node.js
+## Node.js {id="node-js"}
 
 Node.jsをターゲットとするKotlin/JSプロジェクトの場合、プラグインはホスト上にNode.js環境を自動的にダウンロードしてインストールします。既存のNode.jsインスタンスがある場合は、それを使用することもできます。
 
 各サブプロジェクトに対してNode.js設定を構成したり、プロジェクト全体に対して設定したりできます。
 
-### Node.jsバージョンの変更
+### Node.jsバージョンの変更 {id="change-node-js-version"}
 
 デフォルトのNode.jsバージョンは現在24.16.0ですが、特定のサブプロジェクトで別のバージョンを使用できます。サブプロジェクトの`build.gradle(.kts)`ファイルに以下の行を追加します。例：
 
@@ -622,7 +689,7 @@ allprojects {
 </tab>
 </tabs>
 
-### プリインストールされたNode.jsの使用
+### プリインストールされたNode.jsの使用 {id="use-pre-installed-node-js"}
 
 Kotlin/JSプロジェクトをビルドするホストにすでにNode.jsがインストールされている場合は、独自のNode.jsインスタンスをインストールする代わりにそれを使用するようにKotlin Multiplatform Gradleプラグインを構成できます。
 
@@ -651,11 +718,11 @@ project.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsPlu
 </tab>
 </tabs>
 
-## Yarn
+## Yarn {id="yarn"}
 
 デフォルトでは、ビルド時に宣言された依存関係をダウンロードしてインストールするために、プラグインは独自の[Yarn](https://yarnpkg.com/lang/en/)パッケージマネージャーのインスタンスを管理します。これは追加の構成なしですぐに動作しますが、調整したり、ホストにすでにインストールされているYarnを使用したりすることもできます。
 
-### Yarnの追加機能：.yarnrc
+### Yarnの追加機能：.yarnrc {id="additional-yarn-features-yarnrc"}
 
 追加のYarn機能を構成するには、プロジェクトのルートに`.yarnrc`ファイルを配置します。
 ビルド時に自動的に取得されます。
@@ -668,7 +735,7 @@ registry "http://my.registry/api/npm/"
 
 `.yarnrc`の詳細については、[公式のYarnドキュメント](https://classic.yarnpkg.com/en/docs/yarnrc/)を参照してください。
 
-### プリインストールされたYarnの使用
+### プリインストールされたYarnの使用 {id="use-pre-installed-yarn"}
 
 Kotlin/JSプロジェクトをビルドするホストにすでにYarnがインストールされている場合は、独自のYarnインスタンスをインストールする代わりにそれを使用するようにKotlin Multiplatform Gradleプラグインを構成できます。
 
@@ -697,7 +764,7 @@ rootProject.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlu
 </tab>
 </tabs>
 
-### kotlin-js-storeによるバージョンロック
+### kotlin-js-storeによるバージョンロック {id="version-locking-via-kotlin-js-store"}
 
 プロジェクトルートの`kotlin-js-store`ディレクトリは、バージョンロックに必要な`yarn.lock`ファイルを保持するために、Kotlin Multiplatform Gradleプラグインによって自動的に生成されます。ロックファイルはYarnプラグインによって完全に管理され、`kotlinNpmInstall` Gradleタスクの実行中に更新されます。
 
@@ -736,7 +803,7 @@ rootProject.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlu
 
 `yarn.lock`の詳細については、[公式のYarnドキュメント](https://classic.yarnpkg.com/lang/en/docs/yarn-lock/)を参照してください。
 
-### yarn.lockが更新されたことの報告
+### yarn.lockが更新されたことの報告 {id="reporting-that-yarn-lock-has-been-updated"}
 
 Kotlin/JSは、`yarn.lock`ファイルが更新された場合に通知するGradle設定を提供しています。CIビルドプロセス中に`yarn.lock`が密かに変更された場合に通知を受け取りたいときに、これらの設定を使用できます。
 
@@ -782,7 +849,7 @@ rootProject.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlu
 </tab>
 </tabs>
 
-### デフォルトで --ignore-scripts を使用してnpm依存関係をインストールする
+### デフォルトで --ignore-scripts を使用してnpm依存関係をインストールする {id="installing-npm-dependencies-with-ignore-scripts-by-default"}
 
 侵害されたnpmパッケージからの悪意のあるコード実行の可能性を減らすために、Kotlin Multiplatform Gradleプラグインは、デフォルトでnpm依存関係のインストール中の[ライフサイクルスクリプト](https://docs.npmjs.com/cli/v8/using-npm/scripts#life-cycle-scripts)の実行を阻止します。
 
@@ -809,7 +876,7 @@ rootProject.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlu
 </tab>
 </tabs>
 
-## 配信ターゲットディレクトリ
+## 配信ターゲットディレクトリ {id="distribution-target-directory"}
 
 デフォルトでは、Kotlin/JSプロジェクトのビルド結果はプロジェクトルート内の`/build/dist/<targetName>/<binaryName>`ディレクトリに置かれます。
 
@@ -853,7 +920,7 @@ kotlin {
 </tab>
 </tabs>
 
-## モジュール名
+## モジュール名 {id="module-name"}
 
 対応する`.js`および`.d.ts`ファイルを含むJavaScript _モジュール_ （`build/js/packages/myModuleName`に生成される）の名前を調整するには、`outputModuleName`オプションを使用します。
 
@@ -867,7 +934,7 @@ kotlin {
 
 これは`build/dist`内のwebpack出力には影響しないことに注意してください。
 
-## package.jsonのカスタマイズ
+## package.jsonのカスタマイズ {id="package-json-customization"}
 
 `package.json`ファイルは、JavaScriptパッケージのメタデータを保持します。npmなどの一般的なパッケージレジストリでは、公開されるすべてのパッケージにこのようなファイルが必要です。これを使用してパッケージの公開を追跡および管理します。
 

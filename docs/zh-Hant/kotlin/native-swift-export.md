@@ -17,11 +17,11 @@ Swift export 讓針對 Apple 目標的多平台開發更加精簡。例如，如
 * **模組名稱自訂**。您可以在 Kotlin 專案的 Gradle 配置中自訂產生的 Swift 模組名稱。
 * **並行支援**。您可以從 Swift 無縫呼叫 Kotlin 的暫停函式，並能開箱即用地將 `kotlinx.coroutines` flows 匯出為 Swift 的 `AsyncSequence`。
 
-## 啟用 Swift export
+## 啟用 Swift export {id="enable-swift-export"}
 
 Swift export 目前處於 [Alpha](components-stability.md#stability-levels-explained) 階段且尚不完整，因此預期會有重大變更。若要嘗試，請在您的 Kotlin 專案中 [設定建置檔案](#configure-kotlin-project)，並 [設定 Xcode](#configure-xcode-project) 以整合 Swift export。
 
-### 設定 Kotlin 專案
+### 設定 Kotlin 專案 {id="configure-kotlin-project"}
 
 您可以使用專案中的以下建置檔案作為設定 Swift export 的起點：
 
@@ -62,7 +62,7 @@ Kotlin 編譯器會自動產生所有必要的檔案（包括 `swiftmodule` 檔�
 >
 {style="tip"}
 
-### 設定 Xcode 專案
+### 設定 Xcode 專案 {id="configure-xcode-project"}
 
 若要配置 Xcode 以將 Swift export 整合到您的專案中：
 
@@ -78,7 +78,7 @@ Kotlin 編譯器會自動產生所有必要的檔案（包括 `swiftmodule` 檔�
 
 4. 組建專案。建置過程會在輸出目錄中產生 Swift 模組。
 
-## 目前限制
+## 目前限制 {id="current-limitations"}
 
 Swift export 目前僅適用於使用 [直接整合](https://kotlinlang.org/docs/multiplatform/multiplatform-direct-integration.html) 將 iOS 框架連接到 Xcode 專案的專案。這是使用 IntelliJ IDEA 中的 Kotlin Multiplatform 外掛程式或透過 [Web 精靈](https://kmp.jetbrains.com/) 建立的 Kotlin Multiplatform 專案的標準配置。
 
@@ -87,7 +87,6 @@ Swift export 目前僅適用於使用 [直接整合](https://kotlinlang.org/docs
 * 繼承自 `List`、`Set` 或 `Map` 的型別在匯出期間會被忽略 ([KT-80416](https://youtrack.jetbrains.com/issue/KT-80416))。
 * `List`、`Set` 或 `Map` 的繼承者無法在 Swift 側具現化 ([KT-80417](https://youtrack.jetbrains.com/issue/KT-80417))。
 * 匯出到 Swift 時，Kotlin 泛型型別參數會被型別擦除為其上界 (upper bounds)。
-* 不支援跨語言繼承，因此 Swift 類別不能直接繼承自 Kotlin 匯出的類別或介面。
 * 目前沒有 IDE 遷移提示或自動化功能。
 * 當使用需要選擇性加入 (opt-in) 的宣告時，您必須在 Gradle 建置檔案的「模組層級」新增明確的 `optIn` 編譯器選項。例如，對於 `kotlinx.datetime` 程式庫：
 
@@ -107,41 +106,42 @@ Swift export 目前僅適用於使用 [直接整合](https://kotlinlang.org/docs
   }
   ```
 
-## 對應
+## 對應 {id="mappings"}
 
 下表顯示了 Kotlin 概念如何對應到 Swift。
 
-| Kotlin                                 | Swift                          |
-|----------------------------------------|--------------------------------|
-| [`class`](#classes)                    | `class`                        |
-| [`object`](#objects)                   | 具有 `shared` 屬性的 `class`      |
-| [`enum class`](#enums)                 | `enum`                         |
-| [`typealias`](#type-aliases)           | `typealias`                    |
-| [函式](#functions)                      | 函式                             |
-| [`suspend fun`](#suspending-functions) | `async`                        |
-| [`kotlinx.coroutines` flows](#flows)   | `AsyncSequence`                |
-| [屬性](#properties)                     | 屬性                             |
-| [建構函式](#constructors)                | 初始設定式                         |
-| [套件](#packages)                       | 巢狀列舉                           |
-| `Boolean`                              | `Bool`                         |
-| `Char`                                 | `Unicode.UTF16.CodeUnit`       |
-| `Byte`                                 | `Int8`                         |
-| `Short`                                | `Int16`                        |
-| `Int`                                  | `Int32`                        |
-| `Long`                                 | `Int64`                        |
-| `UByte`                                | `UInt8`                        |
-| `UShort`                               | `UInt16`                       |
-| `UInt`                                 | `UInt32`                       |
-| `ULong`                                | `UInt64`                       |
-| `Float`                                | `Float`                        |
-| `Double`                               | `Double`                       |
-| `Any`                                  | `KotlinBase` 類別               |
-| `Unit`                                 | `Void`                         |
-| [`Nothing`](#kotlin-nothing)           | `Never`                        |
+| Kotlin                                                            | Swift                          |
+|-------------------------------------------------------------------|--------------------------------|
+| [`class`](#classes)                                               | `class`                        |
+| [`object`](#objects)                                              | 具有 `shared` 屬性的 `class`      |
+| [`enum class`](#enums)                                            | `enum`                         |
+| [`sealed` 類別與介面](#sealed-classes-and-interfaces)             | `enum`                         |
+| [`typealias`](#type-aliases)                                      | `typealias`                    |
+| [函式](#functions)                                                | 函式                           |
+| [`suspend fun`](#suspending-functions)                            | `async`                        |
+| [`kotlinx.coroutines` flows](#flows)                              | `AsyncSequence`                |
+| [屬性](#properties)                                               | 屬性                           |
+| [建構函式](#constructors)                                         | 初始設定式                     |
+| [套件](#packages)                                                 | 巢狀列舉                       |
+| `Boolean`                                                         | `Bool`                         |
+| `Char`                                                            | `Unicode.UTF16.CodeUnit`       |
+| `Byte`                                                            | `Int8`                         |
+| `Short`                                                           | `Int16`                        |
+| `Int`                                                             | `Int32`                        |
+| `Long`                                                            | `Int64`                        |
+| `UByte`                                                           | `UInt8`                        |
+| `UShort`                                                          | `UInt16`                       |
+| `UInt`                                                            | `UInt32`                       |
+| `ULong`                                                           | `UInt64`                       |
+| `Float`                                                           | `Float`                        |
+| `Double`                                                          | `Double`                       |
+| `Any`                                                             | `KotlinBase` 類別              |
+| `Unit`                                                            | `Void`                         |
+| [`Nothing`](#kotlin-nothing)                                      | `Never`                        |
 
-### 宣告
+### 宣告 {id="declarations"}
 
-#### 類別 (Classes)
+#### 類別 (Classes) {id="classes"}
 
 Swift export 僅支援直接繼承自 `Any` 的 final 類別，例如 `class Foo()`。它們會被轉換為繼承自特殊 `KotlinBase` 類別的 Swift 類別：
 
@@ -171,7 +171,7 @@ public class MyClass : KotlinRuntime.KotlinBase {
 }
 ```
 
-#### 物件 (Objects)
+#### 物件 (Objects) {id="objects"}
 
 物件會被轉換為具有私有 `init` 和靜態 `shared` 存取子的 Swift 類別：
 
@@ -194,7 +194,7 @@ public class O : KotlinRuntime.KotlinBase {
 }
 ```
 
-#### 型別別名 (Type aliases)
+#### 型別別名 (Type aliases) {id="type-aliases"}
 
 Kotlin 型別別名會原樣匯出：
 
@@ -208,7 +208,7 @@ typealias MyInt = Int
 public typealias MyInt = Swift.Int32
 ```
 
-#### 列舉 (Enums)
+#### 列舉 (Enums) {id="enums"}
 
 Kotlin `enum class` 宣告會被匯出為一般的原生 Swift `enum` 型別：
 
@@ -232,7 +232,45 @@ public enum Color: Swift.CaseIterable, Swift.LosslessStringConvertible, Swift.Ra
 }
 ```
 
-#### 函式 (Functions)
+#### 密封類別與介面 (Sealed classes and interfaces) {id="sealed-classes-and-interfaces"}
+
+在 Kotlin 中定義的密封階層結構會對應到 Swift 列舉，從而支援詳盡的 `switch` 陳述式。
+
+Swift export 會在每個密封型別上產生 `.sealedType()` 方法。該方法會傳回一個 Swift 列舉，其 case 與密封階層結構的直接子類別相符。您可以巢狀呼叫這些方法來比對階層結構中更深層的層級。
+
+例如，在 Kotlin 中宣告具有類別階層結構的密封介面：
+
+```kotlin
+// Kotlin
+sealed interface Shape
+
+class Circle : Shape {
+    override fun toString(): String = "Circle"
+}
+
+class Rectangle : Shape {
+    override fun toString(): String = "Rectangle"
+}
+
+fun createCircle(): Shape = Circle()
+```
+
+在 Swift 側，您可以使用沒有 `default` case 的詳盡 `switch`：
+
+```swift
+// Swift
+let shape = createCircle()
+
+let name = switch shape.sealedType() {
+    case let .circle(type): "It's a \(type.value)"
+    case let .rectangle(type): "It's a \(type.value)"
+}
+// name == "It's a Circle"
+```
+
+由於 `switch` 是詳盡無遺的，如果將新的子類別新增至密封階層結構中，編譯器就會發出警告，讓您可以立即處理，而無需依賴 `switch` 的 `default` case。
+
+#### 函式 (Functions) {id="functions"}
 
 Swift export 支援簡單的頂層函式與方法：
 
@@ -283,7 +321,7 @@ public func log(messages: Swift.String...)
 >
 {style="note"}
 
-#### 屬性 (Properties)
+#### 屬性 (Properties) {id="properties"}
 
 Kotlin 屬性會被轉換為 Swift 屬性：
 
@@ -318,7 +356,7 @@ public var c: Swift.Int32 {
 }
 ```
 
-#### 建構函式 (Constructors)
+#### 建構函式 (Constructors) {id="constructors"}
 
 建構函式會被轉換為 Swift 初始設定式：
 
@@ -338,9 +376,9 @@ public class Foo : KotlinRuntime.KotlinBase {
 }
 ```
 
-### 型別
+### 型別 {id="types"}
 
-#### kotlin.Nothing
+#### kotlin.Nothing {id="kotlin-nothing"}
 
 Kotlin `Nothing` 型別會被轉換為 `Never` 型別：
 
@@ -362,11 +400,11 @@ public func baz(input: Swift.Never) -> Void {
 }
 ```
 
-#### 分類器型別 (Classifier types)
+#### 分類器型別 (Classifier types) {id="classifier-types"}
 
 Swift export 目前僅支援直接繼承自 `Any` 的 final 類別。
 
-### 套件 (Packages)
+### 套件 (Packages) {id="packages"}
 
 Kotlin 套件會被轉換為巢狀 Swift 列舉以避免名稱衝突：
 
@@ -399,9 +437,9 @@ public enum foo {
 }
 ```
 
-### 並行 (Concurrency)
+### 並行 (Concurrency) {id="concurrency"}
 
-#### 暫停函式 (Suspending functions)
+#### 暫停函式 (Suspending functions) {id="suspending-functions"}
 
 您可以從 Swift 呼叫 Kotlin 的暫停函式。Kotlin [暫停函式](coroutines-basics.md#suspending-functions) 和暫停功能型別會被匯出為 Swift 相對應的 `async` 版本：
 
@@ -418,7 +456,7 @@ suspend fun hello(): String {
 let msg = try await hello()
 ```
 
-#### Flows
+#### Flows {id="flows"}
 
 您也可以將 `kotlinx.coroutines` flows 匯出為 Swift 的 [`AsyncSequence`](https://developer.apple.com/documentation/Swift/AsyncSequence)：
 
@@ -438,7 +476,7 @@ for try await element in flowOfStrings().asAsyncSequence() {
 }
 ```
 
-#### 協程分派器 (Coroutine dispatchers)
+#### 協程分派器 (Coroutine dispatchers) {id="coroutine-dispatchers"}
 
 預設情況下，當您從 Swift 呼叫 Kotlin 暫停函式或使用 `asAsyncSequence` 函式時，Kotlin 會建立一個使用 [`Dispatchers.Default`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-dispatchers/-default.html) 分派器的協程上下文，並在該處執行匯出的程式碼。
 
@@ -451,7 +489,47 @@ suspend fun runOnMain(): Int = withContext(Dispatchers.Main) {
 }
 ```
 
-## Swift export 的演進
+## 跨語言繼承 {id="cross-language-inheritance"}
+
+Swift export 支援跨語言繼承。此功能的一個常見使用案例是[反向匯入](native-lib-import-stability.md#swift-library-import)模式，即在 Kotlin 中定義協定，並在 Swift 側提供平台特有的實作。當您需要使用無法直接匯入到 Kotlin 中的純 Swift 程式庫時，這特別有用。
+
+若要實作此模式，您需要宣告一個 Kotlin 介面以及一個可供 Swift 實作繼承的 Kotlin 超類別。接著在 Swift 中實作該介面，並將 Swift 物件傳遞給接受該介面的 Kotlin 函式。例如，對於 CryptoKit 程式庫：
+
+1. 在 Kotlin 側，宣告一個介面、一個接受該介面的函式，以及一個 `open` 基底類別：
+
+    ```kotlin
+    // Kotlin
+    interface CryptoProvider {
+        fun hashMD5(input: String): String
+    }
+
+    fun processHash(provider: CryptoProvider, input: String): String = provider.hashMD5(input)
+
+    open class SwiftBase
+    ```
+
+2. 在 Swift 側，繼承匯出的 `SwiftBase` 類別，使用純 Swift 程式庫實作該介面，並將該物件傳回給 Kotlin：
+
+    ```swift
+    // Swift
+    import CryptoKit
+
+    final class IosCryptoProvider: SwiftBase, CryptoProvider {
+        func hashMD5(input: String) -> String {
+            guard let data = input.data(using: .utf8) else { return "failed" }
+            return Insecure.MD5.hash(data: data).description
+        }
+    }
+
+    let provider = IosCryptoProvider()
+    
+    // 呼叫 Kotlin 函式，該函式會回呼 Swift 中的 hashMD5()
+    print(processHash(provider: provider, input: "Hello, world!"))
+    ```
+
+當 Kotlin 接收到該 Swift 物件時，會將其視為一般 Kotlin 介面的實作，直接呼叫 Swift 程式碼。
+
+## Swift export 的演進 {id="evolution-of-swift-export"}
 
 我們計劃在未來的 Kotlin 版本中擴展並逐步穩定 Swift export，改善 Kotlin 與 Swift 之間的互通性。您可以留下您的回饋：
 

@@ -68,16 +68,31 @@ Kotlin/Native는 [디버그(debug)와 릴리스(release)](https://kotlinlang.org
 >
 {style="tip"}
 
-### 릴리스 바이너리 크기 줄이기 {id="enable-caches-for-release-binaries"}
+### 릴리스 바이너리 캐시 활성화하기 {id="enable-caches-for-release-binaries"}
+<primary-label ref="experimental-opt-in"/>
+
+기본적으로 Kotlin/Native는 링크 타임 최적화(LTO) 모드로 릴리스 바이너리를 컴파일합니다. 즉, 모든 모듈이 함께 컴파일되고 최적화됩니다. 이를 통해 런타임 시 릴리스 바이너리가 더 빨라지지만, 컴파일 시간이 크게 증가합니다.
+
+일부 컴파일러 최적화보다 빠른 컴파일을 우선시하고 싶다면 릴리스 모드에서 캐싱을 활성화할 수 있습니다. 캐싱을 활성화하려면 `gradle.properties` 파일에 다음 두 옵션을 모두 추가하세요.
+
+```properties
+# Enables the compiler to use caches in release mode
+kotlin.native.binary.enableReleaseBinaryCache=true
+# Makes the Kotlin Gradle plugin invoke the compiler with `-Xauto-cache-from` and related options
+kotlin.internal.native.enableReleaseBinaryCache=true
+```
+
+> 이 기능은 활발히 개발 중이므로 런타임 성능에 아직 개선의 여지가 있습니다.
+> 향후 Kotlin 릴리스에서 성능 개선이 예정되어 있습니다.
+> 
+{style="warning"}
+
+### 릴리스 바이너리 크기 줄이기 {id="reduce-the-size-of-release-binaries"}
 <primary-label ref="experimental-opt-in"/>
 
 릴리스 바이너리의 크기를 줄이고 빌드 시간을 개선하려면, `smallBinary` [바이너리 옵션을 활성화](native-binary-options.md#how-to-enable)해 보세요.
 
 이는 LLVM 컴파일 단계에서 컴파일러의 기본 최적화 인자로 `-Oz`를 효과적으로 설정합니다. 이 옵션은 아직 [실험적(Experimental)](components-stability.md#stability-levels-explained) 단계이며, 일부 경우에 런타임 성능에 영향을 줄 수 있습니다.
-
-### Gradle 데몬을 비활성화하지 마세요 {id="reduce-the-size-of-release-binaries"}
-
-특별한 이유가 없다면 [Gradle 데몬(daemon)](https://docs.gradle.org/current/userguide/gradle_daemon.html)을 비활성화하지 마세요. 기본적으로 [Kotlin/Native는 Gradle 데몬에서 실행됩니다](https://blog.jetbrains.com/kotlin/2020/03/kotlin-1-3-70-released/#kotlin-native). 데몬이 활성화되면 동일한 JVM 프로세스가 사용되므로 매 컴파일마다 프로세스를 준비(warm up)할 필요가 없습니다.
 
 ### 전이적 익스포트를 사용하지 마세요 {id="don-t-use-transitive-export"}
 
@@ -106,19 +121,19 @@ Gradle 구성 캐시를 사용하려면 `gradle.properties` 파일에 `org.gradl
 
 ### 이전에 비활성화했던 기능 활성화하기 {id="enable-previously-disabled-features"}
 
-Gradle 데몬과 컴파일러 캐시를 비활성화하는 Kotlin/Native 옵션들이 있습니다.
+과거에 빌드 문제를 우회하기 위해 일부 Kotlin/Native 기능을 비활성화했을 수 있습니다. 예를 들면 다음과 같습니다.
 
-* `kotlin.native.disableCompilerDaemon=true`
-* Gradle 빌드 파일의 `binaries {}` 블록에 있는 [`disableNativeCache`](https://kotlinlang.org/docs/multiplatform/multiplatform-dsl-reference.html#binaries) DSL.
+* `kotlin.native.disableCompilerDaemon=true`: [Gradle 데몬(daemon)](https://docs.gradle.org/current/userguide/gradle_daemon.html)을 비활성화합니다.
+* `disableNativeCache`: [컴파일 캐시](https://kotlinlang.org/docs/multiplatform/multiplatform-dsl-reference.html#binaries)를 비활성화합니다.
 
-이전에 이러한 기능에 문제가 있어 `gradle.properties` 파일이나 Gradle 빌드 파일에 해당 라인을 추가했다면, 이를 제거하고 빌드가 성공적으로 완료되는지 확인해 보세요. 이러한 속성들은 이미 해결된 문제들을 우회하기 위해 과거에 추가되었을 가능성이 큽니다.
+원래 이러한 우회책을 필요로 했던 문제들이 이미 해결되었을 수 있습니다. `gradle.properties` 파일이나 Gradle 빌드 파일에 이러한 라인이 포함되어 있다면, 이를 제거하고 빌드가 성공적으로 완료되는지 확인해 보세요.
 
 ### klib 아티팩트의 증분 컴파일 시도 {id="try-incremental-compilation-of-klib-artifacts"}
-<primary-label ref="experimental-opt-in"/>
+<primary-label ref="beta"/>
 
 증분 컴파일(incremental compilation)을 사용하면 프로젝트 모듈에서 생성된 `klib` 아티팩트의 일부만 변경된 경우, `klib`의 해당 부분만 바이너리로 다시 컴파일됩니다.
 
-이 기능은 아직 [실험적(Experimental)](components-stability.md#stability-levels-explained) 단계입니다. 이를 활성화하려면 `gradle.properties` 파일에 다음 옵션을 추가하세요.
+이 기능은 [베타(Beta)](components-stability.md#stability-levels-explained) 단계입니다. 이를 활성화하려면 `gradle.properties` 파일에 다음 옵션을 추가하세요.
 
 ```properties
 kotlin.incremental.native=true
@@ -128,7 +143,7 @@ kotlin.incremental.native=true
 
 ## Windows 구성 {id="windows-configuration"}
 
-Windows 보안(Windows Security)이 Kotlin/Native 컴파일러 속도를 늦출 수 있습니다. 기본적으로 `%\USERPROFILE%`에 위치한 `.konan` 디렉토리를 Windows 보안 제외 사항에 추가하면 이를 방지할 수 있습니다. [Windows 보안에 제외 사항을 추가](https://support.microsoft.com/ko-kr/windows/add-an-exclusion-to-windows-security-811816c0-4dfd-af4a-47e4-c301afe13b26)하는 방법을 알아보세요.
+Windows 보안(Windows Security)이 Kotlin/Native 컴파일러 속도를 늦출 수 있습니다. 기본적으로 `%\USERPROFILE%`에 위치한 `.konan` 디렉토리를 Windows 보안 제외 사항에 추가하면 이를 방지할 수 있습니다. [Windows 보안에 제외 사항을 추가](https://support.microsoft.com/en-us/windows/add-an-exclusion-to-windows-security-811816c0-4dfd-af4a-47e4-c301afe13b26)하는 방법을 알아보세요.
 
 ## LLVM 구성 {id="llvm-configuration"}
 <primary-label ref="advanced"/>

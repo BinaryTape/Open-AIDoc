@@ -2,11 +2,11 @@
 
 Kotlin 提供靈活的工具來控制程式流。使用 `if`、`when` 和迴圈來為您的條件定義清晰且具表現力的邏輯。
 
-## If 運算式
+## If 運算式 {id="if-expression"}
 
 在 Kotlin 中使用 `if` 時，請將要檢查的條件放在圓括號 `()` 中，並將結果為 true 時要執行的操作放在花括號 `{}` 中。您可以使用 `else` 和 `else if` 來增加額外的分支和檢查。
 
-您也可以將 `if` 當作運算式（expression）使用，這讓您可以直接將其傳回值指派給變數。在這種形式下，必須包含 `else` 分支。`if` 運算式的用途與其他語言中的三元運算子 (`condition ? then : else`) 相同。
+您也可以將 `if` 當作運算式使用，這讓您可以直接將其傳回值指派給變數。在這種形式下，必須包含 `else` 分支。`if` 運算式的用途與其他語言中的三元運算子 (`condition ? then : else`) 相同。
 
 例如：
 
@@ -64,7 +64,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="if-else-blocks-kotlin"}
 
-## When 運算式與陳述式
+## When 運算式與陳述式 {id="when-expressions-and-statements"}
 
 `when` 是一種條件運算式，根據多個可能的值或條件執行程式碼。它類似於 Java、C 和其他語言中的 `switch` 陳述式。`when` 會評估其引數，並按順序將結果與每個分支進行比較，直到滿足某個分支條件。例如：
 
@@ -145,9 +145,9 @@ when { ... }
 </tr>
 </table>
 
-您使用 `when` 的方式決定了您是否需要在分支中涵蓋所有可能的情況。涵蓋所有可能的情況稱為 **窮舉**（exhaustive）。
+您使用 `when` 的方式決定了您是否需要在分支中涵蓋所有可能的情況。涵蓋所有可能的情況稱為 _窮舉_（exhaustive）。
 
-### 陳述式
+### 陳述式 {id="statements"}
 
 如果您將 `when` 作為陳述式使用，則不需要涵蓋所有可能的情況。在此範例中，並未涵蓋所有情況，因此沒有觸發任何分支。但是，不會發生錯誤：
 
@@ -167,7 +167,7 @@ fun main() {
 
 與 `if` 一樣，每個分支都可以是一個程式碼區塊，其值是區塊中最後一個運算式的值。
 
-### 運算式
+### 運算式 {id="expressions"}
 
 如果您將 `when` 作為運算式使用，則 **必須** 涵蓋所有可能的情況。第一個相符分支的值會成為整個運算式的值。如果您沒有涵蓋所有情況，編譯器會擲回錯誤。
 
@@ -226,7 +226,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-when-no-subject"}
 
-### When 的其他用法
+### When 的其他用法 {id="other-ways-to-use-when"}
 
 `when` 運算式和陳述式提供了不同的方式來簡化程式碼、處理多個條件以及執行型別檢查。
 
@@ -419,7 +419,38 @@ when (animal) {
 }
 ```
 
-## For 迴圈
+### JVM 上的位元組碼產生 {id="bytecode-generation-on-the-jvm"}
+
+當您針對 JVM 21 或更高版本編譯 Kotlin 程式碼時，編譯器會為符合資格的 `when` 運算式產生 [`invokedynamic`](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/invoke/package-summary.html) 指令。這會產生更精簡的位元組碼，類似於 Java `switch` 陳述式所產生的位元組碼。
+
+當滿足以下所有條件時，編譯器會搭配 [`SwitchBootstraps.typeSwitch()`](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/runtime/SwitchBootstraps.html) 方法使用 `invokedynamic`：
+
+* 除 `else` 以外的所有條件均為 `is` 或 `null` 檢查。
+* `when` 運算式不包含[防護條件 (`if`)](#guard-conditions-in-when-expressions)。
+* 條件中不包含無法直接進行型別檢查的型別，例如可變 Kotlin 集合（`MutableList`）或函式型別（`kotlin.Function1`、`kotlin.Function2` 等）。
+* 除 `else` 之外，`when` 運算式至少有兩個條件。
+* 所有分支皆檢查 `when` 運算式的相同主體。
+
+例如：
+
+```kotlin
+open class Shape
+
+class Circle : Shape()
+class Rectangle : Shape()
+class Triangle : Shape()
+
+fun countCorners(shape: Shape) = when (shape) {
+    is Circle -> 0
+    is Rectangle -> 4
+    is Triangle -> 3
+    else -> -1
+}
+```
+
+這裡的 `when (shape)` 運算式會被編譯為單個 `invokedynamic` 型別 switch，而不是位元組碼中多個 `instanceof` 檢查。
+
+## For 迴圈 {id="for-loops"}
 
 使用 `for` 迴圈來反覆運算 [集合](collections-overview.md)、[陣列](arrays.md) 或 [範圍](ranges.md)：
 
@@ -446,7 +477,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-for-loop"}
 
-### 範圍
+### 範圍 {id="ranges"}
 
 要反覆運算一組數字範圍，請使用帶有 `..` 和 `..<` 運算子的 [範圍運算式](ranges.md)：
 
@@ -478,7 +509,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-for-loop-range"}
 
-### 陣列
+### 陣列 {id="arrays"}
 
 如果您想透過索引來反覆運算陣列或列表，可以使用 `indices` 屬性：
 
@@ -514,7 +545,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-for-loop-array-index"}
 
-### 迭代器
+### 迭代器 {id="iterators"}
 
 `for` 迴圈可以反覆運算任何提供 [迭代器](iterators.md) 的物件。集合預設提供迭代器，而範圍和陣列則會被編譯成基於索引的迴圈。
 
@@ -582,7 +613,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-for-loop-iterator-from-scratch"}
 
-## While 迴圈
+## While 迴圈 {id="while-loops"}
 
 `while` 和 `do-while` 迴圈會在滿足條件時持續執行其主體中的程式碼。兩者之間的區別在於檢查條件的時間點：
 
@@ -632,6 +663,6 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-do-while-loop"}
 
-## 迴圈中的 break 與 continue
+## 迴圈中的 break 與 continue {id="break-and-continue-in-loops"}
 
 Kotlin 支援在迴圈中使用傳統的 `break` 和 `continue` 運算子。請參閱 [返回與跳轉](returns.md)。

@@ -3,9 +3,9 @@
 선택한 [JavaScript 모듈](js-modules.md) 시스템에 따라 Kotlin/JS 컴파일러는 서로 다른 출력을 생성합니다.
 하지만 일반적으로 Kotlin 컴파일러는 JavaScript 코드에서 자유롭게 사용할 수 있는 일반적인 JavaScript 클래스, 함수 및 프로퍼티를 생성합니다. 다만 몇 가지 유의해야 할 미묘한 사항들이 있습니다.
 
-## plain 모드에서 별도의 JavaScript 객체로 선언 분리하기
+## plain 모드에서 별도의 JavaScript 객체로 선언 분리하기 {id="isolating-declarations-in-a-separate-javascript-object-in-plain-mode"}
 
-모듈 종류를 명시적으로 `plain`으로 설정한 경우, Kotlin은 전역 객체(global object)를 오염시키는 것을 방지하기 위해 현재 모듈의 모든 Kotlin 선언을 포함하는 객체를 생성합니다. 즉, `myModule`이라는 모듈의 모든 선언은 JavaScript에서 `myModule` 객체를 통해 사용할 수 있습니다. 예를 들어:
+모듈 종류를 명시적으로 `plain`으로 설정한 경우, Kotlin은 전역 객체를 오염시키는 것을 방지하기 위해 현재 모듈의 모든 Kotlin 선언을 포함하는 객체를 생성합니다. 즉, `myModule`이라는 모듈의 모든 선언은 JavaScript에서 `myModule` 객체를 통해 사용할 수 있습니다. 예를 들어:
 
 ```kotlin
 fun foo() = "Hello"
@@ -27,7 +27,7 @@ alert(require('myModule').foo());
 
 JavaScript 모듈 시스템에 대한 자세한 내용은 [JavaScript 모듈](js-modules.md)을 참고하세요.
 
-## 패키지 구조
+## 패키지 구조 {id="package-structure"}
 
 대부분의 모듈 시스템(CommonJS, Plain, UMD)에서 Kotlin은 패키지 구조를 JavaScript에 노출합니다.
 루트 패키지에 선언을 정의하지 않는 한, JavaScript에서 전체 경로 이름(fully qualified names)을 사용해야 합니다.
@@ -60,7 +60,7 @@ import { foo } from 'myModule';
 alert(foo());
 ```
 
-### `@JsName` 어노테이션
+### `@JsName` 어노테이션 {id="jsname-annotation"}
 
 어떤 경우(예를 들어 오버로드 지원 등)에는 Kotlin 컴파일러가 생성된 JavaScript 코드의 함수 및 속성 이름을 맹글링(mangling)합니다. 생성되는 이름을 제어하려면 `@JsName` 어노테이션을 사용할 수 있습니다:
 
@@ -87,7 +87,7 @@ person.hello();                          // "Hello Dmitry!" 출력
 person.helloWithGreeting("Servus");      // "Servus Dmitry!" 출력
 ```
 
-만약 `@JsName` 어노테이션을 지정하지 않았다면, 해당 함수의 이름에는 함수 시그니처로부터 계산된 접미사(예: `hello_61zpoe`)가 포함되었을 것입니다.
+만약 `@JsName` 어노테이션을 지정하지 않았다면, 해당 함수의 이름에는 함수 시그니처로부터 계산된 접미사(예: `hello_61zpoe$`)가 포함되었을 것입니다.
 
 Kotlin 컴파일러가 맹글링을 적용하지 않는 몇 가지 경우가 있습니다:
 - `external` 선언은 맹글링되지 않습니다.
@@ -102,7 +102,7 @@ Kotlin 컴파일러가 맹글링을 적용하지 않는 몇 가지 경우가 있
 external fun newC()
 ```
 
-### `@JsExport` 어노테이션
+### `@JsExport` 어노테이션 {id="jsexport-annotation"}
 <primary-label ref="experimental-general"/>
 
 최상위 선언(클래스, 인터페이스, 함수 등)에 `@JsExport` 어노테이션을 적용하면 Kotlin 선언을 JavaScript 또는 TypeScript에서 사용할 수 있게 됩니다. 이 어노테이션은 Kotlin에 정의된 이름으로 모든 중첩된 선언을 내보냅니다.
@@ -128,7 +128,7 @@ interface Identity {
 * 생성 및 내보낼 함수의 이름을 지정하기 위해 [`@JsName` 어노테이션](#jsname-어노테이션)과 함께 사용. 이는 동일한 이름을 가진 함수의 오버로드와 같은 내보내기 시의 모호함을 해결하는 데 도움이 됩니다.
 * `@file:JsExport`를 사용하여 파일 수준에서 적용.
 
-#### 값 클래스(value class) 내보내기 지원
+#### 값 클래스 내보내기 {id="export-value-classes"}
 
 Kotlin의 [인라인 값 클래스(inline value classes)](inline-classes.md)를 일반 TypeScript 클래스로 내보낼 수 있습니다.
 
@@ -161,7 +161,50 @@ console.log(await auth.login(new Email("not-an-email")));
 // "Invalid email"
 ```
 
-### `@JsNoRuntime` 어노테이션
+#### 일시 중단 람다 내보내기 {id="export-suspending-lambdas"}
+
+Kotlin의 [일시 중단 람다 식(suspending lambda expressions)](lambdas.md#lambda-expressions-and-anonymous-functions)을 JavaScript [async 함수](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function)로 내보낼 수 있습니다:
+
+1. 이 기능을 활성화하려면 `build.gradle.kts` 파일에 다음 컴파일러 옵션을 추가하세요:
+
+    ```kotlin
+    kotlin {
+        js {
+            compilations.all {
+                compileTaskProvider.configure {
+                    compilerOptions {
+                        freeCompilerArgs.add("-Xsuspend-lambda-exporting")
+                    }
+                }
+            }
+        }
+    }
+    ```
+
+2. 관련 Kotlin 선언에 `@JsExport` 어노테이션을 표시합니다:
+
+    ```kotlin
+    // Kotlin
+    @JsExport
+    class TaskRunner {
+        suspend fun runTask(task: suspend () -> String): String {
+            return task()
+        }
+    }
+    ```
+
+3. TypeScript 측에서 `suspend` 람다는 일반 `async` 함수로 매핑됩니다:
+
+    ```typescript
+    // TypeScript
+    import { TaskRunner } from "..."
+    
+    const runner = new TaskRunner();
+    const result = await runner.runTask(async () => "done");
+    console.log(result); // "done"
+    ```
+
+### `@JsNoRuntime` 어노테이션 {id="jsnoruntime-annotation"}
 
 `@JsNoRuntime` 어노테이션을 사용하여 Kotlin 인터페이스를 JavaScript/TypeScript로 내보낼 수 있습니다. 이를 통해 일반 TypeScript 인터페이스로 직접 매핑할 수 있습니다.
 
@@ -212,7 +255,7 @@ Kotlin 멀티플랫폼 프로젝트의 경우 일반적인 규칙은 다음과 �
 * [`::class` 구문](js-reflection.md)을 사용하는 클래스 참조.
 * [구체화된 타입 인자(reified type argument)](inline-functions.md#reified-type-parameters)로 전달되는 인터페이스.
 
-### `@JsStatic`
+### `@JsStatic` {id="jsstatic"}
 <primary-label ref="experimental-general"/>
 
 `@JsStatic` 어노테이션은 컴파일러가 대상 선언에 대해 추가적인 정적 메서드를 생성하도록 지시합니다. 이를 통해 Kotlin 코드의 정적 멤버를 JavaScript에서 직접 사용할 수 있습니다.
@@ -244,7 +287,7 @@ C.Companion.callNonStatic(); // 이 방식만 작동함
 
 이 기능은 [실험적(Experimental)](components-stability.md#stability-levels-explained)입니다. 이슈 트래커인 [YouTrack](https://youtrack.jetbrains.com/issue/KT-18891/JS-provide-a-way-to-declare-static-members-JsStatic)에서 피드백을 공유해 주세요.
 
-### Kotlin의 `Long` 타입을 표현하기 위해 `BigInt` 타입 사용하기
+### Kotlin의 `Long` 타입을 표현하기 위해 `BigInt` 타입 사용하기 {id="use-bigint-type-to-represent-kotlin-s-long-type"}
 <primary-label ref="experimental-general"/>
 
 Kotlin/JS는 현대적인 JavaScript(ES2020)로 컴파일할 때 Kotlin `Long` 값을 표현하기 위해 JavaScript의 기본 `BigInt` 타입을 사용합니다.
@@ -265,7 +308,7 @@ kotlin {
 
 이 기능은 [실험적(Experimental)](components-stability.md#stability-levels-explained)입니다. 이슈 트래커인 [YouTrack](https://youtrack.jetbrains.com/issue/KT-57128/KJS-Use-BigInt-to-represent-Long-values-in-ES6-mode)에서 피드백을 공유해 주세요.
 
-#### 내보낸 선언에서 `Long` 사용하기
+#### 내보낸 선언에서 `Long` 사용하기 {id="use-long-in-exported-declarations"}
 
 Kotlin의 `Long` 타입은 JavaScript의 `BigInt` 타입으로 컴파일될 수 있으므로, Kotlin/JS는 JavaScript로 `Long` 값을 내보내는 것을 지원합니다.
 
@@ -287,7 +330,7 @@ Kotlin의 `Long` 타입은 JavaScript의 `BigInt` 타입으로 컴파일될 수 
 
 2. `BigInt` 타입을 활성화합니다. 활성화 방법은 [Kotlin의 `Long` 타입을 표현하기 위해 `BigInt` 타입 사용하기](#use-bigint-type-to-represent-kotlin-s-long-type)를 참고하세요.
 
-### Kotlin의 `LongArray` 타입을 표현하기 위해 `BigInt64Array` 타입 사용하기
+### Kotlin의 `LongArray` 타입을 표현하기 위해 `BigInt64Array` 타입 사용하기 {id="use-bigint64array-type-to-represent-kotlin-s-longarray-type"}
 <primary-label ref="experimental-general"/>
 
 Kotlin/JS는 JavaScript로 컴파일할 때 Kotlin의 `LongArray` 값을 표현하기 위해 JavaScript의 기본 `BigInt64Array` 타입을 사용할 수 있습니다.
@@ -308,7 +351,7 @@ kotlin {
 
 이 기능은 [실험적(Experimental)](components-stability.md#stability-levels-explained)입니다. 이슈 트래커인 [YouTrack](https://youtrack.jetbrains.com/issue/KT-79284/Use-BigInt64Array-for-LongArray)에서 피드백을 공유해 주세요.
 
-## JavaScript에서의 Kotlin 타입
+## JavaScript에서의 Kotlin 타입 {id="kotlin-types-in-javascript"}
 
 Kotlin 타입이 JavaScript 타입으로 어떻게 매핑되는지 확인하세요:
 

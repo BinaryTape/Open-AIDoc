@@ -48,11 +48,17 @@ Stream().read()
 fun powerOf(number: Int, exponent: Int): Int { /*...*/ }
 ```
 
-在函式主體內，收到的引數是唯讀的（隱含宣告為 `val`）：
+當您將物件傳遞給函式時，編譯器會傳遞該物件參照的複本。
+複製的參照指向同一個物件，因此函式可以修改該物件的可變狀態。
+
+函式參數在函式主體內是唯讀的（隱式宣告為 `val`），因此您無法對其重新指派：
 
 ```kotlin
-fun powerOf(number: Int, exponent: Int): Int {
-    number = 2 // 錯誤：'val' 不能重新指派。
+class Counter(var value: Int)
+
+fun reset(counter: Counter) {
+    counter.value = 0    // 允許：修改物件
+    counter = Counter(0) // 錯誤：'val' 不能重新指派
 }
 ```
 
@@ -69,7 +75,7 @@ fun powerOf(
 您可以移動宣告中的參數，而不必擔心哪一個會變成最後一個。
 
 > Kotlin 函式可以接收其他函式作為參數，也可以作為引數傳遞。
-> 若要了解更多，請參閱 [](lambdas.md)。
+> 若要了解更多資訊，請參閱 [](lambdas.md)。
 > 
 {style="note"}
 
@@ -282,13 +288,89 @@ mergeStrings(strings = arrayOf("a", "b", "c"))
 ### 傳回型別 {id="return-types"}
 
 當您宣告具有區塊主體的函式時（透過將指令放在花括號 `{}` 內），
-必須一律明確指定傳回型別。
-唯一的例外是當它們傳回 `Unit` 時，
-[在這種情況下指定傳回型別是選用的](#unit-returning-functions)。
+必須一律明確指定傳回型別。唯一的例外是當函式傳回 `Unit` 時，[在這種情況下指定傳回型別是選用的](#unit-returning-functions)。
 
-Kotlin 不會為具有區塊主體的函式推論傳回型別。
-這些函式的控制流程可能很複雜，這會使傳回型別對於讀者甚至是編譯器都不夠清晰。
-然而，如果您不指定，Kotlin 可以為 [單一運算式函式](#single-expression-functions) 推論傳回型別。
+Kotlin 不會為具有區塊主體的函式推論傳回型別。這些函式的控制流程可能很複雜，這會使傳回型別對於讀者甚至是編譯器都不夠清晰。然而，如果您不指定，Kotlin 可以為 [單一運算式函式](#single-expression-functions) 推論傳回型別。
+
+Kotlin 函式傳回單一值，但該值可以包含多筆資料。有關表示這些值的方法，請參閱 [傳回多個值](#return-multiple-values)。
+
+#### 傳回多個值 {id="return-multiple-values"}
+
+當您需要傳回多個具有不同意義的相關值時，請宣告一個 [資料類別](data-classes.md)，即使您只在一個函式中使用它：
+
+```kotlin
+data class OrderSummary(
+    val subtotal: Double,
+    val tax: Double,
+)
+
+fun calculateOrderSummary(prices: List<Double>): OrderSummary {
+    val subtotal = prices.sum()
+    val tax = subtotal * 0.2
+    return OrderSummary(subtotal, tax)
+}
+
+fun main() {
+    val summary = calculateOrderSummary(listOf(12.50, 8.00, 4.50))
+
+    println(summary.subtotal)
+    // 25.0
+    println(summary.tax)
+    // 5.0
+}
+```
+{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="return-multiple-values-data-class"}
+
+當您需要傳回多個具有不同意義的值時，資料類別非常適用。如果傳回的值屬於同種類型且您希望將它們作為一組來處理，請考慮改為傳回集合：
+
+```kotlin
+data class Person(val name: String)
+
+val friendGroups = listOf(
+    listOf(Person("Alice"), Person("Bob")),
+    listOf(Person("Charlie"), Person("Diana"), Person("Eve")),
+    listOf(Person("Frank"))
+)
+
+fun findLargestGroupOfFriends(): List<Person> {
+    return friendGroups.maxByOrNull { it.size } ?: emptyList()
+}
+
+fun main() {
+    val largestGroup = findLargestGroupOfFriends()
+
+    println(largestGroup.map { it.name })
+    // [Charlie, Diana, Eve]
+}
+```
+{kotlin-runnable="true" kotlin-min-compiler-version="1.4" id="return-multiple-values-list"}
+
+如果您需要傳回固定數量的值，也可以使用標準庫中的 [`Pair`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-pair/) 或 [`Triple`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-triple/) 資料類別。然而，它們的屬性具有通用的名稱（如 `first`、`second` 和 `third`），這可能會使結果難以理解。
+
+例如，雖然 `calculateOrderTotals()` 函式傳回一個 `Pair`，但並不明確每個 `Double` 代表什麼：
+
+```kotlin
+fun calculateOrderTotals(prices: List<Double>): Pair<Double, Double> {
+    val subtotal = prices.sum()
+    val tax = subtotal * 0.2
+    return Pair(subtotal, tax)
+}
+
+fun main() {
+    val totals = calculateOrderTotals(listOf(12.50, 8.00, 4.50))
+
+    // 'first' 代表什麼？
+    println(totals.first)
+    // 25.0
+  
+    // 'second' 代表什麼？
+    println(totals.second)
+    // 5.0
+}
+```
+{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="return-multiple-values-pair"}
+
+對於具有不同意義的結果，建議使用具有描述性屬性名稱的資料類別，正如 [`OrderSummary` 資料類別範例](#return-multiple-values) 中所示。
 
 ### 單一運算式函式 {id="single-expression-functions"}
 
@@ -315,7 +397,7 @@ fun double(x: Int) = x * 2
 在上面的例子中，如果您希望 `double()` 函式傳回 `Number` 而非 `Int`，
 您必須明確宣告。
 
-如果函式的傳回型別已明確指定，您可以在運算式主體中使用 `return` 陳述式：
+如果您在運算式主體內使用 `return` 陳述式，則必須明確指定傳回型別：
 
 ```kotlin
 fun getDisplayNameOrDefault(userId: String?): String =
@@ -478,26 +560,26 @@ infix fun Int.shl(x: Int): Int { /*...*/ }
 1 shl 2
 ```
 
-`infix` 函式必須符合以下要求：
+Infix 函式必須符合以下要求：
 
 * 它們必須是類別的成員函數或 [擴充方法](extensions.md)。
 * 它們必須只有一個參數。
 * 參數不得 [接受可變數量的引數](#variable-number-of-arguments-varargs) (`vararg`)，且不得有 [預設值](#parameters-with-default-values)。
 
-> `infix` 函式呼叫的優先級低於算術運算子、型別轉換與 `rangeTo` 運算子。
+> Infix 函式呼叫的優先級低於算術運算子、型別轉換與 `rangeTo` 運算子。
 > 以下運算式是等效的：
 > * `1 shl 2 + 3` 等效於 `1 shl (2 + 3)`
 > * `0 until n * 2` 等效於 `0 until (n * 2)`
 > * `xs union ys as Set<*>` 等效於 `xs union (ys as Set<*>)`
 >
-> 另一方面，`infix` 函式呼叫的優先級高於布林運算子 `&&` 和 `||`、`is` 和 `in` 檢查以及其他一些運算子。這些運算式也是等效的：
+> 另一方面，infix 函式呼叫的優先級高於布林運算子 `&&` 和 `||`、`is` 和 `in` 檢查以及其他一些運算子。這些運算式也是等效的：
 > * `a && b xor c` 等效於 `a && (b xor c)`
 > * `a xor b in c` 等效於 `(a xor b) in c`
 >
 {style="note"}
 
-請注意，`infix` 函式始終需要指定接收者和參數。
-當您使用 `infix` 表示法在目前接收者上呼叫方法時，請明確使用 `this`。
+請注意，infix 函式始終需要指定接收者和參數。
+當您使用 infix 表示法在目前接收者上呼叫方法時，請明確使用 `this`。
 這可確保剖析不會產生歧義。
 
 ```kotlin

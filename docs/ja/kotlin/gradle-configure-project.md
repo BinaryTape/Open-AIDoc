@@ -49,7 +49,8 @@ plugins {
 
 | KGP バージョン | Gradle の最小および最大バージョン | AGP の最小および最大バージョン |
 |---------------|---------------------------------------|-----------------------------------------------------|
-| 2.4.0-2.4.10  | %minGradleVersion%–%maxGradleVersion% | %minAndroidGradleVersion%–%maxAndroidGradleVersion% |
+| 2.4.20        | %minGradleVersion%–%maxGradleVersion% | %minAndroidGradleVersion%–%maxAndroidGradleVersion% |
+| 2.4.0-2.4.10  | 7.6.3–9.5.0                           | 8.5.2–9.1.0                                         |
 | 2.3.20–2.3.21 | 7.6.3–9.3.0                           | 8.2.2–9.0.0                                         |
 | 2.3.10        | 7.6.3–9.0.0                           | 8.2.2–9.0.0                                         |
 | 2.3.0         | 7.6.3–9.0.0                           | 8.2.2–8.13.0                                        |
@@ -277,12 +278,13 @@ Gradle 6.7 で [Java ツールチェーンのサポート](https://docs.gradle.o
 
 ツールチェーンのサポートにより、Gradle はローカルの JDK を自動検出し、ビルドに必要な不足している JDK をインストールできます。これにより、Gradle 自体は任意の JDK で実行しながら、メジャー JDK バージョンに依存するタスクに対して[リモートビルドキャッシュ機能](gradle-compilation-and-caches.md#gradle-build-cache-support)を再利用できます。
 
-Kotlin Gradle プラグインは、Kotlin/JVM コンパイルタスクで Java ツールチェーンをサポートしています。JS および Native タスクはツールチェーンを使用しません。Kotlin コンパイラは常に Gradle デーモンが実行されている JDK 上で動作します。
+Kotlin Gradle プラグインは、Kotlin/JVM コンパイルタスクで Java ツールチェーンをサポートしています。JS および Native タスクはツールチェーンを使用しません。
+Kotlin コンパイラは常に Gradle デーモンが実行されている JDK 上で動作します。
 Java ツールチェーンは以下のことを行います。
 * JVM ターゲットで利用可能な [`-jdk-home` オプション](compiler-reference.md#jdk-home-path)を設定する。
 * ユーザーが `jvmTarget` オプションを明示的に設定していない場合、[`compilerOptions.jvmTarget`](gradle-compiler-options.md#attributes-specific-to-jvm) をツールチェーンの JDK バージョンに設定する。
   ユーザーがツールチェーンを構成していない場合、`jvmTarget` フィールドはデフォルト値を使用します。
-  [関連するコンパイルタスクの JVM ターゲット互換性のチェック](#check-for-jvm-target-compatibility-of-related-compile-tasks)についての詳細を確認してください。
+  [JVM ターゲットの互換性](#check-for-jvm-target-compatibility-of-related-compile-tasks)についての詳細を確認してください。
 * すべての Java コンパイル、テスト、javadoc タスクで使用されるツールチェーンを設定する。
 * [`kapt` ワーカー](kapt.md#run-kapt-tasks-in-parallel)が実行される JDK に影響を与える。
 
@@ -674,7 +676,7 @@ plugins {
 要件に応じて、以下のターゲットを指定できます。
 
 * **`wasmJs`**: ブラウザまたは Node.js での実行用
-* **`wasmWasi`**: Wasmtime、WasmEdge などの [WASI (WebAssembly System Interface)](https://wasi.dev/) をサポートする Wasm環境での実行用
+* **`wasmWasi`**: Wasmtime、WasmEdge などの [WASI (WebAssembly System Interface)](https://wasi.dev/) をサポートする Wasm 環境での実行用
 
 Web ブラウザまたは Node.js 用に `wasmJs` ターゲットを構成します。
 
@@ -688,12 +690,12 @@ kotlin {
 }
 ```
 
-WASI 環境の場合は、`wasmWasi` ターゲットを構成します。
+WASI 環境の場合は、Node.js または Wasmtime を使用して `wasmWasi` ターゲットを構成します。
 
 ```kotlin
 kotlin {
     wasmWasi {
-        nodejs {
+        nodejs { // または wasmtime
             /* ... */
         }
     }

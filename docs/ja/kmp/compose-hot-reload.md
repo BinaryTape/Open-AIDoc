@@ -147,7 +147,7 @@ MCP サーバーを使用すると、AI コーディングエージェントが�
 
 ### AI エージェントの接続 {id="connect-an-ai-agent"}
 
-AI エージェントを接続するには、エージェントの MCP クライアント設定で `hotMcpServer` Gradle タスクを指定します。たとえば、`.mcp.json` では以下のようになります。
+AI エージェントを接続するには、エージェントの MCP クライアント設定で `hotMcpServer` Gradle タスクを実行するように指定します。たとえば、`.mcp.json` では以下のようになります。
 
 ```json
 {
@@ -164,6 +164,10 @@ AI エージェントを接続するには、エージェントの MCP クライ
   }
 }
 ```
+
+Gradle はすべてのサブプロジェクトからタスクを検索し、`hotMcpServer` という短い名前を `hotMcpServerJvm` や `hotMcpServerDesktop` などのターゲット固有のバリアントに一致させます。
+
+モジュールで複数の JVM ターゲットを定義している場合は、曖昧さを回避するために完全修飾タスク名（`:<module>:hotMcpServer<Target>`、たとえば `:app:hotMcpServerDesktop` や `:composeApp:hotMcpServerJvm`）を指定してください。
 
 ### 利用可能な MCP ツール {id="available-mcp-tools"}
 

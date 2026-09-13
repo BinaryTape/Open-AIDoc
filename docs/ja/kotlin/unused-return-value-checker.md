@@ -19,7 +19,7 @@
 * `if`、`when`、`while` などの条件式でチェックされている。
 * ラムダの最後の文として使用されている。
 
-このチェッカーは、`++` や `--` などのインクリメント・デクリメント操作や、右辺で現在の関数を抜けるような論理演算のショートカット（例：`condition || return`）については、無視された結果として報告しません。
+このチェッカーは、`++` や `--` などのインクリメント操作や、右辺で現在の関数を抜けるような論理演算のショートカット（例：`condition || return`）については、無視された結果として報告しません。
 
 未使用戻り値チェッカーを使用することで、関数呼び出しが意味のある結果を生成しているにもかかわらず、その結果が暗黙的に破棄されているバグを特定できます。これにより、予期しない動作を防ぎ、そのような問題の追跡を容易にすることができます。
 
@@ -89,7 +89,7 @@ kotlin {
 
 [-Xreturn-value-checker コンパイラオプション](#configure-the-unused-return-value-checker)を `check` に設定すると、チェッカーは、Kotlin標準ライブラリのほとんどの関数のよう、マークされている式からの無視された結果のみを報告します。
 
-自身のコードをマークするには、[`@MustUseReturnValues`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-must-use-return-value/) アノテーションを使用します。チェッカーの対象にしたいスコープに応じて、ファイル、クラス、または関数に適用できます。
+自身のコードをマークするには、[`@MustUseReturnValues`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-must-use-return-values/) アノテーションを使用します。チェッカーの対象にしたいスコープに応じて、ファイル、クラス、または関数に適用できます。
 
 例えば、ファイル全体をマークできます：
 
@@ -249,7 +249,8 @@ kotlin {
 
 ## Javaアノテーションとの相互運用性 {id="interoperability-with-java-annotations"}
 
-一部のJavaライブラリでは、異なるアノテーションを使用して同様のメカニズムを採用しています。未使用戻り値チェッカーは、以下のアノテーションを `@MustUseReturnValues` を使用するのと同等として扱います：
+一部のJavaライブラリでは、異なるアノテーションを使用して同様のメカニズムを採用しています。
+未使用戻り値チェッカーは、以下のアノテーションを `@MustUseReturnValues` を使用するのと同等として扱います：
 
 * [`com.google.errorprone.annotations.CheckReturnValue`](https://errorprone.info/api/latest/com/google/errorprone/annotations/CheckReturnValue.html)
 * [`edu.umd.cs.findbugs.annotations.CheckReturnValue`](https://findbugs.sourceforge.net/api/edu/umd/cs/findbugs/annotations/CheckReturnValue.html)

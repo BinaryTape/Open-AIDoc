@@ -29,8 +29,8 @@ Kotlin 2.0.0부터 다음 유형의 릴리스를 제공합니다:
 
 향후 안정 버전 Kotlin 릴리스의 대략적인 일정은 다음과 같습니다:
 
-* **2.4.20**: 2026년 9월 예정
 * **2.5.0**: 2026년 12월 예정
+* **2.5.20**: 2027년 3월 예정
 
 ## 새로운 Kotlin 버전으로 업데이트 {id="update-to-a-new-kotlin-version"}
 
@@ -109,7 +109,7 @@ Kotlin %kotlinVersion%으로 업데이트하려면 `pom.xml` 파일에서 버전
 
 ## IDE 지원 {id="ide-support"}
 
-Kotlin은 JetBrains에서 개발한 공식 Kotlin 플러그인을 통해 [IntelliJ IDEA](https://www.jetbrains.com/idea/download/) 및 [Android Studio](https://developer.android.com/kotlin/get-started)에서 별도의 설정 없이 완전한 기능을 지원합니다.
+Kotlin은 [IntelliJ IDEA](https://www.jetbrains.com/idea/download/) 및 [Android Studio](https://developer.android.com/kotlin/get-started)에서 별도의 설정 없이 완전한 기능을 지원합니다.
 
 ## 표준 라이브러리 보안 지원 {id="standard-library-security-support"}
 
@@ -129,7 +129,7 @@ JVM용 Kotlin 표준 라이브러리에 영향을 미치는 보안 취약점을 
         <th>Kotlin 릴리스 라인</th>
         <th>릴리스 날짜</th>
         <th>지원 종료</th>
-        <th>최신 버그 수정 릴리스</th>
+        <th>최신 릴리스</th>
     </tr>
     <tr>
         <td><strong>2.4</strong>
@@ -141,7 +141,7 @@ JVM용 Kotlin 표준 라이브러리에 영향을 미치는 보안 취약점을 
             <p>2027년 12월 3일</p>
         </td>
         <td>
-            <p>2.4.10</p>
+            <p>2.4.20</p>
         </td>
     </tr>
 </table>
@@ -162,6 +162,16 @@ JVM용 Kotlin 표준 라이브러리에 영향을 미치는 보안 취약점을 
     <tr>
         <th>빌드 정보</th>
         <th>빌드 주요 사항</th>
+    </tr>
+    <tr>
+        <td><strong>2.4.20</strong>
+            <p>출시일: <strong>2026년 9월 7일</strong></p>
+            <p><a href="https://github.com/JetBrains/kotlin/releases/tag/v2.4.20" target="_blank">GitHub에서 릴리스 보기</a></p>
+        </td>
+        <td>
+            <p>새로운 실험적 기능 및 안정화된 기능, 성능 개선, 버그 수정 및 도구 업데이트를 포함하는 도구 릴리스입니다.</p>
+            <p>자세한 내용은 <a href="https://github.com/JetBrains/kotlin/releases/tag/v2.4.20">변경 로그</a>를 참조하세요.</p>
+        </td>
     </tr>
     <tr>
         <td><strong>2.4.10</strong>

@@ -1,6 +1,6 @@
 [//]: # (title: 設定 Kotlin/JS 專案)
 
-Kotlin/JS 專案使用 Gradle 作為建構系統。為了讓開發人員輕鬆管理其 Kotlin/JS 專案，我們提供了 `kotlin.multiplatform` Gradle 外掛程式，它提供了專案配置工具以及用於自動化 JavaScript 開發典型常式的輔助任務。
+Kotlin/JS 專案使用 Gradle 作為建置系統。為了讓開發人員輕鬆管理其 Kotlin/JS 專案，我們提供了 `kotlin.multiplatform` Gradle 外掛程式，它提供了專案配置工具以及用於自動化 JavaScript 開發典型常式的輔助任務。
 
 該外掛程式會在背景使用 [npm](https://www.npmjs.com/) 或 [Yarn](https://yarnpkg.com/) 封裝管理員下載 npm 相依性，並使用 [webpack](https://webpack.js.org/) 從 Kotlin 專案建置 JavaScript 組合包。相依性管理和配置調整很大程度可以直接從 Gradle 建置檔案中完成，並提供覆寫自動產生的配置以實現完全控制的選項。
 
@@ -48,7 +48,7 @@ kotlin {
 * [目標目錄](#distribution-target-directory)與[模組名稱](#module-name)
 * 專案的 [`package.json` 檔案](#package-json-customization)
 
-## 執行環境
+## 執行環境 {id="execution-environments"}
 
 Kotlin/JS 專案可以針對兩種不同的執行環境： 
 
@@ -75,7 +75,7 @@ kotlin {
 
 Kotlin 多平台外掛程式會自動配置其任務以配合選定的環境。這包括下載和安裝執行與測試應用程式所需的環境與相依性。這讓開發人員無需額外配置即可建置、執行和測試簡單專案。對於針對 Node.js 的專案，還可以選擇使用現有的安裝。了解如何[使用預先安裝的 Node.js](#use-pre-installed-node-js)。
 
-## 支援 ES2015 特性
+## 支援 ES2015 特性 {id="support-for-es2015-features"}
 
 Kotlin 提供對 ES2015 特性的支援，包括：
 
@@ -96,7 +96,7 @@ tasks.withType<KotlinJsCompile>().configureEach {
 
 [在官方文件中進一步了解 ES2015 (ECMAScript 2015, ES6)](https://262.ecma-international.org/6.0/)。
 
-## 配置輸出粒度
+## 配置輸出粒度 {id="configure-output-granularity"}
 
 您可以選擇編譯器在專案中輸出 `.js` 檔案的方式：
 
@@ -114,7 +114,7 @@ tasks.withType<KotlinJsCompile>().configureEach {
      kotlin.js.ir.output.granularity=per-file // 預設為 'per-module'
      ```
 
-## 產生 TypeScript 宣告檔案 (`d.ts`)
+## 產生 TypeScript 宣告檔案 (`d.ts`) {id="generation-of-typescript-declaration-files-d-ts"}
 <primary-label ref="experimental-opt-in"/>
 
 Kotlin/JS 編譯器可以從您的 Kotlin 程式碼產生 TypeScript 定義。這些定義在處理混合應用程式時，可供 JavaScript 工具和 IDE 用於：
@@ -142,7 +142,7 @@ kotlin {
 
 您可以在 `build/js/packages/<package_name>/kotlin` 目錄中找到這些定義，以及對應的未經 webpack 處理的 JavaScript 程式碼。
 
-## 相依性
+## 相依性 {id="dependencies"}
 
 要宣告相依性，請在 `build.gradle(.kts)` 檔案中使用 `jsMain` 原始碼集內的 `dependencies {}` 區塊：
 
@@ -164,7 +164,7 @@ kotlin {
 </tab>
 <tab title="Groovy" group-key="groovy">
 
-```kotlin
+```groovy
 kotlin {
     sourceSets {
         jsMain {
@@ -189,9 +189,9 @@ repositories {
 
 如果您加入的程式庫相依於 [來自 npm 的套件](#npm-dependencies)，Gradle 也會自動解決這些遞移相依性。
 
-### Kotlin 標準函式庫
+### Kotlin 標準函式庫 {id="kotlin-standard-libraries"}
 
-對 [標準函式庫](https://kotlinlang.org/api/latest/jvm/stdlib/index.html) 的相依性會自動加入。標準函式庫的版本與 Kotlin 多平台外掛程式的版本相同。
+對[標準函式庫](https://kotlinlang.org/api/latest/jvm/stdlib/index.html)的相依性會自動加入。標準函式庫的版本與 Kotlin 多平台外掛程式的版本相同。
 
 對於多平台測試，可以使用 [`kotlin.test`](https://kotlinlang.org/api/latest/kotlin.test/) API。當您建立多平台專案時，可以透過在 `commonTest` 中使用單一相依性，將測試相依性加入到所有原始碼集：
 
@@ -226,7 +226,7 @@ kotlin {
 </tab>
 </tabs>
 
-### npm 相依性
+### npm 相依性 {id="npm-dependencies"}
 
 在 JavaScript 世界中，最常見的相依性管理方式是 [npm](https://www.npmjs.com/)。它提供了最大的 JavaScript 模組公共存儲庫。
 
@@ -283,7 +283,7 @@ kotlin.js.yarn=false
 
 安裝 npm 相依性後，您可以在程式碼中使用其 API，如[在 Kotlin 中呼叫 JS](js-interop.md) 中所述。
 
-## run 任務
+## run 任務 {id="run-task"}
 
 Kotlin 多平台 Gradle 外掛程式提供了一個 `jsBrowserDevelopmentRun` 任務，讓您無需額外配置即可執行純 Kotlin/JS 專案。
 
@@ -311,9 +311,11 @@ Kotlin 多平台 Gradle 外掛程式提供了一個 `jsBrowserDevelopmentRun` �
 
 一旦您的專案建置成功，`webpack-dev-server` 將自動重新整理瀏覽器頁面。
 
-## test 任務
+## test 任務 {id="test-task"}
 
-Kotlin 多平台 Gradle 外掛程式會自動為專案設定測試基礎結構。對於瀏覽器專案，它會下載並安裝 [Karma](https://karma-runner.github.io/) 測試執行器及其他必要的相依性；對於 Node.js 專案，則使用 [Mocha](https://mochajs.org/) 測試框架。 
+Kotlin 多平台 Gradle 外掛程式會自動為專案設定測試基礎結構。它會下載並安裝所需的測試執行器及其他相依性。
+
+對於瀏覽器專案，您可以在 [Karma](#karma) 測試執行器和全新的[用於瀏覽器測試的 DSL](#dsl-for-browser-testing) 之間進行選擇。對於 Node.js 專案，則可使用 [Mocha](#node-js) 測試框架。
 
 該外掛程式還提供了有用的測試功能，例如：
 
@@ -321,7 +323,13 @@ Kotlin 多平台 Gradle 外掛程式會自動為專案設定測試基礎結構�
 * 產生測試報告
 * 主控台中的測試執行結果
 
-為了執行瀏覽器測試，外掛程式預設使用 [Headless Chrome](https://chromium.googlesource.com/chromium/src/+/lkgr/headless/README.md)。您也可以透過在建置指令碼的 `useKarma {}` 區塊中加入對應的項目，選擇另一個瀏覽器來執行測試：
+### Karma {id="karma"}
+
+> Karma 專案已[被棄用](https://github.com/karma-runner/karma#karma)。預期不會再有新功能或錯誤修復。作為瀏覽器測試的替代方案，請嘗試全新的[用於瀏覽器測試的 DSL](#dsl-for-browser-testing)。
+> 
+{style="warning"}
+
+要配置 [Karma](https://karma-runner.github.io/) 測試執行器，請在 `build.gradle(.kts)` 檔案中的瀏覽器 `testTask` 內加入 `useKarma {}` 區塊。例如，要在特定瀏覽器中執行測試，請使用：
 
 ```kotlin
 kotlin {
@@ -352,33 +360,70 @@ kotlin {
 kotlin.js.browser.karma.browsers=firefox,safari
 ```
 
-這種方法允許您為所有模組定義瀏覽器清單，然後在特定模組的建置指令碼中新增特定的瀏覽器。 
+這允許您為所有模組定義瀏覽器清單，然後在特定模組的建置檔案中新增特定的瀏覽器。
 
-請注意，Kotlin 多平台 Gradle 外掛程式不會自動為您安裝這些瀏覽器，而僅使用其執行環境中可用的瀏覽器。例如，如果您在持續整合伺服器上執行 Kotlin/JS 測試，請確保已安裝您要測試的瀏覽器。
+Kotlin 多平台 Gradle 外掛程式在建置時會自動在 `build/js/packages/projectName-test/karma.conf.js` 產生 Karma 配置檔案。該檔案包含您在建置檔案的 `useKarma {}` 區塊中所設定的內容。
 
-如果您想跳過測試，請將 `enabled = false` 這一行加入到 `testTask {}` 中：
+您也可以將額外的配置檔案放在專案根目錄下的 `karma.config.d` 目錄中。此目錄中的所有 `.js` 配置檔案都將被讀取，並在建置時自動合併到產生的 `karma.conf.js` 中。
+
+關於 Karma 配置的更多資訊，請參閱 [Karma 文件](https://karma-runner.github.io/6.4/config/configuration-file.html)。
+
+### 用於瀏覽器測試的 DSL {id="dsl-for-browser-testing"}
+<primary-label ref="experimental-opt-in"/>
+
+Kotlin 提供了一個實驗性的 DSL，用於在瀏覽器環境中執行 Kotlin/JS 測試。它的設計與具體技術無關。目前的實作在底層包含以下工具：
+
+* [Playwright](https://playwright.dev/) 作為瀏覽器驅動程式和發行管理員，支援 Chromium、Firefox 和 WebKit (Safari) 瀏覽器引擎。
+* [Mocha](https://mochajs.org/) 作為測試執行器。
+* [webpack](https://webpack.js.org/) 作為組合器（將在[未來版本](https://youtrack.jetbrains.com/issue/KT-48308/)中替換為 [Vite](https://vite.dev/)）。
+
+要嘗試全新的用於瀏覽器測試的 DSL，請在 Kotlin/JS 目標的 `browser {}` 內新增需要選擇加入的 `test {}` 區塊：
 
 ```kotlin
+import org.jetbrains.kotlin.gradle.ExperimentalJsTestDsl
+import kotlin.time.Duration.Companion.seconds
+
 kotlin {
     js {
         browser {
-            testTask {
-                enabled = false
+            @OptIn(ExperimentalJsTestDsl::class)
+            test {
+                // 使用 kotlin.Duration 為所有執行器配置預設逾時時間
+                timeout = 30.seconds
+                // 使用 Gradle providers 配置無前端 (headless) 模式
+                headless = providers
+                    .environmentVariable("IS_IN_CI")
+                    .map { it.toBoolean() }
+                    .orElse(false)
+                // 啟用並配置自訂的 Chromium 執行器
+                chromium("chromium-no-webgl2") {
+                    // 覆寫此執行器的預設逾時時間
+                    timeout = 10.seconds
+
+                    // Chromium 特定的額外啟動引數
+                    launchArgs.add("--disable-webgl2")
+                }
+                // 啟用 Firefox 執行器
+                firefox()
+                // 啟用 WebKit (Safari) 測試執行器
+                webkit()
+                // 啟用並配置自訂的 WebKit 執行器
+                webkit("headful") {
+                    headless = false
+                }
             }
         }
-        binaries.executable()
-        // ...
     }
 }
 ```
 
-要執行測試，請執行標準生命週期 `check` 任務：
+關於全新瀏覽器測試 DSL 配置的更多資訊，請參閱[在 Kotlin/JS 中執行測試](js-running-tests.md#advanced-configuration)。
 
-```bash
-./gradlew check
-```
+### Node.js {id="node-js-test-task"}
 
-要指定 Node.js 測試執行器使用的環境變數（例如，將外部資訊傳遞給測試，或微調套件解析），請在建置指令碼的 `testTask {}` 區塊內使用帶有鍵值對的 `environment()` 函式：
+對於 Node.js 專案，Kotlin 多平台 Gradle 外掛程式會自動設定 [Mocha](https://mochajs.org/) 測試框架。
+
+要指定 Node.js 測試執行器使用的環境變數（例如，將外部資訊傳遞給測試，或微調套件解析），請在建置檔案的 `testTask {}` 區塊內使用帶有鍵值對的 `environment()` 函式：
 
 ```kotlin
 kotlin {
@@ -392,21 +437,44 @@ kotlin {
 }
 ```
 
-### Karma 配置
+### 執行測試 {id="run-tests"}
 
-Kotlin 多平台 Gradle 外掛程式在建置時會自動產生 Karma 配置檔案，其中包含您在 `build.gradle(.kts)` 的 [`kotlin.js.browser.testTask.useKarma {}` 區塊](#test-task) 中的設定。您可以在 `build/js/packages/projectName-test/karma.conf.js` 找到該檔案。要對 Karma 使用的配置進行調整，請將您的額外配置檔案放在專案根目錄下名為 `karma.config.d` 的目錄中。此目錄中的所有 `.js` 配置檔案都將被讀取，並在建置時自動合併到產生的 `karma.conf.js` 中。
+預設情況下，Kotlin 多平台 Gradle 外掛程式使用 [Headless Chrome](https://chromium.googlesource.com/chromium/src/+/lkgr/headless/README.md) 來執行瀏覽器測試。外掛程式未隨附任何瀏覽器；測試執行器對缺少瀏覽器的處理方式有所不同：
 
-Karma 的所有配置功能在 Karma 的 [文件](https://karma-runner.github.io/5.0/config/configuration-file.html) 中都有詳盡描述。
+* 使用 [Karma](#karma) 時，任何其他瀏覽器應已安裝在您的電腦上，以便外掛程式可以使用它來執行測試。如果您在持續整合伺服器上執行 Kotlin/JS 測試，請確保要測試的瀏覽器也已安裝在該伺服器上。
+* 使用全新的[用於瀏覽器測試的 DSL](#dsl-for-browser-testing) 時，外掛程式會在首次執行時透過 [`playwright install`](https://playwright.dev/docs/browsers#install-browsers) 指令安裝所需的瀏覽器。Playwright 會管理這些瀏覽器的位置，且不會使用本機已安裝的瀏覽器。
 
-## webpack 組合
+要執行測試，請執行標準生命週期 `check` 任務：
+
+```bash
+./gradlew check
+```
+
+如果您想跳過測試，請在建置檔案的 `testTask {}` 區塊中將其停用：
+
+```kotlin
+kotlin {
+    js {
+        browser {
+            testTask {
+                enabled.set(false)
+            }
+        }
+        binaries.executable()
+        // ...
+    }
+}
+```
+
+## webpack 組合 {id="webpack-bundling"}
 
 對於瀏覽器目標，Kotlin 多平台 Gradle 外掛程式使用廣為人知的 [webpack](https://webpack.js.org/) 模組組合器。
 
-### webpack 任務
+### webpack 任務 {id="webpack-task"}
 
 最常見的 webpack 調整可以透過 Gradle 建置檔案中的 `kotlin.js.browser.webpackTask {}` 配置區塊直接進行：
-* `mainOutputFileName` - webpack 處理後的輸出檔案名稱。執行 webpack 任務後，它將產生在 `<projectDir>/build/kotlin-webpack/<targetName>/<binaryName>` 中。預設值為專案名稱。
-* `output.libraryTarget` - webpack 輸出檔案的模組系統。了解更多關於 [Kotlin/JS 專案可用的模組系統](js-modules.md)。預設值為 `umd`。
+* `mainOutputFileName` − webpack 處理後的輸出檔案名稱。執行 webpack 任務後，它將產生在 `<projectDir>/build/kotlin-webpack/<targetName>/<binaryName>` 中。預設值為專案名稱。
+* `output.libraryTarget` − webpack 輸出檔案的模組系統。了解更多關於 [Kotlin/JS 專案可用的模組系統](js-modules.md)。預設值為 `umd`。
   
 ```groovy
 webpackTask {
@@ -417,7 +485,7 @@ webpackTask {
 
 您也可以在 `commonWebpackConfig {}` 區塊中配置用於組合、執行和測試任務的通用 webpack 設定。
 
-### webpack 配置檔案 
+### webpack 配置檔案 {id="webpack-configuration-file"}
 
 Kotlin 多平台 Gradle 外掛程式在建置時會自動產生標準的 webpack 配置檔案。它位於 `build/js/packages/projectName/webpack.config.js`。
 
@@ -434,16 +502,16 @@ config.module.rules.push({
 });
 ```
 
-webpack 的所有配置功能在其 [文件](https://webpack.js.org/concepts/configuration/) 中都有詳盡描述。
+webpack 的所有配置功能在其[文件](https://webpack.js.org/concepts/configuration/)中都有詳盡描述。
 
-### 建置可執行檔
+### 建置可執行檔 {id="building-executables"}
 
 為了透過 webpack 建置可執行 JavaScript 構件，Kotlin 多平台 Gradle 外掛程式包含 `jsBrowserDevelopmentWebpack` 和 `jsBrowserProductionWebpack` Gradle 任務。
 
 * `jsBrowserDevelopmentWebpack` 建立開發構件，雖然檔案體積較大，但建立所需時間較短。因此，在主動開發期間請使用 `jsBrowserDevelopmentWebpack` 任務。
 * `jsBrowserProductionWebpack` 對產生的構件套用無效程式碼消除，並縮減產生的 JavaScript 檔案，這需要更多時間，但產生的可執行檔體積較小。因此，在準備將專案用於生產環境時，請使用 `jsBrowserProductionWebpack` 任務。
  
- 執行其中任一任務以獲取對應的開發或生產構件。除非[另有指定](#distribution-target-directory)，否則產生的檔案將位於 `build/kotlin-webpack` 中。
+執行其中任一任務以獲取對應的開發或生產構件。除非[另有指定](#distribution-target-directory)，否則產生的檔案將位於 `build/kotlin-webpack` 中。
 
 ```bash
 ./gradlew jsBrowserProductionWebpack
@@ -459,7 +527,7 @@ webpack 的所有配置功能在其 [文件](https://webpack.js.org/concepts/con
 
 此任務會產生包含專案資源且可供使用的發佈內容。
 
-## CSS
+## CSS {id="css"}
 
 Kotlin 多平台 Gradle 外掛程式還提供對 webpack 的 [CSS](https://webpack.js.org/loaders/css-loader/) 和 [style](https://webpack.js.org/loaders/style-loader/) 載入器的支援。雖然所有選項都可以透過直接修改用於建置專案的 [webpack 配置檔案](#webpack-bundling) 來更改，但最常用的設定可以直接從 `build.gradle(.kts)` 檔案中取得。
 
@@ -561,13 +629,13 @@ browser {
 
 要在同一個專案中使用不同的模式，請使用 `cssSupport.rules`。在這裡，您可以指定一個 `KotlinWebpackCssRules` 清單，其中每個規則定義一個模式，以及 [include](https://webpack.js.org/configuration/module/#ruleinclude) 和 [exclude](https://webpack.js.org/configuration/module/#ruleexclude) 模式。
 
-## Node.js
+## Node.js {id="node-js"}
 
-對於針對 Node.js 的 Kotlin/JS 專案，該外掛程式會自動在主機上下載並安裝 Node.js 環境。如果您已經安裝了 Node.js 實體，也可以使用它。
+對於針對 Node.js 的 Kotlin/JS 專案，該外掛程式會自動在主機上下載並安裝 Node.js 環境。如果您已經安裝了 Node.js 執行個體，也可以使用它。
 
 您可以為每個子專案配置 Node.js 設定，也可以為整個專案進行設定。
 
-### 更改 Node.js 版本
+### 更改 Node.js 版本 {id="change-node-js-version"}
 
 預設的 Node.js 版本目前為 24.16.0，但您可以為特定的子專案使用不同的版本。將以下內容加入到您的子專案 `build.gradle(.kts)` 檔案中。例如：
 
@@ -619,11 +687,11 @@ allprojects {
 </tab>
 </tabs>
 
-### 使用預先安裝的 Node.js
+### 使用預先安裝的 Node.js {id="use-pre-installed-node-js"}
 
-如果在您建置 Kotlin/JS 專案的主機上已經安裝了 Node.js，您可以配置 Kotlin 多平台 Gradle 外掛程式使用它，而不是安裝自己的 Node.js 實體。
+如果在您建置 Kotlin/JS 專案的主機上已經安裝了 Node.js，您可以配置 Kotlin 多平台 Gradle 外掛程式使用它，而不是安裝自己的 Node.js 執行個體。
 
-要使用預先安裝的 Node.js 實體，請將以下內容加入到您的 `build.gradle(.kts)` 檔案中：
+要使用預先安裝的 Node.js 執行個體，請將以下內容加入到您的 `build.gradle(.kts)` 檔案中：
 
 <tabs group="build-script">
 <tab title="Kotlin" group-key="kotlin">
@@ -648,11 +716,11 @@ project.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsPlu
 </tab>
 </tabs>
 
-## Yarn
+## Yarn {id="yarn"}
 
-預設情況下，為了在建置時下載並安裝您宣告的相依性，該外掛程式會管理其自己的 [Yarn](https://yarnpkg.com/lang/en/) 封裝管理員實體。它開箱即用，無需額外配置，但您可以對其進行調整或使用主機上已安裝的 Yarn。
+預設情況下，為了在建置時下載並安裝您宣告的相依性，該外掛程式會管理其自己的 [Yarn](https://yarnpkg.com/lang/en/) 封裝管理員執行個體。它開箱即用，無需額外配置，但您可以對其進行調整或使用主機上已安裝的 Yarn。
 
-### 額外的 Yarn 特性：.yarnrc
+### 額外的 Yarn 特性：.yarnrc {id="additional-yarn-features-yarnrc"}
 
 要配置額外的 Yarn 特性，請在專案根目錄中放置一個 `.yarnrc` 檔案。建置時，它會自動被讀取。
 
@@ -664,11 +732,11 @@ registry "http://my.registry/api/npm/"
 
 要了解更多關於 `.yarnrc` 的資訊，請造訪 [Yarn 官方文件](https://classic.yarnpkg.com/en/docs/yarnrc/)。
 
-### 使用預先安裝的 Yarn
+### 使用預先安裝的 Yarn {id="use-pre-installed-yarn"}
 
-如果在您建置 Kotlin/JS 專案的主機上已經安裝了 Yarn，您可以配置 Kotlin 多平台 Gradle 外掛程式使用它，而不是安裝自己的 Yarn 實體。
+如果在您建置 Kotlin/JS 專案的主機上已經安裝了 Yarn，您可以配置 Kotlin 多平台 Gradle 外掛程式使用它，而不是安裝自己的 Yarn 執行個體。
 
-要使用預先安裝的 Yarn 實體，請將以下行加入到 `build.gradle(.kts)` 中：
+要使用預先安裝的 Yarn 執行個體，請將以下行加入到 `build.gradle(.kts)` 中：
 
 <tabs group="build-script">
 <tab title="Kotlin" group-key="kotlin">
@@ -693,11 +761,11 @@ rootProject.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlu
 </tab>
 </tabs>
 
-### 透過 kotlin-js-store 進行版本鎖定
+### 透過 kotlin-js-store 進行版本鎖定 {id="version-locking-via-kotlin-js-store"}
 
 專案根目錄下的 `kotlin-js-store` 目錄由 Kotlin 多平台 Gradle 外掛程式自動產生，用於存放 `yarn.lock` 檔案，這對於版本鎖定是必要的。鎖定檔案完全由 Yarn 外掛程式管理，並在執行 `kotlinNpmInstall` Gradle 任務期間更新。
 
-為了遵循 [推薦實務](https://classic.yarnpkg.com/blog/2016/11/24/lockfiles-for-all/)，請將 `kotlin-js-store` 及其內容提交到您的版本控制系統中。這可確保您的應用程式在所有機器上都使用完全相同的相依性樹進行建置。
+為了遵循[推薦實務](https://classic.yarnpkg.com/blog/2016/11/24/lockfiles-for-all/)，請將 `kotlin-js-store` 及其內容提交到您的版本控制系統中。這可確保您的應用程式在所有機器上都使用完全相同的相依性樹進行建置。
 
 如果需要，您可以在 `build.gradle(.kts)` 中更改目錄和鎖定檔案的名稱：
 
@@ -730,15 +798,15 @@ rootProject.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlu
 > 
 {style="warning"}
 
-To learn more about `yarn.lock`, visit the [official Yarn documentation](https://classic.yarnpkg.com/lang/en/docs/yarn-lock/).
+若要進一步了解 `yarn.lock`，請造訪 [Yarn 官方文件](https://classic.yarnpkg.com/lang/en/docs/yarn-lock/)。
 
-### 回報 yarn.lock 已更新
+### 回報 yarn.lock 已更新 {id="reporting-that-yarn-lock-has-been-updated"}
 
 Kotlin/JS 提供了 Gradle 設定，可以在 `yarn.lock` 檔案更新時通知您。當您希望在 CI 建置過程中如果 `yarn.lock` 被靜默更改時收到通知，可以使用這些設定：
 
 * `YarnLockMismatchReport`：指定如何報告 `yarn.lock` 檔案的更改。您可以使用以下值之一：
     * `FAIL`：使對應的 Gradle 任務失敗。這是預設值。
-    * `WARNING`：在警告日誌中寫入關於更改的資訊。
+    * `WARNING`：在警告記錄中寫入關於更改的資訊。
     * `NONE`：停用回報。
 * `reportNewYarnLock`：明確回報最近建立的 `yarn.lock` 檔案。預設情況下，此選項是停用的：在第一次啟動時產生新的 `yarn.lock` 檔案是常見做法。您可以使用此選項來確保檔案已提交到您的存儲庫。
 * `yarnLockAutoReplace`：每次執行 Gradle 任務時自動替換 `yarn.lock`。
@@ -778,9 +846,9 @@ rootProject.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlu
 </tab>
 </tabs>
 
-### 預設使用 --ignore-scripts 安裝 npm 相依性
+### 預設使用 --ignore-scripts 安裝 npm 相依性 {id="installing-npm-dependencies-with-ignore-scripts-by-default"}
 
-為了減少執行來自受損 npm 套件的惡意程式碼的可能性，Kotlin 多平台 Gradle 外掛程式預設在安裝 npm 相依性期間阻止執行 [生命週期指令碼](https://docs.npmjs.com/cli/v8/using-npm/scripts#life-cycle-scripts)。
+為了減少執行來自受損 npm 套件的惡意程式碼的可能性，Kotlin 多平台 Gradle 外掛程式預設在安裝 npm 相依性期間阻止執行[生命週期指令碼](https://docs.npmjs.com/cli/v8/using-npm/scripts#life-cycle-scripts)。
 
 您可以透過在 `build.gradle(.kts)` 中加入以下行來明確啟用生命週期指令碼執行：
 
@@ -805,7 +873,7 @@ rootProject.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlu
 </tab>
 </tabs>
 
-## 發佈目標目錄
+## 發佈目標目錄 {id="distribution-target-directory"}
 
 預設情況下，Kotlin/JS 專案建置的結果位於專案根目錄內的 `/build/dist/<targetName>/<binaryName>` 目錄中。
 
@@ -848,7 +916,7 @@ kotlin {
 </tab>
 </tabs>
 
-## 模組名稱
+## 模組名稱 {id="module-name"}
 
 要調整 JavaScript _模組_ 的名稱（該名稱在 `build/js/packages/myModuleName` 中產生），包括對應的 `.js` 和 `.d.ts` 檔案，請使用 `outputModuleName` 選項：
 
@@ -862,7 +930,7 @@ kotlin {
 
 請注意，這不會影響 `build/dist` 中的 webpack 輸出。
 
-## package.json 自定義
+## package.json 自定義 {id="package-json-customization"}
 
 `package.json` 檔案保存了 JavaScript 套件的元資料。受歡迎的套件註冊表（如 npm）要求所有發佈的套件都必須擁有此類檔案。它們使用它來追蹤和管理套件發佈。  
 
@@ -891,4 +959,4 @@ kotlin {
 }
 ```
 
-了解更多關於在 [npm 文件](https://docs.npmjs.com/cli/v6/configuring-npm/package-json) 中為 npm 註冊表編寫 `package.json` 檔案的資訊。
+在 [npm 文件](https://docs.npmjs.com/cli/v6/configuring-npm/package-json)中進一步了解為 npm 註冊表編寫 `package.json` 檔案的資訊。

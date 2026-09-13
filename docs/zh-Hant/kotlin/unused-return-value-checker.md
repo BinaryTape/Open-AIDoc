@@ -94,7 +94,7 @@ kotlin {
 檢查器僅會報告來自已標記運算式的被忽略結果，例如 Kotlin 標準函式庫中的大多數函式。
 
 要標記您自己的程式碼，
-請使用 [`@MustUseReturnValues`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-must-use-return-value/) 註解。
+請使用 [`@MustUseReturnValues`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-must-use-return-values/) 註解。
 您可以根據想要檢查器涵蓋的作用域，將其套用於檔案、類別或函式。
 
 例如，您可以標記整個檔案：

@@ -4,7 +4,7 @@ _[현대적인 언어 유지(Keeping the Language Modern)](kotlin-evolution-prin
 
 대부분의 언어 변경 사항은 업데이트 변경 로그나 컴파일러 경고와 같은 다른 채널을 통해 이미 발표되었지만, 이 문서는 Kotlin 2.3에서 Kotlin 2.4로의 마이그레이션을 위한 완전한 참조를 제공하기 위해 이를 모두 요약합니다. 이 문서에는 도구 관련 변경 사항에 대한 정보도 포함되어 있습니다.
 
-## 기본 용어
+## 기본 용어 {id="basic-terms"}
 
 이 문서에서는 여러 종류의 호환성을 소개합니다.
 
@@ -14,9 +14,9 @@ _[현대적인 언어 유지(Keeping the Language Modern)](kotlin-evolution-prin
 
 이러한 정의는 순수 Kotlin에 대해서만 제공된다는 점을 기억하십시오. 다른 언어(예: Java)의 관점에서의 Kotlin 코드 호환성은 이 문서의 범위를 벗어납니다.
 
-## 언어 (Language)
+## 언어 (Language) {id="language"}
 
-### -language-version=1.9 및 K1 컴파일러 지원 종료
+### -language-version=1.9 및 K1 컴파일러 지원 종료 {id="drop-support-for-language-version-1-9-and-the-k1-compiler"}
 
 > **이슈**: [KT-80590](https://youtrack.jetbrains.com/issue/KT-80590)
 >
@@ -31,7 +31,7 @@ _[현대적인 언어 유지(Keeping the Language Modern)](kotlin-evolution-prin
 > - 2.2.0: `-language-version`에 1.9 버전을 사용할 때 경고 보고
 > - 2.4.0: 경고를 에러로 격상
 
-### Java 타입에 대한 유연한 명시적 nullable 타입 인자 금지
+### Java 타입에 대한 유연한 명시적 nullable 타입 인자 금지 {id="prohibit-flexible-explicit-nullable-type-arguments-for-java-types"}
 
 > **이슈**: [KTLC-284](https://youtrack.jetbrains.com/issue/KTLC-284)
 >
@@ -46,7 +46,7 @@ _[현대적인 언어 유지(Keeping the Language Modern)](kotlin-evolution-prin
 > - 2.2.0: 유연한 타입으로 취급되는 명시적으로 지정된 nullable 타입 인자에 대해 경고 보고
 > - 2.4.0: 경고를 에러로 격상
 
-### 명백히 비호환인 타입에 대한 항상 false인 is 검사 금지
+### 명백히 비호환인 타입에 대한 항상 false인 is 검사 금지 {id="prohibit-always-false-is-checks-for-definitely-incompatible-types"}
 
 > **이슈**: [KTLC-365](https://youtrack.jetbrains.com/issue/KTLC-365)
 >
@@ -61,7 +61,7 @@ _[현대적인 언어 유지(Keeping the Language Modern)](kotlin-evolution-prin
 > - 2.0.0: 명백히 비호환인 타입에 대한 `is` 검사에 대해 경고 보고
 > - 2.4.0: 경고를 에러로 격상
 
-### 인라인 함수에서 낮은 가시성을 가진 타입 및 선언 노출 금지
+### 인라인 함수에서 낮은 가시성을 가진 타입 및 선언 노출 금지 {id="prohibit-exposing-types-and-declarations-with-lower-visibility-in-inline-functions"}
 
 > **이슈**: [KTLC-283](https://youtrack.jetbrains.com/issue/KTLC-283)
 >
@@ -76,7 +76,7 @@ _[현대적인 언어 유지(Keeping the Language Modern)](kotlin-evolution-prin
 > - 2.3.0: 인라인 함수에서 낮은 가시성을 가진 타입 및 선언 노출 시 경고 보고
 > - 2.4.0: 경고를 에러로 격상
 
-### 어노테이션의 기본 use-site target 선택 변경
+### 어노테이션의 기본 use-site target 선택 변경 {id="change-default-use-site-target-selection-for-annotations"}
 
 > **이슈**: [KTLC-391](https://youtrack.jetbrains.com/issue/KTLC-391)
 >
@@ -93,7 +93,7 @@ _[현대적인 언어 유지(Keeping the Language Modern)](kotlin-evolution-prin
 > - 2.2.0: 새로운 기본 규칙으로 인해 선택된 use-site target이 변경될 때 경고 보고
 > - 2.4.0: 새로운 기본 규칙 활성화
 
-### 접근 불가능한 타입에 대한 암시적 참조 금지
+### 접근 불가능한 타입에 대한 암시적 참조 금지 {id="forbid-implicit-references-to-inaccessible-types"}
 
 > **이슈**: [KTLC-384](https://youtrack.jetbrains.com/issue/KTLC-384)
 >
@@ -110,7 +110,7 @@ _[현대적인 언어 유지(Keeping the Language Modern)](kotlin-evolution-prin
 > - 2.3.0: 접근 불가능한 타입에 대한 암시적 참조 시 경고 보고
 > - 2.4.0: 경고를 에러로 격상
 
-### Jakarta nullability 어노테이션 강제 적용
+### Jakarta nullability 어노테이션 강제 적용 {id="enforce-jakarta-nullability-annotations"}
 
 > **이슈**: [KTLC-285](https://youtrack.jetbrains.com/issue/KTLC-285)
 >
@@ -125,7 +125,7 @@ _[현대적인 언어 유지(Keeping the Language Modern)](kotlin-evolution-prin
 > - 2.2.0: Jakarta nullability 어노테이션이 지정된 Java 선언의 nullability 불일치에 대해 경고 보고
 > - 2.4.0: 경고를 에러로 격상
 
-### 호출 가능 참조 한정자에서 잘못 위치한 타입 인자 보고
+### 호출 가능 참조 한정자에서 잘못 위치한 타입 인자 보고 {id="report-misplaced-type-arguments-in-callable-reference-qualifiers"}
 
 > **이슈**: [KTLC-388](https://youtrack.jetbrains.com/issue/KTLC-388)
 >
@@ -141,7 +141,7 @@ _[현대적인 언어 유지(Keeping the Language Modern)](kotlin-evolution-prin
 >
 > - 2.4.0: 호출 가능 참조의 좌측에 있는 타입 인자가 한정자의 다른 부분에 속하는 경우 경고 보고
 
-### nullable 상한을 가진 reified 타입 파라미터의 클래스 리터럴에 대해 에러 보고
+### nullable 상한을 가진 reified 타입 파라미터의 클래스 리터럴에 대해 에러 보고 {id="report-errors-for-class-literals-from-reified-type-parameters-with-nullable-upper-bounds"}
 
 > **이슈**: [KTLC-370](https://youtrack.jetbrains.com/issue/KTLC-370)
 >
@@ -156,7 +156,7 @@ _[현대적인 언어 유지(Keeping the Language Modern)](kotlin-evolution-prin
 > - 2.3.0: nullable 상한을 가진 reified 타입 파라미터에서 유래된 타입의 식에 `::class` 사용 시 경고 보고
 > - 2.4.0: 경고를 에러로 격상
 
-### 익명 객체에서 선언 전 초기화 금지
+### 익명 객체에서 선언 전 초기화 금지 {id="prohibit-initialization-before-declarations-in-anonymous-objects"}
 
 > **이슈**: [KTLC-290](https://youtrack.jetbrains.com/issue/KTLC-290)
 >
@@ -171,7 +171,7 @@ _[현대적인 언어 유지(Keeping the Language Modern)](kotlin-evolution-prin
 > - 2.2.20: 익명 객체의 `init` 블록에서 프로퍼티 선언 전 프로퍼티를 초기화할 때 경고 보고
 > - 2.4.0: 경고를 에러로 격상
 
-### 추상 클래스가 아닌 Java sealed 클래스를 사용한 when 표현식의 망라성 강제
+### 추상 클래스가 아닌 Java sealed 클래스를 사용한 when 표현식의 망라성 강제 {id="enforce-exhaustiveness-for-when-expressions-with-non-abstract-java-sealed-classes"}
 
 > **이슈**: [KTLC-366](https://youtrack.jetbrains.com/issue/KTLC-366)
 >
@@ -186,7 +186,7 @@ _[현대적인 언어 유지(Keeping the Language Modern)](kotlin-evolution-prin
 > - 2.3.0: 추상 클래스가 아닌 Java sealed 클래스를 사용한 비망라적 `when` 표현식에 대해 경고 보고
 > - 2.4.0: 경고를 에러로 격상
 
-### 너무 많은 파라미터를 가진 getValue() 및 setValue() 함수에 operator 수정자 금지
+### 너무 많은 파라미터를 가진 getValue() 및 setValue() 함수에 operator 수정자 금지 {id="prohibit-operator-modifier-on-getvalue-and-setvalue-functions-with-too-many-parameters"}
 
 > **이슈**: [KTLC-289](https://youtrack.jetbrains.com/issue/KTLC-289)
 >
@@ -201,7 +201,7 @@ _[현대적인 언어 유지(Keeping the Language Modern)](kotlin-evolution-prin
 > - 2.2.20: 값 파라미터가 너무 많은 `operator` `getValue()` 및 `setValue()` 함수에 대해 경고 보고
 > - 2.4.0: 경고를 에러로 격상
 
-### 제네릭 호출에서 일치하지 않는 타입 인자 금지
+### 제네릭 호출에서 일치하지 않는 타입 인자 금지 {id="prohibit-inconsistent-type-arguments-in-generic-calls"}
 
 > **이슈**: [KTLC-373](https://youtrack.jetbrains.com/issue/KTLC-373)
 >
@@ -216,7 +216,7 @@ _[현대적인 언어 유지(Keeping the Language Modern)](kotlin-evolution-prin
 > - 2.3.0: 제네릭 호출의 명시적 타입 인자가 타입 파라미터 간의 상한 제약을 위반할 때 경고 보고
 > - 2.4.0: 경고를 에러로 격상
 
-### javaClass 프로퍼티 참조 지원 중단
+### javaClass 프로퍼티 참조 지원 중단 {id="deprecate-references-to-the-javaclass-property"}
 
 > **이슈**: [KTLC-375](https://youtrack.jetbrains.com/issue/KTLC-375)
 >
@@ -230,7 +230,7 @@ _[현대적인 언어 유지(Keeping the Language Modern)](kotlin-evolution-prin
 >
 > - 2.4.0: `javaClass` 프로퍼티에 대한 프로퍼티 참조 시 경고 보고
 
-### opt-in이 필요한 암시적 enum 생성자 호출에 대해 에러 보고
+### opt-in이 필요한 암시적 enum 생성자 호출에 대해 에러 보고 {id="report-errors-for-implicit-enum-constructor-calls-that-require-opt-in"}
 
 > **이슈**: [KTLC-359](https://youtrack.jetbrains.com/issue/KTLC-359)
 >
@@ -245,7 +245,7 @@ _[현대적인 언어 유지(Keeping the Language Modern)](kotlin-evolution-prin
 > - 2.2.20: enum 엔트리가 opt-in이 필요한 enum 기본 생성자를 암시적으로 호출할 때 경고 보고
 > - 2.4.0: 경고를 에러로 격상
 
-### enum 엔트리에 inline 수정자 금지
+### enum 엔트리에 inline 수정자 금지 {id="forbid-inline-modifier-on-enum-entries"}
 
 > **이슈**: [KTLC-361](https://youtrack.jetbrains.com/issue/KTLC-361)
 >
@@ -260,7 +260,7 @@ _[현대적인 언어 유지(Keeping the Language Modern)](kotlin-evolution-prin
 > - 2.3.0: enum 엔트리에 `inline` 수정자 사용 시 경고 보고
 > - 2.4.0: 경고를 에러로 격상
 
-### 어노테이션 호출 및 파라미터 기본값 외부에서 배열 리터럴 금지
+### 어노테이션 호출 및 파라미터 기본값 외부에서 배열 리터럴 금지 {id="prohibit-array-literals-outside-annotation-calls-and-parameter-defaults"}
 
 > **이슈**: [KTLC-369](https://youtrack.jetbrains.com/issue/KTLC-369)
 >
@@ -275,7 +275,7 @@ _[현대적인 언어 유지(Keeping the Language Modern)](kotlin-evolution-prin
 > - 2.3.0: 어노테이션 호출 및 어노테이션 파라미터의 기본값 외부에서 배열 리터럴 사용 시 경고 보고
 > - 2.4.0: 경고를 에러로 격상
 
-### CLI 컴파일러 모드에서 _root_ide_package_ 금지
+### CLI 컴파일러 모드에서 _root_ide_package_ 금지 {id="prohibit-rootidepackage-in-cli-compiler-mode"}
 
 > **이슈**: [KTLC-378](https://youtrack.jetbrains.com/issue/KTLC-378)
 >
@@ -290,7 +290,7 @@ _[현대적인 언어 유지(Keeping the Language Modern)](kotlin-evolution-prin
 > - 2.3.20: CLI 컴파일러 모드에서 `_root_ide_package_` 참조 시 경고 보고
 > - 2.4.0: 경고를 에러로 격상
 
-### vararg 변환이 포함된 함수 참조의 동등성 수정
+### vararg 변환이 포함된 함수 참조의 동등성 수정 {id="correct-equality-for-function-references-with-vararg-conversions"}
 
 > **이슈**: [KTLC-385](https://youtrack.jetbrains.com/issue/KTLC-385)
 >
@@ -304,7 +304,7 @@ _[현대적인 언어 유지(Keeping the Language Modern)](kotlin-evolution-prin
 >
 > - 2.4.0: 새로운 동작 도입
 
-### 컴패니언 객체 접근에 대한 opt-in 강제
+### 컴패니언 객체 접근에 대한 opt-in 강제 {id="enforce-opt-in-for-companion-object-access"}
 
 > **이슈**: [KTLC-386](https://youtrack.jetbrains.com/issue/KTLC-386)
 >
@@ -319,7 +319,7 @@ _[현대적인 언어 유지(Keeping the Language Modern)](kotlin-evolution-prin
 > - 2.3.20: 컴패니언 객체 접근 시 opt-in이 필요한 경우 경고 보고
 > - 2.4.0: `ERROR` 레벨의 opt-in 요구 사항에 대해 경고를 에러로 격상
 
-### 중첩된 제네릭 인자를 가진 상위 타입의 타입 불일치 보고
+### 중첩된 제네릭 인자를 가진 상위 타입의 타입 불일치 보고 {id="report-type-mismatches-from-supertypes-with-nested-generic-arguments"}
 
 > **이슈**: [KTLC-372](https://youtrack.jetbrains.com/issue/KTLC-372)
 >
@@ -333,7 +333,7 @@ _[현대적인 언어 유지(Keeping the Language Modern)](kotlin-evolution-prin
 >
 > - 2.4.0: 중첩된 제네릭 인자를 가진 상위 타입과 관련된 타입 불일치에 대해 에러 보고
 
-### 접근 불가능한 선언이 포함된 추론된 타입 금지
+### 접근 불가능한 선언이 포함된 추론된 타입 금지 {id="prohibit-inferred-types-with-inaccessible-declarations"}
 
 > **이슈**: [KTLC-363](https://youtrack.jetbrains.com/issue/KTLC-363)
 >
@@ -348,9 +348,9 @@ _[현대적인 언어 유지(Keeping the Language Modern)](kotlin-evolution-prin
 > - 2.3.0: 추론된 타입에 현재 스코프에서 접근할 수 없는 선언이 포함된 경우 경고 보고
 > - 2.4.0: 경고를 에러로 격상
 
-## 표준 라이브러리 (Standard library)
+## 표준 라이브러리 (Standard library) {id="standard-library"}
 
-### kotlin.io.readLine() 함수 지원 중단
+### kotlin.io.readLine() 함수 지원 중단 {id="deprecate-kotlin-io-readline-function"}
 
 > **이슈**: [KTLC-394](https://youtrack.jetbrains.com/issue/KTLC-394)
 >
@@ -364,7 +364,7 @@ _[현대적인 언어 유지(Keeping the Language Modern)](kotlin-evolution-prin
 >
 > - 2.4.0: `kotlin.io.readLine()` 사용 시 경고 보고
 
-### AbstractCoroutineContextKey 및 관련 API 지원 중단
+### AbstractCoroutineContextKey 및 관련 API 지원 중단 {id="deprecate-abstractcoroutinecontextkey-and-related-apis"}
 
 > **이슈**: [KT-84970](https://youtrack.jetbrains.com/issue/KT-84970)
 >
@@ -378,7 +378,7 @@ _[현대적인 언어 유지(Keeping the Language Modern)](kotlin-evolution-prin
 >
 > - 2.4.0: 지원 중단된 API 사용 시 경고 보고
 
-### 무한대 범위에 대한 Random.nextDouble() 계약 변경
+### 무한대 범위에 대한 Random.nextDouble() 계약 변경 {id="change-random-nextdouble-contract-for-infinite-bounds"}
 
 > **이슈**: [KT-84368](https://youtrack.jetbrains.com/issue/KT-84368)
 >
@@ -392,9 +392,9 @@ _[현대적인 언어 유지(Keeping the Language Modern)](kotlin-evolution-prin
 >
 > - 2.4.0: 새로운 동작 활성화
 
-## 도구 (Tools)
+## 도구 (Tools) {id="tools"}
 
-### 레거시 Kotlin/JS 컴파일러 타입 선택 API 지원 중단
+### 레거시 Kotlin/JS 컴파일러 타입 선택 API 지원 중단 {id="deprecate-legacy-kotlin-js-compiler-type-selection-apis"}
 
 > **이슈**: [KT-64275](https://youtrack.jetbrains.com/issue/KT-64275), [KT-84753](https://youtrack.jetbrains.com/issue/KT-84753)
 >
@@ -411,7 +411,7 @@ _[현대적인 언어 유지(Keeping the Language Modern)](kotlin-evolution-prin
 > - 1.8.0: 레거시 Kotlin/JS 컴파일러 타입 상수 지원 중단
 > - 2.4.0: 지원 중단된 레거시 컴파일러 타입 API를 제거하고, `KotlinJsCompilerType` 또는 컴파일러 타입 파라미터를 포함하는 `KotlinProjectExtension.js()` 오버로드 사용 시 경고 보고
 
-### Kotlin Android 확장에서 sourceSets 지원 중단
+### Kotlin Android 확장에서 sourceSets 지원 중단 {id="deprecate-sourcesets-in-the-kotlin-android-extension"}
 
 > **이슈**: [KT-74451](https://youtrack.jetbrains.com/issue/KT-74451)
 >
@@ -425,7 +425,7 @@ _[현대적인 언어 유지(Keeping the Language Modern)](kotlin-evolution-prin
 >
 > - 2.4.0: `KotlinAndroidProjectExtension`에서 `sourceSets` 접근 시 경고 보고
 
-### Kotlin/Native Apple 프레임워크에 대한 consumable configuration 제거
+### Kotlin/Native Apple 프레임워크에 대한 consumable configuration 제거 {id="remove-consumable-configurations-for-kotlin-native-apple-frameworks"}
 
 > **이슈**: [KT-74503](https://youtrack.jetbrains.com/issue/KT-74503), [KT-82230](https://youtrack.jetbrains.com/issue/KT-82230)
 >
@@ -439,7 +439,7 @@ _[현대적인 언어 유지(Keeping the Language Modern)](kotlin-evolution-prin
 >
 > - 2.4.0: Kotlin/Native Apple 프레임워크에 대한 consumable configuration 제거
 
-### Kotlin Gradle 플러그인에서 지원 중단된 태스크, 컴파일 및 DSL API 제거
+### Kotlin Gradle 플러그인에서 지원 중단된 태스크, 컴파일 및 DSL API 제거 {id="remove-deprecated-task-compilation-and-dsl-apis-from-the-kotlin-gradle-plugin"}
 
 > **이슈**: [KT-85509](https://youtrack.jetbrains.com/issue/KT-85509)
 >
@@ -485,7 +485,7 @@ _[현대적인 언어 유지(Keeping the Language Modern)](kotlin-evolution-prin
 >
 > - 2.4.0: 지원 중단된 API 제거
 
-### 명시적인 shrunk classpath snapshot 설정 지원 중단
+### 명시적인 shrunk classpath snapshot 설정 지원 중단 {id="deprecate-explicit-shrunk-classpath-snapshot-configuration"}
 
 > **이슈**: [KT-75837](https://youtrack.jetbrains.com/issue/KT-75837)
 >
@@ -499,7 +499,7 @@ _[현대적인 언어 유지(Keeping the Language Modern)](kotlin-evolution-prin
 >
 > - 2.4.0: `shrunkClasspathSnapshot` 사용 시 경고 보고
 
-### 불필요한 ABI 검증 Gradle DSL 요소 제거
+### 불필요한 ABI 검증 Gradle DSL 요소 제거 {id="remove-redundant-abi-validation-gradle-dsl-elements"}
 
 > **이슈**: [KT-80685](https://youtrack.jetbrains.com/issue/KT-80685)
 >
@@ -513,7 +513,7 @@ _[현대적인 언어 유지(Keeping the Language Modern)](kotlin-evolution-prin
 >
 > - 2.4.0: 불필요한 ABI 검증 DSL 요소 제거
 
-### 노후한 Compose 컴파일러 Gradle 플러그인 옵션 지원 중단
+### 노후한 Compose 컴파일러 Gradle 플러그인 옵션 지원 중단 {id="deprecate-obsolete-compose-compiler-gradle-plugin-options"}
 
 > **이슈**: [KT-85343](https://youtrack.jetbrains.com/issue/KT-85343)
 >
@@ -539,7 +539,7 @@ _[현대적인 언어 유지(Keeping the Language Modern)](kotlin-evolution-prin
 > - 2.1.0: `stabilityConfigurationFile`에 대해 경고 보고
 > - 2.4.0: 경고를 에러로 격상
 
-### 노후한 Kotlin/Native Gradle 태스크 API에 대해 에러 보고
+### 노후한 Kotlin/Native Gradle 태스크 API에 대해 에러 보고 {id="report-errors-for-obsolete-kotlin-native-gradle-task-apis"}
 
 > **이슈**: [KT-85510](https://youtrack.jetbrains.com/issue/KT-85510)
 >
@@ -585,3 +585,17 @@ _[현대적인 언어 유지(Keeping the Language Modern)](kotlin-evolution-prin
 > **지속 중단 사이클**:
 >
 > - 2.4.0: 지원 중단된 Kotlin/Native Gradle 태스크 API에 대해 에러 보고, `KotlinNativeLink.compilation` 프로퍼티 제거
+
+### 컴파일러 인자 값의 대소문자 불일치에 대해 경고 보고 {id="report-warnings-for-case-mismatches-in-compiler-argument-values"}
+
+> **이슈**: [KT-86059](https://youtrack.jetbrains.com/issue/KT-86059)
+>
+> **컴포넌트**: 빌드 도구 API
+>
+> **비호환 변경 유형**: 소스
+>
+> **요약**: 고정된 값 세트를 허용하는 컴파일러 인자는 이전에 대소문자를 일관되지 않게 처리했습니다. 일부는 임의의 대소문자를 허용했지만, 다른 일부는 정확한 일치를 요구했습니다. [빌드 도구 API(Build tools API)](build-tools-api.md)는 이제 이러한 값에 대해 임의의 대소문자를 허용하지만, 예를 들어 `Case mismatch for -module-kind: expected 'commonjs', got 'CommonJS'`와 같은 경고를 보고합니다. 마이그레이션하려면 [컴파일러 참조(compiler reference)](compiler-reference.md)에 나열된 인자의 대소문자를 사용하십시오.
+>
+> **지속 중단 사이클**:
+>
+> - 2.4.20: 컴파일러 인자 값의 대소문자가 예상 값과 일치하지 않을 때 경고 보고

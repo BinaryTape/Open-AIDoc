@@ -2,11 +2,11 @@
 
 코틀린은 프로그램의 흐름을 제어하기 위한 유연한 도구를 제공합니다. `if`, `when`, 그리고 반복문을 사용하여 조건에 대해 명확하고 표현력 있는 로직을 정의할 수 있습니다.
 
-## If 식(If expression)
+## If 식(If expression) {id="if-expression"}
 
 코틀린에서 `if`를 사용하려면, 소괄호 `()` 안에 확인할 조건을 추가하고 중괄호 `{}` 안에 결과가 참일 때 실행할 동작을 추가합니다. 추가적인 분기와 확인을 위해 `else` 및 `else if`를 사용할 수 있습니다.
 
-또한 `if`를 **식(expression)**으로 작성할 수도 있는데, 이를 통해 반환된 값을 변수에 직접 할당할 수 있습니다. 이 형태에서는 `else` 분기가 필수입니다. `if` 식은 다른 언어에 있는 삼항 연산자(`조건 ? 참 : 거짓`)와 동일한 목적으로 사용됩니다.
+또한 `if`를 식(expression)으로 작성할 수도 있는데, 이를 통해 반환된 값을 변수에 직접 할당할 수 있습니다. 이 형태에서는 `else` 분기가 필수입니다. `if` 식은 다른 언어에 있는 삼항 연산자(`조건 ? 참 : 거짓`)와 동일한 목적으로 사용됩니다.
 
 예를 들어:
 
@@ -64,7 +64,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="if-else-blocks-kotlin"}
 
-## When 식 및 문(When expressions and statements)
+## When 식 및 문(When expressions and statements) {id="when-expressions-and-statements"}
 
 `when`은 여러 가능한 값이나 조건에 따라 코드를 실행하는 조건부 식입니다. 이는 Java, C 및 기타 언어의 `switch` 문과 유사합니다. `when`은 인자(argument)를 평가하고, 한 분기의 조건이 충족될 때까지 각 분기를 순서대로 비교합니다. 예를 들어:
 
@@ -145,9 +145,9 @@ when { ... }
 </tr>
 </table>
 
-`when`을 어떻게 사용하느냐에 따라 분기에서 가능한 모든 케이스를 처리해야 하는지 여부가 결정됩니다. 가능한 모든 케이스를 처리하는 것을 **망라적(exhaustive)**이라고 합니다.
+`when`을 어떻게 사용하느냐에 따라 분기에서 가능한 모든 케이스를 처리해야 하는지 여부가 결정됩니다. 가능한 모든 케이스를 처리하는 것을 _망라적(exhaustive)_이라고 합니다.
 
-### 문(Statements)
+### 문(Statements) {id="statements"}
 
 `when`을 문으로 사용하는 경우, 가능한 모든 케이스를 처리할 필요는 없습니다. 다음 예제에서는 일부 케이스가 누락되어 어떤 분기도 트리거되지 않지만, 오류는 발생하지 않습니다.
 
@@ -167,7 +167,7 @@ fun main() {
 
 `if`와 마찬가지로 각 분기는 블록이 될 수 있으며, 블록의 마지막 식의 값이 해당 분기의 값이 됩니다.
 
-### 식(Expressions)
+### 식(Expressions) {id="expressions"}
 
 `when`을 식으로 사용하는 경우, **반드시** 가능한 모든 케이스를 처리해야 합니다. 처음으로 일치하는 분기의 값이 전체 식의 값이 됩니다. 모든 케이스를 처리하지 않으면 컴파일러가 오류를 발생시킵니다.
 
@@ -226,7 +226,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-when-no-subject"}
 
-### when의 다른 활용 방법
+### when의 다른 활용 방법 {id="other-ways-to-use-when"}
 
 `when` 식과 문은 코드를 단순화하고, 여러 조건을 처리하며, 타입 검사를 수행하는 다양한 방법을 제공합니다.
 
@@ -419,7 +419,38 @@ when (animal) {
 }
 ```
 
-## For 반복문
+### JVM에서의 바이트코드 생성 {id="bytecode-generation-on-the-jvm"}
+
+JVM 21 이상을 대상으로 코틀린 코드를 컴파일할 때, 컴파일러는 적격한 `when` 식에 대해 [`invokedynamic`](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/invoke/package-summary.html) 명령어를 생성합니다. 이를 통해 Java의 `switch` 문에서 생성되는 바이트코드와 유사하게 더 작은 바이트코드가 생성됩니다.
+
+컴파일러는 다음 조건을 모두 만족할 때 [`SwitchBootstraps.typeSwitch()`](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/runtime/SwitchBootstraps.html) 메서드와 함께 `invokedynamic`을 사용합니다.
+
+* `else`를 제외한 모든 조건이 `is` 또는 `null` 검사입니다.
+* `when` 식에 [가드 조건(`if`)](#guard-conditions-in-when-expressions)이 포함되어 있지 않습니다.
+* 조건에 변경 가능한 코틀린 컬렉션(`MutableList`)이나 함수 타입(`kotlin.Function1`, `kotlin.Function2` 등)과 같이 직접 타입 검사를 수행할 수 없는 타입이 포함되어 있지 않습니다.
+* `when` 식에 `else` 외에 최소 2개 이상의 조건이 있습니다.
+* 모든 분기가 `when` 식의 동일한 대상을 검사합니다.
+
+예를 들어:
+
+```kotlin
+open class Shape
+
+class Circle : Shape()
+class Rectangle : Shape()
+class Triangle : Shape()
+
+fun countCorners(shape: Shape) = when (shape) {
+    is Circle -> 0
+    is Rectangle -> 4
+    is Triangle -> 3
+    else -> -1
+}
+```
+
+여기서 `when (shape)` 식은 바이트코드에서 여러 번의 `instanceof` 검사를 수행하는 대신 단일 `invokedynamic` 타입 스위치(type switch)로 컴파일됩니다.
+
+## For 반복문 {id="for-loops"}
 
 [컬렉션](collections-overview.md), [배열](arrays.md), 또는 [범위](ranges.md)를 순회하려면 `for` 루프를 사용합니다.
 
@@ -446,7 +477,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-for-loop"}
 
-### 범위(Ranges)
+### 범위(Ranges) {id="ranges"}
 
 숫자 범위를 순회하려면 `..` 및 `..<` 연산자가 포함된 [범위 식(range expression)](ranges.md)을 사용합니다.
 
@@ -478,7 +509,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-for-loop-range"}
 
-### 배열(Arrays)
+### 배열(Arrays) {id="arrays"}
 
 배열이나 리스트를 인덱스와 함께 순회하려면 `indices` 프로퍼티를 사용할 수 있습니다.
 
@@ -514,7 +545,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-for-loop-array-index"}
 
-### 반복자(Iterators)
+### 반복자(Iterators) {id="iterators"}
 
 `for` 루프는 [반복자(iterator)](iterators.md)를 제공하는 모든 대상을 순회합니다. 컬렉션은 기본적으로 반복자를 제공하는 반면, 범위와 배열은 인덱스 기반 루프로 컴파일됩니다.
 
@@ -582,7 +613,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-for-loop-iterator-from-scratch"}
 
-## While 반복문
+## While 반복문 {id="while-loops"}
 
 `while` 및 `do-while` 루프는 조건이 충족되는 동안 본문의 코드를 계속해서 실행합니다. 두 루프의 차이점은 조건 확인 시점입니다.
 
@@ -632,6 +663,6 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-do-while-loop"}
 
-## 반복문에서의 break 및 continue
+## 반복문에서의 break 및 continue {id="break-and-continue-in-loops"}
 
 코틀린은 반복문에서 전통적인 `break` 및 `continue` 연산자를 지원합니다. [반환 및 점프](returns.md)를 참조하세요.

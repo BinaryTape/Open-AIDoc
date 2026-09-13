@@ -3,7 +3,7 @@
 要在 Kotlin 中声明一个函数：
 * 使用 `fun` 关键字。
 * 在圆括号 `()` 中指定形参。
-* 如果需要，包含 [返回值类型](#return-types)。
+* 如果需要，包含[返回值类型](#return-types)。
 
 例如：
 
@@ -48,11 +48,17 @@ Stream().read()
 fun powerOf(number: Int, exponent: Int): Int { /*...*/ }
 ```
 
-在函数体内，接收到的实参是只读的（隐式声明为 `val`）：
+将对象传递给函数时，编译器会传递对该对象引用的副本。
+复制的引用指向同一个对象，因此函数可以修改该对象的可变状态。
+
+在函数体内，函数形参是只读的（隐式声明为 `val`），因此无法对其重新赋值：
 
 ```kotlin
-fun powerOf(number: Int, exponent: Int): Int {
-    number = 2 // 错误：'val' 不能被重新赋值。
+class Counter(var value: Int)
+
+fun reset(counter: Counter) {
+    counter.value = 0    // 允许：修改对象
+    counter = Counter(0) // 错误：'val' 不能被重新赋值
 }
 ```
 
@@ -280,14 +286,91 @@ mergeStrings(strings = arrayOf("a", "b", "c"))
 
 ### 返回值类型 {id="return-types"}
 
-当你声明具有代码块体的函数时（通过将指令放在花括号 `{}` 中），
-必须始终显式指定返回值类型。
-唯一的例外是当它们返回 `Unit` 时，
-[在这种情况下指定返回值类型是可选的](#unit-returning-functions)。
+当你声明具有代码块体的函数时（通过将指令放在花括号 `{}` 中），必须始终显式指定返回值类型。
+唯一的例外是当函数返回 `Unit` 时，[在这种情况下指定返回值类型是可选的](#unit-returning-functions)。
 
-Kotlin 不会为具有代码块体的函数推断返回值类型。
-它们的控制流可能很复杂，这使得返回值类型对阅读者甚至对编译器都不清晰。
+Kotlin 不会为具有代码块体的函数推断返回值类型。它们的控制流可能很复杂，这使得返回值类型对阅读者甚至对编译器都不清晰。
 但是，如果你不指定，Kotlin 可以为[单表达式函数](#single-expression-functions)推断返回值类型。
+
+Kotlin 函数返回单个值，但该值可以包含多项数据。有关表示这些值的方式，请参阅[返回多个值](#return-multiple-values)。
+
+#### 返回多个值 {id="return-multiple-values"}
+
+当你需要返回多个含义各不相同的相关值时，请声明一个[数据类](data-classes.md)，即使仅在一个函数中使用它也是如此：
+
+```kotlin
+data class OrderSummary(
+    val subtotal: Double,
+    val tax: Double,
+)
+
+fun calculateOrderSummary(prices: List<Double>): OrderSummary {
+    val subtotal = prices.sum()
+    val tax = subtotal * 0.2
+    return OrderSummary(subtotal, tax)
+}
+
+fun main() {
+    val summary = calculateOrderSummary(listOf(12.50, 8.00, 4.50))
+
+    println(summary.subtotal)
+    // 25.0
+    println(summary.tax)
+    // 5.0
+}
+```
+{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="return-multiple-values-data-class"}
+
+当你需要返回具有不同含义的多个值时，数据类非常适用。如果返回的值属于同一类型且希望成组处理它们，请考虑改为返回集合：
+
+```kotlin
+data class Person(val name: String)
+
+val friendGroups = listOf(
+    listOf(Person("Alice"), Person("Bob")),
+    listOf(Person("Charlie"), Person("Diana"), Person("Eve")),
+    listOf(Person("Frank"))
+)
+
+fun findLargestGroupOfFriends(): List<Person> {
+    return friendGroups.maxByOrNull { it.size } ?: emptyList()
+}
+
+fun main() {
+    val largestGroup = findLargestGroupOfFriends()
+
+    println(largestGroup.map { it.name })
+    // [Charlie, Diana, Eve]
+}
+```
+{kotlin-runnable="true" kotlin-min-compiler-version="1.4" id="return-multiple-values-list"}
+
+如果你需要返回固定数量的值，也可以使用标准库中的 [`Pair`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-pair/) 或 [`Triple`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-triple/) 数据类。然而，它们的属性具有通用的名称（例如 `first`、`second` 和 `third`），这可能会使结果难以理解。
+
+例如，虽然 `calculateOrderTotals()` 函数返回一个 `Pair`，但并不明确每个 `Double` 代表什么：
+
+```kotlin
+fun calculateOrderTotals(prices: List<Double>): Pair<Double, Double> {
+    val subtotal = prices.sum()
+    val tax = subtotal * 0.2
+    return Pair(subtotal, tax)
+}
+
+fun main() {
+    val totals = calculateOrderTotals(listOf(12.50, 8.00, 4.50))
+
+    // 'first' 代表什么？
+    println(totals.first)
+    // 25.0
+  
+    // 'second' 代表什么？
+    println(totals.second)
+    // 5.0
+}
+```
+{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="return-multiple-values-pair"}
+
+对于具有不同含义的结果，建议优先使用具有描述性属性名称的数据类，如 [`OrderSummary` 数据类示例](#return-multiple-values)中所示。
 
 ### 单表达式函数 {id="single-expression-functions"}
 
@@ -623,7 +706,7 @@ Stream().read()
 
 ## 泛型函数 {id="generic-functions"}
 
-你可以通过在函数名称之前使用尖括号 `<>` 来为函数指定泛型参数：
+你可以通过在函数名称之前使用尖括号 `<>` 来为函数指定泛型形参：
 
 ```kotlin
 fun <T> singletonList(item: T): List<T> { /*...*/ }

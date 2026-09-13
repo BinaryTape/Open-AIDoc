@@ -2,7 +2,7 @@
 
 Kotlin 提供了灵活的工具来控制程序流程。使用 `if`、`when` 以及循环来为你的条件定义清晰、富有表现力的逻辑。
 
-## If 表达式
+## If 表达式 {id="if-expression"}
 
 在 Kotlin 中使用 `if`，请将要检查的条件放在圆括号 `()` 中，并将结果为 `true` 时要执行的操作放在花括号 `{}` 中。你可以使用 `else` 和 `else if` 来增加额外的分支和检查。
 
@@ -64,7 +64,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="if-else-blocks-kotlin"}
 
-## When 表达式与语句
+## When 表达式与语句 {id="when-expressions-and-statements"}
 
 `when` 是一种根据多个可能的值或条件执行代码的条件表达式。它类似于 Java、C 及其他语言中的 `switch` 语句。`when` 会对其主体进行求值，并按顺序将其结果与每个分支进行比较，直到满足某个分支条件。例如：
 
@@ -147,7 +147,7 @@ when { ... }
 
 你使用 `when` 的方式决定了你是否需要在分支中覆盖所有可能的情况。覆盖所有可能的情况被称为是**完备的 (exhaustive)**。
 
-### 语句
+### 语句 {id="statements"}
 
 如果你将 `when` 作为语句使用，则不需要覆盖所有可能的情况。在以下示例中，由于未覆盖某些情况，因此没有触发任何分支。但是，不会发生错误：
 
@@ -167,7 +167,7 @@ fun main() {
 
 与 `if` 相同，每个分支都可以是一个代码块，其值是块中最后一个表达式的值。
 
-### 表达式
+### 表达式 {id="expressions"}
 
 如果你将 `when` 作为表达式使用，你**必须**覆盖所有可能的情况。第一个匹配分支的值将作为整个表达式的值。如果你没有覆盖所有情况，编译器将抛出错误。
 
@@ -226,7 +226,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-when-no-subject"}
 
-### When 的其它用法
+### When 的其它用法 {id="other-ways-to-use-when"}
 
 `when` 表达式与语句提供了不同的方式来简化你的代码、处理多个条件并执行类型检查。
 
@@ -422,7 +422,38 @@ when (animal) {
 }
 ```
 
-## For 循环
+### JVM 上的字节码生成 {id="bytecode-generation-on-the-jvm"}
+
+当针对 JVM 21 或更高版本编译 Kotlin 代码时，编译器会为符合条件的 `when` 表达式生成 [`invokedynamic`](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/invoke/package-summary.html) 指令。这样可以生成更小的字节码，类似于 Java `switch` 语句生成的字节码。
+
+当满足以下所有条件时，编译器会将 `invokedynamic` 与 [`SwitchBootstraps.typeSwitch()`](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/runtime/SwitchBootstraps.html) 方法配合使用：
+
+* 除 `else` 外的所有条件均为 `is` 或 `null` 检查。
+* `when` 表达式不包含[守卫条件 (`if`)](#guard-conditions-in-when-expressions)。
+* 条件中不包含无法直接进行类型检查的类型，例如可变 Kotlin 集合（`MutableList`）或函数类型（`kotlin.Function1`、`kotlin.Function2` 等）。
+* 除 `else` 外，`when` 表达式至少包含两个条件。
+* 所有分支检查的都是 `when` 表达式的同一个主体。
+
+例如：
+
+```kotlin
+open class Shape
+
+class Circle : Shape()
+class Rectangle : Shape()
+class Triangle : Shape()
+
+fun countCorners(shape: Shape) = when (shape) {
+    is Circle -> 0
+    is Rectangle -> 4
+    is Triangle -> 3
+    else -> -1
+}
+```
+
+此处的 `when (shape)` 表达式在字节码中会被编译为单个 `invokedynamic` 类型 switch，而不是多个 `instanceof` 检查。
+
+## For 循环 {id="for-loops"}
 
 使用 `for` 循环来遍历[集合](collections-overview.md)、[数组](arrays.md)或[区间](ranges.md)：
 
@@ -449,7 +480,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-for-loop"}
 
-### 区间
+### 区间 {id="ranges"}
 
 要遍历数字区间，请使用带有 `..` 和 `..<` 运算符的[区间表达式](ranges.md)：
 
@@ -481,7 +512,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-for-loop-range"}
 
-### 数组
+### 数组 {id="arrays"}
 
 如果你想通过索引遍历数组或列表，可以使用 `indices` 属性：
 
@@ -517,7 +548,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-for-loop-array-index"}
 
-### 迭代器
+### 迭代器 {id="iterators"}
 
 `for` 循环可以遍历任何提供了[迭代器](iterators.md)的对象。集合默认提供迭代器，而区间和数组则会被编译为基于索引的循环。
 
@@ -585,7 +616,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-for-loop-iterator-from-scratch"}
 
-## While 循环
+## While 循环 {id="while-loops"}
 
 只要满足条件，`while` 和 `do-while` 循环就会持续运行其主体中的代码。它们之间的区别在于条件检查的时间：
 
@@ -635,6 +666,6 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-do-while-loop"}
 
-## 循环中的 break 和 continue
+## 循环中的 break 和 continue {id="break-and-continue-in-loops"}
 
 Kotlin 支持在循环中使用传统的 `break` 和 `continue` 运算符。请参阅[返回与跳转](returns.md)。

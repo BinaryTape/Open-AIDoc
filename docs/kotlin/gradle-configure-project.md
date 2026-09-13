@@ -49,7 +49,8 @@ plugins {
 
 | KGP 版本      | Gradle 最小和最大版本                 | AGP 最小和最大版本                                  |
 |---------------|---------------------------------------|-----------------------------------------------------|
-| 2.4.0-2.4.10  | %minGradleVersion%–%maxGradleVersion% | %minAndroidGradleVersion%–%maxAndroidGradleVersion% |
+| 2.4.20        | %minGradleVersion%–%maxGradleVersion% | %minAndroidGradleVersion%–%maxAndroidGradleVersion% |
+| 2.4.0-2.4.10  | 7.6.3–9.5.0                           | 8.5.2–9.1.0                                         |
 | 2.3.20–2.3.21 | 7.6.3–9.3.0                           | 8.2.2–9.0.0                                         |
 | 2.3.10        | 7.6.3–9.0.0                           | 8.2.2–9.0.0                                         |
 | 2.3.0         | 7.6.3–9.0.0                           | 8.2.2–8.13.0                                        |
@@ -64,7 +65,7 @@ plugins {
 > *Kotlin 2.0.20–2.0.21 和 Kotlin 2.1.0–2.1.10 与最高至 8.6 版本的 Gradle 完全兼容。
 > 也支持 8.7–8.10 版本的 Gradle，但有一个例外：如果您使用 Kotlin 多平台 Gradle 插件，
 > 您可能会在多平台项目调用 JVM 目标中的 `withJava()` 函数时看到弃用警告。
-> 有关更多信息，请参阅 [默认创建的 Java 源集](https://kotlinlang.org/docs/multiplatform/multiplatform-compatibility-guide.html#java-source-sets-created-by-default)。
+> 有关更多信息，请参阅[默认创建的 Java 源集](https://kotlinlang.org/docs/multiplatform/multiplatform-compatibility-guide.html#java-source-sets-created-by-default)。
 >
 {style="warning"}
 
@@ -663,8 +664,7 @@ kotlin {
 
 ### 以 WebAssembly 为目标 {id="targeting-webassembly"}
 
-如果您想跨多个平台共享逻辑和 UI，请使用 Kotlin/Wasm。有关更多信息，
-请参阅 [Web 开发](web-overview.md#kotlin-wasm)。
+如果您想跨多个平台共享逻辑和 UI，请使用 Kotlin/Wasm。有关更多信息，请参阅 [Web 开发](web-overview.md#kotlin-wasm)。
 
 与 JavaScript 一样，以 WebAssembly (Wasm) 为目标时请使用 `kotlin-multiplatform` 插件：
 
@@ -706,12 +706,12 @@ kotlin {
 }
 ```
 
-对于 WASI 环境，请配置 `wasmWasi` 目标：
+对于 WASI 环境，请使用 Node.js 或 Wasmtime 配置 `wasmWasi` 目标：
 
 ```kotlin
 kotlin {
     wasmWasi {
-        nodejs {
+        nodejs { // 或 wasmtime
             /* ... */
         }
     }
@@ -990,7 +990,6 @@ kotlin.stdlib.jdk.variants.version.alignment=false
   
 * 如果您添加了 Kotlin 标准库版本 `%kotlinVersion%` 的依赖项：`implementation("org.jetbrains.kotlin:kotlin-stdlib:%kotlinVersion%")`，以及旧版本（早于 `1.8.0`）的 Kotlin Gradle 插件，请更新 Kotlin Gradle 插件以匹配标准库版本：
 
-  
   <tabs group="build-script">
   <tab title="Kotlin" group-key="kotlin">
 
@@ -1290,7 +1289,7 @@ dependencyResolutionManagement {
 </tab>
 <tab title="Groovy" group-key="groovy">
 
-```kotlin
+```groovy
 dependencyResolutionManagement {
     repositories {
         mavenCentral()

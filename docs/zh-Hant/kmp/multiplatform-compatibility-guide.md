@@ -19,7 +19,8 @@ Kotlin 目前的穩定版本為 %kotlinVersion%。請注意特定變更相對於
 
 | Kotlin Multiplatform 外掛程式版本 | Gradle                                | Android Gradle 外掛程式                             | Xcode   |
 |-------------------------------------|---------------------------------------|-----------------------------------------------------|---------|
-| 2.4.0-2.4.10                        | %minGradleVersion%–%maxGradleVersion% | %minAndroidGradleVersion%–%maxAndroidGradleVersion% | %xcode% |
+| 2.4.20                              | %minGradleVersion%–%maxGradleVersion% | %minAndroidGradleVersion%–%maxAndroidGradleVersion% | %xcode% |
+| 2.4.0-2.4.10                        | 7.6.3–9.5.0                           | 8.5.2–9.1.0                                         | 26.4    |
 | 2.3.20–2.3.21                       | 7.6.3–9.3.0                           | 8.2.2–9.0.0                                         | 26.0    |
 | 2.3.10                              | 7.6.3–9.0.0                           | 8.2.2–9.0.0                                         | 26.0    |
 | 2.3.0                               | 7.6.3–9.0.0                           | 8.2.2–8.13.0                                        | 26.0    |
@@ -49,7 +50,7 @@ undefined
 
 **發生了什麼變化？**
 
-在 Kotlin 2.3.0 之前，我們透過 `com.android.application` 和 `com.android.library` 外掛程式提供對 Android 目標的支援。這是在 Google 的 Android 小組開發專門為 Kotlin Multiplatform 量身定制的外掛程式期間的臨時解決方案。
+在 Kotlin 2.3.0 之前，我們透過 `com.android.application` 和 `com.android.library` 外掛程式提供對 Android 目標的支援。這是在 Google 的 Android 小組開發專門為 Kotlin Multiplatform 量身定制的獨立外掛程式期間的臨時解決方案。
 
 最初我們使用 `android` 區塊，但後來轉向使用 `androidTarget` 區塊，以便將 `android` 名稱保留給新外掛程式使用。
 
@@ -113,7 +114,7 @@ kotlin {
 
 此外，現在只有在存在 Java 原始碼時，Gradle 才會執行 Java 編譯任務，這會觸發先前未曾執行的 JVM 驗證診斷。如果您在 `KotlinJvmCompile` 任務中或 `compilerOptions` 內部明確配置了不相容的 JVM 目標，此診斷將失敗。有關確保 JVM 目標相容性的指南，請參閱[檢查相關編譯任務的 JVM 目標相容性](https://kotlinlang.org/docs/gradle-configure-project.html#check-for-jvm-target-compatibility-of-related-compile-tasks)。
 
-如果您的專案使用的 Gradle 版本高於 8.7且不依賴 Gradle Java 外掛程式（如 [Java](https://docs.gradle.org/current/userguide/java_plugin.html)、[Java Library](https://docs.gradle.org/current/userguide/java_library_plugin.html) 或 [Application](https://docs.gradle.org/current/userguide/application_plugin.html)），或是依賴 Gradle Java 外掛程式的第三方 Gradle 外掛程式，則可以移除 `withJava()` 函式。
+如果您的專案使用的 Gradle 版本高於 8.7 且不依賴 Gradle Java 外掛程式（如 [Java](https://docs.gradle.org/current/userguide/java_plugin.html)、[Java Library](https://docs.gradle.org/current/userguide/java_library_plugin.html) 或 [Application](https://docs.gradle.org/current/userguide/application_plugin.html)），或是依賴 Gradle Java 外掛程式的第三方 Gradle 外掛程式，則可以移除 `withJava()` 函式。
 
 如果您的專案使用了 [Application](https://docs.gradle.org/current/userguide/application_plugin.html) Gradle Java 外掛程式，我們建議遷移到[新的實驗性 DSL](https://kotlinlang.org/docs/whatsnew2120.html#kotlin-multiplatform-new-dsl-to-replace-gradle-s-application-plugin)。從 Gradle 8.7 開始，Application 外掛程式將不再與 Kotlin Multiplatform Gradle 外掛程式配合工作。
 
@@ -121,7 +122,7 @@ kotlin {
 
 如果您在 Kotlin 2.1.20 且 Gradle 版本高於 8.7 的情況下使用 [Java 測試夾具](https://docs.gradle.org/current/userguide/java_testing.html#sec:java_test_fixtures) Gradle 外掛程式，該外掛程式將無法運作。請改為升級到 [Kotlin 2.1.21](https://kotlinlang.org/docs/releases.html#release-details)，該問題已在該版本中修復。
 
-如果您遇到任何問題，請在我們的[問題追蹤器](https://kotl.in/issue)中報告，或是在我們的[公開 Slack 頻道](https://kotlinlang.slack.com/archives/C19FD9681)尋求協助。
+如果您遇到任何問題，請在我們的[問題追蹤器](https://kotl.in/issue)中回報，或是在我們的[公開 Slack 頻道](https://kotlinlang.slack.com/archives/C19FD9681)尋求協助。
 
 **變更何時生效？**
 
@@ -249,7 +250,7 @@ kotlin {
 以下是計劃的棄用週期：
 
 * 1.9.20：在 Kotlin Multiplatform 專案中使用多個相似目標時引入棄用警告
-* 2.1.0：在此類情況下報告錯誤，Kotlin/JS 目標除外；欲了解更多關於此例外的資訊，請參閱 [YouTrack 中的問題](https://youtrack.jetbrains.com/issue/KT-47038/KJS-MPP-Split-JS-target-into-JsBrowser-and-JsNode)
+* 2.1.0：在此類情況下回報錯誤，Kotlin/JS 目標除外；欲了解更多關於此例外的資訊，請參閱 [YouTrack 中的問題](https://youtrack.jetbrains.com/issue/KT-47038/KJS-MPP-Split-JS-target-into-JsBrowser-and-JsNode)
 
 undefined
 ### 棄用支援以舊版模式發佈的多平台程式庫 {id="deprecated-support-of-multiplatform-libraries-published-in-legacy-mode"}
@@ -315,7 +316,7 @@ undefined
 
 以下是計劃的棄用週期：
 
-* 1.8.20：使用已棄用的 Gradle 屬性時報告警告
+* 1.8.20：使用已棄用的 Gradle 屬性時回報警告
 * 1.9.20：將此警告提升為錯誤
 * 2.0.0：移除已棄用的屬性；Kotlin Gradle 外掛程式將忽略其使用情況
 
@@ -361,7 +362,7 @@ undefined
 
 以下是計劃的棄用週期：
 
-* 1.9.20：對任何使用預設設定相關 API 的行為報告警告
+* 1.9.20：對任何使用預設設定相關 API 的行為回報警告
 * 2.0.0：將此警告提升為錯誤
 * 2.2.0：從 Kotlin Gradle 外掛程式的公開 API 中移除預設設定相關 API；仍在使用它的原始碼將因「無法解析的參照 (unresolved reference)」錯誤而失敗，且二進位檔案（例如 Gradle 外掛程式）除非針對最新版本的 Kotlin Gradle 外掛程式重新編譯，否則可能會發生連結錯誤
 
@@ -372,11 +373,11 @@ undefined
 
 我們正在棄用 Kotlin Multiplatform DSL 中的 `ios()`、`watchos()` 和 `tvos()` 目標快速鍵。它們原本旨在為 Apple 目標部分建立原始碼集階層結構。然而，事實證明它們難以擴展，有時甚至會造成混淆。
 
-例如，`ios()` 快速鍵同時建立了 `iosArm64` 和 `iosX64` 目標，但未包含在使用 Apple 晶片的主機上工作時所必需的 `iosSimulatorArm64` 目標。然而，更改此快速鍵難以實作，並可能導致現有使用者專案出現問題。
+例如，`ios()` 快速鍵同時建立了 `iosArm64` 和 `iosX64` 目標，但未包含在使用 Apple M 晶片的主機上工作時所必需的 `iosSimulatorArm64` 目標。然而，變更此快速鍵難以實作，並可能導致現有使用者專案出現問題。
 
 **現在的最佳實務是什麼？**
 
-Kotlin Gradle 外掛程式現在提供了一個內建的階層結構模板。自 Kotlin 1.9.20 起，它預設啟用，並包含為常見使用案例預定義的中間原始碼集。
+Kotlin Gradle 外掛程式現在提供了一個內建的階層結構範本。自 Kotlin 1.9.20 起，它預設啟用，並包含為常見使用案例預定義的中間原始碼集。
 
 您應該指定目標清單，而不是使用快速鍵，外掛程式隨後會根據此清單自動設定中間原始碼集。
 
@@ -388,8 +389,8 @@ Kotlin Gradle 外掛程式現在提供了一個內建的階層結構模板。自
 
 以下是計劃的棄用週期：
 
-* 1.9.20：使用 `ios()`、`watchos()` 和 `tvos()` 目標快速鍵時報告警告；改為預設啟用預設階層結構模板
-* 2.1.0：使用目標快速鍵時報告錯誤
+* 1.9.20：使用 `ios()`、`watchos()` 和 `tvos()` 目標快速鍵時回報警告；改為預設啟用預設階層結構範本
+* 2.1.0：使用目標快速鍵時回報錯誤
 * 2.2.0：從 Kotlin Multiplatform Gradle 外掛程式中移除目標快速鍵 DSL
 
 ### Kotlin 升級後 iOS 框架版本不正確 {id="incorrect-version-of-ios-framework-after-kotlin-upgrade"}
@@ -450,7 +451,7 @@ kotlin {
 
 若要替換 `KotlinCompilation.source(someSourceSet)`，請使用 `.srcDir()` 函式將您的原始碼直接加入適當的原始碼集。或者，您可以建立一個新的原始碼集，並加入從 `KotlinCompilation` 的預設原始碼集到 `someSourceSet` 的 `dependsOn` 關係。您也可以使用[原始碼集慣例](https://kotlinlang.org/api/kotlin-gradle-plugin/kotlin-gradle-plugin-api/org.jetbrains.kotlin.gradle.dsl/-kotlin-multiplatform-source-set-conventions/)直接引用原始碼，這對 IDE 較友善且被認為是最穩健的方法。最後，您可以使用 `KotlinCompilation.defaultSourceSet.dependsOn(someSourceSet)`，這在所有情況下都有效。
 
-您可以透過以下方式之一更改上述程式碼：
+您可以透過以下方式之一變更上述程式碼：
 
 ```kotlin
 kotlin {
@@ -545,13 +546,13 @@ undefined
 3. 調整相依性宣告：
 
    * 我們建議使用 `sourceSets {}` 區塊並配置各個原始碼集的相依性，`jsMain {}` 用於生產相依性，`jsTest {}` 用於測試相依性。詳情請參閱[加入相依性](multiplatform-add-dependencies.md)。
-   * 但是，如果您想在頂層區塊中宣告相依性，請將宣告從 `api("group:artifact:1.0")` 更改為 `add("jsMainApi", "group:artifact:1.0")`，依此類推。
+   * 但是，如果您想在頂層區塊中宣告相依性，請將宣告從 `api("group:artifact:1.0")` 變更為 `add("jsMainApi", "group:artifact:1.0")`，依此類推。
 
      > 在這種情況下，請確保頂層 `dependencies {}` 區塊位於 `kotlin {}` 區塊**之後**。否則，您將收到「找不到配置 (Configuration not found)」錯誤。
      >
      {style="note"}
 
-   您可以透過以下方式之一更改 `build.gradle.kts` 檔案中的程式碼：
+   您可以透過以下方式之一變更 `build.gradle.kts` 檔案中的程式碼：
 
    <Tabs>
    <TabItem title="kotlin-js">
@@ -614,7 +615,7 @@ undefined
 
 以下是 `kotlin-js` Gradle 外掛程式的棄用週期：
 
-* 1.9.0：使用 `kotlin-js` Gradle 外掛程式時產生棄用警告
+* 1.9.0：使用 `kotlin-js` 外掛程式時產生棄用警告
 * 2.4.0：[將此警告提升為錯誤](https://youtrack.jetbrains.com/issue/KT-59305)
 
 undefined
@@ -658,7 +659,7 @@ undefined
 
 以下是棄用週期：
 
-* <=1.9.0：使用 `kotlin.mpp.androidSourceSetLayoutVersion=1` 時報告警告；該警告可以使用 `kotlin.mpp.androidSourceSetLayoutVersion1.nowarn=true` Gradle 屬性來隱藏
+* <=1.9.0：使用 `kotlin.mpp.androidSourceSetLayoutVersion=1` 時回報警告；該警告可以使用 `kotlin.mpp.androidSourceSetLayoutVersion1.nowarn=true` Gradle 屬性來隱藏
 * 1.9.20：將此警告提升為錯誤；此錯誤**無法**被隱藏
 * 2.4.0：移除對舊版 Android 原始碼集佈局的支援，並[移除 `kotlin.mpp.androidSourceSetLayoutVersion=1` Gradle 屬性](https://youtrack.jetbrains.com/issue/KT-82265)
 
@@ -689,8 +690,8 @@ undefined
 
 以下是計劃的棄用週期：
 
-* 1.9.0：在 `commonMain` 中使用 `dependsOn` 時報告警告
-* &gt;=1.9.20：在 `commonMain` 或 `commonTest` 中使用 `dependsOn` 時報告錯誤
+* 1.9.0：在 `commonMain` 中使用 `dependsOn` 時回報警告
+* &gt;=1.9.20：在 `commonMain` 或 `commonTest` 中使用 `dependsOn` 時回報錯誤
 
 ### 前向宣告的新方法 {initial-collapse-state="collapsed" collapsible="true" id="new-approach-to-forward-declarations"}
 

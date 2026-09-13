@@ -4,6 +4,8 @@
 
 <web-summary>阅读 Kotlin 2.4.0 版本说明，了解新的语言功能、Kotlin Multiplatform、JVM、Native、JS 和 Wasm 的更新，以及 Gradle 和 Maven 的构建工具支持。</web-summary>
 
+_[发布日期：2026 年 7 月 14 日](releases.md#release-history)_
+
 <tldr>
     <p> 有关错误修复版本 2.4.10 的详细信息，请参阅 <a href="https://github.com/JetBrains/kotlin/releases/tag/v2.4.10">更改列表</a></p>
 </tldr>
@@ -408,11 +410,11 @@ kotlin {
 
 <secondary-label ref="language"/>
 
-Kotlin 2.4.0 引入了 `@IntroducedAt` 注解，用于在向已发布的 API 添加新的可选参数时保持二进制兼容性。
+Kotlin 2.4.0 引入了 `@IntroducedAt` 注解，用于在向已发布的 API 添加新的可选形参时保持二进制兼容性。
 
-以前，向函数添加可选参数通常需要使用 `@JvmOverloads`，这可能会生成超出需要的重载。或者，为了保持二进制兼容性，您必须将旧签名保留为隐藏的已弃用重载。
+以前，向函数添加可选形参通常需要使用 `@JvmOverloads`，这可能会生成超出需要的重载。或者，为了保持二进制兼容性，您必须将旧签名保留为隐藏的已弃用重载。
 
-使用 `@IntroducedAt` 注解，您可以用新添加的可选参数引入的版本对其进行标记。编译器使用此信息自动生成相应的隐藏重载。
+使用 `@IntroducedAt` 注解，您可以用新添加的可选形参引入的版本对其进行标记。编译器使用此信息自动生成相应的隐藏重载。
 
 此注解是 [Experimental](components-stability.md#stability-levels-explained)。要启用它，请使用 `@OptIn(ExperimentalVersionOverloading::class)` 注解。
 
@@ -617,7 +619,7 @@ Kotlin 2.2.0 中的 Kotlin Metadata JVM 库 [引入了对读取存储在 Kotlin 
 ### 垃圾回收器默认启用并发标记 {id="default-concurrent-marking-in-garbage-collector"}
 <secondary-label ref="native"/>
 
-在 Kotlin 2.0.20 中，Kotlin team [引入了实验性支持](whatsnew2020.md#concurrent-marking-in-garbage-collector) 用于并发标记清除垃圾回收器 (CMS GC)。在处理了用户反馈并修复了回归问题后，我们现在准备从 Kotlin 2.4.0 开始默认启用 CMS。
+在 Kotlin 2.0.20 中，Kotlin 团队 [引入了实验性支持](whatsnew2020.md#concurrent-marking-in-garbage-collector) 用于并发标记清除垃圾回收器 (CMS GC)。在处理了用户反馈并修复了回归问题后，我们现在准备从 Kotlin 2.4.0 开始默认启用 CMS。
 
 垃圾回收器中之前的默认并行标记并发清除 (PMCS) 设置在 GC 标记堆中的对象时必须暂停应用程序线程。相比之下，CMS 允许标记阶段与应用程序线程并发运行。
 
@@ -797,7 +799,7 @@ Kotlin 2.4.0 进一步改进了向 JavaScript/TypeScript 的导出，包括支�
 ### 支持将值类导出到 JavaScript/TypeScript {id="support-for-value-class-export-to-javascript-typescript"}
 <secondary-label ref="js"/>
 
-以前，只有常规 Kotlin 类可以导出到 JavaScript/TypeScript。Kotlin 2.4.0 取送了这一限制。您现在可以将 Kotlin 的 [内联值类](inline-classes.md) 导出为常规 TypeScript 类。
+以前，只有常规 Kotlin 类可以导出到 JavaScript/TypeScript。Kotlin 2.4.0 取消了这一限制。您现在可以将 Kotlin 的 [内联值类](inline-classes.md) 导出为常规 TypeScript 类。
 
 要导出值类，请在 Kotlin 侧使用 `@JsExport` 注解标记它：
 
@@ -846,7 +848,7 @@ console.log(await auth.login(new Email("not-an-email")));
 * 展开 (Spread) 和剩余 (Rest) 运算符
 * 模板字符串
 
-请记住，`js()` 函数的参数应该是一个字符串常量，因为它是在编译时解析并按原样转换为 JavaScript 代码的。例如，要内联展开运算符，请使用：
+请记住，`js()` 函数的实参应该是一个字符串常量，因为它是在编译时解析并按原样转换为 JavaScript 代码的。例如，要内联展开运算符，请使用：
 
 ```kotlin
 fun spreadExample(): dynamic = js("""
@@ -871,7 +873,7 @@ fun spreadExample(): dynamic = js("""
 
 在 Kotlin 2.4.0 中，差异注解现在会在导出期间保存，并映射到 TypeScript 的 [差异注解](https://www.typescriptlang.org/docs/handbook/2/generics.html#variance-annotations)。
 
-在您的 Kotlin 代码中，定义泛型类型参数的差异：
+在您的 Kotlin 代码中，定义泛型类型形参的差异：
 
 ```Kotlin
 // Kotlin
@@ -941,7 +943,7 @@ export interface DataProcessor {
 
 * `is` 和 `as` 类型检查。
 * 使用 [`::class` 语法](js-reflection.md) 的类引用。
-* 将接口作为具体化 (reified) 类型参数传递。
+* 将接口作为具体化 (reified) 类型实参传递。
 
 > 避免对外部接口使用 `@JsNoRuntime` 注解，因为这会导致编译器警告。
 >
@@ -971,7 +973,7 @@ interface Identity {
 
 ## Gradle {id="gradle"}
 
-Kotlin 2.4.0 完全兼容 Gradle 7.6.3 到 9.5.0。您也可以使用截至最新 Gradle 发布版的 Gradle 版本。但请注意，这样做可能会导致弃用警告，并且某些新的 Gradle 功能可能无法工作。Kotlin 2.4.0 还带来了多项改进，如跨平台一致的默认模块名称，以及向 Kotlin/JVM 的 Problems API 写入的编译器消息。
+Kotlin 2.4.0 完全兼容 Gradle 7.6.3 到 9.5.0。您也可以使用截至最新 Gradle 发布版的 Gradle 版本。但请注意，这样做可能会导致弃用警告，并且某些新的 Gradle 功能可能无法工作。Kotlin 2.4.0 还带来了多项改进，如跨平台一致的默认模块名称，以及向 Kotlin/JVM 的 Problems API 写入编译器消息。
 
 ### 最低支持的 AGP 版本提升至 8.5.2 {id="minimum-supported-agp-version-bumped-to-8-5-2"}
 <secondary-label ref="gradle"/>
@@ -1095,7 +1097,7 @@ Kotlin 2.4.0 为 Kotlin Maven 插件引入了对 [Maven Toolchains](https://mave
 2. `maven-toolchains-plugin` 中的 JDK 版本。通过 Maven Toolchains 设置的 JDK 版本会覆盖 `JAVA_HOME` 路径中设置的 JDK 版本。
 3. `JAVA_HOME` 路径。
 
-您还可以使用特定于插件的 `<jdkToolchain>` 选项来直接设置 `kotlin-maven-plugin` 工具链中的 JDK 版本。与使用 `maven-toolchains-plugin` 相比，此参数仅影响 Kotlin 编译，对构建中的其他插件没有影响。
+您还可以使用特定于插件的 `<jdkToolchain>` 选项来直接设置 `kotlin-maven-plugin` 工具链中的 JDK 版本。与使用 `maven-toolchains-plugin` 相比，此形参仅影响 Kotlin 编译，对构建中的其他插件没有影响。
 
 > 目前，将 `maven-toolchains-plugin` 设置为使用特定的 JDK 版本不会影响 `kotlin-maven-plugin` 的 `kapt` 和 `test-kapt` 目标。要解决此问题，请在 `JAVA_HOME` 路径中设置所需的版本。更多详细信息请参见 [KT-79897](https://youtrack.jetbrains.com/issue/KT-79897)。
 >
@@ -1136,7 +1138,7 @@ Kotlin 2.4.0 在 `.klib` 编译期间对同一模块中声明的内联函数包�
 ### 在 klib 编译期间一致的模块内函数内联 {id="consistent-intra-module-function-inlining-during-klib-compilation"}
 <secondary-label ref="compiler"/>
 
-以前，[函数内联](inline-functions.md) 在不同的 Kotlin 平台上的行为不一致。JetBrains team 正在努力在所有支持的平台上统一它，以确保相同的兼容性保证。
+以前，[函数内联](inline-functions.md) 在不同的 Kotlin 平台上的行为不一致。JetBrains 团队正在努力在所有支持的平台上统一它，以确保相同的兼容性保证。
 
 在 Kotlin/JVM 上，函数内联发生在编译时。因此，当使用 Kotlin/JVM 编译器编译 Kotlin 源代码时，生成的类文件在字节码中没有内联函数调用，因为内联函数的主体被内联到了它们的调用处，所以它们的行为在编译期间就已固定。
 
@@ -1296,7 +1298,7 @@ Kotlin 2.4.0 通过新的运行时库使 Power-assert 支持的函数更易于�
 
 从 Kotlin 2.4.0 开始，Compose 编译器提供了更一致的增量编译。不同文件之间内部类型的稳定性现在在运行时推断。这允许 Compose 更新推断的稳定性值，即使类用法未被重新编译。
 
-作为一个副作用，每当 `@Composable` 函数使用来自不同文件的 `internal` 类作为参数时，您的构件大小可能会增加。这是由于编译器为稳定和不稳定两种情况都编码了执行路径，因为稳定性必须在运行时决定。运行时的这种稳定性开销会被执行全应用优化的压缩工具（如 R8）移除，因为它们能够推断出不必要的执行路径并将其消除。
+作为一个副作用，每当 `@Composable` 函数使用来自不同文件的 `internal` 类作为形参时，您的构件大小可能会增加。这是由于编译器为稳定和不稳定两种情况都编码了执行路径，因为稳定性必须在运行时决定。运行时的这种稳定性开销会被执行全应用优化的压缩工具（如 R8）移除，因为它们能够推断出不必要的执行路径并将其消除。
 
 此更新不会改变最终的稳定性值，因此 `@Composable` 函数的行为保持不变。
 

@@ -52,10 +52,16 @@ plugins {
 </tab>
 </tabs>
 
-Power-assert 外掛程式提供了多個選項來套用其行為：
+Power-assert 外掛程式提供了多個選項來自訂其行為：
 
-* **`functions`**：完整限定的函式路徑列表。Power-assert 外掛程式將轉換對這些函式的呼叫。如果未指定，預設僅轉換 `kotlin.assert()` 呼叫。
-* **`includedSourceSets`**：Power-assert 外掛程式將轉換的 Gradle 原始碼集列表。如果未指定，預設將轉換所有 *測試原始碼集* (test source sets)。
+* **`functions`**：列出 Power-assert 外掛程式在呼叫時會轉換的函式之完整限定路徑。若未指定，預設僅轉換 `kotlin.assert()` 呼叫。
+* **`compilationFilter`**：控制 Power-assert 外掛程式套用至哪些 Kotlin 編譯。您可以建立自己的自訂篩選器，或使用預定義的選項：
+  * `PowerAssertCompilationFilter.TESTS`：套用至所有測試原始碼集 (預設)。
+  * `PowerAssertCompilationFilter.ALL`：套用至所有原始碼集。
+
+  > `compilationFilter` 選項已取代已棄用的 `includedSourceSets`（該選項曾用於列出 Power-assert 外掛程式要轉換的 Gradle 原始碼集）。這兩個選項互斥：若指定了 `includedSourceSets`，`compilationFilter` 將會被忽略。
+  >
+  {style="note"}
 
 若要自訂行為，請將 `powerAssert {}` 區塊加入您的建置指令碼檔案：
 
@@ -66,7 +72,9 @@ Power-assert 外掛程式提供了多個選項來套用其行為：
 // build.gradle.kts
 powerAssert {
     functions = listOf("kotlin.assert", "kotlin.test.assertTrue", "kotlin.test.assertEquals", "kotlin.test.assertNull")
-    includedSourceSets = listOf("commonMain", "jvmMain", "jsMain", "nativeMain")
+    compilationFilter = PowerAssertCompilationFilter {
+        it.name in setOf("commonMain", "jvmMain", "jsMain", "nativeMain")
+    }
 }
 ```
 
@@ -77,7 +85,9 @@ powerAssert {
 // build.gradle
 powerAssert {
     functions = ["kotlin.assert", "kotlin.test.assertTrue", "kotlin.test.assertEquals", "kotlin.test.assertNull"]
-    includedSourceSets = ["commonMain", "jvmMain", "jsMain", "nativeMain"]
+    compilationFilter = PowerAssertCompilationFilter {
+        it.name in ["commonMain", "jvmMain", "jsMain", "nativeMain"]
+    }
 }
 ```
 

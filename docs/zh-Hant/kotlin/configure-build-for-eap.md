@@ -1,9 +1,9 @@
 [//]: # (title: 為 EAP 設定您的組建)
 
 <tldr>
-    <!--<p>No preview versions are currently available.</p> -->
-    <p>最新 Kotlin EAP 版本：<strong>%kotlinEapVersion%</strong></p>
-    <p><a href="eap.md#build-details">探索 Kotlin EAP 版本詳細資訊</a></p>
+    <p>目前沒有可用的預覽版本。</p>
+    <!--<p>最新 Kotlin EAP 版本：<strong>%kotlinEapVersion%</strong></p>
+    <p><a href="eap.md#build-details">探索 Kotlin EAP 版本詳細資訊</a></p> -->
 </tldr>
 
 若要將您的組建設定為使用 Kotlin 的 EAP 版本，您需要： 

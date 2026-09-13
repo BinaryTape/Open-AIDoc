@@ -4,6 +4,8 @@
 
 <web-summary>閱讀 Kotlin 2.4.0 版本說明，涵蓋新語言特性、Kotlin Multiplatform、JVM、Native、JS 和 Wasm 的更新，以及 Gradle 和 Maven 的建置工具支援。</web-summary>
 
+_[發布日期：2026 年 7 月 14 日](releases.md#release-history)_
+
 <tldr>
     <p>有關錯誤修正版本 2.4.10 的詳細資訊，請參閱 <a href="https://github.com/JetBrains/kotlin/releases/tag/v2.4.10">變更日誌</a></p>
 </tldr>
@@ -1020,15 +1022,15 @@ Kotlin 2.4.0 透過支援 Maven Toolchains 以及 Java 與 JVM 目標版本的�
 
 這可確保 Kotlin 和 Maven 編譯器針對相同的位元組碼版本，從而避免 Kotlin 產生的位元組碼與專案其餘部分或預期部署環境不相容的問題。
 
-啟用 `<extensions>` 選項後，您無需設定 `kotlin.compiler.jvmTarget` 或 `kotlin.compiler.jdkRelease` 選項。如果兩者都未定義， Kotlin Maven 外掛程式會按以下順序自動解析 JVM 目標版本：
+啟用 `<extensions>` 選項後，您無需設定 `kotlin.compiler.jvmTarget` 或 `kotlin.compiler.jdkRelease` 選項。如果兩者都未定義，Kotlin Maven 外掛程式會按以下順序自動解析 JVM 目標版本：
 
 1. 作為在專案屬性中或在 `maven-compiler-plugin` 配置中定義的 `maven.compiler.release` 版本。
 
-   In this case, both `jvmTarget` and `jdkRelease` compiler options are set for the Kotlin compiler, limiting the API to a specific JDK version.
+   在此情況下，會為 Kotlin 編譯器同時設定 `jvmTarget` 和 `jdkRelease` 編譯器選項，將 API 限制為特定 JDK 版本。
 
 2. 如果未設定 Maven release 版本，則作為 `maven.compiler.target` 版本。編譯器目標可以在專案屬性中或在 `maven-compiler-plugin` 配置中定義。
 
-   In this case, only Kotlin's `jvmTarget` is set, and the API is not limited to a specific JDK version.
+   在此情況下，僅設定 Kotlin 的 `jvmTarget`，且 API 不受限於特定 JDK 版本。
 
 這極大地簡化了您的 Kotlin 專案配置，因此您的 `pom.xml` 檔案可以像這樣：
 

@@ -251,13 +251,13 @@ Kotlin 2.0.0 以降、最新の言語バージョンを試すには、`gradle.pr
 ビルドレポートには、さまざまなコンパイルフェーズの所要時間や、コンパイルが増分にならなかった理由が含まれます。
 コンパイル時間が長すぎる場合や、同じプロジェクトでも時間が異なる場合など、パフォーマンスの問題を調査するためにビルドレポートを使用してください。
 
-Kotlin ビルドレポートは、単一の Gradle タスクを最小単位とする [Gradle Build Scans](https://scans.gradle.com/) よりも効率的に、ビルドパフォーマンスの問題を調査するのに役立ちます。
+Kotlin ビルドレポートは、単一の Gradle タスクを最小単位とする [Gradle build scans](https://scans.gradle.com/) よりも効率的に、ビルドパフォーマンスの問題を調査するのに役立ちます。
 
 実行時間の長いコンパイルにおいて、ビルドレポートを分析することで解決できる一般的なケースが 2 つあります：
 * ビルドが増分ではなかった。理由を分析し、根本的な問題を修正してください。
 * ビルドは増分だったが、時間がかかりすぎた。ソースファイルの再編成（大きなファイルの分割、個別のクラスを異なるファイルに保存、巨大なクラスのリファクタリング、トップレベル関数を異なるファイルで宣言するなど）を試みてください。
 
-ビルドレポートには、プロジェクトで使用されている Kotlin バージョンも表示されます。さらに、Kotlin 1.9.0 以降では、[Gradle Build Scans](https://scans.gradle.com/) でコードのコンパイルにどのコンパイラが使用されたかを確認できるようになりました。
+ビルドレポートには、プロジェクトで使用されている Kotlin バージョンも表示されます。さらに、Kotlin 1.9.0 以降では、[Gradle build scans](https://scans.gradle.com/) でコードのコンパイルにどのコンパイラが使用されたかを確認できるようになりました。
 
 [ビルドレポートの読み方](https://blog.jetbrains.com/kotlin/2022/06/introducing-kotlin-build-reports/#how_to_read_build_reports)および [JetBrains におけるビルドレポートの活用方法](https://blog.jetbrains.com/kotlin/2022/06/introducing-kotlin-build-reports/#how_we_use_build_reports_in_jetbrains)について詳細を確認してください。
 
@@ -275,9 +275,9 @@ kotlin.build.report.output=file
 |---|---|
 | `file` | ビルドレポートを人間が読みやすい形式でローカルファイルに保存します。デフォルトでは `${project_folder}/build/reports/kotlin-build/${project_name}-timestamp.txt` です。 |
 | `single_file` | ビルドレポートをオブジェクトの形式で指定されたローカルファイルに保存します。 |
-| `build_scan` | ビルドレポートを [ビルドスキャン](https://scans.gradle.com/) の `custom values` セクションに保存します。Gradle Enterprise プラグインは、カスタム値の数とその長さを制限していることに注意してください。大規模なプロジェクトでは、一部の値が失われる可能性があります。 |
+| `build_scan` | ビルドレポートを [build scan](https://scans.gradle.com/) の `custom values` セクションに保存します。Gradle Enterprise プラグインは、カスタム値の数とその長さを制限していることに注意してください。大規模なプロジェクトでは、一部の値が失われる可能性があります。 |
 | `http` | HTTP(S) を使用してビルドレポートを投稿します。POST メソッドでメトリクスを JSON 形式で送信します。送信データの現在のバージョンは [Kotlin リポジトリ](https://github.com/JetBrains/kotlin/blob/master/libraries/tools/kotlin-gradle-plugin/src/common/kotlin/org/jetbrains/kotlin/gradle/report/data/GradleCompileStatisticsData.kt)で確認できます。HTTP エンドポイントのサンプルは、[こちらのブログ記事](https://blog.jetbrains.com/kotlin/2022/06/introducing-kotlin-build-reports/#enable_build_reports)にあります。 |
-| `json` | ビルドレポートを JSON 形式でローカルファイルに保存します。ビルドレポートの場所は `kotlin.build.report.json.directory` で設定します（下記参照）。デフォルトの名前は `${project_name}-build-<date-time>-<index>.json` です。 |
+| `json` | ビルドレポートを JSON 形式でローカルファイルに保存します。デフォルトでは `${project_folder}/build/reports/kotlin-build/${project_name}-build-<date-time>-<index>.json` です。 |
 
 `kotlin.build.report` で使用可能なオプションのリストは以下の通りです：
 
@@ -289,10 +289,7 @@ kotlin.build.report.output=file,single_file,http,build_scan,json
 # 非推奨の `kotlin.internal.single.build.metrics.file` プロパティの代わりに使用してください
 kotlin.build.report.single_file=my/directory/path/some_filename
 
-# json 出力を使用する場合は必須。レポートの保存場所
-kotlin.build.report.json.directory=my/directory/path
-
-# オプション。ファイルベースのレポートの出力ディレクトリ。デフォルト：build/reports/kotlin-build/
+# オプション。ファイルベースまたは JSON レポートの出力ディレクトリ。デフォルト：build/reports/kotlin-build/
 kotlin.build.report.file.output_dir=kotlin-reports
 
 # オプション。ビルドレポートを識別するためのラベル（例：デバッグパラメータなど）
@@ -319,9 +316,9 @@ kotlin.build.report.include_compiler_arguments=true|false
 
 ### カスタム値の制限 {id="limit-of-custom-values"}
 
-ビルドスキャンの統計情報を収集するために、Kotlin ビルドレポートは [Gradle のカスタム値](https://docs.gradle.org/enterprise/tutorials/extending-build-scans/)を使用します。
+ビルドスキャンの統計情報を収集するために、Kotlin ビルドレポートは [Gradle のカスタム値](https://docs.gradle.com/enterprise/tutorials/extending-build-scans/)を使用します。
 ユーザー自身と、さまざまな Gradle プラグインの両方がカスタム値にデータを書き込むことができます。カスタム値の数には制限があります。
-現在の最大カスタム値数は、[Build scan プラグインのドキュメント](https://docs.gradle.org/enterprise/gradle-plugin/#adding_custom_values)で確認してください。
+現在の最大カスタム値数は、[Build scan プラグインのドキュメント](https://docs.gradle.com/enterprise/gradle-plugin/#adding_custom_values)で確認してください。
 
 大規模なプロジェクトの場合、このようなカスタム値の数が非常に多くなることがあります。この数が制限を超えると、ログに以下のメッセージが表示されることがあります：
 

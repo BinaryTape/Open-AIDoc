@@ -1,7 +1,7 @@
 # 管理本機資源環境
 
 您可能需要管理應用程式內設定，讓使用者能夠自訂體驗，例如更改語言或佈景主題。
-若要動態更新應用程式的資源環境，您可以配置應用程式使用的以下資源相關設定：
+若要動態更新應用程式的資源環境，您可以設定應用程式使用的以下資源相關設定：
 
 * [地區設定 (語言與地區)](#locale)
 * [佈景主題](#theme)
@@ -16,7 +16,7 @@
 * **桌面**: [`Locale.getDefault()`](https://developer.android.com/reference/java/util/Locale#getDefault(java.util.Locale.Category))
 * **Web**: [`window.navigator.languages`](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/languages)
 
-1. 在 `common` 原始碼集中，使用 `expect` 關鍵字定義預期的 `LocalAppLocale` 物件。地區設定指定為 BCP 47 語言標籤，例如 `es`、`es-ES` 或 `zh-Hans`。將 `customAppLocale` 設定為 `null` 以使用系統地區設定：
+1. 在通用原始碼集中，使用 `expect` 關鍵字定義預期的 `LocalAppLocale` 物件。地區設定指定為 BCP 47 語言標籤，例如 `es`、`es-ES` 或 `zh-Hans`。將 `customAppLocale` 設定為 `null` 以使用系統地區設定：
 
     ```kotlin
     var customAppLocale by mutableStateOf<String?>(null)
@@ -118,10 +118,6 @@
 5. 對於 Web 平台，繞過 `window.navigator.languages` 屬性的唯讀限制，以引入自訂的地區設定邏輯：
 
     ```kotlin
-    external object window {
-        var __customLocale: String?
-    }
-    
     actual object LocalAppLocale {
         private val LocalAppLocale = staticCompositionLocalOf { Locale.current }
         actual val current: String
@@ -129,9 +125,21 @@
     
         @Composable
         actual infix fun provides(value: String?): ProvidedValue<*> {
-            window.__customLocale = value?.replace('_', '-')
+            updateCustomLocale(value?.replace('_', '-'))
             return LocalAppLocale.provides(Locale.current)
         }
+    }
+    
+    @OptIn(ExperimentalWasmJsInterop::class)
+    private fun updateCustomLocale(value: String?) {
+        js(
+            """
+            if (window.__customLocale !== value) {
+                window.__customLocale = value;
+                window.dispatchEvent(new Event("languagechange"));
+            }
+            """
+        )
     }
     ```
 
@@ -221,7 +229,7 @@ Compose Multiplatform 透過 `isSystemInDarkTheme()` 定義目前的佈景主題
     }
     ```
 
-3. 在 iOS、桌面與 Web 平台上，您可以直接更改 `LocalSystemTheme`：
+3. 在 iOS、桌面與 Web 平台上，您可以直接變更 `LocalSystemTheme`：
 
     ```kotlin
     @OptIn(InternalComposeUiApi::class)

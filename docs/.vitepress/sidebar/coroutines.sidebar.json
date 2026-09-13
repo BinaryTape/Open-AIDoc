@@ -54,11 +54,21 @@
     "link": "select-expression"
   },
   {
-    "text": "coroutines.debug-coroutines-with-idea",
-    "link": "debug-coroutines-with-idea"
-  },
-  {
-    "text": "coroutines.debug-flow-with-idea",
-    "link": "debug-flow-with-idea"
+    "text": "coroutines.coroutine-debugging",
+    "items": [
+      {
+        "text": "coroutines.coroutines-debugging",
+        "link": "coroutines-debugging"
+      },
+      {
+        "text": "coroutines.debug-coroutines-with-idea",
+        "link": "debug-coroutines-with-idea"
+      },
+      {
+        "text": "coroutines.debug-flow-with-idea",
+        "link": "debug-flow-with-idea"
+      }
+    ],
+    "collapsed": true
   }
 ]

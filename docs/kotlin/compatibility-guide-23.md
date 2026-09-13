@@ -1,6 +1,6 @@
 [//]: # (title: Kotlin 2.3.x 兼容性指南)
 
-“保持语言现代性”和“舒适更新”是 Kotlin 语言设计的基本原则。前者指出应当移除阻碍语言演进的构造，后者则强调这种移除应当事先进行良好的沟通，以使代码迁移尽可能顺畅。
+_[保持语言现代性](kotlin-evolution-principles.md)_与_[舒适更新](kotlin-evolution-principles.md)_是 Kotlin 语言设计的基本原则。前者指出应当移除阻碍语言演进的构造，后者则强调这种移除应当事先进行良好的沟通，以使代码迁移尽可能顺畅。
 
 虽然大多数语言变更已经通过其他渠道（如更新日志或编译器警告）宣布，但本文档对这些变更进行了汇总，为从 Kotlin 2.2 迁移到 Kotlin 2.3 提供完整参考。本文档还包含有关工具相关变更的信息。
 
@@ -579,7 +579,7 @@
 > **不兼容变更类型**：源码
 >
 > **简要摘要**：实验性的 `kotlinArtifacts` API 已弃用。请使用 Kotlin Gradle 插件中当前的 DSL 来[构建最终的原生二进制文件](https://kotlinlang.org/docs/multiplatform/multiplatform-build-native-binaries.html)。
-> 如果这不足以完成迁移，请在 [YouTrack 问题](https://youtrack.jetbrains.com/issue/KT-74953)中留下评论。
+> 如果这不足以完成迁移，请在[此 YouTrack 问题](https://youtrack.jetbrains.com/issue/KT-74953)中留下评论。
 >
 > **弃用周期**：
 >
@@ -745,6 +745,7 @@
 > **弃用周期**：
 >
 > - 2.3.20：报告警告
+> - 2.4.20：将警告提升为错误
 
 ### 弃用 `kotlin.kmp.isolated-projects.support` Gradle 属性 {id="deprecate-kotlin-kmp-isolated-projects-support-gradle-property"}
 
@@ -787,7 +788,7 @@
 >
 > **弃用周期**：
 >
-> - 2.3.20：在涉及 `LanguageSettings.enableLanguageFeature` 时报告警告
+> - 2.3.20：在使用 `LanguageSettings.enableLanguageFeature` 时报告警告
 > - 2.4.0：将警告提升为错误
 
 ### 弃用“进程外”编译器执行策略 {id="deprecate-out-of-process-compiler-execution-strategy"}

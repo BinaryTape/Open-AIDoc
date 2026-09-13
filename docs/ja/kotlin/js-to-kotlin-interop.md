@@ -1,10 +1,10 @@
-[//]: # (title: JavaScriptからKotlinコードを使用する)
+[//]: # (title: JavaScript から Kotlin コードを使用する)
 
 選択された [JavaScript モジュール](js-modules.md)システムに応じて、Kotlin/JS コンパイラは異なる出力を生成します。
 しかし、一般的に Kotlin コンパイラは通常の JavaScript のクラス、関数、プロパティを生成するため、JavaScript コードから自由に利用できます。
 ただし、いくつか注意すべき細かい点があります。
 
-## plain モードにおいて個別の JavaScript オブジェクトに宣言を分離する
+## plain モードにおいて個別の JavaScript オブジェクトに宣言を分離する {id="isolating-declarations-in-a-separate-javascript-object-in-plain-mode"}
 
 モジュール形式を明示的に `plain` に設定した場合、Kotlin は現在のモジュールのすべての Kotlin 宣言を含むオブジェクトを作成します。
 これはグローバルオブジェクトを汚染するのを防ぐために行われます。つまり、`myModule` というモジュールの場合、すべての宣言は `myModule` オブジェクトを介して JavaScript から利用可能になります。例えば：
@@ -29,7 +29,7 @@ alert(require('myModule').foo());
 
 JavaScript モジュールシステムの詳細については、[JavaScript モジュール](js-modules.md)を参照してください。
 
-## パッケージ構造
+## パッケージ構造 {id="package-structure"}
 
 ほとんどのモジュールシステム（CommonJS、Plain、UMD）において、Kotlin はそのパッケージ構造を JavaScript に公開します。
 ルートパッケージ以外で宣言を定義する場合、JavaScript では完全修飾名（fully qualified names）を使用する必要があります。
@@ -62,10 +62,10 @@ import { foo } from 'myModule';
 alert(foo());
 ```
 
-### `@JsName` アノテーション
+### `@JsName` アノテーション {id="jsname-annotation"}
 
 場合によっては（例えば、オーバーロードをサポートするため）、Kotlin コンパイラは JavaScript コード内で生成される関数や属性の名前をマングル（難読化・加工）します。
-生成される名前を制御するには、`@JsName` アノテーションを使用できます。
+生成される名前を制御するには、`@JsName` アノテーションを使用できます：
 
 ```kotlin
 // モジュール 'kjs'
@@ -81,7 +81,7 @@ class Person(val name: String) {
 }
 ```
 
-これで、JavaScript からこのクラスを次のように使用できます。
+これで、JavaScript からこのクラスを次のように使用できます：
 
 ```javascript
 // 必要に応じて、選択したモジュールシステムに従って 'kjs' をインポートしてください
@@ -90,7 +90,7 @@ person.hello();                          // "Hello Dmitry!" を出力
 person.helloWithGreeting("Servus");      // "Servus Dmitry!" を出力
 ```
 
-`@JsName` アノテーションを指定しなかった場合、対応する関数の名前には、関数のシグネチャから計算されたサフィックス（例えば `hello_61zpoe`）が含まれます。
+`@JsName` アノテーションを指定しなかった場合、対応する関数の名前には、関数のシグネチャから計算されたサフィックス（例えば `hello_61zpoe$`）が含まれます。
 
 Kotlin コンパイラがマングリングを適用しないケースがいくつかあることに注意してください：
 - `external` 宣言はマングルされません。
@@ -105,7 +105,7 @@ Kotlin コンパイラがマングリングを適用しないケースがいく�
 external fun newC()
 ```
 
-### `@JsExport` アノテーション
+### `@JsExport` アノテーション {id="jsexport-annotation"}
 <primary-label ref="experimental-general"/>
 
 トップレベルの宣言（クラス、インターフェース、関数など）に `@JsExport` アノテーションを適用することで、Kotlin の宣言を JavaScript または TypeScript から利用できるようにします。このアノテーションは、Kotlin で指定された名前ですべてのネストされた宣言をエクスポートします。
@@ -131,7 +131,7 @@ interface Identity {
 * 生成およびエクスポートされる関数の名前を指定するための [`@JsName` アノテーション](#jsname-annotation)との併用。これは、エクスポートにおける曖昧さ（同名の関数のオーバーロードなど）を解決するのに役立ちます。
 * `@file:JsExport` を使用したファイルレベルでの適用。
 
-#### 値クラスのエクスポートのサポート
+#### 値クラスのエクスポート {id="export-value-classes"}
 
 Kotlin の [インライン値クラス（inline value classes）](inline-classes.md)を、通常の TypeScript クラスとしてエクスポートできます。
 
@@ -164,7 +164,50 @@ console.log(await auth.login(new Email("not-an-email")));
 // "Invalid email"
 ```
 
-### `@JsNoRuntime` アノテーション
+#### 中断ラムダ式のエクスポート {id="export-suspending-lambdas"}
+
+Kotlin の[中断ラムダ式（suspending lambda expressions）](lambdas.md#lambda-expressions-and-anonymous-functions)を JavaScript の [async 関数](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function)としてエクスポートできます：
+
+1. この機能を有効にするには、`build.gradle.kts` ファイルに以下のコンパイラオプションを追加します：
+
+    ```kotlin
+    kotlin {
+        js {
+            compilations.all {
+                compileTaskProvider.configure {
+                    compilerOptions {
+                        freeCompilerArgs.add("-Xsuspend-lambda-exporting")
+                    }
+                }
+            }
+        }
+    }
+    ```
+
+2. 関連する Kotlin 宣言に `@JsExport` アノテーションを付加します：
+
+    ```kotlin
+    // Kotlin
+    @JsExport
+    class TaskRunner {
+        suspend fun runTask(task: suspend () -> String): String {
+            return task()
+        }
+    }
+    ```
+
+3. TypeScript 側では、`suspend` ラムダは通常の `async` 関数にマッピングされます：
+
+    ```typescript
+    // TypeScript
+    import { TaskRunner } from "..."
+    
+    const runner = new TaskRunner();
+    const result = await runner.runTask(async () => "done");
+    console.log(result); // "done"
+    ```
+
+### `@JsNoRuntime` アノテーション {id="jsnoruntime-annotation"}
 
 `@JsNoRuntime` アノテーションを使用して、Kotlin インターフェースを JavaScript/TypeScript にエクスポートできます。
 これにより、通常の TypeScript インターフェースへの直接的なマッピングが可能になります。
@@ -216,7 +259,7 @@ Kotlin マルチプラットフォームプロジェクトにおける一般的�
 * [`::class` 構文](js-reflection.md)を使用するクラス参照。
 * [具体化された型引数（reified type argument）](inline-functions.md#reified-type-parameters)として渡されるインターフェース。
 
-### `@JsStatic`
+### `@JsStatic` {id="jsstatic"}
 <primary-label ref="experimental-general"/>
 
 `@JsStatic` アノテーションは、ターゲットとなる宣言に対して追加の静的メソッドを生成するようコンパイラに指示します。
@@ -250,12 +293,12 @@ C.Companion.callNonStatic(); // これが唯一の動作する方法
 
 この機能は[試験的](components-stability.md#stability-levels-explained)です。課題トラッカー [YouTrack](https://youtrack.jetbrains.com/issue/KT-18891/JS-provide-a-way-to-declare-static-members-JsStatic) でフィードバックを共有してください。
 
-### Kotlin の `Long` 型を表現するために `BigInt` 型を使用する
+### Kotlin の `Long` 型を表現するために `BigInt` 型を使用する {id="use-bigint-type-to-represent-kotlin-s-long-type"}
 <primary-label ref="experimental-general"/>
 
 Kotlin/JS は、モダンな JavaScript（ES2020）へコンパイルする際、Kotlin の `Long` 値を表現するために JavaScript の組み込みの `BigInt` 型を使用します。
 
-`BigInt` 型のサポートを有効にするには、`build.gradle(.kts)` ファイルに以下のコンパイラオプションを追加する必要があります。
+`BigInt` 型のサポートを有効にするには、`build.gradle(.kts)` ファイルに以下のコンパイラオプションを追加する必要があります：
 
 ```kotlin
 // build.gradle.kts
@@ -271,7 +314,7 @@ kotlin {
 
 この機能は[試験的](components-stability.md#stability-levels-explained)です。課題トラッカー [YouTrack](https://youtrack.jetbrains.com/issue/KT-57128/KJS-Use-BigInt-to-represent-Long-values-in-ES6-mode) でフィードバックを共有してください。
 
-#### エクスポートされた宣言で `Long` を使用する
+#### エクスポートされた宣言で `Long` を使用する {id="use-long-in-exported-declarations"}
 
 Kotlin の `Long` 型は JavaScript の `BigInt` 型にコンパイルできるため、Kotlin/JS は `Long` 値の JavaScript へのエクスポートをサポートしています。
 
@@ -291,14 +334,14 @@ Kotlin の `Long` 型は JavaScript の `BigInt` 型にコンパイルできる�
     }
     ```
 
-2. `BigInt` 型を有効にします。有効化の方法については、[Kotlin の Long 型を表現するために BigInt 型を使用する](#kotlin-の-long-型を表現するために-bigint-型を使用する)を参照してください。
+2. `BigInt` 型を有効にします。有効化の方法については、[Kotlin の `Long` 型を表現するために `BigInt` 型を使用する](#kotlin-の-long-型を表現するために-bigint-型を使用する)を参照してください。
 
-### Kotlin の `LongArray` 型を表現するために `BigInt64Array` 型を使用する
+### Kotlin の `LongArray` 型を表現するために `BigInt64Array` 型を使用する {id="use-bigint64array-type-to-represent-kotlin-s-longarray-type"}
 <primary-label ref="experimental-general"/>
 
 Kotlin/JS は、JavaScript へコンパイルする際、Kotlin の `LongArray` 値を表現するために JavaScript の組み込みの `BigInt64Array` 型を使用できます。
 
-`BigInt64Array` 型のサポートを有効にするには、`build.gradle(.kts)` ファイルに以下のコンパイラオプションを追加します。
+`BigInt64Array` 型のサポートを有効にするには、`build.gradle(.kts)` ファイルに以下のコンパイラオプションを追加します：
 
 ```kotlin
 // build.gradle.kts
@@ -314,7 +357,7 @@ kotlin {
 
 この機能は[試験的](components-stability.md#stability-levels-explained)です。課題トラッカー [YouTrack](https://youtrack.jetbrains.com/issue/KT-79284/Use-BigInt64Array-for-LongArray) でフィードバックを共有してください。
 
-## JavaScript における Kotlin の型
+## JavaScript における Kotlin の型 {id="kotlin-types-in-javascript"}
 
 Kotlin の型が JavaScript の型にどのようにマッピングされるかを確認してください：
 

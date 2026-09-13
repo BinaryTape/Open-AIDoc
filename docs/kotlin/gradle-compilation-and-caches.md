@@ -279,7 +279,7 @@ kotlin.build.report.output=file
 | `single_file` | 将构建报告以对象格式保存到指定的本地文件。 |
 | `build_scan` | 将构建报告保存到 [build scan](https://scans.gradle.com/) 的 `custom values` 部分。请注意，Gradle Enterprise 插件限制了自定义值的数量及其长度。在大项目中，某些值可能会丢失。 |
 | `http` | 使用 HTTP(S) 发布构建报告。POST 方法以 JSON 格式发送指标。您可以在 [Kotlin 仓库](https://github.com/JetBrains/kotlin/blob/master/libraries/tools/kotlin-gradle-plugin/src/common/kotlin/org/jetbrains/kotlin/gradle/report/data/GradleCompileStatisticsData.kt)中查看所发送数据的当前版本。您可以在[这篇博客文章](https://blog.jetbrains.com/kotlin/2022/06/introducing-kotlin-build-reports/#enable_build_reports)中找到 HTTP 端点的示例 |
-| `json` | 将构建报告以 JSON 格式保存到本地文件。在 `kotlin.build.report.json.directory` 中设置构建报告的位置（见下文）。默认情况下，其名称为 `${project_name}-build-<date-time>-<index>.json`。 |
+| `json` | 将构建报告以 JSON 格式保存到本地文件。默认情况下，其名称为 `${project_folder}/build/reports/kotlin-build/${project_name}-build-<date-time>-<index>.json`。 |
 
 以下是 `kotlin.build.report` 的可用选项列表：
 
@@ -291,10 +291,7 @@ kotlin.build.report.output=file,single_file,http,build_scan,json
 # 用来替代已弃用的 `kotlin.internal.single.build.metrics.file` 属性
 kotlin.build.report.single_file=my/directory/path/some_filename
 
-# 如果使用 json 输出，则为必填。放置报告的位置 
-kotlin.build.report.json.directory=my/directory/path
-
-# 可选。基于文件的报告的输出目录。默认：build/reports/kotlin-build/
+# 可选。基于文件或 JSON 报告的输出目录。默认：build/reports/kotlin-build/
 kotlin.build.report.file.output_dir=kotlin-reports
 
 # 可选。用于标记构建报告的标签（例如，调试参数）
@@ -307,7 +304,7 @@ kotlin.build.report.label=some_label
 # 必填。发布基于 HTTP(S) 的报告的位置
 kotlin.build.report.http.url=http://127.0.0.1:8080
 
-# 可选。如果 HTTP 端点需要身份验证，则提供用户名 and 密码
+# 可选。如果 HTTP 端点需要身份验证，则提供用户名和密码
 kotlin.build.report.http.user=someUser
 kotlin.build.report.http.password=somePassword
 
@@ -321,9 +318,9 @@ kotlin.build.report.include_compiler_arguments=true|false
 
 ### 自定义值的限制 {id="limit-of-custom-values"}
 
-为了收集构建扫描统计信息，Kotlin 构建报告使用了 [Gradle 的自定义值](https://docs.gradle.org/enterprise/tutorials/extending-build-scans/)。
+为了收集构建扫描统计信息，Kotlin 构建报告使用了 [Gradle 的自定义值](https://docs.gradle.com/enterprise/tutorials/extending-build-scans/)。
 您和不同的 Gradle 插件都可以向自定义值写入数据。自定义值的数量有限制。
-请在 [Build scan 插件文档](https://docs.gradle.org/enterprise/gradle-plugin/#adding_custom_values)中查看当前最大的自定义值计数。
+请在 [Build scan 插件文档](https://docs.gradle.com/enterprise/gradle-plugin/#adding_custom_values)中查看当前最大的自定义值计数。
 
 如果您有一个大型项目，此类自定义值的数量可能会非常多。如果该数量超过限制，您可能会在日志中看到以下消息：
 

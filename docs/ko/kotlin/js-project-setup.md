@@ -48,7 +48,7 @@ kotlin {
 * [타겟 디렉토리](#distribution-target-directory) 및 [모듈 이름](#module-name)
 * [프로젝트의 `package.json` 파일](#package-json-customization)
 
-## 실행 환경
+## 실행 환경 {id="execution-environments"}
 
 Kotlin/JS 프로젝트는 두 가지 다른 실행 환경을 타겟으로 할 수 있습니다: 
 
@@ -75,7 +75,7 @@ kotlin {
 
 Kotlin Multiplatform 플러그인은 선택한 환경에 맞춰 작업 태스크를 자동으로 구성합니다. 여기에는 애플리케이션 실행 및 테스트를 위해 필요한 환경과 의존성을 다운로드하고 설치하는 과정이 포함됩니다. 이를 통해 개발자는 추가 설정 없이 간단한 프로젝트를 빌드하고 실행하며 테스트할 수 있습니다. 기존에 설치된 환경을 사용하는 옵션도 있습니다. [사전 설치된 Node.js 사용하기](#use-pre-installed-node-js) 방법을 알아보세요.
 
-## ES2015 기능 지원
+## ES2015 기능 지원 {id="support-for-es2015-features"}
 
 Kotlin은 다음과 같은 ES2015 기능에 대한 지원을 제공합니다:
 
@@ -96,7 +96,7 @@ tasks.withType<KotlinJsCompile>().configureEach {
 
 [공식 문서에서 ES2015(ECMAScript 2015, ES6)에 대해 더 자세히 알아보세요](https://262.ecma-international.org/6.0/).
 
-## 출력 세분화 구성
+## 출력 세분화 구성 {id="configure-output-granularity"}
 
 컴파일러가 프로젝트에서 `.js` 파일을 출력하는 방식을 선택할 수 있습니다:
 
@@ -114,7 +114,7 @@ tasks.withType<KotlinJsCompile>().configureEach {
      kotlin.js.ir.output.granularity=per-file // 'per-module'이 기본값입니다.
      ```
 
-## TypeScript 선언 파일(`d.ts`) 생성
+## TypeScript 선언 파일(`d.ts`) 생성 {id="generation-of-typescript-declaration-files-d-ts"}
 <primary-label ref="experimental-opt-in"/>
 
 Kotlin/JS 컴파일러는 Kotlin 코드에서 TypeScript 정의를 생성할 수 있습니다. 이 정의는 하이브리드 애플리케이션을 작업할 때 JavaScript 도구 및 IDE에서 다음 용도로 사용될 수 있습니다:
@@ -142,7 +142,7 @@ kotlin {
 
 생성된 정의는 `build/js/packages/<package_name>/kotlin` 디렉토리에서 해당 webpack 처리 전 JavaScript 코드와 함께 찾을 수 있습니다.
 
-## 의존성
+## 의존성 {id="dependencies"}
 
 의존성을 선언하려면 `build.gradle(.kts)` 파일의 `jsMain` 소스 세트 내에 `dependencies {}` 블록을 사용하세요:
 
@@ -189,7 +189,7 @@ repositories {
 
 추가하려는 라이브러리에 [npm 패키지](#npm-dependencies)에 대한 의존성이 있는 경우, Gradle은 이러한 전이 의존성(transitive dependencies)도 자동으로 해결합니다.
 
-### Kotlin 표준 라이브러리
+### Kotlin 표준 라이브러리 {id="kotlin-standard-libraries"}
 
 [표준 라이브러리(standard library)](https://kotlinlang.org/api/latest/jvm/stdlib/index.html)에 대한 의존성은 자동으로 추가됩니다. 표준 라이브러리의 버전은 Kotlin Multiplatform 플러그인의 버전과 동일합니다.
 
@@ -226,7 +226,7 @@ kotlin {
 </tab>
 </tabs>
 
-### npm 의존성
+### npm 의존성 {id="npm-dependencies"}
 
 JavaScript 세계에서 의존성을 관리하는 가장 일반적인 방법은 [npm](https://www.npmjs.com/)입니다. npm은 가장 큰 JavaScript 모듈 공용 저장소를 제공합니다.
 
@@ -283,7 +283,7 @@ kotlin.js.yarn=false
 
 npm 의존성이 설치되면, [Kotlin에서 JS 호출하기(Calling JS from Kotlin)](js-interop.md)에 설명된 대로 코드에서 해당 API를 사용할 수 있습니다.
 
-## run 태스크
+## run 태스크 {id="run-task"}
 
 Kotlin Multiplatform Gradle 플러그인은 추가 설정 없이 순수 Kotlin/JS 프로젝트를 실행할 수 있는 `jsBrowserDevelopmentRun` 태스크를 제공합니다.
 
@@ -311,17 +311,25 @@ Node.js를 타겟으로 하는 Kotlin/JS 프로젝트를 실행하려면, `nodeR
 
 프로젝트 빌드가 성공하면 `webpack-dev-server`가 브라우저 페이지를 자동으로 새로고침합니다.
 
-## test 태스크
+## test 태스크 {id="test-task"}
 
-Kotlin Multiplatform Gradle 플러그인은 프로젝트를 위한 테스트 인프라를 자동으로 설정합니다. 브라우저 프로젝트의 경우 [Karma](https://karma-runner.github.io/) 테스트 러너와 기타 필요한 의존성을 다운로드하고 설치하며, Node.js 프로젝트의 경우 [Mocha](https://mochajs.org/) 테스트 프레임워크가 사용됩니다.
+Kotlin Multiplatform Gradle 플러그인은 프로젝트를 위한 테스트 인프라를 자동으로 설정합니다. 필요한 테스트 러너와 기타 의존성을 다운로드하고 설치합니다.
+
+브라우저 프로젝트의 경우 [Karma](#karma) 테스트 러너와 새로운 [브라우저 테스트용 DSL](#dsl-for-browser-testing) 중에서 선택할 수 있습니다. Node.js 프로젝트의 경우 [Mocha](#node-js-test-task) 테스트 프레임워크를 사용할 수 있습니다.
 
 플러그인은 다음과 같은 유용한 테스트 기능도 제공합니다:
 
-* 소스 맵(Source maps) 생성
+* 소스 맵(Source map) 생성
 * 테스트 보고서 생성
 * 콘솔에 테스트 실행 결과 표시
 
-브라우저 테스트 실행을 위해 플러그인은 기본적으로 [Headless Chrome](https://chromium.googlesource.com/chromium/src/+/lkgr/headless/README.md)을 사용합니다. 빌드 스크립트의 `useKarma {}` 블록 내에 해당 항목을 추가하여 테스트를 실행할 다른 브라우저를 선택할 수도 있습니다:
+### Karma {id="karma"}
+
+> Karma 프로젝트는 [지원 중단(deprecated)](https://github.com/karma-runner/karma#karma)되었습니다. 새로운 기능 추가나 버그 수정은 기대할 수 없습니다. 브라우저 테스트를 위한 대안으로 새로운 [브라우저 테스트용 DSL](#dsl-for-browser-testing)을 사용해 보세요.
+> 
+{style="warning"}
+
+[Karma](https://karma-runner.github.io/) 테스트 러너를 구성하려면, `build.gradle(.kts)` 파일의 브라우저 `testTask` 내에 `useKarma {}` 블록을 추가하세요. 예를 들어 특정 브라우저를 대상으로 테스트를 실행하려면 다음과 같이 사용합니다:
 
 ```kotlin
 kotlin {
@@ -352,33 +360,70 @@ kotlin {
 kotlin.js.browser.karma.browsers=firefox,safari
 ```
 
-이 방식을 사용하면 모든 모듈에 대해 브라우저 목록을 정의한 다음, 특정 모듈의 빌드 스크립트에서 특정 브라우저를 추가할 수 있습니다.
+이 방식을 사용하면 모든 모듈에 대해 브라우저 목록을 정의한 다음, 특정 모듈의 빌드 파일에서 특정 브라우저를 추가할 수 있습니다.
 
-Kotlin Multiplatform Gradle 플러그인이 이러한 브라우저를 자동으로 설치해주지는 않으며, 실행 환경에서 사용 가능한 브라우저만 사용한다는 점에 유의하세요. 예를 들어 지속적 통합(CI) 서버에서 Kotlin/JS 테스트를 실행하는 경우, 테스트하려는 브라우저가 설치되어 있는지 확인해야 합니다.
+Kotlin Multiplatform Gradle 플러그인은 빌드 시점에 `build/js/packages/projectName-test/karma.conf.js` 위치에 Karma 구성 파일을 자동으로 생성합니다. 이 파일에는 빌드 파일의 `useKarma {}` 블록에서 설정한 항목들이 포함됩니다.
 
-테스트를 건너뛰려면 `testTask {}`에 `enabled = false` 라인을 추가하세요:
+프로젝트 루트의 `karma.config.d` 디렉토리 내에 추가 구성 파일을 배치할 수도 있습니다. 이 디렉토리에 있는 모든 `.js` 구성 파일은 빌드 시점에 자동으로 감지되어 생성된 `karma.conf.js`에 병합됩니다.
+
+Karma 구성에 대한 자세한 내용은 [Karma 문서](https://karma-runner.github.io/6.4/config/configuration-file.html)를 참조하세요.
+
+### 브라우저 테스트용 DSL {id="dsl-for-browser-testing"}
+<primary-label ref="experimental-opt-in"/>
+
+Kotlin은 브라우저 환경에서 Kotlin/JS 테스트를 실행하기 위한 실험적 DSL을 제공합니다. 이는 특정 기술에 종속되지 않도록(technology-agnostic) 설계되었습니다. 현재 구현에는 내부적으로 다음과 같은 도구들이 포함되어 있습니다:
+
+* [Playwright](https://playwright.dev/): Chromium, Firefox 및 WebKit(Safari) 브라우저 엔진을 지원하는 브라우저 드라이버이자 배포 관리자 역할을 합니다.
+* [Mocha](https://mochajs.org/): 테스트 러너 역할을 합니다.
+* [webpack](https://webpack.js.org/): 번들러 역할을 합니다([향후 릴리스](https://youtrack.jetbrains.com/issue/KT-48308/)에서 [Vite](https://vite.dev/)로 대체될 예정).
+
+새로운 브라우저 테스트용 DSL을 사용해 보려면, Kotlin/JS 타겟의 `browser {}` 내에 옵트인 `test {}` 블록을 추가하세요:
 
 ```kotlin
+import org.jetbrains.kotlin.gradle.ExperimentalJsTestDsl
+import kotlin.time.Duration.Companion.seconds
+
 kotlin {
     js {
         browser {
-            testTask {
-                enabled = false
+            @OptIn(ExperimentalJsTestDsl::class)
+            test {
+                // kotlin.Duration을 사용하여 모든 러너의 기본 타임아웃 구성
+                timeout = 30.seconds
+                // Gradle provider를 사용하여 headless 모드 구성
+                headless = providers
+                    .environmentVariable("IS_IN_CI")
+                    .map { it.toBoolean() }
+                    .orElse(false)
+                // 커스텀 Chromium 러너 활성화 및 구성
+                chromium("chromium-no-webgl2") {
+                    // 이 러너에 대한 기본 타임아웃 재정의
+                    timeout = 10.seconds
+
+                    // Chromium 전용 추가 실행 인자
+                    launchArgs.add("--disable-webgl2")
+                }
+                // Firefox 러너 활성화
+                firefox()
+                // WebKit(Safari) 테스트 러너 활성화
+                webkit()
+                // 커스텀 WebKit 러너 활성화 및 구성
+                webkit("headful") {
+                    headless = false
+                }
             }
         }
-        binaries.executable()
-        // ...
     }
 }
 ```
 
-테스트를 실행하려면 표준 수명 주기 태스크인 `check`를 실행하세요:
+새로운 브라우저 테스트용 DSL 구성에 대한 자세한 내용은 [Kotlin/JS에서 테스트 실행](js-running-tests.md#advanced-configuration)을 참조하세요.
 
-```bash
-./gradlew check
-```
+### Node.js {id="node-js-test-task"}
 
-Node.js 테스트 러너에서 사용되는 환경 변수를 지정하려면(예: 테스트에 외부 정보를 전달하거나 패키지 확인을 미세 조정하기 위해), 빌드 스크립트의 `testTask {}` 블록 내에서 `environment()` 함수를 키-값 쌍과 함께 사용하세요:
+Node.js 프로젝트의 경우, Kotlin Multiplatform Gradle 플러그인은 [Mocha](https://mochajs.org/) 테스트 프레임워크를 자동으로 설정합니다.
+
+Node.js 테스트 러너에서 사용되는 환경 변수를 지정하려면(예: 테스트에 외부 정보를 전달하거나 패키지 해결을 미세 조정하기 위해), 빌드 파일의 `testTask {}` 블록 내에서 `environment()` 함수를 키-값 쌍과 함께 사용하세요:
 
 ```kotlin
 kotlin {
@@ -392,18 +437,40 @@ kotlin {
 }
 ```
 
-### Karma 구성
+### 테스트 실행 {id="run-tests"}
 
-Kotlin Multiplatform Gradle 플러그인은 빌드 시점에 `build.gradle(.kts)`의 [`kotlin.js.browser.testTask.useKarma {}` 블록](#test-task) 설정을 포함하는 Karma 구성 파일을 자동으로 생성합니다. 이 파일은 `build/js/packages/projectName-test/karma.conf.js`에서 찾을 수 있습니다.
-Karma에서 사용하는 구성을 조정하려면, 프로젝트 루트에 `karma.config.d`라는 디렉토리를 만들고 그 안에 추가 구성 파일을 배치하세요. 이 디렉토리에 있는 모든 `.js` 구성 파일은 빌드 시점에 자동으로 감지되어 생성된 `karma.conf.js`에 병합됩니다.
+기본적으로 Kotlin Multiplatform Gradle 플러그인은 브라우저 테스트를 실행하기 위해 [Headless Chrome](https://chromium.googlesource.com/chromium/src/+/lkgr/headless/README.md)을 사용합니다. 플러그인에는 브라우저가 번들로 포함되어 있지 않으며, 테스트 러너마다 누락된 브라우저를 다루는 방식이 다릅니다:
 
-모든 Karma 구성 기능은 Karma의 [문서](https://karma-runner.github.io/5.0/config/configuration-file.html)에 잘 설명되어 있습니다.
+* [Karma](#karma)를 사용하는 경우, 플러그인이 테스트를 실행하는 데 사용할 수 있도록 필요한 다른 브라우저가 머신에 이미 설치되어 있어야 합니다. 지속적 통합(CI) 서버에서 Kotlin/JS 테스트를 실행하는 경우, 테스트하려는 브라우저가 해당 서버에도 설치되어 있는지 확인하세요.
+* 새로운 [브라우저 테스트용 DSL](#dsl-for-browser-testing)을 사용하는 경우, 플러그인은 처음 실행할 때 [`playwright install`](https://playwright.dev/docs/browsers#install-browsers) 명령을 사용하여 필요한 브라우저를 설치합니다. Playwright가 이러한 브라우저의 위치를 관리하며, 로컬에 설치된 브라우저는 사용하지 않습니다.
 
-## webpack 번들링
+테스트를 실행하려면 표준 수명 주기 태스크인 `check`를 실행하세요:
+
+```bash
+./gradlew check
+```
+
+테스트를 건너뛰려면 빌드 파일의 `testTask {}` 블록에서 테스트를 비활성화하세요:
+
+```kotlin
+kotlin {
+    js {
+        browser {
+            testTask {
+                enabled.set(false)
+            }
+        }
+        binaries.executable()
+        // ...
+    }
+}
+```
+
+## webpack 번들링 {id="webpack-bundling"}
 
 브라우저 타겟의 경우, Kotlin Multiplatform Gradle 플러그인은 널리 알려진 [webpack](https://webpack.js.org/) 모듈 번들러를 사용합니다.
 
-### webpack 태스크
+### webpack 태스크 {id="webpack-task"}
 
 가장 일반적인 webpack 조정은 Gradle 빌드 파일의 `kotlin.js.browser.webpackTask {}` 구성 블록을 통해 직접 수행할 수 있습니다:
 * `mainOutputFileName` - webpack 출력 파일의 이름입니다. webpack 태스크 실행 후 `<projectDir>/build/kotlin-webpack/<targetName>/<binaryName>`에 생성됩니다. 기본값은 프로젝트 이름입니다.
@@ -418,7 +485,7 @@ webpackTask {
 
 번들링, 실행 및 테스트 태스크에서 공통으로 사용할 webpack 설정은 `commonWebpackConfig {}` 블록에서 구성할 수 있습니다.
 
-### webpack 구성 파일 
+### webpack 구성 파일 {id="webpack-configuration-file"}
 
 Kotlin Multiplatform Gradle 플러그인은 빌드 시점에 표준 webpack 구성 파일을 자동으로 생성합니다. 이 파일은 `build/js/packages/projectName/webpack.config.js`에 위치합니다.
 
@@ -438,7 +505,7 @@ config.module.rules.push({
 
 모든 webpack 구성 기능은 webpack [문서](https://webpack.js.org/concepts/configuration/)에 잘 설명되어 있습니다.
 
-### 실행 파일 빌드
+### 실행 파일 빌드 {id="building-executables"}
 
 webpack을 통해 실행 가능한 JavaScript 아티팩트를 빌드하기 위해 Kotlin Multiplatform Gradle 플러그인은 `jsBrowserDevelopmentWebpack` 및 `jsBrowserProductionWebpack` Gradle 태스크를 포함하고 있습니다.
 
@@ -461,7 +528,7 @@ webpack을 통해 실행 가능한 JavaScript 아티팩트를 빌드하기 위�
 
 이 태스크는 프로젝트 리소스를 포함하여 바로 사용할 수 있는 배포물을 생성합니다.
 
-## CSS
+## CSS {id="css"}
 
 Kotlin Multiplatform Gradle 플러그인은 webpack의 [CSS](https://webpack.js.org/loaders/css-loader/) 및 [style](https://webpack.js.org/loaders/style-loader/) 로더에 대한 지원도 제공합니다. 프로젝트를 빌드하는 데 사용되는 [webpack 구성 파일](#webpack-bundling)을 직접 수정하여 모든 옵션을 변경할 수 있지만, 가장 자주 사용되는 설정은 `build.gradle(.kts)` 파일에서 직접 사용할 수 있습니다.
 
@@ -563,13 +630,13 @@ browser {
 
 동일한 프로젝트에서 서로 다른 모드를 사용하려면 `cssSupport.rules`를 사용하세요. 여기에서 각각 모드를 정의하는 `KotlinWebpackCssRules` 목록과 [include](https://webpack.js.org/configuration/module/#ruleinclude) 및 [exclude](https://webpack.js.org/configuration/module/#ruleexclude) 패턴을 지정할 수 있습니다.
 
-## Node.js
+## Node.js {id="node-js"}
 
 Node.js를 타겟으로 하는 Kotlin/JS 프로젝트의 경우, 플러그인이 호스트에 Node.js 환경을 자동으로 다운로드하고 설치합니다. 이미 설치된 Node.js 인스턴스가 있다면 그것을 사용할 수도 있습니다.
 
 각 하위 프로젝트에 대해 Node.js 설정을 구성하거나 프로젝트 전체에 대해 설정할 수 있습니다.
 
-### Node.js 버전 변경
+### Node.js 버전 변경 {id="change-node-js-version"}
 
 기본 Node.js 버전은 현재 24.16.0이지만, 특정 하위 프로젝트에 대해 다른 버전을 사용할 수 있습니다. 하위 프로젝트의 `build.gradle(.kts)` 파일에 다음 라인을 추가하세요. 예:
 
@@ -621,7 +688,7 @@ allprojects {
 </tab>
 </tabs>
 
-### 사전 설치된 Node.js 사용하기
+### 사전 설치된 Node.js 사용하기 {id="use-pre-installed-node-js"}
 
 Kotlin/JS 프로젝트를 빌드하는 호스트에 이미 Node.js가 설치되어 있는 경우, 자체 Node.js 인스턴스를 설치하는 대신 이를 사용하도록 Kotlin Multiplatform Gradle 플러그인을 구성할 수 있습니다.
 
@@ -650,11 +717,11 @@ project.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsPlu
 </tab>
 </tabs>
 
-## Yarn
+## Yarn {id="yarn"}
 
 기본적으로 빌드 시점에 선언된 의존성을 다운로드하고 설치하기 위해 플러그인은 자체 [Yarn](https://yarnpkg.com/lang/en/) 패키지 관리자 인스턴스를 관리합니다. 추가 구성 없이 바로 작동하지만, 이를 미세 조정하거나 호스트에 이미 설치된 Yarn을 사용할 수 있습니다.
 
-### 추가 Yarn 기능: .yarnrc
+### 추가 Yarn 기능: .yarnrc {id="additional-yarn-features-yarnrc"}
 
 추가적인 Yarn 기능을 구성하려면 프로젝트 루트에 `.yarnrc` 파일을 배치하세요.
 빌드 시점에 자동으로 감지됩니다.
@@ -667,7 +734,7 @@ registry "http://my.registry/api/npm/"
 
 `.yarnrc`에 대해 더 자세히 알아보려면 [공식 Yarn 문서](https://classic.yarnpkg.com/en/docs/yarnrc/)를 방문하세요.
 
-### 사전 설치된 Yarn 사용하기
+### 사전 설치된 Yarn 사용하기 {id="use-pre-installed-yarn"}
 
 Kotlin/JS 프로젝트를 빌드하는 호스트에 이미 Yarn이 설치되어 있는 경우, 자체 Yarn 인스턴스를 설치하는 대신 이를 사용하도록 Kotlin Multiplatform Gradle 플러그인을 구성할 수 있습니다.
 
@@ -696,7 +763,7 @@ rootProject.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlu
 </tab>
 </tabs>
 
-### kotlin-js-store를 통한 버전 고정
+### kotlin-js-store를 통한 버전 고정 {id="version-locking-via-kotlin-js-store"}
 
 프로젝트 루트의 `kotlin-js-store` 디렉토리는 버전 고정에 필요한 `yarn.lock` 파일을 보관하기 위해 Kotlin Multiplatform Gradle 플러그인에 의해 자동으로 생성됩니다. lock 파일은 Yarn 플러그인에 의해 완전히 관리되며 `kotlinNpmInstall` Gradle 태스크 실행 중에 업데이트됩니다.
 
@@ -735,7 +802,7 @@ rootProject.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlu
 
 `yarn.lock`에 대해 더 자세히 알아보려면 [공식 Yarn 문서](https://classic.yarnpkg.com/lang/en/docs/yarn-lock/)를 방문하세요.
 
-### yarn.lock 업데이트 보고
+### yarn.lock 업데이트 보고 {id="reporting-that-yarn-lock-has-been-updated"}
 
 Kotlin/JS는 `yarn.lock` 파일이 업데이트되었을 때 이를 알려주는 Gradle 설정을 제공합니다. CI 빌드 프로세스 중에 `yarn.lock`이 자동으로 변경되었는지 확인하고 싶을 때 이 설정을 사용할 수 있습니다:
 
@@ -781,7 +848,7 @@ rootProject.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlu
 </tab>
 </tabs>
 
-### 기본적으로 --ignore-scripts를 사용하여 npm 의존성 설치
+### 기본적으로 --ignore-scripts를 사용하여 npm 의존성 설치 {id="installing-npm-dependencies-with-ignore-scripts-by-default"}
 
 해킹된 npm 패키지로부터 악성 코드가 실행될 가능성을 줄이기 위해, Kotlin Multiplatform Gradle 플러그인은 기본적으로 npm 의존성 설치 중에 [수명 주기 스크립트(lifecycle scripts)](https://docs.npmjs.com/cli/v8/using-npm/scripts#life-cycle-scripts)가 실행되는 것을 방지합니다.
 
@@ -808,7 +875,7 @@ rootProject.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlu
 </tab>
 </tabs>
 
-## 배포 타겟 디렉토리
+## 배포 타겟 디렉토리 {id="distribution-target-directory"}
 
 기본적으로 Kotlin/JS 프로젝트 빌드 결과물은 프로젝트 루트 내의 `/build/dist/<targetName>/<binaryName>` 디렉토리에 위치합니다.
 
@@ -851,7 +918,7 @@ kotlin {
 </tab>
 </tabs>
 
-## 모듈 이름
+## 모듈 이름 {id="module-name"}
 
 해당 `.js` 및 `.d.ts` 파일을 포함하여 JavaScript *모듈*(이는 `build/js/packages/myModuleName`에 생성됨)의 이름을 조정하려면 `outputModuleName` 옵션을 사용하세요:
 
@@ -865,7 +932,7 @@ kotlin {
 
 이 설정은 `build/dist`에 있는 webpack 출력물에는 영향을 주지 않는다는 점에 유의하세요.
 
-## package.json 사용자 정의
+## package.json 사용자 정의 {id="package-json-customization"}
 
 `package.json` 파일은 JavaScript 패키지의 메타데이터를 보관합니다. npm과 같은 대중적인 패키지 저장소는 게시된 모든 패키지에 이 파일이 포함되도록 요구합니다. 이 파일은 패키지 게시물을 추적하고 관리하는 데 사용됩니다.
 

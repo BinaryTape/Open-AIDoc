@@ -119,10 +119,6 @@
 5. Web プラットフォームでは、カスタムロケールロジックを導入するために、`window.navigator.languages` プロパティの読み取り専用制限をバイパスします：
 
     ```kotlin
-    external object window {
-        var __customLocale: String?
-    }
-    
     actual object LocalAppLocale {
         private val LocalAppLocale = staticCompositionLocalOf { Locale.current }
         actual val current: String
@@ -130,9 +126,21 @@
     
         @Composable
         actual infix fun provides(value: String?): ProvidedValue<*> {
-            window.__customLocale = value?.replace('_', '-')
+            updateCustomLocale(value?.replace('_', '-'))
             return LocalAppLocale.provides(Locale.current)
         }
+    }
+    
+    @OptIn(ExperimentalWasmJsInterop::class)
+    private fun updateCustomLocale(value: String?) {
+        js(
+            """
+            if (window.__customLocale !== value) {
+                window.__customLocale = value;
+                window.dispatchEvent(new Event("languagechange"));
+            }
+            """
+        )
     }
     ```
 

@@ -226,21 +226,28 @@ dependencies {
 > 你可以在程式碼輸出中的執行緒名稱旁顯示協同程式名稱，以獲得額外資訊。
 > 為此，請在你的建置工具或 IDE 執行配置中傳遞 `-Dkotlinx.coroutines.debug` VM 選項。
 >
-> 請參閱[偵錯協同程式](https://github.com/Kotlin/kotlinx.coroutines/blob/master/docs/topics/debugging.md)以獲取更多資訊。
+> 請參閱[偵錯協同程式](coroutines-debugging.md)以獲取更多資訊。
 >
 {style="tip"}
 
 ## 協同程式作用域與結構化並行
 
-當你在應用程式中執行許多協同程式時，你需要一種將它們作為群組管理的方法。Kotlin 協同程式依賴一個稱為 _結構化並行 (structured concurrency)_ 的原則來提供這種結構。
+當你在應用程式中執行許多協同程式時，你需要一種將它們作為群組管理的方法。
+Kotlin 協同程式依賴一個稱為 _結構化並行 (structured concurrency)_ 的原則來提供這種結構。
 
-根據這個原則，協同程式會形成一個父項與子項任務的樹狀階層結構，並具有連結的生命週期。協同程式的生命週期是從其建立到完成、失敗或取消的一系列狀態。
+根據這個原則，協同程式會形成一個父項與子項任務的樹狀階層結構，並具有連結的生命週期。
+協同程式的生命週期是從其建立到完成、失敗或取消的一系列狀態。
 
-父項協同程式會等待其所有子項完成後才結束。如果父項協同程式失敗或被取消，其所有子項協同程式也會被遞迴取消。保持協同程式以此方式連結，可以讓取消和錯誤處理變得可預測且安全。
+父項協同程式會等待其所有子項完成後才結束。
+如果父項協同程式失敗或被取消，其所有子項協同程式也會被遞迴取消。
+保持協同程式以此方式連結，可以讓取消和錯誤處理變得可預測且安全。
 
-為了維持結構化並行，新的協同程式只能在定義並管理其生命週期的 [`CoroutineScope`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-coroutine-scope/) 中啟動。`CoroutineScope` 包含 _協同程式上下文 (coroutine context)_，其定義了分派器與其他執行屬性。當你在另一個協同程式內部啟動協同程式時，它會自動成為其父項作用域的子項。
+為了維持結構化並行，新的協同程式只能在定義並管理其生命週期的 [`CoroutineScope`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-coroutine-scope/) 中啟動。
+`CoroutineScope` 包含 _協同程式上下文 (coroutine context)_，其定義了分派器與其他執行屬性。
+當你在另一個協同程式內部啟動協同程式時，它會自動成為其父項作用域的子項。
 
-在 `CoroutineScope` 上呼叫 [協同程式建構器函式](#coroutine-builder-functions)（例如 `CoroutineScope.launch()`）會啟動一個與該作用域相關聯的協同程式的子項。在建構器的區塊內，[接收者 (receiver)](lambdas.md#function-literals-with-receiver) 是一個巢狀的 `CoroutineScope`，因此你在該處啟動的任何協同程式都會成為其子項。
+在 `CoroutineScope` 上呼叫 [協同程式建構器函式](#coroutine-builder-functions)（例如 `CoroutineScope.launch()`）會啟動一個與該作用域相關聯的協同程式的子項。
+在建構器的區塊內，[接收者 (receiver)](lambdas.md#function-literals-with-receiver) 是一個巢狀的 `CoroutineScope`，因此你在該處啟動的任何協同程式都會成為其子項。
 
 ### 使用 `coroutineScope()` 函式建立協同程式作用域
 
@@ -283,7 +290,8 @@ suspend fun main() {
 ```
 {kotlin-runnable="true"}
 
-由於此範例中未指定 [分派器](#coroutine-dispatchers)，因此 `coroutineScope()` 區塊中的 `CoroutineScope.launch()` 建構器函式會繼承當前的上下文。如果該上下文沒有指定的分派器，`CoroutineScope.launch()` 會使用 `Dispatchers.Default`，它在共享執行緒池上執行。
+由於此範例中未指定 [分派器](#coroutine-dispatchers)，因此 `coroutineScope()` 區塊中的 `CoroutineScope.launch()` 建構器函式會繼承當前的上下文。
+如果該上下文沒有指定的分派器，`CoroutineScope.launch()` 會使用 `Dispatchers.Default`，它在共享執行緒池上執行。
 
 ### 從協同程式作用域中提取協同程式建構器 {id="extract-coroutine-builders-from-the-coroutine-scope"}
 
@@ -308,7 +316,9 @@ suspend fun main() {
 >
 {style="tip"}
 
-`coroutineScope()` 函式接受一個具有 `CoroutineScope` 接收者的 Lambda。在該 Lambda 內部，隱含接收者是一個 `CoroutineScope`，因此像 `CoroutineScope.launch()` 與 [`CoroutineScope.async()`](#coroutinescope-async) 這樣的建構器函式會被解析為該接收者上的 [擴充函式](extensions.md#extension-functions) 上。
+`coroutineScope()` 函式接受一個具有 `CoroutineScope` 接收者的 Lambda。
+在該 Lambda 內部，隱含接收者是一個 `CoroutineScope`，因此像 `CoroutineScope.launch()` 與 [`CoroutineScope.async()`](#coroutinescope-async) 這樣的建構器函式會被解析為該接收者上的
+[擴充函式](extensions.md#extension-functions)。
 
 要將協同程式建構器提取到另一個函式中，該函式必須宣告一個 `CoroutineScope` 接收者，否則會發生編譯錯誤：
 
@@ -338,11 +348,13 @@ fun launchAll() {
 ```
 {kotlin-runnable="true"}
 
-在執行此範例時，`launchAll()` 函式不需要 `suspend` 關鍵字，因為它僅在當前的 `CoroutineScope` 中啟動協同程式並立即返回。僅在函式需要在返回前暫停與恢復時，才將其標記為 `suspend`。
+在此範例中，`launchAll()` 函式不需要 `suspend` 關鍵字，因為它僅在當前的 `CoroutineScope` 中啟動協同程式並立即返回。
+僅在函式需要在返回前暫停與恢復時，才將其標記為 `suspend`。
 
 ## 協同程式建構器函式 {id="coroutine-builder-functions"}
 
-協同程式建構器函式是一個接受 `suspend` [Lambda](lambdas.md) 的函式，該 Lambda 定義了要執行的協同程式。這裡有一些範例：
+協同程式建構器函式是一個接受 `suspend` [Lambda](lambdas.md) 的函式，該 Lambda 定義了要執行的協同程式。
+這裡有一些範例：
 
 * [`CoroutineScope.launch()`](#coroutinescope-launch)
 * [`CoroutineScope.async()`](#coroutinescope-async)
@@ -350,11 +362,14 @@ fun launchAll() {
 * [`withContext()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/with-context.html)
 * [`coroutineScope()`](#create-a-coroutine-scope-with-the-coroutinescope-function)
 
-協同程式建構器函式需要一個 `CoroutineScope` 才能執行。這可以是現有的作用域，也可以是使用 `coroutineScope()`、[`runBlocking()`](#runblocking) 或 [`withContext()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/with-context.html#) 等輔助函式建立的作用域。每個建構器都定義了協同程式如何啟動以及你如何與其結果進行互動。
+協同程式建構器函式需要一個 `CoroutineScope` 才能執行。
+這可以是現有的作用域，也可以是使用 `coroutineScope()`、[`runBlocking()`](#runblocking) 或 [`withContext()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/with-context.html#) 等輔助函式建立的作用域。
+每個建構器都定義了協同程式如何啟動以及你如何與其結果進行互動。
 
 ### `CoroutineScope.launch()` {id="coroutinescope-launch"}
 
-[`CoroutineScope.launch()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/launch.html#) 協同程式建構器函式是 `CoroutineScope` 上的擴充函式。它在現有的 [協同程式作用域](#coroutine-scope-and-structured-concurrency) 內啟動一個新的協同程式，且不會阻塞作用域的其餘部分。
+[`CoroutineScope.launch()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/launch.html#) 協同程式建構器函式是 `CoroutineScope` 上的擴充函式。
+它在現有的 [協同程式作用域](#coroutine-scope-and-structured-concurrency) 內啟動一個新的協同程式，且不會阻塞作用域的其餘部分。
 
 當不需要結果或你不希望等待結果時，請使用 `CoroutineScope.launch()` 與其他工作一起並行執行任務：
 
@@ -396,7 +411,9 @@ suspend fun performBackgroundWork() = coroutineScope { // this: CoroutineScope
 
 ### `CoroutineScope.async()` {id="coroutinescope-async"}
 
-[`CoroutineScope.async()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/async.html) 協同程式建構器函式是 `CoroutineScope` 上的擴充函式。它在現有的 [協同程式作用域](#coroutine-scope-and-structured-concurrency) 內啟動一個並行計算，並回傳一個代表最終結果的 [`Deferred`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-deferred/) 控制代碼。使用 `.await()` 函式來暫停程式碼，直到結果就緒為止：
+[`CoroutineScope.async()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/async.html) 協同程式建構器函式是 `CoroutineScope` 上的擴充函式。
+它在現有的 [協同程式作用域](#coroutine-scope-and-structured-concurrency) 內啟動一個並行計算，並回傳一個代表最終結果的 [`Deferred`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-deferred/) 控制代碼。
+使用 `.await()` 函式來暫停程式碼，直到結果就緒為止：
 
 ```kotlin
 // 匯入 kotlin.time.Duration 以毫秒為單位表示時長
@@ -428,7 +445,8 @@ suspend fun main() = withContext(Dispatchers.Default) { // this: CoroutineScope
 
 ### `runBlocking()` {id="runblocking"}
 
-[`runBlocking()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/run-blocking.html) 協同程式建構器函式會建立一個協同程式作用域，並阻塞當前 [執行緒](#comparing-coroutines-and-jvm-threads)，直到該作用域內啟動的協同程式完成。
+[`runBlocking()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/run-blocking.html) 協同程式建構器函式會建立一個協同程式作用域，並阻塞當前 [執行緒](#comparing-coroutines-and-jvm-threads)，直到
+該作用域內啟動的協同程式完成。
 
 僅在沒有其他選擇從非暫停程式碼呼叫暫停程式碼時，才使用 `runBlocking()`：
 
@@ -458,14 +476,18 @@ suspend fun myReadItem(): Int {
 
 ## 協同程式分派器 {id="coroutine-dispatchers"}
 
-一個 [_協同程式分派器 (coroutine dispatcher)_](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-dispatchers/#) 控制協同程式執行時使用哪個執行緒或執行緒池。協同程式並不總是繫結於單一執行緒。根據分派器的不同，它們可以在一個執行緒上暫停並在另一個執行緒上恢復。這讓你可以同時執行許多協同程式，而無需為每個協同程式分配個別的執行緒。
+一個 [_協同程式分派器 (coroutine dispatcher)_](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-dispatchers/#) 控制協同程式執行時使用哪個執行緒或執行緒池。
+協同程式並不總是繫結於單一執行緒。
+根據分派器的不同，它們可以在一個執行緒上暫停並在另一個執行緒上恢復。
+這讓你可以同時執行許多協同程式，而無需為每個協同程式分配個別的執行緒。
 
 > 儘管協同程式可以在不同的執行緒上暫停與恢復，
 > 但在協同程式暫停前寫入的值，保證在協同程式恢復時仍然可以在同一個協同程式中使用。
 >
 {style="tip"}
 
-分派器與 [協同程式作用域](#coroutine-scope-and-structured-concurrency) 配合運作，以定義協同程式何時執行以及在何處執行。雖然協同程式作用域控制協同程式的生命週期，但分派器控制使用哪些執行緒進行執行。
+分派器與 [協同程式作用域](#coroutine-scope-and-structured-concurrency) 配合運作，以定義協同程式何時執行以及在何處執行。
+雖然協同程式作用域控制協同程式的生命週期，但分派器控制使用哪些執行緒進行執行。
 
 > 你不必為每個協同程式都指定分派器。
 > 預設情況下，協同程式會從其父項作用域繼承分派器。
@@ -475,7 +497,9 @@ suspend fun myReadItem(): Int {
 >
 {style="note"}
 
-`kotlinx.coroutines` 程式庫包含了針對不同使用案例的不同分派器。例如，[`Dispatchers.Default`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-dispatchers/-default.html) 在共享執行緒池上執行協同程式，在背景執行工作，與主執行緒分離。這使其成為資料處理等 CPU 密集型操作的理想選擇。
+`kotlinx.coroutines` 程式庫包含了針對不同使用案例的不同分派器。
+例如，[`Dispatchers.Default`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-dispatchers/-default.html) 在共享執行緒池上執行協同程式，在背景執行工作，
+與主執行緒分離。這使其成為資料處理等 CPU 密集型操作的理想選擇。
 
 要為 `CoroutineScope.launch()` 等協同程式建構器指定分派器，請將其作為引數傳遞：
 
@@ -527,9 +551,15 @@ suspend fun main() = withContext(Dispatchers.Default) { // this: CoroutineScope
 
 雖然協同程式是可暫停的計算，且能像 JVM 上的執行緒一樣並行執行程式碼，但它們在底層的運作方式不同。
 
-_執行緒 (thread)_ 由作業系統管理。執行緒可以在多個 CPU 核心上平行執行任務，代表了 JVM 上並行的標準方法。當你建立一個執行緒時，作業系統會為其堆疊分配記憶體，並使用核心在執行緒之間進行切換。這使得執行緒功能強大，但也耗費資源。每個執行緒通常需要幾 MB 的記憶體，且通常 JVM 同時只能處理幾千個執行緒。
+_執行緒 (thread)_ 由作業系統管理。執行緒可以在多個 CPU 核心上平行執行任務，代表了 JVM 上並行的標準方法。
+當你建立一個執行緒時，作業系統會為其堆疊分配記憶體，並使用核心在執行緒之間進行切換。
+這使得執行緒功能強大，但也耗費資源。
+每個執行緒通常需要幾 MB 的記憶體，且通常 JVM 同時只能處理幾千個執行緒。
 
-另一方面，協同程式並不繫結於特定的執行緒。它可以在一個執行緒上暫停並在另一個執行緒上恢復，因此許多協同程式可以共用同一個執行緒池。當協同程式暫停時，執行緒不會被阻塞，並能自由執行其他任務。這使得協同程式比執行緒輕量得多，並允許在一個程序中執行數百萬個協同程式而不會耗盡系統資源。
+另一方面，協同程式並不繫結於特定的執行緒。
+它可以在一個執行緒上暫停並在另一個執行緒上恢復，因此許多協同程式可以共用同一個執行緒池。
+當協同程式暫停時，執行緒不會被阻塞，並能自由執行其他任務。
+這使得協同程式比執行緒輕量得多，並允許在一個程序中執行數百萬個協同程式而不會耗盡系統資源。
 
 ![比較協同程式與執行緒](coroutines-and-threads.svg){width="700"}
 
@@ -576,9 +606,11 @@ fun main() {
 ```
 {kotlin-runnable="true" validate="false"}
 
-執行這個版本會消耗更多記憶體，因為每個執行緒都需要自己的記憶體堆疊。對於 50,000 個執行緒，這可能高達 100 GB，而相同數量的協同程式大約僅需 500 MB。
+執行這個版本會消耗更多記憶體，因為每個執行緒都需要自己的記憶體堆疊。
+對於 50,000 個執行緒，這可能高達 100 GB，而相同數量的協同程式大約僅需 500 MB。
 
-根據你的作業系統、JDK 版本與設定，JVM 執行緒版本可能會丟出記憶體不足錯誤 (out-of-memory error)，或者為了避免同時執行過多執行緒而減慢執行緒建立的速度。
+根據你的作業系統、JDK 版本與設定，
+JVM 執行緒版本可能會丟出記憶體不足錯誤 (out-of-memory error)，或者為了避免同時執行過多執行緒而減慢執行緒建立的速度。
 
 ## 下一步 {id="what-s-next"}
 

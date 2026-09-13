@@ -89,7 +89,7 @@ kotlin {
 
 [`-Xreturn-value-checker` 컴파일러 옵션](#configure-the-unused-return-value-checker)을 `check`으로 설정하면, 검사기는 Kotlin 표준 라이브러리의 대부분의 함수처럼 표시된 표현식에서 발생하는 무시된 결과만 보고합니다.
 
-직접 작성한 코드에 표시하려면 [`@MustUseReturnValues`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-must-use-return-value/) 어노테이션을 사용하세요. 검사기가 적용되기를 원하는 범위에 따라 파일, 클래스 또는 함수에 적용할 수 있습니다.
+직접 작성한 코드에 표시하려면 [`@MustUseReturnValues`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-must-use-return-values/) 어노테이션을 사용하세요. 검사기가 적용되기를 원하는 범위에 따라 파일, 클래스 또는 함수에 적용할 수 있습니다.
 
 예를 들어, 파일 전체에 표시할 수 있습니다:
 

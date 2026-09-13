@@ -223,7 +223,7 @@ dependencies {
 > 추가 정보를 위해 코드 출력 시 스레드 이름 옆에 코루틴 이름을 표시할 수 있습니다.
 > 이를 위해 빌드 도구나 IDE의 실행 구성에서 `-Dkotlinx.coroutines.debug` VM 옵션을 전달하세요.
 >
-> 자세한 내용은 [코루틴 디버깅](https://github.com/Kotlin/kotlinx.coroutines/blob/master/docs/topics/debugging.md)을 참조하세요.
+> 자세한 내용은 [코루틴 디버깅](coroutines-debugging.md)을 참조하세요.
 >
 {style="tip"}
 

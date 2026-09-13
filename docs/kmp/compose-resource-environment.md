@@ -118,10 +118,6 @@
 5. 对于 Web 平台，绕过 `window.navigator.languages` 属性的只读限制，引入自定义区域性逻辑：
 
     ```kotlin
-    external object window {
-        var __customLocale: String?
-    }
-    
     actual object LocalAppLocale {
         private val LocalAppLocale = staticCompositionLocalOf { Locale.current }
         actual val current: String
@@ -129,9 +125,21 @@
     
         @Composable
         actual infix fun provides(value: String?): ProvidedValue<*> {
-            window.__customLocale = value?.replace('_', '-')
+            updateCustomLocale(value?.replace('_', '-'))
             return LocalAppLocale.provides(Locale.current)
         }
+    }
+    
+    @OptIn(ExperimentalWasmJsInterop::class)
+    private fun updateCustomLocale(value: String?) {
+        js(
+            """
+            if (window.__customLocale !== value) {
+                window.__customLocale = value;
+                window.dispatchEvent(new Event("languagechange"));
+            }
+            """
+        )
     }
     ```
 
@@ -174,7 +182,7 @@ Compose Multiplatform 通过 `isSystemInDarkTheme()` 定义当前主题。各平
     ```
 * iOS、桌面和 Web 平台使用 `LocalSystemTheme.current`。
 
-作为一种临时解决方法，在实现通用的公共 API 之前，您可以使用 `expect-actual` 机制来管理平台特定的主题自定义：
+作为一种临时解决方法，在实现通用的公共 API 之前，您可以使用 `expect-actual` 机制来应对这种差异，并管理平台特定的主题自定义：
 
 1. 在通用代码中，使用 `expect` 关键字定义预期的 `LocalAppTheme` 对象：
  

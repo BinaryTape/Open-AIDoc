@@ -4,6 +4,8 @@
 
 <web-summary>새로운 언어 기능, Kotlin Multiplatform, JVM, Native, JS, Wasm 업데이트, 그리고 Gradle 및 Maven 빌드 도구 지원을 포함한 Kotlin 2.4.0 릴리스 노트를 확인해 보세요.</web-summary>
 
+_[출시일: 2026년 7월 14일](releases.md#release-history)_
+
 <tldr>
     <p>버그 수정 릴리스인 2.4.10에 대한 자세한 내용은 <a href="https://github.com/JetBrains/kotlin/releases/tag/v2.4.10">변경 로그(changelog)</a>를 참조하세요.</p>
 </tldr>
@@ -616,7 +618,7 @@ Kotlin 2.4.0부터 [Swift export가 Alpha 단계로 격상되었습니다](#swif
 ### 가비지 컬렉터의 기본 동시 마킹(Concurrent marking) {id="default-concurrent-marking-in-garbage-collector"}
 <secondary-label ref="native"/>
 
-In Kotlin 2.0.20에서 Kotlin 팀은 CMS GC(Concurrent Mark and Sweep Garbage Collector)에 대한 [실험적 지원을 도입](whatsnew2020.md#concurrent-marking-in-garbage-collector)했습니다. 사용자 피드백을 처리하고 회귀 문제를 수정한 후, Kotlin 2.4.0부터 CMS를 기본적으로 활성화합니다.
+Kotlin 2.0.20에서 Kotlin 팀은 CMS GC(Concurrent Mark and Sweep Garbage Collector)에 대한 [실험적 지원을 도입](whatsnew2020.md#concurrent-marking-in-garbage-collector)했습니다. 사용자 피드백을 처리하고 회귀 문제를 수정한 후, Kotlin 2.4.0부터 CMS를 기본적으로 활성화합니다.
 
 이전의 기본 설정이었던 PMCS(Parallel Mark Concurrent Sweep) 가비지 컬렉터는 GC가 힙의 객체를 마킹하는 동안 애플리케이션 스레드를 일시 중지해야 했습니다. 반면, CMS는 마킹 단계를 애플리케이션 스레드와 동시에 실행할 수 있도록 합니다.
 
@@ -1003,7 +1005,7 @@ kotlin {
 ### Kotlin/JVM을 위한 Problems API로 작성된 컴파일러 메시지 {id="compiler-messages-written-to-problems-api-for-kotlin-jvm"}
 <secondary-label ref="gradle"/>
 
-In Kotlin 2.2.0에서 Kotlin Gradle 플러그인(KGP)은 Gradle CLI와 IntelliJ IDEA 모두에서 일관된 경험을 제공하기 위해 [Gradle의 Problems API](https://docs.gradle.org/current/userguide/reporting_problems.html)에 진단을 보고하기 시작했습니다.
+Kotlin 2.2.0에서 Kotlin Gradle 플러그인(KGP)은 Gradle CLI와 IntelliJ IDEA 모두에서 일관된 경험을 제공하기 위해 [Gradle의 Problems API](https://docs.gradle.org/current/userguide/reporting_problems.html)에 진단을 보고하기 시작했습니다.
 
 Kotlin 2.4.0에서 플러그인은 Kotlin/JVM에 대한 컴파일러 메시지도 Problems API로 작성하여, 해당 API가 모든 로그와 메시지의 단일 소스가 되는 것에 한 걸음 더 다가갔습니다.
 

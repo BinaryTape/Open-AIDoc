@@ -2,6 +2,10 @@
 
 [//]: # (title: コルーチンとチャネル − チュートリアル)
 
+> 今後のアップデートでこのチュートリアルは改訂される予定です。それまでの間、コルーチンの入門に関する最新のガイドについては、[コルーチンの基本](coroutines-basics.md)を参照してください。
+> 
+{style="note"}
+
 このチュートリアルでは、IntelliJ IDEA でコルーチンを使用して、基盤となるスレッドをブロックしたりコールバックを使用したりせずにネットワークリクエストを実行する方法を学びます。
 
 > コルーチンに関する予備知識は必要ありませんが、Kotlin の基本的な構文に慣れていることが前提となります。
@@ -226,7 +230,7 @@ UI のレスポンスを維持するために、計算全体を別のスレッ�
 
     `SwingUtilities.invokeLater` を呼び出すことで、結果を更新する `updateResults()` の呼び出しがメイン UI スレッド（AWT イベントディスパッチスレッド）で行われるようにします。
 
-ただし、`BACKGROUND` オプションを介してコントリビューターを読み込もうとすると、リストは更新されますが何も変化しないことがわかります。
+ただし、`BACKGROUND` オプションを介してコントリビューターを読み込もうとすると、リストは更新されますが UI には何も変化がないことがわかります。
 
 ### タスク 2 {id="task-2"}
 
@@ -449,8 +453,8 @@ suspend fun loadContributorsSuspend(service: GitHubService, req: RequestData): L
 中断関数を使用したコードは、「ブロッキング」バージョンに似ています。ブロッキングバージョンとの大きな違いは、スレッドをブロックする代わりに、コルーチンが中断 (suspend) されることです：
 
 ```text
-ブロック (block) -> 中断 (suspend)
-スレッド (thread) -> コルーチン (coroutine)
+block -> suspend
+thread -> coroutine
 ```
 
 > スレッドでコードを実行するのと同様に、コルーチン上でもコードを実行できるため、コルーチンは「軽量スレッド (lightweight threads)」と呼ばれることがよくあります。以前はブロックしていた（そして回避しなければならなかった）操作は、代わりにコルーチンを中断できるようになりました。
@@ -478,7 +482,7 @@ launch {
 
 計算を続行する準備が整うと、スレッド（必ずしも同じスレッドとは限りません）に戻されます。
 
-`loadContributorsSuspend()` の例では、各 "contributors" リクエストが中断メカズムを使用して結果を待ちます。まず、新しいリクエストが送信されます。次に、レスポンスを待つ間、`launch` 関数によって開始された「コントリビューター読み込み」コルーチン全体が中断されます。
+`loadContributorsSuspend()` の例では、各 "contributors" リクエストが中断メカニズムを使用して結果を待ちます。まず、新しいリクエストが送信されます。次に、レスポンスを待つ間、`launch` 関数によって開始された「コントリビューター読み込み」コルーチン全体が中断されます。
 
 コルーチンは、対応するレスポンスが受信された後にのみ再開されます：
 
@@ -1157,10 +1161,10 @@ suspend fun loadContributorsChannels(
 次のタスクでは、解決策の総実行時間を比較します。GitHub サービスをモックし、このサービスが指定されたタイムアウト後に結果を返すようにします：
 
 ```text
-repos リクエスト - 1000ミリ秒の遅延内に回答を返す
-repo-1 - 1000ミリ秒の遅延
-repo-2 - 1200ミリ秒の遅延
-repo-3 - 800ミリ秒の遅延
+repos request - returns an answer within 1000 ms delay
+repo-1 - 1000 ms delay
+repo-2 - 1200 ms delay
+repo-3 - 800 ms delay
 ```
 
 `suspend` 関数を使用した逐次的な解決策には、約4000ミリ秒かかるはずです (4000 = 1000 + (1000 + 1200 + 800))。
@@ -1198,8 +1202,8 @@ fun testDelayInSuspend() = runTest {
 }
 
 suspend fun foo() {
-    delay(1000)    // 遅延なしで自動的に進む
-    println("foo") // foo() が呼び出されるとすぐに実行される
+    delay(1000)    // auto-advances without delay
+    println("foo") // executes eagerly when foo() is called
 }
 ```
 
@@ -1224,8 +1228,8 @@ fun testDelayInLaunch() = runTest {
 
 suspend fun bar() = coroutineScope {
     launch {
-        delay(1000)    // 遅延なしで自動的に進む
-        println("bar") // bar() が呼び出されるとすぐに実行される
+        delay(1000)    // auto-advances without delay
+        println("bar") // executes eagerly when bar() is called
     }
 }
 ```
@@ -1272,9 +1276,9 @@ compileTestKotlin {
     @Test
     fun test() = runTest {
         val startTime = currentTime
-        // アクション
+        // action
         val totalTime = currentTime - startTime
-        // 結果のテスト
+        // testing result
     }
     ```
 
@@ -1293,8 +1297,8 @@ fun testConcurrent() = runTest {
     val totalTime = currentTime - startTime
 
     Assert.assertEquals(
-        "呼び出しは並行して実行されるため、総仮想時間は 2200 ms である必要があります： " +
-                "repos リクエストに 1000、さらに並行コントリビューターリクエストに max(1000, 1200, 800) = 1200",
+        "The calls run concurrently, so the total virtual time should be 2200 ms: " +
+                "1000 for repos request plus max(1000, 1200, 800) = 1200 for concurrent contributors requests)",
         expectedConcurrentResults.timeFromStart, totalTime
     )
 }
@@ -1310,10 +1314,10 @@ fun testChannels() = runTest {
         val expected = concurrentProgressResults[index++]
         val time = currentTime - startTime
         Assert.assertEquals(
-            "期待される中間結果までの時間 ${expected.timeFromStart} ms:",
+            "Expected intermediate results after ${expected.timeFromStart} ms:",
             expected.timeFromStart, time
         )
-        Assert.assertEquals("中間結果の誤り $time:", expected.users, users)
+        Assert.assertEquals("Wrong intermediate results after $time:", expected.users, users)
     }
 }
 ```

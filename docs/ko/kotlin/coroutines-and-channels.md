@@ -2,6 +2,10 @@
 
 [//]: # (title: 코루틴과 채널 − 튜토리얼)
 
+> 향후 업데이트에서 이 튜토리얼이 개정될 예정입니다. 그동안 코루틴을 시작하는 데 필요한 최신 가이드는 [코루틴 기초(Coroutines basics)](coroutines-basics.md)를 참조하세요.
+> 
+{style="note"}
+
 이 튜토리얼에서는 IntelliJ IDEA에서 코루틴을 사용하여 기본 스레드(underlying thread)를 차단하거나 콜백을 사용하지 않고 네트워크 요청을 수행하는 방법을 배웁니다.
 
 > 코루틴에 대한 사전 지식은 필요하지 않지만, 기본적인 Kotlin 문법에는 익숙해야 합니다.
@@ -14,7 +18,7 @@
 * 코루틴을 사용하여 요청을 동시에(concurrently) 보내는 방법.
 * 채널(channels)을 사용하여 서로 다른 코루틴 간에 정보를 공유하는 방법.
 
-네트워크 요청을 위해 [Retrofit](https://square.github.io/retrofit/) 라이브러리를 사용하지만, 이 튜토리얼에서 보여주는 방식은 코루틴을 지원하는 다른 라이브러리에서도 유사하게 작동합니다.
+네트워크 요청을 위해 [Retrofit](https://square.github.io/retrofit/) 라이브러리가 필요하지만, 이 튜토리얼에서 보여주는 방식은 코루틴을 지원하는 다른 라이브러리에서도 유사하게 작동합니다.
 
 > 모든 작업의 솔루션은 [프로젝트 저장소](http://github.com/kotlin-hands-on/intro-coroutines)의 `solutions` 브랜치에서 찾을 수 있습니다.
 >
@@ -61,7 +65,7 @@
 
 이 로직을 구현하는 방법은 여러 가지가 있습니다: [블로킹 요청(blocking requests)](#blocking-requests) 또는 [콜백(callbacks)](#callbacks)을 사용하는 방식입니다. 이러한 해결책들을 [코루틴(coroutines)](#coroutines)을 사용하는 방식과 비교해 보고, [채널(channels)](#channels)을 사용하여 서로 다른 코루틴 간에 정보를 공유하는 방법을 알아보겠습니다.
 
-## 블로킹 요청 (Blocking requests) {id="blocking-requests"}
+## 블로킹 요청 {id="blocking-requests"}
 
 [Retrofit](https://square.github.io/retrofit/) 라이브러리를 사용하여 GitHub에 HTTP 요청을 보낼 것입니다. 이 라이브러리를 통해 특정 조직의 저장소 목록과 각 저장소의 기여자 목록을 요청할 수 있습니다:
 
@@ -183,7 +187,7 @@ interface GitHubService {
 
 대안으로 `groupBy()` 대신 [`groupingBy()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/grouping-by.html) 함수를 사용할 수도 있습니다.
 
-## 콜백 (Callbacks) {id="callbacks"}
+## 콜백 {id="callbacks"}
 
 이전 해결책은 작동하지만 스레드를 차단하여 UI를 멈추게 합니다. 이를 피하기 위한 전통적인 접근 방식은 _콜백_을 사용하는 것입니다.
 
@@ -226,7 +230,7 @@ UI를 반응형으로 유지하려면 전체 계산을 별도의 스레드로 �
 
     `SwingUtilities.invokeLater`를 호출함으로써 결과를 업데이트하는 `updateResults()` 호출이 메인 UI 스레드(AWT 이벤트 파견 스레드)에서 실행되도록 보장합니다.
 
-하지만 `BACKGROUND` 옵션을 통해 기여자를 로드하려고 하면 리스트가 업데이트되기는 하지만 아무것도 변하지 않는 것을 볼 수 있습니다.
+하지만 `BACKGROUND` 옵션을 통해 기여자를 로드하려고 하면 리스트가 업데이트되기는 하지만 UI에는 아무것도 변하지 않는 것을 볼 수 있습니다.
 
 ### 과제 2 {id="task-2"}
 
@@ -373,7 +377,7 @@ updateResults(allUsers.aggregate())
 >
 {style="tip"}
 
-## 일시 중단 함수 (Suspending functions) {id="suspending-functions"}
+## 일시 중단 함수 {id="suspending-functions"}
 
 일시 중단 함수를 사용하여 동일한 로직을 구현할 수 있습니다. `Call<List<Repo>>`를 반환하는 대신, 다음과 같이 API 호출을 [일시 중단 함수](composing-suspending-functions.md)로 정의합니다:
 
@@ -444,13 +448,13 @@ suspend fun loadContributorsSuspend(service: GitHubService, req: RequestData): L
 * `loadContributorsSuspend()`는 `suspend` 함수로 정의되어야 합니다.
 * 이전에는 `execute`가 `Response`를 반환했지만, 이제는 API 함수가 `Response`를 직접 반환하므로 더 이상 호출할 필요가 없습니다. 이 세부 사항은 Retrofit 라이브러리에 국한된 것입니다. 다른 라이브러리에서는 API가 다르겠지만 개념은 동일합니다.
 
-## 코루틴 (Coroutines) {id="coroutines"}
+## 코루틴 {id="coroutines"}
 
 일시 중단 함수를 사용한 코드는 "블로킹" 버전과 비슷해 보입니다. 블로킹 버전과의 큰 차이점은 스레드를 차단하는 대신 코루틴이 일시 중단된다는 것입니다:
 
 ```text
-block(차단) -> suspend(일시 중단)
-thread(스레드) -> coroutine(코루틴)
+block -> suspend
+thread -> coroutine
 ```
 
 > 코루틴은 스레드에서 코드를 실행하는 방식과 유사하게 코루틴 상에서 코드를 실행할 수 있기 때문에 흔히 경량 스레드(lightweight threads)라고 불립니다. 이전에 차단되었던(그리고 피해야 했던) 작업들은 이제 대신 코루틴을 일시 중단시킬 수 있습니다.
@@ -506,13 +510,13 @@ launch {
 
 일시 중단 함수는 스레드를 공정하게 다루며 "대기"를 위해 스레드를 차단하지 않습니다. 하지만 이것이 아직 동시성(concurrency)을 가져다주지는 않습니다.
 
-## 동시성 (Concurrency) {id="concurrency"}
+## 동시성 {id="concurrency"}
 
 Kotlin 코루틴은 스레드보다 훨씬 적은 리소스를 소모합니다. 새로운 계산을 비동기적으로 시작하고 싶을 때마다 스레드 대신 새로운 코루틴을 생성할 수 있습니다.
 
 새 코루틴을 시작하려면 주요 _코루틴 빌더_ 중 하나인 `launch`, `async`, 또는 `runBlocking`을 사용합니다. 라이브러리에 따라 추가적인 코루틴 빌더를 정의할 수도 있습니다.
 
-`async`는 새 코루틴을 시작하고 `Deferred` 객체를 반환합니다. `Deferred`는 다른 언어에서 `Future` 또는 `Promise`와 같은 이름으로 알려진 개념을 나타냅니다. 이것은 계산 내용을 저장하지만, 최종 결과를 얻는 시점을 _미룹니다(defer)_. 즉, _미래_ 어느 시점에 결과를 줄 것을 _약속(promise)_합니다.
+`async`는 새 코루틴을 시작하고 `Deferred` 객체를 반환합니다. `Deferred`는 다른 언어에서 `Future` 또는 `Promise`와 같은 이름으로 알려진 개념을 나타냅니다. 이것은 계산 내용을 저장하지만, 최종 결과를 얻는 시점을 _미룹니다(defers)_. 즉, _미래_ 어느 시점에 결과를 줄 것을 _약속(promises)_합니다.
 
 `async`와 `launch`의 주요 차이점은 `launch`가 특정 결과를 반환할 것으로 기대되지 않는 계산을 시작하는 데 사용된다는 점입니다. `launch`는 코루틴을 나타내는 `Job`을 반환합니다. `Job.join()`을 호출하여 완료될 때까지 기다릴 수 있습니다.
 
@@ -689,7 +693,7 @@ deferreds.awaitAll() // List<List<User>>
 
 3. 코드를 실행하고 코루틴이 스레드 풀의 스레드에서 실행되는지 확인합니다.
 
-## 구조화된 동시성 (Structured concurrency) {id="structured-concurrency"}
+## 구조화된 동시성 {id="structured-concurrency"}
 
 * _코루틴 스코프(coroutine scope)_는 서로 다른 코루틴 간의 구조와 부모-자식 관계를 담당합니다. 새로운 코루틴은 일반적으로 스코프 내부에서 시작되어야 합니다.
 * _코루틴 컨텍스트(coroutine context)_는 코루틴 커스텀 이름이나 코루틴이 스케줄링되어야 하는 스레드를 지정하는 디스패처와 같이 주어진 코루틴을 실행하는 데 사용되는 추가적인 기술 정보를 저장합니다.
@@ -838,7 +842,7 @@ fun main() = runBlocking { /* this: CoroutineScope */
     }   
     ```
 
-`launch` 함수는 `Job` 인스턴스를 반환합니다. `Job`은 모든 데이터를 로드하고 결과를 업데이트하는 "loading coroutine"에 대한 참조를 저장합니다. 여기에 `Job` 인스턴스를 수신 객체로 전달하여 `setUpCancellation()` 확장 함수를 호출할 수 있습니다(`#1` 라인).
+`launch` 함수는 `Job` 인스턴스를 반환합니다. `Job`은 모든 데이터를 로드하고 결과를 업데이트하는 "loading 코루틴"에 대한 참조를 저장합니다. 여기에 `Job` 인스턴스를 수신 객체로 전달하여 `setUpCancellation()` 확장 함수를 호출할 수 있습니다(`#1` 라인).
 
 이를 표현하는 또 다른 방법은 다음과 같이 명시적으로 쓰는 것입니다:
 
@@ -865,7 +869,7 @@ launch(Dispatchers.Default) {  // 외부 스코프
 }
 ```
 
-모든 중첩된 코루틴은 상속된 컨텍스트로 자동으로 시작됩니다. 디스패처는 이 컨텍스트의 일부입니다. 그렇기 때문에 `async`로 시작된 모든 코루틴은 디폴트(default) 디스패처 컨텍스트로 시작됩니다:
+모든 중첩된 코루틴은 상속된 컨텍스트로 자동으로 시작됩니다. 디스패처는 이 컨텍스트의 일부입니다. 그렇기 때문에 `async`로 시작된 모든 코루틴은 기본(default) 디스패처 컨텍스트로 시작됩니다:
 
 ```kotlin
 suspend fun loadContributorsConcurrent(
@@ -886,7 +890,7 @@ suspend fun loadContributorsConcurrent(
 >
 {style="tip"}
 
-## 진행 상황 표시하기 (Showing progress) {id="showing-progress"}
+## 진행 상황 표시하기 {id="showing-progress"}
 
 일부 저장소에 대한 정보가 꽤 빨리 로드됨에도 불구하고, 사용자는 모든 데이터가 로드된 후에야 결과 리스트를 보게 됩니다. 그때까지는 진행 상황을 나타내는 로더 아이콘만 돌아가고, 현재 상태나 어떤 기여자가 이미 로드되었는지에 대한 정보는 없습니다.
 
@@ -957,7 +961,7 @@ suspend fun loadContributorsProgress(
 }
 ```
 
-#### 순차 vs 동시 (Consecutive vs concurrent) {id="consecutive-vs-concurrent"}
+#### 순차 vs 동시 {id="consecutive-vs-concurrent"}
 
 `updateResults()` 콜백은 각 요청이 완료된 후에 호출됩니다:
 
@@ -971,7 +975,7 @@ suspend fun loadContributorsProgress(
 
 동시성을 추가하려면 _채널(channels)_을 사용하세요.
 
-## 채널 (Channels) {id="channels"}
+## 채널 {id="channels"}
 
 공유된 가변 상태(shared mutable state)를 사용하여 코드를 작성하는 것은 꽤 어렵고 에러가 발생하기 쉽습니다(콜백을 사용한 해결책처럼). 더 간단한 방법은 공통된 가변 상태를 사용하는 대신 통신을 통해 정보를 공유하는 것입니다. 코루틴은 _채널_을 통해 서로 통신할 수 있습니다.
 
@@ -1007,21 +1011,21 @@ interface Channel<E> : SendChannel<E>, ReceiveChannel<E>
 라이브러리에는 여러 유형의 채널이 정의되어 있습니다. 이들은 내부에 몇 개의 요소를 저장할 수 있는지, 그리고 `send()` 호출이 일시 중단될 수 있는지 여부가 다릅니다. 모든 채널 유형에 대해 `receive()` 호출은 유사하게 작동합니다. 채널이 비어 있지 않으면 요소를 받고, 그렇지 않으면 일시 중단됩니다.
 
 <deflist collapsible="true">
-   <def title="무제한 채널 (Unlimited channel)">
+   <def title="무제한 채널 (Unlimited channel)" id="unlimited-channel">
        <p>무제한 채널은 큐와 가장 유사합니다. 프로듀서는 이 채널에 요소를 보낼 수 있으며 채널은 무한히 계속 커질 것입니다. <code>send()</code> 호출은 결코 일시 중단되지 않습니다. 프로그램 메모리가 부족해지면 <code>OutOfMemoryException</code>이 발생합니다. 무제한 채널과 큐의 차이점은 소비자가 비어 있는 채널에서 받으려고 할 때 새로운 요소가 보내질 때까지 일시 중단된다는 점입니다.</p>
        <img src="unlimited-channel.png" alt="무제한 채널" width="500"/>
    </def>
-   <def title="버퍼 채널 (Buffered channel)">
-       <p>버퍼 채널의 크기는 지정된 숫자로 제한됩니다. 프로듀서는 크기 제한에 도달할 때까지 이 채널에 요소를 보낼 수 있습니다. 모든 요소는 내부에 저장됩니다. 채널이 가득 차면 다음 <code>send</code> 호출은 여유 공간이 생길 때까지 일시 중단됩니다.</p>
+   <def title="버퍼 채널 (Buffered channel)" id="buffered-channel">
+       <p>버퍼 채널의 크기는 지정된 숫자로 제한됩니다. 프로듀서는 크기 제한에 도달할 때까지 이 채널에 요소를 보낼 수 있습니다. 모든 요소는 내부에 저장됩니다. 채널이 가득 차면 다음 <code>send()</code> 호출은 여유 공간이 생길 때까지 일시 중단됩니다.</p>
        <img src="buffered-channel.png" alt="버퍼 채널" width="500"/>
    </def>
-   <def title="랑데뷰 채널 (Rendezvous channel)">
-       <p> "랑데뷰(Rendezvous)" 채널은 버퍼가 없는 채널로, 크기가 0인 버퍼 채널과 같습니다. 두 함수(<code>send()</code> 또는 <code>receive()</code>) 중 하나는 항상 다른 함수가 호출될 때까지 일시 중단됩니다.</p>
+   <def title="랑데뷰 채널 (Rendezvous channel)" id="rendezvous-channel">
+       <p>"랑데뷰(Rendezvous)" 채널은 버퍼가 없는 채널로, 크기가 0인 버퍼 채널과 같습니다. 두 함수(<code>send()</code> 또는 <code>receive()</code>) 중 하나는 항상 다른 함수가 호출될 때까지 일시 중단됩니다.</p>
        <p><code>send()</code> 함수가 호출되었는데 요소를 처리할 준비가 된 일시 중단된 <code>receive()</code> 호출이 없다면 <code>send()</code>는 일시 중단됩니다. 마찬가지로 <code>receive()</code> 함수가 호출되었는데 채널이 비어 있거나 요소를 보낼 준비가 된 일시 중단된 <code>send()</code> 호출이 없다면 <code>receive()</code> 호출은 일시 중단됩니다.</p>
        <p>"랑데뷰"라는 이름("정해진 시간과 장소에서의 만남")은 <code>send()</code>와 <code>receive()</code>가 "제시간에 만나야" 한다는 사실을 의미합니다.</p>
        <img src="rendezvous-channel.png" alt="랑데뷰 채널" width="500"/>
    </def>
-   <def title="콘플레이티드 채널 (Conflated channel)">
+   <def title="콘플레이티드 채널 (Conflated channel)" id="conflated-channel">
        <p>콘플레이티드(Conflated, 결합된) 채널에 전송된 새 요소는 이전에 전송된 요소를 덮어쓰므로 수신자는 항상 최신 요소만 받게 됩니다. <code>send()</code> 호출은 절대 일시 중단되지 않습니다.</p>
        <img src="conflated-channel.gif" alt="콘플레이티드 채널" width="500"/>
    </def>
@@ -1153,13 +1157,13 @@ suspend fun loadContributorsChannels(
 다음 과제에서는 해결책들의 총 실행 시간을 비교할 것입니다. GitHub 서비스를 모의(mock)하고 이 서비스가 지정된 타임아웃 후에 결과를 반환하도록 만들 것입니다:
 
 ```text
-repos request - 1000ms 지연 내에 응답 반환
-repo-1 - 1000ms 지연
-repo-2 - 1200ms 지연
-repo-3 - 800ms 지연
+repos request - 1000 ms 지연 내에 응답 반환
+repo-1 - 1000 ms 지연
+repo-2 - 1200 ms 지연
+repo-3 - 800 ms 지연
 ```
 
-`suspend` 함수를 사용한 순차적 해결책은 약 4000ms(4000 = 1000 + (1000 + 1200 + 800))가 걸려야 합니다. 동시 해결책은 약 2200ms(2200 = 1000 + max(1000, 1200, 800))가 걸려야 합니다.
+`suspend` 함수를 사용한 순차적 해결책은 약 4000 ms(4000 = 1000 + (1000 + 1200 + 800))가 걸려야 합니다. 동시 해결책은 약 2200 ms(2200 = 1000 + max(1000, 1200, 800))가 걸려야 합니다.
 
 진행 상황을 보여주는 해결책의 경우 타임스탬프와 함께 중간 결과도 확인할 수 있습니다.
 
@@ -1199,7 +1203,7 @@ suspend fun foo() {
 
 `TestScope`의 `currentTime` 속성을 사용하여 현재 가상 시간을 확인할 수 있습니다.
 
-이 예제에서 실제 실행 시간은 수 밀리초인 반면, 가상 시간은 1000밀리초인 지연 인자와 동일합니다.
+이 예제에서 실제 실행 시간은 수 밀리초인 반면, 가상 시간은 지연 인자와 동일한 1000밀리초입니다.
 
 자식 코루틴에서 "가상" `delay` 효과를 완전히 얻으려면, 모든 자식 코루틴을 `TestDispatcher`로 시작해야 합니다. 그렇지 않으면 작동하지 않습니다. 이 디스패처는 다른 디스패처를 제공하지 않는 한 다른 `TestScope`로부터 자동으로 상속됩니다:
 
@@ -1249,12 +1253,12 @@ compileTestKotlin {
 
 `tests/tasks/`에 있는 다음 테스트들이 실제 시간 대신 가상 시간을 사용하도록 리팩토링하세요:
 
-* Request4SuspendKtTest.kt
-* Request5ConcurrentKtTest.kt
-* Request6ProgressKtTest.kt
-* Request7ChannelsKtTest.kt
+* `Request4SuspendKtTest.kt`
+* `Request5ConcurrentKtTest.kt`
+* `Request6ProgressKtTest.kt`
+* `Request7ChannelsKtTest.kt`
 
-리팩토링 전후의 총 실행 시간을 비교해 보세요.
+리팩토링을 적용하기 전후의 총 실행 시간을 비교해 보세요.
 
 #### 과제 8을 위한 팁 {initial-collapse-state="collapsed" collapsible="true" id="tip-for-task-8"}
 

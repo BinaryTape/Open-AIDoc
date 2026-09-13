@@ -1,8 +1,8 @@
 [//]: # (title: 參與 Kotlin 早期體驗預覽)
 
 <tldr>
-    <!-- <p>目前沒有可用的預覽版本。</p> -->
-    <p>最新 Kotlin EAP 版本：<strong>%kotlinEapVersion%</strong></p>
+    <p>目前沒有可用的預覽版本。</p>
+    <!-- <p>最新 Kotlin EAP 版本：<strong>%kotlinEapVersion%</strong></p> -->
 </tldr>
 
 您可以參與 Kotlin 早期體驗預覽 (EAP)，在最新 Kotlin 特性發佈前進行試用。
@@ -17,7 +17,7 @@ Kotlin EAP 組建通常包含以下階段：
 | **RC**    | 第一個版本候選 (RC)。專注於穩定 Beta1 與 Beta2 中提供的變更，以及修復測試過程中發現的迴歸。 |
 | **RC2**   | 包含用於完成發佈並確認就緒情況的重要修復。 | 
 
-如果您發現錯誤並回報至我們的問題追蹤器 [YouTrack](https://kotl.in/issue)，我們將不勝感激。 
+如果您發現錯誤並回報至我們建立的問題追蹤器 [YouTrack](https://kotl.in/issue)，我們將不勝感激。 
 在大多數情況下，我們可以在最終版本發佈前修復這些錯誤，這意指您無需等待下一個 Kotlin 版本即可解決您的問題。 
 
 透過參與早期體驗預覽並回報錯誤，您正在為 Kotlin 做出貢獻，並幫助我們為[日益增長的 Kotlin 社群](https://kotlinlang.org/community/)中的每個人打造更好的 Kotlin。
@@ -43,11 +43,9 @@ Kotlin EAP 組建通常包含以下階段：
 
 ## 組建詳細資訊 {id="build-details"}
 
-<!--
 _目前沒有可用的預覽版本。_
--->
 
-<table>
+<!--<table>
     <tr>
         <th>組建資訊</th>
         <th>組建亮點</th>
@@ -62,4 +60,4 @@ _目前沒有可用的預覽版本。_
             <p>如需更多詳細資訊，請參閱 <a href="https://github.com/JetBrains/kotlin/releases/tag/v2.4.20-RC3">變更記錄</a> 或 <a href="whatsnew-eap.md">Kotlin 2.4.20-RC3 的新功能</a>。</p>
         </td>
     </tr>
-</table>
+</table>-->

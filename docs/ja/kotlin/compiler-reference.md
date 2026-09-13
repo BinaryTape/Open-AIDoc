@@ -11,7 +11,7 @@ Kotlin の各リリースには、サポートされているターゲット（J
 
 また、[コマンドラインコンパイラの使用](command-line.md)チュートリアルで説明されているように、コマンドラインから手動で Kotlin コンパイラを実行することもできます。
 
-## コンパイラオプション
+## コンパイラオプション {id="compiler-options"}
 
 Kotlin コンパイラには、コンパイルプロセスをカスタマイズするための多数のオプションがあります。
 ターゲットごとのコンパイラオプションとその説明をこのページに記載しています。
@@ -36,15 +36,15 @@ Kotlin コンパイラには、コンパイルプロセスをカスタマイズ�
   > ```
   {style="note"}
 
-## コンパイラオプションのスキーマ
+## コンパイラオプションのスキーマ {id="schema-for-compiler-options"}
 
 すべてのコンパイラオプションに共通のスキーマが、JAR アーティファクトとして [`org.jetbrains.kotlin:kotlin-compiler-arguments-description`](https://central.sonatype.com/artifact/org.jetbrains.kotlin/kotlin-compiler-arguments-description) で公開されています。このアーティファクトには、すべてのコンパイラオプションの説明のコード表現と（Kotlin 以外の利用者向けの）JSON 版の両方が含まれています。また、各オプションが導入されたバージョンや安定化したバージョンなどのメタデータも含まれています。
 
-## 共通オプション
+## 共通オプション {id="common-options"}
 
 以下のオプションは、すべての Kotlin コンパイラで共通です。
 
-### -api-version _version_
+### -api-version _version_ {id="api-version-version"}
 
 実行時にコードが使用できる Kotlin API を制御するための API バージョンを設定します。例えば、Kotlin コンパイラバージョン 2.4.0 で `-api-version=2.1` を使用すると、コードは Kotlin 標準ライブラリ 2.1.0 との互換性を維持します。
 
@@ -54,16 +54,16 @@ Kotlin コンパイラには、コンパイルプロセスをカスタマイズ�
 
 API バージョンが互換性にどのように影響するかについての詳細は、[ライブラリ作成者のための後方互換性ガイドライン](api-guidelines-backward-compatibility.md#choose-compatible-language-and-api-versions)を参照してください。
 
-### -help (-h)
+### -help (-h) {id="help-h"}
 
 使用法を表示して終了します。標準オプションのみが表示されます。
 高度なオプションを表示するには、`-X` を使用してください。
 
-### -kotlin-home _path_
+### -kotlin-home _path_ {id="kotlin-home-path"}
 
 ランタイムライブラリの検出に使用される Kotlin コンパイラへのカスタムパスを指定します。
 
-### -language-version _version_
+### -language-version _version_ {id="language-version-version"}
 
 コンパイル中に使用可能な Kotlin 言語機能を制御するための言語バージョンを設定します。
 
@@ -78,72 +78,72 @@ API バージョンが互換性にどのように影響するかについての�
 > 
 {style="tip"}
 
-### -opt-in _annotation_
+### -opt-in _annotation_ {id="opt-in-annotation"}
 
 指定された完全修飾名を持つ要件アノテーションを使用して、[オプトインを必要とする](opt-in-requirements.md) API の使用を有効にします。
 
-### -P plugin:pluginId:optionName=value
+### -P plugin:pluginId:optionName=value {id="p-plugin-pluginid-optionname-value"}
 
 Kotlin コンパイラプラグインにオプションを渡します。
 コアプラグインとそのオプションは、ドキュメントの[コアコンパイラプラグイン](components-stability.md#core-compiler-plugins)セクションに記載されています。
 
-### -progressive
+### -progressive {id="progressive"}
 
 コンパイラの[プログレッシブモード](whatsnew13.md#progressive-mode)を有効にします。
 
 プログレッシブモードでは、不安定なコードに対する非推奨化（deprecation）やバグ修正が、緩やかな移行サイクルを経ることなく即座に適用されます。
 プログレッシブモードで書かれたコードには後方互換性がありますが、非プログレッシブモードで書かれたコードはプログレッシブモードでコンパイルエラーを引き起こす可能性があります。
 
-### -script
+### -script {id="script"}
 
 Kotlin スクリプトファイルを評価します。このオプションを指定して呼び出すと、コンパイラは引数の中で最初の Kotlin スクリプト（`*.kts`）ファイルを実行します。
 
-### -verbose
+### -verbose {id="verbose"}
 
 コンパイルプロセスの詳細を含む、詳細なログ出力を有効にします。
 
-### -version
+### -version {id="version"}
 
 コンパイラのバージョンを表示します。
 
-### -X
+### -X {id="x"}
 
 <primary-label ref="experimental-general"/>
 
 高度なオプションに関する情報を表示して終了します。これらのオプションは現在不安定（unstable）であり、その名前や動作は予告なく変更される可能性があります。
 
-### Kotlin コントラクトオプション
+### Kotlin コントラクトオプション {id="kotlin-contract-options"}
 <primary-label ref="experimental-general"/>
 
 以下のオプションは、実験的な Kotlin コントラクト（contracts）機能を有効にします。
 
-#### -Xallow-contracts-on-more-functions
+#### -Xallow-contracts-on-more-functions {id="xallow-contracts-on-more-functions"}
 
 プロパティアクセサ、特定の演算子関数、ジェネリック型に対する型アサーションなど、追加の宣言でコントラクトを有効にします。
 
-#### -Xallow-condition-implies-returns-contracts
+#### -Xallow-condition-implies-returns-contracts {id="xallow-condition-implies-returns-contracts"}
 
 コントラクト内で `returnsNotNull()` 関数を使用して、特定の条件に対して非 null の戻り値を想定できるようにします。
 
-#### -Xallow-holdsin-contract
+#### -Xallow-holdsin-contract {id="xallow-holdsin-contract"}
 
 コントラクト内で `holdsIn` キーワードを使用して、ラムダ内で boolean 条件が `true` であると想定できるようにします。
 
-#### -Xallow-returns-result-of
+#### -Xallow-returns-result-of {id="xallow-returns-result-of"}
 
 `returnsResultOf()` コントラクトの使用を許可し、未使用の戻り値チェッカーが、無視できる結果と高階関数からの意味のある結果を区別できるようにします。
 
-### -Xallow-reified-type-in-catch
+### -Xallow-reified-type-in-catch {id="xallow-reified-type-in-catch"}
 <primary-label ref="experimental-general"/>
 
 `inline` 関数の `catch` 節で reified（実体化された）`Throwable` 型パラメータのサポートを有効にします。
 
-### -Xcollection-literals
+### -Xcollection-literals {id="xcollection-literals"}
 <primary-label ref="experimental-general"/>
 
 角括弧構文 `[]` による[コレクションリテラル](whatsnew24.md#support-for-collection-literals)のサポートを有効にします。
 
-### -Xcompiler-plugin-order={plugin.before>plugin.after}
+### -Xcompiler-plugin-order= {plugin.before>plugin.after id="xcompiler-plugin-order"}
 <primary-label ref="experimental-general"/>
 
 コンパイラプラグインの実行順序を設定します。コンパイラはまず `plugin.before` を実行し、次に `plugin.after` を実行します。
@@ -182,19 +182,19 @@ kotlinc -Xcompiler-plugin-order=plugin.middle>plugin.last
 
 この実行順序はコンパイラプラグインのバックエンドのみを制御し、フロントエンドは制御しません。
 
-### -Xdata-flow-based-exhaustiveness
+### -Xdata-flow-based-exhaustiveness {id="xdata-flow-based-exhaustiveness"}
 <primary-label ref="experimental-general"/>
 
 `when` 式に対してデータフローに基づく網羅性（exhaustiveness）チェックを有効にします。
 
-### -Xexplicit-context-arguments
+### -Xexplicit-context-arguments {id="xexplicit-context-arguments"}
 <primary-label ref="experimental-general"/>
 
 コンテキストパラメータに対する明示的な[コンテキスト引数](context-parameters.md#pass-context-arguments-explicitly)を有効にします。
 
 これにより、呼び出し側でコンテキスト引数を渡すことで、オーバーロードの曖昧さを解消できるようになります。
 
-### -Xklib-ir-inliner
+### -Xklib-ir-inliner {id="xklib-ir-inliner"}
 <primary-label ref="experimental-general"/>
 
 Kotlin/Native、Kotlin/JS、および Kotlin/Wasm に対して[モジュール内インライン化](whatsnew24.md#consistent-intra-module-function-inlining-during-klib-compilation)を有効にするかどうかを構成します。デフォルトでは有効になっています。
@@ -204,12 +204,12 @@ Kotlin/Native、Kotlin/JS、および Kotlin/Wasm に対して[モジュール�
 * `disabled`: Kotlin/Native、Kotlin/JS、および Kotlin/Wasm のモジュール内インライン化を無効にします。
 * `full`: モジュール間インライン化を有効にします。
 
-### -Xintrinsic-const-evaluation
+### -Xintrinsic-const-evaluation {id="xintrinsic-const-evaluation"}
 <primary-label ref="experimental-general"/>
 
 [向上したコンパイル時の定数](whatsnew24.md#improved-compile-time-constants)を有効にします。
 
-### -Xname-based-destructuring
+### -Xname-based-destructuring {id="xname-based-destructuring"}
 <primary-label ref="experimental-opt-in"/>
 
 プロパティ名に基づく[分解宣言](destructuring-declarations.md#name-based-destructuring)をコンパイラがどのように解釈するかを構成します。
@@ -220,12 +220,12 @@ Kotlin/Native、Kotlin/JS、および Kotlin/Wasm に対して[モジュール�
 * `name-mismatch`: データクラスでのポジションベース（位置ベース）の分解において、変数名がプロパティ名と一致しない場合に警告を報告します。
 * `complete`: 丸括弧を使用した短縮形式の名前ベースの分解を有効にし、角括弧構文によるポジションベースの分解のサポートを継続します。
 
-### -Xphases-to-dump-before
+### -Xphases-to-dump-before {id="xphases-to-dump-before"}
 <primary-label ref="experimental-general"/>
 
 IR lowering コンパイルステージの後にダンプファイルを作成するには、`ExternalPackageParentPatcherLowering` に設定します。Kotlin/JVM の出力ディレクトリは [`-Xdump-directory`](#xdump-directory) コンパイラオプションで設定します。
 
-### -Xrepl
+### -Xrepl {id="xrepl"}
 <primary-label ref="experimental-general"/>
 
 Kotlin REPL を起動します。
@@ -234,7 +234,7 @@ Kotlin REPL を起動します。
 kotlinc -Xrepl
 ```
 
-### -Xreturn-value-checker
+### -Xreturn-value-checker {id="xreturn-value-checker"}
 <primary-label ref="experimental-general"/>
 
 コンパイラが[無視された結果を報告する](unused-return-value-checker.md)方法を設定します：
@@ -243,26 +243,26 @@ kotlinc -Xrepl
 * `check`: チェッカーを有効にし、マークされた関数からの無視された結果に対して警告を報告します。
 * `full`: チェッカーを有効にし、プロジェクト内のすべての関数をマークされたものとして扱い、無視された結果に対して警告を報告します。
 
-### 警告管理
+### 警告管理 {id="warning-management"}
 
-#### -nowarn
+#### -nowarn {id="nowarn"}
 
 コンパイル中のすべての警告を抑制します。
 
-#### -Werror
+#### -Werror {id="werror"}
 
 すべての警告をコンパイルエラーとして扱います。
 
-#### -Wextra
+#### -Wextra {id="wextra"}
 
 有効な場合に警告を発する[追加の宣言、式、および型のコンパイラチェック](whatsnew21.md#extra-compiler-checks)を有効にします。
 
-#### -Xrender-internal-diagnostic-names
+#### -Xrender-internal-diagnostic-names {id="xrender-internal-diagnostic-names"}
 <primary-label ref="experimental-general"/>
 
 警告とともに内部診断名を表示します。これは、`-Xwarning-level` オプションで構成する `DIAGNOSTIC_NAME` を特定するのに役立ちます。
 
-#### -Xwarning-level
+#### -Xwarning-level {id="xwarning-level"}
 <primary-label ref="experimental-general"/>
 
 特定のコンパイラ警告の重大度レベルを設定します：
@@ -287,7 +287,7 @@ kotlinc -Xwarning-level=DIAGNOSTIC_NAME:(error|warning|disabled)
 
 `DIAGNOSTIC_NAME` を確認するには、[`-Xrender-internal-diagnostic-names`](#xrender-internal-diagnostic-names) を使用してください。
 
-### @argfile
+### @argfile {id="argfile"}
 
 指定されたファイルからコンパイラオプションを読み込みます。このようなファイルには、値を含むコンパイラオプションやソースファイルへのパスを含めることができます。オプションとパスは空白で区切る必要があります。例：
 
@@ -313,7 +313,7 @@ $ kotlinc @compiler.options @classes
 $ kotlinc @options/compiler.options hello.kt
 ```
 
-## Kotlin/JVM コンパイラオプション
+## Kotlin/JVM コンパイラオプション {id="kotlin-jvm-compiler-options"}
 
 JVM 用の Kotlin コンパイラは、Kotlin ソースファイルを Java クラスファイルにコンパイルします。
 Kotlin から JVM へのコンパイル用のコマンドラインツールは `kotlinc` および `kotlinc-jvm` です。
@@ -321,24 +321,24 @@ Kotlin から JVM へのコンパイル用のコマンドラインツールは `
 
 [共通オプション](#common-options)に加えて、Kotlin/JVM コンパイラには以下のオプションがあります。
 
-### -classpath _path_ (-cp _path_)
+### -classpath _path_ (-cp _path_) {id="classpath-path-cp-path"}
 
 指定されたパスでクラスファイルを検索します。クラスパスの要素は、システムのパス区切り文字（Windows では **;**、macOS/Linux では **:**）で区切ります。
 クラスパスには、ファイルやディレクトリのパス、ZIP、または JAR ファイルを含めることができます。
 
-### -d _path_
+### -d _path_ {id="d-path"}
 
 生成されたクラスファイルを指定した場所に配置します。場所はディレクトリ、ZIP、または JAR ファイルが可能です。
 
-### -include-runtime
+### -include-runtime {id="include-runtime"}
 
 生成される JAR ファイルに Kotlin ランタイムを含めます。これにより、生成されたアーカイブを Java が利用可能な任意の環境で実行できるようになります。
 
-### -jdk-home _path_
+### -jdk-home _path_ {id="jdk-home-path"}
 
 デフォルトの `JAVA_HOME` と異なる場合に、クラスパスに含めるカスタム JDK ホームディレクトリを使用します。
 
-### -Xjdk-release=version
+### -Xjdk-release=version {id="xjdk-release-version"}
 
 <primary-label ref="experimental-general"/>
 
@@ -350,7 +350,7 @@ Kotlin から JVM へのコンパイル用のコマンドラインツールは `
 >
 {style="note"}
 
-### -jvm-default _mode_
+### -jvm-default _mode_ {id="jvm-default-mode"}
 
 インターフェースで宣言された関数を JVM 上のデフォルトメソッドにコンパイルする方法を制御します。
 
@@ -360,72 +360,72 @@ Kotlin から JVM へのコンパイル用のコマンドラインツールは `
 | `no-compatibility` | インターフェースにデフォルト実装のみを生成し、互換性ブリッジや `DefaultImpls` クラスをスキップします。                            |
 | `disable`          | 互換性ブリッジと `DefaultImpls` クラスのみを生成し、デフォルトメソッドをスキップします。                                            |
 
-### -jvm-target _version_
+### -jvm-target _version_ {id="jvm-target-version"}
 
 生成される JVM バイトコードのターゲットバージョンを指定します。可能な値は `1.8`, `9`, `10`, ..., `26` です。
 デフォルト値は `%defaultJvmTargetVersion%` です。
 
-### -java-parameters
+### -java-parameters {id="java-parameters"}
 
 メソッドパラメータに関する Java 1.8 リフレクション用のメタデータを生成します。
 
-### -module-name _name_ (JVM)
+### -module-name _name_ (JVM) {id="module-name-name-jvm"}
 
 生成される `.kotlin_module` ファイルにカスタム名を設定します。
   
-### -no-jdk
+### -no-jdk {id="no-jdk"}
 
 Java ランタイムを自動的にクラスパスに含めません。
 
-### -no-reflect
+### -no-reflect {id="no-reflect"}
 
 Kotlin リフレクション（`kotlin-reflect.jar`）を自動的にクラスパスに含めません。
 
-### -no-stdlib (JVM)
+### -no-stdlib (JVM) {id="no-stdlib-jvm"}
 
 Kotlin/JVM 標準ライブラリ（`kotlin-stdlib.jar`）および Kotlin リフレクション（`kotlin-reflect.jar`）を自動的にクラスパスに含めません。
   
-### -script-templates _classnames[,]_
+### -script-templates _classnames[,]_ {id="script-templates-classnames"}
 
 スクリプト定義テンプレートクラスを指定します。完全修飾クラス名を使用し、カンマ（**,**）で区切ります。
 
-### -Xdump-directory
+### -Xdump-directory {id="xdump-directory"}
 <primary-label ref="experimental-general"/>
 
 [-Xphases-to-dump-before`](#xphases-to-dump-before) コンパイラオプションのダンプファイルディレクトリを設定します。
 
-### -Xjvm-expose-boxed
+### -Xjvm-expose-boxed {id="xjvm-expose-boxed"}
 <primary-label ref="experimental-general"/>
 
 モジュール内のすべてのインライン値クラスのボックス化（boxed）バージョンと、それらを使用する関数のボックス化バリアントを生成し、両方を Java からアクセス可能にします。詳細については、Java から Kotlin を呼び出すためのガイドの[インライン値クラス](java-to-kotlin-interop.md#inline-value-classes)を参照してください。
 
-### -Xnullability-annotations
+### -Xnullability-annotations {id="xnullability-annotations"}
 <primary-label ref="experimental-general"/>
 
 特定の Java パッケージからの Null 許容性アノテーションを Kotlin コンパイラがどのように解釈するかを構成します。
 
 サポートされているアノテーションと構成オプションの全リストについては、[Null 許容性アノテーション](java-interop.md#nullability-annotations)を参照してください。
 
-## Kotlin/JS コンパイラオプション
+## Kotlin/JS コンパイラオプション {id="kotlin-js-compiler-options"}
 
 JS 用の Kotlin コンパイラは、Kotlin ソースファイルを JavaScript コードにコンパイルします。
 Kotlin から JS へのコンパイル用のコマンドラインツールは `kotlinc-js` です。
 
 [共通オプション](#common-options)に加えて、Kotlin/JS コンパイラには以下のオプションがあります。
 
-### -libraries _path_
+### -libraries _path_ {id="libraries-path"}
 
 `.meta.js` および `.kjsm` ファイルを含む Kotlin ライブラリへのパス。システムのパス区切り文字で区切ります。
 
-### -main _{call|noCall}_
+### -main _{call|noCall}_ {id="main-call-nocall"}
 
 実行時に `main` 関数を呼び出すかどうかを定義します。
 
-### -meta-info
+### -meta-info {id="meta-info"}
 
 メタデータを含む `.meta.js` および `.kjsm` ファイルを生成します。JS ライブラリを作成するときにこのオプションを使用します。
 
-### -module-kind {umd|commonjs|amd|plain}
+### -module-kind {umd|commonjs|amd|plain id="module-kind"}
 
 コンパイラによって生成される JS モジュールの種類：
 
@@ -436,35 +436,35 @@ Kotlin から JS へのコンパイル用のコマンドラインツールは `k
     
 異なる種類の JS モジュールとその違いの詳細については、[こちらの記事](https://www.davidbcalhoun.com/2014/what-is-amd-commonjs-and-umd/)を参照してください。
 
-### -no-stdlib (JS)
+### -no-stdlib (JS) {id="no-stdlib-js"}
 
 デフォルトの Kotlin/JS 標準ライブラリをコンパイル依存関係に自動的に含めません。
 
-### -output _filepath_
+### -output _filepath_ {id="output-filepath"}
 
 コンパイル結果の出力先ファイルを設定します。値は、ファイル名を含む `.js` ファイルへのパスである必要があります。
 
-### -output-postfix _filepath_
+### -output-postfix _filepath_ {id="output-postfix-filepath"}
 
 指定されたファイルの内容を出力ファイルの最後に追加します。
 
-### -output-prefix _filepath_
+### -output-prefix _filepath_ {id="output-prefix-filepath"}
 
 指定されたファイルの内容を出力ファイルの最初に追加します。
 
-### -source-map
+### -source-map {id="source-map"}
 
 ソースマップを生成します。
 
-### -source-map-base-dirs _path_
+### -source-map-base-dirs _path_ {id="source-map-base-dirs-path"}
 
 指定されたパスをベースディレクトリとして使用します。ベースディレクトリは、ソースマップ内の相対パスの計算に使用されます。
 
-### -source-map-embed-sources _{always|never|inlining}_
+### -source-map-embed-sources _{always|never|inlining}_ {id="source-map-embed-sources-always-never-inlining"}
 
 ソースファイルをソースマップに埋め込みます。
 
-### -source-map-names-policy _{simple-names|fully-qualified-names|no}_
+### -source-map-names-policy _{simple-names|fully-qualified-names|no}_ {id="source-map-names-policy-simple-names-fully-qualified-names-no"}
 
 Kotlin コードで宣言した変数名と関数名をソースマップに追加します。
 
@@ -474,114 +474,119 @@ Kotlin コードで宣言した変数名と関数名をソースマップに追�
 | `fully-qualified-names` | 変数名と完全修飾された関数名が追加されます。 | `com.example.kjs.playground.main` |
 | `no` | 変数名や関数名は追加されません。 | N/A |
 
-### -source-map-prefix
+### -source-map-prefix {id="source-map-prefix"}
 
 ソースマップ内のパスに指定されたプレフィックスを追加します。
 
-### -target {es5|es2015}
+### -target {es5|es2015 id="target"}
 
 指定された ECMA バージョン用の JS ファイルを生成します。
 
-### -Xenable-implementing-interfaces-from-typescript
+### -Xenable-implementing-interfaces-from-typescript {id="xenable-implementing-interfaces-from-typescript"}
 <primary-label ref="experimental-general"/>
 
 JavaScript/TypeScript から、`@JsExport` アノテーションでエクスポートされた [Kotlin インターフェースの実装](whatsnew2320.md#implementing-kotlin-interfaces-from-javascript-typescript)を許可します。
 
-### -Xes-long-as-bigint
+### -Xes-long-as-bigint {id="xes-long-as-bigint"}
 <primary-label ref="experimental-general"/>
 
 モダンな JavaScript (ES2020) へのコンパイル時に、Kotlin の `Long` 値を表すために JavaScript の `BigInt` 型のサポートを有効にします。
 
-## Kotlin/Native コンパイラオプション
+### -Xsuspend-lambda-exporting {id="xsuspend-lambda-exporting"}
+<primary-label ref="experimental-general"/>
+
+`@JsExport` 宣言内で宣言された[中断ラムダ式の JavaScript `async` 関数としてのエクスポート](js-to-kotlin-interop.md#export-suspending-lambdas)を許可します。
+
+## Kotlin/Native コンパイラオプション {id="kotlin-native-compiler-options"}
 
 Kotlin/Native コンパイラは、Kotlin ソースファイルを[サポートされているプラットフォーム](native-overview.md#target-platforms)用のネイティブバイナリにコンパイルします。
 Kotlin/Native コンパイル用のコマンドラインツールは `kotlinc-native` です。
 
 [共通オプション](#common-options)に加えて、Kotlin/Native コンパイラには以下のオプションがあります。
 
-### -enable-assertions (-ea)
+### -enable-assertions (-ea) {id="enable-assertions-ea"}
 
 生成されたコードでランタイムアサーションを有効にします。
 
-### -entry _name_ (-e _name_)
+### -entry _name_ (-e _name_) {id="entry-name-e-name"}
 
 完全修飾されたエントリポイント名を指定します。
 
-### -g
+### -g {id="g"}
 
 デバッグ情報の出力を有効にします。このオプションは最適化レベルを下げるため、[`-opt`](#opt) オプションと組み合わせるべきではありません。
     
-### -generate-test-runner (-tr)
+### -generate-test-runner (-tr) {id="generate-test-runner-tr"}
 
 プロジェクトからユニットテストを実行するためのアプリケーションを生成します。
 
-### -generate-no-exit-test-runner (-trn)
+### -generate-no-exit-test-runner (-trn) {id="generate-no-exit-test-runner-trn"}
 
 明示的なプロセス終了を行わずにユニットテストを実行するためのアプリケーションを生成します。
 
-### -include-binary _path_ (-ib _path_)
+### -include-binary _path_ (-ib _path_) {id="include-binary-path-ib-path"}
 
 生成された klib ファイル内に外部バイナリをパックします。
 
-### -library _path_ (-l _path_)
+### -library _path_ (-l _path_) {id="library-path-l-path"}
 
 ライブラリとリンクします。Kotlin/Native プロジェクトでのライブラリの使用については、[Kotlin/Native ライブラリ](native-libraries.md)を参照してください。
 
-### -library-version _version_ (-lv _version_)
+### -library-version _version_ (-lv _version_) {id="library-version-version-lv-version"}
 
 ライブラリのバージョンを設定します。
 
-### -linker-option
+### -linker-option {id="linker-option"}
 
 バイナリビルド中にリンカーに引数を渡します。これは、特定のネイティブライブラリに対してリンクするために使用できます。
 
-### -linker-options _args_
+### -linker-options _args_ {id="linker-options-args"}
 
 バイナリビルド中にリンカーに複数の引数を渡します。引数は空白で区切ります。
     
-### -list-targets
+### -list-targets {id="list-targets"}
 
 利用可能なハードウェアターゲットを一覧表示します。
 
-### -manifest _path_
+### -manifest _path_ {id="manifest-path"}
 
 マニフェスト追記ファイルを提供します。
 
-### -module-name _name_ (Native)
+### -module-name _name_ (Native) {id="module-name-name-native"}
 
 コンパイルモジュールの名前を指定します。
 このオプションは、Objective-C にエクスポートされる宣言のプレフィックスを指定するためにも使用できます：
 [Kotlin フレームワークにカスタムの Objective-C プレフィックス/名前を指定するにはどうすればよいですか？](native-faq.md#how-do-i-specify-a-custom-objective-c-prefix-name-for-my-kotlin-framework)
 
-### -native-library _path_ (-nl _path_)
+### -native-library _path_ (-nl _path_) {id="native-library-path-nl-path"}
 
 ネイティブビットコードライブラリを含めます。
 
-### -no-default-libs
+### -no-default-libs {id="no-default-libs"}
 
 ユーザーコードと、コンパイラに同梱されているビルド済みの[プラットフォームライブラリ](native-platform-libs.md)とのリンクを無効にします。
 
-### -nomain
+### -nomain {id="nomain"}
 
 `main` エントリポイントが外部ライブラリによって提供されるものと想定します。
 
-### -nopack
+### -nopack {id="nopack"}
 
 ライブラリを klib ファイルにパックしません。
 
-### -nostdlib
+### -nostdlib {id="nostdlib"}
 
 標準ライブラリ（stdlib）とリンクしません。
 
-### -opt
+### -opt {id="opt"}
 
 コンパイルの最適化を有効にし、実行時のパフォーマンスが優れたバイナリを生成します。最適化レベルを下げる [`-g`](#g) オプションと組み合わせることは推奨されません。
 
-### -output _name_ (-o _name_)
+### -output _name_ (-o _name_) {id="output-name-o-name"}
 
 出力ファイルの名前を設定します。
 
-### -produce _output_ (-p _output_)
+### -produce _output_ (-p _output_) {id="produce-output-p-output"}
 
 出力ファイルの種類を指定します：
 
@@ -592,20 +597,20 @@ Kotlin/Native コンパイル用のコマンドラインツールは `kotlinc-na
 - `library`
 - `bitcode`
 
-### -repo _path_ (-r _path_)
+### -repo _path_ (-r _path_) {id="repo-path-r-path"}
 
 ライブラリ検索パス。詳細は [ライブラリ検索順序](native-libraries.md#library-search-sequence) を参照してください。
 
-### -target _target_
+### -target _target_ {id="target-target"}
 
 ハードウェアターゲットを設定します。利用可能なターゲットのリストを表示するには、[`-list-targets`](#list-targets) オプションを使用します。
 
-### -Xccall-mode
+### -Xccall-mode {id="xccall-mode"}
 <primary-label ref="experimental-general"/>
 
 cinterop 経由でインポートされた C または Objective-C ライブラリ用の[新しい相互運用モード](whatsnew2320.md#new-interoperability-mode-for-c-or-objective-c-libraries)を有効にします。
 
-### -Xoverride-konan-properties=min.version.*
+### -Xoverride-konan-properties=min.version.* {id="xoverride-konan-properties-min-version"}
 <primary-label ref="experimental-general"/>
 
 Kotlin のデフォルトよりも低い、サポートされる Apple ターゲットのバージョンを構成します。例：

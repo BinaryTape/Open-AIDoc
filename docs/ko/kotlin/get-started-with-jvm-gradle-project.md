@@ -18,16 +18,11 @@
 
 4. **Gradle** 빌드 시스템을 선택합니다.
 5. **JDK** 목록에서 프로젝트에 사용할 [JDK](https://www.oracle.com/java/technologies/downloads/)를 선택합니다.
-    * 컴퓨터에 JDK가 설치되어 있지만 IDE에 정의되어 있지 않은 경우, **Add JDK**를 선택하고 JDK 홈 디렉토리의 경로를 지정하세요.
+    * 컴퓨터에 JDK가 설치되어 있지만 IDE에 정의되어 있지 않은 경우, **Add JDK**를 선택하고 JDK 홈 디렉터리의 경로를 지정하세요.
     * 컴퓨터에 필요한 JDK가 없는 경우, **Download JDK**를 선택하세요.
 
-6. Gradle용 **Kotlin** DSL을 선택합니다.
+6. Gradle DSL로 **Kotlin**을 선택합니다.
 7. 샘플 `"Hello World!"` 애플리케이션이 포함된 파일을 생성하려면 **Add sample code** 체크박스를 선택합니다.
-
-   > **Generate code with onboarding tips** 옵션을 활성화하여 샘플 코드에 유용한 추가 주석을 추가할 수도 있습니다.
-   >
-   {style="tip"}
-
 8. **Create**를 클릭합니다.
 
 Gradle을 사용하는 프로젝트를 성공적으로 생성했습니다!
@@ -55,7 +50,7 @@ plugins {
     kotlin("jvm") version "%kotlinVersion%" // 사용할 Kotlin 버전
 }
 
-group = "org.example" // 회사 이름(예: `org.jetbrains`)
+group = "org.example" // 회사 이름(예: `org.jetbrains.kotlin`)
 version = "1.0-SNAPSHOT" // 빌드된 아티팩트에 할당할 버전
 
 repositories { // 의존성 소스. 1️⃣ 참고
@@ -67,18 +62,23 @@ dependencies { // 사용할 모든 라이브러리. 3️⃣ 참고
     testImplementation(kotlin("test")) // Kotlin 테스트 라이브러리
 }
 
-tasks.test { // 4️⃣ 참고
-    useJUnitPlatform() // 테스트용 JUnitPlatform. 5️⃣ 참고
+kotlin { // 생성된 JVM 툴체인 설정. 4️⃣ 참고
+    jvmToolchain(25) // 프로젝트를 컴파일하기 위한 JDK.
+}
+
+tasks.test { // 테스트 태스크 설정. 5️⃣ 참고 
+    useJUnitPlatform() // 테스트용 JUnitPlatform. 6️⃣ 참고
 }
 ```
 
 * 1️⃣ [의존성 소스](https://docs.gradle.org/current/userguide/declaring_repositories.html)에 대해 더 자세히 알아보세요.
 * 2️⃣ [Maven Central 저장소](https://central.sonatype.com/)입니다. [Google의 Maven 저장소](https://maven.google.com/)나 회사의 비공개 저장소가 될 수도 있습니다.
-* 3️⃣ [의존성 선언](https://docs.gradle.org/current/userguide/declaring_dependencies.html)에 대해 더 자세히 알아보세요. 
-* 4️⃣ [태스크(tasks)](https://docs.gradle.org/current/dsl/org.gradle.api.Task.html)에 대해 더 자세히 알아보세요.
-* 5️⃣ [테스트용 JUnitPlatform](https://docs.gradle.org/current/javadoc/org/gradle/api/tasks/testing/Test.html#useJUnitPlatform)입니다.
+* 3️⃣ [의존성 선언](https://docs.gradle.org/current/userguide/declaring_dependencies.html)에 대해 더 자세히 알아보세요.
+* 4️⃣ [Java 툴체인 지원](gradle-configure-project.md#gradle-java-toolchains-support)에 대해 더 자세히 알아보세요.
+* 5️⃣ [태스크(tasks)](https://docs.gradle.org/current/dsl/org.gradle.api.Task.html)에 대해 더 자세히 알아보세요.
+* 6️⃣ [테스트용 JUnitPlatform](https://docs.gradle.org/current/javadoc/org/gradle/api/tasks/testing/Test.html#useJUnitPlatform)입니다.
 
-보시다시피 Gradle 빌드 파일에 몇 가지 Kotlin 관련 아티팩트가 추가되었습니다:
+Gradle 빌드 파일에 몇 가지 Kotlin 전용 아티팩트가 있습니다:
 
 1. `plugins {}` 블록에는 `kotlin("jvm")` 아티팩트가 있습니다. 이 플러그인은 프로젝트에서 사용할 Kotlin 버전을 정의합니다.
 
@@ -87,15 +87,15 @@ tasks.test { // 4️⃣ 참고
 
 ## 애플리케이션 실행 {id="run-the-application"}
 
-1. **View** | **Tool Windows** | **Gradle**을 선택하여 Gradle 창을 엽니다.
+1. **View** | **Tool Windows** | **Gradle**을 선택하여 Gradle 창을 엽니다:
 
-   ![main 함수가 포함된 Main.kt](jvm-gradle-view-build.png){width=700}
+   ![main 함수가 포함된 Main.kt](jvm-gradle-view-build.png){width=450}
 
-2. `Tasks\build\`에서 **build** Gradle 태스크를 실행합니다. **Build** 창에 `BUILD SUCCESSFUL`이 나타납니다.
+2. `Tasks/build`에서 **build** Gradle 태스크를 실행합니다. **Build** 창에 `BUILD SUCCESSFUL`이 나타납니다.
    이는 Gradle이 애플리케이션을 성공적으로 빌드했음을 의미합니다.
 
-3. `src/main/kotlin`에서 `Main.kt` 파일을 엽니다.
-   * `src` 디렉토리는 Kotlin 소스 파일과 리소스를 포함합니다. 
+3. `src/main/kotlin`에서 `Main.kt` 파일을 엽니다:
+   * `src` 디렉터리는 Kotlin 소스 파일과 리소스를 포함합니다. 
    * `Main.kt` 파일은 `Hello World!`를 출력하는 샘플 코드를 포함하고 있습니다.
 
 4. 거터(gutter)에 있는 녹색 **Run** 아이콘을 클릭하고 **Run 'MainKt'**를 선택하여 애플리케이션을 실행합니다.
@@ -104,7 +104,7 @@ tasks.test { // 4️⃣ 참고
 
 **Run** 도구 창에서 결과를 확인할 수 있습니다:
 
-![Kotlin 실행 결과](jvm-output-gradle.png){width=600}
+![Kotlin 실행 결과](jvm-output-gradle.png){width=700}
 
 축하합니다! 첫 번째 Kotlin 애플리케이션을 성공적으로 실행했습니다.
 
