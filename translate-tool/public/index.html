@@ -540,7 +540,7 @@ const app = createApp({
     }
 
     const showSettings = ref(false);
-    const apiKey = ref(localStorage.getItem('od_apiKey') || '');
+    const apiKey = ref(sessionStorage.getItem('od_apiKey') || '');
     const promptLang = ref('zh-Hans');
     const editingPrompt = ref('');
     const terminologyPreview = ref('');
@@ -819,7 +819,7 @@ const app = createApp({
       await loadPrompt();
       toast('已恢复默认', 'success');
     }
-    watch(apiKey, (v) => { localStorage.setItem('od_apiKey', v); });
+    watch(apiKey, (v) => { sessionStorage.setItem('od_apiKey', v); });
 
     return {
       sidebarTab, projects, languages, languageNames, models, hasEnvKey,
