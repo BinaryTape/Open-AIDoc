@@ -10,13 +10,13 @@ _[출시일: 2025년 12월 16일](releases.md#release-history)_
 
 Kotlin 2.3.0이 출시되었습니다! 주요 하이라이트는 다음과 같습니다.
 
-* **언어(Language)**: [더 많은 기능의 안정화 및 기본 활성화, 사용되지 않는 반환 값 체커, 명시적 뒷받침하는 필드(explicit backing fields), 문맥 민감 해소(context-sensitive resolution)의 변경 사항](#language).
+* **언어(Language)**: [더 많은 기능의 안정화 및 기본 활성화, 사용되지 않는 반환 값 체커, 명시적 뒷받침하는 필드, 문맥 민감 해소의 변경 사항](#language).
 * **Kotlin/JVM**: [Java 25 지원](#kotlin-jvm-support-for-java-25).
-* **Kotlin/Native**: [Swift 내보내기(export)를 통한 상호운용성 개선, 릴리스 태스크의 빌드 시간 단축, C 및 Objective-C 라이브러리 임포트 베타(Beta) 진입](#kotlin-native).
-* **Kotlin/Wasm**: [완전한 정규화된 이름(FQN) 및 새로운 예외 처리 제안 기본 활성화, Latin-1 문자를 위한 새로운 압축 저장 방식](#kotlin-wasm).
-* **Kotlin/JS**: [새로운 실험적 중단 함수(suspend function) 내보내기, `LongArray` 표현 방식 변경, 통합된 동반 객체(companion object) 접근 등](#kotlin-js).
+* **Kotlin/Native**: [Swift 내보내기를 통한 상호운용성 개선, 릴리스 태스크의 빌드 시간 단축, C 및 Objective-C 라이브러리 임포트 베타 진입](#kotlin-native).
+* **Kotlin/Wasm**: [완전한 정규화된 이름 및 새로운 예외 처리 제안 기본 활성화, Latin-1 문자를 위한 새로운 압축 저장 방식](#kotlin-wasm).
+* **Kotlin/JS**: [새로운 실험적 중단 함수 내보내기, `LongArray` 표현 방식 변경, 통합된 동반 객체 접근 등](#kotlin-js).
 * **Gradle**: [Gradle 9.0과의 호환성 및 생성된 소스 등록을 위한 새로운 API](#gradle).
-* **Compose 컴파일러**: [미니파이된(minified) Android 애플리케이션을 위한 스택 트레이스](#compose-compiler-stack-traces-for-minified-android-applications).
+* **Compose 컴파일러**: [미니파이된 Android 애플리케이션을 위한 스택 트레이스](#compose-compiler-stack-traces-for-minified-android-applications).
 * **표준 라이브러리**: [시간 추적 기능 안정화 및 UUID 생성과 파싱 개선](#standard-library).
 
 이 비디오에서 업데이트 개요를 확인할 수도 있습니다.
@@ -43,8 +43,8 @@ Kotlin 2.3.0은 기능 안정화에 중점을 두었으며, 사용되지 않는 
 
 이전 Kotlin 릴리스에서 실험적(Experimental) 및 베타(Beta)로 도입되었던 몇 가지 언어 기능이 Kotlin 2.3.0에서 [안정화(Stable)](components-stability.md#stability-levels-explained) 단계로 승격되었습니다.
 
-* [중첩된 타입 별칭(type alias) 지원](whatsnew22.md#support-for-nested-type-aliases)
-* [데이터 흐름 기반의 `when` 표현식 완전성 검사(exhaustiveness checks)](whatsnew2220.md#data-flow-based-exhaustiveness-checks-for-when-expressions)
+* [중첩된 타입 별칭 지원](whatsnew22.md#support-for-nested-type-aliases)
+* [데이터 흐름 기반의 `when` 표현식 완전성 검사](whatsnew2220.md#data-flow-based-exhaustiveness-checks-for-when-expressions)
 
 ### 기본으로 활성화된 기능 {id="features-enabled-by-default"}
 
@@ -55,7 +55,7 @@ Kotlin 2.3.0에서는 [명시적 반환 타입이 있는 표현식 본문의 `re
 ### 사용되지 않는 반환 값 체커(Unused return value checker) {id="unused-return-value-checker"}
 <primary-label ref="experimental-general"/>
 
-Kotlin 2.3.0은 무시된 결과를 방지하는 데 도움이 되는 '사용되지 않는 반환 값 체커'를 도입했습니다.
+Kotlin 2.3.0은 무시된 결과를 방지하는 데 도움이 되는 사용되지 않는 반환 값 체커를 도입했습니다.
 표현식이 `Unit` 또는 `Nothing` 이외의 값을 반환하지만 함수로 전달되지 않거나, 조건문에서 검사되지 않거나, 그 외 다른 방식으로 사용되지 않을 때 경고를 표시합니다.
 
 이 체커는 함수 호출이 의미 있는 결과를 생성하지만 자동으로 버려지는 버그를 잡는 데 도움을 주며, 이는 예상치 못한 동작이나 추적하기 어려운 문제로 이어질 수 있습니다.
@@ -190,7 +190,7 @@ fun <T> MutableList<T>.addAndIgnoreResult(element: T): Boolean {
 }
 ```
 
-함수 자체를 무시 가능(ignorable)으로 표시하지 않고도 경고를 억제할 수 있습니다.
+함수 자체를 무시 가능으로 표시하지 않고도 경고를 억제할 수 있습니다.
 이를 위해 결과를 언더스코어(`_`)가 있는 특수한 이름 없는 변수에 할당하세요.
 
 ```kotlin
@@ -301,7 +301,7 @@ Kotlin 2.3.0부터 컴파일러는 Java 25 바이트코드를 포함하는 클�
 
 ## Kotlin/Native {id="kotlin-native"}
 
-Kotlin 2.3.0은 Swift 내보내기(export) 지원과 C 및 Objective-C 라이브러리 임포트 기능을 개선하고, 릴리스 태스크의 빌드 시간 단축했습니다.
+Kotlin 2.3.0은 Swift 내보내기(export) 지원과 C 및 Objective-C 라이브러리 임포트 기능을 개선하고, 릴리스 태스크의 빌드 시간을 단축했습니다.
 
 ### Swift 내보내기를 통한 상호운용성 개선 {id="improved-interop-through-swift-export"}
 <primary-label ref="experimental-general"/>
@@ -443,7 +443,7 @@ Kotlin/Wasm 타겟에서 런타임에 완전한 정규화된 이름(Fully Qualif
 
 Kotlin 2.3.0에서는 Kotlin/Wasm 타겟에서 `KClass.qualifiedName` 프로퍼티가 기본적으로 활성화됩니다. 즉, 추가 구성 없이 런타임에 FQN을 사용할 수 있습니다.
 
-FQN을 기본적으로 활성화하면 코드 이식성이 향상되고, 런타임 오류 발생 시 FQN을 표시하여 더 유익한 정보를 제공할 수 있습니다.
+FQN을 기본적으로 활성화하면 코드 이식성이 향상되고, 런타임 오류 발생 시 완전한 정규화된 이름을 표시하여 더 유익한 정보를 제공할 수 있습니다.
 
 이 변경 사항은 컴파일러 최적화 덕분에 컴파일된 Wasm 바이너리 크기를 증가시키지 않습니다. 이는 Latin-1 문자열 리터럴에 대해 압축 저장 방식을 사용하여 메타데이터를 줄였기 때문입니다.
 
@@ -651,7 +651,7 @@ private external fun jsFun()
 
 이 기능은 기본적으로 활성화되어 있습니다.
 
-### JavaScript 기본 내보내기(default exports) 지원 {id="support-for-javascript-default-exports"}
+### JavaScript 기본 내보내기 지원 {id="support-for-javascript-default-exports"}
 
 이전에는 Kotlin/JS가 Kotlin 코드에서 JavaScript의 기본 내보내기(default exports)를 생성할 수 없었습니다. 대신 Kotlin/JS는 명명된 내보내기(named exports)만 생성했습니다. 예:
 
@@ -691,9 +691,9 @@ export default HelloWorker;
 
 Kotlin 2.3.0은 Gradle 7.6.3부터 9.0.0까지 완벽하게 호환됩니다. 최신 Gradle 버전까지도 사용할 수 있습니다. 다만, 최신 버전을 사용할 경우 지원 중단 경고가 발생할 수 있으며 일부 새로운 Gradle 기능이 작동하지 않을 수 있습니다.
 
-또한, 지원되는 최소 Android Gradle 플러그인(AGP) 버전은 이제 8.2.2이며, 최대 지원 버전은 8.13.0입니다.
+또한, 지원되는 최소 Android Gradle 플러그인 버전은 이제 8.2.2이며, 최대 지원 버전은 8.13.0입니다.
 
-Kotlin 2.3.0은 또한 Gradle 프로젝트에서 생성된 소스(generated sources)를 등록하기 위한 새로운 API를 도입했습니다.
+Kotlin 2.3.0은 또한 Gradle 프로젝트에서 생성된 소스를 등록하기 위한 새로운 API를 도입했습니다.
 
 ### Gradle 프로젝트에서 생성된 소스 등록을 위한 새로운 API {id="new-api-for-registering-generated-sources-in-gradle-projects"}
 <primary-label ref="experimental-general"/>
@@ -704,7 +704,7 @@ Kotlin 2.3.0은 [`KotlinSourceSet`](https://kotlinlang.org/api/kotlin-gradle-plu
 
 자세한 내용은 [생성된 소스 등록](gradle-configure-project.md#register-generated-sources)을 참조하세요.
 
-## 표준 라이브러리(Standard library) {id="standard-library"}
+## 표준 라이브러리 {id="standard-library"}
 
 Kotlin 2.3.0은 새로운 시간 추적 기능인 [`kotlin.time.Clock` 및 `kotlin.time.Instant`](whatsnew2120.md#new-time-tracking-functionality)를 안정화하고, 실험적 UUID API에 몇 가지 개선 사항을 추가했습니다.
 
@@ -760,7 +760,7 @@ Kotlin 2.3.0은 문자열로부터 `Uuid` 인스턴스를 생성하는 새로운
 
 해당 함수는 다음과 같습니다.
 
-* `Uuid.parseOrNull()` – 16진수-대시(hex-and-dash) 또는 16진수 형식의 UUID를 파싱합니다.
+* `Uuid.parseOrNull()` – 16진수-대시 또는 16진수 형식의 UUID를 파싱합니다.
 * `Uuid.parseHexDashOrNull()` – 16진수-대시 형식의 UUID만 파싱하며, 그렇지 않으면 `null`을 반환합니다.
 * `Uuid.parseHexOrNull()` – 순수 16진수 형식의 UUID만 파싱하며, 그렇지 않으면 `null`을 반환합니다.
 
@@ -871,8 +871,8 @@ Composer.setDiagnosticStackTraceMode(ComposeStackTraceMode.GroupKeys)
 java.lang.IllegalStateException: <message>
         at <original trace>
     Suppressed: androidx.compose.runtime.DiagnosticComposeException: Composition stack when thrown:
-        at $compose.m$123(SourceFile:1)
-        at $compose.m$234(SourceFile:1)
+        at $$compose.m$123(SourceFile:1)
+        at $$compose.m$234(SourceFile:1)
         ...
 ```
 
@@ -910,7 +910,7 @@ composeCompiler {
 
 * Android Gradle 플러그인(AGP) 9.0.0 이상에서 Android 타겟용 Kotlin Multiplatform Gradle 플러그인을 계속 사용하는 경우, `androidTarget` 블록 사용 시 구성 오류가 발생하며 마이그레이션 방법을 안내하는 진단 메시지가 표시됩니다. AGP 8.x를 사용하고 Kotlin 2.3.10으로 업데이트하거나, [Google의 Android 타겟용 플러그인](https://kotlinlang.org/docs/multiplatform/multiplatform-compatibility-guide.html#migrate-to-google-s-plugin-for-android-targets)으로 마이그레이션하여 이 오류를 피할 수 있습니다.
 
-* AGP 9.0.0에는 [Kotlin에 대한 기본 지원(built-in support)](https://developer.android.com/build/releases/agp-preview#android-gradle-plugin-built-in-kotlin)이 포함되어 있습니다. Kotlin 2.3.0부터 이 버전의 AGP를 `kotlin-android` 플러그인과 함께 사용하면 [구성 오류가 발생](compatibility-guide-23.md#deprecate-kotlin-android-plugin-for-agp-versions-9-0-0-and-later)합니다. 해당 플러그인이 더 이상 필요하지 않기 때문입니다. 마이그레이션을 돕기 위한 새로운 진단 메시지가 제공됩니다. 이전 AGP 버전을 사용하는 경우 지원 중단 경고가 표시됩니다.
+* AGP 9.0.0에는 [Kotlin에 대한 기본 지원](https://developer.android.com/build/releases/agp-preview#android-gradle-plugin-built-in-kotlin)이 포함되어 있습니다. Kotlin 2.3.0부터 이 버전의 AGP를 `kotlin-android` 플러그인과 함께 사용하면 [구성 오류가 발생](compatibility-guide-23.md#deprecate-kotlin-android-plugin-for-agp-versions-9-0-0-and-later)합니다. 해당 플러그인이 더 이상 필요하지 않기 때문입니다. 마이그레이션을 돕기 위한 새로운 진단 메시지가 제공됩니다. 이전 AGP 버전을 사용하는 경우 지원 중단 경고가 표시됩니다.
 
 * Ant 빌드 시스템에 대한 지원은 더 이상 제공되지 않습니다.
 
@@ -920,27 +920,22 @@ Kotlin Multiplatform 문서가 kotlinlang.org로 이동했습니다. 이제 한 
 
 지난 Kotlin 릴리스 이후의 다른 주목할 만한 변경 사항은 다음과 같습니다.
 
-* [KMP 개요(KMP overview)](https://kotlinlang.org/docs/multiplatform/kmp-overview.html) – Kotlin Multiplatform 생태계를 한 페이지에서 살펴보세요.
-* [Kotlin Multiplatform 빠른 시작(Kotlin Multiplatform quickstart)](https://kotlinlang.org/docs/multiplatform/quickstart.html) – KMP IDE 플러그인을 사용하여 환경을 설정하는 방법을 배워보세요.
+* [KMP 개요](https://kotlinlang.org/docs/multiplatform/kmp-overview.html) – Kotlin Multiplatform 생태계를 한 페이지에서 살펴보세요.
+* [Kotlin Multiplatform 빠른 시작](https://kotlinlang.org/docs/multiplatform/quickstart.html) – KMP IDE 플러그인을 사용하여 환경을 설정하는 방법을 배워보세요.
 * [Compose Multiplatform 1.9.3의 새로운 기능](https://kotlinlang.org/docs/multiplatform/whats-new-compose-190.html) – 최신 릴리스의 하이라이트를 확인하세요.
-* [Kotlin/JS 시작하기(Get started with Kotlin/JS)](js-get-started.md) – Kotlin/JavaScript를 사용하여 브라우저용 웹 애플리케이션을 만들어 보세요.
-* [클래스(Classes)](classes.md) – Kotlin에서 클래스를 사용하는 기본 사항과 모범 사례를 배워보세요.
-* [확장(Extensions)](extensions.md) – Kotlin에서 클래스와 인터페이스를 확장하는 방법을 배워보세요.
-* [코루틴 기초(Coroutines basics)](coroutines-basics.md) – 주요 코루틴 개념을 탐구하고 첫 번째 코루틴을 만드는 방법을 배워보세요.
-* [취소 및 타임아웃(Cancellation and timeouts)](cancellation-and-timeouts.md) – 코루틴 취소가 어떻게 작동하는지, 그리고 코루틴이 취소에 응답하도록 만드는 방법을 배워보세요.
+* [Kotlin/JS 시작하기](js-get-started.md) – Kotlin/JavaScript를 사용하여 브라우저용 웹 애플리케이션을 만들어 보세요.
+* [클래스](classes.md) – Kotlin에서 클래스를 사용하는 기본 사항과 모범 사례를 배워보세요.
+* [확장](extensions.md) – Kotlin에서 클래스와 인터페이스를 확장하는 방법을 배워보세요.
+* [코루틴 기초](coroutines-basics.md) – 주요 코루틴 개념을 탐구하고 첫 번째 코루틴을 만드는 방법을 배워보세요.
+* [취소 및 타임아웃](coroutines-cancellation.md) – 코루틴 취소가 어떻게 작동하는지, 그리고 코루틴이 취소에 응답하도록 만드는 방법을 배워보세요.
 * [Kotlin/Native 라이브러리](native-libraries.md) – `klib` 라이브러리 아티팩트를 생성하는 방법을 확인하세요.
 * [Kotlin Notebook 개요](kotlin-notebook-overview.md) – Kotlin Notebook 플러그인으로 대화형 노트북 문서를 만들어 보세요.
-* [Java 프로젝트에 Kotlin 추가하기(Add Kotlin to a Java project)](mixing-java-kotlin-intellij.md) – Kotlin과 Java를 모두 사용하도록 Java 프로젝트를 구성하세요.
-* [Kotlin으로 Java 코드 테스트하기(Test Java code with Kotlin)](jvm-test-using-junit.md) – JUnit으로 Java-Kotlin 혼합 프로젝트를 테스트하세요.
-* [새로운 사례 연구 페이지(New case studies page)](https://kotlinlang.org/case-studies/) – 다양한 기업들이 Kotlin을 어떻게 적용하고 있는지 확인해 보세요.
+* [Java 프로젝트에 Kotlin 추가하기](mixing-java-kotlin-intellij.md) – Kotlin과 Java를 모두 사용하도록 Java 프로젝트를 구성하세요.
+* [Kotlin으로 Java 코드 테스트하기](jvm-test-using-junit.md) – JUnit으로 Java-Kotlin 혼합 프로젝트를 테스트하세요.
+* [새로운 사례 연구 페이지](https://kotlinlang.org/case-studies/) – 다양한 기업들이 Kotlin을 어떻게 적용하고 있는지 확인해 보세요.
 
 ## Kotlin 2.3.0으로 업데이트하는 방법 {id="how-to-update-to-kotlin-2-3-0"}
 
 Kotlin 플러그인은 IntelliJ IDEA 및 Android Studio에 번들 플러그인으로 제공됩니다.
 
 새로운 Kotlin 버전으로 업데이트하려면 빌드 스크립트에서 [Kotlin 버전을 2.3.0으로 변경](releases.md#update-to-a-new-kotlin-version)하세요.
-
-```kotlin
-plugins {
-    kotlin("jvm") version "2.3.0"
-}

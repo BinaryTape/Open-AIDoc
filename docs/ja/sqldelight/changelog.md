@@ -12,8 +12,68 @@
 
 ### Fixed {id="fixed"}
 
+- まだありません！
+
+## [2.4.0] - 2026-09-17 {id="2-4-0-2026-09-17"}
+[2.4.0]: https://github.com/sqldelight/sqldelight/releases/tag/2.4.0
+
+### Added
+- [Nativeドライバ] `inMemoryDriver` に `extendedConfig` パラメータを追加 (#5539 by @GuilhE)
+- [PostgreSQLダイアレクト] 暗黙的に定義されたシステムカラム (System Columns) のクエリサポートを追加 (#5834 by @griffio)
+- [PostgreSQLダイアレクト] 基本的な配列リテラル (Array literal) のサポートを追加 (#5997 by @griffio)
+- [PostgreSQLダイアレクト] 基本的な LTREE のサポートを追加 (#5880 by @yesitskev @griffio)
+- [MySQLダイアレクト] INET 関数のサポートを追加 (#5072 by @mcxinyu)
+- [PostgreSQLダイアレクト] ALTER INDEX のサポートを追加 (#6224 by @griffio)
+- [SQLiteダイアレクト] SQLite 3.44 の集計関数 DISTINCT、ORDER BY、および FILTER のサポートを追加 (#6236 by @griffio)
+- [SQLiteダイアレクト] SQLite 3.37 STRICT テーブルのサポートを追加 (#6230 by @griffio)
+- [Gradleプラグイン] `codegenExcludedColumns` を使用して生成されたモデルからカラムを除外するサポートを追加 (#6243 by @sokolikp)
+- [コンパイラ] スキーマに `allTableNames` 関数を追加 (#6245 by @edenman)
+- [PostgreSQLダイアレクト] ANY 演算子のサポートを追加 (#6253 by @griffio)
+- [SQLiteダイアレクト] SQLite 3.39 の RIGHT JOIN および FULL JOIN のサポートを追加 (#6273 by @griffio)
+- [PostgreSQLダイアレクト] トリガー関数における `RAISE` 文および `FOUND` 変数のサポートを追加 (#6297 by @griffio)
+
+### Changed
+- [PostgreSQLダイアレクト] arrayIntermediateType の可視性を public に変更 (#5835 by @griffio)
+- [Gradleプラグイン] より厳格な MigrationFile のバージョニングを実装 (#5730 by @madisp)
+- [Gradleプラグイン] サポートする Gradle の最小バージョンを 8.2.1 に引き上げ (#6217 by @maxsav)
+- [Gradleプラグイン] Gradle の隔離されたプロジェクト (Isolated Projects) をサポート (#6217 by @maxsav)
+- [IntelliJプラグイン] 最小バージョンを 2023.3 / Android Studio Jellyfish に変更
+
+### Fixed
+- [Gradleプラグイン] JDK 24+ において、コンパイラワーカーからの `sun.misc.Unsafe` 非推奨警告を抑制 (#6321)
+- [コンパイラ] 生成されたコードにおける Kotlin の追加の警告を抑制 (#6208 by @eyupcanakman)
+- [コンパイラ] グループ化されていない集計結果セット内の他のカラムが、常に Null 許容になるように修正
+- [PostgreSQLダイアレクト] coalesce および ifnull の Null 許容性を正しく解決するように修正
+- [PostgreSQLダイアレクト] PostgreSQL ダイアレクトの IDE 統合を修正
+- [PostgreSQLダイアレクト] PostgreSQL ダイアレクトの IDE プラグインを改善 (#6209 by @griffio)
+- [Intellijプラグイン] IDE プラグインがすべてのダイアレクトでコード補完を実行可能に改善 (#6210 by @griffio)
+- [Gradleプラグイン] データベース検証タスク実行時の循環依存エラーを修正 (#6221 by @griffio)
+- [コンパイラ] 複数行の更新 (multirow update) における楽観的ロックを修正 (#6240 by @griffio)
+- [Intellijプラグイン] IDEA 2026.2 でクラッシュを引き起こす非推奨事項を修正 (#6247 by @griffio)
+- [Gradleプラグイン] AGP 8.9 から 8.11 において、生成されたソースが Kotlin コンパイルに反映されない問題を修正
+- [PostgreSQLダイアレクト] lower および upper 関数が Primitive バインド引数を使用する際にデフォルトで TEXT になるように修正 (#6262 by @griffio)
+- [コンパイラ] アダプタを使用しマイグレーションで Null 許容性が変更される場合に、データクラスバインディングを用いたインサート値を修正 (#6269 by griffio)
+- [コンパイラ] Null 安全な演算子 (IS および IS DISTINCT FROM) で Null 許容のバインド引数を使用するように修正 (#6265 by @griffio)
+- [Gradleプラグイン] プロジェクト依存関係に AGP のバリアント解決 (variant resolution) を使用するように修正 (#6217 by @maxsav)
+- [Gradleプラグイン] AGP バリアントのリストがビルド間で異なる場合に、generateDatabaseInterface のビルドキャッシュがミスする問題を修正
+- [Gradleプラグイン] データベースを設定せずにプラグインを適用した場合の IDE 同期時のクラッシュを修正 (#6088)
+- [PostgreSQLダイアレクト] 関数呼び出しをネストして使用する際の JSON 集計関数を修正 (#6281 by @griffio)
+- [Paging3拡張] データベースが空の場合の KeyedQueryPagingSource のクラッシュを修正 (#6284 by @woods-marshes)
+- [コンパイラ] `COALESCE` のようなカプセル化関数でミューテータ文が使用される際の Java 型アダプタの問題を修正 (#6292 by @griffio)
+- [コンパイラ] モジュール名が大文字の場合に、生成されたコードのパッケージ名も大文字になってしまう問題を修正 (#6316 by @griffio)
+- [PostgreSQLダイアレクト] 日付データ型において大文字小文字を区別しないように修正 (#6328 by @griffio)
 - [PostgreSQLダイアレクト] `string_agg` 関数が Null 許容になるように修正 (#6340 by @griffio)
 - [SQLiteダイアレクト] `GROUP BY` を使用した SQLite 3.44 の集計関数を修正 (#6343 by @griffio)
+- [Gradleプラグイン] 設定時 (configuration time) にデータベースの依存関係を解決しないように修正 (#6353 by @joshfriend)
+
+## [2.4.0-rc2] - 2026-09-14 {id="2-4-0-rc2-2026-09-14"}
+[2.4.0-rc2]: https://github.com/sqldelight/sqldelight/releases/tag/2.4.0-rc2
+
+### Fixed
+
+- [PostgreSQLダイアレクト] `string_agg` 関数が Null 許容になるように修正 (#6340 by @griffio)
+- [SQLiteダイアレクト] `GROUP BY` を使用した SQLite 3.44 の集計関数を修正 (#6343 by @griffio)
+- [Gradleプラグイン] 設定時 (configuration time) にデータベースの依存関係を解決しないように修正 (#6353 by @joshfriend)
 
 ## [2.4.0-rc1] - 2026-09-01 {id="2-4-0-rc1-2026-09-01"}
 [2.4.0-rc1]: https://github.com/sqldelight/sqldelight/releases/tag/2.4.0-rc1
@@ -864,6 +924,8 @@ sqldelight {
 - [Gradleプラグイン] Gradle プラグインで `kotlin-native-utils` に依存しないように修正 (by @ilmat192)
 - [Gradleプラグイン] マイグレーションファイルのみが存在する場合でもデータベースを書き出すように修正 (#2094)
 - [Gradleプラグイン] 最終的なコンパイルユニットでダイヤモンド依存関係が 1 回だけ取得されるように修正 (#1455)
+
+また、本リリースにおいて SQLDelight のインフラ改善に多大な貢献をしてくれた @3flex に深く感謝します。
 
 ## [1.4.4] - 2020-10-08 {id="1-4-4-2020-10-08"}
 [1.4.4]: https://github.com/sqldelight/sqldelight/releases/tag/1.4.4

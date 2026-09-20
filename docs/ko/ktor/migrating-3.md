@@ -141,7 +141,7 @@ fun main(args: Array<String>) {
 
 </compare>
 
-명령줄 구성에 대한 자세한 내용은 [코드로 구성하기(Configuration in code)](server-configuration-code.topic#command-line) 주제를 참조하세요.
+`embeddedServer`를 사용한 명령줄 구성에 대한 자세한 내용은 [코드로 구성하기(Configuration in code)](server-configuration-code.topic#command-line) 주제를 참조하세요.
 
 #### `ServerConfigBuilder` 도입 {id="ServerConfigBuilder"}
 
@@ -280,7 +280,9 @@ class ApplicationTest {
 @Test
 fun testHello() = testApplication {
     environment {
-        config = ApplicationConfig("application-custom.conf")
+        config = ApplicationConfig(
+            "application-custom.conf"
+        )
     }
 }
 ```
@@ -408,7 +410,7 @@ JS 및 WasmJS 환경에서 비동기 작업을 지원하기 위해 [`TCPSocketBu
 
 ### 바이너리 및 파일 항목에 대한 새로운 기본 제한 {id="new-default-limit-for-binary-and-file-items"}
 
-Ktor 3.0.0에서는 [`ApplicationCall.receiveMultipart()`](https://api.ktor.io/3.0.x/ktor-server-core/io.ktor.server.request/receive-multipart.html)를 사용하여 바이너리 및 파일 항목을 받을 때 50MiB(약 52.4MB)의 기본 제한이 도입되었습니다. 받은 파일이나 바이너리 항목이 50MiB 제한을 초과하면 `IOException`이 발생합니다.
+Ktor 3.0.0에서는 [`ApplicationCall.receiveMultipart()`](https://api.ktor.io/3.0.x/ktor-server-core/io.ktor.server.request/receive-multipart.html)를 사용하여 바이너리 및 파일 항목을 받을 때 50MiB의 기본 제한이 도입되었습니다. 받은 파일이나 바이너리 항목이 50MiB 제한을 초과하면 `IOException`이 발생합니다.
 
 #### 기본 제한 재정의 {id="override-the-default-limit"}
 

@@ -274,10 +274,19 @@ fun main() {
 
 作为下一步，请查看我们关于热门 Kotlin 应用程序的教程：
 
-* [使用 Spring Boot 和 Kotlin 创建后端应用程序](jvm-create-project-with-spring-boot.md)
-* 从头开始为 Android 和 iOS 创建跨平台应用程序并：
-    * [在保持 UI 原生的同时共享业务逻辑](https://kotlinlang.org/docs/multiplatform/multiplatform-create-first-app.html)
-    * [共享业务逻辑和 UI](https://kotlinlang.org/docs/multiplatform/compose-multiplatform-create-first-app.html)
+<p></p> <!-- workaround for MRK057: Paragraph can only contain inline elements -->
+<panels columns="2" id="kotlin-tour-whats-next">
+    <panel>
+        <title>用于后端的 Kotlin</title>
+        <p>使用 Spring Boot 和 Kotlin 创建后端应用程序。</p>
+        <a href="jvm-create-project-with-spring-boot.md" as="button" icon="arrow-right" icon-position="right" id="kotlin-tour-backend-tutorial">开始</a>
+    </panel>
+    <panel>
+        <title>Kotlin Multiplatform</title>
+        <p>从头开始创建跨平台应用程序并共享业务逻辑与 UI。</p>
+        <a href="https://kotlinlang.org/docs/multiplatform/compose-multiplatform-create-first-app.html" as="button" icon="arrow-right" icon-position="right" id="kotlin-tour-cmp-tutorial">开始</a>
+    </panel>
+</panels>
 
 <seealso></seealso>
 

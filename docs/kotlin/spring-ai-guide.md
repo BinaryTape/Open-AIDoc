@@ -1,4 +1,5 @@
 [//]: # (title: 创建一个使用 Spring AI 回答问题的 Kotlin 应用 — 教程)
+[//]: # (description: 了解如何使用 Kotlin、Spring AI、Spring Boot、OpenAI、Qdrant 和 RAG 构建文档问答应用程序。)
 
 <web-summary>学习如何创建一个使用 Spring AI 回答问题的 Kotlin 应用。</web-summary>
 

@@ -45,7 +45,7 @@
 1. 未經驗證的用戶端向伺服器應用程式中的特定 [路由](server-routing.md) 發送請求。
 2. 伺服器傳回一個 HTML 頁面，其中至少包含一個 HTML Web 表單，提示使用者輸入使用者名稱和密碼。 
    > Ktor 允許您使用 [Kotlin DSL](server-html-dsl.md) 建置表單，或者您也可以在各種 JVM 範本引擎（如 FreeMarker、Velocity 等）中進行選擇。
-3. 當使用者提交使用者名稱和密碼時，用戶端會向伺服器發送一個包含 Web 表單資料（包括使用者名稱 and 密碼）的請求。
+3. 當使用者提交使用者名稱和密碼時，用戶端會向伺服器發送一個包含 Web 表單資料（包括使用者名稱與密碼）的請求。
    
    ```kotlin
    POST http://localhost:8080/login
@@ -78,6 +78,10 @@ install(Authentication) {
 ## 設定表單驗證 {id="configure"}
 
 ### 步驟 1：設定表單提供者 {id="configure-provider"}
+
+<Tabs group="auth-dsl">
+<TabItem title="具名提供者" group-key="classic">
+
 `form` 驗證提供者透過 [FormAuthenticationProvider.Config](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-form-authentication-provider/-config/index.html) 類別公開其設定。在下面的範例中，指定了以下設定：
 * `userParamName` 和 `passwordParamName` 屬性指定了用於獲取使用者名稱和密碼的參數名稱。
 * `validate` 函式負責驗證使用者名稱和密碼。
@@ -90,22 +94,63 @@ install(Authentication) {
         userParamName = "username"
         passwordParamName = "password"
         validate { credentials ->
-            if (credentials.name == "jetbrains" && credentials.password == "foobar") {
+            val isValid = credentials.name == "jetbrains" &&
+                credentials.password == "foobar"
+            if (isValid) {
                 UserIdPrincipal(credentials.name)
             } else {
                 null
             }
         }
         challenge {
-            call.respond(HttpStatusCode.Unauthorized, "Credentials are not valid")
+            val message = "Credentials are not valid"
+            val status = HttpStatusCode.Unauthorized
+            call.respond(status, message)
         }
     }
 }
 ```
 
+</TabItem>
+<TabItem title="型別安全" group-key="typed">
+
+<note>
+    <p>
+        型別安全驗證配置 API 為實驗功能。它隨時可能被棄用或變更。使用前需明確啟用 (Opt-in)。若要了解更多詳細資訊，請參閱 <a href="server-typed-auth.md#prerequisites">啟用 API</a>。
+    </p>
+</note>
+
+`form()` 函式會為您選擇的 principal 型別建立一個配置。其中不需要 `install(Authentication)` 步驟：此配置是一個值，您可以將其傳遞給需要它的路由。
+
+```kotlin
+data class User(val name: String)
+
+val formAuth = form<User>("auth-form") {
+    usernameField = "username"
+    passwordField = "password"
+    validate { credentials ->
+        val isValid = credentials.name == "jetbrains" &&
+            credentials.password == "foobar"
+        if (isValid) User(credentials.name) else null
+    }
+    onUnauthorized = {
+        val message = "Credentials are not valid"
+        call.respond(HttpStatusCode.Unauthorized, message)
+    }
+}
+```
+
+有兩個名稱與傳統提供者不同。表單欄位為 `usernameField` 和 `passwordField`，而非 `userParamName` 與 `passwordParamName`。失敗處理常式為 `onUnauthorized`，而非 `challenge`。如需完整的 API，請參閱 [型別安全驗證](server-typed-auth.md)。
+
+</TabItem>
+</Tabs>
+
 > 至於 `basic` 驗證，您也可以使用 [UserHashedTableAuth](server-basic-auth.md#validate-user-hash) 來驗證儲存在記憶體表格中的使用者，該表格保存了使用者名稱和密碼雜湊值。
 
 ### 步驟 2：保護特定資源 {id="authenticate-route"}
+
+<Tabs group="auth-dsl">
+<TabItem title="具名提供者" group-key="classic">
 
 設定好 `form` 提供者後，您需要定義一個用於接收資料的 `post` 路由。
 然後，將此路由加入 **[authenticate](server-auth.md#authenticate-route)** 函式中。
@@ -115,11 +160,30 @@ install(Authentication) {
 routing {
     authenticate("auth-form") {
         post("/login") {
-            call.respondText("Hello, ${call.principal<UserIdPrincipal>()?.name}!")
+            val user = call.principal<UserIdPrincipal>()
+            call.respondText("Hello, ${user?.name}!")
         }
     }
 }
 ```
+
+</TabItem>
+<TabItem title="型別安全" group-key="typed">
+
+定義用於傳送表單資料的 `post` 路由，並將其包裝在 `authenticateWith()` 中。在該區塊內，`call.principal` 即為您的 principal 型別，且絕不會為 `null`：
+
+```kotlin
+routing {
+    authenticateWith(formAuth) {
+        post("/login") {
+            call.respondText("Hello, ${call.principal.name}!")
+        }
+    }
+}
+```
+
+</TabItem>
+</Tabs>
 
 您可以使用 [Session 驗證](server-session-auth.md) 來儲存已登入使用者的 ID。
 例如，當使用者第一次使用 Web 表單登入時，您可以將使用者名稱儲存到 Cookie 工作階段中，並在後續請求中使用 `session` 提供者對該使用者進行授權。

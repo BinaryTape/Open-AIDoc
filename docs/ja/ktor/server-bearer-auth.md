@@ -11,7 +11,7 @@
 <var name="example_name" value="auth-bearer"/>
 <p>
     <b>コード例</b>:
-    <a href="https://github.com/ktorio/ktor-documentation/tree/%ktor_version%/codeSnippets/snippets/%example_name%">
+    <a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/%example_name%">
         %example_name%
     </a>
 </p>
@@ -20,7 +20,7 @@
 </p>
 </tldr>
 
-Bearer 認証スキームは、アクセス制御と認証に使用される [HTTP フレームワーク](https://developer.mozilla.org/ja/docs/Web/HTTP/Authentication)の一部です。このスキームには、Bearer トークンと呼ばれるセキュリティトークンが含まれます。Bearer 認証スキームは [OAuth](server-oauth.md) または [JWT](server-jwt.md) の一部として使用されますが、Bearer トークンを認可するためのカスタムロジックを提供することもできます。
+Bearer 認証スキームは、アクセス制御と認証に使用される [HTTP フレームワーク](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication)の一部です。このスキームには、Bearer トークンと呼ばれるセキュリティトークンが含まれます。Bearer 認証スキームは [OAuth](server-oauth.md) または [JWT](server-jwt.md) の一部として使用されますが、Bearer トークンを認可するためのカスタムロジックを提供することもできます。
 
 Ktor における認証の全般的な情報については、[Ktor Server における認証と認可](server-auth.md)セクションを参照してください。
 
@@ -78,6 +78,9 @@ Ktor でのさまざまな認証プロバイダーの設定方法の概要につ
 
 ### ステップ 1: Bearer プロバイダーの設定 {id="configure-provider"}
 
+<Tabs group="auth-dsl">
+<TabItem title="Classic" group-key="classic">
+
 `bearer` 認証プロバイダーは、[BearerAuthenticationProvider.Configuration](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-bearer-authentication-provider/-config/index.html) クラスを介して設定を公開します。以下の例では、次の設定が指定されています。
 * `realm` プロパティは、`WWW-Authenticate` ヘッダーで渡される realm を設定します。
 * `authenticate` 関数は、クライアントから送信されたトークンをチェックし、認証に成功した場合は `UserIdPrincipal` を、失敗した場合は `null` を返します。
@@ -97,7 +100,45 @@ install(Authentication) {
 }
 ```
 
+</TabItem>
+<TabItem title="Type-safe" group-key="typed">
+
+<note>
+    <p>
+        型安全な認証スキーム API は実験的なものです。いつでも廃止または変更される可能性があります。
+        オプトインが必要です。詳細については、
+        <a href="server-typed-auth.md#prerequisites">API の有効化</a>を参照してください。
+    </p>
+</note>
+
+`bearer()` 関数は、選択したプリンシパル型のスキームを作成します。`install(Authentication)` ステップは不要で、スキームはそれを必要とするルートに渡す値となります。
+
+```kotlin
+data class User(val name: String)
+
+val bearerAuth = bearer<User>("auth-bearer") {
+    realm = "Access to the '/' path"
+    validate { tokenCredential ->
+        if (tokenCredential.token == "abc123") {
+            User("jetbrains")
+        } else {
+            null
+        }
+    }
+}
+```
+
+名称の変更に注意してください。従来のプロバイダーでは `authenticate` を使用しますが、型安全なスキームでは他の型安全スキームと同様に `validate` を使用します。これは独自のプリンシパル型を返し、認証に失敗した場合は `null` を返します。
+
+また、`authHeader` を設定して `Authorization` ヘッダー以外の場所からトークンを読み取ったり、`authSchemes` を設定して `Bearer` 以外のスキームを受け入れたりすることもできます。完全な API については、[型安全な認証](server-typed-auth.md)を参照してください。
+
+</TabItem>
+</Tabs>
+
 ### ステップ 2: 特定のリソースの保護 {id="authenticate-route"}
+
+<Tabs group="auth-dsl">
+<TabItem title="Classic" group-key="classic">
 
 `bearer` プロバイダーを設定した後、**[authenticate](server-auth.md#authenticate-route)** 関数を使用してアプリケーション内の特定のリソースを保護できます。認証に成功した場合、ルートハンドラー内で `call.principal` 関数を使用して認証済みの [UserIdPrincipal](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-user-id-principal/index.html) を取得し、認証されたユーザーの名前を取得できます。
 
@@ -105,7 +146,27 @@ install(Authentication) {
 routing {
     authenticate("auth-bearer") {
         get("/") {
-            call.respondText("Hello, ${call.principal<UserIdPrincipal>()?.name}!")
+            val user = call.principal<UserIdPrincipal>()
+            call.respondText("Hello, ${user?.name}!")
         }
     }
 }
+```
+
+</TabItem>
+<TabItem title="Type-safe" group-key="typed">
+
+スキームを `authenticateWith()` に渡します。ブロック内では、`call.principal` は指定したプリンシパル型になり、`null` になることはないため、キャストや null チェックは不要です。
+
+```kotlin
+routing {
+    authenticateWith(bearerAuth) {
+        get("/") {
+            call.respondText("Hello, ${call.principal.name}!")
+        }
+    }
+}
+```
+
+</TabItem>
+</Tabs>

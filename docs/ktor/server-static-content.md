@@ -38,12 +38,13 @@
 
 ## ZIP 文件 {id="zipped"}
 
-为了从 ZIP 文件提供静态内容，Ktor 提供了 [`staticZip()`](https://api.ktor.io/ktor-server-core/io.ktor.server.http.content/static-zip.html) 函数。
+为了从 ZIP 文件提供静态内容，Ktor 提供了 [
+`staticZip()`](https://api.ktor.io/ktor-server-core/io.ktor.server.http.content/static-zip.html) 函数。
 这允许您将请求直接映射到 ZIP 归档的内容，如下例所示：
 
  ```kotlin
  routing {
-     staticZip("/", "", Paths.get("files/text-files.zip"))
+     staticZip("/", "/", Paths.get("files/text-files.zip"))
  }
  ```
 
@@ -88,16 +89,24 @@ staticResources("/custom", "static", index = "custom_index.html")
 
 ### 预压缩文件 {id="precompressed"}
 
-Ktor 提供了提供预压缩文件的能力，以避免使用[动态压缩](server-compression.md)。
-要使用此功能，请在语句块中定义 `preCompressed()` 函数：
+Ktor 可以提供预压缩的静态文件，而不是使用 [Compression](server-compression.md) 插件动态压缩响应。
+
+要启用此功能，请使用 `preCompressed()` 函数并指定支持的压缩格式：
 
 ```kotlin
 staticFiles("/", File("files")) {
-    preCompressed(CompressedFileType.BROTLI, CompressedFileType.GZIP)
+    preCompressed(
+        CompressedFileType.BROTLI,
+        CompressedFileType.GZIP,
+        CompressedFileType.ZSTD,
+        CompressedFileType.DEFLATE
+    )
 }
 ```
 
-在此示例中，对于发往 `/js/script.js` 的请求，Ktor 可以提供 `/js/script.js.br` 或 `/js/script.js.gz`。
+当客户端请求静态文件时，Ktor 会检查客户端支持的内容编码，并在可用时提供匹配的预压缩版本。
+
+例如，对于发往 `/js/script.js` 的请求，Ktor 可以提供预压缩变体，例如 `/js/script.js.br` 或 `/js/script.js.gz`。
 
 ### HEAD 请求 {id="autohead"}
 
@@ -123,7 +132,7 @@ staticFiles("/", File("files")) {
 
 ### 内容类型 {id="content-type"}
 
-默认情况下，Ktor 会尝试从文件扩展名中猜测 `Content-Type` 标头的值。您可以使用 `contentType()` 函数显式设置 `Content-Type` 标头。
+默认情况下，Ktor 会尝试从文件扩展名中推测 `Content-Type` 标头的值。您可以使用 `contentType()` 函数显式设置 `Content-Type` 标头。
 
 ```kotlin
 staticFiles("/files", File("textFiles")) {
@@ -143,7 +152,7 @@ staticFiles("/files", File("textFiles")) {
 `cacheControl()` 函数允许您为 HTTP 缓存配置 `Cache-Control` 标头。
 
 ```kotlin
-    install(ConditionalHeaders)
+fun Application.module() {
     routing {
         staticFiles("/files", File("textFiles")) {
             cacheControl { file ->

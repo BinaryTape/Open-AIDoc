@@ -11,13 +11,13 @@ Coil は **Co**routine **I**mage **L**oader の略称です。
 
 翻訳: [日本語](README-ja.md), [한국어](README-ko.md), [Русский](README-ru.md), [Svenska](README-sv.md), [Türkçe](README-tr.md), [中文](README-zh.md), [پارسی](README-fa.md), [O'zbekcha](README-uz.md)
 
-## クイックスタート
+## クイックスタート {id="quick-start"}
 
 Compose ライブラリと [ネットワークライブラリ](https://coil-kt.github.io/coil/network/) をインポートします：
 
 ```kotlin
-implementation("io.coil-kt.coil3:coil-compose:3.6.2")
-implementation("io.coil-kt.coil3:coil-network-okhttp:3.6.2")
+implementation("io.coil-kt.coil3:coil-compose:3.6.3")
+implementation("io.coil-kt.coil3:coil-network-okhttp:3.6.3")
 ```
 
 画像を読み込むには、`AsyncImage` コンポーザブルを使用します：
@@ -31,7 +31,7 @@ AsyncImage(
 
 Coil の [詳細なドキュメントはこちら](https://coil-kt.github.io/coil/getting_started/) をご覧ください。
 
-## ライセンス
+## ライセンス {id="license"}
 
     Copyright 2026 Coil Contributors
 

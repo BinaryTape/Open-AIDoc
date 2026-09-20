@@ -4,14 +4,14 @@
 
 <link-summary>ルートハンドラー内で受信リクエストを処理する方法について説明します。</link-summary>
 
-Ktorでは、[ルートハンドラー](server-routing.md#define_route)内で入力リクエストを処理し、[レスポンス](server-responses.md)を送信できます。
+Ktorでは、[ルートハンドラー](server-routing.md#define_route)から受信リクエストを処理し、[レスポンス](server-responses.md)を送信できます。
 
-ルートハンドラーは、クライアントとサーバー間の単一のHTTPエクスチェンジを表す[`ApplicationCall`](https://api.ktor.io/ktor-server-core/io.ktor.server.application/-application-call/index.html)上で動作します。これはルートハンドラー内で`call`プロパティを通じて利用でき、受信リクエスト（`ApplicationRequest`）と送信レスポンス（`ApplicationResponse`）の両方が含まれています。
+各ルートハンドラーは、`call`プロパティを通じて[`ApplicationCall`](https://api.ktor.io/ktor-server-core/io.ktor.server.application/-application-call/index.html)を提供します。`ApplicationCall`は単一のHTTPエクスチェンジを表し、受信リクエストと送信レスポンスの両方へのアクセスを提供します。
 
-ルートハンドラー内では、`ApplicationCall`を使用して以下のようなアクションを実行できます。
+ルートハンドラー内では、`ApplicationCall`を使用して以下を行うことができます。
 
-* ヘッダー、Cookie、接続の詳細などの[リクエスト情報](#request_information)を取得する。
-* [パスパラメータ](#path_parameters)の値を取得する。
+* ヘッダー、Cookie、接続の詳細などの[リクエスト情報](#request_information)にアクセスする。
+* [パスパラメータ](#path_parameters)を取得する。
 * [クエリパラメータ](#query_parameters)を取得する。
 * データオブジェクト、フォームパラメータ、ファイルなどの[リクエストボディの内容](#body_contents)を受信する。
 
@@ -52,13 +52,13 @@ routing {
 
 ### `X-Forwarded-` ヘッダー {id="x-forwarded-headers"}
 
-HTTPプロキシまたはロードバランサーを経由したリクエストに関する情報を取得するには、[Forwarded headers](server-forward-headers.md)プラグインをインストールし、[`ApplicationRequest.origin`](https://api.ktor.io/ktor-server-core/io.ktor.server.plugins/origin.html)プロパティを使用します。
+HTTPプロキシまたはロードバランサーを経由したリクエストに関する情報を収集するには、[Forwarded headers](server-forward-headers.md)プラグインをインストールします。その後、[`ApplicationRequest.origin`](https://api.ktor.io/ktor-server-core/io.ktor.server.plugins/origin.html)プロパティを通じてこの情報にアクセスできます。
 
 ## パスパラメータ {id="path_parameters"}
 
 リクエストを処理する際、`ApplicationCall.parameters`プロパティを使用して[パスパラメータ](server-routing.md#path_parameter)の値を取得できます。
 
-たとえば、以下のコードスニペットでは、パス`/user/admin`に対して`call.parameters["login"]`は`"admin"`を返します。
+たとえば、`/user/admin`へのリクエストに対して、`call.parameters["login"]`は`"admin"`を返します。
 
 ```kotlin
 get("/user/{login}") {
@@ -70,7 +70,7 @@ get("/user/{login}") {
 
 ## クエリパラメータ {id="query_parameters"}
 
-URLクエリ文字列のパラメータを取得するには、[`ApplicationRequest.queryParameters`](https://api.ktor.io/ktor-server-core/io.ktor.server.request/-application-request/query-parameters.html)プロパティを使用できます。
+URLクエリ文字列のパラメータを取得するには、[`ApplicationRequest.queryParameters`](https://api.ktor.io/ktor-server-core/io.ktor.server.request/-application-request/query-parameters.html)プロパティを使用します。
 
 以下の例では、`/products?price=asc`へのリクエストから`price`クエリパラメータにアクセスしています。
 
@@ -90,14 +90,12 @@ get("/products") {
 
 すべてのルートハンドラーで欠落している値を手動でチェックする代わりに、Ktorは必須のリクエストデータへのアクセスを簡素化する以下のヘルパー関数を提供しています。
 
-[//]: # (TODO: APIリンクを追加)
+* [`.requireQueryParameter()`](https://api.ktor.io/ktor-server-core/io.ktor.server.request/require-query-parameter.html)は、リクエストURLから必須のクエリパラメータを取得します。
+* [`.requireHeader()`](https://api.ktor.io/ktor-server-core/io.ktor.server.request/require-header.html)は、必須のHTTPヘッダー値を取得します。
+* [`.requireCookie()`](https://api.ktor.io/ktor-server-core/io.ktor.server.request/require-cookie.html)は、必須のCookie値を取得し、オプションで指定されたエンコーディングを使用してデコードします。
+* [`.requirePathParameter()`](https://api.ktor.io/ktor-server-core/io.ktor.server.request/require-path-parameter.html)は、ルート定義から必須のパスパラメータを取得します。
 
-* `ApplicationCall.requireQueryParameter()` — リクエストURLから必須のクエリパラメータを取得します。パラメータがない場合は例外をスローします。
-* `ApplicationCall.requireHeader()` — 必須のHTTPヘッダー値を取得します。リクエストにヘッダーが存在しない場合は例外をスローします。
-* `ApplicationCall.requireCookie()` — 必須のCookie値を取得します。オプションで指定されたエンコーディングを使用してデコードします。Cookieがない場合は例外をスローします。
-* `RoutingCall.requirePathParameter()` — ルート定義から必須のパスパラメータを取得します。一致したルートにパラメータが存在しない場合は例外をスローします。
-
-各関数は非null値を返すか、値が欠けている場合に`MissingRequestParameterException`をスローします。
+各関数は非null値を返すか、要求された値が欠けている場合に`MissingRequestParameterException`をスローします。
 
 ```kotlin
 post("/checkout/{cartId}") {
@@ -110,11 +108,14 @@ post("/checkout/{cartId}") {
 ```
 
 ## ボディの内容 {id="body_contents"}
-このセクションでは、`POST`、`PUT`、または`PATCH`で送信されたボディの内容を受信する方法を説明します。
+
+リクエストボディにアクセスするには、Ktorのreceive関数を使用します。適切な関数は、[生のペイロード](#raw)、[デシリアライズされたオブジェクト](#objects)、[フォームパラメータ](#form_parameters)、または[マルチパートデータ](#form_data)のどれが必要かによって異なります。
 
 ### 生のペイロード {id="raw"}
 
-生のボディペイロードにアクセスして手動で解析するには、受信するペイロードの型を受け取る[`ApplicationCall.receive()`](https://api.ktor.io/ktor-server-core/io.ktor.server.request/receive.html)関数を使用します。次のようなHTTPリクエストがあるとします。
+生のボディペイロードにアクセスして手動で解析するには、受信するペイロードの型を受け取る[`ApplicationCall.receive()`](https://api.ktor.io/ktor-server-core/io.ktor.server.request/receive.html)関数を使用します。
+
+クライアントが次のようなHTTPリクエストを送信したとします。
 
 ```HTTP
 POST http://localhost:8080/text
@@ -123,59 +124,65 @@ Content-Type: text/plain
 Hello, world!
 ```
 
-このリクエストのボディは、以下のいずれかの方法で、指定した型のオブジェクトとして受信できます。
+リクエストボディは、[`String`](#string)、[`ByteArray`](#bytearray)、または[`ByteReadChannel`](#bytereadchannel)として受信できます。
 
-- **String**
+#### `String` {id="string"}
 
-   リクエストボディをString値として受信するには、`call.receive<String>()`を使用します。
-   [`.receiveText()`](https://api.ktor.io/ktor-server-core/io.ktor.server.request/receive-text.html)を使用して同じ結果を得ることもできます。
-   ```kotlin
-   post("/text") {
-       val text = call.receiveText()
-       call.respondText(text)
-   }
-   ```
-- **ByteArray**
+リクエストボディをテキストとして受信するには、`.receive<String>()`または[`.receiveText()`](https://api.ktor.io/ktor-server-core/io.ktor.server.request/receive-text.html)関数を使用します。
+```kotlin
+post("/text") {
+    val text = call.receiveText()
+    call.respondText(text)
+}
+```
 
-   リクエストのボディをバイト配列として受信するには、`call.receive<ByteArray>()`を呼び出します。
-   ```kotlin
-           post("/bytes") {
-               val bytes = call.receive<ByteArray>()
-               call.respond(String(bytes))
-           }
-   
-   ```
-- **ByteReadChannel**
+#### `ByteArray` {id="bytearray"}
 
-   `call.receive<ByteReadChannel>()`または[`.receiveChannel()`](https://api.ktor.io/ktor-server-core/io.ktor.server.request/receive-channel.html)を使用して、バイトシーケンスの非同期読み取りを可能にする[`ByteReadChannel`](https://api.ktor.io/ktor-io/io.ktor.utils.io/-byte-read-channel/index.html)を受信できます。
-   ```kotlin
-   post("/channel") {
-       val readChannel = call.receiveChannel()
-       val text = readChannel.readRemaining().readString()
-       call.respondText(text)
-   }
-   ```
+リクエストのボディをバイト配列として受信するには、`.receive<ByteArray>()`関数を使用します。
 
-   以下のサンプルは、`ByteReadChannel`を使用してファイルをアップロードする方法を示しています。
-   ```kotlin
-   post("/upload") {
-       val file = File("uploads/ktor_logo.png")
-       call.receiveChannel().copyAndClose(file.writeChannel())
-       call.respondText("A file is uploaded")
-   }
-   ```
+```kotlin
+        post("/bytes") {
+            val bytes = call.receive<ByteArray>()
+            call.respond(String(bytes))
+        }
+
+```
+
+#### `ByteReadChannel` {id="bytereadchannel"}
+
+ボディを[`ByteReadChannel`](https://api.ktor.io/ktor-io/io.ktor.utils.io/-byte-read-channel/index.html)として非同期に読み取るには、`.receive<ByteReadChannel>()`または[`.receiveChannel()`](https://api.ktor.io/ktor-server-core/io.ktor.server.request/receive-channel.html)関数を使用します。
+
+```kotlin
+post("/channel") {
+    val readChannel = call.receiveChannel()
+    val text = readChannel.readRemaining().readString()
+    call.respondText(text)
+}
+```
+
+また、`ByteReadChannel`を使用してファイルをアップロードすることもできます。
+
+```kotlin
+post("/upload") {
+    val file = File("uploads/ktor_logo.png")
+    call.receiveChannel().copyAndClose(file.writeChannel())
+    call.respondText("A file is uploaded")
+}
+```
 
 > Ktorのチャンネルと、`RawSink`、`RawSource`、`OutputStream`などの型との間の変換については、[I/O相互運用性](io-interoperability.md)を参照してください。
 >
 {style="tip"}
 
 > 完全な例については、[post-raw-data](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/post-raw-data)を参照してください。
+> 
+{style="tip"}
 
 ### オブジェクト {id="objects"}
 
-Ktorは[ContentNegotiation](server-serialization.md)プラグインを提供し、リクエストのメディアタイプをネゴシエートして、コンテンツを必要な型のオブジェクトにデシリアライズします。
+Ktorは、リクエストのメディアタイプをネゴシエートし、コンテンツを必要な型のオブジェクトにデシリアライズする[`ContentNegotiation`](server-serialization.md)プラグインを提供しています。
 
-リクエストのコンテンツを受信して変換するには、データクラスをパラメータとして受け取る[`ApplicationCall.receive()`](https://api.ktor.io/ktor-server-core/io.ktor.server.request/receive.html)関数を呼び出します。
+リクエストのコンテンツを受信して変換するには、期待される型を指定して[`ApplicationCall.receive()`](https://api.ktor.io/ktor-server-core/io.ktor.server.request/receive.html)関数を使用します。
 
 ```kotlin
 post("/customer") {
@@ -185,10 +192,22 @@ post("/customer") {
 }
 ```
 
+リクエストコンテンツが`null`にデシリアライズされる可能性がある場合は、null許容型引数を使用します。
+
+```kotlin
+val customer = call.receive<Customer?>()
+```
+
 > 詳細については、[Ktor Serverにおけるコンテンツネゴシエーションとシリアライズ](server-serialization.md)を参照してください。
+> 
+{style="tip"}
 
 ### フォームパラメータ {id="form_parameters"}
-Ktorでは、[receiveParameters](https://api.ktor.io/ktor-server-core/io.ktor.server.request/receive-parameters.html)関数を使用して、`x-www-form-urlencoded`と`multipart/form-data`の両方のタイプで送信されたフォームパラメータを受信できます。以下の例は、ボディにフォームパラメータを渡した[HTTPクライアント](https://www.jetbrains.com/help/idea/http-client-in-product-code-editor.html)の`POST`リクエストを示しています。
+
+[`.receiveParameters()`](https://api.ktor.io/ktor-server-core/io.ktor.server.request/receive-parameters.html)関数を使用して、`x-www-form-urlencoded`と`multipart/form-data`の両方の型で送信されたフォームパラメータを受信できます。
+
+たとえば、クライアントが以下のリクエストを送信したとします。
+
 ```HTTP
 POST http://localhost:8080/signup
 Content-Type: application/x-www-form-urlencoded
@@ -196,7 +215,8 @@ Content-Type: application/x-www-form-urlencoded
 username=JetBrains&email=example@jetbrains.com&password=foobar&confirmation=foobar
 ```
 
-コード内でパラメータ値を取得するには、次のようにします。
+コード内でパラメータ値にアクセスするには、次のようにします。
+
 ```kotlin
 post("/signup") {
     val formParameters = call.receiveParameters()
@@ -206,14 +226,16 @@ post("/signup") {
 ```
 
 > 完全な例については、[post-form-parameters](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/post-form-parameters)を参照してください。
+> 
+{style="tip"}
 
 ### マルチパートフォームデータ {id="form_data"}
 
-マルチパートリクエストの一部として送信されたファイルを受信するには、[`.receiveMultipart()`](https://api.ktor.io/ktor-server-core/io.ktor.server.request/receive-multipart.html)関数を呼び出し、必要に応じて各パートをループします。
+マルチパートリクエストの一部として送信されたファイルを受信するには、[`.receiveMultipart()`](https://api.ktor.io/ktor-server-core/io.ktor.server.request/receive-multipart.html)関数を使用します。
 
-マルチパートリクエストデータは順次処理されるため、特定のパートに直接アクセスすることはできません。また、これらのリクエストには、フォームフィールド、ファイル、バイナリデータなど、異なる種類のパートが含まれる場合があり、それぞれを異なる方法で処理する必要があります。
+マルチパートリクエストデータは順次処理されるため、特定のパートに直接アクセスすることはできません。各パートはフォームフィールド、ファイル、またはその他のバイナリコンテンツを表すことができるため、それぞれの型を個別に処理します。
 
-この例では、ファイルを受信してファイルシステムに保存する方法を示します。
+以下の例では、フォームフィールドとファイルを受信し、ローカルファイルシステムにファイルを保存します。
 
 ```kotlin
 import io.ktor.server.application.*
@@ -257,19 +279,19 @@ fun Application.main() {
 
 #### デフォルトのファイルサイズ制限 {id="default-file-size-limit"}
 
-デフォルトでは、受信可能なバイナリおよびファイル項目の許容サイズは50MiBに制限されています。受信したファイルまたはバイナリ項目が50MiBの制限を超えると、`IOException`がスローされます。
+デフォルトでは、バイナリおよびファイルパートは50MiBに制限されています。パートがこの制限を超えると、Ktorは`IOException`をスローします。
 
-デフォルトのフォームフィールド制限を上書きするには、`.receiveMultipart()`を呼び出すときに`formFieldLimit`パラメータを渡します。
+呼び出しに対してデフォルトの制限を上書きするには、`.receiveMultipart()`関数に`formFieldLimit`パラメータを渡します。
 
 ```kotlin
 val multipartData = call.receiveMultipart(formFieldLimit = 1024 * 1024 * 100)
 ```
 
-この例では、新しい制限が100MiBに設定されています。
+この例では、制限を100 MiBに設定しています。
 
 #### フォームフィールド {id="form-fields"}
 
-`PartData.FormItem`はフォームフィールドを表し、その値は`value`プロパティを介してアクセスできます。
+`PartData.FormItem`はフォームフィールドを表します。その値には`value`プロパティを通じてアクセスできます。
 
 ```kotlin
 when (part) {
@@ -281,7 +303,7 @@ when (part) {
 
 #### ファイルアップロード {id="file-uploads"}
 
-`PartData.FileItem`はファイル項目を表します。ファイルアップロードをバイトストリームとして処理できます。
+`PartData.FileItem`はアップロードされたファイルを表します。ファイルアップロードはバイトストリームとして処理できます。[`.provider()`](https://api.ktor.io/ktor-http/io.ktor.http.content/-part-data/-file-item/provider.html)関数を使用してファイルコンテンツに`ByteReadChannel`としてアクセスし、宛先へストリーミングします。
 
 ```kotlin
 when (part) {
@@ -293,9 +315,9 @@ when (part) {
 }
 ```
 
-[`.provider()`](https://api.ktor.io/ktor-http/io.ktor.http.content/-part-data/-file-item/provider.html)関数は、データをインクリメンタルに読み取ることができる`ByteReadChannel`を返します。`.copyAndClose()`関数を使用すると、適切なリソースクリーンアップを保証しながら、ファイルの内容を指定された宛先に書き込みます。
+`.copyAndClose()`関数を使用すると、適切なリソースクリーンアップを保証しながら、指定された宛先にファイルコンテンツを書き込みます。
 
-アップロードされたファイルのサイズを特定するには、`post`ハンドラー内で`Content-Length` [ヘッダー値](#request_information)を取得できます。
+リクエストに`Content-Length` [ヘッダー値](#request_information)が含まれている場合は、それを使用してリクエストボディ全体のサイズを検査できます。
 
 ```kotlin
 post("/upload") {
@@ -304,12 +326,16 @@ post("/upload") {
 }
 ```
 
+マルチパートリクエストの場合、`Content-Length`は個別にアップロードされたファイルのサイズではなく、マルチパートボディ全体を表します。
+
 #### リソースのクリーンアップ {id="resource-cleanup"}
 
-フォームの処理が完了したら、リソースを解放するために`.dispose()`関数を使用して各パートを破棄します。
+フォームの処理が完了したら、リソースを解放するために`.dispose()`関数を使用して各マルチパートパートを破棄します。
 
 ```kotlin
 part.dispose()
 ```
 
 > このサンプルの実行方法については、[upload-file](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/upload-file)を参照してください。
+> 
+{style="tip"}

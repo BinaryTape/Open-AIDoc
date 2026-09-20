@@ -51,7 +51,7 @@ Ktor를 사용하면 OpenAPI 사양(specification)을 기반으로 OpenAPI 문�
       </TabItem>
   </Tabs>
 
-* 필요한 경우, [코드 생성기(code generator)](https://github.com/swagger-api/swagger-codegen-generators)를 커스터마이징하려면 `swagger-codegen-generators` 의존성을 추가하세요.
+* 필요한 경우, [코드 생성기(code generator)](https://github.com/swagger-api/swagger-codegen-generators)를 커스터마이징하려면 `swagger-codegen-generators` 의존성을 추가하세요:
 
   <var name="group_id" value="io.swagger.codegen.v3"/>
   <var name="artifact_name" value="swagger-codegen-generators"/>
@@ -70,17 +70,11 @@ Ktor를 사용하면 OpenAPI 사양(specification)을 기반으로 OpenAPI 문�
 
   `$swagger_codegen_version`을 `swagger-codegen-generators` 아티팩트의 필요한 버전(예: `%swagger_codegen_version%`)으로 교체할 수 있습니다.
 
-> Ktor 3.4.0에서 `OpenAPI` 플러그인은 `ktor-server-routing-openapi` 의존성을 필요로 합니다.
-> 이는 의도된 브레이킹 체인지(breaking change)가 아니며 Ktor 3.4.1에서 수정될 예정입니다.
-> 런타임 에러를 방지하려면 Ktor 3.4.0을 사용하는 경우 의존성을 수동으로 추가하세요.
->
-{style="warning"}
-
 ## 정적 OpenAPI 파일 사용 {id="static-openapi-file"}
 
 기존 사양에서 OpenAPI 문서를 제공하려면, OpenAPI 문서 경로를 인자로 받는 [`openAPI()`](%plugin_api_link%) 함수를 사용하세요.
 
-다음 예제는 `openapi` 경로에 `GET` 엔드포인트를 생성하고 제공된 OpenAPI 사양 파일로부터 Swagger UI를 렌더링합니다.
+다음 예제는 `openapi` 경로에 `GET` 엔드포인트를 생성하고 제공된 OpenAPI 사양 파일로부터 Swagger UI를 렌더링합니다:
 
 ```kotlin
 import io.ktor.server.plugins.openapi.*
@@ -97,7 +91,7 @@ routing {
 
 정적 파일에 의존하는 대신, OpenAPI 컴파일러 플러그인과 라우트 어노테이션(route annotations)으로 생성된 메타데이터를 사용하여 런타임에 OpenAPI 사양을 생성할 수 있습니다.
 
-이 모드에서 OpenAPI 플러그인은 라우팅 트리(routing tree)에서 직접 사양을 어셈블합니다.
+이 모드에서 OpenAPI 플러그인은 라우팅 트리(routing tree)에서 직접 사양을 어셈블합니다:
 
 ```kotlin
  openAPI(path = "openapi") {
@@ -116,11 +110,35 @@ routing {
 
 ## OpenAPI 구성 {id="configure-openapi"}
 
-기본적으로 문서는 `StaticHtml2Codegen`을 사용하여 렌더링됩니다. `openAPI {}` 블록 내에서 렌더러를 커스터마이징할 수 있습니다.
+`openAPI {}` 구성 블록을 사용하면 생성된 OpenAPI 문서와 Ktor가 문서를 렌더링하는 방식을 구성할 수 있습니다.
 
-> `StaticHtmlCodegen` 및 `StaticHtml2Codegen`은 OpenAPI 3.0.x 문서만 지원합니다. OpenAPI 3.1 문서와 함께 사용하면 불완전하거나 잘못된 HTML이 생성될 수 있습니다. OpenAPI 3.1의 경우 Swagger UI 5.x와 함께 [`swaggerUI()`](server-swagger-ui.md) 함수를 사용하세요. OpenAPI 플러그인의 HTML 렌더러를 계속 사용해야 하는 경우 사양을 OpenAPI 3.0.3으로 유지하세요.
+### 문서 메타데이터 구성 {id="configure-document-metadata"}
+
+구성 블록에서 최상위 OpenAPI 메타데이터를 직접 정의할 수 있습니다.
+
+예를 들어, `info`를 사용하여 일반적인 API 정보를 지정하고, `tag()`를 사용하여 태그와 해당 설명을 정의할 수 있습니다:
+
+```kotlin
+openAPI("openapi") {
+    info = OpenApiInfo("Books API from routes", "1.0.0")
+    tag(
+        name = "Books",
+        description = "Operations on books"
+    )
+}
+```
+
+서버, 보안 요구 사항, 재사용 가능한 컴포넌트, 외부 문서 및 사양 확장과 같은 다른 최상위 OpenAPI 속성도 구성할 수 있습니다.
+
+> 사용 가능한 모든 옵션에 대한 전체 목록은 [`OpenAPIConfig`](https://api.ktor.io/ktor-server-openapi/io.ktor.server.plugins.openapi/-open-a-p-i-config/index.html) API 레퍼런스를 참조하세요.
 >
-{style="note"}
+{style="tip"}
+
+### 문서 렌더러 구성 {id="configure-the-document-renderer"}
+
+기본적으로 문서는 `StaticHtml2Codegen`을 사용하여 렌더링됩니다.
+
+다른 렌더러를 사용하려면 `codegen` 속성에 할당하세요:
 
 ```kotlin
 routing {
@@ -128,3 +146,8 @@ routing {
         codegen = StaticHtmlCodegen()
     }
 }
+```
+
+> `StaticHtmlCodegen` 및 `StaticHtml2Codegen`은 OpenAPI 3.0.x 문서만 지원합니다. OpenAPI 3.1 문서와 함께 사용하면 불완전하거나 잘못된 HTML이 생성될 수 있습니다. OpenAPI 3.1의 경우 Swagger UI 5.x와 함께 [`swaggerUI()`](server-swagger-ui.md) 함수를 사용하세요. OpenAPI 플러그인의 HTML 렌더러를 계속 사용해야 하는 경우 사양을 OpenAPI 3.0.3으로 유지하세요.
+>
+{style="note"}

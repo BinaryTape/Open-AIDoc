@@ -95,6 +95,9 @@ install(Authentication) {
 
 ### ステップ 1: APIキープロバイダーの設定 {id="configure-provider"}
 
+<Tabs group="auth-dsl">
+<TabItem title="クラシック" group-key="classic">
+
 `apiKey` 認証プロバイダーの設定は、[`ApiKeyAuthenticationProvider.Config`](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-api-key-authentication-provider/-config/index.html) クラスを通じて公開されます。以下の例では、次の設定が指定されています。
 
 * `validate` 関数はリクエストから抽出されたAPIキーを受け取り、認証に成功した場合は `Principal` を返し、失敗した場合は `null` を返します。
@@ -116,11 +119,45 @@ install(Authentication) {
 }
 ```
 
+</TabItem>
+<TabItem title="型安全" group-key="typed">
+
+<note>
+    <p>
+        型安全な認証スキームAPIは実験的（Experimental）です。予告なく削除または変更される可能性があります。
+        オプトインが必要です。詳細については、
+        <a href="server-typed-auth.md#prerequisites">APIの有効化</a>を参照してください。
+    </p>
+</note>
+
+`apiKey()` 関数は、選択したプリンシパル型のスキームを作成します。`install(Authentication)` のステップは不要です。スキームは、それを必要とするルートに渡す値となります。
+
+```kotlin
+data class AppPrincipal(val key: String)
+
+val apiKeyAuth = apiKey<AppPrincipal>("api-key") {
+    validate { keyFromHeader ->
+        val expectedApiKey = "this-is-expected-key"
+        keyFromHeader
+            .takeIf { it == expectedApiKey }
+            ?.let { AppPrincipal(it) }
+    }
+}
+```
+
+クラシックプロバイダーとは異なり、名前の指定が必須です。完全なAPIについては、[型安全な認証](server-typed-auth.md)を参照してください。
+
+</TabItem>
+</Tabs>
+
 #### キーの場所のカスタマイズ {id="key-location"}
 
 デフォルトでは、`apiKey` プロバイダーは `X-API-Key` ヘッダーからAPIキーを探します。
 
 `headerName` を使用してカスタムヘッダーを指定できます。
+
+<Tabs group="auth-dsl">
+<TabItem title="クラシック" group-key="classic">
 
 ```kotlin
 apiKey("api-key-header") {
@@ -130,6 +167,21 @@ apiKey("api-key-header") {
     }
 }
 ```
+
+</TabItem>
+<TabItem title="型安全" group-key="typed">
+
+```kotlin
+val apiKeyAuth = apiKey<AppPrincipal>("api-key-header") {
+    headerName = "X-Secret-Key"
+    validate { key ->
+        // ...
+    }
+}
+```
+
+</TabItem>
+</Tabs>
 
 ### ステップ 2: APIキーの検証 {id="validate"}
 
@@ -142,7 +194,8 @@ apiKey("api-key-header") {
 ```kotlin
 apiKey {
     validate { keyFromHeader ->
-        val expectedApiKey = environment.config.property("api.key").getString()
+        val expectedApiKey = 
+            environment.config.property("api.key").getString()
         keyFromHeader
             .takeIf { it == expectedApiKey }
             ?.let { AppPrincipal(it) }
@@ -210,6 +263,9 @@ apiKey {
 
 ### ステップ 4: 特定のリソースの保護 {id="authenticate-route"}
 
+<Tabs group="auth-dsl">
+<TabItem title="クラシック" group-key="classic">
+
 `apiKey` プロバイダーを設定した後、[`authenticate`](server-auth.md#authenticate-route) 関数を使用してアプリケーション内の特定のリソースを保護できます。認証に成功した場合、ルートハンドラー内で `call.principal` 関数を使用して認証済みのプリンシパルを取得できます。
 
 ```kotlin
@@ -217,11 +273,31 @@ routing {
     authenticate {
         get("/") {
             val principal = call.principal<AppPrincipal>()!!
-            call.respondText("Hello, authenticated client! Your key: ${principal.key}")
+            val key = principal.key
+            call.respondText("Hello! Your key: $key")
         }
     }
 }
 ```
+
+</TabItem>
+<TabItem title="型安全" group-key="typed">
+
+スキームを `authenticateWith()` に渡します。ブロック内では、`call.principal` は指定したプリンシパル型となり、`null` になることはないため、`!!` は不要です。
+
+```kotlin
+routing {
+    authenticateWith(apiKeyAuth) {
+        get("/") {
+            val key = call.principal.key
+            call.respondText("Hello! Your key: $key")
+        }
+    }
+}
+```
+
+</TabItem>
+</Tabs>
 
 ## APIキー認証の例 {id="complete-example"}
 

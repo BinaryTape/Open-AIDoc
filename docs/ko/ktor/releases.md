@@ -36,6 +36,19 @@ IntelliJ Ktor 플러그인을 사용하여 Ktor 프로젝트를 최신 버전으
 </tr>
 
 <tr>
+<td>3.6.0</td><td>2026년 9월 17일</td><td>
+<p>
+Netty를 위한 실험적 HTTP/3 지원, Kotlin Multiplatform용 기본 클라이언트 엔진, JVM WebRTC 지원, 그리고 클라이언트 및 서버 전반의 기타 기능과 개선 사항을 추가한 마이너 릴리스입니다.
+</p>
+자세한 내용은 <Links href="/ktor/whats-new-360" summary="undefined">Ktor 3.6.0의 새로운 기능</Links>을 참조하세요.
+<var name="version" value="3.6.0"/>
+<p>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub에서 변경 로그 확인</a>
+</p>
+</td>
+</tr>
+
+<tr>
 <td>3.5.2</td><td>2026년 8월 4일</td><td>
 <p>
 향상된 속도 제한(rate limiting) 지원, 복구된 텍스트 처리 성능, 그리고 I/O 처리, OpenAPI 및 구성 문제 수정을 통해 안정성과 성능에 집중한 패치 릴리스입니다.

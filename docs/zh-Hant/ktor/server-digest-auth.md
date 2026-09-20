@@ -29,6 +29,7 @@ Ktor 允許您使用 Digest 驗證來登入使用者並保護特定的 [路由 (
 > Digest 驗證提供比 [Basic 驗證](server-basic-auth.md) 更強的安全性，因為密碼絕不會以純文字形式傳送。然而，仍建議在生產環境中使用 [HTTPS/TLS](server-ssl.md) 以增加傳輸層級的安全性。
 
 ## 新增相依性 {id="add_dependencies"}
+
 若要啟用 `digest` 驗證，您需要在建置指令碼中包含 `%artifact_name%` 構件：
 
 <Tabs group="languages">
@@ -78,16 +79,17 @@ Digest 驗證流程如下所示：
 
    `response` 值的產生方式如下：
 
-   * `HA1 = H(username:realm:password)`，其中 `H` 為配置的雜湊演算法（例如 SHA-512-256）
+    * `HA1 = H(username:realm:password)`，其中 `H` 為配置的雜湊演算法（例如 SHA-512-256）
    > 此部分 [儲存](#digest-table) 在伺服器上，Ktor 可用來驗證使用者憑據。
 
-   * `HA2 = H(method:digestURI)`（針對 `qop=auth`）或 `HA2 = H(method:digestURI:H(entityBody))`（針對 `qop=auth-int`）
+    * `HA2 = H(method:digestURI)`（針對 `qop=auth`）或 `HA2 = H(method:digestURI:H(entityBody))`（針對 `qop=auth-int`）
 
-   * `response = H(HA1:nonce:nc:cnonce:qop:HA2)`
+    * `response = H(HA1:nonce:nc:cnonce:qop:HA2)`
 
 4. 伺服器 [驗證](#configure-provider) 用戶端傳送的憑據，並回應所請求的內容。在成功完成帶有 QoP 的驗證後，伺服器還會傳回 `Authentication-Info` 標頭以進行相互驗證。
 
 ## 安裝 Digest 驗證 {id="install"}
+
 若要安裝 `digest` 驗證提供者，請在 `install` 區塊內呼叫 [digest](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/digest.html) 函式：
 
 ```kotlin
@@ -100,6 +102,7 @@ install(Authentication) {
     }
 }
 ```
+
 您可以選擇性地指定一個 [提供者名稱 (provider name)](server-auth.md#provider-name)，該名稱可用於 [驗證指定的路由](#authenticate-route)。
 
 ## 配置 Digest 驗證 {id="configure"}
@@ -123,7 +126,10 @@ Ktor 支援多種用於 Digest 驗證的雜湊演算法。您可以使用 `algor
 install(Authentication) {
     digest("auth-digest") {
         realm = "Access to the '/' path"
-        algorithms = listOf(DigestAlgorithm.SHA_512_256, DigestAlgorithm.MD5)
+        algorithms = listOf(
+            DigestAlgorithm.SHA_512_256,
+            DigestAlgorithm.MD5
+        )
         // ...
     }
 }
@@ -135,14 +141,16 @@ install(Authentication) {
 
 #### 工作階段演算法 (-sess 變體) {id="sess-algorithms"}
 
-`-sess` 演算法變體（例如 `SHA-512-256-sess`, `SHA-256-sess`, `MD5-sess`）會修改 `HA1` 雜湊的計算方式。工作階段演算法不會直接儲存 `H(username:realm:password)`，而是計算 `H(H(username:realm:password):nonce:cnonce)`，其中 `cnonce` 是用戶端提供的 nonce。
+`-sess` 演算法變體（例如 `SHA-512-256-sess`、`SHA-256-sess`、`MD5-sess`）會修改 `HA1` 雜湊的計算方式。工作階段演算法不會直接儲存 `H(username:realm:password)`，而是計算 `H(H(username:realm:password):nonce:cnonce)`，其中 `cnonce` 是用戶端提供的 nonce。
 
 **優點：**
-- 特定於工作階段的雜湊可防止預先計算的字典攻擊。
-- 洩漏一個工作階段的雜湊不會暴露密碼，也不會對其他工作階段造成威脅。
+
+- 特定於工作階段的雜湊可防止預先計算的字典攻擊
+- 洩漏一個工作階段的雜湊不會暴露密碼，也不會對其他工作階段造成威脅
 
 **缺點：**
-- 伺服器必須為每個驗證請求計算雜湊（無法使用預先計算的值）。
+
+- 伺服器必須為每個驗證請求計算雜湊（無法使用預先計算的值）
 
 對於大多數應用程式，標準（非工作階段）演算法已足夠，特別是與 SHA-512-256 等強雜湊函式一起使用時。
 
@@ -158,52 +166,118 @@ val userPasswords: Map<String, String> = mapOf(
     "admin" to "password"
 )
 
-fun computeHash(userName: String, realm: String, password: String, algorithm: DigestAlgorithm): ByteArray =
-    algorithm.toDigester().digest("$userName:$realm:$password".toByteArray(UTF_8))
-
+fun computeHash(
+    userName: String,
+    realm: String,
+    password: String,
+    algorithm: DigestAlgorithm
+): ByteArray =
+    algorithm.toDigester()
+        .digest("$userName:$realm:$password".toByteArray(UTF_8))
 ```
 
 ### 步驟 3：配置 Digest 提供者 {id="configure-provider"}
 
+<Tabs group="auth-dsl">
+<TabItem title="Classic" group-key="classic">
+
 `digest` 驗證提供者透過 [DigestAuthenticationProvider.Config](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-digest-authentication-provider/-config/index.html) 類別公開其設定。在下面的範例中，指定了以下設定：
+
 * `realm` 屬性設定要在 `WWW-Authenticate` 標頭中傳遞的領域。
 * `algorithms` 屬性指定要接受哪些雜湊演算法。
 * `digestProvider` 函式為指定的使用者名稱和演算法獲取 Digest 的 `HA1` 部分。
 * （選用）`validate` 函式允許您將憑據映射到自訂的 Principal。
 
 ```kotlin
-fun Application.main() {
-    install(Authentication) {
-        digest("auth-digest") {
-            realm = myRealm
-            // 支援現代 SHA-512-256 和舊版 MD5 用戶端
-            algorithms = listOf(DigestAlgorithm.SHA_512_256, DigestAlgorithm.MD5)
-            digestProvider { userName, realm, algorithm ->
-                // 使用要求的演算法計算 H(username:realm:password)
-                userPasswords[userName]?.let { password ->
-                    computeHash(userName, realm, password, algorithm)
-                }
+install(Authentication) {
+    digest("auth-digest") {
+        realm = myRealm
+        // 同時支援現代 SHA-512-256
+        // 與舊版 MD5 用戶端
+        algorithms = listOf(
+            DigestAlgorithm.SHA_512_256,
+            DigestAlgorithm.MD5
+        )
+        digestProvider { userName, realm, algorithm ->
+            // 使用請求的演算法計算
+            // H(username:realm:password)
+            userPasswords[userName]?.let { password ->
+                computeHash(
+                    userName, realm, password, algorithm
+                )
             }
-            validate { credentials ->
-                if (credentials.userName.isNotEmpty()) {
-                    CustomPrincipal(credentials.userName, credentials.realm)
-                } else {
-                    null
-                }
+        }
+        validate { credentials ->
+            if (credentials.userName.isNotEmpty()) {
+                CustomPrincipal(
+                    credentials.userName,
+                    credentials.realm
+                )
+            } else {
+                null
             }
         }
     }
 }
-
-data class CustomPrincipal(val userName: String, val realm: String)
 ```
 
-`digestProvider` 函式接收三個參數：
-- `userName` - 來自用戶端請求的使用者名稱
-- `realm` - 配置的領域
-- `algorithm` - 用戶端正在使用的雜湊演算法
+</TabItem>
+<TabItem title="Type-safe" group-key="typed">
 
-您應該回傳使用指定演算法計算出的 `HA1` 雜湊，如果找不到該使用者則回傳 `null`。
+<note>
+    <p>
+        型別安全的驗證方案 API 處於實驗階段。它可能隨時被移除或變更。需要明確選擇加入 (Opt-in)。如需詳細資訊，請參閱<a href="server-typed-auth.md#prerequisites">啟用 API</a>。
+    </p>
+</note>
+
+`digest()` 函式會為您選擇的 Principal 型別建立方案。沒有 `install(Authentication)` 步驟：該方案是一個值，您將其傳遞給需要它的路由。
+
+```kotlin
+data class CustomPrincipal(
+    val userName: String,
+    val realm: String
+)
+
+val digestAuth = digest<CustomPrincipal>("auth-digest") {
+    realm = myRealm
+    // 同時支援現代 SHA-512-256
+    // 與舊版 MD5 用戶端
+    algorithms = listOf(
+        DigestAlgorithm.SHA_512_256,
+        DigestAlgorithm.MD5
+    )
+    digestProvider { userName, realm, algorithm ->
+        // 使用請求的演算法計算
+        // H(username:realm:password)
+        userPasswords[userName]?.let { password ->
+            computeHash(userName, realm, password, algorithm)
+        }
+    }
+    validate { credentials ->
+        if (credentials.userName.isNotEmpty()) {
+            CustomPrincipal(
+                credentials.userName,
+                credentials.realm
+            )
+        } else {
+            null
+        }
+    }
+}
+```
+
+型別安全的 `digest()` 函式僅在 JVM 上可用。如需完整的 API，請參閱[型別安全驗證](server-typed-auth.md)。
+
+</TabItem>
+</Tabs>
+
+`digestProvider` 函式接收三個參數：
+
+- `userName` – 來自用戶端請求的使用者名稱
+- `realm` - 配置的領域
+- `algorithm` – 用戶端正在使用的雜湊演算法
+
+您應該傳回使用指定演算法計算出的 `HA1` 雜湊，如果找不到該使用者則傳回 `null`。
 
 您也可以使用 [nonceManager](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-digest-authentication-provider/-config/nonce-manager.html) 屬性來指定產生 nonce 值的方式。
 
@@ -211,14 +285,17 @@ data class CustomPrincipal(val userName: String, val realm: String)
 
 品質保護 (QoP) 決定了 Digest 計算中包含的內容：
 
-- `DigestQop.AUTH` - 僅驗證（預設）。Digest 包含請求方法和 URI。
-- `DigestQop.AUTH_INT` - 具有完整性保護的驗證。Digest 還包含請求主體，提供防篡改保護。
+- `DigestQop.AUTH` – 僅驗證（預設）。Digest 包含請求方法和 URI。
+- `DigestQop.AUTH_INT` – 具有完整性保護的驗證。Digest 還包含請求主體，提供防篡改保護。
 
 ```kotlin
 install(Authentication) {
     digest("auth-digest") {
         realm = "Secure API"
-        supportedQop = listOf(DigestQop.AUTH, DigestQop.AUTH_INT)
+        supportedQop = listOf(
+            DigestQop.AUTH,
+            DigestQop.AUTH_INT
+        )
         // ...
     }
 }
@@ -228,19 +305,40 @@ install(Authentication) {
 
 ### 步驟 5：保護特定資源 {id="authenticate-route"}
 
+<Tabs group="auth-dsl">
+<TabItem title="Classic" group-key="classic">
+
 配置完 `digest` 提供者後，您可以使用 **[authenticate](server-auth.md#authenticate-route)** 函式來保護應用程式中的特定資源。在驗證成功的情況下，您可以在路由處理常式中使用 `call.principal` 函式擷取已驗證的 [Principal](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-principal/index.html)，並取得已驗證使用者的名稱。
 
 ```kotlin
-        authenticate("auth-digest") {
-            get("/") {
-                call.respondText("Hello, ${call.principal<CustomPrincipal>()?.userName}!")
-            }
+routing {
+    authenticate("auth-digest") {
+        get("/") {
+            val user = call.principal<CustomPrincipal>()
+            call.respondText("Hello, ${user?.userName}!")
         }
     }
 }
-
-data class CustomPrincipal(val userName: String, val realm: String)
 ```
+
+</TabItem>
+<TabItem title="Type-safe" group-key="typed">
+
+將方案傳遞給 `authenticateWith()`。在區塊內，`call.principal` 為您的 Principal 型別且絕不為 `null`，因此不需要型別轉換或 null 檢查：
+
+```kotlin
+routing {
+    authenticateWith(digestAuth) {
+        get("/") {
+            val user = call.principal
+            call.respondText("Hello, ${user.userName}!")
+        }
+    }
+}
+```
+
+</TabItem>
+</Tabs>
 
 ## 進階配置 {id="advanced"}
 
@@ -260,8 +358,8 @@ install(Authentication) {
             // 從雜湊中尋找實際的使用者名稱
             users.find { username ->
                 val digester = algorithm.toDigester()
-                val computedHash = hex(digester.digest("$username:$realm".toByteArray()))
-                computedHash == userhash
+                val bytes = "$username:$realm".toByteArray()
+                hex(digester.digest(bytes)) == userhash
             }
         }
         digestProvider { userName, realm, algorithm ->
@@ -290,8 +388,9 @@ install(Authentication) {
 ```
 
 嚴格模式：
-- 移除 MD5 演算法（僅允許 SHA-256、SHA-512-256 及其工作階段變體）。
-- 強制使用 UTF-8 字元集。
+
+- 移除 MD5 演算法（僅允許 SHA-256、SHA-512-256 及其工作階段變體）
+- 強制使用 UTF-8 字元集
 
 ### UTF-8 字元集支援 {id="charset"}
 
@@ -310,15 +409,16 @@ install(Authentication) {
 ### Authentication-Info 標頭 {id="auth-info"}
 
 在成功完成帶有 QoP 的驗證後，伺服器會自動傳回包含以下內容的 `Authentication-Info` 標頭：
-- `rspauth` - 用於相互驗證的回應驗證值。
-- `nextnonce` - 用戶端下一次使用的 nonce。
-- `qop`, `nc`, `cnonce` - 驗證參數的回顯。
+
+- `rspauth` - 用於相互驗證的回應驗證值
+- `nextnonce` - 用戶端下一次使用的 nonce
+- `qop`、`nc`、`cnonce` - 驗證參數的回顯
 
 這允許用戶端驗證伺服器的身分（相互驗證）。
 
 ## 安全建議 {id="security"}
 
-1. **使用 SHA-512-256 或 SHA-256** - 避免在生產環境中使用 MD5；它僅包含用於向後相容性。
+1. **使用 SHA-512-256 或 SHA-256** - 避免在生產環境中使用 MD5；它僅包含用於舊版相容性。
 
 2. **使用 `strictRfc7616Mode()`** - 用於沒有舊版用戶端需求的新應用程式。
 

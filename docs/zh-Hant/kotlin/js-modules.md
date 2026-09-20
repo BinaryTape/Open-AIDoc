@@ -10,7 +10,7 @@
 
 ## 瀏覽器目標 {id="browser-targets"}
 
-如果您打算在網頁瀏覽器環境中執行程式碼，並希望使用 UMD 以外的模組系統，您可以在 `webpackTask` 組建組態區塊中指定所需的模組類型。例如，要切換到 CommonJS，請使用：
+如果您打算在網頁瀏覽器環境中執行程式碼，並希望使用 UMD 以外的模組系統，您可以在 `webpackTask` 組態區塊中指定所需的模組類型。例如，要切換到 CommonJS，請使用：
 
 ```groovy
 kotlin {
@@ -23,14 +23,13 @@ kotlin {
         binaries.executable()
     }
 }
-
 ```
 
-Webpack 提供兩種不同形式的 CommonJS：`commonjs` 與 `commonjs2`，這會影響您宣告的可用方式。在大多數情況下，您可能需要 `commonjs2`，它會將 `module.exports` 語法新增到產生的程式庫中。或者，您也可以選擇 `commonjs` 選項，它嚴格遵循 CommonJS 規範。若要進一步了解 `commonjs` 與 `commonjs2` 之間的差異，請參閱 [Webpack 存儲庫](https://github.com/webpack/webpack/issues/1114)。
+Webpack 提供兩種不同形式的 CommonJS：`commonjs` 與 `commonjs2`，這會影響您宣告的可用方式。在大多數情況下，您可能需要 `commonjs2`，它會將 `module.exports` 語法新增到產生的程式庫中。或者，您也可以選擇 `commonjs` 選項，它嚴格遵循 CommonJS 規範。若要了解更多關於 `commonjs` 與 `commonjs2` 之間的差異，請參閱 [Webpack 存儲庫](https://github.com/webpack/webpack/issues/1114)。
 
 ## JavaScript 程式庫與 Node.js 檔案 {id="javascript-libraries-and-node-js-files"}
 
-如果您正在建立用於 JavaScript 或 Node.js 環境的程式庫，且想要使用不同的模組系統，則指令會略有不同。
+如果您正在建立用於 JavaScript 或 Node.js 環境的程式庫，且想要使用不同的模組系統，則操作說明會略有不同。
 
 ### 選擇目標模組系統 {id="choose-the-target-module-system"}
 
@@ -57,7 +56,7 @@ compileKotlinJs.compilerOptions.moduleKind = org.jetbrains.kotlin.gradle.dsl.JsM
 
 可用的值為：`umd`（預設）、`es`、`commonjs`、`amd`、`plain`。
 
-> 這與調整 `webpackTask.output.libraryTarget` 不同。程式庫目標會更改由 webpack 產生的輸出（在您的程式碼編譯完成後）。`compilerOptions.moduleKind` 則會更改由 Kotlin 編譯器產生的輸出。
+> 這與調整 `webpackTask.output.libraryTarget` 不同。程式庫目標會更改由 _webpack 產生的_輸出（在您的程式碼編譯完成後）。`compilerOptions.moduleKind` 則會更改由 _Kotlin 編譯器產生的_輸出。
 >
 {style="note"}  
 
@@ -91,7 +90,7 @@ external fun sayHello(name: String)
 
 ### 應用 @JsModule 於軟件包 {id="apply-jsmodule-to-packages"}
 
-某些 JavaScript 程式庫匯出軟件包（命名空間）而不是函式和類別。就 JavaScript 而言，這是一個具有類別、函式和屬性等成員的物件。將這些軟件包作為 Kotlin 物件匯入通常看起來不自然。編譯器可以使用以下表示法將匯入的 JavaScript 軟件包對應到 Kotlin 軟件包：
+某些 JavaScript 程式庫匯出軟件包（命名空間）而不是函式和類別。就 JavaScript 而言，這是一個具有類別、函式和屬性等成員的*物件*。將這些軟件包作為 Kotlin 物件匯入通常看起來不自然。編譯器可以使用以下表示法將匯入的 JavaScript 軟件包對應到 Kotlin 軟件包：
 
 ```kotlin
 @file:JsModule("extModule")

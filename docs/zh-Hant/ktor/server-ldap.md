@@ -64,11 +64,16 @@ install(Authentication) {
 
 若要驗證 LDAP 使用者，您需要呼叫 [ldapAuthenticate](https://api.ktor.io/ktor-server-auth-ldap/io.ktor.server.auth.ldap/ldap-authenticate.html) 函式。此函式接受 [UserPasswordCredential](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-user-password-credential/index.html) 並根據指定的 LDAP 伺服器進行校驗。
 
+<Tabs group="auth-dsl">
+<TabItem title="Classic" group-key="classic">
+
 ```kotlin
 install(Authentication) {
     basic("auth-ldap") {
         validate { credentials ->
-            ldapAuthenticate(credentials, "ldap://0.0.0.0:389", "cn=%s,dc=ktor,dc=io")
+            val url = "ldap://0.0.0.0:389"
+            val userDNFormat = "cn=%s,dc=ktor,dc=io"
+            ldapAuthenticate(credentials, url, userDNFormat)
         }
     }
 }
@@ -82,7 +87,9 @@ install(Authentication) {
 install(Authentication) {
     basic("auth-ldap") {
         validate { credentials ->
-            ldapAuthenticate(credentials, "ldap://localhost:389", "cn=%s,dc=ktor,dc=io") {
+            val url = "ldap://localhost:389"
+            val userDNFormat = "cn=%s,dc=ktor,dc=io"
+            ldapAuthenticate(credentials, url, userDNFormat) {
                 if (it.name == it.password) {
                     UserIdPrincipal(it.name)
                 } else {
@@ -94,7 +101,62 @@ install(Authentication) {
 }
 ```
 
+</TabItem>
+<TabItem title="Type-safe" group-key="typed">
+
+<note>
+    <p>
+        型別安全驗證方案 API 為實驗性功能。它可能隨時被移除或變更。
+        需要明確加入（opt-in）。如需更多詳細資訊，請參閱
+        <a href="server-typed-auth.md#prerequisites">啟用 API</a>。
+    </p>
+</note>
+
+目前沒有專門針對 LDAP 的型別安全驗證方案。請在型別安全 [`basic`](server-basic-auth.md)、[`digest`](server-digest-auth.md) 或 [`form`](server-form-based-auth.md) 方案的 `validate` 區塊內呼叫 `ldapAuthenticate`。
+
+將區塊傳遞給 `ldapAuthenticate` 以傳回您自訂的 principal 型別：
+
+```kotlin
+data class User(val name: String)
+
+val ldapAuth = basic<User>("auth-ldap") {
+    validate { credentials ->
+        val url = "ldap://0.0.0.0:389"
+        val userDNFormat = "cn=%s,dc=ktor,dc=io"
+        ldapAuthenticate(credentials, url, userDNFormat) {
+            User(it.name)
+        }
+    }
+}
+```
+
+該區塊還允許您為已驗證使用者新增校驗：
+
+```kotlin
+val ldapAuth = basic<User>("auth-ldap") {
+    validate { credentials ->
+        val url = "ldap://localhost:389"
+        val userDNFormat = "cn=%s,dc=ktor,dc=io"
+        ldapAuthenticate(credentials, url, userDNFormat) {
+            if (it.name == it.password) {
+                User(it.name)
+            } else {
+                null
+            }
+        }
+    }
+}
+```
+
+如需完整的 API，請參閱[型別安全驗證](server-typed-auth.md)。
+
+</TabItem>
+</Tabs>
+
 ### 步驟 3：保護特定資源 {id="authenticate-route"}
+
+<Tabs group="auth-dsl">
+<TabItem title="Classic" group-key="classic">
 
 設定 LDAP 後，您可以使用 **[authenticate](server-auth.md#authenticate-route)** 函式來保護應用程式中的特定資源。在驗證成功的情況下，您可以在路由處理常式中使用 `call.principal` 函式取得已驗證的 [UserIdPrincipal](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-user-id-principal/index.html)，並獲取已驗證使用者的名稱。
 
@@ -102,11 +164,30 @@ install(Authentication) {
 routing {
     authenticate("auth-ldap") {
         get("/") {
-            call.respondText("Hello, ${call.principal<UserIdPrincipal>()?.name}!")
+            val user = call.principal<UserIdPrincipal>()
+            call.respondText("Hello, ${user?.name}!")
         }
     }
 }
 ```
+
+</TabItem>
+<TabItem title="Type-safe" group-key="typed">
+
+將方案傳遞給 `authenticateWith()`。在該區塊內，`call.principal` 即為您的 principal 型別且永遠不會為 `null`，因此不需要型別轉換或 null 檢查：
+
+```kotlin
+routing {
+    authenticateWith(ldapAuth) {
+        get("/") {
+            call.respondText("Hello, ${call.principal.name}!")
+        }
+    }
+}
+```
+
+</TabItem>
+</Tabs>
 
 您可以在此處找到完整的可執行範例：[auth-ldap](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/auth-ldap)。
 

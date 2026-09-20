@@ -53,11 +53,11 @@ get("/") {
 
 #### 부분 HTML 프래그먼트 {id="partial-html-fragments"}
 
-`<html>`, `<head>`, 또는 `<body>`로 감싸지 않고 HTML의 일부(fragment)만 반환해야 하는 경우, `call.respondHtmlFragment()`를 사용할 수 있습니다:
+`<html>`, `<head>`, 또는 `<body>`로 감싸지 않고 HTML의 일부(fragment)만 반환해야 하는 경우, `call.respondHtmlPartial()`을 사용할 수 있습니다:
 
 ```kotlin
     get("/fragment") {
-        call.respondHtmlFragment(HttpStatusCode.Created) {
+        call.respondHtmlPartial(HttpStatusCode.Created) {
             div("fragment") {
                 span { +"Created!" }
             }

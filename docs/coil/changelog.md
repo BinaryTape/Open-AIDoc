@@ -1,15 +1,19 @@
 # 更新日志
 
-## [3.6.2] - 2026年9月4日
+## [3.6.3] - 2026年9月18日 {id="3-6-3-september-18-2026"}
+
+- 修复使用 Android Gradle Plugin 9.4.0 和 R8 的构建因 Kotlin 模块名称元数据中的无效字符而失败的问题。
+
+## [3.6.2] - 2026年9月4日 {id="3-6-2-september-4-2026"}
 
 - 修复当等待请求被取消时，`DeDupeConcurrentRequestStrategy` 挂起特定 key 的请求的问题。([#3566](https://github.com/coil-kt/coil/pull/3566))
 - 修复在使用 Compose Multiplatform 1.13 时的 JS/WASM 链接错误。([#3568](https://github.com/coil-kt/coil/pull/3568))
 
-## [3.6.1] - 2026年9月1日
+## [3.6.1] - 2026年9月1日 {id="3-6-1-september-1-2026"}
 
 - 修复启用 ES 模块时 JS 构建失败的问题。([#3558](https://github.com/coil-kt/coil/pull/3558))
 
-## [3.6.0] - 2026年8月26日
+## [3.6.0] - 2026年8月26日 {id="3-6-0-august-26-2026"}
 
 - **新增**：添加对在 JS/WASM 上加载 `blob:` URL（对象 URL）的支持。([#3504](https://github.com/coil-kt/coil/pull/3504))
 - **新增**：添加 `ImageRequest.Builder.allowPartialImage` 和 `ImageLoader.Builder.allowPartialImage` 以配置 Android 上的 `StaticImageDecoder` 是否接受部分图像。此功能默认启用，与之前 Coil 版本的行为一致。([#3494](https://github.com/coil-kt/coil/pull/3494))
@@ -26,7 +30,7 @@
 - 更新 Skiko 至 0.150.1。
 - 更新 `kotlinx-io-okio` 至 0.9.1。
 
-## [3.5.0] - 2026年6月10日
+## [3.5.0] - 2026年6月10日 {id="3-5-0-june-10-2026"}
 
 自 `3.4.0` 以来的变更：
 
@@ -53,7 +57,7 @@
 - 更新 Compose 至 1.11.1。
 - 更新 Skiko 至 0.144.6。
 
-## [3.5.0-beta01] - 2026年5月4日
+## [3.5.0-beta01] - 2026年5月4日 {id="3-5-0-beta01-may-4-2026"}
 
 - 移除 `iosX64` 和 `macosX64` 目标。([#3386](https://github.com/coil-kt/coil/pull/3386))
 - 将 Android 的最低 SDK 版本提升至 23。([#3283](https://github.com/coil-kt/coil/pull/3283))
@@ -66,7 +70,7 @@
 - 更新 Skiko 至 0.144.5。
 - 更新 `androidx.annotation` 至 1.10.0。
 
-## [3.4.0] - 2026年2月24日
+## [3.4.0] - 2026年2月24日 {id="3-4-0-february-24-2026"}
 
 - **新增**：添加 `ConcurrentRequestStrategy` 以支持合并针对相同 key 的在途网络请求。([#2995](https://github.com/coil-kt/coil/pull/2995), [#3326](https://github.com/coil-kt/coil/pull/3326))
     - `DeDupeConcurrentRequestStrategy` 可启用此行为，并让等待者等待在途网络请求的结果。
@@ -96,7 +100,7 @@
 - 更新 `androidx.lifecycle` 至 2.9.4。
 - 更新 `androidx.exifinterface` 至 1.4.2。
 
-## [3.3.0] - 2025年7月22日
+## [3.3.0] - 2025年7月22日 {id="3-3-0-july-22-2025"}
 
 - **新增**：引入一个新 API，用于在应用处于后台时限制 Android 上的 `MemoryCache.maxSize`。
     - 如果设置了 `ImageLoader.Builder.memoryCacheMaxSizePercentWhileInBackground`，则当应用处于后台时，`ImageLoader` 的内存缓存将被限制为其最大大小的百分比。此设置目前默认禁用。
@@ -117,7 +121,7 @@
 - 更新 Okio 至 3.15.0。
 - 更新 Skiko 至 0.9.4.2。
 
-## [3.2.0] - 2025年5月13日
+## [3.2.0] - 2025年5月13日 {id="3-2-0-may-13-2025"}
 
 自 `3.1.0` 以来的变更：
 
@@ -143,11 +147,11 @@
 - 更新 Compose 至 1.8.0。
 - 更新 `accompanist-drawablepainter` 至 0.37.3。
 
-## [3.2.0-rc02] - 2025年4月26日
+## [3.2.0-rc02] - 2025年4月26日 {id="3-2-0-rc02-april-26-2025"}
 
 - 修复在非 JVM 目标上使用 `KtorNetworkFetcherFactory` (Ktor 3) 加载图像时，图像请求因 `ClosedByteChannelException` 而失败的问题。
 
-## [3.2.0-rc01] - 2025年4月24日
+## [3.2.0-rc01] - 2025年4月24日 {id="3-2-0-rc01-april-24-2025"}
 
 - **重要**：由于 Compose `1.8.0` 的要求，`coil-compose` 和 `coil-compose-core` 现在需要 Java 11 字节码。有关如何启用它，请参阅[此处](https://coil-kt.github.io/coil/faq/#how-do-i-target-java-8-or-java-11)。
 - 将 `AsyncImagePreviewHandler` 的函数式构造函数更改为返回 `AsyncImagePainter.State.Success` 而不是 `AsyncImagePainter.State.Loading`。
@@ -164,7 +168,7 @@
 - 更新 Skiko 至 0.9.4。
 - 更新 Coroutines 至 1.10.2。
 
-## [3.1.0] - 2025年2月4日
+## [3.1.0] - 2025年2月4日 {id="3-1-0-february-4-2025"}
 
 - 提升 `AsyncImage` 性能。
     - 取决于可组合项是被实例化还是被重用，运行时性能提升了 25% 到 40%。内存分配也减少了 35% 到 48%。更多信息请参阅[此处](https://github.com/coil-kt/coil/pull/2795)。
@@ -187,7 +191,7 @@
 - 更新 Compose 至 1.7.3。
 - 更新 `androidx.core` 至 1.15.0。
 
-## [3.0.4] - 2024年11月25日
+## [3.0.4] - 2024年11月25日 {id="3-0-4-november-25-2024"}
 
 - 修复矢量可绘制对象在 Android Studio 预览中不渲染的问题。
 - 修复尺寸超过 `maxBitmapSize` 的请求可能出现内存缓存未命中的问题。
@@ -200,25 +204,25 @@
 - 如果即时主调度器不可用，在 Compose 中回退到使用 `Dispatchers.Unconfined`。这仅用于预览/测试环境。
 - 将 Ktor 2 更新至 `2.3.13`。
 
-## [3.0.3] - 2024年11月14日
+## [3.0.3] - 2024年11月14日 {id="3-0-3-november-14-2024"}
 
 - 修复基于 `ImageView` 的 `ScaleType` 设置 `ImageRequest.scale` 的问题。
 - 修复 `DiskCache` 在删除文件后无法跟踪条目移除的边缘情况。
 - 在记录错误时将 throwable 传递给 `Logger`。
 - 不要用 `kotlin-stdlib` 替换 `kotlin-stdlib-jdk7` 和 `kotlin-stdlib-jdk8`。
 
-## [3.0.2] - 2024年11月9日
+## [3.0.2] - 2024年11月9日 {id="3-0-2-november-9-2024"}
 
 - 修复在 Android 上使用自定义 `CacheStrategy` 调用 `OkHttpNetworkFetcherFactory` 时发生崩溃的问题。
 - 修复 `CacheControlCacheStrategy` 计算缓存条目寿命不正确的问题。
 - 修复在 API >= 28 上，只有当 `ImageRequest.bitmapConfig` 为 `ARGB_8888` 或 `HARDWARE` 时才会生效的情况。
 
-## [3.0.1] - 2024年11月7日
+## [3.0.1] - 2024年11月7日 {id="3-0-1-november-7-2024"}
 
 - 修复使用硬件位图支持的 `BitmapImage` 调用 `Image.toBitmap` 时发生崩溃的问题。
 - 修复 `AsyncImageModelEqualityDelegate.Default` 对非 `ImageRequest` 模型进行不正确的相等性比较的问题。
 
-## [3.0.0] - 2024年11月4日
+## [3.0.0] - 2024年11月4日 {id="3-0-0-november-4-2024"}
 
 Coil 3.0.0 是 Coil 的下一个主要版本，全面支持 [Compose Multiplatform](https://www.jetbrains.com/compose-multiplatform/)。
 
@@ -228,7 +232,7 @@ Coil 3.0.0 是 Coil 的下一个主要版本，全面支持 [Compose Multiplatfo
 
 - 移除剩余的已弃用方法。
 
-## [3.0.0-rc02] - 2024年10月28日
+## [3.0.0-rc02] - 2024年10月28日 {id="3-0-0-rc02-october-28-2024"}
 
 [有关 3.x 中改进和重要变更的完整列表，请查看升级指南](https://coil-kt.github.io/coil/upgrading_to_coil3/)。自 `3.0.0-rc01` 以来的变更：
 
@@ -243,7 +247,7 @@ Coil 3.0.0 是 Coil 的下一个主要版本，全面支持 [Compose Multiplatfo
 - 更新 Ktor 至 `3.0.0`。
 - 更新 `androidx.annotation` 至 `1.9.0`。
 
-## [3.0.0-rc01] - 2024年10月8日
+## [3.0.0-rc01] - 2024年10月8日 {id="3-0-0-rc01-october-8-2024"}
 
 [有关 3.x 中改进和重要变更的完整列表，请查看升级指南](https://coil-kt.github.io/coil/upgrading_to_coil3/)。自 `3.0.0-alpha10` 以来的变更：
 
@@ -260,7 +264,7 @@ Coil 3.0.0 是 Coil 的下一个主要版本，全面支持 [Compose Multiplatfo
 - 更新 Kotlin 至 2.0.20。
 - 更新 Okio 至 3.9.1。
 
-## [3.0.0-alpha10] - 2024年8月7日
+## [3.0.0-alpha10] - 2024年8月7日 {id="3-0-0-alpha10-august-7-2024"}
 
 - **破坏性变更**：将 `ImageLoader.Builder.networkObserverEnabled` 替换为 `NetworkFetcher` 的 `ConnectivityChecker` 接口。
     - 要禁用网络观察程序，请将 `ConnectivityChecker.ONLINE` 传递给 `KtorNetworkFetcherFactory`/`OkHttpNetworkFetcherFactory` 的构造函数。
@@ -280,14 +284,14 @@ AsyncImage(
 - 从 `Image` API 中移除 `@ExperimentalCoilApi`。
 - 更新 Kotlin 至 2.0.10。
 
-## [3.0.0-alpha09] - 2024年7月23日
+## [3.0.0-alpha09] - 2024年7月23日 {id="3-0-0-alpha09-july-23-2024"}
 
 - **破坏性变更**：将 `io.coil-kt.coil3:coil-network-ktor` 构件重命名为 `io.coil-kt.coil3:coil-network-ktor2`，它依赖于 Ktor 2.x。此外，引入依赖于 Ktor 3.x 的 `io.coil-kt.coil3:coil-network-ktor3`。`wasmJs` 支持仅在 Ktor 3.x 中可用。
 - **新增**：添加 `AsyncImagePainter.restart()` 以手动重启图像请求。
 - 从 `NetworkClient` 及相关类中移除 `@ExperimentalCoilApi`。
 - 优化 `ImageRequest` 以避免不必要的 `Extras` 和 `Map` 分配。
 
-## [2.7.0] - 2024年7月17日
+## [2.7.0] - 2024年7月17日 {id="2-7-0-july-17-2024"}
 
 - 略微优化内部协程使用，以提高 `ImageLoader.execute`、`AsyncImage`、`SubcomposeAsyncImage` 和 `rememberAsyncImagePainter` 的性能。([#2205](https://github.com/coil-kt/coil/pull/2205))
 - 修复分块响应的重复网络调用。([#2363](https://github.com/coil-kt/coil/pull/2363))
@@ -295,13 +299,13 @@ AsyncImage(
 - 更新 Compose UI 至 1.6.8。
 - 更新 Okio 至 3.9.0。
 
-## [3.0.0-alpha08] - 2024年7月8日
+## [3.0.0-alpha08] - 2024年7月8日 {id="3-0-0-alpha08-july-8-2024"}
 
 - **破坏性变更**：将 `ImageRequest` 和 `ImageLoader` 的 `dispatcher` 方法重命名为 `coroutineContext`。例如，`ImageRequest.Builder.dispatcher` 现在是 `ImageRequest.Builder.coroutineContext`。重命名是因为该方法现在接受任何 `CoroutineContext` 而不再要求是 `Dispatcher`。
 - 修复：修复可能由于竞态条件而发生的 `IllegalStateException: Reading a state that was created after the snapshot was taken or in a snapshot that has not yet been applied`。
     - 注意：这重新引入了对 `Dispatchers.Main.immediate` 的软依赖。因此，您应该在 JVM 上重新添加对 [`kotlinx-coroutines-swing`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-swing/) 的依赖。如果未导入，则 `ImageRequest` 不会被立即调度，并且在设置 `ImageRequest.placeholder` 或从内存缓存解析之前将有一帧延迟。
 
-## [3.0.0-alpha07] - 2024年6月26日
+## [3.0.0-alpha07] - 2024年6月26日 {id="3-0-0-alpha07-june-26-2024"}
 
 - **破坏性变更**：`AsyncImagePainter` 默认不再等待 `onDraw`，而是使用 `Size.ORIGINAL`。
     - 这修复了[与 Roborazzi/Paparazzi 的兼容性问题](https://github.com/coil-kt/coil/issues/1910)，并整体提高了测试可靠性。
@@ -331,12 +335,12 @@ AsyncImage(
 - 更新 Skiko 至 0.8.4。
 - [有关 3.x 中重要变更的完整列表，请查看升级指南。](https://coil-kt.github.io/coil/upgrading_to_coil3/)
 
-## [3.0.0-alpha06] - 2024年2月29日
+## [3.0.0-alpha06] - 2024年2月29日 {id="3-0-0-alpha06-february-29-2024"}
 
 - 将 Skiko 降级至 0.7.93。
 - [有关 3.x 中重要变更的完整列表，请查看升级指南。](https://coil-kt.github.io/coil/upgrading_to_coil3/)
 
-## [3.0.0-alpha05] - 2024年2月28日
+## [3.0.0-alpha05] - 2024年2月28日 {id="3-0-0-alpha05-february-28-2024"}
 
 - **新增**：支持 `wasmJs` 目标。
 - 创建 `DrawablePainter` 和 `DrawableImage` 以支持在非 Android 平台上绘制不以位图为后端的 `Image`。
@@ -350,7 +354,7 @@ AsyncImage(
 - 更新 Skiko 至 0.7.94。
 - [有关 3.x 中重要变更的完整列表，请查看升级指南。](https://coil-kt.github.io/coil/upgrading_to_coil3/)
 
-## [2.6.0] - 2024年2月23日
+## [2.6.0] - 2024年2月23日 {id="2-6-0-february-23-2024"}
 
 - 使 `rememberAsyncImagePainter`、`AsyncImage` 和 `SubcomposeAsyncImage` [可重启且可跳过](https://developer.android.com/jetpack/compose/performance/stability#functions)。这通过避免重组（除非可组合项的参数之一发生变化）来提高性能。
     - 向 `rememberAsyncImagePainter`、`AsyncImage` 和 `SubcomposeAsyncImage` 添加可选的 `modelEqualityDelegate` 参数，以控制 `model` 是否会触发重组。
@@ -364,7 +368,7 @@ AsyncImage(
 - 更新 `androidx.collection` 至 1.4.0。
 - 更新 `androidx.lifecycle` 至 2.7.0。
 
-## [3.0.0-alpha04] - 2024年2月1日
+## [3.0.0-alpha04] - 2024年2月1日 {id="3-0-0-alpha04-february-1-2024"}
 
 - **破坏性变更**：从 `OkHttpNetworkFetcherFactory` 和 `KtorNetworkFetcherFactory` 的公开 API 中移除 `Lazy`。
 - 在 `OkHttpNetworkFetcherFactory` 中暴露 `Call.Factory` 而不是 `OkHttpClient`。
@@ -372,7 +376,7 @@ AsyncImage(
 - 将 Compose 降级至 1.5.12。
 - [有关重要变更的完整列表，请查看升级指南。](https://coil-kt.github.io/coil/upgrading_to_coil3/)
 
-## [3.0.0-alpha03] - 2024年1月20日
+## [3.0.0-alpha03] - 2024年1月20日 {id="3-0-0-alpha03-january-20-2024"}
 
 - **破坏性变更**：`coil-network` 已重命名为 `coil-network-ktor`。此外，新增了一个依赖于 OkHttp 且不需要指定 Ktor 引擎的 `coil-network-okhttp` 构件。
     - 取决于您导入的构件，您可以使用 `KtorNetworkFetcherFactory` 或 `OkHttpNetworkFetcherFactory` 手动引用 `Fetcher.Factory`。
@@ -380,7 +384,7 @@ AsyncImage(
 - 向 `AsyncImage` 添加 `clipToBounds` 参数。
 - [有关重要变更的完整列表，请查看升级指南。](https://coil-kt.github.io/coil/upgrading_to_coil3/)
 
-## [3.0.0-alpha02] - 2024年1月10日
+## [3.0.0-alpha02] - 2024年1月10日 {id="3-0-0-alpha02-january-10-2024"}
 
 - **破坏性变更**：`coil-gif`、`coil-network`、`coil-svg` 和 `coil-video` 的软件包已更新，使其所有类分别属于 `coil.gif`、`coil.network`、`coil.svg` 和 `coil.video`。这有助于避免与其他构件的类名冲突。
 - **破坏性变更**：`ImageDecoderDecoder` 已重命名为 `AnimatedImageDecoder`。
@@ -393,14 +397,14 @@ AsyncImage(
 - 修复：多个 `coil3.Uri` 解析修复。
 - [有关重要变更的完整列表，请查看升级指南。](https://coil-kt.github.io/coil/upgrading_to_coil3/)
 
-## [3.0.0-alpha01] - 2023年12月30日
+## [3.0.0-alpha01] - 2023年12月30日 {id="3-0-0-alpha01-december-30-2023"}
 
 - **新增**：[Compose Multiplatform](https://www.jetbrains.com/lp/compose-multiplatform/) 支持。Coil 现在是一个支持 Android、JVM、iOS、macOS 和 Javascript 的 Kotlin 多平台库。
 - Coil 的 Maven 坐标已更新为 `io.coil-kt.coil3`，其导入已更新为 `coil3`。这允许 Coil 3 与 Coil 2 并行运行而不会出现二进制兼容性问题。例如，`io.coil-kt:coil:[version]` 现在是 `io.coil-kt.coil3:coil:[version]`。
 - `coil-base` 和 `coil-compose-base` 构件分别重命名为 `coil-core` 和 `coil-compose-core`，以符合 Coroutines、Ktor 和 AndroidX 使用的命名约定。
 - [有关重要变更的完整列表，请查看升级指南。](https://coil-kt.github.io/coil/upgrading_to_coil3/)
 
-## [2.5.0] - 2023年10月30日
+## [2.5.0] - 2023年10月30日 {id="2-5-0-october-30-2023"}
 
 - **新增**：添加 `MediaDataSourceFetcher.Factory` 以支持在 `coil-video` 中解码 `MediaDataSource` 实现。([#1795](https://github.com/coil-kt/coil/pull/1795))
 - 将 `SHIFT6m` 设备添加到硬件位图黑名单。([#1812](https://github.com/coil-kt/coil/pull/1812))
@@ -419,7 +423,7 @@ AsyncImage(
 - 更新 `com.squareup.okhttp3` 至 4.12.0。
 - 更新 `com.squareup.okio` 至 3.6.0。
 
-## [2.4.0] - 2023年5月21日
+## [2.4.0] - 2023年5月21日 {id="2-4-0-may-21-2023"}
 
 - 将 `DiskCache` 的 `get`/`edit` 重命名为 `openSnapshot`/`openEditor`。
 - 在 `AsyncImagePainter` 中不要自动将 `ColorDrawable` 转换为 `ColorPainter`。
@@ -434,7 +438,7 @@ AsyncImage(
 - 更新 `androidx.profileinstaller:profileinstaller` 至 1.3.1。
 - 更新 `com.squareup.okhttp3` 至 4.11.0。
 
-## [2.3.0] - 2023年3月25日
+## [2.3.0] - 2023年3月25日 {id="2-3-0-march-25-2023"}
 
 - **新增**：引入一个新构件 `coil-test`，其中包含 `FakeImageLoaderEngine`。此类对于硬编码图像加载器响应非常有用，以确保测试中响应的一致性和同步性（从主线程）。有关更多信息，请参阅[此处](https://coil-kt.github.io/coil/testing)。
 - **新增**：向 `coil-base`（`coil` 的子模块）和 `coil-compose-base`（`coil-compose` 的子模块）添加[基准配置文件 (baseline profiles)](https://developer.android.com/topic/performance/baselineprofiles/overview)。
@@ -453,7 +457,7 @@ AsyncImage(
 - 更新 `androidx.lifecycle` 至 2.6.1。
 - 更新 `okio` 至 3.3.0。
 
-## [2.2.2] - 2022年10月1日
+## [2.2.2] - 2022年10月1日 {id="2-2-2-october-1-2022"}
 
 - 确保图像加载器在注册其系统回调之前已完全初始化。[#1465](https://github.com/coil-kt/coil/pull/1465)
 - 在 API 30+ 上的 `VideoFrameDecoder` 中设置首选位图配置以避免色带问题。[#1487](https://github.com/coil-kt/coil/pull/1487)
@@ -462,14 +466,14 @@ AsyncImage(
 - 修复解码资产子文件夹内的视频的问题。[#1489](https://github.com/coil-kt/coil/pull/1489)
 - 更新 `androidx.annotation` 至 1.5.0。
 
-## [2.2.1] - 2022年9月8日
+## [2.2.1] - 2022年9月8日 {id="2-2-1-september-8-2022"}
 
 - 修复：`RoundedCornersTransformation` 现在可以正确缩放 `input` 位图。
 - 移除对 `kotlin-parcelize` 插件的依赖。
 - 将编译 SDK 更新至 33。
 - 将 `androidx.appcompat:appcompat-resources` 降级至 1.4.2 以解决 [#1423](https://github.com/coil-kt/coil/issues/1423)。
 
-## [2.2.0] - 2022年8月16日
+## [2.2.0] - 2022年8月16日 {id="2-2-0-august-16-2022"}
 
 - **新增**：向 `coil-video` 添加 `ImageRequest.videoFramePercent`，以支持将视频帧指定为视频时长的百分比。
 - **新增**：添加 `ExifOrientationPolicy` 以配置 `BitmapFactoryDecoder` 如何处理 EXIF 方向数据。
@@ -485,14 +489,14 @@ AsyncImage(
 - 更新 `androidx.appcompat:appcompat-resources` 至 1.5.0。
 - 更新 `androidx.core` 至 1.8.0。
 
-## [2.1.0] - 2022年5月17日
+## [2.1.0] - 2022年5月17日 {id="2-1-0-may-17-2022"}
 
 - **新增**：支持加载 `ByteArray`。([#1202](https://github.com/coil-kt/coil/pull/1202))
 - **新增**：支持使用 `ImageRequest.Builder.css` 为 SVG 设置自定义 CSS 规则。([#1210](https://github.com/coil-kt/coil/pull/1210))
 - 修复：将 `GenericViewTarget` 的私有方法转换为受保护方法。([#1273](https://github.com/coil-kt/coil/pull/1273))
 - 更新编译 SDK 至 32。([#1268](https://github.com/coil-kt/coil/pull/1268))
 
-## [2.0.0] - 2022年5月10日
+## [2.0.0] - 2022年5月10日 {id="2-0-0-may-10-2022"}
 
 Coil 2.0.0 是该库的一次重大迭代，包含破坏性变更。有关如何升级，请查看[升级指南](https://coil-kt.github.io/coil/upgrading/)。
 
@@ -562,7 +566,7 @@ AsyncImage(
 - 修复首先应用 `ImageView.load` 构建器参数而不是最后应用的问题。
 - 修复如果响应未修改则不合并 HTTP 标头的问题。
 
-## [2.0.0-rc03] - 2022年4月11日
+## [2.0.0-rc03] - 2022年4月11日 {id="2-0-0-rc03-april-11-2022"}
 
 - 移除 `ScaleResolver` 接口。
 - 将 `Size` 构造函数转换为函数。
@@ -570,14 +574,14 @@ AsyncImage(
 - 防范 `SystemCallbacks.onTrimMemory` 中罕见的崩溃。
 - 更新 Coroutines 至 1.6.1。
 
-## [2.0.0-rc02] - 2022年3月20日
+## [2.0.0-rc02] - 2022年3月20日 {id="2-0-0-rc02-march-20-2022"}
 
 - 将 `ImageRequest` 的默认尺寸恢复为当前显示的尺寸，而不是 `Size.ORIGINAL`。
 - 修复 `DiskCache.Builder` 被标记为实验性的问题。只有 `DiskCache` 的方法是实验性的。
 - 修复在将图像加载到具有一个维度为 `WRAP_CONTENT` 的 `ImageView` 时，会以原始尺寸加载图像而不是将其适配到有界维度中的情况。
 - 从 `MemoryCache.Key`、`MemoryCache.Value` 和 `Parameters.Entry` 中移除组件函数。
 
-## [2.0.0-rc01] - 2022年3月2日
+## [2.0.0-rc01] - 2022年3月2日 {id="2-0-0-rc01-march-2-2022"}
 
 自 `1.4.0` 以来的重大变更：
 
@@ -629,7 +633,7 @@ AsyncImage(
 - 更新 Compose 至 1.1.1。
 - 更新 `accompanist-drawablepainter` 至 0.23.1。
 
-## [2.0.0-alpha09] - 2022年2月16日
+## [2.0.0-alpha09] - 2022年2月16日 {id="2-0-0-alpha09-february-16-2022"}
 
 - 修复 `AsyncImage` 创建无效约束的问题。([#1134](https://github.com/coil-kt/coil/pull/1134))
 - 向 `AsyncImagePainter` 添加 `ContentScale` 参数。([#1144](https://github.com/coil-kt/coil/pull/1144))
@@ -640,11 +644,11 @@ AsyncImage(
 - 更新 `accompanist-drawablepainter` 至 0.23.0。
 - 更新 `androidx.lifecycle` 至 2.4.1。
 
-## [2.0.0-alpha08] - 2022年2月7日
+## [2.0.0-alpha08] - 2022年2月7日 {id="2-0-0-alpha08-february-7-2022"}
 
 - 更新 `DiskCache` 和 `ImageSource` 以使用 Okio 的 `FileSystem` API。([#1115](https://github.com/coil-kt/coil/pull/1115))
 
-## [2.0.0-alpha07] - 2022年1月30日
+## [2.0.0-alpha07] - 2022年1月30日 {id="2-0-0-alpha07-january-30-2022"}
 
 - 显著提升 `AsyncImage` 性能，并将 `AsyncImage` 拆分为 `AsyncImage` 和 `SubcomposeAsyncImage`。([#1048](https://github.com/coil-kt/coil/pull/1048))
     - `SubcomposeAsyncImage` 提供 `loading`/`success`/`error`/`content` 插槽 API，并使用性能较差的子组合。
@@ -663,7 +667,7 @@ AsyncImage(
 - 更新 `accompanist-drawablepainter` 至 0.22.1-rc。
 - 更新 `androidx.appcompat:appcompat-resources` 至 1.4.1。
 
-## [2.0.0-alpha06] - 2021年12月24日
+## [2.0.0-alpha06] - 2021年12月24日 {id="2-0-0-alpha06-december-24-2021"}
 
 - 添加 `ImageSource.Metadata` 以支持从资产、资源和内容 URI 进行解码，无需缓冲或临时文件。([#1060](https://github.com/coil-kt/coil/pull/1060))
 - 延迟执行图像请求，直到 `AsyncImage` 具有正向约束。([#1028](https://github.com/coil-kt/coil/pull/1028))
@@ -675,7 +679,7 @@ AsyncImage(
 - 更新 `accompanist-drawablepainter` 至 0.22.0-rc。
 - 更新 `androidx.collection` 至 1.2.0。
 
-## [2.0.0-alpha05] - 2021年11月28日
+## [2.0.0-alpha05] - 2021年11月28日 {id="2-0-0-alpha05-november-28-2021"}
 
 - **重要**：重构 `Size` 以支持在任一维度上使用图像的原始尺寸。
     - `Size` 现在由其宽度和高度的两个 `Dimension` 值组成。`Dimension` 可以是正像素值或 `Dimension.Original`。
@@ -689,7 +693,7 @@ AsyncImage(
 - 依赖 `androidx.collection` 而不是 `androidx.collection-ktx`。
 - 更新 OkHttp 至 4.9.3。
 
-## [2.0.0-alpha04] - 2021年11月22日
+## [2.0.0-alpha04] - 2021年11月22日 {id="2-0-0-alpha04-november-22-2021"}
 
 - **新增**：向 `coil-compose` 添加 `AsyncImage`。
     - `AsyncImage` 是一个异步执行 `ImageRequest` 并渲染结果的可组合项。
@@ -750,7 +754,7 @@ AsyncImage(
 - 更新 Compose 至 1.1.0-beta03 并依赖 `compose.foundation` 而不是 `compose.ui`。
 - 更新 `androidx.appcompat-resources` 至 1.4.0。
 
-## [2.0.0-alpha03] - 2021年11月12日
+## [2.0.0-alpha03] - 2021年11月12日 {id="2-0-0-alpha03-november-12-2021"}
 
 - 添加在 Android 29+ 上加载音乐缩略图的能力。([#967](https://github.com/coil-kt/coil/pull/967))
 - 修复：使用 `context.resources` 加载当前包的资源。([#968](https://github.com/coil-kt/coil/pull/968))
@@ -763,7 +767,7 @@ AsyncImage(
 - 更新 `androidx.lifecycle` 至 2.4.0。
     - 移除对 `lifecycle-common-java8` 的依赖，因为它已合并到 `lifecycle-common` 中。
 
-## [2.0.0-alpha02] - 2021年10月24日
+## [2.0.0-alpha02] - 2021年10月24日 {id="2-0-0-alpha02-october-24-2021"}
 
 - 添加一个新的 `coil-bom` 构件，其中包含 [物料清单 (BOM)](https://docs.gradle.org/7.2/userguide/platforms.html#sub:bom_import)。
     - 导入 `coil-bom` 允许您依赖其他 Coil 构件而无需指定版本。
@@ -773,7 +777,7 @@ AsyncImage(
 - 更新 Kotlin 至 1.5.31。
 - 更新 Compose 至 1.0.4。
 
-## [2.0.0-alpha01] - 2021年10月11日
+## [2.0.0-alpha01] - 2021年10月11日 {id="2-0-0-alpha01-october-11-2021"}
 
 Coil 2.0.0 是该库的下一个主要迭代，具有新功能、性能改进、API 改进和各种错误修复。在 2.0.0 稳定版发布之前，此版本可能与未来的 alpha 版本存在二进制/源码不兼容。
 
@@ -824,7 +828,7 @@ Coil 2.0.0 是该库的下一个主要迭代，具有新功能、性能改进、
 - 更新 OkHttp 至 4.9.2。
 - 更新 Okio 至 3.0.0-alpha.10。
 
-## [1.4.0] - 2021年10月6日
+## [1.4.0] - 2021年10月6日 {id="1-4-0-october-6-2021"}
 
 - **新增**：向 `ImagePainter.State.Success` 和 `ImagePainter.State.Error` 添加 `ImageResult`。([#887](https://github.com/coil-kt/coil/pull/887))
     - 这是一个二进制不兼容的变更，更改了 `ImagePainter.State.Success` 和 `ImagePainter.State.Error` 的签名，但这些 API 已标记为实验性的。
@@ -839,7 +843,7 @@ Coil 2.0.0 是该库的下一个主要迭代，具有新功能、性能改进、
 - 更新 Coroutines 至 1.5.2。
 - 更新 Compose 至 1.0.3。
 
-## [1.3.2] - 2021年8月4日
+## [1.3.2] - 2021年8月4日 {id="1-3-2-august-4-2021"}
 
 - `coil-compose` 现在依赖 `compose.ui` 而不是 `compose.foundation`。
     - `compose.ui` 是一个更小的依赖项，因为它是 `compose.foundation` 的子集。
@@ -848,12 +852,12 @@ Coil 2.0.0 是该库的下一个主要迭代，具有新功能、性能改进、
 - 更新 Coroutines 至 1.5.1。
 - 更新 `androidx.exifinterface:exifinterface` 至 1.3.3。
 
-## [1.3.1] - 2021年7月28日
+## [1.3.1] - 2021年7月28日 {id="1-3-1-july-28-2021"}
 
 - 更新 Jetpack Compose 至 `1.0.0`。热烈祝贺 Compose 团队发布[稳定版本](https://android-developers.googleblog.com/2021/07/jetpack-compose-announcement.html)！
 - 更新 `androidx.appcompat:appcompat-resources` 至 1.3.1。
 
-## [1.3.0] - 2021年7月10日
+## [1.3.0] - 2021年7月10日 {id="1-3-0-july-10-2021"}
 
 - **新增**：添加对 [Jetpack Compose](https://developer.android.com/jetpack/compose) 的支持。它基于 [Accompanist](https://github.com/google/accompanist/) 的 Coil 集成，但进行了大量更改。有关更多信息，请查看[文档](https://coil-kt.github.io/coil/compose/)。
 - 添加 `allowConversionToBitmap` 以启用/禁用 `Transformation` 的自动位图转换。([#775](https://github.com/coil-kt/coil/pull/775))
@@ -864,7 +868,7 @@ Coil 2.0.0 是该库的下一个主要迭代，具有新功能、性能改进、
 - 修复 Licensee 找不到 Coil 许可证 URL 的问题。([#774](https://github.com/coil-kt/coil/pull/774))
 - 更新 `androidx.core:core-ktx` 至 1.6.0。
 
-## [1.2.2] - 2021年6月4日
+## [1.2.2] - 2021年6月4日 {id="1-2-2-june-4-2021"}
 
 - 修复在将具有共享状态的可绘制对象转换为位图时的竞态条件。([#771](https://github.com/coil-kt/coil/pull/771))
 - 修复 `ImageLoader.Builder.fallback` 设置 `error` 可绘制对象而不是 `fallback` 可绘制对象的问题。
@@ -876,11 +880,11 @@ Coil 2.0.0 是该库的下一个主要迭代，具有新功能、性能改进、
 - 更新 `androidx.appcompat:appcompat-resources` 至 1.3.0。
 - 更新 `androidx.core:core-ktx` 至 1.5.0。
 
-## [1.2.1] - 2021年4月27日
+## [1.2.1] - 2021年4月27日 {id="1-2-1-april-27-2021"}
 
 - 修复 `VideoFrameUriFetcher` 尝试处理 http/https URI 的问题。([#734](https://github.com/coil-kt/coil/pull/734))
 
-## [1.2.0] - 2021年4月12日
+## [1.2.0] - 2021年4月12日 {id="1-2-0-april-12-2021"}
 
 - **重要**：在 `SvgDecoder` 中使用 SVG 的视图边界（view bounds）来计算其纵横比。([#688](https://github.com/coil-kt/coil/pull/688))
     - 此前，`SvgDecoder` 使用 SVG 的 `width`/`height` 元素来确定其纵横比，但这并未正确遵循 SVG 规范。
@@ -908,7 +912,7 @@ Coil 2.0.0 是该库的下一个主要迭代，具有新功能、性能改进、
 - 更新 OkHttp 至 3.12.13。
 - 更新 `androidx.lifecycle:lifecycle-common-java8` 至 2.3.1。
 
-## [1.1.1] - 2021年1月11日
+## [1.1.1] - 2021年1月11日 {id="1-1-1-january-11-2021"}
 
 - 修复 `ViewSizeResolver.size` 可能会因为多次恢复协程而抛出 `IllegalStateException` 的情况。
 - 修复如果从主线程调用 `HttpFetcher` 会永远阻塞的问题。
@@ -919,7 +923,7 @@ Coil 2.0.0 是该库的下一个主要迭代，具有新功能、性能改进、
 - 更新 Okio 至 2.10.0。
 - 更新 `androidx.exifinterface:exifinterface` 至 1.3.2。
 
-## [1.1.0] - 2020年11月24日
+## [1.1.0] - 2020年11月24日 {id="1-1-0-november-24-2020"}
 
 - **重要**：将 `CENTER` 和 `MATRIX` `ImageView` 缩放类型更改为解析为 `OriginalSize`。([#587](https://github.com/coil-kt/coil/pull/587))
     - 此更改仅影响未显式指定请求尺寸时的隐式尺寸解析算法。
@@ -939,7 +943,7 @@ Coil 2.0.0 是该库的下一个主要迭代，具有新功能、性能改进、
 - 更新 Kotlin 至 1.4.20 并迁移到 `kotlin-parcelize` 插件。
 - 更新 Coroutines 至 1.4.1。
 
-## [1.0.0] - 2020年10月22日
+## [1.0.0] - 2020年10月22日 {id="1-0-0-october-22-2020"}
 
 自 `0.13.0` 以来的变更：
 - 添加 `Context.imageLoader` 扩展函数。([#534](https://github.com/coil-kt/coil/pull/534))
@@ -953,7 +957,7 @@ Coil 2.0.0 是该库的下一个主要迭代，具有新功能、性能改进、
 - 更新 Okio 至 2.9.0。
 - 更新 `androidx.exifinterface:exifinterface` 至 1.3.1。
 
-## [1.0.0-rc3] - 2020年9月21日
+## [1.0.0-rc3] - 2020年9月21日 {id="1-0-0-rc3-september-21-2020"}
 
 - 由于不稳定，撤销使用 [`-Xjvm-default=all`](https://blog.jetbrains.com/kotlin/2020/07/kotlin-1-4-m3-generating-default-methods-in-interfaces/) 编译器标志。
     - **这是与之前发布候选版本源码兼容但二进制不兼容的更改。**
@@ -963,13 +967,13 @@ Coil 2.0.0 是该库的下一个主要迭代，具有新功能、性能改进、
 - 更新 AndroidX 依赖项：
     - `androidx.exifinterface:exifinterface` -> 1.3.0
 
-## [1.0.0-rc2] - 2020年9月3日
+## [1.0.0-rc2] - 2020年9月3日 {id="1-0-0-rc2-september-3-2020"}
 
 - **此版本需要 Kotlin 1.4.0 或更高版本。**
 - [0.13.0](#0130---september-3-2020) 中的所有更改。
 - 依赖基础 Kotlin `stdlib` 而不是 `stdlib-jdk8`。
 
-## [0.13.0] - 2020年9月3日
+## [0.13.0] - 2020年9月3日 {id="0-13-0-september-3-2020"}
 
 - **重要**：默认在主线程启动拦截器链。([#513](https://github.com/coil-kt/coil/pull/513))
     - 这在很大程度上恢复了 `0.11.0` 及更低版本的行为，即在主线程上同步检查内存缓存。
@@ -994,7 +998,7 @@ Coil 2.0.0 是该库的下一个主要迭代，具有新功能、性能改进、
 - 更新 Coroutines 至 1.3.9。
 - 更新 Okio 至 2.8.0。
 
-## [1.0.0-rc1] - 2020年8月18日
+## [1.0.0-rc1] - 2020年8月18日 {id="1-0-0-rc1-august-18-2020"}
 
 - **此版本需要 Kotlin 1.4.0 或更高版本。**
 - 更新 Kotlin 至 1.4.0 并启用 [`-Xjvm-default=all`](https://blog.jetbrains.com/kotlin/2020/07/kotlin-1-4-m3-generating-default-methods-in-interfaces/)。
@@ -1003,7 +1007,7 @@ Coil 2.0.0 是该库的下一个主要迭代，具有新功能、性能改进、
 - 移除 0.12.0 中所有现有的弃用方法。
 - 更新 Coroutines 至 1.3.9。
 
-## [0.12.0] - 2020年8月18日
+## [0.12.0] - 2020年8月18日 {id="0-12-0-august-18-2020"}
 
 - **破坏性变更**：`LoadRequest` 和 `GetRequest` 已由 `ImageRequest` 替换：
     - `ImageLoader.execute(LoadRequest)` -> `ImageLoader.enqueue(ImageRequest)`
@@ -1059,7 +1063,7 @@ Coil 2.0.0 是该库的下一个主要迭代，具有新功能、性能改进、
     - `androidx.appcompat:appcompat-resources` -> 1.2.0
     - `androidx.core:core-ktx` -> 1.3.1
 
-## [0.11.0] - 2020年5月14日
+## [0.11.0] - 2020年5月14日 {id="0-11-0-may-14-2020"}
 
 - **破坏性变更**：**此版本移除了所有现有的已弃用函数。**
     - 这支持了移除 Coil 的 `ContentProvider`，这样它就不会在应用启动时运行任何代码。
@@ -1083,7 +1087,7 @@ Coil 2.0.0 是该库的下一个主要迭代，具有新功能、性能改进、
 - 更新 Coroutines 至 1.3.6。
 - 更新 OkHttp 至 3.12.11。
 
-## [0.10.1] - 2020年4月26日
+## [0.10.1] - 2020年4月26日 {id="0-10-1-april-26-2020"}
 
 - 修复 API 23 及以下版本在解码大型 PNG 时发生 OOM 的问题。([#372](https://github.com/coil-kt/coil/pull/372))。
     - 这禁用了对 PNG 文件的 EXIF 方向解码。PNG EXIF 方向极少使用，且读取 PNG EXIF 数据（即使它是空的）也需要将整个文件缓冲到内存中，这对性能不利。
@@ -1093,9 +1097,9 @@ Coil 2.0.0 是该库的下一个主要迭代，具有新功能、性能改进、
 
 - 更新 Okio 至 2.6.0。
 
-## [0.10.0] - 2020年4月20日
+## [0.10.0] - 2020年4月20日 {id="0-10-0-april-20-2020"}
 
-### 亮点
+### 亮点 {id="highlights"}
 
 - **此版本弃用了大部分 DSL API，转而直接使用构建器。** 更改如下所示：
 
@@ -1148,7 +1152,7 @@ Coil 2.0.0 是该库的下一个主要迭代，具有新功能、性能改进、
 
 ---
 
-### 完整版本说明
+### 完整版本说明 {id="full-release-notes"}
 
 - **重要**：弃用 DSL 语法，转而使用构建器语法。([#267](https://github.com/coil-kt/coil/pull/267))
 - **重要**：弃用 `Coil` 和 `ImageLoader` 扩展函数。([#322](https://github.com/coil-kt/coil/pull/322))
@@ -1206,7 +1210,7 @@ Coil 2.0.0 是该库的下一个主要迭代，具有新功能、性能改进、
 - 更新 AndroidX 依赖项：
     - `androidx.exifinterface:exifinterface` -> 1.2.0
 
-## [0.9.5] - 2020年2月6日
+## [0.9.5] - 2020年2月6日 {id="0-9-5-february-6-2020"}
 
 - 修复：确保在检查视图是否启用硬件加速之前将其附加。这修复了请求硬件位图可能会错过内存缓存的情况。
 
@@ -1215,7 +1219,7 @@ Coil 2.0.0 是该库的下一个主要迭代，具有新功能、性能改进、
 - 更新 AndroidX 依赖项：
     - `androidx.core:core-ktx` -> 1.2.0
 
-## [0.9.4] - 2020年2月3日
+## [0.9.4] - 2020年2月3日 {id="0-9-4-february-3-2020"}
 
 - 修复：在 ImageDecoderDecoder 中进行下采样时遵循纵横比。感谢 @zhanghai。
 
@@ -1224,7 +1228,7 @@ Coil 2.0.0 是该库的下一个主要迭代，具有新功能、性能改进、
 - 此前，只要位图的配置大于或等于请求中指定的配置，就会从内存缓存中返回位图。例如，如果您请求一个 `ARGB_8888` 位图，可能会从内存缓存中为您返回一个 `RGBA_F16` 位图。现在，缓存配置和请求配置必须相等。
 - 使 `scale` 和 `durationMillis` 在 `CrossfadeDrawable` 和 `CrossfadeTransition` 中公开。
 
-## [0.9.3] - 2020年2月1日
+## [0.9.3] - 2020年2月1日 {id="0-9-3-february-1-2020"}
 
 - 修复：在 `ScaleDrawable` 内部平移子可绘制对象以确保其居中。
 - 修复：修复 GIF 和 SVG 无法完全填满边界的问题。
@@ -1240,7 +1244,7 @@ Coil 2.0.0 是该库的下一个主要迭代，具有新功能、性能改进、
 - 更新 AndroidX 依赖项：
     - `androidx.lifecycle:lifecycle-common-java8` -> 2.2.0
 
-## [0.9.2] - 2020年1月19日
+## [0.9.2] - 2020年1月19日 {id="0-9-2-january-19-2020"}
 
 - 修复：修复在 API 19 之前解码 GIF 的问题。感谢 @mario。
 - 修复：修复光栅化的矢量可绘制对象未被标记为已采样的问题。
@@ -1262,11 +1266,11 @@ Coil 2.0.0 是该库的下一个主要迭代，具有新功能、性能改进、
 
 - 更新 OkHttp 至 3.12.8。
 
-## [0.9.1] - 2019年12月30日
+## [0.9.1] - 2019年12月30日 {id="0-9-1-december-30-2019"}
 
 - 修复：修复调用 `LoadRequestBuilder.crossfade(false)` 时崩溃的问题。
 
-## [0.9.0] - 2019年12月30日
+## [0.9.0] - 2019年12月30日 {id="0-9-0-december-30-2019"}
 
 - **破坏性变更**：`Transformation.transform` 现在包含一个 `Size` 参数。这是为了支持根据 `Target` 的尺寸更改输出 `Bitmap` 尺寸的变换。带有变换的请求现在也不受[图像采样](https://coil-kt.github.io/coil/getting_started/#image-sampling)的限制。
 - **破坏性变更**：`Transformation` 现在应用于任何类型的 `Drawable`。此前，如果输入 `Drawable` 不是 `BitmapDrawable`，则会跳过 `Transformation`。现在，在应用 `Transformation` 之前，`Drawable` 会先渲染到位图上。
@@ -1304,7 +1308,7 @@ Coil 2.0.0 是该库的下一个主要迭代，具有新功能、性能改进、
 - 更新 AndroidX 依赖项：
     - `androidx.exifinterface:exifinterface` -> 1.1.0
 
-## [0.8.0] - 2019年10月22日
+## [0.8.0] - 2019年10月22日 {id="0-8-0-october-22-2019"}
 
 - **破坏性变更**：`SvgDrawable` 已被移除。取而代之的是，SVG 现在由 `SvgDecoder` 预渲染为 `BitmapDrawable`。这使得 SVG **在主线程上的渲染成本显著降低**。此外，`SvgDecoder` 现在在其构造函数中需要一个 `Context`。
 - **破坏性变更**：`SparseIntArraySet` 扩展函数已移至 `coil.extension` 包。
@@ -1341,7 +1345,7 @@ Coil 2.0.0 是该库的下一个主要迭代，具有新功能、性能改进、
 - 更新 Okio 至 2.4.1。
 - 为 `coil-base` 将 `appcompat-resources` 从 `compileOnly` 更改为 `implementation`。
 
-## [0.7.0] - 2019年9月8日
+## [0.7.0] - 2019年9月8日 {id="0-7-0-september-8-2019"}
 - **破坏性变更**：`ImageLoaderBuilder.okHttpClient(OkHttpClient.Builder.() -> Unit)` 现在变为 `ImageLoaderBuilder.okHttpClient(() -> OkHttpClient)`。此外，初始值设定项现在在后台线程上延迟调用。 **如果您设置了自定义 `OkHttpClient`，您必须设置 `OkHttpClient.cache` 以启用磁盘缓存。** 如果您未设置自定义 `OkHttpClient`，Coil 将创建启用磁盘缓存的默认 `OkHttpClient`。可以使用 `CoilUtils.createDefaultCache(context)` 创建默认的 Coil 缓存。例如：
 
 ```kotlin
@@ -1392,12 +1396,12 @@ val imageLoader = ImageLoader(context) {
     - `androidx.lifecycle:lifecycle-common-java8` -> 2.1.0
 - 将 `appcompat` 替换为 `appcompat-resources` 作为可选的 `compileOnly` 依赖项。`appcompat-resources` 是一个更小的构件。
 
-## [0.6.1] - 2019年8月16日
+## [0.6.1] - 2019年8月16日 {id="0-6-1-august-16-2019"}
 - 新增：向 `RequestBuilder` 添加 `transformations(List<Transformation>)`。
 - 修复：为文件 URI 在缓存键中添加最后修改日期。
 - 修复：确保 View 维度评估为至少 1px。
 - 修复：在帧之间清除 `MovieDrawable` 的画布。
 - 修复：正确打开资产。
 
-## [0.6.0] - 2019年8月12日
+## [0.6.0] - 2019年8月12日 {id="0-6-0-august-12-2019"}
 - 初始版本。

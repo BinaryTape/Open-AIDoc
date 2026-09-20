@@ -3,10 +3,10 @@
 SVG 지원을 추가하려면 확장 라이브러리를 추가하세요:
 
 ```kotlin
-implementation("io.coil-kt.coil3:coil-svg:3.6.2")
+implementation("io.coil-kt.coil3:coil-svg:3.6.3")
 ```
 
-이것으로 끝입니다! `ImageLoader`가 자동으로 모든 SVG를 감지하고 디코딩합니다. Coil은 파일의 처음 1KB에서 `<svg ` 마커를 찾아 SVG를 감지하며, 이는 대부분의 경우를 처리할 수 있습니다. 만약 SVG가 자동으로 감지되지 않는다면, 요청 시 `Decoder`를 명시적으로 설정할 수 있습니다:
+이것으로 끝입니다! `ImageLoader`가 자동으로 모든 SVG를 감지하고 디코딩합니다. Coil은 파일의 처음 1 KB에서 `<svg ` 마커를 찾아 SVG를 감지하며, 이는 대부분의 경우를 처리할 수 있습니다. 만약 SVG가 자동으로 감지되지 않는다면, 요청 시 `Decoder`를 명시적으로 설정할 수 있습니다:
 
 ```kotlin
 imageView.load("/path/to/svg") {

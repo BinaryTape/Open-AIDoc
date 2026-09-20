@@ -15,11 +15,11 @@ Ktor 3.3.0 在伺服器、用戶端及工具方面帶來了新功能。以下是
 
 ### 靜態資源的自訂備援 {id="custom-fallback"}
 
-Ktor 3.3.0 為靜態內容引入了新的 `fallback()` 函式／方法，允許您在找不到請求的資源時定義自訂行為。
+Ktor 3.3.0 為靜態內容引入了新的 `fallback()` 函式，允許您在找不到請求的資源時定義自訂行為。
 
 與總是提供相同備援檔案的 `default()` 不同，`fallback()` 讓您可以存取原始請求的路徑和目前的 `ApplicationCall`。您可以使用它來進行重定向、傳回自訂狀態碼或動態提供不同的檔案。
 
-若要定義自訂備援行為，請在 `staticFiles()`、`staticResources()`, `staticZip()` 或 `staticFileSystem()` 中使用 `fallback()` 函式／方法：
+若要定義自訂備援行為，請在 `staticFiles()`、`staticResources()`、`staticZip()` 或 `staticFileSystem()` 中使用 `fallback()` 函式：
 
 ```kotlin
 staticFiles("/files", File("textFiles")) {
@@ -82,8 +82,8 @@ ktor {
 Ktor 3.3.0 為 Netty 引擎引入了 HTTP/2 明文 (h2c) 支援，這允許在沒有 TLS 加密的情況下進行 HTTP/2 通訊。
 這種設定通常用於受信任的環境，例如本機測試或私有網路。
 
-若要啟用 h2c，請在引擎配置中將 `enableH2c` 標記設為 true。
-如需更多資訊，請參閱 [不含 TLS 的 HTTP/2](server-http2.md#http-2-without-tls)。
+若要啟用 h2c，請在引擎配置中將 `enableH2c` 旗標設為 true。
+如需更多資訊，請參閱 [不含 TLS 的 HTTP/2](server-http2.md#http2-without-tls)。
 
 ## Ktor Client {id="ktor-client"}
 
@@ -101,7 +101,7 @@ install(SSE) {
 }
 ```
 
-或者針對每個呼叫進行配置：
+或者針對每次呼叫進行配置：
 
 ```kotlin
 client.sse(url, { bufferPolicy(SSEBufferPolicy.All) }) {
@@ -117,7 +117,7 @@ client.sse(url, { bufferPolicy(SSEBufferPolicy.All) }) {
 
 此版本為多平台專案引入了用於點對點即時通訊的實驗性 WebRTC 用戶端支援。
 
-WebRTC 支援視訊通話、多工遊戲和協作工具等應用程式。透過此版本，您現在可以使用統一的 Kotlin API 在 JavaScript/Wasm 和 Android 目標平台上建立對等連線並交換資料通道。我們計劃在未來的版本中增加 iOS、JVM 桌面和 Native 等目標平台。
+WebRTC 支援視訊通話、多人遊戲和協作工具等應用程式。透過此版本，您現在可以使用統一的 Kotlin API 在 JavaScript/Wasm 和 Android 目標平台上建立對等連線並交換資料通道。我們計劃在未來的版本中增加 iOS、JVM 桌面和 Native 等目標平台。
 
 您可以透過為您的平台選擇引擎並提供配置來建立 `WebRtcClient`，類似於 `HttpClient`：
 
@@ -150,6 +150,18 @@ val androidClient = WebRtcClient(AndroidWebRtc) {
 ```kotlin
 val iosClient = WebRtcClient(IosWebRtc) {
     // 相同的配置，不需要額外的 context
+}
+```
+
+</TabItem>
+
+<TabItem title="JVM" group-key="jvm">
+
+```kotlin
+val jvmClient = WebRtcClient(JvmWebRtc) {
+    defaultConnectionConfig = {
+        iceServers = listOf(WebRtc.IceServer("stun:stun.l.google.com:19302"))
+    }
 }
 ```
 

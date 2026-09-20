@@ -8,7 +8,7 @@
 - [CommonJS](http://wiki.commonjs.org/wiki/Modules/1.1)，广泛用于 Node.js/npm（`require` 函数和 `module.exports` 对象）。
 - Plain。不为任何模块系统编译。你可以通过其在全局作用域中的名称访问模块。
 
-## browser 目标 {id="browser-targets"}
+## Browser 目标 {id="browser-targets"}
 
 如果你打算在 Web 浏览器环境中运行代码，并希望使用 UMD 以外的模块系统，可以在 `webpackTask` 配置块中指定所需的模块类型。例如，要切换到 CommonJS，请使用：
 

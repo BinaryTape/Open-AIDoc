@@ -8,8 +8,11 @@
 
 [Ktor HTTP 클라이언트](client-create-and-configure.md)는 멀티플랫폼이며 JVM,
 [Android](https://kotlinlang.org/docs/android-overview.html), [JavaScript](https://kotlinlang.org/docs/js-overview.html)
-(WebAssembly 포함), 그리고 [Native](https://kotlinlang.org/docs/native-overview.html) 타겟에서 실행됩니다. 각 플랫폼은 네트워크 요청을 처리하기 위해 특정 엔진이 필요합니다.
-예를 들어, JVM 애플리케이션에는 `Apache`나 `Jetty`를, Android에는 `OkHttp`나 `Android`를, Kotlin/Native를 타겟으로 하는 데스크톱 애플리케이션에는 `Curl`을 사용할 수 있습니다. 모든 엔진은 기능과 설정 면에서 약간씩 다르므로, 플랫폼과 사용 사례의 요구 사항에 가장 적합한 엔진을 선택할 수 있습니다.
+(WebAssembly 포함), 그리고 [Native](https://kotlinlang.org/docs/native-overview.html) 타겟에서 실행됩니다. 각 플랫폼은 네트워크 요청을 처리하기 위해 특정 클라이언트 엔진이 필요합니다.
+
+Ktor는 다양한 플랫폼에 맞는 여러 엔진을 제공합니다. 예를 들어, JVM 애플리케이션에는 `Apache`나 `Jetty`를, Android에는 `OkHttp`나 `Android`를, Kotlin/Native를 타겟으로 하는 데스크톱 애플리케이션에는 `Curl`을 사용할 수 있습니다.
+
+각 엔진은 서로 다른 기능과 설정 옵션을 지원합니다. 멀티플랫폼 프로젝트의 경우 Ktor의 기본 엔진을 사용하거나 각 타겟별로 특정 엔진을 직접 선택할 수 있습니다.
 
 ## 지원되는 플랫폼 {id="platforms"}
 
@@ -45,7 +48,11 @@ _* 이전 버전의 Android에서 CIO 엔진을 사용하려면 [Java 8 API 디�
 
 ## 엔진 의존성 추가하기 {id="dependencies"}
 
-[`ktor-client-core`](client-dependencies.md) 아티팩트 외에도 Ktor 클라이언트는 특정 엔진에 대한 의존성이 필요합니다. 지원되는 각 플랫폼에는 해당 섹션에서 설명하는 사용 가능한 엔진 세트가 있습니다.
+[`ktor-client-core`](client-dependencies.md) 아티팩트 외에도 Ktor 클라이언트는 특정 엔진에 대한 의존성이 필요합니다.
+
+### 특정 엔진 사용하기 {id="use-a-specific-engine"}
+
+지원되는 각 플랫폼에는 해당 섹션에서 설명하는 사용 가능한 엔진 세트가 있습니다.
 
 * [JVM](#jvm)
 * [JVM 및 Android](#jvm-android)
@@ -56,6 +63,24 @@ _* 이전 버전의 Android에서 CIO 엔진을 사용하려면 [Java 8 API 디�
 > 의존성 해결 방식은 빌드 도구마다 다릅니다. Gradle은 특정 플랫폼에 적합한 아티팩트를 해결하지만, Maven은 이 기능을 지원하지 않습니다. 즉, Maven의 경우 플랫폼 접미사를 수동으로 지정해야 합니다.
 >
 {type="note"}
+
+### 멀티플랫폼 프로젝트에서 기본 엔진 사용하기 {id="default-engines"}
+
+대부분의 Kotlin Multiplatform 프로젝트의 경우 `ktor-client-engine-defaults` 아티팩트를 사용하세요. 이 아티팩트는 각 타겟 플랫폼에 알맞게 선별된 클라이언트 엔진을 제공하므로, 플랫폼별 소스 세트마다 별도의 엔진 의존성을 선언할 필요가 없습니다.
+
+`commonMain` 소스 세트에 `ktor-client-engine-defaults` 아티팩트를 추가합니다.
+
+```kotlin
+kotlin {
+    sourceSets {
+        commonMain {
+            dependencies {
+                api("io.ktor:ktor-client-engine-defaults:%ktor_version%")
+            }
+        }
+    }
+}
+```
 
 ## 엔진 지정하기 {id="create"}
 
@@ -68,9 +93,9 @@ import io.ktor.client.engine.cio.*
 val client = HttpClient(CIO)
 ```
 
-## 기본 엔진 {id="default"}
+## 자동 엔진 선택 {id="default"}
 
-엔진 인수를 생략하면 클라이언트는 [빌드 스크립트의 의존성](#dependencies)에 따라 자동으로 엔진을 선택합니다.
+엔진 인수를 생략하면 클라이언트는 [빌드 스크립트에서 사용 가능한 의존성](#dependencies)에 따라 자동으로 엔진을 선택합니다.
 
 ```kotlin
 import io.ktor.client.*
@@ -78,7 +103,11 @@ import io.ktor.client.*
 val client = HttpClient()
 ```
 
-이 기능은 특히 멀티플랫폼 프로젝트에서 유용합니다. 예를 들어, [Android와 iOS](client-create-multiplatform-application.md)를 모두 타겟으로 하는 프로젝트의 경우, `androidMain` 소스 세트에는 [Android](#jvm-android) 의존성을 추가하고 `iosMain` 소스 세트에는 [Darwin](#darwin) 의존성을 추가할 수 있습니다. `HttpClient` 생성 시 런타임에 적절한 엔진이 선택됩니다.
+해당 타겟 플랫폼에 사용 가능한 엔진이 하나뿐이라면 Ktor는 그 엔진을 사용합니다. 사용 가능한 엔진이 여러 개인 경우 Ktor는 우선순위가 가장 높은 엔진을 선택합니다.
+
+기본적으로 `CIO`의 우선순위가 가장 낮습니다. 즉, 동일한 플랫폼에 대해 `CIO`와 지원되는 다른 엔진이 모두 사용 가능한 경우 Ktor는 다른 엔진을 선택합니다. `CIO`는 더 높은 우선순위의 엔진을 사용할 수 없을 때 사용됩니다.
+
+Kotlin Multiplatform 프로젝트의 경우 [`ktor-client-engine-defaults` 의존성](#default-engines)이 각 타겟에 맞는 기본 엔진을 제공합니다. 또는 해당 플랫폼 소스 세트에 [특정 엔진 의존성을 추가](#use-a-specific-engine)할 수도 있습니다.
 
 ## 엔진 설정하기 {id="configure"}
 
@@ -522,13 +551,19 @@ CIO 엔진은 JVM, Android, Native, JavaScript 및 WebAssembly JavaScript(WasmJs
                random = mySecureRandom
                addKeyStore(myKeyStore, myKeyStorePassword)
            }
+           dnsResolver = CioDnsResolver(
+               server = "1.1.1.1",
+               timeout = 3.seconds
+           )
        }
    }
    ```
 
 ## JavaScript {id="js"}
 
-`Js` 엔진은 [JavaScript 프로젝트](https://kotlinlang.org/docs/js-overview.html)에 사용될 수 있습니다. 브라우저 애플리케이션의 경우 [fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)를 사용하고, Node.js의 경우 `node-fetch`를 사용합니다. 이를 사용하려면 다음 단계를 따르세요.
+`Js` 엔진은 [Kotlin/JS](https://kotlinlang.org/docs/js-overview.html) 프로젝트에 사용될 수 있습니다. 브라우저 애플리케이션의 경우 [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)를 사용하고, Node.js의 경우 `node-fetch`를 사용합니다.
+
+`Js` 엔진을 사용하려면 다음 단계를 따르세요.
 
 1. `ktor-client-js` 의존성을 추가합니다.
 
@@ -545,7 +580,7 @@ CIO 엔진은 JVM, Android, Native, JavaScript 및 WebAssembly JavaScript(WasmJs
            <code-block lang="XML" code="               &lt;dependency&gt;&#10;                   &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                   &lt;artifactId&gt;%artifact_name%%target%&lt;/artifactId&gt;&#10;                   &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;               &lt;/dependency&gt;"/>
        </TabItem>
    </Tabs>
-2. `Js` 클래스를 `HttpClient` 생성자의 인수로 전달합니다.
+2. `Js` 클래스를 `HttpClient()` 생성자의 인수로 전달합니다.
    ```kotlin
    import io.ktor.client.*
    import io.ktor.client.engine.js.*
@@ -553,14 +588,32 @@ CIO 엔진은 JVM, Android, Native, JavaScript 및 WebAssembly JavaScript(WasmJs
    val client = HttpClient(Js)
    ```
 
-   `JsClient()` 함수를 호출하여 `Js` 엔진 싱글톤을 가져올 수도 있습니다.
+   또는 `JsClient()` 함수를 호출하여 `Js` 엔진 싱글톤을 가져올 수도 있습니다.
    ```kotlin
    import io.ktor.client.engine.js.*
 
    val client = JsClient()
    ```
 
-전체 예제는 [client-engine-js](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-engine-js)를 참조하세요.
+   > 전체 예제는 [client-engine-js](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-engine-js)를 참조하세요.
+   > 
+   {style="tip"}
+
+### fetch 재정의하기 {id="js-custom-fetch"}
+
+기본적으로 `Js` 엔진은 전역 `fetch()` 함수를 사용합니다. 커스텀 구현을 사용하려면 엔진 설정에서 `fetch` 프로퍼티를 설정하세요.
+
+```kotlin
+val client = HttpClient(Js) {
+    engine {
+        fetch = { url, init ->
+            Promise.reject(IllegalStateException("Networking not available"))
+        }
+    }
+}
+```
+
+이 기능은 자체적인 `fetch()` 구현이나 래퍼(wrapper)를 제공하는 JavaScript 라이브러리와 연동할 때 유용합니다.
 
 ## 제한 사항 {id="limitations"}
 
@@ -601,7 +654,8 @@ CIO 엔진은 JVM, Android, Native, JavaScript 및 WebAssembly JavaScript(WasmJs
 
 ## 예제: 멀티플랫폼 모바일 프로젝트에서 엔진을 설정하는 방법 {id="mpp-config"}
 
-멀티플랫폼 프로젝트를 빌드할 때, [expected 및 actual 선언](https://kotlinlang.org/docs/multiplatform-mobile-connect-to-platform-specific-apis.html)을 사용하여 각 타겟 플랫폼에 맞는 엔진을 선택하고 설정할 수 있습니다. 이를 통해 공통 코드에서는 대부분의 클라이언트 설정을 공유하면서 플랫폼 코드에서는 엔진별 옵션을 적용할 수 있습니다. [크로스 플랫폼 모바일 애플리케이션 만들기](client-create-multiplatform-application.md) 튜토리얼에서 생성된 프로젝트를 사용하여 이를 달성하는 방법을 보여드리겠습니다.
+멀티플랫폼 프로젝트를 빌드할 때, [expected 및 actual 선언](https://kotlinlang.org/docs/multiplatform-mobile-connect-to-platform-specific-apis.html)을 사용하여 각 타겟 플랫폼에 맞는 엔진을 선택하고 설정할 수 있습니다. 이를 통해 공통 코드에서는 대부분의 클라이언트 설정을 공유하면서 플랫폼 코드에서는 엔진별 옵션을 적용할 수 있습니다.
+[크로스 플랫폼 모바일 애플리케이션 만들기](client-create-multiplatform-application.md) 튜토리얼에서 생성된 프로젝트를 사용하여 이를 달성하는 방법을 보여드리겠습니다.
 
 <procedure>
 

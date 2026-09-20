@@ -29,6 +29,7 @@ Ktor를 사용하면 사용자 로그인 및 특정 [라우트(route)](server-ro
 > Digest 인증은 비밀번호를 평문으로 전송하지 않기 때문에 [Basic 인증](server-basic-auth.md)보다 더 강력한 보안을 제공합니다. 하지만 추가적인 전송 계층 보안을 위해 프로덕션 환경에서는 [HTTPS/TLS](server-ssl.md)를 함께 사용하는 것이 권장됩니다.
 
 ## 의존성 추가 {id="add_dependencies"}
+
 `digest` 인증을 활성화하려면 빌드 스크립트에 `%artifact_name%` 아티팩트를 포함해야 합니다:
 
 <Tabs group="languages">
@@ -78,16 +79,17 @@ Digest 인증 흐름은 다음과 같습니다:
 
    `response` 값은 다음과 같은 방식으로 생성됩니다:
 
-   * `HA1 = H(username:realm:password)`, 여기서 `H`는 구성된 해시 알고리즘(예: SHA-512-256)입니다.
+    * `HA1 = H(username:realm:password)`, 여기서 `H`는 구성된 해시 알고리즘(예: SHA-512-256)입니다.
    > 이 부분은 서버에 [저장](#digest-table)되며, Ktor에서 사용자 자격 증명을 검증하는 데 사용될 수 있습니다.
 
-   * `HA2 = H(method:digestURI)` (`qop=auth`인 경우) 또는 `HA2 = H(method:digestURI:H(entityBody))` (`qop=auth-int`인 경우)
+    * `HA2 = H(method:digestURI)` (`qop=auth`인 경우) 또는 `HA2 = H(method:digestURI:H(entityBody))` (`qop=auth-int`인 경우)
 
-   * `response = H(HA1:nonce:nc:cnonce:qop:HA2)`
+    * `response = H(HA1:nonce:nc:cnonce:qop:HA2)`
 
 4. 서버는 클라이언트가 보낸 자격 증명을 [검증](#configure-provider)하고 요청된 콘텐츠로 응답합니다. QoP를 통한 인증에 성공하면, 서버는 상호 인증을 위해 `Authentication-Info` 헤더도 함께 반환합니다.
 
 ## Digest 인증 설치 {id="install"}
+
 `digest` 인증 프로바이더를 설치하려면 `install` 블록 내에서 [digest](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/digest.html) 함수를 호출하십시오.
 
 ```kotlin
@@ -100,6 +102,7 @@ install(Authentication) {
     }
 }
 ```
+
 선택적으로 특정 [라우트 인증](#authenticate-route)에 사용할 [프로바이더 이름](server-auth.md#provider-name)을 지정할 수 있습니다.
 
 ## Digest 인증 구성 {id="configure"}
@@ -123,7 +126,10 @@ Ktor는 Digest 인증을 위해 여러 해시 알고리즘을 지원합니다. `
 install(Authentication) {
     digest("auth-digest") {
         realm = "Access to the '/' path"
-        algorithms = listOf(DigestAlgorithm.SHA_512_256, DigestAlgorithm.MD5)
+        algorithms = listOf(
+            DigestAlgorithm.SHA_512_256,
+            DigestAlgorithm.MD5
+        )
         // ...
     }
 }
@@ -138,10 +144,12 @@ install(Authentication) {
 `-sess` 알고리즘 변형(예: `SHA-512-256-sess`, `SHA-256-sess`, `MD5-sess`)은 `HA1` 해시 계산 방식을 변경합니다. `H(username:realm:password)`를 저장하는 대신, 세션 알고리즘은 `H(H(username:realm:password):nonce:cnonce)`를 계산합니다. 여기서 `cnonce`는 클라이언트가 제공한 nonce입니다.
 
 **장점:**
+
 - 세션별 해시는 사전 계산된 사전 공격(pre-computed dictionary attacks)을 방지합니다.
 - 한 세션의 해시가 유출되어도 비밀번호가 노출되지 않으며 다른 세션에 영향을 주지 않습니다.
 
 **단점:**
+
 - 서버는 각 인증 요청마다 해시를 계산해야 합니다 (사전 계산된 값을 사용할 수 없음).
 
 대부분의 애플리케이션에서는 특히 SHA-512-256과 같은 강력한 해시 함수와 함께 사용할 때 표준(비세션) 알고리즘으로도 충분합니다.
@@ -158,50 +166,114 @@ val userPasswords: Map<String, String> = mapOf(
     "admin" to "password"
 )
 
-fun computeHash(userName: String, realm: String, password: String, algorithm: DigestAlgorithm): ByteArray =
-    algorithm.toDigester().digest("$userName:$realm:$password".toByteArray(UTF_8))
-
+fun computeHash(
+    userName: String,
+    realm: String,
+    password: String,
+    algorithm: DigestAlgorithm
+): ByteArray =
+    algorithm.toDigester()
+        .digest("$userName:$realm:$password".toByteArray(UTF_8))
 ```
 
 ### 3단계: Digest 프로바이더 구성 {id="configure-provider"}
 
+<Tabs group="auth-dsl">
+<TabItem title="Classic" group-key="classic">
+
 `digest` 인증 프로바이더는 [DigestAuthenticationProvider.Config](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-digest-authentication-provider/-config/index.html) 클래스를 통해 설정을 노출합니다. 아래 예제에서는 다음 설정들이 지정되었습니다:
+
 * `realm` 속성은 `WWW-Authenticate` 헤더에 전달될 realm을 설정합니다.
 * `algorithms` 속성은 허용할 해시 알고리즘을 지정합니다.
 * `digestProvider` 함수는 지정된 사용자 이름과 알고리즘에 대한 Digest의 `HA1` 부분을 가져옵니다.
 * (선택 사항) `validate` 함수를 사용하여 자격 증명을 커스텀 Principal에 매핑할 수 있습니다.
 
 ```kotlin
-fun Application.main() {
-    install(Authentication) {
-        digest("auth-digest") {
-            realm = myRealm
-            // 최신 SHA-512-256 및 레거시 MD5 클라이언트 모두 지원
-            algorithms = listOf(DigestAlgorithm.SHA_512_256, DigestAlgorithm.MD5)
-            digestProvider { userName, realm, algorithm ->
-                // 요청된 알고리즘을 사용하여 H(username:realm:password) 계산
-                userPasswords[userName]?.let { password ->
-                    computeHash(userName, realm, password, algorithm)
-                }
+install(Authentication) {
+    digest("auth-digest") {
+        realm = myRealm
+        // 최신 SHA-512-256 및 레거시 MD5 클라이언트 모두 지원
+        algorithms = listOf(
+            DigestAlgorithm.SHA_512_256,
+            DigestAlgorithm.MD5
+        )
+        digestProvider { userName, realm, algorithm ->
+            // 요청된 알고리즘을 사용하여 H(username:realm:password) 계산
+            userPasswords[userName]?.let { password ->
+                computeHash(
+                    userName, realm, password, algorithm
+                )
             }
-            validate { credentials ->
-                if (credentials.userName.isNotEmpty()) {
-                    CustomPrincipal(credentials.userName, credentials.realm)
-                } else {
-                    null
-                }
+        }
+        validate { credentials ->
+            if (credentials.userName.isNotEmpty()) {
+                CustomPrincipal(
+                    credentials.userName,
+                    credentials.realm
+                )
+            } else {
+                null
             }
         }
     }
 }
-
-data class CustomPrincipal(val userName: String, val realm: String)
 ```
 
+</TabItem>
+<TabItem title="Type-safe" group-key="typed">
+
+<note>
+    <p>
+        타입 세이프 인증 체계 API는 실험적입니다. 언제든지 중단되거나 변경될 수 있습니다.
+        사용을 위해 명시적인 동의(Opt-in)가 필요합니다. 자세한 내용은
+        <a href="server-typed-auth.md#prerequisites">API 활성화</a>를 참조하십시오.
+    </p>
+</note>
+
+`digest()` 함수는 선택한 principal 타입을 위한 체계를 생성합니다. `install(Authentication)` 단계는 필요하지 않으며, 이 체계는 이를 필요로 하는 라우트에 전달하는 값입니다.
+
+```kotlin
+data class CustomPrincipal(
+    val userName: String,
+    val realm: String
+)
+
+val digestAuth = digest<CustomPrincipal>("auth-digest") {
+    realm = myRealm
+    // 최신 SHA-512-256 및 레거시 MD5 클라이언트 모두 지원
+    algorithms = listOf(
+        DigestAlgorithm.SHA_512_256,
+        DigestAlgorithm.MD5
+    )
+    digestProvider { userName, realm, algorithm ->
+        // 요청된 알고리즘을 사용하여 H(username:realm:password) 계산
+        userPasswords[userName]?.let { password ->
+            computeHash(userName, realm, password, algorithm)
+        }
+    }
+    validate { credentials ->
+        if (credentials.userName.isNotEmpty()) {
+            CustomPrincipal(
+                credentials.userName,
+                credentials.realm
+            )
+        } else {
+            null
+        }
+    }
+}
+```
+
+타입 세이프 `digest()` 함수는 JVM에서만 사용할 수 있습니다. 전체 API에 대해서는 [타입 세이프 인증](server-typed-auth.md)을 참조하십시오.
+
+</TabItem>
+</Tabs>
+
 `digestProvider` 함수는 세 가지 매개변수를 받습니다:
-- `userName` - 클라이언트 요청의 사용자 이름
+
+- `userName` – 클라이언트 요청의 사용자 이름
 - `realm` - 구성된 realm
-- `algorithm` - 클라이언트가 사용 중인 해시 알고리즘
+- `algorithm` – 클라이언트가 사용 중인 해시 알고리즘
 
 지정된 알고리즘으로 계산된 `HA1` 해시를 반환해야 하며, 사용자를 찾을 수 없는 경우 `null`을 반환해야 합니다.
 
@@ -211,14 +283,17 @@ data class CustomPrincipal(val userName: String, val realm: String)
 
 QoP(Quality of Protection)는 Digest 계산에 포함될 내용을 결정합니다:
 
-- `DigestQop.AUTH` - 인증 전용 (기본값). Digest에 요청 메서드와 URI가 포함됩니다.
-- `DigestQop.AUTH_INT` - 무결성 보호를 포함한 인증. Digest에 요청 본문도 포함되어 변조 방지 기능을 제공합니다.
+- `DigestQop.AUTH` – 인증 전용 (기본값). Digest에 요청 메서드와 URI가 포함됩니다.
+- `DigestQop.AUTH_INT` – 무결성 보호를 포함한 인증. Digest에 요청 본문도 포함되어 변조 방지 기능을 제공합니다.
 
 ```kotlin
 install(Authentication) {
     digest("auth-digest") {
         realm = "Secure API"
-        supportedQop = listOf(DigestQop.AUTH, DigestQop.AUTH_INT)
+        supportedQop = listOf(
+            DigestQop.AUTH,
+            DigestQop.AUTH_INT
+        )
         // ...
     }
 }
@@ -228,19 +303,40 @@ install(Authentication) {
 
 ### 5단계: 특정 리소스 보호 {id="authenticate-route"}
 
+<Tabs group="auth-dsl">
+<TabItem title="Classic" group-key="classic">
+
 `digest` 프로바이더를 구성한 후에는 **[authenticate](server-auth.md#authenticate-route)** 함수를 사용하여 애플리케이션의 특정 리소스를 보호할 수 있습니다. 인증에 성공하면 라우트 핸들러 내부에서 `call.principal` 함수를 사용하여 인증된 [Principal](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-principal/index.html)을 검색하고 인증된 사용자의 이름을 가져올 수 있습니다.
 
 ```kotlin
-        authenticate("auth-digest") {
-            get("/") {
-                call.respondText("Hello, ${call.principal<CustomPrincipal>()?.userName}!")
-            }
+routing {
+    authenticate("auth-digest") {
+        get("/") {
+            val user = call.principal<CustomPrincipal>()
+            call.respondText("Hello, ${user?.userName}!")
         }
     }
 }
-
-data class CustomPrincipal(val userName: String, val realm: String)
 ```
+
+</TabItem>
+<TabItem title="Type-safe" group-key="typed">
+
+체계를 `authenticateWith()`에 전달하십시오. 블록 내부에서 `call.principal`은 지정한 principal 타입이며 절대 `null`이 아니므로 캐스팅이나 null 검사가 필요하지 않습니다:
+
+```kotlin
+routing {
+    authenticateWith(digestAuth) {
+        get("/") {
+            val user = call.principal
+            call.respondText("Hello, ${user.userName}!")
+        }
+    }
+}
+```
+
+</TabItem>
+</Tabs>
 
 ## 고급 구성 {id="advanced"}
 
@@ -260,8 +356,8 @@ install(Authentication) {
             // 해시에서 실제 사용자 이름 찾기
             users.find { username ->
                 val digester = algorithm.toDigester()
-                val computedHash = hex(digester.digest("$username:$realm".toByteArray()))
-                computedHash == userhash
+                val bytes = "$username:$realm".toByteArray()
+                hex(digester.digest(bytes)) == userhash
             }
         }
         digestProvider { userName, realm, algorithm ->
@@ -290,6 +386,7 @@ install(Authentication) {
 ```
 
 Strict 모드:
+
 - MD5 알고리즘을 제거합니다 (SHA-256, SHA-512-256 및 해당 세션 변형만 허용).
 - UTF-8 문자셋을 강제합니다.
 
@@ -310,6 +407,7 @@ install(Authentication) {
 ### Authentication-Info 헤더 {id="auth-info"}
 
 QoP를 통한 인증에 성공하면 서버는 다음을 포함하는 `Authentication-Info` 헤더를 자동으로 반환합니다:
+
 - `rspauth` - 상호 인증을 위한 응답 인증 값
 - `nextnonce` - 클라이언트가 다음에 사용할 nonce
 - `qop`, `nc`, `cnonce` - 인증 매개변수 에코

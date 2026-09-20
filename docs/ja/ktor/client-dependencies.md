@@ -115,7 +115,7 @@
 
 ```kotlin
 [versions]
-ktor = "3.4.0"
+ktor = "3.6.0"
 
 [libraries]
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
@@ -133,7 +133,9 @@ sourceSets {
 
 ### エンジン依存関係 {id="engine-dependency"}
 
-[エンジン](client-engines.md)はネットワークリクエストの処理を担当します。Apache、CIO、Android、iOS など、さまざまなプラットフォームで利用可能な異なるクライアントエンジンがあります。たとえば、次のように `CIO` エンジンの依存関係を追加できます：
+[エンジン](client-engines.md)はネットワークリクエストの処理を担当します。Ktor は、さまざまなプラットフォーム向けに異なるクライアントエンジンを提供しています。
+
+たとえば、次のように `CIO` エンジンを追加できます：
 
 <var name="artifact_name" value="ktor-client-cio"/>
 <Tabs group="languages">
@@ -150,19 +152,41 @@ sourceSets {
 
 #### マルチプラットフォーム {id="engine-dependency-multiplatform"}
 
-マルチプラットフォームプロジェクトの場合、必要なエンジンの依存関係を対応するソースセットに追加する必要があります。
+##### デフォルトエンジンの使用 {id="use-default-engines"}
 
-たとえば、Android 用の `OkHttp` エンジンの依存関係を追加するには、まず `gradle/libs.versions.toml` ファイルで Ktor バージョンと `ktor-client-okhttp` アーティファクトを定義します：
+マルチプラットフォームプロジェクトの場合、`ktor-client-engine-defaults` アーティファクトを使用して、各ターゲットプラットフォームに適したクライアントエンジンを提供できます。
+
+まず、`gradle/libs.versions.toml` ファイルでアーティファクトを定義します：
+
+```toml
+[libraries]
+ktor-client-engine-defaults = { module = "io.ktor:ktor-client-engine-defaults", version.ref = "ktor" }
+```
+
+次に、それを `commonMain` ソースセットに追加します：
 
 ```kotlin
-[versions]
-ktor = "3.4.0"
+kotlin {
+    sourceSets {
+        commonMain {
+            dependencies {
+                api(libs.ktor.client.engine.defaults)
+            }
+        }
+    }
+}
+```
 
+##### 特定のエンジンの使用 {id="kmp-specific-engine"}
+
+特定のエンジンが必要な場合は、代わりに該当するプラットフォームのソースセットにその依存関係を追加します。たとえば、Android で `OkHttp` を使用するには、`ktor-client-okhttp` アーティファクトを定義します：
+
+```toml
 [libraries]
 ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
 ```
 
-次に、`ktor-client-okhttp` を `androidMain` ソースセットに依存関係として追加します：
+次に、`androidMain` ソースセットに依存関係として追加します：
 
 ```kotlin
 sourceSets {
@@ -172,7 +196,7 @@ sourceSets {
 }
 ```
 
-特定のエンジンに必要な依存関係の全リストについては、[エンジンの依存関係を追加する](client-engines.md#dependencies)を参照してください。
+各エンジンに必要な依存関係については、[エンジンの依存関係を追加する](client-engines.md#dependencies)を参照してください。
 
 ### ロギング依存関係 {id="logging-dependency"}
 

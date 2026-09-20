@@ -1,6 +1,6 @@
 [//]: # (title: レート制限)
 
-<show-structure for="chapter" depth="2"/>
+<show-structure for="chapter" depth="3"/>
 <primary-label ref="server-plugin"/>
 
 <var name="plugin_name" value="RateLimit"/>
@@ -28,15 +28,17 @@
 %plugin_name%は、受信リクエストのボディを検証する機能を提供します。
 </link-summary>
 
-[%plugin_name%](%plugin_api_link%)プラグインを使用すると、クライアントが特定の期間内に行うことができる[リクエスト](server-requests.md)の数を制限できます。
-Ktorは、レート制限を構成するためのさまざまな手段を提供しています。例えば：
-- アプリケーション全体に対してグローバルにレート制限を有効にしたり、異なる[リソース](server-routing.md)ごとに異なるレート制限を構成したりできます。
-- IPアドレス、APIキー、アクセストークンなどの特定の要求パラメータに基づいてレート制限を構成できます。
+[`%plugin_name%`](%plugin_api_link%)プラグインを使用すると、クライアントが特定の期間内に行うことができる[リクエスト](server-requests.md)の数を制限できます。
+
+Ktorは、レート制限を構成するためのさまざまな方法を提供しています。
+
+* アプリケーション全体に対してグローバルにレート制限を適用したり、特定の[リソース](server-routing.md)ごとに異なる制限を構成したりできます。
+* IPアドレス、APIキー、アクセストークンなどのリクエストパラメータに基づいてレート制限を適用できます。
 
 ## 依存関係の追加 {id="add_dependencies"}
 
 <p>
-    <code>%plugin_name%</code>を使用するには、ビルドスクリプトに<code>%artifact_name%</code>アーティファクトを含める必要があります。
+    <code>%plugin_name%</code>を使用するには、ビルドスクリプトに<code>%artifact_name%</code>アーティファクトを追加します。
 </p>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
@@ -53,15 +55,15 @@ Ktorは、レート制限を構成するためのさまざまな手段を提供�
 ## %plugin_name%のインストール {id="install_plugin"}
 
 <p>
-    <code>%plugin_name%</code>プラグインをアプリケーションに<a href="#install">インストール</a>するには、指定された<Links href="/ktor/server-modules" summary="Modules allow you to structure your application by grouping routes.">モジュール</Links>内の<code>install</code>関数に渡します。
-    以下のコードスニペットは、<code>%plugin_name%</code>をインストールする方法を示しています...
+    <code>%plugin_name%</code>プラグインをアプリケーションに<a href="#install">インストール</a>するには、指定された<Links href="/ktor/server-modules" summary="Modules allow you to structure your application by grouping routes.">モジュール</a>内の<code>install</code>関数に渡します。
+    以下の例は、<code>%plugin_name%</code>をインストールする方法を示しています。
 </p>
 <list>
     <li>
-        ... <code>embeddedServer</code>関数の呼び出し内。
+        <code>embeddedServer()</code>関数の呼び出し内。
     </li>
     <li>
-        ... <code>Application</code>クラスの拡張関数である、明示的に定義された<code>module</code>内。
+        <code>Application</code>クラスの明示的に定義された<code>module()</code>拡張関数内。
     </li>
 </list>
 <Tabs>
@@ -77,19 +79,22 @@ Ktorは、レート制限を構成するためのさまざまな手段を提供�
 
 ### 概要 {id="overview"}
 
-Ktorはレート制限に「トークンバケットアルゴリズム」を使用しており、以下のように動作します。
-1. 最初に、トークンの数によって定義されるキャパシティ（容量）を持つバケットがあります。
-2. 各受信リクエストは、バケットから1つのトークンを消費しようとします。
-    - 十分なキャパシティがある場合、サーバーはリクエストを処理し、以下のヘッダーを含むレスポンスを送信します。
-        - `X-RateLimit-Limit`: 指定されたバケットのキャパシティ。
-        - `X-RateLimit-Remaining`: バケットに残っているトークンの数。
-        - `X-RateLimit-Reset`: バケットが補充される時間を指定するUTCタイムスタンプ（秒単位）。
-    - キャパシティが不足している場合、サーバーは `429 Too Many Requests` レスポンスを使用してリクエストを拒否し、クライアントが次のリクエストを行うまでに待機すべき時間（秒単位）を示す `Retry-After` ヘッダーを追加します。
-3. 指定された期間が経過すると、バケットのキャパシティが補充されます。
+Ktorはレート制限にトークンバケット（_token bucket_）アルゴリズムを使用しており、以下のように動作します。
+1. 利用可能なトークンの数を定義する、指定されたキャパシティ（容量）を持つバケットが作成されます。
+2. 各受信リクエストはバケットから1つのトークンを消費します。
+   * 十分なキャパシティがある場合、サーバーはリクエストを処理し、レスポンスに以下のヘッダーを含めます。
+     * `X-RateLimit-Limit`: バケットのキャパシティ。
+     * `X-RateLimit-Remaining`: バケットに残っているトークンの数。
+     * `X-RateLimit-Reset`: バケットが補充される時間を指定するUTCタイムスタンプ（秒単位）。
+   * キャパシティが不足している場合、サーバーは `429 Too Many Requests` レスポンスを使用してリクエストを拒否します。レスポンスには、クライアントが次のリクエストを送信するまでに待機すべき秒数を示す `Retry-After` ヘッダーが含まれます。
+3. 指定された補充期間が経過すると、バケットが補充されます。
 
 ### レートリミッターの登録 {id="register"}
-Ktorでは、アプリケーション全体、または特定のルートにレート制限を適用できます。
-- アプリケーション全体にレート制限を適用するには、`global`メソッドを呼び出し、構成済みのレートリミッターを渡します。
+
+アプリケーション全体にグローバルにレート制限を適用することも、特定のルート向けにレートリミッターを登録することもできます。
+
+* グローバルにレート制限を適用するには、`global()`関数を呼び出してレートリミッターを構成します。
+
    ```kotlin
    install(RateLimit) {
        global {
@@ -98,7 +103,8 @@ Ktorでは、アプリケーション全体、または特定のルートにレ�
    }
    ```
 
-- `register`メソッドは、特定のルートに適用できるレートリミッターを登録します。
+* 特定のルート向けにレート制限を構成するには、`register()`関数を使用してレートリミッターを登録します。
+
    ```kotlin
    install(RateLimit) {
        register {
@@ -107,70 +113,125 @@ Ktorでは、アプリケーション全体、または特定のルートにレ�
    }
    ```
 
-上記のコードサンプルは、`%plugin_name%`プラグインの最小限の構成を示していますが、`register`メソッドを使用して登録されたレートリミッターの場合、それを[特定のルート](#rate-limiting-scope)に適用する必要もあります。
+上記の例は、`%plugin_name%`プラグインに必要な最小限の構成を示しています。
+`register()`を使用する場合、登録されたレートリミッターを[特定のルート](#rate-limiting-scope)に適用する必要もあります。
 
 ### レート制限の構成 {id="configure-rate-limiting"}
 
-このセクションでは、レート制限を構成する方法について説明します。
+以下のオプションを使用してレートリミッターを構成できます。
 
-1. (オプション) `register`メソッドを使用すると、レート制限ルールを[特定のルート](#rate-limiting-scope)に適用するために使用できるレートリミッター名を指定できます。
-   ```kotlin
-       install(RateLimit) {
-           register(RateLimitName("protected")) {
-               // ...
-           }
-       }
-   ```
+#### レートリミッターへの名前付け {id="name-a-rate-limiter"}
 
-2. `rateLimiter`メソッドは、2つのパラメータを使用してレートリミッターを作成します。`limit`はバケットのキャパシティを定義し、`refillPeriod`はこのバケットの補充期間を指定します。
-   以下の例のレートリミッターは、1分間に30件のリクエストの処理を許可します。
-   ```kotlin
-   register(RateLimitName("protected")) {
-       rateLimiter(limit = 30, refillPeriod = 60.seconds)
-   }
-   ```
+`register()`関数を使用してレートリミッターに名前を割り当てることができます。これにより、名前付きのレートリミッターを[特定のルート](#rate-limiting-scope)に適用できるようになります。
 
-3. (オプション) `requestKey`を使用すると、リクエストのキーを返す関数を指定できます。
-   異なるキーを持つリクエストは、独立したレート制限を持ちます。
-   以下の例では、`login` [クエリパラメータ](server-requests.md#query_parameters)が、異なるユーザーを区別するために使用されるキーです。
-   ```kotlin
-   register(RateLimitName("protected")) {
-       requestKey { applicationCall ->
-           applicationCall.request.queryParameters["login"]!!
-       }
-   }
-   ```
+```kotlin
+    install(RateLimit) {
+        register(RateLimitName("protected")) {
+            // ...
+        }
+    }
+```
 
-   > キーには、適切な `equals` および `hashCode` の実装が必要であることに注意してください。
+#### リミットと補充期間の設定 {id="set-the-limit-and-refill-period"}
 
-4. (オプション) `requestWeight`は、リクエストによって消費されるトークンの数を返す関数を設定します。
-   以下の例では、リクエストキーを使用してリクエストの重みを構成しています。
-   ```kotlin
-   register(RateLimitName("protected")) {
-       requestKey { applicationCall ->
-           applicationCall.request.queryParameters["login"]!!
-       }
-       requestWeight { applicationCall, key ->
-           when(key) {
-               "jetbrains" -> 1
-               else -> 2
-           }
-       }
-   }
-   ```
+`rateLimiter()`関数を使用して、バケットのキャパシティと補充期間を構成します。
 
-5. (オプション) `modifyResponse`を使用すると、各リクエストとともに送信されるデフォルトの `X-RateLimit-*` ヘッダーをオーバーライドできます。
-   ```kotlin
-   register(RateLimitName("protected")) {
-       modifyResponse { applicationCall, state ->
-           applicationCall.response.header("X-RateLimit-Custom-Header", "Some value")
-       }
-   }
-   ```
+* `limit`は利用可能なトークンの数を指定します。
+* `refillPeriod`はバケットが補充される頻度を指定します。
+
+以下の例では、1分あたり最大30件のリクエストを許可します。
+
+```kotlin
+register(RateLimitName("protected")) {
+    rateLimiter(limit = 30, refillPeriod = 60.seconds)
+}
+```
+
+#### キーによるリクエストの区別 {id="distinguish-requests-by-key"}
+
+`requestKey()`関数を使用して、各リクエストに対するキーを返すことができます。異なるキーを持つリクエストには、個別の独立したレート制限が適用されます。
+
+以下の例では、ユーザーを区別するために`login` [クエリパラメータ](server-requests.md#query_parameters)を使用しています。
+
+```kotlin
+register(RateLimitName("protected")) {
+    requestKey { applicationCall ->
+        applicationCall.request.queryParameters["login"]!!
+    }
+}
+```
+
+> リクエストキーには適切な `equals` および `hashCode` の実装が必要であることに注意してください。
+> 
+{style="tip"}
+
+#### 認証済みユーザーのレート制限 {id="rate-limit-authenticated-users"}
+
+認証プリンシパル（Principal）をリクエストキーとして使用することで、認証済みユーザーごとにレート制限を適用できます。
+
+`rateLimit()`を`authenticate()`の内部にネストし、`requestKey()`からプリンシパルにアクセスします。
+
+```kotlin
+install(Authentication) {
+    basic("auth") { validate { UserIdPrincipal(it.name) } }
+}
+install(RateLimit) {
+    register(RateLimitName("per-user")) {
+        rateLimiter(limit = 10, refillPeriod = 60.seconds)
+        requestKey { call.principal<UserIdPrincipal>()?.name ?: "anonymous" }
+    }
+}
+
+routing {
+    authenticate("auth") {
+        rateLimit(RateLimitName("per-user")) {
+            get("/api") { call.respondText("OK") }
+        }
+    }
+}
+```
+
+#### リクエストの重みの設定 {id="set-the-request-weight"}
+
+`requestWeight()`関数を使用して、各リクエストが消費するトークンの数を指定します。この関数は、アプリケーションコールとリクエストキーを受け取ります。
+
+以下の例では、`jetbrains`キーを持つリクエストは1トークンを消費し、その他のすべてのリクエストは2トークンを消費します。
+
+```kotlin
+register(RateLimitName("protected")) {
+    requestKey { applicationCall ->
+        applicationCall.request.queryParameters["login"]!!
+    }
+    requestWeight { applicationCall, key ->
+        when(key) {
+            "jetbrains" -> 1
+            else -> 2
+        }
+    }
+}
+```
+
+#### レスポンスのカスタマイズ {id="customize-the-response"}
+
+レート制限が適用された際のレスポンスをカスタマイズするには、`modifyResponse()`関数を使用します。
+
+例えば、カスタムのレート制限ヘッダーを追加できます。
+
+```kotlin
+register(RateLimitName("protected")) {
+    modifyResponse { applicationCall, state ->
+        applicationCall.response.header("X-RateLimit-Custom-Header", "Some value")
+    }
+}
+```
 
 ### レート制限の適用範囲の定義 {id="rate-limiting-scope"}
 
-レートリミッターを構成した後、`rateLimit`メソッドを使用してそのルールを特定のルートに適用できます。
+レートリミッターを構成した後、`rateLimit()`関数を使用してそれを特定のルートに適用できます。
+
+#### デフォルトのレートリミッターの適用 {id="apply-the-default-rate-limiter"}
+
+名前を指定せずに`rateLimit()`関数を使用すると、デフォルトで登録されたレートリミッターが適用されます。
 
 ```kotlin
 routing {
@@ -183,7 +244,9 @@ routing {
 }
 ```
 
-このメソッドは、[レートリミッター名](#configure-rate-limiting)を受け入れることもできます。
+#### 名前付きレートリミッターの適用 {id="apply-a-named-rate-limiter"}
+
+`rateLimit()`関数に`RateLimitName`を渡すことで、[名前付きレートリミッター](#configure-rate-limiting)を適用できます。
 
 ```kotlin
 routing {
@@ -199,8 +262,13 @@ routing {
 
 ## 例 {id="example"}
 
-以下のコードサンプルは、`RateLimit`プラグインを使用して、異なるリソースに異なるレートリミッターを適用する方法を示しています。
-[StatusPages](server-status-pages.md)プラグインは、`429 Too Many Requests`レスポンスが送信された拒否リクエストを処理するために使用されています。
+以下の例は、異なるルートに異なるレートリミッターを適用する方法を示しています。
+この例では以下を構成しています。
+
+* ホームページ用のデフォルトレートリミッター。
+* パブリックAPI用の名前付きパブリックレートリミッター。
+* リクエストキーと重みを使用する、名前付き保護レートリミッター。
+* `429 Too Many Requests`レスポンスで拒否されたリクエストのレスポンスをカスタマイズするための[`StatusPages`](server-status-pages.md)プラグイン。
 
 ```kotlin
 package com.example
@@ -267,4 +335,6 @@ fun Application.module() {
 
 ```
 
-完全な例はこちらにあります: [rate-limit](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/rate-limit)
+> 完全な例については、[rate-limit](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/rate-limit)を参照してください。
+>
+{style="tip"}

@@ -41,7 +41,7 @@ ZIP 파일에서 정적 콘텐츠를 서빙하기 위해 Ktor는 [`staticZip()`]
 
  ```kotlin
  routing {
-     staticZip("/", "", Paths.get("files/text-files.zip"))
+     staticZip("/", "/", Paths.get("files/text-files.zip"))
  }
  ```
 
@@ -84,16 +84,24 @@ staticResources("/custom", "static", index = "custom_index.html")
 
 ### 사전 압축된 파일 {id="precompressed"}
 
-Ktor는 사전 압축된(pre-compressed) 파일을 서빙하고 [동적 압축](server-compression.md) 사용을 피할 수 있는 기능을 제공합니다.
-이 기능을 사용하려면 블록 구문 내에서 `preCompressed()` 함수를 정의하세요.
+Ktor는 [Compression](server-compression.md) 플러그인을 사용하여 응답을 동적으로 압축하는 대신, 사전 압축된(pre-compressed) 정적 파일을 서빙할 수 있습니다.
+
+이 기능을 활성화하려면 `preCompressed()` 함수를 사용하고 지원되는 압축 형식을 지정하세요.
 
 ```kotlin
 staticFiles("/", File("files")) {
-    preCompressed(CompressedFileType.BROTLI, CompressedFileType.GZIP)
+    preCompressed(
+        CompressedFileType.BROTLI,
+        CompressedFileType.GZIP,
+        CompressedFileType.ZSTD,
+        CompressedFileType.DEFLATE
+    )
 }
 ```
 
-이 예제에서 `/js/script.js`에 대한 요청이 발생하면, Ktor는 `/js/script.js.br` 또는 `/js/script.js.gz`를 서빙할 수 있습니다.
+클라이언트가 정적 파일을 요청하면 Ktor는 클라이언트가 지원하는 콘텐츠 인코딩을 확인하고 사용 가능한 경우 일치하는 사전 압축 버전을 서빙합니다.
+
+예를 들어 `/js/script.js`에 대한 요청이 발생하면, Ktor는 `/js/script.js.br` 또는 `/js/script.js.gz`와 같은 사전 압축된 변형 파일을 서빙할 수 있습니다.
 
 ### HEAD 요청 {id="autohead"}
 
@@ -139,7 +147,7 @@ staticFiles("/files", File("textFiles")) {
 `cacheControl()` 함수를 사용하면 HTTP 캐싱을 위한 `Cache-Control` 헤더를 구성할 수 있습니다.
 
 ```kotlin
-    install(ConditionalHeaders)
+fun Application.module() {
     routing {
         staticFiles("/files", File("textFiles")) {
             cacheControl { file ->
@@ -175,7 +183,7 @@ staticFiles("/filesWithStrongGeneratedEtag", File("files")) {
 }
 ```
 
-이 예제에서는 리소스 콘텐츠의 SHA-256 해시를 사용하여 강력한(strong) `ETag`가 생성됩니다.
+이 예제에서는 리소스 콘텐츠의 SHA‑256 해시를 사용하여 강력한(strong) `ETag`가 생성됩니다.
 I/O 오류가 발생하면 `ETag`가 생성되지 않습니다.
 
 > Ktor의 캐싱에 대한 자세한 내용은 [Caching headers](server-caching-headers.md)를 참조하세요.
@@ -204,7 +212,7 @@ staticResources("/", "static"){
 
 이 예제에서 `/index`가 요청되면 Ktor는 `/index.html`을 검색하고 찾은 콘텐츠를 서빙합니다.
 
-### 사용자 정의 폴백 (Custom fallback) {id="custom-fallback"}
+### 사용자 정의 폴백 {id="custom-fallback"}
 
 요청된 정적 리소스를 찾을 수 없을 때 사용자 정의 폴백 동작을 구성하려면 `fallback()` 함수를 사용하세요.
 `fallback()`을 사용하면 요청된 경로를 검사하고 응답 방법을 결정할 수 있습니다. 예를 들어 다른 리소스로 리다이렉트하거나, 특정 HTTP 상태를 반환하거나, 대체 파일을 서빙할 수 있습니다.

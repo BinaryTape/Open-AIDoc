@@ -23,17 +23,20 @@
 ContentNegotiation 插件有两个主要用途：在客户端与服务器之间协商媒体类型，以及在发送请求和接收响应时以特定格式序列化/反序列化内容。
 </link-summary>
 
-[ContentNegotiation](https://api.ktor.io/ktor-client-content-negotiation/io.ktor.client.plugins.contentnegotiation/-content-negotiation) 插件有两个主要用途：
-* 在客户端与服务器之间协商媒体类型。为此，它使用 `Accept` 和 `Content-Type` 标头。
-* 在发送 [请求](client-requests.md) 和接收 [响应](client-responses.md) 时以特定格式序列化/反序列化内容。Ktor 开箱即用支持以下格式：JSON、XML、CBOR 和 ProtoBuf。
+[`ContentNegotiation`](https://api.ktor.io/ktor-client-content-negotiation/io.ktor.client.plugins.contentnegotiation/-content-negotiation) 插件有两个主要用途：
+* 在客户端与服务器之间协商媒体类型，使用 `Accept` 和 `Content-Type` 标头。
+* 以支持的格式序列化 [请求](client-requests.md) 体以及反序列化 [响应](client-responses.md) 体。Ktor 开箱即用支持 JSON、XML、CBOR 和 ProtoBuf。
 
-> 在服务器端，Ktor 提供了 [ContentNegotiation](server-serialization.md) 插件用于序列化/反序列化内容。
+> 在服务器端，Ktor 提供了 [`ContentNegotiation`](server-serialization.md) 插件用于序列化和反序列化内容。
+>
+{style="tip"}
 
 ## 添加依赖项 {id="add_dependencies"}
-### ContentNegotiation {id="add_content_negotiation_dependency"}
+
+### 内容协商 {id="add_content_negotiation_dependency"}
 
 <p>
-    要使用 <code>%plugin_name%</code>，您需要在构建脚本中包含 <code>%artifact_name%</code> 构件：
+    要使用 <code>%plugin_name%</code>，请在构建脚本中添加 <code>%artifact_name%</code> 构件：
 </p>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
@@ -46,19 +49,24 @@ ContentNegotiation 插件有两个主要用途：在客户端与服务器之间�
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
     </TabItem>
 </Tabs>
-<tip>
-    要了解更多关于 Ktor 客户端所需构件的信息，请参阅 <Links href="/ktor/client-dependencies" summary="了解如何向现有项目添加客户端依赖项。">添加客户端依赖项</Links>。
-</tip>
 
-请注意，特定格式的序列化器需要额外的构件。例如，kotlinx.serialization 需要 `ktor-serialization-kotlinx-json` 依赖项来支持 JSON。根据包含的构件，Ktor 会自动选择默认序列化器。如有需要，您可以显式 [指定序列化器](#configure_serializer) 并对其进行配置。
+> 特定格式的序列化器需要额外的构件。
+> 
+> 例如，`kotlinx.serialization` 需要 `ktor-serialization-kotlinx-json` 依赖项来支持 JSON。根据包含的构件，Ktor 会自动选择默认序列化器。如有需要，您可以显式 [指定序列化器](#configure_serializer) 并对其进行配置。
+> 
+{style="note"}
+
+<tip>
+    要详细了解 Ktor 客户端所需的构件，请参阅 <Links href="/ktor/client-dependencies" summary="了解如何向现有项目添加客户端依赖项。">添加客户端依赖项</Links>。
+</tip>
 
 ### 序列化 {id="serialization_dependency"}
 
-在开始使用 kotlinx.serialization 转换器之前，您需要按照 [Setup](https://github.com/Kotlin/kotlinx.serialization#setup) 章节所述添加 Kotlin 序列化插件。
+在开始使用 `kotlinx.serialization` 转换器之前，请按照 [Setup](https://github.com/Kotlin/kotlinx.serialization#setup) 章节所述添加 Kotlin 序列化插件。
 
 #### JSON {id="add_json_dependency"}
 
-要序列化/反序列化 JSON 数据，您可以选择以下库之一：kotlinx.serialization、Gson 或 Jackson。
+要序列化和反序列化 JSON 数据，请向项目中添加序列化库。Ktor 支持 `kotlinx.serialization`、Gson 或 Jackson。
 
 <Tabs group="json-libraries">
 <TabItem title="kotlinx.serialization" group-key="kotlinx">
@@ -119,7 +127,7 @@ ContentNegotiation 插件有两个主要用途：在客户端与服务器之间�
 
 #### XML {id="add_xml_dependency"}
 
-要序列化/反序列化 XML，请在构建脚本中添加 `ktor-serialization-kotlinx-xml`：
+要序列化和反序列化 XML，请在构建脚本中添加 `ktor-serialization-kotlinx-xml` 构件：
 
 <var name="artifact_name" value="ktor-serialization-kotlinx-xml"/>
 <Tabs group="languages">
@@ -136,7 +144,7 @@ ContentNegotiation 插件有两个主要用途：在客户端与服务器之间�
 
 #### CBOR {id="add_cbor_dependency"}
 
-要序列化/反序列化 CBOR，请在构建脚本中添加 `ktor-serialization-kotlinx-cbor`：
+要序列化和反序列化 CBOR，请在构建脚本中添加 `ktor-serialization-kotlinx-cbor` 构件：
 
 <var name="artifact_name" value="ktor-serialization-kotlinx-cbor"/>
 <Tabs group="languages">
@@ -153,7 +161,7 @@ ContentNegotiation 插件有两个主要用途：在客户端与服务器之间�
 
 #### ProtoBuf {id="add_protobuf_dependency"}
 
-要序列化/反序列化 ProtoBuf，请在构建脚本中添加 `ktor-serialization-kotlinx-protobuf`：
+要序列化和反序列化 ProtoBuf，请在构建脚本中添加 `ktor-serialization-kotlinx-protobuf` 构件：
 
 <var name="artifact_name" value="ktor-serialization-kotlinx-protobuf"/>
 <Tabs group="languages">
@@ -168,16 +176,17 @@ ContentNegotiation 插件有两个主要用途：在客户端与服务器之间�
     </TabItem>
 </Tabs>
 
-## 安装 ContentNegotiation {id="install_plugin"}
+## 安装 `ContentNegotiation` {id="install_plugin"}
 
-要安装 `ContentNegotiation`，请在 [客户端配置块](client-create-and-configure.md#configure-client) 内部将其传递给 `install` 函数：
+要安装 `ContentNegotiation` 插件，请在 [客户端配置块](client-create-and-configure.md#configure-client) 内部将其传递给 `install` 函数：
 
 ```kotlin
 val client = HttpClient(CIO) {
     install(ContentNegotiation)
 }
 ```
-现在您可以 [配置](#configure_serializer) 所需的 JSON 序列化器。
+
+随后您可以 [配置](#configure_serializer) 所需的 JSON 序列化器。
 
 ## 配置序列化器 {id="configure_serializer"}
 
@@ -186,7 +195,8 @@ val client = HttpClient(CIO) {
 <Tabs group="json-libraries">
 <TabItem title="kotlinx.serialization" group-key="kotlinx">
 
-要在您的应用程序中注册 JSON 序列化器，请调用 `json` 方法：
+要在您的应用程序中注册 JSON 序列化器，请调用 `json()` 函数：
+
 ```kotlin
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
@@ -198,7 +208,8 @@ val client = HttpClient(CIO) {
 }
 ```
 
-在 `json` 构造函数中，您可以访问 [JsonBuilder](https://kotlinlang.org/api/kotlinx.serialization/kotlinx-serialization-json/kotlinx.serialization.json/-json-builder/) API，例如：
+要自定义 JSON 序列化，请在 `json()` 构造函数中传入 `Json` 配置：
+
 ```kotlin
 val client = HttpClient(CIO) {
     install(ContentNegotiation) {
@@ -210,12 +221,17 @@ val client = HttpClient(CIO) {
 }
 ```
 
-您可以在此处找到完整示例：[client-json-kotlinx](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-json-kotlinx)。
+有关可用的配置选项，请参阅 [`JsonBuilder`](https://kotlinlang.org/api/kotlinx.serialization/kotlinx-serialization-json/kotlinx.serialization.json/-json-builder/)。
+
+> 完整示例请参阅 [client-json-kotlinx](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-json-kotlinx)。
+>
+{style="tip"}
 
 </TabItem>
 <TabItem title="Gson" group-key="gson">
 
-要在您的应用程序中注册 Gson 序列化器，请调用 [gson](https://api.ktor.io/ktor-serialization-gson/io.ktor.serialization.gson/gson.html) 方法：
+要在您的应用程序中注册 Gson 序列化器，请调用 [`gson()`](https://api.ktor.io/ktor-serialization-gson/io.ktor.serialization.gson/gson.html) 函数：
+
 ```kotlin
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.gson.*
@@ -227,12 +243,12 @@ val client = HttpClient(CIO) {
 }
 ```
 
-`gson` 方法还允许您调整 [GsonBuilder](https://www.javadoc.io/doc/com.google.code.gson/gson/latest/com.google.gson/com/google/gson/GsonBuilder.html) 提供的序列化设置。
+要自定义 Gson 序列化，请向 `gson()` 函数传递一个配置块。有关可用的配置选项，请参阅 [`GsonBuilder`](https://www.javadoc.io/doc/com.google.code.gson/gson/latest/com.google.gson/com/google/gson/GsonBuilder.html)。
 
 </TabItem>
 <TabItem title="Jackson" group-key="jackson">
 
-要在您的应用程序中注册 Jackson 序列化器，请调用 [jackson](https://api.ktor.io/ktor-serialization-jackson/io.ktor.serialization.jackson/jackson.html) 方法：
+要在您的应用程序中注册 Jackson 序列化器，请调用 [`jackson()`](https://api.ktor.io/ktor-serialization-jackson/io.ktor.serialization.jackson/jackson.html) 函数：
 
 ```kotlin
 import io.ktor.client.plugins.contentnegotiation.*
@@ -245,7 +261,7 @@ val client = HttpClient(CIO) {
 }
 ```
 
-`jackson` 方法还允许您调整 [ObjectMapper](https://fasterxml.github.io/jackson-databind/javadoc/2.17.2/com/fasterxml/jackson/databind/ObjectMapper.html) 提供的序列化设置，例如：
+要自定义 Jackson 序列化，请使用 [`ObjectMapper`](https://fasterxml.github.io/jackson-databind/javadoc/2.17.2/com/fasterxml/jackson/databind/ObjectMapper.html) 提供的设置：
 
 ```kotlin
 import io.ktor.client.plugins.contentnegotiation.*
@@ -268,7 +284,8 @@ val client = HttpClient(CIO) {
 
 ### XML 序列化器 {id="register_xml"}
 
-要在您的应用程序中注册 XML 序列化器，请调用 `xml` 方法：
+要在您的应用程序中注册 XML 序列化器，请调用 `xml()` 函数：
+
 ```kotlin
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.xml.*
@@ -280,7 +297,7 @@ val client = HttpClient(CIO) {
 }
 ```
 
-`xml` 方法还允许您访问 XML 序列化设置，例如：
+要自定义 XML 序列化，请向 `xml()` 函数传递所需选项：
 
 ```kotlin
 import io.ktor.client.plugins.contentnegotiation.*
@@ -298,7 +315,9 @@ val client = HttpClient(CIO) {
 ```
 
 ### CBOR 序列化器 {id="register_cbor"}
-要在您的应用程序中注册 CBOR 序列化器，请调用 `cbor` 方法：
+
+要在您的应用程序中注册 CBOR 序列化器，请调用 `cbor()` 函数：
+
 ```kotlin
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.cbor.*
@@ -310,7 +329,7 @@ val client = HttpClient(CIO) {
 }
 ```
 
-`cbor` 方法还允许您访问 [CborBuilder](https://kotlinlang.org/api/kotlinx.serialization/kotlinx-serialization-cbor/kotlinx.serialization.cbor/-cbor-builder/) 提供的 CBOR 序列化设置，例如：
+要自定义 CBOR 序列化，请在 `cbor()` 构造函数中传入 `Cbor` 配置：
 
 ```kotlin
 import io.ktor.client.plugins.contentnegotiation.*
@@ -326,8 +345,12 @@ val client = HttpClient(CIO) {
 }
 ```
 
+有关可用的配置选项，请参阅 [`CborBuilder`](https://kotlinlang.org/api/kotlinx.serialization/kotlinx-serialization-cbor/kotlinx.serialization.cbor/-cbor-builder/)。
+
 ### ProtoBuf 序列化器 {id="register_protobuf"}
-要在您的应用程序中注册 ProtoBuf 序列化器，请调用 `protobuf` 方法：
+
+要在您的应用程序中注册 ProtoBuf 序列化器，请调用 `protobuf()` 函数：
+
 ```kotlin
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.protobuf.*
@@ -339,7 +362,7 @@ val client = HttpClient(CIO) {
 }
 ```
 
-`protobuf` 方法还允许您访问 [ProtoBufBuilder](https://kotlinlang.org/api/kotlinx.serialization/kotlinx-serialization-protobuf/kotlinx.serialization.protobuf/-proto-buf-builder/) 提供的 ProtoBuf 序列化设置，例如：
+要自定义 ProtoBuf 序列化，请向 `protobuf()` 函数传入 `ProtoBuf` 配置：
 
 ```kotlin
 import io.ktor.client.plugins.contentnegotiation.*
@@ -355,15 +378,37 @@ val client = HttpClient(CIO) {
 }
 ```
 
+有关可用的选项，请参阅 [`ProtoBufBuilder`](https://kotlinlang.org/api/kotlinx.serialization/kotlinx-serialization-protobuf/kotlinx.serialization.protobuf/-proto-buf-builder/)。
+
+## 配置 `Accept` 标头 {id="configure_accept_header"}
+
+默认情况下，`ContentNegotiation` 插件会将已注册的内容类型添加到传出请求的 `Accept` 标头中。
+
+如果您显式设置了 `Accept` 标头，并且不希望插件添加已注册的内容类型，请将 `acceptHeaderMergeStrategy` 属性设置为 `ContentTypeMergeStrategy.SkipIfPresent`：
+
+```kotlin
+val client = HttpClient(CIO) {
+    install(ContentNegotiation) {
+        register(ContentType.Application.Json, noOpJsonConverter)
+        acceptHeaderMergeStrategy = ContentTypeMergeStrategy.SkipIfPresent
+    }
+}
+```
+
+使用 `SkipIfPresent` 时，插件会保留现有的 `Accept` 标头。如果请求不包含 `Accept` 标头，插件将照常添加已注册的内容类型。
+
 ## 接收和发送数据 {id="receive_send_data"}
+
 ### 创建数据类 {id="create_data_class"}
 
-要接收和发送数据，您需要有一个数据类，例如：
+以下示例使用 `Customer` 数据类来表示客户端发送和接收的数据：
+
 ```kotlin
 data class Customer(val id: Int, val firstName: String, val lastName: String)
 ```
 
-如果您使用 kotlinx.serialization，请确保该类具有 `@Serializable` 注解：
+如果您使用 `kotlinx.serialization`，请为该类添加 `@Serializable` 注解：
+
 ```kotlin
 @Serializable
 data class Customer(val id: Int, val firstName: String, val lastName: String)
@@ -377,7 +422,9 @@ kotlinx.serialization 库支持以下类型的序列化/反序列化：
 
 ### 发送数据 {id="send_data"}
 
-要将 [类实例](#create_data_class) 作为 JSON 在 [请求](client-requests.md) 体中发送，请使用 `setBody` 函数分配此实例，并通过调用 `contentType` 将内容类型设置为 `application/json`：
+要将 [类实例](#create_data_class) 在 [请求](client-requests.md) 体中发送，请使用 `setBody()` 函数分配此实例，并通过调用 `contentType()` 函数设置内容类型。
+
+以下示例将 `Customer` 对象作为 JSON 发送：
 
 ```kotlin
 val response: HttpResponse = client.post("http://localhost:8080/customer") {
@@ -386,13 +433,20 @@ val response: HttpResponse = client.post("http://localhost:8080/customer") {
 }
 ```
 
-要以 XML 或 CBOR 格式发送数据，请分别将 `contentType` 设置为 `ContentType.Application.Xml` 或 `ContentType.Application.Cbor`。
+`ContentNegotiation` 插件会使用配置的序列化器将请求体转换为指定格式。
+
+要以其他已注册的格式发送数据，请指定相应的内容类型，例如 `ContentType.Application.Xml` 或 `ContentType.Application.Cbor`。
 
 ### 接收数据 {id="receive_data"}
 
-当服务器发送带有 `application/json`、`application/xml` 或 `application/cbor` 内容的 [响应](client-responses.md) 时，您可以通过将 [数据类](#create_data_class) 指定为用于接收响应有效负载的函数的参数（如下例中的 `body`）来进行反序列化：
+当服务器返回带有受支持内容类型的 [响应](client-responses.md) 时，`ContentNegotiation` 插件可以将响应体反序列化为所需类型。
+
+例如，要将 JSON 响应反序列化为 `Customer` 对象，请调用 `body()` 函数：
+
 ```kotlin
 val customer: Customer = client.get("http://localhost:8080/customer/3").body()
 ```
 
-您可以在此处找到完整示例：[client-json-kotlinx](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-json-kotlinx)。
+> 完整示例请参阅 [client-json-kotlinx](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-json-kotlinx)。
+>
+{style="tip"}

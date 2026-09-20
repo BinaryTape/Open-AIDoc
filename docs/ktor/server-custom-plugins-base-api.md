@@ -5,39 +5,39 @@
 <tldr>
 <var name="example_name" value="custom-plugin-base-api"/>
 <p>
-    <b>代码示例</b>:
-    <a href="https://github.com/ktorio/ktor-documentation/tree/%ktor_version%/codeSnippets/snippets/%example_name%">
+    <b>代码示例</b>：
+    <a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/%example_name%">
         %example_name%
     </a>
 </p>
 </tldr>
 
-> 从 v2.0.0 开始，Ktor 为[创建自定义插件](server-custom-plugins.md)提供了一个新的简化 API。
->
-{type="note"}
+Ktor 提供了用于开发自定义[插件](server-plugins.md)的基础 API，这些插件可在多个应用程序之间实现可复用的功能。
 
-Ktor 暴露了用于开发自定义[插件](server-plugins.md)的 API，这些插件实现了通用功能，并可以在多个应用程序中复用。
-此 API 允许您拦截不同的[流水线](#pipelines)阶段，从而为请求/响应处理添加自定义逻辑。
-例如，您可以拦截 `Monitoring` 阶段来记录传入请求或收集指标。
+该基础 API 允许您拦截不同的[流水线](#pipelines)阶段，并为请求和响应处理添加自定义逻辑。例如，您可以拦截 `Monitoring` 阶段来记录传入请求或收集指标。
 
 ## 创建插件 {id="create"}
-要创建自定义插件，请按照以下步骤操作：
 
-1. 创建一个插件类并[声明一个伴生对象](#create-companion)，该对象需实现以下接口之一：
-   - [BaseApplicationPlugin](https://api.ktor.io/ktor-server-core/io.ktor.server.application/-base-application-plugin/index.html)：如果插件应该在应用程序级别工作。
-   - [BaseRouteScopedPlugin](https://api.ktor.io/ktor-server-core/io.ktor.server.application/-base-route-scoped-plugin/index.html)：如果插件可以[安装到特定路由](server-plugins.md#install-route)。
-2. [实现](#implement)此伴生对象的 `key` 和 `install` 成员。
+要使用基础 API 创建自定义插件：
+
+1. 创建一个插件类并[声明一个伴生对象](#create-companion)，该对象需实现一个插件接口。
+2. 在伴生对象中[实现](#implement) `key` 属性和 `install()` 函数。
 3. 提供[插件配置](#plugin-configuration)。
-4. 通过拦截所需的流水线阶段来[处理调用](#call-handling)。 
+4. 通过拦截所需的流水线阶段来[处理调用](#call-handling)。
 5. [安装插件](#install)。
 
 ### 创建伴生对象 {id="create-companion"}
 
-自定义插件的类应具有一个实现了 `BaseApplicationPlugin` 或 `BaseRouteScopedPlugin` 接口的伴生对象。
-`BaseApplicationPlugin` 接口接受三个类型形参：
-- 此插件兼容的流水线类型。
-- 此插件的[配置对象类型](#plugin-configuration)。
-- 插件对象的实例类型。
+自定义插件的类必须具有一个实现以下接口之一的伴生对象：
+
+* 用于应用程序级插件的 [`BaseApplicationPlugin`](https://api.ktor.io/ktor-server-core/io.ktor.server.application/-base-application-plugin/index.html)。
+* 用于[安装在特定路由上](server-plugins.md#install-route)的插件的 [`BaseRouteScopedPlugin`](https://api.ktor.io/ktor-server-core/io.ktor.server.application/-base-route-scoped-plugin/index.html)。
+
+`BaseApplicationPlugin` 接口接受以下类型形参：
+
+* 插件支持的流水线类型。
+* 插件的[配置类型](#plugin-configuration)。
+* 插件实例类型。
 
 ```kotlin
 class CustomHeader() {
@@ -47,11 +47,12 @@ class CustomHeader() {
 }
 ```
 
-### 实现 'key' 和 'install' 成员 {id="implement"}
+### 实现 'key' 属性和 'install()' 函数 {id="implement"}
 
-作为 `BaseApplicationPlugin` 接口的子类，伴生对象应实现两个成员：
-- `key` 属性用于标识插件。Ktor 拥有所有属性的映射，每个插件都会使用指定的键将自身添加到此映射中。
-- `install` 函数允许您配置插件的工作方式。在这里，您需要拦截流水线并返回插件实例。我们将在[下一章](#call-handling)中了解如何拦截流水线并处理调用。
+实现 `BaseApplicationPlugin` 的伴生对象必须定义以下内容：
+
+* `key` 属性用于标识插件。Ktor 将插件实例存储在应用程序的属性中，并使用此键来访问该插件实例。
+* `install()` 函数用于配置插件。在此函数中，拦截所需的流水线阶段并返回插件实例。[处理调用](#call-handling)部分展示了如何拦截流水线阶段。
 
 ```kotlin
 class CustomHeader() {
@@ -68,13 +69,15 @@ class CustomHeader() {
 
 ### 处理调用 {id="call-handling"}
 
-在自定义插件中，您可以通过拦截[现有流水线阶段](#pipelines)或新定义的阶段来处理请求和响应。例如，[身份验证](server-auth.md)插件将 `Authenticate` 和 `Challenge` 自定义阶段添加到默认流水线。因此，拦截特定流水线允许您访问调用的不同阶段，例如：
+在自定义插件中，您可以通过拦截[现有的流水线阶段](#pipelines)或新定义的阶段来处理请求和响应。例如，[身份验证](server-auth.md)插件将 `Authenticate` 和 `Challenge` 自定义阶段添加到默认流水线。
 
-- `ApplicationCallPipeline.Monitoring`：拦截此阶段可用于请求日志记录或收集指标。
-- `ApplicationCallPipeline.Plugins`：可用于修改响应参数，例如追加自定义标头。
-- `ApplicationReceivePipeline.Transform` 和 `ApplicationSendPipeline.Transform`：允许您获取并[转换](#transform)从客户端接收的数据，以及在发送回数据之前对其进行转换。
+拦截特定阶段可让您访问调用处理的特定阶段：
 
-下面的示例演示了如何拦截 `ApplicationCallPipeline.Plugins` 阶段并为每个响应追加一个自定义标头：
+* `ApplicationCallPipeline.Monitoring`：将此阶段用于请求日志记录、指标、跟踪以及类似的监控任务。
+* `ApplicationCallPipeline.Plugins`：使用此阶段处理调用或修改响应参数，例如追加自定义标头。
+* `ApplicationReceivePipeline.Transform` 和 `ApplicationSendPipeline.Transform`：使用这些阶段访问并[转换](#transform)从客户端接收的数据或发送给客户端的数据。
+
+以下示例拦截了 `ApplicationCallPipeline.Plugins` 阶段，并为每个响应追加一个自定义标头：
 
 ```kotlin
 class CustomHeader() {
@@ -91,13 +94,17 @@ class CustomHeader() {
 }
 ```
 
-请注意，此插件中的自定义标头名称和值是硬编码的。您可以通过[提供配置](#plugin-configuration)来传递所需的自定义标头名称/值，从而使此插件更加灵活。
+在此示例中，标头名称和值是硬编码的。要使插件具有可复用性，请[提供配置](#plugin-configuration)，以允许用户指定标头名称和值。
 
-> 自定义插件允许您共享与调用相关的任何值，因此您可以在处理此调用的任何处理程序内部访问此值。您可以从[共享调用状态](server-custom-plugins.md#call-state)中了解更多信息。
+> 自定义插件可以在不同的处理程序之间共享与调用关联的值。要了解更多信息，请参阅[共享调用状态](server-custom-plugins.md#call-state)。
+>
+{style="tip"}
 
 ### 提供插件配置 {id="plugin-configuration"}
 
-[前一章](#call-handling)展示了如何创建一个向每个响应追加预定义自定义标头的插件。让我们让这个插件更有用，并提供一个用于传递所需自定义标头名称/值的配置。首先，您需要在插件类内部定义一个配置类：
+[上一节](#call-handling)展示了如何创建一个向每个响应追加预定义自定义标头的插件。为了使该插件具有可复用性，请定义一个允许用户指定标头名称和值的配置。
+
+首先，在插件类内部定义一个配置类：
 
 ```kotlin
 class Configuration {
@@ -106,7 +113,7 @@ class Configuration {
 }
 ```
 
-考虑到插件配置字段是可变的，建议将它们保存在局部变量中：
+您可以在插件安装期间更新插件配置属性。如果插件在拦截器中使用这些值，请将它们存储在 `install()` 函数内的局部变量中：
 
 ```kotlin
 class CustomHeader(configuration: Configuration) {
@@ -120,7 +127,7 @@ class CustomHeader(configuration: Configuration) {
 }
 ```
 
-最后，在 `install` 函数中，您可以获取此配置并使用其属性：
+然后，在 `install()` 函数中读取该配置并使用其属性：
 
 ```kotlin
 class CustomHeader(configuration: Configuration) {
@@ -148,7 +155,7 @@ class CustomHeader(configuration: Configuration) {
 
 ### 安装插件 {id="install"}
 
-要将自定义插件[安装](server-plugins.md#install)到您的应用程序，请调用 `install` 函数并传递所需的[配置](#plugin-configuration)参数：
+要将自定义插件[安装](server-plugins.md#install)到您的应用程序，请调用 `Application.install()` 函数并传递所需的[配置](#plugin-configuration)参数：
 
 ```kotlin
 install(CustomHeader) {
@@ -159,12 +166,15 @@ install(CustomHeader) {
 
 ## 示例 {id="examples"}
 
-以下代码片段演示了自定义插件的几个示例。
-您可以在此处找到可运行的项目：[custom-plugin-base-api](https://github.com/ktorio/ktor-documentation/blob/%ktor_version%/codeSnippets/snippets/custom-plugin-base-api)
+以下示例展示了使用基础 API 构建的几个自定义插件。
+
+> 如需完整的可运行项目，请参阅 [custom-plugin-base-api](https://github.com/ktorio/ktor-documentation/blob/%ktor_version%/codeSnippets/snippets/custom-plugin-base-api)。
+>
+{style="tip"}
 
 ### 请求日志记录 {id="request-logging"}
 
-以下示例显示了如何创建一个用于记录传入请求的自定义插件：
+以下示例创建了一个用于记录传入请求的自定义插件：
 
 ```kotlin
 package com.example.plugins
@@ -193,7 +203,7 @@ class RequestLogging {
 
 ### 自定义标头 {id="custom-header"}
 
-此示例演示了如何创建一个向每个响应追加自定义标头的插件：
+以下示例创建了一个向每个响应追加自定义标头的插件：
 
 ```kotlin
 package com.example.plugins
@@ -228,9 +238,7 @@ class CustomHeader(configuration: Configuration) {
 
 ### 正文转换 {id="transform"}
 
-以下示例显示了如何：
-- 转换从客户端接收的数据； 
-- 转换要发送到客户端的数据。
+以下示例创建了一个转换请求和响应正文的插件：
 
 ```kotlin
 package com.example.plugins
@@ -248,7 +256,7 @@ class DataTransformation {
         override fun install(pipeline: ApplicationCallPipeline, configure: Configuration.() -> Unit): DataTransformation {
             val plugin = DataTransformation()
             pipeline.receivePipeline.intercept(ApplicationReceivePipeline.Transform) { data ->
-                val newValue = (data as ByteReadChannel).readUTF8Line()?.toInt()?.plus(1)
+                val newValue = (data as ByteReadChannel).readLine()?.toInt()?.plus(1)
                 if (newValue != null) {
                     proceedWith(newValue)
                 }
@@ -268,29 +276,30 @@ class DataTransformation {
 
 ## 流水线 {id="pipelines"}
 
-Ktor 中的 [Pipeline](https://api.ktor.io/ktor-utils/io.ktor.util.pipeline/-pipeline/index.html) 是拦截器的集合，这些拦截器被分组到一个或多个有序阶段中。每个拦截器都可以在处理请求之前和之后执行自定义逻辑。
+Ktor 中的 [`Pipeline`](https://api.ktor.io/ktor-utils/io.ktor.util.pipeline/-pipeline/index.html) 是分组到一个或多个有序阶段中的拦截器集合。在请求处理继续进行之前和之后，每个拦截器都可以运行自定义逻辑。
 
-[ApplicationCallPipeline](https://api.ktor.io/ktor-server-core/io.ktor.server.application/-application-call-pipeline/index.html) 是用于执行应用程序调用的流水线。此流水线定义了 5 个阶段：
+[`ApplicationCallPipeline`](https://api.ktor.io/ktor-server-core/io.ktor.server.application/-application-call-pipeline/index.html) 负责执行应用程序调用。它定义了以下阶段：
 
-- `Setup`：用于为处理准备调用及其属性的阶段。
-- `Monitoring`：用于跟踪调用的阶段。它对于请求日志记录、收集指标、错误处理等可能很有用。
-- `Plugins`：用于[处理调用](#call-handling)的阶段。大多数插件在此阶段进行拦截。
-- `Call`：用于完成调用的阶段。
-- `Fallback`：用于处理未处理调用的阶段。
+* `Setup`：准备调用及其属性以供处理。
+* `Monitoring`：跟踪调用。将此阶段用于请求日志记录、指标、错误处理和类似任务。
+* `Plugins`：处理调用。大多数插件会拦截此阶段。
+* `Call`：完成调用。
+* `Fallback`：处理未被前面阶段处理的调用。
 
 ## 流水线阶段到新 API 处理程序的映射 {id="mapping"}
 
-从 v2.0.0 开始，Ktor 为[创建自定义插件](server-custom-plugins.md)提供了一个新的简化 API。
-通常，此 API 不需要理解 Ktor 内部概念，例如流水线、阶段等。相反，您可以使用各种处理程序（如 `onCall`、`onCallReceive`、`onCallRespond` 等）访问[处理请求和响应](#call-handling)的不同阶段。
-下表显示了流水线阶段如何映射到新 API 中的处理程序。
+您可以使用简化的[自定义插件 API](server-custom-plugins.md) 来创建自定义插件。在大多数情况下，此 API 不需要直接了解流水线和阶段等 Ktor 内部概念。相反，它为[请求和响应处理](server-custom-plugins.md#call-handling)的不同阶段提供了诸如 `onCall()`、`onCallReceive()` 和 `onCallRespond()` 等处理程序。
 
-| 基础 API                               | 新 API                                                 |
-|----------------------------------------|---------------------------------------------------------|
-| `ApplicationCallPipeline.Setup` 之前 | [on(CallFailed)](server-custom-plugins.md#other)               |
-| `ApplicationCallPipeline.Setup`        | [on(CallSetup)](server-custom-plugins.md#other)                |
-| `ApplicationCallPipeline.Plugins`      | [onCall](server-custom-plugins.md#on-call)                     |
-| `ApplicationReceivePipeline.Transform` | [onCallReceive](server-custom-plugins.md#on-call-receive)      |
-| `ApplicationSendPipeline.Transform`    | [onCallRespond](server-custom-plugins.md#on-call-respond)      |
-| `ApplicationSendPipeline.After`        | [on(ResponseBodyReadyForSend)](server-custom-plugins.md#other) |
-| `ApplicationSendPipeline.Engine`       | [on(ResponseSent)](server-custom-plugins.md#other)             |
-| `Authentication.ChallengePhase` 之后  | [on(AuthenticationChecked)](server-custom-plugins.md#other)    |
+下表展示了基础 API 流水线阶段如何映射到简化 API 处理程序：
+
+| 基础 API                               | 新 API                                                              |
+|----------------------------------------|---------------------------------------------------------------------|
+| `ApplicationCallPipeline.Setup` 之前   | [`on(CallFailed)`](server-custom-plugins.md#other)                  |
+| `ApplicationCallPipeline.Setup`        | [`on(CallSetup)`](server-custom-plugins.md#other)                   |
+| `ApplicationCallPipeline.Plugins`      | [`onCall()`](server-custom-plugins.md#on-call)                      |
+| `ApplicationCallPipeline.Call`         | [`onCallValidators()`](server-custom-plugins.md#on-call-validators) |
+| `ApplicationReceivePipeline.Transform` | [`onCallReceive()`](server-custom-plugins.md#on-call-receive)       |
+| `ApplicationSendPipeline.Transform`    | [`onCallRespond()`](server-custom-plugins.md#on-call-respond)       |
+| `ApplicationSendPipeline.After`        | [`on(ResponseBodyReadyForSend)`](server-custom-plugins.md#other)    |
+| `ApplicationSendPipeline.Engine`       | [`on(ResponseSent)`](server-custom-plugins.md#other)                |
+| `Authentication.ChallengePhase` 之后   | [`on(AuthenticationChecked)`](server-custom-plugins.md#other)       |

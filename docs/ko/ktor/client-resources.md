@@ -23,20 +23,25 @@
 Resources 플러그인을 사용하여 타입 세이프(type-safe)한 요청을 보내는 방법을 알아봅니다.
 </link-summary>
 
-Ktor는 타입 세이프한 [요청](client-requests.md)을 구현할 수 있게 해주는 `%plugin_name%` 플러그인을 제공합니다. 이를 위해 서버에서 사용 가능한 리소스를 설명하는 클래스를 생성하고, `@Resource` 키워드를 사용하여 이 클래스에 어노테이션을 달아야 합니다. `@Resource` 어노테이션은 kotlinx.serialization 라이브러리에서 제공하는 `@Serializable` 동작을 포함하고 있음에 유의하세요.
+Ktor는 타입 세이프한 [클라이언트 요청](client-requests.md)을 보낼 수 있도록 `%plugin_name%` 플러그인을 제공합니다.
+이를 위해 서버 엔드포인트를 나타내는 클래스를 정의하고 `@Resource` 키워드로 어노테이션을 지정해야 합니다.
 
-> Ktor 서버는 [타입 세이프 라우팅](server-resources.md)을 구현할 수 있는 기능을 제공합니다.
+리소스 클래스는 프로퍼티를 경로 및 쿼리 파라미터로 변환하기 위해 `kotlinx.serialization`을 사용합니다.
+
+> Ktor 서버는 [타입 세이프 라우팅](server-resources.md)을 제공합니다.
+>
+{style="tip"}
 
 ## 의존성 추가 {id="add_dependencies"}
 
 ### kotlinx.serialization 추가 {id="add_serialization"}
 
-[리소스 클래스](#resource_classes)는 `@Serializable` 동작을 가져야 하므로, [Setup](https://github.com/Kotlin/kotlinx.serialization#setup) 섹션의 설명에 따라 Kotlin serialization 플러그인을 추가해야 합니다.
+`Resources` 플러그인은 `kotlinx.serialization`을 기반으로 동작합니다. [`kotlinx.serialization` 설정 가이드](https://github.com/Kotlin/kotlinx.serialization#setup)에 설명된 대로 Kotlin serialization 플러그인을 활성화하세요.
 
 ### %plugin_name% 의존성 추가 {id="add_plugin_dependencies"}
 
 <p>
-    <code>%plugin_name%</code>을 사용하려면 빌드 스크립트에 <code>%artifact_name%</code> 아티팩트를 포함해야 합니다:
+    <code>%plugin_name%</code>을 사용하려면 빌드 스크립트에 <code>%artifact_name%</code> 아티팩트를 추가하세요:
 </p>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
@@ -55,7 +60,8 @@ Ktor는 타입 세이프한 [요청](client-requests.md)을 구현할 수 있게
 
 ## %plugin_name% 설치 {id="install_plugin"}
 
-`%plugin_name%`을 설치하려면 [클라이언트 구성 블록](client-create-and-configure.md#configure-client) 내의 `install` 함수에 전달하세요:
+`%plugin_name%` 플러그인을 설치하려면 [클라이언트 구성 블록](client-create-and-configure.md#configure-client)의 `install` 함수에 전달하세요:
+
 ```kotlin
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
@@ -120,7 +126,7 @@ class Articles() {
 
 ### 예제: CRUD 작업을 위한 리소스 {id="example_crud"}
 
-위의 예제들을 요약하여 CRUD 작업을 위한 `Articles` 리소스를 만들어 보겠습니다.
+다음 예제는 CRUD 작업을 위한 `Articles` 리소스를 생성합니다:
 
 ```kotlin
 @Resource("/articles")
@@ -136,13 +142,19 @@ class Articles() {
 }
 ```
 
-이 리소스는 모든 기사 목록 조회, 새 기사 게시, 수정 등에 사용할 수 있습니다. 다음 섹션에서 이 리소스에 대해 [타입 세이프 요청을 보내는 방법](#make_requests)을 살펴보겠습니다.
+이 리소스는 모든 기사 목록 조회, 새 기사 게시, 기존 기사 수정에 사용할 수 있습니다.
+
+다음 섹션에서는 이 리소스를 사용하여 [타입 세이프 요청을 보내는 방법](#make_requests)을 보여줍니다.
 
 > 전체 예제는 여기에서 확인할 수 있습니다: [client-type-safe-requests](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-type-safe-requests).
+>
+{style="tip"}
 
 ## 타입 세이프 요청 보내기 {id="make_requests"}
 
-타입이 지정된 리소스에 [요청을 보내려면](client-requests.md), 요청 함수(`request`, `get`, `post`, `put` 등)에 리소스 클래스 인스턴스를 전달해야 합니다. 예를 들어, 아래 샘플은 `/articles` 경로로 요청을 보내는 방법을 보여줍니다.
+타입이 지정된 리소스에 [요청을 보내려면](client-requests.md), `request()`, `get()`, `post()`, `put()`과 같은 요청 함수에 리소스 클래스 인스턴스를 전달하세요.
+
+다음 예제는 `/articles` 경로로 요청을 보냅니다:
 
 ```kotlin
 @Resource("/articles")
@@ -159,7 +171,7 @@ fun main() {
 }
 ```
 
-아래 예제는 [예제: CRUD 작업을 위한 리소스](#example_crud)에서 생성한 `Articles` 리소스에 대해 타입 세이프 요청을 보내는 방법을 보여줍니다. 
+다음 예제는 [예제: CRUD 작업을 위한 리소스](#example_crud)에서 생성한 `Articles` 리소스에 대해 타입 세이프 요청을 보냅니다. 
 
 ```kotlin
 fun main() {
@@ -184,6 +196,17 @@ fun main() {
 }
 ```
 
-[defaultRequest](client-default-request.md) 함수는 모든 요청에 대한 기본 URL을 지정하는 데 사용됩니다.
+[`defaultRequest()`](client-default-request.md) 함수는 모든 요청에 대한 기본 URL을 지정합니다.
+
+> 클라이언트 플러그인 또는 계측(instrumentation)을 개발할 때, `RESOURCE` 요청 속성을 통해 타입 세이프 요청에 사용된 리소스 인스턴스에 접근할 수 있습니다:
+>  ```kotlin
+>  onRequest { call, _ ->
+>    val resource = call.attributes.getOrNull(RESOURCE)
+>  }
+>  ```
+> 
+{style="tip"}
 
 > 전체 예제는 여기에서 확인할 수 있습니다: [client-type-safe-requests](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-type-safe-requests).
+>
+{style="tip"}

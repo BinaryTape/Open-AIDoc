@@ -36,6 +36,19 @@ IntelliJ Ktor 外掛程式允許您將 Ktor 專案遷移到最新版本。
 </tr>
 
 <tr>
+<td>3.6.0</td><td>2026 年 9 月 17 日</td><td>
+<p>
+一個次要版本，新增了對 Netty 的實驗性 HTTP/3 支援、Kotlin Multiplatform 的預設用戶端引擎、JVM WebRTC 支援，以及橫跨用戶端與伺服器的其他功能與改進。
+</p>
+如需更多詳細資訊，請參閱 <Links href="/ktor/whats-new-360" summary="undefined">Ktor 3.6.0 的新功能</Links>。
+<var name="version" value="3.6.0"/>
+<p>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">在 GitHub 上查看變更記錄</a>
+</p>
+</td>
+</tr>
+
+<tr>
 <td>3.5.2</td><td>2026 年 8 月 4 日</td><td>
 <p>
 一個專注於穩定性與效能的修正版本，增強了速率限制支援、恢復了文字處理效能，並修正了 I/O 處理、OpenAPI 以及配置問題。
@@ -50,7 +63,7 @@ IntelliJ Ktor 外掛程式允許您將 Ktor 專案遷移到最新版本。
 <tr>
 <td>3.5.1</td><td>2026 年 6 月 26 日</td><td>
 <p>
-一個修正版本，包含 OpenAPI 外掛程式改進、擴展的身分驗證 KDoc 文件，以及涵蓋 Kotlin 2.4 編譯器相容性、HTTP 與快集行為、身分驗證、WebRTC 穩定性，以及跨 JVM、Darwin、Android 與 Windows 的平台特定問題等廣泛的錯誤修正。
+一個修正版本，包含 OpenAPI 外掛程式改進、擴展的身分驗證 KDoc 文件，以及涵蓋 Kotlin 2.4 編譯器相容性、HTTP 與快取行為、身分驗證、WebRTC 穩定性，以及跨 JVM、Darwin、Android 與 Windows 的平台特定問題等廣泛的錯誤修正。
 </p>
 <var name="version" value="3.5.1"/>
 <p>
@@ -63,7 +76,7 @@ IntelliJ Ktor 外掛程式允許您將 Ktor 專案遷移到最新版本。
 <td>3.5.0</td><td>2026 年 5 月 15 日</td><td>
 <p>
 一個次要版本，引入了 RFC 7616 摘要身分驗證支援、適用於 OkHttp 與 Apache5 的自訂 DNS 解析器配置、請求參數輔助函式，以及針對配置、工作階段 (sessions) 與 JavaScript 相容性的其他改進。
-如需更多資訊，請參閱 <Links href="/ktor/whats-new-350" summary="undefined">Ktor 3.5.0 的新功能</Links>。
+如需更多詳細資訊，請參閱 <Links href="/ktor/whats-new-350" summary="undefined">Ktor 3.5.0 的新功能</Links>。
 </p>
 <var name="version" value="3.5.0"/>
 <p>

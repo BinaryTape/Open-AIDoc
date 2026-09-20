@@ -37,12 +37,12 @@ Kotlin 外掛程式隨每個 Android Studio 版本一併提供。
 
 欲了解更多資訊，請參閱 [Kotlin 語言伺服器與 Visual Studio Code](kotlin-lsp.md#kotlin-in-visual-studio-code)。
 
-## 其他 IDE 支援 {id="other-ides-support"}
+## 其他 IDE 支援 {id="other-ide-support"}
 
 JetBrains 不為其他 IDE 提供官方 Kotlin 外掛程式。
 您可以在其他程式碼編輯器中使用 [Kotlin 語言伺服器](kotlin-lsp.md)。
 
-若要在沒有 IDE 相關功能（例如程式碼格式化、偵錯工具、重構）的文字編輯器中使用 Kotlin，您可以從 Kotlin [GitHub Releases](%kotlinLatestUrl%) 下載最新的 Kotlin 命令列編譯器 (`kotlin-compiler-%kotlinVersion%.zip`) 並[手動安裝](command-line.md#manual-install)。此外，您也可以使用封裝管理員，例如 [Homebrew](command-line.md#homebrew)、 [SDKMAN!](command-line.md#sdkman) 與 [Snap package](command-line.md#snap-package)。
+若要在沒有 IDE 相關功能（例如程式碼格式化、偵錯工具、重構）的文字編輯器中使用 Kotlin，您可以從 Kotlin [GitHub Releases](%kotlinLatestUrl%) 下載最新的 Kotlin 命令列編譯器 (`kotlin-compiler-%kotlinVersion%.zip`) 並[手動安裝](command-line.md#manual-install)。此外，您也可以使用封裝管理員，例如 [Homebrew](command-line.md#homebrew)、[SDKMAN!](command-line.md#sdkman) 與 [Snap package](command-line.md#snap-package)。
 
 ## 與 Kotlin 語言版本的相容性 {id="compatibility-with-the-kotlin-language-versions"}
 
@@ -50,7 +50,13 @@ JetBrains 不為其他 IDE 提供官方 Kotlin 外掛程式。
 當發佈新的 Kotlin 版本時，這些工具會自動建議將 Kotlin 更新至最新版本。
 請在 [Kotlin 版本發佈](releases.md#ide-support)中查看最新支援的語言版本。
 
+## IDE 中的 AI 支援 {id="ai-support-in-ides"}
+
+IntelliJ IDEA 與 Android Studio 透過內建的 AI 功能以及與 AI 編碼代理 (AI coding agent) 的整合，支援 AI 輔助的 Kotlin 開發。根據您的工作流程，您可以直接在 IDE 中使用 AI、連接外部代理，或將 AI 工具與 Kotlin 專屬指導相結合。
+
+如需可用 AI 工具的總覽以及何時使用它們，請參閱 [](ai-for-development.md)。
+
 ## 下一步？ {id="what-s-next"}
 
 * [在 IntelliJ IDEA 中建立主控台應用程式](jvm-get-started.md)
-* [使用 IntelliJ IDEA 或 Android Studio 建立您的第一個跨平台行動應用程式](https://kotlinlang.org/docs/multiplatform/multiplatform-create-first-app.html)
+* [使用 Android Studio 建立您的第一個跨平台行動應用程式](https://kotlinlang.org/docs/multiplatform/multiplatform-create-first-app.html)

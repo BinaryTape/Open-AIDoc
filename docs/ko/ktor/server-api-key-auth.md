@@ -25,7 +25,7 @@ Ktor를 사용하면 [라우트](server-routing.md)를 보호하고 클라이언
 
 ## 의존성 추가 {id="add_dependencies"}
 
-API Key 인증을 활성화하려면 빌드 스크립트에 `ktor-server-auth` 및 `%artifact_name%` 아티팩트를 추가하세요.
+API Key 인증을 활성화하려면 빌드 스크립트에 `ktor-server-auth` 및 `%artifact_name%` 아티팩트를 추가하세요:
 
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
@@ -72,7 +72,7 @@ API Key 인증 흐름은 다음과 같습니다:
 
 ## API Key 인증 설치 {id="install"}
 
-`apiKey` 인증 프로바이더를 설치하려면, `install(Authentication)` 블록 내에서 [`apiKey`](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/api-key.html) 함수를 호출하세요.
+`apiKey` 인증 프로바이더를 설치하려면, `install(Authentication)` 블록 내에서 [`apiKey`](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/api-key.html) 함수를 호출하세요:
 
 ```kotlin
 import io.ktor.server.application.*
@@ -95,6 +95,9 @@ install(Authentication) {
 
 ### 1단계: API Key 프로바이더 구성 {id="configure-provider"}
 
+<Tabs group="auth-dsl">
+<TabItem title="Classic" group-key="classic">
+
 `apiKey` 인증 프로바이더는 [`ApiKeyAuthenticationProvider.Config`](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-api-key-authentication-provider/-config/index.html) 클래스를 통해 설정을 노출합니다. 아래 예제에서는 다음 설정이 지정되었습니다:
 
 * `validate` 함수는 요청에서 추출된 API Key를 수신하며, 인증 성공 시 `Principal`을 반환하고 인증 실패 시 `null`을 반환합니다.
@@ -116,11 +119,45 @@ install(Authentication) {
 }
 ```
 
+</TabItem>
+<TabItem title="Type-safe" group-key="typed">
+
+<note>
+    <p>
+        타입 안전(type-safe) 인증 스키마 API는 실험적(experimental)입니다. 언제든지 중단되거나 변경될 수 있습니다.
+        사용을 위해 opt-in이 필요합니다. 자세한 내용은
+        <a href="server-typed-auth.md#prerequisites">API 활성화</a>를 참조하세요.
+    </p>
+</note>
+
+`apiKey()` 함수는 원하는 프린시펄 타입에 대한 스키마를 생성합니다. `install(Authentication)` 단계는 없습니다. 스키마는 해당 스키마가 필요한 라우트에 전달하는 값입니다.
+
+```kotlin
+data class AppPrincipal(val key: String)
+
+val apiKeyAuth = apiKey<AppPrincipal>("api-key") {
+    validate { keyFromHeader ->
+        val expectedApiKey = "this-is-expected-key"
+        keyFromHeader
+            .takeIf { it == expectedApiKey }
+            ?.let { AppPrincipal(it) }
+    }
+}
+```
+
+기존(classic) 프로바이더와 달리 이름 지정이 필수입니다. 전체 API에 대한 내용은 [타입 안전 인증](server-typed-auth.md)을 참조하세요.
+
+</TabItem>
+</Tabs>
+
 #### 키 위치 커스터마이징 {id="key-location"}
 
 기본적으로 `apiKey` 프로바이더는 `X-API-Key` 헤더에서 API Key를 찾습니다.
 
 `headerName`을 사용하여 커스텀 헤더를 지정할 수 있습니다:
+
+<Tabs group="auth-dsl">
+<TabItem title="Classic" group-key="classic">
 
 ```kotlin
 apiKey("api-key-header") {
@@ -130,6 +167,21 @@ apiKey("api-key-header") {
     }
 }
 ```
+
+</TabItem>
+<TabItem title="Type-safe" group-key="typed">
+
+```kotlin
+val apiKeyAuth = apiKey<AppPrincipal>("api-key-header") {
+    headerName = "X-Secret-Key"
+    validate { key ->
+        // ...
+    }
+}
+```
+
+</TabItem>
+</Tabs>
 
 ### 2단계: API Key 검증 {id="validate"}
 
@@ -142,7 +194,8 @@ apiKey("api-key-header") {
 ```kotlin
 apiKey {
     validate { keyFromHeader ->
-        val expectedApiKey = environment.config.property("api.key").getString()
+        val expectedApiKey = 
+            environment.config.property("api.key").getString()
         keyFromHeader
             .takeIf { it == expectedApiKey }
             ?.let { AppPrincipal(it) }
@@ -210,6 +263,9 @@ apiKey {
 
 ### 4단계: 특정 리소스 보호 {id="authenticate-route"}
 
+<Tabs group="auth-dsl">
+<TabItem title="Classic" group-key="classic">
+
 `apiKey` 프로바이더를 구성한 후, [`authenticate`](server-auth.md#authenticate-route) 함수를 사용하여 애플리케이션의 특정 리소스를 보호할 수 있습니다. 인증에 성공하면 라우트 핸들러 내부에서 `call.principal` 함수를 사용하여 인증된 프린시펄(principal)을 가져올 수 있습니다.
 
 ```kotlin
@@ -217,11 +273,31 @@ routing {
     authenticate {
         get("/") {
             val principal = call.principal<AppPrincipal>()!!
-            call.respondText("Hello, authenticated client! Your key: ${principal.key}")
+            val key = principal.key
+            call.respondText("Hello! Your key: $key")
         }
     }
 }
 ```
+
+</TabItem>
+<TabItem title="Type-safe" group-key="typed">
+
+`authenticateWith()`에 스키마를 전달하세요. 해당 블록 내에서 `call.principal`은 사용자가 정의한 프린시펄 타입이며 절대 `null`이 될 수 없으므로 `!!` 연산자가 필요하지 않습니다:
+
+```kotlin
+routing {
+    authenticateWith(apiKeyAuth) {
+        get("/") {
+            val key = call.principal.key
+            call.respondText("Hello! Your key: $key")
+        }
+    }
+}
+```
+
+</TabItem>
+</Tabs>
 
 ## API Key 인증 예제 {id="complete-example"}
 

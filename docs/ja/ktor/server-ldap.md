@@ -64,11 +64,16 @@ install(Authentication) {
 
 LDAPユーザーを認証するには、[ldapAuthenticate](https://api.ktor.io/ktor-server-auth-ldap/io.ktor.server.auth.ldap/ldap-authenticate.html)関数を呼び出す必要があります。この関数は[UserPasswordCredential](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-user-password-credential/index.html)を受け取り、指定されたLDAPサーバーに対して検証を行います。
 
+<Tabs group="auth-dsl">
+<TabItem title="Classic" group-key="classic">
+
 ```kotlin
 install(Authentication) {
     basic("auth-ldap") {
         validate { credentials ->
-            ldapAuthenticate(credentials, "ldap://0.0.0.0:389", "cn=%s,dc=ktor,dc=io")
+            val url = "ldap://0.0.0.0:389"
+            val userDNFormat = "cn=%s,dc=ktor,dc=io"
+            ldapAuthenticate(credentials, url, userDNFormat)
         }
     }
 }
@@ -82,7 +87,9 @@ install(Authentication) {
 install(Authentication) {
     basic("auth-ldap") {
         validate { credentials ->
-            ldapAuthenticate(credentials, "ldap://localhost:389", "cn=%s,dc=ktor,dc=io") {
+            val url = "ldap://localhost:389"
+            val userDNFormat = "cn=%s,dc=ktor,dc=io"
+            ldapAuthenticate(credentials, url, userDNFormat) {
                 if (it.name == it.password) {
                     UserIdPrincipal(it.name)
                 } else {
@@ -94,7 +101,60 @@ install(Authentication) {
 }
 ```
 
+</TabItem>
+<TabItem title="Type-safe" group-key="typed">
+
+<note>
+    <p>
+        型安全な認証スキームのAPIは実験的（experimental）です。いつでも廃止または変更される可能性があります。オプトインが必要です。詳細については、<a href="server-typed-auth.md#prerequisites">APIの有効化</a>を参照してください。
+    </p>
+</note>
+
+LDAP専用の型安全な認証スキームはありません。型安全な[`basic`](server-basic-auth.md)、[`digest`](server-digest-auth.md)、または[`form`](server-form-based-auth.md)スキームの`validate`ブロック内で`ldapAuthenticate`を呼び出します。
+
+独自のプリンシパルタイプを返すには、`ldapAuthenticate`にブロックを渡します:
+
+```kotlin
+data class User(val name: String)
+
+val ldapAuth = basic<User>("auth-ldap") {
+    validate { credentials ->
+        val url = "ldap://0.0.0.0:389"
+        val userDNFormat = "cn=%s,dc=ktor,dc=io"
+        ldapAuthenticate(credentials, url, userDNFormat) {
+            User(it.name)
+        }
+    }
+}
+```
+
+このブロックを使用すると、認証されたユーザーに対して検証を追加することもできます:
+
+```kotlin
+val ldapAuth = basic<User>("auth-ldap") {
+    validate { credentials ->
+        val url = "ldap://localhost:389"
+        val userDNFormat = "cn=%s,dc=ktor,dc=io"
+        ldapAuthenticate(credentials, url, userDNFormat) {
+            if (it.name == it.password) {
+                User(it.name)
+            } else {
+                null
+            }
+        }
+    }
+}
+```
+
+完全なAPIについては、[型安全な認証](server-typed-auth.md)を参照してください。
+
+</TabItem>
+</Tabs>
+
 ### ステップ3：特定のリソースの保護 {id="authenticate-route"}
+
+<Tabs group="auth-dsl">
+<TabItem title="Classic" group-key="classic">
 
 LDAPを構成した後、**[authenticate](server-auth.md#authenticate-route)**関数を使用してアプリケーション内の特定のリソースを保護できます。認証に成功した場合、ルートハンドラー内で`call.principal`関数を使用して認証済みの[UserIdPrincipal](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-user-id-principal/index.html)を取得し、認証されたユーザーの名前を取得できます。
 
@@ -102,11 +162,30 @@ LDAPを構成した後、**[authenticate](server-auth.md#authenticate-route)**�
 routing {
     authenticate("auth-ldap") {
         get("/") {
-            call.respondText("Hello, ${call.principal<UserIdPrincipal>()?.name}!")
+            val user = call.principal<UserIdPrincipal>()
+            call.respondText("Hello, ${user?.name}!")
         }
     }
 }
 ```
+
+</TabItem>
+<TabItem title="Type-safe" group-key="typed">
+
+スキームを`authenticateWith()`に渡します。ブロック内では、`call.principal`は独自のプリンシパルタイプとなり、`null`になることはないため、キャストやnullチェックは不要です:
+
+```kotlin
+routing {
+    authenticateWith(ldapAuth) {
+        get("/") {
+            call.respondText("Hello, ${call.principal.name}!")
+        }
+    }
+}
+```
+
+</TabItem>
+</Tabs>
 
 実行可能な完全な例はこちらで確認できます：[auth-ldap](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/auth-ldap)。
 

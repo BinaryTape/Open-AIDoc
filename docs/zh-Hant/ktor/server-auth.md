@@ -47,6 +47,12 @@ HTTP 為存取控制和身份驗證提供了一個[通用架構](https://develop
 ### OAuth {id="oauth"}
 [OAuth](server-oauth.md) 是一種用於保護 API 存取權限的開放標準。Ktor 中的 `oauth` 提供者允許您使用外部提供者（如 Google、Facebook、Twitter 等）實作身份驗證。
 
+### OpenID Connect {id="oidc"}
+
+[OpenID Connect](server-oidc.md) 是建構在 OAuth 2.0 之上的身份識別層。`Oidc` 外掛程式會讀取提供者的探索文件（discovery document），因此您只需設定發行者 URL（issuer URL），而無需配置端點和簽章金鑰。它可以在 [API](server-oidc-resource-server.md) 中驗證存取權杖，並執行[瀏覽器登入](server-oidc-browser-login.md)，包括 PKCE、工作階段和登出。
+
+該外掛程式為實驗功能，且僅在 JVM 上可用。
+
 ### Session {id="sessions"}
 [Sessions](server-sessions.md)（工作階段）提供了一種在不同 HTTP 請求之間持久化資料的機制。典型使用案例包括儲存已登入使用者的 ID、購物車內容，或在用戶端保留使用者偏好。在 Ktor 中，已經擁有相關聯工作階段的使用者可以使用 `session` 提供者進行驗證。請從 [Ktor Server 中的 Session 身份驗證](server-session-auth.md)了解如何操作。
 
@@ -56,6 +62,19 @@ Ktor 提供兩種自訂身份驗證與授權行為的方式：
 
 * 使用[自訂身份驗證提供者](#custom-auth-provider)。
 * 使用[自訂外掛程式](server-custom-plugins.md)來實作授權邏輯。例如，您可以使用 `AuthenticationChecked` [hook](server-custom-plugins.md#call-handling) 來驗證存取權限。如需更多資訊，請參閱 [custom-plugin-authorization](https://github.com/ktorio/ktor-documentation/blob/%ktor_version%/codeSnippets/snippets/custom-plugin-authorization) 範例。
+
+## 型別安全身份驗證配置 API {id="type-safe"}
+
+<primary-label ref="experimental"/>
+
+Ktor 還提供了一個[型別安全身份驗證配置 API](server-typed-auth.md)，將配置與委託主體型別繫結。
+在受保護的路由內部，`call.principal` 即為該委託主體型別，且保證為非 `null`，因此不需要型別轉換或 null 檢查。
+該 API 還支援選擇性啟用的[角色檢查](server-typed-auth.md#roles)、[匿名備援](server-typed-auth.md#anonymous)、具型別的[工作階段](server-typed-session-auth.md)以及 [OAuth 2.0 流程](server-oauth2-flows.md)。
+
+> 此 API 是本主題所述具名提供者方法的替代方案。
+> 兩種 API 均可在同一個應用程式中使用。如需更多資訊，請參閱[型別安全身份驗證](server-typed-auth.md)。
+>
+{style="note"}
 
 ## 新增相依性 {id="add_dependencies"}
 
@@ -80,14 +99,14 @@ Ktor 提供兩種自訂身份驗證與授權行為的方式：
 
 <p>
     若要將 <code>%plugin_name%</code> 外掛程式<a href="#install">安裝</a>到應用程式，請將其傳遞給指定<Links href="/ktor/server-modules" summary="Modules allow you to structure your application by grouping routes.">模組</Links>中的 <code>install</code> 函式。
-    以下程式碼片段顯示了如何安裝 <code>%plugin_name%</code> ...
+    以下範例顯示了如何安裝 <code>%plugin_name%</code>：
 </p>
 <list>
     <li>
-        ... 在 <code>embeddedServer</code> 函式呼叫內部。
+        在 <code>embeddedServer()</code> 函式呼叫內部。
     </li>
     <li>
-        ... 在顯式定義的 <code>module</code> 內部，該模組是 <code>Application</code> 類別的擴充函式。
+        在 <code>Application</code> 類別上明確定義的 <code>module()</code> 擴充函式內部。
     </li>
 </list>
 <Tabs>
@@ -159,7 +178,9 @@ install(Authentication) {
     basic("auth-basic") {
         realm = "Access to the '/' path"
         validate { credentials ->
-            if (credentials.name == "jetbrains" && credentials.password == "foobar") {
+            val isValid = credentials.name == "jetbrains" &&
+                credentials.password == "foobar"
+            if (isValid) {
                 UserIdPrincipal(credentials.name)
             } else {
                 null
@@ -213,15 +234,16 @@ install(Authentication) {
   在下面的程式碼片段中，只有通過 [Session 身份驗證](server-session-auth.md)的使用者才能嘗試使用 basic 身份驗證存取 `/admin` 路由：
    ```kotlin
    routing {
-       authenticate("auth-session", strategy = AuthenticationStrategy.Required) {
+       val required = AuthenticationStrategy.Required
+       authenticate("auth-session", strategy = required) {
            get("/hello") {
                // ...
-           }    
-           authenticate("auth-basic", strategy = AuthenticationStrategy.Required) {
+           }
+           authenticate("auth-basic", strategy = required) {
                get("/admin") {
                    // ...
                }
-           }  
+           }
        }
    }
    ```
@@ -236,7 +258,8 @@ install(Authentication) {
 routing {
     authenticate("auth-basic") {
         get("/") {
-            call.respondText("Hello, ${call.principal<UserIdPrincipal>()?.name}!")
+            val user = call.principal<UserIdPrincipal>()
+            call.respondText("Hello, ${user?.name}!")
         }
     }
 }
@@ -257,10 +280,14 @@ authenticate("auth-session") {
 在下面的範例中，傳遞了 `"auth-session"` 值來獲取最頂層 session 提供者的委託主體：
 
 ```kotlin
-authenticate("auth-session", strategy = AuthenticationStrategy.Required) {
-    authenticate("auth-basic", strategy = AuthenticationStrategy.Required) {
+val required = AuthenticationStrategy.Required
+authenticate("auth-session", strategy = required) {
+    authenticate("auth-basic", strategy = required) {
         get("/admin") {
-            val userSession = call.principal<UserSession>("auth-session")
+            val userSession =
+                call.principal<UserSession>(
+                    "auth-session"
+                )
         }
     }
 }
@@ -273,9 +300,11 @@ authenticate("auth-session", strategy = AuthenticationStrategy.Required) {
 ```kotlin
 provider("custom") {
   authenticate { context ->
-    val exampleHeader = context.call.request.headers["Example-Header"]
+    val headers = context.call.request.headers
+    val exampleHeader = headers["Example-Header"]
     if (exampleHeader == null) {
-      val cause = AuthenticationFailedCause.Error("No example header found")
+      val message = "No example header found"
+      val cause = AuthenticationFailedCause.Error(message)
       context.challenge(key = this, cause) { challenge, call ->
         call.respondText("Challenge")
         challenge.complete()

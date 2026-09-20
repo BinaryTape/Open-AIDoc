@@ -74,7 +74,7 @@ fun main() {
 
 ## Kotlin 程式庫 {id="kotlin-libraries"}
 
-標準函式庫涵蓋了許多常見的使用案例，但仍有一些情況未涉及。幸運的是， Kotlin 團隊和社群其他成員開發了各式各樣的程式庫來補充標準函式庫。例如，[`kotlinx-datetime`](https://kotlinlang.org/api/kotlinx-datetime/) 能協助您在不同平台間管理時間。
+標準函式庫涵蓋了許多常見的使用案例，但仍有一些情況未涉及。幸運的是，Kotlin 團隊和社群其他成員開發了各式各樣的程式庫來補充標準函式庫。例如，[`kotlinx-datetime`](https://kotlinlang.org/api/kotlinx-datetime/) 能協助您在不同平台間管理時間。
 
 您可以在我們的[搜尋平台](https://klibs.io/)上找到有用的程式庫。若要使用它們，您需要執行額外的步驟，例如新增相依性或外掛程式。每個程式庫都有一個 GitHub 儲存庫，其中包含如何將其包含在您的 Kotlin 專案中的說明。
 
@@ -273,10 +273,19 @@ fun main() {
 
 作為下一步，請查看我們針對熱門 Kotlin 應用程式的教學：
 
-* [使用 Spring Boot 與 Kotlin 建立後端應用程式](jvm-create-project-with-spring-boot.md)
-* 從頭開始為 Android 與 iOS 建立跨平台應用程式，並且：
-    * [在保持 UI 原生的同時共用商務邏輯](https://kotlinlang.org/docs/multiplatform/multiplatform-create-first-app.html)
-    * [共用商務邏輯與 UI](https://kotlinlang.org/docs/multiplatform/compose-multiplatform-create-first-app.html)
+<p></p> <!-- workaround for MRK057: Paragraph can only contain inline elements -->
+<panels columns="2" id="kotlin-tour-whats-next">
+    <panel>
+        <title>Kotlin 後端開發</title>
+        <p>使用 Spring Boot 與 Kotlin 建立後端應用程式。</p>
+        <a href="jvm-create-project-with-spring-boot.md" as="button" icon="arrow-right" icon-position="right" id="kotlin-tour-backend-tutorial">開始</a>
+    </panel>
+    <panel>
+        <title>Kotlin Multiplatform</title>
+        <p>從頭開始建立跨平台應用程式，並共用商務邏輯與 UI。</p>
+        <a href="https://kotlinlang.org/docs/multiplatform/compose-multiplatform-create-first-app.html" as="button" icon="arrow-right" icon-position="right" id="kotlin-tour-cmp-tutorial">開始</a>
+    </panel>
+</panels>
 
 <seealso></seealso>
 

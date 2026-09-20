@@ -603,6 +603,24 @@
         "link": "android-overview"
       },
       {
+        "text": "kotlin.ai-development",
+        "items": [
+          {
+            "text": "kotlin.kotlin-with-ai",
+            "link": "kotlin-with-ai"
+          },
+          {
+            "text": "kotlin.kotlin-ai-apps-development-overview",
+            "link": "kotlin-ai-apps-development-overview"
+          },
+          {
+            "text": "kotlin.spring-ai-guide",
+            "link": "spring-ai-guide"
+          }
+        ],
+        "collapsed": true
+      },
+      {
         "text": "kotlin.designing-your-library",
         "collapsed": true,
         "include": "api-guidelines"
@@ -610,41 +628,49 @@
       {
         "text": "kotlin.custom-script-deps-tutorial",
         "link": "custom-script-deps-tutorial"
+      }
+    ],
+    "collapsed": true
+  },
+  {
+    "text": "kotlin.development-tooling",
+    "items": [
+      {
+        "text": "kotlin.kotlin-ide",
+        "link": "kotlin-ide"
       },
       {
-        "text": "kotlin.development-tooling",
-        "items": [
-          {
-            "text": "kotlin.kotlin-ide",
-            "link": "kotlin-ide"
-          },
-          {
-            "text": "kotlin.kotlin-lsp",
-            "link": "kotlin-lsp"
-          },
-          {
-            "text": "kotlin.dokka",
-            "collapsed": true,
-            "include": "dokka"
-          },
-          {
-            "text": "kotlin.run-code-snippets",
-            "link": "run-code-snippets"
-          },
-          {
-            "text": "kotlin.kotlin-doc",
-            "link": "kotlin-doc"
-          },
-          {
-            "text": "kotlin.kotlin-osgi",
-            "link": "kotlin-osgi"
-          },
-          {
-            "text": "kotlin.kotlin-and-ci",
-            "link": "kotlin-and-ci"
-          }
-        ],
-        "collapsed": true
+        "text": "kotlin.ai-for-development",
+        "link": "ai-for-development"
+      },
+      {
+        "text": "kotlin.kotlin-ai-skills",
+        "link": "kotlin-ai-skills"
+      },
+      {
+        "text": "kotlin.run-code-snippets",
+        "link": "run-code-snippets"
+      },
+      {
+        "text": "kotlin.kotlin-lsp",
+        "link": "kotlin-lsp"
+      },
+      {
+        "text": "kotlin.dokka",
+        "collapsed": true,
+        "include": "dokka"
+      },
+      {
+        "text": "kotlin.kotlin-doc",
+        "link": "kotlin-doc"
+      },
+      {
+        "text": "kotlin.kotlin-osgi",
+        "link": "kotlin-osgi"
+      },
+      {
+        "text": "kotlin.kotlin-and-ci",
+        "link": "kotlin-and-ci"
       }
     ],
     "collapsed": true
@@ -810,76 +836,6 @@
     "collapsed": true
   },
   {
-    "text": "kotlin.kotlin-for-ai-and-data-analysis",
-    "items": [
-      {
-        "text": "kotlin.kotlin-for-ai",
-        "items": [
-          {
-            "text": "kotlin.kotlin-ai-skills",
-            "link": "kotlin-ai-skills"
-          },
-          {
-            "text": "kotlin.kotlin-ai-apps-development-overview",
-            "link": "kotlin-ai-apps-development-overview"
-          },
-          {
-            "text": "kotlin.spring-ai-guide",
-            "link": "spring-ai-guide"
-          }
-        ],
-        "collapsed": true
-      },
-      {
-        "text": "kotlin.kotlin-for-data-analysis",
-        "items": [
-          {
-            "text": "kotlin.data-analysis-overview",
-            "link": "data-analysis-overview"
-          },
-          {
-            "text": "kotlin.working-with-data-sources",
-            "items": [
-              {
-                "text": "kotlin.data-analysis-work-with-data-sources",
-                "link": "data-analysis-work-with-data-sources"
-              },
-              {
-                "text": "kotlin.data-analysis-work-with-api",
-                "link": "data-analysis-work-with-api"
-              },
-              {
-                "text": "kotlin.data-analysis-connect-to-db",
-                "link": "data-analysis-connect-to-db"
-              }
-            ],
-            "collapsed": true
-          },
-          {
-            "text": "kotlin.visualizing-data",
-            "items": [
-              {
-                "text": "kotlin.data-analysis-visualization",
-                "link": "data-analysis-visualization"
-              },
-              {
-                "text": "kotlin.lets-plot",
-                "link": "lets-plot"
-              }
-            ],
-            "collapsed": true
-          },
-          {
-            "text": "kotlin.data-analysis-libraries",
-            "link": "data-analysis-libraries"
-          }
-        ],
-        "collapsed": true
-      }
-    ],
-    "collapsed": true
-  },
-  {
     "text": "kotlin.library-guides",
     "items": [
       {
@@ -1011,6 +967,52 @@
       {
         "text": "kotlin.metadata-jvm",
         "link": "metadata-jvm"
+      },
+      {
+        "text": "kotlin.data-analysis",
+        "items": [
+          {
+            "text": "kotlin.data-analysis-overview",
+            "link": "data-analysis-overview"
+          },
+          {
+            "text": "kotlin.working-with-data-sources",
+            "items": [
+              {
+                "text": "kotlin.data-analysis-work-with-data-sources",
+                "link": "data-analysis-work-with-data-sources"
+              },
+              {
+                "text": "kotlin.data-analysis-work-with-api",
+                "link": "data-analysis-work-with-api"
+              },
+              {
+                "text": "kotlin.data-analysis-connect-to-db",
+                "link": "data-analysis-connect-to-db"
+              }
+            ],
+            "collapsed": true
+          },
+          {
+            "text": "kotlin.visualizing-data",
+            "items": [
+              {
+                "text": "kotlin.data-analysis-visualization",
+                "link": "data-analysis-visualization"
+              },
+              {
+                "text": "kotlin.lets-plot",
+                "link": "lets-plot"
+              }
+            ],
+            "collapsed": true
+          },
+          {
+            "text": "kotlin.data-analysis-libraries",
+            "link": "data-analysis-libraries"
+          }
+        ],
+        "collapsed": true
       },
       {
         "text": "kotlin.lincheck-kotlinx-lincheck",

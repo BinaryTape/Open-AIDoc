@@ -16,6 +16,10 @@ Kotlin 2.4.20 正式推出！以下為本次發布的重點摘要：
 * **Build tools API：** [支援新目標：Kotlin/JS、Kotlin/Wasm 和 Kotlin 中繼資料](#build-tools-api)
 * **Kotlin 編譯器：** [`kotlinr` 執行器指令以及獨立的原生映像檔](#kotlin-compiler)
 
+您也可以在此影片中查看更新概覽：
+
+<video src="https://www.youtube.com/v/UhRfN7fx5rs" title="Kotlin 2.4.20 新功能"/>
+
 > 如需有關 Kotlin 發布週期的詳細資訊，請參閱 [Kotlin 發布流程](releases.md)。
 >
 {style="tip"}

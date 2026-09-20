@@ -1,6 +1,6 @@
 [//]: # (title: 速率限制)
 
-<show-structure for="chapter" depth="2"/>
+<show-structure for="chapter" depth="3"/>
 <primary-label ref="server-plugin"/>
 
 <var name="plugin_name" value="RateLimit"/>
@@ -28,15 +28,17 @@
 %plugin_name% 提供了验证传入请求正文的能力。
 </link-summary>
 
-[%plugin_name%](%plugin_api_link%) 插件允许你限制客户端在特定时间段内可以发出的[请求](server-requests.md)数量。
-Ktor 提供了多种配置速率限制的方式，例如：
-- 你可以为整个应用程序全局启用速率限制，或者为不同的[资源](server-routing.md)配置不同的速率限制。
-- 你可以基于特定的请求参数配置速率限制：IP 地址、API 密钥或访问令牌等。
+[`%plugin_name%`](%plugin_api_link%) 插件允许你限制客户端在指定时间段内可以发出的[请求](server-requests.md)数量。
+
+Ktor 提供了多种配置速率限制的方式：
+
+* 为整个应用程序全局应用速率限制，或为特定[资源](server-routing.md)配置不同的限制。
+* 基于请求参数应用速率限制，例如 IP 地址、API 密钥或访问令牌。
 
 ## 添加依赖项 {id="add_dependencies"}
 
 <p>
-    要使用 <code>%plugin_name%</code>，你需要在构建脚本中包含 <code>%artifact_name%</code> 构件：
+    要使用 <code>%plugin_name%</code>，请在构建脚本中添加 <code>%artifact_name%</code> 构件：
 </p>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
@@ -54,14 +56,14 @@ Ktor 提供了多种配置速率限制的方式，例如：
 
 <p>
     要在应用程序中<a href="#install">安装</a> <code>%plugin_name%</code> 插件，请将其传递给指定<Links href="/ktor/server-modules" summary="模块允许你通过对路由进行分组来构建应用程序。">模块</Links>中的 <code>install</code> 函数。
-    以下代码片段显示了如何安装 <code>%plugin_name%</code> ...
+    以下示例展示了如何安装 <code>%plugin_name%</code>：
 </p>
 <list>
     <li>
-        ... 在 <code>embeddedServer</code> 函数调用中。
+        在 <code>embeddedServer()</code> 函数调用中。
     </li>
     <li>
-        ... 在显式定义的 <code>module</code> 中，它是 <code>Application</code> 类的扩展函数。
+        在 <code>Application</code> 类上显式定义的 <code>module()</code> 扩展函数中。
     </li>
 </list>
 <Tabs>
@@ -77,19 +79,22 @@ Ktor 提供了多种配置速率限制的方式，例如：
 
 ### 概览 {id="overview"}
 
-Ktor 使用**令牌桶 (token bucket)** 算法进行速率限制，其工作原理如下：
-1. 开始时，我们有一个由容量定义的桶，即令牌数量。
-2. 每个传入请求都会尝试从桶中消耗一个令牌：
-    - 如果有足够的容量，服务器会处理请求并发送带有以下标头的响应：
-        - `X-RateLimit-Limit`：指定的桶容量。
-        - `X-RateLimit-Remaining`：桶中剩余的令牌数量。
-        - `X-RateLimit-Reset`：一个 UTC 时间戳（以秒为单位），指定补充桶的时间。
-    - 如果容量不足，服务器会使用 `429 Too Many Requests` 响应拒绝请求，并添加 `Retry-After` 标头，指示客户端在发出后续请求之前应等待多长时间（以秒为单位）。
-3. 在指定的时间段后，桶容量会被补充。
+Ktor 使用_令牌桶 (token bucket)_ 算法进行速率限制，其工作原理如下：
+1. 创建一个具有指定容量的桶，用于定义可用令牌的数量。
+2. 每个传入请求都会从桶中消耗一个令牌：
+   * 如果有足够的容量，服务器会处理请求并在响应中包含以下标头：
+     * `X-RateLimit-Limit`：桶容量。
+     * `X-RateLimit-Remaining`：桶中剩余的令牌数量。
+     * `X-RateLimit-Reset`：UTC 时间戳（以秒为单位），指定补充桶的时间。
+   * 如果容量不足，服务器会使用 `429 Too Many Requests` 响应拒绝请求。响应中包含 `Retry-After` 标头，指示客户端在发送下一个请求之前应等待多少秒。
+3. 在指定的补充周期后，桶会被补充。
 
 ### 注册速率限制器 {id="register"}
-Ktor 允许你将速率限制全局应用于整个应用程序或特定路由：
-- 要将速率限制应用于整个应用程序，请调用 `global` 方法并传递配置好的速率限制器。
+
+你可以将速率限制全局应用于整个应用程序，也可以为特定路由注册速率限制器：
+
+* 要全局应用速率限制，请调用 `global()` 函数并配置速率限制器：
+
    ```kotlin
    install(RateLimit) {
        global {
@@ -98,7 +103,8 @@ Ktor 允许你将速率限制全局应用于整个应用程序或特定路由：
    }
    ```
 
-- `register` 方法注册一个可应用于特定路由的速率限制器。
+* 要为特定路由配置速率限制，请使用 `register()` 函数注册速率限制器：
+
    ```kotlin
    install(RateLimit) {
        register {
@@ -107,71 +113,125 @@ Ktor 允许你将速率限制全局应用于整个应用程序或特定路由：
    }
    ```
 
-上面的代码示例演示了 `%plugin_name%` 插件的最小配置，但对于使用 `register` 方法注册的速率限制器，你还需要将其应用于[特定路由](#rate-limiting-scope)。
+上面的示例展示了 `%plugin_name%` 插件所需的最小配置。
+如果使用 `register()`，你还需要将注册的速率限制器应用于[特定路由](#rate-limiting-scope)。
 
 ### 配置速率限制 {id="configure-rate-limiting"}
 
-在本节中，我们将了解如何配置速率限制：
+你可以使用以下选项配置速率限制器。
 
-1. （可选）`register` 方法允许你指定一个速率限制器名称，该名称可用于将速率限制规则应用于[特定路由](#rate-limiting-scope)：
-   ```kotlin
-       install(RateLimit) {
-           register(RateLimitName("protected")) {
-               // ...
-           }
-       }
-   ```
+#### 为速率限制器命名 {id="name-a-rate-limiter"}
 
-2. `rateLimiter` 方法创建一个速率限制器，它带有两个参数：
-   `limit` 定义桶容量，而 `refillPeriod` 指定该桶的补充周期。
-   下面示例中的速率限制器允许每分钟处理 30 个请求：
-   ```kotlin
-   register(RateLimitName("protected")) {
-       rateLimiter(limit = 30, refillPeriod = 60.seconds)
-   }
-   ```
+使用 `register()` 函数为速率限制器分配名称。随后你可以将命名速率限制器应用于[特定路由](#rate-limiting-scope)：
 
-3. （可选）`requestKey` 允许你指定一个返回请求键的函数。
-   具有不同键的请求拥有独立的速率限制。
-   在下面的示例中，`login` [查询参数](server-requests.md#query_parameters)是用于区分不同用户的键：
-   ```kotlin
-   register(RateLimitName("protected")) {
-       requestKey { applicationCall ->
-           applicationCall.request.queryParameters["login"]!!
-       }
-   }
-   ```
+```kotlin
+    install(RateLimit) {
+        register(RateLimitName("protected")) {
+            // ...
+        }
+    }
+```
 
-   > 请注意，键应具有良好的 `equals` 和 `hashCode` 实现。
+#### 设置限制和补充周期 {id="set-the-limit-and-refill-period"}
 
-4. （可选）`requestWeight` 设置一个返回请求消耗多少令牌的函数。
-   在下面的示例中，请求键用于配置请求权重：
-   ```kotlin
-   register(RateLimitName("protected")) {
-       requestKey { applicationCall ->
-           applicationCall.request.queryParameters["login"]!!
-       }
-       requestWeight { applicationCall, key ->
-           when(key) {
-               "jetbrains" -> 1
-               else -> 2
-           }
-       }
-   }
-   ```
+使用 `rateLimiter()` 函数配置桶容量和补充周期：
 
-5. （可选）`modifyResponse` 允许你重写随每个请求发送的默认 `X-RateLimit-*` 标头：
-   ```kotlin
-   register(RateLimitName("protected")) {
-       modifyResponse { applicationCall, state ->
-           applicationCall.response.header("X-RateLimit-Custom-Header", "Some value")
-       }
-   }
-   ```
+* `limit` 指定可用令牌的数量。
+* `refillPeriod` 指定补充桶的频率。
+
+以下示例允许每分钟最多 30 个请求：
+
+```kotlin
+register(RateLimitName("protected")) {
+    rateLimiter(limit = 30, refillPeriod = 60.seconds)
+}
+```
+
+#### 按键区分请求 {id="distinguish-requests-by-key"}
+
+使用 `requestKey()` 函数为每个请求返回一个键。具有不同键的请求拥有独立的速率限制。
+
+以下示例使用 `login` [查询参数](server-requests.md#query_parameters)来区分用户：
+
+```kotlin
+register(RateLimitName("protected")) {
+    requestKey { applicationCall ->
+        applicationCall.request.queryParameters["login"]!!
+    }
+}
+```
+
+> 确保请求键具有适当的 `equals` 和 `hashCode` 实现。
+> 
+{style="tip"}
+
+#### 对已验证用户进行速率限制 {id="rate-limit-authenticated-users"}
+
+你可以使用身份验证主体 (principal) 作为请求键，以便按已验证用户应用速率限制。
+
+将 `rateLimit()` 嵌套在 `authenticate()` 内部，然后从 `requestKey()` 中访问主体：
+
+```kotlin
+install(Authentication) {
+    basic("auth") { validate { UserIdPrincipal(it.name) } }
+}
+install(RateLimit) {
+    register(RateLimitName("per-user")) {
+        rateLimiter(limit = 10, refillPeriod = 60.seconds)
+        requestKey { call.principal<UserIdPrincipal>()?.name ?: "anonymous" }
+    }
+}
+
+routing {
+    authenticate("auth") {
+        rateLimit(RateLimitName("per-user")) {
+            get("/api") { call.respondText("OK") }
+        }
+    }
+}
+```
+
+#### 设置请求权重 {id="set-the-request-weight"}
+
+使用 `requestWeight()` 函数指定每个请求消耗多少令牌。该函数接收应用程序调用和请求键。
+
+在以下示例中，具有 `jetbrains` 键的请求消耗一个令牌，而所有其他请求消耗两个：
+
+```kotlin
+register(RateLimitName("protected")) {
+    requestKey { applicationCall ->
+        applicationCall.request.queryParameters["login"]!!
+    }
+    requestWeight { applicationCall, key ->
+        when(key) {
+            "jetbrains" -> 1
+            else -> 2
+        }
+    }
+}
+```
+
+#### 自定义响应 {id="customize-the-response"}
+
+使用 `modifyResponse()` 函数自定义应用速率限制时的响应。
+
+例如，你可以添加自定义速率限制标头：
+
+```kotlin
+register(RateLimitName("protected")) {
+    modifyResponse { applicationCall, state ->
+        applicationCall.response.header("X-RateLimit-Custom-Header", "Some value")
+    }
+}
+```
 
 ### 定义速率限制范围 {id="rate-limiting-scope"}
 
-配置速率限制器后，你可以使用 `rateLimit` 方法将其规则应用于特定路由：
+配置速率限制器后，你可以使用 `rateLimit()` 函数将其应用于特定路由。
+
+#### 应用默认速率限制器 {id="apply-the-default-rate-limiter"}
+
+使用不带名称的 `rateLimit()` 函数来应用默认注册的速率限制器：
 
 ```kotlin
 routing {
@@ -184,7 +244,9 @@ routing {
 }
 ```
 
-此方法还可以接受一个[速率限制器名称](#configure-rate-limiting)：
+#### 应用命名速率限制器 {id="apply-a-named-rate-limiter"}
+
+将 `RateLimitName` 传递给 `rateLimit()` 函数以应用[命名速率限制器](#configure-rate-limiting)：
 
 ```kotlin
 routing {
@@ -200,8 +262,13 @@ routing {
 
 ## 示例 {id="example"}
 
-下面的代码示例演示了如何使用 `RateLimit` 插件将不同的速率限制器应用于不同的资源。
-[StatusPages](server-status-pages.md) 插件用于处理已拒绝的请求，对于这些请求，已发送了 `429 Too Many Requests` 响应。
+以下示例展示了如何将不同的速率限制器应用于不同的路由。
+它配置了：
+
+* 主页的默认速率限制器。
+* 公共 API 的命名 public 速率限制器。
+* 使用请求键和权重的命名 protected 速率限制器。
+* [`StatusPages`](server-status-pages.md) 插件，用于为因 `429 Too Many Requests` 响应而被拒绝的请求自定义响应。
 
 ```kotlin
 package com.example
@@ -268,4 +335,6 @@ fun Application.module() {
 
 ```
 
-你可以在此处找到完整的示例：[rate-limit](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/rate-limit)。
+> 有关完整示例，请参阅 [rate-limit](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/rate-limit)。
+>
+{style="tip"}

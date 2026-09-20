@@ -41,7 +41,7 @@ ZIPファイルから静的コンテンツを配信するために、Ktorは[`st
 
  ```kotlin
  routing {
-     staticZip("/", "", Paths.get("files/text-files.zip"))
+     staticZip("/", "/", Paths.get("files/text-files.zip"))
  }
  ```
 
@@ -84,16 +84,24 @@ staticResources("/custom", "static", index = "custom_index.html")
 
 ### 事前圧縮されたファイル {id="precompressed"}
 
-Ktorは、事前圧縮されたファイルを配信し、[動的圧縮](server-compression.md)の使用を避ける機能を提供しています。
-この機能を使用するには、ブロックステートメント内で `preCompressed()` 関数を定義します。
+Ktorは、[Compression](server-compression.md)プラグインでレスポンスを動的に圧縮する代わりに、事前圧縮された静的ファイルを配信できます。
+
+この機能を有効にするには、`preCompressed()` 関数を使用して、サポートする圧縮形式を指定します。
 
 ```kotlin
 staticFiles("/", File("files")) {
-    preCompressed(CompressedFileType.BROTLI, CompressedFileType.GZIP)
+    preCompressed(
+        CompressedFileType.BROTLI,
+        CompressedFileType.GZIP,
+        CompressedFileType.ZSTD,
+        CompressedFileType.DEFLATE
+    )
 }
 ```
 
-この例では、`/js/script.js` へのリクエストに対して、Ktorは `/js/script.js.br` または `/js/script.js.gz` を配信できます。
+クライアントが静的ファイルをリクエストすると、Ktorはクライアントがサポートするコンテンツエンコーディングを確認し、利用可能な場合は一致する事前圧縮バージョンを配信します。
+
+たとえば、`/js/script.js` へのリクエストに対して、Ktorは `/js/script.js.br` や `/js/script.js.gz` などの事前圧縮されたバリアントを配信できます。
 
 ### HEADリクエスト {id="autohead"}
 
@@ -107,7 +115,7 @@ staticResources("/", "static"){
 
 ### デフォルトファイルレスポンス {id="default-file"}
 
-`default()` 関数は、対応するファイルがない静的ルート内のリクエストに対して、特定のファイルで応答する機能を提供します。
+`default()` 関数は、対応するファイルがない静的ルート内のリクエストに対して、ファイルで応答する機能を提供します。
 
 ```kotlin
 staticFiles("/", File("files")) {
@@ -139,7 +147,7 @@ staticFiles("/files", File("textFiles")) {
 `cacheControl()` 関数を使用すると、HTTPキャッシュ用の `Cache-Control` ヘッダーを構成できます。
 
 ```kotlin
-    install(ConditionalHeaders)
+fun Application.module() {
     routing {
         staticFiles("/files", File("textFiles")) {
             cacheControl { file ->

@@ -53,11 +53,11 @@ get("/") {
 
 #### 部分 HTML 片段 {id="partial-html-fragments"}
 
-如果你只需要傳回 HTML 片段，而不將其封裝在 `<html>`、`<head>` 或 `<body>` 中，可以使用 `call.respondHtmlFragment()`：
+如果你只需要傳回 HTML 片段，而不將其封裝在 `<html>`、`<head>` 或 `<body>` 中，可以使用 `call.respondHtmlPartial()`：
 
 ```kotlin
     get("/fragment") {
-        call.respondHtmlFragment(HttpStatusCode.Created) {
+        call.respondHtmlPartial(HttpStatusCode.Created) {
             div("fragment") {
                 span { +"Created!" }
             }

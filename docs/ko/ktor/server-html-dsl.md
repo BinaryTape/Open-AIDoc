@@ -96,7 +96,13 @@ fun Application.module() {
 get("/login") {
     call.respondHtml {
         body {
-            form(action = "/login", encType = FormEncType.applicationXWwwFormUrlEncoded, method = FormMethod.post) {
+            val urlEncoded = FormEncType
+                .applicationXWwwFormUrlEncoded
+            form(
+                action = "/login",
+                encType = urlEncoded,
+                method = FormMethod.post
+            ) {
                 p {
                     +"Username:"
                     textInput(name = "username")
@@ -140,7 +146,7 @@ get("/login") {
 
 ## HTML 일부(Partial) 보내기 {id="html_fragments"}
 
-전체 HTML 문서를 생성하는 것 외에도 `.respondHtmlFragment()` 함수를 사용하여 HTML 프래그먼트(fragments)로 응답할 수 있습니다.
+전체 HTML 문서를 생성하는 것 외에도 `.respondHtmlPartial()` 함수를 사용하여 HTML 프래그먼트(fragments)로 응답할 수 있습니다.
 
 HTML 프래그먼트는 HTMX와 같은 라이브러리에서 사용하는 동적 업데이트와 같이 전체 `<html>` 문서가 필요하지 않은 부분적인 마크업을 반환할 때 유용합니다.
 
@@ -157,7 +163,7 @@ import kotlinx.html.*
 fun Application.module() {
     routing {
         get("/fragment") {
-            call.respondHtmlFragment(HttpStatusCode.Created) {
+            call.respondHtmlPartial(HttpStatusCode.Created) {
                 div("fragment") {
                     span { +"Created!" }
                 }

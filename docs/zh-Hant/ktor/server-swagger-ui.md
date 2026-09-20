@@ -27,7 +27,7 @@ SwaggerUI 外掛程式可讓您為專案產生 Swagger UI。
 </link-summary>
 
 Ktor 讓您能根據 OpenAPI 規格為專案產生並提供 Swagger UI。
-透過 Swagger UI，您可以直接從瀏覽器中將您的 API 端點可視化並進行互動。 
+透過 Swagger UI，您可以直接從瀏覽器中將您的 API 端點視覺化並進行互動。 
 
 您可以透過以下任一方式提供 OpenAPI 規格：
 
@@ -49,12 +49,6 @@ Ktor 讓您能根據 OpenAPI 規格為專案產生並提供 Swagger UI。
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
     </TabItem>
 </Tabs>
-
-> 在 Ktor 3.4.0 中，`SwaggerUI` 外掛程式需要 `ktor-server-routing-openapi` 相依性。
-> 這並非刻意的破壞性變更，並將在 Ktor 3.4.1 中修正。
-> 如果您使用的是 Ktor 3.4.0，請手動新增該相依性以避免執行時錯誤。
-> 
-{style="warning"}
 
 ## 使用靜態 OpenAPI 檔案 {id="static-openapi-file"}
 
@@ -94,7 +88,32 @@ swaggerUI("/swaggerUI") {
 
 ## 配置 Swagger UI {id="configure-swagger-ui"}
 
-您可以在 `swaggerUI {}` 區塊內自訂 Swagger UI，例如覆寫預設的 Swagger UI 版本：
+`swaggerUI {}` 配置區塊可讓您設定 OpenAPI 文件並自訂 Swagger UI。
+
+### 配置文件元資料 {id="configure-document-metadata"}
+
+您可以直接在配置區塊中定義頂層 OpenAPI 元資料。
+
+例如，使用 `info` 指定一般 API 資訊，並使用 `tag()` 定義標籤及其說明：
+
+```kotlin
+swaggerUI("/swagger") {
+    info = OpenApiInfo("Books API from routes", "1.0.0")
+    tag(
+        name = "Books",
+        description = "Operations on books"
+    )
+}
+```
+您也可以設定其他頂層 OpenAPI 屬性，例如伺服器、安全性需求、可重複使用的組件、外部文件和規格擴充。
+
+> 如需可用選項的完整清單，請參閱 [`SwaggerConfig`](https://api.ktor.io/ktor-server-swagger/io.ktor.server.plugins.swagger/-swagger-config/index.html) API 參考。
+> 
+{style="tip"}
+
+### 配置 Swagger UI 版本 {id="configure-the-swagger-ui-version"}
+
+Ktor 預設使用預定義的 Swagger UI 版本。若要使用其他版本，請設定 `version` 屬性：
 
 ```kotlin
 routing {

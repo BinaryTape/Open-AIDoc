@@ -146,7 +146,7 @@ Ktor 애플리케이션에 대한 테스트를 작성하기 전에 테스트 파
 
 `testApplication {}` 함수는 Ktor 서버 테스트의 진입점입니다. 이 함수는 격리된 테스트 환경을 생성하고, 실제 웹 서버를 시작하지 않고 애플리케이션을 실행하며, 요청을 보내고 응답을 검증할 수 있도록 미리 구성된 HTTP 클라이언트를 제공합니다.
 
-`testApplication {}` 블록 내부에서 로드할 모듈, 노출할 라우트, 환경 설정 방법 또는 모킹(mock)할 외부 서비스 등 테스트 애플리케이션이 어떻게 작동해야 하는지 구성합니다.
+`testApplication {}` 블록 내부에서 로드할 모듈, 노출할 라우트, 환경 설정 방법 또는 모킹할 외부 서비스 등 테스트 애플리케이션이 어떻게 작동해야 하는지 구성합니다.
 
 다음 섹션에서는 사용 가능한 구성 옵션에 대해 설명합니다.
 
@@ -220,7 +220,9 @@ class ApplicationTest {
 @Test
 fun testHello() = testApplication {
     environment {
-        config = ApplicationConfig("application-custom.conf")
+        config = ApplicationConfig(
+            "application-custom.conf"
+        )
     }
 }
 ```
@@ -296,7 +298,8 @@ class ApplicationTest {
 fun testHello() = testApplication {
     routing {
         get("/login-test") {
-            call.sessions.set(UserSession("xyzABC123","abc123"))
+            val session = UserSession("xyzABC123", "abc123")
+            call.sessions.set(session)
         }
     }
 }
@@ -314,7 +317,9 @@ fun testHello() = testApplication {
 @Test
 fun testHello() = testApplication {
     environment {
-        config = ApplicationConfig("application-custom.conf")
+        config = ApplicationConfig(
+            "application-custom.conf"
+        )
     }
 }
 ```
@@ -341,12 +346,17 @@ fun testDevEnvironment() = testApplication {
 fun testHello() = testApplication {
     externalServices {
         hosts("https://www.googleapis.com") {
-            install(io.ktor.server.plugins.contentnegotiation.ContentNegotiation) {
+            install(
+                io.ktor.server.plugins.contentnegotiation
+                    .ContentNegotiation
+            ) {
                 json()
             }
             routing {
                 get("oauth2/v2/userinfo") {
-                    call.respond(UserInfo("1", "JetBrains", "", ""))
+                    val info =
+                        UserInfo("1", "JetBrains", "", "")
+                    call.respond(info)
                 }
             }
         }
@@ -735,8 +745,8 @@ data class UserSession(val id: String, val count: Int)
 
 fun Application.main() {
     install(Sessions) {
-        val secretEncryptKey = hex("00112233445566778899aabbccddeeff")
-        val secretSignKey = hex("6819b57a326945c1968f45236589")
+        val secretEncryptKey = "00112233445566778899aabbccddeeff".hexToByteArray()
+        val secretSignKey = "6819b57a326945c1968f45236589".hexToByteArray()
         cookie<UserSession>("user_session") {
             cookie.path = "/"
             cookie.maxAgeInSeconds = 10

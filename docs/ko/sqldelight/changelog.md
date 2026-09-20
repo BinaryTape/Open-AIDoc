@@ -12,8 +12,68 @@
 
 ### 수정됨 {id="fixed"}
 
+- 아직 없음!
+
+## [2.4.0] - 2026-09-17 {id="2-4-0-2026-09-17"}
+[2.4.0]: https://github.com/sqldelight/sqldelight/releases/tag/2.4.0
+
+### 추가됨
+- [Native 드라이버] `inMemoryDriver`에 `extendedConfig` 파라미터 추가 (#5539 by @GuilhE)
+- [PostgreSQL 다이얼렉트] 암시적으로 정의된 시스템 컬럼(implicitly defined System Columns)에 대한 쿼리 지원 추가 (#5834 by @griffio)
+- [PostgreSQL 다이얼렉트] 기본적인 배열 리터럴(Array literal) 지원 추가 (#5997 by @griffio)
+- [PostgreSQL 다이얼렉트] 기본적인 LTREE 지원 추가 (#5880 by @yesitskev @griffio)
+- [MySQL 다이얼렉트] INET 함수 지원 추가 (#5072 by @mcxinyu)
+- [PostgreSQL 다이얼렉트] `ALTER INDEX` 지원 추가 (#6224 by @griffio)
+- [SQLite 다이얼렉트] SQLite 3.44 집계 함수 `DISTINCT`, `ORDER BY`, `FILTER` 지원 추가 (#6236 by @griffio)
+- [SQLite 다이얼렉트] SQLite 3.37 `STRICT` 테이블 지원 추가 (#6230 by @griffio)
+- [Gradle 플러그인] `codegenExcludedColumns`를 사용하여 생성된 모델에서 컬럼을 제외하는 지원 추가 (#6243 by @sokolikp)
+- [컴파일러] 스키마에 `allTableNames` 함수 추가 (#6245 by @edenman)
+- [PostgreSQL 다이얼렉트] `ANY` 연산자 지원 추가 (#6253 by @griffio)
+- [SQLite 다이얼렉트] SQLite 3.39 `RIGHT JOIN` 및 `FULL JOIN` 지원 추가 (#6273 by @griffio)
+- [PostgreSQL 다이얼렉트] 트리거 함수에서의 `RAISE` 문 및 `FOUND` 변수 지원 추가 (#6297 by @griffio)
+
+### 변경됨
+- [PostgreSQL 다이얼렉트] `arrayIntermediateType` 가시성을 public으로 변경 (#5835 by @griffio)
+- [Gradle 플러그인] 더 엄격한 `MigrationFile` 버전 관리(versioning) 구현 (#5730 by @madisp)
+- [Gradle 플러그인] 최소 지원 Gradle 버전을 8.2.1로 상향 (#6217 by @maxsav)
+- [Gradle 플러그인] Gradle 격리된 프로젝트(isolated projects) 지원 (#6217 by @maxsav)
+- [IntelliJ 플러그인] 최소 버전 2023.3 / Android Studio Jellyfish
+
+### 수정됨
+- [Gradle 플러그인] JDK 24+에서 컴파일러 워커(compiler worker)의 `sun.misc.Unsafe` 지원 중단 경고(deprecation warnings) 억제 (#6321)
+- [컴파일러] 생성된 코드에서 Kotlin 추가 경고(extra warnings) 억제 (#6208 by @eyupcanakman)
+- [컴파일러] 그룹화되지 않은 집계 결과 집합(non-grouped aggregate result set)의 다른 컬럼들은 항상 널 허용(nullable)임
+- [PostgreSQL 다이얼렉트] `coalesce` 및 `ifnull`에 대한 널 허용 여부(nullability)를 올바르게 해결
+- [PostgreSQL 다이얼렉트] PostgreSQL 다이얼렉트의 IDE 통합 수정
+- [PostgreSQL 다이얼렉트] PostgreSQL 다이얼렉트용 IDE 플러그인 개선 (#6209 by @griffio)
+- [Intellij 플러그인] IDE 플러그인이 모든 다이얼렉트에 대해 코드 완성(code completions)을 수행할 수 있음 (#6210 by @griffio)
+- [Gradle 플러그인] 데이터베이스 검증(verify database) 태스크 실행 중 발생하는 순환 의존성(circular dependency) 에러 수정 (#6221 by @griffio)
+- [컴파일러] 다중 행 업데이트(multirow update)에 대한 낙관적 락(optimistic lock) 수정 (#6240 by @griffio)
+- [Intellij 플러그인] IDEA 2026.2에서 크래시를 유발하는 지원 중단(deprecations) 관련 수정 (#6247 by @griffio)
+- [Gradle 플러그인] AGP 8.9에서 8.11 버전까지 Kotlin 컴파일 시 생성된 소스(generated sources)를 인식하지 못하던 문제 수정
+- [PostgreSQL 다이얼렉트] Primitive 바운드 인자를 사용할 때 `lower` 및 `upper` 함수의 기본값을 `TEXT`로 설정하도록 수정 (#6262 by @griffio)
+- [컴파일러] 어댑터를 사용한 데이터 클래스 바인딩 및 널 허용 여부(nullability)를 변경하는 마이그레이션이 포함된 insert values 수정 (#6269 by griffio)
+- [컴파일러] 널 안전 연산자(null safe operators, `IS` 및 `IS DISTINCT FROM`)와 함께 널 허용(nullable) 바인드 인자 사용 (#6265 by @griffio)
+- [Gradle 플러그인] 프로젝트 의존성에 대해 AGP의 변형 해결(variant resolution) 사용 (#6217 by @maxsav)
+- [Gradle 플러그인] 빌드 간에 AGP 변형 목록이 다를 때 `generateDatabaseInterface`의 빌드 캐시 미스 수정
+- [Gradle 플러그인] 데이터베이스를 구성하지 않고 플러그인을 적용했을 때 발생하는 IDE 동기화 크래시 수정 (#6088)
+- [PostgreSQL 다이얼렉트] 중첩된 함수 호출을 사용할 때의 JSON 집계 함수 수정 (#6281 by @griffio)
+- [Paging3 확장] 빈 데이터베이스에서 `KeyedQueryPagingSource`가 크래시되는 현상 수정 (#6284 by @woods-marshes)
+- [컴파일러] `COALESCE`와 같은 캡슐화 함수(encapsulating functions)와 함께 뮤테이터 문(mutator statements)을 사용할 때 발생하는 Java 타입 어댑터 문제 수정 (#6292 by @griffio)
+- [컴파일러] 모듈 이름이 대문자로 시작할 때 생성된 코드의 패키지 이름도 대문자로 시작하던 문제 수정 (#6316 by @griffio)
+- [PostgreSQL 다이얼렉트] 날짜 데이터 타입이 대소문자를 구분하지 않도록 허용 (#6328 by @griffio)
 - [PostgreSQL 다이얼렉트] `string_agg` 함수가 널 허용(nullable)이 되도록 수정 (#6340 by @griffio)
 - [SQLite 다이얼렉트] `GROUP BY`를 사용하는 SQLite 3.44 집계 함수 수정 (#6343 by @griffio)
+- [Gradle 플러그인] 구성 단계(configuration time)에서 데이터베이스 의존성을 해결(resolve)하지 않도록 방지 (#6353 by @joshfriend)
+
+## [2.4.0-rc2] - 2026-09-14 {id="2-4-0-rc2-2026-09-14"}
+[2.4.0-rc2]: https://github.com/sqldelight/sqldelight/releases/tag/2.4.0-rc2
+
+### 수정됨
+
+- [PostgreSQL 다이얼렉트] `string_agg` 함수가 널 허용(nullable)이 되도록 수정 (#6340 by @griffio)
+- [SQLite 다이얼렉트] `GROUP BY`를 사용하는 SQLite 3.44 집계 함수 수정 (#6343 by @griffio)
+- [Gradle 플러그인] 구성 단계(configuration time)에서 데이터베이스 의존성을 해결(resolve)하지 않도록 방지 (#6353 by @joshfriend)
 
 ## [2.4.0-rc1] - 2026-09-01 {id="2-4-0-rc1-2026-09-01"}
 [2.4.0-rc1]: https://github.com/sqldelight/sqldelight/releases/tag/2.4.0-rc1

@@ -11,13 +11,13 @@ Coil 是 **Co**routine **I**mage **L**oader 的縮寫。
 
 翻譯：[日本語](README-ja.md), [한국어](README-ko.md), [Русский](README-ru.md), [Svenska](README-sv.md), [Türkçe](README-tr.md), [中文](README-zh.md), [پارسی](README-fa.md), [O'zbekcha](README-uz.md)
 
-## 快速入門
+## 快速入門 {id="quick-start"}
 
 匯入 Compose 程式庫與一個 [網路程式庫](https://coil-kt.github.io/coil/network/)：
 
 ```kotlin
-implementation("io.coil-kt.coil3:coil-compose:3.6.2")
-implementation("io.coil-kt.coil3:coil-network-okhttp:3.6.2")
+implementation("io.coil-kt.coil3:coil-compose:3.6.3")
+implementation("io.coil-kt.coil3:coil-network-okhttp:3.6.3")
 ```
 
 若要載入圖片，請使用 `AsyncImage` Composable：
@@ -31,7 +31,7 @@ AsyncImage(
 
 請在此查看 Coil 的 [完整文件](https://coil-kt.github.io/coil/getting_started/)。
 
-## 授權
+## 授權 {id="license"}
 
     Copyright 2026 Coil Contributors
 

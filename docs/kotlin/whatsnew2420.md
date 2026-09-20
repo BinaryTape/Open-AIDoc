@@ -16,6 +16,10 @@ Kotlin 2.4.20 现已发布！以下是本次发行的亮点：
 * **构建工具 API：** [支持新目标：Kotlin/JS、Kotlin/Wasm 和 Kotlin 元数据](#build-tools-api)
 * **Kotlin 编译器：** [`kotlinr` 运行器命令和独立的原生镜像](#kotlin-compiler)
 
+你也可以在此视频中查看更新概述：
+
+<video src="https://www.youtube.com/v/UhRfN7fx5rs" title="Kotlin 2.4.20 的最新变化"/>
+
 > 有关 Kotlin 发行周期的信息，请参阅 [Kotlin 发行流程](releases.md)。
 >
 {style="tip"}

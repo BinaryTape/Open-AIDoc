@@ -37,7 +37,7 @@ Kotlin 익스텐션은 Kotlin Language Server를 통해 코드 완성, 내비게
 
 자세한 내용은 [Kotlin Language Server 및 Visual Studio Code](kotlin-lsp.md#kotlin-in-visual-studio-code)를 참조하세요.
 
-## 기타 IDE 지원 {id="other-ides-support"}
+## 기타 IDE 지원 {id="other-ide-support"}
 
 JetBrains는 다른 IDE를 위한 공식 Kotlin 플러그인을 제공하지 않습니다.
 다른 코드 에디터에서는 [Kotlin Language Server](kotlin-lsp.md)를 사용할 수 있습니다.
@@ -50,7 +50,13 @@ IntelliJ IDEA 및 Android Studio의 경우, Kotlin 플러그인은 각 릴리스
 새로운 Kotlin 버전이 출시되면 이러한 도구는 Kotlin을 최신 버전으로 자동 업데이트하도록 제안합니다.
 지원되는 최신 언어 버전은 [Kotlin 릴리스](releases.md#ide-support)를 확인하세요.
 
+## IDE의 AI 지원 {id="ai-support-in-ides"}
+
+IntelliJ IDEA와 Android Studio는 내장된 AI 기능 및 AI 코딩 에이전트와의 연동을 통해 AI 기반 Kotlin 개발을 지원합니다. 워크플로에 따라 IDE에서 직접 AI를 사용하거나, 외부 에이전트를 연결하거나, AI 도구를 Kotlin 전용 가이드와 결합하여 활용할 수 있습니다.
+
+사용 가능한 AI 도구의 개요와 사용 시기는 [](ai-for-development.md)를 참조하세요.
+
 ## 다음 단계 {id="what-s-next"}
 
 * [IntelliJ IDEA에서 콘솔 애플리케이션 만들기](jvm-get-started.md)
-* [IntelliJ IDEA 또는 Android Studio를 사용하여 첫 번째 크로스 플랫폼 모바일 앱 만들기](https://kotlinlang.org/docs/multiplatform/multiplatform-create-first-app.html)
+* [Android Studio를 사용하여 첫 번째 크로스 플랫폼 모바일 앱 만들기](https://kotlinlang.org/docs/multiplatform/multiplatform-create-first-app.html)

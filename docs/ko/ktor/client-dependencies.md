@@ -115,7 +115,7 @@
 
 ```kotlin
 [versions]
-ktor = "3.4.0"
+ktor = "3.6.0"
 
 [libraries]
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
@@ -133,7 +133,9 @@ sourceSets {
 
 ### 엔진 의존성 {id="engine-dependency"}
 
-[엔진](client-engines.md)은 네트워크 요청을 처리하는 역할을 담당합니다. Apache, CIO, Android, iOS 등 다양한 플랫폼에서 사용할 수 있는 서로 다른 클라이언트 엔진들이 있습니다. 예를 들어, 다음과 같이 `CIO` 엔진 의존성을 추가할 수 있습니다:
+[엔진](client-engines.md)은 네트워크 요청을 처리하는 역할을 담당합니다. Ktor는 다양한 플랫폼을 위해 서로 다른 클라이언트 엔진들을 제공합니다.
+
+예를 들어, 다음과 같이 `CIO` 엔진을 추가할 수 있습니다:
 
 <var name="artifact_name" value="ktor-client-cio"/>
 <Tabs group="languages">
@@ -150,19 +152,41 @@ sourceSets {
 
 #### 멀티플랫폼 {id="engine-dependency-multiplatform"}
 
-멀티플랫폼 프로젝트의 경우, 해당 소스 세트에 필요한 엔진에 대한 의존성을 추가해야 합니다.
+##### 기본 엔진 사용하기 {id="use-default-engines"}
 
-예를 들어, Android용 `OkHttp` 엔진 의존성을 추가하려면 먼저 `gradle/libs.versions.toml` 파일에 Ktor 버전과 `ktor-client-okhttp` 아티팩트를 정의할 수 있습니다:
+멀티플랫폼 프로젝트의 경우, `ktor-client-engine-defaults` 아티팩트를 사용하여 각 대상 플랫폼에 맞게 선별된 클라이언트 엔진을 제공할 수 있습니다.
+
+먼저, `gradle/libs.versions.toml` 파일에 아티팩트를 정의합니다:
+
+```toml
+[libraries]
+ktor-client-engine-defaults = { module = "io.ktor:ktor-client-engine-defaults", version.ref = "ktor" }
+```
+
+그런 다음, `commonMain` 소스 세트에 추가합니다:
 
 ```kotlin
-[versions]
-ktor = "3.4.0"
+kotlin {
+    sourceSets {
+        commonMain {
+            dependencies {
+                api(libs.ktor.client.engine.defaults)
+            }
+        }
+    }
+}
+```
 
+##### 특정 엔진 사용하기 {id="kmp-specific-engine"}
+
+특정 엔진이 필요한 경우, 대신 해당 플랫폼 소스 세트에 의존성을 추가하세요. 예를 들어 Android에서 `OkHttp`를 사용하려면 `ktor-client-okhttp` 아티팩트를 정의합니다:
+
+```toml
 [libraries]
 ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
 ```
 
-그런 다음, `androidMain` 소스 세트에 `ktor-client-okhttp`를 의존성으로 추가합니다:
+그런 다음, `androidMain` 소스 세트에 의존성으로 추가합니다:
 
 ```kotlin
 sourceSets {
@@ -172,7 +196,7 @@ sourceSets {
 }
 ```
 
-특정 엔진에 필요한 전체 의존성 목록은 [엔진 의존성 추가하기](client-engines.md#dependencies)를 참조하세요.
+각 엔진에 필요한 의존성에 대해서는 [엔진 의존성 추가하기](client-engines.md#dependencies)를 참조하세요.
 
 ### 로깅 의존성 {id="logging-dependency"}
 

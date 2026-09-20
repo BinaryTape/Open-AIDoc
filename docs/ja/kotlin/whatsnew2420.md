@@ -16,6 +16,10 @@ Kotlin 2.4.20 がリリースされました！主なハイライトは以下の
 * **Build tools API:** [新しいターゲットのサポート: Kotlin/JS、Kotlin/Wasm、Kotlin メタデータ](#build-tools-api)
 * **Kotlin コンパイラ:** [`kotlinr` ランナーコマンドと独立したネイティブイメージ](#kotlin-compiler)
 
+アップデートの概要は、こちらの動画でもご覧いただけます：
+
+<video src="https://www.youtube.com/v/UhRfN7fx5rs" title="What's New in Kotlin 2.4.20"/>
+
 > Kotlin のリリースサイクルに関する詳細については、[Kotlin のリリースプロセス](releases.md)を参照してください。
 >
 {style="tip"}

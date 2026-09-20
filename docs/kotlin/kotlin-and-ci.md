@@ -1,51 +1,49 @@
 [//]: # (title: Kotlin 与 TeamCity 的持续集成)
 
-在本页中，您将学习如何设置 [TeamCity](https://www.jetbrains.com/teamcity/) 来构建您的 Kotlin 项目。
-要了解更多信息和 TeamCity 的基础知识，请查看[文档页面](https://www.jetbrains.com/teamcity/documentation/)，其中包含有关安装、基本配置等信息。
+在本页中，您将学习如何配置 [TeamCity](https://www.jetbrains.com/teamcity/) 来构建 Kotlin 应用程序。
+有关 TeamCity 的安装和基本设置，请参阅 [TeamCity 文档](https://www.jetbrains.com/teamcity/documentation/)。
 
-Kotlin 支持不同的构建工具，因此如果您使用的是 Maven 或 Gradle 等标准工具，设置 Kotlin 项目的过程与集成这些工具的任何其他语言或库没有什么不同。
-在使用 IntelliJ IDEA 内部构建系统时，会存在一些细微的要求和差异，TeamCity 也支持该系统。
+Kotlin 可以直接与 Gradle 和 Maven 等标准构建工具集成，因此在 TeamCity 中配置 Kotlin 构建的工作流程与配置任何其他项目相同。如果您改为使用 IntelliJ IDEA 构建系统来编译项目，TeamCity 也提供了专用的运行器。
 
 ## Gradle 和 Maven {id="gradle-and-maven"}
 
-如果使用 Maven 或 Gradle，设置过程非常简单。只需要定义构建步骤即可。
-例如，如果使用 Gradle，只需为运行器类型定义所需的参数，例如步骤名称和需要执行的 Gradle 任务。
+使用 Gradle 或 Maven 构建时，构建配置文件（`build.gradle.kts` 或 `pom.xml`）中已经声明了 Kotlin 依赖项和编译器插件。TeamCity 不需要任何额外的 Kotlin 专属设置。
 
-<img src="teamcity-gradle.png" alt="Gradle Build Step" width="700"/>
+对于 Gradle，请在构建配置中添加一个 Gradle 构建步骤，并指定要运行的 **Step name**（步骤名称）和 **Gradle tasks**（Gradle 任务）。
+<img src="teamcity-gradle.png" alt="Gradle Build Step" width="700" border-effect="line"/>
 
-由于 Kotlin 所需的所有依赖项都在 Gradle 文件中定义，因此无需为 Kotlin 正常运行进行任何额外配置。
-
-如果使用 Maven，同样的配置也适用。唯一的区别是运行器类型将是 Maven。
+同样，对于 Maven，请添加一个 Maven 构建步骤，并指定要执行的 **Step name**（步骤名称）和 **Goals**（目标）。
 
 ## IntelliJ IDEA 构建系统 {id="intellij-idea-build-system"}
 
-如果在 TeamCity 中使用 IntelliJ IDEA 构建系统，请确保 IntelliJ IDEA 使用的 Kotlin 版本与 TeamCity 运行的版本相同。您可能需要下载特定版本的 Kotlin 插件并将其安装在 TeamCity 上。
+如果使用 IntelliJ IDEA 项目文件构建项目，TeamCity 中的 Kotlin 版本必须与 IDE 项目中配置的版本相匹配。
+您可以使用 TeamCity recipe 来自动化下载和配置 Kotlin 编译器。Recipe 是元运行器（meta-runner）的演进形态：它们的作用相同，但提供了额外的优势，例如 YAML 支持以及可在 [JetBrains Marketplace](https://plugins.jetbrains.com/teamcity_recipe) 上轻松共享。
 
-幸运的是，已经有一个现成的元运行器 (meta-runner) 可以处理大部分手动工作。如果您不熟悉 TeamCity 元运行器的概念，请查看[文档](https://www.jetbrains.com/help/teamcity/working-with-meta-runner.html)。它们是一种非常简单且强大且无需编写插件即可引入自定义运行器的方法。
+1. 下载并导入 recipe。
+   * 从 [GitHub](https://github.com/JetBrains/Kotlin.TeamCity) 下载 Kotlin 元运行器文件。
+   * 将其作为新的 recipe 导入 TeamCity。有关详情，请参阅[使用 recipe](https://www.jetbrains.com/help/teamcity/working-with-meta-runner.html)。
+  <img src="teamcity-add-recipe.png" alt="TeamCity recipe" width="700" border-effect="line"/>
 
-### 下载并安装元运行器 {id="download-and-install-the-meta-runner"}
+2. 添加获取 Kotlin 编译器步骤。
+   * 使用导入的运行器添加一个构建步骤。
+   * 指定 **Step name**（步骤名称）和所需的 **Kotlin Version**（Kotlin 版本）。
+  <img src="teamcity-step-name.png" alt="Setup Kotlin Compiler" width="700" border-effect="line"/>
 
-Kotlin 的元运行器可在 [GitHub](https://github.com/jonnyzzz/Kotlin.TeamCity) 上找到。
-下载该元运行器并从 TeamCity 用户界面导入
+  >在运行构建之前，请在构建配置中将 `system.path.macro.KOTLIN.BUNDLED` 添加为系统参数。
+  >您可以为其指定任意占位符值，运行器将在构建时使用解析出的编译器路径将其覆盖。
+  >
+  > {style="note"}
 
-<img src="teamcity-metarunner.png" alt="Meta-runner" width="700"/>
-
-### 设置 Kotlin 编译器获取步骤 {id="setup-kotlin-compiler-fetching-step"}
-
-基本上，此步骤仅限于定义步骤名称和所需的 Kotlin 版本。可以使用标签 (Tags)。
-
-<img src="teamcity-setupkotlin.png" alt="Setup Kotlin Compiler" width="700"/>
-
-运行器将根据 IntelliJ IDEA 项目的路径设置，将属性 `system.path.macro.KOTLIN.BUNDLED` 的值设置为正确的值。但是，此值需要在 TeamCity 中定义（并且可以设置为任何值）。因此，您需要将其定义为系统变量。
-
-### 设置 Kotlin 编译步骤 {id="setup-kotlin-compilation-step"}
-
-最后一步是定义项目的实际编译，它使用标准的 IntelliJ IDEA 运行器类型。
-
-<img src="teamcity-idearunner.png" alt="IntelliJ IDEA Runner" width="700"/>
-
-至此，我们的项目现在应该可以构建并生成相应的构件。
+3. 添加编译步骤。
+   在获取编译器步骤之后添加一个 IntelliJ IDEA Project 运行器步骤，以编译项目并生成构建工件。
+  <img src="teamcity-intellij-step.png" alt="IntelliJ IDEA Project runner" width="500" border-effect="line"/>
 
 ## 其他 CI 服务器 {id="other-ci-servers"}
 
-如果使用 TeamCity 以外的持续集成工具，只要它支持任何构建工具或调用命令行工具，就应该可以编译 Kotlin 并将自动化作为 CI 流程的一部分。
+如果使用 TeamCity 以外的 CI 系统，直接在流水线脚本中调用标准的 Gradle 或 Maven 命令即可。
+
+## 下一步 {id="what-s-next"}
+
+* 了解如何[为 Kotlin Multiplatform 应用程序配置 TeamCity](https://kotlinlang.org/docs/multiplatform/configure-teamcity-for-kmp.html)，以构建、测试和部署 Kotlin Multiplatform 应用程序。
+* 按照教程在托管的 macOS 代理上[为 Kotlin Multiplatform 项目配置 iOS 交付流水线](https://kotlinlang.org/docs/multiplatform/ios-ci-cd-teamcity.html)，并自动部署到 TestFlight。
+* 了解如何[将项目设置存储在版本控制中](https://www.jetbrains.com/help/teamcity/storing-project-settings-in-version-control.html)，并使用 Kotlin DSL 将流水线作为代码进行管理。

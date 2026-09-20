@@ -5,7 +5,7 @@
 若要新增影片畫格支援，請匯入擴充套件程式庫：
 
 ```kotlin
-implementation("io.coil-kt.coil3:coil-video:3.6.2")
+implementation("io.coil-kt.coil3:coil-video:3.6.3")
 ```
 
 並在建構 `ImageLoader` 時將解碼器新增至您的組件登錄中：

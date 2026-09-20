@@ -70,12 +70,6 @@ Ktor 允許您根據 OpenAPI 規格提供 OpenAPI 文件。
 
   您可以將 `$swagger_codegen_version` 替換為所需的 `swagger-codegen-generators` 構件版本，例如 `%swagger_codegen_version%`。
 
-> 在 Ktor 3.4.0 中，`OpenAPI` 外掛程式需要 `ktor-server-routing-openapi` 相依性。
-> 這並非刻意的破壞性變更，將於 Ktor 3.4.1 中修正。
-> 如果您正在使用 Ktor 3.4.0，請手動加入該相依性以避免執行時錯誤。
->
-{style="warning"}
-
 ## 使用靜態 OpenAPI 檔案 {id="static-openapi-file"}
 
 若要從現有規格提供 OpenAPI 文件，請使用 [`openAPI()`](%plugin_api_link%) 函式並提供 OpenAPI 文件的路徑。
@@ -116,11 +110,35 @@ routing {
 
 ## 設定 OpenAPI {id="configure-openapi"}
 
-預設情況下，文件會使用 `StaticHtml2Codegen` 進行算繪。您可以在 `openAPI {}` 區塊中自訂算繪器：
+`openAPI {}` 設定區塊可讓您設定產生的 OpenAPI 文件以及 Ktor 如何算繪文件。
 
-> `StaticHtmlCodegen` 與 `StaticHtml2Codegen` 僅支援 OpenAPI 3.0.x 文件。將其用於 OpenAPI 3.1 文件可能會產生不完整或不正確的 HTML。對於 OpenAPI 3.1，請搭配 Swagger UI 5.x 使用 [`swaggerUI()`](server-swagger-ui.md) 函式。如果您需要繼續使用 OpenAPI 外掛程式的 HTML 算繪器，請將規格保持在 OpenAPI 3.0.3。
+### 設定文件元資料 {id="configure-document-metadata"}
+
+您可以直接在設定區塊中定義頂層 OpenAPI 元資料。
+
+例如，使用 `info` 指定一般 API 資訊，並使用 `tag()` 定義標籤及其說明：
+
+```kotlin
+openAPI("openapi") {
+    info = OpenApiInfo("Books API from routes", "1.0.0")
+    tag(
+        name = "Books",
+        description = "Operations on books"
+    )
+}
+```
+
+您也可以設定其他頂層 OpenAPI 屬性，例如伺服器、安全需求、可重複使用的元件、外部文件以及規格擴充。
+
+> 如需可用選項的完整清單，請參閱 [`OpenAPIConfig`](https://api.ktor.io/ktor-server-openapi/io.ktor.server.plugins.openapi/-open-a-p-i-config/index.html) API 參考。
 >
-{style="note"}
+{style="tip"}
+
+### 設定文件算繪器 {id="configure-the-document-renderer"}
+
+預設情況下，文件會使用 `StaticHtml2Codegen` 進行算繪。
+
+若要使用不同的算繪器，請將其指派給 `codegen` 屬性：
 
 ```kotlin
 routing {
@@ -128,3 +146,8 @@ routing {
         codegen = StaticHtmlCodegen()
     }
 }
+```
+
+> `StaticHtmlCodegen` 與 `StaticHtml2Codegen` 僅支援 OpenAPI 3.0.x 文件。將其用於 OpenAPI 3.1 文件可能會產生不完整或不正確的 HTML。對於 OpenAPI 3.1，請搭配 Swagger UI 5.x 使用 [`swaggerUI()`](server-swagger-ui.md) 函式。如果您需要繼續使用 OpenAPI 外掛程式的 HTML 算繪器，請將規格保持在 OpenAPI 3.0.3。
+>
+{style="note"}

@@ -79,9 +79,11 @@ ktor {
 
 ### HTTP/2 明文 (h2c) 支持 {id="http2-h2c-support"}
 
-Ktor 3.3.0 为 Netty 引擎引入了对 HTTP/2 明文 (h2c) 的支持，这允许在没有 TLS 加密的情况下进行 HTTP/2 通信。这种设置通常用于受信任的环境，例如本地测试或私有网络。
+Ktor 3.3.0 为 Netty 引擎引入了对基于明文的 HTTP/2 (h2c) 的支持，这允许在没有 TLS 加密的情况下进行 HTTP/2 通信。
+这种设置通常用于受信任的环境，例如本地测试或私有网络。
 
-要启用 h2c，请在引擎配置中将 `enableH2c` 标志设置为 true。有关更多信息，请参阅 [不带 TLS 的 HTTP/2](server-http2.md#http-2-without-tls)。
+要启用 h2c，请在引擎配置中将 `enableH2c` 标志设置为 true。
+有关更多信息，请参阅 [不带 TLS 的 HTTP/2](server-http2.md#http2-without-tls)。
 
 ## Ktor Client {id="ktor-client"}
 
@@ -99,7 +101,7 @@ install(SSE) {
 }
 ```
 
-或者针对每个调用进行配置：
+或者针对每次调用进行配置：
 
 ```kotlin
 client.sse(url, { bufferPolicy(SSEBufferPolicy.All) }) {
@@ -107,7 +109,7 @@ client.sse(url, { bufferPolicy(SSEBufferPolicy.All) }) {
 }
 ```
 
-随着 SSE 流被消耗，客户端会在内存缓冲区中维护已处理数据的快照（无需从网络重新读取）。如果发生错误，你可以安全地调用 `response?.bodyAsText()` 进行日志记录或诊断。
+随着 SSE 流被消耗，客户端会在内存缓冲区中维护已处理数据的快照（无需从网络重新读取）。如果发生错误，你可以安全地调用 `response?.bodyAsText()` 用于日志记录或诊断。
 
 有关更多信息，请参阅 [响应缓冲](client-server-sent-events.topic#response-buffering)。
 
@@ -153,6 +155,18 @@ val iosClient = WebRtcClient(IosWebRtc) {
 
 </TabItem>
 
+<TabItem title="JVM" group-key="jvm">
+
+```kotlin
+val jvmClient = WebRtcClient(JvmWebRtc) {
+    defaultConnectionConfig = {
+        iceServers = listOf(WebRtc.IceServer("stun:stun.l.google.com:19302"))
+    }
+}
+```
+
+</TabItem>
+
 创建后，客户端可以使用交互式连接建立 (ICE) 建立点对点连接。协商完成后，对等点可以打开数据通道并交换消息。
 
 ```kotlin
@@ -167,8 +181,8 @@ connection.awaitIceGatheringComplete()
 // 侦听传入的数据通道事件
 connection.dataChannelEvents.collect { event ->
    when (event) {
-     is Open -> println("另一个对等点打开了一个通道: ${event.channel}")
-     is Closed -> println("数据通道已关闭")
+     is Open -> println("Another peer opened a chanel: ${event.channel}")
+     is Closed -> println("Data channel is closed")
      is Closing, is BufferedAmountLow, is Error -> println(event)
    }
 }

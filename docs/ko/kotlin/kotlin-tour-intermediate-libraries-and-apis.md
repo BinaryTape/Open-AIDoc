@@ -274,10 +274,19 @@ fun main() {
 
 다음 단계로, 인기 있는 Kotlin 애플리케이션을 위한 튜토리얼을 확인해 보세요:
 
-* [Spring Boot와 Kotlin으로 백엔드 애플리케이션 만들기](jvm-create-project-with-spring-boot.md)
-* Android 및 iOS용 크로스 플랫폼 애플리케이션을 처음부터 만들기:
-    * [UI는 네이티브로 유지하면서 비즈니스 로직 공유하기](https://kotlinlang.org/docs/multiplatform/multiplatform-create-first-app.html)
-    * [비즈니스 로직과 UI 모두 공유하기](https://kotlinlang.org/docs/multiplatform/compose-multiplatform-create-first-app.html)
+<p></p> <!-- workaround for MRK057: Paragraph can only contain inline elements -->
+<panels columns="2" id="kotlin-tour-whats-next">
+    <panel>
+        <title>백엔드를 위한 Kotlin</title>
+        <p>Spring Boot와 Kotlin으로 백엔드 애플리케이션 만들기.</p>
+        <a href="jvm-create-project-with-spring-boot.md" as="button" icon="arrow-right" icon-position="right" id="kotlin-tour-backend-tutorial">시작하기</a>
+    </panel>
+    <panel>
+        <title>Kotlin Multiplatform</title>
+        <p>크로스 플랫폼 애플리케이션을 처음부터 만들고 비즈니스 로직과 UI 공유하기.</p>
+        <a href="https://kotlinlang.org/docs/multiplatform/compose-multiplatform-create-first-app.html" as="button" icon="arrow-right" icon-position="right" id="kotlin-tour-cmp-tutorial">시작하기</a>
+    </panel>
+</panels>
 
 <seealso></seealso>
 

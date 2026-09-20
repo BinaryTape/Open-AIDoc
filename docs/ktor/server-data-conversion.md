@@ -26,12 +26,14 @@
 用于 Ktor 服务器的 %plugin_name% 插件允许您为序列化和反序列化值列表添加自定义转换器。
 </link-summary>
 
-[%plugin_name%](https://api.ktor.io/ktor-utils/io.ktor.util.converters/-data-conversion/index.html) 插件允许您序列化和反序列化值列表。默认情况下，Ktor 通过 [DefaultConversionService](https://api.ktor.io/ktor-utils/io.ktor.util.converters/-default-conversion-service/index.html) 处理基本类型和枚举。您可以通过安装和配置 `%plugin_name%` 插件来扩展此服务以处理其他类型。
+[%plugin_name%](https://api.ktor.io/ktor-utils/io.ktor.util.converters/-data-conversion/index.html) 插件允许您序列化和反序列化值列表。默认情况下，Ktor 通过 [`DefaultConversionService`](https://api.ktor.io/ktor-utils/io.ktor.util.converters/-default-conversion-service/index.html) 处理字符串和常用类型，包括数值类型、无符号整数类型、`Uuid` 以及枚举。
+
+您可以通过安装和配置 `%plugin_name%` 插件来扩展此服务以处理其他类型。
 
 ## 添加依赖项 {id="add_dependencies"}
 
 <p>
-    要使用 <code>%plugin_name%</code>，您需要在构建脚本中包含 <code>%artifact_name%</code> 构件：
+    要使用 <code>%plugin_name%</code>，请在构建脚本中添加 <code>%artifact_name%</code> 构件：
 </p>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
@@ -49,14 +51,14 @@
 
 <p>
     要在应用程序中<a href="#install">安装</a> <code>%plugin_name%</code> 插件，请将其传递给指定<Links href="/ktor/server-modules" summary="模块允许您通过对路由进行分组来构建应用程序。">模块</Links>中的 <code>install</code> 函数。
-    以下代码片段展示了如何安装 <code>%plugin_name%</code> ...
+    以下示例展示了如何安装 <code>%plugin_name%</code>：
 </p>
 <list>
     <li>
-        ... 在 <code>embeddedServer</code> 函数调用中。
+        在 <code>embeddedServer()</code> 函数调用中。
     </li>
     <li>
-        ... 在显式定义的 <code>module</code>（它是 <code>Application</code> 类的扩展函数）中。
+        在 <code>Application</code> 类上显式定义的 <code>module()</code> 扩展函数中。
     </li>
 </list>
 <Tabs>
@@ -88,9 +90,7 @@
       }
   ```
 
-## 访问服务 {id="access-the-service"}
-
-{id="service"}
+## 访问服务 {id="service"}
 
 您可以从当前上下文中访问 `%plugin_name%` 服务：
 
@@ -100,7 +100,7 @@ val dataConversion = application.conversionService
 
 然后，您可以使用转换器服务来调用回调函数：
 
-* `fromValues(values: List<String>, type: TypeInfo)` 回调函数接受 `values` 字符串列表，以及要转换到的 `TypeInfo` 目标类型，并返回解码后的值。
+* `fromValues(values: List<String>, type: TypeInfo)` 回调函数接受 `values` 字符串列表以及要转换到的目标 `TypeInfo`，并返回解码后的值。
 * `toValues(value: Any?)` 回调函数接受一个任意值，并返回代表该值的字符串列表。
 
 ## 示例 {id="example"}

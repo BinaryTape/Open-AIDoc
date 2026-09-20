@@ -22,16 +22,24 @@
 </p>
 </tldr>
 
-[OAuth](https://oauth.net/)는 액세스 위임(access delegation)을 위한 개방형 표준입니다. OAuth를 사용하면 Google, Facebook, Twitter 등과 같은 외부 제공자를 사용하여 애플리케이션의 사용자를 인증(authorize)할 수 있습니다.
+[OAuth](https://oauth.net/)는 액세스 위임(access delegation)을 위한 개방형 표준입니다. OAuth를 사용하면 Google, Facebook, Twitter 등과 같은 외부 제공자를 사용하여 애플리케이션 사용자를 인증(authorize)할 수 있습니다.
 
 `oauth` 제공자는 권한 부여 코드 플로우(authorization code flow)를 지원합니다. OAuth 파라미터를 한 곳에서 구성할 수 있으며, Ktor는 필요한 파라미터와 함께 지정된 권한 부여 서버로 자동 요청을 보냅니다.
 
 > Ktor의 인증 및 인가에 대한 일반적인 정보는 [Ktor 서버의 인증 및 인가(Authentication and authorization in Ktor Server)](server-auth.md) 섹션에서 확인할 수 있습니다.
 
+> Ktor는 타입이 지정된(typed) OAuth 2.0 플로우도 제공합니다. 이름을 지정하여 제공자를 구성하는 대신, 플로우 값을 생성하여 설치하면 Ktor가 로그인 및 콜백 라우트를 자동으로 생성해 줍니다. 또한 `oauth2Session` 플로우는 로그인 후 애플리케이션 라우트를 보호하기 위한 스키마를 제공합니다. [OAuth 2.0 플로우(OAuth 2.0 flows)](server-oauth2-flows.md)를 참조하세요.
+>
+{style="tip"}
+
+> 사용하는 제공자가 OpenID Connect를 지원하는 경우, `Oidc` 플러그인을 통해 더 많은 작업을 수행할 수 있습니다. 이 플러그인은 제공자의 디스커버리 문서를 읽으므로 권한 부여, 토큰, JWKS 엔드포인트 대신 발급자(issuer) URL만 구성하면 되며, PKCE, ID 토큰 검증, 세션 및 로그아웃을 자동으로 처리해 줍니다. [OpenID Connect](server-oidc.md)를 참조하세요.
+>
+{style="tip"}
+
 ## 의존성 추가 {id="add_dependencies"}
 
 <p>
-    <code>%plugin_name%</code>을 사용하려면 빌드 스크립트에 <code>%artifact_name%</code> 아티팩트를 포함해야 합니다:
+    <code>%plugin_name%</code>을 사용하려면 빌드 스크립트에 <code>%artifact_name%</code> 아티팩트를 추가해야 합니다:
 </p>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
@@ -53,7 +61,9 @@
 ```kotlin
 import io.ktor.server.sessions.*
 
-fun Application.main(httpClient: HttpClient = applicationHttpClient) {
+fun Application.main(
+    httpClient: HttpClient = applicationHttpClient
+) {
     install(Sessions) {
         cookie<UserSession>("user_session")
     }
@@ -87,14 +97,16 @@ Ktor 애플리케이션에서의 OAuth 권한 부여 플로우는 다음과 같�
 
 ## OAuth 설치 {id="install"}
 
-`oauth` 인증 제공자를 설치하려면, `install` 블록 내에서 [oauth](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/oauth.html) 함수를 호출하세요. 선택적으로 [제공자 이름](server-auth.md#provider-name)을 지정할 수 있습니다.
+`oauth` 인증 제공자를 설치하려면 `install` 블록 내에서 [oauth](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/oauth.html) 함수를 호출하세요. 선택적으로 [제공자 이름](server-auth.md#provider-name)을 지정할 수 있습니다.
 예를 들어, "auth-oauth-google"이라는 이름으로 `oauth` 제공자를 설치하는 방법은 다음과 같습니다:
 
 ```kotlin
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 
-fun Application.main(httpClient: HttpClient = applicationHttpClient) {
+fun Application.main(
+    httpClient: HttpClient = applicationHttpClient
+) {
     install(Authentication) {
         oauth("auth-oauth-google") {
             // oauth 인증 구성
@@ -142,7 +154,9 @@ val applicationHttpClient = HttpClient(CIO) {
 클라이언트 인스턴스는 서버 [테스트](server-testing.md)에서 별도의 클라이언트 인스턴스를 생성할 수 있도록 `main` [모듈 함수](server-modules.md)로 전달됩니다.
 
 ```kotlin
-fun Application.main(httpClient: HttpClient = applicationHttpClient) {
+fun Application.main(
+    httpClient: HttpClient = applicationHttpClient
+) {
 }
 ```
 
@@ -152,6 +166,16 @@ fun Application.main(httpClient: HttpClient = applicationHttpClient) {
 고정된 OAuth 설정이 있는 제공자의 경우 `settings` 속성을 사용하세요.
 
 ```kotlin
+val googleAuthorizeUrl =
+    "https://accounts.google.com/o/oauth2/auth"
+val googleTokenUrl =
+    "https://accounts.google.com/o/oauth2/token"
+val profileScope =
+    "https://www.googleapis.com/auth/userinfo.profile"
+val googleClientId =
+    System.getenv("GOOGLE_CLIENT_ID").orEmpty()
+val googleClientSecret =
+    System.getenv("GOOGLE_CLIENT_SECRET").orEmpty()
 val redirects = ConcurrentMap<String, String>()
 install(Authentication) {
     oauth("auth-oauth-google") {
@@ -159,16 +183,18 @@ install(Authentication) {
         urlProvider = { "http://localhost:8080/callback" }
         settings = OAuthServerSettings.OAuth2ServerSettings(
                 name = "google",
-                authorizeUrl = "https://accounts.google.com/o/oauth2/auth",
-                accessTokenUrl = "https://accounts.google.com/o/oauth2/token",
+                authorizeUrl = googleAuthorizeUrl,
+                accessTokenUrl = googleTokenUrl,
                 requestMethod = HttpMethod.Post,
-                clientId = System.getenv("GOOGLE_CLIENT_ID").orEmpty(),
-                clientSecret = System.getenv("GOOGLE_CLIENT_SECRET").orEmpty(),
-                defaultScopes = listOf("https://www.googleapis.com/auth/userinfo.profile"),
-                extraAuthParameters = listOf("access_type" to "offline"),
+                clientId = googleClientId,
+                clientSecret = googleClientSecret,
+                defaultScopes = listOf(profileScope),
+                extraAuthParameters =
+                    listOf("access_type" to "offline"),
                 onStateCreated = { call, state ->
                     // 리다이렉트 url 값과 함께 새로운 state 저장
-                    call.request.queryParameters["redirectUrl"]?.let {
+                    val query = call.request.queryParameters
+                    query["redirectUrl"]?.let {
                         redirects[state] = it
                     }
                 }
@@ -177,7 +203,10 @@ install(Authentication) {
             if (cause is OAuth2RedirectError) {
                 respondRedirect("/login-after-fallback")
             } else {
-                respond(HttpStatusCode.Forbidden, cause.message)
+                respond(
+                    HttpStatusCode.Forbidden,
+                    cause.message
+                )
             }
         }
         client = httpClient
@@ -223,13 +252,19 @@ routing {
             }
 
             get("/callback") {
-                val currentPrincipal: OAuthAccessTokenResponse.OAuth2? = call.principal()
+                val currentPrincipal:
+                    OAuthAccessTokenResponse.OAuth2? =
+                        call.principal()
                 // 권한 부여 전에 url을 찾을 수 없는 경우 홈으로 리다이렉트
                 currentPrincipal?.let { principal ->
                     principal.state?.let { state ->
-                        call.sessions.set(UserSession(state, principal.accessToken))
-                        redirects.remove(state)?.let { redirect ->
-                            call.respondRedirect(redirect)
+                        val session = UserSession(
+                            state,
+                            principal.accessToken
+                        )
+                        call.sessions.set(session)
+                        redirects.remove(state)?.let { url ->
+                            call.respondRedirect(url)
                             return@get
                         }
                     }
@@ -256,9 +291,12 @@ routing {
 private suspend fun getPersonalGreeting(
     httpClient: HttpClient,
     userSession: UserSession
-): UserInfo = httpClient.get("https://www.googleapis.com/oauth2/v2/userinfo") {
+): UserInfo = httpClient.get(
+    "https://www.googleapis.com/oauth2/v2/userinfo"
+) {
     headers {
-        append(HttpHeaders.Authorization, "Bearer ${userSession.token}")
+        val bearer = "Bearer ${userSession.token}"
+        append(HttpHeaders.Authorization, bearer)
     }
 }.body()
 ```
@@ -269,7 +307,8 @@ private suspend fun getPersonalGreeting(
 get("/{path}") {
     val userSession: UserSession? = getSession(call)
     if (userSession != null) {
-        val userInfo: UserInfo = getPersonalGreeting(httpClient, userSession)
+        val userInfo: UserInfo =
+            getPersonalGreeting(httpClient, userSession)
         call.respondText("Hello, ${userInfo.name}!")
     }
 }

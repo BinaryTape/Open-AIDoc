@@ -28,10 +28,18 @@
 
 > 您可以在 [Ktor Server 中的身份验证与授权](server-auth.md)章节中获取有关 Ktor 身份验证与授权的一般信息。
 
+> Ktor 还提供了类型化的 OAuth 2.0 流。无需配置指定名称的提供程序，只需创建并安装一个流值，Ktor 就会自动为您创建登录和回调路由。`oauth2Session` 流还为您提供了一种在登录后保护应用程序路由的方案。请参阅 [OAuth 2.0 流](server-oauth2-flows.md)。
+>
+{style="tip"}
+
+> 如果您的提供程序支持 OpenID Connect，`Oidc` 插件的功能更为强大。它会读取提供程序的发现文档（discovery document），因此您只需配置签发者 URL（issuer URL），而无需手动配置授权、令牌和 JWKS 端点，并且它会为您处理 PKCE、ID 令牌验证、会话以及注销。请参阅 [OpenID Connect](server-oidc.md)。
+>
+{style="tip"}
+
 ## 添加依赖项 {id="add_dependencies"}
 
 <p>
-    要使用 <code>%plugin_name%</code>，您需要在构建脚本中包含 <code>%artifact_name%</code> 构件：
+    要使用 <code>%plugin_name%</code>，您需要在构建脚本中添加 <code>%artifact_name%</code> 构件：
 </p>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
@@ -53,7 +61,9 @@
 ```kotlin
 import io.ktor.server.sessions.*
 
-fun Application.main(httpClient: HttpClient = applicationHttpClient) {
+fun Application.main(
+    httpClient: HttpClient = applicationHttpClient
+) {
     install(Sessions) {
         cookie<UserSession>("user_session")
     }
@@ -75,7 +85,7 @@ Ktor 应用程序中的 OAuth 授权流可能如下所示：
     * 授权类型（grant type）：用于获取访问令牌（授权码）。
     * `state` 参数：用于缓解 CSRF 攻击并重定向用户。
     * 特定提供程序的其他可选参数。
-3. 授权页面会显示一个同意屏幕，列出 Ktor 应用程序所需的权限级别。这些权限取决于[步骤 2：配置 OAuth 提供程序](#configure-oauth-provider)中所配置的作用域。
+3. 授权页面会显示一个同意屏幕，列出 Ktor 应用程序所需的权限级别。这些权限取决于在[步骤 2：配置 OAuth 提供程序](#configure-oauth-provider)中配置的指定作用域。
 4. 如果用户批准了请求的权限，授权服务器将重定向回指定的重定向 URL 并发送授权码。
 5. Ktor 会向指定的访问令牌 URL 再次发起自动请求，包含以下参数：
     * 授权码。
@@ -94,7 +104,9 @@ Ktor 应用程序中的 OAuth 授权流可能如下所示：
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 
-fun Application.main(httpClient: HttpClient = applicationHttpClient) {
+fun Application.main(
+    httpClient: HttpClient = applicationHttpClient
+) {
     install(Authentication) {
         oauth("auth-oauth-google") {
             // 配置 oauth 身份验证
@@ -142,7 +154,9 @@ val applicationHttpClient = HttpClient(CIO) {
 客户端实例被传递到 `main` [模块函数](server-modules.md)，以便能够在服务器[测试](server-testing.md)中创建单独的客户端实例。
 
 ```kotlin
-fun Application.main(httpClient: HttpClient = applicationHttpClient) {
+fun Application.main(
+    httpClient: HttpClient = applicationHttpClient
+) {
 }
 ```
 
@@ -152,6 +166,16 @@ fun Application.main(httpClient: HttpClient = applicationHttpClient) {
 对于具有固定 OAuth 设置的提供程序，请使用 `settings` 属性。
 
 ```kotlin
+val googleAuthorizeUrl =
+    "https://accounts.google.com/o/oauth2/auth"
+val googleTokenUrl =
+    "https://accounts.google.com/o/oauth2/token"
+val profileScope =
+    "https://www.googleapis.com/auth/userinfo.profile"
+val googleClientId =
+    System.getenv("GOOGLE_CLIENT_ID").orEmpty()
+val googleClientSecret =
+    System.getenv("GOOGLE_CLIENT_SECRET").orEmpty()
 val redirects = ConcurrentMap<String, String>()
 install(Authentication) {
     oauth("auth-oauth-google") {
@@ -159,16 +183,18 @@ install(Authentication) {
         urlProvider = { "http://localhost:8080/callback" }
         settings = OAuthServerSettings.OAuth2ServerSettings(
                 name = "google",
-                authorizeUrl = "https://accounts.google.com/o/oauth2/auth",
-                accessTokenUrl = "https://accounts.google.com/o/oauth2/token",
+                authorizeUrl = googleAuthorizeUrl,
+                accessTokenUrl = googleTokenUrl,
                 requestMethod = HttpMethod.Post,
-                clientId = System.getenv("GOOGLE_CLIENT_ID").orEmpty(),
-                clientSecret = System.getenv("GOOGLE_CLIENT_SECRET").orEmpty(),
-                defaultScopes = listOf("https://www.googleapis.com/auth/userinfo.profile"),
-                extraAuthParameters = listOf("access_type" to "offline"),
+                clientId = googleClientId,
+                clientSecret = googleClientSecret,
+                defaultScopes = listOf(profileScope),
+                extraAuthParameters =
+                    listOf("access_type" to "offline"),
                 onStateCreated = { call, state ->
-                    // 保存带有重定向 url 值的新状态
-                    call.request.queryParameters["redirectUrl"]?.let {
+                    // 保存带有重定向 url 的新状态
+                    val query = call.request.queryParameters
+                    query["redirectUrl"]?.let {
                         redirects[state] = it
                     }
                 }
@@ -177,7 +203,10 @@ install(Authentication) {
             if (cause is OAuth2RedirectError) {
                 respondRedirect("/login-after-fallback")
             } else {
-                respond(HttpStatusCode.Forbidden, cause.message)
+                respond(
+                    HttpStatusCode.Forbidden,
+                    cause.message
+                )
             }
         }
         client = httpClient
@@ -223,13 +252,19 @@ routing {
             }
 
             get("/callback") {
-                val currentPrincipal: OAuthAccessTokenResponse.OAuth2? = call.principal()
+                val currentPrincipal:
+                    OAuthAccessTokenResponse.OAuth2? =
+                        call.principal()
                 // 如果在授权前找不到该 url，则重定向回主页
                 currentPrincipal?.let { principal ->
                     principal.state?.let { state ->
-                        call.sessions.set(UserSession(state, principal.accessToken))
-                        redirects.remove(state)?.let { redirect ->
-                            call.respondRedirect(redirect)
+                        val session = UserSession(
+                            state,
+                            principal.accessToken
+                        )
+                        call.sessions.set(session)
+                        redirects.remove(state)?.let { url ->
+                            call.respondRedirect(url)
                             return@get
                         }
                     }
@@ -242,7 +277,7 @@ routing {
 
 在此示例中，接收令牌后执行了以下操作：
 
-* 令牌被保存在 [会话](server-sessions.md) 中，其内容可以在其他路由中访问。
+* 令牌被保存在[会话](server-sessions.md)中，其内容可以在其他路由中访问。
 * 用户被重定向到下一个发起 Google API 请求的路由。
 * 如果未找到请求的路由，用户将被重定向到 `/home` 路由。
 
@@ -256,9 +291,12 @@ routing {
 private suspend fun getPersonalGreeting(
     httpClient: HttpClient,
     userSession: UserSession
-): UserInfo = httpClient.get("https://www.googleapis.com/oauth2/v2/userinfo") {
+): UserInfo = httpClient.get(
+    "https://www.googleapis.com/oauth2/v2/userinfo"
+) {
     headers {
-        append(HttpHeaders.Authorization, "Bearer ${userSession.token}")
+        val bearer = "Bearer ${userSession.token}"
+        append(HttpHeaders.Authorization, bearer)
     }
 }.body()
 ```
@@ -269,7 +307,8 @@ private suspend fun getPersonalGreeting(
 get("/{path}") {
     val userSession: UserSession? = getSession(call)
     if (userSession != null) {
-        val userInfo: UserInfo = getPersonalGreeting(httpClient, userSession)
+        val userInfo: UserInfo =
+            getPersonalGreeting(httpClient, userSession)
         call.respondText("Hello, ${userInfo.name}!")
     }
 }

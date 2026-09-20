@@ -4,12 +4,12 @@
 
 <link-summary>了解如何发送不同类型的响应。</link-summary>
 
-Ktor 允许您在 [路由处理程序](server-routing.md#define_route) 内部处理传入的 [请求](server-requests.md) 并发送响应。您可以发送不同类型的响应：纯文本、HTML 文档和模板、序列化数据对象等。您还可以配置各种 [响应参数](#parameters)，例如内容类型、标头、Cookie 和状态码。
+Ktor 允许您在[路由处理程序](server-routing.md#define_route)内部处理传入的[请求](server-requests.md)并发送响应。您可以发送不同类型的响应：纯文本、HTML 文档和模板、序列化数据对象等。您还可以配置各种[响应参数](#parameters)，例如内容类型、标头、Cookie 和状态码。
 
 在路由处理程序内部，可以使用以下 API 来处理响应：
-* 一组用于 [发送特定内容类型](#payload) 的函数，例如 [`call.respondText()`](https://api.ktor.io/ktor-server-core/io.ktor.server.response/respond-text.html) 和 [`call.respondHtml()`](https://api.ktor.io/ktor-server-html-builder/io.ktor.server.html/respond-html.html)。 
-* [`call.respond()`](https://api.ktor.io/ktor-server-core/io.ktor.server.response/respond.html) 函数，允许您在响应中 [发送任何数据类型](#payload)。当安装了 [ContentNegotiation](server-serialization.md) 插件时，您可以发送以特定格式序列化的数据对象。
-* [`call.response()`](https://api.ktor.io/ktor-server-core/io.ktor.server.application/-application-call/response.html) 属性，返回 [`ApplicationResponse`](https://api.ktor.io/ktor-server-core/io.ktor.server.response/-application-response/index.html) 对象，提供对 [响应参数](#parameters) 的访问，以便设置状态码、添加标头和配置 Cookie。
+* 一组用于[发送特定内容类型](#payload)的函数，例如 [`call.respondText()`](https://api.ktor.io/ktor-server-core/io.ktor.server.response/respond-text.html) 和 [`call.respondHtml()`](https://api.ktor.io/ktor-server-html-builder/io.ktor.server.html/respond-html.html)。 
+* [`call.respond()`](https://api.ktor.io/ktor-server-core/io.ktor.server.response/respond.html) 函数，允许您在响应中[发送任何数据类型](#payload)。当安装了 [ContentNegotiation](server-serialization.md) 插件时，您可以发送以特定格式序列化的数据对象。
+* [`call.response()`](https://api.ktor.io/ktor-server-core/io.ktor.server.application/-application-call/response.html) 属性，返回 [`ApplicationResponse`](https://api.ktor.io/ktor-server-core/io.ktor.server.response/-application-response/index.html) 对象，提供对[响应参数](#parameters)的访问，以便设置状态码、添加标头和配置 Cookie。
 * [`call.respondRedirect()`](https://api.ktor.io/ktor-server-core/io.ktor.server.response/respond-redirect.html) 函数，用于发送重定向响应。
 
 ## 设置响应负载 {id="payload"}
@@ -53,11 +53,11 @@ get("/") {
 
 #### 部分 HTML 片段 {id="partial-html-fragments"}
 
-如果您只需要返回 HTML 片段，而不将其包装在 `<html>`、`<head>` 或 `<body>` 中，可以使用 `call.respondHtmlFragment()`：
+如果您只需要返回 HTML 片段，而不将其包装在 `<html>`、`<head>` 或 `<body>` 中，可以使用 `call.respondHtmlPartial()`：
 
 ```kotlin
     get("/fragment") {
-        call.respondHtmlFragment(HttpStatusCode.Created) {
+        call.respondHtmlPartial(HttpStatusCode.Created) {
             div("fragment") {
                 span { +"Created!" }
             }
@@ -83,7 +83,7 @@ get("/index") {
     call.respondTemplate("index.ftl", mapOf("user" to sampleUser))
 }
 ```
-您可以从 [模板](server-templating.md) 帮助部分了解更多信息。
+您可以从[模板](server-templating.md)帮助部分了解更多信息。
 
 ### 对象 {id="object"}
 
@@ -108,7 +108,7 @@ routing {
 - 对于表示为 `File` 对象的文件，请使用 [`call.respondFile()`](https://api.ktor.io/ktor-server-core/io.ktor.server.response/respond-file.html) 函数。
 - 对于由给定 `Path` 对象指向的文件，请将 `call.respond()` 函数与 [`LocalPathContent`](https://api.ktor.io/ktor-server-core/io.ktor.server.http.content/-local-path-content/index.html) 类配合使用。
 
-下面的示例显示了如何通过添加 `Content-Disposition` [标头](#headers) 来发送文件并使其可供下载：
+下面的示例显示了如何通过添加 `Content-Disposition` [标头](#headers)来发送文件并使其可供下载：
 
 ```kotlin
 import io.ktor.http.*
@@ -169,7 +169,7 @@ routing {
 ```
 
 在上面的示例中，由于资源扩展名是 `.html`，因此响应将包含 `Content-Type: text/html` 标头。
-为方便起见，您可以分别通过第一个和第二个参数传递资源位置的组成部分，即相对路径和软件包。
+为方便起见，您可以分别通过第一个和第二个形参传递资源位置的组成部分，即相对路径和软件包。
 以下示例根据请求的路径解析 `assets` 软件包下的资源：
 
 ```kotlin
@@ -222,9 +222,9 @@ get("/") {
 
 ### 内容类型 {id="content-type"}
 
-在安装了 [ContentNegotiation](server-serialization.md) 插件的情况下，Ktor 会自动选择内容类型。如果需要，您可以通过传递相应的参数手动指定内容类型。 
+在安装了 [ContentNegotiation](server-serialization.md) 插件的情况下，Ktor 会自动选择内容类型。如果需要，您可以通过传递相应的形参手动指定内容类型。 
 
-在下面的示例中，`call.respondText()` 函数接受 `ContentType.Text.Plain` 作为参数：
+在下面的示例中，`call.respondText()` 函数接受 `ContentType.Text.Plain` 作为形参：
 
 ```kotlin
 get("/") {
@@ -279,7 +279,7 @@ get("/") {
 }
 ```
 
-> Ktor 还提供了使用 Cookie 处理会话的功能。要了解更多信息，请参阅 [会话](server-sessions.md)。
+> Ktor 还提供了使用 Cookie 处理会话的功能。要了解更多信息，请参阅[会话](server-sessions.md)。
 
 ## 重定向 {id="redirect"}
 

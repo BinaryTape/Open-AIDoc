@@ -1,4 +1,5 @@
 [//]: # (title: Spring AIを使用して質問に答えるKotlinアプリを作成する — チュートリアル)
+[//]: # (description: Kotlin、Spring AI、Spring Boot、OpenAI、Qdrant、およびRAGを使用してドキュメント質問応答アプリケーションを構築する方法を学びます。)
 
 <web-summary>Spring AIを使用して質問に答えるKotlinアプリを作成する方法を学びます。</web-summary>
 
@@ -35,7 +36,7 @@
 >
 {style="note"}
 
-IntelliJ IDEA Ultimate Editionで新しいSpring Bootプロジェクトを作成します。
+IntelliJ IDEA Ultimateサブスクリプションで新しいSpring Bootプロジェクトを作成します。
 
 1. IntelliJ IDEAで、**File** | **New** | **Project** を選択します。
 2. 左側のパネルで、**New Project** | **Spring Boot** を選択します。

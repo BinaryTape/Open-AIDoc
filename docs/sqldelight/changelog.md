@@ -12,8 +12,68 @@
 
 ### 已修复 {id="fixed"}
 
+- 暂无！
+
+## [2.4.0] - 2026-09-17 {id="2-4-0-2026-09-17"}
+[2.4.0]: https://github.com/sqldelight/sqldelight/releases/tag/2.4.0
+
+### 已添加
+- [原生驱动程序] 为 `inMemoryDriver` 添加了 `extendedConfig` 形参 (#5539 由 @GuilhE 贡献)
+- [PostgreSQL 方言] 添加了对隐式定义的系统列 (System Columns) 的查询支持 (#5834 由 @griffio 贡献)
+- [PostgreSQL 方言] 添加了基础数组字面量 (Array literal) 支持 (#5997 由 @griffio 贡献)
+- [PostgreSQL 方言] 添加了基础 LTREE 支持 (#5880 由 @yesitskev @griffio 贡献)
+- [MySQL 方言] 添加了对 INET 函数的支持 (#5072 由 @mcxinyu 贡献)
+- [PostgreSQL 方言] 添加了对 `ALTER INDEX` 的支持 (#6224 由 @griffio 贡献)
+- [SQLite 方言] 添加了对 SQLite 3.44 聚合函数 `DISTINCT`、`ORDER BY` 和 `FILTER` 的支持 (#6236 由 @griffio 贡献)
+- [SQLite 方言] 添加了对 SQLite 3.37 STRICT 表的支持 (#6230 由 @griffio 贡献)
+- [Gradle 插件] 添加了通过 `codegenExcludedColumns` 从生成的模型中排除列的支持 (#6243 由 @sokolikp 贡献)
+- [编译器] 在架构中添加了 `allTableNames` 函数 (#6245 由 @edenman 贡献)
+- [PostgreSQL 方言] 添加了对 `ANY` 运算符的支持 (#6253 由 @griffio 贡献)
+- [SQLite 方言] 为 SQLite 3.39 添加了对 `RIGHT JOIN` 和 `FULL JOIN` 的支持 (#6273 由 @griffio 贡献)
+- [PostgreSQL 方言] 添加了对触发器函数中 `RAISE` 语句和 `FOUND` 变量的支持 (#6297 由 @griffio 贡献)
+
+### 已变更
+- [PostgreSQL 方言] 将 `arrayIntermediateType` 的可见性更改为 public (#5835 由 @griffio 贡献)
+- [Gradle 插件] 实现了更严格的 `MigrationFile` 版本控制 (#5730 由 @madisp 贡献)
+- [Gradle 插件] 将最低支持的 Gradle 版本提高到 8.2.1 (#6217 由 @maxsav 贡献)
+- [Gradle 插件] 支持 Gradle 隔离项目 (isolated projects) (#6217 由 @maxsav 贡献)
+- [IntelliJ 插件] 最低版本要求为 2023.3 / Android Studio Jellyfish
+
+### 已修复
+- [Gradle 插件] 抑制 JDK 24+ 上编译器工作程序 (compiler worker) 的 `sun.misc.Unsafe` 弃用警告 (#6321)
+- [编译器] 抑制生成代码中的 Kotlin 额外警告 (#6208 由 @eyupcanakman 贡献)
+- [编译器] 非分组聚合结果集中的其他列始终为可为 null
+- [PostgreSQL 方言] 正确解析 `coalesce` 和 `ifnull` 的为 null 性
+- [PostgreSQL 方言] 修复了 PostgreSQL 方言的 IDE 集成
+- [PostgreSQL 方言] 改进了 PostgreSQL 方言的 IDE 插件 (#6209 由 @griffio 贡献)
+- [IntelliJ 插件] IDE 插件可以为所有方言执行代码补全 (#6210 由 @griffio 贡献)
+- [Gradle 插件] 修复了运行验证数据库任务时的循环依赖错误 (#6221 由 @griffio 贡献)
+- [编译器] 修复了多行更新的乐观锁问题 (#6240 由 @griffio 贡献)
+- [IntelliJ 插件] 修复了在 IDEA 2026.2 中导致崩溃的弃用 (deprecation) 问题 (#6247 由 @griffio 贡献)
+- [Gradle 插件] 修复了生成的源码在 AGP 8.9 到 8.11 上未被 Kotlin 编译拾取的问题
+- [PostgreSQL 方言] 修复了 `lower` 和 `upper` 函数使用原始绑定实参时默认为 `TEXT` 的问题 (#6262 由 @griffio 贡献)
+- [编译器] 修复了使用适配器且迁移更改了为 null 性时，通过数据类绑定插入值的问题 (#6269 由 @griffio 贡献)
+- [编译器] 在使用 null 安全运算符（`IS` 和 `IS DISTINCT FROM`）时使用可为 null 的绑定实参 (#6265 由 @griffio 贡献)
+- [Gradle 插件] 为项目依赖项使用 AGP 的变体解析 (#6217 由 @maxsav 贡献)
+- [Gradle 插件] 修复了当构建之间的 AGP 变体列表不同时，`generateDatabaseInterface` 出现的构建缓存未命中问题
+- [Gradle 插件] 修复了在未配置任何数据库的情况下应用插件时导致的 IDE 同步崩溃问题 (#6088)
+- [PostgreSQL 方言] 修复了使用嵌套函数调用时的 JSON 聚合函数问题 (#6281 由 @griffio 贡献)
+- [Paging3 扩展] 修复了数据库为空时 `KeyedQueryPagingSource` 崩溃的问题 (#6284 由 @woods-marshes 贡献)
+- [编译器] 修复了当变更器语句与 `COALESCE` 等封装函数一起使用时出现的 Java 类型适配器问题 (#6292 由 @griffio 贡献)
+- [编译器] 修复了模块名称大写时，生成的代码包名也大写的问题 (#6316 由 @griffio 贡献)
+- [PostgreSQL 方言] 允许日期数据类型不区分大小写 (#6328 由 @griffio 贡献)
 - [PostgreSQL 方言] 修复了 `string_agg` 函数为可为 null 的问题 (#6340 由 @griffio 贡献)
 - [SQLite 方言] 修复了使用 `GROUP BY` 的 SQLite 3.44 聚合函数问题 (#6343 由 @griffio 贡献)
+- [Gradle 插件] 避免在配置阶段解析数据库依赖项。 (#6353 由 @joshfriend 贡献)
+
+## [2.4.0-rc2] - 2026-09-14 {id="2-4-0-rc2-2026-09-14"}
+[2.4.0-rc2]: https://github.com/sqldelight/sqldelight/releases/tag/2.4.0-rc2
+
+### 已修复
+
+- [PostgreSQL 方言] 修复了 `string_agg` 函数为可为 null 的问题 (#6340 由 @griffio 贡献)
+- [SQLite 方言] 修复了使用 `GROUP BY` 的 SQLite 3.44 聚合函数问题 (#6343 由 @griffio 贡献)
+- [Gradle 插件] 避免在配置阶段解析数据库依赖项。 (#6353 由 @joshfriend 贡献)
 
 ## [2.4.0-rc1] - 2026-09-01 {id="2-4-0-rc1-2026-09-01"}
 [2.4.0-rc1]: https://github.com/sqldelight/sqldelight/releases/tag/2.4.0-rc1

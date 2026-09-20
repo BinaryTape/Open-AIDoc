@@ -9,16 +9,18 @@
 [Ktor HTTP client](client-create-and-configure.md) 是多平台的，可執行於 JVM、
 [Android](https://kotlinlang.org/docs/android-overview.html)、[JavaScript](https://kotlinlang.org/docs/js-overview.html)
 （包括 WebAssembly）以及 [Native](https://kotlinlang.org/docs/native-overview.html) 目標。每個平台都需要
-特定的引擎來處理網路請求。
-例如，您可以為 JVM 應用程式使用 `Apache` 或 `Jetty`，為 Android 使用 `OkHttp` 或 `Android`，
-為目標是 Kotlin/Native 的桌面應用程式使用 `Curl`。每個引擎在功能和
-配置上略有不同，因此您可以選擇最符合您的平台和使用案例需求的引擎。
+特定的用戶端引擎來處理網路請求。
+
+Ktor 為不同平台提供了數個引擎。例如，您可以為 JVM 應用程式使用 `Apache` 或 `Jetty`，
+為 Android 使用 `OkHttp` 或 `Android`，為目標是 Kotlin/Native 的桌面應用程式使用 `Curl`。
+
+每個引擎支援不同的功能和配置選項。對於多平台專案，您可以使用 Ktor 的預設引擎，或為各個目標選擇特定引擎。
 
 ## 支援的平台 {id="platforms"}
 
 下表列出了每個引擎支援的 [平台](client-supported-platforms.md)：
 
-| 引擎      | 平台                                                                                                             |
+| 引擎      | 平台                                                                                                              |
 |-----------|-------------------------------------------------------------------------------------------------------------------|
 | `Apache5` | [JVM](#jvm)                                                                                                       |
 | `Java`    | [JVM](#jvm)                                                                                                       |
@@ -45,12 +47,15 @@
 | `OkHttp`  | 5.0+              | 8+           |
 
 _* 若要在較舊的 Android 版本上使用 CIO 引擎，您需要
-啟用 [Java 8 API 脫糖 (desugaring)](https://developer.android.com/studio/write/java8-support)_。
+啟用 [Java 8 API 脫糖 (desugaring)](https://developer.android.com/studio/write/java8-support)。_
 
 ## 新增引擎相依性 {id="dependencies"}
 
 除了 [`ktor-client-core`](client-dependencies.md) 構件外，Ktor 用戶端還需要特定引擎的相依性。
-每個支援的平台都有的一組可用引擎，詳見相應章節：
+
+### 使用特定引擎 {id="use-a-specific-engine"}
+
+每個支援的平台都有一組可用引擎，詳見相應章節：
 
 * [JVM](#jvm)
 * [JVM 與 Android](#jvm-android)
@@ -63,11 +68,28 @@ _* 若要在較舊的 Android 版本上使用 CIO 引擎，您需要
 >
 {type="note"}
 
+### 在多平台專案中使用預設引擎 {id="default-engines"}
+
+對於大多數 Kotlin Multiplatform 專案，請使用 `ktor-client-engine-defaults` 構件。它為每個目標平台提供精心挑選的用戶端引擎，因此您無需在平台特定的原始碼集中宣告單獨的引擎相依性。
+
+將 `ktor-client-engine-defaults` 構件新增至您的 `commonMain` 原始碼集：
+
+```kotlin
+kotlin {
+    sourceSets {
+        commonMain {
+            dependencies {
+                api("io.ktor:ktor-client-engine-defaults:%ktor_version%")
+            }
+        }
+    }
+}
+```
+
 ## 指定引擎 {id="create"}
 
 若要使用特定引擎，請將引擎類別傳遞給 [
-`HttpClient`](https://api.ktor.io/ktor-client-core/io.ktor.client/-http-client/index.html) 建構函式。
-以下範例建立了一個使用 `CIO` 引擎的用戶端：
+`HttpClient`](https://api.ktor.io/ktor-client-core/io.ktor.client/-http-client/index.html) 建構函式。以下範例建立了一個使用 `CIO` 引擎的用戶端：
 
 ```kotlin
 import io.ktor.client.*
@@ -76,9 +98,9 @@ import io.ktor.client.engine.cio.*
 val client = HttpClient(CIO)
 ```
 
-## 預設引擎 {id="default"}
+## 自動選擇引擎 {id="default"}
 
-如果您省略引擎引數，用戶端將根據 [建置指令碼](#dependencies) 中的相依性自動選擇引擎。
+如果您省略引擎引數，用戶端將根據 [建置指令碼](#dependencies) 中可用的引擎相依性自動選擇引擎。
 
 ```kotlin
 import io.ktor.client.*
@@ -86,9 +108,11 @@ import io.ktor.client.*
 val client = HttpClient()
 ```
 
-這在多平台專案中特別有用。例如，對於一個同時針對
-[Android 和 iOS](client-create-multiplatform-application.md) 的專案，您可以將 [Android](#jvm-android) 相依性
-新增至 `androidMain` 原始碼集，並將 [Darwin](#darwin) 相依性新增至 `iosMain` 原始碼集。建立 `HttpClient` 時，會在執行時選擇適當的引擎。
+如果目標平台只有一個可用引擎，Ktor 就會使用該引擎。如果有多個可用引擎，Ktor 會選擇具有最高優先級的引擎。
+
+預設情況下，`CIO` 具有最低優先級。這表示如果同一個平台同時有 `CIO` 和其他支援的引擎可用，Ktor 會選擇另一個引擎。僅在沒有更高優先級的引擎可用時，才會使用 `CIO`。
+
+對於 Kotlin Multiplatform 專案，[`ktor-client-engine-defaults` 相依性](#default-engines) 為每個目標提供了預設引擎。或者，您也可以將[特定引擎相依性新增](#use-a-specific-engine)至相應的平台原始碼集中。
 
 ## 配置引擎 {id="configure"}
 
@@ -174,7 +198,7 @@ JVM 目標支援 [`Apache5`](#apache5)、[`Java`](#java) 以及
                // ...
            }
    
-           // 自訂逐次請求 (per-request) 設定
+           // 自訂逐次請求設定
            customizeRequest {
                // this: RequestConfig.Builder
            }
@@ -375,7 +399,7 @@ JVM 目標支援 [`Apache5`](#apache5)、[`Java`](#java) 以及
 Ktor 為 [Kotlin/Native](https://kotlinlang.org/docs/native-overview.html) 目標提供 [`Darwin`](#darwin)、[`WinHttp`](#winhttp) 和 [`Curl`](#curl) 引擎。
 
 > 在 Kotlin/Native 專案中使用 Ktor 需要
-> [新記憶體管理員](https://kotlinlang.org/docs/native-memory-manager.html)，從 Kotlin 1.7.20 開始已預設啟用。
+> [新記憶體管理器](https://kotlinlang.org/docs/native-memory-manager.html)，從 Kotlin 1.7.20 開始已預設啟用。
 >
 {id="newmm-note" style="note"}
 
@@ -558,13 +582,19 @@ CIO 引擎是一個完全非同步且基於協同程式的引擎，可用於 JVM
                random = mySecureRandom
                addKeyStore(myKeyStore, myKeyStorePassword)
            }
+           dnsResolver = CioDnsResolver(
+               server = "1.1.1.1",
+               timeout = 3.seconds
+           )
        }
    }
    ```
 
 ## JavaScript {id="js"}
 
-`Js` 引擎可用於 [JavaScript 專案](https://kotlinlang.org/docs/js-overview.html)。它對瀏覽器應用程式使用 [fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)，對 Node.js 使用 `node-fetch`。要使用 it，請按照以下步驟操作：
+`Js` 引擎可用於 [Kotlin/JS](https://kotlinlang.org/docs/js-overview.html) 專案。它對瀏覽器應用程式使用 [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)，對 Node.js 使用 `node-fetch`。
+
+要使用 `Js` 引擎，請按照以下步驟操作：
 
 1. 新增 `ktor-client-js` 相依性：
 
@@ -581,7 +611,7 @@ CIO 引擎是一個完全非同步且基於協同程式的引擎，可用於 JVM
            <code-block lang="XML" code="               &lt;dependency&gt;&#10;                   &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                   &lt;artifactId&gt;%artifact_name%%target%&lt;/artifactId&gt;&#10;                   &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;               &lt;/dependency&gt;"/>
        </TabItem>
    </Tabs>
-2. 將 `Js` 類別作為引數傳遞給 `HttpClient` 建構函式：
+2. 將 `Js` 類別作為引數傳遞給 `HttpClient()` 建構函式：
    ```kotlin
    import io.ktor.client.*
    import io.ktor.client.engine.js.*
@@ -596,7 +626,25 @@ CIO 引擎是一個完全非同步且基於協同程式的引擎，可用於 JVM
    val client = JsClient()
    ```
 
-完整範例請參閱 [client-engine-js](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-engine-js)。
+   > 完整範例請參閱 [client-engine-js](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-engine-js)。
+   > 
+   {style="tip"}
+
+### 覆寫 fetch {id="js-custom-fetch"}
+
+預設情況下，`Js` 引擎使用全域 `fetch()` 函式。若要使用自訂實作，請在引擎配置中設定 `fetch` 屬性：
+
+```kotlin
+val client = HttpClient(Js) {
+    engine {
+        fetch = { url, init ->
+            Promise.reject(IllegalStateException("Networking not available"))
+        }
+    }
+}
+```
+
+在與提供自訂 `fetch()` 實作或包裝函式的 JavaScript 程式庫進行整合時，這非常有用。
 
 ## 限制 {id="limitations"}
 
@@ -640,9 +688,10 @@ CIO 引擎是一個完全非同步且基於協同程式的引擎，可用於 JVM
 ## 範例：如何在多平台行動專案中配置引擎 {id="mpp-config"}
 
 在建置多平台專案時，您可以使用
-[預期宣告與實際宣告 (expected and actual declarations)](https://kotlinlang.org/docs/multiplatform-mobile-connect-to-platform-specific-apis.html) 
+[預期宣告與實際宣告 (expected and actual declarations)](https://kotlinlang.org/docs/multiplatform-mobile-connect-to-platform-specific-apis.html)
 來為每個目標平台選擇並配置引擎。這讓您能在通用程式碼中共享大部分用戶端配置，同時在平台程式碼中套用引擎特定的選項。
-我們將使用在 [建立跨平台行動應用程式](client-create-multiplatform-application.md) 教學中建立的專案來演示如何實現這一點：
+我們將使用在 [建立跨平台行動應用程式](client-create-multiplatform-application.md)
+教學中建立的專案來演示如何實現這一點：
 
 <procedure>
 

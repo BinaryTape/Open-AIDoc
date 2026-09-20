@@ -9,7 +9,7 @@
         <b>所需依赖项</b>：<code>io.ktor:%artifact_name%</code>
     </p>
     <p>
-        <b>支持的平台</b>：JS/Wasm、Android
+        <b>支持的平台</b>：JS/Wasm、Android、iOS、JVM
     </p>   
     <p>
         <b>代码示例</b>：<a href="https://github.com/ktorio/ktor-chat/">ktor-chat</a>
@@ -23,10 +23,10 @@ Web 实时通信 (WebRTC) 是一套用于浏览器和原生应用中实时点对
 
 Ktor 中的 WebRTC 客户端支持在多平台项目中进行实时点对点通信。借助 WebRTC，您可以构建如下功能：
 
-- 视频与语音通话
-- 多人游戏
-- 协作应用（白板、编辑器等）
-- 客户端之间的低延迟数据交换
+* 视频与语音通话
+* 多人游戏
+* 协作应用，例如白板和编辑器
+* 客户端之间的低延迟数据交换
 
 ## 添加依赖项 {id="add-dependencies"}
 
@@ -48,9 +48,10 @@ Ktor 中的 WebRTC 客户端支持在多平台项目中进行实时点对点通�
 
 创建 `WebRtcClient` 时，请根据目标平台选择引擎：
 
-- JS/Wasm：`JsWebRtc` – 使用 [WebRTC](https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API)、[媒体捕获与流](https://developer.mozilla.org/en-US/docs/Web/API/Media_Capture_and_Streams_API) 浏览器 API。
-- Android：`AndroidWebRtc` – 使用由 [Stream](https://github.com/GetStream/webrtc-android) 提供的 Android 预编译 WebRTC 库和 Android 媒体 API。
-- iOS：`IosWebRtc` - 使用适用于 iOS 的 [WebRTC SDK](https://github.com/webrtc-sdk) 和原生 [AVFoundation](https://developer.apple.com/documentation/avfoundation) 框架。
+* JS/Wasm：`JsWebRtc` 使用浏览器 [WebRTC](https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API) 与[媒体捕获与流](https://developer.mozilla.org/en-US/docs/Web/API/Media_Capture_and_Streams_API) API。
+* Android：`AndroidWebRtc` 使用预编译的 [Stream WebRTC Android 库](https://github.com/GetStream/webrtc-android)和 Android 媒体 API。
+* iOS：`IosWebRtc` 使用 [WebRTC SDK](https://github.com/webrtc-sdk) 和原生 [AVFoundation](https://developer.apple.com/documentation/avfoundation) 框架。
+* JVM：`JvmWebRtc` 使用由 [webrtc-java](https://github.com/devopvoid/webrtc-java) 提供的原生 WebRTC 绑定。
 
 您可以随后提供类似于 `HttpClient` 的平台特定配置。STUN/TURN 服务器是 [ICE](#ice) 正常工作所必需的。您可以使用 [coturn](https://github.com/coturn/coturn) 等现有解决方案：
 
@@ -88,11 +89,24 @@ val iosClient = WebRtcClient(IosWebRtc) {
 ```
 
 </TabItem>
+
+<TabItem title="JVM" group-key="jvm">
+
+```kotlin
+val jvmClient = WebRtcClient(JvmWebRtc) {
+    defaultConnectionConfig = {
+        iceServers = listOf(WebRtc.IceServer("stun:stun.l.google.com:19302"))
+    }
+}
+```
+
+</TabItem>
 </Tabs>
 
 ## 创建连接并协商 SDP {id="create-a-connection-and-negotiate-sdp"}
 
-创建 `WebRtcClient` 后，下一步是创建对等连接。对等连接是管理两个客户端之间实时通信的核心对象。
+创建 `WebRtcClient` 后，下一步是创建对等连接。
+对等连接是管理两个客户端之间实时通信的核心对象。
 
 为了建立连接，WebRTC 使用会话描述协议 (SDP)。这包含三个步骤：
 
@@ -126,9 +140,9 @@ caller.setRemoteDescription(
 
 SDP 协商完成后，对等端仍需发现如何跨网络连接。[交互式连接建立 (ICE)](https://en.wikipedia.org/wiki/Interactive_Connectivity_Establishment) 允许对等端寻找彼此间的网络路径。
 
-- 每个对等端收集自己的 ICE 候选者。
-- 这些候选者必须通过您选择的信令通道发送给另一个对等端。
-- 一旦双方都添加了彼此的候选者，连接即可成功。
+* 每个对等端收集自己的 ICE 候选者。
+* 这些候选者必须通过您选择的信令通道发送给另一个对等端。
+* 一旦双方都添加了彼此的候选者，连接即可成功。
 
 ```kotlin
 // 收集并发送本地候选者
@@ -168,11 +182,29 @@ scope.launch {
     callee.dataChannelEvents.collect { event ->
         when (event) {
             is DataChannelEvent.Open -> println("Channel opened: ${event.channel}")
-            is DataChannelEvent.Closed -> println("Channel closed")
-            else -> {}
+            is DataChannelEvent.Closing -> println("Channel closing: ${event.channel}")
+            is DataChannelEvent.Closed -> println("Channel closed: ${event.channel}")
+            is DataChannelEvent.BufferedAmountLow ->
+                println("Buffered amount is low: ${event.channel}")
+            is DataChannelEvent.Error ->
+                println("Channel error: ${event.reason}")
         }
     }
 }
+```
+
+`DataChannelEvent` 可以表示以下事件：
+
+* `Open`：通道已就绪，可发送和接收数据。
+* `Closing`：通道已开始关闭。
+* `Closed`：通道已关闭。
+* `BufferedAmountLow`：已缓冲的待发送数据量已降至或低于 `bufferedAmountLowThreshold`。
+* `Error`：通道发生错误。在 JVM 上不会发出此事件。发送失败将改为抛出 `WebRtc.IOException`。
+
+要接收 `BufferedAmountLow`，请在通道上设置阈值：
+
+```kotlin
+channel.setBufferedAmountLowThreshold(16 * 1024)
 ```
 
 ### 发送和接收消息 {id="sending-and-receiving-messages"}
@@ -209,9 +241,17 @@ pc.addTrack(audio)
 pc.addTrack(video)
 ```
 
-在 Web 端，这使用 `navigator.mediaDevices.getUserMedia`。在 Android 端，它使用 Camera2 API，且您必须手动请求麦克风/摄像头权限。在 iOS 端，它使用 AVFoundation API，您也应手动请求任何权限。客户端将尝试根据指定的约束寻找最合适的媒体设备，否则将抛出 `WebRtcMedia.DeviceException`。
+媒体捕获具有平台特定性：
 
-> `WebRtcClient`、`WebRtcPeerConnection`、`WebRtcMedia.Track` 等接口都是 `AutoCloseable` 的。请确保在不再需要时调用 `close()` 方法以释放资源。
+* 在 Web 端，它使用 `navigator.mediaDevices.getUserMedia`。
+* 在 Android 端，它使用 Camera2 API。您需要单独请求麦克风和摄像头权限。
+* 在 iOS 端，它使用 AVFoundation API。您也需要单独请求所需权限。
+* 在 JVM 端，它使用 [webrtc-java](https://github.com/devopvoid/webrtc-java) 访问系统摄像头和麦克风。操作系统可能会提示用户授予权限。
+
+客户端将根据指定的约束选择最合适的媒体设备。如果没有可用合适设备，它将抛出 `WebRtcMedia.DeviceException`。
+
+> `WebRtcClient`、`WebRtcPeerConnection`、`WebRtcMedia.Track` 等接口都实现了 `AutoCloseable`。当不再需要它们时，请调用 `close()` 函数以释放资源。
+> 
 {style="note"}
 
 ### 接收远程轨道 {id="receiving-remote-tracks"}
@@ -310,10 +350,24 @@ kotlin {
 ```
 
 </TabItem>
+
+<TabItem title="JVM" group-key="jvm">
+
+```kotlin
+val videoTrack = rtcClient.createVideoTrack()
+val nativeTrack: dev.onvoid.webrtc.media.video.VideoTrack = videoTrack.getNative()
+
+// 没有内置的视频视图。请附加一个 sink 并使用 Swing、JavaFX、Compose 或其他 UI 工具包渲染视频帧。
+nativeTrack.addSink { frame ->
+    // 将 frame.buffer 绘制到 UI，然后调用 frame.release()
+}
+```
+
+</TabItem>
 </Tabs>
 
 ```kotlin
-// 在 Android 和 iOS 上，音频轨道播放可以在不使用 `getNative()` 的情况下开始/停止
+// 在 Android、iOS 和 JVM 上，音频轨道播放可以在不使用 `getNative()` 的情况下开始/停止
 // 在浏览器中，您仍应创建一个未定义的元素。
 
 val audio = rtcClient.createAudioTrack()
@@ -324,14 +378,16 @@ audio.enable(false)
 ```
 
 > 这些片段可以与 Compose Multiplatform 配合使用，但未考虑其生命周期。有关完整的集成示例，请参阅 [Ktor Chat](https://github.com/ktorio/ktor-chat) 示例。
+> 
 {style="note"}
 
 ## 限制 {id="limitations"}
 
 WebRTC 客户端目前处于实验性阶段，并具有以下限制：
 
-- 不包含信令。您需要实现自己的信令（例如使用 WebSocket 或 HTTP）。
-- 支持的平台包括 JavaScript/Wasm、Android 和 iOS。JVM 桌面和 Kotlin/Native 支持计划在未来版本中提供。
-- 权限必须由您的应用程序处理。浏览器会提示用户访问麦克风和摄像头，而 Android 和 iOS 则需要运行时权限请求。
-- 仅支持基础音频和视频轨道。屏幕共享、设备选择、联播 (simulcast) 和高级 RTP 功能尚不可用。
-- 连接统计信息可用，但各平台之间存在差异，且未遵循统一的架构。
+* **信令：** 不包含信令。您需要单独实现信令，例如使用 WebSocket 或 HTTP。
+* **平台支持：** 客户端支持 JavaScript/Wasm、Android、iOS 和 JVM 桌面。Kotlin/Native 支持计划在未来版本中提供。
+* **权限：** 权限必须由您的应用程序处理。浏览器会提示用户访问麦克风和摄像头。Android 和 iOS 需要运行时权限请求。在 JVM 上，摄像头和麦克风访问权限是在操作系统级别授予的。
+* **JVM 限制：** 不支持候选者预取。`iceCandidatePoolSize` 必须为 `0` 或省略。不支持 `facingMode`、`aspectRatio` 和 `resizeMode` 视频约束，如果设置则会抛出异常。不发出 `DataChannelEvent.Error`。
+* **媒体功能：** 仅支持基础音频和视频轨道。屏幕共享、设备选择、联播 (simulcast) 和高级 RTP 功能尚不可用。
+* **连接统计信息：** 统计信息可用，但各平台之间存在差异，且未遵循统一的架构。

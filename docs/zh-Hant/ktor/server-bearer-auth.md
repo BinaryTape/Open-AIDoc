@@ -11,7 +11,7 @@
 <var name="example_name" value="auth-bearer"/>
 <p>
     <b>程式碼範例</b>：
-    <a href="https://github.com/ktorio/ktor-documentation/tree/%ktor_version%/codeSnippets/snippets/%example_name%">
+    <a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/%example_name%">
         %example_name%
     </a>
 </p>
@@ -46,7 +46,7 @@ Bearer 驗證方案是 [HTTP 架構](https://developer.mozilla.org/en-US/docs/We
 一般而言，Bearer 驗證流程可能如下所示：
 
 1. 在使用者成功驗證並授權存取後，伺服器會向用戶端傳回一個存取權杖。
-2. 用戶端可以使用 Bearer 方案，透過在 `Authorization` 標頭中傳遞權杖，向受保護的資源發出請求。
+2. 用戶端可以使用 `Bearer` 方案，透過在 `Authorization` 標頭中傳遞權杖，向受保護的資源發出請求。
    ```HTTP
    GET http://localhost:8080/
    Authorization: Bearer abc123
@@ -78,6 +78,9 @@ install(Authentication) {
 
 ### 步驟 1：配置 Bearer 提供者 {id="configure-provider"}
 
+<Tabs group="auth-dsl">
+<TabItem title="傳統" group-key="classic">
+
 `bearer` 驗證提供者透過 [BearerAuthenticationProvider.Configuration](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-bearer-authentication-provider/-config/index.html) 類別公開其設定。在下方的範例中，指定了以下設定：
 * `realm` 屬性設定了要在 `WWW-Authenticate` 標頭中傳遞的領域 (realm)。
 * `authenticate` 函式會檢查用戶端傳送的權杖，並在驗證成功時傳回 `UserIdPrincipal`，若驗證失敗則傳回 `null`。
@@ -97,7 +100,45 @@ install(Authentication) {
 }
 ```
 
+</TabItem>
+<TabItem title="型別安全" group-key="typed">
+
+<note>
+    <p>
+        型別安全驗證方案 API 為實驗性功能。它可能隨時被移除或變更。
+        需要選擇加入 (Opt-in)。如需詳細資訊，請參閱
+        <a href="server-typed-auth.md#prerequisites">啟用 API</a>。
+    </p>
+</note>
+
+`bearer()` 函式會為您選擇的 principal 型別建立方案。這裡不需要 `install(Authentication)` 步驟：該方案是一個值，您只需將其傳遞給需要它的路由即可。
+
+```kotlin
+data class User(val name: String)
+
+val bearerAuth = bearer<User>("auth-bearer") {
+    realm = "Access to the '/' path"
+    validate { tokenCredential ->
+        if (tokenCredential.token == "abc123") {
+            User("jetbrains")
+        } else {
+            null
+        }
+    }
+}
+```
+
+請注意名稱的變更：傳統提供者使用 `authenticate`，而型別安全方案則與其他型別安全方案一樣使用 `validate`。它會傳回您的 principal 型別，若驗證失敗則傳回 `null`。
+
+您也可以設定 `authHeader` 以從 `Authorization` 標頭以外的位置讀取權杖，並設定 `authSchemes` 以接受 `Bearer` 以外的方案。如需完整的 API，請參閱[型別安全驗證](server-typed-auth.md)。
+
+</TabItem>
+</Tabs>
+
 ### 步驟 2：保護特定資源 {id="authenticate-route"}
+
+<Tabs group="auth-dsl">
+<TabItem title="傳統" group-key="classic">
 
 配置 `bearer` 提供者後，您可以使用 **[authenticate](server-auth.md#authenticate-route)** 函式保護應用程式中的特定資源。在驗證成功的情況下，您可以在路由處理常式中使用 `call.principal` 函式擷取已驗證的 [UserIdPrincipal](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-user-id-principal/index.html)，並獲取已驗證使用者的名稱。
 
@@ -105,7 +146,27 @@ install(Authentication) {
 routing {
     authenticate("auth-bearer") {
         get("/") {
-            call.respondText("Hello, ${call.principal<UserIdPrincipal>()?.name}!")
+            val user = call.principal<UserIdPrincipal>()
+            call.respondText("Hello, ${user?.name}!")
         }
     }
 }
+```
+
+</TabItem>
+<TabItem title="型別安全" group-key="typed">
+
+將該方案傳遞給 `authenticateWith()`。在該區塊內，`call.principal` 即為您的 principal 型別且絕不為 `null`，因此無需進行轉換或 null 檢查：
+
+```kotlin
+routing {
+    authenticateWith(bearerAuth) {
+        get("/") {
+            call.respondText("Hello, ${call.principal.name}!")
+        }
+    }
+}
+```
+
+</TabItem>
+</Tabs>

@@ -18,7 +18,7 @@
 
 기본 인증(Basic authentication) 스킴은 액세스 제어 및 인증에 사용되는 [HTTP 프레임워크](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication)의 일부입니다. 이 스킴에서 사용자 자격 증명은 Base64를 사용하여 인코딩된 사용자 이름/비밀번호 쌍으로 전송됩니다.
 
-Ktor를 사용하면 기본 인증을 사용하여 사용자를 로그인시키고 특정 [라우트(route)](server-routing.md)를 보호할 수 있습니다. Ktor의 인증에 대한 일반적인 정보는 [Ktor 서버의 인증 및 인가](server-auth.md) 섹션에서 확인할 수 있습니다.
+Ktor를 사용하면 기본 인증을 사용하여 사용자를 로그인시키고 특정 [라우트](server-routing.md)를 보호할 수 있습니다. Ktor의 인증에 대한 일반적인 정보는 [Ktor 서버의 인증 및 인가](server-auth.md) 섹션에서 확인할 수 있습니다.
 
 > 기본 인증은 사용자 이름과 비밀번호를 일반 텍스트로 전달하므로, 민감한 정보를 보호하려면 [HTTPS/TLS](server-ssl.md)를 사용해야 합니다.
 
@@ -78,9 +78,12 @@ install(Authentication) {
 
 ## 기본 인증 설정 {id="configure"}
 
-Ktor에서 다양한 인증 프로바이더를 설정하는 방법에 대한 일반적인 개념은 [인증 설정](server-auth.md#configure)을 참조하세요. 이 섹션에서는 `basic` 인증 프로바이더의 구체적인 설정에 대해 알아봅니다. 
+Ktor에서 다양한 인증 프로바이더를 설정하는 방법에 대한 일반적인 개념은 [인증 설정](server-auth.md#configure)을 참조하세요. 이 섹션에서는 `basic` 인증 프로바이더의 세부 설정에 대해 알아봅니다. 
 
 ### 1단계: 기본 프로바이더 설정 {id="configure-provider"}
+
+<Tabs group="auth-dsl">
+<TabItem title="이름 지정 프로바이더" group-key="classic">
 
 `basic` 인증 프로바이더는 [BasicAuthenticationProvider.Configuration](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-basic-authentication-provider/-config/index.html) 클래스를 통해 설정을 노출합니다. 아래 예제에서는 다음 설정이 지정되었습니다:
 * `realm` 프로퍼티는 `WWW-Authenticate` 헤더에 전달될 realm을 설정합니다.
@@ -91,7 +94,9 @@ install(Authentication) {
     basic("auth-basic") {
         realm = "Access to the '/' path"
         validate { credentials ->
-            if (credentials.name == "jetbrains" && credentials.password == "foobar") {
+            val isValid = credentials.name == "jetbrains" &&
+                credentials.password == "foobar"
+            if (isValid) {
                 UserIdPrincipal(credentials.name)
             } else {
                 null
@@ -104,19 +109,72 @@ install(Authentication) {
 `validate` 함수는 `UserPasswordCredential`을 확인하고 인증에 성공하면 `UserIdPrincipal`을 반환하고, 실패하면 `null`을 반환합니다. 
 > 사용자 이름과 비밀번호 해시를 보관하는 인메모리 테이블에 저장된 사용자를 검증하려면 [UserHashedTableAuth](#validate-user-hash)를 사용할 수도 있습니다.
 
+</TabItem>
+<TabItem title="타입 세이프" group-key="typed">
+
+<note>
+    <p>
+        타입 세이프 인증 스킴 API는 실험적(experimental)입니다. 언제든지 제거되거나 변경될 수 있습니다.
+        옵트인(opt-in)이 필요합니다. 자세한 내용은
+        <a href="server-typed-auth.md#prerequisites">API 활성화</a>를 참조하세요.
+    </p>
+</note>
+
+`basic()` 함수는 원하는 프린시펄(principal) 타입을 위한 스킴을 생성합니다. `install(Authentication)` 단계는 필요하지 않으며, 이 스킴은 해당 스킴이 필요한 라우트에 전달하는 값입니다.
+
+```kotlin
+data class User(val name: String)
+
+val basicAuth = basic<User>("auth-basic") {
+    realm = "Access to the '/' path"
+    validate { credentials ->
+        val isValid = credentials.name == "jetbrains" &&
+            credentials.password == "foobar"
+        if (isValid) User(credentials.name) else null
+    }
+}
+```
+
+`validate` 함수는 `UserPasswordCredential`을 확인하고 해당 프린시펄 타입을 반환하거나, 인증에 실패하면 `null`을 반환합니다. 전체 API는 [타입 세이프 인증](server-typed-auth.md)을 참조하세요.
+
+</TabItem>
+</Tabs>
+
 ### 2단계: 특정 리소스 보호 {id="authenticate-route"}
 
-`basic` 프로바이더를 설정한 후에는 **[authenticate](server-auth.md#authenticate-route)** 함수를 사용하여 애플리케이션의 특정 리소스를 보호할 수 있습니다. 인증에 성공하면 라우트 핸들러 내에서 `call.principal` 함수를 사용하여 인증된 [UserIdPrincipal](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-user-id-principal/index.html)을 검색하고 인증된 사용자의 이름을 가져올 수 있습니다.
+<Tabs group="auth-dsl">
+<TabItem title="이름 지정 프로바이더" group-key="classic">
+
+`basic` 프로바이더를 설정한 후에는 **[authenticate](server-auth.md#authenticate-route)** 함수를 사용하여 애플리케이션의 특정 리소스를 보호할 수 있습니다. 인증에 성공하면 라우트 핸들러 내에서 `call.principal` 함수를 사용하여 인증된 [UserIdPrincipal](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-user-id-principal/index.html)을 가져오고 인증된 사용자의 이름을 얻을 수 있습니다.
 
 ```kotlin
 routing {
     authenticate("auth-basic") {
         get("/") {
-            call.respondText("Hello, ${call.principal<UserIdPrincipal>()?.name}!")
+            val user = call.principal<UserIdPrincipal>()
+            call.respondText("Hello, ${user?.name}!")
         }
     }
 }
 ```
+
+</TabItem>
+<TabItem title="타입 세이프" group-key="typed">
+
+스킴을 `authenticateWith()`에 전달합니다. 블록 내부에서 `call.principal`은 해당 프린시펄 타입이며 절대 `null`이 아니므로, 타입 캐스팅이나 null 검사가 필요하지 않습니다:
+
+```kotlin
+routing {
+    authenticateWith(basicAuth) {
+        get("/") {
+            call.respondText("Hello, ${call.principal.name}!")
+        }
+    }
+}
+```
+
+</TabItem>
+</Tabs>
 
 ## UserHashedTableAuth로 검증 {id="validate-user-hash"}
 
@@ -127,7 +185,9 @@ Ktor를 사용하면 사용자 이름과 비밀번호 해시를 보관하는 인
 1. [getDigestFunction](https://api.ktor.io/ktor-utils/io.ktor.util/get-digest-function.html) 함수를 사용하여 지정된 알고리즘과 솔트(salt) 프로바이더로 다이제스트 함수를 생성합니다:
    
    ```kotlin
-   val digestFunction = getDigestFunction("SHA-256") { "ktor${it.length}" }
+   val digestFunction = getDigestFunction("SHA-256") {
+       "ktor${it.length}"
+   }
    ```
 
 2. `UserHashedTableAuth`의 새 인스턴스를 초기화하고 다음 프로퍼티를 지정합니다:

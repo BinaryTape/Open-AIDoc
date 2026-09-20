@@ -26,7 +26,7 @@ kotlin {
 
 ```
 
-Webpackは`commonjs`と`commonjs2`という2つの異なるフレーバーのCommonJSを提供しており、これらは宣言を公開する方法に影響します。ほとんどの場合、生成されたライブラリに`module.exports`構文を追加する`commonjs2`が必要になるでしょう。あるいは、CommonJS仕様に厳密に準拠した`commonjs`オプションを選択することもできます。`commonjs`と`commonjs2`の違いについて詳しく知るには、[Webpackのリポジトリ](https://github.com/webpack/webpack/issues/1114)を参照してください。
+Webpackは`commonjs`と`commonjs2`という2つの異なるフレーバーのCommonJSを提供しており、これらは宣言を利用可能にする方法に影響します。ほとんどの場合、生成されたライブラリに`module.exports`構文を追加する`commonjs2`が必要になるでしょう。あるいは、CommonJS仕様に厳密に準拠した`commonjs`オプションを選択することもできます。`commonjs`と`commonjs2`の違いについて詳しく知るには、[Webpackのリポジトリ](https://github.com/webpack/webpack/issues/1114)を参照してください。
 
 ## JavaScriptライブラリとNode.jsファイル {id="javascript-libraries-and-node-js-files"}
 
@@ -34,7 +34,7 @@ JavaScriptまたはNode.js環境で使用するライブラリを作成してお
 
 ### ターゲットモジュールシステムの選択 {id="choose-the-target-module-system"}
 
-ターゲットとなるモジュールシステムを選択するには、Gradleビルドスクリプトで`moduleKind`コンパイラオプションを設定します。
+ターゲットとなるモジュールシステムを選択するには、Gradleビルドスクリプトで`moduleKind`コンパイラオプションを設定します:
 
 <tabs group="build-script">
 <tab title="Kotlin" group-key="kotlin">
@@ -57,7 +57,7 @@ compileKotlinJs.compilerOptions.moduleKind = org.jetbrains.kotlin.gradle.dsl.JsM
 
 利用可能な値は、`umd` (デフォルト)、`es`, `commonjs`, `amd`, `plain` です。
 
-> これは `webpackTask.output.libraryTarget` を調整することとは異なります。ライブラリターゲットは（コードがコンパイルされた後に）*webpackによって生成される*出力を変更します。`compilerOptions.moduleKind` は *Kotlinコンパイラによって生成される* 出力を変更します。
+> これは `webpackTask.output.libraryTarget` を調整することとは異なります。ライブラリターゲットは（コードがすでにコンパイルされた後に）*webpackによって生成される*出力を変更します。`compilerOptions.moduleKind` は *Kotlinコンパイラによって生成される* 出力を変更します。
 >
 {style="note"}  
 

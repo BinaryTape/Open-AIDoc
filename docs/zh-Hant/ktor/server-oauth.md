@@ -28,10 +28,18 @@
 
 > 您可以在 [Ktor Server 中的身分驗證與授權](server-auth.md) 章節中獲取有關 Ktor 身分驗證與授權的一般資訊。
 
+> Ktor 還提供了具型別的 OAuth 2.0 流程。無需設定具名提供者，只需建立流程值並安裝它，Ktor 就會為您建立登入與回呼路由。`oauth2Session` 流程還為您提供了一種在登入後保護應用程式路由的配置方案。請參閱 [OAuth 2.0 流程](server-oauth2-flows.md)。
+>
+{style="tip"}
+
+> 如果您的提供者支援 OpenID Connect，`Oidc` 外掛程式的功能則更進一步。它會讀取提供者的探索文件，因此您只需設定簽發者 (issuer) URL，而無需設定授權、權杖及 JWKS 端點，並且它會為您處理 PKCE、ID 權杖驗證、工作階段與登出。請參閱 [OpenID Connect](server-oidc.md)。
+>
+{style="tip"}
+
 ## 新增相依性 {id="add_dependencies"}
 
 <p>
-    若要使用 <code>%plugin_name%</code>，您需要在組建指令碼中包含 <code>%artifact_name%</code> 構件：
+    若要使用 <code>%plugin_name%</code>，請在組建指令碼中新增 <code>%artifact_name%</code> 構件：
 </p>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
@@ -53,7 +61,9 @@
 ```kotlin
 import io.ktor.server.sessions.*
 
-fun Application.main(httpClient: HttpClient = applicationHttpClient) {
+fun Application.main(
+    httpClient: HttpClient = applicationHttpClient
+) {
     install(Sessions) {
         cookie<UserSession>("user_session")
     }
@@ -94,7 +104,9 @@ Ktor 應用程式中的 OAuth 授權流程可能如下所示：
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 
-fun Application.main(httpClient: HttpClient = applicationHttpClient) {
+fun Application.main(
+    httpClient: HttpClient = applicationHttpClient
+) {
     install(Authentication) {
         oauth("auth-oauth-google") {
             // Configure oauth authentication
@@ -142,16 +154,28 @@ val applicationHttpClient = HttpClient(CIO) {
 用戶端執行個體會傳遞給 `main` [模組函式](server-modules.md)，以便能夠在伺服器 [測試](server-testing.md) 中建立獨立的用戶端執行個體。
 
 ```kotlin
-fun Application.main(httpClient: HttpClient = applicationHttpClient) {
+fun Application.main(
+    httpClient: HttpClient = applicationHttpClient
+) {
 }
 ```
 
 ### 步驟 2：設定 OAuth 提供者 {id="configure-oauth-provider"}
 
-下方的程式碼片段展示了如何建立並設定名為 `auth-oauth-google` 的 `oauth` 提供者。
+下方的程式碼片段展示了如何建立並設定名稱為 `auth-oauth-google` 的 `oauth` 提供者。
 對於具有固定 OAuth 設定的提供者，請使用 `settings` 屬性。
 
 ```kotlin
+val googleAuthorizeUrl =
+    "https://accounts.google.com/o/oauth2/auth"
+val googleTokenUrl =
+    "https://accounts.google.com/o/oauth2/token"
+val profileScope =
+    "https://www.googleapis.com/auth/userinfo.profile"
+val googleClientId =
+    System.getenv("GOOGLE_CLIENT_ID").orEmpty()
+val googleClientSecret =
+    System.getenv("GOOGLE_CLIENT_SECRET").orEmpty()
 val redirects = ConcurrentMap<String, String>()
 install(Authentication) {
     oauth("auth-oauth-google") {
@@ -159,16 +183,18 @@ install(Authentication) {
         urlProvider = { "http://localhost:8080/callback" }
         settings = OAuthServerSettings.OAuth2ServerSettings(
                 name = "google",
-                authorizeUrl = "https://accounts.google.com/o/oauth2/auth",
-                accessTokenUrl = "https://accounts.google.com/o/oauth2/token",
+                authorizeUrl = googleAuthorizeUrl,
+                accessTokenUrl = googleTokenUrl,
                 requestMethod = HttpMethod.Post,
-                clientId = System.getenv("GOOGLE_CLIENT_ID").orEmpty(),
-                clientSecret = System.getenv("GOOGLE_CLIENT_SECRET").orEmpty(),
-                defaultScopes = listOf("https://www.googleapis.com/auth/userinfo.profile"),
-                extraAuthParameters = listOf("access_type" to "offline"),
+                clientId = googleClientId,
+                clientSecret = googleClientSecret,
+                defaultScopes = listOf(profileScope),
+                extraAuthParameters =
+                    listOf("access_type" to "offline"),
                 onStateCreated = { call, state ->
-                    //saves new state with redirect url value
-                    call.request.queryParameters["redirectUrl"]?.let {
+                    // saves new state with redirect url
+                    val query = call.request.queryParameters
+                    query["redirectUrl"]?.let {
                         redirects[state] = it
                     }
                 }
@@ -177,7 +203,10 @@ install(Authentication) {
             if (cause is OAuth2RedirectError) {
                 respondRedirect("/login-after-fallback")
             } else {
-                respond(HttpStatusCode.Forbidden, cause.message)
+                respond(
+                    HttpStatusCode.Forbidden,
+                    cause.message
+                )
             }
         }
         client = httpClient
@@ -223,13 +252,20 @@ routing {
             }
 
             get("/callback") {
-                val currentPrincipal: OAuthAccessTokenResponse.OAuth2? = call.principal()
-                // redirects home if the url is not found before authorization
+                val currentPrincipal:
+                    OAuthAccessTokenResponse.OAuth2? =
+                        call.principal()
+                // redirects home if the url is not found
+                // before authorization
                 currentPrincipal?.let { principal ->
                     principal.state?.let { state ->
-                        call.sessions.set(UserSession(state, principal.accessToken))
-                        redirects.remove(state)?.let { redirect ->
-                            call.respondRedirect(redirect)
+                        val session = UserSession(
+                            state,
+                            principal.accessToken
+                        )
+                        call.sessions.set(session)
+                        redirects.remove(state)?.let { url ->
+                            call.respondRedirect(url)
                             return@get
                         }
                     }
@@ -256,9 +292,12 @@ routing {
 private suspend fun getPersonalGreeting(
     httpClient: HttpClient,
     userSession: UserSession
-): UserInfo = httpClient.get("https://www.googleapis.com/oauth2/v2/userinfo") {
+): UserInfo = httpClient.get(
+    "https://www.googleapis.com/oauth2/v2/userinfo"
+) {
     headers {
-        append(HttpHeaders.Authorization, "Bearer ${userSession.token}")
+        val bearer = "Bearer ${userSession.token}"
+        append(HttpHeaders.Authorization, bearer)
     }
 }.body()
 ```
@@ -269,7 +308,8 @@ private suspend fun getPersonalGreeting(
 get("/{path}") {
     val userSession: UserSession? = getSession(call)
     if (userSession != null) {
-        val userInfo: UserInfo = getPersonalGreeting(httpClient, userSession)
+        val userInfo: UserInfo =
+            getPersonalGreeting(httpClient, userSession)
         call.respondText("Hello, ${userInfo.name}!")
     }
 }

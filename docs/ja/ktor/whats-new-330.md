@@ -36,7 +36,7 @@ staticFiles("/files", File("textFiles")) {
 
 ### 静的コンテンツの LastModified および ETag ヘッダー {id="lastmodified-and-etag-headers-for-static-content"}
 
-Ktor 3.3.0 では、静的リソースに対する `ETag` および `LastModified` ヘッダーのサポートが導入されました。[`ConditionalHeaders`](server-conditional-headers.md) プラグインがインストールされている場合、条件付きヘッダーを処理して、前回のクエストからコンテンツが変更されていない場合にボディの送信を回避できます。
+Ktor 3.3.0 では、静的リソースに対する `ETag` および `LastModified` ヘッダーのサポートが導入されました。[`ConditionalHeaders`](server-conditional-headers.md) プラグインがインストールされている場合、条件付きヘッダーを処理して、前回のリクエストからコンテンツが変更されていない場合にボディの送信を回避できます。
 
 ```kotlin
 staticFiles("/filesWithEtagAndLastModified", File("files")) {
@@ -81,7 +81,7 @@ ktor {
 
 Ktor 3.3.0 では、Netty エンジンにおいて HTTP/2 over cleartext (h2c) のサポートが導入されました。これにより、TLS 暗号化なしでの HTTP/2 通信が可能になります。このセットアップは、通常、ローカルテストやプライベートネットワークなどの信頼できる環境で使用されます。
 
-h2c を有効にするには、エンジン設定で `enableH2c` フラグを true に設定します。詳細については、[TLS なしの HTTP/2](server-http2.md#http-2-without-tls) を参照してください。
+h2c を有効にするには、エンジン設定で `enableH2c` フラグを true に設定します。詳細については、[TLS なしの HTTP/2](server-http2.md#http2-without-tls) を参照してください。
 
 ## Ktor Client {id="ktor-client"}
 
@@ -148,6 +148,18 @@ val androidClient = WebRtcClient(AndroidWebRtc) {
 ```kotlin
 val iosClient = WebRtcClient(IosWebRtc) {
     // 同じ設定、追加のコンテキストは不要
+}
+```
+
+</TabItem>
+
+<TabItem title="JVM" group-key="jvm">
+
+```kotlin
+val jvmClient = WebRtcClient(JvmWebRtc) {
+    defaultConnectionConfig = {
+        iceServers = listOf(WebRtc.IceServer("stun:stun.l.google.com:19302"))
+    }
 }
 ```
 

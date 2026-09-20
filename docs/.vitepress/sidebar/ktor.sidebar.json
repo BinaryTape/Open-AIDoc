@@ -124,6 +124,10 @@
                 "link": "server-http2"
               },
               {
+                "text": "ktor.server-http3",
+                "link": "server-http3"
+              },
+              {
                 "text": "ktor.server-development-mode",
                 "link": "server-development-mode"
               },
@@ -286,10 +290,6 @@
                 "link": "server-form-based-auth"
               },
               {
-                "text": "ktor.server-session-auth",
-                "link": "server-session-auth"
-              },
-              {
                 "text": "ktor.server-ldap",
                 "link": "server-ldap"
               },
@@ -305,8 +305,51 @@
                 "collapsed": true
               },
               {
-                "text": "ktor.server-oauth",
-                "link": "server-oauth"
+                "text": "ktor.sessions",
+                "items": [
+                  {
+                    "text": "ktor.server-session-auth",
+                    "link": "server-session-auth"
+                  },
+                  {
+                    "text": "ktor.server-typed-session-auth",
+                    "link": "server-typed-session-auth"
+                  }
+                ],
+                "collapsed": true
+              },
+              {
+                "text": "ktor.oauth",
+                "items": [
+                  {
+                    "text": "ktor.server-oauth",
+                    "link": "server-oauth"
+                  },
+                  {
+                    "text": "ktor.server-oauth2-flows",
+                    "link": "server-oauth2-flows"
+                  }
+                ],
+                "collapsed": true
+              },
+              {
+                "text": "ktor.server-oidc",
+                "link": "server-oidc",
+                "items": [
+                  {
+                    "text": "ktor.server-oidc-resource-server",
+                    "link": "server-oidc-resource-server"
+                  },
+                  {
+                    "text": "ktor.server-oidc-browser-login",
+                    "link": "server-oidc-browser-login"
+                  }
+                ],
+                "collapsed": true
+              },
+              {
+                "text": "ktor.server-typed-auth",
+                "link": "server-typed-auth"
               }
             ],
             "collapsed": true
@@ -789,6 +832,10 @@
       {
         "text": "ktor.releases",
         "link": "releases"
+      },
+      {
+        "text": "ktor.whats-new-360",
+        "link": "whats-new-360"
       },
       {
         "text": "ktor.whats-new-350",

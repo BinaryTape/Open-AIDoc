@@ -3,7 +3,7 @@
 要添加对 [Compose UI](https://www.jetbrains.com/compose-multiplatform/) 的支持，请导入扩展库：
 
 ```kotlin
-implementation("io.coil-kt.coil3:coil-compose:3.6.2")
+implementation("io.coil-kt.coil3:coil-compose:3.6.3")
 ```
 
 然后使用 `AsyncImage` 可组合项来加载并显示图像：
@@ -17,7 +17,7 @@ AsyncImage(
 
 `model` 既可以是 `ImageRequest.data` 的值，也可以是 `ImageRequest` 本身。`contentDescription` 用于设置无障碍服务使用的文本，以描述此图像所代表的内容。
 
-## AsyncImage
+## AsyncImage {id="asyncimage"}
 
 `AsyncImage` 是一个异步执行图像请求并呈现结果的可组合项。它支持与标准 `Image` 可组合项相同的参数，此外，它还支持设置 `placeholder`/`error`/`fallback` painter 以及 `onLoading`/`onSuccess`/`onError` 回调。以下是一个加载图像并设置圆形裁剪、淡入淡出和占位符的示例：
 
@@ -38,7 +38,7 @@ AsyncImage(
 
 在大多数情况下，请优先使用 `AsyncImage`。它会根据可组合项的约束和提供的 `ContentScale` 正确确定加载图像的尺寸。
 
-## rememberAsyncImagePainter
+## rememberAsyncImagePainter {id="rememberasyncimagepainter"}
 
 在内部，`AsyncImage` 和 `SubcomposeAsyncImage` 使用 `rememberAsyncImagePainter` 来加载 `model`。如果你需要的是 `Painter` 而不是可组合项，可以使用 `rememberAsyncImagePainter` 来加载图像：
 
@@ -72,7 +72,7 @@ Image(
 
 另一个缺点是，在使用 `rememberAsyncImagePainter` 时，第一次组合的 `AsyncImagePainter.state` 始终为 `AsyncImagePainter.State.Empty` —— 即使图像存在于内存缓存中且会在第一帧绘制。
 
-## SubcomposeAsyncImage
+## SubcomposeAsyncImage {id="subcomposeasyncimage"}
 
 `SubcomposeAsyncImage` 是 `AsyncImage` 的变体，它使用子组合为 `AsyncImagePainter` 的状态提供插槽 API，而不是使用 Painter。示例如下：
 
@@ -111,7 +111,7 @@ SubcomposeAsyncImage(
 
 具体而言，只有当你需要观察 `AsyncImagePainter.state`，且不能像使用 `rememberAsyncImagePainter` 那样在第一次组合和第一帧时状态为 `Empty` 时，此函数才有用。`SubcomposeAsyncImage` 使用子组合来获取图像的约束，因此其 `AsyncImagePainter.state` 会立即更新。
 
-## 观察 AsyncImagePainter.state
+## 观察 AsyncImagePainter.state {id="observing-asyncimagepainter-state"}
 
 ```kotlin
 val painter = rememberAsyncImagePainter("https://example.com/image.jpg")
@@ -134,7 +134,7 @@ when (state) {
 }
 ```
 
-## 过渡
+## 过渡 {id="transitions"}
 
 你可以使用 `ImageRequest.Builder.crossfade` 启用内置的淡入淡出过渡：
 
@@ -168,7 +168,7 @@ Image(
 
 有关完整的 `AnimatedContent` 示例，请参阅 [Compose AnimatedContent](/coil/recipes#compose-animatedcontent)。
 
-## 预览
+## 预览 {id="previews"}
 
 `AsyncImage`/`rememberAsyncImagePainter`/`SubcomposeAsyncImage` 的 Android Studio 预览行为由 `LocalAsyncImagePreviewHandler` 控制。默认情况下，它会尝试在预览环境中正常执行请求。由于预览环境禁用了网络访问，因此网络 URL 将始终失败。
 
@@ -189,7 +189,7 @@ CompositionLocalProvider(LocalAsyncImagePreviewHandler provides previewHandler) 
 
 这对于在相同预览环境中执行的 [AndroidX Compose 预览屏幕截图测试库](https://developer.android.com/studio/preview/compose-screenshot-testing) 也非常有用。
 
-## Compose 多平台资源
+## Compose 多平台资源 {id="compose-multiplatform-resources"}
 
 Coil 支持通过使用 `Res.getUri` 作为 `model` 参数来加载 [Compose 多平台资源](https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-multiplatform-resources.html)。示例：
 

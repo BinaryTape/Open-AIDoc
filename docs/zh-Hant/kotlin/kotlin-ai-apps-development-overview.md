@@ -1,4 +1,5 @@
 [//]: # (title: 用於 AI 驅動應用程式開發的 Kotlin)
+[//]: # (description: 了解如何使用 Koog、MCP Kotlin SDK、各大 LLM 供應商、RAG 管線、AI 代理人、Spring AI 與 LangChain4j，透過 Kotlin 建構 AI 驅動的應用程式。)
 
 <web-summary>了解 Koog 如何協助您使用 Kotlin 建構 AI 驅動的應用程式。</web-summary>
 
@@ -38,7 +39,7 @@ fun main() {
 * **企業級整合**。Koog 與熱門的 JVM 架構整合，例如 [Spring Boot](https://spring.io/projects/spring-boot) 和 [Ktor](https://ktor.io)。
 * **透過 OpenTelemetry 匯出器實現可觀察性**。Koog 提供與 W&B Weave 和 Langfuse 等熱門可觀察性供應商的即用型整合，用於監控與偵錯 AI 應用程式。
 * **LLM 切換與無縫的歷史記錄適應**。Koog 允許在任何時間點切換到具有新工具集的不同 LLM，且不會遺失現有的對話歷史記錄。它還支援在多個 LLM 供應商之間進行重新路由，包括 OpenAI、Anthropic、Google 等。您可以透過 Koog 與 Ollama 的整合，在本機使用本機模型執行代理人。
-* **與 JVM 和 Kotlin 應用程式整合**。Koog 為 JVM 與 Kotlin 開發人員提供了慣用的、類型安全的 DSL。
+* **與 JVM 和 Kotlin 應用程式整合**。Koog 為 JVM 與 Kotlin 開發人員提供了慣用的、型別安全的 DSL。
 * **Model Context Protocol (MCP) 整合**。Koog 支援在代理人中使用 MCP 工具。
 * **知識檢索與記憶**。透過嵌入 (embeddings)、分級文件存儲以及共享的代理人記憶，Koog 本身會在對話中主動保留知識。
 * **串流功能**。Koog 讓開發人員能夠透過串流支援與平行工具呼叫即時處理回應。
@@ -52,7 +53,7 @@ fun main() {
 
 ## Model Context Protocol (MCP) Kotlin SDK {id="model-context-protocol-mcp-kotlin-sdk"}
 
-[MCP Kotlin SDK](https://github.com/modelcontextprotocol/kotlin-sdk) 是 Model Context Protocol 的 Kotlin 多平台實作。
+[MCP Kotlin SDK](https://github.com/modelcontextprotocol/kotlin-sdk) 是 Model Context Protocol 的 Kotlin 多平台實作。 
 該 SDK 讓開發人員能以 Kotlin 建構 AI 驅動的應用程式，並與 JVM、WebAssembly 及 iOS 上的 LLM 介面整合。
 
 透過 MCP Kotlin SDK，您可以：
@@ -65,7 +66,7 @@ fun main() {
 
 ## 探索其他 AI 驅動的應用程式情境 {id="explore-other-ai-powered-application-scenarios"}
 
-得益於與 Java 的無縫互通性以及 Kotlin 多平台，您可以將 Kotlin 與成熟的 AI SDK 和架構結合，建構後端以及桌面/行動裝置 UI，並採用 RAG 和基於代理人的工作流等模式。
+得益於與 Java 的無縫互通性以及 Kotlin 多平台，您可以將 Kotlin 與成熟的 AI SDK 和架構結合，建構後端以及桌面/行動裝置 UI，並採用 RAG 和基於代理人的工作流程等模式。
 
 > 您可以從 [Kotlin-AI-Examples](https://github.com/Kotlin/Kotlin-AI-Examples) 存儲庫中探索並執行範例。
 > 每個專案都是獨立的。您可以將每個專案作為建構基於 Kotlin 的 AI 應用程式的參考或範本。
@@ -75,7 +76,7 @@ fun main() {
 使用 Kotlin 連接到主要的模型供應商，如 OpenAI、Anthropic、Google 等：
 
 * [OpenAI](https://github.com/openai/openai-java) — OpenAI API 的官方 Java SDK。它涵蓋了回應與對話、圖片及音訊。
-* [Anthropic (Claude)](https://github.com/anthropics/anthropic-sdk-java) — Claude Messages API 的官方 Java SDK。它包含用於 Vertex AI 與 Bedrock 整合的模組。
+* [Anthropic (Claude)](https://github.com/anthropics/anthropic-sdk-java) — Claude Messages API 的官方 Java SDK。它包含用於 Vertex AI 與 Bedrock 整合的模組。 
 * [Google AI (Gemini / Vertex AI)](https://github.com/googleapis/java-genai) — 官方 Java SDK，具有可在 Gemini API 與 Vertex AI 之間切換的單一用戶端。
 * [Azure OpenAI](https://github.com/Azure/azure-sdk-for-java/tree/main/sdk/openai/azure-ai-openai) — Azure OpenAI 服務的官方 Java 用戶端。它支援對話補全與嵌入。
 * [AWS Bedrock](https://github.com/aws/aws-sdk-kotlin) — 用於調用基礎模型的官方 SDK。它包含用於 Bedrock 與 Bedrock Runtime 的 Kotlin SDK 與 Java SDK。
@@ -87,6 +88,6 @@ fun main() {
 
 ## 下一步 {id="what-s-next"}
 
-* 完成 [使用 Spring AI 建立回答問題的 Kotlin 應用程式](spring-ai-guide.md) 教學，進一步了解如何在 IntelliJ IDEA 中將 Spring AI 與 Kotlin 搭配使用。
-* 加入 [Kotlin 社群](https://kotlinlang.org/community/)，與其他使用 Kotlin 建構 AI 應用程式的開發人員交流。
-* 了解關於 [](kotlin-ai-skills.md)
+* 完成 [使用 Spring AI 建立回答問題的 Kotlin 應用程式](spring-ai-guide.md) 教學，進一步了解如何在 IntelliJ IDEA 中將 Spring AI 與 Kotlin 搭配使用
+* 加入 [Kotlin 社群](https://kotlinlang.org/community/)，與其他使用 Kotlin 建構 AI 應用程式的開發人員交流
+* 了解 [可用於協助您進行 Kotlin 開發的 AI 工具](ai-for-development.md)。

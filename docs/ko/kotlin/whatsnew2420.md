@@ -16,6 +16,10 @@ Kotlin 2.4.20이 출시되었습니다! 이번 릴리스의 주요 하이라이�
 * **Build tools API:** [새로운 타깃 지원: Kotlin/JS, Kotlin/Wasm, Kotlin 메타데이터](#build-tools-api)
 * **Kotlin 컴파일러:** [`kotlinr` 실행 명령어 및 별도의 네이티브 이미지](#kotlin-compiler)
 
+다음 비디오에서도 업데이트에 대한 개요를 확인하실 수 있습니다.
+
+<video src="https://www.youtube.com/v/UhRfN7fx5rs" title="What's New in Kotlin 2.4.20"/>
+
 > Kotlin 릴리스 주기에 대한 자세한 내용은 [Kotlin 릴리스 프로세스](releases.md)를 참조하세요.
 >
 {style="tip"}
@@ -435,7 +439,7 @@ kotlin {
 ### 새로운 컴파일 모드 {id="new-compilation-modes"}
 <secondary-label ref="wasm"/>
 
-Kotlin 2.4.20에서는 새로운 멀티 모듈 모드를 포함하여 Kotlin/Wasm 컴파일 모드를 선택할 수 있는 지원이 추가되었습니다. 이전에는 프로젝트와 해당 의존성을 함께 컴파일하여 단일 바이너리를 생성하는 모놀리스(monolith) 컴파일 모드를 컴파일러가 사용했습니다. 이를 통해 컴파일러가 데드 코드 제거(DCE)를 수행하고 가장 작은 크기의 결과물을 생성할 수 있었습니다.
+Kotlin 2.4.20에서는 새로운 멀티 모듈 모드를 포함하여 Kotlin/Wasm 컴파일 모드를 선택할 수 있는 지원이 추가되었습니다. 이전에는 컴파일러가 프로젝트와 해당 의존성을 함께 컴파일하여 단일 바이너리를 생성하는 모놀리스(monolith) 컴파일 모드를 사용했습니다. 이를 통해 컴파일러가 데드 코드 제거(DCE)를 수행하고 가장 작은 크기의 결과물을 생성할 수 있었습니다.
 
 이제 다음과 같은 컴파일 모드 중 하나를 선택할 수 있습니다.
 

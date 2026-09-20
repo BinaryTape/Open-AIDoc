@@ -18,7 +18,7 @@ Kotlin プラグインは、IntelliJ IDEA の各リリースに同梱されて�
 各 IDEA のリリースでは、IDE での Kotlin 開発者のエクスペリエンスを向上させる新機能やアップグレードが導入されます。
 Kotlin に関する最新のアップデートと改善点については、[IntelliJ IDEA の新機能](https://www.jetbrains.com/idea/whatsnew/)を参照してください。
 
-IntelliJ IDEA の詳細については、[公式ドキュメント](https://www.jetbrains.com/help/idea/discover-intellij-idea.html)（英語）をご覧ください。
+IntelliJ IDEA の詳細については、[公式ドキュメント](https://www.jetbrains.com/help/idea/discover-intellij-idea.html)をご覧ください。
 
 ## Android Studio {id="android-studio"}
 
@@ -38,7 +38,7 @@ Kotlin 拡張機能は、Kotlin Language Server を通じて、コード補完�
 
 詳細については、[Kotlin Language Server と Visual Studio Code](kotlin-lsp.md#kotlin-in-visual-studio-code) を参照してください。
 
-## その他の IDE サポート {id="other-ides-support"}
+## その他の IDE サポート {id="other-ide-support"}
 
 JetBrains は、他の IDE 向けの公式な Kotlin プラグインを提供していません。
 他のコードエディタで [Kotlin Language Server](kotlin-lsp.md) を使用できます。
@@ -52,7 +52,14 @@ IntelliJ IDEA と Android Studio では、Kotlin プラグインが各リリー�
 新しい Kotlin バージョンがリリースされると、これらのツールは自動的に Kotlin を最新バージョンに更新することを提案します。
 サポートされている最新の言語バージョンについては、[Kotlin リリース](releases.md#ide-support)を確認してください。
 
+## IDE における AI サポート {id="ai-support-in-ides"}
+
+IntelliJ IDEA と Android Studio は、組み込みの AI 機能や AI コーディングエージェントとの連携を通じて、AI を活用した Kotlin 開発をサポートしています。
+ワークフローに応じて、IDE 内で直接 AI を利用したり、外部エージェントに接続したり、AI ツールと Kotlin 固有のガイダンスを組み合わせたりすることができます。
+
+利用可能な AI ツールの概要およびそれらの使い分けについては、[](ai-for-development.md) を参照してください。
+
 ## 次のステップ {id="what-s-next"}
 
 * [IntelliJ IDEA でコンソールアプリケーションを作成する](jvm-get-started.md)
-* [IntelliJ IDEA または Android Studio を使用して初めてのクロスプラットフォームモバイルアプリを作成する](https://kotlinlang.org/docs/multiplatform/multiplatform-create-first-app.html)
+* [Android Studio を使用して初めてのクロスプラットフォームモバイルアプリを作成する](https://kotlinlang.org/docs/multiplatform/multiplatform-create-first-app.html)

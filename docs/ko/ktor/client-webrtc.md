@@ -9,7 +9,7 @@
         <b>필수 종속 항목</b>: <code>io.ktor:%artifact_name%</code>
     </p>
     <p>
-        <b>지원 플랫폼</b>: JS/Wasm, Android
+        <b>지원 플랫폼</b>: JS/Wasm, Android, iOS, JVM
     </p>   
     <p>
         <b>코드 예제</b>: <a href="https://github.com/ktorio/ktor-chat/">ktor-chat</a>
@@ -23,10 +23,10 @@ WebRTC(Web Real-Time Communication)는 브라우저와 네이티브 앱에서 �
 
 Ktor의 WebRTC 클라이언트는 멀티플랫폼 프로젝트에서 실시간 피어 투 피어 통신을 가능하게 합니다. WebRTC를 사용하면 다음과 같은 기능을 구축할 수 있습니다.
 
-- 화상 및 음성 통화
-- 멀티플레이어 게임
-- 협업 애플리케이션 (화이트보드, 에디터 등)
-- 클라이언트 간 저지연(Low-latency) 데이터 교환
+* 화상 및 음성 통화
+* 멀티플레이어 게임
+* 협업 애플리케이션 (화이트보드, 에디터 등)
+* 클라이언트 간 저지연(Low-latency) 데이터 교환
 
 ## 종속 항목 추가 {id="add-dependencies"}
 
@@ -48,9 +48,10 @@ Ktor의 WebRTC 클라이언트는 멀티플랫폼 프로젝트에서 실시간 �
 
 `WebRtcClient`를 생성할 때 대상 플랫폼에 맞는 엔진을 선택하세요.
 
-- JS/Wasm: `JsWebRtc` – [WebRTC](https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API), [Media Capture and Streams](https://developer.mozilla.org/en-US/docs/Web/API/Media_Capture_and_Streams_API) 브라우저 API를 사용합니다.
-- Android: `AndroidWebRtc` – [Stream](https://github.com/GetStream/webrtc-android)에서 제공하는 Android용 사전 컴파일된 WebRTC 라이브러리와 Android 미디어 API를 사용합니다.
-- iOS: `IosWebRtc` - iOS용 [WebRTC SDK](https://github.com/webrtc-sdk)와 네이티브 [AVFoundation](https://developer.apple.com/documentation/avfoundation) 프레임워크를 사용합니다.
+* JS/Wasm: `JsWebRtc` – [WebRTC](https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API), [Media Capture and Streams](https://developer.mozilla.org/en-US/docs/Web/API/Media_Capture_and_Streams_API) 브라우저 API를 사용합니다.
+* Android: `AndroidWebRtc` – Android용 사전 컴파일된 [Stream WebRTC 라이브러리](https://github.com/GetStream/webrtc-android)와 Android 미디어 API를 사용합니다.
+* iOS: `IosWebRtc` – [WebRTC SDK](https://github.com/webrtc-sdk)와 네이티브 [AVFoundation](https://developer.apple.com/documentation/avfoundation) 프레임워크를 사용합니다.
+* JVM: `JvmWebRtc` – [webrtc-java](https://github.com/devopvoid/webrtc-java)에서 제공하는 네이티브 WebRTC 바인딩을 사용합니다.
 
 그 후 `HttpClient`와 유사하게 플랫폼별 구성을 제공할 수 있습니다. [ICE](#ice)가 올바르게 작동하려면 STUN/TURN 서버가 필요합니다. [coturn](https://github.com/coturn/coturn)과 같은 기존 솔루션을 사용할 수 있습니다.
 
@@ -84,6 +85,18 @@ val androidClient = WebRtcClient(AndroidWebRtc) {
 ```kotlin
 val iosClient = WebRtcClient(IosWebRtc) {
     // 동일한 구성, 추가 컨텍스트 불필요
+}
+```
+
+</TabItem>
+
+<TabItem title="JVM" group-key="jvm">
+
+```kotlin
+val jvmClient = WebRtcClient(JvmWebRtc) {
+    defaultConnectionConfig = {
+        iceServers = listOf(WebRtc.IceServer("stun:stun.l.google.com:19302"))
+    }
 }
 ```
 
@@ -127,9 +140,9 @@ caller.setRemoteDescription(
 
 SDP 협상이 완료되면 피어들은 여전히 네트워크를 통해 연결하는 방법을 찾아야 합니다. [ICE(Interactive Connectivity Establishment)](https://en.wikipedia.org/wiki/Interactive_Connectivity_Establishment)를 통해 피어들은 서로에게 도달하는 네트워크 경로를 찾을 수 있습니다.
 
-- 각 피어는 자신의 ICE 후보(ICE candidates)를 수집합니다.
-- 이러한 후보들은 선택한 시그널링 채널을 통해 상대 피어에게 전송되어야 합니다.
-- 양쪽 피어가 서로의 후보를 추가하면 연결이 성공할 수 있습니다.
+* 각 피어는 자신의 ICE 후보(ICE candidates)를 수집합니다.
+* 이러한 후보들은 선택한 시그널링 채널을 통해 상대 피어에게 전송되어야 합니다.
+* 양쪽 피어가 서로의 후보를 추가하면 연결이 성공할 수 있습니다.
 
 ```kotlin
 // 로컬 후보 수집 및 전송
@@ -169,11 +182,29 @@ scope.launch {
     callee.dataChannelEvents.collect { event ->
         when (event) {
             is DataChannelEvent.Open -> println("Channel opened: ${event.channel}")
-            is DataChannelEvent.Closed -> println("Channel closed")
-            else -> {}
+            is DataChannelEvent.Closing -> println("Channel closing: ${event.channel}")
+            is DataChannelEvent.Closed -> println("Channel closed: ${event.channel}")
+            is DataChannelEvent.BufferedAmountLow ->
+                println("Buffered amount is low: ${event.channel}")
+            is DataChannelEvent.Error ->
+                println("Channel error: ${event.reason}")
         }
     }
 }
+```
+
+`DataChannelEvent`는 다음과 같은 이벤트를 나타낼 수 있습니다.
+
+* `Open`: 채널이 데이터를 송수신할 준비가 되었습니다.
+* `Closing`: 채널이 닫히기 시작했습니다.
+* `Closed`: 채널이 닫혔습니다.
+* `BufferedAmountLow`: 버퍼링된 발신 데이터의 양이 `bufferedAmountLowThreshold` 이하로 떨어졌습니다.
+* `Error`: 채널에 오류가 발생했습니다. 이 이벤트는 JVM에서는 발생하지 않습니다. 대신 전송 실패 시 `WebRtc.IOException`이 발생합니다.
+
+`BufferedAmountLow`를 수신하려면 채널에 임계값을 설정하세요.
+
+```kotlin
+channel.setBufferedAmountLowThreshold(16 * 1024)
 ```
 
 ### 메시지 송수신 {id="sending-and-receiving-messages"}
@@ -210,10 +241,18 @@ pc.addTrack(audio)
 pc.addTrack(video)
 ```
 
-웹에서는 `navigator.mediaDevices.getUserMedia`를 사용합니다. Android에서는 Camera2 API를 사용하며 마이크/카메라 권한을 수동으로 요청해야 합니다. iOS에서는 AVFoundation API를 사용하며 마찬가지로 권한을 수동으로 요청해야 합니다. 클라이언트는 지정된 제약 조건(constraints)에 따라 가장 적합한 미디어 장치를 찾으려고 시도하며, 찾지 못할 경우 `WebRtcMedia.DeviceException`을 발생시킵니다.
+미디어 캡처는 플랫폼에 따라 다릅니다.
 
-> `WebRtcClient`, `WebRtcPeerConnection`, `WebRtcMedia.Track` 및 기타 인터페이스는 `AutoCloseable`입니다.
-> 더 이상 필요하지 않을 때 리소스를 해제하려면 반드시 `close()` 메서드를 호출하세요.
+* 웹에서는 `navigator.mediaDevices.getUserMedia`를 사용합니다.
+* Android에서는 Camera2 API를 사용합니다. 카메라 및 마이크 권한을 별도로 요청해야 합니다.
+* iOS에서는 AVFoundation API를 사용합니다. 마찬가지로 필요한 권한을 별도로 요청해야 합니다.
+* JVM에서는 [webrtc-java](https://github.com/devopvoid/webrtc-java)를 사용하여 시스템 카메라 및 마이크에 액세스합니다. 운영 체제에서 사용자에게 권한을 요청할 수 있습니다.
+
+클라이언트는 지정된 제약 조건(constraints)에 따라 가장 적합한 미디어 장치를 선택합니다. 적합한 장치를 사용할 수 없는 경우 `WebRtcMedia.DeviceException`을 발생시킵니다.
+
+> `WebRtcClient`, `WebRtcPeerConnection`, `WebRtcMedia.Track` 및 기타 인터페이스는 `AutoCloseable`을 구현합니다.
+> 더 이상 필요하지 않을 때 리소스를 해제하려면 `close()` 함수를 호출하세요.
+> 
 {style="note"}
 
 ### 원격 트랙 수신 {id="receiving-remote-tracks"}
@@ -233,7 +272,8 @@ scope.launch {
 
 ## 플랫폼별 로직 {id="platform-specific-logic"}
 
-이 API는 고수준의 추상화를 제공하지만, 플랫폼 전용 API에 액세스해야 하는 사용 사례가 있을 수 있습니다. `.getNative()` 확장 함수를 사용하여 기본 구현을 가져올 수 있습니다.
+이 API는 고수준의 추상화를 제공하지만, 플랫폼 전용 API에 액세스해야 하는 사용 사례가 있을 수 있습니다.
+`.getNative()` 확장 함수를 사용하여 기본 구현을 가져올 수 있습니다.
 플랫폼별 라이브러리는 iOS의 `WebRTC-SDK` CocoaPod을 제외하고 전이적 라이브러리(transitive libraries)로 노출됩니다.
 
 <Tabs group="platform" id="platform-specific-logic-tabs">
@@ -313,10 +353,25 @@ kotlin {
 ```
 
 </TabItem>
+
+<TabItem title="JVM" group-key="jvm">
+
+```kotlin
+val videoTrack = rtcClient.createVideoTrack()
+val nativeTrack: dev.onvoid.webrtc.media.video.VideoTrack = videoTrack.getNative()
+
+// 내장 비디오 뷰가 없습니다. 싱크(sink)를 연결하고 Swing, JavaFX, Compose
+// 또는 다른 UI 툴킷으로 프레임을 렌더링하세요.
+nativeTrack.addSink { frame ->
+    // frame.buffer를 UI에 그린 다음 frame.release()를 호출합니다.
+}
+```
+
+</TabItem>
 </Tabs>
 
 ```kotlin
-// Android 및 iOS에서는 `getNative()`를 사용하지 않고도 오디오 트랙 재생을 시작/중지할 수 있습니다.
+// Android, iOS 및 JVM에서는 `getNative()`를 사용하지 않고도 오디오 트랙 재생을 시작/중지할 수 있습니다.
 // 브라우저에서는 여전히 정의되지 않은 엘리먼트를 생성해야 합니다.
 
 val audio = rtcClient.createAudioTrack()
@@ -327,14 +382,16 @@ audio.enable(false)
 ```
 
 > 이 스니펫들은 Compose Multiplatform과 함께 사용할 수 있지만, 해당 생명주기(lifecycle)를 고려하지는 않습니다. 완전한 통합을 위해서는 [Ktor Chat](https://github.com/ktorio/ktor-chat) 예제를 참조하세요.
+> 
 {style="note"}
 
 ## 제한 사항 {id="limitations"}
 
 WebRTC 클라이언트는 실험적이며 다음과 같은 제한 사항이 있습니다.
 
-- 시그널링이 포함되어 있지 않습니다. 자체적인 시그널링(예: WebSockets 또는 HTTP 사용)을 구현해야 합니다.
-- 지원되는 플랫폼은 JavaScript/Wasm, Android 및 iOS입니다. JVM 데스크톱 및 Kotlin/Native 지원은 향후 릴리스에서 계획되어 있습니다.
-- 권한 처리는 애플리케이션에서 직접 수행해야 합니다. 브라우저는 사용자에게 마이크 및 카메라 액세스를 요청하는 반면, Android 및 iOS는 런타임 권한 요청이 필요합니다.
-- 기본적인 오디오 및 비디오 트랙만 지원됩니다. 화면 공유, 장치 선택, 시뮬캐스트(simulcast) 및 고급 RTP 기능은 아직 제공되지 않습니다.
-- 연결 통계를 사용할 수 있지만 플랫폼마다 다르며 통합된 스키마를 따르지 않습니다.
+* **시그널링:** 시그널링이 포함되어 있지 않습니다. WebSockets나 HTTP 등을 사용하여 별도로 구현해야 합니다.
+* **플랫폼 지원:** 이 클라이언트는 JavaScript/Wasm, Android, iOS 및 JVM 데스크톱을 지원합니다. Kotlin/Native 지원은 향후 릴리스에서 계획되어 있습니다.
+* **권한:** 권한 처리는 애플리케이션에서 직접 수행해야 합니다. 브라우저는 사용자에게 마이크 및 카메라 액세스를 요청합니다. Android 및 iOS는 런타임 권한 요청이 필요합니다. JVM에서는 운영 체제 수준에서 카메라 및 마이크 액세스 권한이 부여됩니다.
+* **JVM 제한 사항:** 후보 프리페칭(Candidate prefetching)은 지원되지 않습니다. `iceCandidatePoolSize`는 `0`이거나 생략되어야 합니다. `facingMode`, `aspectRatio` 및 `resizeMode` 비디오 제약 조건은 지원되지 않으며 설정 시 예외를 발생시킵니다. `DataChannelEvent.Error`는 발생하지 않습니다.
+* **미디어 기능:** 기본적인 오디오 및 비디오 트랙만 지원됩니다. 화면 공유, 장치 선택, 시뮬캐스트(simulcast) 및 고급 RTP 기능은 아직 제공되지 않습니다.
+* **연결 통계:** 연결 통계를 사용할 수 있지만 플랫폼마다 다르며 통합된 스키마를 따르지 않습니다.

@@ -23,20 +23,26 @@
 了解如何使用 Resources 外掛程式發送型別安全請求。
 </link-summary>
 
-Ktor 提供 `%plugin_name%` 外掛程式，讓您能夠實作型別安全[請求](client-requests.md)。為此，您需要建立一個描述伺服器可用資源的類別，然後使用 `@Resource` 關鍵字來註解該類別。請注意，`@Resource` 註解具有由 kotlinx.serialization 程式庫提供的 `@Serializable` 行為。
+Ktor 提供 `%plugin_name%` 外掛程式，用於發送型別安全[用戶端請求](client-requests.md)。
+為此，您需要定義代表伺服器端點的類別，並使用 `@Resource` 關鍵字對其進行註解。
 
-> Ktor 伺服器提供了實作[型別安全路由](server-resources.md)的功能。
+資源類別使用 `kotlinx.serialization` 將其屬性轉換為路徑與查詢參數。
+
+> 在伺服器端，Ktor 提供[型別安全路由](server-resources.md)。
+>
+{style="tip"}
 
 ## 新增相依性 {id="add_dependencies"}
 
 ### 新增 kotlinx.serialization {id="add_serialization"}
 
-鑑於[資源類別](#resource_classes)應具備 `@Serializable` 行為，您需要按照 [Setup](https://github.com/Kotlin/kotlinx.serialization#setup) 章節中的說明新增 Kotlin 序列化外掛程式。
+`Resources` 外掛程式依賴於 `kotlinx.serialization`。請按照
+[`kotlinx.serialization` 設定指南](https://github.com/Kotlin/kotlinx.serialization#setup)中的說明啟用 Kotlin 序列化外掛程式。
 
 ### 新增 %plugin_name% 相依性 {id="add_plugin_dependencies"}
 
 <p>
-    若要使用 <code>%plugin_name%</code>，您需要在建置指令碼中包含 <code>%artifact_name%</code> 構件：
+    若要使用 <code>%plugin_name%</code>，請在建置指令碼中新增 <code>%artifact_name%</code> 構件：
 </p>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
@@ -55,7 +61,8 @@ Ktor 提供 `%plugin_name%` 外掛程式，讓您能夠實作型別安全[請求
 
 ## 安裝 %plugin_name% {id="install_plugin"}
 
-若要安裝 `%plugin_name%`，請將其傳遞給[用戶端配置區塊](client-create-and-configure.md#configure-client)內的 `install` 函式：
+若要安裝 `%plugin_name%` 外掛程式，請將其傳遞給[用戶端配置區塊](client-create-and-configure.md#configure-client)內的 `install` 函式：
+
 ```kotlin
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
@@ -120,7 +127,7 @@ class Articles() {
 
 ### 範例：用於 CRUD 操作的資源 {id="example_crud"}
 
-讓我們總結上述範例，並為 CRUD 操作建立 `Articles` 資源。
+下列範例建立了用於 CRUD 操作的 `Articles` 資源：
 
 ```kotlin
 @Resource("/articles")
@@ -136,13 +143,19 @@ class Articles() {
 }
 ```
 
-此資源可用於列出所有文章、發佈新文章、編輯文章等。我們將在下一節中介紹如何對此資源[發送型別安全請求](#make_requests)。
+此資源可用於列出所有文章、發佈新文章，以及編輯現有文章。
 
-> 您可以在此處找到完整的範例：[client-type-safe-requests](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-type-safe-requests)。
+下一節將示範如何使用此資源[發送型別安全請求](#make_requests)。
+
+> 若要查看完整範例，請參閱 [client-type-safe-requests](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-type-safe-requests)。
+>
+{style="tip"}
 
 ## 發送型別安全請求 {id="make_requests"}
 
-若要對具備型別的資源[發送請求](client-requests.md)，您需要將資源類別執行個體傳遞給請求函式（`request`、`get`、`post`、`put` 等）。例如，下方的範例展示了如何對 `/articles` 路徑發送請求。
+若要對具備型別的資源[發送請求](client-requests.md)，請將資源類別執行個體傳遞給請求函式，例如 `request()`、`get()`、`post()` 或 `put()`。
+
+下列範例對 `/articles` 路徑發送請求：
 
 ```kotlin
 @Resource("/articles")
@@ -159,7 +172,7 @@ fun main() {
 }
 ```
 
-下列範例展示了如何對 [範例：用於 CRUD 操作的資源](#example_crud) 中建立的 `Articles` 資源發送具備型別的請求。
+下列範例對[範例：用於 CRUD 操作的資源](#example_crud)中建立的 `Articles` 資源發送具備型別的請求。
 
 ```kotlin
 fun main() {
@@ -184,6 +197,17 @@ fun main() {
 }
 ```
 
-[defaultRequest](client-default-request.md) 函式用於為所有請求指定預設 URL。
+[`defaultRequest()`](client-default-request.md) 函式用於為所有請求指定預設 URL。
 
-> 您可以在此處找到完整的範例：[client-type-safe-requests](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-type-safe-requests)。
+> 在開發用戶端外掛程式或檢測工具時，您可以透過 `RESOURCE` 請求屬性存取用於型別安全請求的資源執行個體：
+>  ```kotlin
+>  onRequest { call, _ ->
+>    val resource = call.attributes.getOrNull(RESOURCE)
+>  }
+>  ```
+> 
+{style="tip"}
+
+> 若要查看完整範例，請參閱 [client-type-safe-requests](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-type-safe-requests)。
+>
+{style="tip"}

@@ -8,29 +8,30 @@
 </p>
 </tldr>
 
-[HTTP/2](https://en.wikipedia.org/wiki/HTTP/2) 是一種現代的二進制雙工多路複用協定，旨在取代 HTTP/1.x。
+[HTTP/2](https://en.wikipedia.org/wiki/HTTP/2) 是一種現代的二進制多路複用協定，旨在取代 HTTP/1.x。
 
-Jetty 與 Netty 引擎提供了 Ktor 可使用的 HTTP/2 實作。然而，兩者之間存在顯著差異，且每個引擎都需要額外的配置。
-一旦您的主機為 Ktor 配置妥當，HTTP/2 支援將會自動啟用。
+Ktor 透過 Jetty 和 Netty 伺服器引擎支援 HTTP/2。然而，兩者之間存在顯著差異，且每個引擎都需要額外的配置。一旦您的主機配置妥當，HTTP/2 支援將會自動啟用。
 
-關鍵需求：
+針對基於 TLS 的 HTTP/2，您通常需要：
 
-*   一份 SSL 憑證（可以是自我簽署憑證）。
-*   適用於特定引擎的 ALPN 實作（請參閱 Netty 與 Jetty 的對應章節）。
+* [一份 SSL 憑證](#ssl_certificate)（可以是自我簽署憑證）。
+* 所選引擎支援的 [ALPN 實作](#apln_implementation)。
 
-## SSL 憑證 {id="ssl_certificate"}
+[基於純文字的 HTTP/2 (h2c)](#http2-without-tls) 可在 Netty 引擎中使用，且不需要 SSL 或 ALPN 配置。
 
-根據規格，HTTP/2 不需要加密，但所有瀏覽器都會要求與 HTTP/2 搭配使用加密連線。
-這就是為什麼運作正常的 TLS 環境是啟用 HTTP/2 的先決條件。因此，需要憑證來啟用加密。
-出於測試目的，可以使用 JDK 中的 `keytool` 產生憑證...
+## 配置 SSL 憑證 {id="ssl_certificate"}
+
+HTTP/2 不需要 TLS，但瀏覽器通常僅支援透過加密連線使用 HTTP/2。若要在 TLS 上使用 HTTP/2，您需要為伺服器配置 SSL 憑證。
+
+出於測試目的，您可以使用 JDK `keytool` 工具產生自我簽署憑證：
 
 ```bash
 keytool -keystore test.jks -genkeypair -alias testkey -keyalg RSA -keysize 4096 -validity 5000 -dname 'CN=localhost, OU=ktor, O=ktor, L=Unspecified, ST=Unspecified, C=US'
 ```
 
-... 或使用 [buildKeyStore](server-ssl.md) 函式。
+您也可以使用 [`buildKeyStore()`](server-ssl.md) 函式以程式化方式建立金鑰庫。
 
-下一步是配置 Ktor 以使用您的金鑰庫。請參閱 `application.conf` / `application.yaml` [配置檔案](server-configuration-file.topic) 範例：
+接著，在您的 <Path>application.conf</Path> 或 <Path>application.yaml</Path> [配置檔案](server-configuration-file.topic) 中配置 Ktor 以使用該金鑰庫：
 
 <Tabs group="config">
 <TabItem title="application.conf" group-key="hocon">
@@ -72,34 +73,36 @@ ktor:
 
     security:
         ssl:
-            keyStore: test.jks
-            keyAlias: testkey
-            keyStorePassword: foobar
-            privateKeyPassword: foobar
+            keyStore = test.jks
+            keyAlias = testkey
+            keyStorePassword = foobar
+            privateKeyPassword = foobar
 ```
 
 </TabItem>
 </Tabs>
 
-## ALPN 實作 {id="apln_implementation"}
+## 配置 ALPN {id="apln_implementation"}
 
-HTTP/2 需要啟用 ALPN（[應用層協定協商](https://en.wikipedia.org/wiki/Application-Layer_Protocol_Negotiation)）。第一個選項是使用需要新增到啟動類別路徑（boot classpath）的外部 ALPN 實作。
-另一個選項是使用 OpenSSL 原生繫結和預先編譯的原生二進制檔案。
-此外，每個特定的引擎可能僅支援其中一種方法。
+基於 TLS 的 HTTP/2 使用 [應用層協定協商 (ALPN)](https://en.wikipedia.org/wiki/Application-Layer_Protocol_Negotiation) 在用戶端與伺服器之間協商協定。ALPN 的配置方式取決於所使用的伺服器引擎。
 
 ### Jetty {id="jetty"}
 
-由於自 Java 8 開始支援 ALPN API，Jetty 引擎不需要任何特定配置即可使用 HTTP/2。因此，您只需要：
+Jetty 引擎無需額外的 Ktor 配置即可處理 ALPN。
+若要在 Jetty 上使用基於 TLS 的 HTTP/2：
 1. 使用 Jetty 引擎[建立伺服器](server-engines.md#choose-create-server)。
-2. 按照 [SSL 憑證](#ssl_certificate) 中的說明新增 SSL 配置。
+2. [配置 SSL 憑證](#ssl_certificate)。
 3. 配置 `sslPort`。
 
-[http2-jetty](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/http2-jetty) 可執行範例展示了 Jetty 的 HTTP/2 支援。
+> 關於 Jetty 搭配 HTTP/2 的完整可執行範例，請參閱 [http2-jetty](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/http2-jetty)。
+>
+{style="tip"}
 
 ### Netty {id="netty"}
 
-要在 Netty 中啟用 HTTP/2，請使用 OpenSSL 繫結（[tcnative Netty 移植版本](https://netty.io/wiki/forked-tomcat-native.html)）。
-下方的範例顯示如何將原生實作（靜態連結的 BoringSSL 程式庫，OpenSSL 的一個分支）新增到 `build.gradle.kts` 檔案中：
+若要在 Netty 上使用基於 TLS 的 HTTP/2，請新增 [Netty `tcnative`](https://netty.io/wiki/forked-tomcat-native.html) OpenSSL 繫結。
+
+以下範例展示如何將靜態連結的 BoringSSL 實作新增至 <Path>build.gradle.kts</Path> 檔案中：
 
 ```kotlin
 val osName = System.getProperty("os.name").lowercase()
@@ -119,16 +122,20 @@ dependencies {
 }
 ```
 
-`tc.native.classifier` 應為以下之一：`linux-x86_64`、`osx-x86_64` 或 `windows-x86_64`。
-[http2-netty](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/http2-netty) 可執行範例展示了如何啟用 Netty 的 HTTP/2 支援。
+`tc.native.classifier` 可以是 `linux-x86_64`、`osx-x86_64` 或 `windows-x86_64`。
 
-#### 不具備 TLS 的 HTTP/2 {id="http-2-without-tls"}
+> 關於 Netty 搭配 HTTP/2 的完整可執行範例，請參閱 [http2-netty](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/http2-netty)。
+> 
+{style="tip"}
 
-Netty 引擎也支援 [基於純文字的 HTTP/2 (h2c)](https://httpwg.org/specs/rfc7540.html#discover-http)。
-這允許在不使用 TLS 的情況下進行 HTTP/2 通訊，通常用於不需要加密的私有網路內。
-用戶端可以透過 HTTP/1.1 請求發起通訊，然後升級到 HTTP/2。
+## 不具備 TLS 的 HTTP/2 {id="http2-without-tls"}
 
-要啟用 h2c，請在引擎配置中將 `enableH2c` 旗標設定為 `true`：
+Netty 引擎支援 [基於純文字的 HTTP/2 (h2c)](https://httpwg.org/specs/rfc7540.html#discover-http)，允許在不使用 TLS 的情況下進行 HTTP/2 通訊。
+這在不需要加密的私有網路內非常實用。
+
+用戶端可以直接使用 h2c 進行連線，或是將 HTTP/1.1 連線升級為 HTTP/2。
+
+若要啟用 h2c，請在引擎配置中將 `enableH2c` 和 `enableHttp2` 選項皆設定為 `true`：
 
 ```kotlin
 embeddedServer(Netty, configure = {
@@ -140,4 +147,4 @@ embeddedServer(Netty, configure = {
 })
 ```
 
-請注意，h2c 需要 `enableHttp2 = true`，且如果伺服器上配置了 SSL 連接器，則無法使用。
+您可以在同一台伺服器上同時啟用 h2c 與基於 TLS 的 HTTP/2。純文字連接器會接受 h2c 連線，而 SSL 連接器則會使用基於 TLS 的 HTTP/2。

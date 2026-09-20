@@ -554,8 +554,8 @@
   "kotlin.data-analysis-overview": "概覽",
   "kotlin.kotlin-notebook-overview": "Kotlin Notebook 概覽",
   "kotlin.kotlin-for-ai-powered-apps": "用於 AI 驅動應用程式的 Kotlin",
-  "kotlin.kotlin-ai-apps-development-overview": "Kotlin AI 應用程式開發概覽",
-  "kotlin.spring-ai-guide": "使用 Spring AI 建立 Kotlin 應用程式 – 教學",
+  "kotlin.kotlin-ai-apps-development-overview": "開發 AI 驅動的應用程式",
+  "kotlin.spring-ai-guide": "使用 Spring AI 建構 AI 聊天機器人 – 教學",
   "kotlin.libraries": "程式庫",
   "kotlin.constructing-collections": "建立",
   "kotlin.iterators": "遍歷",
@@ -698,5 +698,15 @@
   "kotlin.mapping-strings-from-c": "字串",
   "kmp.compose-desktop-tabbing": "標籤頁導覽",
   "kotlin.whatsnew2420": "Kotlin 2.4.20",
-  "coroutines.coroutine-debugging": "協同程式偵錯"
+  "coroutines.coroutine-debugging": "協同程式偵錯",
+  "kotlin.ai-development": "AI 開發",
+  "kotlin.kotlin-with-ai": "概覽",
+  "kotlin.ai-for-development": "AI 工具",
+  "ktor.sessions": "會話",
+  "ktor.oauth": "OAuth",
+  "ktor.server-oauth": "OAuth 驗證",
+  "ktor.server-oauth2-flows": "型別安全的 OAuth 2.0 流程",
+  "ktor.server-oidc": "OpenID Connect",
+  "ktor.server-oidc-resource-server": "資源伺服器",
+  "ktor.server-oidc-browser-login": "瀏覽器登入"
 }

@@ -15,7 +15,7 @@
   请注意，[特定平台](client-supported-platforms.md)可能需要特定的引擎来处理网络请求。
 - (可选) **[日志依赖项](#logging-dependency)**
 
-  提供日志框架以启用结构化且灵活的日志记录能力。
+  提供日志框架以启用结构化且灵活的日志记录功能。
 
 - (可选) **[插件依赖项](#plugin-dependency)**
 
@@ -93,7 +93,7 @@
 
 ### 客户端依赖项 {id="client-dependency"}
 
-主要客户端功能在 `ktor-client-core` 工件中提供。根据您的构建系统，您可以按以下方式添加它：
+主要的客户端功能在 `ktor-client-core` 工件中提供。根据您的构建系统，您可以按以下方式添加它：
 
 <var name="artifact_name" value="ktor-client-core"/>
 <Tabs group="languages">
@@ -116,7 +116,7 @@
 
 ```kotlin
 [versions]
-ktor = "3.4.0"
+ktor = "3.6.0"
 
 [libraries]
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
@@ -134,7 +134,9 @@ sourceSets {
 
 ### 引擎依赖项 {id="engine-dependency"}
 
-[引擎](client-engines.md)负责处理网络请求。有适用于各种平台的不同客户端引擎，例如 Apache、CIO、Android、iOS 等。例如，您可以按如下方式添加 `CIO` 引擎依赖项：
+[引擎](client-engines.md)负责处理网络请求。Ktor 为不同的平台提供了不同的客户端引擎。
+
+例如，您可以按如下方式添加 `CIO` 引擎：
 
 <var name="artifact_name" value="ktor-client-cio"/>
 <Tabs group="languages">
@@ -151,19 +153,41 @@ sourceSets {
 
 #### 多平台 {id="engine-dependency-multiplatform"}
 
-对于多平台项目，您需要将所需引擎的依赖项添加到相应的源集中。
+##### 使用默认引擎 {id="use-default-engines"}
 
-例如，要为 Android 添加 `OkHttp` 引擎依赖项，您可以先在 `gradle/libs.versions.toml` 文件中定义 Ktor 版本和 `ktor-client-okhttp` 工件：
+对于多平台项目，您可以使用 `ktor-client-engine-defaults` 工件为每个目标平台提供精选的客户端引擎。
+
+首先，在您的 `gradle/libs.versions.toml` 文件中定义该工件：
+
+```toml
+[libraries]
+ktor-client-engine-defaults = { module = "io.ktor:ktor-client-engine-defaults", version.ref = "ktor" }
+```
+
+然后，将其添加到 `commonMain` 源集中：
 
 ```kotlin
-[versions]
-ktor = "3.4.0"
+kotlin {
+    sourceSets {
+        commonMain {
+            dependencies {
+                api(libs.ktor.client.engine.defaults)
+            }
+        }
+    }
+}
+```
 
+##### 使用特定引擎 {id="kmp-specific-engine"}
+
+如果您需要特定的引擎，请改为将其依赖项添加到相应的平台源集中。例如，要在 Android 上使用 `OkHttp`，请定义 `ktor-client-okhttp` 工件：
+
+```toml
 [libraries]
 ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
 ```
 
-然后，将 `ktor-client-okhttp` 作为依赖项添加到 `androidMain` 源集中：
+然后，将其作为依赖项添加到 `androidMain` 源集中：
 
 ```kotlin
 sourceSets {
@@ -173,12 +197,12 @@ sourceSets {
 }
 ```
 
-有关特定引擎所需依赖项的完整列表，请参阅[添加引擎依赖项](client-engines.md#dependencies)。
+有关各引擎所需依赖项的信息，请参阅[添加引擎依赖项](client-engines.md#dependencies)。
 
 ### 日志依赖项 {id="logging-dependency"}
 
   <p>
-    在 JVM 上，Ktor 使用 Simple Logging Facade for Java
+    在 <a href="#jvm">JVM</a> 上，Ktor 使用 Simple Logging Facade for Java
     (<a href="http://www.slf4j.org/">SLF4J</a>) 作为日志记录的抽象层。SLF4J 将日志记录 API 与底层的日志记录实现解耦，
     允许您集成最适合应用程序要求的日志框架。
     常见的选择包括 <a href="https://logback.qos.ch/">Logback</a> 或 

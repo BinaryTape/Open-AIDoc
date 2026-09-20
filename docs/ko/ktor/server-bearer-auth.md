@@ -11,7 +11,7 @@
 <var name="example_name" value="auth-bearer"/>
 <p>
     <b>코드 예제</b>:
-    <a href="https://github.com/ktorio/ktor-documentation/tree/%ktor_version%/codeSnippets/snippets/%example_name%">
+    <a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/%example_name%">
         %example_name%
     </a>
 </p>
@@ -70,13 +70,16 @@ install(Authentication) {
 }
 ```
 
-필요한 경우 [특정 경로를 인증](#authenticate-route)하는 데 사용할 수 있는 [프로바이더 이름(provider name)](server-auth.md#provider-name)을 지정할 수 있습니다.
+필요한 경우 [특정 경로를 인증](#authenticate-route)하는 데 사용할 수 있는 [프로바이더 이름](server-auth.md#provider-name)을 지정할 수 있습니다.
 
 ## Bearer 인증 구성 {id="configure"}
 
 Ktor에서 다양한 인증 프로바이더를 구성하는 방법에 대한 일반적인 개념은 [인증 구성](server-auth.md#configure)을 참조하세요. 이 섹션에서는 `bearer` 인증 프로바이더의 구체적인 구성에 대해 살펴보겠습니다. 
 
 ### 1단계: bearer 프로바이더 구성 {id="configure-provider"}
+
+<Tabs group="auth-dsl">
+<TabItem title="Classic" group-key="classic">
 
 `bearer` 인증 프로바이더는 [BearerAuthenticationProvider.Configuration](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-bearer-authentication-provider/-config/index.html) 클래스를 통해 설정을 노출합니다. 아래 예제에서는 다음과 같은 설정이 지정되었습니다.
 * `realm` 속성은 `WWW-Authenticate` 헤더에 전달될 realm을 설정합니다.
@@ -97,7 +100,46 @@ install(Authentication) {
 }
 ```
 
+</TabItem>
+<TabItem title="Type-safe" group-key="typed">
+
+<note>
+    <p>
+        타입 안전(type-safe) 인증 스킴 API는 실험적(experimental) 기능입니다. 언제든지 제거되거나 변경될 수 있습니다.
+        옵트인이 필요합니다. 자세한 내용은
+        <a href="server-typed-auth.md#prerequisites">API 활성화</a>를 참조하세요.
+    </p>
+</note>
+
+`bearer()` 함수는 원하는 principal 타입에 대한 스킴을 생성합니다. `install(Authentication)`
+단계는 필요하지 않으며, 스킴은 이를 필요로 하는 라우트에 전달하는 값입니다.
+
+```kotlin
+data class User(val name: String)
+
+val bearerAuth = bearer<User>("auth-bearer") {
+    realm = "Access to the '/' path"
+    validate { tokenCredential ->
+        if (tokenCredential.token == "abc123") {
+            User("jetbrains")
+        } else {
+            null
+        }
+    }
+}
+```
+
+이름 변경에 유의하세요. 클래식 프로바이더는 `authenticate`를 사용하는 반면, 타입 안전 스킴은 다른 타입 안전 스킴과 마찬가지로 `validate`를 사용합니다. 이 함수는 사용자가 지정한 principal 타입을 반환하거나, 인증에 실패하면 `null`을 반환합니다.
+
+또한 `authHeader`를 설정하여 `Authorization` 헤더 이외의 위치에서 토큰을 읽을 수 있으며, `authSchemes`를 설정하여 `Bearer` 이외의 스킴을 허용할 수도 있습니다. 전체 API에 대해서는 [타입 안전 인증](server-typed-auth.md)을 참조하세요.
+
+</TabItem>
+</Tabs>
+
 ### 2단계: 특정 리소스 보호 {id="authenticate-route"}
+
+<Tabs group="auth-dsl">
+<TabItem title="Classic" group-key="classic">
 
 `bearer` 프로바이더를 구성한 후에는 **[authenticate](server-auth.md#authenticate-route)** 함수를 사용하여 애플리케이션의 특정 리소스를 보호할 수 있습니다. 인증에 성공하면 라우트 핸들러 내부에서 `call.principal` 함수를 사용해 인증된 [UserIdPrincipal](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-user-id-principal/index.html)을 가져와 인증된 사용자의 이름을 얻을 수 있습니다.
 
@@ -105,7 +147,27 @@ install(Authentication) {
 routing {
     authenticate("auth-bearer") {
         get("/") {
-            call.respondText("Hello, ${call.principal<UserIdPrincipal>()?.name}!")
+            val user = call.principal<UserIdPrincipal>()
+            call.respondText("Hello, ${user?.name}!")
         }
     }
 }
+```
+
+</TabItem>
+<TabItem title="Type-safe" group-key="typed">
+
+스킴을 `authenticateWith()`에 전달합니다. 블록 내부에서 `call.principal`은 사용자가 지정한 principal 타입이며 절대 `null`이 될 수 없으므로, 타입 캐스팅이나 null 검사가 필요하지 않습니다.
+
+```kotlin
+routing {
+    authenticateWith(bearerAuth) {
+        get("/") {
+            call.respondText("Hello, ${call.principal.name}!")
+        }
+    }
+}
+```
+
+</TabItem>
+</Tabs>

@@ -78,6 +78,10 @@ install(Authentication) {
 ## 配置表单身份验证 {id="configure"}
 
 ### 第 1 步：配置表单提供者 {id="configure-provider"}
+
+<Tabs group="auth-dsl">
+<TabItem title="命名提供者" group-key="classic">
+
 `form` 身份验证提供者通过 [FormAuthenticationProvider.Config](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-form-authentication-provider/-config/index.html) 类公开其设置。在下面的示例中，指定了以下设置：
 * `userParamName` 和 `passwordParamName` 属性指定了用于获取用户名和密码的参数名称。
 * `validate` 函数验证用户名和密码。
@@ -90,22 +94,68 @@ install(Authentication) {
         userParamName = "username"
         passwordParamName = "password"
         validate { credentials ->
-            if (credentials.name == "jetbrains" && credentials.password == "foobar") {
+            val isValid = credentials.name == "jetbrains" &&
+                credentials.password == "foobar"
+            if (isValid) {
                 UserIdPrincipal(credentials.name)
             } else {
                 null
             }
         }
         challenge {
-            call.respond(HttpStatusCode.Unauthorized, "Credentials are not valid")
+            val message = "Credentials are not valid"
+            val status = HttpStatusCode.Unauthorized
+            call.respond(status, message)
         }
     }
 }
 ```
 
+</TabItem>
+<TabItem title="类型安全" group-key="typed">
+
+<note>
+    <p>
+        类型安全的身份验证方案 API 是实验性的。它可能会随时被移除或更改。
+        使用需要选择加入（Opt-in）。有关更多详细信息，请参阅
+        <a href="server-typed-auth.md#prerequisites">启用 API</a>。
+    </p>
+</note>
+
+`form()` 函数为您选择的主体类型创建方案。无需经历 `install(Authentication)`
+步骤：该方案是一个值，您可以将其传递给需要它的路由。
+
+```kotlin
+data class User(val name: String)
+
+val formAuth = form<User>("auth-form") {
+    usernameField = "username"
+    passwordField = "password"
+    validate { credentials ->
+        val isValid = credentials.name == "jetbrains" &&
+            credentials.password == "foobar"
+        if (isValid) User(credentials.name) else null
+    }
+    onUnauthorized = {
+        val message = "Credentials are not valid"
+        call.respond(HttpStatusCode.Unauthorized, message)
+    }
+}
+```
+
+有两个名称与经典提供者不同。表单字段为 `usernameField` 和 `passwordField`，而不是
+`userParamName` 和 `passwordParamName`。失败处理程序是 `onUnauthorized`，而不是 `challenge`。有关完整的
+API，请参阅[类型安全身份验证](server-typed-auth.md)。
+
+</TabItem>
+</Tabs>
+
 > 对于 `basic` 身份验证，您还可以使用 [UserHashedTableAuth](server-basic-auth.md#validate-user-hash) 来验证存储在内存表中的用户，该表保存了用户名和密码哈希。
 
 ### 第 2 步：保护特定资源 {id="authenticate-route"}
+
+<Tabs group="auth-dsl">
+<TabItem title="命名提供者" group-key="classic">
 
 配置 `form` 提供者后，您需要定义发送数据的 `post` 路由。
 然后，将此路由添加到 **[authenticate](server-auth.md#authenticate-route)** 函数中。
@@ -115,11 +165,31 @@ install(Authentication) {
 routing {
     authenticate("auth-form") {
         post("/login") {
-            call.respondText("Hello, ${call.principal<UserIdPrincipal>()?.name}!")
+            val user = call.principal<UserIdPrincipal>()
+            call.respondText("Hello, ${user?.name}!")
         }
     }
 }
 ```
+
+</TabItem>
+<TabItem title="类型安全" group-key="typed">
+
+定义发送表单数据的 `post` 路由，并将其包装在 `authenticateWith()` 中。在该代码块内，
+`call.principal` 为您指定的主体类型，并且绝不会为 `null`：
+
+```kotlin
+routing {
+    authenticateWith(formAuth) {
+        post("/login") {
+            call.respondText("Hello, ${call.principal.name}!")
+        }
+    }
+}
+```
+
+</TabItem>
+</Tabs>
 
 您可以使用[会话身份验证](server-session-auth.md)来存储已登录用户的 ID。
 例如，当用户第一次使用 Web 表单登录时，您可以将用户名保存到 Cookie 会话中，并在后续请求中使用 `session` 提供者授权该用户。

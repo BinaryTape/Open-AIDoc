@@ -3,7 +3,7 @@
 要使用測試支援類別，請匯入擴充套件程式庫：
 
 ```kotlin
-testImplementation("io.coil-kt.coil3:coil-test:3.6.2")
+testImplementation("io.coil-kt.coil3:coil-test:3.6.3")
 ```
 
 `coil-test` 包含 `FakeImageLoaderEngine`，可以將其新增至您的 `ImageLoader` 中，以攔截所有傳入的 `ImageRequest` 並傳回自訂的 `ImageResult`。這對於測試非常有用，因為它能使圖片載入變為同步（從主執行緒執行）且一致。透過使用 `FakeImageLoaderEngine`，`ImageLoader` 將避免所有通常用於載入圖片的記憶體快取、執行緒跳轉、磁碟/網路 I/O 擷取以及圖片解碼。以下是一個範例：

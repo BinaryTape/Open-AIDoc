@@ -1,4 +1,5 @@
 [//]: # (title: Spring AI로 질문에 답하는 Kotlin 앱 만들기 — 튜토리얼)
+[//]: # (description: Kotlin, Spring AI, Spring Boot, OpenAI, Qdrant, RAG를 사용하여 문서 질문 답변 애플리케이션을 구축하는 방법을 알아봅니다.)
 
 <web-summary>Spring AI를 사용하여 질문에 답하는 Kotlin 앱을 만드는 방법을 알아봅니다.</web-summary>
 

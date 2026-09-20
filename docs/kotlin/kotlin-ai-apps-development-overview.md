@@ -1,4 +1,5 @@
 [//]: # (title: Kotlin 用于人工智能驱动的应用开发)
+[//]: # (description: 了解如何使用 Koog、MCP Kotlin SDK、主流 LLM 提供商、RAG 流水线、AI 智能体、Spring AI 以及 LangChain4j 通过 Kotlin 构建人工智能驱动的应用程序。)
 
 <web-summary>了解 Koog 如何帮助您使用 Kotlin 构建人工智能驱动的应用程序。</web-summary>
 
@@ -88,4 +89,4 @@ fun main() {
 
 * 完成[使用 Spring AI 创建回答问题的 Kotlin 应用](spring-ai-guide.md)教程，详细了解如何在 IntelliJ IDEA 中将 Spring AI 与 Kotlin 结合使用。
 * 加入 [Kotlin 社区](https://kotlinlang.org/community/)，与其他使用 Kotlin 构建 AI 应用程序的开发者建立联系。
-* 了解关于 [](kotlin-ai-skills.md) 的内容。
+* 了解[可用于协助 Kotlin 开发的 AI 工具](ai-for-development.md)。

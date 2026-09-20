@@ -8,7 +8,7 @@ Kotlin 프로젝트를 다양한 인기 모듈 시스템을 위한 JavaScript �
 - [CommonJS](http://wiki.commonjs.org/wiki/Modules/1.1): Node.js/npm에서 널리 사용됩니다(`require` 함수와 `module.exports` 객체 사용).
 - Plain (일반): 어떤 모듈 시스템으로도 컴파일하지 않습니다. 전역 스코프(global scope)에서 이름을 통해 모듈에 접근할 수 있습니다.
 
-## 브라우저 타겟 (Browser targets) {id="browser-targets"}
+## 브라우저 타겟 {id="browser-targets"}
 
 웹 브라우저 환경에서 코드를 실행하려 하고 UMD 이외의 모듈 시스템을 사용하고 싶다면, `webpackTask` 구성 블록에서 원하는 모듈 유형을 지정할 수 있습니다. 예를 들어, CommonJS로 전환하려면 다음과 같이 사용합니다.
 

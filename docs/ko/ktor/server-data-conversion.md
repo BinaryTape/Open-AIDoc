@@ -26,12 +26,14 @@
 Ktor 서버용 %plugin_name% 플러그인을 사용하면 값 목록을 직렬화 및 역직렬화하기 위한 커스텀 컨버터를 추가할 수 있습니다.
 </link-summary>
 
-[%plugin_name%](https://api.ktor.io/ktor-utils/io.ktor.util.converters/-data-conversion/index.html) 플러그인을 사용하면 값 목록을 직렬화(serialize) 및 역직렬화(deserialize)할 수 있습니다. 기본적으로 Ktor는 [DefaultConversionService](https://api.ktor.io/ktor-utils/io.ktor.util.converters/-default-conversion-service/index.html)를 통해 기본 타입(primitive types)과 열거형(enums)을 처리합니다. `%plugin_name%` 플러그인을 설치하고 구성하여 추가적인 타입을 처리하도록 이 서비스를 확장할 수 있습니다.
+[%plugin_name%](https://api.ktor.io/ktor-utils/io.ktor.util.converters/-data-conversion/index.html) 플러그인을 사용하면 값 목록을 직렬화(serialize) 및 역직렬화(deserialize)할 수 있습니다. 기본적으로 Ktor는 [`DefaultConversionService`](https://api.ktor.io/ktor-utils/io.ktor.util.converters/-default-conversion-service/index.html)를 통해 문자열 및 숫자 타입, 부호 없는 정수(unsigned integer) 타입, `Uuid`, 열거형(enums)을 포함한 공통 타입을 처리합니다.
+
+`%plugin_name%` 플러그인을 설치하고 구성하여 추가적인 타입을 처리하도록 이 서비스를 확장할 수 있습니다.
 
 ## 의존성 추가 {id="add_dependencies"}
 
 <p>
-    <code>%plugin_name%</code>을(를) 사용하려면 빌드 스크립트에 <code>%artifact_name%</code> 아티팩트를 포함해야 합니다:
+    <code>%plugin_name%</code>을(를) 사용하려면 빌드 스크립트에 <code>%artifact_name%</code> 아티팩트를 추가하세요:
 </p>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
@@ -49,14 +51,14 @@ Ktor 서버용 %plugin_name% 플러그인을 사용하면 값 목록을 직렬�
 
 <p>
     애플리케이션에 <code>%plugin_name%</code> 플러그인을 <a href="#install">설치</a>하려면, 지정된 <Links href="/ktor/server-modules" summary="모듈을 사용하면 경로를 그룹화하여 애플리케이션 구조를 잡을 수 있습니다.">모듈</Links>의 <code>install</code> 함수에 이를 전달하세요.
-    아래 코드 스니펫은 <code>%plugin_name%</code>을(를) 설치하는 방법을 보여줍니다...
+    다음 예제는 <code>%plugin_name%</code>을(를) 설치하는 방법을 보여줍니다:
 </p>
 <list>
     <li>
-        ... <code>embeddedServer</code> 함수 호출 내부에서 설치.
+        <code>embeddedServer()</code> 함수 호출 내부에서 설치.
     </li>
     <li>
-        ... <code>Application</code> 클래스의 확장 함수인 명시적으로 정의된 <code>module</code> 내부에서 설치.
+        <code>Application</code> 클래스의 명시적으로 정의된 <code>module()</code> 확장 함수 내부에서 설치.
     </li>
 </list>
 <Tabs>
@@ -88,9 +90,7 @@ Ktor 서버용 %plugin_name% 플러그인을 사용하면 값 목록을 직렬�
       }
   ```
 
-## 서비스 접근하기 {id="access-the-service"}
-
-{id="service"}
+## 서비스 접근하기 {id="service"}
 
 현재 컨텍스트에서 `%plugin_name%` 서비스에 접근할 수 있습니다:
 
@@ -100,7 +100,7 @@ val dataConversion = application.conversionService
 
 그런 다음 컨버터 서비스를 사용하여 콜백 함수를 호출할 수 있습니다:
 
-* `fromValues(values: List<String>, type: TypeInfo)` 콜백 함수는 문자열 목록인 `values`와 변환할 대상인 `TypeInfo`를 인자로 받아 디코딩된 값을 반환합니다.
+* `fromValues(values: List<String>, type: TypeInfo)` 콜백 함수는 문자열 목록인 `values`와 값을 변환할 대상인 `TypeInfo`를 인자로 받아 디코딩된 값을 반환합니다.
 * `toValues(value: Any?)` 콜백 함수는 임의의 값을 인자로 받아 이를 나타내는 문자열 목록을 반환합니다.
 
 ## 예제 {id="example"}

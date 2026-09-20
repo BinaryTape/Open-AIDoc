@@ -274,10 +274,19 @@ fun main() {
 
 次のステップとして、人気のKotlinアプリケーションのチュートリアルをチェックしてください。
 
-* [Spring BootとKotlinでバックエンドアプリケーションを作成する](jvm-create-project-with-spring-boot.md)
-* AndroidとiOS向けのクロスプラットフォームアプリケーションをゼロから作成する：
-    * [UIをネイティブに保ちつつビジネスロジックを共有する](https://kotlinlang.org/docs/multiplatform/multiplatform-create-first-app.html)
-    * [ビジネスロジックとUIを共有する](https://kotlinlang.org/docs/multiplatform/compose-multiplatform-create-first-app.html)
+<p></p> <!-- workaround for MRK057: Paragraph can only contain inline elements -->
+<panels columns="2" id="kotlin-tour-whats-next">
+    <panel>
+        <title>バックエンド向けKotlin</title>
+        <p>Spring BootとKotlinでバックエンドアプリケーションを作成します。</p>
+        <a href="jvm-create-project-with-spring-boot.md" as="button" icon="arrow-right" icon-position="right" id="kotlin-tour-backend-tutorial">開始する</a>
+    </panel>
+    <panel>
+        <title>Kotlin Multiplatform</title>
+        <p>クロスプラットフォームアプリケーションをゼロから作成し、ビジネスロジックとUIを共有します。</p>
+        <a href="https://kotlinlang.org/docs/multiplatform/compose-multiplatform-create-first-app.html" as="button" icon="arrow-right" icon-position="right" id="kotlin-tour-cmp-tutorial">開始する</a>
+    </panel>
+</panels>
 
 <seealso></seealso>
 

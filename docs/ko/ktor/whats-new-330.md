@@ -79,9 +79,9 @@ ktor {
 
 ### HTTP/2 클리어텍스트(h2c) 지원 {id="http2-h2c-support"}
 
-Ktor 3.3.0은 Netty 엔진에 대해 HTTP/2 클리어텍스트(h2c) 지원을 도입했습니다. 이를 통해 TLS 암호화 없이 HTTP/2 통신이 가능해집니다. 이 설정은 일반적으로 로컬 테스트나 프라이빗 네트워크와 같이 신뢰할 수 있는 환경에서 사용됩니다.
+Ktor 3.3.0은 Netty 엔진에 대해 HTTP/2 클리어텍스트(h2c) 지원을 도입하여, TLS 암호화 없이 HTTP/2 통신이 가능해집니다. 이 설정은 일반적으로 로컬 테스트나 프라이빗 네트워크와 같이 신뢰할 수 있는 환경에서 사용됩니다.
 
-h2c를 활성화하려면 엔진 설정에서 `enableH2c` 플래그를 true로 설정하세요. 자세한 내용은 [TLS 없는 HTTP/2](server-http2.md#http-2-without-tls)를 참조하세요.
+h2c를 활성화하려면 엔진 설정에서 `enableH2c` 플래그를 true로 설정하세요. 자세한 내용은 [TLS 없는 HTTP/2](server-http2.md#http2-without-tls)를 참조하세요.
 
 ## Ktor Client {id="ktor-client"}
 
@@ -148,6 +148,18 @@ val androidClient = WebRtcClient(AndroidWebRtc) {
 ```kotlin
 val iosClient = WebRtcClient(IosWebRtc) {
     // 동일한 설정, 추가 컨텍스트 불필요
+}
+```
+
+</TabItem>
+
+<TabItem title="JVM" group-key="jvm">
+
+```kotlin
+val jvmClient = WebRtcClient(JvmWebRtc) {
+    defaultConnectionConfig = {
+        iceServers = listOf(WebRtc.IceServer("stun:stun.l.google.com:19302"))
+    }
 }
 ```
 

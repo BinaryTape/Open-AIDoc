@@ -7,7 +7,7 @@ Glide とは異なり、GIF はデフォルトではサポートされていま�
 GIF サポートを追加するには、拡張ライブラリをインポートします：
 
 ```kotlin
-implementation("io.coil-kt.coil3:coil-gif:3.6.2")
+implementation("io.coil-kt.coil3:coil-gif:3.6.3")
 ```
 
 これで完了です！`ImageLoader` はファイルヘッダーを使用して GIF を自動的に検出し、正しくデコードします。

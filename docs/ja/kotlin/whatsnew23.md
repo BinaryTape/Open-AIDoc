@@ -394,7 +394,7 @@ kotlin.native.binary.objcExportBlockExplicitParameterNames=false
 
 ### リリース用タスクのビルド時間短縮 {id="faster-build-time-for-release-tasks"}
 
-Kotlin/Native 2.3.0 ではいくつかのパフォーマンス改善が行われました。その結果、`linkRelease*`（例：`linkReleaseFrameworkIosArm64`）などのリリース用タスク의 ビルド時間が短縮されました。
+Kotlin/Native 2.3.0 ではいくつかのパフォーマンス改善が行われました。その結果、`linkRelease*`（例：`linkReleaseFrameworkIosArm64`）などのリリース用タスクのビルド時間が短縮されました。
 
 ベンチマークによると、プロジェクトの規模にもよりますが、リリースビルドは最大 40% 高速化されています。これらの改善は、iOS をターゲットとした Kotlin Multiplatform プロジェクトで最も顕著です。
 
@@ -539,7 +539,7 @@ kotlin {
 }
 ```
 
-この機能は [実験적 (Experimental)](components-stability.md#stability-levels-explained) です。イシュートラッカー [YouTrack](https://youtrack.jetbrains.com/issue/KT-79284/Use-BigInt64Array-for-LongArray) でのフィードバックをお待ちしております。
+この機能は [実験的 (Experimental)](components-stability.md#stability-levels-explained) です。イシュートラッカー [YouTrack](https://youtrack.jetbrains.com/issue/KT-79284/Use-BigInt64Array-for-LongArray) でのフィードバックをお待ちしております。
 
 ### JS モジュールシステム間での統一されたコンパニオンオブジェクトアクセス {id="unified-companion-object-access-across-js-module-systems"}
 
@@ -870,12 +870,12 @@ Composer.setDiagnosticStackTraceMode(ComposeStackTraceMode.GroupKeys)
 java.lang.IllegalStateException: <message>
         at <original trace>
     Suppressed: androidx.compose.runtime.DiagnosticComposeException: Composition stack when thrown:
-        at $compose.m$123(SourceFile:1)
-        at $compose.m$234(SourceFile:1)
+        at $$compose.m$123(SourceFile:1)
+        at $$compose.m$234(SourceFile:1)
         ...
 ```
 
-Jetバック Compose 1.10 によってこのモードで生成されるスタックトレースには、まだデオブスキュレート（復元）が必要なグループキーのみが含まれています。これは、Kotlin 2.3.0 リリースの Compose コンパイラ Gradle プラグインによって対処されており、R8 によって生成される ProGuard マッピングファイルにグループキーのエントリが付加されるようになりました。コンパイラが一部の関数のマッピング作成に失敗した場合に新しい警告が表示される場合は、[Google IssueTracker](https://issuetracker.google.com/issues/new?component=610764&template=1424126) に報告してください。
+Jetpack Compose 1.10 によってこのモードで生成されるスタックトレースには、まだデオブスキュレート（復元）が必要なグループキーのみが含まれています。これは、Kotlin 2.3.0 リリースの Compose コンパイラ Gradle プラグインによって対処されており、R8 によって生成される ProGuard マッピングファイルにグループキーのエントリが付加されるようになりました。コンパイラが一部の関数のマッピング作成に失敗した場合に新しい警告が表示される場合は、[Google IssueTracker](https://issuetracker.google.com/issues/new?component=610764&template=1424126) に報告してください。
 
 > Compose コンパイラ Gradle プラグインは、R8 マッピングファイルに依存しているため、ビルドで R8 が有効な場合にのみグループキー・スタックトレース用のデオブスキュレーションマッピングを作成します。
 >

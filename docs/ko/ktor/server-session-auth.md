@@ -24,6 +24,11 @@ Ktor에서는 `session` 프로바이더를 사용하여 이미 세션이 연결�
 
 > Ktor의 인증 및 인가에 대한 일반적인 정보는 [Ktor 서버의 인증 및 인가](server-auth.md) 섹션에서 확인할 수 있습니다.
 
+> 또한 Ktor는 타입 안전한(type-safe) 세션 인증 방식을 제공합니다. 이를 통해 라우트 핸들러에 non-null 프린시펄과 저장된 세션에 대한 읽기/쓰기 접근 권한을 제공하며, 세션 타입과 프린시펄 타입을 분리하여 유지합니다. 자세한 내용은
+> [타입 안전한 세션 인증](server-typed-session-auth.md)을 참조하세요.
+>
+{style="tip"}
+
 ## 의존성 추가 {id="add_dependencies"}
 `session` 인증을 활성화하려면 빌드 스크립트에 다음 아티팩트를 포함해야 합니다.
 
@@ -85,7 +90,8 @@ install(Authentication) {
 
 이 섹션에서는 [폼 기반 인증](server-form-based-auth.md)으로 사용자를 인증하고, 이 사용자에 대한 정보를 쿠키 세션에 저장한 다음, `session` 프로바이더를 사용하여 이후 요청에서 이 사용자를 인증하는 방법을 설명합니다.
 
-> 전체 예제는 [auth-form-session](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/auth-form-session)을 참조하세요.
+> 전체 예제는
+> [auth-form-session](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/auth-form-session)을 참조하세요.
 
 ### 1단계: 데이터 클래스 생성 {id="data-class"}
 
@@ -115,7 +121,7 @@ install(Sessions) {
 
 `session` 인증 프로바이더는 [`SessionAuthenticationProvider.Config`](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-session-authentication-provider/-config/index.html) 클래스를 통해 설정을 노출합니다. 아래 예제에서는 다음 설정이 지정되었습니다.
 
-* `validate()` 함수는 [세션 인스턴스](#data-class)를 확인하고 인증에 성공하면 `Any` 유형의 프린시펄(principal)을 반환합니다.
+* `validate()` 함수는 [세션 인스턴스](#data-class)를 확인하고 인증에 성공하면 `Any` 유형의 프린시펄을 반환합니다.
 * `challenge()` 함수는 인증에 실패할 경우 수행할 동작을 지정합니다. 예를 들어, 로그인 페이지로 다시 리다이렉트하거나 [`UnauthorizedResponse`](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-unauthorized-response/index.html)를 보낼 수 있습니다.
 
 ```kotlin
@@ -144,8 +150,14 @@ install(Authentication) {
 ```kotlin
 authenticate("auth-form") {
     post("/login") {
-        val userName = call.principal<UserIdPrincipal>()?.name.toString()
-        call.sessions.set(UserSession(name = userName, count = 1))
+        val principal =
+            call.principal<UserIdPrincipal>()
+        val userName = principal?.name.toString()
+        val session = UserSession(
+            name = userName,
+            count = 1
+        )
+        call.sessions.set(session)
         call.respondRedirect("/hello")
     }
 }
@@ -163,10 +175,17 @@ authenticate("auth-form") {
 authenticate("auth-session") {
     get("/hello") {
         val userSession = call.principal<UserSession>()
-        call.sessions.set(userSession?.copy(count = userSession.count + 1))
-        call.respondText("Hello, ${userSession?.name}! Visit count is ${userSession?.count}.")
+        val next = userSession?.copy(
+            count = userSession.count + 1
+        )
+        call.sessions.set(next)
+        call.respondText(
+            "Hello, ${userSession?.name}! " +
+                "Visit count is ${userSession?.count}."
+        )
     }
 }
 ```
 
-> 전체 예제는 [auth-form-session](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/auth-form-session)을 참조하세요.
+> 전체 예제는
+> [auth-form-session](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/auth-form-session)을 참조하세요.

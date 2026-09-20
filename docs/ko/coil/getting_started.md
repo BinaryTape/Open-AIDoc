@@ -5,8 +5,8 @@
 일반적인 Compose UI 프로젝트에서는 다음을 임포트합니다:
 
 ```kotlin
-implementation("io.coil-kt.coil3:coil-compose:3.6.2")
-implementation("io.coil-kt.coil3:coil-network-okhttp:3.6.2")
+implementation("io.coil-kt.coil3:coil-compose:3.6.3")
+implementation("io.coil-kt.coil3:coil-network-okhttp:3.6.3")
 ```
 
 임포트가 완료되면 `AsyncImage`를 사용하여 네트워크에서 이미지를 로드할 수 있습니다:
@@ -26,8 +26,8 @@ AsyncImage(
 Compose UI 대신 Android View를 사용한다면 다음을 임포트하세요:
 
 ```kotlin
-implementation("io.coil-kt.coil3:coil:3.6.2")
-implementation("io.coil-kt.coil3:coil-network-okhttp:3.6.2")
+implementation("io.coil-kt.coil3:coil:3.6.3")
+implementation("io.coil-kt.coil3:coil-network-okhttp:3.6.3")
 ```
 
 임포트가 완료되면 `ImageView.load` 확장 함수를 사용하여 네트워크에서 이미지를 로드할 수 있습니다:

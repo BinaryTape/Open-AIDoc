@@ -24,6 +24,10 @@
 
 > 您可以在 [Ktor Server 中的身份验证与授权](server-auth.md)章节中获取有关 Ktor 身份验证与授权的一般信息。
 
+> Ktor 还提供了一种类型安全的 session 身份验证方案。它为路由处理程序提供非 null 的主体以及对所存储 session 的读写访问权限，并将 session 类型与主体类型分开。请参阅[类型安全的 session 身份验证](server-typed-session-auth.md)。
+>
+{style="tip"}
+
 ## 添加依赖项 {id="add_dependencies"}
 要启用 `session` 身份验证，您需要在构建脚本中包含以下构件：
 
@@ -83,7 +87,7 @@ install(Authentication) {
 
 ## 配置 session 身份验证 {id="configure"}
 
-本节演示了如何使用 [基于表单的身份验证](server-form-based-auth.md)对用户进行身份验证，将有关该用户的信息保存到 cookie session 中，然后在后续请求中使用 `session` 提供程序对该用户进行授权。
+本节演示了如何使用[基于表单的身份验证](server-form-based-auth.md)对用户进行身份验证，将有关该用户的信息保存到 cookie session 中，然后在后续请求中使用 `session` 提供程序对该用户进行授权。
 
 > 有关完整示例，请参阅 [auth-form-session](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/auth-form-session)。
 
@@ -144,14 +148,20 @@ install(Authentication) {
 ```kotlin
 authenticate("auth-form") {
     post("/login") {
-        val userName = call.principal<UserIdPrincipal>()?.name.toString()
-        call.sessions.set(UserSession(name = userName, count = 1))
+        val principal =
+            call.principal<UserIdPrincipal>()
+        val userName = principal?.name.toString()
+        val session = UserSession(
+            name = userName,
+            count = 1
+        )
+        call.sessions.set(session)
         call.respondRedirect("/hello")
     }
 }
 ```
 
-> 有关基于表单的身份验证流程的更多详细信息，请参阅 [基于表单的身份验证](server-form-based-auth.md)文档。
+> 有关基于表单的身份验证流程的更多详细信息，请参阅[基于表单的身份验证](server-form-based-auth.md)文档。
 
 ### 第 5 步：保护特定资源 {id="authenticate-route"}
 
@@ -163,8 +173,14 @@ authenticate("auth-form") {
 authenticate("auth-session") {
     get("/hello") {
         val userSession = call.principal<UserSession>()
-        call.sessions.set(userSession?.copy(count = userSession.count + 1))
-        call.respondText("Hello, ${userSession?.name}! Visit count is ${userSession?.count}.")
+        val next = userSession?.copy(
+            count = userSession.count + 1
+        )
+        call.sessions.set(next)
+        call.respondText(
+            "Hello, ${userSession?.name}! " +
+                "Visit count is ${userSession?.count}."
+        )
     }
 }
 ```

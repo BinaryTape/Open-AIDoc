@@ -44,6 +44,12 @@ HTTP는 접근 제어 및 인증을 위한 [일반적인 프레임워크](https:
 ### OAuth {id="oauth"}
 [OAuth](server-oauth.md)는 API 접근 보안을 위한 개방형 표준입니다. Ktor의 `oauth` 프로바이더를 사용하면 Google, Facebook, Twitter 등과 같은 외부 프로바이더를 사용하여 인증을 구현할 수 있습니다.
 
+### OpenID Connect {id="oidc"}
+
+[OpenID Connect](server-oidc.md)는 OAuth 2.0 기반의 신원 계층(identity layer)입니다. `Oidc` 플러그인은 프로바이더의 디스커버리 문서를 읽어오므로, 엔드포인트와 서명 키 대신 발급자(issuer) URL을 구성할 수 있습니다. [API](server-oidc-resource-server.md)에서 액세스 토큰을 검증하고 PKCE, 세션 및 로그아웃을 포함한 [브라우저 로그인](server-oidc-browser-login.md)을 실행할 수 있습니다.
+
+이 플러그인은 실험적(experimental) 단계이며 JVM에서만 사용할 수 있습니다.
+
 ### 세션 {id="sessions"}
 [세션(Sessions)](server-sessions.md)은 서로 다른 HTTP 요청 간에 데이터를 유지하는 메커니즘을 제공합니다. 일반적인 사용 사례로는 로그인한 사용자의 ID, 장바구니 내용 저장 또는 클라이언트에 사용자 기본 설정 유지 등이 있습니다. Ktor에서 이미 연결된 세션이 있는 사용자는 `session` 프로바이더를 사용하여 인증될 수 있습니다. 자세한 방법은 [Ktor Server의 세션 인증](server-session-auth.md)에서 확인하세요.
 
@@ -54,10 +60,23 @@ Ktor는 인증 및 인가 동작을 커스터마이징하는 두 가지 방법�
 * [커스텀 인증 프로바이더](#custom-auth-provider)를 사용합니다.
 * [커스텀 플러그인](server-custom-plugins.md)을 사용하여 인가 로직을 구현합니다. 예를 들어, `AuthenticationChecked` [훅(hook)](server-custom-plugins.md#call-handling)을 사용하여 접근 권한을 확인할 수 있습니다. 자세한 내용은 [custom-plugin-authorization](https://github.com/ktorio/ktor-documentation/blob/%ktor_version%/codeSnippets/snippets/custom-plugin-authorization) 예제를 참조하십시오.
 
+## 타입 안전한 인증 스킴 API {id="type-safe"}
+
+<primary-label ref="experimental"/>
+
+Ktor는 스킴을 프린시펄 타입에 바인딩하는 [타입 안전한 인증 스킴 API(type-safe authentication scheme API)](server-typed-auth.md)도 제공합니다.
+보호된 라우트 내부에서 `call.principal`은 해당 프린시펄 타입이 되며 `null`이 아님이 보장되므로, 캐스팅이나 null 검사가 필요하지 않습니다.
+이 API는 선택적 [역할 검사(role checks)](server-typed-auth.md#roles), [익명 대체(anonymous fallback)](server-typed-auth.md#anonymous), 타입이 지정된 [세션](server-typed-session-auth.md), 그리고 [OAuth 2.0 플로우](server-oauth2-flows.md)도 지원합니다.
+
+> 이 API는 본 문서에서 설명하는 이름 지정 프로바이더(named provider) 방식의 대안입니다.
+> 두 API 모두 동일한 애플리케이션에서 함께 사용할 수 있습니다. 자세한 내용은 [타입 안전한 인증(Type-safe authentication)](server-typed-auth.md)을 참조하십시오.
+>
+{style="note"}
+
 ## 의존성 추가 {id="add_dependencies"}
 
 <p>
-    <code>%plugin_name%</code>을 사용하려면 빌드 스크립트에 <code>%artifact_name%</code> 아티팩트를 포함해야 합니다:
+    <code>%plugin_name%</code>을 사용하려면 빌드 스크립트에 <code>%artifact_name%</code> 아티팩트를 추가하십시오:
 </p>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
@@ -77,14 +96,14 @@ Ktor는 인증 및 인가 동작을 커스터마이징하는 두 가지 방법�
 
 <p>
     애플리케이션에 <code>%plugin_name%</code> 플러그인을 <a href="#install">설치</a>하려면, 지정된 <Links href="/ktor/server-modules" summary="모듈을 사용하면 라우트를 그룹화하여 애플리케이션을 구조화할 수 있습니다.">모듈</Links>의 <code>install</code> 함수에 전달하십시오.
-    아래의 코드 스니펫은 <code>%plugin_name%</code>을 설치하는 방법을 보여줍니다 ...
+    아래의 예제는 <code>%plugin_name%</code>을 설치하는 방법을 보여줍니다:
 </p>
 <list>
     <li>
-        ... <code>embeddedServer</code> 함수 호출 내부에서.
+        <code>embeddedServer()</code> 함수 호출 내부에서.
     </li>
     <li>
-        ... <code>Application</code> 클래스의 확장 함수인 명시적으로 정의된 <code>module</code> 내부에서.
+        <code>Application</code> 클래스의 명시적으로 정의된 <code>module()</code> 확장 함수 내부에서.
     </li>
 </list>
 <Tabs>
@@ -151,7 +170,9 @@ install(Authentication) {
     basic("auth-basic") {
         realm = "Access to the '/' path"
         validate { credentials ->
-            if (credentials.name == "jetbrains" && credentials.password == "foobar") {
+            val isValid = credentials.name == "jetbrains" &&
+                credentials.password == "foobar"
+            if (isValid) {
                 UserIdPrincipal(credentials.name)
             } else {
                 null
@@ -171,7 +192,8 @@ install(Authentication) {
 
 따라서 `validate()` 함수는 지정된 크리덴셜을 확인하고 인증에 성공하면 프린시펄 `Any`를 반환하고, 인증에 실패하면 `null`을 반환합니다.
 
-> 특정 기준에 따라 인증을 건너뛰려면 [`skipWhen()`](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-authentication-provider/-config/skip-when.html)을 사용하십시오. 예를 들어, [세션](server-sessions.md)이 이미 존재하는 경우 `basic` 인증을 건너뛸 수 있습니다:
+> 특정 기준에 따라 인증을 건너뛰려면 [`skipWhen()`](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-authentication-provider/-config/skip-when.html)을 사용하십시오.
+> 예를 들어, [세션](server-sessions.md)이 이미 존재하는 경우 `basic` 인증을 건너뛸 수 있습니다:
 > ```kotlin
 > basic {
 >     skipWhen { call -> call.sessions.get<UserSession>() != null }
@@ -205,15 +227,16 @@ install(Authentication) {
   아래 코드 스니펫에서는 [세션 인증](server-session-auth.md)을 통과한 사용자만이 기본 인증을 사용하여 `/admin` 라우트에 접근을 시도할 수 있습니다:
    ```kotlin
    routing {
-       authenticate("auth-session", strategy = AuthenticationStrategy.Required) {
+       val required = AuthenticationStrategy.Required
+       authenticate("auth-session", strategy = required) {
            get("/hello") {
                // ...
-           }    
-           authenticate("auth-basic", strategy = AuthenticationStrategy.Required) {
+           }
+           authenticate("auth-basic", strategy = required) {
                get("/admin") {
                    // ...
                }
-           }  
+           }
        }
    }
    ```
@@ -228,7 +251,8 @@ install(Authentication) {
 routing {
     authenticate("auth-basic") {
         get("/") {
-            call.respondText("Hello, ${call.principal<UserIdPrincipal>()?.name}!")
+            val user = call.principal<UserIdPrincipal>()
+            call.respondText("Hello, ${user?.name}!")
         }
     }
 }
@@ -249,10 +273,14 @@ authenticate("auth-session") {
 아래 예제에서는 최상위 세션 프로바이더의 프린시펄을 가져오기 위해 `"auth-session"` 값이 전달됩니다:
 
 ```kotlin
-authenticate("auth-session", strategy = AuthenticationStrategy.Required) {
-    authenticate("auth-basic", strategy = AuthenticationStrategy.Required) {
+val required = AuthenticationStrategy.Required
+authenticate("auth-session", strategy = required) {
+    authenticate("auth-basic", strategy = required) {
         get("/admin") {
-            val userSession = call.principal<UserSession>("auth-session")
+            val userSession =
+                call.principal<UserSession>(
+                    "auth-session"
+                )
         }
     }
 }
@@ -260,14 +288,16 @@ authenticate("auth-session", strategy = AuthenticationStrategy.Required) {
 
 ## 커스텀 인증 프로바이더 {id="custom-auth-provider"}
 
-기본 제공 프로바이더가 요구 사항에 맞지 않는 경우, [`provider()`](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-authentication-config/provider.html) 함수를 사용하여 커스텀 인증 로직을 구현하십시오:
+기본 제공 프로바이더가 요구 사항에 맞지 않는 경우 [`provider()`](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-authentication-config/provider.html) 함수를 사용하여 커스텀 인증 로직을 구현하십시오:
 
 ```kotlin
 provider("custom") {
   authenticate { context ->
-    val exampleHeader = context.call.request.headers["Example-Header"]
+    val headers = context.call.request.headers
+    val exampleHeader = headers["Example-Header"]
     if (exampleHeader == null) {
-      val cause = AuthenticationFailedCause.Error("No example header found")
+      val message = "No example header found"
+      val cause = AuthenticationFailedCause.Error(message)
       context.challenge(key = this, cause) { challenge, call ->
         call.respondText("Challenge")
         challenge.complete()

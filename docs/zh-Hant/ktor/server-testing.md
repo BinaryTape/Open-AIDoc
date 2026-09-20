@@ -220,7 +220,9 @@ class ApplicationTest {
 @Test
 fun testHello() = testApplication {
     environment {
-        config = ApplicationConfig("application-custom.conf")
+        config = ApplicationConfig(
+            "application-custom.conf"
+        )
     }
 }
 ```
@@ -296,7 +298,8 @@ class ApplicationTest {
 fun testHello() = testApplication {
     routing {
         get("/login-test") {
-            call.sessions.set(UserSession("xyzABC123","abc123"))
+            val session = UserSession("xyzABC123", "abc123")
+            call.sessions.set(session)
         }
     }
 }
@@ -314,7 +317,9 @@ fun testHello() = testApplication {
 @Test
 fun testHello() = testApplication {
     environment {
-        config = ApplicationConfig("application-custom.conf")
+        config = ApplicationConfig(
+            "application-custom.conf"
+        )
     }
 }
 ```
@@ -341,12 +346,17 @@ fun testDevEnvironment() = testApplication {
 fun testHello() = testApplication {
     externalServices {
         hosts("https://www.googleapis.com") {
-            install(io.ktor.server.plugins.contentnegotiation.ContentNegotiation) {
+            install(
+                io.ktor.server.plugins.contentnegotiation
+                    .ContentNegotiation
+            ) {
                 json()
             }
             routing {
                 get("oauth2/v2/userinfo") {
-                    call.respond(UserInfo("1", "JetBrains", "", ""))
+                    val info =
+                        UserInfo("1", "JetBrains", "", "")
+                    call.respond(info)
                 }
             }
         }
@@ -358,9 +368,10 @@ fun testHello() = testApplication {
 
 ## 配置用戶端 {id="configure-client"}
 
-`testApplication {}` 函式透過 `client` 屬性提供了一個已配置的 HTTP 用戶端。若要自訂用戶端並安裝額外的外掛程式，請使用 `createClient {}` 函式。
+`testApplication {}` 函式透過 `client` 屬性提供了一個已配置的 HTTP 用戶端。
+若要自訂用戶端並安裝額外的外掛程式，請使用 `createClient {}` 函式。
 
-例如，您可以安裝 [`ContentNegotiation`](client-serialization.md) 外掛程式，以便在 `POST/PUT` 請求中 [發送 JSON 資料](#json-data) ：
+例如，您可以安裝 [`ContentNegotiation`](client-serialization.md) 外掛程式，以便在 `POST/PUT` 請求中 [發送 JSON 資料](#json-data)：
 
 ```kotlin
 @Test
@@ -734,8 +745,8 @@ data class UserSession(val id: String, val count: Int)
 
 fun Application.main() {
     install(Sessions) {
-        val secretEncryptKey = hex("00112233445566778899aabbccddeeff")
-        val secretSignKey = hex("6819b57a326945c1968f45236589")
+        val secretEncryptKey = "00112233445566778899aabbccddeeff".hexToByteArray()
+        val secretSignKey = "6819b57a326945c1968f45236589".hexToByteArray()
         cookie<UserSession>("user_session") {
             cookie.path = "/"
             cookie.maxAgeInSeconds = 10

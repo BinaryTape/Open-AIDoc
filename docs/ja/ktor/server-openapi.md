@@ -70,12 +70,6 @@ OpenAPI仕様は、次のいずれかの方法で提供できます。
 
   `$swagger_codegen_version` は、`swagger-codegen-generators` アーティファクトの必要なバージョン（例：`%swagger_codegen_version%`）に置き換えることができます。
 
-> Ktor 3.4.0では、`OpenAPI` プラグインは `ktor-server-routing-openapi` 依存関係を必要とします。
-> これは意図的な破壊的変更ではなく、Ktor 3.4.1で修正される予定です。
-> ランタイムエラーを避けるため、Ktor 3.4.0を使用している場合は手動で依存関係を追加してください。
->
-{style="warning"}
-
 ## 静的なOpenAPIファイルを使用する {id="static-openapi-file"}
 
 既存の仕様からOpenAPIドキュメントを提供するには、OpenAPIドキュメントへのパスを指定して [`openAPI()`](%plugin_api_link%) 関数を使用します。
@@ -116,11 +110,35 @@ routing {
 
 ## OpenAPIの設定 {id="configure-openapi"}
 
-デフォルトでは、ドキュメントは `StaticHtml2Codegen` を使用してレンダリングされます。`openAPI {}` ブロック内でレンダラーをカスタマイズできます。
+`openAPI {}` 設定ブロックを使用すると、生成されるOpenAPIドキュメントおよびKtorがドキュメントをレンダリングする方法を設定できます。
 
-> `StaticHtmlCodegen` および `StaticHtml2Codegen` は OpenAPI 3.0.x ドキュメントのみをサポートしています。これらを OpenAPI 3.1 ドキュメントで使用すると、不完全または不正確な HTML が生成される可能性があります。OpenAPI 3.1 の場合は、Swagger UI 5.x を備えた [`swaggerUI()`](server-swagger-ui.md) 関数を使用してください。OpenAPI プラグインの HTML レンダラーを引き続き使用する必要がある場合は、仕様を OpenAPI 3.0.3 のままにしてください。
+### ドキュメントメタデータの設定 {id="configure-document-metadata"}
+
+設定ブロック内でトップレベルのOpenAPIメタデータを直接定義できます。
+
+例えば、`info` を使用して一般的なAPI情報を指定したり、`tag()` を使用してタグとその説明を定義したりできます。
+
+```kotlin
+openAPI("openapi") {
+    info = OpenApiInfo("Books API from routes", "1.0.0")
+    tag(
+        name = "Books",
+        description = "Operations on books"
+    )
+}
+```
+
+また、サーバー、セキュリティ要件、再利用可能なコンポーネント、外部ドキュメント、仕様拡張など、他のトップレベルのOpenAPIプロパティも設定できます。
+
+> 利用可能なすべてのオプションについては、[`OpenAPIConfig`](https://api.ktor.io/ktor-server-openapi/io.ktor.server.plugins.openapi/-open-a-p-i-config/index.html) APIリファレンスを参照してください。
 >
-{style="note"}
+{style="tip"}
+
+### ドキュメントレンダラーの設定 {id="configure-the-document-renderer"}
+
+デフォルトでは、ドキュメントは `StaticHtml2Codegen` を使用してレンダリングされます。
+
+別のレンダラーを使用するには、`codegen` プロパティに割り当てます。
 
 ```kotlin
 routing {
@@ -128,3 +146,8 @@ routing {
         codegen = StaticHtmlCodegen()
     }
 }
+```
+
+> `StaticHtmlCodegen` および `StaticHtml2Codegen` は OpenAPI 3.0.x ドキュメントのみをサポートしています。これらを OpenAPI 3.1 ドキュメントで使用すると、不完全または不正確な HTML が生成される可能性があります。OpenAPI 3.1 の場合は、Swagger UI 5.x を備えた [`swaggerUI()`](server-swagger-ui.md) 関数を使用してください。OpenAPI プラグインの HTML レンダラーを引き続き使用する必要がある場合は、仕様を OpenAPI 3.0.3 のままにしてください。
+>
+{style="note"}

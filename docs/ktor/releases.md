@@ -35,6 +35,19 @@ IntelliJ Ktor 插件允许您将 Ktor 项目迁移到最新版本。
 </tr>
 
 <tr>
+<td>3.6.0</td><td>2026 年 9 月 17 日</td><td>
+<p>
+一个次要版本，增加了对 Netty 的实验性 HTTP/3 支持、适用于 Kotlin Multiplatform 的默认客户端引擎、JVM WebRTC 支持，以及在客户端和服务器端的其他功能和改进。
+</p>
+欲了解更多详情，请参阅 <Links href="/ktor/whats-new-360" summary="undefined">Ktor 3.6.0 最新变化</Links>。
+<var name="version" value="3.6.0"/>
+<p>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">在 GitHub 上查看变更日志</a>
+</p>
+</td>
+</tr>
+
+<tr>
 <td>3.5.2</td><td>2026 年 8 月 4 日</td><td>
 <p>
 一个修订版本，专注于稳定性和性能，具有增强的速率限制支持，恢复了文本处理性能，并修复了 I/O 处理、OpenAPI 和配置问题。
@@ -171,7 +184,7 @@ IntelliJ Ktor 插件允许您将 Ktor 项目迁移到最新版本。
 </tr>
 
 <tr>
-<td>3.2.3</td><td>2025 年 July 29 日</td><td>
+<td>3.2.3</td><td>2025 年 7 月 29 日</td><td>
 <p>
 一个修订版本，引入了对 YAML 配置处理、DI 解析以及 Wasm/JS 稳定性的改进，同时修复了分段解析、CIO <code>100 Continue</code> 响应格式化、<code>ByteReadChannel</code> 中的无限读取循环以及服务器停机问题。
 </p>
@@ -662,7 +675,7 @@ IntelliJ Ktor 插件允许您将 Ktor 项目迁移到最新版本。
 <tr>
 <td>2.0.0</td><td>2022 年 4 月 11 日</td><td>
 <p>
-一个主要版本，包含更新的 API 文档 and 各种新功能。欲了解更多关于破坏性变更以及如何从 <code>1.x.x</code> 迁移的信息，请参阅<Links href="/ktor/migration-to-20x" summary="undefined">迁移指南</Links>。
+一个主要版本，包含更新的 API 文档以及各种新功能。欲了解更多关于破坏性变更以及如何从 <code>1.x.x</code> 迁移的信息，请参阅<Links href="/ktor/migration-to-20x" summary="undefined">迁移指南</Links>。
 </p>
 <var name="version" value="2.0.0"/>
 <p>

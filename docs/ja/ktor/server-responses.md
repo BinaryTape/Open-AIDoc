@@ -53,11 +53,11 @@ get("/") {
 
 #### HTMLフラグメント {id="partial-html-fragments"}
 
-`<html>`、`<head>`、`<body>` で囲わずに、HTMLの断片のみを返す必要がある場合は、`call.respondHtmlFragment()` を使用できます。
+`<html>`、`<head>`、`<body>` で囲わずに、HTMLの断片のみを返す必要がある場合は、`call.respondHtmlPartial()` を使用できます。
 
 ```kotlin
     get("/fragment") {
-        call.respondHtmlFragment(HttpStatusCode.Created) {
+        call.respondHtmlPartial(HttpStatusCode.Created) {
             div("fragment") {
                 span { +"Created!" }
             }

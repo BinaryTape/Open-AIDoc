@@ -6,8 +6,11 @@
 ネットワークリクエストを処理するエンジンについて学びます。
 </link-summary>
 
-[Ktor HTTP クライアント](client-create-and-configure.md)はマルチプラットフォームであり、JVM、[Android](https://kotlinlang.org/docs/android-overview.html)、[JavaScript](https://kotlinlang.org/docs/js-overview.html)（WebAssembly を含む）、および [Native](https://kotlinlang.org/docs/native-overview.html) ターゲットで動作します。各プラットフォームでネットワークリクエストを処理するには、特定のエンジンが必要です。
-例えば、JVM アプリケーションには `Apache` や `Jetty`、Android には `OkHttp` や `Android`、Kotlin/Native をターゲットとするデスクトップアプリケーションには `Curl` を使用できます。エンジンごとに機能や設定がわずかに異なるため、プラットフォームやユースケースのニーズに最適なものを選択できます。
+[Ktor HTTP クライアント](client-create-and-configure.md)はマルチプラットフォームであり、JVM、[Android](https://kotlinlang.org/docs/android-overview.html)、[JavaScript](https://kotlinlang.org/docs/js-overview.html)（WebAssembly を含む）、および [Native](https://kotlinlang.org/docs/native-overview.html) ターゲットで動作します。各プラットフォームでネットワークリクエストを処理するには、特定のクライアントエンジンが必要です。
+
+Ktor はさまざまなプラットフォーム向けにいくつかのエンジンを提供しています。例えば、JVM アプリケーションには `Apache` や `Jetty`、Android には `OkHttp` や `Android`、Kotlin/Native をターゲットとするデスクトップアプリケーションには `Curl` を使用できます。
+
+エンジンごとにサポートする機能や設定オプションが異なります。マルチプラットフォームプロジェクトでは、Ktor のデフォルトエンジンを使用することも、個々のターゲットに合わせて特定のエンジンを選択することもできます。
 
 ## サポートされているプラットフォーム {id="platforms"}
 
@@ -43,7 +46,11 @@ _* 古い Android バージョンで CIO エンジンを使用するには、[Ja
 
 ## エンジンの依存関係の追加 {id="dependencies"}
 
-[`ktor-client-core`](client-dependencies.md) アーティファクトに加えて、Ktor クライアントには特定のエンジンの依存関係が必要です。サポートされている各プラットフォームで利用可能なエンジンセットについては、対応するセクションで説明されています。
+[`ktor-client-core`](client-dependencies.md) アーティファクトに加えて、Ktor クライアントには特定のエンジンの依存関係が必要です。
+
+### 特定のエンジンの使用 {id="use-a-specific-engine"}
+
+サポートされている各プラットフォームで利用可能なエンジンセットについては、対応するセクションで説明されています。
 
 * [JVM](#jvm)
 * [JVM および Android](#jvm-android)
@@ -54,6 +61,24 @@ _* 古い Android バージョンで CIO エンジンを使用するには、[Ja
 > 依存関係の解決方法はビルドツールによって異なります。Gradle は特定のプラットフォームに適したアーティファクトを解決しますが、Maven はこの機能をサポートしていません。つまり、Maven の場合はプラットフォームのサフィックスを手動で指定する必要があります。
 >
 {type="note"}
+
+### マルチプラットフォームプロジェクトでデフォルトエンジンを使用する {id="default-engines"}
+
+ほとんどの Kotlin Multiplatform プロジェクトでは、`ktor-client-engine-defaults` アーティファクトを使用します。これはターゲットプラットフォームごとに厳選されたクライアントエンジンを提供するため、プラットフォーム固有のソースセットで個別のエンジンの依存関係を宣言する必要がなくなります。
+
+`commonMain` ソースセットに `ktor-client-engine-defaults` アーティファクトを追加します。
+
+```kotlin
+kotlin {
+    sourceSets {
+        commonMain {
+            dependencies {
+                api("io.ktor:ktor-client-engine-defaults:%ktor_version%")
+            }
+        }
+    }
+}
+```
 
 ## エンジンの指定 {id="create"}
 
@@ -66,9 +91,9 @@ import io.ktor.client.engine.cio.*
 val client = HttpClient(CIO)
 ```
 
-## デフォルトエンジン {id="default"}
+## エンジンの自動選択 {id="default"}
 
-エンジンの引数を省略した場合、クライアントは[ビルドスクリプト内の依存関係](#dependencies)に基づいて自動的にエンジンを選択します。
+エンジンの引数を省略した場合、クライアントは[ビルドスクリプトで利用可能な](#dependencies)エンジンの依存関係から自動的にエンジンを選択します。
 
 ```kotlin
 import io.ktor.client.*
@@ -76,7 +101,11 @@ import io.ktor.client.*
 val client = HttpClient()
 ```
 
-これはマルチプラットフォームプロジェクトで特に便利です。例えば、[Android と iOS](client-create-multiplatform-application.md) の両方をターゲットとするプロジェクトの場合、`androidMain` ソースセットに [Android](#jvm-android) の依存関係を、`iosMain` ソースセットに [Darwin](#darwin) の依存関係を追加できます。`HttpClient` 作成時に、実行時に適切なエンジンが選択されます。
+ターゲットプラットフォームで利用可能なエンジンが 1 つだけの場合、Ktor はそのエンジンを使用します。複数のエンジンが利用可能な場合、Ktor は最も優先度の高いエンジンを選択します。
+
+デフォルトでは、`CIO` の優先度が最も低くなっています。つまり、同じプラットフォームで `CIO` と別のサポートされているエンジンが利用可能な場合、Ktor はもう一方のエンジンを選択します。`CIO` は、より優先度の高いエンジンが利用できない場合に使用されます。
+
+Kotlin Multiplatform プロジェクトの場合、[`ktor-client-engine-defaults` の依存関係](#default-engines)が各ターゲットにデフォルトのエンジンを提供します。あるいは、対応するプラットフォームのソースセットに[特定のエンジンの依存関係を追加](#use-a-specific-engine)することもできます。
 
 ## エンジンの設定 {id="configure"}
 
@@ -523,13 +552,19 @@ CIO エンジンは、JVM、Android、Native、JavaScript、および WebAssembl
                random = mySecureRandom
                addKeyStore(myKeyStore, myKeyStorePassword)
            }
+           dnsResolver = CioDnsResolver(
+               server = "1.1.1.1",
+               timeout = 3.seconds
+           )
        }
    }
    ```
 
 ## JavaScript {id="js"}
 
-`Js` エンジンは [JavaScript プロジェクト](https://kotlinlang.org/docs/js-overview.html)で使用できます。ブラウザアプリケーションでは [fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) を、Node.js では `node-fetch` を使用します。これを使用するには、以下の手順に従ってください。
+`Js` エンジンは [Kotlin/JS](https://kotlinlang.org/docs/js-overview.html) プロジェクトで使用できます。ブラウザアプリケーションでは [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) を、Node.js では `node-fetch` を使用します。
+
+`Js` エンジンを使用するには、以下の手順に従ってください。
 
 1. `ktor-client-js` 依存関係を追加します。
 
@@ -546,7 +581,7 @@ CIO エンジンは、JVM、Android、Native、JavaScript、および WebAssembl
            <code-block lang="XML" code="               &lt;dependency&gt;&#10;                   &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                   &lt;artifactId&gt;%artifact_name%%target%&lt;/artifactId&gt;&#10;                   &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;               &lt;/dependency&gt;"/>
        </TabItem>
    </Tabs>
-2. `Js` クラスを引数として `HttpClient` コンストラクタに渡します。
+2. `Js` クラスを引数として `HttpClient()` コンストラクタに渡します。
    ```kotlin
    import io.ktor.client.*
    import io.ktor.client.engine.js.*
@@ -561,7 +596,25 @@ CIO エンジンは、JVM、Android、Native、JavaScript、および WebAssembl
    val client = JsClient()
    ```
 
-完全な例については、[client-engine-js](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-engine-js) を参照してください。
+   > 完全な例については、[client-engine-js](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-engine-js) を参照してください。
+   > 
+   {style="tip"}
+
+### fetch のオーバーライド {id="js-custom-fetch"}
+
+デフォルトでは、`Js` エンジンはグローバルな `fetch()` 関数を使用します。カスタム実装を使用するには、エンジン設定で `fetch` プロパティを設定します。
+
+```kotlin
+val client = HttpClient(Js) {
+    engine {
+        fetch = { url, init ->
+            Promise.reject(IllegalStateException("Networking not available"))
+        }
+    }
+}
+```
+
+これは、独自の `fetch()` 実装またはラッパーを提供する JavaScript ライブラリと統合する場合に役立ちます。
 
 ## 制限事項 {id="limitations"}
 

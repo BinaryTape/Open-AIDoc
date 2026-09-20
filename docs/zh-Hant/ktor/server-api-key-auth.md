@@ -95,6 +95,9 @@ install(Authentication) {
 
 ### 步驟 1：設定 API Key 提供者 {id="configure-provider"}
 
+<Tabs group="auth-dsl">
+<TabItem title="傳統" group-key="classic">
+
 `apiKey` 驗證提供者透過 [`ApiKeyAuthenticationProvider.Config`](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-api-key-authentication-provider/-config/index.html) 類別公開其設定。在下方的範例中，指定了以下設定：
 
 * `validate` 函式接收從請求中擷取的 API Key，並在驗證成功時傳回 `Principal`，若驗證失敗則傳回 `null`。
@@ -116,11 +119,44 @@ install(Authentication) {
 }
 ```
 
+</TabItem>
+<TabItem title="型別安全" group-key="typed">
+
+<note>
+    <p>
+        型別安全驗證方案 API 為實驗功能。它隨時可能被捨棄或變更。需要選擇加入（Opt-in）。如需更多詳細資訊，請參閱
+        <a href="server-typed-auth.md#prerequisites">啟用 API</a>。
+    </p>
+</note>
+
+`apiKey()` 函式會為您選擇的 principal 型別建立一個方案。不需要 `install(Authentication)` 步驟：該方案是一個值，您可以將其傳遞給需要它的路由。
+
+```kotlin
+data class AppPrincipal(val key: String)
+
+val apiKeyAuth = apiKey<AppPrincipal>("api-key") {
+    validate { keyFromHeader ->
+        val expectedApiKey = "this-is-expected-key"
+        keyFromHeader
+            .takeIf { it == expectedApiKey }
+            ?.let { AppPrincipal(it) }
+    }
+}
+```
+
+與傳統提供者不同，名稱是必填的。如需完整 API，請參閱 [型別安全驗證](server-typed-auth.md)。
+
+</TabItem>
+</Tabs>
+
 #### 自訂金鑰位置 {id="key-location"}
 
 預設情況下，`apiKey` 提供者會在 `X-API-Key` 標頭中尋找 API Key。
 
 您可以使用 `headerName` 來指定自訂標頭：
+
+<Tabs group="auth-dsl">
+<TabItem title="傳統" group-key="classic">
 
 ```kotlin
 apiKey("api-key-header") {
@@ -130,6 +166,21 @@ apiKey("api-key-header") {
     }
 }
 ```
+
+</TabItem>
+<TabItem title="型別安全" group-key="typed">
+
+```kotlin
+val apiKeyAuth = apiKey<AppPrincipal>("api-key-header") {
+    headerName = "X-Secret-Key"
+    validate { key ->
+        // ...
+    }
+}
+```
+
+</TabItem>
+</Tabs>
 
 ### 步驟 2：驗證 API Key {id="validate"}
 
@@ -142,7 +193,8 @@ apiKey("api-key-header") {
 ```kotlin
 apiKey {
     validate { keyFromHeader ->
-        val expectedApiKey = environment.config.property("api.key").getString()
+        val expectedApiKey = 
+            environment.config.property("api.key").getString()
         keyFromHeader
             .takeIf { it == expectedApiKey }
             ?.let { AppPrincipal(it) }
@@ -210,6 +262,9 @@ apiKey {
 
 ### 步驟 4：保護特定資源 {id="authenticate-route"}
 
+<Tabs group="auth-dsl">
+<TabItem title="傳統" group-key="classic">
+
 設定好 `apiKey` 提供者後，您可以使用 [`authenticate`](server-auth.md#authenticate-route) 函式保護應用程式中的特定資源。在驗證成功的情況下，您可以在路由處理常式中使用 `call.principal` 函式擷取已驗證的 Principal。
 
 ```kotlin
@@ -217,11 +272,31 @@ routing {
     authenticate {
         get("/") {
             val principal = call.principal<AppPrincipal>()!!
-            call.respondText("Hello, authenticated client! Your key: ${principal.key}")
+            val key = principal.key
+            call.respondText("Hello! Your key: $key")
         }
     }
 }
 ```
+
+</TabItem>
+<TabItem title="型別安全" group-key="typed">
+
+將該方案傳遞給 `authenticateWith()`。在區塊內，`call.principal` 為您的 principal 型別且絕不為 `null`，因此不需要 `!!`：
+
+```kotlin
+routing {
+    authenticateWith(apiKeyAuth) {
+        get("/") {
+            val key = call.principal.key
+            call.respondText("Hello! Your key: $key")
+        }
+    }
+}
+```
+
+</TabItem>
+</Tabs>
 
 ## API Key 驗證範例 {id="complete-example"}
 

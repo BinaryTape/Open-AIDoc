@@ -24,6 +24,11 @@
 
 > 您可以在 [Ktor Server 中的驗證與授權](server-auth.md) 章節中取得關於 Ktor 驗證與授權的一般資訊。
 
+> Ktor 還提供了一種型別安全的工作階段驗證機制。它為路由處理常式提供非 null 的主體 (principal) 以及對所儲存工作階段的讀寫存取權限，並將工作階段型別與主體型別分開。請參閱
+> [型別安全的工作階段驗證 (Type-safe session authentication)](server-typed-session-auth.md)。
+>
+{style="tip"}
+
 ## 新增相依性 {id="add_dependencies"}
 要啟用 `session` 驗證，您需要在組建指令碼中包含以下構件：
 
@@ -99,7 +104,7 @@ data class UserSession(val name: String, val count: Int)
 
 ### 步驟 2：安裝與配置工作階段 {id="install-session"}
 
-建立資料類別後，您需要安裝並配置 `Sessions` 外掛程式。下面的範例安裝並配置了一個具有指定 cookie 路徑 and 過期時間的 cookie 工作階段。
+建立資料類別後，您需要安裝並配置 `Sessions` 外掛程式。下面的範例安裝並配置了一個具有指定 cookie 路徑與過期時間的 cookie 工作階段。
 
 ```kotlin
 install(Sessions) {
@@ -145,8 +150,14 @@ install(Authentication) {
 ```kotlin
 authenticate("auth-form") {
     post("/login") {
-        val userName = call.principal<UserIdPrincipal>()?.name.toString()
-        call.sessions.set(UserSession(name = userName, count = 1))
+        val principal =
+            call.principal<UserIdPrincipal>()
+        val userName = principal?.name.toString()
+        val session = UserSession(
+            name = userName,
+            count = 1
+        )
+        call.sessions.set(session)
         call.respondRedirect("/hello")
     }
 }
@@ -164,8 +175,14 @@ authenticate("auth-form") {
 authenticate("auth-session") {
     get("/hello") {
         val userSession = call.principal<UserSession>()
-        call.sessions.set(userSession?.copy(count = userSession.count + 1))
-        call.respondText("Hello, ${userSession?.name}! Visit count is ${userSession?.count}.")
+        val next = userSession?.copy(
+            count = userSession.count + 1
+        )
+        call.sessions.set(next)
+        call.respondText(
+            "Hello, ${userSession?.name}! " +
+                "Visit count is ${userSession?.count}."
+        )
     }
 }
 ```

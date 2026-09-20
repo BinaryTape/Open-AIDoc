@@ -3,7 +3,7 @@
 테스트 지원 클래스를 사용하려면 익스텐션 라이브러리를 임포트하세요:
 
 ```kotlin
-testImplementation("io.coil-kt.coil3:coil-test:3.6.2")
+testImplementation("io.coil-kt.coil3:coil-test:3.6.3")
 ```
 
 `coil-test`에는 `FakeImageLoaderEngine`이 포함되어 있으며, 이를 `ImageLoader`에 추가하여 들어오는 모든 `ImageRequest`를 가로채고 커스텀 `ImageResult`를 반환할 수 있습니다. 이는 이미지 로딩을 (메인 스레드에서) 동기식으로 만들고 일관되게 유지해 주므로 테스트에 유용합니다. `FakeImageLoaderEngine`을 사용하면 `ImageLoader`는 이미지를 로드할 때 일반적으로 발생하는 모든 메모리 캐싱, 스레드 점핑(thread jumping), 디스크/네트워크 I/O 페칭(fetching) 및 이미지 디코딩을 수행하지 않습니다. 사용 예시는 다음과 같습니다:

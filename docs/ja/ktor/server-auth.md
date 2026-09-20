@@ -44,6 +44,12 @@ HTTPは、アクセス制御と認証のための [一般的なフレームワ�
 ### OAuth {id="oauth"}
 [OAuth](server-oauth.md) は、APIへのアクセスを保護するためのオープン標準です。Ktorの `oauth` プロバイダーを使用すると、Google、Facebook、Twitterなどの外部プロバイダーを使用した認証を実装できます。
 
+### OpenID Connect {id="oidc"}
+
+[OpenID Connect](server-oidc.md) は、OAuth 2.0の上に構築されたIDレイヤーです。`Oidc` プラグインはプロバイダーのディスカバリードキュメントを読み取るため、エンドポイントや署名キーの代わりに発行者（issuer）URLを設定します。[API](server-oidc-resource-server.md) でアクセストークンを検証したり、PKCE、セッション、ログアウトを含む [ブラウザサインイン](server-oidc-browser-login.md) を実行したりできます。
+
+このプラグインは実験的（experimental）であり、JVMでのみ利用可能です。
+
 ### セッション {id="sessions"}
 [セッション](server-sessions.md) は、異なるHTTPリクエスト間でデータを永続化するためのメカニズムを提供します。一般的なユースケースには、ログインしたユーザーのID、ショッピングバスケットの内容の保存、またはクライアントでのユーザー設定の保持が含まれます。Ktorでは、既に関連付けられたセッションを持つユーザーを `session` プロバイダーを使用して認証できます。詳細については、[Ktor Serverでのセッション認証](server-session-auth.md) を参照してください。
 
@@ -53,6 +59,19 @@ Ktorは、認証と認可の動作をカスタマイズするための2つの方
 
 * [カスタム認証プロバイダー](#custom-auth-provider) を使用する。
 * [カスタムプラグイン](server-custom-plugins.md) を使用して認可ロジックを実装する。例えば、`AuthenticationChecked` [フック](server-custom-plugins.md#call-handling) を使用してアクセスを検証できます。詳細については、[custom-plugin-authorization](https://github.com/ktorio/ktor-documentation/blob/%ktor_version%/codeSnippets/snippets/custom-plugin-authorization) の例を参照してください。
+
+## 型安全な認証スキームAPI {id="type-safe"}
+
+<primary-label ref="experimental"/>
+
+Ktorは、スキームをプリンシパル型にバインドする [型安全な認証スキームAPI](server-typed-auth.md) も提供しています。
+保護されたルート内では、`call.principal` はそのプリンシパル型となり、非 `null` であることが保証されるため、キャストやnullチェックは不要です。
+このAPIは、オプトインの [ロールチェック](server-typed-auth.md#roles)、[匿名フォールバック](server-typed-auth.md#anonymous)、型付き [セッション](server-typed-session-auth.md)、および [OAuth 2.0フロー](server-oauth2-flows.md) もサポートしています。
+
+> このAPIは、このトピックで説明されている名前付きプロバイダーによるアプローチの代替手段です。
+> 両方のAPIを同じアプリケーション内で使用できます。詳細については、[型安全な認証](server-typed-auth.md) を参照してください。
+>
+{style="note"}
 
 ## 依存関係の追加 {id="add_dependencies"}
 
@@ -77,14 +96,14 @@ Ktorは、認証と認可の動作をカスタマイズするための2つの方
 
 <p>
     <code>%plugin_name%</code> プラグインをアプリケーションに <a href="#install">インストール</a> するには、指定された <Links href="/ktor/server-modules" summary="Modules allow you to structure your application by grouping routes.">モジュール</Links> 内の <code>install</code> 関数に渡します。
-    以下のコードスニペットは、<code>%plugin_name%</code> のインストール方法を示しています...
+    以下の例は、<code>%plugin_name%</code> のインストール方法を示しています。
 </p>
 <list>
     <li>
-        ... <code>embeddedServer</code> 関数の呼び出し内。
+        <code>embeddedServer()</code> 関数の呼び出し内。
     </li>
     <li>
-        ... <code>Application</code> クラスの拡張関数である明示的に定義された <code>module</code> 内。
+        <code>Application</code> クラスの拡張関数である明示的に定義された <code>module()</code> 内。
     </li>
 </list>
 <Tabs>
@@ -109,7 +128,7 @@ import io.ktor.server.auth.*
 // ...
 install(Authentication) {
     basic {
-        // Basic認証を設定する
+        // Configure basic authentication
     }
 }
 ```
@@ -127,10 +146,10 @@ install(Authentication) {
 ```kotlin
 install(Authentication) {
     basic("auth-basic") {
-        // Basic認証を設定する
+        // Configure basic authentication
     }
     form("auth-form") {
-        // フォーム認証を設定する
+        // Configure form authentication
     }
     // ...
 }
@@ -151,7 +170,9 @@ install(Authentication) {
     basic("auth-basic") {
         realm = "Access to the '/' path"
         validate { credentials ->
-            if (credentials.name == "jetbrains" && credentials.password == "foobar") {
+            val isValid = credentials.name == "jetbrains" &&
+                credentials.password == "foobar"
+            if (isValid) {
                 UserIdPrincipal(credentials.name)
             } else {
                 null
@@ -177,7 +198,7 @@ install(Authentication) {
 > basic {
 >     skipWhen { call -> call.sessions.get<UserSession>() != null }
 > }
-```
+> ```
 
 ### ステップ4: 特定のリソースを保護する {id="authenticate-route"}
 
@@ -207,15 +228,16 @@ install(Authentication) {
   以下のコードスニペットでは、[セッション認証](server-session-auth.md) に合格したユーザーのみが、Basic認証を使用して `/admin` ルートへのアクセスを試みることができます。
    ```kotlin
    routing {
-       authenticate("auth-session", strategy = AuthenticationStrategy.Required) {
+       val required = AuthenticationStrategy.Required
+       authenticate("auth-session", strategy = required) {
            get("/hello") {
                // ...
-           }    
-           authenticate("auth-basic", strategy = AuthenticationStrategy.Required) {
+           }
+           authenticate("auth-basic", strategy = required) {
                get("/admin") {
                    // ...
                }
-           }  
+           }
        }
    }
    ```
@@ -230,7 +252,8 @@ install(Authentication) {
 routing {
     authenticate("auth-basic") {
         get("/") {
-            call.respondText("Hello, ${call.principal<UserIdPrincipal>()?.name}!")
+            val user = call.principal<UserIdPrincipal>()
+            call.respondText("Hello, ${user?.name}!")
         }
     }
 }
@@ -251,10 +274,14 @@ authenticate("auth-session") {
 以下の例では、最上位のセッションプロバイダーのプリンシパルを取得するために `"auth-session"` 値が渡されています。
 
 ```kotlin
-authenticate("auth-session", strategy = AuthenticationStrategy.Required) {
-    authenticate("auth-basic", strategy = AuthenticationStrategy.Required) {
+val required = AuthenticationStrategy.Required
+authenticate("auth-session", strategy = required) {
+    authenticate("auth-basic", strategy = required) {
         get("/admin") {
-            val userSession = call.principal<UserSession>("auth-session")
+            val userSession =
+                call.principal<UserSession>(
+                    "auth-session"
+                )
         }
     }
 }
@@ -267,9 +294,11 @@ authenticate("auth-session", strategy = AuthenticationStrategy.Required) {
 ```kotlin
 provider("custom") {
   authenticate { context ->
-    val exampleHeader = context.call.request.headers["Example-Header"]
+    val headers = context.call.request.headers
+    val exampleHeader = headers["Example-Header"]
     if (exampleHeader == null) {
-      val cause = AuthenticationFailedCause.Error("No example header found")
+      val message = "No example header found"
+      val cause = AuthenticationFailedCause.Error(message)
       context.challenge(key = this, cause) { challenge, call ->
         call.respondText("Challenge")
         challenge.complete()

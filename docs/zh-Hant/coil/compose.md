@@ -3,7 +3,7 @@
 若要新增對 [Compose UI](https://www.jetbrains.com/compose-multiplatform/) 的支援，請匯入擴充程式庫：
 
 ```kotlin
-implementation("io.coil-kt.coil3:coil-compose:3.6.2")
+implementation("io.coil-kt.coil3:coil-compose:3.6.3")
 ```
 
 接著使用 `AsyncImage` 可組合項 (composable) 來載入並顯示圖片：
@@ -17,7 +17,7 @@ AsyncImage(
 
 `model` 可以是 `ImageRequest.data` 的值，也可以是 `ImageRequest` 本身。`contentDescription` 設定無障礙服務使用的文字，用來描述此圖片所代表的內容。
 
-## AsyncImage
+## AsyncImage {id="asyncimage"}
 
 `AsyncImage` 是一個非同步執行圖片請求並渲染結果的可組合項。它支援與標準 `Image` 可組合項相同的引數 (arguments)，此外還支援設定 `placeholder`/`error`/`fallback` painter 以及 `onLoading`/`onSuccess`/`onError` 回呼 (callbacks)。以下是載入具有圓形裁剪 (circle crop)、淡入淡出 (crossfade) 並設定占位符號 (placeholder) 的圖片範例：
 
@@ -38,7 +38,7 @@ AsyncImage(
 
 在大多數情況下，建議優先使用 `AsyncImage`。它會根據可組合項的約束 (constraints) 和提供的 `ContentScale` 正確決定圖片載入的大小。
 
-## rememberAsyncImagePainter
+## rememberAsyncImagePainter {id="rememberasyncimagepainter"}
 
 在內部，`AsyncImage` 和 `SubcomposeAsyncImage` 使用 `rememberAsyncImagePainter` 來載入 `model`。如果您需要的是 `Painter` 而不是可組合項，可以使用 `rememberAsyncImagePainter` 載入圖片：
 
@@ -72,7 +72,7 @@ Image(
 
 另一項缺點是，使用 `rememberAsyncImagePainter` 時，對於首次組合 (composition)，`AsyncImagePainter.state` 將始終為 `AsyncImagePainter.State.Empty` — 即使圖片存在於記憶體快取 (memory cache) 中且會在第一幀 (first frame) 繪製。
 
-## SubcomposeAsyncImage
+## SubcomposeAsyncImage {id="subcomposeasyncimage"}
 
 `SubcomposeAsyncImage` 是 `AsyncImage` 的一個變體，它使用子組合 (subcomposition) 為 `AsyncImagePainter` 的狀態提供 slot API，而不是使用 `Painter`。以下是一個範例：
 
@@ -111,7 +111,7 @@ SubcomposeAsyncImage(
 
 具體來說，只有在您需要觀察 `AsyncImagePainter.state`，且不能像使用 `rememberAsyncImagePainter` 那樣在首次組合和第一幀時狀態為 `Empty` 的情況下，此函式才有用。`SubcomposeAsyncImage` 使用子組合來獲取圖片的約束，因此其 `AsyncImagePainter.state` 會立即更新。
 
-## 觀察 AsyncImagePainter.state
+## 觀察 AsyncImagePainter.state {id="observing-asyncimagepainter-state"}
 
 ```kotlin
 val painter = rememberAsyncImagePainter("https://example.com/image.jpg")
@@ -134,7 +134,7 @@ when (state) {
 }
 ```
 
-## 轉換 (Transitions)
+## 轉換 (Transitions) {id="transitions"}
 
 您可以使用 `ImageRequest.Builder.crossfade` 啟用內建的淡入淡出轉換 (crossfade transition)：
 
@@ -168,7 +168,7 @@ Image(
 
 請參閱 [Compose AnimatedContent](/coil/recipes#compose-animatedcontent) 以獲取完整的 `AnimatedContent` 範例。
 
-## 預覽 (Previews)
+## 預覽 (Previews) {id="previews"}
 
 Android Studio 對於 `AsyncImage`/`rememberAsyncImagePainter`/`SubcomposeAsyncImage` 的預覽行為是由 `LocalAsyncImagePreviewHandler` 控制的。預設情況下，它會嘗試在預覽環境中正常執行請求。預覽環境中停用了網路存取，因此網路 URL 將始終失敗。
 
@@ -189,7 +189,7 @@ CompositionLocalProvider(LocalAsyncImagePreviewHandler provides previewHandler) 
 
 這對於 [AndroidX 的 Compose Preview 螢幕截圖測試程式庫 (Screenshot Testing library)](https://developer.android.com/studio/preview/compose-screenshot-testing) 也很有用，它在相同的預覽環境中執行。
 
-## Compose Multiplatform 資源 (Resources)
+## Compose Multiplatform 資源 (Resources) {id="compose-multiplatform-resources"}
 
 Coil 支援透過使用 `Res.getUri` 作為 `model` 參數來載入 [Compose Multiplatform 資源 (Resources)](https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-multiplatform-resources.html)。範例：
 

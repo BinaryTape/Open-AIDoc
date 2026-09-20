@@ -31,6 +31,10 @@ Ktor는 `Bearer` 스키마를 사용하여 `Authorization` 헤더에 전달된 J
 
 > Ktor의 인증 및 인가에 대한 일반적인 정보는 [Ktor 서버의 인증 및 인가](server-auth.md) 섹션에서 확인할 수 있습니다.
 
+> 토큰이 OpenID Connect 제공자로부터 온 경우, `Oidc` 플러그인이 발급자 URL에서 JWKS 엔드포인트를 확인(resolve)하고 키가 교체(rotate)될 때 자동으로 새로고침하므로 `JwkProvider`를 수동으로 구성할 필요가 없습니다. 또한 액세스 토큰으로 제시된 ID 토큰을 거부합니다. 자세한 내용은 [OpenID Connect 리소스 서버](server-oidc-resource-server.md)를 참조하세요.
+>
+{style="tip"}
+
 ## 의존성 추가 {id="add_dependencies"}
 `JWT` 인증을 활성화하려면 빌드 스크립트에 `ktor-server-auth` 및 `ktor-server-auth-jwt` 아티팩트를 포함해야 합니다:
 
@@ -134,20 +138,25 @@ jwt {
 <TabItem title="HS256" group-key="hs256">
 
 ```kotlin
-val secret = environment.config.property("jwt.secret").getString()
-val issuer = environment.config.property("jwt.issuer").getString()
-val audience = environment.config.property("jwt.audience").getString()
-val myRealm = environment.config.property("jwt.realm").getString()
+val jwtConfig = environment.config
+val secret = jwtConfig.property("jwt.secret").getString()
+val issuer = jwtConfig.property("jwt.issuer").getString()
+val audience = jwtConfig
+    .property("jwt.audience").getString()
+val myRealm = jwtConfig.property("jwt.realm").getString()
 ```
 
 </TabItem>
 <TabItem title="RS256" group-key="rs256">
 
 ```kotlin
-val privateKeyString = environment.config.property("jwt.privateKey").getString()
-val issuer = environment.config.property("jwt.issuer").getString()
-val audience = environment.config.property("jwt.audience").getString()
-val myRealm = environment.config.property("jwt.realm").getString()
+val jwtConfig = environment.config
+val privateKeyString = jwtConfig
+    .property("jwt.privateKey").getString()
+val issuer = jwtConfig.property("jwt.issuer").getString()
+val audience = jwtConfig
+    .property("jwt.audience").getString()
+val myRealm = jwtConfig.property("jwt.realm").getString()
 ```
 
 </TabItem>
@@ -165,11 +174,12 @@ post("/login") {
     val user = call.receive<User>()
     // 사용자 이름 및 비밀번호 확인
     // ...
+    val expiresAt = System.currentTimeMillis() + 60000
     val token = JWT.create()
         .withAudience(audience)
         .withIssuer(issuer)
         .withClaim("username", user.username)
-        .withExpiresAt(Date(System.currentTimeMillis() + 60000))
+        .withExpiresAt(Date(expiresAt))
         .sign(Algorithm.HMAC256(secret))
     call.respond(hashMapOf("token" to token))
 }
@@ -183,15 +193,24 @@ post("/login") {
     val user = call.receive<User>()
     // 사용자 이름 및 비밀번호 확인
     // ...
-    val publicKey = jwkProvider.get("6f8856ed-9189-488f-9011-0ff4b6c08edc").publicKey
-    val keySpecPKCS8 = PKCS8EncodedKeySpec(Base64.getDecoder().decode(privateKeyString))
-    val privateKey = KeyFactory.getInstance("RSA").generatePrivate(keySpecPKCS8)
+    val keyId = "6f8856ed-9189-488f-9011-0ff4b6c08edc"
+    val publicKey = jwkProvider.get(keyId).publicKey
+    val decoded = Base64.getDecoder()
+        .decode(privateKeyString)
+    val keySpecPKCS8 = PKCS8EncodedKeySpec(decoded)
+    val privateKey = KeyFactory.getInstance("RSA")
+        .generatePrivate(keySpecPKCS8)
+    val algorithm = Algorithm.RSA256(
+        publicKey as RSAPublicKey,
+        privateKey as RSAPrivateKey
+    )
+    val expiresAt = System.currentTimeMillis() + 60000
     val token = JWT.create()
         .withAudience(audience)
         .withIssuer(issuer)
         .withClaim("username", user.username)
-        .withExpiresAt(Date(System.currentTimeMillis() + 60000))
-        .sign(Algorithm.RSA256(publicKey as RSAPublicKey, privateKey as RSAPrivateKey))
+        .withExpiresAt(Date(expiresAt))
+        .sign(algorithm)
     call.respond(hashMapOf("token" to token))
 }
 ```
@@ -210,7 +229,7 @@ post("/login") {
 `realm` 속성을 사용하면 [보호된 라우트](#authenticate-route)에 접근할 때 `WWW-Authenticate` 헤더에 전달될 realm을 설정할 수 있습니다.
 
 ```kotlin
-val myRealm = environment.config.property("jwt.realm").getString()
+val myRealm = jwtConfig.property("jwt.realm").getString()
 install(Authentication) {
     jwt("auth-jwt") {
         realm = myRealm
@@ -228,10 +247,12 @@ install(Authentication) {
 <TabItem title="HS256" group-key="hs256">
 
 ```kotlin
-val secret = environment.config.property("jwt.secret").getString()
-val issuer = environment.config.property("jwt.issuer").getString()
-val audience = environment.config.property("jwt.audience").getString()
-val myRealm = environment.config.property("jwt.realm").getString()
+val jwtConfig = environment.config
+val secret = jwtConfig.property("jwt.secret").getString()
+val issuer = jwtConfig.property("jwt.issuer").getString()
+val audience = jwtConfig
+    .property("jwt.audience").getString()
+val myRealm = jwtConfig.property("jwt.realm").getString()
 install(Authentication) {
     jwt("auth-jwt") {
         realm = myRealm
@@ -248,9 +269,10 @@ install(Authentication) {
 <TabItem title="RS256" group-key="rs256">
 
 ```kotlin
-val issuer = environment.config.property("jwt.issuer").getString()
-val audience = environment.config.property("jwt.audience").getString()
-val myRealm = environment.config.property("jwt.realm").getString()
+val issuer = jwtConfig.property("jwt.issuer").getString()
+val audience = jwtConfig
+    .property("jwt.audience").getString()
+val myRealm = jwtConfig.property("jwt.realm").getString()
 val jwkProvider = JwkProviderBuilder(issuer)
     .cached(10, 24, TimeUnit.HOURS)
     .rateLimited(10, 1, TimeUnit.MINUTES)
@@ -270,12 +292,17 @@ install(Authentication) {
 
 ### 5단계: JWT 페이로드 유효성 검사 {id="validate-payload"}
 
+<Tabs group="auth-dsl">
+<TabItem title="Classic" group-key="classic">
+
 1. `validate` 함수를 사용하면 JWT 페이로드에 대한 유효성 검사를 수행할 수 있습니다. 이 함수는 필수입니다. 구성하지 않으면 제공자 초기화 시 `IllegalArgumentException`이 발생합니다. JWT 페이로드를 포함하는 [JWTCredential](https://api.ktor.io/ktor-server-auth-jwt/io.ktor.server.auth.jwt/-j-w-t-credential/index.html) 객체인 `credential` 파라미터를 확인하세요. 아래 예제에서는 커스텀 `username` 클레임의 값을 확인합니다.
    ```kotlin
    install(Authentication) {
        jwt("auth-jwt") {
            validate { credential ->
-               if (credential.payload.getClaim("username").asString() != "") {
+               val payload = credential.payload
+               val claim = payload.getClaim("username")
+               if (claim.asString() != "") {
                    JWTPrincipal(credential.payload)
                } else {
                    null
@@ -291,13 +318,65 @@ install(Authentication) {
    install(Authentication) {
        jwt("auth-jwt") {
            challenge { defaultScheme, realm ->
-               call.respond(HttpStatusCode.Unauthorized, "Token is not valid or has expired")
+               val text = "Token is not valid or has expired"
+               val status = HttpStatusCode.Unauthorized
+               call.respond(status, text)
            }
        }
    }
    ```
 
+</TabItem>
+<TabItem title="Type-safe" group-key="typed">
+
+<note>
+    <p>
+        타입 세이프(Type-safe) 인증 스키마 API는 실험적(experimental) 기능입니다. 언제든지 제거되거나 변경될 수 있습니다.
+        옵트인(opt-in)이 필요합니다. 자세한 내용은
+        <a href="server-typed-auth.md#prerequisites">API 활성화</a>를 참조하세요.
+    </p>
+</note>
+
+`jwt()` 함수는 원하는 프린시펄(principal) 타입에 대한 스키마를 생성합니다. `install(Authentication)` 단계가 필요 없으며, 스키마는 이를 필요로 하는 라우트에 전달하는 값입니다.
+
+`validate` 내부에서 필요한 클레임을 읽고 고유한 타입을 반환합니다. 그러면 라우트 핸들러는 `JWTPrincipal` 대신 해당 타입을 사용하여 동작합니다:
+
+```kotlin
+data class User(val username: String, val expiresAt: Long?)
+
+val jwtAuth = jwt<User>("auth-jwt") {
+    realm = myRealm
+    verifier(
+        JWT.require(Algorithm.HMAC256(secret))
+            .withAudience(audience)
+            .withIssuer(issuer)
+            .build()
+    )
+    validate { credential ->
+        val payload = credential.payload
+        val username = payload.getClaim("username").asString()
+        if (username != "") {
+            User(username, credential.expiresAt?.time)
+        } else {
+            null
+        }
+    }
+    onUnauthorized = {
+        val message = "Token is not valid or has expired"
+        call.respond(HttpStatusCode.Unauthorized, message)
+    }
+}
+```
+
+실패 핸들러로는 `challenge` 대신 `onUnauthorized`를 사용합니다. 전체 API는 [타입 세이프 인증](server-typed-auth.md)을 참조하세요.
+
+</TabItem>
+</Tabs>
+
 ### 6단계: 특정 리소스 보호 {id="authenticate-route"}
+
+<Tabs group="auth-dsl">
+<TabItem title="Classic" group-key="classic">
 
 `jwt` 제공자를 구성한 후에는 **[authenticate](server-auth.md#authenticate-route)** 함수를 사용하여 애플리케이션의 특정 리소스를 보호할 수 있습니다. 인증에 성공하면 라우트 핸들러 내부에서 `call.principal` 함수를 사용하여 인증된 [JWTPrincipal](https://api.ktor.io/ktor-server-auth-jwt/io.ktor.server.auth.jwt/-j-w-t-principal/index.html)을 가져와 JWT 페이로드를 얻을 수 있습니다. 아래 예제에서는 커스텀 `username` 클레임 값과 토큰 만료 시간을 가져옵니다.
 
@@ -306,9 +385,41 @@ routing {
     authenticate("auth-jwt") {
         get("/hello") {
             val principal = call.principal<JWTPrincipal>()
-            val username = principal!!.payload.getClaim("username").asString()
-            val expiresAt = principal.expiresAt?.time?.minus(System.currentTimeMillis())
-            call.respondText("Hello, $username! Token is expired at $expiresAt ms.")
+            val payload = principal!!.payload
+            val username = payload.getClaim("username")
+                .asString()
+            val now = System.currentTimeMillis()
+            val expiresAt = principal.expiresAt?.time
+                ?.minus(now)
+            call.respondText(
+                "Hello, $username! " +
+                    "Token is expired at $expiresAt ms."
+            )
         }
     }
 }
+```
+
+</TabItem>
+<TabItem title="Type-safe" group-key="typed">
+
+스키마를 `authenticateWith()`에 전달합니다. `validate`에서 클레임을 이미 읽었으므로 핸들러는 고유한 타입으로 동작하며 null 검사가 필요하지 않습니다:
+
+```kotlin
+routing {
+    authenticateWith(jwtAuth) {
+        get("/hello") {
+            val user = call.principal
+            val now = System.currentTimeMillis()
+            val expiresIn = user.expiresAt?.minus(now)
+            call.respondText(
+                "Hello, ${user.username}! " +
+                    "Token is expired at $expiresIn ms."
+            )
+        }
+    }
+}
+```
+
+</TabItem>
+</Tabs>

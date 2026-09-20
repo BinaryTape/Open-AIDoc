@@ -1,8 +1,9 @@
 [//]: # (title: AI 駆動アプリ開発のための Kotlin)
+[//]: # (description: Koog、MCP Kotlin SDK、主要な LLM プロバイダー、RAG パイプライン、AI エージェント、Spring AI、LangChain4j を使用して、Kotlin で AI 駆動アプリケーションを構築する方法について学びます。)
 
 <web-summary>Kotlin を使用して AI 駆動のアプリケーションを構築するために、Koog がどのように役立つかを確認しましょう。</web-summary>
 
-Kotlin は、AI 駆動のアプリケーションを構築するためのモダンで実践的な基盤を提供します。
+Kotlin は、AI 駆動のアプリケーションを構築するためのモダンで実践的な基盤を提供します。  
 プラットフォームを問わず使用でき、確立された AI フレームワークと適切に統合され、一般的な AI 開発パターンをサポートします。
 
 ## Koog {id="koog"}
@@ -38,7 +39,7 @@ fun main() {
 * **エンタープライズ対応の統合**。Koog は、[Spring Boot](https://spring.io/projects/spring-boot) や [Ktor](https://ktor.io) などの人気のある JVM フレームワークと統合します。
 * **OpenTelemetry エクスポーターによるオブザーバビリティ**。Koog は、AI アプリケーションの監視とデバッグのために、W&B Weave や Langfuse などの主要なオブザーバビリティプロバイダーとのすぐに使える統合機能を提供します。
 * **LLM の切り替えとシームレスな履歴適応**。Koog では、既存の会話履歴を失うことなく、任意の時点で新しいツールセットを持つ別の LLM に切り替えることができます。また、OpenAI、Anthropic、Google など、複数の LLM プロバイダー間の再ルーティングも可能です。Koog と Ollama の統合により、ローカルモデルを使用してローカルでエージェントを実行することもできます。
-* **JVM および Kotlin アプリケーションとの統合**。Koog は、JVM および Kotlin 開発者向けに特別に設計された、慣式的で型安全な DSL を提供します。
+* **JVM および Kotlin アプリケーションとの統合**。Koog は、JVM および Kotlin 開発者向けに特別に設計された、慣用的で型安全な DSL を提供します。
 * **Model Context Protocol (MCP) との統合**。Koog では、エージェントで MCP ツールを使用できます。
 * **知識の検索とメモリ**。エンベディング、ランク付けされたドキュメントストレージ、共有エージェントメモリにより、Koog 自体が会話を通じて能動的に知識を保持します。
 * **ストリーミング機能**。Koog は、ストリーミングサポートとツールの並列呼び出しにより、開発者がレスポンスをリアルタイムで処理できるようにします。
@@ -86,6 +87,6 @@ Kotlin を使用して、OpenAI、Anthropic、Google などの主要なモデル
 
 ## 次のステップ {id="what-s-next"}
 
-* [Spring AI を使用して質問に答える Kotlin アプリを作成する](spring-ai-guide.md) チュートリアルを完了し、IntelliJ IDEA で Kotlin と Spring AI を使用する方法について詳しく学びましょう。
+* [Spring AI を使用して質問に答える Kotlin アプリを作成する](spring-ai-guide.md)チュートリアルを完了し、IntelliJ IDEA で Kotlin と Spring AI を使用する方法について詳しく学びましょう。
 * [Kotlin コミュニティ](https://kotlinlang.org/community/)に参加して、Kotlin で AI アプリケーションを構築している他の開発者とつながりましょう。
-* [Kotlin AI スキル](kotlin-ai-skills.md)について学ぶ
+* [Kotlin 開発に役立つ AI ツール](ai-for-development.md)について学びましょう。

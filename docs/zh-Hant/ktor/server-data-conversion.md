@@ -26,12 +26,14 @@
 Ktor 伺服器的 %plugin_name% 外掛程式可讓您針對值的清單序列化與反序列化，新增自訂的轉換器。
 </link-summary>
 
-[%plugin_name%](https://api.ktor.io/ktor-utils/io.ktor.util.converters/-data-conversion/index.html) 外掛程式可讓您序列化與反序列化值的清單。預設情況下，Ktor 透過 [DefaultConversionService](https://api.ktor.io/ktor-utils/io.ktor.util.converters/-default-conversion-service/index.html) 處理基本型別與列舉。您可以透過安裝與配置 `%plugin_name%` 外掛程式來擴充此服務，以處理額外的型別。
+[%plugin_name%](https://api.ktor.io/ktor-utils/io.ktor.util.converters/-data-conversion/index.html) 外掛程式可讓您序列化與反序列化值的清單。預設情況下，Ktor 透過 [`DefaultConversionService`](https://api.ktor.io/ktor-utils/io.ktor.util.converters/-default-conversion-service/index.html) 處理字串與常見型別，包括數值型別、無正負號整數型別、`Uuid` 以及列舉。
+
+您可以透過安裝與配置 `%plugin_name%` 外掛程式來擴充此服務，以處理額外的型別。
 
 ## 新增相依性 {id="add_dependencies"}
 
 <p>
-    若要使用 <code>%plugin_name%</code>，您需要在組建指令碼中包含 <code>%artifact_name%</code> 構件：
+    若要使用 <code>%plugin_name%</code>，請在組建指令碼中新增 <code>%artifact_name%</code> 構件：
 </p>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
@@ -48,15 +50,15 @@ Ktor 伺服器的 %plugin_name% 外掛程式可讓您針對值的清單序列化
 ## 安裝 %plugin_name% {id="install_plugin"}
 
 <p>
-    若要將 <code>%plugin_name%</code> 外掛程式<a href="#install">安裝</a>到應用程式，請將其傳遞給指定 <Links href="/ktor/server-modules" summary="模組允許您透過分組路由來建構您的應用程式。">模組</Links> 中的 <code>install</code> 函式。
-    下方的程式碼片段展示了如何安裝 <code>%plugin_name%</code> ...
+    若要將 <code>%plugin_name%</code> 外掛程式<a href="#install">安裝</a>至您的應用程式，請將其傳遞給指定 <Links href="/ktor/server-modules" summary="模組允許您透過分組路由來建構您的應用程式。">模組</Links> 中的 <code>install</code> 函式。
+    以下範例展示如何安裝 <code>%plugin_name%</code>：
 </p>
 <list>
     <li>
-        ... 在 <code>embeddedServer</code> 函式呼叫內。
+        在 <code>embeddedServer()</code> 函式呼叫內。
     </li>
     <li>
-        ... 在明確定義的 <code>module</code> 內，該模組是 <code>Application</code> 類別的擴充函式。
+        在 <code>Application</code> 類別上明確定義的 <code>module()</code> 擴充函式內。
     </li>
 </list>
 <Tabs>
@@ -88,11 +90,9 @@ Ktor 伺服器的 %plugin_name% 外掛程式可讓您針對值的清單序列化
       }
   ```
 
-## 存取服務 {id="access-the-service"}
+## 存取服務 {id="service"}
 
-{id="service"}
-
-您可以從當前上下文中存取 `%plugin_name%` 服務：
+您可以從目前的上下文中存取 `%plugin_name%` 服務：
 
 ```kotlin
 val dataConversion = application.conversionService

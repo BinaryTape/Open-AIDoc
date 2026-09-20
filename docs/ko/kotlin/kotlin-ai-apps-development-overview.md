@@ -1,4 +1,5 @@
 [//]: # (title: AI 기반 앱 개발을 위한 Kotlin)
+[//]: # (description: Koog, MCP Kotlin SDK, 주요 LLM 제공업체, RAG 파이프라인, AI 에이전트, Spring AI, LangChain4j를 사용하여 Kotlin으로 AI 기반 애플리케이션을 구축하는 방법을 알아보세요.)
 
 <web-summary>Koog가 Kotlin으로 AI 기반 애플리케이션을 구축하는 데 어떻게 도움이 되는지 알아보세요.</web-summary>
 
@@ -89,4 +90,4 @@ Kotlin을 사용하여 OpenAI, Anthropic, Google 등과 같은 주요 모델 제
 
 * IntelliJ IDEA에서 Kotlin과 Spring AI를 사용하는 방법에 대해 자세히 알아보려면 [Spring AI를 사용하여 질문에 답변하는 Kotlin 앱 만들기](spring-ai-guide.md) 튜토리얼을 완료하세요.
 * [Kotlin 커뮤니티](https://kotlinlang.org/community/)에 가입하여 Kotlin으로 AI 애플리케이션을 구축하는 다른 개발자들과 소통하세요.
-* [](kotlin-ai-skills.md)에 대해 알아보세요.
+* [Kotlin 개발에 도움이 되는 AI 도구](ai-for-development.md)에 대해 알아보세요.

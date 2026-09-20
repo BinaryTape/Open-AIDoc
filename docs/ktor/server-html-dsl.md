@@ -96,7 +96,13 @@ fun Application.module() {
 get("/login") {
     call.respondHtml {
         body {
-            form(action = "/login", encType = FormEncType.applicationXWwwFormUrlEncoded, method = FormMethod.post) {
+            val urlEncoded = FormEncType
+                .applicationXWwwFormUrlEncoded
+            form(
+                action = "/login",
+                encType = urlEncoded,
+                method = FormMethod.post
+            ) {
                 p {
                     +"Username:"
                     textInput(name = "username")
@@ -140,7 +146,7 @@ get("/login") {
 
 ## 发送部分 HTML {id="html_fragments"}
 
-除了生成完整的 HTML 文档外，您还可以使用 `.respondHtmlFragment()` 函数响应 HTML 代码片段。
+除了生成完整的 HTML 文档外，您还可以使用 `.respondHtmlPartial()` 函数响应 HTML 代码片段。
 
 当返回不需要完整 `<html>` 文档的部分标记（例如 HTMX 等库使用的动态更新）时，HTML 代码片段非常有用。
 
@@ -157,7 +163,7 @@ import kotlinx.html.*
 fun Application.module() {
     routing {
         get("/fragment") {
-            call.respondHtmlFragment(HttpStatusCode.Created) {
+            call.respondHtmlPartial(HttpStatusCode.Created) {
                 div("fragment") {
                     span { +"Created!" }
                 }

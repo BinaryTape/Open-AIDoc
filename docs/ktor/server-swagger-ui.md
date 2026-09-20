@@ -50,12 +50,6 @@ Ktor 允许您基于 OpenAPI 规范为项目生成并提供 Swagger UI。
     </TabItem>
 </Tabs>
 
-> 在 Ktor 3.4.0 中，`SwaggerUI` 插件需要 `ktor-server-routing-openapi` 依赖项。
-> 这并非有意引入的破坏性变更，并将会在 Ktor 3.4.1 中修正。
-> 如果您正在使用 Ktor 3.4.0，请手动添加该依赖项以避免运行时错误。
-> 
-{style="warning"}
-
 ## 使用静态 OpenAPI 文件 {id="static-openapi-file"}
 
 要从现有的 OpenAPI 规范文件提供 Swagger UI，请使用 [`swaggerUI()`](%plugin_api_link%) 函数并指定文件位置。
@@ -94,7 +88,32 @@ swaggerUI("/swaggerUI") {
 
 ## 配置 Swagger UI {id="configure-swagger-ui"}
 
-您可以在 `swaggerUI {}` 代码块中自定义 Swagger UI，例如通过指定自定义的 Swagger UI 版本：
+通过 `swaggerUI {}` 配置块，您可以配置 OpenAPI 文档并自定义 Swagger UI。
+
+### 配置文档元数据 {id="configure-document-metadata"}
+
+您可以直接在配置块中定义顶级 OpenAPI 元数据。
+
+例如，使用 `info` 指定常规 API 信息，并使用 `tag()` 定义标签及其描述：
+
+```kotlin
+swaggerUI("/swagger") {
+    info = OpenApiInfo("Books API from routes", "1.0.0")
+    tag(
+        name = "Books",
+        description = "Operations on books"
+    )
+}
+```
+您还可以配置其他顶级 OpenAPI 属性，例如服务器、安全要求、可复用组件、外部文档和规范扩展。
+
+> 有关可用选项的完整集合，请参阅 [`SwaggerConfig`](https://api.ktor.io/ktor-server-swagger/io.ktor.server.plugins.swagger/-swagger-config/index.html) API 参考。
+> 
+{style="tip"}
+
+### 配置 Swagger UI 版本 {id="configure-the-swagger-ui-version"}
+
+默认情况下，Ktor 使用预定义的 Swagger UI 版本。若要使用其他版本，请设置 `version` 属性：
 
 ```kotlin
 routing {

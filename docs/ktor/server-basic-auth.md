@@ -82,6 +82,9 @@ install(Authentication) {
 
 ### 第一步：配置 basic 提供程序 {id="configure-provider"}
 
+<Tabs group="auth-dsl">
+<TabItem title="命名提供程序" group-key="classic">
+
 `basic` 身份验证提供程序通过 [BasicAuthenticationProvider.Configuration](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-basic-authentication-provider/-config/index.html) 类公开其设置。在下面的示例中，指定了以下设置：
 * `realm` 属性设置要在 `WWW-Authenticate` 标头中传递的领域值。
 * `validate` 函数验证用户名和密码。
@@ -91,7 +94,9 @@ install(Authentication) {
     basic("auth-basic") {
         realm = "Access to the '/' path"
         validate { credentials ->
-            if (credentials.name == "jetbrains" && credentials.password == "foobar") {
+            val isValid = credentials.name == "jetbrains" &&
+                credentials.password == "foobar"
+            if (isValid) {
                 UserIdPrincipal(credentials.name)
             } else {
                 null
@@ -104,7 +109,39 @@ install(Authentication) {
 `validate` 函数检查 `UserPasswordCredential`，并在身份验证成功的情况下返回 `UserIdPrincipal`，如果身份验证失败则返回 `null`。 
 > 您还可以使用 [UserHashedTableAuth](#validate-user-hash) 来验证存储在内存表中的用户，该表保存了用户名和密码哈希。
 
+</TabItem>
+<TabItem title="类型安全" group-key="typed">
+
+<note>
+    <p>
+        类型安全身份验证方案 API 处于实验阶段。它可能会随时被弃用或更改。需要显式启用（opt-in）。详情请参阅<a href="server-typed-auth.md#prerequisites">启用 API</a>。
+    </p>
+</note>
+
+`basic()` 函数为您所选的主体（principal）类型创建方案。无需 `install(Authentication)` 步骤：该方案是一个值，您可以将其传递给需要它的路由。
+
+```kotlin
+data class User(val name: String)
+
+val basicAuth = basic<User>("auth-basic") {
+    realm = "Access to the '/' path"
+    validate { credentials ->
+        val isValid = credentials.name == "jetbrains" &&
+            credentials.password == "foobar"
+        if (isValid) User(credentials.name) else null
+    }
+}
+```
+
+`validate` 函数检查 `UserPasswordCredential` 并返回您的主体类型，若身份验证失败则返回 `null`。有关完整 API，请参阅[类型安全身份验证](server-typed-auth.md)。
+
+</TabItem>
+</Tabs>
+
 ### 第二步：保护特定资源 {id="authenticate-route"}
+
+<Tabs group="auth-dsl">
+<TabItem title="命名提供程序" group-key="classic">
 
 配置完 `basic` 提供程序后，您可以使用 **[authenticate](server-auth.md#authenticate-route)** 函数保护应用程序中的特定资源。在身份验证成功的情况下，您可以在路由处理程序中使用 `call.principal` 函数检索已通过身份验证的 [UserIdPrincipal](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-user-id-principal/index.html)，并获取已通过身份验证的用户名称。
 
@@ -112,11 +149,30 @@ install(Authentication) {
 routing {
     authenticate("auth-basic") {
         get("/") {
-            call.respondText("Hello, ${call.principal<UserIdPrincipal>()?.name}!")
+            val user = call.principal<UserIdPrincipal>()
+            call.respondText("Hello, ${user?.name}!")
         }
     }
 }
 ```
+
+</TabItem>
+<TabItem title="类型安全" group-key="typed">
+
+将该方案传递给 `authenticateWith()`。在代码块内部，`call.principal` 即为您的主体类型且绝不为 `null`，因此无需进行转换或 null 检查：
+
+```kotlin
+routing {
+    authenticateWith(basicAuth) {
+        get("/") {
+            call.respondText("Hello, ${call.principal.name}!")
+        }
+    }
+}
+```
+
+</TabItem>
+</Tabs>
 
 ## 使用 UserHashedTableAuth 进行验证 {id="validate-user-hash"}
 
@@ -127,7 +183,9 @@ Ktor 允许您使用 [UserHashedTableAuth](#validate-user-hash) 来[验证](#con
 1. 使用 [getDigestFunction](https://api.ktor.io/ktor-utils/io.ktor.util/get-digest-function.html) 函数创建一个具有指定算法和盐提供者的摘要函数：
    
    ```kotlin
-   val digestFunction = getDigestFunction("SHA-256") { "ktor${it.length}" }
+   val digestFunction = getDigestFunction("SHA-256") {
+       "ktor${it.length}"
+   }
    ```
 
 2. 初始化 `UserHashedTableAuth` 的新实例并指定以下属性：

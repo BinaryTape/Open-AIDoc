@@ -78,6 +78,10 @@ install(Authentication) {
 ## 폼 인증 구성 {id="configure"}
 
 ### 1단계: 폼 공급자 구성 {id="configure-provider"}
+
+<Tabs group="auth-dsl">
+<TabItem title="Named provider" group-key="classic">
+
 `form` 인증 공급자는 [FormAuthenticationProvider.Config](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-form-authentication-provider/-config/index.html) 클래스를 통해 설정을 노출합니다. 아래 예제에서는 다음과 같은 설정이 지정되었습니다.
 * `userParamName` 및 `passwordParamName` 속성은 사용자 이름과 비밀번호를 가져오는 데 사용되는 매개변수 이름을 지정합니다.
 * `validate` 함수는 사용자 이름과 비밀번호를 검증합니다.
@@ -90,22 +94,66 @@ install(Authentication) {
         userParamName = "username"
         passwordParamName = "password"
         validate { credentials ->
-            if (credentials.name == "jetbrains" && credentials.password == "foobar") {
+            val isValid = credentials.name == "jetbrains" &&
+                credentials.password == "foobar"
+            if (isValid) {
                 UserIdPrincipal(credentials.name)
             } else {
                 null
             }
         }
         challenge {
-            call.respond(HttpStatusCode.Unauthorized, "Credentials are not valid")
+            val message = "Credentials are not valid"
+            val status = HttpStatusCode.Unauthorized
+            call.respond(status, message)
         }
     }
 }
 ```
 
+</TabItem>
+<TabItem title="Type-safe" group-key="typed">
+
+<note>
+    <p>
+        타입 세이프(type-safe) 인증 스키마 API는 실험적(experimental)입니다. 언제든지 삭제되거나 변경될 수 있습니다.
+        옵트인(opt-in)이 필요합니다. 자세한 내용은
+        <a href="server-typed-auth.md#prerequisites">API 활성화</a>를 참조하세요.
+    </p>
+</note>
+
+`form()` 함수는 선택한 프린시펄(principal) 타입에 대한 스키마를 생성합니다. `install(Authentication)`
+단계는 필요하지 않으며, 스키마는 이를 필요로 하는 라우트에 전달하는 값입니다.
+
+```kotlin
+data class User(val name: String)
+
+val formAuth = form<User>("auth-form") {
+    usernameField = "username"
+    passwordField = "password"
+    validate { credentials ->
+        val isValid = credentials.name == "jetbrains" &&
+            credentials.password == "foobar"
+        if (isValid) User(credentials.name) else null
+    }
+    onUnauthorized = {
+        val message = "Credentials are not valid"
+        call.respond(HttpStatusCode.Unauthorized, message)
+    }
+}
+```
+
+클래식 공급자와 두 가지 이름이 다릅니다. 폼 필드는 `userParamName`과 `passwordParamName` 대신 `usernameField`와 `passwordField`입니다. 실패 핸들러는 `challenge` 대신 `onUnauthorized`입니다. 전체 API에 대해서는 [타입 세이프 인증](server-typed-auth.md)을 참조하세요.
+
+</TabItem>
+</Tabs>
+
 > `basic` 인증과 마찬가지로, 사용자 이름과 비밀번호 해시를 보관하는 인메모리 테이블에 저장된 사용자를 검증하기 위해 [UserHashedTableAuth](server-basic-auth.md#validate-user-hash)를 사용할 수도 있습니다.
 
 ### 2단계: 특정 리소스 보호 {id="authenticate-route"}
+
+<Tabs group="auth-dsl">
+<TabItem title="Named provider" group-key="classic">
 
 `form` 공급자를 구성한 후에는 데이터가 전송될 `post` 라우트를 정의해야 합니다.
 그런 다음 이 라우트를 **[authenticate](server-auth.md#authenticate-route)** 함수 내부에 추가합니다.
@@ -115,11 +163,31 @@ install(Authentication) {
 routing {
     authenticate("auth-form") {
         post("/login") {
-            call.respondText("Hello, ${call.principal<UserIdPrincipal>()?.name}!")
+            val user = call.principal<UserIdPrincipal>()
+            call.respondText("Hello, ${user?.name}!")
         }
     }
 }
 ```
+
+</TabItem>
+<TabItem title="Type-safe" group-key="typed">
+
+폼 데이터가 전송될 `post` 라우트를 정의하고 `authenticateWith()`로 감쌉니다. 블록 내부에서
+`call.principal`은 지정한 프린시펄 타입이며 절대 `null`이 되지 않습니다.
+
+```kotlin
+routing {
+    authenticateWith(formAuth) {
+        post("/login") {
+            call.respondText("Hello, ${call.principal.name}!")
+        }
+    }
+}
+```
+
+</TabItem>
+</Tabs>
 
 로그인한 사용자의 ID를 저장하기 위해 [세션 인증(Session authentication)](server-session-auth.md)을 사용할 수 있습니다.
 예를 들어, 사용자가 처음 웹 폼을 사용하여 로그인할 때 사용자 이름을 쿠키 세션에 저장하고, 이후 요청에서는 `session` 공급자를 사용하여 이 사용자를 승인할 수 있습니다.

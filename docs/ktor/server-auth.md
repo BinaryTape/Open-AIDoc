@@ -44,6 +44,12 @@ HTTP 为访问控制和认证提供了一个 [通用框架](https://developer.mo
 ### OAuth {id="oauth"}
 [OAuth](server-oauth.md) 是用于保护 API 访问的开放标准。Ktor 中的 `oauth` 提供者允许你使用外部提供者（如 Google、Facebook、Twitter 等）实现认证。
 
+### OpenID Connect {id="oidc"}
+
+[OpenID Connect](server-oidc.md) 是构建在 OAuth 2.0 之上的身份层。`Oidc` 插件可以读取提供者的发现文档 (discovery document)，因此你只需配置签发者 URL (issuer URL)，而无需手动配置端点和签名密钥。它可以在 [API](server-oidc-resource-server.md) 中验证访问令牌，并执行 [浏览器登录](server-oidc-browser-login.md)，包括 PKCE、会话以及注销。
+
+该插件目前处于实验阶段，且仅在 JVM 上可用。
+
 ### 会话 {id="sessions"}
 [会话](server-sessions.md) 提供了一种在不同 HTTP 请求之间持久化数据的机制。典型用例包括存储已登录用户的 ID、购物车内容或在客户端保留用户偏好设置。在 Ktor 中，已经拥有关联会话的用户可以使用 `session` 提供者进行认证。详细了解如何从 [Ktor Server 中的会话认证](server-session-auth.md) 执行此操作。
 
@@ -54,10 +60,23 @@ Ktor 提供了两种方式来自定义认证与授权行为：
 * 使用 [自定义认证提供者](#custom-auth-provider)。
 * 使用 [自定义插件](server-custom-plugins.md) 来实现授权逻辑。例如，你可以使用 `AuthenticationChecked` [钩子](server-custom-plugins.md#call-handling) 来验证访问权限。更多信息请参阅 [custom-plugin-authorization](https://github.com/ktorio/ktor-documentation/blob/%ktor_version%/codeSnippets/snippets/custom-plugin-authorization) 示例。
 
+## 类型安全的认证方案 API {id="type-safe"}
+
+<primary-label ref="experimental"/>
+
+Ktor 还提供了[类型安全的认证方案 API](server-typed-auth.md)，用于将方案绑定到主体类型。
+在受保护的路由内部，`call.principal` 即为主体类型，且保证非 `null`，因此不需要进行类型转换或 null 检查。
+该 API 还支持按需启用的 [角色检查](server-typed-auth.md#roles)、[匿名回退](server-typed-auth.md#anonymous)、类型化 [会话](server-typed-session-auth.md) 以及 [OAuth 2.0 流程](server-oauth2-flows.md)。
+
+> 此 API 是本主题中所述命名提供者方式的替代方案。
+> 这两种 API 可以在同一个应用程序中结合使用。有关详细信息，请参阅[类型安全认证](server-typed-auth.md)。
+>
+{style="note"}
+
 ## 添加依赖项 {id="add_dependencies"}
 
 <p>
-    要使用 <code>%plugin_name%</code>，你需要在构建脚本中包含 <code>%artifact_name%</code> 构件：
+    要使用 <code>%plugin_name%</code>，请在构建脚本中添加 <code>%artifact_name%</code> 构件：
 </p>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
@@ -76,15 +95,15 @@ Ktor 提供了两种方式来自定义认证与授权行为：
 ## 安装 Authentication {id="install"}
 
 <p>
-    要将 <code>%plugin_name%</code> 插件<a href="#install">安装</a>到应用程序，请在指定的 <Links href="/ktor/server-modules" summary="模块允许你通过对路由进行分组来构建应用程序。">模块</Links>中将其传递给 <code>install</code> 函数。
-    下面的代码片段展示了如何安装 <code>%plugin_name%</code> ...
+    要将 <code>%plugin_name%</code> 插件<a href="#install">安装</a>到应用程序中，请在指定的 <Links href="/ktor/server-modules" summary="模块允许你通过对路由进行分组来构建应用程序。">模块</Links>中将其传递给 <code>install</code> 函数。
+    以下示例展示了如何安装 <code>%plugin_name%</code>：
 </p>
 <list>
     <li>
-        ... 在 <code>embeddedServer</code> 函数调用中。
+        在 <code>embeddedServer()</code> 函数调用中。
     </li>
     <li>
-        ... 在显式定义的 <code>module</code>（它是 <code>Application</code> 类的扩展函数）中。
+        在 <code>Application</code> 类显式定义的 <code>module()</code> 扩展函数中。
     </li>
 </list>
 <Tabs>
@@ -122,7 +141,7 @@ install(Authentication) {
 
 ### 步骤 2：指定提供者名称 {id="provider-name"}
 
-用于 [使用特定提供者](#choose-provider) 的函数可选地允许你指定提供者名称。下面的代码示例分别使用 `"auth-basic"` 和 `"auth-form"` 名称安装了 [basic](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/basic.html) 和 [form](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/form.html) 提供者：
+用于 [使用特定提供者](#choose-provider) 的函数可选地允许你指定提供者名称。以下代码示例分别使用 `"auth-basic"` 和 `"auth-form"` 名称安装了 [basic](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/basic.html) 和 [form](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/form.html) 提供者：
 
 ```kotlin
 install(Authentication) {
@@ -151,7 +170,9 @@ install(Authentication) {
     basic("auth-basic") {
         realm = "Access to the '/' path"
         validate { credentials ->
-            if (credentials.name == "jetbrains" && credentials.password == "foobar") {
+            val isValid = credentials.name == "jetbrains" &&
+                credentials.password == "foobar"
+            if (isValid) {
                 UserIdPrincipal(credentials.name)
             } else {
                 null
@@ -205,15 +226,16 @@ install(Authentication) {
   在下面的代码片段中，只有通过了 [会话认证](server-session-auth.md) 的用户才能尝试使用 basic 认证访问 `/admin` 路由：
    ```kotlin
    routing {
-       authenticate("auth-session", strategy = AuthenticationStrategy.Required) {
+       val required = AuthenticationStrategy.Required
+       authenticate("auth-session", strategy = required) {
            get("/hello") {
                // ...
-           }    
-           authenticate("auth-basic", strategy = AuthenticationStrategy.Required) {
+           }
+           authenticate("auth-basic", strategy = required) {
                get("/admin") {
                    // ...
                }
-           }  
+           }
        }
    }
    ```
@@ -228,7 +250,8 @@ install(Authentication) {
 routing {
     authenticate("auth-basic") {
         get("/") {
-            call.respondText("Hello, ${call.principal<UserIdPrincipal>()?.name}!")
+            val user = call.principal<UserIdPrincipal>()
+            call.respondText("Hello, ${user?.name}!")
         }
     }
 }
@@ -249,10 +272,14 @@ authenticate("auth-session") {
 在下面的示例中，传递 `"auth-session"` 值以获取最顶层会话提供者的主体：
 
 ```kotlin
-authenticate("auth-session", strategy = AuthenticationStrategy.Required) {
-    authenticate("auth-basic", strategy = AuthenticationStrategy.Required) {
+val required = AuthenticationStrategy.Required
+authenticate("auth-session", strategy = required) {
+    authenticate("auth-basic", strategy = required) {
         get("/admin") {
-            val userSession = call.principal<UserSession>("auth-session")
+            val userSession =
+                call.principal<UserSession>(
+                    "auth-session"
+                )
         }
     }
 }
@@ -265,9 +292,11 @@ authenticate("auth-session", strategy = AuthenticationStrategy.Required) {
 ```kotlin
 provider("custom") {
   authenticate { context ->
-    val exampleHeader = context.call.request.headers["Example-Header"]
+    val headers = context.call.request.headers
+    val exampleHeader = headers["Example-Header"]
     if (exampleHeader == null) {
-      val cause = AuthenticationFailedCause.Error("No example header found")
+      val message = "No example header found"
+      val cause = AuthenticationFailedCause.Error(message)
       context.challenge(key = this, cause) { challenge, call ->
         call.respondText("Challenge")
         challenge.complete()

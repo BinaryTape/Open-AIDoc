@@ -886,8 +886,8 @@ Composer.setDiagnosticStackTraceMode(ComposeStackTraceMode.GroupKeys)
 java.lang.IllegalStateException: <message>
         at <original trace>
     Suppressed: androidx.compose.runtime.DiagnosticComposeException: Composition stack when thrown:
-        at $compose.m$123(SourceFile:1)
-        at $compose.m$234(SourceFile:1)
+        at $$compose.m$123(SourceFile:1)
+        at $$compose.m$234(SourceFile:1)
         ...
 ```
 
@@ -960,4 +960,4 @@ Kotlin Multiplatform 文件已移至 kotlinlang.org。現在您可以在同一�
 
 Kotlin 外掛程式作為隨附外掛程式散佈於 IntelliJ IDEA 與 Android Studio 中。
 
-若要更新至新的 Kotlin 版本，[將 Kotlin 版本更改](releases.md#update-to-a-new-kotlin-version)為 2.3.0 在您的建置指令碼中。
+若要更新至新的 Kotlin 版本，請在您的建置指令碼中[將 Kotlin 版本更改](releases.md#update-to-a-new-kotlin-version)為 2.3.0。

@@ -82,6 +82,9 @@ Ktorでさまざまな認証プロバイダーを構成する方法の概要に�
 
 ### ステップ1：Basicプロバイダーを構成する {id="configure-provider"}
 
+<Tabs group="auth-dsl">
+<TabItem title="Named provider" group-key="classic">
+
 `basic`認証プロバイダーは、[BasicAuthenticationProvider.Configuration](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-basic-authentication-provider/-config/index.html)クラスを通じて設定を公開しています。以下の例では、次の設定が指定されています。
 * `realm`プロパティは、`WWW-Authenticate`ヘッダーで渡されるレルムを設定します。
 * `validate`関数は、ユーザー名とパスワードを検証します。
@@ -91,7 +94,9 @@ install(Authentication) {
     basic("auth-basic") {
         realm = "Access to the '/' path"
         validate { credentials ->
-            if (credentials.name == "jetbrains" && credentials.password == "foobar") {
+            val isValid = credentials.name == "jetbrains" &&
+                credentials.password == "foobar"
+            if (isValid) {
                 UserIdPrincipal(credentials.name)
             } else {
                 null
@@ -104,7 +109,41 @@ install(Authentication) {
 `validate`関数は`UserPasswordCredential`をチェックし、認証に成功した場合は`UserIdPrincipal`を、失敗した場合は`null`を返します。
 > [UserHashedTableAuth](#validate-user-hash)を使用して、ユーザー名とパスワードのハッシュを保持するメモリ内テーブルに保存されたユーザーを検証することもできます。
 
+</TabItem>
+<TabItem title="Type-safe" group-key="typed">
+
+<note>
+    <p>
+        型安全な認証スキームAPIは試験的（experimental）です。いつでも廃止または変更される可能性があります。
+        オプトインが必要です。詳細については、
+        <a href="server-typed-auth.md#prerequisites">APIの有効化</a>を参照してください。
+    </p>
+</note>
+
+`basic()`関数は、任意のプリンシパル型のスキームを作成します。`install(Authentication)`のステップはありません。スキームはそれを必要とするルートに渡す値です。
+
+```kotlin
+data class User(val name: String)
+
+val basicAuth = basic<User>("auth-basic") {
+    realm = "Access to the '/' path"
+    validate { credentials ->
+        val isValid = credentials.name == "jetbrains" &&
+            credentials.password == "foobar"
+        if (isValid) User(credentials.name) else null
+    }
+}
+```
+
+`validate`関数は`UserPasswordCredential`をチェックし、プリンシパル型を返します。認証に失敗した場合は`null`を返します。APIの全容については、[型安全な認証](server-typed-auth.md)を参照してください。
+
+</TabItem>
+</Tabs>
+
 ### ステップ2：特定のリソースを保護する {id="authenticate-route"}
+
+<Tabs group="auth-dsl">
+<TabItem title="Named provider" group-key="classic">
 
 `basic`プロバイダーを構成した後、**[authenticate](server-auth.md#authenticate-route)**関数を使用してアプリケーション内の特定のリソースを保護できます。認証に成功した場合、ルートハンドラー内で`call.principal`関数を使用して認証済みの[UserIdPrincipal](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-user-id-principal/index.html)を取得し、認証されたユーザーの名前を取得できます。
 
@@ -112,11 +151,30 @@ install(Authentication) {
 routing {
     authenticate("auth-basic") {
         get("/") {
-            call.respondText("Hello, ${call.principal<UserIdPrincipal>()?.name}!")
+            val user = call.principal<UserIdPrincipal>()
+            call.respondText("Hello, ${user?.name}!")
         }
     }
 }
 ```
+
+</TabItem>
+<TabItem title="Type-safe" group-key="typed">
+
+スキームを`authenticateWith()`に渡します。ブロック内では、`call.principal`は指定したプリンシパル型となり、`null`になることはないため、キャストやnullチェックは不要です：
+
+```kotlin
+routing {
+    authenticateWith(basicAuth) {
+        get("/") {
+            call.respondText("Hello, ${call.principal.name}!")
+        }
+    }
+}
+```
+
+</TabItem>
+</Tabs>
 
 ## UserHashedTableAuthで検証する {id="validate-user-hash"}
 
@@ -127,7 +185,9 @@ Ktorでは、[UserHashedTableAuth](#validate-user-hash)を使用して、ユー�
 1. [getDigestFunction](https://api.ktor.io/ktor-utils/io.ktor.util/get-digest-function.html)関数を使用して、指定されたアルゴリズムとソルトプロバイダーでダイジェスト関数を作成します：
    
    ```kotlin
-   val digestFunction = getDigestFunction("SHA-256") { "ktor${it.length}" }
+   val digestFunction = getDigestFunction("SHA-256") {
+       "ktor${it.length}"
+   }
    ```
 
 2. `UserHashedTableAuth`の新しいインスタンスを初期化し、以下のプロパティを指定します：

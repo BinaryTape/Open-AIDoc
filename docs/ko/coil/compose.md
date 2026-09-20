@@ -3,7 +3,7 @@
 [Compose UI](https://www.jetbrains.com/compose-multiplatform/) 지원을 추가하려면 확장 라이브러리를 가져오세요:
 
 ```kotlin
-implementation("io.coil-kt.coil3:coil-compose:3.6.2")
+implementation("io.coil-kt.coil3:coil-compose:3.6.3")
 ```
 
 그런 다음 `AsyncImage` 컴포저블을 사용하여 이미지를 로드하고 표시합니다:
@@ -17,7 +17,7 @@ AsyncImage(
 
 `model`은 `ImageRequest.data` 값이거나 `ImageRequest` 자체일 수 있습니다. `contentDescription`은 접근성 서비스에서 이 이미지가 무엇을 나타내는지 설명하는 데 사용되는 텍스트를 설정합니다.
 
-## AsyncImage
+## AsyncImage {id="asyncimage"}
 
 `AsyncImage`는 이미지 요청을 비동기적으로 실행하고 결과를 렌더링하는 컴포저블입니다. 표준 `Image` 컴포저블과 동일한 인수를 지원하며, 추가적으로 `placeholder`/`error`/`fallback` 페인터와 `onLoading`/`onSuccess`/`onError` 콜백 설정을 지원합니다. 다음은 원형 자르기(circle crop), 크로스페이드(crossfade)를 적용하고 플레이스홀더를 설정하여 이미지를 로드하는 예시입니다:
 
@@ -38,7 +38,7 @@ AsyncImage(
 
 대부분의 경우 `AsyncImage`를 사용하는 것이 좋습니다. `AsyncImage`는 컴포저블의 제약 조건(constraints)과 제공된 `ContentScale`을 기반으로 이미지가 로드되어야 할 크기를 올바르게 결정합니다.
 
-## rememberAsyncImagePainter
+## rememberAsyncImagePainter {id="rememberasyncimagepainter"}
 
 내부적으로 `AsyncImage`와 `SubcomposeAsyncImage`는 `rememberAsyncImagePainter`를 사용하여 `model`을 로드합니다. 컴포저블이 아닌 `Painter`가 필요한 경우, `rememberAsyncImagePainter`를 사용하여 이미지를 로드할 수 있습니다:
 
@@ -72,7 +72,7 @@ Image(
 
 또 다른 단점은 `rememberAsyncImagePainter`를 사용할 때 첫 번째 컴포지션(composition)에서 `AsyncImagePainter.state`가 항상 `AsyncImagePainter.State.Empty`가 된다는 점입니다. 이미지가 메모리 캐시에 존재하여 첫 번째 프레임에 그려지더라도 마찬가지입니다.
 
-## SubcomposeAsyncImage
+## SubcomposeAsyncImage {id="subcomposeasyncimage"}
 
 `SubcomposeAsyncImage`는 서브컴포지션(subcomposition)을 사용하여 `Painter`를 사용하는 대신 `AsyncImagePainter`의 상태에 대한 슬롯 API를 제공하는 `AsyncImage`의 변형입니다. 다음은 예시입니다:
 
@@ -111,7 +111,7 @@ SubcomposeAsyncImage(
 
 구체적으로, 이 함수는 `AsyncImagePainter.state`를 관찰해야 하면서 `rememberAsyncImagePainter`처럼 첫 번째 컴포지션과 첫 번째 프레임에서 상태가 `Empty`가 되는 것을 허용할 수 없는 경우에만 유용합니다. `SubcomposeAsyncImage`는 서브컴포지션을 사용하여 이미지의 제약 조건을 가져오므로 `AsyncImagePainter.state`가 즉시 최신 상태로 유지됩니다.
 
-## Observing AsyncImagePainter.state
+## Observing AsyncImagePainter.state {id="observing-asyncimagepainter-state"}
 
 ```kotlin
 val painter = rememberAsyncImagePainter("https://example.com/image.jpg")
@@ -134,7 +134,7 @@ when (state) {
 }
 ```
 
-## Transitions
+## Transitions {id="transitions"}
 
 `ImageRequest.Builder.crossfade`를 사용하여 내장된 크로스페이드 전환을 활성화할 수 있습니다:
 
@@ -168,7 +168,7 @@ Image(
 
 전체 `AnimatedContent` 예시는 [Compose AnimatedContent](/coil/recipes#compose-animatedcontent)를 참조하세요.
 
-## Previews
+## Previews {id="previews"}
 
 `AsyncImage`/`rememberAsyncImagePainter`/`SubcomposeAsyncImage`에 대한 Android Studio 프리뷰 동작은 `LocalAsyncImagePreviewHandler`에 의해 제어됩니다. 기본적으로 프리뷰 환경 내에서 일반적인 요청을 수행하려고 시도합니다. 프리뷰 환경에서는 네트워크 액세스가 비활성화되어 있으므로 네트워크 URL은 항상 실패합니다.
 
@@ -189,7 +189,7 @@ CompositionLocalProvider(LocalAsyncImagePreviewHandler provides previewHandler) 
 
 이는 동일한 프리뷰 환경에서 실행되는 [AndroidX의 Compose Preview Screenshot Testing 라이브러리](https://developer.android.com/studio/preview/compose-screenshot-testing)에도 유용합니다.
 
-## Compose Multiplatform Resources
+## Compose Multiplatform Resources {id="compose-multiplatform-resources"}
 
 Coil은 `model` 파라미터로 `Res.getUri`를 사용하여 [Compose 멀티플랫폼 리소스](https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-multiplatform-resources.html) 로딩을 지원합니다. 예시:
 

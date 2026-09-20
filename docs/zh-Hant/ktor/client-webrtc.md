@@ -9,7 +9,7 @@
         <b>必要相依性</b>：<code>io.ktor:%artifact_name%</code>
     </p>
     <p>
-        <b>支援的平台</b>：JS/Wasm, Android
+        <b>支援的平台</b>：JS/Wasm, Android, iOS, JVM
     </p>   
     <p>
         <b>程式碼範例</b>：<a href="https://github.com/ktorio/ktor-chat/">ktor-chat</a>
@@ -23,10 +23,10 @@ Web 即時通訊（WebRTC）是一套用於瀏覽器和原生應用程式中進�
 
 Ktor 中的 WebRTC 用戶端可在多平台專案中實現即時點對點通訊。透過 WebRTC，您可以建立如下功能：
 
-- 影片與語音通話
-- 多人遊戲
-- 協作應用程式（白板、編輯器等）
-- 用戶端之間的低延遲資料交換
+* 影片與語音通話
+* 多人遊戲
+* 協作應用程式，例如白板與編輯器
+* 用戶端之間的低延遲資料交換
 
 ## 新增相依性 {id="add-dependencies"}
 
@@ -48,11 +48,12 @@ Ktor 中的 WebRTC 用戶端可在多平台專案中實現即時點對點通訊�
 
 建立 `WebRtcClient` 時，請根據您的目標平台選擇引擎：
 
-- JS/Wasm：`JsWebRtc` – 使用 [WebRTC](https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API)、[媒體擷取與串流](https://developer.mozilla.org/en-US/docs/Web/API/Media_Capture_and_Streams_API) 瀏覽器 API。
-- Android：`AndroidWebRtc` – 使用由 [Stream](https://github.com/GetStream/webrtc-android) 提供的 Android 預先編譯 WebRTC 程式庫以及 Android 媒體 API。
-- iOS：`IosWebRtc` - 使用適用於 iOS 的 [WebRTC SDK](https://github.com/webrtc-sdk) 和原生 [AVFoundation](https://developer.apple.com/documentation/avfoundation) 架構。
+* JS/Wasm：`JsWebRtc` – 使用瀏覽器 [WebRTC](https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API) 與 [媒體擷取與串流](https://developer.mozilla.org/en-US/docs/Web/API/Media_Capture_and_Streams_API) API。
+* Android：`AndroidWebRtc` – 使用預先編譯的 [適用於 Android 的 Stream WebRTC 程式庫](https://github.com/GetStream/webrtc-android) 以及 Android 媒體 API。
+* iOS：`IosWebRtc` – 使用 [WebRTC SDK](https://github.com/webrtc-sdk) 和原生 [AVFoundation](https://developer.apple.com/documentation/avfoundation) 架構。
+* JVM：`JvmWebRtc` – 使用由 [webrtc-java](https://github.com/devopvoid/webrtc-java) 提供的原生 WebRTC 繫結。
 
-接著您可以提供類似於 `HttpClient` 的特定平台配置。STUN/TURN 伺服器對於 [ICE](#ice) 的正確運作是必要的。您可以使用現有的解決方案，例如 [coturn](https://github.com/coturn/coturn)：
+接著您可以提供類似於 `HttpClient` 的平台特定配置。STUN/TURN 伺服器對於 [ICE](#ice) 的正確運作是必要的。您可以使用現有的解決方案，例如 [coturn](https://github.com/coturn/coturn)：
 
 <Tabs group="platform" id="create-webrtc-client">
 <TabItem title="JS/Wasm" group-key="js-wasm">
@@ -88,6 +89,18 @@ val iosClient = WebRtcClient(IosWebRtc) {
 ```
 
 </TabItem>
+
+<TabItem title="JVM" group-key="jvm">
+
+```kotlin
+val jvmClient = WebRtcClient(JvmWebRtc) {
+    defaultConnectionConfig = {
+        iceServers = listOf(WebRtc.IceServer("stun:stun.l.google.com:19302"))
+    }
+}
+```
+
+</TabItem>
 </Tabs>
 
 ## 建立連線並協商 SDP {id="create-a-connection-and-negotiate-sdp"}
@@ -106,7 +119,7 @@ val iosClient = WebRtcClient(IosWebRtc) {
 val caller = jsClient.createPeerConnection()
 val offer = caller.createOffer()
 caller.setLocalDescription(offer)
-// 透過您的信令 (signaling) 機制將 offer.sdp 傳送給遠端對等端
+// 透過您的信令機制將 offer.sdp 傳送給遠端對等端
 
 // 受話端接收供應 (offer) 並建立應答 (answer)
 val callee = jsClient.createPeerConnection()
@@ -127,9 +140,9 @@ caller.setRemoteDescription(
 
 SDP 協商完成後，對等端仍需探索如何跨網路連線。[互動式連接建立（ICE）](https://en.wikipedia.org/wiki/Interactive_Connectivity_Establishment) 允許對等端尋找彼此之間的網路路徑。
 
-- 每個對等端都會收集自己的 ICE 候選者。
-- 這些候選者必須透過您選擇的信令通道傳送給另一個對等端。
-- 一旦雙方對等端都新增了對方的候選者，連線即可成功。
+* 每個對等端都會收集自己的 ICE 候選者。
+* 這些候選者必須透過您選擇的信令通道傳送給另一個對等端。
+* 一旦雙方對等端都新增了對方的候選者，連線即可成功。
 
 ```kotlin
 // 收集並傳送本地候選者
@@ -168,12 +181,30 @@ val channel = caller.createDataChannel("chat")
 scope.launch {
     callee.dataChannelEvents.collect { event ->
         when (event) {
-            is DataChannelEvent.Open -> println("通道已開啟：${event.channel}")
-            is DataChannelEvent.Closed -> println("通道已關閉")
-            else -> {}
+            is DataChannelEvent.Open -> println("Channel opened: ${event.channel}")
+            is DataChannelEvent.Closing -> println("Channel closing: ${event.channel}")
+            is DataChannelEvent.Closed -> println("Channel closed: ${event.channel}")
+            is DataChannelEvent.BufferedAmountLow ->
+                println("Buffered amount is low: ${event.channel}")
+            is DataChannelEvent.Error ->
+                println("Channel error: ${event.reason}")
         }
     }
 }
+```
+
+`DataChannelEvent` 可以表示以下事件：
+
+* `Open`：通道已準備好傳送和接收資料。
+* `Closing`：通道已開始關閉。
+* `Closed`：通道已關閉。
+* `BufferedAmountLow`：已緩衝的傳出資料量已降至或低於 `bufferedAmountLowThreshold`。
+* `Error`：通道發生錯誤。此事件不會在 JVM 上發出。傳送失敗時會改為拋出 `WebRtc.IOException`。
+
+若要接收 `BufferedAmountLow`，請在通道上設定門檻值：
+
+```kotlin
+channel.setBufferedAmountLowThreshold(16 * 1024)
 ```
 
 ### 傳送與接收訊息 {id="sending-and-receiving-messages"}
@@ -185,7 +216,7 @@ scope.launch {
 scope.launch { channel.send("hello") }
 
 // 接收訊息
-scope.launch { println("收到： " + channel.receiveText()) }
+scope.launch { println("received: " + channel.receiveText()) }
 ```
 
 ## 新增與觀察媒體軌道 {id="add-and-observe-media-tracks"}
@@ -210,9 +241,18 @@ pc.addTrack(audio)
 pc.addTrack(video)
 ```
 
-在 Web 端，這會使用 `navigator.mediaDevices.getUserMedia`。在 Android 端，它使用 Camera2 API，且您必須手動請求麥克風/相機權限。在 iOS 端，它使用 AVFoundation API，您也應該手動請求任何權限。用戶端將根據指定的約束嘗試尋找最合適的媒體裝置，否則將拋出 `WebRtcMedia.DeviceException`。
+媒體擷取是特定於平台的：
 
-> `WebRtcClient`、`WebRtcPeerConnection`、`WebRtcMedia.Track` 以及其他介面皆為 `AutoCloseable`。請務必在不再需要時呼叫 `close()` 方法以釋放資源。
+* 在 Web 端，它使用 `navigator.mediaDevices.getUserMedia`。
+* 在 Android 端，它使用 Camera2 API。您需要分別請求相機和麥克風權限。
+* 在 iOS 端，它使用 AVFoundation API。您也需要分別請求所需的權限。
+* 在 JVM 端，它使用 [webrtc-java](https://github.com/devopvoid/webrtc-java) 存取系統相機和麥克風。作業系統可能會提示使用者授予權限。
+
+用戶端將根據指定的約束選擇最合適的媒體裝置。如果沒有合適的裝置可用，它將拋出 `WebRtcMedia.DeviceException`。
+
+> `WebRtcClient`、`WebRtcPeerConnection`、`WebRtcMedia.Track` 以及其他介面皆實作了 `AutoCloseable`。
+> 請務必在不再需要時呼叫 `close()` 函式以釋放資源。
+> 
 {style="note"}
 
 ### 接收遠端軌道 {id="receiving-remote-tracks"}
@@ -223,8 +263,8 @@ pc.addTrack(video)
 scope.launch {
     pc.trackEvents.collect { event ->
         when (event) {
-            is TrackEvent.Add -> println("遠端軌道已新增：${event.track.id}")
-            is TrackEvent.Remove -> println("遠端軌道已移除：${event.track.id}")
+            is TrackEvent.Add -> println("Remote track added: ${event.track.id}")
+            is TrackEvent.Remove -> println("Remote track removed: ${event.track.id}")
         }
     }
 }
@@ -232,7 +272,9 @@ scope.launch {
 
 ## 特定平台的邏輯 {id="platform-specific-logic"}
 
-此 API 提供了高階抽象，但在某些使用案例下可能需要存取特定平台的 API。您可以使用 `.getNative()` 擴充函式來獲取底層實作。除 iOS 上的 `WebRTC-SDK` CocoaPod 外，特定平台的程式庫均作為傳遞性程式庫公開。
+此 API 提供了高階抽象，但在某些使用案例下可能需要存取特定平台的 API。
+您可以使用 `.getNative()` 擴充函式來獲取底層實作。
+除 iOS 上的 `WebRTC-SDK` CocoaPod 外，特定平台的程式庫均作為傳遞性程式庫公開。
 
 <Tabs group="platform" id="platform-specific-logic-tabs">
 <TabItem title="JS/Wasm" group-key="js-wasm">
@@ -311,10 +353,25 @@ kotlin {
 ```
 
 </TabItem>
+
+<TabItem title="JVM" group-key="jvm">
+
+```kotlin
+val videoTrack = rtcClient.createVideoTrack()
+val nativeTrack: dev.onvoid.webrtc.media.video.VideoTrack = videoTrack.getNative()
+
+// 沒有內建的影片檢視。請附加 sink 並使用 Swing、JavaFX、Compose
+// 或其他 UI 工具包來渲染畫面格。
+nativeTrack.addSink { frame ->
+    // 將 frame.buffer 繪製到您的 UI，然後執行 frame.release()
+}
+```
+
+</TabItem>
 </Tabs>
 
 ```kotlin
-// 在 Android 和 iOS 上，音訊軌道播放可以無需使用 `getNative()` 即可開始/停止
+// 在 Android、iOS 和 JVM 上，音訊軌道播放可以無需使用 `getNative()` 即可開始/停止
 // 在瀏覽器中，您仍應建立一個未定義的元素。
 
 val audio = rtcClient.createAudioTrack()
@@ -325,14 +382,16 @@ audio.enable(false)
 ```
 
 > 這些程式碼片段可以與 Compose Multiplatform 搭配使用，但未考慮其生命週期。有關完整的整合方式，請參閱 [Ktor Chat](https://github.com/ktorio/ktor-chat) 範例。
+> 
 {style="note"}
 
 ## 限制 {id="limitations"}
 
 WebRTC 用戶端目前處於實驗階段，並具有以下限制：
 
-- 不包含信令。您需要實作自己的信令（例如，使用 WebSockets 或 HTTP）。
-- 支援的平台為 JavaScript/Wasm、Android 和 iOS。JVM 桌面和 Kotlin/Native 的支援計劃在未來的版本中提供。
-- 權限必須由您的應用程式處理。瀏覽器會提示使用者獲取麥克風和相機存取權限，而 Android 和 iOS 則需要執行期權限請求。
-- 僅支援基本的音訊和影片軌道。螢幕共享、裝置選擇、聯播（simulcast）和進階 RTP 功能尚不可用。
-- 連線統計資料雖然可用，但在不同平台之間有所差異，且不遵循統一的架構。
+* **信令：** 不包含信令。您需要個別實作它，例如使用 WebSockets 或 HTTP。
+* **平台支援：** 此用戶端支援 JavaScript/Wasm、Android、iOS 和 JVM 桌面。Kotlin/Native 支援計劃在未來的版本中提供。
+* **權限：** 權限必須由您的應用程式處理。瀏覽器會提示使用者獲取麥克風和相機存取權限。Android 和 iOS 則需要執行期權限請求。在 JVM 上，相機和麥克風存取權限是在作業系統層級授予的。
+* **JVM 限制：** 不支援候選者預先擷取（candidate prefetching）。`iceCandidatePoolSize` 必須為 `0` 或省略。不支援 `facingMode`、`aspectRatio` 與 `resizeMode` 影片約束，若設定將會拋出例外狀況。不會發出 `DataChannelEvent.Error`。
+* **媒體功能：** 僅支援基本的音訊和影片軌道。螢幕共享、裝置選擇、聯播（simulcast）和進階 RTP 功能尚不可用。
+* **連線統計資料：** 雖然可以使用統計資料，但在不同平台之間有所差異，且不遵循統一的架構。

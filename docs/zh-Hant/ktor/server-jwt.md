@@ -31,6 +31,10 @@ Ktor 處理在 `Authorization` 標頭中以 `Bearer` 配置傳遞的 JWT，並�
 
 > 您可以在 [Ktor Server 中的驗證與授權](server-auth.md) 章節中取得有關 Ktor 驗證與授權的一般資訊。
 
+> 如果權杖來自 OpenID Connect 提供程式，`Oidc` 外掛程式會從發行者 URL 解析 JWKS 端點，並在金鑰輪換時重新整理，因此您不需要手動設定 `JwkProvider`。它還會拒絕作為存取權杖出示的 ID 權杖。請參閱 [OpenID Connect 資源伺服器](server-oidc-resource-server.md)。
+>
+{style="tip"}
+
 ## 新增相依性 {id="add_dependencies"}
 要啟用 `JWT` 驗證，您需要在建置指令碼中包含 `ktor-server-auth` 和 `ktor-server-auth-jwt` 構件：
 
@@ -84,7 +88,7 @@ install(Authentication) {
     }
 }
 ```
-您可以選擇性地指定一個 [提供程式名稱 (provider name)](server-auth.md#provider-name)，該名稱可用於[驗證指定的路由](#authenticate-route)。
+您可以選擇性地指定一個[提供程式名稱 (provider name)](server-auth.md#provider-name)，該名稱可用於[驗證指定的路由](#authenticate-route)。
 
 ## 設定 JWT {id="configure-jwt"}
 在本節中，我們將了解如何在伺服器端 Ktor 應用程式中使用 JSON Web Token。我們將展示兩種簽名權杖的方法，因為它們需要稍微不同的方式來驗證權杖：
@@ -134,20 +138,25 @@ jwt {
 <TabItem title="HS256" group-key="hs256">
 
 ```kotlin
-val secret = environment.config.property("jwt.secret").getString()
-val issuer = environment.config.property("jwt.issuer").getString()
-val audience = environment.config.property("jwt.audience").getString()
-val myRealm = environment.config.property("jwt.realm").getString()
+val jwtConfig = environment.config
+val secret = jwtConfig.property("jwt.secret").getString()
+val issuer = jwtConfig.property("jwt.issuer").getString()
+val audience = jwtConfig
+    .property("jwt.audience").getString()
+val myRealm = jwtConfig.property("jwt.realm").getString()
 ```
 
 </TabItem>
 <TabItem title="RS256" group-key="rs256">
 
 ```kotlin
-val privateKeyString = environment.config.property("jwt.privateKey").getString()
-val issuer = environment.config.property("jwt.issuer").getString()
-val audience = environment.config.property("jwt.audience").getString()
-val myRealm = environment.config.property("jwt.realm").getString()
+val jwtConfig = environment.config
+val privateKeyString = jwtConfig
+    .property("jwt.privateKey").getString()
+val issuer = jwtConfig.property("jwt.issuer").getString()
+val audience = jwtConfig
+    .property("jwt.audience").getString()
+val myRealm = jwtConfig.property("jwt.realm").getString()
 ```
 
 </TabItem>
@@ -165,11 +174,12 @@ post("/login") {
     val user = call.receive<User>()
     // 檢查使用者名稱和密碼
     // ...
+    val expiresAt = System.currentTimeMillis() + 60000
     val token = JWT.create()
         .withAudience(audience)
         .withIssuer(issuer)
         .withClaim("username", user.username)
-        .withExpiresAt(Date(System.currentTimeMillis() + 60000))
+        .withExpiresAt(Date(expiresAt))
         .sign(Algorithm.HMAC256(secret))
     call.respond(hashMapOf("token" to token))
 }
@@ -183,15 +193,24 @@ post("/login") {
     val user = call.receive<User>()
     // 檢查使用者名稱和密碼
     // ...
-    val publicKey = jwkProvider.get("6f8856ed-9189-488f-9011-0ff4b6c08edc").publicKey
-    val keySpecPKCS8 = PKCS8EncodedKeySpec(Base64.getDecoder().decode(privateKeyString))
-    val privateKey = KeyFactory.getInstance("RSA").generatePrivate(keySpecPKCS8)
+    val keyId = "6f8856ed-9189-488f-9011-0ff4b6c08edc"
+    val publicKey = jwkProvider.get(keyId).publicKey
+    val decoded = Base64.getDecoder()
+        .decode(privateKeyString)
+    val keySpecPKCS8 = PKCS8EncodedKeySpec(decoded)
+    val privateKey = KeyFactory.getInstance("RSA")
+        .generatePrivate(keySpecPKCS8)
+    val algorithm = Algorithm.RSA256(
+        publicKey as RSAPublicKey,
+        privateKey as RSAPrivateKey
+    )
+    val expiresAt = System.currentTimeMillis() + 60000
     val token = JWT.create()
         .withAudience(audience)
         .withIssuer(issuer)
         .withClaim("username", user.username)
-        .withExpiresAt(Date(System.currentTimeMillis() + 60000))
-        .sign(Algorithm.RSA256(publicKey as RSAPublicKey, privateKey as RSAPrivateKey))
+        .withExpiresAt(Date(expiresAt))
+        .sign(algorithm)
     call.respond(hashMapOf("token" to token))
 }
 ```
@@ -210,7 +229,7 @@ post("/login") {
 `realm` 屬性允許您設定存取[受保護路由](#authenticate-route)時要在 `WWW-Authenticate` 標頭中傳遞的領域。
 
 ```kotlin
-val myRealm = environment.config.property("jwt.realm").getString()
+val myRealm = jwtConfig.property("jwt.realm").getString()
 install(Authentication) {
     jwt("auth-jwt") {
         realm = myRealm
@@ -228,10 +247,12 @@ install(Authentication) {
 <TabItem title="HS256" group-key="hs256">
 
 ```kotlin
-val secret = environment.config.property("jwt.secret").getString()
-val issuer = environment.config.property("jwt.issuer").getString()
-val audience = environment.config.property("jwt.audience").getString()
-val myRealm = environment.config.property("jwt.realm").getString()
+val jwtConfig = environment.config
+val secret = jwtConfig.property("jwt.secret").getString()
+val issuer = jwtConfig.property("jwt.issuer").getString()
+val audience = jwtConfig
+    .property("jwt.audience").getString()
+val myRealm = jwtConfig.property("jwt.realm").getString()
 install(Authentication) {
     jwt("auth-jwt") {
         realm = myRealm
@@ -248,9 +269,10 @@ install(Authentication) {
 <TabItem title="RS256" group-key="rs256">
 
 ```kotlin
-val issuer = environment.config.property("jwt.issuer").getString()
-val audience = environment.config.property("jwt.audience").getString()
-val myRealm = environment.config.property("jwt.realm").getString()
+val issuer = jwtConfig.property("jwt.issuer").getString()
+val audience = jwtConfig
+    .property("jwt.audience").getString()
+val myRealm = jwtConfig.property("jwt.realm").getString()
 val jwkProvider = JwkProviderBuilder(issuer)
     .cached(10, 24, TimeUnit.HOURS)
     .rateLimited(10, 1, TimeUnit.MINUTES)
@@ -270,12 +292,17 @@ install(Authentication) {
 
 ### 步驟 5：驗證 JWT 承載內容 (payload) {id="validate-payload"}
 
+<Tabs group="auth-dsl">
+<TabItem title="Classic" group-key="classic">
+
 1. `validate` 函式允許您對 JWT 承載內容執行驗證。此函式是必需的：如果您沒有配置它，提供程式初始化將拋出 `IllegalArgumentException`。請檢查 `credential` 參數，它代表一個 [JWTCredential](https://api.ktor.io/ktor-server-auth-jwt/io.ktor.server.auth.jwt/-j-w-t-credential/index.html) 物件並包含 JWT 承載內容。在下面的範例中，會檢查自訂 `username` 宣告的值。
    ```kotlin
    install(Authentication) {
        jwt("auth-jwt") {
            validate { credential ->
-               if (credential.payload.getClaim("username").asString() != "") {
+               val payload = credential.payload
+               val claim = payload.getClaim("username")
+               if (claim.asString() != "") {
                    JWTPrincipal(credential.payload)
                } else {
                    null
@@ -291,24 +318,108 @@ install(Authentication) {
    install(Authentication) {
        jwt("auth-jwt") {
            challenge { defaultScheme, realm ->
-               call.respond(HttpStatusCode.Unauthorized, "Token is not valid or has expired")
+               val text = "Token is not valid or has expired"
+               val status = HttpStatusCode.Unauthorized
+               call.respond(status, text)
            }
        }
    }
    ```
 
+</TabItem>
+<TabItem title="Type-safe" group-key="typed">
+
+<note>
+    <p>
+        型別安全的驗證配置 API 是實驗性的。它可能隨時被移除或更改。
+        需要明確宣告選擇加入 (Opt-in)。如需更多詳細資訊，請參閱
+        <a href="server-typed-auth.md#prerequisites">啟用 API</a>。
+    </p>
+</note>
+
+`jwt()` 函式會為您選擇的 principal 型別建立一個配置 (scheme)。這裡沒有 `install(Authentication)` 步驟：該配置是一個值，您可以將其傳遞給需要的路由。
+
+在 `validate` 內讀取您需要的宣告 (claims) 並傳回您自己的型別。然後路由處理常式就可以使用該型別，而不是 `JWTPrincipal`：
+
+```kotlin
+data class User(val username: String, val expiresAt: Long?)
+
+val jwtAuth = jwt<User>("auth-jwt") {
+    realm = myRealm
+    verifier(
+        JWT.require(Algorithm.HMAC256(secret))
+            .withAudience(audience)
+            .withIssuer(issuer)
+            .build()
+    )
+    validate { credential ->
+        val payload = credential.payload
+        val username = payload.getClaim("username").asString()
+        if (username != "") {
+            User(username, credential.expiresAt?.time)
+        } else {
+            null
+        }
+    }
+    onUnauthorized = {
+        val message = "Token is not valid or has expired"
+        call.respond(HttpStatusCode.Unauthorized, message)
+    }
+}
+```
+
+失敗處理常式是 `onUnauthorized` 而不是 `challenge`。如需完整的 API，請參閱[型別安全驗證](server-typed-auth.md)。
+
+</TabItem>
+</Tabs>
+
 ### 步驟 6：保護特定資源 {id="authenticate-route"}
 
-設定完 `jwt` 提供程式後，您可以使用 **[authenticate](server-auth.md#authenticate-route)** 函式保護應用程式中的特定資源。在驗證成功的情況下，您可以使用 `call.principal` 函式在路由處理程式內部檢索已驗證的 [JWTPrincipal](https://api.ktor.io/ktor-server-auth-jwt/io.ktor.server.auth.jwt/-j-w-t-principal/index.html) 並取得 JWT 承載內容。在下面的範例中，會檢索自訂 `username` 宣告的值和權杖到期時間。
+<Tabs group="auth-dsl">
+<TabItem title="Classic" group-key="classic">
+
+設定完 `jwt` 提供程式後，您可以使用 **[authenticate](server-auth.md#authenticate-route)** 函式保護應用程式中的特定資源。在驗證成功的情況下，您可以使用 `call.principal` 函式在路由處理常式內部擷取已驗證的 [JWTPrincipal](https://api.ktor.io/ktor-server-auth-jwt/io.ktor.server.auth.jwt/-j-w-t-principal/index.html) 並取得 JWT 承載內容。在下面的範例中，會擷取自訂 `username` 宣告的值和權杖到期時間。
 
 ```kotlin
 routing {
     authenticate("auth-jwt") {
         get("/hello") {
             val principal = call.principal<JWTPrincipal>()
-            val username = principal!!.payload.getClaim("username").asString()
-            val expiresAt = principal.expiresAt?.time?.minus(System.currentTimeMillis())
-            call.respondText("Hello, $username! Token is expired at $expiresAt ms.")
+            val payload = principal!!.payload
+            val username = payload.getClaim("username")
+                .asString()
+            val now = System.currentTimeMillis()
+            val expiresAt = principal.expiresAt?.time
+                ?.minus(now)
+            call.respondText(
+                "Hello, $username! " +
+                    "Token is expired at $expiresAt ms."
+            )
         }
     }
 }
+```
+
+</TabItem>
+<TabItem title="Type-safe" group-key="typed">
+
+將配置傳遞給 `authenticateWith()`。由於宣告已經在 `validate` 中讀取，因此處理常式可以使用您自己的型別，且不需要進行 null 檢查：
+
+```kotlin
+routing {
+    authenticateWith(jwtAuth) {
+        get("/hello") {
+            val user = call.principal
+            val now = System.currentTimeMillis()
+            val expiresIn = user.expiresAt?.minus(now)
+            call.respondText(
+                "Hello, ${user.username}! " +
+                    "Token is expired at $expiresIn ms."
+            )
+        }
+    }
+}
+```
+
+</TabItem>
+</Tabs>

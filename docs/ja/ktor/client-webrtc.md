@@ -9,7 +9,7 @@
         <b>必要な依存関係</b>: <code>io.ktor:%artifact_name%</code>
     </p>
     <p>
-        <b>サポートされているプラットフォーム</b>: JS/Wasm, Android
+        <b>サポートされているプラットフォーム</b>: JS/Wasm, Android, iOS, JVM
     </p>   
     <p>
         <b>コード例</b>: <a href="https://github.com/ktorio/ktor-chat/">ktor-chat</a>
@@ -23,10 +23,10 @@ Web Real-Time Communication (WebRTC) は、ブラウザやネイティブアプ�
 
 KtorのWebRTCクライアントを使用すると、マルチプラットフォームプロジェクトでリアルタイムのピア・ツー・ピア通信を実現できます。WebRTCを使用すると、以下のような機能を構築できます：
 
-- ビデオおよび音声通話
-- マルチプレイヤーゲーム
-- 共同作業用アプリケーション（ホワイトボード、エディタなど）
-- クライアント間の低遅延データ交換
+* ビデオおよび音声通話
+* マルチプレイヤーゲーム
+* 共同作業用アプリケーション（ホワイトボード、エディタなど）
+* クライアント間の低遅延データ交換
 
 ## 依存関係の追加 {id="add-dependencies"}
 
@@ -48,9 +48,10 @@ KtorのWebRTCクライアントを使用すると、マルチプラットフォ�
 
 `WebRtcClient`を作成する際は、ターゲットプラットフォームに基づいてエンジンを選択します：
 
-- JS/Wasm: `JsWebRtc` – [WebRTC](https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API)、[Media Capture and Streams](https://developer.mozilla.org/en-US/docs/Web/API/Media_Capture_and_Streams_API) ブラウザAPIを使用します。
-- Android: `AndroidWebRtc` – [Stream](https://github.com/GetStream/webrtc-android) によるAndroid用のプリコンパイル済みWebRTCライブラリとAndroidメディアAPIを使用します。
-- iOS: `IosWebRtc` - iOS用の [WebRTC SDK](https://github.com/webrtc-sdk) とネイティブの [AVFoundation](https://developer.apple.com/documentation/avfoundation) フレームワークを使用します。
+* JS/Wasm: `JsWebRtc` – ブラウザの [WebRTC](https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API) および [Media Capture and Streams](https://developer.mozilla.org/en-US/docs/Web/API/Media_Capture_and_Streams_API) APIを使用します。
+* Android: `AndroidWebRtc` – [Stream](https://github.com/GetStream/webrtc-android) によるAndroid用のプリコンパイル済みWebRTCライブラリとAndroidメディアAPIを使用します。
+* iOS: `IosWebRtc` – [WebRTC SDK](https://github.com/webrtc-sdk) とネイティブの [AVFoundation](https://developer.apple.com/documentation/avfoundation) フレームワークを使用します。
+* JVM: `JvmWebRtc` – [webrtc-java](https://github.com/devopvoid/webrtc-java) が提供するネイティブWebRTCバインディングを使用します。
 
 その後、`HttpClient`と同様にプラットフォーム固有の設定を提供できます。[ICE](#ice)が正しく動作するためには、STUN/TURNサーバーが必要です。[coturn](https://github.com/coturn/coturn) などの既存のソリューションを使用できます：
 
@@ -84,6 +85,18 @@ val androidClient = WebRtcClient(AndroidWebRtc) {
 ```kotlin
 val iosClient = WebRtcClient(IosWebRtc) {
     // 同じ設定を使用、追加のcontextは不要
+}
+```
+
+</TabItem>
+
+<TabItem title="JVM" group-key="jvm">
+
+```kotlin
+val jvmClient = WebRtcClient(JvmWebRtc) {
+    defaultConnectionConfig = {
+        iceServers = listOf(WebRtc.IceServer("stun:stun.l.google.com:19302"))
+    }
 }
 ```
 
@@ -127,9 +140,9 @@ caller.setRemoteDescription(
 
 SDPのネゴシエーションが完了した後も、ピアはネットワークを越えて接続する方法を見つける必要があります。[Interactive Connectivity Establishment (ICE)](https://en.wikipedia.org/wiki/Interactive_Connectivity_Establishment) により、ピアは互いへのネットワークパスを見つけることができます。
 
-- 各ピアは自身のICE候補 (ICE candidates) を収集します。
-- これらの候補は、選択したシグナリングチャネルを通じて他方のピアに送信される必要があります。
-- 両方のピアが互いの候補を追加すると、接続が成功します。
+* 各ピアは自身のICE候補 (ICE candidates) を収集します。
+* これらの候補は、選択したシグナリングチャネルを通じて他方のピアに送信される必要があります。
+* 両方のピアが互いの候補を追加すると、接続が成功します。
 
 ```kotlin
 // ローカル候補を収集して送信
@@ -169,11 +182,29 @@ scope.launch {
     callee.dataChannelEvents.collect { event ->
         when (event) {
             is DataChannelEvent.Open -> println("Channel opened: ${event.channel}")
-            is DataChannelEvent.Closed -> println("Channel closed")
-            else -> {}
+            is DataChannelEvent.Closing -> println("Channel closing: ${event.channel}")
+            is DataChannelEvent.Closed -> println("Channel closed: ${event.channel}")
+            is DataChannelEvent.BufferedAmountLow ->
+                println("Buffered amount is low: ${event.channel}")
+            is DataChannelEvent.Error ->
+                println("Channel error: ${event.reason}")
         }
     }
 }
+```
+
+`DataChannelEvent` は以下のイベントを表すことができます：
+
+* `Open`: チャネルがデータの送受信を行える状態になった。
+* `Closing`: チャネルのクローズ処理が開始された。
+* `Closed`: チャネルがクローズされた。
+* `BufferedAmountLow`: バッファされた送信データの量が `bufferedAmountLowThreshold` 以下に低下した。
+* `Error`: チャネルでエラーが発生した。このイベントはJVMでは発生しません。代わりに、送信失敗時に `WebRtc.IOException` がスローされます。
+
+`BufferedAmountLow` を受信するには、チャネルにしきい値を設定します：
+
+```kotlin
+channel.setBufferedAmountLowThreshold(16 * 1024)
 ```
 
 ### メッセージの送信と受信 {id="sending-and-receiving-messages"}
@@ -210,9 +241,17 @@ pc.addTrack(audio)
 pc.addTrack(video)
 ```
 
-Webでは、これは `navigator.mediaDevices.getUserMedia` を使用します。Androidでは Camera2 API を使用し、マイク/カメラの権限を手動でリクエストする必要があります。iOSでは AVFoundation API を使用し、同様に権限を手動でリクエストする必要があります。クライアントは、指定された制約に従って最適なメディアデバイスを見つけようとしますが、見つからない場合は `WebRtcMedia.DeviceException` をスローします。
+メディアキャプチャはプラットフォーム固有です：
 
-> `WebRtcClient`、`WebRtcPeerConnection`、`WebRtcMedia.Track` およびその他のインターフェースは `AutoCloseable` です。不要になった際にリソースを解放するために、必ず `close()` メソッドを呼び出してください。
+* Webでは、`navigator.mediaDevices.getUserMedia` を使用します。
+* Androidでは、Camera2 API を使用します。カメラとマイクの権限を個別にリクエストする必要があります。
+* iOSでは、AVFoundation API を使用します。同様に必要な権限を個別にリクエストする必要があります。
+* JVMでは、[webrtc-java](https://github.com/devopvoid/webrtc-java) を使用してシステムのカメラとマイクにアクセスします。オペレーティングシステムがユーザーに権限を要求する場合があります。
+
+クライアントは、指定された制約に基づいて最適なメディアデバイスを選択します。適切なデバイスが見つからない場合は、`WebRtcMedia.DeviceException` をスローします。
+
+> `WebRtcClient`、`WebRtcPeerConnection`、`WebRtcMedia.Track` およびその他のインターフェースは `AutoCloseable` を実装しています。不要になった際にリソースを解放するために、`close()` 関数を呼び出してください。
+> 
 {style="note"}
 
 ### リモートトラックの受信 {id="receiving-remote-tracks"}
@@ -311,10 +350,25 @@ kotlin {
 ```
 
 </TabItem>
+
+<TabItem title="JVM" group-key="jvm">
+
+```kotlin
+val videoTrack = rtcClient.createVideoTrack()
+val nativeTrack: dev.onvoid.webrtc.media.video.VideoTrack = videoTrack.getNative()
+
+// 組み込みのビデオビューはありません。シンクをアタッチし、
+// Swing、JavaFX、Compose、またはその他のUIツールキットでフレームをレンダリングします。
+nativeTrack.addSink { frame ->
+    // frame.buffer をUIに描画してから、frame.release() を呼び出します
+}
+```
+
+</TabItem>
 </Tabs>
 
 ```kotlin
-// AndroidおよびiOSでは、音声トラックの再生は `getNative()` を使用せずに開始/停止できます。
+// Android、iOS、およびJVMでは、音声トラックの再生は `getNative()` を使用せずに開始/停止できます。
 // ブラウザでは、引き続き undefined 要素を作成する必要があります。
 
 val audio = rtcClient.createAudioTrack()
@@ -325,14 +379,16 @@ audio.enable(false)
 ```
 
 > これらのスニペットは Compose Multiplatform で使用できますが、そのライフサイクルは考慮されていません。完全な統合については、[Ktor Chat](https://github.com/ktorio/ktor-chat) の例を参照してください。
+> 
 {style="note"}
 
 ## 制限事項 {id="limitations"}
 
 WebRTCクライアントは実験的であり、以下の制限事項があります：
 
-- シグナリングは含まれていません。独自のシグナリング（WebSocketやHTTPなど）を実装する必要があります。
-- サポートされているプラットフォームは JavaScript/Wasm、Android、および iOS です。JVMデスクトップおよびKotlin/Nativeのサポートは将来のリリースで計画されています。
-- 権限（Permissions）はアプリケーションで処理する必要があります。ブラウザはユーザーにマイクとカメラへのアクセスを促しますが、AndroidとiOSでは実行時の権限リクエストが必要です。
-- 基本的な音声およびビデオトラックのみがサポートされています。画面共有、デバイス選択、サイマルキャスト（simulcast）、および高度なRTP機能はまだ利用できません。
-- 接続統計（Connection statistics）は利用可能ですが、プラットフォーム間で異なり、統一されたスキーマに従っていません。
+* **シグナリング:** シグナリングは含まれていません。WebSocketやHTTPなどを使用して、独自に実装する必要があります。
+* **プラットフォームサポート:** クライアントはJavaScript/Wasm、Android、iOS、およびJVMデスクトップをサポートしています。Kotlin/Nativeのサポートは将来のリリースで計画されています。
+* **権限:** 権限（Permissions）はアプリケーションで処理する必要があります。ブラウザはユーザーにマイクとカメラへのアクセスを促します。AndroidとiOSでは実行時の権限リクエストが必要です。JVMでは、カメラとマイクへのアクセスはオペレーティングシステムレベルで許可されます。
+* **JVMの制限事項:** 候補のプリフェッチ（Candidate prefetching）はサポートされていません。`iceCandidatePoolSize` は `0` にするか省略する必要があります。`facingMode`、`aspectRatio`、および `resizeMode` のビデオ制約はサポートされておらず、設定すると例外がスローされます。`DataChannelEvent.Error` は発生しません。
+* **メディア機能:** 基本的な音声およびビデオトラックのみがサポートされています。画面共有、デバイス選択、サイマルキャスト（simulcast）、および高度なRTP機能はまだ利用できません。
+* **接続統計:** 接続統計（Connection statistics）は利用可能ですが、プラットフォーム間で異なり、統一されたスキーマに従っていません。

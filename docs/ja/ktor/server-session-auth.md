@@ -24,6 +24,10 @@ Ktor では、すでに関連付けられたセッションを持つユーザー
 
 > Ktor における認証と認可に関する一般的な情報は、[Ktor Server での認証と認可](server-auth.md)セクションで確認できます。
 
+> Ktor は型安全なセッション認証スキームも提供しています。これにより、ルートハンドラーに非 null のプリンシパルと保存されたセッションへの読み書きアクセスを提供し、セッションタイプをプリンシパルタイプから分離して保持します。[型安全なセッション認証](server-typed-session-auth.md)を参照してください。
+>
+{style="tip"}
+
 ## 依存関係の追加 {id="add_dependencies"}
 `session` 認証を有効にするには、ビルドスクリプトに以下のアーティファクトを含める必要があります。
 
@@ -149,8 +153,14 @@ install(Authentication) {
 ```kotlin
 authenticate("auth-form") {
     post("/login") {
-        val userName = call.principal<UserIdPrincipal>()?.name.toString()
-        call.sessions.set(UserSession(name = userName, count = 1))
+        val principal =
+            call.principal<UserIdPrincipal>()
+        val userName = principal?.name.toString()
+        val session = UserSession(
+            name = userName,
+            count = 1
+        )
+        call.sessions.set(session)
         call.respondRedirect("/hello")
     }
 }
@@ -168,8 +178,14 @@ authenticate("auth-form") {
 authenticate("auth-session") {
     get("/hello") {
         val userSession = call.principal<UserSession>()
-        call.sessions.set(userSession?.copy(count = userSession.count + 1))
-        call.respondText("Hello, ${userSession?.name}! Visit count is ${userSession?.count}.")
+        val next = userSession?.copy(
+            count = userSession.count + 1
+        )
+        call.sessions.set(next)
+        call.respondText(
+            "Hello, ${userSession?.name}! " +
+                "Visit count is ${userSession?.count}."
+        )
     }
 }
 ```

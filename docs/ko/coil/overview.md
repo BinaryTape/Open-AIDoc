@@ -11,13 +11,13 @@ Coil은 **Co**routine **I**mage **L**oader의 약자입니다.
 
 번역: [日本語](README-ja.md), [한국어](README-ko.md), [Русский](README-ru.md), [Svenska](README-sv.md), [Türkçe](README-tr.md), [中文](README-zh.md), [پارسی](README-fa.md), [O'zbekcha](README-uz.md)
 
-## 빠른 시작 (Quick Start)
+## 빠른 시작 (Quick Start) {id="quick-start"}
 
 Compose 라이브러리와 [네트워킹 라이브러리](https://coil-kt.github.io/coil/network/)를 추가합니다:
 
 ```kotlin
-implementation("io.coil-kt.coil3:coil-compose:3.6.2")
-implementation("io.coil-kt.coil3:coil-network-okhttp:3.6.2")
+implementation("io.coil-kt.coil3:coil-compose:3.6.3")
+implementation("io.coil-kt.coil3:coil-network-okhttp:3.6.3")
 ```
 
 이미지를 로드하려면 `AsyncImage` 컴포저블(composable)을 사용하세요:
@@ -31,7 +31,7 @@ AsyncImage(
 
 Coil의 [전체 문서는 여기에서 확인](https://coil-kt.github.io/coil/getting_started/)하세요.
 
-## 라이선스 (License)
+## 라이선스 (License) {id="license"}
 
     Copyright 2026 Coil Contributors
 

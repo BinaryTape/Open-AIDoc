@@ -96,7 +96,13 @@ fun Application.module() {
 get("/login") {
     call.respondHtml {
         body {
-            form(action = "/login", encType = FormEncType.applicationXWwwFormUrlEncoded, method = FormMethod.post) {
+            val urlEncoded = FormEncType
+                .applicationXWwwFormUrlEncoded
+            form(
+                action = "/login",
+                encType = urlEncoded,
+                method = FormMethod.post
+            ) {
                 p {
                     +"Username:"
                     textInput(name = "username")
@@ -138,9 +144,9 @@ get("/login") {
 > 
 > kotlinx.html を使用した HTML 生成の詳細については、[kotlinx.html wiki](https://github.com/Kotlin/kotlinx.html/wiki) を参照してください。
 
-## HTML 部分テンプレートの送信 {id="html_fragments"}
+## 部分的な HTML の送信 {id="html_fragments"}
 
-完全な HTML ドキュメントの生成に加えて、`.respondHtmlFragment()` 関数を使用して HTML フラグメントでレスポンスを返すこともできます。
+完全な HTML ドキュメントの生成に加えて、`.respondHtmlPartial()` 関数を使用して HTML フラグメントでレスポンスを返すこともできます。
 
 HTML フラグメントは、HTMX のようなライブラリで使用される動的な更新など、完全な `<html>` ドキュメントを必要としない部分的なマークアップを返す場合に便利です。
 
@@ -157,7 +163,7 @@ import kotlinx.html.*
 fun Application.module() {
     routing {
         get("/fragment") {
-            call.respondHtmlFragment(HttpStatusCode.Created) {
+            call.respondHtmlPartial(HttpStatusCode.Created) {
                 div("fragment") {
                     span { +"Created!" }
                 }
@@ -186,7 +192,7 @@ fun Application.module() {
 
 ## テンプレート {id="templates"}
 
-単純な HTML の生成に加えて、Ktor は複雑なレイアウトを構築するために使用できるテンプレートエンジンを提供します。HTML ページのさまざまな部分に対してテンプレートの階層を作成できます。たとえば、ページ全体のリミットテンプレート、ページヘッダーとフッターの子テンプレートなどです。Ktor はテンプレートを操作するための以下の API を提供しています。
+単純な HTML の生成に加えて、Ktor は複雑なレイアウトを構築するために使用できるテンプレートエンジンを提供します。HTML ページのさまざまな部分に対してテンプレートの階層を作成できます。たとえば、ページ全体のルートテンプレート、ページヘッダーやフッターの子テンプレートなどです。Ktor はテンプレートを操作するための以下の API を提供しています。
 
 1. 指定されたテンプレートに基づいて構築された HTML でレスポンスを返すには、[respondHtmlTemplate](https://api.ktor.io/ktor-server-html-builder/io.ktor.server.html/respond-html-template.html) メソッドを呼び出します。
 2. テンプレートを作成するには、[Template](https://api.ktor.io/ktor-server-html-builder/io.ktor.server.html/-template/index.html) インターフェースを実装し、HTML を提供する `Template.apply` メソッドをオーバーライドする必要があります。

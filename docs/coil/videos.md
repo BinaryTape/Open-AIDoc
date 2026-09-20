@@ -5,7 +5,7 @@
 要添加视频帧支持，请导入扩展库：
 
 ```kotlin
-implementation("io.coil-kt.coil3:coil-video:3.6.2")
+implementation("io.coil-kt.coil3:coil-video:3.6.3")
 ```
 
 并在构建 `ImageLoader` 时将解码器添加到组件注册表中：
@@ -42,7 +42,7 @@ imageView.load("/path/to/video.mp4") {
 }
 ```
 
-如果未指定帧 position，则将解码视频的第一帧。
+如果未指定帧位置，则将解码视频的第一帧。
 
 如果请求的文件名/URI 以[有效视频扩展名](https://developer.android.com/guide/topics/media/media-formats#video-formats)结尾，`ImageLoader` 将自动检测任何视频并提取其帧。如果没有，您可以为请求显式设置 `Decoder`：
 

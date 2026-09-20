@@ -26,12 +26,14 @@
 Ktorサーバーの %plugin_name% プラグインを使用すると、値のリストをシリアライズおよびデシリアライズするためのカスタムコンバーターを追加できます。
 </link-summary>
 
-[%plugin_name%](https://api.ktor.io/ktor-utils/io.ktor.util.converters/-data-conversion/index.html) プラグインを使用すると、値のリストをシリアライズ（serialize）およびデシリアライズ（deserialize）できます。デフォルトでは、Ktorは [DefaultConversionService](https://api.ktor.io/ktor-utils/io.ktor.util.converters/-default-conversion-service/index.html) を通じてプリミティブ型と列挙型（enum）を処理します。`%plugin_name%` プラグインをインストールして構成することで、このサービスを拡張して追加の型を処理できるようになります。
+[%plugin_name%](https://api.ktor.io/ktor-utils/io.ktor.util.converters/-data-conversion/index.html) プラグインを使用すると、値のリストをシリアライズおよびデシリアライズできます。デフォルトでは、Ktorは [`DefaultConversionService`](https://api.ktor.io/ktor-utils/io.ktor.util.converters/-default-conversion-service/index.html) を通じて文字列や、数値型、符号なし整数型、`Uuid`、列挙型（enum）などの一般的な型を処理します。
+
+`%plugin_name%` プラグインをインストールして構成することで、このサービスを拡張して追加の型を処理できるようになります。
 
 ## 依存関係の追加 {id="add_dependencies"}
 
 <p>
-    <code>%plugin_name%</code> を使用するには、ビルドスクリプトに <code>%artifact_name%</code> アーティファクトを含める必要があります。
+    <code>%plugin_name%</code> を使用するには、ビルドスクリプトに <code>%artifact_name%</code> アーティファクトを追加します。
 </p>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
@@ -49,14 +51,14 @@ Ktorサーバーの %plugin_name% プラグインを使用すると、値のリ�
 
 <p>
     アプリケーションに <code>%plugin_name%</code> プラグインを<a href="#install">インストール</a>するには、指定された <Links href="/ktor/server-modules" summary="モジュールを使用すると、ルートをグループ化してアプリケーションを構造化できます。">モジュール</Links>内の <code>install</code> 関数に渡します。
-    以下のコードスニペットは、<code>%plugin_name%</code> をインストールする方法を示しています。
+    以下の例は、<code>%plugin_name%</code> をインストールする方法を示しています。
 </p>
 <list>
     <li>
-        ... <code>embeddedServer</code> 関数の呼び出し内。
+        <code>embeddedServer()</code> 関数の呼び出し内。
     </li>
     <li>
-        ... <code>Application</code> クラスの拡張関数である、明示的に定義された <code>module</code> 内。
+        <code>Application</code> クラスの拡張関数である、明示的に定義された <code>module()</code> 内。
     </li>
 </list>
 <Tabs>
@@ -88,9 +90,7 @@ Ktorサーバーの %plugin_name% プラグインを使用すると、値のリ�
       }
   ```
 
-## サービスへのアクセス {id="access-the-service"}
-
-{id="service"}
+## サービスへのアクセス {id="service"}
 
 現在のコンテキストから `%plugin_name%` サービスにアクセスできます。
 

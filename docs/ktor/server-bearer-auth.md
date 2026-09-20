@@ -11,7 +11,7 @@
 <var name="example_name" value="auth-bearer"/>
 <p>
     <b>代码示例</b>：
-    <a href="https://github.com/ktorio/ktor-documentation/tree/%ktor_version%/codeSnippets/snippets/%example_name%">
+    <a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/%example_name%">
         %example_name%
     </a>
 </p>
@@ -78,6 +78,9 @@ install(Authentication) {
 
 ### 第 1 步：配置 Bearer 提供程序 {id="configure-provider"}
 
+<Tabs group="auth-dsl">
+<TabItem title="Classic" group-key="classic">
+
 `bearer` 身份验证提供程序通过 [BearerAuthenticationProvider.Configuration](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-bearer-authentication-provider/-config/index.html) 类暴露其设置。在下面的示例中，指定了以下设置：
 * `realm` 属性设置要在 `WWW-Authenticate` 标头中传递的 realm。
 * `authenticate` 函数检查客户端发送的令牌，并在身份验证成功时返回 `UserIdPrincipal`，如果身份验证失败则返回 `null`。
@@ -97,7 +100,46 @@ install(Authentication) {
 }
 ```
 
+</TabItem>
+<TabItem title="Type-safe" group-key="typed">
+
+<note>
+    <p>
+        类型安全身份验证方案 API 是实验性功能。它可能会随时被移除或更改。
+        需要选择加入（Opt-in）。有关更多详细信息，请参阅
+        <a href="server-typed-auth.md#prerequisites">启用 API</a>。
+    </p>
+</note>
+
+`bearer()` 函数为您选择的 principal 类型创建一个方案。无需执行 `install(Authentication)`
+步骤：该方案是一个值，您可以将其传递给需要它的路由。
+
+```kotlin
+data class User(val name: String)
+
+val bearerAuth = bearer<User>("auth-bearer") {
+    realm = "Access to the '/' path"
+    validate { tokenCredential ->
+        if (tokenCredential.token == "abc123") {
+            User("jetbrains")
+        } else {
+            null
+        }
+    }
+}
+```
+
+请注意名称的变化：经典提供程序使用 `authenticate`，而类型安全方案与其他类型安全方案一样使用 `validate`。它返回您的 principal 类型，如果身份验证失败则返回 `null`。
+
+您还可以设置 `authHeader` 以从除 `Authorization` 标头之外的其他位置读取令牌，并设置 `authSchemes` 以接受 `Bearer` 之外的其他方案。有关完整 API，请参阅[类型安全身份验证](server-typed-auth.md)。
+
+</TabItem>
+</Tabs>
+
 ### 第 2 步：保护特定资源 {id="authenticate-route"}
+
+<Tabs group="auth-dsl">
+<TabItem title="Classic" group-key="classic">
 
 配置完 `bearer` 提供程序后，您可以使用 **[authenticate](server-auth.md#authenticate-route)** 函数保护应用程序中的特定资源。如果身份验证成功，您可以在路由处理程序中使用 `call.principal` 函数检索已验证的 [UserIdPrincipal](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-user-id-principal/index.html)，并获取已验证用户的名称。
 
@@ -105,7 +147,27 @@ install(Authentication) {
 routing {
     authenticate("auth-bearer") {
         get("/") {
-            call.respondText("Hello, ${call.principal<UserIdPrincipal>()?.name}!")
+            val user = call.principal<UserIdPrincipal>()
+            call.respondText("Hello, ${user?.name}!")
         }
     }
 }
+```
+
+</TabItem>
+<TabItem title="Type-safe" group-key="typed">
+
+将方案传递给 `authenticateWith()`。在该块内，`call.principal` 即为您指定的 principal 类型且绝不为 `null`，因此不需要进行转换或 null 检查：
+
+```kotlin
+routing {
+    authenticateWith(bearerAuth) {
+        get("/") {
+            call.respondText("Hello, ${call.principal.name}!")
+        }
+    }
+}
+```
+
+</TabItem>
+</Tabs>

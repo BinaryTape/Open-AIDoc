@@ -61,6 +61,7 @@
      - [プロパティのアクセサの実装を別のオブジェクトに委譲](delegated-properties.md)します。
  * `catch` は[特定の例外型を処理する](exceptions.md)ブロックを開始します。
  * `constructor` は[プライマリまたはセカンダリコンストラクタ](classes.md#constructors-and-initializer-blocks)を宣言します。
+ * `context` は関数やプロパティの[コンテキストパラメータ](context-parameters.md)を宣言します。
  * `delegate` は[アノテーションの使用箇所ターゲット（use-site target）](annotations.md#annotation-use-site-targets)として使用されます。
  * `dynamic` は Kotlin/JS コードにおいて [dynamic 型](dynamic-type.md)を参照します。
  * `field`
@@ -80,7 +81,7 @@
      - [プロパティのセッター](properties.md)を宣言します。
      - [アノテーションの使用箇所ターゲット](annotations.md#annotation-use-site-targets)として使用されます。
 * `setparam` は[アノテーションの使用箇所ターゲット](annotations.md#annotation-use-site-targets)として使用されます。
-* `value` は `class` キーワードと共に [インラインクラス](inline-classes.md)を宣言します。
+* `value` は `class` キーワードと共に[インラインクラス](inline-classes.md)を宣言します。
 * `where` は[ジェネリック型パラメータの制約](generics.md#upper-bounds)を指定します。
 
 ## 修飾子キーワード {id="modifier-keywords"}

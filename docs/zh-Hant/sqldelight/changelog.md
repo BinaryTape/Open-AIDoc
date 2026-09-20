@@ -12,8 +12,68 @@
 
 ### 修復 {id="fixed"}
 
+- 尚無！
+
+## [2.4.0] - 2026-09-17 {id="2-4-0-2026-09-17"}
+[2.4.0]: https://github.com/sqldelight/sqldelight/releases/tag/2.4.0
+
+### 新增
+- [原生驅動程式] 為 `inMemoryDriver` 新增 `extendedConfig` 參數（#5539 由 @GuilhE 提供）
+- [PostgreSQL 方言] 為隱式定義之系統列 (System Columns) 新增查詢支援（#5834 由 @griffio 提供）
+- [PostgreSQL 方言] 新增基礎陣列常值 (Array literal) 支援（#5997 由 @griffio 提供）
+- [PostgreSQL 方言] 新增基礎 LTREE 支援（#5880 由 @yesitskev @griffio 提供）
+- [MySQL 方言] 新增對 INET 函式的支援（#5072 由 @mcxinyu 提供）
+- [PostgreSQL 方言] 新增對 ALTER INDEX 的支援（#6224 由 @griffio 提供）
+- [SQLite 方言] 新增對 SQLite 3.44 聚合函式 DISTINCT、ORDER BY 與 FILTER 的支援（#6236 由 @griffio 提供）
+- [SQLite 方言] 新增對 SQLite 3.37 STRICT 資料表的支援（#6230 由 @griffio 提供）
+- [Gradle 外掛程式] 新增對使用 `codegenExcludedColumns` 從產生的模型中排除列的支援（#6243 由 @sokolikp 提供）
+- [編譯器] 為架構新增 `allTableNames` 函式（#6245 由 @edenman 提供）
+- [PostgreSQL 方言] 新增對 ANY 運算子的支援（#6253 由 @griffio 提供）
+- [SQLite 方言] 為 SQLite 3.39 新增 RIGHT JOIN 與 FULL JOIN 支援（#6273 由 @griffio 提供）
+- [PostgreSQL 方言] 新增對觸發器函式中 `RAISE` 陳述式與 `FOUND` 變數的支援（#6297 由 @griffio 提供）
+
+### 變更
+- [PostgreSQL 方言] 將 `arrayIntermediateType` 的可見性變更為 public（#5835 由 @griffio 提供）
+- [Gradle 外掛程式] 實作更嚴格的 `MigrationFile` 版本控管（#5730 由 @madisp 提供）
+- [Gradle 外掛程式] 將最低支援的 Gradle 版本提升至 8.2.1（#6217 由 @maxsav 提供）
+- [Gradle 外掛程式] 支援 Gradle 隔離專案 (isolated projects)（#6217 由 @maxsav 提供）
+- [IntelliJ 外掛程式] 最低版本需求為 2023.3 / Android Studio Jellyfish
+
+### 修復
+- [Gradle 外掛程式] 抑制 JDK 24+ 上來自編譯器工作程序 (compiler worker) 的 `sun.misc.Unsafe` 棄用警告（#6321）
+- [編譯器] 抑制產生的程式碼中的 Kotlin 額外警告（#6208 由 @eyupcanakman 提供）
+- [編譯器] 非群組聚合結果集中的其他列一律為可 null
+- [PostgreSQL 方言] 正確解析 `coalesce` 與 `ifnull` 的可 null 性
+- [PostgreSQL 方言] 修復 PostgreSQL 方言的 IDE 整合
+- [PostgreSQL 方言] 改進 PostgreSQL 方言的 IDE 外掛程式（#6209 由 @griffio 提供）
+- [Intellij 外掛程式] IDE 外掛程式可以為所有方言執行程式碼補全（#6210 由 @griffio 提供）
+- [Gradle 外掛程式] 修復執行驗證資料庫任務時的循環相依性錯誤（#6221 由 @griffio 提供）
+- [編譯器] 修復多列更新的樂觀鎖 (optimistic lock)（#6240 由 @griffio 提供）
+- [Intellij 外掛程式] 修復導致 IDEA 2026.2 當機的棄用問題（#6247 由 @griffio 提供）
+- [Gradle 外掛程式] 修復產生的原始碼在 AGP 8.9 至 8.11 上無法被 Kotlin 編譯識別的問題
+- [PostgreSQL 方言] 修復 `lower` 與 `upper` 函式使用 Primitive 繫結引數預設為 TEXT 的問題（#6262 由 @griffio 提供）
+- [編譯器] 修復當使用配接器且遷移變更可 null 性時，使用資料類別繫結插入值的問題（#6269 由 @griffio 提供）
+- [編譯器] 為 null 安全運算子（IS 與 IS DISTINCT FROM）使用可 null 繫結引數（#6265 由 @griffio 提供）
+- [Gradle 外掛程式] 將 AGP 的變體解析 (variant resolution) 用於專案相依項（#6217 由 @maxsav 提供）
+- [Gradle 外掛程式] 修復當不同組建間的 AGP 變體 (variant) 清單不一致時，`generateDatabaseInterface` 的組建快取未命中問題
+- [Gradle 外掛程式] 修復當套用外掛程式但未配置任何資料庫時，IDE 同步當機的問題（#6088）
+- [PostgreSQL 方言] 修復使用巢狀函式呼叫時的 JSON 聚合函式問題（#6281 由 @griffio 提供）
+- [分頁 3 擴充套件] 修復 `KeyedQueryPagingSource` 在空資料庫上當機的問題（#6284 由 @woods-marshes 提供）
+- [編譯器] 修復當變動器 (mutator) 陳述式與 `COALESCE` 等封裝函式搭配使用時的 Java 型別配接器問題（#6292 由 @griffio 提供）
+- [編譯器] 修復當模組名稱為大寫時，產生的程式碼套件名稱也會被變更為大寫的問題（#6316 由 @griffio 提供）
+- [PostgreSQL 方言] 允許日期資料型別不區分大小寫（#6328 由 @griffio 提供）
 - [PostgreSQL 方言] 修復 `string_agg` 函式為可 null（#6340 由 @griffio 提供）
 - [SQLite 方言] 修復使用 `GROUP BY` 的 SQLite 3.44 聚合函式（#6343 由 @griffio 提供）
+- [Gradle 外掛程式] 避免在組態階段解析資料庫相依項（#6353 由 @joshfriend 提供）
+
+## [2.4.0-rc2] - 2026-09-14 {id="2-4-0-rc2-2026-09-14"}
+[2.4.0-rc2]: https://github.com/sqldelight/sqldelight/releases/tag/2.4.0-rc2
+
+### 修復
+
+- [PostgreSQL 方言] 修復 `string_agg` 函式為可 null（#6340 由 @griffio 提供）
+- [SQLite 方言] 修復使用 `GROUP BY` 的 SQLite 3.44 聚合函式（#6343 由 @griffio 提供）
+- [Gradle 外掛程式] 避免在組態階段解析資料庫相依項（#6353 由 @joshfriend 提供）
 
 ## [2.4.0-rc1] - 2026-09-01 {id="2-4-0-rc1-2026-09-01"}
 [2.4.0-rc1]: https://github.com/sqldelight/sqldelight/releases/tag/2.4.0-rc1
@@ -26,7 +86,7 @@
 - [MySQL 方言] 新增對 INET 函式的支援（#5072 由 @mcxinyu 提供）
 - [PostgreSQL 方言] 新增對 ALTER INDEX 的支援（#6224 由 @griffio 提供）
 - [SQLite 方言] 新增對 SQLite 3.44 聚合函式 DISTINCT、ORDER BY 與 FILTER 的支援（#6236 由 @griffio 提供）
-- [SQLite 方言] 新增對 SQLite 3.37 STRICT 資料表 的支援（#6230 由 @griffio 提供）
+- [SQLite 方言] 新增對 SQLite 3.37 STRICT 資料表的支援（#6230 由 @griffio 提供）
 - [Gradle 外掛程式] 新增對使用 `codegenExcludedColumns` 從產生的模型中排除列的支援（#6243 由 @sokolikp 提供）
 - [編譯器] 為架構新增 `allTableNames` 函式（#6245 由 @edenman 提供）
 - [PostgreSQL 方言] 新增對 ANY 運算子的支援（#6253 由 @griffio 提供）
@@ -667,7 +727,7 @@ sqldelight {
 - [編譯器] 讓模組產生查詢實作，而不是在每個模組中重複執行
 - [編譯器] 移除產生的資料類別的自訂 `toString` 產生。（由 @PaulWoitaschek 提供）
 - [JS 驅動程式] 從 `sqljs-driver` 中移除 `sql.js` 相依項（由 @dellisd 提供）
-- [分頁 3 擴充套件] 移除 Android 分頁 2 擴充套件
+- [分頁] 移除 Android 分頁 2 擴充套件
 - [IDE 外掛程式] 在 SQLDelight 同步時新增編輯器橫幅（#2511）
 - [IDE 外掛程式] 最低支援的 IntelliJ 版本為 2021.1
 
@@ -785,7 +845,7 @@ sqldelight {
 
 ### 變更
 - [原生驅動程式] 透過在可能時避免凍結與可共用資料結構來改進原生交易效能（由 @andersio 提供）
-- [分頁 3 擴充套件] 將 Paging3 版本提升至 3.0.0 穩定版
+- [分頁 3] 將 Paging3 版本提升至 3.0.0 穩定版
 - [JS 驅動程式] 將 `sql.js` 升級至 1.5.0
 
 ### 修復

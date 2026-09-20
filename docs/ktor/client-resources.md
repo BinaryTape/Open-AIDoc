@@ -23,20 +23,25 @@
 了解如何使用 Resources 插件发出类型安全请求。
 </link-summary>
 
-Ktor 提供了 `%plugin_name%` 插件，允许您实现类型安全 [请求](client-requests.md)。为此，您需要创建一个描述服务器上可用资源的类，然后使用 `@Resource` 关键字为该类添加注解。请注意，`@Resource` 注解具有 kotlinx.serialization 库提供的 `@Serializable` 行为。
+Ktor 提供了 `%plugin_name%` 插件，用于发出类型安全[客户端请求](client-requests.md)。
+为此，您需要定义表示服务器端点的类，并使用 `@Resource` 关键字为其添加注解。
 
-> Ktor 服务器提供了实现 [类型安全路由](server-resources.md) 的功能。
+资源类使用 `kotlinx.serialization` 将其属性转换为路径参数和查询参数。
+
+> 在服务器端，Ktor 提供了[类型安全路由](server-resources.md)。
+>
+{style="tip"}
 
 ## 添加依赖项 {id="add_dependencies"}
 
 ### 添加 kotlinx.serialization {id="add_serialization"}
 
-鉴于 [资源类](#resource_classes) 应具有 `@Serializable` 行为，您需要按照 [设置](https://github.com/Kotlin/kotlinx.serialization#setup) 部分所述添加 Kotlin 序列化插件。
+`Resources` 插件依赖于 `kotlinx.serialization`。请按照 [`kotlinx.serialization` 设置指南](https://github.com/Kotlin/kotlinx.serialization#setup) 中的说明启用 Kotlin 序列化插件。
 
 ### 添加 %plugin_name% 依赖项 {id="add_plugin_dependencies"}
 
 <p>
-    要使用 <code>%plugin_name%</code>，您需要在构建脚本中包含 <code>%artifact_name%</code> 工件：
+    要使用 <code>%plugin_name%</code>，请在构建脚本中添加 <code>%artifact_name%</code> 工件：
 </p>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
@@ -55,7 +60,8 @@ Ktor 提供了 `%plugin_name%` 插件，允许您实现类型安全 [请求](cli
 
 ## 安装 %plugin_name% {id="install_plugin"}
 
-要安装 `%plugin_name%`，请将其传递给 [客户端配置块](client-create-and-configure.md#configure-client) 内部的 `install` 函数：
+要安装 `%plugin_name%` 插件，请将其传递给[客户端配置块](client-create-and-configure.md#configure-client)内部的 `install` 函数：
+
 ```kotlin
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
@@ -84,7 +90,7 @@ class Articles()
 
 ### 带有查询参数的资源 {id="resource_query_param"}
 
-下面的 `Articles` 类具有 `sort` 字符串属性，该属性用作 [查询参数](server-requests.md#query_parameters)，并允许您定义响应以下带有 `sort` 查询参数路径的资源：`/articles?sort=new`。
+下面的 `Articles` 类具有 `sort` 字符串属性，该属性用作[查询参数](server-requests.md#query_parameters)，并允许您定义响应以下带有 `sort` 查询参数路径的资源：`/articles?sort=new`。
 
 ```kotlin
 @Resource("/articles")
@@ -106,7 +112,7 @@ class Articles() {
 
 ### 带有路径参数的资源 {id="resource_path_param"}
 
-下面的示例演示了如何添加 [嵌套](#resource_nested) 的 `{id}` 整数 [路径参数](server-routing.md#path_parameter)，该参数匹配路径段并将其捕获为名为 `id` 的参数。
+下面的示例演示了如何添加[嵌套](#resource_nested)的 `{id}` 整数[路径参数](server-routing.md#path_parameter)，该参数匹配路径段并将其捕获为名为 `id` 的参数。
 
 ```kotlin
 @Resource("/articles")
@@ -120,7 +126,7 @@ class Articles() {
 
 ### 示例：用于 CRUD 操作的资源 {id="example_crud"}
 
-让我们总结上面的示例，并为 CRUD 操作创建 `Articles` 资源。
+以下示例为 CRUD 操作创建了 `Articles` 资源：
 
 ```kotlin
 @Resource("/articles")
@@ -136,13 +142,19 @@ class Articles() {
 }
 ```
 
-此资源可用于列出所有文章、发布新文章、编辑文章等。我们将在下一节中看到如何向此资源 [发出类型安全请求](#make_requests)。
+此资源可用于列出所有文章、发布新文章以及编辑现有文章。
 
-> 您可以在此处找到完整示例：[client-type-safe-requests](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-type-safe-requests)。
+下一节将展示如何使用此资源[发出类型安全请求](#make_requests)。
+
+> 完整示例请参阅 [client-type-safe-requests](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-type-safe-requests)。
+>
+{style="tip"}
 
 ## 发出类型安全请求 {id="make_requests"}
 
-要向类型化资源 [发出请求](client-requests.md)，您需要将资源类实例传递给请求函数（`request`、`get`、`post`、`put` 等）。例如，下面的示例演示了如何向 `/articles` 路径发出请求。
+要向类型化资源[发出请求](client-requests.md)，请将资源类实例传递给请求函数，例如 `request()`、`get()`、`post()` 或 `put()`。
+
+下面的示例向 `/articles` 路径发出请求：
 
 ```kotlin
 @Resource("/articles")
@@ -159,7 +171,7 @@ fun main() {
 }
 ```
 
-下面的示例演示了如何向在 [示例：用于 CRUD 操作的资源](#example_crud) 中创建的 `Articles` 资源发出类型化请求。
+下面的示例向在[示例：用于 CRUD 操作的资源](#example_crud)中创建的 `Articles` 资源发出类型化请求。
 
 ```kotlin
 fun main() {
@@ -184,6 +196,17 @@ fun main() {
 }
 ```
 
-[defaultRequest](client-default-request.md) 函数用于为所有请求指定默认 URL。
+[`defaultRequest()`](client-default-request.md) 函数用于为所有请求指定默认 URL。
 
-> 您可以在此处找到完整示例：[client-type-safe-requests](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-type-safe-requests)。
+> 在开发客户端插件或进行插桩时，您可以通过 `RESOURCE` 请求属性访问用于类型安全请求的资源实例：
+>  ```kotlin
+>  onRequest { call, _ ->
+>    val resource = call.attributes.getOrNull(RESOURCE)
+>  }
+>  ```
+> 
+{style="tip"}
+
+> 完整示例请参阅 [client-type-safe-requests](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-type-safe-requests)。
+>
+{style="tip"}

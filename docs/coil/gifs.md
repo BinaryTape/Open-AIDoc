@@ -7,7 +7,7 @@
 要添加 GIF 支持，请导入该扩展库：
 
 ```kotlin
-implementation("io.coil-kt.coil3:coil-gif:3.6.2")
+implementation("io.coil-kt.coil3:coil-gif:3.6.3")
 ```
 
 大功告成！`ImageLoader` 将利用文件头自动检测任何 GIF 并正确对其进行解码。

@@ -3,7 +3,7 @@
 テストサポートクラスを使用するには、拡張ライブラリをインポートします：
 
 ```kotlin
-testImplementation("io.coil-kt.coil3:coil-test:3.6.2")
+testImplementation("io.coil-kt.coil3:coil-test:3.6.3")
 ```
 
 `coil-test` には `FakeImageLoaderEngine` が含まれています。これを `ImageLoader` に追加することで、すべての受信 `ImageRequest` をインターセプトし、カスタムの `ImageResult` を返すことができます。これは、画像の読み込みを同期（メインスレッドから実行）かつ一貫性のあるものにできるため、テストにおいて有用です。`FakeImageLoaderEngine` を使用することで、`ImageLoader` は、通常の画像読み込みで行われるメモリキャッシュ、スレッドの切り替え（thread jumping）、ディスク/ネットワーク I/O フェッチ、および画像デコードなどの処理をすべて回避します。例を以下に示します：
@@ -11,7 +11,7 @@ testImplementation("io.coil-kt.coil3:coil-test:3.6.2")
 ```kotlin
 val engine = FakeImageLoaderEngine.Builder()
     .intercept("https://example.com/image.jpg", ColorImage(Color.Red.toArgb()))
-    .bridge({ it is String && it.endsWith("test.png") }, ColorImage(Color.Green.toArgb()))
+    .intercept({ it is String && it.endsWith("test.png") }, ColorImage(Color.Green.toArgb()))
     .default(ColorImage(Color.Blue.toArgb()))
     .build()
 val imageLoader = ImageLoader.Builder(context)

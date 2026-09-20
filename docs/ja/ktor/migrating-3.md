@@ -282,7 +282,9 @@ class ApplicationTest {
 @Test
 fun testHello() = testApplication {
     environment {
-        config = ApplicationConfig("application-custom.conf")
+        config = ApplicationConfig(
+            "application-custom.conf"
+        )
     }
 }
 ```

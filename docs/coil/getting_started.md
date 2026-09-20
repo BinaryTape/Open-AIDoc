@@ -5,8 +5,8 @@
 典型的 Compose UI 项目通常需要导入：
 
 ```kotlin
-implementation("io.coil-kt.coil3:coil-compose:3.6.2")
-implementation("io.coil-kt.coil3:coil-network-okhttp:3.6.2")
+implementation("io.coil-kt.coil3:coil-compose:3.6.3")
+implementation("io.coil-kt.coil3:coil-network-okhttp:3.6.3")
 ```
 
 导入后，您可以使用 `AsyncImage` 从网络加载图像：
@@ -26,8 +26,8 @@ AsyncImage(
 如果您使用 Android 视图而非 Compose UI，请导入：
 
 ```kotlin
-implementation("io.coil-kt.coil3:coil:3.6.2")
-implementation("io.coil-kt.coil3:coil-network-okhttp:3.6.2")
+implementation("io.coil-kt.coil3:coil:3.6.3")
+implementation("io.coil-kt.coil3:coil-network-okhttp:3.6.3")
 ```
 
 导入后，您可以使用 `ImageView.load` 扩展函数从网络加载图像：

@@ -116,7 +116,7 @@
 
 ```kotlin
 [versions]
-ktor = "3.4.0"
+ktor = "3.6.0"
 
 [libraries]
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
@@ -134,7 +134,9 @@ sourceSets {
 
 ### 引擎相依性 {id="engine-dependency"}
 
-[引擎](client-engines.md)負責處理網路請求。有各種適用於不同平台的用戶端引擎，例如 Apache、CIO、Android、iOS 等。例如，您可以按如下方式新增 `CIO` 引擎相依性：
+[引擎](client-engines.md)負責處理網路請求。Ktor 為不同的平台提供了各種用戶端引擎。
+
+例如，您可以按如下方式新增 `CIO` 引擎：
 
 <var name="artifact_name" value="ktor-client-cio"/>
 <Tabs group="languages">
@@ -151,19 +153,41 @@ sourceSets {
 
 #### 多平台 {id="engine-dependency-multiplatform"}
 
-對於多平台專案，您需要將所需引擎的相依性新增至對應的原始碼集。
+##### 使用預設引擎 {id="use-default-engines"}
 
-例如，要為 Android 新增 `OkHttp` 引擎相依性，您可以先在 `gradle/libs.versions.toml` 檔案中定義 Ktor 版本和 `ktor-client-okhttp` 構件：
+對於多平台專案，您可以使用 `ktor-client-engine-defaults` 構件為每個目標平台提供精心挑選的用戶端引擎。
+
+首先，在您的 `gradle/libs.versions.toml` 檔案中定義該構件：
+
+```toml
+[libraries]
+ktor-client-engine-defaults = { module = "io.ktor:ktor-client-engine-defaults", version.ref = "ktor" }
+```
+
+然後，將其新增至 `commonMain` 原始碼集：
 
 ```kotlin
-[versions]
-ktor = "3.4.0"
+kotlin {
+    sourceSets {
+        commonMain {
+            dependencies {
+                api(libs.ktor.client.engine.defaults)
+            }
+        }
+    }
+}
+```
 
+##### 使用特定引擎 {id="kmp-specific-engine"}
+
+如果您需要特定引擎，請改為將其相依性新增至對應的平台原始碼集。例如，要在 Android 上使用 `OkHttp`，請定義 `ktor-client-okhttp` 構件：
+
+```toml
 [libraries]
 ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
 ```
 
-然後，將 `ktor-client-okhttp` 作為相依性新增至 `androidMain` 原始碼集：
+然後，將其作為相依性新增至 `androidMain` 原始碼集：
 
 ```kotlin
 sourceSets {
@@ -173,7 +197,7 @@ sourceSets {
 }
 ```
 
-如需特定引擎所需相依性的完整列表，請參閱[新增引擎相依性](client-engines.md#dependencies)。
+如需各引擎所需的相依性，請參閱[新增引擎相依性](client-engines.md#dependencies)。
 
 ### 記錄相依性 {id="logging-dependency"}
 
@@ -206,9 +230,9 @@ sourceSets {
 
 ### 外掛程式相依性 {id="plugin-dependency"}
 
-Ktor 允許您使用預設情況下無法使用的額外用戶端功能（[外掛程式](client-plugins.md)），例如驗證與序列化。其中一些功能是在單獨的構件中提供的。您可以從所需外掛程式的主題中了解需要哪些相依性。
+Ktor 允許您使用預設情況下無法使用的額外用戶端功能（[外掛程式](client-plugins.md)），例如授權與序列化。其中一些功能是在單獨的構件中提供的。您可以從所需外掛程式的主題中了解需要哪些相依性。
 
-> 對於多平台專案，外掛程式相依性應新增至 `commonMain` 原始碼集。請注意，某些外掛程式對於特定平台可能會有 [限制](client-engines.md#limitations)。
+> 對於多平台專案，外掛程式相依性應新增至 `commonMain` 原始碼集。請注意，某些外掛程式對於特定平台可能會有[限制](client-engines.md#limitations)。
 
 ## 確保 Ktor 版本一致性 {id="ensure-ktor-version-consistency"}
 

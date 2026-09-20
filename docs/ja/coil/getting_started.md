@@ -5,8 +5,8 @@
 一般的なCompose UIプロジェクトでは、以下をインポートします：
 
 ```kotlin
-implementation("io.coil-kt.coil3:coil-compose:3.6.2")
-implementation("io.coil-kt.coil3:coil-network-okhttp:3.6.2")
+implementation("io.coil-kt.coil3:coil-compose:3.6.3")
+implementation("io.coil-kt.coil3:coil-network-okhttp:3.6.3")
 ```
 
 これらをインポートすると、`AsyncImage`を使用してネットワークから画像を読み込むことができます：
@@ -26,8 +26,8 @@ AsyncImage(
 Compose UIの代わりにAndroid Viewを使用する場合は、以下をインポートします：
 
 ```kotlin
-implementation("io.coil-kt.coil3:coil:3.6.2")
-implementation("io.coil-kt.coil3:coil-network-okhttp:3.6.2")
+implementation("io.coil-kt.coil3:coil:3.6.3")
+implementation("io.coil-kt.coil3:coil-network-okhttp:3.6.3")
 ```
 
 これらをインポートすると、`ImageView.load`拡張関数を使用してネットワークから画像を読み込むことができます：

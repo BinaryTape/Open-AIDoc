@@ -16,13 +16,15 @@
 HttpCacheプラグインを使用すると、以前に取得したリソースをメモリ内キャッシュまたは永続キャッシュに保存できます。
 </link-summary>
 
-Ktorクライアントは、以前に取得したリソースをメモリ内キャッシュまたは永続キャッシュに保存できる[HttpCache](https://api.ktor.io/ktor-client-core/io.ktor.client.plugins.cache/-http-cache/index.html)プラグインを提供しています。
+Ktorクライアントは、以前に取得したリソースをメモリまたは永続ストレージにキャッシュするための[`HttpCache`](https://api.ktor.io/ktor-client-core/io.ktor.client.plugins.cache/-http-cache/index.html)プラグインを提供しています。
 
 ## 依存関係の追加 {id="add_dependencies"}
-`HttpCache`は[ktor-client-core](client-dependencies.md)アーティファクトのみを必要とし、特定の依存関係は必要ありません。
+
+`HttpCache`プラグインは[`ktor-client-core`](client-dependencies.md)アーティファクトに含まれており、追加の依存関係は必要ありません。
 
 ## メモリ内キャッシュ {id="memory_cache"}
-`HttpCache`をインストールするには、[クライアント構成ブロック](client-create-and-configure.md#configure-client)内の`install`関数に渡します。
+
+メモリ内キャッシュを有効にするには、[クライアント構成ブロック](client-create-and-configure.md#configure-client)で`HttpCache`をインストールします。
 ```kotlin
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
@@ -33,25 +35,30 @@ val client = HttpClient(CIO) {
 }
 ```
 
-これだけで、クライアントが以前に取得したリソースをメモリ内キャッシュに保存できるようになります。
-例えば、`Cache-Control`ヘッダーが設定されたリソースに対して2回連続で[リクエスト](client-requests.md)を送信した場合、
-データはすでにキャッシュに保存されているため、クライアントは最初のリクエストのみを実行し、2回目はスキップします。
+デフォルトでは、`HttpCache`プラグインはキャッシュされたレスポンスをメモリに保存します。
+
+例えば、`Cache-Control`ヘッダーが設定されたリソースに対して2回連続で[リクエスト](client-requests.md)を送信した場合、クライアントはリソースを再度リクエストする代わりに、キャッシュから2回目のレスポンスを提供できます。
 
 ## 永続キャッシュ {id="persistent_cache"}
 
-Ktorでは、[CacheStorage](https://api.ktor.io/ktor-client-core/io.ktor.client.plugins.cache.storage/-cache-storage/index.html)インターフェースを実装することで永続キャッシュを作成できます。
-JVMでは、[FileStorage](https://api.ktor.io/ktor-client-core/io.ktor.client.plugins.cache.storage/-file-storage.html)関数を呼び出すことでファイルストレージを作成できます。
+[`CacheStorage`](https://api.ktor.io/ktor-client-core/io.ktor.client.plugins.cache.storage/-cache-storage/index.html)の実装を設定することで、キャッシュされたレスポンスを永続的に保存できます。
 
-ファイルキャッシュストレージを作成するには、`File`インスタンスを`FileStorage`関数に渡します。
-次に、そのストレージが共有キャッシュとして使用されるかプライベートキャッシュとして使用されるかに応じて、作成したストレージを`publicStorage`または`privateStorage`関数に渡します。
+Ktorは、キャッシュされたレスポンスをファイルシステムに保存する[`FileStorage()`](https://api.ktor.io/ktor-client-core/io.ktor.client.plugins.cache.storage/-file-storage.html)関数を提供しています。`FileStorage()`は`kotlinx-io`を使用しており、サポートされているすべてのプラットフォームで利用できます。
+
+キャッシュディレクトリの`Path`を作成し、`FileStorage()`関数に渡します。
+次に、`publicStorage()`または`privateStorage()`関数を使用してストレージを設定します。
 
 ```kotlin
 val client = HttpClient(CIO) {
     install(HttpCache) {
-        val cacheFile = Files.createDirectories(Paths.get("build/cache")).toFile()
-        publicStorage(FileStorage(cacheFile))
+        publicStorage(FileStorage(Path("build/cache")))
     }
 }
 ```
 
-> 完全な例はこちらにあります: [client-caching](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-caching)。
+* 共有キャッシュに保存できるレスポンスには、[`publicStorage()`](https://api.ktor.io/ktor-client-core/io.ktor.client.plugins.cache/-http-cache/-config/public-storage.html)関数を使用します。
+* プライベートキャッシュを対象とするレスポンスには、[`privateStorage()`](https://api.ktor.io/ktor-client-core/io.ktor.client.plugins.cache/-http-cache/-config/private-storage.html)関数を使用します。
+
+> 完全な例については、[client-caching](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-caching)を参照してください。
+>
+{style="tip"}

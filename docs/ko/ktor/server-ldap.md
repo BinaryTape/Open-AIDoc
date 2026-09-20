@@ -64,11 +64,16 @@ install(Authentication) {
 
 LDAP 사용자를 인증하려면 [ldapAuthenticate](https://api.ktor.io/ktor-server-auth-ldap/io.ktor.server.auth.ldap/ldap-authenticate.html) 함수를 호출해야 합니다. 이 함수는 [UserPasswordCredential](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-user-password-credential/index.html)을 받아 지정된 LDAP 서버를 대상으로 검증합니다.
 
+<Tabs group="auth-dsl">
+<TabItem title="Classic" group-key="classic">
+
 ```kotlin
 install(Authentication) {
     basic("auth-ldap") {
         validate { credentials ->
-            ldapAuthenticate(credentials, "ldap://0.0.0.0:389", "cn=%s,dc=ktor,dc=io")
+            val url = "ldap://0.0.0.0:389"
+            val userDNFormat = "cn=%s,dc=ktor,dc=io"
+            ldapAuthenticate(credentials, url, userDNFormat)
         }
     }
 }
@@ -82,7 +87,9 @@ install(Authentication) {
 install(Authentication) {
     basic("auth-ldap") {
         validate { credentials ->
-            ldapAuthenticate(credentials, "ldap://localhost:389", "cn=%s,dc=ktor,dc=io") {
+            val url = "ldap://localhost:389"
+            val userDNFormat = "cn=%s,dc=ktor,dc=io"
+            ldapAuthenticate(credentials, url, userDNFormat) {
                 if (it.name == it.password) {
                     UserIdPrincipal(it.name)
                 } else {
@@ -94,7 +101,62 @@ install(Authentication) {
 }
 ```
 
+</TabItem>
+<TabItem title="Type-safe" group-key="typed">
+
+<note>
+    <p>
+        타입 세이프(type-safe) 인증 스키마 API는 실험적(experimental) 기능입니다. 언제든지 제거되거나 변경될 수 있습니다.
+        옵트인(opt-in)이 필요합니다. 자세한 내용은
+        <a href="server-typed-auth.md#prerequisites">API 활성화</a>를 참조하세요.
+    </p>
+</note>
+
+LDAP 전용 타입 세이프 인증 스키마는 없습니다. 타입 세이프 [`basic`](server-basic-auth.md), [`digest`](server-digest-auth.md) 또는 [`form`](server-form-based-auth.md) 스키마의 `validate` 블록 내부에서 `ldapAuthenticate`를 호출하세요.
+
+`ldapAuthenticate`에 블록을 전달하여 고유한 프린시펄(principal) 타입을 반환할 수 있습니다:
+
+```kotlin
+data class User(val name: String)
+
+val ldapAuth = basic<User>("auth-ldap") {
+    validate { credentials ->
+        val url = "ldap://0.0.0.0:389"
+        val userDNFormat = "cn=%s,dc=ktor,dc=io"
+        ldapAuthenticate(credentials, url, userDNFormat) {
+            User(it.name)
+        }
+    }
+}
+```
+
+이 블록을 사용하면 인증된 사용자에 대한 검증을 추가할 수도 있습니다:
+
+```kotlin
+val ldapAuth = basic<User>("auth-ldap") {
+    validate { credentials ->
+        val url = "ldap://localhost:389"
+        val userDNFormat = "cn=%s,dc=ktor,dc=io"
+        ldapAuthenticate(credentials, url, userDNFormat) {
+            if (it.name == it.password) {
+                User(it.name)
+            } else {
+                null
+            }
+        }
+    }
+}
+```
+
+전체 API에 대한 내용은 [타입 세이프 인증](server-typed-auth.md)을 참조하세요.
+
+</TabItem>
+</Tabs>
+
 ### 3단계: 특정 리소스 보호 {id="authenticate-route"}
+
+<Tabs group="auth-dsl">
+<TabItem title="Classic" group-key="classic">
 
 LDAP를 구성한 후에는 **[authenticate](server-auth.md#authenticate-route)** 함수를 사용하여 애플리케이션의 특정 리소스를 보호할 수 있습니다. 인증에 성공하면, 라우트 핸들러 내부에서 `call.principal` 함수를 사용하여 인증된 [UserIdPrincipal](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-user-id-principal/index.html)을 가져와 인증된 사용자의 이름을 얻을 수 있습니다.
 
@@ -102,11 +164,30 @@ LDAP를 구성한 후에는 **[authenticate](server-auth.md#authenticate-route)*
 routing {
     authenticate("auth-ldap") {
         get("/") {
-            call.respondText("Hello, ${call.principal<UserIdPrincipal>()?.name}!")
+            val user = call.principal<UserIdPrincipal>()
+            call.respondText("Hello, ${user?.name}!")
         }
     }
 }
 ```
+
+</TabItem>
+<TabItem title="Type-safe" group-key="typed">
+
+`authenticateWith()`에 스키마를 전달하세요. 블록 내부에서 `call.principal`은 사용자가 정의한 프린시펄 타입이며 결코 `null`이 되지 않으므로, 타입 캐스팅이나 null 검사가 필요하지 않습니다:
+
+```kotlin
+routing {
+    authenticateWith(ldapAuth) {
+        get("/") {
+            call.respondText("Hello, ${call.principal.name}!")
+        }
+    }
+}
+```
+
+</TabItem>
+</Tabs>
 
 실행 가능한 전체 예제는 여기서 확인할 수 있습니다: [auth-ldap](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/auth-ldap).
 

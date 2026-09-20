@@ -98,7 +98,7 @@
 `MessageController` 的回應現在將是一個包含 `Message` 物件集合的 JSON 文件。
 
 > 如果類別路徑中包含 Jackson 函式庫，Spring 應用程式中的任何控制器預設都會呈現 JSON 回應。
-> 由於您[在 `build.gradle.kts` 檔案中指定了 `spring-boot-starter-webmvc` 相依性](jvm-create-project-with-spring-boot.md#explore-the-project-gradle-build-file), Jackson 會作為 *遞移* 相依性被引入。
+> 由於您[在 `build.gradle.kts` 檔案中指定了 `spring-boot-starter-webmvc` 相依性](jvm-create-project-with-spring-boot.md#explore-the-project-gradle-build-file)，Jackson 會作為 *遞移* 相依性被引入。
 > 因此，如果端點回傳一個可以序列化為 JSON 的資料結構，應用程式就會以 JSON 文件進行回應。
 >
 {style="note"}

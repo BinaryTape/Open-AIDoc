@@ -5,7 +5,7 @@
 비디오 프레임 지원을 추가하려면 확장 라이브러리를 임포트하세요:
 
 ```kotlin
-implementation("io.coil-kt.coil3:coil-video:3.6.2")
+implementation("io.coil-kt.coil3:coil-video:3.6.3")
 ```
 
 그리고 `ImageLoader`를 생성할 때 컴포넌트 레지스트리에 디코더를 추가하세요:

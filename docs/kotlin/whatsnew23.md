@@ -884,7 +884,7 @@ java.lang.IllegalStateException: <message>
         ...
 ```
 
-Jetpack Compose 1.10 在此模式下生成的堆栈跟踪仅包含仍需反混淆的组密钥。Kotlin 2.3.0 版本通过 Compose Compiler Gradle 插件解决了这个问题，该插件现在会将组密钥条目附加到 R8 生成 ProGuard 映射文件中。如果您在编译器无法为某些函数创建映射的情况下看到新警告，请将其报告给 [Google IssueTracker](https://issuetracker.google.com/issues/new?component=610764&template=1424126)。
+Jetpack Compose 1.10 在此模式下生成的堆栈跟踪仅包含仍需反混淆的组密钥。Kotlin 2.3.0 版本通过 Compose Compiler Gradle 插件解决了这个问题，该插件现在会将组密钥条目附加到 R8 生成的 ProGuard 映射文件中。如果您在编译器无法为某些函数创建映射的情况下看到新警告，请将其报告给 [Google IssueTracker](https://issuetracker.google.com/issues/new?component=610764&template=1424126)。
 
 > 由于依赖于 R8 映射文件，Compose Compiler Gradle 插件仅在为构建启用 R8 时才会为组密钥堆栈跟踪创建反混淆映射。
 >

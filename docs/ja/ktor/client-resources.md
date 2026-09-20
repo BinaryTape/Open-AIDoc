@@ -23,20 +23,25 @@
 Resources プラグインを使用して型安全なリクエストを作成する方法を学びます。
 </link-summary>
 
-Ktor は、型安全な[リクエスト](client-requests.md)を実装できるようにする `%plugin_name%` プラグインを提供しています。これを実現するには、サーバー上で利用可能なリソースを記述するクラスを作成し、そのクラスに `@Resource` キーワードを使用してアノテーションを付ける必要があります。`@Resource` アノテーションは、kotlinx.serialization ライブラリによって提供される `@Serializable` の動作を持つことに注意してください。
+Ktor は、型安全な[クライアントリクエスト](client-requests.md)を作成するための `%plugin_name%` プラグインを提供しています。
+これを実現するには、サーバーエンドポイントを表すクラスを定義し、それらに `@Resource` キーワードでアノテーションを付けます。
 
-> Ktor サーバーは、[型安全なルーティング](server-resources.md)を実装する機能を提供しています。
+リソースクラスは、`kotlinx.serialization` を使用してそのプロパティをパスパラメータやクエリパラメータに変換します。
+
+> サーバー側では、Ktor は[型安全なルーティング](server-resources.md)を提供しています。
+>
+{style="tip"}
 
 ## 依存関係の追加 {id="add_dependencies"}
 
 ### kotlinx.serialization の追加 {id="add_serialization"}
 
-[リソースクラス](#resource_classes)は `@Serializable` の動作を持つ必要があるため、[Setup](https://github.com/Kotlin/kotlinx.serialization#setup) セクションの記述に従って Kotlin serialization プラグインを追加する必要があります。
+`Resources` プラグインは `kotlinx.serialization` に依存しています。[`kotlinx.serialization` セットアップガイド](https://github.com/Kotlin/kotlinx.serialization#setup)の説明に従って、Kotlin serialization プラグインを有効にしてください。
 
 ### %plugin_name% 依存関係の追加 {id="add_plugin_dependencies"}
 
 <p>
-    <code>%plugin_name%</code> を使用するには、ビルドスクリプトに <code>%artifact_name%</code> アーティファクトを含める必要があります。
+    <code>%plugin_name%</code> を使用するには、ビルドスクリプトに <code>%artifact_name%</code> アーティファクトを追加します:
 </p>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
@@ -55,7 +60,8 @@ Ktor は、型安全な[リクエスト](client-requests.md)を実装できる�
 
 ## %plugin_name% のインストール {id="install_plugin"}
 
-`%plugin_name%` をインストールするには、[クライアント設定ブロック](client-create-and-configure.md#configure-client)内の `install` 関数に渡します。
+`%plugin_name%` プラグインをインストールするには、[クライアント設定ブロック](client-create-and-configure.md#configure-client)内の `install` 関数に渡します。
+
 ```kotlin
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
@@ -84,7 +90,7 @@ class Articles()
 
 ### クエリパラメータを持つリソース {id="resource_query_param"}
 
-以下の `Articles` クラスは、[クエリパラメータ](server-requests.md#query_parameters)として機能する `sort` 文字列プロパティを持っており、`/articles?sort=new` のようなクエリパラメータ付きのパスで応答するリソースを定義できます。
+以下の `Articles` クラスは、[クエリパラメータ](server-requests.md#query_parameters)として機能する `sort` 文字列プロパティを持っており、`/articles?sort=new` のように `sort` クエリパラメータ付きのパスで応答するリソースを定義できます。
 
 ```kotlin
 @Resource("/articles")
@@ -120,7 +126,7 @@ class Articles() {
 
 ### 例: CRUD 操作のためのリソース {id="example_crud"}
 
-上記の例をまとめて、CRUD 操作のための `Articles` リソースを作成してみましょう。
+以下の例では、CRUD 操作のための `Articles` リソースを作成します。
 
 ```kotlin
 @Resource("/articles")
@@ -136,13 +142,19 @@ class Articles() {
 }
 ```
 
-このリソースは、すべての記事のリスト表示、新しい記事の投稿、編集などに使用できます。次のセクションで、このリソースに対して[型安全なリクエストを作成](#make_requests)する方法を見ていきます。
+このリソースは、すべての記事の一覧表示、新しい記事の投稿、既存の記事の編集に使用できます。
 
-> 完全な例はこちらにあります: [client-type-safe-requests](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-type-safe-requests)。
+次のセクションでは、このリソースを使用して[型安全なリクエストを作成](#make_requests)する方法を示します。
+
+> 完全な例については、[client-type-safe-requests](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-type-safe-requests) を参照してください。
+>
+{style="tip"}
 
 ## 型安全なリクエストの作成 {id="make_requests"}
 
-型指定されたリソースに対して[リクエストを作成](client-requests.md)するには、リクエスト関数（`request`、`get`、`post`、`put` など）にリソースクラスのインスタンスを渡す必要があります。たとえば、以下のサンプルは `/articles` パスに対してリクエストを作成する方法を示しています。
+型指定されたリソースに対して[リクエストを作成](client-requests.md)するには、`request()`、`get()`、`post()`、`put()` などのリクエスト関数にリソースクラスのインスタンスを渡します。
+
+以下の例は、`/articles` パスに対してリクエストを作成します。
 
 ```kotlin
 @Resource("/articles")
@@ -159,7 +171,7 @@ fun main() {
 }
 ```
 
-以下の例は、[例: CRUD 操作のためのリソース](#example_crud)で作成した `Articles` リソースに対して、型指定されたリクエストを作成する方法を示しています。
+以下の例は、[例: CRUD 操作のためのリソース](#example_crud)で作成した `Articles` リソースに対して型指定されたリクエストを作成します。
 
 ```kotlin
 fun main() {
@@ -184,6 +196,18 @@ fun main() {
 }
 ```
 
-[defaultRequest](client-default-request.md) 関数は、すべてのリクエストに対するデフォルトの URL を指定するために使用されます。
+[`defaultRequest()`](client-default-request.md) 関数は、すべてのリクエストに対するデフォルトの URL を指定します。
 
-> 完全な例はこちらにあります: [client-type-safe-requests](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-type-safe-requests)。
+> クライアントプラグインや計測（インストルメンテーション）を開発する際、型安全なリクエストに使用されたリソースインスタンスには、
+> `RESOURCE` リクエスト属性を介してアクセスできます。
+>  ```kotlin
+>  onRequest { call, _ ->
+>    val resource = call.attributes.getOrNull(RESOURCE)
+>  }
+>  ```
+> 
+{style="tip"}
+
+> 完全な例については、[client-type-safe-requests](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-type-safe-requests) を参照してください。
+>
+{style="tip"}

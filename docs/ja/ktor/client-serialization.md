@@ -23,17 +23,20 @@
 ContentNegotiation プラグインは、主に 2 つの目的を果たします。クライアントとサーバー間でのメディアタイプのネゴシエーションと、リクエストの送信時やレスポンスの受信時に特定のフォーマットでコンテンツをシリアライズ/デシリアライズすることです。
 </link-summary>
 
-[ContentNegotiation](https://api.ktor.io/ktor-client-content-negotiation/io.ktor.client.plugins.contentnegotiation/-content-negotiation) プラグインは、主に 2 つの目的を果たします。
+[`ContentNegotiation`](https://api.ktor.io/ktor-client-content-negotiation/io.ktor.client.plugins.contentnegotiation/-content-negotiation) プラグインは、主に 2 つの目的を果たします。
 * クライアントとサーバー間でのメディアタイプのネゴシエーション。これには、`Accept` および `Content-Type` ヘッダーを使用します。
-* [リクエスト](client-requests.md)の送信時や[レスポンス](client-responses.md)の受信時に、特定のフォーマットでコンテンツをシリアライズ/デシリアライズすること。Ktor は、JSON、XML、CBOR、ProtoBuf のフォーマットを標準でサポートしています。
+* サポートされているフォーマットでの[リクエスト](client-requests.md)ボディのシリアライズと[レスポンス](client-responses.md)ボディのデシリアライズ。Ktor は、JSON、XML、CBOR、ProtoBuf を標準でサポートしています。
 
-> サーバー側では、Ktor はコンテンツをシリアライズ/デシリアライズするために [ContentNegotiation](server-serialization.md) プラグインを提供しています。
+> サーバー側では、Ktor はコンテンツをシリアライズ/デシリアライズするために [`ContentNegotiation`](server-serialization.md) プラグインを提供しています。
+>
+{style="tip"}
 
 ## 依存関係の追加 {id="add_dependencies"}
+
 ### ContentNegotiation {id="add_content_negotiation_dependency"}
 
 <p>
-    <code>%plugin_name%</code> を使用するには、ビルドスクリプトに <code>%artifact_name%</code> アーティファクトを含める必要があります。
+    <code>%plugin_name%</code> を使用するには、ビルドスクリプトに <code>%artifact_name%</code> アーティファクトを追加します。
 </p>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
@@ -46,19 +49,24 @@ ContentNegotiation プラグインは、主に 2 つの目的を果たします�
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
     </TabItem>
 </Tabs>
+
+> 特定のフォーマットのシリアライザーには追加のアーティファクトが必要です。
+> 
+> 例えば、`kotlinx.serialization` の JSON には `ktor-serialization-kotlinx-json` 依存関係が必要です。含まれているアーティファクトに応じて、Ktor は自動的にデフォルトのシリアライザーを選択します。必要に応じて、シリアライザーを明示的に[指定](#configure_serializer)して設定することもできます。
+> 
+{style="note"}
+
 <tip>
     Ktor クライアントに必要なアーティファクトの詳細については、<Links href="/ktor/client-dependencies" summary="既存のプロジェクトにクライアントの依存関係を追加する方法を学びます。">クライアントの依存関係の追加</Links>を参照してください。
 </tip>
 
-特定のフォーマットのシリアライザーには追加のアーティファクトが必要であることに注意してください。例えば、kotlinx.serialization の JSON には `ktor-serialization-kotlinx-json` 依存関係が必要です。含まれているアーティファクトに応じて、Ktor は自動的にデフォルトのシリアライザーを選択します。必要に応じて、シリアライザーを明示的に[指定](#configure_serializer)して設定することもできます。
+### シリアライズ {id="serialization_dependency"}
 
-### Serialization {id="serialization_dependency"}
-
-kotlinx.serialization コンバーターを使用する前に、[Setup](https://github.com/Kotlin/kotlinx.serialization#setup) セクションの説明に従って Kotlin serialization プラグインを追加する必要があります。
+`kotlinx.serialization` コンバーターを使用する前に、[Setup](https://github.com/Kotlin/kotlinx.serialization#setup) セクションの説明に従って Kotlin serialization プラグインを追加してください。
 
 #### JSON {id="add_json_dependency"}
 
-JSON データをシリアライズ/デシリアライズするには、kotlinx.serialization、Gson、Jackson のいずれかのライブラリを選択できます。
+JSON データをシリアライズおよびデシリアライズするには、プロジェクトにシリアライズライブラリを追加します。Ktor は `kotlinx.serialization`、Gson、または Jackson をサポートしています。
 
 <Tabs group="json-libraries">
 <TabItem title="kotlinx.serialization" group-key="kotlinx">
@@ -119,7 +127,7 @@ JSON データをシリアライズ/デシリアライズするには、kotlinx.
 
 #### XML {id="add_xml_dependency"}
 
-XML をシリアライズ/デシリアライズするには、ビルドスクリプトに `ktor-serialization-kotlinx-xml` を追加します。
+XML をシリアライズおよびデシリアライズするには、ビルドスクリプトに `ktor-serialization-kotlinx-xml` アーティファクトを追加します。
 
 <var name="artifact_name" value="ktor-serialization-kotlinx-xml"/>
 <Tabs group="languages">
@@ -136,7 +144,7 @@ XML をシリアライズ/デシリアライズするには、ビルドスクリ
 
 #### CBOR {id="add_cbor_dependency"}
 
-CBOR をシリアライズ/デシリアライズするには、ビルドスクリプトに `ktor-serialization-kotlinx-cbor` を追加します。
+CBOR をシリアライズおよびデシリアライズするには、ビルドスクリプトに `ktor-serialization-kotlinx-cbor` アーティファクトを追加します。
 
 <var name="artifact_name" value="ktor-serialization-kotlinx-cbor"/>
 <Tabs group="languages">
@@ -153,7 +161,7 @@ CBOR をシリアライズ/デシリアライズするには、ビルドスク�
 
 #### ProtoBuf {id="add_protobuf_dependency"}
 
-ProtoBuf をシリアライズ/デシリアライズするには、ビルドスクリプトに `ktor-serialization-kotlinx-protobuf` を追加します。
+ProtoBuf をシリアライズおよびデシリアライズするには、ビルドスクリプトに `ktor-serialization-kotlinx-protobuf` アーティファクトを追加します。
 
 <var name="artifact_name" value="ktor-serialization-kotlinx-protobuf"/>
 <Tabs group="languages">
@@ -168,15 +176,16 @@ ProtoBuf をシリアライズ/デシリアライズするには、ビルドス�
     </TabItem>
 </Tabs>
 
-## ContentNegotiation のインストール {id="install_plugin"}
+## `ContentNegotiation` のインストール {id="install_plugin"}
 
-`ContentNegotiation` をインストールするには、[クライアント設定ブロック](client-create-and-configure.md#configure-client)内で `install` 関数に渡します。
+`ContentNegotiation` プラグインをインストールするには、[クライアント設定ブロック](client-create-and-configure.md#configure-client)内で `install` 関数に渡します。
 
 ```kotlin
 val client = HttpClient(CIO) {
     install(ContentNegotiation)
 }
 ```
+
 これで、必要な JSON シリアライザーを[設定](#configure_serializer)できるようになります。
 
 ## シリアライザーの設定 {id="configure_serializer"}
@@ -186,7 +195,8 @@ val client = HttpClient(CIO) {
 <Tabs group="json-libraries">
 <TabItem title="kotlinx.serialization" group-key="kotlinx">
 
-アプリケーションに JSON シリアライザーを登録するには、`json` メソッドを呼び出します。
+アプリケーションに JSON シリアライザーを登録するには、`json()` 関数を呼び出します。
+
 ```kotlin
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
@@ -198,7 +208,8 @@ val client = HttpClient(CIO) {
 }
 ```
 
-`json` コンストラクタ内では、[JsonBuilder](https://kotlinlang.org/api/kotlinx.serialization/kotlinx-serialization-json/kotlinx.serialization.json/-json-builder/) API にアクセスできます。例：
+JSON シリアライズをカスタマイズするには、`json()` コンストラクタで `Json` 設定を渡します。
+
 ```kotlin
 val client = HttpClient(CIO) {
     install(ContentNegotiation) {
@@ -210,12 +221,17 @@ val client = HttpClient(CIO) {
 }
 ```
 
-完全な例はこちらにあります: [client-json-kotlinx](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-json-kotlinx)。
+利用可能な設定オプションについては、[`JsonBuilder`](https://kotlinlang.org/api/kotlinx.serialization/kotlinx-serialization-json/kotlinx.serialization.json/-json-builder/) を参照してください。
+
+> 完全な例については、[client-json-kotlinx](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-json-kotlinx) を参照してください。
+>
+{style="tip"}
 
 </TabItem>
 <TabItem title="Gson" group-key="gson">
 
-アプリケーションに Gson シリアライザーを登録するには、[gson](https://api.ktor.io/ktor-serialization-gson/io.ktor.serialization.gson/gson.html) メソッドを呼び出します。
+アプリケーションに Gson シリアライザーを登録するには、[`gson()`](https://api.ktor.io/ktor-serialization-gson/io.ktor.serialization.gson/gson.html) 関数を呼び出します。
+
 ```kotlin
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.gson.*
@@ -227,12 +243,12 @@ val client = HttpClient(CIO) {
 }
 ```
 
-`gson` メソッドでは、[GsonBuilder](https://www.javadoc.io/doc/com.google.code.gson/gson/latest/com.google.gson/com/google/gson/GsonBuilder.html) によって提供されるシリアライズ設定を調整することもできます。
+Gson シリアライズをカスタマイズするには、`gson()` 関数に設定ブロックを渡します。利用可能な設定オプションについては、[`GsonBuilder`](https://www.javadoc.io/doc/com.google.code.gson/gson/latest/com.google.gson/com/google/gson/GsonBuilder.html) を参照してください。
 
 </TabItem>
 <TabItem title="Jackson" group-key="jackson">
 
-アプリケーションに Jackson シリアライザーを登録するには、[jackson](https://api.ktor.io/ktor-serialization-jackson/io.ktor.serialization.jackson/jackson.html) メソッドを呼び出します。
+アプリケーションに Jackson シリアライザーを登録するには、[`jackson()`](https://api.ktor.io/ktor-serialization-jackson/io.ktor.serialization.jackson/jackson.html) 関数を呼び出します。
 
 ```kotlin
 import io.ktor.client.plugins.contentnegotiation.*
@@ -245,7 +261,7 @@ val client = HttpClient(CIO) {
 }
 ```
 
-`jackson` メソッドでは、[ObjectMapper](https://fasterxml.github.io/jackson-databind/javadoc/2.17.2/com/fasterxml/jackson/databind/ObjectMapper.html) によって提供されるシリアライズ設定を調整することもできます。例：
+Jackson シリアライズをカスタマイズするには、[`ObjectMapper`](https://fasterxml.github.io/jackson-databind/javadoc/2.17.2/com/fasterxml/jackson/databind/ObjectMapper.html) によって提供される設定を使用します。
 
 ```kotlin
 import io.ktor.client.plugins.contentnegotiation.*
@@ -268,7 +284,8 @@ val client = HttpClient(CIO) {
 
 ### XML シリアライザー {id="register_xml"}
 
-アプリケーションに XML シリアライザーを登録するには、`xml` メソッドを呼び出します。
+アプリケーションに XML シリアライザーを登録するには、`xml()` 関数を呼び出します。
+
 ```kotlin
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.xml.*
@@ -280,7 +297,7 @@ val client = HttpClient(CIO) {
 }
 ```
 
-`xml` メソッドでは、XML シリアライズ設定にアクセスすることもできます。例：
+XML シリアライズをカスタマイズするには、`xml()` 関数に必要なオプションを渡します。
 
 ```kotlin
 import io.ktor.client.plugins.contentnegotiation.*
@@ -298,7 +315,9 @@ val client = HttpClient(CIO) {
 ```
 
 ### CBOR シリアライザー {id="register_cbor"}
-アプリケーションに CBOR シリアライザーを登録するには、`cbor` メソッドを呼び出します。
+
+アプリケーションに CBOR シリアライザーを登録するには、`cbor()` 関数を呼び出します。
+
 ```kotlin
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.cbor.*
@@ -310,7 +329,7 @@ val client = HttpClient(CIO) {
 }
 ```
 
-`cbor` メソッドでは、[CborBuilder](https://kotlinlang.org/api/kotlinx.serialization/kotlinx-serialization-cbor/kotlinx.serialization.cbor/-cbor-builder/) によって提供される CBOR シリアライズ設定にアクセスすることもできます。例：
+CBOR シリアライズをカスタマイズするには、`cbor()` コンストラクタで `Cbor` 設定を渡します。
 
 ```kotlin
 import io.ktor.client.plugins.contentnegotiation.*
@@ -326,8 +345,12 @@ val client = HttpClient(CIO) {
 }
 ```
 
+利用可能な設定オプションについては、[`CborBuilder`](https://kotlinlang.org/api/kotlinx.serialization/kotlinx-serialization-cbor/kotlinx.serialization.cbor/-cbor-builder/) を参照してください。
+
 ### ProtoBuf シリアライザー {id="register_protobuf"}
-アプリケーションに ProtoBuf シリアライザーを登録するには、`protobuf` メソッドを呼び出します。
+
+アプリケーションに ProtoBuf シリアライザーを登録するには、`protobuf()` 関数を呼び出します。
+
 ```kotlin
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.protobuf.*
@@ -339,7 +362,7 @@ val client = HttpClient(CIO) {
 }
 ```
 
-`protobuf` メソッドでは、[ProtoBufBuilder](https://kotlinlang.org/api/kotlinx.serialization/kotlinx-serialization-protobuf/kotlinx.serialization.protobuf/-proto-buf-builder/) によって提供される ProtoBuf シリアライズ設定にアクセスすることもできます。例：
+ProtoBuf シリアライズをカスタマイズするには、`protobuf()` 関数に `ProtoBuf` 設定を渡します。
 
 ```kotlin
 import io.ktor.client.plugins.contentnegotiation.*
@@ -355,15 +378,37 @@ val client = HttpClient(CIO) {
 }
 ```
 
-## データの受信と送信 {id="receive_send_data"}
+利用可能なオプションについては、[`ProtoBufBuilder`](https://kotlinlang.org/api/kotlinx.serialization/kotlinx-serialization-protobuf/kotlinx.serialization.protobuf/-proto-buf-builder/) を参照してください。
+
+## `Accept` ヘッダーの設定 {id="configure_accept_header"}
+
+デフォルトでは、`ContentNegotiation` プラグインは登録されたコンテンツタイプを送信リクエストの `Accept` ヘッダーに追加します。
+
+`Accept` ヘッダーを明示的に設定しており、プラグインが登録されたコンテンツタイプを追加しないようにしたい場合は、`acceptHeaderMergeStrategy` プロパティを `ContentTypeMergeStrategy.SkipIfPresent` に設定します。
+
+```kotlin
+val client = HttpClient(CIO) {
+    install(ContentNegotiation) {
+        register(ContentType.Application.Json, noOpJsonConverter)
+        acceptHeaderMergeStrategy = ContentTypeMergeStrategy.SkipIfPresent
+    }
+}
+```
+
+`SkipIfPresent` を指定すると、プラグインは既存の `Accept` ヘッダーを保持します。リクエストに `Accept` ヘッダーが含まれていない場合、プラグインは通常どおり登録されたコンテンツタイプを追加します。
+
+## データの送受信 {id="receive_send_data"}
+
 ### データクラスの作成 {id="create_data_class"}
 
-データを送受信するには、データクラスが必要です。例：
+以下の例では、クライアントが送受信するデータを表すために `Customer` データクラスを使用します。
+
 ```kotlin
 data class Customer(val id: Int, val firstName: String, val lastName: String)
 ```
 
-kotlinx.serialization を使用する場合は、このクラスに `@Serializable` アノテーションが付いていることを確認してください。
+`kotlinx.serialization` を使用する場合は、このクラスに `@Serializable` アノテーションを付加してください。
+
 ```kotlin
 @Serializable
 data class Customer(val id: Int, val firstName: String, val lastName: String)
@@ -377,7 +422,9 @@ data class Customer(val id: Int, val firstName: String, val lastName: String)
 
 ### データの送信 {id="send_data"}
 
-[リクエスト](client-requests.md)ボディ内で[クラスインスタンス](#create_data_class)を JSON として送信するには、`setBody` 関数を使用してこのインスタンスを割り当て、`contentType` を呼び出してコンテンツタイプを `application/json` に設定します。
+[リクエスト](client-requests.md)ボディ内で[クラスインスタンス](#create_data_class)を送信するには、`setBody()` 関数を使用してこのインスタンスを割り当て、`contentType()` 関数を使用してコンテンツタイプを設定します。
+
+以下の例では、`Customer` オブジェクトを JSON として送信します。
 
 ```kotlin
 val response: HttpResponse = client.post("http://localhost:8080/customer") {
@@ -386,13 +433,20 @@ val response: HttpResponse = client.post("http://localhost:8080/customer") {
 }
 ```
 
-データを XML または CBOR として送信するには、`contentType` をそれぞれ `ContentType.Application.Xml` または `ContentType.Application.Cbor` に設定します。
+`ContentNegotiation` プラグインは、設定されたシリアライザーを使用してリクエストボディを指定されたフォーマットに変換します。
+
+他の登録されたフォーマットでデータを送信するには、`ContentType.Application.Xml` や `ContentType.Application.Cbor` など、対応するコンテンツタイプを指定します。
 
 ### データの受信 {id="receive_data"}
 
-サーバーが `application/json`、`application/xml`、または `application/cbor` コンテンツを含む[レスポンス](client-responses.md)を送信した場合、レスポンスペイロードを受信するために使用する関数のパラメータとして[データクラス](#create_data_class)を指定することで、それをデシリアライズできます（以下の例では `body`）。
+サーバーがサポートされているコンテンツタイプを含む[レスポンス](client-responses.md)を返した場合、`ContentNegotiation` プラグインはレスポンスボディを期待される型へとデシリアライズできます。
+
+例えば、JSON レスポンスを `Customer` オブジェクトにデシリアライズするには、`body()` 関数を呼び出します。
+
 ```kotlin
 val customer: Customer = client.get("http://localhost:8080/customer/3").body()
 ```
 
-完全な例はこちらにあります: [client-json-kotlinx](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-json-kotlinx)。
+> 完全な例については、[client-json-kotlinx](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-json-kotlinx) を参照してください。
+>
+{style="tip"}

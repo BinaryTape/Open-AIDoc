@@ -5,7 +5,7 @@
 ビデオフレームのサポートを追加するには、拡張ライブラリをインポートします：
 
 ```kotlin
-implementation("io.coil-kt.coil3:coil-video:3.6.2")
+implementation("io.coil-kt.coil3:coil-video:3.6.3")
 ```
 
 そして、`ImageLoader` を構築する際に、コンポーネントレジストリにデコーダーを追加します：

@@ -22,7 +22,7 @@
 - [引入 `ServerConfigBuilder`](#ServerConfigBuilder)。
 - [`embeddedServer()` 傳回 `EmbeddedServer`](#EmbeddedServer) 而非 `ApplicationEngine`。
 
-這些變更將影響依賴於先前模型的現有原始碼。
+這些變更將影響依賴於先前模型的現有程式碼。
 
 #### 重新命名的類別 {id="renamed-classes"}
 
@@ -282,7 +282,9 @@ class ApplicationTest {
 @Test
 fun testHello() = testApplication {
     environment {
-        config = ApplicationConfig("application-custom.conf")
+        config = ApplicationConfig(
+            "application-custom.conf"
+        )
     }
 }
 ```
@@ -392,7 +394,7 @@ install(WebSockets) {
 
 ### 伺服器通訊端 `.bind()` 現在為掛起函式 {id="server-socket-bind-is-now-suspending"}
 
-為了支援 JS 與 WasmJS 環境中的非同步操作，[`TCPSocketBuilder`](https://api.ktor.io/ktor-network/io.ktor.network.sockets/-tcp-socket-builder/index.html) 與 [`UDPSocketBuilder`](https://api.ktor.io/ktor-network/io.ktor.network.sockets/-u-d-p-socket-builder/index.html) 中伺服器通訊端的 `.bind()` 函式已更新為掛起函式 (suspending function)。這意味著現在必須在協同程式內呼叫 `.bind()`。
+為了支援 JS 與 WasmJS 環境中的非同步操作，[`TCPSocketBuilder`](https://api.ktor.io/ktor-network/io.ktor.network.sockets/-tcp-socket-builder/index.html) 與 [`UDPSocketBuilder`](https://api.ktor.io/ktor-network/io.ktor.network.sockets/-u-d-p-socket-builder/index.html) 中伺服器通訊端的 `.bind()` 函式已更新為掛起函式。這意味著現在必須在協同程式內呼叫 `.bind()`。
 
 若要遷移，請確保僅在協同程式或掛起函式中呼叫 `.bind()`。以下是使用 `runBlocking` 的範例：
 
@@ -523,16 +525,16 @@ install(Sessions) {
 
 這影響了許多類別，例如 [`ByteReadChannel`](https://api.ktor.io/3.0.x/ktor-io/io.ktor.utils.io/-byte-read-channel.html) 與 [`ByteWriteChannel`](https://api.ktor.io/3.0.x/ktor-io/io.ktor.utils.io/-byte-write-channel/index.html)。此外，以下 Ktor 類別現在由 `kotlinx-io` 支援，其先前的實作已被棄用：
 
-| Ktor 2.x | Ktor 3.x |
+| Ktor 2.x                                  | Ktor 3.x                  |
 |-------------------------------------------|---------------------------|
-| `io.ktor.utils.io.core.Buffer` | `kotlinx.io.Buffer` |
-| `io.ktor.utils.io.core.BytePacketBuilder` | `kotlinx.io.Sink` |
-| `io.ktor.utils.io.core.ByteReadPacket` | `kotlinx.io.Source` |
-| `io.ktor.utils.io.core.Input` | `kotlinx.io.Source` |
-| `io.ktor.utils.io.core.Output` | `kotlinx.io.Sink` |
-| `io.ktor.utils.io.core.Sink` | `kotlinx.io.Buffer` |
-| `io.ktor.utils.io.errors.EOFException` | `kotlinx.io.EOFException` |
-| `io.ktor.utils.io.errors.IOException` | `kotlinx.io.IOException` |
+| `io.ktor.utils.io.core.Buffer`            | `kotlinx.io.Buffer`       |
+| `io.ktor.utils.io.core.BytePacketBuilder` | `kotlinx.io.Sink`         |
+| `io.ktor.utils.io.core.ByteReadPacket`    | `kotlinx.io.Source`       |
+| `io.ktor.utils.io.core.Input`             | `kotlinx.io.Source`       |
+| `io.ktor.utils.io.core.Output`            | `kotlinx.io.Sink`         |
+| `io.ktor.utils.io.core.Sink`              | `kotlinx.io.Buffer`       |
+| `io.ktor.utils.io.errors.EOFException`    | `kotlinx.io.EOFException` |
+| `io.ktor.utils.io.errors.IOException`     | `kotlinx.io.IOException`  |
 
 棄用的 API 將被支援至 Ktor 4.0，但我們建議您儘早進行遷移。若要遷移您的應用程式，請更新您的程式碼以使用來自 `kotlinx-io` 的對應方法。
 

@@ -6,7 +6,7 @@
 
 <tldr>
 <p>
-<b>所需依赖</b>：<code>io.ktor:%artifact_name%</code>
+<b>所需依赖项</b>：<code>io.ktor:%artifact_name%</code>
 </p>
 <var name="example_name" value="auth-digest"/>
 <p>
@@ -28,7 +28,8 @@ Ktor 允许你使用 Digest 摘要认证来登录用户并保护特定的 [路�
 
 > Digest 摘要认证提供比 [基本认证](server-basic-auth.md) 更强的安全性，因为密码永远不会以明文形式发送。然而，建议在生产环境中使用 [HTTPS/TLS](server-ssl.md) 以增加传输层安全性。
 
-## 添加依赖 {id="add_dependencies"}
+## 添加依赖项 {id="add_dependencies"}
+
 要启用 `digest` 身份验证，你需要在构建脚本中包含 `%artifact_name%` 构件：
 
 <Tabs group="languages">
@@ -78,16 +79,17 @@ Digest 摘要认证流程如下：
 
    `response` 值按以下方式生成：
 
-   * `HA1 = H(username:realm:password)`，其中 `H` 是配置的哈希算法（例如 SHA-512-256）
+    * `HA1 = H(username:realm:password)`，其中 `H` 是配置的哈希算法（例如 SHA-512-256）
    > 这部分 [存储](#digest-table) 在服务器上，可供 Ktor 用于验证用户凭据。
 
-   * `HA2 = H(method:digestURI)`（适用于 `qop=auth`）或 `HA2 = H(method:digestURI:H(entityBody))`（适用于 `qop=auth-int`）
+    * `HA2 = H(method:digestURI)`（适用于 `qop=auth`）或 `HA2 = H(method:digestURI:H(entityBody))`（适用于 `qop=auth-int`）
 
-   * `response = H(HA1:nonce:nc:cnonce:qop:HA2)`
+    * `response = H(HA1:nonce:nc:cnonce:qop:HA2)`
 
 4. 服务器 [验证](#configure-provider) 客户端发送的凭据并返回请求的内容。在使用 QoP 成功通过身份验证后，服务器还会返回 `Authentication-Info` 标头以进行双向认证。
 
 ## 安装 Digest 摘要认证 {id="install"}
+
 要安装 `digest` 身份验证提供程序，请在 `install` 块内调用 [digest](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/digest.html) 函数：
 
 ```kotlin
@@ -100,6 +102,7 @@ install(Authentication) {
     }
 }
 ```
+
 你可以选择性地指定一个 [提供程序名称](server-auth.md#provider-name)，该名称可用于 [验证指定的路由](#authenticate-route)。
 
 ## 配置 Digest 摘要认证 {id="configure"}
@@ -123,7 +126,10 @@ Ktor 为 Digest 摘要认证支持多种哈希算法。你可以使用 `algorith
 install(Authentication) {
     digest("auth-digest") {
         realm = "Access to the '/' path"
-        algorithms = listOf(DigestAlgorithm.SHA_512_256, DigestAlgorithm.MD5)
+        algorithms = listOf(
+            DigestAlgorithm.SHA_512_256,
+            DigestAlgorithm.MD5
+        )
         // ...
     }
 }
@@ -138,10 +144,12 @@ install(Authentication) {
 `-sess` 算法变体（例如 `SHA-512-256-sess`、`SHA-256-sess`、`MD5-sess`）修改了 `HA1` 哈希的计算方式。会话算法计算 `H(H(username:realm:password):nonce:cnonce)`，而不是存储 `H(username:realm:password)`，其中 `cnonce` 是客户端提供的 nonce。
 
 **优点：**
+
 - 会话特定的哈希可防止预计算字典攻击
 - 某个会话的哈希泄露不会暴露密码，也不会对其他会话造成帮助
 
 **缺点：**
+
 - 服务器必须为每个身份验证请求计算哈希（不能使用预计算的值）
 
 对于大多数应用程序，标准（非会话）算法已经足够，尤其是与 SHA-512-256 等强哈希函数配合使用时。
@@ -158,50 +166,117 @@ val userPasswords: Map<String, String> = mapOf(
     "admin" to "password"
 )
 
-fun computeHash(userName: String, realm: String, password: String, algorithm: DigestAlgorithm): ByteArray =
-    algorithm.toDigester().digest("$userName:$realm:$password".toByteArray(UTF_8))
-
+fun computeHash(
+    userName: String,
+    realm: String,
+    password: String,
+    algorithm: DigestAlgorithm
+): ByteArray =
+    algorithm.toDigester()
+        .digest("$userName:$realm:$password".toByteArray(UTF_8))
 ```
 
 ### 步骤 3：配置 Digest 提供程序 {id="configure-provider"}
 
+<Tabs group="auth-dsl">
+<TabItem title="Classic" group-key="classic">
+
 `digest` 身份验证提供程序通过 [DigestAuthenticationProvider.Config](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-digest-authentication-provider/-config/index.html) 类公开其设置。在下面的示例中，指定了以下设置：
+
 * `realm` 属性设置要在 `WWW-Authenticate` 标头中传递的 realm。
 * `algorithms` 属性指定要接受的哈希算法。
 * `digestProvider` 函数获取指定用户名和算法的摘要 `HA1` 部分。
 * （可选）`validate` 函数允许你将凭据映射到自定义 principal。
 
 ```kotlin
-fun Application.main() {
-    install(Authentication) {
-        digest("auth-digest") {
-            realm = myRealm
-            // 支持现代 SHA-512-256 和旧版 MD5 客户端
-            algorithms = listOf(DigestAlgorithm.SHA_512_256, DigestAlgorithm.MD5)
-            digestProvider { userName, realm, algorithm ->
-                // 使用请求的算法计算 H(username:realm:password)
-                userPasswords[userName]?.let { password ->
-                    computeHash(userName, realm, password, algorithm)
-                }
+install(Authentication) {
+    digest("auth-digest") {
+        realm = myRealm
+        // 同时支持现代 SHA-512-256
+        // 和旧版 MD5 客户端
+        algorithms = listOf(
+            DigestAlgorithm.SHA_512_256,
+            DigestAlgorithm.MD5
+        )
+        digestProvider { userName, realm, algorithm ->
+            // 使用请求的算法计算
+            // H(username:realm:password)
+            userPasswords[userName]?.let { password ->
+                computeHash(
+                    userName, realm, password, algorithm
+                )
             }
-            validate { credentials ->
-                if (credentials.userName.isNotEmpty()) {
-                    CustomPrincipal(credentials.userName, credentials.realm)
-                } else {
-                    null
-                }
+        }
+        validate { credentials ->
+            if (credentials.userName.isNotEmpty()) {
+                CustomPrincipal(
+                    credentials.userName,
+                    credentials.realm
+                )
+            } else {
+                null
             }
         }
     }
 }
-
-data class CustomPrincipal(val userName: String, val realm: String)
 ```
 
-`digestProvider` 函数接收三个参数：
-- `userName` - 客户端请求中的用户名
+</TabItem>
+<TabItem title="Type-safe" group-key="typed">
+
+<note>
+    <p>
+        类型安全身份验证方案 API 为实验性功能。可能会随时弃用或更改。需要显式选择启用 (Opt-in)。详情请参阅
+        <a href="server-typed-auth.md#prerequisites">启用 API</a>。
+    </p>
+</note>
+
+`digest()` 函数为你选择的 principal 类型创建一个方案。无需 `install(Authentication)` 步骤：该方案是一个值，你可以将其传递给需要它的路由。
+
+```kotlin
+data class CustomPrincipal(
+    val userName: String,
+    val realm: String
+)
+
+val digestAuth = digest<CustomPrincipal>("auth-digest") {
+    realm = myRealm
+    // 同时支持现代 SHA-512-256
+    // 和旧版 MD5 客户端
+    algorithms = listOf(
+        DigestAlgorithm.SHA_512_256,
+        DigestAlgorithm.MD5
+    )
+    digestProvider { userName, realm, algorithm ->
+        // 使用请求的算法计算
+        // H(username:realm:password)
+        userPasswords[userName]?.let { password ->
+            computeHash(userName, realm, password, algorithm)
+        }
+    }
+    validate { credentials ->
+        if (credentials.userName.isNotEmpty()) {
+            CustomPrincipal(
+                credentials.userName,
+                credentials.realm
+            )
+        } else {
+            null
+        }
+    }
+}
+```
+
+类型安全的 `digest()` 函数仅在 JVM 上可用。如需查看完整 API，请参阅[类型安全身份验证](server-typed-auth.md)。
+
+</TabItem>
+</Tabs>
+
+`digestProvider` 函数接收三个形参：
+
+- `userName` – 客户端请求中的用户名
 - `realm` - 配置的 realm
-- `algorithm` - 客户端正在使用的哈希算法
+- `algorithm` – 客户端正在使用的哈希算法
 
 你应该返回使用指定算法计算的 `HA1` 哈希，如果未找到用户，则返回 `null`。
 
@@ -211,14 +286,17 @@ data class CustomPrincipal(val userName: String, val realm: String)
 
 保护质量 (QoP) 决定了摘要计算中包含的内容：
 
-- `DigestQop.AUTH` - 仅身份验证（默认）。摘要包括请求方法和 URI。
-- `DigestQop.AUTH_INT` - 带有完整性保护的身份验证。摘要还包括请求正文，提供防止篡改的保护。
+- `DigestQop.AUTH` – 仅身份验证（默认）。摘要包括请求方法和 URI。
+- `DigestQop.AUTH_INT` – 带有完整性保护的身份验证。摘要还包括请求正文，提供防止篡改的保护。
 
 ```kotlin
 install(Authentication) {
     digest("auth-digest") {
         realm = "Secure API"
-        supportedQop = listOf(DigestQop.AUTH, DigestQop.AUTH_INT)
+        supportedQop = listOf(
+            DigestQop.AUTH,
+            DigestQop.AUTH_INT
+        )
         // ...
     }
 }
@@ -228,19 +306,40 @@ install(Authentication) {
 
 ### 步骤 5：保护特定资源 {id="authenticate-route"}
 
+<Tabs group="auth-dsl">
+<TabItem title="Classic" group-key="classic">
+
 配置好 `digest` 提供程序后，你可以使用 **[authenticate](server-auth.md#authenticate-route)** 函数保护应用程序中的特定资源。在身份验证成功的情况下，你可以在路由处理程序中使用 `call.principal` 函数检索经过身份验证的 [Principal](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-principal/index.html)，并获取经过身份验证的用户名。
 
 ```kotlin
-        authenticate("auth-digest") {
-            get("/") {
-                call.respondText("Hello, ${call.principal<CustomPrincipal>()?.userName}!")
-            }
+routing {
+    authenticate("auth-digest") {
+        get("/") {
+            val user = call.principal<CustomPrincipal>()
+            call.respondText("Hello, ${user?.userName}!")
         }
     }
 }
-
-data class CustomPrincipal(val userName: String, val realm: String)
 ```
+
+</TabItem>
+<TabItem title="Type-safe" group-key="typed">
+
+将方案传递给 `authenticateWith()`。在该代码块内部，`call.principal` 即为你指定的 principal 类型且永远不为 `null`，因此无需转换或进行 null 检查：
+
+```kotlin
+routing {
+    authenticateWith(digestAuth) {
+        get("/") {
+            val user = call.principal
+            call.respondText("Hello, ${user.userName}!")
+        }
+    }
+}
+```
+
+</TabItem>
+</Tabs>
 
 ## 高级配置 {id="advanced"}
 
@@ -260,8 +359,8 @@ install(Authentication) {
             // 从哈希中查找实际用户名
             users.find { username ->
                 val digester = algorithm.toDigester()
-                val computedHash = hex(digester.digest("$username:$realm".toByteArray()))
-                computedHash == userhash
+                val bytes = "$username:$realm".toByteArray()
+                hex(digester.digest(bytes)) == userhash
             }
         }
         digestProvider { userName, realm, algorithm ->
@@ -290,6 +389,7 @@ install(Authentication) {
 ```
 
 严格模式：
+
 - 移除了 MD5 算法（仅允许 SHA-256、SHA-512-256 及其会话变体）
 - 强制使用 UTF-8 字符集
 
@@ -310,6 +410,7 @@ install(Authentication) {
 ### Authentication-Info 标头 {id="auth-info"}
 
 在使用 QoP 成功通过身份验证后，服务器会自动返回 `Authentication-Info` 标头，其中包含：
+
 - `rspauth` - 用于双向认证的响应认证值
 - `nextnonce` - 供客户端使用的下一个 nonce
 - `qop`、`nc`、`cnonce` - 身份验证参数的回显

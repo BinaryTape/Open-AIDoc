@@ -14,7 +14,7 @@
 
 然而，在当前设计中，`Application` 负责创建、拥有并初始化 `ApplicationEngine` 和 `ApplicationEnvironment`。
 
-这种重构带来了一系列破坏性变更：
+这种重组带来了一系列破坏性变更：
 
 - [`ApplicationEngineEnvironmentBuilder` 和 `applicationEngineEnvironment` 类已重命名](#renamed-classes)。
 - [`ApplicationEngineEnvironment` 中移除了 `start()` 和 `stop()` 方法](#ApplicationEnvironment)。
@@ -40,7 +40,7 @@
 | `ApplicationEngineEnvironment.start()`                | `ApplicationEngine.start()`          |
 | `ApplicationEngineEnvironment.stop()`                 | `ApplicationEngine.stop()`           |
 
-此外，在下表中，您可以查看已移除的属性及其当前的对应所属关系：
+此外，在下表中，您可以查看已移除的属性列表及其当前的对应所属关系：
 
 | 2.x.x | 3.0.x |
 |-------------------------------------------------|----------------------------------------------|
@@ -281,7 +281,9 @@ class ApplicationTest {
 @Test
 fun testHello() = testApplication {
     environment {
-        config = ApplicationConfig("application-custom.conf")
+        config = ApplicationConfig(
+            "application-custom.conf"
+        )
     }
 }
 ```
@@ -409,11 +411,11 @@ install(WebSockets) {
 
 ### 二进制和文件项的新默认限制 {id="new-default-limit-for-binary-and-file-items"}
 
-在 Ktor 3.0.0 中，使用 [`ApplicationCall.receiveMultipart()`](https://api.ktor.io/3.0.x/ktor-server-core/io.ktor.server.request/receive-multipart.html) 接收二进制和文件项时，引入了 50 MB 的默认限制。如果接收到的文件或二进制项超过 50 MB 限制，则会抛出 `IOException`。
+在 Ktor 3.0.0 中，使用 [`ApplicationCall.receiveMultipart()`](https://api.ktor.io/3.0.x/ktor-server-core/io.ktor.server.request/receive-multipart.html) 接收二进制和文件项时，引入了 50 MiB 的默认限制。如果接收到的文件或二进制项超过 50 MiB 限制，则会抛出 `IOException`。
 
 #### 重写默认限制 {id="override-the-default-limit"}
 
-如果您的应用程序之前依赖于在没有显式配置的情况下处理大于 50 MB 的文件，您将需要更新代码以避免意外行为。
+如果您的应用程序之前依赖于在没有显式配置的情况下处理大于 50 MiB 的文件，您将需要更新代码以避免意外行为。
 
 要重写默认限制，请在调用 `.receiveMultipart()` 时传递 `formFieldLimit` 参数：
 

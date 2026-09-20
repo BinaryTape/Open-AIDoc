@@ -20,7 +20,7 @@ Kotlinでは、格納されているオブジェクトの具体的な型に関�
 >
 {style="note"}
 
-## コレクション型 {id="collection-types"}
+## Collection types {id="collection-types"}
 
 Kotlin標準ライブラリは、基本的なコレクション型（セット、リスト、マップ）の実装を提供しています。各コレクション型は、一対のインターフェースで表されます。
 

@@ -6,38 +6,38 @@
 <var name="example_name" value="custom-plugin-base-api"/>
 <p>
     <b>コード例</b>:
-    <a href="https://github.com/ktorio/ktor-documentation/tree/%ktor_version%/codeSnippets/snippets/%example_name%">
+    <a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/%example_name%">
         %example_name%
     </a>
 </p>
 </tldr>
 
-> v2.0.0 以降、Ktor は[カスタムプラグインを作成する](server-custom-plugins.md)ための新しい簡素化された API を提供しています。
->
-{type="note"}
+Ktor は、複数のアプリケーションで再利用可能な機能を実装するカスタム[プラグイン](server-plugins.md)を開発するための Base API を提供しています。
 
-Ktor は、共通の機能を実装し、複数のアプリケーションで再利用可能なカスタム[プラグイン](server-plugins.md)を開発するための API を公開しています。
-この API を使用すると、さまざまな[パイプライン](#pipelines)フェーズをインターセプトして、リクエスト/レスポンス処理にカスタムロジックを追加できます。
-例えば、`Monitoring` フェーズをインターセプトして、受信リクエストをログに記録したり、メトリクスを収集したりできます。
+Base API を使用すると、さまざまな[パイプライン](#pipelines)フェーズをインターセプトして、リクエストとレスポンスの処理にカスタムロジックを追加できます。例えば、`Monitoring` フェーズをインターセプトして、受信リクエストをログに記録したり、メトリクスを収集したりできます。
 
 ## プラグインを作成する {id="create"}
-カスタムプラグインを作成するには、以下の手順に従います。
 
-1. プラグインクラスを作成し、以下のいずれかのインターフェースを実装する[コンパニオンオブジェクトを宣言](#create-companion)します。
-   - プラグインをアプリケーションレベルで動作させる場合は [BaseApplicationPlugin](https://api.ktor.io/ktor-server-core/io.ktor.server.application/-base-application-plugin/index.html)。
-   - プラグインを[特定のルートにインストール](server-plugins.md#install-route)できるようにする場合は [BaseRouteScopedPlugin](https://api.ktor.io/ktor-server-core/io.ktor.server.application/-base-route-scoped-plugin/index.html)。
-2. このコンパニオンオブジェクトの `key` と `install` メンバを[実装](#implement)します。
+Base API を使用してカスタムプラグインを作成するには、以下の手順に従います。
+
+1. プラグインクラスを作成し、プラグインインターフェースを実装する[コンパニオンオブジェクトを宣言](#create-companion)します。
+2. コンパニオンオブジェクト内で `key` プロパティと `install()` 関数を[実装](#implement)します。
 3. [プラグインのコンフィギュレーション](#plugin-configuration)を提供します。
 4. 必要なパイプラインフェーズをインターセプトして[コールを処理](#call-handling)します。
 5. [プラグインをインストール](#install)します。
 
 ### コンパニオンオブジェクトを作成する {id="create-companion"}
 
-カスタムプラグインのクラスには、`BaseApplicationPlugin` または `BaseRouteScopedPlugin` インターフェースを実装するコンパニオンオブジェクトが必要です。
-`BaseApplicationPlugin` インターフェースは、次の 3 つの型パラメータを受け取ります：
-- このプラグインが互換性を持つパイプラインの型。
-- このプラグインの[コンフィギュレーションオブジェクトの型](#plugin-configuration)。
-- プラグインオブジェクト自体の型。
+カスタムプラグインのクラスには、以下のいずれかのインターフェースを実装するコンパニオンオブジェクトが必要です：
+
+* アプリケーションレベルのプラグイン用の [`BaseApplicationPlugin`](https://api.ktor.io/ktor-server-core/io.ktor.server.application/-base-application-plugin/index.html)。
+* [特定のルートにインストールされる](server-plugins.md#install-route)プラグイン用の [`BaseRouteScopedPlugin`](https://api.ktor.io/ktor-server-core/io.ktor.server.application/-base-route-scoped-plugin/index.html)。
+
+`BaseApplicationPlugin` インターフェースは、以下の型パラメータを受け取ります：
+
+* プラグインがサポートするパイプラインの型。
+* プラグインの[コンフィギュレーションの型](#plugin-configuration)。
+* プラグインインスタンス自体の型。
 
 ```kotlin
 class CustomHeader() {
@@ -47,11 +47,12 @@ class CustomHeader() {
 }
 ```
 
-### 'key' と 'install' メンバを実装する {id="implement"}
+### 'key' プロパティと 'install()' 関数を実装する {id="implement"}
 
-`BaseApplicationPlugin` インターフェースを実装するコンパニオンオブジェクトは、2 つのメンバを実装する必要があります。
-- `key` プロパティは、プラグインを識別するために使用されます。Ktor はすべての属性のマップを保持しており、各プラグインは指定されたキーを使用して自身をこのマップに追加します。
-- `install` 関数を使用すると、プラグインの動作を設定できます。ここではパイプラインをインターセプトし、プラグインのインスタンスを返す必要があります。パイプラインをインターセプトしてコールを処理する方法については、[次の章](#call-handling)で詳しく説明します。
+`BaseApplicationPlugin` を実装するコンパニオンオブジェクトは、以下を定義する必要があります：
+
+* `key` プロパティはプラグインを識別します。Ktor はプラグインインスタンスをアプリケーションの属性に保存し、このキーを使用してプラグインインスタンスにアクセスします。
+* `install()` 関数はプラグインを設定します。この関数内では、必要なパイプラインフェーズをインターセプトし、プラグインインスタンスを返します。[コールを処理する](#call-handling)セクションでは、パイプラインフェーズをインターセプトする方法を説明しています。
 
 ```kotlin
 class CustomHeader() {
@@ -59,7 +60,7 @@ class CustomHeader() {
         override val key = AttributeKey<CustomHeader>("CustomHeader")
         override fun install(pipeline: ApplicationCallPipeline, configure: Configuration.() -> Unit): CustomHeader {
             val plugin = CustomHeader()
-            // パイプラインをインターセプトする ...
+            // Intercept a pipeline ...
             return plugin
         }
     }
@@ -68,13 +69,15 @@ class CustomHeader() {
 
 ### コールを処理する {id="call-handling"}
 
-カスタムプラグインでは、[既存のパイプラインフェーズ](#pipelines)または新しく定義されたフェーズをインターセプトすることで、リクエストとレスポンスを処理できます。例えば、[認証 (Authentication)](server-auth.md) プラグインは、デフォルトのパイプラインに `Authenticate` と `Challenge` というカスタムフェーズを追加します。このように、特定のパイプラインをインターセプトすることで、コールのさまざまなステージにアクセスできます。例：
+カスタムプラグインでは、[既存のパイプラインフェーズ](#pipelines)または新しく定義されたフェーズをインターセプトすることで、リクエストとレスポンスを処理できます。例えば、[認証 (Authentication)](server-auth.md) プラグインは、デフォルトのパイプラインに `Authenticate` と `Challenge` のカスタムフェーズを追加します。
 
-- `ApplicationCallPipeline.Monitoring`: このフェーズのインターセプトは、リクエストのログ記録やメトリクスの収集に使用できます。
-- `ApplicationCallPipeline.Plugins`: レスポンスパラメータの変更（カスタムヘッダーの追加など）に使用できます。
-- `ApplicationReceivePipeline.Transform` および `ApplicationSendPipeline.Transform`: クライアントから受信したデータの取得や[変換](#transform)、送信前のデータ変換を行うことができます。
+特定のフェーズをインターセプトすることで、コール処理の特定のステージにアクセスできます：
 
-以下の例は、`ApplicationCallPipeline.Plugins` フェーズをインターセプトし、各レスポンスにカスタムヘッダーを追加する方法を示しています。
+* `ApplicationCallPipeline.Monitoring`: リクエストのログ記録、メトリクス、トレース、および同様のモニタリングタスクにこのフェーズを使用します。
+* `ApplicationCallPipeline.Plugins`: コールを処理したり、カスタムヘッダーの追加などレスポンスパラメータを変更したりするためにこのフェーズを使用します。
+* `ApplicationReceivePipeline.Transform` および `ApplicationSendPipeline.Transform`: クライアントから受信したデータまたはクライアントに送信されるデータにアクセスし、[変換](#transform)するためにこれらのフェーズを使用します。
+
+以下の例は、`ApplicationCallPipeline.Plugins` フェーズをインターセプトし、各レスポンスにカスタムヘッダーを追加します：
 
 ```kotlin
 class CustomHeader() {
@@ -91,13 +94,17 @@ class CustomHeader() {
 }
 ```
 
-このプラグインでは、カスタムヘッダーの名前と値がハードコードされていることに注意してください。プラグインに[コンフィギュレーションを提供](#plugin-configuration)し、必要なカスタムヘッダー名と値を渡せるようにすることで、より柔軟にすることができます。
+この例では、ヘッダー名と値がハードコードされています。プラグインを再利用可能にするには、ユーザーがヘッダー名と値を指定できるように[コンフィギュレーションを提供](#plugin-configuration)します。
 
-> カスタムプラグインを使用すると、コールに関連する任意の値を共有できるため、そのコールを処理するハンドラー内からその値にアクセスできます。詳細は [コールの状態を共有する](server-custom-plugins.md#call-state) を参照してください。
+> カスタムプラグインは、コールに関連する値を異なるハンドラー間で共有できます。詳細については、[コールの状態を共有する](server-custom-plugins.md#call-state)を参照してください。
+>
+{style="tip"}
 
 ### プラグインのコンフィギュレーションを提供する {id="plugin-configuration"}
 
-[前の章](#call-handling)では、定義済みのカスタムヘッダーを各レスポンスに追加するプラグインの作成方法を示しました。このプラグインをより便利にするために、必要なカスタムヘッダー名と値を渡すためのコンフィギュレーションを提供しましょう。まず、プラグインのクラス内にコンフィギュレーションクラスを定義する必要があります。
+[前のセクション](#call-handling)では、定義済みのカスタムヘッダーを各レスポンスに追加するプラグインを作成する方法を示しました。このプラグインを再利用可能にするために、ユーザーがヘッダー名と値を指定できるようにコンフィギュレーションを定義しましょう。
+
+まず、プラグインクラス内にコンフィギュレーションクラスを定義します：
 
 ```kotlin
 class Configuration {
@@ -106,7 +113,7 @@ class Configuration {
 }
 ```
 
-プラグインのコンフィギュレーションフィールドは可変（mutable）であるため、ローカル変数に保存することをお勧めします。
+プラグインのコンフィギュレーションプロパティは、プラグインのインストール中に更新できます。プラグインがインターセプター内でこれらの値を使用する場合は、`install()` 関数内のローカル変数に保存します：
 
 ```kotlin
 class CustomHeader(configuration: Configuration) {
@@ -120,7 +127,7 @@ class CustomHeader(configuration: Configuration) {
 }
 ```
 
-最後に、`install` 関数内でこのコンフィギュレーションを取得し、そのプロパティを使用できます。
+次に、`install()` 関数内でコンフィギュレーションを読み取り、そのプロパティを使用します：
 
 ```kotlin
 class CustomHeader(configuration: Configuration) {
@@ -148,7 +155,7 @@ class CustomHeader(configuration: Configuration) {
 
 ### プラグインをインストールする {id="install"}
 
-カスタムプラグインをアプリケーションに[インストール](server-plugins.md#install)するには、`install` 関数を呼び出し、必要な[コンフィギュレーション](#plugin-configuration)パラメータを渡します。
+カスタムプラグインをアプリケーションに[インストール](server-plugins.md#install)するには、`Application.install()` 関数を呼び出し、必要な[コンフィギュレーション](#plugin-configuration)パラメータを渡します：
 
 ```kotlin
 install(CustomHeader) {
@@ -159,12 +166,15 @@ install(CustomHeader) {
 
 ## 例 {id="examples"}
 
-以下のコードスニペットは、カスタムプラグインのいくつかの例を示しています。
-実行可能なプロジェクトはこちらにあります: [custom-plugin-base-api](https://github.com/ktorio/ktor-documentation/blob/%ktor_version%/codeSnippets/snippets/custom-plugin-base-api)
+以下の例は、Base API で構築されたいくつかのカスタムプラグインを示しています。
+
+> 実行可能な完全なプロジェクトについては、[custom-plugin-base-api](https://github.com/ktorio/ktor-documentation/blob/%ktor_version%/codeSnippets/snippets/custom-plugin-base-api) を参照してください。
+>
+{style="tip"}
 
 ### リクエストのログ記録 {id="request-logging"}
 
-以下の例は、受信リクエストをログに記録するためのカスタムプラグインを作成する方法を示しています。
+以下の例は、受信リクエストをログに記録するカスタムプラグインを作成します：
 
 ```kotlin
 package com.example.plugins
@@ -193,7 +203,7 @@ class RequestLogging {
 
 ### カスタムヘッダー {id="custom-header"}
 
-この例は、各レスポンスにカスタムヘッダーを追加するプラグインを作成する方法を示しています。
+以下の例は、各レスポンスにカスタムヘッダーを追加するプラグインを作成します：
 
 ```kotlin
 package com.example.plugins
@@ -228,9 +238,7 @@ class CustomHeader(configuration: Configuration) {
 
 ### ボディの変換 {id="transform"}
 
-以下の例は、次の方法を示しています。
-- クライアントから受信したデータの変換
-- クライアントに送信するデータの変換
+以下の例は、リクエストボディとレスポンスボディを変換するプラグインを作成します：
 
 ```kotlin
 package com.example.plugins
@@ -248,7 +256,7 @@ class DataTransformation {
         override fun install(pipeline: ApplicationCallPipeline, configure: Configuration.() -> Unit): DataTransformation {
             val plugin = DataTransformation()
             pipeline.receivePipeline.intercept(ApplicationReceivePipeline.Transform) { data ->
-                val newValue = (data as ByteReadChannel).readUTF8Line()?.toInt()?.plus(1)
+                val newValue = (data as ByteReadChannel).readLine()?.toInt()?.plus(1)
                 if (newValue != null) {
                     proceedWith(newValue)
                 }
@@ -268,29 +276,30 @@ class DataTransformation {
 
 ## パイプライン {id="pipelines"}
 
-Ktor における [Pipeline](https://api.ktor.io/ktor-utils/io.ktor.util.pipeline/-pipeline/index.html) はインターセプターのコレクションであり、1 つ以上の順序付けられたフェーズにグループ化されています。各インターセプターは、リクエスト処理の前後にカスタムロジックを実行できます。
+Ktor における [`Pipeline`](https://api.ktor.io/ktor-utils/io.ktor.util.pipeline/-pipeline/index.html) は、1 つ以上の順序付けられたフェーズにグループ化されたインターセプターのコレクションです。各インターセプターは、リクエスト処理が続行される前後にカスタムロジックを実行できます。
 
-[ApplicationCallPipeline](https://api.ktor.io/ktor-server-core/io.ktor.server.application/-application-call-pipeline/index.html) は、アプリケーションコールを実行するためのパイプラインです。このパイプラインは 5 つのフェーズを定義しています：
+[`ApplicationCallPipeline`](https://api.ktor.io/ktor-server-core/io.ktor.server.application/-application-call-pipeline/index.html) は、アプリケーションコールを実行します。以下のフェーズを定義しています：
 
-- `Setup`: コールとその属性を処理のために準備するために使用されるフェーズ。
-- `Monitoring`: コールをトレースするためのフェーズ。リクエストのログ記録、メトリクスの収集、エラー処理などに役立ちます。
-- `Plugins`: [コールを処理](#call-handling)するために使用されるフェーズ。ほとんどのプラグインはこのフェーズでインターセプトします。
-- `Call`: コールを完了するために使用されるフェーズ。
-- `Fallback`: 未処理のコールを処理するためのフェーズ。
+* `Setup`: 処理のためにコールとその属性を準備します。
+* `Monitoring`: コールをトレースします。リクエストのログ記録、メトリクス、エラー処理、および同様のタスクにこのフェーズを使用します。
+* `Plugins`: コールを処理します。ほとんどのプラグインはこのフェーズをインターセプトします。
+* `Call`: コールを完了します。
+* `Fallback`: それ以前のフェーズで処理されなかったコールを処理します。
 
 ## パイプラインフェーズから新しい API ハンドラーへのマッピング {id="mapping"}
 
-v2.0.0 以降、Ktor は[カスタムプラグインを作成する](server-custom-plugins.md)ための新しい簡素化された API を提供しています。
-一般的に、この API はパイプラインやフェーズなどの内部的な Ktor の概念を理解する必要はありません。代わりに、`onCall`、`onCallReceive`、`onCallRespond` などのさまざまなハンドラーを使用して、[リクエストとレスポンスの処理](#call-handling)の異なるステージにアクセスできます。
-以下の表は、パイプラインフェーズが新しい API のハンドラーにどのように対応するかを示しています。
+簡素化された[カスタムプラグイン API](server-custom-plugins.md) を使用してカスタムプラグインを作成できます。多くの場合、この API ではパイプラインやフェーズなどの内部的な Ktor の概念を直接理解する必要はありません。代わりに、[リクエストとレスポンスの処理](server-custom-plugins.md#call-handling)の異なるステージに対応する `onCall()`、`onCallReceive()`、`onCallRespond()` などのハンドラーが提供されています。
 
-| Base API                               | 新しい API                                                 |
-|----------------------------------------|---------------------------------------------------------|
-| `ApplicationCallPipeline.Setup` の前 | [on(CallFailed)](server-custom-plugins.md#other)               |
-| `ApplicationCallPipeline.Setup`        | [on(CallSetup)](server-custom-plugins.md#other)                |
-| `ApplicationCallPipeline.Plugins`      | [onCall](server-custom-plugins.md#on-call)                     |
-| `ApplicationReceivePipeline.Transform` | [onCallReceive](server-custom-plugins.md#on-call-receive)      |
-| `ApplicationSendPipeline.Transform`    | [onCallRespond](server-custom-plugins.md#on-call-respond)      |
-| `ApplicationSendPipeline.After`        | [on(ResponseBodyReadyForSend)](server-custom-plugins.md#other) |
-| `ApplicationSendPipeline.Engine`       | [on(ResponseSent)](server-custom-plugins.md#other)             |
-| `Authentication.ChallengePhase` の後  | [on(AuthenticationChecked)](server-custom-plugins.md#other)    |
+以下の表は、Base API のパイプラインフェーズが簡素化された API のハンドラーにどのようにマッピングされるかを示しています：
+
+| Base API                               | 新しい API                                                             |
+|----------------------------------------|---------------------------------------------------------------------|
+| `ApplicationCallPipeline.Setup` の前   | [`on(CallFailed)`](server-custom-plugins.md#other)                  |
+| `ApplicationCallPipeline.Setup`        | [`on(CallSetup)`](server-custom-plugins.md#other)                   |
+| `ApplicationCallPipeline.Plugins`      | [`onCall()`](server-custom-plugins.md#on-call)                      |
+| `ApplicationCallPipeline.Call`         | [`onCallValidators()`](server-custom-plugins.md#on-call-validators) |
+| `ApplicationReceivePipeline.Transform` | [`onCallReceive()`](server-custom-plugins.md#on-call-receive)       |
+| `ApplicationSendPipeline.Transform`    | [`onCallRespond()`](server-custom-plugins.md#on-call-respond)       |
+| `ApplicationSendPipeline.After`        | [`on(ResponseBodyReadyForSend)`](server-custom-plugins.md#other)    |
+| `ApplicationSendPipeline.Engine`       | [`on(ResponseSent)`](server-custom-plugins.md#other)                |
+| `Authentication.ChallengePhase` の後   | [`on(AuthenticationChecked)`](server-custom-plugins.md#other)       |

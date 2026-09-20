@@ -78,10 +78,14 @@ install(Authentication) {
 ## フォーム認証の設定 {id="configure"}
 
 ### ステップ1: フォームプロバイダーの設定 {id="configure-provider"}
+
+<Tabs group="auth-dsl">
+<TabItem title="名前付きプロバイダー" group-key="classic">
+
 `form`認証プロバイダーは、[FormAuthenticationProvider.Config](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-form-authentication-provider/-config/index.html)クラスを介して設定を公開します。以下の例では、次の設定が指定されています。
 * `userParamName`プロパティと`passwordParamName`プロパティは、ユーザー名とパスワードを取得するために使用するパラメーター名を指定します。
 * `validate`関数は、ユーザー名とパスワードを検証します。
-  `validate`関数は`UserPasswordCredential`をチェックし、認証に成功した場合は`UserIdPrincipal`を返し、失敗した場合は`null`を返します。
+  `validate`関数は`UserPasswordCredential`をチェックし、認証に成功した場合は`UserIdPrincipal`を返し、認証に失敗した場合は`null`を返します。
 * `challenge`関数は、認証が失敗した場合に実行されるアクションを指定します。例えば、ログインページにリダイレクトしたり、[UnauthorizedResponse](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-unauthorized-response/index.html)を送信したりできます。
 
 ```kotlin
@@ -90,22 +94,66 @@ install(Authentication) {
         userParamName = "username"
         passwordParamName = "password"
         validate { credentials ->
-            if (credentials.name == "jetbrains" && credentials.password == "foobar") {
+            val isValid = credentials.name == "jetbrains" &&
+                credentials.password == "foobar"
+            if (isValid) {
                 UserIdPrincipal(credentials.name)
             } else {
                 null
             }
         }
         challenge {
-            call.respond(HttpStatusCode.Unauthorized, "Credentials are not valid")
+            val message = "Credentials are not valid"
+            val status = HttpStatusCode.Unauthorized
+            call.respond(status, message)
         }
     }
 }
 ```
 
+</TabItem>
+<TabItem title="型安全" group-key="typed">
+
+<note>
+    <p>
+        型安全な認証スキームAPIは実験的（Experimental）なものです。いつでも削除または変更される可能性があります。
+        オプトインが必要です。詳細については、
+        <a href="server-typed-auth.md#prerequisites">APIの有効化</a>を参照してください。
+    </p>
+</note>
+
+`form()`関数は、選択したプリンシパル型のスキームを作成します。`install(Authentication)`のステップはありません。
+スキームは、それを必要とするルートに渡す値です。
+
+```kotlin
+data class User(val name: String)
+
+val formAuth = form<User>("auth-form") {
+    usernameField = "username"
+    passwordField = "password"
+    validate { credentials ->
+        val isValid = credentials.name == "jetbrains" &&
+            credentials.password == "foobar"
+        if (isValid) User(credentials.name) else null
+    }
+    onUnauthorized = {
+        val message = "Credentials are not valid"
+        call.respond(HttpStatusCode.Unauthorized, message)
+    }
+}
+```
+
+クラシックなプロバイダーとは2つの名前が異なります。フォームフィールドは`userParamName`と`passwordParamName`ではなく`usernameField`と`passwordField`になります。失敗時のハンドラーは`challenge`ではなく`onUnauthorized`になります。完全なAPIについては、[型安全な認証](server-typed-auth.md)を参照してください。
+
+</TabItem>
+</Tabs>
+
 > `basic`認証と同様に、ユーザー名とパスワードのハッシュを保持するインメモリテーブルに保存されたユーザーを検証するために、[UserHashedTableAuth](server-basic-auth.md#validate-user-hash)を使用することもできます。
 
 ### ステップ2: 特定のリソースの保護 {id="authenticate-route"}
+
+<Tabs group="auth-dsl">
+<TabItem title="名前付きプロバイダー" group-key="classic">
 
 `form`プロバイダーを設定した後、データが送信される`post`ルートを定義する必要があります。
 次に、このルートを**[authenticate](server-auth.md#authenticate-route)**関数の中に追加します。
@@ -115,11 +163,30 @@ install(Authentication) {
 routing {
     authenticate("auth-form") {
         post("/login") {
-            call.respondText("Hello, ${call.principal<UserIdPrincipal>()?.name}!")
+            val user = call.principal<UserIdPrincipal>()
+            call.respondText("Hello, ${user?.name}!")
         }
     }
 }
 ```
+
+</TabItem>
+<TabItem title="型安全" group-key="typed">
+
+フォームデータが送信される`post`ルートを定義し、それを`authenticateWith()`でラップします。ブロック内では、`call.principal`は指定したプリンシパル型となり、決して`null`にはなりません。
+
+```kotlin
+routing {
+    authenticateWith(formAuth) {
+        post("/login") {
+            call.respondText("Hello, ${call.principal.name}!")
+        }
+    }
+}
+```
+
+</TabItem>
+</Tabs>
 
 ログインしたユーザーのIDを保存するために、[セッション認証](server-session-auth.md)を使用できます。
 例えば、ユーザーが初めてウェブフォームを使用してログインしたときに、ユーザー名をクッキーセッションに保存し、その後のリクエストでは`session`プロバイダーを使用してそのユーザーを認可することができます。
