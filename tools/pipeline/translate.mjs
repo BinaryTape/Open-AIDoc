@@ -60,78 +60,28 @@ function getTargetPath(filePath, targetLang) {
   return path.join(baseDir, toContentRelPath(targetLang, docType, relativePath));
 }
 
-// Load previously translated related files as reference
-function loadPreviousTranslations(targetLang, currentFilePath) {
-  try {
-    // Calculate path for the corresponding translation file
-    const targetPath = getTargetPath(currentFilePath, targetLang);
-
-    // Check if corresponding translation file exists
-    if (!fs.existsSync(targetPath)) {
-      console.log(`Reference translation file does not exist: ${targetPath}`);
-      return [];
-    }
-
-    // Read previous translation content
-    const content = fs.readFileSync(targetPath, "utf8");
-    console.log(
-      `Successfully loaded reference translation file: ${targetPath}`
-    );
-
-    return [
-      {
-        file: targetPath,
-        content: content,
-      },
-    ];
-  } catch (error) {
-    console.error("Error loading previous translation:", error);
-    return [];
-  }
-}
-
 // Prepare translation prompt
-function prepareTranslationPrompt(sourceText, targetLang, currentFilePath) {
+function prepareTranslationPrompt(sourceText, targetLang, { isLocaleFile = false } = {}) {
   // Get relevant terminology (minified JSON for the target language)
   const relevantTerms = getTerminologyForLang(targetLang);
 
-  // Get previously translated file with the same name as reference
-  const previousTranslations = currentFilePath.includes("locales")
-    ? fs.readFileSync(currentFilePath, "utf8")
-    : loadPreviousTranslations(targetLang, currentFilePath);
-
-  // Build reference translation section
-  let translationReferences = "";
-  if (previousTranslations.length > 0) {
-    // Choose English or Chinese based on target language
-    if (targetLang === "ja" || targetLang === "ko") {
-      translationReferences =
-        "\n## Reference Translations (Reference previously translated documents to maintain consistent style and terminology)\n";
-      translationReferences += `### Previous Translation Version\n\`\`\`\n${previousTranslations[0].content}\n\`\`\`\n\n`;
-    } else {
-      translationReferences = `\n\`\`\`\n${previousTranslations[0].content}\n\`\`\`\n\n`;
-    }
-  }
-
   // Choose appropriate prompt template based on target language
-  const promptTemplate = currentFilePath.includes("locales")
+  const promptTemplate = isLocaleFile
     ? getLocalePromptTemplate(getLangDisplayName(targetLang))
     : getPromptTemplate(targetLang, getLangDisplayName(targetLang));
 
   // Insert variables into template
-  return fillPromptTemplate(promptTemplate, targetLang, sourceText, relevantTerms, translationReferences);
+  return fillPromptTemplate(promptTemplate, targetLang, sourceText, relevantTerms);
 }
 
 // Fill prompt template with variables, using language-appropriate fallback text
-export function fillPromptTemplate(template, targetLang, sourceText, terms, references) {
+export function fillPromptTemplate(template, targetLang, sourceText, terms) {
   const noTerms = (targetLang === "ja" || targetLang === "ko") ? "No relevant terms" : "无相关术语";
-  const noRefs = (targetLang === "ja" || targetLang === "ko") ? "No reference translations" : "无参考翻译";
 
   // Use split/join so `$` in source Markdown (e.g. `` `$` ``) is not treated as
   // a String.prototype.replace substitution pattern (`$``, `$'`, `$&`, `$n`).
   return template
     .split("{RELEVANT_TERMS}").join(terms || noTerms)
-    .split("{TRANSLATION_REFERENCES}").join(references || noRefs)
     .split("{SOURCE_TEXT}").join(sourceText);
 }
 
@@ -150,7 +100,7 @@ export function getLocalePromptTemplate(langDisplayName) {
 
 ## 2) Terminology & Placeholders
 1. **Glossary has highest priority.** Use the translations from the Glossary exactly as given.
-2. **Consistency.** If a term isn’t in the Glossary, follow the Translation References for style and consistency.
+2. **Consistency.** If a term isn’t in the Glossary, keep it consistent with the values already translated in this JSON.
 3. **Do not alter placeholders or code-like fragments:**
    - API/class/method/config names, flags, CLI commands.
 4. **Uncertain technical terms.** If no guidance exists and translation may confuse, **keep the English term**. In pure JSON UI strings, prefer keeping English rather than risking misleading translations.
@@ -170,9 +120,6 @@ export function getLocalePromptTemplate(langDisplayName) {
 ## 5) Resources
 ### Glossary
 {RELEVANT_TERMS}
-
-### Translation References
-{TRANSLATION_REFERENCES}
 
 ---
 ## 6) Source JSON
@@ -199,9 +146,8 @@ export function getPromptTemplate(targetLang, langDisplayName) {
     
     2.  **Terminology Handling:**
         * **Prioritize the Terminology List:** Strictly translate according to the terminology list provided below. The terminology list has the highest priority.
-        * **Reference Translation Consistency:** For terms not included in the terminology list, please refer to the reference translations to maintain consistency in style and existing terminology usage.
         * **New/Ambiguous Terminology Handling:**
-            * For proper nouns or technical terms not included in the terminology list and without precedent in reference translations, if you choose to translate them, it is recommended to include the original English in parentheses after the translation at first occurrence, e.g., "Translation (English Term)".
+            * For proper nouns or technical terms not included in the terminology list, if you choose to translate them, it is recommended to include the original English in parentheses after the translation at first occurrence, e.g., "Translation (English Term)".
             * If you are uncertain about a term's translation, or believe keeping the English is clearer, please **keep the original English text**.
         * **Placeholders/Variable Names:** Placeholders (such as \`YOUR_API_KEY\`) or special variable names in the document that are not in code blocks should usually be kept in English, or translated with comments based on context.
     
@@ -244,13 +190,9 @@ export function getPromptTemplate(targetLang, langDisplayName) {
     
     ## V. Resources
     
-    ### 1. Terminology List (Glossary)
+    ### Terminology List (Glossary)
     * The following terms must use the specified translations:
     {RELEVANT_TERMS}
-    
-    ### 2. Reference Translations
-    * Please refer to the following previously translated document fragments to maintain consistency in style and terminology:
-    {TRANSLATION_REFERENCES}
     
     ---
     
@@ -285,7 +227,7 @@ export function getPromptTemplate(targetLang, langDisplayName) {
 
     3. **新／模糊術語處理**
 
-    * 對於術語表中未包含、參考翻譯亦無先例的專有名詞或技術術語：
+    * 對於術語表中未包含的專有名詞或技術術語：
 
     * 若你選擇翻譯，**首次出現**可在中文後以括號附註英文原文（可選），如：\`譯文 (English Term)\`。
          * 若不確定或保留英文更清晰，**直接保留英文原文**；必要時在譯文處標註 **\[待確認]**。
@@ -334,13 +276,9 @@ export function getPromptTemplate(targetLang, langDisplayName) {
     
     ## 五、資源
     
-    ### 1. 術語表 (Glossary)
+    ### 術語表 (Glossary)
     * 以下術語必須使用指定翻譯：
     {RELEVANT_TERMS}
-    
-    ### 2. 參考翻譯 (Translation References)
-    * 請參考以下已翻譯的文件片段，以保持風格和術語的一致性：
-    {TRANSLATION_REFERENCES}
     
     ---
     
@@ -362,7 +300,7 @@ export function getPromptTemplate(targetLang, langDisplayName) {
     
     1. **忠实原文与流畅表达**
 
-       * 在确保技术准确性的前提下，译文应自然流畅，符合 \${langDisplayName} 的语言习惯和互联网技术社群的表达方式。
+       * 在确保技术准确性的前提下，译文应自然流畅，符合 ${langDisplayName} 的语言习惯和互联网技术社群的表达方式。
        * 妥善处理原文的语序和句子结构，避免生硬直译或产生阅读障碍。
        * 保持原文的语气（例如：正式、非正式、教学性）。
 
@@ -376,7 +314,7 @@ export function getPromptTemplate(targetLang, langDisplayName) {
     
     3. **新/模糊术语处理**
     
-       * 对于术语表中未包含、参考翻译亦无先例的专有名词或技术术语：
+       * 对于术语表中未包含的专有名词或技术术语：
     
          * 若你选择翻译，**首次出现**可在中文后以括号附注英文原文（可选），如：\`译文 (English Term)\`。
          * 若不确定或保留英文更清晰，**直接保留英文原文**；必要时在译文处标注 **\[待确认]**。
@@ -425,13 +363,9 @@ export function getPromptTemplate(targetLang, langDisplayName) {
     
     ## 五、资源
     
-    ### 1. 术语表 (Glossary)
+    ### 术语表 (Glossary)
     * 以下术语必须使用指定翻译：
     {RELEVANT_TERMS}
-    
-    ### 2. 参考翻译 (Translation References)
-    * 请参考以下已翻译的文档片段，以保持风格和术语的一致性：
-    {TRANSLATION_REFERENCES}
     
     ---
     
@@ -446,7 +380,7 @@ export function getPromptTemplate(targetLang, langDisplayName) {
 // Call LLM API for translation
 async function translateWithLLM(text, targetLang, filePath) {
   const modelConfig = config.modelConfigs[targetLang];
-  const prompt = prepareTranslationPrompt(text, targetLang, filePath);
+  const prompt = prepareTranslationPrompt(text, targetLang);
 
   if (modelConfig.provider === "google") {
     return await callGemini(prompt, modelConfig.model);
@@ -761,11 +695,7 @@ async function translateLocaleFile(filePath) {
     if (content && content.trim()) {
       const targetLang = filePath.split(".")[0];
       const modelConfig = config.modelConfigs[targetLang];
-      const prompt = prepareTranslationPrompt(
-        content,
-        targetLang,
-        absoluteFilePath
-      );
+      const prompt = prepareTranslationPrompt(content, targetLang, { isLocaleFile: true });
       translatedContent = await callGemini(prompt, modelConfig.model);
 
       // Clean up extra content in translation result
