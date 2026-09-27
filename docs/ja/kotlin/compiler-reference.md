@@ -143,7 +143,7 @@ Kotlin スクリプトファイルを評価します。このオプションを�
 
 角括弧構文 `[]` による[コレクションリテラル](whatsnew24.md#support-for-collection-literals)のサポートを有効にします。
 
-### -Xcompiler-plugin-order= {plugin.before>plugin.after id="xcompiler-plugin-order"}
+### -Xcompiler-plugin-order={plugin.before>plugin.after} {id="xcompiler-plugin-order-plugin-before-plugin-after"}
 <primary-label ref="experimental-general"/>
 
 コンパイラプラグインの実行順序を設定します。コンパイラはまず `plugin.before` を実行し、次に `plugin.after` を実行します：
@@ -425,7 +425,7 @@ Kotlin から JS へのコンパイル用のコマンドラインツールは `k
 
 メタデータを含む `.meta.js` および `.kjsm` ファイルを生成します。JS ライブラリを作成するときにこのオプションを使用します。
 
-### -module-kind {umd|commonjs|amd|plain id="module-kind"}
+### -module-kind {umd|commonjs|amd|plain} {id="module-kind-umd-commonjs-amd-plain"}
 
 コンパイラによって生成される JS モジュールの種類：
 
@@ -478,7 +478,7 @@ Kotlin コードで宣言した変数名と関数名をソースマップに追�
 
 ソースマップ内のパスに指定されたプレフィックスを追加します。
 
-### -target {es5|es2015|es2020 id="target"}
+### -target {es5|es2015|es2020} {id="target-es5-es2015-es2020"}
 
 指定された ECMA バージョン用の JS ファイルを生成します。
 
