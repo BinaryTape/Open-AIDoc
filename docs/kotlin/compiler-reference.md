@@ -147,7 +147,7 @@ Kotlin 编译器具有许多用于定制编译过程的选项。
 
 启用对使用方括号语法 `[]` 的[集合字面量](whatsnew24.md#support-for-collection-literals)的支持。
 
-### -Xcompiler-plugin-order= {plugin.before>plugin.after id="xcompiler-plugin-order"}
+### -Xcompiler-plugin-order={plugin.before>plugin.after} {id="xcompiler-plugin-order-plugin-before-plugin-after"}
 <primary-label ref="experimental-general"/>
 
 配置编译器插件的运行顺序。编译器先运行 `plugin.before`，然后运行 `plugin.after`：
@@ -429,7 +429,7 @@ $ kotlinc @options/compiler.options hello.kt
 
 生成带有元数据的 `.meta.js` 和 `.kjsm` 文件。创建 JS 库时请使用此选项。
 
-### -module-kind {umd|commonjs|amd|plain id="module-kind"}
+### -module-kind {umd|commonjs|amd|plain} {id="module-kind-umd-commonjs-amd-plain"}
 
 编译器生成的 JS 模块种类：
 
@@ -483,7 +483,7 @@ $ kotlinc @options/compiler.options hello.kt
 
 向源代码映射中的路径添加指定的前缀。
 
-### -target {es5|es2015|es2020 id="target"}
+### -target {es5|es2015|es2020} {id="target-es5-es2015-es2020"}
 
 为指定的 ECMA 版本生成 JS 文件。
 

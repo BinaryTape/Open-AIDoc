@@ -673,6 +673,5 @@
   "ktor.server-oauth2-flows": "Type-safe OAuth 2.0 flows",
   "ktor.server-oidc": "OpenID Connect",
   "ktor.server-oidc-resource-server": "Resource server",
-  "ktor.server-oidc-browser-login": "Browser login",
-  "koog._0": "0"
+  "ktor.server-oidc-browser-login": "Browser login"
 }

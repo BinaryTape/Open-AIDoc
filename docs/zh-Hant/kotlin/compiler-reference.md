@@ -149,7 +149,7 @@ Kotlin 編譯器有許多用於自訂編譯過程的選項。
 
 支援使用方括號語法 `[]` 的[集合常值](whatsnew24.md#support-for-collection-literals)。
 
-### -Xcompiler-plugin-order= {plugin.before>plugin.after id="xcompiler-plugin-order"}
+### -Xcompiler-plugin-order={plugin.before>plugin.after} {id="xcompiler-plugin-order-plugin-before-plugin-after"}
 <primary-label ref="experimental-general"/>
 
 設定編譯器外掛程式的執行順序。編譯器會先執行 `plugin.before`，然後執行 `plugin.after`：
@@ -433,7 +433,7 @@ Kotlin 到 JS 編譯的命令列工具是 `kotlinc-js`。
 
 產生包含元資料的 `.meta.js` 和 `.kjsm` 檔案。建立 JS 程式庫時請使用此選項。
 
-### -module-kind {umd|commonjs|amd|plain id="module-kind"}
+### -module-kind {umd|commonjs|amd|plain} {id="module-kind-umd-commonjs-amd-plain"}
 
 編譯器產生的 JS 模組類型：
 
@@ -487,7 +487,7 @@ Kotlin 到 JS 編譯的命令列工具是 `kotlinc-js`。
 
 在原始碼對應檔中的路徑新增指定的前綴。
 
-### -target {es5|es2015|es2020 id="target"}
+### -target {es5|es2015|es2020} {id="target-es5-es2015-es2020"}
 
 為指定的 ECMA 版本產生 JS 檔案。
 

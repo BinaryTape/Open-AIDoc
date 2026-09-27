@@ -706,6 +706,5 @@
   "ktor.server-oauth2-flows": "타입 안전한 OAuth 2.0 플로우",
   "ktor.server-oidc": "OpenID Connect",
   "ktor.server-oidc-resource-server": "리소스 서버",
-  "ktor.server-oidc-browser-login": "브라우저 로그인",
-  "koog._0": "0"
+  "ktor.server-oidc-browser-login": "브라우저 로그인"
 }
