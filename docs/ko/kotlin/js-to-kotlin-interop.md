@@ -125,7 +125,7 @@ interface Identity {
 `@JsExport` 어노테이션은 다음과 같은 경우에도 사용할 수 있습니다:
 
 * 멀티플랫폼 프로젝트의 공통(common) 코드. 이는 JavaScript 타겟으로 컴파일할 때만 효과가 있으며, 플랫폼에 국한되지 않는 Kotlin 선언도 내보낼 수 있게 해줍니다.
-* 생성 및 내보낼 함수의 이름을 지정하기 위해 [`@JsName` 어노테이션](#jsname-어노테이션)과 함께 사용. 이는 동일한 이름을 가진 함수의 오버로드와 같은 내보내기 시의 모호함을 해결하는 데 도움이 됩니다.
+* 생성 및 내보낼 함수의 이름을 지정하기 위해 [`@JsName` 어노테이션](#jsname-annotation)과 함께 사용. 이는 동일한 이름을 가진 함수의 오버로드와 같은 내보내기 시의 모호함을 해결하는 데 도움이 됩니다.
 * `@file:JsExport`를 사용하여 파일 수준에서 적용.
 
 #### 값 클래스 내보내기 {id="export-value-classes"}
@@ -355,31 +355,31 @@ kotlin {
 
 Kotlin 타입이 JavaScript 타입으로 어떻게 매핑되는지 확인하세요:
 
-| Kotlin                                                           | JavaScript                | 설명                                                                                                |
-|------------------------------------------------------------------|---------------------------|---------------------------------------------------------------------------------------------------------|
-| `Byte`, `Short`, `Int`, `Float`, `Double`                        | `Number`                  |                                                                                                         |
-| `Char`                                                           | `Number`                  | 숫자는 문자의 코드를 나타냅니다.                                                             |
-| `Long`                                                           | `BigInt`                  | [`-Xes-long-as-bigint` 컴파일러 옵션](compiler-reference.md#xes-long-as-bigint) 설정이 필요합니다. |
-| `Boolean`                                                        | `Boolean`                 |                                                                                                         |
-| `String`                                                         | `String`                  |                                                                                                         |
-| `Array`                                                          | `Array`                   |                                                                                                         |
-| `ByteArray`                                                      | `Int8Array`               |                                                                                                         |
-| `ShortArray`                                                     | `Int16Array`              |                                                                                                         |
-| `IntArray`                                                       | `Int32Array`              |                                                                                                         |
-| `CharArray`                                                      | `UInt16Array`             | `$type$ == "CharArray"` 프로퍼티를 가집니다.                                                           |
-| `FloatArray`                                                     | `Float32Array`            |                                                                                                         |
-| `DoubleArray`                                                    | `Float64Array`            |                                                                                                         |
-| `LongArray`                                                      | `BigInt64Array`           |                                                                                                         |
-| `BooleanArray`                                                   | `Int8Array`               | `$type$ == "BooleanArray"` 프로퍼티를 가집니다.                                                        |
+| Kotlin                                                           | JavaScript                | 설명                                                                                                           |
+|------------------------------------------------------------------|---------------------------|----------------------------------------------------------------------------------------------------------------|
+| `Byte`, `Short`, `Int`, `Float`, `Double`                        | `Number`                  |                                                                                                                |
+| `Char`                                                           | `Number`                  | 숫자는 문자의 코드를 나타냅니다.                                                                               |
+| `Long`                                                           | `BigInt`                  | [`target = "es2020"`](js-project-setup.md#set-an-ecmascript-target)을 설정하거나 [`-Xes-long-as-bigint` 컴파일러 옵션](compiler-reference.md#xes-long-as-bigint)을 구성하세요. |
+| `Boolean`                                                        | `Boolean`                 |                                                                                                                |
+| `String`                                                         | `String`                  |                                                                                                                |
+| `Array`                                                          | `Array`                   |                                                                                                                |
+| `ByteArray`                                                      | `Int8Array`               |                                                                                                                |
+| `ShortArray`                                                     | `Int16Array`              |                                                                                                                |
+| `IntArray`                                                       | `Int32Array`              |                                                                                                                |
+| `CharArray`                                                      | `UInt16Array`             | `$type$ == "CharArray"` 프로퍼티를 가집니다.                                                                  |
+| `FloatArray`                                                     | `Float32Array`            |                                                                                                                |
+| `DoubleArray`                                                    | `Float64Array`            |                                                                                                                |
+| `LongArray`                                                      | `BigInt64Array`           | [`target = "es2020"`](js-project-setup.md#set-an-ecmascript-target)을 설정하거나 [`-Xes-long-as-bigint` 컴파일러 옵션](compiler-reference.md#xes-long-as-bigint)을 구성하세요. |
+| `BooleanArray`                                                   | `Int8Array`               | `$type$ == "BooleanArray"` 프로퍼티를 가집니다.                                                               |
 | `List`, `MutableList`                                            | `KtList`, `KtMutableList` | `KtList.asJsReadonlyArrayView` 또는 `KtMutableList.asJsArrayView`를 통해 `Array`를 노출합니다.                 |
 | `Map`, `MutableMap`                                              | `KtMap`, `KtMutableMap`   | `KtMap.asJsReadonlyMapView` 또는 `KtMutableMap.asJsMapView`를 통해 ES2015 `Map`을 노출합니다.                  |
 | `Set`, `MutableSet`                                              | `KtSet`, `KtMutableSet`   | `KtSet.asJsReadonlySetView` 또는 `KtMutableSet.asJsSetView`를 통해 ES2015 `Set`을 노출합니다.                  |
-| `Unit`                                                           | Undefined                 | 반환 타입으로 사용될 때는 내보낼 수 있지만, 매개변수 타입으로 사용될 때는 내보낼 수 없습니다.                               |
-| `Any`                                                            | `Object`                  |                                                                                                         |
-| `Throwable`                                                      | `Error`                   |                                                                                                         |
+| `Unit`                                                           | `undefined`               | 반환 타입으로 사용될 때는 내보낼 수 있지만, 매개변수 타입으로 사용될 때는 내보낼 수 없습니다.                 |
+| `Any`                                                            | `Object`                  |                                                                                                                |
+| `Throwable`                                                      | `Error`                   |                                                                                                                |
 | `enum class Type`                                                | `Type`                    | 열거형 항목(Enum entries)은 정적 클래스 프로퍼티(`Type.ENTRY`)로 노출됩니다.                                     |
-| Nullable `Type?`                                                 | `Type                     | null                                                                                                    | undefined` |                                                                                            |
-| `@JsExport`가 표시된 타입을 제외한 모든 기타 Kotlin 타입 | 지원되지 않음             | Kotlin의 [부호 없는 정수 타입(unsigned integer types)](unsigned-integer-types.md)을 포함합니다.                                  |
+| Nullable `Type?`                                                 | `Type`, ` null`, 또는 `undefined` |                                                                                                                |
+| `@JsExport`가 표시된 타입을 제외한 모든 기타 Kotlin 타입         | 지원되지 않음             | Kotlin의 [부호 없는 정수 타입(unsigned integer types)](unsigned-integer-types.md)을 포함합니다.               |
 
 추가로 다음 사항을 아는 것이 중요합니다:
 

@@ -12,7 +12,7 @@
 
 ### 修復 {id="fixed"}
 
-- 尚無！
+- [IntelliJ 外掛程式] 透過變更 IntelliJ API 的使用方式修復外掛程式發佈違規（#6366 由 @griffio 提供）
 
 ## [2.4.0] - 2026-09-17 {id="2-4-0-2026-09-17"}
 [2.4.0]: https://github.com/sqldelight/sqldelight/releases/tag/2.4.0
@@ -33,7 +33,7 @@
 - [PostgreSQL 方言] 新增對觸發器函式中 `RAISE` 陳述式與 `FOUND` 變數的支援（#6297 由 @griffio 提供）
 
 ### 變更
-- [PostgreSQL 方言] 將 `arrayIntermediateType` 的可見性變更為 public（#5835 由 @griffio 提供）
+- [PostgreSQL 方言] 將 arrayIntermediateType 的可見性變更為 public（#5835 由 @griffio 提供）
 - [Gradle 外掛程式] 實作更嚴格的 `MigrationFile` 版本控管（#5730 由 @madisp 提供）
 - [Gradle 外掛程式] 將最低支援的 Gradle 版本提升至 8.2.1（#6217 由 @maxsav 提供）
 - [Gradle 外掛程式] 支援 Gradle 隔離專案 (isolated projects)（#6217 由 @maxsav 提供）
@@ -43,28 +43,28 @@
 - [Gradle 外掛程式] 抑制 JDK 24+ 上來自編譯器工作程序 (compiler worker) 的 `sun.misc.Unsafe` 棄用警告（#6321）
 - [編譯器] 抑制產生的程式碼中的 Kotlin 額外警告（#6208 由 @eyupcanakman 提供）
 - [編譯器] 非群組聚合結果集中的其他列一律為可 null
-- [PostgreSQL 方言] 正確解析 `coalesce` 與 `ifnull` 的可 null 性
+- [PostgreSQL 方言] 正確解析 coalesce 與 ifnull 的可 null 性
 - [PostgreSQL 方言] 修復 PostgreSQL 方言的 IDE 整合
 - [PostgreSQL 方言] 改進 PostgreSQL 方言的 IDE 外掛程式（#6209 由 @griffio 提供）
-- [Intellij 外掛程式] IDE 外掛程式可以為所有方言執行程式碼補全（#6210 由 @griffio 提供）
+- [IntelliJ 外掛程式] IDE 外掛程式可以為所有方言執行程式碼補全（#6210 由 @griffio 提供）
 - [Gradle 外掛程式] 修復執行驗證資料庫任務時的循環相依性錯誤（#6221 由 @griffio 提供）
 - [編譯器] 修復多列更新的樂觀鎖 (optimistic lock)（#6240 由 @griffio 提供）
-- [Intellij 外掛程式] 修復導致 IDEA 2026.2 當機的棄用問題（#6247 由 @griffio 提供）
+- [IntelliJ 外掛程式] 修復導致 IDEA 2026.2 當機的棄用問題（#6247 由 @griffio 提供）
 - [Gradle 外掛程式] 修復產生的原始碼在 AGP 8.9 至 8.11 上無法被 Kotlin 編譯識別的問題
-- [PostgreSQL 方言] 修復 `lower` 與 `upper` 函式使用 Primitive 繫結引數預設為 TEXT 的問題（#6262 由 @griffio 提供）
+- [PostgreSQL 方言] 修復 lower 與 upper 函式使用 Primitive 繫結引數預設為 TEXT 的問題（#6262 由 @griffio 提供）
 - [編譯器] 修復當使用配接器且遷移變更可 null 性時，使用資料類別繫結插入值的問題（#6269 由 @griffio 提供）
 - [編譯器] 為 null 安全運算子（IS 與 IS DISTINCT FROM）使用可 null 繫結引數（#6265 由 @griffio 提供）
 - [Gradle 外掛程式] 將 AGP 的變體解析 (variant resolution) 用於專案相依項（#6217 由 @maxsav 提供）
-- [Gradle 外掛程式] 修復當不同組建間的 AGP 變體 (variant) 清單不一致時，`generateDatabaseInterface` 的組建快取未命中問題
+- [Gradle 外掛程式] 修復當不同組建間的 AGP 變體 (variant) 清單不一致時，generateDatabaseInterface 的組建快取未命中問題
 - [Gradle 外掛程式] 修復當套用外掛程式但未配置任何資料庫時，IDE 同步當機的問題（#6088）
 - [PostgreSQL 方言] 修復使用巢狀函式呼叫時的 JSON 聚合函式問題（#6281 由 @griffio 提供）
-- [分頁 3 擴充套件] 修復 `KeyedQueryPagingSource` 在空資料庫上當機的問題（#6284 由 @woods-marshes 提供）
+- [分頁 3 擴充套件] 修復 KeyedQueryPagingSource 在空資料庫上當機的問題（#6284 由 @woods-marshes 提供）
 - [編譯器] 修復當變動器 (mutator) 陳述式與 `COALESCE` 等封裝函式搭配使用時的 Java 型別配接器問題（#6292 由 @griffio 提供）
 - [編譯器] 修復當模組名稱為大寫時，產生的程式碼套件名稱也會被變更為大寫的問題（#6316 由 @griffio 提供）
 - [PostgreSQL 方言] 允許日期資料型別不區分大小寫（#6328 由 @griffio 提供）
 - [PostgreSQL 方言] 修復 `string_agg` 函式為可 null（#6340 由 @griffio 提供）
 - [SQLite 方言] 修復使用 `GROUP BY` 的 SQLite 3.44 聚合函式（#6343 由 @griffio 提供）
-- [Gradle 外掛程式] 避免在組態階段解析資料庫相依項（#6353 由 @joshfriend 提供）
+- [Gradle 外掛程式] 避免在組態階段解析資料庫相依項。（#6353 由 @joshfriend 提供）
 
 ## [2.4.0-rc2] - 2026-09-14 {id="2-4-0-rc2-2026-09-14"}
 [2.4.0-rc2]: https://github.com/sqldelight/sqldelight/releases/tag/2.4.0-rc2
@@ -73,7 +73,7 @@
 
 - [PostgreSQL 方言] 修復 `string_agg` 函式為可 null（#6340 由 @griffio 提供）
 - [SQLite 方言] 修復使用 `GROUP BY` 的 SQLite 3.44 聚合函式（#6343 由 @griffio 提供）
-- [Gradle 外掛程式] 避免在組態階段解析資料庫相依項（#6353 由 @joshfriend 提供）
+- [Gradle 外掛程式] 避免在組態階段解析資料庫相依項。（#6353 由 @joshfriend 提供）
 
 ## [2.4.0-rc1] - 2026-09-01 {id="2-4-0-rc1-2026-09-01"}
 [2.4.0-rc1]: https://github.com/sqldelight/sqldelight/releases/tag/2.4.0-rc1
@@ -94,7 +94,7 @@
 - [PostgreSQL 方言] 新增對觸發器函式中 `RAISE` 陳述式與 `FOUND` 變數的支援（#6297 由 @griffio 提供）
 
 ### 變更
-- [PostgreSQL 方言] 將 `arrayIntermediateType` 的可見性變更為 public（#5835 由 @griffio 提供）
+- [PostgreSQL 方言] 將 arrayIntermediateType 的可見性變更為 public（#5835 由 @griffio 提供）
 - [Gradle 外掛程式] 實作更嚴格的 `MigrationFile` 版本控管（#5730 由 @madisp 提供）
 - [Gradle 外掛程式] 將最低支援的 Gradle 版本提升至 8.2.1（#6217 由 @maxsav 提供）
 - [Gradle 外掛程式] 支援 Gradle 隔離專案 (isolated projects)（#6217 由 @maxsav 提供）
@@ -104,22 +104,22 @@
 - [Gradle 外掛程式] 抑制 JDK 24+ 上來自編譯器工作程序 (compiler worker) 的 `sun.misc.Unsafe` 棄用警告（#6321）
 - [編譯器] 抑制產生的程式碼中的 Kotlin 額外警告（#6208 由 @eyupcanakman 提供）
 - [編譯器] 非群組聚合結果集中的其他列一律為可 null
-- [PostgreSQL 方言] 正確解析 `coalesce` 與 `ifnull` 的可 null 性
+- [PostgreSQL 方言] 正確解析 coalesce 與 ifnull 的可 null 性
 - [PostgreSQL 方言] 修復 PostgreSQL 方言的 IDE 整合
 - [PostgreSQL 方言] 改進 PostgreSQL 方言的 IDE 外掛程式（#6209 由 @griffio 提供）
-- [Intellij 外掛程式] IDE 外掛程式可以為所有方言執行程式碼補全（#6210 由 @griffio 提供）
+- [IntelliJ 外掛程式] IDE 外掛程式可以為所有方言執行程式碼補全（#6210 由 @griffio 提供）
 - [Gradle 外掛程式] 修復執行驗證資料庫任務時的循環相依性錯誤（#6221 由 @griffio 提供）
 - [編譯器] 修復多列更新的樂觀鎖 (optimistic lock)（#6240 由 @griffio 提供）
-- [Intellij 外掛程式] 修復導致 IDEA 2026.2 當機的棄用問題（#6247 由 @griffio 提供）
+- [IntelliJ 外掛程式] 修復導致 IDEA 2026.2 當機的棄用問題（#6247 由 @griffio 提供）
 - [Gradle 外掛程式] 修復產生的原始碼在 AGP 8.9 至 8.11 上無法被 Kotlin 編譯識別的問題
-- [PostgreSQL 方言] 修復 `lower` 與 `upper` 函式使用 Primitive 繫結引數預設為 TEXT 的問題（#6262 由 @griffio 提供）
+- [PostgreSQL 方言] 修復 lower 與 upper 函式使用 Primitive 繫結引數預設為 TEXT 的問題（#6262 由 @griffio 提供）
 - [編譯器] 修復當使用配接器且遷移變更可 null 性時，使用資料類別繫結插入值的問題（#6269 由 @griffio 提供）
 - [編譯器] 為 null 安全運算子（IS 與 IS DISTINCT FROM）使用可 null 繫結引數（#6265 由 @griffio 提供）
 - [Gradle 外掛程式] 將 AGP 的變體解析 (variant resolution) 用於專案相依項（#6217 由 @maxsav 提供）
-- [Gradle 外掛程式] 修復當不同組建間的 AGP 變體 (variant) 清單不一致時，`generateDatabaseInterface` 的組建快取未命中問題
+- [Gradle 外掛程式] 修復當不同組建間的 AGP 變體 (variant) 清單不一致時，generateDatabaseInterface 的組建快取未命中問題
 - [Gradle 外掛程式] 修復當套用外掛程式但未配置任何資料庫時，IDE 同步當機的問題（#6088）
 - [PostgreSQL 方言] 修復使用巢狀函式呼叫時的 JSON 聚合函式問題（#6281 由 @griffio 提供）
-- [分頁 3 擴充套件] 修復 `KeyedQueryPagingSource` 在空資料庫上當機的問題（#6284 由 @woods-marshes 提供）
+- [分頁 3 擴充套件] 修復 KeyedQueryPagingSource 在空資料庫上當機的問題（#6284 由 @woods-marshes 提供）
 - [編譯器] 修復當變動器 (mutator) 陳述式與 `COALESCE` 等封裝函式搭配使用時的 Java 型別配接器問題（#6292 由 @griffio 提供）
 - [編譯器] 修復當模組名稱為大寫時，產生的程式碼套件名稱也會被變更為大寫的問題（#6316 由 @griffio 提供）
 - [PostgreSQL 方言] 允許日期資料型別不區分大小寫（#6328 由 @griffio 提供）
@@ -130,9 +130,9 @@
 ### 新增
 - [PostgreSQL 方言] 改進對 ALTER TABLE ALTER TYPE USING 運算式的支援（#6116 由 @griffio 提供）
 - [PostgreSQL 方言] 新增對 DROP COLUMN IF EXISTS 的支援（#6112 由 @griffio 提供）
-- [Gradle 外掛程式] 新增 `expandSelectStar` 旗標以關閉 Select 萬用字元 (wildcard) 展開（#5813 由 @griffio 提供）
+- [Gradle 外掛程式] 新增 expandSelectStar 旗標以關閉 Select 萬用字元 (wildcard) 展開（#5813 由 @griffio 提供）
 - [MySQL 方言] 新增對視窗函式 (Window Functions) 的支援（#6086 由 @griffio 提供）
-- [Gradle 外掛程式] 修復當起始架構版本不為 1 且 `verifyMigrations` 為 true 時的組建失敗（#6017 由 @neilgmiller 提供）
+- [Gradle 外掛程式] 修復當起始架構版本不為 1 且 verifyMigrations 為 true 時的組建失敗（#6017 由 @neilgmiller 提供）
 - [Gradle 外掛程式] 讓 `SqlDelightWorkerTask` 具備更多可配置性，並更新預設配置以支援在 Windows 上開發（#5215 由 @MSDarwish2000 提供）
 - [SQLite 方言] 新增對 FTS5 虛擬表中合成列 (synthesized columns) 的支援（#5986 由 @watbe 提供）
 - [PostgreSQL 方言] 新增對 Postgres 資料列層級安全性 (row level security) 的支援（#6087 由 @shellderp 提供）
@@ -153,9 +153,9 @@
 ### 修復
 - [IntelliJ 外掛程式] 修復在 VFS 重新整理事件期間，因在 EDT 上阻塞檔案型別偵測而導致的 IDE 凍結。
 - [SQLite 方言] 修復 SQLite 3.38 編譯錯誤時使用 JSON 路徑運算子的問題（#6070 由 @griffio 提供）
-- [SQLite 方言] 使用字串 (String) 型別於 `group_concat` 函式，當使用自訂列型別時（#6082 由 @griffio 提供）
+- [SQLite 方言] 使用字串 (String) 型別於 group_concat 函式，當使用自訂列型別時（#6082 由 @griffio 提供）
 - [Gradle 外掛程式] 提升 `VerifyMigrationTask` 的效能，防止其在複雜架構上掛起（#6073 由 @Lightwood13 提供）
-- [Intellij 外掛程式] 修復外掛程式初始化例外狀況並更新已棄用的方法（#6040 由 @griffio 提供）
+- [IntelliJ 外掛程式] 修復外掛程式初始化例外狀況並更新已棄用的方法（#6040 由 @griffio 提供）
 - [Gradle 外掛程式] 修復與 Android Gradle Plugin 內建 Kotlin 的相容性（#6139）
 
 ## [2.3.1] - 2025-03-12 {id="2-3-1-2025-03-12"}
@@ -183,7 +183,7 @@
 - [PostgreSQL 方言] 新增述詞以檢查 SQL 運算式是否可剖析為 JSON（#5843 由 @griffio 提供）
 - [PostgreSQL 方言] 新增對 PostgreSql Comment On 陳述式的有限支援（#5808 由 @griffio 提供）
 - [MySQL 方言] 新增對索引可見性選項的支援（#5785 由 @orenkislev-faire 提供）
-- [PostgreSql 方言] 新增對 TSQUERY 資料型別的支援（#5779 由 @griffio 提供）
+- [PostgreSQL 方言] 新增對 TSQUERY 資料型別的支援（#5779 由 @griffio 提供）
 - [Gradle 外掛程式] 在新增模組時增加對版本型錄 (version catalog) 的支援（#5755 由 @DRSchlaubi 提供）
 
 ### 變更
@@ -232,25 +232,25 @@
 
 ### 變更
 - [編譯器] 產生的查詢檔案為簡單的變動器 (mutator) 傳回資料列計數（#4578 由 @MariusVolkhart 提供）
-- [原生驅動程式] 更新 `NativeSqlDatabase.kt` 以變更 DELETE、INSERT 與 UPDATE 陳述式的唯讀標記（#5680 由 @griffio 提供）
-- [PostgreSQL 方言] 將 `PgInterval` 變更為字串 (String)（#5403 由 @griffio 提供）
+- [原生驅動程式] 更新 NativeSqlDatabase.kt 以變更 DELETE、INSERT 與 UPDATE 陳述式的唯讀標記（#5680 由 @griffio 提供）
+- [PostgreSQL 方言] 將 PgInterval 變更為字串 (String)（#5403 由 @griffio 提供）
 - [PostgreSQL 方言] 支援 SqlDelight 模組實作 PostgreSql 擴充功能（#5677 由 @griffio 提供）
 
 ### 修復
 - [編譯器] 修復：執行帶有結果的群組陳述式時通知查詢（#5006 由 @vitorhugods 提供）
-- [編譯器] 修復 `SqlDelightModule` 型別解析器（#5625 由 @griffio 提供）
+- [編譯器] 修復 SqlDelightModule 型別解析器（#5625 由 @griffio 提供）
 - [編譯器] 修復 5501 插入物件逸出列（#5503 由 @griffio 提供）
 - [編譯器] 編譯器：改進錯誤訊息，使路徑連結可點擊並具有正確的行與字元位置。（#5604 由 @vanniktech 提供）
 - [編譯器] 修復問題 5298：允許關鍵字用作資料表名稱
 - [編譯器] 修復具名執行並新增測試
 - [編譯器] 在排序初始化陳述式時考慮外鍵 (foreign key) 資料表約束（#5325 由 @TheMrMilchmann 提供）
 - [編譯器] 當涉及製表符 (tab) 時，正確對齊錯誤底線（#5224 由 @drewd 提供）
-- [JDBC 驅動程式] 修復交易結束時 `connectionManager` 的記憶體洩漏
+- [JDBC 驅動程式] 修復交易結束時 connectionManager 的記憶體洩漏
 - [JDBC 驅動程式] 如文件所述，在交易內執行 SQLite 遷移（#5218 由 @morki 提供）
 - [JDBC 驅動程式] 修復交易提交/回復後洩漏的連線（#5205 由 @morki 提供）
 - [Gradle 外掛程式] 在 `GenerateSchemaTask` 之前執行 `DriverInitializer`（#5562 由 @nwagu 提供）
-- [執行階段] 修復當實際驅動程式為非同步 (Async) 時 `LogSqliteDriver` 的當機問題（#5723 由 @edenman 提供）
-- [執行階段] 修復 `StringBuilder` 容量（#5192 由 @janbina 提供）
+- [執行階段] 修復當實際驅動程式為非同步 (Async) 時 LogSqliteDriver 的當機問題（#5723 由 @edenman 提供）
+- [執行階段] 修復 StringBuilder 容量（#5192 由 @janbina 提供）
 - [PostgreSQL 方言] PostgreSql create or replace view（#5407 由 @griffio 提供）
 - [PostgreSQL 方言] PostgreSql to_json（#5606 由 @griffio 提供）
 - [PostgreSQL 方言] PostgreSql 數值解析器（#5399 由 @griffio 提供）
@@ -260,7 +260,7 @@
 - [PostgreSQL 方言] PostgreSql 非同步繫結參數（#5313 由 @griffio 提供）
 - [PostgreSQL 方言] PostgreSql 布林常值（#5262 由 @griffio 提供）
 - [PostgreSQL 方言] PostgreSql 視窗函式（#5155 由 @griffio 提供）
-- [PostgreSQL 方言] PostgreSql `isNull` `isNotNull` 型別（#5173 由 @griffio 提供）
+- [PostgreSQL 方言] PostgreSql isNull isNotNull 型別（#5173 由 @griffio 提供）
 - [PostgreSQL 方言] PostgreSql select distinct（#5172 由 @griffio 提供）
 - [分頁 3 擴充套件] 分頁重新整理初始載入修復（#5615 由 @evant 提供）
 - [分頁 3 擴充套件] 新增 MacOS 原生目標（#5324 由 @vitorhugods 提供）
@@ -270,7 +270,7 @@
 [2.0.2]: https://github.com/sqldelight/sqldelight/releases/tag/2.0.2
 
 ### 新增
-- [PostgreSQL 方言] 新增 PostgreSQL `STRING_AGG` 函式（#4950 由 @anddani 提供）
+- [PostgreSQL 方言] 新增 PostgreSQL STRING_AGG 函式（#4950 由 @anddani 提供）
 - [PostgreSQL 方言] 在 pg 方言中新增 SET 陳述式（#4927 由 @de-luca 提供）
 - [PostgreSQL 方言] 新增 PostgreSql alter column sequence 參數（#4916 由 @griffio 提供）
 - [PostgreSQL 方言] 為 insert 陳述式新增 PostgreSQL alter column default 支援（#4912 由 @griffio 提供）
@@ -280,9 +280,9 @@
 
 ### 變更
 - [IDE 外掛程式] 最低版本需求為 2023.1 / Android Studio Iguana
-- [編譯器] 允許在 `encapsulatingType` 中覆寫型別的可 null 性（#4882 由 @eygraber 提供）
+- [編譯器] 允許在 encapsulatingType 中覆寫型別的可 null 性（#4882 由 @eygraber 提供）
 - [編譯器] 為 SELECT * 內嵌列名
-- [Gradle 外掛程式] 切換至 `processIsolation`（#5068 由 @nwagu 提供）
+- [Gradle 外掛程式] 切換至 processIsolation（#5068 由 @nwagu 提供）
 - [Android 執行階段] 將 Android minSDK 提升至 21（#5094 由 @hfhbd 提供）
 - [驅動程式] 為方言作者公開更多 JDBC/R2DBC 陳述式方法（#5098 由 @hfhbd 提供）
 
@@ -297,12 +297,12 @@
 - [PostgreSQL 方言] 修復 5028 PostgreSql JSON（#5030 由 @griffio 提供）
 - [PostgreSQL 方言] 修復 5040 PostgreSql JSON 運算子（#5041 由 @griffio 提供）
 - [PostgreSQL 方言] 修復 5040 的 JSON 運算子繫結（#5100 由 @griffio 提供）
-- [PostgreSQL 方言] 修復 5082 `tsvector`（#5104 由 @griffio 提供）
+- [PostgreSQL 方言] 修復 5082 tsvector（#5104 由 @griffio 提供）
 - [PostgreSQL 方言] 修復 5032 PostgreSql UPDATE FROM 陳述式的列相鄰性（#5035 由 @griffio 提供）
 - [SQLite 方言] 修復 4897 SQLite 重新命名列（#4899 由 @griffio 提供）
 - [IDE 外掛程式] 修復錯誤處理常式當機（#4988 由 @aperfilyev 提供）
 - [IDE 外掛程式] BugSnag 無法在 IDEA 2023.3 中初始化（由 @aperfilyev 提供）
-- [IDE 外掛程式] 透過外掛程式在 IntelliJ 中開啟 .sq 檔案時出現 `PluginException`（由 @aperfilyev 提供）
+- [IDE 外掛程式] 透過外掛程式在 IntelliJ 中開啟 .sq 檔案時出現 PluginException（由 @aperfilyev 提供）
 - [IDE 外掛程式] 不要將 Kotlin 程式庫打包進 IntelliJ 外掛程式，因為它已經是一個外掛程式相依項（#5126）
 - [IDE 外掛程式] 使用 extensions 陣列而非串流 (stream)（#5127）
 
@@ -316,16 +316,16 @@
 - [PostgreSQL 方言] 新增對二元運算式 (binary expr) 與總和 (sum) 的 PostgreSQL 型別支援（#4539 由 @Adriel-M 提供）
 - [PostgreSQL 方言] 新增對 SELECT 陳述式中 PostgreSQL SELECT DISTINCT ON 語法的支援（#4584 由 @griffio 提供）
 - [PostgreSQL 方言] 新增對 SELECT 陳述式中 PostgreSQL JSON 函式的支援（#4590 由 @MariusVolkhart 提供）
-- [PostgreSQL 方言] 新增 `generate_series` PostgreSQL 函式（#4717 由 @griffio 提供）
+- [PostgreSQL 方言] 新增 generate_series PostgreSQL 函式（#4717 由 @griffio 提供）
 - [PostgreSQL 方言] 新增額外的 Postgres 字串 (String) 函式定義（#4752 由 @MariusVolkhart 提供）
-- [PostgreSQL 方言] 為 `min` 與 `max` 聚合函式新增 DATE PostgreSQL 型別（#4816 由 @anddani 提供）
-- [PostgreSQL 方言] 將 PostgreSql 時間型別新增至 `SqlBinaryExpr`（#4657 由 @griffio 提供）
+- [PostgreSQL 方言] 為 min 與 max 聚合函式新增 DATE PostgreSQL 型別（#4816 由 @anddani 提供）
+- [PostgreSQL 方言] 將 PostgreSql 時間型別新增至 SqlBinaryExpr（#4657 由 @griffio 提供）
 - [PostgreSQL 方言] 在 postgres 方言中新增 TRUNCATE（#4817 由 @de-luca 提供）
 - [SQLite 3.35 方言] 允許依序求值的多個 ON CONFLICT 子句（#4551 由 @griffio 提供）
 - [JDBC 驅動程式] 新增語言註解以獲得更愉快的 SQL 編輯體驗（#4602 由 @MariusVolkhart 提供）
 - [原生驅動程式] 原生驅動程式：新增對 linuxArm64 的支援（#4792 由 @hfhbd 提供）
-- [Android 驅動程式] 為 `AndroidSqliteDriver` 新增 `windowSizeBytes` 參數（#4804 由 @BoD 提供）
-- [分頁 3 擴充套件] 特性：為 `OffsetQueryPagingSource` 新增 `initialOffset`（#4802 由 @MohamadJaara 提供）
+- [Android 驅動程式] 為 AndroidSqliteDriver 新增 windowSizeBytes 參數（#4804 由 @BoD 提供）
+- [分頁 3 擴充套件] 特性：為 OffsetQueryPagingSource 新增 initialOffset（#4802 由 @MohamadJaara 提供）
 
 ### 變更
 - [編譯器] 在適當的情況下偏好使用 Kotlin 型別（#4517 由 @eygraber 提供）
@@ -335,15 +335,15 @@
 - [R2DBC 驅動程式] 最佳化在 PostgreSQL 中處理整數資料型別時的效能（#4588 由 @MariusVolkhart 提供）
 
 ### 移除 {id="removed"}
-- [SQLite Javascript 驅動程式] 移除 `sqljs-driver`（#4613, #4670 由 @dellisd 提供）
+- [SQLite Javascript 驅動程式] 移除 sqljs-driver（#4613, #4670 由 @dellisd 提供）
 
 ### 修復
 - [編譯器] 修復無參數且有傳回值的群組陳述式的編譯（#4699 由 @griffio 提供）
-- [編譯器] 使用 `SqlBinaryExpr` 繫結引數（#4604 由 @griffio 提供）
+- [編譯器] 使用 SqlBinaryExpr 繫結引數（#4604 由 @griffio 提供）
 - [IDE 外掛程式] 如果已設定，則使用 IDEA 專案 JDK（#4689 由 @griffio 提供）
 - [IDE 外掛程式] 修復在 IDEA 2023.2 或更高版本中的 「Unknown element type: TYPE_NAME」 錯誤（#4727）
 - [IDE 外掛程式] 修復了一些與 2023.2 的相容性問題
-- [Gradle 外掛程式] 修正 `verifyMigrationTask` Gradle 任務的文件（#4713 由 @joshfriend 提供）
+- [Gradle 外掛程式] 修正 verifyMigrationTask Gradle 任務的文件（#4713 由 @joshfriend 提供）
 - [Gradle 外掛程式] 新增 Gradle 任務輸出訊息，以協助使用者在驗證資料庫前先產生資料庫（#4684 由 @jingwei99 提供）
 - [PostgreSQL 方言] 修復多次重新命名 PostgreSQL 列的問題（#4566 由 @griffio 提供）
 - [PostgreSQL 方言] 修復 4714 PostgreSQL alter column 可 null 性（#4831 由 @griffio 提供）
@@ -353,20 +353,20 @@
 - [SQLite 方言] 更新來自多個同名列的誤報 (false positive)（#4777 由 @eygraber 提供）
 - [原生驅動程式] 支援具名的記憶體內資料庫（#4662 由 @05nelsonm 提供）
 - [原生驅動程式] 確保查詢接聽程式集合的執行緒安全性（#4567 由 @kpgalligan 提供）
-- [JDBC 驅動程式] 修復 `ConnectionManager` 中的連線洩漏（#4589 由 @MariusVolkhart 提供）
-- [JDBC 驅動程式] 修復選擇 `ConnectionManager` 型別時的 `JdbcSqliteDriver` URL 剖析（#4656 由 @05nelsonm 提供）
+- [JDBC 驅動程式] 修復 ConnectionManager 中的連線洩漏（#4589 由 @MariusVolkhart 提供）
+- [JDBC 驅動程式] 修復選擇 ConnectionManager 型別時的 JdbcSqliteDriver URL 剖析（#4656 由 @05nelsonm 提供）
 
 ## [2.0.0] - 2023-07-26 {id="2-0-0-2023-07-26"}
 [2.0.0]: https://github.com/sqldelight/sqldelight/releases/tag/2.0.0
 
 ### 新增
-- [MySQL 方言] MySQL：在 IF 運算式中支援 `timestamp`/`bigint`（#4329 由 @shellderp 提供）
-- [MySQL 方言] MySQL：新增 `now`（#4431 由 @hfhbd 提供）
+- [MySQL 方言] MySQL：在 IF 運算式中支援 timestamp/bigint（#4329 由 @shellderp 提供）
+- [MySQL 方言] MySQL：新增 now（#4431 由 @hfhbd 提供）
 - [Web 驅動程式] 啟用 NPM 封裝發佈（#4364）
 - [IDE 外掛程式] 允許使用者在 Gradle 工具連接失敗時顯示堆疊追蹤（#4383）
 
 ### 變更
-- [Sqlite 驅動程式] 簡化 `JdbcSqliteDriver` 的架構遷移使用（#3737 由 @morki 提供）
+- [Sqlite 驅動程式] 簡化 JdbcSqliteDriver 的架構遷移使用（#3737 由 @morki 提供）
 - [R2DBC 驅動程式] 真實的非同步 R2DBC 游標（#4387 由 @hfhbd 提供）
 
 ### 修復
@@ -384,19 +384,19 @@
 [2.0.0-rc02]: https://github.com/sqldelight/sqldelight/releases/tag/2.0.0-rc02
 
 ### 新增
-- [MySQL 方言] 支援小寫日期型別，以及日期型別上的 `min` 與 `max`（#4243 由 @shellderp 提供）
+- [MySQL 方言] 支援小寫日期型別，以及日期型別上的 min 與 max（#4243 由 @shellderp 提供）
 - [MySQL 方言] 為二元運算式 (binary expr) 與總和 (sum) 支援 MySQL 型別（#4254 由 @shellderp 提供）
 - [MySQL 方言] 支援不含顯示寬度的無符號整數（#4306 由 @shellderp 提供）
 - [MySQL 方言] 支援 LOCK IN SHARED MODE
-- [PostgreSQL 方言] 為 `min` `max` 新增布林 (boolean) 與 Timestamp（#4245 由 @griffio 提供）
+- [PostgreSQL 方言] 為 min max 新增布林 (boolean) 與 Timestamp（#4245 由 @griffio 提供）
 - [PostgreSQL 方言] Postgres：新增視窗函式支援（#4283 由 @hfhbd 提供）
-- [執行階段] 為執行階段新增 `linuxArm64`、`androidNative` 與 `watchosDeviceArm` 目標（#4258 由 @hfhbd 提供）
-- [分頁擴充套件] 為分頁擴充套件新增 `linux` 與 `mingw x64` 目標（#4280 由 @chippman 提供）
+- [執行階段] 為執行階段新增 linuxArm64、androidNative 與 watchosDeviceArm 目標（#4258 由 @hfhbd 提供）
+- [分頁擴充套件] 為分頁擴充套件新增 linux 與 mingw x64 目標（#4280 由 @chippman 提供）
 
 ### 變更
 - [Gradle 外掛程式] 為 Android API 34 新增自動方言支援（#4251）
-- [分頁擴充套件] 為 `QueryPagingSource` 新增 `SuspendingTransacter` 支援（#4292 由 @daio 提供）
-- [執行階段] 改進 `addListener` API（#4244 由 @hfhbd 提供）
+- [分頁擴充套件] 為 QueryPagingSource 新增 SuspendingTransacter 支援（#4292 由 @daio 提供）
+- [執行階段] 改進 addListener API（#4244 由 @hfhbd 提供）
 - [執行階段] 使用 Long 作為遷移版本（#4297 由 @hfhbd 提供）
 
 ### 修復
@@ -408,17 +408,17 @@
 
 ### 新增
 - [分頁] 為分頁擴充套件新增 JS 瀏覽器目標（#3843 由 @sproctor 提供）
-- [分頁] 為 `androidx-paging3` 擴充套件新增 `iosSimulatorArm64` 目標（#4117）
-- [PostgreSQL 方言] 新增對 `gen_random_uuid()` 的支援與測試（#3855 由 @davidwheeler123 提供）
+- [分頁] 為 androidx-paging3 擴充套件新增 iosSimulatorArm64 目標（#4117）
+- [PostgreSQL 方言] 新增對 gen_random_uuid() 的支援與測試（#3855 由 @davidwheeler123 提供）
 - [PostgreSQL 方言] Alter table add constraint postgres（#4116 由 @griffio 提供）
 - [PostgreSQL 方言] Alter table add constraint check（#4120 由 @griffio 提供）
 - [PostgreSQL 方言] 新增 PostgreSql 字元長度函式（#4121 由 @griffio 提供）
 - [PostgreSQL 方言] 新增 PostgreSql 列預設間隔 (interval)（#4142 由 @griffio 提供）
 - [PostgreSQL 方言] 新增 PostgreSql 間隔列結果（#4152 由 @griffio 提供）
 - [PostgreSQL 方言] 新增 PostgreSql Alter Column（#4165 由 @griffio 提供）
-- [PostgreSQL 方言] PostgreSQL：新增 `date_part`（#4198 由 @hfhbd 提供）
+- [PostgreSQL 方言] PostgreSQL：新增 date_part（#4198 由 @hfhbd 提供）
 - [MySQL 方言] 新增 SQL 字元長度函式（#4134 由 @griffio 提供）
-- [IDE 外掛程式] 新增 `sqldelight` 目錄建議（#3976 由 @aperfilyev 提供）
+- [IDE 外掛程式] 新增 sqldelight 目錄建議（#3976 由 @aperfilyev 提供）
 - [IDE 外掛程式] 在專案樹中壓縮中間套件（#3992 由 @aperfilyev 提供）
 - [IDE 外掛程式] 新增 Join 子句補全（#4086 由 @aperfilyev 提供）
 - [IDE 外掛程式] 建立檢視意圖與即時範本（#4074 由 @aperfilyev 提供）
@@ -426,11 +426,11 @@
 - [Gradle 外掛程式] 啟用型別安全專案存取器（#4005 由 @hfhbd 提供）
 
 ### 變更
-- [Gradle 外掛程式] 允許透過 `ServiceLoader` 機制為 `VerifyMigrationTask` 註冊 `DriverInitializer`（#3986 由 @C2H6O 提供）
+- [Gradle 外掛程式] 允許透過 ServiceLoader 機制為 VerifyMigrationTask 註冊 DriverInitializer（#3986 由 @C2H6O 提供）
 - [Gradle 外掛程式] 建立明確的編譯器環境（#4079 由 @hfhbd 提供）
 - [JS 驅動程式] 將 Web Worker 驅動程式拆分為獨立的產物
-- [JS 驅動程式] 不要公開 `JsWorkerSqlCursor`（#3874 由 @hfhbd 提供）
-- [JS 驅動程式] 停用 `sqljs` 驅動程式的發佈（#4108）
+- [JS 驅動程式] 不要公開 JsWorkerSqlCursor（#3874 由 @hfhbd 提供）
+- [JS 驅動程式] 停用 sqljs 驅動程式的發佈（#4108）
 - [執行階段] 強制要求同步驅動程式必須使用同步架構初始化器（#4013）
 - [執行階段] 改進游標的非同步支援（#4102）
 - [執行階段] 移除已棄用的目標（#4149 由 @hfhbd 提供）
@@ -438,7 +438,7 @@
 
 ### 修復
 - [R2DBC 驅動程式] R2DBC：等待關閉驅動程式（#4139 由 @hfhbd 提供）
-- [編譯器] 在資料庫 `create(SqlDriver)` 中包含來自遷移的 PRAGMA（#3845 由 @MariusVolkhart 提供）
+- [編譯器] 在資料庫 create(SqlDriver) 中包含來自遷移的 PRAGMA（#3845 由 @MariusVolkhart 提供）
 - [編譯器] 修復 RETURNING 子句的程式碼產生（#3872 由 @MariusVolkhart 提供）
 - [編譯器] 不要為虛擬表產生型別（#4015）
 - [Gradle 外掛程式] 小型 Gradle 外掛程式體驗改善（#3930 由 @zacsweers 提供）
@@ -452,7 +452,7 @@
 - [IDE 外掛程式] 新增對 IntelliJ 2023.1 的支援（#4037 由 @madisp 提供）
 - [IDE 外掛程式] 列重新命名時重新命名具名引數使用（#4027 由 @aperfilyev 提供）
 - [IDE 外掛程式] 修復新增遷移快顯視窗（#4105 由 @aperfilyev 提供）
-- [IDE 外掛程式] 在遷移檔案中停用 `SchemaNeedsMigrationInspection`（#4106 由 @aperfilyev 提供）
+- [IDE 外掛程式] 在遷移檔案中停用 SchemaNeedsMigrationInspection（#4106 由 @aperfilyev 提供）
 - [IDE 外掛程式] 為遷移產生使用 SQL 列名而非型別名稱（#4112 由 @aperfilyev 提供）
 
 ## [2.0.0-alpha05] - 2023-01-20 {id="2-0-0-alpha05-2023-01-20"}
@@ -460,7 +460,7 @@
 
 ### 新增
 - [分頁] 多平台分頁擴充套件（由 @jeffdgr8 提供）
-- [執行階段] 為 `Listener` 介面新增 `fun` 修飾詞。
+- [執行階段] 為 Listener 介面新增 fun 修飾詞。
 - [SQLite 方言] 新增 SQLite 3.33 支援 (UPDATE FROM)（由 @eygraber 提供）
 - [PostgreSQL 方言] 在 PostgreSQL 中支援 UPDATE FROM（由 @eygraber 提供）
 
@@ -472,15 +472,15 @@
 - [Gradle 外掛程式] 支援 Kotlin 1.8.0-Beta 並新增多版本 Kotlin 測試（由 @hfhbd 提供）
 
 ### 修復
-- [RDBC 驅動程式] 改為使用 `javaObjectType`（由 @hfhbd 提供）
-- [RDBC 驅動程式] 修復 `bindStatement` 中的原始 null 值（由 @hfhbd 提供）
+- [RDBC 驅動程式] 改為使用 javaObjectType（由 @hfhbd 提供）
+- [RDBC 驅動程式] 修復 bindStatement 中的原始 null 值（由 @hfhbd 提供）
 - [RDBC 驅動程式] 支援 R2DBC 1.0（由 @hfhbd 提供）
-- [PostgreSQL 方言] Postgres：修復不含型別參數的 `Array`（由 @hfhbd 提供）
+- [PostgreSQL 方言] Postgres：修復不含型別參數的 Array（由 @hfhbd 提供）
 - [IDE 外掛程式] 將 IntelliJ 提升至 221.6008.13（由 @hfhbd 提供）
 - [編譯器] 從純檢視 (view) 解析遞迴原始資料表（由 @hfhbd 提供）
 - [編譯器] 使用來自資料表外鍵 (foreign key) 子句的值類別 (value class)（由 @hfhbd 提供）
-- [編譯器] 修復 `SelectQueryGenerator` 以支援不含括號的繫結運算式（由 @bellatoris 提供）
-- [編譯器] 修復使用交易時重複產生 `${name}Indexes` 變數的問題（由 @sachera 提供）
+- [編譯器] 修復 SelectQueryGenerator 以支援不含括號的繫結運算式（由 @bellatoris 提供）
+- [編譯器] 修復使用交易時重複產生 ${name}Indexes 變數的問題（由 @sachera 提供）
 
 ## [1.5.5] - 2023-01-20 {id="1-5-5-2023-01-20"}
 [1.5.5]: https://github.com/sqldelight/sqldelight/releases/tag/1.5.5
@@ -497,50 +497,50 @@
 
 ### 重大變更 {id="breaking-changes"}
 
-- 分頁 3 擴充套件 API 已變更，僅允許 `int` 型別用於計數。
+- 分頁 3 擴充套件 API 已變更，僅允許 int 型別用於計數。
 - 協同程式擴充套件現在需要傳入分派器 (dispatcher)，不再提供預設值。
 - 方言 (Dialect) 與驅動程式 (Driver) 類別現在是最終類別 (final)，請改用委派 (delegation)。
 
 ### 新增
 - [HSQL 方言] Hsql：支援在 Insert 中為產生的列使用 DEFAULT（#3372 由 @hfhbd 提供）
 - [PostgreSQL 方言] PostgreSQL：支援在 INSERT 中為產生的列使用 DEFAULT（#3373 由 @hfhbd 提供）
-- [PostgreSQL 方言] 新增 `NOW()` 至 PostgreSQL（#3403 由 @hfhbd 提供）
+- [PostgreSQL 方言] 新增 NOW() 至 PostgreSQL（#3403 由 @hfhbd 提供）
 - [PostgreSQL 方言] PostgreSQL 新增 NOT 運算子（#3504 由 @hfhbd 提供）
-- [分頁] 允許將 `CoroutineContext` 傳遞給 `*QueryPagingSource`（#3384）
+- [分頁] 允許將 CoroutineContext 傳遞給 *QueryPagingSource（#3384）
 - [Gradle 外掛程式] 為方言提供更好的版本型錄 (version catalog) 支援（#3435）
-- [原生驅動程式] 新增回呼以攔截 `NativeSqliteDriver` 的 `DatabaseConfiguration` 建立過程（#3512 由 @svenjacobs 提供）
+- [原生驅動程式] 新增回呼以攔截 NativeSqliteDriver 的 DatabaseConfiguration 建立過程（#3512 由 @svenjacobs 提供）
 
 ### 變更
-- [分頁] 為由 `KeyedQueryPagingSource` 支援的 `QueryPagingSource` 函式新增預設分派器（#3385）
-- [分頁] 讓 `OffsetQueryPagingSource` 僅適用於 Int（#3386）
-- [非同步執行階段] 將 `await*` 移至上層類別 `ExecutableQuery`（#3524 由 @hfhbd 提供）
+- [分頁] 為由 KeyedQueryPagingSource 支援的 QueryPagingSource 函式新增預設分派器（#3385）
+- [分頁] 讓 OffsetQueryPagingSource 僅適用於 Int（#3386）
+- [非同步執行階段] 將 await* 移至上層類別 ExecutableQuery（#3524 由 @hfhbd 提供）
 - [協同程式擴充套件] 移除流程 (flow) 擴充套件的預設參數（#3489）
 
 ### 修復
 - [Gradle 外掛程式] 更新至 Kotlin 1.7.20（#3542 由 @zacsweers 提供）
 - [R2DBC 驅動程式] 採用 R2DBC 變更，這些變更並不總是傳送值（#3525 由 @hfhbd 提供）
-- [HSQL 方言] 修復使用 Hsql 時 SQLite `VerifyMigrationTask` 失敗的問題（#3380 由 @hfhbd 提供）
+- [HSQL 方言] 修復使用 Hsql 時 SQLite VerifyMigrationTask 失敗的問題（#3380 由 @hfhbd 提供）
 - [Gradle 外掛程式] 將任務轉換為使用延遲組態 (lazy configuration) API（由 @3flex 提供）
 - [Gradle 外掛程式] 避免 Kotlin 1.7.20 中的 NPE（#3398 由 @ZacSweers 提供）
 - [Gradle 外掛程式] 修復壓縮遷移 (squash migrations) 任務的說明（#3449）
-- [IDE 外掛程式] 修復較新 Kotlin 外掛程式中的 `NoSuchFieldError`（#3422 由 @madisp 提供）
-- [IDE 外掛程式] IDEA：`UnusedQueryInspection` - 修復 `ArrayIndexOutOfBoundsException`。（#3427 由 @vanniktech 提供）
+- [IDE 外掛程式] 修復較新 Kotlin 外掛程式中的 NoSuchFieldError（#3422 由 @madisp 提供）
+- [IDE 外掛程式] IDEA：UnusedQueryInspection - 修復 ArrayIndexOutOfBoundsException。（#3427 由 @vanniktech 提供）
 - [IDE 外掛程式] 對舊版 Kotlin 外掛程式參照使用反射
 - [編譯器] 具有擴充函式的自訂方言不建立匯入（#3338 由 @hfhbd 提供）
-- [編譯器] 修復逸出 `CodeBlock.of("${CodeBlock.toString()}")`（#3340 由 @hfhbd 提供）
+- [編譯器] 修復逸出 CodeBlock.of("${CodeBlock.toString()}")（#3340 由 @hfhbd 提供）
 - [編譯器] 在遷移中等待非同步執行 (async execute) 陳述式（#3352）
 - [編譯器] 修復 AS（#3370 由 @hfhbd 提供）
 - [編譯器] `getObject` 方法支援自動填入實際型別。（#3401 由 @robxyy 提供）
 - [編譯器] 修復非同步群組傳回陳述式的程式碼產生（#3411）
 - [編譯器] 如果可能，推論繫結參數的 Kotlin 型別，否則傳回更好的錯誤訊息（#3413 由 @hfhbd 提供）
-- [編譯器] 不允許 `ABS("foo")`（#3430 由 @hfhbd 提供）
+- [編譯器] 不允許 ABS("foo")（#3430 由 @hfhbd 提供）
 - [編譯器] 支援從其他參數推論 Kotlin 型別（#3431 由 @hfhbd 提供）
 - [編譯器] 一律建立資料庫實作（#3540 由 @hfhbd 提供）
 - [編譯器] 放寬 JavaDoc 並將其也新增至自訂對應 (mapper) 函式（#3554 由 @hfhbd 提供）
 - [編譯器] 修復繫結中的 DEFAULT（由 @hfhbd 提供）
 - [分頁] 修復分頁 3（#3396）
-- [分頁] 允許使用 Long 建構 `OffsetQueryPagingSource`（#3409）
-- [分頁] 不要靜態切換 `Dispatchers.Main`（#3428）
+- [分頁] 允許使用 Long 建構 OffsetQueryPagingSource（#3409）
+- [分頁] 不要靜態切換 Dispatchers.Main（#3428）
 
 ## [2.0.0-alpha03] - 2022-06-17 {id="2-0-0-alpha03-2022-06-17"}
 [2.0.0-alpha03]: https://github.com/sqldelight/sqldelight/releases/tag/2.0.0-alpha03
@@ -555,8 +555,8 @@ sqldelight {
   }
 }
 ```
-- `AfterVersionWithDriver` 型別已移除，改用 `AfterVersion`，後者現在一律包含驅動程式。
-- `Schema` 型別不再是 `SqlDriver` 的子型別
+- AfterVersionWithDriver 型別已移除，改用 AfterVersion，後者現在一律包含驅動程式。
+- Schema 型別不再是 SqlDriver 的子型別
 - `PreparedStatement` API 現在使用以零為起始的索引進行呼叫。
 
 ### 新增
@@ -570,16 +570,16 @@ sqldelight {
 - [Gradle 外掛程式] 新增一個標記，用於在遷移檢查期間忽略架構 (schema) 定義
 - [MySQL 方言] 在 MySQL 中支援 FOR SHARE 與 FOR UPDATE（#3098）
 - [MySQL 方言] 支援 MySQL 索引提示 (index hint)（#3099）
-- [PostgreSQL 方言] 新增 `date_trunc`（#3295 由 @hfhbd 提供）
+- [PostgreSQL 方言] 新增 date_trunc（#3295 由 @hfhbd 提供）
 - [JSON 擴充套件] 支援 JSON 資料表函式（#3090）
 
 ### 變更
-- [執行階段] 移除不含驅動程式的 `AfterVersion` 型別（#3091）
-- [執行階段] 將 `Schema` 型別移至最上層
+- [執行階段] 移除不含驅動程式的 AfterVersion 型別（#3091）
+- [執行階段] 將 Schema 型別移至最上層
 - [執行階段] 開放方言與解析器以支援第三方實作（#3232 由 @hfhbd 提供）
 - [編譯器] 在失敗報告中包含用於編譯的方言（#3086）
 - [編譯器] 跳過未使用的配接器 (adapter)（#3162 由 @eygraber 提供）
-- [編譯器] 在 `PrepareStatement` 中使用以零為起始的索引（#3269 由 @hfhbd 提供）
+- [編譯器] 在 PrepareStatement 中使用以零為起始的索引（#3269 由 @hfhbd 提供）
 - [Gradle 外掛程式] 同樣將方言設為適當的 Gradle 相依項，而非字串（#3085）
 - [Gradle 外掛程式] Gradle 驗證任務：缺少資料庫檔案時拋出錯誤。（#3126 由 @vanniktech 提供）
 
@@ -587,7 +587,7 @@ sqldelight {
 - [Gradle 外掛程式] 對 Gradle 外掛程式進行了一些小型清理與調整（#3171 由 @3flex 提供）
 - [Gradle 外掛程式] 不要為產生的目錄使用 AGP 字串
 - [Gradle 外掛程式] 使用 AGP 命名空間 (namespace) 屬性（#3220）
-- [Gradle 外掛程式] 不要將 `kotlin-stdlib` 新增為 Gradle 外掛程式的執行階段相依項（#3245 由 @mbonnin 提供）
+- [Gradle 外掛程式] 不要將 kotlin-stdlib 新增為 Gradle 外掛程式的執行階段相依項（#3245 由 @mbonnin 提供）
 - [Gradle 外掛程式] 簡化多平台組態 (configuration)（#3246 由 @mbonnin 提供）
 - [Gradle 外掛程式] 支援純 JS 專案（#3310 由 @hfhbd 提供）
 - [IDE 外掛程式] 使用 Java Home 為 Gradle 工具 API（#3078）
@@ -602,7 +602,7 @@ sqldelight {
 - [編譯器] 通用資料表不會產生資料類別 (data class)，因此不要傳回它們（#3097）
 - [編譯器] 更快地尋找頂層遷移檔案（#3108）
 - [編譯器] 在管道運算子 (pipe operator) 上正確繼承可 null 性
-- [編譯器] 支援 `iif` ANSI SQL 函式
+- [編譯器] 支援 iif ANSI SQL 函式
 - [編譯器] 不要產生空的查詢檔案（#3300 由 @hfhbd 提供）
 - [編譯器] 修復僅含問號的配接器（#3314 由 @hfhbd 提供）
 - [PostgreSQL 方言] Postgres 主鍵列一律不為 null（#3092）
@@ -653,7 +653,7 @@ sqldelight {
 - [編譯器] 禁止在群組陳述式中使用資料表參數（#1822）
 - [編譯器] 將群組查詢放入交易中（#2785）
 - [執行階段] 從驅動程式的 `execute` 方法傳回更新的資料列計數
-- [執行階段] 將 `SqlCursor` 限制在存取連線的臨界區域內。（#2123 由 @andersio 提供）
+- [執行階段] 將 SqlCursor 限制在存取連線的臨界區域內。（#2123 由 @andersio 提供）
 - [Gradle 外掛程式] 比較遷移的架構 (schema) 定義（#841）
 - [PostgreSQL] 禁止在 PG 中使用雙引號
 - [MySQL] 在 MySQL 中使用 `==` 時報錯（#2673）
@@ -663,14 +663,14 @@ sqldelight {
 - [編譯器] 編譯 upsert 陳述式時的問題（#2791）
 - [編譯器] 查詢結果應使用 select 中的資料表，若有多個相符項（#1874、#2313）
 - [編譯器] 支援更新具有 INSTEAD OF 觸發器的檢視（#1018）
-- [編譯器] 支援函式名稱中的 `from` 與 `for`
+- [編譯器] 支援函式名稱中的 from 與 for
 - [編譯器] 允許在函式運算式中使用 SEPARATOR 關鍵字
 - [編譯器] 無法在 ORDER BY 中存取別名資料表的 ROWID
 - [編譯器] 別名列名在 MySQL 的 HAVING 子句中無法辨識
 - [編譯器] 錯誤的 「找到多個列」 錯誤
 - [編譯器] 無法設定 `PRAGMA locking_mode = EXCLUSIVE;`
 - [PostgreSQL] PostgreSQL 重新命名列
-- [MySQL] `UNIX_TIMESTAMP`、`TO_SECONDS`、`JSON_ARRAYAGG` MySQL 函式無法辨識
+- [MySQL] UNIX_TIMESTAMP、TO_SECONDS、JSON_ARRAYAGG MySQL 函式無法辨識
 - [SQLite] 修復 SQLite 視窗功能
 - [IDE 外掛程式] 在空進度指示器中執行跳轉處理常式 (goto handler)（#2990）
 - [IDE 外掛程式] 確保醒目提示訪問器 (highlight visitor) 不會在專案未配置時執行（#2981、#2976）
@@ -710,7 +710,7 @@ sqldelight {
 - [IDE 外掛程式] 新增 Kotlin 類別補全（由 @aperfilyev 提供）
 - [Gradle 外掛程式] 為 Gradle 型別安全專案存取器新增快捷方式（由 @hfhbd 提供）
 - [編譯器] 根據方言自訂程式碼產生（由 @MariusVolkhart 提供）
-- [JDBC 驅動程式] 為 `JdbcDriver` 新增常見型別（由 @MariusVolkhart 提供）
+- [JDBC 驅動程式] 為 JdbcDriver 新增常見型別（由 @MariusVolkhart 提供）
 - [SQLite] 增加對 SQLite 3.35 的支援（由 @eygraber 提供）
 - [SQLite] 增加對 ALTER TABLE DROP COLUMN 的支援（由 @eygraber 提供）
 - [SQLite] 增加對 SQLite 3.30 方言的支援（由 @eygraber 提供）
@@ -720,13 +720,13 @@ sqldelight {
 - [HSQL] 自訂 HSQL 插入查詢（由 @MariusVolkhart 提供）
 
 ### 變更
-- [全部] 套件名稱已從 `com.squareup.sqldelight` 變更為 `app.cash.sqldelight`。
+- [全部] 套件名稱已從 com.squareup.sqldelight 變更為 app.cash.sqldelight。
 - [執行階段] 將方言移入其各自隔離的 Gradle 模組中
 - [執行階段] 切換至由驅動程式實作的查詢通知。
 - [執行階段] 將預設列配接器提取到單獨的模組（#2056、#2060）
 - [編譯器] 讓模組產生查詢實作，而不是在每個模組中重複執行
-- [編譯器] 移除產生的資料類別的自訂 `toString` 產生。（由 @PaulWoitaschek 提供）
-- [JS 驅動程式] 從 `sqljs-driver` 中移除 `sql.js` 相依項（由 @dellisd 提供）
+- [編譯器] 移除產生的資料類別的自訂 toString 產生。（由 @PaulWoitaschek 提供）
+- [JS 驅動程式] 從 sqljs-driver 中移除 sql.js 相依項（由 @dellisd 提供）
 - [分頁] 移除 Android 分頁 2 擴充套件
 - [IDE 外掛程式] 在 SQLDelight 同步時新增編輯器橫幅（#2511）
 - [IDE 外掛程式] 最低支援的 IntelliJ 版本為 2021.1
@@ -735,7 +735,7 @@ sqldelight {
 - [執行階段] 展平接聽程式清單以減少分配與指標追蹤。（由 @andersio 提供）
 - [IDE 外掛程式] 修復錯誤訊息以允許跳轉至錯誤（由 @hfhbd 提供）
 - [IDE 外掛程式] 新增遺漏的檢查說明（#2768 由 @aperfilyev 提供）
-- [IDE 外掛程式] 修復 `GotoDeclarationHandler` 中的例外（#2531, #2688, #2804 由 @aperfilyev 提供）
+- [IDE 外掛程式] 修復 GotoDeclarationHandler 中的例外（#2531, #2688, #2804 由 @aperfilyev 提供）
 - [IDE 外掛程式] 醒目提示匯入關鍵字（由 @aperfilyev 提供）
 - [IDE 外掛程式] 修復未解決的 Kotlin 型別（#1678 由 @aperfilyev 提供）
 - [IDE 外掛程式] 修復未解決套件的醒目提示（#2543 由 @aperfilyev 提供）
@@ -747,31 +747,31 @@ sqldelight {
 - [IDE 外掛程式] 在檔案剖析期間正確移出主執行緒，且僅在寫入時移回
 - [IDE 外掛程式] 改進與舊版 IntelliJ 版本的相容性（由 @3flex 提供）
 - [IDE 外掛程式] 使用更快的註解 (annotation) API
-- [Gradle 外掛程式] 在新增執行階段時明確支援 `js`/`android` 外掛程式（由 @ZacSweers 提供）
+- [Gradle 外掛程式] 在新增執行階段時明確支援 js/android 外掛程式（由 @ZacSweers 提供）
 - [Gradle 外掛程式] 註冊遷移輸出任務，而不從遷移推導架構 (schema)（#2744 由 @kevincianfarini 提供）
 - [Gradle 外掛程式] 如果遷移任務當機，印出當機時正在執行的檔案
 - [Gradle 外掛程式] 產生程式碼時對檔案進行排序以確保輸出是冪等 (idempotent) 的（由 @ZacSweers 提供）
 - [編譯器] 使用更快的 API 疊代檔案，且不探索整個 PSI 圖
 - [編譯器] 為選擇函式參數新增關鍵字重整 (keyword mangling)（#2759 由 @aperfilyev 提供）
-- [編譯器] 修復 `packageName` 為遷移配接器（由 @hfhbd 提供）
+- [編譯器] 修復 packageName 為遷移配接器（由 @hfhbd 提供）
 - [編譯器] 在屬性而非型別上發出註解（#2798 由 @aperfilyev 提供）
-- [編譯器] 在傳遞給 `Query` 子型別之前對引數進行排序（#2379 由 @aperfilyev 提供）
+- [編譯器] 在傳遞給 Query 子型別之前對引數進行排序（#2379 由 @aperfilyev 提供）
 
 ## [1.5.3] - 2021-11-23 {id="1-5-3-2021-11-23"}
 [1.5.3]: https://github.com/sqldelight/sqldelight/releases/tag/1.5.3
 
 ### 新增
-- [JDBC 驅動程式] 開放 `JdbcDriver` 以支援第三方驅動程式實作（#2672 由 @hfhbd 提供）
+- [JDBC 驅動程式] 開放 JdbcDriver 以支援第三方驅動程式實作（#2672 由 @hfhbd 提供）
 - [MySQL 方言] 為時間增量新增遺漏的函式（#2671 由 @sdoward 提供）
 - [協同程式擴充套件] 為協同程式擴充套件新增 M1 目標（由 @PhilipDukhov 提供）
 
 ### 變更
-- [分頁 3 擴充套件] 將 `sqldelight-android-paging3` 作為 JAR 而非 AAR 發佈（#2634 由 @julioromano 提供）
-- 同時也是軟關鍵字 (soft keyword) 的屬性名稱現在將以底線結尾。例如 `value` 將公開為 `value_`
+- [分頁 3 擴充套件] 將 sqldelight-android-paging3 作為 JAR 而非 AAR 發佈（#2634 由 @julioromano 提供）
+- 同時也是軟關鍵字 (soft keyword) 的屬性名稱現在將以底線結尾。例如 value 將公開為 value_
 
 ### 修復
 - [編譯器] 不要為重複的陣列參數提取變數（由 @aperfilyev 提供）
-- [Gradle 外掛程式] 新增 `kotlin.mpp.enableCompatibilityMetadataVariant`。（#2628 由 @martinbonnin 提供）
+- [Gradle 外掛程式] 新增 kotlin.mpp.enableCompatibilityMetadataVariant。（#2628 由 @martinbonnin 提供）
 - [IDE 外掛程式] 尋找用法處理需要讀取操作 (read action)
 
 ## [1.5.2] - 2021-10-12 {id="1-5-2-2021-10-12"}
@@ -782,19 +782,19 @@ sqldelight {
 - [IDE 外掛程式] 新增 NULL 比較檢查（由 @aperfilyev 提供）
 - [IDE 外掛程式] 新增檢查抑制器 (inspection suppressor)（#2519 由 @aperfilyev 提供）
 - [IDE 外掛程式] 混合具名與位置參數檢查（由 @aperfilyev 提供）
-- [SQLite 驅動程式] 新增 `mingwX86` 目標。（#2558 由 @enginegl 提供）
+- [SQLite 驅動程式] 新增 mingwX86 目標。（#2558 由 @enginegl 提供）
 - [SQLite 驅動程式] 新增 M1 目標
-- [SQLite 驅動程式] 新增 `linuxX64` 支援（#2456 由 @chippmann 提供）
-- [MySQL 方言] 為 MySQL 新增 `ROW_COUNT` 函式（#2523）
+- [SQLite 驅動程式] 新增 linuxX64 支援（#2456 由 @chippmann 提供）
+- [MySQL 方言] 為 MySQL 新增 ROW_COUNT 函式（#2523）
 - [PostgreSQL 方言] postgres 重新命名、刪除列（由 @pabl0rg 提供）
 - [PostgreSQL 方言] PostgreSQL 語法無法辨識 CITEXT
 - [PostgreSQL 方言] 包含 TIMESTAMP WITH TIME ZONE 與 TIMESTAMPTZ
 - [PostgreSQL 方言] 為 PostgreSQL GENERATED 列新增語法 (grammar)
-- [執行階段] 提供 `SqlDriver` 作為 `AfterVersion` 的參數（#2534, 2614 由 @ahmedre 提供）
+- [執行階段] 提供 SqlDriver 作為 AfterVersion 的參數（#2534, 2614 由 @ahmedre 提供）
 
 ### 變更
 - [Gradle 外掛程式] 明確要求 Gradle 7.0（#2572 由 @martinbonnin 提供）
-- [Gradle 外掛程式] 讓 `VerifyMigrationTask` 支援 Gradle 的最新檢查（#2533 由 @3flex 提供）
+- [Gradle 外掛程式] 讓 VerifyMigrationTask 支援 Gradle 的最新檢查（#2533 由 @3flex 提供）
 - [IDE 外掛程式] 當將可 null 型別與不可為 null 型別聯結 (join) 時，不要發出 「聯結比較兩個不同型別的列」 的警告（#2550 由 @pchmielowski 提供）
 - [IDE 外掛程式] 釐清列型別中小寫 「as」 的錯誤（由 @aperfilyev 提供）
 
@@ -804,23 +804,23 @@ sqldelight {
 - [IDE 外掛程式] 避免在未使用查詢檢查期間當機（#2610）
 - [IDE 外掛程式] 在寫入操作 (write action) 內執行資料庫同步寫入（#2605）
 - [IDE 外掛程式] 讓 IDE 排程 SQLDelight 同步
-- [IDE 外掛程式] 修復 `JavaTypeMixin` 中的 NPE（#2603 由 @aperfilyev 提供）
-- [IDE 外掛程式] 修復 `MismatchJoinColumnInspection` 中的 `IndexOutOfBoundsException`（#2602 由 @aperfilyev 提供）
-- [IDE 外掛程式] 新增 `UnusedColumnInspection` 的說明（#2600 由 @aperfilyev 提供）
-- [IDE 外掛程式] 將 `PsiElement.generatedVirtualFiles` 包裹在讀取操作中（#2599 由 @aperfilyev 提供）
+- [IDE 外掛程式] 修復 JavaTypeMixin 中的 NPE（#2603 由 @aperfilyev 提供）
+- [IDE 外掛程式] 修復 MismatchJoinColumnInspection 中的 IndexOutOfBoundsException（#2602 由 @aperfilyev 提供）
+- [IDE 外掛程式] 新增 UnusedColumnInspection 的說明（#2600 由 @aperfilyev 提供）
+- [IDE 外掛程式] 將 PsiElement.generatedVirtualFiles 包裹在讀取操作中（#2599 由 @aperfilyev 提供）
 - [IDE 外掛程式] 移除不必要的非 null 轉換（#2596）
 - [IDE 外掛程式] 正確處理尋找用法的 null（#2595）
 - [IDE 外掛程式] 修復 Android 產生檔案的 IDE 自動補全（#2573 由 @martinbonnin 提供）
-- [IDE 外掛程式] 修復 `SqlDelightGotoDeclarationHandler` 中的 NPE（由 @aperfilyev 提供）
+- [IDE 外掛程式] 修復 SqlDelightGotoDeclarationHandler 中的 NPE（由 @aperfilyev 提供）
 - [IDE 外掛程式] 在 insert 陳述式內的引數中重整 (mangle) Kotlin 關鍵字（#2433 由 @aperfilyev 提供）
-- [IDE 外掛程式] 修復 `SqlDelightFoldingBuilder` 中的 NPE（#2382 由 @aperfilyev 提供）
-- [IDE 外掛程式] 在 `CopyPasteProcessor` 中擷取 `ClassCastException`（#2369 由 @aperfilyev 提供）
+- [IDE 外掛程式] 修復 SqlDelightFoldingBuilder 中的 NPE（#2382 由 @aperfilyev 提供）
+- [IDE 外掛程式] 在 CopyPasteProcessor 中擷取 ClassCastException（#2369 由 @aperfilyev 提供）
 - [IDE 外掛程式] 修復更新即時範本（由 @IliasRedissi 提供）
 - [IDE 外掛程式] 為意圖操作 (intention action) 新增說明（#2489 由 @aperfilyev 提供）
-- [IDE 外掛程式] 修復 `CreateTriggerMixin` 中找不到資料表時的例外（由 @aperfilyev 提供）
+- [IDE 外掛程式] 修復 CreateTriggerMixin 中找不到資料表時的例外（由 @aperfilyev 提供）
 - [編譯器] 以拓撲方式對資料表建立陳述式進行排序
 - [編譯器] 停止在目錄上呼叫 `forDatabaseFiles` 回呼（#2532）
-- [Gradle 外掛程式] 將 `generateDatabaseInterface` 任務相依性傳遞給潛在取用者（#2518 由 @martinbonnin 提供）
+- [Gradle 外掛程式] 將 generateDatabaseInterface 任務相依性傳遞給潛在取用者（#2518 由 @martinbonnin 提供）
 
 ## [1.5.1] - 2021-07-16 {id="1-5-1-2021-07-16"}
 [1.5.1]: https://github.com/sqldelight/sqldelight/releases/tag/1.5.1
@@ -829,7 +829,7 @@ sqldelight {
 - [PostgreSQL 方言] PostgreSQL JSONB 與 ON Conflict Do Nothing（由 @satook 提供）
 - [PostgreSQL 方言] 增加對 PostgreSQL ON CONFLICT (column, ...) DO UPDATE（由 @satook 提供）
 - [MySQL 方言] 支援 MySQL 產生的列 (generated column)（由 @JGulbronson 提供）
-- [原生驅動程式] 新增 `watchosX64` 支援
+- [原生驅動程式] 新增 watchosX64 支援
 - [IDE 外掛程式] 新增參數型別與註解（由 @aperfilyev 提供）
 - [IDE 外掛程式] 新增產生 「全選」 查詢的操作（由 @aperfilyev 提供）
 - [IDE 外掛程式] 在自動補全中顯示列型別（由 @aperfilyev 提供）
@@ -846,29 +846,29 @@ sqldelight {
 ### 變更
 - [原生驅動程式] 透過在可能時避免凍結與可共用資料結構來改進原生交易效能（由 @andersio 提供）
 - [分頁 3] 將 Paging3 版本提升至 3.0.0 穩定版
-- [JS 驅動程式] 將 `sql.js` 升級至 1.5.0
+- [JS 驅動程式] 將 sql.js 升級至 1.5.0
 
 ### 修復
-- [JDBC SQLite 驅動程式] 在清除 `ThreadLocal` 之前在連線上呼叫 `close()`（#2444 由 @hannesstruss 提供）
+- [JDBC SQLite 驅動程式] 在清除 ThreadLocal 之前在連線上呼叫 close()（#2444 由 @hannesstruss 提供）
 - [RX 擴充套件] 修復訂閱 / 處置競態洩漏（#2403 由 @pyricau 提供）
 - [協同程式擴充套件] 確保我們在通知前註冊查詢接聽程式
-- [編譯器] 對 `notifyQueries` 進行排序以獲得一致的 Kotlin 輸出檔案（由 @thomascjy 提供）
-- [編譯器] 不要為選擇查詢類別屬性加上 `@JvmField` 註解（由 @eygraber 提供）
+- [編譯器] 對 notifyQueries 進行排序以獲得一致的 Kotlin 輸出檔案（由 @thomascjy 提供）
+- [編譯器] 不要為選擇查詢類別屬性加上 @JvmField 註解（由 @eygraber 提供）
 - [IDE 外掛程式] 修復匯入最佳化程式（#2350 由 @aperfilyev 提供）
 - [IDE 外掛程式] 修復未使用的列檢查 (unused column inspection)（由 @aperfilyev 提供）
 - [IDE 外掛程式] 為匯入檢查與類別標註程式新增巢狀類別支援（由 @aperfilyev 提供）
-- [IDE 外掛程式] 修復 `CopyPasteProcessor` 中的 NPE（#2363 由 @aperfilyev 提供）
-- [IDE 外掛程式] 修復 `InlayParameterHintsProvider` 中的當機（#2359 由 @aperfilyev 提供）
+- [IDE 外掛程式] 修復 CopyPasteProcessor 中的 NPE（#2363 由 @aperfilyev 提供）
+- [IDE 外掛程式] 修復 InlayParameterHintsProvider 中的當機（#2359 由 @aperfilyev 提供）
 - [IDE 外掛程式] 修復將任何文字貼上到建立資料表陳述式時插入空行的問題（#2431 由 @aperfilyev 提供）
 
 ## [1.5.0] - 2021-04-23 {id="1-5-0-2021-04-23"}
 [1.5.0]: https://github.com/sqldelight/sqldelight/releases/tag/1.5.0
 
 ### 新增
-- [SQLite Javascript 驅動程式] 啟用 `sqljs-driver` 發佈（#1667 由 @dellisd 提供）
+- [SQLite Javascript 驅動程式] 啟用 sqljs-driver 發佈（#1667 由 @dellisd 提供）
 - [分頁 3 擴充套件] 用於 Android Paging 3 程式庫的擴充套件（#1786 由 @kevincianfarini 提供）
 - [MySQL 方言] 增加對 mysql 的 ON DUPLICATE KEY UPDATE 衝突解決的支援。（由 @rharter 提供）
-- [SQLite 方言] 為 SQLite `offsets()` 新增編譯器支援（由 @qjroberts 提供）
+- [SQLite 方言] 為 SQLite offsets() 新增編譯器支援（由 @qjroberts 提供）
 - [IDE 外掛程式] 為未知型別新增匯入快速修正（#683 由 @aperfilyev 提供）
 - [IDE 外掛程式] 新增未使用的匯入檢查（#1161 由 @aperfilyev 提供）
 - [IDE 外掛程式] 新增未使用的查詢檢查（由 @aperfilyev 提供）
@@ -889,20 +889,20 @@ sqldelight {
 
 ### 修復
 - [編譯器] Lambda 之前的 NBSP（由 @oldergod 提供）
-- [編譯器] 修復產生的 `bind*` 與 `cursor.get*` 陳述式中不相容的型別
+- [編譯器] 修復產生的 bind* 與 cursor.get* 陳述式中不相容的型別
 - [編譯器] SQL 子句應保留配接型別 (adapted type)（#2067）
 - [編譯器] 僅具 NULL 關鍵字的列應為可 null
 - [編譯器] 不要產生帶有型別註解的對應器 (mapper) Lambda（#1957）
 - [編譯器] 如果自訂查詢會發生衝突，則使用檔案名稱作為額外的套件後綴（#1057、#1278）
 - [編譯器] 確保外鍵 (foreign key) 串聯 (cascade) 會導致查詢接聽程式收到通知（#1325、#1485）
 - [編譯器] 如果聯結 (union) 兩個相同的型別，則傳回資料表型別（#1342）
-- [編譯器] 確保傳入 `ifnull` 與 `coalesce` 的參數可以為 null（#1263）
+- [編譯器] 確保傳入 ifnull 與 coalesce 的參數可以為 null（#1263）
 - [編譯器] 為運算式正確使用查詢施加的可 null 性
 - [MySQL 方言] 支援 MySQL if 陳述式
 - [PostgreSQL 方言] 在 PostgreSQL 中將 NUMERIC 與 DECIMAL 擷取為 Double（#2118）
 - [SQLite 方言] UPSERT 通知應考慮 BEFORE/AFTER UPDATE 觸發器。（#2198 由 @andersio 提供）
-- [SQLite 驅動程式] 為 `SqliteDriver` 中的執行緒使用多個連線，除非我們在記憶體中（#1832）
-- [JDBC 驅動程式] JDBC 驅動程式假定 `autoCommit` 為 true（#2041）
+- [SQLite 驅動程式] 為 SqliteDriver 中的執行緒使用多個連線，除非我們在記憶體中（#1832）
+- [JDBC 驅動程式] JDBC 驅動程式假定 autoCommit 為 true（#2041）
 - [JDBC 驅動程式] 確保在發生例外時關閉連線（#2306）
 - [IDE 外掛程式] 修復因路徑分隔符號錯誤導致在 Windows 上 GoToDeclaration/FindUsages 毀損的問題（#2054 由 @angusholder 提供）
 - [IDE 外掛程式] 忽略 Gradle 錯誤而不是當機。
@@ -916,12 +916,12 @@ sqldelight {
 - [IDE 外掛程式] 若 IntelliJ 在 SQLDelight 建立索引期間遇到例外，請勿當機
 - [IDE 外掛程式] 處理在 IDE 中產生程式碼前偵測錯誤時發生的例外
 - [IDE 外掛程式] 讓 IDE 外掛程式相容於動態外掛程式 (Dynamic Plugins)（#1536）
-- [Gradle 外掛程式] 使用 `WorkerApi` 產生資料庫時的競態條件 (race condition)（#2062 由 @stephanenicolas 提供）
-- [Gradle 外掛程式] `classLoaderIsolation` 防止自訂 JDBC 使用（#2048 由 @benasher44 提供）
-- [Gradle 外掛程式] 改進遺漏 `packageName` 的錯誤訊息（由 @vanniktech 提供）
+- [Gradle 外掛程式] 使用 WorkerApi 產生資料庫時的競態條件 (race condition)（#2062 由 @stephanenicolas 提供）
+- [Gradle 外掛程式] classLoaderIsolation 防止自訂 JDBC 使用（#2048 由 @benasher44 提供）
+- [Gradle 外掛程式] 改進遺漏 packageName 的錯誤訊息（由 @vanniktech 提供）
 - [Gradle 外掛程式] SQLDelight 將 IntelliJ 相依項流失至 buildscript 類別路徑（#1998）
 - [Gradle 外掛程式] 修復 Gradle 組建快取（#2075）
-- [Gradle 外掛程式] 不要在 Gradle 外掛程式中相依於 `kotlin-native-utils`（由 @ilmat192 提供）
+- [Gradle 外掛程式] 不要在 Gradle 外掛程式中相依於 kotlin-native-utils（由 @ilmat192 提供）
 - [Gradle 外掛程式] 如果只有遷移 (migration) 檔案，也要寫入資料庫（#2094）
 - [Gradle 外掛程式] 確保菱形相依項在最終編譯單元中僅被選取一次（#1455）
 
@@ -932,8 +932,8 @@ sqldelight {
 
 ### 新增
 - [PostgreSQL 方言] 支援 WITH 中修改資料的陳述式
-- [PostgreSQL 方言] 支援 `substring` 函式
-- [Gradle 外掛程式] 新增了 `verifyMigrations` 旗標，用於在 SQLDelight 編譯期間驗證遷移（#1872）
+- [PostgreSQL 方言] 支援 substring 函式
+- [Gradle 外掛程式] 新增了 verifyMigrations 旗標，用於在 SQLDelight 編譯期間驗證遷移（#1872）
 
 ### 變更
 - [編譯器] 在非 SQLite 方言中將 SQLite 特定函式標記為未知
@@ -944,7 +944,7 @@ sqldelight {
 - [編譯器] 產生資料庫介面時出現註冊表 (registry) 警告（#1792）
 - [編譯器] case 陳述式的型別推論錯誤（#1811）
 - [編譯器] 為無版本的遷移檔案提供更好的錯誤（#2006）
-- [編譯器] 某些資料庫型別 `ColumnAdapter` 所需的編組 (marshal) 資料庫型別不正確（#2012）
+- [編譯器] 某些資料庫型別 ColumnAdapter 所需的編組 (marshal) 資料庫型別不正確（#2012）
 - [編譯器] CAST 的可 null 性（#1261）
 - [編譯器] 查詢包裝器 (wrapper) 中出現許多名稱遮蔽 (name shadowed) 警告（#1946 由 @eygraber 提供）
 - [編譯器] 產生的程式碼使用完全限定名稱 (full qualifier names)（#1939）
@@ -965,7 +965,7 @@ sqldelight {
 [1.4.3]: https://github.com/sqldelight/sqldelight/releases/tag/1.4.3
 
 ### 新增
-- [MySQL 方言] 增加對 MySQL `last_insert_id` 函式的支援（由 @lawkai 提供）
+- [MySQL 方言] 增加對 MySQL last_insert_id 函式的支援（由 @lawkai 提供）
 - [PostgreSQL 方言] 支援 SERIAL 資料型別（由 @veyndan 與 @felipecsl 提供）
 - [PostgreSQL 方言] 支援 PostgreSQL RETURNING（由 @veyndan 提供）
 
@@ -974,12 +974,12 @@ sqldelight {
 - [編譯器] 修復 Upsert 陳述式編譯器錯誤（#1809 由 @eygraber 提供）
 - [編譯器] 修復產生無效 Kotlin 的問題（#1925 由 @eygraber 提供）
 - [編譯器] 為未知函式提供更好的錯誤訊息（#1843）
-- [編譯器] 公開字串作為 `instr` 第二個參數的型別
+- [編譯器] 公開字串作為 instr 第二個參數的型別
 - [IDE 外掛程式] 修復 IDE 外掛程式的背景程序膨脹與 UI 執行緒停頓 (stalling)（#1916）
 - [IDE 外掛程式] 處理模組 (module) 為 null 的情況（#1902）
 - [IDE 外掛程式] 在未配置的 sq 檔案中，為套件名稱傳回空字串（#1920）
 - [IDE 外掛程式] 修復群組陳述式並為其新增整合測試（#1820）
-- [IDE 外掛程式] 使用內建的 `ModuleUtil` 尋找元素的模組（#1854）
+- [IDE 外掛程式] 使用內建的 ModuleUtil 尋找元素的模組（#1854）
 - [IDE 外掛程式] 僅將有效元素新增至查詢（lookups）（#1909）
 - [IDE 外掛程式] 父代 (parent) 可以為 null（#1857）
 
@@ -988,14 +988,14 @@ sqldelight {
 
 ### 新增
 - [執行階段] 支援新的 JS IR 後端
-- [Gradle 外掛程式] 新增 `generateSqlDelightInterface` Gradle 任務。（由 @vanniktech 提供）
-- [Gradle 外掛程式] 新增 `verifySqlDelightMigration` Gradle 任務。（由 @vanniktech 提供）
+- [Gradle 外掛程式] 新增 generateSqlDelightInterface Gradle 任務。（由 @vanniktech 提供）
+- [Gradle 外掛程式] 新增 verifySqlDelightMigration Gradle 任務。（由 @vanniktech 提供）
 
 ### 修復
 - [IDE 外掛程式] 使用 Gradle 工具 API 促進 IDE 與 Gradle 之間的資料共享
 - [IDE 外掛程式] 預設架構推導 (schema derivation) 為 false
-- [IDE 外掛程式] 正確獲取 `commonMain` 來源集 (source set)
-- [MySQL 方言] 在 `mySqlFunctionType()` 中新增了 `minute`（由 @maaxgr 提供）
+- [IDE 外掛程式] 正確獲取 commonMain 來源集 (source set)
+- [MySQL 方言] 在 mySqlFunctionType() 中新增了 minute（由 @maaxgr 提供）
 
 ## [1.4.1] - 2020-08-21 {id="1-4-1-2020-08-21"}
 [1.4.1]: https://github.com/sqldelight/sqldelight/releases/tag/1.4.1
@@ -1004,14 +1004,14 @@ sqldelight {
 - [執行階段] 支援 Kotlin 1.4.0（#1859）
 
 ### 變更
-- [Gradle 外掛程式] 讓 AGP 相依項變為 `compileOnly`（#1362）
+- [Gradle 外掛程式] 讓 AGP 相依項變為 compileOnly（#1362）
 
 ### 修復
 - [編譯器] 為列定義規則與資料表介面產生器新增選用 JavaDoc（#1224 由 @endanke 提供）
-- [SQLite 方言] 增加對 SQLite FTS5 輔助函式 `highlight`、`snippet` 與 `bm25` 的支援（由 @drampelt 提供）
-- [MySQL 方言] 支援 MySQL `bit` 資料型別
+- [SQLite 方言] 增加對 SQLite FTS5 輔助函式 highlight、snippet 與 bm25 的支援（由 @drampelt 提供）
+- [MySQL 方言] 支援 MySQL bit 資料型別
 - [MySQL 方言] 支援 MySQL 二進位常值 (binary literal)
-- [PostgreSQL 方言] 從 `sql-psi` 公開 SERIAL（由 @veyndan 提供）
+- [PostgreSQL 方言] 從 sql-psi 公開 SERIAL（由 @veyndan 提供）
 - [PostgreSQL 方言] 新增 BOOLEAN 資料型別（由 @veyndan 提供）
 - [PostgreSQL 方言] 新增 NULL 列約束（由 @veyndan 提供）
 - [HSQL 方言] 為 HSQL 增加 `AUTO_INCREMENT` 支援（由 @rharter 提供）
@@ -1028,7 +1028,7 @@ sqldelight {
 - [IDE] 對遷移 (.sqm) 檔案的 IDE 支援
 - [IDE] 新增模仿內建 SQL 即時範本 (Live Template) 的 SQLDelight 即時範本（#1154 由 @veyndan 提供）
 - [IDE] 新增新建 SqlDelight 檔案操作（#42 由 @romtsn 提供）
-- [執行階段] 用於傳回結果的交易的 `transactionWithReturn` API
+- [執行階段] 用於傳回結果的交易的 transactionWithReturn API
 - [編譯器] 語法用於將多個 SQL 陳述式群組在一起在一個 .sq 檔案中
 - [編譯器] 支援從遷移 (migration) 檔案產生架構 (schema)
 - [Gradle 外掛程式] 新增一個任務用於將遷移檔案輸出為有效 SQL
@@ -1037,23 +1037,23 @@ sqldelight {
 - [文件] 文件網站翻新（由 @saket 提供）
 - [Gradle 外掛程式] 改進不支援方言的錯誤訊息（由 @veyndan 提供）
 - [IDE] 根據方言動態變更檔案圖示（由 @veyndan 提供）
-- [JDBC 驅動程式] 公開源自 `javax.sql.DataSource` 的 `JdbcDriver` 建構函式（#1614）
+- [JDBC 驅動程式] 公開源自 javax.sql.DataSource 的 JdbcDriver 建構函式（#1614）
 
 ### 修復
 - [編譯器] 支援資料表上的 JavaDoc 並修復一個檔案中出現多個 JavaDoc 的問題（#1224）
 - [編譯器] 啟用為合成列 (synthesized column) 插入值（#1351）
 - [編譯器] 修復目錄名稱清理 (sanitizing) 中的不一致（由 @ZacSweers 提供）
 - [編譯器] 合成列應在聯結中保留可 null 性（#1656）
-- [編譯器] 將刪除陳述式釘選在 `delete` 關鍵字上（#1643）
+- [編譯器] 將刪除陳述式釘選在 delete 關鍵字上（#1643）
 - [編譯器] 修復引號問題（#1525 由 @angusholder 提供）
-- [編譯器] 修復 `between` 運算子以正確遞迴進入運算式（#1279）
+- [編譯器] 修復 between 運算子以正確遞迴進入運算式（#1279）
 - [編譯器] 為建立索引時遺漏資料表/列提供更好的錯誤（#1372）
 - [編譯器] 允許在聯結約束中使用外部查詢的投影 (projection)（#1346）
-- [原生驅動程式] 讓 `execute` 使用 `transationPool`（由 @benasher44 提供）
+- [原生驅動程式] 讓 execute 使用 transationPool（由 @benasher44 提供）
 - [JDBC 驅動程式] 使用 JDBC 交易 API 而非 SQLite（#1693）
-- [IDE] 修復 `virtualFile` 參照使其一律為原始檔案（#1782）
+- [IDE] 修復 virtualFile 參照使其一律為原始檔案（#1782）
 - [IDE] 向 Bugsnag 回報錯誤時使用正確的可拋出物件 (throwable)（#1262）
-- [分頁擴充套件] 修復洩漏的 `DataSource`（#1628）
+- [分頁擴充套件] 修復洩漏的 DataSource（#1628）
 - [Gradle 外掛程式] 如果在產生架構時輸出資料庫檔案已存在，請將其刪除（#1645）
 - [Gradle 外掛程式] 如果有間隙，則遷移驗證失敗
 - [Gradle 外掛程式] 明確使用我們設定的檔案索引（#1644）
@@ -1066,26 +1066,26 @@ sqldelight {
 * 新功能：[編譯器] #1436 支援 SQLite 3.24 方言與 upsert。
 * 新功能：[JDBC 驅動程式] 將 JDBC 驅動程式從 SQLite JVM 驅動程式中分離出來。
 * 修復：[編譯器] #1199 支援任意長度的 Lambda。
-* 修復：[編譯器] #1610 修復 `avg()` 的傳回型別為可 null。
+* 修復：[編譯器] #1610 修復 avg() 的傳回型別為可 null。
 * 修復：[IntelliJ] #1594 修復路徑分隔符號處理，此問題導致 Windows 上的跳轉與尋找用法毀損。
 
 ## [1.2.2] - 2020-01-22 {id="1-2-2-2020-01-22"}
 [1.2.2]: https://github.com/sqldelight/sqldelight/releases/tag/1.2.2
 
 * 新功能：[執行階段] 支援 Windows (mingW)、tvOS、watchOS 與 macOS 架構。
-* 修復：[編譯器] `sum()` 的傳回型別應為可 null。
-* 修復：[分頁] 將 `Transacter` 傳入 `QueryDataSourceFactory` 以避免競態條件。
+* 修復：[編譯器] sum() 的傳回型別應為可 null。
+* 修復：[分頁] 將 Transacter 傳入 QueryDataSourceFactory 以避免競態條件。
 * 修復：[IntelliJ 外掛程式] 尋找檔案套件名稱時不要搜尋相依項。
 * 修復：[Gradle] #862 將 Gradle 中的驗證器記錄變更為偵錯 (debug) 層級。
-* 增強：[Gradle] 將 `GenerateSchemaTask` 轉換為使用 Gradle 工作程序 (worker)。
-* 注意：`sqldelight-runtime` 成品已重新命名為執行階段 (runtime)。
+* 增強：[Gradle] 將 GenerateSchemaTask 轉換為使用 Gradle 工作程序 (worker)。
+* 注意：sqldelight-runtime 成品已重新命名為執行階段 (runtime)。
 
 ## [1.2.1] - 2019-12-11 {id="1-2-1-2019-12-11"}
 [1.2.1]: https://github.com/sqldelight/sqldelight/releases/tag/1.2.1
 
 * 修復：[Gradle] Kotlin 原生 1.3.60 支援。
 * 修復：[Gradle] #1287 同步時發出警告。
-* 修復：[編譯器] #1469 為查詢建立 `SynetheticAccessor`。
+* 修復：[編譯器] #1469 為查詢建立 SynetheticAccessor。
 * 修復：[JVM 驅動程式] 修復記憶體洩漏。
 * 注意：協同程式擴充套件成品需要將 kotlinx Bintray Maven 存儲庫新增至您的 buildscript。
 
@@ -1110,7 +1110,7 @@ sqldelight {
 * 修復：[Gradle] #1274 啟用 SQLDelight 擴充套件與 Kotlin DSL 的配合使用。
 * 修復：[編譯器] 為每個查詢具決定性地產生唯一識別碼 (id)。
 * 修復：[編譯器] 僅在交易完成時通知接聽查詢。
-* 修復：[JVM 驅動程式] #1370 強制 `JdbcSqliteDriver` 使用者提供資料庫 URL。
+* 修復：[JVM 驅動程式] #1370 強制 JdbcSqliteDriver 使用者提供資料庫 URL。
 
 ## [1.1.3] - 2019-04-14 {id="1-1-3-2019-04-14"}
 [1.1.3]: https://github.com/sqldelight/sqldelight/releases/tag/1.1.3
@@ -1123,14 +1123,14 @@ sqldelight {
 * 新功能：[執行階段] #1267 記錄驅動程式裝飾器 (decorator)。
 * 修復：[編譯器] #1254 拆分長度超過 2^16 個字元的字串常值 (string literal)。
 * 修復：[Gradle] #1260 產生的原始碼在多平台專案中被辨識為 iOS 來源。
-* 修復：[IDE] #1290 `kotlin.KotlinNullPointerException` 發生在 `CopyAsSqliteAction.kt:43`。
-* 修復：[Gradle] #1268 近期版本中執行 `linkDebugFrameworkIos*` 任務失敗。
+* 修復：[IDE] #1290 kotlin.KotlinNullPointerException 發生在 CopyAsSqliteAction.kt:43。
+* 修復：[Gradle] #1268 近期版本中執行 linkDebugFrameworkIos* 任務失敗。
 
 ## [1.1.1] - 2019-03-01 {id="1-1-1-2019-03-01"}
 [1.1.1]: https://github.com/sqldelight/sqldelight/releases/tag/1.1.1
 
 * 修復：[Gradle] 修復 Android 專案的模組相依性編譯。
-* 修復：[Gradle] #1246 在 `afterEvaluate` 中設定 API 相依性。
+* 修復：[Gradle] #1246 在 afterEvaluate 中設定 API 相依性。
 * 修復：[編譯器] 陣列型別能正確印出。
 
 ## [1.1.0] - 2019-02-27 {id="1-1-0-2019-02-27"}
@@ -1145,7 +1145,7 @@ sqldelight {
 [1.0.3]: https://github.com/sqldelight/sqldelight/releases/tag/1.0.3
 
 * 增強：[執行階段] #1195 原生驅動程式/執行階段 Arm32。
-* 增強：[執行階段] #1190 從 `Query` 型別公開對應器 (mapper)。
+* 增強：[執行階段] #1190 從 Query 型別公開對應器 (mapper)。
 
 ## [1.0.2] - 2019-01-26 {id="1-0-2-2019-01-26"}
 [1.0.2]: https://github.com/sqldelight/sqldelight/releases/tag/1.0.2
@@ -1156,7 +1156,7 @@ sqldelight {
 ## [1.0.1] - 2019-01-21 {id="1-0-1-2019-01-21"}
 [1.0.1]: https://github.com/sqldelight/sqldelight/releases/tag/1.0.1
 
-* 增強：[原生驅動程式] 允許將目錄名稱傳遞給 `DatabaseConfiguration`。
+* 增強：[原生驅動程式] 允許將目錄名稱傳遞給 DatabaseConfiguration。
 * 增強：[編譯器] #1173 沒有套件的檔案編譯失敗。
 * 修復：[IDE] 正確向 Square 回報 IDE 錯誤。
 * 修復：[IDE] #1162 同一套件中的型別顯示為錯誤，但運作正常。
@@ -1217,15 +1217,15 @@ sqldelight {
  * 新功能：IntelliJ 外掛程式對 .sq 檔案執行格式化
  * 新功能：支援 SQLite timestamp 常值
  * 修復：參數化型別 (Parameterized types) 可以在 IntelliJ 中點擊跳轉
- * 修復：逸出的列名從游標 (Cursor) 抓取時不再拋出 `RuntimeException`。
+ * 修復：逸出的列名從游標 (Cursor) 抓取時不再拋出 RuntimeException。
  * 修復：Gradle 外掛程式嘗試列印例外時不會當機。
 
 ## [0.4.4] - 2016-07-20 {id="0-4-4-2016-07-20"}
 [0.4.4]: https://github.com/sqldelight/sqldelight/releases/tag/0.4.4
 
- * 新功能：原生支援 `short` 作為列 Java 型別
+ * 新功能：原生支援 short 作為列 Java 型別
  * 新功能：產生的對應器與工廠方法上的 Javadoc
- * 修復：`group_concat` 與 `nullif` 函式具有正確的可 null 性
+ * 修復：group_concat 與 nullif 函式具有正確的可 null 性
  * 修復：與 Android Studio 2.2-alpha 的相容性
  * 修復：WITH RECURSIVE 不再使外掛程式當機。
 
@@ -1237,7 +1237,7 @@ sqldelight {
  * 新功能：具名陳述式上的 Javadoc 將出現在產生的字串上。
  * 修復：產生的檢視模型包含可 null 性註解。
  * 修復：從聯結 (unions) 產生的程式碼具有正確的型別與可 null 性，以支援所有可能的列。
- * 修復：`sum` 與 `round` SQLite 函式在產生的程式碼中具有正確型別。
+ * 修復：sum 與 round SQLite 函式在產生的程式碼中具有正確型別。
  * 修復：CAST 的修復、內部 select 的修復。
  * 修復：自動補全 (Autocomplete) 在 CREATE TABLE 陳述式中。
  * 修復：SQLite 關鍵字可用於套件。

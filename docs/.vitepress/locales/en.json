@@ -51,7 +51,7 @@
   "kotlin.kotlin-overview": "Kotlin overview",
   "kotlin.what-s-new-in-kotlin": "What's new in Kotlin",
   "kotlin.whatsnew22": "Kotlin 2.2.0",
-  "kotlin.whatsnew-eap": "Kotlin 2.4.20-RC3",
+  "kotlin.whatsnew-eap": "Kotlin 2.5.0-Beta1",
   "kotlin.earlier-versions": "Earlier versions",
   "kotlin.whatsnew2120": "Kotlin 2.1.20",
   "kotlin.whatsnew21": "Kotlin 2.1.0",
@@ -642,7 +642,7 @@
   "coroutines.flows": "Flows",
   "coroutines.coroutines-flow": "Overview",
   "kmp.kotlin-toolchain": "Kotlin Toolchain",
-  "kmp.whats-new-compose-112": "Compose Multiplatform 1.12.0",
+  "kmp.whats-new-compose-112": "Compose Multiplatform 1.12.1",
   "kotlin.take-kotlin-tour": "Take Kotlin tour",
   "kotlin.beginner": "Beginner",
   "kotlin.intermediate": "Intermediate",
@@ -673,5 +673,6 @@
   "ktor.server-oauth2-flows": "Type-safe OAuth 2.0 flows",
   "ktor.server-oidc": "OpenID Connect",
   "ktor.server-oidc-resource-server": "Resource server",
-  "ktor.server-oidc-browser-login": "Browser login"
+  "ktor.server-oidc-browser-login": "Browser login",
+  "koog._0": "0"
 }

@@ -71,7 +71,8 @@ API 버전이 호환성에 미치는 영향에 대한 자세한 내용은 [라�
 
 최신 세 개의 안정적인 Kotlin 버전 중 하나를 언어 버전으로 구성할 수 있습니다. 예를 들어 Kotlin 2.5.0은 2.2 버전까지의 언어 버전을 지원합니다.
 
-이전 언어 버전을 사용하는 경우 이전 API 버전도 함께 사용해야 합니다. 자세한 내용은 [여기](#api-version-version)를 참조하세요.
+이전 언어 버전을 사용하는 경우 이전 API 버전도 함께 사용해야 합니다.
+자세한 내용은 [여기](#api-version-version)를 참조하세요.
 
 > 기술적으로는 향후 안정화될 언어 기능을 미리 사용해 보기 위해 더 최신 언어 버전을 구성할 수도 있습니다. 하지만 개별 기능을 활성화할 때는 각 기능의 전용 지침을 따르는 것이 좋습니다.
 > 
@@ -356,7 +357,7 @@ Kotlin to JVM 컴파일을 위한 커맨드 라인 도구는 `kotlinc` 및 `kotl
 | 모드               | 설명                                                                                                                       |
 |--------------------|-----------------------------------------------------------------------------------------------------------------------------------|
 | `enable`           | 인터페이스에 기본 구현을 생성하고 서브클래스 및 `DefaultImpls` 클래스에 브리지 함수를 포함합니다. (기본값) |
-| `no-compatibility` | 인터페이스에 기본 구현만 생성하고 호환성 브리지 및 `DefaultImpls` 클래스를 건너뜜.                  |
+| `no-compatibility` | 인터페이스에 기본 구현만 생성하고 호환성 브리지 및 `DefaultImpls` 클래스를 건너뜀.                  |
 | `disable`          | 호환성 브리지 및 `DefaultImpls` 클래스만 생성하고 기본 메서드를 건너뜜.                                        |
 
 ### -jvm-target _version_ {id="jvm-target-version"}
@@ -408,7 +409,7 @@ Kotlin 컴파일러가 특정 Java 패키지의 null 허용 여부(nullability) 
 ## Kotlin/JS 컴파일러 옵션 {id="kotlin-js-compiler-options"}
 
 JS용 Kotlin 컴파일러는 Kotlin 소스 파일을 JavaScript 코드로 컴파일합니다. 
-Kotlin to JS 컴파일을 위한 커맨드 라인 도구는 `kotlinc-js`.
+Kotlin to JS 컴파일을 위한 커맨드 라인 도구는 `kotlinc-js`입니다.
 
 [공통 옵션](#common-options) 외에도 Kotlin/JS 컴파일러에는 아래에 나열된 옵션들이 있습니다.
 
@@ -477,7 +478,7 @@ Kotlin 코드에서 선언한 변수 및 함수 이름을 소스 맵에 추가�
 
 소스 맵의 경로에 지정된 접두사를 추가합니다.
 
-### -target {es5|es2015 id="target"}
+### -target {es5|es2015|es2020 id="target"}
 
 지정된 ECMA 버전에 맞는 JS 파일을 생성합니다.
 
@@ -487,9 +488,9 @@ Kotlin 코드에서 선언한 변수 및 함수 이름을 소스 맵에 추가�
 `@JsExport` 어노테이션으로 내보낸 [Kotlin 인터페이스를 JavaScript/TypeScript에서 구현](whatsnew2320.md#implementing-kotlin-interfaces-from-javascript-typescript)할 수 있도록 허용합니다.
 
 ### -Xes-long-as-bigint {id="xes-long-as-bigint"}
-<primary-label ref="experimental-general"/>
 
-현대 JavaScript(ES2020)로 컴파일할 때 Kotlin `Long` 값을 표현하기 위해 JavaScript `BigInt` 타입 사용을 활성화합니다.
+현대 JavaScript(ES2020)로 컴파일할 때 Kotlin `Long` 값을 표현하기 위해 JavaScript `BigInt` 타입 지원을 활성화합니다.
+이 옵션은 `es5` 및 `es2015` 타겟에만 필요합니다. `es2020` 타겟은 이 옵션을 기본적으로 활성화합니다.
 
 ### -Xsuspend-lambda-exporting {id="xsuspend-lambda-exporting"}
 <primary-label ref="experimental-general"/>
@@ -499,7 +500,7 @@ Kotlin 코드에서 선언한 변수 및 함수 이름을 소스 맵에 추가�
 ## Kotlin/Native 컴파일러 옵션 {id="kotlin-native-compiler-options"}
 
 Kotlin/Native 컴파일러는 Kotlin 소스 파일을 [지원되는 플랫폼](native-overview.md#target-platforms)을 위한 네이티브 바이너리로 컴파일합니다. 
-Kotlin/Native 컴파일을 위한 커맨드 라인 도구는 `kotlinc-native`.
+Kotlin/Native 컴파일을 위한 커맨드 라인 도구는 `kotlinc-native`입니다.
 
 [공통 옵션](#common-options) 외에도 Kotlin/Native 컴파일러에는 아래에 나열된 옵션들이 있습니다.
 

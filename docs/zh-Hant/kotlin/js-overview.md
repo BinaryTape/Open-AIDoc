@@ -6,7 +6,7 @@ Kotlin/JavaScript (Kotlin/JS) 讓您可以將 Kotlin 程式碼、Kotlin 標準�
 
 Kotlin Multiplatform Gradle 外掛程式讓您可以存取各種功能，例如控制應用程式的打包 (bundling) 以及直接從 npm 新增 JavaScript 相依性。若要查看可用配置選項的概覽，請參閱[設定 Kotlin/JS 專案](js-project-setup.md)。
 
-> 目前 Kotlin/JS 的實作針對 [ES5](https://www.ecma-international.org/ecma-262/5.1/) 與 [ES2015](https://262.ecma-international.org/6.0/) 標準。
+> 目前 Kotlin/JS 的實作針對 [ES5](https://www.ecma-international.org/ecma-262/5.1/)、[ES2015](https://262.ecma-international.org/6.0/) 與 [ES2020](https://262.ecma-international.org/11.0/) 標準。
 >
 {style="tip"}
 

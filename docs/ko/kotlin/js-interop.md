@@ -14,7 +14,7 @@ fun jsTypeOf(o: Any): String {
 }
 ```
 
-JavaScript 코드 인라인 삽입은 다음을 포함한 [ES2015 기능](js-project-setup.md#support-for-es2015-features)을 완벽하게 지원합니다.
+JavaScript 코드 인라인 삽입은 다음을 포함한 [ES2015 기능](js-project-setup.md#set-an-ecmascript-target)을 완벽하게 지원합니다.
 
 * `const` 및 `let` 변수 선언
 * ES 클래스

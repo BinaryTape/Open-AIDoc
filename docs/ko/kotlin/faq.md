@@ -71,7 +71,7 @@ JVM 측면에서 주요 빌드 도구로는 [Gradle](gradle.md)과 [Maven](maven
 
 JVM을 대상으로 할 때 Kotlin은 Java와 호환되는 바이트코드를 생성합니다.
 
-JavaScript를 대상으로 할 때 Kotlin은 ES5.1로 트랜스파일(transpile)하며 AMD 및 CommonJS를 포함한 모듈 시스템과 호환되는 코드를 생성합니다. 
+JavaScript를 대상으로 할 때 Kotlin은 설정된 타깃에 따라 ES5, ES2015 또는 ES2020 코드를 생성할 수 있습니다. 코드는 AMD 및 CommonJS를 포함한 모듈 시스템과 호환됩니다. 
 
 네이티브를 대상으로 할 때 Kotlin은 (LLVM을 통해) 플랫폼별 코드를 생성합니다. 
 
@@ -128,7 +128,8 @@ Kotlin은 전 세계의 다양한 컨퍼런스에서도 다뤄지고 있습니�
 
 ### Kotlin 소셜 미디어가 있나요? {id="is-kotlin-on-social-media"}
 
-네. [Kotlin YouTube 채널](https://www.youtube.com/c/Kotlin)을 구독하고 [Twitter](https://twitter.com/kotlin) 또는 [Bluesky](https://bsky.app/profile/kotlinlang.org)에서 Kotlin을 팔로우하세요.
+네. 
+[Kotlin YouTube 채널](https://www.youtube.com/c/Kotlin)을 구독하고 [Twitter](https://twitter.com/kotlin) 또는 [Bluesky](https://bsky.app/profile/kotlinlang.org)에서 Kotlin을 팔로우하세요.
 
 ### 다른 온라인 Kotlin 리소스가 있나요? {id="any-other-online-kotlin-resources"}
 

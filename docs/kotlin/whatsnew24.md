@@ -835,7 +835,7 @@ console.log(await auth.login(new Email("not-an-email")));
 ### 内联 JS 代码时支持 ES2015 功能 {id="support-for-es2015-features-when-inlining-js-code"}
 <secondary-label ref="js"/>
 
-从 Kotlin 2.4.0 开始，JavaScript 代码内联全面支持 [ES2015 功能](js-project-setup.md#support-for-es2015-features)。
+从 Kotlin 2.4.0 开始，JavaScript 代码内联全面支持 [ES2015 功能](js-project-setup.md#set-an-ecmascript-target)。
 
 这对于与第三方库的互操作性以及直接控制自动生成应用代码非常有用。
 

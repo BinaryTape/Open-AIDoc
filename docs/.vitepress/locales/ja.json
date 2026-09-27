@@ -85,7 +85,7 @@
   "kotlin.kotlin-overview": "Kotlinの概要",
   "kotlin.what-s-new-in-kotlin": "Kotlinの新機能",
   "kotlin.whatsnew22": "Kotlin 2.2.0",
-  "kotlin.whatsnew-eap": "Kotlin 2.4.20-RC3",
+  "kotlin.whatsnew-eap": "Kotlin 2.5.0-Beta1",
   "kotlin.earlier-versions": "以前のバージョン",
   "kotlin.whatsnew2120": "Kotlin 2.1.20",
   "kotlin.whatsnew21": "Kotlin 2.1.0",
@@ -674,7 +674,7 @@
   "coroutines.flows": "Flow",
   "coroutines.coroutines-flow": "概要",
   "kmp.kotlin-toolchain": "Kotlin ツールチェーン",
-  "kmp.whats-new-compose-112": "Compose Multiplatform 1.12.0",
+  "kmp.whats-new-compose-112": "Compose Multiplatform 1.12.1",
   "kotlin.take-kotlin-tour": "Kotlinツアーに参加する",
   "kotlin.beginner": "初級",
   "kotlin.intermediate": "中級",
@@ -705,5 +705,6 @@
   "ktor.server-oauth2-flows": "型安全なOAuth 2.0フロー",
   "ktor.server-oidc": "OpenID Connect",
   "ktor.server-oidc-resource-server": "リソースサーバー",
-  "ktor.server-oidc-browser-login": "ブラウザログイン"
+  "ktor.server-oidc-browser-login": "ブラウザログイン",
+  "koog._0": "0"
 }

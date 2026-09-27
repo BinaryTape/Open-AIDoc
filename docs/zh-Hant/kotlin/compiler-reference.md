@@ -10,7 +10,7 @@ JVM、JavaScript 以及[支援平台](native-overview.md#target-platforms)的原
 * 當你在主控台或 IDE 中呼叫 `gradle build` 時，Gradle 會使用編譯器。
 * 當你在主控台或 IDE 中呼叫 `mvn compile` 或 `mvn test-compile` 時，Maven 會使用編譯器。
 
-你也可以按照[使用命令列編譯器](command-line.md)教學中的說明，從主控台手動執行 Kotlin 編譯器。
+你也可以按照[使用命令列編譯器](command-line.md)教學中的說明，從命令列手動執行 Kotlin 編譯器。
 
 ## 編譯器選項 {id="compiler-options"}
 
@@ -50,9 +50,9 @@ Kotlin 編譯器有許多用於自訂編譯過程的選項。
 
 設定 API 版本以控制程式碼在執行階段可以使用的 Kotlin API。例如，如果你使用 Kotlin 編譯器版本 2.4.0 並配合 `-api-version=2.1`，你的程式碼將保持與 Kotlin 標準程式庫 2.1.0 相容。
 
-你不能將 `-api-version` 的值設定為高於 [`-language-version`](#language-version-version) 的值。
+你不能將 `-api-version` 的值設定為高於 `-language-version` 的值。
 
-在大多數情況下，API 版本和語言版本應相同。一個例外是當你為必須執行舊版本 Kotlin 標準程式庫的取用者開發程式庫時。在這種情況下，請設定較舊的 API 版本，以避免意外使用那些取用者無法使用的 API。
+在大多數情況下，API 版本和[語言版本](#language-version-version)應相同。一個例外是當你為必須執行舊版本 Kotlin 標準程式庫的取用者開發程式庫時。在這種情況下，請設定較舊的 API 版本，以避免意外使用那些取用者無法使用的 API。
 
 如需更多關於 API 版本如何影響相容性的資訊，請參閱[程式庫作者的回溯相容性指南](api-guidelines-backward-compatibility.md#choose-compatible-language-and-api-versions)。
 
@@ -77,7 +77,7 @@ Kotlin 編譯器有許多用於自訂編譯過程的選項。
 如需詳細資訊，請參閱 [](#api-version-version)。
 
 > 技術上，你可以配置較新的語言版本，以便在即將推出的語言特性穩定之前對其進行測試。
-> 然而，我們建議按照各自的專用說明來啟用個別特性。
+> 然而，建議按照各自的專屬說明來啟用個別特性。
 > 
 {style="tip"}
 
@@ -207,8 +207,8 @@ kotlinc -Xcompiler-plugin-order=plugin.middle>plugin.last
 
 該選項支援以下模式：
 
-* `disabled`: 停用 Kotlin/Native、Kotlin/JS 和 Kotlin/Wasm 的模組內內嵌。
-* `full`: 啟用跨模組內嵌。
+* `disabled`：停用 Kotlin/Native、Kotlin/JS 和 Kotlin/Wasm 的模組內內嵌。
+* `full`：啟用跨模組內嵌。
 
 ### -Xintrinsic-const-evaluation {id="xintrinsic-const-evaluation"}
 <primary-label ref="experimental-general"/>
@@ -222,9 +222,9 @@ kotlinc -Xcompiler-plugin-order=plugin.middle>plugin.last
 
 該選項支援以下模式：
 
-* `only-syntax`: 啟用顯式形式的名稱相關解構，而不變更現有解構宣告的行為。
-* `name-mismatch`: 當資料類別中的位置相關解構所使用的變數名稱與屬性名稱不符時，回報警告。
-* `complete`: 啟用使用圓括號的短形式名稱相關解構，並繼續支援使用方括號語法的位置相關解構。
+* `only-syntax`：啟用顯式形式的名稱相關解構，而不變更現有解構宣告的行為。
+* `name-mismatch`：當資料類別中的位置相關解構所使用的變數名稱與屬性名稱不符時，回報警告。
+* `complete`：啟用使用圓括號的短形式名稱相關解構，並繼續支援使用方括號語法的位置相關解構。
 
 ### -Xphases-to-dump-before {id="xphases-to-dump-before"}
 <primary-label ref="experimental-general"/>
@@ -234,7 +234,7 @@ kotlinc -Xcompiler-plugin-order=plugin.middle>plugin.last
 ### -Xrepl {id="xrepl"}
 <primary-label ref="experimental-general"/>
 
-啟用 Kotlin REPL。
+啟動 Kotlin REPL。
 
 ```bash
 kotlinc -Xrepl
@@ -245,9 +245,9 @@ kotlinc -Xrepl
 
 設定編譯器如何[回報被忽略的結果](unused-return-value-checker.md)：
 
-* `disable`: 停用未使用的傳回值檢查器（預設）。
-* `check`: 啟用檢查器，並對來自已標記函式之被忽略的結果回報警告。
-* `full`: 啟用檢查器，將專案中的所有函式視為已標記，並對被忽略的結果回報警告。
+* `disable`：停用未使用的傳回值檢查器（預設）。
+* `check`：啟用檢查器，並對來自已標記函式之被忽略的結果回報警告。
+* `full`：啟用檢查器，將專案中的所有函式視為已標記，並對被忽略的結果回報警告。
 
 ### 警告管理 {id="warning-management"}
 
@@ -278,11 +278,11 @@ kotlinc -Xrepl
 kotlinc -Xwarning-level=DIAGNOSTIC_NAME:(error|warning|disabled)
 ```
 
-* `error`: 僅將指定的警告提升為錯誤。
-* `warning`: 為指定的診斷發出警告，且預設為啟用。
-* `disabled`: 僅在整個模組範圍內隱藏指定的警告。
+* `error`：僅將指定的警告提升為錯誤。
+* `warning`：為指定的診斷發出警告，且預設為啟用。
+* `disabled`：僅在整個模組範圍內隱藏指定的警告。
 
-你可以透過結合模組級規則與特定規則來調整專案中的警告回報：
+你可以透過結合整個模組的規則與特定規則來調整專案中的警告回報：
 
 | 指令 | 說明 |
 |----------------------------------------------------|-------------------------------------------------------------|
@@ -487,7 +487,7 @@ Kotlin 到 JS 編譯的命令列工具是 `kotlinc-js`。
 
 在原始碼對應檔中的路徑新增指定的前綴。
 
-### -target {es5|es2015 id="target"}
+### -target {es5|es2015|es2020 id="target"}
 
 為指定的 ECMA 版本產生 JS 檔案。
 
@@ -497,9 +497,9 @@ Kotlin 到 JS 編譯的命令列工具是 `kotlinc-js`。
 允許從 JavaScript/TypeScript 實作使用 `@JsExport` 註解[匯出的 Kotlin 介面](whatsnew2320.md#implementing-kotlin-interfaces-from-javascript-typescript)。
 
 ### -Xes-long-as-bigint {id="xes-long-as-bigint"}
-<primary-label ref="experimental-general"/>
 
 在編譯為現代 JavaScript (ES2020) 時，啟用對 JavaScript `BigInt` 型別的支援，以表示 Kotlin `Long` 值。
+此選項僅適用於 `es5` 和 `es2015` 目標。`es2020` 目標預設啟用此選項。
 
 ### -Xsuspend-lambda-exporting {id="xsuspend-lambda-exporting"}
 <primary-label ref="experimental-general"/>

@@ -12,7 +12,7 @@
 
 ### 수정됨 {id="fixed"}
 
-- 아직 없음!
+- [IntelliJ 플러그인] IntelliJ API 사용 방식을 변경하여 플러그인 게시 위반 사항(plugin publishing violations) 수정 (#6366 @griffio)
 
 ## [2.4.0] - 2026-09-17 {id="2-4-0-2026-09-17"}
 [2.4.0]: https://github.com/sqldelight/sqldelight/releases/tag/2.4.0

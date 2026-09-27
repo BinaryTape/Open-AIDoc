@@ -1,8 +1,8 @@
 [//]: # (title: Kotlin Early Access Preview への参加)
 
 <tldr>
-    <p>現在、プレビューバージョンは利用できません。</p>
-    <!-- <p>最新の Kotlin EAP リリース: <strong>%kotlinEapVersion%</strong></p> -->
+    <!-- <p>現在、プレビューバージョンは利用できません。</p> -->
+    <p>最新の Kotlin EAP リリース: <strong>%kotlinEapVersion%</strong></p>
 </tldr>
 
 Kotlin Early Access Preview (EAP) に参加すると、最新の Kotlin 機能を正式リリース前に試すことができます。
@@ -43,21 +43,21 @@ Kotlin EAP ビルドには、通常以下のステージが含まれます。
 
 ## ビルドの詳細 {id="build-details"}
 
-_現在、プレビューバージョンは利用できません。_
+<!-- _現在、プレビューバージョンは利用できません。_ -->
 
-<!--<table>
+<table>
     <tr>
         <th>ビルド情報</th>
         <th>ビルドのハイライト</th>
     </tr>
     <tr>
-        <td><strong>2.4.20-RC3</strong>
-            <p>リリース日: <strong>2026年9月2日</strong></p>
-            <p><a href="https://github.com/JetBrains/kotlin/releases/tag/v2.4.20-RC3" target="_blank">GitHub でのリリース</a></p>
+        <td><strong>2.5.0-Beta1</strong>
+            <p>リリース日: <strong>2026年9月23日</strong></p>
+            <p><a href="https://github.com/JetBrains/kotlin/releases/tag/v2.5.0-Beta1" target="_blank">GitHub でのリリース</a></p>
         </td>
         <td>
-            <p>パフォーマンスの向上、バグ修正、およびツールのアップデートを含むツールリリースです。</p>
-            <p>詳細については、<a href="https://github.com/JetBrains/kotlin/releases/tag/v2.4.20-RC3">チェンジログ</a> または <a href="whatsnew-eap.md">Kotlin 2.4.20-RC3 の新機能</a> を参照してください。</p>
+            <p>言語における主要な変更とツールのアップデートを含む言語リリースです。</p>
+            <p>詳細については、<a href="https://github.com/JetBrains/kotlin/releases/tag/v2.5.0-Beta1">チェンジログ</a> または <a href="whatsnew-eap.md">Kotlin 2.5.0-Beta1 の新機能</a> を参照してください。</p>
         </td>
     </tr>
-</table>-->
+</table>

@@ -4,14 +4,14 @@
 
 该命令行 (CLI) 应用程序执行以下循环：
 
-- 从控制台读取输入。
-- 如果输入不是 `/bye` 且不为空，则使用用户输入和指定的会话 ID 运行智能体。
-- 智能体首先加载该会话 ID 的历史对话记录，并将其与用户输入一起添加到提示词中。
-- 智能体进行 LLM 交互。
-- 运行结束时，在返回响应之前，智能体会将完整的历史对话记录存储在指定的会话 ID 下，并将大小限制为最近的 20 条消息。
-- 随后，应用打印出智能体的响应。
+- 从控制台读取输入
+- 如果输入不是 `/bye` 且不为空，则使用用户输入和指定的会话 ID 运行智能体
+- 智能体首先加载该会话 ID 之前的历史对话记录，并将其与用户输入一起添加到提示词中
+- 智能体进行 LLM 交互
+- 运行结束时，在返回响应之前，智能体会将完整的历史对话记录存储在指定的会话 ID 下，并将大小限制为最近的 20 条消息
+- 随后，应用打印出智能体的响应
 
-下图为流程演示：
+流程示意如下：
 
 ```mermaid
 graph TB
@@ -47,8 +47,8 @@ graph TB
     
         ```kotlin title="build.gradle.kts"
         dependencies {
-            implementation("ai.koog:koog-agents:1.2.0")
-            implementation("ai.koog:agents-features-memory:1.2.0")
+            implementation("ai.koog:koog-agents:1.3.0")
+            implementation("ai.koog:agents-features-memory:1.3.0")
         }
         ```
     
@@ -67,7 +67,7 @@ graph TB
         <dependency>
             <groupId>ai.koog</groupId>
             <artifactId>koog-agents-jvm</artifactId>
-            <version>1.2.0</version>
+            <version>1.3.0</version>
         </dependency>
         <dependency>
             <groupId>ai.koog</groupId>
@@ -111,8 +111,7 @@ graph TB
                 if (input.isEmpty()) continue
 
                 val reply = agent.run(input, sessionId)
-                println("Assistant: $reply
-")
+                println("Assistant: $reply\n")
             }
         }
     }
@@ -143,8 +142,7 @@ graph TB
                     if (input.isEmpty()) continue;
     
                     String reply = agent.run(input, sessionId);
-                    System.out.println("Assistant: " + reply + "
-");
+                    System.out.println("Assistant: " + reply + "\n");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -155,7 +153,7 @@ graph TB
 
 ## 实现细节 {id="implementation-details"}
 
-`agent.run()` 的第二个参数是用于识别和区分正在进行的对话的 [会话 ID](index.md#session-ids)。在本示例中，它是常量，因为一次只有一个对话。在实际应用中，您可以为例如与同一用户相关的对话分配一个单独的唯一 ID。
+`agent.run()` 的第二个参数是用于识别和区分正在进行的对话的 [会话 ID](index.md#session-ids)。在本示例中，它是常量，因为一次只有一个对话。在实际应用中，例如您可以为与同一用户相关的对话分配一个单独的唯一 ID。
 
 智能体使用默认的 [历史记录提供程序](index.md#history-providers)，该程序将对话历史存储在内存中。这意味着当应用程序退出时，历史记录将会丢失。在实际应用中，您应该实现自定义历史记录提供程序，以便将历史记录持久化存储在数据库或文件中。
 

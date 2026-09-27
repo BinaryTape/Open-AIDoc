@@ -38,7 +38,7 @@ kotlin {
 在 `kotlin {}` 區塊內，您可以管理以下層面：
 
 * [目標執行環境](#execution-environments)：瀏覽器或 Node.js 
-* [支援 ES2015 特性](#support-for-es2015-features)：類別、模組與產生器
+* [](#set-an-ecmascript-target)：ES5、ES2015 或 ES2020
 * [配置輸出粒度](#configure-output-granularity)
 * [產生 TypeScript 宣告檔案](#generation-of-typescript-declaration-files-d-ts)
 * [專案相依性](#dependencies)：Maven 和 npm
@@ -75,26 +75,29 @@ kotlin {
 
 Kotlin 多平台外掛程式會自動配置其任務以配合選定的環境。這包括下載和安裝執行與測試應用程式所需的環境與相依性。這讓開發人員無需額外配置即可建置、執行和測試簡單專案。對於針對 Node.js 的專案，還可以選擇使用現有的安裝。了解如何[使用預先安裝的 Node.js](#use-pre-installed-node-js)。
 
-## 支援 ES2015 特性 {id="support-for-es2015-features"}
+## 設定 ECMAScript 目標 {id="set-an-ecmascript-target"}
 
-Kotlin 提供對 ES2015 特性的支援，包括：
+Kotlin/JS 可以針對 ECMAScript 標準的 ES5、ES2015 和 ES2020 版本產生 JavaScript。請選擇目標環境支援的最新版本：
 
-* 模組：簡化您的程式碼庫並提高可維護性。
-* 類別：允許結合 OOP 原則，產出更簡潔且直觀的程式碼。
-* 產生器：用於編譯 [suspend 函式](https://kotlinlang.org/docs/composing-suspending-functions.html)，以改善最終組合包大小並協助偵錯。
-* [JavaScript 程式碼內嵌](js-interop.md#inline-javascript)。
+* `es5` 提供與舊版 JavaScript 環境的相容性，且為預設目標。
+* `es2015` 啟用對 ES2015 特性的支援，包括：
+    * 模組：簡化您的程式碼庫並提高可維護性。
+    * 類別：允許結合 OOP 原則，產出更簡潔且直觀的程式碼。
+    * 產生器：用於編譯 [suspend 函式](https://kotlinlang.org/docs/composing-suspending-functions.html)，以改善最終組合包大小並協助偵錯。
+    * [JavaScript 程式碼內嵌](js-interop.md#inline-javascript)。
+* `es2020` 包含所有受支援的 ES2015 特性，並允許編譯器在產生的 JavaScript 程式碼中使用 ECMAScript 2020 特性。例如，它會將 Kotlin 的 `Long` 值編譯為 JavaScript 的 `BigInt` 值。
 
-您可以透過在 `build.gradle(.kts)` 檔案中新增 `es2015` 編譯目標，一次啟用所有支援的 ES2015 特性：
+若要配置 ECMAScript 目標，請在 `build.gradle(.kts)` 檔案中設定 `target` 屬性。例如，以 ES2020 為目標：
 
 ```kotlin
 tasks.withType<KotlinJsCompile>().configureEach {
     compilerOptions {
-        target = "es2015"
+        target = "es2020"
     }
 }
 ```
 
-[在官方文件中進一步了解 ES2015 (ECMAScript 2015, ES6)](https://262.ecma-international.org/6.0/)。
+進一步了解 [ES5](https://262.ecma-international.org/5.1/)、[ES2015](https://262.ecma-international.org/6.0/) 和 [ES2020](https://262.ecma-international.org/11.0/) 標準。
 
 ## 配置輸出粒度 {id="configure-output-granularity"}
 
@@ -108,7 +111,7 @@ tasks.withType<KotlinJsCompile>().configureEach {
   ```
 
 * **每個檔案一個**。您可以配置更細粒度的輸出，為每個 Kotlin 檔案產生一個（或兩個，如果檔案包含匯出的宣告）JavaScript 檔案。要啟用按檔案編譯模式：
-  1. 將 `es2015` 設定為[編譯目標](#support-for-es2015-features)，以在您的專案中支援 ES2015 特性。
+  1. 將 `es2015` 或 `es2020` 設定為[編譯目標](#set-an-ecmascript-target)，以在您的專案中支援 ES2015 特性。
   2. 在 `gradle.properties` 檔案中加入以下行：
      ```none
      kotlin.js.ir.output.granularity=per-file // 預設為 'per-module'

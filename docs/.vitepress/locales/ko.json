@@ -85,7 +85,7 @@
   "kotlin.kotlin-overview": "Kotlin 개요",
   "kotlin.what-s-new-in-kotlin": "Kotlin의 새로운 기능",
   "kotlin.whatsnew22": "Kotlin 2.2.0",
-  "kotlin.whatsnew-eap": "Kotlin 2.4.20-RC3",
+  "kotlin.whatsnew-eap": "Kotlin 2.5.0-Beta1",
   "kotlin.earlier-versions": "이전 버전",
   "kotlin.whatsnew2120": "Kotlin 2.1.20",
   "kotlin.whatsnew21": "Kotlin 2.1.0",
@@ -675,7 +675,7 @@
   "coroutines.flows": "Flow",
   "coroutines.coroutines-flow": "개요",
   "kmp.kotlin-toolchain": "Kotlin 툴체인",
-  "kmp.whats-new-compose-112": "Compose Multiplatform 1.12.0",
+  "kmp.whats-new-compose-112": "Compose Multiplatform 1.12.1",
   "kotlin.take-kotlin-tour": "Kotlin tour 시작하기",
   "kotlin.beginner": "초급",
   "kotlin.intermediate": "중급",
@@ -706,5 +706,6 @@
   "ktor.server-oauth2-flows": "타입 안전한 OAuth 2.0 플로우",
   "ktor.server-oidc": "OpenID Connect",
   "ktor.server-oidc-resource-server": "리소스 서버",
-  "ktor.server-oidc-browser-login": "브라우저 로그인"
+  "ktor.server-oidc-browser-login": "브라우저 로그인",
+  "koog._0": "0"
 }

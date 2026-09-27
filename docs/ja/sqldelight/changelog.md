@@ -12,7 +12,7 @@
 
 ### Fixed {id="fixed"}
 
-- まだありません！
+- [IntelliJプラグイン] IntelliJ API の使用法を変更することで、プラグイン公開時の違反を修正 (#6366 @griffio) 
 
 ## [2.4.0] - 2026-09-17 {id="2-4-0-2026-09-17"}
 [2.4.0]: https://github.com/sqldelight/sqldelight/releases/tag/2.4.0
@@ -495,7 +495,7 @@ Kotlin 1.7.20 および AGP 7.3.0 との互換性アップデート。
 ## [2.0.0-alpha04] - 2022-10-03 {id="2-0-0-alpha04-2022-10-03"}
 [2.0.0-alpha04]: https://github.com/sqldelight/sqldelight/releases/tag/2.0.0-alpha04
 
-### 破壊的変更 {id="breaking-changes"}
+### Breaking Changes {id="breaking-changes"}
 
 - Paging 3 拡張 API が変更され、count には int 型のみが許可されるようになりました。
 - コルーチン拡張で、ディスパッチャのデフォルト設定がなくなり、渡すことが必須になりました。
@@ -545,7 +545,7 @@ Kotlin 1.7.20 および AGP 7.3.0 との互換性アップデート。
 ## [2.0.0-alpha03] - 2022-06-17 {id="2-0-0-alpha03-2022-06-17"}
 [2.0.0-alpha03]: https://github.com/sqldelight/sqldelight/releases/tag/2.0.0-alpha03
 
-### 破壊的変更
+### Breaking Changes
 
 - ダイアレクトは、実際の Gradle 依存関係のように参照されるようになりました。
 ```groovy
@@ -612,7 +612,7 @@ sqldelight {
 ## [2.0.0-alpha02] - 2022-04-13 {id="2-0-0-alpha02-2022-04-13"}
 [2.0.0-alpha02]: https://github.com/sqldelight/sqldelight/releases/tag/2.0.0-alpha02
 
-### 破壊的変更
+### Breaking Changes
 
 - すべての `app.cash.sqldelight.runtime.rx` を `app.cash.sqldelight.rx2` に置換する必要があります。
 
@@ -682,7 +682,7 @@ sqldelight {
 
 2.0 の最初のアルファリリースであり、いくつかの破壊的変更が含まれています。今後も ABI の破壊的変更が予想されるため、このリリースに依存するライブラリは公開しないでください（アプリケーションでの利用は問題ありません）。
 
-### 破壊的変更
+### Breaking Changes
 
 - まず、すべての `com.squareup.sqldelight` を `app.cash.sqldelight` に置換する必要があります。
 - 次に、すべての `app.cash.sqldelight.android` を `app.cash.sqldelight.driver.android` に置換する必要があります。

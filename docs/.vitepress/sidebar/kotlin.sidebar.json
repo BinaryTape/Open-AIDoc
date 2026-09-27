@@ -101,6 +101,10 @@
         "link": "whatsnew2420"
       },
       {
+        "text": "kotlin.whatsnew-eap",
+        "link": "whatsnew-eap"
+      },
+      {
         "text": "kotlin.whatsnew24",
         "link": "whatsnew24"
       },
@@ -1255,20 +1259,12 @@
             "link": "ksp-quickstart"
           },
           {
+            "text": "kotlin.ksp-multiplatform",
+            "link": "ksp-multiplatform"
+          },
+          {
             "text": "kotlin.ksp-kapt-migration",
             "link": "ksp-kapt-migration"
-          },
-          {
-            "text": "kotlin.ksp-examples",
-            "link": "ksp-examples"
-          },
-          {
-            "text": "kotlin.ksp-additional-details",
-            "link": "ksp-additional-details"
-          },
-          {
-            "text": "kotlin.ksp-reference",
-            "link": "ksp-reference"
           },
           {
             "text": "kotlin.ksp-incremental",
@@ -1279,16 +1275,20 @@
             "link": "ksp-multi-round"
           },
           {
-            "text": "kotlin.ksp-multiplatform",
-            "link": "ksp-multiplatform"
+            "text": "kotlin.ksp-reference",
+            "link": "ksp-reference"
+          },
+          {
+            "text": "kotlin.ksp-additional-details",
+            "link": "ksp-additional-details"
           },
           {
             "text": "kotlin.ksp-command-line",
             "link": "ksp-command-line"
           },
           {
-            "text": "kotlin.ksp-faq",
-            "link": "ksp-faq"
+            "text": "kotlin.ksp-examples",
+            "link": "ksp-examples"
           }
         ],
         "collapsed": true

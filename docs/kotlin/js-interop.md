@@ -14,7 +14,7 @@ fun jsTypeOf(o: Any): String {
 }
 ```
 
-JavaScript 代码内联完全支持 [ES2015 特性](js-project-setup.md#support-for-es2015-features)，包括：
+JavaScript 代码内联完全支持 [ES2015 特性](js-project-setup.md#set-an-ecmascript-target)，包括：
 
 * `const` 与 `let` 变量声明
 * ES 类
@@ -23,7 +23,7 @@ JavaScript 代码内联完全支持 [ES2015 特性](js-project-setup.md#support-
 * 扩展与 rest 运算符
 * 模板字符串
 
-因为 `js` 的参数是在编译时解析并“原样”翻译为 JavaScript 代码的，所以它必须是一个字符串常量。因此，以下代码是不正确的：
+因为 `js` 的实参是在编译时解析并“原样”翻译为 JavaScript 代码的，所以它必须是一个字符串常量。因此，以下代码是不正确的：
 
 ```kotlin
 fun jsTypeOf(o: Any): String {

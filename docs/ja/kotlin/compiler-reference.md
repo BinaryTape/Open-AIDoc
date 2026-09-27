@@ -146,7 +146,7 @@ Kotlin スクリプトファイルを評価します。このオプションを�
 ### -Xcompiler-plugin-order= {plugin.before>plugin.after id="xcompiler-plugin-order"}
 <primary-label ref="experimental-general"/>
 
-コンパイラプラグインの実行順序を設定します。コンパイラはまず `plugin.before` を実行し、次に `plugin.after` を実行します。
+コンパイラプラグインの実行順序を設定します。コンパイラはまず `plugin.before` を実行し、次に `plugin.after` を実行します：
 
 3つ以上のプラグインに対して複数の順序ルールを定義できます。例：
 
@@ -165,20 +165,20 @@ kotlinc -Xcompiler-plugin-order=plugin.middle>plugin.last
 
 以下のプラグインを ID で設定できます：
 
-| コンパイラプラグイン         | プラグイン ID                              |
+| コンパイラプラグイン | プラグイン ID |
 |-----------------------------|--------------------------------------------|
-| `all-open`, `kotlin-spring` | `org.jetbrains.kotlin.allopen`             |
-| AtomicFU                    | `org.jetbrains.kotlinx.atomicfu`           |
-| Compose                     | `androidx.compose.compiler.plugins.kotlin` |
-| `js-plain-objects`          | `org.jetbrains.kotlinx.jspo`               |
-| `jvm-abi-gen`               | `org.jetbrains.kotlin.jvm.abi`             |
-| kapt                        | `org.jetbrains.kotlin.kapt3`               |
-| Lombok                      | `org.jetbrains.kotlin.lombok`              |
-| `no-arg`, `kotlin-jpa`      | `org.jetbrains.kotlin.noarg`               |
-| Parcelize                   | `org.jetbrains.kotlin.parcelize`           |
-| Power-assert                | `org.jetbrains.kotlin.powerassert`         |
-| SAM with receiver           | `org.jetbrains.kotlin.samWithReceiver`     |
-| Serialization               | `org.jetbrains.kotlinx.serialization`      |
+| `all-open`, `kotlin-spring` | `org.jetbrains.kotlin.allopen` |
+| AtomicFU | `org.jetbrains.kotlinx.atomicfu` |
+| Compose | `androidx.compose.compiler.plugins.kotlin` |
+| `js-plain-objects` | `org.jetbrains.kotlinx.jspo` |
+| `jvm-abi-gen` | `org.jetbrains.kotlin.jvm.abi` |
+| kapt | `org.jetbrains.kotlin.kapt3` |
+| Lombok | `org.jetbrains.kotlin.lombok` |
+| `no-arg`, `kotlin-jpa` | `org.jetbrains.kotlin.noarg` |
+| Parcelize | `org.jetbrains.kotlin.parcelize` |
+| Power-assert | `org.jetbrains.kotlin.powerassert` |
+| SAM with receiver | `org.jetbrains.kotlin.samWithReceiver` |
+| Serialization | `org.jetbrains.kotlinx.serialization` |
 
 この実行順序はコンパイラプラグインのバックエンドのみを制御し、フロントエンドは制御しません。
 
@@ -277,10 +277,10 @@ kotlinc -Xwarning-level=DIAGNOSTIC_NAME:(error|warning|disabled)
 
 プロジェクト内での警告レポートは、モジュール全体のルールと特定のルールを組み合わせることで調整できます：
 
-| コマンド                                           | 説明                                                   |
-|----------------------------------------------------|--------------------------------------------------------|
-| `-nowarn -Xwarning-level=DIAGNOSTIC_NAME:warning`  | 指定されたもの以外のすべての警告を抑制します。         |
-| `-Werror -Xwarning-level=DIAGNOSTIC_NAME:warning`  | 指定されたもの以外のすべての警告をエラーに引き上げます。 |
+| コマンド | 説明 |
+|----------------------------------------------------|-------------------------------------------------------------|
+| `-nowarn -Xwarning-level=DIAGNOSTIC_NAME:warning` | 指定されたもの以外のすべての警告を抑制します。 |
+| `-Werror -Xwarning-level=DIAGNOSTIC_NAME:warning` | 指定されたもの以外のすべての警告をエラーに引き上げます。 |
 | `-Wextra -Xwarning-level=DIAGNOSTIC_NAME:disabled` | 指定されたもの以外のすべての追加チェックを有効にします。 |
 
 一般ルールから除外したい警告が多数ある場合は、[`@argfile`](#argfile) を使用して別のファイルにリストすることができます。
@@ -354,11 +354,11 @@ Kotlin から JVM へのコンパイル用のコマンドラインツールは `
 
 インターフェースで宣言された関数を JVM 上のデフォルトメソッドにコンパイルする方法を制御します。
 
-| モード             | 説明                                                                                                                               |
-|--------------------|------------------------------------------------------------------------------------------------------------------------------------|
-| `enable`           | インターフェースにデフォルト実装を生成し、サブクラスにブリッジ関数を含め、`DefaultImpls` クラスを生成します。（デフォルト）        |
-| `no-compatibility` | インターフェースにデフォルト実装のみを生成し、互換性ブリッジや `DefaultImpls` クラスをスキップします。                            |
-| `disable`          | 互換性ブリッジと `DefaultImpls` クラスのみを生成し、デフォルトメソッドをスキップします。                                            |
+| モード | 説明 |
+|--------------------|-----------------------------------------------------------------------------------------------------------------------------------|
+| `enable` | インターフェースにデフォルト実装を生成し、サブクラスにブリッジ関数を含め、`DefaultImpls` クラスを生成します。（デフォルト） |
+| `no-compatibility` | インターフェースにデフォルト実装のみを生成し、互換性ブリッジや `DefaultImpls` クラスをスキップします。 |
+| `disable` | 互換性ブリッジと `DefaultImpls` クラスのみを生成し、デフォルトメソッドをスキップします。 |
 
 ### -jvm-target _version_ {id="jvm-target-version"}
 
@@ -397,7 +397,7 @@ Kotlin/JVM 標準ライブラリ（`kotlin-stdlib.jar`）および Kotlin リフ
 ### -Xjvm-expose-boxed {id="xjvm-expose-boxed"}
 <primary-label ref="experimental-general"/>
 
-モジュール内のすべてのインライン値クラスのボックス化（boxed）バージョンと、それらを使用する関数のボックス化バリアントを生成し、両方を Java からアクセス可能にします。詳細については、Java から Kotlin を呼び出すためのガイドの[インライン値クラス](java-to-kotlin-interop.md#inline-value-classes)を参照してください。
+モジュール内のすべてのインライン値クラスのボックス化バージョンと、それらを使用する関数のボックス化バリアントを生成し、両方を Java からアクセス可能にします。詳細については、Java から Kotlin を呼び出すためのガイドの[インライン値クラス](java-to-kotlin-interop.md#inline-value-classes)を参照してください。
 
 ### -Xnullability-annotations {id="xnullability-annotations"}
 <primary-label ref="experimental-general"/>
@@ -469,7 +469,7 @@ Kotlin から JS へのコンパイル用のコマンドラインツールは `k
 Kotlin コードで宣言した変数名と関数名をソースマップに追加します。
 
 | 設定 | 説明 | 出力例 |
-|---|---|---|
+|-------------------------|---------------------------------------------------------------|-----------------------------------|
 | `simple-names` | 変数名と単純な関数名が追加されます。（デフォルト） | `main` |
 | `fully-qualified-names` | 変数名と完全修飾された関数名が追加されます。 | `com.example.kjs.playground.main` |
 | `no` | 変数名や関数名は追加されません。 | N/A |
@@ -478,7 +478,7 @@ Kotlin コードで宣言した変数名と関数名をソースマップに追�
 
 ソースマップ内のパスに指定されたプレフィックスを追加します。
 
-### -target {es5|es2015 id="target"}
+### -target {es5|es2015|es2020 id="target"}
 
 指定された ECMA バージョン用の JS ファイルを生成します。
 
@@ -488,9 +488,9 @@ Kotlin コードで宣言した変数名と関数名をソースマップに追�
 JavaScript/TypeScript から、`@JsExport` アノテーションでエクスポートされた [Kotlin インターフェースの実装](whatsnew2320.md#implementing-kotlin-interfaces-from-javascript-typescript)を許可します。
 
 ### -Xes-long-as-bigint {id="xes-long-as-bigint"}
-<primary-label ref="experimental-general"/>
 
 モダンな JavaScript (ES2020) へのコンパイル時に、Kotlin の `Long` 値を表すために JavaScript の `BigInt` 型のサポートを有効にします。
+このオプションは `es5` および `es2015` ターゲットにのみ必要です。`es2020` ターゲットではデフォルトで有効になっています。
 
 ### -Xsuspend-lambda-exporting {id="xsuspend-lambda-exporting"}
 <primary-label ref="experimental-general"/>

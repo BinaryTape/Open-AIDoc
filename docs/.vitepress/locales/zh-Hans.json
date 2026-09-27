@@ -22,7 +22,7 @@
   "homepage.card.koog.tag.2": "Kotlin",
   "homepage.banner.title": "开始探索文档",
   "homepage.banner.description": "选择上方任一技术栈，开始探索详尽的文档和示例",
-  "homepage.ad.description": "通过 innovation 咨询和解决方案连接全球与亚洲技术社区，利用我们在移动基础设施和新兴 AI 领域的专业知识，促进全球范围内的开源协作。",
+  "homepage.ad.description": "通过创新咨询和解决方案连接全球与亚洲技术社区，利用我们在移动基础设施和新兴 AI 领域的专业知识，促进全球范围内的开源协作。",
   "homepage.ad.contact": "联系方式：hi@binarytape.com",
   "homepage.ad.sponsor": "Open AIDoc 由 BinaryTape 赞助支持",
   "koin.setup": "配置",
@@ -85,7 +85,7 @@
   "kotlin.kotlin-overview": "Kotlin 概览",
   "kotlin.what-s-new-in-kotlin": "Kotlin 最新变化",
   "kotlin.whatsnew22": "Kotlin 2.2.0",
-  "kotlin.whatsnew-eap": "Kotlin 2.4.20-RC3",
+  "kotlin.whatsnew-eap": "Kotlin 2.5.0-Beta1",
   "kotlin.earlier-versions": "更早版本",
   "kotlin.whatsnew2120": "Kotlin 2.1.20",
   "kotlin.whatsnew21": "Kotlin 2.1.0",
@@ -673,7 +673,7 @@
   "coroutines.flows": "Flows",
   "coroutines.coroutines-flow": "概览",
   "kmp.kotlin-toolchain": "Kotlin 工具链",
-  "kmp.whats-new-compose-112": "Compose Multiplatform 1.12.0",
+  "kmp.whats-new-compose-112": "Compose Multiplatform 1.12.1",
   "kotlin.take-kotlin-tour": "参加 Kotlin 导览",
   "kotlin.beginner": "初学者",
   "kotlin.intermediate": "中级",
@@ -704,5 +704,6 @@
   "ktor.server-oauth2-flows": "类型安全的 OAuth 2.0 流程",
   "ktor.server-oidc": "OpenID Connect",
   "ktor.server-oidc-resource-server": "资源服务器",
-  "ktor.server-oidc-browser-login": "浏览器登录"
+  "ktor.server-oidc-browser-login": "浏览器登录",
+  "koog._0": "0"
 }

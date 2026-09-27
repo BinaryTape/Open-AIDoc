@@ -287,8 +287,7 @@ mergeStrings(strings = arrayOf("a", "b", "c"))
 
 ### 傳回型別 {id="return-types"}
 
-當您宣告具有區塊主體的函式時（透過將指令放在花括號 `{}` 內），
-必須一律明確指定傳回型別。唯一的例外是當函式傳回 `Unit` 時，[在這種情況下指定傳回型別是選用的](#unit-returning-functions)。
+當您宣告具有區塊主體的函式時（透過將指令放在花括號 `{}` 內），必須一律明確指定傳回型別。唯一的例外是當函式傳回 `Unit` 時，[在這種情況下指定傳回型別是選用的](#unit-returning-functions)。
 
 Kotlin 不會為具有區塊主體的函式推論傳回型別。這些函式的控制流程可能很複雜，這會使傳回型別對於讀者甚至是編譯器都不夠清晰。然而，如果您不指定，Kotlin 可以為 [單一運算式函式](#single-expression-functions) 推論傳回型別。
 
@@ -406,14 +405,13 @@ fun getDisplayNameOrDefault(userId: String?): String =
 
 ### 傳回 Unit 的函式 {id="unit-returning-functions"}
 
-如果函式具有區塊主體（花括號 `{}` 內的指令）且不傳回有用的值，
-編譯器會假設其傳回型別為 `Unit`。
-`Unit` 是一種只有一個值的型別，該值也稱為 `Unit`。
+如果函式具有區塊主體且未明確指定傳回型別，編譯器會將其傳回型別推論為 `Unit`。
 
-您不必指定 `Unit` 作為傳回型別，除非是函式型別參數。
-您也永遠不必明確傳回 `Unit`。
+`Unit` 是一種只有一個值的型別，該值也稱為 `Unit`。此值是一個[物件](object-declarations.md)，因此只存在單一 `Unit` 執行個體。
+與其他程式設計語言中的 `void` 不同，`Unit` 是一個真實的型別，如果您的程式碼需要，可以使用它的值。
+這樣一來，產生結果的函式與僅執行操作的函式就符合相同的型別模型：兩者都傳回一個值，並且可以由函式型別表示或與泛型 API 一起使用。
 
-例如，您可以宣告 `printHello()` 函式而不傳回 `Unit`：
+您不需要在函式宣告中指定 `Unit` 或明確傳回其值。但是，當 `Unit` 是函式型別的一部分時（例如 `() -> Unit`），您必須指定它。例如，讓我們宣告一個不傳回 `Unit` 的 `printHello()` 函式：
 
 ```kotlin
 // 函式型別參數 ('action') 的宣告仍然 
@@ -430,22 +428,25 @@ fun printHello(name: String?, action: () -> Unit) {
 fun main() {
     printHello("Kodee") {
         println("This runs after the greeting.")
+        // Hello Kodee
+        // This runs after the greeting.
     }
-    // Hello Kodee
-    // This runs after the greeting.
 
     printHello(null) {
         println("No name provided, but action still runs.")
+        // Hi there!
+        // No name provided, but action still runs.
     }
-    // No name provided, but action still runs
 }
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" validate="false" id="return-unit-implicit"}
 
-這與下面這種冗長的宣告是等效的：
+這與以下更冗長的宣告等效，後者明確指定了傳回型別與傳回值：
 
 ```kotlin
 //sampleStart
+// 在 '() -> Unit' 函式型別中需要 'Unit'，
+// 但將 ': Unit' 宣告為 'printHello()' 的傳回型別是選用的
 fun printHello(name: String?, action: () -> Unit): Unit {
     if (name != null)
         println("Hello $name")
@@ -453,20 +454,21 @@ fun printHello(name: String?, action: () -> Unit): Unit {
         println("Hi there!")
 
     action()
+    // 明確傳回 'Unit' 值是選用的
     return Unit
 }
 //sampleEnd
 fun main() {
     printHello("Kodee") {
-        println("This runs after the greeting.")
+        println("This action runs when a name is given.")
+        // Hello Kodee
+        // This action runs when a name is given.
     }
-    // Hello Kodee
-    // This runs after the greeting.
-
     printHello(null) {
-        println("No name provided, but action still runs.")
+        println("This action runs when no name is provided.")
+        // Hi there!
+        // This action runs when no name is provided.
     }
-    // No name provided, but action still runs
 }
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" validate="false" id="return-unit-explicit"}

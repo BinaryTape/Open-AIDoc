@@ -1,12 +1,12 @@
 [//]: # (title: 为抢先体验计划 (EAP) 配置构建)
 
 <tldr>
-    <p>目前没有可用的预览版本。</p>
-    <!--<p>最新 Kotlin EAP 版本：<strong>%kotlinEapVersion%</strong></p>
-    <p><a href="eap.md#build-details">探索 Kotlin EAP 发布详情</a></p> -->
+    <!-- <p>目前没有可用的预览版本。</p> -->
+    <p>最新 Kotlin EAP 版本：<strong>%kotlinEapVersion%</strong></p>
+    <p><a href="eap.md#build-details">探索 Kotlin EAP 发布详情</a></p>
 </tldr>
 
-要将构建配置为使用 Kotlin 的抢先体验计划 (EAP) 版本，您需要： 
+要将构建配置为使用 Kotlin 的 EAP 版本，您需要： 
 
 * 指定 Kotlin 的 EAP 版本。[此处列出了可用的 EAP 版本](eap.md#build-details)。
 * 将依赖项的版本更改为 EAP 版本。
@@ -148,5 +148,5 @@ dependencies {
 ## 如果遇到任何问题 {id="if-you-run-into-any-problems"}
 
 * 向 [我们的问题跟踪器 YouTrack](https://kotl.in/issue) 报告问题。
-* 在 [Kotlin Slack 的 #eap 频道](https://app.slack.com/client/T09229ZC6/C0KLZSCHF) 寻求帮助 ([获取邀请](https://surveys.jetbrains.com/s3/kotlin-slack-sign-up))。
+* 在 [Kotlin Slack 的 #eap 频道](https://app.slack.com/client/T09229ZC6/C0KLZSCHF) 寻求帮助（[获取邀请](https://surveys.jetbrains.com/s3/kotlin-slack-sign-up)）。
 * 回滚到最新的稳定版本：[在构建脚本文件中进行更改](#adjust-the-kotlin-version)。

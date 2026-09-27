@@ -12,7 +12,7 @@
 
 ### 已修复 {id="fixed"}
 
-- 暂无！
+- [IntelliJ 插件] 通过更改 IntelliJ API 用法修复插件发布违规问题 (#6366 由 @griffio 贡献)
 
 ## [2.4.0] - 2026-09-17 {id="2-4-0-2026-09-17"}
 [2.4.0]: https://github.com/sqldelight/sqldelight/releases/tag/2.4.0

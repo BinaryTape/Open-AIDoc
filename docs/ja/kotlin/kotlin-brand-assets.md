@@ -5,7 +5,7 @@
 当社のロゴは、マークとタイプフェイス（書体）で構成されています。
 フルカラーバージョンがメインであり、ほとんどの場合においてこれを使用してください。
 
-[すべてのバージョンをダウンロード](https://resources.jetbrains.com/storage/products/kotlin/docs/kotlin_logos.zip){:.typo-float-right.kto-button.kto-button_size_m.kto-button_mode_outline}
+<a href="https://resources.jetbrains.com/storage/products/kotlin/docs/kotlin_logos.zip" as="button" mode="classic" icon="download" icon-position="right">すべてのロゴをダウンロード</a>
 
 当社のロゴとマークには保護領域（アイソレーション）が設定されています。他のデザイン要素がこの領域内に入らないようにロゴを配置してください。
 保護領域の最小サイズは、マークの高さの半分です。
@@ -40,7 +40,7 @@ Kotlinブランドパッケージには、いくつかの公式Kotlinエコシ�
 
 これらのロゴは、同じダウンロードバンドルに含まれています：
 
-[すべてのバージョンをダウンロード](https://resources.jetbrains.com/storage/products/kotlin/docs/kotlin_logos.zip){:.typo-float-right.kto-button.kto-button_size_m.kto-button_mode_outline}
+<a href="https://resources.jetbrains.com/storage/products/kotlin/docs/kotlin_logos.zip" as="button" mode="classic" icon="download" icon-position="right">すべてのロゴをダウンロード</a>
 
 ## Kotlinマスコット {id="kotlin-mascot"}
 
@@ -51,19 +51,19 @@ Kotlinのマスコットであり、あなたの創造性を常に励まし、�
 
 Kodeeはデジタル素材や印刷物で使用できます。そのために、ダウンロードして活用できるさまざまなKotlinマスコットアセットを用意しました。
 
-[すべてのアセットをダウンロード](https://resources.jetbrains.com/storage/products/kotlin/docs/kotlin_mascot_2.zip){:.typo-float-right.kto-button.kto-button_size_m.kto-button_mode_outline}
+<a href="https://resources.jetbrains.com/storage/products/kotlin/docs/kotlin_mascot_2.zip" as="button" mode="classic" icon="download" icon-position="right">すべてのロゴをダウンロード</a>
 
 ![Kotlin mascot Kodee in action](mascot-in-action.png){width=700}
 
 ## Kotlinユーザーグループのブランドアセット {id="kotlin-user-group-brand-assets"}
 
-私たちは、Kotlinユーザーグループ（KUG）向けに、認識しやすく、Kotlinとの関連性を明確に伝えるために特別に設計されたロゴを提供しています。
+私たちは、Kotlinユーザーグループ向けに、認識しやすく、Kotlinとの関連性を明確に伝えるために特別に設計されたロゴを提供しています。
 
 * 公式のKotlinロゴは言語自体に関連付けられています。混乱を招く可能性があるため、それ以外の目的で、あるいは異なる範囲で使用しないでください。その派生形についても同様です。
-* ユーザーグループ独自のロゴを使用することは、コミュニティの意見や行動がKotlinチームから独立していることも意味します。
+* ユーザーグループのロゴは、コミュニティの意見や行動がKotlinチームから独立していることも意味します。
 * 皆さんの意見が私たちの意見と一致する必要はありません。これが創造的で強力なコミュニティにとって最も有益なモデルであると考えています。
 
-[すべてのアセットをダウンロード](https://drive.google.com/drive/folders/0B3Zi34svOj1RZ2sxZExhblRJc1k){:.typo-float-right.kto-button.kto-button_size_m.kto-button_mode_outline}
+<a href="https://drive.google.com/drive/folders/0B3Zi34svOj1RZ2sxZExhblRJc1k" as="button" mode="classic" icon="download" icon-position="right">すべてのロゴをダウンロード</a>
 
 ### ユーザーグループのスタイル {id="style-for-user-groups"}
 
@@ -113,7 +113,7 @@ JetBrainsは、Kotlin Nightイベント用のブランディングと素材を�
 私たちのチームがイベントプロモーション用のデジタルアセットを用意し、ステッカーやTシャツを含むグッズパックを発送します。
 あなたのKotlin Nightを楽しいものにするために、私たちが用意したものをチェックしてください！
 
-[すべてのアセットをダウンロード](https://drive.google.com/drive/folders/1wTJ-PiO6VvbY6XdACGLsWZ_N8KHI0Nvr){:.typo-float-right.kto-button.kto-button_size_m.kto-button_mode_outline}
+<a href="https://drive.google.com/drive/folders/1wTJ-PiO6VvbY6XdACGLsWZ_N8KHI0Nvr" as="button" mode="classic" icon="download" icon-position="right">すべてのアセットをダウンロード</a>
 
 ### ソーシャルメディア {id="social-media"}
 

@@ -10,7 +10,7 @@ Kotlin 是一門開源的靜態型別程式語言，目標平台包括 JVM、And
 
 ### Kotlin 的目前版本是什麼？ {id="what-is-the-current-version-of-kotlin"}
 
-目前發佈的版本是 %kotlinVersion%，發佈日期為 %kotlinReleaseDate%。
+目前發佈的版本是 %kotlinVersion%，發佈日期為 %kotlinReleaseDate%。  
 您可以在 [GitHub](https://github.com/jetbrains/kotlin) 上找到更多資訊。
 
 ### Kotlin 是免費的嗎？ {id="is-kotlin-free"}
@@ -27,12 +27,10 @@ Kotlin 同時具有物件導向和函式式建構。您可以以 OO 和 FP 風�
 Kotlin 更加簡潔。粗略估計顯示程式碼行數減少了約 40%。
 它也更加型別安全——例如，對不可為 null 型別的支援使應用程式不易出現 NPE。
 其他特性包括智慧轉換、高階函數、擴充函式以及帶接收者的 Lambda 運算式，提供了編寫具表現力程式碼的能力，並促進了 DSL 的建立。
-
+ 
 ### Kotlin 與 Java 程式語言相容嗎？ {id="is-kotlin-compatible-with-the-java-programming-language"}
 
-是的。Kotlin 與 Java 程式語言 100% 互通，且重點一直放在確保您現有的程式碼庫可以與 Kotlin 正確互動。
-您可以輕鬆地[從 Java 呼叫 Kotlin 程式碼](java-to-kotlin-interop.md)以及[從 Kotlin 呼叫 Java 程式碼](java-interop.md)。
-這使得採用變得更加容易且風險更低。IDE 中還內建了自動的 [Java-to-Kotlin 轉換器](mixing-java-kotlin-intellij.md#convert-java-files-to-kotlin)，可簡化現有程式碼的遷移。
+是的。Kotlin 與 Java 程式語言 100% 互通，且重點一直放在確保您現有的程式碼庫可以與 Kotlin 正確互動。您可以輕鬆地[從 Java 呼叫 Kotlin 程式碼](java-to-kotlin-interop.md)以及[從 Kotlin 呼叫 Java 程式碼](java-interop.md)。這使得採用變得更加容易且風險更低。IDE 中還內建了自動的 [Java-to-Kotlin 轉換器](mixing-java-kotlin-intellij.md#convert-java-files-to-kotlin)，可簡化現有程式碼的遷移。
 
 ### 我可以用 Kotlin 做什麼？ {id="what-can-i-use-kotlin-for"}
 
@@ -46,14 +44,11 @@ Kotlin 可用於任何類型的開發，無論是後端、用戶端 Web、Androi
 
 ### 我可以將 Kotlin 用於後端開發嗎？ {id="can-i-use-kotlin-for-backend-development"}
 
-是的。Kotlin 與 JVM 100% 相容，因此您可以使用任何現有的架構，例如 Spring Boot、vert.x 或 JSF。
-此外，還有專門用 Kotlin 編寫的架構，例如 [Ktor](https://github.com/kotlin/ktor)。
-如需更多資訊，請查看[後端開發概覽](server-overview.md)。
+是的。Kotlin 與 JVM 100% 相容，因此您可以使用任何現有的架構，例如 Spring Boot、vert.x 或 JSF。此外，還有專門用 Kotlin 編寫的架構，例如 [Ktor](https://github.com/kotlin/ktor)。如需更多資訊，請查看[後端開發概覽](server-overview.md)。
 
 ### 我可以將 Kotlin 用於 Web 開發嗎？ {id="can-i-use-kotlin-for-web-development"}
 
-是的。對於後端 Web 開發，Kotlin 與 [Ktor](https://ktor.io/) 和 [Spring](https://spring.io/) 等架構搭配良好，讓您能高效建置伺服器端應用程式。
-此外，您可以使用 Kotlin/Wasm 進行用戶端 Web 開發。
+是的。對於後端 Web 開發，Kotlin 與 [Ktor](https://ktor.io/) 和 [Spring](https://spring.io/) 等架構搭配良好，讓您能高效建置伺服器端應用程式。此外，您可以使用 Kotlin/Wasm 進行用戶端 Web 開發。
 了解如何[開始使用 Kotlin/Wasm](wasm-get-started.md)。
 
 ### 我可以將 Kotlin 用於桌面開發嗎？ {id="can-i-use-kotlin-for-desktop-development"}
@@ -76,7 +71,7 @@ Kotlin 在 [IntelliJ IDEA](https://www.jetbrains.com/idea/download/) 和 [Androi
 
 您也可以嘗試使用 [Kotlin Playground](https://play.kotlinlang.org) 在瀏覽器中編寫、執行和分享 Kotlin 程式碼。
 此外，還提供[命令列編譯器](command-line.md)，為編譯和執行應用程式提供簡單直接的支援。
-
+  
 ### 哪些建置工具支援 Kotlin？ {id="what-build-tools-support-kotlin"}
 
 在 JVM 方面，主要的建置工具包括 [Gradle](gradle.md) 和 [Maven](maven.md)。
@@ -86,7 +81,7 @@ Kotlin 在 [IntelliJ IDEA](https://www.jetbrains.com/idea/download/) 和 [Androi
 
 當目標平台為 JVM 時，Kotlin 會產生與 Java 相容的位元組碼。
 
-當目標平台為 JavaScript 時，Kotlin 會轉譯為 ES5.1 並產生與包括 AMD 和 CommonJS 在內的模組系統相容的程式碼。
+當目標平台為 JavaScript 時，Kotlin 可根據設定的目標產生 ES5、ES2015 或 ES2020 程式碼。該程式碼與包含 AMD 和 CommonJS 在內的模組系統相容。
 
 當目標平台為 Native 時，Kotlin 將產生特定於平台的程式碼（透過 LLVM）。
 
@@ -98,14 +93,14 @@ Kotlin 讓您選擇執行的 JVM 版本。預設情況下，Kotlin/JVM 編譯器
 
 ### Kotlin 很難嗎？ {id="is-kotlin-hard"}
 
-Kotlin 受到 Java、C#、JavaScript、Scala 和 Groovy 等現有語言的啟發。我們試圖確保 Kotlin 易於學習，以便人們可以輕鬆上手，在幾天內就能閱讀和編寫 Kotlin。
-學習慣用的 (idiomatic) Kotlin 並使用其更多進階特性可能需要更長的時間，但總體而言它不是一門複雜的語言。
+Kotlin 受到 Java、C#、JavaScript、Scala 和 Groovy 等現有語言的啟發。我們試圖確保 Kotlin 易於學習，以便大家可以輕鬆上手，在幾天內就能閱讀和編寫 Kotlin。
+學習慣用的 Kotlin 並使用其更多進階特性可能需要更長的時間，但總體而言它不是一門複雜的語言。  
 如需更多資訊，請查看我們的[學習材料](learning-materials-overview.md)。
-
+ 
 ### 哪些公司正在使用 Kotlin？ {id="what-companies-are-using-kotlin"}
-
+ 
 使用 Kotlin 的公司太多，無法一一列舉，但一些較知名且已公開宣佈使用 Kotlin 的公司（透過部落格文章、GitHub 存儲庫或演講）包括 [Square](https://medium.com/square-corner-blog/square-open-source-loves-kotlin-c57c21710a17)、[Pinterest](https://www.youtube.com/watch?v=mDpnc45WwlI) 以及 [Basecamp](https://signalvnoise.com/svn3/using-kotlin-to-make-android-apis-fun-again/)。
-
+ 
 ### 誰開發了 Kotlin？ {id="who-develops-kotlin"}
 
 Kotlin 由 [JetBrains](https://www.jetbrains.com/) 的工程師團隊開發（目前團隊規模為 100 人以上）。
@@ -135,7 +130,7 @@ Kotlin 有許多書籍可供選擇。我們審閱過其中一些，並推薦作�
 是的！Kotlin 有一個非常活躍的社群。Kotlin 開發人員常聚在 [Kotlin 論壇](https://discuss.kotlinlang.org)、[StackOverflow](https://stackoverflow.com/questions/tagged/kotlin)，更活躍的則在 [Kotlin Slack](https://slack.kotlinlang.org)（截至 2020 年 4 月成員已接近 30,000 人）。
 
 ### 有 Kotlin 的相關活動嗎？ {id="are-there-kotlin-events"}
-
+ 
 是的！現在有許多 User Groups 和 Meetups 專門圍繞 Kotlin。您可以在[網站上找到清單](https://kotlinlang.org/user-groups/user-group-list.html)。
 此外，世界各地還有社群組織的 [Kotlin Nights](https://kotlinlang.org/community/events.html) 活動。
 
@@ -143,7 +138,7 @@ Kotlin 有許多書籍可供選擇。我們審閱過其中一些，並推薦作�
 
 是的！[KotlinConf](https://kotlinconf.com/) 是由 JetBrains 主辦的年度會議，匯集了來自世界各地的開發人員、愛好者和專家，分享他們對 Kotlin 的知識與經驗。
 
-除了技術演講和工作坊，KotlinConf 還提供社交機會、社群互動和社交活動，讓與會者可以與其他 Kotlin 使用者建立聯繫並交換想法。
+除了技術演講和工作坊，KotlinConf 還提供交流機會、社群互動和社交活動，讓與會者可以與其他 Kotlin 使用者建立聯繫並交換想法。
 它是促進 Kotlin 生態系統內協作和社群建設的平台。
 
 Kotlin 也在全球不同的會議中被提及。您可以在網站上找到[即將舉行的演講清單](https://kotlinlang.org/community/talks.html?time=upcoming)。

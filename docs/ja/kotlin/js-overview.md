@@ -6,7 +6,7 @@ Kotlin/JavaScript (Kotlin/JS) を使用すると、Kotlinコード、Kotlin標�
 
 Kotlin Multiplatform Gradleプラグインを使用すると、アプリケーションのバンドリングの制御や、npmからのJavaScript依存関係の直接追加といった機能にアクセスできます。利用可能な設定オプションの概要については、「[Kotlin/JSプロジェクトの設定](js-project-setup.md)」を参照してください。
 
-> 現在のKotlin/JSの実装は、[ES5](https://www.ecma-international.org/ecma-262/5.1/)および[ES2015](https://262.ecma-international.org/6.0/)標準をターゲットにしています。
+> 現在のKotlin/JSの実装は、[ES5](https://www.ecma-international.org/ecma-262/5.1/)、[ES2015](https://262.ecma-international.org/6.0/)、および[ES2020](https://262.ecma-international.org/11.0/)標準をターゲットにしています。
 >
 {style="tip"}
 

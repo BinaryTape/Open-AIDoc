@@ -5,7 +5,7 @@
 저희 로고는 마크와 서체로 구성됩니다. 
 풀컬러 버전이 기본이며, 대부분의 경우에 이 버전을 사용해야 합니다.
 
-[모든 버전 다운로드](https://resources.jetbrains.com/storage/products/kotlin/docs/kotlin_logos.zip){:.typo-float-right.kto-button.kto-button_size_m.kto-button_mode_outline}
+<a href="https://resources.jetbrains.com/storage/products/kotlin/docs/kotlin_logos.zip" as="button" mode="classic" icon="download" icon-position="right">모든 로고 다운로드</a>
 
 로고와 마크에는 보호 영역(protective field)이 있습니다. 다른 디자인 요소가 이 영역을 침범하지 않도록 로고를 배치해 주세요.
 보호 영역의 최소 크기는 마크 높이의 절반입니다.
@@ -40,7 +40,7 @@ Kotlin 브랜드 패키지에는 여러 공식 Kotlin 생태계 프로젝트, �
 
 동일한 다운로드 번들에서 이 로고들을 찾을 수 있습니다:
 
-[모든 버전 다운로드](https://resources.jetbrains.com/storage/products/kotlin/docs/kotlin_logos.zip){:.typo-float-right.kto-button.kto-button_size_m.kto-button_mode_outline}
+<a href="https://resources.jetbrains.com/storage/products/kotlin/docs/kotlin_logos.zip" as="button" mode="classic" icon="download" icon-position="right">모든 로고 다운로드</a>
 
 ## Kotlin 마스코트 {id="kotlin-mascot"}
 
@@ -52,7 +52,7 @@ Kotlin의 마스코트이자 창의성을 북돋아 주고 영감을 주는 친�
 디지털 및 인쇄물에 Kodee를 사용할 수 있습니다. 이를 위해 다운로드하여 살펴볼 수 있는 다양한 
 Kotlin 마스코트 자산을 준비했습니다.
 
-[모든 자산 다운로드](https://resources.jetbrains.com/storage/products/kotlin/docs/kotlin_mascot_2.zip){:.typo-float-right.kto-button.kto-button_size_m.kto-button_mode_outline}
+<a href="https://resources.jetbrains.com/storage/products/kotlin/docs/kotlin_mascot_2.zip" as="button" mode="classic" icon="download" icon-position="right">모든 로고 다운로드</a>
 
 ![Kotlin mascot Kodee in action](mascot-in-action.png){width=700}
 
@@ -65,7 +65,7 @@ Kotlin 사용자 그룹이 쉽게 인식되고 Kotlin과의 연관성을 전달�
 * 사용자 그룹 로고는 커뮤니티의 의견과 활동이 Kotlin 팀과 독립적임을 의미하기도 합니다.
 * 여러분의 의견이 저희와 일치할 필요는 없으며, 이것이 창의적이고 강력한 커뮤니티를 위한 가장 유익한 모델이라고 생각합니다.
 
-[모든 자산 다운로드](https://drive.google.com/drive/folders/0B3Zi34svOj1RZ2sxZExhblRJc1k){:.typo-float-right.kto-button.kto-button_size_m.kto-button_mode_outline}
+<a href="https://drive.google.com/drive/folders/0B3Zi34svOj1RZ2sxZExhblRJc1k" as="button" mode="classic" icon="download" icon-position="right">모든 로고 다운로드</a>
 
 ### 사용자 그룹 스타일 {id="style-for-user-groups"}
 
@@ -122,7 +122,7 @@ JetBrains는 Kotlin Night 이벤트를 위한 브랜딩 및 자료를 제공합�
 저희 팀은 이벤트 홍보를 위한 디지털 자산을 준비하고 스티커와 티셔츠가 포함된 굿즈 패키지를 배송해 드립니다. 
 Kotlin Night을 즐겁게 만들기 위해 무엇이 준비되어 있는지 확인해 보세요!
 
-[모든 자산 다운로드](https://drive.google.com/drive/folders/1wTJ-PiO6VvbY6XdACGLsWZ_N8KHI0Nvr){:.typo-float-right.kto-button.kto-button_size_m.kto-button_mode_outline}
+<a href="https://drive.google.com/drive/folders/1wTJ-PiO6VvbY6XdACGLsWZ_N8KHI0Nvr" as="button" mode="classic" icon="download" icon-position="right">모든 자산 다운로드</a>
 
 ### 소셜 미디어 {id="social-media"}
 

@@ -6,7 +6,7 @@ Kotlin/JavaScript (Kotlin/JS) 允许你将 Kotlin 代码、Kotlin 标准库以�
 
 Kotlin Multiplatform Gradle 插件使你能够使用诸如控制应用程序打包以及直接从 npm 添加 JavaScript 依赖项等功能。要了解可用配置选项的概览，请参阅[设置 Kotlin/JS 项目](js-project-setup.md)。
 
-> Kotlin/JS 的当前实现面向 [ES5](https://www.ecma-international.org/ecma-262/5.1/) 和 [ES2015](https://262.ecma-international.org/6.0/) 标准。
+> Kotlin/JS 的当前实现面向 [ES5](https://www.ecma-international.org/ecma-262/5.1/)、[ES2015](https://262.ecma-international.org/6.0/) 和 [ES2020](https://262.ecma-international.org/11.0/) 标准。
 >
 {style="tip"}
 
@@ -39,7 +39,7 @@ Kotlin Multiplatform Gradle 插件使你能够使用诸如控制应用程序打�
 
 * **使用 Kotlin/JS 构建服务器端和无服务器应用程序**
 
-  Kotlin/JS 中的 Node.js 目标允许你在 JavaScript 运行时为服务器端或无服务器环境创建应用程序。这提供了快速启动和低内存占用。[`kotlinx-nodejs`](https://github.com/Kotlin/kotlinx-nodejs) 库提供了从 Kotlin 对 [Node.js API](https://nodejs.org/docs/latest/api/) 的类型安全访问。
+  Kotlin/JS 中的 Node.js 目标允许你在 JavaScript 运行时为服务器端或无服务器环境创建应用程序。这提供了快速启动和低内存使用情况。[`kotlinx-nodejs`](https://github.com/Kotlin/kotlinx-nodejs) 库提供了从 Kotlin 对 [Node.js API](https://nodejs.org/docs/latest/api/) 的类型安全访问。
 
 根据你的用例，Kotlin/JS 项目可以使用来自 Kotlin 生态系统的兼容库，以及来自 JavaScript 和 TypeScript 生态系统的第三方库。
 
@@ -49,7 +49,7 @@ Kotlin/JS 还兼容最常见的模块系统：[ESM](https://tc39.es/ecma262/#sec
 
 ### 分享你的用例 {id="share-your-use-cases"}
 
-[Kotlin/JS 用例](#use-cases-for-kotlin-js)中的列表并未列举详尽。欢迎尝试不同的方法，并找到最适合你项目的方案。
+[Kotlin/JS 的用例](#use-cases-for-kotlin-js)中的列表并未列举详尽。欢迎尝试不同的方法，并找到最适合你项目的方案。
 
 欢迎在 [Kotlin Slack](https://surveys.jetbrains.com/s3/kotlin-slack-sign-up) 的 [#javascript](https://kotlinlang.slack.com/archives/C0B8L3U69) 频道中与 Kotlin/JS 社区分享你的用例、经验和问题。
 

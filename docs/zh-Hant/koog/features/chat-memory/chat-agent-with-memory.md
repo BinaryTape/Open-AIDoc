@@ -47,8 +47,8 @@ graph TB
     
         ```kotlin title="build.gradle.kts"
         dependencies {
-            implementation("ai.koog:koog-agents:1.2.0")
-            implementation("ai.koog:agents-features-memory:1.2.0")
+            implementation("ai.koog:koog-agents:1.3.0")
+            implementation("ai.koog:agents-features-memory:1.3.0")
         }
         ```
     
@@ -67,7 +67,7 @@ graph TB
         <dependency>
             <groupId>ai.koog</groupId>
             <artifactId>koog-agents-jvm</artifactId>
-            <version>1.2.0</version>
+            <version>1.3.0</version>
         </dependency>
         <dependency>
             <groupId>ai.koog</groupId>
@@ -111,8 +111,7 @@ graph TB
                 if (input.isEmpty()) continue
 
                 val reply = agent.run(input, sessionId)
-                println("Assistant: $reply
-")
+                println("Assistant: $reply\n")
             }
         }
     }
@@ -143,8 +142,7 @@ graph TB
                     if (input.isEmpty()) continue;
     
                     String reply = agent.run(input, sessionId);
-                    System.out.println("Assistant: " + reply + "
-");
+                    System.out.println("Assistant: " + reply + "\n");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -159,7 +157,7 @@ graph TB
 
 代理使用預設的 [歷程記錄提供者](index.md#history-providers)，它會將對話歷程記錄儲存在記憶體中。這意指當應用程式結束時，歷程記錄將會遺失。在實際應用程式中，您應該實作自訂的歷程記錄提供者，以便將歷程記錄持久化儲存在資料庫或檔案中。
 
-`windowSize(20)` [前置處理器](index.md#preprocessors) 可確保限制上下文大小：代理僅儲存最多 20 則最近的訊息。如果沒有這個設定，提示詞的大小可能會超過內容限制。
+`windowSize(20)` [前置處理器](index.md#preprocessors) 可確保限制上下文大小：代理僅儲存最多 20 則最近的訊息。如果沒有這個設定，提示詞的大小可能會超過上下文限制。
 
 ## 範例階段 {id="example-session"}
 

@@ -6,7 +6,7 @@ Kotlin は当初、Java プラットフォームとの容易な相互運用を�
 
 ## インライン JavaScript {id="inline-javascript"}
 
-[`js()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.js/js.html) 関数を使用すると、Kotlin コード内に JavaScript コードをインラインで記述できます。
+[`js()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.js/js.html) 関数を使用すると、Kotlin コード内に JavaScript コードをインラインで記述できます：
 
 ```kotlin
 fun jsTypeOf(o: Any): String {
@@ -14,7 +14,7 @@ fun jsTypeOf(o: Any): String {
 }
 ```
 
-JavaScript コードのインライン記述では、以下を含む [ES2015 機能](js-project-setup.md#support-for-es2015-features)を完全にサポートしています：
+JavaScript コードのインライン記述では、以下を含む [ES2015 機能](js-project-setup.md#set-an-ecmascript-target)を完全にサポートしています：
 
 * `const` および `let` 変数宣言
 * ES クラス
@@ -216,7 +216,7 @@ function usingAsOperator(s) {
 
 Kotlin/JS は、他のプラットフォームと比較して等価性チェックに関する特定のセマンティクスを持っています。
 
-In Kotlin/JS、Kotlin の[参照の等価性](equality.md#referential-equality)演算子（`===`）は、常に JavaScript の[厳格な等価性](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Strict_equality)演算子（`===`）に変換されます。
+Kotlin/JS では、Kotlin の[参照の等価性](equality.md#referential-equality)演算子（`===`）は、常に JavaScript の[厳格な等価性](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Strict_equality)演算子（`===`）に変換されます。
 
 JavaScript の `===` 演算子は、2 つの値が等しいことだけでなく、それら 2 つの値の型も等しいことをチェックします：
 

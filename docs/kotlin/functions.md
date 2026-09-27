@@ -406,17 +406,19 @@ fun getDisplayNameOrDefault(userId: String?): String =
 
 ### 返回 Unit 的函数 {id="unit-returning-functions"}
 
-如果函数具有代码块体（花括号 `{}` 内的指令）并且不返回有用的值，
-编译器会假定其返回值类型为 `Unit`。
-`Unit` 是一种只有唯一值的类型，该值也称为 `Unit`。
+如果一个函数具有代码块体且未显式指定返回值类型，编译器会将其返回值类型推断为 `Unit`。
 
-你不需要将 `Unit` 指定为返回值类型，除非是函数类型形参。
-你永远不需要显式返回 `Unit`。
+`Unit` 是一种只有一个值的类型，该值也称为 `Unit`。此值是一个[对象](object-declarations.md)，因此仅存在单个 `Unit` 实例。
+与其它编程语言中的 `void` 不同，`Unit` 是一种真实的类型，当你的代码需要时，你可以使用它的值。
+这样一来，产生结果的函数与仅执行操作的函数都符合相同的类型模型：它们都返回一个值，
+并且可以由函数类型表示或与泛型 API 一同使用。
 
-例如，你可以声明一个 `printHello()` 函数而不返回 `Unit`：
+你不需要在函数声明中指定 `Unit`，也不需要显式返回其值。但是，当 `Unit` 是函数类型的一部分（例如 `() -> Unit`）时，你必须指定
+`Unit`。例如，让我们声明一个不返回 `Unit` 的 `printHello()` 函数：
 
 ```kotlin
-// 函数类型形参 ('action') 的声明仍然需要显式的返回值类型
+// 函数类型形参 ('action') 的声明仍然
+// 需要显式的返回值类型
 fun printHello(name: String?, action: () -> Unit) {
     if (name != null)
         println("Hello $name")
@@ -429,22 +431,25 @@ fun printHello(name: String?, action: () -> Unit) {
 fun main() {
     printHello("Kodee") {
         println("This runs after the greeting.")
+        // Hello Kodee
+        // This runs after the greeting.
     }
-    // Hello Kodee
-    // This runs after the greeting.
 
     printHello(null) {
         println("No name provided, but action still runs.")
+        // Hi there!
+        // No name provided, but action still runs.
     }
-    // No name provided, but action still runs
 }
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" validate="false" id="return-unit-implicit"}
 
-这等同于以下详细声明：
+这等同于以下更详细的声明，它显式指定了返回值类型和值：
 
 ```kotlin
 //sampleStart
+// 在 `() -> Unit` 函数类型中必须指定 `Unit`，
+// 但在 `printHello()` 的返回值类型中声明 `: Unit` 是可选的
 fun printHello(name: String?, action: () -> Unit): Unit {
     if (name != null)
         println("Hello $name")
@@ -452,20 +457,21 @@ fun printHello(name: String?, action: () -> Unit): Unit {
         println("Hi there!")
 
     action()
+    // 显式返回 `Unit` 值是可选的
     return Unit
 }
 //sampleEnd
 fun main() {
     printHello("Kodee") {
-        println("This runs after the greeting.")
+        println("This action runs when a name is given.")
+        // Hello Kodee
+        // This action runs when a name is given.
     }
-    // Hello Kodee
-    // This runs after the greeting.
-
     printHello(null) {
-        println("No name provided, but action still runs.")
+        println("This action runs when no name is provided.")
+        // Hi there!
+        // This action runs when no name is provided.
     }
-    // No name provided, but action still runs
 }
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" validate="false" id="return-unit-explicit"}

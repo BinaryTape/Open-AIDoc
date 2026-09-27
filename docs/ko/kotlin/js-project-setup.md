@@ -37,8 +37,8 @@ kotlin {
 
 `kotlin {}` 블록 내에서 다음 사항들을 관리할 수 있습니다:
 
-* [타겟 실행 환경](#execution-environments): 브라우저(browser) 또는 Node.js 
-* [ES2015 기능 지원](#support-for-es2015-features): 클래스, 모듈, 제너레이터(generator)
+* [타겟 실행 환경](#execution-environments): 브라우저 또는 Node.js 
+* [ECMAScript 타겟 설정](#set-an-ecmascript-target): ES5, ES2015, 또는 ES2020
 * [출력 세분화 구성](#configure-output-granularity)
 * [TypeScript 선언 파일 생성](#generation-of-typescript-declaration-files-d-ts)
 * [프로젝트 의존성](#dependencies): Maven 및 npm
@@ -52,7 +52,7 @@ kotlin {
 
 Kotlin/JS 프로젝트는 두 가지 다른 실행 환경을 타겟으로 할 수 있습니다: 
 
-* 브라우저에서의 클라이언트 측 스크립팅을 위한 **브라우저(Browser)**
+* 브라우저에서의 클라이언트 측 스크립팅을 위한 브라우저(Browser)
 * 브라우저 외부에서 JavaScript 코드를 실행하기 위한(예: 서버 측 스크립팅) [Node.js](https://nodejs.org/)
 
 Kotlin/JS 프로젝트의 타겟 실행 환경을 정의하려면, `js {}` 블록 내부에 `browser {}` 또는 `nodejs {}`를 추가하세요:
@@ -75,26 +75,29 @@ kotlin {
 
 Kotlin Multiplatform 플러그인은 선택한 환경에 맞춰 작업 태스크를 자동으로 구성합니다. 여기에는 애플리케이션 실행 및 테스트를 위해 필요한 환경과 의존성을 다운로드하고 설치하는 과정이 포함됩니다. 이를 통해 개발자는 추가 설정 없이 간단한 프로젝트를 빌드하고 실행하며 테스트할 수 있습니다. 기존에 설치된 환경을 사용하는 옵션도 있습니다. [사전 설치된 Node.js 사용하기](#use-pre-installed-node-js) 방법을 알아보세요.
 
-## ES2015 기능 지원 {id="support-for-es2015-features"}
+## ECMAScript 타겟 설정 {id="set-an-ecmascript-target"}
 
-Kotlin은 다음과 같은 ES2015 기능에 대한 지원을 제공합니다:
+Kotlin/JS는 ECMAScript 표준의 ES5, ES2015 및 ES2020 버전에 맞는 JavaScript를 생성할 수 있습니다. 타겟 환경에서 지원하는 최신 버전을 선택하세요:
 
-* 코드베이스를 단순화하고 유지보수성을 향상시키는 모듈.
-* OOP 원칙을 통합하여 더 깨끗하고 직관적인 코드를 작성할 수 있게 해주는 클래스.
-* [중단 함수(suspend functions)](https://kotlinlang.org/docs/composing-suspending-functions.html) 컴파일을 위한 제너레이터(Generator). 이는 최종 번들 크기를 개선하고 디버깅을 돕습니다.
-* [JavaScript 코드 인라이닝(inlining)](js-interop.md#inline-javascript).
+* `es5`는 이전 JavaScript 환경과의 호환성을 제공하며 기본 타겟입니다.
+* `es2015`는 다음과 같은 ES2015 기능에 대한 지원을 활성화합니다:
+    * 코드베이스를 단순화하고 유지보수성을 향상시키는 모듈.
+    * OOP 원칙을 통합하여 더 깨끗하고 직관적인 코드를 작성할 수 있게 해주는 클래스.
+    * 최종 번들 크기를 개선하고 디버깅을 돕는 [중단 함수(suspend functions)](https://kotlinlang.org/docs/composing-suspending-functions.html) 컴파일용 제너레이터(generator).
+    * [JavaScript 코드 인라이닝(inlining)](js-interop.md#inline-javascript).
+* `es2020`은 지원되는 모든 ES2015 기능을 포함하며, 컴파일러가 생성된 JavaScript 코드에서 ECMAScript 2020 기능을 사용할 수 있도록 합니다. 예를 들어, Kotlin `Long` 값을 JavaScript `BigInt` 값으로 컴파일합니다.
 
-`build.gradle(.kts)` 파일에 `es2015` 컴파일 타겟을 추가하여 지원되는 모든 ES2015 기능을 한 번에 활성화할 수 있습니다:
+ECMAScript 타겟을 구성하려면 `build.gradle(.kts)` 파일에서 `target` 속성을 설정하세요. 예를 들어 ES2020을 타겟으로 설정하려면:
 
 ```kotlin
 tasks.withType<KotlinJsCompile>().configureEach {
     compilerOptions {
-        target = "es2015"
+        target = "es2020"
     }
 }
 ```
 
-[공식 문서에서 ES2015(ECMAScript 2015, ES6)에 대해 더 자세히 알아보세요](https://262.ecma-international.org/6.0/).
+[ES5](https://262.ecma-international.org/5.1/), [ES2015](https://262.ecma-international.org/6.0/), 및 [ES2020](https://262.ecma-international.org/11.0/) 표준에 대해 더 자세히 알아보세요.
 
 ## 출력 세분화 구성 {id="configure-output-granularity"}
 
@@ -108,7 +111,7 @@ tasks.withType<KotlinJsCompile>().configureEach {
   ```
 
 * **파일당 하나(One per file)**. 각 Kotlin 파일당 하나의 JavaScript 파일(파일에 내보낸 선언이 포함된 경우 두 개)을 생성하는 더 세분화된 출력을 설정할 수 있습니다. 파일별 컴파일 모드를 활성화하려면:
-  1. 프로젝트에서 ES2015 기능을 지원하도록 `es2015`를 [컴파일 타겟](#support-for-es2015-features)으로 설정합니다.
+  1. 프로젝트에서 ES2015 기능을 지원하도록 `es2015` 또는 `es2020`을 [컴파일 타겟](#set-an-ecmascript-target)으로 설정합니다.
   2. `gradle.properties` 파일에 다음 라인을 추가합니다:
      ```none
      kotlin.js.ir.output.granularity=per-file // 'per-module'이 기본값입니다.
@@ -191,7 +194,7 @@ repositories {
 
 ### Kotlin 표준 라이브러리 {id="kotlin-standard-libraries"}
 
-[표준 라이브러리(standard library)](https://kotlinlang.org/api/latest/jvm/stdlib/index.html)에 대한 의존성은 자동으로 추가됩니다. 표준 라이브러리의 버전은 Kotlin Multiplatform 플러그인의 버전과 동일합니다.
+[표준 라이브러리](https://kotlinlang.org/api/latest/jvm/stdlib/index.html)에 대한 의존성은 자동으로 추가됩니다. 표준 라이브러리의 버전은 Kotlin Multiplatform 플러그인의 버전과 동일합니다.
 
 멀티플랫폼 테스트를 위해 [`kotlin.test`](https://kotlinlang.org/api/latest/kotlin.test/) API를 사용할 수 있습니다. 멀티플랫폼 프로젝트를 생성할 때 `commonTest`에서 단일 의존성을 사용하여 모든 소스 세트에 테스트 의존성을 추가할 수 있습니다:
 
@@ -281,7 +284,7 @@ kotlin.js.yarn=false
 * [optionalDependencies](https://docs.npmjs.com/files/package.json#optionaldependencies): `optionalNpm(...)`을 통해 사용
 * [peerDependencies](https://docs.npmjs.com/files/package.json#peerdependencies): `peerNpm(...)`을 통해 사용
 
-npm 의존성이 설치되면, [Kotlin에서 JS 호출하기(Calling JS from Kotlin)](js-interop.md)에 설명된 대로 코드에서 해당 API를 사용할 수 있습니다.
+npm 의존성이 설치되면, [Kotlin에서 JS 호출하기](js-interop.md)에 설명된 대로 코드에서 해당 API를 사용할 수 있습니다.
 
 ## run 태스크 {id="run-task"}
 
@@ -360,7 +363,7 @@ kotlin {
 kotlin.js.browser.karma.browsers=firefox,safari
 ```
 
-이 방식을 사용하면 모든 모듈에 대해 브라우저 목록을 정의한 다음, 특정 모듈의 빌드 파일에서 특정 브라우저를 추가할 수 있습니다.
+이 방식을 사용하면 모든 모듈에 대해 브라우저 목록을 정의한 다음, 특정 모듈의 빌드 파일에서 특정 브라우저를 추가할 수 있습니다. 
 
 Kotlin Multiplatform Gradle 플러그인은 빌드 시점에 `build/js/packages/projectName-test/karma.conf.js` 위치에 Karma 구성 파일을 자동으로 생성합니다. 이 파일에는 빌드 파일의 `useKarma {}` 블록에서 설정한 항목들이 포함됩니다.
 
@@ -371,9 +374,9 @@ Karma 구성에 대한 자세한 내용은 [Karma 문서](https://karma-runner.g
 ### 브라우저 테스트용 DSL {id="dsl-for-browser-testing"}
 <primary-label ref="experimental-opt-in"/>
 
-Kotlin은 브라우저 환경에서 Kotlin/JS 테스트를 실행하기 위한 실험적 DSL을 제공합니다. 이는 특정 기술에 종속되지 않도록(technology-agnostic) 설계되었습니다. 현재 구현에는 내부적으로 다음과 같은 도구들이 포함되어 있습니다:
+Kotlin은 브라우저 환경에서 Kotlin/JS 테스트를 실행하기 위한 실험적 DSL을 제공합니다. 이는 특정 기술에 종속되지 않도록 설계되었습니다. 현재 구현에는 내부적으로 다음과 같은 도구들이 포함되어 있습니다:
 
-* [Playwright](https://playwright.dev/): Chromium, Firefox 및 WebKit(Safari) 브라우저 엔진을 지원하는 브라우저 드라이버이자 배포 관리자 역할을 합니다.
+* [Playwright](https://playwright.dev/): Chromium, Firefox 및 WebKit (Safari) 브라우저 엔진을 지원하는 브라우저 드라이버이자 배포 관리자 역할을 합니다.
 * [Mocha](https://mochajs.org/): 테스트 러너 역할을 합니다.
 * [webpack](https://webpack.js.org/): 번들러 역할을 합니다([향후 릴리스](https://youtrack.jetbrains.com/issue/KT-48308/)에서 [Vite](https://vite.dev/)로 대체될 예정).
 
@@ -405,7 +408,7 @@ kotlin {
                 }
                 // Firefox 러너 활성화
                 firefox()
-                // WebKit(Safari) 테스트 러너 활성화
+                // WebKit (Safari) 테스트 러너 활성화
                 webkit()
                 // 커스텀 WebKit 러너 활성화 및 구성
                 webkit("headful") {
@@ -473,8 +476,8 @@ kotlin {
 ### webpack 태스크 {id="webpack-task"}
 
 가장 일반적인 webpack 조정은 Gradle 빌드 파일의 `kotlin.js.browser.webpackTask {}` 구성 블록을 통해 직접 수행할 수 있습니다:
-* `mainOutputFileName` - webpack 출력 파일의 이름입니다. webpack 태스크 실행 후 `<projectDir>/build/kotlin-webpack/<targetName>/<binaryName>`에 생성됩니다. 기본값은 프로젝트 이름입니다.
-* `output.libraryTarget` - webpack 출력의 모듈 시스템입니다. [Kotlin/JS 프로젝트에서 사용 가능한 모듈 시스템](js-modules.md)에 대해 더 자세히 알아보세요. 기본값은 `umd`입니다.
+* `mainOutputFileName` − webpack 출력 파일의 이름입니다. webpack 태스크 실행 후 `<projectDir>/build/kotlin-webpack/<targetName>/<binaryName>`에 생성됩니다. 기본값은 프로젝트 이름입니다.
+* `output.libraryTarget` − webpack 출력의 모듈 시스템입니다. [Kotlin/JS 프로젝트에서 사용 가능한 모듈 시스템](js-modules.md)에 대해 더 자세히 알아보세요. 기본값은 `umd`입니다.
   
 ```groovy
 webpackTask {
@@ -920,7 +923,7 @@ kotlin {
 
 ## 모듈 이름 {id="module-name"}
 
-해당 `.js` 및 `.d.ts` 파일을 포함하여 JavaScript *모듈*(이는 `build/js/packages/myModuleName`에 생성됨)의 이름을 조정하려면 `outputModuleName` 옵션을 사용하세요:
+해당 `.js` 및 `.d.ts` 파일을 포함하여 JavaScript _모듈_(이는 `build/js/packages/myModuleName`에 생성됨)의 이름을 조정하려면 `outputModuleName` 옵션을 사용하세요:
 
 ```kotlin
 kotlin {

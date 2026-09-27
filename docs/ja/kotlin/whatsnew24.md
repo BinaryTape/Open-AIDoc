@@ -839,7 +839,7 @@ console.log(await auth.login(new Email("not-an-email")));
 ### JS コードのインライン化時における ES2015 機能のサポート {id="support-for-es2015-features-when-inlining-js-code"}
 <secondary-label ref="js"/>
 
-Kotlin 2.4.0 以降、JavaScript コードのインライン化において [ES2015 機能](js-project-setup.md#support-for-es2015-features) を完全にサポートするようになりました。
+Kotlin 2.4.0 以降、JavaScript コードのインライン化において [ES2015 機能](js-project-setup.md#set-an-ecmascript-target) を完全にサポートするようになりました。
 
 これは、サードパーティライブラリとの相互運用性や、自動生成されるアプリケーションコードを直接制御する場合に有用です。
 
@@ -1348,6 +1348,6 @@ Kotlin エコシステムにおいて、以下のドキュメント変更を行�
 * [Lincheck を使い始める](lincheck-getting-started.md) – プロジェクトを作成し、Lincheck でテストを実行。
 * [Lincheck で任意のコードをテストする](lincheck-testing-arbitrary-code.md) – Lincheck で並行コードをテストする方法を学ぶ。
 * [Lincheck でデータ構造をテストする方法](lincheck-how-to-test-data-structures.md) – Lincheck のデータ構造テストプロセスを深く掘り下げる。
-* [Lincheck によるテスト戦略](lincheck-testing-strategies.md) – Lincheck のテスト戦略（モデルチェックとストレス解消テスト）について学ぶ。
+* [Lincheck によるテスト戦略](lincheck-testing-strategies.md) – Lincheck のテスト戦略（モデルチェックとストレステスト）について学ぶ。
 * [Lincheck によるテスト戦略の構成](lincheck-testing-strategies-options.md) – Lincheck のテスト戦略に関するさまざまなオプションを探索。
 * [Dokku を使用して Ktor アプリケーションをデプロイする](https://ktor.io/docs/dokku.html) – Dokku を使用したデプロイワークフローについて学ぶ。

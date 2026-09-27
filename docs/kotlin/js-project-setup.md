@@ -38,7 +38,7 @@ kotlin {
 在 `kotlin {}` 代码块内部，你可以管理以下方面：
 
 * [目标执行环境](#execution-environments)：浏览器或 Node.js 
-* [对 ES2015 功能的支持](#support-for-es2015-features)：类、模块和生成器
+* [设置 ECMAScript 目标](#set-an-ecmascript-target)：ES5、ES2015 或 ES2020
 * [配置输出颗粒度](#configure-output-granularity)
 * [生成 TypeScript 定义文件](#generation-of-typescript-declaration-files-d-ts)
 * [项目依赖项](#dependencies)：Maven 和 npm
@@ -75,26 +75,29 @@ kotlin {
 
 Kotlin 多平台插件会自动配置其任务以使用所选环境。这包括下载并安装运行和测试应用程序所需的环境和依赖项。这使得开发者无需额外配置即可构建、运行和测试简单的项目。此外，还可以选择使用现有的安装。了解如何[使用预安装的 Node.js](#use-pre-installed-node-js)。
 
-## 对 ES2015 功能的支持 {id="support-for-es2015-features"}
+## 设置 ECMAScript 目标 {id="set-an-ecmascript-target"}
 
-Kotlin 对 ES2015 功能提供支持，包括：
+Kotlin/JS 可以针对 ECMAScript 标准的 ES5、ES2015 和 ES2020 版本生成 JavaScript。请选择目标环境所支持的最新版本：
 
-* 模块：简化你的代码库并提高可维护性。
-* 类：允许整合 OOP 原则，从而产生更简洁、更直观的代码。
-* 生成器：用于编译 [suspend 函数](https://kotlinlang.org/docs/composing-suspending-functions.html)，从而优化最终的 bundle 大小并有助于调试。
-* [JavaScript 代码内联](js-interop.md#inline-javascript)。
+* `es5` 提供了与旧版 JavaScript 环境的兼容性，并且是默认目标。
+* `es2015` 启用了对 ES2015 功能的支持，包括：
+    * 简化代码库并提高可维护性的模块。
+    * 允许整合 OOP 原则的类，从而产生更整洁、更直观的代码。
+    * 用于编译 [suspend 函数](https://kotlinlang.org/docs/composing-suspending-functions.html)的生成器，可优化最终 bundle 大小并有助于调试。
+    * [JavaScript 代码内联](js-interop.md#inline-javascript)。
+* `es2020` 包含所有受支持的 ES2015 功能，并允许编译器在生成的 JavaScript 代码中使用 ECMAScript 2020 功能。例如，它将 Kotlin `Long` 值编译为 JavaScript `BigInt` 值。
 
-你可以通过在 `build.gradle(.kts)` 文件中添加 `es2015` 编译目标来一次性启用所有受支持的 ES2015 功能：
+要配置 ECMAScript 目标，请在 `build.gradle(.kts)` 文件中设置 `target` 属性。例如，以 ES2020 为目标：
 
 ```kotlin
 tasks.withType<KotlinJsCompile>().configureEach {
     compilerOptions {
-        target = "es2015"
+        target = "es2020"
     }
 }
 ```
 
-[在官方文档中详细了解 ES2015 (ECMAScript 2015, ES6)](https://262.ecma-international.org/6.0/)。
+详细了解 [ES5](https://262.ecma-international.org/5.1/)、[ES2015](https://262.ecma-international.org/6.0/) 和 [ES2020](https://262.ecma-international.org/11.0/) 标准。
 
 ## 配置输出颗粒度 {id="configure-output-granularity"}
 
@@ -108,7 +111,7 @@ tasks.withType<KotlinJsCompile>().configureEach {
   ```
 
 * **每个文件一个**。你可以设置更细粒度的输出，为每个 Kotlin 文件生成一个（如果文件包含导出的声明，则为两个）JavaScript 文件。要启用按文件编译模式：
-  1. 将 `es2015` 设置为[编译目标](#support-for-es2015-features)以支持项目中的 ES2015 功能。
+  1. 将 `es2015` 或 `es2020` 设置为[编译目标](#set-an-ecmascript-target)以支持项目中的 ES2015 功能。
   2. 在 `gradle.properties` 文件中添加以下行：
      ```none
      kotlin.js.ir.output.granularity=per-file // 默认为 'per-module'
@@ -377,7 +380,7 @@ Kotlin 提供了一个实验性 DSL，用于在浏览器环境中运行 Kotlin/J
 * [Mocha](https://mochajs.org/) 用作测试运行程序。
 * [webpack](https://webpack.js.org/) 用作捆绑器（将在[未来版本](https://youtrack.jetbrains.com/issue/KT-48308/)中被 [Vite](https://vite.dev/) 替换）。
 
-要试用用于浏览器测试的新 DSL，请在 Kotlin/JS 编译目标的 `browser {}` 内部添加需要选择加入的 `test {}` 代码块：
+要试用用于浏览器测试的新 DSL，请在 Kotlin/JS 目标的 `browser {}` 内部添加需要选择加入的 `test {}` 代码块：
 
 ```kotlin
 import org.jetbrains.kotlin.gradle.ExperimentalJsTestDsl
@@ -473,8 +476,8 @@ kotlin {
 ### webpack 任务 {id="webpack-task"}
 
 最常用的 webpack 调整可以直接通过 Gradle 构建文件中的 `kotlin.js.browser.webpackTask {}` 配置块进行：
-* `mainOutputFileName` - 经过 webpack 处理的输出文件名称。执行 webpack 任务后，它将在 `<projectDir>/build/kotlin-webpack/<targetName>/<binaryName>` 中生成。默认值为项目名称。
-* `output.libraryTarget` - 经过 webpack 处理的输出的模块系统。详细了解[适用于 Kotlin/JS 项目的可用模块系统](js-modules.md)。默认值为 `umd`。
+* `mainOutputFileName` − 经过 webpack 处理的输出文件名称。执行 webpack 任务后，它将在 `<projectDir>/build/kotlin-webpack/<targetName>/<binaryName>` 中生成。默认值为项目名称。
+* `output.libraryTarget` − 经过 webpack 处理的输出的模块系统。详细了解[适用于 Kotlin/JS 项目的可用模块系统](js-modules.md)。默认值为 `umd`。
   
 ```groovy
 webpackTask {

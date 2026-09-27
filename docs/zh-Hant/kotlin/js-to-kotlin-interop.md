@@ -1,8 +1,7 @@
 [//]: # (title: 在 JavaScript 中使用 Kotlin 程式碼)
 
 根據所選的 [JavaScript 模組](js-modules.md) 系統，Kotlin/JS 編譯器會產生不同的輸出。
-但總體而言，Kotlin 編譯器會產生一般的 JavaScript 類別、函式和屬性，您可以從 JavaScript 程式碼中自由使用它們。
-不過，您應該記住一些細微之處。
+但總體而言，Kotlin 編譯器會產生一般的 JavaScript 類別、函式和屬性，您可以從 JavaScript 程式碼中自由使用它們。不過，您應該記住一些細微之處。
 
 ## 在 plain 模式下將宣告隔離在單獨的 JavaScript 物件中 {id="isolating-declarations-in-a-separate-javascript-object-in-plain-mode"}
 
@@ -125,7 +124,7 @@ interface Identity {
 * 與 [`@JsName` 註解](#jsname-annotation)結合使用，以指定產生和匯出的函式名稱。這有助於解決匯出中的歧義（例如同名函式的多載）。
 * 使用 `@file:JsExport` 套用於檔案層級。
 
-#### 支援值類別 (value class) 匯出 {id="export-value-classes"}
+#### 匯出值類別 {id="export-value-classes"}
 
 您可以將 Kotlin 的 [內嵌值類別](inline-classes.md) 匯出為一般的 TypeScript 類別。
 
@@ -352,31 +351,31 @@ kotlin {
 
 了解 Kotlin 型別如何對應到 JavaScript 型別：
 
-| Kotlin                                                           | JavaScript                | 說明                                                                                                |
-|------------------------------------------------------------------|---------------------------|---------------------------------------------------------------------------------------------------------|
-| `Byte`, `Short`, `Int`, `Float`, `Double`                        | `Number`                  |                                                                                                         |
-| `Char`                                                           | `Number`                  | 該數字代表字元的代碼。                                                             |
-| `Long`                                                           | `BigInt`                  | 需要配置 [`-Xes-long-as-bigint` 編譯器選項](compiler-reference.md#xes-long-as-bigint)。 |
-| `Boolean`                                                        | `Boolean`                 |                                                                                                         |
-| `String`                                                         | `String`                  |                                                                                                         |
-| `Array`                                                          | `Array`                   |                                                                                                         |
-| `ByteArray`                                                      | `Int8Array`               |                                                                                                         |
-| `ShortArray`                                                     | `Int16Array`              |                                                                                                         |
-| `IntArray`                                                       | `Int32Array`              |                                                                                                         |
-| `CharArray`                                                      | `UInt16Array`             | 包含屬性 `$type$ == "CharArray"`。                                                           |
-| `FloatArray`                                                     | `Float32Array`            |                                                                                                         |
-| `DoubleArray`                                                    | `Float64Array`            |                                                                                                         |
-| `LongArray`                                                      | `BigInt64Array`           |                                                                                                         |
-| `BooleanArray`                                                   | `Int8Array`               | 包含屬性 `$type$ == "BooleanArray"`。                                                        |
-| `List`, `MutableList`                                            | `KtList`, `KtMutableList` | 透過 `KtList.asJsReadonlyArrayView` 或 `KtMutableList.asJsArrayView` 暴露 `Array`。                 |
-| `Map`, `MutableMap`                                              | `KtMap`, `KtMutableMap`   | 透過 `KtMap.asJsReadonlyMapView` 或 `KtMutableMap.asJsMapView` 暴露 ES2015 `Map`。                  |
-| `Set`, `MutableSet`                                              | `KtSet`, `KtMutableSet`   | 透過 `KtSet.asJsReadonlySetView` 或 `KtMutableSet.asJsSetView` 暴露 ES2015 `Set`。                  |
-| `Unit`                                                           | Undefined                 | 當用作傳回型別時可匯出，但用作參數型別時則不可。                               |
-| `Any`                                                            | `Object`                  |                                                                                                         |
-| `Throwable`                                                      | `Error`                   |                                                                                                         |
-| `enum class Type`                                                | `Type`                    | 列舉成員會被暴露為靜態類別屬性 (`Type.ENTRY`)。                                     |
-| 可為 Null 的 `Type?`                                                 | `Type                     | null                                                                                                    | undefined` |                                                                                            |
-| 除了標記有 `@JsExport` 的型別外，所有其他 Kotlin 型別 | 不支援             | 包含 Kotlin 的[無符號整數類型](unsigned-integer-types.md)。                                  |
+| Kotlin                                                           | JavaScript                | 說明                                                                                                           |
+|------------------------------------------------------------------|---------------------------|----------------------------------------------------------------------------------------------------------------|
+| `Byte`, `Short`, `Int`, `Float`, `Double`                        | `Number`                  |                                                                                                                |
+| `Char`                                                           | `Number`                  | 該數字代表字元的代碼。                                                                                         |
+| `Long`                                                           | `BigInt`                  | 設定 [`target = "es2020"`](js-project-setup.md#set-an-ecmascript-target) 或配置 [`-Xes-long-as-bigint` 編譯器選項](compiler-reference.md#xes-long-as-bigint)。          |
+| `Boolean`                                                        | `Boolean`                 |                                                                                                                |
+| `String`                                                         | `String`                  |                                                                                                                |
+| `Array`                                                          | `Array`                   |                                                                                                                |
+| `ByteArray`                                                      | `Int8Array`               |                                                                                                                |
+| `ShortArray`                                                     | `Int16Array`              |                                                                                                                |
+| `IntArray`                                                       | `Int32Array`              |                                                                                                                |
+| `CharArray`                                                      | `UInt16Array`             | 包含屬性 `$type$ == "CharArray"`。                                                                             |
+| `FloatArray`                                                     | `Float32Array`            |                                                                                                                |
+| `DoubleArray`                                                    | `Float64Array`            |                                                                                                                |
+| `LongArray`                                                      | `BigInt64Array`           | 設定 [`target = "es2020"`](js-project-setup.md#set-an-ecmascript-target) 或配置 [`-Xes-long-as-bigint` 編譯器選項](compiler-reference.md#xes-long-as-bigint)。          |
+| `BooleanArray`                                                   | `Int8Array`               | 包含屬性 `$type$ == "BooleanArray"`。                                                                          |
+| `List`, `MutableList`                                            | `KtList`, `KtMutableList` | 透過 `KtList.asJsReadonlyArrayView` 或 `KtMutableList.asJsArrayView` 暴露 `Array`。                            |
+| `Map`, `MutableMap`                                              | `KtMap`, `KtMutableMap`   | 透過 `KtMap.asJsReadonlyMapView` 或 `KtMutableMap.asJsMapView` 暴露 ES2015 `Map`。                             |
+| `Set`, `MutableSet`                                              | `KtSet`, `KtMutableSet`   | 透過 `KtSet.asJsReadonlySetView` 或 `KtMutableSet.asJsSetView` 暴露 ES2015 `Set`。                             |
+| `Unit`                                                           | `undefined`               | 當用作傳回型別時可匯出，但用作參數型別時則不可。                                                               |
+| `Any`                                                            | `Object`                  |                                                                                                                |
+| `Throwable`                                                      | `Error`                   |                                                                                                                |
+| `enum class Type`                                                | `Type`                    | 列舉成員會被暴露為靜態類別屬性 (`Type.ENTRY`)。                                                                |
+| 可為 Null 的 `Type?`                                             | `Type`、`null` 或 `undefined` |                                                                                                                |
+| 除了標記有 `@JsExport` 的型別外，所有其他 Kotlin 型別             | 不支援                    | 包含 Kotlin 的[無符號整數類型](unsigned-integer-types.md)。                                                     |
 
 此外，請務必了解：
 

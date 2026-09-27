@@ -835,7 +835,7 @@ console.log(await auth.login(new Email("not-an-email")));
 ### 內嵌 JS 程式碼時支援 ES2015 特性 {id="support-for-es2015-features-when-inlining-js-code"}
 <secondary-label ref="js"/>
 
-從 Kotlin 2.4.0 開始，JavaScript 程式碼內嵌已完全支援 [ES2015 特性](js-project-setup.md#support-for-es2015-features)。
+從 Kotlin 2.4.0 開始，JavaScript 程式碼內嵌已完全支援 [ES2015 特性](js-project-setup.md#set-an-ecmascript-target)。
 
 這對於與第三方程式庫的互通性以及對自動應用程式程式碼產生的直接控制非常有用。
 
@@ -1277,7 +1277,7 @@ Kotlin 2.4.0 加入了對註解處理器探索的 `includeCompileClasspath` 配�
 
 Kotlin 2.4.0 透過新的執行時程式庫，使 Power-assert 相關函式更容易被發現且更容易配置。
 
-以前，採用 Power-assert 需要複雜的建置組態以及函式參數慣例。從此版本開始，具有 Power-assert 能力的函式可以使用新的執行時程式庫直接與編譯器外掛程式轉換整合。
+以前，採用 Power-assert 需要複雜的組建組態以及函式參數慣例。從此版本開始，具有 Power-assert 能力的函式可以使用新的執行時程式庫直接與編譯器外掛程式轉換整合。
 
 這為外掛程式使用者和程式庫作者帶來了重大改進：
 

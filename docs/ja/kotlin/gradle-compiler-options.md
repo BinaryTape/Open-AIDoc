@@ -698,8 +698,8 @@ tasks
 | `sourceMapEmbedSources` | ソースファイルをソースマップに埋め込みます | `JsSourceMapEmbedMode.SOURCE_MAP_SOURCE_CONTENT_INLINING`, `JsSourceMapEmbedMode.SOURCE_MAP_SOURCE_CONTENT_NEVER`, `JsSourceMapEmbedMode.SOURCE_MAP_SOURCE_CONTENT_ALWAYS` | `null` |
 | `sourceMapNamesPolicy` | Kotlin コードで宣言した変数名と関数名をソースマップに追加します。動作の詳細については、[コンパイラリファレンス](compiler-reference.md#source-map-names-policy-simple-names-fully-qualified-names-no)を参照してください | `JsSourceMapNamesPolicy.SOURCE_MAP_NAMES_POLICY_FQ_NAMES`, `JsSourceMapNamesPolicy.SOURCE_MAP_NAMES_POLICY_SIMPLE_NAMES`, `JsSourceMapNamesPolicy.SOURCE_MAP_NAMES_POLICY_NO` | `null` |
 | `sourceMapPrefix` | ソースマップ内のパスに指定されたプレフィックスを追加します | | `null` |
-| `target` | 特定の ECMA バージョン用の JS ファイルを生成します | `"es5"`, `"es2015"` | `"es5"` |
-| `useEsClasses` | 生成された JavaScript コードで ES2015 クラスを使用できるようにします。ES2015 ターゲットを使用する場合はデフォルトで有効になります | | `null` |
+| `target` | 特定の ECMA バージョン用の JS ファイルを生成します | `"es5"`, `"es2015"`, `"es2020"` | `"es5"` |
+| `useEsClasses` | 生成された JavaScript コードで ES2015 クラスを使用できるようにします。ES2015 および ES2020 ターゲットを使用する場合はデフォルトで有効になります | | `null` |
 
 ### コンパイラオプションの型 {id="types-for-compiler-options"}
 

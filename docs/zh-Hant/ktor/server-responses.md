@@ -8,6 +8,7 @@ Ktor 允許你在 [路由處理常式](server-routing.md#define_route) 中處理
 
 在路由處理常式中，可以使用以下 API 來處理回應：
 * 一組用於 [傳送特定內容類型](#payload) 的函式，例如 [`call.respondText()`](https://api.ktor.io/ktor-server-core/io.ktor.server.response/respond-text.html) 與 [`call.respondHtml()`](https://api.ktor.io/ktor-server-html-builder/io.ktor.server.html/respond-html.html)。 
+* 用於 [串流文字](#streaming-text) 與 [串流二進位](#streaming-binary) 回應的函式，例如 [`call.respondTextWriter()`](https://api.ktor.io/ktor-server-core/io.ktor.server.response/respond-text-writer.html)、[`call.respondOutputStream()`](https://api.ktor.io/ktor-server-core/io.ktor.server.response/respond-output-stream.html) 以及 [`call.respondBytesWriter()`](https://api.ktor.io/ktor-server-core/io.ktor.server.response/respond-bytes-writer.html)。
 * [`call.respond()`](https://api.ktor.io/ktor-server-core/io.ktor.server.response/respond.html) 函式，允許你在回應中 [傳送任何資料型別](#payload)。當安裝了 [ContentNegotiation](server-serialization.md) 外掛程式後，你可以傳送以特定格式序列化的資料物件。
 * [`call.response()`](https://api.ktor.io/ktor-server-core/io.ktor.server.application/-application-call/response.html) 屬性，它會傳回 [`ApplicationResponse`](https://api.ktor.io/ktor-server-core/io.ktor.server.response/-application-response/index.html) 物件，提供對 [回應參數](#parameters) 的存取，以便設定狀態碼、新增標頭以及配置 Cookie。
 * [`call.respondRedirect()`](https://api.ktor.io/ktor-server-core/io.ktor.server.response/respond-redirect.html) 函式，用於傳送重新導向回應。
@@ -20,6 +21,54 @@ Ktor 允許你在 [路由處理常式](server-routing.md#define_route) 中處理
 ```kotlin
 get("/") {
     call.respondText("Hello, world!")
+}
+```
+
+### 串流文字 {id="streaming-text"}
+
+若要在 JVM 上以累加方式串流文字，請使用 [`call.respondTextWriter()`](https://api.ktor.io/ktor-server-core/io.ktor.server.response/respond-text-writer.html) 函式。
+Ktor 會提供一個 [`Writer`](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/Writer.html)，並在該區塊完成時自動將其關閉。
+
+當你想要讓緩衝區的輸出可供底層回應通道讀取時，請呼叫 `flush()` 函式：
+
+```kotlin
+get("/stream") {
+    call.respondTextWriter(ContentType.Text.Plain) {
+        for (i in 1..5) {
+            appendLine("line-$i")
+            flush()
+        }
+    }
+}
+```
+
+### 串流二進位 {id="streaming-binary"}
+
+若要在 JVM 上串流二進位資料，請使用 [`call.respondOutputStream()`](https://api.ktor.io/ktor-server-core/io.ktor.server.response/respond-output-stream.html) 函式。
+Ktor 會提供一個 [`OutputStream`](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/OutputStream.html)，並在該區塊完成時自動將其關閉：
+
+```kotlin
+get("/stream-bytes") {
+    call.respondOutputStream(ContentType.Application.OctetStream) {
+        for (i in 1..5) {
+            write("jvm chunk-$i\n".toByteArray())
+            flush()
+        }
+    }
+}
+```
+
+對於多平台應用程式，請使用 [`call.respondBytesWriter()`](https://api.ktor.io/ktor-server-core/io.ktor.server.response/respond-bytes-writer.html) 函式。
+它提供了一個 [`ByteWriteChannel`](https://api.ktor.io/ktor-io/io.ktor.utils.io/-byte-write-channel/index.html)，Ktor 會在該區塊完成時自動將其關閉：
+
+```kotlin
+get("/stream-channel") {
+    call.respondBytesWriter(ContentType.Application.OctetStream) {
+        for (i in 1..5) {
+            writeStringUtf8("kmp chunk-$i\n")
+            flush()
+        }
+    }
 }
 ```
 
@@ -56,11 +105,10 @@ get("/") {
 如果你只需要傳回 HTML 片段，而不將其封裝在 `<html>`、`<head>` 或 `<body>` 中，可以使用 `call.respondHtmlPartial()`：
 
 ```kotlin
-    get("/fragment") {
-        call.respondHtmlPartial(HttpStatusCode.Created) {
-            div("fragment") {
-                span { +"Created!" }
-            }
+get("/fragment") {
+    call.respondHtmlPartial(HttpStatusCode.Created) {
+        div("fragment") {
+            span { +"Created!" }
         }
     }
 }

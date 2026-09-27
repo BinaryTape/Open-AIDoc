@@ -48,7 +48,7 @@ Kotlin 2.4.0이 출시되었습니다! 주요 하이라이트는 다음과 같�
 * [공통 Kotlin 표준 라이브러리의 안정적인 UUID API](#stable-uuid-api-in-the-common-kotlin-standard-library)
 * [JVM에서 부호 없는 정수를 `BigInteger`로 변환하기 위한 새로운 API](#new-api-for-converting-unsigned-integers-to-biginteger-on-the-jvm)
 * [정렬 순서 확인 지원](#support-for-checking-sorted-order)
-* [JavaScript/TypeScript로의 값 클래스 내보내기(value class export) 지원](#support-for-value-class-export-to-javascript-typescript)
+* [JavaScript/TypeScript로의 값 클래스 내보내기 지원](#support-for-value-class-export-to-javascript-typescript)
 * [JS 코드 인라이닝 시 ES2015 기능 지원](#support-for-es2015-features-when-inlining-js-code)
 * [Maven: Java와 JVM 타겟 버전 간의 자동 정렬](#automatic-alignment-between-java-and-jvm-target-versions)
 * [Maven Toolchains 지원](#support-for-maven-toolchains)
@@ -834,7 +834,7 @@ console.log(await auth.login(new Email("not-an-email")));
 ### JS 코드 인라이닝 시 ES2015 기능 지원 {id="support-for-es2015-features-when-inlining-js-code"}
 <secondary-label ref="js"/>
 
-Kotlin 2.4.0부터 JavaScript 코드 인라이닝은 [ES2015 기능](js-project-setup.md#support-for-es2015-features)을 완벽하게 지원합니다.
+Kotlin 2.4.0부터 JavaScript 코드 인라이닝은 [ES2015 기능](js-project-setup.md#set-an-ecmascript-target)을 완벽하게 지원합니다.
 
 이는 서드파티 라이브러리와의 상호운용성뿐만 아니라 자동 애플리케이션 코드 생성에 대한 직접적인 제어에도 유용합니다.
 

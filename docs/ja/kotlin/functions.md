@@ -282,12 +282,9 @@ mergeStrings(strings = arrayOf("a", "b", "c"))
 
 ### 戻り値の型 {id="return-types"}
 
-ブロック本体（波括弧 `{}` 内に命令を記述する形式）を持つ関数を宣言する場合、常に明示的に戻り値の型を指定する必要があります。
-唯一の例外は、`Unit` を返す場合です。[その場合、戻り値の型の指定は任意です](#unit-returning-functions)。
+ブロック本体（波括弧 `{}` 内に命令を記述する形式）を持つ関数を宣言する場合、常に明示的に戻り値の型を指定する必要があります。唯一の例外は、関数が `Unit` を返す場合です。[その場合、戻り値の型の指定は任意です](#unit-returning-functions)。
 
-Kotlin はブロック本体を持つ関数の戻り値の型を推論しません。
-そのような関数の制御フローは複雑になる可能性があり、読み手にとっても、時にはコンパイラにとっても戻り値の型が不明確になるためです。
-ただし、[単一式関数](#single-expression-functions)の場合は、戻り値の型を指定しなくても Kotlin が推論できます。
+Kotlin はブロック本体を持つ関数の戻り値の型を推論しません。そのような関数の制御フローは複雑になる可能性があり、読み手にとっても、時にはコンパイラにとっても戻り値の型が不明確になるためです。ただし、[単一式関数](#single-expression-functions)の場合は、戻り値の型を指定しなくても Kotlin が推論できます。
 
 Kotlin の関数は単一の値を返しますが、その値に複数のデータを含めることができます。これらの値を表現する方法については、[複数の値を返す](#return-multiple-values)を参照してください。
 
@@ -400,13 +397,13 @@ fun getDisplayNameOrDefault(userId: String?): String =
 
 ### Unit を返す関数 {id="unit-returning-functions"}
 
-関数がブロック本体（波括弧 `{}` 内の命令）を持ち、有用な値を返さない場合、コンパイラはその戻り値の型が `Unit` であると見なします。
-`Unit` は、`Unit` と呼ばれる値を 1 つだけ持つ型です。
+関数がブロック本体を持ち、明示的な戻り値の型がない場合、コンパイラはその戻り値の型を `Unit` と推論します。
 
-関数型のパラメータを除いて、戻り値の型として `Unit` を指定する必要はありません。
-また、明示的に `Unit` を返す必要もありません。
+`Unit` は、同じく `Unit` と呼ばれる値を 1 つだけ持つ型です。この値は[オブジェクト](object-declarations.md)であるため、単一の `Unit` インスタンスしか存在しません。
+他のプログラミング言語の `void` とは異なり、`Unit` は実際の型であり、コードが必要とする場合にはその値を使用できます。
+これにより、結果を生成する関数とアクションのみを実行する関数の両方が同じ型モデルに適合します。つまり、両方とも値を返し、関数型で表現したり、ジェネリック API とともに使用したりできます。
 
-例えば、`Unit` を返さずに `printHello()` 関数を宣言できます：
+関数の宣言で `Unit` を指定したり、その値を明示的に返したりする必要はありません。ただし、`() -> Unit` などの関数型の一部である場合は `Unit` を指定する必要があります。例えば、`Unit` を返さずに `printHello()` 関数を宣言してみましょう：
 
 ```kotlin
 // 関数型パラメータ ('action') の宣言には依然として 
@@ -423,22 +420,25 @@ fun printHello(name: String?, action: () -> Unit) {
 fun main() {
     printHello("Kodee") {
         println("This runs after the greeting.")
+        // Hello Kodee
+        // This runs after the greeting.
     }
-    // Hello Kodee
-    // This runs after the greeting.
 
     printHello(null) {
         println("No name provided, but action still runs.")
+        // Hi there!
+        // No name provided, but action still runs.
     }
-    // No name provided, but action still runs
 }
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" validate="false" id="return-unit-implicit"}
 
-これは、以下の冗長な宣言と同等です：
+これは、戻り値の型と値を明示的に指定する以下の冗長な宣言と同等です：
 
 ```kotlin
 //sampleStart
+// `() -> Unit` 関数型には `Unit` が必要ですが、
+// `printHello()` の戻り値の型として `: Unit` を宣言することは任意です
 fun printHello(name: String?, action: () -> Unit): Unit {
     if (name != null)
         println("Hello $name")
@@ -446,20 +446,21 @@ fun printHello(name: String?, action: () -> Unit): Unit {
         println("Hi there!")
 
     action()
+    // `Unit` の値を明示的に返すことは任意です
     return Unit
 }
 //sampleEnd
 fun main() {
     printHello("Kodee") {
-        println("This runs after the greeting.")
+        println("This action runs when a name is given.")
+        // Hello Kodee
+        // This action runs when a name is given.
     }
-    // Hello Kodee
-    // This runs after the greeting.
-
     printHello(null) {
-        println("No name provided, but action still runs.")
+        println("This action runs when no name is provided.")
+        // Hi there!
+        // This action runs when no name is provided.
     }
-    // No name provided, but action still runs
 }
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" validate="false" id="return-unit-explicit"}

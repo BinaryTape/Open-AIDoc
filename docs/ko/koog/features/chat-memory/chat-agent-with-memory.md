@@ -5,7 +5,7 @@
 CLI 애플리케이션은 다음과 같은 루프를 실행합니다:
 
 - 콘솔에서 입력을 읽습니다.
-- 입력이 `/bye`가 아니거나 비어 있지 않으면, 사용자 입력과 지정된 세션 ID(session ID)로 에이전트를 실행합니다.
+- 입력이 `/bye`가 아니거나 비어 있지 않으면, 사용자 입력과 지정된 세션 ID로 에이전트를 실행합니다.
 - 에이전트는 먼저 해당 세션 ID에 대한 이전 대화 기록을 로드하고, 사용자 입력과 함께 프롬프트에 메시지를 추가합니다.
 - 에이전트가 LLM 상호 작용을 수행합니다.
 - 실행이 끝나고 응답을 반환하기 전에, 에이전트는 전체 대화 기록을 지정된 세션 ID 아래에 저장하며, 크기를 최신 20개의 메시지로 제한합니다.
@@ -47,8 +47,8 @@ graph TB
     
         ```kotlin title="build.gradle.kts"
         dependencies {
-            implementation("ai.koog:koog-agents:1.2.0")
-            implementation("ai.koog:agents-features-memory:1.2.0")
+            implementation("ai.koog:koog-agents:1.3.0")
+            implementation("ai.koog:agents-features-memory:1.3.0")
         }
         ```
     
@@ -67,7 +67,7 @@ graph TB
         <dependency>
             <groupId>ai.koog</groupId>
             <artifactId>koog-agents-jvm</artifactId>
-            <version>1.2.0</version>
+            <version>1.3.0</version>
         </dependency>
         <dependency>
             <groupId>ai.koog</groupId>
@@ -111,8 +111,7 @@ graph TB
                 if (input.isEmpty()) continue
 
                 val reply = agent.run(input, sessionId)
-                println("Assistant: $reply
-")
+                println("Assistant: $reply\n")
             }
         }
     }
@@ -143,8 +142,7 @@ graph TB
                     if (input.isEmpty()) continue;
     
                     String reply = agent.run(input, sessionId);
-                    System.out.println("Assistant: " + reply + "
-");
+                    System.out.println("Assistant: " + reply + "\n");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -155,15 +153,15 @@ graph TB
 
 ## 구현 세부 사항 {id="implementation-details"}
 
-`agent.run()`의 두 번째 인자는 진행 중인 대화를 식별하고 구분하는 데 사용되는 [세션 ID(session ID)](index.md#session-ids)입니다.
+`agent.run()`의 두 번째 인자는 진행 중인 대화를 식별하고 구분하는 데 사용되는 [세션 ID](index.md#session-ids)입니다.
 이 예제에서는 한 번에 하나의 대화만 진행되므로 상수로 처리되었습니다.
 실제 애플리케이션에서는 예를 들어 동일한 사용자와 관련된 대화에 대해 별도의 고유 ID를 가질 수 있습니다.
 
-에이전트는 대화 기록을 메모리에 저장하는 기본 [기록 제공자(history provider)](index.md#history-providers)를 사용합니다.
+에이전트는 대화 기록을 메모리에 저장하는 기본 [기록 제공자](index.md#history-providers)를 사용합니다.
 즉, 애플리케이션이 종료되면 기록이 손실됩니다.
 실제 애플리케이션에서는 데이터베이스나 파일에 기록을 영구적으로 저장하기 위해 커스텀 기록 제공자를 구현해야 합니다.
 
-`windowSize(20)` [전처리기(preprocessor)](index.md#preprocessors)는 제한된 컨텍스트 크기를 보장합니다:
+`windowSize(20)` [전처리기](index.md#preprocessors)는 제한된 컨텍스트 크기를 보장합니다:
 에이전트는 최대 20개의 최신 메시지만 저장합니다.
 이것이 없으면 프롬프트 크기가 컨텍스트 제한을 초과하여 커질 수 있습니다.
 

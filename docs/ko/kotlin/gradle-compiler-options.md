@@ -11,11 +11,11 @@ Kotlin의 각 릴리스에는 지원되는 타겟(JVM, JavaScript 및 [지원되
 
 ## 옵션을 정의하는 방법 {id="how-to-define-options"}
 
-Kotlin 컴파일러에는 컴파일 프로세스를 맞춤화하기 위한 여러 옵션이 있습니다.
+Kotlin 컴파일러에는 컴파일 프로세스를 맞춤화하기 위한 여러 옵션이 있습니다. 
 
 Gradle DSL을 사용하면 컴파일러 옵션을 포괄적으로 구성할 수 있습니다. 이는 [Kotlin Multiplatform](https://kotlinlang.org/docs/multiplatform/multiplatform-dsl-reference.html#compiler-options) 및 [JVM/Android](#target-the-jvm) 프로젝트에서 사용할 수 있습니다.
 
-Gradle DSL을 사용하면 빌드 스크립트 내에서 다음 세 가지 레벨로 컴파일러 옵션을 구성할 수 있습니다:
+Gradle DSL을 사용하면 빌드 스크립트 내에서 다음 세 가지 레벨로 컴파일러 옵션을 구성할 수 있습니다: 
 * **[익스텐션 레벨(Extension level)](#extension-level)**: 모든 타겟 및 공유 소스 세트에 대해 `kotlin {}` 블록에서 설정합니다.
 * **[타겟 레벨(Target level)](#target-level)**: 특정 타겟을 위한 블록에서 설정합니다.
 * **[컴파일 단위 레벨(Compilation unit level)](#compilation-unit-level)**: 보통 특정 컴파일 태스크에서 설정합니다.
@@ -124,7 +124,7 @@ tasks.named('compileKotlin', org.jetbrains.kotlin.gradle.tasks.KotlinCompilation
 
 ### `kotlinOptions {}`에서 `compilerOptions {}`로 마이그레이션 {initial-collapse-state="collapsed" collapsible="true" id="migrate-from-kotlinoptions-to-compileroptions"}
 
-Kotlin 2.2.0 이전에는 `kotlinOptions {}` 블록을 사용하여 컴파일러 옵션을 구성할 수 있었습니다. `kotlinOptions {}` 블록은 Kotlin 2.0.0부터 사용이 중단(deprecated)되었으므로, 이 섹션에서는 빌드 스크립트에서 대신 `compilerOptions {}` 블록을 사용하도록 마이그레이션하기 위한 가이드와 권장 사항을 제공합니다:
+Kotlin 2.2.0 이전에는 `kotlinOptions {}` 블록을 사용하여 컴파일러 옵션을 구성할 수 있었습니다. `kotlinOptions {}` 블록은 Kotlin 2.0.0부터 지원 중단(deprecated)되었으므로, 이 섹션에서는 빌드 스크립트에서 대신 `compilerOptions {}` 블록을 사용하도록 마이그레이션하기 위한 가이드와 권장 사항을 제공합니다:
 
 * [컴파일러 옵션 중앙화 및 타입 사용](#centralize-compiler-options-and-use-types)
 * [`android.kotlinOptions`에서 마이그레이션](#migrate-away-from-android-kotlinoptions)
@@ -187,7 +187,7 @@ plugins {
 }
 
 kotlin {
-    // 익스텐션 레벨
+    // Extension level
     compilerOptions {
         jvmTarget = JvmTarget.fromTarget("%jvmLTSVersionSupportedByKotlin%")
         languageVersion = KotlinVersion.fromVersion("%languageVersion%")
@@ -195,7 +195,7 @@ kotlin {
     }
 }
 
-// 컴파일 단위 레벨에서의 오버라이드 예시
+// Example of overriding at compilation unit level
 tasks.named<KotlinJvmCompile>("compileKotlin"){
     compilerOptions {
         apiVersion = KotlinVersion.fromVersion("%apiVersion%")
@@ -215,7 +215,7 @@ plugins {
 }
 
 kotlin {
-  // 익스텐션 레벨
+  // Extension level
     compilerOptions {
         jvmTarget = JvmTarget.fromTarget("%jvmLTSVersionSupportedByKotlin%")
         languageVersion = KotlinVersion.fromVersion("%languageVersion%")
@@ -223,7 +223,7 @@ kotlin {
     }
 }
 
-// 컴파일 단위 레벨에서의 오버라이드 예시
+// Example of overriding at compilation unit level
 tasks.named("compileKotlin", KotlinJvmCompile).configure {
     compilerOptions {
         apiVersion = KotlinVersion.fromVersion("%apiVersion%")
@@ -558,7 +558,7 @@ tasks.named('compileKotlin', KotlinCompilationTask) {
 ### 공통 속성 {id="common-attributes"}
 
 | 이름 | 설명 | 가능한 값 | 기본값 |
-|-------------------|------------------------------------------------------------------------------------------------------------------------------------------|---------------------------|---------------|
+|---|---|---|---|
 | `optIn` | [옵트인 컴파일러 인자](opt-in-requirements.md) 목록을 구성하기 위한 속성 | `listOf( /* opt-ins */ )` | `emptyList()` |
 | `progressiveMode` | [프로그레시브 컴파일러 모드](whatsnew13.md#progressive-mode)를 활성화합니다. | `true`, `false` | `false` |
 | `extraWarnings` | true인 경우 경고를 생성하는 [추가 선언, 표현식 및 타입 컴파일러 체크](whatsnew21.md#extra-compiler-checks)를 활성화합니다. | `true`, `false` | `false` |
@@ -566,7 +566,7 @@ tasks.named('compileKotlin', KotlinCompilationTask) {
 ### JVM 전용 속성 {id="attributes-specific-to-jvm"}
 
 | 이름 | 설명 | 가능한 값 | 기본값 |
-|---------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------|-----------------------------|
+|---|---|---|---|
 | `javaParameters` | 메서드 파라미터에 대한 Java 1.8 리플렉션용 메타데이터를 생성합니다. | | false |
 | `jvmTarget` | 생성된 JVM 바이트코드의 타겟 버전입니다. | "1.8", "9", "10", ..., "25", "26". 또한 [컴파일러 옵션용 타입](#types-for-compiler-options)을 참고하세요. | "%defaultJvmTargetVersion%" |
 | `noJdk` | 클래스패스에 Java 런타임을 자동으로 포함하지 않습니다. | | false |
@@ -576,7 +576,7 @@ tasks.named('compileKotlin', KotlinCompilationTask) {
 ### JVM 및 JavaScript 공통 속성 {id="attributes-common-to-jvm-and-javascript"}
 
 | 이름 | 설명 | 가능한 값 | 기본값 |
-|-----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------|---------------|
+|---|---|---|---|
 | `allWarningsAsErrors` | 경고가 있는 경우 이를 에러로 보고합니다. | | false |
 | `suppressWarnings` | 경고를 생성하지 않습니다. | | false |
 | `verbose` | 상세 로깅 출력을 활성화합니다. [Gradle 디버그 로그 레벨이 활성화된](https://docs.gradle.org/current/userguide/logging.html) 경우에만 작동합니다. | | false |
@@ -601,17 +601,17 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
 kotlin {
     compilerOptions {
-        // Kotlin API 버전 및 JVM 타겟을 지정합니다.
+        // Specifies the version of the Kotlin API and the JVM target
         apiVersion.set(KotlinVersion.%gradleLanguageVersion%)
         jvmTarget.set(JvmTarget.JVM_1_8)
         
-        // 단일 실험적 인자
+        // Single experimental argument
         freeCompilerArgs.add("-Xexport-kdoc")
 
-        // 단일 추가 인자
+        // Single additional argument
         freeCompilerArgs.add("-Xno-param-assertions")
 
-        // 인자 목록
+        // List of arguments
         freeCompilerArgs.addAll(
             listOf(
                 "-Xno-receiver-assertions",
@@ -631,17 +631,17 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
 tasks.named('compileKotlin', KotlinCompilationTask) {
     compilerOptions {
-        // Kotlin API 버전 및 JVM 타겟을 지정합니다.
+        // Specifies the version of the Kotlin API and the JVM target
         apiVersion = KotlinVersion.%gradleLanguageVersion%
         jvmTarget = JvmTarget.JVM_1_8
         
-        // 단일 실험적 인자
+        // Single experimental argument
         freeCompilerArgs.add("-Xexport-kdoc")
         
-        // 단일 추가 인자, 키-값 쌍이 될 수 있습니다.
+        // Single additional argument, can be a key-value pair
         freeCompilerArgs.add("-Xno-param-assertions")
         
-        // 인자 목록
+        // List of arguments
         freeCompilerArgs.addAll(["-Xno-receiver-assertions", "-Xno-call-assertions"])
     }
 }
@@ -697,15 +697,15 @@ tasks
 | `sourceMapEmbedSources` | 소스 파일을 소스 맵에 포함합니다. | `JsSourceMapEmbedMode.SOURCE_MAP_SOURCE_CONTENT_INLINING`, `JsSourceMapEmbedMode.SOURCE_MAP_SOURCE_CONTENT_NEVER`, `JsSourceMapEmbedMode.SOURCE_MAP_SOURCE_CONTENT_ALWAYS` | `null` |
 | `sourceMapNamesPolicy` | Kotlin 코드에 선언한 변수 및 함수 이름을 소스 맵에 추가합니다. 동작에 대한 자세한 내용은 [컴파일러 레퍼런스](compiler-reference.md#source-map-names-policy-simple-names-fully-qualified-names-no)를 참고하세요. | `JsSourceMapNamesPolicy.SOURCE_MAP_NAMES_POLICY_FQ_NAMES`, `JsSourceMapNamesPolicy.SOURCE_MAP_NAMES_POLICY_SIMPLE_NAMES`, `JsSourceMapNamesPolicy.SOURCE_MAP_NAMES_POLICY_NO` | `null` |
 | `sourceMapPrefix` | 소스 맵의 경로에 지정된 접두사를 추가합니다. | | `null` |
-| `target` | 특정 ECMA 버전에 맞는 JS 파일을 생성합니다. | `"es5"`, `"es2015"` | `"es5"` |
-| `useEsClasses` | 생성된 JavaScript 코드가 ES2015 클래스를 사용하도록 합니다. ES2015 타겟 사용 시 기본적으로 활성화됩니다. | | `null` |
+| `target` | 특정 ECMA 버전에 맞는 JS 파일을 생성합니다. | `"es5"`, `"es2015"`, `"es2020"` | `"es5"` |
+| `useEsClasses` | 생성된 JavaScript 코드가 ES2015 클래스를 사용하도록 합니다. ES2015 및 ES2020 타겟 사용 시 기본적으로 활성화됩니다. | | `null` |
 
 ### 컴파일러 옵션용 타입 {id="types-for-compiler-options"}
 
 일부 `compilerOptions`는 `String` 타입 대신 새로운 타입을 사용합니다:
 
 | 옵션 | 타입 | 예시 |
-|------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|
+|---|---|---|
 | `jvmTarget` | [`JvmTarget`](https://github.com/JetBrains/kotlin/blob/master/libraries/tools/kotlin-gradle-compiler-types/src/generated/kotlin/org/jetbrains/kotlin/gradle/dsl/JvmTarget.kt) | `compilerOptions.jvmTarget.set(JvmTarget.JVM_11)` |
 | `apiVersion` 및 `languageVersion` | [`KotlinVersion`](https://github.com/JetBrains/kotlin/blob/master/libraries/tools/kotlin-gradle-compiler-types/src/generated/kotlin/org/jetbrains/kotlin/gradle/dsl/KotlinVersion.kt) | `compilerOptions.languageVersion.set(KotlinVersion.%gradleLanguageVersion%)` |
 | `main` | [`JsMainFunctionExecutionMode`](https://github.com/JetBrains/kotlin/blob/master/libraries/tools/kotlin-gradle-compiler-types/src/generated/kotlin/org/jetbrains/kotlin/gradle/dsl/JsMainFunctionExecutionMode.kt) | `compilerOptions.main.set(JsMainFunctionExecutionMode.NO_CALL)` |
@@ -716,7 +716,7 @@ tasks
 ## 다음 단계는? {id="what-s-next"}
 
 다음에 대해 자세히 알아보세요:
-* [Kotlin 멀티플랫폼 DSL 레퍼런스](https://kotlinlang.org/docs/multiplatform/multiplatform-dsl-reference.html).
+* [Kotlin 멀티플랫폼 DSL 레퍼런스](https://kotlinlang.org/docs/multiplatform/multiplatform-dsl-reference.html). 
 * [증분 컴파일, 캐시 지원, 빌드 보고서 및 Kotlin 데몬](gradle-compilation-and-caches.md).
 * [Gradle 기본 사항 및 세부 사항](https://docs.gradle.org/current/userguide/userguide.html).
 * [Gradle 플러그인 변형 지원](gradle-plugin-variants.md).

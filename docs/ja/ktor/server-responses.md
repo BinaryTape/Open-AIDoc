@@ -8,8 +8,9 @@ Ktorでは、[ルートハンドラー](server-routing.md#define_route)内で受
 
 ルートハンドラー内では、レスポンスを操作するために以下のAPIを利用できます。
 * [`call.respondText()`](https://api.ktor.io/ktor-server-core/io.ktor.server.response/respond-text.html) や [`call.respondHtml()`](https://api.ktor.io/ktor-server-html-builder/io.ktor.server.html/respond-html.html) など、[特定のコンテンツタイプを送信する](#payload)ための関数群。
+* [`call.respondTextWriter()`](https://api.ktor.io/ktor-server-core/io.ktor.server.response/respond-text-writer.html)、[`call.respondOutputStream()`](https://api.ktor.io/ktor-server-core/io.ktor.server.response/respond-output-stream.html)、[`call.respondBytesWriter()`](https://api.ktor.io/ktor-server-core/io.ktor.server.response/respond-bytes-writer.html) など、[テキストのストリーミング](#streaming-text)や[バイナリのストリーミング](#streaming-binary)レスポンスを行うための関数群。
 * レスポンス内で[任意のデータタイプを送信](#payload)できる [`call.respond()`](https://api.ktor.io/ktor-server-core/io.ktor.server.response/respond.html) 関数。[ContentNegotiation](server-serialization.md) プラグインがインストールされている場合、特定の形式でシリアライズされたデータオブジェクトを送信できます。
-* [`ApplicationResponse`](https://api.ktor.io/ktor-server-core/io.ktor.server.response/-application-response/index.html) オブジェクトを返す [`call.response()`](https://api.ktor.io/ktor-server-application/-application-call/response.html) プロパティ。ステータスコードの設定、ヘッダーの追加、クッキーの構成など、[レスポンスパラメータ](#parameters)へのアクセスを提供します。
+* [`ApplicationResponse`](https://api.ktor.io/ktor-server-core/io.ktor.server.response/-application-response/index.html) オブジェクトを返す [`call.response()`](https://api.ktor.io/ktor-server-core/io.ktor.server.application/-application-call/response.html) プロパティ。ステータスコードの設定、ヘッダーの追加、クッキーの構成など、[レスポンスパラメータ](#parameters)へのアクセスを提供します。
 * リダイレクトレスポンスを送信するための [`call.respondRedirect()`](https://api.ktor.io/ktor-server-core/io.ktor.server.response/respond-redirect.html) 関数。
 
 ## レスポンスペイロードの設定 {id="payload"}
@@ -20,6 +21,54 @@ Ktorでは、[ルートハンドラー](server-routing.md#define_route)内で受
 ```kotlin
 get("/") {
     call.respondText("Hello, world!")
+}
+```
+
+### テキストのストリーミング {id="streaming-text"}
+
+JVM上でテキストをインクリメンタルにストリーミングするには、[`call.respondTextWriter()`](https://api.ktor.io/ktor-server-core/io.ktor.server.response/respond-text-writer.html) 関数を使用します。
+Ktorは [`Writer`](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/Writer.html) を提供し、ブロックが完了すると自動的に閉じます。
+
+バッファリングされた出力を基盤となるレスポンスチャネルに反映させたい場合は、`flush()` 関数を呼び出します。
+
+```kotlin
+get("/stream") {
+    call.respondTextWriter(ContentType.Text.Plain) {
+        for (i in 1..5) {
+            appendLine("line-$i")
+            flush()
+        }
+    }
+}
+```
+
+### バイナリのストリーミング {id="streaming-binary"}
+
+JVM上でバイナリデータをストリーミングするには、[`call.respondOutputStream()`](https://api.ktor.io/ktor-server-core/io.ktor.server.response/respond-output-stream.html) 関数を使用します。
+Ktorは [`OutputStream`](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/OutputStream.html) を提供し、ブロックが完了すると自動的に閉じます。
+
+```kotlin
+get("/stream-bytes") {
+    call.respondOutputStream(ContentType.Application.OctetStream) {
+        for (i in 1..5) {
+            write("jvm chunk-$i\n".toByteArray())
+            flush()
+        }
+    }
+}
+```
+
+マルチプラットフォームアプリケーションの場合は、[`call.respondBytesWriter()`](https://api.ktor.io/ktor-server-core/io.ktor.server.response/respond-bytes-writer.html) 関数を使用します。
+これは [`ByteWriteChannel`](https://api.ktor.io/ktor-io/io.ktor.utils.io/-byte-write-channel/index.html) を提供し、ブロックが完了するとKtorによって自動的に閉じられます。
+
+```kotlin
+get("/stream-channel") {
+    call.respondBytesWriter(ContentType.Application.OctetStream) {
+        for (i in 1..5) {
+            writeStringUtf8("kmp chunk-$i\n")
+            flush()
+        }
+    }
 }
 ```
 
@@ -56,11 +105,10 @@ get("/") {
 `<html>`、`<head>`、`<body>` で囲わずに、HTMLの断片のみを返す必要がある場合は、`call.respondHtmlPartial()` を使用できます。
 
 ```kotlin
-    get("/fragment") {
-        call.respondHtmlPartial(HttpStatusCode.Created) {
-            div("fragment") {
-                span { +"Created!" }
-            }
+get("/fragment") {
+    call.respondHtmlPartial(HttpStatusCode.Created) {
+        div("fragment") {
+            span { +"Created!" }
         }
     }
 }

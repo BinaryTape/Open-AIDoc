@@ -46,7 +46,9 @@ HTML 응답을 보내려면 필요한 [라우트(route)](server-routing.md) 내�
 import io.ktor.server.application.*
 import io.ktor.server.html.*
 import io.ktor.http.*
+import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.utils.io.*
 import kotlinx.html.*
 
 fun Application.module() {
@@ -157,7 +159,9 @@ HTML 프래그먼트는 HTMX와 같은 라이브러리에서 사용하는 동적
 import io.ktor.server.application.*
 import io.ktor.server.html.*
 import io.ktor.http.*
+import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.utils.io.*
 import kotlinx.html.*
 
 fun Application.module() {
@@ -192,7 +196,7 @@ fun Application.module() {
 
 ## 템플릿(Templates) {id="templates"}
 
-일반 HTML 생성 외에도 Ktor는 복잡한 레이아웃을 빌드하는 데 사용할 수 있는 템플릿 엔진을 제공합니다. HTML 페이지의 각 부분에 대해 계층적인 템플릿을 생성할 수 있습니다. 예를 들어, 전체 페이지를 위한 루트 템플릿, 페이지 헤더와 푸터를 위한 자식 템플릿 등을 만들 수 있습니다. Ktor는 템플릿 작업을 위해 다음과 같은 API를 노출합니다.
+일반 HTML 생성 외에도 Ktor는 복잡한 레이아웃을 빌드하는 데 사용할 수 있는 템플릿 엔진을 제공합니다. HTML 페이지의 각 부분에 대해 계층적인 템플릿을 생성할 수 있습니다. 예를 들어, 전체 페이지를 위한 루트 템플릿, 페이지 헤더와 푸터를 위한 자식 템플릿 등을 만들 수 있습니다. Ktor는 템플릿 작업을 위해 다음과 같은 API를 제공합니다.
 
 1. 지정된 템플릿을 기반으로 빌드된 HTML로 응답하려면 [respondHtmlTemplate](https://api.ktor.io/ktor-server-html-builder/io.ktor.server.html/respond-html-template.html) 메서드를 호출하세요.
 2. 템플릿을 만들려면 [Template](https://api.ktor.io/ktor-server-html-builder/io.ktor.server.html/-template/index.html) 인터페이스를 구현하고 HTML을 제공하는 `Template.apply` 메서드를 오버라이드해야 합니다.
@@ -230,7 +234,7 @@ fun Application.module() {
        }
    }
    ```
-   블록 내부에서 템플릿에 액세스하고 해당 프로퍼티 값을 지정할 수 있습니다. 이 값들은 템플릿 클래스에 지정된 플레이스홀더를 대체하게 됩니다. 다음 단계에서 `LayoutTemplate`을 생성하고 해당 프로퍼티를 정의할 것입니다.
+   블록 내부에서 템플릿에 접근하고 해당 프로퍼티 값을 지정할 수 있습니다. 이 값들은 템플릿 클래스에 지정된 플레이스홀더를 대체하게 됩니다. 다음 단계에서 `LayoutTemplate`을 생성하고 해당 프로퍼티를 정의할 것입니다.
   
 2. 루트 레이아웃 템플릿은 다음과 같은 모습입니다.
    ```kotlin

@@ -10,7 +10,7 @@ Kotlinは、JVM、Android、JavaScript、Wasm、およびNativeをターゲッ�
 
 ### Kotlinの現在のバージョンは何ですか？ {id="what-is-the-current-version-of-kotlin"}
 
-現在のリリースバージョンは %kotlinVersion% で、%kotlinReleaseDate% に公開されました。
+現在のリリースバージョンは %kotlinVersion% で、%kotlinReleaseDate% に公開されました。  
 詳細は[GitHub](https://github.com/jetbrains/kotlin)で確認できます。
 
 ### Kotlinは無料ですか？ {id="is-kotlin-free"}
@@ -30,15 +30,13 @@ Kotlinはより簡潔です。大まかな見積もりでは、コードの行�
  
 ### KotlinはJavaプログラミング言語と互換性がありますか？ {id="is-kotlin-compatible-with-the-java-programming-language"}
 
-はい。KotlinはJavaプログラミング言語と100%の相互運用性があり、既存のコードベースがKotlinと適切に連携できるようにすることに重点が置かれています。
-[JavaからKotlinのコードを呼び出したり](java-to-kotlin-interop.md)、[KotlinからJavaのコードを呼び出したり](java-interop.md)することが簡単にできます。
-これにより、導入がはるかに容易になり、リスクも低減されます。また、既存のコードの移行を簡素化するために、[IDEには自動のJavaからKotlinへのコンバーター](mixing-java-kotlin-intellij.md#convert-java-files-to-kotlin)も組み込まれており、既存のコードの移行を簡素化します。
+はい。KotlinはJavaプログラミング言語と100%の相互運用性があり、既存のコードベースがKotlinと適切に連携できるようにすることに重点が置かれています。[JavaからKotlinのコードを呼び出したり](java-to-kotlin-interop.md)、[KotlinからJavaのコードを呼び出したり](java-interop.md)することが簡単にできます。これにより、導入がはるかに容易になり、リスクも低減されます。また、既存のコードの移行を簡素化するために、[IDEには自動のJavaからKotlinへのコンバーター](mixing-java-kotlin-intellij.md#convert-java-files-to-kotlin)も組み込まれています。
 
 ### Kotlinは何に使用できますか？ {id="what-can-i-use-kotlin-for"}
 
 Kotlinは、バックエンド、クライアントサイドWeb、Android、マルチプラットフォームライブラリなど、あらゆる種類の開発に使用できます。
-現在開発中のKotlin/Nativeにより、組み込みシステム、macOS、iOSなどの他のプラットフォームもサポートされています。
-Kotlinは、モバイルやサーバーサイドのアプリケーション、JavaScriptやJavaFXを使用したクライアントサイド、データサイエンスなど、多くの分野で使用されています。
+現在開発中のKotlin/Nativeにより、組み込みシステム、macOS、iOSなどの他のプラットフォームもサポートされます。
+モバイルやサーバーサイドのアプリケーション、JavaScriptやJavaFXを使用したクライアントサイド、データサイエンスなど、多くの分野でKotlinが使用されています。
 
 ### Android開発にKotlinを使用できますか？ {id="can-i-use-kotlin-for-android-development"}
 
@@ -46,19 +44,16 @@ Kotlinは、モバイルやサーバーサイドのアプリケーション、Ja
 
 ### バックエンド開発にKotlinを使用できますか？ {id="can-i-use-kotlin-for-backend-development"}
 
-はい。KotlinはJVMと100%の互換性があるため、Spring Boot、vert.x、JSFなどの既存のフレームワークをそのまま使用できます。
-さらに、[Ktor](https://github.com/kotlin/ktor)のようにKotlinで書かれた特定のフレームワークもあります。
-詳細については、[バックエンド開発の概要](server-overview.md)を確認してください。
+はい。KotlinはJVMと100%の互換性があるため、Spring Boot、vert.x、JSFなどの既存のフレームワークをそのまま使用できます。さらに、[Ktor](https://github.com/kotlin/ktor)のようにKotlinで書かれた特定のフレームワークもあります。詳細については、[バックエンド開発の概要](server-overview.md)を確認してください。
 
 ### Web開発にKotlinを使用できますか？ {id="can-i-use-kotlin-for-web-development"}
 
-はい。バックエンドのWeb開発において、Kotlinは[Ktor](https://ktor.io/)や[Spring](https://spring.io/)などのフレームワークとうまく連携し、サーバーサイドアプリケーションを効率的に構築できます。
-さらに、クライアントサイドのWeb開発にはKotlin/Wasmを使用できます。
+はい。バックエンドのWeb開発において、Kotlinは[Ktor](https://ktor.io/)や[Spring](https://spring.io/)などのフレームワークとうまく連携し、サーバーサイドアプリケーションを効率的に構築できます。さらに、クライアントサイドのWeb開発にはKotlin/Wasmを使用できます。
 [Kotlin/Wasmの始め方](wasm-get-started.md)をご覧ください。
 
 ### デスクトップ開発にKotlinを使用できますか？ {id="can-i-use-kotlin-for-desktop-development"}
 
-はい。JavaFX、SwingなどのJava UIフレームワークを使用できます。
+はい。JavaFX、Swingなどの任意のJava UIフレームワークを使用できます。
 さらに、[TornadoFX](https://github.com/edvin/tornadofx)のようなKotlin固有のフレームワークもあります。
 
 ### ネイティブ開発にKotlinを使用できますか？ {id="can-i-use-kotlin-for-native-development"}
@@ -86,7 +81,7 @@ JVM側では、主なビルドツールとして[Gradle](gradle.md)と[Maven](ma
 
 JVMをターゲットにする場合、KotlinはJava互換のバイトコードを生成します。
 
-JavaScriptをターゲットにする場合、KotlinはES5.1にトランスパイルし、AMDやCommonJSなどのモジュールシステムと互換性のあるコードを生成します。
+JavaScriptをターゲットにする場合、Kotlinは設定されたターゲットに応じてES5、ES2015、またはES2020コードを生成できます。このコードは、AMDやCommonJSなどのモジュールシステムと互換性があります。
 
 ネイティブをターゲットにする場合、Kotlinは（LLVMを介して）プラットフォーム固有のコードを生成します。
 
@@ -99,7 +94,7 @@ Kotlinでは実行用のJVMバージョンを選択できます。デフォル�
 ### Kotlinは難しいですか？ {id="is-kotlin-hard"}
 
 Kotlinは、Java、C#、JavaScript、Scala、Groovyなどの既存の言語からインスピレーションを得ています。数日あればKotlinの読み書きができるようになり、誰でもすぐに使い始められるように、学習しやすさを重視して設計されています。
-慣習的（イディオマティック）なKotlinを習得し、より高度な機能を使用するには少し時間がかかるかもしれませんが、全体としては複雑な言語ではありません。
+慣習的（イディオマティック）なKotlinを習得し、より高度な機能を使用するには少し時間がかかるかもしれませんが、全体としては複雑な言語ではありません。  
 詳細については、[学習資料](learning-materials-overview.md)を確認してください。
  
 ### どのような企業がKotlinを使用していますか？ {id="what-companies-are-using-kotlin"}
@@ -154,13 +149,12 @@ JetBrains Academyの[Kotlin Coreトラック](https://hyperskill.org/tracks?cate
 
 ### Kotlinはソーシャルメディアを利用していますか？ {id="is-kotlin-on-social-media"}
 
-はい。
+はい。 
 [Kotlin YouTubeチャンネル](https://www.youtube.com/c/Kotlin)を購読し、[Twitter](https://twitter.com/kotlin)または[Bluesky](https://bsky.app/profile/kotlinlang.org)でKotlinをフォローしてください。
 
 ### 他にオンラインのKotlinリソースはありますか？ {id="any-other-online-kotlin-resources"}
 
-ウェブサイトには、コミュニティメンバーによる[Kotlin Digests](https://kotlin.link)、
-[ニュースレター](http://kotlinweekly.net)、[ポッドキャスト](https://talkingkotlin.com)など、多くの[オンラインリソース](https://kotlinlang.org/community/)が用意されています。
+ウェブサイトには、コミュニティメンバーによる[Kotlin Digests](https://kotlin.link)、[ニュースレター](http://kotlinweekly.net)、[ポッドキャスト](https://talkingkotlin.com)など、多くの[オンラインリソース](https://kotlinlang.org/community/)が用意されています。
 
 ### HDのKotlinロゴはどこで入手できますか？ {id="where-can-i-get-an-hd-kotlin-logo"}
 

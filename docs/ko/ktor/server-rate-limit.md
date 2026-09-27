@@ -1,6 +1,6 @@
 [//]: # (title: 속도 제한(Rate limiting))
 
-<show-structure for="chapter" depth="3"/>
+<show-structure for="chapter" depth="4"/>
 <primary-label ref="server-plugin"/>
 
 <var name="plugin_name" value="RateLimit"/>
@@ -25,7 +25,7 @@
 </tldr>
 
 <link-summary>
-%plugin_name%은 들어오는 요청 본문을 검증하는 기능을 제공합니다.
+%plugin_name%은 클라이언트가 지정된 시간 동안 보낼 수 있는 요청 수를 제한합니다.
 </link-summary>
 
 [`%plugin_name%`](%plugin_api_link%) 플러그인을 사용하면 클라이언트가 지정된 시간 동안 보낼 수 있는 [요청](server-requests.md) 수를 제한할 수 있습니다.
@@ -33,7 +33,7 @@
 Ktor는 속도 제한을 구성하기 위한 여러 가지 방법을 제공합니다:
 
 * 애플리케이션 전체에 전역적으로 속도 제한을 적용하거나 특정 [리소스](server-routing.md)에 대해 각기 다른 제한을 구성합니다.
-* IP 주소, API 키 또는 액세스 토큰과 같은 요청 파라미터를 기반으로 속도 제한을 적용합니다.
+* [IP 주소](#client-ip), [API 키](#api-key), [액세스 토큰](#access-token)과 같은 [요청 키](#request-key)를 기반으로 속도 제한을 적용합니다.
 
 ## 의존성 추가 {id="add_dependencies"}
 
@@ -147,9 +147,15 @@ register(RateLimitName("protected")) {
 }
 ```
 
-#### 키로 요청 구분 {id="distinguish-requests-by-key"}
+#### 키로 요청 구분 {id="request-key"}
 
-`requestKey()` 함수를 사용하여 각 요청에 대한 키를 반환할 수 있습니다. 서로 다른 키를 가진 요청은 독립적인 속도 제한을 갖습니다.
+`requestKey()` 함수를 사용하여 각 요청에 대한 키를 반환할 수 있습니다. 서로 다른 키를 가진 요청은 독립적인 속도 제한을 갖습니다. 기본적으로 모든 요청은 동일한 버킷을 공유합니다.
+
+> 요청 키에는 적절한 `equals` 및 `hashCode` 구현이 되어 있어야 합니다.
+> 
+{style="note"}
+
+##### 쿼리 파라미터 {id="query-parameter"}
 
 다음 예제는 `login` [쿼리 파라미터](server-requests.md#query_parameters)를 사용하여 사용자를 구분합니다:
 
@@ -161,9 +167,47 @@ register(RateLimitName("protected")) {
 }
 ```
 
-> 요청 키에는 적절한 `equals` 및 `hashCode` 구현이 되어 있어야 합니다.
-> 
-{style="tip"}
+##### 클라이언트 IP 주소 {id="client-ip"}
+
+각 클라이언트 IP 주소에 별도의 속도 제한을 적용하려면 [`call.request.origin.remoteHost`](https://api.ktor.io/ktor-http/io.ktor.http/-request-connection-point/remote-host.html)를 요청 키로 사용하세요:
+
+```kotlin
+register(RateLimitName("per-ip")) {
+    rateLimiter(limit = 5, refillPeriod = 60.seconds)
+    requestKey { call ->
+        call.request.origin.remoteHost
+    }
+}
+```
+
+애플리케이션이 프록시나 로드 밸런서 뒤에서 실행되는 경우, `origin.remoteHost`가 프록시 대신 원래의 클라이언트 주소를 나타내도록 [Forwarded headers](server-forward-headers.md) 플러그인을 구성하세요.
+
+##### API 키 헤더 {id="api-key"}
+
+헤더로 전송된 API 키를 기준으로 요청 속도를 제한하려면 `requestKey()`에서 해당 헤더 값을 반환하세요:
+
+```kotlin
+register(RateLimitName("per-api-key")) {
+    rateLimiter(limit = 5, refillPeriod = 60.seconds)
+    requestKey { call ->
+        call.request.headers["X-Api-Key"] ?: "anonymous"
+    }
+}
+```
+
+이 방식을 [API 키 인증](server-api-key-auth.md)과 결합하여 원시 헤더 값 대신 인증된 주체(principal)를 요청 키로 사용할 수도 있습니다.
+
+##### 액세스 토큰 또는 Bearer 토큰 {id="access-token"}
+
+각 Bearer 토큰에 별도의 속도 제한을 적용하려면 `Authorization` 헤더에서 원시 토큰을 요청 키로 반환하세요:
+
+```kotlin
+requestKey { call ->
+    call.request.authorization()?.removePrefix("Bearer ") ?: "anonymous"
+}
+```
+
+요청이 인증된 경우, 인증된 각 사용자 식별자에 별도의 속도 제한을 적용하려면 [인증 주체](#rate-limit-authenticated-users)를 요청 키로 사용하는 것을 권장합니다.
 
 #### 인증된 사용자 속도 제한 {id="rate-limit-authenticated-users"}
 
@@ -203,7 +247,7 @@ register(RateLimitName("protected")) {
         applicationCall.request.queryParameters["login"]!!
     }
     requestWeight { applicationCall, key ->
-        when(key) {
+        when (key) {
             "jetbrains" -> 1
             else -> 2
         }
@@ -268,6 +312,7 @@ routing {
 * 홈페이지를 위한 기본 속도 제한기.
 * 공개 API를 위한 이름이 지정된 공개(public) 속도 제한기.
 * 요청 키와 가중치를 사용하는 이름이 지정된 보호(protected) 속도 제한기.
+* 클라이언트 IP 및 `X-Api-Key` 헤더를 키로 사용하는 이름이 지정된 속도 제한기.
 * `429 Too Many Requests` 응답으로 거부된 요청에 대한 응답을 커스터마이징하는 [`StatusPages`](server-status-pages.md) 플러그인.
 
 ```kotlin
@@ -275,6 +320,7 @@ package com.example
 
 import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.plugins.*
 import io.ktor.server.plugins.ratelimit.*
 import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
@@ -297,10 +343,22 @@ fun Application.module() {
                 applicationCall.request.queryParameters["login"]!!
             }
             requestWeight { applicationCall, key ->
-                when(key) {
+                when (key) {
                     "jetbrains" -> 1
                     else -> 2
                 }
+            }
+        }
+        register(RateLimitName("per-ip")) {
+            rateLimiter(limit = 5, refillPeriod = 60.seconds)
+            requestKey { call ->
+                call.request.origin.remoteHost
+            }
+        }
+        register(RateLimitName("per-api-key")) {
+            rateLimiter(limit = 5, refillPeriod = 60.seconds)
+            requestKey { call ->
+                call.request.headers["X-Api-Key"] ?: "anonymous"
             }
         }
     }
@@ -328,6 +386,20 @@ fun Application.module() {
                 val requestsLeft = call.response.headers["X-RateLimit-Remaining"]
                 val login = call.request.queryParameters["login"]
                 call.respondText("Welcome to protected API, $login! $requestsLeft requests left.")
+            }
+        }
+        rateLimit(RateLimitName("per-ip")) {
+            get("/ip-api") {
+                val requestsLeft = call.response.headers["X-RateLimit-Remaining"]
+                val clientHost = call.request.origin.remoteHost
+                call.respondText("Welcome to IP API, $clientHost! $requestsLeft requests left.")
+            }
+        }
+        rateLimit(RateLimitName("per-api-key")) {
+            get("/keyed-api") {
+                val requestsLeft = call.response.headers["X-RateLimit-Remaining"]
+                val apiKey = call.request.headers["X-Api-Key"] ?: "anonymous"
+                call.respondText("Welcome to keyed API, $apiKey! $requestsLeft requests left.")
             }
         }
     }

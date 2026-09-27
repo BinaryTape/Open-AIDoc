@@ -14,7 +14,7 @@ JVM、JavaScript 以及針對[支援平台](native-overview.md#target-platforms)
 
 Kotlin 編譯器具有多個選項，用於自訂編譯過程。
 
-Gradle DSL 允許對編譯器選項進行全面的組建組態。它適用於 [Kotlin Multiplatform](https://kotlinlang.org/docs/multiplatform/multiplatform-dsl-reference.html#compiler-options) 和 [JVM/Android](#target-the-jvm) 專案。
+Gradle DSL 允許對編譯器選項進行全面的配置。它適用於 [Kotlin Multiplatform](https://kotlinlang.org/docs/multiplatform/multiplatform-dsl-reference.html#compiler-options) 和 [JVM/Android](#target-the-jvm) 專案。
 
 透過 Gradle DSL，您可以在建置指令碼中於三個層級配置編譯器選項：
 * **[擴充層級](#extension-level)**：在 `kotlin {}` 區塊中，適用於所有目標和共用原始碼集。
@@ -403,11 +403,11 @@ kotlin {
 * 將任何 `-progressive` 編譯器選項的使用遷移至專用的 DSL：`progressiveMode.set(true)`。
 * 將任何 `-Xjvm-default` 編譯器選項的使用遷移至 [使用專用 DSL](gradle-compiler-options.md#attributes-specific-to-jvm)：`jvmDefault.set()`。使用以下選項對應：
 
-  | 之前                            | 之後                                              |
-  |-----------------------------------|---------------------------------------------------|
-  | `-Xjvm-default=all-compatibility` | `jvmDefault.set(JvmDefaultMode.ENABLE)`           |
-  | `-Xjvm-default=all`               | `jvmDefault.set(JvmDefaultMode.NO_COMPATIBILITY)` | 
-  | `-Xjvm-default=disable`           | `jvmDefault.set(JvmDefaultMode.DISABLE)`          |
+  | 之前 | 之後 |
+  |---|---|
+  | `-Xjvm-default=all-compatibility` | `jvmDefault.set(JvmDefaultMode.ENABLE)` |
+  | `-Xjvm-default=all` | `jvmDefault.set(JvmDefaultMode.NO_COMPATIBILITY)` | 
+  | `-Xjvm-default=disable` | `jvmDefault.set(JvmDefaultMode.DISABLE)` |
 
 例如，如果您原本有：
 
@@ -559,7 +559,7 @@ tasks.named('compileKotlin', KotlinCompilationTask) {
 ### 常用屬性 {id="common-attributes"}
 
 | 名稱 | 描述 | 可能的值 | 預設值 |
-|-------------------|----------------------------------------------------------------------------------------------------------------------------------------|---------------------------|---------------|
+|---|---|---|---|
 | `optIn` | 用於配置 [加入編譯器引數](opt-in-requirements.md) 列表的屬性 | `listOf( /* opt-ins */ )` | `emptyList()` |
 | `progressiveMode` | 啟用 [漸進式編譯器模式](whatsnew13.md#progressive-mode) | `true`, `false` | `false` |
 | `extraWarnings` | 如果為 true，則啟用 [額外的宣告、運算式和型別編譯器檢查](whatsnew21.md#extra-compiler-checks)，這些檢查會發出警告 | `true`, `false` | `false` |
@@ -567,7 +567,7 @@ tasks.named('compileKotlin', KotlinCompilationTask) {
 ### JVM 特定屬性 {id="attributes-specific-to-jvm"}
 
 | 名稱 | 描述 | 可能的值 | 預設值 |
-|---------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------|-----------------------------|
+|---|---|---|---|
 | `javaParameters` | 為方法參數上的 Java 1.8 反射產生元資料 | | false |
 | `jvmTarget` | 產生的 JVM 位元組碼的目標版本 | "1.8", "9", "10", ..., "25", 26"。另請參閱 [編譯器選項的類型](#types-for-compiler-options) | "%defaultJvmTargetVersion%" |
 | `noJdk` | 不要自動將 Java 執行階段包含到類別路徑中 | | false |
@@ -577,13 +577,13 @@ tasks.named('compileKotlin', KotlinCompilationTask) {
 ### JVM 和 JavaScript 共有屬性 {id="attributes-common-to-jvm-and-javascript"}
 
 | 名稱 | 描述 | 可能的值 | 預設值 |
-|-----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------|---------------|
+|---|---|---|---|
 | `allWarningsAsErrors` | 如果有任何警告，則回報錯誤 | | false |
 | `suppressWarnings` | 不要產生警告 | | false |
 | `verbose` | 啟用詳細的記錄輸出。僅在 [啟用 Gradle 偵錯記錄層級](https://docs.gradle.org/current/userguide/logging.html) 時有效 | | false |
 | `freeCompilerArgs` | 額外編譯器引數的列表。您也可以在此處使用實驗性的 `-X` 引數。請參閱 [範例](#example-of-additional-arguments-usage-via-freecompilerargs) | | [] |
-| `apiVersion` | 限制宣告的使用僅限於指定的隨附程式庫版本。如需更多資訊，請參閱 [`-api-version`](compiler-reference.md#api-version-version)。 | "2.0", "2.1", "2.2", "2.3", "2.4", "2.5" (實驗性) | |
-| `languageVersion` | 提供與指定 Kotlin 版本的原始碼相容性。如需更多資訊，請參閱 [`-language-version`](compiler-reference.md#language-version-version)。 | "2.0", "2.1", "2.2", "2.3", "2.4", "2.5" (實驗性) | |
+| `apiVersion` | 控制您的程式碼可以使用哪些 Kotlin API。如需更多資訊，請參閱 [`-api-version`](compiler-reference.md#api-version-version)。 | "2.0", "2.1", "2.2", "2.3", "2.4", "2.5" (實驗性) | |
+| `languageVersion` | 控制編譯期間可使用哪些 Kotlin 語言功能與語法。如需更多資訊，請參閱 [`-language-version`](compiler-reference.md#language-version-version)。 | "2.0", "2.1", "2.2", "2.3", "2.4", "2.5" (實驗性) | |
 
 > 我們將在未來的版本中棄用 `freeCompilerArgs` 屬性。如果您在 Kotlin Gradle DSL 中缺少某些選項，請[提交問題 (Issue)](https://youtrack.jetbrains.com/newissue?project=kt)。
 >
@@ -691,7 +691,7 @@ tasks
 ### JavaScript 特定屬性 {id="attributes-specific-to-javascript"}
 
 | 名稱 | 描述 | 可能的值 | 預設值 |
-|-------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------|
+|---|---|---|---|
 | `friendModulesDisabled` | 停用內部宣告匯出 | | `false` |
 | `main` | 指定執行時是否應呼叫 `main` 函式 | `JsMainFunctionExecutionMode.CALL`, `JsMainFunctionExecutionMode.NO_CALL` | `JsMainFunctionExecutionMode.CALL` |
 | `moduleKind` | 編譯器產生的 JS 模組類型 | `JsModuleKind.MODULE_AMD`, `JsModuleKind.MODULE_PLAIN`, `JsModuleKind.MODULE_ES`, `JsModuleKind.MODULE_COMMONJS`, `JsModuleKind.MODULE_UMD` | `null` |
@@ -699,15 +699,15 @@ tasks
 | `sourceMapEmbedSources` | 將原始碼檔案嵌入原始碼對應檔中 | `JsSourceMapEmbedMode.SOURCE_MAP_SOURCE_CONTENT_INLINING`, `JsSourceMapEmbedMode.SOURCE_MAP_SOURCE_CONTENT_NEVER`, `JsSourceMapEmbedMode.SOURCE_MAP_SOURCE_CONTENT_ALWAYS` | `null` |
 | `sourceMapNamesPolicy` | 將您在 Kotlin 程式碼中宣告的變數和函式名稱新增到原始碼對應檔中。如需關於此行為的更多資訊，請參閱我們的 [編譯器參考](compiler-reference.md#source-map-names-policy-simple-names-fully-qualified-names-no) | `JsSourceMapNamesPolicy.SOURCE_MAP_NAMES_POLICY_FQ_NAMES`, `JsSourceMapNamesPolicy.SOURCE_MAP_NAMES_POLICY_SIMPLE_NAMES`, `JsSourceMapNamesPolicy.SOURCE_MAP_NAMES_POLICY_NO` | `null` |
 | `sourceMapPrefix` | 向原始碼對應檔中的路徑新增指定的前綴 | | `null` |
-| `target` | 為特定的 ECMA 版本產生 JS 檔案 | `"es5"`, `"es2015"` | `"es5"` |
-| `useEsClasses` | 讓產生的 JavaScript 程式碼使用 ES2015 類別。在使用 ES2015 目標的情況下預設啟用 | | `null` |
+| `target` | 為特定的 ECMA 版本產生 JS 檔案 | `"es5"`, `"es2015"`, `"es2020"` | `"es5"` |
+| `useEsClasses` | 讓產生的 JavaScript 程式碼使用 ES2015 類別。在使用 ES2015 與 ES2020 目標的情況下預設啟用 | | `null` |
 
 ### 編譯器選項的類型 {id="types-for-compiler-options"}
 
 部分 `compilerOptions` 使用新型別而非 `String` 型別：
 
 | 選項 | 型別 | 範例 |
-|------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|
+|---|---|---|
 | `jvmTarget` | [`JvmTarget`](https://github.com/JetBrains/kotlin/blob/master/libraries/tools/kotlin-gradle-compiler-types/src/generated/kotlin/org/jetbrains/kotlin/gradle/dsl/JvmTarget.kt) | `compilerOptions.jvmTarget.set(JvmTarget.JVM_11)` |
 | `apiVersion` 和 `languageVersion` | [`KotlinVersion`](https://github.com/JetBrains/kotlin/blob/master/libraries/tools/kotlin-gradle-compiler-types/src/generated/kotlin/org/jetbrains/kotlin/gradle/dsl/KotlinVersion.kt) | `compilerOptions.languageVersion.set(KotlinVersion.%gradleLanguageVersion%)` |
 | `main` | [`JsMainFunctionExecutionMode`](https://github.com/JetBrains/kotlin/blob/master/libraries/tools/kotlin-gradle-compiler-types/src/generated/kotlin/org/jetbrains/kotlin/gradle/dsl/JsMainFunctionExecutionMode.kt) | `compilerOptions.main.set(JsMainFunctionExecutionMode.NO_CALL)` |

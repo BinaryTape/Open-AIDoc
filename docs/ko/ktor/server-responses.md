@@ -4,10 +4,11 @@
 
 <link-summary>다양한 유형의 응답을 보내는 방법을 알아봅니다.</link-summary>
 
-Ktor를 사용하면 [라우트 핸들러](server-routing.md#define_route) 내에서 들어오는 [요청(requests)](server-requests.md)을 처리하고 응답(responses)을 보낼 수 있습니다. 일반 텍스트, HTML 문서 및 템플릿, 직렬화된 데이터 객체 등 다양한 유형의 응답을 보낼 수 있습니다. 또한 콘텐츠 타입, 헤더, 쿠키 및 상태 코드와 같은 다양한 [응답 파라미터](#parameters)를 구성할 수 있습니다.
+Ktor를 사용하면 [라우트 핸들러](server-routing.md#define_route) 내에서 들어오는 [요청](server-requests.md)을 처리하고 응답을 보낼 수 있습니다. 일반 텍스트, HTML 문서 및 템플릿, 직렬화된 데이터 객체 등 다양한 유형의 응답을 보낼 수 있습니다. 또한 콘텐츠 타입, 헤더, 쿠키 및 상태 코드와 같은 다양한 [응답 파라미터](#parameters)를 구성할 수 있습니다.
 
 라우트 핸들러 내부에서 응답 작업을 위해 다음과 같은 API를 사용할 수 있습니다:
 * [`call.respondText()`](https://api.ktor.io/ktor-server-core/io.ktor.server.response/respond-text.html) 및 [`call.respondHtml()`](https://api.ktor.io/ktor-server-html-builder/io.ktor.server.html/respond-html.html)과 같이 [특정 콘텐츠 타입을 보내기](#payload) 위한 함수 세트.
+* [`call.respondTextWriter()`](https://api.ktor.io/ktor-server-core/io.ktor.server.response/respond-text-writer.html), [`call.respondOutputStream()`](https://api.ktor.io/ktor-server-core/io.ktor.server.response/respond-output-stream.html), [`call.respondBytesWriter()`](https://api.ktor.io/ktor-server-core/io.ktor.server.response/respond-bytes-writer.html)와 같이 [텍스트 스트리밍](#streaming-text) 및 [바이너리 스트리밍](#streaming-binary) 응답을 위한 함수.
 * 응답 내에 [모든 데이터 타입을 보낼 수](#payload) 있게 해주는 [`call.respond()`](https://api.ktor.io/ktor-server-core/io.ktor.server.response/respond.html) 함수. [ContentNegotiation](server-serialization.md) 플러그인이 설치되어 있으면 특정 형식으로 직렬화된 데이터 객체를 보낼 수 있습니다.
 * [`ApplicationResponse`](https://api.ktor.io/ktor-server-core/io.ktor.server.response/-application-response/index.html) 객체를 반환하는 [`call.response()`](https://api.ktor.io/ktor-server-application/-application-call/response.html) 프로퍼티. 이를 통해 상태 코드 설정, 헤더 추가 및 쿠키 구성과 같은 [응답 파라미터](#parameters)에 접근할 수 있습니다.
 * 리다이렉트 응답을 보내기 위한 [`call.respondRedirect()`](https://api.ktor.io/ktor-server-core/io.ktor.server.response/respond-redirect.html) 함수.
@@ -20,6 +21,54 @@ Ktor를 사용하면 [라우트 핸들러](server-routing.md#define_route) 내�
 ```kotlin
 get("/") {
     call.respondText("Hello, world!")
+}
+```
+
+### 텍스트 스트리밍 {id="streaming-text"}
+
+JVM에서 텍스트를 점진적으로 스트리밍하려면 [`call.respondTextWriter()`](https://api.ktor.io/ktor-server-core/io.ktor.server.response/respond-text-writer.html) 함수를 사용하세요.
+Ktor는 [`Writer`](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/Writer.html)를 제공하며 블록이 완료되면 자동으로 이를 닫습니다.
+
+버퍼링된 출력을 기본(underlying) 응답 채널에서 사용할 수 있게 하려면 `flush()` 함수를 호출하세요:
+
+```kotlin
+get("/stream") {
+    call.respondTextWriter(ContentType.Text.Plain) {
+        for (i in 1..5) {
+            appendLine("line-$i")
+            flush()
+        }
+    }
+}
+```
+
+### 바이너리 스트리밍 {id="streaming-binary"}
+
+JVM에서 바이너리 데이터를 스트리밍하려면 [`call.respondOutputStream()`](https://api.ktor.io/ktor-server-core/io.ktor.server.response/respond-output-stream.html) 함수를 사용하세요.
+Ktor는 [`OutputStream`](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/OutputStream.html)을 제공하며 블록이 완료되면 자동으로 이를 닫습니다:
+
+```kotlin
+get("/stream-bytes") {
+    call.respondOutputStream(ContentType.Application.OctetStream) {
+        for (i in 1..5) {
+            write("jvm chunk-$i\n".toByteArray())
+            flush()
+        }
+    }
+}
+```
+
+멀티플랫폼 애플리케이션의 경우, [`call.respondBytesWriter()`](https://api.ktor.io/ktor-server-core/io.ktor.server.response/respond-bytes-writer.html) 함수를 사용하세요.
+이 함수는 블록이 완료될 때 Ktor가 자동으로 닫아주는 [`ByteWriteChannel`](https://api.ktor.io/ktor-io/io.ktor.utils.io/-byte-write-channel/index.html)을 제공합니다:
+
+```kotlin
+get("/stream-channel") {
+    call.respondBytesWriter(ContentType.Application.OctetStream) {
+        for (i in 1..5) {
+            writeStringUtf8("kmp chunk-$i\n")
+            flush()
+        }
+    }
 }
 ```
 
@@ -56,11 +105,10 @@ get("/") {
 `<html>`, `<head>`, 또는 `<body>`로 감싸지 않고 HTML의 일부(fragment)만 반환해야 하는 경우, `call.respondHtmlPartial()`을 사용할 수 있습니다:
 
 ```kotlin
-    get("/fragment") {
-        call.respondHtmlPartial(HttpStatusCode.Created) {
-            div("fragment") {
-                span { +"Created!" }
-            }
+get("/fragment") {
+    call.respondHtmlPartial(HttpStatusCode.Created) {
+        div("fragment") {
+            span { +"Created!" }
         }
     }
 }
@@ -279,7 +327,7 @@ get("/") {
 }
 ```
 
-> Ktor는 쿠키를 사용하여 세션을 처리하는 기능도 제공합니다. 자세한 내용은 [세션(Sessions)](server-sessions.md)을 참조하세요.
+> Ktor는 쿠키를 사용하여 세션을 처리하는 기능도 제공합니다. 자세한 내용은 [세션](server-sessions.md)을 참조하세요.
 
 ## 리다이렉트 {id="redirect"}
 

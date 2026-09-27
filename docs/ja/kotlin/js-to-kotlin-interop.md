@@ -334,7 +334,7 @@ Kotlin の `Long` 型は JavaScript の `BigInt` 型にコンパイルできる�
     }
     ```
 
-2. `BigInt` 型を有効にします。有効化の方法については、[Kotlin の `Long` 型を表現するために `BigInt` 型を使用する](#kotlin-の-long-型を表現するために-bigint-型を使用する)を参照してください。
+2. `BigInt` 型を有効にします。有効化の方法については、[Kotlin の `Long` 型を表現するために `BigInt` 型を使用する](#use-bigint-type-to-represent-kotlin-s-long-type)を参照してください。
 
 ### Kotlin の `LongArray` 型を表現するために `BigInt64Array` 型を使用する {id="use-bigint64array-type-to-represent-kotlin-s-longarray-type"}
 <primary-label ref="experimental-general"/>
@@ -365,7 +365,7 @@ Kotlin の型が JavaScript の型にどのようにマッピングされるか�
 |------------------------------------------------------------------|---------------------------|---------------------------------------------------------------------------------------------------------|
 | `Byte`, `Short`, `Int`, `Float`, `Double`                        | `Number`                  |                                                                                                         |
 | `Char`                                                           | `Number`                  | 数値は文字コードを表します。                                                             |
-| `Long`                                                           | `BigInt`                  | [`-Xes-long-as-bigint` コンパイラオプション](compiler-reference.md#xes-long-as-bigint)の設定が必要です。 |
+| `Long`                                                           | `BigInt`                  | [`target = "es2020"` を設定するか](js-project-setup.md#set-an-ecmascript-target)、[`-Xes-long-as-bigint` コンパイラオプション](compiler-reference.md#xes-long-as-bigint)を設定します。 |
 | `Boolean`                                                        | `Boolean`                 |                                                                                                         |
 | `String`                                                         | `String`                  |                                                                                                         |
 | `Array`                                                          | `Array`                   |                                                                                                         |
@@ -375,16 +375,16 @@ Kotlin の型が JavaScript の型にどのようにマッピングされるか�
 | `CharArray`                                                      | `UInt16Array`             | `$type$ == "CharArray"` というプロパティを持ちます。                                                           |
 | `FloatArray`                                                     | `Float32Array`            |                                                                                                         |
 | `DoubleArray`                                                    | `Float64Array`            |                                                                                                         |
-| `LongArray`                                                      | `BigInt64Array`           |                                                                                                         |
+| `LongArray`                                                      | `BigInt64Array`           | [`target = "es2020"` を設定するか](js-project-setup.md#set-an-ecmascript-target)、[`-Xes-long-as-bigint` コンパイラオプション](compiler-reference.md#xes-long-as-bigint)を設定します。 |
 | `BooleanArray`                                                   | `Int8Array`               | `$type$ == "BooleanArray"` というプロパティを持ちます。                                                        |
 | `List`, `MutableList`                                            | `KtList`, `KtMutableList` | `KtList.asJsReadonlyArrayView` または `KtMutableList.asJsArrayView` を介して `Array` を公開します。                 |
 | `Map`, `MutableMap`                                              | `KtMap`, `KtMutableMap`   | `KtMap.asJsReadonlyMapView` または `KtMutableMap.asJsMapView` を介して ES2015 の `Map` を公開します。                  |
 | `Set`, `MutableSet`                                              | `KtSet`, `KtMutableSet`   | `KtSet.asJsReadonlySetView` または `KtMutableSet.asJsSetView` を介して ES2015 の `Set` を公開します。                  |
-| `Unit`                                                           | Undefined                 | 戻り値の型として使用される場合はエクスポート可能ですが、パラメータの型として使用される場合はエクスポートできません。                               |
+| `Unit`                                                           | `undefined`               | 戻り値の型として使用される場合はエクスポート可能ですが、パラメータの型として使用される場合はエクスポートできません。                               |
 | `Any`                                                            | `Object`                  |                                                                                                         |
 | `Throwable`                                                      | `Error`                   |                                                                                                         |
 | `enum class Type`                                                | `Type`                    | Enum エントリは、クラスの静的プロパティ（`Type.ENTRY`）として公開されます。                                     |
-| Nullable `Type?`                                                 | `Type                     | null                                                                                                    | undefined` |                                                                                            |
+| Nullable `Type?`                                                 | `Type`、`null`、または `undefined` |                                                                                            |
 | `@JsExport` が付いていないその他のすべての Kotlin 型 | サポートされていません             | Kotlin の [符号なし整数型](unsigned-integer-types.md)を含みます。                                  |
 
 さらに、以下の点を知っておくことが重要です：

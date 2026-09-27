@@ -10,18 +10,16 @@ _[發佈日期：%kotlinEapReleaseDate%](eap.md#build-details)_
 
 > 本文件並未涵蓋早期體驗預覽 (EAP) 發佈版的所有功能，但重點介紹了一些重大改進。
 >
-> 請參閱 [GitHub 變更日誌](https://github.com/JetBrains/kotlin/releases/tag/v%kotlinEapVersion%) 中的完整變更列表。
+> 請參閱 [GitHub 變更記錄](https://github.com/JetBrains/kotlin/releases/tag/v%kotlinEapVersion%) 中的完整變更清單。
 >
 {style="note"}
 
 Kotlin %kotlinEapVersion% 版本已發佈！以下是此 EAP 版本的一些詳細資訊：
 
-* **標準函式庫**：[支援協同程式堆疊追蹤恢復，以及用於檢查集合元素相等性和唯一性的新功能](#standard-library)
-* **Kotlin/Native**：[新的 Swift 匯出功能，以及為 SwiftPM 相依性自動產生的 `Package.swift` 檔案](#kotlin-native)
-* **Kotlin/Wasm**：[針對 `@JsFun` 宣告中頂層 `require()` 呼叫的變更、改進的伴隨物件初始化順序，以及 Kotlin Gradle 外掛程式對 Wasmtime 的支援](#kotlin-wasm)
-* **Kotlin/JS**：[用於瀏覽器測試的新 DSL，以及支援將 suspend lambda 匯出為 async 函式](#kotlin-js)
-* **建置工具 API**：[支援新目標：Kotlin/JS、Kotlin/Wasm 以及 Kotlin 元資料](#build-tools-api)
-* **Kotlin 編譯器**：[原生映像（native image）的實驗性發佈版本](#kotlin-compiler-native-image)
+* **語言**：[`only-syntax` 模式下穩定的基於名稱的解構](#stable-language-features)以及[新的實驗性伴隨擴充與伴隨區塊](#companion-extensions-and-blocks)
+* **標準函式庫**：[用於簡化 `if` 運算式常見模式的新實驗性函式](#standard-library-new-functions-for-simplifying-common-patterns-with-if-expressions)
+* **Kotlin/JS**：[支援 `es2020` 目標](#kotlin-js-support-for-the-es2020-target)
+* **Kotlin 編譯器**：[在 `.klib` 編譯期間更一致的 inline 函式行為](#consistent-cross-module-function-inlining-during-klib-compilation)<!--and a [new experimental compilation scheme for Kotlin Multiplatform]().-->
 
 > 有關 Kotlin 發佈週期的資訊，請參閱 [Kotlin 發佈程序](releases.md)。
 >
@@ -33,489 +31,210 @@ Kotlin %kotlinEapVersion% 版本已發佈！以下是此 EAP 版本的一些詳�
 
 若要更新到新的 Kotlin 版本，請確保您的 IDE 已更新至最新版本，並在建置指令碼中[將 Kotlin 版本更改](releases.md#update-to-a-new-kotlin-version)為 %kotlinEapVersion%。
 
-## 新功能 {id=new-experimental-features}
-<primary-label ref="experimental-exp"/>
+## 語言 {id="language"}
 
-此版本提供以下預覽版（pre-stable）功能。這包括具有 [Beta](components-stability.md#stability-levels-explained)、[Alpha](components-stability.md#stability-levels-explained) 和 [實驗性](components-stability.md#stability-levels-explained) 狀態的功能：
+Kotlin %kotlinEapVersion% 穩定了在先前版本中引入的兩個語言特性。它還引入了實驗性的伴隨擴充（companion extensions）和伴隨區塊（companion blocks）。
 
-* [標準函式庫：支援協同程式堆疊追蹤恢復](#support-for-coroutine-stack-trace-recovery)
-* [標準函式庫：用於檢查集合元素相等性和唯一性的新函式](#new-functions-to-check-collection-elements-for-equality-and-uniqueness)
-* [Kotlin/JS：用於瀏覽器測試的新 DSL](#a-new-dsl-for-browser-testing)
-* [建置工具 API：支援 Kotlin/JS、Kotlin/Wasm 和 Kotlin 元資料](#build-tools-api)
-* [Kotlin 編譯器：獨立的 Kotlin 編譯器映像](#kotlin-compiler-native-image)
+### 穩定的語言特性 {id="stable-language-features"}
 
-## 標準函式庫 {id="standard-library"}
+<secondary-label ref="language"/>
 
-Kotlin %kotlinEapVersion% 新增了對協同程式堆疊追蹤恢復的支援，並引入了用於檢查集合元素相等性和唯一性的新函式。
+Kotlin 2.3.20 和 2.4.0 引入了一些處於[實驗性](components-stability.md#stability-levels-explained)階段的語言特性。我們很高興地宣布，以下語言特性在此版本中已達到[穩定](components-stability.md#stability-levels-explained)狀態：
 
-### 支援協同程式堆疊追蹤恢復 {id="support-for-coroutine-stack-trace-recovery"}
+* `only-syntax` 模式下的[基於名稱的解構](destructuring-declarations.md#name-based-destructuring)。
+
+  在此模式下，「舊的」解構語法 `val (x, y)` 保持其基於位置的行為，而「新的」語法 `(val x, val y)` 則執行基於名稱的解構。
+
+* [改進的編譯期常數](whatsnew24.md#improved-compile-time-constants)。
+
+### 伴隨擴充與伴隨區塊 {id="companion-extensions-and-blocks"}
+
 <primary-label ref="experimental-opt-in"/>
-<secondary-label ref="standard-library"/>
 
-Kotlin %kotlinEapVersion% 在標準函式庫中新增了 `StackTraceRecoverable` 介面。這改進了與 `kotlinx.coroutines` 程式庫的整合，因為它讓您可以定義如何為堆疊追蹤恢復建立新的例外執行個體，而無需增加對 `kotlinx.coroutines` 的相依性。
+<secondary-label ref="language"/>
 
-當一個協同程式拋出例外，而另一個協同程式重新拋出它時，堆疊追蹤恢復有助於偵錯。它讓您可以查看例外的源頭以及另一個協同程式在哪裡重新拋出它。
+Kotlin %kotlinEapVersion% 引入了伴隨擴充與伴隨區塊。
 
-`kotlinx.coroutines` 程式庫透過建立一個包含額外協同程式堆疊追蹤資訊的新例外執行個體來執行堆疊追蹤恢復。對於建構函式僅接受例外訊息、原因、兩者皆有或不含參數的例外，這會自動發生。
+先前，若要宣告可透過型別名稱存取的擴充、函式和屬性，該型別必須具有伴隨物件（companion object）。伴隨擴充與伴隨區塊移除了這項要求，並讓您可以：
 
-如果例外建構函式具有額外的必要參數（例如行號或錯誤代碼），請實作 `StackTraceRecoverable` 介面，以定義 `kotlinx.coroutines` 程式庫如何建立該例外的新執行個體。
+* 透過將 `companion` 修飾詞新增到頂層擴充中來宣告伴隨擴充，即使它所擴充的型別沒有伴隨物件也是如此。
+* 在類別或介面內的 `companion {}` 區塊中宣告函式和屬性，而無需建立物件執行個體。在支援 static 成員的平台上，編譯器會將這些宣告產生為 static 成員。因此，在 JVM 上您不需要為它們加上 `@JvmStatic` 註解。
 
-若要實作此介面，請覆寫 `copyForStackTraceRecovery()` 函式。此函式會回傳一個用於堆疊追蹤恢復的新例外執行個體，如果您不希望 `kotlinx.coroutines` 程式庫複製該例外，則回傳 `null`。
-
-> `StackTraceRecoverable` 介面在所有目標上皆可用，但 `kotlinx.coroutines` 程式庫僅在 JVM 上將其用於堆疊追蹤恢復。
->
-{style="note"}
-
-這些 API 處於[實驗性](components-stability.md#stability-levels-explained)階段，需要使用 `@OptIn(ExperimentalStdlibCoroutineSupportApi::class)` 註解進行選擇加入。
-
-以下是一個自訂例外的範例，它在為堆疊追蹤恢復建立新執行個體時會保留 `line` 屬性：
+以下是將 `UnitX` 宣告為伴隨擴充，並在伴隨區塊中宣告 `Zero` 的範例：
 
 ```kotlin
-import kotlin.coroutines.ExperimentalStdlibCoroutineSupportApi
-import kotlin.coroutines.debug.StackTraceRecoverable
+// 將 UnitX 宣告為伴隨擴充
+companion val Vector.UnitX get() = Vector(1.0, 0.0)
 
-@OptIn(ExperimentalStdlibCoroutineSupportApi::class)
-class FileEditException
-// 此實作需要一個私有建構函式
-// 以便將 cause 傳遞給 IllegalStateException 建構函式
-private constructor(
-    val line: Int,
-    private val detail: String,
-    cause: Throwable?,
-) : IllegalStateException("When editing line $line: $detail", cause),
-    // 實作 StackTraceRecoverable 以進行堆疊追蹤恢復
-    StackTraceRecoverable<FileEditException> {
-
-    constructor(line: Int, detail: String) : this(line, detail, null)
-
-    // 複製行號和訊息詳細資訊
-    override fun copyForStackTraceRecovery(): FileEditException =
-        FileEditException(line, detail, this)
+data class Vector(val x: Double, val y: Double) {
+    companion {
+        // 在伴隨區塊中宣告 Zero
+        val Zero: Vector get() = Vector(0.0, 0.0)
     }
+}
 
 fun main() {
-    val original = FileEditException(15, "Unexpected token")
+    println(Vector.UnitX)
+    // Vector(x=1.0, y=0.0)
     
-    // 通常情況下，您不需要直接呼叫此函式，除非您正在測試其行為
-    // kotlinx.coroutines 程式庫會在堆疊追蹤恢復期間自動叫用它
-    val copy = original.copyForStackTraceRecovery()
-
-    println(copy.message)
-    // When editing line 15: Unexpected token
-
-    println(copy.cause == original)
-    // true
+    println(Vector.Zero)
+    // Vector(x=0.0, y=0.0)
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="2.4.20-Beta2"}
 
-如需更多資訊，請參閱該功能的 [KEEP](https://github.com/Kotlin/KEEP/blob/main/proposals/stdlib/KEEP-0461-stacktrace-recoverable.md)。
+如需有關此設計的更多資訊，請參閱該特性的 [KEEP](https://github.com/Kotlin/KEEP/blob/main/proposals/KEEP-0449-companions-block-extension.md)。
 
-我們歡迎您在 [YouTrack](https://youtrack.jetbrains.com/issue/KT-86595) 中向我們提供回饋。
+伴隨擴充與伴隨區塊處於[實驗性](components-stability.md#stability-levels-explained)階段。若要選擇加入，請將以下編譯器選項新增至您的建置檔案中：
 
-### 用於檢查集合元素相等性和唯一性的新函式 {id="new-functions-to-check-collection-elements-for-equality-and-uniqueness"}
+<tabs group="build-system">
+<tab title="Gradle" group-key="gradle">
+
+```kotlin
+kotlin {
+    compilerOptions {
+        freeCompilerArgs.add("-Xcompanion-blocks-and-extensions")
+    }
+}
+```
+
+</tab>
+<tab title="Maven" group-key="maven">
+
+```xml
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-maven-plugin</artifactId>
+            <configuration>
+                <args>
+                    <arg>-Xcompanion-blocks-and-extensions</arg>
+                </args>
+            </configuration>
+        </plugin>
+    </plugins>
+</build>
+```
+
+</tab>
+</tabs>
+
+我們歡迎您在 [YouTrack](https://youtrack.jetbrains.com/issue/KT-11968) 中向我們提供回饋。
+
+## 標準函式庫：用於簡化 `if` 運算式常見模式的新函式 {id="standard-library-new-functions-for-simplifying-common-patterns-with-if-expressions"}
+
 <primary-label ref="experimental-opt-in"/>
 <secondary-label ref="standard-library"/>
 
-在 Kotlin %kotlinEapVersion% 之前，如果您想檢查集合元素是否全部不同或全部相等，必須使用效率較低的程式碼模式。
+Kotlin %kotlinEapVersion% 引入了新的標準函式庫函式，讓您可以在回傳 `Boolean` 值之前先檢查該值，或根據該值回傳可為 null 的結果。
 
-Kotlin %kotlinEapVersion% 引入了實驗性函式來填補這一空白：
+先前，這些模式需要使用帶有 `else` 分支的明確 `if` 運算式。現在您可以使用以下函式來簡化它們：
 
-| 函式 | 檢查內容 |
-|--------------------|------------------------------------------------------------|
-| `.allDistinct()` | 集合中的每個值都是唯一的。 |
-| `.allDistinctBy()` | 每個物件在選定的屬性上都具有唯一值。 |
-| `.allEqual()` | 集合中的每個值都相同。 |
-| `.allEqualBy()` | 每個物件在選定的屬性上都具有相同的值。 |
+* `onTrue()`：當 `Boolean` 值為 `true` 時執行指定的程式碼區塊，並回傳原始的 Boolean 值。
+* `onFalse()`：當 `Boolean` 值為 `false` 時執行指定的程式碼區塊，並回傳原始的 Boolean 值。
+* `ifOrNull()`：當 `Boolean` 值為 `true` 時執行指定的程式碼區塊並回傳其結果。如果值為 `false`，該函式會回傳 `null` 且不執行該區塊。
 
-您可以在集合、序列和陣列上使用這些函式。它們使用結構相等性來比較元素，就像其他集合操作一樣。
+這些函式處於[實驗性](components-stability.md#stability-levels-explained)階段，需要使用 `@OptIn(ExperimentalStdlibApi::class)` 註解或 `-opt-in=kotlin.ExperimentalStdlibApi` 編譯器選項進行選擇加入。
 
-這些函式處於[實驗性](components-stability.md#stability-levels-explained)階段，需要使用 `@OptIn(ExperimentalStdlibApi::class)` 註解或 `-opt-in=kotlin.ExperimentalStdlibApi` 編譯器選項進行選擇加入：
+以下為範例：
 
 ```kotlin
 @OptIn(ExperimentalStdlibApi::class)
 fun main() {
-    data class Response(
-        val participantId: String,
-        val answer: String,
-        val responseDate: String
-    )
-
-    val responses = listOf(
-        Response("P001", "Yes", "2026-07-21"),
-        Response("P002", "Maybe", "2026-07-21"),
-        Response("P003", "No", "2026-07-21")
-    )
-
-    // 檢查是否所有參與者都給出了相同的答案
-    println(responses.allEqualBy { it.answer })
-    // false
-
-    // 檢查重複的參與者
-    println(responses.allDistinctBy { it.participantId })
-    // true
-
-    // 檢查是否所有回應都在同一日期提交
-    println(responses.allEqualBy { it.responseDate })
-    // true
-
-    val answers = responses.map { it.answer }
-
-    // 檢查答案是否相同
-    println(answers.allEqual())
-    // false
-
-    // 檢查答案是否各不相同
-    println(answers.allDistinct())
-    // true
-}
-```
-
-我們歡迎您在 [YouTrack](https://youtrack.jetbrains.com/issue/KT-30270) 中分享您使用這些函式的體驗回饋。
-
-## Kotlin/Native {id="kotlin-native"}
-
-Kotlin %kotlinEapVersion% 帶來了新的 Swift 匯出功能（包括對密封類別和跨語言繼承的支援），以及為 SwiftPM 相依性自動產生的 `Package.swift` 檔案。
-
-### 新的 Swift 匯出功能 {id="new-swift-export-features"}
-<secondary-label ref="native"/>
-
-#### 密封類別 {id="sealed-classes"}
-
-Kotlin %kotlinEapVersion% 在 Swift 匯出中新增了對密封類別（sealed classes）和介面的支援。
-
-先前，您必須為密封型別的每個 `switch` 陳述式編寫一個 `default` 情況。現在，在 Kotlin 中定義的密封階層結構會對應到 Swift 列舉（enums），從而在 Xcode 中實現具有完整自動補全功能的窮舉 `switch` 陳述式。
-
-Swift 匯出會在每個密封型別上產生一個 `.sealedType()` 方法。此方法會回傳一個 Swift 列舉，其成員與密封階層的直接子類別相符。您可以巢狀呼叫這些方法來匹配更深層的階層結構。
-
-例如，在 Kotlin 中宣告一個具有類別階層的密封介面：
-
-```kotlin
-// Kotlin
-sealed interface Shape
-
-class Circle : Shape {
-   override fun toString(): String = "Circle"
-}
-
-class Rectangle : Shape {
-   override fun toString(): String = "Rectangle"
-}
-
-fun createCircle(): Shape = Circle()
-```
-
-在 Swift 端，您可以使用窮舉 `switch` 而無需 `default` 情況：
-
-```swift
-// Swift
-let shape = createCircle()
-
-let name = switch shape.sealedType() {
-   case let .circle(type): "It's a \(type.value)"
-   case let .rectangle(type): "It's a \(type.value)"
-}
-// name == "It's a Circle"
-```
-
-由於 `switch` 是窮舉的，如果密封階層中新增了新的子類別，編譯器會警告您，以便您可以立即處理它，而不需要依賴 `default` 情況。
-
-#### Swift 匯出中的跨語言繼承 {id="cross-language-inheritance-in-swift-export"}
-
-Kotlin %kotlinEapVersion% 在 Swift 匯出中引入了跨語言繼承支援。
-
-此功能的一個常見使用案例是[反向匯入](native-lib-import-stability.md#swift-library-import)模式，即您在 Kotlin 中定義合約，並在 Swift 端提供平台特定的實作。
-當您需要使用無法直接匯入 Kotlin 的純 Swift 程式庫時，這特別有用。
-
-若要實作此模式，請宣告一個供 Swift 實作繼承的 Kotlin `open` 基底類別以及一個 Kotlin 介面。然後在 Swift 中實作該介面，並將 Swift 物件傳遞給接受該介面的 Kotlin 函式。例如，針對 CryptoKit 程式庫：
-
-1. 在 Kotlin 端，宣告一個 `open` 基底類別以及一個 Kotlin 介面，並包含一個接受它的函式：
-
-   ```kotlin
-   // Kotlin
-   interface CryptoProvider {
-      fun hashMD5(input: String): String
-   }
-
-   fun processHash(provider: CryptoProvider, input: String): String = provider.hashMD5(input)
-
-   open class SwiftBase 
-   ```
-
-2. 在 Swift 端，繼承自匯出的 `SwiftBase` 類別，使用純 Swift 程式庫實作該介面，並將物件傳回 Kotlin：
-
-   ```swift
-   // Swift
-   import CryptoKit
-
-   final class IosCryptoProvider: SwiftBase, CryptoProvider {
-      func hashMD5(input: String) -> String {
-          guard let data = input.data(using: .utf8) else { return "failed" }
-          return Insecure.MD5.hash(data: data).description
-      }
-   }
-
-   let provider = IosCryptoProvider()
-
-   // 呼叫被分派到 Swift 實作
-   print(processHash(provider: provider, input: "Hello, world!"))
-   ```
-
-當 Kotlin 接收到 Swift 物件時，會將其視為一般介面的實作，並執行 Swift 程式碼。
-
-如需更多關於 Swift 匯出的詳細資訊，請參閱我們的[文件](native-swift-export.md)。
-
-### 為 SwiftPM 相依性產生的 `Package.swift` {id="generated-package-swift-for-swiftpm-dependencies"}
-<secondary-label ref="native"/>
-
-匯出相依於 SwiftPM 套件的 XCFramework 時，您必須發佈生成的 SwiftPM 套件才能正確解析。為了協助此操作，`assembleSharedXCFramework` Gradle 任務現在會產生一個 `Package.swift` 檔案，以便與 XCFramework 一起散佈。
-
-如需詳細資訊，請參閱 [SwiftPM 匯出頁面](https://kotlinlang.org/docs/multiplatform/multiplatform-spm-export.html)。
-
-## Kotlin/Wasm {id="kotlin-wasm"}
-
-Kotlin %kotlinEapVersion% 更改了 Kotlin/Wasm 處理 `@JsFun` 宣告中頂層 `require()` 呼叫的方式，使伴隨物件的初始化順序與 JVM 行為一致，並在 Kotlin Gradle 外掛程式中新增了對 Wasmtime 作為 `wasmWasi` 目標執行階段的支援。
-
-### 針對 `@JsFun` 宣告中頂層 `require()` 呼叫的變更 {id="changes-to-top-level-require-calls-in-jsfun-declarations"}
-<secondary-label ref="wasm"/>
-
-當 `@JsFun` 宣告使用頂層 `require()` 函式時，Kotlin/Wasm 現在會報錯。
-
-先前，編譯器會在 `import-object.mjs` 檔案中產生一個 `require` 變數，允許 `@JsFun` 宣告呼叫 `require()`。
-
-此行為無意中洩露了編譯器的實作細節。為了支援從中遷移，Kotlin/Wasm 移除了此產生的 `require` 宣告，且編譯器現在會針對此類呼叫報錯。例如：
-
-```kotlin
-// 會報錯
-@JsFun("(mod) => require(mod)")
-external fun loadModule(mod: String): JsAny
-```
-
-為了準備應對此變更，請將 `@JsFun` 宣告中的頂層 `require()` 呼叫替換為 `@JsModule` 註解：
-
-```kotlin
-@JsModule("module")
-external val module: Module
-
-external interface Module {
-    // 定義預期的模組成員
-}
-```
-
-對於動態模組載入，請改用 `import()` 運算式。新增 `/* webpackIgnore: true */` 魔術註解以防止 webpack 解析該動態匯入：
-
-```kotlin
-@JsFun("""
-    ((module) => () => module)(
-        await import(/* webpackIgnore: true */ "module")
-    )
-""")
-private external fun loadModuleDynamically(): JsAny?
-```
-
-您也可以有條件地使用 `import()` 運算式。例如，您可以僅在 Node.js 中執行時載入模組：
-
-```kotlin
-@JsFun("""
-    ((module) => () => module)(
-        ((typeof process !== "undefined") && (process.release.name === "node"))
-            ? await import(/* webpackIgnore: true */ "module")
-            : null
-    )
-""")
-private external fun loadNodeModule(): JsAny?
-```
-
-如果您的專案相依於需要頂層 `require()` 函式的相依性，可以將其作為 `globalThis` 的屬性加入作為權宜之計：
-
-```kotlin
-@JsFun("""
-    ((module) => {
-        globalThis.require = module.default.createRequire(import.meta.url)
-        return () => {}
-    })(await import("node:module"))
-""")
-external fun defineRequire()
-```
-
-如果您遇到任何問題，請在我們的[問題追蹤器](https://youtrack.jetbrains.com/projects/KT/issues/KT-86192)分享您的回饋。
-
-### 改進的伴隨物件初始化順序 {id="improved-companion-object-initialization-order"}
-<secondary-label ref="wasm"/>
-
-Kotlin/Wasm 現在會在子類別伴隨物件之前初始化父類別伴隨物件，與 JVM 行為一致。先前，初始化順序可能會反過來，導致跨平台行為不一致。
-
-此更新改進了跨平台的一致性，並減少了平台特定的類別初始化行為差異。它還能正確處理更深層繼承階層中的伴隨物件初始化，包括中間類別未宣告伴隨物件的情況。
-
-### Kotlin Gradle 外掛程式對 Wasmtime 的支援 {id="support-for-wasmtime-in-the-kotlin-gradle-plugin"}
-<secondary-label ref="wasm"/>
-
-Kotlin %kotlinEapVersion% 引入了對 [Wasmtime](https://docs.wasmtime.dev/) 作為 Kotlin Gradle 外掛程式中 `wasmWasi` 目標執行階段的支援。
-
-先前，`wasmWasi` 目標僅支援 Node.js 執行階段，這需要 JavaScript 引導才能執行 WASI 應用程式。透過 Wasmtime 支援，您現在可以在獨立的 WebAssembly 執行階段上執行 Kotlin/Wasm 應用程式。
-
-若要使用 Wasmtime 作為 `wasmWasi` 目標的執行階段，請將 `wasmtime()` 新增到您的 Gradle 建置檔案中：
-
-```kotlin
-kotlin {
-    wasmWasi {
-        wasmtime()
+    val tags = mutableSetOf("kotlin", "jvm")
+
+    // 使用 onTrue() 函式在 add() 回傳 true 時輸出訊息
+    val added = tags.add("wasm").onTrue {
+        println("Tag added")
     }
+    println(added)
+    // Tag added
+    // true
+
+    // 使用 onFalse() 函式在 remove() 回傳 false 時輸出訊息
+    val removed = tags.remove("native").onFalse {
+        println("Tag not found")
+    }
+    println(removed)
+    // Tag not found
+    // false
+
+    // 使用 ifOrNull() 函式在 tags 中包含 "wasm" 時回傳訊息
+    val message = ifOrNull("wasm" in tags) {
+        "Wasm tag is available"
+    }
+    println(message)
+    // Wasm tag is available
 }
 ```
+{kotlin-runnable="true" kotlin-min-compiler-version="2.5.0-Beta1" validate="false"}
 
-我們歡迎您在 [YouTrack](https://youtrack.jetbrains.com/issue/KT-86633) 中向我們提供回饋。
+我們歡迎您在 [YouTrack](https://youtrack.jetbrains.com/issue/KT-6938) 中向我們提供回饋。
 
-## Kotlin/JS {id="kotlin-js"}
-
-Kotlin %kotlinEapVersion% 引入了一種新的實驗性 DSL 用於瀏覽器測試，並新增了支援將 suspend lambda 匯出為 JavaScript async 函式的功能。
-
-### 用於瀏覽器測試的新 DSL {id="a-new-dsl-for-browser-testing"}
-<primary-label ref="experimental-opt-in"/>
+## Kotlin/JS：支援 `es2020` 目標 {id="kotlin-js-support-for-the-es2020-target"}
 <secondary-label ref="js"/>
 
-Kotlin %kotlinEapVersion% 引入了一種新的實驗性 DSL，用於在瀏覽器環境中執行 Kotlin/JS 測試。
+Kotlin %kotlinEapVersion% 在 Kotlin/JS 編譯器與 Gradle 外掛程式中新增了 `es2020` 目標。先前僅提供 `es5` 和 `es2015` 目標，且對較新 JavaScript 功能（例如 `BigInt`）的支援必須在以 ES2015 為目標時單獨啟用。透過以 ES2020 為目標，您可以在無需額外設定的情況下，使用最高至 ECMAScript 2020 的所有受支援 JavaScript 功能（包括 `BigInt`）。
 
-目前，Kotlin Gradle 外掛程式使用 [Karma](https://github.com/karma-runner/karma) 作為瀏覽器啟動器，以便在不同的瀏覽器中執行 JavaScript 測試。Karma 專案已經過時 2 年了，這促使我們探索支援瀏覽器測試的替代方案。
-
-新的 DSL 旨在取代 Karma 作為底層不同工具的管理員，其內容包括：
-
-* [Mocha](https://mochajs.org/) 作為測試執行器。
-* [Webpack](https://webpack.js.org/) 作為綑綁器（在[未來版本](https://youtrack.jetbrains.com/issue/KT-48308/)中將被 [Vite](https://vite.dev/) 取代）。
-* [Playwright](https://playwright.dev/) 作為瀏覽器驅動程式和發行管理員，支援 Chromium、Firefox 和 WebKit (Safari) 瀏覽器引擎。
-
-若要嘗試新的測試 DSL，請在 Kotlin/JS 目標的 `browser{}` 區塊內新增選擇啟用的 `test{}` 區塊：
+若要啟用新目標，請在 `compilerOptions` 區塊中將 `target` 設定為 `es2020`：
 
 ```kotlin
-import org.jetbrains.kotlin.gradle.ExperimentalJsTestDsl
-import kotlin.time.Duration.Companion.seconds
-
-kotlin {
-    js {
-        browser {
-            @OptIn(ExperimentalJsTestDsl::class)
-            // 新增並設定新的 test{} 區塊
-            test {
-                // 設定所有執行器的預設逾時
-                timeout = 2.seconds
-                // 使用 Gradle 提供者設定無頭模式（headless mode）
-                headless = providers
-                    .environmentVariable("IS_IN_CI")
-                    .map { it.toBoolean() }
-                    .orElse(false)
-                // 啟用並設定 Chromium 測試執行器
-                chromium {
-                    // 覆寫通用的逾時選項
-                    timeout = 5.seconds
-                    // 新增額外的啟動參數
-                    launchArgs.add("--no-sandbox")
-                }
-                // 啟用 Firefox 測試執行器
-                firefox()
-                // 啟用 WebKit 測試執行器
-                webkit()
-                // 啟用並設定額外的 WebKit 測試執行器
-                webkit("noheadless") {
-                    // 設定自訂選項
-                    headless = false
-                }
-            }
+kotlin { 
+    js { 
+        compilerOptions { 
+            target.set("es2020") 
         }
     }
 }
 ```
 
-新的 DSL 正在積極開發中。我們歡迎您在 [YouTrack](https://youtrack.jetbrains.com/issue/KT-66897) 中向我們提供回饋。
+## Kotlin 編譯器 {id="kotlin-compiler"}
 
-### 支援將 suspend lambda 匯出為 async 函式 {id="support-for-exporting-suspending-lambdas-as-async-functions"}
-<secondary-label ref="js"/>
+Kotlin %kotlinEapVersion% 為 `.klib` 編譯期間的函式 inlining 帶來了更多改進，並帶來了諸如改進型別推論效能等實驗性功能<!-- and a new compilation scheme for Kotlin Multiplatform -->。
 
-在 Kotlin %kotlinEapVersion% 中，您現在可以將 suspend [Lambda 運算式](lambdas.md#lambda-expressions-and-anonymous-functions)匯出為 JavaScript `async` 函式。
+### klib 編譯期間一致的跨模組函式 inlining {id="consistent-cross-module-function-inlining-during-klib-compilation"}
 
-先前，無法從 Kotlin/JS 程式庫中匯出包含 suspend lambda 的宣告。現在 Kotlin 編譯器會自動處理 Kotlin 的 `suspend` 函式與原生 JavaScript 的 [`async`/`await`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function) 模型之間的橋接，這對於混合 Kotlin/TypeScript 的程式碼庫非常有用。
-
-若要啟用此功能，請在您的 `build.gradle.kts` 檔案中新增以下編譯器選項：
-
-```kotlin
-kotlin {
-    js {
-        compilations.all {
-            compileTaskProvider.configure {
-                compilerOptions {
-                    freeCompilerArgs.add("-Xsuspend-lambda-exporting")
-                }
-            }
-        }
-    }
-}
-```
-
-然後，使用 `@JsExport` 標記相關宣告：
-
-```kotlin
-// Kotlin
-@JsExport
-class TaskRunner {
-    suspend fun runTask(task: suspend () -> String): String {
-        return task()
-    }
-}
-```
-
-在 TypeScript 端，suspend lambda 會顯示為一般的 `async` 函式：
-
-```typescript
-// TypeScript
-import { TaskRunner } from "..."
-
-const runner = new TaskRunner();
-const result = await runner.runTask(async () => "done");
-console.log(result); // "done"
-```
-
-如需更多關於 `@JsExport` 註解的資訊，請參閱[我們的文件](js-to-kotlin-interop.md#jsexport-annotation)。
-
-## 建置工具 API {id="build-tools-api"}
-
-### 支援 Kotlin/JS、Kotlin/Wasm 以及 Kotlin 元資料 {id="support-for-kotlin-js-kotlin-wasm-and-kotlin-metadata"}
-<primary-label ref="experimental-general"/>
-<secondary-label ref="bta"/>
-
-在 [Kotlin 2.2.0](whatsnew22.md#new-experimental-build-tools-api) 中，建置工具 API (BTA) 已可用於 Kotlin/JVM。Kotlin %kotlinEapVersion% 邁出了 BTA 穩定化的下一步，新增了對新目標的支援：Kotlin/JS、Kotlin/Wasm 以及 Kotlin 元資料。
-
-這使得 Kotlin Gradle 外掛程式與編譯器的互動更加一致。在某些情況下，您還可以受益於更快、更穩定的編譯。
-
-BTA 是一個通用 API，充當建置系統與 Kotlin 編譯器生態系統之間的抽象層。它有助於在現有的建置工具中支援 Kotlin 功能以及與 Kotlin 編譯器的相容性。
-
-在 Kotlin %kotlinEapVersion% 中，BTA 在新目標中作為選擇加入功能提供。若要嘗試，請在您的 `gradle.properties` 檔案中設定對應屬性：
-
-```properties
-kotlin.wasm.runViaBuildToolsApi=true
-kotlin.js.runViaBuildToolsApi=true
-kotlin.metadata.runViaBuildToolsApi=true
-```
-
-從 Kotlin 2.5.0 開始，我們計劃在 Kotlin/JS、Kotlin/Wasm 和 Kotlin 元資料中預設啟用 BTA。
-
-如果您對 BTA 提案感興趣或想分享您的回饋，請參閱此 [KEEP](https://github.com/Kotlin/KEEP/blob/build-tools-api/proposals/extensions/build-tools-api.md)。
-
-## Kotlin 編譯器：原生映像 {id="kotlin-compiler-native-image"}
-<primary-label ref="experimental-general"/>
 <secondary-label ref="compiler"/>
 
-Kotlin %kotlinEapVersion% 推出了 Kotlin 編譯器原生映像（native image）的第一個[實驗性](components-stability.md#stability-levels-explained)版本。原生映像提供了標準 `kotlinc` 命令列工具的直接替代方案，同時提供更快的啟動時間和更高的效能。
+Kotlin 2.4.0 在 `.klib` 編譯期間啟用了 [Kotlin/Native、Kotlin/JS 和 Kotlin/Wasm 上一致的模組內函式 inlining](whatsnew24.md#consistent-intra-module-function-inlining-during-klib-compilation)。跨不同 Kotlin 平台之函式 inlining 的一致性使得提供相容性保證變得更容易。
 
-若要嘗試原生映像，請從 [GitHub Releases](https://github.com/JetBrains/kotlin/releases/tag/v%kotlinEapVersion%) 下載組建。
+Kotlin 2.4.0 還引入了在 `.klib` 編譯期間啟用**跨模組** inlining 的可能性，以確保專案中的所有 inline 函式都能一致地進行 inline 處理。Kotlin %kotlinEapVersion% 預設啟用跨模組 inlining。
 
-原生映像還捆綁了以下編譯器外掛程式，您可以透過 `-Xplugin` 或 `-Xcompiler-plugin` CLI 選項使用它們：
+如果您遇到此功能的非預期問題，可以使用以下命令列編譯器選項將其停用：
 
-* [Serialization](serialization.md)
-* [Compose 編譯器](compose-compiler-options.md)
-* [All-open](all-open-plugin.md)
-* [`no-arg`](no-arg-plugin.md)
-* [SAM with receiver](sam-with-receiver-plugin.md)
-* [Assignment](https://plugins.gradle.org/plugin/org.jetbrains.kotlin.plugin.assignment)
-* [Lombok](lombok.md)
-* [Power-assert](power-assert.md)
+```bash
+-Xklib-ir-inliner=disabled
+```
 
-如需更多關於 Kotlin 編譯器原生映像的資訊，請參閱其 [README](https://github.com/JetBrains/kotlin/blob/master/prepare/compiler-native-image/README.md)。
+請在 [YouTrack](https://kotl.in/issue) 中分享您的回饋並回報任何問題。
+
+### 改進的型別推論效能 {id="improved-type-inference-performance"}
+
+<primary-label ref="experimental-opt-in"/>
+
+<secondary-label ref="compiler"/>
+
+Kotlin %kotlinEapVersion% 透過減少型別推論期間產生的約束數量來提高編譯器效能。先前，複雜的泛型程式碼可能會產生過多的約束，導致編譯或 IDE 分析卡住無回應。此變更可能會影響某些邊緣情況下的型別推論，尤其是涉及建構器推論（builder inference）或具有非典型邊界的複雜平台型別的情況。因此，編譯器可能會推論出不同的型別、選擇不同的多載，或回報不同的診斷資訊。這些差異可能是此改進的預期結果。
+
+此功能預設為啟用。若要還原先前的型別推論行為，請使用 `-XXLanguage:-EliminateSecondKindIncorporation` 選項。
+
+我們歡迎您在 [YouTrack](https://youtrack.jetbrains.com/issue/KT-85879) 中向我們提供回饋。
+
+<!--
+### New experimental compilation scheme for Kotlin Multiplatform {id="new-experimental-compilation-scheme-for-kotlin-multiplatform"}
+
+<primary-label ref="experimental-opt-in"/>
+
+<secondary-label ref="compiler"/>
+
+Kotlin %kotlinEapVersion% introduces a new experimental compilation scheme for Kotlin Multiplatform (KMP) that makes the
+compiler handle common source sets more consistently with the IDE. This change prevents common code from accidentally
+resolving to platform-specific declarations, improves consistency in overload resolution and type inference, and enables
+incremental compilation for common source sets. Learn more about KMP separate compilation and how to try it in our [blog post](TBD).
+-->
+
+## 破壞性變更與棄用 {id="breaking-changes-and-deprecations"}
+
+Kotlin %kotlinEapVersion% 引入了一項警告，作為將執行 Kotlin 編譯器所需的最低 JDK 版本從 JDK 8 提升至 JDK 17 的第一步。我們提升最低要求的 JDK 版本，以加快開發速度，並讓編譯器能夠使用需要較新 Java 版本的新程式庫。JDK 17 具有較長的支援週期，並有助於我們保持與較新版本 Gradle 和 Maven 的相容性。您可以使用 `-Xallow-pre-17-runtime-jdk` 編譯器選項來選擇不接收此警告。當 JDK 17 成為強制要求時，此選項將在 Kotlin 2.5.20 或 2.6.0 中移除。
+
+如果您在升級專案時遇到困難，請在 [YouTrack](https://kotl.in/issue) 上分享您的經驗，或直接在 Kotlin Slack 上聯絡開發人員。[獲取邀請](https://surveys.jetbrains.com/s3/kotlin-slack-sign-up?_gl=1*ju6cbn*_ga*MTA3MTk5NDkzMC4xNjQ2MDY3MDU4*_ga_9J976DJZ68*MTY1ODMzNzA3OS4xMDAuMS4xNjU4MzQwODEwLjYw)並加入 [#compiler](https://kotlinlang.slack.com/archives/C7L3JB43G) 頻道。

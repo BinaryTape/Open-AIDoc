@@ -83,8 +83,8 @@ maven("https://redirector.kotlinlang.org/maven/compose-dev")
 
 | Compose Multiplatform 版本 | Jetpack Compose 版本 |
 |-----------------------------------------------------------------------------------|-------------------------|
-| [1.12.0](https://github.com/JetBrains/compose-multiplatform/releases/tag/v1.12.0) | 1.12.0                  |
-| [1.11.1](https://github.com/JetBrains/compose-multiplatform/releases/tag/v1.11.0) | 1.11.2                  |
+| [1.12.1](https://github.com/JetBrains/compose-multiplatform/releases/tag/v1.12.1) | 1.12.1                  |
+| [1.11.1](https://github.com/JetBrains/compose-multiplatform/releases/tag/v1.11.1) | 1.11.2                  |
 | [1.10.3](https://github.com/JetBrains/compose-multiplatform/releases/tag/v1.10.3) | 1.10.5                  |
 | [1.9.3](https://github.com/JetBrains/compose-multiplatform/releases/tag/v1.9.3)   | 1.9.4                   |
 | [1.8.2](https://github.com/JetBrains/compose-multiplatform/releases/tag/v1.8.2)   | 1.8.2                   |

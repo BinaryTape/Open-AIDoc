@@ -38,7 +38,7 @@ kotlin {
 `kotlin {}`ブロック内では、以下の側面を管理できます。
 
 * [ターゲット実行環境](#execution-environments): ブラウザまたはNode.js 
-* [ES2015機能のサポート](#support-for-es2015-features): クラス、モジュール、ジェネレーター
+* [ECMAScriptターゲットの設定](#set-an-ecmascript-target): ES5、ES2015、またはES2020
 * [出力の粒度の設定](#configure-output-granularity)
 * [TypeScript宣言ファイルの生成](#generation-of-typescript-declaration-files-d-ts)
 * [プロジェクトの依存関係](#dependencies): Mavenおよびnpm
@@ -75,26 +75,29 @@ kotlin {
 
 Kotlin Multiplatformプラグインは、選択した環境で動作するようにタスクを自動的に構成します。これには、アプリケーションの実行とテストに必要な環境と依存関係のダウンロードとインストールが含まれます。これにより、開発者は追加の構成なしでシンプルなプロジェクトをビルド、実行、およびテストできます。既存のインストールを使用するオプションもあります。[プリインストールされたNode.jsの使用](#use-pre-installed-node-js)方法を確認してください。
 
-## ES2015機能のサポート {id="support-for-es2015-features"}
+## ECMAScriptターゲットの設定 {id="set-an-ecmascript-target"}
 
-Kotlinは、以下を含むES2015機能のサポートを提供しています。
+Kotlin/JSは、ECMAScript標準のES5、ES2015、およびES2020バージョン用のJavaScriptを生成できます。ターゲット環境でサポートされている最新のバージョンを選択してください。
 
-* モジュール：コードベースを簡素化し、メンテナンス性を向上させます。
-* クラス：OOPの原則を取り入れることができ、よりクリーンで直感的なコードになります。
-* ジェネレーター：[サスペンド関数](https://kotlinlang.org/docs/composing-suspending-functions.html)のコンパイルに使用され、最終的なバンドルサイズを改善し、デバッグを容易にします。
-* [JavaScriptコードのインライン化](js-interop.md#inline-javascript)。
+* `es5`は古いJavaScript環境との互換性を提供し、デフォルトのターゲットです。
+* `es2015`は、以下を含むES2015機能のサポートを有効にします。
+    * モジュール：コードベースを簡素化し、メンテナンス性を向上させます。
+    * クラス：OOPの原則を取り入れることができ、よりクリーンで直感的なコードになります。
+    * ジェネレーター：[サスペンド関数](https://kotlinlang.org/docs/composing-suspending-functions.html)のコンパイルに使用され、最終的なバンドルサイズを改善し、デバッグを容易にします。
+    * [JavaScriptコードのインライン化](js-interop.md#inline-javascript)。
+* `es2020`にはサポートされているすべてのES2015機能が含まれており、コンパイラが生成されたJavaScriptコードでECMAScript 2020機能を使用できるようにします。例えば、Kotlinの`Long`値をJavaScriptの`BigInt`値にコンパイルします。
 
-`build.gradle(.kts)`ファイルに`es2015`コンパイルターゲットを追加することで、サポートされているすべてのES2015機能を一度に有効にできます。
+ECMAScriptターゲットを構成するには、`build.gradle(.kts)`ファイルで`target`プロパティを設定します。例えば、ES2020をターゲットにするには以下のようにします。
 
 ```kotlin
 tasks.withType<KotlinJsCompile>().configureEach {
     compilerOptions {
-        target = "es2015"
+        target = "es2020"
     }
 }
 ```
 
-[ES2015 (ECMAScript 2015, ES6) の詳細については、公式ドキュメントを参照してください](https://262.ecma-international.org/6.0/)。
+[ES5](https://262.ecma-international.org/5.1/)、[ES2015](https://262.ecma-international.org/6.0/)、および[ES2020](https://262.ecma-international.org/11.0/)標準の詳細を確認してください。
 
 ## 出力の粒度の設定 {id="configure-output-granularity"}
 
@@ -108,7 +111,7 @@ tasks.withType<KotlinJsCompile>().configureEach {
   ```
 
 * **ファイルごとに1つ（One per file）**。Kotlinファイルごとに1つ（ファイルにエクスポートされた宣言が含まれている場合は2つ）のJavaScriptファイルを生成する、よりきめ細かい出力を設定できます。ファイルごとのコンパイルモードを有効にするには：
-  1. プロジェクトでES2015機能をサポートするために、`es2015`を[コンパイルターゲット](#support-for-es2015-features)として設定します。
+  1. プロジェクトでES2015機能をサポートするために、`es2015`または`es2020`を[コンパイルターゲット](#set-an-ecmascript-target)として設定します。
   2. `gradle.properties`ファイルに以下の行を追加します。
      ```none
      kotlin.js.ir.output.granularity=per-file // デフォルトは 'per-module'
@@ -475,7 +478,7 @@ kotlin {
 
 最も一般的なwebpackの調整は、Gradleビルドファイルの`kotlin.js.browser.webpackTask {}`構成ブロックを介して直接行うことができます。
 * `mainOutputFileName` - webpack出力ファイルの名前。webpackタスクの実行後、`<projectDir>/build/kotlin-webpack/<targetName>/<binaryName>`に生成されます。デフォルト値はプロジェクト名です。
-* `output.libraryTarget` - webpack出力のモジュールシステム。 [Kotlin/JSプロジェクトで利用可能なモジュールシステム](js-modules.md)の詳細を確認してください。デフォルト値は`umd`です。
+* `output.libraryTarget` - webpack出力のモジュールシステム。[Kotlin/JSプロジェクトで利用可能なモジュールシステム](js-modules.md)の詳細を確認してください。デフォルト値は`umd`です。
   
 ```groovy
 webpackTask {
@@ -513,7 +516,7 @@ webpackを通じて実行可能なJavaScriptアーティファクトをビルド
 * `jsBrowserDevelopmentWebpack`は開発用アーティファクトを作成します。これらはサイズは大きいですが、作成にかかる時間は短いです。そのため、活発な開発中には`jsBrowserDevelopmentWebpack`タスクを使用してください。
 * `jsBrowserProductionWebpack`は、生成されたアーティファクトにデッドコード削除（Dead Code Elimination）を適用し、結果のJavaScriptファイルを最小化（minify）します。これには時間がかかりますが、サイズがより小さい実行可能ファイルが生成されます。そのため、本番環境での使用に向けてプロジェクトを準備する際には`jsBrowserProductionWebpack`タスクを使用してください。
  
- 開発用または本番用のそれぞれのアーティファクトを取得するには、これらのタスクのいずれかを実行します。生成されたファイルは、[別途指定](#distribution-target-directory)しない限り、`build/kotlin-webpack`で利用可能になります。
+開発用または本番用のそれぞれのアーティファクトを取得するには、これらのタスクのいずれかを実行します。生成されたファイルは、[別途指定](#distribution-target-directory)しない限り、`build/kotlin-webpack`で利用可能になります。
 
 ```bash
 ./gradlew jsBrowserProductionWebpack
@@ -808,7 +811,7 @@ rootProject.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlu
 Kotlin/JSは、`yarn.lock`ファイルが更新された場合に通知するGradle設定を提供しています。CIビルドプロセス中に`yarn.lock`が密かに変更された場合に通知を受け取りたいときに、これらの設定を使用できます。
 
 * `YarnLockMismatchReport`：`yarn.lock`ファイルへの変更をどのように報告するかを指定します。以下のいずれかの値を使用できます。
-    * `FAIL`：対応する Gradle タスクを失敗させます。これがデフォルトです。
+    * `FAIL`：対応するGradleタスクを失敗させます。これがデフォルトです。
     * `WARNING`：変更に関する情報を警告ログに書き込みます。
     * `NONE`：報告を無効にします。
 * `reportNewYarnLock`：新しく作成された`yarn.lock`ファイルについて明示的に報告します。デフォルトでは、このオプションは無効になっています。初回起動時に新しい`yarn.lock`ファイルを生成するのが一般的だからです。このオプションを使用して、ファイルがリポジトリにコミットされていることを確認できます。

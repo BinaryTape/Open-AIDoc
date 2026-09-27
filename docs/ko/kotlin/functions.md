@@ -399,13 +399,13 @@ fun getDisplayNameOrDefault(userId: String?): String =
 
 ### Unit을 반환하는 함수 {id="unit-returning-functions"}
 
-함수가 블록 본문(중괄호 `{}` 안의 명령문)을 가지고 있고 유용한 값을 반환하지 않는 경우, 컴파일러는 반환 타입을 `Unit`으로 간주합니다.
-`Unit`은 `Unit`이라는 하나의 값만 가지는 타입입니다.
+함수가 블록 본문을 가지고 있고 명시적인 반환 타입이 없는 경우, 컴파일러는 반환 타입을 `Unit`으로 추론합니다.
 
-함수형 타입 파라미터를 제외하고는 반환 타입으로 `Unit`을 명시할 필요가 없습니다.
-또한 `Unit`을 명시적으로 반환할 필요도 없습니다.
+`Unit`은 `Unit`이라는 단 하나의 값만 가지는 타입입니다. 이 값은 [객체(object)](object-declarations.md)이므로 단 하나의 `Unit` 인스턴스만 존재합니다.
+다른 프로그래밍 언어의 `void`와 달리 `Unit`은 실제 타입이며, 코드에서 필요한 경우 그 값을 사용할 수 있습니다.
+이러한 방식을 통해 결과를 생성하는 함수와 작업만 수행하는 함수가 동일한 타입 모델에 들어맞게 됩니다. 즉, 두 경우 모두 값을 반환하며 함수 타입으로 표현하거나 제네릭 API와 함께 사용할 수 있습니다.
 
-예를 들어, `Unit`을 반환하지 않고 `printHello()` 함수를 선언할 수 있습니다:
+함수 선언에서 `Unit`을 지정하거나 그 값을 명시적으로 반환할 필요는 없습니다. 하지만 `() -> Unit`과 같이 함수 타입의 일부일 때는 `Unit`을 명시해야 합니다. 예를 들어, `Unit`을 반환하지 않고 `printHello()` 함수를 선언해 보겠습니다:
 
 ```kotlin
 // 함수형 타입 파라미터('action')의 선언에는 
@@ -422,22 +422,25 @@ fun printHello(name: String?, action: () -> Unit) {
 fun main() {
     printHello("Kodee") {
         println("This runs after the greeting.")
+        // Hello Kodee
+        // This runs after the greeting.
     }
-    // Hello Kodee
-    // This runs after the greeting.
 
     printHello(null) {
         println("No name provided, but action still runs.")
+        // Hi there!
+        // No name provided, but action still runs.
     }
-    // No name provided, but action still runs
 }
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" validate="false" id="return-unit-implicit"}
 
-이는 다음의 장황한 선언과 동일합니다:
+이는 반환 타입과 반환 값을 명시적으로 지정하는 다음과 같은 더 장황한 선언과 동일합니다:
 
 ```kotlin
 //sampleStart
+// `() -> Unit` 함수 타입에는 `Unit`이 필수이지만,
+// `printHello()`의 반환 타입으로 `: Unit`을 선언하는 것은 선택 사항입니다.
 fun printHello(name: String?, action: () -> Unit): Unit {
     if (name != null)
         println("Hello $name")
@@ -445,20 +448,21 @@ fun printHello(name: String?, action: () -> Unit): Unit {
         println("Hi there!")
 
     action()
+    // `Unit` 값을 명시적으로 반환하는 것은 선택 사항입니다.
     return Unit
 }
 //sampleEnd
 fun main() {
     printHello("Kodee") {
-        println("This runs after the greeting.")
+        println("This action runs when a name is given.")
+        // Hello Kodee
+        // This action runs when a name is given.
     }
-    // Hello Kodee
-    // This runs after the greeting.
-
     printHello(null) {
-        println("No name provided, but action still runs.")
+        println("This action runs when no name is provided.")
+        // Hi there!
+        // This action runs when no name is provided.
     }
-    // No name provided, but action still runs
 }
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" validate="false" id="return-unit-explicit"}
@@ -536,7 +540,7 @@ val list = asList(-1, 0, *a.toTypedArray(), 4)
 
 ### 중위 표기법 (Infix notation) {id="infix-notation"}
 
-`infix` 키워드를 사용하여 괄호나 점(.) 없이 호출할 수 있는 함수를 선언할 수 있습니다.
+`infix` 키워드를 사용하여 괄호나 마침표 없이 호출할 수 있는 함수를 선언할 수 있습니다.
 이를 통해 코드에서 간단한 함수 호출을 더 읽기 쉽게 만들 수 있습니다.
 
 ```kotlin

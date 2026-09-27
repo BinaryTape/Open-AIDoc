@@ -4,7 +4,7 @@ exclude: true
 ---
 
 # --8<-- [start:prerequisites]
-确保您的开发环境和项目满足以下要求：
+确保您的环境和项目满足以下要求：
 
 - JDK 17+
 - Kotlin 2.2.0+
@@ -12,17 +12,17 @@ exclude: true
 # --8<-- [end:prerequisites]
 
 # --8<-- [start:dependencies]
-添加 [Koog](https://central.sonatype.com/artifact/ai.koog/koog-agents/) 依赖项：
+添加 [Koog 软件包](https://central.sonatype.com/artifact/ai.koog/koog-agents/)作为依赖项：
 
 === "Gradle (Kotlin)"
 
     ``` kotlin title="build.gradle.kts"
     dependencies {
         // 稳定版
-        implementation("ai.koog:koog-agents:1.2.0")
+        implementation("ai.koog:koog-agents:1.3.0")
 
         // Beta 版
-        implementation("ai.koog:koog-agents-additions:1.2.0-beta")
+        implementation("ai.koog:koog-agents-additions:1.3.0-beta")
     }
     ```
 
@@ -31,10 +31,10 @@ exclude: true
     ``` groovy title="build.gradle"
     dependencies {
         // 稳定版
-        implementation 'ai.koog:koog-agents:1.2.0'
+        implementation 'ai.koog:koog-agents:1.3.0'
 
         // Beta 版
-        implementation 'ai.koog:koog-agents-additions:1.2.0-beta'
+        implementation 'ai.koog:koog-agents-additions:1.3.0-beta'
     }
     ```
 
@@ -46,14 +46,14 @@ exclude: true
         <dependency>
             <groupId>ai.koog</groupId>
             <artifactId>koog-agents-jvm</artifactId>
-            <version>1.2.0</version>
+            <version>1.3.0</version>
         </dependency>
 
         <!-- Beta 版 -->
         <dependency>
             <groupId>ai.koog</groupId>
             <artifactId>koog-agents-additions-jvm</artifactId>
-            <version>1.2.0-beta</version>
+            <version>1.3.0-beta</version>
         </dependency>
     </dependency>
     ```

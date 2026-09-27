@@ -6,7 +6,7 @@ Kotlin/JavaScript(Kotlin/JS)를 사용하면 코틀린 코드, 코틀린 표준 
 
 Kotlin Multiplatform Gradle 플러그인을 사용하면 애플리케이션의 번들링(bundling)을 제어하고 npm에서 직접 자바스크립트 의존성을 추가하는 것과 같은 기능을 사용할 수 있습니다. 사용 가능한 구성 옵션에 대한 개요는 [Kotlin/JS 프로젝트 설정](js-project-setup.md)을 참조하세요.
 
-> 현재 Kotlin/JS 구현은 [ES5](https://www.ecma-international.org/ecma-262/5.1/) 및 [ES2015](https://262.ecma-international.org/6.0/) 표준을 타겟으로 합니다.
+> 현재 Kotlin/JS 구현은 [ES5](https://www.ecma-international.org/ecma-262/5.1/), [ES2015](https://262.ecma-international.org/6.0/), [ES2020](https://262.ecma-international.org/11.0/) 표준을 타겟으로 합니다.
 >
 {style="tip"}
 
@@ -29,7 +29,7 @@ Kotlin Multiplatform Gradle 플러그인을 사용하면 애플리케이션의 �
      * Android 개발에 익숙하다면, [Kobweb](https://kobweb.varabyte.com/)이나 [Kilua](https://kilua.dev/)와 같은 Compose 기반 프레임워크로 웹 애플리케이션을 빌드할 수 있습니다.
      * JetBrains에서 제공하는 [공통 자바스크립트 라이브러리용 코틀린 래퍼(Kotlin wrappers)](https://github.com/JetBrains/kotlin-wrappers)를 사용하여 Kotlin/JS로 완전한 타입 안정성이 보장되는 React 애플리케이션을 빌드하세요. 코틀린 래퍼(`kotlin-wrappers`)는 React 및 기타 자바스크립트 프레임워크에 대한 추상화 및 통합을 제공합니다.
        
-       이러한 래퍼는 [React Redux](https://react-redux.js.org/), [React Router](https://reactrouter.com/), [styled-components](https://styled-components.com/)와 같은 보조 라이브러도 지원합니다. 또한 자바스크립트 생태계와의 상호 운용성(interoperability)을 통해 서드파티 React 컴포넌트 및 컴포넌트 라이브러리를 사용할 수 있습니다.
+       이러한 래퍼는 [React Redux](https://react-redux.js.org/), [React Router](https://reactrouter.com/), [styled-components](https://styled-components.com/)와 같은 보조 라이브러리도 지원합니다. 또한 자바스크립트 생태계와의 상호 운용성(interoperability)을 통해 서드파티 React 컴포넌트 및 컴포넌트 라이브러리를 사용할 수 있습니다.
   
      * 코틀린 생태계와 통합되고 간결하며 표현력이 풍부한 코드를 지원하는 [Kotlin/JS 프레임워크](js-frameworks.md)를 사용하세요.
 

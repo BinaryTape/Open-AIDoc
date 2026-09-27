@@ -85,7 +85,7 @@
   "kotlin.kotlin-overview": "Kotlin 概覽",
   "kotlin.what-s-new-in-kotlin": "Kotlin 新功能",
   "kotlin.whatsnew22": "Kotlin 2.2.0",
-  "kotlin.whatsnew-eap": "Kotlin 2.4.20-RC3",
+  "kotlin.whatsnew-eap": "Kotlin 2.5.0-Beta1",
   "kotlin.earlier-versions": "更早版本",
   "kotlin.whatsnew2120": "Kotlin 2.1.20",
   "kotlin.whatsnew21": "Kotlin 2.1.0",
@@ -216,6 +216,7 @@
   "kotlin.power-assert": "Power-assert",
   "kotlin.compose-compiler": "Compose 編譯器",
   "kotlin.compose-compiler-migration-guide": "編譯器遷移指南",
+  "kotlin.compose-compiler-options": "編譯器選項",
   "kotlin.compose-compiler-options": "編譯器選項",
   "kotlin.kotlin-symbol-processing-api": "Kotlin 符號處理 API",
   "kotlin.ksp-overview": "KSP 概覽",
@@ -677,7 +678,7 @@
   "coroutines.flows": "Flow",
   "coroutines.coroutines-flow": "概覽",
   "kmp.kotlin-toolchain": "Kotlin 工具鏈",
-  "kmp.whats-new-compose-112": "Compose Multiplatform 1.12.0",
+  "kmp.whats-new-compose-112": "Compose Multiplatform 1.12.1",
   "kotlin.take-kotlin-tour": "開始 Kotlin 之旅",
   "kotlin.beginner": "初學者",
   "kotlin.intermediate": "中級",
@@ -708,5 +709,6 @@
   "ktor.server-oauth2-flows": "型別安全的 OAuth 2.0 流程",
   "ktor.server-oidc": "OpenID Connect",
   "ktor.server-oidc-resource-server": "資源伺服器",
-  "ktor.server-oidc-browser-login": "瀏覽器登入"
+  "ktor.server-oidc-browser-login": "瀏覽器登入",
+  "koog._0": "0"
 }

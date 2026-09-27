@@ -14,7 +14,7 @@ fun jsTypeOf(o: Any): String {
 }
 ```
 
-JavaScript 程式碼內嵌完整支援 [ES2015 特性](js-project-setup.md#support-for-es2015-features)，包括：
+JavaScript 程式碼內嵌完整支援 [ES2015 特性](js-project-setup.md#set-an-ecmascript-target)，包括：
 
 * `const` 與 `let` 變數宣告
 * ES 類別
@@ -23,18 +23,18 @@ JavaScript 程式碼內嵌完整支援 [ES2015 特性](js-project-setup.md#suppo
 * 展開 (Spread) 與其餘 (rest) 運算子
 * 範本字串 (Template strings)
 
-因為 `js` 的參數是在編譯期剖析並「原封不動」地翻譯為 JavaScript 程式碼，所以它必須是字串常值。因此，以下程式碼是不正確的：
+因為 `js` 的參數是在編譯期剖析並「原封不動」地翻譯為 JavaScript 程式碼，所以它必須是字串常數。因此，以下程式碼是不正確的：
 
 ```kotlin
 fun jsTypeOf(o: Any): String {
-    return js(getTypeof() + " o") // 錯誤：引數必須是字串常值
+    return js(getTypeof() + " o") // 錯誤：引數必須是字串常數
     // 編譯器無法求值字串連接
 }
 
 fun getTypeof() = "typeof"
 ```
 
-相反地，例如要內嵌其餘運算子，請使用字串常值：
+相反地，例如要內嵌其餘運算子，請使用字串常數：
 
 ```kotlin
 fun runSumExample() {

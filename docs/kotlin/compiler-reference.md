@@ -50,7 +50,7 @@ Kotlin 编译器具有许多用于定制编译过程的选项。
 
 设置 API 版本以控制您的代码在运行时可以使用哪些 Kotlin API。例如，如果您使用 Kotlin 编译器版本 2.4.0 并配合 `-api-version=2.1`，您的代码将保持与 Kotlin 标准库 2.1.0 的兼容。
 
-您不能将 `-api-version` 的值设置为高于 [`-language-version`](#language-version-version) 的值。
+您不能将 `-api-version` 的值设置为高于 `-language-version` 的值。
 
 在大多数情况下，API 版本和[语言版本](#language-version-version)应当相同。一个例外情况是：当您为必须运行旧版本 Kotlin 标准库的使用者开发库时。在这种情况下，请设置较旧的 API 版本，以避免意外使用这些使用者无法获取的 API。
 
@@ -396,7 +396,7 @@ $ kotlinc @options/compiler.options hello.kt
 ### -Xdump-directory {id="xdump-directory"}
 <primary-label ref="experimental-general"/>
 
-为 [-Xphases-to-dump-before`](#xphases-to-dump-before) 编译器选项配置转储文件目录。
+为 [`-Xphases-to-dump-before`](#xphases-to-dump-before) 编译器选项配置转储文件目录。
 
 ### -Xjvm-expose-boxed {id="xjvm-expose-boxed"}
 <primary-label ref="experimental-general"/>
@@ -474,7 +474,7 @@ $ kotlinc @options/compiler.options hello.kt
 将您在 Kotlin 代码中声明的变量和函数名称添加到源代码映射中。
 
 | 设置 | 描述 | 输出示例 |
-|---|---|---|
+|-------------------------|---------------------------------------------------------------|-----------------------------------|
 | `simple-names` | 添加变量名和简单函数名。（默认） | `main` |
 | `fully-qualified-names` | 添加变量名和完全限定函数名。 | `com.example.kjs.playground.main` |
 | `no` | 不添加变量或函数名称。 | N/A |
@@ -483,7 +483,7 @@ $ kotlinc @options/compiler.options hello.kt
 
 向源代码映射中的路径添加指定的前缀。
 
-### -target {es5|es2015 id="target"}
+### -target {es5|es2015|es2020 id="target"}
 
 为指定的 ECMA 版本生成 JS 文件。
 
@@ -493,9 +493,8 @@ $ kotlinc @options/compiler.options hello.kt
 允许从 JavaScript/TypeScript 中[实现 Kotlin 接口](whatsnew2320.md#implementing-kotlin-interfaces-from-javascript-typescript)，这些接口需使用 `@JsExport` 注解导出。
 
 ### -Xes-long-as-bigint {id="xes-long-as-bigint"}
-<primary-label ref="experimental-general"/>
 
-在编译为现代 JavaScript (ES2020) 时，启用对 JavaScript `BigInt` 类型的支持以表示 Kotlin `Long` 值。
+在编译为现代 JavaScript (ES2020) 时，启用对 JavaScript `BigInt` 类型的支持以表示 Kotlin `Long` 值。此选项仅在 `es5` 和 `es2015` 目标中需要。`es2020` 目标默认启用此选项。
 
 ### -Xsuspend-lambda-exporting {id="xsuspend-lambda-exporting"}
 <primary-label ref="experimental-general"/>
@@ -552,7 +551,7 @@ Kotlin/Native 编译器将 Kotlin 源文件编译为针对[受支持平台](nati
     
 ### -list-targets {id="list-targets"}
 
-列出可用的 hardware 目标。
+列出可用的硬件目标。
 
 ### -manifest _路径_ {id="manifest-path"}
 

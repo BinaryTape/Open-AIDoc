@@ -17,12 +17,10 @@ _[发布日期：%kotlinEapReleaseDate%](eap.md#build-details)_
 
 Kotlin %kotlinEapVersion% 版本已发布！以下是此 EAP 版本的一些详细信息：
 
-* **标准库：** [支持协程堆栈跟踪恢复，以及用于检查集合元素相等性和唯一性的新功能](#standard-library)
-* **Kotlin/Native：** [新的 Swift 导出功能以及为 SwiftPM 依赖项自动生成的 `Package.swift` 文件](#kotlin-native)
-* **Kotlin/Wasm：** [`@JsFun` 声明中顶层 `require()` 调用的更改、改进的伴生对象初始化顺序，以及 Kotlin Gradle 插件对 Wasmtime 的支持](#kotlin-wasm)
-* **Kotlin/JS：** [用于浏览器测试的新 DSL 以及支持将挂起 lambda 导出为 JavaScript 异步函数](#kotlin-js)
-* **构建工具 API：** [支持新目标：Kotlin/JS、Kotlin/Wasm 和 Kotlin 元数据](#build-tools-api)
-* **Kotlin 编译器：** [原生镜像的实验性发布](#kotlin-compiler-native-image)
+* **语言：** [`only-syntax` 模式下稳定的基于名称的析构](#stable-language-features)以及[新的实验性伴生扩展与伴生块](#companion-extensions-and-blocks)
+* **标准库：** [用于简化 `if` 表达式常见模式的新实验性函数](#standard-library-new-functions-for-simplifying-common-patterns-with-if-expressions)
+* **Kotlin/JS：** [支持 `es2020` 目标](#kotlin-js-support-for-the-es2020-target)
+* **Kotlin 编译器：** [`.klib` 编译期间更加一致的内联函数行为](#consistent-cross-module-function-inlining-during-klib-compilation)<!--and a [new experimental compilation scheme for Kotlin Multiplatform]().-->
 
 > 有关 Kotlin 发布周期的信息，请参阅 [Kotlin 发布流程](releases.md)。
 >
@@ -34,488 +32,210 @@ Kotlin %kotlinEapVersion% 版本已发布！以下是此 EAP 版本的一些详�
 
 要更新到新的 Kotlin 版本，请确保您的 IDE 已更新至最新版本，并在您的构建脚本中将 [Kotlin 版本更改](releases.md#update-to-a-new-kotlin-version)为 %kotlinEapVersion%。
 
-## 新功能 {id=new-experimental-features}
-<primary-label ref="experimental-exp"/>
+## 语言 {id="language"}
 
-本版本提供以下预稳定功能。包括处于 [Beta](components-stability.md#stability-levels-explained)、[Alpha](components-stability.md#stability-levels-explained) 和 [实验性](components-stability.md#stability-levels-explained) 阶段的功能：
+Kotlin %kotlinEapVersion% 稳定了早期版本中引入的两项语言功能。它还引入了实验性的伴生扩展与伴生块。
 
-* [标准库：支持协程堆栈跟踪恢复](#support-for-coroutine-stack-trace-recovery)
-* [标准库：用于检查集合元素相等性和唯一性的新函数](#new-functions-to-check-collection-elements-for-equality-and-uniqueness)
-* [Kotlin/JS：用于浏览器测试的新 DSL](#a-new-dsl-for-browser-testing)
-* [构建工具 API：支持 Kotlin/JS、Kotlin/Wasm 和 Kotlin 元数据](#build-tools-api)
-* [Kotlin 编译器：独立的 Kotlin 编译器镜像](#kotlin-compiler-native-image)
+### 稳定的语言功能 {id="stable-language-features"}
 
-## 标准库 {id="standard-library"}
+<secondary-label ref="language"/>
 
-Kotlin %kotlinEapVersion% 添加了对协程堆栈跟踪恢复的支持，并引入了用于检查集合元素相等性和唯一性的新函数。
+Kotlin 2.3.20 和 2.4.0 以[实验性](components-stability.md#stability-levels-explained)阶段引入了几项语言功能。我们很高兴地宣布，以下语言功能在此版本中现已达到[稳定](components-stability.md#stability-levels-explained)阶段：
 
-### 支持协程堆栈跟踪恢复 {id="support-for-coroutine-stack-trace-recovery"}
+* `only-syntax` 模式下的[基于名称的析构](destructuring-declarations.md#name-based-destructuring)。
+
+  在此模式下，“旧的”析构语法 `val (x, y)` 保持其基于位置的行为，而“新的”语法 `(val x, val y)` 则执行基于名称的析构。
+
+* [改进的编译时常量](whatsnew24.md#improved-compile-time-constants)。
+
+### 伴生扩展与伴生块 {id="companion-extensions-and-blocks"}
+
 <primary-label ref="experimental-opt-in"/>
-<secondary-label ref="standard-library"/>
 
-Kotlin %kotlinEapVersion% 在标准库中添加了 `StackTraceRecoverable` 接口。这改进了与 `kotlinx.coroutines` 库的集成，因为它允许您定义如何为堆栈跟踪恢复创建新的异常实例，而无需添加对 `kotlinx.coroutines` 的依赖。
+<secondary-label ref="language"/>
 
-当一个协程抛出异常而另一个协程重新抛出该异常时，堆栈跟踪恢复有助于调试。它可以让您看到异常源自何处以及另一个协程在何处重新抛出了它。
+Kotlin %kotlinEapVersion% 引入了伴生扩展和伴生块。
 
-`kotlinx.coroutines` 库通过创建一个包含额外协程堆栈跟踪信息的新异常实例来执行堆栈跟踪恢复。对于构造函数仅接受异常消息、原因 (cause)、两者皆有或不带参数的异常，这是自动发生的。
+此前，要声明可通过类型名称访问的扩展、函数和属性，该类型需要具有伴生对象。伴生扩展和伴生块移除了此要求，使您可以：
 
-如果异常构造函数具有额外的必需参数（例如行号或错误代码），请实现 `StackTraceRecoverable` 接口以定义 `kotlinx.coroutines` 库如何创建该异常的新实例。
+* 通过为顶层扩展添加 `companion` 修饰符来声明伴生扩展，即使其扩展的类型没有伴生对象也是如此。
+* 在类或接口内部的 `companion {}` 块中声明函数和属性，而无需创建对象实例。在支持静态成员的平台上，编译器会将这些声明生成为静态成员。因此，在 JVM 上无需使用 `@JvmStatic` 对其进行注解。
 
-要实现该接口，请重写 `copyForStackTraceRecovery()` 函数。在此重写中，返回用于堆栈跟踪恢复的新异常实例，如果您不希望 `kotlinx.coroutines` 库复制该异常，则返回 `null`。
-
-> `StackTraceRecoverable` 接口在所有目标平台上都可用，但 `kotlinx.coroutines` 库仅在 JVM 上将其用于堆栈跟踪恢复。
->
-{style="note"}
-
-这些 API 处于[实验性](components-stability.md#stability-levels-explained)阶段，需要使用 `@OptIn(ExperimentalStdlibCoroutineSupportApi::class)` 注解进行显式启用。
-
-以下是一个自定义异常示例，它在为堆栈跟踪恢复创建新实例时保留了 `line` 属性：
+以下是一个将 `UnitX` 声明为伴生扩展并在伴生块中声明 `Zero` 的示例：
 
 ```kotlin
-import kotlin.coroutines.ExperimentalStdlibCoroutineSupportApi
-import kotlin.coroutines.debug.StackTraceRecoverable
+// 将 UnitX 声明为伴生扩展
+companion val Vector.UnitX get() = Vector(1.0, 0.0)
 
-@OptIn(ExperimentalStdlibCoroutineSupportApi::class)
-class FileEditException
-// 实现需要一个私有构造函数
-// 以将 cause 传递给 IllegalStateException 构造函数
-private constructor(
-    val line: Int,
-    private val detail: String,
-    cause: Throwable?,
-) : IllegalStateException("When editing line $line: $detail", cause),
-    // 实现 StackTraceRecoverable 以进行堆栈跟踪恢复
-    StackTraceRecoverable<FileEditException> {
-
-    constructor(line: Int, detail: String) : this(line, detail, null)
-
-    // 复制行号和消息详情
-    override fun copyForStackTraceRecovery(): FileEditException =
-        FileEditException(line, detail, this)
+data class Vector(val x: Double, val y: Double) {
+    companion {
+        // 在伴生块中声明 Zero
+        val Zero: Vector get() = Vector(0.0, 0.0)
     }
+}
 
 fun main() {
-    val original = FileEditException(15, "Unexpected token")
+    println(Vector.UnitX)
+    // Vector(x=1.0, y=0.0)
     
-    // 通常情况下，除非您正在测试其行为，否则无需直接调用此函数
-    // kotlinx.coroutines 库会在堆栈跟踪恢复期间自动调用它
-    val copy = original.copyForStackTraceRecovery()
-
-    println(copy.message)
-    // When editing line 15: Unexpected token
-
-    println(copy.cause == original)
-    // true
+    println(Vector.Zero)
+    // Vector(x=0.0, y=0.0)
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="2.4.20-Beta2"}
 
-欲了解更多信息，请参阅该功能的 [KEEP](https://github.com/Kotlin/KEEP/blob/main/proposals/stdlib/KEEP-0461-stacktrace-recoverable.md)。
+有关该设计的更多信息，请参阅该功能的 [KEEP](https://github.com/Kotlin/KEEP/blob/main/proposals/KEEP-0449-companions-block-extension.md)。
 
-我们欢迎您在 [YouTrack](https://youtrack.jetbrains.com/issue/KT-86595) 中提供反馈。
+伴生扩展和伴生块处于[实验性](components-stability.md#stability-levels-explained)阶段。要选择启用，请在您的构建文件中添加以下编译器选项：
 
-### 用于检查集合元素相等性和唯一性的新函数 {id="new-functions-to-check-collection-elements-for-equality-and-uniqueness"}
+<tabs group="build-system">
+<tab title="Gradle" group-key="gradle">
+
+```kotlin
+kotlin {
+    compilerOptions {
+        freeCompilerArgs.add("-Xcompanion-blocks-and-extensions")
+    }
+}
+```
+
+</tab>
+<tab title="Maven" group-key="maven">
+
+```xml
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-maven-plugin</artifactId>
+            <configuration>
+                <args>
+                    <arg>-Xcompanion-blocks-and-extensions</arg>
+                </args>
+            </configuration>
+        </plugin>
+    </plugins>
+</build>
+```
+
+</tab>
+</tabs>
+
+我们欢迎您在 [YouTrack](https://youtrack.jetbrains.com/issue/KT-11968) 中提供反馈。
+
+## 标准库：用于简化 `if` 表达式常见模式的新函数 {id="standard-library-new-functions-for-simplifying-common-patterns-with-if-expressions"}
+
 <primary-label ref="experimental-opt-in"/>
 <secondary-label ref="standard-library"/>
 
-在 Kotlin %kotlinEapVersion% 之前，如果您想检查集合元素是否全部不同或全部相等，必须使用低效的代码模式。
+Kotlin %kotlinEapVersion% 引入了新的标准库函数，让您可以在返回 `Boolean` 值之前对其进行检查，或根据该值返回可空结果。
 
-Kotlin %kotlinEapVersion% 引入了实验性函数来填补这一空白：
+此前，这些模式需要带有 `else` 分支的显式 `if` 表达式。现在，您可以使用以下函数对其进行简化：
 
-| 函数 | 检查项 |
-|--------------------|------------------------------------------------------------|
-| `.allDistinct()` | 集合中的每个值都是唯一的。 |
-| `.allDistinctBy()` | 每个对象对于所选属性都具有唯一值。 |
-| `.allEqual()` | 集合中的每个值都是相同的。 |
-| `.allEqualBy()` | 每个对象对于所选属性都具有相同的值。 |
+* `onTrue()`：当 `Boolean` 值为 `true` 时运行指定的代码块，并返回原始的布尔值。
+* `onFalse()`：当 `Boolean` 值为 `false` 时运行指定的代码块，并返回原始的布尔值。
+* `ifOrNull()`：当 `Boolean` 值为 `true` 时运行指定的代码块并返回其结果。如果该值为 `false`，则该函数不运行代码块并返回 `null`。
 
-您可以在集合、序列和数组上使用这些函数。它们与其他集合操作一样，使用结构相等性来比较元素。
+这些函数处于[实验性](components-stability.md#stability-levels-explained)阶段，需要使用 `@OptIn(ExperimentalStdlibApi::class)` 注解或 `-opt-in=kotlin.ExperimentalStdlibApi` 编译器选项进行显式启用。
 
-这些函数处于[实验性](components-stability.md#stability-levels-explained)阶段，需要使用 `@OptIn(ExperimentalStdlibApi::class)` 注解或 `-opt-in=kotlin.ExperimentalStdlibApi` 编译器选项进行显式启用：
+示例如下：
 
 ```kotlin
 @OptIn(ExperimentalStdlibApi::class)
 fun main() {
-    data class Response(
-        val participantId: String,
-        val answer: String,
-        val responseDate: String
-    )
-
-    val responses = listOf(
-        Response("P001", "Yes", "2026-07-21"),
-        Response("P002", "Maybe", "2026-07-21"),
-        Response("P003", "No", "2026-07-21")
-    )
-
-    // 检查是否所有参与者都给出了相同的答案
-    println(responses.allEqualBy { it.answer })
-    // false
-
-    // 检查是否存在重复的参与者
-    println(responses.allDistinctBy { it.participantId })
-    // true
-
-    // 检查是否所有响应都在同一日期提交
-    println(responses.allEqualBy { it.responseDate })
-    // true
-
-    val answers = responses.map { it.answer }
-
-    // 检查答案是否完全相同
-    println(answers.allEqual())
-    // false
-
-    // 检查答案是否互不相同
-    println(answers.allDistinct())
-    // true
-}
-```
-
-我们欢迎您在 [YouTrack](https://youtrack.jetbrains.com/issue/KT-30270) 中分享您对这些函数的使用反馈。
-
-## Kotlin/Native {id="kotlin-native"}
-
-Kotlin %kotlinEapVersion% 带来了新的 Swift 导出功能，包括对密封类和跨语言继承的支持，以及为 SwiftPM 依赖项自动生成的 `Package.swift` 文件。
-
-### 新管 Swift 导出功能 {id="new-swift-export-features"}
-<secondary-label ref="native"/>
-
-#### 密封类 {id="sealed-classes"}
-
-Kotlin %kotlinEapVersion% 为 Swift 导出添加了对密封类和接口的支持。
-
-此前，您必须为针对密封类型的每个 `switch` 语句编写 `default` 情况。现在，Kotlin 中定义的密封层次结构会被映射到 Swift 枚举，从而在 Xcode 中实现具有完整自动补全功能的穷举式 `switch` 语句。
-
-Swift 导出会在每个密封类型上生成一个 `.sealedType()` 方法。该方法返回一个 Swift 枚举，其成员与密封层次结构的直接子类匹配。您可以嵌套这些调用以匹配更深层次的层次结构。
-
-例如，在 Kotlin 中声明一个具有类层次结构的密封接口：
-
-```kotlin
-// Kotlin
-sealed interface Shape
-
-class Circle : Shape {
-   override fun toString(): String = "Circle"
-}
-
-class Rectangle : Shape {
-   override fun toString(): String = "Rectangle"
-}
-
-fun createCircle(): Shape = Circle()
-```
-
-在 Swift 端，您可以使用不带 `default` 情况的穷举式 `switch`：
-
-```swift
-// Swift
-let shape = createCircle()
-
-let name = switch shape.sealedType() {
-   case let .circle(type): "It's a \(type.value)"
-   case let .rectangle(type): "It's a \(type.value)"
-}
-// name == "It's a Circle"
-```
-
-由于 `switch` 是穷举式的，如果密封层次结构中添加了新的子类，编译器会向您发出警告，以便您可以立即处理，而无需依赖 `default` 情况。
-
-#### Swift 导出中的跨语言继承 {id="cross-language-inheritance-in-swift-export"}
-
-Kotlin %kotlinEapVersion% 在 Swift 导出中引入了跨语言继承支持。
-
-此功能的一个常见用例是[反向导入](native-lib-import-stability.md#swift-library-import)模式，即在 Kotlin 中定义契约，并在 Swift 端提供平台特定的实现。当您需要使用无法直接导入到 Kotlin 的纯 Swift 库时，这尤其有用。
-
-要实现此模式，请声明一个供 Swift 实现继承的 Kotlin 超类和一个 Kotlin 接口。然后在 Swift 中实现该接口，并将 Swift 对象传递给接受该接口的 Kotlin 函数。例如，对于 CryptoKit 库：
-
-1. 在 Kotlin 端，声明一个 `open` 基类和一个包含接受该接口的函数的 Kotlin 接口：
-
-   ```kotlin
-   // Kotlin
-   interface CryptoProvider {
-      fun hashMD5(input: String): String
-   }
-
-   fun processHash(provider: CryptoProvider, input: String): String = provider.hashMD5(input)
-
-   open class SwiftBase 
-   ```
-
-2. 在 Swift 端，继承导出的 `SwiftBase` 类，使用纯 Swift 库实现该接口，并将对象传回 Kotlin：
-
-   ```swift
-   // Swift
-   import CryptoKit
-
-   final class IosCryptoProvider: SwiftBase, CryptoProvider {
-      func hashMD5(input: String) -> String {
-          guard let data = input.data(using: .utf8) else { return "failed" }
-          return Insecure.MD5.hash(data: data).description
-      }
-   }
-
-   let provider = IosCryptoProvider()
-
-   // 调用被调度到 Swift 实现
-   print(processHash(provider: provider, input: "Hello, world!"))
-   ```
-
-当 Kotlin 接收到 Swift 对象时，会将其视为常规接口的实现，并执行 Swift 代码。
-
-有关 Swift 导出的更多详情，请参阅我们的[文档](native-swift-export.md)。
-
-### 为 SwiftPM 依赖项生成 `Package.swift` {id="generated-package-swift-for-swiftpm-dependencies"}
-<secondary-label ref="native"/>
-
-在导出依赖于 SwiftPM 软件包的 XCFramework 时，您必须发布生成的 SwiftPM 软件包才能使其正确解析。为了协助完成此操作，`assembleSharedXCFramework` Gradle 任务现在会生成一个 `Package.swift` 文件，以便随 XCFramework 一起分发。
-
-详情请参阅 [SwiftPM 导出页面](https://kotlinlang.org/docs/multiplatform/multiplatform-spm-export.html)。
-
-## Kotlin/Wasm {id="kotlin-wasm"}
-
-Kotlin %kotlinEapVersion% 更改了 Kotlin/Wasm 处理 `@JsFun` 声明中顶层 `require()` 调用方式，并将伴生对象初始化顺序与 JVM 行为对齐，同时在 Kotlin Gradle 插件中添加了对 Wasmtime 作为 `wasmWasi` 目标运行时的支持。
-
-### `@JsFun` 声明中顶层 `require()` 调用的更改 {id="changes-to-top-level-require-calls-in-jsfun-declarations"}
-<secondary-label ref="wasm"/>
-
-当 `@JsFun` 声明使用顶层 `require()` 函数时，Kotlin/Wasm 现在会报告错误。
-
-此前，编译器在 `import-object.mjs` 文件中生成一个 `require` 变量，允许 `@JsFun` 声明调用 `require()`。
-
-这种行为无意中暴露了编译器的实现细节。为了支持从此行为迁移，Kotlin/Wasm 移除了这个生成的 `require` 声明，且编译器现在会针对此类调用报告错误。例如：
-
-```kotlin
-// 报告错误
-@JsFun("(mod) => require(mod)")
-external fun loadModule(mod: String): JsAny
-```
-
-要为此更改做好准备，请将 `@JsFun` 声明中的顶层 `require()` 调用替换为 `@JsModule` 注解：
-
-```kotlin
-@JsModule("module")
-external val module: Module
-
-external interface Module {
-    // 定义预期的模块成员
-}
-```
-
-对于动态模块加载，请改用 `import()` 表达式。添加 `/* webpackIgnore: true */` 魔法注释以防止 webpack 解析动态导入：
-
-```kotlin
-@JsFun("""
-    ((module) => () => module)(
-        await import(/* webpackIgnore: true */ "module")
-    )
-""")
-private external fun loadModuleDynamically(): JsAny?
-```
-
-您还可以有条件地使用 `import()` 表达式。例如，您可以仅在 Node.js 中运行时加载模块：
-
-```kotlin
-@JsFun("""
-    ((module) => () => module)(
-        ((typeof process !== "undefined") && (process.release.name === "node"))
-            ? await import(/* webpackIgnore: true */ "module")
-            : null
-    )
-""")
-private external fun loadNodeModule(): JsAny?
-```
-
-如果您的项目依赖于需要顶层 `require()` 函数的依赖项，请将其添加为 `globalThis` 的属性作为权宜之计：
-
-```kotlin
-@JsFun("""
-    ((module) => {
-        globalThis.require = module.default.createRequire(import.meta.url)
-        return () => {}
-    })(await import("node:module"))
-""")
-external fun defineRequire()
-```
-
-如果您遇到任何问题，请在我们的[问题跟踪器](https://youtrack.jetbrains.com/projects/KT/issues/KT-86192)中分享您的反馈。
-
-### 改进的伴生对象初始化顺序 {id="improved-companion-object-initialization-order"}
-<secondary-label ref="wasm"/>
-
-Kotlin/Wasm 现在在子类伴生对象之前初始化超类伴生对象，这与 JVM 行为一致。此前，初始化顺序可能会颠倒，导致不同平台之间的行为不一致。
-
-此更新提高了跨平台的一致性，并减少了类初始化行为中平台特定的差异。它还能够正确处理更深层继承层次结构中的伴生对象初始化，包括中间类未声明伴生对象的情况。
-
-### Kotlin Gradle 插件对 Wasmtime 的支持 {id="support-for-wasmtime-in-the-kotlin-gradle-plugin"}
-<secondary-label ref="wasm"/>
-
-Kotlin %kotlinEapVersion% 在 Kotlin Gradle 插件中引入了对 [Wasmtime](https://docs.wasmtime.dev/) 作为 `wasmWasi` 目标运行时的支持。
-
-此前，`wasmWasi` 目标仅支持 Node.js 运行时，这需要 JavaScript 引导程序来运行 WASI 应用程序。有了 Wasmtime 支持，您现在可以在独立的 WebAssembly 运行时上运行 Kotlin/Wasm 应用程序。
-
-要使用 Wasmtime 作为 `wasmWasi` 目标的运行时，请在您的 Gradle 构建文件中添加 `wasmtime()`：
-
-```kotlin
-kotlin {
-    wasmWasi {
-        wasmtime()
+    val tags = mutableSetOf("kotlin", "jvm")
+
+    // 当 add() 返回 true 时，使用 onTrue() 函数输出一条消息
+    val added = tags.add("wasm").onTrue {
+        println("Tag added")
     }
+    println(added)
+    // Tag added
+    // true
+
+    // 当 remove() 返回 false 时，使用 onFalse() 函数输出一条消息
+    val removed = tags.remove("native").onFalse {
+        println("Tag not found")
+    }
+    println(removed)
+    // Tag not found
+    // false
+
+    // 当 tags 中包含 "wasm" 时，使用 ifOrNull() 函数返回一条消息
+    val message = ifOrNull("wasm" in tags) {
+        "Wasm tag is available"
+    }
+    println(message)
+    // Wasm tag is available
 }
 ```
+{kotlin-runnable="true" kotlin-min-compiler-version="2.5.0-Beta1" validate="false"}
 
-我们欢迎您在 [YouTrack](https://youtrack.jetbrains.com/issue/KT-86633) 中提供反馈。
+我们欢迎您在 [YouTrack](https://youtrack.jetbrains.com/issue/KT-6938) 中提供反馈。
 
-## Kotlin/JS {id="kotlin-js"}
-
-Kotlin %kotlinEapVersion% 引入了一个用于浏览器测试的新实验性 DSL，并添加了对将挂起 lambda 导出为 JavaScript 异步函数的支持。
-
-### 用于浏览器测试的新 DSL {id="a-new-dsl-for-browser-testing"}
-<primary-label ref="experimental-opt-in"/>
+## Kotlin/JS：支持 `es2020` 目标 {id="kotlin-js-support-for-the-es2020-target"}
 <secondary-label ref="js"/>
 
-Kotlin %kotlinEapVersion% 引入了一个新的实验性 DSL，用于在浏览器环境中运行 Kotlin/JS 测试。
+Kotlin %kotlinEapVersion% 在 Kotlin/JS 编译器和 Gradle 插件中添加了 `es2020` 目标。此前，仅提供 `es5` 和 `es2015` 目标，并且对诸如 `BigInt` 等较新 JavaScript 功能的支持必须在以 ES2015 为目标时单独启用。通过以 ES2020 为目标，您无需进行额外配置即可使用截至 ECMAScript 2020 支持的所有 JavaScript 功能（包括 `BigInt`）。
 
-目前，Kotlin Gradle 插件使用 [Karma](https://github.com/karma-runner/karma) 作为浏览器启动器，以在不同浏览器中运行 JavaScript 测试。Karma 项目已经弃用 2 年了，这促使我们探索支持浏览器测试的其他方式。
-
-新的 DSL 旨在取代 Karma 作为底层不同工具的管理器，包括：
-
-* [Mocha](https://mochajs.org/) 作为测试运行程序。
-* [Webpack](https://webpack.js.org/) 作为捆绑器（在[未来版本](https://youtrack.jetbrains.com/issue/KT-48308/)中将被 [Vite](https://vite.dev/) 取代）。
-* [Playwright](https://playwright.dev/) 作为浏览器驱动程序和分发管理器，支持 Chromium、Firefox 和 WebKit (Safari) 浏览器引擎。
-
-要试用新的测试 DSL，请在 Kotlin/JS 目标的 `browser{}` 块内添加显式启用的 `test{}` 块：
+要启用新目标，请在 `compilerOptions` 块中将 `target` 设置为 `es2020`：
 
 ```kotlin
-import org.jetbrains.kotlin.gradle.ExperimentalJsTestDsl
-import kotlin.time.Duration.Companion.seconds
-
-kotlin {
-    js {
-        browser {
-            @OptIn(ExperimentalJsTestDsl::class)
-            // 添加并配置新的 test{} 块
-            test {
-                // 为所有运行程序配置默认超时
-                timeout = 2.seconds
-                // 使用 Gradle provider 配置无头模式
-                headless = providers
-                    .environmentVariable("IS_IN_CI")
-                    .map { it.toBoolean() }
-                    .orElse(false)
-                // 启用并配置 Chromium 测试运行程序
-                chromium {
-                    // 重写通用超时选项
-                    timeout = 5.seconds
-                    // 添加额外的启动参数
-                    launchArgs.add("--no-sandbox")
-                }
-                // 启用 Firefox 测试运行程序
-                firefox()
-                // 启用 WebKit 测试运行程序
-                webkit()
-                // 启用并配置额外的 WebKit 测试运行程序
-                webkit("noheadless") {
-                    // 设置自定义选项
-                    headless = false
-                }
-            }
+kotlin { 
+    js { 
+        compilerOptions { 
+            target.set("es2020") 
         }
     }
 }
 ```
 
-新的 DSL 正在积极开发中。我们欢迎您在 [YouTrack](https://youtrack.jetbrains.com/issue/KT-66897) 中提供反馈。
+## Kotlin 编译器 {id="kotlin-compiler"}
 
-### 支持将挂起 lambda 导出为异步函数 {id="support-for-exporting-suspending-lambdas-as-async-functions"}
-<secondary-label ref="js"/>
+Kotlin %kotlinEapVersion% 为 `.klib` 编译期间的函数内联带来了更多改进，并引入了诸如改进类型推断性能等实验性功能<!-- and a new compilation scheme for Kotlin Multiplatform -->。
 
-在 Kotlin %kotlinEapVersion% 中，您现在可以将挂起 [lambda 表达式](lambdas.md#lambda-expressions-and-anonymous-functions)导出为 JavaScript `async` 函数。
+### klib 编译期间一致的跨模块函数内联 {id="consistent-cross-module-function-inlining-during-klib-compilation"}
 
-此前，无法从 Kotlin/JS 库中导出包含挂起 lambda 的声明。现在，Kotlin 编译器会自动处理 Kotlin 挂起函数与原生 JavaScript [`async`/`await`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function) 模型之间的桥接，这对于 Kotlin/TypeScript 混合代码库非常有用。
-
-要启用此功能，请将以下编译器选项添加到您的 `build.gradle.kts` 文件中：
-
-```kotlin
-kotlin {
-    js {
-        compilations.all {
-            compileTaskProvider.configure {
-                compilerOptions {
-                    freeCompilerArgs.add("-Xsuspend-lambda-exporting")
-                }
-            }
-        }
-    }
-}
-```
-
-然后，使用 `@JsExport` 标记相关声明：
-
-```kotlin
-// Kotlin
-@JsExport
-class TaskRunner {
-    suspend fun runTask(task: suspend () -> String): String {
-        return task()
-    }
-}
-```
-
-在 TypeScript 端，挂起 lambda 显示为常规 `async` 函数：
-
-```typescript
-// TypeScript
-import { TaskRunner } from "..."
-
-const runner = new TaskRunner();
-const result = await runner.runTask(async () => "done");
-console.log(result); // "done"
-```
-
-有关 `@JsExport` 注解的更多信息，请参阅[我们的文档](js-to-kotlin-interop.md#jsexport-annotation)。
-
-## 构建工具 API {id="build-tools-api"}
-
-### 支持 Kotlin/JS、Kotlin/Wasm 和 Kotlin 元数据 {id="support-for-kotlin-js-kotlin-wasm-and-kotlin-metadata"}
-<primary-label ref="experimental-general"/>
-<secondary-label ref="bta"/>
-
-在 [Kotlin 2.2.0](whatsnew22.md#new-experimental-build-tools-api) 中，构建工具 API (BTA) 已可用于 Kotlin/JVM。Kotlin %kotlinEapVersion% 通过添加对新目标的支持，迈出了 BTA 稳定的下一步：Kotlin/JS、Kotlin/Wasm 和 Kotlin 元数据。
-
-这使得 Kotlin Gradle 插件与编译器的交互更加一致。在某些情况下，您还可以从更快、更稳定的编译中受益。
-
-BTA 是一个通用 API，充当构建系统与 Kotlin 编译器生态系统之间的抽象层。它有助于支持构建工具中可用的 Kotlin 功能以及与 Kotlin 编译器的兼容性。
-
-在 Kotlin %kotlinEapVersion% 中，BTA 在新目标中作为显式启用功能提供。要试用它，请将相应的属性添加到您的 `gradle.properties` 文件中：
-
-```properties
-kotlin.wasm.runViaBuildToolsApi=true
-kotlin.js.runViaBuildToolsApi=true
-kotlin.metadata.runViaBuildToolsApi=true
-```
-
-从 Kotlin 2.5.0 开始，我们计划在 Kotlin/JS、Kotlin/Wasm 和 Kotlin 元数据中默认启用 BTA。
-
-如果您对 BTA 提案感兴趣或想分享反馈，请参阅此 [KEEP](https://github.com/Kotlin/KEEP/blob/build-tools-api/proposals/extensions/build-tools-api.md)。
-
-## Kotlin 编译器：原生镜像 {id="kotlin-compiler-native-image"}
-<primary-label ref="experimental-general"/>
 <secondary-label ref="compiler"/>
 
-Kotlin %kotlinEapVersion% 推出了 Kotlin 编译器原生镜像的首个[实验性](components-stability.md#stability-levels-explained)版本。原生镜像提供了标准 `kotlinc` 命令行工具的直接替代方案，同时提供了更快的启动时间和更高的性能。
+Kotlin 2.4.0 在 `.klib` 编译期间启用了 [Kotlin/Native、Kotlin/JS 和 Kotlin/Wasm 上一致的模块内函数内联](whatsnew24.md#consistent-intra-module-function-inlining-during-klib-compilation)。跨不同 Kotlin 平台的一致函数内联让提供兼容性保证变得更加容易。
 
-要试用原生镜像，请从 [GitHub Releases](https://github.com/JetBrains/kotlin/releases/tag/v%kotlinEapVersion%) 下载构建版本。
+Kotlin 2.4.0 还引入了在 `.klib` 编译期间启用**跨模块**内联的可能性，以确保项目中的所有内联函数都得到一致的内联。Kotlin %kotlinEapVersion% 默认启用了跨模块内联。
 
-原生镜像还捆绑了以下编译器插件，您可以配合 `-Xplugin` 或 `-Xcompiler-plugin` CLI 选项使用：
+如果您在使用此功能时遇到非预期问题，可以使用以下命令行编译器选项将其禁用：
 
-* [Serialization](serialization.md)
-* [Compose 编译器](compose-compiler-options.md)
-* [All-open](all-open-plugin.md)
-* [`no-arg`](no-arg-plugin.md)
-* [SAM with receiver](sam-with-receiver-plugin.md)
-* [Assignment](https://plugins.gradle.org/plugin/org.jetbrains.kotlin.plugin.assignment)
-* [Lombok](lombok.md)
-* [Power-assert](power-assert.md)
+```bash
+-Xklib-ir-inliner=disabled
+```
 
-有关 Kotlin 编译器原生镜像的更多信息，请参阅其 [README](https://github.com/JetBrains/kotlin/blob/master/prepare/compiler-native-image/README.md)。
+请在 [YouTrack](https://kotl.in/issue) 中分享您的反馈并报告任何问题。
+
+### 改进的类型推断性能 {id="improved-type-inference-performance"}
+
+<primary-label ref="experimental-opt-in"/>
+
+<secondary-label ref="compiler"/>
+
+Kotlin %kotlinEapVersion% 通过减少类型推断期间生成的约束数量来提高编译器性能。此前，复杂的泛型代码可能会生成过多的约束，导致编译或 IDE 分析挂起。这一更改可能会影响某些极端情况下的类型推断，特别是涉及构建器推断（builder inference）或具有非寻常边界的复杂平台类型的情况。因此，编译器可能会推断出不同的类型、选择不同的重载或报告不同的诊断信息。这些差异可能是该项改进的预期结果。
+
+该功能默认启用。要恢复先前的类型推断行为，请使用 `-XXLanguage:-EliminateSecondKindIncorporation` 选项。
+
+我们欢迎您在 [YouTrack](https://youtrack.jetbrains.com/issue/KT-85879) 中提供反馈。
+
+<!--
+### New experimental compilation scheme for Kotlin Multiplatform {id="new-experimental-compilation-scheme-for-kotlin-multiplatform"}
+
+<primary-label ref="experimental-opt-in"/>
+
+<secondary-label ref="compiler"/>
+
+Kotlin %kotlinEapVersion% introduces a new experimental compilation scheme for Kotlin Multiplatform (KMP) that makes the
+compiler handle common source sets more consistently with the IDE. This change prevents common code from accidentally
+resolving to platform-specific declarations, improves consistency in overload resolution and type inference, and enables
+incremental compilation for common source sets. Learn more about KMP separate compilation and how to try it in our [blog post](TBD).
+-->
+
+## 破坏性变更与弃用 {id="breaking-changes-and-deprecations"}
+
+Kotlin %kotlinEapVersion% 引入了一项警告，作为将运行 Kotlin 编译器所需的最低 JDK 版本从 JDK 8 提升到 JDK 17 的第一步。我们提升最低所需 JDK 是为了加快开发速度，并使编译器能够访问需要更新 Java 版本的新库。JDK 17 具有较长的支持周期，并有助于我们保持与较新版本的 Gradle 和 Maven 的兼容性。可以使用 `-Xallow-pre-17-runtime-jdk` 编译器选项禁用该警告。当 JDK 17 成为强制要求时，此选项将在 Kotlin 2.5.20 或 2.6.0 中移除。
+
+如果您在升级项目时遇到困难，请在 [YouTrack](https://kotl.in/issue) 上分享您的经验，或直接在 Kotlin Slack 上与开发者联系。[获取邀请](https://surveys.jetbrains.com/s3/kotlin-slack-sign-up?_gl=1*ju6cbn*_ga*MTA3MTk5NDkzMC4xNjQ2MDY3MDU4*_ga_9J976DJZ68*MTY1ODMzNzA3OS4xMDAuMS4xNjU4MzQwODEwLjYw)并加入 [#compiler](https://kotlinlang.slack.com/archives/C7L3JB43G) 频道。

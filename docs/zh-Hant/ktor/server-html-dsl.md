@@ -46,7 +46,9 @@ HTML DSL 不需要[安裝](server-plugins.md#install)，但需要 `%artifact_nam
 import io.ktor.server.application.*
 import io.ktor.server.html.*
 import io.ktor.http.*
+import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.utils.io.*
 import kotlinx.html.*
 
 fun Application.module() {
@@ -157,7 +159,9 @@ get("/login") {
 import io.ktor.server.application.*
 import io.ktor.server.html.*
 import io.ktor.http.*
+import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.utils.io.*
 import kotlinx.html.*
 
 fun Application.module() {

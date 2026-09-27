@@ -46,7 +46,9 @@ HTML レスポンスを送信するには、必要な[ルート](server-routing.
 import io.ktor.server.application.*
 import io.ktor.server.html.*
 import io.ktor.http.*
+import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.utils.io.*
 import kotlinx.html.*
 
 fun Application.module() {
@@ -157,7 +159,9 @@ HTML フラグメントは、HTMX のようなライブラリで使用される�
 import io.ktor.server.application.*
 import io.ktor.server.html.*
 import io.ktor.http.*
+import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.utils.io.*
 import kotlinx.html.*
 
 fun Application.module() {

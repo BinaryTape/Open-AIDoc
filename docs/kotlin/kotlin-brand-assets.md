@@ -5,7 +5,7 @@
 我们的徽标由标志和字体组成。
 彩色版本是主版本，应在绝大多数情况下使用。
 
-[下载所有版本](https://resources.jetbrains.com/storage/products/kotlin/docs/kotlin_logos.zip){:.typo-float-right.kto-button.kto-button_size_m.kto-button_mode_outline}
+<a href="https://resources.jetbrains.com/storage/products/kotlin/docs/kotlin_logos.zip" as="button" mode="classic" icon="download" icon-position="right">下载所有徽标</a>
 
 我们的徽标和标志具有保护区域。请妥善放置徽标，确保其他设计元素不会进入该框内。
 保护区域的最小尺寸为标志高度的一半。
@@ -19,7 +19,7 @@
 * 不要给徽标加轮廓。
 * 不要用第三方颜色重新涂色徽标。
 * 不要修改文本。
-* 不要将徽标置于复杂的背景上向。不要将徽标置于明亮的背景前。
+* 不要将徽标置于复杂的背景上。不要将徽标置于明亮的背景前。
 
 [阅读 Kotlin 品牌使用指南](https://kotlinfoundation.org/guidelines/)。
 
@@ -40,7 +40,7 @@ Kotlin 品牌包还包括几个官方 Kotlin 生态系统项目、库、框架�
 
 您可以在同一个下载包中找到这些徽标：
 
-[下载所有版本](https://resources.jetbrains.com/storage/products/kotlin/docs/kotlin_logos.zip){:.typo-float-right.kto-button.kto-button_size_m.kto-button_mode_outline}
+<a href="https://resources.jetbrains.com/storage/products/kotlin/docs/kotlin_logos.zip" as="button" mode="classic" icon="download" icon-position="right">下载所有徽标</a>
 
 ## Kotlin 吉祥物 {id="kotlin-mascot"}
 
@@ -52,7 +52,7 @@ Kotlin 品牌包还包括几个官方 Kotlin 生态系统项目、库、框架�
 您可以在您的数字和印刷材料中使用 Kodee。为此，我们准备了各种 
 Kotlin 吉祥物资源供您下载和探索。
 
-[下载所有资源](https://resources.jetbrains.com/storage/products/kotlin/docs/kotlin_mascot_2.zip){:.typo-float-right.kto-button.kto-button_size_m.kto-button_mode_outline}
+<a href="https://resources.jetbrains.com/storage/products/kotlin/docs/kotlin_mascot_2.zip" as="button" mode="classic" icon="download" icon-position="right">下载所有徽标</a>
 
 ![行动中的 Kotlin 吉祥物 Kodee](mascot-in-action.png){width=700}
 
@@ -64,7 +64,7 @@ Kotlin 吉祥物资源供您下载和探索。
 * 用户组徽标也意味着社区的观点和行动独立于 Kotlin 团队。
 * 您的观点不必与我们一致，我们认为这是建立一个富有创造力且强大的社区最有利的模式。
 
-[下载所有资源](https://drive.google.com/drive/folders/0B3Zi34svOj1RZ2sxZExhblRJc1k){:.typo-float-right.kto-button.kto-button_size_m.kto-button_mode_outline}
+<a href="https://drive.google.com/drive/folders/0B3Zi34svOj1RZ2sxZExhblRJc1k" as="button" mode="classic" icon="download" icon-position="right">下载所有徽标</a>
 
 ### 用户组风格 {id="style-for-user-groups"}
 
@@ -113,7 +113,7 @@ Kotlin 吉祥物资源供您下载和探索。
 JetBrains 为 Kotlin Night 活动提供品牌和材料。
 我们的团队将为活动推广准备数字资源，并运送包含贴纸和 T 恤的周边包。看看我们有什么能让您的 Kotlin Night 充满乐趣！
 
-[下载所有资源](https://drive.google.com/drive/folders/1wTJ-PiO6VvbY6XdACGLsWZ_N8KHI0Nvr){:.typo-float-right.kto-button.kto-button_size_m.kto-button_mode_outline}
+<a href="https://drive.google.com/drive/folders/1wTJ-PiO6VvbY6XdACGLsWZ_N8KHI0Nvr" as="button" mode="classic" icon="download" icon-position="right">下载所有资源</a>
 
 ### 社交媒体 {id="social-media"}
 

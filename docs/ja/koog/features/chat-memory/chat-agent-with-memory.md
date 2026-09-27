@@ -47,8 +47,8 @@ graph TB
     
         ```kotlin title="build.gradle.kts"
         dependencies {
-            implementation("ai.koog:koog-agents:1.2.0")
-            implementation("ai.koog:agents-features-memory:1.2.0")
+            implementation("ai.koog:koog-agents:1.3.0")
+            implementation("ai.koog:agents-features-memory:1.3.0")
         }
         ```
     
@@ -67,7 +67,7 @@ graph TB
         <dependency>
             <groupId>ai.koog</groupId>
             <artifactId>koog-agents-jvm</artifactId>
-            <version>1.2.0</version>
+            <version>1.3.0</version>
         </dependency>
         <dependency>
             <groupId>ai.koog</groupId>
@@ -111,8 +111,7 @@ graph TB
                 if (input.isEmpty()) continue
 
                 val reply = agent.run(input, sessionId)
-                println("Assistant: $reply
-")
+                println("Assistant: $reply\n")
             }
         }
     }
@@ -143,8 +142,7 @@ graph TB
                     if (input.isEmpty()) continue;
     
                     String reply = agent.run(input, sessionId);
-                    System.out.println("Assistant: " + reply + "
-");
+                    System.out.println("Assistant: " + reply + "\n");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
