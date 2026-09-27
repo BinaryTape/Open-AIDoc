@@ -13,6 +13,10 @@
 const FENCE = /^\s{0,3}(`{3,}|~{3,})(.*)$/
 const ATX = /^(\s{0,3})(#{1,6})\s+(.*)$/
 const ATTR_BLOCK = /\s*\{([^{}]*)\}\s*$/
+// markdown-it-attrs syntax: `#id`, `.class`, `key`, `key=value`, `key="value"`.
+// Heading text can end in braces of its own — `-target {es5|es2015|es2020}`,
+// `-Xcompiler-plugin-order={plugin.before>plugin.after}` — and those are text.
+const ATTR_TOKEN = /^(#[\w-]+|\.[\w-]+|[\w-]+(=("[^"]*"|'[^']*'|[^\s"'{}=]+))?)$/
 // `# --8<-- [start:name]` is a pymdownx.snippets region marker, not a heading.
 // Koog writes them with a leading `#` so MkDocs hides them from the rendered
 // snippet, which makes them indistinguishable from an H1 by shape alone.
@@ -62,7 +66,7 @@ export function listHeadings(markdown) {
     const [, indent, hashes, rest] = match
     if (SNIPPET_MARKER.test(rest.trim())) continue
 
-    const attrMatch = rest.match(ATTR_BLOCK)
+    const attrMatch = matchAttrBlock(rest)
     headings.push({
       index,
       indent,
@@ -141,6 +145,14 @@ export function applySourceAnchors(translated, source) {
   })
 
   return { content: lines.join('\n'), added, skipped: null }
+}
+
+/** The trailing `{...}` of a heading, when it is an attribute block and not text. */
+function matchAttrBlock(rest) {
+  const match = rest.match(ATTR_BLOCK)
+  if (!match) return null
+  const tokens = match[1].match(/(?:[^\s"']+|"[^"]*"|'[^']*')+/g) ?? []
+  return tokens.length > 0 && tokens.every((token) => ATTR_TOKEN.test(token)) ? match : null
 }
 
 function documentTitleAnchor(markdown) {

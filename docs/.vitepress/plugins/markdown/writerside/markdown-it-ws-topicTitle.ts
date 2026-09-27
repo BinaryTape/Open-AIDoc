@@ -28,9 +28,12 @@ export default function markdownItWsTopicTitle(md) {
                     const titleId = titleIdMatch ? titleIdMatch[1] : slugify(titleText)
                     const titleTextWithoutId = titleText.replace(/\s*\{id="([^"]+)"\}\s*$/, '');
 
+                    // Heading text goes into attribute values: an unescaped quote
+                    // would end the attribute early and fail the whole site build.
+                    const attr = (value: string) => md.utils.escapeHtml(value);
                     const replacement = {
                         type: 'html_inline',
-                        content: `<TopicTitle id="${titleId}" level="${level}" title="${titleTextWithoutId}" labelRef="${labelRef}"/>`,
+                        content: `<TopicTitle id="${attr(titleId)}" level="${level}" title="${attr(titleTextWithoutId)}" labelRef="${attr(labelRef)}"/>`,
                         level: openTok.level
                     };
 

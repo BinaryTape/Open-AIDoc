@@ -25,6 +25,31 @@ describe('headingAnchor', () => {
   })
 })
 
+describe('headings that end in braces of their own', () => {
+  it.each([
+    '-target {es5|es2015|es2020}',
+    '-module-kind {umd|commonjs|amd|plain}',
+    '-Xcompiler-plugin-order={plugin.before>plugin.after}',
+  ])('keeps %s as heading text, not an attribute block', (heading) => {
+    const [parsed] = listHeadings(`### ${heading}`)
+    expect(parsed.text).toBe(heading)
+    expect(parsed.attrs).toBeNull()
+  })
+
+  it('still recognises real attribute blocks', () => {
+    const md = ['## One {id="one"}', '## Two {#two .wide}', "## Three {data-x='y'}"].join('\n')
+    expect(listHeadings(md).map((h) => h.attrs)).toEqual(['id="one"', '#two .wide', "data-x='y'"])
+  })
+
+  it('anchors such a heading after its braces instead of inside them', () => {
+    const source = '### -Xcompiler-plugin-order={plugin.before>plugin.after}\n\nConfigure the order.'
+    const translated = '### -Xcompiler-plugin-order={plugin.before>plugin.after}\n\n配置运行顺序。'
+    expect(applySourceAnchors(translated, source).content.split('\n')[0]).toBe(
+      '### -Xcompiler-plugin-order={plugin.before>plugin.after} {id="xcompiler-plugin-order-plugin-before-plugin-after"}'
+    )
+  })
+})
+
 describe('listHeadings', () => {
   it('skips headings inside fenced code blocks', () => {
     const md = ['# Real', '', '```bash', '# not a heading', '```', '', '## Also real'].join('\n')

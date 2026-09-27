@@ -55,7 +55,7 @@ Ktorは、レート制限を構成するためのいくつかの方法を提供�
 ## %plugin_name%のインストール {id="install_plugin"}
 
 <p>
-    <code>%plugin_name%</code>プラグインをアプリケーションに<a href="#install">インストール</a>するには、指定された<Links href="/ktor/server-modules" summary="Modules allow you to structure your application by grouping routes.">モジュール</a>内の<code>install</code>関数に渡します。
+    <code>%plugin_name%</code>プラグインをアプリケーションに<a href="#install">インストール</a>するには、指定された<Links href="/ktor/server-modules" summary="Modules allow you to structure your application by grouping routes.">モジュール</Links>内の<code>install</code>関数に渡します。
     以下の例は、<code>%plugin_name%</code>をインストールする方法を示しています。
 </p>
 <list>

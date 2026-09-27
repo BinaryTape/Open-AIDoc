@@ -143,7 +143,7 @@ Kotlin 스크립트 파일을 평가합니다. 이 옵션과 함께 호출하면
 
 대괄호 구문 `[]`을 사용하는 [컬렉션 리터럴](whatsnew24.md#support-for-collection-literals) 지원을 활성화합니다.
 
-### -Xcompiler-plugin-order= {plugin.before>plugin.after id="xcompiler-plugin-order"}
+### -Xcompiler-plugin-order={plugin.before>plugin.after} {id="xcompiler-plugin-order-plugin-before-plugin-after"}
 <primary-label ref="experimental-general"/>
 
 컴파일러 플러그인의 실행 순서를 구성합니다. 컴파일러는 `plugin.before`를 먼저 실행한 다음 `plugin.after`를 실행합니다:
@@ -425,7 +425,7 @@ Kotlin to JS 컴파일을 위한 커맨드 라인 도구는 `kotlinc-js`입니�
 
 메타데이터가 포함된 `.meta.js` 및 `.kjsm` 파일을 생성합니다. JS 라이브러리를 만들 때 이 옵션을 사용하세요.
 
-### -module-kind {umd|commonjs|amd|plain id="module-kind"}
+### -module-kind {umd|commonjs|amd|plain} {id="module-kind-umd-commonjs-amd-plain"}
 
 컴파일러가 생성하는 JS 모듈의 종류:
 
@@ -478,7 +478,7 @@ Kotlin 코드에서 선언한 변수 및 함수 이름을 소스 맵에 추가�
 
 소스 맵의 경로에 지정된 접두사를 추가합니다.
 
-### -target {es5|es2015|es2020 id="target"}
+### -target {es5|es2015|es2020} {id="target-es5-es2015-es2020"}
 
 지정된 ECMA 버전에 맞는 JS 파일을 생성합니다.
 
