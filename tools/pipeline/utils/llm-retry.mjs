@@ -59,7 +59,6 @@ export function suggestedDelayMs(error) {
  * @param {() => Promise<T>} fn
  * @param {object} options
  * @param {string} options.label - Shown in logs, e.g. `docs/x.md → ja`
- * @param {number} [options.deadline] - Epoch ms; no retry is scheduled past it
  * @param {number} [options.maxAttempts] - Attempts in total, for transient failures
  * @param {number} [options.maxRejections] - Attempts in total, for rejected output
  * @param {number} [options.baseDelayMs] - First backoff delay
@@ -69,7 +68,6 @@ export function suggestedDelayMs(error) {
  */
 export async function withRetry(fn, {
   label,
-  deadline = Infinity,
   maxAttempts = 5,
   maxRejections = 3,
   baseDelayMs = 30_000,
@@ -87,9 +85,6 @@ export async function withRetry(fn, {
 
       const backoff = Math.min(baseDelayMs * 2 ** (attempt - 1), MAX_BACKOFF_MS) * (0.75 + Math.random() * 0.5)
       const delay = kind === 'rejected' ? 0 : Math.max(backoff, suggestedDelayMs(error) ?? 0)
-      if (Date.now() + delay >= deadline) {
-        throw new Error(`time budget exhausted (last attempt: ${error.message})`, { cause: error })
-      }
       console.warn(`  ↻ ${label}: attempt ${attempt} failed (${error.message})` +
         (delay ? `, retrying in ${Math.round(delay / 1000)}s` : ', retrying'))
       await sleep(delay)

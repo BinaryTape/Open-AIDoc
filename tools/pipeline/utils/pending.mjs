@@ -1,7 +1,6 @@
 /**
- * Translations that could not be done in a run — failed after retries, or
- * not started before the time budget ran out — are carried over to the next
- * run in a pending file next to the repository's checkpoint:
+ * Translations that failed in a run, after their retries, are carried over
+ * to the next run in a pending file next to the repository's checkpoint:
  *
  *   .github/last_check_koin.txt            ← upstream commit last synced
  *   .github/last_check_koin.pending.json   ← { "docs/x.md": { langs, reason } }

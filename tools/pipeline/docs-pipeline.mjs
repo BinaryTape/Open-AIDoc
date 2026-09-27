@@ -151,9 +151,7 @@ async function translate(context) {
     Logger.info(`Processing task for: ${repoConfig.id}`);
 
     console.log("\n--- Starting translation process ---");
-    const { translatedPaths, pending } = await translateFiles(repoConfig, work, {
-      deadline: context.deadline,
-    });
+    const { translatedPaths, pending } = await translateFiles(repoConfig, work);
     translatedPaths.forEach((p) => context.gitAddPaths.add(p));
 
     await repoConfig.syncStrategy.postTranslate(context, repoConfig);
@@ -280,16 +278,6 @@ function reportPending(context) {
   }
 }
 
-/**
- * Deadline for starting translations, from TRANSLATE_TIME_BUDGET_MINUTES
- * (measured from the start of the run). Translations not started by then are
- * left pending, so the run still commits its work before the job times out.
- */
-function translationDeadline(startedAt) {
-  const minutes = Number(process.env.TRANSLATE_TIME_BUDGET_MINUTES);
-  return Number.isFinite(minutes) && minutes > 0 ? startedAt + minutes * 60_000 : Infinity;
-}
-
 async function main() {
   Logger.info("Starting Documentation Synchronization Workflow...");
   validateRepos(REPOS);
@@ -300,11 +288,7 @@ async function main() {
     gitAddPaths: new Set(),
     gitRemovePaths: new Set(),
     pendingReport: [],
-    deadline: translationDeadline(Date.now()),
   };
-  if (context.deadline !== Infinity) {
-    Logger.dim(`Translation time budget ends at ${new Date(context.deadline).toISOString()}.`);
-  }
 
   try {
     await sync(context);
