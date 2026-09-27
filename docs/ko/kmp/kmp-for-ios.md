@@ -1,4 +1,3 @@
-```xml
 <topic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:noNamespaceSchemaLocation="https://resources.jetbrains.com/writerside/1.0/topic.v2.xsd"
        id="kmp-for-ios" title="iOS용 Kotlin Multiplatform: 통합, 성능 및 워크플로에 대한 오해">

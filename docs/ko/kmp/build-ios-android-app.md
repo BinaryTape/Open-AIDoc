@@ -1,4 +1,3 @@
-```xml
 <topic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:noNamespaceSchemaLocation="https://resources.jetbrains.com/writerside/1.0/topic.v2.xsd" id="build-ios-android-app" title="Android 및 iOS 앱 구축 방법 (그리고 Kotlin Multiplatform을 사용해야 하는 경우)">
   <web-summary>Android 및 iOS 앱 구축 방법을 탐색하고, 아키텍처와 프레임워크를 비교하며, Kotlin Multiplatform이 적합한 위치를 확인해 보세요.</web-summary>

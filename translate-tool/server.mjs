@@ -584,7 +584,7 @@ app.post('/api/translate', async (req, res) => {
       config: { temperature: 1 },
     });
 
-    const translated = cleanupTranslation(response.text);
+    const translated = cleanupTranslation(response.text, content);
     res.json({ success: true, content: translated });
   } catch (error) {
     console.error('Translation error:', error);
@@ -667,7 +667,7 @@ async function processQueueAsync(apiKey) {
         contents: prompt,
         config: { temperature: 1 },
       });
-      item.result = cleanupTranslation(response.text);
+      item.result = cleanupTranslation(response.text, sourceText);
       item.status = 'completed';
     } catch (error) {
       item.error = error.message;
