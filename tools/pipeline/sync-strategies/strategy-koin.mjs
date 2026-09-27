@@ -2,23 +2,22 @@ import fs from "fs-extra";
 import { glob } from "glob";
 import { defaultStrategy } from "./strategy.mjs";
 import { writeSidebar } from "../processors/SidebarProcessor.mjs";
-import {
-  appendUnlistedDocs,
-  docusaurusToSidebarNodes,
-  fetchDocusaurusSidebars,
-} from "../processors/DocusaurusSidebarProcessor.mjs";
+import { reconcileSidebar } from "../processors/SidebarReconciler.mjs";
 
-const KOIN_SITE = "https://insert-koin.io";
 const SIDEBAR_FILE = "docs/.vitepress/sidebar/koin.sidebar.json";
+
+// Upstream pages the published Koin sidebar deliberately leaves out.
+export const KOIN_HIDDEN_PAGES = ["reference/koin-android/r8-proguard"];
 
 export const koinStrategy = {
   ...defaultStrategy,
 
   /**
    * @override
-   * The Koin sidebar lives in the website repository, which is not public, so
-   * the published one is mirrored instead. koin-annotations feeds the same
-   * docs and sidebar; only the koin repository drives it.
+   * The Koin sidebar is kept in the website repository, which is not public,
+   * so koin.sidebar.json is curated here and reconciled with the upstream docs
+   * on every sync. koin-annotations feeds the same docs and sidebar; only the
+   * koin repository drives it.
    */
   postSync: async (repoPath, context, repoConfig) => {
     if (repoConfig?.id !== "koin") return;
@@ -27,38 +26,31 @@ export const koinStrategy = {
 };
 
 /**
- * Regenerate the Koin sidebar from insert-koin.io. When the site cannot be
- * read, keep the current sidebar and append the pages it does not list.
+ * Reconcile the curated Koin sidebar with the upstream docs of the clone.
  * @param {string} repoPath - Path to the koin clone
  */
 export async function syncKoinSidebar(repoPath) {
-  const upstreamDocs = (await glob("docs/**/*.md", { cwd: repoPath, nodir: true }))
+  const docIds = (await glob("docs/**/*.md", { cwd: repoPath, nodir: true }))
     .map((file) => file.replaceAll("\\", "/").replace(/^docs\//, "").replace(/\.md$/, ""));
-  // A page is servable when upstream still has it (it is translated later in
-  // this run) or when a translation already exists (pages kept in the
-  // website repository, such as support/*).
-  const hasDoc = (docId) => upstreamDocs.includes(docId) || fs.pathExistsSync(`docs/koin/${docId}.md`);
+  // Servable when upstream still has the page (it is translated later in this
+  // run) or a translation already exists (pages kept in the website
+  // repository, such as support/*).
+  const isServable = (docId) => docIds.includes(docId) || fs.pathExistsSync(`docs/koin/${docId}.md`);
 
-  console.log(`  Running Koin postSync: Mirroring sidebar from ${KOIN_SITE}...`);
-  try {
-    const sidebars = await fetchDocusaurusSidebars(KOIN_SITE);
-    const { sidebarNodes, translateKeys, skipped } = docusaurusToSidebarNodes(sidebars, {
-      docType: "koin",
-      hasDoc,
-    });
-    if (sidebarNodes.length === 0) throw new Error("the published sidebar has no servable pages");
-    if (skipped.length > 0) {
-      console.warn(`  ⚠️  Pages on the published sidebar with no source here: ${skipped.join(", ")}`);
-    }
-    await writeSidebar("koin", sidebarNodes, translateKeys);
-    console.log(`  Mirroring sidebar finished`);
-  } catch (error) {
+  const current = await fs.readJson(SIDEBAR_FILE);
+  const { sidebarNodes, translateKeys, added, removed, autoGroups } = reconcileSidebar(current, {
+    docType: "koin",
+    docIds,
+    hidden: KOIN_HIDDEN_PAGES,
+    isServable,
+  });
+
+  console.log(`  Koin sidebar: ${added.length} page(s) added, ${removed.length} removed`);
+  if (autoGroups.length > 0) {
     console.warn(
-      `  ⚠️  Could not read the published Koin sidebar (${error.message}); ` +
-        `keeping ${SIDEBAR_FILE} and appending the pages it does not list.`
+      `  ⚠️  New upstream directories with no listed sibling, filed in auto groups ` +
+        `that need curating in ${SIDEBAR_FILE}: ${autoGroups.join(", ")}`
     );
-    const current = await fs.readJson(SIDEBAR_FILE);
-    const { sidebarNodes, translateKeys } = appendUnlistedDocs(current, upstreamDocs, "koin");
-    await writeSidebar("koin", sidebarNodes, translateKeys);
   }
+  await writeSidebar("koin", sidebarNodes, translateKeys);
 }
