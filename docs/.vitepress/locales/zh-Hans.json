@@ -704,6 +704,5 @@
   "ktor.server-oauth2-flows": "类型安全的 OAuth 2.0 流程",
   "ktor.server-oidc": "OpenID Connect",
   "ktor.server-oidc-resource-server": "资源服务器",
-  "ktor.server-oidc-browser-login": "浏览器登录",
-  "koog._0": "0"
+  "ktor.server-oidc-browser-login": "浏览器登录"
 }

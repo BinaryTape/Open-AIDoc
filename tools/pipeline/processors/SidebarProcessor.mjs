@@ -140,7 +140,7 @@ async function parseWSSidebar(source, docType) {
     }
 }
 
-async function parseMKSidebar(source, docType, baseUrl) {
+export async function parseMKSidebar(source, docType, baseUrl) {
     let yamlStr = await fs.readFile(source, 'utf8');
     yamlStr = preprocessPythonTags(yamlStr);
     yamlStr = yamlStr.replace(/!ENV\s*\[([^\]]+)\]/g, 'null');
@@ -181,12 +181,20 @@ async function parseMKSidebar(source, docType, baseUrl) {
                 ? Object.entries(value).map(([t, v]) => ({[t]: v}))
                 : [];
 
-        node.items = children
-            .map((child) => {
-                const [[t, v]] = Object.entries(child);
-                return entryToNode(t, v);
-            })
-            .filter(Boolean);
+        node.items = [];
+        for (const child of children) {
+            // A path without a title is the section's own index page
+            // (MkDocs `navigation.indexes`): it is the section's link, not a
+            // child. Read as a title/value pair it would be split into single
+            // characters, leaving an empty `{docType}._0` entry.
+            if (typeof child === 'string') {
+                const p = child.trim();
+                if (!node.link && p.endsWith('.md')) node.link = p.replace(/\.md$/i, '');
+                continue;
+            }
+            const [[t, v]] = Object.entries(child);
+            node.items.push(entryToNode(t, v));
+        }
 
         node.collapsed = node.items.length > 0 ? true : undefined;
 
