@@ -1,4 +1,3 @@
-```xml
 <topic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xsi:noNamespaceSchemaLocation="https://resources.jetbrains.com/writerside/1.0/topic.v2.xsd"
    id="cross-platform-frameworks" title="最も人気のあるクロスプラットフォームアプリ開発フレームワーク7選">

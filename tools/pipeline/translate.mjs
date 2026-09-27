@@ -6,6 +6,7 @@ import pLimit from "p-limit";
 import { toContentRelPath } from "../../shared/content-paths.ts";
 import { applySourceAnchors } from "./utils/heading-anchors.mjs";
 import { restoreTitleComment } from "./utils/title-comment.mjs";
+import { stripWrapperFence } from "./utils/wrapper-fence.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -527,7 +528,7 @@ async function translateFile(filePath) {
           }
 
           // Clean up extra content in translation result
-          translatedContent = cleanupTranslation(translatedContent);
+          translatedContent = cleanupTranslation(translatedContent, content);
 
           // A Writerside title comment rewritten as YAML frontmatter leaves the
           // page with no H1 at all.
@@ -564,22 +565,11 @@ async function translateFile(filePath) {
 }
 
 // Clean up extra content in translation results
-export function cleanupTranslation(text) {
+export function cleanupTranslation(text, source) {
   if (!text) return "";
 
-  // Remove markdown code block markers at beginning
-  if (text.startsWith("```markdown")) {
-    text = text.replace(/^```markdown\n/, "");
-  } else if (text.startsWith("```md")) {
-    text = text.replace(/^```md\n/, "");
-  } else if (text.startsWith("```")) {
-    text = text.replace(/^```\n/, "");
-  }
-
-  // Remove markdown code block markers at end
-  if (text.endsWith("```")) {
-    text = text.replace(/```$/, "");
-  }
+  // Remove a code fence wrapping the whole document (```markdown, ```xml, …).
+  text = stripWrapperFence(text, source);
 
   // A model occasionally returns the whole document on one line with a literal
   // `\n` wherever a line break belongs. Unescaping is only safe when there is
@@ -779,10 +769,7 @@ async function translateLocaleFile(filePath) {
       translatedContent = await callGemini(prompt, modelConfig.model);
 
       // Clean up extra content in translation result
-      translatedContent = cleanupTranslation(translatedContent);
-      if (translatedContent.startsWith("```json")) {
-        translatedContent = translatedContent.replace(/^```json\n/, "");
-      }
+      translatedContent = cleanupTranslation(translatedContent, content);
     } else {
       console.error(`File content is empty: ${filePath}`);
     }
