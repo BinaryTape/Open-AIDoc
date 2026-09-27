@@ -66,6 +66,11 @@ jobs:
           GIT_COMMITTER_EMAIL: ${{ secrets.DOCS_SYNC_EMAIL }}
           GITHUB_HEAD_REF: ${{ github.head_ref || github.ref_name }}
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          # Stop starting translations after this many minutes; the rest is
+          # left pending for the next run. The job has 360 minutes in total and
+          # still needs time for in-flight requests (up to 10 minutes each),
+          # the commit, and the post-sync test and site build steps below.
+          TRANSLATE_TIME_BUDGET_MINUTES: "240"
         run: pnpm pipeline:run
 
       # Report-only: never block the sync commit/push.
