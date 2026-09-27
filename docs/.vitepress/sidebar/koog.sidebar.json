@@ -6,9 +6,6 @@
         "text": "koog.overview",
         "items": [
           {
-            "text": "koog._0"
-          },
-          {
             "text": "koog.key-features",
             "link": "key-features"
           },
@@ -25,6 +22,7 @@
             "link": "glossary"
           }
         ],
+        "link": "index",
         "collapsed": true
       },
       {
@@ -34,9 +32,6 @@
       {
         "text": "koog.agents",
         "items": [
-          {
-            "text": "koog._0"
-          },
           {
             "text": "koog.basic-agents",
             "link": "agents/basic-agents"
@@ -53,9 +48,6 @@
             "text": "koog.planner-agents",
             "items": [
               {
-                "text": "koog._0"
-              },
-              {
                 "text": "koog.llm-based-planners",
                 "link": "agents/planner-agents/llm-based-planners"
               },
@@ -64,23 +56,19 @@
                 "link": "agents/planner-agents/goap-agents"
               }
             ],
+            "link": "agents/planner-agents/index",
             "collapsed": true
           }
         ],
+        "link": "agents/index",
         "collapsed": true
       },
       {
         "text": "koog.prompts",
         "items": [
           {
-            "text": "koog._0"
-          },
-          {
             "text": "koog.creating-prompts",
             "items": [
-              {
-                "text": "koog._0"
-              },
               {
                 "text": "koog.multimodal-content",
                 "link": "prompts/prompt-creation/multimodal-content"
@@ -90,6 +78,7 @@
                 "link": "prompts/prompt-creation/cache-control"
               }
             ],
+            "link": "prompts/prompt-creation/index",
             "collapsed": true
           },
           {
@@ -119,6 +108,7 @@
             "link": "prompts/llm-response-caching"
           }
         ],
+        "link": "prompts/index",
         "collapsed": true
       },
       {
@@ -155,9 +145,6 @@
         "text": "koog.tools",
         "items": [
           {
-            "text": "koog._0"
-          },
-          {
             "text": "koog.built-in-tools",
             "link": "tools/built-in-tools"
           },
@@ -174,14 +161,12 @@
             "link": "tools/tool-descriptor-schemer"
           }
         ],
+        "link": "tools/index",
         "collapsed": true
       },
       {
         "text": "koog.features",
         "items": [
-          {
-            "text": "koog._0"
-          },
           {
             "text": "koog.event-handlers",
             "link": "features/agent-event-handlers"
@@ -194,9 +179,6 @@
             "text": "koog.chat-memory",
             "items": [
               {
-                "text": "koog._0"
-              },
-              {
                 "text": "koog.chat-agent-with-memory",
                 "link": "features/chat-memory/chat-agent-with-memory"
               },
@@ -205,6 +187,7 @@
                 "link": "features/chat-memory/chat-backend-with-memory"
               }
             ],
+            "link": "features/chat-memory/index",
             "collapsed": true
           },
           {
@@ -219,9 +202,6 @@
             "text": "koog.opentelemetry",
             "items": [
               {
-                "text": "koog._0"
-              },
-              {
                 "text": "koog.datadog-exporter",
                 "link": "features/open-telemetry/opentelemetry-datadog-exporter"
               },
@@ -234,6 +214,7 @@
                 "link": "features/open-telemetry/opentelemetry-weave-exporter"
               }
             ],
+            "link": "features/open-telemetry/index",
             "collapsed": true
           },
           {
@@ -241,6 +222,7 @@
             "link": "features/custom-features"
           }
         ],
+        "link": "features/index",
         "collapsed": true
       },
       {
@@ -255,9 +237,6 @@
         "text": "koog.a2a-protocol",
         "items": [
           {
-            "text": "koog._0"
-          },
-          {
             "text": "koog.a2a-server-implementation",
             "link": "a2a/a2a-server"
           },
@@ -270,6 +249,7 @@
             "link": "a2a/a2a-koog-integration"
           }
         ],
+        "link": "a2a/index",
         "collapsed": true
       },
       {
@@ -343,13 +323,11 @@
             "text": "koog.subgraphs",
             "items": [
               {
-                "text": "koog._0"
-              },
-              {
                 "text": "koog.custom-subgraphs",
                 "link": "custom-subgraphs"
               }
             ],
+            "link": "subgraphs-overview",
             "collapsed": true
           },
           {
@@ -381,9 +359,6 @@
   {
     "text": "koog.examples",
     "items": [
-      {
-        "text": "koog._0"
-      },
       {
         "text": "koog.attachments",
         "link": "examples/Attachments"
@@ -437,6 +412,7 @@
         "link": "examples/Weave"
       }
     ],
+    "link": "examples",
     "collapsed": true
   },
   {
