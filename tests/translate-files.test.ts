@@ -99,15 +99,6 @@ describe('translateFiles', () => {
     await expect(translateFiles(repoConfig, work(['zh-Hans', 'ja']))).rejects.toBeInstanceOf(FatalApiError)
   })
 
-  it('leaves everything pending once the time budget is spent', async () => {
-    const { translatedPaths, pending } = await translateFiles(repoConfig, work(['zh-Hans', 'ja']), {
-      deadline: Date.now() - 1,
-    })
-
-    expect(generateContent).not.toHaveBeenCalled()
-    expect(translatedPaths).toEqual([])
-    expect(pending).toEqual({ 'docs/guide.md': { langs: ['zh-Hans', 'ja'], reason: 'time budget exhausted' } })
-  })
 
   it('skips a source removed upstream instead of queueing it again', async () => {
     const { pending } = await translateFiles(repoConfig, [{ file: 'docs/gone.md', langs: ['ja'] }])

@@ -153,9 +153,7 @@ async function translate(context) {
     Logger.info(`Processing task for: ${repoConfig.id}`);
 
     console.log("\n--- Starting translation process ---");
-    const { translatedPaths, pending } = await translateFiles(repoConfig, work, {
-      deadline: context.deadline,
-    });
+    const { translatedPaths, pending } = await translateFiles(repoConfig, work);
     translatedPaths.forEach((p) => context.gitAddPaths.add(p));
 
     await repoConfig.syncStrategy.postTranslate(context, repoConfig);
@@ -282,16 +280,6 @@ function reportPending(context) {
   }
 }
 
-/**
- * Deadline for starting translations, from TRANSLATE_TIME_BUDGET_MINUTES
- * (measured from the start of the run). Translations not started by then are
- * left pending, so the run still commits its work before the job times out.
- */
-function translationDeadline(startedAt) {
-  const minutes = Number(process.env.TRANSLATE_TIME_BUDGET_MINUTES);
-  return Number.isFinite(minutes) && minutes > 0 ? startedAt + minutes * 60_000 : Infinity;
-}
-
 const githubUrl = (repoConfig) => `https://github.com/${repoConfig.repo}.git`;
 
 /**
@@ -299,13 +287,11 @@ const githubUrl = (repoConfig) => `https://github.com/${repoConfig.repo}.git`;
  * @param {object} [options]
  * @param {typeof REPOS} [options.repos] - Upstream repositories to sync
  * @param {(repoConfig: object) => string} [options.repoUrl] - Where to clone each one from
- * @param {number} [options.deadline] - Epoch ms after which no translation is started
  * @returns {Promise<object>} The run context, for inspection
  */
 export async function runPipeline({
   repos = REPOS,
   repoUrl = githubUrl,
-  deadline = translationDeadline(Date.now()),
 } = {}) {
   Logger.info("Starting Documentation Synchronization Workflow...");
   validateRepos(repos);
@@ -317,11 +303,7 @@ export async function runPipeline({
     gitAddPaths: new Set(),
     gitRemovePaths: new Set(),
     pendingReport: [],
-    deadline,
   };
-  if (context.deadline !== Infinity) {
-    Logger.dim(`Translation time budget ends at ${new Date(context.deadline).toISOString()}.`);
-  }
 
   await sync(context);
   await detect(context);

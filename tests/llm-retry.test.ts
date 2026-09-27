@@ -58,12 +58,4 @@ describe('withRetry', () => {
     const fn = vi.fn().mockRejectedValue(apiError(403, 'permission denied'))
     await expect(withRetry(fn, { label: 't', sleep: noSleep })).rejects.toBeInstanceOf(FatalApiError)
   })
-
-  it('does not schedule a retry past the deadline', async () => {
-    const fn = vi.fn().mockRejectedValue(apiError(429))
-    await expect(
-      withRetry(fn, { label: 't', sleep: noSleep, baseDelayMs: 60_000, deadline: Date.now() + 1000 })
-    ).rejects.toThrow('time budget exhausted')
-    expect(fn).toHaveBeenCalledTimes(1)
-  })
 })

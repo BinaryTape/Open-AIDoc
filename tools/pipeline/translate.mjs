@@ -578,12 +578,10 @@ export function getLangDisplayName(langCode) {
  * @param {object} repoConfig
  * @param {{file: string, langs: string[]}[]} work - Source files (relative to
  *   the clone) and the languages each one needs
- * @param {{deadline?: number}} [options] - Epoch ms after which no translation
- *   is started or retried
  * @returns {Promise<{translatedPaths: string[], pending: import("./utils/pending.mjs").Pending}>}
  *   `pending` holds what was not translated, to be carried over to the next run.
  */
-export async function translateFiles(repoConfig, work, { deadline = Infinity } = {}) {
+export async function translateFiles(repoConfig, work) {
   const total = work.reduce((sum, unit) => sum + unit.langs.length, 0);
   console.log(`Translating ${work.length} files (${total} translations) for ${repoConfig.id} (${repoConfig.docType})...`);
 
@@ -613,11 +611,9 @@ export async function translateFiles(repoConfig, work, { deadline = Infinity } =
 
     for (const lang of langs) {
       jobs.push(limit(async () => {
-        if (Date.now() >= deadline) return defer(file, lang, "time budget exhausted");
         try {
           translatedPaths.push(await withRetry(() => translateUnit(file, lang, source), {
             label: `${file} → ${lang}`,
-            deadline,
           }));
         } catch (error) {
           if (error instanceof FatalApiError) {

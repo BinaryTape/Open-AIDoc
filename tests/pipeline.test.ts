@@ -290,25 +290,6 @@ describe('docs pipeline', () => {
     expect(originHas('.github/last_check_demo.pending.json')).toBe(false)
   })
 
-  it('leaves translations not started before the deadline pending, and still commits', async () => {
-    await run({ deadline: Date.now() - 1 })
-
-    expect(markdownCalls()).toHaveLength(0)
-    for (const id of ['demo', 'mk']) {
-      const pending = JSON.parse(readSite(`.github/last_check_${id}.pending.json`))
-      expect(Object.values(pending).every((entry: any) => entry.reason === 'time budget exhausted')).toBe(true)
-      expect(Object.values(pending).every((entry: any) => entry.langs.length === LANGS.length)).toBe(true)
-    }
-    expect(originHas('.github/last_check_mk.pending.json')).toBe(true)
-
-    generateContent.mockClear()
-    await run()
-
-    expect(markdownCalls()).toHaveLength(4 * LANGS.length)
-    expect(originHas('.github/last_check_demo.pending.json')).toBe(false)
-    expect(originHas('.github/last_check_mk.pending.json')).toBe(false)
-    expect(originHas('docs/zh-Hant/mk/index.md')).toBe(true)
-  })
 
   it('stops before committing anything when the API key is rejected', async () => {
     override = () => Object.assign(new Error('API key not valid. Please pass a valid API key.'), { status: 400 })
