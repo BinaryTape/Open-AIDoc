@@ -704,5 +704,21 @@
   "ktor.server-oauth2-flows": "类型安全的 OAuth 2.0 流程",
   "ktor.server-oidc": "OpenID Connect",
   "ktor.server-oidc-resource-server": "资源服务器",
-  "ktor.server-oidc-browser-login": "浏览器登录"
+  "ktor.server-oidc-browser-login": "浏览器登录",
+  "koin.introduction": "简介",
+  "koin.kotlin-multiplatform": "Kotlin 多平台",
+  "koin.core": "核心",
+  "koin.advanced": "进阶",
+  "koin.koin-for-android": "Android 版 Koin",
+  "koin.koin-for-compose": "Compose 版 Koin",
+  "koin.koin-for-ktor": "Ktor 版 Koin",
+  "koin.integrations": "集成",
+  "koin.tutorials": "教程",
+  "koin.best-practices": "最佳实践",
+  "koin.testing": "测试",
+  "koin.migration": "迁移",
+  "koin.dsl-reference": "DSL 参考",
+  "koin.annotations-reference": "注解参考",
+  "koin.reference": "参考",
+  "koin.support": "支持"
 }

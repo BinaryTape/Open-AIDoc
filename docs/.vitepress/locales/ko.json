@@ -706,5 +706,21 @@
   "ktor.server-oauth2-flows": "타입 안전한 OAuth 2.0 플로우",
   "ktor.server-oidc": "OpenID Connect",
   "ktor.server-oidc-resource-server": "리소스 서버",
-  "ktor.server-oidc-browser-login": "브라우저 로그인"
+  "ktor.server-oidc-browser-login": "브라우저 로그인",
+  "koin.introduction": "소개",
+  "koin.kotlin-multiplatform": "Kotlin 멀티플랫폼",
+  "koin.core": "코어",
+  "koin.advanced": "고급",
+  "koin.koin-for-android": "Android용 Koin",
+  "koin.koin-for-compose": "Compose용 Koin",
+  "koin.koin-for-ktor": "Ktor용 Koin",
+  "koin.integrations": "통합",
+  "koin.tutorials": "튜토리얼",
+  "koin.best-practices": "모범 사례",
+  "koin.testing": "테스트",
+  "koin.migration": "마이그레이션",
+  "koin.dsl-reference": "DSL 레퍼런스",
+  "koin.annotations-reference": "어노테이션 레퍼런스",
+  "koin.reference": "레퍼런스",
+  "koin.support": "지원"
 }

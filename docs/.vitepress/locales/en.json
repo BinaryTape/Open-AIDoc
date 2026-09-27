@@ -673,5 +673,22 @@
   "ktor.server-oauth2-flows": "Type-safe OAuth 2.0 flows",
   "ktor.server-oidc": "OpenID Connect",
   "ktor.server-oidc-resource-server": "Resource server",
-  "ktor.server-oidc-browser-login": "Browser login"
+  "ktor.server-oidc-browser-login": "Browser login",
+  "koin.introduction": "Introduction",
+  "koin.setup": "Setup",
+  "koin.kotlin-multiplatform": "Kotlin Multiplatform",
+  "koin.core": "Core",
+  "koin.advanced": "Advanced",
+  "koin.koin-for-android": "Koin for Android",
+  "koin.koin-for-compose": "Koin for Compose",
+  "koin.koin-for-ktor": "Koin for Ktor",
+  "koin.integrations": "Integrations",
+  "koin.tutorials": "Tutorials",
+  "koin.best-practices": "Best Practices",
+  "koin.testing": "Testing",
+  "koin.migration": "Migration",
+  "koin.dsl-reference": "DSL Reference",
+  "koin.annotations-reference": "Annotations Reference",
+  "koin.reference": "Reference",
+  "koin.support": "Support"
 }
