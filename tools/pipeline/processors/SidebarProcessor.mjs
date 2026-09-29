@@ -31,6 +31,16 @@ export async function generateSidebar(source, docType, baseUrl = '') {
         translateKeys = new Map();
     }
 
+    await writeSidebar(docType, sidebarNodes, translateKeys);
+}
+
+/**
+ * Write a sidebar JSON and register its translatable labels in the locale files.
+ * @param {string} docType - Sidebar id → docs/.vitepress/sidebar/{docType}.sidebar.json
+ * @param {object[]} sidebarNodes
+ * @param {Map<string, string>} translateKeys - Locale key → English label
+ */
+export async function writeSidebar(docType, sidebarNodes, translateKeys) {
     await generateSidebarJson(docType, sidebarNodes);
     await generateLocaleJson(translateKeys);
 }

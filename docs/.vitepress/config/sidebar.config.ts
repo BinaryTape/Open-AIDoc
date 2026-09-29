@@ -66,7 +66,8 @@ function getTitleFromMarkdown(framework: string, rootDir: string, filePath: stri
     const content = fs.readFileSync(fullPath, "utf-8");
 
     switch (framework) {
-        case 'Docusaurus' : const { data } = matter(content); return data.title || null;
+        // Docusaurus falls back to the first H1 when a page sets no title.
+        case 'Docusaurus' : const { data, content: body } = matter(content); return data.title || body.match(/^# (.+)$/m)?.[1] || null;
         case 'Writerside' : return getWritersideTitle(content) || null;
         default : break;
     }
