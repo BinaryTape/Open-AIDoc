@@ -231,9 +231,8 @@ C. 自定义 HTML → 用 Vue 组件承载
 
 2) 在终端运行：
    ```bash
-   pnpm pipeline:run
-   # 或
-   act -s GOOGLE_API_KEY=KEY -j docs-update
+   pnpm pipeline:run                 # 全部仓库，在一个进程里同步、翻译、提交并推送
+   pnpm pipeline:run --repo koin     # 只处理指定仓库（REPOS 的 id，可用逗号分隔多个）
    ```
 
 脚本阶段说明：
@@ -247,6 +246,13 @@ C. 自定义 HTML → 用 Vue 组件承载
 - 每篇文档的每种语言单独翻译、单独重试：限流（429）、5xx、网络错误会退避重试；译文与原文结构对不上（标题、代码块、链接明显变少，常见于模型输出摘要或被截断）时会重新生成，始终不合格就不写入，保留原有译文；API key 无效会直接终止整个运行。
 - 重试后仍然失败的文档记在 `.github/last_check_{id}.pending.json`（文档路径 → 缺失的语言 + 原因），下次运行只补这些语言。断点（`last_check_{id}.txt`）照常前进。
 - 全量重译：删除 `.github/last_check_*.txt` 后运行，会被当作首次运行处理全部文档。
+
+CI 中的运行方式（`.github/workflows/docs-update.yaml`）：
+- **plan**：记下 `main` 的当前提交作为基线，列出要同步的仓库。
+- **translate**：每个上游仓库一个 matrix 任务，都从同一个基线提交开始，执行 STAGE 1–3（`docs-pipeline.mjs translate`），**不提交**，只把改动的文件、删除清单、词典键的增量和待办上传为 artifact。任务失败会自动重试一次（API key 无效除外）；一个仓库失败不影响其他仓库。
+- **finalize**：按 REPOS 顺序应用所有成功任务的 artifact（词典按键合并），翻译侧边栏标签，提交一次（`docs-pipeline.mjs finalize`），强制推送到 `automation/docs-sync` 分支，并创建或更新同步 PR。
+- 失败的仓库不会进入提交，断点保持不动，下次运行会重新同步；需要立即重试时，在工作流运行页面使用 **Re-run failed jobs**（finalize 可以重复执行，结果相同），或手动运行工作流并填写 `repo`。
+- 每个仓库的结果和待办会写进同步 PR 的描述和运行汇总。
 
 站点构建时才会应用 **LinkRewrite**（与上述 STAGE 无关）。
 
