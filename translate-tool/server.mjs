@@ -385,29 +385,6 @@ function getDefaultPrompt(targetLang) {
 // ─── Translation Helpers ────────────────────────────────────────────────────
 
 /**
- * Find the local previous translation for a file.
- * @param {string} projectName - e.g. "kotlin"
- * @param {string} fileName - basename of the file, e.g. "getting-started.md"
- * @param {string} targetLang
- */
-function loadPreviousTranslation(projectName, fileName, targetLang) {
-  try {
-    const targetPath = path.join(
-      ROOT,
-      'docs',
-      toContentRelPath(targetLang, projectName, fileName)
-    );
-    if (fs.existsSync(targetPath)) {
-      const content = fs.readFileSync(targetPath, 'utf8');
-      return `\n### 先前翻译版本\n\`\`\`\n${content}\n\`\`\`\n`;
-    }
-  } catch (e) {
-    console.warn('Failed to load previous translation:', e.message);
-  }
-  return '';
-}
-
-/**
  * Calculate the local target path for saving a translated file.
  * @param {string} projectName - e.g. "kotlin"
  * @param {string} fileName - basename of the file
@@ -559,7 +536,7 @@ app.post('/api/prompt/:lang', (req, res) => {
 // ─── Translation ────────────────────────────────────────────────────────────
 
 app.post('/api/translate', async (req, res) => {
-  const { sourceContent, targetLang, model, useTerminology, usePrevTranslation, preprocessMode, customPrompt, projectName, fileName, apiKey } = req.body;
+  const { sourceContent, targetLang, model, useTerminology, preprocessMode, customPrompt, projectName, fileName, apiKey } = req.body;
 
   try {
     // Optional pre-processing
@@ -570,13 +547,9 @@ app.post('/api/translate', async (req, res) => {
 
     const ai = getGenAI(apiKey);
     const terms = useTerminology !== false ? getTerminologyForLang(targetLang) : '';
-    let prevTranslation = '';
-    if (usePrevTranslation !== false && projectName && fileName) {
-      prevTranslation = loadPreviousTranslation(projectName, fileName, targetLang);
-    }
 
     const promptTemplate = customPrompt || getDefaultPrompt(targetLang);
-    const prompt = fillPromptTemplate(promptTemplate, targetLang, content, terms, prevTranslation);
+    const prompt = fillPromptTemplate(promptTemplate, targetLang, content, terms);
 
     const response = await ai.models.generateContent({
       model: model || 'gemini-3.8-flash',
@@ -652,16 +625,12 @@ async function processQueueAsync(apiKey) {
     try {
       const ai = getGenAI(apiKey);
       const terms = item.options.useTerminology !== false ? getTerminologyForLang(item.targetLang) : '';
-      let prevTranslation = '';
-      if (item.options.usePrevTranslation !== false && item.projectName && item.fileName) {
-        prevTranslation = loadPreviousTranslation(item.projectName, item.fileName, item.targetLang);
-      }
       let sourceText = item.sourceContent;
       if (item.options.preprocessMode && item.options.preprocessMode !== 'none' && item.fileName) {
         sourceText = await preprocessContent(sourceText, item.fileName, item.projectName || 'unknown', item.options.preprocessMode);
       }
       const promptTemplate = item.options.customPrompt || getDefaultPrompt(item.targetLang);
-      const prompt = fillPromptTemplate(promptTemplate, item.targetLang, sourceText, terms, prevTranslation);
+      const prompt = fillPromptTemplate(promptTemplate, item.targetLang, sourceText, terms);
       const response = await ai.models.generateContent({
         model: item.model,
         contents: prompt,

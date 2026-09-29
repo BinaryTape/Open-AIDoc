@@ -363,7 +363,6 @@
           </select>
         </div>
         <label><input type="checkbox" v-model="useTerminology"> 术语表</label>
-        <label><input type="checkbox" v-model="usePrevTranslation"> 先前翻译</label>
         <div class="toolbar-sep"></div>
         <button class="btn" @click="preprocessOnly" :disabled="!sourceContent || preprocessMode === 'none' || isPreprocessing" title="仅预处理，不翻译">
           <span v-if="isPreprocessing" class="spinner" style="width:12px;height:12px;border-width:1.5px"></span>
@@ -440,7 +439,7 @@
             <button class="btn btn-primary btn-sm" @click="savePrompt">保存修改</button>
           </div>
           <textarea v-model="editingPrompt" rows="16" style="font-size:12px"></textarea>
-          <p class="setting-hint">可用占位符: {RELEVANT_TERMS}, {TRANSLATION_REFERENCES}, {SOURCE_TEXT}</p>
+          <p class="setting-hint">可用占位符: {RELEVANT_TERMS}, {SOURCE_TEXT}</p>
         </div>
         <div class="setting-group">
           <label>术语表预览</label>
@@ -512,7 +511,6 @@ const app = createApp({
     const selectedModel = ref('gemini-3.8-flash');
     const preprocessMode = ref('both'); // 'none' | 'topic' | 'markdown' | 'both'
     const useTerminology = ref(true);
-    const usePrevTranslation = ref(true);
     const isTranslating = ref(false);
     const isPreprocessing = ref(false);
     const sourceView = ref('code');     // 原文档默认编辑器
@@ -741,7 +739,6 @@ const app = createApp({
             model: selectedModel.value,
             preprocessMode: preprocessMode.value,
             useTerminology: useTerminology.value,
-            usePrevTranslation: usePrevTranslation.value,
             projectName: selectedFile.value?.projectName || null,
             fileName: selectedFile.value?.name || null,
             apiKey: apiKey.value || undefined,
@@ -764,7 +761,7 @@ const app = createApp({
           projectName: selectedFile.value?.projectName || null,
           targetLang: targetLang.value,
           model: selectedModel.value,
-          options: { preprocessMode: preprocessMode.value, useTerminology: useTerminology.value, usePrevTranslation: usePrevTranslation.value },
+          options: { preprocessMode: preprocessMode.value, useTerminology: useTerminology.value },
         }
       });
       sidebarTab.value = 'queue';
@@ -825,7 +822,7 @@ const app = createApp({
       sidebarTab, projects, languages, languageNames, models, hasEnvKey,
       navLevel, currentProject, currentRepoIdx, currentRepoData, currentRepoConfig, loadingTree, expanded,
       selectedFile, sourceContent, translatedContent, loadingFile,
-      targetLang, selectedModel, preprocessMode, useTerminology, usePrevTranslation, isTranslating, isPreprocessing,
+      targetLang, selectedModel, preprocessMode, useTerminology, isTranslating, isPreprocessing,
       sourceView, targetView,
       queue, isProcessingQueue, activeQueueItem,
       uploads, isDragging, fileInput,

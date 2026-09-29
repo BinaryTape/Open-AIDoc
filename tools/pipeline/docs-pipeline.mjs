@@ -1,8 +1,11 @@
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { execa } from "execa";
 import fs from "fs-extra";
 import { glob } from "glob";
-import { translateFiles, translateLocaleFiles } from "./translate.mjs";
+import { TARGET_LANGUAGES, translateFiles, translateLocaleFiles } from "./translate.mjs";
 import { REPOS, validateRepos } from "./repos.config.mjs";
+import { mergeWork, readPending, writePending } from "./utils/pending.mjs";
 
 const Logger = {
   info: (message) => console.log(`\n✅ ${message}`),
@@ -50,7 +53,7 @@ async function sync(context) {
   for (const repoConfig of context.repos) {
     console.log(`\n--- Processing repository: ${repoConfig.id} (${repoConfig.docType}) ---`);
     const repoExists = await fs.pathExists(repoConfig.cloneDir);
-    const repoUrl = `https://github.com/${repoConfig.repo}.git`;
+    const repoUrl = context.repoUrl(repoConfig);
 
     if (!repoExists) {
       console.log(`Cloning full history of ${repoConfig.repo}...`);
@@ -77,14 +80,20 @@ async function detect(context) {
   for (const repoConfig of context.repos) {
     const lastSha = await files.getLastCommitSha(repoConfig.lastCheckFile);
     const currentSha = await git.getCurrentSha(repoConfig.cloneDir);
+    const pending = await readPending(repoConfig);
+    const pendingCount = Object.keys(pending).length;
 
     Logger.info(`Checking: ${repoConfig.id}`);
     Logger.dim(`Current SHA: ${currentSha}`);
     Logger.dim(`Last checked SHA: ${lastSha || "N/A"}`);
+    if (pendingCount > 0) {
+      Logger.dim(`Pending from earlier runs: ${pendingCount} document(s).`);
+    }
 
     const isFirstRun = !lastSha;
     const hasChanged = lastSha !== currentSha;
 
+    let changedDocs = [];
     if (isFirstRun || hasChanged) {
       Logger.dim(
         isFirstRun
@@ -93,30 +102,39 @@ async function detect(context) {
       );
       const docPatterns = repoConfig.syncStrategy.getDocPatterns();
       const allDocs = await files.find(repoConfig.cloneDir, docPatterns);
-      const changedDocs = isFirstRun
+      changedDocs = isFirstRun
         ? allDocs
         : (await git.getChangedFiles(repoConfig.cloneDir, lastSha)).filter(
             (f) => allDocs.includes(f)
           );
+    } else {
+      Logger.dim("No new commits detected in the repository.");
+    }
 
-      if (changedDocs.length > 0) {
-        Logger.dim(`Found ${changedDocs.length} changed document(s).`);
-        Logger.dim(changedDocs.map((f) => `  - ${f}`).join("\n"));
-        const task = {
-          repoConfig,
-          files: changedDocs,
-          newSha: currentSha,
-        };
-        await repoConfig.syncStrategy.postDetect(repoConfig, task);
-        context.tasks.push(task);
-      } else {
+    if (changedDocs.length === 0 && pendingCount === 0) {
+      if (isFirstRun || hasChanged) {
         Logger.dim("No relevant documents changed, updating checkpoint.");
         await fs.outputFile(repoConfig.lastCheckFile, currentSha);
         context.gitAddPaths.add(repoConfig.lastCheckFile);
       }
-    } else {
-      Logger.dim("No new commits detected in the repository.");
+      continue;
     }
+
+    if (changedDocs.length > 0) {
+      Logger.dim(`Found ${changedDocs.length} changed document(s).`);
+      Logger.dim(changedDocs.map((f) => `  - ${f}`).join("\n"));
+    }
+    const task = {
+      repoConfig,
+      files: changedDocs,
+      newSha: currentSha,
+    };
+    // Also run for pending-only tasks: strategies prepare the clone here
+    // (flattening, topic conversion) and pending paths refer to that layout.
+    await repoConfig.syncStrategy.postDetect(repoConfig, task);
+    // Changed documents need every language; pending ones only those missing.
+    task.work = mergeWork(task.files, pending, TARGET_LANGUAGES);
+    context.tasks.push(task);
   }
 }
 
@@ -131,18 +149,23 @@ async function translate(context) {
   }
 
   for (const task of context.tasks) {
-    const { repoConfig, files: filesToTranslate } = task;
+    const { repoConfig, work } = task;
     Logger.info(`Processing task for: ${repoConfig.id}`);
 
     console.log("\n--- Starting translation process ---");
-    console.log(
-      `Translating ${filesToTranslate.length} files for ${repoConfig.id} (${repoConfig.docType})...`
-    );
-
-    const translatedPaths = await translateFiles(repoConfig, filesToTranslate);
+    const { translatedPaths, pending } = await translateFiles(repoConfig, work);
     translatedPaths.forEach((p) => context.gitAddPaths.add(p));
 
     await repoConfig.syncStrategy.postTranslate(context, repoConfig);
+
+    // What could not be translated is carried over in the pending file, so the
+    // checkpoint can move on without losing it.
+    const pendingChange = await writePending(repoConfig, pending);
+    if (pendingChange?.removed) context.gitRemovePaths.add(pendingChange.path);
+    else if (pendingChange) context.gitAddPaths.add(pendingChange.path);
+    for (const [file, { langs, reason }] of Object.entries(pending)) {
+      context.pendingReport.push({ repo: repoConfig.id, file, langs, reason });
+    }
 
     await fs.outputFile(repoConfig.lastCheckFile, task.newSha);
     context.gitAddPaths.add(repoConfig.lastCheckFile);
@@ -181,6 +204,10 @@ async function commit(context) {
   Logger.dim("Adding the following paths to git:");
   pathsToAdd.forEach((p) => Logger.dim(`  - ${p}`));
   await execa("git", ["add", ...pathsToAdd]);
+  if (context.gitRemovePaths.size > 0) {
+    // Pending files emptied in this run; untracked ones are simply gone.
+    await execa("git", ["rm", "--cached", "--ignore-unmatch", "--quiet", "--", ...context.gitRemovePaths]);
+  }
 
   const { stdout: status } = await execa("git", ["status", "--porcelain"]);
   if (!status) {
@@ -222,24 +249,76 @@ async function commit(context) {
   await execa("git", ["push", "origin", `HEAD:${branchName}`]);
 }
 
-async function main() {
+// =================================================================
+// REPORT - List what is carried over to the next run
+// =================================================================
+function reportPending(context) {
+  const rows = context.pendingReport;
+  if (rows.length === 0) {
+    Logger.info("Every queued translation completed.");
+    return;
+  }
+
+  Logger.error(`${rows.length} document(s) left pending for the next run:`);
+  rows.forEach(({ repo, file, langs, reason }) =>
+    Logger.dim(`[${repo}] ${file} (${langs.join(", ")}): ${reason}`)
+  );
+
+  if (process.env.GITHUB_STEP_SUMMARY) {
+    const escape = (text) => String(text).replaceAll("|", "\\|").replaceAll("\n", " ");
+    const lines = [
+      "## Translations pending for the next run",
+      "",
+      "| Repository | Document | Languages | Reason |",
+      "| --- | --- | --- | --- |",
+      ...rows.map(({ repo, file, langs, reason }) =>
+        `| ${repo} | \`${escape(file)}\` | ${langs.join(", ")} | ${escape(reason)} |`
+      ),
+      "",
+    ];
+    fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, lines.join("\n") + "\n");
+  }
+}
+
+const githubUrl = (repoConfig) => `https://github.com/${repoConfig.repo}.git`;
+
+/**
+ * Run every stage in the current working directory (the site repository).
+ * @param {object} [options]
+ * @param {typeof REPOS} [options.repos] - Upstream repositories to sync
+ * @param {(repoConfig: object) => string} [options.repoUrl] - Where to clone each one from
+ * @returns {Promise<object>} The run context, for inspection
+ */
+export async function runPipeline({
+  repos = REPOS,
+  repoUrl = githubUrl,
+} = {}) {
   Logger.info("Starting Documentation Synchronization Workflow...");
-  validateRepos(REPOS);
+  validateRepos(repos);
 
   const context = {
-    repos: REPOS,
+    repos,
+    repoUrl,
     tasks: [],
     gitAddPaths: new Set(),
+    gitRemovePaths: new Set(),
+    pendingReport: [],
   };
 
-  try {
-    await sync(context);
-    await detect(context);
-    await translate(context);
-    await translateSidebar(context);
-    await commit(context);
+  await sync(context);
+  await detect(context);
+  await translate(context);
+  await translateSidebar(context);
+  await commit(context);
+  reportPending(context);
 
-    Logger.info("Workflow completed successfully.");
+  Logger.info("Workflow completed successfully.");
+  return context;
+}
+
+async function main() {
+  try {
+    await runPipeline();
   } catch (error) {
     Logger.error("Workflow failed with an error:");
     console.error(error);
@@ -247,7 +326,11 @@ async function main() {
   }
 }
 
-(async () => {
+// Run only when executed as a script, not when imported (e.g. by tests).
+const isEntryPoint =
+  process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+
+if (isEntryPoint) (async () => {
   process.env.GIT_AUTHOR_NAME =
     process.env.GIT_AUTHOR_NAME || "github-actions[bot]";
   process.env.GIT_AUTHOR_EMAIL =
