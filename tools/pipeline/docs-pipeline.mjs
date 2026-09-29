@@ -6,6 +6,8 @@ import { glob } from "glob";
 import { TARGET_LANGUAGES, translateFiles, translateLocaleFiles } from "./translate.mjs";
 import { REPOS, validateRepos } from "./repos.config.mjs";
 import { mergeWork, readPending, writePending } from "./utils/pending.mjs";
+import { FatalApiError } from "./utils/llm-retry.mjs";
+import { applyRepoArtifacts, exportRepoChanges, formatSyncReport, stageChanges } from "./sync-artifacts.mjs";
 
 const Logger = {
   info: (message) => console.log(`\n✅ ${message}`),
@@ -186,28 +188,18 @@ async function translateSidebar(context) {
 }
 
 // =================================================================
-// STAGE 4: COMMIT - Push all changes to the repository
+// STAGE 4: COMMIT - Commit (and push) all changes
 // =================================================================
-async function commit(context) {
+async function commit(context, { push = true } = {}) {
   Logger.step("STAGE 4: Finalizing and committing changes...");
   if (context.gitAddPaths.size === 0) {
     Logger.info("No file changes to commit.");
     return;
   }
 
-  const sidebarFiles = await files.find("docs/.vitepress/sidebar", ["*.json"]);
-  sidebarFiles.forEach((f) =>
-    context.gitAddPaths.add(`docs/.vitepress/sidebar/${f}`)
-  );
-
-  const pathsToAdd = [...context.gitAddPaths];
-  Logger.dim("Adding the following paths to git:");
-  pathsToAdd.forEach((p) => Logger.dim(`  - ${p}`));
-  await execa("git", ["add", ...pathsToAdd]);
-  if (context.gitRemovePaths.size > 0) {
-    // Pending files emptied in this run; untracked ones are simply gone.
-    await execa("git", ["rm", "--cached", "--ignore-unmatch", "--quiet", "--", ...context.gitRemovePaths]);
-  }
+  await stageChanges(context);
+  Logger.dim("Staged the following paths:");
+  [...context.gitAddPaths].forEach((p) => Logger.dim(`  - ${p}`));
 
   const { stdout: status } = await execa("git", ["status", "--porcelain"]);
   if (!status) {
@@ -241,6 +233,7 @@ async function commit(context) {
       },
     }
   );
+  if (!push) return;
 
   const branchName = process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME;
   if (!branchName) throw new Error("Could not determine branch to push to.");
@@ -263,33 +256,19 @@ function reportPending(context) {
   rows.forEach(({ repo, file, langs, reason }) =>
     Logger.dim(`[${repo}] ${file} (${langs.join(", ")}): ${reason}`)
   );
-
-  if (process.env.GITHUB_STEP_SUMMARY) {
-    const escape = (text) => String(text).replaceAll("|", "\\|").replaceAll("\n", " ");
-    const lines = [
-      "## Translations pending for the next run",
-      "",
-      "| Repository | Document | Languages | Reason |",
-      "| --- | --- | --- | --- |",
-      ...rows.map(({ repo, file, langs, reason }) =>
-        `| ${repo} | \`${escape(file)}\` | ${langs.join(", ")} | ${escape(reason)} |`
-      ),
-      "",
-    ];
-    fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, lines.join("\n") + "\n");
-  }
 }
 
 const githubUrl = (repoConfig) => `https://github.com/${repoConfig.repo}.git`;
 
 /**
- * Run every stage in the current working directory (the site repository).
+ * Sync, detect and translate, in the current working directory (the site
+ * repository). Nothing is committed.
  * @param {object} [options]
  * @param {typeof REPOS} [options.repos] - Upstream repositories to sync
  * @param {(repoConfig: object) => string} [options.repoUrl] - Where to clone each one from
- * @returns {Promise<object>} The run context, for inspection
+ * @returns {Promise<object>} The run context
  */
-export async function runPipeline({
+export async function translateRepos({
   repos = REPOS,
   repoUrl = githubUrl,
 } = {}) {
@@ -308,21 +287,101 @@ export async function runPipeline({
   await sync(context);
   await detect(context);
   await translate(context);
-  await translateSidebar(context);
-  await commit(context);
-  reportPending(context);
-
-  Logger.info("Workflow completed successfully.");
   return context;
 }
 
-async function main() {
+/**
+ * Translate the sidebar labels, then commit what the run changed.
+ * @param {object} context - Context of translateRepos, or of applyRepoArtifacts
+ * @param {{push?: boolean}} [options]
+ */
+export async function publishRun(context, { push = true } = {}) {
+  await translateSidebar(context);
+  await commit(context, { push });
+  reportPending(context);
+  Logger.info("Workflow completed successfully.");
+}
+
+/**
+ * Run every stage in one process: all repositories, one commit, pushed.
+ * @param {object} [options] - See translateRepos
+ * @returns {Promise<object>} The run context, for inspection
+ */
+export async function runPipeline(options = {}) {
+  const context = await translateRepos(options);
+  await publishRun(context);
+  return context;
+}
+
+/**
+ * CI: apply the artifacts of the per-repository jobs, translate the sidebar
+ * labels and commit, without pushing (the workflow pushes the sync branch).
+ * @returns {Promise<string>} Markdown report of the run
+ */
+export async function finalizeRun({ artifactsDir, expected }) {
+  const { context, results } = await applyRepoArtifacts(artifactsDir, expected);
+  await publishRun(context, { push: false });
+  return formatSyncReport(results, context.pendingReport);
+}
+
+function selectRepos(ids) {
+  if (ids.length === 0) return REPOS;
+  const unknown = ids.filter((id) => !REPOS.some((r) => r.id === id));
+  if (unknown.length > 0) throw new Error(`Unknown repository id(s): ${unknown.join(", ")}`);
+  return REPOS.filter((r) => ids.includes(r.id));
+}
+
+function parseArgs(argv) {
+  const [command, rest] = !argv[0] || argv[0].startsWith("--") ? ["run", argv] : [argv[0], argv.slice(1)];
+  const options = { repo: [] };
+  for (let i = 0; i < rest.length; i++) {
+    const name = rest[i].replace(/^--/, "");
+    const value = rest[++i] ?? "";
+    if (name === "repo") options.repo.push(...value.split(",").filter(Boolean));
+    else options[name] = value;
+  }
+  return { command, options };
+}
+
+/**
+ * Commands:
+ *   (none) [--repo id]               sync, translate and push, all in one process
+ *   list [--repo id]                 print `repos=[…]` for a GitHub Actions output
+ *   translate --repo id --out dir    CI: translate one repository, export the changes
+ *   finalize --artifacts dir --expect '["id",…]' [--report file]
+ *                                    CI: apply every job's changes and commit (no push)
+ */
+async function main(argv) {
+  const { command, options } = parseArgs(argv);
   try {
-    await runPipeline();
+    if (command === "list") {
+      console.log(`repos=${JSON.stringify(selectRepos(options.repo).map((r) => r.id))}`);
+      return;
+    }
+    if (!process.env.GOOGLE_API_KEY) {
+      throw new Error("GOOGLE_API_KEY environment variable is not set.");
+    }
+
+    if (command === "run") {
+      await runPipeline({ repos: selectRepos(options.repo) });
+    } else if (command === "translate") {
+      if (!options.out || options.repo.length === 0) throw new Error("translate needs --repo and --out");
+      const context = await translateRepos({ repos: selectRepos(options.repo) });
+      reportPending(context);
+      await exportRepoChanges(context, options.out);
+    } else if (command === "finalize") {
+      if (!options.artifacts || !options.expect) throw new Error("finalize needs --artifacts and --expect");
+      const report = await finalizeRun({ artifactsDir: options.artifacts, expected: JSON.parse(options.expect) });
+      if (options.report) await fs.outputFile(options.report, report);
+      console.log(report);
+    } else {
+      throw new Error(`Unknown command: ${command}`);
+    }
   } catch (error) {
     Logger.error("Workflow failed with an error:");
     console.error(error);
-    process.exit(1);
+    // 3: a credentials problem, which retrying the job cannot fix
+    process.exit(error instanceof FatalApiError ? 3 : 1);
   }
 }
 
@@ -330,18 +389,11 @@ async function main() {
 const isEntryPoint =
   process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
 
-if (isEntryPoint) (async () => {
+if (isEntryPoint) {
   process.env.GIT_AUTHOR_NAME =
     process.env.GIT_AUTHOR_NAME || "github-actions[bot]";
   process.env.GIT_AUTHOR_EMAIL =
     process.env.GIT_AUTHOR_EMAIL ||
     "github-actions[bot]@users.noreply.github.com";
-  // Uncomment the next line to simulate a specific branch name for testing
-  // process.env.GITHUB_REF_NAME = "docs-update-branch";
-  console.log("Starting documentation pipeline script...");
-  if (!process.env.GOOGLE_API_KEY) {
-    console.error("GOOGLE_API_KEY environment variable is not set.");
-    process.exit(1);
-  }
-  await main();
-})();
+  await main(process.argv.slice(2));
+}

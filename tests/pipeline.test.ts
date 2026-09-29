@@ -6,7 +6,8 @@
  * and push — except the model: @google/genai is replaced by a fake that
  * returns a structurally faithful "translation" (prose lines tagged with the
  * target language). Upstream repositories and the site's `origin` are
- * throwaway git repositories in a temp directory.
+ * throwaway git repositories in a temp directory. The same sync is also run
+ * the way CI runs it: one job per repository, then one job that commits.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { execFileSync } from 'node:child_process'
@@ -21,7 +22,8 @@ vi.mock('@google/genai', () => ({
   },
 }))
 
-const { runPipeline } = await import('../tools/pipeline/docs-pipeline.mjs')
+const { runPipeline, translateRepos, finalizeRun } = await import('../tools/pipeline/docs-pipeline.mjs')
+const { exportRepoChanges } = await import('../tools/pipeline/sync-artifacts.mjs')
 const { defaultStrategy } = await import('../tools/pipeline/sync-strategies/strategy.mjs')
 const { koogStrategy } = await import('../tools/pipeline/sync-strategies/strategy-koog.mjs')
 const { FatalApiError } = await import('../tools/pipeline/utils/llm-retry.mjs')
@@ -150,7 +152,8 @@ const originHas = (path: string) => {
     return false
   }
 }
-const run = (options = {}) => runPipeline({ repos, repoUrl: (r: { id: string }) => join(root, 'upstream', r.id), ...options })
+const repoUrl = (r: { id: string }) => join(root, 'upstream', r.id)
+const run = (options = {}) => runPipeline({ repos, repoUrl, ...options })
 
 beforeEach(() => {
   root = mkdtempSync(join(tmpdir(), 'pipeline-'))
@@ -298,5 +301,96 @@ describe('docs pipeline', () => {
 
     expect(originLog()).toEqual(['site skeleton'])
     expect(existsSync(siteFile('.github/last_check_demo.txt'))).toBe(false)
+  })
+})
+
+// ─── Per-repository CI jobs ──────────────────────────────────────────────────
+
+/** A CI job's checkout: a fresh clone of the site at the current origin/main. */
+function checkout(name: string) {
+  const dir = join(root, name)
+  git(root, 'clone', '-q', origin(), dir)
+  return dir
+}
+
+const artifacts = () => join(root, 'artifacts')
+
+async function repoJob(id: string) {
+  process.chdir(checkout(`job-${id}`))
+  const context = await translateRepos({ repos: repos.filter((r) => r.id === id), repoUrl })
+  await exportRepoChanges(context, join(artifacts(), `sync-${id}`))
+}
+
+async function finalizeJob(name: string, expected = ['demo', 'mk']) {
+  const dir = checkout(name)
+  process.chdir(dir)
+  const report = await finalizeRun({ artifactsDir: artifacts(), expected })
+  return { dir, report }
+}
+
+const treeOf = (dir: string) => git(dir, 'rev-parse', 'HEAD^{tree}')
+
+describe('docs pipeline split into per-repository CI jobs', () => {
+  it('ends in the same commit tree as a single run', async () => {
+    await repoJob('demo')
+    await repoJob('mk')
+    const { dir, report } = await finalizeJob('finalize')
+
+    expect(git(dir, 'log', '--format=%s', '-1')).toBe('docs: [demo, mk] Sync and translate upstream documentation')
+    expect(git(dir, 'rev-list', '--count', 'HEAD')).toBe('2')
+    expect(report).toContain('| demo | ✅ updated |')
+    expect(report).toContain('| mk | ✅ updated |')
+
+    // The same sync done by one process, pushed to origin
+    process.chdir(site())
+    await run()
+    expect(treeOf(dir)).toBe(git(origin(), 'rev-parse', 'main^{tree}'))
+  })
+
+  it('commits the repositories that succeeded and reports the one that failed', async () => {
+    await repoJob('demo') // the mk job failed: no artifact
+    const { dir, report } = await finalizeJob('finalize')
+
+    expect(git(dir, 'log', '--format=%s', '-1')).toBe('docs: [demo] Sync and translate upstream documentation')
+    expect(existsSync(join(dir, '.github/last_check_demo.txt'))).toBe(true)
+    expect(existsSync(join(dir, '.github/last_check_mk.txt'))).toBe(false)
+    expect(existsSync(join(dir, 'docs/mk/usage.md'))).toBe(false)
+    expect(report).toContain('| mk | ❌ failed, retried next run |')
+    expect(report).toContain('Re-run failed jobs')
+  })
+
+  it('finalizes to the same tree when run again from the same artifacts', async () => {
+    await repoJob('demo')
+    await repoJob('mk')
+    const first = await finalizeJob('finalize-1')
+    const second = await finalizeJob('finalize-2')
+
+    expect(treeOf(second.dir)).toBe(treeOf(first.dir))
+  })
+
+  it('carries a job\'s pending translations into the commit and the report', async () => {
+    override = (source, lang) => (lang === 'ja' && source.includes('Intro to Setup.') ? '概要のみ。' : undefined)
+    await repoJob('demo')
+    override = () => undefined
+    await repoJob('mk')
+    const { dir, report } = await finalizeJob('finalize')
+
+    const pending = JSON.parse(readFileSync(join(dir, '.github/last_check_demo.pending.json'), 'utf8'))
+    expect(pending['docs/nested/setup.md'].langs).toEqual(['ja'])
+    expect(git(dir, 'ls-files', '.github/last_check_demo.pending.json')).not.toBe('')
+    expect(report).toMatch(/\| demo \| `docs\/nested\/setup\.md` \| ja \| incomplete translation/)
+  })
+
+  it('commits nothing when no job changed anything', async () => {
+    await run() // origin now holds a synced site
+    generateContent.mockClear()
+    await repoJob('demo')
+    await repoJob('mk')
+    const { dir, report } = await finalizeJob('finalize')
+
+    expect(markdownCalls()).toHaveLength(0)
+    expect(git(dir, 'rev-list', '--count', 'HEAD')).toBe('2') // skeleton + the earlier sync, nothing new
+    expect(git(dir, 'status', '--porcelain')).toBe('')
+    expect(report).toContain('| demo | — no changes |')
   })
 })

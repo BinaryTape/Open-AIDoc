@@ -1,28 +1,55 @@
 name: Docs update
 
+# Each upstream repository is synced and translated in its own job, all from
+# the same commit of main; the jobs only upload what they changed. One final
+# job applies every job's changes, commits once and opens (or updates) the
+# sync pull request, so no two jobs ever race to push.
+#
+# A repository whose job fails is left out of the commit and keeps its
+# checkpoint, so the next run syncs it again. To retry right away, use
+# "Re-run failed jobs" (the final job is repeatable), or run the workflow with
+# `repo` set.
+
 on:
   schedule:
     - cron: "0 0 * * 0" # Run every Sunday at 0:00 UTC
-  workflow_dispatch: # Allow manual trigger
+  workflow_dispatch:
+    inputs:
+      repo:
+        description: "Only sync these upstream repositories (REPOS ids, comma-separated); empty for all"
+        required: false
+        default: ""
 
-# Push uses DOCS_SYNC_TOKEN (admin/maintain PAT) so branch rules can be bypassed.
-# Commit author/committer come from DOCS_SYNC_NAME + DOCS_SYNC_EMAIL (sync bot account).
+concurrency:
+  group: docs-update
+  cancel-in-progress: false
+
+# Pushes and the pull request use DOCS_SYNC_TOKEN (sync account PAT), so the
+# pull request also triggers CI. Commit author/committer come from
+# DOCS_SYNC_NAME + DOCS_SYNC_EMAIL.
 permissions:
   contents: read
 
+env:
+  SYNC_BRANCH: automation/docs-sync
+
 jobs:
-  docs-update:
+  plan:
     runs-on: ubuntu-latest
-    timeout-minutes: 360
+    timeout-minutes: 10
+    outputs:
+      repos: ${{ steps.repos.outputs.repos }}
+      sha: ${{ steps.base.outputs.sha }}
     steps:
       - name: Check sync secrets
         env:
           DOCS_SYNC_TOKEN: ${{ secrets.DOCS_SYNC_TOKEN }}
           DOCS_SYNC_NAME: ${{ secrets.DOCS_SYNC_NAME }}
           DOCS_SYNC_EMAIL: ${{ secrets.DOCS_SYNC_EMAIL }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
         run: |
           missing=0
-          for key in DOCS_SYNC_TOKEN DOCS_SYNC_NAME DOCS_SYNC_EMAIL; do
+          for key in DOCS_SYNC_TOKEN DOCS_SYNC_NAME DOCS_SYNC_EMAIL GOOGLE_API_KEY; do
             if [ -z "${!key}" ]; then
               echo "::error::Missing repository secret: $key"
               missing=1
@@ -30,75 +57,136 @@ jobs:
           done
           if [ "$missing" -ne 0 ]; then
             echo "Add these repository secrets (Settings → Secrets and variables → Actions):"
-            echo "  DOCS_SYNC_TOKEN  — PAT of the sync account (repo contents: read/write; account needs Admin or Maintain to bypass main ruleset)"
+            echo "  DOCS_SYNC_TOKEN  — PAT of the sync account (repo contents read/write, pull requests read/write)"
             echo "  DOCS_SYNC_NAME   — git user.name / GitHub display identity (e.g. openaidoc-sync)"
             echo "  DOCS_SYNC_EMAIL  — verified email or noreply, e.g. 12345678+openaidoc-sync@users.noreply.github.com"
+            echo "  GOOGLE_API_KEY   — Gemini API key used for translation"
             exit 1
           fi
 
       - name: Checkout main repository
         uses: actions/checkout@v4
+
+      - uses: ./.github/actions/setup-pnpm
+
+      # Every job starts from this commit, so their changes combine cleanly.
+      - name: Record base commit
+        id: base
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: List repositories to sync
+        id: repos
+        env:
+          REPO_INPUT: ${{ inputs.repo }}
+        run: node --import tsx tools/pipeline/docs-pipeline.mjs list --repo "$REPO_INPUT" >> "$GITHUB_OUTPUT"
+
+  translate:
+    name: translate (${{ matrix.repo }})
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    strategy:
+      # One repository failing must not cancel the others.
+      fail-fast: false
+      # All jobs share the Gemini quota; each runs up to 10 requests at once.
+      max-parallel: 3
+      matrix:
+        repo: ${{ fromJSON(needs.plan.outputs.repos) }}
+    steps:
+      - name: Checkout main repository
+        uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          ref: ${{ needs.plan.outputs.sha }}
+
+      - uses: ./.github/actions/setup-pnpm
+
+      # Translation calls retry on their own; this retries the whole job once
+      # for failures around them (a clone that times out, a crashed runner
+      # step). Exit code 3 is a credentials problem, which a retry cannot fix.
+      - name: Sync and translate ${{ matrix.repo }}
+        env:
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          REPO: ${{ matrix.repo }}
+        run: |
+          for attempt in 1 2; do
+            node --import tsx tools/pipeline/docs-pipeline.mjs translate \
+              --repo "$REPO" --out "$RUNNER_TEMP/sync" && exit 0
+            status=$?
+            if [ "$status" -eq 3 ]; then exit "$status"; fi
+            echo "::warning::Attempt $attempt for $REPO failed (exit $status)"
+            # Start the retry from the base commit; upstream clones are
+            # git-ignored and survive, so they are only fetched again.
+            git reset -q --hard && git clean -qfd
+          done
+          exit 1
+
+      - name: Upload changes
+        uses: actions/upload-artifact@v4
+        with:
+          name: sync-${{ matrix.repo }}
+          path: ${{ runner.temp }}/sync
+          # Checkpoints and pending files live under .github/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 7
+
+  finalize:
+    needs: [plan, translate]
+    # Commit what the successful jobs produced even when some failed.
+    if: ${{ always() && needs.plan.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout main repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.plan.outputs.sha }}
           token: ${{ secrets.DOCS_SYNC_TOKEN }}
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
+      - uses: ./.github/actions/setup-pnpm
+
+      # With every job failed there is nothing to download; the next step
+      # still runs and reports each repository as failed.
+      - name: Download changes
+        uses: actions/download-artifact@v4
+        continue-on-error: true
         with:
-          version: 11
-          run_install: false
+          pattern: sync-*
+          path: ${{ runner.temp }}/artifacts
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-          cache: "pnpm"
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      # Sync may commit/push even when the tree would fail tests.
-      - name: Run Update and Translation Script
+      - name: Apply changes, translate sidebar labels and commit
         env:
           GIT_AUTHOR_NAME: ${{ secrets.DOCS_SYNC_NAME }}
           GIT_AUTHOR_EMAIL: ${{ secrets.DOCS_SYNC_EMAIL }}
           GIT_COMMITTER_NAME: ${{ secrets.DOCS_SYNC_NAME }}
           GIT_COMMITTER_EMAIL: ${{ secrets.DOCS_SYNC_EMAIL }}
-          GITHUB_HEAD_REF: ${{ github.head_ref || github.ref_name }}
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
-        run: pnpm pipeline:run
-
-      # Report-only: never block the sync commit/push.
-      - name: Post-sync unit tests (report only)
-        id: unit_tests
-        continue-on-error: true
-        run: pnpm test
-
-      - name: Post-sync docs check (report only)
-        id: docs_check
-        continue-on-error: true
-        run: pnpm docs:check
-
-      - name: Write post-sync test summary
-        if: always()
-        env:
-          UNIT_OUTCOME: ${{ steps.unit_tests.outcome }}
-          DOCS_OUTCOME: ${{ steps.docs_check.outcome }}
+          EXPECTED_REPOS: ${{ needs.plan.outputs.repos }}
         run: |
-          {
-            echo "## Docs update summary"
-            echo ""
-            echo "| Step | Result |"
-            echo "| --- | --- |"
-            echo "| Pipeline (sync/translate/commit) | ${{ job.status }} |"
-            echo "| \`pnpm test\` | ${UNIT_OUTCOME} |"
-            echo "| \`pnpm docs:check\` | ${DOCS_OUTCOME} |"
-            echo ""
-            if [ "$UNIT_OUTCOME" = "success" ] && [ "$DOCS_OUTCOME" = "success" ]; then
-              echo "✅ All post-sync tests passed."
-            else
-              echo "⚠️ Post-sync tests reported failures. Sync commit is **not** blocked."
-              echo ""
-              echo "Open the failed steps above for full logs. Fix via a follow-up PR (CI will require green tests)."
-            fi
-          } >> "$GITHUB_STEP_SUMMARY"
+          node --import tsx tools/pipeline/docs-pipeline.mjs finalize \
+            --artifacts "$RUNNER_TEMP/artifacts" \
+            --expect "$EXPECTED_REPOS" \
+            --report "$RUNNER_TEMP/report.md"
+          cat "$RUNNER_TEMP/report.md" >> "$GITHUB_STEP_SUMMARY"
+
+      # The sync branch is rebuilt from main on every run: a sync pull request
+      # that is still open when the next run starts is replaced by one covering
+      # both, since main's checkpoints have not moved.
+      - name: Push sync branch and open or update the pull request
+        env:
+          GH_TOKEN: ${{ secrets.DOCS_SYNC_TOKEN }}
+          BASE_SHA: ${{ needs.plan.outputs.sha }}
+        run: |
+          if [ "$(git rev-parse HEAD)" = "$BASE_SHA" ]; then
+            echo "Nothing to sync."
+            exit 0
+          fi
+          git push --force origin "HEAD:refs/heads/$SYNC_BRANCH"
+          pr=$(gh pr list --head "$SYNC_BRANCH" --state open --json number --jq '.[0].number')
+          if [ -n "$pr" ]; then
+            gh pr edit "$pr" --body-file "$RUNNER_TEMP/report.md"
+          else
+            gh pr create --base main --head "$SYNC_BRANCH" \
+              --title "docs: sync upstream documentation" \
+              --body-file "$RUNNER_TEMP/report.md"
+          fi
