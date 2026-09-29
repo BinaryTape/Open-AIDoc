@@ -1,3 +1,5 @@
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { execa } from "execa";
 import fs from "fs-extra";
 import { glob } from "glob";
@@ -51,7 +53,7 @@ async function sync(context) {
   for (const repoConfig of context.repos) {
     console.log(`\n--- Processing repository: ${repoConfig.id} (${repoConfig.docType}) ---`);
     const repoExists = await fs.pathExists(repoConfig.cloneDir);
-    const repoUrl = `https://github.com/${repoConfig.repo}.git`;
+    const repoUrl = context.repoUrl(repoConfig);
 
     if (!repoExists) {
       console.log(`Cloning full history of ${repoConfig.repo}...`);
@@ -278,27 +280,45 @@ function reportPending(context) {
   }
 }
 
-async function main() {
+const githubUrl = (repoConfig) => `https://github.com/${repoConfig.repo}.git`;
+
+/**
+ * Run every stage in the current working directory (the site repository).
+ * @param {object} [options]
+ * @param {typeof REPOS} [options.repos] - Upstream repositories to sync
+ * @param {(repoConfig: object) => string} [options.repoUrl] - Where to clone each one from
+ * @returns {Promise<object>} The run context, for inspection
+ */
+export async function runPipeline({
+  repos = REPOS,
+  repoUrl = githubUrl,
+} = {}) {
   Logger.info("Starting Documentation Synchronization Workflow...");
-  validateRepos(REPOS);
+  validateRepos(repos);
 
   const context = {
-    repos: REPOS,
+    repos,
+    repoUrl,
     tasks: [],
     gitAddPaths: new Set(),
     gitRemovePaths: new Set(),
     pendingReport: [],
   };
 
-  try {
-    await sync(context);
-    await detect(context);
-    await translate(context);
-    await translateSidebar(context);
-    await commit(context);
-    reportPending(context);
+  await sync(context);
+  await detect(context);
+  await translate(context);
+  await translateSidebar(context);
+  await commit(context);
+  reportPending(context);
 
-    Logger.info("Workflow completed successfully.");
+  Logger.info("Workflow completed successfully.");
+  return context;
+}
+
+async function main() {
+  try {
+    await runPipeline();
   } catch (error) {
     Logger.error("Workflow failed with an error:");
     console.error(error);
@@ -306,7 +326,11 @@ async function main() {
   }
 }
 
-(async () => {
+// Run only when executed as a script, not when imported (e.g. by tests).
+const isEntryPoint =
+  process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+
+if (isEntryPoint) (async () => {
   process.env.GIT_AUTHOR_NAME =
     process.env.GIT_AUTHOR_NAME || "github-actions[bot]";
   process.env.GIT_AUTHOR_EMAIL =
