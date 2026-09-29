@@ -7,6 +7,8 @@ import { toContentRelPath } from "../../shared/content-paths.ts";
 import { applySourceAnchors } from "./utils/heading-anchors.mjs";
 import { restoreTitleComment } from "./utils/title-comment.mjs";
 import { stripWrapperFence } from "./utils/wrapper-fence.mjs";
+import { checkTranslation } from "./utils/translation-check.mjs";
+import { FatalApiError, TranslationRejected, withRetry } from "./utils/llm-retry.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -15,12 +17,22 @@ const __dirname = path.dirname(__filename);
 const configPath = path.resolve(__dirname, "./translate-config.json");
 const config = JSON.parse(fs.readFileSync(configPath, "utf8"));
 
+export const TARGET_LANGUAGES = config.targetLanguages;
+
+// Translations started at once; each language of each file is one translation.
+const CONCURRENCY = 10;
+// A request that hangs longer than this is abandoned and retried.
+const REQUEST_TIMEOUT_MS = 10 * 60 * 1000;
+
 // Google LLM API
 let genAI = (() => {
   let instance;
   return () => {
     if (!instance) {
-      instance = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY });
+      instance = new GoogleGenAI({
+        apiKey: process.env.GOOGLE_API_KEY,
+        httpOptions: { timeout: REQUEST_TIMEOUT_MS },
+      });
     }
     return instance;
   };
@@ -193,7 +205,7 @@ export function getPromptTemplate(targetLang, langDisplayName) {
     ### Terminology List (Glossary)
     * The following terms must use the specified translations:
     {RELEVANT_TERMS}
-    
+
     ---
     
     ## VI. Content to Translate
@@ -279,7 +291,7 @@ export function getPromptTemplate(targetLang, langDisplayName) {
     ### 術語表 (Glossary)
     * 以下術語必須使用指定翻譯：
     {RELEVANT_TERMS}
-    
+
     ---
     
     ## 六、待翻譯內容
@@ -366,7 +378,7 @@ export function getPromptTemplate(targetLang, langDisplayName) {
     ### 术语表 (Glossary)
     * 以下术语必须使用指定翻译：
     {RELEVANT_TERMS}
-    
+
     ---
     
     ## 六、待翻译内容
@@ -377,125 +389,65 @@ export function getPromptTemplate(targetLang, langDisplayName) {
     \`\`\``;
 }
 
-// Call LLM API for translation
-async function translateWithLLM(text, targetLang, filePath) {
-  const modelConfig = config.modelConfigs[targetLang];
-  const prompt = prepareTranslationPrompt(text, targetLang);
-
-  if (modelConfig.provider === "google") {
-    return await callGemini(prompt, modelConfig.model);
-  }
-
-  throw new Error(`Unsupported provider: ${modelConfig.provider}`);
-}
-
 // Call Gemini API
-async function callGemini(prompt, model) {
-  try {
-    const response = await genAI().models.generateContent({
-      model: model,
-      contents: prompt,
-      config: {
-        temperature: 1,
-      },
-    });
-
-    return response.text;
-  } catch (error) {
-    console.error("Gemini API error:", error);
-    throw error;
+async function callGemini(prompt, targetLang) {
+  const modelConfig = config.modelConfigs[targetLang];
+  if (modelConfig.provider !== "google") {
+    throw new Error(`Unsupported provider: ${modelConfig.provider}`);
   }
+
+  const response = await genAI().models.generateContent({
+    model: modelConfig.model,
+    contents: prompt,
+    config: {
+      temperature: 1,
+    },
+  });
+
+  // Anything but a natural stop means the text is cut short or missing. A
+  // document too long for the output limit will not fit on another try either.
+  const finishReason = response.candidates?.[0]?.finishReason;
+  if (finishReason === "MAX_TOKENS") {
+    throw new Error("output cut off at the model's token limit");
+  }
+  if (finishReason && finishReason !== "STOP") {
+    throw new TranslationRejected(`generation stopped early (${finishReason})`);
+  }
+  if (!response.text?.trim()) {
+    throw new TranslationRejected("empty response");
+  }
+  return response.text;
 }
 
-// Translate file
-async function translateFile(filePath) {
-  console.log(`Translating file: ${filePath}`);
-  const targetTranslateFiles = [];
+// Translate one file into one language and write the result
+async function translateUnit(filePath, targetLang, source) {
+  const prompt = prepareTranslationPrompt(source, targetLang);
+  let translated = cleanupTranslation(await callGemini(prompt, targetLang), source);
 
-  if (!filePath) {
-    console.error("Invalid file path");
-    return targetTranslateFiles;
+  // A Writerside title comment rewritten as YAML frontmatter leaves the
+  // page with no H1 at all.
+  translated = restoreTitleComment(translated, source).content;
+
+  // A summary, a truncated page or an invented stub is not written; the
+  // current translation, if any, stays until a complete one arrives.
+  const problems = checkTranslation(translated, source);
+  if (problems.length > 0) {
+    throw new TranslationRejected(`incomplete translation: ${problems.join("; ")}`);
   }
 
-  // Fix file path, need to read source file from REPO_PATH
-  const absoluteFilePath = path.resolve(process.env.REPO_PATH, filePath);
+  const targetPath = getTargetPath(filePath, targetLang);
 
-  // Check if file exists
-  if (!fs.existsSync(absoluteFilePath)) {
-    console.error(`File not found: ${absoluteFilePath}`);
-    return targetTranslateFiles;
+  // Translating a heading changes the anchor generated from it, which
+  // would break every upstream `page.md#anchor` link pointing at it.
+  const anchored = applySourceAnchors(translated, source);
+  if (anchored.skipped) {
+    console.warn(`⚠️ Keeping upstream anchors out of ${targetPath}: ${anchored.skipped}`);
   }
 
-  try {
-    let content = fs.readFileSync(absoluteFilePath, "utf8");
-
-    for (const targetLang of config.targetLanguages) {
-      try {
-        // Use new path calculation function
-        const targetPath = getTargetPath(filePath, targetLang);
-
-        if (!targetPath) {
-          console.error(
-            `Unable to get target path: ${filePath} -> ${targetLang}`
-          );
-          continue;
-        }
-
-        // Create target directory
-        fs.mkdirSync(path.dirname(targetPath), { recursive: true });
-
-        // Translate content
-        let translatedContent;
-        if (content && content.trim()) {
-          translatedContent = await translateWithLLM(
-            content,
-            targetLang,
-            filePath
-          );
-
-          // Check translation result
-          if (!translatedContent) {
-            console.error(
-              `Translation result is empty: ${filePath} -> ${targetLang}`
-            );
-            continue;
-          }
-
-          // Clean up extra content in translation result
-          translatedContent = cleanupTranslation(translatedContent, content);
-
-          // A Writerside title comment rewritten as YAML frontmatter leaves the
-          // page with no H1 at all.
-          translatedContent = restoreTitleComment(translatedContent, content).content;
-
-          // Translating a heading changes the anchor generated from it, which
-          // would break every upstream `page.md#anchor` link pointing at it.
-          const anchored = applySourceAnchors(translatedContent, content);
-          if (anchored.skipped) {
-            console.warn(
-              `⚠️ Keeping upstream anchors out of ${targetPath}: ${anchored.skipped}`
-            );
-          }
-          translatedContent = anchored.content;
-        } else {
-          console.error(`File content is empty: ${filePath}`);
-          continue;
-        }
-
-        // Write translated file
-        fs.writeFileSync(targetPath, translatedContent);
-        console.log(`Translated to ${targetLang}: ${targetPath}`);
-        targetTranslateFiles.push(targetPath);
-      } catch (langError) {
-        console.error(
-          `Error translating to ${targetLang}: ${langError.message}`
-        );
-      }
-    }
-  } catch (fileError) {
-    console.error(`Error processing file ${filePath}: ${fileError.message}`);
-  }
-  return targetTranslateFiles;
+  fs.mkdirSync(path.dirname(targetPath), { recursive: true });
+  fs.writeFileSync(targetPath, anchored.content);
+  console.log(`Translated to ${targetLang}: ${targetPath}`);
+  return targetPath;
 }
 
 // Clean up extra content in translation results
@@ -621,95 +573,105 @@ export function getLangDisplayName(langCode) {
   return config.languageNames[langCode] || langCode;
 }
 
-async function retry(fn, attempts = 3) {
-  let lastError;
-  for (let i = 1; i <= attempts; i++) {
-    try {
-      return await fn();
-    } catch (e) {
-      lastError = e;
-      console.warn(`Attempt ${i} failed: ${e.message}`);
-    }
-  }
-  throw lastError;
-}
-
-export async function translateFiles(repoConfig, files) {
-  console.log(`Translating ${files.length} files for ${repoConfig.id} (${repoConfig.docType})...`);
+/**
+ * Translate the files of one repository.
+ * @param {object} repoConfig
+ * @param {{file: string, langs: string[]}[]} work - Source files (relative to
+ *   the clone) and the languages each one needs
+ * @returns {Promise<{translatedPaths: string[], pending: import("./utils/pending.mjs").Pending}>}
+ *   `pending` holds what was not translated, to be carried over to the next run.
+ */
+export async function translateFiles(repoConfig, work) {
+  const total = work.reduce((sum, unit) => sum + unit.langs.length, 0);
+  console.log(`Translating ${work.length} files (${total} translations) for ${repoConfig.id} (${repoConfig.docType})...`);
 
   // Set environment variables
   process.env.DOC_TYPE = repoConfig.docType;
   process.env.REPO_PATH = repoConfig.cloneDir;
   process.env.DOC_PATH = repoConfig.sourceDocRoot;
 
-  const limit = pLimit(10);
-  const translationTasks = files.map((file) =>
-    limit(async () => {
-      try {
-        return await retry(() => translateFile(file), 3);
-      } catch (e) {
-        console.error(`❌ Failed translating ${file} after 3 attempts:`, e);
-        return [];
-      }
-    })
-  );
+  const translatedPaths = [];
+  const pending = {};
+  const defer = (file, lang, reason) => {
+    console.error(`❌ ${file} → ${lang}: ${reason}`);
+    (pending[file] ??= { langs: [], reason }).langs.push(lang);
+  };
 
-  const results = await Promise.all(translationTasks);
-  return results.flat();
+  const limit = pLimit(CONCURRENCY);
+  const jobs = [];
+  for (const { file, langs } of work) {
+    const absolutePath = path.resolve(process.env.REPO_PATH, file);
+    const source = fs.existsSync(absolutePath) ? fs.readFileSync(absolutePath, "utf8") : null;
+    if (!source?.trim()) {
+      // Removed upstream since it was queued, or never produced by the
+      // strategy (e.g. a skipped topic): there is nothing to translate.
+      console.warn(`Skipping ${file}: ${source === null ? "source not found" : "empty source"}`);
+      continue;
+    }
+
+    for (const lang of langs) {
+      jobs.push(limit(async () => {
+        try {
+          translatedPaths.push(await withRetry(() => translateUnit(file, lang, source), {
+            label: `${file} → ${lang}`,
+          }));
+        } catch (error) {
+          if (error instanceof FatalApiError) {
+            limit.clearQueue();
+            throw error;
+          }
+          defer(file, lang, error.message);
+        }
+      }));
+    }
+  }
+
+  await Promise.all(jobs);
+  return { translatedPaths, pending };
 }
 
 export async function translateLocaleFiles(files) {
   console.log(`Translating locale files...`);
 
-  const limit = pLimit(10);
-  const translationTasks = files.map((file) =>
+  const translatedPaths = [];
+  const limit = pLimit(CONCURRENCY);
+  await Promise.all(files.map((file) =>
     limit(async () => {
       try {
-        return await retry(() => translateLocaleFile(file), 3);
-      } catch (e) {
-        console.error(`❌ Failed translating ${file} after 3 attempts:`, e);
-        return [];
+        translatedPaths.push(await withRetry(() => translateLocaleFile(file), { label: file }));
+      } catch (error) {
+        if (error instanceof FatalApiError) throw error;
+        // The file keeps its untranslated values; every run translates the
+        // locale files again, so they are picked up next time.
+        console.error(`❌ ${file}: ${error.message}`);
       }
     })
-  );
-
-  const results = await Promise.all(translationTasks);
-  return results.flat();
+  ));
+  return translatedPaths;
 }
 
 async function translateLocaleFile(filePath) {
   console.log(`Translating locale file: ${filePath}`);
-  let targetTranslateFile = "";
   const absoluteFilePath = path.resolve("docs/.vitepress/locales", filePath);
+  const content = fs.readFileSync(absoluteFilePath, "utf8");
+  const targetLang = path.basename(filePath, ".json");
 
-  if (!fs.existsSync(absoluteFilePath)) {
-    console.error(`File not found: ${absoluteFilePath}`);
-    return targetTranslateFile;
-  }
+  const prompt = prepareTranslationPrompt(content, targetLang, { isLocaleFile: true });
+  const translated = cleanupTranslation(await callGemini(prompt, targetLang), content);
 
+  // An unparsable file or a lost key breaks the site configuration.
+  let values;
   try {
-    let content = fs.readFileSync(absoluteFilePath, "utf8");
-
-    // Translate content
-    let translatedContent;
-    if (content && content.trim()) {
-      const targetLang = filePath.split(".")[0];
-      const modelConfig = config.modelConfigs[targetLang];
-      const prompt = prepareTranslationPrompt(content, targetLang, { isLocaleFile: true });
-      translatedContent = await callGemini(prompt, modelConfig.model);
-
-      // Clean up extra content in translation result
-      translatedContent = cleanupTranslation(translatedContent, content);
-    } else {
-      console.error(`File content is empty: ${filePath}`);
-    }
-
-    // Write translated file
-    fs.writeFileSync(absoluteFilePath, translatedContent);
-    console.log(`${filePath} Translated`);
-    targetTranslateFile = absoluteFilePath;
-  } catch (fileError) {
-    console.error(`Error processing file ${filePath}: ${fileError.message}`);
+    values = JSON.parse(translated);
+  } catch (error) {
+    throw new TranslationRejected(`invalid JSON: ${error.message}`);
   }
-  return targetTranslateFile;
+  const missing = Object.keys(JSON.parse(content)).filter((key) => !(key in values));
+  if (missing.length > 0) {
+    throw new TranslationRejected(`missing keys: ${missing.slice(0, 5).join(", ")}${missing.length > 5 ? ", …" : ""}`);
+  }
+
+  fs.writeFileSync(absoluteFilePath, JSON.stringify(values, null, 2) + "\n");
+  console.log(`${filePath} Translated`);
+  return absoluteFilePath;
 }

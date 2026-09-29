@@ -238,10 +238,15 @@ C. 自定义 HTML → 用 Vue 组件承载
 
 脚本阶段说明：
 - STAGE 1: 同步上游仓库（克隆/更新）并执行 SyncStrategy 的 `postSync`；
-- STAGE 2: 计算变更并生成任务，调用 SyncStrategy 的 `postDetect`；
+- STAGE 2: 计算变更并生成任务（加上上次遗留的待办），调用 SyncStrategy 的 `postDetect`；
 - STAGE 3: 调用 Gemini 执行翻译，随后执行 SyncStrategy 的 `postTranslate`（拷贝资源等）；
 - STAGE 3.1: 翻译/更新 `docs/.vitepress/locales/*.json`；
 - STAGE 4: 统一 `git add` + `commit` + `push` 到 `GITHUB_REF_NAME`。
+
+翻译的可靠性：
+- 每篇文档的每种语言单独翻译、单独重试：限流（429）、5xx、网络错误会退避重试；译文与原文结构对不上（标题、代码块、链接明显变少，常见于模型输出摘要或被截断）时会重新生成，始终不合格就不写入，保留原有译文；API key 无效会直接终止整个运行。
+- 重试后仍然失败的文档记在 `.github/last_check_{id}.pending.json`（文档路径 → 缺失的语言 + 原因），下次运行只补这些语言。断点（`last_check_{id}.txt`）照常前进。
+- 全量重译：删除 `.github/last_check_*.txt` 后运行，会被当作首次运行处理全部文档。
 
 站点构建时才会应用 **LinkRewrite**（与上述 STAGE 无关）。
 
