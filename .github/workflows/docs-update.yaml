@@ -2,8 +2,10 @@ name: Docs update
 
 # Each upstream repository is synced and translated in its own job, all from
 # the same commit of main; the jobs only upload what they changed. One final
-# job applies every job's changes, commits once and opens (or updates) the
-# sync pull request, so no two jobs ever race to push.
+# job applies every job's changes, commits once and pushes straight to the
+# branch the workflow runs on (main), so no two jobs ever race to push. Tests
+# and the site build run after the push and only report: a sync is never held
+# back, and a broken result shows up in the run summary to be fixed after.
 #
 # A repository whose job fails is left out of the commit and keeps its
 # checkpoint, so the next run syncs it again. To retry right away, use
@@ -24,14 +26,10 @@ concurrency:
   group: docs-update
   cancel-in-progress: false
 
-# Pushes and the pull request use DOCS_SYNC_TOKEN (sync account PAT), so the
-# pull request also triggers CI. Commit author/committer come from
-# DOCS_SYNC_NAME + DOCS_SYNC_EMAIL.
+# The push uses DOCS_SYNC_TOKEN (admin/maintain PAT) so the main ruleset can be
+# bypassed. Commit author/committer come from DOCS_SYNC_NAME + DOCS_SYNC_EMAIL.
 permissions:
   contents: read
-
-env:
-  SYNC_BRANCH: automation/docs-sync
 
 jobs:
   plan:
@@ -57,7 +55,7 @@ jobs:
           done
           if [ "$missing" -ne 0 ]; then
             echo "Add these repository secrets (Settings → Secrets and variables → Actions):"
-            echo "  DOCS_SYNC_TOKEN  — PAT of the sync account (repo contents read/write, pull requests read/write)"
+            echo "  DOCS_SYNC_TOKEN  — PAT of the sync account (repo contents: read/write; account needs Admin or Maintain to bypass main ruleset)"
             echo "  DOCS_SYNC_NAME   — git user.name / GitHub display identity (e.g. openaidoc-sync)"
             echo "  DOCS_SYNC_EMAIL  — verified email or noreply, e.g. 12345678+openaidoc-sync@users.noreply.github.com"
             echo "  GOOGLE_API_KEY   — Gemini API key used for translation"
@@ -135,13 +133,16 @@ jobs:
     # Commit what the successful jobs produced even when some failed.
     if: ${{ always() && needs.plan.result == 'success' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    # Includes the report-only site build after the push.
+    timeout-minutes: 120
     steps:
       - name: Checkout main repository
         uses: actions/checkout@v4
         with:
           ref: ${{ needs.plan.outputs.sha }}
           token: ${{ secrets.DOCS_SYNC_TOKEN }}
+          # Full history, so the sync commit can be rebased before pushing.
+          fetch-depth: 0
 
       - uses: ./.github/actions/setup-pnpm
 
@@ -169,24 +170,63 @@ jobs:
             --report "$RUNNER_TEMP/report.md"
           cat "$RUNNER_TEMP/report.md" >> "$GITHUB_STEP_SUMMARY"
 
-      # The sync branch is rebuilt from main on every run: a sync pull request
-      # that is still open when the next run starts is replaced by one covering
-      # both, since main's checkpoints have not moved.
-      - name: Push sync branch and open or update the pull request
+      # Something may have been merged into the branch while the jobs ran: the
+      # sync commit is then rebased onto it before pushing (a sync only touches
+      # translated docs, sidebars, locale files and checkpoints).
+      - name: Push to ${{ github.ref_name }}
+        id: push
         env:
-          GH_TOKEN: ${{ secrets.DOCS_SYNC_TOKEN }}
           BASE_SHA: ${{ needs.plan.outputs.sha }}
+          BRANCH: ${{ github.ref_name }}
+          GIT_COMMITTER_NAME: ${{ secrets.DOCS_SYNC_NAME }}
+          GIT_COMMITTER_EMAIL: ${{ secrets.DOCS_SYNC_EMAIL }}
         run: |
           if [ "$(git rev-parse HEAD)" = "$BASE_SHA" ]; then
             echo "Nothing to sync."
+            echo "pushed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          git push --force origin "HEAD:refs/heads/$SYNC_BRANCH"
-          pr=$(gh pr list --head "$SYNC_BRANCH" --state open --json number --jq '.[0].number')
-          if [ -n "$pr" ]; then
-            gh pr edit "$pr" --body-file "$RUNNER_TEMP/report.md"
-          else
-            gh pr create --base main --head "$SYNC_BRANCH" \
-              --title "docs: sync upstream documentation" \
-              --body-file "$RUNNER_TEMP/report.md"
-          fi
+          for attempt in 1 2 3; do
+            git fetch origin "$BRANCH"
+            git -c user.name="$GIT_COMMITTER_NAME" -c user.email="$GIT_COMMITTER_EMAIL" rebase "origin/$BRANCH"
+            if git push origin "HEAD:refs/heads/$BRANCH"; then
+              echo "pushed=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            echo "::warning::Push attempt $attempt was rejected; retrying on the latest $BRANCH"
+          done
+          exit 1
+
+      # Report only: never block the sync.
+      - name: Post-sync unit tests (report only)
+        id: unit_tests
+        if: ${{ steps.push.outputs.pushed == 'true' }}
+        continue-on-error: true
+        run: pnpm test
+
+      - name: Post-sync docs check (report only)
+        id: docs_check
+        if: ${{ steps.push.outputs.pushed == 'true' }}
+        continue-on-error: true
+        run: pnpm docs:check
+
+      - name: Write post-sync test summary
+        if: ${{ always() && steps.push.outputs.pushed == 'true' }}
+        env:
+          UNIT_OUTCOME: ${{ steps.unit_tests.outcome }}
+          DOCS_OUTCOME: ${{ steps.docs_check.outcome }}
+        run: |
+          {
+            echo "## Post-sync checks"
+            echo ""
+            echo "| Check | Result |"
+            echo "| --- | --- |"
+            echo "| \`pnpm test\` | ${UNIT_OUTCOME} |"
+            echo "| \`pnpm docs:check\` (site build) | ${DOCS_OUTCOME} |"
+            echo ""
+            if [ "$UNIT_OUTCOME" = "success" ] && [ "$DOCS_OUTCOME" = "success" ]; then
+              echo "✅ All post-sync checks passed."
+            else
+              echo "⚠️ The sync is on the branch already; open the failed steps above for the logs and fix it in a follow-up change."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
