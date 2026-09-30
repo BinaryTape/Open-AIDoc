@@ -1,553 +1,554 @@
-# Change Log
+# 変更履歴 (Change Log)
 
-## Unreleased {id="unreleased"}
+## 未リリース (Unreleased) {id="unreleased"}
 
-### Added {id="added"}
-
-- まだありません！
-
-### Changed {id="changed"}
+### 追加 (Added) {id="added"}
 
 - まだありません！
 
-### Fixed {id="fixed"}
+### 変更 (Changed) {id="changed"}
 
-- [IntelliJプラグイン] IntelliJ API の使用法を変更することで、プラグイン公開時の違反を修正 (#6366 @griffio) 
+- [Gradle Plugin] コード生成タスク全体でパース済みの `.sq` ファイルをメモリ上に保持し、ガベージコレクション後に再パースされないようにしました。これにより、大規模プロジェクトでのコード生成が高速化されます (#6374 by @C2H6O)
+- [IntelliJ Plugin] クラッシュ報告先を独自のBugsnagインスタンスからJetBrains Marketplaceに変更しました (#6376 by @JakeWharton)
+
+### 修正 (Fixed) {id="fixed"}
+
+- [IntelliJ Plugin] IntelliJ APIの使用方法を変更し、プラグイン公開時の違反を修正しました (#6366 #6368 by @griffio)
 
 ## [2.4.0] - 2026-09-17 {id="2-4-0-2026-09-17"}
 [2.4.0]: https://github.com/sqldelight/sqldelight/releases/tag/2.4.0
 
-### Added
-- [Nativeドライバ] `inMemoryDriver` に `extendedConfig` パラメータを追加 (#5539 by @GuilhE)
-- [PostgreSQLダイアレクト] 暗黙的に定義されたシステムカラム (System Columns) のクエリサポートを追加 (#5834 by @griffio)
-- [PostgreSQLダイアレクト] 基本的な配列リテラル (Array literal) のサポートを追加 (#5997 by @griffio)
-- [PostgreSQLダイアレクト] 基本的な LTREE のサポートを追加 (#5880 by @yesitskev @griffio)
-- [MySQLダイアレクト] INET 関数のサポートを追加 (#5072 by @mcxinyu)
-- [PostgreSQLダイアレクト] ALTER INDEX のサポートを追加 (#6224 by @griffio)
-- [SQLiteダイアレクト] SQLite 3.44 の集計関数 DISTINCT、ORDER BY、および FILTER のサポートを追加 (#6236 by @griffio)
-- [SQLiteダイアレクト] SQLite 3.37 STRICT テーブルのサポートを追加 (#6230 by @griffio)
-- [Gradleプラグイン] `codegenExcludedColumns` を使用して生成されたモデルからカラムを除外するサポートを追加 (#6243 by @sokolikp)
-- [コンパイラ] スキーマに `allTableNames` 関数を追加 (#6245 by @edenman)
-- [PostgreSQLダイアレクト] ANY 演算子のサポートを追加 (#6253 by @griffio)
-- [SQLiteダイアレクト] SQLite 3.39 の RIGHT JOIN および FULL JOIN のサポートを追加 (#6273 by @griffio)
-- [PostgreSQLダイアレクト] トリガー関数における `RAISE` 文および `FOUND` 変数のサポートを追加 (#6297 by @griffio)
+### 追加 (Added)
+- [Native Driver] `inMemoryDriver` に `extendedConfig` パラメータを追加しました (#5539 by @GuilhE)
+- [PostgreSQL Dialect] 暗黙的に定義されたシステム列 (System Columns) のクエリサポートを追加しました (#5834 by @griffio)
+- [PostgreSQL Dialect] 基本的な配列リテラルのサポートを追加しました (#5997 by @griffio)
+- [PostgreSQL Dialect] 基本的な LTREE のサポートを追加しました (#5880 by @yesitskev @griffio)
+- [MySQL Dialect] INET関数のサポートを追加しました (#5072 by @mcxinyu)
+- [PostgreSQL Dialect] ALTER INDEX のサポートを追加しました (#6224 by @griffio)
+- [SQLite Dialect] SQLite 3.44 の集約関数 DISTINCT、ORDER BY、FILTER のサポートを追加しました (#6236 by @griffio)
+- [SQLite Dialect] SQLite 3.37 の STRICT テーブルのサポートを追加しました (#6230 by @griffio)
+- [Gradle Plugin] `codegenExcludedColumns` を使用して生成されるモデルから特定の列を除外するサポートを追加しました (#6243 by @sokolikp)
+- [Compiler] スキーマに `allTableNames` 関数を追加しました (#6245 by @edenman)
+- [PostgreSQL Dialect] ANY 演算子のサポートを追加しました (#6253 by @griffio)
+- [SQLite Dialect] SQLite 3.39 の RIGHT JOIN および FULL JOIN のサポートを追加しました (#6273 by @griffio)
+- [PostgreSQL Dialect] トリガー関数における `RAISE` 文と `FOUND` 変数のサポートを追加しました (#6297 by @griffio)
 
-### Changed
-- [PostgreSQLダイアレクト] arrayIntermediateType の可視性を public に変更 (#5835 by @griffio)
-- [Gradleプラグイン] より厳格な MigrationFile のバージョニングを実装 (#5730 by @madisp)
-- [Gradleプラグイン] サポートする Gradle の最小バージョンを 8.2.1 に引き上げ (#6217 by @maxsav)
-- [Gradleプラグイン] Gradle の隔離されたプロジェクト (Isolated Projects) をサポート (#6217 by @maxsav)
-- [IntelliJプラグイン] 最小バージョンを 2023.3 / Android Studio Jellyfish に変更
+### 変更 (Changed)
+- [PostgreSQL Dialect] arrayIntermediateType の可視性を public に変更しました (#5835 by @griffio)
+- [Gradle Plugin] より厳格な MigrationFile のバージョニングを実装しました (#5730 by @madisp)
+- [Gradle Plugin] 最小サポート Gradle バージョンを 8.2.1 に引き上げました (#6217 by @maxsav)
+- [Gradle Plugin] Gradle の Isolated Projects をサポートしました (#6217 by @maxsav)
+- [IntelliJ Plugin] 最小バージョンを 2023.3 / Android Studio Jellyfish に変更しました
 
-### Fixed
-- [Gradleプラグイン] JDK 24+ において、コンパイラワーカーからの `sun.misc.Unsafe` 非推奨警告を抑制 (#6321)
-- [コンパイラ] 生成されたコードにおける Kotlin の追加の警告を抑制 (#6208 by @eyupcanakman)
-- [コンパイラ] グループ化されていない集計結果セット内の他のカラムが、常に Null 許容になるように修正
-- [PostgreSQLダイアレクト] coalesce および ifnull の Null 許容性を正しく解決するように修正
-- [PostgreSQLダイアレクト] PostgreSQL ダイアレクトの IDE 統合を修正
-- [PostgreSQLダイアレクト] PostgreSQL ダイアレクトの IDE プラグインを改善 (#6209 by @griffio)
-- [Intellijプラグイン] IDE プラグインがすべてのダイアレクトでコード補完を実行可能に改善 (#6210 by @griffio)
-- [Gradleプラグイン] データベース検証タスク実行時の循環依存エラーを修正 (#6221 by @griffio)
-- [コンパイラ] 複数行の更新 (multirow update) における楽観的ロックを修正 (#6240 by @griffio)
-- [Intellijプラグイン] IDEA 2026.2 でクラッシュを引き起こす非推奨事項を修正 (#6247 by @griffio)
-- [Gradleプラグイン] AGP 8.9 から 8.11 において、生成されたソースが Kotlin コンパイルに反映されない問題を修正
-- [PostgreSQLダイアレクト] lower および upper 関数が Primitive バインド引数を使用する際にデフォルトで TEXT になるように修正 (#6262 by @griffio)
-- [コンパイラ] アダプタを使用しマイグレーションで Null 許容性が変更される場合に、データクラスバインディングを用いたインサート値を修正 (#6269 by griffio)
-- [コンパイラ] Null 安全な演算子 (IS および IS DISTINCT FROM) で Null 許容のバインド引数を使用するように修正 (#6265 by @griffio)
-- [Gradleプラグイン] プロジェクト依存関係に AGP のバリアント解決 (variant resolution) を使用するように修正 (#6217 by @maxsav)
-- [Gradleプラグイン] AGP バリアントのリストがビルド間で異なる場合に、generateDatabaseInterface のビルドキャッシュがミスする問題を修正
-- [Gradleプラグイン] データベースを設定せずにプラグインを適用した場合の IDE 同期時のクラッシュを修正 (#6088)
-- [PostgreSQLダイアレクト] 関数呼び出しをネストして使用する際の JSON 集計関数を修正 (#6281 by @griffio)
-- [Paging3拡張] データベースが空の場合の KeyedQueryPagingSource のクラッシュを修正 (#6284 by @woods-marshes)
-- [コンパイラ] `COALESCE` のようなカプセル化関数でミューテータ文が使用される際の Java 型アダプタの問題を修正 (#6292 by @griffio)
-- [コンパイラ] モジュール名が大文字の場合に、生成されたコードのパッケージ名も大文字になってしまう問題を修正 (#6316 by @griffio)
-- [PostgreSQLダイアレクト] 日付データ型において大文字小文字を区別しないように修正 (#6328 by @griffio)
-- [PostgreSQLダイアレクト] `string_agg` 関数が Null 許容になるように修正 (#6340 by @griffio)
-- [SQLiteダイアレクト] `GROUP BY` を使用した SQLite 3.44 の集計関数を修正 (#6343 by @griffio)
-- [Gradleプラグイン] 設定時 (configuration time) にデータベースの依存関係を解決しないように修正 (#6353 by @joshfriend)
+### 修正 (Fixed)
+- [Gradle Plugin] JDK 24+ において、コンパイラワーカーからの `sun.misc.Unsafe` 非推奨警告を抑制しました (#6321)
+- [Compiler] 生成されたコードにおける Kotlin の余分な警告を抑制しました (#6208 by @eyupcanakman)
+- [Compiler] グループ化されていない集約結果セットのその他の列が常に nullable になるよう修正しました
+- [PostgreSQL Dialect] coalesce および ifnull の null 許容性を正しく解決するようにしました
+- [PostgreSQL Dialect] PostgreSQL ダイアレクトの IDE 連携を修正しました
+- [PostgreSQL Dialect] PostgreSQL ダイアレクト向けの IDE プラグインを改善しました (#6209 by @griffio)
+- [Intellij Plugin] IDE プラグインがすべてのダイアレクトでコード補完を実行できるようにしました (#6210 by @griffio)
+- [Gradle Plugin] データベース検証タスクの実行時に循環依存エラーが発生する問題を修正しました (#6221 by @griffio)
+- [Compiler] 複数行の更新に対するオプティミスティックロック (楽観的ロック) を修正しました (#6240 by @griffio)
+- [Intellij Plugin] IDEA 2026.2 でクラッシュを引き起こしていた非推奨 API の使用を修正しました (#6247 by @griffio)
+- [Gradle Plugin] AGP 8.9 から 8.11 において、生成されたソースが Kotlin コンパイルで認識されない問題を修正しました
+- [PostgreSQL Dialect] プリミティブバインド引数を使用する lower および upper 関数がデフォルトで TEXT になるよう修正しました (#6262 by @griffio)
+- [Compiler] アダプターを使用したデータクラスバインディングと null 許容性を変更するマイグレーションを伴う挿入値の処理を修正しました (#6269 by griffio)
+- [Compiler] null 安全演算子 (IS および IS DISTINCT FROM) で nullable なバインド引数を使用するようにしました (#6265 by @griffio)
+- [Gradle Plugin] プロジェクト依存関係に AGP のバリアント解決を使用するようにしました (#6217 by @maxsav)
+- [Gradle Plugin] ビルド間で AGP バリアントのリストが異なる場合に generateDatabaseInterface でビルドキャッシュミスが発生する問題を修正しました
+- [Gradle Plugin] データベースが設定されていない状態でプラグインが適用された場合の IDE 同期クラッシュを修正しました (#6088)
+- [PostgreSQL Dialect] ネストされた関数呼び出しを使用する際の JSON 集約関数を修正しました (#6281 by @griffio)
+- [Paging3 Extension] 空のデータベースで KeyedQueryPagingSource がクラッシュする問題を修正しました (#6284 by @woods-marshes)
+- [Compiler] `COALESCE` などのカプセル化関数とともにミューテーター文が使用された場合の Java 型アダプターの問題を修正しました (#6292 by @griffio)
+- [Compiler] モジュール名が大文字で始まっている場合、生成されるコードのパッケージ名も大文字になってしまう問題を修正しました (#6316 by @griffio)
+- [PostgreSQL Dialect] 日付データ型の大文字・小文字を区別しないようにしました (#6328 by @griffio)
+- [PostgreSQL Dialect] `string_agg` 関数が nullable になるよう修正しました (#6340 by @griffio)
+- [SQLite Dialect] `GROUP BY` を使用する SQLite 3.44 集約関数を修正しました (#6343 by @griffio)
+- [Gradle Plugin] 設定時 (configuration time) にデータベースの依存関係が解決されるのを回避するようにしました (#6353 by @joshfriend)
 
 ## [2.4.0-rc2] - 2026-09-14 {id="2-4-0-rc2-2026-09-14"}
 [2.4.0-rc2]: https://github.com/sqldelight/sqldelight/releases/tag/2.4.0-rc2
 
-### Fixed
+### 修正 (Fixed)
 
-- [PostgreSQLダイアレクト] `string_agg` 関数が Null 許容になるように修正 (#6340 by @griffio)
-- [SQLiteダイアレクト] `GROUP BY` を使用した SQLite 3.44 の集計関数を修正 (#6343 by @griffio)
-- [Gradleプラグイン] 設定時 (configuration time) にデータベースの依存関係を解決しないように修正 (#6353 by @joshfriend)
+- [PostgreSQL Dialect] `string_agg` 関数が nullable になるよう修正しました (#6340 by @griffio)
+- [SQLite Dialect] `GROUP BY` を使用する SQLite 3.44 集約関数を修正しました (#6343 by @griffio)
+- [Gradle Plugin] 設定時 (configuration time) にデータベースの依存関係が解決されるのを回避するようにしました (#6353 by @joshfriend)
 
 ## [2.4.0-rc1] - 2026-09-01 {id="2-4-0-rc1-2026-09-01"}
 [2.4.0-rc1]: https://github.com/sqldelight/sqldelight/releases/tag/2.4.0-rc1
 
-### Added
-- [Nativeドライバ] `inMemoryDriver` に `extendedConfig` パラメータを追加 (#5539 by @GuilhE)
-- [PostgreSQLダイアレクト] 暗黙的に定義されたシステムカラム (System Columns) のクエリサポートを追加 (#5834 by @griffio)
-- [PostgreSQLダイアレクト] 基本的な配列リテラル (Array literal) のサポートを追加 (#5997 by @griffio)
-- [PostgreSQLダイアレクト] 基本的な LTREE のサポートを追加 (#5880 by @yesitskev @griffio)
-- [MySQLダイアレクト] INET 関数のサポートを追加 (#5072 by @mcxinyu)
-- [PostgreSQLダイアレクト] `ALTER INDEX` のサポートを追加 (#6224 by @griffio)
-- [SQLiteダイアレクト] SQLite 3.44 の集計関数 `DISTINCT`、`ORDER BY`、および `FILTER` のサポートを追加 (#6236 by @griffio)
-- [SQLiteダイアレクト] SQLite 3.37 の `STRICT` テーブルのサポートを追加 (#6230 by @griffio)
-- [Gradleプラグイン] `codegenExcludedColumns` を使用して生成されたモデルからカラムを除外するサポートを追加 (#6243 by @sokolikp)
-- [コンパイラ] スキーマに `allTableNames` 関数を追加 (#6245 by @edenman)
-- [PostgreSQLダイアレクト] ANY 演算子のサポートを追加 (#6253 by @griffio)
-- [SQLiteダイアレクト] SQLite 3.39 の `RIGHT JOIN` および `FULL JOIN` のサポートを追加 (#6273 by @griffio)
-- [PostgreSQLダイアレクト] トリガー関数における `RAISE` 文および `FOUND` 変数のサポートを追加 (#6297 by @griffio)
+### 追加 (Added)
+- [Native Driver] `inMemoryDriver` に `extendedConfig` パラメータを追加しました (#5539 by @GuilhE)
+- [PostgreSQL Dialect] 暗黙的に定義されたシステム列のクエリサポートを追加しました (#5834 by @griffio)
+- [PostgreSQL Dialect] 基本的な配列リテラルのサポートを追加しました (#5997 by @griffio)
+- [PostgreSQL Dialect] 基本的な LTREE のサポートを追加しました (#5880 by @yesitskev @griffio)
+- [MySQL Dialect] INET関数のサポートを追加しました (#5072 by @mcxinyu)
+- [PostgreSQL Dialect] ALTER INDEX のサポートを追加しました (#6224 by @griffio)
+- [SQLite Dialect] SQLite 3.44 の集約関数 DISTINCT、ORDER BY、FILTER のサポートを追加しました (#6236 by @griffio)
+- [SQLite Dialect] SQLite 3.37 の STRICT テーブルのサポートを追加しました (#6230 by @griffio)
+- [Gradle Plugin] `codegenExcludedColumns` を使用して生成されるモデルから特定の列を除外するサポートを追加しました (#6243 by @sokolikp)
+- [Compiler] スキーマに `allTableNames` 関数を追加しました (#6245 by @edenman)
+- [PostgreSQL Dialect] ANY 演算子のサポートを追加しました (#6253 by @griffio)
+- [SQLite Dialect] SQLite 3.39 の RIGHT JOIN および FULL JOIN のサポートを追加しました (#6273 by @griffio)
+- [PostgreSQL Dialect] トリガー関数における `RAISE` 文と `FOUND` 変数のサポートを追加しました (#6297 by @griffio)
 
-### Changed
-- [PostgreSQLダイアレクト] `arrayIntermediateType` の可視性を public に変更 (#5835 by @griffio)
-- [Gradleプラグイン] より厳格な MigrationFile のバージョニングを実装 (#5730 by @madisp)
-- [Gradleプラグイン] サポートする Gradle の最小バージョンを 8.2.1 に引き上げ (#6217 by @maxsav)
-- [Gradleプラグイン] Gradle の隔離されたプロジェクト (Isolated Projects) をサポート (#6217 by @maxsav)
-- [IntelliJプラグイン] 最小バージョンを 2023.3 / Android Studio Jellyfish に変更
+### 変更 (Changed)
+- [PostgreSQL Dialect] arrayIntermediateType の可視性を public に変更しました (#5835 by @griffio)
+- [Gradle Plugin] より厳格な MigrationFile のバージョニングを実装しました (#5730 by @madisp)
+- [Gradle Plugin] 最小サポート Gradle バージョンを 8.2.1 に引き上げました (#6217 by @maxsav)
+- [Gradle Plugin] Gradle の Isolated Projects をサポートしました (#6217 by @maxsav)
+- [IntelliJ Plugin] 最小バージョンを 2023.3 / Android Studio Jellyfish に変更しました
 
-### Fixed
-- [Gradleプラグイン] JDK 24+ において、コンパイラワーカーからの `sun.misc.Unsafe` 非推奨警告を抑制 (#6321)
-- [コンパイラ] 生成されたコードにおける Kotlin の追加の警告を抑制 (#6208 by @eyupcanakman)
-- [コンパイラ] グループ化されていない集計結果セット内の他のカラムが、常に Null 許容になるように修正
-- [PostgreSQLダイアレクト] `coalesce` および `ifnull` の Null 許容性を正しく解決するように修正
-- [PostgreSQLダイアレクト] PostgreSQL ダイアレクトの IDE 統合を修正
-- [PostgreSQLダイアレクト] PostgreSQL ダイアレクトの IDE プラグインを改善 (#6209 by @griffio)
-- [Intellijプラグイン] IDE プラグインがすべてのダイアレクトでコード補完を実行可能に改善 (#6210 by @griffio)
-- [Gradleプラグイン] データベース検証タスク実行時の循環依存エラーを修正 (#6221 by @griffio)
-- [コンパイラ] 複数行の更新 (multirow update) における楽観的ロックを修正 (#6240 by @griffio)
-- [Intellijプラグイン] IDEA 2026.2 でクラッシュを引き起こす非推奨事項を修正 (#6247 by @griffio)
-- [Gradleプラグイン] AGP 8.9 から 8.11 において、生成されたソースが Kotlin コンパイルに反映されない問題を修正
-- [PostgreSQLダイアレクト] `lower` および `upper` 関数が Primitive バインド引数を使用する際にデフォルトで `TEXT` になるように修正 (#6262 by @griffio)
-- [コンパイラ] アダプタを使用しマイグレーションで Null 許容性が変更される場合に、データクラスバインディングを用いたインサート値を修正 (#6269 by @griffio)
-- [コンパイラ] Null 安全な演算子 (`IS` および `IS DISTINCT FROM`) で Null 許容のバインド引数を使用するように修正 (#6265 by @griffio)
-- [Gradleプラグイン] プロジェクト依存関係に AGP のバリアント解決 (variant resolution) を使用するように修正 (#6217 by @maxsav)
-- [Gradleプラグイン] AGP バリアントのリストがビルド間で異なる場合に、`generateDatabaseInterface` のビルドキャッシュがミスする問題を修正
-- [Gradleプラグイン] データベースを設定せずにプラグインを適用した場合の IDE 同期時のクラッシュを修正 (#6088)
-- [PostgreSQLダイアレクト] 関数呼び出しをネストして使用する際の JSON 集計関数を修正 (#6281 by @griffio)
-- [Paging3拡張] データベースが空の場合の `KeyedQueryPagingSource` のクラッシュを修正 (#6284 by @woods-marshes)
-- [コンパイラ] `COALESCE` のようなカプセル化関数でミューテータ文が使用される際の Java 型アダプタの問題を修正 (#6292 by @griffio)
-- [コンパイラ] モジュール名が大文字の場合に、生成されたコードのパッケージ名も大文字になってしまう問題を修正 (#6316 by @griffio)
-- [PostgreSQLダイアレクト] 日付データ型において大文字小文字を区別しないように修正 (#6328 by @griffio)
+### 修正 (Fixed)
+- [Gradle Plugin] JDK 24+ において、コンパイラワーカーからの `sun.misc.Unsafe` 非推奨警告を抑制しました (#6321)
+- [Compiler] 生成されたコードにおける Kotlin の余分な警告を抑制しました (#6208 by @eyupcanakman)
+- [Compiler] グループ化されていない集約結果セットのその他の列が常に nullable になるよう修正しました
+- [PostgreSQL Dialect] coalesce および ifnull の null 許容性を正しく解決するようにしました
+- [PostgreSQL Dialect] PostgreSQL ダイアレクトの IDE 連携を修正しました
+- [PostgreSQL Dialect] PostgreSQL ダイアレクト向けの IDE プラグインを改善しました (#6209 by @griffio)
+- [Intellij Plugin] IDE プラグインがすべてのダイアレクトでコード補完を実行できるようにしました (#6210 by @griffio)
+- [Gradle Plugin] データベース検証タスクの実行時に循環依存エラーが発生する問題を修正しました (#6221 by @griffio)
+- [Compiler] 複数行の更新に対するオプティミスティックロックを修正しました (#6240 by @griffio)
+- [Intellij Plugin] IDEA 2026.2 でクラッシュを引き起こしていた非推奨 API の使用を修正しました (#6247 by @griffio)
+- [Gradle Plugin] AGP 8.9 から 8.11 において、生成されたソースが Kotlin コンパイルで認識されない問題を修正しました
+- [PostgreSQL Dialect] プリミティブバインド引数を使用する lower および upper 関数がデフォルトで TEXT になるよう修正しました (#6262 by @griffio)
+- [Compiler] アダプターを使用したデータクラスバインディングと null 許容性を変更するマイグレーションを伴う挿入値の処理を修正しました (#6269 by griffio)
+- [Compiler] null 安全演算子 (IS および IS DISTINCT FROM) で nullable なバインド引数を使用するようにしました (#6265 by @griffio)
+- [Gradle Plugin] プロジェクト依存関係に AGP のバリアント解決を使用するようにしました (#6217 by @maxsav)
+- [Gradle Plugin] ビルド間で AGP バリアントのリストが異なる場合に generateDatabaseInterface でビルドキャッシュミスが発生する問題を修正しました
+- [Gradle Plugin] データベースが設定されていない状態でプラグインが適用された場合の IDE 同期クラッシュを修正しました (#6088)
+- [PostgreSQL Dialect] ネストされた関数呼び出しを使用する際の JSON 集約関数を修正しました (#6281 by @griffio)
+- [Paging3 Extension] 空のデータベースで KeyedQueryPagingSource がクラッシュする問題を修正しました (#6284 by @woods-marshes)
+- [Compiler] `COALESCE` などのカプセル化関数とともにミューテーター文が使用された場合の Java 型アダプターの問題を修正しました (#6292 by @griffio)
+- [Compiler] モジュール名が大文字で始まっている場合、生成されるコードのパッケージ名も大文字になってしまう問題を修正しました (#6316 by @griffio)
+- [PostgreSQL Dialect] 日付データ型の大文字・小文字を区別しないようにしました (#6328 by @griffio)
 
 ## [2.3.2] - 2026-03-16 {id="2-3-2-2026-03-16"}
 [2.3.2]: https://github.com/sqldelight/sqldelight/releases/tag/2.3.2
 
-### Added
-- [PostgreSQLダイアレクト] `ALTER TABLE ALTER TYPE USING` 式のサポートを改善 (#6116 by @griffio)
-- [PostgreSQLダイアレクト] `DROP COLUMN IF EXISTS` のサポートを追加 (#6112 by @griffio)
-- [Gradleプラグイン] `Select` ワイルドカード展開を無効にする `expandSelectStar` フラグを追加 (#5813 by @griffio)
-- [MySQLダイアレクト] ウィンドウ関数 (Window Functions) のサポートを追加 (#6086 by @griffio)
-- [Gradleプラグイン] 開始スキーマバージョンが 1 ではなく、`verifyMigrations` が true の場合にビルドが失敗する問題を修正 (#6017 by @neilgmiller)
-- [Gradleプラグイン] `SqlDelightWorkerTask` をより詳細に設定可能にし、Windows 上での開発をサポートするようにデフォルト設定を更新 (#5215 by @MSDarwish2000)
-- [SQLiteダイアレクト] FTS5 仮想テーブルにおける合成カラム (synthesized columns) のサポートを追加 (#5986 by @watbe)
-- [PostgreSQLダイアレクト] Postgres の行レベルセキュリティ (row level security) のサポートを追加 (#6087 by @shellderp)
-- [PostgreSQLダイアレクト] `FOR UPDATE` を拡張し、`OF table`、`NO KEY UPDATE`、`NO WAIT` をサポート (#6104 by @shellderp)
-- [PostgreSQLダイアレクト] Postgis の `Point` 型と関連関数のサポートを追加 (#5602 by @vanniktech)
-- [ランタイム] トランザクションの `CoroutineContext` を制御するメカニズムを提供する `SuspendingTransacter.TransactionDispatcher` を追加 (#5967 by @eygraber)
-- [Gradleプラグイン] Android Gradle Plugin 9.0 の新しい DSL との完全な互換性を追加 (#6140)
-- [PostgreSQLダイアレクト] PostgreSql の `CREATE TABLE` ストレージパラメータのサポートを追加 (#6148 by @griffio)
-- [PostgreSQLダイアレクト] PostgreSql の一意なテーブル制約における Null 許容の結果カラムを修正 (#6167 by @griffio)
+### 追加 (Added)
+- [PostgreSQL Dialect] ALTER TABLE ALTER TYPE USING 式のサポートを改善しました (#6116 by @griffio)
+- [PostgreSQL Dialect] DROP COLUMN IF EXISTS のサポートを追加しました (#6112 by @griffio)
+- [Gradle Plugin] Select のワイルドカード展開を無効化する expandSelectStar フラグを追加しました (#5813 by @griffio)
+- [MySQL Dialect] ウィンドウ関数 (Window Functions) のサポートを追加しました (#6086 by @griffio)
+- [Gradle Plugin] 開始スキーマバージョンが 1 以外で verifyMigrations が true の場合にビルドが失敗する問題を修正しました (#6017 by @neilgmiller)
+- [Gradle Plugin] `SqlDelightWorkerTask` の設定自由度を高め、Windows 上での開発をサポートするようデフォルト設定を更新しました (#5215 by @MSDarwish2000)
+- [SQLite Dialect] FTS5 仮想テーブルにおける合成列 (synthesized columns) のサポートを追加しました (#5986 by @watbe)
+- [PostgreSQL Dialect] Postgres の行レベルセキュリティ (RLS) のサポートを追加しました (#6087 by @shellderp)
+- [PostgreSQL Dialect] FOR UPDATE を拡張し、OF table、NO KEY UPDATE、NO WAIT をサポートしました (#6104 by @shellderp)
+- [PostgreSQL Dialect] PostGIS の Point 型および関連関数のサポートを追加しました (#5602 by @vanniktech)
+- [Runtime] トランザクションの `CoroutineContext` を制御する仕組みを提供する `SuspendingTransacter.TransactionDispatcher` を追加しました (#5967 by @eygraber)
+- [Gradle Plugin] Android Gradle Plugin 9.0 の新しい DSL との完全な互換性を確保しました (#6140)
+- [PostgreSQL Dialect] PostgreSQL の CREATE TABLE ストレージパラメータをサポートしました (#6148 by @griffio)
+- [PostgreSQL Dialect] PostgreSQL のユニークテーブル制約において nullable な結果列を修正しました (#6167 by @griffio)
 
-### Changed
-- [コンパイラ] コンパイラの出力型を `java.lang.Void` から `kotlin.Nothing` に変更 (#6099 by @griffio)
-- [コンパイラ] パッケージ名にアンダースコアを使用可能に変更。以前はアンダースコアがサニタイズされ、予期しない動作の原因となっていました (#6027 by @BierDav)
-- [Paging拡張] AndroidX Paging への切り替え (#5910 by @jeffdgr8)
-- [Androidドライバ] Android の `minSdk` を 23 に引き上げ (#6141)
-- [Paging拡張] Paging 3.4.1 へのアップグレード、および X64 Apple ターゲットの削除 (#6166)
+### 変更 (Changed)
+- [Compiler] コンパイラの出力型を java.lang.Void から kotlin.Nothing に変更しました (#6099 by @griffio)
+- [Compiler] パッケージ名にアンダースコアを使用できるようにしました。以前はアンダースコアがサニタイズされ予期しない動作が発生していました (#6027 by @BierDav)
+- [Paging Extension] AndroidX Paging に移行しました (#5910 by @jeffdgr8)
+- [Android Driver] Android の minSdk を 23 に引き上げました (#6141)
+- [Paging Extension] Paging 3.4.1 にアップグレードし、X64 Apple ターゲットを削除しました (#6166)
 
-### Fixed
-- [IntelliJプラグイン] VFS リフレッシュイベント中に EDT 上でブロッキングなファイルタイプ検出が行われることによる IDE のフリーズを修正
-- [SQLiteダイアレクト] Json パス演算子を使用する際の Sqlite 3.38 のコンパイルエラーを修正 (#6070 by @griffio)
-- [SQLiteダイアレクト] カスタムカラム型を使用する際、`group_concat` 関数に `String` 型を使用するように修正 (#6082 by @griffio)
-- [Gradleプラグイン] `VerifyMigrationTask` のパフォーマンスを改善し、複雑なスキーマでハングアップする問題を修正 (#6073 by @Lightwood13)
-- [Intellijプラグイン] プラグイン初期化時の例外を修正し、非推奨メソッドを更新 (#6040 by @griffio)
-- [Gradleプラグイン] Android Gradle Plugin 内蔵の Kotlin との互換性を修正 (#6139)
+### 修正 (Fixed)
+- [IntelliJ Plugin] VFS リフレッシュイベント中に EDT 上でファイルタイプ検出をブロックすることによって引き起こされていた IDE のフリーズを修正しました
+- [SQLite Dialect] JSON パス演算子を使用する際の SQLite 3.38 コンパイルエラーを修正しました (#6070 by @griffio)
+- [SQLite Dialect] カスタム列タイプを使用する際、group_concat 関数で String 型を使用するようにしました (#6082 by @griffio)
+- [Gradle Plugin] 複雑なスキーマでハングアップしないよう `VerifyMigrationTask` のパフォーマンスを改善しました (#6073 by @Lightwood13)
+- [Intellij Plugin] プラグイン初期化時の例外を修正し、非推奨メソッドを更新しました (#6040 by @griffio)
+- [Gradle Plugin] Android Gradle Plugin 内蔵の Kotlin との互換性を修正しました (#6139)
 
 ## [2.3.1] - 2025-03-12 {id="2-3-1-2025-03-12"}
 [2.3.1]: https://github.com/sqldelight/sqldelight/releases/tag/2.3.1
 
-リリースの失敗です。2.3.2 を使用してください！
+リリースに失敗しました。2.3.2 を使用してください！
 
 ## [2.3.0] - 2025-03-12 {id="2-3-0-2025-03-12"}
 [2.3.0]: https://github.com/sqldelight/sqldelight/releases/tag/2.3.0
 
-リリースの失敗です。2.3.2 を使用してください！
+リリースに失敗しました。2.3.2 を使用してください！
 
 ## [2.2.1] - 2025-11-13 {id="2-2-1-2025-11-13"}
 [2.2.1]: https://github.com/sqldelight/sqldelight/releases/tag/2.2.1
 
-### Added
-- [PostgreSQLダイアレクト] Postgres の numeric/integer/biginteger 型マッピングを修正 (#5994 by @griffio)
-- [コンパイラ] `CAST` が必要な場合にソースファイルの場所を含めるよう、コンパイラのエラーメッセージを改善 (#5979 by @griffio)
-- [PostgreSQLダイアレクト] Postgres JSON 演算子によるパス抽出のサポートを追加 (#5971 by @griffio)
-- [SQLiteダイアレクト] 共通テーブル式 (Common Table Expressions) を使用した `MATERIALIZED` クエリプランナヒントの Sqlite 3.35 サポートを追加 (#5961 by @griffio)
-- [PostgreSQLダイアレクト] 共通テーブル式 (Common Table Expressions) を使用した `MATERIALIZED` クエリプランナヒントのサポートを追加 (#5961 by @griffio)
-- [PostgreSQLダイアレクト] Postgres JSON Aggregate `FILTER` のサポートを追加 (#5957 by @griffio)
-- [PostgreSQLダイアレクト] Postgres Enum のサポートを追加 (#5935 by @griffio)
-- [PostgreSQLダイアレクト] Postgres トリガー (Triggers) の限定的なサポートを追加 (#5932 by @griffio)
-- [PostgreSQLダイアレクト] SQL 式が JSON としてパース可能かどうかをチェックする述語を追加 (#5843 by @griffio)
-- [PostgreSQLダイアレクト] PostgreSql `COMMENT ON` 文の限定的なサポートを追加 (#5808 by @griffio)
-- [MySQLダイアレクト] インデックス可視性オプションのサポートを追加 (#5785 by @orenkislev-faire)
-- [PostgreSqlダイアレクト] `TSQUERY` データ型のサポートを追加 (#5779 by @griffio)
-- [Gradleプラグイン] モジュール追加時のバージョンカタログのサポートを追加 (#5755 by @DRSchlaubi)
+### 追加 (Added)
+- [PostgreSQL Dialect] Postgres の numeric/integer/biginteger 型マッピングを修正しました (#5994 by @griffio)
+- [Compiler] CAST が必要な際、エラーメッセージにソースファイルの場所を含めるように改善しました (#5979 by @griffio)
+- [PostgreSQL Dialect] Postgres JSON 演算子パス抽出のサポートを追加しました (#5971 by @griffio)
+- [SQLite Dialect] 共通テーブル式 (CTE) を使用した MATERIALIZED クエリプランナーヒントの SQLite 3.35 サポートを追加しました (#5961 by @griffio)
+- [PostgreSQL Dialect] 共通テーブル式を使用した MATERIALIZED クエリプランナーヒントのサポートを追加しました (#5961 by @griffio)
+- [PostgreSQL Dialect] Postgres JSON 集約 FILTER のサポートを追加しました (#5957 by @griffio)
+- [PostgreSQL Dialect] Postgres の Enum (列挙型) のサポートを追加しました (#5935 by @griffio)
+- [PostgreSQL Dialect] Postgres トリガーの限定的なサポートを追加しました (#5932 by @griffio)
+- [PostgreSQL Dialect] SQL 式が JSON としてパース可能かどうかをチェックする述語を追加しました (#5843 by @griffio)
+- [PostgreSQL Dialect] PostgreSQL の Comment On 文の限定的なサポートを追加しました (#5808 by @griffio)
+- [MySQL Dialect] インデックス可視性オプションのサポートを追加しました (#5785 by @orenkislev-faire)
+- [PostgreSql Dialect] TSQUERY データ型のサポートを追加しました (#5779 by @griffio)
+- [Gradle Plugin] モジュール追加時のバージョンカタログ (Version Catalogs) のサポートを追加しました (#5755 by @DRSchlaubi)
 
-### Changed
-- 開発中のスナップショットが Central Portal Snapshots リポジトリ (https://central.sonatype.com/repository/maven-snapshots/) に公開されるようになりました。
-- [コンパイラ] コンストラクターリファレンスを使用して、デフォルトで生成されるクエリを簡素化 (#5814 by @jonapoul)
+### 変更 (Changed)
+- 開発中のスナップショットは、Central Portal Snapshots リポジトリ (https://central.sonatype.com/repository/maven-snapshots/) に公開されるようになりました。
+- [Compiler] コンストラクタ参照を使用して、デフォルトで生成されるクエリを簡素化しました (#5814 by @jonapoul)
 
-### Fixed
-- [コンパイラ] 共通テーブル式を含む View を使用した際のスタックオーバーフローを修正 (#5928 by @griffio)
-- [Gradleプラグイン] SqlDelight ツールウィンドウを開いて "New Connection" を追加する際のクラッシュを修正 (#5906 by @griffio)
-- [IntelliJプラグイン] copy-to-sqlite ガターアクションにおけるスレッド関連のクラッシュを回避 (#5901 by @griffio)
-- [IntelliJプラグイン] `CREATE INDEX` および `CREATE VIEW` スキーマ文を使用する際の PostgreSQL ダイアレクトの修正 (#5772 by @griffio)
-- [コンパイラ] カラム参照時の FTS スタックオーバーフローを修正 (#5896 by @griffio)
-- [コンパイラ] `WITH RECURSIVE` のスタックオーバーフローを修正 (#5892 by @griffio)
-- [コンパイラ] `INSERT`|`UPDATE`|`DELETE RETURNING` 文の Notify を修正 (#5851 by @griffio)
-- [コンパイラ] `Long` を返すトランザクションブロックの非同期リザルト型を修正 (#5836 by @griffio)
-- [コンパイラ] SQL パラメータバインディングの計算量を O(n²) から O(n) に最適化 (#5898 by @chenf7)
-- [SQLiteダイアレクト] Sqlite 3.18 で欠落していた関数を修正 (#5759 by @griffio)
+### 修正 (Fixed)
+- [Compiler] 共通テーブル式を含む View を使用する際のスタックオーバーフローを修正しました (#5928 by @griffio)
+- [Gradle Plugin] SqlDelight ツールウィンドウを開いて「New Connection」を追加する際のクラッシュを修正しました (#5906 by @griffio)
+- [IntelliJ Plugin] copy-to-sqlite ガターアクションでのスレッド関連のクラッシュを回避しました (#5901 by @griffio)
+- [IntelliJ Plugin] スキーマ文 CREATE INDEX および CREATE VIEW を使用する際の PostgreSQL ダイアレクトの修正を行いました (#5772 by @griffio)
+- [Compiler] 列を参照する際の FTS スタックオーバーフローを修正しました (#5896 by @griffio)
+- [Compiler] With Recursive のスタックオーバーフローを修正しました (#5892 by @griffio)
+- [Compiler] Insert|Update|Delete Returning 文の通知 (Notify) を修正しました (#5851 by @griffio)
+- [Compiler] Long を返すトランザクションブロックの非同期結果型を修正しました (#5836 by @griffio)
+- [Compiler] SQL パラメータバインディングの計算量を O(n²) から O(n) に最適化しました (#5898 by @chenf7)
+- [SQLite Dialect] SQLite 3.18 で不足していた関数を修正しました (#5759 by @griffio)
 
 ## [2.2.0] - 2025-11-13 {id="2-2-0-2025-11-13"}
 [2.2.0]: https://github.com/sqldelight/sqldelight/releases/tag/2.2.0
 
-アーティファクトの一部のみが公開された、リリースの失敗です。2.2.1 を使用してください！
+アーティファクトが一部のみ公開されたためリリースに失敗しました。2.2.1 を使用してください！
 
 ## [2.1.0] - 2025-05-16 {id="2-1-0-2025-05-16"}
 [2.1.0]: https://github.com/sqldelight/sqldelight/releases/tag/2.1.0
 
-### Added
-- [WASMドライバ] Web Worker ドライバに `wasmJs` サポートを追加 (#5534 by @IlyaGulya)
-- [PostgreSQLダイアレクト] PostgreSql の `UnNest` 配列から行への展開をサポート (#5673 by @griffio)
-- [PostgreSQLダイアレクト] PostgreSql `TSRANGE`/`TSTZRANGE` のサポート (#5297 by @griffio)
-- [PostgreSQLダイアレクト] PostgreSql `RIGHT FULL JOIN` (#5086 by @griffio)
-- [PostgreSQLダイアレクト] PostgreSql の時間型からの `EXTRACT` (#5273 by @griffio)
-- [PostgreSQLダイアレクト] PostgreSql 配列包含演算子 (#4933 by @griffio)
-- [PostgreSQLダイアレクト] PostgreSql `DROP CONSTRAINT` (#5288 by @griffio)
-- [PostgreSQLダイアレクト] PostgreSql 型キャスト (#5089 by @griffio)
-- [PostgreSQLダイアレクト] サブクエリのための PostgreSql `LATERAL JOIN` 演算子 (#5122 by @griffio)
-- [PostgreSQLダイアレクト] PostgreSQL `ILIKE` 演算子 (#5330 by @griffio)
-- [PostgreSQLダイアレクト] PostgreSql `XML` 型 (#5331 by @griffio)
-- [PostgreSQLダイアレクト] PostgreSql `AT TIME ZONE` (#5243 by @griffio)
-- [PostgreSQLダイアレクト] PostgreSQL の `ORDER BY NULLS` をサポート (#5199 by @griffio)
-- [PostgreSQLダイアレクト] PostgreSQL の現在の日付/時刻関数のサポートを追加 (#5226 by @drewd)
-- [PostgreSQLダイアレクト] PostgreSql 正規表現演算子 (#5137 by @griffio)
-- [PostgreSQLダイアレクト] BRIN GIST を追加 (#5059 by @griffio)
-- [MySQLダイアレクト] MySql ダイアレクトの `RENAME INDEX` をサポート (#5212 by @orenkislev-faire)
-- [JSON拡張] JSON テーブル関数にエイリアスを追加 (#5372 by @griffio)
+### 追加 (Added)
+- [WASM Driver] Web Worker ドライバーに wasmJs のサポートを追加しました (#5534 by @IlyaGulya)
+- [PostgreSQL Dialect] PostgreSQL の配列を行に展開する UnNest のサポートを追加しました (#5673 by @griffio)
+- [PostgreSQL Dialect] PostgreSQL の TSRANGE/TSTZRANGE をサポートしました (#5297 by @griffio)
+- [PostgreSQL Dialect] PostgreSQL の Right Full Join をサポートしました (#5086 by @griffio)
+- [PostgreSQL Dialect] PostgreSQL の日時・時間型からの extract をサポートしました (#5273 by @griffio)
+- [PostgreSQL Dialect] PostgreSQL の配列包含演算子をサポートしました (#4933 by @griffio)
+- [PostgreSQL Dialect] PostgreSQL の drop constraint をサポートしました (#5288 by @griffio)
+- [PostgreSQL Dialect] PostgreSQL の型キャストをサポートしました (#5089 by @griffio)
+- [PostgreSQL Dialect] PostgreSQL のサブクエリ用 LATERAL JOIN 演算子をサポートしました (#5122 by @griffio)
+- [PostgreSQL Dialect] PostgreSQL の ILIKE 演算子をサポートしました (#5330 by @griffio)
+- [PostgreSQL Dialect] PostgreSQL の XML 型をサポートしました (#5331 by @griffio)
+- [PostgreSQL Dialect] PostgreSQL の AT TIME ZONE をサポートしました (#5243 by @griffio)
+- [PostgreSQL Dialect] PostgreSQL の ORDER BY NULLS をサポートしました (#5199 by @griffio)
+- [PostgreSQL Dialect] PostgreSQL の現在日時・時間関数のサポートを追加しました (#5226 by @drewd)
+- [PostgreSQL Dialect] PostgreSQL の正規表現演算子をサポートしました (#5137 by @griffio)
+- [PostgreSQL Dialect] BRIN、GIST インデックスを追加しました (#5059 by @griffio)
+- [MySQL Dialect] MySQL ダイアレクトで RENAME INDEX をサポートしました (#5212 by @orenkislev-faire)
+- [JSON Extension] JSON テーブル関数にエイリアスを追加しました (#5372 by @griffio)
 
-### Changed
-- [コンパイラ] 生成されたクエリファイルがシンプルなミューテータに対して行数を返すように変更 (#4578 by @MariusVolkhart)
-- [Nativeドライバ] `NativeSqlDatabase.kt` を更新し、`DELETE`、`INSERT`、`UPDATE` 文の readonly フラグを変更 (#5680 by @griffio)
-- [PostgreSQLダイアレクト] `PgInterval` を `String` に変更 (#5403 by @griffio)
-- [PostgreSQLダイアレクト] SqlDelight モジュールによる PostgreSql 拡張の実装をサポート (#5677 by @griffio)
+### 変更 (Changed)
+- [Compiler] 生成されたクエリファイルが、単純なミューテーターに対して変更行数を返すようにしました (#4578 by @MariusVolkhart)
+- [Native Driver] NativeSqlDatabase.kt を更新し、DELETE、INSERT、UPDATE 文の readonly フラグを変更しました (#5680 by @griffio)
+- [PostgreSQL Dialect] PgInterval を String に変更しました (#5403 by @griffio)
+- [PostgreSQL Dialect] PostgreSQL 拡張機能を実装するための SqlDelight モジュールをサポートしました (#5677 by @griffio)
 
-### Fixed
-- [コンパイラ] fix: 結果を伴うグループ文を実行する際のクエリ通知を修正 (#5006 by @vitorhugods)
-- [コンパイラ] `SqlDelightModule` 型リゾルバを修正 (#5625 by @griffio)
-- [コンパイラ] 課題 5501: エスケープされたカラムを持つオブジェクトのインサートを修正 (#5503 by @griffio)
-- [コンパイラ] コンパイラ: 正しい行と文字位置でパスリンクがクリック可能になるようエラーメッセージを改善 (#5604 by @vanniktech)
-- [コンパイラ] 課題 5298 を修正: キーキーワードをテーブル名として使用できるように変更
-- [コンパイラ] 名前付き実行を修正し、テストを追加
-- [コンパイラ] 初期化文のソート時に外部キーのテーブル制約を考慮するように修正 (#5325 by @TheMrMilchmann)
-- [コンパイラ] タブが含まれる場合のエラー下線を正しく配置するように修正 (#5224 by @drewd)
-- [JDBCドライバ] トランザクション終了時の `connectionManager` のメモリリークを修正
-- [JDBCドライバ] ドキュメントに記載されている通り、トランザクション内で SQLite のマイグレーションを実行するように修正 (#5218 by @morki)
-- [JDBCドライバ] トランザクションのコミット/ロールバック後の接続リークを修正 (#5205 by @morki)
-- [Gradleプラグイン] `DriverInitializer` を `GenerateSchemaTask` の前に実行 (#5562 by @nwagu)
-- [ランタイム] 実際のドライバが非同期の場合の `LogSqliteDriver` におけるクラッシュを修正 (#5723 by @edenman)
-- [ランタイム] `StringBuilder` の容量を修正 (#5192 by @janbina)
-- [PostgreSQLダイアレクト] PostgreSql `CREATE OR REPLACE VIEW` (#5407 by @griffio)
-- [PostgreSQLダイアレクト] PostgreSQL `to_json` (#5606 by @griffio)
-- [PostgreSQLダイアレクト] PostgreSql 数値リゾルバを修正 (#5399 by @griffio)
-- [PostgreSQLダイアレクト] sqlite ウィンドウ関数を修正 (#2799 by @griffio)
-- [PostgreSQLダイアレクト] PostgreSql `SELECT DISTINCT ON` (#5345 by @griffio)
-- [PostgreSQLダイアレクト] `ALTER TABLE ADD COLUMN IF NOT EXISTS` (#5309 by @griffio)
-- [PostgreSQLダイアレクト] PostgreSQL 非同期バインドパラメータ (#5313 by @griffio)
-- [PostgreSQLダイアレクト] PostgreSql boolean リテラル (#5262 by @griffio)
-- [PostgreSQLダイアレクト] PostgreSql ウィンドウ関数 (#5155 by @griffio)
-- [PostgreSQLダイアレクト] PostgreSql `isNull`/`isNotNull` 型 (#5173 by @griffio)
-- [PostgreSQLダイアレクト] PostgreSql `SELECT DISTINCT` (#5172 by @griffio)
-- [Paging拡張] ページングリフレッシュの初期ロードを修正 (#5615 by @evant)
-- [Paging拡張] MacOS ネイティブターゲットを追加 (#5324 by @vitorhugods)
-- [IntelliJプラグイン] K2 サポート
+### 修正 (Fixed)
+- [Compiler] 修正: 結果を伴うグループ化された文を実行する際にクエリを通知するようにしました (#5006 by @vitorhugods)
+- [Compiler] SqlDelightModule の型リゾルバーを修正しました (#5625 by @griffio)
+- [Compiler] 5501のエスケープされた列を持つオブジェクトの挿入を修正しました (#5503 by @griffio)
+- [Compiler] 正しい行および文字位置でパスリンクをクリックできるようエラーメッセージを改善しました (#5604 by @vanniktech)
+- [Compiler] 課題5298の修正: キーワードをテーブル名として使用できるようにしました
+- [Compiler] 名前付き execute を修正し、テストを追加しました
+- [Compiler] 初期化文をソートする際に、外部キーテーブル制約を考慮するようにしました (#5325 by @TheMrMilchmann)
+- [Compiler] タブが含まれている場合でもエラーの下線が適切に揃うようにしました (#5224 by @drewd)
+- [JDBC Driver] トランザクション終了時における connectionManager のメモリリークを修正しました
+- [JDBC Driver] ドキュメントの記載通り、SQLite のマイグレーションをトランザクション内で実行するようにしました (#5218 by @morki)
+- [JDBC Driver] トランザクションのコミット/ロールバック後にコネクションがリークする問題を修正しました (#5205 by @morki)
+- [Gradle Plugin] `GenerateSchemaTask` の前に `DriverInitializer` を実行するようにしました (#5562 by @nwagu)
+- [Runtime] 実際のドライバーが Async である場合の LogSqliteDriver でのクラッシュを修正しました (#5723 by @edenman)
+- [Runtime] StringBuilder の初期容量を修正しました (#5192 by @janbina)
+- [PostgreSQL Dialect] PostgreSQL の create or replace view を修正しました (#5407 by @griffio)
+- [PostgreSQL Dialect] PostgreSQL の to_json を修正しました (#5606 by @griffio)
+- [PostgreSQL Dialect] PostgreSQL の numeric リゾルバーを修正しました (#5399 by @griffio)
+- [PostgreSQL Dialect] SQLite のウィンドウ関数を修正しました (#2799 by @griffio)
+- [PostgreSQL Dialect] PostgreSQL の SELECT DISTINCT ON を修正しました (#5345 by @griffio)
+- [PostgreSQL Dialect] ALTER TABLE ADD COLUMN IF NOT EXISTS を修正しました (#5309 by @griffio)
+- [PostgreSQL Dialect] PostgreSQL の非同期バインドパラメータを修正しました (#5313 by @griffio)
+- [PostgreSQL Dialect] PostgreSQL の真偽値リテラルを修正しました (#5262 by @griffio)
+- [PostgreSQL Dialect] PostgreSQL のウィンドウ関数を修正しました (#5155 by @griffio)
+- [PostgreSQL Dialect] PostgreSQL の isNull / isNotNull 型を修正しました (#5173 by @griffio)
+- [PostgreSQL Dialect] PostgreSQL の SELECT DISTINCT を修正しました (#5172 by @griffio)
+- [Paging Extension] Paging の初回読み込みリフレッシュを修正しました (#5615 by @evant)
+- [Paging Extension] macOS ネイティブターゲットを追加しました (#5324 by @vitorhugods)
+- [IntelliJ Plugin] K2 をサポートしました
 
 ## [2.0.2] - 2024-04-05 {id="2-0-2-2024-04-05"}
 [2.0.2]: https://github.com/sqldelight/sqldelight/releases/tag/2.0.2
 
-### Added
-- [PostgreSQLダイアレクト] PostgreSQL `STRING_AGG` 関数を追加 (#4950 by @anddani)
-- [PostgreSQLダイアレクト] PostgreSQL ダイアレクトに `SET` 文を追加 (#4927 by @de-luca)
-- [PostgreSQLダイアレクト] PostgreSql カラムのシーケンスパラメータ変更 (alter column sequence parameters) を追加 (#4916 by @griffio)
-- [PostgreSQLダイアレクト] インサート文における PostgreSQL カラムのデフォルト値変更のサポートを追加 (#4912 by @griffio)
-- [PostgreSQLダイアレクト] PostgreSql シーケンスの変更 (alter sequence) と削除 (drop sequence) を追加 (#4920 by @griffio)
-- [PostgreSQLダイアレクト] Postgres 正規表現関数の定義を追加 (#5025 by @MariusVolkhart)
-- [PostgreSQLダイアレクト] GIN のグラマーを追加 (#5027 by @griffio)
+### 追加 (Added)
+- [PostgreSQL Dialect] PostgreSQL の STRING_AGG 関数を追加しました (#4950 by @anddani)
+- [PostgreSQL Dialect] pg ダイアレクトに SET 文を追加しました (#4927 by @de-luca)
+- [PostgreSQL Dialect] PostgreSQL の alter column シーケンスパラメータを追加しました (#4916 by @griffio)
+- [PostgreSQL Dialect] INSERT 文における PostgreSQL の alter column default のサポートを追加しました (#4912 by @griffio)
+- [PostgreSQL Dialect] PostgreSQL の alter sequence および drop sequence を追加しました (#4920 by @griffio)
+- [PostgreSQL Dialect] Postgres 正規表現関数の定義を追加しました (#5025 by @MariusVolkhart)
+- [PostgreSQL Dialect] GIN インデックスの文法を追加しました (#5027 by @griffio)
 
-### Changed
-- [IDEプラグイン] 最小バージョンを 2023.1 / Android Studio Iguana に変更
-- [コンパイラ] `encapsulatingType` における型の Null 許容性の上書きを許可 (#4882 by @eygraber)
-- [コンパイラ] `SELECT *` のカラム名をインライン化
-- [Gradleプラグイン] `processIsolation` へ切り替え (#5068 by @nwagu)
-- [Androidランタイム] Android の `minSDK` を 21 に引き上げ (#5094 by @hfhbd)
-- [ドライバ] ダイアレクト作者向けに、より多くの JDBC/R2DBC ステートメントメソッドを公開 (#5098 by @hfhbd)
+### 変更 (Changed)
+- [IDE Plugin] 最小バージョンを 2023.1 / Android Studio Iguana に変更しました
+- [Compiler] encapsulatingType で型の null 許容性をオーバーライドできるようにしました (#4882 by @eygraber)
+- [Compiler] SELECT * に対する列名をインライン化しました
+- [Gradle Plugin] processIsolation に切り替えました (#5068 by @nwagu)
+- [Android Runtime] Android の minSDK を 21 に引き上げました (#5094 by @hfhbd)
+- [Drivers] ダイアレクト開発者向けに JDBC/R2DBC のステートメントメソッドをさらに公開しました (#5098 by @hfhbd)
 
-### Fixed
-- [PostgreSQLダイアレクト] PostgreSQL `ALTER TABLE ALTER COLUMN` を修正 (#4868 by @griffio)
-- [PostgreSQLダイアレクト] 課題 4448 を修正: テーブルモデルのインポート欠落 (#4885 by @griffio)
-- [PostgreSQLダイアレクト] 課題 4932 を修正: PostgreSQL デフォルト制約関数 (#4934 by @griffio)
-- [PostgreSQLダイアレクト] 課題 4879 を修正: マイグレーション中の `ALTER TABLE RENAME COLUMN` における PostgreSQL クラスキャストエラー (#4880 by @griffio)
-- [PostgreSQLダイアレクト] 課題 4474 を修正: PostgreSql 拡張の作成 (create extension) (#4541 by @griffio)
-- [PostgreSQLダイアレクト] 課題 5018 を修正: PostgreSql `ADD PRIMARY KEY` の非 Null 型 (#5020 by @griffio)
-- [PostgreSQLダイアレクト] 課題 4703 を修正: 集計式 (#5071 by @griffio)
-- [PostgreSQLダイアレクト] 課題 5028 を修正: PostgreSql JSON (#5030 by @griffio)
-- [PostgreSQLダイアレクト] 課題 5040 を修正: PostgreSql JSON 演算子 (#5041 by @griffio)
-- [PostgreSQLダイアレクト] 課題 5040 の JSON 演算子バインディングを修正 (#5100 by @griffio)
-- [PostgreSQLダイアレクト] 課題 5082 を修正: `tsvector` (#5104 by @griffio)
-- [PostgreSQLダイアレクト] 課題 5032 を修正: PostgreSql `UPDATE FROM` 文におけるカラムの隣接性 (#5035 by @griffio)
-- [SQLiteダイアレクト] 課題 4897 を修正: sqlite `ALTER TABLE RENAME COLUMN` (#4899 by @griffio)
-- [IDEプラグイン] エラーハンドラのクラッシュを修正 (#4988 by @aperfilyev)
-- [IDEプラグイン] IDEA 2023.3 で BugSnag の初期化に失敗する問題を修正 (by @aperfilyev)
-- [IDEプラグイン] プラグイン経由で IntelliJ で .sq ファイルを開く際の `PluginException` を修正 (by @aperfilyev)
-- [IDEプラグイン] すでにプラグインの依存関係にあるため、Kotlin lib を IntelliJ プラグインにバンドルしないように変更 (#5126)
-- [IDEプラグイン] ストリームの代わりに拡張機能配列を使用するように変更 (#5127)
+### 修正 (Fixed)
+- [PostgreSQL Dialect] PostgreSQL の alter table alter column を修正しました (#4868 by @griffio)
+- [PostgreSQL Dialect] テーブルモデルのインポート不足 (4448) を修正しました (#4885 by @griffio)
+- [PostgreSQL Dialect] PostgreSQL のデフォルト制約関数 (4932) を修正しました (#4934 by @griffio)
+- [PostgreSQL Dialect] マイグレーション中の alter table rename column における PostgreSQL の ClassCastException (4879) を修正しました (#4880 by @griffio)
+- [PostgreSQL Dialect] PostgreSQL の CREATE EXTENSION (4474) を修正しました (#4541 by @griffio)
+- [PostgreSQL Dialect] PostgreSQL の非 null 型に対する Primary Key 追加 (5018) を修正しました (#5020 by @griffio)
+- [PostgreSQL Dialect] 集約式 (4703) を修正しました (#5071 by @griffio)
+- [PostgreSQL Dialect] PostgreSQL の JSON 処理 (5028) を修正しました (#5030 by @griffio)
+- [PostgreSQL Dialect] PostgreSQL の JSON 演算子 (5040) を修正しました (#5041 by @griffio)
+- [PostgreSQL Dialect] 5040 に対する JSON 演算子のバインディングを修正しました (#5100 by @griffio)
+- [PostgreSQL Dialect] tsvector (5082) を修正しました (#5104 by @griffio)
+- [PostgreSQL Dialect] PostgreSQL の UPDATE FROM 文における列の隣接性 (5032) を修正しました (#5035 by @griffio)
+- [SQLite Dialect] SQLite の alter table rename column (4897) を修正しました (#4899 by @griffio)
+- [IDE Plugin] エラーハンドラーのクラッシュを修正しました (#4988 by @aperfilyev)
+- [IDE Plugin] IDEA 2023.3 で BugSnag の初期化に失敗する問題を修正しました (by @aperfilyev)
+- [IDE Plugin] プラグイン経由で IntelliJ で .sq ファイルを開いたときの PluginException を修正しました (by @aperfilyev)
+- [IDE Plugin] kotlin-lib は既にプラグインの依存関係にあるため、IntelliJ プラグインにバンドルしないようにしました (#5126)
+- [IDE Plugin] stream の代わりに extensions 配列を使用するようにしました (#5127)
 
 ## [2.0.1] - 2023-12-01 {id="2-0-1-2023-12-01"}
 [2.0.1]: https://github.com/sqldelight/sqldelight/releases/tag/2.0.1
 
-### Added
-- [コンパイラ] `SELECT` 実行時の複数カラム式 (multi-column-expr) のサポートを追加 (#4453 by @Adriel-M)
-- [PostgreSQLダイアレクト] PostgreSQL `CREATE INDEX CONCURRENTLY` のサポートを追加 (#4531 by @griffio)
-- [PostgreSQLダイアレクト] PostgreSQL CTE の補助ステートメントが相互に参照可能になるようサポート (#4493 by @griffio)
-- [PostgreSQLダイアレクト] バイナリ式 (binary expr) および `sum` における PostgreSQL 型のサポートを追加 (#4539 by @Adriel-M)
-- [PostgreSQLダイアレクト] PostgreSQL `SELECT DISTINCT ON` 構文のサポートを追加 (#4584 by @griffio)
-- [PostgreSQLダイアレクト] `SELECT` 文における PostgreSQL JSON 関数のサポートを追加 (#4590 by @MariusVolkhart)
-- [PostgreSQLダイアレクト] `generate_series` PostgreSQL 関数を追加 (#4717 by @griffio)
-- [PostgreSQLダイアレクト] 追加の Postgres 文字列関数の定義を追加 (#4752 by @MariusVolkhart)
-- [PostgreSQLダイアレクト] `min` および `max` 集計関数に `DATE` PostgreSQL 型を追加 (#4816 by @anddani)
-- [PostgreSQLダイアレクト] `SqlBinaryExpr` に PostgreSql の時間型を追加 (#4657 by @griffio)
-- [PostgreSQLダイアレクト] Postgres ダイアレクトに `TRUNCATE` を追加 (#4817 by @de-luca)
-- [SQLite 3.35 ダイアレクト] 順番に評価される複数の `ON CONFLICT` 句を許可 (#4551 by @griffio)
-- [JDBCドライバ] SQL 編集をより快適にするための Language アノテーションを追加 (#4602 by @MariusVolkhart)
-- [Nativeドライバ] `linuxArm64` のサポートを追加 (#4792 by @hfhbd)
-- [Androidドライバ] `AndroidSqliteDriver` に `windowSizeBytes` パラメータを追加 (#4804 by @BoD)
-- [Paging3拡張] feat: `OffsetQueryPagingSource` に `initialOffset` を追加 (#4802 by @MohamadJaara)
+### 追加 (Added)
+- [Compiler] SELECT 実行時の multi-column-expr のサポートを追加しました (#4453 by @Adriel-M)
+- [PostgreSQL Dialect] PostgreSQL の CREATE INDEX CONCURRENTLY のサポートを追加しました (#4531 by @griffio)
+- [PostgreSQL Dialect] PostgreSQL の CTE 補助文が互いを参照できるようにしました (#4493 by @griffio)
+- [PostgreSQL Dialect] 二項式および sum 用の PostgreSQL 型のサポートを追加しました (#4539 by @Adriel-M)
+- [PostgreSQL Dialect] PostgreSQL の SELECT DISTINCT ON 構文のサポートを追加しました (#4584 by @griffio)
+- [PostgreSQL Dialect] SELECT 文における PostgreSQL の JSON 関数のサポートを追加しました (#4590 by @MariusVolkhart)
+- [PostgreSQL Dialect] PostgreSQL の generate_series 関数を追加しました (#4717 by @griffio)
+- [PostgreSQL Dialect] Postgres の文字列関数の定義を追加しました (#4752 by @MariusVolkhart)
+- [PostgreSQL Dialect] min および max 集約関数に PostgreSQL の DATE 型を追加しました (#4816 by @anddani)
+- [PostgreSQL Dialect] SqlBinaryExpr に PostgreSQL の日時・時間型を追加しました (#4657 by @griffio)
+- [PostgreSQL Dialect] postgres ダイアレクトに TRUNCATE を追加しました (#4817 by @de-luca)
+- [SQLite 3.35 Dialect] 順次評価される複数の ON CONFLICT 句を許可するようにしました (#4551 by @griffio)
+- [JDBC Driver] より快適な SQL 編集のために Language アノテーションを追加しました (#4602 by @MariusVolkhart)
+- [Native Driver] native-driver: linuxArm64 のサポートを追加しました (#4792 by @hfhbd)
+- [Android Driver] AndroidSqliteDriver に windowSizeBytes パラメータを追加しました (#4804 by @BoD)
+- [Paging3 Extension] 機能追加: OffsetQueryPagingSource に initialOffset を追加しました (#4802 by @MohamadJaara)
 
-### Changed
-- [コンパイラ] 適切な場合には Kotlin 型を優先するように変更 (#4517 by @eygraber)
-- [コンパイラ] 値型をインサートする際、常にカラム名を含めるように変更 (#4864)
-- [PostgreSQLダイアレクト] PostgreSQL ダイアレクトから実験的ステータスを削除 (#4443 by @hfhbd)
-- [PostgreSQLダイアレクト] PostgreSQL 型のドキュメントを更新 (#4569 by @MariusVolkhart)
-- [R2DBCドライバ] PostgreSQL における整数データ型の処理パフォーマンスを最適化 (#4588 by @MariusVolkhart)
+### 変更 (Changed)
+- [Compiler] 適切な箇所では Kotlin の型を優先して使用するようにしました (#4517 by @eygraber)
+- [Compiler] 値型 (value type) の挿入を行う際は、常に列名を含めるようにしました (#4864)
+- [PostgreSQL Dialect] PostgreSQL ダイアレクトから実験的 (experimental) ステータスを削除しました (#4443 by @hfhbd)
+- [PostgreSQL Dialect] PostgreSQL の型に関するドキュメントを更新しました (#4569 by @MariusVolkhart)
+- [R2DBC Driver] PostgreSQL での整数データ型の処理パフォーマンスを最適化しました (#4588 by @MariusVolkhart)
 
-### Removed {id="removed"}
-- [SQLite Javascriptドライバ] `sqljs-driver` を削除 (#4613, #4670 by @dellisd)
+### 削除 (Removed) {id="removed"}
+- [SQLite Javascript Driver] sqljs-driver を削除しました (#4613, #4670 by @dellisd)
 
-### Fixed
-- [コンパイラ] 戻り値がありパラメータのないグループ化されたステートメントのコンパイルを修正 (#4699 by @griffio)
-- [コンパイラ] `SqlBinaryExpr` で引数をバインドするように修正 (#4604 by @griffio)
-- [IDEプラグイン] 設定されている場合は IDEA Project JDK を使用するように修正 (#4689 by @griffio)
-- [IDEプラグイン] IDEA 2023.2 以上における "Unknown element type: TYPE_NAME" エラーを修正 (#4727)
-- [IDEプラグイン] 2023.2 とのいくつかの互換性問題を修正
-- [Gradleプラグイン] `verifyMigrationTask` Gradle タスクのドキュメントを修正 (#4713 by @joshfriend)
-- [Gradleプラグイン] データベースを検証する前にデータベースを生成するよう促すタスク出力メッセージを追加 (#4684 by @jingwei99)
-- [PostgreSQLダイアレクト] PostgreSQL のカラム名を複数回リネームする問題を修正 (#4566 by @griffio)
-- [PostgreSQLダイアレクト] 課題 4714 を修正: PostgreSql カラムの Null 許容性変更 (#4831 by @griffio)
-- [PostgreSQLダイアレクト] 課題 4837 を修正: `ALTER TABLE ALTER COLUMN` (#4846 by @griffio)
-- [PostgreSQLダイアレクト] 課題 4501 を修正: PostgreSql シーケンス (#4528 by @griffio)
-- [SQLiteダイアレクト] カラム式で JSON バイナリ演算子を使用可能に修正 (#4776 by @eygraber)
-- [SQLiteダイアレクト] 名前が一致する複数のカラムが見つかった場合の `UPDATE FROM` の誤検出を修正 (#4777 by @eygraber)
-- [Nativeドライバ] 名前付きインメモリデータベースをサポート (#4662 by @05nelsonm)
-- [Nativeドライバ] クエリリスナーコレクションのスレッドセーフを確保 (#4567 by @kpgalligan)
-- [JDBCドライバ] `ConnectionManager` における接続リークを修正 (#4589 by @MariusVolkhart)
-- [JDBCドライバ] `ConnectionManager` タイプを選択する際の `JdbcSqliteDriver` URL 解析を修正 (#4656 by @05nelsonm)
+### 修正 (Fixed)
+- [Compiler] 戻り値がありパラメータのないグループ化された文のコンパイルを修正しました (#4699 by @griffio)
+- [Compiler] SqlBinaryExpr による引数のバインドを修正しました (#4604 by @griffio)
+- [IDE Plugin] 設定されている場合は IDEA Project JDK を使用するようにしました (#4689 by @griffio)
+- [IDE Plugin] IDEA 2023.2 以降での「Unknown element type: TYPE_NAME」エラーを修正しました (#4727)
+- [IDE Plugin] 2023.2 とのいくつかの互換性の問題を修正しました
+- [Gradle Plugin] Gradle の verifyMigrationTask タスクのドキュメントを修正しました (#4713 by @joshfriend)
+- [Gradle Plugin] データベースを検証する前にユーザーがデータベースを生成するのを助けるための Gradle タスク出力メッセージを追加しました (#4684 by @jingwei99)
+- [PostgreSQL Dialect] PostgreSQL の列が複数回リネームされる問題を修正しました (#4566 by @griffio)
+- [PostgreSQL Dialect] PostgreSQL の alter column nullability (4714) を修正しました (#4831 by @griffio)
+- [PostgreSQL Dialect] alter table alter column (4837) を修正しました (#4846 by @griffio)
+- [PostgreSQL Dialect] PostgreSQL のシーケンス (4501) を修正しました (#4528 by @griffio)
+- [SQLite Dialect] 列式での JSON 二項演算子の使用を許可しました (#4776 by @eygraber)
+- [SQLite Dialect] 同じ名前の複数列が見つかった場合の Update From の誤検知を修正しました (#4777 by @eygraber)
+- [Native Driver] 名前付きインメモリデータベースをサポートしました (#4662 by @05nelsonm)
+- [Native Driver] クエリリスナーコレクションのスレッドセーフ性を確保しました (#4567 by @kpgalligan)
+- [JDBC Driver] ConnectionManager における接続リークを修正しました (#4589 by @MariusVolkhart)
+- [JDBC Driver] ConnectionManager のタイプを選択する際の JdbcSqliteDriver の URL パースを修正しました (#4656 by @05nelsonm)
 
 ## [2.0.0] - 2023-07-26 {id="2-0-0-2023-07-26"}
 [2.0.0]: https://github.com/sqldelight/sqldelight/releases/tag/2.0.0
 
-### Added
-- [MySQLダイアレクト] MySQL: `IF` 式における `timestamp`/`bigint` をサポート (#4329 by @shellderp)
-- [MySQLダイアレクト] MySQL: `now` を追加 (#4431 by @hfhbd)
-- [Webドライバ] NPM パッケージの公開を有効化 (#4364)
-- [IDEプラグイン] Gradle ツール接続失敗時にスタックトレースを表示可能に修正 (#4383)
+### 追加 (Added)
+- [MySQL Dialect] MySQL: IF 式での timestamp/bigint をサポートしました (#4329 by @shellderp)
+- [MySQL Dialect] MySQL: NOW() を追加しました (#4431 by @hfhbd)
+- [Web Driver] NPM パッケージの公開を有効にしました (#4364)
+- [IDE Plugin] Gradle tooling の接続に失敗した際にスタックトレースを表示できるようにしました (#4383)
 
-### Changed
-- [Sqliteドライバ] `JdbcSqliteDriver` におけるスキーママイグレーションの使用を簡素化 (#3737 by @morki)
-- [R2DBCドライバ] リアルな非同期 R2DBC カーソル (#4387 by @hfhbd)
+### 変更 (Changed)
+- [Sqlite Driver] JdbcSqliteDriver のスキーママイグレーションの使用を簡素化しました (#3737 by @morki)
+- [R2DBC Driver] 真の非同期 R2DBC カーソルに対応しました (#4387 by @hfhbd)
 
-### Fixed
-- [IDEプラグイン] 必要になるまでデータベースプロジェクトサービスをインスタンス化しないように変更 (#4382)
-- [IDEプラグイン] 使用箇所検索中のプロセスキャンセルを処理 (#4340)
-- [IDEプラグイン] 非同期コードの IDE 生成を修正 (#4406)
-- [IDEプラグイン] パッケージ構造の組み立てを 1 回限りの計算にし、EDT 外に移動 (#4417)
-- [IDEプラグイン] 2023.2 における Kotlin 型解決に正しいスタブインデックスキーを使用 (#4416)
-- [IDEプラグイン] 検索を実行する前にインデックスの準備が整うのを待つように修正 (#4419)
-- [IDEプラグイン] インデックスが利用できない場合は "goto" を実行しないように変更 (#4420)
-- [コンパイラ] グループ化されたステートメントの結果式を修正 (#4378)
-- [コンパイラ] 仮想テーブルをインターフェース型として使用しないように修正 (#4427 by @hfhbd)
+### 修正 (Fixed)
+- [IDE Plugin] 必要になるまでデータベースプロジェクトサービスをインスタンス化しないようにしました (#4382)
+- [IDE Plugin] 使用箇所の検索 (find usages) 中のプロセスキャンセルを処理するようにしました (#4340)
+- [IDE Plugin] IDE による非同期コードの生成を修正しました (#4406)
+- [IDE Plugin] パッケージ構造の組み立てを一度だけ計算し、EDT 外で行うように変更しました (#4417)
+- [IDE Plugin] 2023.2 における Kotlin 型解決のために正しいスタブインデックスキーを使用するようにしました (#4416)
+- [IDE Plugin] 検索を実行する前にインデックスの準備が整うのを待つようにしました (#4419)
+- [IDE Plugin] インデックスが利用できない場合は定義へのジャンプ (goto) を実行しないようにしました (#4420)
+- [Compiler] グループ化された文の結果式を修正しました (#4378)
+- [Compiler] 仮想テーブルをインターフェース型として使用しないようにしました (#4427 by @hfhbd)
 
 ## [2.0.0-rc02] - 2023-06-27 {id="2-0-0-rc02-2023-06-27"}
 [2.0.0-rc02]: https://github.com/sqldelight/sqldelight/releases/tag/2.0.0-rc02
 
-### Added
-- [MySQLダイアレクト] 小文字の日付型、および日付型に対する `min` と `max` をサポート (#4243 by @shellderp)
-- [MySQLダイアレクト] バイナリ式と `sum` に対する MySql 型をサポート (#4254 by @shellderp)
-- [MySQLダイアレクト] 表示幅のない符号なし整数 (unsigned ints) をサポート (#4306 by @shellderp)
-- [MySQLダイアレクト] `LOCK IN SHARED MODE` をサポート
-- [PostgreSQLダイアレクト] `min`/`max` に boolean と `Timestamp` を追加 (#4245 by @griffio)
-- [PostgreSQLダイアレクト] Postgres: ウィンドウ関数のサポートを追加 (#4283 by @hfhbd)
-- [ランタイム] ランタイムに `linuxArm64`、`androidNative`、`watchosDeviceArm` ターゲットを追加 (#4258 by @hfhbd)
-- [Paging拡張] Paging 拡張に linux と mingw x64 ターゲットを追加 (#4280 by @chippman)
+### 追加 (Added)
+- [MySQL Dialect] 小文字の日時型、および日時型に対する min と max をサポートしました (#4243 by @shellderp)
+- [MySQL Dialect] 二項式および sum 用の MySQL 型をサポートしました (#4254 by @shellderp)
+- [MySQL Dialect] 表示幅のない unsigned int をサポートしました (#4306 by @shellderp)
+- [MySQL Dialect] LOCK IN SHARED MODE をサポートしました
+- [PostgreSQL Dialect] min / max に boolean および Timestamp を追加しました (#4245 by @griffio)
+- [PostgreSQL Dialect] Postgres: ウィンドウ関数のサポートを追加しました (#4283 by @hfhbd)
+- [Runtime] runtime に linuxArm64、androidNative、watchosDeviceArm ターゲットを追加しました (#4258 by @hfhbd)
+- [Paging Extension] paging extension に linux および mingw x64 ターゲットを追加しました (#4280 by @chippman)
 
-### Changed
-- [Gradleプラグイン] Android API 34 に対する automatic dialect サポートを追加 (#4251)
-- [Paging拡張] `QueryPagingSource` における `SuspendingTransacter` のサポートを追加 (#4292 by @daio)
-- [ランタイム] `addListener` API を改善 (#4244 by @hfhbd)
-- [ランタイム] マイグレーションバージョンとして `Long` を使用するように変更 (#4297 by @hfhbd)
+### 変更 (Changed)
+- [Gradle Plugin] Android API 34 の自動ダイアレクトサポートを追加しました (#4251)
+- [Paging Extension] QueryPagingSource での SuspendingTransacter のサポートを追加しました (#4292 by @daio)
+- [Runtime] addListener API を改善しました (#4244 by @hfhbd)
+- [Runtime] マイグレーションのバージョンに Long を使用するようにしました (#4297 by @hfhbd)
 
-### Fixed
-- [Gradleプラグイン] 生成されたソースに安定した出力パスを使用 (#4269 by @joshfriend)
-- [Gradleプラグイン] Gradle の微調整 (#4222 by @3flex)
+### 修正 (Fixed)
+- [Gradle Plugin] 生成されたソースに安定した出力パスを使用するようにしました (#4269 by @joshfriend)
+- [Gradle Plugin] Gradle の微調整を行いました (#4222 by @3flex)
 
 ## [2.0.0-rc01] - 2023-05-29 {id="2-0-0-rc01-2023-05-29"}
 [2.0.0-rc01]: https://github.com/sqldelight/sqldelight/releases/tag/2.0.0-rc01
 
-### Added
-- [Paging] Paging 拡張に js browser ターゲットを追加 (#3843 by @sproctor)
-- [Paging] androidx-paging3 拡張に `iosSimulatorArm64` ターゲットを追加 (#4117)
-- [PostgreSQLダイアレクト] `gen_random_uuid()` のサポートとテストを追加 (#3855 by @davidwheeler123)
-- [PostgreSQLダイアレクト] PostgreSQL の `ALTER TABLE ADD CONSTRAINT` (#4116 by @griffio)
-- [PostgreSQLダイアレクト] `ALTER TABLE ADD CONSTRAINT CHECK` (#4120 by @griffio)
-- [PostgreSQLダイアレクト] PostgreSQL の文字長関数を追加 (#4121 by @griffio)
-- [PostgreSQLダイアレクト] PostgreSQL のカラムデフォルト `INTERVAL` を追加 (#4142 by @griffio)
-- [PostgreSQLダイアレクト] PostgreSQL `INTERVAL` カラム結果を追加 (#4152 by @griffio)
-- [PostgreSQLダイアレクト] PostgreSQL `ALTER COLUMN` を追加 (#4165 by @griffio)
-- [PostgreSQLダイアレクト] PostgreSQL: `date_part` を追加 (#4198 by @hfhbd)
-- [MySQLダイアレクト] SQL 文字長関数を追加 (#4134 by @griffio)
-- [IDEプラグイン] sqldelight ディレクトリのサジェストを追加 (#3976 by @aperfilyev)
-- [IDEプラグイン] プロジェクトツリー内の中間パッケージをコンパクトに表示 (#3992 by @aperfilyev)
-- [IDEプラグイン] `JOIN` 句の補完を追加 (#4086 by @aperfilyev)
-- [IDEプラグイン] View 作成のインテンションとライブテンプレートを追加 (#4074 by @aperfilyev)
-- [IDEプラグイン] `DELETE` または `UPDATE` 内で `WHERE` が欠落している場合に警告を表示 (#4058 by @aperfilyev)
-- [Gradleプラグイン] 型セーフなプロジェクトアクセサを有効化 (#4005 by @hfhbd)
+### 追加 (Added)
+- [Paging] paging extensions に js browser ターゲットを追加しました (#3843 by @sproctor)
+- [Paging] androidx-paging3 extension に iosSimulatorArm64 ターゲットを追加しました (#4117)
+- [PostgreSQL Dialect] gen_random_uuid() のサポートとテストを追加しました (#3855 by @davidwheeler123)
+- [PostgreSQL Dialect] Postgres の ALTER TABLE ADD CONSTRAINT をサポートしました (#4116 by @griffio)
+- [PostgreSQL Dialect] ALTER TABLE ADD CONSTRAINT CHECK をサポートしました (#4120 by @griffio)
+- [PostgreSQL Dialect] PostgreSQL の文字列長関数を追加しました (#4121 by @griffio)
+- [PostgreSQL Dialect] PostgreSQL の列デフォルト INTERVAL を追加しました (#4142 by @griffio)
+- [PostgreSQL Dialect] PostgreSQL の INTERVAL 列の結果を追加しました (#4152 by @griffio)
+- [PostgreSQL Dialect] PostgreSQL の Alter Column を追加しました (#4165 by @griffio)
+- [PostgreSQL Dialect] PostgreSQL: date_part を追加しました (#4198 by @hfhbd)
+- [MySQL Dialect] SQL 文字列長関数を追加しました (#4134 by @griffio)
+- [IDE Plugin] sqldelight ディレクトリの候補表示を追加しました (#3976 by @aperfilyev)
+- [IDE Plugin] プロジェクトツリー内の中間パッケージをコンパクトに表示するようにしました (#3992 by @aperfilyev)
+- [IDE Plugin] JOIN 句の補完を追加しました (#4086 by @aperfilyev)
+- [IDE Plugin] ビュー作成のインテンションとライブテンプレートを追加しました (#4074 by @aperfilyev)
+- [IDE Plugin] DELETE または UPDATE 内で WHERE が不足している場合に警告するようにしました (#4058 by @aperfilyev)
+- [Gradle Plugin] 型安全なプロジェクトアクセサーを有効化しました (#4005 by @hfhbd)
 
-### Changed
-- [Gradleプラグイン] `ServiceLoader` メカニズムを使用して `VerifyMigrationTask` 用の `DriverInitializer` を登録可能に変更 (#3986 by @C2H6O)
-- [Gradleプラグイン] 明示的なコンパイラ環境を作成 (#4079 by @hfhbd)
-- [JSドライバ] Web Worker ドライバを別のアーティファクトに分割
-- [JSドライバ] `JsWorkerSqlCursor` を公開しないように変更 (#3874 by @hfhbd)
-- [JSドライバ] `sqljs` ドライバの公開を停止 (#4108)
-- [ランタイム] 同期ドライバに同期スキーマ初期化子を強制 (#4013)
-- [ランタイム] Cursor の非同期サポートを改善 (#4102)
-- [ランタイム] 非推奨ターゲットを削除 (#4149 by @hfhbd)
-- [ランタイム] 古い MM のサポートを削除 (#4148 by @hfhbd)
+### 変更 (Changed)
+- [Gradle Plugin] ServiceLoader メカニズムを使用して VerifyMigrationTask 用の DriverInitializer を登録できるようにしました (#3986 by @C2H6O)
+- [Gradle Plugin] 明示的なコンパイラ環境を作成するようにしました (#4079 by @hfhbd)
+- [JS Driver] Web Worker ドライバーを個別のアーティファクトに分割しました
+- [JS Driver] JsWorkerSqlCursor を外部公開しないようにしました (#3874 by @hfhbd)
+- [JS Driver] sqljs ドライバーの公開を無効化しました (#4108)
+- [Runtime] 同期ドライバーには同期スキーマ初期化子が必須であることを強制するようにしました (#4013)
+- [Runtime] Cursor の非同期サポートを改善しました (#4102)
+- [Runtime] 非推奨となったターゲットを削除しました (#4149 by @hfhbd)
+- [Runtime] 従来のメモリモデル (MM) のサポートを削除しました (#4148 by @hfhbd)
 
-### Fixed
-- [R2DBCドライバ] R2DBC: ドライバのクローズを待機するように修正 (#4139 by @hfhbd)
-- [コンパイラ] データベース `create(SqlDriver)` にマイグレーションからの `PRAGMA` を含めるように修正 (#3845 by @MariusVolkhart)
-- [コンパイラ] `RETURNING` 句のコード生成を修正 (#3872 by @MariusVolkhart)
-- [コンパイラ] 仮想テーブルの型を生成しないように修正 (#4015)
-- [Gradleプラグイン] Gradle プラグインの QoL を向上させる小さな改善 (#3930 by @zacsweers)
-- [IDEプラグイン] 未解決の Kotlin 型を修正 (#3924 by @aperfilyev)
-- [IDEプラグイン] ワイルドカード展開インテンションが修飾子付きで動作するように修正 (#3979 by @aperfilyev)
-- [IDEプラグイン] java home が見つからない場合に利用可能な JDK を使用するように修正 (#3925 by @aperfilyev)
-- [IDEプラグイン] パッケージ名に対する使用箇所検索を修正 (#4010)
-- [IDEプラグイン] 無効な要素に対して自動インポートを表示しないように変更 (#4008)
-- [IDEプラグイン] ダイアレクトが欠落している場合に解決しないように変更 (#4009)
-- [IDEプラグイン] 無効な状態での IDE によるコンパイラ実行を無視 (#4016)
-- [IDEプラグイン] IntelliJ 2023.1 のサポートを追加 (#4037 by @madisp)
-- [IDEプラグイン] カラム名変更時に名前付き引数の使用箇所をリネームするように修正 (#4027 by @aperfilyev)
-- [IDEプラグイン] マイグレーション追加ポップアップを修正 (#4105 by @aperfilyev)
-- [IDEプラグイン] マイグレーションファイル内の `SchemaNeedsMigrationInspection` を無効化 (#4106 by @aperfilyev)
-- [IDEプラグイン] マイグレーション生成に型名の代わりに SQL カラム名を使用するように修正 (#4112 by @aperfilyev)
+### 修正 (Fixed)
+- [R2DBC Driver] R2DBC: ドライバーのクローズを待機 (await) するようにしました (#4139 by @hfhbd)
+- [Compiler] データベースの create(SqlDriver) にマイグレーションからの PRAGMA を含めるようにしました (#3845 by @MariusVolkhart)
+- [Compiler] RETURNING 句のコード生成を修正しました (#3872 by @MariusVolkhart)
+- [Compiler] 仮想テーブルの型を生成しないようにしました (#4015)
+- [Gradle Plugin] Gradle プラグインの細かな QoL (利便性) の改善を行いました (#3930 by @zacsweers)
+- [IDE Plugin] 未解決の Kotlin 型に関する問題を修正しました (#3924 by @aperfilyev)
+- [IDE Plugin] ワイルドカード展開インテンションが修飾子付きでも機能するよう修正しました (#3979 by @aperfilyev)
+- [IDE Plugin] JAVA_HOME が見つからない場合は利用可能な JDK を使用するようにしました (#3925 by @aperfilyev)
+- [IDE Plugin] パッケージ名に対する使用箇所の検索を修正しました (#4010)
+- [IDE Plugin] 無効な要素に対して自動インポートを表示しないようにしました (#4008)
+- [IDE Plugin] ダイアレクトが見つからない場合は名前解決を行わないようにしました (#4009)
+- [IDE Plugin] 無効化された状態での IDE によるコンパイラ実行を無視するようにしました (#4016)
+- [IDE Plugin] IntelliJ 2023.1 のサポートを追加しました (#4037 by @madisp)
+- [IDE Plugin] 列名のリネーム時に名前付き引数の使用箇所もリネームするようにしました (#4027 by @aperfilyev)
+- [IDE Plugin] マイグレーション追加のポップアップを修正しました (#4105 by @aperfilyev)
+- [IDE Plugin] マイグレーションファイル内で SchemaNeedsMigrationInspection を無効化しました (#4106 by @aperfilyev)
+- [IDE Plugin] マイグレーション生成時に型名ではなく SQL の列名を使用するようにしました (#4112 by @aperfilyev)
 
 ## [2.0.0-alpha05] - 2023-01-20 {id="2-0-0-alpha05-2023-01-20"}
 [2.0.0-alpha05]: https://github.com/sqldelight/sqldelight/releases/tag/2.0.0-alpha05
 
-### Added
-- [Paging] マルチプラットフォーム Paging 拡張 (by @jeffdgr8)
-- [ランタイム] `Listener` インターフェースに `fun` 修飾子を追加。
-- [SQLiteダイアレクト] SQLite 3.33 サポート (`UPDATE FROM`) を追加 (by @eygraber))
-- [PostgreSQLダイアレクト] PostgreSQL における `UPDATE FROM` をサポート (by @eygraber))
+### 追加 (Added)
+- [Paging] マルチプラットフォーム向け Paging 拡張機能 (by @jeffdgr8)
+- [Runtime] Listener インターフェースに fun 修飾子を追加しました。
+- [SQLite Dialect] SQLite 3.33 (UPDATE FROM) のサポートを追加しました (by @eygraber)
+- [PostgreSQL Dialect] PostgreSQL での UPDATE FROM をサポートしました (by @eygraber)
 
-### Changed
-- [RDBCドライバ] コネクションを公開 (by @hfhbd)
-- [ランタイム] マイグレーションコールバックをメインの `migrate` 関数に移動
-- [Gradleプラグイン] 下流プロジェクトから `Configurations` を隠蔽
-- [Gradleプラグイン] IntelliJ のみをシェード (by @hfhbd)
-- [Gradleプラグイン] Kotlin 1.8.0-Beta をサポートし、複数バージョンの Kotlin テストを追加 (by @hfhbd)
+### 変更 (Changed)
+- [RDBC Driver] コネクションを外部公開しました (by @hfhbd)
+- [Runtime] マイグレーションのコールバックをメインの `migrate` 関数内に移動しました
+- [Gradle Plugin] ダウンストリームのプロジェクトから Configuration を隠蔽しました
+- [Gradle Plugin] IntelliJ のみを shade (埋め込み) するようにしました (by @hfhbd)
+- [Gradle Plugin] Kotlin 1.8.0-Beta をサポートし、複数バージョンの Kotlin テストを追加しました (by @hfhbd)
 
-### Fixed
-- [RDBCドライバ] 代わりに `javaObjectType` を使用するように修正 (by @hfhbd)
-- [RDBCドライバ] `bindStatement` におけるプリミティブの Null 値を修正 (by @hfhbd)
-- [RDBCドライバ] R2DBC 1.0 をサポート (by @hfhbd)
-- [PostgreSQLダイアレクト] Postgres: 型パラメータのない配列を修正 (by @hfhbd)
-- [IDEプラグイン] intellij を 221.6008.13 に引き上げ (by @hfhbd)
-- [コンパイラ] 純粋な View から再帰的な元のテーブルを解決するように修正 (by @hfhbd)
-- [コンパイラ] テーブルの外部キー句から値クラスを使用するように修正 (by @hfhbd)
-- [コンパイラ] 括弧のないバインド式をサポートするように `SelectQueryGenerator` を修正 (by @bellatoris)
-- [コンパイラ] トランザクション使用時の `${name}Indexes` 変数の重複生成を修正 (by @sachera)
+### 修正 (Fixed)
+- [RDBC Driver] 代わりに javaObjectType を使用するようにしました (by @hfhbd)
+- [RDBC Driver] bindStatement におけるプリミティブの null 値を修正しました (by @hfhbd)
+- [RDBC Driver] R2DBC 1.0 をサポートしました (by @hfhbd)
+- [PostgreSQL Dialect] Postgres: 型パラメータのない配列を修正しました (by @hfhbd)
+- [IDE Plugin] IntelliJ のバージョンを 221.6008.13 に引き上げました (by @hfhbd)
+- [Compiler] 単純なビューから再帰的な元のテーブルを解決するようにしました (by @hfhbd)
+- [Compiler] テーブルの外部キー句から値クラス (Value Classes) を使用するようにしました (by @hfhbd)
+- [Compiler] 括弧のないバインド式をサポートするよう SelectQueryGenerator を修正しました (by @bellatoris)
+- [Compiler] トランザクション使用時に ${name}Indexes 変数が重複して生成される問題を修正しました (by @sachera)
 
 ## [1.5.5] - 2023-01-20 {id="1-5-5-2023-01-20"}
 [1.5.5]: https://github.com/sqldelight/sqldelight/releases/tag/1.5.5
 
-Kotlin 1.8 および IntelliJ 2021+ との互換性リリース。JDK 17 をサポート。
+これは Kotlin 1.8 および IntelliJ 2021+ との互換性リリースであり、JDK 17 をサポートします。
 
 ## [1.5.4] - 2022-10-06 {id="1-5-4-2022-10-06"}
 [1.5.4]: https://github.com/sqldelight/sqldelight/releases/tag/1.5.4
 
-Kotlin 1.7.20 および AGP 7.3.0 との互換性アップデート。
+これは Kotlin 1.7.20 および AGP 7.3.0 との互換性アップデートです。
 
 ## [2.0.0-alpha04] - 2022-10-03 {id="2-0-0-alpha04-2022-10-03"}
 [2.0.0-alpha04]: https://github.com/sqldelight/sqldelight/releases/tag/2.0.0-alpha04
 
-### Breaking Changes {id="breaking-changes"}
+### 破壊的変更 (Breaking Changes) {id="breaking-changes"}
 
-- Paging 3 拡張 API が変更され、count には int 型のみが許可されるようになりました。
-- コルーチン拡張で、ディスパッチャのデフォルト設定がなくなり、渡すことが必須になりました。
-- ダイアレクトおよびドライバクラスが `final` になりました。代わりにデリゲーションを使用してください。
+- Paging 3 拡張機能の API が変更され、カウントには int 型のみを許可するようになりました。
+- coroutines 拡張機能において、デフォルトのディスパッチャが廃止され、明示的にディスパッチャを渡すことが必須になりました。
+- Dialect クラスおよび Driver クラスが final になりました。拡張する場合は委譲 (delegation) を使用してください。
 
-### Added
-- [HSQLダイアレクト] Hsql: インサート時の生成カラムに対する `DEFAULT` の使用をサポート (#3372 by @hfhbd)
-- [PostgreSQLダイアレクト] PostgreSQL: `INSERT` における生成カラムに対する `DEFAULT` の使用をサポート (#3373 by @hfhbd)
-- [PostgreSQLダイアレクト] PostgreSQL に `NOW()` を追加 (#3403 by @hfhbd)
-- [PostgreSQLダイアレクト] PostgreSQL に `NOT` 演算子を追加 (#3504 by @hfhbd)
-- [Paging] `*QueryPagingSource` に `CoroutineContext` を渡せるように修正 (#3384)
-- [Gradleプラグイン] ダイアレクトに対するより良いバージョンカタログサポートを追加 (#3435)
-- [Nativeドライバ] `NativeSqliteDriver` の `DatabaseConfiguration` 作成時にフックするコールバックを追加 (#3512 by @svenjacobs)
+### 追加 (Added)
+- [HSQL Dialect] Hsql: INSERT 内の生成列 (generated columns) に対する DEFAULT の使用をサポートしました (#3372 by @hfhbd)
+- [PostgreSQL Dialect] PostgreSQL: INSERT 内の生成列に対する DEFAULT の使用をサポートしました (#3373 by @hfhbd)
+- [PostgreSQL Dialect] PostgreSQL に NOW() を追加しました (#3403 by @hfhbd)
+- [PostgreSQL Dialect] PostgreSQL: NOT 演算子を追加しました (#3504 by @hfhbd)
+- [Paging] *QueryPagingSource への CoroutineContext の引き渡しを可能にしました (#3384)
+- [Gradle Plugin] ダイアレクトに対するバージョンカタログのサポートを改善しました (#3435)
+- [Native Driver] NativeSqliteDriver の DatabaseConfiguration 作成時に介入できるコールバックを追加しました (#3512 by @svenjacobs)
 
-### Changed
-- [Paging] `KeyedQueryPagingSource` をベースとする `QueryPagingSource` 関数にデフォルトのディスパッチャを追加 (#3385)
-- [Paging] `OffsetQueryPagingSource` が `Int` でのみ動作するように変更 (#3386)
-- [Asyncランタイム] `await*` を親クラスの `ExecutableQuery` に移動 (#3524 by @hfhbd)
-- [コルーチン拡張] Flow 拡張のデフォルトパラメータを削除 (#3489)
+### 変更 (Changed)
+- [Paging] KeyedQueryPagingSource をバックにした QueryPagingSource 関数にデフォルトのディスパッチャを追加しました (#3385)
+- [Paging] OffsetQueryPagingSource が Int のみで動作するように変更しました (#3386)
+- [Async Runtime] await* を上位クラス ExecutableQuery に移動しました (#3524 by @hfhbd)
+- [Coroutines Extensions] Flow 拡張機能からデフォルト引数を削除しました (#3489)
 
-### Fixed
-- [Gradleプラグイン] Kotlin 1.7.20 に更新 (#3542 by @zacsweers)
-- [R2DBCドライバ] 常に値を送信するとは限らない R2DBC の変更を採用 (#3525 by @hfhbd)
-- [HSQLダイアレクト] Hsql で SQLite の `VerifyMigrationTask` が失敗する問題を修正 (#3380 by @hfhbd)
-- [Gradleプラグイン] タスクを遅延設定 (lazy configuration) API を使用するように変換 (by @3flex)
-- [Gradleプラグイン] Kotlin 1.7.20 における NPE を回避 (#3398 by @ZacSweers)
-- [Gradleプラグイン] squash migrations タスクの説明を修正 (#3449)
-- [IDEプラグイン] 新しい Kotlin プラグインにおける `NoSuchFieldError` を修正 (#3422 by @madisp)
-- [IDEプラグイン] IDEA: `UnusedQueryInspection` - `ArrayIndexOutOfBoundsException` を修正 (#3427 by @vanniktech)
-- [IDEプラグイン] 古い Kotlin プラグイン参照にリフレクションを使用
-- [コンパイラ] 拡張関数を持つカスタムダイアレクトがインポートを作成しない問題を修正 (#3338 by @hfhbd)
-- [コンパイラ] `CodeBlock.of("${CodeBlock.toString()}")` のエスケープを修正 (#3340 by @hfhbd)
-- [コンパイラ] マイグレーションにおける非同期実行文の待機を追加 (#3352)
-- [コンパイラ] `AS` を修正 (#3370 by @hfhbd)
-- [コンパイラ] `getObject` メソッドが実際の型の自動充填をサポート (#3401 by @robxyy)
-- [コンパイラ] 非同期でグループ化された戻り値のある文のコード生成を修正 (#3411)
-- [コンパイラ] 可能であればバインドパラメータの Kotlin 型を推論し、そうでなければより良いエラーメッセージを表示 (#3413 by @hfhbd)
-- [コンパイラ] `ABS("foo")` を禁止 (#3430 by @hfhbd)
-- [コンパイラ] 他のパラメータからの Kotlin 型推論をサポート (#3431 by @hfhbd)
-- [コンパイラ] 常にデータベース実装を作成するように変更 (#3540 by @hfhbd)
-- [コンパイラ] javaDoc 制約を緩和し、カスタムマッパー関数にも追加 (#3554 @hfhbd)
-- [コンパイラ] バインディングにおける `DEFAULT` を修正 (by @hfhbd)
-- [Paging] Paging 3 を修正 (#3396)
-- [Paging] `Long` による `OffsetQueryPagingSource` の構築を許可 (#3409)
-- [Paging] `Dispatchers.Main` を静的にスワップしないように変更 (#3428)
+### 修正 (Fixed)
+- [Gradle Plugin] Kotlin 1.7.20 に更新しました (#3542 by @zacsweers)
+- [R2DBC Driver] 常に値を送信するとは限らない R2DBC の変更に対応しました (#3525 by @hfhbd)
+- [HSQL Dialect] Hsql 使用時に失敗していた SQLite の VerifyMigrationTask を修正しました (#3380 by @hfhbd)
+- [Gradle Plugin] タスクを遅延構成 API (Lazy Configuration API) を使用するように変換しました (by @3flex)
+- [Gradle Plugin] Kotlin 1.7.20 での NPE を回避しました (#3398 by @ZacSweers)
+- [Gradle Plugin] マイグレーション統合タスク (squash migrations task) の説明を修正しました (#3449)
+- [IDE Plugin] より新しい Kotlin プラグインでの NoSuchFieldError を修正しました (#3422 by @madisp)
+- [IDE Plugin] IDEA: UnusedQueryInspection - ArrayIndexOutOfBoundsException を修正しました (#3427 by @vanniktech)
+- [IDE Plugin] 古い Kotlin プラグインの参照にリフレクションを使用するようにしました
+- [Compiler] 拡張関数を持つカスタムダイアレクトがインポートを作成しない問題を修正しました (#3338 by @hfhbd)
+- [Compiler] CodeBlock.of("${CodeBlock.toString()}") のエスケープを修正しました (#3340 by @hfhbd)
+- [Compiler] マイグレーション内の非同期 execute 文を待機 (await) するようにしました (#3352)
+- [Compiler] AS を修正しました (#3370 by @hfhbd)
+- [Compiler] `getObject` メソッドが実際の型の自動補完をサポートしました (#3401 by @robxyy)
+- [Compiler] 非同期でグループ化された returning 文のコード生成を修正しました (#3411)
+- [Compiler] 可能であればバインドパラメータの Kotlin 型を推論し、不可能な場合はより分かりやすいエラーメッセージで失敗するようにしました (#3413 by @hfhbd)
+- [Compiler] ABS("foo") を許可しないようにしました (#3430 by @hfhbd)
+- [Compiler] 他のパラメータからの Kotlin 型の推論をサポートしました (#3431 by @hfhbd)
+- [Compiler] 常にデータベース実装を作成するようにしました (#3540 by @hfhbd)
+- [Compiler] JavaDoc の制約を緩和し、カスタムマッパー関数にも追加されるようにしました (#3554 @hfhbd)
+- [Compiler] バインディング内の DEFAULT を修正しました (by @hfhbd)
+- [Paging] Paging 3 を修正しました (#3396)
+- [Paging] Long による OffsetQueryPagingSource の構築を許可しました (#3409)
+- [Paging] Dispatchers.Main を静的にスワップしないようにしました (#3428)
 
 ## [2.0.0-alpha03] - 2022-06-17 {id="2-0-0-alpha03-2022-06-17"}
 [2.0.0-alpha03]: https://github.com/sqldelight/sqldelight/releases/tag/2.0.0-alpha03
 
-### Breaking Changes
+### 破壊的変更 (Breaking Changes)
 
-- ダイアレクトは、実際の Gradle 依存関係のように参照されるようになりました。
+- ダイアレクトは通常の Gradle 依存関係のように参照されるようになりました。
 ```groovy
 sqldelight {
   MyDatabase {
@@ -555,140 +556,140 @@ sqldelight {
   }
 }
 ```
-- `AfterVersionWithDriver` 型は削除され、常にドライバを持つ `AfterVersion` に統合されました。
+- `AfterVersionWithDriver` 型が削除され、常にドライバーを保持するようになった `AfterVersion` に一本化されました。
 - `Schema` 型は `SqlDriver` のサブタイプではなくなりました。
-- `PreparedStatement` API は、0 始まりのインデックスで呼び出されるようになりました。
+- `PreparedStatement` API は、0 から始まるインデックス (zero-based indexes) で呼び出されるようになりました。
 
-### Added
-- [IDEプラグイン] 実行中のデータベースに対して SQLite、MySQL、および PostgreSQL コマンドを実行する機能を追加 (#2718 by @aperfilyev)
-- [IDEプラグイン] Android Studio DB inspector のサポートを追加 (#3107 by @aperfilyev)
-- [ランタイム] 非同期ドライバのサポートを追加 (#3168 by @dellisd)
-- [Nativeドライバ] 新しい Kotlin Native メモリモデルをサポート (#3177 by @kpgalligan)
-- [JSドライバ] SqlJs worker 用のドライバを追加 (#3203 by @dellisd)
-- [Gradleプラグイン] SQLDelight タスク host クラスパスを公開
-- [Gradleプラグイン] マイグレーションを統合 (squashing) するための Gradle タスクを追加
-- [Gradleプラグイン] マイグレーションチェック中にスキーマ定義を無視するフラグを追加
-- [MySQLダイアレクト] MySQL における `FOR SHARE` および `FOR UPDATE` をサポート (#3098)
-- [MySQLダイアレクト] MySQL インデックスヒントをサポート (#3099)
-- [PostgreSQLダイアレクト] `date_trunc` を追加 (#3295 by @hfhbd)
-- [JSON拡張] JSON テーブル関数をサポート (#3090)
+### 追加 (Added)
+- [IDE Plugin] 実行中のデータベースに対して SQLite、MySQL、PostgreSQL コマンドを実行する機能を追加しました (#2718 by @aperfilyev)
+- [IDE Plugin] Android Studio の Database Inspector のサポートを追加しました (#3107 by @aperfilyev)
+- [Runtime] 非同期ドライバーのサポートを追加しました (#3168 by @dellisd)
+- [Native Driver] 新しい Kotlin/Native メモリモデルをサポートしました (#3177 by @kpgalligan)
+- [JS Driver] SqlJs Worker 用のドライバーを追加しました (#3203 by @dellisd)
+- [Gradle Plugin] SQLDelight タスクのクラスパスを公開しました
+- [Gradle Plugin] マイグレーションを統合 (squash) する Gradle タスクを追加しました
+- [Gradle Plugin] マイグレーションチェック中にスキーマ定義を無視するフラグを追加しました
+- [MySQL Dialect] MySQL での FOR SHARE および FOR UPDATE をサポートしました (#3098)
+- [MySQL Dialect] MySQL のインデックスヒントをサポートしました (#3099)
+- [PostgreSQL Dialect] date_trunc を追加しました (#3295 by @hfhbd)
+- [JSON Extensions] JSON テーブル関数をサポートしました (#3090)
 
-### Changed
-- [ランタイム] ドライバのない `AfterVersion` 型を削除 (#3091)
-- [ランタイム] `Schema` 型をトップレベルに移動
-- [ランタイム] サードパーティ実装をサポートするためにダイアレクトとリゾルバをオープンに変更 (#3232 by @hfhbd)
-- [コンパイラ] 失敗レポートにコンパイルに使用されたダイアレクトを含めるように変更 (#3086)
-- [コンパイラ] 未使用のアダプタをスキップ (#3162 by @eygraber)
-- [コンパイラ] `PreparedStatement` で 0 始まりのインデックスを使用 (#3269 by @hfhbd)
-- [Gradleプラグイン] ダイアレクトを文字列ではなく適切な Gradle 依存関係に変更 (#3085)
-- [Gradleプラグイン] Gradle 検証タスク: データベースファイルが欠落している場合に例外を投げるように変更 (#3126 by @vanniktech)
+### 変更 (Changed)
+- [Runtime] ドライバーを含まない AfterVersion 型を削除しました (#3091)
+- [Runtime] Schema 型をトップレベルに移動しました
+- [Runtime] サードパーティの実装をサポートするために、ダイアレクトとリゾルバーを open にしました (#3232 by @hfhbd)
+- [Compiler] 失敗レポートにコンパイル時に使用されたダイアレクトを含めるようにしました (#3086)
+- [Compiler] 未使用のアダプターをスキップするようにしました (#3162 by @eygraber)
+- [Compiler] PrepareStatement で 0 から始まるインデックスを使用するようにしました (#3269 by @hfhbd)
+- [Gradle Plugin] ダイアレクトを文字列ではなく適切な Gradle 依存関係として指定するようにしました (#3085)
+- [Gradle Plugin] Gradle Verify タスク: データベースファイルが存在しない場合に例外をスローするようにしました (#3126 by @vanniktech)
 
-### Fixed
-- [Gradleプラグイン] Gradle プラグインの細かなクリーンアップと調整 (#3171 by @3flex)
-- [Gradleプラグイン] 生成ディレクトリに AGP 文字列を使用しないように変更
-- [Gradleプラグイン] AGP 名前空間属性を使用 (#3220)
-- [Gradleプラグイン] `kotlin-stdlib` を Gradle プラグインのランタイム依存関係として追加しないように修正 (#3245 by @mbonnin)
-- [Gradleプラグイン] マルチプラットフォーム設定を簡素化 (#3246 by @mbonnin)
-- [Gradleプラグイン] JS のみのプロジェクトをサポート (#3310 by @hfhbd)
-- [IDEプラグイン] Gradle tooling API に java home を使用 (#3078)
-- [IDEプラグイン] IDE プラグイン内の正しい `classLoader` で JDBC ドライバをロードするように修正 (#3080)
-- [IDEプラグイン] 既存の PSI 変更中のエラーを回避するため、無効化の前にファイル要素を null としてマーク (#3082)
-- [IDEプラグイン] `ALTER TABLE` 文における新しいテーブル名の使用箇所を検索する際のクラッシュを修正 (#3106)
-- [IDEプラグイン] インスペクタを最適化し、期待される例外タイプについては警告なしで失敗できるように変更 (#3121)
-- [IDEプラグイン] 生成ディレクトリであるべきファイルを削除 (#3198)
-- [IDEプラグイン] 非安全な演算子呼び出しを修正
-- [コンパイラ] `RETURNING` 文を伴う更新および削除でクエリが確実に実行されるように修正 (#3084)
-- [コンパイラ] 複合セレクトにおける引数型を正しく推論するように修正 (#3096)
-- [コンパイラ] 共通テーブルはデータクラスを生成しないため、それらを返さないように修正 (#3097)
-- [コンパイラ] 最上位のマイグレーションファイルをより高速に見つけるように修正 (#3108)
-- [コンパイラ] パイプ演算子の Null 許容性を正しく継承するように修正
-- [コンパイラ] `iif` ANSI SQL 関数をサポート
-- [コンパイラ] 空のクエリファイルを生成しないように修正 (#3300 by @hfhbd)
-- [コンパイラ] 疑問符のみのアダプタを修正 (#3314 by @hfhbd)
-- [PostgreSQLダイアレクト] Postgres のプライマリキーカラムは常に非 Null になるように修正 (#3092)
-- [PostgreSQLダイアレクト] 複数テーブルで同名のカラムがある場合のコピーを修正 (#3297 by @hfhbd)
-- [SQLite 3.35 ダイアレクト] 変更されたテーブルからインデックス付きのカラムを削除する際にのみエラーを表示するように修正 (#3158 by @eygraber)
+### 修正 (Fixed)
+- [Gradle Plugin] Gradle プラグインの細かなクリーンアップと微調整を行いました (#3171 by @3flex)
+- [Gradle Plugin] 生成ディレクトリに AGP 文字列を使用しないようにしました
+- [Gradle Plugin] AGP の namespace 属性を使用するようにしました (#3220)
+- [Gradle Plugin] Gradle プラグインのランタイム依存関係に kotlin-stdlib を追加しないようにしました (#3245 by @mbonnin)
+- [Gradle Plugin] マルチプラットフォームの設定を簡素化しました (#3246 by @mbonnin)
+- [Gradle Plugin] JS のみのプロジェクトをサポートしました (#3310 by @hfhbd)
+- [IDE Plugin] Gradle Tooling API に JAVA_HOME を使用するようにしました (#3078)
+- [IDE Plugin] IDE プラグイン内で適切な ClassLoader 上に JDBC ドライバーをロードするようにしました (#3080)
+- [IDE Plugin] 既に存在する PSI の変更中のエラーを回避するため、無効化する前にファイル要素を null としてマークするようにしました (#3082)
+- [IDE Plugin] ALTER TABLE 文で新しいテーブル名の使用箇所を検索する際にクラッシュしないようにしました (#3106)
+- [IDE Plugin] インスペクターを最適化し、予期される例外タイプに対してはエラーを出さずに失敗できるようにしました (#3121)
+- [IDE Plugin] 生成ディレクトリであるべきファイルを削除するようにしました (#3198)
+- [IDE Plugin] 安全でない演算子の呼び出しを修正しました
+- [Compiler] RETURNING 文を含む UPDATE および DELETE が確実にクエリを実行するようにしました (#3084)
+- [Compiler] 複合 SELECT における引数の型を正しく推論するようにしました (#3096)
+- [Compiler] 共通テーブルはデータクラスを生成しないため、それらを返さないようにしました (#3097)
+- [Compiler] 最上位のマイグレーションファイルをより高速に見つけるようにしました (#3108)
+- [Compiler] パイプ演算子で null 許容性を適切に継承するようにしました
+- [Compiler] ANSI SQL の iif 関数をサポートしました
+- [Compiler] 空のクエリファイルを生成しないようにしました (#3300 by @hfhbd)
+- [Compiler] クエスチョンマークのみのアダプターを修正しました (#3314 by @hfhbd)
+- [PostgreSQL Dialect] Postgres のプライマリキー列は常に非 null (non-null) となるようにしました (#3092)
+- [PostgreSQL Dialect] 複数テーブルで同名の COPY を行う際の処理を修正しました (#3297 by @hfhbd)
+- [SQLite 3.35 Dialect] 変更対象のテーブルからインデックス付きの列を削除する場合にのみエラーを表示するようにしました (#3158 by @eygraber)
 
 ## [2.0.0-alpha02] - 2022-04-13 {id="2-0-0-alpha02-2022-04-13"}
 [2.0.0-alpha02]: https://github.com/sqldelight/sqldelight/releases/tag/2.0.0-alpha02
 
-### Breaking Changes
+### 破壊的変更 (Breaking Changes)
 
-- すべての `app.cash.sqldelight.runtime.rx` を `app.cash.sqldelight.rx2` に置換する必要があります。
+- `app.cash.sqldelight.runtime.rx` のすべての使用箇所を `app.cash.sqldelight.rx2` に置き換える必要があります。
 
-### Added
-- [コンパイラ] グループ化されたステートメントの末尾での `RETURNING` をサポート
-- [コンパイラ] ダイアレクトモジュールによるコンパイラ拡張をサポートし、SQLite JSON 拡張を追加 (#1379, #2087)
-- [コンパイラ] 値を返す `PRAGMA` 文をサポート (#1106)
-- [コンパイラ] マークされたカラムに対する value 型の生成をサポート
-- [コンパイラ] 楽観的ロックとバリデーションのサポートを追加 (#1952)
-- [コンパイラ] マルチアップデート文をサポート
-- [PostgreSQL] Postgres の `RETURNING` 文をサポート
-- [PostgreSQL] Postgres の日付型をサポート
-- [PostgreSQL] Postgres のインターバルをサポート
-- [PostgreSQL] Postgres の Boolean をサポートし、`ALTER TABLE` 時のインサートを修正
-- [PostgreSQL] Postgres におけるオプションの `LIMIT` をサポート
-- [PostgreSQL] Postgres `BYTEA` 型をサポート
-- [PostgreSQL] Postgres シリアルのテストを追加
-- [PostgreSQL] Postgres の `FOR UPDATE` 構文をサポート
-- [PostgreSQL] PostgreSQL 配列型をサポート
-- [PostgreSQL] Postgres における `UUID` 型の保存/取得を適切に処理
-- [PostgreSQL] PostgreSQL `NUMERIC` 型をサポート (#1882)
-- [PostgreSQL] 共通テーブル式内でのクエリの返却をサポート (#2471)
-- [PostgreSQL] JSON 特有の演算子をサポート
-- [PostgreSQL] Postgres Copy を追加 (by @hfhbd)
-- [MySQL] MySQL `REPLACE` をサポート
-- [MySQL] `NUMERIC`/`BigDecimal` MySQL 型をサポート (#2051)
-- [MySQL] MySQL `TRUNCATE` 文をサポート
-- [MySQL] MySQL における JSON 特有の演算子をサポート (by @eygraber)
-- [MySQL] MySQL `INTERVAL` をサポート (#2969 by @eygraber)
-- [HSQL] HSQL ウィンドウ機能を追加
-- [SQLite] `WHERE` 句における Null 許容パラメータの等価性チェックを置換しないように変更 (#1490 by @eygraber)
-- [SQLite] Sqlite 3.35 の `RETURNING` 文をサポート (#1490 by @eygraber)
-- [SQLite] `GENERATED` 句をサポート
-- [SQLite] Sqlite 3.38 ダイアレクトのサポートを追加 (by @eygraber)
+### 追加 (Added)
+- [Compiler] グループ化された文の末尾での return をサポートしました
+- [Compiler] ダイアレクトモジュールを介したコンパイラ拡張機能をサポートし、SQLite JSON 拡張機能を追加しました (#1379, #2087)
+- [Compiler] 値を返す PRAGMA 文をサポートしました (#1106)
+- [Compiler] マークされた列に対する値型 (value types) の生成をサポートしました
+- [Compiler] オプティミスティックロック (楽観的ロック) と検証のサポートを追加しました (#1952)
+- [Compiler] 複数更新 (multi-update) 文をサポートしました
+- [PostgreSQL] Postgres の RETURNING 文をサポートしました
+- [PostgreSQL] Postgres の日付型をサポートしました
+- [PostgreSQL] PG の INTERVAL をサポートしました
+- [PostgreSQL] PG の真偽値 (Booleans) をサポートし、ALTER TABLE 時の挿入を修正しました
+- [PostgreSQL] Postgres における任意の LIMIT をサポートしました
+- [PostgreSQL] PG の BYTEA 型をサポートしました
+- [PostgreSQL] Postgres の SERIAL に対するテストを追加しました
+- [PostgreSQL] Postgres の FOR UPDATE 構文をサポートしました
+- [PostgreSQL] PostgreSQL の配列型をサポートしました
+- [PostgreSQL] PG での UUID 型の保存と取得を適切に行うようにしました
+- [PostgreSQL] PostgreSQL の NUMERIC 型をサポートしました (#1882)
+- [PostgreSQL] 共通テーブル式内でのクエリの RETURNING をサポートしました (#2471)
+- [PostgreSQL] JSON 固有の演算子をサポートしました
+- [PostgreSQL] Postgres の COPY を追加しました (by @hfhbd)
+- [MySQL] MySQL の REPLACE をサポートしました
+- [MySQL] MySQL の NUMERIC/BigDecimal 型をサポートしました (#2051)
+- [MySQL] MySQL の TRUNCATE 文をサポートしました
+- [MySQL] MySQL における JSON 固有の演算子をサポートしました (by @eygraber)
+- [MySQL] MySQL の INTERVAL をサポートしました (#2969 by @eygraber)
+- [HSQL] HSQL のウィンドウ機能を追加しました
+- [SQLite] WHERE 句内の nullable なパラメータに対する等価性チェックを置き換えないようにしました (#1490 by @eygraber)
+- [SQLite] SQLite 3.35 の RETURNING 文をサポートしました (#1490 by @eygraber)
+- [SQLite] GENERATED 句をサポートしました
+- [SQLite] SQLite 3.38 ダイアレクトのサポートを追加しました (by @eygraber)
 
-### Changed
-- [コンパイラ] 生成コードを整理
-- [コンパイラ] グループ化されたステートメント内でのテーブルパラメータの使用を禁止 (#1822)
-- [コンパイラ] グループ化されたクエリをトランザクション内に配置 (#2785)
-- [ランタイム] ドライバの実行メソッドから更新された行数を返すように変更
-- [ランタイム] 接続にアクセスするクリティカルセクションに `SqlCursor` を限定 (#2123 by @andersio)
-- [Gradleプラグイン] マイグレーションのためにスキーマ定義を比較 (#841)
-- [PostgreSQL] Postgres におけるダブルクォートを禁止
-- [MySQL] MySQL における `==` の使用をエラーに設定 (#2673)
+### 変更 (Changed)
+- [Compiler] 生成されるコードを整理しました
+- [Compiler] グループ化された文でのテーブルパラメータの使用を禁止しました (#1822)
+- [Compiler] グループ化されたクエリをトランザクション内に配置するようにしました (#2785)
+- [Runtime] ドライバーの execute メソッドから更新行数を返すようにしました
+- [Runtime] コネクションにアクセスするクリティカルセクションに SqlCursor を閉じ込めました (#2123 by @andersio)
+- [Gradle Plugin] マイグレーション用にスキーマ定義を比較するようにしました (#841)
+- [PostgreSQL] PG での二重引用符の使用を禁止しました
+- [MySQL] MySQL での == の使用に対してエラーを出すようにしました (#2673)
 
-### Fixed
-- [コンパイラ] 2.0 alpha において異なるテーブルから同じアダプタ型を使用するとコンパイルエラーが発生する問題を修正
-- [コンパイラ] `UPSERT` 文のコンパイル問題を修正 (#2791)
-- [コンパイラ] 複数（複数）のマッチがある場合、セレクト内のテーブルを使用するようにクエリ結果を修正 (#1874, #2313)
-- [コンパイラ] `INSTEAD OF` トリガーを持つ View の更新をサポート (#1018)
-- [コンパイラ] 関数名における `FROM` と `FOR` をサポート
-- [コンパイラ] 関数式における `SEPARATOR` キーワードを許可
-- [コンパイラ] `ORDER BY` においてエイリアスされたテーブルの `ROWID` にアクセスできない問題を修正
-- [コンパイラ] MySQL の `HAVING` 句でエイリアスされたカラム名が認識されない問題を修正
-- [コンパイラ] 誤った "Multiple columns found" エラーを修正
-- [コンパイラ] `PRAGMA locking_mode = EXCLUSIVE;` が設定できない問題を修正
-- [PostgreSQL] PostgreSQL のカラムリネームを修正
-- [MySQL] `UNIX_TIMESTAMP`、`TO_SECONDS`、`JSON_ARRAYAGG` MySQL 関数が認識されない問題を修正
-- [SQLite] fix SQLite ウィンドウ機能を修正
-- [IDEプラグイン] 空のプログレスインジケータで goto ハンドラを実行するように修正 (#2990)
-- [IDEプラグイン] プロジェクトが設定されていない場合にハイライトビジターが実行されないように修正 (#2981, #2976)
-- [IDEプラグイン] 推移的に生成されたコードも IDE 内で更新されるように修正 (#1837)
-- [IDEプラグイン] ダイアレクト更新時にインデックスを無効化するように修正
+### 修正 (Fixed)
+- [Compiler] 2.0 alpha において異なるテーブルの同一アダプター型が原因で発生していたコンパイルエラーを修正しました
+- [Compiler] UPSERT 文のコンパイルに関する問題を修正しました (#2791)
+- [Compiler] 複数のマッチが存在する場合、クエリ結果が SELECT 内のテーブルを使用するようにしました (#1874, #2313)
+- [Compiler] INSTEAD OF トリガーを持つビューの更新をサポートしました (#1018)
+- [Compiler] 関数名における from および for をサポートしました
+- [Compiler] 関数式内での SEPARATOR キーワードを許可しました
+- [Compiler] ORDER BY 内でエイリアスされたテーブルの ROWID にアクセスできない問題を修正しました
+- [Compiler] MySQL の HAVING 句でエイリアスされた列名が認識されない問題を修正しました
+- [Compiler] 誤った「Multiple columns found」エラーを修正しました
+- [Compiler] PRAGMA locking_mode = EXCLUSIVE; を設定できない問題を修正しました
+- [PostgreSQL] PostgreSQL の列名変更 (rename column) を修正しました
+- [MySQL] UNIX_TIMESTAMP、TO_SECONDS、JSON_ARRAYAGG の MySQL 関数が認識されない問題を修正しました
+- [SQLite] SQLite のウィンドウ機能を修正しました
+- [IDE Plugin] 空のプログレスインジケーター内でジャンプハンドラーを実行するようにしました (#2990)
+- [IDE Plugin] プロジェクトが構成されていない場合はハイライトビジターが実行されないようにしました (#2981, #2976)
+- [IDE Plugin] 推移的に生成されたコードも IDE 内で確実に更新されるようにしました (#1837)
+- [IDE Plugin] ダイアレクト更新時にインデックスを無効化するようにしました
 
 ## [2.0.0-alpha01] - 2022-03-31 {id="2-0-0-alpha01-2022-03-31"}
 [2.0.0-alpha01]: https://github.com/sqldelight/sqldelight/releases/tag/2.0.0-alpha01
 
-2.0 の最初のアルファリリースであり、いくつかの破壊的変更が含まれています。今後も ABI の破壊的変更が予想されるため、このリリースに依存するライブラリは公開しないでください（アプリケーションでの利用は問題ありません）。
+これは 2.0 の最初のアルファリリースであり、いくつかの破壊的変更が含まれています。今後も ABI の破壊的変更が予定されているため、このリリースに依存するライブラリは公開しないでください (アプリケーションでの利用は問題ありません)。
 
-### Breaking Changes
+### 破壊的変更 (Breaking Changes)
 
-- まず、すべての `com.squareup.sqldelight` を `app.cash.sqldelight` に置換する必要があります。
-- 次に、すべての `app.cash.sqldelight.android` を `app.cash.sqldelight.driver.android` に置換する必要があります。
-- 次に、すべての `app.cash.sqldelight.sqlite.driver` を `app.cash.sqldelight.driver.jdbc.sqlite` に置換する必要があります。
-- 次に、すべての `app.cash.sqldelight.drivers.native` を `app.cash.sqldelight.driver.native` に置換する必要があります。
-- IDE プラグインは 2.X バージョンに更新する必要があります（[alpha または eap チャンネル](https://plugins.jetbrains.com/plugin/8191-sqldelight/versions/alpha) で入手可能）。
+- まず、`com.squareup.sqldelight` のすべての記述を `app.cash.sqldelight` に置き換える必要があります。
+- 次に、`app.cash.sqldelight.android` のすべての記述を `app.cash.sqldelight.driver.android` に置き換える必要があります。
+- さらに、`app.cash.sqldelight.sqlite.driver` のすべての記述を `app.cash.sqldelight.driver.jdbc.sqlite` に置き換える必要があります。
+- また、`app.cash.sqldelight.drivers.native` のすべての記述を `app.cash.sqldelight.driver.native` に置き換える必要があります。
+- IDE プラグインは 2.X バージョンに更新する必要があります。[alpha または eap チャンネル](https://plugins.jetbrains.com/plugin/8191-sqldelight/versions/alpha) から入手できます。
 - ダイアレクトは依存関係となり、Gradle 内で指定するようになりました：
 
 ```gradle
@@ -702,624 +703,624 @@ sqldelight {
 
 現在サポートされているダイアレクトは、`mysql-dialect`、`postgresql-dialect`、`hsql-dialect`、`sqlite-3-18-dialect`、`sqlite-3-24-dialect`、`sqlite-3-25-dialect`、`sqlite-3-30-dialect`、および `sqlite-3-35-dialect` です。
 
-- プリミティブ型をインポートする必要があります（例：`INTEGER AS Boolean` の場合は `import kotlin.Boolean` が必要）。以前サポートされていた一部の型にはアダプタが必要になりました。プリミティブアダプタは、ほとんどの変換（`Integer AS kotlin.Int` 用の `IntColumnAdapter` など）向けに `app.cash.sqldelight:primitive-adapters:2.0.0-alpha01` で利用可能です。
+- プリミティブ型はインポートが必要になりました (例: `INTEGER AS Boolean` の場合、`import kotlin.Boolean` が必要)。以前サポートされていた一部の型にはアダプターが必要になりました。大半の変換用プリミティブアダプターは `app.cash.sqldelight:primitive-adapters:2.0.0-alpha01` で提供されています (例: `Integer AS kotlin.Int` 用の `IntColumnAdapter`)。
 
-### Added
-- [IDEプラグイン] 基本的なマイグレーション提案を追加 (by @aperfilyev)
-- [IDEプラグイン] インポートヒントアクションを追加 (by @aperfilyev)
-- [IDEプラグイン] Kotlin クラス補完を追加 (by @aperfilyev)
-- [Gradleプラグイン] Gradle の型セーフなプロジェクトアクセサのショートカットを追加 (by @hfhbd)
-- [コンパイラ] ダイアレクトに基づいてコード生成をカスタマイズ (by @MariusVolkhart)
-- [JDBCドライバ] `JdbcDriver` に共通型を追加 (by @MariusVolkhart)
-- [SQLite] Sqlite 3.35 のサポートを追加 (by @eygraber)
-- [SQLite] `ALTER TABLE DROP COLUMN` のサポートを追加 (by @eygraber)
-- [SQLite] Sqlite 3.30 ダイアレクトのサポートを追加 (by @eygraber)
-- [SQLite] Sqlite における `NULLS FIRST`/`LAST` をサポート (by @eygraber)
-- [HSQL] HSQL の生成句 (generated clause) サポートを追加 (by @MariusVolkhart)
-- [HSQL] HSQL における名前付きパラメータのサポートを追加 (by @MariusVolkhart)
-- [HSQL] HSQL インサートクエリをカスタマイズ (by @MariusVolkhart)
+### 追加 (Added)
+- [IDE Plugin] マイグレーションの基本的な提案機能 (by @aperfilyev)
+- [IDE Plugin] インポートヒントアクションの追加 (by @aperfilyev)
+- [IDE Plugin] Kotlin クラス補完の追加 (by @aperfilyev)
+- [Gradle Plugin] Gradle の型安全なプロジェクトアクセサーのショートカットを追加 (by @hfhbd)
+- [Compiler] ダイアレクトに基づくコード生成のカスタマイズ (by @MariusVolkhart)
+- [JDBC Driver] JdbcDriver に共通の型を追加 (by @MariusVolkhart)
+- [SQLite] SQLite 3.35 のサポートを追加 (by @eygraber)
+- [SQLite] ALTER TABLE DROP COLUMN のサポートを追加 (by @eygraber)
+- [SQLite] SQLite 3.30 ダイアレクトのサポートを追加 (by @eygraber)
+- [SQLite] SQLite での NULLS FIRST/LAST をサポート (by @eygraber)
+- [HSQL] GENERATED 句に対する HSQL サポートを追加 (by @MariusVolkhart)
+- [HSQL] HSQL での名前付きパラメータのサポートを追加 (by @MariusVolkhart)
+- [HSQL] HSQL の挿入クエリをカスタマイズ (by @MariusVolkhart)
 
-### Changed
-- [全体] パッケージ名が com.squareup.sqldelight から app.cash.sqldelight に変更されました。
-- [ランタイム] ダイアレクトを独自の独立した Gradle モジュールに移動
-- [ランタイム] ドライバ実装によるクエリ通知に切り替え
-- [ランタイム] デフォルトのカラムアダプタを別モジュールに抽出 (#2056, #2060)
-- [コンパイラ] 各モジュールでやり直すのではなく、モジュールにクエリ実装を生成させるように変更
-- [コンパイラ] 生成されたデータクラスのカスタム `toString` 生成を削除 (by @PaulWoitaschek)
-- [JSドライバ] `sql.js-driver` から `sql.js` 依存関係を削除 (by @dellisd)
-- [Paging] Android Paging 2 拡張を削除
-- [IDEプラグイン] SQLDelight 同期中にエディタバナーを表示するように変更 (#2511)
-- [IDEプラグイン] 最小サポート IntelliJ バージョンを 2021.1 に変更
+### 変更 (Changed)
+- [Everything] パッケージ名が com.squareup.sqldelight から app.cash.sqldelight に変更されました。
+- [Runtime] ダイアレクトをそれぞれの独立した Gradle モジュールに移動しました
+- [Runtime] ドライバー実装によるクエリ通知に切り替えました。
+- [Runtime] デフォルトの列アダプターを別モジュールに抽出しました (#2056, #2060)
+- [Compiler] 各モジュールでやり直すのではなく、モジュールにクエリ実装を生成させるようにしました
+- [Compiler] 生成されるデータクラスのカスタム toString 生成を削除しました。(by @PaulWoitaschek)
+- [JS Driver] sqljs-driver から sql.js 依存関係を削除しました (by @dellisd)
+- [Paging] Android Paging 2 拡張機能を削除しました
+- [IDE Plugin] SQLDelight の同期中にエディタバナーを追加しました (#2511)
+- [IDE Plugin] サポートされる IntelliJ の最小バージョンを 2021.1 に変更しました
 
-### Fixed
-- [ランタイム] アロケーションとポインタチェイシングを減らすためにリスナーリストをフラット化 (by @andersio)
-- [IDEプラグイン] エラーへのジャンプを可能にするためエラーメッセージを修正 (by @hfhbd)
-- [IDEプラグイン] 欠落していたインスペクションの説明を追加 (#2768 by @aperfilyev)
-- [IDEプラグイン] `GotoDeclarationHandler` における例外を修正 (#2531, #2688, #2804 by @aperfilyev)
-- [IDEプラグイン] `import` キーワードをハイライト表示 (by @aperfilyev)
-- [IDEプラグイン] 未解決の Kotlin 型を修正 (#1678 by @aperfilyev)
-- [IDEプラグイン] 未解決パッケージのハイライトを修正 (#2543 by @aperfilyev)
-- [IDEプラグイン] プロジェクトインデックスが初期化されていない場合は、不一致カラムの検査を試みないように変更
-- [IDEプラグイン] Gradle 同期が発生するまでファイルインデックスを初期化しないように変更
-- [IDEプラグイン] Gradle 同期が開始された場合は SQLDelight インポートをキャンセル
-- [IDEプラグイン] データベースを再生成する際、アンドゥアクションが実行されるスレッドの外で実行するように修正
-- [IDEプラグイン] 参照を解決できない場合は空の Java 型を使用
-- [IDEプラグイン] ファイル解析中にメインスレッドから離れ、書き込み時のみ戻るように改善
-- [IDEプラグイン] 古い IntelliJ バージョンとの互換性を改善 (by @3flex)
-- [IDEプラグイン] より高速なアノテーション API を使用
-- [Gradleプラグイン] JS/Android プラグインランタイム追加時に明示的にサポート (by @ZacSweers)
-- [Gradleプラグイン] マイグレーションからスキーマを派生させずにマイグレーション出力タスクを登録 (#2744 by @kevincianfarini)
-- [Gradleプラグイン] マイグレーションタスクがクラッシュした場合、クラッシュしたファイルを出力
-- [Gradleプラグイン] 冪等な出力を保証するため、コード生成時にファイルをソート (by @ZacSweers)
-- [コンパイラ] ファイルの反復処理に高速な API を使用し、PSI グラフ全体を探索しないように変更
-- [コンパイラ] セレクト関数のパラメータにキーワードマングリングを追加 (#2759 by @aperfilyev)
-- [コンパイラ] マイグレーションアダプタの `packageName` を修正 (by @hfhbd)
-- [コンパイラ] 型ではなくプロパティにアノテーションを出力 (#2798 by @aperfilyev)
-- [コンパイラ] Query サブタイプに渡す前に引数をソート (#2379 by @aperfilyev)
+### 修正 (Fixed)
+- [Runtime] アロケーションとポインタチェイスを削減するためにリスナーリストをフラット化しました。(by @andersio)
+- [IDE Plugin] エラーへのジャンプを可能にするためエラーメッセージを修正しました (by @hfhbd)
+- [IDE Plugin] 不足していたインスペクションの説明を追加しました (#2768 by @aperfilyev)
+- [IDE Plugin] GotoDeclarationHandler での例外を修正しました (#2531, #2688, #2804 by @aperfilyev)
+- [IDE Plugin] import キーワードのハイライトを行いました (by @aperfilyev)
+- [IDE Plugin] 未解決の Kotlin 型を修正しました (#1678 by @aperfilyev)
+- [IDE Plugin] 未解決のパッケージに対するハイライトを修正しました (#2543 by @aperfilyev)
+- [IDE Plugin] プロジェクトのインデックスがまだ初期化されていない場合は、型の不一致な列を検査しないようにしました
+- [IDE Plugin] Gradle 同期が実行されるまでファイルインデックスを初期化しないようにしました
+- [IDE Plugin] Gradle 同期が開始された場合は SQLDelight のインポートをキャンセルするようにしました
+- [IDE Plugin] 元に戻す (Undo) アクションが実行されたスレッドの外部でデータベースを再生成するようにしました
+- [IDE Plugin] 参照が解決できない場合は空の Java 型を使用するようにしました
+- [IDE Plugin] ファイル解析中は適切にメインスレッドから離れ、書き込み時のみ戻るように修正しました
+- [IDE Plugin] 古い IntelliJ バージョンとの互換性を改善しました (by @3flex)
+- [IDE Plugin] より高速なアノテーション API を使用するようにしました
+- [Gradle Plugin] ランタイム追加時に JS / Android プラグインを明示的にサポートするようにしました (by @ZacSweers)
+- [Gradle Plugin] マイグレーションからスキーマを導出せずにマイグレーション出力タスクを登録するようにしました (#2744 by @kevincianfarini)
+- [Gradle Plugin] マイグレーションタスクがクラッシュした場合、実行時にクラッシュしたファイルを出力するようにしました
+- [Gradle Plugin] べき等な出力を保証するために、コード生成時にファイルをソートするようにしました (by @ZacSweers)
+- [Compiler] ファイルの反復処理により高速な API を使用し、PSI グラフ全体を走査しないようにしました
+- [Compiler] select 関数のパラメータにキーワードのマングリングを追加しました (#2759 by @aperfilyev)
+- [Compiler] マイグレーションアダプターの packageName を修正しました (by @hfhbd)
+- [Compiler] 型ではなくプロパティにアノテーションを出力するようにしました (#2798 by @aperfilyev)
+- [Compiler] Query サブタイプに渡す前に引数をソートするようにしました (#2379 by @aperfilyev)
 
 ## [1.5.3] - 2021-11-23 {id="1-5-3-2021-11-23"}
 [1.5.3]: https://github.com/sqldelight/sqldelight/releases/tag/1.5.3
 
-### Added
-- [JDBCドライバ] サードパーティドライバ実装のために `JdbcDriver` をオープンに変更 (#2672 by @hfhbd)
-- [MySQLダイアレクト] 時間増分用の欠落していた関数を追加 (#2671 by @sdoward)
-- [コルーチン拡張] コルーチン拡張に M1 ターゲットを追加 (by @PhilipDukhov)
+### 追加 (Added)
+- [JDBC Driver] サードパーティのドライバー実装向けに JdbcDriver を open にしました (#2672 by @hfhbd)
+- [MySQL Dialect] 時間加算に関する不足していた関数を追加しました (#2671 by @sdoward)
+- [Coroutines Extension] coroutines-extensions に M1 ターゲットを追加しました (by @PhilipDukhov)
 
-### Changed
-- [Paging3拡張] `sqldelight-android-paging3` を AAR ではなく JAR として配布 (#2634 by @julioromano)
-- ソフトキーワードでもあるプロパティ名にアンダースコアが付加されるようになりました。例えば、`value` は `value_` として公開されます。
+### 変更 (Changed)
+- [Paging3 Extension] sqldelight-android-paging3 を AAR ではなく JAR として配布するようにしました (#2634 by @julioromano)
+- ソフトキーワードでもあるプロパティ名には、末尾にアンダースコアが付加されるようになりました。例えば、`value` は `value_` として公開されます。
 
-### Fixed
-- [コンパイラ] 重複する配列パラメータに対して変数を抽出しないように修正 (by @aperfilyev)
-- [Gradleプラグイン] `kotlin.mpp.enableCompatibilityMetadataVariant` を追加 (#2628 by @martinbonnin)
-- [IDEプラグイン] 使用箇所検索処理に read action が必要だった問題を修正
+### 修正 (Fixed)
+- [Compiler] 重複する配列パラメータに対して変数を抽出しないようにしました (by @aperfilyev)
+- [Gradle Plugin] kotlin.mpp.enableCompatibilityMetadataVariant を追加しました (#2628 by @martinbonnin)
+- [IDE Plugin] 使用箇所の検索処理にリード・アクション (Read Action) が必要だった問題を修正しました
 
 ## [1.5.2] - 2021-10-12 {id="1-5-2-2021-10-12"}
 [1.5.2]: https://github.com/sqldelight/sqldelight/releases/tag/1.5.2
 
-### Added
-- [Gradleプラグイン] HMPP サポート (#2548 by @martinbonnin)
-- [IDEプラグイン] NULL 比較インスペクションを追加 (by @aperfilyev)
-- [IDEプラグイン] インスペクションサプレッサーを追加 (#2519 by @aperfilyev)
-- [IDEプラグイン] 名前付きパラメータと位置パラメータの混在インスペクションを追加 (by @aperfilyev)
-- [SQLiteドライバ] `mingwX86` ターゲットを追加 (#2558 by @enginegl)
-- [SQLiteドライバ] M1 ターゲットを追加
-- [SQLiteドライバ] `linuxX64` サポートを追加 (#2456 by @chippmann)
-- [MySQLダイアレクト] MySQL に `ROW_COUNT` 関数を追加 (#2523)
-- [PostgreSQLダイアレクト] PostgreSQL のリネーム、カラム削除を追加 (by @pabl0rg)
-- [PostgreSQLダイアレクト] PostgreSQL グラマーが `CITEXT` を認識しない問題を修正
-- [PostgreSQLダイアレクト] `TIMESTAMP WITH TIME ZONE` と `TIMESTAMPTZ` を追加
-- [PostgreSQLダイアレクト] PostgreSQL `GENERATED` カラムのグラマーを追加
-- [ランタイム] `AfterVersion` のパラメータとして `SqlDriver` を提供 (#2534, 2614 by @ahmedre)
+### 追加 (Added)
+- [Gradle Plugin] HMPP のサポート (#2548 by @martinbonnin)
+- [IDE Plugin] NULL 比較インスペクションの追加 (by @aperfilyev)
+- [IDE Plugin] インスペクション抑止機能の追加 (#2519 by @aperfilyev)
+- [IDE Plugin] 名前付きパラメータと位置指定パラメータの混在に対するインスペクション (by @aperfilyev)
+- [SQLite Driver] mingwX86 ターゲットを追加しました (#2558 by @enginegl)
+- [SQLite Driver] M1 ターゲットを追加しました
+- [SQLite Driver] linuxX64 のサポートを追加しました (#2456 by @chippmann)
+- [MySQL Dialect] MySQL に ROW_COUNT 関数を追加しました (#2523)
+- [PostgreSQL Dialect] PostgreSQL のリネーム、列の削除 (by @pabl0rg)
+- [PostgreSQL Dialect] PostgreSQL 文法で CITEXT が認識されない問題を修正
+- [PostgreSQL Dialect] TIMESTAMP WITH TIME ZONE および TIMESTAMPTZ を含めました
+- [PostgreSQL Dialect] PostgreSQL の GENERATED 列の文法を追加しました
+- [Runtime] AfterVersion のパラメータとして SqlDriver を提供するようにしました (#2534, 2614 by @ahmedre)
 
-### Changed
-- [Gradleプラグイン] Gradle 7.0 を明示的に要求 (#2572 by @martinbonnin)
-- [Gradleプラグイン] `VerifyMigrationTask` が Gradle の最新状態チェック (up-to-date checks) をサポートするように修正 (#2533 by @3flex)
-- [IDEプラグイン] Null 許容型と非 Null 型を結合する際、「Join compares two columns of different types」と警告しないように変更 (#2550 by @pchmielowski)
-- [IDEプラグイン] カラム型における小文字の 'as' に関するエラーを明確化 (by @aperfilyev)
+### 変更 (Changed)
+- [Gradle Plugin] 明示的に Gradle 7.0 を要求するようにしました (#2572 by @martinbonnin)
+- [Gradle Plugin] VerifyMigrationTask が Gradle の最新状態チェック (up-to-date checks) をサポートするようにしました (#2533 by @3flex)
+- [IDE Plugin] nullable な型と non-nullable な型を結合する際に「Join compares two columns of different types」と警告しないようにしました (#2550 by @pchmielowski)
+- [IDE Plugin] 列の型における小文字の 'as' に対するエラーメッセージを明確化しました (by @aperfilyev)
 
-### Fixed
-- [IDEプラグイン] プロジェクトがすでに破棄されている場合は新しいダイアレクトで再パースしないように修正 (#2609)
-- [IDEプラグイン] 関連する仮想ファイルが null の場合、モジュールも null になるように修正 (#2607)
-- [IDEプラグイン] 未使用クエリ検査中のクラッシュを回避 (#2610)
-- [IDEプラグイン] データベース同期の書き込みを write action 内で実行するように修正 (#2605)
-- [IDEプラグイン] IDE に SQLDelight 同期をスケジュールさせるように変更
-- [IDEプラグイン] `JavaTypeMixin` における NPE を修正 (#2603 by @aperfilyev)
-- [IDEプラグイン] `MismatchJoinColumnInspection` における `IndexOutOfBoundsException` を修正 (#2602 by @aperfilyev)
-- [IDEプラグイン] `UnusedColumnInspection` の説明を追加 (#2600 by @aperfilyev)
-- [IDEプラグイン] `PsiElement.generatedVirtualFiles` を read action でラップ (#2599 by @aperfilyev)
-- [IDEプラグイン] 不要な非 Null キャストを削除 (#2596)
-- [IDEプラグイン] 使用箇所検索における Null を適切に処理 (#2595)
-- [IDEプラグイン] Android 用生成ファイルの IDE オートコンプリートを修正 (#2573 by @martinbonnin)
-- [IDEプラグイン] `SqlDelightGotoDeclarationHandler` における NPE を修正 (by @aperfilyev)
-- [IDEプラグイン] `INSERT` 文内の引数で Kotlin キーワードをマングリングするように修正 (#2433 by @aperfilyev)
-- [IDEプラグイン] `SqlDelightFoldingBuilder` における NPE を修正 (#2382 by @aperfilyev)
-- [IDEプラグイン] `CopyPasteProcessor` における `ClassCastException` をキャッチ (#2369 by @aperfilyev)
-- [IDEプラグイン] update ライブテンプレートを修正 (by @IliasRedissi)
-- [IDEプラグイン] インテンションアクションに説明を追加 (#2489 by @aperfilyev)
-- [IDEプラグイン] テーブルが見つからない場合の `CreateTriggerMixin` における例外を修正 (by @aperfilyev)
-- [コンパイラ] テーブル作成文をトポロジカルソート
-- [コンパイラ] ディレクトリに対して `forDatabaseFiles` コールバックを呼び出すのを停止 (#2532)
-- [Gradleプラグイン] `generateDatabaseInterface` タスクの依存関係を潜在的な消費者に伝搬 (#2518 by @martinbonnin)
+### 修正 (Fixed)
+- [IDE Plugin] プロジェクトが既に破棄されている場合は新しいダイアレクトでの再パースを行わないようにしました (#2609)
+- [IDE Plugin] 関連付けられた仮想ファイルが null の場合、モジュールも null になるよう処理しました (#2607)
+- [IDE Plugin] 未使用クエリのインスペクション中のクラッシュを回避しました (#2610)
+- [IDE Plugin] データベース同期の書き込みをライト・アクション (Write Action) 内で実行するようにしました (#2605)
+- [IDE Plugin] SQLDelight の同期スケジュールを IDE に委ねるようにしました
+- [IDE Plugin] JavaTypeMixin における NPE を修正しました (#2603 by @aperfilyev)
+- [IDE Plugin] MismatchJoinColumnInspection における IndexOutOfBoundsException を修正しました (#2602 by @aperfilyev)
+- [IDE Plugin] UnusedColumnInspection の説明を追加しました (#2600 by @aperfilyev)
+- [IDE Plugin] PsiElement.generatedVirtualFiles をリード・アクション内にラップしました (#2599 by @aperfilyev)
+- [IDE Plugin] 不要な non-null キャストを削除しました (#2596)
+- [IDE Plugin] 使用箇所の検索で null を適切に処理するようにしました (#2595)
+- [IDE Plugin] Android 向けに生成されたファイルに対する IDE のオートコンプリートを修正しました (#2573 by @martinbonnin)
+- [IDE Plugin] SqlDelightGotoDeclarationHandler における NPE を修正しました (by @aperfilyev)
+- [IDE Plugin] INSERT 文内の引数で Kotlin キーワードをマングルするようにしました (#2433 by @aperfilyev)
+- [IDE Plugin] SqlDelightFoldingBuilder における NPE を修正しました (#2382 by @aperfilyev)
+- [IDE Plugin] CopyPasteProcessor における ClassCastException を捕捉するようにしました (#2369 by @aperfilyev)
+- [IDE Plugin] update ライブテンプレートを修正しました (by @IliasRedissi)
+- [IDE Plugin] インテンションアクションに説明を追加しました (#2489 by @aperfilyev)
+- [IDE Plugin] テーブルが見つからない場合の CreateTriggerMixin の例外を修正しました (by @aperfilyev)
+- [Compiler] テーブル作成文をトポロジカルソートするようにしました
+- [Compiler] ディレクトリに対して `forDatabaseFiles` コールバックを呼び出すのを停止しました (#2532)
+- [Gradle Plugin] generateDatabaseInterface タスクの依存関係を潜在的な利用者に伝播させるようにしました (#2518 by @martinbonnin)
 
 ## [1.5.1] - 2021-07-16 {id="1-5-1-2021-07-16"}
 [1.5.1]: https://github.com/sqldelight/sqldelight/releases/tag/1.5.1
 
-### Added
-- [PostgreSQLダイアレクト] PostgreSQL JSONB と `ON CONFLICT DO NOTHING` (by @satook)
-- [PostgreSQLダイアレクト] PostgreSQL `ON CONFLICT (column, ...) DO UPDATE` のサポートを追加 (by @satook)
-- [MySQLダイアレクト] MySQL 生成カラムのサポートを追加 (by @JGulbronson)
-- [Nativeドライバ] `watchosX64` サポートを追加
-- [IDEプラグイン] パラメータ型とアノテーションを追加 (by @aperfilyev)
-- [IDEプラグイン] 'select all' クエリ生成アクションを追加 (by @aperfilyev)
-- [IDEプラグイン] オートコンプリートにカラム型を表示 (by @aperfilyev)
-- [IDEプラグイン] オートコンプリートにアイコンを追加 (by @aperfilyev)
-- [IDEプラグイン] 'select by primary key' クエリ生成アクションを追加 (by @aperfilyev)
-- [IDEプラグイン] 'insert into' クエリ生成アクションを追加 (by @aperfilyev)
-- [IDEプラグイン] カラム名、文の識別子、関数名のハイライトを追加 (by @aperfilyev)
-- [IDEプラグイン] 残りのクエリ生成アクションを追加 (#489 by @aperfilyev)
-- [IDEプラグイン] `insert-stmt` からのパラメータヒントを表示 (by @aperfilyev)
-- [IDEプラグイン] テーブルエイリアスインテンションアクション (by @aperfilyev)
-- [IDEプラグイン] カラム名修飾インテンション (by @aperfilyev)
-- [IDEプラグイン] Kotlin プロパティへの宣言ジャンプ (by @aperfilyev)
+### 追加 (Added)
+- [PostgreSQL Dialect] PostgreSQL の JSONB および ON CONFLICT DO NOTHING (by @satook)
+- [PostgreSQL Dialect] PostgreSQL の ON CONFLICT (column, ...) DO UPDATE のサポートを追加しました (by @satook)
+- [MySQL Dialect] MySQL の生成列をサポートしました (by @JGulbronson)
+- [Native Driver] watchosX64 のサポートを追加しました
+- [IDE Plugin] パラメータ型とアノテーションを追加しました (by @aperfilyev)
+- [IDE Plugin] 'select all' クエリを生成するアクションを追加しました (by @aperfilyev)
+- [IDE Plugin] オートコンプリートで列の型を表示するようにしました (by @aperfilyev)
+- [IDE Plugin] オートコンプリートにアイコンを追加しました (by @aperfilyev)
+- [IDE Plugin] 'select by primary key' クエリを生成するアクションを追加しました (by @aperfilyev)
+- [IDE Plugin] 'insert into' クエリを生成するアクションを追加しました (by @aperfilyev)
+- [IDE Plugin] 列名、文の識別子、関数名に対するハイライトを追加しました (by @aperfilyev)
+- [IDE Plugin] 残りのクエリ生成アクションを追加しました (#489 by @aperfilyev)
+- [IDE Plugin] INSERT 文からパラメータヒントを表示するようにしました (by @aperfilyev)
+- [IDE Plugin] テーブルエイリアスのインテンションアクションを追加しました (by @aperfilyev)
+- [IDE Plugin] 列名を完全修飾するインテンションを追加しました (by @aperfilyev)
+- [IDE Plugin] Kotlin プロパティの宣言へのジャンプを追加しました (by @aperfilyev)
 
-### Changed
-- [Nativeドライバ] 可能な場合には凍結 (freezing) や共有可能なデータ構造を避けることで、ネイティブトランザクションのパフォーマンスを改善 (by @andersio)
-- [Paging 3] Paging3 バージョンを 3.0.0 stable に引き上げ
-- [JSドライバ] sql.js を 1.5.0 にアップグレード
+### 変更 (Changed)
+- [Native Driver] 可能な限りフリーズや共有可能データ構造を回避することで、ネイティブトランザクションのパフォーマンスを改善しました (by @andersio)
+- [Paging 3] Paging3 のバージョンを 3.0.0 安定版に引き上げました
+- [JS Driver] sql.js を 1.5.0 にアップグレードしました
 
-### Fixed
-- [JDBC SQLiteドライバ] 接続の `close()` を呼び出す前に `ThreadLocal` をクリアするように修正 (#2444 by @hannesstruss)
-- [RX拡張] サブスクリプション/破棄のレースリークを修正 (#2403 by @pyricau)
-- [コルーチン拡張] 通知前にクエリリスナーを登録するように修正
-- [コンパイラ] Kotlin 出力ファイルを一貫させるため `notifyQueries` をソート (by @thomascjy)
-- [コンパイラ] select クエリクラスのプロパティに `@JvmField` アノテーションを付けないように修正 (by @eygraber)
-- [IDEプラグイン] インポート最適化を修正 (#2350 by @aperfilyev)
-- [IDEプラグイン] 未使用カラム検査を修正 (by @aperfilyev)
-- [IDEプラグイン] インポート検査とクラスアノテーターにネストされたクラスのサポートを追加 (by @aperfilyev)
-- [IDEプラグイン] `CopyPasteProcessor` における NPE を修正 (#2363 by @aperfilyev)
-- [IDEプラグイン] `InlayParameterHintsProvider` におけるクラッシュを修正 (#2359 by @aperfilyev)
-- [IDEプラグイン] `CREATE TABLE` 文に任意のテキストをコピー＆ペーストした際の空白行の挿入を修正 (#2431 by @aperfilyev)
+### 修正 (Fixed)
+- [JDBC SQLite Driver] ThreadLocal をクリアする前にコネクションの close() を呼び出すようにしました (#2444 by @hannesstruss)
+- [RX extensions] 購読 (subscription) / 破棄 (disposal) の競合によるリークを修正しました (#2403 by @pyricau)
+- [Coroutines extension] 通知を行う前に確実にクエリリスナーを登録するようにしました
+- [Compiler] Kotlin 出力ファイルを一貫させるために notifyQueries をソートするようにしました (by @thomascjy)
+- [Compiler] select クエリクラスのプロパティに @JvmField アノテーションを付与しないようにしました (#eygraber による)
+- [IDE Plugin] インポートの最適化を修正しました (#2350 by @aperfilyev)
+- [IDE Plugin] 未使用列のインスペクションを修正しました (by @aperfilyev)
+- [IDE Plugin] インポートのインスペクションとクラスアノテーターにネストされたクラスのサポートを追加しました (by @aperfilyev)
+- [IDE Plugin] CopyPasteProcessor における NPE を修正しました (#2363 by @aperfilyev)
+- [IDE Plugin] InlayParameterHintsProvider のクラッシュを修正しました (#2359 by @aperfilyev)
+- [IDE Plugin] CREATE TABLE 文内に任意のテキストをコピー＆ペーストした際に空行が挿入される問題を修正しました (#2431 by @aperfilyev)
 
 ## [1.5.0] - 2021-04-23 {id="1-5-0-2021-04-23"}
 [1.5.0]: https://github.com/sqldelight/sqldelight/releases/tag/1.5.0
 
-### Added
-- [SQLite Javascriptドライバ] `sqljs-driver` の公開を有効化 (#1667 by @dellisd)
-- [Paging3拡張] Android Paging 3 ライブラリ用拡張 (#1786 by @kevincianfarini)
-- [MySQLダイアレクト] MySQL の `ON DUPLICATE KEY UPDATE` 衝突解決のサポートを追加 (by @rharter)
-- [SQLiteダイアレクト] SQLite `offsets()` のコンパイラサポートを追加 (by @qjroberts)
-- [IDEプラグイン] 未知の型に対するインポートクイックフィックスを追加 (#683 by @aperfilyev)
-- [IDEプラグイン] 未使用インポート検査を追加 (#1161 by @aperfilyev)
-- [IDEプラグイン] 未使用クエリ検査を追加 (by @aperfilyev)
-- [IDEプラグイン] 未使用カラム検査を追加 (#569 by @aperfilyev)
-- [IDEプラグイン] コピー＆ペースト時にインポートを自動的に保持するように修正 (#684 by @aperfilyev)
-- [IDEプラグイン] Gradle/IntelliJ プラグインバージョン間に非互換性がある場合にバルーンを表示
-- [IDEプラグイン] `Insert Into ... VALUES(?)` パラメータヒントを追加 (#506 by @aperfilyev)
-- [IDEプラグイン] インラインパラメータヒントを追加 (by @aperfilyev)
-- [ランタイム] コールバックを伴うマイグレーション実行用の API をランタイムに追加 (#1844)
+### 追加 (Added)
+- [SQLite Javascript Driver] sqljs-driver の公開を有効化しました (#1667 by @dellisd)
+- [Paging3 Extension] Android Paging 3 ライブラリ向け拡張機能 (#1786 by @kevincianfarini)
+- [MySQL Dialect] MySQL の ON DUPLICATE KEY UPDATE 競合解決のサポートを追加しました (by @rharter)
+- [SQLite Dialect] SQLite の offsets() に対するコンパイラサポートを追加しました (by @qjroberts)
+- [IDE Plugin] 未知の型に対するインポートのクイックフィックスを追加しました (#683 by @aperfilyev)
+- [IDE Plugin] 未使用のインポートのインスペクションを追加しました (#1161 by @aperfilyev)
+- [IDE Plugin] 未使用クエリのインスペクションを追加しました (by @aperfilyev)
+- [IDE Plugin] 未使用列のインスペクションを追加しました (#569 by @aperfilyev)
+- [IDE Plugin] コピー＆ペースト時にインポートを自動的に取り込むようにしました (#684 by @aperfilyev)
+- [IDE Plugin] Gradle と IntelliJ プラグインのバージョン間に互換性がない場合に通知バルーンを表示するようにしました
+- [IDE Plugin] Insert Into ... VALUES(?) のパラメータヒントを追加しました (#506 by @aperfilyev)
+- [IDE Plugin] インラインパラメータヒントを追加しました (by @aperfilyev)
+- [Runtime] コールバックを伴うマイグレーション実行用の API をランタイムに追加しました (#1844)
 
-### Changed
-- [コンパイラ] "IS NOT NULL" クエリをスマートキャストするように変更 (#867)
-- [コンパイラ] 実行時に失敗するキーワードに対する保護を追加 (#1471, #1629)
-- [Gradleプラグイン] Gradle プラグインのサイズを 60mb から 13mb に削減
-- [Gradleプラグイン] Android バリアントを適切にサポートし、KMM ターゲット固有の sql サポートを削除 (#1039)
-- [Gradleプラグイン] minsdk に基づいて最小 sqlite バージョンを選択 (#1684)
-- [Nativeドライバ] Native ドライバの接続プールとパフォーマンスのアップデート
+### 変更 (Changed)
+- [Compiler] "IS NOT NULL" クエリをスマートキャストするようにしました (#867)
+- [Compiler] 実行時に失敗するキーワードに対する防御策を追加しました (#1471, #1629)
+- [Gradle Plugin] Gradle プラグインのサイズを 60MB から 13MB に削減しました
+- [Gradle Plugin] Android バリアントを適切にサポートし、KMM ターゲット固有の SQL サポートを削除しました (#1039)
+- [Gradle Plugin] minsdk に基づいて最小 SQLite バージョンを選択するようにしました (#1684)
+- [Native Driver] Native ドライバーのコネクションプールとパフォーマンスを更新しました
 
-### Fixed
-- [コンパイラ] ラムダ前の NBSP を修正 (by @oldergod)
-- [コンパイラ] 生成された `bind*` および `cursor.get*` 文における互換性のない型を修正
-- [コンパイラ] SQL 句が適合型 (adapted type) を保持するように修正 (#2067)
-- [コンパイラ] `NULL` キーワードのみのカラムは Null 許容になるように修正
-- [コンパイラ] 型アノテーション付きのマッパーラムダを生成しないように修正 (#1957)
-- [コンパイラ] カスタムクエリが衝突する場合、ファイル名をパッケージサフィックスとして追加するように修正 (#1057, #1278)
-- [コンパイラ] 外部キーのカスケードがクエリリスナーに通知されるように修正 (#1325, #1485)
-- [コンパイラ] 同じ型の 2 つをユニオンする場合、テーブル型を返すように修正 (#1342)
-- [コンパイラ] `ifnull` および `coalesce` へのパラメータが Null 許容になるように修正 (#1263)
-- [コンパイラ] 式に対してクエリによって課された Null 許容性を正しく使用するように修正
-- [MySQLダイアレクト] MySQL `if` 文をサポート
-- [PostgreSQLダイアレクト] PostgreSQL において `NUMERIC` および `DECIMAL` を `Double` として取得するように修正 (#2118)
-- [SQLiteダイアレクト] `UPSERT` 通知が `BEFORE`/`AFTER UPDATE` トリガーを考慮するように修正 (#2198 by @andersio)
-- [SQLiteドライバ] メモリ内処理でない限り、SqliteDriver 内のスレッドに複数の接続を使用するように修正 (#1832)
-- [JDBCドライバ] JDBC ドライバが `autoCommit` を true と仮定する問題を修正 (#2041)
-- [JDBCドライバ] 例外発生時に確実に接続を閉じるように修正 (#2306)
-- [IDEプラグイン] パスセパレータのバグによる Windows 上での GoToDeclaration/FindUsages の不具合を修正 (#2054 by @angusholder)
-- [IDEプラグイン] IDE でクラッシュする代わりに Gradle エラーを無視するように変更
-- [IDEプラグイン] sqldelight ファイルが非 sqldelight モジュールに移動された場合、コード生成を試みないように変更
-- [IDEプラグイン] IDE でのコード生成エラーを無視
-- [IDEプラグイン] 負のサブストリングを試みないように修正 (#2068)
-- [IDEプラグイン] Gradle アクション実行前にプロジェクトが破棄されていないか確認 (#2155)
-- [IDEプラグイン] Null 許容型に対する算術演算も Null 許容になるように修正 (#1853)
-- [IDEプラグイン] 'expand * intention' が追加のプロジェクションでも動作するように修正 (#2173 by @aperfilyev)
-- [IDEプラグイン] GoTo 中に Kotlin 解決が失敗した場合、sqldelight ファイルへの移動を試みないように変更
-- [IDEプラグイン] IntelliJ が SQLDelight のインデックス作成中に例外に遭遇してもクラッシュしないように修正
-- [IDEプラグイン] IDE でのコード生成前のエラー検出中に発生する例外を処理
-- [IDEプラグイン] IDE プラグインを Dynamic Plugins と互換性を持たせるように修正 (#1536)
-- [Gradleプラグイン] WorkerApi を使用したデータベース生成におけるレースコンディションを修正 (#2062 by @stephanenicolas)
-- [Gradleプラグイン] `classLoaderIsolation` がカスタム JDBC の使用を妨げる問題を修正 (#2048 by @benasher44)
-- [Gradleプラグイン] `packageName` 欠落のエラーメッセージを改善 (by @vanniktech)
-- [Gradleプラグイン] SQLDelight が IntelliJ 依存関係を buildscript クラスパスに漏洩させる問題を修正 (#1998)
-- [Gradleプラグイン] Gradle ビルドキャッシュを修正 (#2075)
-- [Gradleプラグイン] Gradle プラグインで `kotlin-native-utils` に依存しないように修正 (by @ilmat192)
-- [Gradleプラグイン] マイグレーションファイルのみが存在する場合でもデータベースを書き出すように修正 (#2094)
-- [Gradleプラグイン] 最終的なコンパイルユニットでダイヤモンド依存関係が 1 回だけ取得されるように修正 (#1455)
+### 修正 (Fixed)
+- [Compiler] ラムダの前の NBSP (ノーブレークスペース) を修正しました (by @oldergod)
+- [Compiler] 生成された bind* および cursor.get* 文における型の非互換性を修正しました
+- [Compiler] SQL 句が適合した型 (adapted type) を保持するようにしました (#2067)
+- [Compiler] NULL キーワードのみの列を nullable になるよう修正しました
+- [Compiler] 型アノテーション付きのマッパーラムダを生成しないようにしました (#1957)
+- [Compiler] カスタムクエリが競合する場合、追加のパッケージサフィックスとしてファイル名を使用するようにしました (#1057, #1278)
+- [Compiler] 外部キーのカスケードによって確実にクエリリスナーへ通知されるようにしました (#1325, #1485)
+- [Compiler] 同じ型の 2 つを UNION する場合、テーブルの型を返すようにしました (#1342)
+- [Compiler] ifnull および coalesce へのパラメータが nullable になれるよう修正しました (#1263)
+- [Compiler] 式に対してクエリから課される null 許容性を正しく適用するようにしました
+- [MySQL Dialect] MySQL の IF 文をサポートしました
+- [PostgreSQL Dialect] PostgreSQL で NUMERIC および DECIMAL を Double として取得するようにしました (#2118)
+- [SQLite Dialect] UPSERT 通知が BEFORE/AFTER UPDATE トリガーを考慮するようにしました (#2198 by @andersio)
+- [SQLite Driver] インメモリでない限り、SqliteDriver のスレッドに対して複数のコネクションを使用するようにしました (#1832)
+- [JDBC Driver] JDBC ドライバーが autoCommit を true と仮定してしまう問題を修正しました (#2041)
+- [JDBC Driver] 例外発生時に確実にコネクションを閉じるようにしました (#2306)
+- [IDE Plugin] パス区切り文字のバグにより Windows で GoToDeclaration / FindUsages が壊れていた問題を修正しました (#2054 by @angusholder)
+- [IDE Plugin] IDE 内でクラッシュする代わりに Gradle エラーを無視するようにしました
+- [IDE Plugin] sqldelight ファイルが SQLDelight 非対応のモジュールに移動された場合、コード生成を試行しないようにしました
+- [IDE Plugin] IDE 内でのコード生成エラーを無視するようにしました
+- [IDE Plugin] 負のインデックスで substring を試みないようにしました (#2068)
+- [IDE Plugin] Gradle アクションを実行する前にプロジェクトが破棄されていないかも確認するようにしました (#2155)
+- [IDE Plugin] nullable な型に対する演算も nullable になるよう修正しました (#1853)
+- [IDE Plugin] 「* の展開 (expand * intention)」が追加の射影 (projections) と連動するようにしました (#2173 by @aperfilyev)
+- [IDE Plugin] GoTo 中に Kotlin の解決に失敗した場合、sqldelight ファイルへの移動を試みないようにしました
+- [IDE Plugin] SQLDelight のインデックス作成中に IntelliJ で例外が発生してもクラッシュしないようにしました
+- [IDE Plugin] IDE でのコード生成前にエラーを検出する際に発生する例外を処理するようにしました
+- [IDE Plugin] IDE プラグインを動的プラグイン (Dynamic Plugins) に対応させました (#1536)
+- [Gradle Plugin] WorkerApi を使用したデータベース生成における競合状態を修正しました (#2062 by @stephanenicolas)
+- [Gradle Plugin] classLoaderIsolation によりカスタム JDBC の使用が妨げられていた問題を修正しました (#2048 by @benasher44)
+- [Gradle Plugin] packageName 不足時のエラーメッセージを改善しました (by @vanniktech)
+- [Gradle Plugin] SQLDelight がビルドスクリプトのクラスパスに IntelliJ の依存関係を混入させていた問題を修正しました (#1998)
+- [Gradle Plugin] Gradle のビルドキャッシュを修正しました (#2075)
+- [Gradle Plugin] Gradle プラグインで kotlin-native-utils に依存しないようにしました (by @ilmat192)
+- [Gradle Plugin] マイグレーションファイルしか存在しない場合でもデータベースを書き出すようにしました (#2094)
+- [Gradle Plugin] 最終的なコンパイル単位でダイヤモンド依存関係が一度だけ取得されるようにしました (#1455)
 
-また、本リリースにおいて SQLDelight のインフラ改善に多大な貢献をしてくれた @3flex に深く感謝します。
+また、本リリースで SQLDelight のインフラ改善に多大な貢献をしてくれた @3flex 氏にも感謝します。
 
 ## [1.4.4] - 2020-10-08 {id="1-4-4-2020-10-08"}
 [1.4.4]: https://github.com/sqldelight/sqldelight/releases/tag/1.4.4
 
-### Added
-- [PostgreSQLダイアレクト] `WITH` 内でのデータ変更文をサポート
-- [PostgreSQLダイアレクト] `substring` 関数をサポート
-- [Gradleプラグイン] SQLDelight コンパイル中のマイグレーション検証を有効にする `verifyMigrations` フラグを追加 (#1872)
+### 追加 (Added)
+- [PostgreSQL Dialect] WITH 内でのデータ変更文をサポートしました
+- [PostgreSQL Dialect] substring 関数をサポートしました
+- [Gradle Plugin] SQLDelight コンパイル中にマイグレーションを検証するための verifyMigrations フラグを追加しました (#1872)
 
-### Changed
-- [コンパイラ] 非 SQLite ダイアレクトにおいて SQLite 固有の関数を未知としてフラグ付け
-- [Gradleプラグイン] sqldelight プラグインが適用されているがデータベースが設定されていない場合に警告を表示 (#1421)
+### 変更 (Changed)
+- [Compiler] 非 SQLite ダイアレクトにおいて、SQLite 固有の関数を未知 (unknown) としてフラグを立てるようにしました
+- [Gradle Plugin] sqldelight プラグインが適用されているにもかかわらずデータベースが設定されていない場合に警告を出すようにしました (#1421)
 
-### Fixed
-- [コンパイラ] `ORDER BY` 句でカラム名をバインドした際にエラーを報告するように修正 (#1187 by @eygraber)
-- [コンパイラ] データベースインターフェース生成時にレジストリ警告が表示される問題を修正 (#1792)
-- [コンパイラ] case 文の誤った型推論を修正 (#1811)
-- [コンパイラ] バージョンのないマイグレーションファイルに対してより適切なエラーを表示 (#2006)
-- [コンパイラ] 一部のデータベース型 `ColumnAdapter` において整列 (marshal) に必要なデータベース型が誤っている問題を修正 (#2012)
-- [コンパイラ] `CAST` の Null 許容性を修正 (#1261)
-- [コンパイラ] クエリラッパーにおける多数の名前のシャドウイング警告を修正 (#1946 by @eygraber)
-- [コンパイラ] 生成されたコードが完全修飾名を使用している問題を修正 (#1939)
-- [IDEプラグイン] Gradle 同期から SQLDelight コード生成をトリガーするように修正
-- [IDEプラグイン] .sq ファイル変更時にプラグインがデータベースインターフェースを再生成しない問題を修正 (#1945)
-- [IDEプラグイン] ファイルを新しいパッケージに移動する際の問題を修正 (#444)
-- [IDEプラグイン] カーソルの移動先がない場合は、クラッシュせずに何もしないように修正 (#1994)
-- [IDEプラグイン] Gradle プロジェクト外のファイルに対して空のパッケージ名を使用するように修正 (#1973)
-- [IDEプラグイン] 無効な型に対して正常に失敗するように修正 (#1943)
-- [IDEプラグイン] 未知の式に遭遇した際により適切なエラーメッセージを投げるように修正 (#1958)
-- [Gradleプラグイン] SQLDelight が IntelliJ 依存関係を buildscript クラスパスに漏洩させる問題を修正 (#1998)
-- [Gradleプラグイン] *.sq ファイルにメソッドドキュメントを追加した際の "JavadocIntegrationKt not found" コンパイルエラーを修正 (#1982)
-- [Gradleプラグイン] SQLDelight Gradle プラグインが Configuration Caching (CoCa) をサポートしていない問題を修正 (#1947 by @stephanenicolas)
-- [SQLite JDBCドライバ] SQLException: database in auto-commit mode (#1832)
-- [コルーチン拡張] coroutines-extensions の IR バックエンドを修正 (#1918 by @dellisd)
+### 修正 (Fixed)
+- [Compiler] ORDER BY 句内で列名をバインドした際にエラーを報告するようにしました (#1187 by @eygraber)
+- [Compiler] DB インターフェース生成時にレジストリ警告が表示される問題を修正しました (#1792)
+- [Compiler] CASE 文の誤った型推論を修正しました (#1811)
+- [Compiler] バージョンのないマイグレーションファイルに対してより適切なエラーを出すようにしました (#2006)
+- [Compiler] 一部のデータベース型の ColumnAdapter において、マーシャリングに必要なデータベース型が誤っていた問題を修正しました (#2012)
+- [Compiler] CAST の null 許容性を修正しました (#1261)
+- [Compiler] クエリラッパーで名前のシャドウイング警告が多発する問題を修正しました (#1946 by @eygraber)
+- [Compiler] 生成されたコードが完全修飾名を使用していた問題を修正しました (#1939)
+- [IDE Plugin] Gradle の同期から SQLDelight のコード生成をトリガーするようにしました
+- [IDE Plugin] .sq ファイルの変更時にプラグインがデータベースインターフェースを再生成しない問題を修正しました (#1945)
+- [IDE Plugin] 新しいパッケージにファイルを移動した際の問題を修正しました (#444)
+- [IDE Plugin] カーソルの移動先がない場合は、クラッシュする代わりに何もしないようにしました (#1994)
+- [IDE Plugin] Gradle プロジェクト外のファイルには空のパッケージ名を使用するようにしました (#1973)
+- [IDE Plugin] 無効な型に対して正常に失敗するようにしました (#1943)
+- [IDE Plugin] 未知の式に遭遇した際により適切なエラーメッセージをスローするようにしました (#1958)
+- [Gradle Plugin] SQLDelight がビルドスクリプトのクラスパスに IntelliJ の依存関係を混入させていた問題を修正しました (#1998)
+- [Gradle Plugin] *.sq ファイル内でメソッドのドキュメントを追加した際の「JavadocIntegrationKt not found」コンパイルエラーを修正しました (#1982)
+- [Gradle Plugin] SqlDelight Gradle プラグインが Configuration Cache (CoCa) をサポートしていなかった問題を修正しました (#1947 by @stephanenicolas)
+- [SQLite JDBC Driver] SQLException: database in auto-commit mode を修正しました (#1832)
+- [Coroutines Extension] coroutines-extensions の IR バックエンドを修正しました (#1918 by @dellisd)
 
 ## [1.4.3] - 2020-09-04 {id="1-4-3-2020-09-04"}
 [1.4.3]: https://github.com/sqldelight/sqldelight/releases/tag/1.4.3
 
-### Added
-- [MySQLダイアレクト] MySQL `last_insert_id` 関数のサポートを追加 (by @lawkai)
-- [PostgreSQLダイアレクト] `SERIAL` データ型をサポート (by @veyndan & @felipecsl)
-- [PostgreSQLダイアレクト] PostgreSQL `RETURNING` をサポート (by @veyndan)
+### 追加 (Added)
+- [MySQL Dialect] MySQL の last_insert_id 関数のサポートを追加しました (by @lawkai)
+- [PostgreSQL Dialect] SERIAL データ型のサポートを追加しました (by @veyndan & @felipecsl)
+- [PostgreSQL Dialect] PostgreSQL の RETURNING をサポートしました (by @veyndan)
 
-### Fixed
-- [MySQLダイアレクト] MySQL `AUTO_INCREMENT` をデフォルト値を持つものとして扱うように修正 (#1823)
-- [コンパイラ] Upsert 文のコンパイルエラーを修正 (#1809 by @eygraber)
-- [コンパイラ] 無効な Kotlin が生成される問題を修正 (#1925 by @eygraber)
-- [コンパイラ] 未知の関数に対してより適切なエラーメッセージを表示 (#1843)
-- [コンパイラ] `instr` の第 2 パラメータの型として文字列を公開
-- [IDEプラグイン] IDE プラグインのデーモン肥大化と UI スレッドの停滞を修正 (#1916)
-- [IDEプラグイン] モジュールが null のシナリオを処理 (#1902)
-- [IDEプラグイン] 未設定の sq ファイルにおいてパッケージ名として空文字列を返すように修正 (#1920)
-- [IDEプラグイン] グループ化されたステートメントを修正し、その統合テストを追加 (#1820)
-- [IDEプラグイン] 要素のモジュールを見つけるために内蔵の `ModuleUtil` を使用するように修正 (#1854)
-- [IDEプラグイン] ルックアップに有効な要素のみを追加するように修正 (#1909)
-- [IDEプラグイン] 親要素が null になり得る問題を修正 (#1857)
+### 修正 (Fixed)
+- [MySQL Dialect] MySQL の AUTO_INCREMENT をデフォルト値を持つものとして扱うようにしました (#1823)
+- [Compiler] Upsert 文のコンパイルエラーを修正しました (#1809 by @eygraber)
+- [Compiler] 無効な Kotlin が生成される問題を修正しました (#1925 by @eygraber)
+- [Compiler] 未知の関数に対してより適切なエラーメッセージを表示するようにしました (#1843)
+- [Compiler] instr の第2引数の型として String を公開するようにしました
+- [IDE Plugin] IDE プラグインによるデーモンの肥大化と UI スレッドの停止を修正しました (#1916)
+- [IDE Plugin] モジュールが null になるシナリオを処理しました (#1902)
+- [IDE Plugin] 未設定の sq ファイルではパッケージ名に空文字列を返すようにしました (#1920)
+- [IDE Plugin] グループ化された文を修正し、その統合テストを追加しました (#1820)
+- [IDE Plugin] 要素のモジュールを検索するために組み込みの ModuleUtil を使用するようにしました (#1854)
+- [IDE Plugin] ルックアップには有効な要素のみを追加するようにしました (#1909)
+- [IDE Plugin] 親が null になる可能性を考慮しました (#1857)
 
 ## [1.4.2] - 2020-08-27 {id="1-4-2-2020-08-27"}
 [1.4.2]: https://github.com/sqldelight/sqldelight/releases/tag/1.4.2
 
-### Added
-- [ランタイム] 新しい JS IR バックエンドをサポート
-- [Gradleプラグイン] `generateSqlDelightInterface` Gradle タスクを追加 (by @vanniktech)
-- [Gradleプラグイン] `verifySqlDelightMigration` Gradle タスクを追加 (by @vanniktech)
+### 追加 (Added)
+- [Runtime] 新しい JS IR バックエンドをサポートしました
+- [Gradle Plugin] generateSqlDelightInterface Gradle タスクを追加しました (by @vanniktech)
+- [Gradle Plugin] verifySqlDelightMigration Gradle タスクを追加しました (by @vanniktech)
 
-### Fixed
-- [IDEプラグイン] IDE と Gradle 間のデータ共有を容易にするため Gradle tooling API を使用
-- [IDEプラグイン] スキーマ派生をデフォルトで false に設定
-- [IDEプラグイン] `commonMain` ソースセットを正しく取得するように修正
-- [MySQLダイアレクト] `mySqlFunctionType()` に minute を追加 (by @maaxgr)
+### 修正 (Fixed)
+- [IDE Plugin] IDE と Gradle 間のデータ共有を容易にするために Gradle tooling API を使用するようにしました
+- [IDE Plugin] スキーマ導出のデフォルトを false に変更しました
+- [IDE Plugin] commonMain ソースセットを適切に取得するようにしました
+- [MySQL Dialect] mySqlFunctionType() に MINUTE を追加しました (by @maaxgr)
 
 ## [1.4.1] - 2020-08-21 {id="1-4-1-2020-08-21"}
 [1.4.1]: https://github.com/sqldelight/sqldelight/releases/tag/1.4.1
 
-### Added
-- [ランタイム] Kotlin 1.4.0 をサポート (#1859)
+### 追加 (Added)
+- [Runtime] Kotlin 1.4.0 をサポートしました (#1859)
 
-### Changed
-- [Gradleプラグイン] AGP 依存関係を `compileOnly` に変更 (#1362)
+### 変更 (Changed)
+- [Gradle Plugin] AGP 依存関係を compileOnly に変更しました (#1362)
 
-### Fixed
-- [コンパイラ] カラム定義ルールおよびテーブルインターフェースジェネレータにオプションの javadoc を追加 (#1224 by @endanke)
-- [SQLiteダイアレクト] sqlite FTS5 補助関数 `highlight`、`snippet`、および `bm25` のサポートを追加 (by @drampelt)
-- [MySQLダイアレクト] MySQL `bit` データ型をサポート
-- [MySQLダイアレクト] MySQL バイナリリテラルをサポート
-- [PostgreSQLダイアレクト] `SERIAL` を公開 (by @veyndan)
-- [PostgreSQLダイアレクト] `BOOLEAN` データ型を追加 (by @veyndan)
-- [PostgreSQLダイアレクト] `NULL` カラム制約を追加 (by @veyndan)
-- [HSQLダイアレクト] HSQL に `AUTO_INCREMENT` サポートを追加 (by @rharter)
+### 修正 (Fixed)
+- [Compiler] 列定義ルールおよびテーブルインターフェースジェネレーターに任意の Javadoc を追加できるようにしました (#1224 by @endanke)
+- [SQLite Dialect] SQLite FTS5 の補助関数 highlight、snippet、bm25 のサポートを追加しました (by @drampelt)
+- [MySQL Dialect] MySQL の BIT データ型をサポートしました
+- [MySQL Dialect] MySQL のバイナリリテラルをサポートしました
+- [PostgreSQL Dialect] sql-psi から SERIAL を公開しました (by @veyndan)
+- [PostgreSQL Dialect] BOOLEAN データ型を追加しました (by @veyndan)
+- [PostgreSQL Dialect] NULL 列制約を追加しました (by @veyndan)
+- [HSQL Dialect] HSQL に `AUTO_INCREMENT` のサポートを追加しました (by @rharter)
 
 ## [1.4.0] - 2020-06-22 {id="1-4-0-2020-06-22"}
 [1.4.0]: https://github.com/sqldelight/sqldelight/releases/tag/1.4.0
 
-### Added
-- [MySQLダイアレクト] MySQL サポート (by @JGulbronson & @veyndan)
-- [PostgreSQLダイアレクト] 実験的な PostgreSQL サポート (by @veyndan)
-- [HSQLダイアレクト] 実験的な H2 サポート (by @MariusVolkhart)
-- [SQLiteダイアレクト] SQLite FTS5 サポート (by @benasher44 & @jpalawaga)
-- [SQLiteダイアレクト] `ALTER TABLE RENAME COLUMN` をサポート (#1505 by @angusholder)
+### 追加 (Added)
+- [MySQL Dialect] MySQL サポート (by @JGulbronson & @veyndan)
+- [PostgreSQL Dialect] 実験的な PostgreSQL サポート (by @veyndan)
+- [HSQL Dialect] 実験的な H2 サポート (by @MariusVolkhart)
+- [SQLite Dialect] SQLite FTS5 サポート (by @benasher44 & @jpalawaga)
+- [SQLite Dialect] alter table rename column をサポートしました (#1505 by @angusholder)
 - [IDE] マイグレーション (.sqm) ファイルの IDE サポート
-- [IDE] 内蔵の SQL ライブテンプレートを模した SQLDelight ライブテンプレートを追加 (#1154 by @veyndan)
-- [IDE] 新しい SqlDelight ファイルアクションを追加 (#42 by @romtsn)
-- [ランタイム] 結果を返すトランザクション用の `transactionWithReturn` API
-- [コンパイラ] .sq ファイル内で複数の SQL ステートメントをグループ化するための構文
-- [コンパイラ] マイグレーションファイルからのスキーマ生成をサポート
-- [Gradleプラグイン] マイグレーションファイルを有効な SQL として出力するタスクを追加
+- [IDE] 組み込みの SQL ライブテンプレートを模倣した SQLDelight ライブテンプレートを追加しました (#1154 by @veyndan)
+- [IDE] 新規 SqlDelight ファイル作成アクションを追加しました (#42 by @romtsn)
+- [Runtime] 結果を返すトランザクション用の transactionWithReturn API
+- [Compiler] .sq ファイル内で複数の SQL 文をグループ化するための構文
+- [Compiler] マイグレーションファイルからのスキーマ生成をサポートしました
+- [Gradle Plugin] マイグレーションファイルを有効な SQL として出力するタスクを追加しました
 
-### Changed
-- [ドキュメント] ドキュメントウェブサイトの全面刷新 (by @saket)
-- [Gradleプラグイン] サポートされていないダイアレクトのエラーメッセージを改善 (by @veyndan)
-- [IDE] ダイアレクトに基づいてファイルアイコンを動的に変更 (by @veyndan)
-- [JDBCドライバ] `javax.sql.DataSource` から `JdbcDriver` コンストラクタを公開 (#1614)
+### 変更 (Changed)
+- [Documentation] ドキュメント Web サイトの全面的な改訂 (by @saket)
+- [Gradle Plugin] サポートされていないダイアレクトのエラーメッセージを改善しました (by @veyndan)
+- [IDE] ダイアレクトに基づいて動的にファイルアイコンを変更するようにしました (by @veyndan)
+- [JDBC Driver] javax.sql.DataSource から JdbcDriver のコンストラクタを公開しました (#1614)
 
-### Fixed
-- [コンパイラ] テーブル上の Javadoc サポート、および 1 つのファイル内の複数の javadoc を修正 (#1224)
-- [コンパイラ] 合成カラムへの値の挿入を可能に修正 (#1351)
-- [コンパイラ] ディレクトリ名のサニタイズにおける不一致を修正 (by @ZacSweers)
-- [コンパイラ] 合成カラムが結合をまたいで Null 許容性を保持するように修正 (#1656)
-- [コンパイラ] 削除文を delete キーワードに固定 (#1643)
-- [コンパイラ] クォート処理を修正 (#1525 by @angusholder)
-- [コンパイラ] between 演算子が式を適切に再帰するように修正 (#1279)
-- [コンパイラ] インデックス作成時のテーブル/カラム欠落に対してより適切なエラーを表示 (#1372)
-- [コンパイラ] 結合制約において外部クエリのプロジェクションを使用可能に修正 (#1346)
-- [Nativeドライバ] `execute` に `transationPool` を使用するように修正 (by @benasher44)
-- [JDBCドライバ] sqlite の代わりに jdbc トランザクション API を使用するように修正 (#1693)
-- [IDE] `virtualFile` 参照が常に元のファイルになるように修正 (#1782)
-- [IDE] Bugsnag にエラーを報告する際に正しいスロー可能オブジェクトを使用するように修正 (#1262)
-- [Paging拡張] リークしていた `DataSource` を修正 (#1628)
-- [Gradleプラグイン] スキーマ生成時に出力 db ファイルがすでに存在する場合、削除するように修正 (#1645)
-- [Gradleプラグイン] ギャップがある場合にマイグレーション検証を失敗させるように修正
-- [Gradleプラグイン] 設定したファイルインデックスを明示的に使用するように修正 (#1644)
+### 修正 (Fixed)
+- [Compiler] テーブルでの Javadoc をサポートし、1 つのファイルに複数の Javadoc がある場合を修正しました (#1224)
+- [Compiler] 合成列への値の挿入を可能にしました (#1351)
+- [Compiler] ディレクトリ名のサニタイズにおける不整合を修正しました (by @ZacSweers)
+- [Compiler] 合成列が JOIN をまたいでも null 許容性を維持するようにしました (#1656)
+- [Compiler] DELETE 文のピン留め位置を delete キーワードに修正しました (#1643)
+- [Compiler] クォート処理を修正しました (#1525 by @angusholder)
+- [Compiler] BETWEEN 演算子が式を適切に再帰処理するよう修正しました (#1279)
+- [Compiler] インデックス作成時にテーブル/列が見つからない場合のより適切なエラーを表示するようにしました (#1372)
+- [Compiler] JOIN 制約内で外部クエリの射影を使用できるようにしました (#1346)
+- [Native Driver] execute が transactionPool を使用するように変更しました (by @benasher44)
+- [JDBC Driver] SQLite の代わりに JDBC のトランザクション API を使用するようにしました (#1693)
+- [IDE] virtualFile の参照が常に元のファイルになるよう修正しました (#1782)
+- [IDE] Bugsnag へのエラー報告時に正しい throwable を使用するようにしました (#1262)
+- [Paging Extension] DataSource のリークを修正しました (#1628)
+- [Gradle Plugin] スキーマ生成時に出力先 DB ファイルが既に存在する場合は削除するようにしました (#1645)
+- [Gradle Plugin] マイグレーションに欠番がある場合に検証を失敗させるようにしました
+- [Gradle Plugin] 設定したファイルインデックスを明示的に使用するようにしました (#1644)
 
 ## [1.3.0] - 2020-04-03 {id="1-3-0-2020-04-03"}
 [1.3.0]: https://github.com/sqldelight/sqldelight/releases/tag/1.3.0
 
-* 新機能: [Gradle] コンパイル対象の SQL ダイアレクトを指定する `dialect` プロパティ。
-* 新機能: [コンパイラ] #1009 mysql ダイアレクトの実験的サポート。
-* 新機能: [コンパイラ] #1436 sqlite:3.24 ダイアレクトと upsert のサポート。
-* 新機能: [JDBCドライバ] sqlite jvm ドライバから JDBC ドライバを分割。
-* 修正: [コンパイラ] #1199 任意の長さのラムダをサポート。
-* 修正: [コンパイラ] #1610 `avg()` の戻り値の型を Null 許容に修正。
-* 修正: [IntelliJ] #1594 Windows 上で Goto と Find Usages を破壊していたパスセパレータの処理を修正。
+* 新機能: [Gradle] コンパイル対象の SQL ダイアレクトを指定する dialect プロパティを追加しました。
+* 新機能: [Compiler] #1009 MySQL ダイアレクトを実験的にサポートしました。
+* 新機能: [Compiler] #1436 sqlite:3.24 ダイアレクトおよび UPSERT をサポートしました。
+* 新機能: [JDBC Driver] SQLite JVM ドライバーから JDBC ドライバーを分離しました。
+* 修正: [Compiler] #1199 任意の長さのラムダをサポートしました。
+* 修正: [Compiler] #1610 avg() の戻り値の型が nullable になるよう修正しました。
+* 修正: [IntelliJ] #1594 Windows で Goto や Find Usages が壊れていたパス区切り文字の処理を修正しました。
 
 ## [1.2.2] - 2020-01-22 {id="1-2-2-2020-01-22"}
 [1.2.2]: https://github.com/sqldelight/sqldelight/releases/tag/1.2.2
 
-* 新機能: [ランタイム] Windows (mingW)、tvOS、watchOS、および macOS アーキテクチャのサポート。
-* 修正: [コンパイラ] `sum()` の戻り値の型は Null 許容であるべき。
-* 修正: [Paging] レースコンディションを避けるため、`QueryDataSourceFactory` に `Transacter` を渡すように修正。
-* 修正: [IntelliJプラグイン] ファイルのパッケージ名を探す際に依存関係を検索しないように修正。
-* 修正: [Gradle] #862 Gradle のバリデータログをデバッグレベルに変更。
-* 改善: [Gradle] `GenerateSchemaTask` を Gradle worker を使用するように変換。
-* 注意: `sqldelight-runtime` アーティファクトは `runtime` にリネームされました。
+* 新機能: [Runtime] Windows (mingw)、tvOS、watchOS、macOS アーキテクチャをサポートしました。
+* 修正: [Compiler] sum() の戻り値の型が nullable になるように修正しました。
+* 修正: [Paging] 競合状態を避けるため、QueryDataSourceFactory に Transacter を渡すようにしました。
+* 修正: [IntelliJ Plugin] ファイルのパッケージ名を検索する際に依存関係内を検索しないようにしました。
+* 修正: [Gradle] #862 Gradle 内のバリデータログを debug レベルに変更しました。
+* 改善: [Gradle] GenerateSchemaTask が Gradle ワーカーを使用するように変更しました。
+* 注意: sqldelight-runtime アーティファクトは runtime に名前が変更されました。
 
 ## [1.2.1] - 2019-12-11 {id="1-2-1-2019-12-11"}
 [1.2.1]: https://github.com/sqldelight/sqldelight/releases/tag/1.2.1
 
-* 修正: [Gradle] Kotlin Native 1.3.60 サポート。
-* 修正: [Gradle] #1287 同期時の警告。
-* 修正: [コンパイラ] #1469 クエリ用の `SynetheticAccessor` 作成。
-* 修正: [JVMドライバ] メモリリークを修正。
-* 注意: coroutine extension アーティファクトには、buildscript に kotlinx bintray maven リポジトリを追加する必要があります。
+* 修正: [Gradle] Kotlin/Native 1.3.60 をサポートしました。
+* 修正: [Gradle] #1287 同期時の警告を修正しました。
+* 修正: [Compiler] #1469 クエリに対する SynetheticAccessor の作成を修正しました。
+* 修正: [JVM Driver] メモリリークを修正しました。
+* 注意: coroutine 拡張アーティファクトを使用する場合、buildscript に kotlinx の bintray maven リポジトリを追加する必要があります。
 
 ## [1.2.0] - 2019-08-30 {id="1-2-0-2019-08-30"}
 [1.2.0]: https://github.com/sqldelight/sqldelight/releases/tag/1.2.0
 
-* 新機能: [ランタイム] 安定した Flow API。
-* 修正: [Gradle] Kotlin Native 1.3.50 サポート。
-* 修正: [Gradle] #1380 クリーンビルドが時々失敗する問題を修正。
-* 修正: [Gradle] #1348 検証タスク実行時に "Could not retrieve functions" と表示される問題を修正。
-* 修正: [Compile] #1405 クエリに FTS テーブルの結合が含まれている場合にビルドできない問題を修正。
-* 修正: [Gradle] #1266 複数のデータベースモジュールがある場合に、散発的に Gradle ビルドが失敗する問題を修正。
+* 新機能: [Runtime] 安定版の Flow API を追加しました。
+* 修正: [Gradle] Kotlin/Native 1.3.50 をサポートしました。
+* 修正: [Gradle] #1380 クリーンビルドが失敗することがある問題を修正しました。
+* 修正: [Gradle] #1348 verify タスクの実行時に「Could not retrieve functions」と出力される問題を修正しました。
+* 修正: [Compile] #1405 クエリに FTS テーブルの結合が含まれている場合にプロジェクトをビルドできない問題を修正しました。
+* 修正: [Gradle] #1266 複数のデータベースモジュールがある場合に Gradle ビルドが散発的に失敗する問題を修正しました。
 
 ## [1.1.4] - 2019-07-11 {id="1-1-4-2019-07-11"}
 [1.1.4]: https://github.com/sqldelight/sqldelight/releases/tag/1.1.4
 
-* 新機能: [ランタイム] 実験的な Kotlin Flow API。
-* 修正: [Gradle] Kotlin/Native 1.3.40 互換性。
-* 修正: [Gradle] #1243 Gradle のオンデマンド設定時における SQLDelight の使用に関する修正。
-* 修正: [Gradle] #1385 漸進的アノテーション処理 (incremental annotation processing) における SQLDelight の使用に関する修正。
-* 修正: [Gradle] Gradle タスクのキャッシュを有効化。
-* 修正: [Gradle] #1274 Kotlin DSL での sqldelight 拡張の使用を有効化。
-* 修正: [コンパイラ] 各クエリに対して一意の ID が決定論的に生成されるように修正。
-* 修正: [コンパイラ] トランザクションが完了したときにのみ、待機中のクエリに通知するように修正。
-* 修正: [JVMドライバ] #1370 `JdbcSqliteDriver` ユーザーに DB URL の提供を強制。
+* 新機能: [Runtime] 実験的な Kotlin Flow API を追加しました。
+* 修正: [Gradle] Kotlin/Native 1.3.40 との互換性を確保しました。
+* 修正: [Gradle] #1243 Gradle の Configure on demand とともに SQLDelight を使用する場合の問題を修正しました。
+* 修正: [Gradle] #1385 インクリメンタルなアノテーション処理とともに SQLDelight を使用する場合の問題を修正しました。
+* 修正: [Gradle] Gradle タスクのキャッシュを許可しました。
+* 修正: [Gradle] #1274 Kotlin DSL での sqldelight 拡張機能の使用を可能にしました。
+* 修正: [Compiler] 各クエリに対して決定論的に一意の ID が生成されるようにしました。
+* 修正: [Compiler] トランザクションが完了したときにのみリスニングしているクエリへ通知するようにしました。
+* 修正: [JVM Driver] #1370 JdbcSqliteDriver の利用者に DB URL の指定を必須としました。
 
 ## [1.1.3] - 2019-04-14 {id="1-1-3-2019-04-14"}
 [1.1.3]: https://github.com/sqldelight/sqldelight/releases/tag/1.1.3
 
-* Gradle Metadata 1.0 リリース。
+* Gradle Metadata 1.0 リリースに対応しました。
 
 ## [1.1.2] - 2019-04-14 {id="1-1-2-2019-04-14"}
 [1.1.2]: https://github.com/sqldelight/sqldelight/releases/tag/1.1.2
 
-* 新機能: [ランタイム] #1267 ロギングドライバデコレータ。
-* 修正: [コンパイラ] #1254 2^16 文字を超える文字列リテラルを分割するように修正。
-* 修正: [Gradle] #1260 生成されたソースが Multiplatform プロジェクトにおいて iOS ソースとして認識される問題を修正。
-* 修正: [IDE] #1290 `CopyAsSqliteAction.kt:43` における `kotlin.KotlinNullPointerException`。
-* 修正: [Gradle] #1268 最近のバージョンで `linkDebugFrameworkIos*` タスクが失敗する問題を修正。
+* 新機能: [Runtime] #1267 ロギング用ドライバーデコレーターを追加しました。
+* 修正: [Compiler] #1254 2^16 文字を超える文字列リテラルを分割するようにしました。
+* 修正: [Gradle] #1260 マルチプラットフォームプロジェクトで生成されたソースが iOS ソースとして認識される問題を修正しました。
+* 修正: [IDE] #1290 CopyAsSqliteAction.kt:43 での kotlin.KotlinNullPointerException を修正しました。
+* 修正: [Gradle] #1268 最近のバージョンで linkDebugFrameworkIos* タスクの実行に失敗する問題を修正しました。
 
 ## [1.1.1] - 2019-03-01 {id="1-1-1-2019-03-01"}
 [1.1.1]: https://github.com/sqldelight/sqldelight/releases/tag/1.1.1
 
-* 修正: [Gradle] Android プロジェクトのモジュール依存関係のコンパイルを修正。
-* 修正: [Gradle] #1246 `afterEvaluate` で api 依存関係をセットアップするように修正。
-* 修正: [コンパイラ] 配列型が適切に出力されるように修正。
+* 修正: [Gradle] Android プロジェクトにおけるモジュール依存関係のコンパイルを修正しました。
+* 修正: [Gradle] #1246 afterEvaluate で API 依存関係をセットアップするようにしました。
+* 修正: [Compiler] 配列型が正しく出力されるようにしました。
 
 ## [1.1.0] - 2019-02-27 {id="1-1-0-2019-02-27"}
 [1.1.0]: https://github.com/sqldelight/sqldelight/releases/tag/1.1.0
 
-* 新機能: [Gradle] #502 スキーマモジュールの依存関係を指定可能に変更。
-* 改善: [コンパイラ] #1111 テーブルエラーが他のエラーより前にソートされるように改善。
-* 修正: [コンパイラ] #1225 `REAL` リテラルに対して正しい型を返すように修正。
-* 修正: [コンパイラ] #1218 `docid` がトリガーを通じて伝搬するように修正。
+* 新機能: [Gradle] #502 スキーマモジュールの依存関係を指定できるようにしました。
+* 改善: [Compiler] #1111 テーブルのエラーが他のエラーよりも前にソートされるようにしました。
+* 修正: [Compiler] #1225 REAL リテラルに対して正しい型を返すようにしました。
+* 修正: [Compiler] #1218 トリガーを経由して docid が伝播するようにしました。
 
 ## [1.0.3] - 2019-01-30 {id="1-0-3-2019-01-30"}
 [1.0.3]: https://github.com/sqldelight/sqldelight/releases/tag/1.0.3
 
-* 改善: [ランタイム] #1195 Native ドライバ/ランタイム Arm32。
-* 改善: [ランタイム] #1190 `Query` 型からマッパーを公開。
+* 改善: [Runtime] #1195 Native Driver/Runtime の Arm32 サポート。
+* 改善: [Runtime] #1190 Query 型からマッパーを公開するようにしました。
 
 ## [1.0.2] - 2019-01-26 {id="1-0-2-2019-01-26"}
 [1.0.2]: https://github.com/sqldelight/sqldelight/releases/tag/1.0.2
 
-* 修正: [Gradleプラグイン] Kotlin 1.3.20 に更新。
-* 修正: [ランタイム] トランザクションが例外を飲み込まないように修正。
+* 修正: [Gradle Plugin] Kotlin 1.3.20 に更新しました。
+* 修正: [Runtime] トランザクションが例外をもみ消さないようにしました。
 
 ## [1.0.1] - 2019-01-21 {id="1-0-1-2019-01-21"}
 [1.0.1]: https://github.com/sqldelight/sqldelight/releases/tag/1.0.1
 
-* 改善: [Nativeドライバ] `DatabaseConfiguration` にディレクトリ名を渡せるように変更。
-* 改善: [コンパイラ] #1173 パッケージのないファイルがコンパイルに失敗するように修正。
-* 修正: [IDE] IDE エラーを Square に適切に報告するように修正。
-* 修正: [IDE] #1162 同じパッケージ内の型がエラーとして表示されるが正常に動作する問題を修正。
-* 修正: [IDE] #1166 テーブルのリネームが NPE で失敗する問題を修正。
-* 修正: [コンパイラ] #1167 `UNION` と `SELECT` を含む複雑な SQL ステートメントのパース試行時に例外が発生する問題を修正。
+* 改善: [Native Driver] DatabaseConfiguration にディレクトリ名を渡せるようにしました。
+* 改善: [Compiler] #1173 パッケージのないファイルでコンパイルが失敗するようにしました。
+* 修正: [IDE] Square に IDE エラーを適切に報告するようにしました。
+* 修正: [IDE] #1162 同じパッケージ内の型がエラーとして表示されるものの正常に機能する問題を修正しました。
+* 修正: [IDE] #1166 テーブルのリネームが NPE で失敗する問題を修正しました。
+* 修正: [Compiler] #1167 UNION と SELECT を含む複雑な SQL 文をパースしようとすると例外がスローされる問題を修正しました。
 
 ## [1.0.0] - 2019-01-08 {id="1-0-0-2019-01-08"}
 [1.0.0]: https://github.com/sqldelight/sqldelight/releases/tag/1.0.0
 
-* 新機能: 生成コードの全面刷新（Kotlin 化）。
+* 新機能: 生成されるコードを全面的に見直し、Kotlin に刷新しました。
 * 新機能: RxJava2 拡張アーティファクト。
 * 新機能: Android Paging 拡張アーティファクト。
-* 新機能: Kotlin Multiplatform サポート。
-* 新機能: Android、iOS、および JVM SQLite ドライバアーティファクト。
+* 新機能: Kotlin Multiplatform のサポート。
+* 新機能: Android、iOS、および JVM SQLite ドライバーアーティファクト。
 * 新機能: トランザクション API。
 
 ## [0.7.0] - 2018-02-12 {id="0-7-0-2018-02-12"}
 [0.7.0]: https://github.com/sqldelight/sqldelight/releases/tag/0.7.0
 
- * 新機能: 生成コードが Support SQLite ライブラリのみを使用するように更新されました。すべてのクエリが、生の文字列ではなくステートメントオブジェクトを生成するようになりました。
- * 新機能: IDE におけるステートメントの折りたたみ。
+ * 新機能: 生成されるコードが更新され、Support SQLite ライブラリのみを使用するようになりました。すべてのクエリは生の文字列ではなくステートメントオブジェクトを生成するようになりました。
+ * 新機能: IDE でのステートメントの折りたたみ (Statement folding)。
  * 新機能: Boolean 型が自動的に処理されるようになりました。
- * 修正: コード生成から非推奨の marshal を削除。
- * 修正: 'avg' SQL 関数の型マッピングを `REAL` に修正。
- * 修正: 'julianday' SQL 関数の検出を修正。
+ * 修正: コード生成から非推奨の marshal を削除しました。
+ * 修正: 'avg' SQL 関数の型マッピングが REAL になるよう修正しました。
+ * 修正: 'julianday' SQL 関数を正しく検出するようにしました。
 
 ## [0.6.1] - 2017-03-22 {id="0-6-1-2017-03-22"}
 [0.6.1]: https://github.com/sqldelight/sqldelight/releases/tag/0.6.1
 
- * 新機能: 引数のない Delete、Update、および Insert ステートメントに対してコンパイル済みステートメントが生成されるようになりました。
- * 修正: サブクエリで使用されている View 内の Using 句がエラーにならないように修正。
- * 修正: 生成された Mapper からの重複した型を削除。
- * 修正: サブクエリを引数に対してチェックする式で使用可能に修正。
+ * 新機能: 引数のない DELETE、UPDATE、INSERT 文に対して、コンパイル済みステートメントが生成されるようになりました。
+ * 修正: サブクエリで使用されているビュー内の USING 句でエラーが発生しないようにしました。
+ * 修正: 生成された Mapper での重複した型を削除しました。
+ * 修正: 引数に対してチェックを行う式でサブクエリを使用できるようにしました。
 
 ## [0.6.0] - 2017-03-06 {id="0-6-0-2017-03-06"}
 [0.6.0]: https://github.com/sqldelight/sqldelight/releases/tag/0.6.0
 
- * 新機能: Select クエリが、文字列定数ではなく `SqlDelightStatement` ファクトリとして公開されるようになりました。
- * 新機能: クエリの JavaDoc が、ステートメントおよびマッパーファクトリにコピーされるようになりました。
- * 新機能: View 名の文字列定数を出力するように変更。
- * 修正: ファクトリを必要とする View に対するクエリにおいて、それらのファクトリを引数として正しく要求するように修正。
- * 修正: insert への引数の数が指定されたカラムの数と一致することを検証するように修正。
- * 修正: where 句で使用される blob リテラルを適切にエンコードするように修正。
+ * 新機能: SELECT クエリは文字列定数の代わりに `SqlDelightStatement` ファクトリとして公開されるようになりました。
+ * 新機能: クエリの JavaDoc がステートメントおよびマッパーファクトリにコピーされるようになりました。
+ * 新機能: ビュー名用の文字列定数を出力するようにしました。
+ * 修正: ファクトリを必要とするビューに対するクエリで、それらのファクトリを引数として正しく要求するようにしました。
+ * 修正: INSERT への引数の数が指定された列数と一致しているかを検証するようにしました。
+ * 修正: WHERE 句で使用される BLOB リテラルを適切にエンコードするようにしました。
  * このリリースには Gradle 3.3 以降が必要です。
 
 ## [0.5.1] - 2016-10-24 {id="0-5-1-2016-10-24"}
 [0.5.1]: https://github.com/sqldelight/sqldelight/releases/tag/0.5.1
 
- * 新機能: コンパイル済みステートメントが抽象型を継承するようになりました。
- * 修正: パラメータ内のプリミティブ型が Null 許容の場合にボックス化されるように修正。
- * 修正: bind args に必要なすべてのファクトリがファクトリメソッドに存在するように修正。
- * 修正: エスケープされたカラム名が正しく整列 (marshal) されるように修正。
+ * 新機能: コンパイル済みステートメントが抽象型を継承するようにしました。
+ * 修正: パラメータ内のプリミティブ型が nullable の場合はボクシングされるようにしました。
+ * 修正: バインド引数に必要なすべてのファクトリがファクトリメソッド内に存在するようにしました。
+ * 修正: エスケープされた列名が正しくマーシャリングされるようにしました。
 
 ## [0.5.0] - 2016-10-19 {id="0-5-0-2016-10-19"}
 [0.5.0]: https://github.com/sqldelight/sqldelight/releases/tag/0.5.0
 
- * 新機能: SQLite 引数を Factory を通じて型セーフに渡せるようになりました。
- * 新機能: IntelliJ プラグインが .sq ファイルのフォーマットを実行するようになりました。
- * 新機能: SQLite タイムスタンプリテラルのサポート。
- * 修正: パラメータ化された型が IntelliJ でクリック可能になるように修正。
- * 修正: エスケープされたカラム名が Cursor から取得した際に、`RuntimeException` を投げないように修正。
- * 修正: Gradle プラグインが例外出力時にクラッシュしないように修正。
+ * 新機能: SQLite の引数を Factory を通じて型安全に渡せるようにしました。
+ * 新機能: IntelliJ プラグインが .sq ファイルのフォーマットを実行するようにしました。
+ * 新機能: SQLite のタイムスタンプリテラルをサポートしました。
+ * 修正: IntelliJ でパラメータ化された型をクリックしてジャンプできるようにしました。
+ * 修正: Cursor から取得した場合にエスケープされた列名が RuntimeException をスローしないようにしました。
+ * 修正: Gradle プラグインが例外を出力しようとしてクラッシュしないようにしました。
 
 ## [0.4.4] - 2016-07-20 {id="0-4-4-2016-07-20"}
 [0.4.4]: https://github.com/sqldelight/sqldelight/releases/tag/0.4.4
 
- * 新機能: カラムの Java 型として short をネイティブサポート。
- * 新機能: 生成されたマッパーおよびファクトリメソッドに Javadoc を追加。
- * 修正: `group_concat` および `nullif` 関数が適切な Null 許容性を持つように修正。
- * 修正: Android Studio 2.2-alpha との互換性を修正。
- * 修正: `WITH RECURSIVE` でプラグインがクラッシュしないように修正。
+ * 新機能: 列の Java 型としての Short をネイティブサポートしました。
+ * 新機能: 生成されたマッパーおよびファクトリメソッドに Javadoc を追加しました。
+ * 修正: group_concat および nullif 関数が適切な null 許容性を持つようにしました。
+ * 修正: Android Studio 2.2-alpha との互換性を確保しました。
+ * 修正: WITH RECURSIVE によってプラグインがクラッシュしないようにしました。
 
 ## [0.4.3] - 2016-07-07 {id="0-4-3-2016-07-07"}
 [0.4.3]: https://github.com/sqldelight/sqldelight/releases/tag/0.4.3
 
- * 新機能: コンパイルエラーがソースファイルにリンクされるようになりました。
- * 新機能: 右クリックで SQLDelight コードを有効な SQLite としてコピー可能になりました。
- * 新機能: 名前付きステートメントの Javadoc が生成された String に表示されるようになりました。
- * 修正: 生成されたビューモデルに Null 許容性アノテーションが含まれるように修正。
- * 修正: ユニオンから生成されたコードが、すべての可能なカラムをサポートするために適切な型と Null 許容性を持つように修正。
- * 修正: `sum` および `round` SQLite 関数が適切な型を持つように修正。
- * 修正: `CAST`、内部セレクトに関するバグを修正。
- * 修正: `CREATE TABLE` 文におけるオートコンプリートを修正。
- * 修正: SQLite キーワードをパッケージで使用可能に修正。
+ * 新機能: コンパイルエラーからソースファイルへリンクするようにしました。
+ * 新機能: 右クリックで SQLDelight コードを有効な SQLite としてコピーできるようにしました。
+ * 新機能: 名前付きステートメントの Javadoc が生成された String 上に表示されるようにしました。
+ * 修正: 生成されたビューモデルに null 許容性アノテーションを含めるようにしました。
+ * 修正: UNION から生成されたコードが、すべての可能な列をサポートするために適切な型と null 許容性を持つようにしました。
+ * 修正: SQLite 関数の sum および round が、生成コード内で適切な型を持つようにしました。
+ * 修正: CAST および内部 SELECT のバグを修正しました。
+ * 修正: CREATE TABLE 文内でのオートコンプリートを修正しました。
+ * 修正: パッケージ内で SQLite キーワードを使用できるようにしました。
 
 ## [0.4.2] - 2016-06-16 {id="0-4-2-2016-06-16"}
 [0.4.2]: https://github.com/sqldelight/sqldelight/releases/tag/0.4.2
 
- * 新機能: Marshal を Factory から作成可能になりました。
- * 修正: IntelliJ プラグインが適切なジェネリック順序でファクトリメソッドを生成するように修正。
- * 修正: 関数名に任意のケース（大文字小文字）を使用可能に修正。
+ * 新機能: Factory から Marshal を作成できるようにしました。
+ * 修正: IntelliJ プラグインが適切なジェネリクス順序でファクトリメソッドを生成するようにしました。
+ * 修正: 関数名の大文字・小文字を問わず使用できるようにしました。
 
 ## [0.4.1] - 2016-06-14 {id="0-4-1-2016-06-14"}
 [0.4.1]: https://github.com/sqldelight/sqldelight/releases/tag/0.4.1
 
- * 修正: IntelliJ プラグインが適切なジェネリック順序でクラスを生成するように修正。
- * 修正: カラム定義に任意のケース（大文字小文字）を使用可能に修正。
+ * 修正: IntelliJ プラグインが適切なジェネリクス順序でクラスを生成するようにしました。
+ * 修正: 列定義の大文字・小文字を問わず使用できるようにしました。
 
 ## [0.4.0] - 2016-06-14 {id="0-4-0-2016-06-14"}
 [0.4.0]: https://github.com/sqldelight/sqldelight/releases/tag/0.4.0
 
  * 新機能: マッパーがテーブル単位ではなくクエリ単位で生成されるようになりました。
- * 新機能: .sq ファイル内で Java 型をインポート可能になりました。
+ * 新機能: .sq ファイル内で Java の型をインポートできるようにしました。
  * 新機能: SQLite 関数が検証されるようになりました。
- * 修正: 重複エラーを削除。
- * 修正: 大文字のカラム名および Java キーワードのカラム名がエラーにならないように修正。
+ * 修正: 重複したエラーを削除しました。
+ * 修正: 大文字の列名および Java キーワードと同じ列名でエラーが発生しないようにしました。
 
 ## [0.3.2] - 2016-05-14 {id="0-3-2-2016-05-14"}
 [0.3.2]: https://github.com/sqldelight/sqldelight/releases/tag/0.3.2
 
- * 新機能: オートコンプリートと使用箇所検索がビューとエイリアスに対して機能するようになりました。
- * 修正: コンパイル時の検証において、セレクト内での関数の使用を許可。
- * 修正: デフォルト値のみを宣言する insert 文をサポート。
- * 修正: SQLDelight を使用していないプロジェクトがインポートされた際にプラグインがクラッシュしないように修正。
+ * 新機能: オートコンプリートと使用箇所の検索がビューおよびエイリアスでも機能するようになりました。
+ * 修正: コンパイル時の検証で、SELECT 内での関数の使用を許可するようにしました。
+ * 修正: デフォルト値のみを宣言する INSERT 文をサポートしました。
+ * 修正: SQLDelight を使用していないプロジェクトをインポートした際にプラグインがクラッシュしないようにしました。
 
 ## [0.3.1] - 2016-04-27 {id="0-3-1-2016-04-27"}
 [0.3.1]: https://github.com/sqldelight/sqldelight/releases/tag/0.3.1
 
-  * 修正: メソッドリファレンスによる実行時の Illegal Access 例外を避けるため、インターフェースの可視性を public に戻しました。
-  * 修正: サブ式が適切に評価されるように修正。
+  * 修正: メソッド参照からの Illegal Access 実行時例外を回避するため、インターフェースの可視性を public に戻しました。
+  * 修正: 部分式 (Subexpressions) が適切に評価されるようにしました。
 
 ## [0.3.0] - 2016-04-26 {id="0-3-0-2016-04-26"}
 [0.3.0]: https://github.com/sqldelight/sqldelight/releases/tag/0.3.0
 
-  * 新機能: カラム定義で SQLite 型を使用し、Java 型を指定するための追加の 'AS' 制約を使用できるようになりました。
-  * 新機能: IDE からバグレポートを送信可能になりました。
-  * 修正: オートコンプリートが適切に機能するように修正。
-  * 修正: .sq ファイルの編集時に SQLDelight モデルファイルが更新されるように修正。
-  * 削除: アタッチされたデータベースのサポートを終了。
+  * 新機能: 列定義で SQLite の型を使用し、さらに Java の型を指定するための 'AS' 制約を持てるようにしました。
+  * 新機能: IDE からバグレポートを送信できるようにしました。
+  * 修正: オートコンプリートが適切に機能するようにしました。
+  * 修正: .sq ファイルの編集時に SQLDelight モデルファイルが更新されるようにしました。
+  * 削除: アタッチされたデータベース (Attached databases) のサポートを終了しました。
 
 ## [0.2.2] - 2016-03-07 {id="0-2-2-2016-03-07"}
 [0.2.2]: https://github.com/sqldelight/sqldelight/releases/tag/0.2.2
 
- * 新機能: 挿入、更新、削除、インデックス、およびトリガー文で使用されるカラムのコンパイル時検証。
- * 修正: ファイルの移動/作成時に IDE プラグインがクラッシュしないように修正。
+ * 新機能: INSERT、UPDATE、DELETE、INDEX、TRIGGER 文で使用される列のコンパイル時検証を追加しました。
+ * 修正: ファイルの移動/作成時に IDE プラグインがクラッシュしないようにしました。
 
 ## [0.2.1] - 2016-03-07 {id="0-2-1-2016-03-07"}
 [0.2.1]: https://github.com/sqldelight/sqldelight/releases/tag/0.2.1
 
- * 新機能: Ctrl+`/` (OSX では Cmd+`/`) で選択した行のコメントをトグル可能になりました。
- * 新機能: SQL クエリで使用されるカラムのコンパイル時検証。
- * 修正: IDE と Gradle プラグインの両方で Windows パスをサポート。
+ * 新機能: Ctrl+`/` (macOS では Cmd+`/`) で選択した行のコメントを切り替えられるようにしました。
+ * 新機能: SQL クエリで使用される列のコンパイル時検証を追加しました。
+ * 修正: IDE と Gradle プラグインの両方で Windows のパスをサポートしました。
 
 ## [0.2.0] - 2016-02-29 {id="0-2-0-2016-02-29"}
 [0.2.0]: https://github.com/sqldelight/sqldelight/releases/tag/0.2.0
 
- * 新機能: Marshal クラスにコピーコンストラクタを追加。
- * 新機能: Kotlin 1.0 final にアップデート。
- * 修正: 'sqldelight' フォルダ構造の問題を、ビルドを失敗させない方法で報告するように修正。
- * 修正: `table_name` という名前のカラムを禁止。それらから生成された定数がテーブル名定数と衝突するためです。
- * 修正: `.sq` ファイルが開かれているかどうかにかかわらず、IDE プラグインがモデルクラスを即座に生成することを保証するように修正。
- * 修正: IDE と Gradle プラグインの両方で Windows パスをサポート。
+ * 新機能: Marshal クラスにコピーコンストラクタを追加しました。
+ * 新機能: Kotlin 1.0 正式版に更新しました。
+ * 修正: 'sqldelight' フォルダ構造の問題を、ビルドを失敗させない形で報告するようにしました。
+ * 修正: `table_name` という名前の列を禁止しました (生成される定数がテーブル名定数と衝突するため)。
+ * 修正: `.sq` ファイルが開かれているかどうかにかかわらず、IDE プラグインがモデルクラスを即座に生成するようにしました。
+ * 修正: IDE と Gradle プラグインの両方で Windows のパスをサポートしました。
 
 ## [0.1.2] - 2016-02-13 {id="0-1-2-2016-02-13"}
 [0.1.2]: https://github.com/sqldelight/sqldelight/releases/tag/0.1.2
 
- * 修正: ほとんどのプロジェクトで Gradle プラグインを使用できなくしていたコードを削除。
- * 修正: Antlr ランタイムに対する不足していたコンパイラ依存関係を追加。
+ * 修正: ほとんどのプロジェクトで Gradle プラグインの使用を妨げていたコードを削除しました。
+ * 修正: Antlr ランタイムに対するコンパイラの依存関係の不足を追加しました。
 
 ## [0.1.1] - 2016-02-12 {id="0-1-1-2016-02-12"}
 [0.1.1]: https://github.com/sqldelight/sqldelight/releases/tag/0.1.1
 
- * 修正: Gradle プラグインが自身と同じバージョンのランタイムを指すように修正。
+ * 修正: Gradle プラグインが自身と同じバージョンのランタイムを確実に参照するようにしました。
 
 ## [0.1.0] - 2016-02-12 {id="0-1-0-2016-02-12"}
 [0.1.0]: https://github.com/sqldelight/sqldelight/releases/tag/0.1.0
