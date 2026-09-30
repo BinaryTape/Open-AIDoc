@@ -74,14 +74,13 @@ const PROJECTS = [
     name: 'koin', displayName: 'Koin',
     repos: [
       { repo: 'InsertKoinIO/koin', branch: 'main', docPaths: ['docs'] },
-      { repo: 'InsertKoinIO/koin-annotations', branch: 'main', docPaths: ['docs'] },
     ],
   },
   {
     // sqlDelightStrategy: getDocPatterns → docs/**/*.md
     name: 'sqldelight', displayName: 'SQLDelight',
     repos: [
-      { repo: 'sqldelight/sqldelight', branch: 'master', docPaths: ['docs'] },
+      { repo: 'sqldelight/sqldelight', branch: 'main', docPaths: ['docs'] },
     ],
   },
   {

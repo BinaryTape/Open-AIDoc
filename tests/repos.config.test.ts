@@ -40,6 +40,13 @@ describe('REPOS config', () => {
     }
   })
 
+  it('feeds each sidebar from a single repository', () => {
+    // Two repositories writing the same docs overwrite each other with
+    // whichever changed last (koin-annotations once did this to koin).
+    const sidebarIds = REPOS.map((r) => r.sidebarId)
+    expect(new Set(sidebarIds).size).toBe(sidebarIds.length)
+  })
+
   it('rejects duplicate ids', () => {
     const broken = [
       { ...REPOS[0] },

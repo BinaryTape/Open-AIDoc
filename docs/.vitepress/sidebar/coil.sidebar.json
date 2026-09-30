@@ -84,6 +84,10 @@
     "link": "changelog"
   },
   {
+    "text": "coil.contributing",
+    "link": "contributing"
+  },
+  {
     "text": "coil.code-of-conduct",
     "link": "code_of_conduct"
   }
