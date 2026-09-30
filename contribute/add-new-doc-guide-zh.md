@@ -250,9 +250,9 @@ C. 自定义 HTML → 用 Vue 组件承载
 CI 中的运行方式（`.github/workflows/docs-update.yaml`）：
 - **plan**：记下 `main` 的当前提交作为基线，列出要同步的仓库。
 - **translate**：每个上游仓库一个 matrix 任务，都从同一个基线提交开始，执行 STAGE 1–3（`docs-pipeline.mjs translate`），**不提交**，只把改动的文件、删除清单、词典键的增量和待办上传为 artifact。任务失败会自动重试一次（API key 无效除外）；一个仓库失败不影响其他仓库。
-- **finalize**：按 REPOS 顺序应用所有成功任务的 artifact（词典按键合并），翻译侧边栏标签，提交一次（`docs-pipeline.mjs finalize`），强制推送到 `automation/docs-sync` 分支，并创建或更新同步 PR。
+- **finalize**：按 REPOS 顺序应用所有成功任务的 artifact（词典按键合并），翻译侧边栏标签，提交一次（`docs-pipeline.mjs finalize`），直接推送到运行所在的分支（定时任务即 `main`；运行期间 `main` 若有新提交，会先 rebase 再推送）。推送后运行单元测试和站点构建，**只报告不阻断**，结果写进运行汇总。
 - 失败的仓库不会进入提交，断点保持不动，下次运行会重新同步；需要立即重试时，在工作流运行页面使用 **Re-run failed jobs**（finalize 可以重复执行，结果相同），或手动运行工作流并填写 `repo`。
-- 每个仓库的结果和待办会写进同步 PR 的描述和运行汇总。
+- 每个仓库的结果、待办和同步后的检查结果都写进运行汇总（运行页面底部）。
 
 站点构建时才会应用 **LinkRewrite**（与上述 STAGE 无关）。
 
