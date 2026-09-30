@@ -16,11 +16,9 @@ export const koinStrategy = {
    * @override
    * The Koin sidebar is kept in the website repository, which is not public,
    * so koin.sidebar.json is curated here and reconciled with the upstream docs
-   * on every sync. koin-annotations feeds the same docs and sidebar; only the
-   * koin repository drives it.
+   * on every sync.
    */
-  postSync: async (repoPath, context, repoConfig) => {
-    if (repoConfig?.id !== "koin") return;
+  postSync: async (repoPath) => {
     await syncKoinSidebar(repoPath);
   },
 };

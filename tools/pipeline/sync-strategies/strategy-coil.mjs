@@ -11,6 +11,8 @@ const extraFilesMapping = new Map([
   ["coil-gif/README.md", "docs/gifs.md"],
   ["coil-network-core/README.md", "docs/network.md"],
   ["coil-compose/README.md", "docs/compose.md"],
+  // Copied into docs/ by the upstream docs build (mkdocs.yml nav: Contributing)
+  [".github/ISSUE_TEMPLATE/CONTRIBUTING.md", "docs/contributing.md"],
 ]);
 
 export const coilStrategy = {
@@ -28,32 +30,10 @@ export const coilStrategy = {
    */
   postDetect: async (repoConfig, task) => {
     console.log("  Running Coil postDetect: Copying root markdown files...");
-    const repoPath = repoConfig.cloneDir;
-    const mappedFiles = await Promise.all(
-      task.files.map(async (file) => {
-        if (extraFilesMapping.has(file)) {
-          //'coil-repo\\coil-video\\README.md'
-          const src = path.join(repoPath, file);
-          //'coil-repo\\docs\\videos.md'
-          const dest = path.join(repoPath, extraFilesMapping.get(file));
-          await fs.copy(src, dest);
-
-          let content = await fs.readFile(dest, "utf8");
-          if (file === "README.md") {
-            content = content.replace(
-                /(!\[[^\]]*]\()logo\.svg(\))/,
-                "$1/coil/coil_full_colored.svg$2"
-              );
-          }
-          content = content.replaceAll("/coil/recipes/#", "/coil/recipes#");
-          await fs.writeFile(dest, content, "utf8");
-
-          return extraFilesMapping.get(file);
-        }
-        return file;
-      })
-    );
-    task.files = mappedFiles;
+    // Every mapped page is copied, not only the changed ones: pages carried
+    // over in the pending file are read from their docs/ path too.
+    await copyExtraFiles(repoConfig.cloneDir);
+    task.files = task.files.map((file) => extraFilesMapping.get(file) ?? file);
   },
 
   /**
@@ -74,3 +54,28 @@ export const coilStrategy = {
     }
   },
 };
+
+/**
+ * Copy the markdown files kept outside docs/ upstream to their docs/ path in
+ * the clone, the way the upstream docs build does.
+ * @param {string} repoPath - Path to the coil clone
+ */
+export async function copyExtraFiles(repoPath) {
+  for (const [file, docPath] of extraFilesMapping) {
+    const src = path.join(repoPath, file);
+    if (!(await fs.pathExists(src))) {
+      console.warn(`  ⚠️  Warning: ${file} not found in ${repoPath}`);
+      continue;
+    }
+
+    let content = await fs.readFile(src, "utf8");
+    if (file === "README.md") {
+      content = content.replace(
+        /(!\[[^\]]*]\()logo\.svg(\))/,
+        "$1/coil/coil_full_colored.svg$2"
+      );
+    }
+    content = content.replaceAll("/coil/recipes/#", "/coil/recipes#");
+    await fs.outputFile(path.join(repoPath, docPath), content, "utf8");
+  }
+}

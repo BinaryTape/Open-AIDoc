@@ -6,6 +6,9 @@ import {processTopicFileAsync} from "../processors/TopicProcessor.mjs";
 import {generateSidebar} from "../processors/SidebarProcessor.mjs";
 import {processMarkdownFile} from "../processors/MarkdownProcessor.mjs";
 
+// lib*.topic files are libraries of snippets included by other topics, not pages.
+const isIncludeLibrary = (file) => /^lib.*\.topic$/.test(path.basename(file));
+
 export const ktorStrategy = {
     ...defaultStrategy,
 
@@ -33,7 +36,7 @@ export const ktorStrategy = {
         console.log(`  Process markdown files finished - ${repoPath}`);
 
         console.log(` Running Ktor postSync: Convert topic files - ${repoPath}`);
-        const topicFiles = docs.filter(doc => doc.endsWith(".topic") && !doc.startsWith('lib'));
+        const topicFiles = docs.filter(doc => doc.endsWith(".topic") && !isIncludeLibrary(doc));
         for (const topic in topicFiles) {
             const topicPath = path.join(docsPath, topicFiles[topic]);
             await processTopicFileAsync(topicPath, docsPath, true)
@@ -42,14 +45,9 @@ export const ktorStrategy = {
 
         console.log(` Running Ktor postDetect: Change file extension - ${repoPath}`);
         // Map to flattened doc path, convert .topic -> .md
-        task.files = await Promise.all(
-            task.files.map(async (file) => {
-                if (file.endsWith('.topic')) {
-                    file = file.replace('.topic', '.md');
-                }
-                return file;
-            })
-        );
+        task.files = task.files
+            .filter((file) => !isIncludeLibrary(file))
+            .map((file) => file.replace(/\.topic$/, '.md'));
         console.log(`  Mapped files: ${task.files.join("\n")}`);
         console.log(`  Change file extension finished - ${repoPath}`);
 
