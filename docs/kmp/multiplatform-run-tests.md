@@ -1,24 +1,24 @@
-[//]: # (title: 测试您的多平台应用 – 教程)
+[//]: # (title: 测试您的多平台应用 − 教程)
 
 <secondary-label ref="IntelliJ IDEA"/>
 <secondary-label ref="Android Studio"/>
 
 <tldr>
-<p>本教程使用 IntelliJ IDEA，但您也可以在 Android Studio 中按照本教程进行操作 – 这两个 IDE 共享相同的核心功能和 Kotlin Multiplatform 支持。</p>
+<p>本教程使用 IntelliJ IDEA，但您也可以在 Android Studio 中进行操作 – 两款 IDE 拥有相同的核心功能以及对 Kotlin Multiplatform 的支持。</p>
 </tldr>
 
 在本教程中，您将学习如何在 Kotlin Multiplatform 应用程序中创建、配置和运行测试。
 
 多平台项目的测试可以分为两类：
 
-* **公共代码的测试**。这些测试可以使用任何支持的框架在任何平台上运行。
-* **平台特定代码的测试**。这些对于测试平台特定逻辑至关重要。它们使用平台特定的框架，并可以受益于其附加功能，例如更丰富的 API 和更广泛的断言。
+* 公共代码测试。这些测试可以使用任何受支持的框架在任何平台上运行。
+* 平台特定代码测试。这对于测试平台特定逻辑至关重要。它们使用平台特定的框架，并可以利用其附加功能，例如更丰富的 API 和更广泛的断言集。
 
-多平台项目支持这两个类别。本教程首先向您展示如何在一个简单的 Kotlin Multiplatform 项目中为公共代码设置、创建和运行单元测试。然后，您将处理一个更复杂的示例，该示例需要针对公共代码和平台特定代码进行测试。
+多平台项目对这两类测试均提供支持。本教程将首先向您展示如何在简单的 Kotlin Multiplatform 项目中设置、创建并运行公共代码的单元测试。随后，您将处理一个更复杂的示例，该示例需要同时针对公共代码和平台特定代码进行测试。
 
-> 本教程假设您熟悉：
-> * Kotlin Multiplatform 项目的布局。如果不是这种情况，请在开始之前完成[此教程](multiplatform-create-first-app.md)。
-> * 流行单元测试框架（如 [JUnit](https://junit.org/junit5/)）的基础知识。
+> 本教程假定您已熟悉：
+> * Kotlin Multiplatform 项目的布局结构。如果不熟悉，请在开始前完成[本教程](multiplatform-upgrade-app.md)。
+> * 常用单元测试框架的基础知识，例如 [JUnit](https://junit.org/junit5/)。
 >
 {style="tip"}
 
@@ -26,7 +26,7 @@
 
 ### 创建项目 {id="create-a-project"}
 
-1. 在[快速入门](quickstart.md)中，按照说明[设置您的 Kotlin Multiplatform 开发环境](quickstart.md#set-up-the-environment)。
+1. 在[快速入门指南](quickstart.md)中，按照说明[设置用于 Kotlin Multiplatform 开发的环境](quickstart.md#set-up-the-environment)。
 2. 在 IntelliJ IDEA 中，选择 **File** | **New** | **Project**。
 3. 在左侧面板中，选择 **Kotlin Multiplatform**。
 4. 在 **New Project** 窗口中指定以下字段：
@@ -35,15 +35,15 @@
     * **Project ID**: kmp.project.testing
 
 5. 选择 **Android** 目标。
-   如果您使用的是 Mac，请同时选择 **iOS**。确保已选择 **Do not share UI** 选项。
-6. 取消选择 **Include tests** 并点击 **Create**。
+   如果您使用的是 Mac，也请同时选择 **iOS**。请确保选择 **Do not share UI** 选项。
+6. 取消选中 **Include tests**，然后点击 **Create**。
 
    ![创建简单的多平台项目](create-test-multiplatform-project.png){width=800}
 
 ### 编写代码 {id="write-code"}
 
-在 `sharedLogic/src/commonMain/kotlin` 目录中，创建一个新的 `common.example.search` 软件包。
-在此软件包中，创建一个 Kotlin 文件 `Grep.kt`，并添加以下函数：
+在 `sharedLogic/src/commonMain/kotlin` 目录下，创建一个新的 `common.example.search` 软件包。
+在此软件包中创建一个 Kotlin 文件 `Grep.kt`，并添加以下函数：
 
 ```kotlin
 fun grep(lines: List<String>, pattern: String, action: (String) -> Unit) {
@@ -53,13 +53,13 @@ fun grep(lines: List<String>, pattern: String, action: (String) -> Unit) {
 }
 ```
 
-此函数旨在模拟 [UNIX `grep` 命令](https://en.wikipedia.org/wiki/Grep)。在这里，该函数接收多行文本、一个用作正则表达式的模式，以及一个在每当某行匹配模式时调用的函数。
+该函数的设计类似于 [UNIX `grep` 命令](https://en.wikipedia.org/wiki/Grep)。在这里，该函数接收多行文本、一个用作正则表达式的模式，以及一个每当某行与模式匹配时都会被调用的函数。
 
 ### 添加测试 {id="add-tests"}
 
-现在，让我们测试公共代码。一个必不可少的部分是公共测试的源集，它将 [`kotlin.test`](https://kotlinlang.org/api/latest/kotlin.test/) API 库作为依赖项。
+现在，让我们来测试公共代码。其中必不可少的部分是用于通用测试的源集，该源集将 [`kotlin.test`](https://kotlinlang.org/api/latest/kotlin.test/) API 库作为依赖项。
 
-1. 在 `sharedLogic/build.gradle.kts` 文件中，检查是否存在对 `kotlin.test` 库的依赖：
+1. 在 `sharedLogic/build.gradle.kts` 文件中，检查是否存在对 `kotlin.test` 库的依赖项：
 
     ```kotlin
    sourceSets {
@@ -70,15 +70,15 @@ fun grep(lines: List<String>, pattern: String, action: (String) -> Unit) {
    }
    ```
    
-2. `commonTest` 源集存储所有公共测试。您需要在项目中创建一个同名目录：
+2. `commonTest` 源集用于存储所有通用测试。您需要在项目中创建同名目录：
 
     1. 右键点击 `sharedLogic/src` 目录，然后选择 **New | Directory**。IDE 会显示一个选项列表。
-    2. 开始输入 `commonTest/kotlin` 路径以缩小选择范围，然后从列表中选择它：
+    2. 开始输入 `commonTest/kotlin` 路径以缩小选择范围，然后从列表中选中它：
 
-      ![创建公共测试目录](create-common-test-dir.png){width=350}
+      ![创建通用测试目录](create-common-test-dir.png){width=350}
 
-3. 在 `commonTest/kotlin` 目录中，创建一个新的 `common.example.search` 软件包。
-4. 在此软件包中，创建 `Grep.kt` 文件并使用以下单元测试更新它：
+3. 在 `commonTest/kotlin` 目录下，创建一个新的 `common.example.search` 软件包。
+4. 在此软件包中创建 `Grep.kt` 文件，并添加以下单元测试进行更新：
 
     ```kotlin
     import kotlin.test.Test
@@ -110,31 +110,33 @@ fun grep(lines: List<String>, pattern: String, action: (String) -> Unit) {
     }
     ```
 
-如您所见，导入的注解和断言既不是平台特定的，也不是框架特定的。当您稍后运行此测试时，平台特定的框架将提供测试运行程序。
+如您所见，导入的注解和断言既不针对特定平台，也不针对特定框架。
+稍后运行此测试时，将由平台特定的框架提供测试运行程序。
 
 #### 探索 `kotlin.test` API {initial-collapse-state="collapsed" collapsible="true"}
 
-[`kotlin.test`](https://kotlinlang.org/api/latest/kotlin.test/) 库提供了与平台无关的注解和断言，供您在测试中使用。`Test` 等注解映射到所选框架提供的注解或其最接近的等效项。
+[`kotlin.test`](https://kotlinlang.org/api/latest/kotlin.test/) 库提供了与平台无关的注解和断言，供您在测试中使用。诸如 `Test` 之类的注解会映射到所选框架提供的注解或其最接近的对应项。
 
-断言通过 [`Asserter` 接口](https://kotlinlang.org/api/latest/kotlin.test/kotlin.test/-asserter/)的实现来执行。此接口定义了测试中常用的不同检查。该 API 有一个默认实现，但通常您将使用框架特定的实现。
+断言通过 [`Asserter` 接口](https://kotlinlang.org/api/latest/kotlin.test/kotlin.test/-asserter/)的实现来执行。该接口定义了测试中通常执行的各类检查。该 API 具有默认实现，但通常您将使用特定于框架的实现。
 
-例如，JVM 上支持 JUnit 4、JUnit 5 和 TestNG 框架。在 Android 上，对 `assertEquals()` 的调用可能会导致对 `asserter.assertEquals()` 的调用，其中 `asserter` 对象是 `JUnit4Asserter` 的一个实例。在 iOS 上，`Asserter` 类型的默认实现与 Kotlin/Native 测试运行程序配合使用。
+例如，JVM 上支持 JUnit 4、JUnit 5 和 TestNG 框架。在 Android 上，对 `assertEquals()` 的调用可能会导致对 `asserter.assertEquals()` 的调用，其中 `asserter` 对象是 `JUnit4Asserter` 的一个实例。在 iOS 上，`Asserter` 类型的默认实现会与 Kotlin/Native 的测试运行程序结合使用。
 
 ### 运行测试
 
 您可以通过以下方式执行测试：
 
 * 使用装订区域中的 **Run** 图标运行 `shouldFindMatches()` 测试函数。
-* 使用测试文件的上下文菜单运行该文件。
+* 使用测试文件的上下文菜单运行测试文件。
 * 使用装订区域中的 **Run** 图标运行 `GrepTest` 测试类。
 
-还有一个方便的快捷键 <shortcut>⌃ ⇧ F10</shortcut>/<shortcut>Ctrl+Shift+F10</shortcut>。无论您选择哪种选项，都会看到一个运行测试的目标列表：
+还有一个便捷的快捷键 <shortcut>⌃ ⇧ F10</shortcut>/<shortcut>Ctrl+Shift+F10</shortcut>。
+无论您选择哪种方式，都会看到一个用于运行测试的目标列表：
 
 ![运行测试任务](run-test-tasks.png){width=300}
 
-对于 `android` 选项，测试使用 JUnit 4 运行。对于 `iosSimulatorArm64`，Kotlin 编译器会检测测试注解并创建一个由 Kotlin/Native 自己的测试运行程序执行的“测试二进制文件”。
+对于 `android` 选项，测试使用 JUnit 4 运行。对于 `iosSimulatorArm64`，Kotlin 编译器会检测测试注解并创建一个*测试二进制文件*，由 Kotlin/Native 自带的测试运行程序执行。
 
-以下是成功运行测试生成的输出示例：
+以下是测试成功运行生成的输出示例：
 
 ![测试输出](run-test-results.png){width=700}
 
@@ -142,12 +144,13 @@ fun grep(lines: List<String>, pattern: String, action: (String) -> Unit) {
 
 ### 为公共代码编写测试
 
-您已经使用 `grep()` 函数创建了一个公共代码测试。现在，让我们考虑一个使用 `CurrentRuntime` 类的更高级公共代码测试。此类包含执行代码的平台的详细信息。例如，对于在本地 JVM 上运行的 Android 单元测试，它可能具有值 "OpenJDK" 和 "17.0"。
+您已经为包含 `grep()` 函数的公共代码创建了测试。现在，让我们考虑使用 `CurrentRuntime` 类进行更高级的公共代码测试。此类包含运行该代码的平台的详细信息。
+例如，对于在本地 JVM 上运行的 Android 单元测试，它可能具有值 "OpenJDK" 和 "17.0"。
 
-`CurrentRuntime` 的实例应使用作为字符串的平台名称和版本创建，其中版本是可选的。当存在版本时，如果可用，您只需要字符串开头的数字。
+创建 `CurrentRuntime` 实例时应将平台的名称和版本作为字符串传入，其中版本是可选的。当存在版本时，如果可用，您只需要字符串开头的数字部分。
 
-1. 在 `commonMain/kotlin` 目录中，创建一个新的 `org.kmp.testing` 软件包。
-2. 在此软件包中，创建 `CurrentRuntime.kt` 文件并使用以下实现更新它：
+1. 在 `commonMain/kotlin` 目录下，创建一个新的 `org.kmp.testing` 软件包。
+2. 在此软件包中创建 `CurrentRuntime.kt` 文件，并添加以下实现进行更新：
 
     ```kotlin
     class CurrentRuntime(val name: String, rawVersion: String?) {
@@ -166,8 +169,8 @@ fun grep(lines: List<String>, pattern: String, action: (String) -> Unit) {
     }
     ```
 
-3. 在 `commonTest/kotlin` 目录中，创建一个新的 `org.kmp.testing` 软件包。
-4. 在此软件包中，创建 `CurrentRuntimeTest.kt` 文件并使用以下平台和框架无关的测试更新它：
+3. 在 `commonTest/kotlin` 目录下，创建一个新的 `org.kmp.testing` 软件包。
+4. 在此软件包中创建 `CurrentRuntimeTest.kt` 文件，并添加以下与平台和框架无关的测试进行更新：
 
     ```kotlin
     import kotlin.test.Test
@@ -200,28 +203,29 @@ fun grep(lines: List<String>, pattern: String, action: (String) -> Unit) {
     }
     ```
 
-您可以使用 [IDE 中提供的](#run-tests)任何方式运行此测试。
+您可以使用 [IDE 中提供的](#运行测试)任意方式运行此测试。
 
 ### 添加平台特定测试
 
-> 这里为了简洁明了，使用了[预期声明与实际声明机制](multiplatform-connect-to-apis.md)。在更复杂的代码中，更好的方法是使用接口和工厂函数。
+> 为简明起见，此处使用了[预期声明与实际声明机制](multiplatform-connect-to-apis.md)。在更复杂的代码中，更好的做法是使用接口和工厂函数。
 >
 {style="note"}
 
-现在您已经有了编写公共代码测试的经验，让我们探索为 Android 和 iOS 编写平台特定测试。
+现在您已经具备了为公共代码编写测试的经验，接下来让我们探索为 Android 和 iOS 编写平台特定测试。
 
-要创建 `CurrentRuntime` 实例，请在公共 `CurrentRuntime.kt` 文件中声明如下函数：
+若要创建 `CurrentRuntime` 的实例，请在公共的 `CurrentRuntime.kt` 文件中声明如下函数：
 
 ```kotlin
 expect fun determineCurrentRuntime(): CurrentRuntime
 ```
 
-该函数应对每个受支持的平台具有单独的实现。否则，构建将失败。除了在每个平台上实现此函数外，您还应该提供测试。让我们为 Android 和 iOS 创建它们。
+该函数应该针对每个受支持的平台分别具有单独的实现。否则，构建将失败。
+除了在每个平台上实现此函数之外，您还应该提供测试。让我们为 Android 和 iOS 创建测试。
 
 #### 针对 Android {id="for-android"}
 
-1. 在 `androidMain/kotlin` 目录中，创建一个新的 `org.kmp.testing` 软件包。
-2. 在此软件包中，创建 `AndroidRuntime.kt` 文件，并使用预期函数 `determineCurrentRuntime()` 的实际实现来更新它：
+1. 在 `androidMain/kotlin` 目录下，创建一个新的 `org.kmp.testing` 软件包。
+2. 在此软件包中创建 `AndroidRuntime.kt` 文件，并使用预期函数 `determineCurrentRuntime()` 的实际实现对其进行更新：
 
     ```kotlin
     actual fun determineCurrentRuntime(): CurrentRuntime {
@@ -233,15 +237,16 @@ expect fun determineCurrentRuntime(): CurrentRuntime
     }
     ```
 
-3. 在 `sharedLogic/src` 目录中创建一个测试目录：
+3. 在 `sharedLogic/src` 目录下为测试创建一个目录：
  
    1. 右键点击 `sharedLogic/src` 目录，然后选择 **New | Directory**。IDE 会显示一个选项列表。
-   2. 开始输入 `androidHostTest/kotlin` 路径以缩小选择范围，然后从列表中选择它：
+   2. 开始输入 `androidHostTest/kotlin` 路径以缩小选择范围，然后从列表中选中它：
 
       ![创建 Android 测试目录](create-android-test-dir.png){width=350}
 
-4. 在 `androidHostTest/kotlin` 目录中，创建一个新的 `org.kmp.testing` 软件包。
-5. 在此软件包中，创建 `AndroidRuntimeTest.kt` 文件并使用以下 Android 测试更新它。为了使测试通过，请确保设置运行时的实际名称和版本（但查看测试如何失败也是有用的）：
+4. 在 `androidHostTest/kotlin` 目录下，创建一个新的 `org.kmp.testing` 软件包。
+5. 在此软件包中创建 `AndroidRuntimeTest.kt` 文件，并添加以下 Android 测试进行更新。
+   为了使测试通过，请确保设置运行时的实际名称和版本（但观察测试如何失败也很有用）：
 
     ```kotlin
     import kotlin.test.Test
@@ -258,14 +263,14 @@ expect fun determineCurrentRuntime(): CurrentRuntime
     }
     ```
    
-Android 特定的测试在本地 JVM 上运行，这看起来可能很奇怪。这是因为这些测试在当前机器上作为本地单元测试运行。如 [Android Studio 文档](https://developer.android.com/studio/test/test-in-android-studio)中所述，这些测试与在设备或模拟器上运行的受检测测试不同。
+Android 特定的测试在本地 JVM 上运行可能看起来有些奇怪。这是因为这些测试是作为本地单元测试在当前计算机上运行的。正如 [Android Studio 文档](https://developer.android.com/studio/test/test-in-android-studio)中所述，这些测试不同于在设备或模拟器上运行的插桩测试 (instrumented tests)。
 
-您可以向项目添加其他类型的测试。要了解受检测测试，请参阅此 [Touchlab 指南](https://touchlab.co/understanding-and-configuring-your-kmm-test-suite/)。
+您还可以向项目中添加其他类型的测试。若要了解插桩测试，请参阅这份 [Touchlab 指南](https://touchlab.co/understanding-and-configuring-your-kmm-test-suite/)。
 
 #### 针对 iOS {id="for-ios"}
 
-1. In the `iosMain/kotlin` 目录中，创建一个新的 `org.kmp.testing` 目录。
-2. 在此目录中，创建 `IOSRuntime.kt` 文件，并使用预期函数 `determineCurrentRuntime()` 的实际实现来更新它：
+1. 在 `iosMain/kotlin` 目录下，创建一个新的 `org.kmp.testing` 目录。
+2. 在此目录下创建 `IOSRuntime.kt` 文件，并使用预期函数 `determineCurrentRuntime()` 的实际实现对其进行更新：
 
     ```kotlin
     import kotlin.experimental.ExperimentalNativeApi
@@ -278,13 +283,13 @@ Android 特定的测试在本地 JVM 上运行，这看起来可能很奇怪。�
     }
     ```
 
-3. 在 `sharedLogic/src` 目录中创建一个新目录：
+3. 在 `sharedLogic/src` 目录下创建一个新目录：
    
    1. 右键点击 `sharedLogic/src` 目录，然后选择 **New | Directory**。IDE 会显示一个选项列表。
-   2. 开始输入 `iosTest/kotlin` 路径以缩小选择范围，然后从列表中选择它：
+   2. 开始输入 `iosTest/kotlin` 路径以缩小选择范围，然后从列表中选中它：
 
-4. 在 `iosTest/kotlin` 目录中，创建一个新的 `org.kmp.testing` 目录。
-5. 在此目录中，创建 `IOSRuntimeTest.kt` 文件并使用以下 iOS 测试更新它：
+4. 在 `iosTest/kotlin` 目录下，创建一个新的 `org.kmp.testing` 目录。
+5. 在此目录下创建 `IOSRuntimeTest.kt` 文件，并添加以下 iOS 测试进行更新：
 
     ```kotlin 
     import kotlin.test.Test
@@ -302,15 +307,16 @@ Android 特定的测试在本地 JVM 上运行，这看起来可能很奇怪。�
 
 ### 运行多个测试并分析报告 {id="run-multiple-tests-and-analyze-reports"}
 
-在这个阶段，您已经拥有了公共、Android 和 iOS 实现的代码以及它们的测试。您项目中的目录结构应该如下所示：
+在这个阶段，您已经拥有了公共、Android 和 iOS 实现的代码以及它们的测试。
+项目中的目录结构应如下所示：
 
 ![整个项目结构](code-and-test-structure.png){width=300}
 
-您可以从上下文菜单运行单个测试或使用快捷键。另一个选项是使用 Gradle 任务。例如，如果您运行 `allTests` Gradle 任务，项目中的每个测试都将使用相应的测试运行程序运行：
+您可以从上下文菜单运行单个测试，也可以使用快捷键。另一个选择是使用 Gradle 任务。例如，如果您运行 `allTests` Gradle 任务，项目中的每个测试都将使用相应的测试运行程序运行：
 
 ![Gradle 测试任务](gradle-alltests.png){width=700}
 
-运行测试时，除了 IDE 中的输出外，还会生成 HTML 报告。您可以在 `sharedLogic/build/reports/tests` 目录中找到它们：
+运行测试时，除了 IDE 中的输出之外，还会生成 HTML 报告。您可以在 `sharedLogic/build/reports/tests` 目录下找到它们：
 
 ![多平台测试的 HTML 报告](shared-tests-folder-reports.png){width=300}
 
@@ -321,20 +327,21 @@ Android 特定的测试在本地 JVM 上运行，这看起来可能很奇怪。�
 
 ![多平台测试的 HTML 报告](multiplatform-test-report.png){width=700}
 
-## 在多平台项目中使用测试的规则 {id="rules-for-using-tests-in-multiplatform-projects"}
+## 多平台项目中使用测试的规则 {id="rules-for-using-tests-in-multiplatform-projects"}
 
-您现在已经在 Kotlin Multiplatform 应用程序中创建、配置并执行了测试。在未来的项目中处理测试时，请记住：
+现在，您已经在 Kotlin Multiplatform 应用程序中完成测试的创建、配置和执行。
+在未来的项目中处理测试时，请记住：
 
-* 编写公共代码的测试时，仅使用多平台库，例如 [kotlin.test](https://kotlinlang.org/api/latest/kotlin.test/)。将依赖项添加到 `commonTest` 源集。
-* `kotlin.test` API 中的 `Asserter` 类型只能间接使用。虽然 `Asserter` 实例是可见的，但您不需要在测试中使用它。
-* 始终保持在测试库 API 范围内。幸运的是，编译器和 IDE 会阻止您使用框架特定的功能。
-* 虽然使用哪个框架运行 `commonTest` 中的测试并不重要，但最好使用您打算使用的每个框架运行测试，以检查您的开发环境是否已正确设置。
-* 考虑物理差异。例如，滚动惯性和摩擦值因平台和设备而异，因此设置相同的滚动速度可能会导致不同的滚动位置。请始终在目标平台上测试您的组件以确保预期行为。
-* 编写平台特定代码的测试时，您可以使用相应框架的功能，例如注解和扩展。
-* 您可以从 IDE 运行测试，也可以使用 Gradle 任务。
+* 编写公共代码测试时，仅使用多平台库，例如 [kotlin.test](https://kotlinlang.org/api/latest/kotlin.test/)。请将依赖项添加到 `commonTest` 源集中。
+* 来自 `kotlin.test` API 的 `Asserter` 类型只能间接使用。虽然 `Asserter` 实例可见，但您不需要在测试中直接使用它。
+* 始终保持在测试库 API 范围内。幸运的是，编译器和 IDE 会阻止您使用特定于框架的功能。
+* 尽管使用哪个框架来运行 `commonTest` 中的测试并不重要，但最好使用打算采用的每个框架分别运行测试，以检查开发环境是否设置正确。
+* 考虑物理层面的差异。例如，滚动惯性和摩擦力值因平台和设备而异，因此设置相同的滚动速度可能会导致不同的滚动位置。请始终在目标平台上测试您的组件以确保符合预期行为。
+* 编写平台特定代码的测试时，您可以使用对应框架的功能，例如注解和扩展程序。
+* 您既可以从 IDE 运行测试，也可以使用 Gradle 任务运行测试。
 * 运行测试时，会自动生成 HTML 测试报告。
 
-## 下一步 {id="what-s-next"}
+## 后续步骤 {id="what-s-next"}
 
-* 在[了解多平台项目结构](multiplatform-discover-project.md)中探索多平台项目的布局。
-* 查看 [Kotest](https://kotest.io/)，这是 Kotlin 生态系统提供的另一个多平台测试框架。Kotest 允许以多种风格编写测试，并支持对常规测试的补充方法。其中包括[数据驱动型](https://kotest.io/docs/framework/datatesting/data-driven-testing.html)测试和[基于属性的](https://kotest.io/docs/proptest/property-based-testing.html)测试。
+* 在[了解多平台项目结构](multiplatform-discover-project.md)中探索多平台项目的布局结构。
+* 了解 [Kotest](https://kotest.io/)，这是 Kotlin 生态系统提供的另一个多平台测试框架。Kotest 支持以多种风格编写测试，并支持对常规测试的补充方法。其中包括[数据驱动测试](https://kotest.io/docs/framework/datatesting/data-driven-testing.html)和[基于属性的测试](https://kotest.io/docs/proptest/property-based-testing.html)。

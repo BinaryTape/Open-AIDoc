@@ -2,42 +2,42 @@
 
 <no-index/>
 
-Kotlinを最大限に活用するには、既存のライブラリやAPIを使用して、車輪の再発明を避け、コーディングにより多くの時間を割けるようにしましょう。
+Kotlinを最大限に活用するために、既存のライブラリやAPIを利用して、車輪の再発明に費やす時間を減らし、コーディングにより多くの時間を使いましょう。
 
-ライブラリは、一般的なタスクを簡素化する再利用可能なコードを配布するものです。ライブラリ内には、関連するクラス、関数、ユーティリティをグループ化したパッケージやオブジェクトがあります。ライブラリは、開発者が自身のコードで使用できる関数、クラス、プロパティのセットとしてAPI（Application Programming Interface）を公開します。
+ライブラリは、一般的なタスクを簡素化する再利用可能なコードを配布します。ライブラリ内には、関連するクラス、関数、ユーティリティをグループ化したパッケージやオブジェクトが存在します。ライブラリは、開発者が自身のコード内で利用できる関数、クラス、プロパティのセットとしてAPI（Application Programming Interface）を公開します。
 
 ![KotlinのライブラリとAPI](kotlin-library-diagram.svg){width=600}
 
-Kotlinで何ができるか見ていきましょう。
+Kotlinでどのようなことが可能になるのかを見ていきましょう。
 
 ## 標準ライブラリ {id="the-standard-library"}
 
-Kotlinには、コードを簡潔で表現豊かにするための必須の型、関数、コレクション、ユーティリティを提供する標準ライブラリがあります。標準ライブラリの大部分（[`kotlin` パッケージ](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/)内のすべて）は、明示的にインポートすることなく、どのKotlinファイルでもすぐに利用できます。
+Kotlinには、コードを簡潔かつ表現力豊かにするための基本的な型、関数、コレクション、ユーティリティを提供する標準ライブラリ（standard library）があります。標準ライブラリの大部分（[`kotlin` パッケージ](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/)内のすべて）は、明示的にインポートすることなく、任意のKotlinファイルでそのまま利用できます。
 
 ```kotlin
 fun main() {
     val text = "emosewa si niltoK"
     
-   // 標準ライブラリの reversed() 関数を使用する
+   // 標準ライブラリの reversed() 関数を使用
     val reversedText = text.reversed()
 
-    // 標準ライブラリの print() 関数を使用する
+    // 標準ライブラリの print() 関数を使用
     print(reversedText)
     // Kotlin is awesome
 }
 ```
 {kotlin-runnable="true" id="kotlin-tour-libraries-stdlib"}
 
-ただし、標準ライブラリの一部には、コードで使用する前にインポートが必要なものもあります。 
+ただし、標準ライブラリの一部の機能は、コードで使用する前にインポートが必要です。
 例えば、標準ライブラリの時間計測機能を使用したい場合は、[`kotlin.time` パッケージ](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.time/)をインポートする必要があります。
 
-ファイルの先頭に、`import` キーワードに続けて必要なパッケージを追加します。
+ファイルの先頭に `import` キーワードを追加し、その後に必要なパッケージを記述します。
 
 ```kotlin
 import kotlin.time.*
 ```
 
-アスタリスク `*` はワイルドカードインポートで、そのパッケージ内のすべてのものをインポートするようKotlinに指示します。アスタリスク `*` はコンパニオンオブジェクトには使用できません。代わりに、使用したいコンパニオンオブジェクトのメンバを明示的に宣言する必要があります。
+アスタリスク `*` はワイルドカードインポートで、パッケージ内のすべてをインポートするようKotlinに指示します。コンパニオンオブジェクトに対してアスタリスク `*` を使用することはできません。代わりに、使用したいコンパニオンオブジェクトのメンバーを明示的に宣言する必要があります。
 
 例：
 
@@ -58,34 +58,35 @@ fun main() {
 この例では：
 
 * `Duration` クラスと、そのコンパニオンオブジェクトから `hours` および `minutes` 拡張プロパティをインポートしています。
-* `minutes` プロパティを使用して、`30` を30分の `Duration` に変換しています。
-* `hours` プロパティを使用して、`0.5` を30分の `Duration` に変換しています。
-* 両方の期間が等しいかどうかを確認し、結果を出力しています。
+* `minutes` プロパティを使用して `30` を30分の `Duration` に変換しています。
+* `hours` プロパティを使用して `0.5` を30分の `Duration` に変換しています。
+* 両方のDurationが等しいかどうかをチェックし、結果を出力しています。
 
-### 作る前に探す {id="search-before-you-build"}
+### 作る前に探す（Search before you build） {id="search-before-you-build"}
 
-独自のコードを書くと決める前に、探しているものがすでに存在するかどうかを標準ライブラリで確認してください。以下は、標準ライブラリがすでに多数のクラス、関数、プロパティを提供している分野のリストです。
+自分でコードを書く前に、求めているものがすでに存在しないか標準ライブラリを確認してください。
+以下は、標準ライブラリが多数のクラス、関数、プロパティをあらかじめ提供している分野のリストです。
 
-* [コレクション](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/)
-* [シーケンス](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.sequences/)
-* [文字列操作](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/)
-* [時間管理](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.time/)
+* [コレクション（Collections）](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/)
+* [シーケンス（Sequences）](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.sequences/)
+* [文字列操作（String manipulation）](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/)
+* [時間管理（Time management）](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.time/)
 
-標準ライブラリに他に何があるか詳しく知るには、[APIリファレンス](https://kotlinlang.org/api/core/kotlin-stdlib/)を探索してください。
+標準ライブラリに他にどのようなものが含まれているかを詳しく知るには、その[APIリファレンス](https://kotlinlang.org/api/core/kotlin-stdlib/)を参照してください。
 
 ## Kotlinライブラリ {id="kotlin-libraries"}
 
-標準ライブラリは多くの一般的なユースケースをカバーしていますが、対応していないものもあります。幸いなことに、Kotlinチームやコミュニティは標準ライブラリを補完するために幅広いライブラリを開発しています。例えば、[`kotlinx-datetime`](https://kotlinlang.org/api/kotlinx-datetime/) は、異なるプラットフォーム間で時間を管理するのに役立ちます。
+標準ライブラリは多くの一般的なユースケースをカバーしていますが、対応していないものもあります。幸いなことに、Kotlinチームやコミュニティは標準ライブラリを補完する幅広いライブラリを開発しています。例えば、[`kotlinx-datetime`](https://kotlinlang.org/api/kotlinx-datetime/)は異なるプラットフォーム間での時間管理を支援します。
 
-有用なライブラリは、[検索プラットフォーム](https://klibs.io/)で見つけることができます。それらを使用するには、依存関係やプラグインの追加といった追加の手順が必要です。各ライブラリには、Kotlinプロジェクトにそれを含める方法が記載されたGitHubリポジトリがあります。
+便利なライブラリは[検索プラットフォーム](https://klibs.io/)で見つけることができます。それらを使用するには、依存関係やプラグインを追加するなどの追加手順が必要です。各ライブラリには、Kotlinプロジェクトにそれを含める方法を説明したGitHubリポジトリがあります。
 
-ライブラリを追加したら、その中の任意のパッケージをインポートできます。以下は、ニューヨークの現在時刻を確認するために `kotlinx-datetime` パッケージをインポートする例です。
+ライブラリを追加したら、その中の任意のパッケージをインポートできます。以下は、ニューヨークの現在時刻を取得するために `kotlinx-datetime` パッケージをインポートする例です。
 
 ```kotlin
 import kotlinx.datetime.*
 
 fun main() {
-    val now = Clock.System.now() // 現在の瞬間を取得
+    val now = Clock.System.now() // 現在のインスタントを取得
     println("Current instant: $now")
 
     val zone = TimeZone.of("America/New_York")
@@ -98,41 +99,41 @@ fun main() {
 この例では：
 
 * `kotlinx.datetime` パッケージをインポートしています。
-* `Clock.System.now()` 関数を使用して、現在時刻を含む `Instant` クラスのインスタンスを作成し、その結果を `now` 変数に代入しています。
+* `Clock.System.now()` 関数を使用して現在時刻を含む `Instant` クラスのインスタンスを作成し、その結果を `now` 変数に代入しています。
 * 現在時刻を出力しています。
-* `TimeZone.of()` 関数を使用してニューヨークのタイムゾーンを見つけ、その結果を `zone` 変数に代入しています。
+* `TimeZone.of()` 関数を使用してニューヨークのタイムゾーンを取得し、その結果を `zone` 変数に代入しています。
 * 現在時刻を含むインスタンスに対して `.toLocalDateTime()` 関数を呼び出し、引数としてニューヨークのタイムゾーンを渡しています。
-* 結果を `localDateTime` 変数に代入しています。
-* ニューヨークのタイムゾーンに調整された時刻を出力しています。
+* その結果を `localDateTime` 変数に代入しています。
+* ニューヨークのタイムゾーンに合わせて調整された時刻を出力しています。
 
-> この例で使用されている関数やクラスの詳細については、[APIリファレンス](https://kotlinlang.org/api/kotlinx-datetime/kotlinx-datetime/kotlinx.datetime/)を参照してください。
+> この例で使用している関数やクラスの詳細については、[APIリファレンス](https://kotlinlang.org/api/kotlinx-datetime/kotlinx-datetime/kotlinx.datetime/)を参照してください。
 >
 {style="tip"}
 
-## APIへのオプトイン {id="opt-in-to-apis"}
+## APIのオプトイン {id="opt-in-to-apis"}
 
-ライブラリの作者は、特定のAPIをコードで使用する前にオプトイン（承認）が必要であるとマークする場合があります。これは通常、APIがまだ開発中であり、将来変更される可能性がある場合に行われます。オプトインしない場合、以下のような警告やエラーが表示されます。
+ライブラリの作者は、コードで使用する前にオプトイン（明示的な利用許可）を要求するように特定のAPIをマークする場合があります。これは通常、APIがまだ開発中であり、将来変更される可能性がある場合に行われます。オプトインしない場合、以下のような警告またはエラーが表示されます。
 
 ```text
 This declaration needs opt-in. Its usage should be marked with '@...' or '@OptIn(...)'
 ```
 
-オプトインするには、`@OptIn` と書き、その後にAPIを分類するクラス名を括弧で囲み、末尾に2つのコロン `::` と `class` を付けます。
+オプトインするには、`@OptIn` と記述し、続けてAPIを分類するクラス名を丸括弧で囲み、末尾に2つのコロン `::` と `class` を付けます。
 
-例えば、標準ライブラリの `uintArrayOf()` 関数は、[APIリファレンス](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/to-u-int-array.html)に示されているように、`@ExperimentalUnsignedTypes` に該当します。
+例えば、標準ライブラリの `uintArrayOf()` 関数は、[APIリファレンス](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/to-u-int-array.html)に示されているように `@ExperimentalUnsignedTypes` に該当します。
 
 ```kotlin
 @ExperimentalUnsignedTypes
 inline fun uintArrayOf(vararg elements: UInt): UIntArray
 ```
 
-コード内でのオプトインは以下のようになります。
+コード内でのオプトインは次のようになります：
 
 ```kotlin
 @OptIn(ExperimentalUnsignedTypes::class)
 ```
 
-以下は、`uintArrayOf()` 関数を使用して符号なし整数の配列を作成し、その要素の1つを変更するためにオプトインする例です。
+以下は、`uintArrayOf()` 関数を使用して符号なし整数の配列を作成し、その要素の1つを変更するためにオプトインする例です：
 
 ```kotlin
 @OptIn(ExperimentalUnsignedTypes::class)
@@ -148,36 +149,35 @@ fun main() {
 ```
 {kotlin-runnable="true" id="kotlin-tour-libraries-apis"}
 
-これはオプトインの最も簡単な方法ですが、他にも方法はあります。詳細については、[オプトイン要件](opt-in-requirements.md)を参照してください。
+これは最も簡単なオプトインの方法ですが、他にも方法があります。詳細については、[オプトインの要件](opt-in-requirements.md)を参照してください。
 
 ## 練習問題 {completion-point="true" id="practice"}
 
-### 演習 1 {initial-collapse-state="collapsed" collapsible="true" id="libraries-exercise-1"}
+<deflist appearance="clear" collapsible="true" numbered="true">
+<def title="複利の計算" id="libraries-exercise-1">
 
-ユーザーが投資の将来価値を計算するのを助ける財務アプリケーションを開発しています。複利を計算する公式は以下の通りです。
+ユーザーが投資の将来価値を計算できるように支援する金融アプリケーションを開発しています。複利を計算する計算式は以下のとおりです。
 
 <math>A = P \times (1 + \displaystyle\frac{r}{n})^{nt}</math>
 
 ここで：
 
-* `A` は、利息適用後の累積金額（元本 + 利息）。
-* `P` は元本（初期投資額）。
-* `r` は年利率（小数）。
-* `n` は1年あたりの複利計算回数。
-* `t` は投資期間（年）。
+* `A` は利息発生後の元利合計額（元金 + 利息）。
+* `P` は元金額（初期投資額）。
+* `r` は年利（小数）。
+* `n` は1年あたりの複利計算頻度（回数）。
+* `t` は資金が投資される期間（年単位）。
 
-コードを更新して以下を行ってください。
+次の手順に従ってコードを更新してください。
 
 1. [`kotlin.math` パッケージ](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.math/)から必要な関数をインポートします。
-2. 複利適用後の最終的な金額を計算する処理を `calculateCompoundInterest()` 関数の本体に追加します。
-
-|--|--|
+2. 複利適用後の最終金額を計算する処理を `calculateCompoundInterest()` 関数の本体に追加します。
 
 ```kotlin
-// ここにコードを書いてください
+// ここにコードを記述してください
 
 fun calculateCompoundInterest(P: Double, r: Double, n: Int, t: Int): Double {
-    // ここにコードを書いてください
+    // ここにコードを記述してください
 }
 
 fun main() {
@@ -193,7 +193,6 @@ fun main() {
 ```
 {validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-libraries-exercise-1"}
 
-|---|---|
 ```kotlin
 import kotlin.math.*
 
@@ -213,18 +212,17 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="解答例" id="kotlin-tour-libraries-solution-1"}
 
-### 演習 2 {initial-collapse-state="collapsed" collapsible="true" id="libraries-exercise-2"}
+</def>
+<def title="データ処理にかかる時間の測定" id="libraries-exercise-2">
 
-プログラム内で複数のデータ処理タスクを実行するのにかかる時間を計測したいと考えています。コードを更新して、[`kotlin.time`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.time/) パッケージから正しいインポート文と関数を追加してください。
-
-|---|---|
+プログラム内の複数のデータ処理タスクにかかる時間を測定したいと考えています。コードを更新して、[`kotlin.time`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.time/) パッケージから正しいインポート文と関数を追加してください。
 
 ```kotlin
-// ここにコードを書いてください
+// ここにコードを記述してください
 
 fun main() {
-    val timeTaken = /* ここにコードを書いてください */ {
-        // 何らかのデータ処理をシミュレート
+    val timeTaken = /* ここにコードを記述してください */ {
+        // データ処理のシミュレーション
         val data = List(1000) { it * 2 }
         val filteredData = data.filter { it % 3 == 0 }
 
@@ -238,13 +236,12 @@ fun main() {
 ```
 {validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-libraries-exercise-2"}
 
-|---|---|
 ```kotlin
 import kotlin.time.measureTime
 
 fun main() {
     val timeTaken = measureTime {
-        // 何らかのデータ処理をシミュレート
+        // データ処理のシミュレーション
         val data = List(1000) { it * 2 }
         val filteredData = data.filter { it % 3 == 0 }
 
@@ -258,27 +255,31 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="解答例" id="kotlin-tour-libraries-solution-2"}
 
-### 演習 3 {initial-collapse-state="collapsed" collapsible="true" id="properties-exercise-3"}
+</def>
+<def title="実験的APIへのオプトイン" id="libraries-exercise-3">
 
-最新のKotlinリリースで利用可能な標準ライブラリの新機能があります。それを試してみたいのですが、オプトインが必要です。その機能は [`@ExperimentalStdlibApi`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-experimental-stdlib-api/) に該当します。コード内でのオプトインはどのようになるべきですか？
+最新のKotlinリリースで利用可能な新機能が標準ライブラリに追加されました。それを試してみたいのですが、オプトインが必要です。この機能は [`@ExperimentalStdlibApi`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-experimental-stdlib-api/) に該当します。
+コード内のオプトインはどのように記述すべきでしょうか？
 
-|---|---|
 ```kotlin
 @OptIn(ExperimentalStdlibApi::class)
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="解答例" id="kotlin-tour-libraries-solution-3"}
 
+</def>
+</deflist>
+
 ## 次のステップ {id="what-s-next"}
 
-おめでとうございます！中級編のツアーを完了しました。今回の体験について[フィードバックを共有](https://surveys.hotjar.com/bf4ce865-99ce-4fc1-b107-e9b16bc31592)していただけませんか？ 
+おめでとうございます！中級ツアーを完了しました！体験に関する[フィードバックを共有](https://surveys.hotjar.com/bf4ce865-99ce-4fc1-b107-e9b16bc31592)していただけませんか？
 
-次のステップとして、人気のKotlinアプリケーションのチュートリアルをチェックしてください。
+次のステップとして、人気のあるKotlinアプリケーションのチュートリアルをご覧ください。
 
 <p></p> <!-- workaround for MRK057: Paragraph can only contain inline elements -->
 <panels columns="2" id="kotlin-tour-whats-next">
     <panel>
         <title>バックエンド向けKotlin</title>
-        <p>Spring BootとKotlinでバックエンドアプリケーションを作成します。</p>
+        <p>Spring BootとKotlinを使用してバックエンドアプリケーションを作成します。</p>
         <a href="jvm-create-project-with-spring-boot.md" as="button" icon="arrow-right" icon-position="right" id="kotlin-tour-backend-tutorial">開始する</a>
     </panel>
     <panel>

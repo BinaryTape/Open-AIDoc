@@ -1,49 +1,48 @@
 [//]: # (title: Kotlin Multiplatformとは)
-[//]: # (description: Kotlin Multiplatformは、JetBrainsによるオープンソーステクノロジーで、Android、iOS、デスクトップ、ウェブ、サーバー間でのコード共有を可能にします。)
+[//]: # (description: Kotlin Multiplatformは、ネイティブ開発の利点を維持しながら、Android、iOS、デスクトップ、ウェブ、サーバー間でコードを共有できるようにするJetBrainsのオープンソーステクノロジーです。)
 
-Kotlin Multiplatform (KMP) は、JetBrainsが提供するオープンソースのテクノロジーです。ネイティブ開発の利点を維持しながら、Android、iOS、デスクトップ、ウェブ、サーバー間でコードを共有することを可能にします。
+Kotlin Multiplatform（KMP）は、ネイティブ開発の利点を維持しながら、Android、iOS、デスクトップ、ウェブ、サーバー間でコードを共有できるようにするJetBrainsのオープンソーステクノロジーです。
 
-Compose Multiplatformを使用すると、UIコードも複数のプラットフォーム間で共有でき、コードの再利用性を最大限に高めることができます。
+Compose Multiplatformを使用すれば、UIコードも複数のプラットフォーム間で共有でき、コードの再利用性を最大限に高めることができます。
 
-## なぜ企業はKMPを選ぶのか {id="why-companies-choose-kmp"}
+## 企業がKMPを選択する理由 {id="why-companies-choose-kmp"}
 
-### コスト効率と迅速なデリバリー {id="cost-efficiency-and-faster-delivery"}
+### コスト効率と迅速なリリース {id="cost-efficiency-and-faster-delivery"}
 
-Kotlin Multiplatformは、技術面と組織面の両方のプロセスを合理化するのに役立ちます。
+Kotlin Multiplatformは、技術的および組織的なプロセスの両方を効率化するのに役立ちます。
 
-* ロジックやUIコードをプラットフォーム間で共有することで、重複を減らし、メンテナンスコストを削減できます。これにより、複数のプラットフォームで機能を同時にリリースすることも可能になります。
-* 統一されたロジックが共有コード内でアクセス可能になるため、チームのコラボレーションが容易になります。チームメンバー間のナレッジ共有がスムーズになり、各プラットフォーム専用チーム間での作業の重複を減らすことができます。
+* ロジックやUIコードをプラットフォーム間で共有することで、重複作業やメンテナンスコストを削減できます。これにより、複数のプラットフォームで機能を同時にリリースすることも可能になります。
+* 共有コードによってロジックが一元化されるため、チーム間のコラボレーションが容易になり、チームメンバー間でのナレッジの共有がスムーズになり、各プラットフォーム専門チーム間での重複した作業を削減できます。
 
-市場投入までの時間の短縮に加え、KMPの採用後にユーザーの **55%** がコラボレーションの向上を報告し、チームの **65%** がパフォーマンスと品質の向上を報告しています（KMPアンケート 2024年第2四半期）。
+市場投入までの期間短縮に加え、KMPの導入後にユーザーの**55%**がコラボレーションの向上を報告し、チームの**65%**がパフォーマンスと品質の向上を報告しています（KMP Survey Q2 2024より）。
 
-KMPは、スタートアップからグローバル企業まで、あらゆる規模の組織のプロダクション環境で使用されています。Google、Duolingo、Forbes、Philips、McDonald's、Bolt、H&M、Baidu、Kuaishou、Bilibiliなどの企業が、その柔軟性、ネイティブのパフォーマンス、ネイティブなユーザーエクスペリエンスを提供する能力、コスト効率、および段階的な導入のサポートを理由にKMPを採用しています。[KMPを採用している企業の詳細はこちら](https://kotlinlang.org/case-studies/?type=multiplatform)をご覧ください。
+KMPは、スタートアップからグローバル企業に至るまで、あらゆる規模の組織の本番環境で使用されています。Google、Duolingo、Forbes、Philips、McDonald's、Bolt、H&M、Baidu、Kuaishou、Bilibiliといった企業が、その柔軟性、ネイティブパフォーマンス、ネイティブなユーザー体験の提供能力、コスト効率、そして段階的な導入のしやすさを評価してKMPを採用しています。[KMPを採用した企業についての詳細](https://kotlinlang.org/case-studies/?type=multiplatform)。
 
 ### コード共有の柔軟性 {id="flexibility-of-code-sharing"}
 
-自分のスタイルに合わせてコードを共有できます。ネットワークやストレージなどの独立したモジュールを共有し、時間の経過とともに共有コードを段階的に拡張していくことが可能です。
-また、UIはネイティブに保ちつつビジネスロジックをすべて共有したり、Compose Multiplatformを使用してUIを段階的に移行したりすることもできます。
+状況に合わせて柔軟にコードを共有できます。ネットワークやストレージなどの独立したモジュールだけを共有し、時間をかけて徐々に共有コードを拡張していくことが可能です。また、UIはネイティブのまま維持してビジネスロジックのみをすべて共有することも、Compose Multiplatformを使用して段階的にUIを移行することもできます。
 
-![段階的なKMP導入の図：ロジックの一部を共有しUIは共有しない、UIを除いたすべてのロジックを共有する、ロジックとUIを共有する](kmp-graphic.png){width="700"}
+![段階的なKMP導入の図解: ロジックの一部を共有しUIは共有しない、UIなしですべてのロジックを共有する、ロジックとUIを両方共有する](kmp-graphic.png){width="700"}
 
-### iOSでのネイティブな操作感 {id="native-feel-on-ios"}
+### iOSにおけるネイティブな使用感 {id="native-feel-on-ios"}
 
-SwiftUIやUIKitを使用してUIを完全に構築することも、Compose Multiplatformを使用してAndroidとiOSで統一されたエクスペリエンスを作成することも、必要に応じてネイティブUIコードと共有UIコードを組み合わせることもできます。
+SwiftUIやUIKitを使用してUIを完全に構築することも、Compose MultiplatformでAndroidとiOSで統一された体験を作成することも、必要に応じてネイティブUIコードと共有UIコードを組み合わせることもできます。
 
-どのアプローチを採用しても、各プラットフォームでネイティブに感じられるアプリを作成できます。
+どのアプローチを選択しても、各プラットフォームでネイティブに感じられるアプリを作成できます。
 
 <video src="https://www.youtube.com/watch?v=LB5a2FRrT94" width="700"/>
 
-### ネイティブのパフォーマンス {id="native-performance"}
+### ネイティブパフォーマンス {id="native-performance"}
 
-Kotlin Multiplatformは [Kotlin/Native](https://kotlinlang.org/docs/native-overview.html) を活用してネイティブバイナリを生成し、iOSのように仮想マシンが望ましくない、あるいは不可能な場所でプラットフォームAPIに直接アクセスします。
+Kotlin Multiplatformは[Kotlin/Native](https://kotlinlang.org/docs/native-overview.html)を活用してネイティブバイナリを生成し、iOSなどの仮想マシンが望ましくない、または利用できない環境でプラットフォームAPIに直接アクセスします。
 
-これにより、プラットフォームに依存しないコードを記述しながら、ネイティブに近いパフォーマンスを実現できます。
+これにより、プラットフォームに依存しないコードを記述しながら、ほぼネイティブと同等のパフォーマンスを実現できます。
 
-![iPhone 13およびiPhone 16のiOSにおけるCompose MultiplatformとSwiftUIの同等のパフォーマンスを示すグラフ](cmp-ios-performance.png){width="700"}
+![iPhone 13およびiPhone 16におけるiOS上のCompose MultiplatformとSwiftUIの同等のパフォーマンスを示すグラフ](cmp-ios-performance.png){width="700"}
 
-### シームレスなツール環境 {id="seamless-tooling"}
+### シームレスな開発ツール {id="seamless-tooling"}
 
-IntelliJ IDEA and Android Studioは、[Kotlin Multiplatform IDEプラグイン](https://plugins.jetbrains.com/plugin/14936-kotlin-multiplatform)によって、共通UIプレビュー、[Compose Multiplatformのホットリロード](compose-hot-reload.md)、言語をまたいだナビゲーション、リファクタリング、そしてKotlinとSwiftコード間のデバッグといった、スマートなIDEサポートをKMPに提供します。
+IntelliJ IDEAとAndroid Studioは、[Kotlin Multiplatform IDEプラグイン](https://plugins.jetbrains.com/plugin/14936-kotlin-multiplatform)によるKMP向けのスマートなIDEサポートを提供しており、共通UIプレビュー、[Compose Multiplatform向けのホットリロード](compose-hot-reload.md)、言語間のナビゲーション、リファクタリング、KotlinコードとSwiftコードを横断したデバッグなどが利用できます。
 
 <video src="https://youtu.be/ACmerPEQAWA" width="700"/>
 
@@ -53,38 +52,38 @@ JetBrainsのAIコーディングエージェントである[Junie](https://jetbr
 
 ## Kotlin Multiplatformのユースケースを見る {id="discover-kotlin-multiplatform-use-cases"}
 
-多くの企業や開発者が、Kotlinコードの共有によってどのようなメリットをすでに享受しているかを確認してください。
+企業や開発者がKotlinコードの共有によってどのようにメリットを享受しているかをご覧ください。
 
-* [ケーススタディのページ](https://kotlinlang.org/case-studies/?type=multiplatform)で、企業がどのようにKMPを既存のコードベースに正常に導入したかを確認できます。
-* [厳選されたサンプルリスト](multiplatform-samples.md)や、GitHubの [kotlin-multiplatform-sample](https://github.com/topics/kotlin-multiplatform-sample) トピックで、幅広いサンプルアプリをチェックしてください。
+* [ケーススタディページ](https://kotlinlang.org/case-studies/?type=multiplatform)で、企業が自社のコードベースにどのようにKMPを導入して成功を収めたかを確認できます。
+* [厳選されたサンプルリスト](multiplatform-samples.md)やGitHubの[kotlin-multiplatform-sample](https://github.com/topics/kotlin-multiplatform-sample)トピックで、幅広いサンプルアプリをチェックしてください。
 
 ## 基本を学ぶ {id="learn-the-basics"}
 
-KMPの動作をすぐに確認するには、[クイックスタート](quickstart.md)を試してみてください。環境をセットアップし、さまざまなプラットフォームでサンプルアプリケーションを実行します。
+KMPの動作をすばやく体験するには、[クイックスタート](quickstart.md)をお試しください。環境をセットアップし、さまざまなプラットフォームでサンプルアプリケーションを実行できます。
 
-ユースケースを選択する
-: * プラットフォーム間でUIとビジネスロジックの両方のコードを共有するアプリを作成するには、[ロジックとUIの共有チュートリアル](compose-multiplatform-create-first-app.md)に従ってください。
-  * Androidアプリをマルチプラットフォームアプリに変換する方法については、[移行チュートリアル](multiplatform-integrate-in-existing-app.md)を確認してください。
-  * UIの実装を共有せずに一部のコードを共有する方法については、[ロジック共有チュートリアル](multiplatform-create-first-app.md)に従ってください。
+ユースケースの選択
+: * プラットフォーム間でUIとビジネスロジックの両方のコードを共有するアプリを作成するには、[ロジックとUIの共有チュートリアル](compose-multiplatform-new-project.md)に従ってください。
+  * Androidアプリをマルチプラットフォームアプリに変換する方法を確認するには、[移行チュートリアル](multiplatform-integrate-in-existing-app.md)を参照してください。
+  * UIの実装を共有せずに一部のコードのみを共有する方法を確認するには、[ロジック共有のチュートリアル](multiplatform-upgrade-app.md)に従ってください。
 
-技術的な詳細を掘り下げる
+技術的な詳細を深く知る
 : * まずは[基本的なプロジェクト構造](multiplatform-discover-project.md)から始めましょう。
-  * 利用可能な[コード共有の仕組み](multiplatform-share-on-platforms.md)について学びます。
-  * KMPプロジェクトで[依存関係がどのように機能するか](multiplatform-add-dependencies.md)を確認してください。
-  * さまざまな [iOSとの統合方法](multiplatform-ios-integration-overview.md)を検討してください。
-  * KMPがどのように[コードをコンパイル](multiplatform-configure-compilations.md)し、さまざまなターゲット向けに[バイナリをビルド](multiplatform-build-native-binaries.md)するかについて学びます。
-  * [マルチプラットフォームアプリの公開](multiplatform-publish-apps.md)または[マルチプラットフォームライブラリの公開](multiplatform-publish-lib-setup.md)について読んでください。
+  * 利用可能な[コード共有メカニズム](multiplatform-share-on-platforms.md)について学びます。
+  * KMPプロジェクトで[依存関係がどのように機能するか](multiplatform-add-dependencies.md)を確認します。
+  * さまざまな[iOS連携方法](multiplatform-ios-integration-overview.md)を検討します。
+  * KMPがさまざまなターゲット向けに[コードをコンパイル](multiplatform-configure-compilations.md)し、[バイナリをビルド](multiplatform-build-native-binaries.md)する方法を学びます。
+  * [マルチプラットフォームアプリの公開](multiplatform-publish-apps.md)や[マルチプラットフォームライブラリの公開](multiplatform-publish-lib-setup.md)について読みます。
 
-## Kotlin Multiplatformライブラリのエコシステムを探索する {id="explore-the-kotlin-mutliplatform-library-ecosystem"}
+## Kotlin Multiplatformライブラリエコシステムの探索 {id="explore-the-kotlin-mutliplatform-library-ecosystem"}
 
-ネットワーク、ストレージ、依存関係注入（DI）、テスト、UI、シリアライズなど、数千ものマルチプラットフォーム向けライブラリが利用可能です。
+ネットワーク、ストレージ、依存性注入（DI）、テスト、UI、シリアライゼーションなど、数千ものマルチプラットフォームライブラリが利用可能です。
 
-JetBrainsが運営する検索プラットフォーム [klibs.io](https://klibs.io) で、これらのライブラリを検索できます。
+JetBrainsが運営する検索プラットフォーム[klibs.io](https://klibs.io)で探してみてください。
 
-## Kotlin Multiplatformを大規模に導入する {id="adopt-kotlin-multiplatform-at-scale"}
+## Kotlin Multiplatformの大規模導入 {id="adopt-kotlin-multiplatform-at-scale"}
 
-チームにクロスプラットフォームフレームワークを導入することは、挑戦となる場合があります。クロスプラットフォーム開発のメリットや潜在的な問題の解決策については、以下のハイレベルな概要をご覧ください。
+チームでクロスプラットフォームフレームワークを採用することは、大きな挑戦になり得ます。そのメリットや潜在的な問題の解決策について学ぶには、クロスプラットフォーム開発の概要をご覧ください。
 
 * [クロスプラットフォームモバイル開発とは？](cross-platform-mobile-development.topic): クロスプラットフォームアプリケーションのさまざまなアプローチと実装の概要を提供します。
 * [チームにマルチプラットフォームモバイル開発を導入する方法](multiplatform-introduce-your-team.md): チームにクロスプラットフォーム開発を導入するための戦略を提案します。
-* [Kotlin Multiplatformを採用してプロジェクトを強化すべき10の理由](multiplatform-reasons-to-try.md): クロスプラットフォームソリューションとしてKotlin Multiplatformを採用する理由を列挙しています。
+* [Kotlin Multiplatformを採用してプロジェクトを加速させる10の理由](multiplatform-reasons-to-try.md): クロスプラットフォームソリューションとしてKotlin Multiplatformを採用すべき理由を挙げています。

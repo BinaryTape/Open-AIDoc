@@ -1,67 +1,65 @@
 [//]: # (title: ライブラリをnpmに公開する – チュートリアル)
 
 <tldr>
-<p><a href="https://npm-publish.petuska.dev/latest/">npm-publish Gradleプラグイン</a>を使用して、手動またはGitHub ActionsでKotlinマルチプラットフォームライブラリをnpmに公開します。</p>
+<p><a href="https://npm-publish.petuska.dev/latest/">npm-publish Gradle プラグイン</a>を使用して、Kotlin Multiplatformライブラリを手動またはGitHub Actionsを使ってnpmに公開します。</p>
 </tldr>
 
-ライブラリを公開するには、以下の準備が必要です：
+ライブラリを公開するには、以下の手順が必要です。
 
-1. [npmのアカウント](https://docs.npmjs.com/creating-a-new-npm-user-account)と[アクセストークン](https://docs.npmjs.com/creating-and-viewing-access-tokens)を含む、認証情報を準備する。
-2. Kotlinマルチプラットフォームプロジェクトで公開用プラグインを設定する。
-3. 公開用プラグインに認証情報を提供するか、継続的インテグレーション（CI）用に信頼されたパブリッシャー（Trusted Publisher）を設定する。
-4. 手動またはCIを使用して、公開タスクを実行する。
+1. [npmのアカウント](https://docs.npmjs.com/creating-a-new-npm-user-account)や[アクセストークン](https://docs.npmjs.com/creating-and-viewing-access-tokens)などの認証情報を準備する。
+2. Kotlin Multiplatformプロジェクトで公開プラグインを設定する。
+3. 公開プラグインに認証情報を提供するか、継続的インテグレーション（CI）用のTrusted Publisherを設定する。
+4. 手動またはCIを使用して公開タスクを実行する。
 
-このチュートリアルでは、プロジェクトのホストにGitHubを使用し、GitHub Actions経由でCIを実行します。
+このチュートリアルでは、プロジェクトのホスティングにGitHubを使用し、GitHub Actions経由でCIを実行します。
 
 ## サンプルライブラリ {id="sample-library"}
 
-[サンプルライブラリプロジェクト](https://github.com/Kotlin/kotlin-multiplatform-web-library)を使用して、
-実際に動作する設定を確認しながら進めることができます。
+実際の動作する設定を確認しながら進めるために、[サンプルライブラリプロジェクト](https://github.com/Kotlin/kotlin-multiplatform-web-library)を利用できます。
 
-コードを再利用する場合は、必ず**すべての例の値を、ご自身のプロジェクト固有の値に置き換えてください**。
+コードを再利用する場合は、**すべてのサンプル値を実際のプロジェクトに応じた値に置き換えてください**。
 
 ## アカウントと認証情報の準備 {id="prepare-accounts-and-credentials"}
 
 npmに公開するには、[npmポータルにサインイン](https://www.npmjs.com/login)している必要があります。
 
-このチュートリアルでは、手動公開の設定を行うために「組織（Organization）」と「アクセストークン」が必要になります。
+このチュートリアルでは、手動公開を設定するためにOrganization（組織）とアクセストークンが必要です。
 
-### シンプルな組織の作成 {id="create-a-simple-organization"}
+### シンプルなOrganizationの作成 {id="create-a-simple-organization"}
 
-このチュートリアルでは、名前の競合を避けるために、npmの組織（Organization）の下でライブラリを公開します。
+このチュートリアルでは、名前の衝突を避けるためにnpmのOrganization配下にライブラリを公開します。
 
-新しい組織を作成するには、[npmのドキュメント](https://docs.npmjs.com/creating-an-organization)に従ってください。
+新しいOrganizationを作成するには、[npmのドキュメント](https://docs.npmjs.com/creating-an-organization)に従ってください。
 
 ### アクセストークンの生成 {id="generate-an-access-token"}
 
-手動でnpmに公開するには、新しく作成した組織の下でパッケージを公開することを許可するアクセストークンが必要です。
+手動でnpmに公開するには、新しく作成したOrganization配下にパッケージを公開できるアクセストークンが必要です。
 トークンを生成するには、[npmのガイド](https://docs.npmjs.com/creating-and-viewing-access-tokens)に従ってください。
 
-このチュートリアルでは、簡略化されたセキュリティ設定を使用します：
+このチュートリアルでは、簡略化したセキュリティ設定を使用します。
 * **Bypass two-factor authentication (2FA)** オプションを有効にします。
-* トークンの一般権限と組織権限の両方を **Read and write** に設定します。
+* トークンの全般的な権限（general permissions）とOrganizationの権限の両方を **Read and write** に設定します。
 
 ## ライブラリプロジェクトの設定 {id="configure-the-library-project"}
 
-[サンプルプロジェクト](https://github.com/Kotlin/kotlin-multiplatform-web-library)を使用する場合は、
-公開前にデフォルトの名前を更新してください。
-これには以下が含まれます：
+[サンプルプロジェクト](https://github.com/Kotlin/kotlin-multiplatform-web-library)を使用する場合は、公開前にデフォルトの名前を更新してください。
+これには以下が含まれます。
 
-* ライブラリモジュールの名前。
-* `settings.gradle.kts` ファイルで設定されているプロジェクト名。
+* ライブラリモジュールの名前
+* `settings.gradle.kts` ファイルで設定されているプロジェクト名
 
-名前の設定が完了したら、次の手順に従って公開の設定を行います。
+名前を設定したら、次の手順に従って公開の設定を行います。
 
-### 公開用プラグインのセットアップ {id="set-up-the-publishing-plugin"}
+### 公開プラグインの設定 {id="set-up-the-publishing-plugin"}
 
 このチュートリアルでは、npmへの公開を支援する公式の [npm-publish プラグイン](https://github.com/Kotlin/npm-publish) を使用します。
 プラグインの詳細や利用可能な設定オプションについては、[プラグインのドキュメント](https://npm-publish.petuska.dev)を参照してください。
 
-Kotlinマルチプラットフォームプロジェクトにプラグインを追加します：
+Kotlin Multiplatformプロジェクトにプラグインを追加します。
 
 1. ライブラリモジュールの `build.gradle.kts` ファイルを開きます。
 
-2. `plugins {}` ブロックに以下の行を追加します：
+2. `plugins {}` ブロックに次の行を追加します。
 
     ```kotlin
     // <module directory>/build.gradle.kts
@@ -75,10 +73,10 @@ Kotlinマルチプラットフォームプロジェクトにプラグインを�
     > 
     {style="note"}
 
-3. 以下の設定を追加します。
-   ご自身のライブラリに合わせて値をカスタマイズしてください。
+3. 次の設定を追加します。
+   ライブラリに応じた値にカスタマイズしてください。
    必須のパラメータは `organization`、`authToken`、`packageName`、`version` のみです。
-   その他は拡張例として示しています：
+   残りは拡張例として記載しています。
 
     ```kotlin
     // <module directory>/build.gradle.kts
@@ -125,56 +123,53 @@ Kotlinマルチプラットフォームプロジェクトにプラグインを�
     }
     ```
 
-    > これを設定するために、[Gradle プロパティ](https://docs.gradle.org/current/userguide/build_environment.html)を使用することもできます。
+    > これを設定するために、[Gradleプロパティ](https://docs.gradle.org/current/userguide/build_environment.html)を使用することもできます。
     > 
     {style="tip"}
 
-`npmPublish {}` ブロック内の重要な設定は以下の通りです：
+`npmPublish {}` ブロックの重要な設定は以下のとおりです。
 
-* `organization` パラメータと `registries {}` ブロックは認証の詳細を指定します。
-  このケースでは、メインのnpmレジストリを使用し、公開タスク実行時にトークンを保持すべき環境変数 `NPM_TOKEN` の名前を指定しています。
-* `packageName` と `version` パラメータは必須のパッケージオプションを定義します：
-  * `version` パラメータを省略すると、モジュールのバージョンがデフォルト値として使用されます。
-  * `packageName` パラメータを省略すると、モジュールの名前がデフォルト値として使用されます。
-* `packageJson {}` ブロックは様々なメタデータを保持します。
+* `organization` パラメータと `registries {}` ブロックで認証の詳細を指定します。
+  ここではメインのnpmレジストリと、公開タスク実行時にトークンを保持する `NPM_TOKEN` 環境変数の名前を使用します。
+* `packageName` パラメータと `version` パラメータは、必須のパッケージオプションを定義します。
+  * `version` パラメータは省略可能で、省略した場合はモジュールのバージョンがデフォルト値として使用されます。
+  * `packageName` パラメータは省略可能で、省略した場合はモジュール名がデフォルト値として使用されます。
+* `packageJson {}` ブロックには各種メタデータを指定します。
 
-## 手動で公開する {id="publish-manually"}
+## 手動での公開 {id="publish-manually"}
 
-手動での公開は、プロジェクトの構造をまだ試行錯誤している段階や、
-公開の自動化を独自に実装したい場合に役立ちます。
+手動公開は、プロジェクト構造を試行錯誤している段階や、公開の自動化を独自に実装したい場合に役立ちます。
 
-これで、ローカルマシンからnpmにライブラリを公開できるようになりました。
-公開するには、以下のコマンドを実行します。`YOUR_ACCESS_TOKEN` の部分には、先ほど生成したアクセストークンを貼り付けてください：
+これでローカルマシンからライブラリをnpmに公開できるようになりました。
+公開するには、`YOUR_ACCESS_TOKEN` の部分に先ほど生成したアクセストークンを貼り付けて、次のコマンドを実行します。
 
 ```bash
 NPM_TOKEN=YOUR_ACCESS_TOKEN ./gradlew :shared:publishJsPackageToNpmjsRegistry
 ```
 
 ライブラリが公開されると、npmレジストリで確認できるようになります。
-npmの組織ページを開き、**Packages** タブを確認してください
-（個人の **Packages** ページではないことに注意してください）。
+npmのOrganizationページを開き、（個人の **Packages** ページではなく）**Packages** タブを確認してください。
 
 ![npmに公開されたライブラリ](published-on-npm.png){width=700}
 
 ### トラブルシューティング {id="troubleshooting"}
 
-手動公開でよく起こる問題がいくつかあります：
+手動公開でよく発生する問題には、以下のようなものがあります。
 
-* `build.gradle.kts` 設定内の `version` フィールドに注意してください：
-  同じバージョン、またはそれ以前のバージョンですでにパッケージが公開されている場合、npmは公開に失敗します。
-* 組織スコープのパッケージ用にトークンを生成する際は、
-  必ず一般権限（general permissions）**および**組織権限（organization permissions）の両方を設定してください。
+* `build.gradle.kts` 設定内の `version` フィールドに注意してください。
+  すでに同じバージョンまたはそれ以前のバージョンでパッケージが公開されている場合、npmは公開を失敗させます。
+* Organizationスコープのパッケージ用にトークンを生成する際は、全般的な権限（general permissions）**および** Organizationの権限の両方を設定していることを確認してください。
 
-## 継続的インテグレーション（CI）を使用して公開する {id="publish-using-continuous-integration-ci"}
+## 継続的インテグレーション（CI）を使用した公開 {id="publish-using-continuous-integration-ci"}
 
-npmの信頼されたパブリッシャー（Trusted Publishers）という仕組みを利用すると、OpenID Connectを使用してCIを迅速にセットアップできます。
-この方法では、トークンの生成や管理を一切行う必要がありません。
+npmのTrusted Publisher機能を使用すると、OpenID Connectを利用したCIを素早くセットアップできます。
+このアプローチにより、トークンの生成と管理が完全に不要になります。
 
-この例では、[GitHub Actions](https://docs.github.com/en/actions) を使用したワークフローをセットアップします。
+この例では、[GitHub Actions](https://docs.github.com/en/actions) を使用したワークフローを設定します。
 
-### GitHub Actions ワークフローファイルの作成 {id="create-a-github-actions-workflow-file"}
+### GitHub Actionsワークフローファイルの作成 {id="create-a-github-actions-workflow-file"}
 
-GitHub Actionを設定する `.github/workflows/publish.yml` ファイルを作成します：
+GitHub Actionを設定する `.github/workflows/publish.yml` ファイルを作成します。
 
 ```yaml
 # .github/workflows/publish.yml
@@ -186,8 +181,8 @@ on:
     types: [released, prereleased]
 
 permissions:
-  id-token: write  # GitHub Actionsがnpmの信頼されたパブリッシャーと
-                   # 統合するために必要
+  id-token: write  # GitHub ActionsがnpmのTrusted Publishingと
+                   # 連携するために必要です
   contents: read
 
 jobs:
@@ -206,75 +201,73 @@ jobs:
           distribution: 'zulu'
           java-version: 21
 
-      # ライブラリモジュールの公開用Gradleタスクを実行
+      # ライブラリモジュールのnpm公開Gradleタスクを実行
       - name: Publish to npm
         run: ./gradlew :shared:publishJsPackageToNpmjsRegistry
 ```
 
-このファイルをプロジェクトをホストしているGitHubリポジトリにコミットしてプッシュすると、
-そのリポジトリでGitHubリリースを作成するたびにワークフローが実行されます。
+このファイルをプロジェクトをホストしているGitHubリポジトリにコミットしてプッシュすると、そのリポジトリでGitHubリリースが作成されるたびにワークフローが実行されます。
 
-> ワークフローを[タグがプッシュされたときにトリガー](https://stackoverflow.com/a/61892639)するように設定することもできます。
+> リポジトリに[タグがプッシュされたときにトリガー](https://stackoverflow.com/a/61892639)するようにワークフローを設定することもできます。
 > 
 {style="tip"}
 
-### GitHub Actionsを信頼されたパブリッシャーとして設定する {id="set-up-github-actions-as-your-trusted-publisher"}
+### GitHub ActionsをTrusted Publisherとして設定 {id="set-up-github-actions-as-your-trusted-publisher"}
 
-ワークフローを公開したら、GitHub Actionを使用してnpmパッケージに[信頼されたパブリッシャー（Trusted Publisher）](https://docs.npmjs.com/trusted-publishers)を追加できます：
+ワークフローをプッシュしたら、GitHub Actionを使用してnpmパッケージに[Trusted Publisher](https://docs.npmjs.com/trusted-publishers)を追加できます。
 
-1. [手動で公開](#publish-manually)したパッケージのページを開きます。
+1. [公開済みパッケージ](#手動での公開)のページを開きます。
 2. **Settings** タブを開き、**Trusted Publisher** セクションを見つけます。
 3. **Select your publisher** の下にある **GitHub Actions** ボタンをクリックします。
-4. フォームに入力します：
-   * GitHub名（または組織名）
+4. フォームに入力します。
+   * GitHubの名前（またはOrganization）
    * リポジトリ名
-   * ワークフローファイルの名前（このチュートリアルでは [publish.yml](#create-a-github-actions-workflow-file) を使用しました）。
+   * ワークフローファイル名（このチュートリアルでは [publish.yml](#github-actionsワークフローファイルの作成) を使用しました）。
 5. **Setup connection** ボタンをクリックします。
 
-![GitHub Actions用のnpm Trusted Publisher設定](npm-trusted-publisher-github.png)
+![GitHub Actions向けのnpm Trusted Publisher設定](npm-trusted-publisher-github.png)
 
-> [npmは提供された座標を検証しません](https://docs.npmjs.com/trusted-publishers#troubleshooting)。
-> そのため、詳細を正しく入力したか必ず確認してください。
+> [npmは入力された座標情報を検証しない](https://docs.npmjs.com/trusted-publishers#troubleshooting)ため、詳細を正しく入力していることを確認してください。
 > 
 {style="warning"}
 
-作成された接続はパッケージ設定の **Trusted Publishers** セクションに表示されます。
-これは、指定された座標を持つワークフローがnpmへの公開を許可されたことを意味します。
+作成された接続は、パッケージの設定にある **Trusted Publishers** セクションに一覧表示されます。
+これにより、指定された座標のワークフローがnpmへの公開を承認されたことになります。
 
 ### GitHubでリリースを作成する {id="create-a-release-on-github"}
 
-ワークフローと信頼されたパブリッシャーの接続が設定されたので、[GitHubリリースを作成](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository#creating-a-release)することで公開をトリガーする準備が整いました：
+ワークフローとTrusted Publisherの接続が設定できたら、[GitHubリリースを作成](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository#creating-a-release)して公開をトリガーする準備が整いました。
 
-1. `build.gradle.kts` 設定のパッケージバージョンを、公開したいバージョンに設定します。
+1. `build.gradle.kts` の設定で、パッケージのバージョンを公開したいバージョンに設定します。
 
-   > すでに使用されているバージョン番号、またはすでに公開されているバージョンより低い番号の場合、npmは公開を許可しません。
+   > バージョン番号がすでに使用されている場合、またはすでに公開されているバージョンより低い場合、npmは公開を許可しません。
    > 
-   > {style="note"}
+   {style="note"}
 
 2. GitHubリポジトリに移動します。
 3. 右側のサイドバーで **Releases** をクリックします。
-4. **Draft a new release** ボタン（このリポジトリでまだリリースを作成したことがない場合は **Create a new release** ボタン）をクリックします。
-5. Gitタグを作成または選択します（システム間で番号を一致させるため、可能であればモジュールのバージョンと一致させてください）。
+4. **Draft a new release** ボタン（このリポジトリで過去にリリースを作成したことがない場合は **Create a new release** ボタン）をクリックします。
+5. Gitタグを作成または選択します（システム間での番号の一貫性を保つため、可能な限りモジュールのバージョンと一致させてください）。
 6. リリースのタイトルを設定します（タグと同じ名前にすると便利です）。
    
-   すべてを把握しやすくするために、タグのバージョンを `build.gradle.kts` ファイルで指定したライブラリのバージョン番号と同じにすることをお勧めします。
+   すべてを把握しやすくするために、タグのバージョンは `build.gradle.kts` ファイルで指定したライブラリのバージョン番号と同じにすることをお勧めします。
 
-   ![GitHubでリリースを作成する](create-release-and-tag-for-npm.png){width=700}
+   ![GitHubでリリースを作成](create-release-and-tag-for-npm.png){width=700}
 
 7. **Publish release** ボタンをクリックします。
 
 Actionがトリガーされたかどうかを確認するには、GitHubリポジトリのページ上部にある **Actions** タブをクリックします。
-新しく公開されたリリースによって、公開ワークフローの実行がトリガーされていることが確認できるはずです。
-ワークフローをクリックして、公開タスクのログを確認します。
+新しく公開されたリリースによって、公開ワークフローの実行がトリガーされたことが確認できるはずです。
+ワークフローをクリックすると、公開タスクのログを表示できます。
 
-ワークフローの実行が完了すると、npmレジストリのパッケージページに新しいバージョンのパッケージが表示されます。
+ワークフローの実行が完了すると、npmレジストリのパッケージページにパッケージの新しいバージョンが表示されます。
 
-![CI/CDからnpmに公開されたライブラリの2番目のバージョン](published-second-version-on-npm.png){width=700}
+![CI/CDからnpmに公開されたライブラリ](published-second-version-on-npm.png){width=700}
 
 ## 次のステップ {id="what-s-next"}
 
 * [READMEにshields.ioバッジを追加する](https://shields.io/badges/npm-version)
-* [Dokkaを使用してAPIドキュメントを生成する](https://kotl.in/dokka)
-* [Renovateを使用して依存関係の更新を自動化する](https://docs.renovatebot.com/)
+* [DokkaでAPIドキュメントを生成する](https://kotl.in/dokka)
+* [Renovateで依存関係の更新を自動化する](https://docs.renovatebot.com/)
 * [Kotlin Slackでコミュニティとライブラリを共有する](https://kotlinlang.slack.com/)
-  （登録は https://kotl.in/slack から）
+  （登録は https://kotl.in/slack をご覧ください）

@@ -2,22 +2,22 @@
 
 <no-index/>
 
-在初學者導覽中，您學習了如何使用屬性來宣告類別執行個體的特性，以及如何存取它們。本章節將深入探討 Kotlin 中屬性的運作方式，並探索您可以在程式碼中使用的其他方式。
+在初學者導覽中，你已經學習了如何使用屬性來宣告類別執行個體的特徵，以及如何存取它們。本章節將深入探討屬性在 Kotlin 中的運作方式，並探索在程式碼中使用它們的其他方式。
 
 ## 支援欄位 (Backing fields) {id="backing-fields"}
 
-在 Kotlin 中，屬性具有預設的 `get()` 和 `set()` 函式（稱為屬性存取子），用於處理值的檢索和修改。雖然這些預設函式在程式碼中不明顯可見，但編譯器會自動產生它們，以便在後台管理屬性存取。這些存取子使用 **支援欄位** 來儲存實際的屬性值。
+在 Kotlin 中，屬性具有預設的 `get()` 與 `set()` 函式，稱為屬性存取子，負責處理屬性值的擷取與修改。雖然這些預設函式在程式碼中不明顯可見，但編譯器會在幕後自動產生它們來管理屬性存取。這些存取子使用**支援欄位**來儲存實際的屬性值。
 
-如果符合以下任一條件，則會存在支援欄位：
+若符合以下任一條件，支援欄位便會存在：
 
-* 您為屬性使用預設的 `get()` 或 `set()` 函式。
-* 您嘗試透過在程式碼中使用 `field` 關鍵字來存取屬性值。
+* 你為該屬性使用了預設的 `get()` 或 `set()` 函式。
+* 你嘗試在程式碼中使用 `field` 關鍵字存取屬性值。
 
-> `get()` 和 `set()` 函式也被稱為 getter 和 setter。
+> `get()` 與 `set()` 函式也被稱為 getter 與 setter。
 >
 {style="tip"}
 
-例如，這段程式碼具有 `category` 屬性，它沒有自訂的 `get()` 或 `set()` 函式，因此使用預設實作：
+例如，以下程式碼中的 `category` 屬性沒有自訂的 `get()` 或 `set()` 函式，因此使用預設實作：
 
 ```kotlin
 class Contact(val id: Int, var email: String) {
@@ -25,7 +25,7 @@ class Contact(val id: Int, var email: String) {
 }
 ```
 
-在底層，這相當於以下虛擬碼：
+在底層，這等同於以下虛擬碼：
 
 ```kotlin
 class Contact(val id: Int, var email: String) {
@@ -40,10 +40,10 @@ class Contact(val id: Int, var email: String) {
 
 在此範例中：
 
-* `get()` 函式從欄位中檢索屬性值：`""`。
-* `set()` 函式接受 `value` 作為參數，並將其指派給欄位，其中 `value` 為 `""`。
+* `get()` 函式從欄位中擷取屬性值：`""`。
+* `set()` 函式接受 `value` 作為參數並將其指派給欄位，其中 `value` 為 `""`。 
 
-當您想在 `get()` 或 `set()` 函式中加入額外邏輯而又不造成無窮迴圈時，存取支援欄位非常有用。例如，您有一個帶有 `name` 屬性的 `Person` 類別：
+當你想在 `get()` 或 `set()` 函式中加入額外邏輯而不造成無窮迴圈時，存取支援欄位非常有用。例如，你有一個帶有 `name` 屬性的 `Person` 類別：
 
 ```kotlin
 class Person {
@@ -51,13 +51,13 @@ class Person {
 }
 ```
 
-您想要確保 `name` 屬性的首字母大寫，因此您建立了一個自訂的 `set()` 函式，該函式使用 [`.replaceFirstChar()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.text/replace-first-char.html) 和 [`.uppercase()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.text/uppercase-char.html) 擴充函式。然而，如果您在 `set()` 函式中直接引用屬性，將會建立一個無窮迴圈，並在執行期看到 `StackOverflowError`：
+你想確保 `name` 屬性的首字母大寫，因此建立了一個使用 [`.replaceFirstChar()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.text/replace-first-char.html) 和 [`.uppercase()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.text/uppercase-char.html) 擴充函式的自訂 `set()` 函式。然而，如果你在 `set()` 函式中直接參照該屬性，將會建立一個無窮迴圈，並在執行時期看到 `StackOverflowError`：
 
 ```kotlin
 class Person {
     var name: String = ""
         set(value) {
-            // 這會導致執行期錯誤
+            // This causes a runtime error
             name = value.replaceFirstChar { firstChar -> firstChar.uppercase() }
         }
 }
@@ -71,7 +71,7 @@ fun main() {
 ```
 {validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-properties-stackoverflow"}
 
-要解決此問題，您可以改為在 `set()` 函式中使用支援欄位，透過 `field` 關鍵字引用它：
+若要修正此問題，可以在 `set()` 函式中改為使用 `field` 關鍵字參照支援欄位：
 
 ```kotlin
 class Person {
@@ -90,68 +90,67 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-properties-backingfield"}
 
-當您想要新增日誌記錄、在屬性值變更時發送通知，或使用比較屬性新舊值的額外邏輯時，支援欄位也很有用。
+當你想要新增記錄 (logging)、在屬性值變更時傳送通知，或是使用額外邏輯來比較新舊屬性值時，支援欄位也十分有用。
 
-欲了解更多資訊，請參閱 [支援欄位](properties.md#backing-fields)。
+如需更多資訊，請參閱[支援欄位](properties.md#backing-fields)。
 
-## 擴充屬性 (Extension properties) {id="extension-properties"}
+## 擴充屬性 {id="extension-properties"}
 
-就像擴充函式一樣，也存在擴充屬性。擴充屬性允許您在不修改原始碼的情況下，向現有類別新增屬性。然而，Kotlin 中的擴充屬性 **不** 具有支援欄位。這意味著您需要自行撰寫 `get()` 和 `set()` 函式。此外，由於缺乏支援欄位，這意味著它們無法持有任何狀態。
+就像擴充函式一樣，Kotlin 也提供擴充屬性。擴充屬性可讓你在不修改現有類別原始碼的情況下，為其新增屬性。但是，Kotlin 中的擴充屬性**沒有**支援欄位。這意味著你必須自行撰寫 `get()` 與 `set()` 函式。此外，缺乏支援欄位也意味著它們無法保存任何狀態。
 
-要宣告擴充屬性，請寫下您要擴充的類別名稱，後接一個 `.` 和您的屬性名稱。就像一般類別屬性一樣，您需要為屬性宣告型別。
-例如：
+若要宣告擴充屬性，請寫出要擴充的類別名稱，接著加上 `.` 和屬性名稱。與一般類別屬性相同，你必須為屬性宣告型別。例如：
 
 ```kotlin
 val String.lastChar: Char
 ```
 {validate="false"}
 
-當您希望屬性包含計算值而又不使用繼承時，擴充屬性最為有用。您可以將擴充屬性想像成只有一個參數的函式：接收者。
+當你希望屬性包含計算值而無需使用繼承時，擴充屬性最為實用。你可以將擴充屬性想像為只有一個參數（接收者，receiver）的函式。
 
-例如，假設您有一個名為 `Person` 的資料類別，具有兩個屬性：`firstName` 和 `lastName`。
+例如，假設你有一個名為 `Person` 的資料類別，包含兩個屬性：`firstName` 和 `lastName`。
 
 ```kotlin
 data class Person(val firstName: String, val lastName: String)
 ```
 
-您希望能夠在不修改 `Person` 資料類別或繼承它的情況下，存取人員的全名。您可以透過建立具有自訂 `get()` 函式的擴充屬性來實現此目的：
+你希望能夠存取該人物的全名，但不想修改 `Person` 資料類別或繼承它。你可以透過建立帶有自訂 `get()` 函式的擴充屬性來達成：
 
 ```kotlin
 data class Person(val firstName: String, val lastName: String)
 
-// 擴充屬性以取得全名
+// Extension property to get the full name
 val Person.fullName: String
     get() = "$firstName $lastName"
 
 fun main() {
     val person = Person(firstName = "John", lastName = "Doe")
 
-    // 使用擴充屬性
+    // Use the extension property
     println(person.fullName)
     // John Doe
 }
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-properties-extension"}
 
-> 擴充屬性無法覆寫類別中既有的屬性。
+> 擴充屬性無法覆寫類別現有的屬性。
 > 
 {style="note"}
 
-就像擴充函式一樣，Kotlin 標準函式庫廣泛使用了擴充屬性。例如，請參閱 `CharSequence` 的 [`lastIndex` 屬性](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.text/last-index.html)。
+就像擴充函式一樣，Kotlin 標準程式庫廣泛使用了擴充屬性。例如，請參閱 `CharSequence` 的 [`lastIndex` 屬性](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.text/last-index.html)。
 
-## 委派屬性 (Delegated properties) {id="delegated-properties"}
+## 委託屬性 (Delegated properties) {id="delegated-properties"}
 
-您已經在[類別與介面](kotlin-tour-intermediate-classes-interfaces.md#delegation)章節中了解過委派。您也可以對屬性使用委派，將其屬性存取子委派給另一個物件。當您對儲存屬性有更複雜的需求，而簡單的支援欄位無法處理時（例如將值儲存在資料庫資料表、瀏覽器工作階段或 Map 中），這非常有用。使用委派屬性還能減少樣板程式碼，因為獲取和設定屬性的邏輯僅包含在您委派給的物件中。
+你已經在[類別與介面](kotlin-tour-intermediate-classes-interfaces.md#delegation)章節中學習了委託。你也可以將委託與屬性結合使用，將其屬性存取子委託給另一個物件。當你有更複雜的屬性儲存需求，而簡單的支援欄位無法處理時（例如將值儲存在資料庫資料表、瀏覽器工作階段或 Map 中），這會非常有用。使用委託屬性還可以減少樣板程式碼，因為取得與設定屬性的邏輯僅包含在委託對象中。
 
-語法類似於對類別使用委派，但運作層級不同。宣告您的屬性，後接 `by` 關鍵字和您要委派給的物件。例如：
+其語法類似於類別委託，但在不同的層級運作。宣告屬性後，加上 `by` 關鍵字以及你要委託的物件。例如：
 
 ```kotlin
 val displayName: String by Delegate
 ```
 
-在這裡，委派屬性 `displayName` 將其屬性存取子指向 `Delegate` 物件。
+在此，委託屬性 `displayName` 將其屬性存取子委託給 `Delegate` 物件。
 
-您委派給的每個物件 **必須** 具有一個 `getValue()` 運算子函式，Kotlin 使用該函式來檢索委派屬性的值。如果屬性是可變的，它還必須具有一個 `setValue()` 運算子函式，供 Kotlin 設定其值。
+每個受委託的物件**必須**具備 `getValue()` 運算子函式，Kotlin 會使用該函式來擷取委託屬性的值。如果該屬性是可變的 (mutable)，它還必須具備 `setValue()` 運算子函式，以便 Kotlin 設定其值。
 
 預設情況下，`getValue()` 和 `setValue()` 函式具有以下結構：
 
@@ -164,17 +163,17 @@ operator fun setValue(thisRef: Any?, property: KProperty<*>, value: String) {}
 
 在這些函式中：
 
-* `operator` 關鍵字將這些函式標記為運算子函式，使其能夠多載 `get()` 和 `set()` 函式。
-* `thisRef` 參數指的是 **包含** 委派屬性的物件。預設情況下，型別設定為 `Any?`，但您可能需要宣告更具體的型別。
-* `property` 參數指的是被存取或更改其值的屬性。您可以使用此參數來存取屬性名稱或型別等資訊。預設情況下，型別設定為 `KProperty<*>`，但您也可以使用 `Any?`。您不需要擔心在程式碼中更改此設定。
+* `operator` 關鍵字將這些函式標記為運算子函式，使它們能夠多載 `get()` 和 `set()` 函式。
+* `thisRef` 參數代表**包含**委託屬性的物件。預設情況下，型別設定為 `Any?`，但你可能需要宣告更具體的型別。
+* `property` 參數代表被存取或變更值的屬性。你可以使用此參數存取屬性名稱或型別等資訊。預設情況下，型別設定為 `KProperty<*>`，但你也可以使用 `Any?`。你不需要擔心在程式碼中修改它。
 
-`getValue()` 函式預設的傳回型別為 `String`，但您可以根據需要進行調整。
+`getValue()` 函式預設的傳回型別為 `String`，但你可以依需求進行調整。
 
-`setValue()` 函式有一個額外的參數 `value`，用於持有被指派給屬性的新值。
+`setValue()` 函式有一個額外的參數 `value`，用於保存指派給該屬性的新值。
 
-那麼，這在實踐中看起來如何？假設您想要一個計算屬性（例如使用者的顯示名稱），該屬性僅計算一次，因為該操作開銷很大且您的應用程式對效能敏感。您可以使用委派屬性來快取顯示名稱，這樣它只會被計算一次，但可以隨時存取而不會影響效能。
+那麼，這在實務上是如何運作的？假設你需要一個計算屬性（例如使用者的顯示名稱），因為該運算開銷較大且應用程式對效能較為敏感，因此只計算一次。你可以使用委託屬性來快取顯示名稱，使其只計算一次，之後便可隨時存取而不會影響效能。
 
-首先，您需要建立要委派給的物件。在這種情況下，該物件將是 `CachedStringDelegate` 類別的執行個體：
+首先，你需要建立委託對象。在此例中，該物件將是 `CachedStringDelegate` 類別的執行個體：
 
 ```kotlin
 class CachedStringDelegate {
@@ -182,7 +181,7 @@ class CachedStringDelegate {
 }
 ```
 
-`cachedValue` 屬性包含快取的值。在 `CachedStringDelegate` 類別中，將您希望委派屬性的 `get()` 函式具備的行為，新增到 `getValue()` 運算子函式主體中：
+`cachedValue` 屬性包含快取的值。在 `CachedStringDelegate` 類別內，將委託屬性的 `get()` 函式所需的行為加入到 `getValue()` 運算子函式的主體中：
 
 ```kotlin
 class CachedStringDelegate {
@@ -200,9 +199,9 @@ class CachedStringDelegate {
 }
 ```
 
-`getValue()` 函式檢查 `cachedValue` 屬性是否為 `null`。如果是，則函式會指派 `"Default Value"` 並列印一個字串以便記錄。如果 `cachedValue` 屬性已經計算過，則屬性不為 `null`。在這種情況下，會列印另一個字串以便記錄。最後，函式使用 Elvis 運算子傳回快取值，如果值為 `null` 則傳回 `"Unknown"`。
+`getValue()` 函式檢查 `cachedValue` 屬性是否為 `null`。如果是，該函式會指派 `"Default value"` 並印出字串以供記錄之用。如果 `cachedValue` 屬性已經計算過，該屬性便不是 `null`。在此情況下，會印出另一個字串以供記錄。最後，函式使用 Elvis 運算子傳回快取的值，若值為 `null` 則傳回 `"Unknown"`。
 
-現在，您可以將您想要快取的屬性 (`val displayName`) 委派給 `CachedStringDelegate` 類別的執行個體：
+現在你可以將想要快取的屬性 (`val displayName`) 委託給 `CachedStringDelegate` 類別的執行個體：
 
 ```kotlin
 class CachedStringDelegate {
@@ -226,12 +225,12 @@ class User(val firstName: String, val lastName: String) {
 fun main() {
     val user = User("John", "Doe")
 
-    // 第一次存取會計算並快取值
+    // First access computes and caches the value
     println(user.displayName)
     // Computed and cached: John Doe
     // John Doe
 
-    // 後續存取則從快取中檢索值
+    // Subsequent accesses retrieve the value from cache
     println(user.displayName)
     // Accessed from cache: John Doe
     // John Doe
@@ -241,22 +240,22 @@ fun main() {
 
 此範例：
 
-* 建立了一個 `User` 類別，其標頭中有兩個屬性 `firstName` 和 `lastName`，類別主體中有一個屬性 `displayName`。
-* 將 `displayName` 屬性委派給 `CachedStringDelegate` 類別的執行個體。
-* 建立了 `User` 類別的執行個體 `user`。
-* 列印存取 `user` 執行個體上的 `displayName` 屬性的結果。
+* 建立了一個 `User` 類別，其標頭中有兩個屬性 `firstName` 與 `lastName`，類別主體中有一個屬性 `displayName`。
+* 將 `displayName` 屬性委託給 `CachedStringDelegate` 類別的執行個體。
+* 建立了名為 `user` 的 `User` 類別執行個體。
+* 印出存取 `user` 執行個體上 `displayName` 屬性的結果。
 
-請注意，在 `getValue()` 函式中，`thisRef` 參數的型別從 `Any?` 型別縮小為物件型別：`User`。這是為了讓編譯器可以存取 `User` 類別的 `firstName` 和 `lastName` 屬性。
+請注意，在 `getValue()` 函式中，`thisRef` 參數的型別從 `Any?` 型別縮小為物件型別：`User`。這樣編譯器才能存取 `User` 類別的 `firstName` 和 `lastName` 屬性。
 
-### 標準委派 {id="standard-delegates"}
+### 標準委託 {id="standard-delegates"}
 
-Kotlin 標準函式庫提供了一些有用的委派，因此您不一定總是需要從頭開始建立自己的委派。如果您使用這些委派之一，則不需要定義 `getValue()` 和 `setValue()` 函式，因為標準函式庫會自動提供它們。
+Kotlin 標準程式庫提供了一些好用的委託，因此你不必總是從頭建立。如果你使用這些委託之一，則不需要定義 `getValue()` 和 `setValue()` 函式，因為標準程式庫會自動提供它們。
 
 #### 延遲載入屬性 (Lazy properties) {id="lazy-properties"}
 
-要僅在屬性首次被存取時才初始化它，請使用延遲載入屬性。標準函式庫提供了 `Lazy` 介面用於委派。
+若要在屬性首次被存取時才進行初始化，請使用延遲屬性。標準程式庫提供了 `Lazy` 介面以供委託使用。
 
-要建立 `Lazy` 介面的執行個體，請使用 `lazy()` 函式，並提供一個 Lambda 運算式，以便在首次呼叫 `get()` 函式時執行。後續任何對 `get()` 函式的呼叫都會傳回第一次呼叫時提供的相同結果。延遲載入屬性使用[尾隨 Lambda](kotlin-tour-functions.md#trailing-lambdas) 語法來傳遞 Lambda 運算式。
+若要建立 `Lazy` 介面的執行個體，請使用 `lazy()` 函式，並向其提供一個 Lambda 運算式，以便在首次呼叫 `get()` 函式時執行。之後對 `get()` 函式的任何呼叫都會傳回首次呼叫時提供的相同結果。延遲屬性使用[尾隨 Lambda](kotlin-tour-functions.md#trailing-lambdas) 語法來傳遞 Lambda 運算式。
 
 例如：
 
@@ -283,12 +282,12 @@ fun fetchData() {
 }
 
 fun main() {
-    // 第一次存取 databaseConnection
+    // First time accessing databaseConnection
     fetchData()
     // Connecting to the database...
     // Data: [Data1, Data2, Data3]
 
-    // 後續存取則使用現有連線
+    // Subsequent access uses the existing connection
     fetchData()
     // Data: [Data1, Data2, Data3]
 }
@@ -298,27 +297,27 @@ fun main() {
 在此範例中：
 
 * 有一個具有 `connect()` 和 `query()` 成員函式的 `Database` 類別。
-* `connect()` 函式將字串列印到主控台，而 `query()` 函式接受 SQL 查詢並傳回一個清單。
-* 有一個 `databaseConnection` 屬性，它是一個延遲載入屬性。
+* `connect()` 函式向主控台印出字串，而 `query()` 函式接受 SQL 查詢並傳回清單。
+* 有一個 `databaseConnection` 屬性，它是一個延遲屬性。
 * 提供給 `lazy()` 函式的 Lambda 運算式：
-  * 建立了 `Database` 類別的執行個體。
+  * 建立 `Database` 類別的執行個體。
   * 在此執行個體 (`db`) 上呼叫 `connect()` 成員函式。
   * 傳回該執行個體。
 * 有一個 `fetchData()` 函式：
   * 透過在 `databaseConnection` 屬性上呼叫 `query()` 函式來建立 SQL 查詢。
   * 將 SQL 查詢指派給 `data` 變數。
-  * 將 `data` 變數列印到主控台。
-* `main()` 函式呼叫 `fetchData()` 函式。第一次呼叫時，延遲載入屬性會被初始化。第二次呼叫時，傳回與第一次呼叫相同的結果。
+  * 將 `data` 變數印出至主控台。
+* `main()` 函式呼叫 `fetchData()` 函式。首次呼叫時，延遲屬性會被初始化。第二次呼叫時，會傳回與首次呼叫相同的結果。
 
-延遲載入屬性不僅在初始化資源密集時很有用，在程式碼中可能不會使用到該屬性時也很有用。此外，延遲載入屬性預設是執行緒安全的，這在您於並行環境中工作時特別有益。
+延遲屬性不僅在初始化耗費資源時很有用，在程式碼中可能根本不會使用到該屬性時也非常有用。此外，延遲屬性預設是執行緒安全 (thread-safe) 的，如果你在並行環境中工作，這會特別有益。
 
-欲了解更多資訊，請參閱 [延遲載入屬性](delegated-properties.md#lazy-properties)。
+如需更多資訊，請參閱[延遲屬性](delegated-properties.md#lazy-properties)。
 
 #### 可觀察屬性 (Observable properties) {id="observable-properties"}
 
-要監控屬性值是否發生變化，請使用可觀察屬性。當您想要偵測屬性值的變更並利用此資訊來觸發反應時，可觀察屬性非常有用。標準函式庫提供了 `Delegates` 物件用於委派。
+若要監控屬性的值是否變更，請使用可觀察屬性。當你想要偵測屬性值的變更並利用該資訊觸發反應時，可觀察屬性非常有用。標準程式庫提供了 `Delegates` 物件以供委託使用。
 
-要建立可觀察屬性，您必須先匯入 `kotlin.properties.Delegates.observable`。然後，使用 `observable()` 函式並提供一個 Lambda 運算式，以便在屬性變更時執行。就像延遲載入屬性一樣，可觀察屬性使用[尾隨 Lambda](kotlin-tour-functions.md#trailing-lambdas) 語法來傳遞 Lambda 運算式。
+若要建立可觀察屬性，必須先匯入 `kotlin.properties.Delegates.observable`。然後，使用 `observable()` 函式並向其提供一個 Lambda 運算式，以便在屬性每次變更時執行。與延遲屬性一樣，可觀察屬性也使用[尾隨 Lambda](kotlin-tour-functions.md#trailing-lambdas) 語法來傳遞 Lambda 運算式。
 
 例如：
 
@@ -352,44 +351,43 @@ fun main() {
 * `observable()` 函式接受 `20.0` 作為參數，並用它來初始化屬性。
 * 提供給 `observable()` 函式的 Lambda 運算式：
   * 具有三個參數：
-    * `_`：指的是屬性本身。
-    * `old`：屬性的舊值。
-    * `new`：屬性的新值。
-  * 檢查 `new` 參數是否大於 `25`，並根據結果將字串列印到主控台。
+    * `_`，代表屬性本身。
+    * `old`，代表屬性的舊值。
+    * `new`，代表屬性的新值。
+  * 檢查 `new` 參數是否大於 `25`，並根據結果向主控台印出字串。
 * `main()` 函式：
-  * 建立了一個名為 `thermostat` 的 `Thermostat` 類別執行個體。
-  * 將該執行個體的 `temperature` 屬性值更新為 `22.5`，這會觸發包含溫度更新的列印陳述式。
-  * 將該執行個體的 `temperature` 屬性值更新為 `27.0`，這會觸發包含警告的列印陳述式。
+  * 建立名為 `thermostat` 的 `Thermostat` 類別執行個體。
+  * 將執行個體的 `temperature` 屬性值更新為 `22.5`，這會觸發印出溫度更新的陳述式。
+  * 將執行個體的 `temperature` 屬性值更新為 `27.0`，這會觸發印出警告的陳述式。
 
-可觀察屬性不僅對日誌記錄和偵錯有用。您還可以用於像是更新 UI 或執行額外檢查（例如驗證資料有效性）等使用案例。
+可觀察屬性不僅對記錄和偵錯很有用。你還可以將它們用於更新 UI 或執行額外檢查（例如驗證資料的有效性）等使用案例。
 
-欲了解更多資訊，請參閱 [可觀察屬性](delegated-properties.md#observable-properties)。
+如需更多資訊，請參閱[可觀察屬性](delegated-properties.md#observable-properties)。
 
 ## 練習 {completion-point="true" id="practice"}
 
-### 練習 1 {initial-collapse-state="collapsed" collapsible="true" id="properties-exercise-1"}
+<deflist appearance="clear" collapsible="true" numbered="true">
+<def title="尋找缺貨書籍" id="properties-exercise-1">
 
-您在一家書店管理庫存系統。庫存儲存在一個清單中，每個項目代表特定書籍的數量。例如，`listOf(3, 0, 7, 12)` 表示書店有 3 本第一本書、0 本第二本、7 本第三本以及 12 本第四本。
+你正在管理書店的庫存系統。庫存儲存在一個清單中，其中每個項目代表特定書籍的數量。例如，`listOf(3, 0, 7, 12)` 表示書店有 3 本第一本書、0 本第二本書、7 本第三本書，以及 12 本第四本書。
 
-寫一個名為 `findOutOfStockBooks()` 的函式，傳回所有缺貨書籍的索引清單。
+撰寫一個名為 `findOutOfStockBooks()` 的函式，傳回所有缺貨書籍的索引清單。
 
 <deflist collapsible="true">
     <def title="提示 1">
-        使用標準函式庫中的 <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/indices.html"><code>indices</code></a> 擴充屬性。
+        使用標準程式庫中的 <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/indices.html"><code>indices</code></a> 擴充屬性。
     </def>
 </deflist>
 
 <deflist collapsible="true">
     <def title="提示 2">
-        您可以使用 <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/build-list.html"><code>buildList()</code></a> 函式來建立和管理清單，而不是手動建立並傳回一個可變清單。<code>buildList()</code> 函式使用了一個帶接收者的 Lambda，這是在之前的章節中學過的。
+        你可以使用 <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/build-list.html"><code>buildList()</code></a> 函式來建立和管理清單，而無需手動建立並傳回可變清單。<code>buildList()</code> 函式使用了帶有接收者的 Lambda，這已在前面的章節中介紹過。
     </def>
 </deflist>
 
-|--|--|
-
 ```kotlin
 fun findOutOfStockBooks(inventory: List<Int>): List<Int> {
-    // 在此處撰寫您的程式碼
+    // Write your code here
 }
 
 fun main() {
@@ -400,7 +398,6 @@ fun main() {
 ```
 {validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-properties-exercise-1"}
 
-|---|---|
 ```kotlin
 fun findOutOfStockBooks(inventory: List<Int>): List<Int> {
     val outOfStockIndices = mutableListOf<Int>()
@@ -420,7 +417,6 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="範例解答 1" id="kotlin-tour-properties-solution-1-1"}
 
-|---|---|
 ```kotlin
 fun findOutOfStockBooks(inventory: List<Int>): List<Int> = buildList {
     for (index in inventory.indices) {
@@ -438,24 +434,23 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="範例解答 2" id="kotlin-tour-properties-solution-1-2"}
 
-### 練習 2 {initial-collapse-state="collapsed" collapsible="true" id="properties-exercise-2"}
+</def>
+<def title="將公里轉換為英哩" id="properties-exercise-2">
 
-您有一個旅遊應用程式，需要同時以公里和英里顯示距離。為 `Double` 型別建立一個名為 `asMiles` 的擴充屬性，將以公里為單位的距離轉換為英里：
+你有一個旅遊應用程式，需要同時以公里和英哩顯示距離。為 `Double` 型別建立一個名為 `asMiles` 的擴充屬性，將以公里為單位的距離轉換為英哩：
 
-> 將公里轉換為英里的公式為 `miles = kilometers * 0.621371`。
+> 將公里轉換為英哩的公式為 `miles = kilometers * 0.621371`。
 >
 {style="note"}
 
 <deflist collapsible="true">
     <def title="提示">
-        請記住，擴充屬性需要自訂的 <code>get()</code> 函式。
+        請記住擴充屬性需要自訂的 <code>get()</code> 函式。
     </def>
 </deflist>
 
-|---|---|
-
 ```kotlin
-val // 在此處撰寫您的程式碼
+val // Write your code here
 
 fun main() {
     val distanceKm = 5.0
@@ -469,7 +464,6 @@ fun main() {
 ```
 {validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-properties-exercise-2"}
 
-|---|---|
 ```kotlin
 val Double.asMiles: Double
     get() = this * 0.621371
@@ -486,11 +480,10 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="範例解答" id="kotlin-tour-properties-solution-2"}
 
-### 練習 3 {initial-collapse-state="collapsed" collapsible="true" id="properties-exercise-3"}
+</def>
+<def title="延遲初始化健康檢查" id="properties-exercise-3">
 
-您有一個系統健康檢查程式，可以判斷雲端系統的狀態。然而，它執行健康檢查的兩個函式效能消耗很大。使用延遲載入屬性來初始化檢查，以便僅在需要時才執行這些高昂的函式：
-
-|---|---|
+你有一個系統健康檢查器，可以判斷雲端系統的狀態。但是，它執行健康檢查的兩個函式需要消耗大量效能。使用延遲屬性來初始化這些檢查，以便僅在需要時才執行高開銷的函式：
 
 ```kotlin
 fun checkAppServer(): Boolean {
@@ -504,7 +497,7 @@ fun checkDatabase(): Boolean {
 }
 
 fun main() {
-    // 在此處撰寫您的程式碼
+    // Write your code here
 
     when {
         isAppServerHealthy -> println("Application server is online and healthy")
@@ -517,7 +510,6 @@ fun main() {
 ```
 {validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-properties-exercise-3"}
 
-|---|---|
 ```kotlin
 fun checkAppServer(): Boolean {
     println("Performing application server health check...")
@@ -544,20 +536,19 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="範例解答" id="kotlin-tour-properties-solution-3"}
 
-### 練習 4 {initial-collapse-state="collapsed" collapsible="true" id="properties-exercise-4"}
+</def>
+<def title="追蹤預算變更" id="properties-exercise-4">
 
-您正在構建一個簡單的預算追蹤應用程式。該應用程式需要觀察使用者剩餘預算的變化，並在預算低於特定門檻時通知他們。您有一個 `Budget` 類別，它使用包含初始預算金額的 `totalBudget` 屬性進行初始化。在類別中，建立一個名為 `remainingBudget` 的可觀察屬性，列印：
+你正在建置一個簡易的預算追蹤應用程式。該應用程式需要觀察使用者剩餘預算的變更，並在低於特定閾值時通知他們。你有一個使用 `totalBudget` 屬性初始化的 `Budget` 類別，該屬性包含初始預算金額。在類別內建立一個名為 `remainingBudget` 的可觀察屬性，用於印出：
 
-* 當值低於初始預算的 20% 時發出警告。
-* 當預算比前一個值增加時發出鼓勵訊息。
-
-|---|---|
+* 當金額低於初始預算的 20% 時顯示警告。
+* 當預算相較於前一次增加時顯示鼓勵訊息。
 
 ```kotlin
 import kotlin.properties.Delegates.observable
 
 class Budget(val totalBudget: Int) {
-    var remainingBudget: Int // 在此處撰寫您的程式碼
+    var remainingBudget: Int // Write your code here
 }
 
 fun main() {
@@ -573,7 +564,6 @@ fun main() {
 ```
 {validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-properties-exercise-4"}
 
-|---|---|
 ```kotlin
 import kotlin.properties.Delegates.observable
 
@@ -599,6 +589,9 @@ fun main() {
 }
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="範例解答" id="kotlin-tour-properties-solution-4"}
+
+</def>
+</deflist>
 
 <seealso></seealso>
 

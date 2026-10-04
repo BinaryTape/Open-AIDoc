@@ -2,8 +2,8 @@
 
 <no-index/>
 
-Kotlinは、クラスとオブジェクトによるオブジェクト指向プログラミングをサポートしています。オブジェクトは、プログラム内でデータを保存するのに便利です。
-クラスを使用すると、オブジェクトの一連の特性を宣言できます。クラスからオブジェクトを作成することで、これらの特性を毎回宣言する必要がなくなるため、時間と手間を節約できます。
+Kotlinはクラスとオブジェクトを使用したオブジェクト指向プログラミングをサポートしています。オブジェクトは、プログラム内でデータを格納するのに役立ちます。
+クラスを使用すると、オブジェクトの一連の特性（特徴）を宣言できます。クラスからオブジェクトを作成すると、毎回それらの特性を宣言する必要がないため、時間と手間を節約できます。
 
 クラスを宣言するには、`class` キーワードを使用します： 
 
@@ -13,30 +13,30 @@ class Customer
 
 ## プロパティ {id="properties"}
 
-クラスのオブジェクトの特性は、プロパティとして宣言できます。クラスのプロパティは以下の場所で宣言できます：
+クラスのオブジェクトの特性は、プロパティで宣言できます。クラスのプロパティは次のように宣言できます：
 
 * クラス名の後の丸括弧 `()` 内。
 ```kotlin
 class Contact(val id: Int, var email: String)
 ```
 
-* 波括弧 `{}` で囲まれたクラスボディ内。
+* 波括弧 `{}` で定義されるクラス本体（クラスボディ）内。
 ```kotlin
 class Contact(val id: Int, var email: String) {
     val category: String = ""
 }
 ```
 
-クラスのインスタンスが作成された後に変更する必要がない限り、プロパティは読み取り専用 (`val`) として宣言することをお勧めします。
+クラスのインスタンスを作成した後に変更する必要がない限り、プロパティは読み取り専用（`val`）として宣言することをお勧めします。
 
-丸括弧内で `val` や `var` を付けずにプロパティを宣言することもできますが、その場合、インスタンス作成後にそれらのプロパティにアクセスすることはできません。
+丸括弧内では `val` や `var` なしでプロパティを宣言することもできますが、それらのプロパティにはインスタンス作成後にアクセスすることはできません。
 
-> * 丸括弧 `()` 内に含まれる内容は、**クラスヘッダー**と呼ばれます。
-> * クラスプロパティを宣言する際、[末尾のカンマ](coding-conventions.md#trailing-commas)（trailing comma）を使用できます。
+> * 丸括弧 `()` 内に含まれる内容は、**クラスヘッダー**（class header）と呼ばれます。
+> * クラスプロパティを宣言する際には、[末尾のカンマ（trailing comma）](coding-conventions.md#trailing-commas)を使用できます。
 >
 {style="note"}
 
-関数のパラメータと同様に、クラスのプロパティにもデフォルト値を設定できます：
+関数のパラメーターと同様に、クラスのプロパティにもデフォルト値を持たせることができます：
 ```kotlin
 class Contact(val id: Int, var email: String = "example@gmail.com") {
     val category: String = "work"
@@ -45,9 +45,9 @@ class Contact(val id: Int, var email: String = "example@gmail.com") {
 
 ## インスタンスの作成 {id="create-instance"}
 
-クラスからオブジェクトを作成するには、コンストラクタを使用してクラスの**インスタンス**を宣言します。
+クラスからオブジェクトを作成するには、**コンストラクター**を使用してクラスの**インスタンス**を宣言します。
 
-デフォルトでは、Kotlinはクラスヘッダーで宣言されたパラメータを持つコンストラクタを自動的に作成します。
+デフォルトでは、Kotlinはクラスヘッダーで宣言されたパラメーターを持つコンストラクターを自動的に作成します。
 
 例：
 ```kotlin
@@ -64,9 +64,9 @@ fun main() {
 * `Contact` はクラスです。
 * `contact` は `Contact` クラスのインスタンスです。
 * `id` と `email` はプロパティです。
-* デフォルトのコンストラクタで `id` と `email` を使用して `contact` を作成しています。
+* `id` と `email` は、`contact` を作成するためにデフォルトコンストラクターで使用されています。
 
-Kotlinのクラスは、自分で定義したものを含め、複数のコンストラクタを持つことができます。複数のコンストラクタを宣言する方法の詳細については、[コンストラクタ](classes.md#constructors-and-initializer-blocks)を参照してください。
+Kotlinのクラスには、自分で定義したものを含め、複数のコンストラクターを持たせることができます。複数のコンストラクターを宣言する方法について詳しくは、[コンストラクター](classes.md#constructors-and-initializer-blocks)を参照してください。
 
 ## プロパティへのアクセス {id="access-properties"}
 
@@ -92,7 +92,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-access-property"}
 
-> 文字列の一部としてプロパティの値を連結するには、文字列テンプレート（`${}`）を使用できます。
+> 文字列の一部としてプロパティの値を結合するには、文字列テンプレート（`$`）を使用できます。
 > 例：
 > ```kotlin
 > println("Their email address is: ${contact.email}")
@@ -100,11 +100,11 @@ fun main() {
 >
 {style="tip"}
 
-## メンバ関数 {id="member-functions"}
+## メンバー関数 {id="member-functions"}
 
-オブジェクトの特性としてプロパティを宣言するだけでなく、**メンバ関数**でオブジェクトの振る舞いを定義することもできます。
+オブジェクトの特性の一部としてプロパティを宣言することに加え、メンバー関数を使用してオブジェクトの振る舞いを定義することもできます。
 
-Kotlinでは、メンバ関数はクラスボディ内で宣言する必要があります。インスタンスでメンバ関数を呼び出すには、インスタンス名の後にピリオド `.` を付け、その後に関数名を書きます。例：
+Kotlinでは、メンバー関数はクラス本体内で宣言する必要があります。インスタンスでメンバー関数を呼び出すには、インスタンス名の後にピリオド `.` を付け、その後に関数名を書きます。例：
 
 ```kotlin
 class Contact(val id: Int, var email: String) {
@@ -115,7 +115,7 @@ class Contact(val id: Int, var email: String) {
 
 fun main() {
     val contact = Contact(1, "mary@gmail.com")
-    // メンバ関数 printId() を呼び出す
+    // メンバー関数 printId() を呼び出し
     contact.printId()           
     // 1
 }
@@ -124,7 +124,7 @@ fun main() {
 
 ## データクラス {id="data-classes"}
 
-Kotlinには、データの保存に特に便利な**データクラス**（data classes）があります。データクラスは通常のクラスと同じ機能を持ちますが、追加のメンバ関数が自動的に備わっています。これらのメンバ関数を使用すると、インスタンスを読みやすい形式で出力したり、クラスのインスタンス同士を比較したり、インスタンスをコピーしたりといったことが簡単にできます。これらの関数は自動的に利用可能になるため、各クラスごとに同じようなボイラープレートコード（定型的なコード）を書く手間が省けます。
+Kotlinには、データの格納に特に便利な**データクラス**（data classes）があります。データクラスはクラスと同じ機能を持ちますが、追加のメンバー関数が自動的に付属します。これらのメンバー関数を使用すると、インスタンスを読みやすい形式で簡単に出力したり、クラスのインスタンス同士を比較したり、インスタンスをコピーしたりできます。これらの関数は自動的に利用可能になるため、各クラスで同じボイラープレートコードを書く手間が省けます。
 
 データクラスを宣言するには、`data` キーワードを使用します：
 
@@ -132,25 +132,25 @@ Kotlinには、データの保存に特に便利な**データクラス**（data
 data class User(val name: String, val id: Int)
 ```
 
-Kotlinコンパイラは、メンバ関数を生成する際、[プライマリコンストラクタ](classes.md#primary-constructor)内で定義されたプロパティのみを使用します。データクラスのボディ内でプロパティを宣言した場合、それらは生成される関数の出力には含まれません。
+Kotlinコンパイラーは、メンバー関数を生成する際に[プライマリコンストラクター](classes.md#primary-constructor)内で定義されたプロパティのみを使用します。データクラスの本体内でプロパティを宣言した場合、それらは生成される関数の出力には含まれません。
 
-データクラスの最も便利な定義済みメンバ関数は以下の通りです：
+データクラスで最も役立つ事前定義されたメンバー関数は以下のとおりです：
 
-| **関数** | **説明** |
-|--------------------|------------------------------------------------------------------------------------------|
-| `toString()` | クラスインスタンスとそのプロパティを読みやすい文字列で出力します。 |
-| `equals()` または `==` | クラスのインスタンス同士を比較します。 |
-| `copy()` | 別のインスタンスをコピーして新しいインスタンスを作成します。一部のプロパティのみを変更することも可能です。 |
+| **関数**           | **説明**                                                                 |
+|--------------------|--------------------------------------------------------------------------|
+| `toString()`       | クラスインスタンスとそのプロパティを読みやすい文字列として出力します。   |
+| `equals()` または `==` | クラスのインスタンス同士を比較します。                                   |
+| `copy()`           | 別のインスタンスをコピーして、場合によっては一部のプロパティを変更したクラスインスタンスを作成します。 |
 
-各関数の使用例については、以下のセクションを参照してください：
+各関数の使用例については、次のセクションを参照してください：
 
-* [文字列として出力](#print-as-string)
-* [インスタンスの比較](#compare-instances)
-* [インスタンスのコピー](#copy-instance)
+* [文字列として出力](#文字列として出力)
+* [インスタンスの比較](#インスタンスの比較)
+* [インスタンスのコピー](#インスタンスのコピー)
 
 ### 文字列として出力 {id="print-as-string"}
 
-クラスインスタンスを読みやすい文字列で出力するには、`toString()` 関数を明示的に呼び出すか、`println()` や `print()` 関数を使用します。これらの関数は内部で自動的に `toString()` を呼び出します。
+クラスインスタンスの読みやすい文字列を出力するには、明示的に `toString()` 関数を呼び出すか、自動的に `toString()` を呼び出してくれる出力関数（`println()` や `print()`）を使用します：
 
 ```kotlin
 data class User(val name: String, val id: Int)
@@ -159,7 +159,7 @@ fun main() {
     //sampleStart
     val user = User("Alex", 1)
     
-    // 出力が読みやすくなるよう、自動的に toString() 関数が使用されます
+    // 自動的に toString() 関数が使用され、読みやすい形式で出力される
     println(user)            
     // User(name=Alex, id=1)
     //sampleEnd
@@ -167,7 +167,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-data-classes-print-string"}
 
-これは、デバッグやログの作成時に特に便利です。
+これは、デバッグ時やログを作成する際に特に便利です。
 
 ### インスタンスの比較 {id="compare-instances"}
 
@@ -182,11 +182,11 @@ fun main() {
     val secondUser = User("Alex", 1)
     val thirdUser = User("Max", 2)
 
-    // user と second user を比較
+    // user と secondUser を比較
     println("user == secondUser: ${user == secondUser}") 
     // user == secondUser: true
     
-    // user と third user を比較
+    // user と thirdUser を比較
     println("user == thirdUser: ${user == thirdUser}")   
     // user == thirdUser: false
     //sampleEnd
@@ -196,9 +196,9 @@ fun main() {
 
 ### インスタンスのコピー {id="copy-instance"}
 
-データクラスのインスタンスの正確なコピーを作成するには、そのインスタンスで `copy()` 関数を呼び出します。
+データクラスのインスタンスの完全なコピーを作成するには、インスタンスで `copy()` 関数を呼び出します。
 
-インスタンスのコピーを作成しつつ、一部のプロパティ**のみ**を変更したい場合は、`copy()` 関数を呼び出す際に関数パラメータとして変更したいプロパティの値を指定します。
+データクラスのインスタンスのコピーを作成**し**、一部のプロパティを変更するには、インスタンスで `copy()` 関数を呼び出し、関数のパラメーターとして置き換えたいプロパティの値を渡します。
 
 例：
 
@@ -209,7 +209,7 @@ fun main() {
     //sampleStart
     val user = User("Alex", 1)
 
-    // user の正確なコピーを作成
+    // user の完全なコピーを作成
     println(user.copy())       
     // User(name=Alex, id=1)
 
@@ -225,19 +225,19 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-data-classes-copy-instance"}
 
-インスタンスのコピーを作成することは、元のインスタンスを直接変更するよりも安全です。なぜなら、元のインスタンスに依存している他のコードが、コピーやその後の操作による影響を受けないためです。
+インスタンスのコピーを作成することは、元のインスタンスを変更するよりも安全です。元のインスタンスに依存するコードが、コピーやそれに対する操作の影響を受けないためです。
 
-データクラスの詳細については、[データクラス](data-classes.md)を参照してください。
+データクラスに関する詳細については、[データクラス](data-classes.md)を参照してください。
 
-このツアーの最後の章は、Kotlinの [Null安全](kotlin-tour-null-safety.md)についてです。
+このツアーの最後の章では、Kotlinの[Null安全性](kotlin-tour-null-safety.md)について扱います。
 
-## 練習問題 {completion-point="true" id="practice"}
+## 演習問題 {completion-point="true" id="practice"}
 
-### 演習 1 {initial-collapse-state="collapsed" collapsible="true" id="exercise-1"}
+<deflist appearance="clear" collapsible="true" numbered="true">
+<def title="データクラスの宣言">
 
-2つのプロパティ（名前用のプロパティと給与用のプロパティ）を持つデータクラス `Employee` を定義してください。給与のプロパティは、年末に昇給できるように可変（mutable）にしてください。`main` 関数はこのデータクラスの使用例を示しています。
+名前用と給与用の2つのプロパティを持つデータクラス `Employee` を定義してください。給与用のプロパティは変更可能（mutable）にしておかないと、年末に昇給できなくなります！`main` 関数では、このデータクラスをどのように使用できるかを示しています。
 
-|---|---|
 ```kotlin
 // ここにコードを書いてください
 
@@ -250,7 +250,6 @@ fun main() {
 ```
 {validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-classes-exercise-1"}
 
-|---|---|
 ```kotlin
 data class Employee(val name: String, var salary: Int)
 
@@ -263,11 +262,11 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="解答例" id="kotlin-tour-classes-solution-1"}
 
-### 演習 2 {initial-collapse-state="collapsed" collapsible="true" id="exercise-2"}
+</def>
+<def title="ネストされたデータクラスの宣言">
 
-このコードをコンパイルするために必要な、追加のデータクラスを宣言してください。
+このコードをコンパイルするために必要な追加のデータクラスを宣言してください。
 
-|---|---|
 ```kotlin
 data class Person(val name: Name, val address: Address, val ownsAPet: Boolean = true)
 // ここにコードを書いてください
@@ -283,7 +282,6 @@ fun main() {
 ```
 {validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-classes-exercise-2"}
 
-|---|---|
 ```kotlin
 data class Person(val name: Name, val address: Address, val ownsAPet: Boolean = true)
 data class Name(val first: String, val last: String)
@@ -300,28 +298,28 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="解答例" id="kotlin-tour-classes-solution-2"}
 
-### 演習 3 {initial-collapse-state="collapsed" collapsible="true" id="exercise-3"}
+</def>
+<def title="クラスを使用したランダムな従業員の生成">
 
-コードをテストするために、ランダムな従業員を作成できるジェネレーターが必要です。候補となる名前の固定リスト（クラスボディ内）を持つ `RandomEmployeeGenerator` クラスを定義してください。最小給与と最大給与（クラスヘッダー内）でクラスを設定できるようにします。クラスボディ内に `generateEmployee()` 関数を定義してください。ここでも、`main` 関数はこのクラスの使用例を示しています。
+コードをテストするために、ランダムに従業員を作成できるジェネレーターが必要です。候補となる名前の固定リスト（クラス本体内）を持つ `RandomEmployeeGenerator` クラスを定義してください。最小給与と最大給与（クラスヘッダー内）を設定できるようにクラスを構成します。クラス本体で `generateEmployee()` 関数を定義してください。ここでも、`main` 関数でこのクラスをどのように使用できるかを示しています。
 
-> この演習では、[`Random.nextInt()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.random/-random/next-int.html) 関数を使用するためにパッケージをインポートしています。
-> パッケージのインポートの詳細については、[パッケージとインポート](packages.md)を参照してください。
+> この演習では、[`Random.nextInt()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.random/-random/next-int.html) 関数を使用するためにパッケージをインポートします。
+> パッケージのインポートに関する詳細は、[パッケージとインポート](packages.md)を参照してください。
 >
 {style="tip"}
 
 <deflist collapsible="true" id="kotlin-tour-classes-exercise-3-hint-1">
     <def title="ヒント 1">
-        リストには、リスト内のランダムなアイテムを返す <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/random.html"><code>.random()</code></a> という拡張関数があります。
+        リストには、リスト内のランダムな要素を返す <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/random.html"><code>.random()</code></a> という拡張関数があります。
     </def>
 </deflist>
 
 <deflist collapsible="true" id="kotlin-tour-classes-exercise-3-hint-2">
     <def title="ヒント 2">
-        <code>Random.nextInt(from = ..., until = ...)</code> は、指定された範囲内のランダムな <code>Int</code> 数値を返します。
+        <code>Random.nextInt(from = ..., until = ...)</code> を使用すると、指定した範囲内のランダムな <code>Int</code> 数値を取得できます。
     </def>
 </deflist>
 
-|---|---|
 ```kotlin
 import kotlin.random.Random
 
@@ -341,7 +339,6 @@ fun main() {
 ```
 {validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-classes-exercise-3"}
 
-|---|---|
 ```kotlin
 import kotlin.random.Random
 
@@ -365,6 +362,9 @@ fun main() {
 }
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="解答例" id="kotlin-tour-classes-solution-3"}
+
+</def>
+</deflist>
 
 <seealso></seealso>
 

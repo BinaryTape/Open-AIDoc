@@ -1,60 +1,53 @@
-[//]: # (title: KtorとSQLDelightを使用したマルチプラットフォームアプリの作成)
+[//]: # (title: Ktor と SQLDelight を使用してマルチプラットフォームアプリを作成する)
 
 <secondary-label ref="IntelliJ IDEA"/>
 <secondary-label ref="Android Studio"/>
 
 <tldr>
-<p>このチュートリアルではIntelliJ IDEAを使用しますが、Android Studioでも同様に進めることができます。両方のIDEは共通のコア機能とKotlin Multiplatformサポートを共有しています。</p>
+<p>このチュートリアルでは IntelliJ IDEA を使用しますが、Android Studio でも同様に進めることができます。両方の IDE は同じコア機能と Kotlin Multiplatform サポートを共有しています。</p>
 </tldr>
 
-このチュートリアルでは、IntelliJ IDEAを使用して、Kotlin Multiplatformを用いたiOSおよびAndroid向けの高度なモバイルアプリケーションを作成する方法を説明します。
-このアプリケーションでは以下のことを行います。
+このチュートリアルでは、IntelliJ IDEA を使用して Kotlin Multiplatform による高度な iOS および Android 向けモバイルアプリケーションを作成する方法を説明します。
+このアプリケーションは次の処理を行います。
 
-* Ktorを使用して、パブリックな [Launch Library](https://lldev.thespacedevs.com/docs) からインターネット経由でデータを取得する。
-* SQLDelightを使用して、ローカルデータベースにデータを保存する。
-* 宇宙ロケットの打ち上げリストを、打ち上げ日、結果、および打ち上げに関する詳細な説明とともに表示する。
+* [Ktor](https://ktor.io/docs/create-client.html) と [`kotlinx.serialization`](https://kotlinlang.org/docs/serialization.html) を使用して、公開されている [Launch Library](https://lldev.thespacedevs.com/docs) からインターネット経由でデータを取得する。
+* [SQLDelight](https://github.com/cashapp/sqldelight) を使用してローカルデータベースにデータを保存する。
+* 宇宙ロケットの打ち上げリストを、打ち上げ日、結果、および打ち上げの詳細な説明とともに表示する。
+* [Koin](https://insert-koin.io/) を使用してプラットフォーム固有のデータベースドライバーを提供する。
 
-このアプリケーションには、iOSとAndroidの両方のプラットフォームで共有されるコードを含むモジュールが含まれます。ビジネスロジックとデータアクセスレイヤーは共有モジュールに一度だけ実装され、両方のアプリケーションのUIはネイティブで実装されます。
+このアプリケーションには、iOS と Android の両方のプラットフォーム用の共有コードを持つモジュールが含まれます。ビジネスロジックとデータアクセス層は共有モジュール内で一度だけ実装され、両方のアプリケーションの UI はネイティブになります。
 
-![エミュレーターとシミュレーター](android-and-ios.png){width=600}
+![Emulator and Simulator](android-and-ios.png){width=600}
 
-プロジェクトでは、以下のマルチプラットフォームライブラリを使用します。
-
-* インターネット経由でデータを取得するためのHTTPクライアントとしての [Ktor](https://ktor.io/docs/create-client.html)。
-* JSONレスポンスをエンティティクラスのオブジェクトにデシリアライズするための [`kotlinx.serialization`](https://github.com/Kotlin/kotlinx.serialization)。
-* 非同期コードを記述するための [`kotlinx.coroutines`](https://github.com/Kotlin/kotlinx.coroutines)。
-* SQLクエリからKotlinコードを生成し、型安全なデータベースAPIを作成するための [SQLDelight](https://github.com/cashapp/sqldelight)。
-* 依存性の注入（Dependency Injection）を介してプラットフォーム固有のデータベースドライバーを提供するための [Koin](https://insert-koin.io/)。
-
-> [テンプレートプロジェクト](https://github.com/kotlin-hands-on/kmm-networking-and-data-storage) および [最終的なアプリケーション](https://github.com/kotlin-hands-on/kmm-networking-and-data-storage/tree/final) のソースコードは、GitHubリポジトリで見つけることができます。
+> [テンプレートプロジェクト](https://github.com/kotlin-hands-on/kmm-networking-and-data-storage)および[完成版アプリケーション](https://github.com/kotlin-hands-on/kmm-networking-and-data-storage/tree/final)のソースコードは、GitHub リポジトリで確認できます。
 >
 {style="note"}
 
-## プロジェクトの作成 {id="create-a-project"}
+## プロジェクトを作成する {id="create-a-project"}
 
-1. [クイックスタート](quickstart.md)の手順に従って、[Kotlin Multiplatform開発のための環境構築](quickstart.md#set-up-the-environment)を完了してください。
-2. IntelliJ IDEAで、**File** | **New** | **Project** を選択します。
-3. 左側のパネルで **Kotlin Multiplatform** を選択します（Android Studioの場合、テンプレートは **New Project** ウィザードの **Generic** タブにあります）。
+1. [クイックスタート](quickstart.md)にある手順に従い、[Kotlin Multiplatform 開発用の環境をセットアップ](quickstart.md#set-up-the-environment)してください。
+2. IntelliJ IDEA で、**File** | **New** | **Project** を選択します。
+3. 左側のパネルで **Kotlin Multiplatform** を選択します（Android Studio の場合、このテンプレートは **New Project** ウィザードの **Generic** タブにあります）。
 4. **New Project** ウィンドウで以下のフィールドを指定します。
 
    * **Name**: SpaceTutorial
    * **Project ID**: com.jetbrains.spacetutorial
 
-5. **Android** と **iOS** のターゲットを選択します。
-6. iOSについては、**Do not share UI** オプションを選択します。両方のプラットフォームでネイティブUIを実装します。
+5. **Android** および **iOS** ターゲットを選択します。
+6. iOS については、**Do not share UI** オプションを選択します。両プラットフォームでネイティブ UI を実装します。
 7. すべてのフィールドとターゲットを指定したら、**Create** をクリックします。
 
-   ![KtorとSQLDelightを使用したマルチプラットフォームプロジェクトの作成](create-ktor-sqldelight-multiplatform-project.png){width=800}
+   ![Create Ktor and SQLDelight Multiplatform project](create-ktor-sqldelight-multiplatform-project.png){width=800}
 
-## Gradle依存関係の追加 {id="add-gradle-dependencies"}
+## Gradle の依存関係を追加する {id="add-gradle-dependencies"}
 
-共有モジュールにマルチプラットフォームライブラリを追加するには、モジュールの `build.gradle.kts` ファイル内の関連するソースセットの `dependencies {}` ブロックに依存関係の指示（`implementation`）を追加する必要があります。
+共有モジュールにマルチプラットフォームライブラリを追加するには、モジュールの `build.gradle.kts` ファイル内の関連するソースセットの `dependencies {}` ブロックに依存関係の指示（`implementation`）を追加します。
 
-`kotlinx.serialization` と SQLDelight ライブラリの両方は、追加の設定も必要です。
+`kotlinx.serialization` および SQLDelight ライブラリには、追加の設定も必要です。
 
-`gradle/libs.versions.toml` ファイルのバージョンカタログ内の行を変更または追加して、必要なすべての依存関係を反映させます。
+必要なすべての依存関係を反映するために、`gradle/libs.versions.toml` ファイルのバージョンカタログ内の行を変更または追加します。
 
-1. `[versions]` ブロックで、AGP（Android Gradle Plugin）のバージョンを確認し、残りを追加します。
+1. `[versions]` ブロックで、AGP のバージョンを確認し、残りを追加します。
 
    ```toml
    [versions]
@@ -69,7 +62,7 @@
    ```
    {initial-collapse-state="collapsed" collapsible="true" collapsed-title="[versions]"}
 
-2. `[libraries]` ブロックに、以下のライブラリ参照を追加します。
+2. `[libraries]` ブロックに、次のライブラリ参照を追加します。
 
    ```
    [libraries]
@@ -89,7 +82,7 @@
    ```
    {initial-collapse-state="collapsed" collapsible="true" collapsed-title="[libraries]"}
 
-3. `[plugins]` ブロックで、必要なGradleプラグインを指定します。
+3. `[plugins]` ブロックで、必要な Gradle プラグインを指定します。
 
    ```toml
    [plugins]
@@ -98,10 +91,10 @@
    sqldelight = { id = "app.cash.sqldelight", version.ref = "sqlDelight" }
    ```
 
-4. バージョンカタログが更新されると、プロジェクトの再同期を促されます。
-   **Sync Gradle Changes** ボタンをクリックして、Gradleファイルを同期します。 ![Gradleファイルの同期](gradle-sync.png){width=50}
+4. バージョンカタログを更新すると、プロジェクトの再同期を促すメッセージが表示されます。
+   **Sync Gradle Changes** ボタンをクリックして Gradle ファイルを同期します: ![Synchronize Gradle files](gradle-sync.png){width=50}
 
-5. `sharedLogic/build.gradle.kts` ファイルの冒頭にある `plugins {}` ブロックに、以下の行を追加します。
+5. `sharedLogic/build.gradle.kts` ファイルの先頭にある `plugins {}` ブロックに、次の行を追加します。
 
    ```kotlin
    plugins {
@@ -111,10 +104,10 @@
    }
    ```
 
-6. 共通ソースセット（common source set）には、各ライブラリのコアアーティファクトと、ネットワークリクエストおよびレスポンスの処理に `kotlinx.serialization` を使用するためのKtor [シリアライゼーション機能](https://ktor.io/docs/serialization-client.html)が必要です。
-    また、iOSおよびAndroidソースセットには、SQLDelightとKtorのプラットフォームドライバーが必要です。
+6. common ソースセットには各ライブラリのコアアーティファクトと、`kotlinx.serialization` を使用するための Ktor [シリアライゼーション機能](https://ktor.io/docs/serialization-client.html)が必要です。
+    iOS および Android ソースセットには、SQLDelight と Ktor のプラットフォームドライバーも必要です。
 
-    同じ `sharedLogic/build.gradle.kts` ファイルに、必要なすべての依存関係を追加します。
+    同じ `sharedLogic/build.gradle.kts` ファイルで、必要なすべての依存関係を追加します。
 
     ```kotlin
     kotlin {
@@ -142,51 +135,51 @@
     }
     ```
 
-7. 依存関係を指定したら、**Sync Gradle Changes** ボタンをもう一度クリックしてGradleファイルを更新します。
+7. 依存関係を指定したら、もう一度 **Sync Gradle Changes** ボタンをクリックして Gradle ファイルを更新します。
 
-Gradleの同期が完了したら、プロジェクトの設定は終了です。コードの記述を開始できます。
+Gradle の同期が完了すると、プロジェクトの設定は完了し、コードの記述を開始できます。
 
-> マルチプラットフォームの依存関係に関する詳細なガイドについては、[Kotlin Multiplatformライブラリへの依存関係](multiplatform-add-dependencies.md) を参照してください。
+> マルチプラットフォームの依存関係に関する詳細なガイドについては、[Kotlin Multiplatform ライブラリへの依存関係](multiplatform-add-dependencies.md)を参照してください。
 >
 {style="tip"}
 
-## アプリケーションデータモデルの作成 {id="create-an-application-data-model"}
+## アプリケーションのデータモデルを作成する {id="create-an-application-data-model"}
 
-チュートリアルアプリには、ネットワーキングサービスとキャッシュサービスを抽象化するファサードとして、パブリックな `SpaceSDK` クラスが含まれます。
-アプリケーションデータモデルには、以下の情報を持つ3つのエンティティクラスがあります。
+このチュートリアルのアプリには、ネットワークおよびキャッシュサービスに対するファサードとしてパブリックな `SpaceSDK` クラスが含まれます。
+アプリケーションのデータモデルには、以下を持つ3つのエンティティクラスが含まれます。
 
-* 打ち上げに関する一般情報
-* ミッションパッチの画像へのリンク
-* 打ち上げに関連する記事のURL
+* 打ち上げに関する一般的な情報
+* ミッションパッチ（記章）の画像へのリンク
+* 打ち上げに関連する記事の URL
 
-> このチュートリアルの最後までには、これらすべてのデータがUIに表示されるわけではありません。
-> データモデルはシリアライゼーションを実演するために使用しています。
-> しかし、リンクやパッチを使って、この例をより情報量の多いものに拡張して遊んでみることもできます！
+> このチュートリアルの終わりまでに、これらすべてのデータが UI に表示されるわけではありません。
+> データモデルはシリアライゼーションの実演のために使用しています。
+> リンクやパッチを使って自由に拡張し、より情報豊富なアプリに仕上げてみてください！
 >
 {style="note"}
 
 必要なデータクラスを作成します。
 
-1. `sharedLogic/src/commonMain/kotlin/com/jetbrains/spacetutorial` ディレクトリに `entity` パッケージを作成し、そのパッケージの中に `Entity.kt` ファイルを作成します。
+1. `sharedLogic/src/commonMain/kotlin/com/jetbrains/spacetutorial` ディレクトリに `entity` パッケージを作成し、そのパッケージ内に `Entity.kt` ファイルを作成します。
 2. 基本的なエンティティのすべてのデータクラスを宣言します。
 
    ```kotlin
    
    ```
 
-各シリアル化可能なクラスには `@Serializable` アノテーションを付ける必要があります。`kotlinx.serialization` プラグインは、アノテーションの引数でシリアライザーへのリンクを明示的に渡さない限り、`@Serializable` クラス用のデフォルトシリアライザーを自動的に生成します。
+シリアライズ可能な各クラスには `@Serializable` アノテーションを付ける必要があります。アノテーション引数でシリアライザーへのリンクを明示的に渡さない限り、`kotlinx.serialization` プラグインは `@Serializable` クラスのデフォルトシリアライザーを自動的に生成します。
 
 `@SerialName` アノテーションを使用するとフィールド名を再定義でき、より読みやすい識別子を使用してデータクラスのプロパティにアクセスするのに役立ちます。
 
-## SQLDelightの設定とキャッシュロジックの実装 {id="configure-sqldelight-and-implement-cache-logic"}
+## SQLDelight の設定とキャッシュロジックの実装 {id="configure-sqldelight-and-implement-cache-logic"}
 
-SQLDelightライブラリを使用すると、SQLクエリから型安全なKotlinデータベースAPIを生成できます。コンパイル中にジェネレーターはSQLクエリを検証し、共有モジュールで使用できるKotlinコードに変換します。
+SQLDelight ライブラリを使用すると、SQL クエリから型安全な Kotlin データベース API を生成できます。コンパイル中にジェネレーターが SQL クエリを検証し、共有モジュールで使用できる Kotlin コードに変換します。
 
-### SQLDelightの設定 {id="configure-sqldelight"}
+### SQLDelight を設定する {id="configure-sqldelight"}
 
-SQLDelightの依存関係はすでにプロジェクトに含まれています。
-ライブラリを設定するには、`sharedLogic/build.gradle.kts` ファイルを開き、最後に `sqldelight {}` ブロックを追加します。
-このブロックには、データベースのリストとそのパラメータが含まれます。
+SQLDelight の依存関係はすでにプロジェクトに含まれています。
+ライブラリを設定するには、`sharedLogic/build.gradle.kts` ファイルを開き、末尾に `sqldelight {}` ブロックを追加します。
+このブロックには、データベースとそのパラメーターのリストが含まれます。
 
 ```kotlin
 sqldelight {
@@ -198,24 +191,24 @@ sqldelight {
 }
 ```
 
-`packageName` パラメータは、生成されるKotlinソースのパッケージ名を指定します。
+`packageName` パラメーターは、生成される Kotlin ソースのパッケージ名を保持します。
 
-プロンプトが表示されたらGradleプロジェクトファイルを同期するか、<shortcut>Shift</shortcut> を2回押して **Sync All Gradle, Swift Package Manager projects** を検索して実行します。
+プロンプトが表示されたら Gradle プロジェクトファイルを同期するか、<shortcut>Shift</shortcut> を2回押して **Sync All Gradle, Swift Package Manager projects** アクションを検索して実行します。
 
-> `.sq` ファイルを扱うために、公式の [SQLDelightプラグイン](https://plugins.jetbrains.com/plugin/8191-sqldelight) をインストールすることを検討してください。
+> `.sq` ファイルを扱うために、公式の [SQLDelight プラグイン](https://plugins.jetbrains.com/plugin/8191-sqldelight)のインストールを検討してください。
 >
 {style="tip"}
 
-### データベースAPIの生成 {id="generate-the-database-api"}
+### データベース API を生成する {id="generate-the-database-api"}
 
-まず、必要なすべてのSQLクエリを含む `.sq` ファイルを作成します。デフォルトでは、SQLDelightプラグインはソースセットの `sqldelight` フォルダ内にある `.sq` ファイルを探します。
+まず、必要なすべての SQL クエリを含む `.sq` ファイルを作成します。デフォルトでは、SQLDelight プラグインはソースセットの `sqldelight` フォルダー内にある `.sq` ファイルを探します。
 
-1. `sharedLogic/src/commonMain` ディレクトリに新しい `sqldelight` ディレクトリを作成します。
-2. `sqldelight` ディレクトリの中に、パッケージ用のネストされたディレクトリを作成するために、`com/jetbrains/spacetutorial/cache` という名前の新しいディレクトリを作成します。
-3. `cache` ディレクトリの中に、`AppDatabase.sq` ファイルを作成します（`build.gradle.kts` ファイルで指定したデータベースと同じ名前にします）。
-   アプリケーションのすべてのSQLクエリはこのファイルに保存されます。
-4. データベースには、打ち上げに関するデータを持つテーブルが含まれます。
-   テーブルを作成するための以下のコードを `AppDatabase.sq` ファイルに追加し、後で使用するいくつかの関数を定義します。
+1. `sharedLogic/src/commonMain` ディレクトリに、新しい `sqldelight` ディレクトリを作成します。
+2. `sqldelight` ディレクトリ内に、パッケージ用のネストされたディレクトリとして `com/jetbrains/spacetutorial/cache` という名前の新しいディレクトリを作成します。
+3. `cache` ディレクトリ内に、`AppDatabase.sq` ファイルを作成します（`build.gradle.kts` ファイルで指定したデータベースと同じ名前にします）。
+   アプリケーションのすべての SQL クエリはこのファイルに保存されます。
+4. データベースには、打ち上げに関するデータを含むテーブルが含まれます。
+   `AppDatabase.sq` ファイルに次のコードを追加してテーブルを作成し、後で使用するいくつかの関数を定義します。
 
    ```sql
    import kotlin.Boolean;
@@ -243,23 +236,23 @@ sqldelight {
    FROM Launch;
    ```
 
-5. 対応する `AppDatabase` インターフェースを生成します（これについては後でデータベースドライバーを使用して初期化します）。
-   そのためには、プロジェクトのルートにあるターミナルで以下のコマンドを実行します。
+5. 対応する `AppDatabase` インターフェース（後でデータベースドライバーで初期化します）を生成します。
+   そのためには、プロジェクトのルートにあるターミナルで次のコマンドを実行します。
 
    ```shell
    ./gradlew generateCommonMainAppDatabaseInterface
    ```
 
-   生成されたKotlinコードは `sharedLogic/build/generated/sqldelight` ディレクトリに保存されます。
+   生成された Kotlin コードは `sharedLogic/build/generated/sqldelight` ディレクトリに保存されます。
 
-### プラットフォーム固有のデータベースドライバー用のファクトリの作成 {id="create-factories-for-platform-specific-database-drivers"}
+### プラットフォーム固有のデータベースドライバーファクトリを作成する {id="create-factories-for-platform-specific-database-drivers"}
 
-`AppDatabase` インターフェースを初期化するために、`SqlDriver` インスタンスを渡します。
-SQLDelightはSQLiteドライバーの複数のプラットフォーム固有の実装を提供しているため、各プラットフォームごとに個別にインスタンスを作成する必要があります。
+`AppDatabase` インターフェースを初期化するには、それに `SqlDriver` インスタンスを渡します。
+SQLDelight は SQLite ドライバーの複数のプラットフォーム固有の実装を提供しているため、各プラットフォームごとにこれらのインスタンスを個別に作成する必要があります。
 
-これは [expect/actualインターフェース](multiplatform-expect-actual.md) を使用して実現することもできますが、このプロジェクトでは Kotlin Multiplatform で依存性の注入を試すために [Koin](https://insert-koin.io/) を使用します。
+これは [expect/actual インターフェース](multiplatform-expect-actual.md)でも実現できますが、このプロジェクトでは Kotlin Multiplatform での依存関係注入を試すために [Koin](https://insert-koin.io/) を使用します。
 
-1. データベースドライバー用のインターフェースを作成します。そのためには、`sharedLogic/src/commonMain/kotlin/com/jetbrains/spacetutorial/` ディレクトリに `cache` パッケージを作成します。
+1. データベースドライバー用のインターフェースを作成します。これを行うには、`sharedLogic/src/commonMain/kotlin/com/jetbrains/spacetutorial/` ディレクトリに `cache` パッケージを作成します。
 2. `cache` パッケージ内に `DatabaseDriverFactory` インターフェースを作成します。
 
    ```kotlin
@@ -273,7 +266,7 @@ SQLDelightはSQLiteドライバーの複数のプラットフォーム固有の�
    ```
 
 3. Android 用にこのインターフェースを実装するクラスを作成します。`sharedLogic/src/androidMain/kotlin` ディレクトリに `com.jetbrains.spacetutorial.cache` パッケージを作成し、その中に `AndroidDatabaseDriverFactory.kt` ファイルを作成します。
-4. Android では、SQLiteドライバーは `AndroidSqliteDriver` クラスによって実装されます。`DatabaseDriverFactory.kt` ファイルで、データベース情報とコンテキストへのリンクを `AndroidSqliteDriver` クラスのコンストラクタに渡します。
+4. Android では、SQLite ドライバーは `AndroidSqliteDriver` クラスによって実装されます。`DatabaseDriverFactory.kt` ファイルで、データベース情報とコンテキストリンクを `AndroidSqliteDriver` クラスのコンストラクタに渡します。
 
    ```kotlin
    package com.jetbrains.spacetutorial.cache
@@ -289,8 +282,8 @@ SQLDelightはSQLiteドライバーの複数のプラットフォーム固有の�
    }
    ```
 
-5. iOS 用には、`shared/src/iosMain/kotlin/com/jetbrains/spacetutorial/` ディレクトリに `cache` パッケージを作成します。
-6. `cache` パッケージ内に `DatabaseDriverFactory.kt` ファイルを作成し、このコードを追加します。
+5. iOS の場合は、`shared/src/iosMain/kotlin/com/jetbrains/spacetutorial/` ディレクトリに `cache` パッケージを作成します。
+6. `cache` パッケージ内に `DatabaseDriverFactory.kt` ファイルを作成し、次のコードを追加します。
 
    ```kotlin
    package com.jetbrains.spacetutorial.cache
@@ -307,14 +300,14 @@ SQLDelightはSQLiteドライバーの複数のプラットフォーム固有の�
 
 これらのファクトリは、後でプロジェクトのプラットフォーム固有の部分で使用します。
 
-### キャッシュの実装 {id="implement-cache"}
+### キャッシュを実装する {id="implement-cache"}
 
-ここまでで、プラットフォームデータベースドライバー用のファクトリと、データベース操作を実行するための `AppDatabase` インターフェースを追加しました。
+ここまでの手順で、プラットフォームのデータベースドライバー用のファクトリと、データベース操作を実行するための `AppDatabase` インターフェースを追加しました。
 次に、`AppDatabase` インターフェースをラップし、キャッシュロジックを含む `Database` クラスを作成します。
 
-1. 共通ソースセット `sharedLogic/src/commonMain/kotlin` の `com.jetbrains.spacetutorial.cache` パッケージに新しい `Database` クラスを作成します。これには両方のプラットフォームに共通のロジックが含まれます。
+1. common ソースセット `sharedLogic/src/commonMain/kotlin` 内の `com.jetbrains.spacetutorial.cache` パッケージに、新しい `Database` クラスを作成します。これには両方のプラットフォームに共通のロジックが含まれます。
 
-2. `AppDatabase` にドライバーを提供するために、抽象的な `DatabaseDriverFactory` インスタンスを `Database` クラスのコンストラクタに渡します。
+2. `AppDatabase` にドライバーを提供するために、抽象 `DatabaseDriverFactory` インスタンスを `Database` クラスのコンストラクタに渡します。
 
    ```kotlin
    package com.jetbrains.spacetutorial.cache
@@ -325,9 +318,9 @@ SQLDelightはSQLiteドライバーの複数のプラットフォーム固有の�
    }
    ```
 
-   このクラスの [可視性](https://kotlinlang.org/docs/visibility-modifiers.html#class-members) は internal に設定されており、マルチプラットフォームモジュール内からのみアクセス可能であることを意味します。
+   このクラスの[可視性](https://kotlinlang.org/docs/visibility-modifiers.html#class-members)は internal に設定されており、マルチプラットフォームモジュール内からのみアクセス可能であることを意味します。
 
-3. `Database` クラスの中に、いくつかのデータ処理操作を実装します。
+3. `Database` クラス内に、いくつかのデータ処理操作を実装します。
    まず、すべてのロケット打ち上げのリストを返す `getAllLaunches()` 関数を作成します。
    `mapLaunchSelecting()` 関数は、データベースクエリの結果を `RocketLaunch` オブジェクトにマッピングするために使用されます。
 
@@ -399,14 +392,14 @@ SQLDelightはSQLiteドライバーの複数のプラットフォーム固有の�
     }
     ```
 
-## APIサービスの実装 {id="implement-the-api-service"}
+## API サービスを実装する {id="implement-the-api-service"}
 
-インターネット経由でデータを取得するために、[Launch LibraryパブリックAPI](https://lldev.thespacedevs.com/docs) と、`/2.3.0/launches` エンドポイントからすべての打ち上げリストを取得する単一のメソッドを使用します。
+インターネット経由でデータを取得するには、[Launch Library のパブリック API](https://lldev.thespacedevs.com/docs) と、`/2.3.0/launches` エンドポイントからすべての打ち上げリストを取得する単一のメソッドを使用します。
 
-アプリケーションをAPIに接続するクラスを作成します。
+アプリケーションを API に接続するクラスを作成します。
 
 1. `sharedLogic/src/commonMain/kotlin/com/jetbrains/spacetutorial/` ディレクトリに `network` パッケージを作成します。
-2. `network` ディレクトリの中に `SpaceApi` クラスを作成します。
+2. `network` ディレクトリ内に `SpaceApi` クラスを作成します。
 
     ```kotlin
     package com.jetbrains.spacetutorial.network
@@ -428,10 +421,10 @@ SQLDelightはSQLiteドライバーの複数のプラットフォーム固有の�
     }
     ```
 
-    このクラスはネットワークリクエストを実行し、JSONレスポンスを `com.jetbrains.spacetutorial.entity` パッケージのエンティティにデシリアライズします。
-    Ktorの `HttpClient` インスタンスが `httpClient` プロパティを初期化して保持します。
+    このクラスはネットワークリクエストを実行し、JSON レスポンスを `com.jetbrains.spacetutorial.entity` パッケージのエンティティにデシリアライズします。
+    Ktor の `HttpClient` インスタンスは `httpClient` プロパティを初期化して保持します。
 
-    このコードでは、`GET` リクエストの結果をデシリアライズするために Ktor の [`ContentNegotiation`](https://ktor.io/docs/serialization-client.html) プラグインを使用しています。このプラグインは、リクエストとレスポンスのペイロードを JSON として処理し、必要に応じてシリアライズおよびデシリアライズします。
+    このコードでは、`GET` リクエストの結果をデシリアライズするために [`ContentNegotiation`](https://ktor.io/docs/serialization-client.html) Ktor プラグインを使用しています。このプラグインはリクエストとレスポンスのペイロードを JSON として処理し、必要に応じてシリアライズおよびデシリアライズします。
 
 3. ロケット打ち上げのリストを返すデータ取得関数を宣言します。
 
@@ -450,19 +443,19 @@ SQLDelightはSQLiteドライバーの複数のプラットフォーム固有の�
     }
     ```
 
-`getAllLaunches` 関数には `suspend` 修飾子が付いています。これは、サスペンド関数である `HttpClient.get()` の呼び出しを含んでいるためです。
-`HttpClient.get()` 関数にはインターネット経由でデータを取得するための非同期操作が含まれており、コルーチンまたは別のサスペンド関数からしか呼び出すことができません。ネットワークリクエストはHTTPクライアントのスレッドプールで実行されます。
+`getAllLaunches` 関数には、suspend 関数である `HttpClient.get()` の呼び出しが含まれているため、`suspend` 修飾子が付いています。
+`HttpClient.get()` 関数にはインターネット経由でデータを取得する非同期操作が含まれており、コルーチンまたは別の suspend 関数からのみ呼び出すことができます。ネットワークリクエストは HTTP クライアントのスレッドプールで実行されます。
 
-GETリクエストを送信するためのURLが、`get()` 関数の引数として渡されます。
+GET リクエストを送信するための URL は、引数として `get()` 関数に渡されます。
 
-## SDKの構築 {id="build-an-sdk"}
+## SDK を構築する {id="build-an-sdk"}
 
-iOSおよびAndroidアプリケーションは、共有モジュールを通じて宇宙APIと通信します。共有モジュールは公開クラス `SpaceSDK` を提供します。
+iOS および Android アプリケーションは、パブリッククラス `SpaceSDK` を提供する共有モジュールを介して Space API と通信します。
 
-1. 共通ソースセット `sharedLogic/src/commonMain/kotlin` の `com.jetbrains.spacetutorial` パッケージに `SpaceSDK` クラスを作成します。
-   このクラスは、`Database` クラスと `SpaceApi` クラスのファサードになります。
+1. common ソースセット `sharedLogic/src/commonMain/kotlin` の `com.jetbrains.spacetutorial` パッケージに、`SpaceSDK` クラスを作成します。
+   このクラスは、`Database` および `SpaceApi` クラスのファサードになります。
 
-   `Database` クラスのインスタンスを作成するために、`DatabaseDriverFactory` インスタンスを提供します。
+   `Database` クラスのインスタンスを作成するには、`DatabaseDriverFactory` インスタンスを提供します。
 
    ```kotlin
    package com.jetbrains.spacetutorial
@@ -476,9 +469,9 @@ iOSおよびAndroidアプリケーションは、共有モジュールを通じ�
    }
    ```
 
-   `SpaceSDK` クラスのコンストラクタを通じて、プラットフォーム固有のコードで正しいデータベースドライバーを注入します。
+   適切なデータベースドライバーは、`SpaceSDK` クラスのコンストラクタを介してプラットフォーム固有のコードから注入されます。
 
-2. 作成したデータベースとAPIを使用して打ち上げリストを取得・保存する `getLaunches` 関数を追加します。
+2. 作成したデータベースと API を使用して打ち上げリストを要求および保存する `getLaunches` 関数を追加します。
 
     ```kotlin
     import com.jetbrains.spacetutorial.entity.RocketLaunch
@@ -500,22 +493,22 @@ iOSおよびAndroidアプリケーションは、共有モジュールを通じ�
     }
     ```
 
-このクラスには、すべての打ち上げ情報を取得するための関数が1つ含まれています。`forceReload` の値に応じて、キャッシュされた値を返すか、インターネットからデータをロードしてからその結果でキャッシュを更新します。キャッシュされたデータがない場合は、`forceReload` フラグの値に関係なくインターネットからデータをロードします。
+このクラスには、すべての打ち上げ情報を取得するための関数が1つ含まれています。`forceReload` の値に応じて、キャッシュされた値を返すか、インターネットからデータを読み込んでその結果でキャッシュを更新します。キャッシュされたデータがない場合は、`forceReload` フラグの値に関係なくインターネットからデータを読み込みます。
 
-SDKのクライアントは、`forceReload` フラグを使用して最新の打ち上げ情報をロードでき、ユーザー向けのプル・トゥ・リフレッシュ（引っ張って更新）ジェスチャなどを実現できます。
+SDK のクライアントは、`forceReload` フラグを使用して打ち上げに関する最新情報を読み込み、ユーザー向けにスワイプして更新（pull-to-refresh）ジェスチャーを有効にできます。
 
-Kotlinのすべての例外は非検査（unchecked）ですが、Swiftには検査例外（checked errors）しかありません（詳細は [Swift/Objective-Cとの相互運用性](https://kotlinlang.org/docs/native-objc-interop.html#errors-and-exceptions) を参照）。したがって、Swiftコードに期待される例外を認識させるために、Swiftから呼び出されるKotlin関数には、潜在的な例外クラスのリストを指定する `@Throws` アノテーションを付ける必要があります。
+すべての Kotlin 例外は非チェック（unchecked）ですが、Swift にはチェックされるエラー（checked error）しかありません（詳細については [Swift/Objective-C との相互運用性](https://kotlinlang.org/docs/native-objc-interop.html#errors-and-exceptions)を参照してください）。したがって、Swift コードに想定される例外を認識させるには、Swift から呼び出される Kotlin 関数に、発生する可能性のある例外クラスのリストを指定した `@Throws` アノテーションを付ける必要があります。
 
-## Androidアプリケーションの作成 {id="create-the-android-application"}
+## Android アプリケーションを作成する {id="create-the-android-application"}
 
-IntelliJ IDEAが初期のGradle設定を自動で行うため、`sharedUI` モジュールと `sharedLogic` モジュールはすでにAndroidアプリケーション（`androidApp`）に接続されています。
+IntelliJ IDEA が初期の Gradle 設定を処理するため、`sharedUI` および `sharedLogic` モジュールはすでに Android アプリケーション（`androidApp`）に接続されています。
 
-プロンプトが表示されたらGradleプロジェクトファイルを同期するか、<shortcut>Shift</shortcut> を2回押して **Sync All Gradle, Swift Package Manager projects** を検索して実行します。
+プロンプトが表示されたら Gradle プロジェクトファイルを同期するか、<shortcut>Shift</shortcut> を2回押して **Sync All Gradle, Swift Package Manager projects** を検索して実行します。
 
-### `androidApp` へのインターネットアクセス権限の追加 {id="add-internet-access-permission-for-androidapp"}
+### `androidApp` にインターネットアクセスのパーミッションを追加する {id="add-internet-access-permission-for-androidapp"}
 
-インターネットにアクセスするには、Androidアプリケーションに適切な権限が必要です。
-`androidApp/src/main/AndroidManifest.xml` ファイルに、`<uses-permission>` タグを追加します。
+インターネットにアクセスするには、Android アプリケーションに適切な権限（パーミッション）が必要です。
+`androidApp/src/main/AndroidManifest.xml` ファイルに `<uses-permission>` タグを追加します。
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -525,15 +518,15 @@ IntelliJ IDEAが初期のGradle設定を自動で行うため、`sharedUI` モ�
 </manifest>
 ```
 
-### 依存性の注入コードの追加 {id="add-dependency-injection-code"}
+### 依存関係注入コードを追加する {id="add-dependency-injection-code"}
 
-Koinの依存性の注入を使用すると、異なるコンテキストで使用できるモジュール（コンポーネントのセット）を宣言できます。
-このプロジェクトでは、Androidアプリケーション用とiOSアプリ用の2つのモジュールを作成します。
-次に、対応するモジュールを使用して、各ネイティブUIに対してKoinを開始します。
+Koin の依存関係注入を使用すると、さまざまなコンテキストで使用できるモジュール（コンポーネントのセット）を宣言できます。
+このプロジェクトでは、Android アプリケーション用と iOS アプリ用という2つのモジュールを作成します。
+その後、対応するモジュールを使用して各ネイティブ UI で Koin を起動します。
 
-Androidアプリのコンポーネントを含むKoinモジュールを宣言します。
+Android アプリ用のコンポーネントを含む Koin モジュールを宣言します。
 
-1. `sharedUI/build.gradle.kts` ファイル内の `androidMain` ソースセットに、Koin Android の依存関係を追加します。
+1. `sharedUI/build.gradle.kts` ファイルに、`androidMain` ソースセット用の Koin Android 依存関係を追加します。
 
    ```kotlin
    kotlin {
@@ -552,7 +545,7 @@ Androidアプリのコンポーネントを含むKoinモジュールを宣言し
 4. Android UI は共有されないため、`sharedUI` モジュールから `commonMain` および `commonTest` ソースセットを削除します。
 5. `sharedUI/src/androidMain/kotlin/com.jetbrains.spacetutorial` パッケージに `AppModule.kt` ファイルを作成します。
 
-   そのファイルで、`SpaceApi` クラス用と `SpaceSDK` クラス用の2つの [シングルトン](https://insert-koin.io/docs/reference/koin-core/definitions#defining-a-singleton) として Koin モジュールを宣言します。
+   そのファイル内で、`SpaceApi` クラス用と `SpaceSDK` クラス用の2つの[シングルトン](https://insert-koin.io/docs/reference/koin-core/definitions#defining-a-singleton)として Koin モジュールを宣言します。
 
     ```kotlin
     import com.jetbrains.spacetutorial.cache.AndroidDatabaseDriverFactory
@@ -572,9 +565,9 @@ Androidアプリのコンポーネントを含むKoinモジュールを宣言し
     ```
 
    `SpaceSDK` クラスのコンストラクタには、プラットフォーム固有の `AndroidDatabaseDriverFactory` クラスが注入されます。
-   `get()` 関数はモジュール内の依存関係を解決します。`SpaceSDK()` の `api` パラメータの代わりに、Koinは先ほど宣言した `SpaceApi` シングルトンを渡します。
+   `get()` 関数はモジュール内の依存関係を解決します。`SpaceSDK()` の `api` パラメーターの位置には、Koin が先ほど宣言された `SpaceApi` シングルトンを渡します。
 
-6. `androidApp/build.gradle.kts` ファイルに、`androidApp` モジュール用の Koin Android 依存関係を追加します。
+6. `androidApp/build.gradle.kts` ファイルで、`androidApp` モジュール用の Koin Android 依存関係を追加します。
 
    ```kotlin
    kotlin {
@@ -586,9 +579,9 @@ Androidアプリのコンポーネントを含むKoinモジュールを宣言し
    }
    ```
 
-7. `androidApp` モジュールの `src/main/kotlin/com/jetbrains/spacetutorial` ディレクトリに、Koin モジュールを開始する `MainApplication` クラスを作成します。
+7. `androidApp` モジュールの `src/main/kotlin/com/jetbrains/spacetutorial` ディレクトリに、Koin モジュールを起動する `MainApplication` クラスを作成します。
 
-   `modules()` 関数の呼び出しで、`AppModule.kt` ファイルで宣言したモジュールを指定します。
+   `AppModule.kt` ファイルで宣言したモジュールを `modules()` 関数に渡します。
 
    ```kotlin
    package com.jetbrains.spacetutorial
@@ -609,7 +602,7 @@ Androidアプリのコンポーネントを含むKoinモジュールを宣言し
    }
    ```
 
-8. `AndroidManifest.xml` ファイルの `<application>` タグで、作成した `MainApplication` クラスを指定します。
+8. 作成した `MainApplication` クラスを `AndroidManifest.xml` ファイルの `<application>` タグで指定します。
 
     ```xml
     <manifest xmlns:android="http://schemas.android.com/apk/res/android">
@@ -622,11 +615,11 @@ Androidアプリのコンポーネントを含むKoinモジュールを宣言し
     </manifest>
     ```
 
-これで、プラットフォーム固有のデータベースドライバーによって提供される情報を使用するUIを実装する準備が整いました。
+これで、プラットフォーム固有のデータベースドライバーから提供される情報を使用する UI を実装する準備が整いました。
 
-### 打ち上げリストを表示するビューモデルの準備 {id="prepare-the-view-model-with-the-list-of-launches"}
+### 打ち上げリストを含むビューモデルを準備する {id="prepare-the-view-model-with-the-list-of-launches"}
 
-Jetpack ComposeとMaterial 3を使用してAndroidのUIを実装します。まず、SDKを使用して打ち上げリストを取得するビューモデルを作成します。次にMaterialテーマを設定し、最後にすべてを統合するコンポーザブル（composable）関数を作成します。
+Jetpack Compose と Material 3 を使用して Android UI を実装します。まず、SDK を使用して打ち上げリストを取得するビューモデルを作成します。次に Material テーマを設定し、最後にすべてを統合するコンポーザブル関数を記述します。
 
 1. `sharedUI/src/androidMain/kotlin` ディレクトリの `com.jetbrains.spacetutorial` パッケージに `RocketLaunchViewModel.kt` ファイルを作成します。
 
@@ -650,9 +643,9 @@ Jetpack ComposeとMaterial 3を使用してAndroidのUIを実装します。ま�
    )
    ```
 
-   `RocketLaunchScreenState` インスタンスは、SDKから受信したデータとリクエストの現在の状態を保存します。
+   `RocketLaunchScreenState` インスタンスは、SDK から受信したデータとリクエストの現在の状態を保持します。
 
-2. `RocketLaunchViewModel` クラスに `loadLaunches` 関数を追加します。この関数は、このビューモデルのコルーチンスコープでSDKの `getLaunches` 関数を呼び出します。
+2. `RocketLaunchViewModel` クラスに `loadLaunches` 関数を追加します。これは、このビューモデルのコルーチンスコープ内で SDK の `getLaunches` 関数を呼び出します。
 
    ```kotlin
    import androidx.lifecycle.viewModelScope
@@ -675,7 +668,7 @@ Jetpack ComposeとMaterial 3を使用してAndroidのUIを実装します。ま�
    }
    ```
 
-3. `RocketLaunchViewModel` クラスの中に、`RocketLaunchViewModel` オブジェクトが作成されたらすぐにAPIにデータを要求するために、`loadLaunches()` の呼び出しを含む `init {}` ブロックを追加します。
+3. `RocketLaunchViewModel` クラス内に `loadLaunches()` の呼び出しを含む `init {}` ブロックを追加し、`RocketLaunchViewModel` オブジェクトが作成されるとすぐに API にデータを要求するようにします。
 
     ```kotlin
     class RocketLaunchViewModel(private val sdk: SpaceSDK) : ViewModel() {
@@ -687,7 +680,7 @@ Jetpack ComposeとMaterial 3を使用してAndroidのUIを実装します。ま�
     }
     ```
 
-4. 次に、`AppModule.kt` ファイルで、Koinモジュールにビューモデルを指定します。
+4. 次に、`AppModule.kt` ファイルで、Koin モジュールにビューモデルを指定します。
 
     ```kotlin
     import org.koin.core.module.dsl.viewModel
@@ -698,15 +691,16 @@ Jetpack ComposeとMaterial 3を使用してAndroidのUIを実装します。ま�
     }
     ```
 
-### Materialテーマの構築 {id="build-the-material-theme"}
+### Material Theme を構築する {id="build-the-material-theme"}
 
-Materialテーマによって提供される `AppTheme` 関数の周りに、メインの `App()` コンポーザブルを構築します。
+メインの `App()` コンポーザブルは、Material Theme によって提供される `AppTheme` 関数を中心に構築します。
 
-1. [Material Theme Builder](https://m3.material.io/theme-builder#/custom) を使用して、Composeアプリ用のテーマを生成できます。色とフォントを選択し、右下の **Export theme** をクリックします。
-2. エクスポート画面で、**Export** ドロップダウンをクリックし、**Jetpack Compose (Theme.kt)** オプションを選択します。
-3. アーカイブを解凍し、`theme` フォルダを `sharedUI/src/androidMain/kotlin/com/jetbrains/spacetutorial` ディレクトリにコピーします。
+1. [Material Theme Builder](https://m3.material.io/theme-builder#/custom) を使用して、Compose アプリ用のテーマを生成できます。
+   色やフォントを選択し、右下の **Export theme** をクリックします。
+2. エクスポート画面で **Export** ドロップダウンをクリックし、**Jetpack Compose (Theme.kt)** オプションを選択します。
+3. アーカイブを解凍し、`theme` フォルダーを `sharedUI/src/androidMain/kotlin/com/jetbrains/spacetutorial` ディレクトリにコピーします。
 
-   ![themeディレクトリの場所](theme-directory.png){width=299}
+   ![theme directory location](theme-directory.png){width=299}
 
 4. `theme` パッケージ内の各ファイルで、`package` 行を作成したパッケージを参照するように変更します。
 
@@ -714,19 +708,19 @@ Materialテーマによって提供される `AppTheme` 関数の周りに、メ
     package com.jetbrains.spacetutorial.theme
     ```
 
-5. `Color.kt` ファイルに、成功した打ち上げと失敗した打ち上げに使用する色のための2つの変数を追加します。
+5. `Color.kt` ファイルに、成功した打ち上げと失敗した打ち上げに使用する色の変数を2つ追加します。
 
     ```kotlin
     val app_theme_successful = Color(0xff4BB543)
     val app_theme_unsuccessful = Color(0xffFC100D)
     ```
 
-### プレゼンテーションロジックの実装 {id="implement-the-presentation-logic"}
+### プレゼンテーションロジックを実装する {id="implement-the-presentation-logic"}
 
-アプリケーションのメインとなる `App()` コンポーザブルを作成し、それを `ComponentActivity` クラスから呼び出します。
+アプリケーション用のメインの `App()` コンポーザブルを作成し、`ComponentActivity` クラスから呼び出します。
 
 1. `sharedUI/src/androidApp/kotlin/com/jetbrains/spacetutorial` ディレクトリに `App.kt` ファイルを作成します。
-2. `App.kt` ファイルを開き、以下のコードを挿入します。
+2. `App.kt` ファイルを開き、次のコードを挿入します。
 
     ```kotlin
     package com.jetbrains.spacetutorial
@@ -756,9 +750,9 @@ Materialテーマによって提供される `AppTheme` 関数の周りに、メ
     }
     ```
 
-   ここでは、[Koin ViewModel API](https://insert-koin.io/docs/reference/koin-compose/compose-viewmodel) を使用して、Android Koinモジュールで宣言した `viewModel` を参照しています。
+   ここでは、[Koin ViewModel API](https://insert-koin.io/docs/reference/koin-compose/compose-viewmodel) を使用して、Android Koin モジュールで宣言した `viewModel` を参照しています。
 
-3. 次に、読み込み画面、打ち上げ結果の列、およびプル・トゥ・リフレッシュ・アクションを実装するUIコードを追加します。
+3. 次に、ローディング画面、打ち上げ結果のカラム、スワイプして更新（pull-to-refresh）アクションを実装する UI コードを追加します。
 
     ```kotlin
     import androidx.compose.foundation.layout.Arrangement
@@ -862,7 +856,7 @@ Materialテーマによって提供される `AppTheme` 関数の周りに、メ
     ```
     {initial-collapse-state="collapsed" collapsible="true" collapsed-title="import com.jetbrains.spacetutorial.theme.AppTheme"}
 
-4. 最後に、`androidApp/src/main/AndroidManifest.xml` の `<activity>` タグで `MainActivity` クラスを指定します。
+4. 最後に、`androidApp/src/main/AndroidManifest.xml` 内で、`<activity>` タグに `MainActivity` クラスを指定します。
 
     ```xml
     <manifest xmlns:android="http://schemas.android.com/apk/res/android">
@@ -878,40 +872,40 @@ Materialテーマによって提供される `AppTheme` 関数の周りに、メ
     </manifest>
     ```
 
-5. Androidアプリを実行します。実行構成メニューから **androidApp** を選択し、エミュレーターを選択して、実行ボタンをクリックします。
-   アプリは自動的にAPIリクエストを実行し、打ち上げリストを表示します（背景色は生成したMaterialテーマによって異なります）。
+5. Android アプリを実行します。実行構成メニューから **androidApp** を選択し、エミュレーターを選択して、実行ボタンをクリックします。
+   アプリは自動的に API リクエストを実行し、打ち上げのリストを表示します（背景色は生成した Material Theme によって異なります）。
 
-   ![Androidアプリケーション](android-application.png){width=350}
+   ![Android application](android-application.png){width=350}
 
-これで、ビジネスロジックが Kotlin Multiplatform モジュールに実装され、UIがネイティブの Jetpack Compose を使用して作成された Android アプリケーションを作成できました。
+これで、ビジネスロジックが Kotlin Multiplatform モジュールに実装され、UI がネイティブの Jetpack Compose 上で動作する Android アプリケーションが作成できました。
 
-## iOSアプリケーションの作成 {id="create-the-ios-application"}
+## iOS アプリケーションを作成する {id="create-the-ios-application"}
 
-プロジェクトのiOS部分については、ユーザーインターフェースの構築に [SwiftUI](https://developer.apple.com/xcode/swiftui/) を使用し、[Model View View-Model](https://en.wikipedia.org/wiki/Model–view–viewmodel) パターンを利用します。
+プロジェクトの iOS 部分では、[SwiftUI](https://developer.apple.com/xcode/swiftui/) を利用してユーザーインターフェースを構築し、[Model View View-Model](https://en.wikipedia.org/wiki/Model–view–viewmodel)（MVVM）パターンを採用します。
 
-IntelliJ IDEAは、共有モジュールにすでに接続されたiOSプロジェクトを生成します。Kotlinモジュールは `sharedLogic/build.gradle.kts` ファイルで指定された名前（`baseName = "SharedLogic"`）でエクスポートされ、通常の `import` ステートメント `import SharedLogic` を使用してインポートされます。
+IntelliJ IDEA は、共有モジュールにすでに接続されている iOS プロジェクトを生成します。Kotlin モジュールは、`sharedLogic/build.gradle.kts` ファイルで指定された名前（`baseName = "SharedLogic"`）でエクスポートされ、通常の `import` ステートメント（`import SharedLogic`）を使用してインポートされます。
 
-### SQLDelight用の動的リンクフラグの追加 {id="add-the-dynamic-linking-flag-for-sqldelight"}
+### SQLDelight 用の動的リンクフラグを追加する {id="add-the-dynamic-linking-flag-for-sqldelight"}
 
-デフォルトでは、IntelliJ IDEAはiOSフレームワークの静的リンク用に設定されたプロジェクトを生成します。
+デフォルトでは、IntelliJ IDEA は iOS フレームワークの静的リンク用に設定されたプロジェクトを生成します。
 
-iOSでネイティブのSQLDelightドライバーを使用するには、Xcodeツールがシステム提供のSQLiteバイナリを見つけられるようにするための動的リンカーフラグを追加します。
+iOS でネイティブ SQLDelight ドライバーを使用するには、Xcode ツールがシステム提供の SQLite バイナリを見つけられるようにする動的リンカーフラグを追加します。
 
-1. IntelliJ IDEAで、**File** | **Open Project in Xcode** オプションを選択してプロジェクトをXcodeで開きます。
-2. Xcodeで、プロジェクト名をクリックしてその設定を開きます。
+1. IntelliJ IDEA で、**File** | **Open Project in Xcode** オプションを選択して、Xcode でプロジェクトを開きます。
+2. Xcode でプロジェクト名をクリックして、その設定を開きます。
 3. **Build Settings** タブに切り替え、**All** リストに切り替えて、**Other Linker Flags** フィールドを検索します。
-4. フィールドを展開し、**Debug** フィールドの隣にあるプラス記号を押し、`-lsqlite3` 文字列を **Any Architecture | Any SDK** に貼り付けます。
-5. **Other Linker Flags** | **Release** フィールドについても同様の手順を繰り返します。
+4. フィールドを展開し、**Debug** フィールドの横にあるプラス記号を押して、**Any Architecture | Any SDK** に `-lsqlite3` という文字列を貼り付けます。
+5. **Other Linker Flags** | **Release** フィールドに対しても同じ手順を繰り返します。
 
-   ![Xcodeプロジェクトにリンカーフラグを正しく追加した結果](xcode-other-linker-flags.png){width="434"}
-6. IntelliJ IDEAに戻ります。
+   ![The result of correctly adding the linker flag to the Xcode project](xcode-other-linker-flags.png){width="434"}
+6. IntelliJ IDEA に戻ります。
 
-### iOS依存性の注入用のKoinクラスの準備 {id="prepare-a-koin-class-for-ios-dependency-injection"}
+### iOS の依存関係注入用に Koin クラスを準備する {id="prepare-a-koin-class-for-ios-dependency-injection"}
 
-SwiftコードでKoinのクラスや関数を使用するために、特別な `KoinComponent` クラスを作成し、iOS用のKoinモジュールを宣言します。
+Swift コードで Koin のクラスや関数を使用するために、特別な `KoinComponent` クラスを作成し、iOS 用の Koin モジュールを宣言します。
 
 1. `sharedLogic/src/iosMain/kotlin/com/jetbrains/spacetutorial` ディレクトリに `KoinHelper.kt` ファイルを作成します。
-2. `SpaceSDK` クラスを遅延Koin注入でラップする `KoinHelper` クラスを追加します。
+2. 遅延 Koin インジェクションで `SpaceSDK` クラスをラップする `KoinHelper` クラスを追加します。
 
     ```kotlin
     package com.jetbrains.spacetutorial
@@ -929,7 +923,7 @@ SwiftコードでKoinのクラスや関数を使用するために、特別な `
     }
     ```
 
-3. `KoinHelper` クラスの下に `initKoin()` 関数を追加します。これは、iOS Koinモジュールを初期化して開始するためにSwiftで使用します。
+3. `KoinHelper` クラスの下に、iOS Koin モジュールを初期化して起動するために Swift で使用する `initKoin()` 関数を追加します。
 
     ```kotlin
     import com.jetbrains.spacetutorial.cache.IOSDatabaseDriverFactory
@@ -951,15 +945,15 @@ SwiftコードでKoinのクラスや関数を使用するために、特別な `
     }
     ```
 
-これで、共通の `SpaceSDK` クラスでネイティブデータベースドライバーを使用するために、iOSアプリでKoinモジュールを開始できるようになりました。
+これで、iOS アプリで Koin モジュールを起動して、共通の `SpaceSDK` クラスでネイティブデータベースドライバーを使用できるようになります。
 
-### UIの実装 {id="implement-the-ui"}
+### UI を実装する {id="implement-the-ui"}
 
-まず、リストのアイテムを表示するための `RocketLaunchRow` SwiftUIビューを作成します。これは `HStack` と `VStack` ビューに基づいています。`RocketLaunchRow` 構造体には、データを表示するための便利なヘルパーを持つ拡張機能を追加します。
+まず、リストの項目を表示するための `RocketLaunchRow` SwiftUI ビューを作成します。これは `HStack` と `VStack` ビューに基づきます。データを表示するための便利なヘルパーを備えた `RocketLaunchRow` 構造体の拡張機能も作成します。
 
-1. IntelliJ IDEAで、**Project** ビューにいることを確認します。
-2. `iosApp/iosApp` フォルダ内の `ContentView.swift` の隣に、`RocketLaunchRow` という名前で新しいSwiftファイルを作成します。
-3. `RocketLaunchRow.swift` ファイルを以下のコードで更新します。
+1. IntelliJ IDEA で、**Project** ビューになっていることを確認します。
+2. `iosApp/iosApp` フォルダー内の `ContentView.swift` の隣に新しい Swift ファイルを作成し、`RocketLaunchRow` と名前を付けます。
+3. `RocketLaunchRow.swift` ファイルを次のコードで更新します。
 
     ```Swift
     import SwiftUI
@@ -999,7 +993,7 @@ SwiftコードでKoinのクラスや関数を使用するために、特別な `
 
    打ち上げのリストは、プロジェクトにすでに含まれている `ContentView` ビューに表示されます。
 
-4. `ContentView.swift` ファイルで、データを準備して管理する `ViewModel` クラスを持つ `ContentView` クラスの拡張機能を追加します。
+4. `ContentView.swift` ファイルで、データを準備および管理する `ViewModel` クラスを持つ `ContentView` クラスの拡張機能を追加します。
 
     ```Swift
     extension ContentView {
@@ -1016,16 +1010,16 @@ SwiftコードでKoinのクラスや関数を使用するために、特別な `
     }
     ```
 
-    ビューモデル（`ContentView.ViewModel`）は、[Combineフレームワーク](https://developer.apple.com/documentation/combine) を介してビュー（`ContentView`）と接続します。
+    ビューモデル（`ContentView.ViewModel`）は、[Combine フレームワーク](https://developer.apple.com/documentation/combine)を介してビュー（`ContentView`）と接続します。
     * `ContentView.ViewModel` クラスは `ObservableObject` として宣言されます。
-    * `launches` プロパティには `@Published` 属性が使用されているため、このプロパティが変更されるたびにビューモデルはシグナルを発行します。
+    * `launches` プロパティには `@Published` 属性が使用されているため、ビューモデルはこのプロパティが変更されるたびにシグナルを発行します。
 
-5. `ContentView_Previews` 構造体を削除します。ビューモデルと互換性のあるプレビューを実装する必要はありません。
+5. `ContentView_Previews` 構造体を削除します。今回はビューモデルと互換性のあるプレビューは実装しません。
 
-6. `ContentView` クラスの本体を更新して打ち上げリストを表示し、リロード機能を追加します。
+6. 打ち上げのリストを表示し、再読み込み機能を追加するために `ContentView` クラスの body を更新します。
 
-   * これはUIの下準備です。`loadLaunches` 関数はチュートリアルの次の段階で実装します。
-   * `viewModel` プロパティには、ビューモデルを購読するために `@ObservedObject` 属性が付けられています。
+   * これは UI の基礎作業です。`loadLaunches` 関数はチュートリアルの次のフェーズで実装します。
+   * `viewModel` プロパティには、ビューモデルを購読するために `@ObservedObject` 属性が付与されています。
 
    ```swift
    struct ContentView: View {
@@ -1057,19 +1051,19 @@ SwiftコードでKoinのクラスや関数を使用するために、特別な `
    }
    ```
 
-7. `RocketLaunch` クラスは `List` ビューを初期化するためのパラメータとして使用されるため、[Identifiableプロトコルに適合](https://developer.apple.com/documentation/swift/identifiable) する必要があります。
-   このクラスにはすでに `id` という名前のプロパティがあるため、`ContentView.swift` の下部に拡張機能を追加するだけで済みます。
+7. `RocketLaunch` クラスは `List` ビューを初期化するためのパラメーターとして使用されるため、[`Identifiable` プロトコルに準拠](https://developer.apple.com/documentation/swift/identifiable)している必要があります。
+   このクラスにはすでに `id` という名前のプロパティがあるため、`ContentView.swift` の末尾に拡張機能を追加するだけで完了します。
 
     ```Swift
     extension RocketLaunch: Identifiable { }
     ```
 
-### データのロード {id="load-the-data"}
+### データを読み込む {id="load-the-data"}
 
-ビューモデルでロケット打ち上げに関するデータを取得するには、マルチプラットフォームライブラリの `KoinHelper` クラスのインスタンスが必要です。
-これにより、正しいデータベースドライバーを使用してSDK関数を呼び出すことができます。
+ビューモデルでロケット打ち上げに関するデータを取得するには、Multiplatform ライブラリの `KoinHelper` クラスのインスタンスが必要です。
+これにより、適切なデータベースドライバーを使用して SDK 関数を呼び出すことができます。
 
-1. `ContentView.swift` ファイルで、`ViewModel` クラスを拡張して `KoinHelper` オブジェクトと `loadLaunches` 関数を含めます。
+1. `ContentView.swift` ファイルで、`KoinHelper` オブジェクトと `loadLaunches` 関数を含めるように `ViewModel` クラスを拡張します。
 
    ```Swift
    extension ContentView {
@@ -1083,13 +1077,13 @@ SwiftコードでKoinのクラスや関数を使用するために、特別な `
            }
     
            func loadLaunches(forceReload: Bool) {
-               // TODO: データを取得する
+               // TODO: retrieve data
            }
        }
    }
    ```
 
-2. `loadLaunches()` 関数で、`KoinHelper.getLaunches()` 関数（`SpaceSDK` クラスへの呼び出しを中継します）を呼び出し、その結果を `launches` プロパティに保存します。
+2. `loadLaunches()` 関数内で、`KoinHelper.getLaunches()` 関数（`SpaceSDK` クラスへの呼び出しをプロキシします）を呼び出し、その結果を `launches` プロパティに保存します。
 
     ```Swift
     func loadLaunches(forceReload: Bool) {
@@ -1105,12 +1099,12 @@ SwiftコードでKoinのクラスや関数を使用するために、特別な `
     }
     ```
 
-    KotlinモジュールをAppleフレームワークにコンパイルすると、[サスペンド関数](https://kotlinlang.org/docs/whatsnew14.html#support-for-kotlin-s-suspending-functions-in-swift-and-objective-c) は Swift の `async`/`await` メカニズムを使用して呼び出すことができます。
+    Kotlin モジュールを Apple フレームワークにコンパイルすると、Swift の `async`/`await` メカニズムを使用して [suspending functions（中断関数）](https://kotlinlang.org/docs/whatsnew14.html#support-for-kotlin-s-suspending-functions-in-swift-and-objective-c)を呼び出すことができます。
    
-    `getLaunches` 関数は Kotlin で `@Throws(Exception::class)` アノテーションが付けられているため、`Exception` クラスまたはそのサブクラスのインスタンスである例外は `NSError` として Swift に伝播されます。
-    したがって、そのようなすべての例外は `loadLaunches()` 関数でキャッチできます。
+    `getLaunches` 関数には Kotlin で `@Throws(Exception::class)` アノテーションが付いているため、`Exception` クラスまたはそのサブクラスのインスタンスである例外は `NSError` として Swift に伝播されます。
+    そのため、そのような例外はすべて `loadLaunches()` 関数でキャッチできます。
 
-3. アプリのエントリーポイントである `iOSApp.swift` ファイルに移動し、Koinモジュール、ビュー、およびビューモデルを初期化します。
+3. アプリのエントリポイントである `iOSApp.swift` ファイルに移動し、Koin モジュール、ビュー、およびビューモデルを初期化します。
 
     ```Swift
     import SwiftUI
@@ -1130,21 +1124,21 @@ SwiftコードでKoinのクラスや関数を使用するために、特別な `
     }
     ```
 
-4. IntelliJ IDEAで、**iosApp** 構成に切り替え、エミュレーターを選択して実行し、結果を確認します。
+4. IntelliJ IDEA で **iosApp** 実行構成に切り替え、シミュレーターを選択して実行し、結果を確認します。
 
-![iOSアプリケーション](ios-application.png){width=350}
+![iOS Application](ios-application.png){width=350}
 
-> プロジェクトの最終バージョンは [`final` ブランチ](https://github.com/kotlin-hands-on/kmm-networking-and-data-storage/tree/final) で見つけることができます。
+> プロジェクトの最終バージョンは [`final` ブランチ](https://github.com/kotlin-hands-on/kmm-networking-and-data-storage/tree/final)で確認できます。
 >
 {style="note"}
 
 ## 次のステップ {id="what-s-next"}
 
-このチュートリアルでは、JSONの解析やメインスレッドでのデータベースへのリクエストなど、リソース負荷の高い操作が含まれています。並行コードの記述方法やアプリの最適化について学ぶには、[コルーチンガイド](https://kotlinlang.org/docs/coroutines-guide.html) を参照してください。
+このチュートリアルでは、JSON の解析やメインスレッドでのデータベースへのリクエストなど、潜在的にリソースを多く消費する操作を取り上げました。並行コードを記述してアプリを最適化する方法については、[コルーチンガイド](https://kotlinlang.org/docs/coroutines-guide.html)を参照してください。
 
-また、以下の追加学習資料も確認してください。
+以下の追加の学習資料も参照できます。
 
-* [マルチプラットフォームプロジェクトでのKtor HTTPクライアントの使用](https://ktor.io/docs/http-client-engines.html#mpp-config)
-* [Koinと依存性の注入について読む](https://insert-koin.io/docs/setup/why)
-* [AndroidアプリケーションをiOSで動作させる](multiplatform-integrate-in-existing-app.md)
-* [マルチプラットフォームプロジェクトの構造について詳しく学ぶ](multiplatform-discover-project.md)。
+* [マルチプラットフォームプロジェクトで Ktor HTTP クライアントを使用する](https://ktor.io/docs/http-client-engines.html#mpp-config)
+* [Koin と依存関係注入について読む](https://insert-koin.io/docs/setup/why)
+* [Android アプリケーションを iOS で動作させる](multiplatform-integrate-in-existing-app.md)
+* [マルチプラットフォームプロジェクトの構造についてさらに詳しく知る](multiplatform-discover-project.md)

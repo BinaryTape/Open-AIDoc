@@ -2,30 +2,30 @@
 
 <no-index/>
 
-在本章節中，你將基於對擴充方法的理解，學習如何使用作用域函式（scope functions）來撰寫更道地的程式碼。
+在本章中，你將在對擴充函式理解的基礎上，學習如何使用作用域函式來撰寫更符合慣用法的程式碼。
 
-## 作用域函式 (Scope functions) {id="scope-functions"}
+## 作用域函式 {id="scope-functions"}
 
-在程式設計中，作用域（scope）是變數或物件被辨識的區域。最常提到的作用域是全域作用域和區域作用域：
+在程式設計中，作用域是變數或物件被辨識的有效範圍。最常提到的作用域是全域作用域和區域作用域：
 
-* **全域作用域 (Global scope)** – 可以從程式中任何地方存取的變數或物件。
-* **區域作用域 (Local scope)** – 僅能在定義該變數或物件的區塊或函式內存取的變數或物件。
+* **全域作用域** – 可從程式中任何地方存取的變數或物件。
+* **區域作用域** – 僅能在定義它的區塊或函式內存取的變數或物件。
 
-在 Kotlin 中，還有作用域函式，允許你圍繞物件建立一個臨時作用域並執行一些程式碼。
+在 Kotlin 中，還有作用域函式，可讓你圍繞物件建立一個臨時作用域並執行特定程式碼。
 
-作用域函式使你的程式碼更加簡潔，因為你不需要在臨時作用域內引用物件的名稱。根據作用域函式的不同，你可以透過關鍵字 `this` 引用物件，或者透過關鍵字 `it` 將其作為引數使用。
+作用域函式能讓你的程式碼更加簡潔，因為你不需要在臨時作用域內重複參照物件的名稱。根據所用的作用域函式，你可以透過關鍵字 `this` 來參照該物件，或是透過關鍵字 `it` 將其作為引數來存取。
 
 Kotlin 總共有五個作用域函式：`let`、`apply`、`run`、`also` 和 `with`。
 
-每個作用域函式都接受一個 Lambda 運算式，並傳回物件本身或 Lambda 運算式的結果。在本導覽中，我們將解釋每個作用域函式及其使用方法。
+每個作用域函式都接受一個 Lambda 運算式，並傳回該物件或 Lambda 運算式的結果。在此導覽中，我們將解釋每個作用域函式及其用法。
 
-> 你也可以觀看由 Kotlin 技術傳教士 Sebastian Aigner 主講的關於作用域函式的演講：[Back to the Stdlib: Making the Most of Kotlin's Standard Library](https://youtu.be/DdvgvSHrN9g?feature=shared&t=1511)。
+> 你也可以觀看 Kotlin 技術傳教士 Sebastian Aigner 關於作用域函式的演講：[Back to the Stdlib: Making the Most of Kotlin's Standard Library](https://youtu.be/DdvgvSHrN9g?feature=shared&t=1511)。
 > 
 {style="tip"}
 
 ### Let {id="let"}
 
-當你想在程式碼中執行 null 檢查，並在隨後對傳回的物件執行進一步操作時，請使用 `let` 作用域函式。
+當你想要在程式碼中執行 null 檢查，並在隨後對傳回的物件執行進一步操作時，請使用 `let` 作用域函式。
 
 請看以下範例：
 
@@ -46,17 +46,17 @@ fun main() {
 ```
 {validate = "false"}
 
-該範例有兩個函式：
-* `sendNotification()`：具有一個函式參數 `recipientAddress` 並傳回一個字串。
+此範例包含兩個函式：
+* `sendNotification()`：具有函式參數 `recipientAddress` 並傳回一個字串。
 * `getNextAddress()`：沒有函式參數並傳回一個字串。
 
-該範例建立了一個變數 `address`，其型別為可為 null 的 `String`。但在呼叫 `sendNotification()` 函式時會出現問題，因為該函式不預期 `address` 可能是 `null` 值。結果編譯器會報告錯誤： 
+範例中建立了一個具有可為 null 的 `String` 型別的變數 `address`。但在呼叫 `sendNotification()` 函式時會出現問題，因為該函式未預期 `address` 可能為 `null` 值。因此編譯器會回報錯誤：
 
 ```text
 Argument type mismatch: actual type is 'String?', but 'String' was expected.
 ```
 
-在入門導覽中，你已經知道可以使用 if 條件執行 null 檢查，或使用 [Elvis 運算子 `?:`](kotlin-tour-null-safety.md#use-elvis-operator)。但如果你想在程式碼稍後使用傳回的物件呢？你可以透過 if 條件**以及** else 分支來實現：
+在初學者導覽中，你已經知道可以使用 if 條件進行 null 檢查，或使用 [Elvis 運算子 `?:`](kotlin-tour-null-safety.md#use-elvis-operator)。但如果你之後想在程式碼中使用傳回的物件該怎麼辦？你可以使用 if 條件**以及** else 分支來達成：
 
 ```kotlin
 fun sendNotification(recipientAddress: String): String {
@@ -104,17 +104,17 @@ fun main() {
 
 該範例：
 * 建立了名為 `address` 和 `confirm` 的變數。
-* 對 `address` 變數使用 `let` 作用域函式的安全呼叫。
-* 在 `let` 作用域函式內建立一個臨時作用域。
-* 將 `sendNotification()` 函式作為 Lambda 運算式傳遞到 `let` 作用域函式中。
-* 使用臨時作用域透過 `it` 引用 `address` 變數。
+* 在 `address` 變數上對 `let` 作用域函式使用安全呼叫。
+* 在 `let` 作用域函式中建立了一個臨時作用域。
+* 將 `sendNotification()` 函式作為 Lambda 運算式傳入 `let` 作用域函式。
+* 利用臨時作用域，透過 `it` 參照 `address` 變數。
 * 將結果指派給 `confirm` 變數。
 
-透過這種方法，你的程式碼可以處理 `address` 變數可能為 `null` 的情況，並且你可以在程式碼稍後使用 `confirm` 變數。
+透過這種方法，你的程式碼可以處理 `address` 變數可能為 `null` 值的狀況，並且你可以在後續程式碼中使用 `confirm` 變數。
 
 ### Apply {id="apply"}
 
-使用 `apply` 作用域函式在建立物件（如類別執行個體）時對其進行初始化，而不是在程式碼的後續位置。這種方法使你的程式碼更易於閱讀和管理。
+使用 `apply` 作用域函式在建立物件（例如類別執行個體）時立即進行初始化，而不是延後到後續程式碼中處理。這種做法使你的程式碼更容易閱讀和管理。
 
 請看以下範例：
 
@@ -143,11 +143,11 @@ fun main() {
 ```
 {kotlin-runnable="true" id="kotlin-tour-scope-function-apply-before"}
 
-該範例有一個 `Client` 類別，包含一個名為 `token` 的屬性和三個成員函數：`connect()`、`authenticate()` 和 `getData()`。
+該範例包含一個 `Client` 類別，其中具有一個名為 `token` 的屬性以及三個成員函數：`connect()`、`authenticate()` 和 `getData()`。
 
-該範例在 `main()` 函式中初始化 `token` 屬性並呼叫其成員函數之前，先建立了 `client` 作為 `Client` 類別的執行個體。
+該範例建立了 `Client` 類別的執行個體 `client`，隨後在 `main()` 函式中初始化其 `token` 屬性並呼叫其成員函數。
 
-雖然這個範例很精簡，但在現實世界中，從建立類別執行個體到配置並使用它（及其成員函數）可能需要一段時間。然而，如果使用 `apply` 作用域函式，你可以在程式碼的同一位置建立、配置並使用類別執行個體上的成員函數：
+雖然這個範例很簡短，但在實際開發中，在建立類別執行個體後，可能需要經過一段時間才能對其（及其成員函數）進行設定與使用。然而，如果使用 `apply` 作用域函式，你便可以在程式碼的同一處建立、設定並使用類別執行個體的成員函數：
 
 ```kotlin
 class Client() {
@@ -178,19 +178,19 @@ fun main() {
 
 該範例：
 
-* 建立 `client` 作為 `Client` 類別的執行個體。
-* 對 `client` 執行個體使用 `apply` 作用域函式。
-* 在 `apply` 作用域函式內建立一個臨時作用域，以便在存取其屬性或函式時不需要明確引用 `client` 執行個體。
-* 向 `apply` 作用域函式傳遞一個 Lambda 運算式，用於更新 `token` 屬性並呼叫 `connect()` 和 `authenticate()` 函式。
+* 建立了 `Client` 類別的執行個體 `client`。
+* 在 `client` 執行個體上使用 `apply` 作用域函式。
+* 在 `apply` 作用域函式中建立了一個臨時作用域，這樣你在存取其屬性或函式時就不需要明確參照 `client` 執行個體。
+* 向 `apply` 作用域函式傳遞一個 Lambda 運算式，用以更新 `token` 屬性並呼叫 `connect()` 與 `authenticate()` 函式。
 * 在 `main()` 函式中呼叫 `client` 執行個體上的 `getData()` 成員函數。
 
-如你所見，當你處理大量程式碼時，這種策略非常方便。
+如你所見，當你處理大型程式碼區塊時，這種策略非常方便。
 
 ### Run {id="run"}
 
-與 `apply` 類似，你可以使用 `run` 作用域函式來初始化物件，但最好使用 `run` 在程式碼的特定時刻初始化物件**並**立即計算結果。
+與 `apply` 類似，你可以使用 `run` 作用域函式來初始化物件，但更好的做法是使用 `run` 在程式碼的特定時刻初始化物件，**並**立即計算出結果。
 
-讓我們繼續前一個 `apply` 函式的範例，但這一次，你希望將 `connect()` 和 `authenticate()` 函式分組，以便在每次請求時呼叫它們。
+讓我們繼續先前 `apply` 函式的範例，但這次你希望將 `connect()` 與 `authenticate()` 函式分組，以便在每次請求時呼叫它們。
 
 例如：
 
@@ -226,24 +226,24 @@ fun main() {
 
 該範例：
 
-* 建立 `client` 作為 `Client` 類別的執行個體。
-* 對 `client` 執行個體使用 `apply` 作用域函式。
-* 在 `apply` 作用域函式內建立一個臨時作用域，以便在存取其屬性或函式時不需要明確引用 `client` 執行個體。
-* 向 `apply` 作用域函式傳遞一個 Lambda 運算式，用於更新 `token` 屬性。
+* 建立了 `Client` 類別的執行個體 `client`。
+* 在 `client` 執行個體上使用 `apply` 作用域函式。
+* 在 `apply` 作用域函式中建立了一個臨時作用域，這樣你在存取其屬性或函式時就不需要明確參照 `client` 執行個體。
+* 向 `apply` 作用域函式傳遞一個 Lambda 運算式，用以更新 `token` 屬性。
 
 `main()` 函式：
 
-* 建立一個型別為 `String` 的 `result` 變數。
-* 對 `client` 執行個體使用 `run` 作用域函式。
-* 在 `run` 作用域函式內建立一個臨時作用域，以便在存取其屬性或函式時不需要明確引用 `client` 執行個體。
-* 向 `run` 作用域函式傳遞一個 Lambda 運算式，呼叫 `connect()`、`authenticate()` 和 `getData()` 函式。
+* 建立了型別為 `String` 的 `result` 變數。
+* 在 `client` 執行個體上使用 `run` 作用域函式。
+* 在 `run` 作用域函式中建立了一個臨時作用域，這樣你在存取其屬性或函式時就不需要明確參照 `client` 執行個體。
+* 向 `run` 作用域函式傳遞一個 Lambda 運算式，用以呼叫 `connect()`、`authenticate()` 和 `getData()` 函式。
 * 將結果指派給 `result` 變數。
 
-現在你可以在程式碼中進一步使用傳回的結果。
+現在你可以在後續程式碼中進一步使用傳回的結果。
 
 ### Also {id="also"}
 
-使用 `also` 作用域函式對物件執行額外操作，然後傳回該物件以在程式碼中繼續使用它，例如撰寫日誌。
+當你需要對物件執行額外動作（例如記錄日誌），然後傳回該物件以在程式碼中繼續使用時，請使用 `also` 作用域函式。
 
 請看以下範例：
 
@@ -265,15 +265,15 @@ fun main() {
 
 * 建立了包含字串清單的 `medals` 變數。
 * 建立了具有 `List<String>` 型別的 `reversedLongUpperCaseMedals` 變數。
-* 對 `medals` 變數使用 `.map()` 擴充方法。
-* 向 `.map()` 函式傳遞一個 Lambda 運算式，該運算式透過 `it` 關鍵字引用 `medals` 並對其呼叫 `.uppercase()` 擴充方法。
-* 對 `medals` 變數使用 `.filter()` 擴充方法。
-* 向 `.filter()` 函式傳遞一個 Lambda 運算式作為謂詞，該運算式透過 `it` 關鍵字引用 `medals` 並檢查清單中的項目是否超過 4 個字元。
-* 對 `medals` 變數使用 `.reversed()` 擴充方法。
+* 在 `medals` 變數上使用 `.map()` 擴充函式。
+* 向 `.map()` 函式傳遞一個 Lambda 運算式，該運算式透過關鍵字 `it` 參照 `medals`，並對其呼叫 `.uppercase()` 擴充函式。
+* 在 `medals` 變數上使用 `.filter()` 擴充函式。
+* 向 `.filter()` 函式傳遞一個 Lambda 運算式作為述詞（predicate），該運算式透過關鍵字 `it` 參照 `medals`，並檢查清單中的項目是否超過 4 個字元。
+* 在 `medals` 變數上使用 `.reversed()` 擴充函式。
 * 將結果指派給 `reversedLongUpperCaseMedals` 變數。
 * 列印 `reversedLongUpperCaseMedals` 變數中包含的清單。
 
-在函式呼叫之間添加一些日誌記錄以查看 `medals` 變數發生了什麼會很有用。`also` 函式對此很有幫助：
+在各個函式呼叫之間新增一些記錄以查看 `medals` 變數的變化會很有幫助。`also` 函式正好可以幫上忙：
 
 ```kotlin
 fun main() {
@@ -295,19 +295,19 @@ fun main() {
 
 現在該範例：
 
-* 對 `medals` 變數使用 `also` 作用域函式。
-* 在 `also` 作用域函式內建立一個臨時作用域，以便在將 `medals` 變數作為函式參數使用時不需要明確引用它。
-* 向 `also` 作用域函式傳遞一個 Lambda 運算式，該運算式透過 `it` 關鍵字使用 `medals` 變數作為函式參數來呼叫 `println()` 函式。
+* 在 `medals` 變數上使用 `also` 作用域函式。
+* 在 `also` 作用域函式中建立了一個臨時作用域，這樣在將 `medals` 變數用作函式參數時，就不需要明確參照它。
+* 向 `also` 作用域函式傳遞一個 Lambda 運算式，該運算式透過關鍵字 `it` 將 `medals` 變數作為函式參數來呼叫 `println()` 函式。
 
-由於 `also` 函式會傳回物件本身，因此它不僅適用於日誌記錄，還適用於偵錯、鏈接多個操作以及執行其他不影響程式碼主要流程的副作用操作。
+由於 `also` 函式會傳回該物件，因此它不僅可用於日誌記錄，還適用於偵錯、鏈結多個操作以及執行其他不影響程式碼主流程的副作用操作。
 
 ### With {id="with"}
 
-與其他作用域函式不同，`with` 不是擴充方法，因此語法不同。你將接收器物件作為引數傳遞給 `with`。
+與其他作用域函式不同，`with` 不是擴充函式，因此語法有所不同。你是將接收者物件作為引數傳遞給 `with`。
 
-當你想對一個物件呼叫多個函式時，請使用 `with` 作用域函式。
+當你想在同一個物件上呼叫多個函式時，請使用 `with` 作用域函式。
 
-請看這個範例：
+請看以下範例：
 
 ```kotlin
 class Canvas {
@@ -333,11 +333,11 @@ fun main() {
 ```
 {kotlin-runnable="true" id="kotlin-tour-scope-function-with-before"}
 
-該範例建立了一個 `Canvas` 類別，它有三個成員函數：`rect()`、`circ()` 和 `text()`。這些成員函數中的每一個都會列印一條根據你提供的函式參數建構的敘述。
+該範例建立了一個 `Canvas` 類別，其中包含三個成員函數：`rect()`、`circ()` 和 `text()`。每個成員函數都會列印由你提供的函式參數所構成的陳述式。
 
-該範例在對執行個體呼叫具有不同函式參數的一系列成員函數之前，先建立了 `mainMonitorPrimaryBufferBackedCanvas` 作為 `Canvas` 類別的執行個體。
+該範例建立了 `Canvas` 類別的執行個體 `mainMonitorPrimaryBufferBackedCanvas`，隨後使用不同的函式參數對該執行個體依序呼叫一系列成員函數。
 
-你可以看到這段程式碼很難閱讀。如果你使用 `with` 函式，程式碼會變得簡潔：
+你可以看到這段程式碼很難閱讀。如果使用 `with` 函式，程式碼就會變得簡練流暢：
 
 ```kotlin
 class Canvas {
@@ -366,40 +366,40 @@ fun main() {
 ```
 {kotlin-runnable="true" id="kotlin-tour-scope-function-with-after"}
 
-這個範例：
-* 使用 `with` 作用域函式，並以 `mainMonitorSecondaryBufferBackedCanvas` 執行個體作為接收器。
-* 在 `with` 作用域函式內建立一個臨時作用域，以便在呼叫其成員函數時不需要明確引用 `mainMonitorSecondaryBufferBackedCanvas` 執行個體。
-* 向 `with` 作用域函式傳遞一個 Lambda 運算式，該運算式呼叫具有不同函式參數的一系列成員函數。
+該範例：
+* 使用 `with` 作用域函式，並以 `mainMonitorSecondaryBufferBackedCanvas` 執行個體作為接收者。
+* 在 `with` 作用域函式中建立了一個臨時作用域，這樣在呼叫其成員函數時，就不需要明確參照 `mainMonitorSecondaryBufferBackedCanvas` 執行個體。
+* 向 `with` 作用域函式傳遞一個 Lambda 運算式，以不同的函式參數依序呼叫一系列成員函數。
 
-現在這段程式碼更容易閱讀，你也更不容易出錯。
+現在這段程式碼更加易讀，出錯的機率也大幅降低。
 
 ## 使用案例概覽 {id="use-case-overview"}
 
-本節介紹了 Kotlin 中可用的不同作用域函式及其主要使用案例，以使你的程式碼更加道地。你可以將此表格作為快速參考。重要的是要注意，你不需要完全理解這些函式的工作原理即可在程式碼中使用它們。
+本節介紹了 Kotlin 中可用的各種作用域函式，以及讓你的程式碼更具慣用語意的主要使用案例。你可以將此表格作為快速參考。值得注意的是，你不需要完全理解這些函式的底層運作方式，就能在程式碼中使用它們。
 
 | 函式 | 透過以下方式存取 `x` | 傳回值 | 使用案例 |
 |----------|-------------------|---------------|----------------------------------------------------------------------------------------------|
-| `let`    | `it`              | Lambda 結果 | 在程式碼中執行 null 檢查，隨後對傳回的物件執行進一步操作。 |
-| `apply`  | `this`            | `x`           | 在建立物件時進行初始化。 |
-| `run`    | `this`            | Lambda 結果 | 在建立物件時進行初始化**並**計算結果。 |
-| `also`   | `it`              | `x`           | 在傳回物件之前完成額外操作。 |
-| `with`   | `this`            | Lambda 結果 | 對一個物件呼叫多個函式。 |
+| `let` | `it` | Lambda 結果 | 在程式碼中執行 null 檢查，隨後對傳回的物件執行進一步操作。 |
+| `apply` | `this` | `x` | 在建立物件時進行初始化。 |
+| `run` | `this` | Lambda 結果 | 在建立物件時進行初始化**並**計算結果。 |
+| `also` | `it` | `x` | 在傳回物件前完成額外操作。 |
+| `with` | `this` | Lambda 結果 | 在物件上呼叫多個函式。 |
 
-有關作用域函式的更多資訊，請參閱[作用域函式](scope-functions.md)。
+若要深入了解作用域函式，請參閱[作用域函式](scope-functions.md)。
 
 ## 練習 {completion-point="true" id="practice"}
 
-### 練習 1 {initial-collapse-state="collapsed" collapsible="true" id="scope-functions-exercise-1"}
+<deflist appearance="clear" collapsible="true" numbered="true">
+<def title="使用安全呼叫與 let 改寫函式" id="scope-functions-exercise-1">
 
-將 `.getPriceInEuros()` 函式改寫為使用安全呼叫運算子 `?.` 和 `let` 作用域函式的單運算式函式。
+將 `.getPriceInEuros()` 函式改寫為使用安全呼叫運算子 `?.` 與 `let` 作用域函式的單一運算式函式。
 
 <deflist collapsible="true">
     <def title="提示">
-        使用安全呼叫運算子 <code>?.</code> 從 <code>getProductInfo()</code> 函式中安全地存取 <code>priceInDollars</code> 屬性。然後，使用 <code>let</code> 作用域函式將 <code>priceInDollars</code> 的值轉換為歐元。
+        使用安全呼叫運算子 <code>?.</code> 安全地存取來自 <code>getProductInfo()</code> 函式的 <code>priceInDollars</code> 屬性。然後，使用 <code>let</code> 作用域函式將 <code>priceInDollars</code> 的值轉換為歐元。
     </def>
 </deflist>
 
-|---|---|
 ```kotlin
 data class ProductInfo(val priceInDollars: Double?)
 
@@ -436,7 +436,6 @@ fun main() {
 ```
 {validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-scope-functions-exercise-1"}
 
-|---|---|
 ```kotlin
 data class ProductInfo(val priceInDollars: Double?)
 
@@ -464,13 +463,13 @@ fun main() {
     }
 }
 ```
-{initial-collapse-state="collapsed" collapsible="true" collapsed-title="範例解答" id="kotlin-tour-scope-functions-solution-1"}
+{initial-collapse-state="collapsed" collapsible="true" collapsed-title="參考解答" id="kotlin-tour-scope-functions-solution-1"}
 
-### 練習 2 {initial-collapse-state="collapsed" collapsible="true" id="scope-functions-exercise-2"}
+</def>
+<def title="鏈結 apply 與 also" id="scope-functions-exercise-2">
 
-你有一個 `updateEmail()` 函式用於更新使用者的電子郵件地址。使用 `apply` 作用域函式來更新電子郵件地址，然後使用 `also` 作用域函式來列印一條日誌訊息：`Updating email for user with ID: ${it.id}`。
+你有一個用於更新使用者電子郵件地址的 `updateEmail()` 函式。請使用 `apply` 作用域函式來更新電子郵件地址，然後使用 `also` 作用域函式列印記錄訊息：`Updating email for user with ID: ${it.id}`。
 
-|---|---|
 ```kotlin
 data class User(val id: Int, var email: String)
 
@@ -487,7 +486,6 @@ fun main() {
 ```
 {validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-scope-functions-exercise-2"}
 
-|---|---|
 ```kotlin
 data class User(val id: Int, var email: String)
 
@@ -504,7 +502,10 @@ fun main() {
     // Updated User: User(id=1, email=new_email@example.com)
 }
 ```
-{initial-collapse-state="collapsed" collapsible="true" collapsed-title="範例解答" id="kotlin-tour-scope-functions-solution-2"}
+{initial-collapse-state="collapsed" collapsible="true" collapsed-title="參考解答" id="kotlin-tour-scope-functions-solution-2"}
+
+</def>
+</deflist>
 
 <seealso></seealso>
 

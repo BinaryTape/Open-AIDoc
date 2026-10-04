@@ -1,21 +1,21 @@
-[//]: # (title: Null安全)
+[//]: # (title: Null安全（Null safety）)
 
 <no-index/>
 
-初級編のツアーでは、コード内で `null` 値を扱う方法を学びました。この章では、Null安全機能の一般的なユースケースと、それらを最大限に活用する方法について説明します。
+入門ツアーでは、コード内で `null` 値を処理する方法を学びました。この章では、Null安全機能の一般的なユースケースと、それらを最大限に活用する方法について解説します。
 
-## スマートキャストと安全なキャスト {id="smart-casts-and-safe-casts"}
+## スマートキャストとセーフキャスト {id="smart-casts-and-safe-casts"}
 
-Kotlinでは、明示的な宣言がなくても型を推論できる場合があります。変数やオブジェクトを特定の型に属しているかのように扱うようKotlinに指示するプロセスは、**キャスト**（casting）と呼ばれます。型が自動的にキャストされる場合（推論される場合など）、それは**スマートキャスト**（smart casting）と呼ばれます。
+Kotlin は、明示的な宣言がなくても型を推論できる場合があります。変数やオブジェクトを特定の型に属しているかのように扱うよう Kotlin に指示するプロセスを、**キャスト（casting）** と呼びます。型が推論された場合のように自動的にキャストされる場合、それを**スマートキャスト（smart casting）** と呼びます。
 
 ### is および !is 演算子 {id="is-and-is-operators"}
 
-キャストの仕組みを詳しく見る前に、オブジェクトが特定の型であるかどうかを確認する方法を見てみましょう。これには、`when` や `if` の条件式で `is` および `!is` 演算子を使用します。
+キャストがどのように機能するかを見る前に、オブジェクトが特定の型であるかどうかを確認する方法を見てみましょう。これには、`when` や `if` 条件式と一緒に `is` および `!is` 演算子を使用できます。
 
-* `is` はオブジェクトがその型であるかを確認し、ブール値を返します。
-* `!is` はオブジェクトがその型で**ない**ことを確認し、ブール値を返します。
+* `is` は、オブジェクトがその型であるかどうかをチェックし、Boolean 値を返します。
+* `!is` は、オブジェクトがその型**ではない**かどうかをチェックし、Boolean 値を返します。
 
-例：
+例:
 
 ```kotlin
 fun printObjectType(obj: Any) {
@@ -39,20 +39,20 @@ fun main() {
     printObjectType(myList)
     // It's NOT a Double
 
-    // 型は Double なので、else ブランチが実行される
+    // 型は Double なので、else 分岐がトリガーされる
     printObjectType(myDouble)
     // Unknown type
 }
 ```
 {kotlin-runnable="true" id="kotlin-tour-null-safety-casts"}
 
-> `when` 条件式で `is` および `!is` 演算子を使用する例は、[openクラスとその他の特殊なクラス](kotlin-tour-intermediate-open-special-classes.md#sealed-classes) の章ですでに確認しました。
+> `when` 条件式と `is` および `!is` 演算子を組み合わせる例は、[オープンなクラスとその他の特別なクラス](kotlin-tour-intermediate-open-special-classes.md#sealed-classes)の章ですでに確認しました。
 > 
 {style="tip"}
 
 ### as および as? 演算子 {id="as-and-as-operators"}
 
-オブジェクトを他の型に明示的に*キャスト*するには、`as` 演算子を使用します。これには、Null許容型からそれに対応する非Null型へのキャストも含まれます。キャストが不可能な場合、プログラムは**実行時に**クラッシュします。そのため、これは**安全ではない（unsafe）**キャスト演算子と呼ばれます。
+オブジェクトを別の型に明示的に*キャスト*するには、`as` 演算子を使用します。これには、null許容型からその非null対応型へのキャストも含まれます。キャストが不可能な場合、プログラムは**実行時（at runtime）** にクラッシュします。そのため、これは**安全ではない（unsafe）** キャスト演算子と呼ばれます。
 
 ```kotlin
 fun main() {
@@ -60,14 +60,14 @@ fun main() {
     val a: String? = null
     val b = a as String
 
-    // 実行時にエラーが発生する
+    // 実行時にエラーを発生させる
     print(b)
 //sampleEnd
 }
 ```
 {kotlin-runnable="true" validate="false" id="kotlin-tour-null-safety-as-operator"}
 
-オブジェクトを非Null型に明示的にキャストしつつ、失敗した場合にエラーを投げるのではなく `null` を返したい場合は、`as?` 演算子を使用します。`as?` 演算子は失敗してもエラーを発生させないため、**安全な（safe）**演算子と呼ばれます。
+オブジェクトを明示的に非null型にキャストしつつ、失敗時にエラーをスローする代わりに `null` を返すようにするには、`as?` 演算子を使用します。`as?` 演算子は失敗してもエラーをトリガーしないため、**安全な（safe）** 演算子と呼ばれます。
 
 ```kotlin
 fun main() {
@@ -83,7 +83,7 @@ fun main() {
 ```
 {kotlin-runnable="true" id="kotlin-tour-null-safety-safe-operator"}
 
-`as?` 演算子とエルビス演算子 `?:` を組み合わせることで、数行のコードを1行にまとめることができます。たとえば、以下の `calculateTotalStringLength()` 関数は、混在したリストに含まれるすべての文字列の合計の長さを計算します。
+`as?` 演算子を Elvis 演算子 `?:` と組み合わせることで、複数行のコードを1行に短縮できます。たとえば、次の `calculateTotalStringLength()` 関数は、混在したリストに含まれるすべての文字列の長さの合計を計算します。
 
 ```kotlin
 fun calculateTotalStringLength(items: List<Any>): Int {
@@ -93,7 +93,7 @@ fun calculateTotalStringLength(items: List<Any>): Int {
         totalLength += if (item is String) {
             item.length
         } else {
-            0  // 文字列以外のアイテムには 0 を加算
+            0  // String でない要素には 0 を加算
         }
     }
 
@@ -101,16 +101,16 @@ fun calculateTotalStringLength(items: List<Any>): Int {
 }
 ```
 
-この例では：
+この例では:
 
 * `totalLength` 変数をカウンターとして使用しています。
-* `for` ループを使用してリスト内のすべてのアイテムをループしています。
-* `if` と `is` 演算子を使用して、現在のアイテムが文字列かどうかを確認しています。
-    * 文字列であれば、その長さがカウンターに加算されます。
-    * 文字列でなければ、カウンターはインクリメントされません。
-* `totalLength` 変数の最終的な値を返します。
+* `for` ループを使用してリスト内のすべての要素を反復処理しています。
+* `if` と `is` 演算子を使用して、現在の要素が文字列かどうかをチェックしています:
+  * 文字列である場合、文字列の長さがカウンターに加算されます。
+  * 文字列でない場合、カウンターは増加しません。
+* `totalLength` 変数の最終値を返します。
 
-このコードは以下のように短縮できます。
+このコードは次のように短縮できます。
 
 ```kotlin
 fun calculateTotalStringLength(items: List<Any>): Int {
@@ -118,15 +118,15 @@ fun calculateTotalStringLength(items: List<Any>): Int {
 }
 ```
 
-この例では [`.sumOf()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/sum-of.html) 拡張関数を使用し、以下の処理を行うラムダ式を渡しています。
+この例では [`.sumOf()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/sum-of.html) 拡張関数を使用し、次のようなラムダ式を提供しています。
 
-* リスト内の各アイテムに対して、`as?` を使用して `String` への安全なキャストを実行します。
-* 安全な呼び出し `?.` を使用して、呼び出しが `null` を返さない場合に `length` プロパティにアクセスします。
-* エルビス演算子 `?:` を使用して、安全な呼び出しが `null` を返した場合には `0` を返します。
+* リスト内の各要素に対して、`as?` を使用して `String` へのセーフキャストを実行します。
+* 呼び出しが `null` 値を返さない場合に、安全な呼び出し `?.` を使用して `length` プロパティにアクセスします。
+* 安全な呼び出しが `null` 値を返した場合に、Elvis 演算子 `?:` を使用して `0` を返します。
 
 ## Null 値とコレクション {id="null-values-and-collections"}
 
-Kotlinにおいて、コレクションの操作には `null` 値の処理や不要な要素のフィルタリングが含まれることがよくあります。Kotlinには、リスト、セット、マップ、その他の種類のコレクションを扱う際に、クリーンで効率的、かつNull安全なコードを書くために役立つ関数が用意されています。
+Kotlin では、コレクションを扱う際に `null` 値の処理や不要な要素のフィルタリングが頻繁に発生します。Kotlin には、リスト、セット、マップ、その他の種類のコレクションを操作する際に、クリーンで効率的、かつ null 安全なコードを書くために使用できる便利な関数が用意されています。
 
 リストから `null` 値をフィルタリングするには、[`filterNotNull()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/filter-not-null.html) 関数を使用します。
 
@@ -164,14 +164,14 @@ fun main() {
 ```
 {kotlin-runnable="true" id="kotlin-tour-null-safety-listofnotnull"}
 
-これらの例では、すべてのアイテムが `null` 値である場合、空のリストが返されます。
+これらの例のどちらでも、すべての要素が `null` 値である場合は、空のリストが返されます。
 
-Kotlinには、コレクション内の値を検索するために使用できる関数も用意されています。値が見つからない場合、これらはエラーを発生させる代わりに `null` 値を返します。
+Kotlin は、コレクション内の値を検索するために使用できる関数も提供しています。値が見つからない場合、これらはエラーを発生させる代わりに `null` 値を返します。
 
-* [`maxOrNull()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/max-or-null.html) は最大値を見つけます。存在しない場合は `null` を返します。
-* [`minOrNull()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/min-or-null.html) は最小値を見つけます。存在しない場合は `null` を返します。
+* [`maxOrNull()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/max-or-null.html) は最大値を見つけます。存在しない場合は、`null` 値を返します。
+* [`minOrNull()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/min-or-null.html) は最小値を見つけます。存在しない場合は、`null` 値を返します。
 
-例：
+例:
 
 ```kotlin
 fun main() {
@@ -179,12 +179,12 @@ fun main() {
     // 1週間に記録された気温
     val temperatures = listOf(15, 18, 21, 21, 19, 17, 16)
   
-    // 週の最高気温を見つける
+    // 1週間の最高気温を見つける
     val maxTemperature = temperatures.maxOrNull()
     println("Highest temperature recorded: ${maxTemperature ?: "No data"}")
     // Highest temperature recorded: 21
 
-    // 週の最低気温を見つける
+    // 1週間の最低気温を見つける
     val minTemperature = temperatures.minOrNull()
     println("Lowest temperature recorded: ${minTemperature ?: "No data"}")
     // Lowest temperature recorded: 15
@@ -193,13 +193,13 @@ fun main() {
 ```
 {kotlin-runnable="true" id="kotlin-tour-null-safety-collections"}
 
-この例では、エルビス演算子 `?:` を使用して、関数が `null` 値を返した場合に出力する文字列を指定しています。
+この例では、関数が `null` 値を返した場合に出力する文字列を返すために Elvis 演算子 `?:` を使用しています。
 
-> `maxOrNull()` および `minOrNull()` 関数は、`null` 値を**含まない**コレクションで使用するように設計されています。そうでない場合、関数が目的の値を見つけられなかったのか、それとも `null` 値を見つけたのかを区別できません。
+> `maxOrNull()` および `minOrNull()` 関数は、`null` 値を含ま**ない**コレクションで使用するように設計されています。そうでない場合、関数が目的の値を見つけられなかったのか、それとも `null` 値を見つけたのかを判別できません。
 >
 {style="note"}
 
-[`singleOrNull()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/single-or-null.html) 関数をラムダ式と組み合わせて使用すると、条件に一致する単一のアイテムを検索できます。一致するものが存在しない、あるいは複数存在する場合、関数は `null` 値を返します。
+ラムダ式とともに [`singleOrNull()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/single-or-null.html) 関数を使用すると、条件に一致する単一の要素を検索できます。一致する要素が存在しないか、複数存在する場合、この関数は `null` 値を返します。
 
 ```kotlin
 fun main() {
@@ -207,7 +207,7 @@ fun main() {
     // 1週間に記録された気温
     val temperatures = listOf(15, 18, 21, 21, 19, 17, 16)
 
-    // 気温がちょうど30度の日が1日だけあったか確認する
+    // 30度のあった日がちょうど1日だけあったかどうかを確認
     val singleHotDay = temperatures.singleOrNull{ it == 30 }
     println("Single hot day with 30 degrees: ${singleHotDay ?: "None"}")
     // Single hot day with 30 degrees: None
@@ -216,13 +216,13 @@ fun main() {
 ```
 {kotlin-runnable="true" id="kotlin-tour-null-safety-singleornull"}
 
-> `singleOrNull()` 関数は、`null` 値を**含まない**コレクションで使用するように設計されています。
+> `singleOrNull()` 関数は、`null` 値を含ま**ない**コレクションで使用するように設計されています。
 >
 {style="note"}
 
-一部の関数は、ラムダ式を使用してコレクションを変換し、目的を果たせない場合には `null` 値を返します。
+一部の関数はラムダ式を使用してコレクションを変換し、その目的を果たせない場合に `null` 値を返します。
 
-ラムダ式でコレクションを変換し、`null` ではない最初の値を返すには、[`firstNotNullOfOrNull()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/first-not-null-of-or-null.html) 関数を使用します。そのような値が存在しない場合、関数は `null` 値を返します。
+ラムダ式でコレクションを変換し、`null` ではない最初の値を返すには、[`firstNotNullOfOrNull()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/first-not-null-of-or-null.html) 関数を使用します。そのような値が存在しない場合、この関数は `null` 値を返します。
 
 ```kotlin
 fun main() {
@@ -243,15 +243,15 @@ fun main() {
 ```
 {kotlin-runnable="true" id="kotlin-tour-null-safety-firstnotnullofornull"}
 
-各コレクションアイテムを順次処理して累積値を作成する（またはコレクションが空の場合は `null` 値を返す）には、[`reduceOrNull()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/reduce-or-null.html) 関数を使用します。
+ラムダ式を使用して各コレクション要素を順次処理し、累積値を作成する（またはコレクションが空の場合は `null` 値を返す）には、[`reduceOrNull()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/reduce-or-null.html) 関数を使用します。
 
 ```kotlin
 fun main() {
 //sampleStart
-    // ショッピングカート内のアイテムの価格
+    // ショッピングカート内の商品の価格
     val itemPrices = listOf(20, 35, 15, 40, 10)
 
-    // reduceOrNull() 関数を使用して合計金額を計算する
+    // reduceOrNull() 関数を使用して合計金額を計算
     val totalPrice = itemPrices.reduceOrNull { runningTotal, price -> runningTotal + price }
     println("Total price of items in the cart: ${totalPrice ?: "No items"}")
     // Total price of items in the cart: 120
@@ -265,31 +265,31 @@ fun main() {
 ```
 {kotlin-runnable="true" id="kotlin-tour-null-safety-reduceornull"}
 
-この例でも、関数が `null` 値を返した場合に出力する文字列を指定するためにエルビス演算子 `?:` を使用しています。
+この例でも、関数が `null` 値を返した場合に出力する文字列を返すために Elvis 演算子 `?:` を使用しています。
 
-> `reduceOrNull()` 関数は、`null` 値を**含まない**コレクションで使用するように設計されています。
+> `reduceOrNull()` 関数は、`null` 値を含ま**ない**コレクションで使用するように設計されています。
 >
 {style="note"}
 
-コードをより安全にするために使用できるその他の関数については、Kotlinの [標準ライブラリ](https://kotlinlang.org/api/core/kotlin-stdlib/) を探索してください。
+コードをより安全にするために使用できる他の関数については、Kotlin の[標準ライブラリ（standard library）](https://kotlinlang.org/api/core/kotlin-stdlib/)を参照してください。
 
-## 早期リターンとエルビス演算子 {id="early-returns-and-the-elvis-operator"}
+## 早期リターンと Elvis 演算子 {id="early-returns-and-the-elvis-operator"}
 
-初級編のツアーでは、関数の処理を特定の地点で停止させるために [早期リターン](kotlin-tour-functions.md#early-returns-in-functions) を使用する方法を学びました。エルビス演算子 `?:` を早期リターンと組み合わせて使用することで、関数内の事前条件をチェックできます。このアプローチは、ネストされたチェックを使用する必要がないため、コードを簡潔に保つのに最適です。コードの複雑さが軽減されるため、メンテナンスも容易になります。例：
+入門ツアーでは、ある地点以降に関数の処理が進むのを停止するために[早期リターン（early return）](kotlin-tour-functions.md#early-returns-in-functions)を使用する方法を学びました。関数内の前提条件をチェックするために、早期リターンと Elvis 演算子 `?:` を組み合わせることができます。このアプローチはネストされたチェックを使用する必要がないため、コードを簡潔に保つための優れた方法です。コードの複雑さが軽減されるため、保守も容易になります。例:
 
 ```kotlin
 data class User(
     val id: Int,
     val name: String,
-    // 友人のユーザーIDのリスト
+    // 友達のユーザーIDのリスト
     val friends: List<Int>
 )
 
-// ユーザーの友人の数を取得する関数
+// ユーザーの友達の数を取得する関数
 fun getNumberOfFriends(users: Map<Int, User>, userId: Int): Int {
     // ユーザーを取得し、見つからない場合は -1 を返す
     val user = users[userId] ?: return -1
-    // 友人の数を返す
+    // 友達の数を返す
     return user.friends.size
 }
 
@@ -312,22 +312,22 @@ fun main() {
 ```
 {kotlin-runnable="true" id="kotlin-tour-null-safety-early-return"}
 
-この例では：
+この例では:
 
-* `id`、`name`、および友人のリストのプロパティを持つ `User` データクラスがあります。
-* `getNumberOfFriends()` 関数は：
-    * `User` インスタンスのマップと、整数としてのユーザーIDを受け取ります。
-    * 提供されたユーザーIDを使用して `User` インスタンスのマップの値にアクセスします。
-    * エルビス演算子を使用して、マップの値が `null` の場合に `-1` という値で関数を早期に終了させます。
-    * マップから見つかった値を `user` 変数に代入します。
-    * `size` プロパティを使用して、ユーザーの友人リストの友人数を返します。
-* `main()` 関数は：
-    * 3つの `User` インスタンスを作成します。
-    * これらの `User` インスタンスのマップを作成し、`users` 変数に代入します。
-    * `users` 変数に対して `1` と `2` の値で `getNumberOfFriends()` 関数を呼び出し、`"Alice"` には2人の友人が、`"Bob"` には1人の友人がいることを返します。
-    * `users` 変数に対して `4` の値で `getNumberOfFriends()` 関数を呼び出し、値 `-1` で早期リターンを発生させます。
+* ユーザーの `id`、`name`、および友達のリスト用のプロパティを持つ `User` データクラスがあります。
+* `getNumberOfFriends()` 関数は:
+  * `User` インスタンスのマップと、整数としてのユーザー ID を受け取ります。
+  * 提供されたユーザー ID を使用して、`User` インスタンスのマップの値にアクセスします。
+  * マップの値が `null` 値の場合、Elvis 演算子を使用して値 `-1` で関数から早期リターンします。
+  * マップから見つかった値を `user` 変数に代入します。
+  * `size` プロパティを使用して、ユーザーの友達リスト内の友達の数を返します。
+* `main()` 関数は:
+  * 3つの `User` インスタンスを作成します。
+  * これらの `User` インスタンスのマップを作成し、`users` 変数に代入します。
+  * `users` 変数に対して値 `1` および `2` で `getNumberOfFriends()` 関数を呼び出し、`"Alice"` には2人の友達、`"Bob"` には1人の友達を返します。
+  * `users` 変数に対して値 `4` で `getNumberOfFriends()` 関数を呼び出します。これにより、値 `-1` で早期リターンがトリガーされます。
 
-早期リターンを使わなくても、コードをもっと簡潔にできることに気づくかもしれません。しかし、そのアプローチでは `users[userId]` が `null` 値を返す可能性があるため、複数の安全な呼び出しが必要になり、コードが少し読みにくくなります。
+早期リターンを使わなければコードをさらに簡潔にできるのではないかと思うかもしれません。ただし、その方法では `users[userId]` が `null` 値を返す可能性があるため、複数の安全な呼び出しが必要になり、コードが少し読みにくくなります。
 
 ```kotlin
 fun getNumberOfFriends(users: Map<Int, User>, userId: Int): Int {
@@ -337,22 +337,24 @@ fun getNumberOfFriends(users: Map<Int, User>, userId: Int): Int {
 ```
 {validate="false"}
 
-この例ではエルビス演算子で1つの条件のみをチェックしていますが、重要なエラーパスをカバーするために複数のチェックを追加することもできます。エルビス演算子を使用した早期リターンは、プログラムが不要な処理を行うのを防ぎ、`null` 値や無効なケースが検出されたらすぐに停止させることで、コードをより安全にします。
+この例では Elvis 演算子で1つの条件のみをチェックしていますが、重大なエラーパスをカバーするために複数のチェックを追加することもできます。Elvis 演算子を使用した早期リターンは、プログラムが無駄な処理を行うのを防ぎ、`null` 値や無効なケースが検出されたらすぐに停止することで、コードをより安全にします。
 
-コードで `return` を使用する方法の詳細については、[リターンとジャンプ](returns.md) を参照してください。
+コード内で `return` を使用する方法の詳細については、[リターンとジャンプ](returns.md)を参照してください。
 
 ## 練習問題 {completion-point="true" id="practice"}
 
-### 練習問題 1 {initial-collapse-state="collapsed" collapsible="true" id="null-safety-exercise-1"}
+<deflist appearance="clear" collapsible="true" numbered="true">
+<def title="セーフキャストと Elvis 演算子によるユーザーデータの検証" id="null-safety-exercise-1">
 
-ユーザーがさまざまな種類の通知を有効または無効にできるアプリの通知システムを開発しています。以下の条件を満たすように `getNotificationPreferences()` 関数を完成させてください。
+ユーザーがさまざまな種類の通知を有効または無効にできるアプリの通知システムを開発しています。
+次の条件を満たすように `getNotificationPreferences()` 関数を完成させてください。
 
-1. `validUser` 変数で `as?` 演算子を使用して、`user` が `User` クラスのインスタンスであるかを確認する。そうでなければ空のリストを返す。
-2. `userName` 変数でエルビス演算子 `?:` を使用して、ユーザー名が `null` の場合にデフォルトで `"Guest"` になるようにする。
-3. 最終的な return 文で `.takeIf()` 関数を使用し、メールとSMSの通知設定が有効な場合にのみ含めるようにする。
-4. `main()` 関数が正常に実行され、期待通りの出力が表示されるようにする。
+1. `validUser` 変数で `as?` 演算子を使用して、`user` が `User` クラスのインスタンスであるかどうかをチェックします。そうでない場合は、空のリストを返します。
+2. `userName` 変数で Elvis `?:` 演算子を使用して、ユーザーの名前が `null` の場合にデフォルトで `"Guest"` になるようにします。
+3. 最後の return 文で `.takeIf()` 関数を使用して、有効になっている場合にのみメールおよび SMS の通知設定を含めます。
+4. `main()` 関数が正常に実行され、期待される出力を出力すること。
 
-> [`takeIf()` 関数](scope-functions.md#takeif-and-takeunless) は、与えられた条件が真であれば元の値を返し、そうでなければ `null` を返します。例：
+> [`takeIf()` 関数](scope-functions.md#takeif-and-takeunless)は、指定された条件が真の場合は元の値を返し、そうでない場合は `null` を返します。例:
 >
 > ```kotlin
 > fun main() {
@@ -361,8 +363,7 @@ fun getNumberOfFriends(users: Map<Int, User>, userId: Int): Int {
 >     // ユーザーにアクティブなセッションがある
 >     val hasSession = true
 > 
->     // ユーザーがログインしており、かつアクティブなセッションがある場合に
->     // ダッシュボードへのアクセスを許可する
+>     // ユーザーがログインしており、アクティブなセッションがある場合にダッシュボードへのアクセスを許可する
 >     val canAccessDashboard = userIsLoggedIn.takeIf { hasSession }
 > 
 >     println(canAccessDashboard ?: "Access denied")
@@ -371,8 +372,6 @@ fun getNumberOfFriends(users: Map<Int, User>, userId: Int): Int {
 > ```
 >
 {style = "tip"}
-
-|--|--|
 
 ```kotlin
 data class User(val name: String?)
@@ -398,8 +397,6 @@ fun main() {
 }
 ```
 {validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-null-safety-exercise-1"}
-
-|--|--|
 
 ```kotlin
 data class User(val name: String?)
@@ -429,11 +426,10 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="解答例" id="kotlin-tour-null-safety-solution-1"}
 
-### 練習問題 2 {initial-collapse-state="collapsed" collapsible="true" id="null-safety-exercise-2"}
+</def>
+<def title="singleOrNull() で単一のアクティブなサブスクリプションを検索する" id="null-safety-exercise-2">
 
-あなたはサブスクリプション制のストリーミングサービスに取り組んでおり、ユーザーは複数のサブスクリプションを持つことができますが、**一度にアクティブにできるのは1つだけ**です。`singleOrNull()` 関数を述語（predicate）とともに使用して、アクティブなサブスクリプションが複数ある場合に `null` 値を返すように、`getActiveSubscription()` 関数を完成させてください。
-
-|--|--|
+ユーザーが複数のサブスクリプションを所有できるものの、**一度にアクティブにできるのは1つだけ**というサブスクリプションベースのストリーミングサービスで作業しています。述語（プレディケート）付きの `singleOrNull()` 関数を使用して、アクティブなサブスクリプションが複数ある場合に `null` 値を返すように `getActiveSubscription()` 関数を完成させてください。
 
 ```kotlin
 data class Subscription(val name: String, val isActive: Boolean)
@@ -459,8 +455,6 @@ fun main() {
 }
 ```
 {validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-null-safety-exercise-2"}
-
-|--|--|
 
 ```kotlin
 data class Subscription(val name: String, val isActive: Boolean)
@@ -489,8 +483,6 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="解答例 1" id="kotlin-tour-null-safety-solution-2-1"}
 
-|--|--|
-
 ```kotlin
 data class Subscription(val name: String, val isActive: Boolean)
 
@@ -517,11 +509,10 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="解答例 2" id="kotlin-tour-null-safety-solution-2-2"}
 
-### 練習問題 3 {initial-collapse-state="collapsed" collapsible="true" id="null-safety-exercise-3"}
+</def>
+<def title="mapNotNull() でアクティブなユーザー名をフィルタリングする" id="null-safety-exercise-3">
 
-あなたはソーシャルメディアプラットフォームに取り組んでおり、ユーザーにはユーザー名とアカウントステータスがあります。現在アクティブなユーザー名のリストを確認したいと考えています。[`mapNotNull()` 関数](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/map-not-null.html) に、ユーザーがアクティブであればそのユーザー名を返し、そうでなければ `null` 値を返す述語（predicate）を指定して、`getActiveUsernames()` 関数を完成させてください。
-
-|--|--|
+ユーザーがユーザー名とアカウントステータスを持っているソーシャルメディアプラットフォームで作業しています。現在アクティブなユーザー名のリストを確認したいと考えています。[`mapNotNull()` 関数](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/map-not-null.html)に述語を持たせ、アクティブな場合はユーザー名を返し、そうでない場合は `null` 値を返すように `getActiveUsernames()` 関数を完成させてください。
 
 ```kotlin
 data class User(val username: String, val isActive: Boolean)
@@ -543,13 +534,9 @@ fun main() {
 ```
 {validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-null-safety-exercise-3"}
 
-|--|--|
-
-> 練習問題 1 と同様に、ユーザーがアクティブかどうかをチェックする際に [`takeIf()` 関数](scope-functions.md#takeif-and-takeunless) を使用することもできます。
+> 練習問題 1 と同様に、ユーザーがアクティブかどうかをチェックする際に [`takeIf()` 関数](scope-functions.md#takeif-and-takeunless)を使用できます。
 >
 { style = "tip" }
-
-|--|--|
 
 ```kotlin
 data class User(val username: String, val isActive: Boolean)
@@ -573,8 +560,6 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="解答例 1" id="kotlin-tour-null-safety-solution-3-1"}
 
-|--|--|
-
 ```kotlin
 data class User(val username: String, val isActive: Boolean)
 
@@ -594,20 +579,19 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="解答例 2" id="kotlin-tour-null-safety-solution-3-2"}
 
-### 練習問題 4 {initial-collapse-state="collapsed" collapsible="true" id="null-safety-exercise-4"}
+</def>
+<def title="早期リターンと Elvis 演算子による在庫の検証" id="null-safety-exercise-4">
 
-あなたは Eコマースプラットフォームの在庫管理システムに取り組んでいます。販売を処理する前に、利用可能な在庫に基づいて、製品の要求数量が有効かどうかを確認する必要があります。
+Eコマースプラットフォームの在庫管理システムで作業しています。販売を処理する前に、利用可能な在庫に基づいて商品のリクエスト数量が有効であるかどうかを確認する必要があります。
 
-早期リターンとエルビス演算子（該当する場合）を使用して、以下をチェックするように `validateStock()` 関数を完成させてください。
+早期リターンと Elvis 演算子（該当する場合）を使用して次の条件をチェックするように、`validateStock()` 関数を完成させてください。
 
 * `requested` 変数が `null` である。
 * `available` 変数が `null` である。
 * `requested` 変数が負の値である。
-* `requested` 変数の量が `available` 変数の量よりも多い。
+* `requested` 変数の数量が `available` 変数の数量を超えている。
 
-上記のすべての場合において、関数は値 `-1` で早期リターンする必要があります。
-
-|--|--|
+上記のいずれの場合も、関数は値 `-1` で早期リターンする必要があります。
 
 ```kotlin
 fun validateStock(requested: Int?, available: Int?): Int {
@@ -624,8 +608,6 @@ fun main() {
 }
 ```
 {validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-null-safety-exercise-4"}
-
-|--|--|
 
 ```kotlin
 fun validateStock(requested: Int?, available: Int?): Int {
@@ -648,6 +630,9 @@ fun main() {
 }
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="解答例" id="kotlin-tour-null-safety-solution-4"}
+
+</def>
+</deflist>
 
 <seealso></seealso>
 

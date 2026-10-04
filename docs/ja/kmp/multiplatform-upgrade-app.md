@@ -1,64 +1,114 @@
-[//]: # (title: iOSとAndroid間でより多くのロジックを共有する)
+[//]: # (title: ネイティブ UI: REST API リクエスト用の共有ロジック)
 
 <secondary-label ref="IntelliJ IDEA"/>
 <secondary-label ref="Android Studio"/>
 
-<tldr>
-    <p>このチュートリアルではIntelliJ IDEAを使用しますが、Android Studioでも同様に進めることができます。両方のIDEは同じコア機能とKotlin Multiplatformのサポートを共有しています。</p>
-    <br/>
-    <p>これは<strong>「共有ロジックとネイティブUIを備えたKotlin Multiplatformアプリの作成」</strong>チュートリアルの第4部です。続行する前に、前のステップを完了していることを確認してください。</p>
-    <p><img src="icon-1-done.svg" width="20" alt="First step"/> <Links href="/kmp/multiplatform-create-first-app" summary="This tutorial uses IntelliJ IDEA, but you can also follow it in Android Studio – both IDEs share the same core functionality and Kotlin Multiplatform support. This is the first part of the Create a Kotlin Multiplatform app with shared logic and native UI tutorial. Create your Kotlin Multiplatform app Update the user interface Add dependencies Share more logic Wrap up your project">Kotlin Multiplatformアプリの作成</Links><br/>
-      <img src="icon-2-done.svg" width="20" alt="Second step"/> <Links href="/kmp/multiplatform-update-ui" summary="This tutorial uses IntelliJ IDEA, but you can also follow it in Android Studio – both IDEs share the same core functionality and Kotlin Multiplatform support. This is the second part of the Create a Kotlin Multiplatform app with shared logic and native UI tutorial. Before proceeding, make sure you've completed previous steps. Create your Kotlin Multiplatform app Update the user interface Add dependencies Share more logic Wrap up your project">ユーザーインターフェースの更新</Links><br/>
-      <img src="icon-3-done.svg" width="20" alt="Third step"/> <Links href="/kmp/multiplatform-dependencies" summary="This tutorial uses IntelliJ IDEA, but you can also follow it in Android Studio – both IDEs share the same core functionality and Kotlin Multiplatform support. This is the third part of the Create a Kotlin Multiplatform app with shared logic and native UI tutorial. Before proceeding, make sure you've completed previous steps. Create your Kotlin Multiplatform app Update the user interface Add dependencies Share more logic Wrap up your project">依存関係の追加</Links><br/>
-      <img src="icon-4.svg" width="20" alt="Fourth step"/> <strong>より多くのロジックを共有する</strong><br/>
-      <img src="icon-5-todo.svg" width="20" alt="Fifth step"/> プロジェクトのまとめ<br/>
-    </p>
-</tldr>
+このチュートリアルでは、特定のビジネスロジックのコードを共有しながら、ネイティブコードで個別の UI を実装する方法を説明します。
+ロジックと UI の両方を共有する例については、[完全に共有されたコード: タイムゾーン選択アプリ](compose-multiplatform-new-project.md) を参照してください。
 
-外部の依存関係を使用して共通ロジックを実装したので、より複雑なロジックの追加を開始できます。ネットワークリクエストとデータシリアライゼーションは、Kotlin Multiplatformを使用してコードを共有するための[最も一般的なユースケース](https://kotlinlang.org/lp/multiplatform/)です。このオンボーディングジャーニーを完了した後に将来のプロジェクトで使用できるように、最初のアプリケーションでこれらを実装する方法を学びましょう。
+ここでは、[Launch Library 2](https://lldev.thespacedevs.com/docs) REST API から最新の宇宙ロケット打ち上げ成功に関する情報を取得し、その結果を表示するアプリケーションを作成します。
+ネットワーク処理およびデータシリアライズのコードは、iOS と Android の間で共有されます。
 
-更新されたアプリは、インターネット経由で [LaunchLibrary 2](https://lldev.thespacedevs.com/docs) API からデータを取得し、最新の宇宙打ち上げの概要を表示します。
+Kotlin Multiplatform IDE ウィザードで作成したプロジェクトから最終成果物に仕上げるために、以下の手順を行います。
 
-> プロジェクトの最終的な状態は、GitHubリポジトリの2つのブランチにあり、それぞれ異なるコルーチンソリューションが含まれています。
-> * [`main`](https://github.com/kotlin-hands-on/get-started-with-kmp/tree/main) ブランチには、KMP-NativeCoroutinesによる実装が含まれています。
-> * [`main-skie`](https://github.com/kotlin-hands-on/get-started-with-kmp/tree/main-skie) ブランチには、SKIEによる実装が含まれています。
+1. [共通およびプラットフォーム固有の依存関係を設定する](#add-dependencies)
+2. [API リクエストとレスポンス保存用のデータモデルをセットアップする](#set-up-api-requests)
+3. ネイティブ UI でデータを取得・表示する:
+   * [Android UI の更新](#update-native-android-ui) 
+   * [iOS UI の更新](#update-native-ios-ui)。
+     Kotlin コルーチンを Swift コードに統合するための2つの異なるライブラリを試すことができます。
+
+> プロジェクトの最終状態は、GitHub リポジトリの2つのブランチで利用可能であり、それぞれ異なる iOS コルーチンソリューションが採用されています。
+> * [`main`](https://github.com/kotlin-hands-on/get-started-with-kmp/tree/main) ブランチには KMP-NativeCoroutines 実装が含まれています。
+> * [`main-skie`](https://github.com/kotlin-hands-on/get-started-with-kmp/tree/main-skie) ブランチには SKIE（Kotlin-Swift 相互運用性ライブラリ）実装が含まれています。
 >
-{style="note"}
+{style="tip"}
 
-## 依存関係の追加 {id="add-more-dependencies"}
+## プロジェクトの作成 {id="create-a-project"}
 
-プロジェクトに以下のマルチプラットフォームライブラリを追加する必要があります。
+IDE と Kotlin Multiplatform IDE プラグインをインストールした状態で、新しい Kotlin Multiplatform プロジェクトを作成します。
 
-* [`kotlinx.coroutines`](https://github.com/Kotlin/kotlinx.coroutines): 同時操作を可能にするために、コルーチン（coroutines）を使用します。
-* [`kotlinx.serialization`](https://github.com/Kotlin/kotlinx.serialization): SpaceX API からの JSON レスポンスを、ネットワーク操作の処理に使用されるエンティティクラスのオブジェクトにデシリアライズします。
-* [Ktor](https://ktor.io/): HTTP 経由でデータを送受信するためのフレームワークです。
+1. IntelliJ IDEA で、**File** | **New** | **Project** を選択します。
+2. 左側のパネルで **Kotlin Multiplatform** を選択します。
+3. **New Project** ウィンドウで以下の項目を指定します。
+
+    * **Name**: GreetingKMP
+    * **Project ID**（パッケージ名として使用）: com.jetbrains.greetingkmp
+
+4. **Android** と **iOS** のターゲットを選択します。
+   iOS については、UI をネイティブに保つために **Do not share UI** オプションを選択します。
+5. **Create** をクリックします。
+
+   ![Kotlin Multiplatform プロジェクトの作成](create-first-multiplatform-app.png){width=700}
+
+最初のインポートには数分かかります。
+完了したら、すべての事前チェック（preflight checks）が緑色になっていることを確認してください（**View | Tool Windows | Projects Environment Preflight Checks**）。
+
+## プロジェクト構造の確認 {id="examine-the-project-structure"}
+
+IntelliJ IDEA で `GreetingKMP` フォルダを展開します。
+
+この Kotlin Multiplatform プロジェクトには、以下のモジュールが含まれています。
+
+* **androidApp** は、Android アプリケーションをビルドする Kotlin モジュールです。ビルドシステムとして Gradle を使用します。
+  **androidApp** モジュールは、通常の Android ライブラリとして **sharedLogic** モジュールに依存し、これを使用します。
+* **iosApp** は、iOS アプリケーションをビルドする Xcode プロジェクトです。
+* **sharedLogic** は、Android アプリケーションと iOS アプリケーションで共有されるロジックを含むマルチプラットフォームモジュールです。
+* **sharedUI** は、Compose Multiplatform で実装された UI コードを含むモジュールです。
+  このプロジェクトでは、**sharedUI** は Android アプリでのみ使用されますが、必要に応じていつでも他のターゲットに拡張できます。
+  Android では、[Compose Multiplatform の呼び出しが直接 Jetpack Compose に変換される](compose-multiplatform-jetpack-libraries.md)ため、この特定の構成においてオーバーヘッドはありません。
+
+**iosApp** 以外のすべてのモジュールは、ビルドシステムとして Gradle を使用します。
+**iosApp** モジュールは Xcode でビルドされ、Xcode が Kotlin の Gradle ビルドを呼び出して **sharedLogic** モジュールから iOS フレームワークを作成します。
+これは Kotlin Multiplatform における「直接的な iOS 統合（_direct iOS integration_）」の一例です。
+
+> Kotlin の iOS 向けビルドの詳細については、[iOS 統合方式](multiplatform-ios-integration-overview.md) を参照してください。
+> 
+{style="tip"}
+
+## 依存関係の追加 {id="add-dependencies"}
+
+プロジェクトには以下のマルチプラットフォームライブラリが必要です。
+
+* タイムスタンプの処理とフォーマットを行う [`kotlinx-datetime`](https://github.com/Kotlin/kotlinx-datetime)。
+* HTTP 経由でデータを送受信するためのフレームワークである [Ktor](https://ktor.io/)。
+* コルーチン Flow を使用してネットワーク呼び出しを非同期に処理する [`kotlinx.coroutines`](https://github.com/Kotlin/kotlinx.coroutines)。
+* API の JSON レスポンスを Kotlin オブジェクトにデシリアライズする [`kotlinx.serialization`](https://github.com/Kotlin/kotlinx.serialization)。
+
+すべてのプラットフォーム固有コードは各ライブラリのプラットフォーム向けアーティファクトにラップされているため、プラットフォーム固有の呼び出しを独自に実装する必要はありません。
+
+ネイティブ iOS UI では、Swift と Kotlin の間で非同期コードを橋渡しするための追加ライブラリが必要になります。
+この設定については、共通 API の準備が完了した後の [iOS UI の更新](#update-native-ios-ui) セクションで説明します。
 
 ### Gradle バージョンカタログの更新 {id="update-the-gradle-version-catalog"}
 
-`gradle/libs.versions.toml` に以下のエントリを追加し、Gradle ファイルを同期して、ビルド構成コードで参照を利用できるようにします。
+`gradle/libs.versions.toml` に以下のエントリを追加し、Gradle ファイルを同期して、ビルド設定コードでこれらの参照を利用できるようにします。
 
 ```toml
 [versions]
-coroutinesVersion = "%coroutinesVersion%"
-ktorVersion = "%ktorVersion%"
-# Kotlinのバージョンは既にカタログに設定されているはずです
-kotlin = "%kotlinVersion%"
+# ...
+kotlinx-coroutines = "%coroutinesVersion%"
+kotlinx-datetime = "%dateTimeVersion%"
+ktor = "%ktorVersion%"
 
 [libraries]
-kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutinesVersion" }
-ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktorVersion" }
-ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktorVersion" }
-ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktorVersion" }
-ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktorVersion" }
-ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktorVersion" }
+# ...
+kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
+ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
+ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
 
 [plugins]
+# ...
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ```
 
 ### 対応するソースセットへの依存関係の追加 {id="add-dependencies-to-corresponding-source-sets"}
 
-`sharedLogic/build.gradle.kts` ファイルの対応するソースセットにライブラリ参照を追加します。
+`sharedLogic/build.gradle.kts` ファイルの対応するソースセットにライブラリの参照を追加します。
 
 ```kotlin
 plugins {
@@ -70,13 +120,15 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             // ...
-            // Kotlin Multiplatform Gradle プラグインは
-            // プラットフォーム固有のコルーチンアーティファクトを自動的に追加します
+            // Kotlin Multiplatform Gradle プラグインは、
+            // コルーチンおよび datetime のプラットフォーム固有アーティファクトを
+            // 自動的に追加します
             implementation(libs.kotlinx.coroutines)
-            // 主要な Ktor の依存関係
+            implementation(libs.kotlinx.datetime)
+            // Ktor のメイン依存関係
             implementation(libs.ktor.client.core)
-            // Ktor が特定の形式でシリアライゼーションを
-            // 使用できるようにするための依存関係
+            // Ktor が特定のフォーマットで
+            // シリアライズを使用できるようにするための依存関係
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.serialization.kotlinx.json)
         }
@@ -92,22 +144,30 @@ kotlin {
 }
 ```
 
-**Sync Gradle Changes** ボタンをクリックして、Gradle ファイルを同期します。
+Gradle ファイルを同期します。**Shift** を2回押し、**Sync Project with Gradle Files** コマンドを検索して実行します。
 
-## APIリクエストの設定 {id="set-up-api-requests"}
+> マルチプラットフォーム依存関係の管理方法についての詳細は、[マルチプラットフォームライブラリへの依存関係の追加](multiplatform-add-dependencies.md) を参照してください。
+>
+{style="tip"}
 
-データを取得するために [Launch Library API](https://github.com/r-spacex/SpaceX-API/tree/master/docs#rspacex-api-docs) を使用します。具体的には、**/2.3.0/launches** エンドポイントからすべての打ち上げリストを取得します。
+## API リクエストのセットアップ {id="set-up-api-requests"}
+
+データの取得には [Launch Library API](https://lldev.thespacedevs.com/docs) を使用し、具体的には **/2.3.0/launches** エンドポイントから打ち上げのリストを取得します。
 
 ### データモデルの作成 {id="create-a-data-model"}
 
-`sharedLogic/src/commonMain/.../greetingkmp` ディレクトリに新しい `RocketLaunch.kt` ファイルを作成し、SpaceX API からのデータを格納するデータクラスを追加します。
+`sharedLogic/src/commonMain/.../greetingkmp` ディレクトリに新しい `RocketLaunch.kt` ファイルを作成し、Launch Library API からのデータを格納するデータクラスを追加します。
 
 ```kotlin
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+// @Serializable は、kotlinx.serialization プラグインに対して
+// このクラス用のデフォルトシリアライザを自動生成するよう指示します
 @Serializable
 data class RocketLaunch(
+    // @SerialName はフィールド名を再定義し、
+    // シリアライズされたフォーマットでプロパティ名をより読みやすくします
     @SerialName("id")
     val id: String,
     @SerialName("name")
@@ -133,107 +193,60 @@ data class LaunchListResponse(
 )
 ```
 
-* `RocketLaunch` クラスには `@Serializable` アノテーションが付与されており、`kotlinx.serialization` プラグインが自動的にデフォルトのシリアライザーを生成できるようになっています。
-* `@SerialName` アノテーションを使用すると、フィールド名を再定義できるため、データクラスでより読みやすい名前のプロパティを宣言できます。
-
-### HTTPクライアントの接続 {id="connect-http-client"}
+### HTTP クライアントの接続 {id="connect-http-client"}
 
 1. `sharedLogic/src/commonMain/.../greetingkmp` ディレクトリに新しい `RocketComponent` クラスを作成します。
-2. HTTP GET リクエストを通じてロケットの打ち上げ情報を取得するための `httpClient` プロパティを追加します。
+2. `httpClient` プロパティを追加し、それを使用して HTTP GET リクエストの結果から最終的な文字列を構築します。
 
     ```kotlin
     import io.ktor.client.HttpClient
+    import io.ktor.client.call.body
     import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+    import io.ktor.client.request.get
     import io.ktor.serialization.kotlinx.json.json
+    import kotlinx.datetime.TimeZone
+    import kotlinx.datetime.toLocalDateTime
     import kotlinx.serialization.json.Json
+    import kotlin.time.Instant
     
     class RocketComponent {
         private val httpClient = HttpClient {
+            // ContentNegotiation Ktor プラグインと JSON シリアライザが
+            // GET リクエストの結果をデシリアライズします
             install(ContentNegotiation) {
                 json(Json {
+                    // より読みやすい JSON を生成
                     prettyPrint = true
+                    // クォートなしのキーや文字列値など、
+                    // 非標準の JSON 入力を許容
                     isLenient = true
+                    // モデルで宣言されていないキーを無視
                     ignoreUnknownKeys = true
                 })
             }
         }
-    }
-    ```
 
-   * Ktor の [`ContentNegotiation`](https://ktor.io/docs/serialization-client.html#register_json) プラグインと JSON シリアライザーが、GET リクエストの結果をデシリアライズします。
-   * ここでの JSON シリアライザーは、`prettyPrint` プロパティによって JSON をより読みやすい形式で出力するように構成されています。また、`isLenient` によって不正な形式の JSON を読み取る際に柔軟に対応し、`ignoreUnknownKeys` によってロケット打ち上げモデルで宣言されていないキーを無視します。
+        // 最新の打ち上げ成功の日付文字列を返します。
+        // 中断関数 httpClient.get() を呼び出すため、
+        // suspend としてマークされています
+        private suspend fun getDateOfLastSuccessfulLaunch(): String {
+            // ロケット打ち上げに関する情報を非同期で取得
+            val response: LaunchListResponse =
+                httpClient.get("https://lldev.thespacedevs.com/2.3.0/launches/previous/?mode=list&limit=10&format=json").body()
+            // 最新の打ち上げ成功を取得。
+            // レスポンスでは打ち上げが新しい順にソートされており、
+            // 成功した打ち上げには 'status.id' 3 が付けられています
+            val lastSuccessLaunch = response.results.first { it.status.id == 3 }
+            // 打ち上げ日時をローカル時刻に変換
+            val date = Instant.parse(lastSuccessLaunch.launchDateUTC)
+                .toLocalDateTime(TimeZone.currentSystemDefault())
 
-3. ロケットの打ち上げに関する情報を非同期で取得する `getDateOfLastSuccessfulLaunch()` [suspend関数 (suspending function)](https://kotlinlang.org/docs/coroutines-basics.html) を `RocketComponent` に追加します。
+            // 日付は "MMMM D, YYYY" 形式（例: "JULY 15, 2026"）で表示されます
+            return "${date.month} ${date.day}, ${date.year}"
+        }
 
-   ```kotlin
-   import io.ktor.client.request.get
-   import io.ktor.client.call.body
-   
-   class RocketComponent {
-       // ...
-       
-       private suspend fun getDateOfLastSuccessfulLaunch(): String {
-           val rockets: List<RocketLaunch> = httpClient.get("https://api.spacexdata.com/v4/launches").body()
-   
-           // とりあえずスタブの日付で初期化
-           val date: String = "October 5, 2026"
-        
-           return "$date"
-       }
-   }
-   ```
-
-   * `httpClient.get()` も suspend関数です。スレッドをブロックせずに非同期でネットワーク経由でデータを取得する必要があるためです。
-   * suspend関数は、コルーチンまたは他のsuspend関数からしか呼び出すことができません。そのため、`getDateOfLastSuccessfulLaunch()` に `suspend` キーワードが付与されています。ネットワークリクエストは HTTP クライアントのスレッドプールで実行されます。
-
-4. HTTP リクエスト呼び出しの後に、リスト内の最後の打ち上げ成功を取得する呼び出しを追加します（打ち上げリストは日付の古い順に並んでいます）。
-
-   ```kotlin
-   class RocketComponent {
-       // ...
-       
-       private suspend fun getDateOfLastSuccessfulLaunch(): String {
-           val response: LaunchListResponse =
-               httpClient.get("https://lldev.thespacedevs.com/2.3.0/launches/previous/?mode=list&limit=10&format=json").body()
-           val lastSuccessLaunch = response.results.first { it.status.id == 3 }
-           val date: String = "October 5, 2026"
-           
-           return "$date"
-       }
-   }
-   ```
-
-5. 打ち上げの UTC 日時をローカルの日付に変換し、その結果を `date` に代入します。その後、フォーマットされた出力を返します。
-
-   ```kotlin
-   import kotlinx.datetime.TimeZone
-   import kotlinx.datetime.toLocalDateTime
-   import kotlin.time.ExperimentalTime
-   import kotlin.time.Instant
-
-   class RocketComponent {
-       // ...
-       
-       private suspend fun getDateOfLastSuccessfulLaunch(): String {
-           val response: LaunchListResponse =
-               httpClient.get("https://lldev.thespacedevs.com/2.3.0/launches/previous/?mode=list&limit=10&format=json").body()
-           val lastSuccessLaunch = response.results.first { it.status.id == 3 }
-           val date = Instant.parse(lastSuccessLaunch.launchDateUTC)
-               .toLocalDateTime(TimeZone.currentSystemDefault())
-       
-           return "${date.month} ${date.day}, ${date.year}"
-       }
-   }
-   ```
-
-   日付は "MMMM DD, YYYY" 形式（例：OCTOBER 5, 2022）で表示されます。
-
-6. 同じクラスに、`getDateOfLastSuccessfulLaunch()` 関数を使用してメッセージを作成する別の suspend関数 `launchPhrase()` を追加します。
-
-    ```kotlin
-    class RocketComponent {
-        // ...
-    
+        // 中断関数 getDateOfLastSuccessfulLaunch() を使用して、
+        // UI 用の最終的な文字列を構築します
         suspend fun launchPhrase(): String =
             try {
                 "The last successful launch was on ${getDateOfLastSuccessfulLaunch()} 🚀"
@@ -244,209 +257,191 @@ data class LaunchListResponse(
     }
     ```
 
+   中断関数（suspending function）は、コルーチンまたは他の中断関数からしか呼び出すことができません。
+   たとえば、`httpClient.get()` はスレッドをブロックすることなくネットワーク経由で非同期にデータを取得する必要があるため、中断関数となっています。
+   `getDateOfLastSuccessfulLaunch()` 関数は `httpClient.get()` を呼び出すため、同様に `suspend` キーワードで修飾されています。
+
 ### コルーチン Flow の作成 {id="create-a-coroutine-flow"}
 
-単に suspend関数を呼び出す代わりに、値のシーケンスを生成する必要がある場合は [Flow (フロー)](https://kotlinlang.org/docs/flow.html) を使用できます。
-Flow は、suspend関数の単一の戻り値ではなく、値が生成されるたびにそのシーケンスをエミット（放出）できます。
+単に中断関数を呼び出す代わりに、一連の値を生成する必要がある場合は [Flow](https://kotlinlang.org/docs/flow.html) を使用できます。
+Flow は、単一の値を返す中断関数とは異なり、値が生成されるたびに一連の値を順次放出（emit）できます。
 
-1. `shared/src/commonMain/kotlin` ディレクトリにある `Greeting.kt` ファイルを開きます。
-2. `Greeting` クラスに `rocketComponent` プロパティを追加します。このプロパティは、最新の打ち上げ成功日のメッセージを保持します。
-
-   ```kotlin
-   class Greeting {
-       private val rocketComponent = RocketComponent()
-       //...
-   }
-   ```
-
-3. `greet()` 関数を `Flow` を返すように変更します。
+1. `sharedLogic/src/commonMain/kotlin` ディレクトリにある `Greeting.kt` ファイルを開きます。
+2. 主にネットワークリクエストに対応するため、`Greeting` クラスの `greet()` 関数を更新して文字列の `Flow` を返すようにします。
+   この `Flow` 内で、`RocketComponent` プロパティを使用して打ち上げ日を放出します。
 
     ```kotlin
     import kotlinx.coroutines.delay
     import kotlinx.coroutines.flow.Flow
     import kotlinx.coroutines.flow.flow
+    import kotlin.random.Random
     import kotlin.time.Duration.Companion.seconds
     
     class Greeting {
-        // ...
+        private val platform = getPlatform()
+   
+        // 最新の打ち上げ成功日を保持
+        private val rocketComponent = RocketComponent()
+        // 挨拶文字列を構築し、1つずつ非同期に放出
         fun greet(): Flow<String> = flow {
             emit(if (Random.nextBoolean()) "Hi!" else "Hello!")
             delay(1.seconds)
             emit("Guess what this is! > ${platform.name.reversed()}")
-            delay(1.seconds)
-            emit(daysPhrase())
             emit(rocketComponent.launchPhrase())
         }
     }
     ```
 
-   * ここでは、すべてのステートメントをラップする `flow()` ビルダー関数を使用して `Flow` が作成されています。
-   * `Flow` は、各エミッションの間に1秒の遅延を置いて文字列をエミットします。最後の要素はネットワークレスポンスが返ってきた後にのみエミットされるため、正確な遅延はネットワーク状況に依存します。
+    `Flow` は、中断可能なブロックをラップする [`flow()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/flow.html) ビルダー関数で作成されます。
 
-`greet()` 関数の戻り値の型を `Flow` に変更することで、共有モジュールの API を更新しました。次に、プロジェクトのネイティブ部分を更新して、`greet()` 関数の呼び出し結果を適切に処理できるようにする必要があります。
+これで、`greet()` 関数は単一の `String` ではなく `Flow<String>` を返すようになりました。
+ネイティブ UI コード側では `Greeting` クラスをインポートし、`greet()` 関数によって放出された文字列を収集（collect）します。
+
+以降のセクションで示すように、ネイティブ UI で対応する変更を実装しましょう。
 
 ## ネイティブ Android UI の更新 {id="update-native-android-ui"}
 
-共有モジュールと Android アプリケーションの両方が Kotlin で記述されているため、Android から共有コードを使用するのは非常に簡単です。
+共有モジュールと Android アプリケーションはどちらも Kotlin で書かれているため、Android から共有コードを使用するのは非常にシンプルです。
 
 ### ViewModel の導入 {id="introduce-a-view-model"}
 
-ViewModel は、[Android アクティビティ](https://developer.android.com/guide/components/activities/intro-activities)のライフサイクルを通じて維持されるべきデータやその他のアプリコンポーネントの管理を支援する、Android 開発で一般的なパターンです。
-アプリケーションがより複雑になってきたので、私たちのアプリにも ViewModel を導入しましょう。
-これは SpaceX API から受信したデータを格納し、UI で利用できるようにします。
+ViewModel は、Android 開発において [Android Activity](https://developer.android.com/guide/components/activities/intro-activities) のライフサイクル全体を通して UI 関連のデータを管理するために一般的に使用されます。
+アプリケーションが複雑になるにつれて、ViewModel を導入するメリットが大きくなります。
+ViewModel は Launch Library API から受け取ったデータを保持し、UI から利用できるようにします。
 
-Android プラットフォームコード内に ViewModel クラスを作成します。
+`sharedUI/src/commonMain/.../greetingkmp` ディレクトリに、Android のライフサイクル機構と構成変更の追跡を利用するために、マルチプラットフォーム AndroidX ライブラリの `[ViewModel](https://developer.android.com/reference/kotlin/androidx/lifecycle/ViewModel)` を継承した新しい `MainViewModel` クラスを作成します。
 
-1. `sharedUI/src/commonMain/.../greetingkmp` ディレクトリに、新しい `MainViewModel` Kotlin クラスを作成します。
+```kotlin
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
-    ```kotlin
-    import androidx.lifecycle.ViewModel
-    
-    class MainViewModel : ViewModel() {
-        // ...
-    }
-    ```
+class MainViewModel: ViewModel() {
+    // StateFlow は単一の現在の状態値を保持する Flow です
+    val greetingList: StateFlow<List<String>>
+        // 明示的なバッキングフィールドはクラス外部からは読み取り専用、
+        // 内部からは可変（mutable）です
+        field = MutableStateFlow<List<String>>(listOf())
 
-   このクラスは Android の `ViewModel` クラスを継承しており、ライフサイクルや構成の変更に関するプラットフォームの期待に沿うようにしています。
-
-2. [StateFlow](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/-state-flow/) 型の `greetingList` 値とそのバッキングプロパティを作成します。
-
-    ```kotlin
-    import kotlinx.coroutines.flow.MutableStateFlow
-    import kotlinx.coroutines.flow.StateFlow
-    
-    class MainViewModel : ViewModel() {
-        private val _greetingList = MutableStateFlow<List<String>>(listOf())
-        val greetingList: StateFlow<List<String>> get() = _greetingList
-    }
-    ```
-
-   * ここでの `StateFlow` は `Flow` インターフェースを継承していますが、単一の値または状態（state）を持ちます。
-   * プライベートなバッキングプロパティ `_greetingList` により、このクラスのクライアントだけが読み取り専用の `greetingList` プロパティにアクセスできるようになります。
-
-3. ViewModel の `init` 関数内で、`Greeting().greet()` フローからすべての文字列を収集（collect）します。
-
-    ```kotlin
-   import androidx.lifecycle.viewModelScope
-   import kotlinx.coroutines.launch
-   
-   class MainViewModel : ViewModel() {
-       private val _greetingList = MutableStateFlow<List<String>>(listOf())
-       val greetingList: StateFlow<List<String>> get() = _greetingList
-       
-       init {
-           viewModelScope.launch {
-               Greeting().greet().collect { phrase ->
-                    //...
-               }
-           }
-       }
-    }
-    ```
-
-   `Flow.collect()` 関数は suspend関数であるため、ViewModel のスコープ内で `launch` コルーチンが使用されます。これは、launch コルーチンが ViewModel のライフサイクルの正しいフェーズの間だけ実行されることを意味します。
-
-4. `collect` の末尾ラムダ内で、`update()` 関数を使用して、収集した `phrase` を `_greetingList` 内のフレーズリストに追加します。
-
-    ```kotlin
-    import kotlinx.coroutines.flow.update
-   
-    class MainViewModel : ViewModel() {
-        //...
-   
-        init {
-            viewModelScope.launch {
-                Greeting().greet().collect { phrase ->
-                    _greetingList.update { list -> list + phrase }
-                }
+    // Greeting().greet() の呼び出しによって放出されたすべての文字列を収集
+    init {
+        // この ViewModel が所有するコルーチン内で収集を開始します。
+        // これは ViewModel が保持されている間アクティブであり、
+        // ViewModel が破棄されると自動的にキャンセルされます。
+        viewModelScope.launch {
+            // 新しいフレーズを greetingList に追加
+            Greeting().greet().collect { phrase ->
+                greetingList.update { list -> list + phrase }
             }
         }
     }
-    ```
+}
+```
 
-### ViewModel の Flow を使用する {id="use-the-view-model-s-flow"}
+### ViewModel の Flow の利用 {id="use-the-view-model-s-flow"}
 
-1. `sharedUI/src/commonMain/.../greetingkmp` で `App.kt` ファイルを開き、以前の実装を新しく実装した ViewModel を使用するように置き換えて更新します。
+`sharedUI/src/commonMain/.../greetingkmp` で `App.kt` ファイルを開き、新しく実装した ViewModel を使用するように既存の実装を置き換えます。
 
-    ```kotlin
-    import androidx.lifecycle.compose.collectAsStateWithLifecycle
-    import androidx.compose.runtime.getValue
-    import androidx.lifecycle.viewmodel.compose.viewModel
-    
-    @Composable
-    @Preview
-    fun App(mainViewModel: MainViewModel = viewModel()) {
-        MaterialTheme {
-            val greetings by mainViewModel.greetingList.collectAsStateWithLifecycle()
-    
-            Column(
-                modifier = Modifier
-                    .safeContentPadding()
-                    .fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                greetings.forEach { greeting ->
-                    Text(greeting)
-                    HorizontalDivider()
-                }
+Flow が新しい値を放出するにつれて、コンポジションが更新され、挨拶のフレーズが1つずつ表示されます。
+
+```kotlin
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.ui.unit.dp
+
+@Composable
+@Preview
+fun App(mainViewModel: MainViewModel = viewModel()) {
+    MaterialTheme {
+        // ViewModel の Flow から greetingList の値を収集し、
+        // ライフサイクルを認識した方法で Composable な状態として表現します
+        val greetings by mainViewModel.greetingList.collectAsStateWithLifecycle()
+
+        // 挨拶フレーズを区切り線付きの Column として表示
+        Column(
+            modifier = Modifier
+                .safeContentPadding()
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            greetings.forEach { greeting ->
+                Text(greeting)
+                HorizontalDivider()
             }
         }
     }
-    ```
+}
+```
 
-   * `collectAsStateWithLifecycle()` 関数は `greetingList` に対して呼び出され、ViewModel の Flow から値を収集し、ライフサイクルを考慮した方法でコンポーザブルな状態として表現します。
-   * 新しい Flow が作成されると、Compose の状態が変化し、垂直に配置されディバイダーで区切られた挨拶フレーズを含むスクロール可能な `Column` が表示されます。
+### インターネットアクセスのパーミッション追加 {id="add-internet-access-permission"}
 
-### インターネットアクセス権限の追加 {id="add-internet-access-permission"}
-
-インターネットにアクセスするために、Android アプリケーションには適切な権限が必要です。すべてのネットワークリクエストは共有モジュールから行われるため、そのマニフェストにインターネットアクセス権限を追加するのが適切です。
-
-`androidApp/src/main/AndroidManifest.xml` ファイルをアクセス権限で更新します。
+Android アプリケーションがインターネットにアクセスできるようにするには、`androidApp/src/main/AndroidManifest.xml` ファイルに以下のパーミッションを追加します。
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.INTERNET"/>
-    ...
+    <!-- マニフェストの残りの部分 -->
 </manifest>
 ```
 
 ### アプリの実行 {id="run-the-app"}
 
-最終的な結果を確認するには、**androidApp** 実行構成を再実行します。
+最終結果を確認するには、**androidApp** 実行構成を実行します。
 
-![Androidの最終結果](multiplatform-mobile-upgrade-android.png){width=350}
+> 新しいエミュレータの作成や実機でのアプリ実行に関する詳細は、[Kotlin Multiplatform アプリケーションのビルドと実行](build-and-run-kmp.md) を参照してください。
+>
+{style="note"}
+
+![Android の最終結果](multiplatform-mobile-upgrade-android.png){width=350}
 
 ## ネイティブ iOS UI の更新 {id="update-native-ios-ui"}
 
-プロジェクトの iOS 部分では、Android アプリで行ったのと同様に [Model–view–viewmodel](https://ja.wikipedia.org/wiki/Model_View_ViewModel) パターンを使用して、UI を `sharedLogic` モジュールに接続します。
+プロジェクトの iOS 側でも、Android アプリと同様に ViewModel パターンを利用して UI を `sharedLogic` モジュールに接続します。
+このモジュールは、`ContentView.swift` ファイル内に `import SharedLogic` 宣言ですでにインポートされています。
 
-モジュールは、`ContentView.swift` ファイル内で `import SharedLogic` 宣言によってすでにインポートされています。
+iOS アプリのコードは `iosApp/iosApp` ディレクトリに含まれています。
+`ContentView.swift` にロジックの大半が含まれ、`iOSApp.swift` にアプリのエントリポイントが含まれています。
 
-### ViewModel の導入 {id="introducing-a-viewmodel"}
+### `ViewModel` の導入 {id="introduce-a-viewmodel"}
 
-`iosApp/ContentView.swift` で、`ContentView` のための `ViewModel` クラスを作成します。これはデータを準備して管理します。並行処理をサポートするために、`task()` 呼び出し内で `startObserving()` 関数を呼び出します。
+`iosApp/ContentView.swift` ファイルに、`ContentView` 用のデータを準備・管理する `ViewModel` クラスを作成します。
+ファイル全体を以下のコードに置き換えます。
 
 ```swift
 import SwiftUI
 import SharedLogic
 
 struct ContentView: View {
+    // 下記で ObservableObject として宣言されている
+    // ビューモデルをビューに購読させます
     @ObservedObject private(set) var viewModel: ViewModel
 
     var body: some View {
         ListView(phrases: viewModel.greetings)
+            // 並行処理をサポートするため、.task モディファイアを使用して
+            // startObserving() 関数を呼び出します
             .task { await self.viewModel.startObserving() }
     }
 }
 
+// ViewModel は ContentView と密接に関連しているため、
+// その extension として宣言されます
 extension ContentView {
     @MainActor
     class ViewModel: ObservableObject {
-        @Published var greetings: Array<String> = []
+        // このプロパティは、ViewModel の Flow から放出された
+        // 挨拶フレーズを保持するためのものです
+        @Published var greetings: [String] = []
         
         func startObserving() {
-            // ...
+            // 実装内容は選択した iOS コルーチンライブラリに依存します（後述）
         }
     }
 }
@@ -462,32 +457,32 @@ struct ListView: View {
 }
 ```
 
-* `ViewModel` は `ContentView` と密接に関連しているため、そのエクステンションとして宣言されています。
-* `ViewModel` は、`String` フレーズの配列である `greetings` プロパティを持っています。
+SwiftUI はビューモデル（`ContentView.ViewModel`）とビュー（`ContentView`）を次のように接続します。
 
-SwiftUI は ViewModel (`ContentView.ViewModel`) をビュー (`ContentView`) に接続します。
+* `ContentView.ViewModel` クラスは `ObservableObject` として宣言されており、変更を通知できます。
+  `ContentView` 内の `viewModel` プロパティの `@ObservedObject` ラッパーが、ビューをこれらの変更に購読させます。
+* `@Published` ラッパーを持つ `greetings` プロパティへの変更により、SwiftUI がトリガーされて `ContentView` が更新されます。
 
-* `ContentView.ViewModel` は `ObservableObject` として宣言されています。`ContentView` 内の `viewModel` プロパティに対する `@ObservedObject` ラッパーは、ビューを ViewModel に購読させます。
-* ViewModel の `greetings` プロパティは `@Published` ラッパーを使用しています。これにより、このプロパティが変更されたときに SwiftUI が自動的にビューを更新できるようになります。
+次に、Swift で Kotlin の Flow を利用できる既存の KMP ライブラリのいずれかを使用して、`startObserving()` 関数を実装する必要があります。
 
-次に、Flow を消費するために `startObserving()` 関数を実装する必要があります。
+### Swift で Kotlin の Flow を利用するためのライブラリの選択 {id="choose-a-library-for-consuming-kotlin-flows-in-swift"}
 
-### iOS から Flow を消費するためのライブラリを選択する {id="choose-a-library-to-consume-flows-from-ios"}
+このチュートリアルでは、iOS で Flow を扱うために [SKIE](https://skie.touchlab.co/) または [KMP-NativeCoroutines](https://github.com/rickclephas/KMP-NativeCoroutines) ライブラリを使用できます。
+どちらも、Kotlin/Native コンパイラがデフォルトではまだ提供していない、Flow におけるキャンセル処理やジェネリクスをサポートするオープンソースソリューションです。
 
-このチュートリアルでは、iOS で Flow を操作しやすくするために、[SKIE](https://skie.touchlab.co/) または [KMP-NativeCoroutines](https://github.com/rickclephas/KMP-NativeCoroutines) ライブラリを使用できます。
-これらはいずれも、Kotlin/Native コンパイラがデフォルトではまだ提供していない、Flow によるキャンセルやジェネリクスをサポートするオープンソースのソリューションです。
+* KMP-NativeCoroutines ライブラリは、必要なラッパーを生成することで、iOS から中断関数や Flow を利用できるようにします。
+  KMP-NativeCoroutines は、Combine や RxSwift に加えて、Swift の `async`/`await` 機能をサポートしています。
+  KMP-NativeCoroutines を使用するには、iOS プロジェクトで SwiftPM または CocoaPods の依存関係を追加する必要があります。
+* SKIE ライブラリは、Kotlin コンパイラによって生成された Objective-C API を拡張します。SKIE は Flow を Swift の `AsyncSequence` 相当のものに変換します。SKIE は、スレッド制限なしで、自動的な双方向キャンセルを伴って Swift の `async`/`await` を直接サポートします（Combine や RxSwift にはアダプターが必要です）。SKIE は、さまざまな Kotlin 型を Swift の同等の型にブリッジするなど、Kotlin から Swift フレンドリーな API を生成するためのその他の機能も提供します。また、iOS プロジェクトに追加の依存関係を追加する必要がありません。
 
-* KMP-NativeCoroutines ライブラリは、必要なラッパーを生成することで、iOS から suspend関数や Flow を利用しやすくします。KMP-NativeCoroutines は Swift の `async`/`await` 機能に加えて、Combine や RxSwift もサポートしています。KMP-NativeCoroutines を使用するには、iOS プロジェクトに SwiftPM または CocoaPod の依存関係を追加する必要があります。
-* SKIE ライブラリは、Kotlin コンパイラによって生成される Objective-C API を拡張します。SKIE は Flow を Swift の `AsyncSequence` に相当するものに変換します。SKIE は、スレッドの制限なしで Swift の `async`/`await` を直接サポートし、双方向の自動キャンセル機能を備えています（Combine や RxSwift にはアダプターが必要です）。SKIE は、さまざまな Kotlin 型を Swift の同等な型にブリッジするなど、Kotlin から Swift フレンドリーな API を生成するための他の機能も提供します。また、iOS プロジェクトに追加の依存関係を追加する必要もありません。
+  > 最新の SKIE は、最新の安定版 Kotlin バージョンをサポートしていない場合があります。
+  > どの Kotlin バージョンにダウングレードすべきかを確認するには、[最新バージョンの変更履歴（changelog）](https://skie.touchlab.co/category/changelog) をチェックしてください。
 
-### オプション 1. KMP-NativeCoroutines の構成 {initial-collapse-state="collapsed" collapsible="true" id="option-1-configure-kmp-nativecoroutines"}
+### オプション 1: KMP-NativeCoroutines の設定 {initial-collapse-state="collapsed" collapsible="true" id="option-1-configure-kmp-nativecoroutines"}
 
-> 最新バージョンのライブラリを使用することをお勧めします。
-> [KMP-NativeCoroutines のリポジトリ](https://github.com/rickclephas/KMP-NativeCoroutines/releases)を確認して、プラグインの新しいバージョンが利用可能かどうか、およびそれが使用している Kotlin バージョンと互換性があるかどうかを確認してください。
->
-{style="note"}
+KMP-NativeCoroutines の依存関係を含めるようにビルドスクリプトを更新します。
 
-1. Gradle バージョンカタログに KMP-NativeCoroutines のバージョンとプラグイン参照を追加します。
+1. Gradle [バージョンカタログ](https://docs.gradle.org/current/userguide/version_catalogs.html) に KMP-NativeCoroutines のバージョンとプラグインの参照を追加します。
 
     ```toml
     [versions]
@@ -497,7 +492,7 @@ SwiftUI は ViewModel (`ContentView.ViewModel`) をビュー (`ContentView`) に
     kmpNativeCoroutines = { id = "com.rickclephas.kmp.nativecoroutines", version.ref = "kmpNativeCoroutines" }
     ```
 
-2. プロジェクトのルートにある `build.gradle.kts` ファイル（`shared/build.gradle.kts` ファイル**ではない**）で、KMP-NativeCoroutines プラグインを `plugins {}` ブロックに追加します。
+2. プロジェクトのルートにある `build.gradle.kts` ファイル（`sharedLogic/build.gradle.kts` ファイル**ではありません**）で、`plugins {}` ブロックに KMP-NativeCoroutines プラグインを追加します。
 
     ```kotlin
     plugins {
@@ -506,7 +501,7 @@ SwiftUI は ViewModel (`ContentView.ViewModel`) をビュー (`ContentView`) に
     }
     ```
 
-3. `sharedLogic/build.gradle.kts` ファイルで、KMP-NativeCoroutines プラグインを `plugins {}` ブロックに追加します。
+3. `sharedLogic/build.gradle.kts` ファイルで、`plugins {}` ブロックに KMP-NativeCoroutines プラグインを追加します。
 
     ```kotlin
     plugins {
@@ -515,12 +510,12 @@ SwiftUI は ViewModel (`ContentView.ViewModel`) をビュー (`ContentView`) に
     }
     ```
 
-4. 同じく `sharedLogic/build.gradle.kts` ファイルで、実験的な `@ObjCName` アノテーションをオプトインします。
+4. 同じ `sharedLogic/build.gradle.kts` ファイルで、実験的な `@ObjCName` アノテーションをオプトインします。
 
     ```kotlin
     kotlin {
         // ...
-        sourceSets{
+        sourceSets {
             all {
                 languageSettings {
                     optIn("kotlin.experimental.ExperimentalObjCName")
@@ -531,12 +526,13 @@ SwiftUI は ViewModel (`ContentView.ViewModel`) をビュー (`ContentView`) に
     }
     ```
 
-5. **Sync Gradle Changes** ボタンをクリックして、Gradle ファイルを同期します。
+5. **Shift** を2回押し、**Sync Project with Gradle Files** コマンドを検索して実行します。
 
-#### KMP-NativeCoroutines で Flow をマークする {id="mark-the-flow-with-kmp-nativecoroutines"}
+#### KMP-NativeCoroutines で Flow にアノテーションを付加 {id="mark-the-flow-with-kmp-nativecoroutines"}
 
 1. `sharedLogic/src/commonMain/kotlin` ディレクトリにある `Greeting.kt` ファイルを開きます。
-2. `greet()` 関数に `@NativeCoroutines` アノテーションを追加します。これにより、プラグインが iOS 上で正しい Flow 処理をサポートするための適切なコードを生成します。
+2. `greet()` 関数に `@NativeCoroutines` アノテーションを追加します。
+   これにより、プラグインは iOS 上での正しい Flow 処理をサポートするコードを生成します。
 
    ```kotlin
     import com.rickclephas.kmp.nativecoroutines.NativeCoroutines
@@ -551,34 +547,36 @@ SwiftUI は ViewModel (`ContentView.ViewModel`) をビュー (`ContentView`) に
     }
     ```
 
-#### Xcode で SwiftPM を使用してライブラリをインポートする
+#### Xcode で SwiftPM を使用してライブラリをインポート
 
-`async/await` メカニズムを操作するために必要な KMP-NativeCoroutines Swift パッケージのパーツをインストールします。
+`async/await` メカニズムの操作に必要な KMP-NativeCoroutines Swift パッケージのパーツをインストールします。
 
 1. **File | Open Project in Xcode** に移動します。
-2. Xcode で、左側のメニューにある `iosApp` プロジェクトを right-click し、**Add Package Dependencies** を選択します。
-3. 検索バーに、パッケージ名を入力します。
+2. Xcode で、左側のメニューにある `iosApp` プロジェクトを右クリックし、**Add Package Dependencies** を選択します。
+3. 検索バーにパッケージ名を入力します。
 
      ```none
     https://github.com/rickclephas/KMP-NativeCoroutines.git
     ```
 
-   ![KMP-NativeCoroutinesのインポート](multiplatform-import-kmp-nativecoroutines.png){width=700}
+   ![KMP-NativeCoroutines のインポート](multiplatform-import-kmp-nativecoroutines.png){width=700}
 
-4. **Dependency Rule** ドロップダウンで、**Exact Version** を選択し、隣のフィールドに `%kmpncVersion%` バージョンを入力します。
+4. **Dependency Rule** ドロップダウンで **Exact Version** を選択し、隣接するフィールドにバージョン `%kmpncVersion%` を入力します。
 5. **Add Package** ボタンをクリックします。Xcode は GitHub からパッケージを取得し、パッケージ製品を選択するための別のウィンドウを開きます。
-6. 図のように "KMPNativeCoroutinesAsync" と "KMPNativeCoroutinesCore" をアプリに追加し、**Add Package** をクリックします。
+6. 図のように **KMPNativeCoroutinesAsync** と **KMPNativeCoroutinesCore** をアプリに追加し、**Add Package** をクリックします。
 
-   ![KMP-NativeCoroutinesパッケージの追加](multiplatform-add-package.png){width=500}
-7. IntelliJ IDEA に戻り、**Tools | Swift Package Manager | Resolve Dependencies** メニュー項目を選択します。これにより、Kotlin ビルドで使用される `Package.resolved` ロックファイルが作成され、Swift パッケージのバージョンを一貫して保つためにリポジトリにコミットできます。
+   ![KMP-NativeCoroutines パッケージの追加](multiplatform-add-package.png){width=500}
+7. IntelliJ IDEA に戻り、**Tools | Swift Package Manager | Resolve Dependencies** を選択します。
+   これにより、Kotlin Multiplatform ビルドタスクで使用される `Package.resolved` ロックファイルが作成されます。このファイルは、Swift パッケージのバージョンの一貫性を保つためにリポジトリにコミットできます。
 
-#### KMP-NativeCoroutines ライブラリを使用して Flow を消費する
+#### KMP-NativeCoroutines ライブラリを使用した Flow の利用
 
-1. `iosApp/ContentView.swift` で、`Greeting().greet()` 関数のために KMP-NativeCoroutine の `asyncSequence()` 関数を使用して Flow を消費するように `startObserving()` 関数を更新します。
+1. `iosApp/ContentView.swift` で `startObserving()` 関数を更新し、KMP-NativeCoroutines の `asyncSequence()` 関数を使用して Flow を利用します。
 
-    ```Swift
+    ```swift
     func startObserving() async {
         do {
+            // Kotlin の Greeting().greet() から放出された Flow を利用
             let sequence = asyncSequence(for: Greeting().greet())
             for try await phrase in sequence {
                 self.greetings.append(phrase)
@@ -589,9 +587,9 @@ SwiftUI は ViewModel (`ContentView.ViewModel`) をビュー (`ContentView`) に
     }
     ```
 
-   ここでのループと `await` メカニズムは、Flow を反復処理し、Flow が値をエミットするたびに `greetings` プロパティを更新するために使用されます。
+   ここでは、Flow を反復処理し、Flow が値を放出するたびに `greetings` プロパティを更新するために、ループと `await` メカニズムが使用されています。
 
-2. `ViewModel` に `@MainActor` アノテーションが付与されていることを確認します。このアノテーションにより、Kotlin/Native の要件に準拠するために、`ViewModel` 内のすべての非同期操作がメインスレッドで実行されるようになります。
+2. `ViewModel` に `@MainActor` アノテーションが付いていることを確認します。
 
     ```Swift
     // ...
@@ -600,9 +598,12 @@ SwiftUI は ViewModel (`ContentView.ViewModel`) をビュー (`ContentView`) に
     
     // ...
     extension ContentView {
+        // `ViewModel` 内のすべての非同期操作が
+        // アプリのメイン UI コンテキスト内で実行されることを保証します。
+        // これにより、UI に反映されない `@Published` プロパティの更新を防ぎます。
         @MainActor
         class ViewModel: ObservableObject {
-            @Published var greetings: Array<String> = []
+            @Published var greetings: [String] = []
     
             func startObserving() async {
                 do {
@@ -618,7 +619,14 @@ SwiftUI は ViewModel (`ContentView.ViewModel`) をビュー (`ContentView`) に
     }
     ```
 
-### オプション 2. SKIE の構成 {initial-collapse-state="collapsed" collapsible="true"}
+ここでの `@MainActor` は、プロジェクトをビルドして Kotlin のシンボル（具体的には `greet()`）が iOS プロジェクトの依存関係と同期されるまで、未解決の参照（unresolved reference）エラーを引き起こす可能性があります。
+
+> ビルドエラーが発生した場合は、Kotlin と KMP-NativeCoroutines のバージョンに互換性があることを確認してください。
+> Gradle プラグインのバージョンと Swift パッケージのバージョンの両方を、[互換性マトリックス](https://github.com/rickclephas/KMP-NativeCoroutines#compatibility) に従って設定する必要があります。
+>
+{style="warning"}
+
+### オプション 2: SKIE の設定 {initial-collapse-state="collapsed" collapsible="true"}
 
 ライブラリをセットアップするには、Gradle バージョンカタログに SKIE のバージョンとプラグイン参照を追加します。
 
@@ -630,12 +638,12 @@ skie = "%skieVersion%"
 skie = { id = "co.touchlab.skie", version.ref = "skie" }
 ```
 
-> SKIE は最新の Kotlin バージョンをサポートしていない場合があります。
-> Kotlin のバージョンが新しすぎる場合、Gradle 同期中に安全にダウングレードできるバージョンのリストと共に報告されます。
+> SKIE は、最新の安定版 Kotlin バージョンをサポートしていない場合があります。
+> お使いの Kotlin バージョンが新しすぎる場合、Gradle の同期中に安全にダウングレードできるバージョンのリストとともに報告されます。
 > 
 {style="note"}
 
-次に、`sharedLogic/build.gradle.kts` ファイルのプラグインリストに追加し、**Sync Gradle Changes** ボタンをクリックします。
+次に、`sharedLogic/build.gradle.kts` ファイルのプラグインリストに追加します。
 
 ```kotlin
 plugins {
@@ -644,16 +652,14 @@ plugins {
 }
 ```
 
-#### SKIE を使用して Flow を消費する {id="consume-the-flow-using-skie"}
+**Shift** を2回押し、**Sync Project with Gradle Files** コマンドを検索して実行します。
 
-ループと `await` メカニズムを使用して `Greeting().greet()` Flow を反復処理し、Flow が値をエミットするたびに `greetings` プロパティを更新します。
+#### SKIE を使用した Flow の利用 {id="consume-the-flow-using-skie"}
 
-> IntelliJ IDEA と Android Studio は、SKIE の使用中に Kotlin コードへの呼び出しで Swift エラーを誤って報告することがあります。これはライブラリの既知の問題であり、アプリのビルドや実行には影響しません。
->
-{style="warning"}
+ループと `await` メカニズムを使用して `Greeting().greet()` Flow を反復処理し、Flow が値を放出するたびに `greetings` プロパティを更新します。
 
-`ViewModel` に `@MainActor` アノテーションが付与されていることを確認してください。
-このアノテーションにより、Kotlin/Native の要件に準拠するために、`ViewModel` 内のすべての非同期操作がメインスレッドで実行されるようになります。
+`ViewModel` に `@MainActor` アノテーションが付いていることを確認してください。
+このアノテーションは、Kotlin/Native の要件に準拠するために、`ViewModel` 内のすべての非同期操作がメインスレッドで実行されることを保証します。
 
 ```Swift
 // ...
@@ -671,44 +677,60 @@ extension ContentView {
 }
 ```
 
-### ViewModel を消費して iOS アプリを実行する {id="consume-the-viewmodel-and-run-the-ios-app"}
+### ViewModel の利用と iOS アプリの実行 {id="consume-the-viewmodel-and-run-the-ios-app"}
 
-`iosApp/iOSApp.swift` で、アプリのエントリーポイントを更新します。
+`iosApp/iOSApp.swift` で、アプリのエントリポイントを更新します。
 
 ```swift
+import SwiftUI
+
 @main
 struct iOSApp: App {
-   var body: some Scene {
-       WindowGroup {
-           ContentView(viewModel: ContentView.ViewModel())
-       }
-   }
+    var body: some Scene {
+        WindowGroup {
+            ContentView(viewModel: ContentView.ViewModel())
+        }
+    }
 }
 ```
 
-IntelliJ IDEA から **iosApp** 構成を実行して、アプリのロジックが同期されていることを確認します。
+IntelliJ IDEA から **iosApp** 構成を実行し、アプリのロジックが同期されていることを確認します。
 
-![最終結果](multiplatform-mobile-upgrade-ios.png){width=350}
-
-> プロジェクトの最終的な状態は、GitHubリポジトリの2つのブランチにあり、それぞれ異なるコルーチンソリューションが含まれています。
-> * [`main`](https://github.com/kotlin-hands-on/get-started-with-kmp/tree/main) ブランチには、KMP-NativeCoroutinesによる実装が含まれています。
-> * [`main-skie`](https://github.com/kotlin-hands-on/get-started-with-kmp/tree/main-skie) ブランチには、SKIEによる実装が含まれています。
+> 新しいエミュレータの作成や実機でのアプリ実行に関する詳細は、[Kotlin Multiplatform アプリケーションのビルドと実行](build-and-run-kmp.md) を参照してください。
 >
 {style="note"}
 
-## 次のステップ {id="next-step"}
+![最終結果](multiplatform-mobile-upgrade-ios.png){width=350}
 
-チュートリアルの最後の部分では、プロジェクトをまとめ、次にとるべきステップを確認します。
+## プロジェクトの最終状態 {id="final-state-of-the-project"}
 
-**[次のパートに進む](multiplatform-wrap-up.md)**
+プロジェクトの最終状態は、異なるコルーチンソリューションを採用した GitHub リポジトリの2つのブランチで確認できます。
+* [`main`](https://github.com/kotlin-hands-on/get-started-with-kmp/tree/main) ブランチには KMP-NativeCoroutines 実装が含まれています。
+* [`main-skie`](https://github.com/kotlin-hands-on/get-started-with-kmp/tree/main-skie) ブランチには SKIE 実装が含まれています。
 
-### 関連項目 {id="see-also"}
+## 発生する可能性のある問題と解決策 {id="possible-issues-and-solutions"}
 
-* [suspend関数の合成](https://kotlinlang.org/docs/composing-suspending-functions.html)に関するさまざまなアプローチを探索してください。
-* [Objective-C フレームワークおよびライブラリとの相互運用性](https://kotlinlang.org/docs/native-objc-interop.html)について詳しく学びましょう。
-* [ネットワークとデータストレージ](multiplatform-ktor-sqldelight.md)に関するこのチュートリアルを完了してください。
+### Xcode が共有フレームワークを呼び出すコードでエラーを報告する {id="xcode-reports-errors-in-the-code-calling-the-shared-framework"}
 
-## ヘルプを得る {id="get-help"}
+Xcode で作業している場合、Xcode プロジェクトがフレームワークの古いバージョンを使用している可能性があります。
+これを解決するには、IntelliJ IDEA または Android Studio に戻ってプロジェクトをリビルドするか、iOS 実行構成を開始してください。
 
-* **Kotlin Slack**: [招待](https://surveys.jetbrains.com/s3/kotlin-slack-sign-up)を受けて、[#multiplatform](https://kotlinlang.slack.com/archives/C3PQML5NU) チャンネルに参加してください。
-* **Kotlin 問題トラッカー**: [新しい問題を報告](https://youtrack.jetbrains.com/newIssue?project=KT)してください。
+### Xcode が共有フレームワークのインポート時にエラーを報告する {id="xcode-reports-an-error-when-importing-the-shared-framework"}
+
+Xcode を使用している場合、キャッシュされたバイナリをクリアする必要があるかもしれません。メインメニューの **Product | Clean Build Folder** を選択して、環境をリセットしてみてください。
+
+## 次のステップ {id="what-s-next"}
+
+* UI コードも共有する [別のチュートリアル](compose-multiplatform-new-project.md) を参照してください。
+* Kotlin Multiplatform がサポートするコード共有のさまざまなアプローチについては、[プラットフォーム間でのコード共有](multiplatform-share-on-platforms.md) を参照してください。
+* [Kotlin Multiplatform プロジェクト構造の背後にある原則](multiplatform-discover-project.md) について学びましょう。
+* マルチプラットフォームの依存関係を管理する方法の詳細については、[マルチプラットフォームライブラリへの依存関係の追加](multiplatform-add-dependencies.md) を参照してください。
+* Kotlin Multiplatform プロジェクトを [iOS アプリと統合](multiplatform-ios-integration-overview.md) する方法を確認してください。
+* [ネットワーク処理とデータストレージ](multiplatform-ktor-sqldelight.md) に関するチュートリアルに従って、より複雑な KMP アプリを作成してみましょう。
+* [厳選されたサンプルマルチプラットフォームプロジェクトのリスト](multiplatform-samples.md) を参照してください。
+* [中断関数の構成](https://kotlinlang.org/docs/coroutines-basics.html) に対するさまざまなアプローチを確認してください。
+
+## サポートの利用 {id="get-help"}
+
+* ![Slack](slack.svg){width=25}{type="joined"} **Kotlin Slack**: KMP および Compose Multiplatform に関するディスカッションに参加し、サポートを受けられます。[招待](https://surveys.jetbrains.com/s3/kotlin-slack-sign-up) をリクエストして、[#multiplatform](https://kotlinlang.slack.com/archives/C3PQML5NU) チャンネルに参加してください。
+* **Kotlin 課題トラッカー**: [新しい課題を報告する](https://youtrack.jetbrains.com/newIssue?project=KT)。

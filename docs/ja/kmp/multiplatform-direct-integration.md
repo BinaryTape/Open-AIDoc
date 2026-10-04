@@ -1,37 +1,37 @@
 [//]: # (title: 直接統合)
 
 <tldr>
-   これはローカルでの統合方法です。以下の場合に適しています：<br/>
+   これはローカル統合の方法です。次の場合に適しています：<br/>
 
-   * ローカルマシンで iOS をターゲットとした Kotlin Multiplatform プロジェクトをすでにセットアップしている。<br/>
+   * ローカルマシン上に iOS をターゲットとする Kotlin Multiplatform プロジェクトが既にセットアップされている。
    * Kotlin Multiplatform プロジェクトに CocoaPods の依存関係がない。<br/>
 
-   [自分に最適な統合方法を選択する](multiplatform-ios-integration-overview.md)
+   [最適な統合方法を選択する](multiplatform-ios-integration-overview.md)
 </tldr>
 
-Kotlin Multiplatform プロジェクトと iOS プロジェクトでコードを共有しながら同時に開発したい場合、特別なスクリプトを使用して直接統合（direct integration）をセットアップできます。
+Kotlin Multiplatform プロジェクトと iOS プロジェクトの間でコードを共有しながら同時に開発したい場合、専用のスクリプトを使用して直接統合を設定できます。
 
-このスクリプトは、Xcode 内の iOS プロジェクトに Kotlin フレームワークを接続するプロセスを自動化します。
+このスクリプトは、Kotlin フレームワークを Xcode の iOS プロジェクトに接続するプロセスを自動化します：
 
 ![Direct integration diagram](direct-integration-scheme.svg){width=700}
 
-このスクリプトは、Xcode 環境向けに特別に設計された `embedAndSignAppleFrameworkForXcode` Gradle タスクを使用します。セットアップ中に、このタスクを iOS アプリビルドの Run Script フェーズに追加します。これにより、iOS アプリのビルドが実行される前に Kotlin アーティファクトがビルドされ、派生データ（derived data）に含まれるようになります。
+このスクリプトは、Xcode 環境専用に設計された `embedAndSignAppleFrameworkForXcode` Gradle タスクを使用します。セットアップ時に、これを iOS アプリビルドの Run Script フェーズに追加します。これにより、iOS アプリのビルドが実行される前に Kotlin アーティファクトがビルドされ、派生データ（Derived Data）に含まれるようになります。
 
-一般的に、このスクリプトは以下の処理を行います：
+基本的に、このスクリプトは以下の処理を行います：
 
-* コンパイルされた Kotlin フレームワークを iOS プロジェクト構造内の正しいディレクトリにコピーします。
-* 埋め込まれたフレームワークのコード署名プロセスを処理します。
-* Kotlin フレームワークでのコード変更が Xcode の iOS アプリに反映されるようにします。
+* コンパイルされた Kotlin フレームワークを、iOS プロジェクト構造内の適切なディレクトリにコピーする。
+* 埋め込まれたフレームワークのコード署名プロセスを処理する。
+* Kotlin フレームワーク内のコード変更が、Xcode 上の iOS アプリに確実に反映されるようにする。
 
 ## セットアップ方法 {id="how-to-set-up"}
 
-現在、Kotlin フレームワークの接続に CocoaPods プラグインを使用している場合は、まず移行を行ってください。プロジェクトに CocoaPods の依存関係がない場合は、[このステップをスキップ](#connect-the-framework-to-your-project)してください。
+現在、Kotlin フレームワークを接続するために CocoaPods プラグインを使用している場合は、まず移行を行ってください。プロジェクトに CocoaPods の依存関係がない場合は、[この手順をスキップ](#connect-the-framework-to-your-project)してください。
 
 ### CocoaPods プラグインからの移行 {id="migrate-from-the-cocoapods-plugin"}
 
 CocoaPods プラグインから移行するには：
 
-1. Xcode で、**Product** | **Clean Build Folder** を選択するか、<shortcut>Cmd + Shift + K</shortcut> ショートカットを使用してビルドディレクトリをクリーンアップします。
+1. Xcode で、**Product** | **Clean Build Folder** を選択するか、<shortcut>Cmd + Shift + K</shortcut> ショートカットを使用してビルドディレクトリをクリーンします。
 2. Podfile のあるディレクトリで、次のコマンドを実行します：
 
     ```none
@@ -41,11 +41,11 @@ CocoaPods プラグインから移行するには：
 3. `build.gradle(.kts)` ファイルから `cocoapods {}` ブロックを削除します。
 4. `.podspec` ファイルと Podfile を削除します。
 
-### プロジェクトへのフレームワークの接続
+### フレームワークをプロジェクトに接続する
 
 マルチプラットフォームプロジェクトから生成された Kotlin フレームワークを Xcode プロジェクトに接続するには：
 
-1. `embedAndSignAppleFrameworkForXcode` タスクは、`binaries.framework` 構成オプションが宣言されている場合にのみ登録されます。Kotlin Multiplatform プロジェクトの `build.gradle.kts` ファイルで iOS ターゲットの宣言を確認してください。
+1. `embedAndSignAppleFrameworkForXcode` タスクは、`binaries.framework` 設定オプションが宣言されている場合にのみ登録されます。Kotlin Multiplatform プロジェクトの `build.gradle.kts` ファイルで、iOS ターゲットの宣言を確認してください。
 2. Xcode で、プロジェクト名をダブルクリックして iOS プロジェクト設定を開きます。
 3. 左側の **Targets** セクションでターゲットを選択し、**Build Phases** タブに移動します。
 4. **+** をクリックし、**New Run Script Phase** を選択します。
@@ -63,10 +63,10 @@ CocoaPods プラグインから移行するには：
    ./gradlew :<Shared module name>:embedAndSignAppleFrameworkForXcode
    ```
 
-   * `cd` コマンドには、Kotlin Multiplatform プロジェクトのルートへのパスを指定します（例: `$SRCROOT/..`）。
-   * `./gradlew` コマンドには、共有モジュールの名前を指定します（例: `:shared` または `:sharedUI`）。
+   * `cd` コマンドで、Kotlin Multiplatform プロジェクトのルートへのパスを指定します（例: `$SRCROOT/..`）。
+   * `./gradlew` コマンドで、共有モジュールの名前を指定します（例: `:shared` や `:sharedUI`）。
    
-   iOS の実行構成を開始すると、IntelliJ IDEA と Android Studio は Xcode のビルドを開始する前に Kotlin フレームワークの依存関係をビルドし、環境変数 `OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED` を "YES" に設定します。提供されたシェルスクリプトはこの変数を確認し、Xcode から Kotlin フレームワークが二重にビルドされるのを防ぎます。
+   IntelliJ IDEA や Android Studio で iOS の実行構成を開始すると、Xcode のビルドを開始する前に Kotlin フレームワークの依存関係がビルドされ、環境変数 `OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED` が "YES" に設定されます。提供されているシェルスクリプトはこの変数を確認し、Kotlin フレームワークが Xcode から二重にビルドされるのを防ぎます。
      
    > これをサポートしていないプロジェクトで iOS の実行構成を起動すると、IDE はビルドガードを設定するための修正を提案します。
    >
@@ -76,30 +76,30 @@ CocoaPods プラグインから移行するには：
 
    ![Add the script](xcode-run-script-phase-2.png){width=700}
 
-   これにより、Xcode はビルドのたびにスクリプトを実行し、出力の依存関係が欠落しているという警告を毎回出さないようになります。
+   これにより、Xcode が毎回のビルドでスクリプトを実行するようになり、出力の依存関係が見つからないという警告が毎回表示されるのを防ぎます。
 
 7. **Run Script** フェーズを上に移動し、**Compile Sources** フェーズの前に配置します。
 
    ![Drag the Run Script phase](xcode-run-script-phase-3.png){width=700}
 
-8. **Build Settings** タブの **Build Options** にある **User Script Sandboxing** オプションを無効にします。
+8. **Build Settings** タブで、**Build Options** にある **User Script Sandboxing** オプションを無効にします：
 
    ![User Script Sandboxing](disable-sandboxing-in-xcode-project-settings.png){width=700}
 
-   > 最初にサンドボックスを無効にせずに iOS プロジェクトをビルドした場合は、Gradle デーモンの再起動が必要になる場合があります。
-   > サンドボックス化された可能性がある Gradle デーモンプロセスを停止してください：
+   > 事前にサンドボックス化を無効にせずに iOS プロジェクトをビルドした場合、Gradle デーモンの再起動が必要になることがあります。
+   > サンドボックス化された可能性のある Gradle デーモンプロセスを停止してください：
    > ```shell
    > ./gradlew --stop
    > ```
    >
-   > {style="tip"}
+   {style="tip"}
 
-9. Xcode でプロジェクトをビルドします。すべてが正しくセットアップされていれば、プロジェクトのビルドに成功します。
+9. Xcode でプロジェクトをビルドします。すべてが正しく設定されていれば、プロジェクトは正常にビルドされます。
 
-> デフォルトの `Debug` や `Release` とは異なるカスタムビルド構成を使用している場合は、**Build Settings** タブの **User-Defined** で `KOTLIN_FRAMEWORK_BUILD_TYPE` 設定を追加し、`Debug` または `Release` に設定してください。
+> デフォルトの `Debug` または `Release` とは異なるカスタムビルド構成を使用している場合は、**Build Settings** タブで、**User-Defined** の下に `KOTLIN_FRAMEWORK_BUILD_TYPE` 設定を追加し、`Debug` または `Release` に設定してください。
 >
 {style="note"}
 
 ## 次のステップ {id="what-s-next"}
 
-Swift Package Manager を使用する場合も、ローカル統合を利用できます。[ローカルパッケージ内の Kotlin フレームワークへの依存関係を追加する方法](multiplatform-spm-local-integration.md)を確認してください。
+Swift Package Manager を使用する場合でも、ローカル統合を利用できます。[ローカルパッケージで Kotlin フレームワークへの依存関係を追加する方法を見る](multiplatform-spm-local-integration.md)。

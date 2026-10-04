@@ -42,6 +42,42 @@
     "collapsed": true
   },
   {
+    "text": "kmp.create-kmp-apps",
+    "items": [
+      {
+        "text": "kmp.compose-multiplatform-new-project",
+        "link": "compose-multiplatform-new-project"
+      },
+      {
+        "text": "kmp.multiplatform-upgrade-app",
+        "link": "multiplatform-upgrade-app"
+      },
+      {
+        "text": "kmp.migrate-to-kmp-from-android",
+        "items": [
+          {
+            "text": "kmp.multiplatform-integrate-in-existing-app",
+            "link": "multiplatform-integrate-in-existing-app"
+          },
+          {
+            "text": "kmp.migrate-from-android",
+            "link": "migrate-from-android"
+          }
+        ],
+        "collapsed": true
+      },
+      {
+        "text": "kmp.multiplatform-ktor-sqldelight",
+        "link": "multiplatform-ktor-sqldelight"
+      },
+      {
+        "text": "kmp.create-kotlin-multiplatform-library",
+        "link": "create-kotlin-multiplatform-library"
+      }
+    ],
+    "collapsed": true
+  },
+  {
     "text": "kmp.compose-multiplatform-ui-framework",
     "items": [
       {
@@ -109,6 +145,10 @@
       {
         "text": "kmp.compose-platform-specifics",
         "link": "compose-platform-specifics"
+      },
+      {
+        "text": "kmp.compose-multiplatform-entry-points",
+        "link": "compose-multiplatform-entry-points"
       },
       {
         "text": "kmp.implementing-layouts",
@@ -356,81 +396,33 @@
     "collapsed": true
   },
   {
-    "text": "kmp.choose-your-use-case",
-    "items": [
-      {
-        "text": "kmp.create-an-app-with-shared-logic-and-ui",
-        "items": [
-          {
-            "text": "kmp.compose-multiplatform-create-first-app",
-            "link": "compose-multiplatform-create-first-app"
-          },
-          {
-            "text": "kmp.compose-multiplatform-explore-composables",
-            "link": "compose-multiplatform-explore-composables"
-          },
-          {
-            "text": "kmp.compose-multiplatform-modify-project",
-            "link": "compose-multiplatform-modify-project"
-          },
-          {
-            "text": "kmp.compose-multiplatform-new-project",
-            "link": "compose-multiplatform-new-project"
-          }
-        ],
-        "collapsed": true
-      },
-      {
-        "text": "kmp.create-an-app-with-shared-logic-and-native-ui",
-        "items": [
-          {
-            "text": "kmp.multiplatform-create-first-app",
-            "link": "multiplatform-create-first-app"
-          },
-          {
-            "text": "kmp.multiplatform-update-ui",
-            "link": "multiplatform-update-ui"
-          },
-          {
-            "text": "kmp.multiplatform-dependencies",
-            "link": "multiplatform-dependencies"
-          },
-          {
-            "text": "kmp.multiplatform-upgrade-app",
-            "link": "multiplatform-upgrade-app"
-          },
-          {
-            "text": "kmp.multiplatform-wrap-up",
-            "link": "multiplatform-wrap-up"
-          }
-        ],
-        "collapsed": true
-      },
-      {
-        "text": "kmp.multiplatform-integrate-in-existing-app",
-        "link": "multiplatform-integrate-in-existing-app"
-      },
-      {
-        "text": "kmp.migrate-from-android",
-        "link": "migrate-from-android"
-      },
-      {
-        "text": "kmp.multiplatform-ktor-sqldelight",
-        "link": "multiplatform-ktor-sqldelight"
-      },
-      {
-        "text": "kmp.create-kotlin-multiplatform-library",
-        "link": "create-kotlin-multiplatform-library"
-      }
-    ],
-    "collapsed": true
-  },
-  {
-    "text": "kmp.explore-project-structure",
+    "text": "kmp.manage-project-structure",
     "items": [
       {
         "text": "kmp.multiplatform-discover-project",
         "link": "multiplatform-discover-project"
+      },
+      {
+        "text": "kmp.multiplatform-hierarchy",
+        "link": "multiplatform-hierarchy"
+      },
+      {
+        "text": "kmp.multiplatform-dependencies",
+        "items": [
+          {
+            "text": "kmp.multiplatform-add-dependencies",
+            "link": "multiplatform-add-dependencies"
+          },
+          {
+            "text": "kmp.multiplatform-android-dependencies",
+            "link": "multiplatform-android-dependencies"
+          },
+          {
+            "text": "kmp.multiplatform-ios-dependencies",
+            "link": "multiplatform-ios-dependencies"
+          }
+        ],
+        "collapsed": true
       },
       {
         "text": "kmp.multiplatform-advanced-project-structure",
@@ -455,34 +447,12 @@
         "link": "multiplatform-share-on-platforms"
       },
       {
-        "text": "kmp.multiplatform-expect-actual",
-        "link": "multiplatform-expect-actual"
-      },
-      {
         "text": "kmp.multiplatform-connect-to-apis",
         "link": "multiplatform-connect-to-apis"
       },
       {
-        "text": "kmp.multiplatform-hierarchy",
-        "link": "multiplatform-hierarchy"
-      }
-    ],
-    "collapsed": true
-  },
-  {
-    "text": "kmp.add-dependencies",
-    "items": [
-      {
-        "text": "kmp.multiplatform-add-dependencies",
-        "link": "multiplatform-add-dependencies"
-      },
-      {
-        "text": "kmp.multiplatform-android-dependencies",
-        "link": "multiplatform-android-dependencies"
-      },
-      {
-        "text": "kmp.multiplatform-ios-dependencies",
-        "link": "multiplatform-ios-dependencies"
+        "text": "kmp.multiplatform-expect-actual",
+        "link": "multiplatform-expect-actual"
       }
     ],
     "collapsed": true
@@ -594,11 +564,15 @@
     "collapsed": true
   },
   {
-    "text": "kmp.kmp-tooling",
+    "text": "kmp.kotlin-multiplatform-tooling",
     "items": [
       {
         "text": "kmp.recommended-ides",
         "link": "recommended-ides"
+      },
+      {
+        "text": "kmp.build-and-run-kmp",
+        "link": "build-and-run-kmp"
       },
       {
         "text": "kmp.compose-hot-reload",

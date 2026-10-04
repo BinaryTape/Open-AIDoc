@@ -1026,6 +1026,10 @@
       {
         "text": "kotlin.ktor",
         "href": "https://ktor.io/docs/welcome.html"
+      },
+      {
+        "text": "kotlin.exposed",
+        "href": "https://www.jetbrains.com/help/exposed/get-started-with-exposed.html"
       }
     ],
     "collapsed": true
@@ -1279,16 +1283,12 @@
             "link": "ksp-reference"
           },
           {
-            "text": "kotlin.ksp-additional-details",
-            "link": "ksp-additional-details"
+            "text": "kotlin.ksp-kotlin-model",
+            "link": "ksp-kotlin-model"
           },
           {
             "text": "kotlin.ksp-command-line",
             "link": "ksp-command-line"
-          },
-          {
-            "text": "kotlin.ksp-examples",
-            "link": "ksp-examples"
           }
         ],
         "collapsed": true

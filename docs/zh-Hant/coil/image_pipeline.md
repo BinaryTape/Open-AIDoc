@@ -1,10 +1,10 @@
 # 擴充圖片管線
 
-Android [開箱即用](https://developer.android.com/guide/topics/media/media-formats#image-formats)地支援許多圖片格式，但也有許多它不支援的格式（例如：GIF、SVG、MP4 等）。
+Android [開箱即用](https://developer.android.com/guide/topics/media/media-formats#image-formats)支援許多圖片格式，但也有許多格式不受支援（例如：GIF、SVG、MP4 等）。
 
-幸運的是，`ImageLoader` 支援可外掛的組建，以新增快取層、新的資料型別、新的擷取行為、新的圖片編碼，或者覆寫基礎圖片載入行為。Coil 的圖片管線由五個主要部分組成，並依以下順序執行：[Interceptor](/coil/api/coil-core/coil3.intercept/-interceptor)、[Mapper](/coil/api/coil-core/coil3.map/-mapper)、[Keyer](/coil/api/coil-core/coil3.key/-keyer)、[Fetcher](/coil/api/coil-core/coil3.fetch/-fetcher) 以及 [Decoder](/coil/api/coil-core/coil3.decode/-decoder)。
+幸運的是，[ImageLoader](image_loaders.md) 支援可插入式組件，可用於新增快取層、新資料型別、新擷取行為、新圖片編碼，或覆寫基礎的圖片載入行為。Coil 的圖片管線由五個主要部分組成，並依下列順序執行：[Interceptors](/coil/api/coil-core/coil3.intercept/-interceptor)、[Mappers](/coil/api/coil-core/coil3.map/-mapper)、[Keyers](/coil/api/coil-core/coil3.key/-keyer)、[Fetchers](/coil/api/coil-core/coil3.fetch/-fetcher) 以及 [Decoders](/coil/api/coil-core/coil3.decode/-decoder)。
 
-自訂組建在透過 [ComponentRegistry](/coil/api/coil-core/coil3/-component-registry) 建構 `ImageLoader` 時必須被加入：
+自訂組件必須在透過 [ComponentRegistry](/coil/api/coil-core/coil3/-component-registry) 建構 `ImageLoader` 時加入：
 
 ```kotlin
 val imageLoader = ImageLoader.Builder(context)
@@ -18,9 +18,9 @@ val imageLoader = ImageLoader.Builder(context)
     .build()
 ```
 
-## Interceptor {id="interceptors"}
+## Interceptors {id="interceptors"}
 
-Interceptor 允許您觀察、轉換、短路或重試對 `ImageLoader` 圖片引擎的請求。例如，您可以像這樣加入自訂快取層：
+Interceptor 允許你觀察、轉換、短路（short circuit）或重試發往 `ImageLoader` 圖片引擎的請求。例如，你可以像這樣新增自訂快取層：
 
 ```kotlin
 class CustomCacheInterceptor(
@@ -42,13 +42,13 @@ class CustomCacheInterceptor(
 }
 ```
 
-Interceptor 是一項進階功能，讓您能使用自訂邏輯封裝 `ImageLoader` 的圖片管線。其設計深受 [OkHttp 的 `Interceptor` 介面](https://square.github.io/okhttp/interceptors/#interceptors) 啟發。
+Interceptor 是一項進階功能，讓你能使用自訂邏輯包裝 `ImageLoader` 的圖片管線。其設計很大程度上基於 [OkHttp 的 `Interceptor` 介面](https://lysine.dev/okhttp/interceptors/#interceptors)。
 
-請參閱 [Interceptor](/coil/api/coil-core/coil3.intercept/-interceptor) 以了解更多資訊。
+如需更多資訊，請參閱 [Interceptor](/coil/api/coil-core/coil3.intercept/-interceptor)。
 
-## Mapper {id="mappers"}
+## Mappers {id="mappers"}
 
-Mapper 允許您新增對自訂資料型別的支援。例如，假設我們從伺服器取得此模型：
+Mapper 允許你新增對自訂資料型別的支援。舉例來說，假設我們從伺服器取得以下模型：
 
 ```kotlin
 data class Item(
@@ -59,7 +59,7 @@ data class Item(
 )
 ```
 
-我們可以撰寫一個自訂 Mapper 將其對應至其 URL，稍後將在管線中進行處理：
+我們可以撰寫一個自訂 Mapper 將其對應至其 URL，後續會在管線中進行處理：
 
 ```kotlin
 class ItemMapper : Mapper<Item, String> {
@@ -67,7 +67,7 @@ class ItemMapper : Mapper<Item, String> {
 }
 ```
 
-在組建 `ImageLoader` 時註冊它之後（見上文），我們就可以安全地載入 `Item`：
+在建構 `ImageLoader` 時註冊它（見上文）後，我們就可以安全地載入 `Item`：
 
 ```kotlin
 val request = ImageRequest.Builder(context)
@@ -77,34 +77,34 @@ val request = ImageRequest.Builder(context)
 imageLoader.enqueue(request)
 ```
 
-請參閱 [Mapper](/coil/api/coil-core/coil3.map/-mapper) 以了解更多資訊。
+如需更多資訊，請參閱 [Mapper](/coil/api/coil-core/coil3.map/-mapper)。
 
-## Keyer {id="keyers"}
+## Keyers {id="keyers"}
 
-Keyer 將資料轉換為快取金鑰的一部分。當此請求的輸出被寫入 `MemoryCache` 時，此值將用作 `MemoryCache.Key.key`。
+Keyer 將資料轉換為快取索引鍵的一部分。當此請求的輸出寫入 `MemoryCache` 時，該值將用作 `MemoryCache.Key.key`。
 
-請參閱 [Keyer](/coil/api/coil-core/coil3.key/-keyer) 以了解更多資訊。
+如需更多資訊，請參閱 [Keyers](/coil/api/coil-core/coil3.key/-keyer)。
 
-## Fetcher {id="fetchers"}
+## Fetchers {id="fetchers"}
 
-Fetcher 將資料（例如：URL、URI、File 等）轉換為 `ImageSource` 或 `Image`。它們通常將輸入資料轉換為隨後可由 `Decoder` 取用的格式。使用此介面可新增對自訂擷取機制（例如：Cronet、自訂 URI 配置等）的支援。
+Fetcher 將資料（例如 URL、URI、File 等）轉換為 `ImageSource` 或 `Image`。它們通常將輸入資料轉換為可供 `Decoder` 使用的格式。使用此介面可新增對自訂擷取機制的支援（例如 Cronet、自訂 URI 配置等）。
 
-請參閱 [Fetcher](/coil/api/coil-core/coil3.fetch/-fetcher) 以了解更多資訊。
+如需更多資訊，請參閱 [Fetcher](/coil/api/coil-core/coil3.fetch/-fetcher)。
 
 !!! Note
-    如果您加入一個使用自訂資料型別的 `Fetcher`，您也需要提供一個自訂的 `Keyer`，以確保使用該型別的請求結果可被記憶體快取。例如，`Fetcher.Factory<MyDataType>` 將需要加入 `Keyer<MyDataType>`。
+    如果你新增了使用自訂資料型別的 `Fetcher`，你也需要提供自訂的 `Keyer`，以確保使用該型別的請求結果可被記憶體快取。例如，`Fetcher.Factory<MyDataType>` 需要新增 `Keyer<MyDataType`。
 
-## Decoder {id="decoders"}
+## Decoders {id="decoders"}
 
-Decoder 讀取 `ImageSource` 並傳回 `Image`。使用此介面可新增對自訂檔案格式（例如：GIF、SVG、TIFF 等）的支援。
+Decoder 讀取 `ImageSource` 並傳回一個 `Image`。使用此介面可新增對自訂檔案格式的支援（例如 GIF、SVG、TIFF 等）。
 
-請參閱 [Decoder](/coil/api/coil-core/coil3.decode/-decoder) 以了解更多資訊。
+如需更多資訊，請參閱 [Decoder](/coil/api/coil-core/coil3.decode/-decoder)。
 
 ## 自訂 ImageLoader 與 ImageRequest 屬性 {id="custom-imageloader-and-imagerequest-properties"}
 
-Coil 支援透過 `Extras` 將自訂資料附加到 `ImageRequest` 和 `ImageLoader`。`Extras` 是一個額外屬性的 Map，透過 `Extras.Key` 進行參照。
+Coil 支援透過 `ImageRequest` 與 `ImageLoader` 的 `Extras` 附加自訂資料。`Extras` 是一個透過 `Extras.Key` 引用的額外屬性 Map。
 
-例如，假設我們要為每個 `ImageRequest` 支援自訂逾時。我們可以為其新增自訂擴充函式，如下所示：
+例如，假設我們想要為每個 `ImageRequest` 支援自訂逾時時間。我們可以像這樣為其新增自訂擴充函式：
 
 ```kotlin
 fun ImageRequest.Builder.timeout(timeout: Duration) = apply {
@@ -121,11 +121,11 @@ val ImageRequest.timeout: Duration
 val Options.timeout: Duration
     get() = getExtra(timeoutKey)
 
-// 注意：Extras.Key 執行個體應以靜態方式宣告，因為它們是以執行個體相等性進行比較的。
+// NOTE: Extras.Key instances should be declared statically as they're compared with instance equality.
 private val timeoutKey = Extras.Key(default = Duration.INFINITE)
 ```
 
-接著，我們可以在註冊於 `ImageLoader` 中的自訂 `Interceptor` 內讀取該屬性：
+接著我們可以在註冊至 `ImageLoader` 的自訂 `Interceptor` 內讀取該屬性：
 
 ```kotlin
 class TimeoutInterceptor : Interceptor {
@@ -156,14 +156,14 @@ AsyncImage(
 
 此外：
 
-- 我們可以透過我們定義的 `ImageLoader.Builder.timeout` 擴充函式來設定預設逾時值。
-- 我們可以透過我們定義的 `Options.timeout` 擴充函式，在 `Mapper`、`Fetcher` 和 `Decoder` 內部讀取逾時。
+- 我們可以透過我們定義的 `ImageLoader.Builder.timeout` 擴充函式設定預設逾時值。
+- 我們可以透過我們定義的 `Options.timeout` 擴充函式在 `Mapper`、`Fetcher` 與 `Decoder` 內讀取逾時設定。
 
-[Coil 本身也使用這種模式](https://github.com/coil-kt/coil/blob/main/coil-gif/src/main/java/coil3/gif/imageRequests.kt)，在 `coil-gif` 以及其他擴充程式庫中為 GIF 支援自訂請求屬性。
+[Coil 本身也使用此模式](https://github.com/coil-kt/coil/blob/main/coil-gif/src/main/java/coil3/gif/imageRequests.kt)來為 `coil-gif` 中的 GIF 以及其他擴充程式庫支援自訂請求屬性。
 
-## 串聯組建 {id="chaining-components"}
+## 鏈結組件 {id="chaining-components"}
 
-Coil 圖片載入器組建的一個實用特性是它們可以在內部串聯。例如，假設您需要執行網路請求以取得要載入的圖片 URL。
+Coil 圖片載入器組件的一個實用特性是它們可以在內部相互鏈結。例如，假設你需要執行網路請求以取得即將載入的圖片 URL。
 
 首先，讓我們建立一個僅由我們的 Fetcher 處理的自訂資料型別：
 
@@ -173,7 +173,7 @@ data class PartialUrl(
 )
 ```
 
-接著，建立我們的自訂 `Fetcher`，它將取得圖片 URL 並委派給內部的網路 Fetcher：
+接著建立我們的自訂 `Fetcher`，它將取得圖片 URL 並委派給內部的網路 Fetcher：
 
 ```kotlin
 class PartialUrlFetcher(
@@ -189,10 +189,10 @@ class PartialUrlFetcher(
             .build()
         val response = callFactory.newCall(request).await()
 
-        // 讀取圖片 URL。
+        // Read the image URL.
         val imageUrl: String = readImageUrl(response.body)
 
-        // 這將委派給內部的網路 Fetcher。
+        // This will delegate to the internal network fetcher.
         val data = imageLoader.components.map(imageUrl, options)
         val output = imageLoader.components.newFetcher(data, options, imageLoader)
         val (fetcher) = checkNotNull(output) { "no supported fetcher" }
@@ -209,7 +209,7 @@ class PartialUrlFetcher(
 }
 ```
 
-最後，我們只需要在 `ComponentRegistry` 中註冊該 `Fetcher`，並傳遞 `PartialUrl` 作為我們的 `model`/`data`：
+最後，我們只需要在 `ComponentRegistry` 中註冊該 `Fetcher`，並將 `PartialUrl` 作為 `model`/`data` 傳入：
 
 ```kotlin
 AsyncImage(
@@ -218,4 +218,4 @@ AsyncImage(
 )
 ```
 
-這種模式同樣可以應用於 `Mapper`、`Keyer` 和 `Decoder`。
+此模式同樣可套用於 `Mapper`、`Keyer` 和 `Decoder`。

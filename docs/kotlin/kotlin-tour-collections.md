@@ -2,39 +2,39 @@
 
 <no-index/>
 
-在编程时，能够将数据分组到结构中以便后续处理是非常有用的。Kotlin 提供的集合正是为了这一目的。
+在编程时，能够将数据归类到特定结构中以便后续处理非常实用。Kotlin 提供的集合正是用于此目的。
 
-Kotlin 拥有以下用于对项进行分组的集合类型：
+Kotlin 提供了以下用于对元素进行分组的集合：
 
-| **集合类型** | **描述**                                                         |
+| **集合类型** | **说明**                                                         |
 |---------------------|-------------------------------------------------------------------------|
-| List               | 有序的项集合                                            |
-| Set                | 唯一的无序项集合                                   |
+| List               | 元素的有序集合                                            |
+| Set                | 唯一元素的无序集合                                   |
 | Map                | 键值对的集合，其中键是唯一的，且仅映射到一个值 |
 
 每种集合类型都可以是可变的或只读的。
 
 ## List {id="list"}
 
-List 按添加顺序存储项，并允许重复项。
+List 会按照元素的添加顺序存储元素，并允许存在重复元素。
 
-要创建只读 List ([`List`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/))，请使用 
+要创建只读列表（[`List`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/)），请使用 
 [`listOf()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/list-of.html) 函数。
 
-要创建可变 List ([`MutableList`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-list.html))，
+要创建可变列表（[`MutableList`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-list.html)），
 请使用 [`mutableListOf()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/mutable-list-of.html) 函数。
 
-创建 List 时，Kotlin 可以推断存储的项类型。要显式声明类型，请在 List 声明后的尖括号 `<>` 内添加类型：
+创建列表时，Kotlin 可以推断所存储元素的类型。若要显式声明类型，请在列表声明后的尖括号 `<>` 中添加类型：
 
 ```kotlin
 fun main() { 
 //sampleStart
-    // 只读 List
+    // 只读列表
     val readOnlyShapes = listOf("triangle", "square", "circle")
     println(readOnlyShapes)
     // [triangle, square, circle]
     
-    // 带有显式类型声明的可变 List
+    // 显式声明类型的可变列表
     val shapes: MutableList<String> = mutableListOf("triangle", "square", "circle")
     println(shapes)
     // [triangle, square, circle]
@@ -43,17 +43,17 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-lists-declaration"}
 
-> 为了防止不必要的修改，你可以通过将可变 List 赋值给一个 `List` 来创建该 List 的只读视图：
+> 为了防止不必要的修改，你可以通过将可变列表赋值给 `List` 来创建其只读视图：
 > 
 > ```kotlin
 >     val shapes: MutableList<String> = mutableListOf("triangle", "square", "circle")
 >     val shapesLocked: List<String> = shapes
 > ```
-> 这也称为**转换**。
+> 这也被称为**转换**。
 > 
 {style="tip"}
 
-List 是有序的，因此要访问 List 中的项，请使用[索引访问运算符](operator-overloading.md#indexed-access-operator) `[]`：
+由于列表是有序的，因此要访问列表中的某个元素，请使用[索引访问运算符](operator-overloading.md#indexed-access-operator) `[]`：
 
 ```kotlin
 fun main() { 
@@ -66,7 +66,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-list-access"}
 
-要获取 List 中的第一个或最后一个项，请分别使用 [`.first()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/first.html)
+要获取列表中的第一个或最后一个元素，请分别使用 [`.first()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/first.html)
 和 [`.last()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/last.html) 函数：
 
 ```kotlin
@@ -81,14 +81,14 @@ fun main() {
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-list-first"}
 
 > [`.first()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/first.html) 和 [`.last()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/last.html)
-> 函数是**扩展**函数的示例。要在对象上调用扩展函数，请在对象后紧跟一个点号 `.` 并写下函数名称。
+> 函数是**扩展**函数的示例。要在对象上调用扩展函数，请在对象后添加英文句点 `.` 并跟上函数名称。
 > 
 > 扩展函数将在[中级教程](kotlin-tour-intermediate-extension-functions.md#extension-functions)中详细介绍。
-> 目前，你只需要知道如何调用它们即可。 
+> 目前，你只需要知道如何调用它们即可。
 > 
 {style="note"}
 
-要获取 List 中的项数，请使用 [`.count()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/count.html)
+要获取列表中的元素数量，请使用 [`.count()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/count.html)
 函数：
 
 ```kotlin
@@ -102,7 +102,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-list-count"}
 
-要检查某个项是否在 List 中，请使用 [`in` 运算符](operator-overloading.md#in-operator)：
+要检查某个元素是否在列表中，请使用 [`in` 运算符](operator-overloading.md#in-operator)：
 
 ```kotlin
 fun main() {
@@ -115,19 +115,19 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-list-in"}
 
-要从可变 List 中添加或移除项，请分别使用 [`.add()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-list/add.html)
+要从可变列表中添加或移除元素，请分别使用 [`.add()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-list/add.html)
 和 [`.remove()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/remove.html) 函数：
 
 ```kotlin
 fun main() { 
 //sampleStart
     val shapes: MutableList<String> = mutableListOf("triangle", "square", "circle")
-    // 将 "pentagon" 添加到 List 中
+    // 向列表中添加 "pentagon"
     shapes.add("pentagon") 
     println(shapes)  
     // [triangle, square, circle, pentagon]
 
-    // 从 List 中移除第一个 "pentagon"
+    // 从列表中移除第一个出现的 "pentagon"
     shapes.remove("pentagon") 
     println(shapes)  
     // [triangle, square, circle]
@@ -138,22 +138,22 @@ fun main() {
 
 ## Set {id="set"}
 
-List 是有序且允许重复项的，而 Set 则是**无序**且仅存储**唯一**项的。
+列表是有序的并且允许重复元素，而 Set 则是**无序的**，且仅存储**唯一**的元素。
 
-要创建只读 Set ([`Set`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-set/))，请使用 
+要创建只读 Set（[`Set`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-set/)），请使用 
 [`setOf()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/set-of.html) 函数。
 
-要创建可变 Set ([`MutableSet`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-set/))，
+要创建可变 Set（[`MutableSet`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-set/)），
 请使用 [`mutableSetOf()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/mutable-set-of.html) 函数。
 
-创建 Set 时，Kotlin 可以推断存储的项类型。要显式声明类型，请在 Set 声明后的尖括号 `<>` 内添加类型：
+创建 Set 时，Kotlin 可以推断所存储元素的类型。若要显式声明类型，请在 Set 声明后的尖括号 `<>` 中添加类型：
 
 ```kotlin
 fun main() {
 //sampleStart
     // 只读 Set
     val readOnlyFruit = setOf("apple", "banana", "cherry", "cherry")
-    // 带有显式类型声明的可变 Set
+    // 显式声明类型的可变 Set
     val fruit: MutableSet<String> = mutableSetOf("apple", "banana", "cherry", "cherry")
     
     println(readOnlyFruit)
@@ -163,9 +163,9 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-sets-declaration"}
 
-你可以在前面的示例中看到，由于 Set 仅包含唯一元素，重复的 `"cherry"` 项被丢弃了。
+你可以从前面的示例中看到，由于 Set 仅包含唯一元素，因此重复的 `"cherry"` 元素会被自动丢弃。
 
-> 为了防止不必要的修改，你可以通过将可变 Set 赋值给一个 `Set` 来创建该 Set 的只读视图：
+> 为了防止不必要的修改，你可以通过将可变 Set 赋值给 `Set` 来创建其只读视图：
 > 
 > ```kotlin
 >     val fruit: MutableSet<String> = mutableSetOf("apple", "banana", "cherry", "cherry")
@@ -174,11 +174,11 @@ fun main() {
 >
 {style="tip"}
 
-> 由于 Set 是**无序**的，你无法访问特定索引处的项。
+> 由于 Set 是**无序的**，因此你无法通过特定索引访问其中的元素。
 > 
 {style="note"}
 
-要获取 Set 中的项数，请使用 [`.count()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/count.html)
+要获取 Set 中的元素数量，请使用 [`.count()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/count.html)
 函数：
 
 ```kotlin
@@ -192,7 +192,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-set-count"}
 
-要检查某个项是否在 Set 中，请使用 [`in` 运算符](operator-overloading.md#in-operator)：
+要检查某个元素是否在 Set 中，请使用 [`in` 运算符](operator-overloading.md#in-operator)：
 
 ```kotlin
 fun main() {
@@ -205,14 +205,14 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-set-in"}
 
-要从可变 Set 中添加或移除项，请分别使用 [`.add()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-set/add.html)
+要从可变 Set 中添加或移除元素，请分别使用 [`.add()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-set/add.html)
 和 [`.remove()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/remove.html) 函数：
 
 ```kotlin
 fun main() { 
 //sampleStart
     val fruit: MutableSet<String> = mutableSetOf("apple", "banana", "cherry", "cherry")
-    fruit.add("dragonfruit")    // 将 "dragonfruit" 添加到 Set
+    fruit.add("dragonfruit")    // 向 Set 中添加 "dragonfruit"
     println(fruit)              // [apple, banana, cherry, dragonfruit]
     
     fruit.remove("dragonfruit") // 从 Set 中移除 "dragonfruit"
@@ -224,24 +224,23 @@ fun main() {
 
 ## Map {id="map"}
 
-Map 以键值对的形式存储项。你可以通过引用键来访问值。你可以将 Map 想象成一份食物菜单。
-你可以通过找到你想吃的食物（键）来找到价格（值）。如果你想在不使用数字索引（如 List）的情况下查找值，Map 非常有用。
+Map 以键值对的形式存储元素。你可以通过引用键来访问其对应的值。你可以将 Map 想象成一份菜单：通过查找你想吃的菜品（键），即可找到对应的价格（值）。如果你希望查找某个值，但又不想像在列表中那样使用数字索引，Map 会非常有用。
 
-> * Map 中的每个键都必须是唯一的，以便 Kotlin 能够理解你想要获取哪个值。 
-> * 你在 Map 中可以有重复的值。
+> * Map 中的每个键都必须是唯一的，以便 Kotlin 能够确定你想要获取哪一个值。
+> * Map 中可以存在重复的值。
 >
 {style="note"}
 
-要创建只读 Map ([`Map`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/))，请使用 
+要创建只读 Map（[`Map`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/)），请使用 
 [`mapOf()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/map-of.html) 函数。
 
-要创建可变 Map ([`MutableMap`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-map/))，
+要创建可变 Map（[`MutableMap`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-map/)），
 请使用 [`mutableMapOf()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/mutable-map-of.html) 函数。
 
-创建 Map 时，Kotlin 可以推断存储的项类型。要显式声明类型，请在 Map 声明后的尖括号 `<>` 内添加键和值的类型。例如：`MutableMap<String, Int>`。
-键的类型为 `String`，值的类型为 `Int`。
+创建 Map 时，Kotlin 可以推断所存储元素的类型。若要显式声明类型，请在 Map 声明后的尖括号 `<>` 中添加键和值的类型。例如：`MutableMap<String, Int>`。
+其中键的类型为 `String`，值的类型为 `Int`。
 
-创建 Map 最简单的方法是在每个键与其相关值之间使用 [`to`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/to.html)：
+创建 Map 最简单的方法是在每个键与其关联的值之间使用 [`to`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/to.html)：
 
 ```kotlin
 fun main() {
@@ -251,7 +250,7 @@ fun main() {
     println(readOnlyJuiceMenu)
     // {apple=100, kiwi=190, orange=100}
 
-    // 带有显式类型声明的可变 Map
+    // 显式声明类型的可变 Map
     val juiceMenu: MutableMap<String, Int> = mutableMapOf("apple" to 100, "kiwi" to 190, "orange" to 100)
     println(juiceMenu)
     // {apple=100, kiwi=190, orange=100}
@@ -260,7 +259,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-maps-declaration"}
 
-> 为了防止不必要的修改，你可以通过将可变 Map 赋值给一个 `Map` 来创建该 Map 的只读视图：
+> 为了防止不必要的修改，你可以通过将可变 Map 赋值给 `Map` 来创建其只读视图：
 > 
 > ```kotlin
 >     val juiceMenu: MutableMap<String, Int> = mutableMapOf("apple" to 100, "kiwi" to 190, "orange" to 100)
@@ -269,7 +268,7 @@ fun main() {
 >
 {style="tip"}
 
-要访问 Map 中的值，请使用[索引访问运算符](operator-overloading.md#indexed-access-operator) `[]` 及其键：
+要访问 Map 中的值，请使用带有键的[索引访问运算符](operator-overloading.md#indexed-access-operator) `[]`：
 
 ```kotlin
 fun main() {
@@ -283,7 +282,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-map-access"}
 
-> 如果你尝试使用 Map 中不存在的键来访问键值对，你将看到一个 `null` 值：
+> 如果尝试使用 Map 中不存在的键来访问键值对，你将获得一个 `null` 值：
 >
 > ```kotlin
 > fun main() {
@@ -297,17 +296,17 @@ fun main() {
 > ```
 > {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-map-no-key" validate="false"}
 > 
-> 本教程稍后将在 [null 安全](kotlin-tour-null-safety.md)章节中解释 null 值。
+> 本教程稍后会在[空安全](kotlin-tour-null-safety.md)章节中详细解释 null 值。
 > 
 {style="note"}
 
-你还可以使用[索引访问运算符](operator-overloading.md#indexed-access-operator) `[]` 向可变 Map 添加项：
+你还可以使用[索引访问运算符](operator-overloading.md#indexed-access-operator) `[]` 向可变 Map 中添加项：
 
 ```kotlin
 fun main() {
 //sampleStart
     val juiceMenu: MutableMap<String, Int> = mutableMapOf("apple" to 100, "kiwi" to 190, "orange" to 100)
-    juiceMenu["coconut"] = 150 // 向 Map 中添加键 "coconut" 及其值 150
+    juiceMenu["coconut"] = 150 // 向 Map 中添加键 "coconut" 及其对应的值 150
     println(juiceMenu)
     // {apple=100, kiwi=190, orange=100, coconut=150}
 //sampleEnd
@@ -345,7 +344,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-map-count"}
 
-要检查某个特定键是否已包含在 Map 中，请使用 [`.containsKey()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/contains-key.html)
+要检查某个键是否已经包含在 Map 中，请使用 [`.containsKey()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/contains-key.html)
 函数：
 
 ```kotlin
@@ -376,14 +375,14 @@ fun main() {
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-map-keys-values"}
 
 > [`keys`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/keys.html) 和 [`values`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/values.html)
-> 是对象**属性**的示例。要访问对象的属性，请在对象后紧跟一个点号 `.` 并写下属性名称。
+> 是对象的**属性**示例。要访问对象的属性，请在对象后添加英文句点 `.` 并跟上属性名称。
 >
 > 属性将在[类](kotlin-tour-classes.md)章节中进行更详细的讨论。
-> 在本教程的此阶段，你只需要知道如何访问它们即可。
+> 在本教程的当前阶段，你只需要知道如何访问它们即可。
 >
 {style="note"}
 
-要检查键或值是否在 Map 中，请使用 [`in` 运算符](operator-overloading.md#in-operator)：
+要检查某个键或值是否存在于 Map 中，请使用 [`in` 运算符](operator-overloading.md#in-operator)：
 
 ```kotlin
 fun main() {
@@ -392,7 +391,7 @@ fun main() {
     println("orange" in readOnlyJuiceMenu.keys)
     // true
     
-    // 或者，你不需要使用 keys 属性
+    // 另一种写法，你不需要显式使用 keys 属性
     println("orange" in readOnlyJuiceMenu)
     // true
     
@@ -403,17 +402,17 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-map-in"}
 
-有关集合用法的更多信息，请参阅[集合](collections-overview.md)。
+有关集合可用操作的更多信息，请参阅[集合](collections-overview.md)。
 
-现在你已经了解了基本类型以及如何管理集合，是时候探索可以在程序中使用的[控制流](kotlin-tour-control-flow.md)了。
+既然你已经了解了基本类型以及如何管理集合，现在可以进一步探索可以在程序中使用的[控制流](kotlin-tour-control-flow.md)。
 
 ## 练习 {completion-point="true" id="practice"}
 
-### 练习 1 {initial-collapse-state="collapsed" collapsible="true" id="exercise-1"}
+<deflist appearance="clear" collapsible="true" numbered="true">
+<def title="统计两个列表中的元素总数">
 
-你有一个“绿色”数字列表和一个“红色”数字列表。完成代码以打印总共有多少个数字。
+你有一个“绿色”数字列表和一个“红色”数字列表。请补全代码，打印出总共有多少个数字。
 
-|---|---|
 ```kotlin
 fun main() {
     val greenNumbers = listOf(1, 4, 23)
@@ -423,7 +422,6 @@ fun main() {
 ```
 {validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-collections-exercise-1"}
 
-|---|---|
 ```kotlin
 fun main() {
     val greenNumbers = listOf(1, 4, 23)
@@ -434,11 +432,11 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="示例解法" id="kotlin-tour-collections-solution-1"}
 
-### 练习 2 {initial-collapse-state="collapsed" collapsible="true" id="exercise-2"}
+</def>
+<def title="检查请求的协议是否受支持">
 
-你有一组服务器支持的协议。用户请求使用特定协议。完成程序以检查请求的协议是否受支持（`isSupported` 必须是一个布尔值）。
+你拥有一组服务器支持的协议集合。用户请求使用特定协议。请补全程序以检查请求的协议是否受支持（`isSupported` 必须为布尔值）。
 
-|---|---|
 ```kotlin
 fun main() {
     val SUPPORTED = setOf("HTTP", "HTTPS", "FTP")
@@ -451,11 +449,11 @@ fun main() {
 
 <deflist collapsible="true" id="kotlin-tour-collections-exercise-2-hint">
     <def title="提示">
-        确保检查的是大写形式的请求协议。你可以使用 <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.text/uppercase.html"><code>.uppercase()</code></a> 函数来帮助你完成此操作。
+        请确保在检查请求的协议时将其转换为大写形式。你可以使用 <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.text/uppercase.html"><code>.uppercase()</code></a>
+函数来完成此操作。
     </def>
 </deflist>
 
-|---|---|
 ```kotlin
 fun main() {
     val SUPPORTED = setOf("HTTP", "HTTPS", "FTP")
@@ -466,11 +464,11 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="示例解法" id="kotlin-tour-collections-solution-2"}
 
-### 练习 3 {initial-collapse-state="collapsed" collapsible="true" id="exercise-3"}
+</def>
+<def title="使用 Map 拼写数字">
 
-定义一个 Map，将 1 到 3 的整数与其对应的拼写形式关联起来。使用此 Map 拼写给定的数字。
+定义一个 Map，将整数 1 到 3 与其对应的拼写关联起来。使用该 Map 拼写给定的数字。
 
-|---|---|
 ```kotlin
 fun main() {
     val number2word = // 在此处编写你的代码
@@ -480,7 +478,6 @@ fun main() {
 ```
 {validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-collections-exercise-3"}
 
-|---|---|
 ```kotlin
 fun main() {
     val number2word = mapOf(1 to "one", 2 to "two", 3 to "three")
@@ -489,6 +486,9 @@ fun main() {
 }
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="示例解法" id="kotlin-tour-collections-solution-3"}
+
+</def>
+</deflist>
 
 <seealso></seealso>
 

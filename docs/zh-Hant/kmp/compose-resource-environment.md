@@ -1,22 +1,24 @@
 # 管理本機資源環境
 
-您可能需要管理應用程式內設定，讓使用者能夠自訂體驗，例如更改語言或佈景主題。
-若要動態更新應用程式的資源環境，您可以設定應用程式使用的以下資源相關設定：
+您可能需要管理應用程式內的設定，以允許使用者自訂體驗，例如變更語言或佈景主題。
+若要動態更新應用程式的資源環境，您可以配置應用程式使用的以下資源相關設定：
 
-* [地區設定 (語言與地區)](#locale)
+* [地區設定（語言和地區）](#locale)
 * [佈景主題](#theme)
 * [解析度密度](#density)
 
-## 地區設定 {id="locale"}
+## 地區設定 (Locale) {id="locale"}
 
-每個平台處理地區設定（如語言和地區）的方式各不相同。作為臨時解決方案，在實作通用的公開 API 之前，您需要在共用程式碼中定義一個通用的進入點。然後，使用平台特定的 API 為每個平台提供對應的宣告：
+每個平台處理語言和地區等地區設定的方式都有所不同。在通用公用 API 實作之前，作為臨時因應措施，您需要在共用程式碼中定義一個通用進入點。接著，使用各平台特有的 API 為每個平台提供對應的宣告：
 
-* **Android**: [`context.resources.configuration.locale`](https://developer.android.com/reference/android/content/res/Configuration#setLocale(java.util.Locale))
-* **iOS**: [`NSLocale.preferredLanguages`](https://developer.apple.com/documentation/foundation/nslocale/preferredlanguages)
-* **桌面**: [`Locale.getDefault()`](https://developer.android.com/reference/java/util/Locale#getDefault(java.util.Locale.Category))
-* **Web**: [`window.navigator.languages`](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/languages)
+* **Android**：[`context.resources.configuration.locale`](https://developer.android.com/reference/android/content/res/Configuration#setLocale(java.util.Locale))
+* **iOS**：[`NSLocale.preferredLanguages`](https://developer.apple.com/documentation/foundation/nslocale/preferredlanguages)
+* **桌面端 (desktop)**：[`Locale.getDefault()`](https://developer.android.com/reference/java/util/Locale#getDefault(java.util.Locale.Category))
+* **Web**：[`window.navigator.languages`](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/languages)
 
-1. 在通用原始碼集中，使用 `expect` 關鍵字定義預期的 `LocalAppLocale` 物件。地區設定指定為 BCP 47 語言標籤，例如 `es`、`es-ES` 或 `zh-Hans`。將 `customAppLocale` 設定為 `null` 以使用系統地區設定：
+1. 在通用原始碼集 (common source set) 中，使用 `expect` 關鍵字定義預期的 `LocalAppLocale` 物件。
+   地區設定是以 BCP 47 語言標籤指定的，例如 `es`、`es-ES` 或 `zh-Hans`。
+   將 `customAppLocale` 設定為 `null` 即可使用系統地區設定：
 
     ```kotlin
     var customAppLocale by mutableStateOf<String?>(null)
@@ -70,7 +72,6 @@
 3. 在 iOS 原始碼集中，新增修改 `NSLocale.preferredLanguages` 的 `actual` 實作：
  
     ```kotlin
-    @OptIn(InternalComposeUiApi::class)
     actual object LocalAppLocale {
         private const val LANG_KEY = "AppleLanguages"
         private val default = NSLocale.preferredLanguages.first() as String
@@ -91,7 +92,7 @@
     }
     ```
 
-4. 在桌面原始碼集中，新增使用 `Locale.getDefault()` 更新 JVM 預設地區設定的 `actual` 實作：
+4. 在桌面端原始碼集中，新增使用 `Locale.getDefault()` 更新 JVM 預設地區設定的 `actual` 實作：
 
     ```kotlin
     actual object LocalAppLocale {
@@ -115,7 +116,7 @@
     }
     ```
 
-5. 對於 Web 平台，繞過 `window.navigator.languages` 屬性的唯讀限制，以引入自訂的地區設定邏輯：
+5. 對於 Web 平台，繞過 `window.navigator.languages` 屬性的唯讀限制以引入自訂地區設定邏輯：
 
     ```kotlin
     actual object LocalAppLocale {
@@ -143,7 +144,7 @@
     }
     ```
 
-    接著，在瀏覽器的 `index.html` 中，在載入應用程式指令碼之前放入以下程式碼：
+    接著，在瀏覽器的 `index.html` 中，於載入應用程式指令碼之前放入以下程式碼：
 
     ```html    
     <html lang="en">
@@ -174,17 +175,18 @@
 
 ## 佈景主題 {id="theme"}
 
-Compose Multiplatform 透過 `isSystemInDarkTheme()` 定義目前的佈景主題。不同平台的佈景主題處理方式各不相同：
+Compose Multiplatform 透過 `isSystemInDarkTheme()` 定義目前的佈景主題。
+各平台處理佈景主題的方式各不相同：
 
-* Android 透過以下按位元運算定義佈景主題： 
+* Android 透過以下位元運算定義佈景主題：
     ```kotlin
         Resources.getConfiguration().uiMode and Configuration.UI_MODE_NIGHT_MASK
     ```
-* iOS、桌面與 Web 平台使用 `LocalSystemTheme.current`。
+* iOS、桌面端和 Web 平台使用 `LocalSystemTheme.current`。
 
-作為臨時解決方案，在實作通用的公開 API 之前，您可以使用 `expect-actual` 機制來管理平台特定的佈景主題自訂，以處理這些差異：
+作為臨時因應措施，在通用公用 API 實作之前，您可以利用 `expect-actual` 機制解決此差異，以管理特定平台的佈景主題自訂：
 
-1. 在共用程式碼中，使用 `expect` 關鍵字定義預期的 `LocalAppTheme` 物件：
+1. 在通用程式碼中，使用 `expect` 關鍵字定義預期的 `LocalAppTheme` 物件：
  
     ```kotlin
     var customAppThemeIsDark by mutableStateOf<Boolean?>(null)
@@ -205,7 +207,7 @@ Compose Multiplatform 透過 `isSystemInDarkTheme()` 定義目前的佈景主題
     }
     ```
 
-2. 在 Android 程式碼中，新增使用 `LocalConfiguration` API 的 `actual` 實作：
+2. 在 Android 程式碼中，新增使用 `LocalConfiguration` API 的 actual 實作：
 
    ```kotlin
     actual object LocalAppTheme {
@@ -229,7 +231,7 @@ Compose Multiplatform 透過 `isSystemInDarkTheme()` 定義目前的佈景主題
     }
     ```
 
-3. 在 iOS、桌面與 Web 平台上，您可以直接變更 `LocalSystemTheme`：
+3. 在 iOS、桌面端與 Web 平台上，您可以直接變更 `LocalSystemTheme`：
 
     ```kotlin
     @OptIn(InternalComposeUiApi::class)
@@ -250,9 +252,9 @@ Compose Multiplatform 透過 `isSystemInDarkTheme()` 定義目前的佈景主題
     }
     ```
 
-## 密度
+## 密度 (Density)
 
-若要變更應用程式的解析度 `Density`，您可以使用所有平台都支援的通用 `LocalDensity` API：
+若要變更應用程式的解析度 `Density`，您可以使用所有平台均支援的通用 `LocalDensity` API：
 
 ```kotlin
 var customAppDensity by mutableStateOf<Density?>(null)
@@ -279,7 +281,7 @@ fun AppEnvironment(content: @Composable () -> Unit) {
 }
 ```
 
-## 接下來？ {id="what-s-next"}
+## 後續步驟 {id="what-s-next"}
 
-* 進一步了解[資源限定詞](compose-multiplatform-resources-setup.md#qualifiers)的詳細資訊。
-* 了解如何[在地化資源](compose-localize-strings.md)。
+* 深入了解 [資源限定詞 (resource qualifiers)](compose-multiplatform-resources-setup.md#qualifiers) 的詳細資訊。
+* 了解如何 [在地化資源 (localize resources)](compose-localize-strings.md)。

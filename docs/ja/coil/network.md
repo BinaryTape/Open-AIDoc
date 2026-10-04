@@ -1,8 +1,8 @@
-# ネットワーク画像
+# ネットワーク画像 (Network Images)
 
-デフォルトでは、Coil 3.x はネットワークからの画像読み込みをサポートしていません。これは、独自のネットワーク・ソリューションを使用したいユーザーや、ネットワーク URL のサポートを必要としない（例：ディスクからの画像読み込みのみを行う）ユーザーに対して、大きなネットワーク依存関係を強制することを避けるためです。
+デフォルトでは、Coil 3.x にはネットワークから画像を読み込むためのサポートが含まれていません。これは、独自のネットワーキングソリューションを使用したいユーザーや、ネットワーク URL のサポートを必要としない（例: ディスクからのみ画像を読み込む）ユーザーに対して、肥大化したネットワーク依存関係を強制することを避けるためです。
 
-ネットワークからの画像取得サポートを追加するには、**以下のうちいずれか1つのみ**をインポートしてください：
+ネットワークから画像を取得するためのサポートを追加するには、**以下のうちいずれか1つのみ**をインポートしてください:
 
 ```kotlin
 implementation("io.coil-kt.coil3:coil-network-okhttp:3.6.3") // Android/JVM でのみ利用可能。
@@ -10,11 +10,11 @@ implementation("io.coil-kt.coil3:coil-network-ktor2:3.6.3")
 implementation("io.coil-kt.coil3:coil-network-ktor3:3.6.3")
 ```
 
-OkHttp を使用する場合、設定は以上です。インポートすると、`https://example.com/image.jpg` のようなネットワーク URL が自動的にサポートされます。Ktor を使用する場合は、各プラットフォームに対応したエンジンを追加する必要があります（以下を参照）。
+OkHttp を使用している場合は、これだけで完了です。インポートすると、`https://example.com/image.jpg` のようなネットワーク URL が自動的にサポートされます。Ktor を使用している場合は、各プラットフォームに対応するエンジンを追加する必要があります（下記参照）。
 
 ## Ktor ネットワークエンジン {id="ktor-network-engines"}
 
-`coil-network-ktor2` または `coil-network-ktor3` に依存している場合は、プラットフォーム（Javascript を除く）ごとに [Ktor エンジン](https://ktor.io/docs/client-engines.html)をインポートする必要があります。以下はクイックスタート用のエンジンセットです：
+`coil-network-ktor2` または `coil-network-ktor3` に依存している場合は、（JavaScript を除く）各プラットフォーム向けの [Ktor エンジン](https://ktor.io/docs/client-engines.html) をインポートする必要があります。以下はクイックスタート用のエンジンセットです:
 
 ```kotlin
 androidMain {
@@ -34,11 +34,11 @@ jvmMain {
 }
 ```
 
-カスタムのネットワーク・ライブラリを使用したい場合は、`io.coil-kt.coil3:coil-network-core` をインポートし、`NetworkClient` を実装し、`ImageLoader` でカスタム `NetworkClient` を使用して `NetworkFetcher` を登録してください。
+カスタムのネットワーキングライブラリを使用したい場合は、`io.coil-kt.coil3:coil-network-core` をインポートし、`NetworkClient` を実装した上で、そのカスタム `NetworkClient` を持つ `NetworkFetcher` を `ImageLoader` に登録できます。
 
 ## カスタム OkHttpClient の使用 {id="using-a-custom-okhttpclient"}
 
-`io.coil-kt.coil3:coil-network-okhttp` を使用する場合、`ImageLoader` の作成時にカスタム `OkHttpClient` を指定できます：
+`io.coil-kt.coil3:coil-network-okhttp` を使用している場合、`ImageLoader` の作成時にカスタムの `OkHttpClient` を指定できます:
 
 ```kotlin
 val imageLoader = ImageLoader.Builder(context)
@@ -55,15 +55,15 @@ val imageLoader = ImageLoader.Builder(context)
 ```
 
 !!! Note
-    すでに構築済みの `OkHttpClient` がある場合は、[`newBuilder()`](https://square.github.io/okhttp/5.x/okhttp/okhttp3/-ok-http-client/#customize-your-client-with-newbuilder) を使用して、元のクライアントとリソースを共有する新しいクライアントを構築してください。
+    すでにビルド済みの `OkHttpClient` がある場合は、[`newBuilder()`](https://lysine.dev/okhttp/5.x/okhttp/okhttp3/-ok-http-client/#customize-your-client-with-newbuilder) を使用して元のクライアントとリソースを共有する新しいクライアントをビルドしてください。
 
 ## Cache-Control のサポート {id="cache-control-support"}
 
-デフォルトでは、Coil 3.x は `Cache-Control` ヘッダーを考慮せず、常に応答をディスクキャッシュに保存します。
+デフォルトでは、Coil 3.x は `Cache-Control` ヘッダーを考慮せず、常にレスポンスをディスクキャッシュに保存します。
 
-`io.coil-kt.coil3:coil-network-cache-control` には、`NetworkFetcher` がネットワークレスポンスの [`Cache-Control` ヘッダー](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control)を確実に尊重するようにする `CacheStrategy` 実装が含まれています。
+`io.coil-kt.coil3:coil-network-cache-control` には、`NetworkFetcher` がネットワークレスポンスの [`Cache-Control` ヘッダー](https://developer.mozilla.org/ja/docs/Web/HTTP/Headers/Cache-Control) を確実に考慮するようにする `CacheStrategy` の実装が含まれています。
 
-`CacheControlCacheStrategy` を `NetworkFetcher` に渡し、そのカスタム `NetworkFetcher` を `ImageLoader` に登録します：
+`CacheControlCacheStrategy` を `NetworkFetcher` に渡し、そのカスタム `NetworkFetcher` を `ImageLoader` に登録します:
 
 ```kotlin
 OkHttpNetworkFetcherFactory(
@@ -72,11 +72,11 @@ OkHttpNetworkFetcherFactory(
 ```
 
 !!! Note
-    Android API レベル 25 以下をサポートするには、`coreLibraryDesugaring` を有効にする必要があります。[こちら](https://developer.android.com/studio/write/java8-support#library-desugaring)のドキュメントに従って有効にしてください。
+    Android API レベル 25 以下をサポートするには、`coreLibraryDesugaring` を有効にする必要があります。有効にする手順については、[こちら](https://developer.android.com/studio/write/java8-support#library-desugaring)のドキュメントを参照してください。
 
-#### ヘッダー {id="headers"}
+#### ヘッダー (Headers) {id="headers"}
 
-画像リクエストへのヘッダーの追加は、2 つの方法のいずれかで行うことができます。単一のリクエストに対してヘッダーを設定できます：
+画像リクエストにヘッダーを追加するには、2つの方法のいずれかを使用できます。単一のリクエストに対してヘッダーを設定できます:
 
 ```kotlin
 val headers = NetworkHeaders.Builder()
@@ -90,7 +90,7 @@ val request = ImageRequest.Builder(context)
 imageLoader.execute(request)
 ```
 
-または、`ImageLoader` によって実行されるすべてのリクエストに対してヘッダーを設定する OkHttp [`Interceptor`](https://square.github.io/okhttp/interceptors/) を作成することもできます：
+または、`ImageLoader` によって実行されるすべてのリクエストに対してヘッダーを設定する OkHttp の [`Interceptor`](https://lysine.dev/okhttp/interceptors/) を作成することもできます:
 
 ```kotlin
 class RequestHeaderInterceptor(
@@ -123,3 +123,4 @@ val imageLoader = ImageLoader.Builder(context)
         )
     }
     .build()
+```

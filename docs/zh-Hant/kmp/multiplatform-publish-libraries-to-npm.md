@@ -1,68 +1,65 @@
-[//]: # (title: 將您的程式庫發佈到 npm – 教學)
+[//]: # (title: 將你的程式庫發佈至 npm – 教學)
 
 <tldr>
-<p>使用 <a href="https://npm-publish.petuska.dev/latest/">npm-publish Gradle 外掛程式</a>，透過手動或使用 GitHub Actions 將您的 Kotlin 多平台程式庫發佈到 npm。</p>
+<p>手動或使用 GitHub Actions，透過 <a href="https://npm-publish.petuska.dev/latest/">npm-publish Gradle 外掛程式</a>將你的 Kotlin Multiplatform 程式庫發佈至 npm。</p>
 </tldr>
 
-若要發佈您的程式庫，您需要：
+若要發佈你的程式庫，你將需要：
 
-1. 準備憑據，包括 [npm 帳戶](https://docs.npmjs.com/creating-a-new-npm-user-account) 和 [存取權杖 (access token)](https://docs.npmjs.com/creating-and-viewing-access-tokens)。
-2. 在您的 Kotlin 多平台專案中設定發佈外掛程式。
-3. 將憑據提供給發佈外掛程式，或為持續整合設定受信任的發佈者 (Trusted Publisher)。
-4. 執行發佈任務，不論是手動或使用 CI。
+1. 準備憑據，包括 [npm 帳戶](https://docs.npmjs.com/creating-a-new-npm-user-account) 以及 [存取權杖](https://docs.npmjs.com/creating-and-viewing-access-tokens)。
+2. 在你的 Kotlin Multiplatform 專案中配置發佈外掛程式。
+3. 為發佈外掛程式提供憑據，或為持續整合設定 Trusted Publisher。
+4. 手動或使用 CI 執行發佈任務。
 
-在本教學中，我們使用 GitHub 來託管專案，並透過 GitHub Actions 執行 CI。
+在本教學中，我們使用 GitHub 代管專案，並透過 GitHub Actions 執行 CI。
 
 ## 範例程式庫 {id="sample-library"}
 
-您可以使用 [範例程式庫專案](https://github.com/Kotlin/kotlin-multiplatform-web-library)
-來跟隨步驟並查看可運作的配置。
+你可以使用[範例程式庫專案](https://github.com/Kotlin/kotlin-multiplatform-web-library)跟隨本教學並查看可正常運作的配置。
 
-如果您重用該程式碼，請務必**將所有範例值替換為**您專案特定的值。
+如果你重複使用該程式碼，請務必將**所有範例值替換**為專屬於你專案的數值。
 
 ## 準備帳戶與憑據 {id="prepare-accounts-and-credentials"}
 
-若要發佈到 npm，您需要[登入 npm 門戶網站](https://www.npmjs.com/login)。
+若要發佈至 npm，你需要[登入 npm 入口網站](https://www.npmjs.com/login)。
 
-在本教學中，您將需要一個組織和一個存取權杖來設定手動發佈。
+在本教學中，你將需要一個組織以及一個存取權杖來配置手動發佈。
 
-### 建立一個簡單的組織 {id="create-a-simple-organization"}
+### 建立簡易組織 {id="create-a-simple-organization"}
 
-在本教學中，我們將程式庫發佈在 npm 組織下，以避免名稱衝突。
+在本教學中，我們將程式庫發佈在一個 npm 組織下，以避免命名衝突。
 
-要建立新組織，請參閱 [npm 文件](https://docs.npmjs.com/creating-an-organization)。
+若要建立新組織，請遵循 [npm 文件](https://docs.npmjs.com/creating-an-organization)。
 
 ### 產生存取權杖 {id="generate-an-access-token"}
 
-要手動發佈到 npm，您需要一個存取權杖，允許在您新建立的組織下發佈套件。
-要產生此類權杖，請參閱 [npm 指南](https://docs.npmjs.com/creating-and-viewing-access-tokens)。
+若要手動發佈至 npm，你需要一個允許在你新建立的組織下發佈軟件包的存取權杖。
+若要產生此權杖，請遵循 [npm 指南](https://docs.npmjs.com/creating-and-viewing-access-tokens)。
 
-對於本教學，請使用簡化的安全配置：
-* 啟用 **Bypass two-factor authentication (2FA)**（繞過雙重身分驗證）選項。
-* 將權杖的一般權限和組織權限均設定為 **Read and write**（讀取與寫入）。
+針對本教學，請使用簡化的安全配置：
+* 啟用 **Bypass two-factor authentication (2FA)** 選項。
+* 將權杖的一般權限與組織權限皆設定為 **Read and write**。
 
-## 設定程式庫專案 {id="configure-the-library-project"}
+## 配置程式庫專案 {id="configure-the-library-project"}
 
-如果您使用 [範例專案](https://github.com/Kotlin/kotlin-multiplatform-web-library)，
-請在發佈前更新預設名稱。
+如果你使用[範例專案](https://github.com/Kotlin/kotlin-multiplatform-web-library)，請在發佈前更新預設名稱。
 這包括：
 
 * 程式庫模組的名稱。
-* 在 `settings.gradle.kts` 檔案中設定的專案名稱。 
+* 在 `settings.gradle.kts` 檔案中設定的專案名稱。
 
-設定好名稱後，請按照後續步驟設定發佈。
+設定好名稱後，請遵循以下步驟設定發佈。
 
 ### 設定發佈外掛程式 {id="set-up-the-publishing-plugin"}
 
-本教學使用官方的 [npm-publish 外掛程式](https://github.com/Kotlin/npm-publish)
-來協助發佈到 npm。
-要了解更多關於該外掛程式及其可用配置選項的資訊，請參閱[外掛程式文件](https://npm-publish.petuska.dev)。
+本教學使用官方的 [npm-publish 外掛程式](https://github.com/Kotlin/npm-publish)來協助發佈至 npm。
+若要進一步了解該外掛程式與可用的配置選項，請參閱[外掛程式的文件](https://npm-publish.petuska.dev)。
 
-將外掛程式新增到您的 Kotlin 多平台專案中：
+將外掛程式新增至你的 Kotlin Multiplatform 專案：
 
-1. 開啟程式庫模組的 `build.gradle.kts` 檔案。
+1. 開啟你的程式庫模組的 `build.gradle.kts` 檔案。
 
-2. 在 `plugins {}` 區塊中新增以下行： 
+2. 在 `plugins {}` 區塊中新增以下內容：
 
     ```kotlin
     // <module directory>/build.gradle.kts
@@ -72,14 +69,14 @@
     }
     ```
     
-    > 有關該外掛程式的最新可用版本，請查看 [Releases](https://github.com/Kotlin/npm-publish/releases) 頁面。
+    > 若要查看外掛程式的最新可用版本，請查看 [Releases](https://github.com/Kotlin/npm-publish/releases) 頁面。
     > 
     {style="note"}
 
 3. 新增以下配置。
-   請務必根據您的程式庫自訂值。
-   唯一必要的參數是 `organization`、`authToken`、`packageName` 和 `version`。
-   其餘部分作為擴展範例提供：
+   請務必根據你的程式庫自訂這些值。
+   唯一必要的參數為 `organization`、`authToken`、`packageName` 以及 `version`。
+   其餘部分作為擴充範例提供：
 
     ```kotlin
     // <module directory>/build.gradle.kts
@@ -88,8 +85,8 @@
         
         registries {
             npmjs {
-                // 當您執行發佈套件的指令時，
-                // 您將透過此環境變數傳遞您的 npm 權杖
+                // 當你執行發佈軟件包的指令時，
+                // 將作為此環境變數傳入你的 npm 權杖
                 authToken = System.getenv("NPM_TOKEN")
             }
         }
@@ -126,56 +123,54 @@
     }
     ```
 
-    > 要配置此項，您也可以使用 [Gradle 屬性](https://docs.gradle.org/current/userguide/build_environment.html)。
+    > 若要進行此配置，你也可以使用 [Gradle 屬性](https://docs.gradle.org/current/userguide/build_environment.html)。
     > 
     {style="tip"}
 
 `npmPublish {}` 區塊中的重要設定如下：
 
-* `organization` 參數和 `registries {}` 區塊指定了身分驗證詳細資訊。
-  在這種情況下，我們使用主要的 npm 存儲庫，
-  以及在執行發佈任務時應持有權杖的 `NPM_TOKEN` 變數名稱。
-* `packageName` 和 `version` 參數定義了必要的套件選項：
-  * 可以省略 `version` 參數，以使用模組的版本作為預設值。
-  * 可以省略 `packageName` 參數，以使用模組的名稱作為預設值。
-* `packageJson {}` 區塊持有各種元資料。
+* `organization` 參數與 `registries {}` 區塊指定了身分驗證詳細資訊。
+  在此案例中，我們使用主要 npm registry，以及在執行發佈任務時應存放權杖的 `NPM_TOKEN` 變數名稱。
+* `packageName` 與 `version` 參數定義了必要的軟件包選項：
+  * 可以省略 `version` 參數，以使用你模組的版本作為預設值。
+  * 可以省略 `packageName` 參數，以使用你模組的名稱作為預設值。
+* `packageJson {}` 區塊包含各種元資料。
 
 ## 手動發佈 {id="publish-manually"}
 
-當您仍在嘗試專案結構，或想要自行實作發佈自動化時，手動發佈會非常有用。
+當你仍在嘗試專案結構，或希望自行實作發佈自動化時，手動發佈會非常有用。
 
-現在您可以從本機電腦將程式庫發佈到 npm。
-若要執行此操作，請執行以下指令，並將您之前產生的存取權杖貼到 `YOUR_ACCESS_TOKEN` 的位置：
+現在你可以從本機電腦將程式庫發佈至 npm。
+若要執行此操作，請執行以下指令，並將先前產生的存取權杖貼在 `YOUR_ACCESS_TOKEN` 位置：
 
 ```bash
 NPM_TOKEN=YOUR_ACCESS_TOKEN ./gradlew :shared:publishJsPackageToNpmjsRegistry
 ```
 
-發佈程式庫後，您應該能夠在 npm 存儲庫中看到它。
-開啟您的 npm 組織頁面並檢查 **Packages** 分頁
-（但不是在您的個人 **Packages** 頁面）。
+程式庫發佈完成後，你應該能夠在 npm registry 中看到它。
+開啟你的 npm 組織頁面並檢查 **Packages** 分頁
+（而非個人 **Packages** 頁面）。
 
-![npm 上已發佈的程式庫](published-on-npm.png){width=700}
+![在 npm 上發佈的程式庫](published-on-npm.png){width=700}
 
 ### 疑難排解 {id="troubleshooting"}
 
-手動發佈時經常出錯的幾件事：
+手動發佈時常出現的幾個問題：
 
-* 留意 `build.gradle.kts` 配置中的 `version` 欄位：
-  如果套件已使用相同或更早的版本發佈過，npm 會發佈失敗。
-* 產生針對組織作用域 (organization-scoped) 套件的權杖時，
-  請確保同時設定一般權限**和**組織權限。
+* 隨時注意 `build.gradle.kts` 配置中的 `version` 欄位：
+  如果軟件包已使用相同或更早的版本發佈過，npm 的發佈將會失敗。
+* 為作用域套件（organization-scoped package）產生權杖時，請確保同時設定了一般**與**組織權限。
 
 ## 使用持續整合 (CI) 發佈 {id="publish-using-continuous-integration-ci"}
 
-npm 的受信任的發佈者 (Trusted Publishers) 機制允許您使用 OpenID Connect 快速設定 CI。
-這種方法可以完全避免產生和維護權杖。
+npm 的 Trusted Publishers 機制可讓你使用 OpenID Connect 快速設定 CI。
+這種方法完全避免了產生與維護權杖的麻煩。
 
-在此範例中，我們將使用 [GitHub Actions](https://docs.github.com/en/actions) 設定工作流程。
+在本範例中，我們將使用 [GitHub Actions](https://docs.github.com/en/actions) 設定一個工作流程。
 
 ### 建立 GitHub Actions 工作流程檔案 {id="create-a-github-actions-workflow-file"}
 
-建立 `.github/workflows/publish.yml` 檔案來設定 GitHub action：
+建立一個配置 GitHub action 的 `.github/workflows/publish.yml` 檔案：
 
 ```yaml
 # .github/workflows/publish.yml
@@ -187,8 +182,7 @@ on:
     types: [released, prereleased]
 
 permissions:
-  id-token: write  # GitHub Actions 與 npm 受信任發佈整合
-                   # 所需的權限
+  id-token: write  # GitHub Actions 與 npm 信任發佈整合時為必要項
   contents: read
 
 jobs:
@@ -196,7 +190,7 @@ jobs:
     name: Release build and publish
     runs-on: ubuntu-latest
     steps:
-      # 檢出觸發的分支
+      # 檢出觸發分支
       - name: Check out code
         uses: actions/checkout@v4
 
@@ -212,70 +206,67 @@ jobs:
         run: ./gradlew :shared:publishJsPackageToNpmjsRegistry
 ```
 
-一旦您將此檔案提交並推送到託管專案的 GitHub 存儲庫，
-每當您在該存儲庫中建立 GitHub 版本 (release) 時，該工作流程就會執行。
+一旦你將此檔案提交並推送到代管你專案的 GitHub 存儲庫，每當你在該存儲庫中建立 GitHub release 時，此工作流程就會執行。
 
-> 您也可以將工作流程設定為[在推送標籤時觸發](https://stackoverflow.com/a/61892639)。
+> 你也可以將工作流程配置為[在推送標籤時觸發](https://stackoverflow.com/a/61892639)。
 > 
 {style="tip"}
 
-### 設定 GitHub Actions 為您的受信任的發佈者 {id="set-up-github-actions-as-your-trusted-publisher"}
+### 將 GitHub Actions 設定為你的 Trusted Publisher {id="set-up-github-actions-as-your-trusted-publisher"}
 
-現在您已經發佈了工作流程，可以使用 GitHub Action 將[受信任的發佈者 (Trusted Publisher)](https://docs.npmjs.com/trusted-publishers) 新增到您的 npm 套件：
+現在你已經發佈了工作流程，可以使用 GitHub Action 為你的 npm 軟件包新增 [Trusted Publisher](https://docs.npmjs.com/trusted-publishers)：
 
-1. 開啟[已發佈的套件](#manual-publishing)頁面。
-2. 開啟 **Settings** 分頁並找到 **Trusted Publisher** 區塊。
-3. 在 **Select your publisher** 下，點擊 **GitHub Actions** 按鈕。
+1. 開啟[已發佈的軟件包](#手動發佈)頁面。
+2. 開啟 **Settings** 分頁並找到 **Trusted Publisher** 區段。
+3. 在 **Select your publisher** 下方，點擊 **GitHub Actions** 按鈕。
 4. 填寫表單：
-   * 您的 GitHub 名稱（或組織）
+   * 你的 GitHub 名稱（或組織）
    * 存儲庫名稱
-   * 工作流程檔案的名稱（在本教學中，我們使用了 [publish.yml](#create-a-github-actions-workflow-file)）。
+   * 工作流程檔案名稱（在本教學中，我們使用了 [publish.yml](#建立-github-actions-工作流程檔案)）。
 5. 點擊 **Setup connection** 按鈕。
 
-![為 GitHub Actions 設定 npm 受信任的發佈者](npm-trusted-publisher-github.png)
+![針對 GitHub Actions 的 npm Trusted Publisher 設定](npm-trusted-publisher-github.png)
 
-> [npm 不會驗證提供的座標](https://docs.npmjs.com/trusted-publishers#troubleshooting)，
-> 因此請確保您輸入的詳細資訊正確無誤。
+> [npm 不會驗證提供的座標資訊](https://docs.npmjs.com/trusted-publishers#troubleshooting)，因此請確保輸入的詳細資料正確無誤。
 > 
 {style="warning"}
 
-建立的連線隨後會列在套件設定的 **Trusted Publishers** 區塊中，
-這表示具有指定座標的工作流程現在已被授權發佈到 npm。
+建立好的連線隨後會列在軟件包設定的 **Trusted Publishers** 區段中，這表示具有指定座標資訊的工作流程現在已獲得授權可發佈至 npm。
 
-### 在 GitHub 上建立版本 {id="create-a-release-on-github"}
+### 在 GitHub 上建立 Release {id="create-a-release-on-github"}
 
-設定好工作流程和受信任的發佈者連線後，您現在可以準備透過[建立 GitHub 版本](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository#creating-a-release)來觸發發佈：
+設定好工作流程與 Trusted Publisher 連線後，你現在可以透過[建立 GitHub release](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository#creating-a-release) 來觸發發佈：
 
-1. 將 `build.gradle.kts` 配置中的套件版本設定為您想要發佈的版本。
+1. 將 `build.gradle.kts` 配置中的軟件包版本設定為你想要發佈的版本。
 
    > 如果版本號已被使用或低於已發佈的版本，npm 將不允許發佈。
    > 
    {style="note"}
 
-2. 前往您的 GitHub 存儲庫。
-3. 在右側欄中，點擊 **Releases**。
-4. 點擊 **Draft a new release** 按鈕（如果您之前未曾為此存儲庫建立過版本，則點擊 **Create a new release** 按鈕）。
-5. 建立或選擇一個 Git 標籤（如果可能，請與模組的版本相符，以保持各個系統間編號的一致性）。
-6. 設定版本標題（將版本命名為與標籤相同是很方便的做法）。
+2. 前往你的 GitHub 存儲庫。
+3. 在右側邊欄中，點擊 **Releases**。
+4. 點擊 **Draft a new release** 按鈕（如果之前未曾為此存儲庫建立過 release，則點擊 **Create a new release** 按鈕）。
+5. 建立或選取一個 Git 標籤（如果可能，請與模組版本相符，以保持不同系統間編號的一致性）。
+6. 設定 release 標題（將 release 命名為與標籤相同的名稱會很方便）。
    
-   為了追蹤所有內容，您可能希望標籤中的版本與您在 `build.gradle.kts` 檔案中指定的程式庫版本號相同。
+   為了掌握所有內容，你可能會希望標籤中的版本與你在 `build.gradle.kts` 檔案中指定的程式庫版本號相同。
 
-   ![在 GitHub 上建立版本](create-release-and-tag-for-npm.png){width=700}
+   ![在 GitHub 上建立 release](create-release-and-tag-for-npm.png){width=700}
 
 7. 點擊 **Publish release** 按鈕。
 
-要檢查 Action 是否被觸發，請點擊 GitHub 存儲庫頁面頂部的 **Actions** 分頁。
-您應該會看到新發佈的版本觸發了發佈工作流程的執行。
+若要檢查 Action 是否已被觸發，請點擊 GitHub 存儲庫頁面頂端的 **Actions** 分頁。
+你應該會看到新發佈的 release 觸發了發佈工作流程的執行。
 點擊該工作流程以查看發佈任務的日誌。
 
-當工作流程執行完成後，您套件的新版本應該會列在 npm 存儲庫的套件頁面中。
+工作流程執行完成後，新版本的軟件包應會列在 npm registry 中的軟件包頁面上。
 
 ![透過 CI/CD 在 npm 上發佈的程式庫](published-second-version-on-npm.png){width=700}
 
-## 下一步 {id="what-s-next"}
+## 後續步驟 {id="what-s-next"}
 
-* [將 shield.io 徽章新增到您的 README](https://shields.io/badges/npm-version)
+* [為你的 README 新增 shield.io 徽章](https://shields.io/badges/npm-version)
 * [使用 Dokka 產生 API 文件](https://kotl.in/dokka)
 * [使用 Renovate 自動化相依性更新](https://docs.renovatebot.com/)
-* [在 Kotlin Slack 中與社群分享您的程式庫](https://kotlinlang.slack.com/)
-  （要註冊，請造訪 https://kotl.in/slack）
+* [在 Kotlin Slack 中與社群分享你的程式庫](https://kotlinlang.slack.com/)
+  （若要註冊，請造訪 https://kotl.in/slack）

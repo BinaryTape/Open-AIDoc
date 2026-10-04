@@ -1,22 +1,22 @@
 [//]: # (title: 멀티플랫폼 ViewModel)
 
-Android [ViewModel](https://developer.android.com/topic/libraries/architecture/viewmodel)을 사용하면 앱의 비즈니스 로직과 UI 컴포넌트를 연결할 수 있습니다.
-Compose Multiplatform을 사용하면 공통 코드(common code)에서도 ViewModel을 사용할 수 있습니다.
+Android [ViewModel](https://developer.android.com/topic/libraries/architecture/viewmodel)을 사용하면 앱의 비즈니스 로직을 UI 컴포넌트와 연결할 수 있습니다.
+Compose Multiplatform을 사용하면 공통 코드에서도 ViewModel을 사용할 수 있습니다.
 
 이 페이지에서는 멀티플랫폼 프로젝트에서 ViewModel을 설정하고 사용하는 방법을 안내합니다:
 
-* [종속성 설정하기](#set-up-dependencies).
-* [공통 코드에서 ViewModel 사용하기](#using-viewmodel-in-common-code).
-* [내비게이션 목적지에 따른 ViewModel 스코핑(범위 지정)](#viewmodel-scoping-with-navigation-3).
-* [Koin 또는 Metro를 사용한 의존성 주입](#viewmodel-and-dependency-injection).
-* [ViewModel 및 UI 코드의 공유 수준 선택하기](#levels-of-code-sharing): 
-  완전한 공유 방식부터 리포지토리나 데이터 계층만 공유하는 방식까지.
+* [의존성 설정](#set-up-dependencies)
+* [공통 코드에서 ViewModel 사용하기](#using-viewmodel-in-common-code)
+* [탐색 대상에 ViewModel 스코프 지정](#viewmodel-scoping-with-navigation-3)
+* [Koin 또는 Metro를 사용한 의존성 주입](#viewmodel-and-dependency-injection)
+* [공유할 ViewModel 및 UI 코드의 범위 선택](#levels-of-code-sharing):
+  완전한 공유 방식부터 리포지토리나 데이터 레이어만 공유하는 방식까지 지원합니다.
 
-## 종속성 설정하기 {id="set-up-dependencies"}
+## 의존성 설정 {id="set-up-dependencies"}
 
-플랫폼 간에 ViewModel과 UI를 공유하려면 다음 단계를 따르세요:
+플랫폼 전반에서 ViewModel과 UI를 공유하려면 다음과 같이 설정합니다:
 
-1. Gradle 버전 카탈로그 파일에 종속성을 정의합니다:
+1. Gradle 버전 카탈로그(Version Catalog) 파일에 의존성을 정의합니다:
 
     ```toml
     [versions]
@@ -27,10 +27,10 @@ Compose Multiplatform을 사용하면 공통 코드(common code)에서도 ViewMo
     androidx-lifecycle-viewmodel-navigation3 = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "androidx-viewmodel" }
     ``` 
    
-    > 멀티플랫폼 ViewModel 구현의 변경 사항은 [새로운 기능](https://www.jetbrains.com/help/kotlin-multiplatform-dev/whats-new-compose.html)에서 확인하거나, [Compose Multiplatform 변경 로그](https://github.com/JetBrains/compose-multiplatform/blob/master/CHANGELOG.md)에서 EAP 릴리스 소식을 팔로우할 수 있습니다.
+    > 멀티플랫폼 ViewModel 구현의 변경 사항은 [새로운 기능(What's new)](https://www.jetbrains.com/help/kotlin-multiplatform-dev/whats-new-compose.html)에서 확인하거나, [Compose Multiplatform 변경 로그](https://github.com/JetBrains/compose-multiplatform/blob/master/CHANGELOG.md)에서 EAP 릴리스 소식을 팔로우할 수 있습니다.
     >
     {style="tip"}
-2. KMP 모듈의 `build.gradle.kts` 파일에서 `commonMain` 소스 세트에 다음 종속성을 추가합니다:
+2. KMP 모듈의 `build.gradle.kts` 파일에서 `commonMain` 소스 세트에 다음 의존성을 추가합니다:
 
     ```kotlin
     kotlin {
@@ -47,12 +47,12 @@ Compose Multiplatform을 사용하면 공통 코드(common code)에서도 ViewMo
     ```
     {initial-collapse-state="collapsed" collapsible="true" collapsed-title="implementation(libs.androidx.lifecycle.viewmodel.compose)"}
 
-> 코드 공유 방식에 따라 종속성이 달라질 수 있습니다. 자세한 내용은 [코드 공유 수준](#levels-of-code-sharing)을 참고하세요.
+> 코드 공유 방식에 따라 의존성이 달라질 수 있습니다. 자세한 내용은 [undefined](#levels-of-code-sharing)를 참고하세요.
 >
 {style="note"}
 
-데스크톱 타겟이 있는 경우 `kotlinx-coroutines-swing` 종속성도 추가하세요.
-`ViewModel`에서 코루틴을 실행할 때, `ViewModel.viewModelScope`는 `Dispatchers.Main.immediate`에 연결되는데, 이는 기본적으로 데스크톱 환경에서 사용할 수 없을 수도 있습니다. Kotlinx Coroutines Swing 라이브러리는 ViewModel 코루틴이 Compose Multiplatform에서 올바르게 작동하도록 도와줍니다.
+데스크톱 타깃이 있는 경우 `kotlinx-coroutines-swing` 의존성도 추가해야 합니다.
+`ViewModel`에서 코루틴을 실행할 때 `ViewModel.viewModelScope`는 `Dispatchers.Main.immediate`에 바인딩되는데, 이는 데스크톱에서 기본적으로 사용할 수 없을 수 있습니다. Kotlinx Coroutines Swing 라이브러리를 사용하면 Compose Multiplatform에서 ViewModel 코루틴이 올바르게 동작합니다.
     
 1. Gradle 버전 카탈로그에서:
 
@@ -84,18 +84,18 @@ Compose Multiplatform을 사용하면 공통 코드(common code)에서도 ViewMo
 
 ## 공통 코드에서 ViewModel 사용하기 {id="using-viewmodel-in-common-code"}
 
-Compose Multiplatform은 공통 `ViewModelStoreOwner` 구현을 제공하므로, 공통 코드에서 `ViewModel` 클래스를 사용하는 방식은 [Android 권장 사례](https://developer.android.com/topic/libraries/architecture/viewmodel#best-practices)와 크게 다르지 않습니다.
+Compose Multiplatform은 공통 `ViewModelStoreOwner` 구현을 제공하므로, 공통 코드에서 `ViewModel` 클래스를 사용하는 방법은 [Android 모범 사례](https://developer.android.com/topic/libraries/architecture/viewmodel#best-practices)와 크게 다르지 않습니다.
 
-하지만 JVM 이외의 플랫폼에서는 객체 인스턴스화를 위한 타입 리플렉션(type reflection)을 사용할 수 없다는 중요한 차이점이 있습니다.
-따라서 공통 코드에서는 매개변수 없이 `viewModel()` 함수를 호출할 수 없습니다.
-`ViewModel` 인스턴스를 생성할 때마다 최소한 초기화 함수(initializer)를 인자로 제공해야 합니다.
+그러나 객체 인스턴스화를 위한 타입 리플렉션을 사용할 수 없는 비-JVM(non-JVM) 플랫폼에서는 중요한 차이점이 있습니다.
+공통 코드에서는 매개변수 없이 `viewModel()` 함수를 호출할 수 없습니다.
+`ViewModel` 인스턴스를 생성할 때마다 최소한 초기화 함수(initializer)를 인수로 전달해야 합니다.
 
-초기화 함수만 제공되는 경우, Compose Multiplatform은 내부적으로 기본 팩토리를 생성합니다.
-하지만 [Jetpack Compose와 마찬가지로](https://developer.android.com/topic/libraries/architecture/viewmodel#jetpack-compose) 직접 팩토리를 구현하고 더 명시적인 버전의 공통 `viewModel()` 함수를 호출할 수도 있습니다.
+초기화 함수만 제공되는 경우 Compose Multiplatform이 내부적으로 기본 팩토리를 생성합니다.
+하지만 [Jetpack Compose와 마찬가지로](https://developer.android.com/topic/libraries/architecture/viewmodel#jetpack-compose) 고유한 팩토리를 구현하고 더 명시적인 버전의 공통 `viewModel()` 함수를 호출할 수도 있습니다.
 
-이제 ViewModel을 정의하고 컴포저블에 연결해 보겠습니다:
+ViewModel을 정의하고 이를 컴포저블에 연결해 보겠습니다:
 
-1. 주문 수량과 가격을 포함한 UI 상태를 관리하는 간단한 `OrderViewModel` 클래스를 정의합니다:
+1. 주문 항목의 수량과 가격을 포함한 UI 상태를 관리하는 간단한 `OrderViewModel` 클래스를 정의합니다:
 
    ```kotlin
    data class OrderUiState(val quantity: Int = 0, val price: String = "$0.00")
@@ -105,16 +105,16 @@ Compose Multiplatform은 공통 `ViewModelStoreOwner` 구현을 제공하므로,
           field = MutableStateFlow(OrderUiState())
 
       fun setQuantity(n: Int) {
-          uiState.update { it.copy(quantity = n, price = "${n * 2}.00") }
+          uiState.update { it.copy(quantity = n, price = "$${n * 2}.00") }
       }
    }
    ```
 
-    > 이 예제는 Kotlin 2.4.0에서 안정화된 [명시적 백킹 필드(explicit backing fields)](https://kotlinlang.org/docs/properties.html#explicit-backing-fields)를 사용합니다. 이전 버전을 사용하는 경우, `-Xexplicit-backing-fields` 컴파일러 옵션을 추가하거나 대신 `.asStateFlow()`를 사용하는 이전의 백킹 필드 패턴을 사용하세요.
+    > 이 예제는 Kotlin 2.4.0에서 안정화된 [명시적 백킹 필드(explicit backing fields)](https://kotlinlang.org/docs/properties.html#explicit-backing-fields)를 사용합니다. 이전 버전을 사용하는 경우 `-Xexplicit-backing-fields` 컴파일러 옵션을 추가하거나 `.asStateFlow()`를 사용하는 이전 백킹 필드 패턴을 대신 사용하세요.
     >
     {style="note"}
 
-2. 초기화 함수와 함께 공통 `viewModel()` 함수를 사용하여 커스텀 ViewModel을 컴포저블 함수에 추가합니다:
+2. 초기화 함수와 함께 공통 `viewModel()` 함수를 사용하여 컴포저블 함수에 커스텀 ViewModel을 추가합니다:
 
     ```kotlin
     import com.example.ui.OrderViewModel
@@ -127,14 +127,12 @@ Compose Multiplatform은 공통 `ViewModelStoreOwner` 구현을 제공하므로,
     }
     ```
 
-## Navigation 3를 사용한 ViewModel 스코핑 {id="viewmodel-scoping-with-navigation-3"}
+## Navigation 3을 사용한 ViewModel 스코프 지정 {id="viewmodel-scoping-with-navigation-3"}
 
-공통 코드에서 Navigation 3와 함께 ViewModel을 사용할 때, 
-기본적으로 ViewModel은 내비게이션 엔트리에 자동으로 스코핑되지 않습니다. 
-명시적인 스코핑이 없으면, 사용자가 화면을 벗어난 후에도 각 ViewModel은 화면이 아닌 `Activity`에 연결된 상태로 유지됩니다.
+공통 코드에서 Navigation 3과 함께 ViewModel을 사용할 때, 기본적으로 ViewModel이 네비게이션 엔트리에 자동으로 스코프 지정(scoped)되지 않습니다.
+명시적인 스코프 지정이 없으면 사용자가 다른 화면으로 이동한 후에도 각 ViewModel이 화면이 아닌 `Activity`에 바인딩된 상태로 유지됩니다.
 
-각 내비게이션 엔트리별로 ViewModel을 스코핑하고 Compose 상태(saveable state)를 저장하려면, 
-내비게이션 목적지를 정의할 때 Navigation 3 엔트리 데코레이터(decorator)를 `NavDisplay`에 전달하세요:
+네비게이션 엔트리별로 ViewModel과 저장 가능한(saveable) Compose 상태를 스코프 지정하려면, 탐색 대상을 정의할 때 `NavDisplay`에 Navigation 3 엔트리 데코레이터를 전달합니다:
 
 ```kotlin
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
@@ -146,7 +144,7 @@ NavDisplay(
    entryDecorators = listOf(
        // 엔트리별 Compose 상태 저장
        rememberSaveableStateHolderNavEntryDecorator(),
-       // 엔트리별 ViewModel 스코핑
+       // 엔트리별 ViewModel 스코프 지정
        rememberViewModelStoreNavEntryDecorator()
    ),
    backStack = backStack,
@@ -156,17 +154,17 @@ NavDisplay(
 
 ## ViewModel과 의존성 주입 {id="viewmodel-and-dependency-injection"}
 
-의존성 주입(DI) 프레임워크를 사용하면 현재 환경이나 타겟 플랫폼에 따라 구성 요소에 서로 다른 종속성을 주입할 수 있습니다. 
-ViewModel을 관리하기 위해 Koin, Metro 또는 Kotlin 멀티플랫폼을 지원하는 다른 DI 프레임워크를 사용할 수 있습니다.
+의존성 주입(DI, Dependency Injection) 프레임워크를 사용하면 현재 환경이나 타깃 플랫폼에 따라 컴포넌트에 서로 다른 의존성을 주입할 수 있습니다.
+ViewModel을 관리하기 위해 Koin, Metro 또는 Kotlin Multiplatform을 지원하는 다른 DI 프레임워크를 사용할 수 있습니다.
 
-의존성 주입 사용에 대한 고급 예제는 [데이터 접근 계층 공유](multiplatform-ktor-sqldelight.md) 튜토리얼을 참고하세요.
+의존성 주입 사용에 관한 심화 예제는 [데이터 접근 레이어 공유하기](multiplatform-ktor-sqldelight.md) 튜토리얼을 참고하세요.
 
 ### Koin {id="koin"}
 
-Koin은 종속성 구성을 위해 DSL 또는 어노테이션을 제공하는 런타임 DI 프레임워크입니다. 
-Compose ViewModel과 함께 Koin을 사용하려면 `koin-compose-viewmodel` 종속성을 추가하세요.
+Koin은 의존성을 구성하기 위해 DSL이나 애너테이션을 제공하는 런타임 DI 프레임워크입니다.
+Compose ViewModel과 함께 Koin을 사용하려면 `koin-compose-viewmodel` 의존성을 추가합니다.
 
-그런 다음 `koinViewModel()`을 사용하여 컴포저블 함수에 ViewModel을 주입할 수 있습니다:
+그런 다음 `koinViewModel()`을 사용하여 Composable 함수에 ViewModel을 주입할 수 있습니다:
 
 ```kotlin
 @Composable
@@ -177,14 +175,14 @@ fun CupcakeApp(
 }
 ```
 
-자세한 내용은 Koin 문서의 [ViewModel 지원](https://insert-koin.io/docs/reference/koin-core/viewmodel) 및 [Compose에서 ViewModel 주입](https://insert-koin.io/docs/reference/koin-compose/compose-viewmodel)을 참고하세요.
+자세한 내용은 [ViewModel 지원](https://insert-koin.io/docs/reference/koin-core/viewmodel) 및 [Compose에서 ViewModel 주입](https://insert-koin.io/docs/reference/koin-compose/compose-viewmodel)에 대한 Koin 문서를 참고하세요.
 
 ### Metro {id="metro"}
 
-Metro는 Kotlin 컴파일러 플러그인으로 구현된 컴파일 타임 DI 프레임워크입니다. 
-Compose ViewModel과 함께 Metro를 사용하려면 `metrox-viewmodel-compose` 종속성을 추가하세요.
+Metro는 Kotlin 컴파일러 플러그인으로 구현된 컴파일 타임 DI 프레임워크입니다.
+Compose ViewModel과 함께 Metro를 사용하려면 `metrox-viewmodel-compose` 의존성을 추가합니다.
 
-그런 다음 `metroViewModel()`을 사용하여 컴포저블 함수에 ViewModel을 주입할 수 있습니다:
+그런 다음 `metroViewModel()`을 사용하여 Composable 함수에 ViewModel을 주입할 수 있습니다:
 
 ```kotlin
 @Composable
@@ -195,20 +193,22 @@ fun CupcakeApp(
 }
 ```
 
-자세한 내용은 MetroX 문서의 [ViewModel 통합](https://zacsweers.github.io/metro/latest/metrox-viewmodel/) 및 [Compose에서 ViewModel 접근](https://zacsweers.github.io/metro/latest/metrox-viewmodel-compose/)을 참고하세요.
+자세한 내용은 [ViewModel 연동](https://zacsweers.github.io/metro/latest/metrox-viewmodel/) 및 [Compose에서 ViewModel 접근](https://zacsweers.github.io/metro/latest/metrox-viewmodel-compose/)에 대한 MetroX 문서를 참고하세요.
 
 ## 코드 공유 수준 {id="levels-of-code-sharing"}
 
-코드의 어느 부분을 공유하고 어느 부분을 플랫폼별로 유지할지 선택할 수 있습니다:
+코드에서 공유할 부분과 플랫폼 전용으로 유지할 부분을 선택할 수 있습니다:
 
-* 플랫폼 간에 UI와 비즈니스 로직을 모두 공유하려면 [공유 로직 및 UI 튜토리얼](compose-multiplatform-create-first-app.md)을 참고하세요.
-* UI 구현을 공유하지 않고 일부 코드만 공유하려면 [공유 로직 튜토리얼](multiplatform-create-first-app.md)을 참고하세요.
+* 플랫폼 간에 UI와 비즈니스 로직을 모두 공유하려면 [로직 및 UI 공유 튜토리얼](compose-multiplatform-new-project.md)을 참고하세요.
+* UI 구현을 공유하지 않고 일부 코드만 공유하려면 [로직 공유 튜토리얼](multiplatform-upgrade-app.md)을 참고하세요.
 
-다음 예제들은 다양한 코드 공유 수준에서 ViewModel을 사용하는 방법을 보여줍니다. 모든 예제는 위에서 소개한 `OrderViewModel` 클래스를 기반으로 합니다.
+다음 예제들은 다양한 코드 공유 수준에서 ViewModel을 사용하는 방법을 보여줍니다.
+모든 예제는 위에서 소개한 `OrderViewModel` 클래스를 기반으로 합니다.
 
-### ViewModel 및 UI 공유 {id="shared-viewmodel-and-ui"}
+### ViewModel과 UI 모두 공유 {id="shared-viewmodel-and-ui"}
 
-이 방식에서는 `ViewModel`과 UI를 포함한 모든 것이 Compose Multiplatform을 통해 공유됩니다. 앱의 UI 코드를 한 번만 작성하면 모든 플랫폼에서 작동합니다.
+이 방식에서는 `ViewModel`과 UI를 포함한 모든 것이 Compose Multiplatform을 통해 공유됩니다.
+앱의 UI 코드를 한 번만 작성하면 모든 플랫폼에서 동작합니다.
 
 ```kotlin
 @Composable
@@ -228,13 +228,14 @@ fun CupcakeApp(
 }
 ```
 
-### ViewModel 공유 및 플랫폼별 UI {id="shared-viewmodel-and-platform-specific-ui"}
+### 공유 ViewModel 및 플랫폼별 UI {id="shared-viewmodel-and-platform-specific-ui"}
 
-이 방식에서는 `ViewModel`(비즈니스 로직)은 공유되지만, 각 플랫폼은 네이티브 UI 구현을 갖습니다. 자세한 내용은 [Kotlin Multiplatform을 위한 ViewModel 설정](https://developer.android.com/kotlin/multiplatform/viewmodel)을 참고하세요.
+이 방식에서는 `ViewModel`(비즈니스 로직)은 공유되지만, 각 플랫폼마다 고유한 네이티브 UI 구현을 갖습니다.
+자세한 내용은 [Kotlin Multiplatform용 ViewModel 설정](https://developer.android.com/kotlin/multiplatform/viewmodel)을 참고하세요.
 
-이 경우 UI가 공유되지 않으므로, ViewModel 라이브러리를 Compose Multiplatform 버전에서 `androidx.lifecycle` 라이브러리로 전환할 수 있습니다.
+이 경우 UI가 공유되지 않으므로 Compose Multiplatform 버전의 ViewModel 라이브러리 대신 `androidx.lifecycle` 라이브러리로 전환할 수 있습니다.
 
-1. Gradle 버전 카탈로그에서 종속성을 업데이트합니다:
+1. Gradle 버전 카탈로그에서 의존성을 업데이트합니다:
 
     ```toml
     [versions]
@@ -244,7 +245,7 @@ fun CupcakeApp(
     androidx-lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel", version.ref = "androidx-viewmodel" }
     ```
 
-2. `build.gradle.kts` 파일에서 종속성을 `api`로 선언합니다. 바이너리 프레임워크로 노출되어야 하기 때문입니다:
+2. 바이너리 프레임워크로 내보내야 하므로, `build.gradle.kts` 파일에서 의존성을 `api`로 선언합니다:
 
     ```kotlin
     kotlin {
@@ -262,7 +263,7 @@ fun CupcakeApp(
 
 #### Android 구현 {id="android-implementation"}
 
-Android에서 Jetpack Compose는 `Activity`가 제공하는 `ViewModelStoreOwner`를 자동으로 찾아 `OrderViewModel`을 공급합니다.
+Android에서는 Jetpack Compose가 `Activity`에서 제공하는 `ViewModelStoreOwner`를 자동으로 찾아 `OrderViewModel`을 제공합니다.
 
 ```kotlin
 @Composable
@@ -283,8 +284,8 @@ fun AndroidCupcakeApp(
 
 #### iOS 구현 {id="ios-implementation"}
 
-iOS에는 내장된 `ViewModelStoreOwner`가 없으므로 ViewModel의 생명주기를 SwiftUI에 수동으로 연결해야 합니다. 
-[KMP-ObservableViewModel](https://klibs.io/project/rickclephas/KMP-ObservableViewModel) 라이브러리를 사용하는 것을 권장합니다. 이 라이브러리는 SwiftUI가 Kotlin Multiplatform ViewModel을 직접 관찰할 수 있게 해주며, iOS에 필요한 ViewModel 생명주기 및 store-owner 관련 상용구 코드를 처리해 줍니다.
+iOS에는 내장된 `ViewModelStoreOwner`가 없으므로 ViewModel의 수명 주기를 SwiftUI에 수동으로 연결해야 합니다.
+SwiftUI가 Kotlin Multiplatform ViewModel을 직접 관찰할 수 있도록 지원하고 iOS에 필요한 ViewModel 수명 주기/스토어 소유자 관련 보일러플레이트를 처리해 주는 [KMP-ObservableViewModel](https://klibs.io/project/rickclephas/KMP-ObservableViewModel) 라이브러리 사용을 권장합니다.
 
 1. Swift에서 접근할 수 있도록 ViewModel API를 내보냅니다:
     
@@ -300,7 +301,7 @@ iOS에는 내장된 `ViewModelStoreOwner`가 없으므로 ViewModel의 생명주
    }
    ```
 
-2. KMP-ObservableViewModel의 ViewModel 기본 클래스와 `@NativeCoroutinesState` 어노테이션을 사용하여 `commonMain`에 ViewModel을 정의합니다:
+2. KMP-ObservableViewModel의 ViewModel 기본 클래스와 `@NativeCoroutinesState` 애너테이션을 사용하여 `commonMain`에 ViewModel을 정의합니다:
     
    ```kotlin
     import com.rickclephas.kmp.observableviewmodel.ViewModel
@@ -353,16 +354,16 @@ iOS에는 내장된 `ViewModelStoreOwner`가 없으므로 ViewModel의 생명주
     }
    ```
 
-### 공유 리포지토리/데이터 계층, 플랫폼별 ViewModel 및 UI {id="shared-repo-data-layer-platform-specific-viewmodels-and-ui"}
+### 공유 리포지토리/데이터 레이어, 플랫폼별 ViewModel 및 UI {id="shared-repo-data-layer-platform-specific-viewmodels-and-ui"}
 
-또 다른 옵션은 데이터와 리포지토리 계층만 공유하고 플랫폼별 ViewModel 구현을 사용하는 것입니다. 
-이를 통해 Android의 Hilt 의존성 주입이나 iOS의 Combine을 사용하는 `ObservableObject`와 같이 각 플랫폼의 네이티브 패턴을 사용할 수 있습니다.
+또 다른 방법은 데이터 및 리포지토리 레이어만 공유하고 플랫폼별 ViewModel 구현을 사용하는 것입니다.
+이를 통해 Android 의존성 주입을 위한 Hilt나 iOS를 위한 Combine 기반 `ObservableObject`와 같이 각 플랫폼의 고유한 네이티브 패턴을 사용할 수 있습니다.
 
 1. 데이터 로직을 포함하는 공유 리포지토리 클래스를 생성합니다:
 
     ```kotlin
     class OrderRepository {
-       fun calculatePrice(quantity: Int) = "${quantity * 2}.00"
+       fun calculatePrice(quantity: Int) = "$${quantity * 2}.00"
     }
     ```
 
@@ -386,7 +387,7 @@ iOS에는 내장된 `ViewModelStoreOwner`가 없으므로 ViewModel의 생명주
        }
        ```
 
-   * iOS에서는 `ObservableObject`를 사용하여 Swift에서 네이티브로 ViewModel을 구현합니다:
+   * iOS에서는 `ObservableObject`를 사용하여 Swift로 네이티브 ViewModel을 구현합니다:
 
        ```swift
        import shared
@@ -447,5 +448,5 @@ iOS에는 내장된 `ViewModelStoreOwner`가 없으므로 ViewModel의 생명주
 ## 다음 단계 {id="what-s-next"}
 
 * [전체 샘플](https://github.com/JetBrains/compose-multiplatform/tree/master/examples/nav_cupcake)을 확인해 보세요.
-* Android 중심의 추가 가이드는 [Kotlin Multiplatform을 위한 ViewModel 설정](https://developer.android.com/kotlin/multiplatform/viewmodel)을 참고하세요.
-* 공유 ViewModel을 네이티브 UI와 함께 사용할 때 [Compose Multiplatform과 SwiftUI를 통합](compose-swiftui-integration.md)하는 방법을 알아보세요.
+* 추가적인 Android 중심 가이드는 [Kotlin Multiplatform용 ViewModel 설정](https://developer.android.com/kotlin/multiplatform/viewmodel)을 참고하세요.
+* 네이티브 UI와 공유 ViewModel을 함께 사용할 때 [Compose Multiplatform을 SwiftUI와 통합하는 방법](compose-swiftui-integration.md)을 알아보세요.

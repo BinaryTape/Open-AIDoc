@@ -1,47 +1,55 @@
-[//]: # (title: プラットフォーム固有の API の使用)
+[//]: # (title: プラットフォーム固有のAPIを使用する)
 
-この記事では、マルチプラットフォームのアプリケーションやライブラリを開発する際に、プラットフォーム固有の API を使用する方法について説明します。
+この記事では、マルチプラットフォームアプリケーションやライブラリを開発する際に、プラットフォーム固有のAPIを使用する方法について学びます。
 
 <video src="https://www.youtube.com/v/bSNumV04y_w" title="Using Platform-Specific APIs in KMP Apps"/>
 
-## Kotlin マルチプラットフォームライブラリ {id="kotlin-multiplatform-libraries"}
+## Kotlin Multiplatformライブラリ {id="kotlin-multiplatform-libraries"}
 
-プラットフォーム固有の API を使用するコードを書く前に、代わりにマルチプラットフォームライブラリを使用できるかどうかを確認してください。
-このタイプのライブラリは、プラットフォームごとに異なる実装を持つ共通の Kotlin API を提供します。
+プラットフォーム固有のAPIを使用するコードを書く前に、代わりにマルチプラットフォームライブラリを使用できないか確認してください。
+この種のライブラリは、プラットフォームごとに異なる実装を持つ共通のKotlin APIを提供します。
 
-ネットワーク、ロギング、アナリティクスの実装や、デバイス機能へのアクセスなどに使用できるライブラリがすでに多数存在します。Kotlin Multiplatform ライブラリの検索プラットフォームである [klibs.io](https://klibs.io) でライブラリを探してみてください。
+ネットワーク処理、ロギング、アナリティクスなどの実装や、デバイス機能へのアクセスなどに利用できる多くのライブラリがすでに存在しています。Kotlin Multiplatformライブラリの検索プラットフォームである [klibs.io](https://klibs.io) でライブラリを探してみてください。
 
-## expect と actual による関数とプロパティ {id="expected-and-actual-functions-and-properties"}
+## expectedおよびactualの関数とプロパティ {id="expected-and-actual-functions-and-properties"}
 
-Kotlin は、共通ロジックを開発しながらプラットフォーム固有の API にアクセスするための言語メカニズムとして、[expect および actual 宣言](multiplatform-expect-actual.md)を提供しています。
+Kotlinは、共通ロジックを開発しながらプラットフォーム固有のAPIにアクセスするための言語メカニズムである、[expected/actual宣言（期待宣言と実宣言）](multiplatform-expect-actual.md)を提供しています。
 
-このメカニズムでは、マルチプラットフォームモジュールの共通（common）ソースセットで期待される宣言（expected declaration）を定義し、各プラットフォームのソースセットでその期待される宣言に対応する実際の宣言（actual declaration）を提供する必要があります。コンパイラは、共通ソースセットで `expect` キーワードが付けられたすべての宣言に対して、ターゲットとなるすべてのプラットフォームソースセットに `actual` キーワードが付けられた対応する宣言が存在することを保証します。
+このメカニズムでは、マルチプラットフォームモジュールの共通ソースセット（common source set）でexpected宣言を定義し、各プラットフォームのソースセットでそのexpected宣言に対応するactual宣言を提供する必要があります。コンパイラは、共通ソースセットで `expect` キーワードが付与されたすべての宣言に対して、対象となるすべてのプラットフォームソースセットに対応する `actual` キーワード付きの宣言が存在することを保証します。
 
-これは、関数、クラス、インターフェース、列挙型、プロパティ、アノテーションなど、ほとんどの Kotlin 宣言で機能します。このセクションでは、`expect` と `actual` を使用した関数とプロパティに焦点を当てます。
+これは、関数、クラス、インターフェース、列挙型（enum）、プロパティ、アノテーションなど、ほとんどのKotlin宣言で機能します。このセクションでは、expectedおよびactualの関数とプロパティの使用に焦点を当てます。
 
-![Using expected and actual functions and properties](expect-functions-properties.svg){width=700}
+![expectedおよびactualの関数とプロパティの使用](expect-functions-properties.svg){width=700}
 
-この例では、共通ソースセットで期待される `platform()` 関数を定義し、プラットフォームソースセットで実際の（actual）実装を提供します。特定のプラットフォーム向けにコードを生成する際、Kotlin コンパイラは `expect` 宣言と `actual` 宣言をマージします。これにより、実際の実装を持つ 1 つの `platform()` 関数が生成されます。`expect` 宣言と `actual` 宣言は同じパッケージ内に定義される必要があり、最終的なプラットフォームコードでは _1 つの宣言_ にマージされます。生成されたプラットフォームコード内で `expect` 宣言された `platform()` 関数を呼び出すと、対応する正しい `actual` 実装が呼び出されます。
+この例では、共通ソースセットで期待される `platform()` 関数（expected宣言）が定義され、プラットフォームソースセットで実際の実装（actual宣言）が提供されています。
+特定のプラットフォーム向けにコードを生成する際、Kotlinコンパイラはexpected宣言とactual宣言をマージします。
+その結果、ターゲットプラットフォーム向けの実装を持つ `platform()` 関数が生成されます。
 
-### 例: UUID の生成 {id="example-generate-a-uuid"}
+生成されるプラットフォームコード内で*1つの宣言*にマージされるためには、expected宣言とactual宣言が同じパッケージで定義されている必要があります。
+これにより、共通コード内のexpected `platform()` 関数の呼び出しは、正しいactual実装に対応するようになります。
 
-Kotlin Multiplatform を使用して iOS および Android アプリケーションを開発しており、汎用一意識別子（UUID）を生成したいと仮定しましょう。
+expectedおよびactual関数と同様に、expectedおよびactualプロパティを使用することで、プラットフォームごとに異なる値を使用できます。expectedおよびactualの関数やプロパティは、シンプルなユースケースに最も役立ちます。
 
-これを行うには、Kotlin Multiplatform モジュールの共通ソースセットで、`expect` キーワードを使用して期待される関数 `randomUUID()` を宣言します。実装コードは含めないでください。
+### 例: UUIDの生成 {id="example-generate-a-uuid"}
+
+Kotlin Multiplatformを使用してiOSおよびAndroidアプリケーションを開発しており、汎用一意識別子（UUID: universally unique identifier）を生成する仕組みが必要だと仮定しましょう。
+
+これを行うには、Kotlin Multiplatformモジュールの共通ソースセットで、`expect` キーワードを使用してexpected関数 `randomUUID()` を宣言します。
+`expect` 宣言には実装コードを**含めないでください**。
 
 ```kotlin
-// 共通（common）ソースセット内:
+// common ソースセット内:
 expect fun randomUUID(): String
 ```
 
-各プラットフォーム固有のソースセット（iOS および Android）で、共通モジュールで期待される `randomUUID()` 関数の実際の実装を提供します。これらの実際の実装をマークするには、`actual` キーワードを使用します。
+各プラットフォーム固有のソースセット（iOSおよびAndroid）で、共通モジュールで期待（expect）されている `randomUUID()` 関数のactual実装を提供します。これらの実際の実装には `actual` キーワードを使用します。
 
-![Generating UUID with expected and actual declarations](expect-generate-uuid.svg){width=700}
+![expectedおよびactual宣言によるUUIDの生成](expect-generate-uuid.svg){width=700}
 
-以下のスニペットは、Android と iOS の実装を示しています。プラットフォーム固有のコードでは、`actual` キーワードを使用し、関数には同じ名前を使用します。
+以下のスニペットは、AndroidとiOSの実装を示しています。プラットフォーム固有のコードでは `actual` キーワードを使用し、関数名を共通コードと同じにします。
 
 ```kotlin
-// android ソースセット内:
+// Android ソースセット内:
 import java.util.*
 
 actual fun randomUUID() = UUID.randomUUID().toString()
@@ -54,21 +62,23 @@ import platform.Foundation.NSUUID
 actual fun randomUUID(): String = NSUUID().UUIDString()
 ```
 
-Android の実装では Android で利用可能な API を使用し、iOS の実装では iOS で利用可能な API を使用します。Kotlin/Native コードから iOS の API にアクセスできます。
+Androidの実装ではAndroidで利用可能なAPIを使用し、iOSの実装ではiOSで利用可能なAPIを使用します。Kotlin/NativeコードからはiOSのAPIにアクセスできます。
 
-Android 用の最終的なプラットフォームコードを生成する際、Kotlin コンパイラは自動的に `expect` 宣言と `actual` 宣言をマージし、実際の Android 固有の実装を持つ単一の `randomUUID()` 関数を生成します。iOS に対しても同じプロセスが繰り返されます。
+Android向けのプラットフォームコードを生成する際、Kotlinコンパイラはexpected宣言とactual宣言を自動的にマージし、実際のAndroid固有実装を持つ単一の `randomUUID()` 関数を生成します。iOSに対しても同様の処理が実行されます。
 
-簡略化のため、この例および以降の例では「common」、「ios」、「android」という簡略化されたソースセット名を使用しています。通常、これらは `commonMain`、`iosMain`、`androidMain` を指します。同様のロジックは、テストソースセットである `commonTest`、`iosTest`、`androidTest` でも定義できます。
+### expect/actual宣言に関する詳細 {id="further-reading-on-expect-actual-declarations"}
 
-`expect`/`actual` 関数と同様に、`expect`/`actual` プロパティを使用すると、プラットフォームごとに異なる値を使用できます。`expect`/`actual` の関数とプロパティは、単純なケースで最も役立ちます。
+* `expect`/`actual` 宣言が実際に動作する様子を確認するには、各ターゲットのプラットフォーム名を返す関数を含む [基本的なKMPアプリの例](quickstart.md#create-a-project) をご覧ください。
+* `expect`/`actual` メカニズムの詳細については、[Expected and actual declarations](multiplatform-expect-actual.md)（期待宣言と実宣言）を参照してください。
 
-## 共通コード内でのインターフェース {id="interfaces-in-common-code"}
+## 共通コードでのインターフェース {id="interfaces-in-common-code"}
 
-プラットフォーム固有のロジックが非常に大きく複雑な場合は、共通コードでそれを表すインターフェースを定義し、プラットフォームソースセットで異なる実装を提供することで、コードを簡素化できます。
+[Kotlinの継承メカニズム](https://kotlinlang.org/docs/inheritance.html)により、より柔軟なコード共有が可能になります。
+例えば、プラットフォームに依存しない抽象的な宣言を持つインターフェースを共通コードで定義し、プラットフォームソースセットでそのインターフェースの実装を提供することができます。
 
-![Using interfaces](expect-interfaces.svg){width=700}
+![インターフェースの使用](expect-interfaces.svg){width=700}
 
-プラットフォームソースセットの実装では、対応する依存関係を使用します。
+プラットフォーム名は、プラットフォームに関係なく `String` として保持されます。
 
 ```kotlin
 // commonMain ソースセット内:
@@ -76,6 +86,8 @@ interface Platform {
     val name: String
 }
 ```
+
+その後、Android APIの呼び出しで宣言をオーバーライドして、その `String` に値を割り当てることができます。
 
 ```kotlin
 // androidMain ソースセット内:
@@ -86,6 +98,8 @@ class AndroidPlatform : Platform {
 }
 ```
 
+あるいはiOSのシステムコールを呼び出します。
+
 ```kotlin
 // iosMain ソースセット内:
 import platform.UIKit.UIDevice
@@ -95,15 +109,16 @@ class IOSPlatform : Platform {
 }
 ```
 
-共通のインターフェースが必要な場合に適切なプラットフォーム実装を注入するには、次のオプションのいずれかを選択できます。それぞれについて以下で詳しく説明します。
+共通インターフェースを使用する際に適切なプラットフォーム実装を注入するには、次のいずれかの方法を選択できます。
 
-* [`expect` と `actual` による関数を使用する](#expected-and-actual-functions)
-* [異なるエントリポイントを介して実装を提供する](#different-entry-points)
-* [依存性注入（DI）フレームワークを使用する](#dependency-injection-framework)
+* [expectedおよびactual関数の使用](#expected-and-actual-functions)
+* [異なるエントリポイント経由での実装の提供](#different-entry-points)
+* [依存性注入（DI）フレームワークの使用](#dependency-injection-framework)
 
-### expect と actual による関数 {id="expected-and-actual-functions"}
+### expectedおよびactual関数 {id="expected-and-actual-functions"}
 
-このインターフェースの値を返す `expect` 関数を定義し、次にそのサブクラスを返す `actual` 関数を定義します。
+共通インターフェースを [expect/actual宣言](#expected-and-actual-functions-and-properties) と組み合わせることができます。  
+このインターフェースの値を返す `expect` 関数を定義し、そのインターフェースを実装するプラットフォーム固有のクラスを返す `actual` 関数を定義します。
 
 ```kotlin
 // commonMain ソースセット内:
@@ -126,16 +141,20 @@ class IOSPlatform : Platform
 actual fun platform() = IOSPlatform()
 ```
 
-共通コードで `platform()` 関数を呼び出すと、`Platform` 型のオブジェクトを扱うことができます。
-この共通コードを Android で実行すると、`platform()` の呼び出しは `AndroidPlatform` クラスのインスタンスを返します。
-iOS で実行すると、`platform()` は `IOSPlatform` クラスのインスタンスを返します。
+共通コードでの `platform()` 関数の呼び出しは、`Platform` 型のオブジェクトを扱います。
+コンパイラがexpected宣言とactual宣言をマージすると、`platform()` の呼び出しはAndroidでは `AndroidPlatform` クラスのインスタンスを、iOSでは `IOSPlatform` クラスのインスタンスを返します。
+
+> これは、Kotlin Multiplatform IDEウィザード（[Web版](https://kmp.jetbrains.com/)も利用可能）で生成されるプロジェクトで使用されているアプローチです。
+> [KMP クイックスタート](quickstart.md#create-a-project)を実行してシンプルなプロジェクトを作成し、実装が実際に動作する様子を確認してください。
+> 
+{style="tip"}
 
 ### 異なるエントリポイント {id="different-entry-points"}
 
-エントリポイントを制御できる場合は、`expect`/`actual` 宣言を使用せずに各プラットフォームアーティファクトの実装を構築できます。これを行うには、共有の Kotlin Multiplatform モジュールでプラットフォームの実装を定義し、プラットフォームモジュール側でそれらをインスタンス化します。
+エントリポイントを制御できる場合は、expectedおよびactual宣言を使用せずに、各プラットフォームアーティファクトの実装を構築できます。これを行うには、共有Kotlin Multiplatformモジュールでプラットフォーム実装を定義し、プラットフォームモジュール側でそれらをインスタンス化します。
 
 ```kotlin
-// 共有 Kotlin Multiplatform モジュール
+// 共有Kotlin Multiplatformモジュール
 // commonMain ソースセット内:
 interface Platform
 
@@ -168,7 +187,7 @@ class MyApp : Application() {
 ```
 
 ```Swift
-// iosApp プラットフォームモジュール内 (Swift):
+// iOSアプリのSwiftコード内:
 import shared
 
 @main
@@ -179,20 +198,20 @@ struct iOSApp : App {
 }
 ```
 
-Android では、`AndroidPlatform` のインスタンスを作成して `application()` 関数に渡す必要があります。同様に iOS では、`IOSPlatform` のインスタンスを作成して渡す必要があります。これらのエントリポイントはアプリケーションのエントリポイントである必要はありませんが、ここで共有モジュールの特定の機能を呼び出すことができます。
+Androidでは `AndroidPlatform` のインスタンスを作成して `application()` 関数に渡し、iOSでも同様に `IOSPlatform` のインスタンスを作成して渡します。これらのエントリポイントはアプリケーション自体のエントリポイントである必要はありませんが、ここから共有モジュールの特定の機能を呼び出すことができます。
 
-`expect`/`actual` 関数を使用したり、エントリポイントを通じて直接提供したりして適切な実装を提供する方法は、単純なシナリオではうまく機能します。ただし、プロジェクトで依存性注入（DI）フレームワークを使用している場合は、一貫性を確保するために、単純なケースであっても DI フレームワークを使用することをお勧めします。
+expected/actual関数を使用したり、エントリポイントを通じて直接適切な実装を提供したりする方法は、シンプルなシナリオではうまく機能します。
+ただし、プロジェクトで依存性注入（DI）フレームワークを使用している場合は、一貫性を確保するためにシンプルなケースでもそれを使用することをお勧めします。
 
-### 依存性注入（DI）フレームワーク {id="dependency-injection-framework"}
+### 依存性注入フレームワーク {id="dependency-injection-framework"}
 
-現代的なアプリケーションでは、通常、疎結合なアーキテクチャを作成するために依存性注入（DI）フレームワークを使用します。DI フレームワークを使用すると、現在の環境に基づいてコンポーネントに依存関係を注入できます。
+モダンなアプリケーションでは、依存性注入（DI: Dependency Injection）フレームワークを使用して、使用する実装を実行時に動的に決定し、疎結合なアーキテクチャを構築できます。
+Kotlin Multiplatformをサポートする任意のDIフレームワークを使用すれば、プラットフォームに応じて実行時に異なる依存関係をコンポーネントに注入できます。
 
-Kotlin Multiplatform をサポートする DI フレームワークであれば、プラットフォームごとに異なる依存関係を注入するのに役立ちます。
-
-たとえば、[Koin](https://insert-koin.io/) は Kotlin Multiplatform をサポートする依存性注入フレームワークです。
+例えば、[Koin](https://insert-koin.io/) はKotlin Multiplatformをサポートする依存性注入フレームワークです。Koinを使用して `Platform` の例を実装すると、次のようになります。
 
 ```kotlin
-// 共通（common）ソースセット内:
+// common ソースセット内:
 import org.koin.dsl.module
 
 interface Platform
@@ -220,18 +239,14 @@ actual val platformModule = module {
 }
 ```
 
-ここでは、Koin DSL が注入用のコンポーネントを定義するモジュールを作成します。共通コードで `expect` キーワードを使用してモジュールを宣言し、次に `actual` キーワードを使用して各プラットフォーム向けの固有の実装を提供します。フレームワークが、実行時に正しい実装を選択することを担当します。
+ここでは、Koin DSLを使用して注入用のコンポーネントを定義するモジュールを作成しています。共通コードで `expect` キーワードを使用してモジュールを宣言し、各プラットフォームで `actual` キーワードを使用してプラットフォーム固有の実装を提供します。フレームワークが実行時に適切な実装の選択を行います。
 
-DI フレームワークを使用する場合、すべての依存関係をそのフレームワークを通じて注入します。プラットフォームの依存関係の処理にも同じロジックが適用されます。すでにプロジェクトに DI を導入している場合は、手動で `expect`/`actual` 関数を使用するのではなく、DI を使い続けることをお勧めします。これにより、依存関係を注入する 2 つの異なる方法が混在するのを避けることができます。
+DIフレームワークを使用する場合、すべての依存関係はそのフレームワークを通じて注入します。プラットフォームの依存関係を処理する場合も同じロジックが適用されます。すでにプロジェクトにDIを導入している場合は、expected/actual関数を手動で使用するのではなく、引き続きDIを使用することをお勧めします。これにより、依存関係を注入する2つの異なるアプローチが混在するのを防ぐことができます。
 
-また、共通インターフェースを常に Kotlin で実装する必要はありません。別の「プラットフォームモジュール」内で、Swift などの他の言語で実装することもできます。このアプローチを選択した場合は、DI フレームワークを使用して iOS プラットフォームモジュールからその実装を提供する必要があります。
+また、共通インターフェースを常にKotlinで実装する必要はありません。別の*プラットフォームモジュール*で、Swiftなどの他の言語を使って実装することも可能です。このアプローチを選択した場合は、DIフレームワークを使用してiOSプラットフォームモジュールから実装を提供します。
 
-![Using dependency injection framework](expect-di-framework.svg){width=700}
+![依存性注入フレームワークの使用](expect-di-framework.svg){width=700}
 
-このアプローチは、実装をプラットフォームモジュールに配置する場合にのみ機能します。Kotlin Multiplatform モジュールが自己完結できなくなり、別のモジュールで共通インターフェースを実装する必要があるため、あまりスケーラブルではありません。
+このアプローチは、プラットフォームモジュール内に実装を配置する場合にのみ機能します。Kotlin Multiplatformモジュールが自己完結できず、別のモジュールで共通インターフェースを実装する必要があるため、あまり拡張性が高くありません。
 
 <!-- If you're interested in having this functionality expanded to a shared module, please vote for this issue in Youtrack and describe your use case. -->
-
-## 次のステップ {id="what-s-next"}
-
-`expect`/`actual` メカニズムの例と詳細については、[expect および actual 宣言](multiplatform-expect-actual.md)を参照してください。

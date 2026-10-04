@@ -4,21 +4,21 @@
 <secondary-label ref="Android Studio"/>
 
 <tldr>
-<p>このチュートリアルでは IntelliJ IDEA を使用していますが、Android Studio でも進めることができます。どちらの IDE も、同じコア機能と Kotlin Multiplatform サポートを共有しています。</p>
+<p>このチュートリアルではIntelliJ IDEAを使用しますが、Android Studioでも同様に進めることができます。両方のIDEで同じコア機能とKotlin Multiplatformサポートが共有されています。</p>
 </tldr>
 
-このチュートリアルでは、Kotlin Multiplatform アプリケーションでテストを作成、構成、および実行する方法を学びます。
+このチュートリアルでは、Kotlin Multiplatformアプリケーションでテストを作成、設定、実行する方法を学びます。
 
-マルチプラットフォームプロジェクトのテストは、次の 2 つのカテゴリに分けられます。
+マルチプラットフォームプロジェクトのテストは、大きく2つのカテゴリに分けることができます。
 
-* **共通コード（common code）のテスト**: これらのテストは、サポートされている任意のフレームワークを使用して、任意のプラットフォームで実行できます。
-* **プラットフォーム固有コード（platform-specific code）のテスト**: これらは、プラットフォーム固有のロジックをテストするために不可欠です。プラットフォーム固有のフレームワークを使用し、より豊富な API や幅広いアサーションなどの追加機能を利用できます。
+* 共通コードのテスト: これらのテストは、サポートされている任意のフレームワークを使用して任意のプラットフォーム上で実行できます。
+* プラットフォーム固有コードのテスト: プラットフォーム固有のロジックをテストするために不可欠です。プラットフォーム固有のフレームワークを使用し、より豊富なAPIや幅広いアサーションなど、その追加機能の恩恵を受けることができます。
 
-マルチプラットフォームプロジェクトでは、両方のカテゴリがサポートされています。このチュートリアルでは、まず、シンプルな Kotlin Multiplatform プロジェクトにおいて、共通コードのユニットテストをセットアップ、作成、および実行する方法を説明します。その後、共通コードとプラットフォーム固有コードの両方のテストを必要とする、より複雑な例を扱います。
+マルチプラットフォームプロジェクトでは、両方のカテゴリがサポートされています。このチュートリアルでは、まずシンプルなKotlin Multiplatformプロジェクトにおいて、共通コードのユニットテストをセットアップ、作成、実行する方法を説明します。その後、共通コードとプラットフォーム固有コードの両方のテストが必要な、より複雑な例を扱います。
 
-> このチュートリアルは、以下の知識があることを前提としています。
-> * Kotlin Multiplatform プロジェクトのレイアウト。そうでない場合は、開始前に[このチュートリアル](multiplatform-create-first-app.md)を完了してください。
-> * [JUnit](https://junit.org/junit5/) などの一般的なユニットテストフレームワークの基本。
+> このチュートリアルでは、以下について理解していることを前提としています:
+> * Kotlin Multiplatformプロジェクトの構成。よくわからない場合は、始める前に[こちらのチュートリアル](multiplatform-upgrade-app.md)を完了してください。
+> * [JUnit](https://junit.org/junit5/)などの代表的なユニットテストフレームワークの基礎。
 >
 {style="tip"}
 
@@ -26,24 +26,24 @@
 
 ### プロジェクトの作成 {id="create-a-project"}
 
-1. [クイックスタート](quickstart.md)の指示に従って、[Kotlin Multiplatform 開発のための環境をセットアップ](quickstart.md#set-up-the-environment)してください。
-2. IntelliJ IDEA で、**File** | **New** | **Project** を選択します。
-3. 左側のパネルで **Kotlin Multiplatform** を選択します。
-4. **New Project** ウィンドウで以下の項目を指定します。
+1. [クイックスタート](quickstart.md)で、[Kotlin Multiplatform開発用の環境をセットアップする](quickstart.md#set-up-the-environment)手順を完了します。
+2. IntelliJ IDEAで、**File** | **New** | **Project**を選択します。
+3. 左側のパネルで**Kotlin Multiplatform**を選択します。
+4. **New Project**ウィンドウで以下のフィールドを指定します:
 
     * **Name**: KMP testing
     * **Project ID**: kmp.project.testing
 
-5. **Android** ターゲットを選択します。
-   Mac を使用している場合は、**iOS** も選択してください。**Do not share UI** オプションが選択されていることを確認してください。
-6. **Include tests** の選択を解除し、**Create** をクリックします。
+5. **Android**ターゲットを選択します。
+   Macを使用している場合は、**iOS**も選択してください。その際、**Do not share UI**オプションを選択していることを確認してください。
+6. **Include tests**の選択を解除し、**Create**をクリックします。
 
-   ![シンプルなマルチプラットフォームプロジェクトの作成](create-test-multiplatform-project.png){width=800}
+   ![Create simple multiplatform project](create-test-multiplatform-project.png){width=800}
 
-### コードの記述 {id="write-code"}
+### コードを書く {id="write-code"}
 
-`sharedLogic/src/commonMain/kotlin` ディレクトリに、新しい `common.example.search` パッケージを作成します。
-このパッケージに、以下の関数を含む Kotlin ファイル `Grep.kt` を作成します。
+`sharedLogic/src/commonMain/kotlin`ディレクトリ内に、新しいパッケージ`common.example.search`を作成します。
+このパッケージ内にKotlinファイル`Grep.kt`を作成し、以下の関数を記述します:
 
 ```kotlin
 fun grep(lines: List<String>, pattern: String, action: (String) -> Unit) {
@@ -53,13 +53,13 @@ fun grep(lines: List<String>, pattern: String, action: (String) -> Unit) {
 }
 ```
 
-この関数は、[UNIX の `grep` コマンド](https://en.wikipedia.org/wiki/Grep)に似せて設計されています。ここでは、この関数はテキストの各行、正規表現として使用されるパターン、および行がパターンに一致するたびに呼び出される関数を引数に取ります。
+この関数は、[UNIXの`grep`コマンド](https://en.wikipedia.org/wiki/Grep)を模倣するように設計されています。この関数はテキスト行のリスト、正規表現として使用されるパターン、そして行がパターンに一致するたびに呼び出される関数を受け取ります。
 
-### テストの追加 {id="add-tests"}
+### テストを追加する {id="add-tests"}
 
-次に、共通コードをテストしましょう。不可欠な部分は、[`kotlin.test`](https://kotlinlang.org/api/latest/kotlin.test/) API ライブラリを依存関係として持つ、共通テスト用のソースセットです。
+それでは、共通コードをテストしてみましょう。重要な要素となるのは共通テスト用のソースセットであり、これには[`kotlin.test`](https://kotlinlang.org/api/latest/kotlin.test/) APIライブラリへの依存関係が含まれます。
 
-1. `sharedLogic/build.gradle.kts` ファイルで、`kotlin.test` ライブラリへの依存関係があることを確認します。
+1. `sharedLogic/build.gradle.kts`ファイルで、`kotlin.test`ライブラリへの依存関係があることを確認します:
 
     ```kotlin
    sourceSets {
@@ -70,15 +70,15 @@ fun grep(lines: List<String>, pattern: String, action: (String) -> Unit) {
    }
    ```
    
-2. `commonTest` ソースセットには、すべての共通テストが格納されます。プロジェクトに同じ名前のディレクトリを作成する必要があります。
+2. `commonTest`ソースセットにはすべての共通テストが格納されます。プロジェクト内に同じ名前のディレクトリを作成する必要があります:
 
-    1. `sharedLogic/src` ディレクトリを右クリックし、**New | Directory** を選択します。IDE にオプションのリストが表示されます。
-    2. `commonTest/kotlin` パスを入力して選択範囲を絞り込み、リストから選択します。
+    1. `sharedLogic/src`ディレクトリを右クリックし、**New | Directory**を選択します。IDEに選択肢のリストが表示されます。
+    2. `commonTest/kotlin`パスを入力し始めて候補を絞り込み、リストから選択します:
 
-      ![共通テストディレクトリの作成](create-common-test-dir.png){width=350}
+      ![Creating common test directory](create-common-test-dir.png){width=350}
 
-3. `commonTest/kotlin` ディレクトリに、新しい `common.example.search` パッケージを作成します。
-4. このパッケージに `Grep.kt` ファイルを作成し、以下のユニットテストで更新します。
+3. `commonTest/kotlin`ディレクトリ内に、新しいパッケージ`common.example.search`を作成します。
+4. このパッケージ内に`Grep.kt`ファイルを作成し、以下のユニットテストを記述します:
 
     ```kotlin
     import kotlin.test.Test
@@ -110,46 +110,45 @@ fun grep(lines: List<String>, pattern: String, action: (String) -> Unit) {
     }
     ```
 
-ご覧のとおり、インポートされたアノテーションやアサーションは、プラットフォームにもフレームワークにも依存していません。
-後でこのテストを実行すると、プラットフォーム固有のフレームワークがテストランナーを提供します。
+ご覧のとおり、インポートされたアノテーションやアサーションはプラットフォーム固有でもフレームワーク固有でもありません。後でこのテストを実行する際、プラットフォーム固有のフレームワークがテストランナーを提供します。
 
-#### `kotlin.test` API を詳しく見る {initial-collapse-state="collapsed" collapsible="true"}
+#### `kotlin.test` APIの詳細 {initial-collapse-state="collapsed" collapsible="true"}
 
-[`kotlin.test`](https://kotlinlang.org/api/latest/kotlin.test/) ライブラリは、テストで使用するためのプラットフォームに依存しないアノテーションとアサーションを提供します。`Test` などのアノテーションは、選択したフレームワークによって提供されるアノテーション、またはそれに最も近い同等のアノテーションにマッピングされます。
+[`kotlin.test`](https://kotlinlang.org/api/latest/kotlin.test/)ライブラリは、テストで使用するためのプラットフォームに依存しないアノテーションとアサーションを提供します。`Test`などのアノテーションは、選択されたフレームワークが提供するもの、またはそれに最も近い同等のものにマッピングされます。
 
-アサーションは、[`Asserter` インターフェース](https://kotlinlang.org/api/latest/kotlin.test/kotlin.test/-asserter/)の実装を通じて実行されます。このインターフェースは、テストで一般的に実行されるさまざまなチェックを定義しています。API にはデフォルトの実装がありますが、通常はフレームワーク固有の実装を使用することになります。
+アサーションは、[`Asserter`インターフェース](https://kotlinlang.org/api/latest/kotlin.test/kotlin.test/-asserter/)の実装を通じて実行されます。このインターフェースは、テストで一般的に行われるさまざまなチェックを定義しています。APIにはデフォルトの実装がありますが、通常はフレームワーク固有の実装が使用されます。
 
-たとえば、JVM では JUnit 4、JUnit 5、および TestNG フレームワークがすべてサポートされています。Android では、`assertEquals()` の呼び出しにより `asserter.assertEquals()` が呼び出され、この `asserter` オブジェクトは `JUnit4Asserter` のインスタンスになります。iOS では、`Asserter` 型のデフォルト実装が Kotlin/Native テストランナーと組み合わせて使用されます。
+例えば、JVM上ではJUnit 4、JUnit 5、およびTestNGフレームワークがすべてサポートされています。Androidでは、`assertEquals()`の呼び出しによって`asserter.assertEquals()`が呼び出される場合があり、その際の`asserter`オブジェクトは`JUnit4Asserter`のインスタンスになります。iOSでは、`Asserter`型のデフォルト実装がKotlin/Nativeテストランナーと組み合わせて使用されます。
 
 ### テストの実行
 
-テストは以下の方法で実行できます。
+テストは以下のいずれかの方法で実行できます:
 
-* ガターにある **Run** アイコンを使用して `shouldFindMatches()` テスト関数を実行する。
-* コンテキストメニューを使用してテストファイルを実行する。
-* ガターにある **Run** アイコンを使用して `GrepTest` テストクラスを実行する。
+* ガター（エディタ左端）にある**Run**アイコンを使用して、テスト関数`shouldFindMatches()`を実行する。
+* コンテキストメニューからテストファイルを実行する。
+* ガターにある**Run**アイコンを使用して、テストクラス`GrepTest`を実行する。
 
-便利なショートカット <shortcut>⌃ ⇧ F10</shortcut>/<shortcut>Ctrl+Shift+F10</shortcut> もあります。
-どのオプションを選択しても、テストを実行するターゲットのリストが表示されます。
+便利なショートカット<shortcut>⌃ ⇧ F10</shortcut>/<shortcut>Ctrl+Shift+F10</shortcut>もあります。
+どの方法を選択しても、テストを実行するターゲットのリストが表示されます:
 
-![テストタスクの実行](run-test-tasks.png){width=300}
+![Run test task](run-test-tasks.png){width=300}
 
-`android` オプションの場合、テストは JUnit 4 を使用して実行されます。`iosSimulatorArm64` の場合、Kotlin コンパイラがテストアノテーションを検出し、Kotlin/Native 独自のテストランナーによって実行される「テストバイナリ（test binary）」を作成します。
+`android`オプションの場合、テストはJUnit 4を使用して実行されます。`iosSimulatorArm64`の場合、Kotlinコンパイラがテストアノテーションを検出し、Kotlin/Native独自のテストランナーによって実行される*テストバイナリ*を作成します。
 
-以下は、テスト実行が成功したときに出力される例です。
+テストが正常に実行された際に出力される例を以下に示します:
 
-![テスト出力](run-test-results.png){width=700}
+![Test output](run-test-results.png){width=700}
 
 ## より複雑なプロジェクトでの作業
 
-### 共通コードのテストを記述する
+### 共通コードのテストを書く
 
-すでに `grep()` 関数を使用して共通コードのテストを作成しました。今度は、`CurrentRuntime` クラスを使用した、より高度な共通コードテストを考えてみましょう。このクラスには、コードが実行されているプラットフォームの詳細が含まれています。たとえば、ローカル JVM で実行される Android ユニットテストの場合、値として "OpenJDK" と "17.0" を持つ可能性があります。
+すでに`grep()`関数を使用して共通コードのテストを作成しました。次は、`CurrentRuntime`クラスを使ったより高度な共通コードのテストを考えてみましょう。このクラスには、コードが実行されているプラットフォームの詳細情報が含まれます。例えば、ローカルJVM上で実行されるAndroidユニットテストの場合、「OpenJDK」や「17.0」といった値を持つことがあります。
 
-`CurrentRuntime` のインスタンスは、プラットフォームの名前とバージョンを文字列として渡して作成する必要があります（バージョンはオプション）。バージョンが存在する場合、可能であれば文字列の先頭にある数字のみが必要です。
+`CurrentRuntime`のインスタンスは、プラットフォームの名前とバージョンを文字列として渡して作成される必要があります（バージョンは省略可能）。バージョンが存在する場合は、文字列の先頭にある数値のみを取得します（取得可能な場合）。
 
-1. `commonMain/kotlin` ディレクトリに、新しい `org.kmp.testing` パッケージを作成します。
-2. このパッケージに `CurrentRuntime.kt` ファイルを作成し、以下の実装で更新します。
+1. `commonMain/kotlin`ディレクトリ内に、新しいパッケージ`org.kmp.testing`を作成します。
+2. このパッケージ内に`CurrentRuntime.kt`ファイルを作成し、以下の実装を記述します:
 
     ```kotlin
     class CurrentRuntime(val name: String, rawVersion: String?) {
@@ -168,8 +167,8 @@ fun grep(lines: List<String>, pattern: String, action: (String) -> Unit) {
     }
     ```
 
-3. `commonTest/kotlin` ディレクトリに、新しい `org.kmp.testing` パッケージを作成します。
-4. このパッケージに `CurrentRuntimeTest.kt` ファイルを作成し、以下のプラットフォームおよびフレームワークに依存しないテストで更新します。
+3. `commonTest/kotlin`ディレクトリ内に、新しいパッケージ`org.kmp.testing`を作成します。
+4. このパッケージ内に`CurrentRuntimeTest.kt`ファイルを作成し、以下のプラットフォームおよびフレームワークに依存しないテストを記述します:
 
     ```kotlin
     import kotlin.test.Test
@@ -202,28 +201,28 @@ fun grep(lines: List<String>, pattern: String, action: (String) -> Unit) {
     }
     ```
 
-このテストは、[IDE で利用可能](#run-tests)な任意の方法で実行できます。
+[IDEで利用可能な任意の方法](#run-tests)を使用して、このテストを実行できます。
 
 ### プラットフォーム固有のテストを追加する
 
-> ここでは、簡潔さとシンプルさのために [expect および actual 宣言のメカニズム](multiplatform-connect-to-apis.md)を使用しています。より複雑なコードでは、インターフェースとファクトリ関数を使用するアプローチの方が適しています。
+> ここでは、簡潔さとシンプルさのために[expect/actual宣言の仕組み](multiplatform-connect-to-apis.md)を使用しています。より複雑なコードでは、インターフェースとファクトリ関数を使用するアプローチの方が適しています。
 >
 {style="note"}
 
-共通コードのテストを記述した経験ができたので、次に Android と iOS のプラットフォーム固有のテストを記述してみましょう。
+共通コードのテストを書く経験ができたので、次はAndroidとiOS向けのプラットフォーム固有テストの作成を見ていきましょう。
 
-`CurrentRuntime` のインスタンスを作成するために、共通の `CurrentRuntime.kt` ファイルで次のように関数を宣言します。
+`CurrentRuntime`のインスタンスを作成するために、共通の`CurrentRuntime.kt`ファイルで以下のように関数を宣言します:
 
 ```kotlin
 expect fun determineCurrentRuntime(): CurrentRuntime
 ```
 
-この関数は、サポートされているプラットフォームごとに個別の実装を持つ必要があります。そうでない場合、ビルドは失敗します。各プラットフォームでこの関数を実装すると同時に、テストも提供する必要があります。Android と iOS 用に作成してみましょう。
+この関数は、サポートされているプラットフォームごとに個別の実装を持つ必要があります。そうでない場合、ビルドは失敗します。各プラットフォームでこの関数を実装するだけでなく、テストも提供する必要があります。それでは、AndroidとiOS向けにテストを作成しましょう。
 
-#### Android の場合 {id="for-android"}
+#### Androidの場合 {id="for-android"}
 
-1. `androidMain/kotlin` ディレクトリに、新しい `org.kmp.testing` パッケージを作成します。
-2. このパッケージに `AndroidRuntime.kt` ファイルを作成し、期待される `determineCurrentRuntime()` 関数の実際の（actual）実装で更新します。
+1. `androidMain/kotlin`ディレクトリ内に、新しいパッケージ`org.kmp.testing`を作成します。
+2. このパッケージ内に`AndroidRuntime.kt`ファイルを作成し、expected関数`determineCurrentRuntime()`のactual実装を記述します:
 
     ```kotlin
     actual fun determineCurrentRuntime(): CurrentRuntime {
@@ -235,15 +234,16 @@ expect fun determineCurrentRuntime(): CurrentRuntime
     }
     ```
 
-3. `sharedLogic/src` ディレクトリの中に、テスト用のディレクトリを作成します。
+3. `sharedLogic/src`ディレクトリ内にテスト用のディレクトリを作成します:
  
-   1. `sharedLogic/src` ディレクトリを右クリックし、**New | Directory** を選択します。IDE にオプションのリストが表示されます。
-   2. `androidHostTest/kotlin` パスを入力して選択範囲を絞り込み、リストから選択します。
+   1. `sharedLogic/src`ディレクトリを右クリックし、**New | Directory**を選択します。IDEに選択肢のリストが表示されます。
+   2. `androidHostTest/kotlin`パスを入力し始めて候補を絞り込み、リストから選択します:
 
-      ![Android テストディレクトリの作成](create-android-test-dir.png){width=350}
+      ![Creating Android test directory](create-android-test-dir.png){width=350}
 
-4. `androidHostTest/kotlin` ディレクトリに、新しい `org.kmp.testing` パッケージを作成します。
-5. このパッケージに `AndroidRuntimeTest.kt` ファイルを作成し、以下の Android テストで更新します。テストをパスさせるために、ランタイムの実際の名前とバージョンを設定してください（ただし、テストが失敗する様子を確認するのも有用です）。
+4. `androidHostTest/kotlin`ディレクトリ内に、新しいパッケージ`org.kmp.testing`を作成します。
+5. このパッケージ内に`AndroidRuntimeTest.kt`ファイルを作成し、以下のAndroidテストを記述します。
+   テストを成功させるには、ランタイムの実際の名前とバージョンを設定してください（ただし、テストがどのように失敗するかを確認するのも有益です）:
 
     ```kotlin
     import kotlin.test.Test
@@ -260,14 +260,14 @@ expect fun determineCurrentRuntime(): CurrentRuntime
     }
     ```
    
-Android 固有のテストがローカル JVM 上で実行されるのは、奇妙に思えるかもしれません。これは、これらのテストが現在のマシン上でローカルユニットテストとして実行されるためです。[Android Studio のドキュメント](https://developer.android.com/studio/test/test-in-android-studio)に記載されているように、これらのテストはデバイスやエミュレーターで実行されるインストゥルメンテーションテスト（instrumented tests）とは異なります。
+Android固有のテストがローカルJVM上で実行されるのは不思議に思えるかもしれません。これは、これらのテストが現在のマシン上でローカルユニットテストとして実行されるためです。[Android Studioのドキュメント](https://developer.android.com/studio/test/test-in-android-studio)で説明されているように、これらのテストは実機またはエミュレータ上で実行されるインストゥルメンテーションテスト（instrumented tests）とは異なります。
 
-プロジェクトには他のタイプのテストを追加することもできます。インストゥルメンテーションテストについては、この [Touchlab ガイド](https://touchlab.co/understanding-and-configuring-your-kmm-test-suite/)を参照してください。
+プロジェクトには他の種類のテストを追加することもできます。インストゥルメンテーションテストの詳細については、こちらの[Touchlabガイド](https://touchlab.co/understanding-and-configuring-your-kmm-test-suite/)を参照してください。
 
-#### iOS の場合 {id="for-ios"}
+#### iOSの場合 {id="for-ios"}
 
-1. `iosMain/kotlin` ディレクトリに、新しい `org.kmp.testing` ディレクトリを作成します。
-2. このディレクトリに `IOSRuntime.kt` ファイルを作成し、期待される `determineCurrentRuntime()` 関数の実際の（actual）実装で更新します。
+1. `iosMain/kotlin`ディレクトリ内に、新しいディレクトリ`org.kmp.testing`を作成します。
+2. このディレクトリ内に`IOSRuntime.kt`ファイルを作成し、expected関数`determineCurrentRuntime()`のactual実装を記述します:
 
     ```kotlin
     import kotlin.experimental.ExperimentalNativeApi
@@ -280,13 +280,13 @@ Android 固有のテストがローカル JVM 上で実行されるのは、奇�
     }
     ```
 
-3. `sharedLogic/src` ディレクトリに新しいディレクトリを作成します。
+3. `sharedLogic/src`ディレクトリ内に新しいディレクトリを作成します:
    
-   1. `sharedLogic/src` ディレクトリを右クリックし、**New | Directory** を選択します。IDE にオプションのリストが表示されます。
-   2. `iosTest/kotlin` パスを入力して選択範囲を絞り込み、リストから選択します。
+   1. `sharedLogic/src`ディレクトリを右クリックし、**New | Directory**を選択します。IDEに選択肢のリストが表示されます。
+   2. `iosTest/kotlin`パスを入力し始めて候補を絞り込み、リストから選択します:
 
-4. `iosTest/kotlin` ディレクトリに、新しい `org.kmp.testing` ディレクトリを作成します。
-5. このディレクトリに `IOSRuntimeTest.kt` ファイルを作成し、以下の iOS テストで更新します。
+4. `iosTest/kotlin`ディレクトリ内に、新しいディレクトリ`org.kmp.testing`を作成します。
+5. このディレクトリ内に`IOSRuntimeTest.kt`ファイルを作成し、以下のiOSテストを記述します:
 
     ```kotlin 
     import kotlin.test.Test
@@ -302,41 +302,41 @@ Android 固有のテストがローカル JVM 上で実行されるのは、奇�
     }
     ```
 
-### 複数のテストを実行してレポートを分析する {id="run-multiple-tests-and-analyze-reports"}
+### 複数のテストの実行とレポートの分析 {id="run-multiple-tests-and-analyze-reports"}
 
-現段階で、共通、Android、および iOS 実装のコードとそのテストが揃いました。プロジェクトのディレクトリ構造は以下のようになっているはずです。
+この段階で、共通、Android、およびiOSの実装コードとそのテストが揃いました。プロジェクトのディレクトリ構造は以下のようになっているはずです:
 
-![プロジェクト構造全体](code-and-test-structure.png){width=300}
+![Whole project structure](code-and-test-structure.png){width=300}
 
-個々のテストはコンテキストメニューやショートカットから実行できます。もう 1 つのオプションは、Gradle タスクを使用することです。たとえば、`allTests` Gradle タスクを実行すると、プロジェクト内のすべてのテストが対応するテストランナーで実行されます。
+個別のテストは、コンテキストメニューから実行するかショートカットを使用できます。もう1つの選択肢として、Gradleタスクを使用する方法もあります。例えば、`allTests` Gradleタスクを実行すると、プロジェクト内のすべてのテストが対応するテストランナーで実行されます:
 
-![Gradle テストタスク](gradle-alltests.png){width=700}
+![Gradle test tasks](gradle-alltests.png){width=700}
 
-テストを実行すると、IDE での出力に加えて HTML レポートが生成されます。レポートは `sharedLogic/build/reports/tests` ディレクトリにあります。
+テストを実行すると、IDEでの出力に加えてHTMLレポートが生成されます。これらは`sharedLogic/build/reports/tests`ディレクトリで確認できます:
 
-![マルチプラットフォームテストの HTML レポート](shared-tests-folder-reports.png){width=300}
+![HTML reports for multiplatform tests](shared-tests-folder-reports.png){width=300}
 
-`allTests` タスクを実行し、生成されたレポートを確認してください。
+`allTests`タスクを実行し、生成されたレポートを確認してみましょう:
 
-* `allTests/index.html` ファイルには、共通テストと iOS テストの統合レポートが含まれています（iOS テストは共通テストに依存しており、共通テストの後に実行されます）。
-* `testDebugUnitTest` および `testReleaseUnitTest` フォルダには、デフォルトの Android ビルドフレーバー両方のレポートが含まれています。（現在、Android のテストレポートは `allTests` レポートと自動的にマージされません。）
+* `allTests/index.html`ファイルには、共通テストとiOSテストの統合レポートが含まれています（iOSテストは共通テストに依存しており、共通テストの後に実行されます）。
+* `testDebugUnitTest`および`testReleaseUnitTest`フォルダには、デフォルトのAndroidビルドフレーバー双方のレポートが含まれています（現時点では、Androidのテストレポートは`allTests`レポートに自動的にはマージされません）。
 
-![マルチプラットフォームテストの HTML レポート](multiplatform-test-report.png){width=700}
+![HTML report for multiplatform tests](multiplatform-test-report.png){width=700}
 
-## マルチプラットフォームプロジェクトでテストを使用するためのルール {id="rules-for-using-tests-in-multiplatform-projects"}
+## マルチプラットフォームプロジェクトでテストを使用する際のルール {id="rules-for-using-tests-in-multiplatform-projects"}
 
-これで、Kotlin Multiplatform アプリケーションでテストを作成、構成、および実行することができました。今後のプロジェクトでテストを扱う際は、以下の点に注意してください。
+これで、Kotlin Multiplatformアプリケーションでのテストの作成、設定、実行が一通り完了しました。今後のプロジェクトでテストを扱う際は、以下の点に留意してください:
 
-* 共通コードのテストを記述する際は、[kotlin.test](https://kotlinlang.org/api/latest/kotlin.test/) などのマルチプラットフォームライブラリのみを使用してください。依存関係は `commonTest` ソースセットに追加します。
-* `kotlin.test` API の `Asserter` 型は、間接的にのみ使用されるべきです。`Asserter` インスタンスは可視ですが、テスト内で直接使用する必要はありません。
-* 常にテスティングライブラリの API の範囲内にとどまってください。幸い、コンパイラと IDE によってフレームワーク固有の機能の使用は防止されます。
-* `commonTest` のテストを実行するためにどのフレームワークを使用するかは重要ではありませんが、開発環境が正しくセットアップされていることを確認するために、使用予定の各フレームワークでテストを実行することをお勧めします。
-* 物理的な違いを考慮してください。たとえば、スクロールの慣性や摩擦の値はプラットフォームやデバイスによって異なるため、同じスクロール速度を設定しても、スクロール位置が異なる場合があります。期待通りの動作を確認するために、常にターゲットプラットフォームでコンポーネントをテストしてください。
-* プラットフォーム固有のコードのテストを記述する際は、アノテーションや拡張機能など、対応するフレームワークの機能を使用できます。
-* テストは IDE からも Gradle タスクからも実行できます。
-* テストを実行すると、HTML テストレポートが自動的に生成されます。
+* 共通コードのテストを作成する際は、[kotlin.test](https://kotlinlang.org/api/latest/kotlin.test/)のようなマルチプラットフォームライブラリのみを使用してください。依存関係は`commonTest`ソースセットに追加します。
+* `kotlin.test` APIの`Asserter`型は、間接的にのみ使用してください。`Asserter`インスタンスは参照可能ですが、テスト内で直接使用する必要はありません。
+* 常にテストライブラリのAPIの範囲内にとどめてください。幸いにも、コンパイラとIDEによってフレームワーク固有の機能の使用が制限されます。
+* `commonTest`内のテストを実行するためにどのフレームワークを使用しても基本的には問題ありませんが、開発環境が正しく設定されているか確認するためにも、使用予定の各フレームワークでテストを実行してみることをお勧めします。
+* 物理的な挙動の違い（physics difference）を考慮してください。例えば、スクロールの慣性や摩擦の値はプラットフォームやデバイスによって異なるため、同じスクロール速度を設定してもスクロール位置が異なる場合があります。コンポーネントが期待どおりに動作することを確認するため、常にターゲットプラットフォーム上でテストしてください。
+* プラットフォーム固有コードのテストを作成する際は、対応するフレームワークの機能（アノテーションや拡張機能など）を使用できます。
+* テストはIDEから実行することも、Gradleタスクを使用して実行することもできます。
+* テストを実行すると、HTMLテストレポートが自動的に生成されます。
 
 ## 次のステップ {id="what-s-next"}
 
-* [マルチプラットフォームプロジェクトの構造を理解する](multiplatform-discover-project.md)で、プロジェクトのレイアウトを確認してください。
-* Kotlin エコシステムによって提供されている別のマルチプラットフォームテストフレームワークである [Kotest](https://kotest.io/) をチェックしてください。Kotest ではさまざまなスタイルでテストを記述でき、通常のテストを補完するアプローチをサポートしています。これには、[データ駆動型](https://kotest.io/docs/framework/datatesting/data-driven-testing.html)や[プロパティベース](https://kotest.io/docs/proptest/property-based-testing.html)のテストが含まれます。
+* [マルチプラットフォームプロジェクトの構造を理解する](multiplatform-discover-project.md)で、マルチプラットフォームプロジェクトの構成を詳しく確認しましょう。
+* Kotlinエコシステムが提供するもう1つのマルチプラットフォームテストフレームワークである[Kotest](https://kotest.io/)もチェックしてみてください。Kotestを使用すると、さまざまなスタイルでテストを記述でき、通常のテストを補完するアプローチがサポートされています。これには、[データ駆動テスト（data-driven testing）](https://kotest.io/docs/framework/datatesting/data-driven-testing.html)や[プロパティベーステスト（property-based testing）](https://kotest.io/docs/proptest/property-based-testing.html)などが含まれます。

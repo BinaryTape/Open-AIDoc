@@ -2,29 +2,27 @@
 
 <no-index/>
 
-プログラミングにおいて、後で処理するためにデータを構造体にグループ化できると便利です。Kotlinでは、まさにこの目的のためにコレクションを提供しています。
+プログラミングにおいて、後で処理するためにデータを構造化してグループにまとめることができると便利です。Kotlinはまさにこの目的のためにコレクション（collections）を提供しています。
 
-Kotlinには、項目をグループ化するための以下のコレクションがあります：
+Kotlinには、アイテムをグループ化するための以下のコレクションがあります：
 
-| **コレクション型** | **説明**                                                         |
+| **コレクション型** | **説明**                                                                 |
 |---------------------|-------------------------------------------------------------------------|
-| リスト（Lists）               | 項目の順序付けられたコレクション                                            |
-| セット（Sets）                | 重複のない、順序のない項目のコレクション                                   |
-| マップ（Maps）                | キーが一意で、1つの値にのみマップされるキーと値のペアのセット |
+| リスト (Lists)      | 順序付けられたアイテムのコレクション                                      |
+| セット (Sets)       | 順序のない、一意なアイテムのコレクション                                  |
+| マップ (Maps)       | キーが一意であり、それぞれ1つの値にのみ対応するキーと値のペアのセット    |
 
-各コレクション型には、可変（mutable）または読み取り専用（read only）があります。
+各コレクション型には、可変（mutable）または読み取り専用（read-only）のものがあります。
 
 ## リスト (List) {id="list"}
 
-リストは、追加された順序で項目を保存し、重複する項目を許可します。
+リストはアイテムが追加された順序で格納し、重複したアイテムを許可します。
 
-読み取り専用リスト ([`List`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/)) を作成するには、
-[`listOf()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/list-of.html) 関数を使用します。
+読み取り専用リスト（[`List`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/)）を作成するには、[`listOf()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/list-of.html) 関数を使用します。
 
-可変リスト ([`MutableList`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-list.html)) を作成するには、
-[`mutableListOf()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/mutable-list-of.html) 関数を使用します。
+可変リスト（[`MutableList`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-list.html)）を作成するには、[`mutableListOf()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/mutable-list-of.html) 関数を使用します。
 
-リストを作成する際、Kotlinは保存されている項目の型を推論できます。型を明示的に宣言するには、リスト宣言の後の山括弧 `<>` 内に型を追加します：
+リストを作成する際、Kotlinは格納されるアイテムの型を推論できます。型を明示的に宣言するには、リスト宣言の後に山括弧 `<>` で囲んで型を指定します：
 
 ```kotlin
 fun main() { 
@@ -34,7 +32,7 @@ fun main() {
     println(readOnlyShapes)
     // [triangle, square, circle]
     
-    // 明示的な型宣言を伴う可変リスト
+    // 明示的な型宣言を持つ可変リスト
     val shapes: MutableList<String> = mutableListOf("triangle", "square", "circle")
     println(shapes)
     // [triangle, square, circle]
@@ -43,17 +41,17 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-lists-declaration"}
 
-> 不要な変更を防ぐために、可変リストを `List` に代入することで、読み取り専用のビューを作成できます：
+> 意図しない変更を防ぐため、可変リストを `List` に代入することで、読み取り専用のビューを作成できます：
 > 
 > ```kotlin
 >     val shapes: MutableList<String> = mutableListOf("triangle", "square", "circle")
 >     val shapesLocked: List<String> = shapes
 > ```
-> これは**キャスト（casting）**とも呼ばれます。
+> これは**キャスト**（casting）とも呼ばれます。
 > 
 {style="tip"}
 
-リストは順序付けられているため、リスト内の項目にアクセスするには、[インデックスアクセス演算子](operator-overloading.md#indexed-access-operator) `[]` を使用します：
+リストは順序付けられているため、リスト内のアイテムにアクセスするには[インデックスアクセス演算子](operator-overloading.md#indexed-access-operator) `[]` を使用します：
 
 ```kotlin
 fun main() { 
@@ -66,8 +64,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-list-access"}
 
-リストの最初または最後の項目を取得するには、それぞれ [`.first()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/first.html)
-および [`.last()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/last.html) 関数を使用します：
+リストの最初または最後のアイテムを取得するには、それぞれ [`.first()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/first.html) および [`.last()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/last.html) 関数を使用します：
 
 ```kotlin
 fun main() { 
@@ -80,16 +77,13 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-list-first"}
 
-> [`.first()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/first.html) および [`.last()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/last.html)
-> 関数は**拡張（extension）**関数の例です。オブジェクトに対して拡張関数を呼び出すには、オブジェクトの後にピリオド `.` を付けて関数名を書きます。
+> [`.first()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/first.html) および [`.last()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/last.html) 関数は**拡張関数**（extension functions）の例です。オブジェクトに対して拡張関数を呼び出すには、オブジェクトの後にピリオド `.` を付け、その後に続けて関数名を書きます。
 > 
-> 拡張関数については、[中級ツアー](kotlin-tour-intermediate-extension-functions.md#extension-functions)で詳しく説明します。
-> 現時点では、呼び出し方を知っておくだけで十分です。
+> 拡張関数については、[中級ツアー](kotlin-tour-intermediate-extension-functions.md#extension-functions)で詳しく説明します。現時点では、その呼び出し方を知っておくだけで十分です。
 > 
 {style="note"}
 
-リスト内の項目数を取得するには、[`.count()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/count.html)
-関数を使用します：
+リスト内のアイテム数を取得するには、[`.count()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/count.html) 関数を使用します：
 
 ```kotlin
 fun main() { 
@@ -102,7 +96,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-list-count"}
 
-項目がリストに含まれているか確認するには、[`in` 演算子](operator-overloading.md#in-operator)を使用します：
+アイテムがリストに含まれているか確認するには、[`in` 演算子](operator-overloading.md#in-operator)を使用します：
 
 ```kotlin
 fun main() {
@@ -115,8 +109,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-list-in"}
 
-可変リストに項目を追加または削除するには、それぞれ [`.add()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-list/add.html)
-および [`.remove()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/remove.html) 関数を使用します：
+可変リストにアイテムを追加または削除するには、それぞれ [`.add()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-list/add.html) および [`.remove()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/remove.html) 関数を使用します：
 
 ```kotlin
 fun main() { 
@@ -138,22 +131,20 @@ fun main() {
 
 ## セット (Set) {id="set"}
 
-リストが順序付けられ、重複した項目を許可するのに対し、セットは**順序がなく**、**一意（ユニーク）な**項目のみを保存します。
+リストが順序付けられており重複したアイテムを許可するのに対し、セットは**順序がなく**、**一意な**アイテムのみを格納します。
 
-読み取り専用セット ([`Set`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-set/)) を作成するには、
-[`setOf()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/set-of.html) 関数を使用します。
+読み取り専用セット（[`Set`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-set/)）を作成するには、[`setOf()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/set-of.html) 関数を使用します。
 
-可変セット ([`MutableSet`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-set/)) を作成するには、
-[`mutableSetOf()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/mutable-set-of.html) 関数を使用します。
+可変セット（[`MutableSet`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-set/)）を作成するには、[`mutableSetOf()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/mutable-set-of.html) 関数を使用します。
 
-セットを作成する際、Kotlinは保存されている項目の型を推論できます。型を明示的に宣言するには、セット宣言の後の山括弧 `<>` 内に型を追加します：
+セットを作成する際、Kotlinは格納されるアイテムの型を推論できます。型を明示的に宣言するには、セット宣言の後に山括弧 `<>` で囲んで型を指定します：
 
 ```kotlin
 fun main() {
 //sampleStart
     // 読み取り専用セット
     val readOnlyFruit = setOf("apple", "banana", "cherry", "cherry")
-    // 明示的な型宣言を伴う可変セット
+    // 明示的な型宣言を持つ可変セット
     val fruit: MutableSet<String> = mutableSetOf("apple", "banana", "cherry", "cherry")
     
     println(readOnlyFruit)
@@ -163,9 +154,9 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-sets-declaration"}
 
-前の例でわかるように、セットは一意な要素のみを含むため、重複した `"cherry"` 項目は破棄されます。
+前の例を見るとわかるように、セットには一意の要素しか含まれないため、重複している `"cherry"` は除外されます。
 
-> 不要な変更を防ぐために、可変セットを `Set` に代入することで、読み取り専用のビューを作成できます：
+> 意図しない変更を防ぐため、可変セットを `Set` に代入することで、読み取り専用のビューを作成できます：
 > 
 > ```kotlin
 >     val fruit: MutableSet<String> = mutableSetOf("apple", "banana", "cherry", "cherry")
@@ -174,12 +165,11 @@ fun main() {
 >
 {style="tip"}
 
-> セットは**順序がない**ため、特定のインデックスにある項目にアクセスすることはできません。
+> セットには**順序がない**ため、特定のインデックスにあるアイテムにアクセスすることはできません。
 > 
 {style="note"}
 
-セット内の項目数を取得するには、[`.count()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/count.html)
-関数を使用します：
+セット内のアイテム数を取得するには、[`.count()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/count.html) 関数を使用します：
 
 ```kotlin
 fun main() { 
@@ -192,7 +182,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-set-count"}
 
-項目がセットに含まれているか確認するには、[`in` 演算子](operator-overloading.md#in-operator)を使用します：
+アイテムがセットに含まれているか確認するには、[`in` 演算子](operator-overloading.md#in-operator)を使用します：
 
 ```kotlin
 fun main() {
@@ -205,8 +195,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-set-in"}
 
-可変セットに項目を追加または削除するには、それぞれ [`.add()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-set/add.html)
-および [`.remove()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/remove.html) 関数を使用します：
+可変セットからアイテムを追加または削除するには、それぞれ [`.add()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-set/add.html) および [`.remove()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/remove.html) 関数を使用します：
 
 ```kotlin
 fun main() { 
@@ -224,22 +213,20 @@ fun main() {
 
 ## マップ (Map) {id="map"}
 
-マップは項目をキーと値のペア（key-value pairs）として保存します。キーを参照することで値にアクセスします。マップは食べ物のメニューのようなものだと想像してください。食べたい料理（キー）を見つけることで、その価格（値）を知ることができます。マップは、リストのように番号付きのインデックスを使用せずに、特定の値を検索したい場合に便利です。
+マップはアイテムをキーと値のペアとして格納します。キーを参照することで値にアクセスします。マップはフードメニューのようなものとしてイメージできます。食べたい料理（キー）を探すことで、価格（値）を見つけることができます。マップは、リストのように番号付きのインデックスを使用せずに値を検索したい場合に便利です。
 
-> * マップ内のすべてのキーは一意である必要があります。これにより、Kotlinは取得したい値を正しく特定できます。
-> * マップ内で値を重複させることは可能です。
+> * Kotlinがどの値を取得したいのかを判断できるように、マップ内の各キーは一意である必要があります。
+> * マップ内で重複した値を持つことは可能です。
 >
 {style="note"}
 
-読み取り専用マップ ([`Map`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/)) を作成するには、
-[`mapOf()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/map-of.html) 関数を使用します。
+読み取り専用マップ（[`Map`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/)）を作成するには、[`mapOf()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/map-of.html) 関数を使用します。
 
-可変マップ ([`MutableMap`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-map/)) を作成するには、
-[`mutableMapOf()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/mutable-map-of.html) 関数を使用します。
+可変マップ（[`MutableMap`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-map/)）を作成するには、[`mutableMapOf()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/mutable-map-of.html) 関数を使用します。
 
-マップを作成する際、Kotlinは保存されている項目の型を推論できます。型を明示的に宣言するには、マップ宣言の後の山括弧 `<>` 内にキーと値の型を追加します。例えば、`MutableMap<String, Int>` のようになります。キーの型は `String` で、値の型は `Int` です。
+マップを作成する際、Kotlinは格納されるアイテムの型を推論できます。型を明示的に宣言するには、マップ宣言の後に山括弧 `<>` でキーと値の型を指定します。例えば `MutableMap<String, Int>` の場合、キーの型は `String` で、値の型は `Int` です。
 
-マップを作成する最も簡単な方法は、各キーとそれに関連する値の間に [`to`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/to.html) を使用することです：
+マップを作成する最も簡単な方法は、各キーとそれに対応する値の間に [`to`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/to.html) を使用することです：
 
 ```kotlin
 fun main() {
@@ -249,7 +236,7 @@ fun main() {
     println(readOnlyJuiceMenu)
     // {apple=100, kiwi=190, orange=100}
 
-    // 明示的な型宣言を伴う可変マップ
+    // 明示的な型宣言を持つ可変マップ
     val juiceMenu: MutableMap<String, Int> = mutableMapOf("apple" to 100, "kiwi" to 190, "orange" to 100)
     println(juiceMenu)
     // {apple=100, kiwi=190, orange=100}
@@ -258,7 +245,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-maps-declaration"}
 
-> 不要な変更を防ぐために、可変マップを `Map` に代入することで、読み取り専用のビューを作成できます：
+> 意図しない変更を防ぐため、可変マップを `Map` に代入することで、読み取り専用のビューを作成できます：
 > 
 > ```kotlin
 >     val juiceMenu: MutableMap<String, Int> = mutableMapOf("apple" to 100, "kiwi" to 190, "orange" to 100)
@@ -267,7 +254,7 @@ fun main() {
 >
 {style="tip"}
 
-マップ内の値にアクセスするには、[インデックスアクセス演算子](operator-overloading.md#indexed-access-operator) `[]` にキーを指定して使用します：
+マップ内の値にアクセスするには、そのキーを指定して[インデックスアクセス演算子](operator-overloading.md#indexed-access-operator) `[]` を使用します：
 
 ```kotlin
 fun main() {
@@ -281,7 +268,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-map-access"}
 
-> マップに存在しないキーでアクセスしようとすると、`null` 値が返されます：
+> マップ内に存在しないキーでキーと値のペアにアクセスしようとすると、`null` 値が返されます：
 >
 > ```kotlin
 > fun main() {
@@ -295,17 +282,17 @@ fun main() {
 > ```
 > {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-map-no-key" validate="false"}
 > 
-> このツアーでは、後半の [Null安全](kotlin-tour-null-safety.md) の章で null 値について説明します。
+> 本ツアーでは、null値について後ほど[Null安全](kotlin-tour-null-safety.md)の章で説明します。
 > 
 {style="note"}
 
-[インデックスアクセス演算子](operator-overloading.md#indexed-access-operator) `[]` を使用して、可変マップに項目を追加することもできます：
+可変マップにアイテムを追加する場合も、[インデックスアクセス演算子](operator-overloading.md#indexed-access-operator) `[]` を使用できます：
 
 ```kotlin
 fun main() {
 //sampleStart
     val juiceMenu: MutableMap<String, Int> = mutableMapOf("apple" to 100, "kiwi" to 190, "orange" to 100)
-    juiceMenu["coconut"] = 150 // キー "coconut"、値 150 をマップに追加
+    juiceMenu["coconut"] = 150 // キー "coconut" と値 150 をマップに追加
     println(juiceMenu)
     // {apple=100, kiwi=190, orange=100, coconut=150}
 //sampleEnd
@@ -313,13 +300,13 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-map-add-item"}
 
-可変マップから項目を削除するには、[`.remove()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/remove.html) 関数を使用します：
+可変マップからアイテムを削除するには、[`.remove()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/remove.html) 関数を使用します：
 
 ```kotlin
 fun main() {
 //sampleStart
     val juiceMenu: MutableMap<String, Int> = mutableMapOf("apple" to 100, "kiwi" to 190, "orange" to 100)
-    juiceMenu.remove("orange")    // マップからキー "orange" を削除
+    juiceMenu.remove("orange")    // キー "orange" をマップから削除
     println(juiceMenu)
     // {apple=100, kiwi=190}
 //sampleEnd
@@ -327,8 +314,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-map-put-remove"}
 
-マップ内の項目数を取得するには、[`.count()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/count.html)
-関数を使用します：
+マップ内のアイテム数を取得するには、[`.count()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/count.html) 関数を使用します：
 
 ```kotlin
 fun main() {
@@ -342,8 +328,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-map-count"}
 
-特定のキーが既にマップに含まれているか確認するには、[`.containsKey()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/contains-key.html)
-関数を使用します：
+特定のキーがすでにマップに含まれているか確認するには、[`.containsKey()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/contains-key.html) 関数を使用します：
 
 ```kotlin
 fun main() {
@@ -356,8 +341,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-map-contains-keys"}
 
-マップのキーまたは値のコレクションを取得するには、それぞれ [`keys`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/keys.html)
-および [`values`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/values.html) プロパティを使用します：
+マップのキーまたは値のコレクションを取得するには、それぞれ [`keys`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/keys.html) および [`values`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/values.html) プロパティを使用します：
 
 ```kotlin
 fun main() {
@@ -372,11 +356,9 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-map-keys-values"}
 
-> [`keys`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/keys.html) と [`values`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/values.html)
-> はオブジェクトの**プロパティ**の例です。オブジェクトのプロパティにアクセスするには、オブジェクトの後にピリオド `.` を付けてプロパティ名を書きます。
+> [`keys`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/keys.html) および [`values`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/values.html) はオブジェクトの**プロパティ**（properties）の例です。オブジェクトのプロパティにアクセスするには、オブジェクトの後にピリオド `.` を付け、その後に続けてプロパティ名を書きます。
 >
-> プロパティについては、[クラス](kotlin-tour-classes.md)の章で詳しく説明します。
-> 現時点では、それらにアクセスする方法を知っておくだけで十分です。
+> プロパティについては、[クラス](kotlin-tour-classes.md)の章で詳しく説明します。現時点では、アクセス方法を知っておくだけで十分です。
 >
 {style="note"}
 
@@ -389,7 +371,7 @@ fun main() {
     println("orange" in readOnlyJuiceMenu.keys)
     // true
     
-    // 代わりに、keys プロパティを使用しなくても確認できます
+    // あるいは、keys プロパティを使用しなくても構いません
     println("orange" in readOnlyJuiceMenu)
     // true
     
@@ -400,27 +382,26 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-map-in"}
 
-コレクションでできることについての詳細は、[コレクション](collections-overview.md)を参照してください。
+コレクションでできることの詳細については、[コレクションの概要](collections-overview.md)を参照してください。
 
-基本型とコレクションの管理方法について学んだので、次はプログラムで使用できる [制御フロー](kotlin-tour-control-flow.md) について見ていきましょう。
+基本型とコレクションの扱い方を学んだので、次はプログラムで使用できる[制御フロー](kotlin-tour-control-flow.md)について見ていきましょう。
 
 ## 練習問題 {completion-point="true" id="practice"}
 
-### 演習 1 {initial-collapse-state="collapsed" collapsible="true" id="exercise-1"}
+<deflist appearance="clear" collapsible="true" numbered="true">
+<def title="2つのリスト内のアイテムの総数を数える">
 
-「緑」の番号のリストと「赤」の番号のリストがあります。合計でいくつの番号があるかを出力するようにコードを完成させてください。
+「緑」の数値のリストと「赤」の数値のリストがあります。合計でいくつの数値があるかを出力するようにコードを完成させてください。
 
-|---|---|
 ```kotlin
 fun main() {
     val greenNumbers = listOf(1, 4, 23)
     val redNumbers = listOf(17, 2)
-    // ここにコードを書いてください
+    // ここにコードを記述してください
 }
 ```
 {validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-collections-exercise-1"}
 
-|---|---|
 ```kotlin
 fun main() {
     val greenNumbers = listOf(1, 4, 23)
@@ -431,16 +412,16 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="解答例" id="kotlin-tour-collections-solution-1"}
 
-### 演習 2 {initial-collapse-state="collapsed" collapsible="true" id="exercise-2"}
+</def>
+<def title="要求されたプロトコルがサポートされているか確認する">
 
-サーバーでサポートされているプロトコルのセットがあります。ユーザーが特定のプロトコルの使用をリクエストします。リクエストされたプロトコルがサポートされているかどうかを確認するプログラムを完成させてください（`isSupported` は Boolean 値である必要があります）。
+サーバーでサポートされているプロトコルのセットがあります。ユーザーが特定のプロトコルの使用を要求しました。要求されたプロトコルがサポートされているかどうかを確認するプログラムを完成させてください（`isSupported` は Boolean 値である必要があります）。
 
-|---|---|
 ```kotlin
 fun main() {
     val SUPPORTED = setOf("HTTP", "HTTPS", "FTP")
     val requested = "smtp"
-    val isSupported = // ここにコードを書いてください 
+    val isSupported = // ここにコードを記述してください 
     println("Support for $requested: $isSupported")
 }
 ```
@@ -448,12 +429,10 @@ fun main() {
 
 <deflist collapsible="true" id="kotlin-tour-collections-exercise-2-hint">
     <def title="ヒント">
-        リクエストされたプロトコルを大文字にして確認するようにしてください。これには <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.text/uppercase.html"><code>.uppercase()</code></a>
-関数が役立ちます。
+        要求されたプロトコルが大文字になっているか確認してください。これには <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.text/uppercase.html"><code>.uppercase()</code></a> 関数を活用できます。
     </def>
 </deflist>
 
-|---|---|
 ```kotlin
 fun main() {
     val SUPPORTED = setOf("HTTP", "HTTPS", "FTP")
@@ -464,21 +443,20 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="解答例" id="kotlin-tour-collections-solution-2"}
 
-### 演習 3 {initial-collapse-state="collapsed" collapsible="true" id="exercise-3"}
+</def>
+<def title="マップを使用して数値を単語で表記する">
 
-1から3までの整数を、対応する英語の綴りに関連付けるマップを定義してください。このマップを使用して、与えられた数値を綴ってください。
+1から3までの整数とそれに対応するスペルを関連付けるマップを定義してください。このマップを使用して、指定された数値をスペルアウト（英単語で出力）してください。
 
-|---|---|
 ```kotlin
 fun main() {
-    val number2word = // ここにコードを書いてください
+    val number2word = // ここにコードを記述してください
     val n = 2
-    println("$n is spelled as '${<ここにコードを書いてください >}'")
+    println("$n is spelled as '${<Write your code here >}'")
 }
 ```
 {validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-collections-exercise-3"}
 
-|---|---|
 ```kotlin
 fun main() {
     val number2word = mapOf(1 to "one", 2 to "two", 3 to "three")
@@ -487,6 +465,9 @@ fun main() {
 }
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="解答例" id="kotlin-tour-collections-solution-3"}
+
+</def>
+</deflist>
 
 <seealso></seealso>
 

@@ -1,79 +1,84 @@
-[//]: # (title: AndroidアプリケーションをiOSで動作させる – チュートリアル)
+[//]: # (title: Android アプリケーションを iOS で動作させる – チュートリアル)
 
 <secondary-label ref="Android Studio"/>
 
-このチュートリアルでは、既存のAndroidアプリケーションをクロスプラットフォーム化し、AndroidとiOSの両方で動作させる方法を説明します。AndroidとiOSの両方のコードを、同じ場所で一度に記述できるようになります。
+このチュートリアルでは、既存の Android アプリケーションをクロスプラットフォーム化し、Android と iOS の両方で動作させる方法を説明します。
+Android と iOS の両方のコードを一度に、同じ場所で記述できるようになります。
 
-このチュートリアルでは、ユーザー名とパスワードを入力するためのシングルスクリーンの[サンプルAndroidアプリケーション](https://github.com/Kotlin/kmp-integration-sample)を使用します。認証情報は検証され、メモリ内データベースに保存されます。
+このチュートリアルでは、ユーザー名とパスワードを入力するための単一画面を持つ [サンプル Android アプリケーション](https://github.com/Kotlin/kmp-integration-sample) を使用します。入力された認証情報は検証され、インメモリデータベースに保存されます。
 
-アプリケーションをiOSとAndroidの両方で動作させるために、まず一部のコードを共有モジュール（shared module）に移動して、コードをクロスプラットフォーム化します。その後、そのクロスプラットフォームコードをAndroidアプリケーションで使用し、次に同じコードを新しいiOSアプリケーションで使用します。
+アプリケーションを iOS と Android の両方で動作させるには、まず一部のコードを共有モジュール（shared module）に移動してコードをクロスプラットフォーム化します。
+その後、クロスプラットフォーム化したコードを Android アプリケーションで使用し、さらに同じコードを新しい iOS アプリケーションでも使用します。
 
-> Kotlinマルチプラットフォームに詳しくない場合は、まず[クロスプラットフォームアプリケーションをゼロから作成する](quickstart.md)方法を学習してください。
+> Kotlin Multiplatform にまだ慣れていない場合は、まず [クロスプラットフォームアプリケーションをゼロから作成する](quickstart.md) 方法をご覧ください。
 >
 {style="tip"}
 
 ## 開発環境の準備 {id="prepare-an-environment-for-development"}
 
-1. クイックスタートの指示に従い、[Kotlinマルチプラットフォーム開発のための環境構築](quickstart.md#set-up-the-environment)を完了させてください。
+1. クイックスタートの指示に従って、[Kotlin Multiplatform 開発用の環境をセットアップ](quickstart.md#set-up-the-environment) します。
 
-   > iOSアプリケーションの実行など、このチュートリアルの特定のステップを完了するには、macOSを搭載したMacが必要です。これはAppleの要件によるものです。
+   > iOS アプリケーションの実行など、このチュートリアルの特定の手順を完了するには macOS を搭載した Mac が必要です。
+   > これは Apple の要件によるものです。
    >
    {style="note"}
 
-2. Android Studioで、バージョン管理から新しいプロジェクトを作成します：
+2. Android Studio で、バージョン管理から新しいプロジェクトを作成します：
 
    ```text
    https://github.com/Kotlin/kmp-integration-sample
    ```
 
-   `master` ブランチにはプロジェクトの初期状態（シンプルなAndroidアプリケーション）が含まれています。iOSアプリケーションと共有モジュールを含む最終的な状態を確認するには、`final` ブランチに切り替えてください。
+   `master` ブランチにはプロジェクトの初期状態（シンプルな Android アプリケーション）が含まれています。
+   iOS アプリケーションと共有モジュールを含む最終状態を確認するには、`final` ブランチに切り替えてください。
    
 3. **Project** ビューに切り替えます：
 
-   ![Project view](switch-to-project.png){width="513"}
+   ![Project ビュー](switch-to-project.png){width="513"}
 
-## コードをクロスプラットフォーム化する {id="make-your-code-cross-platform"}
+## コードのクロスプラットフォーム化 {id="make-your-code-cross-platform"}
 
-コードをクロスプラットフォーム化するために、以下の手順に従います：
+コードをクロスプラットフォーム化するには、以下の手順に従います：
 
-1. [どのコードをクロスプラットフォーム化するか決定する](#decide-what-code-to-make-cross-platform)
-2. [クロスプラットフォームコード用の共有モジュールを作成する](#create-a-shared-module-for-cross-platform-code)
-3. [コード共有をテストする](#add-code-to-the-shared-module)
-4. [Androidアプリケーションに共有モジュールへの依存関係を追加する](#add-a-dependency-on-the-shared-module-to-your-android-application)
-5. [ビジネスロジックをクロスプラットフォーム化する](#make-the-business-logic-cross-platform)
-6. [Androidでクロスプラットフォームアプリケーションを実行する](#run-your-cross-platform-application-on-android)
+1. [クロスプラットフォーム化するコードの決定](#decide-what-code-to-make-cross-platform)
+2. [クロスプラットフォームコード用の共有モジュールの作成](#create-a-shared-module-for-cross-platform-code)
+3. [コード共有のテスト](#add-code-to-the-shared-module)
+4. [Android アプリケーションに共有モジュールへの依存関係を追加](#add-a-dependency-on-the-shared-module-to-your-android-application)
+5. [ビジネスロジックのクロスプラットフォーム化](#make-the-business-logic-cross-platform)
+6. [Android でクロスプラットフォームアプリケーションを実行](#run-your-cross-platform-application-on-android)
 
-### どのコードをクロスプラットフォーム化するか決定する {id="decide-what-code-to-make-cross-platform"}
+### クロスプラットフォーム化するコードの決定 {id="decide-what-code-to-make-cross-platform"}
 
-AndroidアプリケーションのどのコードをiOSと共有し、どのコードをネイティブのままにするかを決定します。シンプルなルールは、できるだけ再利用したいものを共有することです。ビジネスロジックはAndroidとiOSの両方で同じであることが多いため、再利用の絶好の候補です。
+Android アプリケーションのどのコードを iOS と共有し、どのコードをネイティブのまま残すかを決定します。シンプルなルールとして、「可能な限り再利用したいものを共有する」というものがあります。ビジネスロジックは Android と iOS の両方で同じであることが多いため、再利用に最適な候補です。
 
-サンプルAndroidアプリケーションでは、ビジネスロジックは `com.jetbrains.simplelogin.androidapp.data` パッケージに保存されています。将来のiOSアプリケーションでも同じロジックを使用するため、これもクロスプラットフォーム化する必要があります。
+サンプルの Android アプリケーションでは、ビジネスロジックは `com.jetbrains.simplelogin.androidapp.data` パッケージに格納されています。今後作成する iOS アプリケーションでも同じロジックを使用するため、これもクロスプラットフォーム化する必要があります。
 
-![Business logic to share](business-logic-to-share.png){width=366}
+![共有するビジネスロジック](business-logic-to-share.png){width=366}
 
-### クロスプラットフォームコード用の共有モジュールを作成する {id="create-a-shared-module-for-cross-platform-code"}
+### クロスプラットフォームコード用の共有モジュールの作成 {id="create-a-shared-module-for-cross-platform-code"}
 
-iOSとAndroidの両方で使用されるクロスプラットフォームコードは、共有（shared）モジュールに保存されます。Android StudioとIntelliJ IDEAはどちらも、Kotlinマルチプラットフォーム用の共有モジュールを作成するためのウィザードを提供しています。
+iOS と Android の両方で使用されるクロスプラットフォームコードは、共有モジュールに格納されます。
+Android Studio と IntelliJ IDEA の両方に、Kotlin Multiplatform 用の共有モジュールを作成するためのウィザードが用意されています。
 
-既存のAndroidアプリケーションと将来のiOSアプリケーションの両方に接続するための共有モジュールを作成します：
+既存の Android アプリケーションと今後作成する iOS アプリケーションの両方に接続するための共有モジュールを作成します：
 
-1. Android Studioで、メインメニューから **File** | **New** | **New Module** を選択します。
-2. テンプレートのリストから **Kotlin Multiplatform Shared Module** を選択します。
-   ライブラリ名は `shared` のままにし、パッケージ名を入力します：
+1. Android Studio で、メインメニューから **File** | **New** | **New Module** を選択します。
+2. テンプレートの一覧から **Kotlin Multiplatform Shared Module** を選択します。
+   モジュール名は `shared` のままにし、パッケージ名を入力します：
    
    ```text
    com.jetbrains.simplelogin.shared
    ```
    
-3. **Finish** をクリックします。ウィザードが共有モジュールを作成し、それに応じてビルドスクリプトを変更し、Gradleの同期を開始します。
-4. 同期が完了するまで待ちます。
-   `shared` ディレクトリに以下のファイル構造が表示されます：
+3. **Finish** をクリックします。ウィザードによって共有モジュールが作成され、それに応じてビルドスクリプトが変更され、Gradle の同期（sync）が開始されます。
+4. 同期が完了するのを待ちます。
+   `shared` ディレクトリ内に以下のようなファイル構造が表示されます：
 
-   ![Final file structure inside the shared directory](shared-directory-structure.png){width="341"}
+   ![shared ディレクトリ内の最終的なファイル構造](shared-directory-structure.png){width="341"}
 
-   作成されたプロジェクトのレイアウトをより詳しく理解したい場合は、[Kotlinマルチプラットフォームプロジェクト構造の基本](multiplatform-discover-project.md)を参照してください。
+   生成されたプロジェクトのレイアウトをより詳しく理解したい場合は、[Kotlin Multiplatform プロジェクト構造の基本](multiplatform-discover-project.md) を参照してください。
 
-5. `shared` モジュールはAndroidアプリケーションのライブラリとして使用されるため、`shared/build.gradle.kts` の `kotlin.android {}` ブロックを以下の `androidLibrary {}` ブロックに置き換えます：
+5. `shared` モジュールは Android アプリケーションのライブラリとして使用されるため、`shared/build.gradle.kts` 内の `kotlin.android {}` ブロックを以下の `androidLibrary {}` ブロックに置き換えます：
 
     ```kotlin
     import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -103,11 +108,11 @@ iOSとAndroidの両方で使用されるクロスプラットフォームコー�
     }
     ```
    
-### 共有モジュールにコードを追加する {id="add-code-to-the-shared-module"}
+### 共有モジュールへのコードの追加 {id="add-code-to-the-shared-module"}
 
-共有モジュールが作成されたので、`shared/src/commonMain/kotlin/com.jetbrains.simplelogin.shared` ディレクトリに共有される共通コードを追加します：
+共有モジュールが作成できたので、`shared/src/commonMain/kotlin/com.jetbrains.simplelogin.shared` ディレクトリに共有する共通コードを追加します：
 
-1. 以下のコードで新しい `Greeting` クラスを作成します：
+1. 以下のコードを含む新しい `Greeting` クラスを作成します：
 
     ```kotlin
     package com.jetbrains.simplelogin.shared
@@ -121,7 +126,7 @@ iOSとAndroidの両方で使用されるクロスプラットフォームコー�
     }
     ```
 
-2. 既存のファイルのコードを以下のように置き換えます：
+2. 既存のファイル内のコードを以下のように置き換えます：
 
      * `commonMain/Platform.kt` 内：
 
@@ -162,11 +167,11 @@ iOSとAndroidの両方で使用されるクロスプラットフォームコー�
          actual fun getPlatform(): Platform = IOSPlatform()
          ```
 
-これで、プラットフォーム名をプロパティとして持つプラットフォーム固有のオブジェクトを返す共通の `getPlatform()` 関数が作成されました。
+これで、プラットフォーム名をプロパティとして持つプラットフォーム固有のオブジェクトを返す共通の `getPlatform()` 関数が用意できました。
 
-### Androidアプリケーションに共有モジュールへの依存関係を追加する {id="add-a-dependency-on-the-shared-module-to-your-android-application"}
+### Android アプリケーションに共有モジュールへの依存関係を追加 {id="add-a-dependency-on-the-shared-module-to-your-android-application"}
 
-Androidアプリケーションでクロスプラットフォームコードを使用するには、共有モジュールをアプリケーションに接続し、ビジネスロジックコードをそこに移動して、そのコードをクロスプラットフォーム化します。
+Android アプリケーションでクロスプラットフォームコードを使用するには、共有モジュールを接続し、ビジネスロジックコードをそこに移動して、そのコードをクロスプラットフォーム化します。
 
 1. `app/build.gradle.kts` ファイルに共有モジュールへの依存関係を追加します：
 
@@ -177,8 +182,8 @@ Androidアプリケーションでクロスプラットフォームコードを�
     }
     ```
 
-2. IDEの提案に従うか、**File** | **Sync Project with Gradle Files** メニュー項目を使用してGradleファイルを同期します。
-3. `app/src/main/java/` ディレクトリの `com.jetbrains.simplelogin.androidapp.ui.login` パッケージにある `LoginActivity.kt` ファイルを開きます。
+2. IDE のプロンプトに従うか、**File** | **Sync Project with Gradle Files** メニュー項目を使用して Gradle ファイルを同期します。
+3. `app/src/main/java/` ディレクトリで、`com.jetbrains.simplelogin.androidapp.ui.login` パッケージ内の `LoginActivity.kt` ファイルを開きます。
 4. 共有モジュールがアプリケーションに正常に接続されていることを確認するために、`onCreate()` メソッドに `Log.i()` 呼び出しを追加して `greet()` 関数の結果をログに出力します：
 
     ```kotlin
@@ -191,46 +196,47 @@ Androidアプリケーションでクロスプラットフォームコードを�
         // ...
     }
     ```
-5. IDEの提案に従って、不足しているクラスをインポートします。
-6. ツールバーで、実行構成ドロップダウンの隣にあるデバッグアイコンをクリックします：
+5. IDE の提案に従って、不足しているクラスをインポートします。
+6. ツールバーで、実行構成ドロップダウンの横にあるデバッグアイコンをクリックします：
 
-   ![App from list to debug](app-list-android.png){width="300"}
+   ![デバッグするリストからのアプリ](app-list-android.png){width="300"}
 
-7. **Logcat** ツールウィンドウで、ログから "Hello" を検索すると、共有モジュールからの挨拶が見つかります：
+7. **Logcat** ツールウィンドウでログ内の「Hello」を検索すると、共有モジュールからの挨拶が表示されます：
 
-   ![Greeting from the shared module](shared-module-greeting.png){width="700"}
+   ![共有モジュールからの挨拶](shared-module-greeting.png){width="700"}
 
-### ビジネスロジックをクロスプラットフォーム化する {id="make-the-business-logic-cross-platform"}
+### ビジネスロジックのクロスプラットフォーム化 {id="make-the-business-logic-cross-platform"}
 
-これで、ビジネスロジックコードをKotlinマルチプラットフォームの共有モジュールの `commonMain` ソースセットに抽出できます。これにより、AndroidとiOSの両方でコードを使用できるようになります。
+これで、ビジネスロジックコードを Kotlin Multiplatform 共有モジュールの `commonMain` ソースセットに抽出できるようになりました。
+これにより、Android と iOS の両方でコードを使用できるようになります。
 
-1. ビジネスロジックコード `com.jetbrains.simplelogin.androidapp.data` を `app` ディレクトリから `shared/src/commonMain` ディレクトリの `com.jetbrains.simplelogin.shared` パッケージに移動します。
+1. ビジネスロジックコード `com.jetbrains.simplelogin.androidapp.data` を `app` ディレクトリから `shared/src/commonMain` ディレクトリの `com.jetbrains.simplelogin.shared` パッケージへ移動します。
 
-   ![Drag and drop the package with the business logic code](moving-business-logic.png){width=300}
+   ![ビジネスロジックコードを含むパッケージをドラッグ＆ドロップ](moving-business-logic.png){width=300}
 
-2. Android Studioで実行内容を確認されたら、パッケージの移動を選択し、リファクタリングを承認します。
+2. Android Studio からどのような処理を行うか尋ねられたら、パッケージの移動を選択し、リファクタリングを承認します。
 
-   ![Refactor the business logic package](refactor-business-logic-package.png){width=300}
+   ![ビジネスロジックパッケージのリファクタリング](refactor-business-logic-package.png){width=300}
 
-3. プラットフォーム依存のコードに関する警告はすべて無視し、**Refactor Anyway** をクリックします。
+3. プラットフォーム依存のコードに関するすべての警告を無視し、**Refactor Anyway** をクリックします。
 
-   ![Warnings about platform-dependent code](warnings-android-specific-code.png){width=450}
+   ![プラットフォーム依存コードに関する警告](warnings-android-specific-code.png){width=450}
 
-4. Android固有のコードをクロスプラットフォームのKotlinコードに置き換えるか、[期待される宣言と実際の宣言（expected and actual declarations）](multiplatform-connect-to-apis.md)を使用してAndroid固有のAPIに接続することで、Android固有のコードを削除します。詳細は以下のセクションを参照してください：
+4. Android 固有のコードをクロスプラットフォームの Kotlin コードに置き換えるか、[expect/actual 宣言](multiplatform-connect-to-apis.md) を使用して Android 固有の API に接続することで、Android 固有のコードを削除します。詳細については以下のセクションを参照してください：
 
-   #### Android固有のコードをクロスプラットフォームコードに置き換える {initial-collapse-state="collapsed" collapsible="true" id="replace-android-specific-code-with-cross-platform-code"}
+   #### Android 固有のコードをクロスプラットフォームコードに置き換える {initial-collapse-state="collapsed" collapsible="true" id="replace-android-specific-code-with-cross-platform-code"}
    
-   AndroidとiOSの両方でコードが適切に動作するように、移動した `data` ディレクトリ内の可能な限りすべての場所で、JVMの依存関係をKotlinの依存関係に置き換えます。
+   コードが Android と iOS の両方で適切に動作するように、移動した `data` ディレクトリ内のすべての JVM 依存関係を可能な限り Kotlin の依存関係に置き換えます。
 
-   1. `LoginDataValidator` クラスで、`android.utils` パッケージの `Patterns` クラスを、メール検証のパターンに一致するKotlinの正規表現に置き換えます：
+   1. `LoginDataValidator` クラスで、`android.utils` パッケージの `Patterns` クラスを、メール検証用のパターンに一致する Kotlin の正規表現に置き換えます：
    
        ```kotlin
-       // Before
+       // 変更前
        private fun isEmailValid(email: String) = Patterns.EMAIL_ADDRESS.matcher(email).matches()
        ```
    
        ```kotlin
-       // After
+       // 変更後
        private fun isEmailValid(email: String) = emailRegex.matches(email)
        
        companion object {
@@ -245,49 +251,51 @@ Androidアプリケーションでクロスプラットフォームコードを�
        }
        ```
    
-   2. `Patterns` クラスのインポート文を削除します：
+   2. `Patterns` クラスのインポートディレクティブを削除します：
    
        ```kotlin
        import android.util.Patterns
        ```
 
-   3. `LoginDataSource` クラスで、`login()` 関数の `IOException` を `RuntimeException` に置き換えます。`IOException` は Kotlin/JVM 以外では利用できません。
+   3. `LoginDataSource` クラスで、`login()` 関数内の `IOException` を `RuntimeException` に置き換えます。
+      `IOException` は Kotlin/JVM 以外では利用できません。
 
           ```kotlin
-          // Before
+          // 変更前
           return Result.Error(IOException("Error logging in", e))
           ```
 
           ```kotlin
-          // After
+          // 変更後
           return Result.Error(RuntimeException("Error logging in", e))
           ```
 
-   4. `IOException` のインポート文も削除します：
+   4. `IOException` のインポートディレクティブも同様に削除します：
 
        ```kotlin
        import java.io.IOException
        ```
 
-   #### プラットフォーム固有のUUID生成の実装 {initial-collapse-state="collapsed" collapsible="true" id="implement-platform-specific-uuid-generation"}
+   #### プラットフォーム固有の UUID 生成を実装する {initial-collapse-state="collapsed" collapsible="true" id="implement-platform-specific-uuid-generation"}
    
-   `LoginDataSource` クラスでは、`fakeUser` 用の汎用一意識別子（UUID）が `java.util.UUID` クラスを使用して生成されていますが、これはiOSでは利用できません。
+   `LoginDataSource` クラスでは、`fakeUser` の汎用一意識別子（UUID）が `java.util.UUID` クラスを使用して生成されていますが、これは iOS では利用できません。
    
    ```kotlin
    val fakeUser = LoggedInUser(java.util.UUID.randomUUID().toString(), "Jane Doe")
    ```
    
-   Kotlin標準ライブラリは[UUID生成用のクラス](https://kotlinlang.org/docs/uuids.html)を提供していますが、ここでは練習のためにプラットフォーム固有の機能を使用してみましょう。
+   Kotlin 標準ライブラリには [UUID 生成用のクラス](https://kotlinlang.org/docs/uuids.html) が用意されていますが、ここではプラットフォーム固有の機能の接続を練習するために、プラットフォーム固有の機能を使用してみましょう。
    
-   共有コードに `randomUUID()` 関数の `expect` 宣言を提供し、AndroidとiOSの各プラットフォームに対応するソースセットにその `actual` 実装を提供します。詳細は[プラットフォーム固有のAPIへの接続](multiplatform-connect-to-apis.md)で確認できます。
+   共有コードで `randomUUID()` 関数の `expect` 宣言を提供し、Android と iOS の各プラットフォームに対応するソースセットでその `actual` 実装を提供します。
+   詳細については、[プラットフォーム固有の API への接続](multiplatform-connect-to-apis.md) を参照してください。
    
-   1. `login()` 関数内の `java.util.UUID.randomUUID()` 呼び出しを、各プラットフォームで実装する `randomUUID()` 呼び出しに変更します：
+   1. `login()` 関数内の `java.util.UUID.randomUUID()` 呼び出しを、各プラットフォーム向けに実装する `randomUUID()` 呼び出しに変更します：
    
        ```kotlin
        val fakeUser = LoggedInUser(randomUUID(), "Jane Doe")
        ```
    
-   2. `shared/src/commonMain` ディレクトリの `com.jetbrains.simplelogin.shared` パッケージに `Utils.kt` ファイルを作成し、`expect` 宣言を記述します：
+   2. `shared/src/commonMain` ディレクトリの `com.jetbrains.simplelogin.shared` パッケージに `Utils.kt` ファイルを作成し、`expect` 宣言を提供します：
    
        ```kotlin
        package com.jetbrains.simplelogin.shared
@@ -295,7 +303,7 @@ Androidアプリケーションでクロスプラットフォームコードを�
        expect fun randomUUID(): String
        ```
    
-   3. `shared/src/androidMain` ディレクトリ의 `com.jetbrains.simplelogin.shared` パッケージに `Utils.android.kt` ファイルを作成し、Androidでの `randomUUID()` の `actual` 実装を記述します：
+   3. `shared/src/androidMain` ディレクトリの `com.jetbrains.simplelogin.shared` パッケージに `Utils.android.kt` ファイルを作成し、Android 向けの `randomUUID()` の `actual` 実装を提供します：
    
        ```kotlin
        package com.jetbrains.simplelogin.shared
@@ -305,7 +313,7 @@ Androidアプリケーションでクロスプラットフォームコードを�
        actual fun randomUUID() = UUID.randomUUID().toString()
        ```
    
-   4. `shared/src/iosMain` ディレクトリの `com.jetbrains.simplelogin.shared` パッケージに `Utils.ios.kt` ファイルを作成し、iOSでの `randomUUID()` の `actual` 実装を記述します：
+   4. `shared/src/iosMain` ディレクトリの `com.jetbrains.simplelogin.shared` パッケージに `Utils.ios.kt` ファイルを作成し、iOS 向けの `randomUUID()` の `actual` 実装を提供します：
    
        ```kotlin
        package com.jetbrains.simplelogin.shared
@@ -315,74 +323,74 @@ Androidアプリケーションでクロスプラットフォームコードを�
        actual fun randomUUID(): String = NSUUID().UUIDString()
        ```
    
-   5. `shared/src/commonMain` ディレクトリの `LoginDataSource.kt` ファイルで `randomUUID` 関数をインポートします：
+   5. `shared/src/commonMain` ディレクトリの `LoginDataSource.kt` ファイルに `randomUUID` 関数をインポートします：
    
       ```kotlin
       import com.jetbrains.simplelogin.shared.randomUUID
       ```
    
-これで、KotlinはAndroidとiOSでそれぞれのプラットフォーム固有のUUID実装を使用するようになります。
+これで、Kotlin は Android と iOS 向けにプラットフォーム固有の UUID 実装を使用するようになります。
 
-### Androidでクロスプラットフォームアプリケーションを実行する {id="run-your-cross-platform-application-on-android"}
+### Android でクロスプラットフォームアプリケーションを実行 {id="run-your-cross-platform-application-on-android"}
 
-`app` 実行構成を実行し、Androidアプリが以前と同じように動作することを確認します。
+`app` 実行構成を実行して、Android アプリが以前と同じように動作することを確認します。
 
-![Android login application](android-login.png){width=300}
+![Android ログインアプリケーション](android-login.png){width=300}
 
-## クロスプラットフォームアプリケーションをiOSで動作させる {id="make-your-cross-platform-application-work-on-ios"}
+## iOS でクロスプラットフォームアプリケーションを動作させる {id="make-your-cross-platform-application-work-on-ios"}
 
-Androidアプリケーションをクロスプラットフォーム化したら、iOSアプリケーションを作成し、その中で共有ビジネスロジックを再利用できます。
+Android アプリケーションをクロスプラットフォーム化したら、iOS アプリケーションを作成し、共有ビジネスロジックをその中で再利用できます。
 
-1. [XcodeでiOSプロジェクトを作成する](#create-an-ios-project-in-xcode)
-2. [KMPフレームワークを使用するようにiOSプロジェクトを設定する](#configure-the-ios-project-to-use-a-kmp-framework)
-3. [Android StudioでiOSの実行構成をセットアップする](#set-up-an-ios-run-configuration-in-android-studio)
-4. [iOSプロジェクトで共有モジュールを使用する](#use-the-shared-module-in-the-ios-project)
+1. [Xcode で iOS プロジェクトを作成](#create-an-ios-project-in-xcode)
+2. [KMP フレームワークを使用するように iOS プロジェクトを設定](#configure-the-ios-project-to-use-a-kmp-framework)
+3. [Android Studio で iOS の実行構成を設定](#set-up-an-ios-run-configuration-in-android-studio)
+4. [iOS プロジェクトで共有モジュールを使用](#use-the-shared-module-in-the-ios-project)
 
-### XcodeでiOSプロジェクトを作成する {id="create-an-ios-project-in-xcode"}
+### Xcode で iOS プロジェクトを作成 {id="create-an-ios-project-in-xcode"}
 
-1. Xcodeで、**File** | **New** | **Project** をクリックします。
-2. ダイアログで **iOS** タブに切り替えます：
+1. Xcode で、**File** | **New** | **Project** をクリックします。
+2. ダイアログで、**iOS** タブに切り替えます：
 
-   ![iOS project template](ios-project-wizard-1.png){width=700}
+   ![iOS プロジェクトテンプレート](ios-project-wizard-1.png){width=700}
 
 3. **App** テンプレートを選択し、**Next** をクリックします。
 
-4. プロダクト名として "simpleLoginIOS" を指定し、**Next** をクリックします。
+4. プロダクト名として「simpleLoginIOS」を指定し、**Next** をクリックします。
 
-   ![iOS project settings](ios-project-wizard-2.png){width=700}
+   ![iOS プロジェクト設定](ios-project-wizard-2.png){width=700}
 
-5. プロジェクトの保存場所として、クロスプラットフォームアプリケーションが保存されているディレクトリ（例：`kmp-integration-sample`）を選択します。
+5. プロジェクトの保存場所として、クロスプラットフォームアプリケーションを格納しているディレクトリ（例: `kmp-integration-sample`）を選択します。
 
-    Android Studioでは、以下の構造になります：
+    Android Studio では、以下のような構造になります：
     
-    ![iOS project in Android Studio](ios-project-in-as.png){width=194}
+    ![Android Studio 内の iOS プロジェクト](ios-project-in-as.png){width=194}
 
-6. クロスプラットフォームプロジェクトの他のトップレベルディレクトリとの一貫性を保つために、Xcodeを閉じてから `simpleLoginIOS` ディレクトリを `iosApp` にリネームします。
+6. クロスプラットフォームプロジェクトの他のトップレベルディレクトリとの一貫性を保つため、Xcode を閉じて、`simpleLoginIOS` ディレクトリの名前を `iosApp` に変更します。
 
-   > Xcodeを開いたままフォルダ名を変更すると、警告が表示されたり、プロジェクトが破損したりする可能性があります。
+   > Xcode を開いたままフォルダの名前を変更すると、警告が表示され、プロジェクトが破損する可能性があります。
    >
    {style="warning"}
 
-   ![Renamed iOS project directory in Android Studio](ios-directory-renamed-in-as.png){width=194}
+   ![Android Studio で名前を変更した iOS プロジェクトディレクトリ](ios-directory-renamed-in-as.png){width=194}
 
-### KMPフレームワークを使用するようにiOSプロジェクトを設定する {id="configure-the-ios-project-to-use-a-kmp-framework"}
+### KMP フレームワークを使用するように iOS プロジェクトを設定 {id="configure-the-ios-project-to-use-a-kmp-framework"}
 
-iOSアプリとKotlinマルチプラットフォームによってビルドされたフレームワーク間の統合を直接セットアップできます。
+iOS アプリと Kotlin Multiplatform によってビルドされたフレームワークとの連携を直接設定できます。
 
-> この方法の代替案（SwiftPM および CocoaPods）については、[iOS統合方法の概要](multiplatform-ios-integration-overview.md)で説明されています。
+> この方法の代替手段（SwiftPM および CocoaPods）については、[iOS 連携方法の概要](multiplatform-ios-integration-overview.md) で説明されています。
 > 
 {style="note"}
 
-1. Android Studioで `iosApp/simpleLoginIOS.xcodeproj` ディレクトリを右クリックし、**Open In** | **Open In Associated Application** を選択して、XcodeでiOSプロジェクトを開きます。
-2. Xcodeで、**Project** ナビゲーターのプロジェクト名をクリックして、iOSプロジェクトの設定を開きます。
+1. Android Studio で、`iosApp/simpleLoginIOS.xcodeproj` ディレクトリを右クリックし、**Open In** | **Open In Associated Application** を選択して Xcode で iOS プロジェクトを開きます。
+2. Xcode で、**Project** ナビゲータのプロジェクト名をクリックして iOS プロジェクト設定を開きます。
 
 3. 左側の **Targets** セクションで **simpleLoginIOS** を選択し、**Build Phases** タブをクリックします。
 
 4. **+** アイコンをクリックし、**New Run Script Phase** を選択します。
 
-    ![Add a run script phase](xcode-run-script-phase-1.png){width=700}
+    ![Run Script フェーズの追加](xcode-run-script-phase-1.png){width=700}
 
-5. 実行スクリプト（run script）フィールドに以下のスクリプトを貼り付けます：
+5. run script フィールドに以下のスクリプトを貼り付けます：
 
     ```bash
     if [ "YES" = "$OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED" ]; then
@@ -394,33 +402,36 @@ iOSアプリとKotlinマルチプラットフォームによってビルドさ�
     ```
 
 6. **Based on dependency analysis** オプションを無効にします。
-   これにより、Xcodeはビルドのたびにスクリプトを実行し、出力依存関係の欠落に関する警告が毎回出ないようになります。
+   これにより、Xcode がビルドのたびにスクリプトを実行するようになり、出力の依存関係の欠落に関する警告が毎回表示されるのを防ぎます。
 
-   ![Add the script](xcode-run-script-phase-2.png){width=700}
+   ![スクリプトの追加](xcode-run-script-phase-2.png){width=700}
 
-7. **Run Script** フェーズを上に移動し、**Compile Sources** フェーズの前に配置します：
+7. **Run Script** フェーズを上へ移動し、**Compile Sources** フェーズの前に配置します：
 
-   ![Move the Run Script phase](xcode-run-script-phase-3.png){width=700}
+   ![Run Script フェーズの移動](xcode-run-script-phase-3.png){width=700}
 
-8. **Build Settings** タブの **Build Options** で、**User Script Sandboxing** オプションを無効にします：
+8. **Build Settings** タブで、**Build Options** の下にある **User Script Sandboxing** オプションを無効にします：
 
    ![User Script Sandboxing](disable-sandboxing-in-xcode-project-settings.png){width=700}
 
-   > デフォルトの `Debug` または `Release` と異なるカスタムビルド構成を使用している場合は、**Build Settings** タブの **User-Defined** に `KOTLIN_FRAMEWORK_BUILD_TYPE` 設定を追加し、`Debug` または `Release` に設定してください。
+   > デフォルトの `Debug` や `Release` と異なるカスタムビルド構成を使用している場合は、**Build Settings** タブの **User-Defined** に `KOTLIN_FRAMEWORK_BUILD_TYPE` 設定を追加し、`Debug` または `Release` に設定してください。
    >
    {style="note"}
 
-9. **Info** タブで、カスタムの `CADisableMinimumFrameDurationOnPhone` プロパティを追加し、`YES` に設定して、iOSでの高リフレッシュレートを有効にします。
+9. **Info** タブで、カスタムの `CADisableMinimumFrameDurationOnPhone` プロパティを追加し、`YES` に設定して iOS での高リフレッシュレートを有効にします。
 
-10. **Signing & Capabilities** タブで、開発チームを選択するか、まだ作成していない場合は作成します。これにより、KMPモジュールによって生成された `shared` フレームワークの署名が可能になります。
+10. **Signing & Capabilities** タブで、開発チームを選択するか、まだ作成していない場合は作成します。
+    これにより、KMP モジュールによって生成された `shared` フレームワークの署名が有効になります。
 
-    また、ここで **Bundle Identifier** が一意の値に設定されていることを確認してください。そうでない場合、Xcodeでビルドが失敗する可能性があります。
+    ここでは、**Bundle Identifier** に一意の値が設定されていることも確認してください。そうしないと Xcode でビルドに失敗する可能性があります。
 
-11. Xcodeでプロジェクトをビルドします（メインメニューの **Product** | **Build**）。
-    すべてが正しく設定されていれば、プロジェクトのビルドに成功するはずです（「build phase will be run during every build」という警告は無視しても問題ありません）。
+11. Xcode でプロジェクトをビルドします（メインメニューの **Product** | **Build**）。
+    すべてが正しく設定されていれば、プロジェクトは正常にビルドされるはずです
+    （「build phase will be run during every build」という警告は無視しても問題ありません）。
    
-    > **User Script Sandboxing** オプションを無効にする前にプロジェクトをビルドした場合、ビルドが失敗することがあります。Gradleデーモンプロセスがサンドボックス化されている可能性があるため、再起動が必要です。
-    > プロジェクトディレクトリ（この例では `kmp-integration-sample`）で次のコマンドを実行して、プロジェクトを再度ビルドする前に停止させてください：
+    > **User Script Sandboxing** オプションを無効にする前にプロジェクトをビルドした場合、ビルドが失敗することがあります。
+    > Gradle デーモンプロセスがサンドボックス化されている可能性があるため、再起動が必要です。
+    > プロジェクトディレクトリ（この例では `kmp-integration-sample`）で次のコマンドを実行し、プロジェクトを再度ビルドする前にデーモンを停止してください：
     > 
     > ```shell
     > ./gradlew --stop
@@ -428,33 +439,33 @@ iOSアプリとKotlinマルチプラットフォームによってビルドさ�
     > 
     {style="note"}
 
-### Android StudioでiOSの実行構成をセットアップする {id="set-up-an-ios-run-configuration-in-android-studio"}
+### Android Studio で iOS の実行構成を設定 {id="set-up-an-ios-run-configuration-in-android-studio"}
 
-Xcodeが正しくセットアップされたことを確認したら、Android Studioに戻ります：
+Xcode のセットアップが正しく完了していることを確認したら、Android Studio に戻ります：
 
-1. メインメニューで **File | Sync Project with Gradle Files** を選択します。Android Studioは自動的に **simpleLoginIOS** という実行構成を生成します。
+1. メインメニューで **File | Sync Project with Gradle Files** を選択します。Android Studio は **simpleLoginIOS** という名前の実行構成を自動的に生成します。
 
-   Android Studioは自動的に **simpleLoginIOS** という実行構成を生成し、`iosApp` ディレクトリをリンクされたXcodeプロジェクトとしてマークします。
+   Android Studio は **simpleLoginIOS** という名前の実行構成を自動的に生成し、`iosApp` ディレクトリをリンクされた Xcode プロジェクトとしてマークします。
 
-2. 実行構成のリストから **simpleLoginIOS** を選択します。
-   iOSエミュレータを選択し、**Run** をクリックしてiOSの実行構成が正しく動作することを確認します。
+2. 実行構成のリストで **simpleLoginIOS** を選択します。
+   iOS エミュレータを選択し、**Run** をクリックして iOS 実行構成が正しく動作することを確認します。
 
-   ![The iOS run configuration in the list of run configurations](ios-run-configuration-simplelogin.png)
+   ![実行構成リスト内の iOS 実行構成](ios-run-configuration-simplelogin.png)
 
-### iOSプロジェクトで共有モジュールを使用する {id="use-the-shared-module-in-the-ios-project"}
+### iOS プロジェクトで共有モジュールを使用 {id="use-the-shared-module-in-the-ios-project"}
 
-`shared/build.gradle.kts` ファイルは、各iOSターゲットの `binaries.framework.baseName` プロパティを `sharedKit` として定義しています。
-これが、iOSアプリが利用するためにKotlinマルチプラットフォームがビルドするフレームワークの名前です。
+`shared/build.gradle.kts` ファイルでは、各 iOS ターゲットの `binaries.framework.baseName` プロパティが `sharedKit` として定義されています。
+これは、Kotlin Multiplatform が iOS アプリで使用するためにビルドするフレームワークの名前です。
 
-統合をテストするために、Swiftコードから共通コードへの呼び出しを追加します：
+連携をテストするために、Swift コードに共通コードへの呼び出しを追加します：
 
-1. Android Studioで `iosApp/simpleloginIOS/ContentView.swift` ファイルを開き、フレームワークをインポートします：
+1. Android Studio で `iosApp/simpleloginIOS/ContentView.swift` ファイルを開き、フレームワークをインポートします：
 
    ```swift
    import sharedKit
    ```
 
-2. 適切に接続されているか確認するために、`shared` モジュールの `greet()` 関数を使用するように `ContentView` 構造体のコードを更新します：
+2. 適切に接続されていることを確認するために、`ContentView` 構造体のコードを更新して `shared` モジュールの `greet()` 関数を使用するようにします：
 
    ```swift
    struct ContentView: View {
@@ -465,17 +476,17 @@ Xcodeが正しくセットアップされたことを確認したら、Android S
    }
    ```
 
-3. Android StudioのiOS実行構成を使用してアプリを実行し、結果を確認します：
+3. Android Studio の iOS 実行構成を使用してアプリを実行し、結果を確認します：
 
-   ![Greeting from the shared module](xcode-iphone-hello.png){width=300}
+   ![共有モジュールからの挨拶](xcode-iphone-hello.png){width=300}
 
-4. 共有モジュールのビジネスロジックを使用してアプリケーションUIをレンダリングするために、`ContentView.swift` ファイルのコードを再度更新します：
+4. `ContentView.swift` ファイルのコードを再度更新し、共有モジュールのビジネスロジックを使用してアプリケーション UI を描画します：
 
    ```kotlin
    
    ```
 
-5. `simpleLoginIOSApp.swift` ファイルで `sharedKit` モジュールをインポートし、`ContentView()` 関数の引数を指定します：
+5. `simpleLoginIOSApp.swift` ファイルで、`sharedKit` モジュールをインポートし、`ContentView()` 関数の引数を指定します：
 
     ```swift
     import SwiftUI
@@ -491,19 +502,19 @@ Xcodeが正しくセットアップされたことを確認したら、Android S
     }
     ```
 
-6. iOSの実行構成を再度実行し、iOSアプリにログインフォームが表示されることを確認します。
-7. ユーザー名に "Jane"、パスワードに "password" と入力します。
-8. [以前に統合をセットアップした](#configure-the-ios-project-to-use-a-kmp-framework)ため、iOSアプリは共通コードを使用して入力を検証します：
+6. iOS 実行構成を再度実行して、iOS アプリにログインフォームが表示されることを確認します。
+7. ユーザー名に「Jane」、パスワードに「password」と入力します。
+8. [先ほど連携を設定した](#configure-the-ios-project-to-use-a-kmp-framework) ため、iOS アプリは共通コードを使用して入力を検証します：
 
-   ![Simple login application](xcode-iphone-login.png){width=300}
+   ![シンプルなログインアプリケーション](xcode-iphone-login.png){width=300}
 
-## 結果を楽しむ – ロジックの更新は一度だけ {id="enjoy-the-results-update-the-logic-only-once"}
+## 結果の確認 – ロジックの更新は一度だけ {id="enjoy-the-results-update-the-logic-only-once"}
 
-これで、アプリケーションはクロスプラットフォームになりました。`shared` モジュールでビジネスロジックを更新すると、AndroidとiOSの両方で結果を確認できます。
+これでアプリケーションがクロスプラットフォーム化されました。`shared` モジュールのビジネスロジックを更新すれば、Android と iOS の両方でその結果を確認できます。
 
-1. ユーザーのパスワードの検証ロジックを変更します。"password" を有効なオプションにしないようにします。
-    そのためには、`LoginDataValidator` クラスの `checkPassword()` 関数を更新します
-    （すぐに見つけるには、<shortcut>Shift</shortcut> を2回押し、クラス名を入力して **Classes** タブに切り替えます）：
+1. ユーザーのパスワードの検証ロジックを変更します：「password」は無効なオプションとします。
+    これを行うには、`LoginDataValidator` クラスの `checkPassword()` 関数を更新します
+    （素早く見つけるには、<shortcut>Shift</shortcut> を2回押し、クラス名を貼り付けて **Classes** タブに切り替えます）：
 
    ```kotlin
    package com.jetbrains.simplelogin.shared.data
@@ -521,33 +532,33 @@ Xcodeが正しくセットアップされたことを確認したら、Android S
    }
    ```
 
-2. Android StudioからiOS and Androidの両方のアプリケーションを実行して、変更を確認します
-   （iOSのエラーメッセージは、赤い警告の三角形をタップすると表示されます）：
+2. Android Studio から iOS と Android の両方のアプリケーションを実行して変更を確認します
+   （iOS のエラーメッセージは、赤い警告三角形をタップすると表示されます）：
 
-   ![Android and iOS applications password error](android-iphone-password-error.png){width=600}
+   ![Android および iOS アプリケーションのパスワードエラー](android-iphone-password-error.png){width=600}
 
-このチュートリアルの[最終的なコード](https://github.com/Kotlin/kmp-integration-sample/tree/final)を確認できます。
+このチュートリアルの [最終的なコード](https://github.com/Kotlin/kmp-integration-sample/tree/final) を確認できます。
 
 ## 他に何を共有できるか？ {id="what-else-to-share"}
 
-アプリケーションのビジネスロジックを共有しましたが、アプリケーションの他のレイヤーを共有することも決定できます。
-たとえば、`ViewModel` クラスのコードは [Android](https://github.com/Kotlin/kmp-integration-sample/blob/final/app/src/main/java/com/jetbrains/simplelogin/androidapp/ui/login/LoginViewModel.kt) と [iOSアプリケーション](https://github.com/Kotlin/kmp-integration-sample/blob/final/iosApp/SimpleLoginIOS/ContentView.swift#L84) でほぼ同じであり、モバイルアプリケーションが同じプレゼンテーションレイヤーを持つ必要がある場合は、それを共有できます。
+ここではアプリケーションのビジネスロジックを共有しましたが、アプリケーションの他のレイヤーも共有することを検討できます。
+たとえば、`ViewModel` クラスのコードは [Android](https://github.com/Kotlin/kmp-integration-sample/blob/final/app/src/main/java/com/jetbrains/simplelogin/androidapp/ui/login/LoginViewModel.kt) と [iOS アプリケーション](https://github.com/Kotlin/kmp-integration-sample/blob/final/iosApp/SimpleLoginIOS/ContentView.swift#L84) でほぼ同じであり、モバイルアプリケーションで同一のプレゼンテーション層を持たせる必要がある場合は、これも共有することが可能です。
 
 ## 次のステップ {id="what-s-next"}
 
-Androidアプリケーションをクロスプラットフォーム化した後は、以下に進むことができます：
+Android アプリケーションをクロスプラットフォーム化したら、さらに以下のステップに進むことができます：
 
 * [マルチプラットフォームライブラリへの依存関係の追加](multiplatform-add-dependencies.md)
-* [Android依存関係の追加](multiplatform-android-dependencies.md)
-* [iOS依存関係の追加](multiplatform-ios-dependencies.md)
+* [Android 依存関係の追加](multiplatform-android-dependencies.md)
+* [iOS 依存関係の追加](multiplatform-ios-dependencies.md)
 
-Compose Multiplatformを使用して、すべてのプラットフォームで統合されたUIを作成できます：
+Compose Multiplatform を使用して、すべてのプラットフォームで統一された UI を作成できます：
 
-* [Compose MultiplatformとJetpack Composeについて学ぶ](compose-multiplatform-and-jetpack-compose.md)
-* [Compose Multiplatformで利用可能なリソースを探索する](compose-multiplatform-resources.md)
-* [共有ロジックとUIを備えたアプリを作成する](compose-multiplatform-create-first-app.md)
+* [Compose Multiplatform と Jetpack Compose について学ぶ](compose-multiplatform-and-jetpack-compose.md)
+* [Compose Multiplatform の利用可能なリソースを確認する](compose-multiplatform-resources.md)
+* [共有ロジックと UI を持つアプリを作成する](compose-multiplatform-new-project.md)
 
-コミュニティのリソースもチェックしてみてください：
+コミュニティリソースも確認できます：
 
-* [ビデオ: AndroidプロジェクトをKotlinマルチプラットフォームに移行する方法](https://www.youtube.com/watch?v=vb-Pt8SdfEE&t=1s)
-* [ビデオ: Kotlin JVMコードをKotlinマルチプラットフォームに対応させる3つの方法](https://www.youtube.com/watch?v=X6ckI1JWjqo)
+* [動画: Android プロジェクトを Kotlin Multiplatform に移行する方法](https://www.youtube.com/watch?v=vb-Pt8SdfEE&t=1s)
+* [動画: Kotlin JVM コードを Kotlin Multiplatform に対応させる3つの方法](https://www.youtube.com/watch?v=X6ckI1JWjqo)

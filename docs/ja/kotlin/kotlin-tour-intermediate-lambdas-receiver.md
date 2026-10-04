@@ -1,29 +1,29 @@
-[//]: # (title: レシーバ付きラムダ式)
+[//]: # (title: レシーバー付きラムダ式)
 
 <no-index/>
 
-この章では、別の種類の関数であるレシーバ付きラムダ式の使い方と、それがドメイン固有言語（DSL）の作成にどのように役立つかを学びます。
+この章では、別の種類の関数であるラムダ式でレシーバーを使用する方法と、それがドメイン固有言語（DSL: Domain-Specific Language）の作成にどのように役立つかを学びます。
 
-## レシーバ付きラムダ式 {id="lambda-expressions-with-receiver"}
+## レシーバー付きラムダ式 {id="lambda-expressions-with-receiver"}
 
-入門ツアーでは、[ラムダ式](kotlin-tour-functions.md#lambda-expressions)の使い方を学びました。ラムダ式にはレシーバを持たせることもできます。
-この場合、ラムダ式の中では、毎回明示的にレシーバを指定することなく、レシーバの任意のメンバ関数やプロパティにアクセスできます。これらの追加の参照が不要になることで、コードの可読性と保守性が向上します。
+入門ツアーでは、[ラムダ式](kotlin-tour-functions.md#lambda-expressions)の使い方を学びました。ラムダ式にはレシーバーを持たせることもできます。
+この場合、ラムダ式はその都度明示的にレシーバーを指定することなく、レシーバーのメンバー関数やプロパティにアクセスできます。これらの余分な参照を省くことで、コードが読みやすく、保守しやすくなります。
 
-> レシーバ付きラムダ式は、レシーバ付き関数リテラルとも呼ばれます。
+> レシーバー付きラムダ式は、レシーバー付き関数リテラル（function literals with receiver）とも呼ばれます。
 >
 {style="tip"}
 
-レシーバ付きラムダ式の構文は、関数型を定義する際に異なります。まず、拡張したいレシーバを記述します。次に `.` を置き、その後に残りの関数型の定義を続けます。例えば以下のようになります。
+レシーバー付きラムダ式の構文は、関数型を定義する際に異なります。まず、拡張したいレシーバーを記述します。次に `.` を置き、その後に通常の関数型定義を記述します。たとえば、以下のようになります。
 
 ```kotlin
 MutableList<Int>.() -> Unit
 ```
 
-この関数型の構成は以下の通りです。
+この関数型は以下を持っています。
 
-* `MutableList<Int>` がレシーバです。
-* 括弧 `()` 内に関数パラメータはありません。
-* 戻り値はありません（`Unit`）。
+* レシーバーとしての `MutableList<Int>`
+* 丸括弧 `()` 内に関数パラメーターなし
+* 戻り値なし: `Unit`
 
 キャンバスに図形を描画する以下の例を考えてみましょう。
 
@@ -33,10 +33,10 @@ class Canvas {
     fun drawSquare() = println("🟥 Drawing a square")
 }
 
-// レシーバ付きラムダ式の定義
+// レシーバー付きラムダ式の定義
 fun render(block: Canvas.() -> Unit): Canvas {
     val canvas = Canvas()
-    // レシーバ付きラムダ式を使用
+    // レシーバー付きラムダ式を使用
     canvas.block()
     return canvas
 }
@@ -52,20 +52,20 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-intermediate-tour-lambda-expression-with-receiver"}
 
-この例では：
+この例では以下のようになっています。
 
 * `Canvas` クラスには、円や正方形の描画をシミュレートする2つの関数があります。
-* `render()` 関数は `block` パラメータを受け取り、`Canvas` クラスのインスタンスを返します。
-* `block` パラメータはレシーバ付きラムダ式であり、`Canvas` クラスがレシーバとなっています。
-* `render()` 関数は `Canvas` クラスのインスタンスを作成し、その `canvas` インスタンスをレシーバとして `block()` ラムダ式を呼び出します。
-* `main()` 関数は、`block` パラメータに渡されるラムダ式を伴って `render()` 関数を呼び出します。
-* `render()` 関数に渡されたラムダ式の内部では、プログラムは `Canvas` クラスのインスタンスに対して `drawCircle()` と `drawSquare()` 関数を呼び出します。
+* `render()` 関数は `block` パラメーターを受け取り、`Canvas` クラスのインスタンスを返します。
+* `block` パラメーターはレシーバー付きラムダ式であり、`Canvas` クラスがそのレシーバーです。
+* `render()` 関数は `Canvas` クラスのインスタンスを作成し、その `canvas` インスタンスをレシーバーとして `block()` ラムダ式を呼び出します。
+* `main()` 関数はラムダ式を渡して `render()` 関数を呼び出し、それが `block` パラメーターに渡されます。
+* `render()` 関数に渡されたラムダの内部では、`Canvas` クラスのインスタンスに対して `drawCircle()` および `drawSquare()` 関数を呼び出しています。
 
-  `drawCircle()` と `drawSquare()` 関数はレシーバ付きラムダ式の中で呼び出されているため、あたかも `Canvas` クラスの内部にいるかのように直接呼び出すことができます。
+  `drawCircle()` 関数と `drawSquare()` 関数はレシーバー付きラムダ式の中で呼び出されているため、まるで `Canvas` クラスの内部にいるかのように直接呼び出すことができます。
 
-レシーバ付きラムダ式は、ドメイン固有言語（DSL）を作成したい場合に役立ちます。レシーバを明示的に参照することなくレシーバのメンバ関数やプロパティにアクセスできるため、コードがより簡潔になります。
+レシーバー付きラムダ式は、ドメイン固有言語（DSL）を作成したい場合に役立ちます。レシーバーを明示的に参照することなくレシーバーのメンバー関数やプロパティにアクセスできるため、コードをよりシンプルで簡潔にできます。
 
-これを実証するために、メニューの項目を設定する例を考えてみましょう。まず、`MenuItem` クラスと、メニューに項目を追加する `item()` 関数、および全メニュー項目のリスト `items` を持つ `Menu` クラスから始めます。
+これを説明するために、メニュー内の項目を設定する例を考えてみましょう。まず、`MenuItem` クラスと、メニューに項目を追加する `item()` 関数およびすべてのメニュー項目のリスト `items` を持つ `Menu` クラスから始めます。
 
 ```kotlin
 class MenuItem(val name: String)
@@ -79,19 +79,19 @@ class Menu(val name: String) {
 }
 ```
 
-メニューを構築する出発点として、関数パラメータ (`init`) として渡されたレシーバ付きラムダ式を使用する `menu()` 関数を使用します。
+まずはメニューを構築する `menu()` 関数に、関数パラメーター（`init`）として渡されるレシーバー付きラムダ式を使用してみましょう。
 
 ```kotlin
 fun menu(name: String, init: Menu.() -> Unit): Menu {
-    // Menuクラスのインスタンスを作成
+    // Menu クラスのインスタンスを作成
     val menu = Menu(name)
-    // クラスインスタンスに対してレシーバ付きラムダ式 init() を呼び出す
+    // クラスインスタンスに対してレシーバー付きラムダ式 init() を呼び出す
     menu.init()
     return menu
 }
 ```
 
-これで、DSL を使用してメニューを設定し、メニュー構造をコンソールに出力する `printMenu()` 関数を作成できます。
+これで、DSL を使用してメニューを設定できるようになり、メニュー構造をコンソールに出力する `printMenu()` 関数も作成できます。
 
 ```kotlin
 class MenuItem(val name: String)
@@ -116,7 +116,7 @@ fun printMenu(menu: Menu) {
     menu.items.forEach { println("  Item: ${it.name}") }
 }
 
-// DSLを使用
+// DSL を使用
 fun main() {
     // メニューを作成
     val mainMenu = menu("Main Menu") {
@@ -137,21 +137,21 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-intermediate-tour-lambda-expression-with-receiver-dsl"}
 
-見ての通り、レシーバ付きラムダ式を使用することで、メニューを作成するために必要なコードが大幅に簡素化されます。ラムダ式は、セットアップや作成だけでなく、設定にも役立ちます。これらは、API、UI フレームワーク、設定ビルダーのための DSL 構築に一般的に使用され、合理化されたコードを作成することで、基盤となるコード構造やロジックにより集中できるようにします。
+ご覧の通り、レシーバー付きラムダ式を使用することで、メニューの作成に必要なコードが大幅にシンプルになります。ラムダ式はセットアップや作成だけでなく、設定にも便利です。API、UIフレームワーク、設定ビルダー向けの DSL 構築によく使用され、洗練されたコードを作成して、基盤となるコード構造やロジックにより集中しやすくすることができます。
 
-Kotlin のエコシステムには、標準ライブラリの [`buildList()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/build-list.html) や [`buildString()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.text/build-string.html) 関数など、このデザインパターンの例が多くあります。
+Kotlin のエコシステムには、標準ライブラリの [`buildList()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/build-list.html) や [`buildString()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.text/build-string.html) 関数など、このデザインパターンの例が数多く存在します。
 
-> レシーバ付きラムダ式を Kotlin の**型安全なビルダー**と組み合わせることで、実行時ではなくコンパイル時に型に関する問題を検出できる DSL を作成できます。詳細については、[型安全なビルダー](type-safe-builders.md)を参照してください。
+> レシーバー付きラムダ式を Kotlin の**タイプセーフビルダー**と組み合わせることで、実行時ではなくコンパイル時に型の問題を検出できる DSL を作成できます。詳細については、[タイプセーフビルダー](type-safe-builders.md)を参照してください。
 >
 {style="tip"}
 
-## 練習問題 {completion-point="true" id="practice"}
+## 演習 {completion-point="true" id="practice"}
 
-### 練習問題 1 {initial-collapse-state="collapsed" collapsible="true" id="lambda-receivers-exercise-1"}
+<deflist appearance="clear" collapsible="true" numbered="true">
+<def title="レシーバー付きラムダ式でデータを処理する" id="lambda-receivers-exercise-1">
 
-レシーバ付きラムダ式を受け取る `fetchData()` 関数があります。ラムダ式を更新して `append()` 関数を使用し、コードの出力が `Data received - Processed` になるようにしてください。
+レシーバー付きラムダ式を受け取る `fetchData()` 関数があります。コードの出力が `Data received - Processed` となるように、`append()` 関数を使用するようラムダ式を更新してください。
 
-|---|---|
 ```kotlin
 fun fetchData(callback: StringBuilder.() -> Unit) {
     val builder = StringBuilder("Data received")
@@ -160,14 +160,13 @@ fun fetchData(callback: StringBuilder.() -> Unit) {
 
 fun main() {
     fetchData {
-        // ここにコードを書いてください
+        // ここにコードを記述してください
         // Data received - Processed
     }
 }
 ```
 {validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-lambda-receivers-exercise-1"}
 
-|---|---|
 ```kotlin
 fun fetchData(callback: StringBuilder.() -> Unit) {
     val builder = StringBuilder("Data received")
@@ -184,9 +183,10 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="解答例" id="kotlin-tour-lambda-receivers-solution-1"}
 
-### 練習問題 2 {initial-collapse-state="collapsed" collapsible="true" id="lambda-receivers-exercise-2"}
+</def>
+<def title="ダブルクリックイベントを処理する" id="lambda-receivers-exercise-2">
 
-`Button` クラスと、`ButtonEvent` および `Position` データクラスがあります。`Button` クラスの `onEvent()` メンバ関数を呼び出して、ダブルクリックイベントをトリガーするコードを記述してください。コードは `"Double click!"` と出力する必要があります。
+`Button` クラスと、`ButtonEvent` および `Position` データクラスがあります。ダブルクリックイベントをトリガーするために、`Button` クラスの `onEvent()` メンバー関数を呼び出すコードを記述してください。コードは `"Double click!"` と出力する必要があります。
 
 ```kotlin
 class Button {
@@ -212,14 +212,13 @@ fun main() {
     val button = Button()
 
     button.onEvent {
-        // ここにコードを書いてください
+        // ここにコードを記述してください
         // Double click!
     }
 }
 ```
 {validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-lambda-receivers-exercise-2"}
 
-|---|---|
 ```kotlin
 class Button {
     fun onEvent(action: ButtonEvent.() -> Unit) {
@@ -253,15 +252,16 @@ fun main() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="解答例" id="kotlin-tour-lambda-receivers-solution-2"}
 
-### 練習問題 3 {initial-collapse-state="collapsed" collapsible="true" id="lambda-receivers-exercise-3"}
+</def>
+<def title="要素をインクリメントしたリストを作成する" id="lambda-receivers-exercise-3">
 
-整数のリストのコピーを作成し、各要素を 1 ずつインクリメントする関数を記述してください。提供されている、`List<Int>` を `incremented` 関数で拡張する関数のスケルトンを使用してください。
+整数のリストのコピーを作成し、各要素が 1 ずつインクリメントされたリストを作成する関数を記述してください。`List<Int>` を `incremented` 関数で拡張する提供された関数の骨組みを使用してください。
 
 ```kotlin
 fun List<Int>.incremented(): List<Int> {
     val originalList = this
     return buildList {
-        // ここにコードを書いてください
+        // ここにコードを記述してください
     }
 }
 
@@ -274,7 +274,6 @@ fun main() {
 ```
 {validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-lambda-receivers-exercise-3"}
 
-|---|---|
 ```kotlin
 fun List<Int>.incremented(): List<Int> {
     val originalList = this
@@ -291,6 +290,9 @@ fun main() {
 }
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="解答例" id="kotlin-tour-lambda-receivers-solution-3"}
+
+</def>
+</deflist>
 
 <seealso></seealso>
 

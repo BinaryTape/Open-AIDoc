@@ -2,17 +2,17 @@
 
 <no-index/>
 
-Kotlin 中的每個變數與資料結構都有一個型別。型別非常重要，因為它們會告訴編譯器你被允許對該變數或資料結構執行哪些操作。換句話說，即它具有哪些函式與屬性。
+Kotlin 中的每個變數與資料結構都有型別。型別非常重要，因為它們會告訴編譯器你被允許對該變數或資料結構執行哪些操作。換句話說，也就是它擁有那些函式與屬性。
 
-在上一章，Kotlin 能夠在先前的範例中判斷出 `customers` 的型別為 [`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/)。
-Kotlin **推論**型別的能力被稱為**型別推論**。`customers` 被指派了一個整數值。由此，Kotlin 推論出 `customers` 具有數值型別 `Int`。因此，編譯器知道你可以對 `customers` 執行算術運算：
+在上一章的前述範例中，Kotlin 能夠判斷出 `customers` 的型別為 [`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/)。
+Kotlin **推論**型別的能力稱為**型別推論**。`customers` 被指派了一個整數值，Kotlin 藉此推論出 `customers` 具有數值型別 `Int`。因此，編譯器知道你可以對 `customers` 執行算術運算：
 
 ```kotlin
 fun main() {
 //sampleStart
     var customers = 10
 
-    // 有些顧客離開了隊列
+    // 部分顧客離開排隊隊伍
     customers = 8
 
     customers = customers + 3 // 加法範例：11
@@ -27,39 +27,39 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-basic-types-arithmetic"}
 
-> `+=`、`-=`、`*=`、`/=` 與 `%=` 是複合指派運算子。若要了解更多資訊，請參閱 [Augmented assignments](operator-overloading.md#augmented-assignments)。
+> `+=`、`-=`、`*=`、`/=` 與 `%=` 是複合指派運算子。若要了解更多，請參閱[複合指派](operator-overloading.md#augmented-assignments)。
 > 
 {style="tip"}
 
 總體而言，Kotlin 具有以下基本型別：
 
-| **類別**                                              | **基本型別**                    | **範例程式碼**                                                  |
+| **類別**                                                  | **基本型別**                       | **程式碼範例**                                                     |
 |-----------------------------------------------------------|------------------------------------|-------------------------------------------------------------------|
-| [整數](numbers.md#integer-types)                      | `Byte`, `Short`, `Int`, `Long`     | `val year: Int = 2020`<br/> `val amount: Long = 350_000_000`      |
-| [無符號整數](unsigned-integer-types.md)            | `UByte`, `UShort`, `UInt`, `ULong` | `val score: UInt = 100u`                                          |
-| [浮點數](numbers.md#floating-point-types) | `Float`, `Double`                  | `val currentTemp: Float = 24.5f`<br/> `val price: Double = 19.99` |
-| [布林值](booleans.md)                                   | `Boolean`                          | `val isEnabled: Boolean = true`                                   |
-| [字元](characters.md)                               | `Char`                             | `val separator: Char = ','`                                       |
-| [字串](strings.md)                                     | `String`                           | `val message: String = "Hello, world!"`                           |
+| [整數](numbers.md#integer-types)                          | `Byte`, `Short`, `Int`, `Long`     | `val year: Int = 2020`<br/> `val amount: Long = 350_000_000`      |
+| [無正負號整數](unsigned-integer-types.md)                | `UByte`, `UShort`, `UInt`, `ULong` | `val score: UInt = 100u`                                          |
+| [浮點數](numbers.md#floating-point-types)                 | `Float`, `Double`                  | `val currentTemp: Float = 24.5f`<br/> `val price: Double = 19.99` |
+| [布林值](booleans.md)                                     | `Boolean`                          | `val isEnabled: Boolean = true`                                   |
+| [字元](characters.md)                                     | `Char`                             | `val separator: Char = ','`                                       |
+| [字串](strings.md)                                         | `String`                           | `val message: String = "Hello, world!"`                           |
 
-有關基本型別及其屬性的更多資訊，請參閱 [Types overview](types-overview.md)。
+若要了解更多關於基本型別及其屬性的資訊，請參閱[型別概觀](types-overview.md)。
 
-掌握了這些知識，你就可以宣告變數並在稍後進行初始化。只要變數在第一次讀取前完成初始化，Kotlin 就能處理這種情況。
+有了這些知識，你就可以先宣告變數並在稍後進行初始化。只要變數在第一次讀取前完成初始化，Kotlin 就能妥善處理。
 
-要宣告一個變數而不初始化它，請使用 `:` 指定其型別。例如：
+若要宣告變數而不進行初始化，請使用 `:` 指定其型別。例如：
 
 ```kotlin
 fun main() {
 //sampleStart
     // 宣告變數但未初始化
     val d: Int
-    // 變數已初始化
+    // 初始化變數
     d = 3
 
-    // 變數已明確指定型別並初始化
+    // 明確指定型別並初始化的變數
     val e: String = "hello"
 
-    // 變數可以被讀取，因為它們已經完成初始化
+    // 變數已初始化，因此可以讀取
     println(d) // 3
     println(e) // hello
 //sampleEnd
@@ -67,7 +67,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-basic-types-initialization"}
 
-如果你在讀取變數之前未對其進行初始化，你將會看到錯誤：
+如果在讀取變數前尚未將其初始化，你將會看到錯誤：
 
 ```kotlin
 fun main() {
@@ -77,21 +77,21 @@ fun main() {
     
     // 觸發錯誤
     println(d)
-    // 變數 'd' 必須被初始化
+    // Variable 'd' must be initialized
 //sampleEnd
 }
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-basic-types-no-initialization" validate="false"}
 
-現在你已經知道如何宣告基本型別，接著該來學習[集合](kotlin-tour-collections.md)了。
+現在你已經知道如何宣告基本型別，接下來該了解[集合](kotlin-tour-collections.md)了。
 
 ## 練習 {completion-point="true" id="practice"}
 
-### 練習題 {initial-collapse-state="collapsed" collapsible="true" id="exercise"}
+<deflist appearance="clear" collapsible="true">
+<def title="為變數宣告明確型別">
 
-為每個變數明確宣告正確的型別：
+明確為每個變數宣告正確的型別：
 
-|---|---|
 ```kotlin
 fun main() {
     val a: Int = 1000 
@@ -99,13 +99,11 @@ fun main() {
     val c = 3.14
     val d = 100_000_000_000_000
     val e = false
-    val f = '
-'
+    val f = '\n'
 }
 ```
 {validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-basic-types-exercise"}
 
-|---|---|
 ```kotlin
 fun main() {
     val a: Int = 1000
@@ -113,11 +111,13 @@ fun main() {
     val c: Double = 3.14
     val d: Long = 100_000_000_000_000
     val e: Boolean = false
-    val f: Char = '
-'
+    val f: Char = '\n'
 }
 ```
-{initial-collapse-state="collapsed" collapsible="true" collapsed-title="範例解答" id="kotlin-tour-basic-types-solution"}
+{initial-collapse-state="collapsed" collapsible="true" collapsed-title="參考解答" id="kotlin-tour-basic-types-solution"}
+
+</def>
+</deflist>
 
 <seealso></seealso>
 

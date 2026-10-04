@@ -1,16 +1,16 @@
 [//]: # (title: 学習リソース)
 
-<web-summary>KMPの経験レベルに最も適した学習教材を選択してください。</web-summary>
+<web-summary>ご自身の KMP の経験レベルに最適な学習教材を選択してください。</web-summary>
 
-30以上の不可欠なKotlin Multiplatform (KMP) およびCompose Multiplatformの学習教材をまとめました。スキルレベル別に、あなたの経験に合ったチュートリアル、コース、記事を探してみてください。
+Kotlin Multiplatform（KMP）および Compose Multiplatform に関する 30 以上の主要な学習教材をまとめました。スキルレベル別に、ご自身の経験に合ったチュートリアル、コース、記事を探すことができます。
 
-🌱 **初級者**。JetBrainsやGoogleの公式チュートリアルを通じて、KMPとComposeの基礎を学びます。Room、Ktor、SQLDelightなどのコアライブラリを使用して、シンプルなアプリを構築します。
+🌱 **初級（Beginner）**: JetBrains や Google の公式チュートリアルを通じて、KMP と Compose の基礎を学びます。Room、Ktor、SQLDelight などのコアライブラリを使用してシンプルなアプリを構築します。
 
-🌿 **中級者**。共有ViewModel、Koinベースの依存関係注入（DI）、クリーンアーキテクチャを使用して、実践的なアプリを開発します。JetBrainsやコミュニティの教育者によるコースを通じて学びます。
+🌿 **中級（Intermediate）**: 共通の ViewModel、Koin による依存性注入（DI）、クリーンアーキテクチャを活用した実践的なアプリを開発します。JetBrains やコミュニティの講師によるコースを通じて学びます。
 
-🌳 **上級者**。バックエンドやゲーム開発のための本格的なKMPエンジニアリングへと進みます。大規模なマルチチームプロジェクト向けのアーキテクチャのスケーリングや導入に関するガイダンスが含まれます。
+🌳 **上級（Advanced）**: バックエンドやゲーム開発向けの本格的な KMP エンジニアリングへと進み、大規模なマルチチームプロジェクトにおけるアーキテクチャのスケーリングや導入指針について学びます。
 
-🧩 **ライブラリ作者**。再利用可能なKMPライブラリを作成し、公開します。公式のJetBrainsツールとテンプレートを使用して、API設計、Dokkaドキュメント、Mavenパブリッシングについて学びます。
+🧩 **ライブラリ作成者（Library authors）**: 再利用可能な KMP ライブラリを作成・公開します。JetBrains 公式のツールとテンプレートを使用して、API 設計、Dokka によるドキュメント作成、Maven への公開方法を学びます。
 
 <Tabs>
 <TabItem id="all-resources" title="すべて">
@@ -31,7 +31,7 @@
 
 **リソース /**
 
-**種類**
+**種別**
 
 </th>
 <th>
@@ -43,7 +43,7 @@
 
 <th>
 
-**学習内容**
+**学べる内容**
 
 </th>
 <th>
@@ -66,7 +66,7 @@
 </td>
 <td>
 
-[Kotlin Multiplatformの概要](kmp-overview.md)
+[Kotlin Multiplatform Overview](kmp-overview.md)
 
 記事
 
@@ -76,7 +76,7 @@ JetBrains
 </td>
 
 <td>
-KMPの核心的な価値、実際のユースケース、および適切な学習パスを選択するためのガイダンス。
+KMP の中核的な価値、実際のユースケース、適切な学習パスを選択するためのガイダンス。
 </td>
 <td>
 無料
@@ -92,7 +92,7 @@ KMPの核心的な価値、実際のユースケース、および適切な学�
 </td>
 <td>
 
-[はじめてのKMPアプリの作成](multiplatform-create-first-app.md)
+[Create Your First KMP App](multiplatform-upgrade-app.md)
 
 チュートリアル
 
@@ -102,7 +102,7 @@ JetBrains
 </td>
 
 <td>
-KMPプロジェクトをセットアップし、UIを完全にネイティブに保ちながら、AndroidとiOSの間でシンプルなビジネスロジックを共有する方法。
+UI を完全にネイティブに保ちながら、KMP プロジェクトをセットアップし、Android と iOS 間でシンプルなビジネスロジックを共有する方法。
 </td>
 <td>
 無料
@@ -118,7 +118,7 @@ KMPプロジェクトをセットアップし、UIを完全にネイティブに
 </td>
 <td>
 
-[Kotlin Multiplatformを始める (Google Codelab)](https://developer.android.com/codelabs/kmp-get-started)
+[Get Started With Kotlin Multiplatform (Google Codelab)](https://developer.android.com/codelabs/kmp-get-started)
 
 チュートリアル
 
@@ -130,7 +130,7 @@ Android
 </td>
 
 <td>
-既存のAndroidプロジェクトに共有KMPモジュールを追加し、SKIEプラグインを使用してKotlinコードから慣習的なSwift APIを生成してiOSと統合する方法。
+既存の Android プロジェクトに共有 KMP モジュールを追加して iOS と統合する方法。SKIE プラグインを使用して Kotlin コードから慣用的な Swift API を生成する手法も扱います。
 </td>
 <td>
 無料
@@ -146,7 +146,7 @@ Android
 </td>
 <td>
 
-[はじめてのCompose Multiplatformアプリの作成](compose-multiplatform-create-first-app.md)
+[Create Your First Compose Multiplatform App](compose-multiplatform-new-project.md)
 
 チュートリアル
 
@@ -156,7 +156,7 @@ JetBrains
 </td>
 
 <td>
-シンプルなテンプレートから、Android、iOS、デスクトップ、Webで動作する機能的なタイムゾーンアプリへと進めながら、基本的なUIコンポーネント、状態管理、リソース処理を網羅し、完全なCompose Multiplatformアプリをゼロから構築する方法。
+主要な UI コンポーネント、状態管理、リソース処理を網羅し、シンプルなテンプレートから Android、iOS、デスクトップ、Web で動作する実用的なタイムゾーンアプリへと発展させながら、Compose Multiplatform アプリを一から完全に構築する方法。
 </td>
 <td>
 無料
@@ -172,7 +172,7 @@ JetBrains
 </td>
 <td>
 
-[KtorとSQLDelightを使用したマルチプラットフォームアプリの作成](multiplatform-ktor-sqldelight.md)
+[Create a Multiplatform App Using Ktor and SQLDelight](multiplatform-ktor-sqldelight.md)
 
 チュートリアル
 
@@ -182,7 +182,7 @@ JetBrains
 </td>
 
 <td>
-ネットワーク用のKtorとローカルデータベース用のSQLDelightを使用して共有データレイヤーを構築し、それをAndroidのJetpack ComposeとiOSのSwiftUIで構築されたネイティブUIに接続する方法。
+ネットワーク通信に Ktor、ローカルデータベースに SQLDelight を使用して共有データ層を構築し、Android 上の Jetpack Compose および iOS 上の SwiftUI で構築されたネイティブ UI と接続する方法。
 </td>
 <td>
 無料
@@ -198,7 +198,7 @@ JetBrains
 </td>
 <td>
 
-[期待宣言と実体宣言 (Expected and Actual Declarations)](multiplatform-expect-actual.md)
+[Expected and Actual Declarations](multiplatform-expect-actual.md)
 
 記事
 
@@ -208,7 +208,7 @@ JetBrains
 </td>
 
 <td>
-共通コードからプラットフォーム固有のAPIにアクセスするための核心的なexpect/actualメカズム。関数、プロパティ、クラスの使用など、さまざまな戦略をカバーします。
+共通コードからプラットフォーム固有の API にアクセスするための中核的な expect/actual メカニズム。関数、プロパティ、クラスを使用するさまざまな戦略を解説します。
 </td>
 <td>
 無料
@@ -224,9 +224,9 @@ JetBrains
 </td>
 <td>
 
-[KMPアプリでのプラットフォーム固有APIの使用](https://www.youtube.com/watch?v=bSNumV04y_w)
+[Using Platform-Specific APIs in KMP Apps](https://www.youtube.com/watch?v=bSNumV04y_w)
 
-ビデオチュートリアル
+動画チュートリアル
 
 </td>
 <td>
@@ -236,7 +236,7 @@ YouTube
 </td>
 
 <td>
-KMPアプリでプラットフォーム固有のコードを使用するためのベストプラクティス。
+KMP アプリでプラットフォーム固有のコードを使用するためのベストプラクティス。
 </td>
 <td>
 無料
@@ -252,9 +252,9 @@ KMPアプリでプラットフォーム固有のコードを使用するため�
 </td>
 <td>
 
-[AndroidデベロッパーのためのKMP](https://learnkmp.com/)
+[KMP for Android Developers](https://learnkmp.com/)
 
-ビデオコース
+動画コース
 
 </td>
 <td>
@@ -264,10 +264,10 @@ PayHip
 </td>
 
 <td>
-expect/actualやソースセットなどのKMPの基礎をマスターし、ネットワーク用のKtor、依存関係注入用のKoin、Nav3、永続化用のRoomなどの最新ライブラリを使用して完全なアプリスタックを構築することで、既存のAndroid開発スキルをiOSに拡張する方法。
+expect/actual やソースセットなどの KMP の基礎を習得し、ネットワーク用の Ktor、依存性注入用の Koin、Nav3、永続化用の Room などの最新ライブラリを使用して完全なアプリスタックを構築することで、既存の Android 開発スキルを iOS に拡張する方法。
 </td>
 <td>
-39ドル
+$39
 </td>
 <td>
 8–12時間
@@ -280,9 +280,9 @@ expect/actualやソースセットなどのKMPの基礎をマスターし、ネ�
 </td>
 <td>
 
-[Kotlin Multiplatformマスタークラス](https://www.udemy.com/course/kotlin-multiplatform-masterclass/)
+[Kotlin Multiplatform Masterclass](https://www.udemy.com/course/kotlin-multiplatform-masterclass/)
 
-ビデオコース
+動画コース
 
 </td>
 <td>
@@ -292,10 +292,10 @@ Udemy
 </td>
 
 <td>
-クリーンアーキテクチャとMVIをゼロから適用して完全なKMPアプリケーションを構築し、Ktor、SQLDelight、Koinといった必須ライブラリのフルスタックをネイティブのJetpack ComposeおよびSwiftUI UIと統合する方法。
+クリーンアーキテクチャと MVI を一から適用して完全な KMP アプリケーションを構築し、主要ライブラリのフルスタック（Ktor、SQLDelight、Koin）をネイティブの Jetpack Compose および SwiftUI UI と統合する方法。
 </td>
 <td>
-10–20ユーロ
+€10–€20
 </td>
 <td>
 6時間
@@ -308,9 +308,9 @@ Udemy
 </td>
 <td>
 
-[Compose Multiplatformフルコース 2025 | ゼロからヒーローへ](https://www.youtube.com/watch?v=Z92zJzL-6z0&list=PL0pXjGnY7PORAoIX2q7YG2sotapCp4hyl)
+[Compose Multiplatform Full Course 2025 | Zero to Hero](https://www.youtube.com/watch?v=Z92zJzL-6z0&list=PL0pXjGnY7PORAoIX2q7YG2sotapCp4hyl)
 
-ビデオコース
+動画コース
 
 </td>
 <td>
@@ -320,7 +320,7 @@ YouTube
 </td>
 
 <td>
-Compose Multiplatformのみを使用して完全で機能豊富なアプリケーションを構築する方法。基礎から、Firebase Authentication、SQLDelightによるオフラインサポート、リアルタイムアップデートなどの高度な実践的機能まで進みます。
+Compose Multiplatform のみを用いて機能豊富なアプリケーションを丸ごと構築する方法。基礎から始めて、Firebase Authentication、SQLDelight によるオフラインサポート、リアルタイム更新などの実践的で高度な機能までステップアップします。
 </td>
 <td>
 無料
@@ -336,9 +336,9 @@ Compose Multiplatformのみを使用して完全で機能豊富なアプリケ�
 </td>
 <td>
 
-[Kotlin Multiplatform開発](https://www.linkedin.com/learning/kotlin-multiplatform-development)
+[Kotlin Multiplatform Development](https://www.linkedin.com/learning/kotlin-multiplatform-development)
 
-ビデオコース
+動画コース
 
 </td>
 <td>
@@ -348,10 +348,10 @@ LinkedIn Learning
 </td>
 
 <td>
-Compose MultiplatformとネイティブUIのどちらを選択するかというアーキテクチャ上の決定、Swift相互運用の基礎、およびネットワーキング、永続化、依存関係注入のための主要なKMPエコシステムの包括的な概要。
+Compose Multiplatform とネイティブ UI のどちらを採用するかのアーキテクチャ上の選択基準、Swift との相互運用性の基礎、ならびにネットワーク、永続化、依存性注入に関する主要な KMP エコシステムの包括的な概要。
 </td>
 <td>
-約30–40ドル/月
+約 $30–$40/月
 </td>
 <td>
 3時間
@@ -364,20 +364,20 @@ Compose MultiplatformとネイティブUIのどちらを選択するかという
 </td>
 <td>
 
-[Kotlin Multiplatform by Tutorials (第3版)](https://www.kodeco.com/books/kotlin-multiplatform-by-tutorials/v3.0)
+[Kotlin Multiplatform by Tutorials (Third Edition)](https://www.kodeco.com/books/kotlin-multiplatform-by-tutorials/v3.0)
 
 書籍
 
 </td>
 <td>
-Kodeco Team (Kevin D. Moore, Carlos Mota, Saeed Taheri)
+Kodeco Team（Kevin D. Moore、Carlos Mota、Saeed Taheri）
 </td>
 
 <td>
-ネイティブUIを、ネットワーキング、シリアライズ、永続化のためのKMP共有モジュールに接続することによるコード共有の基礎。また、保守可能でスケーラブルな実用的アプリを構築するために、依存関係注入、テスト、最新アーキテクチャを適用する方法も学びます。
+ネイティブ UI をネットワーク、シリアライズ、永続化を担う KMP 共有モジュールに接続することによるコード共有の基礎。依存性注入、テスト、最新のアーキテクチャを適用して、保守性と拡張性に優れた実践的なアプリを構築する方法も解説します。
 </td>
 <td>
-約60ドル
+約 $60
 </td>
 <td>
 40–60時間
@@ -394,7 +394,7 @@ Kodeco Team (Kevin D. Moore, Carlos Mota, Saeed Taheri)
 </td>
 <td>
 
-[AndroidアプリケーションをiOSで動作させる](multiplatform-integrate-in-existing-app.md)
+[Make Your Android Application Work on iOS](multiplatform-integrate-in-existing-app.md)
 
 チュートリアル
 
@@ -404,7 +404,7 @@ JetBrains
 </td>
 
 <td>
-既存のAndroidアプリのビジネスロジックを、元のAndroidアプリと新しいネイティブiOSプロジェクトの両方で使用できる共有モジュールに抽出することで、既存のアプリをKMPに移行する実践的な手順。
+既存の Android アプリのビジネスロジックを共有モジュールに抽出し、元の Android アプリと新しいネイティブ iOS プロジェクトの双方で利用できるようにして KMP へ移行するための実践的な手順。
 </td>
 <td>
 無料
@@ -420,7 +420,7 @@ JetBrains
 </td>
 <td>
 
-[既存のアプリをRoom KMPに移行する (Google Codelab)](https://developer.android.com/codelabs/kmp-migrate-room)
+[Migrate Existing Apps to Room KMP (Google Codelab)](https://developer.android.com/codelabs/kmp-migrate-room)
 
 チュートリアル
 
@@ -432,7 +432,7 @@ Android
 </td>
 
 <td>
-既存のAndroid Roomデータベースを共有KMPモジュールに移行し、使い慣れたDAOとエンティティをAndroidとiOSの両方で再利用する方法。
+既存の Android Room データベースを共有 KMP モジュールへ移行し、使い慣れた DAO やエンティティを Android と iOS の両方で再利用できるようにする方法。
 </td>
 <td>
 無料
@@ -448,9 +448,9 @@ Android
 </td>
 <td>
 
-[Compose MultiplatformでViewModelを共有する方法（依存関係注入を使用！）](https://www.youtube.com/watch?v=O85qOS7U3XQ)
+[How to Share ViewModels in Compose Multiplatform (with Dependency Injection!)](https://www.youtube.com/watch?v=O85qOS7U3XQ)
 
-ビデオチュートリアル
+動画チュートリアル
 
 </td>
 <td>
@@ -460,7 +460,7 @@ YouTube
 </td>
 
 <td>
-依存関係注入にKoinを使用し、Compose Multiplatformプロジェクトで共有 ViewModelを実装する方法。これにより、状態管理ロジックを一度書くだけで済むようになります。
+Compose Multiplatform プロジェクトにおいて、Koin による依存性注入を用いて共有 ViewModel を実装し、状態管理ロジックを一度だけ記述できるようにする方法。
 </td>
 <td>
 無料
@@ -476,9 +476,9 @@ YouTube
 </td>
 <td>
 
-[Compose Multiplatform短期集中コース 2025](https://www.youtube.com/watch?v=WT9-4DXUqsM)
+[The Compose Multiplatform Crash Course 2025](https://www.youtube.com/watch?v=WT9-4DXUqsM)
 
-ビデオコース
+動画コース
 
 </td>
 <td>
@@ -488,7 +488,7 @@ YouTube
 </td>
 
 <td>
-クリーンアーキテクチャを使用して完全で製品レベルの読書アプリをゼロから構築する方法。ネットワーク用のKtor、ローカルデータベース用のRoom、依存関係注入用のKoin、マルチプラットフォームナビゲーションを含む最新のKMPスタックをカバーします。
+クリーンアーキテクチャを用いてプロダクション対応の読書アプリを一から構築する方法。ネットワーク用の Ktor、ローカルデータベース用の Room、依存性注入用の Koin、マルチプラットフォームナビゲーションなど、最新の KMP スタックを網羅します。
 </td>
 <td>
 無料
@@ -504,9 +504,9 @@ YouTube
 </td>
 <td>
 
-[KMPを使用した業界レベルのマルチプラットフォームアプリの構築](https://pl-coding.com/kmp/)
+[Building Industry-Level Multiplatform Apps With KMP](https://pl-coding.com/kmp/)
 
-ビデオコース
+動画コース
 
 </td>
 <td>
@@ -517,10 +517,10 @@ Philipp Lackner
 </td>
 
 <td>
-ネイティブUI（Jetpack Compose and SwiftUI）間でViewModelとビジネスロジックを共有することで、実践的な翻訳アプリを構築する方法。クリーンアーキテクチャから、両プラットフォームのユニットテスト、UIテスト、エンドツーエンドテストまでの開発ライフサイクル全体をカバーします。
+ネイティブ UI（Jetpack Compose と SwiftUI）間で ViewModel とビジネスロジックを共有して実践的な翻訳アプリを構築する方法。クリーンアーキテクチャから両プラットフォーム向けのユニットテスト、UI テスト、E2E テストに至るまで、開発ライフサイクル全体を網羅します。
 </td>
 <td>
-約99ユーロ
+約 €99
 </td>
 <td>
 20時間
@@ -533,9 +533,9 @@ Philipp Lackner
 </td>
 <td>
 
-[業界レベルのCompose Multiplatform Android/iOSアプリの構築](https://pl-coding.com/cmp-mobile)
+[Building Industry-Level Compose Multiplatform Android and iOS Apps](https://pl-coding.com/cmp-mobile)
 
-ビデオコース
+動画コース
 
 </td>
 <td>
@@ -546,10 +546,10 @@ Philipp Lackner
 </td>
 
 <td>
-完全なCompose Multiplatformスタックを使用して、大規模なオフラインファーストのチャットアプリケーションをゼロから構築する方法。リアルタイムWebSocket用のKtor、ローカル永続化用のRoom、マルチモジュール依存関係注入用のKoinを含みます。
+リアルタイム WebSocket 用の Ktor、ローカル永続化用の Room、マルチモジュール依存性注入用の Koin を含む完全な Compose Multiplatform スタックを使用して、大規模なオフラインファーストのチャットアプリケーションを一から構築する方法。
 </td>
 <td>
-約199ユーロ
+約 €199
 </td>
 <td>
 34時間
@@ -562,9 +562,9 @@ Philipp Lackner
 </td>
 <td>
 
-[究極のCompose Multiplatform: Android/iOSとテスト](https://www.udemy.com/course/ultimate-compose-multiplatform-androidios-testing-kotlin/)
+[Ultimate Compose Multiplatform: Android/iOS and Testing](https://www.udemy.com/course/ultimate-compose-multiplatform-androidios-testing-kotlin/)
 
-ビデオコース
+動画コース
 
 </td>
 <td>
@@ -575,10 +575,10 @@ Udemy
 </td>
 
 <td>
-Compose Multiplatformのみを使用して、機能豊富な仮想暗号通貨ウォレットアプリを構築する方法。コアスタック（Ktor、Room、Koin）だけでなく、堅牢なユニット/UIテストや生体認証などの高度なプラットフォーム統合もカバーします。
+Compose Multiplatform のみを用いて機能豊富な仮想暗号資産ウォレットアプリを構築する方法。コアスタック（Ktor、Room、Koin）だけでなく、堅牢なユニット/UI テストや生体認証などの高度なプラットフォーム統合についても解説します。
 </td>
 <td>
-約20ユーロ
+約 €20
 </td>
 <td>
 8時間
@@ -606,7 +606,7 @@ GitHub
 </td>
 
 <td>
-iOSとの相互運用性（Obj-C/Swift）、SKIE、KMP-NativeCoroutines、言語機能のギャップに対するワークアラウンド、Swiftエクスポート、および双方向の相互運用。
+iOS との相互運用性（Obj-C/Swift）、SKIE、KMP-NativeCoroutines、言語機能のギャップに対する回避策、Swift エクスポート、双方向の相互運用性。
 </td>
 <td>
 無料
@@ -622,9 +622,9 @@ iOSとの相互運用性（Obj-C/Swift）、SKIE、KMP-NativeCoroutines、言語
 </td>
 <td>
 
-[AndroidおよびiOS向けマルチモジュールEコマースアプリ (KMP)](https://www.udemy.com/course/multi-modular-ecommerce-app-for-android-ios-kmp/)
+[Multi-Modular Ecommerce App for Android and iOS (KMP)](https://www.udemy.com/course/multi-modular-ecommerce-app-for-android-ios-kmp/)
 
-ビデオコース
+動画コース
 
 </td>
 <td>
@@ -634,10 +634,10 @@ Udemy
 </td>
 
 <td>
-FigmaでのEコマースアプリのUI設計から、Compose Multiplatformを使用した共有UIを持つ完全なマルチモジュールアプリケーションとしての構築、さらには認証、データベース、自動化されたクラウド機能のためのFirebaseサービスを使用したフルバックエンドの作成と統合まで、製品ライフサイクル全体を学びます。
+Figma での E コマースアプリの UI 設計から、Compose Multiplatform による共有 UI を備えた完全なマルチモジュールアプリケーションとしての構築、さらには認証、データベース、自動クラウドアクションのための Firebase サービスを用いたバックエンド全体の作成と統合まで、製品のライフサイクル全体を扱います。
 </td>
 <td>
-約50ユーロ
+約 €50
 </td>
 <td>
 30時間
@@ -650,9 +650,9 @@ FigmaでのEコマースアプリのUI設計から、Compose Multiplatformを使
 </td>
 <td>
 
-[KtorとKotlin MultiplatformおよびComposeの探求](https://www.linkedin.com/learning/exploring-ktor-with-kotlin-multiplatform-and-compose)
+[Exploring Ktor with Kotlin Multiplatform and Compose](https://www.linkedin.com/learning/exploring-ktor-with-kotlin-multiplatform-and-compose)
 
-ビデオコース
+動画コース
 
 </td>
 <td>
@@ -662,10 +662,10 @@ LinkedIn Learning
 </td>
 
 <td>
-まず安全なKtorバックエンドを作成してAWSにデプロイし、次にKotlin Multiplatformを使用してAPIを消費する共有コードを持つネイティブクライアントを構築することで、フルスタックのKotlinアプリケーションを構築する方法。
+安全な Ktor バックエンドを作成して AWS にデプロイし、Kotlin Multiplatform を使用してその API を利用するコード共有型のネイティブクライアントを構築する、フルスタック Kotlin アプリケーションの開発手法。
 </td>
 <td>
-約30–40ドル/月
+約 $30–$40/月
 </td>
 <td>
 2-3時間
@@ -678,9 +678,9 @@ LinkedIn Learning
 </td>
 <td>
 
-[フルスタックゲーム開発 - KotlinとCompose Multiplatform](https://www.udemy.com/course/full-stack-game-development-kotlin-compose-multiplatform/)
+[Full-Stack Game Development - Kotlin and Compose Multiplatform](https://www.udemy.com/course/full-stack-game-development-kotlin-compose-multiplatform/)
 
-ビデオコース
+動画コース
 
 </td>
 <td>
@@ -690,10 +690,10 @@ Udemy
 </td>
 
 <td>
-物理演算、衝突判定、スプライトシートアニメーションをカバーするCompose Multiplatformを使用した完全な2Dゲームの構築方法、およびそれをAndroid、iOS、デスクトップ、Web（Kotlin/Wasm経由）にデプロイする方法。
+物理演算、衝突判定、スプライトシートアニメーションを網羅した完全な 2D ゲームを Compose Multiplatform で構築し、Android、iOS、デスクトップ、Web（Kotlin/Wasm 経由）にデプロイする方法。
 </td>
 <td>
-約99ユーロ
+約 €99
 </td>
 <td>
 8–10時間
@@ -706,9 +706,9 @@ Udemy
 </td>
 <td>
 
-[Philipp Lackner フルスタックバンドル: KMPとSpring Boot](https://pl-coding.com/full-stack-bundle)
+[Philipp Lackner Full-Stack Bundle: KMP and Spring Boot](https://pl-coding.com/full-stack-bundle)
 
-ビデオコース
+動画コース
 
 </td>
 <td>
@@ -719,10 +719,10 @@ Philipp Lackner
 </td>
 
 <td>
-WebSocketを備えたマルチモジュールのSpring Bootバックエンドから、オフラインファーストのCompose Multiplatformクライアント（Android、iOS、デスクトップ、Web）、および完全なCI/CDパイプラインまで、完全なフルスタックチャットアプリケーションを設計、構築、デプロイする方法。
+WebSockets を備えたマルチモジュールの Spring Boot バックエンドから、オフラインファーストの Compose Multiplatform クライアント（Android、iOS、デスクトップ、Web）、完全な CI/CD パイプラインに至るまで、フルスタックのチャットアプリケーションを設計、構築、デプロイする完全なプロセス。
 </td>
 <td>
-約429ユーロ
+約 €429
 </td>
 <td>
 55時間
@@ -735,9 +735,9 @@ WebSocketを備えたマルチモジュールのSpring Bootバックエンドか
 </td>
 <td>
 
-[ネイティブモバイルチームのためのKMP](https://touchlab.co/kmp-teams-intro)
+[KMP for Native Mobile Teams](https://touchlab.co/kmp-teams-intro)
 
-記事シリーズ
+連載記事
 
 </td>
 <td>
@@ -745,7 +745,7 @@ Touchlab
 </td>
 
 <td>
-最初の賛同の獲得や技術的なパイロット運用から、持続可能な実践的ワークフローによる共有コードベースのスケーリングまで、確立されたネイティブモバイルチーム内でのKMP導入プロセス全体を進める方法。
+初期の賛同獲得や技術パイロットの実施から、持続可能な実践ワークフローによる共有コードベースのスケーリングに至るまで、既存のネイティブモバイルチーム内で KMP の導入プロセス全体を進める方法。
 </td>
 <td>
 無料
@@ -765,7 +765,7 @@ Touchlab
 </td>
 <td>
 
-[マルチプラットフォームライブラリ構築のためのAPIガイドライン](https://kotlinlang.org/docs/api-guidelines-build-for-multiplatform.html)
+[API Guidelines for Multiplatform Library Building](https://kotlinlang.org/docs/api-guidelines-build-for-multiplatform.html)
 
 ドキュメント
 
@@ -775,7 +775,7 @@ JetBrains
 </td>
 
 <td>
-コードの再利用を最大化し、幅広いプラットフォーム互換性を確保するための重要なベストプラクティスに従って、マルチプラットフォームライブラリのパブリックAPIを設計する方法。
+コードの再利用性を最大化し、幅広いプラットフォーム互換性を確保するための重要なベストプラクティスに従って、マルチプラットフォームライブラリのパブリック API を設計する方法。
 </td>
 <td>
 無料
@@ -791,7 +791,7 @@ JetBrains
 </td>
 <td>
 
-[Kotlin Multiplatformライブラリの作成](create-kotlin-multiplatform-library.md)
+[Create Your Kotlin Multiplatform Library](create-kotlin-multiplatform-library.md)
 
 チュートリアル
 
@@ -801,7 +801,7 @@ JetBrains
 </td>
 
 <td>
-公式のスターターテンプレートの使用、ローカルMavenパブリッシングのセットアップ、ライブラリの構造化、およびパブリッシングの設定方法。
+公式スターターテンプレートの使用、ローカル Maven 公開のセットアップ、ライブラリの構造化、公開設定の構成を行う方法。
 </td>
 <td>
 無料
@@ -817,7 +817,7 @@ JetBrains
 </td>
 <td>
 
-[Dokkaを使用したドキュメント作成](https://kotlinlang.org/docs/dokka-introduction.html)
+[Documentation with Dokka](https://kotlinlang.org/docs/dokka-introduction.html)
 
 ドキュメント
 
@@ -827,7 +827,7 @@ JetBrains
 </td>
 
 <td>
-Dokkaを使用して、KMPライブラリのプロフェッショナルなAPIドキュメントを複数の形式で自動生成する方法。Kotlin/Java混合プロジェクトもサポートしています。
+Dokka を使用して、Kotlin/Java の混在プロジェクトをサポートしながら、KMP ライブラリ向けの本格的な API ドキュメントを複数の形式で自動生成する方法。
 </td>
 <td>
 無料
@@ -843,9 +843,9 @@ Dokkaを使用して、KMPライブラリのプロフェッショナルなAPIド
 </td>
 <td>
 
-[KMPライブラリテンプレート](https://github.com/Kotlin/multiplatform-library-template)
+[KMP Library Template](https://github.com/Kotlin/multiplatform-library-template)
 
-GitHubテンプレート
+GitHub テンプレート
 
 </td>
 <td>
@@ -855,7 +855,7 @@ GitHub
 </td>
 
 <td>
-ビルドセットアップとパブリッシングのベストプラクティスがあらかじめ設定された公式テンプレートを使用して、新しいKMPライブラリプロジェクトを迅速に立ち上げる方法。
+ビルド設定や公開に関するベストプラクティスがあらかじめ設定された公式テンプレートを使用して、新しい KMP ライブラリプロジェクトを迅速に立ち上げる方法。
 </td>
 <td>
 無料
@@ -871,7 +871,7 @@ GitHub
 </td>
 <td>
 
-[Maven Centralへの公開](multiplatform-publish-libraries-to-maven.md)
+[Publish to Maven Central](multiplatform-publish-libraries-to-maven.md)
 
 チュートリアル
 
@@ -881,7 +881,7 @@ JetBrains
 </td>
 
 <td>
-資格情報のセットアップ、パブリッシングプラグインの設定、CIによるプロセスの自動化など、KMPライブラリをMaven Centralに公開するための完全なステップバイステップのプロセス。
+認証情報のセットアップ、公開プラグインの設定、CI によるプロセスの自動化など、KMP ライブラリを Maven Central に公開するための詳細な手順。
 </td>
 <td>
 無料
@@ -897,9 +897,9 @@ JetBrains
 </td>
 <td>
 
-[Kotlin Multiplatformライブラリ](https://www.linkedin.com/learning/kotlin-multiplatform-libraries)
+[Kotlin Multiplatform Libraries](https://www.linkedin.com/learning/kotlin-multiplatform-libraries)
 
-ビデオコース
+動画コース
 
 </td>
 <td>
@@ -907,10 +907,10 @@ LinkedIn Learning
 </td>
 
 <td>
-効果的なAPI設計とコード共有戦略から、最終的な配布とベストプラクティスまで、KMPライブラリ作成の完全なライフサイクル。
+効果的な API 設計やコード共有戦略から、最終的な配布やベストプラクティスに至るまで、KMP ライブラリ作成のライフサイクル全体。
 </td>
 <td>
-約30–40ドル/月
+約 $30–$40/月
 </td>
 <td>
 2-3時間
@@ -926,25 +926,25 @@ LinkedIn Learning
 
 </TabItem>
 
-<TabItem id="beginner" title="🌱 初級者">
+<TabItem id="beginner" title="🌱 初級">
 
 <include element-id="source" use-filter="empty,beginner" from="kmp-learning-resources.md"/>
 
 </TabItem>
 
-<TabItem id="intermediate" title="🌿 中級者">
+<TabItem id="intermediate" title="🌿 中級">
 
 <include element-id="source" use-filter="empty,intermediate" from="kmp-learning-resources.md"/>
 
 </TabItem>
 
-<TabItem id="advanced" title="🌳 上級者">
+<TabItem id="advanced" title="🌳 上級">
 
 <include element-id="source" use-filter="empty,advanced" from="kmp-learning-resources.md"/>
 
 </TabItem>
 
-<TabItem id="lib-authors" title="🧩 ライブラリ作者">
+<TabItem id="lib-authors" title="🧩 ライブラリ作成者">
 
 <include element-id="source" use-filter="empty,lib-authors" from="kmp-learning-resources.md"/>
 

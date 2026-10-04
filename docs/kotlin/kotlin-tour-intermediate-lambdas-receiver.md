@@ -1,31 +1,31 @@
-[//]: # (title: 带接收者的 lambda 表达式)
+[//]: # (title: 带接收者的 Lambda 表达式)
 
 <no-index/>
 
-在本章中，你将学习如何将接收者与其他类型的函数（即 lambda 表达式）结合使用，以及它们如何帮助你创建领域专用语言 (DSL)。
+在本章中，你将学习如何在另一种函数类型——lambda表达式中使用接收者，以及它们如何帮助你创建领域专用语言。
 
-## 带接收者的 lambda 表达式 {id="lambda-expressions-with-receiver"}
+## 带接收者的 Lambda 表达式 {id="lambda-expressions-with-receiver"}
 
-在初学者教程中，你学习了如何使用 [lambda 表达式](kotlin-tour-functions.md#lambda-expressions)。Lambda 表达式也可以拥有接收者。
-在这种情况下，lambda 表达式可以访问接收者的任何成员函数或属性，而无需每次都显式指定接收者。由于没有这些额外的引用，你的代码将更易于阅读和维护。
+在初学者教程中，你已经学习了如何使用 [lambda表达式](kotlin-tour-functions.md#lambda-expressions)。Lambda 表达式也可以拥有接收者。
+在这种情况下，lambda表达式无需每次都显式指定接收者，即可访问接收者的任何成员函数或属性。省去这些额外的引用后，代码会更易于阅读和维护。
 
-> 带接收者的 lambda 表达式也称为带接收者的函数字面量。
+> 带接收者的 Lambda 表达式也称为带接收者的函数字面值。
 >
 {style="tip"}
 
-在定义函数类型时，带接收者的 lambda 表达式的语法有所不同。首先，编写你想要扩展的接收者。接着，输入一个 `.`，然后完成函数类型定义的其余部分。例如：
+定义函数类型时，带接收者的 lambda 表达式语法会有所不同。首先，写出你想要扩展的接收者。接着，输入一个 `.`，然后完成函数类型定义的其余部分。例如：
 
 ```kotlin
 MutableList<Int>.() -> Unit
 ```
 
-此函数类型具有：
+该函数类型包含：
 
-* 作为接收者的 `MutableList<Int>`。
-* 圆括号 `()` 内没有函数参数。
+* 以 `MutableList<Int>` 作为接收者。
+* 圆括号 `()` 内没有函数形参。
 * 没有返回值：`Unit`。
 
-考虑这个在画布上绘制形状的示例：
+来看这个在画布上绘制形状的示例：
 
 ```kotlin
 class Canvas {
@@ -33,10 +33,10 @@ class Canvas {
     fun drawSquare() = println("🟥 Drawing a square")
 }
 
-// 带接收者的 lambda 表达式定义
+// 带接收者的 Lambda 表达式定义
 fun render(block: Canvas.() -> Unit): Canvas {
     val canvas = Canvas()
-    // 使用带接收者的 lambda 表达式
+    // 使用带接收者的 Lambda 表达式
     canvas.block()
     return canvas
 }
@@ -54,18 +54,18 @@ fun main() {
 
 在此示例中：
 
-* `Canvas` 类有两个模拟绘制圆形或正方形的函数。
-* `render()` 函数接受一个 `block` 参数，并返回 `Canvas` 类的一个实例。
-* `block` 参数是一个带接收者的 lambda 表达式，其中 `Canvas` 类是接收者。
-* `render()` 函数创建 `Canvas` 类的一个实例，并在 `canvas` 实例上调用 `block()` lambda 表达式，将其作为接收者。
-* `main()` 函数使用一个传递给 `block` 参数的 lambda 表达式来调用 `render()` 函数。
+* `Canvas` 类有两个用于模拟绘制圆形或正方形的函数。
+* `render()` 函数接收一个 `block` 形参，并返回 `Canvas` 类的实例。
+* `block` 形参是一个带接收者的 lambda 表达式，其中 `Canvas` 类是接收者。
+* `render()` 函数创建 `Canvas` 类的一个实例，并在 `canvas` 实例上调用 `block()` lambda 表达式，将其用作接收者。
+* `main()` 函数使用一个 lambda 表达式调用 `render()` 函数，该表达式被传递给 `block` 形参。
 * 在传递给 `render()` 函数的 lambda 内部，程序在 `Canvas` 类的实例上调用 `drawCircle()` 和 `drawSquare()` 函数。
 
   由于 `drawCircle()` 和 `drawSquare()` 函数是在带接收者的 lambda 表达式中调用的，因此可以直接调用它们，就像它们位于 `Canvas` 类内部一样。
 
-带接收者的 lambda 表达式在你想创建领域专用语言 (DSL) 时非常有用。由于你可以在不显式引用接收者的情况下访问其成员函数和属性，因此你的代码会变得更加精简。
+当你想要创建领域专用语言 (DSL) 时，带接收者的 lambda 表达式会非常有用。因为你可以直接访问接收者的成员函数和属性而无需显式引用接收者，代码从而变得更加简洁。
 
-为了演示这一点，考虑一个配置菜单项的示例。让我们从一个 `MenuItem` 类和一个 `Menu` 类开始，`Menu` 类包含一个用于向菜单添加项的 `item()` 函数，以及所有菜单项的列表 `items`：
+为了演示这一点，我们来看一个配置菜单项的示例。首先从 `MenuItem` 类和一个 `Menu` 类开始，`Menu` 类包含一个名为 `item()` 的向菜单添加项的函数，以及所有菜单项的列表 `items`：
 
 ```kotlin
 class MenuItem(val name: String)
@@ -79,7 +79,7 @@ class Menu(val name: String) {
 }
 ```
 
-让我们使用作为函数参数 (`init`) 传递给 `menu()` 函数的带接收者的 lambda 表达式，以此作为构建菜单的起点：
+接下来，我们将一个带接收者的 lambda 表达式作为函数形参 (`init`) 传递给用于构建菜单的 `menu()` 函数作为起点：
 
 ```kotlin
 fun menu(name: String, init: Menu.() -> Unit): Menu {
@@ -91,7 +91,7 @@ fun menu(name: String, init: Menu.() -> Unit): Menu {
 }
 ```
 
-现在，你可以使用 DSL 来配置菜单，并创建一个 `printMenu()` 函数以将菜单结构打印到控制台：
+现在你可以使用该 DSL 来配置菜单，并创建一个 `printMenu()` 函数将菜单结构输出到控制台：
 
 ```kotlin
 class MenuItem(val name: String)
@@ -137,21 +137,21 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-intermediate-tour-lambda-expression-with-receiver-dsl"}
 
-如你所见，使用带接收者的 lambda 表达式极大地简化了创建菜单所需的代码。Lambda 表达式不仅在设置和创建时有用，在配置时也非常有用。它们通常用于为 API、UI 框架和配置构建器构建 DSL，以生成精简的代码，让你能够更轻松地专注于底层的代码结构和逻辑。
+如你所见，使用带接收者的 lambda 表达式极大地简化了创建菜单所需的代码。Lambda 表达式不仅适用于设置和创建，还适用于配置。它们常用于为 API、UI 框架和配置构建器构建 DSL，以生成精简的代码，让你能够更轻松地专注于底层的代码结构和逻辑。
 
-Kotlin 生态系统中有许多此设计模式的示例，例如标准库中的 [`buildList()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/build-list.html) 和 [`buildString()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.text/build-string.html) 函数。
+Kotlin 生态系统中有许多关于此设计模式的示例，例如标准库中的 [`buildList()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/build-list.html) 和 [`buildString()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.text/build-string.html) 函数。
 
-> 带接收者的 lambda 表达式可以与 Kotlin 中的**类型安全构建器**结合使用，以创建能在编译时而非运行时检测类型问题的 DSL。要了解更多信息，请参阅[类型安全构建器](type-safe-builders.md)。
+> 在 Kotlin 中，带接收者的 Lambda 表达式可以与**类型安全构建器**相结合，以创建能够在编译时而非运行时检测类型问题的 DSL。要了解更多信息，请参阅[类型安全构建器](type-safe-builders.md)。
 >
 {style="tip"}
 
 ## 练习 {completion-point="true" id="practice"}
 
-### 练习 1 {initial-collapse-state="collapsed" collapsible="true" id="lambda-receivers-exercise-1"}
+<deflist appearance="clear" collapsible="true" numbered="true">
+<def title="使用带接收者的 lambda 表达式处理数据" id="lambda-receivers-exercise-1">
 
 你有一个接受带接收者的 lambda 表达式的 `fetchData()` 函数。更新该 lambda 表达式以使用 `append()` 函数，使代码的输出为：`Data received - Processed`。
 
-|---|---|
 ```kotlin
 fun fetchData(callback: StringBuilder.() -> Unit) {
     val builder = StringBuilder("Data received")
@@ -167,7 +167,6 @@ fun main() {
 ```
 {validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-lambda-receivers-exercise-1"}
 
-|---|---|
 ```kotlin
 fun fetchData(callback: StringBuilder.() -> Unit) {
     val builder = StringBuilder("Data received")
@@ -182,16 +181,17 @@ fun main() {
     }
 }
 ```
-{initial-collapse-state="collapsed" collapsible="true" collapsed-title="示例解决方案" id="kotlin-tour-lambda-receivers-solution-1"}
+{initial-collapse-state="collapsed" collapsible="true" collapsed-title="参考解答" id="kotlin-tour-lambda-receivers-solution-1"}
 
-### 练习 2 {initial-collapse-state="collapsed" collapsible="true" id="lambda-receivers-exercise-2"}
+</def>
+<def title="处理双击事件" id="lambda-receivers-exercise-2">
 
-你有一个 `Button` 类以及 `ButtonEvent` 和 `Position` 数据类。编写代码触发 `Button` 类的 `onEvent()` 成员函数，以触发双击事件。你的代码应打印 `"Double click!"`。
+你有一个 `Button` 类以及 `ButtonEvent` 和 `Position` 数据类。编写代码来调用 `Button` 类的 `onEvent()` 成员函数，以触发双击事件。你的代码应输出 `"Double click!"`。
 
 ```kotlin
 class Button {
     fun onEvent(action: ButtonEvent.() -> Unit) {
-        // 模拟双击事件（不是右键点击）
+        // 模拟双击事件（非右键单击）
         val event = ButtonEvent(isRightClick = false, amount = 2, position = Position(100, 200))
         event.action() // 触发事件回调
     }
@@ -219,11 +219,10 @@ fun main() {
 ```
 {validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-lambda-receivers-exercise-2"}
 
-|---|---|
 ```kotlin
 class Button {
     fun onEvent(action: ButtonEvent.() -> Unit) {
-        // 模拟双击事件（不是右键点击）
+        // 模拟双击事件（非右键单击）
         val event = ButtonEvent(isRightClick = false, amount = 2, position = Position(100, 200))
         event.action() // 触发事件回调
     }
@@ -251,11 +250,12 @@ fun main() {
     }
 }
 ```
-{initial-collapse-state="collapsed" collapsible="true" collapsed-title="示例解决方案" id="kotlin-tour-lambda-receivers-solution-2"}
+{initial-collapse-state="collapsed" collapsible="true" collapsed-title="参考解答" id="kotlin-tour-lambda-receivers-solution-2"}
 
-### 练习 3 {initial-collapse-state="collapsed" collapsible="true" id="lambda-receivers-exercise-3"}
+</def>
+<def title="创建自增列表" id="lambda-receivers-exercise-3">
 
-编写一个函数，创建一个整数列表的副本，其中每个元素都增加 1。使用提供的函数骨架，通过 `incremented` 函数扩展 `List<Int>`。
+编写一个函数，创建整数列表的副本，其中每个元素都递增 1。使用提供的函数骨架，通过 `incremented` 函数扩展 `List<Int>`。
 
 ```kotlin
 fun List<Int>.incremented(): List<Int> {
@@ -274,7 +274,6 @@ fun main() {
 ```
 {validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-lambda-receivers-exercise-3"}
 
-|---|---|
 ```kotlin
 fun List<Int>.incremented(): List<Int> {
     val originalList = this
@@ -290,7 +289,10 @@ fun main() {
     // [2, 3, 4]
 }
 ```
-{initial-collapse-state="collapsed" collapsible="true" collapsed-title="示例解决方案" id="kotlin-tour-lambda-receivers-solution-3"}
+{initial-collapse-state="collapsed" collapsible="true" collapsed-title="参考解答" id="kotlin-tour-lambda-receivers-solution-3"}
+
+</def>
+</deflist>
 
 <seealso></seealso>
 
