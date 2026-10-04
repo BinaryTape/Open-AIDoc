@@ -386,6 +386,7 @@
   "coil.api": "API ⏏",
   "coil.wasm-sample": "Wasm 示例 ⏏",
   "coil.changelog": "更新日志",
+  "coil.contributing": "贡献指南",
   "coil.code-of-conduct": "行为准则",
   "ktor.ktor-server": "Ktor Server",
   "ktor.getting-started-with-ktor-server": "Ktor Server 入门",
