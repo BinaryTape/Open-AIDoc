@@ -380,13 +380,7 @@
   "coil.recipes": "範例教學",
   "coil.faq": "常見問題",
   "coil.java-compatibility": "Java 相容性",
-  "coil.migrating-from-glide/picasso": "從 Glide/Picasso 遷移",
-  "coil.upgrading-to-coil2": "升級至 Coil 2.x",
-  "coil.upgrading-to-Coil3": "升級至 Coil 3.x",
   "coil.works-with-coil": "與 Coil 一起使用",
-  "coil.api": "API ⏏",
-  "coil.wasm-sample": "Wasm 範例 ⏏",
-  "coil.changelog": "更新日誌",
   "coil.contributing": "貢獻指南",
   "coil.code-of-conduct": "行為準則",
   "ktor.ktor-server": "Ktor 伺服器",
@@ -732,5 +726,11 @@
   "kmp.migrate-to-kmp-from-android": "從 Android 遷移至 KMP",
   "kmp.compose-multiplatform-entry-points": "應用程式入口點",
   "kmp.manage-project-structure": "管理專案結構",
-  "kmp.kotlin-multiplatform-tooling": "Kotlin Multiplatform 工具"
+  "kmp.kotlin-multiplatform-tooling": "Kotlin Multiplatform 工具",
+  "coil.migrating-from-glide-picasso": "從 Glide/Picasso 遷移",
+  "coil.upgrading-to-coil-2-x": "升級至 Coil 2.x",
+  "coil.upgrading-to-coil-3-x": "升級至 Coil 3.x",
+  "coil.api-⏏": "API ⏏",
+  "coil.wasm-sample-⏏": "Wasm 範例 ⏏",
+  "coil.change-log": "更新日誌"
 }

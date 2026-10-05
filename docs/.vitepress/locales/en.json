@@ -346,13 +346,7 @@
   "coil.recipes": "Recipes",
   "coil.faq": "FAQ",
   "coil.java-compatibility": "Java Compatibility",
-  "coil.migrating-from-glide/picasso": "Migrating from Glide/Picasso",
-  "coil.upgrading-to-coil2": "Upgrading to Coil 2.x",
-  "coil.upgrading-to-Coil3": "Upgrading to Coil 3.x",
   "coil.works-with-coil": "Works with Coil",
-  "coil.api": "API ⏏",
-  "coil.wasm-sample": "Wasm Sample ⏏",
-  "coil.changelog": "Change Log",
   "coil.contributing": "Contributing",
   "coil.code-of-conduct": "Code of Conduct",
   "ktor.ktor-server": "Ktor Server",
@@ -698,5 +692,11 @@
   "kmp.migrate-to-kmp-from-android": "Migrate to KMP from Android",
   "kmp.compose-multiplatform-entry-points": "App entry points",
   "kmp.manage-project-structure": "Manage project structure",
-  "kmp.kotlin-multiplatform-tooling": "Kotlin Multiplatform tooling"
+  "kmp.kotlin-multiplatform-tooling": "Kotlin Multiplatform tooling",
+  "coil.migrating-from-glide-picasso": "Migrating from Glide/Picasso",
+  "coil.upgrading-to-coil-2-x": "Upgrading to Coil 2.x",
+  "coil.upgrading-to-coil-3-x": "Upgrading to Coil 3.x",
+  "coil.api-⏏": "API ⏏",
+  "coil.wasm-sample-⏏": "WASM Sample ⏏",
+  "coil.change-log": "Change Log"
 }

@@ -103,4 +103,35 @@ describe('generated sidebars', () => {
     expect(sidebar[0]).toMatchObject({ text: `${id}.start`, link: 'start' })
     expect(sidebar[1].items[0]).toMatchObject({ link: 'first' })
   })
+
+  it('coil: regenerated from mkdocs.yml, with its home page served as overview', async () => {
+    write('mkdocs.yml', "site_url: 'https://coil-kt.github.io/coil/'\nnav:\n  - 'Overview': index.md\n  - 'FAQ': faq.md\n  - 'API ⏏': api/index.html\n")
+
+    await coilStrategy.postSync(clone)
+
+    expect(JSON.parse(readFileSync(join(site, 'docs/.vitepress/sidebar/coil.sidebar.json'), 'utf8'))).toEqual([
+      { text: 'coil.overview', link: 'overview' },
+      { text: 'coil.faq', link: 'faq' },
+      { text: 'coil.api-⏏', href: 'https://coil-kt.github.io/coil/api/index.html' },
+    ])
+  })
+})
+
+describe('kotlin strategy', () => {
+  it('expands includes across its topic folders, and translates the including page again', async () => {
+    write('docs/topics/maven/maven-kotlin-compiler.md', [
+      '# Maven', '', '<snippet id="maven-strategy">', '', 'Set `kotlin.compiler.daemon` to false.', '', '</snippet>', '',
+    ].join('\n'))
+    write('docs/topics/compiler/compiler-execution-strategy.md', [
+      '# Execution strategy', '', '## Configure in Maven', '', '<include from ="maven-kotlin-compiler.md" element-id="maven-strategy"/>', '',
+    ].join('\n'))
+
+    const task = { files: ['docs/topics/maven/maven-kotlin-compiler.md'] }
+    await kotlinStrategy.postDetect({ id: 'kotlin-web-site', cloneDir: clone }, task)
+
+    expect(task.files.map((f: string) => f.replaceAll('\\', '/'))).toEqual(['docs/maven-kotlin-compiler.md', 'docs/compiler-execution-strategy.md'])
+    expect(read('docs/compiler-execution-strategy.md')).toBe(
+      '# Execution strategy\n\n## Configure in Maven\n\nSet `kotlin.compiler.daemon` to false.\n'
+    )
+  })
 })

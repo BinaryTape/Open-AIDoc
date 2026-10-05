@@ -379,13 +379,7 @@
   "coil.recipes": "예제",
   "coil.faq": "자주 묻는 질문",
   "coil.java-compatibility": "Java 호환성",
-  "coil.migrating-from-glide/picasso": "Glide/Picasso에서 마이그레이션",
-  "coil.upgrading-to-coil2": "Coil 2.x로 업그레이드",
-  "coil.upgrading-to-Coil3": "Coil 3.x로 업그레이드",
   "coil.works-with-coil": "Coil과 함께 사용",
-  "coil.api": "API ⏏",
-  "coil.wasm-sample": "Wasm 샘플 ⏏",
-  "coil.changelog": "변경 로그",
   "coil.contributing": "기여하기",
   "coil.code-of-conduct": "행동 강령",
   "ktor.ktor-server": "Ktor 서버",
@@ -730,5 +724,11 @@
   "kmp.migrate-to-kmp-from-android": "Android에서 KMP로 마이그레이션",
   "kmp.compose-multiplatform-entry-points": "앱 진입점",
   "kmp.manage-project-structure": "프로젝트 구조 관리",
-  "kmp.kotlin-multiplatform-tooling": "Kotlin Multiplatform 툴링"
+  "kmp.kotlin-multiplatform-tooling": "Kotlin Multiplatform 툴링",
+  "coil.migrating-from-glide-picasso": "Glide/Picasso에서 마이그레이션",
+  "coil.upgrading-to-coil-2-x": "Coil 2.x로 업그레이드",
+  "coil.upgrading-to-coil-3-x": "Coil 3.x로 업그레이드",
+  "coil.api-⏏": "API ⏏",
+  "coil.wasm-sample-⏏": "Wasm 샘플 ⏏",
+  "coil.change-log": "변경 로그"
 }

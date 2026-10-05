@@ -1,6 +1,7 @@
 import fs from "fs-extra";
 import path from "path";
 import { defaultStrategy } from "./strategy.mjs";
+import { parseMKSidebar, writeSidebar } from "../processors/SidebarProcessor.mjs";
 
 const extraFilesMapping = new Map([
   ["CHANGELOG.md", "docs/changelog.md"],
@@ -23,7 +24,9 @@ export const coilStrategy = {
   /**
    * @override
    */
-  postSync: async (repoPath) => {},
+  postSync: async (repoPath) => {
+    await syncCoilSidebar(repoPath);
+  },
 
   /**
    * @override
@@ -78,4 +81,23 @@ export async function copyExtraFiles(repoPath) {
     content = content.replaceAll("/coil/recipes/#", "/coil/recipes#");
     await fs.outputFile(path.join(repoPath, docPath), content, "utf8");
   }
+}
+
+/**
+ * Generate the Coil sidebar from the upstream mkdocs.yml. Its home page is
+ * index.md upstream, which the site serves as overview (from README.md).
+ * @param {string} repoPath - Path to the coil clone
+ */
+export async function syncCoilSidebar(repoPath) {
+  const source = path.join(repoPath, "mkdocs.yml");
+  if (!(await fs.pathExists(source))) {
+    console.warn(`  ⚠️  Warning: coil sidebar source not found: ${source}`);
+    return;
+  }
+  console.log(`  Generating coil sidebar from ${source}...`);
+  const { sidebarNodes, translateKeys } = await parseMKSidebar(source, "coil", "");
+  for (const node of sidebarNodes) {
+    if (node.link === "index.md" || node.link === "index") node.link = "overview";
+  }
+  await writeSidebar("coil", sidebarNodes, translateKeys);
 }

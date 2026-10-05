@@ -56,15 +56,15 @@
     "link": "java_compatibility"
   },
   {
-    "text": "coil.migrating-from-glide/picasso",
+    "text": "coil.migrating-from-glide-picasso",
     "link": "migrating"
   },
   {
-    "text": "coil.upgrading-to-coil2",
+    "text": "coil.upgrading-to-coil-2-x",
     "link": "upgrading_to_coil2"
   },
   {
-    "text": "coil.upgrading-to-Coil3",
+    "text": "coil.upgrading-to-coil-3-x",
     "link": "upgrading_to_coil3"
   },
   {
@@ -72,15 +72,15 @@
     "link": "works_with_coil"
   },
   {
-    "text": "coil.api",
-    "href": "https://coil-kt.github.io/coil/api/"
+    "text": "coil.api-⏏",
+    "href": "https://coil-kt.github.io/coil/api/index.html"
   },
   {
-    "text": "coil.wasm-sample",
-    "href": "https://coil-kt.github.io/coil/sample/"
+    "text": "coil.wasm-sample-⏏",
+    "href": "https://coil-kt.github.io/coil/sample/index.html"
   },
   {
-    "text": "coil.changelog",
+    "text": "coil.change-log",
     "link": "changelog"
   },
   {

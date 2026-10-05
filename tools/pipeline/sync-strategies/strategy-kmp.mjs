@@ -5,6 +5,7 @@ import fs from "fs-extra";
 import {processTopicFileAsync} from "../processors/TopicProcessor.mjs";
 import {syncSidebar} from "../processors/SidebarProcessor.mjs";
 import {processMarkdownFile} from "../processors/MarkdownProcessor.mjs";
+import {expandIncludesForTask} from "../utils/writerside-include.mjs";
 
 export const kmpStrategy = {
     ...defaultStrategy,
@@ -30,6 +31,9 @@ export const kmpStrategy = {
             await copyFlatten(docsPath, docsPath);
         }
         console.log(`  Flattening finished - ${docsPath}`);
+
+        console.log(`  Running KMP postDetect: Expand includes - ${repoPath}`);
+        expandIncludesForTask(task, docsPath, "topics");
 
         console.log(` Running KMP postDetect: Process markdown files - ${repoPath}`);
         const docs = await fs.readdir(docsPath);
