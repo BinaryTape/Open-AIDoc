@@ -1,7 +1,7 @@
 import fs from "fs-extra";
 import path from "path";
 import {defaultStrategy} from "./strategy.mjs";
-import {generateSidebar} from "../processors/SidebarProcessor.mjs";
+import {syncSidebar} from "../processors/SidebarProcessor.mjs";
 
 const extraFilesMapping = new Map([
     ["CHANGELOG.md", "docs/changelog.md"],
@@ -16,7 +16,9 @@ export const sqlDelightStrategy = {
      */
     getDocPatterns: () => ["docs/**/*.md", ...extraFilesMapping.keys()],
 
-    postSync: async (repoPath) => {},
+    postSync: async (repoPath, context, repoConfig) => {
+        await syncSidebar(path.join(repoPath, 'mkdocs.yml'), repoConfig.sidebarId, 'https://sqldelight.github.io/sqldelight/2.1.0/');
+    },
 
     /**
      * @override
@@ -37,14 +39,6 @@ export const sqlDelightStrategy = {
             })
         );
         console.log("  Copying root markdown files finished");
-
-        console.log(`  Running SQLDelight postSync: Generate sidebar...`);
-        const sidebarPath = path.join(repoPath, 'mkdocs.yml');
-        const docType = repoConfig.sidebarId;
-        if (await fs.pathExists(sidebarPath)) {
-            await generateSidebar(sidebarPath, docType, 'https://sqldelight.github.io/sqldelight/2.1.0/');
-        }
-        console.log(`  Generate sidebar finished`);
     },
 
     /**

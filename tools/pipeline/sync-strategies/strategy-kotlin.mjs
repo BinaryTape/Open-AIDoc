@@ -3,7 +3,7 @@ import {copyFlatten} from "../utils/fsUtils.mjs";
 import path from "path";
 import fs from "fs-extra";
 import {processTopicFileAsync} from "../processors/TopicProcessor.mjs";
-import {generateSidebar} from "../processors/SidebarProcessor.mjs";
+import {syncSidebar} from "../processors/SidebarProcessor.mjs";
 
 export const kotlinStrategy = {
     ...defaultStrategy,
@@ -15,6 +15,15 @@ export const kotlinStrategy = {
 
     postSync: async (repoPath, context, repoConfig) => {
         await copyKotlinVersionFile(context, repoConfig);
+
+        // Each repository of the family has one tree in docs/ (kr.tree, kc.tree, ...)
+        const docsPath = path.join(repoPath, "docs");
+        const tree = (await fs.readdir(docsPath)).find(doc => doc.endsWith(".tree"));
+        if (tree) {
+            await syncSidebar(path.join(docsPath, tree), repoConfig.sidebarId);
+        } else {
+            console.warn(`  ⚠️  Warning: no .tree file found in ${docsPath}`);
+        }
     },
 
     /**
@@ -64,15 +73,6 @@ export const kotlinStrategy = {
         );
         console.log(`  Mapped ${task.files.length} files: ${task.files.join("\n")}`);
         console.log(`  Change detected path finished - ${repoPath}`);
-
-        console.log(`  Running Kotlin postDetect: Generate sidebar - ${repoPath}...`);
-        const sidebarFile = docs.filter(doc => doc.endsWith(".tree"));
-        const sidebarPath = path.join(docsPath, sidebarFile[0]);
-        const docType = repoConfig.sidebarId;
-        if (await fs.pathExists(sidebarPath)) {
-            await generateSidebar(sidebarPath, docType);
-        }
-        console.log(`  Generate sidebar finished - ${repoPath}`);
 
         if (repoConfig.id === "kotlin-web-site") {
             console.log(`  Running Kotlin postDetect: Resolve includes`);

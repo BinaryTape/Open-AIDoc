@@ -3,7 +3,7 @@ import {copyFlatten} from "../utils/fsUtils.mjs";
 import path from "path";
 import fs from "fs-extra";
 import {processTopicFileAsync} from "../processors/TopicProcessor.mjs";
-import {generateSidebar} from "../processors/SidebarProcessor.mjs";
+import {syncSidebar} from "../processors/SidebarProcessor.mjs";
 import {processMarkdownFile} from "../processors/MarkdownProcessor.mjs";
 
 export const kmpStrategy = {
@@ -14,7 +14,9 @@ export const kmpStrategy = {
      */
     getDocPatterns: () => ["topics/**/*.md", "topics/**/*.topic"],
 
-    postSync: async (repoPath) => {},
+    postSync: async (repoPath, context, repoConfig) => {
+        await syncSidebar(path.join(repoPath, "mpd.tree"), repoConfig.sidebarId);
+    },
 
     /**
      * @override
@@ -73,14 +75,6 @@ export const kmpStrategy = {
         );
         console.log(`  Mapped files: ${task.files.join("\n")}`);
         console.log(`  Change detected path finished - ${repoPath}`);
-
-        console.log(`  Running KMP postDetect: Generate sidebar - ${repoPath}...`);
-        const sidebarPath = path.join(repoPath, "mpd.tree");
-        const docType = repoConfig.sidebarId;
-        if (await fs.pathExists(sidebarPath)) {
-            await generateSidebar(sidebarPath, docType);
-        }
-        console.log(`  Generate sidebar finished - ${repoPath}`);
     },
 
     /**
