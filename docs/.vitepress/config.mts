@@ -14,6 +14,7 @@ import { applySeoMetadata } from './config/seo.config'
 
 // ===== Vite plugins =====
 import liquidIncludePlugin from "./plugins/vite/vite-liquid-include"
+import releaseSfcAstPlugin from "./plugins/vite/vite-release-sfc-ast"
 
 // ===== Constants =====
 const mkDiffGrammarPath = resolve(__dirname, './plugins/shiki/shiki-mk-diff.json')
@@ -65,7 +66,7 @@ export default defineConfig({
     resolve: {
       alias: { '@': resolve(__dirname, '../.vitepress') }
     },
-    plugins: [liquidIncludePlugin()],
+    plugins: [liquidIncludePlugin(), releaseSfcAstPlugin()],
     build: {
       // Gzipping ~8k page chunks just to print sizes is minutes on 2 vCPU CI.
       reportCompressedSize: false,
