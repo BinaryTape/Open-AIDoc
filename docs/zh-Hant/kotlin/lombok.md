@@ -175,3 +175,4 @@ Lombok 編譯器外掛程式的 JAR 檔可在 Kotlin 編譯器的二進位發行
 # 選項可以重複。
 
 -P plugin:org.jetbrains.kotlin.lombok:config=<PATH_TO_CONFIG_FILE>
+```

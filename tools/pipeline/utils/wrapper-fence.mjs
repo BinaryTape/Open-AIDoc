@@ -59,3 +59,23 @@ export function repairUnclosedWrapper(translated, source = null) {
 
   return { content: lines.slice(first + 1).join('\n').trimStart(), changed: true }
 }
+
+/**
+ * Repair a document translated before wrappers were recognised that ends
+ * with a code block: the cleanup of the time took its closing fence for the
+ * end of a wrapper and dropped it.
+ *
+ * @param {string} translated
+ * @param {string} source - Upstream source
+ * @returns {{content: string, changed: boolean}}
+ */
+export function restoreTrailingFence(translated, source) {
+  const unchanged = { content: translated, changed: false }
+  if (countFenceLines(translated) % 2 === 0 || countFenceLines(source) % 2 !== 0) return unchanged
+
+  const lastLine = (text) => text.trimEnd().split('\n').pop()
+  const closing = lastLine(source)
+  if (!FENCE_LINE.test(closing) || FENCE_LINE.test(lastLine(translated))) return unchanged
+
+  return { content: `${translated.trimEnd()}\n${closing.trimEnd()}\n`, changed: true }
+}

@@ -13,3 +13,4 @@ CREATE INDEX hockeyPlayer_full_name ON hockeyPlayer(full_name);
 
 INSERT INTO hockeyPlayer (player_number, full_name)
 VALUES (15, 'Ryan Getzlaf');
+```

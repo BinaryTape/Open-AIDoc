@@ -251,3 +251,4 @@ class ExtensionTests: KoinTest {
         Assertions.assertNotNull(koin.get<Simple.ComponentA>())
     }
 }
+```

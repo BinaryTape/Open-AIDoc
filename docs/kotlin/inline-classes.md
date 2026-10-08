@@ -218,3 +218,4 @@ fun main() {
     })
     println(my.foo()) // 打印 "foo"
 }
+```

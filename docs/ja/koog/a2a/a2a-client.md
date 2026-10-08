@@ -212,3 +212,4 @@ if (task.status.state == TaskState.Working) {
     val cancelledTask = client.cancelTask(cancelRequest).data
     println("タスクがキャンセルされました: ${cancelledTask.status.state}")
 }
+```

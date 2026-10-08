@@ -131,3 +131,4 @@ Maven에서는 `jpa` 플러그인을 활성화하세요:
 -Xplugin=$KOTLIN_HOME/lib/noarg-compiler-plugin.jar
 -P plugin:org.jetbrains.kotlin.noarg:annotation=com.my.Annotation
 -P plugin:org.jetbrains.kotlin.noarg:preset=jpa
+```

@@ -175,3 +175,4 @@ Kotlin 编译器的二进制发行版中提供了 Lombok 编译器插件 JAR。�
 # 选项可以重复。
 
 -P plugin:org.jetbrains.kotlin.lombok:config=<PATH_TO_CONFIG_FILE>
+```

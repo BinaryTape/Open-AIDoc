@@ -391,3 +391,4 @@ Java 기본 타입으로 매핑되는 플랫폼 타입(`Int!`, `Boolean!`, `Shor
 compileKotlin {
     kotlinOptions.allWarningsAsErrors = true
 }
+```

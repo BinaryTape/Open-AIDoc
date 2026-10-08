@@ -481,3 +481,4 @@ val toIntInvalid = "1000000000000".toIntOrNull()
 
 val toBoolean = "true".toBooleanStrict() // true
 val toBooleanInvalid = "yes".toBooleanStrictOrNull() // null
+```

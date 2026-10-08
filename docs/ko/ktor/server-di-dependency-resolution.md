@@ -219,3 +219,4 @@ dependencies {
 
 // 해결되지 않음
 val charSequenceSink: Sink<String> by dependencies
+```

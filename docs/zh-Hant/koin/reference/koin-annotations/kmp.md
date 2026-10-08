@@ -306,3 +306,4 @@ class PlatformComponentC(val context: Context) {
 // 在 iOS 上不執行任何操作
 @Module
 actual class NativeModuleC
+```

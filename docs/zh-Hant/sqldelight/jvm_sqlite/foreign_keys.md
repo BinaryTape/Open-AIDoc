@@ -10,3 +10,4 @@ JdbcSqliteDriver(
   url = "...", 
   properties = Properties().apply { put("foreign_keys", "true") }
 )
+```

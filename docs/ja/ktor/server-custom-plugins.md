@@ -544,3 +544,4 @@ onCall {
        database.access(...) // データベースへの呼び出し
    }
 }
+```

@@ -119,3 +119,4 @@ java.runtime.version=21
    remote: https://ktor-sample-heroku.herokuapp.com/ deployed to Heroku
    remote:
    remote: Verifying deploy... done.
+   ```

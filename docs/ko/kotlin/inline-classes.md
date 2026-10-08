@@ -219,3 +219,4 @@ fun main() {
     })
     println(my.foo()) // "foo" 출력
 }
+```

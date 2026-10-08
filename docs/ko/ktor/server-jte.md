@@ -132,3 +132,4 @@ get("/index") {
     val params = mapOf("id" to 1, "name" to "John")
     call.respond(JteContent("index.kte", params))
 }
+```

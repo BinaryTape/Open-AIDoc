@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { repairUnclosedWrapper, stripWrapperFence } from '../tools/pipeline/utils/wrapper-fence.mjs'
+import { repairUnclosedWrapper, restoreTrailingFence, stripWrapperFence } from '../tools/pipeline/utils/wrapper-fence.mjs'
 import { cleanupTranslation } from '../tools/pipeline/translate.mjs'
 
 const topicSource = ['<topic title="Frameworks">', '  <chapter title="Intro">', '    <p>Text</p>', '  </chapter>', '</topic>'].join('\n')
@@ -69,5 +69,23 @@ describe('repairUnclosedWrapper', () => {
   it('leaves a closed ```xml block at the top of a page', () => {
     const translated = ['```xml', '<dependency/>', '```', '', '文本'].join('\n')
     expect(repairUnclosedWrapper(translated, null).changed).toBe(false)
+  })
+})
+
+describe('restoreTrailingFence', () => {
+  const source = '# Lambdas\n\nText.\n\n```kotlin\nhtml {\n    body()\n}\n```\n'
+
+  it('restores the closing fence a page ending with a code block lost', () => {
+    const translated = '# Lambda\n\n文本。\n\n```kotlin\nhtml {\n    body()\n}'
+    expect(restoreTrailingFence(translated, source)).toEqual({
+      content: '# Lambda\n\n文本。\n\n```kotlin\nhtml {\n    body()\n}\n```\n',
+      changed: true,
+    })
+  })
+
+  it('leaves balanced fences, and sources that do not end with a code block, alone', () => {
+    const complete = '# Lambda\n\n```kotlin\nhtml {}\n```\n'
+    expect(restoreTrailingFence(complete, source).changed).toBe(false)
+    expect(restoreTrailingFence('# A\n\n```kotlin\nval x = 1\n', '# A\n\n```kotlin\nval x = 1\n```\n\nThe end.\n').changed).toBe(false)
   })
 })

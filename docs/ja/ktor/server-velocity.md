@@ -125,3 +125,4 @@ install(VelocityTools) {
     addDefaultTools() // デフォルトツールの追加
     tool("foo", MyCustomTool::class.java) // カスタムツールの追加
 }
+```

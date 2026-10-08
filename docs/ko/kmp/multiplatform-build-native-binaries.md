@@ -471,3 +471,4 @@ binaries {
         binaryOption("bundleVersion", "2")
     }
 }
+```

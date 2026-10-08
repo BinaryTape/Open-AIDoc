@@ -220,3 +220,4 @@ fun main() {
     })
     println(my.foo()) // 印出 "foo"
 }
+```

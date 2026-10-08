@@ -528,3 +528,4 @@ fun main() {
     val n = Runner.run<OtherImplementation, _>()
     assert(n == 42)
 }
+```

@@ -119,3 +119,4 @@ Gitを使用してHerokuにアプリケーションをデプロイするには�
    remote: https://ktor-sample-heroku.herokuapp.com/ deployed to Heroku
    remote:
    remote: Verifying deploy... done.
+   ```

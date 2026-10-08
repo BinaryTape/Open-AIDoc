@@ -50,3 +50,4 @@ imageView.load("/path/to/video.mp4") {
 imageView.load("/path/to/video") {
     decoderFactory { result, options, _ -> VideoFrameDecoder(result.source, options) }
 }
+```

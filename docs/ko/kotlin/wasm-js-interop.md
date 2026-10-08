@@ -514,3 +514,4 @@ val wasmJsMain by getting {
         implementation("org.jetbrains.kotlinx:kotlinx-browser:0.3")
     }
 }
+```

@@ -12,3 +12,4 @@ val driver: SqlDriver = AndroidSqliteDriver(
         AfterVersion(3) { driver -> driver.execute(null, "INSERT INTO test (value) VALUES('hello')", 0) },
     )
 )
+```
