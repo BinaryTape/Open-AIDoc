@@ -60,8 +60,8 @@
 
 1) 增加 SyncStrategy（若可复用现有策略，可跳过）
 - 根据上游站点技术栈选择相近策略：
-    - Writerside 示例：`kotlinStrategy`、`kmpStrategy`（处理 `.topic`、生成 Writerside 侧边栏）。
-    - MkDocs 示例：`koogStrategy`、`sqlDelightStrategy`（从 `mkdocs.yml` 生成侧边栏）；`coilStrategy` 的侧边栏是手工维护的。
+    - Writerside 示例：`kotlinStrategy`、`kmpStrategy`（处理 `.topic`、生成 Writerside 侧边栏）。Writerside 页面里的 `<include>` 必须在翻译前展开：在 `postDetect` 中把文档拍平到一个目录后调用 `expandIncludesForTask(task, 目录, 相对路径)`（`tools/pipeline/utils/writerside-include.mjs`）。它会展开所有引用，并把「引用了本次改动页面」的页面也加入翻译列表；无法展开的引用会保留原样并在日志里警告。
+    - MkDocs 示例：`koogStrategy`、`sqlDelightStrategy`、`coilStrategy`（从 `mkdocs.yml` 生成侧边栏；coil 把上游首页 `index.md` 对应到本站的 `overview`）。
     - Docusaurus 示例：`koinStrategy`（一般是纯 Markdown 目录结构）。
 - 如需自定义，复制一个最接近的策略文件，新建例如 `tools/pipeline/sync-strategies/strategy-xxx.mjs`：
   ```js

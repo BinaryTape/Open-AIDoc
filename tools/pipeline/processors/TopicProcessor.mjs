@@ -104,7 +104,7 @@ export async function processTopicContentAsync(currentFilePath, docsPath, topicC
         }
     );
 
-    topicContent = replaceInclude(topicContent, docsPath);
+    // <include> is expanded earlier, on the original pages (utils/writerside-include.mjs).
 
     topicContent = topicContent.replace(
         /<card\s*([^>]*)\/>/g,
@@ -139,8 +139,12 @@ export async function processTopicContentAsync(currentFilePath, docsPath, topicC
         }
     );
 
+    // <anchor name="x"/>: an extra link target, usually right above a heading
+    topicContent = topicContent.replace(/<anchor\s+name="([^"]+)"\s*\/>/g, '<a id="$1"></a>');
+
+    // \b: not <action>, <anchor>, ... (an Android manifest in a code block)
     topicContent = topicContent.replace(
-        /<a\s*([^>]*)\/>/g,
+        /<a\b\s*([^>]*)\/>/g,
         (match, attrs) => {
             const anchor = attrs.match(/anchor="([^"]+)"/);
             const href = attrs.match(/href="([^"]+)"/);
@@ -150,9 +154,10 @@ export async function processTopicContentAsync(currentFilePath, docsPath, topicC
             } else if (href) {
                 return `<a href="${href[1]}"></a>`;
             } else if (anchor) {
-                const inner = getChapterTitle(currentFilePath, anchor[1])
+                const inner = getChapterTitle(currentFilePath, anchor[1]) || anchor[1]
                 return `<a anchor="${anchor[1]}">${inner}</a>`
             }
+            return match;
         }
     );
 
@@ -164,8 +169,11 @@ export async function processTopicContentAsync(currentFilePath, docsPath, topicC
                 return `<a href="#${anchor[1]}">${inner}</a>`;
             }
 
+            const hrefMatch = attrs.match(/href="([^"]+)"/);
+            if (!hrefMatch) return match; // a link target: <a id="x"></a>
+
             const summaryMatch = attrs.match(/summary="([^"]+)"/);
-            const href = attrs.match(/href="([^"]+)"/)[1];
+            const href = hrefMatch[1];
             if (summaryMatch && summaryMatch[1] !== undefined) {
                 return `<card href="${docHref(href)}" summary="${summaryMatch[1]}">${inner}</card>`;
             }
@@ -178,7 +186,9 @@ export async function processTopicContentAsync(currentFilePath, docsPath, topicC
                 return match;
             } else if (href.includes('#')) {
                 const topicPath = path.join(docsPath, href.split('#')[0]);
-                inner = getChapterTitle(topicPath, href.split('#')[1]);
+                if (inner === '') {
+                    inner = getChapterTitle(topicPath, href.split('#')[1]) || getTopicTitle(topicPath) || href;
+                }
                 return `<a href="${href}">${inner}</a>`;
             }
 
@@ -303,39 +313,6 @@ export function normalizeWritersideCodeBlocks(content) {
     );
 }
 
-export function replaceInclude(source, docsPath) {
-    const includeRegex = /([ \t]*)<include\s+from="([^"]+)"\s+element-id="([^"]+)"\s*\/?>/g;
-    return source.replace(
-        includeRegex,
-        (match, indention, from, elementId) => {
-            let file = fs.readFileSync(`${docsPath}/${from}`, 'utf8');
-            const reg = new RegExp(`<([^\\s>]+)(?:\\s+[^>]*?)?\\s+id="${elementId}"(?:\\s+[^>]*?)?>\\n([\\s\\S]*?)(\\s*)<\\/\\1>$`, 'm'); //！！！
-
-            const contentMatch = file.match(reg);
-            if (contentMatch && contentMatch[2].match(includeRegex)) {
-                return replaceInclude(contentMatch[2], docsPath);
-            } else if (contentMatch) {
-                return removeMinimalIndention(contentMatch[2], indention);
-            }
-        }
-    );
-}
-
-function removeMinimalIndention(content, indention) {
-    let lines = content.split('\n');
-
-    const minIndent = Math.min(
-        ...lines.filter(line => line.trim().length > 0).map(line => {
-            const match = line.match(/^(\s*)/);
-            return match ? match[1].length : 0;
-        })
-    );
-
-    lines = lines.map(line => indention + line.slice(minIndent));
-
-    return lines.join('\n');
-}
-
 /**
  * Resolve codeSnippets/ next to the Writerside topics/docs directory.
  * Works for both absolute and relative paths (unlike path.split('/')[0]).
@@ -404,22 +381,33 @@ export function getTopicTitle(fileUrl) {
     }
 }
 
+// The id Writerside gives a Markdown heading without an explicit one
+const headingSlug = (title) =>
+    title.toLowerCase().replace(/[`*_]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
+/**
+ * Title of the chapter (heading) with the given id, or '' when not found.
+ */
 export function getChapterTitle(fileUrl, chapterId) {
     try {
         const file = fs.readFileSync(fileUrl, 'utf8');
 
-        let match;
         if (fileUrl.includes('.md')) {
-            match = file.match(new RegExp(`#{1,6}\\s*(.+?)\\s*\\{id="${chapterId}"\\}`));
+            for (const line of file.split('\n')) {
+                const heading = /^#{1,6}\s+(.+?)\s*(?:\{([^{}]*)\})?\s*$/.exec(line);
+                if (!heading) continue;
+                const id = heading[2] && /(?:^|\s)id\s*=\s*"?([^"\s}]+)"?/.exec(heading[2]);
+                if ((id ? id[1] : headingSlug(heading[1])) === chapterId) return heading[1];
+            }
         } else {
-            match = file.match(new RegExp(`<chapter\\s+title="([^"]+)"\\s+id="${chapterId}">([\\s\\S]*?)<\\/chapter>`));
-        }
-        if (match && match[1] !== undefined) {
-            return match[1];
+            const chapter = file.match(new RegExp(`<chapter\\b[^>]*\\bid="${chapterId}"[^>]*>`));
+            const title = chapter && /\btitle="([^"]+)"/.exec(chapter[0]);
+            if (title) return title[1];
         }
     } catch (e) {
         console.error('Failed to get chapter title', fileUrl, e);
     }
+    return '';
 }
 
 function getCardSummary(fileUrl) {
@@ -432,6 +420,7 @@ function getCardSummary(fileUrl) {
     } catch (e) {
         console.error('Failed to get link summary', fileUrl, e);
     }
+    return '';
 }
 
 export function getLinkSummary(fileUrl) {
@@ -450,5 +439,6 @@ export function getLinkSummary(fileUrl) {
     } catch (e) {
         console.error('Failed to get link summary', fileUrl, e);
     }
+    return '';
 }
 

@@ -4,6 +4,7 @@ import path from "path";
 import fs from "fs-extra";
 import {processTopicFileAsync} from "../processors/TopicProcessor.mjs";
 import {syncSidebar} from "../processors/SidebarProcessor.mjs";
+import {expandIncludesForTask} from "../utils/writerside-include.mjs";
 
 export const kotlinStrategy = {
     ...defaultStrategy,
@@ -50,6 +51,9 @@ export const kotlinStrategy = {
         }
         console.log(`  Remove redundant files finished - ${repoPath}`);
 
+        console.log(`  Running Kotlin postDetect: Expand includes - ${repoPath}`);
+        expandIncludesForTask(task, docsPath, "docs");
+
         console.log(` Running Kotlin postDetect: Convert topic files - ${repoPath}`);
         const docs = await fs.readdir(docsPath);
         const topicFiles = docs.filter(doc => doc.endsWith(".topic"));
@@ -73,31 +77,6 @@ export const kotlinStrategy = {
         );
         console.log(`  Mapped ${task.files.length} files: ${task.files.join("\n")}`);
         console.log(`  Change detected path finished - ${repoPath}`);
-
-        if (repoConfig.id === "kotlin-web-site") {
-            console.log(`  Running Kotlin postDetect: Resolve includes`);
-            const includeMD = path.join(docsPath, "kotlin-language-features-and-proposals.md");
-            let content = await fs.readFile(includeMD, "utf8");
-            const includeFilterRe = /<include\s+element-id="([^"]+)"\s+use-filter="([^"]+)"\s+from="([^"]+)"\s*\/?>/g;
-
-            content = content.replace(includeFilterRe, (match, elementId, filterMatch, from) => {
-                const filter = filterMatch.split(',')[1]
-                const snippetRe = new RegExp(
-                    `<snippet\\b[^>]*\\bid="${elementId}"[^>]*>([\\s\\S]*?)</snippet>`,
-                    'i'
-                );
-                const snippetMatch = content.match(snippetRe);
-                const source = snippetMatch ? snippetMatch[1] : content;
-                const trMatch = source.match(new RegExp(`<tr\\s+filter="${filter}">([\\s\\S]*?)<\\/tr>`, 'g'));
-                if (!trMatch) return '';
-
-                const tr = trMatch.join('\n\n');
-                return `<table>\n${tr}\n</table>`
-            })
-
-            await fs.writeFile(includeMD, content, "utf8");
-            console.log(`  Resolve includes finished - ${repoPath}`);
-        }
     },
 
     /**

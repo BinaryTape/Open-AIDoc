@@ -5,6 +5,7 @@ import fs from "fs-extra";
 import {processTopicFileAsync} from "../processors/TopicProcessor.mjs";
 import {syncSidebar} from "../processors/SidebarProcessor.mjs";
 import {processMarkdownFile} from "../processors/MarkdownProcessor.mjs";
+import {expandIncludesForTask} from "../utils/writerside-include.mjs";
 
 // lib*.topic files are libraries of snippets included by other topics, not pages.
 const isIncludeLibrary = (file) => /^lib.*\.topic$/.test(path.basename(file));
@@ -28,6 +29,10 @@ export const ktorStrategy = {
         const repoPath = repoConfig.cloneDir;
         const docsPath = path.join(repoPath, "topics");
         const docs = await fs.readdir(docsPath);
+
+        // A change to lib.topic reaches every page that includes its snippets
+        console.log(`  Running Ktor postDetect: Expand includes - ${repoPath}`);
+        expandIncludesForTask(task, docsPath, "topics");
 
         console.log(` Running Ktor postSync: Process markdown files - ${repoPath}`);
         const mdFiles = docs.filter(doc => doc.endsWith(".md"));

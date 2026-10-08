@@ -88,16 +88,12 @@ export async function processMarkdownContent(filePath, content) {
     content = content.replace(
         /\[]\(([\s\S]*?)\)/g,
         (match, href) => {
-            let title;
-            if (href.startsWith('#')) {
-                title = getChapterTitle(filePath, href.split('#')[1])
-            } else if (href.includes('#')) {
-                const targetFile = path.join(path.dirname(filePath), href.split('#')[0])
-                title = getChapterTitle(targetFile, href.split('#')[1])
-            } else {
-                const topicPath = path.join(path.dirname(filePath), href);
-                title = getTopicTitle(topicPath)
-            }
+            // Writerside fills an empty link with the title of its target
+            const [page, anchor] = href.split('#');
+            const targetFile = page ? path.join(path.dirname(filePath), page) : filePath;
+            const title = (anchor !== undefined && getChapterTitle(targetFile, anchor))
+                || (page && getTopicTitle(targetFile))
+                || href;
 
             return `[${title}](${href})`
         }
