@@ -61,30 +61,29 @@
 1) 增加 SyncStrategy（若可复用现有策略，可跳过）
 - 根据上游站点技术栈选择相近策略：
     - Writerside 示例：`kotlinStrategy`、`kmpStrategy`（处理 `.topic`、生成 Writerside 侧边栏）。
-    - MkDocs 示例：`koogStrategy`、`coilStrategy`（从 `mkdocs.yml` 生成侧边栏）。
+    - MkDocs 示例：`koogStrategy`、`sqlDelightStrategy`（从 `mkdocs.yml` 生成侧边栏）；`coilStrategy` 的侧边栏是手工维护的。
     - Docusaurus 示例：`koinStrategy`（一般是纯 Markdown 目录结构）。
 - 如需自定义，复制一个最接近的策略文件，新建例如 `tools/pipeline/sync-strategies/strategy-xxx.mjs`：
   ```js
   import { defaultStrategy } from "./strategy.mjs";
   import path from "path";
   import fs from "fs-extra";
-  import { generateSidebar } from "../processors/SidebarProcessor.mjs";
+  import { syncSidebar } from "../processors/SidebarProcessor.mjs";
 
   export const myLibStrategy = {
     ...defaultStrategy,
     // 1) 指定需要处理的文档文件匹配模式（相对上游仓库根目录）
     getDocPatterns: () => ["docs/**/*.md"],
 
-    // 2) 如需：拉取后做预处理（可为空）
-    postSync: async (repoPath) => {},
-
-    // 3) 检测阶段：生成侧边栏（使用配置中的 sidebarId，不要从路径推导）
-    postDetect: async (repoConfig, task) => {
-      const sidebarPath = path.join(repoConfig.cloneDir, "docs/mkdocs.yml");
-      if (await fs.pathExists(sidebarPath)) {
-        await generateSidebar(sidebarPath, repoConfig.sidebarId);
-      }
+    // 2) 拉取后：生成侧边栏（使用配置中的 sidebarId，不要从路径推导）。
+    //    放在 postSync 而不是 postDetect：postSync 每次同步都会运行，
+    //    postDetect 只在有文档改动时运行，上游只改目录结构时侧边栏就不会更新。
+    postSync: async (repoPath, context, repoConfig) => {
+      await syncSidebar(path.join(repoPath, "docs/mkdocs.yml"), repoConfig.sidebarId);
     },
+
+    // 3) 检测阶段：如需，对改动的文档做预处理、调整 task.files（可省略）
+    postDetect: async (repoConfig, task) => {},
 
     // 4) 翻译结束后：拷贝资源等
     postTranslate: async (context, repoConfig) => {
@@ -146,10 +145,10 @@
 - 实现 LinkRewrite 时，可参考 `docs/.vitepress/link-rewrites/*.link-rewrite.ts`，并复用 `link-rewrite-utils.ts` 中的工具函数。
 
 完成以上三步后，流水线会：
-- 在 `STAGE 1` 克隆/更新新仓库；
+- 在 `STAGE 1` 克隆/更新新仓库，并（在策略的 `postSync` 中）重新生成侧边栏；
 - 在 `STAGE 2` 依据 SyncStrategy 的 `getDocPatterns()` 找到新增/变更文档；
 - 在 `STAGE 3` 调用 Gemini 翻译，输出到 `docs/{docType}/...`（简中）与其他语言目录；
-- 在 `STAGE 3.1` 生成/更新侧边栏与多语言 locale；
+- 在 `STAGE 3.1` 翻译侧边栏标签（多语言 locale）；
 - 在 `STAGE 4` 统一提交并推送。
 
 ### 关于“自定义 Markdown 语法/HTML 组件”的处理（重要）

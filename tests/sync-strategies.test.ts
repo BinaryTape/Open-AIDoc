@@ -4,6 +4,10 @@ import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { coilStrategy } from '../tools/pipeline/sync-strategies/strategy-coil.mjs'
 import { ktorStrategy } from '../tools/pipeline/sync-strategies/strategy-ktor.mjs'
+import { kmpStrategy } from '../tools/pipeline/sync-strategies/strategy-kmp.mjs'
+import { koogStrategy } from '../tools/pipeline/sync-strategies/strategy-koog.mjs'
+import { kotlinStrategy } from '../tools/pipeline/sync-strategies/strategy-kotlin.mjs'
+import { sqlDelightStrategy } from '../tools/pipeline/sync-strategies/strategy-sqldelight.mjs'
 
 let clone: string
 
@@ -58,5 +62,45 @@ describe('ktor strategy', () => {
 
     expect(task.files).toEqual(['topics/server-cors.md'])
     expect(existsSync(join(clone, 'topics/lib.md'))).toBe(false)
+  })
+})
+
+describe('generated sidebars', () => {
+  const tree = '<instance-profile id="x"><toc-element topic="start.md"/>' +
+    '<toc-element toc-title="Guides"><toc-element topic="first.topic"/></toc-element></instance-profile>\n'
+  const mkdocs = 'site_name: X\nnav:\n  - Start: start.md\n  - Guides:\n    - First: first.md\n'
+
+  const cases = [
+    { strategy: ktorStrategy, id: 'ktor', file: 'ktor.tree', content: tree },
+    { strategy: kmpStrategy, id: 'kmp', file: 'mpd.tree', content: tree },
+    { strategy: kotlinStrategy, id: 'dokka', file: 'docs/dokka.tree', content: tree },
+    { strategy: koogStrategy, id: 'koog', file: 'docs/mkdocs.yml', content: mkdocs },
+    { strategy: sqlDelightStrategy, id: 'sqldelight', file: 'mkdocs.yml', content: mkdocs },
+  ]
+
+  const originalCwd = process.cwd()
+  let site: string
+
+  beforeEach(() => {
+    site = mkdtempSync(join(tmpdir(), 'site-'))
+    mkdirSync(join(site, 'docs/.vitepress/sidebar'), { recursive: true })
+    mkdirSync(join(site, 'docs/.vitepress/locales'), { recursive: true })
+    process.chdir(site)
+  })
+
+  afterEach(() => {
+    process.chdir(originalCwd)
+    rmSync(site, { recursive: true, force: true })
+  })
+
+  // postSync runs on every sync; postDetect only when documents changed
+  it.each(cases)('$id: regenerated from $file on every sync', async ({ strategy, id, file, content }) => {
+    write(file, content)
+
+    await strategy.postSync(clone, { gitAddPaths: new Set() }, { id, sidebarId: id, cloneDir: clone })
+
+    const sidebar = JSON.parse(readFileSync(join(site, `docs/.vitepress/sidebar/${id}.sidebar.json`), 'utf8'))
+    expect(sidebar[0]).toMatchObject({ text: `${id}.start`, link: 'start' })
+    expect(sidebar[1].items[0]).toMatchObject({ link: 'first' })
   })
 })
