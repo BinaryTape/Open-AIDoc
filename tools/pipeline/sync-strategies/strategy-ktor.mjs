@@ -3,7 +3,7 @@ import { copyFlatten } from "../utils/fsUtils.mjs";
 import path from "path";
 import fs from "fs-extra";
 import {processTopicFileAsync} from "../processors/TopicProcessor.mjs";
-import {generateSidebar} from "../processors/SidebarProcessor.mjs";
+import {syncSidebar} from "../processors/SidebarProcessor.mjs";
 import {processMarkdownFile} from "../processors/MarkdownProcessor.mjs";
 
 // lib*.topic files are libraries of snippets included by other topics, not pages.
@@ -17,7 +17,9 @@ export const ktorStrategy = {
      */
     getDocPatterns: () => ["topics/*.md", "topics/*.topic"],
 
-    postSync: async (repoPath) => {},
+    postSync: async (repoPath, context, repoConfig) => {
+        await syncSidebar(path.join(repoPath, "ktor.tree"), repoConfig.sidebarId);
+    },
 
     /**
      * @override
@@ -50,14 +52,6 @@ export const ktorStrategy = {
             .map((file) => file.replace(/\.topic$/, '.md'));
         console.log(`  Mapped files: ${task.files.join("\n")}`);
         console.log(`  Change file extension finished - ${repoPath}`);
-
-        console.log(`  Running Ktor postSync: Generate sidebar - ${repoPath}...`);
-        const sidebarPath = path.join(repoPath, "ktor.tree");
-        const docType = repoConfig.sidebarId;
-        if (await fs.pathExists(sidebarPath)) {
-            await generateSidebar(sidebarPath, docType);
-        }
-        console.log(`  Generate sidebar finished - ${repoPath}`);
     },
 
     /**

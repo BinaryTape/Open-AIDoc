@@ -41,6 +41,22 @@ export async function stageChanges(context) {
   }
 }
 
+/**
+ * Repositories a run updated, in run order: those with documents to
+ * translate and those whose sidebar changed (sidebars are regenerated on
+ * every sync, so navigation can change while no document did).
+ * Call after stageChanges.
+ * @returns {Promise<string[]>}
+ */
+export async function updatedRepoIds(context) {
+  const { stdout } = await execa("git", ["diff", "--cached", "--name-only", "-z"]);
+  const staged = new Set(stdout.split("\0").filter(Boolean));
+  const withTasks = new Set(context.tasks.map((t) => t.repoConfig.id));
+  return context.repos
+    .filter((r) => withTasks.has(r.id) || staged.has(`${SIDEBAR_DIR}/${r.sidebarId}.sidebar.json`))
+    .map((r) => r.id);
+}
+
 async function readJson(file) {
   return (await fs.pathExists(file)) ? fs.readJson(file) : {};
 }
@@ -89,7 +105,7 @@ export async function exportRepoChanges(context, outDir) {
 
   const summary = {
     repos: context.repos.map((r) => r.id),
-    updated: context.tasks.map((t) => t.repoConfig.id),
+    updated: await updatedRepoIds(context),
     files,
     deleted,
     locales,

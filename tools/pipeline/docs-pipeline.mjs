@@ -7,7 +7,7 @@ import { TARGET_LANGUAGES, translateFiles, translateLocaleFiles } from "./transl
 import { REPOS, validateRepos } from "./repos.config.mjs";
 import { mergeWork, readPending, writePending } from "./utils/pending.mjs";
 import { FatalApiError } from "./utils/llm-retry.mjs";
-import { applyRepoArtifacts, exportRepoChanges, formatSyncReport, stageChanges } from "./sync-artifacts.mjs";
+import { applyRepoArtifacts, exportRepoChanges, formatSyncReport, stageChanges, updatedRepoIds } from "./sync-artifacts.mjs";
 
 const Logger = {
   info: (message) => console.log(`\n✅ ${message}`),
@@ -207,7 +207,9 @@ async function commit(context, { push = true } = {}) {
     return;
   }
 
-  const updatedRepos = context.tasks.map((t) => t.repoConfig.id).join(", ");
+  // finalize knows the updated repositories from the artifacts; a single run
+  // works them out from what it staged
+  const updatedRepos = (context.repos ? await updatedRepoIds(context) : context.tasks.map((t) => t.repoConfig.id)).join(", ");
   const commitMessage = `docs: [${updatedRepos}] Sync and translate upstream documentation`;
 
   const authorName = process.env.GIT_AUTHOR_NAME;

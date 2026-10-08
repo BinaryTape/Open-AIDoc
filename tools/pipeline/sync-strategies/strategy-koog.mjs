@@ -1,7 +1,7 @@
 import {defaultStrategy} from "./strategy.mjs";
 import path from "path";
 import fs from "fs-extra";
-import {generateSidebar} from "../processors/SidebarProcessor.mjs";
+import {syncSidebar} from "../processors/SidebarProcessor.mjs";
 
 export const koogStrategy = {
     ...defaultStrategy,
@@ -11,20 +11,8 @@ export const koogStrategy = {
      */
     getDocPatterns: () => ["docs/docs/**/*.md"],
 
-    postSync: async (repoPath) => {},
-
-    /**
-     * @override
-     */
-    postDetect: async (repoConfig, task) => {
-        const repoPath = repoConfig.cloneDir;
-        console.log(`  Running Koog postSync: Generate sidebar - ${repoPath}...`);
-        const sidebarPath = path.join(repoPath, 'docs/mkdocs.yml');
-        const docType = repoConfig.sidebarId;
-        if (await fs.pathExists(sidebarPath)) {
-            await generateSidebar(sidebarPath, docType);
-        }
-        console.log(`  Generate sidebar finished - ${repoPath}`);
+    postSync: async (repoPath, context, repoConfig) => {
+        await syncSidebar(path.join(repoPath, 'docs/mkdocs.yml'), repoConfig.sidebarId);
     },
 
     /**

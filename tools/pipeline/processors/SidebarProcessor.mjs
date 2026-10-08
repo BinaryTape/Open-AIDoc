@@ -35,6 +35,25 @@ export async function generateSidebar(source, docType, baseUrl = '') {
 }
 
 /**
+ * Regenerate a sidebar from the upstream navigation file (Writerside .tree or
+ * mkdocs.yml). Strategies call it from postSync, which runs on every sync, so
+ * a change to the navigation alone is picked up too.
+ * @param {string} source - Navigation file in the upstream clone
+ * @param {string} docType - Sidebar id
+ * @param {string} [baseUrl] - Site URL for MkDocs .html entries
+ */
+export async function syncSidebar(source, docType, baseUrl = '') {
+    try {
+        await fs.access(source);
+    } catch {
+        console.warn(`  ⚠️  Warning: ${docType} sidebar source not found: ${source}`);
+        return;
+    }
+    console.log(`  Generating ${docType} sidebar from ${source}...`);
+    await generateSidebar(source, docType, baseUrl);
+}
+
+/**
  * Write a sidebar JSON and register its translatable labels in the locale files.
  * @param {string} docType - Sidebar id → docs/.vitepress/sidebar/{docType}.sidebar.json
  * @param {object[]} sidebarNodes
