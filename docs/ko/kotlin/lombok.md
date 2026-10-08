@@ -175,3 +175,4 @@ Lombok 컴파일러 플러그인 JAR는 Kotlin 컴파일러의 바이너리 배�
 # 옵션은 반복해서 사용할 수 있습니다.
 
 -P plugin:org.jetbrains.kotlin.lombok:config=<PATH_TO_CONFIG_FILE>
+```

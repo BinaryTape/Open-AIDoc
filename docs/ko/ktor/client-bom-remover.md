@@ -61,3 +61,4 @@ import io.ktor.client.plugins.bomremover.*
 val client = HttpClient(CIO) {
     install(BOMRemover)
 }
+```

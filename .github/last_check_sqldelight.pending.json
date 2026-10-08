@@ -1,0 +1,11 @@
+{
+  "docs/changelog.md": {
+    "langs": [
+      "ja",
+      "ko",
+      "zh-Hans",
+      "zh-Hant"
+    ],
+    "reason": "audit: headings 142/146"
+  }
+}

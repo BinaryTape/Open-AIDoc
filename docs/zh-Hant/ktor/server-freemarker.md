@@ -105,3 +105,4 @@ get("/index") {
     val sampleUser = User(1, "John")
     call.respond(FreeMarkerContent("index.ftl", mapOf("user" to sampleUser)))
 }
+```

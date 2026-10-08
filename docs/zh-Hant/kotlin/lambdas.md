@@ -349,3 +349,4 @@ fun html(init: HTML.() -> Unit): HTML {
 html {       // 帶有接收者的 Lambda 從這裡開始
     body()   // 在接收者物件上呼叫方法
 }
+```

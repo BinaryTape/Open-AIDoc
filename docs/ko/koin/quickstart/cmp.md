@@ -338,3 +338,4 @@ Compose UI는 다음과 같이 시작됩니다:
 
 ```kotlin
 fun MainViewController() = ComposeUIViewController { App() }
+```

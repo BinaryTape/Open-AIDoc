@@ -1,0 +1,49 @@
+{
+  "docs/coding-conventions.md": {
+    "langs": [
+      "ko",
+      "zh-Hant"
+    ],
+    "reason": "audit: headings 52/73; code blocks 58/77"
+  },
+  "docs/js-get-started.md": {
+    "langs": [
+      "ja",
+      "zh-Hant"
+    ],
+    "reason": "audit: headings 7/18; code blocks 7/17; links 22/47; paragraphs 43/99"
+  },
+  "docs/jvm-get-started.md": {
+    "langs": [
+      "zh-Hans",
+      "zh-Hant"
+    ],
+    "reason": "audit: headings 2/4; links 6/11; paragraphs 12/30"
+  },
+  "docs/mapping-function-pointers-from-c.md": {
+    "langs": [
+      "ja"
+    ],
+    "reason": "audit: headings 0/7; code blocks 0/7; links 0/13; paragraphs 3/30"
+  },
+  "docs/native-get-started.md": {
+    "langs": [
+      "ko",
+      "zh-Hans",
+      "zh-Hant"
+    ],
+    "reason": "audit: headings 10/14; code blocks 13/17"
+  },
+  "docs/whatsnew16.md": {
+    "langs": [
+      "zh-Hant"
+    ],
+    "reason": "audit: headings 8/40; code blocks 2/23; links 14/98; paragraphs 31/167"
+  },
+  "docs/whatsnew21.md": {
+    "langs": [
+      "ko"
+    ],
+    "reason": "audit: headings 64/69; code blocks 45/51"
+  }
+}

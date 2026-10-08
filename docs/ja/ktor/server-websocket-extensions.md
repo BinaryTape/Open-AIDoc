@@ -114,3 +114,4 @@ class FrameLoggerExtension(val logger: Logger) : WebSocketExtension<FrameLogger.
         }
     }
 }
+```

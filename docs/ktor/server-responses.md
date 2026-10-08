@@ -341,3 +341,4 @@ get("/") {
 get("/moved") {
     call.respondText("Moved content")
 }
+```

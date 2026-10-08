@@ -57,3 +57,4 @@ fun main() {
 
     accessReifiedTypeArg<Rectangle>() // 透過 typeOf() 存取型別。印出 "Rectangle"
 }
+```

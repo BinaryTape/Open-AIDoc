@@ -55,3 +55,4 @@ Maven으로 Kotlin 애플리케이션을 패키징하려면, 표준 JAR 파일 �
 
 ``` bash
 java -jar target/mymodule-0.0.1-SNAPSHOT-jar-with-dependencies.jar
+```

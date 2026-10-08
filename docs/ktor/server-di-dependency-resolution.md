@@ -219,3 +219,4 @@ dependencies {
 
 // 将无法解析
 val charSequenceSink: Sink<String> by dependencies
+```

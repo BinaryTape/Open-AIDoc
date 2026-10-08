@@ -307,3 +307,4 @@ class MyApp
 fun main() {
     startKoin<MyApp>()
 }
+```

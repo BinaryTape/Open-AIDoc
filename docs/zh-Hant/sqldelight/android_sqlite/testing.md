@@ -30,3 +30,4 @@ dependencies {
     version { strictly('3.8.10.2') }
   }
 }
+```

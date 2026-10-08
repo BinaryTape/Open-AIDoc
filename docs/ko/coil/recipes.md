@@ -223,3 +223,4 @@ ImageLoader.Builder(context)
         add(UrlSizeInterceptor())
     }
     .build()
+```

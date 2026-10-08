@@ -348,3 +348,4 @@ fun html(init: HTML.() -> Unit): HTML {
 html {       // 수신 객체가 있는 람다가 여기서 시작됨
     body()   // 수신 객체의 메서드 호출
 }
+```

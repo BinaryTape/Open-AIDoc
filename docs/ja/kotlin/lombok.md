@@ -175,3 +175,4 @@ LombokコンパイラプラグインのJARは、Kotlinコンパイラのバイ�
 # オプションは繰り返すことができます。
 
 -P plugin:org.jetbrains.kotlin.lombok:config=<PATH_TO_CONFIG_FILE>
+```

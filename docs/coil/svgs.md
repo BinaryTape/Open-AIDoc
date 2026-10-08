@@ -22,3 +22,4 @@ val imageLoader = ImageLoader.Builder(context)
         add(SvgDecoder.Factory())
     }
     .build()
+```

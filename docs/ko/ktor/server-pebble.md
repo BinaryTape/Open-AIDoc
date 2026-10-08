@@ -111,3 +111,4 @@ get("/index") {
     val sampleUser = User(1, "John")
     call.respond(PebbleContent("index.html", mapOf("user" to sampleUser)))
 }
+```

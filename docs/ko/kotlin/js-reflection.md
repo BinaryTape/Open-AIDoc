@@ -51,3 +51,4 @@ fun main() {
 
     accessReifiedTypeArg<Rectangle>() // typeOf()를 통해 타입에 접근. "Rectangle" 출력
 }
+```

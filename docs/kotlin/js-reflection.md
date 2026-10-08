@@ -51,3 +51,4 @@ fun main() {
 
     accessReifiedTypeArg<Rectangle>() // 通过 typeOf() 访问类型。输出 "Rectangle"
 }
+```

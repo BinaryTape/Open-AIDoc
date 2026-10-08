@@ -191,3 +191,4 @@ Status: Starting the site... Time: 41(s)
 Status: Site started successfully. Time: 44(s)
 Deployment has completed successfully
 You can visit your app at: http://your-app-name.some-region.azurewebsites.net
+```

@@ -391,3 +391,4 @@ Kotlin のプリミティブ配列（`IntArray`, `DoubleArray` など）を [Jav
 compileKotlin {
     kotlinOptions.allWarningsAsErrors = true
 }
+```

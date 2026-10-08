@@ -140,3 +140,4 @@ val RequestTracePlugin = createRouteScopedPlugin("RequestTracePlugin", { }) {
         LOGGER.trace("Processing call: ${call.request.uri}")
     }
 }
+```

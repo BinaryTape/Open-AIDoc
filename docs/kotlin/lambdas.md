@@ -348,3 +348,4 @@ fun html(init: HTML.() -> Unit): HTML {
 html {       // 带接收者的 lambda 从这里开始
     body()   // 调用接收者对象上的方法
 }
+```

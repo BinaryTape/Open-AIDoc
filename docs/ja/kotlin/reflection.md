@@ -344,3 +344,4 @@ class Outer {
 
 val o = Outer()
 val boundInnerCtor = o::Inner
+```

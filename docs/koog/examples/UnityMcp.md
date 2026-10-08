@@ -143,3 +143,4 @@ description:" + it.descriptor\n                    }}"
 ```kotlin
 // 关闭 Unity MCP 进程
 process.destroy()
+```

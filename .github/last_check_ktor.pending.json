@@ -1,0 +1,55 @@
+{
+  "topics/client-testing.md": {
+    "langs": [
+      "ja",
+      "ko",
+      "zh-Hans",
+      "zh-Hant"
+    ],
+    "reason": "audit: headings 4/6; code blocks 7/10"
+  },
+  "topics/server-integrate-database.md": {
+    "langs": [
+      "ja",
+      "ko",
+      "zh-Hans",
+      "zh-Hant"
+    ],
+    "reason": "audit: headings 0/16; code blocks 0/23; links 2/46"
+  },
+  "topics/server-requests-and-responses.md": {
+    "langs": [
+      "ja",
+      "ko",
+      "zh-Hans",
+      "zh-Hant"
+    ],
+    "reason": "audit: headings 0/10; code blocks 0/18; links 4/30"
+  },
+  "topics/server-run.md": {
+    "langs": [
+      "ja",
+      "ko",
+      "zh-Hant"
+    ],
+    "reason": "audit: unclosed code block"
+  },
+  "topics/server-server-sent-events.md": {
+    "langs": [
+      "ja",
+      "ko",
+      "zh-Hans",
+      "zh-Hant"
+    ],
+    "reason": "audit: headings 0/8; code blocks 0/11; links 3/12"
+  },
+  "topics/tutorial-first-steps-with-kotlin-rpc.md": {
+    "langs": [
+      "ja",
+      "ko",
+      "zh-Hans",
+      "zh-Hant"
+    ],
+    "reason": "audit: headings 0/16; code blocks 0/20; links 4/22"
+  }
+}
