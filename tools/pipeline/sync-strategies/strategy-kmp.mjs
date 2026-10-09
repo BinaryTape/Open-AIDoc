@@ -7,6 +7,21 @@ import {syncSidebar} from "../processors/SidebarProcessor.mjs";
 import {processMarkdownFile} from "../processors/MarkdownProcessor.mjs";
 import {expandIncludesForTask} from "../utils/writerside-include.mjs";
 
+/**
+ * The KMP docs are published under kotlinlang.org/docs/multiplatform/, so the
+ * tree links Kotlin pages by their kotlinlang.org path (/docs/x.html). Point
+ * them at this site's Kotlin docs, or kotlinlang.org for a page it lacks.
+ * @param {string} href
+ */
+export function kotlinlangHref(href) {
+    const match = /^\/docs\/([^#?]+)\.html([#?].*)?$/.exec(href);
+    if (!match) return href;
+    const [, page, suffix = ""] = match;
+    return fs.pathExistsSync(`docs/kotlin/${page}.md`)
+        ? `/kotlin/${page}${suffix}`
+        : `https://kotlinlang.org${href}`;
+}
+
 export const kmpStrategy = {
     ...defaultStrategy,
 
@@ -16,7 +31,7 @@ export const kmpStrategy = {
     getDocPatterns: () => ["topics/**/*.md", "topics/**/*.topic"],
 
     postSync: async (repoPath, context, repoConfig) => {
-        await syncSidebar(path.join(repoPath, "mpd.tree"), repoConfig.sidebarId);
+        await syncSidebar(path.join(repoPath, "mpd.tree"), repoConfig.sidebarId, "", kotlinlangHref);
     },
 
     /**

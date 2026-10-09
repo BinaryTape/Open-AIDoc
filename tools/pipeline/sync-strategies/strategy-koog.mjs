@@ -2,6 +2,10 @@ import {defaultStrategy} from "./strategy.mjs";
 import path from "path";
 import fs from "fs-extra";
 import {syncSidebar} from "../processors/SidebarProcessor.mjs";
+import {LINKS_FILE, syncKoogApiLinks} from "../utils/koog-api-links.mjs";
+import {toContentRelPath} from "../../../shared/content-paths.ts";
+
+const config = fs.readJsonSync(new URL("../translate-config.json", import.meta.url));
 
 export const koogStrategy = {
     ...defaultStrategy,
@@ -13,6 +17,13 @@ export const koogStrategy = {
 
     postSync: async (repoPath, context, repoConfig) => {
         await syncSidebar(path.join(repoPath, 'docs/mkdocs.yml'), repoConfig.sidebarId);
+
+        // The API links of the upstream docs and of every published translation
+        const docDirs = [
+            path.join(repoPath, repoConfig.sourceDocRoot),
+            ...config.targetLanguages.map((lang) => path.join("docs", toContentRelPath(lang, repoConfig.docType, ""))),
+        ];
+        if (await syncKoogApiLinks(docDirs)) context?.gitAddPaths.add(LINKS_FILE);
     },
 
     /**

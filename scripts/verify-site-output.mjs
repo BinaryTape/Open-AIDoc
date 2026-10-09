@@ -19,7 +19,8 @@ const criticalPages = new Map([
 const htmlFiles = await listFiles(distDir, '.html')
 let renderedKoogDependency = false
 for (const file of htmlFiles) {
-  const relativeFile = relative(distDir, file)
+  // POSIX separators, also on Windows: the checks below match paths like koog/…
+  const relativeFile = relative(distDir, file).replaceAll('\\', '/')
   const html = await readFile(file, 'utf8')
   const bodyHtml = html.slice(html.indexOf('</head>') + '</head>'.length)
 

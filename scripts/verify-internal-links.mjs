@@ -1,6 +1,8 @@
 /**
  * Post-build crawl: every internal page href in docs/.vitepress/dist must
- * resolve to a rendered HTML file (or index.html). External URLs are ignored.
+ * resolve to a rendered HTML file (or index.html). External URLs are ignored;
+ * an href with a scheme a browser cannot follow (such as Koog's unresolved
+ * `api:` links) is reported as dead.
  *
  * Run after docs:build (wired into docs:verify).
  */
@@ -11,7 +13,9 @@ import { fileURLToPath } from 'node:url'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const distDir = resolve(__dirname, '../docs/.vitepress/dist')
-const SITE_HOSTS = new Set(['openaidoc.org', 'www.openaidoc.org', 'localhost'])
+// Not localhost: tutorials link to the reader's own server (http://localhost:8080/...).
+const SITE_HOSTS = new Set(['openaidoc.org', 'www.openaidoc.org'])
+const WEB_SCHEMES = new Set(['http:', 'https:', 'mailto:', 'tel:', 'data:', 'javascript:'])
 
 if (!existsSync(distDir)) {
   console.error(
@@ -110,6 +114,11 @@ function resolveInternalPage(fromUrl, href) {
     return null
   }
 
+  const scheme = /^([a-z][a-z0-9+.-]*:)/i.exec(href)
+  if (scheme && !WEB_SCHEMES.has(scheme[1].toLowerCase())) {
+    return { path: href, candidates: [] }
+  }
+
   let pathWithQuery = href
   if (/^https?:\/\//i.test(href) || href.startsWith('//')) {
     try {
@@ -126,7 +135,7 @@ function resolveInternalPage(fromUrl, href) {
   if (!pathOnly) return null
 
   const lastSeg = pathOnly.split('/').pop() || ''
-  // Static assets and leftover .md / api: refs are not page routes for this gate.
+  // Static assets and leftover .md refs are not page routes for this gate.
   if (lastSeg.includes('.') && !lastSeg.endsWith('.html')) {
     return null
   }

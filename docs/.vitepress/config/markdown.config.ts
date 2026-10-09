@@ -23,6 +23,7 @@ import markdownItMkHlLines from "../plugins/markdown/mkdocs/markdown-it-mk-hl-li
 import markdownItMkAdmonition from "../plugins/markdown/mkdocs/markdown-it-mk-admonitions"
 import markdownItMkCodeTabs from "../plugins/markdown/mkdocs/markdown-it-mk-code-tabs"
 import markdownItMkLinks from "../plugins/markdown/mkdocs/markdown-it-mk-links"
+import markdownItMkApiLinks from "../plugins/markdown/mkdocs/markdown-it-mk-api-links"
 import markdownItDiffTitleWrapper from "../plugins/markdown/mkdocs/markdown-it-mk-diff-code-block"
 import markdownItMKInclude from "../plugins/markdown/mkdocs/markdown-it-mk-Include"
 
@@ -97,6 +98,7 @@ export function registerMarkdownPlugins(md: any) {
   md.use(markdownItMkHlLines)
   md.use(markdownItMkCodeTabs)
   md.use(markdownItMkLinks)
+  md.use(markdownItMkApiLinks)
   md.use(markdownItMKInclude)
   md.use(markdownItMKVars)
   md.use(markdownItDiffTitleWrapper)

@@ -113,3 +113,21 @@ describe('sidebar links resolve to source pages (default locale)', () => {
     }
   })
 })
+
+describe('sidebar href entries', () => {
+  it('keep a site path in the reader\'s language and leave URLs alone', async () => {
+    const { localizeHref } = await import('../docs/.vitepress/config/sidebar.config')
+    expect(localizeHref('ja', '/kotlin/wasm-get-started')).toBe('/ja/kotlin/wasm-get-started')
+    expect(localizeHref('zh-Hans', '/kotlin/wasm-get-started')).toBe('/kotlin/wasm-get-started')
+    expect(localizeHref('ko', 'https://kotlinlang.org/docs/x.html')).toBe('https://kotlinlang.org/docs/x.html')
+    expect(localizeHref('ko', '//cdn.example.com/x')).toBe('//cdn.example.com/x')
+  })
+
+  it('link the KMP sidebar to the Kotlin Wasm page in the same language', async () => {
+    const { default: generateSidebar } = await import('../docs/.vitepress/config/sidebar.config')
+    const find = (nodes: any[]): any =>
+      nodes.map((n) => (n.link?.endsWith('/kotlin/wasm-get-started') ? n : n.items && find(n.items))).find(Boolean)
+    const sidebar = generateSidebar({ lang: 'ja' } as any, { path: 'kmp', framework: 'Writerside', type: 'kmp' } as any)
+    expect(find(sidebar).link).toBe('/ja/kotlin/wasm-get-started')
+  })
+})

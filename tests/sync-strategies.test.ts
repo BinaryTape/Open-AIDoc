@@ -97,11 +97,29 @@ describe('generated sidebars', () => {
   it.each(cases)('$id: regenerated from $file on every sync', async ({ strategy, id, file, content }) => {
     write(file, content)
 
-    await strategy.postSync(clone, { gitAddPaths: new Set() }, { id, sidebarId: id, cloneDir: clone })
+    await strategy.postSync(clone, { gitAddPaths: new Set() }, { id, docType: id, sidebarId: id, cloneDir: clone, sourceDocRoot: '.' })
 
     const sidebar = JSON.parse(readFileSync(join(site, `docs/.vitepress/sidebar/${id}.sidebar.json`), 'utf8'))
     expect(sidebar[0]).toMatchObject({ text: `${id}.start`, link: 'start' })
     expect(sidebar[1].items[0]).toMatchObject({ link: 'first' })
+  })
+
+  it('kmp: kotlinlang.org paths point at this site\'s Kotlin docs, or kotlinlang.org', async () => {
+    mkdirSync(join(site, 'docs/kotlin'), { recursive: true })
+    writeFileSync(join(site, 'docs/kotlin/wasm-get-started.md'), '# Wasm')
+    write('mpd.tree', '<instance-profile id="mpd">' +
+      '<toc-element toc-title="WebAssembly (Wasm)" href="/docs/wasm-get-started.html"/>' +
+      '<toc-element toc-title="JS" href="/docs/js-overview.html#start"/>' +
+      '<toc-element toc-title="Samples" href="https://github.com/Kotlin/samples"/></instance-profile>\n')
+
+    await kmpStrategy.postSync(clone, { gitAddPaths: new Set() }, { id: 'kmp', sidebarId: 'kmp', cloneDir: clone })
+
+    const sidebar = JSON.parse(readFileSync(join(site, 'docs/.vitepress/sidebar/kmp.sidebar.json'), 'utf8'))
+    expect(sidebar.map((n: any) => n.href)).toEqual([
+      '/kotlin/wasm-get-started',
+      'https://kotlinlang.org/docs/js-overview.html#start',
+      'https://github.com/Kotlin/samples',
+    ])
   })
 
   it('coil: regenerated from mkdocs.yml, with its home page served as overview', async () => {
