@@ -108,3 +108,54 @@ describe('translateFiles', () => {
     expect(existsSync(join(dir, 'docs/ja/demo/gone.md'))).toBe(false)
   })
 })
+
+// The page check stands in for utils/page-check.mjs (the site's own one is
+// covered in page-check.test.ts): the page fails while it has an unclosed <div>.
+describe('translateFiles, checking that pages build', () => {
+  const UNCLOSED = `${COMPLETE}\n<div class="note">\n`
+  const checked: string[] = []
+  const pageCheck = async (relativePath: string, content: string) => {
+    checked.push(relativePath)
+    return content.includes('<div class="note">') ? ['Vue: Element is missing end tag.'] : []
+  }
+
+  beforeEach(() => {
+    checked.length = 0
+  })
+
+  it('asks again when the translation would not build, then writes one that does', async () => {
+    generateContent.mockResolvedValueOnce(reply(UNCLOSED)).mockResolvedValue(reply(COMPLETE))
+
+    const { translatedPaths, pending } = await translateFiles(repoConfig, work(['ja']), { pageCheck })
+
+    expect(generateContent).toHaveBeenCalledTimes(2)
+    expect(pending).toEqual({})
+    expect(translatedPaths).toHaveLength(1)
+    expect(checked).toEqual(['ja/demo/guide.md', 'ja/demo/guide.md'])
+  })
+
+  it('keeps the current translation when no answer builds, and says why', async () => {
+    mkdirSync(join(dir, 'docs/ja/demo'), { recursive: true })
+    writeFileSync(join(dir, 'docs/ja/demo/guide.md'), 'previous translation')
+    generateContent.mockResolvedValue(reply(UNCLOSED))
+
+    const { translatedPaths, pending } = await translateFiles(repoConfig, work(['ja']), { pageCheck })
+
+    expect(generateContent).toHaveBeenCalledTimes(3)
+    expect(translatedPaths).toEqual([])
+    expect(pending['docs/guide.md']).toEqual({ langs: ['ja'], reason: 'does not build: Vue: Element is missing end tag.' })
+    expect(readFileSync(join(dir, 'docs/ja/demo/guide.md'), 'utf8')).toBe('previous translation')
+  })
+
+  // Five upstream sources would not build as they are (a bare `<maker>`, a
+  // doubled attribute, ...) while their translations, mended by the model, do.
+  it('checks the translation, not a source that would not build itself', async () => {
+    writeFileSync(join(dir, 'clone/docs/broken.md'), `${SOURCE}\n<div class="note">\n`)
+    generateContent.mockResolvedValue(reply(COMPLETE))
+
+    const { translatedPaths, pending } = await translateFiles(repoConfig, [{ file: 'docs/broken.md', langs: ['ja'] }], { pageCheck })
+
+    expect(translatedPaths).toHaveLength(1)
+    expect(pending).toEqual({})
+  })
+})
