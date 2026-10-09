@@ -24,7 +24,7 @@ function generateSidebarNode(lang: string, framework: string, type: string, side
         const out = {
             ...node,
             text: localizedText,
-            link: node.link ? `${sidebarPrefixDir}${node.link}` : node.href ? node.href : undefined,
+            link: node.link ? `${sidebarPrefixDir}${node.link}` : node.href ? localizeHref(lang, node.href) : undefined,
             collapsed: node.collapsed ?? undefined,
         };
 
@@ -58,6 +58,13 @@ function generateSidebarNode(lang: string, framework: string, type: string, side
     };
 
     return sidebar.map(localizeNode);
+}
+
+// A site path in an href (/kotlin/x, linked from another doc type's sidebar)
+// stays in the reader's language; URLs are left alone.
+export function localizeHref(lang: string, href: string) {
+    if (!href.startsWith('/') || href.startsWith('//') || lang === 'zh-Hans') return href;
+    return `/${lang}${href}`;
 }
 
 function getTitleFromMarkdown(framework: string, rootDir: string, filePath: string) {

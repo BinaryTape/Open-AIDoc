@@ -375,7 +375,7 @@
           },
           {
             "text": "kmp.webassembly-wasm",
-            "href": "/docs/wasm-get-started.html"
+            "href": "/kotlin/wasm-get-started"
           }
         ],
         "collapsed": true

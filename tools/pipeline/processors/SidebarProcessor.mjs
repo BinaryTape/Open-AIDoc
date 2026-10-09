@@ -19,7 +19,7 @@ async function writeJson(file, data) {
     await fs.writeFile(file, JSON.stringify(data, null, 2) + '\n');
 }
 
-export async function generateSidebar(source, docType, baseUrl = '') {
+export async function generateSidebar(source, docType, baseUrl = '', mapHref = null) {
     let sidebarNodes, translateKeys;
 
     if (source.endsWith('tree')) {
@@ -31,7 +31,15 @@ export async function generateSidebar(source, docType, baseUrl = '') {
         translateKeys = new Map();
     }
 
+    if (mapHref) mapHrefs(sidebarNodes, mapHref);
     await writeSidebar(docType, sidebarNodes, translateKeys);
+}
+
+function mapHrefs(nodes, mapHref) {
+    for (const node of nodes) {
+        if (node.href) node.href = mapHref(node.href);
+        if (node.items) mapHrefs(node.items, mapHref);
+    }
 }
 
 /**
@@ -41,8 +49,10 @@ export async function generateSidebar(source, docType, baseUrl = '') {
  * @param {string} source - Navigation file in the upstream clone
  * @param {string} docType - Sidebar id
  * @param {string} [baseUrl] - Site URL for MkDocs .html entries
+ * @param {(href: string) => string} [mapHref] - Rewrites the href entries,
+ *   e.g. paths of the upstream site to this one
  */
-export async function syncSidebar(source, docType, baseUrl = '') {
+export async function syncSidebar(source, docType, baseUrl = '', mapHref = null) {
     try {
         await fs.access(source);
     } catch {
@@ -50,7 +60,7 @@ export async function syncSidebar(source, docType, baseUrl = '') {
         return;
     }
     console.log(`  Generating ${docType} sidebar from ${source}...`);
-    await generateSidebar(source, docType, baseUrl);
+    await generateSidebar(source, docType, baseUrl, mapHref);
 }
 
 /**
