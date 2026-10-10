@@ -1,7 +1,7 @@
 import { coilStrategy } from "./sync-strategies/strategy-coil.mjs";
 import { koinStrategy } from "./sync-strategies/strategy-koin.mjs";
 import { sqlDelightStrategy } from "./sync-strategies/strategy-sqldelight.mjs";
-import { kotlinStrategy } from "./sync-strategies/strategy-kotlin.mjs";
+import { kotlinSerializationStrategy, kotlinStrategy } from "./sync-strategies/strategy-kotlin.mjs";
 import { kmpStrategy } from "./sync-strategies/strategy-kmp.mjs";
 import { koogStrategy } from "./sync-strategies/strategy-koog.mjs";
 import { ktorStrategy } from "./sync-strategies/strategy-ktor.mjs";
@@ -119,6 +119,23 @@ export const REPOS = [
       dest: "docs/public/kotlin",
     },
     syncStrategy: kotlinStrategy,
+  },
+  {
+    // The docs kotlinlang.org publishes for kotlinx.serialization are on this
+    // branch, in docs-website/ (master has only the older GitHub guide).
+    id: "kotlinx-serialization",
+    docType: "kotlin",
+    sidebarId: "serialization",
+    repo: "Kotlin/kotlinx.serialization",
+    branch: "origin/doc-restructuring-master",
+    cloneDir: "serialization-repo",
+    sourceDocRoot: "./docs-website",
+    lastCheckFile: ".github/last_check_serialization.txt",
+    assets: {
+      src: "docs-website/images",
+      dest: "docs/public/kotlin",
+    },
+    syncStrategy: kotlinSerializationStrategy,
   },
   {
     id: "ktor",

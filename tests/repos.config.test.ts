@@ -28,6 +28,7 @@ describe('REPOS config', () => {
       'dokka',
       'kotlin',
       'lincheck',
+      'serialization',
     ])
 
     for (const entry of REPOS) {

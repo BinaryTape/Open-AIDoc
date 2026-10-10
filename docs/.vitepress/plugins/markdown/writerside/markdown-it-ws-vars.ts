@@ -2,6 +2,14 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { DOCS_TYPES } from "../../../docs.config";
 
+// Writerside variable files (docs/.vitepress/variables/) of each doc type,
+// copied there by the docs pipeline
+const VARIABLE_FILES: Record<string, string[]> = {
+  kotlin: ['kotlin.v.list', 'serialization.v.list'],
+  ktor: ['ktor.v.list'],
+  kmp: ['kmp.v.list'],
+};
+
 export default function markdownItWsVars(md) {
   const fileVarRegex = /<var\s+name="(?<name>[^"]+)"\s+value="(?<value>[^"]+)"[^>]*>/gi;
 
@@ -10,34 +18,27 @@ export default function markdownItWsVars(md) {
 
     const variables = Object.create(null);
 
-    let xmlVarsString = '';
     if (state.env && state.env.relativePath) {
       const parts = state.env.relativePath.split('/');
       const docType = parts.find(p => DOCS_TYPES.includes(p));
 
-      let xmlFilePath = '';
-      switch (docType) {
-        case 'kotlin': xmlFilePath = 'docs/.vitepress/variables/kotlin.v.list'; break;
-        case 'ktor':   xmlFilePath = 'docs/.vitepress/variables/ktor.v.list';   break;
-        case 'kmp':    xmlFilePath = 'docs/.vitepress/variables/kmp.v.list';    break;
-      }
-
-      if (xmlFilePath) {
+      // The first file defining a variable wins: kotlin-web-site's own
+      // variables over those of kotlinx.serialization, whose pages also go to kotlin/.
+      for (const file of VARIABLE_FILES[docType] ?? []) {
+        let xmlVarsString = '';
         try {
-          const resolvedPath = path.resolve(xmlFilePath);
+          const resolvedPath = path.resolve('docs/.vitepress/variables', file);
           if (fs.existsSync(resolvedPath)) {
             xmlVarsString = fs.readFileSync(resolvedPath, 'utf-8');
           }
         } catch (error) {
           console.error(`Error reading XML variable file:`, error);
         }
-      }
-    }
 
-    if (xmlVarsString) {
-      let m;
-      while ((m = fileVarRegex.exec(xmlVarsString)) !== null) {
-        variables[m.groups.name] = m.groups.value;
+        let m;
+        while ((m = fileVarRegex.exec(xmlVarsString)) !== null) {
+          if (!(m.groups.name in variables)) variables[m.groups.name] = m.groups.value;
+        }
       }
     }
 
