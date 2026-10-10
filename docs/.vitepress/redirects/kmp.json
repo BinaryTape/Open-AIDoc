@@ -1,0 +1,42 @@
+[
+  {
+    "from": "kmp/amper.md",
+    "to": "kmp/kotlin-toolchain.md"
+  },
+  {
+    "from": "kmp/compose-multiplatform-create-first-app.md",
+    "to": "kmp/compose-multiplatform-new-project.md"
+  },
+  {
+    "from": "kmp/compose-multiplatform-explore-composables.md",
+    "to": "kmp/compose-multiplatform-entry-points.md"
+  },
+  {
+    "from": "kmp/compose-multiplatform-modify-project.md",
+    "to": "kmp/compose-multiplatform-new-project.md"
+  },
+  {
+    "from": "kmp/kmp-ci-tutorial.md",
+    "to": "kmp/github-actions-for-kmp.md"
+  },
+  {
+    "from": "kmp/multiplatform-create-first-app.md",
+    "to": "kmp/multiplatform-upgrade-app.md"
+  },
+  {
+    "from": "kmp/multiplatform-dependencies.md",
+    "to": "kmp/multiplatform-add-dependencies.md"
+  },
+  {
+    "from": "kmp/multiplatform-publish-libraries.md",
+    "to": "kmp/multiplatform-publish-libraries-to-maven.md"
+  },
+  {
+    "from": "kmp/multiplatform-update-ui.md",
+    "to": "kmp/multiplatform-upgrade-app.md"
+  },
+  {
+    "from": "kmp/multiplatform-wrap-up.md",
+    "to": "kmp/multiplatform-upgrade-app.md"
+  }
+]

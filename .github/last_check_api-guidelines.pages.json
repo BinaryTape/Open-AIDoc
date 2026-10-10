@@ -1,0 +1,13 @@
+[
+  "api-guidelines-backward-compatibility.md",
+  "api-guidelines-build-for-multiplatform.md",
+  "api-guidelines-consistency.md",
+  "api-guidelines-debuggability.md",
+  "api-guidelines-informative-documentation.md",
+  "api-guidelines-introduction.md",
+  "api-guidelines-minimizing-mental-complexity.md",
+  "api-guidelines-predictability.md",
+  "api-guidelines-readability.md",
+  "api-guidelines-simplicity.md",
+  "api-guidelines-testability.md"
+]

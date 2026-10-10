@@ -7,6 +7,7 @@ import { TARGET_LANGUAGES, translateFiles, translateLocaleFiles } from "./transl
 import { REPOS, validateRepos } from "./repos.config.mjs";
 import { mergeWork, readPending, writePending } from "./utils/pending.mjs";
 import { FatalApiError } from "./utils/llm-retry.mjs";
+import { removeStalePages } from "./utils/stale-pages.mjs";
 import { applyRepoArtifacts, exportRepoChanges, formatSyncReport, stageChanges, updatedRepoIds } from "./sync-artifacts.mjs";
 
 const Logger = {
@@ -66,11 +67,33 @@ async function sync(context) {
       );
       await git.update(repoConfig.cloneDir, repoConfig.branch);
     }
+    // Before postSync: a curated sidebar (Koin) then drops the removed pages too
+    await removeStale(context, repoConfig);
     await repoConfig.syncStrategy.postSync(
       repoConfig.cloneDir,
       context,
       repoConfig
     );
+  }
+}
+
+// Remove the pages a repository no longer produces (utils/stale-pages.mjs)
+async function removeStale(context, repoConfig) {
+  // The other repositories' inventories are in this repository, synced or not
+  const repos = [...new Map([...REPOS, ...context.repos].map((r) => [r.id, r])).values()];
+  const { removed, held, changed, deleted } = await removeStalePages(repoConfig, repoConfig.cloneDir, {
+    repos,
+    languages: TARGET_LANGUAGES,
+  });
+  changed.forEach((p) => context.gitAddPaths.add(p));
+  deleted.forEach((p) => context.gitRemovePaths.add(p));
+  for (const { page, movedTo } of removed) {
+    Logger.dim(`Removed ${repoConfig.docType}/${page}${movedTo ? ` (moved to ${movedTo})` : ""}`);
+    context.removedPages.push({ repo: repoConfig.id, page, movedTo });
+  }
+  if (held) {
+    Logger.error(`${repoConfig.id}: stale pages kept, ${held}. Check the upstream repository.`);
+    context.removalHeld.push({ repo: repoConfig.id, reason: held });
   }
 }
 
@@ -284,6 +307,8 @@ export async function translateRepos({
     gitAddPaths: new Set(),
     gitRemovePaths: new Set(),
     pendingReport: [],
+    removedPages: [],
+    removalHeld: [],
   };
 
   await sync(context);
@@ -323,7 +348,7 @@ export async function runPipeline(options = {}) {
 export async function finalizeRun({ artifactsDir, expected }) {
   const { context, results } = await applyRepoArtifacts(artifactsDir, expected);
   await publishRun(context, { push: false });
-  return formatSyncReport(results, context.pendingReport);
+  return formatSyncReport(results, context);
 }
 
 function selectRepos(ids) {

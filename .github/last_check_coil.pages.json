@@ -1,0 +1,23 @@
+[
+  "changelog.md",
+  "code_of_conduct.md",
+  "compose.md",
+  "contributing.md",
+  "faq.md",
+  "getting_started.md",
+  "gifs.md",
+  "image_loaders.md",
+  "image_pipeline.md",
+  "image_requests.md",
+  "java_compatibility.md",
+  "migrating.md",
+  "network.md",
+  "overview.md",
+  "recipes.md",
+  "svgs.md",
+  "testing.md",
+  "upgrading_to_coil2.md",
+  "upgrading_to_coil3.md",
+  "videos.md",
+  "works_with_coil.md"
+]

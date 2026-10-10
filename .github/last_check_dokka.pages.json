@@ -1,0 +1,15 @@
+[
+  "README.md",
+  "dokka-cli.md",
+  "dokka-get-started.md",
+  "dokka-gradle-configuration-options.md",
+  "dokka-gradle-troubleshooting-md.md",
+  "dokka-gradle.md",
+  "dokka-html.md",
+  "dokka-introduction.md",
+  "dokka-javadoc.md",
+  "dokka-maven.md",
+  "dokka-migration.md",
+  "dokka-module-and-package-docs.md",
+  "dokka-plugins.md"
+]

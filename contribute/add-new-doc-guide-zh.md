@@ -247,6 +247,13 @@ C. 自定义 HTML → 用 Vue 组件承载
 - 重试后仍然失败的文档记在 `.github/last_check_{id}.pending.json`（文档路径 → 缺失的语言 + 原因），下次运行只补这些语言。断点（`last_check_{id}.txt`）照常前进。
 - 全量重译：删除 `.github/last_check_*.txt` 后运行，会被当作首次运行处理全部文档。
 
+上游删除或移动的页面（`tools/pipeline/utils/stale-pages.mjs`）：
+- 每次同步都会把仓库当前生成的页面记在 `.github/last_check_{id}.pages.json`。上一次清单里有、这次没有、同一文档类型的其他仓库也不再生成的页面（kotlin 系列五个仓库共用 `docs/kotlin/`），会删除它的所有语言译文和待办。本站自己维护的页面（如 koin 的 `support/`）不在任何清单里，不会被删。
+- 页面路径由 SyncStrategy 的 `mapDocPath` 换算（`postDetect` 也用它），新增策略时要保证两者一致。
+- 上游声明了新去处的页面（Writerside 目录的 `accepts-web-file-names`、MkDocs 的 `redirect_maps`，由 SyncStrategy 的 `getMovedPages` 读取），会在 `docs/.vitepress/redirects/{id}.json` 记一条跳转；站点构建结束时生成 Cloudflare Pages 的 `_redirects`（`docs/.vitepress/config/redirects.config.ts`），每种语言一条 301，源页面仍存在或目标页面不存在的规则会被跳过。
+- 一次同步要删除某仓库一半以上的页面、或上游一个页面都没有时，不删除任何页面，运行汇总里会提示人工检查。
+- 删除和跳转都会列在运行汇总的「Pages removed」表里。
+
 CI 中的运行方式（`.github/workflows/docs-update.yaml`）：
 - **plan**：记下 `main` 的当前提交作为基线，列出要同步的仓库。
 - **translate**：每个上游仓库一个 matrix 任务，都从同一个基线提交开始，执行 STAGE 1–3（`docs-pipeline.mjs translate`），**不提交**，只把改动的文件、删除清单、词典键的增量和待办上传为 artifact。任务失败会自动重试一次（API key 无效除外）；一个仓库失败不影响其他仓库。

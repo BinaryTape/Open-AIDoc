@@ -1,0 +1,26 @@
+[
+  {
+    "from": "kotlin/constraints.md",
+    "to": "kotlin/lincheck-operation-execution-options.md"
+  },
+  {
+    "from": "kotlin/introduction.md",
+    "to": "kotlin/lincheck-getting-started.md"
+  },
+  {
+    "from": "kotlin/operation-arguments.md",
+    "to": "kotlin/lincheck-argument-generation-constraints.md"
+  },
+  {
+    "from": "kotlin/progress-guarantees.md",
+    "to": "kotlin/lincheck-progress-guarantees.md"
+  },
+  {
+    "from": "kotlin/sequential-specification.md",
+    "to": "kotlin/lincheck-results-validation.md"
+  },
+  {
+    "from": "kotlin/testing-strategies.md",
+    "to": "kotlin/lincheck-testing-strategies.md"
+  }
+]

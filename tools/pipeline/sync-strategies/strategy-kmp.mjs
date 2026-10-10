@@ -6,6 +6,12 @@ import {processTopicFileAsync} from "../processors/TopicProcessor.mjs";
 import {syncSidebar} from "../processors/SidebarProcessor.mjs";
 import {processMarkdownFile} from "../processors/MarkdownProcessor.mjs";
 import {expandIncludesForTask} from "../utils/writerside-include.mjs";
+import {movedPagesFromTree} from "../utils/moved-pages.mjs";
+
+/** topics/**\/x.md or .topic → topics/x.md: the pages are flattened into topics/. */
+function mapKmpDocPath(file) {
+    return `topics/${path.posix.basename(file).replace(/\.topic$/, ".md")}`;
+}
 
 /**
  * The KMP docs are published under kotlinlang.org/docs/multiplatform/, so the
@@ -29,6 +35,16 @@ export const kmpStrategy = {
      * @override
      */
     getDocPatterns: () => ["topics/**/*.md", "topics/**/*.topic"],
+
+    /**
+     * @override
+     */
+    mapDocPath: mapKmpDocPath,
+
+    /**
+     * @override
+     */
+    getMovedPages: async (repoPath) => movedPagesFromTree(path.join(repoPath, "mpd.tree")),
 
     postSync: async (repoPath, context, repoConfig) => {
         await syncSidebar(path.join(repoPath, "mpd.tree"), repoConfig.sidebarId, "", kotlinlangHref);
@@ -83,15 +99,7 @@ export const kmpStrategy = {
 
         console.log(` Running KMP postDetect: Change detected path - ${repoPath}`);
         // Map to flattened doc path, convert .topic -> .md
-        task.files = await Promise.all(
-            task.files.map(async (file) => {
-                const base = file.split('/');
-                let target = path.join('topics', base[base.length - 1]);
-                if (target.endsWith('.topic')) {
-                    target = target.replace('.topic', '.md');
-                }
-                return target;})
-        );
+        task.files = task.files.map(mapKmpDocPath);
         console.log(`  Mapped files: ${task.files.join("\n")}`);
         console.log(`  Change detected path finished - ${repoPath}`);
     },
