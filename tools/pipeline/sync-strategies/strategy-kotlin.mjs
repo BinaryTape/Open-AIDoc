@@ -5,6 +5,22 @@ import fs from "fs-extra";
 import {processTopicFileAsync} from "../processors/TopicProcessor.mjs";
 import {syncSidebar} from "../processors/SidebarProcessor.mjs";
 import {expandIncludesForTask} from "../utils/writerside-include.mjs";
+import {movedPagesFromTree} from "../utils/moved-pages.mjs";
+
+// Upstream pages the site leaves out
+const REDUNDANT_FILES = ["kotlin-mascot.md", "debugging.md"];
+
+/** docs/**\/x.md or .topic → docs/x.md: the family's pages are flattened into docs/. */
+function mapKotlinDocPath(file) {
+    const name = path.posix.basename(file).replace(/\.topic$/, ".md");
+    return REDUNDANT_FILES.includes(name) ? null : `docs/${name}`;
+}
+
+async function findTree(repoPath) {
+    const docsPath = path.join(repoPath, "docs");
+    const tree = (await fs.readdir(docsPath)).find(doc => doc.endsWith(".tree"));
+    return tree ? path.join(docsPath, tree) : null;
+}
 
 export const kotlinStrategy = {
     ...defaultStrategy,
@@ -14,16 +30,28 @@ export const kotlinStrategy = {
      */
     getDocPatterns: () => ["docs/**/*.md", "docs/**/*.topic"],
 
+    /**
+     * @override
+     */
+    mapDocPath: mapKotlinDocPath,
+
+    /**
+     * @override
+     */
+    getMovedPages: async (repoPath) => {
+        const tree = await findTree(repoPath);
+        return tree ? movedPagesFromTree(tree) : new Map();
+    },
+
     postSync: async (repoPath, context, repoConfig) => {
         await copyKotlinVersionFile(context, repoConfig);
 
         // Each repository of the family has one tree in docs/ (kr.tree, kc.tree, ...)
-        const docsPath = path.join(repoPath, "docs");
-        const tree = (await fs.readdir(docsPath)).find(doc => doc.endsWith(".tree"));
+        const tree = await findTree(repoPath);
         if (tree) {
-            await syncSidebar(path.join(docsPath, tree), repoConfig.sidebarId);
+            await syncSidebar(tree, repoConfig.sidebarId);
         } else {
-            console.warn(`  ⚠️  Warning: no .tree file found in ${docsPath}`);
+            console.warn(`  ⚠️  Warning: no .tree file found in ${path.join(repoPath, "docs")}`);
         }
     },
 
@@ -42,8 +70,7 @@ export const kotlinStrategy = {
         console.log(`  Flattening finished - ${repoPath}`);
 
         console.log(`  Running Kotlin postDetect: Remove redundant files - ${repoPath}...`);
-        const redundantFiles = ["kotlin-mascot.md", "debugging.md"];
-        for (const file of redundantFiles) {
+        for (const file of REDUNDANT_FILES) {
             const filePath = path.join(docsPath, file);
             if (await fs.pathExists(filePath)) {
                 await fs.remove(filePath);
@@ -66,15 +93,7 @@ export const kotlinStrategy = {
 
         console.log(` Running Kotlin postDetect: Change detected path - ${repoPath}`);
         // Map to flattened doc path, convert .topic -> .md
-        task.files = await Promise.all(
-            task.files.map(async (file) => {
-                const base = file.split('/');
-                let target = path.join('docs', base[base.length - 1]);
-                if (target.endsWith('.topic')) {
-                    target = target.replace('.topic', '.md');
-                }
-                return target;})
-        );
+        task.files = task.files.map(mapKotlinDocPath).filter(Boolean);
         console.log(`  Mapped ${task.files.length} files: ${task.files.join("\n")}`);
         console.log(`  Change detected path finished - ${repoPath}`);
     },

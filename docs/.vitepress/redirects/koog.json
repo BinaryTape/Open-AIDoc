@@ -1,0 +1,54 @@
+[
+  {
+    "from": "koog/a2a-client.md",
+    "to": "koog/a2a/a2a-client.md"
+  },
+  {
+    "from": "koog/a2a-koog-integration.md",
+    "to": "koog/a2a/a2a-koog-integration.md"
+  },
+  {
+    "from": "koog/a2a-protocol-overview.md",
+    "to": "koog/a2a/index.md"
+  },
+  {
+    "from": "koog/a2a-server.md",
+    "to": "koog/a2a/a2a-server.md"
+  },
+  {
+    "from": "koog/annotation-based-tools.md",
+    "to": "koog/tools/annotation-based-tools.md"
+  },
+  {
+    "from": "koog/basic-agents.md",
+    "to": "koog/agents/basic-agents.md"
+  },
+  {
+    "from": "koog/built-in-tools.md",
+    "to": "koog/tools/built-in-tools.md"
+  },
+  {
+    "from": "koog/class-based-tools.md",
+    "to": "koog/tools/class-based-tools.md"
+  },
+  {
+    "from": "koog/complex-workflow-agents.md",
+    "to": "koog/agents/graph-based-agents.md"
+  },
+  {
+    "from": "koog/functional-agents.md",
+    "to": "koog/agents/functional-agents.md"
+  },
+  {
+    "from": "koog/getting-started.md",
+    "to": "koog/quickstart.md"
+  },
+  {
+    "from": "koog/planner-agents.md",
+    "to": "koog/agents/planner-agents/index.md"
+  },
+  {
+    "from": "koog/tools-overview.md",
+    "to": "koog/tools/index.md"
+  }
+]

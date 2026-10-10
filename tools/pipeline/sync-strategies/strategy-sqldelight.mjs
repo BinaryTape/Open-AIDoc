@@ -2,6 +2,7 @@ import fs from "fs-extra";
 import path from "path";
 import {defaultStrategy} from "./strategy.mjs";
 import {syncSidebar} from "../processors/SidebarProcessor.mjs";
+import {movedPagesFromMkDocs} from "../utils/moved-pages.mjs";
 
 const extraFilesMapping = new Map([
     ["CHANGELOG.md", "docs/changelog.md"],
@@ -16,6 +17,16 @@ export const sqlDelightStrategy = {
      */
     getDocPatterns: () => ["docs/**/*.md", ...extraFilesMapping.keys()],
 
+    /**
+     * @override
+     */
+    mapDocPath: (file) => extraFilesMapping.get(file) ?? file,
+
+    /**
+     * @override
+     */
+    getMovedPages: async (repoPath) => movedPagesFromMkDocs(path.join(repoPath, "mkdocs.yml")),
+
     postSync: async (repoPath, context, repoConfig) => {
         await syncSidebar(path.join(repoPath, 'mkdocs.yml'), repoConfig.sidebarId, 'https://sqldelight.github.io/sqldelight/2.1.0/');
     },
@@ -27,17 +38,14 @@ export const sqlDelightStrategy = {
         const repoPath = repoConfig.cloneDir;
 
         console.log("  Running SQLDelight postSync: Copying root markdown files...");
-        task.files = await Promise.all(
-            task.files.map(async (file) => {
-                if (extraFilesMapping.has(file)) {
-                    const src = path.join(repoPath, file);
-                    const dest = path.join(repoPath, extraFilesMapping.get(file));
-                    await fs.copy(src, dest);
-                    return extraFilesMapping.get(file);
-                }
-                return file;
-            })
-        );
+        // Every mapped page is copied, not only the changed ones: pages carried
+        // over in the pending file are read from their docs/ path too.
+        for (const [file, docPath] of extraFilesMapping) {
+            if (await fs.pathExists(path.join(repoPath, file))) {
+                await fs.copy(path.join(repoPath, file), path.join(repoPath, docPath));
+            }
+        }
+        task.files = task.files.map(sqlDelightStrategy.mapDocPath);
         console.log("  Copying root markdown files finished");
     },
 

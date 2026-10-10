@@ -6,9 +6,15 @@ import {processTopicFileAsync} from "../processors/TopicProcessor.mjs";
 import {syncSidebar} from "../processors/SidebarProcessor.mjs";
 import {processMarkdownFile} from "../processors/MarkdownProcessor.mjs";
 import {expandIncludesForTask} from "../utils/writerside-include.mjs";
+import {movedPagesFromTree} from "../utils/moved-pages.mjs";
 
 // lib*.topic files are libraries of snippets included by other topics, not pages.
 const isIncludeLibrary = (file) => /^lib.*\.topic$/.test(path.basename(file));
+
+/** topics/x.topic → topics/x.md; snippet libraries are not pages. */
+function mapKtorDocPath(file) {
+    return isIncludeLibrary(file) ? null : file.replace(/\.topic$/, ".md");
+}
 
 export const ktorStrategy = {
     ...defaultStrategy,
@@ -17,6 +23,16 @@ export const ktorStrategy = {
      * @override
      */
     getDocPatterns: () => ["topics/*.md", "topics/*.topic"],
+
+    /**
+     * @override
+     */
+    mapDocPath: mapKtorDocPath,
+
+    /**
+     * @override
+     */
+    getMovedPages: async (repoPath) => movedPagesFromTree(path.join(repoPath, "ktor.tree")),
 
     postSync: async (repoPath, context, repoConfig) => {
         await syncSidebar(path.join(repoPath, "ktor.tree"), repoConfig.sidebarId);
@@ -52,9 +68,7 @@ export const ktorStrategy = {
 
         console.log(` Running Ktor postDetect: Change file extension - ${repoPath}`);
         // Map to flattened doc path, convert .topic -> .md
-        task.files = task.files
-            .filter((file) => !isIncludeLibrary(file))
-            .map((file) => file.replace(/\.topic$/, '.md'));
+        task.files = task.files.map(mapKtorDocPath).filter(Boolean);
         console.log(`  Mapped files: ${task.files.join("\n")}`);
         console.log(`  Change file extension finished - ${repoPath}`);
     },

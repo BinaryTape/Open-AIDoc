@@ -2,6 +2,7 @@ import fs from "fs-extra";
 import path from "path";
 import { defaultStrategy } from "./strategy.mjs";
 import { parseMKSidebar, writeSidebar } from "../processors/SidebarProcessor.mjs";
+import { movedPagesFromMkDocs } from "../utils/moved-pages.mjs";
 
 const extraFilesMapping = new Map([
   ["CHANGELOG.md", "docs/changelog.md"],
@@ -24,6 +25,16 @@ export const coilStrategy = {
   /**
    * @override
    */
+  mapDocPath: (file) => extraFilesMapping.get(file) ?? file,
+
+  /**
+   * @override
+   */
+  getMovedPages: async (repoPath) => movedPagesFromMkDocs(path.join(repoPath, "mkdocs.yml")),
+
+  /**
+   * @override
+   */
   postSync: async (repoPath) => {
     await syncCoilSidebar(repoPath);
   },
@@ -36,7 +47,7 @@ export const coilStrategy = {
     // Every mapped page is copied, not only the changed ones: pages carried
     // over in the pending file are read from their docs/ path too.
     await copyExtraFiles(repoConfig.cloneDir);
-    task.files = task.files.map((file) => extraFilesMapping.get(file) ?? file);
+    task.files = task.files.map(coilStrategy.mapDocPath);
   },
 
   /**

@@ -1,0 +1,18 @@
+[
+  {
+    "from": "kotlin/ksp-additional-details.md",
+    "to": "kotlin/ksp-kotlin-model.md"
+  },
+  {
+    "from": "kotlin/ksp-examples.md",
+    "to": "kotlin/ksp-overview.md"
+  },
+  {
+    "from": "kotlin/ksp-faq.md",
+    "to": "kotlin/ksp-overview.md"
+  },
+  {
+    "from": "kotlin/multiplatform.md",
+    "to": "kmp/get-started.md"
+  }
+]

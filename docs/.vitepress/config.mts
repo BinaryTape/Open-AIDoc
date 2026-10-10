@@ -11,6 +11,7 @@ import {
   shikiRemoveDiffMarker
 } from './config/markdown.config'
 import { applySeoMetadata } from './config/seo.config'
+import { writeRedirectsFile } from './config/redirects.config'
 
 // ===== Vite plugins =====
 import liquidIncludePlugin from "./plugins/vite/vite-liquid-include"
@@ -90,6 +91,11 @@ export default defineConfig({
 
   transformPageData(pageData) {
     applySeoMetadata(pageData)
+  },
+
+  // Redirects for pages moved upstream (Cloudflare Pages' _redirects)
+  buildEnd(siteConfig) {
+    writeRedirectsFile(siteConfig.outDir, resolve(__dirname, 'redirects'))
   },
 
   // Markdown configuration

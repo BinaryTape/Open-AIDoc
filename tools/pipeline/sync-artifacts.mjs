@@ -43,17 +43,20 @@ export async function stageChanges(context) {
 
 /**
  * Repositories a run updated, in run order: those with documents to
- * translate and those whose sidebar changed (sidebars are regenerated on
- * every sync, so navigation can change while no document did).
- * Call after stageChanges.
+ * translate, those whose sidebar changed (sidebars are regenerated on every
+ * sync, so navigation can change while no document did) and those with
+ * pages removed. Call after stageChanges.
  * @returns {Promise<string[]>}
  */
 export async function updatedRepoIds(context) {
   const { stdout } = await execa("git", ["diff", "--cached", "--name-only", "-z"]);
   const staged = new Set(stdout.split("\0").filter(Boolean));
-  const withTasks = new Set(context.tasks.map((t) => t.repoConfig.id));
+  const updated = new Set([
+    ...context.tasks.map((t) => t.repoConfig.id),
+    ...(context.removedPages ?? []).map((r) => r.repo),
+  ]);
   return context.repos
-    .filter((r) => withTasks.has(r.id) || staged.has(`${SIDEBAR_DIR}/${r.sidebarId}.sidebar.json`))
+    .filter((r) => updated.has(r.id) || staged.has(`${SIDEBAR_DIR}/${r.sidebarId}.sidebar.json`))
     .map((r) => r.id);
 }
 
@@ -110,6 +113,8 @@ export async function exportRepoChanges(context, outDir) {
     deleted,
     locales,
     pending: context.pendingReport,
+    removedPages: context.removedPages ?? [],
+    removalHeld: context.removalHeld ?? [],
   };
   await fs.outputJson(path.join(outDir, "summary.json"), summary, { spaces: 2 });
   return summary;
@@ -128,6 +133,8 @@ export async function applyRepoArtifacts(artifactsDir, expected) {
     gitAddPaths: new Set(),
     gitRemovePaths: new Set(),
     pendingReport: [],
+    removedPages: [],
+    removalHeld: [],
   };
   const results = [];
   const localeUpdates = {};
@@ -155,6 +162,8 @@ export async function applyRepoArtifacts(artifactsDir, expected) {
       Object.assign((localeUpdates[name] ??= {}), delta);
     }
     context.pendingReport.push(...summary.pending);
+    context.removedPages.push(...(summary.removedPages ?? []));
+    context.removalHeld.push(...(summary.removalHeld ?? []));
     summary.updated.forEach((updatedId) => context.tasks.push({ repoConfig: { id: updatedId } }));
 
     const changed = summary.files.length + summary.deleted.length + Object.keys(summary.locales).length;
@@ -171,9 +180,11 @@ export async function applyRepoArtifacts(artifactsDir, expected) {
 }
 
 /**
- * Markdown report of a sync run, for the sync pull request and the job summary.
+ * Markdown report of a sync run, for the job summary.
+ * @param {object[]} results - Per repository, from applyRepoArtifacts
+ * @param {{pendingReport?: object[], removedPages?: object[], removalHeld?: object[]}} context
  */
-export function formatSyncReport(results, pendingRows) {
+export function formatSyncReport(results, { pendingReport: pendingRows = [], removedPages = [], removalHeld = [] } = {}) {
   const escape = (text) => String(text).replaceAll("|", "\\|").replaceAll("\n", " ");
   const label = { updated: "✅ updated", unchanged: "— no changes", failed: "❌ failed, retried next run" };
   const lines = [
@@ -203,6 +214,32 @@ export function formatSyncReport(results, pendingRows) {
       "| --- | --- | --- | --- |",
       ...pendingRows.map(({ repo, file, langs, reason }) =>
         `| ${repo} | \`${escape(file)}\` | ${langs.join(", ")} | ${escape(reason)} |`
+      ),
+      ""
+    );
+  }
+
+  if (removedPages.length > 0) {
+    lines.push(
+      "### Pages removed (deleted or moved upstream)",
+      "",
+      "| Repository | Page | Redirected to |",
+      "| --- | --- | --- |",
+      ...removedPages.map(({ repo, page, movedTo }) =>
+        `| ${repo} | \`${escape(page)}\` | ${movedTo ? `\`${escape(movedTo)}\`` : "—"} |`
+      ),
+      ""
+    );
+  }
+
+  if (removalHeld.length > 0) {
+    lines.push(
+      "### ⚠️ Stale pages kept",
+      "",
+      ...removalHeld.map(({ repo, reason }) =>
+        `- **${repo}**: ${escape(reason)}, so nothing was removed. Check the upstream repository; ` +
+          `if the pages really went, delete \`.github/last_check_<id>.pages.json\` of that repository ` +
+          `after removing them by hand.`
       ),
       ""
     );

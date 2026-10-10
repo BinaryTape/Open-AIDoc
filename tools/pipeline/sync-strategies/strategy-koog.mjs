@@ -4,6 +4,7 @@ import fs from "fs-extra";
 import {syncSidebar} from "../processors/SidebarProcessor.mjs";
 import {LINKS_FILE, syncKoogApiLinks} from "../utils/koog-api-links.mjs";
 import {toContentRelPath} from "../../../shared/content-paths.ts";
+import {movedPagesFromMkDocs} from "../utils/moved-pages.mjs";
 
 const config = fs.readJsonSync(new URL("../translate-config.json", import.meta.url));
 
@@ -14,6 +15,11 @@ export const koogStrategy = {
      * @override
      */
     getDocPatterns: () => ["docs/docs/**/*.md"],
+
+    /**
+     * @override
+     */
+    getMovedPages: async (repoPath) => movedPagesFromMkDocs(path.join(repoPath, "docs/mkdocs.yml")),
 
     postSync: async (repoPath, context, repoConfig) => {
         await syncSidebar(path.join(repoPath, 'docs/mkdocs.yml'), repoConfig.sidebarId);
