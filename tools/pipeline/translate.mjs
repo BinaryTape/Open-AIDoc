@@ -4,6 +4,7 @@ import { GoogleGenAI } from "@google/genai";
 import { fileURLToPath } from "url";
 import pLimit from "p-limit";
 import { toContentRelPath } from "../../shared/content-paths.ts";
+import { loadPageCheck } from "./utils/page-check.mjs";
 import { applySourceAnchors } from "./utils/heading-anchors.mjs";
 import { restoreTitleComment } from "./utils/title-comment.mjs";
 import { stripWrapperFence } from "./utils/wrapper-fence.mjs";
@@ -419,8 +420,16 @@ async function callGemini(prompt, targetLang) {
   return response.text;
 }
 
+// Path of a target file relative to docs/, as the site knows the page
+const pagePath = (targetPath) => path.relative("docs", targetPath).replaceAll("\\", "/");
+
+function summarizeProblems(problems) {
+  const shown = problems.slice(0, 3).map((problem) => problem.replace(/\s+/g, " ").slice(0, 160));
+  return shown.join("; ") + (problems.length > 3 ? ` (+${problems.length - 3} more)` : "");
+}
+
 // Translate one file into one language and write the result
-async function translateUnit(filePath, targetLang, source) {
+async function translateUnit(filePath, targetLang, source, pageCheck = null) {
   const prompt = prepareTranslationPrompt(source, targetLang);
   let translated = cleanupTranslation(await callGemini(prompt, targetLang), source);
 
@@ -442,6 +451,12 @@ async function translateUnit(filePath, targetLang, source) {
   const anchored = applySourceAnchors(translated, source);
   if (anchored.skipped) {
     console.warn(`⚠️ Keeping upstream anchors out of ${targetPath}: ${anchored.skipped}`);
+  }
+
+  // One page the site cannot compile stops the whole site from building.
+  const buildProblems = pageCheck ? await pageCheck(pagePath(targetPath), anchored.content) : [];
+  if (buildProblems.length > 0) {
+    throw new TranslationRejected(`does not build: ${summarizeProblems(buildProblems)}`);
   }
 
   fs.mkdirSync(path.dirname(targetPath), { recursive: true });
@@ -578,10 +593,13 @@ export function getLangDisplayName(langCode) {
  * @param {object} repoConfig
  * @param {{file: string, langs: string[]}[]} work - Source files (relative to
  *   the clone) and the languages each one needs
+ * @param {{pageCheck?: Function | null}} [options] - `pageCheck` checks that a
+ *   page builds (utils/page-check.mjs); by default the site's own, when run
+ *   in the site repository
  * @returns {Promise<{translatedPaths: string[], pending: import("./utils/pending.mjs").Pending}>}
  *   `pending` holds what was not translated, to be carried over to the next run.
  */
-export async function translateFiles(repoConfig, work) {
+export async function translateFiles(repoConfig, work, { pageCheck = undefined } = {}) {
   const total = work.reduce((sum, unit) => sum + unit.langs.length, 0);
   console.log(`Translating ${work.length} files (${total} translations) for ${repoConfig.id} (${repoConfig.docType})...`);
 
@@ -589,6 +607,10 @@ export async function translateFiles(repoConfig, work) {
   process.env.DOC_TYPE = repoConfig.docType;
   process.env.REPO_PATH = repoConfig.cloneDir;
   process.env.DOC_PATH = repoConfig.sourceDocRoot;
+
+  if (pageCheck === undefined) pageCheck = await sitePageCheck();
+  // Links may point at pages this run is about to add
+  pageCheck?.addPages?.(work.flatMap(({ file, langs }) => langs.map((lang) => pagePath(getTargetPath(file, lang)))));
 
   const translatedPaths = [];
   const pending = {};
@@ -609,10 +631,12 @@ export async function translateFiles(repoConfig, work) {
       continue;
     }
 
+    // Only translations are checked, not the source: the model often mends
+    // what would not build upstream (a bare `<maker>`, a doubled attribute).
     for (const lang of langs) {
       jobs.push(limit(async () => {
         try {
-          translatedPaths.push(await withRetry(() => translateUnit(file, lang, source), {
+          translatedPaths.push(await withRetry(() => translateUnit(file, lang, source, pageCheck), {
             label: `${file} → ${lang}`,
           }));
         } catch (error) {
@@ -628,6 +652,17 @@ export async function translateFiles(repoConfig, work) {
 
   await Promise.all(jobs);
   return { translatedPaths, pending };
+}
+
+let sitePageCheckLoaded = null;
+
+/** The site's page check, loaded once; null outside the site repository. */
+function sitePageCheck() {
+  sitePageCheckLoaded ??= loadPageCheck().then((check) => {
+    if (!check) console.warn("⚠️ No VitePress site in docs/: translations are not checked for building.");
+    return check;
+  });
+  return sitePageCheckLoaded;
 }
 
 export async function translateLocaleFiles(files) {

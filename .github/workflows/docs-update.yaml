@@ -208,14 +208,45 @@ jobs:
         id: docs_check
         if: ${{ steps.push.outputs.pushed == 'true' }}
         continue-on-error: true
-        run: pnpm docs:check
+        env:
+          # Build as Cloudflare Pages does (4 workers); its build container has 8 GB.
+          CF_PAGES: '1'
+        run: |
+          # GNU time records the peak resident memory of the build (in KB),
+          # node included: the figure to compare with Cloudflare's limit.
+          [ -x /usr/bin/time ] || sudo apt-get install -y -qq time > /dev/null || true
+          measure=()
+          [ -x /usr/bin/time ] && measure=(/usr/bin/time -f '%M' -o build-peak-kb.txt)
+          status=0
+          "${measure[@]}" pnpm docs:build || status=$?
+          if [ -s build-peak-kb.txt ]; then
+            echo "peak_kb=$(tail -n 1 build-peak-kb.txt)" >> "$GITHUB_OUTPUT"
+          fi
+          [ "$status" -eq 0 ] || exit "$status"
+          pnpm docs:verify
 
       - name: Write post-sync test summary
         if: ${{ always() && steps.push.outputs.pushed == 'true' }}
         env:
           UNIT_OUTCOME: ${{ steps.unit_tests.outcome }}
           DOCS_OUTCOME: ${{ steps.docs_check.outcome }}
+          PEAK_KB: ${{ steps.docs_check.outputs.peak_kb }}
+          # Cloudflare Pages builds in an 8 GB container; warn with 1 GB left.
+          LIMIT_GB: '8'
+          WARN_GB: '7'
         run: |
+          memory="not measured"
+          memory_high=false
+          if [ -n "$PEAK_KB" ]; then
+            peak_gb=$(awk -v kb="$PEAK_KB" 'BEGIN { printf "%.1f", kb / 1048576 }')
+            if awk -v kb="$PEAK_KB" -v warn="$WARN_GB" 'BEGIN { exit !(kb / 1048576 >= warn) }'; then
+              memory_high=true
+              memory="⚠️ ${peak_gb} GB"
+              echo "::warning title=Site build memory::The build peaked at ${peak_gb} GB; Cloudflare Pages builds in ${LIMIT_GB} GB."
+            else
+              memory="${peak_gb} GB"
+            fi
+          fi
           {
             echo "## Post-sync checks"
             echo ""
@@ -223,10 +254,13 @@ jobs:
             echo "| --- | --- |"
             echo "| \`pnpm test\` | ${UNIT_OUTCOME} |"
             echo "| \`pnpm docs:check\` (site build) | ${DOCS_OUTCOME} |"
+            echo "| Site build peak memory (Cloudflare limit ${LIMIT_GB} GB) | ${memory} |"
             echo ""
-            if [ "$UNIT_OUTCOME" = "success" ] && [ "$DOCS_OUTCOME" = "success" ]; then
-              echo "✅ All post-sync checks passed."
-            else
+            if [ "$UNIT_OUTCOME" != "success" ] || [ "$DOCS_OUTCOME" != "success" ]; then
               echo "⚠️ The sync is on the branch already; open the failed steps above for the logs and fix it in a follow-up change."
+            elif [ "$memory_high" = true ]; then
+              echo "⚠️ The checks passed, but the site build is close to Cloudflare's memory limit: the Cloudflare build may start failing. Reduce the build's memory before it does."
+            else
+              echo "✅ All post-sync checks passed."
             fi
           } >> "$GITHUB_STEP_SUMMARY"
