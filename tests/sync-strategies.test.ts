@@ -6,7 +6,7 @@ import { coilStrategy } from '../tools/pipeline/sync-strategies/strategy-coil.mj
 import { ktorStrategy } from '../tools/pipeline/sync-strategies/strategy-ktor.mjs'
 import { kmpStrategy } from '../tools/pipeline/sync-strategies/strategy-kmp.mjs'
 import { koogStrategy } from '../tools/pipeline/sync-strategies/strategy-koog.mjs'
-import { kotlinStrategy } from '../tools/pipeline/sync-strategies/strategy-kotlin.mjs'
+import { kotlinSerializationStrategy, kotlinStrategy } from '../tools/pipeline/sync-strategies/strategy-kotlin.mjs'
 import { sqlDelightStrategy } from '../tools/pipeline/sync-strategies/strategy-sqldelight.mjs'
 
 let clone: string
@@ -132,6 +132,43 @@ describe('generated sidebars', () => {
       { text: 'coil.faq', link: 'faq' },
       { text: 'coil.api-⏏', href: 'https://coil-kt.github.io/coil/api/index.html' },
     ])
+  })
+
+  it('kotlinx.serialization: sidebar from docs-website/, whose toc sits in a snippet, and its variables', async () => {
+    write('docs-website/serialization.tree', [
+      '<instance-profile id="serialization" name="Serialization" start-page="serialization.md">',
+      '    <snippet id="serialization">',
+      '        <toc-element topic="serialization.md" toc-title="Introduction"/>',
+      '        <toc-element toc-title="Configure JSON serialization">',
+      '            <toc-element topic="serialization-json-elements.md"/>',
+      '        </toc-element>',
+      '    </snippet>',
+      '</instance-profile>',
+    ].join('\n'))
+    write('docs-website/v.list', '<vars><var name="okioVersion" value="3.16.2"/></vars>\n')
+    const context = { gitAddPaths: new Set() }
+
+    await kotlinSerializationStrategy.postSync(clone, context, { id: 'kotlinx-serialization', sidebarId: 'serialization', cloneDir: clone })
+
+    const sidebar = JSON.parse(readFileSync(join(site, 'docs/.vitepress/sidebar/serialization.sidebar.json'), 'utf8'))
+    expect(sidebar[0]).toMatchObject({ text: 'serialization.serialization', link: 'serialization' })
+    expect(sidebar[1].items[0]).toMatchObject({ link: 'serialization-json-elements' })
+    expect(readFileSync(join(site, 'docs/.vitepress/variables/serialization.v.list'), 'utf8')).toContain('okioVersion')
+    expect([...context.gitAddPaths]).toEqual(['docs/.vitepress/variables/serialization.v.list'])
+  })
+})
+
+describe('kotlinx.serialization strategy', () => {
+  it('flattens docs-website/topics into docs-website/', async () => {
+    write('docs-website/topics/serialization-get-started.md', '[//]: # (title: Get started)\n\nText.\n')
+    write('docs-website/serialization.tree', '<instance-profile id="serialization"/>\n')
+    const task = { files: ['docs-website/topics/serialization-get-started.md'] }
+
+    await kotlinSerializationStrategy.postDetect({ id: 'kotlinx-serialization', cloneDir: clone }, task)
+
+    expect(task.files).toEqual(['docs-website/serialization-get-started.md'])
+    expect(read('docs-website/serialization-get-started.md')).toContain('Get started')
+    expect(kotlinSerializationStrategy.getDocPatterns()).toEqual(['docs-website/**/*.md', 'docs-website/**/*.topic'])
   })
 })
 

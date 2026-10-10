@@ -20,7 +20,8 @@ const Logger = {
 const git = {
   getCurrentSha: async (path) =>
     (await execa("git", ["rev-parse", "HEAD"], { cwd: path })).stdout.trim(),
-  clone: async (url, p) => execa("git", ["clone", url, p]),
+  // The configured branch (origin/x), which is not always the default one
+  clone: async (url, p, b) => execa("git", ["clone", "--branch", b.replace(/^origin\//, ""), url, p]),
   update: async (p, b) => {
     await execa("git", ["fetch", "--all"], { cwd: p });
     await execa("git", ["reset", "--hard", b], { cwd: p });
@@ -60,7 +61,7 @@ async function sync(context) {
 
     if (!repoExists) {
       console.log(`Cloning full history of ${repoConfig.repo}...`);
-      await git.clone(repoUrl, repoConfig.cloneDir);
+      await git.clone(repoUrl, repoConfig.cloneDir, repoConfig.branch);
     } else {
       console.log(
         `Repository ${repoConfig.repo} already exists, fetching latest changes...`

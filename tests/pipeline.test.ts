@@ -305,6 +305,26 @@ describe('docs pipeline', () => {
     expect(git(site(), 'status', '--porcelain')).toBe('')
   })
 
+  // kotlinx.serialization's published docs are on a branch other than its default one
+  it('syncs the configured branch, not the default one', async () => {
+    const dir = join(root, 'upstream', 'branchy')
+    mkdirSync(dir, { recursive: true })
+    git(dir, 'init', '-q', '-b', 'main')
+    commitUpstream('branchy', { 'docs/old.md': doc('Old', ['A', 'B', 'C']) }, 'main docs')
+    git(dir, 'switch', '-q', '-c', 'docs-site')
+    commitUpstream('branchy', { 'docs/site.md': doc('Site', ['A', 'B', 'C']) }, 'site docs', ['docs/old.md'])
+    git(dir, 'switch', '-q', 'main')
+    const branchy = {
+      ...repos[0], id: 'branchy', docType: 'branchy', sidebarId: 'branchy', cloneDir: 'branchy-repo',
+      lastCheckFile: '.github/last_check_branchy.txt', branch: 'origin/docs-site',
+    }
+
+    await runPipeline({ repos: [branchy], repoUrl })
+
+    LANG_FILES('branchy/site.md').forEach((file) => expect(originHas(file), file).toBe(true))
+    expect(originHas('docs/branchy/old.md')).toBe(false)
+  })
+
   it('removes the pages deleted or moved upstream, and redirects the moved one', async () => {
     await run()
     deleteAndMovePages()

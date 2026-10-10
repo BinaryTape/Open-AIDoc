@@ -53,6 +53,7 @@ const PROJECTS = [
       { repo: 'Kotlin/dokka', branch: 'master', docPaths: ['docs/topics'] },
       { repo: 'JetBrains/lincheck', branch: 'master', docPaths: ['docs/topics'] },
       { repo: 'Kotlin/api-guidelines', branch: 'main', docPaths: ['docs/topics'] },
+      { repo: 'Kotlin/kotlinx.serialization', branch: 'doc-restructuring-master', docPaths: ['docs-website/topics'] },
     ],
   },
   {
