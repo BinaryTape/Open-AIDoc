@@ -698,5 +698,10 @@
   "coil.upgrading-to-coil-3-x": "Upgrading to Coil 3.x",
   "coil.api-⏏": "API ⏏",
   "coil.wasm-sample-⏏": "WASM Sample ⏏",
-  "coil.change-log": "Change Log"
+  "coil.change-log": "Change Log",
+  "serialization.serialization": "Introduction",
+  "serialization.configure-json-serialization": "Configure JSON serialization",
+  "serialization.serialization-configure-json-serialization": "Overview",
+  "serialization.serialization-transform-json": "JSON transformation",
+  "serialization.alternative-and-custom-serialization-formats": "Alternative and custom serialization formats"
 }

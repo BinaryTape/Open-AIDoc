@@ -1,6 +1,6 @@
-[//]: # (title: Ktor Client のテスト)
+[//]: # (title: Ktor Client でのテスト)
 
-<show-structure for="chapter" depth="2"/>
+<show-structure for="chapter" depth="3"/>
 
 <var name="artifact_name" value="ktor-client-mock"/>
 
@@ -18,14 +18,14 @@
 </tldr>
 
 <web-summary>
-Ktor は、エンドポイントに接続せずに HTTP 呼び出しをシミュレートする MockEngine を提供します。
+Ktor は、エンドポイントに接続することなく HTTP 呼び出しをシミュレートする MockEngine を提供します。
 </web-summary>
 
 <link-summary>
-HTTP 呼び出しをシミュレートして、MockEngine でクライアントをテストする方法を学びます。
+MockEngine を使用して HTTP 呼び出しをシミュレートし、クライアントをテストする方法を学びます。
 </link-summary>
 
-Ktor は、エンドポイントに接続せずに HTTP 呼び出しをシミュレートする [MockEngine](https://api.ktor.io/ktor-client-mock/io.ktor.client.engine.mock/-mock-engine/index.html) を提供します。
+Ktor は、エンドポイントに接続することなく HTTP 呼び出しをシミュレートする [MockEngine](https://api.ktor.io/ktor-client-mock/io.ktor.client.engine.mock/-mock-engine/index.html) を提供します。
 
 ## 依存関係の追加 {id="add_dependencies"}
 `MockEngine` を使用する前に、ビルドスクリプトに `%artifact_name%` アーティファクトを含める必要があります。
@@ -42,20 +42,19 @@ Ktor は、エンドポイントに接続せずに HTTP 呼び出しをシミュ
     </TabItem>
 </Tabs>
 
-## 使い方 {id="usage"}
+## 使用方法 {id="usage"}
 
-### クライアント設定の共有 {id="share-config"}
+### クライアント構成の共有 {id="share-config"}
 
-`MockEngine` を使用してクライアントをテストする方法を見てみましょう。クライアントが次の設定を持っていると仮定します。
-* リクエストの作成に `CIO` [エンジン](client-engines.md)が使用されている。
+`MockEngine` を使用してクライアントをテストする方法を見てみましょう。クライアントに次の構成があると仮定します:
+* リクエストの実行に `CIO` [エンジン](client-engines.md) を使用している。
 * 受信した JSON データをデシリアライズするために [Json](client-serialization.md) プラグインがインストールされている。
 
-このクライアントをテストするには、その設定を `MockEngine` を使用するテストクライアントと共有する必要があります。設定を共有するには、エンジンをコンストラクタパラメータとして受け取り、クライアント設定を含むクライアントラッパークラスを作成します。
+このクライアントをテストするには、その構成を `MockEngine` を使用するテスト用クライアントと共有する必要があります。構成を共有するには、エンジンをコンストラクターのパラメーターとして受け取り、クライアント構成を含むクライアントラッパークラスを作成します。
 
 ```kotlin
 @Serializable
 data class IpResponse(val ip: String)
-
 class ApiClient(engine: HttpClientEngine) {
     private val httpClient = HttpClient(engine) {
         install(ContentNegotiation) {
@@ -64,10 +63,14 @@ class ApiClient(engine: HttpClientEngine) {
     }
 
     suspend fun getIp(): IpResponse = httpClient.get("https://api.ipify.org/?format=json").body()
+
+    suspend fun getUser(): String = httpClient.get("https://api.example.com/user").body()
+
+    suspend fun getOrders(): String = httpClient.get("https://api.example.com/orders").body()
 }
 ```
 
-その後、次のように `ApiClient` を使用して `CIO` エンジンで HTTP クライアントを作成し、リクエストを行うことができます。
+その後、以下のように `ApiClient` を使用して `CIO` エンジンを持つ HTTP クライアントを作成し、リクエストを実行できます。
 
 ```kotlin
 fun main() {
@@ -76,12 +79,11 @@ fun main() {
         val response = client.getIp()
         println(response.ip)
     }
-}
 ```
 
 ### クライアントのテスト {id="test-client"}
 
-クライアントをテストするには、リクエストパラメータをチェックし、必要なコンテンツ（今回の場合は JSON オブジェクト）でレスポンスを返すハンドラーを備えた `MockEngine` インスタンスを作成する必要があります。
+クライアントをテストするには、リクエストパラメーターを確認し、必要なコンテンツ（今回の例では JSON オブジェクト）で応答できるハンドラーを持つ `MockEngine` インスタンスを作成する必要があります。
 
 ```kotlin
 val mockEngine = MockEngine { request ->
@@ -93,13 +95,13 @@ val mockEngine = MockEngine { request ->
 }
 ```
 
-その後、作成した `MockEngine` を渡して `ApiClient` を初期化し、必要なアサーションを実行できます。
+次に、作成した `MockEngine` を渡して `ApiClient` を初期化し、必要なアサーションを実行します。
 
 ```kotlin
 class ApiClientTest {
     @Test
     fun sampleClientTest() {
-        runBlocking {
+        runTest {
             val mockEngine = MockEngine { request ->
                 respond(
                     content = ByteReadChannel("""{"ip":"127.0.0.1"}"""),
@@ -109,10 +111,52 @@ class ApiClientTest {
             }
             val apiClient = ApiClient(mockEngine)
 
-            Assert.assertEquals("127.0.0.1", apiClient.getIp().ip)
+            assertEquals("127.0.0.1", apiClient.getIp().ip)
         }
+    }
+```
+
+### 複数のエンドポイントのモック {id="multiple-endpoints"}
+
+クライアントが複数の URL を呼び出す場合は、単一の再利用可能なハンドラーを使用し、リクエスト（例えば `request.url.encodedPath` やホスト）に基づいて分岐します。これにより、モックを呼び出し順序に依存しないように保つことができます:
+
+```kotlin
+val mockEngine = MockEngine { request ->
+    when (request.url.encodedPath) {
+        "/user" -> respondOk("user-1")
+        "/orders" -> respondOk("order-1,order-2")
+        else -> error("Unhandled ${request.url}")
     }
 }
 ```
 
-完全な例はこちらで確認できます: [client-testing-mock](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-testing-mock)。
+`else` 分岐では予期しない URL に対してエラーを発生させ、モックの欠落がテストで暗黙的に許容されないようにします。
+また、異なるホストで同じパスが使用されている場合は、`request.url.host` でマッチングすることもできます。
+
+### 呼び出しチェーンのモック {id="call-chain"}
+
+固定された順序での連続した呼び出しに対して異なるレスポンスを返すには、[`addHandler()`](https://api.ktor.io/ktor-client-mock/io.ktor.client.engine.mock/-mock-engine-config/add-handler.html) 関数を使用して複数のハンドラーを登録し、`reuseHandlers` プロパティを `false` に設定して各ハンドラーを 1 回だけ使用するようにします:
+
+```kotlin
+val mockEngine = MockEngine.config {
+    reuseHandlers = false
+    addHandler { respondOk("step-1") }
+    addHandler { respondOk("step-2") }
+}
+```
+
+デフォルトでは `reuseHandlers` プロパティは `true` に設定されており、ハンドラーは循環して再利用されます。
+
+`reuseHandlers` プロパティを `false` に設定すると、ハンドラーは 1 回だけ使用されます。すべてのハンドラーが使用された場合、次のリクエストはエラーをスローして拒否されます。
+
+クライアントを先に構築し、後からレスポンスをエンキューするテストの場合は、[`MockEngine.Queue`](https://api.ktor.io/ktor-client-mock/io.ktor.client.engine.mock/-mock-engine/-queue/index.html) を使用します:
+
+```kotlin
+            val engine = MockEngine.Queue()
+            val client = HttpClient(engine)
+
+            engine += { respondOk("first") }
+            engine += { respondOk("second") }
+```
+
+完全なサンプルはこちらで確認できます: [client-testing-mock](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-testing-mock)。

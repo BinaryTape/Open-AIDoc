@@ -728,5 +728,10 @@
   "coil.upgrading-to-coil-3-x": "升级到 Coil 3.x",
   "coil.api-⏏": "API ⏏",
   "coil.wasm-sample-⏏": "Wasm 示例 ⏏",
-  "coil.change-log": "更新日志"
+  "coil.change-log": "更新日志",
+  "serialization.serialization": "简介",
+  "serialization.configure-json-serialization": "配置 JSON 序列化",
+  "serialization.serialization-configure-json-serialization": "概览",
+  "serialization.serialization-transform-json": "JSON 转换",
+  "serialization.alternative-and-custom-serialization-formats": "替代与自定义序列化格式"
 }

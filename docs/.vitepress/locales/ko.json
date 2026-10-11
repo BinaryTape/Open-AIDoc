@@ -730,5 +730,10 @@
   "coil.upgrading-to-coil-3-x": "Coil 3.x로 업그레이드",
   "coil.api-⏏": "API ⏏",
   "coil.wasm-sample-⏏": "Wasm 샘플 ⏏",
-  "coil.change-log": "변경 로그"
+  "coil.change-log": "변경 로그",
+  "serialization.serialization": "소개",
+  "serialization.configure-json-serialization": "JSON 직렬화 구성",
+  "serialization.serialization-configure-json-serialization": "개요",
+  "serialization.serialization-transform-json": "JSON 변환",
+  "serialization.alternative-and-custom-serialization-formats": "대체 및 커스텀 직렬화 형식"
 }

@@ -729,5 +729,10 @@
   "coil.upgrading-to-coil-3-x": "Coil 3.xへのアップグレード",
   "coil.api-⏏": "API ⏏",
   "coil.wasm-sample-⏏": "Wasmサンプル ⏏",
-  "coil.change-log": "変更履歴"
+  "coil.change-log": "変更履歴",
+  "serialization.serialization": "はじめに",
+  "serialization.configure-json-serialization": "JSONシリアル化の設定",
+  "serialization.serialization-configure-json-serialization": "概要",
+  "serialization.serialization-transform-json": "JSON変換",
+  "serialization.alternative-and-custom-serialization-formats": "代替およびカスタムのシリアル化フォーマット"
 }

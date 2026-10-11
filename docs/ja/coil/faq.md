@@ -1,14 +1,14 @@
 # FAQ
 
-FAQにない質問がありますか？ #coil タグが付いた [StackOverflow](https://stackoverflow.com/questions/tagged/coil) を確認するか、[Github discussions](https://github.com/coil-kt/coil/discussions) を検索してください。
+FAQに掲載されていない質問がありますか？タグ #coil を付けて [StackOverflow](https://stackoverflow.com/questions/tagged/coil) で確認するか、[Github discussions](https://github.com/coil-kt/coil/discussions) を検索してください。
 
-## CoilはJavaプロジェクト、またはKotlinとJavaが混在するプロジェクトで使用できますか？ {id="can-coil-be-used-with-java-projects-or-mixed-kotlin-java-projects"}
+## CoilはJavaプロジェクトやKotlin/Javaの混在プロジェクトで使用できますか？ {id="can-coil-be-used-with-java-projects-or-mixed-kotlin-java-projects"}
 
-はい！ [こちら](java_compatibility.md)をご覧ください。
+はい！[こちらをご覧ください](java_compatibility.md)。
 
 ## 画像をプリロードするにはどうすればよいですか？ {id="how-do-i-preload-an-image"}
 
-ターゲットを指定せずに画像リクエストを開始します。
+ターゲットを指定せずに画像リクエストを実行します：
 
 ```kotlin
 val request = ImageRequest.Builder(context)
@@ -17,16 +17,16 @@ val request = ImageRequest.Builder(context)
 imageLoader.enqueue(request)
 ```
 
-これにより、画像がプリロードされ、ディスクキャッシュとメモリキャッシュに保存されます。
+これにより、画像がプリロードされ、ディスクキャッシュおよびメモリキャッシュに保存されます。
 
-ディスクキャッシュにのみプリロードしたい場合は、次のようにデコードとメモリキャッシュへの保存をスキップできます。
+ディスクキャッシュにのみプリロードしたい場合は、次のようにデコードおよびメモリキャッシュへの保存をスキップできます：
 
 ```kotlin
 val request = ImageRequest.Builder(context)
     .data("https://example.com/image.jpg")
-    // メモリキャッシュへの書き込みを無効にします。
+    // メモリキャッシュへの書き込みを無効化
     .memoryCachePolicy(CachePolicy.DISABLED)
-    // 画像をメモリにデコードするための時間やメモリを無駄にしないよう、デコードステップをスキップします。
+    // デコード処理をスキップし、画像をメモリにデコードするための時間とメモリの消費を防ぐ
     .decoderFactory(BlackholeDecoder.Factory())
     .build()
 imageLoader.enqueue(request)
@@ -34,14 +34,14 @@ imageLoader.enqueue(request)
 
 ## ロギングを有効にするにはどうすればよいですか？ {id="how-do-i-enable-logging"}
 
-[`ImageLoader`を構築する](getting_started.md#configuring-the-singleton-imageloader)際に、`logger(DebugLogger())` を設定してください。
+[`ImageLoader` の構築時](getting_started.md#configuring-the-singleton-imageloader)に `logger(DebugLogger())` を設定します。
 
 !!! Note
     `DebugLogger` はデバッグビルドでのみ使用してください。
 
-## Java 8 または Java 11 をターゲットにするにはどうすればよいですか？ {id="how-do-i-target-java-8-or-java-11"}
+## Java 8またはJava 11をターゲットにするにはどうすればよいですか？ {id="how-do-i-target-java-8-or-java-11"}
 
-Coilは [Java 8 バイトコード (bytecode)](https://developer.android.com/studio/write/java8-support) を必要とします。これは Android Gradle Plugin `4.2.0` 以降および Kotlin Gradle Plugin `1.5.0` 以降ではデフォルトで有効になっています。これらのプラグインの古いバージョンを使用している場合は、Gradleビルドスクリプトに以下を追加してください。
+Coilには [Java 8バイトコード](https://developer.android.com/studio/write/java8-support) が必要です。これは、Android Gradle Plugin `4.2.0` 以降および Kotlin Gradle Plugin `1.5.0` 以降でデフォルトで有効になっています。これらのプラグインの古いバージョンを使用している場合は、Gradleビルドスクリプトに以下を追加してください：
 
 ```kotlin
 android {
@@ -55,7 +55,7 @@ android {
 }
 ```
 
-Coil `3.2.0` 以降、`coil-compose` および `coil-compose-core` には Java 11 バイトコードが必要です。
+Coil `3.2.0` 以降、`coil-compose` および `coil-compose-core` ではJava 11バイトコードが必要になります：
 
 ```kotlin
 android {
@@ -71,49 +71,45 @@ android {
 
 ## Compose MultiplatformでSkikoのバージョン警告が表示されるのはなぜですか？ {id="why-do-i-get-a-skiko-version-warning-with-compose-multiplatform"}
 
-Coilが依存しているSkikoのバージョンがCompose Multiplatformのものより古い場合、Compose Multiplatformは次のような警告を表示します。
+CoilのSkiko依存関係がCompose Multiplatformのものより古い場合、Compose Multiplatformは次のような警告を出力します：
 
 ```text
 w: Skiko dependencies' versions are incompatible.
 ```
 
-Skikoのバージョンは通常、バイナリ互換性を維持しているため、この警告は一般的に無視しても安全です。Coilのリリースは、Compose Multiplatformの**安定版 (stable)** リリースとそのSkikoバージョンを追跡しています。そのため、この警告が表示された場合は、まずCoilを最新バージョンにアップデートしてください。
+SkikoはSkia（マイルストーンバージョン間で破壊的変更が導入される可能性がある）をラップしているため、マイルストーンバージョン間のバイナリ互換性を保証しません。この警告は無視しても安全であると見なすべきではありません。CoilのリリースはCompose Multiplatformの**安定版（stable）**リリースおよびそのSkikoバージョンに追従しているため、この警告が表示された場合は、まずCoilを最新バージョンに更新してください。
 
-**注意**: 原則として、最新のCoilリリースが依存しているバージョンと互換性がない場合を除き、Compose Multiplatformの**アルファ版 (alpha)** や**ベータ版 (beta)** で使用されているSkikoバージョンに合わせるためだけの新しいリリースは行われません。
+**注意**: Coilは、Compose Multiplatformの**アルファ版（alpha）**や**ベータ版（beta）**リリースで使用されるSkikoバージョンに合わせるためだけの新バージョンをリリースすることはありません。ただし、Coilがより新しいSkikoバージョンに依存する必要があるバイナリ互換性の問題が発生した場合は、依存関係を更新した**アルファ版**リリースを公開します。
 
-それでも警告が表示される場合は、以下のGradleプロパティを設定することで無視できます。
+Coilを最新バージョンに更新しても警告が解消されない場合は、次のように警告を抑制できます：
+
+**Compose Multiplatform >= 1.13.0**
+
+Compose Multiplatformプラグインを適用している各モジュールの `build.gradle.kts` ファイルに以下を追加します：
+
+```kotlin
+compose {
+    dependencyCompatibility {
+        exclude("io.coil-kt.coil3")
+    }
+}
+```
+
+これにより、Coilに対してのみ互換性チェックが無効化されます。
+
+**それ以前のバージョンのCompose Multiplatform:**
+
+`gradle.properties` ファイルに以下を追加します：
 
 ```properties
 org.jetbrains.compose.library.compatibility.check.disable=true
 ```
 
-ただし、このGradleプロパティは、Coilだけでなくすべてのライブラリに対してCompose Multiplatformライブラリの互換性チェックを無効にします。CoilとそのSkiko依存関係に対してのみ警告を無効にするには、ルートの `build.gradle.kts` ファイルに以下のコードスニペットを追加してください。
+これにより、Coilを含むすべてのライブラリに対して、Compose Multiplatformのすべてのライブラリ互換性チェックが無効化されます。
 
-```kotlin
-dependencies {
-    components {
-        all {
-            if (id.group == "io.coil-kt.coil3") {
-                allVariants {
-                    withDependencies {
-                        val hadSkikoDependency = removeAll {
-                            it.group == "org.jetbrains.skiko" && it.name == "skiko"
-                        }
-                        if (hadSkikoDependency) {
-                            // `0.150.0` を使用しているCompose Multiplatformのバージョンに合わせたSkikoバージョンに置き換えてください。
-                            add("org.jetbrains.skiko:skiko:0.150.0")
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-```
+## 開発用スナップショットを取得するにはどうすればよいですか？ {id="how-do-i-get-development-snapshots"}
 
-## 開発スナップショットを取得するにはどうすればよいですか？ {id="how-do-i-get-development-snapshots"}
-
-リポジトリの一覧にスナップショットリポジトリを追加します。
+リポジトリ一覧にスナップショットリポジトリを追加します：
 
 Gradle (`.gradle`):
 
@@ -135,16 +131,16 @@ allprojects {
 }
 ```
 
-次に、[最新のスナップショットバージョン](https://github.com/coil-kt/coil/blob/main/gradle.properties#L34)を使用して、同じアーティファクトに依存させます。
+次に、[最新のスナップショットバージョン](https://github.com/coil-kt/coil/blob/main/gradle.properties#L34)で同じアーティファクトを指定します。
 
 !!! Note
-    スナップショットは、CIをパスした `main` ブランチへの新しいコミットごとにデプロイされます。これらには破壊的変更が含まれる可能性や、不安定な場合があります。自己責任で使用してください。
+    スナップショットは、CIを通過した `main` ブランチのコミットごとにデプロイされます。破壊的変更が含まれている可能性や、不安定である可能性があります。自己責任で使用してください。
 
 ## CoilでProguardを使用するにはどうすればよいですか？ {id="how-to-i-use-proguard-with-coil"}
 
-CoilでProguardを使用するには、[設定にこれらのProguardルールを追加してください](https://github.com/coil-kt/coil/blob/main/coil-core/src/jvmMain/resources/META-INF/proguard/proguard-rules.pro)。
+CoilでProguardを使用するには、[設定にこれらのProguardルールを追加](https://github.com/coil-kt/coil/blob/main/coil-core/src/jvmMain/resources/META-INF/proguard/proguard-rules.pro)してください。
 
-また、Ktor、OkHttp、Coroutines 用のカスタムルールを追加する必要がある場合もあります。
+また、Ktor、OkHttp、および Coroutines 用のカスタムルールを追加する必要がある場合もあります。
 
 !!! Note
-    Androidのデフォルトのコードシュリンカー（code shrinker）である **R8を使用している場合、Coil用にカスタムルールを追加する必要はありません**。ルールは自動的に追加されます。
+    Androidのデフォルトのコード縮小ツールである**R8を使用している場合、Coil用のカスタムルールを追加する必要はありません**。ルールは自動的に追加されます。

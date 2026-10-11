@@ -1,0 +1,70 @@
+[
+  {
+    "text": "serialization.serialization",
+    "link": "serialization"
+  },
+  {
+    "text": "serialization.serialization-get-started",
+    "link": "serialization-get-started"
+  },
+  {
+    "text": "serialization.serialization-serialize-builtin-types",
+    "link": "serialization-serialize-builtin-types"
+  },
+  {
+    "text": "serialization.serialization-customization-options",
+    "link": "serialization-customization-options"
+  },
+  {
+    "text": "serialization.configure-json-serialization",
+    "items": [
+      {
+        "text": "serialization.serialization-configure-json-serialization",
+        "link": "serialization-configure-json-serialization"
+      },
+      {
+        "text": "serialization.serialization-json-configuration",
+        "link": "serialization-json-configuration"
+      },
+      {
+        "text": "serialization.serialization-json-elements",
+        "link": "serialization-json-elements"
+      },
+      {
+        "text": "serialization.serialization-transform-json",
+        "link": "serialization-transform-json"
+      },
+      {
+        "text": "serialization.serialization-json-io-sources",
+        "link": "serialization-json-io-sources"
+      }
+    ],
+    "collapsed": true
+  },
+  {
+    "text": "serialization.serialization-polymorphism",
+    "link": "serialization-polymorphism"
+  },
+  {
+    "text": "serialization.serialization-create-and-use-serializers",
+    "link": "serialization-create-and-use-serializers"
+  },
+  {
+    "text": "serialization.alternative-and-custom-serialization-formats",
+    "items": [
+      {
+        "text": "serialization.serialization-custom-formats",
+        "link": "serialization-custom-formats"
+      },
+      {
+        "text": "serialization.serialization-cbor",
+        "link": "serialization-cbor"
+      },
+      {
+        "text": "serialization.serialization-protobuf",
+        "link": "serialization-protobuf"
+      }
+    ],
+    "collapsed": true
+  }
+]

@@ -1,160 +1,61 @@
 [//]: # (title: 序列化)
 
-*序列化*是将应用程序使用的数据转换为可以通过网络传输或存储在数据库或文件中的格式的过程。反之，*反序列化*是从外部源读取数据并将其转换为运行时对象的相反过程。这两者结合在一起，对于大多数与第三方交换数据的应用程序都至关重要。
+**序列化**是将应用程序使用的数据转换为可以通过网络传输、或存储在数据库或文件中的格式的过程。反序列化则是相反的过程，将外部数据转换回运行时对象。两者结合，对于大多数需要与第三方交换数据的应用程序而言至关重要。
 
-一些数据序列化格式，例如 [JSON](https://www.json.org/json-en.html) 和 [protocol buffers](https://developers.google.com/protocol-buffers) 特别常见。由于它们与语言无关且平台无关，因此可以在使用任何现代语言编写的系统之间进行数据交换。
+某些数据序列化格式特别常见，例如 [JSON](https://www.json.org/json-en.html) 和 [Protocol Buffers](https://protobuf.dev/)。这些格式与语言无关且与平台无关，因此你可以使用它们在用任何现代语言编写的系统之间交换数据。Kotlin 通过 [`kotlinx.serialization` 库](#kotlin-serialization-libraries)提供此功能，该库支持多种平台和数据格式。
 
-在 Kotlin 中，数据序列化工具包含在一个独立的组件中：[kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization)。它由几个部分组成：`org.jetbrains.kotlin.plugin.serialization` Gradle 插件、[运行时库](#libraries)以及编译器插件。
+如果你刚接触 Kotlin 中的序列化，建议从[序列化入门](serialization-get-started.md)教程开始。该教程将引导你在项目中设置 Kotlin 序列化，并演示如何序列化和反序列化你的第一个类。
 
-编译器插件 `kotlinx-serialization-compiler-plugin` 和 `kotlinx-serialization-compiler-plugin-embeddable` 直接发布到 Maven Central。第二个插件专为配合 `kotlin-compiler-embeddable` 构件使用而设计，这是脚本构件的默认选项。Gradle 会将编译器插件作为编译器参数添加到您的项目中。
+<a href="serialization-get-started.md"><img src="get-started-serialization.svg" width="700" alt="序列化入门" style="block"/></a>
 
-## 库
+## Kotlin 序列化库 {id="kotlin-serialization-libraries"}
 
-`kotlinx.serialization` 为所有支持的平台（JVM、JavaScript、Native）以及各种序列化格式（JSON、CBOR、protocol buffers 等）提供了一系列库。您可以在[下方](#formats)找到支持的序列化格式的完整列表。
+Kotlin 序列化支持所有平台，包括 JVM、JavaScript 和 Native。无论目标平台是什么，你都可以使用相同的[依赖项声明](serialization-get-started.md#add-plugins-and-dependencies)。
 
-所有 Kotlin 序列化库都属于 `org.jetbrains.kotlinx:` 组。它们的名称以 `kotlinx-serialization-` 开头，并带有反映序列化格式的后缀。示例：
-* `org.jetbrains.kotlinx:kotlinx-serialization-json` 为 Kotlin 项目提供 JSON 序列化。
+Kotlin 序列化通过不同的序列化格式库支持各种序列化格式，例如 JSON、CBOR 和 Protocol Buffers。这些库构建在 `kotlinx-serialization-core` 库之上。有关受支持序列化格式的完整列表，请参阅[受支持的序列化格式](#supported-serialization-formats)。
+
+所有 `kotlinx.serialization` 格式库都属于 `org.jetbrains.kotlinx:` 组，其名称以 `kotlinx-serialization-` 开头，并以反映序列化格式的后缀结尾。例如：
+
+* `org.jetbrains.kotlinx:kotlinx-serialization-json` 提供 JSON 序列化。
 * `org.jetbrains.kotlinx:kotlinx-serialization-cbor` 提供 CBOR 序列化。
 
-平台特定的构件会被自动处理；您不需要手动添加它们。在 JVM、JS、Native 和多平台项目中均使用相同的依赖项。
+`kotlinx.serialization` 库遵循其自身的版本管理，独立于 Kotlin。你可以在 [GitHub](https://github.com/Kotlin/kotlinx.serialization/releases) 上找到最新的发布版本。
 
-请注意，`kotlinx.serialization` 库使用它们自己的版本控制结构，与 Kotlin 的版本控制不匹配。请查看 [GitHub](https://github.com/Kotlin/kotlinx.serialization/releases) 上的发布版本以获取最新版本。
+> 当你不使用特定格式的库时（例如，在编写自己的序列化格式时），请使用 `kotlinx-serialization-core` 库作为依赖项。
+>
+{style="tip"}
 
-## 格式
+## 受支持的序列化格式 {id="supported-serialization-formats"}
 
-`kotlinx.serialization` 包含支持各种序列化格式的库：
+`kotlinx.serialization` 项目为各种序列化格式提供了库：
 
-* [JSON](https://www.json.org/)：[`kotlinx-serialization-json`](https://github.com/Kotlin/kotlinx.serialization/blob/master/formats/README.md#json)
-* [Protocol buffers](https://developers.google.com/protocol-buffers)：[`kotlinx-serialization-protobuf`](https://github.com/Kotlin/kotlinx.serialization/blob/master/formats/README.md#protobuf)
-* [CBOR](https://cbor.io/)：[`kotlinx-serialization-cbor`](https://github.com/Kotlin/kotlinx.serialization/blob/master/formats/README.md#cbor)
-* [Properties](https://en.wikipedia.org/wiki/.properties)：[`kotlinx-serialization-properties`](https://github.com/Kotlin/kotlinx.serialization/blob/master/formats/README.md#properties)
-* [HOCON](https://github.com/lightbend/config/blob/master/HOCON.md)：[`kotlinx-serialization-hocon`](https://github.com/Kotlin/kotlinx.serialization/blob/master/formats/README.md#hocon)（仅限 JVM）
+| 格式 | Artifact ID | 平台 | 状态 |
+|--------------|--------------------------------------------------------------------------------------------------------------------------------|-------------------------|--------------|
+| [JSON](https://www.json.org/json-en.html)            | [`kotlinx-serialization-json`](https://github.com/Kotlin/kotlinx.serialization/blob/master/formats/README.md#json)             | 所有受支持的平台 | 稳定 |
+| [HOCON](https://github.com/lightbend/config/blob/master/HOCON.md) | [`kotlinx-serialization-hocon`](https://github.com/Kotlin/kotlinx.serialization/blob/master/formats/README.md#hocon)           | 仅限 JVM | 实验性 |
+| [Protocol Buffers](https://protobuf.dev/)            | [`kotlinx-serialization-protobuf`](https://github.com/Kotlin/kotlinx.serialization/blob/master/formats/README.md#protobuf)     | 所有受支持的平台 | 实验性 |
+| [CBOR](https://cbor.io/)                             | [`kotlinx-serialization-cbor`](https://github.com/Kotlin/kotlinx.serialization/blob/master/formats/README.md#cbor)             | 所有受支持的平台 | 实验性 |
+| [Properties](https://en.wikipedia.org/wiki/.properties) | [`kotlinx-serialization-properties`](https://github.com/Kotlin/kotlinx.serialization/blob/master/formats/README.md#properties) | 所有受支持的平台 | 实验性 |
 
-请注意，除 JSON 序列化 (`kotlinx-serialization-json`) 之外，所有库目前都处于[实验性](components-stability.md)阶段，这意味着它们的 API 可能会在不经通知的情况下发生变化。
+除 JSON 序列化库（`kotlinx-serialization-json`）外，所有序列化格式库均为[实验性](components-stability.md#stability-levels-explained)。它们的 API 可能会随时更改。有关 JSON 序列化的更多详细信息，请参阅 [JSON 序列化概述](serialization-configure-json-serialization.md)。
 
-还有一些社区维护的库支持更多的序列化格式，例如 [YAML](https://yaml.org/) 或 [Apache Avro](https://avro.apache.org/)。有关可用序列化格式的详细信息，请参阅 [`kotlinx.serialization` 文档](https://github.com/Kotlin/kotlinx.serialization/blob/master/formats/README.md)。
+此外，还有一些社区维护的库支持更多序列化格式，例如 [YAML](https://yaml.org/) 或 [Apache Avro](https://avro.apache.org/)。
 
-## 示例：JSON 序列化
+你可以在[自定义序列化格式](serialization-custom-formats.md)中详细了解其他替代格式以及自定义的实验性序列化格式。
 
-让我们来看看如何将 Kotlin 对象序列化为 JSON。
+## 受支持的序列化类型 {id="supported-serialization-types"}
 
-### 添加插件和依赖项
+Kotlin 序列化支持各种内置类型，包括所有基本类型以及 Kotlin 标准库中的大部分复合类型（如 `List` 类型）。有关更多信息，请参阅[序列化内置类型](serialization-serialize-builtin-types.md)。
 
-在开始之前，您必须配置构建脚本，以便在项目中使用 Kotlin 序列化工具：
+此外，完全支持对带有 `@Serializable` 注解的类进行序列化，从而能够将类实例与 JSON 等格式进行相互转换。有关更多信息，请参阅[序列化类](serialization-customization-options.md)。
 
-1. 应用 Kotlin 序列化 Gradle 插件 `org.jetbrains.kotlin.plugin.serialization`（在 Kotlin Gradle DSL 中为 `kotlin("plugin.serialization")`）。
+## 下一步 {id="what-s-next"}
 
-    <tabs group="build-script">
-    <tab title="Kotlin" group-key="kotlin">
-
-    ```kotlin
-    plugins {
-        kotlin("jvm") version "%kotlinVersion%"
-        kotlin("plugin.serialization") version "%kotlinVersion%"
-    }
-    ```
-
-    </tab>
-    <tab title="Groovy" group-key="groovy">
-
-    ```groovy
-    plugins {
-        id 'org.jetbrains.kotlin.jvm' version '%kotlinVersion%'
-        id 'org.jetbrains.kotlin.plugin.serialization' version '%kotlinVersion%'  
-    }
-    ```
-
-    </tab>
-    </tabs>
-
-2. 添加 JSON 序列化库依赖项：`org.jetbrains.kotlinx:kotlinx-serialization-json:%serializationVersion%`
-
-    <tabs group="build-script">
-    <tab title="Kotlin" group-key="kotlin">
-
-    ```kotlin
-    dependencies {
-        implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:%serializationVersion%")
-    }
-    ```
-
-    </tab>
-    <tab title="Groovy" group-key="groovy">
-
-    ```groovy
-    dependencies {
-        implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:%serializationVersion%'
-    }
-    ```
-
-    </tab>
-    </tabs>
-
-现在您已经准备好在代码中使用序列化 API 了。该 API 位于 `kotlinx.serialization` 软件包及其特定格式的子软件包中，例如 `kotlinx.serialization.json`。
-
-### 序列化和反序列化 JSON
-
-1. 通过为类添加 `@Serializable` 注解使其可序列化。
-
-    ```kotlin
-    import kotlinx.serialization.Serializable
-    
-    @Serializable
-    data class Data(val a: Int, val b: String)
-    ```
-
-2. 通过调用 `Json.encodeToString()` 来序列化该类的实例。
-
-    ```kotlin
-    import kotlinx.serialization.Serializable
-    import kotlinx.serialization.json.Json
-    import kotlinx.serialization.encodeToString
-    
-    @Serializable
-    data class Data(val a: Int, val b: String)
-    
-    fun main() {
-        val json = Json.encodeToString(Data(42, "str"))
-    }
-    ```
-
-   结果，您将获得一个包含该对象 JSON 格式状态的字符串：`{"a": 42, "b": "str"}`
-
-   > 您还可以在单次调用中序列化对象集合，例如列表：
-   > 
-   > ```kotlin
-   > val dataList = listOf(Data(42, "str"), Data(12, "test"))
-   > val jsonList = Json.encodeToString(dataList)
-   > ```
-   > 
-   {style="note"}
-
-3. 使用 `decodeFromString()` 函数从 JSON 反序列化对象：
-
-    ```kotlin
-    import kotlinx.serialization.Serializable
-    import kotlinx.serialization.json.Json
-    import kotlinx.serialization.decodeFromString
-    
-    @Serializable
-    data class Data(val a: Int, val b: String)
-    
-    fun main() {
-        val obj = Json.decodeFromString<Data>("""{"a":42, "b": "str"}""")
-    }
-    ```
-
-大功告成！您已成功将对象序列化为 JSON 字符串，并将其反序列化回对象。
-
-## 下一步
-
-有关 Kotlin 中序列化的更多信息，请参阅 [Kotlin 序列化指南](https://github.com/Kotlin/kotlinx.serialization/blob/master/docs/serialization-guide.md)。
-
-您可以通过以下资源探索 Kotlin 序列化的不同方面：
-
-* [详细了解 Kotlin 序列化及其核心概念](https://github.com/Kotlin/kotlinx.serialization/blob/master/docs/basic-serialization.md)
-* [探索 Kotlin 内置的可序列化类](https://github.com/Kotlin/kotlinx.serialization/blob/master/docs/builtin-classes.md)
-* [更详细地了解序列化器并学习如何创建自定义序列化器](https://github.com/Kotlin/kotlinx.serialization/blob/master/docs/serializers.md)
-* [了解 Kotlin 如何处理多态序列化](https://github.com/Kotlin/kotlinx.serialization/blob/master/docs/polymorphism.md#open-polymorphism)
-* [了解处理 Kotlin 序列化的各种 JSON 功能](https://github.com/Kotlin/kotlinx.serialization/blob/master/docs/json.md#json-elements)
-* [详细了解 Kotlin 支持的实验性序列化格式](https://github.com/Kotlin/kotlinx.serialization/blob/master/docs/formats.md)
+* 在[序列化入门教程](serialization-get-started.md)中学习 Kotlin 序列化的基础知识。
+* 了解 Kotlin 序列化如何处理[基本类型、集合及其他内置类型](serialization-serialize-builtin-types.md)。
+* 在 [JSON 序列化概述](serialization-configure-json-serialization.md)中探索更复杂的 JSON 序列化场景。
+* 深入阅读[序列化类](serialization-customization-options.md)，学习如何序列化类并修改 `@Serializable` 注解的默认行为。
+* 在[创建和使用序列化器](serialization-create-and-use-serializers.md)中学习如何获取生成的序列化器、创建自定义序列化器以及应用序列化器。
+* 在[序列化多态类](serialization-polymorphism.md)中了解如何通过共享基类型来序列化不同的类型。
+* 在[自定义序列化格式](serialization-custom-formats.md)中学习如何创建自定义格式。
+* 探索诸如 [CBOR](serialization-cbor.md) 和 [ProtoBuf](serialization-protobuf.md) 等实验性序列化格式。

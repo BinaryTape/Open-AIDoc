@@ -1,52 +1,52 @@
-[//]: # (title: アプリでマルチプラットフォームリソースを使用する)
+[//]: # (title: アプリでのマルチプラットフォームリソースの使用)
 
 <show-structure depth="2"/>
 
-[プロジェクトのリソースを設定](compose-multiplatform-resources-setup.md)したら、プロジェクトをビルドして、リソースへのアクセスを提供する特別な `Res` クラスを生成します。
-`Res` クラスとすべてのリソースアクセッサを再生成するには、プロジェクトを再度ビルドするか、IDE でプロジェクトを再インポートしてください。
+[プロジェクトのリソースをセットアップ](compose-multiplatform-resources-setup.md)したら、プロジェクトをビルドして、リソースへのアクセスを提供する特別な `Res` クラスを生成します。
+`Res` クラスとすべてのリソースアクセサを再生成するには、プロジェクトを再度ビルドするか、IDEでプロジェクトを再インポートします。
 
-その後、生成されたクラスを使用して、コードまたは外部ライブラリから設定済みのマルチプラットフォームリソースにアクセスできます。
+その後、生成されたクラスを使用して、コード内や外部ライブラリから設定されたマルチプラットフォームリソースにアクセスできるようになります。
 
-以下のトピックの詳細については、続きをお読みください。
+以下のトピックについての詳細は、読み進めて確認してください。
 
-* [生成された `Res` クラスとアクセッサのインポート](#importing-the-generated-class)
-* [アクセッサクラス生成のカスタマイズ](#customizing-accessor-class-generation): 公開設定にする方法、パッケージの割り当て、または無条件に生成する方法。
-* 特定のリソースタイプの操作: 
-  * [ドローアブルリソース](#images): 単純な画像、ラスタライズされた画像、XML ベクターなど。
-  * Material Symbols ライブラリからの[ベクター Android XML アイコン](#icons)。
-  * [文字列](#strings): 単純な文字列、テンプレート、配列、複数形など。
-  * [カスタムフォントの保存と読み込み](#fonts)。
-  * [Raw ファイル](#raw-files)とバイト配列の画像への変換。
-* [文字列 ID でマップされたリソースへのアクセス](#generated-maps-for-resources-and-string-ids)。
-* [マルチプラットフォームリソースを Android アセットとして使用する](#compose-multiplatform-resources-as-android-assets)。
-* Web 固有のリソースの処理:
-  * ブラウザ機能と preload API を使用した[リソースのプリロード](compose-web-resources.md#preloading-of-resources-for-web-targets)。
-  * 欠落している文字に対する[フォントの自動フォールバック](compose-web-resources.md#automatic-font-fallback)。
-  * [Web リソースのキャッシング](compose-web-resources.md#caching-web-resources)。
+* [生成された `Res` クラスとアクセサのインポート](#生成されたクラスのインポート)
+* [アクセサクラス生成のカスタマイズ](#アクセサクラス生成のカスタマイズ): publicにする方法、パッケージの割り当て、無条件での生成など。
+* 特定のリソースタイプの操作:
+  * 単純な画像、ラスタライズ画像、XMLベクターなどの[Drawableリソース](#画像)。
+  * Material Symbolsライブラリの[ベクターAndroid XMLアイコン](#アイコン)。
+  * 単純な文字列、テンプレート、配列、複数形を含む[文字列](#文字列)。
+  * [カスタムフォントの保存と読み込み](#フォント)。
+  * [Rawファイル](#rawファイル)およびバイト配列の画像への変換。
+* [文字列IDにマッピングされたリソースへのアクセス](#リソースと文字列id用に生成されたマップ)。
+* [マルチプラットフォームリソースをAndroidアセットとして使用](#androidアセットとしてのcompose-multiplatformリソース)。
+* Web固有のリソースの処理:
+  * ブラウザ機能とpreload APIを使用した[リソースの事前読み込み（プリロード）](compose-web-resources.md#preloading-of-resources-for-web-targets)。
+  * 欠落している文字に対する[自動フォントフォールバック](compose-web-resources.md#automatic-font-fallback)。
+  * [Webリソースのキャッシュ](compose-web-resources.md#caching-web-resources)。
 * 外部リソースの操作: 
-  [外部ライブラリから](#accessing-multiplatform-resources-from-external-libraries)、
-  [リモートファイル](#remote-files)、および [Java リソース](#using-java-resources)。
+  [外部ライブラリから](#外部ライブラリからのマルチプラットフォームリソースへのアクセス)、
+  [リモートファイル](#リモートファイル)、および[Javaリソース](#javaリソースの使用)。
 
 ## 生成されたクラスのインポート {id="importing-the-generated-class"}
 
-用意したリソースを使用するには、生成されたクラスをインポートします。例：
+準備したリソースを使用するには、生成されたクラスをインポートします。例:
 
 ```kotlin
 import project.shared.generated.resources.Res
 import project.shared.generated.resources.example_image
 ```
 
-ここで：
-* `project` はプロジェクトの名前です。
-* `shared` はリソースディレクトリを配置したモジュールです。
-* `Res` は生成されたクラスのデフォルト名です。
-* `example_image` は `composeResources/drawable` ディレクトリにある画像ファイルの名前です（例：`example_image.png`）。
+ここで:
+* `project` はプロジェクトの名前です
+* `shared` はリソースディレクトリを配置したモジュールです
+* `Res` は生成されたクラスのデフォルト名です
+* `example_image` は `composeResources/drawable` ディレクトリ内の画像ファイルの名前です（例: `example_image.png`）。
 
-## アクセッサクラス生成のカスタマイズ {id="customizing-accessor-class-generation"}
+## アクセサクラス生成のカスタマイズ {id="customizing-accessor-class-generation"}
 
-Gradle の設定を使用して、ニーズに合わせて生成される `Res` クラスをカスタマイズできます。
+Gradle設定を使用して、ニーズに合わせて生成される `Res` クラスをカスタマイズできます。
 
-`build.gradle.kts` ファイルの `compose.resources {}` ブロックで、プロジェクトの `Res` クラスの生成方法に影響を与えるいくつかの設定を指定できます。
+`build.gradle.kts` ファイルの `compose.resources {}` ブロック内で、プロジェクトに対する `Res` クラスの生成方法に影響を与えるいくつかの設定を指定できます。
 設定例は以下のようになります。
 
 ```kotlin
@@ -57,44 +57,44 @@ compose.resources {
 }
 ```
 
-* `publicResClass` を `true` に設定すると、生成された `Res` クラスが公開（public）されます。デフォルトでは、生成されたクラスは [internal](https://kotlinlang.org/docs/visibility-modifiers.html) です。
-* `packageOfResClass` を使用すると、生成された `Res` クラスを特定のパッケージに割り当てることができます（コード内でのアクセスや、最終的なアーティファクトでの分離のため）。デフォルトでは、Compose Multiplatform はクラスに `{group name}.{module name}.generated.resources` パッケージを割り当てます。
-* `generateResClass` を `always` に設定すると、プロジェクトは無条件に `Res` クラスを生成します。これは、リソースライブラリが推移的にのみ利用可能な場合に役立つことがあります。デフォルトでは、Compose Multiplatform は `auto` 値を使用し、現在のプロジェクトがリソースライブラリに対して明示的な `implementation` または `api` 依存関係を持っている場合にのみ `Res` クラスを生成します。
+* `publicResClass` を `true` に設定すると、生成される `Res` クラスがpublicになります。デフォルトでは、生成されるクラスは [internal](https://kotlinlang.org/docs/visibility-modifiers.html) です。
+* `packageOfResClass` を使用すると、生成される `Res` クラスを特定のパッケージに割り当てることができます（コード内からのアクセスのため、また最終成果物内での分離のため）。デフォルトでは、Compose Multiplatform はクラスに `{group name}.{module name}.generated.resources` パッケージを割り当てます。
+* `generateResClass` を `always` に設定すると、プロジェクトで無条件に `Res` クラスが生成されるようになります。これは、リソースライブラリが推移的（transitively）にしか利用できない場合に役立ちます。デフォルトでは、Compose Multiplatform は `auto` 値を使用し、現在のプロジェクトがリソースライブラリに対して明示的な `implementation` または `api` 依存関係を持っている場合にのみ `Res` クラスを生成します。
 
-## リソースの使用方法 {id="resource-usage"}
+## リソースの使用 {id="resource-usage"}
 
 ### 画像 {id="images"}
 
-ドローアブル（drawable）リソースには、単純な画像、ラスタライズされた画像、または XML ベクターとしてアクセスできます。
-SVG 画像は、Android **以外**のすべてのプラットフォームでサポートされています。
+単純な画像、ラスタライズ画像、またはXMLベクターとしてDrawableリソースにアクセスできます。
+SVG画像は、Androidを**除く**すべてのプラットフォームでサポートされています。
 
-* ドローアブルリソースに `Painter` 画像としてアクセスするには、`painterResource()` 関数を使用します。
+* Drawableリソースに `Painter` 画像としてアクセスするには、`painterResource()` 関数を使用します。
 
   ```kotlin
   @Composable
   fun painterResource(resource: DrawableResource): Painter {...}
   ```
 
-  `painterResource()` 関数はリソースパスを受け取り、`Painter` 値を返します。この関数は、Web ターゲットを除いてすべてのターゲットで同期的に動作します。Web ターゲットの場合、最初の再コンポーズ（recomposition）では空の `Painter` を返し、その後の再コンポーズで読み込まれた画像に置き換えられます。
+  `painterResource()` 関数はリソースパスを受け取り、`Painter` 値を返します。この関数はWebを除くすべてのターゲットで同期的に動作します。Webターゲットの場合、最初の再コンポジション（recomposition）では空の `Painter` を返し、その後の再コンポジションで読み込まれた画像に置き換わります。
 
-  * `painterResource()` は、`.png`、`.jpg`、`.bmp`、`.webp` などのラスタライズされた画像形式の場合は `BitmapPainter` を、Android XML ベクタードローアブル形式の場合は `VectorPainter` をロードします。
-  * XML ベクタードローアブルは [Android](https://developer.android.com/reference/android/graphics/drawable/VectorDrawable) と同じ形式ですが、Android リソースへの外部参照はサポートしていません。
+  * `painterResource()` は、`.png`、`.jpg`、`.bmp`、`.webp` などのラスタライズ画像形式には `BitmapPainter` を、Android XMLベクタードローアブル形式には `VectorPainter` を読み込みます。
+  * XMLベクタードローアブルは [Android](https://developer.android.com/reference/android/graphics/drawable/VectorDrawable) と同じ形式ですが、Androidリソースへの外部参照はサポートされていません。
 
-* ドローアブルリソースに `ImageBitmap` ラスタライズ画像としてアクセスするには、`imageResource()` 関数を使用します。
+* Drawableリソースに `ImageBitmap` ラスタライズ画像としてアクセスするには、`imageResource()` 関数を使用します。
 
   ```kotlin
   @Composable
   fun imageResource(resource: DrawableResource): ImageBitmap {...}
   ```
 
-* ドローアブルリソースに `ImageVector` XML ベクターとしてアクセスするには、`vectorResource()` 関数を使用します。
+* Drawableリソースに `ImageVector` XMLベクターとしてアクセスするには、`vectorResource()` 関数を使用します。
 
   ```kotlin
   @Composable
   fun vectorResource(resource: DrawableResource): ImageVector {...}
   ```
 
-Compose Multiplatform コードで画像にアクセスする方法の例を次に示します。
+Compose Multiplatformコードで画像にアクセスする方法の例を以下に示します。
 
 ```kotlin
 Image(
@@ -103,21 +103,21 @@ Image(
 )
 ```
 
-#### キャンバスへの画像の描画 {id="drawing-images-on-a-canvas"}
+#### Canvas上への画像の描画 {id="drawing-images-on-a-canvas"}
 
-`Image()` コンポーザブルで表示する代わりに、リソース画像を自分で描画するには、それを `ImageBitmap` または `ImageVector` としてロードし、`DrawScope` で使用します。
+リソース画像を `Image()` コンポーザブルで表示する代わりに独自に描画したい場合は、`ImageBitmap` または `ImageVector` として読み込み、`DrawScope` 内で使用します。
 
 * `ImageBitmap` を描画するには、`DrawScope.drawImage()` を使用します。
 * `ImageVector` を描画するには、`rememberVectorPainter()` で `Painter` を作成し、`Painter.draw()` を使用します。
 
-`DrawScope` 内でオフセットとサイズをピクセル単位で指定します。
+`DrawScope` 内でのオフセットとサイズはピクセル単位で指定します。
 
 ```kotlin
 val myImageRaster = imageResource(Res.drawable.my_image_raster)
 val myImageVectorPainter = rememberVectorPainter(vectorResource(Res.drawable.my_image_vector))
 
 Canvas(modifier = Modifier.fillMaxSize()) {
-    // ラムダ内では、`this` は `DrawScope` のインスタンスであり、`drawImage()` と `translate()` を提供します
+    // ラムダの内部では、`this` は `DrawScope` のインスタンスであり、`drawImage()` と `translate()` を提供します
     drawImage(image = myImageRaster, topLeft = Offset(20f, 20f))
     translate(left = 20f, top = myImageRaster.height + 40f) {
         // `Painter.draw()` 関数は、`DrawScope` と `Painter` の両方をレシーバーとして使用します
@@ -130,14 +130,14 @@ Canvas(modifier = Modifier.fillMaxSize()) {
 
 ### アイコン {id="icons"}
 
-Material Symbols ライブラリのベクター Android XML アイコンを使用できます。
+Material SymbolsライブラリのベクターAndroid XMLアイコンを使用できます。
 
-1. [Google Fonts Icons](https://fonts.google.com/icons) ギャラリーを開き、アイコンを選択し、Android タブに移動して **Download** をクリックします。
+1. [Google Fonts Icons](https://fonts.google.com/icons) ギャラリーを開き、アイコンを選択してAndroidタブに移動し、**Download** をクリックします。
 
-2. ダウンロードした XML アイコンファイルを、マルチプラットフォームリソースの `drawable` ディレクトリに追加します。
+2. ダウンロードしたXMLアイコンファイルを、マルチプラットフォームリソースの `drawable` ディレクトリに追加します。
 
-3. XML アイコンファイルを開き、`android:fillColor` を `#000000` に設定します。
-   `android:tint` のような色調整のための他の Android 固有の属性を削除します。
+3. XMLアイコンファイルを開き、`android:fillColor` を `#000000` に設定します。
+   `android:tint` など、色調整用の他のAndroid固有の属性を削除します。
 
    変更前:
 
@@ -168,9 +168,9 @@ Material Symbols ライブラリのベクター Android XML アイコンを使�
    </vector>
    ```
    
-4. プロジェクトをビルドしてリソースアクセッサを生成するか、[Kotlin Multiplatform IDE プラグイン](https://plugins.jetbrains.com/plugin/14936-kotlin-multiplatform)に自動的に処理させます。
+4. プロジェクトをビルドしてリソースアクセサを生成するか、[Kotlin Multiplatform IDEプラグイン](https://plugins.jetbrains.com/plugin/14936-kotlin-multiplatform)に自動的に処理させます。
 
-Compose Multiplatform コードでアイコンにアクセスし、`colorFilter` パラメータを使用して色を調整する方法の例を次に示します。
+以下は、Compose Multiplatformコードでアイコンにアクセスし、`colorFilter` パラメータを使用して色を調整する方法の例です。
 
 ```kotlin
 Image(
@@ -183,17 +183,17 @@ Image(
 
 ### 文字列 {id="strings"}
 
-すべての文字列リソースは `composeResources/values` ディレクトリの XML ファイルに保存します。
-各ファイルの各アイテムに対して静的アクセッサが生成されます。
+すべての文字列リソースは `composeResources/values` ディレクトリ内のXMLファイルに保存します。
+各ファイル内の各アイテムに対して静的アクセサが生成されます。
 
-Compose Multiplatform は、XML ファイルに直接文字列リソース、文字列配列、複数形を追加するための、Emmet のような短縮構文をサポートしています。
-たとえば、`strings.xml` で `test{Example}` または `s.test{Example}` と入力して **Tab** を押すと、自動的に `<string name="test">Example</string>` に展開されます。
+[Kotlin Multiplatform IDEプラグイン](https://plugins.jetbrains.com/plugin/14936-kotlin-multiplatform)は、XMLファイル内で文字列リソース、文字列配列、複数形を直接追加するためのEmmet風の省略記法構文をサポートしています。
+たとえば、`strings.xml` で `test{Example}` または `s.test{Example}` と入力して **Tab** キーを押すと、自動的に `<string name="test">Example</string>` に展開されます。
 
-異なるロケール用に文字列をローカライズする方法の詳細については、[文字列のローカライズに関するガイド](compose-localize-strings.md)を参照してください。
+異なるロケール向けに文字列をローカライズする方法については、[文字列のローカライズに関するガイド](compose-localize-strings.md)を参照してください。
 
 #### 単純な文字列 {id="simple-strings"}
 
-単純な文字列を保存するには、XML に `<string>` 要素を追加します。
+単純な文字列を保存するには、XMLに `<string>` 要素を追加します。
 
 ```XML
 <resources>
@@ -202,7 +202,7 @@ Compose Multiplatform は、XML ファイルに直接文字列リソース、文
 </resources>
 ```
 
-文字列リソースを `String` として取得するには、次のコードを使用します。
+文字列リソースを `String` として取得するには、以下のコードを使用します。
 
 <Tabs>
 <TabItem title= "コンポーザブルコードから">
@@ -215,7 +215,7 @@ fun stringResource(resource: StringResource): String {...}
 fun stringResource(resource: StringResource, vararg formatArgs: Any): String {...}
 ```
 
-例：
+例:
 
 ```kotlin
 Text(stringResource(Res.string.app_name))
@@ -230,7 +230,7 @@ suspend fun getString(resource: StringResource): String
 suspend fun getString(resource: StringResource, vararg formatArgs: Any): String
 ```
 
-例：
+例:
 
 ```kotlin
 coroutineScope.launch {
@@ -245,21 +245,21 @@ coroutineScope.launch {
 
 * `\n` – 改行
 * `\t` – タブ記号
-* `\uXXXX` – 特定の Unicode 文字
+* `\uXXXX` – 特定のUnicode文字
 
-[Android の文字列](https://developer.android.com/guide/topics/resources/string-resource#escaping_quotes)のように、"@" や "?" などの特殊な XML 文字をエスケープする必要はありません。
+[Androidの文字列の場合](https://developer.android.com/guide/topics/resources/string-resource#escaping_quotes)とは異なり、"@" や "?" などの特殊なXML文字をエスケープする必要はありません。
 
-> Emmet のような構文を使用し、**Tab** を押して省略形を文字列タグに展開します:
+> [Kotlin Multiplatformプラグイン](https://plugins.jetbrains.com/plugin/14936-kotlin-multiplatform)がインストールされたIDEでは、**Tab** キーを押してEmmet風の略語を文字列タグに展開できます。
 > * `test` → `<string name="test"></string>`
 > * `test{Example}` → `<string name="test">Example</string>`
 >
-{style="note"}
+{style="tip"}
 
 #### 文字列テンプレート {id="string-templates"}
 
-現在、引数は文字列リソースに対して基本的なサポートを提供しています。
-テンプレートを作成するときは、`%<number>` 形式を使用して文字列内に引数を配置し、単純なテキストではなく変数のプレースホルダーであることを示すために `$d` または `$s` 接尾辞を含めます。
-例：
+現在、引数には文字列リソースの基本的なサポートが用意されています。
+テンプレートを作成する場合、文字列内に引数を配置するには `%<number>` 形式を使用し、単純なテキストではなく変数のプレースホルダーであることを示すために `$d` または `$s` のサフィックスを含めます。
+例:
 
 ```XML
 <resources>
@@ -267,28 +267,28 @@ coroutineScope.launch {
 </resources>
 ```
 
-文字列テンプレートリソースを作成してインポートした後、プレースホルダーの引数を正しい順序で渡しながら参照できます。
+文字列テンプレートリソースを作成してインポートした後は、正しい順序でプレースホルダーの引数を渡しながら参照できます。
 
 ```kotlin
 Text(stringResource(Res.string.str_template, 100, "User_name"))
 ```
 
-`$s` と `$d` 接尾辞の間に違いはなく、他の接尾辞はサポートされていません。
-リソース文字列に `%1$s` プレースホルダーを配置し、それを使用して端数を表示することもできます。例：
+`$s` と `$d` のサフィックスに違いはなく、他のサフィックスはサポートされていません。
+リソース文字列に `%1$s` プレースホルダーを配置し、それを使用して小数値を表示することも可能です。例:
 
 ```kotlin
 Text(stringResource(Res.string.str_template, "User_name", 100.1f))
 ```
 
-> プレースホルダーのために `%1$s` や `%2$d` を手動で入力する代わりに、インラインの数字ショートカットを使用できます。 
-> たとえば、文字列値の中で `1` または `1s` と入力すると `%1$s` に展開されます。
+> [Kotlin Multiplatformプラグイン](https://plugins.jetbrains.com/plugin/14936-kotlin-multiplatform)がインストールされたIDEでは、プレースホルダー用に `%1$s` や `%2$d` を手動で入力する代わりに、インラインの数値ショートカットを使用できます。
+> たとえば、文字列値の中で `1` または `1s` と入力すると、`%1$s` に展開されます。
 > 同様に、`2d` と入力すると `%2$d` に展開されます。
 > 
-{style="note"}
+{style="tip"}
 
 #### 文字列配列 {id="string-arrays"}
 
-関連する文字列を配列にグループ化し、`List<String>` オブジェクトとして自動的にアクセスできます。
+関連する文字列を配列にグループ化し、自動的に `List<String>` オブジェクトとしてアクセスできます。
 
 ```XML
 <resources>
@@ -302,7 +302,7 @@ Text(stringResource(Res.string.str_template, "User_name", 100.1f))
 </resources>
 ```
 
-対応するリストを取得するには、次のコードを使用します。
+対応するリストを取得するには、以下のコードを使用します。
 
 <Tabs>
 <TabItem title= "コンポーザブルコードから">
@@ -312,7 +312,7 @@ Text(stringResource(Res.string.str_template, "User_name", 100.1f))
 fun stringArrayResource(resource: StringArrayResource): List<String> {...}
 ```
 
-例：
+例:
 
 ```kotlin
 val arr = stringArrayResource(Res.array.str_arr)
@@ -326,7 +326,7 @@ if (arr.isNotEmpty()) Text(arr[0])
 suspend fun getStringArray(resource: StringArrayResource): List<String>
 ```
 
-例：
+例:
 
 ```kotlin
 coroutineScope.launch {
@@ -337,9 +337,9 @@ coroutineScope.launch {
 </TabItem>
 </Tabs>
 
-> Emmet のような構文を使用して、文字列配列をすばやく定義できます。
-> `string-array`、`sa`、または `>` オペレーターを使用して、空の配列テンプレートを生成します。
-> 名前付きの配列で、定義済みのアイテム数と開始テキストを指定するには、`test>2{Hello}` と入力して **Tab** を押します。
+> [Kotlin Multiplatformプラグイン](https://plugins.jetbrains.com/plugin/14936-kotlin-multiplatform)がインストールされたIDEでは、Emmet風の構文を使用して文字列配列をすばやく定義できます。
+> 空の配列テンプレートを生成するには、`string-array`、`sa`、または `>` 演算子を使用します。
+> 事前定義されたアイテム数と開始テキストを持つ名前付き配列を作成するには、`test>2{Hello}` と入力して **Tab** キーを押します。
 > ```xml
 > <string-array name="test">
 >    <item>Hello</item>
@@ -347,21 +347,21 @@ coroutineScope.launch {
 > </string-array>
 > ```
 >
-{style="note"}
+{style="tip"}
 
 #### 複数形（Plurals） {id="plurals"}
 
-UI に何らかの数量を表示する場合、プログラム的に無関係な文字列を作成することなく、同じものの異なる数（1冊の _book_、多数の _books_ など）に対する文法的な一致をサポートしたい場合があります。
+UIが何らかの数量を表示する場合、プログラム的に無関係な文字列をいくつも作成することなく、同じものの異なる数量に対して文法的な一致（1冊の _book_、多数の _books_ など）をサポートしたい場合があります。
 
-Compose Multiplatform における概念と基本実装は、Android の数量文字列（quantity strings）と同じです。
-プロジェクトで複数形を使用する場合のベストプラクティスやニュアンスの詳細については、[Android ドキュメント](https://developer.android.com/guide/topics/resources/string-resource#Plurals)を参照してください。
+Compose Multiplatformにおける概念と基本的な実装は、Androidの数量文字列（quantity strings）と同じです。
+プロジェクトで複数形を使用する際のベストプラクティスとニュアンスの詳細については、[Androidのドキュメント](https://developer.android.com/guide/topics/resources/string-resource#Plurals)を参照してください。
 
-* サポートされているバリアントは、`zero`、`one`、`two`、`few`、`many`、および `other` です。すべてのバリアントがすべての言語で考慮されるわけではないことに注意してください。たとえば、英語では `zero` は 1 以外の他の複数形と同じであるため無視されます。言語が実際にどのような区別を要求するかを知るには、言語の専門家に頼ってください。
-* 多くの場合、「Books: 1」のような数量に依存しない表現を使用することで、数量文字列を回避できます。これがユーザーエクスペリエンスを悪化させない場合は、その方法を検討してください。
+* サポートされているバリアントは `zero`、`one`、`two`、`few`、`many`、および `other` です。すべての言語でこれらすべてのバリアントが考慮されるわけではないことに注意してください。たとえば、英語では `zero` は1以外の他の複数形と同じであるため無視されます。言語が実際にどのような区別を要求しているかについては、言語の専門家に確認してください。
+* ユーザーエクスペリエンスを損なわないのであれば、「Books: 1」のような数量に依存しない表現を使用することで、数量文字列を回避できることもよくあります。
 
-複数形を定義するには、`composeResources/values` ディレクトリにある任意の `.xml` ファイルに `<plurals>` 要素を追加します。
-`plurals` コレクションは、name 属性（XML ファイルの名前ではない）を使用して参照される単純なリソースです。
-そのため、1つの XML ファイル内の1つの `<resources>` 要素の下で、`plurals` リソースを他の単純なリソースと組み合わせることができます。
+複数形を定義するには、`composeResources/values` ディレクトリ内の任意の `.xml` ファイルに `<plurals>` 要素を追加します。
+`plurals` コレクションは、name属性（XMLファイルの名前ではありません）を使用して参照される単純なリソースです。
+そのため、1つの `<resources>` 要素の下で、同じXMLファイル内の他の単純なリソースと `plurals` リソースを組み合わせることができます。
 
 ```xml
 <resources>
@@ -374,7 +374,7 @@ Compose Multiplatform における概念と基本実装は、Android の数量�
 </resources>
 ```
 
-複数形を `String` として取得するには、次のコードを使用します。
+複数形に `String` としてアクセスするには、以下のコードを使用します。
 
 <Tabs>
 <TabItem title= "コンポーザブルコードから">
@@ -387,7 +387,7 @@ fun pluralStringResource(resource: PluralStringResource, quantity: Int): String 
 fun pluralStringResource(resource: PluralStringResource, quantity: Int, vararg formatArgs: Any): String {...}
 ```
 
-例：
+例:
 
 ```kotlin
 Text(pluralStringResource(Res.plurals.new_message, 1, 1))
@@ -402,7 +402,7 @@ suspend fun getPluralString(resource: PluralStringResource, quantity: Int): Stri
 suspend fun getPluralString(resource: PluralStringResource, quantity: Int, vararg formatArgs: Any): String
 ```
 
-例：
+例:
 
 ```kotlin
 coroutineScope.launch {
@@ -413,10 +413,10 @@ coroutineScope.launch {
 </TabItem>
 </Tabs>
 
-> Emmet のような構文を使用して、複数形リソースを生成できます。
+> [Kotlin Multiplatformプラグイン](https://plugins.jetbrains.com/plugin/14936-kotlin-multiplatform)がインストールされたIDEでは、Emmet風の構文を使用して複数形リソースを生成できます。
 > たとえば、`plurals`、`p`、または `:` を使用して、デフォルトの空の文字列テンプレートを生成します。
-> `values-en/strings.xml` で作業している場合、IDE はロケール、必要な数量、および英語には `one` と `other` のみが必要であることを自動的に検出します。
-> `p.test` または `plurals.test` と入力して **Tab** を押すと、省略形が `plurals` ブロックに展開されます。
+> `values-en/strings.xml` で作業している場合、IDEはロケール、必要な数量、および英語には `one` と `other` のみが必要であることを自動的に検出します。
+> `p.test` または `plurals.test` と入力して **Tab** キーを押すと、略語が `plurals` ブロックに展開されます。
 > ```xml
 > <plurals name="test">
 >     <item quantity="one"></item>
@@ -424,15 +424,15 @@ coroutineScope.launch {
 > </plurals>
 > ```
 >
-{style="note"}
+{style="tip"}
 
 ### フォント {id="fonts"}
 
 カスタムフォントは `composeResources/font` ディレクトリに保存します。
-Compose Multiplatform は、すべてのプラットフォームで TTF、OTF、TTC、およびバリアブルフォント形式をサポートしています。
-WOFF および WOFF2 は Web および macOS でのみ利用可能です。
+Compose Multiplatformは、すべてのプラットフォームでTTF、OTF、TTC、およびバリアブルフォント形式をサポートしています。
+WOFFおよびWOFF2は、WebとmacOSでのみ利用可能です。
 
-フォントを `Font` 型としてロードするには、`Font()` コンポーザブル関数を使用します。
+フォントを `Font` 型として読み込むには、`Font()` コンポーザブル関数を使用します。
 
 ```kotlin
 @Composable
@@ -443,7 +443,7 @@ fun Font(
 ): Font
 ```
 
-例：
+例:
 
 ```kotlin
 @Composable
@@ -477,25 +477,25 @@ private fun InterTypography(): Typography {
 
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="@Composable private fun InterTypography(): Typography { val interFont = FontFamily("}
 
-> `Font` がコンポーザブルである場合、`TextStyle` や `Typography` などの依存コンポーネントもコンポーザブルであることを確認してください。
+> `Font` がコンポーザブルである場合、それに依存するコンポーネント（`TextStyle` や `Typography` など）もコンポーザブルであることを確認してください。
 >
 {style="note"}
 
-Web ターゲットでは、[フォントの自動フォールバック](compose-web-resources.md#automatic-font-fallback)を通じて、絵文字やアラビア文字などの特殊文字が自動的にサポートされます。これにより、必要に応じて必要な Noto フォントがダウンロードされます。
+絵文字やアラビア文字などの特殊文字は、要求に応じて必要なNotoフォントをダウンロードする[自動フォントフォールバック](compose-web-resources.md#automatic-font-fallback)を通じて、Webターゲットで自動的にサポートされます。
 
 使用するフォントを完全に制御する必要がある場合は、特定のフォントをバンドルし、[preload API](compose-web-resources.md#preload-resources-using-the-compose-multiplatform-preload-api) を使用して手動で登録してください。
 
-### Raw ファイル {id="raw-files"}
+### Rawファイル {id="raw-files"}
 
-任意の Raw ファイルをバイト配列としてロードするには、`Res.readBytes(path)` 関数を使用します。
+任意のRaw（未加工の）ファイルをバイト配列として読み込むには、`Res.readBytes(path)` 関数を使用します。
 
 ```kotlin
 suspend fun readBytes(path: String): ByteArray
 ```
 
-Raw ファイルは `composeResources/files` ディレクトリに配置でき、その中に任意の階層を作成できます。
+Rawファイルは `composeResources/files` ディレクトリに配置でき、その中に任意の階層を作成できます。
 
-たとえば、Raw ファイルにアクセスするには、次のコードを使用します。
+たとえば、Rawファイルにアクセスするには以下のコードを使用します。
 
 <Tabs>
 <TabItem title= "コンポーザブルコードから">
@@ -522,11 +522,11 @@ coroutineScope.launch {
 </TabItem>
 </Tabs>
 
-#### バイト配列を画像に変換する {id="convert-byte-arrays-into-images"}
+#### バイト配列から画像への変換 {id="convert-byte-arrays-into-images"}
 
-読み取っているファイルがビットマップ（JPEG、PNG、BMP、WEBP）または XML ベクター画像である場合、次の関数を使用して、`Image()` コンポーザブルに適した `ImageBitmap` または `ImageVector` オブジェクトに変換できます。
+読み込んでいるファイルがビットマップ（JPEG、PNG、BMP、WEBP）またはXMLベクター画像である場合、以下の関数を使用して、`Image()` コンポーザブルに適した `ImageBitmap` または `ImageVector` オブジェクトに変換できます。
 
-[Raw ファイル](#raw-files)セクションで示したように Raw ファイルにアクセスし、その結果をコンポーザブルに渡します。
+[Rawファイル](#rawファイル) セクションで示したようにRawファイルにアクセスし、その結果をコンポーザブルに渡します。
 
 ```kotlin
 // bytes = Res.readBytes("files/example.png")
@@ -536,16 +536,16 @@ Image(bytes.decodeToImageBitmap(), null)
 Image(bytes.decodeToImageVector(LocalDensity.current), null)
 ```
 
-Android 以外のすべてのプラットフォームでは、SVG ファイルを `Painter` オブジェクトに変換することもできます。
+Androidを除くすべてのプラットフォームでは、SVGファイルを `Painter` オブジェクトに変換することもできます。
 
 ```kotlin
 // bytes = Res.readBytes("files/example.svg")
 Image(bytes.decodeToSvgPainter(LocalDensity.current), null)
 ```
 
-### 生成されたリソースと文字列 ID のマップ {id="generated-maps-for-resources-and-string-ids"}
+### リソースと文字列ID用に生成されたマップ {id="generated-maps-for-resources-and-string-ids"}
 
-アクセスの便宜上、Compose Multiplatform はリソースを文字列 ID ともマップします。ファイル名をキーとして使用してアクセスできます。
+アクセスを容易にするため、Compose Multiplatformは文字列IDを使用してリソースをマッピングすることも行います。ファイル名をキーとして使用してアクセスできます。
 
 ```kotlin
 val Res.allDrawableResources: Map<String, DrawableResource>
@@ -555,24 +555,25 @@ val Res.allPluralStringResources: Map<String, PluralStringResource>
 val Res.allFontResources: Map<String, FontResource>
 ```
 
-マップされたリソースをコンポーザブルに渡す例：
+マッピングされたリソースをコンポーザブルに渡す例:
 
 ```kotlin
 Image(painterResource(Res.allDrawableResources["compose_multiplatform"]!!), null)
 ```
 
-### Compose Multiplatform リソースを Android アセットとして使用する {id="compose-multiplatform-resources-as-android-assets"}
+### AndroidアセットとしてのCompose Multiplatformリソース {id="compose-multiplatform-resources-as-android-assets"}
 
-Compose Multiplatform 1.7.0 以降、すべてのマルチプラットフォームリソースは Android アセットにパックされます。これにより、Android Studio は Android ソースセット内の Compose Multiplatform コンポーザブルのプレビューを生成できるようになります。
+Compose Multiplatform 1.7.0以降、すべてのマルチプラットフォームリソースはAndroidアセットにパックされます。
+これにより、Android StudioでAndroidソースセット内のCompose Multiplatformコンポーザブルのプレビューを生成できるようになります。
 
-> Android Studio プレビューは、Android ソースセット内のコンポーザブルでのみ利用可能です。
-> また、最新バージョンの AGP（8.5.2、8.6.0-rc01、または 8.7.0-alpha04）のいずれかが必要です。
+> Android Studioのプレビューは、Androidソースセット内のコンポーザブルに対してのみ利用可能です。
+> また、最新バージョンのAGP（8.5.2、8.6.0-rc01、または8.7.0-alpha04のいずれか）が必要です。
 >
 {style="warning"}
 
-マルチプラットフォームリソースを Android アセットとして使用すると、Android 上の WebView やメディアプレーヤーコンポーネントからの直接アクセスも可能になります。リソースは単純なパス、例えば `Res.getUri("files/index.html")` で到達できるためです。
+マルチプラットフォームリソースをAndroidアセットとして使用することで、リソースに単純なパス（例: `Res.getUri("files/index.html")`）でアクセスできるため、Android上のWebViewやメディアプレーヤーコンポーネントからの直接アクセスも可能になります。
 
-リソース画像へのリンクが含まれたリソース HTML ページを表示する Android コンポーザブルの例：
+リソース画像へのリンクを含むリソースHTMLページを表示するAndroidコンポーザブルの例:
 
 ```kotlin
 // androidMain/kotlin/com/example/webview/App.kt
@@ -599,7 +600,7 @@ fun App() {
 ```
 {initial-collapse-state="collapsed" collapsible="true"  collapsed-title="AndroidView(factory = { WebView(it).apply"}
 
-この例は、次の単純な HTML ファイルで動作します。
+この例は、次のシンプルなHTMLファイルで動作します。
 
 ```html
 <html>
@@ -617,42 +618,45 @@ fun App() {
 
 この例の両方のリソースファイルは、`commonMain` ソースセットに配置されています。
 
-![composeResources ディレクトリのファイル構造](compose-resources-android-webview.png){width="230"}
+![composeResourcesディレクトリのファイル構造](compose-resources-android-webview.png){width="230"}
 
-## 他のライブラリやリソースとの相互作用 {id="interaction-with-other-libraries-and-resources"}
+## 他のライブラリやリソースとの連携 {id="interaction-with-other-libraries-and-resources"}
 
-### 外部ライブラリからマルチプラットフォームリソースへのアクセス {id="accessing-multiplatform-resources-from-external-libraries"}
+### 外部ライブラリからのマルチプラットフォームリソースへのアクセス {id="accessing-multiplatform-resources-from-external-libraries"}
 
-プロジェクトに含まれる他のライブラリを使用してマルチプラットフォームリソースを処理したい場合は、プラットフォーム固有のファイルパスをそれらの API に渡すことができます。
+プロジェクトに含まれる他のライブラリを使用してマルチプラットフォームリソースを処理したい場合は、プラットフォーム固有のファイルパスをそれらの他のAPIに渡すことができます。
 プラットフォーム固有のパスを取得するには、リソースへのプロジェクトパスを指定して `Res.getUri()` 関数を呼び出します。
 
 ```kotlin
 val uri = Res.getUri("files/my_video.mp4")
 ```
 
-`uri` 変数にはファイルへの絶対パスが含まれるようになり、外部ライブラリはそのパスを使用して、自身に適した方法でファイルにアクセスできます。
+これで `uri` 変数にファイルへの絶対パスが格納されたため、外部ライブラリはそのパスを使用して、適切な方法でファイルにアクセスできます。
 
-Android 固有の使用法については、マルチプラットフォームリソースも [Android アセットとしてパック](#compose-multiplatform-resources-as-android-assets)されています。
+Android固有の用途では、マルチプラットフォームリソースは[Androidアセットとしてもパック](#androidアセットとしてのcompose-multiplatformリソース)されます。
 
 ### リモートファイル {id="remote-files"}
 
-リソースライブラリのコンテキストでは、アプリケーションの一部であるファイルのみがリソースと見なされます。
+リソースライブラリのコンテキストでは、アプリケーションの一部であるファイルのみがリソースとみなされます。
 
-専用のライブラリを使用して、URL からインターネット上のリモートファイルをロードできます。
+URLを使用してインターネットからリモートファイルを読み込むには、専用のライブラリを使用できます。
 
 * [Compose ImageLoader](https://github.com/qdsfdhvh/compose-imageloader)
 * [Kamel](https://github.com/Kamel-Media/Kamel)
 * [Ktor client](https://ktor.io/)
 
-画像を手動でダウンロードしたり、そのバイトを読み取ったりする場合は、リソースライブラリの[デコード関数](#convert-byte-arrays-into-images)を使用して変換してください。デスクトップアプリでのネットワーク画像の読み込み例については、[デスクトップ用 Compose Multiplatform での画像の使用](compose-desktop-images.md#loading-images-from-the-file-system-or-the-network)を参照してください。
+画像を手動でダウンロードしたりそのバイトを読み込んだりした場合は、リソースライブラリの[デコード関数](#バイト配列から画像への変換)を使用して変換します。デスクトップアプリでネットワーク画像を読み込む例については、[デスクトップ向けCompose Multiplatformでの画像の使用](compose-desktop-images.md#loading-images-from-the-file-system-or-the-network)を参照してください。
 
-画像を手動でダウンロードしたり、バイトを読み取ったりした場合は、リソースライブラリの[デコード関数](#convert-byte-arrays-into-images)を使用して画像に変換してください。デスクトップアプリケーションでのネットワークからの画像の読み込み例については、[デスクトップ用 Compose Multiplatform での画像の使用](compose-desktop-images.md#loading-images-from-the-file-system-or-the-network)のチュートリアルを参照してください。
+画像のバイトを自身でダウンロードまたは読み込んだ場合は、リソースライブラリの[デコード関数](#バイト配列から画像への変換)を使用して画像に変換してください。
+デスクトップアプリケーションでネットワークから画像を読み込む例については、[デスクトップ向けCompose Multiplatformでの画像の使用](compose-desktop-images.md#loading-images-from-the-file-system-or-the-network) のチュートリアルを参照してください。
 
-### Java リソースの使用 {id="using-java-resources"}
+### Javaリソースの使用 {id="using-java-resources"}
 
-Compose Multiplatform で Java リソースを使用することはできますが、生成されたアクセッサ、マルチモジュールサポート、ローカライズなどのフレームワークが提供する拡張機能の恩恵を受けることはできません。その可能性を最大限に引き出すために、マルチプラットフォームリソースライブラリへの完全な移行を検討してください。
+Compose MultiplatformでJavaリソースを使用することは可能ですが、フレームワークが提供する拡張機能（生成されたアクセサ、マルチモジュールサポート、ローカライズなど）の恩恵を受けることはできません。
+その潜在的な機能を活用するために、マルチプラットフォームリソースライブラリへの完全な移行を検討してください。
 
-Compose Multiplatform 1.7.0 では、`compose.ui` パッケージで利用可能なリソース API は非推奨になりました。引き続き Java リソースを操作する必要がある場合は、Compose Multiplatform 1.7.0 以上にアップグレードした後もコードが動作するように、プロジェクトに次の実装をコピーしてください。
+Compose Multiplatform 1.7.0では、`compose.ui` パッケージで利用可能だったリソースAPIは非推奨（deprecated）になりました。
+引き続きJavaリソースを使用する必要がある場合は、Compose Multiplatform 1.7.0以降にアップグレードした後もコードが動作するように、以下の実装をプロジェクトにコピーしてください。
 
 ```kotlin
 @Composable
@@ -690,5 +694,5 @@ private fun readResourceBytes(resourcePath: String) =
 
 ## 次のステップ {id="what-s-next"}
 
-* iOS、Android、デスクトップをターゲットとした Compose Multiplatform プロジェクトでリソースを処理する方法を示す公式の [デモプロジェクト](https://github.com/JetBrains/compose-multiplatform/tree/master/components/resources/demo) を確認してください。
-* アプリ内のテーマや言語などのアプリケーションの [リソース環境](compose-resource-environment.md) を管理する方法を学びましょう。
+* iOS、Android、デスクトップをターゲットとするCompose Multiplatformプロジェクトでリソースをどのように扱えるかを示した公式の [デモプロジェクト](https://github.com/JetBrains/compose-multiplatform/tree/master/components/resources/demo) を確認してください。
+* アプリ内のテーマや言語など、アプリケーションの [リソース環境](compose-resource-environment.md) を管理する方法を学びましょう。

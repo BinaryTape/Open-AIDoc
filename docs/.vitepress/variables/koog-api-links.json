@@ -1,5 +1,4 @@
 {
-  "agents-core::ai.koog.agents.core.agent.AIAgent": "https://api.koog.ai/agents/agents-core/ai.koog.agents.core.agent/-a-i-agent/index.html",
   "agents-core::ai.koog.agents.core.agent.config.AIAgentConfig": "https://api.koog.ai/agents/agents-core/ai.koog.agents.core.agent.config/-a-i-agent-config/index.html",
   "agents-core::ai.koog.agents.core.agent.context.AIAgentLLMContext": "https://api.koog.ai/agents/agents-core/ai.koog.agents.core.agent.context/-a-i-agent-l-l-m-context/index.html",
   "agents-core::ai.koog.agents.core.agent.entity.AIAgentNode.Companion.builder": "https://api.koog.ai/agents/agents-core/ai.koog.agents.core.agent.entity/-a-i-agent-node/-companion/builder.html",
@@ -37,7 +36,6 @@
   "agents-core::ai.koog.agents.ext.agent.subgraphWithVerification": "https://api.koog.ai/agents/agents-core/ai.koog.agents.ext.agent/subgraph-with-verification.html",
   "agents-features-event-handler::ai.koog.agents.features.eventHandler.feature.EventHandler": "https://api.koog.ai/agents/agents-features/agents-features-event-handler/ai.koog.agents.features.eventHandler.feature/-event-handler/index.html",
   "agents-features-event-handler::ai.koog.agents.features.eventHandler.feature.EventHandlerConfig": "https://api.koog.ai/agents/agents-features/agents-features-event-handler/ai.koog.agents.features.eventHandler.feature/-event-handler-config/index.html",
-  "agents-features-memory::": "https://api.koog.ai/agents/agents-features/agents-features-memory/index.html",
   "agents-features-opentelemetry::ai.koog.agents.features.opentelemetry.feature.OpenTelemetryConfig.addSpanExporter": "https://api.koog.ai/agents/agents-features/agents-features-opentelemetry/ai.koog.agents.features.opentelemetry.feature/-open-telemetry-config/add-span-exporter.html",
   "agents-features-opentelemetry::ai.koog.agents.features.opentelemetry.integration.datadog.addDatadogExporter": "https://api.koog.ai/agents/agents-features/agents-features-opentelemetry/ai.koog.agents.features.opentelemetry.integration.datadog/add-datadog-exporter.html",
   "agents-features-opentelemetry::ai.koog.agents.features.opentelemetry.integration.langfuse.addLangfuseExporter": "https://api.koog.ai/agents/agents-features/agents-features-opentelemetry/ai.koog.agents.features.opentelemetry.integration.langfuse/add-langfuse-exporter.html",

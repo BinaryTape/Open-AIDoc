@@ -1,0 +1,16 @@
+[
+  "serialization-cbor.md",
+  "serialization-configure-json-serialization.md",
+  "serialization-create-and-use-serializers.md",
+  "serialization-custom-formats.md",
+  "serialization-customization-options.md",
+  "serialization-get-started.md",
+  "serialization-json-configuration.md",
+  "serialization-json-elements.md",
+  "serialization-json-io-sources.md",
+  "serialization-polymorphism.md",
+  "serialization-protobuf.md",
+  "serialization-serialize-builtin-types.md",
+  "serialization-transform-json.md",
+  "serialization.md"
+]
