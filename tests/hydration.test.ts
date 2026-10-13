@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { createSSRApp, h, type Component } from 'vue'
 import { renderToString } from 'vue/server-renderer'
 import { compileTemplate } from 'vue/compiler-sfc'
-import { GLOBAL_COMPONENTS, isPlainElement } from '../docs/.vitepress/config/vue-template.config'
+import { GLOBAL_COMPONENTS, isPlainElement, vueCompilerOptions } from '../docs/.vitepress/config/vue-template.config'
 import IgnoreComponent from '../docs/.vitepress/component/IgnoreComponent.vue'
 import Link from '../docs/.vitepress/component/Link.vue'
 import Tabs from '../docs/.vitepress/component/Tabs.vue'
@@ -49,6 +49,14 @@ describe('template compiler options', () => {
     expect(code).toContain('<primary-label></primary-label>')
     expect(code).toContain('<warning><p>Careful.</p></warning>')
     expect(code).toContain('<shortcut>Ctrl+C</shortcut>')
+  })
+
+  it('puts table rows in a tbody, as the browser does', () => {
+    // A component in a cell makes Vue render the table node by node.
+    const source = '<table><tr><th>Target</th></tr><tr><td><code-block lang="kotlin">x</code-block></td></tr></table>'
+    const compile = (ssr: boolean) => compileTemplate({ source, filename: 'page.md', id: 'page', ssr, ssrCssVars: [], compilerOptions: vueCompilerOptions }).code
+    expect(compile(true)).toContain('><tbody><tr><th>Target</th></tr><tr><td>')
+    expect(compile(false)).toMatch(/"table", null, \[\s*_createElementVNode\("tbody"/)
   })
 })
 

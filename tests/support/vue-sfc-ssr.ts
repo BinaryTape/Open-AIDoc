@@ -2,13 +2,12 @@ import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
 import { compileScript, compileTemplate, parse } from 'vue/compiler-sfc'
 import type { Plugin } from 'vitest/config'
-import { isPlainElement } from '../../docs/.vitepress/config/vue-template.config'
+import { vueCompilerOptions as compilerOptions } from '../../docs/.vitepress/config/vue-template.config'
 
 // Lets tests import the site's .vue components, compiled for server rendering
 // with the site's template options. Styles are ignored. A component compiles
 // to `<file>.vue?ssr&lang.ts`, so Vite strips its TypeScript like a .ts file.
 const QUERY = '?ssr&lang.ts'
-const compilerOptions = { isCustomElement: isPlainElement }
 
 export function vueSfcSsr(): Plugin {
   return {

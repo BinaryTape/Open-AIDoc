@@ -48,3 +48,41 @@ export function isPlainElement(tag: string): boolean {
     !FORM_CONTROLS.has(tag) &&
     !isRegisteredComponent(tag)
 }
+
+// The parts of Vue's template AST this file touches (@vue/compiler-core).
+const ELEMENT_NODE = 1 // NodeTypes.ELEMENT
+interface TemplateNode {
+  type: number
+  tag?: string
+  children?: TemplateNode[]
+  loc?: unknown
+}
+
+/**
+ * Writerside tables are written as `<table><tr>…`. The browser puts the rows
+ * in a `<tbody>`, Vue does not, so a table that Vue renders node by node
+ * (one with a component in a cell) fails to hydrate. Add the `<tbody>`.
+ */
+export function wrapTableRows(node: TemplateNode): void {
+  if (node.type !== ELEMENT_NODE || node.tag !== 'table' || !node.children) return
+  const children: TemplateNode[] = []
+  let body: TemplateNode | null = null
+  for (const child of node.children) {
+    if (child.type === ELEMENT_NODE && child.tag === 'tr') {
+      if (!body) {
+        body = { type: ELEMENT_NODE, ns: 0, tag: 'tbody', tagType: 0, props: [], children: [], isSelfClosing: false, loc: child.loc, codegenNode: undefined } as TemplateNode
+        children.push(body)
+      }
+      body.children!.push(child)
+    } else {
+      body = null
+      children.push(child)
+    }
+  }
+  node.children = children
+}
+
+export const vueCompilerOptions = {
+  isCustomElement: isPlainElement,
+  nodeTransforms: [wrapTableRows],
+}

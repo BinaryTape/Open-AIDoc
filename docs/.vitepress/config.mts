@@ -12,7 +12,7 @@ import {
 } from './config/markdown.config'
 import { applySeoMetadata } from './config/seo.config'
 import { writeRedirectsFile } from './config/redirects.config'
-import { isPlainElement } from './config/vue-template.config'
+import { vueCompilerOptions } from './config/vue-template.config'
 
 // ===== Vite plugins =====
 import liquidIncludePlugin from "./plugins/vite/vite-liquid-include"
@@ -66,7 +66,7 @@ export default defineConfig({
   // Vue template compiler (pages and theme components)
   vue: {
     template: {
-      compilerOptions: { isCustomElement: isPlainElement }
+      compilerOptions: vueCompilerOptions
     }
   },
 
