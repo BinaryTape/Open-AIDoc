@@ -531,3 +531,11 @@ img[type="joined"] {
 .ws-tabs-static > input:nth-of-type(12):checked ~ .ws-tabcontents > .ws-tabcontent:nth-of-type(12) {
     display: block;
 }
+
+/* Writerside <panel> titles (see config/vue-template.config.ts). */
+.vp-doc .ws-title {
+  margin: 16px 0 8px;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 28px;
+}

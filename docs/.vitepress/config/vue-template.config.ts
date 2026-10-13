@@ -51,9 +51,14 @@ export function isPlainElement(tag: string): boolean {
 
 // The parts of Vue's template AST this file touches (@vue/compiler-core).
 const ELEMENT_NODE = 1 // NodeTypes.ELEMENT
+const ATTRIBUTE_NODE = 6 // NodeTypes.ATTRIBUTE
+const TEXT_NODE = 2 // NodeTypes.TEXT
+const PLAIN_ELEMENT = 0 // ElementTypes.ELEMENT
 interface TemplateNode {
   type: number
   tag?: string
+  tagType?: number
+  props?: unknown[]
   children?: TemplateNode[]
   loc?: unknown
 }
@@ -82,7 +87,24 @@ export function wrapTableRows(node: TemplateNode): void {
   node.children = children
 }
 
+/**
+ * Writerside titles its panels with `<title>` (`<panel><title>Beginner</title>`).
+ * Inside the page body that is an invisible, invalid element. Where a plain
+ * element contains it, render a `<div class="ws-title">`. Components that read
+ * a `<title>` from their slot (cards, link groups) keep it.
+ */
+export function renameBodyTitles(node: TemplateNode, context: { parent: TemplateNode | null }): void {
+  if (node.type !== ELEMENT_NODE || node.tag !== 'title') return
+  const parent = context.parent
+  if (parent?.type !== ELEMENT_NODE || parent.tagType !== PLAIN_ELEMENT) return
+  node.tag = 'div'
+  node.props = [
+    ...(node.props ?? []),
+    { type: ATTRIBUTE_NODE, name: 'class', nameLoc: node.loc, value: { type: TEXT_NODE, content: 'ws-title', loc: node.loc }, loc: node.loc },
+  ]
+}
+
 export const vueCompilerOptions = {
   isCustomElement: isPlainElement,
-  nodeTransforms: [wrapTableRows],
+  nodeTransforms: [wrapTableRows, renameBodyTitles],
 }

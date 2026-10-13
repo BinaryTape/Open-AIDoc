@@ -58,6 +58,15 @@ describe('template compiler options', () => {
     expect(compile(true)).toContain('><tbody><tr><th>Target</th></tr><tr><td>')
     expect(compile(false)).toMatch(/"table", null, \[\s*_createElementVNode\("tbody"/)
   })
+
+  it('renders panel titles as visible elements, not <title>', () => {
+    const compile = (source: string) => compileTemplate({ source, filename: 'page.md', id: 'page', ssr: true, ssrCssVars: [], compilerOptions: vueCompilerOptions }).code
+    const panel = compile('<panels><panel><title>Beginner</title><p>Basics.</p></panel></panels>')
+    expect(panel).toContain('<div class="ws-title">Beginner</div>')
+    expect(panel).not.toContain('<title>')
+    // A component reading <title> from its slot still gets it.
+    expect(compile('<cards><title>Start</title></cards>')).toMatch(/_createVNode\("title"|"title"/)
+  })
 })
 
 describe('components', () => {
