@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { useSlots, type VNode, ref, computed } from 'vue'
 import Link from "./Link.vue";
-import {useMediaQuery} from "@vueuse/core";
 
 export interface SectionLink {
   summary?: string
@@ -40,11 +39,11 @@ slots.default?.().forEach((vnode: VNode) => {
 
 // 判断插槽里是否有 title
 const hasTitleSlot = computed(() => !!titleContent.value)
-const is640 = useMediaQuery('(min-width: 640px)')
+// Three columns from 640px wide, set in CSS (see Card.vue).
 </script>
 
 <template>
-  <div :class="is640 ? 'ws-col-4' : 'ws-col-12'">
+  <div class="ws-link-group ws-col-12 ws-col-sm-4">
     <h3 v-if="hasTitleSlot">{{ titleContent }}</h3>
     <div class="ws-link-container">
       <template v-if="links.length > 0" v-for="(link, index) in links">
@@ -56,11 +55,13 @@ const is640 = useMediaQuery('(min-width: 640px)')
 </template>
 
 <style scoped>
-.ws-col-12 {
-  --ws-horizontal-layout-gutter: 0;
-  min-width: 100%;
-  margin-left: 0 !important;
-  margin-right: 0 !important;
+@media (max-width: 639.98px) {
+  .ws-link-group {
+    --ws-horizontal-layout-gutter: 0;
+    min-width: 100%;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
 }
 
 .ws-link-container {

@@ -1,5 +1,5 @@
 <script setup>
-import { useSlots, ref, computed } from 'vue';
+import { useSlots, ref, computed, useId } from 'vue';
 
 const slots = useSlots();
 
@@ -9,7 +9,8 @@ const tabs = computed(() => {
 
 const activeIndex = ref(0);
 
-const groupName = `group-${Math.random().toString(36).substring(2, 9)}`;
+// Same on the server and in the browser, so hydration matches.
+const groupName = `group-${useId()}`;
 
 const isTab = tabs.props?.id;
 

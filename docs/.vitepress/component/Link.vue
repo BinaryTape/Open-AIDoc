@@ -1,4 +1,6 @@
 <script setup lang="ts">
+// Spans only: the link sits inside paragraphs, where a <div> makes the browser
+// split the paragraph and Vue hydration fail.
 const props = defineProps({
   href: {
     type: String,
@@ -12,12 +14,12 @@ const props = defineProps({
 </script>
 
 <template>
-  <div class="ws-tooltip-wrapper">
+  <span class="ws-tooltip-wrapper">
     <a :href="props.href" class="ws-link"><slot/></a>
-    <div class="ws-tooltip">
+    <span class="ws-tooltip">
       {{ props.summary }}
-    </div>
-  </div>
+    </span>
+  </span>
 </template>
 
 <style scoped>
@@ -32,6 +34,7 @@ const props = defineProps({
 }
 
 .ws-tooltip {
+  display: block;
   position: absolute;
   bottom: 100%;
   left: 25%;

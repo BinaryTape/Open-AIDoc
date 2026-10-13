@@ -241,6 +241,12 @@ img[type="joined"] {
 .ws-col-11 { --ws-col-count: 11; }
 .ws-col-12 { --ws-col-count: 12; }
 
+/* Column count from 640px wide (Writerside cards and link groups). */
+@media (min-width: 640px) {
+  .ws-col-sm-4 { --ws-col-count: 4; }
+  .ws-col-sm-6 { --ws-col-count: 6; }
+}
+
 .vp-doc tr:nth-child(2n) pre {
   background: var(--vp-c-bg);
 }
