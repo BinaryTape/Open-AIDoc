@@ -1,17 +1,15 @@
 <script setup lang="ts">
-import { useMediaQuery } from '@vueuse/core'
-
+// Two columns from 640px wide, set in CSS: a class computed from the window
+// width differs between server and browser and breaks hydration.
 const props = defineProps<{
   href: string
   summary: string
   badge?: string
 }>()
-
-const is640 = useMediaQuery('(min-width: 640px)')
 </script>
 
 <template>
-  <div :class="['ws-card', is640 ? 'ws-col-6' : 'ws-col-12']">
+  <div class="ws-card ws-col-12 ws-col-sm-6">
     <a :href="props.href" class="ws-card-link">
       <h3><slot/></h3>
       <p>{{ props.summary }}</p>
@@ -20,11 +18,13 @@ const is640 = useMediaQuery('(min-width: 640px)')
 </template>
 
 <style scoped>
-.ws-col-12 {
-  --ws-horizontal-layout-gutter: 0;
-  min-width: 100%;
-  margin-left: 0 !important;
-  margin-right: 0 !important;
+@media (max-width: 639.98px) {
+  .ws-card {
+    --ws-horizontal-layout-gutter: 0;
+    min-width: 100%;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
 }
 
 .ws-card {
