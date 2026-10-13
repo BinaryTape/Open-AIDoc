@@ -734,5 +734,8 @@
   "serialization.configure-json-serialization": "JSONシリアル化の設定",
   "serialization.serialization-configure-json-serialization": "概要",
   "serialization.serialization-transform-json": "JSON変換",
-  "serialization.alternative-and-custom-serialization-formats": "代替およびカスタムのシリアル化フォーマット"
+  "serialization.alternative-and-custom-serialization-formats": "代替およびカスタムのシリアル化フォーマット",
+  "callout.note": "注記",
+  "callout.tip": "ヒント",
+  "callout.warning": "警告"
 }

@@ -737,5 +737,8 @@
   "serialization.configure-json-serialization": "配置 JSON 序列化",
   "serialization.serialization-configure-json-serialization": "概覽",
   "serialization.serialization-transform-json": "JSON 轉換",
-  "serialization.alternative-and-custom-serialization-formats": "替代與自訂序列化格式"
+  "serialization.alternative-and-custom-serialization-formats": "替代與自訂序列化格式",
+  "callout.note": "注意",
+  "callout.tip": "提示",
+  "callout.warning": "警告"
 }

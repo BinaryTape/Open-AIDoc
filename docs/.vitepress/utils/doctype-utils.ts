@@ -39,7 +39,8 @@ export function isDocusaurusDoc(env: any): boolean {
  * @returns whether it is Writerside type
  */
 export function isWritersideDoc(env: any): boolean {
-    return isDocType(env, 'kotlin') || isDocType(env, 'ktor')
+    const docType = getDocType(env)
+    return docType !== null && DocsTypeConfig[docType]?.framework === 'Writerside'
 }
 
 /**

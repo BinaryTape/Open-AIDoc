@@ -1,0 +1,65 @@
+/**
+ * Writerside callouts (note / tip / warning), matching kotlinlang.org and
+ * ktor.io. Markup comes from utils/ws-callout.ts; which tone a type gets on
+ * which site is decided there.
+ * Icons: @rescui/icons (Apache-2.0), see assets/icons/rescui/.
+ * -------------------------------------------------------------------------- */
+
+:root {
+  --ws-callout-green: #4dbb5f;
+  --ws-callout-green-bg: rgba(77, 187, 95, 0.2);
+  --ws-callout-yellow: #f3c033;
+  --ws-callout-yellow-bg: rgba(243, 192, 51, 0.2);
+  --ws-callout-red: #f45c4a;
+  --ws-callout-red-bg: rgba(244, 92, 74, 0.2);
+  --ws-callout-neutral: rgba(25, 25, 28, 0.7);
+  --ws-callout-neutral-bg: rgba(25, 25, 28, 0.05);
+}
+
+.dark {
+  --ws-callout-neutral: rgba(255, 255, 255, 0.7);
+  --ws-callout-neutral-bg: rgba(255, 255, 255, 0.05);
+}
+
+.vp-doc .ws-callout {
+  position: relative;
+  margin: 16px 0;
+  padding: 16px 16px 16px 56px;
+  border-radius: 6px;
+  color: var(--vp-c-text-1);
+  background-color: var(--ws-callout-bg);
+  line-height: 24px;
+}
+
+.vp-doc .ws-callout::before {
+  content: '';
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  width: 24px;
+  height: 24px;
+  background-color: var(--ws-callout-icon);
+  -webkit-mask: var(--ws-callout-mask) no-repeat center / contain;
+  mask: var(--ws-callout-mask) no-repeat center / contain;
+}
+
+.vp-doc .ws-callout > :first-child {
+  margin-top: 0;
+}
+
+.vp-doc .ws-callout > :last-child {
+  margin-bottom: 0;
+}
+
+.vp-doc .ws-callout p {
+  margin: 8px 0;
+}
+
+.ws-callout--note { --ws-callout-mask: url('../assets/icons/rescui/info_24.svg'); }
+.ws-callout--tip { --ws-callout-mask: url('../assets/icons/rescui/read_24.svg'); }
+.ws-callout--warning { --ws-callout-mask: url('../assets/icons/rescui/warning_24.svg'); }
+
+.ws-callout--green { --ws-callout-icon: var(--ws-callout-green); --ws-callout-bg: var(--ws-callout-green-bg); }
+.ws-callout--yellow { --ws-callout-icon: var(--ws-callout-yellow); --ws-callout-bg: var(--ws-callout-yellow-bg); }
+.ws-callout--red { --ws-callout-icon: var(--ws-callout-red); --ws-callout-bg: var(--ws-callout-red-bg); }
+.ws-callout--neutral { --ws-callout-icon: var(--ws-callout-neutral); --ws-callout-bg: var(--ws-callout-neutral-bg); }
