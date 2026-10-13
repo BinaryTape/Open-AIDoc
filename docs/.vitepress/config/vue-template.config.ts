@@ -63,17 +63,26 @@ interface TemplateNode {
   loc?: unknown
 }
 
+const isRow = (node: TemplateNode) => node.type === ELEMENT_NODE && node.tag === 'tr'
+
+// A component that only wraps rows, like `<snippet id="…"><tr>…</tr></snippet>`.
+const isRowComponent = (node: TemplateNode) =>
+  node.type === ELEMENT_NODE && node.tagType !== PLAIN_ELEMENT &&
+  !!node.children?.some(isRow) &&
+  node.children.every((child) => child.type !== ELEMENT_NODE || isRow(child))
+
 /**
  * Writerside tables are written as `<table><tr>…`. The browser puts the rows
  * in a `<tbody>`, Vue does not, so a table that Vue renders node by node
- * (one with a component in a cell) fails to hydrate. Add the `<tbody>`.
+ * (one with a component in a cell) fails to hydrate. Add the `<tbody>`, and
+ * put components that only wrap rows in it too.
  */
 export function wrapTableRows(node: TemplateNode): void {
   if (node.type !== ELEMENT_NODE || node.tag !== 'table' || !node.children) return
   const children: TemplateNode[] = []
   let body: TemplateNode | null = null
   for (const child of node.children) {
-    if (child.type === ELEMENT_NODE && child.tag === 'tr') {
+    if (isRow(child) || isRowComponent(child)) {
       if (!body) {
         body = { type: ELEMENT_NODE, ns: 0, tag: 'tbody', tagType: 0, props: [], children: [], isSelfClosing: false, loc: child.loc, codegenNode: undefined } as TemplateNode
         children.push(body)

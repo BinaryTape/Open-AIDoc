@@ -59,6 +59,14 @@ describe('template compiler options', () => {
     expect(compile(false)).toMatch(/"table", null, \[\s*_createElementVNode\("tbody"/)
   })
 
+  it('keeps rows wrapped in a snippet inside the tbody', () => {
+    const source = '<table><tr><td>A</td></tr><snippet id="s"><tr><td><code-block>x</code-block></td></tr></snippet><tr><td>B</td></tr></table>'
+    const code = compileTemplate({ source, filename: 'page.md', id: 'page', ssr: true, ssrCssVars: [], compilerOptions: vueCompilerOptions }).code
+    // One tbody, opened before the first row and closed after the last.
+    expect(code.match(/<tbody>/g)).toHaveLength(1)
+    expect(code).toMatch(/<tbody><tr><td>A<\/td><\/tr>`\)[\s\S]*_component_snippet[\s\S]*<tr><td>B<\/td><\/tr><\/tbody><\/table>/)
+  })
+
   it('renders panel titles as visible elements, not <title>', () => {
     const compile = (source: string) => compileTemplate({ source, filename: 'page.md', id: 'page', ssr: true, ssrCssVars: [], compilerOptions: vueCompilerOptions }).code
     const panel = compile('<panels><panel><title>Beginner</title><p>Basics.</p></panel></panels>')
