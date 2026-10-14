@@ -1,11 +1,14 @@
 import matter from 'gray-matter'
 import { DOCS_TYPES } from '../../../docs.config'
+import { isWritersideDoc } from '../../../utils/doctype-utils'
 import { getSidebarTitle } from '../../../utils/sidebar-utils'
 
 /**
  * Markdown-it plugin for auto-titling
  * Automatically prepends H1 heading based on frontmatter title or sidebar title
- * Skips 'kotlin' doc type and index pages
+ * Skips Writerside docs (Kotlin, KMP, Ktor) and index pages: a Writerside
+ * topic has its own title (a `[//]: # (title: …)` comment, `<topic title>` or
+ * a starting page's `<title>`), so another heading would duplicate it.
  */
 export default function markdownItAutoTitle(md: any) {
   const originalParse = md.parse
@@ -17,8 +20,7 @@ export default function markdownItAutoTitle(md: any) {
     const parts = env.relativePath.split('/')
     const docType = parts.find((p: string) => DOCS_TYPES.includes(p))
 
-    // Skip auto-titling for 'kotlin' doc type and index pages
-    if (docType === 'kotlin' || docType === undefined) {
+    if (docType === undefined || isWritersideDoc(env)) {
       return originalParse.call(this, modifiedSrc, env)
     }
 
