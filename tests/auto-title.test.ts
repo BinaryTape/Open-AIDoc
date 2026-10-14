@@ -1,6 +1,9 @@
 import { beforeAll, describe, expect, it } from 'vitest'
 import { createMarkdownRenderer, type MarkdownRenderer } from 'vitepress'
+import { createSSRApp, h } from 'vue'
+import { renderToString } from 'vue/server-renderer'
 import { registerMarkdownPlugins } from '../docs/.vitepress/config/markdown.config'
+import Chapter from '../docs/.vitepress/component/Chapter.vue'
 
 // A page has one title. Writerside topics bring their own; other docs get one
 // from frontmatter or the sidebar when they have no `# ` heading.
@@ -47,5 +50,17 @@ describe('page titles', () => {
   it('keeps the heading of other docs that have one', async () => {
     const html = await render('# Overview\n\nText.\n', 'sqldelight/index.md')
     expect(titles(html)).toBe(1)
+  })
+})
+
+describe('Writerside chapters', () => {
+  it('take their heading level from nesting, below the page title', async () => {
+    const chapter = (title: string, children?: () => unknown) => h(Chapter, { title, id: title.toLowerCase() }, children)
+    const html = await renderToString(createSSRApp(() => h('div', [
+      chapter('Prepare', () => [chapter('Build', () => [chapter('Run')]), chapter('Test')]),
+      chapter('Deploy'),
+    ])))
+    const headings = [...html.matchAll(/<(h\d) id="(\w+)"/g)].map((m) => `${m[1]} ${m[2]}`)
+    expect(headings).toEqual(['h2 prepare', 'h3 build', 'h4 run', 'h3 test', 'h2 deploy'])
   })
 })

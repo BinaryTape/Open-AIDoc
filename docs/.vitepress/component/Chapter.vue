@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {useSlots, type VNode} from 'vue'
+import { inject, provide } from 'vue'
 
 const props = defineProps({
   title : {
@@ -12,41 +12,25 @@ const props = defineProps({
   }
 })
 
-const slots = useSlots()
-
-let isHeading = false
-slots.default?.()?.forEach((vnode: VNode) => {
-  if (typeof vnode.type === 'object' && vnode.type.__name === 'Chapter') {
-    isHeading = true
-  }
-})
+// Heading level follows nesting, as on the upstream sites: the topic title is
+// the page's only h1, a top-level chapter is h2, a chapter inside it h3, …
+const LEVEL_KEY = 'ws-chapter-level'
+const level = Math.min(inject<number>(LEVEL_KEY, 1) + 1, 6)
+provide(LEVEL_KEY, level)
 
 </script>
 
 <template>
   <div class="ws-chapter">
-    <h1 :id="props.id" v-if="isHeading">
+    <component :is="`h${level}`" :id="props.id">
       {{ props.title }}
       <a class="header-anchor" :href="`#${props.id}`"></a>
-    </h1>
-    <h2 :id="props.id" v-else>
-      {{ props.title }}
-      <a class="header-anchor" :href="`#${props.id}`"></a>
-    </h2>
+    </component>
     <slot/>
   </div>
 </template>
 
 <style scoped>
-.ws-chapter :deep(h2) {
-  border: none;
-  padding: 0;
-}
-
-.ws-chapter :deep(h1) {
-  margin: 64px 0 0;
-}
-
 .header-anchor {
   top: 0;
 }
