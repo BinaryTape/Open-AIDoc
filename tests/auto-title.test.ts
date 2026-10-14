@@ -36,6 +36,21 @@ describe('page titles', () => {
     expect(html).toContain('<TopicTitle labelRef="server-plugin" title="压缩"/>')
   })
 
+  it('keeps parentheses in the title', async () => {
+    const html = await render('[//]: # (title: 列挙型クラス (Enum classes))\n\nText.\n', 'kotlin/enum-classes.md')
+    expect(html).toMatch(/<h1[^>]*>列挙型クラス \(Enum classes\) /)
+  })
+
+  it('unescapes parentheses in the title', async () => {
+    const html = await render('[//]: # (title: Select 표현식 \\(실험적\\))\n\nText.\n', 'kotlin/select-expression.md')
+    expect(html).toMatch(/<h1[^>]*>Select 표현식 \(실험적\) /)
+  })
+
+  it('escapes a labelled title for its attribute', async () => {
+    const html = await render('[//]: # (title: The "Ktor" \\(beta\\) plugin)\n\n<primary-label ref="server-plugin"/>\n', 'ktor/x.md')
+    expect(html).toContain('<TopicTitle labelRef="server-plugin" title="The &quot;Ktor&quot; (beta) plugin"/>')
+  })
+
   it('adds no heading to a <topic>, which renders its own title', async () => {
     const html = await render('<topic id="FAQ" title="常见问题解答">\n<p>Text.</p>\n</topic>\n', 'ktor/FAQ.md')
     expect(titles(html)).toBe(0)

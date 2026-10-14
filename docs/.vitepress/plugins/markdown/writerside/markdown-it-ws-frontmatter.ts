@@ -1,7 +1,9 @@
 // Process comments and convert title to markdown heading
 
 export default function markdownItWsFrontmatter(md) {
-  const titleCommentRe = /\[\/\/\]: # \(title:\s*(.*?)\)/i;
+  // The title runs to the comment's last ")": titles can contain parentheses,
+  // e.g. "Enum classes (Enums)" or, escaped, "Select expression \(experimental\)".
+  const titleCommentRe = /\[\/\/\]: # \(title:\s*(.*)\)\s*$/i;
   const primaryLabelRe = /<primary-label\s+ref="([^"]+)"\/>/i;
 
   // 在 normalize 阶段之前运行，修改 state.src
@@ -32,7 +34,9 @@ export default function markdownItWsFrontmatter(md) {
     // 根据是否找到 ref 决定插入 <TopicTitle> 还是普通 Markdown 标题
     let newSrc;
     if (ref) {
-      newSrc = `<TopicTitle labelRef="${ref}" title="${titleContent}"/>\n\n${src}`;
+      // An attribute value is not Markdown: undo the escapes, then escape for HTML.
+      const title = md.utils.escapeHtml(titleContent.replace(/\\([\\()[\]])/g, '$1'));
+      newSrc = `<TopicTitle labelRef="${md.utils.escapeHtml(ref)}" title="${title}"/>\n\n${src}`;
     } else {
       newSrc = `# ${titleContent}\n\n${src}`;
     }
