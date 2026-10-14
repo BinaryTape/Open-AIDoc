@@ -733,5 +733,8 @@
   "serialization.configure-json-serialization": "配置 JSON 序列化",
   "serialization.serialization-configure-json-serialization": "概览",
   "serialization.serialization-transform-json": "JSON 转换",
-  "serialization.alternative-and-custom-serialization-formats": "替代与自定义序列化格式"
+  "serialization.alternative-and-custom-serialization-formats": "替代与自定义序列化格式",
+  "callout.note": "注意",
+  "callout.tip": "提示",
+  "callout.warning": "警告"
 }
