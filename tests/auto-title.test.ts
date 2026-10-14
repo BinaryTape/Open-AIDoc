@@ -4,6 +4,7 @@ import { createSSRApp, h } from 'vue'
 import { renderToString } from 'vue/server-renderer'
 import { registerMarkdownPlugins } from '../docs/.vitepress/config/markdown.config'
 import Chapter from '../docs/.vitepress/component/Chapter.vue'
+import { parseTitleComment } from '../docs/.vitepress/utils/title-comment'
 
 // A page has one title. Writerside topics bring their own; other docs get one
 // from frontmatter or the sidebar when they have no `# ` heading.
@@ -39,6 +40,8 @@ describe('page titles', () => {
   it('keeps parentheses in the title', async () => {
     const html = await render('[//]: # (title: 列挙型クラス (Enum classes))\n\nText.\n', 'kotlin/enum-classes.md')
     expect(html).toMatch(/<h1[^>]*>列挙型クラス \(Enum classes\) /)
+    // With parentheses the comment is no valid Markdown comment: it must not show.
+    expect(html).not.toContain('[//]')
   })
 
   it('unescapes parentheses in the title', async () => {
@@ -77,5 +80,14 @@ describe('Writerside chapters', () => {
     ])))
     const headings = [...html.matchAll(/<(h\d) id="(\w+)"/g)].map((m) => `${m[1]} ${m[2]}`)
     expect(headings).toEqual(['h2 prepare', 'h3 build', 'h4 run', 'h3 test', 'h2 deploy'])
+  })
+})
+
+describe('title comments', () => {
+  it('read to the last parenthesis, without Markdown escapes', () => {
+    expect(parseTitleComment('[//]: # (title: Strings)\n\nText.')).toBe('Strings')
+    expect(parseTitleComment('[//]: # (title: イディオム (Idioms))')).toBe('イディオム (Idioms)')
+    expect(parseTitleComment('[//]: # (title: Select 표현식 \\(실험적\\))\r\n')).toBe('Select 표현식 (실험적)')
+    expect(parseTitleComment('# Heading\n')).toBeNull()
   })
 })

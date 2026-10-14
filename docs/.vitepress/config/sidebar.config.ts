@@ -3,6 +3,7 @@ import {SideLocaleConfig} from "../locales.config";
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
+import { parseTitleComment } from "../utils/title-comment";
 
 export default function generateSidebar(localeConfig: SideLocaleConfig, docsConfig: DocsItemConfig) {
     let sidebarPrefixDir = localeConfig.lang === "zh-Hans" ? docsConfig.path : path.posix.join(localeConfig.lang, docsConfig.path);
@@ -86,7 +87,7 @@ function getWritersideTitle(content: string) {
         const topicTitleMatch = topicMatch[1].match(/title="([^"]+)"/)
         return topicTitleMatch ? topicTitleMatch[1] : null;
     }
-    const markdownTitleMatch = content.match(/\[\/\/\]: # \(title:\s*(.*?)\)/i)
+    const markdownTitle = parseTitleComment(content)
     const markdownHeaderMatch = content.match(/^# (.+)$/m)
-    return markdownTitleMatch ? markdownTitleMatch[1] : markdownHeaderMatch ? markdownHeaderMatch[1] : null;
+    return markdownTitle ?? markdownHeaderMatch?.[1] ?? null;
 }
