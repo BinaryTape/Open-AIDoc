@@ -1,12 +1,17 @@
 import { describe, expect, it } from 'vitest'
 import { createMarkdownRenderer } from 'vitepress'
 import { registerMarkdownPlugins } from '../docs/.vitepress/config/markdown.config'
-import { removeMarkdownComments } from '../docs/.vitepress/plugins/markdown/common/markdown-it-remove-comments'
 
 async function render(markdown: string, relativePath = 'kotlin/ksp-quickstart.md') {
   const md = await createMarkdownRenderer('docs', { config: (md) => registerMarkdownPlugins(md) })
   return md.renderAsync(markdown, { relativePath, cleanUrls: true })
 }
+
+/** A comment shown as text, or as the `//` link a leaked `[//]` becomes. */
+const leaked = (html: string) => /\[\/\/\]: #|\/\/<\/a>: #/.test(html)
+/** The text of the code blocks, without Shiki's highlighting spans. */
+const codeText = (html: string) =>
+  [...html.matchAll(/<code>([\s\S]*?)<\/code>/g)].map(m => m[1].replace(/<[^>]+>/g, '')).join('\n')
 
 describe('Markdown comments', () => {
   // Each one rendered as page text before: none is a valid link reference definition.
@@ -15,10 +20,10 @@ describe('Markdown comments', () => {
     ['a call in backticks', '[//]: # (description: Use Lincheck\'s `runConcurrentTest()` function.)'],
     ['a period after it', '[//]: # (TODO KT-85415: see Standalone runtimes).'],
     ['a full-width period after it', '[//]: # (TODO KT-85415: 請參閱獨立執行時 (Standalone runtimes))。'],
+    ['escaped parentheses', '[//]: # (Select expression \\(experimental\\) \\( more)'],
   ])('hides a comment with %s', async (_, comment) => {
     const html = await render(`# Title\n\n${comment}\n\nText.`)
-    expect(html).not.toContain('[//]')
-    expect(html).not.toContain('//</a>')
+    expect(leaked(html)).toBe(false)
     expect(html).toContain('<p>Text.</p>')
   })
 
@@ -32,39 +37,42 @@ describe('Markdown comments', () => {
     expect(html.trim()).toBe('<p>Text.</p>')
   })
 
-  it('handles CRLF line endings', () => {
-    expect(removeMarkdownComments('A\r\n\r\n[//]: # (x (y))\r\n\r\nB')).toBe('A\n\n\nB')
+  it('handles CRLF line endings', async () => {
+    const html = await render('A\r\n\r\n[//]: # (x (y))\r\n[//]: # ()\r\n\r\nB')
+    expect(html.trim()).toBe('<p>A</p>\n<p>B</p>')
   })
 
-  it('ignores escaped parentheses when matching', () => {
-    expect(removeMarkdownComments('[//]: # (a \\( b)\nB')).toBe('B')
+  it('hides comments in list items and blockquotes', async () => {
+    expect(await render('- item\n\n  [//]: # (hidden (x))\n\n  more')).not.toContain('hidden')
+    expect(await render('> a\n>\n> [//]: # (hidden (x))\n>\n> b')).not.toContain('hidden')
   })
 
-  it('removes consecutive comments, including empty ones', () => {
-    expect(removeMarkdownComments('[//]: # ()\n[//]: # (## Heading {id="h"})\n\nB')).toBe('\nB')
+  // A comment in a code sample is code: markdown-it settles fences before this rule runs.
+  it.each([
+    ['a fence', '```markdown\n[//]: # (example)\n```'],
+    ['a tilde fence', '~~~\n[//]: # (example)\n~~~'],
+    ['a fence that opens on a list item\'s first line', '- ```markdown\n  [//]: # (example)\n  ```'],
+    ['a fence holding an indented fence line', '```markdown\n    ```\n[//]: # (example)\n```'],
+    ['an indented code block', 'Text.\n\n    [//]: # (example)'],
+  ])('keeps a comment in %s', async (_, src) => {
+    expect(codeText(await render(src))).toContain('[//]: # (example)')
   })
 
-  it('keeps comments inside fenced code', () => {
-    const src = '```markdown\n[//]: # (title: Example)\n```\n\n~~~\n[//]: # (x)\n~~~'
-    expect(removeMarkdownComments(src)).toBe(src)
-  })
-
-  it('keeps text that does not close cleanly', () => {
+  it('leaves text that does not close cleanly to the other rules', async () => {
     // Unbalanced, crossing a blank line, or followed by more text: not a comment.
-    for (const src of ['[//]: # (a ( b', '[//]: # (a\n\nb)', '[//]: # (a) and more text']) {
-      expect(removeMarkdownComments(src)).toBe(src)
-    }
+    expect(await render('[//]: # (a ( b')).toContain('[//]: # (a ( b')
+    expect(await render('[//]: # (a\n\nb)')).toContain('[//]: # (a')
+    expect(await render('[//]: # (a) and more text')).toContain('and more text')
   })
 
-  it('does not touch a comment that does not start the line', () => {
-    expect(removeMarkdownComments('Text [//]: # (x)')).toBe('Text [//]: # (x)')
-    expect(removeMarkdownComments('    [//]: # (x)')).toBe('    [//]: # (x)')
+  it('does not touch a comment that does not start a block', async () => {
+    expect(await render('Text [//]: # (x)')).toContain('Text [//]: # (x)')
   })
 
   it('still turns the title comment into the heading', async () => {
     const html = await render('[//]: # (title: Getting started with KSP (Kotlin))\n[//]: # (description: About (KSP).)\n\nText.')
     expect(html).toMatch(/^<h1 [^>]*>Getting started with KSP \(Kotlin\) <a class="header-anchor"/)
-    expect(html).not.toContain('[//]')
+    expect(leaked(html)).toBe(false)
   })
 
   it('leaves comments that already rendered as nothing unchanged in the output', async () => {

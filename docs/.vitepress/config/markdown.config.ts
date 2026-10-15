@@ -108,8 +108,6 @@ export function registerMarkdownPlugins(md: any) {
   md.use(markdownItRemoveContributeUrl)
   md.use(markdownItRemoveScript)
   md.use(markdownItCollapsed)
-  // After the source rewriters above (title comment, includes), so it sees
-  // their output and leaves the title comment to ws-frontmatter.
   md.use(markdownItRemoveComments)
 
   // Custom containers
