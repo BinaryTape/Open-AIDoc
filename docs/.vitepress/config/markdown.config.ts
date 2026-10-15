@@ -30,6 +30,7 @@ import markdownItMKInclude from "../plugins/markdown/mkdocs/markdown-it-mk-Inclu
 // ===== Common plugins =====
 import markdownItRemoveScript from "../plugins/markdown/common/markdown-it-remove-script"
 import markdownItRemoveContributeUrl from "../plugins/markdown/common/markdown-it-remove-contribute-url"
+import markdownItRemoveComments from "../plugins/markdown/common/markdown-it-remove-comments"
 import { markdownItCollapsed } from "../plugins/markdown/common/markdownItCollapsed.mts"
 import markdownItAutoTitle from "../plugins/markdown/common/markdown-it-auto-title"
 import { isDocType } from '../utils/doctype-utils'
@@ -107,6 +108,9 @@ export function registerMarkdownPlugins(md: any) {
   md.use(markdownItRemoveContributeUrl)
   md.use(markdownItRemoveScript)
   md.use(markdownItCollapsed)
+  // After the source rewriters above (title comment, includes), so it sees
+  // their output and leaves the title comment to ws-frontmatter.
+  md.use(markdownItRemoveComments)
 
   // Custom containers
   createContainer(md, 'note', 'note', 'NOTE')
