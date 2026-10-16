@@ -31,6 +31,7 @@ import markdownItMKInclude from "../plugins/markdown/mkdocs/markdown-it-mk-Inclu
 import markdownItRemoveScript from "../plugins/markdown/common/markdown-it-remove-script"
 import markdownItRemoveContributeUrl from "../plugins/markdown/common/markdown-it-remove-contribute-url"
 import markdownItRemoveComments from "../plugins/markdown/common/markdown-it-remove-comments"
+import markdownItHtmlLinkLevel from "../plugins/markdown/common/markdown-it-html-link-level"
 import { markdownItCollapsed } from "../plugins/markdown/common/markdownItCollapsed.mts"
 import markdownItAutoTitle from "../plugins/markdown/common/markdown-it-auto-title"
 import { isDocType } from '../utils/doctype-utils'
@@ -109,6 +110,7 @@ export function registerMarkdownPlugins(md: any) {
   md.use(markdownItRemoveScript)
   md.use(markdownItCollapsed)
   md.use(markdownItRemoveComments)
+  md.use(markdownItHtmlLinkLevel)
 
   // Custom containers
   createContainer(md, 'note', 'note', 'NOTE')
