@@ -15,6 +15,10 @@ const rewiteOptions: RewriteLinkOptions = {
     const docType = parts.find(p => DOCS_TYPES.includes(p))
     if (!docType) return href
 
+    // The sync pipeline wrote some links as `//server-plugins` (an empty doc
+    // name). A host without a dot is no site: read it as `/<doc>/server-plugins`.
+    href = href.replace(/^\/\/(?=[^/.?#]+(?:[?#]|$))/, `/${docType}/`)
+
     const rewriteForDocType = DocsTypeConfig[docType].rewriteHref
     if (rewriteForDocType) {
       return rewriteForDocType(env, href)
@@ -96,10 +100,10 @@ export function markdownItRewriteLinks(md: MarkdownIt) {
           }
         )
 
-        // 处理a标签
+        // 处理a标签, and <Links> (a link with a summary tooltip, Link.vue)
         token.content = token.content.replace(
-          /<a\s+([^>]*?)href\s*=\s*["']([^"']+)["']([^>]*?)>/gi,
-          (match, beforeHref, hrefValue, afterHref) => {
+          /<(a|Links)\s+([^>]*?)href\s*=\s*["']([^"']+)["']([^>]*?)>/gi,
+          (match, tag, beforeHref, hrefValue, afterHref) => {
             // External URLs do not need site-local rewriting.
             if (hrefValue.startsWith('http')) {
               return match
@@ -107,7 +111,7 @@ export function markdownItRewriteLinks(md: MarkdownIt) {
 
             // 使用与其他链接相同的逻辑处理href路径
             const newHref = rewiteOptions.rewriteHref(state.env, hrefValue)
-            return `<a ${beforeHref}href="${newHref}"${afterHref}>`
+            return `<${tag} ${beforeHref}href="${newHref}"${afterHref}>`
           }
         )
       }
