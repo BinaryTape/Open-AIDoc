@@ -88,12 +88,12 @@ export async function processTopicFileAsync(inputFile, outputPath, isKtor = fals
 }
 
 export async function processTopicContentAsync(currentFilePath, docsPath, topicContent) {
-    const docName = docsPath.split('/')[0].split('-')[0];
-    const docRoot = `/${docName}/`;
-
-    function docHref(href) {
-        return `${docRoot}${href.split('.')[0]}`;
-    }
+    // Keep the topic link as upstream writes it (`server-plugins.topic`). The
+    // site resolves it per page, into the reader's language, like any <a>
+    // (docs/.vitepress/link-rewrites). Building `/<doc>/<topic>` here took the
+    // doc name from the file path, which is empty for an absolute path:
+    // `//server-plugins`, and never had the language.
+    const docHref = (href) => href;
 
     topicContent = topicContent.replace(
         /<path>([\s\S]*?)<\/path>/g,

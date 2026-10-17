@@ -31,6 +31,11 @@ describe('<Links> hrefs', () => {
     expect(hrefOf(html, 'Links')).toBe('/ja/ktor/server-create-restful-apis#routes')
   })
 
+  it('resolves the topic as the pipeline now writes it', async () => {
+    const html = await render('See <Links href="server-native.topic" summary="Native server.">native</Links>.', 'ko/ktor/server-plugins.md')
+    expect(hrefOf(html, 'Links')).toBe('/ko/ktor/server-native')
+  })
+
   it('handles the KMP pages too', async () => {
     const html = await render('See <Links href="/kmp/get-started" summary="Start.">start</Links>.', 'ja/kmp/multiplatform-intro.md')
     expect(hrefOf(html, 'Links')).toBe('/ja/kmp/get-started')

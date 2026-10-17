@@ -61,4 +61,17 @@ describe('Writerside Markdown processing', () => {
     expect(out).not.toContain('undefined')
     expect(out).toContain('summary=""')
   })
+
+  // The page is at an absolute path here, as in CI. The site resolves the
+  // target per page and language (docs/.vitepress/link-rewrites).
+  it('keeps the target of a <Links> as written, not //<topic>', async () => {
+    const out = await process('See <a href="other.topic">the other page</a>.')
+    expect(out).toContain('<Links href="other.topic" summary="')
+    expect(out).not.toContain('href="//')
+  })
+
+  it('keeps the target of a card as written', async () => {
+    const out = await process('<a href="other.topic" summary="About it.">Other</a>')
+    expect(out).toContain('<card href="other.topic" summary="About it.">Other</card>')
+  })
 })
