@@ -75,8 +75,9 @@ export function markdownItRewriteLinks(md: MarkdownIt) {
     for (let i = 0; i < tokens.length; i++) {
       const token = tokens[i]
 
-      // 查找HTML标签开始
-      if (token.type === 'html_block') {
+      // 查找HTML标签开始. A line holding only an inline component, such as
+      // <Links …>…</Links>, is a top-level html_inline token (VitePress).
+      if (token.type === 'html_block' || token.type === 'html_inline') {
         token.content = rewriteHtmlAttributes(
           token.content,
           ["src", "href"],

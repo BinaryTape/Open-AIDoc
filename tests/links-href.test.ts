@@ -36,6 +36,12 @@ describe('<Links> hrefs', () => {
     expect(hrefOf(html, 'Links')).toBe('/ko/ktor/server-native')
   })
 
+  it('handles a <Links> on a line of its own', async () => {
+    // A top-level html_inline token, not a paragraph (ja/kmp/quickstart).
+    const html = await render('Text.\n\n<Links href="/kmp/kotlin-toolchain" summary="s">Start</Links>\n\n## Next\n', 'ja/kmp/quickstart.md')
+    expect(hrefOf(html, 'Links')).toBe('/ja/kmp/kotlin-toolchain')
+  })
+
   it('handles the KMP pages too', async () => {
     const html = await render('See <Links href="/kmp/get-started" summary="Start.">start</Links>.', 'ja/kmp/multiplatform-intro.md')
     expect(hrefOf(html, 'Links')).toBe('/ja/kmp/get-started')
