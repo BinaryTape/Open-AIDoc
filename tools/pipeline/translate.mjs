@@ -8,6 +8,7 @@ import { loadPageCheck } from "./utils/page-check.mjs";
 import { applySourceAnchors } from "./utils/heading-anchors.mjs";
 import { restoreTitleComment } from "./utils/title-comment.mjs";
 import { stripWrapperFence } from "./utils/wrapper-fence.mjs";
+import { assertCodeBlocksUnchanged, protectCodeBlocks } from "./utils/code-protection.mjs";
 import { checkTranslation } from "./utils/translation-check.mjs";
 import { FatalApiError, TranslationRejected, withRetry } from "./utils/llm-retry.mjs";
 
@@ -430,8 +431,9 @@ function summarizeProblems(problems) {
 
 // Translate one file into one language and write the result
 async function translateUnit(filePath, targetLang, source, pageCheck = null) {
-  const prompt = prepareTranslationPrompt(source, targetLang);
-  let translated = cleanupTranslation(await callGemini(prompt, targetLang), source);
+  const protection = protectCodeBlocks(source);
+  const prompt = protection.instructions + prepareTranslationPrompt(protection.content, targetLang);
+  let translated = finishDocumentTranslation(await callGemini(prompt, targetLang), protection);
 
   // A Writerside title comment rewritten as YAML frontmatter leaves the
   // page with no H1 at all.
@@ -453,6 +455,9 @@ async function translateUnit(filePath, targetLang, source, pageCheck = null) {
     console.warn(`⚠️ Keeping upstream anchors out of ${targetPath}: ${anchored.skipped}`);
   }
 
+  // Title and anchor repairs must also leave the restored code untouched.
+  assertCodeBlocksUnchanged(source, anchored.content);
+
   // One page the site cannot compile stops the whole site from building.
   const buildProblems = pageCheck ? await pageCheck(pagePath(targetPath), anchored.content) : [];
   if (buildProblems.length > 0) {
@@ -472,20 +477,15 @@ export function cleanupTranslation(text, source) {
   // Remove a code fence wrapping the whole document (```markdown, ```xml, …).
   text = stripWrapperFence(text, source);
 
-  // A model occasionally returns the whole document on one line with a literal
-  // `\n` wherever a line break belongs. Unescaping is only safe when there is
-  // no real line break to prove the document already arrived intact: Markdown
-  // carries `\n` inside code samples and escape-sequence tables, and rewriting
-  // those splits string literals and table rows apart.
-  if (!text.includes("\n")) {
-    text = text.replace(/\\n/g, "\n");
-  }
+  // SDK responses are already decoded. Never interpret escapes in document text.
+  const protection = protectCodeBlocks(text);
+  text = protection.content;
 
   // Remove extra blank lines
   text = text.replace(/\n{3,}/g, "\n\n");
 
-  // Remove possible extra spaces
-  text = text.trim();
+  // Remove outer blank lines without stripping a protected block's indentation.
+  text = text.replace(/^(?:[\t ]*\r?\n)+/, "").trimEnd();
 
   // Fix YAML frontmatter values with special characters that need quoting
   text = fixFrontmatterQuoting(text);
@@ -493,7 +493,12 @@ export function cleanupTranslation(text, source) {
   // Prevent translated Markdown from being parsed as broken Vue templates.
   text = fixVueMarkdownParsing(text);
 
-  return text;
+  return protection.restore(text);
+}
+
+// Shared by the sync pipeline and both local translation endpoints.
+export function finishDocumentTranslation(text, protection) {
+  return protection.restore(cleanupTranslation(text, protection.content));
 }
 
 function fixVueMarkdownParsing(text) {
