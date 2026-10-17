@@ -113,7 +113,38 @@ export function renameBodyTitles(node: TemplateNode, context: { parent: Template
   ]
 }
 
+const COMMENT_NODE = 3 // NodeTypes.COMMENT
+interface AttributeNode { type: number, name?: string }
+
+const isParagraph = (node: TemplateNode) =>
+  node.type === ELEMENT_NODE && node.tag === 'p' && node.tagType === PLAIN_ELEMENT
+
+/** Children other than comments and whitespace. */
+const contentChildren = (node: TemplateNode) => (node.children ?? []).filter((child) =>
+  child.type !== COMMENT_NODE &&
+  !(child.type === TEXT_NODE && !(child as { content?: string }).content?.trim()))
+
+/**
+ * Writerside wraps an `<include>` of a `<p>` snippet in `<p>`; once the
+ * include is expanded, the page has `<p><p>…</p></p>`. The browser closes the
+ * outer paragraph at the inner one and turns the last `</p>` into an empty
+ * paragraph, so hydration fails and Vue clears the content. Keep one
+ * paragraph, with the attributes of both (the inner one's win).
+ */
+export function unwrapNestedParagraphs(node: TemplateNode): void {
+  if (!isParagraph(node)) return
+  for (;;) {
+    const children = contentChildren(node)
+    const inner = children.length === 1 ? children[0] : null
+    if (!inner || !isParagraph(inner)) return
+    const innerProps = (inner.props ?? []) as AttributeNode[]
+    const innerNames = new Set(innerProps.map((prop) => prop.name))
+    node.props = [...((node.props ?? []) as AttributeNode[]).filter((prop) => !innerNames.has(prop.name)), ...innerProps]
+    node.children = inner.children ?? []
+  }
+}
+
 export const vueCompilerOptions = {
   isCustomElement: isPlainElement,
-  nodeTransforms: [wrapTableRows, renameBodyTitles],
+  nodeTransforms: [wrapTableRows, renameBodyTitles, unwrapNestedParagraphs],
 }

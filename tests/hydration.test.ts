@@ -75,6 +75,31 @@ describe('template compiler options', () => {
     // A component reading <title> from its slot still gets it.
     expect(compile('<cards><title>Start</title></cards>')).toMatch(/_createVNode\("title"|"title"/)
   })
+
+  describe('a paragraph whose only content is a paragraph', () => {
+    // In a container, as on a page: the root element gets Vue's fallthrough attributes.
+    const compile = (source: string) => compileTemplate({ source: `<div>${source}</div>`, filename: 'page.md', id: 'page', ssr: true, ssrCssVars: [], compilerOptions: vueCompilerOptions }).code
+
+    it('becomes one paragraph, as the browser cannot nest them', () => {
+      // An <include> of a <p> snippet, wrapped in <p> (ktor/server-create-websocket-application).
+      const code = compile('<ol><li><p>\n    <p>Click the Gradle icon\n    (<img alt="icon" src="i.svg"/>) to load changes.</p>\n</p></li></ol>')
+      expect(code).toContain('<ol><li><p>Click the Gradle icon (<img alt="icon" src="i.svg">) to load changes.</p></li></ol>')
+    })
+
+    it('keeps the attributes of both', () => {
+      expect(compile('<p id="outer" class="a"><p class="b">Text.</p></p>')).toContain('<p id="outer" class="b">Text.</p>')
+    })
+
+    it('handles more than two levels and comments', () => {
+      expect(compile('<p><!-- c --><p><p>Text.</p></p></p>')).toMatch(/><p>Text\.<\/p><\/div>/)
+    })
+
+    it('leaves a paragraph with other content alone', () => {
+      expect(compile('<p>Before <p>Inner.</p></p>')).toContain('<p>Before <p>Inner.</p></p>')
+      expect(compile('<p><p>One.</p><p>Two.</p></p>')).toContain('<p><p>One.</p><p>Two.</p></p>')
+      expect(compile('<p>Plain.</p>')).toContain('<p>Plain.</p>')
+    })
+  })
 })
 
 describe('components', () => {
