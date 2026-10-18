@@ -670,7 +670,7 @@
   "coroutines.flows": "Flow",
   "coroutines.coroutines-flow": "개요",
   "kmp.kotlin-toolchain": "Kotlin 툴체인",
-  "kmp.whats-new-compose-112": "Compose Multiplatform 1.12.1",
+  "kmp.whats-new-compose-112": "Compose Multiplatform 1.12.2",
   "kotlin.take-kotlin-tour": "Kotlin tour 시작하기",
   "kotlin.beginner": "초급",
   "kotlin.intermediate": "중급",
@@ -738,5 +738,7 @@
   "serialization.alternative-and-custom-serialization-formats": "대체 및 커스텀 직렬화 형식",
   "callout.note": "참고",
   "callout.tip": "팁",
-  "callout.warning": "경고"
+  "callout.warning": "경고",
+  "kotlin.jvm-backend-faq": "FAQ",
+  "kotlin.reflection": "Reflection (kotlin-reflect)"
 }

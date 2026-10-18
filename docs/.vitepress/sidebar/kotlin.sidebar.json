@@ -361,10 +361,6 @@
         "collapsed": true
       },
       {
-        "text": "kotlin.reflection",
-        "link": "reflection"
-      },
-      {
         "text": "kotlin.destructuring-declarations",
         "link": "destructuring-declarations"
       },
@@ -444,6 +440,10 @@
           {
             "text": "kotlin.spring-boot-claude",
             "link": "spring-boot-claude"
+          },
+          {
+            "text": "kotlin.jvm-backend-faq",
+            "link": "jvm-backend-faq"
           }
         ],
         "collapsed": true
@@ -971,6 +971,10 @@
       {
         "text": "kotlin.metadata-jvm",
         "link": "metadata-jvm"
+      },
+      {
+        "text": "kotlin.reflection",
+        "link": "reflection"
       },
       {
         "text": "kotlin.data-analysis",

@@ -637,7 +637,7 @@
   "coroutines.flows": "Flows",
   "coroutines.coroutines-flow": "Overview",
   "kmp.kotlin-toolchain": "Kotlin Toolchain",
-  "kmp.whats-new-compose-112": "Compose Multiplatform 1.12.1",
+  "kmp.whats-new-compose-112": "Compose Multiplatform 1.12.2",
   "kotlin.take-kotlin-tour": "Take Kotlin tour",
   "kotlin.beginner": "Beginner",
   "kotlin.intermediate": "Intermediate",
@@ -703,5 +703,7 @@
   "serialization.configure-json-serialization": "Configure JSON serialization",
   "serialization.serialization-configure-json-serialization": "Overview",
   "serialization.serialization-transform-json": "JSON transformation",
-  "serialization.alternative-and-custom-serialization-formats": "Alternative and custom serialization formats"
+  "serialization.alternative-and-custom-serialization-formats": "Alternative and custom serialization formats",
+  "kotlin.jvm-backend-faq": "FAQ",
+  "kotlin.reflection": "Reflection (kotlin-reflect)"
 }

@@ -3,39 +3,39 @@
 <show-structure for="chapter" depth="2"/>
 
 <link-summary>
-插件提供常用功能，例如序列化、内容编码、压缩等。
+插件提供通用功能性，例如序列化、内容编码、压缩等。
 </link-summary>
 
 Ktor 中典型的请求/响应流水线如下所示：
 
-![请求响应流水线](request-response-pipeline.png){width="600"}
+![Request Response Pipeline](request-response-pipeline.png){width="600"}
 
-它以请求开始，该请求被路由到特定的处理程序，由我们的应用程序逻辑处理，并最终得到响应。 
+服务器接收请求并通过请求流水线对其进行处理。Ktor 将请求路由到相应的处理程序，由您的应用程序逻辑对其进行处理。然后，响应在发送到客户端之前会经过响应流水线。
 
 ## 通过插件添加功能 {id="add_functionality"}
 
-许多应用程序需要超出应用程序逻辑范围的通用功能。这些可能是序列化和内容编码、压缩、标头、Cookie 支持等。所有这些都在 Ktor 中通过我们所谓的**插件**提供。 
+许多应用程序都需要独立于应用程序逻辑的功能性。这包括身份验证、序列化和内容编码、压缩、标头、Cookie 等。在 Ktor 中，此类功能性由*插件*提供。
 
-如果我们查看之前的流水线图，插件位于请求/响应与应用程序逻辑之间：
+插件可以拦截请求和响应处理的不同阶段。因此，它们可以应用在请求/响应流水线的不同节点上：
 
-![插件流水线](plugin-pipeline.png){width="600"}
+![Plugin pipeline](plugin-pipeline.png){width="600"}
 
-当请求进入时：
+插件运行的具体阶段取决于该插件本身以及它所使用的钩子或流水线阶段。通常，请求的处理流程如下：
 
-* 它通过路由机制被路由到正确的处理程序 
-* 在移交给处理程序之前，它会经过一个或多个插件
-* 处理程序（应用程序逻辑）处理该请求
-* 在响应发送到客户端之前，它会经过一个或多个插件
+* 路由机制确定应由哪个处理程序来处理该请求。
+* 在移交给处理程序之前，请求会由一个或多个插件进行处理。
+* 处理程序使用应用程序逻辑生成响应。
+* 在响应发送到客户端之前，响应会由一个或多个插件进行处理。
 
-## 路由是一个插件 {id="routing"}
+## 路由本身也是插件 {id="routing"}
 
-插件的设计方式旨在提供最大的灵活性，并允许它们存在于请求/响应流水线的任何环节。
-事实上，我们一直称之为 `routing` 的部分，本质上也不过是一个插件。 
+插件旨在提供最大的灵活性，并可存在于请求/响应流水线的任何环节中。在 Ktor 中，`routing` 本身就是作为一个插件实现的：
 
-![作为插件的路由](plugin-pipeline-routing.png){width="600"}
+![Routing as a Plugin](plugin-pipeline-routing.png){width="600"}
 
 ## 添加插件依赖项 {id="dependency"}
-大多数插件需要特定的依赖项。例如，`CORS` 插件需要通过在构建脚本中添加 `ktor-server-cors` 构件：
+
+大多数插件都需要单独的依赖项。例如，[`CORS`](server-cors.md) 插件需要在构建脚本中包含 `ktor-server-cors` 构件：
 
 <var name="artifact_name" value="ktor-server-cors"/>
 <Tabs group="languages">
@@ -50,9 +50,16 @@ Ktor 中典型的请求/响应流水线如下所示：
     </TabItem>
 </Tabs>
 
+> 有关可用插件的完整列表，请参阅 [Ktor 项目生成器](https://start.ktor.io/settings)。有关特定插件所需的依赖项，请参阅相应的插件文档。
+> 
+{style="tip"}
+
 ## 安装插件 {id="install"}
 
-插件通常在服务器初始化阶段使用 `install` 函数进行配置，该函数接受一个插件作为参数。根据您[创建服务器](server-create-and-configure.topic)的方式，您可以在 `embeddedServer` 调用中安装插件……
+插件通常在服务器初始化阶段使用 `install()` 函数进行配置。根据您[创建服务器](server-create-and-configure.topic)的方式，您可以在 `embeddedServer()` 函数内部或在[应用程序模块](server-modules.md)中安装插件：
+
+<Tabs>
+<TabItem title="embeddedServer()">
 
 ```kotlin
 import io.ktor.server.application.*
@@ -68,7 +75,8 @@ fun main() {
 }
 ```
 
-……或者在指定的[模块](server-modules.md)中安装：
+</TabItem>
+<TabItem title="Application.module()">
 
 ```kotlin
 import io.ktor.server.application.*
@@ -82,9 +90,12 @@ fun Application.module() {
 }
 ```
 
-除了拦截请求和响应外，插件还可以包含一个在这一步进行配置的可选配置部分。
+</TabItem>
+</Tabs>
 
-例如，在安装 [Cookies](server-sessions.md#cookie) 时，我们可以设置某些参数，例如我们希望存储 Cookie 的位置或其名称：
+在安装插件时，您可以通过向 `install()` 函数传递配置块来配置插件。
+
+例如，在安装 [`Sessions` 插件](server-sessions.md)时，您可以通过指定会话类型和 Cookie 名称来配置基于 Cookie 的会话：
 
 ```kotlin
 install(Sessions) {
@@ -92,9 +103,11 @@ install(Sessions) {
 } 
 ```
 
-### 为特定路由安装插件 {id="install-route"}
+### 将插件安装到特定路由 {id="install-route"}
 
-在 Ktor 中，您不仅可以全局安装插件，还可以为特定的[路由](server-routing.md)安装插件。如果您需要为不同的应用程序资源使用不同的插件配置，这会非常有用。例如，下面的[示例](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/caching-headers-routes)显示了如何为 `/index` 路由添加指定的[缓存标头](server-caching-headers.md)：
+在 Ktor 中，您不仅可以全局安装插件，还可以将它们安装在特定的[路由](server-routing.md)上。当不同资源需要不同的插件配置时，这非常有用。
+
+例如，以下代码演示了在 `/index` 路由上安装 [`CachingHeader` 插件](server-caching-headers.md)，并配置其添加缓存标头：
 
 ```kotlin
 route("/index") {
@@ -107,34 +120,35 @@ route("/index") {
 }
 ```
 
-注意，以下规则适用于同一插件的多次安装：
-* 安装到特定路由的插件配置会覆盖其[全局配置](#install)。
-* 路由会合并同一路由的安装，且最后一次安装生效。例如，对于这样一个应用程序…… 
+当在多个层级安装相同的插件时，Ktor 会应用以下规则：
+
+* 安装到特定路由的插件配置会覆盖相应的[全局插件配置](#install)。
+* 如果同一路由被多次定义且包含同一插件的多次安装，则路由会合并该路由上的安装。以最后一次安装为准。
+
+在以下示例中，对 `/index/a` 和 `/index/b` 的调用都仅由第二个 `CachingHeaders` 安装处理：
    
-   ```kotlin
-   routing {
-       route("index") {
-           install(CachingHeaders) { /* 第一次配置 */ }
-           get("a") {
-               // ...
-           }
-       }
-       route("index") {
-           install(CachingHeaders) { /* 第二次配置 */ }
-           get("b") {
-               // ...
-           }
-       }
-   }
-   ```
-   {initial-collapse-state="collapsed" collapsed-title="install(CachingHeaders) { // 第一次配置 }"}
-   
-   ……对 `/index/a` 和 `/index/b` 的调用都仅由该插件的第二次安装处理。
+ ```kotlin
+ routing {
+     route("index") {
+         install(CachingHeaders) { /* First configuration */ }
+         get("a") {
+             // ...
+         }
+     }
+     route("index") {
+         install(CachingHeaders) { /* Second configuration */ }
+         get("b") {
+             // ...
+         }
+     }
+ }
+ ```
+ {initial-collapse-state="collapsed" collapsed-title="install(CachingHeaders) { // First configuration }"}
 
-## 默认、可用及自定义插件 {id="default_available_custom"}
+## 默认、可用和自定义插件 {id="default_available_custom"}
 
-默认情况下，Ktor 不会激活任何插件，因此需要您根据应用程序所需的功能自行安装插件。
+Ktor 默认不安装应用程序插件。请安装能提供应用程序所需功能性的插件。
 
-不过，Ktor 确实提供了多种开箱即用的插件。您可以在 [Ktor 插件库](https://github.com/ktorio/ktor-plugin-registry/tree/main/plugins/server)中查看这些插件的完整列表。
+Ktor 提供了丰富的插件。您可以在 [Ktor 项目生成器](https://start.ktor.io/settings)中找到可用插件的完整列表。
 
-此外，您还可以创建自己的[自定义插件](server-custom-plugins.md)。
+您还可以创建自己的[自定义插件](server-custom-plugins.md)，以封装可在应用程序内重用或与其他应用程序共享的功能性。

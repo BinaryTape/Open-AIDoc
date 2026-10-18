@@ -669,7 +669,7 @@
   "coroutines.flows": "Flow",
   "coroutines.coroutines-flow": "概要",
   "kmp.kotlin-toolchain": "Kotlin ツールチェーン",
-  "kmp.whats-new-compose-112": "Compose Multiplatform 1.12.1",
+  "kmp.whats-new-compose-112": "Compose Multiplatform 1.12.2",
   "kotlin.take-kotlin-tour": "Kotlinツアーに参加する",
   "kotlin.beginner": "初級",
   "kotlin.intermediate": "中級",
@@ -737,5 +737,7 @@
   "serialization.alternative-and-custom-serialization-formats": "代替およびカスタムのシリアル化フォーマット",
   "callout.note": "注記",
   "callout.tip": "ヒント",
-  "callout.warning": "警告"
+  "callout.warning": "警告",
+  "kotlin.jvm-backend-faq": "FAQ",
+  "kotlin.reflection": "Reflection (kotlin-reflect)"
 }

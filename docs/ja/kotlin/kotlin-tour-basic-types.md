@@ -2,17 +2,16 @@
 
 <no-index/>
 
-Kotlinのすべての変数とデータ構造には型があります。型は、その変数やデータ構造に対して何を実行できるか、つまりどのような関数やプロパティを持っているかをコンパイラに伝えるため、非常に重要です。
+Kotlin のすべての変数とデータ構造には型があります。型は、コンパイラに対してその変数やデータ構造で何を行うことが許可されているか、言い換えればどのような関数やプロパティを持っているかを伝えるため重要です。
 
-前の章の例では、Kotlinは `customers` が [`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/) 型であることを判断できました。
-このように型を**推論**するKotlinの機能を**型推論**（type inference）と呼びます。`customers` には整数値が代入されています。このことから、Kotlinは `customers` が数値型である `Int` を持っていると推論します。その結果、コンパイラは `customers` に対して算術演算を実行できると認識します。
+前章の例では、Kotlin は `customers` の型が [`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/) であると判断できました。型を**推論**する Kotlin の能力は**型推論**（type inference）と呼ばれます。`customers` には整数値が代入されています。これに基づいて、Kotlin は `customers` が数値型 `Int` を持っていると推論します。その結果、コンパイラは `customers` に対して算術演算を実行できることを認識します。
 
 ```kotlin
 fun main() {
 //sampleStart
     var customers = 10
 
-    // 何人かの顧客が列を離れる
+    // 何人かの客が列を離れる
     customers = 8
 
     customers = customers + 3 // 加算の例: 11
@@ -27,26 +26,26 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-basic-types-arithmetic"}
 
-> `+=`、`-=`、`*=`、`/=`、`%=` は複合代入演算子（augmented assignment operator）です。詳細については、[複合代入](operator-overloading.md#augmented-assignments)を参照してください。
+> `+=`、`-=`、`*=`、`/=`、および `%=` は累加代入演算子（augmented assignment operators）です。詳細については、[累加代入](operator-overloading.md#augmented-assignments)を参照してください。
 > 
 {style="tip"}
 
-Kotlinには、全体として以下の基本型があります。
+Kotlin には全体で以下の基本型があります。
 
-| **カテゴリ**                                              | **基本型**                    | **サンプルコード**                                                  |
+| **カテゴリ**                                              | **基本型**                         | **コード例**                                                      |
 |-----------------------------------------------------------|------------------------------------|-------------------------------------------------------------------|
-| [整数型](numbers.md#integer-types)                      | `Byte`, `Short`, `Int`, `Long`     | `val year: Int = 2020`<br/> `val amount: Long = 350_000_000`      |
-| [符号なし整数型](unsigned-integer-types.md)            | `UByte`, `UShort`, `UInt`, `ULong` | `val score: UInt = 100u`                                          |
-| [浮動小数点数型](numbers.md#floating-point-types) | `Float`, `Double`                  | `val currentTemp: Float = 24.5f`<br/> `val price: Double = 19.99` |
-| [真偽値型](booleans.md)                                   | `Boolean`                          | `val isEnabled: Boolean = true`                                   |
-| [文字型](characters.md)                               | `Char`                             | `val separator: Char = ','`                                       |
-| [文字列型](strings.md)                                     | `String`                           | `val message: String = "Hello, world!"`                           |
+| [整数](numbers.md#integer-types)                          | `Byte`, `Short`, `Int`, `Long`     | `val year: Int = 2020`<br/> `val amount: Long = 350_000_000`      |
+| [符号なし整数](unsigned-integer-types.md)                 | `UByte`, `UShort`, `UInt`, `ULong` | `val score: UInt = 100u`                                          |
+| [浮動小数点数](numbers.md#floating-point-types)           | `Float`, `Double`                  | `val currentTemp: Float = 24.5f`<br/> `val price: Double = 19.99` |
+| [真偽値](booleans.md)                                     | `Boolean`                          | `val isEnabled: Boolean = true`                                   |
+| [文字](characters.md)                                     | `Char`                             | `val separator: Char = ','`                                       |
+| [文字列](strings.md)                                       | `String`                           | `val message: String = "Hello, world!"`                           |
 
-基本型とそのプロパティに関する詳細については、[型の概要](types-overview.md)を参照してください。
+基本型とそのプロパティの詳細については、[型の概要](types-overview.md)を参照してください。
 
-この知識があれば、変数を宣言しておき、後で初期化することができます。変数への最初の読み取りアクセスが発生する前に初期化されていれば、Kotlinはこれを適切に処理できます。
+この知識があれば、変数を宣言して後から初期化することができます。変数が最初に出現する（読み取られる）前に初期化されていれば、Kotlin はこれを処理できます。
 
-初期化せずに変数を宣言するには、`:` を使って型を指定します。例えば以下のようになります。
+変数を初期化せずに宣言するには、`:` を使用してその型を指定します。例えば：
 
 ```kotlin
 fun main() {
@@ -56,10 +55,10 @@ fun main() {
     // 変数を初期化
     d = 3
 
-    // 明示的に型を指定して初期化された変数
+    // 型を明示して変数を初期化
     val e: String = "hello"
 
-    // 初期化されているため変数を読み取ることができる
+    // 変数は初期化されているため読み取り可能
     println(d) // 3
     println(e) // hello
 //sampleEnd
@@ -75,7 +74,7 @@ fun main() {
     // 初期化なしで変数を宣言
     val d: Int
     
-    // エラーを引き起こす
+    // エラーが発生する
     println(d)
     // Variable 'd' must be initialized
 //sampleEnd
@@ -83,14 +82,14 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-basic-types-no-initialization" validate="false"}
 
-基本型の宣言方法がわかったところで、次は[コレクション](kotlin-tour-collections.md)について学びましょう。
+基本型の宣言方法を理解できたので、次は[コレクション](kotlin-tour-collections.md)について学びましょう。
 
 ## 練習問題 {completion-point="true" id="practice"}
 
 <deflist appearance="clear" collapsible="true">
-<def title="変数に明示的な型を宣言する">
+<def title="変数の型を明示的に宣言する" id="basic-types-exercise-1">
 
-各変数に対して正しい型を明示的に宣言してください：
+各変数に対して適切な型を明示的に宣言してください：
 
 ```kotlin
 fun main() {

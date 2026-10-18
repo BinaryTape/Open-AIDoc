@@ -1,57 +1,57 @@
-[//]: # (title: 使用 Kotlin 與 JUnit 測試 Java 程式碼 – 教學)
+[//]: # (title: 使用 Kotlin 和 JUnit 測試 Java 程式碼 – 教學)
 
-<web-summary>設定使用 Maven 或 Gradle 建置的 Java 專案，以整合使用 Kotlin 編寫的 JUnit 測試。</web-summary>
+<web-summary>設定以 Maven 或 Gradle 建置的 Java 專案，以整合用 Kotlin 編寫的 JUnit 測試。</web-summary>
 
-Kotlin 與 Java 完全互通，這意指您可以使用 Kotlin 為 Java 程式碼編寫測試，並將它們與同一個專案中現有的 Java 測試一起執行。
+Kotlin 與 Java 完全互通，這意味著你可以使用 Kotlin 為 Java 程式碼撰寫測試，並在同一個專案中與現有的 Java 測試一起執行。
 
-在本教學中，您將學習如何：
+在本教學中，你將學習如何：
 
-* 配置混合 Java–Kotlin 專案，以使用 [JUnit](https://junit.org/) 執行測試。
+* 配置混合 Java–Kotlin 的專案以使用 [JUnit](https://junit.org/) 執行測試。
 * 新增驗證 Java 程式碼的 Kotlin 測試。
 * 使用 Maven 或 Gradle 執行測試。
 
-> 在開始之前，請確保您具備：
+> 開始之前，請確認你具備：
 >
 > * 已安裝 [Kotlin 擴充套件](https://github.com/Kotlin/kotlin-lsp/tree/main?tab=readme-ov-file#vs-code-quick-start) 的 [IntelliJ IDEA](https://www.jetbrains.com/idea/download/) 或 [VS Code](https://code.visualstudio.com/Download)。
-> * Java 17 或更高版本。
+> * Java 17 或更新版本。
 >
 {style="note"}
 
 ## 配置專案 {id="configure-the-project"}
 
-1. 在您的 IDE 中，從版本控制系統複製範例專案：
+1. 在你的 IDE 中，從版本控制系統複製範例專案：
 
    ```text
    https://github.com/kotlin-hands-on/kotlin-junit-sample.git
    ```
 
-2. 導覽至 `initial` 模組並查看專案結構：
+2. 導覽至 `initial` 模組並檢視專案結構：
 
     ```text
     kotlin-junit-sample/
     ├── initial/
     │   ├── src/
     │   │   ├── main/java/    # Java 原始碼
-    │   │   └── test/java/    # Java 中的 JUnit 測試
+    │   │   └── test/java/    # Java 編寫的 JUnit 測試
     │   ├── pom.xml           # Maven 配置
     │   └── build.gradle.kts  # Gradle 配置
     ```
 
-   `initial` 模組包含一個使用 Java 編寫的簡單 Todo 應用程式，並附帶一個測試。
+   `initial` 模組包含一個使用 Java 編寫的簡易 Todo 應用程式，並附帶一個單一測試。
 
-3. 在同一個目錄中，開啟您的建置檔案並更新其內容以支援 Kotlin：
+3. 在同一個目錄下，開啟你的組建檔案並更新其內容以支援 Kotlin：
 
     <tabs group="build-system">
     <tab title="Maven" group-key="maven">
 
     ```xml
     ```
-   {src="jvm-test-tutorial/pom.xml" initial-collapse-state="collapsed" collapsible="true" ignore-vars="false" collapsed-title="pom.xml 檔案"}
+   {src="jvm-test-tutorial/pom.xml" initial-collapse-state="collapsed" collapsible="true" ignore-vars="false" collapsed-title="pom.xml file"}
 
     * 在 `<properties>` 區段中，設定 Kotlin 版本。
     * 在 `<dependencies>` 區段中，新增 JUnit Jupiter 相依性以執行測試。
-    * 在 `<build><plugins>` 區段中，套用 `<extensions>` 設定為 `true` 的 `kotlin-maven-plugin`。它會自動向建置新增對應的執行程序和 `kotlin-stdlib` 相依性。
-    * 當使用啟用了 extensions 的 Kotlin Maven 外掛程式時，您不需要在 `<build><pluginManagement>` 區段中新增 `maven-compiler-plugin`。
+    * 在 `<build><plugins>` 區段中，套用 `kotlin-maven-plugin` 並將 `<extensions>` 設定為 `true`。它會自動向組建新增對應的 execution 和 `kotlin-stdlib` 相依性。
+    * 當使用啟用了 extensions 的 Kotlin Maven 外掛程式時，你不需要將 `maven-compiler-plugin` 新增至 `<build><pluginManagement>` 區段。
 
     </tab>
     <tab title="Gradle" group-key="gradle">
@@ -97,12 +97,12 @@ Kotlin 與 Java 完全互通，這意指您可以使用 Kotlin 為 Java 程式�
    {initial-collapse-state="collapsed" collapsible="true" collapsed-title="build.gradle.kts"}
 
     * 在 `plugins {}` 區塊中，新增 `kotlin("jvm")` 外掛程式。
-    * 設定 JVM 工具鏈版本以符合您的 Java 版本。
-    * 在 `dependencies {}` 區塊中，新增 `kotlin.test` 程式庫，它提供了 Kotlin 的測試公用程式並與 JUnit 整合。
+    * 設定 JVM toolchain 版本以符合你的 Java 版本。
+    * 在 `dependencies {}` 區塊中，新增提供 Kotlin 測試公用程式並與 JUnit 整合的 `kotlin.test` 程式庫。
       
-    Kotlin/JVM 支援最新的穩定 JUnit 版本 JUnit 6。您可以在 `gradle/libs.versions.toml` 版本目錄中找到它。
+    Kotlin/JVM 支援最新的穩定 JUnit 版本 JUnit 6。你可以在 `gradle/libs.versions.toml` 版本目錄（version catalog）中找到它。
    
-    如果您通常偏好使用版本目錄，甚至可以在那裡新增 `kotlin("jvm")` 外掛程式：
+    如果你通常偏好使用版本目錄，你甚至可以將 `kotlin("jvm")` 外掛程式新增至其中：
 
     ```toml
     # gradle/libs.versions.toml
@@ -124,17 +124,17 @@ Kotlin 與 Java 完全互通，這意指您可以使用 Kotlin 為 Java 程式�
     </tab>
     </tabs>
 
-4. 在您的 IDE 中重新載入建置檔案。
+4. 在 IDE 中重新載入組建檔案。
 
-如需有關建置檔案設定的更多詳細說明，請參閱 [專案配置](mixing-java-kotlin-intellij.md#project-configuration)。
+如需組建檔案設定的更詳細指示，請參閱[專案配置](mixing-java-kotlin-intellij.md#project-configuration)。
 
-## 新增您的第一個 Kotlin 測試 {id="add-your-first-kotlin-test"}
+## 新增你的第一個 Kotlin 測試 {id="add-your-first-kotlin-test"}
 
-位於 `initial/src/test/java` 中的 `TodoItemTest.java` 測試已經驗證了應用程式的基本功能：項目建立、預設值、唯一 ID 以及狀態變更。
+`initial/src/test/java` 中的 `TodoItemTest.java` 測試已經驗證了應用程式的基本功能：項目建立、預設值、唯一識別碼和狀態變更。
 
-您可以透過新增一個驗證存儲庫層級行為的 Kotlin 測試來擴展測試涵蓋率：
+你可以透過新增驗證存儲庫層級行為的 Kotlin 測試來擴展測試涵蓋率：
 
-1. 導覽至相同的測試原始碼目錄 `initial/src/test/java`。
+1. 導覽至同一個測試原始碼目錄：`initial/src/test/java`。
 2. 在與 Java 測試相同的套件中建立 `TodoRepositoryTest.kt` 檔案。
 3. 建立帶有欄位宣告和設定函式的測試類別：
 
@@ -161,7 +161,7 @@ Kotlin 與 Java 完全互通，這意指您可以使用 Kotlin 為 Java 程式�
    ```
 
     * JUnit 註解在 Kotlin 中的運作方式與在 Java 中相同。
-    * 在 Kotlin 中，[`lateinit` 關鍵字](properties.md#late-initialized-properties-and-variables) 允許宣告稍後才初始化的非 null 屬性。這有助於避免在測試中使用可為 null 的型別 (`TodoRepository?`)。
+    * 在 Kotlin 中，[`lateinit` 關鍵字](properties.md#late-initialized-properties-and-variables)允許宣告稍後才初始化的非 null 屬性。這有助於避免在測試中使用可 null 型別（`TodoRepository?`）。
 
 4. 在 `TodoRepositoryTest` 類別內新增一個測試，以檢查初始存儲庫狀態及其大小：
 
@@ -174,10 +174,10 @@ Kotlin 與 Java 完全互通，這意指您可以使用 Kotlin 為 Java 程式�
    }
    ```
 
-    * 與 Java 靜態匯入不同，Jupiter 的 `Assertions` 是以類別形式匯入，並作為斷言函式的限定詞使用。
-    * 在 Kotlin 中，您可以透過 `repository.all` 將 Java 的 getter 存取為屬性，而不是呼叫 `.getAll()`。
+    * 與 Java 的 static 匯入不同，Jupiter 的 `Assertions` 作為類別匯入，並用作斷言函式的限定詞。
+    * 在 Kotlin 中，你可以透過 `repository.all` 將 Java getter 作為屬性存取，而不是呼叫 `.getAll()`。
 
-5. 編寫另一個測試來驗證所有項目的複製行為：
+5. 撰寫另一個測試以驗證所有項目的複本行為：
 
    ```kotlin
    @Test
@@ -196,10 +196,10 @@ Kotlin 與 Java 完全互通，這意指您可以使用 Kotlin 為 Java 程式�
    }
    ```
 
-    * 若要從 Kotlin 類別取得 Java 類別物件，請使用 `::class.java`。
-    * 您可以將複雜的斷言拆分為多行，而無需使用任何特殊的接續字元。
+    * 要從 Kotlin 類別取得 Java 類別物件，請使用 `::class.java`。
+    * 你可以將複雜的斷言拆分成多行，而無需使用任何特殊的接續字元。
 
-6. 新增一個測試以驗證透過 ID 尋找項目：
+6. 新增測試以驗證透過 ID 尋找項目：
 
    ```kotlin
    @Test
@@ -215,9 +215,9 @@ Kotlin 與 Java 完全互通，這意指您可以使用 Kotlin 為 Java 程式�
    }
    ```
 
-   Kotlin 與 Java 的 [`Optional` API](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html) 配合良好。它會自動將 getter 方法轉換為屬性，這就是為什麼這裡將 `isPresent()` 方法作為屬性存取的原因。
+   Kotlin 能順暢地與 Java [`Optional` API](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html) 協同運作。它會自動將 getter 方法轉換為屬性，這就是為什麼此處將 `isPresent()` 方法作為屬性來存取。
 
-7. 編寫一個測試來驗證項目移除機制：
+7. 撰寫測試以驗證項目移除機制：
 
    ```kotlin
     @Test
@@ -246,21 +246,21 @@ Kotlin 與 Java 完全互通，這意指您可以使用 Kotlin 為 Java 程式�
     }
    ```
 
-   在 Kotlin 中，您可以串聯方法呼叫和屬性存取，例如 `repository.getById(id).isEmpty`。
+   在 Kotlin 中，你可以鏈式呼叫方法與屬性存取，例如 `repository.getById(id).isEmpty`。
 
-> 您可以向 `TodoRepositoryTest` 測試類別新增更多測試，以涵蓋更多功能。請參閱範例專案 [`complete`](https://github.com/kotlin-hands-on/kotlin-junit-sample/blob/main/complete/src/test/java/org/jetbrains/kotlin/junit/TodoRepositoryTest.kt) 模組中的完整原始碼。
+> 你可以在 `TodoRepositoryTest` 測試類別中新增更多測試以涵蓋其他功能。請在範例專案的 [`complete`](https://github.com/kotlin-hands-on/kotlin-junit-sample/blob/main/complete/src/test/java/org/jetbrains/kotlin/junit/TodoRepositoryTest.kt) 模組中查看完整原始碼。
 >
 {style="tip"}
 
 ## 執行測試 {id="run-tests"}
 
-同時執行 Java 和 Kotlin 測試，以驗證您的專案運作符合預期：
+執行 Java 和 Kotlin 測試以驗證專案是否如預期運作：
 
 1. 使用裝訂邊圖示執行測試：
 
    ![執行測試](run-test.png)
 
-   您也可以從 `initial` 目錄使用命令列執行所有專案測試：
+   你也可以在命令列中於 `initial` 目錄下執行所有專案測試：
 
     <tabs group="build-system">
     <tab title="Maven" group-key="maven">
@@ -279,7 +279,7 @@ Kotlin 與 Java 完全互通，這意指您可以使用 Kotlin 為 Java 程式�
     </tab>
     </tabs>
 
-2. 透過更改其中一個變數值來檢查測試是否正常運作。例如，修改 `shouldAddItem` 測試以預期錯誤的存儲庫大小：
+2. 透過變更其中一個變數的值來確認測試能正常發揮作用。例如，修改 `shouldAddItem` 測試以預期不正確的存儲庫大小：
 
    ```kotlin
    @Test
@@ -292,14 +292,15 @@ Kotlin 與 Java 完全互通，這意指您可以使用 Kotlin 為 Java 程式�
    }
    ```
 
-3. 再次執行測試並驗證其是否失敗：
+3. 再次執行測試並確認它失敗：
 
    ![檢查測試結果。測試已失敗](test-failed.png)
 
-> 您可以在範例專案的 [`complete`](https://github.com/kotlin-hands-on/kotlin-junit-sample/tree/main/complete) 模組中找到已完整配置並包含測試的專案。
+> 你可以在範例專案的 [`complete`](https://github.com/kotlin-hands-on/kotlin-junit-sample/tree/main/complete) 模組中找到完整配置好測試的專案。
 >
 {style="tip"}
 
-## 下一步 {id="what-s-next"}
+## 後續步驟 {id="what-s-next"}
 
-進一步了解 [使用 Maven 測試 Kotlin 專案](jvm-test-maven.md)。
+* 進一步了解[使用 Maven 測試 Kotlin 專案](jvm-test-maven.md)。
+* 在 [Kotlin 後端開發常見問題](jvm-backend-faq.md)中尋找常見問題的解答。

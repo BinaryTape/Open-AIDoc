@@ -1,45 +1,45 @@
-[//]: # (title: コンパイラの実行戦略)
+[//]: # (title: コンパイラー実行戦略)
 
-「Kotlinコンパイラの実行戦略（Kotlin compiler execution strategy）」は、Kotlinコンパイラがどこで実行されるかを定義します。
-[Gradle](gradle.md) や [Maven](maven.md) などのビルドツールがこの戦略を設定します。
+_Kotlinコンパイラー実行戦略（Kotlin compiler execution strategy）_ は、Kotlinコンパイラーがどこで実行されるかを定義します。
+[Gradle](gradle.md) や [Maven](maven.md) などのビルドツールでこの戦略を設定します。
 
-コンパイラの実行戦略には以下の2つがあります：
+コンパイラー実行戦略には次の2つがあります。
 
-| 戦略 | Kotlinコンパイラの実行場所 | その他の特徴と注意点 |
+| 戦略 | Kotlinコンパイラーが実行される場所 | その他の特徴と注意点 |
 |-----------------------------------|---------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [Kotlinデーモン](kotlin-daemon.md) | 独自のデーモンプロセス内 | GradleおよびMavenにおける**デフォルトで最速の戦略**です。デーモンプロセスは、異なるビルドシステムプロセス間や複数の並列コンパイル間で共有できます。 |
-| インプロセス（In process） | ビルドツールのプロセス内 | メモリ管理の観点からは最もシンプルな戦略ですが、JVMシステムプロパティなどの状態を共有するため、同じプロセス内で実行されている他のロジックからの分離性は低くなります。 |
+| [Kotlinデーモン](kotlin-daemon.md) | 独自のデーモンプロセス内 | GradleおよびMavenにおける _デフォルトかつ最速の戦略_ です。デーモンプロセスは、異なるビルドシステムプロセス間や複数の並列コンパイル間で共有できます。 |
+| インプロセス（In process） | ビルドツールのプロセス内 | メモリ管理の観点からは最もシンプルな戦略ですが、JVMシステムプロパティなどの状態を共有するため、同じプロセスで実行されている他のロジックからの分離性が低くなります。 |
 
 ## Gradleでの設定 {id="configure-in-gradle"}
 
-Kotlinコンパイラの実行戦略は、以下のいずれかのプロパティを使用して定義できます：
+Kotlinコンパイラー実行戦略は、以下のプロパティのいずれかを使用して定義できます。
 
-* `kotlin.compiler.execution.strategy` Gradleプロパティ。
-* `compilerExecutionStrategy` コンパイルタスクプロパティ。
+* Gradleプロパティの `kotlin.compiler.execution.strategy`
+* コンパイルタスクプロパティの `compilerExecutionStrategy`
 
-### Gradleプロパティを使用する {id="use-the-gradle-property"}
+### Gradleプロパティの使用 {id="use-the-gradle-property"}
 
-`kotlin.compiler.execution.strategy` プロパティに指定可能な値は以下の通りです：
+`kotlin.compiler.execution.strategy` プロパティに指定可能な値は以下のとおりです。
 
 * `daemon`（デフォルト）
 * `in-process`
 
-`gradle.properties` で `kotlin.compiler.execution.strategy` プロパティを設定します：
+`gradle.properties` で `kotlin.compiler.execution.strategy` プロパティを設定します。
 
 ```none
 kotlin.compiler.execution.strategy=in-process
 ```
 
-### コンパイルタスクプロパティを使用する {id="use-the-compile-task-property"}
+### コンパイルタスクプロパティの使用 {id="use-the-compile-task-property"}
 
-`compilerExecutionStrategy` タスクプロパティは、`kotlin.compiler.execution.strategy` Gradleプロパティよりも優先されます。
+タスクプロパティの `compilerExecutionStrategy` は、Gradleプロパティの `kotlin.compiler.execution.strategy` よりも優先されます。
 
-`compilerExecutionStrategy` タスクプロパティに指定可能な値は以下の通りです：
+`compilerExecutionStrategy` タスクプロパティに指定可能な値は以下のとおりです。
 
 * [`DAEMON`](https://kotlinlang.org/api/kotlin-gradle-plugin/kotlin-gradle-plugin-api/org.jetbrains.kotlin.gradle.tasks/-kotlin-compiler-execution-strategy/-d-a-e-m-o-n/)（デフォルト）
 * [`IN_PROCESS`](https://kotlinlang.org/api/kotlin-gradle-plugin/kotlin-gradle-plugin-api/org.jetbrains.kotlin.gradle.tasks/-kotlin-compiler-execution-strategy/-i-n_-p-r-o-c-e-s-s/)
 
-ビルドスクリプトで `compilerExecutionStrategy` タスクプロパティを設定します：
+ビルドスクリプトで `compilerExecutionStrategy` タスクプロパティを設定します。
 
 <tabs group="build-script">
 <tab title="Kotlin" group-key="kotlin">
@@ -75,9 +75,9 @@ tasks.withType(CompileUsingKotlinDaemon)
 
 ### フォールバック戦略 {id="fallback-strategy"}
 
-Kotlinデーモンとの通信に失敗した場合、コンパイラは「インプロセス（In process）」戦略にフォールバックします。
+Kotlinデーモンとの通信に失敗した場合、コンパイラーは「インプロセス（In process）」戦略にフォールバックします。
 
-このフォールバックが発生すると、Gradleはビルド出力に以下の警告を表示します：
+このフォールバックが発生すると、Gradleはビルド出力に以下の警告を出力します。
 
 ```none
 Failed to compile with Kotlin daemon: java.lang.RuntimeException: Could not connect to Kotlin compile daemon
@@ -86,12 +86,12 @@ Using fallback strategy: Compile without Kotlin daemon
 Try ./gradlew --stop if this issue persists.
 ```
 
-サイレントなフォールバックは、多くのシステムリソースを消費したり、非決定的なビルドにつながったりする可能性があります。
-詳細については、こちらの [YouTrackの課題](https://youtrack.jetbrains.com/issue/KT-48843/Add-ability-to-disable-Kotlin-daemon-fallback-strategy) を参照してください。
+サイレントフォールバックは大量のシステムリソースを消費したり、非決定論的なビルドを引き起こしたりする可能性があります。
+詳細については、こちらの [YouTrack issue](https://youtrack.jetbrains.com/issue/KT-48843/Add-ability-to-disable-Kotlin-daemon-fallback-strategy) を参照してください。
 
-フォールバックを防止するには、`kotlin.daemon.useFallbackStrategy` Gradleプロパティを使用します。デフォルト値は `true` です。
-`false` に設定すると、デーモンの起動や通信に問題がある場合にビルドが失敗します。
-`gradle.properties` でこのプロパティを宣言します：
+フォールバックを防ぐには、Gradleプロパティの `kotlin.daemon.useFallbackStrategy` を使用します。デフォルト値は `true` です。
+`false` に設定すると、デーモンの起動や通信に問題があった場合にビルドが失敗します。
+このプロパティを `gradle.properties` で宣言します。
 
 ```none
 kotlin.daemon.useFallbackStrategy=false
@@ -122,8 +122,14 @@ tasks.named("compileKotlin").configure {
 </tab>
 </tabs>
 
-コンパイルを実行するためのメモリが不足している場合、ログに関連するメッセージが表示されます。
+コンパイルを実行するのに十分なメモリがない場合、ログに関連するメッセージが表示されます。
 
 ## Mavenでの設定 {id="configure-in-maven"}
 
-<include from ="maven-kotlin-compiler.md" element-id="maven-configure-execution-strategy"/>
+デフォルトでは、MavenはKotlinデーモンのコンパイラー実行戦略を使用します。「インプロセス（in process）」戦略に切り替えるには、`pom.xml` ファイルで以下のプロパティを設定します。
+
+```xml
+<properties>
+    <kotlin.compiler.daemon>false</kotlin.compiler.daemon>
+</properties>
+```

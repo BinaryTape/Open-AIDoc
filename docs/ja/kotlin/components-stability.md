@@ -1,73 +1,75 @@
-[//]: # (title: Kotlinコンポーネントの安定性)
+[//]: # (title: Kotlin コンポーネントの安定性)
 
-Kotlin言語とツールセットは、JVM、JS、Nativeターゲット向けのコンパイラ、標準ライブラリ（Standard Library）、さまざまな付随ツールなど、多くのコンポーネントに分かれています。
-これらのコンポーネントの多くは**Stable（安定版）**として公式にリリースされています。これは、[「スムーズなアップデート（Comfortable Updates）」と「言語を最新の状態に保つ（Keeping the Language Modern）」の原則](kotlin-evolution-principles.md)に従い、後方互換性を保ちながら進化してきたことを意味します。
+Kotlin 言語およびツールセットは、JVM、JS、Native ターゲット向けのコンパイラ、標準ライブラリ、各種付属ツールなど、多くのコンポーネントに分かれています。
+これらのコンポーネントの多くは **Stable**（安定版）として公式にリリースされており、[「快適なアップデート（_Comfortable Updates_）」および「言語のモダン性の維持（_Keeping the Language Modern_）」の原則](kotlin-evolution-principles.md)に従って後方互換性を保ちながら進化してきました。
 
-「フィードバックループ（Feedback Loop）」の原則に従い、コミュニティが試用できるように多くの機能を早期にリリースしているため、一部のコンポーネントはまだ**Stable**としてリリースされていません。
-それらの中には、非常に初期段階のものもあれば、成熟が進んでいるものもあります。
-各コンポーネントの進化の速さと、採用する際にユーザーが負うリスクのレベルに応じて、それらを **Experimental（実験的）**、**Alpha（アルファ）**、または **Beta（ベータ）** としてマークしています。
+私たちは「フィードバックループ（_Feedback Loop_）」の原則に基づき、コミュニティに試してもらうために多くの機能を早い段階でリリースしているため、まだ **Stable** としてリリースされていないコンポーネントも多数存在します。
+それらの一部はごく初期の段階にあり、一部はより成熟しています。
+各コンポーネントが進化する速度や、ユーザーが導入する際のリスクレベルに応じて、それらを **Experimental**（実験的）、**Alpha**、または **Beta** としてマークしています。
 
-## 安定性レベルの解説 {id="stability-levels-explained"}
+## 各安定性レベルの説明 {id="stability-levels-explained"}
 
-各安定性レベルとその意味についてのクイックガイドは以下の通りです。
+これらの安定性レベルとその意味についてのクイックガイドです：
 
-**Experimental** は「おもちゃのプロジェクト（toy projects）でのみ試してください」を意味します：
-* 私たちはアイデアとその実現可能性をテストしている段階です。一部のユーザーに実際に試してもらい、フィードバックを共有してほしいと考えています。スコープは最小限であり、機能はいつでも変更または削除される可能性があります。安定性や互換性は保証されません。
+**Experimental**（実験的）は「トイプロジェクトでのみ試してください」を意味します：
+* アイデアとその実現可能性をテストしている段階です。一部のユーザーに試してもらい、フィードバックを共有してほしいと考えています。
+  対象範囲は最小限であり、機能はいつでも変更または削除される可能性があります。安定性や互換性は保証されません。
 
-**Alpha** は「製品化の準備が整うかどうかをテストしている」ことを意味します：
-* 私たちはこれを製品にする意向があり、最終的な形を決定するためにユーザー価値とマーケットフィット（市場適合性）を検証しています。機能セットはまだ不完全であり、破壊的な変更が予想されます。もし仮説が正しくないことが判明した場合、機能を大幅に変更したり、中止したりする可能性があります。
+**Alpha** は「これを本番環境に対応させるべきかどうかをテストしています」を意味します：
+* これを製品化する意図があり、最終的な形を整えるためにユーザー価値とマーケットフィットを検証しています。
+  機能セットはまだ不完全であり、破壊的変更（breaking changes）が予想されます。仮説が成り立たない場合、機能を大幅に変更または中止する可能性があります。
 
-**Beta** は「使用可能です。移行に伴う問題が最小限になるよう最善を尽くします」を意味します：
-* ほぼ完成しており、ユーザーからのフィードバックが特に重要な時期です。
-* ただし、100%完成しているわけではないため、（ユーザーからのフィードバックに基づくものを含め）変更の可能性があります。
-* 最高のアップデート体験を得るために、事前に出される非推奨（deprecation）警告に注意してください。
+**Beta** は「使用可能であり、移行に関する問題を最小限に抑えるよう最善を尽くします」を意味します：
+* ほぼ完成しており、現在はユーザーフィードバックが特に重要です。
+* ただし、100% 完成しているわけではないため、変更（ユーザーからのフィードバックに基づくものを含む）が生じる可能性があります。
+* 最良のアップデート体験を得るために、非推奨（deprecation）の警告を事前に確認してください。
 
-私たちは、*Experimental*、*Alpha*、*Beta* を総称して **pre-stable（安定前）** レベルと呼んでいます。
+これら _Experimental_、_Alpha_、_Beta_ を総称して、**プレスタブル（pre-stable）** レベルと呼びます。
 
 <a name="stable"/>
 
-**Stable** は「最も保守的なシナリオでも使用してください」を意味します：
-* 完成しています。私たちは、厳格な[後方互換性ルール](https://kotlinfoundation.org/language-committee-guidelines/)に従って進化させていきます。
+**Stable**（安定版）は「最も保守的なシナリオでも使用できます」を意味します：
+* 完成しています。厳格な[後方互換性ルール](https://kotlinfoundation.org/language-committee-guidelines/)に従って進化していきます。
 
-安定性レベルは、そのコンポーネントがどれくらい早く Stable としてリリースされるかについては何も示していません。同様に、リリースまでにコンポーネントがどれほど変更されるかを示すものでもありません。それらは単に、コンポーネントがどれほど速く変化しているか、およびユーザーがアップデートに関する問題のリスクをどれほど負っているかを示すものです。
+なお、安定性レベルは、コンポーネントがどれくらい早く Stable としてリリースされるかを示すものではありません。同様に、リリース前にコンポーネントがどれだけ変更されるかを示すものでもありません。コンポーネントが変化する速度と、ユーザーが直面するアップデート問題のリスクの大きさのみを示しています。
 
-## KotlinコンポーネントのGitHubバッジ {id="github-badges-for-kotlin-components"}
+## Kotlin コンポーネント用の GitHub バッジ {id="github-badges-for-kotlin-components"}
 
-[Kotlin GitHub organization](https://github.com/Kotlin) には、さまざまなKotlin関連プロジェクトがあります。
-私たちがフルタイムで開発しているものもあれば、サイドプロジェクトとして開発しているものもあります。
+[Kotlin GitHub オーガナイゼーション](https://github.com/Kotlin) では、Kotlin に関連するさまざまなプロジェクトをホストしています。
+その中にはフルタイムで開発しているものもあれば、サイドプロジェクトもあります。
 
-各Kotlinプロジェクトには、その安定性とサポート状況を示す2つのGitHubバッジがあります：
+各 Kotlin プロジェクトには、その安定性とサポートステータスを説明する 2 つの GitHub バッジがあります：
 
-* **Stability（安定性）** ステータス。これは、各プロジェクトがどれほど速く進化しているか、およびユーザーがそれを採用する際にどれほどのリスクを負っているかを示します。
-  この安定性ステータスは、[Kotlin言語機能およびそのコンポーネントの安定性レベル](#安定性レベルの解説)と完全に一致します：
-    * ![Experimental stability level](https://kotl.in/badges/experimental.svg){type="joined"} は **Experimental** を表します。
-    * ![Alpha stability level](https://kotl.in/badges/alpha.svg){type="joined"} は **Alpha** を表します。
-    * ![Beta stability level](https://kotl.in/badges/beta.svg){type="joined"} は **Beta** を表します。
-    * ![Stable stability level](https://kotl.in/badges/stable.svg){type="joined"} は **Stable** を表します。
+* **Stability**（安定性）ステータス。各プロジェクトの進化速度と、採用時にユーザーが負うリスクの大きさを示します。
+  安定性ステータスは、[Kotlin 言語機能およびそのコンポーネントの安定性レベル](#各安定性レベルの説明)と完全に一致します：
+    * ![Experimental stability level](https://kotl.in/badges/experimental.svg){type="joined"} は **Experimental** を表します
+    * ![Alpha stability level](https://kotl.in/badges/alpha.svg){type="joined"} は **Alpha** を表します
+    * ![Beta stability level](https://kotl.in/badges/beta.svg){type="joined"} は **Beta** を表します
+    * ![Stable stability level](https://kotl.in/badges/stable.svg){type="joined"} は **Stable** を表します
 
-* **Support（サポート）** ステータス。これは、プロジェクトの保守とユーザーの問題解決に対する私たちのコミットメントを示します。
-  サポートのレベルは、すべてのJetBrains製品で統一されています。  
-  [詳細は JetBrains Open Source ドキュメントを参照してください](https://github.com/JetBrains#jetbrains-on-github)。
+* **Support**（サポート）ステータス。プロジェクトの保守およびユーザーの問題解決を支援するという私たちの取り組みを示します。
+  サポートレベルはすべての JetBrains 製品で統一されています。  
+  [詳細については JetBrains オープンソースドキュメントを参照してください](https://github.com/JetBrains#jetbrains-on-github)。
 
 ## サブコンポーネントの安定性 {id="stability-of-subcomponents"}
 
-安定した（Stable）コンポーネントが、実験的な（Experimental）サブコンポーネントを持つ場合があります。例：
-* 安定したコンパイラが実験的な機能を持っている。
-* 安定したAPIに実験的なクラスや関数が含まれている。
-* 安定したコマンドラインツールに実験的なオプションがある。
+安定したコンポーネントであっても、実験的なサブコンポーネントが含まれている場合があります。例：
+* 安定したコンパイラに実験的な機能が含まれている場合
+* 安定した API に実験的なクラスや関数が含まれている場合
+* 安定したコマンドラインツールに実験的なオプションが含まれている場合
 
-私たちは、どのサブコンポーネントが **Stable** ではないかを正確にドキュメント化するようにしています。
-また、可能な限りユーザーに警告し、明示的なオプトインを求めることで、安定版としてリリースされていない機能を誤って使用してしまうことを避けるよう最善を尽くしています。
+どのサブコンポーネントが **Stable** でないかを正確にドキュメント化するようにしています。
+また、安定版としてリリースされていない機能の誤用を防ぐため、可能な限りユーザーに警告し、明示的なオプトインを求めるよう最善を尽くしています。
 
-## Kotlinコンポーネントの現在の安定性 {id="current-stability-of-kotlin-components"}
+## Kotlin コンポーネントの現在の安定性 {id="current-stability-of-kotlin-components"}
 
-> デフォルトでは、すべての新しいコンポーネントは Experimental ステータスを持ちます。
+> デフォルトでは、すべての新しいコンポーネントは Experimental ステータスになります。
 >
 {style="note"}
 
-### Kotlinコンパイラ {id="kotlin-compiler"}
+### Kotlin コンパイラ {id="kotlin-compiler"}
 
-| **コンポーネント** | **ステータス** | **バージョン以降のステータス** | **コメント** |
+| **コンポーネント**                                                  | **ステータス** | **ステータス適用バージョン** | **備考** |
 |---------------------------------------------------------------------|------------|--------------------------|--------------|
 | Kotlin/JVM                                                          | Stable     | 1.0.0                    |              |
 | Kotlin/Native                                                       | Stable     | 1.9.0                    |              |
@@ -75,9 +77,9 @@ Kotlin言語とツールセットは、JVM、JS、Nativeターゲット向けの
 | Kotlin/Wasm                                                         | Beta       | 2.2.20                   |              |
 | [Analysis API](https://kotlin.github.io/analysis-api/index_md.html) | Stable     |                          |              |
 
-### 主要なコンパイラプラグイン {id="core-compiler-plugins"}
+### コアコンパイラプラグイン {id="core-compiler-plugins"}
 
-| **コンポーネント** | **ステータス** | **バージョン以降のステータス** | **コメント** |
+| **コンポーネント**                               | **ステータス** | **ステータス適用バージョン** | **備考** |
 |--------------------------------------------------|--------------|--------------------------|--------------|
 | [All-open](all-open-plugin.md)                   | Stable       | 1.3.0                    |              |
 | [No-arg](no-arg-plugin.md)                       | Stable       | 1.3.0                    |              |
@@ -86,9 +88,9 @@ Kotlin言語とツールセットは、JVM、JS、Nativeターゲット向けの
 | [Lombok](lombok.md)                              | Alpha        | 2.3.20                   |              |
 | [Power-assert](power-assert.md)                  | Experimental | 2.0.0                    |              |
 
-### Kotlinライブラリ {id="kotlin-libraries"}
+### Kotlin ライブラリ {id="kotlin-libraries"}
 
-| **コンポーネント** | **ステータス** | **バージョン以降のステータス** | **コメント** |
+| **コンポーネント**            | **ステータス** | **ステータス適用バージョン** | **備考** |
 |-------------------------------|------------|--------------------------|--------------|
 | kotlin-stdlib (JVM)           | Stable     | 1.0.0                    |              |
 | kotlinx-coroutines            | Stable     | 1.3.0                    |              |
@@ -99,39 +101,39 @@ Kotlin言語とツールセットは、JVM、JS、Nativeターゲット向けの
 | kotlinx-io                    | Alpha      | 0.2.0                    |              |
 | kotlinx-collections-immutable | Alpha      | 0.3.5                    |              |
 
-### Kotlinマルチプラットフォーム {id="kotlin-multiplatform"}
+### Kotlin Multiplatform {id="kotlin-multiplatform"}
 
-| **コンポーネント** | **ステータス** | **バージョン以降のステータス** | **コメント** |
-|------------------------------------------------|------------|--------------------------|------------------------------------------------------------------------------------------------------------------------|
-| Kotlin Multiplatform                           | Stable     | 1.9.20                   |                                                                                                                        |
-| Kotlin Multiplatform plugin for Android Studio | Beta       | 0.8.0                    | [言語とは別にバージョン管理されています](https://kotlinlang.org/docs/multiplatform/multiplatform-plugin-releases.html) |
+| **コンポーネント**              | **ステータス** | **ステータス適用バージョン** | **備考**                                                                                                                             |
+|---------------------------------|------------|--------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
+| Kotlin Multiplatform            | Stable     | 1.9.20                   |                                                                                                                                      |
+| Kotlin Multiplatform IDE プラグイン | Stable     | 0.9                      | [言語とは別にバージョニングされています](https://www.jetbrains.com/help/kotlin-multiplatform-dev/multiplatform-plugin-releases.html) |
 
 ### Kotlin/Native {id="kotlin-native"}
 
-| **コンポーネント** | **ステータス** | **バージョン以降のステータス** | **コメント** |
+| **コンポーネント**                           | **ステータス** | **ステータス適用バージョン** | **備考**                                                                                                                      |
 |----------------------------------------------|------------|--------------------------|-------------------------------------------------------------------------------------------------------------------------------|
 | Kotlin/Native Runtime                        | Stable     | 1.9.20                   |                                                                                                                               |
-| Kotlin/Native interop with C and Objective-C | Beta       | 1.3.0                    | [CおよびObjective-Cライブラリのインポートの安定性](native-lib-import-stability.md#stability-of-c-and-objective-c-library-import) |
-| klibバイナリ                                 | Stable     | 1.9.20                   | cinterop klibは含まれません。以下を参照してください。 |
-| cinterop klibバイナリ                        | Beta       | 1.3.0                    | [CおよびObjective-Cライブラリのインポートの安定性](native-lib-import-stability.md#stability-of-c-and-objective-c-library-import) |
-| CocoaPodsインテグレーション                  | Stable     | 1.9.20                   |                                                                                                                               |
+| C および Objective-C との Kotlin/Native 相互運用 | Beta       | 1.3.0                    | [C および Objective-C ライブラリインポートの安定性](native-lib-import-stability.md#stability-of-c-and-objective-c-library-import) |
+| klib バイナリ                                | Stable     | 1.9.20                   | cinterop klib は含みません。下記を参照してください                                                                            |
+| cinterop klib バイナリ                       | Beta       | 1.3.0                    | [C および Objective-C ライブラリインポートの安定性](native-lib-import-stability.md#stability-of-c-and-objective-c-library-import) |
+| CocoaPods 連携                               | Stable     | 1.9.20                   |                                                                                                                               |
 
-さまざまなターゲットのサポートレベルの詳細については、[](native-target-support.md) を参照してください。
+各ターゲットのサポートレベルの詳細については、[](native-target-support.md) を参照してください。
 
 ### ビルドツール {id="build-tools"}
 
-| **コンポーネント** | **ステータス** | **バージョン以降のステータス** | **コメント** |
+| **コンポーネント**                                  | **ステータス** | **ステータス適用バージョン** | **備考**                                                                                                                                                          |
 |-----------------------------------------------------|------------|--------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [Kotlin Gradle プラグイン](gradle-configure-project.md) | Stable     | 1.1.1                    | [Kotlin Multiplatform Gradle プラグイン](https://kotlinlang.org/docs/multiplatform/multiplatform-dsl-reference.html#id-and-version) は Kotlin 1.9.20 から安定しています。 |
+| [Kotlin Gradle プラグイン](gradle-configure-project.md) | Stable     | 1.1.1                    | [Kotlin Multiplatform Gradle プラグイン](https://kotlinlang.org/docs/multiplatform/multiplatform-dsl-reference.html#id-and-version) は、Kotlin 1.9.20 から安定しています。 |
 | [Kotlin Maven プラグイン](maven-configure-project.md)   | Stable     | 1.0.0                    |                                                                                                                                                                   |
 
-### Build tools API (BTA) {id="build-tools-api-bta"}
+### ビルドツール API (BTA) {id="build-tools-api-bta"}
 
-| **コンポーネント** | **ステータス** | **バージョン以降のステータス** | **コメント** |
-|-------------------|------------|--------------------------|--------------|
-| BTA for JVM       | Beta       | 2.4.20                   |              |
-| BTA for JS        | Alpha      | 2.4.20                   |              |
-| BTA for Wasm      | Alpha      | 2.4.20                   |              |
+| **コンポーネント** | **ステータス** | **ステータス適用バージョン** | **備考** |
+|---------------|------------|--------------------------|--------------|
+| JVM 向け BTA  | Beta       | 2.4.20                   |              |
+| JS 向け BTA   | Alpha      | 2.4.20                   |              |
+| Wasm 向け BTA | Alpha      | 2.4.20                   |              |
 
 > Build tools API は現在 Kotlin/Native をサポートしていません。
 > 
@@ -139,11 +141,11 @@ Kotlin言語とツールセットは、JVM、JS、Nativeターゲット向けの
 
 ### 言語ツール {id="language-tools"}
 
-| **コンポーネント** | **ステータス** | **バージョン以降のステータス** | **コメント** |
+| **コンポーネント**                    | **ステータス** | **ステータス適用バージョン** | **備考**                                   |
 |---------------------------------------|--------------|--------------------------|------------------------------------------------|
-| スクリプティングの構文とセマンティクス | Alpha        | 1.2.0                    |                                                |
-| スクリプティングの埋め込みおよび拡張API | Beta         | 1.5.0                    |                                                |
-| スクリプティングのIDEサポート         | Beta         |                          | IntelliJ IDEA 2023.1 以降で使用可能 |
+| スクリプティング構文およびセマンティクス | Alpha        | 1.2.0                    |                                                |
+| スクリプティング埋め込みおよび拡張 API | Beta         | 1.5.0                    |                                                |
+| スクリプティング IDE サポート         | Beta         |                          | IntelliJ IDEA 2023.1 以降で利用可能            |
 | CLI スクリプティング                  | Alpha        | 1.2.0                    |                                                |
 
 ## 言語機能と設計提案 {id="language-features-and-design-proposals"}

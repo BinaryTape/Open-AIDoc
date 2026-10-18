@@ -1,337 +1,330 @@
 [//]: # (title: 反射)
+[//]: # (description: 了解 Kotlin 内置的反射支持，以及如何使用独立的 kotlin-reflect 库进行完整的运行时内省。)
 
-**反射**是一组语言和库功能，允许您在运行时内省程序的结构。在Kotlin中，函数与属性是一等公民，而在使用函数式或响应式风格时，内省它们的能力（例如，在运行时获知属性或函数的名称或类型）至关重要。
+*反射* 是一组语言和库功能，允许你在运行时内省程序的结构。
+例如，你可以读取或更新属性、调用函数，或者调用类构造函数来创建实例。这在编译时未知声明的情况下非常有用。
 
-> Kotlin/JS 对反射功能提供有限支持。[详细了解 Kotlin/JS 中的反射](js-reflection.md)。
->
+反射提供了用于描述已编译声明的运行时对象。例如，类由 [`KClass`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/-k-class/) 表示，类型由 [`KType`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/-k-type/) 表示，而属性或函数则由 [`KCallable`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/-k-callable/) 的子类型表示。
+你可以检查这些对象，并使用它们来访问值或调用函数。
+
+## 反射的工作原理 {id="how-reflection-works"}
+
+[反射 API](https://kotlinlang.org/api/core/kotlin-reflect/) 通过诸如 `KClass` 或 `KFunction` 等 Kotlin 类型来表示已编译的声明。
+反射对象表示声明本身，而不是所声明对象的值。例如，你可以使用 `KProperty` 获取属性的名称并返回其类型，而无需从对象中实际读取该属性。
+
+Kotlin 提供了一些基本功能（例如类字面值或[可调用引用](lambdas.md#callable-reference)）作为语言和标准库的一部分。要获得更广泛的运行时内省功能，请导入 [`kotlin-reflect`](https://kotlinlang.org/api/core/kotlin-reflect/) 库。
+
+反射 API 由以下软件包组成：
+
+* [`kotlin.reflect`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/) 是标准库的一部分，包含核心反射类型和函数。
+* [`kotlin.reflect.full`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.full/) 包含用于检查 Kotlin 声明的扩展。
+* [`kotlin.reflect.jvm`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.jvm/) 包含连接 Kotlin 与 Java 反射的 JVM 专属扩展。
+
+> 各平台之间的反射支持可能有所不同。本页面与 Kotlin/JVM 反射 API 保持一致。详细了解 [Kotlin/JS 中的反射](js-reflection.md)。
+> 
 {style="note"}
-
-## JVM 依赖项 {id="jvm-dependency"}
-
-在 JVM 平台上，Kotlin 编译器分发包将使用反射功能所需的运行时组件作为一个单独的构件 `kotlin-reflect.jar` 包含在内。这样做是为了减少不使用反射功能的应用程序所需的运行时库大小。
-
-要在 Gradle 或 Maven 项目中使用反射，请添加对 `kotlin-reflect` 的依赖项：
-
-* 在 Gradle 中：
-
-    <tabs group="build-script">
-    <tab title="Kotlin" group-key="kotlin">
-
-    ```kotlin
-    dependencies {
-        implementation(kotlin("reflect"))
-    }
-    ```
-
-    </tab>
-    <tab title="Groovy" group-key="groovy">
-    
-    ```groovy
-    dependencies {
-        implementation "org.jetbrains.kotlin:kotlin-reflect:%kotlinVersion%"
-    }
-    ```
-
-    </tab>
-    </tabs>
-
-* 在 Maven 中：
-    
-    ```xml
-    <dependencies>
-        <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-reflect</artifactId>
-        </dependency>
-    </dependencies>
-    ```
-
-如果您不使用 Gradle 或 Maven，请确保您的项目类路径中包含 `kotlin-reflect.jar`。在其他受支持的情况下（使用命令行编译器的 IntelliJ IDEA 项目），它会被默认添加。在命令行编译器中，您可以使用 `-no-reflect` 编译器选项从类路径中排除 `kotlin-reflect.jar`。
-
-## 类引用 {id="class-references"}
-
-最基本的反射功能是获取 Kotlin 类的运行时引用。要获取静态已知的 Kotlin 类的引用，可以使用**类文字**语法：
-
-```kotlin
-val c = MyClass::class
-```
-
-该引用是一个 [KClass](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.reflect/-k-class/index.html) 类型的值。
-
->在 JVM 上：Kotlin 类引用与 Java 类引用并不相同。要获取 Java 类引用，请在 `KClass` 实例上使用 `.java` 属性。
->
-{style="note"}
-
-### 绑定的类引用 {id="bound-class-references"}
-
-通过使用对象作为接收者，您可以使用相同的 `::class` 语法获取特定对象所属类的引用：
-
-```kotlin
-val widget: Widget = ...
-assert(widget is GoodWidget) { "Bad widget: ${widget::class.qualifiedName}" }
-```
-
-无论接收者表达式的类型（`Widget`）如何，您都将获得该对象确切类的引用，例如 `GoodWidget` 或 `BadWidget`。
-
-## 可调用引用 {id="callable-references"}
-
-对函数、属性和构造函数的引用也可以被调用，或用作[函数类型](lambdas.md#function-types)的实例。
-
-所有可调用引用的共同超类型是 [`KCallable<out R>`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.reflect/-k-callable/index.html)，其中 `R` 是返回值类型。对于属性，它是属性类型；对于构造函数，它是所构造的类型。
-
-### 函数引用 {id="function-references"}
-
-当您拥有如下声明的具名函数时，可以直接调用它（`isOdd(5)`）：
-
-```kotlin
-fun isOdd(x: Int) = x % 2 != 0
-```
-
-或者，您可以将该函数作为函数类型的值使用，即将其传递给另一个函数。为此，请使用 `::` 运算符：
-
-```kotlin
-fun isOdd(x: Int) = x % 2 != 0
-
-fun main() {
-//sampleStart
-    val numbers = listOf(1, 2, 3)
-    println(numbers.filter(::isOdd))
-//sampleEnd
-}
-```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
-
-这里的 `::isOdd` 是函数类型 `(Int) -> Boolean` 的一个值。
-
-根据参数数量的不同，函数引用属于 [`KFunction<out R>`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.reflect/-k-function/index.html) 的子类型之一。例如，`KFunction3<T1, T2, T3, R>`。
-
-当从上下文中已知预期类型时，`::` 可用于重载函数。例如：
-
-```kotlin
-fun main() {
-//sampleStart
-    fun isOdd(x: Int) = x % 2 != 0
-    fun isOdd(s: String) = s == "brillig" || s == "slithy" || s == "tove"
-    
-    val numbers = listOf(1, 2, 3)
-    println(numbers.filter(::isOdd)) // 引用 isOdd(x: Int)
-//sampleEnd
-}
-```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
-
-或者，您可以通过将方法引用存储在显式指定类型的变量中来提供必要的上下文：
-
-```kotlin
-val predicate: (String) -> Boolean = ::isOdd   // 引用 isOdd(x: String)
-```
-
-如果您需要使用类成员或扩展函数，则需要限定名称：`String::toCharArray`。
-
-即使您使用对扩展函数的引用初始化变量，推断出的函数类型也不会包含接收者，但它会有一个接受接收者对象的额外参数。要改为获取带有接收者的函数类型，请显式指定类型：
-
-```kotlin
-val isEmptyStringList: List<String>.() -> Boolean = List<String>::isEmpty
-```
-
-#### 示例：函数组合 {id="example-function-composition"}
-
-考虑以下函数：
-
-```kotlin
-fun <A, B, C> compose(f: (B) -> C, g: (A) -> B): (A) -> C {
-    return { x -> f(g(x)) }
-}
-```
-
-它返回传递给它的两个函数的组合：`compose(f, g) = f(g(*))`。您可以将此函数应用于可调用引用：
-
-```kotlin
-fun <A, B, C> compose(f: (B) -> C, g: (A) -> B): (A) -> C {
-    return { x -> f(g(x)) }
-}
-
-fun isOdd(x: Int) = x % 2 != 0
-
-fun main() {
-//sampleStart
-    fun length(s: String) = s.length
-    
-    val oddLength = compose(::isOdd, ::length)
-    val strings = listOf("a", "ab", "abc")
-    
-    println(strings.filter(oddLength))
-//sampleEnd
-}
-```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
-
-### 属性引用 {id="property-references"}
-
-要在 Kotlin 中将属性作为一等对象访问，请使用 `::` 运算符：
-
-```kotlin
-val x = 1
-
-fun main() {
-    println(::x.get())
-    println(::x.name) 
-}
-```
-
-表达式 `::x` 求值为 `KProperty0<Int>` 类型的属性对象。您可以使用 `get()` 读取其值，或使用 `name` 属性检索属性名称。有关更多信息，请参阅 [`KProperty` 类的文档](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.reflect/-k-property/index.html)。
-
-对于可变属性（例如 `var y = 1`），`::y` 返回 [`KMutableProperty0<Int>`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.reflect/-k-mutable-property/index.html) 类型的值，该类型具有 `set()` 方法：
-
-```kotlin
-var y = 1
-
-fun main() {
-    ::y.set(2)
-    println(y)
-}
-```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
-
-属性引用可以用在预期具有单个泛型参数的函数处：
-
-```kotlin
-fun main() {
-//sampleStart
-    val strs = listOf("a", "bc", "def")
-    println(strs.map(String::length))
-//sampleEnd
-}
-```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
-
-要访问作为类成员的属性，请按如下方式对其进行限定：
-
-```kotlin
-fun main() {
-//sampleStart
-    class A(val p: Int)
-    val prop = A::p
-    println(prop.get(A(1)))
-//sampleEnd
-}
-```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
-
-对于扩展属性：
-
-```kotlin
-val String.lastChar: Char
-    get() = this[length - 1]
-
-fun main() {
-    println(String::lastChar.get("abc"))
-}
-```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
 
 ### 与 Java 反射的互操作性 {id="interoperability-with-java-reflection"}
 
-在 JVM 平台上，标准库包含反射类的扩展，这些扩展提供了与 Java 反射对象的映射（请参阅包 `kotlin.reflect.jvm`）。例如，要查找支持字段或作为 Kotlin 属性 getter 的 Java 方法，您可以编写如下代码：
+在 JVM 上，`kotlin-reflect` 库在 [`kotlin.reflect.jvm`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.jvm/) 包中提供了扩展，用于在 Kotlin 与 Java 反射对象之间进行转换。例如，你可以找到实现 Kotlin 属性 getter 的 Java 方法以及该属性的支持字段：
 
 ```kotlin
 import kotlin.reflect.jvm.*
- 
-class A(val p: Int)
- 
+
+class User(val name: String)
+
 fun main() {
-    println(A::p.javaGetter) // 打印 "public final int A.getP()"
-    println(A::p.javaField)  // 打印 "private final int A.p"
+    println(User::name.javaGetter)
+    // public final java.lang.String User.getName()
+
+    println(User::name.javaField)
+    // private final java.lang.String User.name
 }
 ```
 
-要获取与 Java 类相对应的 Kotlin 类，请使用 `.kotlin` 扩展属性：
+Kotlin 属性并不总是具有对应的 Java 字段或 getter，因此当不存在匹配的 Java 反射对象时，这两个属性均返回 `null`。
+
+你还可以在 Kotlin 的 `KClass` 与 Java 的 `Class` 对象之间进行转换。要获取与 Java 类对应的 Kotlin 类，请使用 `.kotlin` 扩展属性：
 
 ```kotlin
-fun getKClass(o: Any): KClass<Any> = o.javaClass.kotlin
+fun getKClass(o: Any): KClass<Any> = value.javaClass.kotlin
 ```
 
-### 构造函数引用 {id="constructor-references"}
+## 获取运行时类 {id="obtain-a-runtime-class"}
 
-可以像引用方法和属性一样引用构造函数。只要程序预期一个函数类型对象，且该对象接受与构造函数相同的参数并返回相应类型的对象，您就可以使用构造函数引用。通过使用 `::` 运算符并添加类名来引用构造函数。考虑以下预期一个不含参数且返回类型为 `Foo` 的函数参数的函数：
+大多数反射操作都从 [`KClass`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/-k-class/) 开始。获取它的方式取决于该类在编译时是否已知：
 
-```kotlin
-class Foo
-
-fun function(factory: () -> Foo) {
-    val x: Foo = factory()
-}
-```
-
-使用 `::Foo`（类 `Foo` 的无参构造函数），您可以像这样调用它：
+* 使用 `ClassName::class` 引用在编译时已知的类。
+* 使用 `value::class` 获取运行时值的实际类，该类可能比其声明的类型更具体。
 
 ```kotlin
-function(::Foo)
-```
+import kotlin.reflect.KClass
 
-根据参数数量的不同，构造函数的可调用引用被归类为 [`KFunction<out R>`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.reflect/-k-function/index.html) 的子类型之一。
+class User(val name: String)
 
-### 绑定的函数与属性引用 {id="bound-function-and-property-references"}
+open class Language
+class Kotlin : Language()
 
-您可以引用特定对象的实例方法：
-
-```kotlin
 fun main() {
-//sampleStart
-    val numberRegex = "\\d+".toRegex()
-    println(numberRegex.matches("29"))
-     
-    val isNumber = numberRegex::matches
-    println(isNumber("29"))
-//sampleEnd
+    // 返回表示 User 的 KClass。
+    val userClass: KClass<User> = User::class
+    println(userClass.simpleName)
+    // User
+    
+    val language: Language = Kotlin()
+
+    // 返回表示运行时值的具体类的 KClass
+    val runtimeClass: KClass<out Language> = language::class
+    println(runtimeClass.simpleName)
+    // Kotlin
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-该示例没有直接调用 `matches` 方法，而是使用了对它的引用。此类引用与其接收者绑定。它可以被直接调用（如上例所示），也可以在预期函数类型表达式时使用：
+Kotlin 标准库提供了用于检查类的基本工具。要进行更深入的运行时内省，请添加 `kotlin-reflect` 依赖项并使用其 API。
+
+## 添加 JVM 依赖项 {id="add-the-jvm-dependency"}
+
+在 JVM 平台上，Kotlin 编译器发行版将使用反射功能所需的运行时组件作为单独的构件 `kotlin-reflect.jar` 提供。这使得无需反射功能的应用可以排除此构件，从而缩减运行时类路径的大小。
+
+要在 Gradle 或 Maven 项目中使用反射，请添加对 `kotlin-reflect` 的依赖项：
+
+<tabs group="build-system">
+<tab title="Gradle" group-key="gradle">
 
 ```kotlin
+dependencies {
+    implementation(kotlin("reflect"))
+}
+```
+
+</tab>
+<tab title="Maven" group-key="maven">
+
+```xml
+<dependencies>
+    <dependency>
+        <groupId>org.jetbrains.kotlin</groupId>
+        <artifactId>kotlin-reflect</artifactId>
+        <version>${kotlin.version}</version>
+    </dependency>
+</dependencies>
+```
+
+</tab>
+</tabs>
+
+如果你不使用 Gradle 或 Maven，请确保项目的类路径中包含 `kotlin-reflect.jar`。命令行编译器默认会添加该库。若要从类路径中排除它，请使用 `-no-reflect` [编译器选项](compiler-reference.md#compiler-options)。
+
+## 检查类型 {id="inspect-types"}
+
+`KClass` 和 `KType` 表示不同的信息。`KClass` 表示类，但不保留类型实参或为 null 性。例如，`List<String>` 和 `List<Int>` 共享相同的 `List::class` 表示，而 `String` 和 `String?` 共享 `String::class`。因此，请使用 [`typeOf<T>()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/type-of.html) 函数获取静态已知类型 `T` 的 `KType`，其中包括其类型实参和为 null 性。
+
+在以下示例中，`classifier` 属性将类型与其类或类型形参关联起来。`arguments` 集合包含其类型实参。因此，代码可以独立于 `List` 来检查 `String?`：
+
+```kotlin
+import kotlin.reflect.typeOf
+
 fun main() {
-//sampleStart
-    val numberRegex = "\\d+".toRegex()
-    val strings = listOf("abc", "124", "a70")
-    println(strings.filter(numberRegex::matches))
-//sampleEnd
+    val type = typeOf<List<String?>>()
+
+    println(type.classifier)
+    // class kotlin.collections.List
+    println(type.arguments.single().type)
+    // kotlin.String?
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
 
-比较绑定引用与未绑定引用的类型。绑定的可调用引用已“附加”了其接收者，因此接收者的类型不再是参数：
+> 在 JVM 上，所创建的类型没有注解，即使你在源代码中为该类型添加了注解也是如此。对类型注解的支持可能会在 `kotlin-reflect` 库的未来版本中添加。
+>
+{style="note"}
+
+## 检查值 {id="check-values"}
+
+当你在代码中直接编写目标类型时，可以使用 [`is`、`as` 和 `as?` 运算符](typecasts.md)。但是，如果将目标类存储在 `KClass` 中，请使用：
+
+* [`isInstance()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/-k-class/is-instance.html) 函数，用于检查某个值是否为该类的实例。它返回 `true` 或 `false`。
+* [`cast()`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.full/cast.html) 函数，用于将值转换为目标类型返回。如果值为 `null` 或类型不兼容，则抛出异常。
+* [`safeCast()`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.full/safe-cast.html) 函数，用于将值转换为目标类型返回，如果值为 `null` 或类型不兼容，则返回 `null`。
 
 ```kotlin
-val isNumber: (CharSequence) -> Boolean = numberRegex::matches
+import kotlin.reflect.cast
+import kotlin.reflect.safeCast
 
-val matches: (Regex, CharSequence) -> Boolean = Regex::matches
-```
-
-属性引用也可以被绑定：
-
-```kotlin
 fun main() {
-//sampleStart
-    val prop = "abc"::length
-    println(prop.get())
-//sampleEnd
+    val expectedClass = String::class
+    val value: Any = "Kotlin"
+
+    // 检查该值而不对其进行转换
+    println(expectedClass.isInstance(value))
+    // true
+
+    // 将该值作为 String 返回
+    val text = expectedClass.cast(value)
+    println(text.length)
+    // 6
+
+    // 不兼容的转换会抛出异常
+    val failedCast = runCatching {
+        Int::class.cast(value)
+    }
+    println(failedCast.isFailure)
+    // true
+
+    // 安全转换对于同样的不匹配情况会返回 null
+    val number = Int::class.safeCast(value)
+    println(number)
+    // null
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-您不需要将 `this` 指定为接收者：`this::foo` 与 `::foo` 是等效的。
+## 检查类 {id="inspect-a-class"}
 
-### 绑定的构造函数引用 {id="bound-constructor-references"}
+获取 `KClass` 后，你可以检查其成员。这样，你就可以在使用声明之前了解存在哪些声明。
+使用 [`members`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/-k-class/members.html) 属性可以检查类的函数和属性。它包含一个 `KCallable` 对象集合，涵盖类中可访问的所有声明，包括继承的声明。
 
-通过提供外部类的实例，可以获得[内部类](nested-classes.md#inner-classes)构造函数的绑定可调用引用：
+例如，以下代码列出了在数据类中可访问的函数和属性：
 
 ```kotlin
-class Outer {
-    inner class Inner
+data class User(val name: String, val age: Int)
+
+fun main() {
+    println(User::class.members.map { it.name }.sorted())
+    // [age, component1, component2, copy, equals, hashCode, name, toString]
+}
+```
+
+`kotlin.reflect.full` 包提供了更具体的属性，用于按种类、作用域和接收者筛选声明：
+
+| 属性 | 返回值 |
+|---|---|
+| [`declaredMembers`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.full/declared-members.html) | 直接在类中声明的函数和属性，不包括继承的声明 |
+| [`functions`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.full/functions.html) | 类中可用的所有函数：类及其超类中的非 static 函数，以及在类中声明的 static 函数 |
+| [`declaredFunctions`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.full/declared-functions.html) | 类中声明的所有函数 |
+| [`memberFunctions`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.full/member-functions.html) | 类及其超类中声明的非扩展、非 static 函数 |
+| [`declaredMemberFunctions`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.full/declared-member-functions.html) | 类中声明的非扩展、非 static 函数 |
+| [`memberExtensionFunctions`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.full/member-extension-functions.html) | 声明为类或其超类成员的扩展函数 |
+| [`declaredMemberExtensionFunctions`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.full/declared-member-extension-functions.html) | 在类中声明的扩展函数 |
+| [`staticFunctions`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.full/static-functions.html) | 在类中声明的 static 函数 |
+| [`memberProperties`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.full/member-properties.html) | 类及其超类中声明的非扩展属性 |
+| [`declaredMemberProperties`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.full/declared-member-properties.html) | 类中声明的非扩展属性 |
+| [`memberExtensionProperties`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.full/member-extension-properties.html) | 声明为类或其超类成员的扩展属性 |
+| [`declaredMemberExtensionProperties`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.full/declared-member-extension-properties.html) | 声明为类成员的扩展属性。 |
+| [`staticProperties`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.full/static-properties.html) | 表示 Java 类中声明的 static 字段的属性 |
+
+请选择与你的代码所需声明相匹配的最精确属性。例如，序列化程序可能使用 `declaredMemberProperties` 仅处理由特定类引入的属性，而搜索可调用 API 的框架可能还需要继承的 `memberFunctions`。
+
+你还可以通过反射[检查密封子类](sealed-classes.md#inspect-sealed-subclasses-with-reflection)。
+
+## 读取属性 {id="read-a-property"}
+
+反射允许你读取在运行时选定的属性。
+例如，你有一个 UI 配置，指定 `name` 作为要从 `User` 对象中显示的属性。
+为此，应用程序必须找到匹配的属性声明，然后调用其 getter：
+
+```kotlin
+import kotlin.reflect.full.memberProperties
+
+data class User(val name: String, val age: Int)
+
+fun readProperty(instance: Any, propertyName: String): Any? {
+    // 检查运行时类
+    val runtimeClass = instance::class
+
+    // 查找属性声明
+    val property = runtimeClass.memberProperties
+        .firstOrNull { it.name == propertyName }
+        ?: error("Unknown property: $propertyName")
+
+    // 以该对象作为接收者调用 getter
+    return property.getter.call(instance)
 }
 
-val o = Outer()
-val boundInnerCtor = o::Inner
+fun main() {
+    val user = User("Jane Doe", 22)
+
+    println(readProperty(user, "name"))
+    // Jane Doe
+    println(readProperty(user, "age"))
+    // 22
+}
 ```
+
+本示例使用 [`memberProperties`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.full/member-properties.html) 返回未绑定的属性对象。这些对象描述了属于该类但未附加到特定实例的属性。因此，`getter.call()` 需要 `instance` 作为其接收者。其结果类型为 `Any?`，因为在运行时选定的属性可以返回任何类型。
+
+> 如果属性在编译时已知，请直接访问属性或使用[可调用引用](lambdas.md#callable-reference)，而不是使用反射。
+> 
+{style="tip"}
+
+## 调用函数 {id="call-a-function"}
+
+动态函数调用遵循与[属性](#读取属性)相同的模式。如果所有实参均按其声明顺序提供，你可以使用 [`call()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/-k-callable/call.html)。先传入对象实例来指定未绑定的成员函数，然后添加其常规实参：
+
+```kotlin
+import kotlin.reflect.full.memberFunctions
+
+class Formatter {
+    fun format(text: String, uppercase: Boolean): String =
+        if (uppercase) text.uppercase() else text
+}
+
+fun main() {
+    val formatter = Formatter()
+
+    // 在运行时根据名称查找函数
+    val function = Formatter::class.memberFunctions
+        .single { it.name == "format" }
+
+    // 先提供接收者，然后按顺序提供声明的实参
+    val result = function.call(formatter, "Kotlin", true)
+
+    println(result)
+    // KOTLIN
+}
+```
+
+在本例中，该调用包含三个值：`Formatter` 接收者、`text` 以及 `uppercase`。它同样返回 `Any?` 类型，并在运行时报告不兼容的接收者或实参。
+
+你也可以将值与 `KParameter` 对象关联，而不是按位置提供它们。为此，请使用 [`callBy()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/-k-callable/call-by.html) 函数：
+
+```kotlin
+import kotlin.reflect.full.instanceParameter
+import kotlin.reflect.full.memberFunctions
+import kotlin.reflect.full.valueParameters
+
+class Greeter {
+    fun greet(name: String, punctuation: String = "!") =
+        "Hello, $name$punctuation"
+}
+
+fun main() {
+    val greeter = Greeter()
+    val function = Greeter::class.memberFunctions
+        .single { it.name == "greet" }
+
+    // valueParameters 包含在 greet() 中声明的形参，
+    // 但不包含 Greeter 接收者
+    val nameParameter = function.valueParameters
+        .single { it.name == "name" }
+
+    val result = function.callBy(
+        mapOf(
+            // 成员函数需要实例接收者
+            function.instanceParameter!! to greeter,
+            nameParameter to "Kotlin"
+        )
+    )
+
+    println(result)
+    // Hello, Kotlin!
+}
+```
+
+在此示例中，`instanceParameter` 标识成员函数的接收者，而 `valueParameters` 仅包含在函数签名中声明的形参。
+
+> 当完整的有序实参列表已可用时，请使用 `call()`。
+> 
+> 当需要将实参匹配到形参对象，或者让可选形参使用其默认值时，请使用 `callBy()`。
+> 
+{style="tip"}

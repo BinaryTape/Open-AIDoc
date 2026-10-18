@@ -6,35 +6,36 @@
 플러그인은 직렬화, 콘텐츠 인코딩, 압축 등과 같은 공통 기능을 제공합니다.
 </link-summary>
 
-Ktor의 전형적인 요청/응답 파이프라인(pipeline)은 다음과 같습니다:
+Ktor에서의 일반적인 요청/응답 파이프라인은 다음과 같습니다.
 
 ![Request Response Pipeline](request-response-pipeline.png){width="600"}
 
-요청에서 시작하여 특정 핸들러로 라우팅되고, 애플리케이션 로직에 의해 처리된 후 최종적으로 응답이 이루어집니다. 
+서버가 요청을 수신하면 요청 파이프라인을 통해 처리됩니다. Ktor는 요청을 적절한 핸들러로 라우팅하고, 핸들러에서 애플리케이션 로직이 이를 처리합니다. 그런 다음 응답은 클라이언트로 전송되기 전에 응답 파이프라인을 거치게 됩니다.
 
-## 플러그인으로 기능 추가하기 {id="add_functionality"}
+## 플러그인으로 기능 추가 {id="add_functionality"}
 
-많은 애플리케이션은 애플리케이션 로직의 범위를 벗어난 공통 기능을 필요로 합니다. 이는 직렬화(serialization) 및 콘텐츠 인코딩(content encoding), 압축(compression), 헤더(headers), 쿠키(cookie) 지원 등이 될 수 있습니다. Ktor에서는 이러한 모든 기능을 **플러그인(Plugins)**이라는 수단을 통해 제공합니다. 
+많은 애플리케이션에서는 애플리케이션 로직과 분리된 기능이 필요합니다. 여기에는 인증, 직렬화 및 콘텐츠 인코딩, 압축, 헤더, 쿠키 등이 포함됩니다. Ktor에서는 이러한 기능이 _플러그인(plugin)_을 통해 제공됩니다.
 
-이전 파이프라인 다이어그램을 보면, 플러그인은 요청/응답과 애플리케이션 로직 사이에 위치합니다:
+플러그인은 요청 및 응답 처리의 다양한 단계를 가로챌(intercept) 수 있습니다. 따라서 요청/응답 파이프라인의 서로 다른 지점에 적용될 수 있습니다.
 
 ![Plugin pipeline](plugin-pipeline.png){width="600"}
 
-요청이 들어오면:
+플러그인이 실행되는 정확한 단계는 해당 플러그인과 플러그인이 사용하는 훅(hook) 또는 파이프라인 단계(pipeline phase)에 따라 달라집니다. 일반적으로 요청은 다음과 같이 처리될 수 있습니다.
 
-* 라우팅 메커니즘을 통해 올바른 핸들러로 라우팅됩니다.
-* 핸들러에 전달되기 전에 하나 이상의 플러그인을 거칩니다.
-* 핸들러(애플리케이션 로직)가 요청을 처리합니다.
-* 응답이 클라이언트로 전송되기 전에 하나 이상의 플러그인을 거칩니다.
+* 라우팅 메커니즘이 요청을 처리해야 할 핸들러를 결정합니다.
+* 핸들러로 전달되기 전에 요청은 하나 이상의 플러그인에 의해 처리됩니다.
+* 핸들러는 애플리케이션 로직을 사용하여 응답을 생성합니다.
+* 응답이 클라이언트로 전송되기 전에 응답은 하나 이상의 플러그인에 의해 처리됩니다.
 
-## 라우팅은 플러그인입니다 {id="routing"}
+## 라우팅도 하나의 플러그인입니다 {id="routing"}
 
-플러그인은 최대한의 유연성을 제공하도록 설계되었으며, 요청/응답 파이프라인의 모든 세그먼트에 존재할 수 있습니다. 사실, 지금까지 `routing`이라고 불러온 것은 하나의 플러그인에 불과합니다. 
+플러그인은 최대한의 유연성을 제공하고, 요청/응답 파이프라인의 어떤 세그먼트에도 존재할 수 있도록 설계되었습니다. Ktor에서는 `routing` 자체도 플러그인으로 구현되어 있습니다.
 
 ![Routing as a Plugin](plugin-pipeline-routing.png){width="600"}
 
 ## 플러그인 의존성 추가 {id="dependency"}
-대부분의 플러그인은 특정 의존성을 필요로 합니다. 예를 들어, `CORS` 플러그인은 빌드 스크립트에 `ktor-server-cors` 아티팩트를 추가해야 합니다:
+
+대부분의 플러그인은 별도의 의존성이 필요합니다. 예를 들어, [`CORS`](server-cors.md) 플러그인은 빌드 스크립트에 `ktor-server-cors` 아티팩트가 필요합니다.
 
 <var name="artifact_name" value="ktor-server-cors"/>
 <Tabs group="languages">
@@ -49,9 +50,16 @@ Ktor의 전형적인 요청/응답 파이프라인(pipeline)은 다음과 같습
     </TabItem>
 </Tabs>
 
+> 사용 가능한 플러그인의 전체 목록은 [Ktor Project Generator](https://start.ktor.io/settings)를 참조하세요. 특정 플러그인에 필요한 의존성은 해당 플러그인 문서를 참조하세요.
+> 
+{style="tip"}
+
 ## 플러그인 설치 {id="install"}
 
-플러그인은 일반적으로 플러그인을 매개변수로 받는 `install` 함수를 사용하여 서버의 초기화 단계에서 구성됩니다. [서버를 생성하는 방식](server-create-and-configure.topic)에 따라 `embeddedServer` 호출 내부에서 플러그인을 설치하거나...
+플러그인은 일반적으로 `install()` 함수를 사용하여 서버 초기화 단계에서 구성됩니다. [서버 생성](server-create-and-configure.topic) 방식에 따라 `embeddedServer()` 함수 내부 또는 [애플리케이션 모듈](server-modules.md)에서 플러그인을 설치할 수 있습니다.
+
+<Tabs>
+<TabItem title="embeddedServer()">
 
 ```kotlin
 import io.ktor.server.application.*
@@ -67,7 +75,8 @@ fun main() {
 }
 ```
 
-... 또는 지정된 [모듈(module)](server-modules.md) 내에서 설치할 수 있습니다:
+</TabItem>
+<TabItem title="Application.module()">
 
 ```kotlin
 import io.ktor.server.application.*
@@ -81,9 +90,12 @@ fun Application.module() {
 }
 ```
 
-요청과 응답을 가로채는 것 외에도, 플러그인은 이 단계에서 구성되는 옵션 설정 섹션을 가질 수 있습니다.
+</TabItem>
+</Tabs>
 
-예를 들어, [쿠키(Cookies)](server-sessions.md#cookie)를 설치할 때 쿠키가 저장될 위치나 이름과 같은 특정 매개변수를 설정할 수 있습니다:
+플러그인을 설치할 때 `install()` 함수에 구성 블록을 전달하여 플러그인을 구성할 수 있습니다.
+
+예를 들어, [`Sessions` 플러그인](server-sessions.md)을 설치할 때 세션 타입과 쿠키 이름을 지정하여 쿠키 기반 세션을 구성할 수 있습니다.
 
 ```kotlin
 install(Sessions) {
@@ -91,9 +103,11 @@ install(Sessions) {
 } 
 ```
 
-### 특정 라우트에 플러그인 설치하기 {id="install-route"}
+### 특정 라우트에 플러그인 설치 {id="install-route"}
 
-Ktor에서는 전역뿐만 아니라 특정 [라우트(routes)](server-routing.md)에도 플러그인을 설치할 수 있습니다. 이는 서로 다른 애플리케이션 리소스에 대해 서로 다른 플러그인 구성이 필요한 경우 유용할 수 있습니다. 예를 들어, 아래의 [예제](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/caching-headers-routes)는 `/index` 라우트에 특정 [캐싱 헤더(caching header)](server-caching-headers.md)를 추가하는 방법을 보여줍니다:
+Ktor에서는 플러그인을 전역적으로 설치할 수 있을 뿐만 아니라 특정 [라우트(route)](server-routing.md)에 설치할 수도 있습니다. 이는 서로 다른 리소스에 각기 다른 플러그인 구성이 필요할 때 유용합니다.
+
+예를 들어, 다음 코드는 `/index` 라우트에 [`CachingHeader` 플러그인](server-caching-headers.md)을 설치하고 캐싱 헤더를 추가하도록 구성하는 방법을 보여줍니다.
 
 ```kotlin
 route("/index") {
@@ -106,34 +120,35 @@ route("/index") {
 }
 ```
 
-동일한 플러그인을 여러 번 설치할 때는 다음 규칙이 적용됩니다:
-* 특정 라우트에 설치된 플러그인 구성은 [전역 구성](#install)보다 우선합니다.
-* 라우팅은 동일한 라우트에 대한 설치를 병합하며, 마지막 설치가 적용됩니다. 예를 들어, 다음과 같은 애플리케이션의 경우... 
+동일한 플러그인이 여러 수준에서 설치된 경우, Ktor는 다음 규칙을 적용합니다.
+
+* 특정 라우트에 설치된 플러그인의 구성은 해당하는 [전역 플러그인 구성](#install)보다 우선합니다.
+* 동일한 라우트가 여러 번 정의되고 동일한 플러그인의 다중 설치를 포함하는 경우, 라우팅은 해당 라우트에 대한 설치들을 병합합니다. 이때 마지막 설치가 우선 적용됩니다.
+
+다음 예제에서는 `/index/a` 및 `/index/b`에 대한 호출이 모두 두 번째 `CachingHeaders` 설치에 의해서만 처리됩니다.
    
-   ```kotlin
-   routing {
-       route("index") {
-           install(CachingHeaders) { /* 첫 번째 구성 */ }
-           get("a") {
-               // ...
-           }
-       }
-       route("index") {
-           install(CachingHeaders) { /* 두 번째 구성 */ }
-           get("b") {
-               // ...
-           }
-       }
-   }
-   ```
-   {initial-collapse-state="collapsed" collapsed-title="install(CachingHeaders) { // 첫 번째 구성 }"}
-   
-   ... `/index/a` 및 `/index/b`에 대한 두 호출 모두 플러그인의 두 번째 설치에 의해서만 처리됩니다.
+ ```kotlin
+ routing {
+     route("index") {
+         install(CachingHeaders) { /* 첫 번째 구성 */ }
+         get("a") {
+             // ...
+         }
+     }
+     route("index") {
+         install(CachingHeaders) { /* 두 번째 구성 */ }
+         get("b") {
+             // ...
+         }
+     }
+ }
+ ```
+ {initial-collapse-state="collapsed" collapsed-title="install(CachingHeaders) { // First configuration }"}
 
-## 기본, 사용 가능 및 커스텀 플러그인 {id="default_available_custom"}
+## 기본 제공, 사용 가능 및 커스텀 플러그인 {id="default_available_custom"}
 
-기본적으로 Ktor는 어떠한 플러그인도 활성화하지 않으므로, 애플리케이션에 필요한 기능을 위한 플러그인을 직접 설치해야 합니다.
+Ktor는 기본적으로 애플리케이션 플러그인을 설치하지 않습니다. 애플리케이션에 필요한 기능을 제공하는 플러그인을 직접 설치해야 합니다.
 
-하지만 Ktor는 기본적으로 제공되는 다양한 플러그인을 지원합니다. [Ktor 플러그인 레지스트리(Ktor Plugin Registry)](https://github.com/ktorio/ktor-plugin-registry/tree/main/plugins/server)에서 전체 목록을 확인할 수 있습니다.
+Ktor는 다양한 플러그인을 제공합니다. 사용 가능한 플러그인의 전체 목록은 [Ktor Project Generator](https://start.ktor.io/settings)에서 확인할 수 있습니다.
 
-또한 자신만의 [커스텀 플러그인(custom plugins)](server-custom-plugins.md)을 만들 수도 있습니다.
+또한 애플리케이션 전체에서 재사용하거나 다른 애플리케이션과 공유할 수 있는 기능을 캡슐화하기 위해 자체 [커스텀 플러그인](server-custom-plugins.md)을 만들 수도 있습니다.

@@ -124,6 +124,7 @@
   "js-running-tests.md",
   "js-to-kotlin-interop.md",
   "jvm-annotation-processors.md",
+  "jvm-backend-faq.md",
   "jvm-code-analysis.md",
   "jvm-create-project-with-spring-boot.md",
   "jvm-get-started-spring-boot.md",

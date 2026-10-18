@@ -672,7 +672,7 @@
   "coroutines.flows": "Flow",
   "coroutines.coroutines-flow": "概覽",
   "kmp.kotlin-toolchain": "Kotlin 工具鏈",
-  "kmp.whats-new-compose-112": "Compose Multiplatform 1.12.1",
+  "kmp.whats-new-compose-112": "Compose Multiplatform 1.12.2",
   "kotlin.take-kotlin-tour": "開始 Kotlin 之旅",
   "kotlin.beginner": "初學者",
   "kotlin.intermediate": "中級",
@@ -740,5 +740,7 @@
   "serialization.alternative-and-custom-serialization-formats": "替代與自訂序列化格式",
   "callout.note": "注意",
   "callout.tip": "提示",
-  "callout.warning": "警告"
+  "callout.warning": "警告",
+  "kotlin.jvm-backend-faq": "常見問題",
+  "kotlin.reflection": "反射 (kotlin-reflect)"
 }

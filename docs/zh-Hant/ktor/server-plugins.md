@@ -3,39 +3,39 @@
 <show-structure for="chapter" depth="2"/>
 
 <link-summary>
-外掛程式提供了常用的功能，例如序列化、內容編碼、壓縮等。
+外掛程式提供了通用功能，例如序列化、內容編碼、壓縮等。
 </link-summary>
 
-Ktor 中典型的請求/回應管線如下所示：
+Ktor 中典型的請求／回應管線如下所示：
 
 ![Request Response Pipeline](request-response-pipeline.png){width="600"}
 
-它從一個請求開始，該請求被路由到特定的處理常式，由我們的應用程式邏輯處理，最後得到回應。 
+伺服器接收到請求後，會透過請求管線對其進行處理。Ktor 將請求路由至適當的處理常式，並在該處由您的應用程式邏輯進行處理。接著，回應會在傳送至用戶端之前通過回應管線。
 
-## 使用外掛程式增加功能 {id="add_functionality"}
+## 使用外掛程式新增功能 {id="add_functionality"}
 
-許多應用程式需要不屬於應用程式邏輯範圍內的通用功能。這可能包括序列化和內容編碼、壓縮、標頭、Cookie 支援等。所有這些在 Ktor 中都是透過我們所謂的 **外掛程式** 來提供的。 
+許多應用程式都需要獨立於應用程式邏輯之外的功能。這包括身分驗證、序列化和內容編碼、壓縮、標頭、Cookie 等。在 Ktor 中，這些功能由 _外掛程式_ 提供。
 
-如果我們查看之前的管線圖，外掛程式位於請求/回應與應用程式邏輯之間：
+外掛程式可以攔截請求與回應處理的不同階段。因此，它們可以套用在請求／回應管線中的不同位置：
 
 ![Plugin pipeline](plugin-pipeline.png){width="600"}
 
-當請求進來時：
+外掛程式執行的確切階段取決於該外掛程式本身及其使用的掛鉤或管線階段。一般而言，請求的處理流程如下：
 
-* 它透過路由機制被路由到正確的處理常式
-* 在移交給處理常式之前，它會經過一個或多個外掛程式
-* 處理常式（應用程式邏輯）處理請求
-* 在回應發送給用戶端之前，它會經過一個或多個外掛程式
+* 路由機制決定應由哪個處理常式來處理請求。
+* 在移交給處理常式之前，請求會先由一個或多個外掛程式進行處理。
+* 處理常式使用應用程式邏輯產生回應。
+* 在回應傳送至用戶端之前，回應會由一個或多個外掛程式進行處理。
 
-## 路由也是一個外掛程式 {id="routing"}
+## 路由本身就是一個外掛程式 {id="routing"}
 
-外掛程式的設計方式旨在提供最大的靈活性，並允許它們存在於請求/回應管線的任何區段中。
-事實上，我們到目前為止所稱的 `routing`，也不過是一個外掛程式。 
+外掛程式旨在提供極大的彈性，並能存在於請求／回應管線的任何區段中。在 Ktor 中，`routing` 本身就是實作為一個外掛程式：
 
 ![Routing as a Plugin](plugin-pipeline-routing.png){width="600"}
 
 ## 新增外掛程式相依性 {id="dependency"}
-大多數外掛程式需要特定的相依性。例如，`CORS` 外掛程式需要在建置指令碼中加入 `ktor-server-cors` 構件：
+
+大多數外掛程式都需要額外的相依性。例如，[`CORS`](server-cors.md) 外掛程式需要在建置指令碼中引入 `ktor-server-cors` 構件：
 
 <var name="artifact_name" value="ktor-server-cors"/>
 <Tabs group="languages">
@@ -50,9 +50,16 @@ Ktor 中典型的請求/回應管線如下所示：
     </TabItem>
 </Tabs>
 
+> 如需可用外掛程式的完整清單，請參閱 [Ktor 專案產生器](https://start.ktor.io/settings)。如需特定外掛程式所需的相依性，請參閱對應的外掛程式文件。
+> 
+{style="tip"}
+
 ## 安裝外掛程式 {id="install"}
 
-外掛程式通常在伺服器初始化階段使用 `install` 函式進行配置，該函式接受一個外掛程式作為參數。根據您[建立伺服器](server-create-and-configure.topic)的方式，您可以在 `embeddedServer` 呼叫中安裝外掛程式...
+外掛程式通常在伺服器的初始化階段使用 `install()` 函式進行設定。取決於您[建立伺服器](server-create-and-configure.topic)的方式，您可以在 `embeddedServer()` 函式內部或在[應用程式模組](server-modules.md)中安裝外掛程式：
+
+<Tabs>
+<TabItem title="embeddedServer()">
 
 ```kotlin
 import io.ktor.server.application.*
@@ -68,7 +75,8 @@ fun main() {
 }
 ```
 
-... 或在指定的[模組](server-modules.md)中安裝：
+</TabItem>
+<TabItem title="Application.module()">
 
 ```kotlin
 import io.ktor.server.application.*
@@ -82,9 +90,12 @@ fun Application.module() {
 }
 ```
 
-除了攔截請求和回應外，外掛程式還可以有一個選用的配置區段，在此步驟中進行配置。
+</TabItem>
+</Tabs>
 
-例如，在安裝 [Cookies](server-sessions.md#cookie) 時，我們可以設定某些參數，例如我們希望 Cookie 儲存的位置或其名稱：
+在安裝外掛程式時，您可以透過將設定區塊傳遞給 `install()` 函式來設定該外掛程式。
+
+例如，在安裝 [`Sessions` 外掛程式](server-sessions.md)時，您可以透過指定工作階段型別和 Cookie 名稱來設定以 Cookie 為基礎的工作階段：
 
 ```kotlin
 install(Sessions) {
@@ -94,7 +105,9 @@ install(Sessions) {
 
 ### 將外掛程式安裝到特定路由 {id="install-route"}
 
-在 Ktor 中，您不僅可以全域安裝外掛程式，還可以將其安裝到特定的[路由](server-routing.md)。如果您需要為不同的應用程式資源提供不同的外掛程式配置，這會非常有用。例如，下方的[範例](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/caching-headers-routes)顯示了如何為 `/index` 路由加入指定的[快取標頭](server-caching-headers.md)：
+在 Ktor 中，您不僅可以全域安裝外掛程式，還可以將其安裝在特定的[路由](server-routing.md)上。當不同的資源需要不同的外掛程式設定時，這會非常有用。
+
+例如，以下程式碼展示了如何在 `/index` 路由上安裝 [`CachingHeader` 外掛程式](server-caching-headers.md)，並將其設定為新增快取標頭：
 
 ```kotlin
 route("/index") {
@@ -107,34 +120,35 @@ route("/index") {
 }
 ```
 
-請注意，以下規則適用於同一外掛程式的多個安裝：
-* 安裝到特定路由的外掛程式配置會覆寫其[全域配置](#install)。
-* 路由會合併同一路由的安裝，並以最後一次安裝為準。例如，對於這樣的應用程式... 
+當同一個外掛程式安裝在多個層級時，Ktor 會套用以下規則：
+
+* 安裝到特定路由的外掛程式設定會覆寫對應的[全域外掛程式設定](#install)。
+* 如果同一個路由被多次定義，且包含同一個外掛程式的多次安裝，則路由會合併該路由的安裝設定。以最後一次安裝為準。
+
+在以下範例中，對 `/index/a` 和 `/index/b` 的呼叫都僅由第二個 `CachingHeaders` 安裝處理：
    
-   ```kotlin
-   routing {
-       route("index") {
-           install(CachingHeaders) { /* 第一個配置 */ }
-           get("a") {
-               // ...
-           }
-       }
-       route("index") {
-           install(CachingHeaders) { /* 第二個配置 */ }
-           get("b") {
-               // ...
-           }
-       }
-   }
-   ```
-   {initial-collapse-state="collapsed" collapsed-title="install(CachingHeaders) { // 第一個配置 }"}
-   
-   ... 對 `/index/a` 和 `/index/b` 的呼叫都僅由外掛程式的第二次安裝處理。
+ ```kotlin
+ routing {
+     route("index") {
+         install(CachingHeaders) { /* First configuration */ }
+         get("a") {
+             // ...
+         }
+     }
+     route("index") {
+         install(CachingHeaders) { /* Second configuration */ }
+         get("b") {
+             // ...
+         }
+     }
+ }
+ ```
+ {initial-collapse-state="collapsed" collapsed-title="install(CachingHeaders) { // First configuration }"}
 
 ## 預設、可用及自訂外掛程式 {id="default_available_custom"}
 
-預設情況下，Ktor 不會啟用任何外掛程式，因此需要由您根據應用程式的功能需求來安裝外掛程式。
+Ktor 預設不會安裝應用程式外掛程式。請安裝提供應用程式所需功能的外掛程式。
 
-然而，Ktor 確實提供了各種開箱即用的外掛程式。您可以在 [Ktor 外掛程式儲存庫](https://github.com/ktorio/ktor-plugin-registry/tree/main/plugins/server)中查看這些外掛程式的完整清單。
+Ktor 提供了豐富的外掛程式。您可以在 [Ktor 專案產生器](https://start.ktor.io/settings)中找到可用外掛程式的完整清單。
 
-此外，您還可以建立自己的[自訂外掛程式](server-custom-plugins.md)。
+您也可以建立自己的[自訂外掛程式](server-custom-plugins.md)，以封裝可在應用程式中重複使用或與其他應用程式共享的功能。

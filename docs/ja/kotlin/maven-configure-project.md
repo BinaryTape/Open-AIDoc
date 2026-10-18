@@ -1,16 +1,21 @@
-[//]: # (title: Mavenプロジェクトの設定)
+[//]: # (title: Maven プロジェクトの構成)
 
-既存のJava MavenプロジェクトにKotlinを導入する場合、または新しいKotlin Mavenプロジェクトを作成する場合、KotlinのソースとモジュールをコンパイルするKotlin Mavenプラグインを追加する必要があります。
+既存の Java Maven プロジェクトに Kotlin を導入する場合、または新しい Kotlin Maven プロジェクトを作成する場合は、Kotlin のソースとモジュールをコンパイルする Kotlin Maven プラグインを追加する必要があります。
 
-現在、Maven v3のみがサポートされています。
+現在、Maven v3 のみがサポートされています。
 
-## 自動設定 {id="automatic-configuration"}
+> プロジェクトを Maven 4 に移行する予定がある場合は、[`mvnup`](https://maven.apache.org/tools/mvnup.html) Maven アップグレードツールを使用してビルドを自動的に移行してください。移行の詳細については、[Starting with Maven 4](https://maven.apache.org/guides/mini/guide-migration-to-mvn4.html) ガイドを参照してください。
+>
+{style="note"}
 
-JavaとKotlinの混合プロジェクトおよび純粋なKotlinプロジェクトの両方で、`<extensions>`オプションを使用してMavenの設定を簡略化できます。このアプローチでは、Mavenコンパイラプラグイン（Maven compiler plugin）を設定する必要がないため、時間を節約できます。
+## 自動構成 {id="automatic-configuration"}
 
-`<extensions>`を使用してKotlin Mavenプラグインを適用するには、`pom.xml`ビルドファイルを次のように更新します。
+`<extensions>` オプションを使用することで、Java と Kotlin が混在するプロジェクトおよび純粋な Kotlin プロジェクトの双方で Maven の構成を簡素化できます。
+このアプローチにより、Maven コンパイラプラグインを個別に構成する必要がなくなるため、時間を節約できます。
 
-1. `<properties>`セクションで、KotlinとJVMのターゲットバージョンを定義します。
+`<extensions>` を指定して Kotlin Maven プラグインを適用するには、`pom.xml` ビルドファイルを次のように更新します。
+
+1. `<properties>` セクションで、Kotlin と JVM のターゲットバージョンを定義します。
 
    ```xml
    <properties>
@@ -19,57 +24,59 @@ JavaとKotlinの混合プロジェクトおよび純粋なKotlinプロジェク�
    </properties>
    ```
 
-2. `<build><plugins>`セクションで、`<extensions>`オプションを有効にしたKotlin Mavenプラグインを追加します。
+2. `<build><plugins>` セクションで、`<extensions>` オプションを有効にした Kotlin Maven プラグインを追加します。
 
    ```xml
    <build>
        <plugins>
-           <!-- Kotlinコンパイラプラグインの設定 -->
+           <!-- Kotlin compiler plugin configuration -->
            <plugin>
                <groupId>org.jetbrains.kotlin</groupId>
                <artifactId>kotlin-maven-plugin</artifactId>
                <version>${kotlin.version}</version>
-               <extensions>true</extensions> <!-- 拡張機能を有効化 -->
+               <extensions>true</extensions> <!-- Enable the extension -->
            </plugin>
-           <!-- extensionsを使用する場合、Mavenコンパイラプラグインの設定は不要 -->
+           <!-- No need to configure Maven compiler plugin with extensions -->
        </plugins>
    </build>
    ```
 
-`<extensions>`オプションは以下を行います：
+`<extensions>` オプションには以下の効果があります。
 
-* `src/main/kotlin`および`src/test/kotlin`ディレクトリが存在し、プラグイン設定で指定されていない場合に、それらをソースルートとして登録します。
-* プロジェクトで[`kotlin-stdlib`への依存関係](maven-set-dependencies.md#dependency-on-the-standard-library)がまだ定義されていない場合に、それを追加します。
-* `compile`、`test-compile`、`kapt`、`test-kapt`の実行（execution）をビルドに追加し、適切な[ライフサイクルフェーズ](https://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html)にバインドします。これにより、`kapt`、Kotlinの`compile`、およびJavaの`compile`の各実行が正しい順序で実行されるように、`<id>`や`<goals>`を含む`<executions>`セクションを手動で設定する必要がなくなります。
-* [JVMターゲットバージョンを、プロジェクトで設定されたJavaコンパイラのバージョンと自動的に合わせます。](#jvmターゲットバージョン)
+* `src/main/kotlin` および `src/test/kotlin` ディレクトリが既に存在し、プラグイン構成で指定されていない場合、それらをソースルートとして登録します。
+* プロジェクトでまだ定義されていない場合、[`kotlin-stdlib` の依存関係](maven-set-dependencies.md#dependency-on-the-standard-library) を追加します。
+* 適切な[ライフサイクルフェーズ](https://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html)にバインドされた `compile`、`test-compile`、`kapt`、および `test-kapt` の各 execution をビルドに追加します。
+  そのため、これらが正しい順序で実行されるように、`kapt`、Kotlin の `compile`、Java の `compile` execution に対して `<id>` や `<goals>` を含む `<executions>` セクションを手動で設定する必要はありません。
+* [プロジェクトで構成されている Java コンパイラのバージョンに合わせて JVM ターゲットバージョンを自動的に調整します。](#jvm-target-version)
    
-JavaとKotlinの混合プロジェクトの場合、この設定により以下が保証されます：
+Java と Kotlin が混在するプロジェクトの場合、この構成により以下が保証されます。
 
-* Kotlinコードが最初にコンパイルされます。
-* JavaコードはKotlinの後にコンパイルされ、Kotlinクラスを参照できます。
-* デフォルトのMavenの挙動によってプラグインの順序が上書きされることはありません。
+* Kotlin コードが最初にコンパイルされます。
+* Java コードは Kotlin の後にコンパイルされ、Kotlin クラスを参照できます。
+* Maven のデフォルトの動作によってプラグインの実行順序が上書きされることはありません。
 
-拡張機能の設定は`<executions>`セクション全体を置き換えます。実行（execution）を設定する必要がある場合は、[KotlinとJavaソースのコンパイル](#kotlinとjavaソースのコンパイル)の例を参照してください。
+extension の構成は、`<executions>` セクション全体を置き換えます。execution を個別に構成する必要がある場合は、[Kotlin と Java のソースをコンパイルする](#compile-kotlin-and-java-sources) の例を参照してください。
 
-> 複数のビルドプラグインがデフォルトのライフサイクルを上書きしており、かつ`<extensions>`オプションも有効にしている場合、`<build>`セクション内の最後のプラグインがライフサイクル設定の優先権を持ちます。それ以前のライフサイクル設定への変更はすべて無視されます。
+> 複数のビルドプラグインがデフォルトのライフサイクルを上書きしており、かつ `<extensions>` オプションも有効にしている場合、`<build>` セクション内の最後のプラグインがライフサイクル設定に対して優先順位を持ちます。それ以前のライフサイクル設定への変更はすべて無視されます。
 >
 {style="note"}
 
 <anchor name="maven-compiler-extensions-version"/>
 
-現在、`<extensions>`で使用されるMavenコンパイラプラグインのデフォルトバージョンは **%mavenExtensionsVersion%** です。別のバージョンを個別に設定することもできます：
+現在、`<extensions>` で使用される Maven コンパイラプラグインのデフォルトバージョンは **%mavenExtensionsVersion%** です。
+別のバージョンを個別に設定することもできます。
 
 ```xml
 <build>
     <plugins>
-        <!-- Kotlinコンパイラプラグインの設定 -->
+        <!-- Kotlin compiler plugin configuration -->
         <plugin>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-maven-plugin</artifactId>
             <version>${kotlin.version}</version>
             <extensions>true</extensions>
         </plugin>
-        <!-- Javaクラス用のMavenコンパイラプラグインの設定 -->
+        <!-- Maven compiler plugin configuration for Java classes -->
         <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-compiler-plugin</artifactId>
@@ -79,90 +86,93 @@ JavaとKotlinの混合プロジェクトの場合、この設定により以下�
 </build>
 ```
 
-### JVMターゲットバージョン {id="jvm-target-version"}
+### JVM ターゲットバージョン {id="jvm-target-version"}
 
-`<extensions>`オプションは、KotlinコンパイラとMavenコンパイラが同じバイトコードバージョンをターゲットにすることを保証します。
+`<extensions>` オプションにより、Kotlin コンパイラと Maven コンパイラが同じバイトコードバージョンをターゲットにすることが保証されます。
 
-Kotlin Mavenプラグインは、以下の順序でJVMターゲットバージョンを自動的に解決します。
+Kotlin Maven プラグインは、以下の順序で JVM ターゲットバージョンを自動的に解決します。
 
 ```mermaid
 graph TD
-    A["<b>優先順位 1</b><br/>kotlin.compiler.jdkRelease</br>または kotlin.compiler.jvmTarget"]
-    B["<b>優先順位 2</b><br/>maven.compiler.release"]
-    C["<b>優先順位 3</b><br/>maven.compiler.target"]
+    A["<b>Priority 1</b><br/>kotlin.compiler.jdkRelease</br>or kotlin.compiler.jvmTarget"]
+    B["<b>Priority 2</b><br/>maven.compiler.release"]
+    C["<b>Priority 3</b><br/>maven.compiler.target"]
 
     A --> B
     B --> C
 ```
 
-#### Kotlinコンパイラのバージョン {id="kotlin-compiler-versions"}
+#### Kotlin コンパイラのバージョン {id="kotlin-compiler-versions"}
 
-プロジェクトで `kotlin.compiler.jdkRelease` または `kotlin.compiler.jvmTarget` プロパティのいずれかが定義されている場合、その設定が優先されます。
+プロジェクトで `kotlin.compiler.jdkRelease` または `kotlin.compiler.jvmTarget` プロパティのいずれかが定義されている場合、その設定値が優先されます。
 
-これらのKotlinコンパイラオプションの挙動の違いに注意してください：
+これらの Kotlin コンパイラオプションの動作は異なることに注意してください。
 
-| Kotlinコンパイラオプション | 出力のバイトコードバージョンを制御する | APIを指定したJDKに制限する |
-|------------------------------|-----------------------------------------|-----------------------------------------------------------------------------------------------|
-| `kotlin.compiler.jvmTarget`  | はい | コード内のJDK APIに制限なし |
-| `kotlin.compiler.jdkRelease` | はい | はい － 特定のAPIバージョンのみが許可される（Javaの `--release` コンパイラオプションと同等） |
+| Kotlin コンパイラオプション   | 出力のバイトコードバージョンを制御 | API を指定された JDK に制限                                                    |
+|------------------------------|-----------------------------------|-------------------------------------------------------------------------------|
+| `kotlin.compiler.jvmTarget`  | はい                              | いいえ（コード内の JDK API に制限なし）                                         |
+| `kotlin.compiler.jdkRelease` | はい                              | はい − 特定の API バージョンのみ許可（Java の `--release` コンパイラオプションと同等） |
 
-> `kotlin.compiler.jdkRelease` と `kotlin.compiler.jvmTarget` に異なるJDKオプションを同時に設定しないでください。設定した場合、エラーが発生します。
+> `kotlin.compiler.jdkRelease` と `kotlin.compiler.jvmTarget` に異なる JDK オプションを同時に設定しないでください。
+> エラーが発生します。
 >
 {style="note"}
 
-#### Mavenコンパイラのバージョン {id="maven-compiler-versions"}
+#### Maven コンパイラのバージョン {id="maven-compiler-versions"}
 
-* `kotlin.compiler.jdkRelease` と `kotlin.compiler.jvmTarget` のどちらのオプションも設定されていない場合、プラグインは `maven.compiler.release` のバージョンを採用します。
+* `kotlin.compiler.jdkRelease` も `kotlin.compiler.jvmTarget` も設定されていない場合、プラグインは `maven.compiler.release` のバージョンを採用します。
 
-  `maven.compiler.release` バージョンは、プロジェクトのプロパティとして定義するか、`maven-compiler-plugin` の設定内で定義できます。
-* Mavenの `release` バージョンが設定されていない場合、プラグインは `maven.compiler.target` のバージョンを採用します。
+  `maven.compiler.release` のバージョンは、プロジェクトのプロパティとして定義することも、`maven-compiler-plugin` の構成内で定義することもできます。
+* Maven の release バージョンが設定されていない場合、プラグインは `maven.compiler.target` のバージョンを採用します。
 
-  これは、プロジェクトのプロパティとして定義するか、`maven-compiler-plugin` の設定内で定義できます。
+  これもプロジェクトのプロパティとして定義するか、`maven-compiler-plugin` の構成内で定義できます。
 
-Mavenコンパイラの `target` オプションと `release` オプションの挙動の違いに注意してください：
+Maven コンパイラの `target` オプションと `release` オプションの動作は異なることに注意してください。
 
-| Mavenコンパイラオプション | Kotlinの `jvmTarget` を設定する | Kotlinの `jdkRelease` を設定する | APIを指定したJDKに制限する |
-|--------------------------|---------------------------|----------------------------|----------------------------------------------|
-| `maven.compiler.target`  | はい | いいえ | いいえ － ビルドのJDKクラスパスは可視のまま |
-| `maven.compiler.release` | はい | はい | はい － 特定のAPIバージョンのみに制限 |
+| Maven コンパイラオプション | Kotlin の `jvmTarget` を設定 | Kotlin の `jdkRelease` を設定 | API を指定された JDK に制限                     |
+|--------------------------|-----------------------------|------------------------------|------------------------------------------------|
+| `maven.compiler.target`  | はい                        | いいえ                       | いいえ − ビルドの JDK クラスパスは可視のまま    |
+| `maven.compiler.release` | はい                        | はい                         | はい − 指定された API バージョンのみに制限される |
 
-> `<extensions>` オプションは、プロジェクトレベルのプロパティとグローバルな `maven-compiler-plugin` 設定のみをチェックします。プラグインの `<executions>` セクション内で定義された設定はチェックしません。
+> `<extensions>` オプションは、プロジェクトレベルのプロパティとグローバルな `maven-compiler-plugin` の構成のみをチェックします。
+> プラグインの `<executions>` セクション内で定義された構成はチェックしません。
 >
 {style="note"}
 
-## 手動設定 {id="manual-configuration"}
+## 手動構成 {id="manual-configuration"}
 
-Kotlin Mavenプラグインで`<extensions>`を有効にしない場合は、ソースコードが正しくコンパイルされるようにプロジェクトを手動で設定する必要があります。
+Kotlin Maven プラグインで `<extensions>` を有効にしない場合は、ソースコードが正しくコンパイルされるようにプロジェクトを手動で構成する必要があります。
 
-Mavenプロジェクトを、[JavaとKotlinソースの組み合わせ](#kotlinとjavaソースのコンパイル)または[Kotlinのみのソース](#kotlinのみのソースのコンパイル)をコンパイルするように設定できます。
+Maven プロジェクトを設定して、[Java と Kotlin が混在するソース](#compile-kotlin-and-java-sources) または [Kotlin のみのソース](#compile-kotlin-only-sources) をコンパイルできます。
 
-### KotlinとJavaソースのコンパイル {id="compile-kotlin-and-java-sources"}
+### Kotlin と Java のソースをコンパイルする {id="compile-kotlin-and-java-sources"}
 
-KotlinとJavaの両方のソースファイルがあるプロジェクトをコンパイルするには、Javaコンパイラの前にKotlinコンパイラが実行されるようにする必要があります。
+Kotlin と Java の両方のソースファイルを含むプロジェクトをコンパイルするには、Java コンパイラの前に Kotlin コンパイラが実行されるようにしてください。
 
-Javaコンパイラは、Kotlinの宣言が`.class`ファイルにコンパイルされるまでそれらを認識できません。JavaコードでKotlinクラスを使用する場合、`cannot find symbol`エラーを避けるために、それらのクラスを先にコンパイルする必要があります。
+Java コンパイラは、`.class` ファイルにコンパイルされるまで Kotlin の宣言を認識できません。
+Java コードが Kotlin クラスを使用している場合、`cannot find symbol` エラーを防ぐために、それらのクラスを最初にコンパイルする必要があります。
 
-Mavenは、主に次の2つの要因に基づいてプラグインの実行順序を決定します：
+Maven は、主に次の 2 つの要因に基づいてプラグインの実行順序を決定します。
 
-* `pom.xml`ファイル内でのプラグイン宣言の順序。
-* `default-compile`や`default-testCompile`などの組み込みのデフォルト実行。これらは、`pom.xml`ファイル内での位置に関係なく、常にユーザー定義の実行よりも前に実行されます。
+* `pom.xml` ファイル内でのプラグイン宣言の順序。
+* `default-compile` や `default-testCompile` などの組み込みのデフォルト execution。これらは、`pom.xml` ファイル内の位置に関係なく、常にユーザー定義の execution より前に実行されます。
 
-実行順序を制御するには：
+実行順序を制御するには、以下を行います。
 
-* `maven-compiler-plugin`の前に`kotlin-maven-plugin`を宣言します。
-* Javaコンパイラプラグインのデフォルトの実行を無効にします。
-* コンパイルフェーズを明示的に制御するためにカスタム実行を追加します。
+* `maven-compiler-plugin` の前に `kotlin-maven-plugin` を宣言します。
+* Java コンパイラプラグインのデフォルト execution を無効にします。
+* カスタム execution を追加して、コンパイルフェーズを明示的に制御します。
 
-> デフォルトの実行を無効にするには、Mavenの特別なフェーズである`none`を使用できます。
+> Maven の特別な `none` フェーズを使用すると、デフォルトの execution を無効にできます。
 >
 {style="note"}
 
-Kotlin Mavenプラグインを適用するには、`pom.xml`ビルドファイルを次のように更新します。
+Kotlin Maven プラグインを適用するには、`pom.xml` ビルドファイルを次のように更新します。
 
 ```xml
 <build>
     <plugins>
-        <!-- Kotlinコンパイラプラグインの設定 -->
+        <!-- Kotlin compiler plugin configuration -->
         <plugin>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-maven-plugin</artifactId>
@@ -177,7 +187,7 @@ Kotlin Mavenプラグインを適用するには、`pom.xml`ビルドファイ�
                     <configuration>
                         <sourceDirs>
                             <sourceDir>${project.basedir}/src/main/kotlin</sourceDir>
-                            <!-- KotlinコードがJavaコードを参照できるようにする -->
+                            <!-- Ensure Kotlin code can reference Java code -->
                             <sourceDir>${project.basedir}/src/main/java</sourceDir>
                         </sourceDirs>
                     </configuration>
@@ -198,13 +208,13 @@ Kotlin Mavenプラグインを適用するには、`pom.xml`ビルドファイ�
             </executions>
         </plugin>
 
-        <!-- Mavenコンパイラプラグインの設定 -->
+        <!-- Maven compiler plugin configuration -->
         <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-compiler-plugin</artifactId>
             <version>3.15.0</version>
             <executions>
-                <!-- デフォルトの実行を無効化 -->
+                <!-- Disable default executions -->
                 <execution>
                     <id>default-compile</id>
                     <phase>none</phase>
@@ -214,7 +224,7 @@ Kotlin Mavenプラグインを適用するには、`pom.xml`ビルドファイ�
                     <phase>none</phase>
                 </execution>
 
-                <!-- カスタム実行を定義 -->
+                <!-- Define custom executions -->
                 <execution>
                     <id>java-compile</id>
                     <phase>compile</phase>
@@ -235,19 +245,19 @@ Kotlin Mavenプラグインを適用するには、`pom.xml`ビルドファイ�
 </build>
 ```
 
-この設定により、以下が保証されます：
+この構成により、以下が保証されます。
 
-* Kotlinコードが最初にコンパイルされます。
-* JavaコードはKotlinの後にコンパイルされ、Kotlinクラスを参照できます。
-* デフォルトのMavenの挙動によってプラグインの順序が上書きされることはありません。
+* Kotlin コードが最初にコンパイルされます。
+* Java コードは Kotlin の後にコンパイルされ、Kotlin クラスを参照できます。
+* Maven のデフォルトの動作によってプラグインの実行順序が上書きされることはありません。
 
-Mavenがプラグインの実行をどのように処理するかについての詳細は、Maven公式ドキュメントの[Guide to default plugin execution IDs](https://maven.apache.org/guides/mini/guide-default-execution-ids.html)を参照してください。
+Maven がプラグインの execution を処理する方法の詳細については、公式 Maven ドキュメントの [Guide to default plugin execution IDs](https://maven.apache.org/guides/mini/guide-default-execution-ids.html) を参照してください。
 
-### Kotlinのみのソースのコンパイル {id="compile-kotlin-only-sources"}
+### Kotlin のみのソースをコンパイルする {id="compile-kotlin-only-sources"}
 
-Kotlinソースファイルのみのプロジェクトをコンパイルするには、ソースルートを宣言し、Kotlin Mavenプラグインを設定します。
+Kotlin ソースファイルのみを含むプロジェクトをコンパイルするには、ソースルートを宣言し、Kotlin Maven プラグインを構成します。
 
-1. `<build>`セクションでソースディレクトリを指定します。
+1. `<build>` セクションでソースディレクトリを指定します。
 
     ```xml
     <build>
@@ -256,7 +266,7 @@ Kotlinソースファイルのみのプロジェクトをコンパイルする�
     </build>
     ```
 
-2. Kotlin Mavenプラグインが適用されていることを確認します。
+2. Kotlin Maven プラグインが適用されていることを確認します。
 
     ```xml
     <build>
@@ -284,13 +294,13 @@ Kotlinソースファイルのみのプロジェクトをコンパイルする�
     </build>
     ```
 
-### JDKバージョンの設定 {id="set-jdk-version"}
+### JDK バージョンの設定 {id="set-jdk-version"}
 
-Kotlinは、ビルドでのJDKバージョンの管理に役立つ [Mavenツールチェーン (Maven Toolchains)](https://maven.apache.org/guides/mini/guide-using-toolchains.html) をサポートしています。
+Kotlin は、ビルド内の JDK バージョンを管理するのに役立つ [Maven Toolchains](https://maven.apache.org/guides/mini/guide-using-toolchains.html) をサポートしています。
 
-ビルドで `maven-toolchains-plugin` を設定すると、Mavenを実行しているJVMのバージョン（`JAVA_HOME` パスで設定されたもの）とは無関係に、Kotlinのコンパイルに使用するJDKバージョンを指定できます。Kotlin Mavenプラグインは、選択されたJDKツールチェーンを自動的に取得します。
+ビルドで `maven-toolchains-plugin` を構成すると、Maven を実行している JVM のバージョン（`JAVA_HOME` パスで設定）とは無関係に、Kotlin のコンパイルに使用する JDK バージョンを指定できます。その後、Kotlin Maven プラグインは選択された JDK ツールチェーンを自動的に取得します。
 
-これにより、Kotlinのコンパイルを含む、ビルド内のすべてのプラグインで使用されるJDKを制御する単一のツールチェーンを構成できます。例えば：
+これにより、Kotlin コンパイルを含む、ビルド内のすべてのプラグインで使用される JDK を制御する単一のツールチェーンを構成できます。例えば：
 
 ```xml
 <plugin>
@@ -314,36 +324,38 @@ Kotlinは、ビルドでのJDKバージョンの管理に役立つ [Mavenツー�
 </plugin>
 ```
 
-JDKバージョンを設定するさまざまな方法の優先順位に注意してください：
+JDK バージョンを設定するさまざまな方法の優先順位に注意してください。
 
 ```Mermaid
 graph TD
-    A["<b>優先順位 1</b><br/>kotlin-maven-plugin の jdkHome オプション"]
-    B["<b>優先順位 2</b><br/>maven-toolchains-plugin で設定された<br/>JDKバージョン"]
-    C["<b>優先順位 3</b><br/>JAVA_HOME のバージョン"]
+    A["<b>Priority 1</b><br/>jdkHome option of the kotlin-maven-plugin"]
+    B["<b>Priority 2</b><br/>JDK version set in the <br/>maven-toolchains-plugin"]
+    C["<b>Priority 3</b><br/>JAVA_HOME version"]
 
     A --> B
     B --> C
 ```
 
-* `kotlin-maven-plugin` 設定の `jdkHome` オプションで設定されたJDKバージョンは、常にツールチェーンのバージョンよりも優先されます。
-* `maven-toolchains-plugin` のJDKバージョンは、`JAVA_HOME` パスで設定されたJDKバージョンを上書きします。
+* `kotlin-maven-plugin` 構成の `jdkHome` オプションで設定された JDK バージョンは、常にツールチェーンのバージョンよりも優先されます。
+* `maven-toolchains-plugin` 内の JDK バージョンは、`JAVA_HOME` パスに設定された JDK バージョンを上書きします。
 
-また、プラグイン固有の `<jdkToolchain>` オプションを使用して、`kotlin-maven-plugin` のツールチェーンでJDKバージョンを直接設定することもできます。`maven-toolchains-plugin` を使用する場合と比較して、このパラメータはKotlinのコンパイルにのみ影響し、ビルド内の他のプラグインには影響しません。
+プラグイン固有の `<jdkToolchain>` オプションを使用して、`kotlin-maven-plugin` のツールチェーンで直接 JDK バージョンを設定することもできます。`maven-toolchains-plugin` の使用と比較して、このパラメータは Kotlin のコンパイルにのみ影響し、ビルド内の他のプラグインには影響を与えません。
 
-> 現在、特定のJDKバージョンを使用するように `maven-toolchains-plugin` を設定しても、`kotlin-maven-plugin` の [`kapt` および `test-kapt` ゴールには影響しません](https://youtrack.jetbrains.com/issue/KT-79897)。代わりに、`JAVA_HOME` パスに必要なバージョンを設定してください。
+> 現在、特定の JDK バージョンを使用するように `maven-toolchains-plugin` を設定しても、`kotlin-maven-plugin` の [`kapt` および `test-kapt` ゴールには影響しません](https://youtrack.jetbrains.com/issue/KT-79897)。代わりに、`JAVA_HOME` パスに必要なバージョンを設定してください。
 >
 {style="note"}
 
-## Javaモジュール（JPMS）の設定 {id="configure-java-modules-jpms"}
+## Java モジュール（JPMS）の構成 {id="configure-java-modules-jpms"}
 
-Kotlin Mavenプラグインは [Javaプラットフォームモジュールシステム (JPMS)](https://dev.java/learn/modules/) をサポートしているため、`module-info.java` 記述子とともにKotlinコードをコンパイルし、生成されたモジュールを他のJavaモジュールと同様に使用できます。
+Kotlin Maven プラグインは [Java Platform Module System (JPMS)](https://dev.java/learn/modules/) をサポートしているため、`module-info.java` 記述子と一緒に Kotlin コードをコンパイルし、結果として生成されるモジュールを他の Java モジュールと同様に使用できます。
 
-ビルドファイルにJPMS固有の特別なオプションを追加する必要はありません。単にMavenの前にKotlinコンパイラが実行されるように設定するだけです。
+ビルドファイルで追加の JPMS 固有オプションを指定する必要はありません。
+単に Kotlin コンパイラを Maven の前に構成するだけです。
 
-`module-info.java` 記述子が存在する場合、Kotlinコンパイラはそれをソースファイルとして使用し、クラスパスではなくモジュールパスに対してコンパイルします。Kotlinコンパイラは記述子を読み取ってモジュールグラフを解決し、その後Mavenコンパイラがそれを `module-info.class` ファイルにコンパイルします。
+`module-info.java` 記述子が存在する場合、Kotlin コンパイラはそれをソースファイルとして使用し、クラスパスではなくモジュールパスに対してコンパイルします。Kotlin コンパイラは記述子を読み取ってモジュールグラフを解決し、その後 Maven コンパイラがそれを `module-info.class` ファイルにコンパイルします。
 
-Javaモジュールを設定するには、`${project.basedir}/src/main/java` ディレクトリに `module-info.java` ファイルを作成します。モジュール記述子では、モジュールが必要とするすべての依存関係と、エクスポートするパッケージを宣言します。例えば：
+Java モジュールを構成するには、`${project.basedir}/src/main/java` ディレクトリに `module-info.java` ファイルを作成します。
+モジュール記述子内で、モジュールが必要とするすべての依存関係とモジュールがエクスポートするパッケージを宣言します。例えば：
 
 ```java
 module org.example.myapp {
@@ -354,12 +366,13 @@ module org.example.myapp {
 }
 ```
 
-以下の点に注意してください：
+以下の点に注意してください。
 
-* Javaモジュールは、宣言したものだけを使用できます。コンパイルにはクラスパスではなくモジュールパスが使用されるため、記述子には標準ライブラリ、JDKモジュール（`java.base` を除く）、およびその他のライブラリなど、Kotlinコードが使用するすべての依存関係を含める必要があります。そうしないと、`Unresolved reference` エラーが発生する可能性があります。
-* モジュールの場合、`Package is empty or does not exist` ビルドエラーを避けるために、Kotlinファイルのパッケージ名は `module-info.java` のパッケージ名と一致している必要があります。
-* `pom.xml` ビルドファイルは、[KotlinがJavaの前にコンパイルされるように](#kotlinとjavaソースのコンパイル)設定されている必要があります。[プロジェクトの自動設定](#自動設定)を使用している場合、`<extensions>` オプションによってこれが既に保証されています。
+* Java モジュールで使用できるのは、宣言したもののみです。コンパイルではクラスパスではなくモジュールパスが使用されるため、記述子には Kotlin コードが使用するすべての依存関係（標準ライブラリ、`java.base` を除く JDK モジュール、およびその他のライブラリ）を含める必要があります。そうしないと、`Unresolved reference` エラーが発生する可能性があります。
+* モジュールの場合、`Package is empty or does not exist` というビルドエラーを防ぐために、Kotlin ファイルのパッケージ名は `module-info.java` のパッケージ名と一致している必要があります。
+* `pom.xml` ビルドファイルは、[Kotlin が Java の前にコンパイルされる](#compile-kotlin-and-java-sources) ように構成する必要があります。
+  [自動プロジェクト構成](#automatic-configuration) を使用している場合、`<extensions>` オプションによってこれが既に保証されています。
 
 ## 次のステップ {id="what-s-next"}
 
-[Kotlin Mavenプロジェクトでの依存関係の設定](maven-set-dependencies.md)
+[Kotlin Maven プロジェクトで依存関係を設定する](maven-set-dependencies.md)
