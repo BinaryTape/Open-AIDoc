@@ -69,10 +69,46 @@ export function checkTranslation(translated, source) {
   if (src.paragraphs >= 12 && out.paragraphs <= 0.5 * src.paragraphs) {
     weak.push(`paragraphs ${out.paragraphs}/${src.paragraphs}`)
   }
+  const leftovers = undefinedLeftovers(translated, source)
+  if (leftovers > 0) {
+    strong.push(`"undefined" ${leftovers}`)
+  }
 
   // One weak signal alone is too noisy: a translation may legitimately merge
   // paragraphs or drop a duplicated link.
   return strong.length > 0 || weak.length > 1 ? [...strong, ...weak] : []
+}
+
+// Where the pipeline once wrote "undefined" for content it could not find
+// (fixed in #70): an include, a link summary, the text of an empty link.
+const UNDEFINED_LEFTOVERS = [
+  /^[ \t]*undefined[ \t]*$/gm,
+  /\bsummary="undefined"/g,
+  /\[undefined\]\(/g,
+]
+
+/**
+ * How many more "undefined" placeholders the translation has than its
+ * source, outside code blocks. A page holding the word itself is fine.
+ */
+export function undefinedLeftovers(translated, source) {
+  const placeholders = (text) => {
+    const prose = proseOf(text)
+    return UNDEFINED_LEFTOVERS.reduce((sum, pattern) => sum + count(prose, pattern), 0)
+  }
+  return Math.max(0, placeholders(translated) - placeholders(source))
+}
+
+/** The text outside fenced code blocks. */
+function proseOf(text) {
+  let inFence = false
+  return text.split('\n').filter((line) => {
+    if (FENCE_LINE.test(line)) {
+      inFence = !inFence
+      return false
+    }
+    return !inFence
+  }).join('\n')
 }
 
 function count(text, pattern) {

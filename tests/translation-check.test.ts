@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { checkTranslation, structureOf } from '../tools/pipeline/utils/translation-check.mjs'
+import { checkTranslation, structureOf, undefinedLeftovers } from '../tools/pipeline/utils/translation-check.mjs'
 
 const section = (n: number) => [
   `## Section ${n}`,
@@ -65,5 +65,40 @@ describe('checkTranslation', () => {
     const lastFence = faithful.lastIndexOf('```')
     const open = faithful.slice(0, lastFence) + faithful.slice(lastFence + 3)
     expect(checkTranslation(open, source)).toContain('unclosed code block')
+  })
+})
+
+// The pipeline once wrote "undefined" for content it could not find (#70);
+// published pages from before still show it (P0-13).
+describe('undefinedLeftovers', () => {
+  const source = [
+    '* only the [CIO engine](server-engines.md) is supported',
+    '',
+    '> Using Ktor in a Kotlin/Native project requires a new memory manager.',
+    '{style="note"}',
+    '',
+    'See <Links href="server-native.topic" summary="Run a server without a JVM.">Native server</Links>',
+    'and [](compose-test.md#locales).',
+  ].join('\n')
+
+  it.each([
+    ['an include that was not found', source.replace(/> Using[^\n]*\n\{style="note"\}/, 'undefined')],
+    ['a link summary', source.replace('summary="Run a server without a JVM."', 'summary="undefined"')],
+    ['the text of an empty link', source.replace('[](compose-test.md', '[undefined](compose-test.md')],
+  ])('counts %s', (_, translated) => {
+    expect(undefinedLeftovers(translated, source)).toBe(1)
+    expect(checkTranslation(translated, source)).toContain('"undefined" 1')
+  })
+
+  it('leaves the word itself alone', () => {
+    const word = 'Nullability of generic type parameters is undefined by default.\n\nSanitizers detect undefined behavior.'
+    expect(undefinedLeftovers(word, word)).toBe(0)
+    // As many placeholders as the source: nothing the pipeline added.
+    expect(undefinedLeftovers('undefined', 'undefined')).toBe(0)
+  })
+
+  it('ignores code blocks', () => {
+    const code = '```javascript\nlet x\nundefined\n```'
+    expect(undefinedLeftovers(code, '```javascript\nlet x\n```')).toBe(0)
   })
 })

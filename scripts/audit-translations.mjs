@@ -1,7 +1,8 @@
 /**
  * Audit the published translations against the upstream documents they are
  * translated from, prepared the way the pipeline prepares them, and queue the
- * broken ones (truncated, summarized, missing sections) for the next sync.
+ * broken ones (truncated, summarized, missing sections, "undefined" where the
+ * pipeline once could not find an include or a link summary) for the next sync.
  *
  *   node --import tsx scripts/audit-translations.mjs --clones <dir> [--repo id[,id]] [--strict] [--repair] [--write] [--missing]
  *
