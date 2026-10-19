@@ -20,6 +20,7 @@
 .vp-doc .ws-code-collapse__summary {
   position: relative;
   display: block;
+  margin: 0;
   padding: 12px 24px 12px 52px;
   list-style: none;
   cursor: pointer;
