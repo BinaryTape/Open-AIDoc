@@ -1,4 +1,5 @@
 import {
+    hasFileExtension,
     isExternalOrFragment,
     localizedDocRoute,
     resolveRelativeDocTarget,
@@ -31,9 +32,10 @@ export function kmpRewriteHref(env: any, href: string): string {
     return href;
 }
 
-function rewriteAssets(href: string): string {
+function rewriteAssets(href: string): string | undefined {
     if (href.startsWith('/')) {
-        return href
+        // A file stays as it is; a page (/kmp/get-started) gets localized below.
+        return hasFileExtension(href) ? href : undefined
     }
     if (href.endsWith('.png') || href.endsWith('.svg') || href.endsWith('.jpeg') || href.endsWith('.jpg') || href.endsWith('.gif')) {
         return `/kmp/${href}`

@@ -2,17 +2,24 @@
  * Post-build crawl: every internal page href in docs/.vitepress/dist must
  * resolve to a rendered HTML file (or index.html). External URLs are ignored;
  * an href with a scheme a browser cannot follow (such as Koog's unresolved
- * `api:` links) is reported as dead.
+ * `api:` links) is reported as dead, and so is `//server-plugins`: a host
+ * without a dot is a site path that lost its doc name, not another site.
  *
- * Run after docs:build (wired into docs:verify).
+ * A page's content (<main>) must also link to pages in its own language: a
+ * Japanese page linking to /kotlin/… sends the reader to the Chinese page.
+ *
+ * Run after docs:build (wired into docs:verify). DIST_DIR overrides the
+ * directory (tests).
  */
-import { existsSync } from 'node:fs'
+import { existsSync, readdirSync } from 'node:fs'
 import { readdir, readFile } from 'node:fs/promises'
 import { dirname, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-const distDir = resolve(__dirname, '../docs/.vitepress/dist')
+const distDir = process.env.DIST_DIR
+  ? resolve(process.env.DIST_DIR)
+  : resolve(__dirname, '../docs/.vitepress/dist')
 // Not localhost: tutorials link to the reader's own server (http://localhost:8080/...).
 const SITE_HOSTS = new Set(['openaidoc.org', 'www.openaidoc.org'])
 const WEB_SCHEMES = new Set(['http:', 'https:', 'mailto:', 'tel:', 'data:', 'javascript:'])
@@ -24,9 +31,18 @@ if (!existsSync(distDir)) {
   process.exit(1)
 }
 
+// Locale prefixes (ja, ko, zh-Hant): top-level directories holding a copy of
+// the docs, such as ja/ktor next to ktor. The default locale has no prefix.
+const topDirs = readdirSync(distDir, { withFileTypes: true }).filter((entry) => entry.isDirectory()).map((entry) => entry.name)
+const localePrefixes = new Set(
+  topDirs.filter((dir) => topDirs.some((doc) => doc !== dir && existsSync(resolve(distDir, dir, doc))))
+)
+
 const htmlFiles = await listFiles(distDir, '.html')
 /** @type {Map<string, Set<string>>} */
 const deadPages = new Map()
+/** @type {Map<string, Set<string>>} target path → pages in another language linking to it */
+const otherLanguageLinks = new Map()
 let internalRefs = 0
 
 for (const file of htmlFiles) {
@@ -45,6 +61,28 @@ for (const file of htmlFiles) {
       if (!deadPages.has(resolved.path)) deadPages.set(resolved.path, new Set())
       deadPages.get(resolved.path).add(fromUrl)
     }
+  }
+
+  const pageLocale = localeOf(fromUrl)
+  for (const href of collectHrefs(mainContent(html))) {
+    const resolved = resolveInternalPage(fromUrl, href)
+    if (!resolved || !resolved.candidates.length || localeOf(resolved.path) === pageLocale) continue
+    if (!otherLanguageLinks.has(resolved.path)) otherLanguageLinks.set(resolved.path, new Set())
+    otherLanguageLinks.get(resolved.path).add(fromUrl)
+  }
+}
+
+if (otherLanguageLinks.size > 0) {
+  const ranked = [...otherLanguageLinks.entries()].sort((a, b) => b[1].size - a[1].size)
+  const pages = new Set(ranked.flatMap(([, sources]) => [...sources]))
+  console.error(
+    `Internal link verification failed: ${pages.size} page(s) link to ${ranked.length} page(s) in another language.\n`
+  )
+  for (const [path, sources] of ranked.slice(0, 80)) {
+    console.error(`- ${path} (from ${sources.size} page(s), e.g. ${[...sources].slice(0, 5).join(', ')})`)
+  }
+  if (ranked.length > 80) {
+    console.error(`… and ${ranked.length - 80} more`)
   }
 }
 
@@ -69,6 +107,9 @@ if (deadPages.size > 0) {
   if (ranked.length > 80) {
     console.error(`… and ${ranked.length - 80} more`)
   }
+}
+
+if (deadPages.size > 0 || otherLanguageLinks.size > 0) {
   process.exit(1)
 }
 
@@ -85,6 +126,18 @@ function collectHrefs(html) {
     out.add(match[1])
   }
   return out
+}
+
+/** The page's own content: VitePress puts it in <main>, the nav and footer are outside. */
+function mainContent(html) {
+  const start = html.indexOf('<main')
+  const end = html.lastIndexOf('</main>')
+  return start === -1 || end === -1 ? '' : html.slice(start, end)
+}
+
+function localeOf(urlPath) {
+  const first = urlPath.split('/')[1] ?? ''
+  return localePrefixes.has(first) ? first : ''
 }
 
 function fileToUrl(file) {
@@ -123,6 +176,10 @@ function resolveInternalPage(fromUrl, href) {
   if (/^https?:\/\//i.test(href) || href.startsWith('//')) {
     try {
       const url = new URL(href.startsWith('//') ? `https:${href}` : href)
+      // `//server-plugins`: no such site; the browser cannot follow it.
+      if (href.startsWith('//') && !url.hostname.includes('.')) {
+        return { path: href, candidates: [] }
+      }
       if (!SITE_HOSTS.has(url.hostname)) return null
       pathWithQuery = `${url.pathname}${url.search}${url.hash}`
     } catch {

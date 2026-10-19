@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   getPageLocale,
+  hasFileExtension,
   isExternalOrFragment,
   localizedDocRoute,
   normalizeDocTarget,
@@ -91,6 +92,34 @@ describe('getPageLocale / localizedDocRoute', () => {
     expect(localizedDocRoute(jaEnv, 'kotlin', '', '#top')).toBe(
       '/ja/kotlin/#top'
     )
+  })
+})
+
+describe('Writerside site paths', () => {
+  it.each([
+    ['ktor', ktorRewriteHref, '/ktor/server-native', '/ja/ktor/server-native'],
+    ['ktor', ktorRewriteHref, '/ktor/server-native#install', '/ja/ktor/server-native#install'],
+    ['kmp', kmpRewriteHref, '/kmp/get-started', '/ja/kmp/get-started'],
+  ] as const)('%s localizes the absolute page path %s', (docType, rewriteHref, href, expected) => {
+    // Was returned as is: absolute paths were taken for assets.
+    expect(rewriteHref({ relativePath: `ja/${docType}/x.md` }, href)).toBe(expected)
+    expect(rewriteHref({ relativePath: `${docType}/x.md` }, href)).toBe(href)
+  })
+
+  it.each([
+    ['ktor', ktorRewriteHref],
+    ['kmp', kmpRewriteHref],
+  ] as const)('%s leaves absolute file paths alone', (docType, rewriteHref) => {
+    expect(rewriteHref({ relativePath: `ja/${docType}/x.md` }, `/${docType}/logo.svg`)).toBe(`/${docType}/logo.svg`)
+    expect(rewriteHref({ relativePath: `ja/${docType}/x.md` }, `/${docType}/sample.zip`)).toBe(`/${docType}/sample.zip`)
+  })
+
+  it('tells files from pages', () => {
+    expect(hasFileExtension('/ktor/logo.svg')).toBe(true)
+    expect(hasFileExtension('/ktor/a.zip?x=1')).toBe(true)
+    expect(hasFileExtension('/ktor/server-native')).toBe(false)
+    expect(hasFileExtension('/ktor/server-native.topic#a')).toBe(false)
+    expect(hasFileExtension('/ktor/server-native.md')).toBe(false)
   })
 })
 

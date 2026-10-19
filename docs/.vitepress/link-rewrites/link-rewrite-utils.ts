@@ -39,6 +39,12 @@ export function isExternalOrFragment(href: string) {
     href.startsWith('#')
 }
 
+/** A file (`/ktor/logo.svg`), not a page: an extension other than .md or .topic. */
+export function hasFileExtension(href: string) {
+  const lastSegment = splitHref(href).pathname.split('/').pop() ?? ''
+  return /\.[a-z0-9]+$/i.test(lastSegment) && !/\.(?:md|topic)$/.test(lastSegment)
+}
+
 export function normalizeDocTarget(target: string, docType: string) {
   let normalized = normalizePosixPath(target)
     .replace(new RegExp(`^/${docType}/?`), '')
