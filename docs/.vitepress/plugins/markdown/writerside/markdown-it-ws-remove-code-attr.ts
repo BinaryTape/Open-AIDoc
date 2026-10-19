@@ -16,8 +16,11 @@ const MARKER = /^<!--ws-code-attrs:([^>]*)-->\s*$/
  */
 export default function markdownItWsRemoveCodeAttr(md) {
     md.core.ruler.after("normalize", "remove-code-attrs", function (state) {
+        // First a one-line attribute list, where a quoted value may hold "}"
+        // (collapsed-title=".clickable { count += 1 }"); the old pattern stopped
+        // there and left the rest of the line on the page. Else as before.
         state.src = state.src.replace(
-            /([ \t]*)```\n[ \t]*\{[\s\S]*?\}/gm,
+            /([ \t]*)```\n[ \t]*(?:\{(?:[^}"\n]|"[^"\n]*")*\}|\{[\s\S]*?\})/gm,
             (match, indention) => {
                 const attrs = parseCodeBlockAttrs(match.slice(match.indexOf('\n') + 1))
                 const marker = attrs ? `${indention}<!--ws-code-attrs:${encodeURIComponent(JSON.stringify(attrs))}-->` : ''
@@ -31,9 +34,10 @@ export default function markdownItWsRemoveCodeAttr(md) {
         for (let i = 0; i < tokens.length; i++) {
             const token = tokens[i]
             // The source pattern also matches after an opening fence, where
-            // the line was always dropped: drop the marker from the code too.
+            // the line was always emptied (two pages whose fences do not
+            // pair up): empty the marker's line in the code too.
             if (token.type === 'fence' && token.content.includes('<!--ws-code-attrs:')) {
-                token.content = token.content.replace(/^[ \t]*<!--ws-code-attrs:[^>]*-->[ \t]*\n?/gm, '')
+                token.content = token.content.replace(/^[ \t]*<!--ws-code-attrs:[^>]*-->[ \t]*$/gm, '')
             }
             if (token.type !== 'html_block') continue
             const match = MARKER.exec(token.content.trim())

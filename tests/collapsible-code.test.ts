@@ -66,6 +66,13 @@ describe('collapsible code blocks', () => {
     expect(html).toMatch(/<li>[\s\S]*<details class="ws-code-collapse">[\s\S]*<\/details>[\s\S]*<\/li>/)
   })
 
+  it('reads a collapsed title holding braces', async () => {
+    // Was cut at the first "}": the rest of the line, `.semantics(…)"}`, showed as a paragraph.
+    const html = await render(block('{initial-collapse-state="collapsed" collapsible="true" collapsed-title=".clickable { count += 1 } .semantics(mergeDescendants = true)"}'))
+    expect(html).toContain('>.clickable { count += 1 } .semantics(mergeDescendants = true) {...}</summary>')
+    expect(html).not.toContain('<p>')
+  })
+
   it('keeps every attribute on the fence token, for runnable code later', async () => {
     const md = await createMarkdownRenderer('docs', { config: (md) => registerMarkdownPlugins(md) })
     const tokens = md.parse(block('{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="ex"}') + '\nText.\n', {
