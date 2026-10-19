@@ -22,6 +22,12 @@ describe('parseCodeBlockAttrs', () => {
     })
   })
 
+  it('reads single-quoted values', () => {
+    expect(parseCodeBlockAttrs(`{collapsible="true" collapsed-title='version.set("7.8.0")'}`)).toEqual({
+      collapsible: 'true', 'collapsed-title': 'version.set("7.8.0")',
+    })
+  })
+
   it('keeps braces and spaces inside values', () => {
     expect(parseCodeBlockAttrs('{collapsed-title="fun f() { … }"}')).toEqual({ 'collapsed-title': 'fun f() { … }' })
   })
@@ -71,6 +77,17 @@ describe('collapsible code blocks', () => {
     const html = await render(block('{initial-collapse-state="collapsed" collapsible="true" collapsed-title=".clickable { count += 1 } .semantics(mergeDescendants = true)"}'))
     expect(html).toContain('>.clickable { count += 1 } .semantics(mergeDescendants = true) {...}</summary>')
     expect(html).not.toContain('<p>')
+  })
+
+  it('reads the attribute line after a blank line, as kotlinlang.org does', async () => {
+    // Was shown as a paragraph: {initial-collapse-state="collapsed" …}.
+    const html = await render(block('\n{initial-collapse-state="collapsed" collapsible="true" collapsed-title="InterTypography()"}'))
+    expect(html).toMatch(/^<details class="ws-code-collapse"><summary[^>]*>InterTypography\(\) \{\.\.\.\}<\/summary>/)
+    expect(html).not.toContain('<p>')
+    // A brace line that is not attributes stays as it was (markdown-it-attrs reads it).
+    const other = await render('```kotlin\nx\n```\n\n{ not attributes }\n')
+    expect(other).not.toContain('<details')
+    expect(other).toContain('<p not="" attributes=""></p>')
   })
 
   it('keeps every attribute on the fence token, for runnable code later', async () => {

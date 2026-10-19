@@ -13,14 +13,15 @@
  */
 export type CodeBlockAttrs = Record<string, string>
 
-const ATTR_LINE = /^\{\s*((?:[\w-]+\s*=\s*"[^"]*"\s*)+)\}$/
-const ATTR = /([\w-]+)\s*=\s*"([^"]*)"/g
+// Values in double or single quotes: collapsed-title='version.set("7.8.0")'.
+const ATTR_LINE = /^\{\s*((?:[\w-]+\s*=\s*(?:"[^"]*"|'[^']*')\s*)+)\}$/
+const ATTR = /([\w-]+)\s*=\s*(?:"([^"]*)"|'([^']*)')/g
 
 /** The attributes of a `{name="value" …}` line, or null when it is not one. */
 export function parseCodeBlockAttrs(line: string): CodeBlockAttrs | null {
   const match = ATTR_LINE.exec(line.trim())
   if (!match) return null
-  return Object.fromEntries([...match[1].matchAll(ATTR)].map(([, name, value]) => [name, value]))
+  return Object.fromEntries([...match[1].matchAll(ATTR)].map(([, name, double, single]) => [name, double ?? single]))
 }
 
 /** The attributes markdown-it-ws-remove-code-attr kept on a fence token. */

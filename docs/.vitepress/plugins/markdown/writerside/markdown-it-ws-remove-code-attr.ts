@@ -19,12 +19,23 @@ export default function markdownItWsRemoveCodeAttr(md) {
         // First a one-line attribute list, where a quoted value may hold "}"
         // (collapsed-title=".clickable { count += 1 }"); the old pattern stopped
         // there and left the rest of the line on the page. Else as before.
+        const marker = (indention, attrs) =>
+            `${indention}<!--ws-code-attrs:${encodeURIComponent(JSON.stringify(attrs))}-->`
         state.src = state.src.replace(
-            /([ \t]*)```\n[ \t]*(?:\{(?:[^}"\n]|"[^"\n]*")*\}|\{[\s\S]*?\})/gm,
+            /([ \t]*)```\n[ \t]*(?:\{(?:[^}"'\n]|"[^"\n]*"|'[^'\n]*')*\}|\{[\s\S]*?\})/gm,
             (match, indention) => {
                 const attrs = parseCodeBlockAttrs(match.slice(match.indexOf('\n') + 1))
-                const marker = attrs ? `${indention}<!--ws-code-attrs:${encodeURIComponent(JSON.stringify(attrs))}-->` : ''
-                return `${indention}\`\`\`\n${marker}`
+                return `${indention}\`\`\`\n${attrs ? marker(indention, attrs) : ''}`
+            }
+        );
+        // Writerside also reads the attributes after a blank line (as
+        // kotlinlang.org does); only a line that is all attributes, so other
+        // text after a code block stays.
+        state.src = state.src.replace(
+            /^([ \t]*)```\n[ \t]*\n([ \t]*\{[^\n]*\})[ \t]*$/gm,
+            (match, indention, line) => {
+                const attrs = parseCodeBlockAttrs(line)
+                return attrs ? `${indention}\`\`\`\n${marker(indention, attrs)}` : match
             }
         );
     });
