@@ -25,7 +25,9 @@
   cursor: pointer;
   overflow: hidden;
   font-family: var(--vp-font-family-mono);
-  font-size: var(--vp-code-font-size);
+  /* The size of code in a code block (0.875em of the 16px page), also
+     inside 14px containers such as exercises. */
+  font-size: 0.875rem;
   line-height: var(--vp-code-line-height);
   color: var(--vp-code-block-color);
   white-space: nowrap;
