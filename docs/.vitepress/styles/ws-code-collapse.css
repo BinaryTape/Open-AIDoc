@@ -1,0 +1,89 @@
+/*
+ * Writerside collapsible code blocks (markdown-it-ws-collapsible-code.ts):
+ * <details class="ws-code-collapse"><summary>…</summary><div class="language-…">…</div></details>
+ *
+ * Collapsed, the block is a bar in the code block colours with its summary in
+ * the code font, as on kotlinlang.org. Open, the summary stays above the code
+ * to fold it again. Margins and corners follow VitePress code blocks.
+ */
+.vp-doc .ws-code-collapse {
+  margin: 16px -24px;
+  background-color: var(--vp-code-block-bg);
+  transition: background-color 0.5s;
+}
+
+.vp-doc .ws-code-collapse > div[class*='language-'] {
+  margin: 0;
+  border-radius: 0;
+}
+
+.vp-doc .ws-code-collapse__summary {
+  position: relative;
+  display: block;
+  margin: 0;
+  padding: 12px 24px 12px 52px;
+  list-style: none;
+  cursor: pointer;
+  overflow: hidden;
+  font-family: var(--vp-font-family-mono);
+  /* The size of code in a code block (0.875em of the 16px page), also
+     inside 14px containers such as exercises. */
+  font-size: 0.875rem;
+  line-height: var(--vp-code-line-height);
+  color: var(--vp-code-block-color);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.vp-doc .ws-code-collapse__summary::-webkit-details-marker {
+  display: none;
+}
+
+/* Rescui `down`, pointing right while collapsed. */
+.vp-doc .ws-code-collapse__summary::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 20px;
+  width: 20px;
+  height: 20px;
+  margin-top: -10px;
+  background-color: var(--vp-c-text-2);
+  -webkit-mask: url('../assets/icons/rescui/down_24.svg') center / contain no-repeat;
+  mask: url('../assets/icons/rescui/down_24.svg') center / contain no-repeat;
+  transform: rotate(-90deg);
+  transition: transform 0.2s;
+}
+
+.vp-doc .ws-code-collapse__summary:hover::before {
+  background-color: var(--vp-c-brand-1);
+}
+
+.vp-doc .ws-code-collapse__summary:focus-visible {
+  outline: 2px solid var(--vp-c-brand-1);
+  outline-offset: -2px;
+}
+
+.vp-doc .ws-code-collapse[open] > .ws-code-collapse__summary {
+  color: var(--vp-c-text-2);
+  border-bottom: 1px solid var(--vp-c-divider);
+}
+
+.vp-doc .ws-code-collapse[open] > .ws-code-collapse__summary::before {
+  transform: none;
+}
+
+@media (min-width: 640px) {
+  .vp-doc .ws-code-collapse {
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+}
+
+@media (max-width: 639px) {
+  .vp-doc li .ws-code-collapse {
+    border-radius: 8px 0 0 8px;
+    overflow: hidden;
+  }
+}

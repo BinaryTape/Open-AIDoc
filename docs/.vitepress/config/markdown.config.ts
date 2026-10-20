@@ -14,6 +14,7 @@ import markdownItWsRenderInline from "../plugins/markdown/writerside/markdown-it
 import markdownItWsRename from "../plugins/markdown/writerside/markdown-it-ws-rename"
 import markdownItWsTopicTitle from "../plugins/markdown/writerside/markdown-it-ws-topicTitle"
 import markdownItWsRemoveCodeAttr from "../plugins/markdown/writerside/markdown-it-ws-remove-code-attr"
+import markdownItWsCollapsibleCode from "../plugins/markdown/writerside/markdown-it-ws-collapsible-code"
 import markdownItWsCodeblockCdata from "../plugins/markdown/writerside/markdown-it-ws-codeblock-cdata"
 import { markdownItRewriteLinks } from '../plugins/markdown/writerside/markdown-it-ws-inline-link'
 
@@ -113,6 +114,9 @@ export function registerMarkdownPlugins(md: any) {
   md.use(markdownItRemoveComments)
   md.use(markdownItHtmlLinkLevel)
   md.use(markdownItFenceInfoTrim)
+  // After every other fence renderer (MkDocs hl_lines, diff titles): the
+  // <details> wraps their output.
+  md.use(markdownItWsCollapsibleCode)
 
   // Custom containers
   createContainer(md, 'note', 'note', 'NOTE')
