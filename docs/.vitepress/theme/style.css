@@ -334,9 +334,20 @@ img[type="joined"] {
   }
 }
 
-.language-diff {
+.language-diff,
+.vp-code-block-title > div[class*='language-'] {
   border-radius: 0 0 8px 8px !important;
   margin: 0 !important;
+}
+
+/* VitePress code blocks bleed to the edges on phones; so does the title. */
+@media (max-width: 639px) {
+  .vp-code-block-title > div[class*='language-'] {
+    border-radius: 0 !important;
+  }
+  .vp-code-block-title-bar {
+    border-radius: 0;
+  }
 }
 
 /*
