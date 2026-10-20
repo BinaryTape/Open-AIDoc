@@ -205,7 +205,9 @@ html:not(.dark) .vp-doc [class*="language-text"] code {
   color: #dfdfd6 !important;
 }
 
-.custom-block.details summary {
+/* `>`: only the block's own title, not a <summary> nested in its content
+   (a collapsible code block, ws-code-collapse.css). */
+.custom-block.details > summary {
   margin: 0px 0 8px;
   font-weight: 700;
   cursor: pointer;
