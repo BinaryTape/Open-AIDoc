@@ -7,7 +7,11 @@ import { ktorStrategy } from '../tools/pipeline/sync-strategies/strategy-ktor.mj
 import { kmpStrategy } from '../tools/pipeline/sync-strategies/strategy-kmp.mjs'
 import { koogStrategy } from '../tools/pipeline/sync-strategies/strategy-koog.mjs'
 import { kotlinSerializationStrategy, kotlinStrategy } from '../tools/pipeline/sync-strategies/strategy-kotlin.mjs'
-import { sqlDelightStrategy } from '../tools/pipeline/sync-strategies/strategy-sqldelight.mjs'
+import { latestDocsVersion, sqlDelightStrategy, VERSION_FILE } from '../tools/pipeline/sync-strategies/strategy-sqldelight.mjs'
+
+/** A fetch answering with this JSON, or failing. */
+const fetchJson = (body: unknown, ok = true) => async () => ({ ok, json: async () => body }) as Response
+const offline = async () => { throw new Error('offline') }
 
 let clone: string
 
@@ -97,7 +101,8 @@ describe('generated sidebars', () => {
   it.each(cases)('$id: regenerated from $file on every sync', async ({ strategy, id, file, content }) => {
     write(file, content)
 
-    await strategy.postSync(clone, { gitAddPaths: new Set() }, { id, docType: id, sidebarId: id, cloneDir: clone, sourceDocRoot: '.' })
+    // No network in tests: SQLDelight reads its docs version over HTTP.
+    await strategy.postSync(clone, { gitAddPaths: new Set() }, { id, docType: id, sidebarId: id, cloneDir: clone, sourceDocRoot: '.' }, offline)
 
     const sidebar = JSON.parse(readFileSync(join(site, `docs/.vitepress/sidebar/${id}.sidebar.json`), 'utf8'))
     expect(sidebar[0]).toMatchObject({ text: `${id}.start`, link: 'start' })
@@ -155,6 +160,48 @@ describe('generated sidebars', () => {
     expect(sidebar[1].items[0]).toMatchObject({ link: 'serialization-json-elements' })
     expect(readFileSync(join(site, 'docs/.vitepress/variables/serialization.v.list'), 'utf8')).toContain('okioVersion')
     expect([...context.gitAddPaths]).toEqual(['docs/.vitepress/variables/serialization.v.list'])
+  })
+
+  // The version was a hand-written 2.1.0, and the sidebar's API links pointed at 2.1.0.
+  describe('sqldelight docs version', () => {
+    const versions = [
+      { version: '2.5.0-SNAPSHOT', title: '2.5.0-SNAPSHOT', aliases: ['snapshot'] },
+      { version: '2.4.0', title: '2.4.0', aliases: ['latest'] },
+      { version: '2.3.2', title: '2.3.2', aliases: [] },
+    ]
+    const nav = 'site_name: X\nnav:\n  - Start: start.md\n  - API: 2.x/drivers/android-driver/index.html\n'
+    const sync = (fetchFn: typeof fetch) => {
+      const context = { gitAddPaths: new Set<string>() }
+      write('mkdocs.yml', nav)
+      return sqlDelightStrategy.postSync(clone, context, { id: 'sqldelight', sidebarId: 'sqldelight', cloneDir: clone }, fetchFn)
+        .then(() => ({
+          context,
+          sidebar: JSON.parse(readFileSync(join(site, 'docs/.vitepress/sidebar/sqldelight.sidebar.json'), 'utf8')),
+        }))
+    }
+
+    it('is the version the official docs call latest', async () => {
+      expect(await latestDocsVersion(fetchJson(versions))).toBe('2.4.0')
+      expect(await latestDocsVersion(fetchJson([{ version: '2.4.0', aliases: [] }]))).toBeNull()
+      expect(await latestDocsVersion(fetchJson({}, false))).toBeNull()
+      expect(await latestDocsVersion(offline)).toBeNull()
+    })
+
+    it('goes to the pages and the API links of the sidebar', async () => {
+      const { context, sidebar } = await sync(fetchJson(versions))
+      expect(JSON.parse(readFileSync(join(site, VERSION_FILE), 'utf8'))).toEqual({ versions: { sqldelight: '2.4.0' } })
+      expect([...context.gitAddPaths]).toEqual([VERSION_FILE])
+      expect(sidebar[1].link ?? sidebar[1].href).toBe('https://sqldelight.github.io/sqldelight/2.4.0/2.x/drivers/android-driver/index.html')
+    })
+
+    it('keeps the known version when the official site cannot be read', async () => {
+      mkdirSync(join(site, 'docs/.vitepress/variables'), { recursive: true })
+      writeFileSync(join(site, VERSION_FILE), JSON.stringify({ versions: { sqldelight: '2.3.2' } }))
+      const { context, sidebar } = await sync(offline)
+      expect(JSON.parse(readFileSync(join(site, VERSION_FILE), 'utf8')).versions.sqldelight).toBe('2.3.2')
+      expect(context.gitAddPaths.size).toBe(0)
+      expect(sidebar[1].link ?? sidebar[1].href).toBe('https://sqldelight.github.io/sqldelight/2.3.2/2.x/drivers/android-driver/index.html')
+    })
   })
 })
 
