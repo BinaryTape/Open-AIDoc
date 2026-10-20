@@ -105,27 +105,27 @@
         "items": [
           {
             "text": "sqldelight.coroutines-extensions",
-            "href": "https://sqldelight.github.io/sqldelight/2.1.0/2.x/extensions/coroutines-extensions/index.html"
+            "href": "https://sqldelight.github.io/sqldelight/2.4.0/2.x/extensions/coroutines-extensions/index.html"
           },
           {
             "text": "sqldelight.rxjava2-extensions",
-            "href": "https://sqldelight.github.io/sqldelight/2.1.0/2.x/extensions/rxjava2-extensions/index.html"
+            "href": "https://sqldelight.github.io/sqldelight/2.4.0/2.x/extensions/rxjava2-extensions/index.html"
           },
           {
             "text": "sqldelight.rxjava3-extensions",
-            "href": "https://sqldelight.github.io/sqldelight/2.1.0/2.x/extensions/rxjava3-extensions/index.html"
+            "href": "https://sqldelight.github.io/sqldelight/2.4.0/2.x/extensions/rxjava3-extensions/index.html"
           },
           {
             "text": "sqldelight.androidx-paging3",
-            "href": "https://sqldelight.github.io/sqldelight/2.1.0/2.x/extensions/androidx-paging3/index.html"
+            "href": "https://sqldelight.github.io/sqldelight/2.4.0/2.x/extensions/androidx-paging3/index.html"
           },
           {
             "text": "sqldelight.android-driver",
-            "href": "https://sqldelight.github.io/sqldelight/2.1.0/2.x/drivers/android-driver/index.html"
+            "href": "https://sqldelight.github.io/sqldelight/2.4.0/2.x/drivers/android-driver/index.html"
           },
           {
             "text": "sqldelight.runtime",
-            "href": "https://sqldelight.github.io/sqldelight/2.1.0/2.x/runtime/index.html"
+            "href": "https://sqldelight.github.io/sqldelight/2.4.0/2.x/runtime/index.html"
           }
         ],
         "collapsed": true
@@ -213,11 +213,11 @@
         "items": [
           {
             "text": "sqldelight.coroutines-extensions",
-            "href": "https://sqldelight.github.io/sqldelight/2.1.0/2.x/extensions/coroutines-extensions/index.html"
+            "href": "https://sqldelight.github.io/sqldelight/2.4.0/2.x/extensions/coroutines-extensions/index.html"
           },
           {
             "text": "sqldelight.runtime",
-            "href": "https://sqldelight.github.io/sqldelight/2.1.0/2.x/runtime/index.html"
+            "href": "https://sqldelight.github.io/sqldelight/2.4.0/2.x/runtime/index.html"
           }
         ],
         "collapsed": true
@@ -285,11 +285,11 @@
         "items": [
           {
             "text": "sqldelight.jdbc-driver",
-            "href": "https://sqldelight.github.io/sqldelight/2.1.0/2.x/drivers/jdbc-driver/index.html"
+            "href": "https://sqldelight.github.io/sqldelight/2.4.0/2.x/drivers/jdbc-driver/index.html"
           },
           {
             "text": "sqldelight.runtime",
-            "href": "https://sqldelight.github.io/sqldelight/2.1.0/2.x/runtime/index.html"
+            "href": "https://sqldelight.github.io/sqldelight/2.4.0/2.x/runtime/index.html"
           }
         ],
         "collapsed": true
@@ -357,11 +357,11 @@
         "items": [
           {
             "text": "sqldelight.jdbc-driver",
-            "href": "https://sqldelight.github.io/sqldelight/2.1.0/2.x/drivers/jdbc-driver/index.html"
+            "href": "https://sqldelight.github.io/sqldelight/2.4.0/2.x/drivers/jdbc-driver/index.html"
           },
           {
             "text": "sqldelight.runtime",
-            "href": "https://sqldelight.github.io/sqldelight/2.1.0/2.x/runtime/index.html"
+            "href": "https://sqldelight.github.io/sqldelight/2.4.0/2.x/runtime/index.html"
           }
         ],
         "collapsed": true
@@ -429,11 +429,11 @@
         "items": [
           {
             "text": "sqldelight.jdbc-driver",
-            "href": "https://sqldelight.github.io/sqldelight/2.1.0/2.x/drivers/jdbc-driver/index.html"
+            "href": "https://sqldelight.github.io/sqldelight/2.4.0/2.x/drivers/jdbc-driver/index.html"
           },
           {
             "text": "sqldelight.runtime",
-            "href": "https://sqldelight.github.io/sqldelight/2.1.0/2.x/runtime/index.html"
+            "href": "https://sqldelight.github.io/sqldelight/2.4.0/2.x/runtime/index.html"
           }
         ],
         "collapsed": true
@@ -513,15 +513,15 @@
         "items": [
           {
             "text": "sqldelight.coroutines-extensions",
-            "href": "https://sqldelight.github.io/sqldelight/2.1.0/2.x/extensions/coroutines-extensions/index.html"
+            "href": "https://sqldelight.github.io/sqldelight/2.4.0/2.x/extensions/coroutines-extensions/index.html"
           },
           {
             "text": "sqldelight.native-driver",
-            "href": "https://sqldelight.github.io/sqldelight/2.1.0/2.x/drivers/native-driver/index.html"
+            "href": "https://sqldelight.github.io/sqldelight/2.4.0/2.x/drivers/native-driver/index.html"
           },
           {
             "text": "sqldelight.runtime",
-            "href": "https://sqldelight.github.io/sqldelight/2.1.0/2.x/runtime/index.html"
+            "href": "https://sqldelight.github.io/sqldelight/2.4.0/2.x/runtime/index.html"
           }
         ],
         "collapsed": true
@@ -605,23 +605,23 @@
         "items": [
           {
             "text": "sqldelight.coroutines-extensions",
-            "href": "https://sqldelight.github.io/sqldelight/2.1.0/2.x/extensions/coroutines-extensions/index.html"
+            "href": "https://sqldelight.github.io/sqldelight/2.4.0/2.x/extensions/coroutines-extensions/index.html"
           },
           {
             "text": "sqldelight.rxjava2-extensions",
-            "href": "https://sqldelight.github.io/sqldelight/2.1.0/2.x/extensions/rxjava2-extensions/index.html"
+            "href": "https://sqldelight.github.io/sqldelight/2.4.0/2.x/extensions/rxjava2-extensions/index.html"
           },
           {
             "text": "sqldelight.rxjava3-extensions",
-            "href": "https://sqldelight.github.io/sqldelight/2.1.0/2.x/extensions/rxjava3-extensions/index.html"
+            "href": "https://sqldelight.github.io/sqldelight/2.4.0/2.x/extensions/rxjava3-extensions/index.html"
           },
           {
             "text": "sqldelight.sqlite-driver",
-            "href": "https://sqldelight.github.io/sqldelight/2.1.0/2.x/drivers/sqlite-driver/index.html"
+            "href": "https://sqldelight.github.io/sqldelight/2.4.0/2.x/drivers/sqlite-driver/index.html"
           },
           {
             "text": "sqldelight.runtime",
-            "href": "https://sqldelight.github.io/sqldelight/2.1.0/2.x/runtime/index.html"
+            "href": "https://sqldelight.github.io/sqldelight/2.4.0/2.x/runtime/index.html"
           }
         ],
         "collapsed": true
@@ -715,15 +715,15 @@
         "items": [
           {
             "text": "sqldelight.coroutines-extensions",
-            "href": "https://sqldelight.github.io/sqldelight/2.1.0/2.x/extensions/coroutines-extensions/index.html"
+            "href": "https://sqldelight.github.io/sqldelight/2.4.0/2.x/extensions/coroutines-extensions/index.html"
           },
           {
             "text": "sqldelight.sqljs-driver",
-            "href": "https://sqldelight.github.io/sqldelight/2.1.0/2.x/drivers/sqljs-driver/index.html"
+            "href": "https://sqldelight.github.io/sqldelight/2.4.0/2.x/drivers/sqljs-driver/index.html"
           },
           {
             "text": "sqldelight.runtime",
-            "href": "https://sqldelight.github.io/sqldelight/2.1.0/2.x/runtime/index.html"
+            "href": "https://sqldelight.github.io/sqldelight/2.4.0/2.x/runtime/index.html"
           }
         ],
         "collapsed": true
@@ -733,6 +733,6 @@
   },
   {
     "text": "sqldelight._2-x-api",
-    "href": "https://sqldelight.github.io/sqldelight/2.1.0/2.x/index.html"
+    "href": "https://sqldelight.github.io/sqldelight/2.4.0/2.x/index.html"
   }
 ]
