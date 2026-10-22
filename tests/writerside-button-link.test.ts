@@ -25,8 +25,8 @@ describe('Writerside button links', () => {
   it('draws the tour navigation as buttons', async () => {
     // Were plain links carrying as="button" mode=… icon=… for nothing to read.
     const html = await render(tourNav)
-    expect(html).toContain('<a href="/kotlin/kotlin-tour-hello-world" class="ws-button ws-button--outline ws-button--arrow-left ws-button--icon-left">上一步</a>')
-    expect(html).toContain('<a href="/kotlin/kotlin-tour-collections" class="ws-button ws-button--classic ws-button--arrow-right ws-button--icon-right">下一步</a>')
+    expect(html).toContain('<a href="/kotlin/kotlin-tour-hello-world" class="ws-button ws-button--outline ws-button--arrow-left ws-button--icon-left no-icon">上一步</a>')
+    expect(html).toContain('<a href="/kotlin/kotlin-tour-collections" class="ws-button ws-button--classic ws-button--arrow-right ws-button--icon-right no-icon">下一步</a>')
     expect(html).not.toMatch(/\s(as|mode|icon|icon-position)="/)
   })
 
@@ -35,7 +35,7 @@ describe('Writerside button links', () => {
       'Text.\n\n<a href="native-get-started.md" as="button" mode="rock" icon="arrow-right" icon-position="right">Kotlin/Native 快速入门</a>\n\n## Next\n',
       'kotlin/native-overview.md'
     )
-    expect(html).toContain('<a href="/kotlin/native-get-started" class="ws-button ws-button--rock ws-button--arrow-right ws-button--icon-right">Kotlin/Native 快速入门</a>')
+    expect(html).toContain('<a href="/kotlin/native-get-started" class="ws-button ws-button--rock ws-button--arrow-right ws-button--icon-right no-icon">Kotlin/Native 快速入门</a>')
   })
 
   it('handles a button in a list item, inside a sentence', async () => {
@@ -43,7 +43,7 @@ describe('Writerside button links', () => {
       '* 加入社区：\n\n  <a href="https://slack-chats.kotlinlang.org/c/webassembly" as="button" mode="rock" icon="arrow-right" icon-position="right">加入</a>\n',
       'kotlin/wasm-get-started.md'
     )
-    expect(html).toContain('<a href="https://slack-chats.kotlinlang.org/c/webassembly" class="ws-button ws-button--rock ws-button--arrow-right ws-button--icon-right">加入</a>')
+    expect(html).toContain('<a href="https://slack-chats.kotlinlang.org/c/webassembly" class="ws-button ws-button--rock ws-button--arrow-right ws-button--icon-right no-icon">加入</a>')
   })
 
   it('handles a button in a topic paragraph, with an escaped href', async () => {
@@ -51,12 +51,22 @@ describe('Writerside button links', () => {
       '<topic title="T">\n<p><a as="button" href="https://kotlinlang.org/case-studies/?type=multiplatform&amp;platforms=ios" mode="rock" icon="arrow-right" icon-position="right">探索</a></p>\n</topic>\n',
       'kmp/kmp-for-ios.md'
     )
-    expect(html).toContain('<a href="https://kotlinlang.org/case-studies/?type=multiplatform&amp;platforms=ios" class="ws-button ws-button--rock ws-button--arrow-right ws-button--icon-right">')
+    expect(html).toContain('<a href="https://kotlinlang.org/case-studies/?type=multiplatform&amp;platforms=ios" class="ws-button ws-button--rock ws-button--arrow-right ws-button--icon-right no-icon">')
   })
 
   it('makes a button without a mode a rock one, as kotlinlang.org does', async () => {
     const html = await render('<a href="https://kotlinlang.org/api/core/kotlin-stdlib/" as="button" icon="arrow-right" icon-position="right">Browse API</a>\n', 'kotlin/api-references.md')
-    expect(html).toContain('class="ws-button ws-button--rock ws-button--arrow-right ws-button--icon-right"')
+    expect(html).toContain('class="ws-button ws-button--rock ws-button--arrow-right ws-button--icon-right no-icon"')
+  })
+
+  it("keeps VitePress's external-link arrow off a button that leaves the site", async () => {
+    // The arrow is an ::after on links to other sites; it took the place of the
+    // download icon on kotlin-pdf. `no-icon` is VitePress's opt-out.
+    const html = await render(
+      '<a href="https://kotlinlang.org/assets/kotlin-reference.pdf" as="button" mode="classic" icon="download" icon-position="right">下载</a>\n',
+      'kotlin/kotlin-pdf.md'
+    )
+    expect(html).toContain('class="ws-button ws-button--classic ws-button--download ws-button--icon-right no-icon"')
   })
 
   it('keeps other attributes as written', async () => {
@@ -64,7 +74,7 @@ describe('Writerside button links', () => {
       '<a href="kotlin-tour-hello-world.md" as="button" icon="arrow-right" icon-position="right" progress-aware="true" id="kotlin-tour-start-beginner">开始</a>\n',
       'kotlin/kotlin-tour-welcome.md'
     )
-    expect(html).toContain('<a href="/kotlin/kotlin-tour-hello-world" progress-aware="true" id="kotlin-tour-start-beginner" class="ws-button ws-button--rock ws-button--arrow-right ws-button--icon-right">开始</a>')
+    expect(html).toContain('<a href="/kotlin/kotlin-tour-hello-world" progress-aware="true" id="kotlin-tour-start-beginner" class="ws-button ws-button--rock ws-button--arrow-right ws-button--icon-right no-icon">开始</a>')
   })
 
   it('renders the same from LF and CRLF sources', async () => {
@@ -86,21 +96,21 @@ describe('Writerside button links', () => {
 describe('rewriteButtonLinks', () => {
   it('drops an icon it has no picture for and keeps the button', () => {
     expect(rewriteButtonLinks('<a href="/x" as="button" mode="classic" icon="rocket" icon-position="right">X</a>'))
-      .toBe('<a href="/x" class="ws-button ws-button--classic">X</a>')
+      .toBe('<a href="/x" class="ws-button ws-button--classic no-icon">X</a>')
   })
 
   it('puts the icon on the left unless told otherwise, and reads the download icon', () => {
     expect(rewriteButtonLinks('<a as="button" href="/x.pdf" mode="classic" icon="download">PDF</a>'))
-      .toBe('<a href="/x.pdf" class="ws-button ws-button--classic ws-button--download ws-button--icon-left">PDF</a>')
+      .toBe('<a href="/x.pdf" class="ws-button ws-button--classic ws-button--download ws-button--icon-left no-icon">PDF</a>')
   })
 
   it('reads single quotes and other spellings, and keeps a class of its own', () => {
     expect(rewriteButtonLinks(`<a\n  href='/x' AS='button' Mode="OUTLINE" class="extra">X</a>`))
-      .toBe(`<a href='/x' class="ws-button ws-button--outline extra">X</a>`)
+      .toBe(`<a href='/x' class="ws-button ws-button--outline no-icon extra">X</a>`)
   })
 
   it('makes an unknown mode a rock button', () => {
-    expect(rewriteButtonLinks('<a href="/x" as="button" mode="tinted">X</a>')).toBe('<a href="/x" class="ws-button ws-button--rock">X</a>')
+    expect(rewriteButtonLinks('<a href="/x" as="button" mode="tinted">X</a>')).toBe('<a href="/x" class="ws-button ws-button--rock no-icon">X</a>')
   })
 
   it('leaves other links alone', () => {

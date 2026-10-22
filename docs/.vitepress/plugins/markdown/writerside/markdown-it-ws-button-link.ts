@@ -9,7 +9,7 @@ import { isWritersideDoc } from '../../../utils/doctype-utils'
  * on a plain link. The opening tag is rewritten to classes that
  * styles/ws-button.css draws:
  *
- *   <a href="/kotlin/kotlin-tour-collections" class="ws-button ws-button--classic ws-button--arrow-right ws-button--icon-right">
+ *   <a href="/kotlin/kotlin-tour-collections" class="ws-button ws-button--classic ws-button--arrow-right ws-button--icon-right no-icon">
  *
  * Without a mode the button is a rock one, as on kotlinlang.org. An icon the
  * stylesheet has no picture for is dropped, the button stays. Other
@@ -61,6 +61,9 @@ function buttonLinkTag(tag: string): string {
     const position = value('icon-position').toLowerCase() === 'right' ? 'right' : 'left'
     classes.push(`ws-button--${icon}`, `ws-button--icon-${position}`)
   }
+  // VitePress's opt-out from its external-link arrow, which would take over
+  // the icon's ::after; kotlinlang.org shows no such arrow on buttons either.
+  classes.push('no-icon')
   if (value('class')) classes.push(...value('class').split(/\s+/))
 
   const kept = attrs
