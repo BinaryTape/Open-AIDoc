@@ -11,6 +11,7 @@ JetBrains' Rescui design system. They are licensed under the Apache License 2.0;
 | `read_24.svg` | Writerside `tip` callouts |
 | `warning_24.svg` | Writerside `warning` callouts |
 | `down_24.svg` | Collapsible code blocks |
+| `arrow-left_24.svg`, `arrow-right_24.svg`, `download_24.svg` | Writerside button links |
 
 The package also contains Kotlin, Ktor and JetBrains logos. Those are trademarks, not
 covered by the Apache license; do not copy them here.
