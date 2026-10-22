@@ -2,11 +2,12 @@
  * Writerside button links: <a as="button" mode=… icon=… icon-position=…>,
  * rewritten to classes by plugins/markdown/writerside/markdown-it-ws-button-link.ts:
  *
- *   <a class="ws-button ws-button--classic ws-button--arrow-right ws-button--icon-right">
+ *   <a class="ws-button ws-button--classic ws-button--arrow-right ws-button--icon-right no-icon">
  *
  * Sizes follow the Rescui buttons on kotlinlang.org (size M). Classic takes
  * the site's brand colour; rock and outline are kotlinlang.org's neutrals.
- * Icons: @rescui/icons (Apache-2.0), see assets/icons/rescui/.
+ * Icons: @rescui/icons 0.16.17 (Apache-2.0), as on kotlinlang.org; see
+ * assets/icons/rescui/.
  * -------------------------------------------------------------------------- */
 
 :root {

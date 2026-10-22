@@ -1,2 +1,2 @@
-<!-- @rescui/icons 1.11.0 (Apache-2.0), svg/download_24.svg; see LICENSE.txt -->
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M7.19 11.19a1.5 1.5 0 0 0 0 2.12l3.75 3.75a1.5 1.5 0 0 0 2.121 0l3.75-3.75a1.5 1.5 0 0 0-2.121-2.12L13.5 12.377V4a1.5 1.5 0 0 0-3 0v8.38l-1.19-1.19a1.5 1.5 0 0 0-2.121 0M6 16a1.5 1.5 0 0 0-3 0v3a3 3 0 0 0 3 3h12a3 3 0 0 0 3-3v-3a1.5 1.5 0 0 0-3 0v3H6z"/></svg>
+<!-- @rescui/icons 0.16.17 (Apache-2.0), svg/download.svg; see LICENSE.txt -->
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M18.15 9.445l-6.145 6.547-6.038-6.547H11V2h2v7.445h5.149zM5 18h16v2H3v-2h2z"/></svg>
