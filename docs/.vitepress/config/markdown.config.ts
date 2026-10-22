@@ -33,6 +33,7 @@ import markdownItRemoveScript from "../plugins/markdown/common/markdown-it-remov
 import markdownItRemoveContributeUrl from "../plugins/markdown/common/markdown-it-remove-contribute-url"
 import markdownItRemoveComments from "../plugins/markdown/common/markdown-it-remove-comments"
 import markdownItHtmlLinkLevel from "../plugins/markdown/common/markdown-it-html-link-level"
+import markdownItFenceInfoTrim from "../plugins/markdown/common/markdown-it-fence-info-trim"
 import { markdownItCollapsed } from "../plugins/markdown/common/markdownItCollapsed.mts"
 import markdownItAutoTitle from "../plugins/markdown/common/markdown-it-auto-title"
 import { isDocType } from '../utils/doctype-utils'
@@ -112,6 +113,7 @@ export function registerMarkdownPlugins(md: any) {
   md.use(markdownItCollapsed)
   md.use(markdownItRemoveComments)
   md.use(markdownItHtmlLinkLevel)
+  md.use(markdownItFenceInfoTrim)
   // After every other fence renderer (MkDocs hl_lines, diff titles): the
   // <details> wraps their output.
   md.use(markdownItWsCollapsibleCode)

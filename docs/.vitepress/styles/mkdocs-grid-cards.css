@@ -1,0 +1,62 @@
+/*
+ * Material for MkDocs card grids (Koog), as markdown-it renders them:
+ *
+ *   <div class="grid cards" markdown>
+ *     <ul><li><p>icon <a><strong>Title</strong></a></p><hr><p>Description</p></li>…</ul>
+ *   </div>
+ *
+ * Laid out as on docs.koog.ai: bordered cards, as many 16rem columns as fit
+ * (two in the content column), a divider between title and description.
+ */
+.vp-doc .grid.cards > ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  gap: 8px;
+  margin: 16px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.vp-doc .grid.cards > ul > li {
+  margin: 0;
+  padding: 16px;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  transition: border-color 0.25s, box-shadow 0.25s;
+}
+
+.vp-doc .grid.cards > ul > li:hover {
+  border-color: transparent;
+  box-shadow: var(--vp-shadow-2);
+}
+
+.vp-doc .grid.cards > ul > li > :first-child {
+  margin-top: 0;
+}
+
+.vp-doc .grid.cards > ul > li > :last-child {
+  margin-bottom: 0;
+}
+
+.vp-doc .grid.cards > ul > li > hr {
+  margin: 12px 0;
+}
+
+.vp-doc .grid.cards > ul > li > p:first-child a {
+  text-decoration: none;
+}
+
+/* Beta label after a card title (Koog): `<span class="beta-badge">beta</span>`. */
+.vp-doc .beta-badge {
+  display: inline-block;
+  margin-left: 4px;
+  padding: 0 6px;
+  border-radius: 4px;
+  background-color: var(--vp-c-warning-soft);
+  color: var(--vp-c-warning-1);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 20px;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
