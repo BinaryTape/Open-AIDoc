@@ -2,7 +2,10 @@ import { existsSync, readFileSync, statSync } from 'node:fs'
 import { dirname, isAbsolute, relative, resolve, sep } from 'node:path'
 import { rebaseSnippetLinks } from './mkdocs-snippet-links'
 
-const snippetDirective = /^(\s*)--8<--\s+["']([^"']+)["']\s*$/gm
+// [ \t], not \s: in multiline mode \s also matches the newlines of the blank
+// lines around a directive, which then became part of the "indent" put before
+// every line of the snippet (a blank line after each of them).
+const snippetDirective = /^([ \t]*)--8<--[ \t]+["']([^"']+)["'][ \t]*(?=\r?$)/gm
 const snippetBlockDelimiter = /^(\s*)--8<--\s*$/
 const regionMarker = /^\s*(?:#\s*)?--8<--\s+\[(start|end):([^\]]+)\]\s*$/
 
