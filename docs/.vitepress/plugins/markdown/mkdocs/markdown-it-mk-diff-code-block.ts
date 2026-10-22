@@ -1,4 +1,6 @@
-// Process Material MKDocs flavored diff code block
+// Material for MkDocs code block titles: ```kotlin title="build.gradle.kts"
+// shows the title in a bar above the code. It began with `diff` blocks only.
+import { isMkDocsDoc } from '../../../utils/doctype-utils'
 
 export default function markdownItMkDiffCodeBlock(md) {
   // Store the original fence renderer
@@ -28,8 +30,9 @@ export default function markdownItMkDiffCodeBlock(md) {
       }
     }
 
-    // Check if it's a 'diff' code block and a title was successfully extracted
-    if (langName === 'diff' && titleValue !== null) {
+    // A diff block with a title, or any MkDocs code block with one (Koog,
+    // SQLDelight: ```kotlin title="build.gradle.kts").
+    if (titleValue !== null && (langName === 'diff' || isMkDocsDoc(env))) {
       // Construct the title HTML element
       const titleHtml = `<div class="vp-code-block-title-bar">${titleValue}</div>\n`;
 
@@ -41,8 +44,7 @@ export default function markdownItMkDiffCodeBlock(md) {
       return `<div class="vp-code-block-title">\n${titleHtml}${codeBlockHtml}</div>\n`;
     }
 
-    // If it's not a 'diff' block with a title, or if parsing failed,
-    // use the default renderer.
+    // Without a title, or outside MkDocs docs, use the default renderer.
     return defaultFenceRenderer(tokens, idx, options, env, self);
   };
 }
