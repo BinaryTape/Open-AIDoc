@@ -738,6 +738,8 @@
   "callout.note": "注記",
   "callout.tip": "ヒント",
   "callout.warning": "警告",
+  "compare.before": "変更前",
+  "compare.after": "変更後",
   "kotlin.jvm-backend-faq": "FAQ",
   "kotlin.reflection": "Reflection (kotlin-reflect)"
 }

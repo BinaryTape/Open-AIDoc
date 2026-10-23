@@ -1,0 +1,71 @@
+/**
+ * Writerside code comparisons (markdown-it-ws-compare.ts):
+ *
+ *   <div class="ws-compare ws-compare--left-right | ws-compare--top-bottom">
+ *     <div class="ws-compare__item"><div class="ws-compare__title">…</div>(code block)</div> × 2
+ *
+ * As on kotlinlang.org and ktor.io: left-right is one box in the code block
+ * colour with the two blocks side by side, each under its title; top-bottom
+ * is two boxes, one above the other. On phones left-right stacks too.
+ * The code blocks (VitePress fences or CodeBlock.vue) lose their own box; the
+ * title takes the place of their language label.
+ * -------------------------------------------------------------------------- */
+
+.vp-doc .ws-compare {
+  margin: 16px 0;
+}
+
+.vp-doc .ws-compare__item {
+  min-width: 0;
+  border-radius: 8px;
+  background-color: var(--vp-code-block-bg);
+  transition: background-color 0.5s;
+}
+
+.vp-doc .ws-compare__title {
+  padding: 16px 24px 0;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  color: var(--vp-c-text-1);
+}
+
+.vp-doc .ws-compare .ws-compare__item > div[class*='language-'] {
+  width: auto;
+  margin: 0;
+  border-radius: 0 0 8px 8px;
+  background-color: transparent;
+}
+
+.vp-doc .ws-compare .ws-compare__item > div[class*='language-'] > span.lang {
+  display: none;
+}
+
+.vp-doc .ws-compare--top-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+@media (min-width: 640px) {
+  .vp-doc .ws-compare--left-right {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-radius: 8px;
+    background-color: var(--vp-code-block-bg);
+    transition: background-color 0.5s;
+  }
+
+  .vp-doc .ws-compare--left-right > .ws-compare__item {
+    border-radius: 0;
+    background-color: transparent;
+  }
+}
+
+@media (max-width: 639px) {
+  .vp-doc .ws-compare--left-right {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+}
