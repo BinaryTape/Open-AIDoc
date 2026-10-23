@@ -7,7 +7,9 @@
  *   node --import tsx scripts/audit-translations.mjs --clones <dir> [--repo id[,id]] [--strict] [--repair] [--write] [--missing]
  *
  * Each repository's clone (<dir>/<cloneDir>, see repos.config.mjs) is copied
- * and run through its strategy's postDetect as on a first run, then every
+ * and run through its strategy's postDetect as on a first run (a repository
+ * whose strategy has its own source, such as Koin, is fetched into
+ * <dir>/<cloneDir> when that is missing), then every
  * prepared document is checked in every language with the structural check
  * translation itself uses (utils/translation-check.mjs).
  *
@@ -64,6 +66,9 @@ function parseArgs(argv) {
 /** Run the strategy's postDetect on a copy of the clone, as on a first run. */
 async function prepare(repoConfig, clonesDir) {
   const source = path.join(clonesDir, repoConfig.cloneDir);
+  if (repoConfig.syncStrategy.source && !fs.existsSync(source)) {
+    await repoConfig.syncStrategy.source.update({ ...repoConfig, cloneDir: source });
+  }
   const clone = fs.mkdtempSync(path.join(os.tmpdir(), `audit-${repoConfig.id}-`));
   fs.cpSync(source, clone, { recursive: true, filter: (p) => path.basename(p) !== ".git" });
 
