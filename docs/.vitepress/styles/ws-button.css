@@ -1,0 +1,151 @@
+/**
+ * Writerside button links: <a as="button" mode=… icon=… icon-position=…>,
+ * rewritten to classes by plugins/markdown/writerside/markdown-it-ws-button-link.ts:
+ *
+ *   <a class="ws-button ws-button--classic ws-button--arrow-right ws-button--icon-right no-icon">
+ *
+ * Sizes follow the Rescui buttons on kotlinlang.org (size M). Classic takes
+ * the site's brand colour; rock and outline are kotlinlang.org's neutrals.
+ * Icons: @rescui/icons 0.16.17 (Apache-2.0), as on kotlinlang.org; see
+ * assets/icons/rescui/.
+ * -------------------------------------------------------------------------- */
+
+:root {
+  --ws-button-rock-bg: #19191c;
+  --ws-button-rock-hover-bg: rgba(25, 25, 28, 0.8);
+  --ws-button-rock-text: #ffffff;
+  --ws-button-outline-text: #19191c;
+  --ws-button-outline-border: rgba(25, 25, 28, 0.3);
+  --ws-button-outline-hover-bg: rgba(25, 25, 28, 0.1);
+}
+
+.dark {
+  --ws-button-rock-bg: #ffffff;
+  --ws-button-rock-hover-bg: rgba(255, 255, 255, 0.8);
+  --ws-button-rock-text: #19191c;
+  --ws-button-outline-text: #ffffff;
+  --ws-button-outline-border: rgba(255, 255, 255, 0.3);
+  --ws-button-outline-hover-bg: rgba(255, 255, 255, 0.1);
+}
+
+.vp-doc a.ws-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  max-width: 100%;
+  min-height: 40px;
+  padding: 8px 24px;
+  border: 0;
+  border-radius: 24px;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  text-align: center;
+  text-decoration: none;
+  vertical-align: middle;
+  transition: color 0.1s, background-color 0.1s, border-color 0.1s;
+}
+
+.vp-doc a.ws-button:focus-visible {
+  outline: 2px solid var(--vp-c-brand-1);
+  outline-offset: 2px;
+}
+
+.vp-doc a.ws-button--classic,
+.vp-doc a.ws-button--classic:hover {
+  color: var(--vp-button-brand-text);
+}
+
+.vp-doc a.ws-button--classic {
+  background-color: var(--vp-button-brand-bg);
+}
+
+.vp-doc a.ws-button--classic:hover {
+  background-color: var(--vp-button-brand-hover-bg);
+}
+
+.vp-doc a.ws-button--classic:active {
+  background-color: var(--vp-button-brand-active-bg);
+}
+
+.vp-doc a.ws-button--rock,
+.vp-doc a.ws-button--rock:hover {
+  color: var(--ws-button-rock-text);
+}
+
+.vp-doc a.ws-button--rock {
+  background-color: var(--ws-button-rock-bg);
+}
+
+.vp-doc a.ws-button--rock:hover {
+  background-color: var(--ws-button-rock-hover-bg);
+}
+
+.vp-doc a.ws-button--outline,
+.vp-doc a.ws-button--outline:hover {
+  color: var(--ws-button-outline-text);
+}
+
+.vp-doc a.ws-button--outline {
+  padding: 7px 23px;
+  border: 1px solid var(--ws-button-outline-border);
+  background-color: transparent;
+}
+
+.vp-doc a.ws-button--outline:hover {
+  background-color: var(--ws-button-outline-hover-bg);
+}
+
+/* The icon, in the text colour, before or after the label. */
+.vp-doc a.ws-button--icon-left::before,
+.vp-doc a.ws-button--icon-right::after {
+  content: '';
+  flex: none;
+  width: 24px;
+  height: 24px;
+  background-color: currentColor;
+  -webkit-mask: var(--ws-button-icon) no-repeat center / contain;
+  mask: var(--ws-button-icon) no-repeat center / contain;
+}
+
+.vp-doc a.ws-button--icon-left::before {
+  margin: 0 8px 0 -2px;
+}
+
+.vp-doc a.ws-button--icon-right::after {
+  margin: 0 -2px 0 8px;
+}
+
+.ws-button--arrow-left { --ws-button-icon: url('../assets/icons/rescui/arrow-left_24.svg'); }
+.ws-button--arrow-right { --ws-button-icon: url('../assets/icons/rescui/arrow-right_24.svg'); }
+.ws-button--download { --ws-button-icon: url('../assets/icons/rescui/download_24.svg'); }
+
+/**
+ * Kotlin tour navigation: <list id="tour-nav"> (List.vue) with the previous
+ * and next step, each button as wide as its column. One column on phones.
+ */
+.vp-doc #tour-nav {
+  display: flex;
+  gap: 16px;
+  margin: 32px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.vp-doc #tour-nav > li {
+  flex: 1 1 0;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.vp-doc #tour-nav a.ws-button {
+  width: 100%;
+}
+
+@media (max-width: 640px) {
+  .vp-doc #tour-nav {
+    flex-direction: column;
+  }
+}

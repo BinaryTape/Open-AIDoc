@@ -16,6 +16,7 @@ import markdownItWsTopicTitle from "../plugins/markdown/writerside/markdown-it-w
 import markdownItWsRemoveCodeAttr from "../plugins/markdown/writerside/markdown-it-ws-remove-code-attr"
 import markdownItWsCollapsibleCode from "../plugins/markdown/writerside/markdown-it-ws-collapsible-code"
 import markdownItWsCodeblockCdata from "../plugins/markdown/writerside/markdown-it-ws-codeblock-cdata"
+import markdownItWsButtonLink from "../plugins/markdown/writerside/markdown-it-ws-button-link"
 import { markdownItRewriteLinks } from '../plugins/markdown/writerside/markdown-it-ws-inline-link'
 
 // ===== MkDocs plugins =====
@@ -96,6 +97,8 @@ export function registerMarkdownPlugins(md: any) {
   md.use(markdownItWsRename)
   md.use(markdownItWsTopicTitle)
   md.use(markdownItWsRemoveCodeAttr)
+  // A core rule pushed after the link rewriter's: sees hrefs already rewritten.
+  md.use(markdownItWsButtonLink)
 
   // MkDocs plugins
   md.use(markdownItMkAdmonition)
