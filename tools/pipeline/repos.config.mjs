@@ -13,7 +13,8 @@ import { ktorStrategy } from "./sync-strategies/strategy-ktor.mjs";
  * - id: unique key for logs, commits, and checkpoints
  * - docType: content output folder under docs/ (and docs/{locale}/)
  * - sidebarId: sidebar JSON key → docs/.vitepress/sidebar/{sidebarId}.sidebar.json
- * - cloneDir: local git clone directory at repo root
+ * - cloneDir: local git clone directory at repo root (or the snapshot of a
+ *   strategy with its own `source`, see utils/snapshot-source.mjs)
  * - sourceDocRoot: docs root inside the upstream clone (relative)
  * - syncStrategy: SyncStrategy hooks for this upstream layout
  * - lastCheckFile: checkpoint still lives under .github/ (see project plan)
@@ -23,6 +24,8 @@ export const REPOS = [
     id: "koin",
     docType: "koin",
     sidebarId: "koin",
+    // Not cloned: the docs come from insert-koin.io/llms-full.txt, the repo's
+    // docs/ folder is no longer maintained (strategy-koin.mjs)
     repo: "InsertKoinIO/koin",
     branch: "origin/main",
     cloneDir: "koin-repo",
