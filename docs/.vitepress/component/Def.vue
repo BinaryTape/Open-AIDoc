@@ -19,9 +19,11 @@ export default defineComponent({
     return () => {
       let titleChildren: VNode['children'] = ''
       const contentNodes = (slots.default?.() ?? []).filter((vnode: VNode) => {
+        // <def-title>: the page's <title>, renamed by markdown-it-ws-rename.ts
+        // so that the markup in it is parsed.
         if (
           typeof vnode.type === 'string' &&
-          vnode.type.toLowerCase() === 'title'
+          ['title', 'def-title'].includes(vnode.type.toLowerCase())
         ) {
           titleChildren = vnode.children
           return false
@@ -56,6 +58,8 @@ export default defineComponent({
   border-color: var(--vp-custom-block-details-border);
   color: var(--vp-custom-block-details-text);
   background-color: var(--vp-custom-block-details-bg);
+  /* Holds the floated title when it is taller than the definition. */
+  display: flow-root;
 }
 
 .ws-def-title {
@@ -63,6 +67,8 @@ export default defineComponent({
   width: calc(33.3% - 32px);
   font-weight: 700;
   font-size: 1em;
+  /* Long code names have no break opportunity and ran over the definition. */
+  overflow-wrap: anywhere;
 }
 
 .ws-def-collapse-content {
