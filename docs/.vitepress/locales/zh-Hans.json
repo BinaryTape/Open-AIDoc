@@ -737,6 +737,8 @@
   "callout.note": "注意",
   "callout.tip": "提示",
   "callout.warning": "警告",
+  "compare.before": "修改前",
+  "compare.after": "修改后",
   "kotlin.jvm-backend-faq": "常见问题解答",
   "kotlin.reflection": "反射 (kotlin-reflect)"
 }

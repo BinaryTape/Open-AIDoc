@@ -1,5 +1,4 @@
-import { SiteLocaleConfig } from '../locales.config'
-import { CONTENT_LOCALES, DEFAULT_LOCALE } from '../../../shared/locales'
+import { pageMessage } from './page-messages'
 
 /**
  * Writerside callouts: `> …` blockquotes styled `note`, `tip` or `warning`
@@ -33,10 +32,7 @@ function calloutTone(type: CalloutType, relativePath: string | undefined): Tone 
 
 /** Screen-reader name of the callout, in the page's language. */
 export function calloutLabel(type: CalloutType, relativePath: string | undefined): string {
-  const first = pathSegments(relativePath)[0]
-  const locale = (CONTENT_LOCALES as readonly string[]).includes(first) ? first : DEFAULT_LOCALE
-  const key = `callout.${type}`
-  return SiteLocaleConfig[locale]?.messages[key] ?? SiteLocaleConfig[DEFAULT_LOCALE].messages[key] ?? type
+  return pageMessage(relativePath, `callout.${type}`) ?? type
 }
 
 export function calloutClass(type: CalloutType, relativePath: string | undefined): string {

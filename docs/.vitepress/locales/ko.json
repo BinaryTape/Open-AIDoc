@@ -739,6 +739,8 @@
   "callout.note": "참고",
   "callout.tip": "팁",
   "callout.warning": "경고",
+  "compare.before": "변경 전",
+  "compare.after": "변경 후",
   "kotlin.jvm-backend-faq": "FAQ",
   "kotlin.reflection": "Reflection (kotlin-reflect)"
 }

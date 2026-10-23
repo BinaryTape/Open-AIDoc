@@ -17,6 +17,7 @@ import markdownItWsRemoveCodeAttr from "../plugins/markdown/writerside/markdown-
 import markdownItWsCollapsibleCode from "../plugins/markdown/writerside/markdown-it-ws-collapsible-code"
 import markdownItWsCodeblockCdata from "../plugins/markdown/writerside/markdown-it-ws-codeblock-cdata"
 import markdownItWsButtonLink from "../plugins/markdown/writerside/markdown-it-ws-button-link"
+import markdownItWsCompare from "../plugins/markdown/writerside/markdown-it-ws-compare"
 import { markdownItRewriteLinks } from '../plugins/markdown/writerside/markdown-it-ws-inline-link'
 
 // ===== MkDocs plugins =====
@@ -99,6 +100,7 @@ export function registerMarkdownPlugins(md: any) {
   md.use(markdownItWsRemoveCodeAttr)
   // A core rule pushed after the link rewriter's: sees hrefs already rewritten.
   md.use(markdownItWsButtonLink)
+  md.use(markdownItWsCompare)
 
   // MkDocs plugins
   md.use(markdownItMkAdmonition)
