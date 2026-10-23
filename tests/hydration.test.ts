@@ -24,30 +24,30 @@ describe('template compiler options', () => {
   })
 
   it('compiles Writerside tags without a component as plain elements', () => {
-    for (const tag of ['primary-label', 'secondary-label', 'shortcut', 'warning', 'compare', 'seealso', 'no-index']) {
+    for (const tag of ['primary-label', 'secondary-label', 'shortcut', 'compare', 'seealso', 'no-index']) {
       expect(isPlainElement(tag), tag).toBe(true)
     }
   })
 
   it('leaves components, Vue built-ins and form controls alone', () => {
-    for (const tag of ['tabs', 'tab-item', 'code-block', 'note', 'links', 'TopicTitle', 'Badge', 'component', 'slot', 'template', 'transition', 'input', 'select', 'textarea']) {
+    for (const tag of ['tabs', 'tab-item', 'code-block', 'note', 'warning', 'links', 'TopicTitle', 'Badge', 'component', 'slot', 'template', 'transition', 'input', 'select', 'textarea']) {
       expect(isPlainElement(tag), tag).toBe(false)
     }
   })
 
   it('server-renders the content of an unknown tag', async () => {
-    const source = '<div><primary-label ref="server-plugin"/><warning><p>Careful.</p></warning><shortcut>Ctrl+C</shortcut></div>'
+    const source = '<div><primary-label ref="server-plugin"/><seealso><p>Careful.</p></seealso><shortcut>Ctrl+C</shortcut></div>'
     const compilerOptions = { isCustomElement: isPlainElement }
     const { code } = compileTemplate({ source, filename: 'page.md', id: 'page', ssr: true, ssrCssVars: [], compilerOptions })
     expect(code).not.toContain('resolveComponent')
 
     const client = compileTemplate({ source, filename: 'page.md', id: 'page', compilerOptions }).code
     expect(client).not.toContain('resolveComponent')
-    expect(client).toContain('"warning"')
+    expect(client).toContain('"seealso"')
 
     // The server code writes the tags out with their content.
     expect(code).toContain('<primary-label></primary-label>')
-    expect(code).toContain('<warning><p>Careful.</p></warning>')
+    expect(code).toContain('<seealso><p>Careful.</p></seealso>')
     expect(code).toContain('<shortcut>Ctrl+C</shortcut>')
   })
 
