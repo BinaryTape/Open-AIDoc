@@ -36,6 +36,7 @@ import Step from "../component/Step.vue";
 import Highlight from "../component/Highlight.vue";
 import Note from "../component/Note.vue";
 import Tip from "../component/Tip.vue";
+import Warning from "../component/Warning.vue";
 import YouTubeVideo from "../component/YouTubeVideo.vue";
 
 export default {
@@ -95,6 +96,7 @@ export default {
 
     app.component('note', Note)
     app.component('tip', Tip)
+    app.component('warning', Warning)
 
     app.component('YouTubeVideo', YouTubeVideo)
 

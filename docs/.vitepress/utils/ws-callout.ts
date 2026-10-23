@@ -3,9 +3,9 @@ import { CONTENT_LOCALES, DEFAULT_LOCALE } from '../../../shared/locales'
 
 /**
  * Writerside callouts: `> …` blockquotes styled `note`, `tip` or `warning`
- * (a blockquote without a style is a tip), and the `<note>`/`<tip>` tags.
- * Shared by the Markdown plugin and the Note/Tip components so both render
- * the same markup.
+ * (a blockquote without a style is a tip), and the `<note>`, `<tip>` and
+ * `<warning>` tags. Shared by the Markdown plugin and the Note/Tip/Warning
+ * components so both render the same markup.
  */
 export const CALLOUT_TYPES = ['note', 'tip', 'warning'] as const
 export type CalloutType = (typeof CALLOUT_TYPES)[number]

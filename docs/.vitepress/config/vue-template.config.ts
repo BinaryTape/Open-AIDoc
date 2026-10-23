@@ -2,7 +2,7 @@
  * Vue template compiler options for the site.
  *
  * Writerside pages use many custom tags (`<primary-label>`, `<shortcut>`,
- * `<compare>`, `<warning>`, …). A tag that is neither native HTML nor a
+ * `<compare>`, `<seealso>`, …). A tag that is neither native HTML nor a
  * registered component is compiled as a component that cannot be resolved:
  * server rendering outputs `<!---->` and drops its content, while the browser
  * renders it as an element, so hydration fails and shifts the rest of the
@@ -19,7 +19,7 @@ export const GLOBAL_COMPONENTS = [
   'topic', 'TopicTitle', 'section-starting-page', 'show-structure', 'link-summary', 'card-summary',
   'web-summary', 'snippet', 'description', 'spotlight', 'primary', 'secondary', 'misc', 'cards',
   'card', 'links', 'group', 'Links', 'chapter', 'procedure', 'step', 'control', 'Path', 'ui-path',
-  'emphasis', 'note', 'tip', 'YouTubeVideo',
+  'emphasis', 'note', 'tip', 'warning', 'YouTubeVideo',
 ]
 
 const registered = new Set(GLOBAL_COMPONENTS)
