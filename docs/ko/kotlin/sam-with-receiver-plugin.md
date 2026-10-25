@@ -1,6 +1,6 @@
 [//]: # (title: SAM-with-receiver 컴파일러 플러그인)
 
-*sam-with-receiver* 컴파일러 플러그인은 어노테이션이 달린 자바의 "단일 추상 메서드"(SAM, single abstract method) 인터페이스 메서드의 첫 번째 파라미터를 코틀린에서의 수신 객체(receiver)로 만듭니다. 이 변환은 SAM 어댑터와 SAM 생성자 모두에 대해 SAM 인터페이스가 코틀린 람다로 전달될 때만 작동합니다(자세한 내용은 [SAM 변환 문서](java-interop.md#sam-conversions)를 참고하세요).
+*sam-with-receiver* 컴파일러 플러그인은 애너테이션이 지정된 Java의 "단일 추상 메서드"(SAM, single abstract method) 인터페이스 메서드의 첫 번째 파라미터를 Kotlin에서 수신 객체(receiver)로 변환해 줍니다. 이 변환은 SAM 어댑터 및 SAM 생성자 모두에서 SAM 인터페이스가 Kotlin 람다로 전달될 때만 동작합니다 (자세한 내용은 [SAM 변환 문서](java-interop.md#sam-conversions)를 참조하세요).
 
 예제는 다음과 같습니다:
 
@@ -16,7 +16,7 @@ public interface TaskRunner {
 ```kotlin
 fun test(context: TaskContext) {
     val runner = TaskRunner {
-        // 여기에서 'this'는 'Task'의 인스턴스입니다.
+        // 여기서 'this'는 'Task'의 인스턴스입니다
 
         println("$name is started")
         context.executeTask(this)
@@ -27,7 +27,7 @@ fun test(context: TaskContext) {
 
 ## Gradle {id="gradle"}
 
-사용법은 [all-open](all-open-plugin.md) 및 [no-arg](no-arg-plugin.md)와 동일하지만, sam-with-receiver에는 기본 제공되는 프리셋(preset)이 없으므로 특별하게 처리할 어노테이션 목록을 직접 지정해야 한다는 점이 다릅니다.
+sam-with-receiver에는 기본 제공되는 프리셋이 없어 특별히 처리할 애너테이션 목록을 직접 지정해야 한다는 점을 제외하면, 사용법은 [`all-open`](all-open-plugin.md) 및 [`no-arg`](no-arg-plugin.md)와 동일합니다.
 
 <tabs group="build-script">
 <tab title="Kotlin" group-key="kotlin">
@@ -50,7 +50,7 @@ plugins {
 </tab>
 </tabs>
 
-그 다음 SAM-with-receiver 어노테이션 목록을 지정합니다:
+그런 다음 SAM-with-receiver 애너테이션 목록을 지정합니다:
 
 ```groovy
 samWithReceiver {
@@ -90,7 +90,7 @@ samWithReceiver {
 
 ## 커맨드 라인 컴파일러 {id="command-line-compiler"}
 
-컴파일러 플러그인 클래스패스에 플러그인 JAR 파일을 추가하고 sam-with-receiver 어노테이션 목록을 지정합니다:
+플러그인 JAR 파일을 컴파일러 플러그인 클래스패스에 추가하고 sam-with-receiver 애너테이션 목록을 지정합니다:
 
 ```bash
 -Xplugin=$KOTLIN_HOME/lib/sam-with-receiver-compiler-plugin.jar

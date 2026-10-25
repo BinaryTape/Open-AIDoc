@@ -1,4 +1,4 @@
-[//]: # (title: Native サーバー)
+[//]: # (title: ネイティブサーバー)
 
 <tldr>
 <var name="example_name" value="embedded-server-native"/>
@@ -11,23 +11,25 @@
 </tldr>
 
 <link-summary>
-KtorはKotlin/Nativeをサポートしており、追加のランタイムや仮想マシンなしでサーバーを実行できます。
+Ktor は Kotlin/Native をサポートしており、追加のランタイムや仮想マシンなしでサーバーを実行できます。
 </link-summary>
 
-Ktorは[Kotlin/Native](https://kotlinlang.org/docs/native-overview.html)をサポートしており、追加のランタイムや仮想マシンなしでサーバーを実行できます。現在、Kotlin/NativeでKtorサーバーを実行する場合、以下の制限があります:
-* `embeddedServer`を使用して[サーバーを作成する](server-create-and-configure.topic)必要がある
-* [CIOエンジン](server-engines.md)のみがサポートされている
-* リバースプロキシなしの[HTTPS](server-ssl.md)はサポートされていない
+Ktor は [Kotlin/Native](https://kotlinlang.org/docs/native-overview.html) をサポートしており、追加のランタイムや仮想マシンなしでサーバーを実行できます。現在、Kotlin/Native で Ktor サーバーを実行する際には、以下の制限事項があります:
+* [サーバーの作成](server-create-and-configure.topic)には `embeddedServer` を使用する必要がある
+* [CIO エンジン](server-engines.md)のみがサポートされている
+* リバースプロキシなしの [HTTPS](server-ssl.md) はサポートされていない
 
-undefined
+> Kotlin/Native プロジェクトで Ktor を使用するには、[新しいメモリマネージャー](https://kotlinlang.org/docs/native-memory-manager.html)が必要です。これは Kotlin 1.7.20 以降でデフォルトで有効になっています。
+>
+{id="newmm-note" style="note"}
 
 ## 依存関係の追加 {id="add-dependencies"}
 
-Kotlin/NativeプロジェクトのKtorサーバーには、少なくとも2つの依存関係が必要です。
+Kotlin/Native プロジェクトの Ktor サーバーには、少なくとも2つの依存関係が必要です:
 * `ktor-server-core`（コア依存関係）
-* `ktor-server-cio`（CIOエンジン）
+* `ktor-server-cio`（CIO エンジン）
 
-以下のコードスニペットは、`<Path>build.gradle.kts</Path>`ファイルの`nativeMain`ソースセットに依存関係を追加する方法を示しています。
+以下のコードスニペットは、<Path>build.gradle.kts</Path> ファイルの `nativeMain` ソースセットに依存関係を追加する方法を示しています:
 
 ```kotlin
 kotlin {
@@ -40,7 +42,7 @@ kotlin {
 }
 ```
 
-Nativeサーバーを[テスト](server-testing.md)するには、`nativeTest`ソースセットに`ktor-server-test-host`アーティファクトを追加します。
+Native サーバーを[テスト](server-testing.md)するには、`nativeTest` ソースセットに `ktor-server-test-host` アーティファクトを追加します:
 
 ```kotlin
 kotlin {
@@ -53,9 +55,9 @@ kotlin {
 }
 ```
 
-## Nativeターゲットの設定 {id="native-target"}
+## ネイティブターゲットの設定 {id="native-target"}
 
-必要なNativeターゲットを指定し、`binaries`プロパティを使用して[Nativeバイナリを宣言](https://kotlinlang.org/docs/mpp-build-native-binaries.html)します。
+必要なネイティブターゲットを指定し、`binaries` プロパティを使用して[ネイティブバイナリを宣言](https://kotlinlang.org/docs/mpp-build-native-binaries.html)します:
 
 ```kotlin
 kotlin {
@@ -67,7 +69,7 @@ kotlin {
         hostOs == "Linux" && (arch == "x86_64" || arch == "amd64") -> linuxX64("native")
         hostOs == "Linux" && arch == "aarch64" -> linuxArm64("native")
         hostOs.startsWith("Windows") -> mingwX64("native")
-        // その他のサポートされているターゲットはこちらに記載されています: https://ktor.io/docs/server-native.html#targets
+        // Other supported targets are listed here: https://ktor.io/docs/server-native.html#targets
         else -> throw GradleException("Host OS is not supported in Kotlin/Native.")
     }
 
@@ -81,10 +83,10 @@ kotlin {
 }
 ```
 
-> 完全な例については、[embedded-server-native](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/embedded-server-native)を参照してください。
+> 完全なサンプルについては、[embedded-server-native](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/embedded-server-native) を参照してください。
 >
 {style="tip"}
 
 ## 次のステップ {id="create-server"}
 
-Gradleビルドスクリプトを設定した後、[Ktorサーバーの作成](server-create-and-configure.topic)に進むことができます。
+Gradle ビルドスクリプトを設定したら、続いて [Ktor サーバーの作成](server-create-and-configure.topic)を行うことができます。

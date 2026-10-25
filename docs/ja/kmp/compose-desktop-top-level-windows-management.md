@@ -1,16 +1,21 @@
 [//]: # (title: トップレベルウィンドウの管理)
 
-<web-summary>Compose Multiplatform for desktop でトップレベルウィンドウを管理する方法を学びます。ウィンドウの作成とカスタマイズ、システムトレイへの格納、ダイアログの使用について説明します。</web-summary>
+<web-summary>デスクトップ向けCompose Multiplatformでトップレベルウィンドウを管理する方法を学びます：ウィンドウの作成とカスタマイズ、システムトレイへの格納、ダイアログの使用。</web-summary>
 
-Compose Multiplatform for desktop は、ウィンドウを管理するためのさまざまな機能を提供します。ウィンドウをシステムトレイに格納したり、ドラッグ可能にしたり、サイズの調整、位置の変更などを行うことができます。
+デスクトップ向けCompose Multiplatformは、ウィンドウを管理するためのさまざまな機能を提供します。ウィンドウをトレイに格納したり、ドラッグ可能にしたり、サイズをコンテンツに適応させたり、位置を変更したりできます。
 
-新しく実験的な [ウィンドウとダイアログ API v2](#ウィンドウとダイアログ-api-v2) も参照してください。
+新しい実験的な[ウィンドウとダイアログのAPI v2](#window-and-dialog-api-v2)も参照してください。
 
-undefined
+> このガイドのサンプルは、実行可能なデスクトップアプリです。試すには以下の手順を行います：
+> 1. [Kotlin Multiplatform IDEプラグイン](https://plugins.jetbrains.com/plugin/14936-kotlin-multiplatform)または[オンラインウィザード](https://kmp.jetbrains.com/?android=true&desktop=true&includeTests=false)を使用してCompose Multiplatformプロジェクトを作成します。
+> 2. デスクトップのエントリポイントファイルを開きます。例えば、`desktopApp/src/main/kotlin/com/example/my_desktop_app/main.kt` です。
+> 3. その内容を提供されているサンプルに置き換えます。
+>
+{style="note" id="desktop-snippets-intro"}
 
 ## ウィンドウを開く・閉じる {id="open-and-close-windows"}
 
-`Window()` 関数を使用して、通常のウィンドウを作成できます。コンポーザブルなスコープに配置するには、`application` エントリーポイント内で `Window()` を使用します。
+通常のウィンドウを作成するには、`Window()` 関数を使用できます。これをコンポーザブルスコープに配置するには、`application` エントリポイント内で `Window()` を使用します：
 
 ```kotlin
 import androidx.compose.ui.window.Window
@@ -24,7 +29,7 @@ fun main() = application {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="application { Window(onCloseRequest = ::exitApplication)"}
 
-コンポーザブル関数として、`Window()` はそのプロパティを宣言的に変更できます。たとえば、あるタイトルでウィンドウを開き、後でそのタイトルを変更することができます。
+コンポーザブル関数として、`Window()` はそのプロパティを宣言的に変更できます。例えば、あるタイトルでウィンドウを開き、後からタイトルを変更することができます：
 
 ```kotlin
 import androidx.compose.material.Button
@@ -50,9 +55,9 @@ fun main() = application {
 
 <img src="compose-window-properties.animated.gif" alt="Window properties: change title" preview-src="compose-window-properties.png" width="600"/>
 
-### 条件の追加 {id="add-conditions"}
+### 条件を追加する {id="add-conditions"}
 
-単純な `if` 条件を使用してウィンドウを開いたり閉じたりすることもできます。次のコードサンプルでは、タスクの完了後にアプリケーションウィンドウが自動的に閉じられます。
+単純な `if` 条件を使用してウィンドウを開いたり閉じたりすることもできます。以下のコードサンプルでは、タスクが完了した後にアプリケーションウィンドウが自動的に閉じられます：
 
 ```kotlin
 import androidx.compose.material.Text
@@ -69,7 +74,7 @@ fun main() = application {
     var isPerformingTask by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
-        // 重い処理を実行する
+        // 時間のかかる処理を実行
         delay(2000) 
         isPerformingTask = false
     }
@@ -95,10 +100,10 @@ fun main() = application {
 
 <img src="compose-window-condition.animated.gif" alt="Windows with conditions" preview-src="compose-window-condition.png" width="600"/>
 
-### 終了時の確認の追加 {id="ask-for-confirmation-on-close"}
+### 閉じる際の確認を求める {id="ask-for-confirmation-on-close"}
 
-アプリケーションの終了時にダイアログを表示するなど、カスタムロジックを使用したい場合は、`onCloseRequest` コールバックを使用して終了アクションをオーバーライドできます。
-次のコードサンプルでは、命令的なアプローチ (`window.close()`) の代わりに宣言的なアプローチを使用し、状態の変化 (`isOpen = false`) に応じてウィンドウを閉じています。
+ダイアログを表示するなど、アプリケーション終了時にカスタムロジックを使用したい場合は、`onCloseRequest` コールバックを使用して閉じるアクションをオーバーライドできます。
+以下のコードサンプルでは、命令的なアプローチ（`window.close()`）の代わりに宣言的なアプローチを使用し、状態の変更（`isOpen = false`）に応じてウィンドウを閉じます。
 
 ```kotlin
 import androidx.compose.material.Button
@@ -142,7 +147,7 @@ fun main() = application {
 
 ## シングルウィンドウアプリケーションの作成 {id="create-a-single-window-application"}
 
-1 つのトップレベルウィンドウを持つシンプルなアプリケーションの場合、`Window()` コンポーザブルを含む完全な `application` エントリーポイントは必要ありません。`singleWindowApplication()` 関数がそれら両方を 1 つの呼び出しにラップします。
+トップレベルウィンドウが1つだけのシンプルなアプリケーションの場合、`Window()` コンポーザブルを含む完全な `application` エントリポイントは不要です。`singleWindowApplication()` 関数が両方を1つの呼び出しにラップします：
 
 ```kotlin
 import androidx.compose.ui.window.singleWindowApplication
@@ -152,13 +157,13 @@ fun main() = singleWindowApplication {
 }
 ```
 
-2 つ以上のトップレベルウィンドウ、カスタムの終了ロジック、または実行時におけるウィンドウ属性の変更が必要な場合は、`application` エントリーポイント内で [`Window()` コンポーザブル](#ウィンドウを開く・閉じる) を使用してください。
+複数のトップレベルウィンドウを使用する場合、カスタムの終了ロジックを実装する場合、または実行時にウィンドウ属性を変更する場合は、`application` エントリポイント内で [`Window()` コンポーザブル](#open-and-close-windows) を使用してください。
 
-## ウィンドウの状態の管理 {id="manage-window-state"}
+## ウィンドウの状態を管理する {id="manage-window-state"}
 
-`WindowState` クラスは、ウィンドウの配置（placement）、現在の位置、およびサイズを保持します。
-配置（placement）属性を使用すると、ウィンドウを画面上でどのように配置するかを指定できます（フローティング、最大化/最小化、またはフルスクリーン）。
-状態が変更されると、自動的に再コンポジション（recomposition）がトリガーされます。ウィンドウの状態を変更するには、コールバックを使用するか、コンポーザブル内でそれを監視します。
+`WindowState` クラスは、ウィンドウの配置、現在の位置、およびサイズを保持します。
+配置（placement）属性を使用すると、ウィンドウが画面上でどのように配置されるか（フローティング、最大化/最小化、または全画面表示）を指定できます。
+状態が変更されると、自動的に再コンポジションがトリガーされます。ウィンドウの状態を変更するには、コールバックを使用するか、コンポーザブル内で状態を監視します：
 
 ```kotlin
 import androidx.compose.foundation.clickable
@@ -237,10 +242,10 @@ fun main() = application {
 
 <img src="compose-window-minimize.animated.gif" alt="Changing the state" preview-src="compose-window-minimize.png" width="600"/>
 
-### コンテンツに応じたウィンドウサイズ {id="adapt-window-size-to-its-content"}
+### ウィンドウのサイズをコンテンツに合わせる {id="adapt-window-size-to-its-content"}
 
-事前に寸法を指定せずにコンテンツに基づいてウィンドウのサイズを決定するには、ウィンドウの寸法の片方または両方を `Dp.Unspecified` に設定します。
-Compose Multiplatform は、コンテンツに合わせてウィンドウの初期サイズを自動的に調整します。
+事前に寸法を指定せずにコンテンツに基づいてウィンドウのサイズを設定するには、ウィンドウの寸法の片方または両方に `Dp.Unspecified` を設定します。
+Compose Multiplatformは、コンテンツに合わせて初期ウィンドウサイズを自動的に調整します：
 
 ```kotlin
 import androidx.compose.foundation.background
@@ -278,9 +283,10 @@ fun main() = application {
 
 <img src="compose-window-adaptive-size.png" alt="Adaptive window size" width="451"/>
 
-### 状態の変化をリッスンする {id="listen-to-state-changes"}
+### 状態の変更を監視する {id="listen-to-state-changes"}
 
-状態の変化に反応して、その値を（例えばデータベースに書き込むなど）非コンポーザブルなアプリケーション層に送る必要がある場合は、`snapshotFlow()` 関数を使用できます。この関数は、コンポーザブルの状態の現在の値をキャプチャします。
+状態の変更に反応してアプリケーションの非コンポーザブル部分に値を渡す（例えば、データベースに書き込む）には、`snapshotFlow()` 関数を使用できます。
+この関数はコンポーザブルの状態の現在の値をキャプチャします。
 
 ```kotlin
 import androidx.compose.runtime.LaunchedEffect
@@ -321,9 +327,9 @@ private fun onWindowRelocate(position: WindowPosition) {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="LaunchedEffect(state) { snapshotFlow { state.size } .onEach(::onWindowResize)"}
 
-## 複数のウィンドウを扱う {id="manage-multiple-windows"}
+## 複数のウィンドウを管理する {id="manage-multiple-windows"}
 
-複数のウィンドウを管理するには、アプリケーションの状態用に別のクラスを作成し、`mutableStateListOf` の変更に応じてウィンドウを開いたり閉じたりすることができます。
+複数のウィンドウを管理するには、アプリケーション状態用の独立したクラスを作成し、`mutableStateListOf` の変更に応じてウィンドウを開いたり閉じたりすることができます：
 
 ```kotlin
 import androidx.compose.runtime.Composable
@@ -396,21 +402,23 @@ private class MyWindowState(
 
 より複雑な例については、[Code Viewer](https://github.com/JetBrains/compose-multiplatform/tree/master/examples/codeviewer) サンプルを参照してください。
 
-## ダイアログの表示 {id="show-dialogs"}
+## ダイアログを表示する {id="show-dialogs"}
 
-`DialogWindow()` コンポーザブルを使用して、独自のタイトルバーを持つ別の OS レベルのウィンドウを表示できます。これは、確認、ファイルピッカー、またはユーザーが続行する前に完了しなければならない操作に役立ちます。
+`DialogWindow()` コンポーザブルを使用して、独自のタイトルバーを持つ独立したOSレベルのウィンドウを表示できます。
+これは、確認、ファイルピッカー、またはユーザーが次に進む前に完了する必要があるあらゆるインタラクションに役立ちます。
 
-実験的な `modalityType` パラメータを使用して、ダイアログが他のウィンドウとの対話をブロックするかどうかを制御できます。`DialogModalityType` のいずれかの値を設定します。
+実験的な `modalityType` パラメータを使用して、ダイアログが他のウィンドウとのインタラクションをブロックするかどうかを制御できます。
+以下の `DialogModalityType` 値のいずれかに設定します：
 
-* `Modeless`: 他のどのウィンドウもブロックしません。
-* `DocumentModal`: 親のトップレベルウィンドウと、そのダイアログ自身の子孫を除く、それに付随する他のウィンドウをブロックします。
+* `Modeless`: 他のウィンドウを一切ブロックしません。
+* `DocumentModal`: 親のトップレベルウィンドウと、それにアタッチされた他のすべてのウィンドウをブロックします（ダイアログ自身の子孫ウィンドウを除く）。
 * `ApplicationModal`: 同じアプリケーション内の他のすべてのウィンドウをブロックします。
 
-> 現在のウィンドウ内に留まるオーバーレイ UI（ドロップダウン、ツールチップ、カスタムオーバーレイ）には、マルチプラットフォームの [Popup()](compose-popups.md) コンポーザブルを使用してください。
+> 現在のウィンドウ内に留まるオーバーレイUI（ドロップダウン、ツールチップ、カスタムオーバーレイ）には、マルチプラットフォームの [Popup()](compose-popups.md) コンポーザブルを使用してください。
 >
 {style="tip"}
 
-次のコードサンプルは、通常のウィンドウと `ApplicationModal` ダイアログを組み合わせています。
+以下のコードサンプルは、通常のウィンドウと `ApplicationModal` ダイアログを組み合わせています：
 
 ```kotlin
 import androidx.compose.foundation.layout.Box
@@ -431,7 +439,7 @@ import androidx.compose.ui.window.rememberDialogState
 import androidx.compose.ui.window.DialogModalityType
 import androidx.compose.ui.ExperimentalComposeUiApi
 
-// 実験的な modalityType を有効にする
+// 実験的なmodalityTypeを有効化
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() = application {
     Window(
@@ -465,7 +473,8 @@ fun main() = application {
 
 デフォルトでは、ウィンドウを閉じるとアプリケーションが終了します。代わりにウィンドウをシステムトレイやメニューバーに隠すには、`onCloseRequest` をインターセプトしてウィンドウの可視性（visibility）状態を変更します。
 
-次の例では、ウィンドウを閉じると `isVisible` が `false` に設定され、ウィンドウが非表示になり、システムトレイアイコンが表示されます。トレイアイコンをクリックすると、ウィンドウが復元されます。
+以下の例では、ウィンドウを閉じると `isVisible` が `false` に設定され、ウィンドウが非表示になってシステムトレイアイコンが表示されます。
+トレイアイコンをクリックするとウィンドウが復元されます。
 
 ```kotlin
 import androidx.compose.material.Text
@@ -526,9 +535,9 @@ object TrayIcon : Painter() {
 
 <img src="compose-window-hide-tray.animated.gif" alt="Hide instead of closing" preview-src="compose-window-hide-tray.png" width="600"/>
 
-## ドラッグ可能なウィンドウ領域 {id="make-window-areas-draggable"}
+## ウィンドウ領域をドラッグ可能にする {id="make-window-areas-draggable"}
 
-装飾なし（undecorated）のウィンドウにカスタムのドラッグ可能なタイトルバーを追加したり、ウィンドウ全体をドラッグ可能にしたりするには、`WindowDraggableArea()` コンポーザブルを使用できます。
+装飾のない（undecorated）ウィンドウにカスタムのドラッグ可能なタイトルバーを追加したり、ウィンドウ全体をドラッグ可能にしたりするには、`WindowDraggableArea()` コンポーザブルを使用できます：
 
 ```kotlin
 import androidx.compose.foundation.background
@@ -552,7 +561,7 @@ fun main() = application {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="WindowDraggableArea { Box(Modifier.fillMaxWidth().height(48.dp).background(Color.DarkGray))}"}
 
-`WindowDraggableArea()` は、`singleWindowApplication()`、`Window()`、および `DialogWindow()` コンポーザブル内でのみ使用できます。別のコンポーザブル関数で呼び出すには、レシーバースコープとして `WindowScope` を使用します。
+`WindowDraggableArea()` は、`singleWindowApplication()`、`Window()`、および `DialogWindow()` コンポーザブル内でのみ使用できます。別のコンポーザブル関数内で呼び出すには、レシーバースコープとして `WindowScope` を使用してください：
 
 ```kotlin
 import androidx.compose.foundation.background
@@ -583,11 +592,12 @@ private fun WindowScope.AppWindowTitleBar() = WindowDraggableArea {
 
 <img src="compose-window-draggable-area.animated.gif" alt="Draggable area" preview-src="compose-window-draggable-area.png" width="600"/>
 
-## 透明なウィンドウの作成 {id="create-transparent-windows"}
+## 透過ウィンドウを作成する {id="create-transparent-windows"}
 
-透明なウィンドウを作成するには、`Window()` 関数に `transparent=true` と `undecorated=true` の 2 つのパラメータを渡します。透明なウィンドウを装飾することはできないため、ウィンドウは `undecorated`（装飾なし）である必要があります。
+透過ウィンドウを作成するには、`Window()` 関数に `transparent=true` と `undecorated=true` の2つのパラメータを渡します。
+透明なウィンドウを装飾することはできないため、ウィンドウは必ず undecorated である必要があります。
 
-次のコードサンプルは、コンポーザブルを組み合わせて角の丸い透明なウィンドウを作成する方法を示しています。
+以下のコードサンプルは、コンポーザブルを組み合わせて角丸の透過ウィンドウを作成する方法を示しています：
 
 ```kotlin
 import androidx.compose.foundation.layout.fillMaxSize
@@ -612,13 +622,13 @@ fun main() = application {
             onCloseRequest = { isOpen = false },
             title = "Transparent Window Example",
             transparent = true, 
-            // 透明なウィンドウは装飾なしである必要があります
+            // 透過ウィンドウはundecoratedである必要があります
             undecorated = true, 
         ) {
             Surface(
                 modifier = Modifier.fillMaxSize().padding(5.dp).shadow(3.dp, RoundedCornerShape(20.dp)), 
                 color = Color.Transparent,
-                // 角の丸いウィンドウ
+                // 角丸のウィンドウ
                 shape = RoundedCornerShape(20.dp) 
             ) {
                 Text("Hello World!", color = Color.White)
@@ -629,9 +639,9 @@ fun main() = application {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="Modifier.fillMaxSize().padding(5.dp).shadow(3.dp, RoundedCornerShape(20.dp))"}
 
-## Swing コンポーネントの使用 {id="use-swing-components"}
+## Swingコンポーネントを使用する {id="use-swing-components"}
 
-Compose Multiplatform for desktop は内部で Swing を使用しているため、Swing を直接使用してウィンドウを作成することもできます。
+デスクトップ向けCompose Multiplatformは内部でSwingを使用しているため、Swingを使用して直接ウィンドウを作成できます：
 
 ```kotlin
 import androidx.compose.ui.awt.ComposeWindow
@@ -652,7 +662,7 @@ fun main() = SwingUtilities.invokeLater {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="SwingUtilities.invokeLater { ComposeWindow().apply {"}
 
-また、`Window()` コンポーザブルのスコープを使用することもできます。次のコードサンプルにおいて、`window` は `Window()` 内で作成された `ComposeWindow` です。
+`Window()` コンポーザブルのスコープを使用することもできます。以下のコードサンプルでは、`window` は `Window()` 内で作成された `ComposeWindow` です：
 
 ```kotlin
 import androidx.compose.runtime.LaunchedEffect
@@ -679,7 +689,7 @@ fun main() = singleWindowApplication {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="LaunchedEffect(Unit) { window.dropTarget = DropTarget().apply"}
 
-Swing で実装されたダイアログを使用する必要がある場合は、それをコンポーザブル関数にラップできます。
+Swingで実装されたダイアログを使用する必要がある場合は、それをコンポーザブル関数にラップできます：
 
 ```kotlin
 import androidx.compose.runtime.Composable
@@ -725,20 +735,22 @@ private fun FileDialog(
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="@Composable private fun FileDialog( parent: Frame? = null, "}
 
-## ウィンドウとダイアログ API v2 {id="window-and-dialog-api-v2"}
+## ウィンドウとダイアログのAPI v2 {id="window-and-dialog-api-v2"}
 <primary-label ref="Experimental"/>
 
-Compose Multiplatform 1.12.0 から、再設計された `WindowState` および `DialogState` クラスが `androidx.compose.ui.window.v2` サブパッケージで利用可能になりました。
+Compose Multiplatform 1.12.0以降、再設計された `WindowState` および `DialogState` クラスが `androidx.compose.ui.window.v2` サブパッケージで利用可能になりました。
 
-v2 ウィンドウおよびダイアログ API は、状態のリクエストと、ウィンドウマネージャーによって実際に適用された状態の監視を分離します。また、以前は不可能だったシナリオ、たとえばウィンドウをコンテンツの優先サイズに合わせつつ、ウィンドウがより大きい場合にはコンテンツを（`fillMaxSize()` などの修飾子を介して）拡張させる、といったことが可能になります。詳細は [サイズの指定](#サイズの指定) を参照してください。
+v2のウィンドウおよびダイアログAPIでは、状態を要求することと、ウィンドウマネージャによって実際に適用された状態を監視することが分離されています。
+また、以前は不可能だったシナリオ（例えば、ウィンドウのサイズをコンテンツの推奨サイズに合わせつつ、ウィンドウがそれより大きくなった場合にはコンテンツを（`fillMaxSize()` などの修飾子を介して）拡張させるなど）も実現可能になります。
+詳細は[サイズを指定する](#specify-size)を参照してください。
 
-v2 API は、このページの残りの部分で説明されている既存の API と併用できるため、独自のペースで個々のウィンドウを移行できます。
+v2 APIは、このページの他の部分で説明されている既存のAPIと並行して提供されているため、個々のウィンドウを自分のペースで移行できます。
 
 ### 状態の指定と監視 {id="specify-and-observe-state"}
 
-v2 API は、望ましい状態の指定と、実際の状態の監視を明示的に分離します。
+v2 APIは、望ましい状態の指定と実際の状態の監視を明示的に分離します。
 
-ウィンドウの初期状態を指定するには、`rememberWindowState()` にプロバイダーを渡します。
+ウィンドウの初期状態を指定するには、`rememberWindowState()` にプロバイダを渡します：
 
 ```kotlin
 import androidx.compose.material.Text
@@ -772,7 +784,8 @@ fun main() = application {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="val windowState = rememberWindowState(initialBoundsProvider = WindowBoundsProvider("}
 
-ウィンドウ作成後に状態の変更をリクエストするには、`WindowState` の対応するメソッドを呼び出します。正確なサイズと位置を直接指定できます。
+ウィンドウが作成された後に状態の変更を要求するには、`WindowState` の対応するメソッドを呼び出します。
+正確なサイズと位置を直接指定できます：
 
 ```kotlin
 windowState.requestScreen { defaultScreen }
@@ -780,7 +793,7 @@ windowState.requestSize(DpSize(1024.dp, 768.dp))
 windowState.requestPosition(DpOffset(100.dp, 100.dp))
 ```
 
-相対的な配置や寸法の動的な計算には、プロバイダーを使用します。
+相対的な配置を行ったり、寸法を動的に計算したりするには、プロバイダを使用します：
 
 ```kotlin
 windowState.requestBounds(
@@ -791,8 +804,8 @@ windowState.requestBounds(
 )
 ```
 
-リクエストの適用は非同期です。ウィンドウシステムがリクエストされた状態を調整する場合があり、実際の状態は、たとえばウィンドウを移動またはリサイズしたときなどに後で変更される可能性があります。
-ウィンドウの実際の状態は、`WindowState.screenId` および `WindowState.bounds` を介して監視してください。
+リクエストの適用は非同期です。ウィンドウシステムが要求された状態を調整する場合があり、また、後でウィンドウを移動またはリサイズした際などに実際の状態が変化することもあります。
+ウィンドウの実際の状態は、`WindowState.screenId` および `WindowState.bounds` を介して監視します：
 
 ```kotlin
 if (windowState.isInitialized) {
@@ -801,14 +814,14 @@ if (windowState.isInitialized) {
 }
 ```
 
-同様の非同期モデルは、`DialogState` および `rememberDialogState()` を介してダイアログでも利用可能です。
+ダイアログに対しても、`DialogState` および `rememberDialogState()` を介して同様の非同期モデルが利用可能です。
 
-### 画面の選択 {id="choose-a-screen"}
+### スクリーンを選択する {id="choose-a-screen"}
 
-ウィンドウが表示されるべき画面のリクエストは、`rememberWindowState()` に `initialScreenProvider` を渡すか、後で `WindowState.requestScreen()` を呼び出すことで行えます。
-ウィンドウが実際に配置されている画面は、`WindowState.screenId` を介して監視可能です。
+ウィンドウを表示するスクリーンを要求するには、`initialScreenProvider` を `rememberWindowState()` に渡すか、後から `WindowState.requestScreen()` を呼び出します。
+ウィンドウが実際に配置されているスクリーンは、`WindowState.screenId` を介して監視できます。
 
-たとえば、利用可能な幅が少なくとも `1024.dp` ある画面にウィンドウを配置するようにリクエストし、見つからない場合はデフォルトの画面を使用するようにできます。
+例えば、利用可能な幅が `1024.dp` 以上あるスクリーンへの配置を要求し、見つからない場合はデフォルトのスクリーンにフォールバックすることができます：
 
 ```kotlin
 windowState.requestScreen {
@@ -817,49 +830,49 @@ windowState.requestScreen {
 }
 ```
 
-### 位置の指定 {id="specify-position"}
+### 位置を指定する {id="specify-position"}
 
-ウィンドウの位置を変更するには、`rememberWindowState()` に `initialBoundsProvider` を渡すか、後で `WindowState.requestBounds()` を呼び出します。
-ウィンドウの実際の境界（bounds）は `WindowState.bounds` を介して監視可能です。
+ウィンドウの位置を変更するには、`initialBoundsProvider` を `rememberWindowState()` に渡すか、後から `WindowState.requestBounds()` を呼び出します。
+ウィンドウの実際の境界は `WindowState.bounds` を介して監視できます。
 
-v2 API は `WindowPositionProvider` を使用して、画面および親ウィンドウのジオメトリに関する情報を取得します。
+v2 APIは、スクリーンおよび親ウィンドウのジオメトリに関する情報を取得するために `WindowPositionProvider` を使用します。
 
-標準的な配置には、組み込みのプロパティを使用できます。
+標準的な配置には、組み込みのプロパティを使用できます：
 
 * `Default`: オペレーティングシステムの標準的なカスケード動作を適用します。
 * `Current`: ウィンドウの現在の位置を維持します。
-* `CenteredOnScreen`: 画面内の中央にウィンドウを配置します。
-* `CenteredInParentWindow`: 親ウィンドウ内の中央にウィンドウを配置します。
+* `CenteredOnScreen`: スクリーンの中央にウィンドウを配置します。
+* `CenteredInParentWindow`: 親ウィンドウの中央にウィンドウを配置します。
 
-より詳細な制御には、位置プロバイダー関数を使用します。
+より詳細な制御を行うには、位置プロバイダ関数を使用します：
 
-* `Absolute()`: 指定された `x` および `y` 座標にウィンドウの開始角を配置します。
-* `AlignedToScreen()`: 画面に対してウィンドウを整列させ、オプションのオフセットパラメータを含めることができます。
+* `Absolute()`: ウィンドウの開始コーナーを指定された `x` および `y` 座標に配置します。
+* `AlignedToScreen()`: スクリーンを基準にウィンドウを配置し、オプションのオフセットパラメータを含みます。
     ```kotlin
     WindowPositionProvider.AlignedToScreen(
         alignment = Alignment.Center,
         offset = DpOffset(x = 16.dp, y = 16.dp)
     )
     ```
-* `AlignedToParentWindow()`: ウィンドウを親ウィンドウに固定します。これは通常ダイアログに役立ちます。
+* `AlignedToParentWindow()`: 親ウィンドウにウィンドウを固定（アンカー）します。主にダイアログに役立ちます。
     ```kotlin
     WindowPositionProvider.AlignedToParentWindow(
-        // 親ウィンドウの開始角に固定
+        // 親ウィンドウの開始コーナーに固定
         anchor = Alignment.TopStart,
         // アンカーポイントに対するアライメントを適用
         alignment = Alignment.Center
     )
     ```
 
-### サイズの指定 {id="specify-size"}
+### サイズを指定する {id="specify-size"}
 
-サイズの指定もウィンドウ境界（bounds）の一部であるため、同じ `initialBoundsProvider`/`WindowState.requestBounds()` の仕組みを通じて構成されます。
+サイズ設定もウィンドウ境界（bounds）の一部であるため、同じ `initialBoundsProvider` / `WindowState.requestBounds()` メカニズムを通じて設定されます。
 
-v2 API は `WindowSizeProvider` を使用して画面および親ウィンドウのサイズに関する情報を取得するほか、ウィンドウのコンテンツに対してその固有のサイズを照会します。
+v2 APIは、スクリーンおよび親ウィンドウのサイズに関する情報を取得したり、コンテンツの固有の（intrinsic）サイズを問い合わせたりするために `WindowSizeProvider` を使用します。
 
-一般的な組み込みオプションには、特定のウィンドウサイズを指定する `Fixed()` や、標準の 800×600 dp サイズを指定する `Default` が含まれます。
+一般的な組み込みのオプションには、特定のウィンドウサイズを指定する `Fixed()` や、標準の 800×600 dp サイズを指定する `Default` があります。
 
-カスタムサイズの場合、`WindowSizeProvider()` ラムダは画面メトリクスにアクセスでき、ダイアログの場合は親ウィンドウのメトリクスにもアクセスできます。
+カスタムのサイズ設定を行う場合、`WindowSizeProvider()` ラムダはスクリーンメトリクスにアクセスでき、ダイアログの場合は親ウィンドウのメトリクスにもアクセスできます：
 
 ```kotlin
 WindowSizeProvider {
@@ -868,10 +881,10 @@ WindowSizeProvider {
 }
 ```
 
-v2 API は、よくリクエストされるシナリオを可能にします。
-それは、ウィンドウのサイズをコンテンツの優先サイズに合わせつつ、ユーザーがウィンドウを大きくしたときにはコンテンツがウィンドウいっぱいに広がるように設定することです。
-`WindowSizeProvider.Unconstrained` は、コンテンツのサイズを計算し、ウィンドウのインセットを追加し、その結果を利用可能な画面サイズで制限します。
-サイズ指定はレイアウトから切り離されているため、`fillMaxSize()` を使用するコンテンツは、ユーザーがウィンドウをリサイズした場合でも、ウィンドウいっぱいに広がるように拡張されます。
+v2 APIは、要望の多かったシナリオを可能にします：
+ウィンドウのサイズをコンテンツの推奨サイズに合わせつつ、ユーザーがウィンドウを大きくしたときにはコンテンツがウィンドウを満たすようにすることです。
+`WindowSizeProvider.Unconstrained` はコンテンツのサイズを計算し、ウィンドウのインセットを加算した上で、結果を利用可能な画面サイズで制限します。
+サイズ設定はレイアウトから切り離されているため、`fillMaxSize()` を使用するコンテンツでも、ユーザーがウィンドウをリサイズした場合には拡大してウィンドウ全体を満たします。
 
 ```kotlin
 WindowBoundsProvider(
@@ -880,8 +893,8 @@ WindowBoundsProvider(
 )
 ```
 
-v2 バージョンの `Window()` および `DialogWindow()` コンポーザブルは、`minSize` および `maxSize` パラメータを受け取ります。
-基盤となるウィンドウマネージャーがサポートしている場合、ユーザーはこれらの境界を超えてウィンドウをリサイズすることができなくなります。
+v2バージョンの `Window()` および `DialogWindow()` コンポーザブルは、`minSize` および `maxSize` パラメータを受け入れます。
+基礎となるウィンドウマネージャがサポートしている場合、ユーザーはこれらの境界を超えてウィンドウのサイズを変更することはできなくなります：
 
 ```kotlin
 DialogWindow(
@@ -896,4 +909,4 @@ DialogWindow(
 
 ## 次のステップ {id="what-s-next"}
 
-[その他のデスクトップコンポーネント](compose-desktop-components.md) に関するチュートリアルをご覧ください。
+[その他のデスクトップコンポーネント](compose-desktop-components.md)に関するチュートリアルをご覧ください。

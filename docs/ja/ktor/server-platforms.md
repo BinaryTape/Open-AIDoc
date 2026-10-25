@@ -1,13 +1,15 @@
 [//]: # (title: サポートされているプラットフォーム)
 
-Ktorサーバーは、Kotlinがサポートする以下のプラットフォームで使用できます：
+Ktor サーバーは、Kotlin でサポートされている以下のプラットフォームで使用できます。
 - JVM
 - [Native](server-native.md)
-undefined
+   > Kotlin/Native プロジェクトで Ktor を使用するには、[新しいメモリマネージャー](https://kotlinlang.org/docs/native-memory-manager.html)が必要です。これは Kotlin 1.7.20 以降でデフォルトで有効になっています。
+   >
+   {id="newmm-note" style="note"}
 - [JavaScript](https://kotlinlang.org/docs/js-overview.html)
 - [WasmJs](https://kotlinlang.org/docs/wasm-overview.html)
 
-以下の[ターゲット](https://kotlinlang.org/docs/multiplatform-dsl-reference.html#targets)がサポートされています：
+以下の[ターゲット](https://kotlinlang.org/docs/multiplatform-dsl-reference.html#targets)がサポートされています。
 
 <table>
 

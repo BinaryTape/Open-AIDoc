@@ -1,4 +1,4 @@
-[//]: # (title: 原生伺服器)
+[//]: # (title: Native 伺服器)
 
 <tldr>
 <var name="example_name" value="embedded-server-native"/>
@@ -11,23 +11,26 @@
 </tldr>
 
 <link-summary>
-Ktor 支援 Kotlin/Native，並允許您在沒有額外執行階段或虛擬機的情況下執行伺服器。
+Ktor 支援 Kotlin/Native，並允許您在無需額外執行環境或虛擬機的情況下執行伺服器。
 </link-summary>
 
-Ktor 支援 [Kotlin/Native](https://kotlinlang.org/docs/native-overview.html)，並允許您在沒有額外執行階段或虛擬機的情況下執行伺服器。目前，在 Kotlin/Native 下執行 Ktor 伺服器有以下限制：
-* 應使用 `embeddedServer` [建立伺服器](server-create-and-configure.topic)
+Ktor 支援 [Kotlin/Native](https://kotlinlang.org/docs/native-overview.html)，並允許您在無需額外執行環境或虛擬機的情況下執行伺服器。目前，在 Kotlin/Native 下執行 Ktor 伺服器具備以下限制：
+* [伺服器應使用](server-create-and-configure.topic) `embeddedServer` 建立
 * 僅支援 [CIO 引擎](server-engines.md)
-* 不支援沒有反向代理的 [HTTPS](server-ssl.md)
+* 不支援未搭配反向代理的 [HTTPS](server-ssl.md)
 
-undefined
+> 在 Kotlin/Native 專案中使用 Ktor 需要
+> [新的記憶體管理器](https://kotlinlang.org/docs/native-memory-manager.html)，該管理器從 Kotlin 1.7.20 開始預設啟用。
+>
+{id="newmm-note" style="note"}
 
 ## 新增相依性 {id="add-dependencies"}
 
-在 Kotlin/Native 專案中，Ktor 伺服器至少需要兩個相依性：
+在 Kotlin/Native 專案中的 Ktor 伺服器至少需要兩個相依性：
 * `ktor-server-core`（核心相依性）
 * `ktor-server-cio`（CIO 引擎）
 
-下方的程式碼片段顯示如何將相依性新增至 <Path>build.gradle.kts</Path> 檔案中的 `nativeMain` 原始碼集：
+以下程式碼片段展示了如何在 <Path>build.gradle.kts</Path> 檔案中將相依性新增至 `nativeMain` 原始碼集：
 
 ```kotlin
 kotlin {
@@ -40,7 +43,7 @@ kotlin {
 }
 ```
 
-若要[測試](server-testing.md)原生伺服器，請將 `ktor-server-test-host` 構件新增至 `nativeTest` 原始碼集：
+若要[測試](server-testing.md) Native 伺服器，請將 `ktor-server-test-host` 構件新增至 `nativeTest` 原始碼集：
 
 ```kotlin
 kotlin {
@@ -55,7 +58,7 @@ kotlin {
 
 ## 設定原生目標 {id="native-target"}
 
-指定所需的原生目標，並使用 `binaries` 屬性[宣告原生二進位檔](https://kotlinlang.org/docs/mpp-build-native-binaries.html)：
+指定所需的原生目標，並使用 `binaries` 屬性[宣告原生二進制檔](https://kotlinlang.org/docs/mpp-build-native-binaries.html)：
 
 ```kotlin
 kotlin {
@@ -67,7 +70,7 @@ kotlin {
         hostOs == "Linux" && (arch == "x86_64" || arch == "amd64") -> linuxX64("native")
         hostOs == "Linux" && arch == "aarch64" -> linuxArm64("native")
         hostOs.startsWith("Windows") -> mingwX64("native")
-        // 其他支援的目標列於此處：https://ktor.io/docs/server-native.html#targets
+        // Other supported targets are listed here: https://ktor.io/docs/server-native.html#targets
         else -> throw GradleException("Host OS is not supported in Kotlin/Native.")
     }
 
@@ -81,10 +84,10 @@ kotlin {
 }
 ```
 
-> 有關完整的範例，請參閱 [embedded-server-native](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/embedded-server-native)。
+> 如需完整範例，請參閱 [embedded-server-native](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/embedded-server-native)。
 >
 {style="tip"}
 
 ## 後續步驟 {id="create-server"}
 
-設定完 Gradle 建置指令碼後，您可以繼續[建立 Ktor 伺服器](server-create-and-configure.topic)。
+設定好 Gradle 建置指令碼後，您可以繼續[建立 Ktor 伺服器](server-create-and-configure.topic)。

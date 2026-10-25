@@ -1,31 +1,42 @@
-[//]: # (title: No-arg コンパイラプラグイン)
+[//]: # (title: No-arg コンパイラープラグイン)
 
-*no-arg* コンパイラプラグインは、特定のアノテーションが付与されたクラスに対して、追加の引数なしコンストラクタ（zero-argument constructor）を生成します。
+`no-arg` コンパイラープラグインは、特定のアノテーションが付与されたクラスに対して引数なしコンストラクター（zero-argument constructor）を生成します。
 
-生成されるコンストラクタはシンセティック（synthetic）であるため、Java や Kotlin から直接呼び出すことはできませんが、リフレクションを使用して呼び出すことができます。
+生成されたコンストラクターには `HIDDEN` レベルの `@Deprecated` アノテーションが付与されるため、Javaからは呼び出せますが、Kotlinからは呼び出せません。
+フレームワークはリフレクションを通じてそれを呼び出すことができます。
 
-これにより、Kotlin または Java の観点からは引数なしコンストラクタがない場合でも、Java Persistence API (JPA) がクラスをインスタンス化できるようになります（[以下](#jpa-サポート)の `kotlin-jpa` プラグインの説明を参照してください）。
+例えばこれにより、Java Persistence API (JPA) などのフレームワークが、引数なしコンストラクターを宣言していないKotlinクラスをインスタンス化できるようになります。
 
-## Kotlin ファイル内での記述 {id="in-your-kotlin-file"}
+> KotlinでJPAエンティティを扱う場合は、[`kotlin-jpa` コンパイラープラグイン](kotlin-jpa-plugin.md)を使用できます。
+> このプラグインは、`@Entity`、`@Embeddable`、`@MappedSuperclass` などのJPAアノテーションを自動的に指定します。
+>
+{style="note"}
 
-引数なしコンストラクタが必要なコードをマークするために、新しいアノテーションを追加します：
+## アノテーションの宣言 {id="declare-an-annotation"}
+
+`no-arg` プラグインは、その設定で登録したアノテーションが付与されているクラスのみを処理します。
+そのためプラグインを有効にする前に、引数なしコンストラクターが必要なクラスをマークするためのアノテーションを宣言してください。
+例えば、`NoArgAnnotation` のようになります。
 
 ```kotlin
-package com.my
+package com.example
 
-annotation class Annotation
+annotation class NoArgAnnotation
 ```
 
-## Gradle {id="gradle"}
+## プラグインの適用 {id="apply-the-plugin"}
 
-Gradle の plugins DSL を使用してプラグインを追加します：
+### Gradle {id="gradle"}
+
+`build.gradle(.kts)` ファイルの `plugins {}` ブロックに `no-arg` プラグインを追加します。
 
 <tabs group="build-script">
 <tab title="Kotlin" group-key="kotlin">
 
 ```kotlin
 plugins {
-    kotlin("plugin.noarg") version "%kotlinVersion%"
+    kotlin("jvm") version "%kotlinVersion%"  // 使用するKotlinのバージョン
+    kotlin("plugin.noarg") version "%kotlinVersion%" // Kotlin no-arg プラグイン
 }
 ```
 
@@ -34,6 +45,7 @@ plugins {
 
 ```groovy
 plugins {
+    id "org.jetbrains.kotlin.jvm" version "%kotlinVersion%"
     id "org.jetbrains.kotlin.plugin.noarg" version "%kotlinVersion%"
 }
 ```
@@ -41,15 +53,15 @@ plugins {
 </tab>
 </tabs>
 
-次に、アノテーションが付与されたクラスに対して引数なしコンストラクタの生成をトリガーする、no-arg アノテーションのリストを指定します：
+次に、アノテーションが付与されたクラスに対して引数なしコンストラクターを生成するために、先ほど宣言したアノテーション（例えば `com.example.NoArgAnnotation`）を指定します。
 
 ```groovy
 noArg {
-    annotation("com.my.Annotation")
+    annotation("com.example.NoArgAnnotation")
 }
 ```
 
-シンセティックコンストラクタから初期化ロジックを実行させたい場合は、`invokeInitializers` オプションを有効にします。デフォルトでは無効になっています。
+生成されたコンストラクターからクラスの初期化ロジックを実行させたい場合は、`invokeInitializers` オプションを有効にします。このオプションはデフォルトで無効になっています。
 
 ```groovy
 noArg {
@@ -57,9 +69,15 @@ noArg {
 }
 ```
 
-## Maven {id="maven"}
+### Maven {id="maven"}
+
+`pom.xml` ファイルにプラグインを追加します。
 
 ```xml
+<properties>
+    <kotlin.version>%kotlinVersion%</kotlin.version>
+</properties>
+
 <plugin>
     <artifactId>kotlin-maven-plugin</artifactId>
     <groupId>org.jetbrains.kotlin</groupId>
@@ -67,13 +85,12 @@ noArg {
 
     <configuration>
         <compilerPlugins>
-            <!-- または JPA サポートのための "jpa" -->
             <plugin>no-arg</plugin>
         </compilerPlugins>
 
         <pluginOptions>
-            <option>no-arg:annotation=com.my.Annotation</option>
-            <!-- シンセティックコンストラクタでインスタンス初期化子を呼び出す -->
+            <option>no-arg:annotation=com.example.NoArgAnnotation</option>
+            <!-- 生成されたコンストラクターでインスタンス初期化子を呼び出す -->
             <!-- <option>no-arg:invokeInitializers=true</option> -->
         </pluginOptions>
     </configuration>
@@ -88,47 +105,31 @@ noArg {
 </plugin>
 ```
 
-## JPA サポート {id="jpa-support"}
+## `no-arg` プラグインの使用 {id="use-the-no-arg-plugin"}
 
-`all-open` の上にラップされた `kotlin-spring` プラグインと同様に、`kotlin-jpa` は `no-arg` の上にラップされています。このプラグインは、[`@Entity`](https://docs.oracle.com/javaee/7/api/javax/persistence/Entity.html)、[`@Embeddable`](https://docs.oracle.com/javaee/7/api/javax/persistence/Embeddable.html)、および [`@MappedSuperclass`](https://docs.oracle.com/javaee/7/api/javax/persistence/MappedSuperclass.html) を *no-arg* アノテーションとして自動的に指定します。
-
-Gradle の plugins DSL を使用してプラグインを追加します：
-
-<tabs group="build-script">
-<tab title="Kotlin" group-key="kotlin">
+プラグインが適用されると、登録されたアノテーションが付与されたクラスにはコンパイル時に引数なしコンストラクターが生成されます。手動でコンストラクターを宣言する必要はありません。
 
 ```kotlin
-plugins {
-    kotlin("plugin.jpa") version "%kotlinVersion%"
-}
+package com.example
+
+// no-arg プラグインはこのクラスに対して引数なしコンストラクターを生成します
+@NoArgAnnotation
+class MyEntity(val id: Int)
 ```
 
-</tab>
-<tab title="Groovy" group-key="groovy">
+<!--
+## コマンドラインコンパイラー {id="command-line-compiler"}
 
-```groovy
-plugins {
-    id "org.jetbrains.kotlin.plugin.jpa" version "%kotlinVersion%"
-}
-```
-
-</tab>
-</tabs>
-
-Maven では、`jpa` プラグインを有効にします：
-
-```xml
-<compilerPlugins>
-    <plugin>jpa</plugin>
-</compilerPlugins>
-```
-
-## コマンドラインコンパイラ {id="command-line-compiler"}
-
-コンパイラプラグインのクラスパスにプラグインの JAR ファイルを追加し、アノテーションまたはプリセットを指定します：
+コンパイラープラグインのクラスパスにプラグインのJARファイルを追加し、アノテーションまたはプリセットを指定します。
 
 ```bash
 -Xplugin=$KOTLIN_HOME/lib/noarg-compiler-plugin.jar
 -P plugin:org.jetbrains.kotlin.noarg:annotation=com.my.Annotation
 -P plugin:org.jetbrains.kotlin.noarg:preset=jpa
 ```
+-->
+
+## 次のステップ {id="what-s-next"}
+
+* JPAエンティティには、[`kotlin-jpa` プラグイン](kotlin-jpa-plugin.md)を使用してください。このプラグインは、`@Entity`、`@Embeddable`、`@MappedSuperclass` などのJPAアノテーションを使って `no-arg` および `all-open` プラグインを設定します。
+* [`no-arg` コンパイラープラグイン](https://github.com/JetBrains/kotlin/tree/master/plugins/noarg)のソースコードを確認してください。

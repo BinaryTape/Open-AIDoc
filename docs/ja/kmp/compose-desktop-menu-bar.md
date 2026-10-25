@@ -1,11 +1,16 @@
 [//]: # (title: メニューバー)
-<web-summary>Compose Multiplatform for desktopを使用して、特定のウィンドウにメニューバーを作成する方法を学びます。</web-summary>
+<web-summary>デスクトップ向け Compose Multiplatform で特定のウィンドウ用のメニューバーを作成する方法を学びます。</web-summary>
 
-`MenuBar()` コンポーザブルを使用して、特定のウィンドウのメニューバーを作成できます。`MenuBar()` は `Window()` コンポーザブルのスコープ（scope）内で利用可能なため、各ウィンドウが独自のメニューバーを持つことができます。
+`MenuBar()` コンポーザブルを使用すると、特定のウィンドウ用のメニューバーを作成できます。`MenuBar()` は `Window()` コンポーザブルのスコープ内で利用可能なため、ウィンドウごとに独自のメニューバーを持たせることができます。
 
-undefined
+> このガイドのサンプルは実行可能なデスクトップアプリです。試すには:
+> 1. [Kotlin Multiplatform IDE プラグイン](https://plugins.jetbrains.com/plugin/14936-kotlin-multiplatform)または[オンラインウィザード](https://kmp.jetbrains.com/?android=true&desktop=true&includeTests=false)を使用して Compose Multiplatform プロジェクトを作成します。
+> 2. デスクトップのエントリポイントファイルを開きます（例: `desktopApp/src/main/kotlin/com/example/my_desktop_app/main.kt`）。
+> 3. その内容を提示されているサンプルに置き換えます。
+>
+{style="note" id="desktop-snippets-intro"}
 
-`MenuBar()` では以下のコンポーネントを使用できます：
+`MenuBar()` では以下のコンポーネントを使用できます。
 
 * `Menu()` – メニューまたはサブメニュー
 * `Item()` – クリック可能なメニュー項目
@@ -13,13 +18,13 @@ undefined
 * `RadioButtonItem()` – ラジオボタン付きの項目
 * `Separator()` – 項目のグループを区切る水平線
 
-項目とメニューは `mnemonic`（ニーモニック）パラメータを受け取ります。これは <shortcut>Alt</shortcut> と同時に押されたときに、メニューを開いたり項目を実行したりする文字です。その文字がテキスト内に含まれている場合、最初に出現する箇所に下線が表示されます。また、項目は `shortcut` パラメータも受け取ります。これは、メニューを辿ることなくアクションを実行する `KeyShortcut` です。
+項目とメニューは `mnemonic` パラメータを受け取ります。これは <shortcut>Alt</shortcut> と一緒に押したときにメニューを開いたり項目をトリガーしたりする文字です。その文字がテキストに含まれている場合、最初に出現する文字に下線が引かれます。また、項目は `shortcut` パラメータも受け取ります。これはメニューを開いて辿ることなくアクションをトリガーする `KeyShortcut` です。
 
-> `KeyShortcut` で `ctrl = true` を設定すると、macOS を含め常に <shortcut>Ctrl</shortcut> にマッピングされます。標準的な macOS のショートカットに <shortcut>⌘</shortcut> を使用するには、代わりに `meta = true` を設定してください。
+> `KeyShortcut` で `ctrl = true` を設定すると、macOS を含め、常に <shortcut>Ctrl</shortcut> にマッピングされます。macOS の標準ショートカットで <shortcut>⌘</shortcut> を使用する場合は、代わりに `meta = true` を設定してください。
 >
 {style="tip"}
 
-メニューの内容はコンポーザブル（composable）であるため、`MenuBar()` 内で条件分岐やループを使用して、どの項目を表示するかを決定できます。読み取っている状態（state）が変化すると、メニューは更新されます。次の例では、**Advanced settings** チェックボックスが選択されている間だけ **Settings** サブメニューが表示されます。
+メニューのコンテンツはコンポーザブルであるため、`MenuBar()` の中で条件分岐やループを使用して、どの項目が存在するかを決定できます。読み取っている状態（State）が変化すると、メニューが更新されます。次の例では、**Advanced settings** チェックボックスが選択されている間だけ **Settings** サブメニューが表示されます。
 
 ```kotlin
 import androidx.compose.foundation.layout.Box
@@ -100,9 +105,9 @@ object AboutIcon : Painter() {
 
 <img src="compose-desktop-menu-bar.animated.gif" alt="Desktop menu bar" width="600" preview-src="compose-desktop-menu-bar.png"/>
 
-Windows および Linux では、メニューバーはウィンドウの一部として表示されます。macOS では、ウィンドウがアクティブなときに画面上部のシステムメニューバーに表示されます。
+Windows および Linux では、メニューバーはウィンドウの一部になります。macOS では、ウィンドウがアクティブなときに画面上部のシステムメニューバーに表示されます。
 
 ## 次のステップ {id="what-s-next"}
 
-* アプリケーションアイコンとメニューを[システムトレイ](compose-desktop-tray.md)に追加する方法を学ぶ。
-* [その他のデスクトップコンポーネント](compose-desktop-components.md)に関するチュートリアルを調べる。
+* [システムトレイ](compose-desktop-tray.md)にアプリケーションアイコンやメニューを追加する方法を学びます。
+* [その他のデスクトップコンポーネント](compose-desktop-components.md)に関するチュートリアルを確認してください。

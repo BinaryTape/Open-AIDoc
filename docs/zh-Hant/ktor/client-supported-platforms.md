@@ -1,14 +1,17 @@
 [//]: # (title: 支援的平台)
 
-Ktor HTTP 用戶端可用於 Kotlin 支援的不同平台：
+Ktor HTTP 用戶端可用於 Kotlin 支援的不同平台上：
 - JVM
 - [Android](https://kotlinlang.org/docs/android-overview.html)
 - [Native](https://kotlinlang.org/docs/native-overview.html)
-undefined
+   > 在 Kotlin/Native 專案中使用 Ktor 需要
+   > [新的記憶體管理器](https://kotlinlang.org/docs/native-memory-manager.html)，該管理器從 Kotlin 1.7.20 開始預設啟用。
+   >
+   {id="newmm-note" style="note"}
 - [JavaScript](https://kotlinlang.org/docs/js-overview.html)
 - [WasmJs](https://kotlinlang.org/docs/wasm-overview.html)
 
-您可以將其用於[多平台專案](https://kotlinlang.org/docs/multiplatform.html)，無論是多平台行動應用程式還是全端 Web 應用程式。多平台專案支援以下[目標](https://kotlinlang.org/docs/multiplatform-dsl-reference.html#targets)：
+你可以在[多平台專案](https://kotlinlang.org/docs/multiplatform.html)中使用它，無論是多平台行動應用程式還是全端 Web 應用程式。多平台專案支援以下[目標](https://kotlinlang.org/docs/multiplatform-dsl-reference.html#targets)：
 
 <table>
 

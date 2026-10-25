@@ -1,8 +1,8 @@
-[//]: # (title: SAM-with-receiverコンパイラプラグイン)
+[//]: # (title: SAM-with-receiver コンパイラプラグイン)
 
-*sam-with-receiver* コンパイラプラグインは、アノテーションが付与されたJavaの「単一抽象メソッド」（SAM）インターフェースのメソッドの最初のパラメータを、Kotlinにおけるレシーバーにします。この変換は、SAMインターフェースがKotlinラムダとして渡される場合にのみ機能し、SAMアダプターとSAMコンストラクターの両方に適用されます（詳細は [SAM変換のドキュメント](java-interop.md#sam-conversions) を参照してください）。
+*sam-with-receiver* コンパイラプラグインは、アノテーションが付与された Java の「単一抽象メソッド」（SAM: single abstract method）インターフェースメソッドの最初の引数を、Kotlin におけるレシーバーにします。この変換は、SAM アダプターと SAM コンストラクターのどちらの場合でも、SAM インターフェースが Kotlin ラムダとして渡されたときにのみ機能します（詳細については [SAM 変換のドキュメント](java-interop.md#sam-conversions) を参照してください）。
 
-以下に例を示します：
+以下に例を示します。
 
 ```java
 public @interface SamWithReceiver {}
@@ -16,7 +16,7 @@ public interface TaskRunner {
 ```kotlin
 fun test(context: TaskContext) {
     val runner = TaskRunner {
-        // ここで 'this' は 'Task' のインスタンスです
+        // ここで 'this' は 'Task' のインスタンスになります
 
         println("$name is started")
         context.executeTask(this)
@@ -27,7 +27,7 @@ fun test(context: TaskContext) {
 
 ## Gradle {id="gradle"}
 
-使用方法は [all-open](all-open-plugin.md) や [no-arg](no-arg-plugin.md) と同様ですが、sam-with-receiver には組み込みのプリセットがなく、特別に処理するアノテーションのリストを独自に指定する必要がある点が異なります。
+使用方法は [`all-open`](all-open-plugin.md) や [`no-arg`](no-arg-plugin.md) と同様ですが、sam-with-receiver には組み込みのプリセットがなく、対象とするアノテーションのリストを自身で指定する必要がある点が異なります。
 
 <tabs group="build-script">
 <tab title="Kotlin" group-key="kotlin">
@@ -50,7 +50,7 @@ plugins {
 </tab>
 </tabs>
 
-次に、SAM-with-receiverアノテーションのリストを指定します：
+続いて、SAM-with-receiver アノテーションのリストを指定します。
 
 ```groovy
 samWithReceiver {
@@ -90,7 +90,7 @@ samWithReceiver {
 
 ## コマンドラインコンパイラ {id="command-line-compiler"}
 
-コンパイラプラグインのクラスパスにプラグインのJARファイルを追加し、sam-with-receiverアノテーションのリストを指定します：
+プラグインの JAR ファイルをコンパイラプラグインのクラスパスに追加し、sam-with-receiver アノテーションのリストを指定します。
 
 ```bash
 -Xplugin=$KOTLIN_HOME/lib/sam-with-receiver-compiler-plugin.jar

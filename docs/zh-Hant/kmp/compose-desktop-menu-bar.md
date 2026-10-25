@@ -1,25 +1,31 @@
-[//]: # (title: 功能表列)
-<web-summary>了解如何使用 Compose Multiplatform 桌面版為特定視窗建立功能表列。</web-summary>
+[//]: # (title: 選單列)
+<web-summary>了解如何使用 Compose Multiplatform 桌面版為特定視窗建立選單列。</web-summary>
 
-您可以使用 `MenuBar()` composable 為特定視窗建立功能表列。`MenuBar()` 在 `Window()` composable 的作用域（scope）內可用，因此每個視窗都可以擁有自己的功能表列。
+你可以使用 `MenuBar()` composable 為特定視窗建立選單列。`MenuBar()` 在 `Window()` composable 的作用域中可用，因此每個視窗都可以擁有自己的選單列。
 
-undefined
+> 本指南中的範例是可執行的桌面應用程式。若要嘗試執行：
+> 1. 使用 [Kotlin Multiplatform IDE 外掛程式](https://plugins.jetbrains.com/plugin/14936-kotlin-multiplatform) 或 [線上精靈](https://kmp.jetbrains.com/?android=true&desktop=true&includeTests=false) 建立 Compose Multiplatform 專案。
+> 2. 開啟桌面入口點檔案。例如：`desktopApp/src/main/kotlin/com/example/my_desktop_app/main.kt`。
+> 3. 將其內容替換為提供的範例。
+>
+{style="note" id="desktop-snippets-intro"}
 
-您可以在 `MenuBar()` 中使用以下組件：
+你可以在 `MenuBar()` 中使用下列組建：
 
-* `Menu()` – 功能表或子功能表
-* `Item()` – 可點擊的功能表項目
+* `Menu()` – 選單或子選單
+* `Item()` – 可點擊的選單項目
 * `CheckboxItem()` – 帶有核取方塊的項目
 * `RadioButtonItem()` – 帶有選項按鈕的項目
 * `Separator()` – 分隔項目群組的水平線
 
-項目和功能表接受 `mnemonic` 參數，這是一個助記鍵（mnemonic）字元，與 <shortcut>Alt</shortcut> 同時按下時可開啟功能表或觸發項目。如果該字元出現在文字中，則其首次出現處會加上底線。項目還接受 `shortcut` 參數 – 即在不瀏覽功能表的情況下即可觸發操作的 `KeyShortcut` 快速鍵。
+項目與選單接受 `mnemonic` 參數，這是一個在與 <shortcut>Alt</shortcut> 一起按下時會開啟選單或觸發該項目的字元。若該字元出現在文字中，其首次出現處會加上底線。項目還接受 `shortcut` 參數 – 即一個無需導覽選單即可觸發操作的 `KeyShortcut`。
 
-> 在 `KeyShortcut` 中設定 `ctrl = true` 一律會對應到 <shortcut>Ctrl</shortcut>，包括在 macOS 上。若要在標準 macOS 快速鍵中使用 <shortcut>⌘</shortcut>，請改為設定 `meta = true`。
+> 在 `KeyShortcut` 中設定 `ctrl = true` 一律會對應至 <shortcut>Ctrl</shortcut>，包括在 macOS 上。
+> 若要將 <shortcut>⌘</shortcut> 用於標準 macOS 快速鍵，請改為設定 `meta = true`。
 >
 {style="tip"}
 
-功能表內容是可組合的（composable），因此您可以在 `MenuBar()` 內使用條件判斷和迴圈來決定存在哪些項目。當它們讀取的狀態發生變化時，功能表也會隨之更新。在以下範例中，**Settings** 子功能表僅在勾選 **Advanced settings** 核取方塊時存在：
+選單內容是可組合的（composable），因此你可以在 `MenuBar()` 內部使用條件式和迴圈來決定哪些項目存在。當它們讀取的狀態發生變更時，選單就會隨之更新。在以下範例中，**Settings** 子選單僅在選取 **Advanced settings** 核取方塊時才會存在：
 
 ```kotlin
 import androidx.compose.foundation.layout.Box
@@ -98,11 +104,11 @@ object AboutIcon : Painter() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="Window(MenuBar { Menu( "}
 
-<img src="compose-desktop-menu-bar.animated.gif" alt="Desktop menu bar" width="600" preview-src="compose-desktop-menu-bar.png"/>
+<img src="compose-desktop-menu-bar.animated.gif" alt="桌面選單列" width="600" preview-src="compose-desktop-menu-bar.png"/>
 
-在 Windows 和 Linux 上，功能表列是視窗的一部分。在 macOS 上，當視窗處於活動狀態時，它會顯示在螢幕頂端的系統功能表列中。
+在 Windows 與 Linux 上，選單列是視窗的一部分。在 macOS 上，當視窗處於現用狀態時，它會顯示在螢幕頂端的系統選單列中。
 
 ## 後續步驟 {id="what-s-next"}
 
-* 了解如何將應用程式圖示和功能表新增至 [系統匣](compose-desktop-tray.md)。
-* 探索有關 [其他桌面組件](compose-desktop-components.md) 的教學。
+* 了解如何將應用程式圖示與選單新增至[系統匣](compose-desktop-tray.md)。
+* 探索有關[其他桌面組建](compose-desktop-components.md)的教學。

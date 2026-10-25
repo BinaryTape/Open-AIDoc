@@ -51,7 +51,7 @@
   "kotlin.kotlin-overview": "Kotlin overview",
   "kotlin.what-s-new-in-kotlin": "What's new in Kotlin",
   "kotlin.whatsnew22": "Kotlin 2.2.0",
-  "kotlin.whatsnew-eap": "Kotlin 2.5.0-Beta1",
+  "kotlin.whatsnew-eap": "Kotlin 2.5.0-Beta2",
   "kotlin.earlier-versions": "Earlier versions",
   "kotlin.whatsnew2120": "Kotlin 2.1.20",
   "kotlin.whatsnew21": "Kotlin 2.1.0",
@@ -705,5 +705,8 @@
   "serialization.serialization-transform-json": "JSON transformation",
   "serialization.alternative-and-custom-serialization-formats": "Alternative and custom serialization formats",
   "kotlin.jvm-backend-faq": "FAQ",
-  "kotlin.reflection": "Reflection (kotlin-reflect)"
+  "kotlin.reflection": "Reflection (kotlin-reflect)",
+  "kotlin.kotlin-jpa-plugin": "JPA",
+  "kotlin.kotlin-spring-plugin": "Spring",
+  "kmp.whats-new-compose-113": "Compose Multiplatform %org.jetbrains.compose-eap%"
 }

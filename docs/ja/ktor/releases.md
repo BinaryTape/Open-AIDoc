@@ -1,32 +1,32 @@
-[//]: # (title: Ktorのリリース)
+[//]: # (title: Ktor のリリース)
 
 <show-structure for="chapter" depth="2"/>
 
-Ktorは[セマンティック バージョニング](https://semver.org/)に従っています：
+Ktor は[セマンティック バージョニング](https://semver.org/)（Semantic Versioning）に従います:
 
-- _メジャーバージョン_ (x.0.0) には、互換性のないAPIの変更が含まれます。
-- _マイナーバージョン_ (x.y.0) では、後方互換性のある新機能が提供されます。
-- _パッチバージョン_ (x.y.z) には、後方互換性のある修正が含まれます。
+- _メジャーバージョン_ (x.0.0): 互換性のない API の変更が含まれます。
+- _マイナーバージョン_ (x.y.0): 後方互換性のある新機能が提供されます。
+- _パッチバージョン_ (x.y.z): 後方互換性のある修正が含まれます。
 
-メジャーおよびマイナーリリースごとに、新機能がリリースされる前に試用できるプレビュー（EAP）バージョンもいくつか提供されます。詳細は[アーリーアクセスプログラム](https://ktor.io/eap/)をご覧ください。
+メジャーおよびマイナーの各リリースでは、正式リリース前に新機能をお試しいただけるよう、いくつかのプレビュー（EAP）バージョンも提供しています。詳細については、[Early Access Program](https://ktor.io/eap/) を参照してください。
 
-## Gradleプラグイン {id="gradle"}
+## Gradle プラグイン {id="gradle"}
 
-[Gradle Ktorプラグイン](https://github.com/ktorio/ktor-build-plugins)とフレームワークは同じリリースサイクルにあります。
-すべてのプラグインリリースは[Gradle Plugin Portal](https://plugins.gradle.org/plugin/io.ktor.plugin)で確認できます。
+[Gradle Ktor プラグイン](https://github.com/ktorio/ktor-build-plugins)とフレームワークは同じリリースサイクルです。
+すべてのプラグインリリースは [Gradle Plugin Portal](https://plugins.gradle.org/plugin/io.ktor.plugin) で確認できます。
 
-## IntelliJ Ultimateプラグイン {id="intellij"}
+## IntelliJ Ultimate プラグイン {id="intellij"}
 
-[IntelliJ Ktorプラグイン](https://www.jetbrains.com/help/idea/ktor.html)はKtorフレームワークとは独立してリリースされ、[IntelliJ IDEA Ultimate](https://www.jetbrains.com/idea/download/other.html)と同じリリースサイクルを採用しています。
+[IntelliJ Ktor プラグイン](https://www.jetbrains.com/help/idea/ktor.html)は Ktor フレームワークとは独立してリリースされ、[IntelliJ IDEA Ultimate](https://www.jetbrains.com/idea/download/other.html) と同じリリースサイクルを使用します。
 
 ### 新しいリリースへのアップデート {id="update"}
 
-IntelliJ Ktorプラグインを使用すると、Ktorプロジェクトを最新バージョンに移行できます。
-詳細は[プロジェクトの移行](https://www.jetbrains.com/help/idea/ktor.html#migrate)セクションからご確認いただけます。
+IntelliJ Ktor プラグインを使用すると、Ktor プロジェクトを最新バージョンに移行できます。
+詳細については、[Migrate projects](https://www.jetbrains.com/help/idea/ktor.html#migrate) セクションを参照してください。
 
 ## リリースの詳細 {id="release-details"}
 
-以下の表は、最新のKtorリリースの詳細をまとめたものです。
+以下の表は、最新の Ktor リリースの詳細をまとめたものです。
 
 <table>
 
@@ -37,12 +37,12 @@ IntelliJ Ktorプラグインを使用すると、Ktorプロジェクトを最新
 <tr>
 <td>3.6.0</td><td>2026年9月17日</td><td>
 <p>
-Netty向けの実験的なHTTP/3サポート、Kotlin Multiplatform向けのデフォルトクライアントエンジン、JVM WebRTCサポート、およびクライアントとサーバーの両方にわたるその他の機能と改善を追加したマイナーリリースです。
+Netty 向けの実験的 HTTP/3 サポート、Kotlin Multiplatform 向けのデフォルトクライアントエンジン、JVM WebRTC サポート、ならびにクライアントおよびサーバー全般にわたるその他の機能と改善を追加したマイナーリリース。
 </p>
-詳細は「<Links href="/ktor/whats-new-360" summary="undefined">Ktor 3.6.0の新機能</Links>」をご覧ください。
+詳細については、<Links href="whats-new-360.md" summary="">Ktor 3.6.0 の新機能</Links>を参照してください。
 <var name="version" value="3.6.0"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
@@ -50,11 +50,11 @@ Netty向けの実験的なHTTP/3サポート、Kotlin Multiplatform向けのデ�
 <tr>
 <td>3.5.2</td><td>2026年8月4日</td><td>
 <p>
-安定性とパフォーマンスに重点を置いたパッチリリースです。レート制限（rate limiting）サポートの強化、テキスト処理パフォーマンスの回復、およびI/O処理、OpenAPI、設定に関する問題の修正が含まれています。
+レートリミット（rate limiting）サポートの強化、テキスト処理パフォーマンスの回復、I/O 処理、OpenAPI、および設定に関する問題の修正など、安定性とパフォーマンスに焦点を当てたパッチリリース。
 </p>
 <var name="version" value="3.5.2"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
@@ -62,11 +62,11 @@ Netty向けの実験的なHTTP/3サポート、Kotlin Multiplatform向けのデ�
 <tr>
 <td>3.5.1</td><td>2026年6月26日</td><td>
 <p>
-OpenAPIプラグインの改善、認証のKDocドキュメントの拡充、およびKotlin 2.4コンパイラの互換性、HTTPおよびキャッシュの動作、認証、WebRTCの安定性、さらにJVM、Darwin、Android、Windowsにおけるプラットフォーム固有の問題を含む、広範なバグ修正を盛り込んだパッチリリースです。
+OpenAPI プラグインの改善、認証に関する KDoc ドキュメントの拡充、および Kotlin 2.4 コンパイラ互換性、HTTP とキャッシュの挙動、認証、WebRTC の安定性、JVM、Darwin、Android、Windows にわたるプラットフォーム固有の問題をカバーする広範なバグ修正を含むパッチリリース。
 </p>
 <var name="version" value="3.5.1"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
@@ -74,12 +74,12 @@ OpenAPIプラグインの改善、認証のKDocドキュメントの拡充、お
 <tr>
 <td>3.5.0</td><td>2026年5月15日</td><td>
 <p>
-RFC 7616 Digest認証のサポート、OkHttpおよびApache5向けのカスタムDNSリゾルバー設定、リクエストパラメータのヘルパー関数、および設定、セッション、JavaScript互換性にわたるその他の改善を導入したマイナーリリースです。
-詳細は「<Links href="/ktor/whats-new-350" summary="undefined">Ktor 3.5.0の新機能</Links>」をご覧ください。
+RFC 7616 Digest 認証のサポート、OkHttp および Apache5 向けのカスタム DNS リゾルバー設定、リクエストパラメータのヘルパー関数、ならびに設定、セッション、JavaScript 互換性にわたるその他の改善を導入したマイナーリリース。
+詳細については、<Links href="whats-new-350.md" summary="">Ktor 3.5.0 の新機能</Links>を参照してください。
 </p>
 <var name="version" value="3.5.0"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
@@ -87,11 +87,11 @@ RFC 7616 Digest認証のサポート、OkHttpおよびApache5向けのカスタ�
 <tr>
 <td>3.4.3</td><td>2026年4月22日</td><td>
 <p>
-OpenAPIスキーマ推論、クライアントエンジンのライフサイクル問題、およびいくつかの並行性とプラットフォーム固有のバグ修正に焦点を当てた、安定性重視のパッチリリースです。
+OpenAPI スキーマ推論の修正、クライアントエンジンのライフサイクルの問題、いくつかの並行処理およびプラットフォーム固有のバグ修正など、安定性に焦点を当てたパッチリリース。
 </p>
 <var name="version" value="3.4.3"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
@@ -99,11 +99,11 @@ OpenAPIスキーマ推論、クライアントエンジンのライフサイク�
 <tr>
 <td>3.4.2</td><td>2026年3月27日</td><td>
 <p>
-アロケーションの最適化とWebSocketの修正によりクライアントとエンジンのパフォーマンスを向上させ、OpenAPI、ロギング、GraalVMの互換性、Netty、Darwin、依存関係注入（DI）、圧縮、証明書のピン留め、およびKotlin/Nativeにわたる幅広い問題を解決したパッチリリースです。
+アロケーションの最適化と WebSocket の修正によってクライアントとエンジンのパフォーマンスを向上させるとともに、OpenAPI、ロギング、GraalVM 互換性、Netty、Darwin、依存性注入（DI）、圧縮、証明書ピニング（certificate pinning）、Kotlin/Native にわたる幅広い問題に対処したパッチリリース。
 </p>
 <var name="version" value="3.4.2"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
@@ -111,11 +111,11 @@ OpenAPIスキーマ推論、クライアントエンジンのライフサイク�
 <tr>
 <td>3.4.1</td><td>2026年3月4日</td><td>
 <p>
-重要なデグレード（リグレッション）修正を含むパッチリリースです。これには、<a href="whats-new-340.md#use-engine-dispatcher">エンジンディスパッチャーを使用したHttpStatementの実行</a>の解決や、適切な<code>StreamResetException</code>の伝播の復元が含まれます。また、パフォーマンスの向上、OpenAPIの強化、およびエンジンとプラットフォーム全体の複数の安定性修正も含まれています。
+<a href="whats-new-340.md#use-engine-dispatcher">3.4.0 で発生した Flow 不変条件エラー（Flow invariant error）</a>の解決や、適切な <code>StreamResetException</code> の伝播の復元など、重要なリグレッション修正を含むパッチリリース。また、パフォーマンスの向上、OpenAPI の拡張、エンジンおよびプラットフォーム全般にわたる複数の安定性修正も含まれます。
 </p>
 <var name="version" value="3.4.1"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
@@ -123,11 +123,11 @@ OpenAPIスキーマ推論、クライアントエンジンのライフサイク�
 <tr>
 <td>3.4.0</td><td>2026年1月23日</td><td>
 <p>
-ランタイム生成のOpenAPIスペック、ZstdおよびJackson 3のサポート、OkHttpの二重ストリーミング（duplex streaming）を導入したマイナーリリースです。また、フレームワーク全体の信頼性を高める数十のバグ修正も含まれています。
+ランタイム生成の OpenAPI 仕様、Zstd および Jackson 3 のサポート、OkHttp の全二重ストリーミング（duplex streaming）の導入、ならびにフレームワーク全体の信頼性を高める多数のバグ修正を含むマイナーリリース。
 </p>
 <var name="version" value="3.4.0"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
@@ -135,11 +135,11 @@ OpenAPIスキーマ推論、クライアントエンジンのライフサイク�
 <tr>
 <td>3.3.3</td><td>2025年11月26日</td><td>
 <p>
-Jetty ClientでのHTTP/2 over cleartext (h2c) サポートの追加、ロギングとOpenAPI生成の改善、エンジン、SSE処理、二重レスポンス、HTTP/2ヘッダー、クライアントキャッシュのバグ修正を含むパッチリリースです。
+Jetty Client での HTTP/2 over cleartext (h2c) サポートの追加、ロギングと OpenAPI 生成の改善、エンジン、SSE 処理、二重レスポンス、HTTP/2 ヘッダー、クライアントキャッシュのバグ修正を行ったパッチリリース。
 </p>
 <var name="version" value="3.3.3"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
@@ -147,11 +147,11 @@ Jetty ClientでのHTTP/2 over cleartext (h2c) サポートの追加、ロギン�
 <tr>
 <td>3.3.2</td><td>2025年11月5日</td><td>
 <p>
-DarwinでのSOCKSプロキシサポートの追加、WebRTCクライアントターゲットとJavaプロキシ処理の改良、およびHTTPリretry、OpenAPI、キャッシュ、Android上のNettyにおける複数の問題の修正を含むパッチリリースです。
+Darwin 向けの SOCKS プロキシサポートの追加、WebRTC クライアントターゲットと Java プロキシ処理の改良、HTTP リトライ、OpenAPI、キャッシュ、Android 上の Netty における複数の問題の修正を行ったパッチリリース。
 </p>
 <var name="version" value="3.3.2"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
@@ -159,11 +159,11 @@ DarwinでのSOCKSプロキシサポートの追加、WebRTCクライアントタ
 <tr>
 <td>3.3.1</td><td>2025年10月8日</td><td>
 <p>
-Kotlinを2.2.20に更新し、Content-Length解析エラー、<code>ClientSSESession</code>のシリアライザー欠落、Nettyの設定とシャットダウンのバグなどの複数の問題を修正したパッチリリースです。また、bootJar内での静的リソース提供のサポートも追加されました。
+Kotlin を 2.2.20 に更新し、Content-Length のパースエラー、<code>ClientSSESession</code> のシリアライザー欠落、Netty の設定およびシャットダウンに関するバグなど複数の問題を修正し、bootJar 内の静的リソースの配信サポートを追加したパッチリリース。
 </p>
 <var name="version" value="3.3.1"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
@@ -171,11 +171,11 @@ Kotlinを2.2.20に更新し、Content-Length解析エラー、<code>ClientSSESes
 <tr>
 <td>3.3.0</td><td>2025年9月11日</td><td>
 <p>
-実験的なOpenAPI生成プレビュー、静的コンテンツ処理の改善、AndroidおよびJS/Wasm用のWebRTCクライアント、Jetty、OkHttp、Kotlin 2.2へのアップグレードなどの主要な機能を導入したマイナーリリースです。詳細は「<Links href="/ktor/whats-new-330" summary="undefined">Ktor 3.3.0の新機能</Links>」をご覧ください。
+実験的な OpenAPI 生成プレビュー、静的コンテンツ処理の改善、Android および JS/Wasm 向け WebRTC クライアント、Jetty、OkHttp、Kotlin 2.2 へのアップグレードなどの主要機能を導入したマイナーリリース。詳細については、<Links href="whats-new-330.md" summary="">Ktor 3.3.0 の新機能</Links>を参照してください。
 </p>
 <var name="version" value="3.3.0"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
@@ -183,11 +183,11 @@ Kotlinを2.2.20に更新し、Content-Length解析エラー、<code>ClientSSESes
 <tr>
 <td>3.2.3</td><td>2025年7月29日</td><td>
 <p>
-YAML設定処理、DI解決、Wasm/JSの安定性の向上に加え、マルチパート解析、CIOの<code>100 Continue</code>レスポンス形式、<code>ByteReadChannel</code>の無限読み取りループ、サーバーのシャットダウンの問題に関する修正を含むパッチリリースです。
+YAML 設定処理、DI 解決、Wasm/JS の安定性の向上に加え、マルチパートのパース、CIO の <code>100 Continue</code> レスポンスのフォーマット、<code>ByteReadChannel</code> での無限読み込みループ、サーバーのシャットダウンに関する問題の修正を導入したパッチリリース。
 </p>
 <var name="version" value="3.2.3"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
@@ -195,11 +195,11 @@ YAML設定処理、DI解決、Wasm/JSの安定性の向上に加え、マルチ�
 <tr>
 <td>3.2.2</td><td>2025年7月14日</td><td>
 <p>
-SSEフィールドのシリアル化順序を改善し、CORSプリフライト処理、テストアプリケーションのストリーミング、設定のデシリアライズのバグ、および各プラットフォーム（3.2.1からのwasmJsやDarwinターゲットに影響するデグレードを含む）でのヘッダー欠落の問題を解決したパッチリリースです。
+SSE フィールドのシリアライズ順序を改善し、CORS プリフライト処理、テストアプリケーションのストリーミング、設定のデシリアライズのバグ、および 3.2.1 で wasmJs と Darwin ターゲットに影響を与えたリグレッションを含む各プラットフォームでのヘッダー欠落など、複数の問題を解決したパッチリリース。
 </p>
 <var name="version" value="3.2.2"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
@@ -207,11 +207,11 @@ SSEフィールドのシリアル化順序を改善し、CORSプリフライト�
 <tr>
 <td>3.2.1</td><td>2025年7月4日</td><td>
 <p>
-Time API、テンプレート作成、パブリッシングの改善に加え、プラグインの動作、Netty、OkHttp、および3.2.0で導入された起動時の問題に関する重要なバグ修正を含むパッチリリースです。
+Time API、テンプレート機能、パブリッシングの改善に加え、プラグインの挙動、Netty、OkHttp、および 3.2.0 で混入した起動時の問題に対する重大なバグ修正を含むパッチリリース。
 </p>
 <var name="version" value="3.2.1"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
@@ -219,199 +219,199 @@ Time API、テンプレート作成、パブリッシングの改善に加え、
 <tr>
 <td>3.2.0</td><td>2025年6月12日</td><td>
 <p>
-型付き設定のデシリアライズ、新しい依存関係注入（DI）およびHTMXモジュール、Gradleバージョンカタログのサポート、およびsuspendモジュールのサポートを導入したマイナーリリースです。詳細は「<Links href="/ktor/whats-new-320" summary="undefined">Ktor 3.2.0の新機能</Links>」をご覧ください。
+型付けされた設定のデシリアライズ、新しい依存性注入（DI）および HTMX モジュール、Gradle バージョンカタログのサポート、suspend モジュールのサポートを導入したマイナーリリース。詳細については、<Links href="whats-new-320.md" summary="">Ktor 3.2.0 の新機能</Links>を参照してください。
 </p>
 <var name="version" value="3.2.0"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
 
 <tr>
 <td>3.1.3</td><td>2025年5月5日</td><td><p>
-バイト操作やマルチパート処理の高速化などのパフォーマンス向上、およびより安全なトークンリフレッシュ処理を含むパッチリリースです。メトリクスのメモリ問題の修正、ヘッダー動作の改善、WebSockets、OkHttp、Apache5、Nettyのバグ修正に加え、Kotlin 2.1.0サポートのためのJTEの更新も行われました。
+バイト操作やマルチパート処理の高速化、安全なトークンリフレッシュ処理などのパフォーマンス向上を含むパッチリリース。また、メトリクスにおけるメモリ問題の修正、ヘッダー動作の改善、WebSocket、OkHttp、Apache5、Netty にわたるバグの解決、Kotlin 2.1.0 をサポートするための JTE の更新も含まれます。
 </p>
 <var name="version" value="3.1.3"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
 
 <tr>
 <td>3.1.2</td><td>2025年3月27日</td><td><p>
-Kotlinを2.1.20に更新し、Base64デコード、認証トークンのクリア、Androidサーバーの起動エラー、WebSocketヘッダーのフォーマット、SSEセッションのキャンセルなど、さまざまな問題を修正したパッチリリースです。
+Kotlin を 2.1.20 に更新し、Base64 デコード、認証トークンのクリア、Android サーバーの起動エラー、WebSocket ヘッダーのフォーマット、SSE セッションのキャンセルなど、さまざまな問題を修正したパッチリリース。
 </p>
 <var name="version" value="3.1.2"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
 
 <tr>
 <td>3.1.1</td><td>2025年2月24日</td><td><p>
-ロギングの改善とWebSocketのタイムアウト処理の修正を行ったパッチリリースです。HTTPキャッシュの不整合、フォームデータのコピーエラー、gzip処理のクラッシュ、セグメントプールの破損を引き起こす並行性の問題など、複数のバグを修正しました。
+ロギングの改善と WebSocket タイムアウト処理の修正を行ったパッチリリース。HTTP キャッシュの不整合、フォームデータのコピーエラー、gzip 処理のクラッシュ、セグメントプールの破損を引き起こす並行処理の問題など、複数のバグを修正しています。
 </p>
 <var name="version" value="3.1.1"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
 
 <tr>
 <td>3.1.0</td><td>2025年2月11日</td><td><p>
-さまざまなSSE機能と拡張されたCIOエンジンおよびWebSocketサポートを導入したマイナーリリースです。プラットフォームの互換性、ロギング、認証を強化し、バイトチャネル処理、HTTPリクエストの失敗、並行性の問題に関連する重要なバグを修正しました。
+各種 SSE 機能や、CIO エンジンおよび WebSocket サポートの拡張を導入したマイナーリリース。バイトチャネル処理、HTTP リクエストの失敗、並行処理の問題に関連する重大なバグを修正しつつ、プラットフォーム互換性、ロギング、認証を強化しています。
 </p>
 <var name="version" value="3.1.0"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
 
 <tr>
 <td>3.0.3</td><td>2024年12月18日</td><td><p>
-<code>browserProductionWebpack</code>のビルドエラー、gzip圧縮コンテンツの処理、<code>FormFieldLimit</code>設定の上書きなどの修正を含むパッチリリースです。コアのパフォーマンス向上とテストアプリケーションの適切なシャットダウンも含まれています。
+<code>browserProductionWebpack</code> でのビルドエラーの修正、gzip 圧縮されたコンテンツの処理、<code>FormFieldLimit</code> 設定の上書きなど、さまざまなバグ修正を含むパッチリリース。コアパフォーマンスの向上や、テストアプリケーションの適切なシャットダウンも含まれています。
 </p>
 <var name="version" value="3.0.3"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
 
 <tr>
 <td>3.0.2</td><td>2024年12月4日</td><td><p>
-レスポンスの破損、ボディの切り捨て、接続処理、誤ったヘッダーに関連する複数のバグ修正に加え、バイナリエンコーディングのサポート拡張とAndroid向けのパフォーマンス強化を含むパッチリリースです。
+レスポンスの破損、ボディの途切れ、接続処理、不正なヘッダーに関連する複数のバグ修正に対処し、バイナリエンコーディングのサポート拡張と Android 向けのパフォーマンス向上を含んだパッチリリース。
 </p>
 <var name="version" value="3.0.2"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
 
 <tr>
 <td>2.3.13</td><td>2024年11月20日</td><td><p>
-バグ修正、セキュリティパッチ、および改善を含むパッチリリースです。これには<code>watchosDeviceArm64</code>ターゲットのサポート追加が含まれます。
+バグ修正、セキュリティパッチ、および <code>watchosDeviceArm64</code> ターゲットのサポート追加を含む改善を施したパッチリリース。
 </p>
 <var name="version" value="2.3.13"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
 
 <tr>
 <td>3.0.1</td><td>2024年10月29日</td><td><p>
-クライアントとサーバーのロギングの改善、および各種バグ修正を含むパッチリリースです。
+クライアントおよびサーバーのロギングの改善と、さまざまなバグ修正を含むパッチリリース。
 </p>
 <var name="version" value="3.0.1"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
 
 <tr>
 <td>3.0.0</td><td>2024年10月9日</td><td><p>
-Android Nativeターゲットのサポート追加を含む、改善とバグ修正を盛り込んだメジャーリリースです。
-破壊的変更の詳細については、<Links href="/ktor/migrating-3" summary="undefined">移行ガイド</Links>をご覧ください。
+Android Native ターゲットのサポート追加を含む、改善とバグ修正を盛り込んだメジャーリリース。
+破壊的変更の詳細については、<Links href="migrating-3.md" summary="">移行ガイド</Links>を参照してください。
 </p>
 <var name="version" value="3.0.0"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
 
 <tr>
 <td>3.0.0-rc-2</td><td>2024年10月2日</td><td><p>
-破壊的変更、バグ修正、およびXMLのマルチプラットフォームサポートなどの機能を含む、メジャーリリースの候補（RC）版です。
+破壊的変更を伴う各種改善、バグ修正、XML 向けのマルチプラットフォームサポートなどの機能を含むメジャーリリースカンジデート（RC）。
 </p>
 <var name="version" value="3.0.0-rc-2"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
 
 <tr>
 <td>3.0.0-rc-1</td><td>2024年9月9日</td><td><p>
-重要な改善とバグ修正を含むメジャーリリースの候補（RC）版です。このアップデートでは、後方互換性が強化され、<code>staticZip</code>のサポートが拡張されました。
+大幅な改善とバグ修正を含むメジャーリリースカンジデート（RC）。後方互換性を強化し、拡張された <code>staticZip</code> サポートを特徴としています。
 </p>
 <var name="version" value="3.0.0-rc-1"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
 
 <tr>
 <td>3.0.0-beta-2</td><td>2024年7月15日</td><td><p>
-SSEサポートの改善やKotlin/Wasm用のKtorクライアントなど、さまざまな改善とバグ修正を含むメジャープレリリース版です。
+SSE サポートの改善や Kotlin/Wasm 向け Ktor クライアントなど、さまざまな改善とバグ修正を含むメジャープレリリースバージョン。
 </p>
 <var name="version" value="3.0.0-beta-2"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
 
 <tr>
 <td>2.3.12</td><td>2024年6月20日</td><td><p>
-Ktor CoreとKtor Serverのバグ修正、およびNetty and OpenAPIのバージョン更新を含むパッチリリースです。
+Ktor Core および Ktor Server のバグ修正、ならびに Netty と OpenAPI のバージョン更新を含むパッチリリース。
 </p>
 <var name="version" value="2.3.12"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
 
 <tr>
 <td>2.3.11</td><td>2024年5月9日</td><td><p>
-テストクライアントのエンジンにソケットタイムアウトを適用するためのバグ修正を含むパッチリリースです。
+Test Client のエンジンへのソケットタイムアウト適用に関するバグ修正を含むパッチリリース。
 </p>
 <var name="version" value="2.3.11"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
 
 <tr>
 <td>2.3.10</td><td>2024年4月8日</td><td><p>
-CallLoggingおよびSSEサーバープラグインの各種バグ修正、Androidクライアントのロギング改善などを含むパッチリリースです。
+CallLogging および SSE サーバープラグインに関するさまざまなバグ修正、Android クライアントロギングの改善などを含むパッチリリース。
 </p>
 <var name="version" value="2.3.10"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
 
 <tr>
 <td>2.3.9</td><td>2024年3月4日</td><td><p>
-ContentNegotiationクライアントプラグインのバグ修正と、HTTP経由でのセキュアクッキー送信のサポート追加を含むパッチリリースです。
+ContentNegotiation クライアントプラグインのバグ修正と、HTTP 経由でのセキュアクッキー送信サポートを追加したパッチリリース。
 </p>
 <var name="version" value="2.3.9"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
 
 <tr>
 <td>2.3.8</td><td>2024年1月31日</td><td><p>
-URLBuilder、CORS、およびWebSocketプラグインの各種バグ修正を含むパッチリリースです。
+URLBuilder、CORS、WebSocket プラグインに関する各種バグ修正を含むパッチリリース。
 </p>
 <var name="version" value="2.3.8"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
@@ -419,11 +419,11 @@ URLBuilder、CORS、およびWebSocketプラグインの各種バグ修正を含
 <tr>
 <td>2.3.7</td><td>2023年12月7日</td><td>
 <p>
-ContentNegotiation、WebSocketsのバグ修正、およびNative Serverでのメモリ使用量の改善を含むパッチリリースです。
+ContentNegotiation、WebSockets、Native Server でのメモリ使用量に関するバグ修正を含むパッチリリース。
 </p>
 <var name="version" value="2.3.7"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
@@ -431,11 +431,11 @@ ContentNegotiation、WebSocketsのバグ修正、およびNative Serverでのメ
 <tr>
 <td>3.0.0-beta-1</td><td>2023年11月23日</td><td>
 <p>
-クライアントおよびサーバーのSSEサポートを含む、さまざまな改善とバグ修正を盛り込んだメジャープレリリース版です。
+クライアントおよびサーバーの SSE サポートを含む、さまざまな改善とバグ修正を盛り込んだメジャープレリリースバージョン。
 </p>
 <var name="version" value="3.0.0-beta-1"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
@@ -443,11 +443,11 @@ ContentNegotiation、WebSocketsのバグ修正、およびNative Serverでのメ
 <tr>
 <td>2.3.6</td><td>2023年11月7日</td><td>
 <p>
-2.3.5での破壊的変更の修正およびその他の各種バグ修正を含むパッチリリースです。
+2.3.5 での破壊的変更の修正と、その他さまざまなバグ修正を含むパッチリリース。
 </p>
 <var name="version" value="2.3.6"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
@@ -455,11 +455,11 @@ ContentNegotiation、WebSocketsのバグ修正、およびNative Serverでのメ
 <tr>
 <td>2.3.5</td><td>2023年10月5日</td><td>
 <p>
-DarwinおよびApache5エンジンの設定に関する修正を含むパッチリリースです。
+Darwin および Apache5 エンジン設定の修正を含むパッチリリース。
 </p>
 <var name="version" value="2.3.5"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
@@ -467,11 +467,11 @@ DarwinおよびApache5エンジンの設定に関する修正を含むパッチ�
 <tr>
 <td>2.3.4</td><td>2023年8月31日</td><td>
 <p>
-HTTP CookieヘッダーとNoTransformationFoundExceptionエラーのバグ修正を含むパッチリリースです。
+HTTP Cookie ヘッダーおよび NoTransformationFoundException エラーのバグ修正を含むパッチリリース。
 </p>
 <var name="version" value="2.3.4"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
@@ -479,11 +479,11 @@ HTTP CookieヘッダーとNoTransformationFoundExceptionエラーのバグ修正
 <tr>
 <td>2.3.3</td><td>2023年8月1日</td><td>
 <p>
-<code>linuxArm64</code>のクライアントおよびサーバーのサポートと、各種バグ修正を含むパッチリリースです。
+<code>linuxArm64</code> のクライアントおよびサーバーサポートと、さまざまなバグ修正を含むパッチリリース。
 </p>
 <var name="version" value="2.3.3"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
@@ -491,11 +491,11 @@ HTTP CookieヘッダーとNoTransformationFoundExceptionエラーのバグ修正
 <tr>
 <td>2.3.2</td><td>2023年6月28日</td><td>
 <p>
-Kotlinバージョンを<code>1.8.22</code>にアップグレードし、各種バグ修正を行ったパッチリリースです。
+Kotlin バージョンを <code>1.8.22</code> にアップグレードし、さまざまなバグ修正を行ったパッチリリース。
 </p>
 <var name="version" value="2.3.2"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
@@ -503,11 +503,11 @@ Kotlinバージョンを<code>1.8.22</code>にアップグレードし、各種�
 <tr>
 <td>2.3.1</td><td>2023年5月31日</td><td>
 <p>
-サーバー設定の改善と各種バグ修正を含むパッチリリースです。
+サーバー設定の改善とさまざまなバグ修正を含むパッチリリース。
 </p>
 <var name="version" value="2.3.1"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
@@ -515,11 +515,11 @@ Kotlinバージョンを<code>1.8.22</code>にアップグレードし、各種�
 <tr>
 <td>2.3.0</td><td>2023年4月19日</td><td>
 <p>
-複数の設定ファイルのサポートやRoutingでの正規表現パターンの追加などを行った機能リリースです。
+複数の設定ファイルのサポート、Routing での正規表現パターンのサポートなどを追加した機能リリース。
 </p>
 <var name="version" value="2.3.0"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
@@ -527,11 +527,11 @@ Kotlinバージョンを<code>1.8.22</code>にアップグレードし、各種�
 <tr>
 <td>2.2.4</td><td>2023年2月28日</td><td>
 <p>
-HTTPクライアント、Routing、およびContentNegotiationにおける各種バグ修正を含むパッチリリースです。
+HTTP クライアント、Routing、ContentNegotiation における各種バグ修正を含むパッチリリース。
 </p>
 <var name="version" value="2.2.4"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
@@ -539,11 +539,11 @@ HTTPクライアント、Routing、およびContentNegotiationにおける各種
 <tr>
 <td>2.2.3</td><td>2023年1月31日</td><td>
 <p>
-OAuth2のマルチプラットフォーム機能と各種バグ修正を含むパッチリリースです。
+OAuth2 のマルチプラットフォーム機能と各種バグ修正を含むパッチリリース。
 </p>
 <var name="version" value="2.2.3"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
@@ -551,11 +551,11 @@ OAuth2のマルチプラットフォーム機能と各種バグ修正を含む�
 <tr>
 <td>2.2.2</td><td>2023年1月3日</td><td>
 <p>
-<code>2.2.1</code>のバグ修正、Swaggerプラグインの改善および修正などを含むパッチリリースです。
+<code>2.2.1</code> に対するバグ修正、Swagger プラグインの改善および修正などを含むパッチリリース。
 </p>
 <var name="version" value="2.2.2"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
@@ -563,11 +563,11 @@ OAuth2のマルチプラットフォーム機能と各種バグ修正を含む�
 <tr>
 <td>2.2.1</td><td>2022年12月7日</td><td>
 <p>
-<code>2.2.0</code>での<code>java.lang.NoClassDefFoundError: kotlinx/atomicfu/AtomicFU</code>エラーを修正するためのパッチリリースです。
+<code>2.2.0</code> での <code>java.lang.NoClassDefFoundError: kotlinx/atomicfu/AtomicFU</code> エラーに対するパッチリリース。
 </p>
 <var name="version" value="2.2.1"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
@@ -575,12 +575,12 @@ OAuth2のマルチプラットフォーム機能と各種バグ修正を含む�
 <tr>
 <td>2.2.0</td><td>2022年12月7日</td><td>
 <p>
-Swagger UIホスティング、新しいプラグインAPI、Sessionsのマルチプラットフォームサポートなど、複数の機能を盛り込んだリリースです。
-詳細は「<Links href="/ktor/migration-to-22x" summary="undefined">2.0.xから2.2.xへの移行</Links>」ガイドをご覧ください。
+Swagger UI のホスティング、新しいプラグイン API、Sessions のマルチプラットフォームサポートなど、複数の新機能を含むリリース。
+詳細については、<Links href="migration-to-22x.md" summary="">2.0.x から 2.2.x への移行</Links>ガイドを参照してください。
 </p>
 <var name="version" value="2.2.0"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
@@ -588,11 +588,11 @@ Swagger UIホスティング、新しいプラグインAPI、Sessionsのマル�
 <tr>
 <td>2.1.3</td><td>2022年10月26日</td><td>
 <p>
-各種バグ修正を含むパッチリリースです。
+各種バグ修正を含むパッチリリース。
 </p>
 <var name="version" value="2.1.3"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
@@ -600,11 +600,11 @@ Swagger UIホスティング、新しいプラグインAPI、Sessionsのマル�
 <tr>
 <td>2.1.2</td><td>2022年9月29日</td><td>
 <p>
-Routing、Testingエンジン、Ktorクライアントのバグ修正を含むパッチリリースです。
+Routing、Testing エンジン、Ktor クライアントにおけるバグ修正を含むパッチリリース。
 </p>
 <var name="version" value="2.1.2"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
@@ -612,11 +612,11 @@ Routing、Testingエンジン、Ktorクライアントのバグ修正を含む�
 <tr>
 <td>2.1.1</td><td>2022年9月6日</td><td>
 <p>
-Ktorクライアントとサーバーにおける各種バグ修正を含むパッチリリースです。
+Ktor クライアントおよびサーバーにおける各種バグ修正を含むパッチリリース。
 </p>
 <var name="version" value="2.1.1"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
@@ -624,11 +624,11 @@ Ktorクライアントとサーバーにおける各種バグ修正を含むパ�
 <tr>
 <td>2.1.0</td><td>2022年8月11日</td><td>
 <p>
-YAML設定のサポートと、その他のさまざまな改善およびバグ修正を追加したマイナーリリースです。
+YAML 設定のサポート追加、ならびにその他の各種改善とバグ修正を行ったマイナーリリース。
 </p>
 <var name="version" value="2.1.0"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
@@ -636,11 +636,11 @@ YAML設定のサポートと、その他のさまざまな改善およびバグ�
 <tr>
 <td>2.0.3</td><td>2022年6月28日</td><td>
 <p>
-バグ修正と<code>kotlinx.coroutines</code>バージョンの<code>1.6.2</code>へのアップグレードを含むパッチリリースです。
+バグ修正と <code>kotlinx.coroutines</code> のバージョン <code>1.6.2</code> へのアップグレードを含むパッチリリース。
 </p>
 <var name="version" value="2.0.3"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
@@ -648,11 +648,11 @@ YAML設定のサポートと、その他のさまざまな改善およびバグ�
 <tr>
 <td>2.0.2</td><td>2022年5月27日</td><td>
 <p>
-各種改善、バグ修正、および依存関係のバージョンアップグレードを含むパッチリリースです。
+各種改善、バグ修正、依存関係のバージョンアップグレードを含むパッチリリース。
 </p>
 <var name="version" value="2.0.2"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
@@ -660,11 +660,11 @@ YAML設定のサポートと、その他のさまざまな改善およびバグ�
 <tr>
 <td>2.0.1</td><td>2022年4月28日</td><td>
 <p>
-各種バグ修正とKotlinバージョンの<code>1.6.21</code>への更新を行ったパッチリリースです。
+各種バグ修正と Kotlin バージョンの <code>1.6.21</code> への更新を含むパッチリリース。
 </p>
 <var name="version" value="2.0.1"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
@@ -672,11 +672,11 @@ YAML設定のサポートと、その他のさまざまな改善およびバグ�
 <tr>
 <td>2.0.0</td><td>2022年4月11日</td><td>
 <p>
-APIドキュメントの更新とさまざまな新機能を含むメジャーリリースです。破壊的変更および<code>1.x.x</code>からの移行方法については、<Links href="/ktor/migration-to-20x" summary="undefined">移行ガイド</Links>をご覧ください。
+更新された API ドキュメントとさまざまな新機能を含むメジャーリリース。破壊的変更の詳細および <code>1.x.x</code> からの移行方法については、<Links href="migration-to-20x.md" summary="">移行ガイド</Links>を参照してください。
 </p>
 <var name="version" value="2.0.0"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>
@@ -684,11 +684,11 @@ APIドキュメントの更新とさまざまな新機能を含むメジャー�
 <tr>
 <td>1.6.8</td><td>2022年3月15日</td><td>
 <p>
-依存関係のバージョンアップグレードを含むパッチリリースです。
+依存関係のバージョンアップグレードを含むパッチリリース。
 </p>
 <var name="version" value="1.6.8"/>
 <p>
-    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHubで変更履歴を確認する</a>
+    <a href="https://github.com/ktorio/ktor/releases/tag/%version%">GitHub で変更ログを確認</a>
 </p>
 </td>
 </tr>

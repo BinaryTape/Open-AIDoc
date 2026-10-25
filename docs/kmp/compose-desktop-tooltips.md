@@ -1,16 +1,22 @@
 [//]: # (title: 工具提示)
 
-您可以通过 `TooltipArea` 可组合项为任何组件添加工具提示。`TooltipArea` 与 `Box` 组件类似，可以显示工具提示。
+你可以使用 `TooltipArea` 可组合项为任何组件添加工具提示。`TooltipArea` 与 `Box` 组件类似，可以显示工具提示。
 
-undefined
+> 本指南中的示例是可运行的桌面应用。若要尝试其中一个：
+> 1. 使用 [Kotlin Multiplatform IDE 插件](https://plugins.jetbrains.com/plugin/14936-kotlin-multiplatform)或[在线向导](https://kmp.jetbrains.com/?android=true&desktop=true&includeTests=false)创建一个 Compose Multiplatform 项目。
+> 2. 打开桌面入口点文件。例如：`desktopApp/src/main/kotlin/com/example/my_desktop_app/main.kt`。
+> 3. 将其内容替换为所提供的示例。
+>
+{style="note" id="desktop-snippets-intro"}
 
 `TooltipArea` 可组合项具有以下主要形参：
 
-* `tooltip`：工具提示的可组合内容。
-* `tooltipPlacement`：定义工具提示的位置。您可以指定锚点（鼠标光标或组件）、偏移量和对齐方式。
-* `delayMillis`：显示工具提示前的等待时间（以毫秒为单位）。默认值为 500 ms。
+* `tooltip`，工具提示的可组合内容。
+* `tooltipPlacement`，定义工具提示的位置。你可以指定锚点（鼠标光标或组件）、偏移量以及对齐方式。
+* `delayMillis`，显示工具提示前的等待时间（以毫秒为单位）。默认值为 500 ms。
 
-以下示例展示了如何创建一个包含按钮列表的简单窗口，每个按钮都包装在 `TooltipArea` 中。当您将鼠标悬停在按钮上时，将显示包含按钮名称的工具提示。将此代码添加到 `jvmMain/kotlin` 目录下的 `main.kt` 文件中：
+以下示例展示了如何创建一个简单的窗口，其中包含一系列包裹在 `TooltipArea` 中的按钮。当你将光标悬停在按钮上时，将出现带有该按钮名称的工具提示。
+将此代码添加到 `jvmMain/kotlin` 目录下的 `main.kt` 文件中：
 
 ```kotlin
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -41,7 +47,7 @@ fun main() = singleWindowApplication(
     val buttons = listOf("Button A", "Button B", "Button C", "Button D", "Button E", "Button F")
     Column(Modifier.fillMaxSize(), Arrangement.spacedBy(5.dp)) {
         buttons.forEachIndexed { index, name ->
-            // 将按钮包装在 TooltipArea 中
+            // 将按钮包裹在 TooltipArea 中
             TooltipArea(
                 tooltip = {
                     // 工具提示的可组合内容：
@@ -74,8 +80,8 @@ fun main() = singleWindowApplication(
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="TooltipArea(tooltip = { Surface( "}
 
-<img src="compose-desktop-tooltips.animated.gif" alt="Tooltips" width="288" preview-src="compose-desktop-tooltips.png"/>
+<img src="compose-desktop-tooltips.animated.gif" alt="工具提示" width="288" preview-src="compose-desktop-tooltips.png"/>
 
 ## 后续步骤 {id="what-s-next"}
 
-探索有关[其他桌面组件](https://github.com/JetBrains/compose-multiplatform/tree/master/tutorials#desktop)的教程。
+浏览有关[其他桌面组件](https://github.com/JetBrains/compose-multiplatform/tree/master/tutorials#desktop)的教程。

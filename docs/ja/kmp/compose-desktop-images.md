@@ -1,15 +1,20 @@
 [//]: # (title: 画像とアプリ内アイコン)
-<web-summary>Compose Multiplatform for desktop で画像を表示したり、ファイルシステムやネットワークから読み込んだり、ウィンドウやトレイのアイコンとして使用したりする方法を学びます。</web-summary>
+<web-summary>Compose Multiplatform for desktop で画像を表示する方法、ファイルシステムやネットワークから読み込む方法、およびウィンドウやトレイのアイコンとして使用する方法について学びます。</web-summary>
 
-Compose Multiplatform for desktop は、他のプラットフォームと同様に、[マルチプラットフォームリソース](compose-multiplatform-resources.md)ライブラリから画像を読み込みます。デスクトップアプリケーションでは、JVM API を使用してファイルシステムやネットワークから画像を読み込んだり、画像をウィンドウやトレイのアイコンとして使用したりすることもできます。
+デスクトップ向けの Compose Multiplatform は、他のプラットフォームと同様に [マルチプラットフォームリソース](compose-multiplatform-resources.md) ライブラリから画像を読み込みます。また、デスクトップアプリケーションは、JVM API を使用してファイルシステムやネットワークから画像を読み込んだり、画像をウィンドウやトレイのアイコンとして使用したりすることもできます。
 
-undefined
+> このガイドの例は実行可能なデスクトップアプリです。試すには:
+> 1. [Kotlin Multiplatform IDE プラグイン](https://plugins.jetbrains.com/plugin/14936-kotlin-multiplatform) または [オンラインウィザード](https://kmp.jetbrains.com/?android=true&desktop=true&includeTests=false) を使用して Compose Multiplatform プロジェクトを作成します。
+> 2. デスクトップのエントリポイントファイルを開きます。例: `desktopApp/src/main/kotlin/com/example/my_desktop_app/main.kt`。
+> 3. その内容を提供されたサンプルコードで置き換えます。
+>
+{style="note" id="desktop-snippets-intro"}
 
-このページの例では、Kotlin と Compose Multiplatform のロゴを使用しています。どちらのロゴも [Kotlin ブランドアセット](https://kotlinlang.org/docs/kotlin-brand-assets.html#kotlin-logo)パッケージの一部として入手可能です。
+このページの例では、Kotlin と Compose Multiplatform のロゴを使用しています。両方のロゴは [Kotlin Brand Assets](https://kotlinlang.org/docs/kotlin-brand-assets.html#kotlin-logo) パッケージの一部として利用可能です。
 
 ## リソースからの画像の表示 {id="displaying-images-from-resources"}
 
-アプリケーションに同梱されている画像を表示するには、プロジェクトの[マルチプラットフォームリソースに追加](compose-multiplatform-resources-setup.md)し、プロジェクトをビルドしてリソースアクセサを生成します。アクセサを `painterResource()` に渡して `Painter` インスタンスを作成し、生成された `Painter` を `Image()` コンポーザブルに渡します。
+アプリケーションに同梱されている画像を表示するには、プロジェクトの [マルチプラットフォームリソースに追加](compose-multiplatform-resources-setup.md) し、プロジェクトをビルドしてリソースアクセサを生成します。そのアクセサを `painterResource()` に渡して `Painter` インスタンスを作成し、得られた `Painter` を `Image()` コンポーザブルに渡します:
 
 ```kotlin
 import androidx.compose.foundation.Image
@@ -43,27 +48,27 @@ fun main() = application {
 
 <img src="compose-desktop-images-resource.png" alt="An image from multiplatform resources" width="540"/>
 
-`painterResource()` は、`.png`、`.jpg`、`.bmp`、`.webp` などのラスタライズされた画像形式や、Android XML ベクタードローアブル（vector drawable）形式をサポートしています。リソースを `ImageBitmap` または `ImageVector` 値として取得する方法や、アイコン、フォント、文字列の使用方法の詳細については、[アプリでのマルチプラットフォームリソースの使用](compose-multiplatform-resources-usage.md)を参照してください。
+`painterResource()` は、`.png`、`.jpg`、`.bmp`、`.webp` などのラスタライズされた画像形式や、Android XML ベクタードローアブル形式をサポートしています。リソースを `ImageBitmap` や `ImageVector` の値としてアクセスする方法や、アイコン、フォント、文字列の使用方法の詳細については、[アプリでのマルチプラットフォームリソースの使用](compose-multiplatform-resources-usage.md) を参照してください。
 
-> リソースを共通（common）ソースセットに保存する必要はありません。どのソースセットやモジュールも独自の `composeResources` ディレクトリを持つことができるため、デスクトップアプリケーション固有の画像をデスクトップ関連のコードの隣に保存できます。
+> リソースは必ずしも共通ソースセット（common source set）に配置する必要はありません。任意のソースセットやモジュールが独自の `composeResources` ディレクトリを使用できるため、デスクトップアプリケーション固有の画像をデスクトップ関連のコードの隣に配置できます。
 > 
-> 別のモジュールで宣言されたリソースを使用するには、そのモジュールの生成された `Res` クラスを [public](compose-multiplatform-resources-usage.md#customizing-accessor-class-generation) に設定してください。
+> 別のモジュールで宣言されたリソースを使用するには、そのモジュールで生成された `Res` クラスを [公開 (public)](compose-multiplatform-resources-usage.md#customizing-accessor-class-generation) にしてください。
 >
 {style="tip"}
 
-## ファイルシステムまたはネットワークからの画像の読み込み {id="loading-images-from-the-file-system-or-the-network"}
+## ファイルシステムやネットワークからの画像の読み込み {id="loading-images-from-the-file-system-or-the-network"}
 
-アプリケーションの一部ではない画像（ユーザーが選択したファイルや実行時にダウンロードされたもの）は、リソースではありません。これらは任意の JVM API でバイト列として読み取り、リソースライブラリの以下のいずれかの関数を使用してデコードします。
+アプリケーションの一部ではない画像（ユーザーによって選択されたファイルや実行時にダウンロードされたファイル）はリソースではありません。任意の JVM API を使用してそのバイト列を読み取り、リソースライブラリの以下のいずれかの関数を使ってデコードします:
 
-| 画像形式 | デコード関数 | 結果 |
+| 画像形式     | デコード関数             | 結果          |
 |--------------|--------------------------|---------------|
 | ビットマップ | `decodeToImageBitmap()`  | `ImageBitmap` |
 | XML ベクター | `decodeToImageVector()`  | `ImageVector` |
 | SVG          | `decodeToSvgPainter()`   | `Painter`     |
 
-ファイルやネットワークレスポンスの読み取りは呼び出し元のスレッドをブロックするため、これらの操作は常に UI スレッド以外で実行してください。
+ファイルやネットワークレスポンスの読み取りは呼び出し元のスレッドをブロックするため、これらの操作は常に UI スレッドの外で実行してください。
 
-以下の例では、`Dispatchers.IO` コンテキストで画像を読み込み、準備ができたら画像を表示する `AsyncImage()` コンポーザブルを宣言しています。
+次の例では、`Dispatchers.IO` コンテキストで画像を読み込み、準備ができたらその画像を表示する `AsyncImage()` コンポーザブルを宣言しています:
 
 ```kotlin
 import androidx.compose.foundation.Image
@@ -156,8 +161,8 @@ fun <T> AsyncImage(
             try {
                 load()
             } catch (e: IOException) {
-                // コンソールに出力する代わりに、エラーをログに記録したり、
-                // プレースホルダー画像を表示したりすることもできます。
+                // コンソールに出力する代わりに、エラーをログに記録するか、
+                // プレースホルダー画像を表示することもできます。
                 e.printStackTrace()
                 null
             }
@@ -178,15 +183,15 @@ fun <T> AsyncImage(
 
 <img src="compose-desktop-images-async.png" alt="Images loaded from the file system and the network" width="420"/>
 
-例の中のファイルパスは、アプリケーションの作業ディレクトリを基準に解決されます。
+この例のファイルパスは、アプリケーションの作業ディレクトリを基準にして解決されます。
 
-> リモート画像を自前で読み込む代わりに、[専用の画像読み込みライブラリ](compose-multiplatform-resources-usage.md#remote-files)を使用することもできます。
+> リモート画像を手動で読み込む代わりに、[専用の画像読み込みライブラリ](compose-multiplatform-resources-usage.md#remote-files) を使用することもできます。
 >
 {style="tip"}
 
 ## ウィンドウアイコンの設定 {id="setting-the-window-icon"}
 
-画像をウィンドウアイコンとして使用するには、`Window()` コンポーザブルの `icon` パラメータに `Painter` インスタンスを渡します。
+画像をウィンドウアイコンとして使用するには、`Window()` コンポーザブルの `icon` パラメータに `Painter` インスタンスを渡します:
 
 ```kotlin
 import androidx.compose.foundation.layout.Box
@@ -218,18 +223,18 @@ fun main() = application {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="Window(icon = painterResource(Res.drawable.compose_logo)"}
 
-アイコンが表示される場所は、オペレーティングシステムによって異なります。
+アイコンの表示場所はオペレーティングシステムによって異なります:
 
-* Windows および Linux では、ウィンドウおよびタスクバーのエントリのアイコンになります。
-* macOS では、アプリケーションアイコンはアプリケーションバンドルから取得されます。Dock 内のアイコンを変更するには、[配布設定](compose-native-distribution.md#application-icon)で設定します。
+* Windows および Linux では、ウィンドウおよびそのタスクバーエントリのアイコンになります。
+* macOS では、アプリケーションアイコンはアプリケーションバンドルから取得されます。Dock のアイコンを変更するには、[配布設定](compose-native-distribution.md#application-icon) で設定してください。
 
-次のスクリーンショットは、macOS 上でパッケージ化されたアプリケーションを示しています。ウィンドウには `icon` パラメータに渡されたものと同じ画像が表示されていますが、Dock のアイコンは配布設定で宣言された `.icns` ファイルから取得されています。
+以下のスクリーンショットは、macOS 上でパッケージ化されたアプリケーションを示しています。ウィンドウには `icon` パラメータに渡されたものと同じ画像が表示され、Dock アイコンには配布設定で宣言された `.icns` ファイルが使用されます:
 
 <img src="compose-desktop-images-window-icon.png" alt="A packaged application and its Dock icon" width="426"/>
 
-### シングルウィンドウアプリケーションのアイコン {id="single-window-application-icon"}
+### 単一ウィンドウアプリケーションのアイコン {id="single-window-application-icon"}
 
-`singleWindowApplication()` 関数は、コンポジション（composition）の外側で `icon` パラメータを評価するため、`painterResource()` は使用できません。代わりに、`composeResources` ディレクトリ内のファイルパスを受け取る `Res.readBytes()` でリソースを読み込み、それを `BitmapPainter` にデコードします。
+`singleWindowApplication()` 関数は、`painterResource()` が利用できないコンポジションの外部で `icon` パラメータを評価します。代わりに、`composeResources` ディレクトリ内のファイルパスを受け取る `Res.readBytes()` を使用してリソースを読み込み、`BitmapPainter` にデコードします:
 
 ```kotlin
 import androidx.compose.material.Text
@@ -252,7 +257,7 @@ fun main() {
 
 ## トレイアイコンの設定 {id="setting-the-tray-icon"}
 
-画像を[トレイ](compose-desktop-tray.md)アイコンとして使用するには、`Tray()` コンポーザブルの `icon` パラメータに `Painter` インスタンスを渡します。
+画像を [トレイ](compose-desktop-tray.md) アイコンとして使用するには、`Tray()` コンポーザブルの `icon` パラメータに `Painter` インスタンスを渡します:
 
 ```kotlin
 import androidx.compose.foundation.Image
@@ -298,13 +303,13 @@ fun main() = application {
 }
 ```
 
-macOS では、トレイアイコンはメニューバーに表示されます。
+macOS では、トレイアイコンはメニューバーに表示されます:
 
 <img src="compose-desktop-images-tray-icon.png" alt="A tray icon in the macOS menu bar" width="430"/>
 
 ## 次のステップ {id="what-s-next"}
 
-* [マルチプラットフォームリソース](compose-multiplatform-resources.md)および共通（common）コードからの[アクセス方法](compose-multiplatform-resources-usage.md)について詳しく学ぶ。
-* [システムトレイ](compose-desktop-tray.md)にアプリケーションアイコンを追加する方法を学ぶ。
-* プラットフォーム固有のアプリケーションアイコンを使用して[ネイティブ配布物を作成](compose-native-distribution.md)する方法を学ぶ。
-* [その他のデスクトップコンポーネント](compose-desktop-components.md)に関するチュートリアルを調べる。
+* [マルチプラットフォームリソース](compose-multiplatform-resources.md) および共通コードから [それらにアクセスする方法](compose-multiplatform-resources-usage.md) についてさらに詳しく学びます。
+* [システムトレイ](compose-desktop-tray.md) にアプリケーションアイコンを追加する方法について学びます。
+* プラットフォーム固有のアプリケーションアイコンを含む [ネイティブディストリビューションを作成する](compose-native-distribution.md) 方法について学びます。
+* [その他のデスクトップコンポーネント](compose-desktop-components.md) に関するチュートリアルを確認します。

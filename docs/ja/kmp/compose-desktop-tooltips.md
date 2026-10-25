@@ -2,15 +2,20 @@
 
 `TooltipArea` コンポーザブルを使用すると、任意のコンポーネントにツールチップを追加できます。`TooltipArea` は `Box` コンポーネントに似ており、ツールチップを表示できます。
 
-undefined
+> このガイドの例は実行可能なデスクトップアプリです。実際に試すには：
+> 1. [Kotlin Multiplatform IDE プラグイン](https://plugins.jetbrains.com/plugin/14936-kotlin-multiplatform) または [オンラインウィザード](https://kmp.jetbrains.com/?android=true&desktop=true&includeTests=false) を使用して、Compose Multiplatform プロジェクトを作成します。
+> 2. デスクトップのエントリポイントファイルを開きます。例：`desktopApp/src/main/kotlin/com/example/my_desktop_app/main.kt`。
+> 3. その内容を提供されているサンプルコードに置き換えます。
+>
+{style="note" id="desktop-snippets-intro"}
 
-`TooltipArea` コンポーザブルには、以下の主なパラメータがあります。
+`TooltipArea` コンポーザブルには、主に以下のパラメータがあります。
 
-* `tooltip`: ツールチップのコンポーザブルなコンテンツ。
-* `tooltipPlacement`: ツールチップの位置を定義します。アンカー（マウスカーソルまたはコンポーネント）、オフセット、アライメントを指定できます。
-* `delayMillis`: ツールチップが表示されるまでの時間（ミリ秒単位）。デフォルト値は 500 ms です。
+* `tooltip`: ツールチップのコンポーザブルコンテンツ。
+* `tooltipPlacement`: ツールチップの位置を定義します。アンカー（マウスカーソルまたはコンポーネント）、オフセット、配置を指定できます。
+* `delayMillis`: ツールチップが表示されるまでの待機時間（ミリ秒単位）。デフォルト値は 500 ms です。
 
-以下の例は、ボタンのリストを含み、各ボタンが `TooltipArea` でラップされたシンプルなウィンドウを作成する方法を示しています。ボタンの上にマウスを置くと、そのボタンの名前が表示されたツールチップが表示されます。このコードを `jvmMain/kotlin` にある `main.kt` ファイルに追加してください。
+以下の例は、それぞれが `TooltipArea` でラップされたボタンのリストを含むシンプルなウィンドウを作成する方法を示しています。ボタンの上にカーソルを置くと、ボタンの名前が記載されたツールチップが表示されます。このコードを `jvmMain/kotlin` の `main.kt` ファイルに追加してください。
 
 ```kotlin
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -41,10 +46,10 @@ fun main() = singleWindowApplication(
     val buttons = listOf("Button A", "Button B", "Button C", "Button D", "Button E", "Button F")
     Column(Modifier.fillMaxSize(), Arrangement.spacedBy(5.dp)) {
         buttons.forEachIndexed { index, name ->
-            // ボタンを TooltipArea でラップする
+            // ボタンを TooltipArea でラップ
             TooltipArea(
                 tooltip = {
-                    // コンポーザブルなツールチップのコンテンツ:
+                    // ツールチップのコンポーザブルコンテンツ:
                     Surface(
                         modifier = Modifier.shadow(4.dp),
                         color = Color(255, 255, 210),
@@ -78,4 +83,4 @@ fun main() = singleWindowApplication(
 
 ## 次のステップ {id="what-s-next"}
 
-[他のデスクトップコンポーネント](https://github.com/JetBrains/compose-multiplatform/tree/master/tutorials#desktop)に関するチュートリアルを確認してください。
+[その他のデスクトップコンポーネント](https://github.com/JetBrains/compose-multiplatform/tree/master/tutorials#desktop)に関するチュートリアルも参照してください。

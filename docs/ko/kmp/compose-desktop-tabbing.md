@@ -1,17 +1,22 @@
-[//]: # (title: 탭 내비게이션 및 키보드 포커스)
-<web-summary>데스크톱용 Compose Multiplatform에서 Tab 키를 사용하여 컴포넌트 간을 탐색하는 방법을 알아봅니다.</web-summary>
+[//]: # (title: 탭 탐색 및 키보드 포커스)
+<web-summary>데스크톱용 Compose Multiplatform에서 Tab 키를 사용하여 컴포넌트 사이를 탐색하는 방법을 알아봅니다.</web-summary>
 
-데스크톱용 Compose Multiplatform에서는 다음 컴포넌트로 이동할 때는 <shortcut>Tab</shortcut> 단축키를, 이전 컴포넌트로 이동할 때는 <shortcut>Shift+Tab</shortcut> 단축키를 사용하여 컴포넌트 간 내비게이션을 설정할 수 있습니다.
+데스크톱용 Compose Multiplatform에서는 다음 컴포넌트로 이동하는 단축키인 <shortcut>Tab</shortcut>과 이전 컴포넌트로 이동하는 <shortcut>Shift+Tab</shortcut>을 사용하여 컴포넌트 간 탐색을 설정할 수 있습니다.
 
-undefined
+> 이 가이드의 예제들은 실행 가능한 데스크톱 앱입니다. 직접 사용해보려면 다음과 같이 하세요:
+> 1. [Kotlin Multiplatform IDE 플러그인](https://plugins.jetbrains.com/plugin/14936-kotlin-multiplatform) 또는 [온라인 마법사](https://kmp.jetbrains.com/?android=true&desktop=true&includeTests=false)를 사용하여 Compose Multiplatform 프로젝트를 생성합니다.
+> 2. 데스크톱 진입점(entry-point) 파일을 엽니다. 예를 들어 `desktopApp/src/main/kotlin/com/example/my_desktop_app/main.kt`입니다.
+> 3. 해당 파일의 내용을 제공된 예제 코드로 바꿉니다.
+>
+{style="note" id="desktop-snippets-intro"}
 
-## 기본 탭 내비게이션 {id="default-tab-navigation"}
+## 기본 탭 탐색 {id="default-tab-navigation"}
 
-기본적으로 탭 내비게이션을 사용하면 사용자가 포커스 가능한 컴포넌트가 나타나는 순서대로 이동할 수 있습니다. 이 기능은 기본적으로 활성화되어 있으며 추가 코드가 필요하지 않습니다.
+기본적으로 탭 탐색을 통해 사용자는 포커스 가능한 컴포넌트 사이를 나타나는 순서대로 이동할 수 있습니다. 이 기능은 기본적으로 활성화되어 있으며 추가 코드가 필요하지 않습니다.
 
-포커스 가능한 컴포넌트에는 구현 시 `clickable()`, `selectable()`, `toggleable()` 또는 `focusable()` 수정자(modifier)를 사용하는 모든 항목이 포함됩니다. 예를 들어 텍스트 필드, 버튼, 슬라이더, 내비게이션 항목, null이 아닌 콜백이 있는 선택 컨트롤, `Card()`, `Surface()`, `ListItem()`의 `onClick` 오버로드 등이 있습니다.
+포커스 가능한 컴포넌트에는 구현 시 `clickable()`, `selectable()`, `toggleable()` 또는 `focusable()` 수정자(modifier)를 사용하는 모든 컴포넌트가 포함됩니다. 예를 들어 텍스트 필드, 버튼, 슬라이더, 탐색 항목, null이 아닌 콜백을 가진 선택 컨트롤, `Card()`, `Surface()`, `ListItem()`의 `onClick` 오버로드가 있습니다.
 
-다음은 사용자가 표준 단축키를 사용하여 5개의 텍스트 필드 사이를 이동할 수 있는 창의 예시입니다.
+다음은 사용자가 표준 단축키를 사용하여 5개의 텍스트 필드 사이를 이동할 수 있는 창입니다:
 
 ```kotlin
 import androidx.compose.foundation.layout.Arrangement
@@ -56,15 +61,15 @@ fun main() = application {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="Column() { repeat(5) { TextField(state = rememberTextFieldState()"}
 
-<img src="compose-desktop-tab-navigation-default.animated.gif" alt="Default tab order" width="450" preview-src="compose-desktop-tab-navigation-default.png"/>
+<img src="compose-desktop-tab-navigation-default.animated.gif" alt="기본 탭 순서" width="450" preview-src="compose-desktop-tab-navigation-default.png"/>
 
 ## 커스텀 포커스 가능 컴포넌트 {id="custom-focusable-components"}
 
-기본적으로 포커스할 수 없는 컴포넌트를 탭 순서에 포함하려면 `focusable()` 수정자를 적용하세요.
+기본적으로 포커스할 수 없는 컴포넌트를 탭 순서에 포함하려면 `focusable()` 수정자를 적용합니다.
 
-컴포넌트가 포커스를 받았을 때 모양을 변경하려면 `focusable()` 수정자에 `MutableInteractionSource`를 전달하고, `collectIsFocusedAsState()`로 포커스 상태를 읽어온 뒤, 해당 상태를 사용하여 컴포넌트의 스타일(다른 배경색, 테두리 또는 기타 강조 효과)을 변경하세요. 컴포넌트가 키보드 입력에 반응하게 하려면 `onKeyEvent()` 수정자로 키 이벤트를 처리하세요.
+컴포넌트가 포커스를 받을 때의 모양을 변경하려면 `focusable()` 수정자에 `MutableInteractionSource`를 전달하고, `collectIsFocusedAsState()`로 포커스 상태를 읽은 다음, 해당 상태를 사용하여 컴포넌트의 스타일(다른 배경색, 테두리 또는 기타 강조 표시 등)을 변경합니다. 컴포넌트가 키보드 입력에 반응하도록 하려면 `onKeyEvent()` 수정자로 키 이벤트를 처리합니다.
 
-다음 예제는 `Box()` 컴포저블을 버튼과 같은 컴포넌트로 만듭니다. 박스에 포커스가 맞춰지면 강조 표시되며, <shortcut>Enter</shortcut> 또는 <shortcut>Space</shortcut>를 누르면 관련 동작이 실행됩니다.
+다음 예제는 `Box()` 컴포저블을 버튼과 유사한 컴포넌트로 변환합니다. 포커스를 받으면 상자가 강조 표시되고, <shortcut>Enter</shortcut> 또는 <shortcut>Space</shortcut>를 누르면 관련 동작이 트리거됩니다:
 
 ```kotlin
 import androidx.compose.foundation.background
@@ -176,16 +181,16 @@ fun FocusableBox(
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="Box(modifier = Modifier.focusable(interactionSource = interactionSource)"}
 
-<img src="compose-desktop-tab-navigation-custom-focusable.animated.gif" alt="A custom focusable component" width="450" preview-src="compose-desktop-tab-navigation-custom-focusable.png"/>
+<img src="compose-desktop-tab-navigation-custom-focusable.animated.gif" alt="커스텀 포커스 가능 컴포넌트" width="450" preview-src="compose-desktop-tab-navigation-custom-focusable.png"/>
 
 ## 커스텀 탭 순서 {id="custom-tab-order"}
 
-나타나는 순서가 아닌 다른 순서로 포커스를 이동하려면 두 가지 수정자를 조합합니다.
+컴포넌트가 나타나는 순서와 다른 순서로 포커스를 이동하려면 두 가지 수정자를 함께 사용합니다:
 
-* `focusRequester()`는 포커스 가능한 컴포넌트에 `FocusRequester` 핸들을 연결합니다. 컴포넌트가 [기본적으로 포커스 가능하지 않은 경우](#커스텀-포커스-가능-컴포넌트), `focusRequester()` *뒤에* `focusable()` 수정자를 적용하세요.
-* `focusProperties()`는 탭 순서에서 `next`(다음) 및 `previous`(이전) 요소를 설정합니다. <shortcut>Tab</shortcut> 또는 <shortcut>Shift+Tab</shortcut>을 눌러 포커스를 맞출 `FocusRequester` 핸들이 있는 컴포넌트를 지정합니다.
+* `focusRequester()`는 `FocusRequester` 핸들을 포커스 가능한 컴포넌트에 연결합니다. 컴포넌트가 [기본적으로 포커스 가능하지 않은 경우](#custom-focusable-components), `focusRequester()` 뒤에 `focusable()` 수정자를 적용합니다.
+* `focusProperties()`는 탭 순서에서 `next` 및 `previous` 요소를 설정합니다. 이는 <shortcut>Tab</shortcut> 또는 <shortcut>Shift+Tab</shortcut>을 눌렀을 때 포커스되는 `FocusRequester` 핸들을 가진 컴포넌트입니다.
 
-다음 예제는 5개의 텍스트 필드 각각에 대해 `FocusRequester`를 생성하고 기본 탭 순서를 역순으로 변경합니다.
+다음 예제는 5개의 텍스트 필드 각각에 대해 `FocusRequester`를 생성하고 기본 탭 순서를 반대로 변경합니다:
 
 ```kotlin
 import androidx.compose.foundation.layout.Arrangement
@@ -229,7 +234,7 @@ fun main() = application {
                         modifier = Modifier
                             .focusRequester(focusRequester)
                             .focusProperties {
-                                // 기본 순서를 역순으로 변경:
+                                // 기본 순서를 반대로 변경:
                                 next = focusRequesters[(index - 1 + focusRequesters.size) % focusRequesters.size]
                                 previous = focusRequesters[(index + 1) % focusRequesters.size]
                             }
@@ -242,13 +247,13 @@ fun main() = application {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="Modifier.focusRequester(focusRequester).focusProperties { next ="}
 
-<img src="compose-desktop-tab-navigation-custom-order.animated.gif" alt="Custom tab order" width="450" preview-src="compose-desktop-tab-navigation-custom-order.png"/>
+<img src="compose-desktop-tab-navigation-custom-order.animated.gif" alt="커스텀 탭 순서" width="450" preview-src="compose-desktop-tab-navigation-custom-order.png"/>
 
 ## 코드에서 포커스 이동하기 {id="moving-focus-from-code"}
 
-사용자 상호작용 없이 컴포넌트에 포커스를 주려면, `focusRequester()` 수정자를 사용하여 포커스 가능한 컴포넌트에 `FocusRequester`를 연결하고 `FocusRequester.requestFocus()`를 호출하세요. 컴포넌트가 [기본적으로 포커스 가능하지 않은 경우](#커스텀-포커스-가능-컴포넌트), `focusable()` 수정자는 `focusRequester()` *뒤에* 적용되어야 합니다.
+사용자 상호작용 없이 컴포넌트에 포커스를 맞추려면 `focusRequester()` 수정자를 사용하여 포커스 가능한 컴포넌트에 `FocusRequester`를 연결하고 `FocusRequester.requestFocus()`를 호출합니다. 컴포넌트가 [기본적으로 포커스 가능하지 않은 경우](#custom-focusable-components), `focusable()` 수정자는 `focusRequester()` 뒤에 적용해야 합니다.
 
-다음 예제에서 버튼은 포커스를 텍스트 필드로 이동시켰다가 다시 자신에게로 가져옵니다.
+다음 예제에서는 버튼을 통해 포커스를 텍스트 필드로 이동했다가 다시 버튼 자신으로 이동합니다:
 
 ```kotlin
 import androidx.compose.foundation.layout.Arrangement
@@ -319,13 +324,13 @@ fun main() = application {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="Button(onClick = { textFieldFocusRequester.requestFocus()"}
 
-<img src="compose-desktop-tab-navigation-move-focus-from-code.animated.gif" alt="Moving focus from code" width="450" preview-src="compose-desktop-tab-navigation-move-focus-from-code.png"/>
+<img src="compose-desktop-tab-navigation-move-focus-from-code.animated.gif" alt="코드에서 포커스 이동" width="450" preview-src="compose-desktop-tab-navigation-move-focus-from-code.png"/>
 
-### 컴포넌트가 나타날 때 포커스 주기 {id="focusing-a-component-when-it-appears"}
+### 컴포넌트가 나타날 때 포커스 맞추기 {id="focusing-a-component-when-it-appears"}
 
-폼(form)이나 다이얼로그에서는 사용자가 마우스를 잡지 않고도 바로 타이핑을 시작할 수 있도록 첫 번째 입력창에 즉시 포커스를 주는 경우가 많습니다. 이 경우, 컴포넌트가 컴포지션(composition)에 들어온 후 한 번 실행되는 `LaunchedEffect(Unit)` 블록에서 포커스를 요청하세요.
+양식(form)이나 대화상자(dialog)에서는 일반적으로 첫 번째 입력 필드에 즉시 포커스를 맞춰 사용자가 마우스를 잡지 않고도 바로 입력을 시작할 수 있게 합니다. 이러한 경우에는 컴포넌트가 컴포지션(composition)에 진입한 후 한 번 실행되는 `LaunchedEffect(Unit)` 블록에서 포커스를 요청합니다.
 
-다음 예제에서는 창이 열리자마자 첫 번째 텍스트 필드에 포커스가 맞춰집니다.
+다음 예제에서는 창이 열리자마자 첫 번째 텍스트 필드에 포커스가 맞춰집니다:
 
 ```kotlin
 import androidx.compose.foundation.layout.Arrangement
@@ -381,18 +386,18 @@ fun main() = application {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="LaunchedEffect(Unit) { focusRequester.requestFocus()"}
 
-<img src="compose-desktop-tab-navigation-focus-on-appearance.animated.gif" alt="Focus text field on appearance" width="450" preview-src="compose-desktop-tab-navigation-focus-on-appearance.png"/>
+<img src="compose-desktop-tab-navigation-focus-on-appearance.animated.gif" alt="나타날 때 텍스트 필드에 포커스" width="450" preview-src="compose-desktop-tab-navigation-focus-on-appearance.png"/>
 
-## 다중 라인 텍스트 필드에서 포커스 이동하기 {id="moving-focus-from-multiline-text-fields"}
+## 여러 줄 텍스트 필드에서 포커스 이동하기 {id="moving-focus-from-multiline-text-fields"}
 
-다중 라인(multiline) 텍스트 필드에서는 <shortcut>Tab</shortcut>을 누르면 다음 컴포넌트로 포커스를 이동하는 대신 탭 문자가 삽입됩니다.
+여러 줄(multiline) 텍스트 필드에서는 <shortcut>Tab</shortcut>을 누르면 포커스가 다음 컴포넌트로 이동하는 대신 탭 문자가 삽입됩니다:
 
 ```kotlin
 Column {
     repeat(5) {
         TextField(
             state = rememberTextFieldState("Hello, World!"),
-            // MultiLine은 lineLimits의 기본값입니다.
+            // MultiLine은 lineLimits의 기본값입니다
             lineLimits = TextFieldLineLimits.MultiLine(),
             modifier = Modifier.padding(8.dp)
         )
@@ -400,7 +405,7 @@ Column {
 }
 ```
 
-이는 알려진 문제인 [CMP-5822](https://youtrack.jetbrains.com/issue/CMP-5822)입니다. 기본 동작인 두 줄 이상의 입력을 허용하는 모든 텍스트 필드에 영향을 미칩니다. 우회 방법으로, `onPreviewKeyEvent` 수정자를 사용하여 <shortcut>Tab</shortcut> 키를 가로채고 `LocalFocusManager`의 `FocusManager`를 사용하여 포커스를 이동시키세요.
+이는 알려진 이슈인 [CMP-5822](https://youtrack.jetbrains.com/issue/CMP-5822)입니다. 기본 동작인 여러 줄을 허용하는 모든 텍스트 필드에 영향을 미칩니다. 해결 방법(workaround)으로, `onPreviewKeyEvent` 수정자를 사용하여 <shortcut>Tab</shortcut> 키를 가로채고 `LocalFocusManager`의 `FocusManager`를 사용하여 포커스를 이동할 수 있습니다:
 
 ```kotlin
 import androidx.compose.foundation.layout.Column
@@ -453,5 +458,5 @@ fun Modifier.moveFocusOnTab(): Modifier {
 ## 다음 단계 {id="what-s-next"}
 
 * [키보드 이벤트](compose-desktop-keyboard.md) 처리에 대해 자세히 알아보세요.
-* [다양한 플랫폼의 접근성 지원](compose-desktop-accessibility.md)에 대해 알아보세요.
-* [기타 데스크톱 컴포넌트](compose-desktop-components.md)에 대한 튜토리얼을 살펴보세요.
+* [다양한 플랫폼에서의 접근성 지원](compose-desktop-accessibility.md)에 대해 알아보세요.
+* [다른 데스크톱 컴포넌트](compose-desktop-components.md)에 관한 튜토리얼을 살펴보세요.

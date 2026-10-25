@@ -1,8 +1,8 @@
 [//]: # (title: SAM-with-receiver 編譯器外掛程式)
 
-*sam-with-receiver* 編譯器外掛程式會使帶有註解的 Java 「單一抽象方法」(SAM) 介面方法的第一個參數在 Kotlin 中成為接收者 (receiver)。此轉換僅在 SAM 介面作為 Kotlin Lambda 運算式傳遞時有效，且同時適用於 SAM 適配器與 SAM 建構函式（詳情請參閱 [SAM 轉換文件](java-interop.md#sam-conversions)）。
+*sam-with-receiver* 編譯器外掛程式能讓帶有指定註解的 Java「單一抽象方法」(SAM) 介面方法的第一個參數，在 Kotlin 中成為接收者 (receiver)。此轉換僅在 SAM 介面作為 Kotlin Lambda 運算式傳遞時有效，同時適用於 SAM 適配器與 SAM 建構函式（詳情請參閱 [SAM 轉換文件](java-interop.md#sam-conversions)）。
 
-以下是一個範例：
+以下為範例：
 
 ```java
 public @interface SamWithReceiver {}
@@ -27,7 +27,7 @@ fun test(context: TaskContext) {
 
 ## Gradle {id="gradle"}
 
-其用法與 [all-open](all-open-plugin.md) 和 [no-arg](no-arg-plugin.md) 相同，唯獨 sam-with-receiver 沒有任何內建預設，您需要指定自己的特殊處理註解清單。
+其用法與 [`all-open`](all-open-plugin.md) 及 [`no-arg`](no-arg-plugin.md) 相同，差別在於 sam-with-receiver 沒有任何內建預設，你需要自行指定特殊處理的註解清單。
 
 <tabs group="build-script">
 <tab title="Kotlin" group-key="kotlin">
@@ -90,7 +90,7 @@ samWithReceiver {
 
 ## 命令列編譯器 {id="command-line-compiler"}
 
-將外掛程式的 JAR 檔案新增至編譯器外掛程式的類別路徑 (classpath)，並指定 sam-with-receiver 註解清單：
+將外掛程式 JAR 檔案新增至編譯器外掛程式 classpath，並指定 sam-with-receiver 註解清單：
 
 ```bash
 -Xplugin=$KOTLIN_HOME/lib/sam-with-receiver-compiler-plugin.jar

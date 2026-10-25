@@ -97,12 +97,12 @@
     "text": "kotlin.what-s-new-in-kotlin",
     "items": [
       {
-        "text": "kotlin.whatsnew2420",
-        "link": "whatsnew2420"
-      },
-      {
         "text": "kotlin.whatsnew-eap",
         "link": "whatsnew-eap"
+      },
+      {
+        "text": "kotlin.whatsnew2420",
+        "link": "whatsnew2420"
       },
       {
         "text": "kotlin.whatsnew24",
@@ -1215,6 +1215,10 @@
             "link": "all-open-plugin"
           },
           {
+            "text": "kotlin.kotlin-jpa-plugin",
+            "link": "kotlin-jpa-plugin"
+          },
+          {
             "text": "kotlin.kapt",
             "link": "kapt"
           },
@@ -1233,6 +1237,10 @@
           {
             "text": "kotlin.sam-with-receiver-plugin",
             "link": "sam-with-receiver-plugin"
+          },
+          {
+            "text": "kotlin.kotlin-spring-plugin",
+            "link": "kotlin-spring-plugin"
           },
           {
             "text": "kotlin.custom-compiler-plugins",

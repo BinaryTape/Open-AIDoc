@@ -85,7 +85,7 @@
   "kotlin.kotlin-overview": "Kotlin 概覽",
   "kotlin.what-s-new-in-kotlin": "Kotlin 新功能",
   "kotlin.whatsnew22": "Kotlin 2.2.0",
-  "kotlin.whatsnew-eap": "Kotlin 2.5.0-Beta1",
+  "kotlin.whatsnew-eap": "Kotlin 2.5.0-Beta2",
   "kotlin.earlier-versions": "更早版本",
   "kotlin.whatsnew2120": "Kotlin 2.1.20",
   "kotlin.whatsnew21": "Kotlin 2.1.0",
@@ -744,5 +744,8 @@
   "compare.before": "修改前",
   "compare.after": "修改後",
   "kotlin.jvm-backend-faq": "常見問題",
-  "kotlin.reflection": "反射 (kotlin-reflect)"
+  "kotlin.reflection": "反射 (kotlin-reflect)",
+  "kotlin.kotlin-jpa-plugin": "JPA",
+  "kotlin.kotlin-spring-plugin": "Spring",
+  "kmp.whats-new-compose-113": "Compose Multiplatform %org.jetbrains.compose-eap%"
 }

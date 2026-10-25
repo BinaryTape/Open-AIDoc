@@ -1,26 +1,31 @@
 [//]: # (title: トレイと通知)
-<web-summary>Compose Multiplatform for desktop において、システムトレイにアプリケーションアイコンを追加し、システム通知を送信する方法について学びます。</web-summary>
+<web-summary>デスクトップ向け Compose Multiplatform でシステムトレイにアプリケーションアイコンを追加し、システム通知を送信する方法について学びます。</web-summary>
 
-Compose Multiplatform for desktop では、システムトレイにアプリケーションアイコンを追加し、そこからシステム通知を送信することができます。
+デスクトップ向け Compose Multiplatform では、システムトレイにアプリケーションアイコンを追加し、そこからシステム通知を送信できます。
 
-undefined
+> このガイドの例は実行可能なデスクトップアプリです。試すには以下の手順を行ってください。
+> 1. [Kotlin Multiplatform IDE プラグイン](https://plugins.jetbrains.com/plugin/14936-kotlin-multiplatform)または[オンラインウィザード](https://kmp.jetbrains.com/?android=true&desktop=true&includeTests=false)を使用して Compose Multiplatform プロジェクトを作成します。
+> 2. デスクトップのエントリポイントファイル（例: `desktopApp/src/main/kotlin/com/example/my_desktop_app/main.kt`）を開きます。
+> 3. その内容を提供されたサンプルコードに置き換えます。
+>
+{style="note" id="desktop-snippets-intro"}
 
 ## システムトレイ {id="system-tray"}
 
-システムトレイにアプリケーションアイコンを追加するには、`Tray()` コンポーザブルを使用します。`Tray()` は `application()` 関数のスコープ内で利用可能なため、アプリケーションウィンドウと並行して、あるいは単独で呼び出すことができます。
+システムトレイにアプリケーションアイコンを追加するには、`Tray()` コンポーザブルを使用します。`Tray()` は `application()` 関数のスコープ内で利用可能なため、アプリケーションウィンドウと並べて呼び出すことも、単独で呼び出すこともできます。
 
-`Tray()` コンポーザブルには、以下のパラメータがあります。
+`Tray()` コンポーザブルには以下のパラメータがあります。
 
-* `icon` – トレイアイコンを描画する `Painter` です。
-* `menu` – トレイメニューの内容です。Windows では右クリック、macOS では左クリックでメニューが開きます。項目を追加しない場合、メニューは表示されません。
-* `state` – 通知の送信に使用される `TrayState` です。
-* `tooltip` – ユーザーがアイコンの上にマウスを置いた（ホバーした）ときに表示されるヒントです。
-* `onAction` – アイコンをクリックしたときにトリガーされるアクションです。Windows ではダブルクリック、macOS では右クリックとなります。
+* `icon` – トレイアイコンを描画する `Painter`。
+* `menu` – トレイメニューの内容。メニューは Windows では右クリック、macOS では左クリックで開きます。項目を追加しない場合、メニューは表示されません。
+* `state` – 通知の送信に使用される `TrayState`。
+* `tooltip` – ユーザーがアイコンの上にマウスカーソルを置いたときに表示されるヒント。
+* `onAction` – アイコンをクリックしたときにトリガーされるアクション。Windows ではダブルクリック、macOS では右クリックです。
 
-以下の例では、3 つのメニュー項目を持つアプリケーションアイコンをトレイに作成します。
-* **Increment value**：ウィンドウに表示されている状態（値）を変更します。
-* **Send notification**：システム通知を送信します。
-* **Exit**：アプリケーションを終了します。
+以下の例では、トレイに3つのメニュー項目を持つアプリケーションアイコンを作成します。
+* **Increment value** は、ウィンドウに表示される状態を変更します。
+* **Send notification** は、システム通知を送信します。
+* **Exit** は、アプリケーションを終了します。
 
 ```kotlin
 import androidx.compose.foundation.layout.Box
@@ -82,7 +87,7 @@ fun main() = application {
             },
             icon = MyAppIcon
         ) {
-            // Window content:
+            // ウィンドウのコンテンツ:
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -115,11 +120,11 @@ object TrayIcon : Painter() {
 
 <img src="compose-desktop-tray.animated.gif" alt="Tray menu and notification" width="600" preview-src="compose-desktop-tray.png"/>
 
-すべてのデスクトップ環境にシステムトレイがあるわけではありません。プラットフォームがサポートしていない場合、`Tray()` は例外をスローする代わりに、標準エラー出力にエラーを出力します。アプリケーションでトレイ関連のオプションを表示する前に、`isTraySupported` プロパティを確認してください。
+すべてのデスクトップ環境にシステムトレイがあるわけではありません。プラットフォームがトレイをサポートしていない場合、`Tray()` は例外をスローする代わりに標準エラー出力にエラーを出力します。アプリケーションでトレイ関連のオプションを表示する前に、`isTraySupported` プロパティを確認してください。
 
 ### ウィンドウなしのトレイ {id="tray-without-a-window"}
 
-アプリケーションにトレイアイコンを表示させるために、必ずしもウィンドウが必要なわけではありません。`Tray()` 関数のみが呼び出された場合、アプリケーションは完全にシステムトレイ内のみで実行されます。
+トレイアイコンを持つために、アプリケーションに必ずしもウィンドウが必要なわけではありません。`Tray()` 関数のみが呼び出された場合、アプリケーションは完全にシステムトレイ内だけで実行されます。
 
 ```kotlin
 import androidx.compose.ui.geometry.Size
@@ -151,21 +156,21 @@ object TrayIcon : Painter() {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="Tray(icon = TrayIcon, menu = { Item( "}
 
-閉じるためのウィンドウが存在しないため、メニュー項目から `exitApplication()` を呼び出す必要があります。
+閉じるウィンドウが存在しないため、メニュー項目から `exitApplication()` を呼び出す必要があります。
 
 ## 通知 {id="notifications"}
 
-システム通知を送信するには、[システムトレイの例](#system-tray)のように `rememberNotification()` で通知を作成し、それを `TrayState.sendNotification()` に渡します。通知は、`Tray()` コンポーザブルに渡された `TrayState` を通じて配信されます。ステートがトレイに関連付けられていない場合、通知は失われます。
+システム通知を送信するには、[システムトレイの例](#system-tray)のように、`rememberNotification()` で通知を作成し、`TrayState.sendNotification()` に渡します。通知は `Tray()` コンポーザブルに渡された `TrayState` を介して配信されます。状態がトレイに関連付けられていない場合、通知は失われます。
 
-通知は、タイトル、メッセージ、および通知のアイコンと音を定義するタイプ（Type）で構成されます。利用可能なタイプは、`None`（デフォルト）、`Info`、`Warning`、`Error` です。
+通知は、タイトル、メッセージ、および通知のアイコンとサウンドを定義するタイプで構成されます。利用可能なタイプは、`None`（デフォルトオプション）、`Info`、`Warning`、`Error` です。
 
-アイコンや音に使用される具体的なアセットは、プラットフォームによって異なります。
+アイコンとサウンドに使用される特定のアセットは、プラットフォームによって異なります。
 
-> macOS で通知をテストするには、アプリがパッケージ化（packaged）されている必要があります。そうでない場合、通知は表示されません。
+> macOS で通知をテストするには、アプリがパッケージ化されている必要があります。パッケージ化されていない場合、通知は表示されません。
 >
 {style="note"}
 
 ## 次のステップ {id="what-s-next"}
 
-* ウィンドウに [メニューバー](compose-desktop-menu-bar.md) を追加する方法を学ぶ。
-* [その他のデスクトップコンポーネント](compose-desktop-components.md) に関するチュートリアルを確認する。
+* ウィンドウに[メニューバー](compose-desktop-menu-bar.md)を追加する方法を学ぶ。
+* [その他のデスクトップコンポーネント](compose-desktop-components.md)に関するチュートリアルを確認する。
