@@ -1,0 +1,2 @@
+# pnpm checks a patch by its hash: keep LF on Windows checkouts too.
+patches/*.patch text eol=lf
