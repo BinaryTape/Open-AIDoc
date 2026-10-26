@@ -27,6 +27,7 @@ const { exportRepoChanges } = await import('../tools/pipeline/sync-artifacts.mjs
 const { defaultStrategy } = await import('../tools/pipeline/sync-strategies/strategy.mjs')
 const { koogStrategy } = await import('../tools/pipeline/sync-strategies/strategy-koog.mjs')
 const { FatalApiError } = await import('../tools/pipeline/utils/llm-retry.mjs')
+const { snapshotSource } = await import('../tools/pipeline/utils/snapshot-source.mjs')
 
 const LANGS = ['zh-Hans', 'zh-Hant', 'ja', 'ko']
 const LOCALE_PREFIX: Record<string, string> = { 'zh-Hans': '', 'zh-Hant': 'zh-Hant/', ja: 'ja/', ko: 'ko/' }
@@ -512,5 +513,86 @@ describe('docs pipeline split into per-repository CI jobs', () => {
     expect(git(dir, 'rev-list', '--count', 'HEAD')).toBe('2') // skeleton + the earlier sync, nothing new
     expect(git(dir, 'status', '--porcelain')).toBe('')
     expect(report).toContain('| demo | — no changes |')
+  })
+})
+
+// Koin: the docs are a snapshot the strategy fetches, not a git repository
+describe('docs pipeline with a snapshot source', () => {
+  let snapshot: Record<string, string>
+  const snap = {
+    ...repos[0], id: 'snap', docType: 'snap', sidebarId: 'snap', repo: 'test/snap', cloneDir: 'snap-repo',
+    lastCheckFile: '.github/last_check_snap.txt',
+    syncStrategy: { ...defaultStrategy, source: snapshotSource(async () => ({ ...snapshot })) },
+  }
+  const runSnap = () => runPipeline({ repos: [snap], repoUrl })
+
+  beforeEach(() => {
+    snapshot = {
+      'docs/guide.md': doc('Guide', ['Install', 'Configure', 'Run']),
+      'docs/nested/setup.md': doc('Setup', ['Gradle', 'Maven', 'Verify']),
+    }
+  })
+
+  it('translates every page first, then only the pages whose content changed', async () => {
+    await runSnap()
+
+    expect(markdownCalls()).toHaveLength(2 * LANGS.length)
+    LANG_FILES('snap/nested/setup.md').forEach((file) => expect(originHas(file), file).toBe(true))
+    const sources = JSON.parse(readSite('.github/last_check_snap.sources.json'))
+    expect(Object.keys(sources.files)).toEqual(['docs/guide.md', 'docs/nested/setup.md'])
+    expect(readSite('.github/last_check_snap.txt')).toBe(sources.version)
+    expect(originHas('.github/last_check_snap.sources.json')).toBe(true)
+
+    snapshot['docs/guide.md'] = doc('Guide', ['Install', 'Configure', 'Run', 'Upgrade'])
+    generateContent.mockClear()
+    await runSnap()
+
+    expect(markdownCalls()).toHaveLength(LANGS.length)
+    expect(markdownCalls().every(([{ contents }]) => contents.includes('## Upgrade'))).toBe(true)
+    expect(readSite('docs/ja/snap/guide.md')).toContain('[ja] Details about Upgrade.')
+
+    const commits = originLog().length
+    generateContent.mockClear()
+    await runSnap()
+
+    expect(markdownCalls()).toHaveLength(0)
+    expect(originLog()).toHaveLength(commits)
+    expect(git(site(), 'status', '--porcelain')).toBe('')
+  })
+
+  it('translates every page once when a git checkpoint is switched to a snapshot', async () => {
+    // Koin's checkpoint is a commit of InsertKoinIO/koin until its first snapshot sync
+    write(site(), { '.github/last_check_snap.txt': 'dc86ef8dd8fbe8564fb7453c03f5b738da3450bb' })
+    git(site(), 'add', '-A')
+    git(site(), 'commit', '-q', '-m', 'git checkpoint')
+    git(site(), 'push', '-q', 'origin', 'main')
+
+    await runSnap()
+
+    expect(markdownCalls()).toHaveLength(2 * LANGS.length)
+    expect(readSite('.github/last_check_snap.txt')).toBe(JSON.parse(readSite('.github/last_check_snap.sources.json')).version)
+  })
+
+  it('removes a page the snapshot no longer has', async () => {
+    await runSnap()
+    delete snapshot['docs/nested/setup.md']
+    generateContent.mockClear()
+
+    await runSnap()
+
+    expect(markdownCalls()).toHaveLength(0)
+    LANG_FILES('snap/nested/setup.md').forEach((file) => expect(originHas(file), file).toBe(false))
+    expect(originHas('docs/snap/guide.md')).toBe(true)
+  })
+
+  it('changes nothing when the snapshot cannot be fetched', async () => {
+    await runSnap()
+    const commits = originLog().length
+    const broken = { ...snap, syncStrategy: { ...defaultStrategy, source: snapshotSource(async () => { throw new Error('format changed') }) } }
+
+    await expect(translateRepos({ repos: [broken], repoUrl })).rejects.toThrow('format changed')
+
+    expect(originLog()).toHaveLength(commits)
+    expect(readSite('docs/snap/guide.md')).toContain('[zh-Hans]')
   })
 })

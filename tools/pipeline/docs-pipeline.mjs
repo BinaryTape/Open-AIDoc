@@ -49,6 +49,34 @@ const files = {
     ].map((fp) => fp.replace(/\\/g, "/")),
 };
 
+/**
+ * Where a repository's docs come from: its git repository, cloned, unless its
+ * strategy names another source (utils/snapshot-source.mjs).
+ */
+const gitSource = {
+  update: async (repoConfig, context) => {
+    if (!(await fs.pathExists(repoConfig.cloneDir))) {
+      console.log(`Cloning full history of ${repoConfig.repo}...`);
+      await git.clone(context.repoUrl(repoConfig), repoConfig.cloneDir, repoConfig.branch);
+    } else {
+      console.log(`Repository ${repoConfig.repo} already exists, fetching latest changes...`);
+      await git.update(repoConfig.cloneDir, repoConfig.branch);
+    }
+  },
+  version: async (repoConfig) => git.getCurrentSha(repoConfig.cloneDir),
+  changedFiles: async (repoConfig, lastVersion) => git.getChangedFiles(repoConfig.cloneDir, lastVersion),
+  checkpoint: async () => [],
+};
+
+const sourceOf = (repoConfig) => repoConfig.syncStrategy.source ?? gitSource;
+
+/** Move the checkpoint to this version, with what the source records next to it. */
+async function saveCheckpoint(context, repoConfig, version) {
+  await fs.outputFile(repoConfig.lastCheckFile, version);
+  context.gitAddPaths.add(repoConfig.lastCheckFile);
+  (await sourceOf(repoConfig).checkpoint(repoConfig)).forEach((p) => context.gitAddPaths.add(p));
+}
+
 // =================================================================
 // STAGE 1: SYNC - Clone repositories and prepare
 // =================================================================
@@ -56,19 +84,8 @@ async function sync(context) {
   Logger.step("STAGE 1: Setting up repositories...");
   for (const repoConfig of context.repos) {
     console.log(`\n--- Processing repository: ${repoConfig.id} (${repoConfig.docType}) ---`);
-    const repoExists = await fs.pathExists(repoConfig.cloneDir);
-    const repoUrl = context.repoUrl(repoConfig);
-
-    if (!repoExists) {
-      console.log(`Cloning full history of ${repoConfig.repo}...`);
-      await git.clone(repoUrl, repoConfig.cloneDir, repoConfig.branch);
-    } else {
-      console.log(
-        `Repository ${repoConfig.repo} already exists, fetching latest changes...`
-      );
-      await git.update(repoConfig.cloneDir, repoConfig.branch);
-    }
-    // Before postSync: a curated sidebar (Koin) then drops the removed pages too
+    await sourceOf(repoConfig).update(repoConfig, context);
+    // Before postSync, so a sidebar written there no longer lists removed pages
     await removeStale(context, repoConfig);
     await repoConfig.syncStrategy.postSync(
       repoConfig.cloneDir,
@@ -105,7 +122,8 @@ async function detect(context) {
   Logger.step("STAGE 2: Detecting changes...");
   for (const repoConfig of context.repos) {
     const lastSha = await files.getLastCommitSha(repoConfig.lastCheckFile);
-    const currentSha = await git.getCurrentSha(repoConfig.cloneDir);
+    const source = sourceOf(repoConfig);
+    const currentSha = await source.version(repoConfig);
     const pending = await readPending(repoConfig);
     const pendingCount = Object.keys(pending).length;
 
@@ -128,11 +146,9 @@ async function detect(context) {
       );
       const docPatterns = repoConfig.syncStrategy.getDocPatterns();
       const allDocs = await files.find(repoConfig.cloneDir, docPatterns);
-      changedDocs = isFirstRun
-        ? allDocs
-        : (await git.getChangedFiles(repoConfig.cloneDir, lastSha)).filter(
-            (f) => allDocs.includes(f)
-          );
+      // null: the source has nothing to compare with, every document is new
+      const changed = isFirstRun ? null : await source.changedFiles(repoConfig, lastSha);
+      changedDocs = changed === null ? allDocs : changed.filter((f) => allDocs.includes(f));
     } else {
       Logger.dim("No new commits detected in the repository.");
     }
@@ -140,8 +156,7 @@ async function detect(context) {
     if (changedDocs.length === 0 && pendingCount === 0) {
       if (isFirstRun || hasChanged) {
         Logger.dim("No relevant documents changed, updating checkpoint.");
-        await fs.outputFile(repoConfig.lastCheckFile, currentSha);
-        context.gitAddPaths.add(repoConfig.lastCheckFile);
+        await saveCheckpoint(context, repoConfig, currentSha);
       }
       continue;
     }
@@ -193,8 +208,7 @@ async function translate(context) {
       context.pendingReport.push({ repo: repoConfig.id, file, langs, reason });
     }
 
-    await fs.outputFile(repoConfig.lastCheckFile, task.newSha);
-    context.gitAddPaths.add(repoConfig.lastCheckFile);
+    await saveCheckpoint(context, repoConfig, task.newSha);
   }
 }
 

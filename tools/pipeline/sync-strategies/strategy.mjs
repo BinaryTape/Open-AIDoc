@@ -7,6 +7,13 @@
  */
 export const defaultStrategy = {
   /**
+   * Where the docs come from, when not from cloning the repository: an
+   * object with update, version, changedFiles and checkpoint, such as
+   * utils/snapshot-source.mjs (Koin). null: the git repository.
+   */
+  source: null,
+
+  /**
    * Gets the glob patterns for the document files to be processed.
    * @returns {string[]}
    */
