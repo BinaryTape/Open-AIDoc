@@ -1,50 +1,67 @@
 [//]: # (title: Swing 互操作性)
 
-在这里，您将学习如何在 Compose Multiplatform 应用程序中使用 Swing 组件，反之亦然，了解这种互操作性的限制和优势，以及何时应该或不应该使用这种方法。
+在这里，你将了解如何在 Compose Multiplatform 应用程序中使用 Swing 组件，反之亦然；了解这种互操作性的局限性与优势，以及何时应该或不应该采用这种方法。
 
-Compose Multiplatform 和 Swing 之间的互操作性旨在帮助您：
-* 简化并平滑将 Swing 应用程序迁移到 Compose Multiplatform 的过程。
-* 在没有可用的 Compose 类似物时，使用 Swing 组件增强 Compose Multiplatform 应用程序。
+Compose Multiplatform 与 Swing 之间的互操作性旨在帮助你：
+* 简化并平稳推进 Swing 应用程序向 Compose Multiplatform 的迁移过程。
+* 在没有可用的 Compose 对应组件时，使用 Swing 组件增强 Compose Multiplatform 应用程序。
 
-在许多情况下，直接在 Compose Multiplatform 中实现缺失的组件（并将其贡献给社区）比在 Compose Multiplatform 应用程序中使用 Swing 组件更有效。
+在很多情况下，直接在 Compose Multiplatform 中实现缺失的组件（并将其贡献给社区），要比在 Compose Multiplatform 应用程序中使用 Swing 组件更有效。
 
-undefined
+> 本指南中的示例均为可运行的桌面应用程序。如需试用：
+> 1. 使用 [Kotlin Multiplatform IDE 插件](https://plugins.jetbrains.com/plugin/14936-kotlin-multiplatform) 或 [在线向导](https://kmp.jetbrains.com/?android=true&desktop=true&includeTests=false) 创建一个 Compose Multiplatform 项目。
+> 2. 打开桌面端入口点文件。例如 `desktopApp/src/main/kotlin/com/example/my_desktop_app/main.kt`。
+> 3. 将其内容替换为所提供的示例代码。
+>
+{style="note" id="desktop-snippets-intro"}
 
-## Swing 互操作用例与限制 {id="swing-interop-use-cases-and-limitations"}
+## Swing 互操作用例与局限性 {id="swing-interop-use-cases-and-limitations"}
 
 ### Swing 应用中的 Compose Multiplatform 组件 {id="compose-multiplatform-component-in-a-swing-app"}
 
-第一个用例涉及将 Compose Multiplatform 组件添加到 Swing 应用程序中。您可以通过使用 `ComposePanel` Swing 组件来渲染应用程序的 Compose Multiplatform 部分。从 Swing 的角度来看，`ComposePanel` 是另一个 Swing 组件，并会对其进行相应处理。
+第一种用例是将 Compose Multiplatform 组件添加到 Swing 应用程序中。
+你可以使用 `ComposePanel` Swing 组件来呈现应用程序的 Compose Multiplatform 部分。
+从 Swing 的角度来看，`ComposePanel` 就是另一个普通的 Swing 组件，并会对其进行相应的处理。
 
-请注意，所有 Compose Multiplatform 组件（包括弹出窗口、工具提示和上下文菜单）都在 Swing 的 `ComposePanel` 内渲染，并在其内部定位和调整大小。因此，请考虑将这些组件替换为基于 Swing 的实现，或者尝试两个新的实验性功能：
+请注意，所有 Compose Multiplatform 组件（包括弹出窗口、工具提示和上下文菜单）都在 Swing 的 `ComposePanel` 内呈现，并在其内部进行定位和调整大小。
+因此，建议考虑将这些组件替换为基于 Swing 的实现，或者尝试两项新的实验性功能：
 
-[离屏渲染](#experimental-off-screen-rendering) 
-: 允许直接在 Swing 组件上渲染 Compose 面板。
+[离屏渲染（Off-screen rendering）](#experimental-off-screen-rendering)
+: 允许直接在 Swing 组件上呈现 Compose 面板。
 
-[弹出窗口、对话框和下拉菜单的独立平台视图](#experimental-separate-views-for-popups)
-: 弹出窗口不再受初始可组合画布或应用窗口的限制。
+[为弹出窗口、对话框和下拉菜单提供独立的平台视图](#experimental-separate-views-for-popups)
+: 弹出窗口不再受限于初始可组合画布或应用程序窗口。
 
 以下是使用 `ComposePanel` 的几种场景：
-* 在您的应用程序中嵌入动画对象或整个动画对象面板（例如，表情符号选择或带有事件动画反应的工具栏）。
-* 在应用程序中实现交互式渲染区域（例如图形或信息图表），使用 Compose Multiplatform 实现这些功能更加简单方便。
-* 在应用程序中集成复杂的渲染区域（甚至可能是动画效果），使用 Compose Multiplatform 会更简单。
-* 替换基于 Swing 应用程序中复杂的界面部分，因为 Compose Multiplatform 提供了一个方便的组件布局系统，以及广泛的内置组件和用于快速创建自定义组件的选项。
+* 在应用程序中嵌入动画对象或由动画对象组成的整个面板（例如，表情符号选择器或带有事件动画回应的工具栏）。
+* 在应用程序中实现交互式呈现区域（如图形或信息图表），使用 Compose Multiplatform 可以更轻松、便捷地完成这一工作。
+* 在应用程序中集成复杂的呈现区域（甚至可能带有动画效果），这在 Compose Multiplatform 中更为简单。
+* 替换基于 Swing 的应用程序中复杂的用户界面部分，因为 Compose Multiplatform 提供了便捷的组件布局系统，以及丰富的内置组件和快速创建自定义组件的选项。
 
 ### Compose Multiplatform 应用中的 Swing 组件 {id="swing-component-in-a-compose-multiplatform-app"}
 
-另一个用例是当您需要使用 Swing 中存在但 Compose Multiplatform 中没有类似物的组件时。如果从头开始创建新实现太耗时，请尝试使用 `SwingPanel`。`SwingPanel` 函数作为一个包装器，管理放置在 Compose Multiplatform 组件顶部的 Swing 组件的大小、位置和渲染。
+另一种用例是当你需要使用某个在 Swing 中存在但在 Compose Multiplatform 中没有对应物的组件。
+如果从头开始创建新的实现过于耗时，可以尝试使用 `SwingPanel`。`SwingPanel` 函数作为一个包装器，负责管理放置在 Compose Multiplatform 组件之上的 Swing 组件的大小、位置和呈现。
 
-请注意，`SwingPanel` 中的 Swing 组件将始终分层在 Compose Multiplatform 组件之上，因此位于 `SwingPanel` 下方的任何内容都将被 Swing 组件剪裁。要避免剪裁和重叠问题，请尝试 [实验性互操作混合](#experimental-interop-blending)。如果仍然存在渲染不正确的风险，您可以相应地重新设计 UI，或者避免使用 `SwingPanel` 并尝试实现缺失的组件，从而为技术开发做出贡献。
+请注意，`SwingPanel` 内的 Swing 组件将始终分层位于 Compose Multiplatform 组件之上，
+因此放置在 `SwingPanel` 下方的任何内容都会被该 Swing 组件裁剪掉。为了避免裁剪和重叠问题，
+可以尝试[实验性互操作混合（experimental interop blending）](#experimental-interop-blending)。如果仍然存在渲染错误的风险，
+你可以相应地重新设计 UI，或者避免使用 `SwingPanel` 并尝试自己实现缺失的组件，为技术生态做出贡献。
 
 以下是使用 `SwingPanel` 的场景：
-* 您的应用程序不需要弹出窗口、工具提示或上下文菜单，或者至少它们不在您的 `SwingPanel` 内部。
-* `SwingPanel` 保持在固定位置。在这种情况下，您可以降低当 Swing 组件位置发生变化时出现故障和伪影的风险。然而，这种情况并非强制性的，应针对每个具体案例进行测试。
+* 你的应用程序不需要弹出窗口、工具提示或上下文菜单，或者至少它们不在你的 `SwingPanel` 内部。
+* `SwingPanel` 保持在固定位置。在这种情况下，可以降低 Swing 组件位置变化时出现画面失真和瑕疵的风险。
+不过，该条件并非强制性的，应根据具体情况进行测试。
   
-Compose Multiplatform 和 Swing 可以以两种方式结合，从而实现灵活的 UI 设计。您可以将 `SwingPanel` 放置在 `ComposePanel` 内部，而 `ComposePanel` 也可以在另一个 `SwingPanel` 内部。但在使用这种嵌套组合之前，请考虑潜在的渲染故障。有关代码示例，请参阅 [带有嵌套 SwingPanel 和 ComposePanel 的布局](#layout-with-nested-swing-and-compose-multiplatform-components)。
+Compose Multiplatform 和 Swing 可以双向组合，从而实现灵活的 UI 设计。你可以将 `SwingPanel` 放在 `ComposePanel` 内部，
+而该 `ComposePanel` 还可以再嵌套在另一个 `SwingPanel` 内部。
+但在使用此类嵌套组合之前，请充分考虑潜在的渲染瑕疵问题。
+有关代码示例，请参阅[嵌套 `SwingPanel` 和 `ComposePanel` 的布局](#layout-with-nested-swing-and-compose-multiplatform-components)。
 
 ## 在 Swing 应用程序中使用 Compose Multiplatform {id="use-compose-multiplatform-in-a-swing-application"}
 
-`ComposePanel` 允许您在基于 Swing 的应用程序中使用 Compose Multiplatform 创建 UI。将 `ComposePanel` 实例添加到 Swing 布局中，并在 `setContent` 中定义组合：
+`ComposePanel` 允许你在基于 Swing 的应用程序中使用 Compose Multiplatform 构建 UI。
+将 `ComposePanel` 实例添加到 Swing 布局中，并在 `setContent` 中定义组合（Composition）：
 
 ```kotlin
 import androidx.compose.foundation.layout.Box
@@ -169,28 +186,33 @@ fun Counter(text: String, counter: MutableState<Int>) {
 
 ### 实验性离屏渲染 {id="experimental-off-screen-rendering"}
 
-一种实验性模式允许直接在 Swing 组件上渲染 `ComposePanel`。这可以防止在显示、隐藏或调整 `ComposePanel` 大小时出现过渡渲染问题。它还可以在组合 Swing 组件和 Compose 面板时实现正确的层级：Swing 组件可以显示在 `ComposePanel` 之上或之下。然而，与默认的 Skia 渲染相比，这可能会导致性能损失，且损失随着面板尺寸的增加而增加。
+一种实验性模式允许直接在 Swing 组件上呈现 `ComposePanel`。
+这样可以防止在显示、隐藏或调整 `ComposePanel` 大小时出现过渡渲染问题。
+它还可以在组合 Swing 组件和 Compose 面板时实现正确的层叠：Swing 组件可以显示在 `ComposePanel` 之上或下方。
+然而，与默认的 Skia 渲染相比，这可能会带来性能损失，并且该损失会随着面板尺寸的增大而增加。
 
-此模式仅影响 `ComposePanel` 组件。目前，`ComposeWindow` 或 `ComposeDialog` 没有相应的设置。
+此模式仅影响 `ComposePanel` 组件。
+目前，`ComposeWindow` 或 `ComposeDialog` 还没有相应的设置。
 
-> 离屏渲染处于 [实验性](supported-platforms.md#compose-multiplatform-ui-framework-stability-levels) 阶段，您应仅将其用于评估目的。
+> 离屏渲染属于[实验性功能](supported-platforms.md#compose-multiplatform-ui-framework-stability-levels)，
+> 应仅用于评估目的。
 >
 {style="warning"}
 
-要为特定的 `ComposePanel` 启用离屏渲染，请在创建它时传递 `RenderSettings.SwingGraphics` 值：
+要为特定的 `ComposePanel` 启用离屏渲染，请在创建时传入 `RenderSettings.SwingGraphics` 值：
 
 ```kotlin
 val composePanel = ComposePanel(renderSettings = RenderSettings.SwingGraphics)
 ```
 
-要在项目中默认对每个 `ComposePanel` 启用离屏渲染，请使用 `compose.swing.render.on.graphics` 功能标志：
+要为项目中的每个 `ComposePanel` 默认启用离屏渲染，请使用 `compose.swing.render.on.graphics` 特性标志：
 
 * 在启动时将该标志指定为命令行 JVM 参数：
 
     ```shell
     -Dcompose.swing.render.on.graphics=true
     ```
-* 或者在入口点将该标志作为参数传递给 `System.setProperty()` 函数：
+* 或者在入口点将其作为实参传递给 `System.setProperty()` 函数：
 
     ```kotlin
     fun main() {
@@ -199,19 +221,20 @@ val composePanel = ComposePanel(renderSettings = RenderSettings.SwingGraphics)
     }
     ```
 
-### 实验性弹出窗口独立视图 {id="experimental-separate-views-for-popups"}
+### 为弹出窗口提供独立视图（实验性） {id="experimental-separate-views-for-popups"}
 
-弹出元素（如工具提示和下拉菜单）不受初始可组合画布或应用窗口的限制，这一点可能非常重要。例如，当可组合视图未占据全屏但需要生成警告对话框时。
+弹出元素（如工具提示和下拉菜单）不受初始可组合画布或应用程序窗口的限制，这一点有时非常重要。例如，当可组合视图未占据全屏但需要弹出一个提示对话框时。
 
-> 为弹出窗口创建独立的视图或窗口处于 [实验性](supported-platforms.md#compose-multiplatform-ui-framework-stability-levels) 阶段。需要选择加入（详情见下文），且您应仅将其用于评估目的。
+> 为弹出窗口创建独立视图或窗口属于[实验性功能](supported-platforms.md#compose-multiplatform-ui-framework-stability-levels)。需要选择启用（Opt-in，详见下文），
+> 且仅应将其用于评估目的。
 >
 {style="warning"}
 
-要在桌面上为弹出窗口创建独立的视图或窗口，请设置 `compose.layers.type` 系统属性。支持的值包括：
-* `WINDOW` 将 `Popup` 和 `Dialog` 组件创建为独立的无边框窗口。
-* `COMPONENT` 在同一窗口中将 `Popup` 或 `Dialog` 创建为独立的 Swing 组件。请注意，该设置需要启用离屏渲染（参见 [实验性离屏渲染](#experimental-off-screen-rendering) 部分），且离屏渲染仅适用于 `ComposePanel` 组件，而不适用于全窗口应用程序。
+要在桌面端为弹出窗口创建独立视图或窗口，请设置 `compose.layers.type` 系统属性。支持的值包括：
+* `WINDOW` 将 `Popup` 和 `Dialog` 组件创建为独立的无装饰窗口。
+* `COMPONENT` 将 `Popup` 或 `Dialog` 创建为同一窗口内的独立 Swing 组件。请注意，该设置需要启用离屏渲染（参见[实验性离屏渲染](#experimental-off-screen-rendering)部分），且离屏渲染仅对 `ComposePanel` 组件生效，对全窗口应用程序无效。
 
-请注意，弹出窗口和对话框仍然无法在其自身边界之外绘制任何内容（例如，最顶层容器的阴影）。
+请注意，弹出窗口和对话框仍然无法在其自身边界之外绘制任何内容（例如最顶层容器的阴影）。
 
 以下是使用 `COMPONENT` 属性的代码示例：
 
@@ -249,7 +272,7 @@ fun main() = SwingUtilities.invokeLater {
         ComposeContent()
     }
     
-    // 将整个窗口用于对话框
+    // 对话框使用全窗口
     composePanel.windowContainer = contentPane
     contentPane.add(composePanel)
 
@@ -271,7 +294,8 @@ fun ComposeContent() {
 
 ## 在 Compose Multiplatform 应用程序中使用 Swing {id="use-swing-in-a-compose-multiplatform-application"}
 
-`SwingPanel` 允许您在 Compose Multiplatform 应用程序中使用 Swing 创建 UI。使用 `SwingPanel` 的 `factory` 参数来创建 Swing `JPanel`：
+`SwingPanel` 允许你在 Compose Multiplatform 应用程序中使用 Swing 构建 UI。
+使用 `SwingPanel` 的 `factory` 形参来创建 Swing 的 `JPanel`：
 
 ```kotlin
 import androidx.compose.foundation.layout.Box
@@ -365,9 +389,10 @@ fun actionButton(
 
 <img src="compose-desktop-swingpanel.animated.gif" alt="SwingPanel" preview-src="compose-desktop-swingpanel.png" width="600"/>
 
-### 当 Compose 状态更改时更新 Swing 组件 {id="update-swing-components-when-compose-state-changes"}
+### 在 Compose 状态改变时更新 Swing 组件 {id="update-swing-components-when-compose-state-changes"}
 
-为了使 Swing 组件保持最新状态，请提供一个 `update: (T) -> Unit` 回调，每当可组合状态更改或布局加载时，该回调都会被调用。以下代码示例演示了每当可组合状态更改时，如何更新 `SwingPanel` 中的 Swing 组件：
+为了使 Swing 组件保持最新状态，可以提供一个 `update: (T) -> Unit` 回调，每当可组合状态发生变化或布局膨胀（inflate）时都会调用该回调。
+以下代码示例演示了如何在可组合状态更改时更新 `SwingPanel` 内的 Swing 组件：
 
 ```kotlin
 import androidx.compose.foundation.layout.Column
@@ -440,13 +465,16 @@ fun main() = application {
 
 ### 实验性互操作混合 {id="experimental-interop-blending"}
 
-默认情况下，使用 `SwingPanel` 包装器实现的互操作视图是矩形的，并位于前景，在任何 Compose Multiplatform 组件之上。为了使弹出元素更易于使用，我们引入了对互操作混合的实验性支持。
+默认情况下，使用 `SwingPanel` 包装器实现的互操作视图是矩形的，位于前景中，并且覆盖在任何 Compose Multiplatform 组件之上。为了使弹出元素更易于使用，我们引入了对互操作混合的实验性支持。
 
-> 互操作混合处于 [实验性](supported-platforms.md#compose-multiplatform-ui-framework-stability-levels) 阶段，您应仅将其用于评估目的。
+> 互操作混合属于[实验性功能](supported-platforms.md#compose-multiplatform-ui-framework-stability-levels)，
+> 应仅用于评估目的。
 >
 {style="warning"}
 
-要启用此实验性功能，请将 `compose.interop.blending` 系统属性设置为 `true`。该属性必须在执行应用程序中的任何 Compose 代码之前启用，因此请通过 `-Dcompose.interop.blending=true` 命令行 JVM 参数设置它，或者在入口点使用 `System.setProperty()`：
+要启用此实验性功能，请将 `compose.interop.blending` 系统属性设置为 `true`。
+该属性必须在应用程序执行任何 Compose 代码之前启用，
+因此请通过 `-Dcompose.interop.blending=true` 命令行 JVM 参数设置它，或在入口点使用 `System.setProperty()`：
 
 ```kotlin
 fun main() {
@@ -455,18 +483,18 @@ fun main() {
 }
 ```
 
-启用互操作混合后，您可以在以下用例中依赖 Swing：
+启用互操作混合后，你可以在以下用例中使用 Swing：
 
-* **剪裁**。您不再受矩形形状的限制：`clip` 和 `shadow` 修饰符可以与 `SwingPanel` 配合使用。
-* **重叠**。可以在 `SwingPanel` 之上绘制任何 Compose Multiplatform 内容，并像往常一样与其进行交互。
+* **裁剪（Clipping）**。你不再受限于矩形形状：`clip` 和 `shadow` 修饰符可以与 `SwingPanel` 正常协同工作。
+* **重叠（Overlapping）**。可以在 `SwingPanel` 之上绘制任何 Compose Multiplatform 内容，并照常与之进行交互。
 
-有关详情和已知限制，请参阅 [GitHub 上的说明](https://github.com/JetBrains/compose-multiplatform-core/pull/915)。
+有关详细信息和已知限制，请参阅 [GitHub 上的说明](https://github.com/JetBrains/compose-multiplatform-core/pull/915)。
 
-## 带有嵌套 Swing 和 Compose Multiplatform 组件的布局 {id="layout-with-nested-swing-and-compose-multiplatform-components"}
+## 嵌套 Swing 和 Compose Multiplatform 组件的布局 {id="layout-with-nested-swing-and-compose-multiplatform-components"}
 
-通过互操作性，您可以以两种方式结合 Swing 和 Compose Multiplatform：将 Swing 组件添加到 Compose Multiplatform 应用程序中，以及将 Compose Multiplatform 组件添加到 Swing 应用程序中。如果您想嵌套多个组件并自由结合这些方法，此场景也是受支持的。
+借助互操作性，你可以双向组合 Swing 和 Compose Multiplatform：将 Swing 组件添加到 Compose Multiplatform 应用程序中，以及将 Compose Multiplatform 组件添加到 Swing 应用程序中。如果你希望嵌套多个组件并自由组合这两种方案，系统也支持此场景。
 
-以下代码示例演示了如何将 `SwingPanel` 添加到 `ComposePanel` 中，而该 `ComposePanel` 已经位于另一个 `SwingPanel` 内部，从而创建 Swing-Compose Multiplatform-Swing 结构：
+以下代码示例演示了如何将 `SwingPanel` 添加到 `ComposePanel` 中，而该 `ComposePanel` 本身又位于另一个 `SwingPanel` 内，从而构建出 Swing-Compose Multiplatform-Swing 的嵌套结构：
 
 ```kotlin
 import androidx.compose.foundation.*
@@ -642,6 +670,6 @@ fun SelectableItem(
 
 <img src="compose-desktop-swing-layout.animated.gif" alt="Swing layout" preview-src="compose-desktop-swing-layout.png" width="600"/>
 
-## 下一步 {id="what-s-next"}
+## 后续步骤 {id="what-s-next"}
 
-探索有关 [其他桌面特定组件](https://github.com/JetBrains/compose-multiplatform/tree/master/tutorials#desktop) 的教程。
+浏览关于[其他桌面端特有组件](https://github.com/JetBrains/compose-multiplatform/tree/master/tutorials#desktop)的教程。

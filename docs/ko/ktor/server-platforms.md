@@ -1,22 +1,24 @@
-[//]: # (title: 지원 플랫폼)
+[//]: # (title: 지원되는 플랫폼)
 
 Ktor 서버는 Kotlin에서 지원하는 다음 플랫폼에서 사용할 수 있습니다:
 - JVM
-- [네이티브(Native)](server-native.md)
-undefined
+- [Native](server-native.md)
+   > Kotlin/Native 프로젝트에서 Ktor를 사용하려면 [새로운 메모리 관리자(new memory manager)](https://kotlinlang.org/docs/native-memory-manager.html)가 필요하며, 이는 Kotlin 1.7.20부터 기본적으로 활성화되어 있습니다.
+   >
+   {id="newmm-note" style="note"}
 - [JavaScript](https://kotlinlang.org/docs/js-overview.html)
 - [WasmJs](https://kotlinlang.org/docs/wasm-overview.html)
 
-다음 [타겟(targets)](https://kotlinlang.org/docs/multiplatform-dsl-reference.html#targets)들이 지원됩니다:
+다음 [타깃](https://kotlinlang.org/docs/multiplatform-dsl-reference.html#targets)이 지원됩니다:
 
 <table>
 
 <tr>
 <td>
-        타겟 플랫폼
+        타깃 플랫폼
     </td>
     <td>
-        타겟 프리셋
+        타깃 프리셋
     </td>
 </tr>
 

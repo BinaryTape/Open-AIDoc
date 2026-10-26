@@ -1,64 +1,65 @@
-[//]: # (title: JavaプロジェクトにKotlinを追加する – チュートリアル)
+[//]: # (title: Java プロジェクトへの Kotlin の追加 – チュートリアル)
 
-<web-summary>Kotlinを既存のJavaプロジェクトに統合する − MavenまたはGradleビルドファイルを構成し、ソースファイルを整理して、IntelliJ IDEAでJavaコードをKotlinに変換します。</web-summary>
+<web-summary>既存の Java プロジェクトに Kotlin を統合する − Maven または Gradle のビルドファイルの設定、ソースファイルの整理、IntelliJ IDEA での Java コードから Kotlin への変換。</web-summary>
 
-KotlinはJavaと完全に相互運用可能であるため、すべてを書き直すことなく、既存のJavaプロジェクトに段階的に導入できます。
+Kotlin は Java と完全な相互運用性があるため、すべてを書き直すことなく、既存の Java プロジェクトに段階的に導入できます。
 
-このチュートリアルでは、以下の方法を学びます：
+このチュートリアルでは、次の方法を学びます。
 
-* JavaとKotlinの両方のコードをコンパイルするようにMavenまたはGradleビルドツールをセットアップする。
-* プロジェクトディレクトリ内でJavaとKotlinのソースファイルを整理する。
-* IntelliJ IDEAを使用してJavaファイルをKotlinに変換する。
+* Java と Kotlin の両方のコードをコンパイルするように Maven または Gradle ビルドツールを設定する。
+* プロジェクトディレクトリ内で Java および Kotlin のソースファイルを整理する。
+* IntelliJ IDEA を使用して Java ファイルを Kotlin に変換する。
 
-> このチュートリアルでは、既存の任意のJavaプロジェクトを使用するか、MavenとGradleの両方のビルドファイルが既にセットアップされている公開[サンプルプロジェクト](https://github.com/kotlin-hands-on/kotlin-junit-sample/tree/main/complete)をクローンして使用できます。
+> このチュートリアルでは、既存の任意の Java プロジェクトを使用することも、Maven と Gradle の両方のビルドファイルが既にセットアップされている公開 [サンプルプロジェクト](https://github.com/kotlin-hands-on/kotlin-junit-sample/tree/main/complete) をクローンして使用することもできます。
 > 
-> また、[用意されたスキル](https://github.com/Kotlin/kotlin-agent-skills/blob/main/skills/kotlin-tooling-java-to-kotlin/SKILL.md)を使用して、お好みのAIエージェントに変換を任せることもできます。AIによる処理結果は完全には予測可能ではないことに注意してください。
+> また、用意されている [スキル](https://github.com/Kotlin/kotlin-agent-skills/blob/main/skills/kotlin-tooling-java-to-kotlin/SKILL.md) を使用して、任意の AI エージェントに変換を任せることもできます。ただし、AI の処理結果は完全に予測可能ではないことに留意してください。
 >
 {style="tip"}
 
-## プロジェクトの構成 {id="project-configuration"}
+## プロジェクトの設定 {id="project-configuration"}
 
-JavaプロジェクトにKotlinを追加するには、使用するビルドツールに応じて、KotlinとJavaの両方を使用するようにプロジェクトを構成する必要があります。
+Java プロジェクトに Kotlin を追加するには、使用するビルドツールに応じて、Kotlin と Java の両方を使用できるようにプロジェクトを設定する必要があります。
 
-プロジェクトを構成することで、KotlinとJavaの両方のコードが適切にコンパイルされ、相互にシームレスに参照できるようになります。
+プロジェクトを設定することで、Kotlin と Java の両方のコードが適切にコンパイルされ、互いにシームレスに参照できるようになります。
 
 ### Maven {id="maven"}
 
-> **IntelliJ IDEA 2025.3** 以降、MavenベースのJavaプロジェクトに最初のKotlinファイルを追加すると、IDEは自動的に `pom.xml` ファイルを更新してKotlin Mavenプラグインと標準の依存関係を含めます。バージョンのカスタマイズやビルドフェーズの調整が必要な場合は、手動で構成することもできます。
+> **IntelliJ IDEA 2025.3** 以降では、Maven ベースの Java プロジェクトに最初の Kotlin ファイルを追加すると、IDE が `pom.xml` ファイルを自動的に更新し、Kotlin Maven プラグインと標準依存関係を追加します。  
+> バージョンやビルドフェーズをカスタマイズしたい場合は、手動で設定することも可能です。
 >
 {style="note"}
 
-MavenプロジェクトでKotlinとJavaを併用するには、`pom.xml` ファイルにKotlin Mavenプラグインを適用し、Kotlinの依存関係を追加します：
+Maven プロジェクトで Kotlin と Java を併用するには、`pom.xml` ファイルに Kotlin Maven プラグインを適用し、Kotlin の依存関係を追加します。
 
-1. `<properties>` セクションに、Kotlinバージョンのプロパティを追加します：
+1. `<properties>` セクションに、Kotlin のバージョンプロパティを追加します。
 
     ```xml
     ```
    {src="jvm-test-tutorial/pom.xml" ignore-vars="false" include-lines="13,17,18"}
 
-2. `<dependencies>` セクションに必要な依存関係を追加し、`<plugins>` セクションにも必要な構成を追加します：
+2. `<dependencies>` セクションで、`<plugins>` セクションに必要な依存関係を追加します。
 
     ```xml
     ```
    {src="jvm-test-tutorial/pom.xml" include-lines="32,38-43,45-49,55"}
 
-3. `<build><plugins>` セクションにKotlinプラグインを追加します：
+3. `<build><plugins>` セクションに、Kotlin プラグインを追加します。
 
     ```xml
     ```
    {src="jvm-test-tutorial/pom.xml" include-lines="57-58,95-96,99-107"}
 
-   Kotlin Mavenプラグインで `<extensions>true</extensions>` を有効にすると、以下に役立ちます：
+   Kotlin Maven プラグインで `<extensions>true</extensions>` を有効にすると、以下が行われます。
 
-   * `kotlin-stdlib` 依存関係をプロジェクトに自動的に追加する。
-   * Kotlinを最初にコンパイルし、次にJavaをコンパイルするように実行フェーズを構成する。
-   * Javaコード内でKotlinコードを参照し、その逆も可能にする。
-   * JVMターゲットバージョンをJavaコンパイラのバージョンと自動的に合わせる。
+   * プロジェクトに `kotlin-stdlib` 依存関係が自動的に追加される。
+   * 実行フェーズが設定され、Kotlin が先にコンパイルされてから Java がコンパイルされるようになる。
+   * Java コードから Kotlin コードを参照したり、その逆も行えるようになる。
+   * JVM ターゲットバージョンが Java コンパイラのバージョンと自動的に整合される。
 
-   extensionsを有効にしたKotlin Mavenプラグインを使用する場合、`<build><pluginManagement>` セクションに個別の `maven-compiler-plugin` は必要ありません。
+   extensions を有効にした Kotlin Maven プラグインを使用する場合、`<build><pluginManagement>` セクションに個別の `maven-compiler-plugin` を記述する必要はありません。
 
-4. IDEでMavenプロジェクトを再ロードします。
-5. テストを実行して構成を確認します：
+4. IDE で Maven プロジェクトを再読み込みします。
+5. テストを実行して設定を確認します。
 
     ```bash
     ./mvnw clean test
@@ -66,18 +67,18 @@ MavenプロジェクトでKotlinとJavaを併用するには、`pom.xml` ファ�
 
 ### Gradle {id="gradle"}
 
-GradleプロジェクトでKotlinとJavaを併用するには、`build.gradle.kts` ファイルにKotlin JVMプラグインを適用し、Kotlinの依存関係を追加します：
+Gradle プロジェクトで Kotlin と Java を併用するには、`build.gradle.kts` ファイルに Kotlin JVM プラグインを適用し、Kotlin の依存関係を追加します。
 
-1. `plugins {}` ブロックに、Kotlin JVMプラグインを追加します：
+1. `plugins {}` ブロックに Kotlin JVM プラグインを追加します。
 
     ```kotlin
     plugins {
-        // 他のプラグイン
+        // Other plugins
         kotlin("jvm") version "%kotlinVersion%"
     }
     ```
 
-2. JVMツールチェーンのバージョンをJavaのバージョンと一致するように設定します：
+2. Java のバージョンに合わせて JVM ツールチェーンのバージョンを設定します。
 
     ```kotlin
     kotlin {
@@ -85,21 +86,21 @@ GradleプロジェクトでKotlinとJavaを併用するには、`build.gradle.kt
     }
     ```
 
-   これにより、KotlinはJavaコードと同じJDKバージョンを使用するようになります。
+   これにより、Kotlin が Java コードと同じ JDK バージョンを使用するようになります。
 
-3. `dependencies {}` ブロックに、Kotlinテストユーティリティを提供しJUnitと統合する `kotlin("test")` ライブラリを追加します：
+3. `dependencies {}` ブロックに、Kotlin のテストユーティリティを提供し、JUnit と統合する `kotlin("test")` ライブラリを追加します。
 
     ```kotlin
     dependencies {
-        // 他の依存関係
+        // Other dependencies
     
         testImplementation(kotlin("test"))
-        // 他のテスト用依存関係
+        // Other test dependencies
     }
     ```
 
-4. IDEでGradleプロジェクトを再ロードします。
-5. テストを実行して構成を確認します：
+4. IDE で Gradle プロジェクトを再読み込みします。
+5. テストを実行して設定を確認します。
 
     ```bash
     ./gradlew clean test
@@ -107,49 +108,50 @@ GradleプロジェクトでKotlinとJavaを併用するには、`build.gradle.kt
 
 ## プロジェクト構造 {id="project-structure"}
 
-この構成により、同じソースディレクトリ内にJavaファイルとKotlinファイルを混在させることができます：
+この設定により、同じソースディレクトリ内で Java ファイルと Kotlin ファイルを混在させることができます。
 
 ```none
 src/
   ├── main/
-  │    ├── java/          # JavaおよびKotlinのプロダクションコード
-  │    └── kotlin/        # 追加のKotlinプロダクションコード（任意）
+  │    ├── java/          # Java および Kotlin のプロダクションコード
+  │    └── kotlin/        # 追加の Kotlin プロダクションコード（オプション）
   └── test/
-       ├── java/          # JavaおよびKotlinのテストコード
-       └── kotlin/        # 追加のKotlinテストコード（任意）
+       ├── java/          # Java および Kotlin のテストコード
+       └── kotlin/        # 追加の Kotlin テストコード（オプション）
 ```
 
-これらのディレクトリは手動で作成することも、最初のKotlinファイルを追加する際にIntelliJ IDEAに作成させることもできます。
+これらのディレクトリは手動で作成することも、最初の Kotlin ファイルを追加するときに IntelliJ IDEA に自動作成させることもできます。
 
-Kotlinプラグインは `src/main/java` と `src/test/java` の両方のディレクトリを自動的に認識するため、`.kt` ファイルと `.java` ファイルを同じディレクトリに保持できます。
+Kotlin プラグインは `src/main/java` と `src/test/java` の両方のディレクトリを自動的に認識するため、同じディレクトリ内に `.kt` ファイルと `.java` ファイルを共存させることができます。
 
-## JavaファイルをKotlinに変換する {id="convert-java-files-to-kotlin"}
+## Java ファイルを Kotlin に変換する {id="convert-java-files-to-kotlin"}
 
-Kotlinプラグインには、JavaファイルをKotlinに自動的に変換するJava to Kotlinコンバーター（_J2K_）も同梱されています。ファイルに対してJ2Kを使用するには、そのファイルのコンテキストメニューまたはIntelliJ IDEAの **Code** メニューで **Convert Java File to Kotlin File** をクリックします。
+Kotlin プラグインには、Java ファイルを自動的に Kotlin に変換する Java to Kotlin コンバーター（_J2K_）も同梱されています。
+ファイルに対して J2K を使用するには、コンテキストメニューまたは IntelliJ IDEA の **Code** メニューで **Convert Java File to Kotlin File** をクリックします。
 
-![JavaからKotlinへの変換](convert-java-to-kotlin.png){width=500}
+![Convert Java to Kotlin](convert-java-to-kotlin.png){width=500}
 
-このコンバーターは万能ではありませんが、JavaからKotlinへのほとんどのボイラープレートコードの変換において、かなり優れた働きをします。ただし、場合によっては手動での微調整が必要になることがあります。
+コンバーターは完全無欠というわけではありませんが、Java から Kotlin へのボイラープレートコードの大部分を適切に変換してくれます。ただし、場合によっては手動での微調整が必要になります。
 
-## コンパイラプラグインを詳しく見る {initial-collapse-state="collapsed" collapsible="true" id="explore-compiler-plugins"}
+## コンパイラプラグインを調べる {initial-collapse-state="collapsed" collapsible="true" id="explore-compiler-plugins"}
 
-[Spring](https://spring.io/) や Java Persistence API (JPA) を使用するより複雑なプロジェクトがある場合は、Kotlin の言語機能をフレームワークの期待に自動的に適合させ、ボイラープレートを削減する Kotlin コンパイラプラグインを使用できます：
+[Spring](https://spring.io/) や Java Persistence API (JPA) を使用するより複雑なプロジェクトがある場合は、Kotlin の言語機能をフレームワークの要求に自動的に適応させ、ボイラープレートを削減する Kotlin コンパイラプラグインを使用できます。
 
-* **[`all-open`](all-open-plugin.md)** プラグインは、特定の注釈（アノテーション）が使用されている場合に、クラスとそのメンバーを自動的に `open` にします。これは、クラスが non-final であることを必要とする Spring のようなフレームワークに特に便利です。
+* **[`all-open`](all-open-plugin.md)** プラグインは、特定のアノテーションが付けられたクラスとそのメンバーを自動的に `open` にします。これは、クラスが `final` でないことを要求する Spring などのフレームワークで特に役立ちます。
 
-  Spring の場合、`all-open` の上に構築されたラッパーである専用の [`kotlin-spring`](all-open-plugin.md#spring-support) プラグインを使用できます。これは Spring のアノテーションを自動的に指定します。
-* **[`no-arg`](no-arg-plugin.md)** プラグインは、特定の注釈を持つクラスに対して引数なしのコンストラクタ（zero-argument constructor）を追加で生成します。これにより、デフォルトコンストラクタを持たないクラスを JPA がインスタンス化できるようになります。
+  Spring 向けには、`all-open` のラッパーである専用の [`kotlin-spring`](kotlin-spring-plugin.md) プラグインを使用できます。これにより、Spring アノテーションが自動的に指定されます。
+* **[`no-arg`](no-arg-plugin.md)** プラグインは、特定のアノテーションが付けられたクラスに対して、追加の引数なしコンストラクタ（zero-argument constructor）を生成します。これにより、JPA がデフォルトコンストラクタを持たないクラスをインスタンス化できるようになります。
 
-  [`kotlin-jpa`](no-arg-plugin.md#jpa-support) プラグインも使用できます。これは `no-arg` の上に構築されたラッパーであり、no-arg アノテーションを自動的に指定します。
-* **[`power-assert`](power-assert.md)** プラグインは、アサーションに対してコンテキスト情報を含む詳細な失敗メッセージを提供することで、デバッグ体験を向上させます。中間値を表示し、テストが失敗した理由を理解するのに役立ちます。
+  JPA 向けには、`no-arg` と `all-open` の両方をラップする [`kotlin-jpa`](kotlin-jpa-plugin.md) プラグインを使用できます。これにより JPA アノテーションが自動的に指定され、エンティティは `open` になり、引数なしコンストラクタが追加されます。
+* **[`power-assert`](power-assert.md)** プラグインは、アサーションに関するコンテキスト情報を含む詳細な失敗メッセージを提供することで、デバッグ体験を向上させます。中間値を表示し、テストが失敗した理由を理解しやすくします。
 
 ## 次のステップ {id="next-step"}
 
-JavaプロジェクトでKotlinを使い始める最も簡単な方法は、最初にKotlinのテストを追加することです：
+Java プロジェクトで Kotlin を使い始める最も簡単な方法は、まず Kotlin のテストを追加することです。
 
-[Javaプロジェクトに最初のKotlinテストを追加する](jvm-test-using-junit.md)
+[Java プロジェクトに最初の Kotlin テストを追加する](jvm-test-using-junit.md)
 
 ### 関連項目 {id="see-also"}
 
-* [KotlinとJavaの相互運用性の詳細](java-to-kotlin-interop.md)
-* [Mavenビルド構成リファレンス](maven.md)
+* [Kotlin と Java の相互運用性の詳細](java-to-kotlin-interop.md)
+* [Maven ビルド設定リファレンス](maven.md)

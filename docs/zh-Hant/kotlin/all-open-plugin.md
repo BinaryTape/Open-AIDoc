@@ -1,24 +1,50 @@
 [//]: # (title: All-open 編譯器外掛程式)
 
-Kotlin 預設類別及其成員均為 `final`，這使得在使用如 Spring AOP 等需要類別為 `open` 的架構時變得不便。`all-open` 編譯器外掛程式根據這些架構的需求調整了 Kotlin，讓標註了特定註解的類別及其成員變為 open，而不需要明確使用 `open` 關鍵字。
+在 Kotlin 中，類別及其成員預設為 `final`。這可能會導致仰賴子類別化與執行階段代理（runtime proxy）的架構與程式庫出現問題，因為它們需要類別為 `open`。
 
-例如，當你使用 Spring 時，不需要所有的類別都為 open，只需要標註了特定註解（如 `@Configuration` 或 `@Service`）的類別。`all-open` 外掛程式允許你指定這些註解。
+`all-open` 編譯器外掛程式會在編譯期將類別及其成員設為 `open`，而無需使用 `open` 關鍵字。
+你需要建立一個註解，將其新增至外掛程式選項中，並為要設為 `open` 的類別加上該註解：
 
-Kotlin 為 Gradle 和 Maven 提供了 `all-open` 外掛程式支援，並具備完整的 IDE 整合。
+```kotlin
+@YourAnnotation
+class MyService {
+    // 這個類別及其所有成員現在都是 open 的
+    fun doWork() { /* ... */ }
+}
+```
 
-> 對於 Spring，你可以使用 [`kotlin-spring` 編譯器外掛程式](#spring-support)。
+若某個類別或其任何超類別標有已配置的註解，該類別及其成員就會變為 `open`。
+
+> 對於使用 Kotlin 的 Spring 應用程式，你可以使用 [`kotlin-spring` 編譯器外掛程式](kotlin-spring-plugin.md)。
+> 它會在類別帶有 Spring 註解時，將該類別及其成員設為 `open`。
 >
 {style="note"}
 
-## Gradle {id="gradle"}
+## 宣告註解 {id="declare-an-annotation"}
 
-在你的 `build.gradle(.kts)` 檔案中新增該外掛程式：
+`all-open` 外掛程式僅會處理標有你在其配置中註冊之註解的類別。
+因此在啟用外掛程式之前，請宣告一個註解來標記想要設為 `open` 的類別。
+例如 `AllOpenMarker`：
+
+```kotlin
+package com.example
+
+annotation class AllOpenMarker
+```
+
+## 套用外掛程式 {id="apply-the-plugin"}
+
+### Gradle {id="gradle"}
+
+若要啟用外掛程式，請將其新增至 `build.gradle(.kts)` 檔案的 `plugins {}` 區塊中：
 
 <tabs group="build-script">
 <tab title="Kotlin" group-key="kotlin">
 
 ```kotlin
+// build.gradle.kts
 plugins {
+    kotlin("jvm") version "%kotlinVersion%"
     kotlin("plugin.allopen") version "%kotlinVersion%"
 }
 ```
@@ -27,7 +53,9 @@ plugins {
 <tab title="Groovy" group-key="groovy">
 
 ```groovy
+// build.gradle
 plugins {
+    id "org.jetbrains.kotlin.jvm" version "%kotlinVersion%"
     id "org.jetbrains.kotlin.plugin.allopen" version "%kotlinVersion%"
 }
 ```
@@ -35,15 +63,16 @@ plugins {
 </tab>
 </tabs>
 
-接著指定會使類別變為 open 的註解列表：
+接著指定你稍早宣告的註解（例如 `com.example.AllOpenMarker`）或可使類別成為 `open` 的註解清單：
 
 <tabs group="build-script">
 <tab title="Kotlin" group-key="kotlin">
 
 ```kotlin
 allOpen {
-    annotation("com.my.Annotation")
-    // annotations("com.another.Annotation", "com.third.Annotation")
+    annotation("com.example.AllOpenMarker")
+    // 你可以指定多個註解：
+    // annotations("com.example.AllOpenMarker", "com.anotherPackage.OtherAnnotation")
 }
 ```
 
@@ -52,33 +81,24 @@ allOpen {
 
 ```groovy
 allOpen {
-    annotation("com.my.Annotation")
-    // annotations("com.another.Annotation", "com.third.Annotation")
+    annotation("com.example.AllOpenMarker")
+    // 你可以指定多個註解：
+    // annotations("com.example.AllOpenMarker", "com.anotherPackage.OtherAnnotation")
 }
 ```
 
 </tab>
 </tabs>
 
-如果類別（或其任何基底類別）標註了 `com.my.Annotation`，則該類別本身及其所有成員都將變為 open。
+### Maven {id="maven"}
 
-它也適用於元註解（meta-annotations）：
-
-```kotlin
-@com.my.Annotation
-annotation class MyFrameworkAnnotation
-
-@MyFrameworkAnnotation
-class MyClass // 將會是 all-open
-```
-
-`MyFrameworkAnnotation` 標註了 all-open 元註解 `com.my.Annotation`，因此它也成為了一個 all-open 註解。
-
-## Maven {id="maven"}
-
-在你的 `pom.xml` 檔案中新增該外掛程式：
+在你的 `pom.xml` 檔案中新增此外掛程式：
 
 ```xml
+<properties>
+    <kotlin.version>%kotlinVersion%</kotlin.version>
+</properties>
+
 <plugin>
     <artifactId>kotlin-maven-plugin</artifactId>
     <groupId>org.jetbrains.kotlin</groupId>
@@ -86,14 +106,13 @@ class MyClass // 將會是 all-open
 
     <configuration>
         <compilerPlugins>
-            <!-- 或使用 "spring" 以取得 Spring 支援 -->
             <plugin>all-open</plugin>
         </compilerPlugins>
 
         <pluginOptions>
-            <!-- 每個註解各佔一行 -->
-            <option>all-open:annotation=com.my.Annotation</option>
-            <option>all-open:annotation=com.their.AnotherAnnotation</option>
+            <!-- 若有多個註解，可新增多行 -->
+            <option>all-open:annotation=com.example.AllOpenMarker</option>
+            <option>all-open:annotation=com.anotherPackage.OtherAnnotation</option>
         </pluginOptions>
     </configuration>
 
@@ -107,88 +126,63 @@ class MyClass // 將會是 all-open
 </plugin>
 ```
 
-關於 all-open 註解如何運作的詳細資訊，請參閱 [Gradle 章節](#gradle)。
+## 使用 `all-open` 外掛程式 {id="use-the-all-open-plugin"}
 
-## Spring 支援 {id="spring-support"}
-
-如果你使用 Spring，可以啟用 `kotlin-spring` 編譯器外掛程式，而不需要手動指定 Spring 註解。`kotlin-spring` 是基於 `all-open` 的包裝函式，其行為完全相同。
-
-在你的 `build.gradle(.kts)` 檔案中新增 `spring` 外掛程式：
-
-<tabs group="build-script">
-<tab title="Kotlin" group-key="kotlin">
+若某個類別或其任何超類別帶有你建立的 `com.example.AllOpenMarker` 註解，該類別及其所有成員都會變為 `open`：
 
 ```kotlin
-plugins {
-    id("org.jetbrains.kotlin.plugin.spring") version "%kotlinVersion%"
+package com.example
+
+@AllOpenMarker
+class TestClass {
+    // 這個類別及其所有成員都是 open 的
 }
 ```
 
-</tab>
-<tab title="Groovy" group-key="groovy">
+此外掛程式也支援元註解（meta-annotation）。若你使用 `@AllOpenMarker` 標記另一個註解，則所有標有該註解的類別和成員也都會變為 `open`：
 
-```groovy
-plugins {
-    id "org.jetbrains.kotlin.plugin.spring" version "%kotlinVersion%"
+```kotlin
+package com.example
+
+// 使用先前建立的註解標記的註解
+@AllOpenMarker
+annotation class AnotherAllOpenMarker
+
+@AllOpenMarker
+class NewClass {
+    // 這個類別及其所有成員都是 open 的
+}
+
+@AnotherAllOpenMarker
+class AnotherClass {
+    // 這個類別及其所有成員也都是 open 的
 }
 ```
 
-</tab>
-</tabs>
-
-在 Maven 中，`spring` 外掛程式由 `kotlin-maven-allopen` 外掛程式相依性提供，若要在 `pom.xml` 檔案中啟用它：
-
-```xml
-<compilerPlugins>
-    <plugin>spring</plugin>
-</compilerPlugins>
-
-<dependencies>
-    <dependency>
-        <groupId>org.jetbrains.kotlin</groupId>
-        <artifactId>kotlin-maven-allopen</artifactId>
-        <version>${kotlin.version}</version>
-    </dependency>
-</dependencies>
-```
-
-該外掛程式指定了以下註解： 
-* [`@Component`](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/stereotype/Component.html)
-* [`@Async`](https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/scheduling/annotation/Async.html)
-* [`@Transactional`](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/transaction/annotation/Transactional.html)
-* [`@Cacheable`](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/cache/annotation/Cacheable.html)
-* [`@SpringBootTest`](https://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/test/context/SpringBootTest.html)
-
-得益於元註解支援，標註了 [`@Configuration`](https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/context/annotation/Configuration.html)、
-[`@Controller`](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/stereotype/Controller.html)、
-[`@RestController`](https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/web/bind/annotation/RestController.html)、
-[`@Service`](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/stereotype/Service.html)
-或 [`@Repository`](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/stereotype/Repository.html)
-的類別會自動被開啟（opened），因為這些註解都標註了元註解
-[`@Component`](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/stereotype/Component.html)。
- 
-當然，你可以在同一個專案中同時使用 `kotlin-allopen` 和 `kotlin-spring`。
-
-> 如果你使用 [start.spring.io](https://start.spring.io/#!language=kotlin) 服務產生專案樣板，`kotlin-spring` 外掛程式將預設啟用。
->
-{style="note"}
-
+<!--
 ## 命令列編譯器 {id="command-line-compiler"}
 
-All-open 編譯器外掛程式 JAR 檔案包含在 Kotlin 編譯器的二進制發行版中。你可以透過 `kotlinc` 的 `-Xplugin` 選項提供其 JAR 檔案路徑來掛載該外掛程式：
+Kotlin 編譯器的二進制發行套件中包含 `all-open` 編譯器外掛程式的 JAR。你可以使用 `-Xplugin` kotlinc 選項提供其 JAR 檔案的路徑來附加該外掛程式：
 
 ```bash
 -Xplugin=$KOTLIN_HOME/lib/allopen-compiler-plugin.jar
 ```
 
-你可以使用 `annotation` 外掛程式選項直接指定 all-open 註解，或是啟用 _預設_（preset）：
+你可以使用 `annotation` 外掛程式選項直接指定 `all-open` 註解，或是啟用 _預設_：
 
 ```bash
-# 外掛程式選項格式為："-P plugin:<plugin id>:<key>=<value>"。
+# 外掛程式選項格式為："-P plugin:<plugin id>:<key>=<value>"。 
 # 選項可以重複。
 
 -P plugin:org.jetbrains.kotlin.allopen:annotation=com.my.Annotation
 -P plugin:org.jetbrains.kotlin.allopen:preset=spring
 ```
 
-`all-open` 外掛程式可用的預設有：`spring`、`micronaut` 和 `quarkus`。
+`all-open` 外掛程式可用的預設為：`spring`、`micronaut` 以及 `quarkus`。
+-->
+
+## 後續步驟 {id="what-s-next"}
+
+* 對於 Spring 應用程式，請使用 [`kotlin-spring` 外掛程式](kotlin-spring-plugin.md)，這是一個預先設定好的包裝函式，能將帶有 Spring 註解的類別設為 `open`。
+* 對於 JPA 實體，請使用 [`kotlin-jpa` 外掛程式](kotlin-jpa-plugin.md)，它會將實體設為 `open` 並為其產生無引數建構函式。
+* 探索 [`all-open` 編譯器外掛程式](https://github.com/JetBrains/kotlin/tree/master/plugins/allopen) 的原始碼。

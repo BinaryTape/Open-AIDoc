@@ -1,19 +1,26 @@
 [//]: # (title: 키보드 이벤트)
 
-데스크톱용 Compose Multiplatform에서는 두 가지 서로 다른 스코프에서 이벤트 핸들러를 설정하여 키보드 이벤트를 관리할 수 있습니다:
+데스크톱용 Compose Multiplatform에서는 두 가지 서로 다른 스코프에서 이벤트 핸들러를 설정하여 키보드 이벤트를 관리할 수 있습니다.
 
-* 포커스된 요소 기반의 이벤트 핸들러.
-* 윈도우 스코프의 이벤트 핸들러.
+* 포커스된 요소를 기반으로 하는 이벤트 핸들러
+* 윈도우 스코프의 이벤트 핸들러
 
-undefined
+> 이 가이드의 예제는 실행 가능한 데스크톱 앱입니다. 직접 실행해 보려면 다음 단계를 따르세요.
+> 1. [Kotlin Multiplatform IDE 플러그인](https://plugins.jetbrains.com/plugin/14936-kotlin-multiplatform) 또는 [온라인 마법사](https://kmp.jetbrains.com/?android=true&desktop=true&includeTests=false)를 사용하여 Compose Multiplatform 프로젝트를 생성합니다.
+> 2. 데스크톱 진입점 파일(예: `desktopApp/src/main/kotlin/com/example/my_desktop_app/main.kt`)을 엽니다.
+> 3. 해당 파일의 내용을 제공된 예제 코드로 바꿉니다.
+>
+{style="note" id="desktop-snippets-intro"}
 
 ## 포커스된 컴포넌트에서의 이벤트 {id="events-in-a-focused-component"}
 
-이 방식은 키보드의 키를 누를 때 현재 포커스된 컴포넌트의 이벤트 핸들러가 트리거됨을 의미합니다.
+이 방식은 키보드의 키를 누르면 현재 포커스된 컴포넌트의 이벤트 핸들러가 트리거됨을 의미합니다.
 
-일반적인 시나리오는 `TextField`와 같은 활성 컨트롤에 대해 키보드 핸들러를 정의하는 것입니다. 기본 동작이 트리거되기 전에 키 이벤트를 가로채려면 `onKeyEvent`와 `onPreviewKeyEvent` Modifier를 모두 사용할 수 있습니다. `onKeyEvent` Modifier를 사용하면 개별 키 누름을 처리할 수 있으며, 단축키를 정의할 때는 `onPreviewKeyEvent`를 사용하는 것이 좋습니다.
+일반적인 시나리오는 `TextField`와 같은 활성 컨트롤에 대한 키보드 핸들러를 정의하는 것입니다. 키 이벤트가 기본 동작을 트리거하기 전에 가로채려면 `onKeyEvent` 및 `onPreviewKeyEvent` 수정자(modifier)를 모두 사용할 수 있습니다.
+`onKeyEvent` 수정자로는 개별 키 입력을 처리할 수 있으며, 단축키를 정의할 때는 `onPreviewKeyEvent`를 사용하는 것이 좋습니다.
 
-다음 예제는 <shortcut>Ctrl</shortcut> 키를 누른 상태에서 누르는 키에 따라 서로 다른 동작을 수행하는 `TextField` 상호작용을 보여줍니다. 이 코드를 `sharedUI/src/jvmMain/kotlin` 경로의 `main.kt` 파일에 추가하세요:
+다음 예제는 <shortcut>Ctrl</shortcut> 키를 누른 상태에서 누르는 키에 따라 서로 다른 동작을 수행하는 `TextField` 상호작용을 보여줍니다.
+이 코드를 `sharedUI/src/jvmMain/kotlin`에 있는 `main.kt` 파일에 추가하세요.
 
 ```kotlin
 import androidx.compose.foundation.layout.fillMaxSize
@@ -71,9 +78,11 @@ fun main() = singleWindowApplication (title = "Key events") {
 
 ## 윈도우 스코프에서의 이벤트 {id="events-in-a-window-scope"}
 
-현재 윈도우 내에서 항상 활성화되는 키보드 이벤트 핸들러를 정의하려면 `Window`, `singleWindowApplication` 및 `Dialog` 함수에서 사용할 수 있는 `onPreviewKeyEvent` 및 `onKeyEvent` 파라미터를 사용하세요. 이들은 이벤트가 소비되지 않았을 때 이벤트가 전달(dispatch)되는 방식에서 차이가 있습니다: `onPreviewKeyEvent`는 이벤트를 첫 번째 자식에게 전달하고, `onKeyEvent`는 이벤트를 컴포저블의 부모에게 전달합니다. 일반적으로 `onPreviewKeyEvent`는 화면 전체의 키보드 단축키까지 구현할 수 있어 이벤트를 가로채는 데 선호됩니다.
+현재 윈도우 내에서 항상 활성화되는 키보드 이벤트 핸들러를 정의하려면 `Window`, `singleWindowApplication` 및 `Dialog` 함수에서 제공하는 `onPreviewKeyEvent` 및 `onKeyEvent` 매개변수를 사용하세요.
+두 매개변수는 이벤트가 소비(consume)되지 않았을 때 전달(dispatch)되는 방식에서 차이가 있습니다. `onPreviewKeyEvent`는 이벤트를 첫 번째 자식으로 전달하고, `onKeyEvent`는 컴포저블의 부모로 이벤트를 전달합니다. 일반적으로 화면 전체 수준의 키보드 단축키까지 구현할 수 있는 `onPreviewKeyEvent`가 이벤트를 가로채는 데 더 선호됩니다.
 
-다음 샘플은 `Escape`를 눌러 팝업 다이얼로그를 닫거나 <shortcut>Ctrl+Shift+C</shortcut> 단축키를 눌러 윈도우 콘텐츠를 변경하는 등의 윈도우 상호작용을 보여줍니다. 이 코드를 `sharedUI/src/jvmMain/kotlin` 경로의 `main.kt` 파일에 추가하세요:
+다음 예제는 `Escape` 키를 눌러 팝업 대화상자를 닫거나, <shortcut>Ctrl+Shift+C</shortcut> 단축키를 눌러 윈도우 콘텐츠를 변경하는 등의 윈도우 상호작용을 보여줍니다.
+이 코드를 `sharedUI/src/jvmMain/kotlin`에 있는 `main.kt` 파일에 추가하세요.
 
 ```kotlin
 import androidx.compose.foundation.layout.Arrangement
@@ -159,7 +168,7 @@ fun App() {
 
 <img src="compose-desktop-key-window.animated.gif" alt="Keyboard events in a window scope" width="600" preview-src="compose-desktop-key-window.png"/>
 
-## 다음 단계는 무엇인가요? {id="what-s-next"}
+## 다음 단계 {id="what-s-next"}
 
-* 자세한 내용은 [API reference](https://developer.android.com/reference/kotlin/androidx/compose/ui/input/key/package-summary#keyinputfilter)를 참조하세요.
-* [다른 데스크톱 컴포넌트](https://github.com/JetBrains/compose-multiplatform/tree/master/tutorials#desktop)에 대한 튜토리얼을 살펴보세요.
+* 자세한 내용은 [API 레퍼런스](https://developer.android.com/reference/kotlin/androidx/compose/ui/input/key/package-summary#keyinputfilter)를 참조하세요.
+* [기타 데스크톱 컴포넌트](https://github.com/JetBrains/compose-multiplatform/tree/master/tutorials#desktop)에 대한 튜토리얼을 살펴보세요.

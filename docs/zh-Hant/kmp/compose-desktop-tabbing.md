@@ -1,17 +1,22 @@
 [//]: # (title: Tab 導覽與鍵盤焦點)
-<web-summary>了解如何在 Compose Multiplatform 桌面版中使用 Tab 鍵在組件之間進行導覽。</web-summary>
+<web-summary>了解如何在桌面版 Compose Multiplatform 中使用 Tab 鍵在組件之間進行導覽。</web-summary>
 
-在 Compose Multiplatform 桌面版中，您可以透過鍵盤快速鍵 <shortcut>Tab</shortcut> 導覽至下一個組件，並透過 <shortcut>Shift+Tab</shortcut> 導覽至上一個組件。
+在桌面版 Compose Multiplatform 中，你可以使用 <shortcut>Tab</shortcut> 鍵盤快速鍵導覽至下一個組件，並使用 <shortcut>Shift+Tab</shortcut> 導覽至上一個組件。
 
-undefined
+> 本指南中的範例皆為可執行的桌面應用程式。若要嘗試執行：
+> 1. 使用 [Kotlin Multiplatform IDE 外掛程式](https://plugins.jetbrains.com/plugin/14936-kotlin-multiplatform)或[線上精靈](https://kmp.jetbrains.com/?android=true&desktop=true&includeTests=false)建立 Compose Multiplatform 專案。
+> 2. 開啟桌面端入口點檔案。例如：`desktopApp/src/main/kotlin/com/example/my_desktop_app/main.kt`。
+> 3. 將其內容取代為所提供的範例。
+>
+{style="note" id="desktop-snippets-intro"}
 
 ## 預設 Tab 導覽 {id="default-tab-navigation"}
 
-預設情況下，Tab 導覽允許使用者按照可聚焦組件出現的順序在它們之間移動。此功能預設啟用，不需要任何額外的程式碼。
+預設情況下，Tab 導覽允許使用者按照可取得焦點組件的出現順序在它們之間移動。此功能預設已啟用，不需要額外的程式碼。
 
-可聚焦組件包括在其實作中使用`clickable()`、`selectable()`、`toggleable()`或`focusable()`修飾符的任何內容。例如：文字欄位、按鈕、滑桿、導覽項目、具有非 null 回呼的選取控制項，以及`Card()`、`Surface()`與`ListItem()`的`onClick`多載。
+可取得焦點的組件包含在其實作中使用了 `clickable()`、`selectable()`、`toggleable()` 或 `focusable()` 修飾符的任何元素。例如：文字欄位、按鈕、滑桿、導覽項目、具有非 null 回呼的選取控制項，以及 `Card()`、`Surface()` 和 `ListItem()` 的 `onClick` 多載。
 
-以下是一個視窗範例，使用者可以使用標準快速鍵在五個文字欄位之間導覽：
+以下視窗中，使用者可以使用標準快速鍵在五個文字欄位之間導覽：
 
 ```kotlin
 import androidx.compose.foundation.layout.Arrangement
@@ -58,13 +63,13 @@ fun main() = application {
 
 <img src="compose-desktop-tab-navigation-default.animated.gif" alt="預設 Tab 順序" width="450" preview-src="compose-desktop-tab-navigation-default.png"/>
 
-## 自訂可聚焦組件 {id="custom-focusable-components"}
+## 自訂可取得焦點的組件 {id="custom-focusable-components"}
 
-若要將預設不可聚焦的組件納入 Tab 順序，請套用`focusable()`修飾符。
+若要將預設無法取得焦點的組件納入 Tab 順序中，請套用 `focusable()` 修飾符。
 
-若要在組件獲得焦點時變更其外觀，請將`MutableInteractionSource`傳遞給`focusable()`修飾符，使用`collectIsFocusedAsState()`從中讀取焦點狀態，並使用該狀態來變更組件的樣式：例如不同的背景、邊框或任何其他醒目提示。若要讓組件對鍵盤按下做出反應，請使用`onKeyEvent()`修飾符處理按鍵事件。
+若要在組件取得焦點時變更其外觀，請將 `MutableInteractionSource` 傳遞給 `focusable()` 修飾符，透過 `collectIsFocusedAsState()` 從中讀取焦點狀態，並使用該狀態變更組件的樣式：不同的背景、邊框或任何其他醒目提示。若要讓組件對鍵盤按鍵做出反應，請使用 `onKeyEvent()` 修飾符處理按鍵事件。
 
-以下範例將`Box()`可組合項轉換為類似按鈕的組件。該 Box 在獲得焦點時會醒目提示，且按下 <shortcut>Enter</shortcut> 鍵或 <shortcut>Space</shortcut> 會觸發相關操作：
+以下範例將 `Box()` 可組合項轉換為類似按鈕的組件。當獲得焦點時該 Box 會醒目提示，且按下 <shortcut>Enter</shortcut> 或 <shortcut>Space</shortcut> 會觸發相關操作：
 
 ```kotlin
 import androidx.compose.foundation.background
@@ -124,9 +129,9 @@ fun main() = application {
                     modifier = Modifier.padding(40.dp),
                     verticalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
-                    Text(text = "點擊次數: $clicks")
+                    Text(text = "Clicks: $clicks")
                     repeat(5) { index ->
-                        FocusableBox("按鈕 ${index + 1}", onClick = { clicks++ })
+                        FocusableBox("Button ${index + 1}", onClick = { clicks++ })
                     }
                 }
             }
@@ -176,16 +181,16 @@ fun FocusableBox(
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="Box(modifier = Modifier.focusable(interactionSource = interactionSource)"}
 
-<img src="compose-desktop-tab-navigation-custom-focusable.animated.gif" alt="自訂可聚焦組件" width="450" preview-src="compose-desktop-tab-navigation-custom-focusable.png"/>
+<img src="compose-desktop-tab-navigation-custom-focusable.animated.gif" alt="自訂可取得焦點的組件" width="450" preview-src="compose-desktop-tab-navigation-custom-focusable.png"/>
 
 ## 自訂 Tab 順序 {id="custom-tab-order"}
 
-若要以出現順序以外的順序移動焦點，請結合兩個修飾符：
+若要以不同於出現順序的方式移動焦點，請結合兩個修飾符：
 
-* `focusRequester()` 將 `FocusRequester` 控制代碼附加到可聚焦組件。如果組件[預設不可聚焦](#自訂可聚焦組件)，請在 `focusRequester()` *之後* 套用 `focusable()` 修飾符。
-* `focusProperties()` 設定 Tab 順序中的 `next` 與 `previous` 元素：即按下 <shortcut>Tab</shortcut> 鍵或 <shortcut>Shift+Tab</shortcut> 時聚焦的具有 `FocusRequester` 控制代碼的組件。
+* `focusRequester()` 會將 `FocusRequester` 控制代碼附加到可取得焦點的組件上。如果該組件[預設無法取得焦點](#custom-focusable-components)，請在 `focusRequester()` _之後_套用 `focusable()` 修飾符。
+* `focusProperties()` 用於設定 Tab 順序中的 `next` 與 `previous` 元素：即按下 <shortcut>Tab</shortcut> 或 <shortcut>Shift+Tab</shortcut> 時會聚焦的帶有 `FocusRequester` 控制代碼的組件。
 
-以下範例為五個文字欄位中的每一個都建立了一個 `FocusRequester`，並反轉了預設的 Tab 順序：
+以下範例為五個文字欄位分別建立 `FocusRequester`，並將預設 Tab 順序反轉：
 
 ```kotlin
 import androidx.compose.foundation.layout.Arrangement
@@ -244,11 +249,11 @@ fun main() = application {
 
 <img src="compose-desktop-tab-navigation-custom-order.animated.gif" alt="自訂 Tab 順序" width="450" preview-src="compose-desktop-tab-navigation-custom-order.png"/>
 
-## 從程式碼移動焦點 {id="moving-focus-from-code"}
+## 透過程式碼移動焦點 {id="moving-focus-from-code"}
 
-若要在無須使用者互動的情況下讓組件獲得焦點，請使用 `focusRequester()` 修飾符將 `FocusRequester` 附加到可聚焦組件，並呼叫 `FocusRequester.requestFocus()`。如果組件[預設不可聚焦](#自訂可聚焦組件)，則應在 `focusRequester()` *之後* 套用 `focusable()` 修飾符。
+若要在沒有使用者互動的情況下讓組件取得焦點，請使用 `focusRequester()` 修飾符將 `FocusRequester` 附加至可取得焦點的組件，並呼叫 `FocusRequester.requestFocus()`。如果組件[預設無法取得焦點](#custom-focusable-components)，則應在 `focusRequester()` _之後_套用 `focusable()` 修飾符。
 
-在以下範例中，一個按鈕會將焦點移至文字欄位，然後再移回自身：
+在以下範例中，按鈕會將焦點移至文字欄位，然後再移回自身：
 
 ```kotlin
 import androidx.compose.foundation.layout.Arrangement
@@ -305,7 +310,7 @@ fun main() = application {
                         .fillMaxWidth()
                         .focusRequester(buttonFocusRequester)
                 ) {
-                    Text(text = "焦點切換器")
+                    Text(text = "Focus switcher")
                 }
                 TextField(
                     state = rememberTextFieldState(),
@@ -319,13 +324,13 @@ fun main() = application {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="Button(onClick = { textFieldFocusRequester.requestFocus()"}
 
-<img src="compose-desktop-tab-navigation-move-focus-from-code.animated.gif" alt="從程式碼移動焦點" width="450" preview-src="compose-desktop-tab-navigation-move-focus-from-code.png"/>
+<img src="compose-desktop-tab-navigation-move-focus-from-code.animated.gif" alt="透過程式碼移動焦點" width="450" preview-src="compose-desktop-tab-navigation-move-focus-from-code.png"/>
 
 ### 組件出現時聚焦 {id="focusing-a-component-when-it-appears"}
 
-表單和對話方塊通常會立即聚焦於第一個輸入項，以便使用者無需動用滑鼠即可開始輸入。在此使用案例中，請從 `LaunchedEffect(Unit)` 區塊請求焦點，該區塊在組件進入組成後執行一次。
+表單與對話方塊通常會立即聚焦在其第一個輸入欄位，讓使用者無需動用滑鼠即可開始鍵入。在此使用案例中，可以在 `LaunchedEffect(Unit)` 區塊內請求焦點，該區塊會在組件進入組合（composition）後執行一次。
 
-在以下範例中，第一個文字欄位在視窗開啟時立即獲得焦點：
+在以下範例中，視窗一開啟就會聚焦在第一個文字欄位：
 
 ```kotlin
 import androidx.compose.foundation.layout.Arrangement
@@ -381,18 +386,18 @@ fun main() = application {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="LaunchedEffect(Unit) { focusRequester.requestFocus()"}
 
-<img src="compose-desktop-tab-navigation-focus-on-appearance.animated.gif" alt="出現時聚焦文字欄位" width="450" preview-src="compose-desktop-tab-navigation-focus-on-appearance.png"/>
+<img src="compose-desktop-tab-navigation-focus-on-appearance.animated.gif" alt="組件出現時聚焦文字欄位" width="450" preview-src="compose-desktop-tab-navigation-focus-on-appearance.png"/>
 
 ## 從多行文字欄位移動焦點 {id="moving-focus-from-multiline-text-fields"}
 
-在多行文字欄位中，按下 <shortcut>Tab</shortcut> 鍵會插入一個 tab 字元，而不是將焦點移至下一個組件：
+在多行文字欄位中，按下 <shortcut>Tab</shortcut> 會插入定位字元，而不是將焦點移至下一個組件：
 
 ```kotlin
 Column {
     repeat(5) {
         TextField(
             state = rememberTextFieldState("Hello, World!"),
-            // MultiLine 是 lineLimits 的預設值
+            // MultiLine is the default value of lineLimits
             lineLimits = TextFieldLineLimits.MultiLine(),
             modifier = Modifier.padding(8.dp)
         )
@@ -400,7 +405,7 @@ Column {
 }
 ```
 
-這是一個已知問題，[CMP-5822](https://youtrack.jetbrains.com/issue/CMP-5822)。它會影響任何接受多於一行的文字欄位（這是預設行為）。作為因應措施，請使用 `onPreviewKeyEvent` 修飾符攔截 <shortcut>Tab</shortcut> 鍵，並使用來自 `LocalFocusManager` 的 `FocusManager` 移動焦點：
+這是一個已知的問題：[CMP-5822](https://youtrack.jetbrains.com/issue/CMP-5822)。它會影響任何接受多行的文字欄位（這也是預設行為）。作為因應措施，可以使用 `onPreviewKeyEvent` 修飾符攔截 <shortcut>Tab</shortcut> 鍵，並使用 `LocalFocusManager` 中的 `FocusManager` 來移動焦點：
 
 ```kotlin
 import androidx.compose.foundation.layout.Column
@@ -421,7 +426,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.singleWindowApplication
 
-fun main() = singleWindowApplication(title = "多行文字欄位") {
+fun main() = singleWindowApplication(title = "Multiline text fields") {
     Column {
         repeat(5) {
             TextField(
@@ -450,8 +455,8 @@ fun Modifier.moveFocusOnTab(): Modifier {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="fun Modifier.moveFocusOnTab() { focusManager.moveFocus("}
 
-## 下一步 {id="what-s-next"}
+## 後續步驟 {id="what-s-next"}
 
-* 進一步了解如何處理[鍵盤事件](compose-desktop-keyboard.md)。
-* 了解[不同平台上的輔助功能支援](compose-desktop-accessibility.md)。
+* 進一步了解處理[鍵盤事件](compose-desktop-keyboard.md)。
+* 了解[不同平台上的協助工具支援](compose-desktop-accessibility.md)。
 * 探索關於[其他桌面組件](compose-desktop-components.md)的教學。

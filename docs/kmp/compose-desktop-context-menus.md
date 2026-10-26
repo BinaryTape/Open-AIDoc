@@ -1,12 +1,17 @@
 [//]: # (title: 上下文菜单)
 
-Compose Multiplatform 桌面版提供了对文本上下文菜单的开箱即用支持，并允许你通过添加更多项、进行主题设置和自定义文本来方便地定制任何上下文菜单。
+适用于桌面的 Compose Multiplatform 开箱即用地支持文本上下文菜单，并允许您通过添加更多项、设置主题以及自定义文本来便捷地定制任意上下文菜单。
 
-undefined
+> 本指南中的示例均为可运行的桌面应用。若要尝试运行：
+> 1. 使用 [Kotlin Multiplatform IDE 插件](https://plugins.jetbrains.com/plugin/14936-kotlin-multiplatform) 或 [在线向导](https://kmp.jetbrains.com/?android=true&desktop=true&includeTests=false) 创建一个 Compose Multiplatform 项目。
+> 2. 打开桌面端入口点文件。例如 `desktopApp/src/main/kotlin/com/example/my_desktop_app/main.kt`。
+> 3. 将其内容替换为所提供的示例。
+>
+{style="note" id="desktop-snippets-intro"}
 
 ## 自定义区域中的上下文菜单 {id="context-menu-in-a-custom-area"}
 
-你可以为应用程序的任意区域创建上下文菜单。使用 `ContextMenuArea` 定义一个容器，在该容器中点击鼠标右键将触发上下文菜单的显示：
+您可以为应用程序的任意区域创建上下文菜单。使用 `ContextMenuArea` 可以定义一个容器，在该容器内点击鼠标右键将触发上下文菜单的显示：
 
 ```kotlin
 import androidx.compose.foundation.ContextMenuArea
@@ -31,18 +36,20 @@ fun main() = singleWindowApplication(title = "Context menu") {
             }
         )
     }) {
-        // 提供上下文菜单的蓝色方块
+        // 上下文菜单可用的蓝色方块
         Box(modifier = Modifier.background(Color.Blue).height(100.dp).width(100.dp))
     }
 }
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="ContextMenuArea(items = { listOf( ContextMenuItem( "}
 
-<img src="compose-desktop-context-menu-custom-area.png" alt="上下文菜单：ContextMenuArea" width="500"/>
+<img src="compose-desktop-context-menu-custom-area.png" alt="Context menu: ContextMenuArea" width="500"/>
 
 ## 设置主题 {id="set-up-theming"}
 
-你可以自定义上下文菜单颜色，以创建与系统设置匹配的响应式 UI，并避免在应用程序之间切换时出现剧烈的对比度变化。对于默认的浅色和深色主题，有两个内置实现：`LightDefaultContextMenuRepresentation` 和 `DarkDefaultContextMenuRepresentation`。它们不会自动应用于上下文菜单颜色，因此你需要通过 `LocalContextMenuRepresentation` 设置合适的主题：
+您可以自定义上下文菜单的颜色，以打造与系统设置相契合的自适应 UI，并避免在应用程序之间切换时出现强烈的对比度反差。针对默认的浅色和深色主题，内置了两种实现：
+`LightDefaultContextMenuRepresentation` 和 `DarkDefaultContextMenuRepresentation`。
+它们不会自动应用到上下文菜单颜色上，因此您需要通过 `LocalContextMenuRepresentation` 来设置合适的主题：
 
 ```kotlin
 import androidx.compose.foundation.DarkDefaultContextMenuRepresentation
@@ -86,15 +93,15 @@ fun main() = singleWindowApplication(title = "Dark theme") {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="MaterialTheme( colors = if (isSystemInDarkTheme()) darkColors() else "}
 
-<img src="compose-desktop-context-menu-dark-mode.png" alt="上下文菜单：深色主题" width="500"/>
+<img src="compose-desktop-context-menu-dark-mode.png" alt="Context menu: Dark theme" width="500"/>
 
 ## 本地化菜单项 {id="localize-menu-items"}
 
 默认情况下，上下文菜单将以系统设置的首选语言显示：
 
-<img src="compose-desktop-context-menu-localization.png" alt="上下文菜单：本地化" width="500"/>
+<img src="compose-desktop-context-menu-localization.png" alt="Context menu: Localization" width="500"/>
 
-如果你想使用特定语言，请在运行应用程序之前显式将其指定为默认语言：
+如果您希望使用特定语言，请在运行应用程序之前显式指定默认语言：
 
 ```Console
 java.util.Locale.setDefault(java.util.Locale("en"))
@@ -104,9 +111,10 @@ java.util.Locale.setDefault(java.util.Locale("en"))
 
 ### 默认文本上下文菜单 {id="default-text-context-menu"}
 
-Compose Multiplatform 桌面版为 `TextField` 和可选择的 `Text` 提供了内置的上下文菜单。
+适用于桌面的 Compose Multiplatform 为 `TextField` 和可选中的 `Text` 提供了内置的上下文菜单。
 
-文本字段的默认上下文菜单包括以下操作，具体取决于文本光标的位置和选择范围：复制、剪切、粘贴和全选。此标准上下文菜单在 Material `TextField`（`androidx.compose.material.TextField` 或 `androidx.compose.material3.TextField`）和 Foundation `BasicTextField`（`androidx.compose.foundation.text.BasicTextField`）中默认可用。
+根据光标位置和选区范围，文本字段的默认上下文菜单包含以下操作：复制、剪切、粘贴和全选。
+该标准上下文菜单在 Material `TextField`（`androidx.compose.material.TextField` 或 `androidx.compose.material3.TextField`）以及 Foundation `BasicTextField`（`androidx.compose.foundation.text.BasicTextField`）中默认可用。
 
 ```kotlin
 import androidx.compose.material.Text
@@ -126,11 +134,12 @@ fun main() = singleWindowApplication(title = "Context menu") {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="TextField( value = text.value, onValueChange ="}
 
-<img src="compose-desktop-context-menu-textfield.png" alt="TextField 的默认上下文菜单" width="500"/>
+<img src="compose-desktop-context-menu-textfield.png" alt="Default context menu for TextField" width="500"/>
 
-详情请参阅 [API 参考文档](https://kotlinlang.org/api/compose-multiplatform/material3/androidx.compose.material3/-text-field.html)。
+详细信息请参阅 [API 参考](https://kotlinlang.org/api/compose-multiplatform/material3/androidx.compose.material3/-text-field.html)。
 
-简单文本元素的默认上下文菜单仅包含复制操作。要为 `Text` 组件启用上下文菜单，请将其包装在 `SelectionContainer` 中使文本可被选择：
+简单的文本元素默认上下文菜单仅包含复制操作。
+若要为 `Text` 组件启用上下文菜单，可以通过将其包装在 `SelectionContainer` 中使其变为可选中：
 
 ```kotlin
 import androidx.compose.foundation.text.selection.SelectionContainer
@@ -145,11 +154,11 @@ fun main() = singleWindowApplication(title = "Context menu") {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="SelectionContainer { Text( "}
 
-<img src="compose-desktop-context-menu-text.png" alt="Text 的默认上下文菜单" width="500"/>
+<img src="compose-desktop-context-menu-text.png" alt="Default context menu for Text" width="500"/>
 
 ### 添加自定义项 {id="add-custom-items"}
 
-要为 `TextField` 和 `Text` 组件添加自定义上下文菜单操作，请通过 `ContextMenuItem` 指定新项，并通过 `ContextMenuDataProvider` 将它们添加到上下文菜单项的层次结构中。例如，以下代码示例显示了如何向文本字段和简单的可选择文本元素的默认上下文菜单中添加两个新的自定义操作：
+若要为 `TextField` 和 `Text` 组件添加自定义上下文菜单操作，请通过 `ContextMenuItem` 指定新项，并通过 `ContextMenuDataProvider` 将它们添加到上下文菜单项的层次结构中。例如，以下代码示例演示了如何向文本字段和简单可选文本元素的默认上下文菜单中添加两个新的自定义操作：
 
 ```kotlin
 import androidx.compose.foundation.ContextMenuDataProvider
@@ -198,11 +207,13 @@ fun main() = singleWindowApplication(title = "Context menu") {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="ContextMenuDataProvider( items = { listOf( ContextMenuItem( "}
 
-<img src="compose-desktop-context-menu-custom-actions.png" alt="带有自定义操作的上下文菜单" width="500"/>
+<img src="compose-desktop-context-menu-custom-actions.png" alt="Context menu with custom actions" width="500"/>
 
 ### 重写默认文本上下文菜单 {id="override-default-text-context-menu"}
 
-要重写文本字段和可选择文本元素的默认上下文菜单，请重写 `TextContextMenu` 接口。在以下代码示例中，我们重用了原始的 `TextContextMenu`，但在列表底部添加了一个额外的项。新项会根据文本选择进行调整：
+若要重写文本字段和可选文本元素的默认上下文菜单，请重写 `TextContextMenu` 接口。
+在以下代码示例中，我们复用了原始的 `TextContextMenu`，但在列表底部添加了一个额外的项。
+该新项会根据选中的文本进行自适应调整：
 
 ```kotlin
 import androidx.compose.foundation.ContextMenuDataProvider
@@ -252,7 +263,7 @@ fun CustomTextMenuProvider(content: @Composable () -> Unit) {
                 state: ContextMenuState,
                 content: @Composable () -> Unit
             ) {
-                // 重用原始的 TextContextMenu 并添加一个新项
+                // 复用原始 TextContextMenu 并添加新项
                 ContextMenuDataProvider({
                     val shortText = textManager.selectedText.crop()
                     if (shortText.isNotEmpty()) {
@@ -276,11 +287,11 @@ private fun AnnotatedString.crop() = if (length <= 5) toString() else "${take(5)
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="CompositionLocalProvider( LocalTextContextMenu provides object : TextContextMenu { "}
 
-<img src="compose-desktop-context-menu-custom-text.png" alt="上下文菜单：LocalTextContextMenu" width="500"/>
+<img src="compose-desktop-context-menu-custom-text.png" alt="Context menu: LocalTextContextMenu" width="500"/>
 
 ### Swing 互操作性 {id="swing-interoperability"}
 
-如果你正在将 Compose 代码嵌入到现有的 Swing 应用程序中，并且需要上下文菜单与应用程序其他部分的外观和行为保持一致，可以使用 `JPopupTextMenu` 类。在此类中，`LocalTextContextMenu` 对 Compose 组件中的上下文菜单使用 Swing 的 `JPopupMenu`。
+如果您要将 Compose 代码嵌入到现有的 Swing 应用程序中，并且需要上下文菜单在外观和行为上与应用程序的其他部分保持一致，可以使用 `JPopupTextMenu` 类。在该类中，`LocalTextContextMenu` 使用 Swing 的 `JPopupMenu` 来为 Compose 组件提供上下文菜单。
 
 ```kotlin
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -365,7 +376,7 @@ fun JPopupTextMenuProvider(owner: Component, content: @Composable () -> Unit) {
                     )
                 }
 
-                // 添加可以通过 ContextMenuDataProvider 在应用程序其他部分定义的项 
+                // 添加可以在应用程序其他部分通过 ContextMenuDataProvider 定义的项
                 for (item in items) {
                     add(
                         JMenuItem(item.label).apply {
@@ -406,8 +417,8 @@ private fun circleIcon(color: Color) = object : Icon {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="fun JPopupTextMenuProvider(owner: Component, content: @Composable () -> Unit) "}
 
-<img src="compose-desktop-context-menu-swing.png" alt="上下文菜单：Swing 互操作性" width="500"/>
+<img src="compose-desktop-context-menu-swing.png" alt="Context menu: Swing interoperability" width="500"/>
 
-## 下一步 {id="what-s-next"}
+## 后续步骤 {id="what-s-next"}
 
-探索关于 [其他桌面组件](https://github.com/JetBrains/compose-multiplatform/tree/master/tutorials#desktop) 的教程。
+探索有关[其他桌面组件](https://github.com/JetBrains/compose-multiplatform/tree/master/tutorials#desktop)的教程。

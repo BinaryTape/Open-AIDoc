@@ -1,14 +1,16 @@
 [//]: # (title: サポートされているプラットフォーム)
 
-Ktor HTTP クライアントは、Kotlin がサポートするさまざまなプラットフォームで使用できます：
+Ktor HTTP クライアントは、Kotlin でサポートされているさまざまなプラットフォームで使用できます。
 - JVM
 - [Android](https://kotlinlang.org/docs/android-overview.html)
 - [Native](https://kotlinlang.org/docs/native-overview.html)
-undefined
+   > Kotlin/Native プロジェクトで Ktor を使用するには、[新しいメモリマネージャー](https://kotlinlang.org/docs/native-memory-manager.html)が必要です。これは Kotlin 1.7.20 以降でデフォルトで有効になっています。
+   >
+   {id="newmm-note" style="note"}
 - [JavaScript](https://kotlinlang.org/docs/js-overview.html)
 - [WasmJs](https://kotlinlang.org/docs/wasm-overview.html)
 
-マルチプラットフォームモバイルやフルスタック Web アプリケーションを問わず、[マルチプラットフォームプロジェクト](https://kotlinlang.org/docs/multiplatform.html)で使用できます。マルチプラットフォームプロジェクトでは、以下の[ターゲット](https://kotlinlang.org/docs/multiplatform-dsl-reference.html#targets)がサポートされています：
+マルチプラットフォームモバイルやフルスタック Web アプリケーションなど、[マルチプラットフォームプロジェクト](https://kotlinlang.org/docs/multiplatform.html)で使用できます。マルチプラットフォームプロジェクトでは、以下の[ターゲット](https://kotlinlang.org/docs/multiplatform-dsl-reference.html#targets)がサポートされています。
 
 <table>
 

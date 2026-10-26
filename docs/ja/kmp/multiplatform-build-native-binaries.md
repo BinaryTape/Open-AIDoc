@@ -2,46 +2,46 @@
 
 デフォルトでは、Kotlin/Native ターゲットは `*.klib` ライブラリアーティファクトにコンパイルされます。これは Kotlin/Native 自体から依存関係として利用できますが、実行したりネイティブライブラリとして使用したりすることはできません。
 
-実行可能ファイルや共有ライブラリなどの最終的なネイティブバイナリを宣言するには、ネイティブターゲットの `binaries` プロパティを使用します。このプロパティは、デフォルトの `*.klib` アーティファクトに加えて、このターゲット用にビルドされるネイティブバイナリのコレクションを表し、それらを宣言および設定するための一連のメソッドを提供します。
+実行可能ファイルや共有ライブラリなどの最終的なネイティブバイナリを宣言するには、ネイティブターゲットの `binaries` プロパティを使用します。このプロパティは、デフォルトの `*.klib` アーティファクトに加えて、このターゲット向けにビルドされるネイティブバイナリのコレクションを表し、それらを宣言および設定するための一連のメソッドを提供します。
 
-> `kotlin-multiplatform` プラグインは、デフォルトでは製品版（production）のバイナリを作成しません。デフォルトで利用可能な唯一のバイナリは、`test` コンパイルからユニットテストを実行するためのデバッグテスト実行可能ファイルです。
+> `kotlin-multiplatform` プラグインは、デフォルトでは本番用バイナリを一切作成しません。デフォルトで利用可能な唯一のバイナリは、`test` コンパイルから単体テストを実行できるようにするデバッグ用テスト実行ファイルです。
 >
 {style="note"}
 
-Kotlin/Native コンパイラによって生成されるバイナリには、サードパーティのコード、データ、または派生物が含まれる場合があります。つまり、Kotlin/Native でコンパイルされた最終的なバイナリを配布する場合は、バイナリ配布物に常に必要な [ライセンスファイル](https://kotlinlang.org/docs/native-binary-licenses.html) を含める必要があります。
+Kotlin/Native コンパイラによって生成されるバイナリには、サードパーティのコード、データ、または派生物が含まれる場合があります。これは、Kotlin/Native でコンパイルされた最終バイナリを配布する場合、バイナリ配布物に常に必要な[ライセンスファイル](https://kotlinlang.org/docs/native-binary-licenses.html)を含める必要があることを意味します。
 
 ## バイナリの宣言 {id="declare-binaries"}
 
 `binaries` コレクションの要素を宣言するには、以下のファクトリメソッドを使用します。
 
-| ファクトリメソッド | バイナリの種類 | 利用可能なターゲット |
+| ファクトリメソッド | バイナリ種別 | 利用可能なターゲット |
 |----------------|-----------------------|--------------------------------------------|
-| `executable`   | 製品実行可能ファイル | すべてのネイティブターゲット |
+| `executable`   | プロダクト実行可能ファイル | すべてのネイティブターゲット |
 | `test`         | テスト実行可能ファイル | すべてのネイティブターゲット |
 | `sharedLib`    | 共有ネイティブライブラリ | すべてのネイティブターゲット |
 | `staticLib`    | 静的ネイティブライブラリ | すべてのネイティブターゲット |
-| `framework`    | Objective-C フレームワーク | macOS、iOS、watchOS、および tvOS ターゲットのみ |
+| `framework`    | Objective-C フレームワーク | macOS、iOS、watchOS、tvOS ターゲットのみ |
 
-最もシンプルな形式では追加のパラメータを必要とせず、ビルドタイプごとに1つのバイナリを作成します。現在、2つのビルドタイプが利用可能です：
+最も単純なバージョンでは追加のパラメータは必要なく、各ビルドタイプに対して1つのバイナリが作成されます。現在、2つのビルドタイプが利用可能です:
 
-* `DEBUG` – [デバッガツール](https://kotlinlang.org/docs/native-debugging.html) を使用する際に役立つ追加のメタデータを含む、最適化されていないバイナリを生成します。
-* `RELEASE` – デバッグ情報を含まない、最適化されたバイナリを生成します。
+* `DEBUG` – [デバッガツール](https://kotlinlang.org/docs/native-debugging.html)を使用する際に役立つ追加のメタデータを含む、最適化されていないバイナリを生成します
+* `RELEASE` – デバッグ情報のない最適化されたバイナリを生成します
 
-次のスニペットは、デバッグとリリースの2つの実行可能バイナリを作成します。
+以下のスニペットは、debug と release の2つの実行可能バイナリを作成します:
 
 ```kotlin
 kotlin {
-    linuxX64 { // 代わりに自身のターゲットを定義してください。
+    linuxX64 { // 代わりに独自のターゲットを定義してください。
         binaries {
             executable {
-                // バイナリの設定。
+                // バイナリ設定。
             }
         }
     }
 }
 ```
 
-[追加の設定](multiplatform-dsl-reference.md#native-targets) が不要な場合は、ラムダを省略できます：
+[追加の設定](multiplatform-dsl-reference.md#native-targets)が不要な場合は、ラムダを省略できます:
 
 ```kotlin
 binaries {
@@ -49,7 +49,7 @@ binaries {
 }
 ```
 
-バイナリを作成するビルドタイプを指定することもできます。次の例では、`debug` 実行可能ファイルのみが作成されます：
+どのビルドタイプに対してバイナリを作成するかを指定できます。次の例では、`debug` 実行可能ファイルのみが作成されます:
 
 <Tabs group="build-script">
 <TabItem title="Kotlin" group-key="kotlin">
@@ -57,7 +57,7 @@ binaries {
 ```kotlin
 binaries {
     executable(listOf(DEBUG)) {
-        // バイナリの設定。
+        // バイナリ設定。
     }
 }
 ```
@@ -68,7 +68,7 @@ binaries {
 ```groovy
 binaries {
     executable([DEBUG]) {
-        // バイナリの設定。
+        // バイナリ設定。
     }
 }
 ```
@@ -76,7 +76,7 @@ binaries {
 </TabItem>
 </Tabs>
 
-また、カスタム名を使用してバイナリを宣言することもできます：
+カスタム名を指定してバイナリを宣言することもできます:
 
 <Tabs group="build-script">
 <TabItem title="Kotlin" group-key="kotlin">
@@ -84,13 +84,13 @@ binaries {
 ```kotlin
 binaries {
     executable("foo", listOf(DEBUG)) {
-        // バイナリの設定。
+        // バイナリ設定。
     }
 
-    // ビルドタイプのリストを省略することも可能です
-    //（この場合、利用可能なすべてのビルドタイプが使用されます）。
+    // ビルドタイプのリストは省略可能です
+    // （この場合、利用可能なすべてのビルドタイプが使用されます）。
     executable("bar") {
-        // バイナリの設定。
+        // バイナリ設定。
     }
 }
 ```
@@ -101,13 +101,13 @@ binaries {
 ```groovy
 binaries {
     executable('foo', [DEBUG]) {
-        // バイナリの設定。
+        // バイナリ設定。
     }
 
-    // ビルドタイプのリストを省略することも可能です
-    //（この場合、利用可能なすべてのビルドタイプが使用されます）。
+    // ビルドタイプのリストは省略可能です
+    // （この場合、利用可能なすべてのビルドタイプが使用されます）。
     executable('bar') {
-        // バイナリの設定。
+        // バイナリ設定。
     }
 }
 ```
@@ -115,15 +115,15 @@ binaries {
 </TabItem>
 </Tabs>
 
-最初の引数は名前のプレフィックスを設定し、これがバイナリファイルのデフォルト名になります。例えば、Windows の場合、このコードは `foo.exe` と `bar.exe` というファイルを生成します。また、この名前のプレフィックスを使用して、[ビルドスクリプト内でバイナリにアクセス](#access-binaries) することもできます。
+最初の引数は、バイナリファイルのデフォルト名となる名前プレフィックスを設定します。例えば、Windows の場合、このコードは `foo.exe` と `bar.exe` というファイルを生成します。また、この名前プレフィックスを使用して[ビルドスクリプト内でバイナリにアクセス](#access-binaries)することもできます。
 
 ## バイナリへのアクセス {id="access-binaries"}
 
-バイナリにアクセスして [設定](multiplatform-dsl-reference.md#native-targets) を行ったり、プロパティ（出力ファイルへのパスなど）を取得したりできます。
+バイナリにアクセスして、[バイナリを設定](multiplatform-dsl-reference.md#native-targets)したり、そのプロパティ（出力ファイルへのパスなど）を取得したりできます。
 
-バイナリは一意の名前で取得できます。この名前は、名前のプレフィックス（指定されている場合）、ビルドタイプ、およびバイナリの種類に基づき、`<optional-name-prefix><build-type><binary-kind>` というパターンに従います。例えば、`releaseFramework` や `testDebugExecutable` のようになります。
+一意の名前によってバイナリを取得できます。この名前は、`<任意の名前プレフィックス><ビルドタイプ><バイナリ種別>` というパターンに従い、名前プレフィックス（指定されている場合）、ビルドタイプ、およびバイナリ種別に基づきます（例: `releaseFramework` や `testDebugExecutable`）。
 
-> 静的ライブラリと共有ライブラリには、それぞれ static と shared というサフィックスが付きます。例えば、`fooDebugStatic` や `barReleaseShared` です。
+> 静的ライブラリおよび共有ライブラリには、それぞれ static および shared というサフィックスが付きます（例: `fooDebugStatic` や `barReleaseShared`）。
 >
 {style="note"}
 
@@ -155,7 +155,7 @@ binaries.findByName('fooDebugExecutable')
 </TabItem>
 </Tabs>
 
-あるいは、型付きゲッターを使用して、名前のプレフィックスとビルドタイプでバイナリにアクセスすることもできます。
+あるいは、型付けされたゲッターを使用して、名前プレフィックスとビルドタイプによってバイナリにアクセスすることもできます。
 
 <Tabs group="build-script">
 <TabItem title="Kotlin" group-key="kotlin">
@@ -163,17 +163,17 @@ binaries.findByName('fooDebugExecutable')
 ```kotlin
 // そのようなバイナリが存在しない場合は失敗します。
 binaries.getExecutable("foo", DEBUG)
-binaries.getExecutable(DEBUG)          // 名前のプレフィックスが設定されていない場合は、最初の引数を省略します。
-binaries.getExecutable("bar", "DEBUG") // ビルドタイプに文字列を使用することもできます。
+binaries.getExecutable(DEBUG)          // 名前プレフィックスが設定されていない場合は、最初の引数を省略します。
+binaries.getExecutable("bar", "DEBUG") // ビルドタイプには文字列を使用することもできます。
 
-// 他のバイナリの種類に対しても同様のゲッターが利用可能です：
-// getFramework, getStaticLib, getSharedLib
+// 他のバイナリ種別に対しても同様のゲッターが利用可能です:
+// getFramework、getStaticLib、getSharedLib。
 
 // そのようなバイナリが存在しない場合は null を返します。
 binaries.findExecutable("foo", DEBUG)
 
-// 他のバイナリの種類に対しても同様のゲッターが利用可能です：
-// findFramework, findStaticLib, findSharedLib
+// 他のバイナリ種別に対しても同様のゲッターが利用可能です:
+// findFramework、findStaticLib、findSharedLib。
 ```
 
 </TabItem>
@@ -182,25 +182,25 @@ binaries.findExecutable("foo", DEBUG)
 ```groovy
 // そのようなバイナリが存在しない場合は失敗します。
 binaries.getExecutable('foo', DEBUG)
-binaries.getExecutable(DEBUG)          // 名前のプレフィックスが設定されていない場合は、最初の引数を省略します。
-binaries.getExecutable('bar', 'DEBUG') // ビルドタイプに文字列を使用することもできます。
+binaries.getExecutable(DEBUG)          // 名前プレフィックスが設定されていない場合は、最初の引数を省略します。
+binaries.getExecutable('bar', 'DEBUG') // ビルドタイプには文字列を使用することもできます。
 
-// 他のバイナリの種類に対しても同様のゲッターが利用可能です：
-// getFramework, getStaticLib, getSharedLib
+// 他のバイナリ種別に対しても同様のゲッターが利用可能です:
+// getFramework、getStaticLib、getSharedLib。
 
 // そのようなバイナリが存在しない場合は null を返します。
 binaries.findExecutable('foo', DEBUG)
 
-// 他のバイナリの種類に対しても同様のゲッターが利用可能です：
-// findFramework, findStaticLib, findSharedLib
+// 他のバイナリ種別に対しても同様のゲッターが利用可能です:
+// findFramework、findStaticLib、findSharedLib。
 ```
 
 </TabItem>
 </Tabs>
 
-## 依存関係をバイナリにエクスポートする {id="export-dependencies-to-binaries"}
+## バイナリへの依存関係のエクスポート {id="export-dependencies-to-binaries"}
 
-Objective-C フレームワークやネイティブライブラリ（共有または静的）をビルドする際、現在のプロジェクトのクラスだけでなく、その依存関係のクラスもパックする必要がある場合があります。`export` メソッドを使用して、どの依存関係をバイナリにエクスポートするかを指定します。
+Objective-C フレームワークやネイティブライブラリ（共有または静的）をビルドする際、現在のプロジェクトのクラスだけでなく、その依存関係のクラスもパックする必要がある場合があります。`export` メソッドを使用して、バイナリにエクスポートする依存関係を指定します。
 
 <Tabs group="build-script">
 <TabItem title="Kotlin" group-key="kotlin">
@@ -223,7 +223,7 @@ kotlin {
             export("org.example:exported-library:1.0")
         }
         sharedLib {
-            // 異なるバイナリに異なる依存関係セットをエクスポートすることが可能です。
+            // 異なるバイナリに対して異なる依存関係のセットをエクスポートすることが可能です。
             export(project(':dependency'))
         }
     }
@@ -251,7 +251,7 @@ kotlin {
             export 'org.example:exported-library:1.0'
         }
         sharedLib {
-            // 異なるバイナリに異なる依存関係セットをエクスポートすることが可能です。
+            // 異なるバイナリに対して異なる依存関係のセットをエクスポートすることが可能です。
             export project(':dependency')
         }
     }
@@ -261,21 +261,21 @@ kotlin {
 </TabItem>
 </Tabs>
 
-例えば、Kotlin で複数のモジュールを実装し、それらに Swift からアクセスしたいとします。Swift アプリケーションで複数の Kotlin/Native フレームワークを使用することには制限がありますが、アンブレラ（umbrella）フレームワークを作成し、これらすべてのモジュールをそこにエクスポートすることができます。
+例えば、Kotlin で複数のモジュールを実装し、それらに Swift からアクセスしたいとします。Swift アプリケーションで複数の Kotlin/Native フレームワークを使用することには制限がありますが、アンブレラフレームワークを作成して、これらすべてのモジュールをそこにエクスポートすることができます。
 
-> 対応するソースセットの [`api` 依存関係](https://kotlinlang.org/docs/gradle-configure-project.html#dependency-types) のみをエクスポートできます。
+> エクスポートできるのは、対応するソースセットの [`api` 依存関係](https://kotlinlang.org/docs/gradle-configure-project.html#dependency-types)のみです。
 >
 {style="note"}
 
-依存関係をエクスポートすると、そのすべての API がフレームワークの API に含まれます。コンパイラは、その依存関係のコードの一部しか使用していない場合でも、その依存関係のコードをフレームワークに追加します。これにより、エクスポートされた依存関係（およびある程度はその依存関係）に対してデッドコード削除（DCE）が無効になります。
+依存関係をエクスポートすると、そのすべての API がフレームワーク API に含まれます。そのごく一部しか使用していない場合でも、コンパイラはその依存関係のコードをフレームワークに追加します。これにより、エクスポートされた依存関係（およびある程度はその依存関係）に対するデッドコードの削除（dead code elimination）が無効化されます。
 
-デフォルトでは、エクスポートは非推移的（non-transitive）に動作します。つまり、ライブラリ `bar` に依存しているライブラリ `foo` をエクスポートした場合、`foo` のメソッドのみが出力フレームワークに追加されます。
+デフォルトでは、エクスポートは非推移的に動作します。つまり、ライブラリ `bar` に依存しているライブラリ `foo` をエクスポートした場合、出力されるフレームワークに追加されるのは `foo` のメソッドのみです。
 
-この動作は `transitiveExport` オプションを使用して変更できます。`true` に設定すると、ライブラリ `bar` の宣言もエクスポートされます。
+`transitiveExport` オプションを使用すると、この動作を変更できます。`true` に設定すると、ライブラリ `bar` の宣言もエクスポートされます。
 
-> `transitiveExport` の使用は推奨されません。これは、エクスポートされた依存関係のすべての推移的依存関係をフレームワークに追加するためです。これにより、コンパイル時間とバイナリサイズの両方が増加する可能性があります。
+> `transitiveExport` の使用は推奨されません。エクスポートされた依存関係のすべての推移的依存関係がフレームワークに追加されるためです。これにより、コンパイル時間とバイナリサイズの両方が増加する可能性があります。
 >
-> ほとんどの場合、これらすべての依存関係をフレームワーク API に追加する必要はありません。Swift または Objective-C コードから直接アクセスする必要がある依存関係に対してのみ、明示的に `export` を使用してください。
+> ほとんどの場合、これらすべての依存関係をフレームワーク API に追加する必要はありません。Swift や Objective-C のコードから直接アクセスする必要がある依存関係に対してのみ、明示的に `export` を使用してください。
 >
 {style="warning"}
 
@@ -310,9 +310,9 @@ binaries {
 
 ## ユニバーサルフレームワークのビルド {id="build-universal-frameworks"}
 
-デフォルトでは、Kotlin/Native によって生成される Objective-C フレームワークは 1 つのプラットフォームのみをサポートします。しかし、[`lipo` ツール](https://llvm.org/docs/CommandGuide/llvm-lipo.html) を使用して、このようなフレームワークを単一のユニバーサル（ファット）バイナリにマージすることができます。この操作は、特に 32 ビットおよび 64 ビットの iOS フレームワークで意味があります。この場合、結果として得られるユニバーサルフレームワークを 32 ビットと 64 ビットの両方のデバイスで使用できます。
+デフォルトでは、Kotlin/Native によって生成される Objective-C フレームワークは単一のプラットフォームしかサポートしません。しかし、[`lipo` ツール](https://llvm.org/docs/CommandGuide/llvm-lipo.html)を使用することで、そのようなフレームワークを単一のユニバーサル（fat）バイナリにマージできます。この操作は、特に 32 ビットおよび 64 ビットの iOS フレームワークにとって有用です。この場合、生成されたユニバーサルフレームワークを 32 ビットと 64 ビットの両方のデバイスで使用できます。
 
-> ファットフレームワークは、元のフレームワークと同じベース名（base name）を持つ必要があります。そうでない場合、エラーが発生します。
+> fat フレームワークは、元のフレームワークと同じベース名（base name）を持つ必要があります。そうでない場合、エラーが発生します。
 >
 {style="warning"}
 
@@ -331,9 +331,9 @@ kotlin {
             baseName = "MyFramework"
         }
     }
-    // ファットフレームワークをビルドするタスクを登録します。
+    // fat フレームワークをビルドするタスクを作成します。
     tasks.register<FatFrameworkTask>("debugFatFramework") {
-        // ファットフレームワークは元のフレームワークと同じベース名である必要があります。
+        // fat フレームワークは、元のフレームワークと同じベース名を持つ必要があります。
         baseName = "MyFramework"
         // デフォルトの出力先ディレクトリは "<build directory>/fat-framework" です。
         destinationDirProperty.set(layout.buildDirectory.dir("fat-framework/debug"))
@@ -363,9 +363,9 @@ kotlin {
             }
         }
     }
-    // ファットフレームワークをビルドするタスクを登録します。
+    // fat フレームワークをビルドするタスクを作成します。
     tasks.register("debugFatFramework", FatFrameworkTask) {
-        // ファットフレームワークは元のフレームワークと同じベース名である必要があります。
+        // fat フレームワークは、元のフレームワークと同じベース名を持つ必要があります。
         baseName = "MyFramework"
         // デフォルトの出力先ディレクトリは "<build directory>/fat-framework" です。
         destinationDirProperty.set(layout.buildDirectory.dir("fat-framework/debug"))
@@ -381,9 +381,9 @@ kotlin {
 </TabItem>
 </Tabs>
 
-## XCFrameworks のビルド {id="build-xcframeworks"}
+## XCFramework のビルド {id="build-xcframeworks"}
 
-すべての Kotlin マルチプラットフォームプロジェクトは、すべてのターゲットプラットフォームとアーキテクチャのロジックを単一のバンドルにまとめる出力として XCFrameworks を使用できます。[ユニバーサル（ファット）フレームワーク](#build-universal-frameworks) とは異なり、アプリケーションを App Store に公開する前に不要なアーキテクチャをすべて削除する必要はありません。
+すべての Kotlin Multiplatform プロジェクトは、すべてのターゲットプラットフォームおよびアーキテクチャ向けのロジックを単一のバンドルにまとめるための出力として XCFramework を使用できます。[ユニバーサル（fat）フレームワーク](#build-universal-frameworks)とは異なり、App Store にアプリケーションを公開する前に不要なアーキテクチャをすべて削除する必要はありません。
 
 <Tabs group="build-script">
 <TabItem title="Kotlin" group-key="kotlin">
@@ -434,29 +434,29 @@ kotlin {
 </TabItem>
 </Tabs>
 
-XCFrameworks を宣言すると、Kotlin Gradle プラグインはいくつかの Gradle タスクを登録します：
+XCFramework を宣言すると、Kotlin Gradle プラグインはいくつかの Gradle タスクを登録します:
 
 * `assembleXCFramework`
 * `assemble<Framework name>DebugXCFramework`
 * `assemble<Framework name>ReleaseXCFramework`
 
-undefined
+<a id="build-frameworks"></a>
 
-プロジェクトで [CocoaPods 統合](multiplatform-cocoapods-overview.md) を使用している場合は、Kotlin CocoaPods Gradle プラグインを使用して XCFrameworks をビルドできます。これには、登録されたすべてのターゲットで XCFrameworks をビルドし、podspec ファイルを生成する以下のタスクが含まれます：
+プロジェクトで [CocoaPods の統合](multiplatform-cocoapods-overview.md)を使用している場合は、Kotlin CocoaPods Gradle プラグインを使用して XCFramework をビルドできます。これには、登録されているすべてのターゲットで XCFramework をビルドし、podspec ファイルを生成する以下のタスクが含まれています:
 
-* `podPublishReleaseXCFramework`: podspec ファイルと共にリリース XCFramework を生成します。
-* `podPublishDebugXCFramework`: podspec ファイルと共にデバッグ XCFramework を生成します。
-* `podPublishXCFramework`: podspec ファイルと共にデバッグおよびリリース両方の XCFramework を生成します。
+* `podPublishReleaseXCFramework`: release XCFramework を podspec ファイルとともに生成します。
+* `podPublishDebugXCFramework`: debug XCFramework を podspec ファイルとともに生成します。
+* `podPublishXCFramework`: debug および release の両方の XCFramework を podspec ファイルとともに生成します。
 
-これにより、CocoaPods を通じてモバイルアプリとは別にプロジェクトの共通部分を配布するのに役立ちます。また、プライベートまたはパブリックの podspec リポジトリへの公開に XCFrameworks を使用することもできます。
+これにより、プロジェクトの共有部分を CocoaPods 経由でモバイルアプリとは別に配布するのに役立ちます。また、プライベートまたはパブリックの podspec リポジトリへの公開にも XCFramework を使用できます。
 
-> 異なるバージョンの Kotlin 用にビルドされた Kotlin フレームワークをパブリックリポジトリに公開することは推奨されません。これを行うと、エンドユーザーのプロジェクトで競合が発生する可能性があります。
+> 異なるバージョンの Kotlin 向けにビルドされた Kotlin フレームワークをパブリックリポジトリに公開することは推奨されません。エンドユーザーのプロジェクトで競合が発生する可能性があります。
 >
 {style="warning"}
 
 ## Info.plist ファイルのカスタマイズ {id="customize-the-info-plist-file"}
 
-フレームワークを生成する際、Kotlin/Native コンパイラは情報プロパティリストファイル `Info.plist` を生成します。対応するバイナリオプションを使用して、そのプロパティをカスタマイズできます。
+フレームワークを生成する際、Kotlin/Native コンパイラは情報プロパティリストファイルである `Info.plist` を生成します。対応するバイナリオプションを使用して、そのプロパティをカスタマイズできます:
 
 | プロパティ | バイナリオプション |
 |------------------------------|----------------------------|
@@ -464,7 +464,7 @@ undefined
 | `CFBundleShortVersionString` | `bundleShortVersionString` |
 | `CFBundleVersion`            | `bundleVersion`            |
 
-この機能を有効にするには、`-Xbinary=$option=$value` コンパイラフラグを渡すか、特定のフレームワークに対して `binaryOption("option", "value")` Gradle DSL を設定します。
+この機能を有効にするには、`-Xbinary=$option=$value` コンパイラフラグを渡すか、特定のフレームワークに対して `binaryOption("option", "value")` Gradle DSL を設定します:
 
 ```kotlin
 binaries {

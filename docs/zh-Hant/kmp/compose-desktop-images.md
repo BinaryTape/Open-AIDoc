@@ -1,15 +1,20 @@
-[//]: # (title: 圖片與應用程式內圖示)
-<web-summary>了解如何在 Compose Multiplatform for desktop 中顯示圖片、從檔案系統或網路載入圖片，以及將圖片用作視窗和系統匣圖示。</web-summary>
+[//]: # (title: 影像與應用程式內圖示)
+<web-summary>了解如何在 Compose Multiplatform 桌面版中顯示影像、從檔案系統或網路載入影像，並將其用作視窗和系統匣圖示。</web-summary>
 
-Compose Multiplatform for desktop 就像其他平台一樣，從 [多平台資源](compose-multiplatform-resources.md) 程式庫載入圖片。桌面應用程式也可以透過 JVM API 從檔案系統或網路讀取圖片，並將圖片用作視窗和系統匣圖示。
+Compose Multiplatform 桌面版就像其他平台一樣，從[多平台資源](compose-multiplatform-resources.md)程式庫載入影像。桌面應用程式還可以透過 JVM API 從檔案系統或網路讀取影像，並將影像用作視窗和系統匣圖示。
 
-undefined
+> 本指南中的範例都是可執行的桌面應用程式。若要嘗試執行其中一個：
+> 1. 使用 [Kotlin Multiplatform IDE 外掛程式](https://plugins.jetbrains.com/plugin/14936-kotlin-multiplatform)或[線上精靈](https://kmp.jetbrains.com/?android=true&desktop=true&includeTests=false)建立 Compose Multiplatform 專案。
+> 2. 開啟桌面入口點檔案。例如：`desktopApp/src/main/kotlin/com/example/my_desktop_app/main.kt`。
+> 3. 將其內容取代為所提供的範例。
+>
+{style="note" id="desktop-snippets-intro"}
 
-此頁面中的範例使用 Kotlin 和 Compose Multiplatform 標誌。這兩個標誌都包含在 [Kotlin 品牌資產](https://kotlinlang.org/docs/kotlin-brand-assets.html#kotlin-logo) 套件中。
+本頁的範例使用了 Kotlin 與 Compose Multiplatform 的標誌。這兩個標誌都作為 [Kotlin 品牌資產](https://kotlinlang.org/docs/kotlin-brand-assets.html#kotlin-logo)套件的一部分提供。
 
-## 顯示來自資源的圖片 {id="displaying-images-from-resources"}
+## 顯示來自資源的影像 {id="displaying-images-from-resources"}
 
-若要顯示封裝在應用程式中的圖片，請[將其新增至專案的多平台資源](compose-multiplatform-resources-setup.md)，然後組建專案以產生資源存取子。透過將存取子傳遞給 `painterResource()` 來建立 `Painter` 執行個體，並將產生的 `Painter` 傳遞給 `Image()` Composable：
+若要顯示隨應用程式打包的影像，請[將其新增至專案的多平台資源中](compose-multiplatform-resources-setup.md)，並建置專案以產生資源存取器。透過將存取器傳遞給 `painterResource()` 來建立 `Painter` 執行個體，並將產生的 `Painter` 傳遞給 `Image()` 可組合項：
 
 ```kotlin
 import androidx.compose.foundation.Image
@@ -41,29 +46,29 @@ fun main() = application {
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="Image(painter = painterResource(Res.drawable.kotlin_logo)"}
 
-<img src="compose-desktop-images-resource.png" alt="來自多平台資源的圖片" width="540"/>
+<img src="compose-desktop-images-resource.png" alt="來自多平台資源的影像" width="540"/>
 
-`painterResource()` 支援點陣化圖片格式，例如 `.png`、`.jpg`、`.bmp` 和 `.webp`，以及 Android XML 向量圖格式。有關將資源作為 `ImageBitmap` 或 `ImageVector` 值存取，以及使用圖示、字型和字串的詳細資訊，請參閱[在應用程式中使用多平台資源](compose-multiplatform-resources-usage.md)。
+`painterResource()` 支援點陣圖格式（如 `.png`、`.jpg`、`.bmp` 和 `.webp`），以及 Android XML 向量 drawable 格式。如需以 `ImageBitmap` 或 `ImageVector` 值的形式存取資源，以及使用圖示、字型與字串的詳細資訊，請參閱[在應用程式中使用多平台資源](compose-multiplatform-resources-usage.md)。
 
-> 資源不一定要儲存在 common 原始碼集中。任何原始碼集或模組都可以使用自己的 `composeResources` 目錄，因此您可以將桌面應用程式特有的圖片儲存在與桌面相關的程式碼旁邊。
+> 資源不一定要儲存在 common 原始碼集中。任何原始碼集或模組都可以使用自己的 `composeResources` 目錄，因此您可以將桌面應用程式專用的影像存放在桌面相關程式碼旁。
 > 
-> 若要使用在另一個模組中宣告的資源，請將該模組產生的 `Res` 類別設定為 [public](compose-multiplatform-resources-usage.md#customizing-accessor-class-generation)。
+> 若要使用在其他模組中宣告的資源，請將該模組產生的 `Res` 類別設為 [public](compose-multiplatform-resources-usage.md#customizing-accessor-class-generation)。
 >
 {style="tip"}
 
-## 從檔案系統或網路載入圖片 {id="loading-images-from-the-file-system-or-the-network"}
+## 從檔案系統或網路載入影像 {id="loading-images-from-the-file-system-or-the-network"}
 
-不屬於應用程式一部分的圖片（由使用者選擇或在執行時下載的檔案）不屬於資源。請使用任何 JVM API 讀取其位元組，並使用資源程式庫的以下函式之一進行解碼：
+不屬於應用程式一部分的影像（由使用者選擇或在執行階段下載的檔案）不屬於資源。您可以使用任何 JVM API 讀取其位元組，並使用資源程式庫的下列函式之一進行解碼：
 
-| 圖片格式 | 解碼函式 | 結果 |
+| 影像格式 | 解碼函式 | 結果 |
 |--------------|--------------------------|---------------|
 | 點陣圖 (Bitmap) | `decodeToImageBitmap()` | `ImageBitmap` |
-| XML 向量圖 | `decodeToImageVector()` | `ImageVector` |
+| XML 向量 | `decodeToImageVector()` | `ImageVector` |
 | SVG | `decodeToSvgPainter()` | `Painter` |
 
 讀取檔案或網路回應會阻塞呼叫執行緒，因此請務必在 UI 執行緒之外執行這些操作。
 
-以下範例宣告了一個 `AsyncImage()` Composable，它在 `Dispatchers.IO` 上下文中載入圖片，並在圖片就緒時顯示：
+以下範例宣告了一個 `AsyncImage()` 可組合項，它會在 `Dispatchers.IO` 上下文中載入影像，並在影像就緒時顯示：
 
 ```kotlin
 import androidx.compose.foundation.Image
@@ -156,8 +161,8 @@ fun <T> AsyncImage(
             try {
                 load()
             } catch (e: IOException) {
-                // Instead of printing to the console, you can log the error
-                // or show a placeholder image.
+                // 除了列印到主控台，您也可以記錄錯誤
+                // 或顯示預留位置影像。
                 e.printStackTrace()
                 null
             }
@@ -176,17 +181,17 @@ fun <T> AsyncImage(
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="fun <T> AsyncImage(load: suspend () -> T, painterFor: @Composable (T) -> Painter"}
 
-<img src="compose-desktop-images-async.png" alt="從檔案系統和網路載入的圖片" width="420"/>
+<img src="compose-desktop-images-async.png" alt="從檔案系統與網路載入的影像" width="420"/>
 
-範例中的檔案路徑是相對於應用程式的工作目錄解析的。
+範例中的檔案路徑是相對於應用程式的工作目錄進行解析的。
 
-> 您可以使用[專用的圖片載入程式庫](compose-multiplatform-resources-usage.md#remote-files)，而不是手動載入遠端圖片。
+> 與其手動載入遠端影像，您可以使用[專用的影像載入程式庫](compose-multiplatform-resources-usage.md#remote-files)。
 >
 {style="tip"}
 
 ## 設定視窗圖示 {id="setting-the-window-icon"}
 
-若要將圖片用作視窗圖示，請將 `Painter` 執行個體作為 `icon` 參數傳遞給 `Window()` Composable：
+若要將影像用作視窗圖示，請將 `Painter` 執行個體作為 `icon` 參數傳遞給 `Window()` 可組合項：
 
 ```kotlin
 import androidx.compose.foundation.layout.Box
@@ -221,15 +226,15 @@ fun main() = application {
 圖示的位置取決於作業系統：
 
 * 在 Windows 和 Linux 上，它是視窗及其工作列項目的圖示。
-* 在 macOS 上，應用程式圖示來自應用程式套件 (application bundle)。若要更改 Dock 中的圖示，請在[發行配置](compose-native-distribution.md#application-icon)中進行設定。
+* 在 macOS 上，應用程式圖示來自應用程式套件 (application bundle)。若要變更 Dock 中的圖示，請在[發行組態](compose-native-distribution.md#application-icon)中進行設定。
 
-以下螢幕截圖顯示了 macOS 上封裝後的應用程式。視窗顯示傳遞給 `icon` 參數的相同圖片，而 Dock 圖示則來自發行配置中宣告的 `.icns` 檔案：
+以下螢幕截圖顯示了 macOS 上的已打包應用程式。視窗顯示傳遞給 `icon` 參數的相同影像，而 Dock 圖示則來自發行組態中宣告的 `.icns` 檔案：
 
-<img src="compose-desktop-images-window-icon.png" alt="封裝後的應用程式及其 Dock 圖示" width="426"/>
+<img src="compose-desktop-images-window-icon.png" alt="已打包應用程式及其 Dock 圖示" width="426"/>
 
-### 單視窗應用程式圖示 {id="single-window-application-icon"}
+### 單一視窗應用程式圖示 {id="single-window-application-icon"}
 
-`singleWindowApplication()` 函式在其組合 (composition) 之外評估其 `icon` 參數，此時 `painterResource()` 無法使用。相反地，請使用 `Res.readBytes()` 讀取資源，它接受 `composeResources` 目錄內的檔案路徑，並將其解碼為 `BitmapPainter`：
+`singleWindowApplication()` 函式會在組合 (composition) 之外求值其 `icon` 參數，此時 `painterResource()` 不可用。相對地，請改用 `Res.readBytes()` 讀取資源（該函式接收 `composeResources` 目錄內的檔案路徑），並將其解碼為 `BitmapPainter`：
 
 ```kotlin
 import androidx.compose.material.Text
@@ -252,7 +257,7 @@ fun main() {
 
 ## 設定系統匣圖示 {id="setting-the-tray-icon"}
 
-若要將圖片用作 [系統匣](compose-desktop-tray.md) 圖示，請將 `Painter` 執行個體作為 `icon` 參數傳遞給 `Tray()` Composable：
+若要將影像用作[系統匣](compose-desktop-tray.md)圖示，請將 `Painter` 執行個體作為 `icon` 參數傳遞給 `Tray()` 可組合項：
 
 ```kotlin
 import androidx.compose.foundation.Image
@@ -298,13 +303,13 @@ fun main() = application {
 }
 ```
 
-在 macOS 上，系統匣圖示出現在選單列中：
+在 macOS 上，系統匣圖示會顯示在選單列中：
 
 <img src="compose-desktop-images-tray-icon.png" alt="macOS 選單列中的系統匣圖示" width="430"/>
 
-## 下一步 {id="what-s-next"}
+## 後續步驟 {id="what-s-next"}
 
-* 進一步了解[多平台資源](compose-multiplatform-resources.md)以及[如何在 common 程式碼中存取它們](compose-multiplatform-resources-usage.md)。
+* 進一步了解[多平台資源](compose-multiplatform-resources.md)以及[如何在通用程式碼中存取它們](compose-multiplatform-resources-usage.md)。
 * 了解如何將應用程式圖示新增至[系統匣](compose-desktop-tray.md)。
 * 了解如何使用平台專屬的應用程式圖示[建立原生發行版本](compose-native-distribution.md)。
 * 探索關於[其他桌面元件](compose-desktop-components.md)的教學。

@@ -1,13 +1,13 @@
-[//]: # (title: 1.6.x에서 2.0.x로 마이그레이션하기)
+[//]: # (title: 1.6.x에서 2.0.x로 마이그레이션)
 
 <show-structure for="chapter" depth="2"/>
 
 이 가이드는 Ktor 애플리케이션을 1.6.x 버전에서 2.0.x 버전으로 마이그레이션하는 방법에 대한 지침을 제공합니다.
 
-## Ktor 서버 {id="server"}
+## Ktor Server {id="server"}
 ### 서버 코드가 'io.ktor.server.*' 패키지로 이동되었습니다 {id="server-package"}
-서버와 클라이언트 API를 통합하고 더 잘 구분하기 위해 서버 코드가 `io.ktor.server.*` 패키지로 이동되었습니다 ([KTOR-2865](https://youtrack.jetbrains.com/issue/KTOR-2865)).
-이는 아래에 설명된 대로 애플리케이션의 [의존성](#server-package-dependencies) 및 [임포트](#server-package-imports)를 업데이트해야 함을 의미합니다.
+서버와 클라이언트 API를 통합하고 보다 명확히 구분하기 위해, 서버 코드가 `io.ktor.server.*` 패키지로 이동되었습니다 ([KTOR-2865](https://youtrack.jetbrains.com/issue/KTOR-2865)).
+따라서 아래와 같이 애플리케이션의 [의존성](#server-package-dependencies) 및 [import](#server-package-imports) 문을 업데이트해야 합니다.
 
 #### 의존성 {id="server-package-dependencies"}
 | 서브시스템                                           |               1.6.x               |                                                                                2.0.0 |
@@ -48,7 +48,7 @@
 
 > 모든 플러그인을 한 번에 추가하려면 `io.ktor:ktor-server` 아티팩트를 사용할 수 있습니다.
 
-#### 임포트 {id="server-package-imports"}
+#### Imports {id="server-package-imports"}
 | 서브시스템                                           |                 1.6.x                 |                                                2.0.0 |
 |:----------------------------------------------------|:-------------------------------------:|-----------------------------------------------------:|
 | [Application](server-create-and-configure.topic)    |    `import io.ktor.application.*`     |                `import io.ktor.server.application.*` |
@@ -93,7 +93,7 @@
 
 ### WebSockets 코드가 'websockets' 패키지로 이동되었습니다 {id="server-ws-package"}
 
-WebSockets 코드가 `http-cio`에서 `websockets` 패키지로 이동되었습니다. 이에 따라 다음과 같이 임포트를 업데이트해야 합니다.
+WebSockets 코드가 `http-cio`에서 `websockets` 패키지로 이동되었습니다. 이에 따라 다음과 같이 import 문을 업데이트해야 합니다:
 
 | 1.6.x                                 |                        2.0.0 |
 |:--------------------------------------|-----------------------------:|
@@ -101,13 +101,13 @@ WebSockets 코드가 `http-cio`에서 `websockets` 패키지로 이동되었습�
 
 이 변경 사항은 [클라이언트](#client-ws-package)에도 영향을 미칩니다.
 
-### Feature의 이름이 Plugin으로 변경되었습니다 {id="feature-plugin"}
+### Feature가 Plugin으로 이름 변경되었습니다 {id="feature-plugin"}
 
-Ktor 2.0.0에서는 요청/응답 파이프라인을 가로채는 기능을 더 잘 설명하기 위해 _Feature_의 이름이 _[Plugin](server-plugins.md)_으로 변경되었습니다 ([KTOR-2326](https://youtrack.jetbrains.com/issue/KTOR-2326)).
-이 변경은 전체 Ktor API에 영향을 미치며, 아래에 설명된 대로 애플리케이션을 업데이트해야 합니다.
+Ktor 2.0.0에서는 요청/응답 파이프라인을 가로채는 기능을 더 잘 설명하기 위해 _Feature_의 명칭이 _[Plugin](server-plugins.md)_으로 변경되었습니다 ([KTOR-2326](https://youtrack.jetbrains.com/issue/KTOR-2326)).
+이 변경 사항은 전체 Ktor API에 영향을 미치므로 아래에 설명된 대로 애플리케이션을 업데이트해야 합니다.
 
-#### 임포트 {id="feature-plugin-imports"}
-[플러그인을 설치](server-plugins.md#install)하려면 임포트를 업데이트해야 하며, 이는 또한 서버 코드를 `io.ktor.server.*` 패키지로 [이동](#server-package-imports)하는 것과 관련이 있습니다.
+#### Imports {id="feature-plugin-imports"}
+[플러그인 설치](server-plugins.md#install) 시 import 문의 업데이트가 필요하며, [서버 코드가 이동](#server-package-imports)된 `io.ktor.server.*` 패키지의 영향도 받습니다:
 
 | 1.6.x                       |                             2.0.0 |
 |:----------------------------|----------------------------------:|
@@ -115,20 +115,20 @@ Ktor 2.0.0에서는 요청/응답 파이프라인을 가로채는 기능을 더 
 
 #### 커스텀 플러그인 {id="feature-plugin-custom"}
 
-Feature를 Plugin으로 변경하면서 [커스텀 플러그인](server-custom-plugins-base-api.md) 관련 API에 다음과 같은 변화가 생겼습니다:
-* `ApplicationFeature` 인터페이스의 이름이 `BaseApplicationPlugin`으로 변경되었습니다.
-* `Features` [파이프라인 단계(phase)](server-custom-plugins-base-api.md#pipelines)의 이름이 `Plugins`로 변경되었습니다.
+Feature에서 Plugin으로의 명칭 변경으로 인해 [커스텀 플러그인](server-custom-plugins-base-api.md) 관련 API에 다음과 같은 변경 사항이 적용됩니다:
+* `ApplicationFeature` 인터페이스가 `BaseApplicationPlugin`으로 이름이 변경되었습니다.
+* `Features` [파이프라인 단계(pipeline phase)](server-custom-plugins-base-api.md#pipelines)가 `Plugins`로 이름이 변경되었습니다.
 
-> v2.0.0부터 Ktor는 [커스텀 플러그인을 생성](server-custom-plugins.md)하기 위한 새로운 API를 제공합니다. 일반적으로 이 API는 파이프라인, 단계 등과 같은 내부 Ktor 개념을 이해할 필요가 없습니다. 대신 `onCall`, `onCallReceive`, `onCallRespond` 등과 같은 다양한 핸들러를 사용하여 요청 및 응답 처리의 각 단계에 액세스할 수 있습니다. 이 섹션에서 파이프라인 단계가 새로운 API 핸들러에 어떻게 매핑되는지 알아볼 수 있습니다: [파이프라인 단계와 새 API 핸들러의 매핑](server-custom-plugins-base-api.md#mapping).
+> v2.0.0부터 Ktor는 [커스텀 플러그인을 생성](server-custom-plugins.md)하기 위한 새로운 API를 제공합니다. 일반적으로 이 새로운 API는 파이프라인, 단계(phases) 등과 같은 내부 Ktor 개념을 이해할 필요가 없습니다. 대신 `onCall`, `onCallReceive`, `onCallRespond` 등 다양한 핸들러를 사용하여 요청 및 응답 처리의 여러 단계에 접근할 수 있습니다. 파이프라인 단계가 새 API 핸들러에 매핑되는 방식은 다음 섹션에서 확인할 수 있습니다: [파이프라인 단계와 새 API 핸들러의 매핑](server-custom-plugins-base-api.md#mapping).
 
 ### 콘텐츠 협상 및 직렬화 {id="serialization"}
 
-[콘텐츠 협상(Content negotiation) 및 직렬화(serialization)](server-serialization.md) 서버 API는 서버와 클라이언트 간에 직렬화 라이브러리를 재사용할 수 있도록 리팩토링되었습니다.
+서버와 클라이언트 간에 직렬화 라이브러리를 재사용할 수 있도록 [콘텐츠 협상 및 직렬화(Content negotiation and serialization)](server-serialization.md) 서버 API가 리팩터링되었습니다.
 주요 변경 사항은 다음과 같습니다:
 * `ContentNegotiation`이 `ktor-server-core`에서 별도의 `ktor-server-content-negotiation` 아티팩트로 이동되었습니다.
-* 직렬화 라이브러리가 클라이언트에서도 사용하는 `ktor-*`에서 `ktor-serialization-*` 아티팩트로 이동되었습니다.
+* 직렬화 라이브러리가 `ktor-*`에서 클라이언트에서도 공유되는 `ktor-serialization-*` 아티팩트로 이동되었습니다.
 
-아래와 같이 애플리케이션의 [의존성](#dependencies-serialization) 및 [임포트](#imports-serialization)를 업데이트해야 합니다.
+아래 표시된 대로 애플리케이션의 [의존성](#dependencies-serialization)과 [import](#imports-serialization) 문을 업데이트해야 합니다.
 
 #### 의존성 {id="dependencies-serialization"}
 
@@ -139,7 +139,7 @@ Feature를 Plugin으로 변경하면서 [커스텀 플러그인](server-custom-p
 | [Gson](server-serialization.md)                  |     `io.ktor:ktor-gson`      |         `io.ktor:ktor-serialization-gson` |
 | [Jackson](server-serialization.md)               |    `io.ktor:ktor-jackson`    |      `io.ktor:ktor-serialization-jackson` |
 
-#### 임포트 {id="imports-serialization"}
+#### Imports {id="imports-serialization"}
 | 서브시스템                                 |              1.6.x               |                                         2.0.0 |
 |:------------------------------------------|:--------------------------------:|----------------------------------------------:|
 | [kotlinx.serialization](server-serialization.md) | `import io.ktor.serialization.*` | `import io.ktor.serialization.kotlinx.json.*` |
@@ -148,7 +148,7 @@ Feature를 Plugin으로 변경하면서 [커스텀 플러그인](server-custom-p
 
 #### 커스텀 컨버터 {id="serialization-custom-converter"}
 
-[ContentConverter](server-serialization.md#implement_custom_serializer) 인터페이스에서 노출하는 함수의 시그니처가 다음과 같이 변경되었습니다.
+[ContentConverter](server-serialization.md#implement_custom_serializer) 인터페이스가 제공하는 함수 시그니처가 다음과 같이 변경되었습니다:
 
 <Tabs group="ktor_versions">
 <TabItem title="1.6.x" group-key="1_6">
@@ -175,16 +175,16 @@ interface ContentConverter {
 
 ### 테스트 API {id="testing-api"}
 
-v2.0.0부터 Ktor 서버는 [KTOR-971](https://youtrack.jetbrains.com/issue/KTOR-971)에 설명된 다양한 문제를 해결하는 새로운 [테스트](server-testing.md)용 API를 사용합니다. 주요 변경 사항은 다음과 같습니다:
+v2.0.0부터 Ktor 서버는 [KTOR-971](https://youtrack.jetbrains.com/issue/KTOR-971)에 설명된 다양한 문제를 해결한 새로운 [테스트](server-testing.md) API를 사용합니다. 주요 변경 사항은 다음과 같습니다:
 * `withTestApplication`/`withApplication` 함수가 새로운 `testApplication` 함수로 대체되었습니다.
-* `testApplication` 함수 내에서 기존 [Ktor 클라이언트](client-create-and-configure.md) 인스턴스를 사용하여 서버에 요청을 보내고 결과를 확인할 수 있습니다.
+* `testApplication` 함수 내부에서는 기존 [Ktor 클라이언트](client-create-and-configure.md) 인스턴스를 사용하여 서버에 요청을 보내고 결과를 검증해야 합니다.
 * 특정 기능(예: 쿠키 또는 WebSockets)을 테스트하려면 새 클라이언트 인스턴스를 생성하고 해당 [플러그인](client-plugins.md)을 설치해야 합니다.
 
-1.6.x 테스트를 2.0.0으로 마이그레이션하는 몇 가지 예시를 살펴보겠습니다.
+1.6.x 테스트를 2.0.0으로 마이그레이션하는 몇 가지 예를 살펴보겠습니다:
 
 #### 기본 서버 테스트 {id="basic-test"}
 
-아래 테스트에서 `handleRequest` 함수는 `client.get` 요청으로 대체됩니다.
+아래 테스트에서는 `handleRequest` 함수가 `client.get` 요청으로 대체되었습니다:
 
 <Tabs group="ktor_versions">
 <TabItem title="1.6.x" group-key="1_6">
@@ -218,7 +218,7 @@ fun testRoot() = testApplication {
 
 #### x-www-form-urlencoded {id="x-www-form-urlencoded"}
 
-아래 테스트에서 `handleRequest` 함수는 `client.post` 요청으로 대체됩니다.
+아래 테스트에서는 `handleRequest` 함수가 `client.post` 요청으로 대체되었습니다:
 
 <Tabs group="ktor_versions">
 <TabItem title="1.6.x" group-key="1_6">
@@ -254,7 +254,7 @@ fun testPost() = testApplication {
 
 #### multipart/form-data {id="multipart-form-data"}
 
-v2.0.0에서 `multipart/form-data`를 구성하려면 클라이언트의 `setBody` 함수에 `MultiPartFormDataContent`를 전달해야 합니다.
+v2.0.0에서 `multipart/form-data`를 구성하려면 클라이언트의 `setBody` 함수에 `MultiPartFormDataContent`를 전달해야 합니다:
 
 <Tabs group="ktor_versions">
 <TabItem title="1.6.x" group-key="1_6">
@@ -319,8 +319,8 @@ fun testUpload() = testApplication {
 
 #### JSON 데이터 {id="json-data"}
 
-v.1.6.x에서는 `kotlinx.serialization` 라이브러리에서 제공하는 `Json.encodeToString` 함수를 사용하여 JSON 데이터를 직렬화할 수 있습니다.
-v2.0.0에서는 특정 형식으로 콘텐츠를 직렬화/역직렬화할 수 있는 [ContentNegotiation](client-serialization.md) 플러그인을 설치하고 새 클라이언트 인스턴스를 생성해야 합니다.
+v1.6.x에서는 `kotlinx.serialization` 라이브러리가 제공하는 `Json.encodeToString` 함수를 사용하여 JSON 데이터를 직렬화할 수 있습니다.
+v2.0.0에서는 새 클라이언트 인스턴스를 생성하고 특정 형식으로 콘텐츠를 직렬화/역직렬화할 수 있는 [ContentNegotiation](client-serialization.md) 플러그인을 설치해야 합니다:
 
 <Tabs group="ktor_versions">
 <TabItem title="1.6.x" group-key="1_6">
@@ -363,7 +363,7 @@ fun testPostCustomer() = testApplication {
 
 #### 테스트 중 쿠키 유지 {id="preserving-cookies"}
 
-v1.6.x에서는 테스트 시 요청 간에 쿠키를 유지하기 위해 `cookiesSession`을 사용합니다. v2.0.0에서는 새 클라이언트 인스턴스를 생성하고 [HttpCookies](client-cookies.md) 플러그인을 설치해야 합니다.
+v1.6.x에서는 테스트 시 요청 간에 쿠키를 유지하기 위해 `cookiesSession`을 사용했습니다. v2.0.0에서는 새 클라이언트 인스턴스를 생성하고 [HttpCookies](client-cookies.md) 플러그인을 설치해야 합니다:
 
 <Tabs group="ktor_versions">
 <TabItem title="1.6.x" group-key="1_6">
@@ -416,7 +416,7 @@ v1.6.x에서는 테스트 시 요청 간에 쿠키를 유지하기 위해 `cooki
 
 #### WebSockets {id="testing-ws"}
 
-기존 API에서는 [WebSocket 대화](server-websockets.md)를 테스트하기 위해 `handleWebSocketConversation`을 사용합니다. v2.0.0에서는 클라이언트가 제공하는 [WebSockets](client-websockets.topic) 플러그인을 사용하여 WebSocket 대화를 테스트할 수 있습니다.
+기존 API에서는 [WebSocket 대화](server-websockets.md)를 테스트하기 위해 `handleWebSocketConversation`을 사용했습니다. v2.0.0에서는 클라이언트가 제공하는 [WebSockets](client-websockets.topic) 플러그인을 사용하여 WebSocket 대화를 테스트할 수 있습니다:
 
 <Tabs group="ktor_versions">
 <TabItem title="1.6.x" group-key="1_6">
@@ -464,17 +464,17 @@ v1.6.x에서는 테스트 시 요청 간에 쿠키를 유지하기 위해 `cooki
 </Tabs>
 
 ### DoubleReceive {id="double-receive"}
-v2.0.0에서 [DoubleReceive](server-double-receive.md) 플러그인 구성에는 `receiveEntireContent`와 반대되는 `cacheRawRequest` 속성이 도입되었습니다:
-- v1.6.x에서는 `receiveEntireContent` 속성이 기본적으로 `false`로 설정됩니다.
-- v2.0.0에서는 `cacheRawRequest`가 기본적으로 `true`로 설정됩니다. `receiveEntireContent` 속성은 제거되었습니다.
+v2.0.0에서는 [DoubleReceive](server-double-receive.md) 플러그인 설정에 `receiveEntireContent`의 반대 역할을 하는 `cacheRawRequest` 프로퍼티가 도입되었습니다:
+- v1.6.x에서는 `receiveEntireContent` 프로퍼티가 기본적으로 `false`로 설정되었습니다.
+- v2.0.0에서는 `cacheRawRequest`가 기본적으로 `true`로 설정됩니다. `receiveEntireContent` 프로퍼티는 제거되었습니다.
 
 ### Forwarded headers {id="forwarded-headers"}
 
-v2.0.0에서 `ForwardedHeaderSupport` 및 `XForwardedHeaderSupport` 플러그인의 이름이 각각 [ForwardedHeaders](server-forward-headers.md) 및 `XForwardedHeaders`로 변경되었습니다.
+v2.0.0에서는 `ForwardedHeaderSupport` 및 `XForwardedHeaderSupport` 플러그인의 이름이 각각 [ForwardedHeaders](server-forward-headers.md) 및 `XForwardedHeaders`로 변경되었습니다.
 
 ### Caching headers {id="caching-headers"}
 
-캐싱 옵션을 정의하는 데 사용되는 [options](server-caching-headers.md#configure) 함수가 이제 `OutgoingContent`와 더불어 `ApplicationCall`을 람다 인수로 받습니다.
+캐싱 옵션을 정의하는 데 사용되는 [options](server-caching-headers.md#configure) 함수가 이제 `OutgoingContent` 외에도 람다 인수로 `ApplicationCall`을 전달받습니다: 
 
 <Tabs group="ktor_versions">
 <TabItem title="1.6.x" group-key="1_6">
@@ -503,7 +503,7 @@ install(CachingHeaders) {
 
 ### Conditional headers {id="conditional-headers"}
 
-리소스 버전 목록을 정의하는 데 사용되는 [version](server-conditional-headers.md#configure) 함수가 이제 `OutgoingContent`와 더불어 `ApplicationCall`을 람다 인수로 받습니다.
+리소스 버전 목록을 정의하는 데 사용되는 [version](server-conditional-headers.md#configure) 함수가 이제 `OutgoingContent` 외에도 람다 인수로 `ApplicationCall`을 전달받습니다:
 
 <Tabs group="ktor_versions">
 <TabItem title="1.6.x" group-key="1_6">
@@ -532,7 +532,7 @@ install(ConditionalHeaders) {
 
 ### CORS {id="cors"}
 
-[CORS](server-cors.md) 구성에 사용되는 몇 가지 함수의 이름이 변경되었습니다:
+[CORS](server-cors.md) 설정에 사용되는 여러 함수의 이름이 변경되었습니다:
 - `host` -> `allowHost`
 - `header` -> `allowHeader`
 - `method` -> `allowMethod`
@@ -563,18 +563,18 @@ install(CORS) {
 </Tabs>
 
 ### MicrometerMetrics {id="micrometer-metrics"}
-v1.6.x에서는 HTTP 요청 모니터링에 사용되는 [Ktor 메트릭](server-metrics-micrometer.md)의 기본 이름(접두사)을 지정하기 위해 `baseName` 속성을 사용합니다.
-기본값은 `ktor.http.server`입니다.
+v1.6.x에서는 HTTP 요청을 모니터링하는 데 사용되는 [Ktor 메트릭](server-metrics-micrometer.md)의 기본 이름(접두사)을 지정하기 위해 `baseName` 프로퍼티를 사용했습니다.
+기본값은 `ktor.http.server`였습니다. 
 v2.0.0에서는 `baseName`이 `metricName`으로 대체되었으며 기본값은 `ktor.http.server.requests`입니다.
 
-## Ktor 클라이언트 {id="client"}
+## Ktor Client {id="client"}
 ### 요청 및 응답 {id="request-response"}
 
-v2.0.0에서는 요청을 보내고 응답을 받는 데 사용되는 API가 일관성과 검색 용이성을 위해 업데이트되었습니다 ([KTOR-29](https://youtrack.jetbrains.com/issue/KTOR-29)).
+v2.0.0에서는 요청을 전송하고 응답을 수신하는 데 사용되는 API가 더욱 일관되고 직관적으로 업데이트되었습니다 ([KTOR-29](https://youtrack.jetbrains.com/issue/KTOR-29)).
 
 #### 요청 함수 {id="request-overloads"}
 
-여러 매개변수가 있는 [요청 함수](client-requests.md)는 지원 중단되었습니다. 예를 들어, `port` 및 `path` 매개변수는 [HttpRequestBuilder](https://api.ktor.io/ktor-client-core/io.ktor.client.request/-http-request-builder/index.html)에서 노출하는 `url` 매개변수로 교체해야 합니다.
+매개변수가 여러 개인 [요청 함수](client-requests.md)는 deprecated 처리되었습니다. 예를 들어, `port` 및 `path` 매개변수는 [HttpRequestBuilder](https://api.ktor.io/ktor-client-core/io.ktor.client.request/-http-request-builder/index.html)에서 제공하는 `url` 매개변수로 교체해야 합니다:
 
 <Tabs group="ktor_versions">
 <TabItem title="1.6.x" group-key="1_6">
@@ -593,11 +593,11 @@ client.get { url(port = 8080, path = "/customer/3") }
 </TabItem>
 </Tabs>
 
-`HttpRequestBuilder`를 사용하면 요청 함수 람다 내부에서 추가 [요청 매개변수](client-requests.md#parameters)를 지정할 수도 있습니다.
+또한 `HttpRequestBuilder`를 사용하면 요청 함수 람다 내부에서 추가적인 [요청 매개변수](client-requests.md#parameters)를 지정할 수 있습니다.
 
 #### 요청 본문 {id="request-body"}
 
-[요청 본문](client-requests.md#body)을 설정하는 데 사용되는 `HttpRequestBuilder.body` 속성이 `HttpRequestBuilder.setBody` 함수로 대체되었습니다.
+[요청 본문(request body)](client-requests.md#body)을 설정하는 데 사용되었던 `HttpRequestBuilder.body` 프로퍼티가 `HttpRequestBuilder.setBody` 함수로 대체되었습니다:
 
 <Tabs group="ktor_versions">
 <TabItem title="1.6.x" group-key="1_6">
@@ -621,9 +621,9 @@ client.post("http://localhost:8080/post") {
 </Tabs>
 
 #### 응답 {id="responses"}
-v2.0.0부터 요청 함수(`get`, `post`, `put`, [submitForm](client-requests.md#form_parameters) 등)는 특정 타입의 객체를 받기 위한 제네릭 인수를 받지 않습니다.
-이제 모든 요청 함수는 `HttpResponse` 객체를 반환하며, 이 객체는 특정 타입 인스턴스를 받기 위한 제네릭 인수가 포함된 `body` 함수를 노출합니다.
-또한 `bodyAsText` 또는 `bodyAsChannel`을 사용하여 콘텐츠를 문자열이나 채널로 받을 수도 있습니다.
+v2.0.0부터 요청 함수(`get`, `post`, `put`, [submitForm](client-requests.md#form_parameters) 등)는 특정 타입의 객체를 수신하기 위한 제네릭 인수를 받지 않습니다.
+이제 모든 요청 함수는 `HttpResponse` 객체를 반환하며, 이 객체는 특정 타입의 인스턴스를 받기 위한 제네릭 인수가 있는 `body` 함수를 제공합니다.
+또한 `bodyAsText` 또는 `bodyAsChannel`을 사용하여 콘텐츠를 문자열이나 채널 형태로 수신할 수도 있습니다.
 
 <Tabs group="ktor_versions">
 <TabItem title="1.6.x" group-key="1_6">
@@ -646,7 +646,7 @@ val byteArrayBody: ByteArray = httpResponse.body()
 </TabItem>
 </Tabs>
 
-[ContentNegotiation](client-serialization.md) 플러그인이 설치되어 있으면 다음과 같이 임의의 객체를 받을 수 있습니다.
+[ContentNegotiation](client-serialization.md) 플러그인이 설치되어 있는 경우 다음과 같이 임의의 객체를 수신할 수 있습니다:
 
 <Tabs group="ktor_versions">
 <TabItem title="1.6.x" group-key="1_6">
@@ -666,15 +666,15 @@ val customer: Customer = client.get("http://localhost:8080/customer/3").body()
 </Tabs>
 
 #### 스트리밍 응답 {id="streaming-response"}
-요청 함수에서 [제네릭 인수가 제거](#responses)됨에 따라, 스트리밍 응답을 받으려면 별도의 함수가 필요합니다.
-이를 위해 `prepareGet` 또는 `preparePost`와 같이 `prepare` 접두사가 붙은 함수들이 추가되었습니다.
+요청 함수에서 [제네릭 인수가 제거](#responses)됨에 따라 스트리밍 응답을 수신하려면 별도의 함수가 필요합니다.
+이를 위해 `prepareGet`이나 `preparePost`와 같이 `prepare` 접두사가 붙은 함수가 추가되었습니다:
 
 ```kotlin
 public suspend fun HttpClient.prepareGet(builder: HttpRequestBuilder): HttpStatement
 public suspend fun HttpClient.preparePost(builder: HttpRequestBuilder): HttpStatement
 ```
 
-아래 예시는 이 경우 코드를 어떻게 변경해야 하는지 보여줍니다.
+아래 예시는 이 경우 코드를 변경하는 방법을 보여줍니다:
 
 <Tabs group="ktor_versions">
 <TabItem title="1.6.x" group-key="1_6">
@@ -695,7 +695,7 @@ client.get<HttpStatement>("https://ktor.io/").execute { httpResponse ->
 client.prepareGet("https://ktor.io/").execute { httpResponse ->
     val channel: ByteReadChannel = httpResponse.body()
     while (!channel.isClosedForRead) {
-        // 데이터 읽기
+        // Read data
     }
 }
 ```
@@ -703,18 +703,18 @@ client.prepareGet("https://ktor.io/").execute { httpResponse ->
 </TabItem>
 </Tabs>
 
-전체 예시는 여기서 확인할 수 있습니다: [데이터 스트리밍](client-responses.md#streaming).
+전체 예시는 여기에서 확인할 수 있습니다: [스트리밍 데이터](client-responses.md#streaming).
 
-### 응답 검증 {id="response-validation"}
+### 응답 유효성 검사 {id="response-validation"}
 
-v2.0.0부터 [응답 검증](client-response-validation.md)에 사용되는 `expectSuccess` 속성의 기본값이 `false`로 설정됩니다.
-이에 따라 다음과 같은 코드 변경이 필요합니다:
-- [기본 검증을 활성화](client-response-validation.md#default)하고 2xx가 아닌 응답에 대해 예외를 발생시키려면 `expectSuccess` 속성을 `true`로 설정하세요.
-- `handleResponseExceptionWithRequest`를 사용하여 [2xx가 아닌 예외를 처리](client-response-validation.md#non-2xx)하는 경우에도 명시적으로 `expectSuccess`를 활성화해야 합니다.
+v2.0.0에서는 [응답 유효성 검사](client-response-validation.md)에 사용되는 `expectSuccess` 프로퍼티가 기본적으로 `false`로 설정됩니다.
+이에 따라 코드에서 다음과 같은 변경이 필요합니다:
+- [기본 유효성 검사를 활성화](client-response-validation.md#default)하고 2xx가 아닌 응답에 대해 예외를 발생시키려면 `expectSuccess` 프로퍼티를 `true`로 설정하세요.
+- `handleResponseExceptionWithRequest`를 사용하여 [2xx가 아닌 예외를 처리](client-response-validation.md#non-2xx)하는 경우에도 `expectSuccess`를 명시적으로 활성화해야 합니다.
 
 #### HttpResponseValidator {id="http-response-validator"}
 
-`handleResponseException` 함수가 `handleResponseExceptionWithRequest`로 대체되었습니다. 이 함수는 예외 발생 시 추가 정보를 제공하기 위해 `HttpRequest`에 대한 접근을 추가로 제공합니다.
+[handleResponseException](client-response-validation.md#non-2xx) 함수가 예외에 추가 정보를 제공할 수 있도록 `HttpRequest`에 대한 접근을 추가한 `handleResponseExceptionWithRequest`로 대체되었습니다:
 
 <Tabs group="ktor_versions">
 <TabItem title="1.6.x" group-key="1_6">
@@ -745,31 +745,31 @@ HttpResponseValidator {
 
 Ktor 클라이언트는 이제 콘텐츠 협상을 지원하며 Ktor 서버와 직렬화 라이브러리를 공유합니다.
 주요 변경 사항은 다음과 같습니다:
-* `JsonFeature`는 `ktor-client-content-negotiation` 아티팩트에 있는 `ContentNegotiation`을 위해 사용이 중단되었습니다.
+* `JsonFeature`는 `ktor-client-content-negotiation` 아티팩트에 위치한 `ContentNegotiation`으로 대체(deprecated)되었습니다.
 * 직렬화 라이브러리가 `ktor-client-*`에서 `ktor-serialization-*` 아티팩트로 이동되었습니다.
 
-아래와 같이 클라이언트 코드의 [의존성](#imports-dependencies-client) 및 [임포트](#imports-serialization-client)를 업데이트해야 합니다.
+아래와 같이 클라이언트 코드에서 [의존성](#imports-dependencies-client)과 [import](#imports-serialization-client) 문을 업데이트해야 합니다.
 
 #### 의존성 {id="imports-dependencies-client"}
 
 | 서브시스템             |                1.6.x                |                                     2.0.0 |
 |:----------------------|:-----------------------------------:|------------------------------------------:|
-| `ContentNegotiation`  |                 해당 없음                 | `io.ktor:ktor-client-content-negotiation` |
+| `ContentNegotiation`  |                 n/a                 | `io.ktor:ktor-client-content-negotiation` |
 | kotlinx.serialization | `io.ktor:ktor-client-serialization` | `io.ktor:ktor-serialization-kotlinx-json` |
 | Gson                  |     `io.ktor:ktor-client-gson`      |         `io.ktor:ktor-serialization-gson` |
 | Jackson               |    `io.ktor:ktor-client-jackson`    |      `io.ktor:ktor-serialization-jackson` |
 
-#### 임포트 {id="imports-serialization-client"}
+#### Imports {id="imports-serialization-client"}
 | 서브시스템             |                  1.6.x                  |                                                2.0.0 |
 |:----------------------|:---------------------------------------:|-----------------------------------------------------:|
-| `ContentNegotiation`  |                   해당 없음                   | `import io.ktor.client.plugins.contentnegotiation.*` |
+| `ContentNegotiation`  |                   n/a                   | `import io.ktor.client.plugins.contentnegotiation.*` |
 | kotlinx.serialization | `import io.ktor.client.features.json.*` |        `import io.ktor.serialization.kotlinx.json.*` |
 | Gson                  | `import io.ktor.client.features.json.*` |                `import io.ktor.serialization.gson.*` |
 | Jackson               | `import io.ktor.client.features.json.*` |             `import io.ktor.serialization.jackson.*` |
 
 ### Bearer 인증 {id="bearer-authentication"}
 
-[refreshTokens](client-bearer-auth.md) 함수는 이제 `HttpResponse` 람다 인수(`it`) 대신 `RefreshTokenParams` 인스턴스를 [람다 수신 객체](https://kotlinlang.org/docs/scope-functions.html#context-object-this-or-it)(`this`)로 사용합니다.
+[refreshTokens](client-bearer-auth.md) 함수는 이제 `HttpResponse` 람다 인수(`it`) 대신 `RefreshTokenParams` 인스턴스를 [람다 수신 객체(lambda receiver)](https://kotlinlang.org/docs/scope-functions.html#context-object-this-or-it)(`this`)로 사용합니다:
 
 <Tabs group="ktor_versions">
 <TabItem title="1.6.x" group-key="1_6">
@@ -796,14 +796,14 @@ bearer {
 </TabItem>
 </Tabs>
 
-`RefreshTokenParams`는 다음 속성들을 노출합니다:
-* `response`: 응답 매개변수에 접근;
-* `client`: 토큰 갱신을 위한 요청 전송;
-* `oldTokens`: `loadTokens`를 통해 획득한 토큰에 접근.
+`RefreshTokenParams`는 다음 프로퍼티를 제공합니다:
+* 응답 매개변수에 접근하기 위한 `response`
+* 토큰을 갱신하기 위해 요청을 전송하는 `client`
+* `loadTokens`를 사용하여 얻은 토큰에 접근하기 위한 `oldTokens`
 
 ### HttpSend {id="http-send"}
 
-[HttpSend](client-http-send.md) 플러그인의 API가 다음과 같이 변경되었습니다.
+[HttpSend](client-http-send.md) 플러그인의 API가 다음과 같이 변경되었습니다:
 
 <Tabs group="ktor_versions">
 <TabItem title="1.6.x" group-key="1_6">
@@ -833,18 +833,18 @@ client.plugin(HttpSend).intercept { request ->
 </TabItem>
 </Tabs>
 
-v2.0.0에서는 플러그인 접근 시 인덱스 기반 접근을 사용할 수 없습니다. 대신 [HttpClient.plugin](#client-get) 함수를 사용하세요.
+v2.0.0부터 플러그인에 접근할 때 인덱스 접근 방식을 사용할 수 없습니다. 대신 [HttpClient.plugin](#client-get) 함수를 사용하세요.
 
 ### HttpClient.get(plugin: HttpClientPlugin) 함수가 제거되었습니다 {id="client-get"}
 
-v2.0.0 버전부터 클라이언트 플러그인을 인자로 받는 `HttpClient.get` 함수가 제거되었습니다. 대신 `HttpClient.plugin` 함수를 사용하세요.
+2.0.0 버전부터 클라이언트 플러그인을 인수로 받는 `HttpClient.get` 함수가 제거되었습니다. 대신 `HttpClient.plugin` 함수를 사용하세요.
 
 <Tabs group="ktor_versions">
 <TabItem title="1.6.x" group-key="1_6">
 
 ```kotlin
 client.get(HttpSend).intercept { ... }
-// 또는
+// or
 client[HttpSend].intercept { ... }
 ```
 
@@ -858,13 +858,13 @@ client.plugin(HttpSend).intercept { ... }
 </TabItem>
 </Tabs>
 
-### Feature의 이름이 Plugin으로 변경되었습니다 {id="feature-plugin-client"}
+### Feature가 Plugin으로 이름 변경되었습니다 {id="feature-plugin-client"}
 
-Ktor 서버와 마찬가지로, 클라이언트 API에서도 _Feature_가 _Plugin_으로 이름이 변경되었습니다.
-이로 인해 아래에 설명된 대로 애플리케이션에 영향이 있을 수 있습니다.
+Ktor 서버와 마찬가지로 클라이언트 API에서도 _Feature_가 _Plugin_으로 이름이 변경되었습니다.
+이로 인해 아래 설명된 바와 같이 애플리케이션에 영향을 미칠 수 있습니다.
 
-#### 임포트 {id="feature-plugin-imports-client"}
-[플러그인 설치](client-plugins.md#install)를 위해 임포트를 업데이트하세요.
+#### Imports {id="feature-plugin-imports-client"}
+[플러그인 설치](client-plugins.md#install)를 위한 import 문을 업데이트하세요:
 
 <table>
 
@@ -878,25 +878,25 @@ Ktor 서버와 마찬가지로, 클라이언트 API에서도 _Feature_가 _Plugi
 <td>
 <list>
 <li>
-<Links href="/ktor/client-default-request" summary="DefaultRequest 플러그인을 사용하면 모든 요청에 대해 기본 매개변수를 구성할 수 있습니다.">기본 요청(Default request)</Links>
+<Links href="client-default-request.md" summary="The DefaultRequest plugin allows you to configure default parameters for all requests.">Default request</Links>
 </li>
 <li>
-<Links href="/ktor/client-user-agent" summary="undefined">User agent</Links>
+<Links href="client-user-agent.md" summary="">User agent</Links>
 </li>
 <li>
-<Links href="/ktor/client-text-and-charsets" summary="undefined">문자 집합(Charsets)</Links>
+<Links href="client-text-and-charsets.md" summary="">Charsets</Links>
 </li>
 <li>
-<Links href="/ktor/client-response-validation" summary="상태 코드에 따라 응답을 검증하는 방법을 알아봅니다.">응답 검증</Links>
+<Links href="client-response-validation.md" summary="Learn how to validate a response depending on its status code.">Response validation</Links>
 </li>
 <li>
-<Links href="/ktor/client-timeout" summary="코드 예시: %example_name%">타임아웃(Timeout)</Links>
+<Links href="client-timeout.md" summary="Code example: %example_name%">Timeout</Links>
 </li>
 <li>
-<Links href="/ktor/client-caching" summary="HttpCache 플러그인을 사용하면 이전에 가져온 리소스를 메모리 내 또는 영구 캐시에 저장할 수 있습니다.">HttpCache</Links>
+<Links href="client-caching.md" summary="The HttpCache plugin allows you to save previously fetched resources in an in-memory or persistent cache.">HttpCache</Links>
 </li>
 <li>
-<Links href="/ktor/client-http-send" summary="코드 예시: %example_name%">HttpSend</Links>
+<Links href="client-http-send.md" summary="Code example: %example_name%">HttpSend</Links>
 </li>
 </list>
 </td>
@@ -905,7 +905,7 @@ Ktor 서버와 마찬가지로, 클라이언트 API에서도 _Feature_가 _Plugi
 </tr>
 
 <tr>
-<td><Links href="/ktor/client-auth" summary="Auth 플러그인은 클라이언트 애플리케이션의 인증 및 인가를 처리합니다.">인증(Authentication)</Links></td>
+<td><Links href="client-auth.md" summary="The Auth plugin handles authentication and authorization in your client application.">Authentication</Links></td>
 <td>
 <code>
 import io.ktor.client.features.auth.&#42;
@@ -925,25 +925,25 @@ import io.ktor.client.plugins.auth.providers.&#42;
 </tr>
 
 <tr>
-<td><Links href="/ktor/client-cookies" summary="HttpCookies 플러그인은 쿠키를 자동으로 처리하고 저장소에 호출 간에 유지합니다.">쿠키(Cookies)</Links></td>
+<td><Links href="client-cookies.md" summary="The HttpCookies plugin handles cookies automatically and keep them between calls in a storage.">Cookies</Links></td>
 <td><code>import io.ktor.client.features.cookies.&#42;</code></td>
 <td><code>import io.ktor.client.plugins.cookies.&#42;</code></td>
 </tr>
 
 <tr>
-<td><Links href="/ktor/client-logging" summary="필수 의존성: io.ktor:ktor-client-logging 코드 예시: %example_name%">로깅(Logging)</Links></td>
+<td><Links href="client-logging.md" summary="Required dependencies: io.ktor:ktor-client-logging Code example: %example_name%">Logging</Links></td>
 <td><code>import io.ktor.client.features.logging.&#42;</code></td>
 <td><code>import io.ktor.client.plugins.logging.&#42;</code></td>
 </tr>
 
 <tr>
-<td><Links href="/ktor/client-websockets" summary="Websockets 플러그인을 사용하면 서버와 클라이언트 간에 다방면 통신 세션을 생성할 수 있습니다.">WebSockets</Links></td>
+<td><Links href="client-websockets.topic" summary="The Websockets plugin allows you to create a multi-way communication session between a server and a client.">WebSockets</Links></td>
 <td><code>import io.ktor.client.features.websocket.&#42;</code></td>
 <td><code>import io.ktor.client.plugins.websocket.&#42;</code></td>
 </tr>
 
 <tr>
-<td><Links href="/ktor/client-content-encoding" summary="ContentEncoding 플러그인을 사용하면 지정된 압축 알고리즘('gzip' 및 'deflate' 등)을 활성화하고 설정을 구성할 수 있습니다.">콘텐츠 인코딩(Content encoding)</Links></td>
+<td><Links href="client-content-encoding.md" summary="The ContentEncoding plugin allows you to enable specified compression algorithms (such as 'gzip' and 'deflate') and configure their settings.">Content encoding</Links></td>
 <td><code>import io.ktor.client.features.compression.&#42;</code></td>
 <td><code>import io.ktor.client.plugins.compression.&#42;</code></td>
 </tr>
@@ -951,34 +951,34 @@ import io.ktor.client.plugins.auth.providers.&#42;
 </table>
 
 #### 커스텀 플러그인 {id="feature-plugin-custom-client"}
-`HttpClientFeature` 인터페이스의 이름이 `HttpClientPlugin`으로 변경되었습니다.
+`HttpClientFeature` 인터페이스가 `HttpClientPlugin`으로 이름이 변경되었습니다.
 
-### Native 대상을 위한 새로운 메모리 모델 {id="new-mm"}
+### Native 타깃을 위한 새로운 메모리 모델 {id="new-mm"}
 
-v2.0.0부터 [Native](client-engines.md#native) 대상에서 Ktor 클라이언트를 사용하려면 새로운 Kotlin/Native 메모리 모델을 활성화해야 합니다: [새로운 MM 활성화](https://github.com/JetBrains/kotlin/blob/master/kotlin-native/NEW_MM.md#enable-the-new-mm).
+v2.0.0부터 [Native](client-engines.md#native) 타깃에서 Ktor 클라이언트를 사용하려면 새로운 Kotlin/Native 메모리 모델을 활성화해야 합니다: [새로운 MM 활성화](https://github.com/JetBrains/kotlin/blob/master/kotlin-native/NEW_MM.md#enable-the-new-mm).
 
-> v2.2.0부터는 새로운 Kotlin/Native 메모리 모델이 [기본으로 활성화](migration-to-22x.md#new-mm)됩니다.
+> v2.2.0부터는 새로운 Kotlin/Native 메모리 모델이 [기본적으로 활성화](migration-to-22x.md#new-mm)됩니다.
 
-### 'Ios' 엔진이 'Darwin'으로 이름이 변경되었습니다 {id="darwin"}
+### 'Ios' 엔진이 'Darwin'으로 이름 변경되었습니다 {id="darwin"}
 
-`Ios` [엔진](client-engines.md)이 iOS뿐만 아니라 macOS, tvOS를 포함한 다른 운영 체제도 대상으로 한다는 점을 고려하여 v2.0.0에서 `Darwin`으로 이름이 변경되었습니다. 이로 인해 다음과 같은 변경 사항이 발생합니다:
+`Ios` [엔진](client-engines.md)이 iOS뿐만 아니라 macOS, tvOS를 포함한 다른 운영 체제도 타깃으로 삼는 점을 고려하여, v2.0.0에서는 `Darwin`으로 이름이 변경되었습니다. 이로 인해 다음과 같은 변경 사항이 발생합니다:
 * `io.ktor:ktor-client-ios` 아티팩트의 이름이 `io.ktor:ktor-client-darwin`으로 변경되었습니다.
-* `HttpClient` 인스턴스를 생성할 때 `Darwin` 클래스를 인자로 전달해야 합니다.
-* `IosClientEngineConfig` 구성 클래스의 이름이 `DarwinClientEngineConfig`로 변경되었습니다.
+* `HttpClient` 인스턴스를 생성할 때 `Darwin` 클래스를 인수로 전달해야 합니다.
+* `IosClientEngineConfig` 설정 클래스의 이름이 `DarwinClientEngineConfig`로 변경되었습니다.
 
-`Darwin` 엔진을 구성하는 방법은 [Darwin](client-engines.md#darwin) 섹션을 참조하세요.
+`Darwin` 엔진을 설정하는 방법은 [Darwin](client-engines.md#darwin) 섹션을 참조하세요.
 
 ### WebSockets 코드가 'websockets' 패키지로 이동되었습니다 {id="client-ws-package"}
 
-WebSockets 코드가 `http-cio`에서 `websockets` 패키지로 이동되었습니다. 이에 따라 다음과 같이 임포트를 업데이트해야 합니다.
+WebSockets 코드가 `http-cio`에서 `websockets` 패키지로 이동되었습니다. 이에 따라 다음과 같이 import 문을 업데이트해야 합니다:
 
 | 1.6.x                                 |                        2.0.0 |
 |:--------------------------------------|-----------------------------:|
 | `import io.ktor.http.cio.websocket.*` | `import io.ktor.websocket.*` |
 
-### 기본 요청 {id="default-request"}
+### 기본 요청 (Default request) {id="default-request"}
 
-[DefaultRequest](client-default-request.md) 플러그인은 `HttpRequestBuilder` 대신 `DefaultRequestBuilder` 구성 클래스를 사용합니다.
+[DefaultRequest](client-default-request.md) 플러그인은 `HttpRequestBuilder` 대신 `DefaultRequestBuilder` 설정 클래스를 사용합니다:
 
 <Tabs group="ktor_versions">
 <TabItem title="1.6.x" group-key="1_6">
