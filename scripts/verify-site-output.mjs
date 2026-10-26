@@ -5,8 +5,6 @@ import { visibleUndefined } from './lib/visible-undefined.mjs'
 const distDir = resolve('docs/.vitepress/dist')
 const siteOrigin = 'https://openaidoc.org'
 const errors = []
-/** Pages showing "undefined" (P0-13): a warning until the queued retranslations land. */
-const undefinedPages = []
 
 const criticalPages = new Map([
   ['index.html', `${siteOrigin}/`],
@@ -36,8 +34,10 @@ for (const file of htmlFiles) {
     errors.push(`${relativeFile}: contains an invalid <title> element in the page body`)
   }
 
+  // Where the sync pipeline once wrote "undefined" for content it could not
+  // find (an include, a link summary). Retranslate the page; do not edit it.
   const placeholders = visibleUndefined(html)
-  if (placeholders > 0) undefinedPages.push(`${relativeFile} (${placeholders})`)
+  if (placeholders > 0) errors.push(`${relativeFile}: shows "undefined" where content is missing (${placeholders})`)
 
   if (relativeFile !== '404.html') {
     assertIncludes(
@@ -104,14 +104,6 @@ for (const canonicalUrl of criticalPages.values()) {
     `<loc>${canonicalUrl}</loc>`,
     `sitemap.xml: missing critical URL ${canonicalUrl}`
   )
-}
-
-// A warning for now: the pages are queued for retranslation (pending files),
-// and the next sync replaces them. Make it an error once this reaches zero.
-if (undefinedPages.length > 0) {
-  console.warn(`Warning: ${undefinedPages.length} page(s) show "undefined" where content is missing:`)
-  for (const page of undefinedPages.slice(0, 40)) console.warn(`- ${page}`)
-  if (undefinedPages.length > 40) console.warn(`… and ${undefinedPages.length - 40} more`)
 }
 
 if (errors.length > 0) {
