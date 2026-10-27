@@ -11,7 +11,9 @@ import '../styles/mkdocs-grid-cards.css'
 import '../styles/ws-button.css'
 import '../styles/ws-compare.css'
 import '../styles/ws-runnable.css'
+import '../styles/ws-collapse-section.css'
 import { useKotlinPlayground } from './kotlin-playground'
+import { useOpenAnchorTarget } from './open-anchor-target'
 import HomeLayout from './layout/Home.vue' // 调整路径，如果它在子目录，例如 './layouts/MyHomeLayout.vue'
 import { SiteLocaleConfig } from '../locales.config'
 import { createI18n, setLocale } from '../utils/i18n-utils'
@@ -47,6 +49,7 @@ export default {
   Layout: defineComponent({
     setup() {
       useKotlinPlayground()
+      useOpenAnchorTarget()
       return () => h(DefaultTheme.Layout, null, {
         // https://vitepress.dev/guide/extending-default-theme#layout-slots
       })
