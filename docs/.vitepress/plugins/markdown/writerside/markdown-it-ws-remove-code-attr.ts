@@ -19,10 +19,11 @@ export default function markdownItWsRemoveCodeAttr(md) {
         // First a one-line attribute list, where a quoted value may hold "}"
         // (collapsed-title=".clickable { count += 1 }"); the old pattern stopped
         // there and left the rest of the line on the page. Else as before.
+        // The closing fence may end in spaces (coroutine-context-and-dispatchers).
         const marker = (indention, attrs) =>
             `${indention}<!--ws-code-attrs:${encodeURIComponent(JSON.stringify(attrs))}-->`
         state.src = state.src.replace(
-            /([ \t]*)```\n[ \t]*(?:\{(?:[^}"'\n]|"[^"\n]*"|'[^'\n]*')*\}|\{[\s\S]*?\})/gm,
+            /([ \t]*)```[ \t]*\n[ \t]*(?:\{(?:[^}"'\n]|"[^"\n]*"|'[^'\n]*')*\}|\{[\s\S]*?\})/gm,
             (match, indention) => {
                 const attrs = parseCodeBlockAttrs(match.slice(match.indexOf('\n') + 1))
                 return `${indention}\`\`\`\n${attrs ? marker(indention, attrs) : ''}`
@@ -32,7 +33,7 @@ export default function markdownItWsRemoveCodeAttr(md) {
         // kotlinlang.org does); only a line that is all attributes, so other
         // text after a code block stays.
         state.src = state.src.replace(
-            /^([ \t]*)```\n[ \t]*\n([ \t]*\{[^\n]*\})[ \t]*$/gm,
+            /^([ \t]*)```[ \t]*\n[ \t]*\n([ \t]*\{[^\n]*\})[ \t]*$/gm,
             (match, indention, line) => {
                 const attrs = parseCodeBlockAttrs(line)
                 return attrs ? `${indention}\`\`\`\n${marker(indention, attrs)}` : match

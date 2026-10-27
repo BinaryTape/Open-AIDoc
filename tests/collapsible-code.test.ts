@@ -90,6 +90,15 @@ describe('collapsible code blocks', () => {
     expect(other).toContain('<p not="" attributes=""></p>')
   })
 
+  it('reads the attribute line after a closing fence that ends in spaces', async () => {
+    // Was an empty <p kotlin-runnable="true" …></p>, and the sample did not run.
+    for (const gap of ['', '\n']) {
+      const html = await render(`\`\`\`kotlin\nx\n\`\`\`  \n${gap}{collapsible="true" collapsed-title="T"}\n`)
+      expect(html).toMatch(/^<details class="ws-code-collapse" open><summary[^>]*>T \{\.\.\.\}<\/summary>/)
+      expect(html).not.toMatch(/<p[ >]/)
+    }
+  })
+
   it('keeps every attribute on the fence token, for runnable code later', async () => {
     const md = await createMarkdownRenderer('docs', { config: (md) => registerMarkdownPlugins(md) })
     const tokens = md.parse(block('{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="ex"}') + '\nText.\n', {
