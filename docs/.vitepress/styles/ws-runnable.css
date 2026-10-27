@@ -1,0 +1,104 @@
+/**
+ * Runnable Kotlin samples (theme/kotlin-playground.ts). Until the Kotlin
+ * Playground editor is up, the highlighted code block shows; then it is
+ * hidden and the editor takes its place.
+ *
+ * The editor keeps Playground's IntelliJ IDEA / Darcula colours for the code
+ * and is fitted to the site's code blocks: same box, font and spacing, with
+ * the "Open in Playground · Target · Running on" line inside the box.
+ * -------------------------------------------------------------------------- */
+
+.vp-doc .ws-runnable.is-mounted > div[class*='language-'] {
+  display: none;
+}
+
+.vp-doc .ws-runnable .executable-fragment-wrapper {
+  position: relative;
+  margin: 16px 0;
+}
+
+.vp-doc .ws-runnable .executable-fragment {
+  border: 0;
+  border-radius: 8px;
+  /* Room for the compiler line, which sits at the bottom of the wrapper. */
+  padding-bottom: 32px;
+  background-color: var(--vp-code-block-bg);
+  transition: background-color 0.5s;
+}
+
+.vp-doc .ws-runnable .CodeMirror {
+  height: auto;
+  background-color: transparent;
+  font-family: var(--vp-font-family-mono);
+  font-size: var(--vp-code-font-size);
+  line-height: var(--vp-code-line-height);
+}
+
+.vp-doc .ws-runnable .CodeMirror-gutters {
+  border: 0;
+  background-color: transparent;
+}
+
+.vp-doc .ws-runnable .CodeMirror-lines {
+  padding: 20px 0 0;
+}
+
+.vp-doc .ws-runnable .CodeMirror pre.CodeMirror-line,
+.vp-doc .ws-runnable .CodeMirror pre.CodeMirror-line-like {
+  padding: 0 64px 0 8px;
+}
+
+.vp-doc .ws-runnable .run-button {
+  top: 20px;
+  right: 24px;
+}
+
+.vp-doc .ws-runnable .compiler-info {
+  top: auto;
+  bottom: 4px;
+  left: 24px;
+  right: 24px;
+  width: auto;
+  padding: 0;
+  font-size: 12px;
+  color: var(--vp-c-text-3);
+}
+
+.vp-doc .ws-runnable .compiler-info a {
+  font-weight: inherit;
+  color: inherit;
+  text-decoration: none;
+}
+
+.vp-doc .ws-runnable .compiler-info a:hover {
+  color: var(--vp-c-brand-1);
+}
+
+/* Output, under the code: no box of its own, a divider above it. */
+.vp-doc .ws-runnable .js-code-output-executor {
+  border-top: 0;
+}
+
+.vp-doc .ws-runnable .output-wrapper {
+  margin-top: 12px;
+  border: 0;
+  border-top: 1px solid var(--vp-c-divider);
+  background-color: transparent;
+}
+
+.vp-doc .ws-runnable .code-output {
+  padding: 12px 24px 0;
+  font-family: var(--vp-font-family-mono);
+  /* The code's size: --vp-code-font-size is in em, which compounds here. */
+  font-size: 14px;
+  line-height: var(--vp-code-line-height);
+}
+
+.vp-doc .ws-runnable .code-output > * {
+  font: inherit;
+}
+
+.vp-doc .ws-runnable .console-close {
+  top: 20px;
+  right: 24px;
+}

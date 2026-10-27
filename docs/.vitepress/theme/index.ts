@@ -1,5 +1,5 @@
 // https://vitepress.dev/guide/custom-theme
-import { h } from 'vue'
+import { defineComponent, h } from 'vue'
 import type { Theme } from 'vitepress'
 import DefaultTheme from 'vitepress/theme'
 import 'aos/dist/aos.css'
@@ -10,6 +10,8 @@ import '../styles/ws-code-collapse.css'
 import '../styles/mkdocs-grid-cards.css'
 import '../styles/ws-button.css'
 import '../styles/ws-compare.css'
+import '../styles/ws-runnable.css'
+import { useKotlinPlayground } from './kotlin-playground'
 import HomeLayout from './layout/Home.vue' // 调整路径，如果它在子目录，例如 './layouts/MyHomeLayout.vue'
 import { SiteLocaleConfig } from '../locales.config'
 import { createI18n, setLocale } from '../utils/i18n-utils'
@@ -42,11 +44,14 @@ import YouTubeVideo from "../component/YouTubeVideo.vue";
 
 export default {
   extends: DefaultTheme,
-  Layout: () => {
-    return h(DefaultTheme.Layout, null, {
-      // https://vitepress.dev/guide/extending-default-theme#layout-slots
-    })
-  },
+  Layout: defineComponent({
+    setup() {
+      useKotlinPlayground()
+      return () => h(DefaultTheme.Layout, null, {
+        // https://vitepress.dev/guide/extending-default-theme#layout-slots
+      })
+    },
+  }),
   enhanceApp({ app, router, siteData }) {
     // ...
     app.component('HomeLayout', HomeLayout)
