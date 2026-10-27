@@ -1,0 +1,10 @@
+{
+  "topics/compose-test.md": {
+    "langs": [
+      "ja",
+      "ko",
+      "zh-Hans"
+    ],
+    "reason": "manual: \"undefined\" in a code block (P3-10)"
+  }
+}
