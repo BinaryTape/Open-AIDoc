@@ -101,9 +101,9 @@ describe('collapsible code blocks', () => {
   })
 
   it('leaves other code blocks as they were, attribute line dropped', async () => {
-    const html = await render(block('{kotlin-runnable="true" validate="false"}'))
+    const html = await render(block('{validate="false"}'))
     expect(html).not.toContain('<details')
-    expect(html).not.toContain('kotlin-runnable')
+    expect(html).not.toContain('validate')
     expect(html).toMatch(/^<div class="language-kotlin/)
   })
 })

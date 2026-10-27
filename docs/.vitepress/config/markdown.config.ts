@@ -18,6 +18,7 @@ import markdownItWsCollapsibleCode from "../plugins/markdown/writerside/markdown
 import markdownItWsCodeblockCdata from "../plugins/markdown/writerside/markdown-it-ws-codeblock-cdata"
 import markdownItWsButtonLink from "../plugins/markdown/writerside/markdown-it-ws-button-link"
 import markdownItWsCompare from "../plugins/markdown/writerside/markdown-it-ws-compare"
+import markdownItWsRunnable from "../plugins/markdown/writerside/markdown-it-ws-runnable"
 import { markdownItRewriteLinks } from '../plugins/markdown/writerside/markdown-it-ws-inline-link'
 
 // ===== MkDocs plugins =====
@@ -101,6 +102,9 @@ export function registerMarkdownPlugins(md: any) {
   // A core rule pushed after the link rewriter's: sees hrefs already rewritten.
   md.use(markdownItWsButtonLink)
   md.use(markdownItWsCompare)
+  // Wraps the fence renderer; registered before the collapsible-code one,
+  // whose <details> then goes around it.
+  md.use(markdownItWsRunnable)
 
   // MkDocs plugins
   md.use(markdownItMkAdmonition)
