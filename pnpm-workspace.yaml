@@ -11,3 +11,7 @@ onlyBuiltDependencies:
   - esbuild
   - protobufjs
   - '@google/genai'
+
+# The lean-chunk fix (P0-10); see the comment in the patch.
+patchedDependencies:
+  vitepress@2.0.0-alpha.18: patches/vitepress@2.0.0-alpha.18.patch

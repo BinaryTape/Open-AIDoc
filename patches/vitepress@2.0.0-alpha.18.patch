@@ -1,0 +1,18 @@
+diff --git a/dist/node/chunk-Cne7GbZY.js b/dist/node/chunk-Cne7GbZY.js
+index 3db2b26a4da6c622a1a85e456e9b6021b503f335..39bfa7d21b4402f459fc2294da60759f24fc959a 100644
+--- a/dist/node/chunk-Cne7GbZY.js
++++ b/dist/node/chunk-Cne7GbZY.js
+@@ -30615,7 +30615,12 @@ const themeRE = /(?:^|\/)\.vitepress\/theme\/index\.(m|c)?(j|t)s$/;
+ const startsWithThemeRE = /^@theme(?:\/|$)/;
+ const docsearchRE = /\/docsearch\.css(?:$|\?)/;
+ const hashRE = /\.([-\w]+)\.js$/;
+-const staticInjectMarkerRE = /\bcreateStaticVNode\((?:(".*")|('.*')), (\d+)\)/g;
++// Open-AIDoc patch: match the HTML argument itself, string literals joined by
++// `+` (with asset imports between them: "<img src=\"" + _imports_0 + "\">"),
++// not up to the last quote of the line. Rolldown can print two
++// createStaticVNode calls on one line, and the greedy ".*" then marked the
++// code between them as static, stripping it from the lean chunk.
++const staticInjectMarkerRE = /\bcreateStaticVNode\((?:("(?:[^"\\\n]|\\.)*"(?:\s*\+\s*(?:[\w$.]+\s*\+\s*)*"(?:[^"\\\n]|\\.)*")*)|('(?:[^'\\\n]|\\.)*'(?:\s*\+\s*(?:[\w$.]+\s*\+\s*)*'(?:[^'\\\n]|\\.)*')*)), (\d+)\)/g;
+ const staticStripRE = /['"`]__VP_STATIC_START__[^]*?__VP_STATIC_END__['"`]/g;
+ const staticRestoreRE = /__VP_STATIC_(START|END)__/g;
+ const scriptClientRE = /<script\b[^>]*client\b[^>]*>([^]*?)<\/script>/;

@@ -1,6 +1,7 @@
 import { readdir, readFile } from 'node:fs/promises'
 import { resolve, relative } from 'node:path'
 import { visibleUndefined } from './lib/visible-undefined.mjs'
+import { strippedCode } from './lib/lean-modules.mjs'
 
 const distDir = resolve('docs/.vitepress/dist')
 const siteOrigin = 'https://openaidoc.org'
@@ -106,6 +107,17 @@ for (const canonicalUrl of criticalPages.values()) {
   )
 }
 
+// Lean page modules (first page load) must lose only the HTML of their static
+// vnodes, never code (P0-10).
+const leanModules = await listFiles(distDir, '.lean.js')
+for (const file of leanModules) {
+  const lean = await readFile(file, 'utf8')
+  const full = await readFile(file.replace(/\.lean\.js$/, '.js'), 'utf8')
+  for (const { name, full: inFull, lean: inLean } of strippedCode(full, lean)) {
+    errors.push(`${relative(distDir, file).replaceAll('\\', '/')}: code stripped with the static HTML (${name}(…) called ${inFull} times in the full module, ${inLean} in the lean one)`)
+  }
+}
+
 if (errors.length > 0) {
   console.error(`Site verification failed with ${errors.length} issue(s):`)
   for (const error of errors) console.error(`- ${error}`)
@@ -114,7 +126,7 @@ if (errors.length > 0) {
 
 console.log(
   `Site verification passed: ${htmlFiles.length} HTML pages, ` +
-  `${sitemapUrls.length} sitemap URLs, critical SEO metadata and GA present.`
+  `${sitemapUrls.length} sitemap URLs, ${leanModules.length} lean page modules, critical SEO metadata and GA present.`
 )
 
 function assertIncludes(value, expected, message) {
