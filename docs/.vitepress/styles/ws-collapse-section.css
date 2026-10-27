@@ -1,0 +1,74 @@
+/**
+ * Writerside collapsible sections (markdown-it-ws-collapsible-section.ts):
+ *
+ *   <details class="ws-collapse"><summary class="ws-collapse__summary"><h3>…</h3></summary>…</details>
+ *
+ * As on kotlinlang.org: the heading looks as usual, with a ⊕ in the margin to
+ * its left that turns into ⊗ when the section is open. On narrow screens,
+ * with no margin to spare, the icon goes before the heading text.
+ * Icon: @rescui/icons 0.16.17 `plus` (Apache-2.0), see assets/icons/rescui/.
+ * -------------------------------------------------------------------------- */
+
+.vp-doc .ws-collapse__summary {
+  display: block;
+  list-style: none;
+  cursor: pointer;
+}
+
+.vp-doc .ws-collapse__summary::-webkit-details-marker {
+  display: none;
+}
+
+.vp-doc .ws-collapse__summary:focus-visible {
+  outline: 2px solid var(--vp-c-brand-1);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+.vp-doc .ws-collapse__summary > :is(h2, h3, h4, h5, h6) {
+  position: relative;
+}
+
+.vp-doc .ws-collapse__summary > :is(h2, h3, h4, h5, h6)::before {
+  content: '';
+  position: absolute;
+  /* Centred on the first line of the heading. */
+  top: calc((1lh - 20px) / 2);
+  left: -28px;
+  width: 20px;
+  height: 20px;
+  background-color: var(--vp-c-text-2);
+  -webkit-mask: url('../assets/icons/rescui/plus_24.svg') no-repeat center / contain;
+  mask: url('../assets/icons/rescui/plus_24.svg') no-repeat center / contain;
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+/* An h2 has a rule and padding above its text. */
+.vp-doc .ws-collapse__summary > h2::before {
+  top: calc(24px + (1lh - 20px) / 2);
+}
+
+.vp-doc .ws-collapse__summary:hover > :is(h2, h3, h4, h5, h6)::before {
+  background-color: var(--vp-c-brand-1);
+}
+
+.vp-doc .ws-collapse[open] > .ws-collapse__summary > :is(h2, h3, h4, h5, h6)::before {
+  transform: rotate(45deg);
+}
+
+/* VitePress puts the heading's # link in the left margin, where the icon is:
+   it follows the heading text instead. */
+.vp-doc .ws-collapse__summary .header-anchor {
+  position: static;
+  margin-left: 0.25em;
+}
+
+@media (max-width: 767px) {
+  .vp-doc .ws-collapse__summary > :is(h2, h3, h4, h5, h6) {
+    padding-left: 28px;
+  }
+
+  .vp-doc .ws-collapse__summary > :is(h2, h3, h4, h5, h6)::before {
+    left: 0;
+  }
+}

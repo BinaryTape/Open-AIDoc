@@ -12,6 +12,7 @@ JetBrains' Rescui design system. They are licensed under the Apache License 2.0;
 | `warning_24.svg` | 1.11.0 | Writerside `warning` callouts |
 | `down_24.svg` | 1.11.0 | Collapsible code blocks |
 | `arrow-left_24.svg`, `arrow-right_24.svg`, `download_24.svg` | 0.16.17 | Writerside button links |
+| `plus_24.svg` | 0.16.17 | Collapsible sections (⊕; turned 45° when open, ⊗) |
 
 kotlinlang.org draws its buttons with the 0.16 icons: thin, square-ended arrows, which
 1.0 redrew rounded and heavier. 0.16.17, the last 0.x release, names its files without a

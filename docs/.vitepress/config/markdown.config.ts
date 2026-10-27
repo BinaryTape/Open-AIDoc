@@ -19,6 +19,7 @@ import markdownItWsCodeblockCdata from "../plugins/markdown/writerside/markdown-
 import markdownItWsButtonLink from "../plugins/markdown/writerside/markdown-it-ws-button-link"
 import markdownItWsCompare from "../plugins/markdown/writerside/markdown-it-ws-compare"
 import markdownItWsRunnable from "../plugins/markdown/writerside/markdown-it-ws-runnable"
+import markdownItWsCollapsibleSection from "../plugins/markdown/writerside/markdown-it-ws-collapsible-section"
 import { markdownItRewriteLinks } from '../plugins/markdown/writerside/markdown-it-ws-inline-link'
 
 // ===== MkDocs plugins =====
@@ -105,6 +106,7 @@ export function registerMarkdownPlugins(md: any) {
   // Wraps the fence renderer; registered before the collapsible-code one,
   // whose <details> then goes around it.
   md.use(markdownItWsRunnable)
+  md.use(markdownItWsCollapsibleSection)
 
   // MkDocs plugins
   md.use(markdownItMkAdmonition)
