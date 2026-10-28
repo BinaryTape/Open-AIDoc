@@ -1,0 +1,136 @@
+/* Material for MkDocs admonitions (`!!!`) and collapsible blocks (`???`),
+ * matching docs.koog.ai, sqldelight.github.io and coil-kt.github.io, and the
+ * beta status after a page in the Koog sidebar. Markup comes from
+ * plugins/markdown/mkdocs/markdown-it-mk-admonitions.ts and
+ * config/sidebar.config.ts.
+ * Colours: Material's defaults (Koog's own for beta). Text is 14px, as in
+ * VitePress' own blocks, against Material's 80% of the body (12.8px).
+ * Icons: Material Design Icons (Apache-2.0), see assets/icons/mdi/.
+ * -------------------------------------------------------------------------- */
+
+:root {
+  --mk-admonition-shadow: 0 4px 10px rgba(0, 0, 0, 0.05), 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+.dark {
+  --mk-admonition-shadow: 0 4px 10px rgba(0, 0, 0, 0.2), 0 0 1px rgba(0, 0, 0, 0.4);
+}
+
+.vp-doc .mk-admonition {
+  display: flow-root;
+  margin: 20px 0;
+  padding: 0 12px;
+  border: 1px solid var(--mk-admonition-color);
+  border-radius: 4px;
+  color: var(--vp-c-text-1);
+  background-color: var(--vp-c-bg);
+  box-shadow: var(--mk-admonition-shadow);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.vp-doc .mk-admonition__title {
+  position: relative;
+  margin: 0 -12px;
+  padding: 8px 12px 8px 40px;
+  border-radius: 3px 3px 0 0;
+  background-color: color-mix(in srgb, var(--mk-admonition-color) 10%, transparent);
+  font-weight: 700;
+}
+
+.vp-doc .mk-admonition__title::before {
+  content: '';
+  position: absolute;
+  top: 9px;
+  left: 12px;
+  width: 20px;
+  height: 20px;
+  background-color: var(--mk-admonition-color);
+  -webkit-mask: var(--mk-admonition-icon) no-repeat center / contain;
+  mask: var(--mk-admonition-icon) no-repeat center / contain;
+}
+
+.vp-doc .mk-admonition p,
+.vp-doc .mk-admonition ul,
+.vp-doc .mk-admonition ol {
+  margin: 12px 0;
+  line-height: inherit;
+}
+
+.vp-doc .mk-admonition p.mk-admonition__title {
+  margin: 0 -12px;
+}
+
+.vp-doc .mk-admonition div[class*='language-'] {
+  margin: 12px 0;
+  border-radius: 4px;
+}
+
+.vp-doc .mk-admonition > :last-child {
+  margin-bottom: 12px;
+}
+
+/* Collapsible: the chevron on the right turns down when open. */
+.vp-doc details.mk-admonition > summary {
+  display: block;
+  padding-right: 36px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.vp-doc details.mk-admonition > summary::-webkit-details-marker {
+  display: none;
+}
+
+.vp-doc details.mk-admonition > summary::after {
+  content: '';
+  position: absolute;
+  top: 9px;
+  right: 8px;
+  width: 20px;
+  height: 20px;
+  background-color: var(--mk-admonition-color);
+  -webkit-mask: url('../assets/icons/mdi/chevron-right.svg') no-repeat center / contain;
+  mask: url('../assets/icons/mdi/chevron-right.svg') no-repeat center / contain;
+  transition: transform 0.25s;
+}
+
+.vp-doc details.mk-admonition[open] > summary::after {
+  transform: rotate(90deg);
+}
+
+.vp-doc details.mk-admonition:not([open]) > summary {
+  border-radius: 3px;
+}
+
+.mk-admonition--note { --mk-admonition-color: #448aff; --mk-admonition-icon: url('../assets/icons/mdi/pencil-circle.svg'); }
+.mk-admonition--abstract { --mk-admonition-color: #00b0ff; --mk-admonition-icon: url('../assets/icons/mdi/clipboard-text.svg'); }
+.mk-admonition--info { --mk-admonition-color: #00b8d4; --mk-admonition-icon: url('../assets/icons/mdi/information.svg'); }
+.mk-admonition--tip { --mk-admonition-color: #00bfa5; --mk-admonition-icon: url('../assets/icons/mdi/fire.svg'); }
+.mk-admonition--success { --mk-admonition-color: #00c853; --mk-admonition-icon: url('../assets/icons/mdi/check.svg'); }
+.mk-admonition--question { --mk-admonition-color: #64dd17; --mk-admonition-icon: url('../assets/icons/mdi/help-circle.svg'); }
+.mk-admonition--warning { --mk-admonition-color: #ff9100; --mk-admonition-icon: url('../assets/icons/mdi/alert.svg'); }
+.mk-admonition--failure { --mk-admonition-color: #ff5252; --mk-admonition-icon: url('../assets/icons/mdi/close.svg'); }
+.mk-admonition--danger { --mk-admonition-color: #ff1744; --mk-admonition-icon: url('../assets/icons/mdi/lightning-bolt-circle.svg'); }
+.mk-admonition--bug { --mk-admonition-color: #f50057; --mk-admonition-icon: url('../assets/icons/mdi/shield-bug.svg'); }
+.mk-admonition--example { --mk-admonition-color: #7c4dff; --mk-admonition-icon: url('../assets/icons/mdi/test-tube.svg'); }
+.mk-admonition--quote { --mk-admonition-color: #9e9e9e; --mk-admonition-icon: url('../assets/icons/mdi/format-quote-close.svg'); }
+.mk-admonition--beta { --mk-admonition-color: #7c3aed; --mk-admonition-icon: url('../assets/icons/mdi/beta.svg'); }
+
+/* Sidebar status (Material's navigation.status): an 18px β after the title. */
+.mk-status {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  margin-left: 6px;
+  vertical-align: -3px;
+  background-color: var(--vp-c-text-3);
+  -webkit-mask: url('../assets/icons/mdi/beta.svg') no-repeat center / contain;
+  mask: url('../assets/icons/mdi/beta.svg') no-repeat center / contain;
+}
+
+/* The previous / next page links reuse the sidebar text; Material shows
+ * the status in the navigation only. */
+.VPDocFooter .mk-status {
+  display: none;
+}

@@ -207,10 +207,10 @@ describe('Koog MkDocs admonitions', () => {
     ].join('\n')
     const html = md.render(source, koogEnv)
 
-    expect(html).toContain('::: warning Keep it secret')
-    expect(html).toContain('<details class="custom-block tip">')
+    expect(html).toContain('<div class="mk-admonition mk-admonition--warning">\n<p class="mk-admonition__title">Keep it secret</p>')
+    expect(html).toContain('<details class="mk-admonition mk-admonition--tip">')
     expect(html).toContain('<strong>Details</strong>')
-    expect(html).toContain('<details open class="custom-block info">')
+    expect(html).toContain('<details open class="mk-admonition mk-admonition--note">')
     expect(html).not.toContain('???')
   })
 

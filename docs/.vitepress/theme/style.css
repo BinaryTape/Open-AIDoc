@@ -475,10 +475,6 @@ img[type="joined"] {
     transition: color 0.25s;
 }
 
-.ws-tabcontents {
-    padding: 0 12px;
-}
-
 .ws-tabs-container .ws-tabcontents .ws-tabcontent {
     display: none;
     margin-top: 0 !important;
