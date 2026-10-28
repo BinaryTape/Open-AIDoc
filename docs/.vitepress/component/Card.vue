@@ -1,16 +1,23 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+import { cardIcon } from '../utils/card-icons'
+
 // Two columns from 640px wide, set in CSS: a class computed from the window
 // width differs between server and browser and breaks hydration.
 const props = defineProps<{
   href: string
   summary: string
   badge?: string
+  type?: string
 }>()
+
+const icon = computed(() => cardIcon(props.type))
 </script>
 
 <template>
   <div class="ws-card ws-col-12 ws-col-sm-6">
     <a :href="props.href" class="ws-card-link">
+      <span v-if="icon" :class="['ws-card-icon', `ws-card-icon--${icon}`]" aria-hidden="true"></span>
       <h3><slot/></h3>
       <p>{{ props.summary }}</p>
     </a>
@@ -36,6 +43,7 @@ const props = defineProps<{
   border-style: solid;
   cursor: pointer;
   border-color: var(--vp-c-divider);
+  background-color: var(--vp-c-bg);
   transition: color .1s, background-color .1s, border-color .1s;
 }
 
@@ -50,6 +58,10 @@ const props = defineProps<{
 
 .ws-card-link :deep(h3) {
   margin: 0;
+}
+
+.ws-card-link .ws-card-icon + h3 {
+  margin-top: 24px;
 }
 
 .ws-card-link :deep(p) {
