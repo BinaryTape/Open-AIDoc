@@ -1,5 +1,5 @@
 diff --git a/dist/node/chunk-Cne7GbZY.js b/dist/node/chunk-Cne7GbZY.js
-index 3db2b26a4da6c622a1a85e456e9b6021b503f335..39bfa7d21b4402f459fc2294da60759f24fc959a 100644
+index 3db2b26a4da6c622a1a85e456e9b6021b503f335..6e0c9a84b3a926fcf46b051c32c5f0d74326ad4c 100644
 --- a/dist/node/chunk-Cne7GbZY.js
 +++ b/dist/node/chunk-Cne7GbZY.js
 @@ -30615,7 +30615,12 @@ const themeRE = /(?:^|\/)\.vitepress\/theme\/index\.(m|c)?(j|t)s$/;
@@ -16,3 +16,119 @@ index 3db2b26a4da6c622a1a85e456e9b6021b503f335..39bfa7d21b4402f459fc2294da60759f
  const staticStripRE = /['"`]__VP_STATIC_START__[^]*?__VP_STATIC_END__['"`]/g;
  const staticRestoreRE = /__VP_STATIC_(START|END)__/g;
  const scriptClientRE = /<script\b[^>]*client\b[^>]*>([^]*?)<\/script>/;
+@@ -31067,9 +31072,12 @@ async function bundle(config, options) {
+   });
+   let clientResult = null;
+   let serverResult;
+-  await task("building client + server bundles", async () => {
+-    if (!config.mpa) clientResult = await build$9(await resolveViteConfig(false));
+-    serverResult = await build$9(await resolveViteConfig(true));
++  // Open-AIDoc patch: VITEPRESS_BUILD_STEP=client|server builds one bundle
++  // only (see splitBuildStep in build()).
++  const step = splitBuildStep(config);
++  await task(step ? `building ${step} bundle` : "building client + server bundles", async () => {
++    if (!config.mpa && step !== "server") clientResult = await build$9(await resolveViteConfig(false));
++    if (step !== "client") serverResult = await build$9(await resolveViteConfig(true));
+   });
+   if (config.mpa) {
+     await pMap(
+@@ -34571,11 +34579,21 @@ async function build(root, buildOptions = {}) {
+     siteConfig.outDir = path.resolve(process.cwd(), buildOptions.outDir);
+     delete buildOptions.outDir;
+   }
++  const step = splitBuildStep(siteConfig);
+   try {
+-    const { clientResult, serverResult, pageToHashMap } = await bundle(
++    const { clientResult, serverResult, pageToHashMap } = step === "render" ? readSplitBuildState(siteConfig) : await bundle(
+       siteConfig,
+       buildOptions
+     );
++    if (step === "client") {
++      writeSplitBuildState(siteConfig, clientResult, pageToHashMap);
++    }
++    if (step === "client" || step === "server") {
++      siteConfig.logger.info(
++        `${step} bundle built in ${((Date.now() - start) / 1e3).toFixed(2)}s.`
++      );
++      return;
++    }
+     if (process.env.BUNDLE_ONLY) {
+       return;
+     }
+@@ -34651,13 +34669,16 @@ async function build(root, buildOptions = {}) {
+     );
+   } finally {
+     unlinkVue();
+-    if (!process.env.DEBUG) {
++    if (!process.env.DEBUG && step !== "server") {
+       fs__default.rmSync(siteConfig.tempDir, {
+         recursive: true,
+         force: true,
+         maxRetries: 10
+       });
+     }
++    if (step === "render") {
++      fs__default.rmSync(splitBuildStatePath(siteConfig), { force: true });
++    }
+   }
+   await generateSitemap(siteConfig);
+   await siteConfig.buildEnd?.(siteConfig);
+@@ -34666,6 +34687,58 @@ async function build(root, buildOptions = {}) {
+     `build complete in ${((Date.now() - start) / 1e3).toFixed(2)}s.`
+   );
+ }
++// Open-AIDoc patch: split `vitepress build` into three processes, run in
++// this order with VITEPRESS_BUILD_STEP set:
++//   client  builds the client bundle into outDir and saves what rendering
++//           reads from it (chunk names and imports, the page hash map);
++//   server  builds the SSR bundle into tempDir and keeps it;
++//   render  renders the pages from those two, then finishes the build.
++// Rolldown keeps the native memory of a bundle until the process exits, so
++// in one process the server bundle and the rendering stack on top of the
++// client bundle's.
++function splitBuildStep(config) {
++  const step = process.env.VITEPRESS_BUILD_STEP;
++  if (!step) return void 0;
++  if (!["client", "server", "render"].includes(step)) {
++    throw new Error(`Unknown VITEPRESS_BUILD_STEP: ${step}`);
++  }
++  if (config.mpa) {
++    throw new Error("VITEPRESS_BUILD_STEP does not support mpa mode");
++  }
++  return step;
++}
++function splitBuildStatePath(config) {
++  return path.join(config.cacheDir, "split-build-client.json");
++}
++function writeSplitBuildState(config, clientResult, pageToHashMap) {
++  const output = clientResult.output.map(
++    (chunk) => chunk.type === "chunk" ? {
++      type: chunk.type,
++      fileName: chunk.fileName,
++      name: chunk.name,
++      isEntry: chunk.isEntry,
++      facadeModuleId: chunk.facadeModuleId,
++      imports: chunk.imports,
++      // rendering reads module ids only to detect the default theme
++      moduleIds: chunk.name === "theme" ? chunk.moduleIds : []
++    } : { type: chunk.type, fileName: chunk.fileName }
++  );
++  fs__default.mkdirSync(config.cacheDir, { recursive: true });
++  fs__default.writeFileSync(
++    splitBuildStatePath(config),
++    JSON.stringify({ output, pageToHashMap })
++  );
++}
++function readSplitBuildState(config) {
++  const { output, pageToHashMap } = JSON.parse(
++    fs__default.readFileSync(splitBuildStatePath(config), "utf8")
++  );
++  return {
++    clientResult: { output },
++    serverResult: void 0,
++    pageToHashMap: Object.assign(/* @__PURE__ */ Object.create(null), pageToHashMap)
++  };
++}
+ function linkVue() {
+   const root = packageDirectorySync();
+   if (root) {

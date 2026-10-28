@@ -6,7 +6,7 @@ settings:
 
 patchedDependencies:
   vitepress@2.0.0-alpha.18:
-    hash: 74448ed6532877ad7d82bc11f2c0cbf8e2a9f09faa7f4b4bc1aea6fe4bd8ee7d
+    hash: f8625c564ee0ad39ed3efd70d6f9420393b39887bf91e483d91e1c0df5938d11
     path: patches/vitepress@2.0.0-alpha.18.patch
 
 importers:
@@ -82,7 +82,7 @@ importers:
         version: 4.23.1
       vitepress:
         specifier: ^2.0.0-alpha.18
-        version: 2.0.0-alpha.18(patch_hash=74448ed6532877ad7d82bc11f2c0cbf8e2a9f09faa7f4b4bc1aea6fe4bd8ee7d)(@types/node@25.9.5)(esbuild@0.28.1)(postcss@8.5.23)(tsx@4.23.1)
+        version: 2.0.0-alpha.18(patch_hash=f8625c564ee0ad39ed3efd70d6f9420393b39887bf91e483d91e1c0df5938d11)(@types/node@25.9.5)(esbuild@0.28.1)(postcss@8.5.23)(tsx@4.23.1)
       vitest:
         specifier: ^3.2.7
         version: 3.2.7(@types/node@25.9.5)(lightningcss@1.33.0)(tsx@4.23.1)
@@ -3507,7 +3507,7 @@ snapshots:
       fsevents: 2.3.3
       tsx: 4.23.1
 
-  vitepress@2.0.0-alpha.18(patch_hash=74448ed6532877ad7d82bc11f2c0cbf8e2a9f09faa7f4b4bc1aea6fe4bd8ee7d)(@types/node@25.9.5)(esbuild@0.28.1)(postcss@8.5.23)(tsx@4.23.1):
+  vitepress@2.0.0-alpha.18(patch_hash=f8625c564ee0ad39ed3efd70d6f9420393b39887bf91e483d91e1c0df5938d11)(@types/node@25.9.5)(esbuild@0.28.1)(postcss@8.5.23)(tsx@4.23.1):
     dependencies:
       '@docsearch/css': 4.6.3
       '@docsearch/js': 4.6.3
