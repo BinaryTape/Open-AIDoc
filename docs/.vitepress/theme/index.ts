@@ -14,6 +14,7 @@ import '../styles/ws-runnable.css'
 import '../styles/ws-collapse-section.css'
 import { useKotlinPlayground } from './kotlin-playground'
 import { useOpenAnchorTarget } from './open-anchor-target'
+import { useLinkedTabs } from './linked-tabs'
 import HomeLayout from './layout/Home.vue' // 调整路径，如果它在子目录，例如 './layouts/MyHomeLayout.vue'
 import { SiteLocaleConfig } from '../locales.config'
 import { createI18n, setLocale } from '../utils/i18n-utils'
@@ -50,6 +51,7 @@ export default {
     setup() {
       useKotlinPlayground()
       useOpenAnchorTarget()
+      useLinkedTabs()
       return () => h(DefaultTheme.Layout, null, {
         // https://vitepress.dev/guide/extending-default-theme#layout-slots
       })
