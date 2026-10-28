@@ -16,6 +16,7 @@ import markdownItWsTopicTitle from "../plugins/markdown/writerside/markdown-it-w
 import markdownItWsRemoveCodeAttr from "../plugins/markdown/writerside/markdown-it-ws-remove-code-attr"
 import markdownItWsCollapsibleCode from "../plugins/markdown/writerside/markdown-it-ws-collapsible-code"
 import markdownItWsCodeblockCdata from "../plugins/markdown/writerside/markdown-it-ws-codeblock-cdata"
+import markdownItWsCodeBlock from "../plugins/markdown/writerside/markdown-it-ws-code-block"
 import markdownItWsButtonLink from "../plugins/markdown/writerside/markdown-it-ws-button-link"
 import markdownItWsCompare from "../plugins/markdown/writerside/markdown-it-ws-compare"
 import markdownItWsRunnable from "../plugins/markdown/writerside/markdown-it-ws-runnable"
@@ -128,6 +129,9 @@ export function registerMarkdownPlugins(md: any) {
   // After every other fence renderer (MkDocs hl_lines, diff titles): the
   // <details> wraps their output.
   md.use(markdownItWsCollapsibleCode)
+  // After every other HTML renderer: they see the <code-block> tag, which
+  // this one then replaces with a code block from the fence renderer above.
+  md.use(markdownItWsCodeBlock)
 
   // Custom containers
   createContainer(md, 'note', 'note', 'NOTE')

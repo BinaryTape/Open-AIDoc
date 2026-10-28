@@ -15,7 +15,7 @@
  * the tag as a plain element.
  */
 export const GLOBAL_COMPONENTS = [
-  'HomeLayout', 'deflist', 'def', 'list', 'tldr', 'tabs', 'tab', 'Tabs', 'TabItem', 'code-block',
+  'HomeLayout', 'deflist', 'def', 'list', 'tldr', 'tabs', 'tab', 'Tabs', 'TabItem',
   'topic', 'TopicTitle', 'section-starting-page', 'show-structure', 'link-summary', 'card-summary',
   'web-summary', 'snippet', 'description', 'spotlight', 'primary', 'secondary', 'misc', 'cards',
   'card', 'links', 'group', 'Links', 'chapter', 'procedure', 'step', 'control', 'Path', 'ui-path',
