@@ -5,14 +5,15 @@ import path from "path";
 import matter from "gray-matter";
 import { parseTitleComment } from "../utils/title-comment";
 
-export default function generateSidebar(localeConfig: SideLocaleConfig, docsConfig: DocsItemConfig) {
+// `withStatus: false` gives plain-text titles (no beta mark), for page headings.
+export default function generateSidebar(localeConfig: SideLocaleConfig, docsConfig: DocsItemConfig, { withStatus = true } = {}) {
     let sidebarPrefixDir = localeConfig.lang === "zh-Hans" ? docsConfig.path : path.posix.join(localeConfig.lang, docsConfig.path);
     const relativePrefixDir = path.posix.join("docs", sidebarPrefixDir);
     sidebarPrefixDir = path.posix.join("/", sidebarPrefixDir);
-    return generateSidebarNode(localeConfig.lang, docsConfig.framework, docsConfig.type, sidebarPrefixDir, relativePrefixDir);
+    return generateSidebarNode(localeConfig.lang, docsConfig.framework, docsConfig.type, sidebarPrefixDir, relativePrefixDir, withStatus);
 }
 
-function generateSidebarNode(lang: string, framework: string, type: string, sidebarPrefixDir: string, relativePrefixDir: string) {
+function generateSidebarNode(lang: string, framework: string, type: string, sidebarPrefixDir: string, relativePrefixDir: string, withStatus: boolean) {
     const sidebarPath = `docs/.vitepress/sidebar/${type}.sidebar.json`;
     const sidebar = JSON.parse(fs.readFileSync(sidebarPath, 'utf8'));
     const locale: Record<string, string> = JSON.parse(fs.readFileSync(`docs/.vitepress/locales/${lang}.json`, 'utf8'));
@@ -22,9 +23,11 @@ function generateSidebarNode(lang: string, framework: string, type: string, side
             (node.text && locale[node.text]) ??
             (node.link ? getTitleFromMarkdown(framework, relativePrefixDir, node.link) : node.text);
 
+        const status = withStatus && node.link && framework === 'MKDocs' ? getPageStatus(relativePrefixDir, node.link, locale) : '';
+
         const out = {
             ...node,
-            text: localizedText,
+            text: localizedText && localizedText + status,
             link: node.link ? `${sidebarPrefixDir}${node.link}` : node.href ? localizeHref(lang, node.href) : undefined,
             collapsed: node.collapsed ?? undefined,
         };
@@ -34,7 +37,7 @@ function generateSidebarNode(lang: string, framework: string, type: string, side
             const fallbackDocPath = path.join(relativePrefixDir, `${node.include}.md`);
 
             if (fs.existsSync(includedSidebarPath)) {
-                out.items = generateSidebarNode(lang, framework, node.include, sidebarPrefixDir, relativePrefixDir);
+                out.items = generateSidebarNode(lang, framework, node.include, sidebarPrefixDir, relativePrefixDir, withStatus);
             } else if (fs.existsSync(fallbackDocPath)) {
                 // Some upstream Writerside trees reference an optional child
                 // documentation set that is not part of this repository. Keep
@@ -79,6 +82,19 @@ function getTitleFromMarkdown(framework: string, rootDir: string, filePath: stri
         case 'Writerside' : return getWritersideTitle(content) || null;
         default : break;
     }
+}
+
+// Material's navigation.status: a page with `status: beta` in its front matter
+// gets a β after its title (styles/mk-admonition.css). Statuses without a
+// message (`mkdocs.status.<status>`) are not shown.
+export function getPageStatus(rootDir: string, filePath: string, locale: Record<string, string>) {
+    const fullPath = path.join(rootDir, `${filePath}.md`);
+    if (!fs.existsSync(fullPath)) return '';
+    const status = matter(fs.readFileSync(fullPath, "utf-8")).data.status;
+    const label = typeof status === 'string' && /^[\w-]+$/.test(status) ? locale[`mkdocs.status.${status}`] : undefined;
+    if (!label) return '';
+    const escaped = label.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+    return `<span class="mk-status mk-status--${status}" role="img" title="${escaped}" aria-label="${escaped}"></span>`;
 }
 
 function getWritersideTitle(content: string) {

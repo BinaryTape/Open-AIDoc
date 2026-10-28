@@ -24,7 +24,7 @@ export function getSidebarTitle(relativePath: string): string | undefined {
   const localeConfig = SiteLocaleConfig[locale];
   if (!localeConfig) return undefined;
 
-  const sidebarConfig = generateSidebar(localeConfig, docType);
+  const sidebarConfig = generateSidebar(localeConfig, docType, { withStatus: false });
   const rest = parts.slice(1).join('/');
   return findTitleInSidebar(sidebarConfig, rest);
 }
