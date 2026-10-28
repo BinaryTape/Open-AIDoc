@@ -1,0 +1,67 @@
+/*
+ * Writerside start pages (<section-starting-page>: kotlin/home,
+ * kmp/get-started, kmp/compose-multiplatform, ktor/welcome), styled after
+ * kotlinlang.org:
+ * - a large subtitle under the title;
+ * - <spotlight> cards with a picture for their `type` (utils/card-icons.ts);
+ * - <secondary> on a grey band reaching the sidebar and the window edge;
+ * - <links> groups as plain text links underlined by a thin grey border.
+ *
+ * Icons: @rescui/icons (Apache-2.0); see assets/icons/rescui/.
+ */
+
+.vp-doc .page .ws-description {
+  max-width: 680px;
+  margin: 24px 0 48px;
+  font-size: 28px;
+  font-weight: 300;
+  line-height: 1.4;
+}
+
+@media (max-width: 639.98px) {
+  .vp-doc .page .ws-description {
+    margin-bottom: 32px;
+    font-size: 22px;
+  }
+}
+
+.ws-card-icon {
+  display: block;
+  width: 72px;
+  height: 72px;
+  background-color: var(--vp-c-brand-1);
+  -webkit-mask: var(--ws-card-icon) center / contain no-repeat;
+  mask: var(--ws-card-icon) center / contain no-repeat;
+}
+
+.ws-card-icon--rocket { --ws-card-icon: url('../assets/icons/rescui/rocket_24.svg'); }
+.ws-card-icon--learn { --ws-card-icon: url('../assets/icons/rescui/learn_24.svg'); }
+.ws-card-icon--hint { --ws-card-icon: url('../assets/icons/rescui/hint_24.svg'); }
+.ws-card-icon--computer { --ws-card-icon: url('../assets/icons/rescui/computer_28.svg'); }
+
+/* The shadow paints the band past the content column; the sidebar covers it
+   on the left, and clip-path keeps it to the section's own height (plus
+   1px, so that adjacent bands join without a seam). */
+.vp-doc .ws-section--secondary {
+  margin: 48px 0;
+  padding: 48px 0 16px;
+  background-color: var(--vp-c-bg-soft);
+  box-shadow: 0 0 0 100vmax var(--vp-c-bg-soft);
+  clip-path: inset(-1px -100vmax);
+}
+
+.vp-doc .ws-section--secondary + .ws-section--secondary {
+  margin-top: -48px;
+}
+
+.vp-doc .ws-link-group .ws-link {
+  color: var(--vp-c-text-1);
+  font-weight: 400;
+  text-decoration: none;
+  border-bottom: 1px solid var(--vp-c-divider);
+  transition: border-color .1s;
+}
+
+.vp-doc .ws-link-group .ws-link:hover {
+  border-bottom-color: var(--vp-c-text-1);
+}

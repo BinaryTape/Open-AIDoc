@@ -2,15 +2,22 @@
 import { defineComponent, h, type VNode } from 'vue'
 import Card from './Card.vue'
 
+// One component for the Writerside start page sections <spotlight>,
+// <primary>, <secondary> and <cards>; `kind` names the tag, for styling
+// (ws-start-page.css).
 export default defineComponent({
   name: 'TopicCardSection',
-  setup(_, { slots }) {
+  props: {
+    kind: { type: String, default: 'cards' }
+  },
+  setup(props, { slots }) {
     return () => {
       let titleContent = ''
       const links: Array<{
         summary?: string
         content: string
         href?: string
+        type?: string
       }> = []
 
       const contentNodes = (slots.default?.() ?? []).filter((vnode: VNode) => {
@@ -26,6 +33,7 @@ export default defineComponent({
           links.push({
             summary: vnode.props?.summary,
             href: vnode.props?.href,
+            type: vnode.props?.type,
             content: textContent(vnode.children)
           })
           return false
@@ -37,12 +45,12 @@ export default defineComponent({
       const cards = links.length > 0
         ? links.map((link) => h(
             Card,
-            { href: link.href, summary: link.summary },
+            { href: link.href, summary: link.summary, type: link.type },
             { default: () => link.content }
           ))
         : contentNodes
 
-      return h('div', { class: 'ws-section' }, [
+      return h('div', { class: ['ws-section', `ws-section--${props.kind}`] }, [
         titleContent
           ? h('h2', { class: 'ws-section-title' }, titleContent)
           : null,

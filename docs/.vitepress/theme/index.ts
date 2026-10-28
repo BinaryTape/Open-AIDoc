@@ -12,6 +12,7 @@ import '../styles/ws-button.css'
 import '../styles/ws-compare.css'
 import '../styles/ws-runnable.css'
 import '../styles/ws-collapse-section.css'
+import '../styles/ws-start-page.css'
 import { useKotlinPlayground } from './kotlin-playground'
 import { useOpenAnchorTarget } from './open-anchor-target'
 import { useLinkedTabs } from './linked-tabs'
@@ -44,6 +45,14 @@ import Note from "../component/Note.vue";
 import Tip from "../component/Tip.vue";
 import Warning from "../component/Warning.vue";
 import YouTubeVideo from "../component/YouTubeVideo.vue";
+
+// The start page section tags share TopicCardSection, told which tag they are.
+const cardSection = (kind: string) => defineComponent({
+  name: `TopicCardSection-${kind}`,
+  setup(_, { slots }) {
+    return () => h(TopicCardSection, { kind }, slots)
+  }
+})
 
 export default {
   extends: DefaultTheme,
@@ -84,12 +93,12 @@ export default {
 
     app.component('description', Description)
 
-    app.component('spotlight', TopicCardSection)
-    app.component('primary', TopicCardSection)
-    app.component('secondary', TopicCardSection)
+    app.component('spotlight', cardSection('spotlight'))
+    app.component('primary', cardSection('primary'))
+    app.component('secondary', cardSection('secondary'))
     app.component('misc', EmptyComponent)
 
-    app.component('cards', TopicCardSection)
+    app.component('cards', cardSection('cards'))
     app.component('card', Card)
 
     app.component('links', TopicLinkSection)
