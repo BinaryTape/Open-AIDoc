@@ -51,11 +51,12 @@ describe('Writerside <compare>', () => {
   })
 
   it('wraps <code-block> tags too', async () => {
-    const html = await render(codeBlocks('<compare type="top-bottom">'), 'kmp/multiplatform-project-agp-9-migration.md')
+    // Each tag then renders as a code block (markdown-it-ws-code-block).
+    const html = strip(await render(codeBlocks('<compare type="top-bottom">'), 'kmp/multiplatform-project-agp-9-migration.md'))
     expect(html).toContain(
       '<div class="ws-compare ws-compare--top-bottom">' +
-      '<div class="ws-compare__item"><div class="ws-compare__title" v-pre>修改前</div><code-block lang="kotlin" code="val a = 1"/></div>' +
-      '<div class="ws-compare__item"><div class="ws-compare__title" v-pre>修改后</div><code-block lang="kotlin" code="val b = 2"/></div>' +
+      '<div class="ws-compare__item"><div class="ws-compare__title" v-pre>修改前</div><div class="language-kotlin"><pre/>\n</div></div>' +
+      '<div class="ws-compare__item"><div class="ws-compare__title" v-pre>修改后</div><div class="language-kotlin"><pre/>\n</div></div>' +
       '</div>'
     )
     expect(html).not.toContain('<compare')

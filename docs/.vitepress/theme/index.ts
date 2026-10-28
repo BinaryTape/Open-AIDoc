@@ -22,7 +22,6 @@ import { createI18n, setLocale } from '../utils/i18n-utils'
 import Deflist from '../component/Deflist.vue'
 import Def from '../component/Def.vue'
 import List from "../component/List.vue";
-import CodeBlock from "../component/CodeBlock.vue";
 import TLDR from "../component/TLDR.vue";
 import Tabs from "../component/Tabs.vue";
 import Tab from "../component/Tab.vue";
@@ -79,7 +78,6 @@ export default {
     app.component('tab', Tab)
     app.component('Tabs', Tabs)
     app.component('TabItem', Tab)
-    app.component('code-block', CodeBlock)
 
     app.component('topic', Topic)
     app.component('TopicTitle', TopicTitle)
