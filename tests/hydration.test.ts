@@ -30,7 +30,7 @@ describe('template compiler options', () => {
   })
 
   it('leaves components, Vue built-ins and form controls alone', () => {
-    for (const tag of ['tabs', 'tab-item', 'code-block', 'note', 'warning', 'links', 'TopicTitle', 'Badge', 'component', 'slot', 'template', 'transition', 'input', 'select', 'textarea']) {
+    for (const tag of ['tabs', 'tab-item', 'note', 'warning', 'links', 'TopicTitle', 'Badge', 'component', 'slot', 'template', 'transition', 'input', 'select', 'textarea']) {
       expect(isPlainElement(tag), tag).toBe(false)
     }
   })
@@ -53,14 +53,14 @@ describe('template compiler options', () => {
 
   it('puts table rows in a tbody, as the browser does', () => {
     // A component in a cell makes Vue render the table node by node.
-    const source = '<table><tr><th>Target</th></tr><tr><td><code-block lang="kotlin">x</code-block></td></tr></table>'
+    const source = '<table><tr><th>Target</th></tr><tr><td><note>x</note></td></tr></table>'
     const compile = (ssr: boolean) => compileTemplate({ source, filename: 'page.md', id: 'page', ssr, ssrCssVars: [], compilerOptions: vueCompilerOptions }).code
     expect(compile(true)).toContain('><tbody><tr><th>Target</th></tr><tr><td>')
     expect(compile(false)).toMatch(/"table", null, \[\s*_createElementVNode\("tbody"/)
   })
 
   it('keeps rows wrapped in a snippet inside the tbody', () => {
-    const source = '<table><tr><td>A</td></tr><snippet id="s"><tr><td><code-block>x</code-block></td></tr></snippet><tr><td>B</td></tr></table>'
+    const source = '<table><tr><td>A</td></tr><snippet id="s"><tr><td><note>x</note></td></tr></snippet><tr><td>B</td></tr></table>'
     const code = compileTemplate({ source, filename: 'page.md', id: 'page', ssr: true, ssrCssVars: [], compilerOptions: vueCompilerOptions }).code
     // One tbody, opened before the first row and closed after the last.
     expect(code.match(/<tbody>/g)).toHaveLength(1)
