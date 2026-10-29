@@ -70,10 +70,37 @@ describe('template compiler options', () => {
   it('renders panel titles as visible elements, not <title>', () => {
     const compile = (source: string) => compileTemplate({ source, filename: 'page.md', id: 'page', ssr: true, ssrCssVars: [], compilerOptions: vueCompilerOptions }).code
     const panel = compile('<panels><panel><title>Beginner</title><p>Basics.</p></panel></panels>')
-    expect(panel).toContain('<div class="ws-title">Beginner</div>')
+    expect(panel).toContain('<div class="ws-panel"><div class="ws-title">Beginner</div>')
     expect(panel).not.toContain('<title>')
     // A component reading <title> from its slot still gets it.
     expect(compile('<cards><title>Start</title></cards>')).toMatch(/_createVNode\("title"|"title"/)
+  })
+
+  describe('Writerside panels', () => {
+    const compile = (source: string) => compileTemplate({ source: `<div>${source}</div>`, filename: 'page.md', id: 'page', ssr: true, ssrCssVars: [], compilerOptions: vueCompilerOptions }).code
+
+    it('renders a grid with its column counts', () => {
+      const code = compile('<panels columns="2" id="start"><panel><title>A</title><p>a</p></panel></panels>')
+      expect(code).toContain('<div id="start" class="ws-panels" data-columns="2" data-columns-tablet="2" data-columns-mobile="1">')
+      expect(code).not.toMatch(/<panels|\scolumns=/)
+      expect(compile('<panels columns="3" columns-tablet="2" columns-mobile="2"></panels>'))
+        .toContain('class="ws-panels" data-columns="3" data-columns-tablet="2" data-columns-mobile="2"')
+    })
+
+    it('puts a panel\'s content after its title, each button in a paragraph', () => {
+      const code = compile('<panels columns="2"><panel>\n  <title>Beginner</title>\n  <p>Basics.</p>\n  <a href="/start" class="ws-button">Start</a>\n</panel></panels>')
+      expect(code).toContain('<div class="ws-panel"><div class="ws-title">Beginner</div><div class="ws-panel__content"><p>Basics.</p><p><a href="/start" class="ws-button">Start</a></p></div></div>')
+    })
+
+    it('keeps an icon, its link and a button that follows in one paragraph', () => {
+      const code = compile('<panels><panel><title>stdlib</title><p>Text.</p>\n<img src="g.svg" width="18"/> <a href="https://github.com">GitHub</a><br/><br/>\n<a href="/api" class="ws-button">API</a></panel></panels>')
+      expect(code).toMatch(/<div class="ws-panel__content"><p>Text\.<\/p><p><img src="g\.svg" width="18"> <a href="https:\/\/github\.com">GitHub<\/a><br><br> ?<a href="\/api" class="ws-button">API<\/a><\/p><\/div>/)
+    })
+
+    it('leaves block content as it is', () => {
+      const code = compile('<panels><panel><title>T</title><p>One.</p><ul><li>x</li></ul><p>Two.</p></panel></panels>')
+      expect(code).toContain('<div class="ws-panel__content"><p>One.</p><ul><li>x</li></ul><p>Two.</p></div>')
+    })
   })
 
   describe('a paragraph whose only content is a paragraph', () => {
