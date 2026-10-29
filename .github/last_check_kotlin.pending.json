@@ -1,0 +1,20 @@
+{
+  "docs/jvm-test-using-junit.md": {
+    "langs": [
+      "ja",
+      "ko",
+      "zh-Hans",
+      "zh-Hant"
+    ],
+    "reason": "manual: empty {src} code blocks, snippets now expanded (P0-18)"
+  },
+  "docs/mixing-java-kotlin-intellij.md": {
+    "langs": [
+      "ja",
+      "ko",
+      "zh-Hans",
+      "zh-Hant"
+    ],
+    "reason": "manual: empty {src} code blocks, snippets now expanded (P0-18)"
+  }
+}
