@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   applySourceAnchors,
+  pairHeadings,
   headingAnchor,
   listHeadings,
 } from '../tools/pipeline/utils/heading-anchors.mjs'
@@ -73,6 +74,17 @@ describe('listHeadings', () => {
     expect(listHeadings(md)).toEqual([])
   })
 
+  it('sees a fence indented under a nested list item', () => {
+    // kmp/compose-resource-environment: `## Density` came after such a block.
+    const md = ['1. Step', '    * Sub-step', '        ```kotlin', '        # comment', '        ```', '', '## Density'].join('\n')
+    expect(listHeadings(md).map((h) => h.text)).toEqual(['Density'])
+  })
+
+  it('does not take inline code opening a line for a fence', () => {
+    const md = ['```a``` and more', '', '## Real'].join('\n')
+    expect(listHeadings(md).map((h) => h.text)).toEqual(['Real'])
+  })
+
   it('separates a trailing attribute block from the text', () => {
     const [heading] = listHeadings('## Checks {id="is-and-is-operators"}')
     expect(heading.text).toBe('Checks')
@@ -95,12 +107,12 @@ describe('applySourceAnchors', () => {
     const translated = ['# 字符串', '', '## 声明字符串', '', '文本。', '', '### 多行字符串'].join('\n')
     // The source title comment is not an ATX heading, so the translated H1 has
     // no counterpart and the documents would not pair — drop it for this case.
-    const { content, added, skipped } = applySourceAnchors(
+    const { content, added, drift } = applySourceAnchors(
       translated.replace('# 字符串\n\n', ''),
       source
     )
 
-    expect(skipped).toBeNull()
+    expect(drift).toBeNull()
     expect(added).toBe(2)
     expect(content).toContain('## 声明字符串 {id="declare-strings"}')
     expect(content).toContain('### 多行字符串 {id="multiline-strings"}')
@@ -167,7 +179,56 @@ describe('applySourceAnchors', () => {
   it('refuses to guess when the documents disagree on structure', () => {
     // Heading levels repeat, so a dropped heading cannot be located by level
     // alone — pairing on anyway would shift every anchor after it.
-    expect(applySourceAnchors('## 一\n\n## 二', '## One').skipped).toMatch(/heading count differs/)
-    expect(applySourceAnchors('### 一', '## One').skipped).toMatch(/heading level differs/)
+    const extra = applySourceAnchors('## 一\n\n## 二', '## One')
+    expect(extra).toMatchObject({ added: 0, unpaired: 2 })
+    expect(extra.drift).toMatch(/heading count differs/)
+    expect(applySourceAnchors('### 一', '## One').drift).toMatch(/heading level differs/)
+  })
+})
+
+describe('pairing headings when the translation dropped one', () => {
+  const pairOf = (source: string[], translated: string[]) => {
+    const heading = (line: string) => listHeadings(line)[0]
+    const { pairs } = pairHeadings(source.map(heading), translated.map(heading))
+    return translated.map((_, i) => pairs.get(i)?.text ?? null)
+  }
+
+  it('pairs everything around a dropped heading whose level gives it away', () => {
+    // kotlin/whatsnew1430: the translation has no "Serialization updates".
+    expect(
+      pairOf(
+        ['## Standard library', '### Char conversions', '## Serialization updates', '### Inline classes', '### Unsigned types'],
+        ['## 标准库', '### Char 转换', '### 内联类', '### 无符号类型']
+      )
+    ).toEqual(['Standard library', 'Char conversions', 'Inline classes', 'Unsigned types'])
+  })
+
+  it('leaves the headings it cannot place unpaired', () => {
+    // kotlin/typecasts: upstream added "Intersection types" amid a run of H3s
+    // after the page was translated. Any of them could be the missing one.
+    expect(
+      pairOf(
+        ['## Smart casts', '### Control flow', '### Intersection types', '### Inline functions', '## Cast operators'],
+        ['## 智能转换', '### 控制流', '### 内联函数', '## 转换操作符']
+      )
+    ).toEqual(['Smart casts', null, null, 'Cast operators'])
+  })
+
+  it('stops pairing where the Latin words of a heading disagree', () => {
+    // By level alone the two walks would contradict each other on both headings.
+    expect(
+      pairOf(['## Kotlin/JVM', '## Kotlin/Native', '## Kotlin/JS'], ['## Kotlin/JVM 概览', '## Kotlin/JS'])
+    ).toEqual(['Kotlin/JVM', 'Kotlin/JS'])
+  })
+
+  it('stamps the headings it could pair', () => {
+    // kotlin/whatsnew21: the translation opens without the first two sections.
+    const { content, added, unpaired, drift } = applySourceAnchors(
+      '### 守卫条件\n\n### 非局部 break',
+      '## IDE support\n\n## Language\n\n### Guard conditions\n\n### Non-local break'
+    )
+    expect(content).toBe('### 守卫条件 {id="guard-conditions"}\n\n### 非局部 break {id="non-local-break"}')
+    expect({ added, unpaired }).toEqual({ added: 2, unpaired: 0 })
+    expect(drift).toMatch(/heading count differs \(source 4, translation 2\)/)
   })
 })

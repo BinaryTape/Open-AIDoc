@@ -34,6 +34,14 @@ describe('Writerside Markdown processing', () => {
     expect(await process(manifest)).toContain('<action android:name="android.intent.action.MAIN" />')
   })
 
+  it('links a section of another page to that page', async () => {
+    // Ktor: <a href="server-plugins.md" anchor="install"> came out as href="#install".
+    expect(await process('See <a href="other.md" anchor="custom-setup">setup</a>.')).toContain(
+      '<a href="other.md#custom-setup">setup</a>'
+    )
+    expect(await process('See <a anchor="custom-setup">here</a>.')).toContain('<a href="#custom-setup">here</a>')
+  })
+
   it('turns <anchor> into a link target', async () => {
     expect(await process('<anchor name="android-target-rename"/>\n### Migrate')).toContain(
       '<a id="android-target-rename"></a>\n### Migrate'
