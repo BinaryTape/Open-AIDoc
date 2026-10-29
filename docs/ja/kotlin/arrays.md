@@ -22,7 +22,7 @@ Java APIとの相互運用性や低レベルの要件がある場合に配列を
 | Java相互運用性 | `T[]` にマッピングされる | `java.util.List` および<br/> `java.util.Set` にマッピングされる |
 | 関数型スタイルのフィルタリングと変換 | 限定的 | 広範 |
 
-[配列をコレクションに変換する](#コレクションへの変換)方法についてはこちらをご覧ください。
+[配列をコレクションに変換する](#convert-to-collections)方法についてはこちらをご覧ください。
 
 ## 配列の作成 {id="create-arrays"}
 
@@ -63,7 +63,7 @@ val emptyArrayRight = emptyArray<String>()
 val emptyArrayLeft: Array<String> = emptyArray()
 ```
 
-配列に[要素を追加する方法](#要素の追加と削除)についてはこちらをご覧ください。
+配列に[要素を追加する方法](#add-and-remove-elements)についてはこちらをご覧ください。
 
 ### nullを含む配列 {id="array-with-nulls"}
 

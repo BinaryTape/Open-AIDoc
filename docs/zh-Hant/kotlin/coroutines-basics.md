@@ -230,7 +230,7 @@ dependencies {
 >
 {style="tip"}
 
-## 協同程式作用域與結構化並行
+## 協同程式作用域與結構化並行 {id="coroutine-scope-and-structured-concurrency"}
 
 當你在應用程式中執行許多協同程式時，你需要一種將它們作為群組管理的方法。
 Kotlin 協同程式依賴一個稱為 _結構化並行 (structured concurrency)_ 的原則來提供這種結構。
@@ -249,7 +249,7 @@ Kotlin 協同程式依賴一個稱為 _結構化並行 (structured concurrency)_
 在 `CoroutineScope` 上呼叫 [協同程式建構器函式](#coroutine-builder-functions)（例如 `CoroutineScope.launch()`）會啟動一個與該作用域相關聯的協同程式的子項。
 在建構器的區塊內，[接收者 (receiver)](lambdas.md#function-literals-with-receiver) 是一個巢狀的 `CoroutineScope`，因此你在該處啟動的任何協同程式都會成為其子項。
 
-### 使用 `coroutineScope()` 函式建立協同程式作用域
+### 使用 `coroutineScope()` 函式建立協同程式作用域 {id="create-a-coroutine-scope-with-the-coroutinescope-function"}
 
 要使用當前的協同程式上下文建立一個新的協同程式作用域，請使用
 [`coroutineScope()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/coroutine-scope.html) 函式。

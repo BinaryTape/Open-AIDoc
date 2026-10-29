@@ -40,7 +40,7 @@
   {kotlin-runnable="true"}
 
 > 간단한 경우에는 `this`를 명시적으로 작성할 필요가 없습니다. 코틀린은 현재 스코프에서 이를 해석합니다.
-> [암시적인 this](#암시적인-this)에서 더 자세히 알아보세요.
+> [암시적인 this](#implicit-this)에서 더 자세히 알아보세요.
 > 
 {style="tip"}
 

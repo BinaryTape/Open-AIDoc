@@ -280,7 +280,7 @@ fun main() {
 
 ## 함수 호출 {id="call-a-function"}
 
-동적 함수 호출도 [프로퍼티](#프로퍼티-읽기)와 동일한 패턴을 따릅니다. 모든 인자를 선언된 순서대로 사용할 수 있다면
+동적 함수 호출도 [프로퍼티](#read-a-property)와 동일한 패턴을 따릅니다. 모든 인자를 선언된 순서대로 사용할 수 있다면
 [`call()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/-k-callable/call.html)을 사용할 수 있습니다. 언바운드 멤버 함수를 선언할 때는 객체 인스턴스를 먼저 전달한 다음, 일반 인자들을 차례로 추가합니다.
 
 ```kotlin

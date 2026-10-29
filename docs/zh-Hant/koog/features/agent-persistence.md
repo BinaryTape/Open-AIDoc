@@ -150,7 +150,7 @@ Agent 持久化功能具有三個主要配置選項：
 - `NoPersistenceStorageProvider`：不儲存檢查點的無操作 (no-op) 實作。這是預設提供者。
 
 您也可以透過實作 `PersistenceStorageProvider` 介面來實作自訂存儲提供者。
-如需更多資訊，請參閱 [自訂存儲提供者](#自訂存儲提供者)。
+如需更多資訊，請參閱 [自訂存儲提供者](#custom-storage-providers)。
 
 ### 連續持久化 (Continuous persistence) {id="continuous-persistence"}
 

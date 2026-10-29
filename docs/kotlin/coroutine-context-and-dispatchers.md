@@ -7,7 +7,7 @@
 
 协程上下文是一组各种元素的集合。 主要元素是协程的 [Job]（我们之前见过的）及其调度器（本节将介绍）。
 
-## 调度器与线程
+## 调度器与线程 {id="dispatchers-and-threads"}
 
 协程上下文包含一个 *协程调度器*（参见 [CoroutineDispatcher]），它决定了相关协程在哪个或哪些线程中执行。 协程调度器可以将协程的执行限制在特定线程中，将其分派到线程池中，或者让其不受限地运行。
 
@@ -60,7 +60,7 @@ main runBlocking      : I'm working in thread main
   
 [newSingleThreadContext] 为协程运行创建一个线程。 专用线程是一种非常昂贵的资源。 在实际应用中，当不再需要时，必须使用 [close][ExecutorCoroutineDispatcher.close] 函数将其释放，或者将其存储在顶级变量中并在整个应用中重用。
 
-## 非受限调度器 vs 受限调度器
+## 非受限调度器 vs 受限调度器 {id="unconfined-vs-confined-dispatcher"}
  
 [Dispatchers.Unconfined] 协程调度器在调用者线程中启动协程，但仅持续到第一个挂起点。 在挂起之后，它在完全由调用的挂起函数决定的线程中恢复协程。 非受限调度器适用于既不消耗 CPU 时间，也不更新限制在特定线程中的任何共享数据（如 UI）的协程。
 
@@ -107,11 +107,11 @@ main runBlocking: After delay in thread main
 >
 {style="note"}
 
-## 调试协程与线程
+## 调试协程与线程 {id="debugging-coroutines-and-threads"}
 
 协程可以在一个线程上挂起并在另一个线程上恢复。 如果没有专门的工具，即使使用单线程调度器，也可能很难弄清楚协程在何时、何地、正在做什么。
 
-### 使用 IDEA 调试
+### 使用 IDEA 调试 {id="debugging-with-idea"}
 
 Kotlin 插件的协程调试器简化了在 IntelliJ IDEA 中调试协程的过程。
 
@@ -133,7 +133,7 @@ Kotlin 插件的协程调试器简化了在 IntelliJ IDEA 中调试协程的过�
 
 在[教程](https://kotlinlang.org/docs/tutorials/coroutines/debug-coroutines-with-idea.html)中详细了解协程调试。
 
-### 使用日志调试
+### 使用日志调试 {id="debugging-using-logging"}
 
 在没有协程调试器的情况下调试带有线程的应用的另一种方法是在每个日志语句中打印日志文件中的线程名称。 此功能受到日志框架的普遍支持。 使用协程时，仅靠线程名称并不能提供太多上下文，因此 `kotlinx.coroutines` 包含了调试功能以使其更加轻松。 
 
@@ -183,9 +183,9 @@ fun main() = runBlocking<Unit> {
 >
 {style="note"}
 
-## 线程间跳转
+## 线程间跳转 {id="jumping-between-threads"}
 
-使用 `-Dkotlinx.coroutines.debug` JVM 选项运行以下代码（参见[调试](#调试协程与线程)）：
+使用 `-Dkotlinx.coroutines.debug` JVM 选项运行以下代码（参见[调试](#debugging-coroutines-and-threads)）：
 
 ```kotlin
 import kotlinx.coroutines.*
@@ -228,7 +228,7 @@ fun main() {
 
 上面的示例使用了 Kotlin 标准库中的 `use` 函数，以便在不再需要时正确释放由 [newSingleThreadContext] 创建的线程资源。
 
-## 上下文中的作业
+## 上下文中的作业 {id="job-in-the-context"}
 
 协程的 [Job] 是其上下文的一部分，可以使用 `coroutineContext[Job]` 表达式从中检索它：
 
@@ -247,7 +247,7 @@ fun main() = runBlocking<Unit> {
 > 
 {style="note"}
 
-在[调试模式](#调试协程与线程)下，它的输出如下：
+在[调试模式](#debugging-coroutines-and-threads)下，它的输出如下：
 
 ```
 My job is "coroutine#1":BlockingCoroutine{Active}@6d311334
@@ -257,7 +257,7 @@ My job is "coroutine#1":BlockingCoroutine{Active}@6d311334
 
 请注意，[CoroutineScope] 中的 [isActive] 只是 `coroutineContext[Job]?.isActive == true` 的一种便捷快捷方式。
 
-## 协程的子协程
+## 协程的子协程 {id="children-of-a-coroutine"}
 
 当一个协程在另一个协程的 [CoroutineScope] 中启动时，它通过 [CoroutineScope.coroutineContext] 继承其上下文，并且新协程的 [Job] 成为父协程作业的一个 *子作业*。 当父协程被取消时，其所有子协程也会被递归地取消。
 
@@ -313,7 +313,7 @@ job1: I am not affected by cancellation of the request
 
 <!--- TEST -->
 
-## 父级的责任 
+## 父级的责任 {id="parental-responsibilities"}
 
 父协程始终等待其所有子协程完成。 父协程不必显式跟踪它启动的所有子协程，也不必在结束时使用 [Job.join] 来等待它们：
 
@@ -355,9 +355,9 @@ Now processing of the request is complete
 
 <!--- TEST -->
 
-## 为调试命名协程
+## 为调试命名协程 {id="naming-coroutines-for-debugging"}
 
-当协程经常打印日志，而您只需要关联来自同一协程的日志记录时，自动分配的 ID 非常有用。 但是，当协程与特定请求的处理相关联或执行某些特定的后台任务时，为了调试目的，最好显式地对其命名。 [CoroutineName] 上下文元素的作用与线程名称相同。 当[调试模式](#调试协程与线程)开启时，它会包含在执行此协程的线程名称中。
+当协程经常打印日志，而您只需要关联来自同一协程的日志记录时，自动分配的 ID 非常有用。 但是，当协程与特定请求的处理相关联或执行某些特定的后台任务时，为了调试目的，最好显式地对其命名。 [CoroutineName] 上下文元素的作用与线程名称相同。 当[调试模式](#debugging-coroutines-and-threads)开启时，它会包含在执行此协程的线程名称中。
 
 以下示例演示了这一概念：
 
@@ -401,7 +401,7 @@ fun main() = runBlocking(CoroutineName("main")) {
 
 <!--- TEST FLEXIBLE_THREAD -->
 
-## 组合上下文元素
+## 组合上下文元素 {id="combining-context-elements"}
 
 有时我们需要为一个协程上下文定义多个元素。 我们对此可以使用 `+` 运算符。 例如，我们可以同时启动一个带有显式指定调度器和显式指定名称的协程： 
 
@@ -430,7 +430,7 @@ I'm working in thread DefaultDispatcher-worker-1 @test#2
 
 <!--- TEST FLEXIBLE_THREAD -->
 
-## 协程作用域
+## 协程作用域 {id="coroutine-scope"}
 
 让我们将关于上下文、子协程和作业的知识结合起来。 假设我们的应用有一个具有生命周期的对象，但该对象不是协程。 例如，我们正在编写一个 Android 应用，并在 Android activity 的上下文中启动各种协程，以执行异步操作来获取和更新数据、制作动画等。 当 activity 被销毁时，这些协程必须被取消以避免内存泄漏。
 
@@ -524,7 +524,7 @@ Destroying activity!
 >
 {style="note"}
 
-### 线程局部数据
+### 线程局部数据 {id="thread-local-data"}
 
 有时，能够在协程之间或向协程传递一些线程局部数据是很方便的。 但是，由于它们不绑定到任何特定的线程，如果手动执行此操作，可能会导致模板代码。
 
@@ -558,7 +558,7 @@ fun main() = runBlocking<Unit> {
 {style="note"}
 
 在此示例中，我们使用 [Dispatchers.Default] 在后台线程池中启动一个新协程，因此它在线程池中的不同线程上工作，但它仍然具有我们使用 `threadLocal.asContextElement(value = "launch")` 指定的线程局部变量的值，无论协程在哪个线程上执行。
-因此，输出（带有[调试](#调试协程与线程)）为：
+因此，输出（带有[调试](#debugging-coroutines-and-threads)）为：
 
 ```text
 Pre-main, current thread: Thread[main @coroutine#1,5,main], thread local value: 'main'

@@ -48,7 +48,7 @@ KGP 会创建必要的 Gradle 任务。如果您的项目中有多个模块需�
 
 该任务会比较 ABI 转储并将检测到的任何差异作为错误打印出来。请仔细检查输出，以确定是否需要更改代码以保持二进制兼容性。
 
-默认情况下，[当项目中启用了二进制兼容性验证](#如何启用) 并且您运行 `check` 任务时，Gradle 也会运行 `checkKotlinAbi` 任务。 
+默认情况下，[当项目中启用了二进制兼容性验证](#how-to-enable) 并且您运行 `check` 任务时，Gradle 也会运行 `checkKotlinAbi` 任务。 
 
 ## 更新参考 ABI 转储 {id="update-reference-abi-dump"}
 

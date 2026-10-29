@@ -9,7 +9,7 @@ Select 表达式可以同时等待多个挂起函数，并选择第一个可用�
 >
 {style="note"}
 
-## 从通道中选择
+## 从通道中选择 {id="selecting-from-channels"}
 
 假设我们有两个字符串生产者：`fizz` 和 `buzz`。`fizz` 每 500 毫秒生成一个 "Fizz" 字符串：
 
@@ -113,7 +113,7 @@ fizz -> 'Fizz'
 
 <!--- TEST -->
 
-## 在通道关闭时选择
+## 在通道关闭时选择 {id="selecting-on-close"}
 
 当通道关闭时，`select` 中的 [onReceive][ReceiveChannel.onReceive] 子句会失败，导致相应的 `select` 抛出异常。我们可以使用 [onReceiveCatching][ReceiveChannel.onReceiveCatching] 子句在通道关闭时执行特定操作。以下示例还展示了 `select` 是一个表达式，它会返回其所选子句的结果：
 
@@ -210,7 +210,7 @@ Channel 'a' is closed
 
 第二个观察结果是，当通道已经关闭时，[onReceiveCatching][ReceiveChannel.onReceiveCatching] 会被立即选中。
 
-## 选择发送
+## 选择发送 {id="selecting-to-send"}
 
 Select 表达式具有 [onSend][SendChannel.onSend] 子句，将其与选择的偏向性结合使用会大有裨益。
 
@@ -286,7 +286,7 @@ Done consuming
 
 <!--- TEST -->
 
-## 选择延迟值
+## 选择延迟值 {id="selecting-deferred-values"}
 
 可以使用 [onAwait][Deferred.onAwait] 子句来选择延迟值。让我们从一个在随机延迟后返回延迟字符串值的异步函数开始：
 
@@ -356,7 +356,7 @@ Deferred 4 produced answer 'Waited for 128 ms'
 
 <!--- TEST -->
 
-## 在延迟值通道上切换
+## 在延迟值通道上切换 {id="switch-over-a-channel-of-deferred-values"}
 
 让我们编写一个通道生产者函数，它消费一个延迟字符串值通道，等待接收到的每个延迟值，但仅持续到下一个延迟值到来或通道关闭为止。这个示例将 [onReceiveCatching][ReceiveChannel.onReceiveCatching] 和 [onAwait][Deferred.onAwait] 子句放在同一个 `select` 中：
 

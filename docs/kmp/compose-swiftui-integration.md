@@ -107,7 +107,7 @@ Main_iosKt.ComposeEntryPointWithUIViewController(createUIViewController: { () ->
 
 您可以使用 SwiftUI 的 [`Map`](https://developer.apple.com/documentation/mapkit/map) 组件在 Compose Multiplatform 中实现地图视图。这允许您的应用显示完全交互式的 SwiftUI 地图。
 
-对于同一个 [Kotlin 入口点函数](#在-compose-multiplatform-中使用-swiftui)，在 Swift 中，使用 `UIHostingController` 传递包装 `Map` 视图的 `UIViewController`：
+对于同一个 [Kotlin 入口点函数](#use-swiftui-inside-compose-multiplatform)，在 Swift 中，使用 `UIHostingController` 传递包装 `Map` 视图的 `UIViewController`：
 
 ```swift
 import SwiftUI
@@ -178,7 +178,7 @@ Main_iosKt.ComposeEntryPointWithUIViewController(createUIViewController: {
 
 您可以使用 SwiftUI 和 UIKit 的 [`UIImagePickerController`](https://developer.apple.com/documentation/uikit/uiimagepickercontroller) 在 Compose Multiplatform 中实现相机视图，并将其包装在兼容 SwiftUI 的组件中。这允许您的应用启动系统相机并拍摄照片。
 
-对于同一个 [Kotlin 入口点函数](#在-compose-multiplatform-中使用-swiftui)，在 Swift 中，使用 `UIImagePickerController` 定义一个基础的 `CameraView` 并使用 `UIHostingController` 将其嵌入：
+对于同一个 [Kotlin 入口点函数](#use-swiftui-inside-compose-multiplatform)，在 Swift 中，使用 `UIImagePickerController` 定义一个基础的 `CameraView` 并使用 `UIHostingController` 将其嵌入：
 
 ```swift
 Main_iosKt.ComposeEntryPointWithUIViewController(createUIViewController: {
@@ -292,7 +292,7 @@ struct CameraPreview: View {
 
 您可以通过使用 `UIViewRepresentable` 包装 UIKit 的 [`WKWebView`](https://developer.apple.com/documentation/webkit/wkwebview) 组件，在 Compose Multiplatform 中使用 SwiftUI 实现 Web 视图。这允许您显示具有完整原生渲染的嵌入式 Web 内容。
 
-对于同一个 [Kotlin 入口点函数](#在-compose-multiplatform-中使用-swiftui)，在 Swift 中，定义一个使用 `UIHostingController` 嵌入的基础 `WebView`：
+对于同一个 [Kotlin 入口点函数](#use-swiftui-inside-compose-multiplatform)，在 Swift 中，定义一个使用 `UIHostingController` 嵌入的基础 `WebView`：
 
 ```swift
 Main_iosKt.ComposeEntryPointWithUIViewController(createUIViewController: {

@@ -52,7 +52,7 @@ class CounterTest {
 | ------------------------------------------------------------------------------- |
 ```
 
-## Lincheck 的運作方式
+## Lincheck 的運作方式 {id="how-lincheck-works"}
 
 每當 JVM 執行並行程式碼時，跨執行緒的操作執行順序可能會發生變化。例如，一個操作可能會被另一個執行緒中的操作中斷。這本身不是錯誤，但如果程式碼中存在並行錯誤 (concurrency bugs)，則可能導致錯誤。
 
@@ -68,12 +68,12 @@ Lincheck 實作了兩種測試策略，以尋找導致錯誤行為的執行排�
 * **模型檢查** (Model checking)。Lincheck 透過在程式中插入明確的執行緒切換指令來控制排程。這些指令被放置在同步點或共用記憶體存取處。模型檢查使 Lincheck 能夠產生導致錯誤的精確執行追蹤 (trace)。
 * **壓力測試** (Stress testing)。由作業系統控制排程。Lincheck 會多次執行每個案例，以增加發現錯誤的機會。
 
-## 探索 Lincheck
+## 探索 Lincheck {id="explore-lincheck"}
 
 * 在 [Lincheck 快速入門](lincheck-getting-started.md) 中逐步學習 Lincheck 特性。
 * 了解 Lincheck 中 [測試並行資料結構的宣告式方法](lincheck-how-to-test-data-structures.md)。
 
-## 了解更多
+## 了解更多 {id="learn-more"}
 
 * Nikita Koval 的 "How we test concurrent algorithms in Kotlin Coroutines"：[影片](https://youtu.be/jZqkWfa11Js)。KotlinConf 2023
 * Maria Sokolova 的 "Lincheck: Testing concurrency on the JVM" 工作坊：[第 1 部分](https://www.youtube.com/watch?v=YNtUK9GK4pA)，[第 2 部分](https://www.youtube.com/watch?v=EW7mkAOErWw)。Hydra 2021

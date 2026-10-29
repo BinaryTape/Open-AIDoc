@@ -121,7 +121,7 @@
                 <code-block lang="kotlin" code="                    ktor_version=%ktor_version%"/>
                 <note id="eap-note">
                     <p>
-                        若要使用 EAP 版本的 Ktor，你需要加入 <a href="#repositories">Space 儲存庫</a>。
+                        若要使用 EAP 版本的 Ktor，你需要加入 <a href="server-dependencies.topic#repositories">Space 儲存庫</a>。
                     </p>
                 </note>
             </step>
@@ -202,7 +202,7 @@
             </step>
             <step>
                 <p>
-                    使用 <code>println()</code> 函式來列印伺服器傳回的<a href="#status">狀態碼</a>，並使用 <code>close()</code> 函式來關閉串流並釋放與其相關的所有資源。
+                    使用 <code>println()</code> 函式來列印伺服器傳回的<a href="client-responses.md#status">狀態碼</a>，並使用 <code>close()</code> 函式來關閉串流並釋放與其相關的所有資源。
                     <Path>Main.kt</Path>
                     檔案內容應如下所示：
                 </p>
@@ -248,7 +248,7 @@
     <chapter title="啟用記錄" id="enable-logging">
         <p>
             因為 Ktor 在 JVM 上使用 SLF4J 抽象層進行記錄，若要啟用記錄，你需要
-            <a href="#jvm">提供一個記錄架構</a>，例如
+            <a href="client-logging.md#jvm">提供一個記錄架構</a>，例如
             <a href="https://logback.qos.ch/">Logback</a>。
         </p>
         <procedure id="enable-logging-procedure">

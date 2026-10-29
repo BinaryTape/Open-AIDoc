@@ -216,13 +216,13 @@ jobs:
 
 ワークフローをプッシュしたら、GitHub Actionを使用してnpmパッケージに[Trusted Publisher](https://docs.npmjs.com/trusted-publishers)を追加できます。
 
-1. [公開済みパッケージ](#手動での公開)のページを開きます。
+1. [公開済みパッケージ](#publish-manually)のページを開きます。
 2. **Settings** タブを開き、**Trusted Publisher** セクションを見つけます。
 3. **Select your publisher** の下にある **GitHub Actions** ボタンをクリックします。
 4. フォームに入力します。
    * GitHubの名前（またはOrganization）
    * リポジトリ名
-   * ワークフローファイル名（このチュートリアルでは [publish.yml](#github-actionsワークフローファイルの作成) を使用しました）。
+   * ワークフローファイル名（このチュートリアルでは [publish.yml](#create-a-github-actions-workflow-file) を使用しました）。
 5. **Setup connection** ボタンをクリックします。
 
 ![GitHub Actions向けのnpm Trusted Publisher設定](npm-trusted-publisher-github.png)

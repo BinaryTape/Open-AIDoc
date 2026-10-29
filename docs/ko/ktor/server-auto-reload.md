@@ -72,18 +72,18 @@
     </chapter>
     <chapter title="개발 모드 활성화" id="enable">
         <p>
-            오토 리로드를 사용하려면 먼저 <a href="#enable">개발 모드</a>를 활성화해야 합니다.
+            오토 리로드를 사용하려면 먼저 <a href="server-development-mode.topic#enable">개발 모드</a>를 활성화해야 합니다.
             이는 <Links href="//server-create-and-configure" summary="Learn how to create a server depending on your application deployment needs.">서버를 생성하고 실행</Links>하는 방식에 따라 달라집니다.
         </p>
         <list>
             <li>
                 <p>
-                    <code>EngineMain</code>을 사용하여 서버를 실행하는 경우, <a href="#application-conf">설정 파일</a>에서 개발 모드를 활성화하세요.
+                    <code>EngineMain</code>을 사용하여 서버를 실행하는 경우, <a href="server-development-mode.topic#application-conf">설정 파일</a>에서 개발 모드를 활성화하세요.
                 </p>
             </li>
             <li>
                 <p>
-                    <code>embeddedServer</code>를 사용하여 서버를 실행하는 경우, <a href="#system-property"><code>io.ktor.development</code></a> 시스템 속성을 사용할 수 있습니다.
+                    <code>embeddedServer</code>를 사용하여 서버를 실행하는 경우, <a href="server-development-mode.topic#system-property"><code>io.ktor.development</code></a> 시스템 속성을 사용할 수 있습니다.
                 </p>
             </li>
         </list>

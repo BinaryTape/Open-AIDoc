@@ -104,7 +104,7 @@ Main_iosKt.ComposeEntryPointWithUIViewController(createUIViewController: { () ->
 
 SwiftUIの [`Map`](https://developer.apple.com/documentation/mapkit/map) コンポーネントを使用して、Compose Multiplatformにマップビューを実装できます。これにより、アプリケーションで完全にインタラクティブなSwiftUIマップを表示できます。
 
-[Kotlinのエントリポイント関数](#compose-multiplatform内でswiftuiを使用する)と同じものに対して、Swiftで `UIHostingController` を使用して `Map` ビューをラップした `UIViewController` を渡します。
+[Kotlinのエントリポイント関数](#use-swiftui-inside-compose-multiplatform)と同じものに対して、Swiftで `UIHostingController` を使用して `Map` ビューをラップした `UIViewController` を渡します。
 
 ```swift
 import SwiftUI
@@ -175,7 +175,7 @@ Main_iosKt.ComposeEntryPointWithUIViewController(createUIViewController: {
 
 SwiftUIとUIKitの [`UIImagePickerController`](https://developer.apple.com/documentation/uikit/uiimagepickercontroller) を使用し、SwiftUI互換コンポーネントでラップすることで、Compose Multiplatformにカメラビューを実装できます。これにより、アプリケーションからシステムカメラを起動して写真を撮影できます。
 
-[Kotlinのエントリポイント関数](#compose-multiplatform内でswiftuiを使用する)と同じものに対して、Swiftで `UIImagePickerController` を使用した基本的な `CameraView` を定義し、`UIHostingController` を使って埋め込みます。
+[Kotlinのエントリポイント関数](#use-swiftui-inside-compose-multiplatform)と同じものに対して、Swiftで `UIImagePickerController` を使用した基本的な `CameraView` を定義し、`UIHostingController` を使って埋め込みます。
 
 ```swift
 Main_iosKt.ComposeEntryPointWithUIViewController(createUIViewController: {
@@ -289,7 +289,7 @@ struct CameraPreview: View {
 
 UIKitの [`WKWebView`](https://developer.apple.com/documentation/webkit/wkwebview) コンポーネントを `UIViewRepresentable` でラップすることで、Compose Multiplatformにウェブビューを実装できます。これにより、完全なネイティブレンダリングで埋め込みウェブコンテンツを表示できます。
 
-[Kotlinのエントリポイント関数](#compose-multiplatform内でswiftuiを使用する)と同じものに対して、Swiftで `UIHostingController` を使用して埋め込まれた基本的な `WebView` を定義します。
+[Kotlinのエントリポイント関数](#use-swiftui-inside-compose-multiplatform)と同じものに対して、Swiftで `UIHostingController` を使用して埋め込まれた基本的な `WebView` を定義します。
 
 ```swift
 Main_iosKt.ComposeEntryPointWithUIViewController(createUIViewController: {

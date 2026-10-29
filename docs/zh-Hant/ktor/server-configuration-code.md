@@ -121,7 +121,7 @@
     <tip>
         <p>
             您也可以使用自訂環境來 
-            <a href="#embedded-server">
+            <a href="server-ssl.md#embedded-server">
                 提供 HTTPS 服務
             </a>。
         </p>
@@ -157,7 +157,7 @@
     <tip>
         對於靜態配置，您可以使用設定檔或環境變數。
         若要了解更多，請參閱 
-        <a href="#command-line">
+        <a href="server-configuration-file.topic#command-line">
             檔案中的配置
         </a>
         。

@@ -10,23 +10,23 @@
 
 다음 주제에 대한 자세한 내용을 계속 읽어보세요:
 
-* [생성된 `Res` 클래스 및 접근자 임포트](#생성된-클래스-임포트하기)
-* [접근자 클래스 생성 커스터마이징](#접근자-클래스-생성-커스터마이징): public으로 설정하는 방법, 패키지 할당, 무조건 생성하도록 하는 방법
+* [생성된 `Res` 클래스 및 접근자 임포트](#importing-the-generated-class)
+* [접근자 클래스 생성 커스터마이징](#customizing-accessor-class-generation): public으로 설정하는 방법, 패키지 할당, 무조건 생성하도록 하는 방법
 * 특정 리소스 유형 다루기: 
-  * 단순 이미지, 래스터화된 이미지 또는 XML 벡터와 같은 [드로어블(Drawable) 리소스](#이미지)
-  * Material Symbols 라이브러리의 [벡터 Android XML 아이콘](#아이콘)
-  * 단순 문자열, 템플릿, 배열, 복수형(plurals)을 포함한 [문자열](#문자열)
-  * [커스텀 폰트 저장 및 로드](#폰트)
-  * [Raw 파일](#raw-파일) 및 바이트 배열을 이미지로 변환
-* [문자열 ID로 매핑된 리소스 접근](#리소스-및-문자열-id에-대해-생성된-맵)
-* [멀티플랫폼 리소스를 Android 에셋으로 사용](#android-에셋으로-compose-multiplatform-리소스-사용하기)
+  * 단순 이미지, 래스터화된 이미지 또는 XML 벡터와 같은 [드로어블(Drawable) 리소스](#images)
+  * Material Symbols 라이브러리의 [벡터 Android XML 아이콘](#icons)
+  * 단순 문자열, 템플릿, 배열, 복수형(plurals)을 포함한 [문자열](#strings)
+  * [커스텀 폰트 저장 및 로드](#fonts)
+  * [Raw 파일](#raw-files) 및 바이트 배열을 이미지로 변환
+* [문자열 ID로 매핑된 리소스 접근](#generated-maps-for-resources-and-string-ids)
+* [멀티플랫폼 리소스를 Android 에셋으로 사용](#compose-multiplatform-resources-as-android-assets)
 * 웹 전용 리소스 처리:
   * 브라우저 기능 및 프리로드 API를 사용한 [리소스 프리로드](compose-web-resources.md#preloading-of-resources-for-web-targets)
   * 누락된 문자에 대한 [자동 폰트 대체(fallback)](compose-web-resources.md#automatic-font-fallback)
   * [웹 리소스 캐싱](compose-web-resources.md#caching-web-resources)
 * 외부 리소스 다루기: 
-  [외부 라이브러리 리소스](#외부-라이브러리의-멀티플랫폼-리소스-접근하기),
-  [원격 파일](#원격-파일), [Java 리소스](#java-리소스-사용하기)
+  [외부 라이브러리 리소스](#accessing-multiplatform-resources-from-external-libraries),
+  [원격 파일](#remote-files), [Java 리소스](#using-java-resources)
 
 ## 생성된 클래스 임포트하기 {id="importing-the-generated-class"}
 
@@ -543,7 +543,7 @@ coroutineScope.launch {
 읽어온 파일이 비트맵(JPEG, PNG, BMP, WEBP) 또는 XML 벡터 이미지인 경우, 다음 함수들을 사용하여
 `Image()` 컴포저블에 적합한 `ImageBitmap` 또는 `ImageVector` 객체로 변환할 수 있습니다.
 
-[Raw 파일](#raw-파일) 섹션에 나와 있는 대로 raw 파일에 접근한 다음 결과를 컴포저블에 전달합니다:
+[Raw 파일](#raw-files) 섹션에 나와 있는 대로 raw 파일에 접근한 다음 결과를 컴포저블에 전달합니다:
 
 ```kotlin
 // bytes = Res.readBytes("files/example.png")
@@ -654,7 +654,7 @@ val uri = Res.getUri("files/my_video.mp4")
 이제 `uri` 변수에 파일의 절대 경로가 포함되어 있으므로, 모든 외부 라이브러리는 해당 경로를 사용하여
 자신에게 맞는 방식으로 파일에 접근할 수 있습니다.
 
-Android 전용 사용의 경우 멀티플랫폼 리소스는 [Android 에셋으로도 패키징됩니다](#android-에셋으로-compose-multiplatform-리소스-사용하기).
+Android 전용 사용의 경우 멀티플랫폼 리소스는 [Android 에셋으로도 패키징됩니다](#compose-multiplatform-resources-as-android-assets).
 
 ### 원격 파일 {id="remote-files"}
 
@@ -666,12 +666,12 @@ Android 전용 사용의 경우 멀티플랫폼 리소스는 [Android 에셋으�
 * [Kamel](https://github.com/Kamel-Media/Kamel)
 * [Ktor client](https://ktor.io/)
 
-이미지를 수동으로 다운로드하거나 바이트를 직접 읽는 경우, 리소스 라이브러리의 [디코딩 함수](#바이트-배열을-이미지로-변환)를
+이미지를 수동으로 다운로드하거나 바이트를 직접 읽는 경우, 리소스 라이브러리의 [디코딩 함수](#convert-byte-arrays-into-images)를
 사용하여 변환하세요. 데스크톱 앱에서 네트워크 이미지를 로드하는 예시는
 [데스크톱용 Compose Multiplatform에서 이미지 사용하기](compose-desktop-images.md#loading-images-from-the-file-system-or-the-network)를 참조하세요.
 
 이미지를 직접 다운로드하거나 바이트를 읽은 경우 리소스 라이브러리의
-[디코딩 함수](#바이트-배열을-이미지로-변환)를 사용하여 이미지로 변환하세요.
+[디코딩 함수](#convert-byte-arrays-into-images)를 사용하여 이미지로 변환하세요.
 데스크톱 애플리케이션에서 네트워크로부터 이미지를 로드하는 예시는
 [데스크톱용 Compose Multiplatform에서 이미지 사용하기](compose-desktop-images.md#loading-images-from-the-file-system-or-the-network) 튜토리얼을 참조하세요.
 

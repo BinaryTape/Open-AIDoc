@@ -6,7 +6,7 @@
 本节涵盖了异常处理以及因异常而导致的取消。
 我们已经知道，已取消的协程会在挂起点抛出 [CancellationException]，并且协程机制会忽略该异常。在这里，我们将探讨如果在取消过程中抛出异常，或者同一个协程的多个子协程抛出异常会发生什么。
 
-## 异常传播
+## 异常传播 {id="exception-propagation"}
 
 协程构建器有两种形式：自动传播异常（[launch]）或向用户公开异常（[async] 和 [produce]）。
 当这些构建器被用于创建一个*根*协程（即不是另一个协程的*子协程*）时，前者将异常视为**未捕获的异常**，类似于 Java 的 `Thread.uncaughtExceptionHandler`；而后者则依赖用户来消耗最终的异常，例如通过 [await][Deferred.await] 或 [receive][ReceiveChannel.receive]（[produce] 和 [receive][ReceiveChannel.receive] 在[通道](https://github.com/Kotlin/kotlinx.coroutines/blob/master/docs/channels.md)章节中介绍）。
@@ -60,7 +60,7 @@ Caught ArithmeticException
 
 <!--- TEST EXCEPTION-->
 
-## CoroutineExceptionHandler
+## CoroutineExceptionHandler {id="coroutineexceptionhandler"}
 
 可以自定义将**未捕获的异常**打印到控制台的默认行为。
 根协程上的 [CoroutineExceptionHandler] 上下文元素可以作为该根协程及其所有子协程的通用 `catch` 块，在其中进行自定义异常处理。
@@ -108,7 +108,7 @@ CoroutineExceptionHandler got java.lang.AssertionError
 
 <!--- TEST-->
 
-## 取消与异常
+## 取消与异常 {id="cancellation-and-exceptions"}
 
 取消与异常密切相关。协程在内部使用 `CancellationException` 进行取消，这些异常会被所有处理程序忽略，因此它们应仅用作补充调试信息的来源，可以通过 `catch` 块获取。
 当使用 [Job.cancel] 取消协程时，它会终止，但不会取消其父协程。
@@ -211,7 +211,7 @@ CoroutineExceptionHandler got java.lang.ArithmeticException
 
 <!--- TEST-->
 
-## 异常聚合
+## 异常聚合 {id="exceptions-aggregation"}
 
 当一个协程的多个子协程因异常失败时，通用规则是“首个异常获胜”，因此首个异常会被处理。
 在第一个异常之后发生的所有其他异常都将作为被抑制的异常附加到第一个异常上。
@@ -310,7 +310,7 @@ CoroutineExceptionHandler got java.io.IOException
 
 <!--- TEST-->
 
-## 监督
+## 监督 {id="supervision"}
 
 正如我们之前研究过的，故障是双向关系，会在整个协程层次结构中传播。让我们来看看需要单向故障传播的情况。
 
@@ -318,7 +318,7 @@ CoroutineExceptionHandler got java.io.IOException
 
 另一个例子是服务器进程，它衍生出多个子作业，并需要*监督*它们的执行，跟踪它们的失败，并且仅重启失败的那部分。
 
-### 监督作业
+### 监督作业 {id="supervision-job"}
 
 [SupervisorJob][SupervisorJob()] 可用于这些目的。
 它类似于常规的 [Job][Job()]，唯一的区别是子协程的失败或取消不会向上传播给监督者作业，也不会传播给它的其他子协程。通过以下示例可以轻松演示：
@@ -373,7 +373,7 @@ The second child is cancelled because the supervisor was cancelled
 
 <!--- TEST-->
 
-### 监督作用域
+### 监督作用域 {id="supervision-scope"}
 
 我们可以使用 [supervisorScope][_supervisorScope] 代替 [coroutineScope][_coroutineScope] 来进行*作用域内*的并发。它仅在一个方向上传播取消，且仅在自身失败时才取消所有子协程。它也会像 [coroutineScope][_coroutineScope] 一样，在完成前等待所有子协程。
 
@@ -421,7 +421,7 @@ Caught an assertion error
 
 <!--- TEST-->
 
-#### 监督协程中的异常
+#### 监督协程中的异常 {id="exceptions-in-supervised-coroutines"}
 
 常规作业和监督作业之间的另一个关键区别是异常处理。
 每个子协程都应该通过异常处理机制自行处理其异常。

@@ -35,14 +35,14 @@
             title="Ktor 是否提供捕获 IPC 信号（例如 SIGTERM 或 SIGINT）的方法，以便优雅地处理服务器停机？"
             id="sigterm">
         <p>
-            如果您正在运行 <a href="#engine-main">EngineMain</a>，它将自动处理。
+            如果您正在运行 <a href="server-create-and-configure.topic#engine-main">EngineMain</a>，它将自动处理。
             否则，您需要手动处理。
             您可以使用 JVM 提供的 <code>Runtime.getRuntime().addShutdownHook</code> 设施。
         </p>
     </chapter>
     <chapter title="在代理之后如何获取客户端 IP？" id="proxy-ip">
         <p>
-            如果代理提供了正确的标头，并且安装了 <Links href="//server-forward-headers" summary="所需依赖项：io.ktor:%artifact_name%">ForwardedHeader</Links> 插件，则 <code>call.request.origin</code> 属性会提供有关原始调用者（代理）的<a href="#request_information">连接信息</a>。
+            如果代理提供了正确的标头，并且安装了 <Links href="//server-forward-headers" summary="所需依赖项：io.ktor:%artifact_name%">ForwardedHeader</Links> 插件，则 <code>call.request.origin</code> 属性会提供有关原始调用者（代理）的<a href="server-requests.md#request_information">连接信息</a>。
         </p>
     </chapter>
     <chapter title="如何测试 main 分支上的最新提交？" id="bleeding-edge">
@@ -60,7 +60,7 @@
     <chapter title="我的路由没有被执行。我该如何调试它？" id="route-not-executing">
         <p>
             Ktor 提供了一种跟踪机制来帮助排查路由决策。
-            请查看 <a href="#trace_routes">Tracing routes</a> 章节。
+            请查看 <a href="server-routing.md#trace_routes">Tracing routes</a> 章节。
         </p>
     </chapter>
     <chapter title="如何解决 'Response has already been sent' 错误？" id="response-already-sent">
@@ -102,7 +102,7 @@
     </chapter>
     <chapter title="如何在 Windows 上安装 'curl' 以在 Kotlin/Native 上使用相应的引擎？" id="native-curl">
         <p>
-            <a href="#curl">Curl</a> 客户端引擎需要安装 <code>curl</code> 库。
+            <a href="client-engines.md#curl">Curl</a> 客户端引擎需要安装 <code>curl</code> 库。
             在 Windows 上，您可以考虑使用 MinGW/MSYS2 的 <code>curl</code> 二进制文件。
         </p>
         <procedure>

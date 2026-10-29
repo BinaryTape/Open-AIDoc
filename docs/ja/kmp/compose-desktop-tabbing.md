@@ -181,7 +181,7 @@ fun FocusableBox(
 
 表示順序以外の順序でフォーカスを移動させるには、2つのモディファイアを組み合わせます。
 
-* `focusRequester()` は、フォーカス可能なコンポーネントに `FocusRequester` ハンドルをアタッチします。コンポーネントが[デフォルトでフォーカス可能でない](#カスタムのフォーカス可能コンポーネント)場合は、`focusRequester()` の *後* に `focusable()` モディファイアを適用します。
+* `focusRequester()` は、フォーカス可能なコンポーネントに `FocusRequester` ハンドルをアタッチします。コンポーネントが[デフォルトでフォーカス可能でない](#custom-focusable-components)場合は、`focusRequester()` の *後* に `focusable()` モディファイアを適用します。
 * `focusProperties()` は、タブ順序における `next`（次）と `previous`（前）の要素を設定します。これらは <shortcut>Tab</shortcut> または <shortcut>Shift+Tab</shortcut> を押すことでフォーカスされる `FocusRequester` ハンドルを持つコンポーネントです。
 
 次の例では、5つのテキストフィールドのそれぞれに `FocusRequester` を作成し、デフォルトのタブ順序を逆にしています。
@@ -245,7 +245,7 @@ fun main() = application {
 
 ## コードからのフォーカス移動 {id="moving-focus-from-code"}
 
-ユーザーの操作なしにコンポーネントをフォーカスさせるには、`focusRequester()` モディファイアを使用してフォーカス可能なコンポーネントに `FocusRequester` をアタッチし、`FocusRequester.requestFocus()` を呼び出します。コンポーネントが[デフォルトでフォーカス可能でない](#カスタムのフォーカス可能コンポーネント)場合は、`focusRequester()` の *後* に `focusable()` モディファイアを適用する必要があります。
+ユーザーの操作なしにコンポーネントをフォーカスさせるには、`focusRequester()` モディファイアを使用してフォーカス可能なコンポーネントに `FocusRequester` をアタッチし、`FocusRequester.requestFocus()` を呼び出します。コンポーネントが[デフォルトでフォーカス可能でない](#custom-focusable-components)場合は、`focusRequester()` の *後* に `focusable()` モディファイアを適用する必要があります。
 
 次の例では、ボタンがフォーカスをテキストフィールドに移動させ、また自身に戻します。
 

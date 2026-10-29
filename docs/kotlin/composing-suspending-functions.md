@@ -5,7 +5,7 @@
 
 本节涵盖了组合挂起函数的各种方法。
 
-## 默认顺序执行
+## 默认顺序执行 {id="sequential-by-default"}
 
 假设我们有两个在别处定义的挂起函数，它们执行一些有用的操作，比如某种远程服务调用或计算。我们暂且假定它们是有用的，但实际上在这个示例中，每个函数只是为了演示目的而延迟一秒钟：
 
@@ -67,7 +67,7 @@ Completed in 2017 ms
 
 <!--- TEST ARBITRARY_TIME -->
 
-## 使用 async 并发
+## 使用 async 并发 {id="concurrent-using-async"}
 
 如果 `doSomethingUsefulOne` 和 `doSomethingUsefulTwo` 的调用之间没有依赖关系，并且我们希望通过同时**并发**执行两者来更快地获得答案，该怎么办？这就是 [async] 大显身手的地方。
 
@@ -115,7 +115,7 @@ Completed in 1017 ms
 
 这快了两倍，因为两个协程并发执行。请注意，协程的并发总是显式的。
 
-## 惰性启动的 async
+## 惰性启动的 async {id="lazily-started-async"}
 
 可选地，可以通过将 [async] 的 `start` 参数设置为 [CoroutineStart.LAZY] 来使其变为惰性。在这种模式下，只有当其结果被 [await][Deferred.await] 请求时，或者其 `Job` 的 [start][Job.start] 函数被调用时，它才会启动协程。运行以下示例：
 
@@ -166,7 +166,7 @@ Completed in 1017 ms
 
 请注意，如果我们只是在 `println` 中调用 [await][Deferred.await]，而没有先在各个协程上调用 [start][Job.start]，这将导致顺序执行的行为，因为 [await][Deferred.await] 会启动协程执行并等待其完成，这并不是惰性启动的预期用例。 `async(start = CoroutineStart.LAZY)` 的用例是在计算值涉及挂起函数时，替代标准的 [lazy](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/lazy.html) 函数。
 
-## async 风格的函数
+## async 风格的函数 {id="async-style-functions"}
 
 > 这种带有 async 函数的编程风格在这里仅用于说明，因为它是其他编程语言中流行的一种风格。出于下文所述的原因，**强烈建议不要**在 Kotlin 协程中使用此风格。
 >
@@ -252,7 +252,7 @@ Completed in 1085 ms
 
 考虑一下，如果在 `val one = somethingUsefulOneAsync()` 这一行和 `one.await()` 表达式之间，代码中存在逻辑错误，程序抛出了异常，并且程序正在执行的操作中止了。通常，全局错误处理程序可以捕获此异常，为开发者记录并报告错误，但程序原本可以继续执行其他操作。然而，在这里，即使启动它的操作已经中止，`somethingUsefulOneAsync` 仍会在后台运行。如下节所示，结构化并发不会出现此问题。
 
-## 使用 async 的结构化并发
+## 使用 async 的结构化并发 {id="structured-concurrency-with-async"}
 
 让我们将[使用 async 并发](#concurrent-using-async)示例重构为一个函数，该函数并发运行 `doSomethingUsefulOne` 和 `doSomethingUsefulTwo` 并返回它们的组合结果。由于 [async] 是 [CoroutineScope] 的扩展，我们将使用 [coroutineScope][_coroutineScope] 函数来提供必要的作用域：
 

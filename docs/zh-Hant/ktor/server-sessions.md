@@ -47,7 +47,7 @@ Sessions 外掛程式提供了一種在不同 HTTP 請求之間持久化資料�
 ## 安裝 Sessions {id="install_plugin"}
 
 <p>
-    若要將 <code>%plugin_name%</code> 外掛程式<a href="#install">安裝</a>至應用程式，
+    若要將 <code>%plugin_name%</code> 外掛程式<a href="server-plugins.md#install">安裝</a>至應用程式，
     請將其傳遞給指定 <Links href="/ktor/server-modules" summary="模組允許您透過分組路由來組織應用程式結構。">模組</Links> 中的 <code>install</code> 函式。
     下方的程式碼片段展示了如何安裝 <code>%plugin_name%</code> ...
 </p>
@@ -68,7 +68,7 @@ Sessions 外掛程式提供了一種在不同 HTTP 請求之間持久化資料�
     </TabItem>
 </Tabs>
 <p>
-    <code>%plugin_name%</code> 外掛程式也可以<a href="#install-route">安裝到特定的路由</a>。
+    <code>%plugin_name%</code> 外掛程式也可以<a href="server-plugins.md#install-route">安裝到特定的路由</a>。
     如果您需要針對不同的應用程式資源使用不同的 <code>%plugin_name%</code> 配置，這會非常有用。
 </p>
 

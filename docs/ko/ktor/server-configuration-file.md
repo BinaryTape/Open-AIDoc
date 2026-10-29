@@ -27,7 +27,7 @@
 </p>
 <chapter title="개요" id="configuration-file-overview">
     <p>
-        <a href="#engine-main">
+        <a href="server-create-and-configure.topic#engine-main">
             EngineMain
         </a>
         을 사용하여 서버를 시작하면, Ktor는 
@@ -146,7 +146,7 @@
     <chapter title="사용자 정의 설정" id="config-custom">
         <p>
             Ktor는 <a href="#predefined-properties">사전 정의된 속성</a> 외에도 설정 파일에 사용자 정의 설정을 유지할 수 있도록 허용합니다.
-            아래 설정 파일에는 <a href="#jwt-settings">JWT</a> 설정을 보관하는 데 사용되는 사용자 정의 <code>jwt</code> 그룹이 포함되어 있습니다.
+            아래 설정 파일에는 <a href="server-jwt.md#jwt-settings">JWT</a> 설정을 보관하는 데 사용되는 사용자 정의 <code>jwt</code> 그룹이 포함되어 있습니다.
         </p>
         <tabs group="config">
             <tab title="application.conf" group-key="hocon" id="application-conf-4">
@@ -209,7 +209,7 @@
         </def>
         <def title="ktor.deployment.watch" id="ktor-deployment-watch">
             <p>
-                <a href="#watch-paths">자동 리로딩(auto-reloading)</a>에 사용되는 감시 경로.
+                <a href="server-auto-reload.topic#watch-paths">자동 리로딩(auto-reloading)</a>에 사용되는 감시 경로.
             </p>
         </def>
         <def title="ktor.deployment.rootPath" id="ktor-deployment-root-path">
@@ -366,7 +366,7 @@
 </chapter>
 <chapter title="커맨드 라인" id="command-line">
     <p>
-        <a href="#engine-main">EngineMain</a>을 사용하여 서버를 생성하는 경우, 
+        <a href="server-create-and-configure.topic#engine-main">EngineMain</a>을 사용하여 서버를 생성하는 경우, 
         <Links href="/ktor/server-fatjar" summary="Ktor Gradle 플러그인을 사용하여 실행 가능한 fat JAR를 생성하고 실행하는 방법을 알아봅니다.">패키징된 애플리케이션</Links>을 커맨드 라인에서 실행하고 해당 커맨드 라인 인자를 전달하여 필요한 서버 파라미터를 오버라이드할 수 있습니다. 예를 들어, 다음과 같은 방법으로 설정 파일에 지정된 포트를 오버라이드할 수 있습니다:
     </p>
     <code-block lang="shell" code="            java -jar sample-app.jar -port=8080"/>
@@ -404,7 +404,7 @@
         </def>
         <def title="-watch" id="watch">
             <p>
-                <a href="#watch-paths">자동 리로딩(auto-reloading)</a>에 사용되는 감시 경로.
+                <a href="server-auto-reload.topic#watch-paths">자동 리로딩(auto-reloading)</a>에 사용되는 감시 경로.
             </p>
         </def>
     </deflist>

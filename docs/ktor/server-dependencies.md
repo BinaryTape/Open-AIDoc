@@ -165,7 +165,7 @@
         <list>
             <li>
                 <p>
-                    如果您使用 <a href="#embedded-server">embeddedServer</a>，请按如下方式指定主类：
+                    如果您使用 <a href="server-create-and-configure.topic#embedded-server">embeddedServer</a>，请按如下方式指定主类：
                 </p>
                 <Tabs group="languages">
                     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
@@ -181,7 +181,7 @@
             </li>
             <li>
                 <p>
-                    如果您使用 <a href="#engine-main">EngineMain</a>，则需要将其配置为主类。
+                    如果您使用 <a href="server-create-and-configure.topic#engine-main">EngineMain</a>，则需要将其配置为主类。
                     对于 Netty，它将如下所示：
                 </p>
                 <Tabs group="languages">

@@ -386,7 +386,7 @@ fun main() {
 在以下情况下，你可以使用*代理类（surrogate class）*（即与另一个类的序列化形式相匹配的类）：
 
 * 想要在不修改类本身的情况下更改类的序列化方式。
-* 避免[创建复合序列化器](#创建自定义复合序列化器)。
+* 避免[创建复合序列化器](#create-a-custom-composite-serializer)。
 * 在创建原始类之前验证序列化形式。
 * 处理直接序列化不符合类规则的情况。
 
@@ -407,7 +407,7 @@ private class ColorSurrogate(val r: Int, val g: Int, val b: Int) {
 }
 ```
 
-与[将序列化委托给另一个序列化器](#将序列化委托给另一个序列化器)类似，自定义序列化器将原始类转换为另一种表示形式，并包装该表示形式自动生成的 `SerialDescriptor`。
+与[将序列化委托给另一个序列化器](#delegate-serialization-to-another-serializer)类似，自定义序列化器将原始类转换为另一种表示形式，并包装该表示形式自动生成的 `SerialDescriptor`。
 
 > 代理类使用它们自己的 `serialName` 定义 `SerialDescriptor`。
 > 你可以复用代理类 `SerialDescriptor` 的结构，但不能复用其 `serialName`，因为每个 `SerialDescriptor` 必须具有唯一的 `serialName`。
@@ -492,7 +492,7 @@ fun main() {
 
 你可以使用复合序列化器来表示复杂的数据结构，例如具有多个属性的类。
 
-与使用[代理类](#使用代理类序列化类)相比，自定义复合序列化器允许你直接定义原始类的序列化结构，而无需额外的转换步骤。
+与使用[代理类](#serialize-classes-with-a-surrogate-class)相比，自定义复合序列化器允许你直接定义原始类的序列化结构，而无需额外的转换步骤。
 在某些情况下这也可以提升性能，但需要手动编写更多的序列化逻辑。
 
 要创建自定义复合序列化器：
@@ -567,7 +567,7 @@ fun main() {
 6. 使用 `@Serializable(YourSerializer::class)` 注解为类指定自定义序列化器。
 
    > 如果你只需要转换或重构数据而无需手动处理每个元素，
-   > 可以考虑[将序列化委托给另一个序列化器](#将序列化委托给另一个序列化器)或使用[代理类](#使用代理类序列化类)，这是更简单的方法。
+   > 可以考虑[将序列化委托给另一个序列化器](#delegate-serialization-to-another-serializer)或使用[代理类](#serialize-classes-with-a-surrogate-class)，这是更简单的方法。
    >
    {style="tip"}
 
@@ -1068,7 +1068,7 @@ fun main() {
 ### 使用类型别名指定序列化器 {id="specify-serializers-with-type-aliases"}
 
 在 Kotlin 序列化中，通常使用 `@Serializable` 注解显式指定序列化策略。
-除了[上下文序列化](#实现上下文序列化)之外，它不提供全局序列化器配置。
+除了[上下文序列化](#implement-contextual-serialization)之外，它不提供全局序列化器配置。
 
 如果你在多处重复使用相同的序列化器，可以定义附带序列化器注解的 [`typealias`](type-aliases.md)。
 
@@ -1198,7 +1198,7 @@ fun main() {
 要以上下文方式序列化泛型类，可以在 `SerializersModule` 中注册一个函数。
 该函数接收泛型类型实参的序列化器，并在运行时创建相应的序列化器。
 
-你不能为泛型类使用单个序列化器实例，因为[泛型类型实参可能会发生变化](#为泛型创建自定义序列化器)。
+你不能为泛型类使用单个序列化器实例，因为[泛型类型实参可能会发生变化](#create-a-custom-serializer-for-generic-types)。
 例如，以下方法仅适用于 `Box<Int>`，但不适用于 `Box<String>` 等其他类型：
 
 ```kotlin

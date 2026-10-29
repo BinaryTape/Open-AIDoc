@@ -525,7 +525,7 @@ fun main() {
 ```
 
 `userInputActor` は、その専用スレッドで `processUserInput()` 関数を呼び出します。
-[アクターベースの共有リソース協調](#アクターベースの共有リソース協調)の実装における `while` ループとは異なり、`processUserInput()` 関数への各呼び出しは1つのコマンドのみを読み取って処理します。
+[アクターベースの共有リソース協調](#actor-based-shared-resource-coordination)の実装における `while` ループとは異なり、`processUserInput()` 関数への各呼び出しは1つのコマンドのみを読み取って処理します。
 
 `remind` コマンド、`help` コマンド、または不明なコマンドを処理した後、関数は別のリクエストを `userInputActor` に送信します。
 
@@ -1160,7 +1160,7 @@ private val funAnimationFrames = (
 
 ## 中断関数 (Suspending functions) {id="suspending-functions"}
 
-[コールバックベースの制御フロー](#コールバック-callbacks)は、依存する操作の数が増えるにつれて保守が難しくなることがあります。
+[コールバックベースの制御フロー](#callbacks)は、依存する操作の数が増えるにつれて保守が難しくなることがあります。
 Kotlinは、非同期制御フローをわかりやすく順次的な（シーケンシャルな）スタイルで表現できるようにする*中断関数 (suspending functions)* を提供しています。
 
 コールバックでは、非同期操作に続く作業を個別に定義し、それをコールバックとしてスケジュールします。
@@ -1206,7 +1206,7 @@ suspend fun suspendMain(
 `suspendMain()` 関数は、各実行パスをコールバックで手動で協調させる代わりに、`while` ループ、`continue`、`break` を直接使用できます。
 中断関数では、`return`、`try`、`catch`、`finally` などの使い慣れた構文を使用したり、他の中断関数を呼び出したりすることも可能です。
 
-> `runInfiniteLoop()` ヘルパー関数のようないわゆる[制御フローの抽象化](#制御フローの抽象化)でこの動作を再現しようとすると、ますます複雑なスケジューリングロジックが必要になります。
+> `runInfiniteLoop()` ヘルパー関数のようないわゆる[制御フローの抽象化](#control-flow-abstractions)でこの動作を再現しようとすると、ますます複雑なスケジューリングロジックが必要になります。
 >
 {style="note"}
 
@@ -1232,7 +1232,7 @@ suspend fun suspendMain(
 ```
 
 ここで、[`suspendCoroutine()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.coroutines/suspend-coroutine.html) 関数は実行を中断し、中断ポイントに続く実行を表す [`Continuation`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.coroutines/-continuation/) インターフェースの実装を提供します。
-これは、[制御フローの抽象化](#制御フローの抽象化)にある `runInfiniteLoop()` 関数が、スケジュールする次のループイテレーションを表すために `helper()` 関数を使用しているのと似ています。
+これは、[制御フローの抽象化](#control-flow-abstractions)にある `runInfiniteLoop()` 関数が、スケジュールする次のループイテレーションを表すために `helper()` 関数を使用しているのと似ています。
 
 コールバックを使用する場合と比較して、中断関数ではその後の作業を個別に定義する必要がありません。
 コンパイラが中断ポイントに続く実行を表す Continuation（継続）を作成してくれます。

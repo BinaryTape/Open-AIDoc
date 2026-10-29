@@ -150,7 +150,7 @@ Agentの永続化機能には、主に3つの設定オプションがありま�
 - `NoPersistenceStorageProvider`: チェックポイントを保存しない、何もしない（no-op）実装です。これがデフォルトのプロバイダーです。
 
 また、`PersistenceStorageProvider` インターフェースを実装することで、カスタムストレージプロバイダーを作成することも可能です。
-詳細については、[カスタムストレージプロバイダー](#カスタムストレージプロバイダー)を参照してください。
+詳細については、[カスタムストレージプロバイダー](#custom-storage-providers)を参照してください。
 
 ### 継続的な永続化 (Continuous persistence) {id="continuous-persistence"}
 

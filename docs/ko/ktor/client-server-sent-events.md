@@ -34,7 +34,7 @@
 </chapter>
 <chapter title="SSE 설치" id="install_plugin">
     <p>
-        <code>SSE</code> 플러그인을 설치하려면, <a href="#configure-client">클라이언트 구성 블록</a> 내부의 <code>install</code> 함수에 전달하세요:
+        <code>SSE</code> 플러그인을 설치하려면, <a href="client-create-and-configure.md#configure-client">클라이언트 구성 블록</a> 내부의 <code>install</code> 함수에 전달하세요:
     </p>
     <code-block lang="kotlin" code="            import io.ktor.client.*&#10;            import io.ktor.client.engine.cio.*&#10;            import io.ktor.client.plugins.sse.*&#10;&#10;            //...&#10;            val client = HttpClient(CIO) {&#10;                install(SSE)&#10;            }"/>
 </chapter>

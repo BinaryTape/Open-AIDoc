@@ -14,8 +14,8 @@ Compose Hot Reload 可帮助你在开发 Compose Multiplatform 项目时直观�
 
 可以通过两种方式添加 Compose Hot Reload：
 
-* [在 IntelliJ IDEA 或 Android Studio 中从头创建项目](#从头创建)
-* [向现有项目添加 Gradle 插件](#向现有项目添加)
+* [在 IntelliJ IDEA 或 Android Studio 中从头创建项目](#from-scratch)
+* [向现有项目添加 Gradle 插件](#to-an-existing-project)
 
 ### 从头创建 {id="from-scratch"}
 

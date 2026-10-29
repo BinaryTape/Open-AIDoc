@@ -114,7 +114,7 @@
                 <code-block lang="kotlin" code="                    ktor_version=%ktor_version%"/>
                 <note id="eap-note">
                     <p>
-                        Ktor의 EAP 버전을 사용하려면 <a href="#repositories">Space 저장소(Space repository)</a>를 추가해야 합니다.
+                        Ktor의 EAP 버전을 사용하려면 <a href="server-dependencies.topic#repositories">Space 저장소(Space repository)</a>를 추가해야 합니다.
                     </p>
                 </note>
             </step>
@@ -191,7 +191,7 @@
             </step>
             <step>
                 <p>
-                    <code>println()</code> 함수를 사용하여 서버에서 반환한 <a href="#status">상태 코드(status code)</a>를 출력하고, <code>close()</code> 함수를 사용하여 스트림을 닫고 이와 관련된 모든 리소스를 해제합니다.
+                    <code>println()</code> 함수를 사용하여 서버에서 반환한 <a href="client-responses.md#status">상태 코드(status code)</a>를 출력하고, <code>close()</code> 함수를 사용하여 스트림을 닫고 이와 관련된 모든 리소스를 해제합니다.
                     <Path>Main.kt</Path>
                     파일은 다음과 같아야 합니다:
                 </p>

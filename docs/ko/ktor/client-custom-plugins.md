@@ -151,7 +151,7 @@ v2.2.0부터 Ktor는 커스텀 클라이언트 [플러그인](client-plugins.md)
 </td>
 <td>
 <p>
-<a href="#body">요청 본문</a>을 변환할 수 있게 해줍니다.
+<a href="client-requests.md#body">요청 본문</a>을 변환할 수 있게 해줍니다.
 이 핸들러에서는 본문을 
 <a href="https://api.ktor.io/ktor-http/io.ktor.http.content/-outgoing-content/index.html">OutgoingContent</a> 
 (예: <code>TextContent</code>, <code>ByteArrayContent</code>, 또는 <code>FormDataContent</code>)로 직렬화하거나,
@@ -187,7 +187,7 @@ v2.2.0부터 Ktor는 커스텀 클라이언트 [플러그인](client-plugins.md)
 </td>
 <td>
 <p>
-<a href="#body">응답 본문</a>을 변환할 수 있게 해줍니다.
+<a href="client-responses.md#body">응답 본문</a>을 변환할 수 있게 해줍니다.
 이 핸들러는 각 <code>HttpResponse.body</code> 호출 시마다 호출됩니다.
 본문을 <code>requestedType</code>의 인스턴스로 역직렬화하거나, 
 변환을 적용할 수 없는 경우 <code>null</code>을 반환해야 합니다.
@@ -206,7 +206,7 @@ v2.2.0부터 Ktor는 커스텀 클라이언트 [플러그인](client-plugins.md)
 </td>
 <td>
 이 플러그인에 의해 할당된 리소스를 정리할 수 있게 해줍니다.
-이 핸들러는 클라이언트가 <a href="#close-client">닫힐(closed)</a> 때 호출됩니다.
+이 핸들러는 클라이언트가 <a href="client-create-and-configure.md#close-client">닫힐(closed)</a> 때 호출됩니다.
 </td>
 </tr>
 
@@ -263,7 +263,7 @@ v2.2.0부터 Ktor는 커스텀 클라이언트 [플러그인](client-plugins.md)
 </td>
 <td>
 <p>
-<a href="#body">요청 본문</a>을 변환할 수 있게 해줍니다.
+<a href="client-requests.md#body">요청 본문</a>을 변환할 수 있게 해줍니다.
 이 핸들러에서는 본문을 
 <a href="https://api.ktor.io/ktor-http/io.ktor.http.content/-outgoing-content/index.html">OutgoingContent</a> 
 (예: <code>TextContent</code>, <code>ByteArrayContent</code>, 또는 <code>FormDataContent</code>)로 직렬화하거나,
@@ -343,7 +343,7 @@ v2.2.0부터 Ktor는 커스텀 클라이언트 [플러그인](client-plugins.md)
 </td>
 <td>
 <p>
-<a href="#body">응답 본문</a>을 변환할 수 있게 해줍니다.
+<a href="client-responses.md#body">응답 본문</a>을 변환할 수 있게 해줍니다.
 이 핸들러는 각 <code>HttpResponse.body</code> 호출 시마다 호출됩니다.
 본문을 <code>requestedType</code>의 인스턴스로 역직렬화하거나, 
 변환을 적용할 수 없는 경우 <code>null</code>을 반환해야 합니다.
@@ -366,7 +366,7 @@ v2.2.0부터 Ktor는 커스텀 클라이언트 [플러그인](client-plugins.md)
 </td>
 <td>
 이 플러그인에 의해 할당된 리소스를 정리할 수 있게 해줍니다.
-이 핸들러는 클라이언트가 <a href="#close-client">닫힐(closed)</a> 때 호출됩니다.
+이 핸들러는 클라이언트가 <a href="client-create-and-configure.md#close-client">닫힐(closed)</a> 때 호출됩니다.
 </td>
 </tr>
 

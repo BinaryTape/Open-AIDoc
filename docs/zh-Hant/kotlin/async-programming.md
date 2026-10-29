@@ -528,7 +528,7 @@ fun main() {
 ```
 
 `userInputActor` 會在其專屬的執行緒上呼叫 `processUserInput()` 函式。
-不同於[基於 Actor 的共享資源協調](#基於-actor-的共享資源協調)實作中的 `while` 迴圈，每次呼叫 `processUserInput()` 函式只會讀取並處理一個指令。
+不同於[基於 Actor 的共享資源協調](#actor-based-shared-resource-coordination)實作中的 `while` 迴圈，每次呼叫 `processUserInput()` 函式只會讀取並處理一個指令。
 
 在處理完 `remind` 指令、`help` 指令或未知指令後，該函式會向 `userInputActor` 發送另一個請求：
 
@@ -1164,7 +1164,7 @@ private val funAnimationFrames = (
 
 ## 掛起函式 (Suspending functions) {id="suspending-functions"}
 
-隨著相依操作數量的增加，[基於回呼的控制流程](#回呼-callbacks)可能會變得難以維護。
+隨著相依操作數量的增加，[基於回呼的控制流程](#callbacks)可能會變得難以維護。
 Kotlin 提供了*掛起函式 (suspending functions)*，讓你能夠以清晰、循序的風格來表達非同步控制流程。
 
 使用回呼時，你需要單獨定義非同步操作之後的工作，並將其排定為回呼。
@@ -1210,7 +1210,7 @@ suspend fun suspendMain(
 `suspendMain()` 函式可以直接使用 `while` 迴圈、`continue` 與 `break`，而不需要手動使用回呼協調每個執行路徑。
 掛起函式也可以使用熟悉的結構，例如 `return`、`try`、`catch` 與 `finally`，並呼叫其他掛起函式。
 
-> 若要使用類似 `runInfiniteLoop()` 幫助函式等[控制流程抽象](#控制流程抽象-control-flow-abstractions)來重新建立此行為，將需要越來越複雜的排程邏輯。
+> 若要使用類似 `runInfiniteLoop()` 幫助函式等[控制流程抽象](#control-flow-abstractions)來重新建立此行為，將需要越來越複雜的排程邏輯。
 >
 {style="note"}
 
@@ -1236,7 +1236,7 @@ suspend fun suspendMain(
 ```
 
 在此，[`suspendCoroutine()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.coroutines/suspend-coroutine.html) 函式會暫停執行，並提供一個 [`Continuation`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.coroutines/-continuation/) 介面的實作，該實作代表掛起點之後要執行的內容。
-這類似於[控制流程抽象](#控制流程抽象-control-flow-abstractions)中的 `runInfiniteLoop()` 函式如何使用 `helper()` 函式來代表要排定的下一次迴圈迭代。
+這類似於[控制流程抽象](#control-flow-abstractions)中的 `runInfiniteLoop()` 函式如何使用 `helper()` 函式來代表要排定的下一次迴圈迭代。
 
 與使用回呼相比，掛起函式不需要單獨定義後續工作。
 編譯器會建立一個代表掛起點之後執行的延續體 (continuation)。

@@ -6,7 +6,7 @@
 本節涵蓋例外處理以及因例外而起的取消。
 我們已經知道，已取消的協程會在懸掛點 (suspension points) 拋出 [CancellationException]，且該例外會被協程機制忽略。這裡我們來看看如果在取消期間拋出例外，或是同一個協程的多個子協程拋出例外會發生什麼事。
 
-## 例外傳播 (Exception propagation)
+## 例外傳播 (Exception propagation) {id="exception-propagation"}
 
 協程產生器 (Coroutine builders) 分為兩類：自動傳播例外 ([launch]) 或向使用者公開例外 ([async] 與 [produce])。
 當這些產生器用於建立一個 *根 (root)* 協程（即不是另一個協程的 *子* 協程）時，前者將例外視為 **未捕獲 (uncaught)** 例外，類似於 Java 的 `Thread.uncaughtExceptionHandler`；而後者則依賴使用者來取用最終的例外，例如透過 [await][Deferred.await] 或 [receive][ReceiveChannel.receive]（[produce] 與 [receive][ReceiveChannel.receive] 在 [通道 (Channels)](https://github.com/Kotlin/kotlinx.coroutines/blob/master/docs/channels.md) 章節中介紹）。
@@ -60,7 +60,7 @@ Caught ArithmeticException
 
 <!--- TEST EXCEPTION-->
 
-## CoroutineExceptionHandler
+## CoroutineExceptionHandler {id="coroutineexceptionhandler"}
 
 可以自訂將 **未捕獲** 例外列印到主控台的預設行為。
 *根* 協程上的 [CoroutineExceptionHandler] 上下文元素可用於此根協程及其所有子協程的通用 `catch` 區塊，並在其中進行自訂例外處理。
@@ -108,7 +108,7 @@ CoroutineExceptionHandler got java.lang.AssertionError
 
 <!--- TEST-->
 
-## 取消與例外 (Cancellation and exceptions)
+## 取消與例外 (Cancellation and exceptions) {id="cancellation-and-exceptions"}
 
 取消與例外密切相關。協程內部使用 `CancellationException` 進行取消，這些例外會被所有處理常式忽略，因此它們應僅作為額外偵錯資訊的來源（可透過 `catch` 區塊取得）。
 當使用 [Job.cancel] 取消協程時，它會終止，但不會取消其父協程。
@@ -211,7 +211,7 @@ CoroutineExceptionHandler got java.lang.ArithmeticException
 
 <!--- TEST-->
 
-## 例外聚合 (Exceptions aggregation)
+## 例外聚合 (Exceptions aggregation) {id="exceptions-aggregation"}
 
 當一個協程的多個子協程因例外失敗時，一般規則是「第一個例外獲勝」，因此第一個例外會被處理。
 第一個例外之後發生的所有額外例外都會作為被抑制 (suppressed) 的例外附加到第一個例外上。 
@@ -311,7 +311,7 @@ CoroutineExceptionHandler got java.io.IOException
 
 <!--- TEST-->
 
-## 監督 (Supervision)
+## 監督 (Supervision) {id="supervision"}
 
 如前所述，取消是一種在整個協程階層中傳播的雙向關係。讓我們來看看需要單向取消傳播的情況。 
 
@@ -319,7 +319,7 @@ CoroutineExceptionHandler got java.io.IOException
 
 另一個例子是衍生多個子 Job 的伺服器處理程序，它需要 *監督* 它們的執行、追蹤它們的失敗，並且只重啟失敗的 Job。
 
-### 監督 Job (Supervision job)
+### 監督 Job (Supervision job) {id="supervision-job"}
 
 [SupervisorJob][SupervisorJob()] 可用於這些目的。 
 它類似於一般的 [Job][Job()]，唯一的例外是取消僅向**下**傳播。這可以透過下列範例輕鬆示範：
@@ -374,7 +374,7 @@ The second child is cancelled because the supervisor was cancelled
 
 <!--- TEST-->
 
-### 監督作用域 (Supervision scope)
+### 監督作用域 (Supervision scope) {id="supervision-scope"}
 
 我們可以使用 [supervisorScope][_supervisorScope] 來代替 [coroutineScope][_coroutineScope] 進行 *限定作用域* 的並行。它僅向一個方向傳播取消，並且只有在自身失敗時才會取消所有子協程。它也會像 [coroutineScope][_coroutineScope] 一樣，在完成前等待所有子協程。
 
@@ -422,7 +422,7 @@ Caught an assertion error
 
 <!--- TEST-->
 
-#### 監督協程中的例外 (Exceptions in supervised coroutines)
+#### 監督協程中的例外 (Exceptions in supervised coroutines) {id="exceptions-in-supervised-coroutines"}
 
 常規 Job 與監督 Job (supervisor jobs) 之間的另一個關鍵區別是例外處理。
 每個子協程都應透過例外處理機制自行處理其例外。

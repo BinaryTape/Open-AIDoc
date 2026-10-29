@@ -48,7 +48,7 @@
 ## %plugin_name% 설치 {id="install_plugin"}
 
 <p>
-    애플리케이션에 <code>%plugin_name%</code> 플러그인을 <a href="#install">설치</a>하려면, 지정된 <Links href="/ktor/server-modules" summary="모듈을 사용하면 경로를 그룹화하여 애플리케이션 구조를 구성할 수 있습니다.">모듈(module)</Links>의 <code>install</code> 함수에 전달하세요.
+    애플리케이션에 <code>%plugin_name%</code> 플러그인을 <a href="server-plugins.md#install">설치</a>하려면, 지정된 <Links href="/ktor/server-modules" summary="모듈을 사용하면 경로를 그룹화하여 애플리케이션 구조를 구성할 수 있습니다.">모듈(module)</Links>의 <code>install</code> 함수에 전달하세요.
     아래 코드 스니펫은 <code>%plugin_name%</code>을 설치하는 방법을 보여줍니다 ...
 </p>
 <list>
@@ -68,7 +68,7 @@
     </TabItem>
 </Tabs>
 <p>
-    <code>%plugin_name%</code> 플러그인은 <a href="#install-route">특정 경로(routes)에 설치</a>할 수도 있습니다.
+    <code>%plugin_name%</code> 플러그인은 <a href="server-plugins.md#install-route">특정 경로(routes)에 설치</a>할 수도 있습니다.
     이는 서로 다른 애플리케이션 리소스에 대해 다른 <code>%plugin_name%</code> 구성이 필요한 경우 유용할 수 있습니다.
 </p>
 

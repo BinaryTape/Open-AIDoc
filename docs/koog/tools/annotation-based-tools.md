@@ -20,7 +20,7 @@
 ## @Tool 注解 {id="tool-annotation"}
 
 `@Tool` 注解用于将函数 (Kotlin) 或方法 (Java) 标记为应公开给 LLM 的工具。
-带有 `@Tool` 注解的函数和方法通过反射从实现 `ToolSet` 接口的对象中收集。详情请参阅 [实现 ToolSet 接口](#1-实现-toolset-接口)。
+带有 `@Tool` 注解的函数和方法通过反射从实现 `ToolSet` 接口的对象中收集。详情请参阅 [实现 ToolSet 接口](#1-implement-the-toolset-interface)。
 
 ### 定义 {id="definition"}
 

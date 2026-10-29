@@ -67,7 +67,7 @@
 
 <var name="plugin_name" value="MicrometerMetrics"/>
 <p>
-    若要在應用程式中 <a href="#install">安裝</a> <code>%plugin_name%</code> 外掛程式，
+    若要在應用程式中 <a href="server-plugins.md#install">安裝</a> <code>%plugin_name%</code> 外掛程式，
     請將其傳遞給指定 <Links href="/ktor/server-modules" summary="模組允許您透過分組路由來結構化您的應用程式。">模組</Links> 中的 <code>install</code> 函式。
     下方的程式碼片段顯示如何安裝 <code>%plugin_name%</code> ...
 </p>

@@ -82,7 +82,7 @@
                 </TabItem>
             </Tabs>
             <note>
-                除了直接使用<code>EngineMain.main()</code>启动服务器外，您还可以使用<code>EngineMain.createServer()</code>手动创建服务器实例。要了解更多信息，请参阅<a href="#createServer"></a>。
+                除了直接使用<code>EngineMain.main()</code>启动服务器外，您还可以使用<code>EngineMain.createServer()</code>手动创建服务器实例。要了解更多信息，请参阅<a href="server-engines.md#createServer"></a>。
             </note>
             <p>
                 有关完整示例，请参阅<a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/engine-main">engine-main</a>和<a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/engine-main-yaml">engine-main-yaml</a>。

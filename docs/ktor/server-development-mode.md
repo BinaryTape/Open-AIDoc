@@ -8,7 +8,7 @@
 <list>
     <li>用于在不重启服务器的情况下重新加载应用程序类的<Links href="//server-auto-reload" summary="了解如何使用自动重载在代码更改时重新加载应用程序类。">自动重载</Links>。
     </li>
-    <li>用于调试<a href="#pipelines">流水线</a>的扩展信息（带堆栈跟踪）。
+    <li>用于调试<a href="server-custom-plugins-base-api.md#pipelines">流水线</a>的扩展信息（带堆栈跟踪）。
     </li>
     <li>在发生 <emphasis>5**</emphasis> 服务器错误时，在<Links href="//server-status-pages" summary="%plugin_name% 允许 Ktor 应用程序根据抛出的异常或状态码对任何失败状态做出适当响应。">响应页面</Links>上提供扩展的调试信息。
     </li>
@@ -70,7 +70,7 @@
     </chapter>
     <chapter title="'io.ktor.development' 环境变量" id="environment-variable">
         <p>
-            要为 <a href="#native">原生客户端</a> 启用开发模式，请使用 <code>io.ktor.development</code> 环境变量。
+            要为 <a href="client-engines.md#native">原生客户端</a> 启用开发模式，请使用 <code>io.ktor.development</code> 环境变量。
         </p>
     </chapter>
 </chapter>

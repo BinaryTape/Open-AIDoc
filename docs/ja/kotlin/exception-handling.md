@@ -6,7 +6,7 @@
 このセクションでは、例外処理と例外によるキャンセルについて説明します。
 キャンセルされたコルーチンは、サスペンションポイント（中断点）で [CancellationException] をスローすること、およびそれがコルーチンの仕組みによって無視されることは、すでに知っています。ここでは、キャンセル中に例外がスローされた場合や、同じコルーチンの複数の子が例外をスローした場合に何が起こるかを見ていきます。
 
-## 例外の伝播
+## 例外の伝播 {id="exception-propagation"}
 
 コルーチンビルダーには、例外を自動的に伝播するもの（[launch]）と、ユーザーに公開するもの（[async] および [produce]）の2つの種類があります。
 これらのビルダーが、他のコルーチンの「子」ではない「ルート」コルーチンを作成するために使用される場合、前者のビルダー（launch）は、Java の `Thread.uncaughtExceptionHandler` と同様に、例外を**未キャッチ（uncaught）**の例外として扱います。一方、後者（async/produce）は、ユーザーが最終的な例外を消費することに依存しています（例えば、[await][Deferred.await] や [receive][ReceiveChannel.receive] を介して行われます。[produce] と [receive][ReceiveChannel.receive] については [チャネル](https://github.com/Kotlin/kotlinx.coroutines/blob/master/docs/channels.md) のセクションで説明します）。
@@ -60,7 +60,7 @@ Caught ArithmeticException
 
 <!--- TEST EXCEPTION-->
 
-## CoroutineExceptionHandler
+## CoroutineExceptionHandler {id="coroutineexceptionhandler"}
 
 **未キャッチ**の例外をコンソールに表示するデフォルトの動作をカスタマイズすることが可能です。
 ルートコルーチンの [CoroutineExceptionHandler] コンテキスト要素は、そのルートコルーチンと、カスタム例外処理が行われる可能性のあるすべての子コルーチンに対する汎用的な `catch` ブロックとして使用できます。
@@ -108,7 +108,7 @@ CoroutineExceptionHandler got java.lang.AssertionError
 
 <!--- TEST-->
 
-## キャンセルと例外
+## キャンセルと例外 {id="cancellation-and-exceptions"}
 
 キャンセルは例外と密接に関係しています。コルーチンは内部的にキャンセルのために `CancellationException` を使用しており、これらの例外はすべてのハンドラーによって無視されます。したがって、これらは `catch` ブロックで取得できる追加のデバッグ情報のソースとしてのみ使用されるべきです。
 [Job.cancel] を使用してコルーチンがキャンセルされた場合、そのコルーチンは終了しますが、その親はキャンセルされません。
@@ -211,7 +211,7 @@ CoroutineExceptionHandler got java.lang.ArithmeticException
 
 <!--- TEST-->
 
-## 例外の集約
+## 例外の集約 {id="exceptions-aggregation"}
 
 コルーチンの複数の子が例外で失敗した場合、一般的なルールは「最初の例外が勝つ」であり、最初の例外が処理されます。
 最初の例外の後に発生したすべての追加の例外は、抑制された例外（suppressed exceptions）として最初の例外に添付されます。
@@ -311,7 +311,7 @@ CoroutineExceptionHandler got java.io.IOException
 
 <!--- TEST-->
 
-## スーパービジョン (Supervision)
+## スーパービジョン (Supervision) {id="supervision"}
 
 以前に学んだように、キャンセルはコルーチン階層全体を伝播する双方向の関係です。次に、単方向のキャンセルが必要な場合を見てみましょう。
 
@@ -319,7 +319,7 @@ CoroutineExceptionHandler got java.io.IOException
 
 別の例は、複数の子ジョブを生成し、それらの実行を「監視（supervise）」し、それらの失敗を追跡して、失敗したものだけを再起動する必要があるサーバープロセスです。
 
-### スーパービジョンジョブ (Supervision job)
+### スーパービジョンジョブ (Supervision job) {id="supervision-job"}
 
 この目的には [SupervisorJob][SupervisorJob()] を使用できます。
 これは通常の [Job][Job()] に似ていますが、キャンセルが下方向にのみ伝播するという点だけが異なります。これは、次の例を使用して簡単に示すことができます。
@@ -374,7 +374,7 @@ The second child is cancelled because the supervisor was cancelled
 
 <!--- TEST-->
 
-### スーパービジョンスコープ (Supervision scope)
+### スーパービジョンスコープ (Supervision scope) {id="supervision-scope"}
 
 スコープを限定した（scoped）並行性のために、[coroutineScope][_coroutineScope] の代わりに [supervisorScope][_supervisorScope] を使用できます。これは、キャンセルを一方方向にのみ伝播し、自身が失敗した場合にのみすべての子をキャンセルします。また、[coroutineScope][_coroutineScope] と同様に、完了する前にすべての子を待ちます。
 
@@ -422,7 +422,7 @@ Caught an assertion error
 
 <!--- TEST-->
 
-#### 監視対象コルーチンの例外
+#### 監視対象コルーチンの例外 {id="exceptions-in-supervised-coroutines"}
 
 通常のジョブとスーパービジョンジョブのもう1つの重要な違いは、例外処理です。
 すべての子は、例外処理メカニズムを介して自ら例外を処理する必要があります。

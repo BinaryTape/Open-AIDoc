@@ -5,7 +5,7 @@
 
 `Deferred` 值提供了在協同程式之間傳輸單個值的便利方式。Channel 則提供了傳輸值流（stream of values）的方式。
 
-## Channel 基礎
+## Channel 基礎 {id="channel-basics"}
 
 [Channel] 在概念上非常類似於 `BlockingQueue`。一個關鍵的區別是，它具有暫停式的 [send][SendChannel.send] 操作來代替阻塞式的 `put`，以及具有暫停式的 [receive][ReceiveChannel.receive] 操作來代替阻塞式的 `take`。
 
@@ -46,7 +46,7 @@ Done!
 
 <!--- TEST -->
 
-## 關閉與迭代 Channel 
+## 關閉與迭代 Channel {id="closing-and-iteration-over-channels"}
 
 與隊列（queue）不同，Channel 可以被關閉，以表示不再有元素進入。在接收端，使用一般的 `for` 迴圈從 Channel 中接收元素非常方便。
  
@@ -84,7 +84,7 @@ fun main() = runBlocking {
 Done!
 -->
 
-## 建置 Channel 生產者
+## 建置 Channel 生產者 {id="building-channel-producers"}
 
 協同程式產生元素序列的模式相當常見。這是並行（concurrent）程式碼中經常出現的「生產者-消費者（producer-consumer）」模式的一部分。您可以將這樣的生產者抽象化為一個將 Channel 作為參數的函式，但這與「結果應從函式回傳」的常識相悖。
 
@@ -121,7 +121,7 @@ fun main() = runBlocking {
 Done!
 -->
 
-## 管線 (Pipelines)
+## 管線 (Pipelines) {id="pipelines"}
 
 管線（pipeline）是一種模式，其中一個協同程式正在產生（可能是無限的）值流：
 
@@ -188,7 +188,7 @@ Done!
 >
 {style="note"}
 
-## 使用管線產生質數
+## 使用管線產生質數 {id="prime-numbers-with-pipeline"}
 
 讓我們以一個使用協同程式管線產生質數的範例，將管線發揮到極致。我們從一個無限的數字序列開始。
 
@@ -269,7 +269,7 @@ fun CoroutineScope.filter(numbers: ReceiveChannel<Int>, prime: Int) = produce<In
 
 無論如何，這是一種極其不切實際的尋找質數的方法。在實踐中，管線確實涉及其他一些暫停呼叫（如對遠端服務的非同步呼叫），而這些管線無法使用 `sequence`/`iterator` 建置，因為它們不允許任意暫停，而不像 `produce` 是完全非同步的。
  
-## 扇出 (Fan-out)
+## 扇出 (Fan-out) {id="fan-out"}
 
 多個協同程式可以從同一個 Channel 接收資料，從而在它們之間分配工作。讓我們從一個定期產生整數的生產者協同程式開始（每秒十個數字）：
 
@@ -351,7 +351,7 @@ Processor #3 received 10
 
 此外，請注意我們如何在 `launchProcessor` 程式碼中使用 `for` 迴圈顯式迭代 Channel 以執行扇出。與 `consumeEach` 不同，這種 `for` 迴圈模式在多個協同程式中使用是完全安全的。如果其中一個處理器協同程式失敗，其他處理器仍會處理該 Channel，而透過 `consumeEach` 編寫的處理器在正常或異常完成時總是會消費（取消）底層 Channel。
 
-## 扇入 (Fan-in)
+## 扇入 (Fan-in) {id="fan-in"}
 
 多個協同程式可以向同一個 Channel 傳送資料。例如，讓我們有一個字串 Channel，以及一個暫停函式，該函式以指定的延遲重複向此 Channel 傳送指定的字串：
 
@@ -410,7 +410,7 @@ BAR!
 
 <!--- TEST -->
 
-## 具緩衝區的 Channel
+## 具緩衝區的 Channel {id="buffered-channels"}
 
 目前為止展示的 Channel 都沒有緩衝區。無緩衝的 Channel 在傳送者與接收者會合（rendezvous）時傳輸元素。如果先呼叫了傳送，則它會被暫停直到呼叫接收；如果先呼叫了接收，它會被暫停直到呼叫傳送。
 
@@ -457,7 +457,7 @@ Sending 4
 
 前四個元素被加入緩衝區，傳送者在嘗試傳送第五個元素時暫停。
 
-## Channel 是公平的
+## Channel 是公平的 {id="channels-are-fair"}
 
 對於從多個協同程式呼叫的順序，Channel 的傳送和接收操作是「公平」的。它們按照先進先出的順序提供服務，例如，第一個呼叫 `receive` 的協同程式會獲得元素。在以下範例中，兩個協同程式「ping」和「pong」正從共享的「table」Channel 接收「ball」物件。
 
@@ -506,7 +506,7 @@ pong Ball(hits=4)
 
 請注意，有時由於所使用的執行器性質，Channel 可能會產生看起來不公平的執行。詳情請參閱[此問題](https://github.com/Kotlin/kotlinx.coroutines/issues/111)。
 
-## Ticker Channel
+## Ticker Channel {id="ticker-channels"}
 
 Ticker Channel 是一種特殊的會合 Channel，每當自上次消費以來經過給定的延遲時，它就會產生一個 `Unit`。雖然它單獨看起來可能沒什麼用，但它是一個有用的建構區塊，可以用來建立複雜的、基於時間的 [produce] 管線，以及執行視窗化和其他與時間相關處理的運算子。Ticker Channel 可以用在 [select] 中來執行「每跳動一次（on tick）」的操作。
 

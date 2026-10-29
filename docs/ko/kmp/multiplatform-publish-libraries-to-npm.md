@@ -216,13 +216,13 @@ jobs:
 
 이제 워크플로를 저장소에 올렸으므로 GitHub Action을 npm 패키지의 [Trusted Publisher](https://docs.npmjs.com/trusted-publishers)로 추가할 수 있습니다.
 
-1. [배포된 패키지](#수동으로-배포하기) 페이지를 엽니다.
+1. [배포된 패키지](#publish-manually) 페이지를 엽니다.
 2. **Settings** 탭을 열고 **Trusted Publisher** 섹션을 찾습니다.
 3. **Select your publisher** 아래에서 **GitHub Actions** 버튼을 클릭합니다.
 4. 양식을 작성합니다.
    * GitHub 사용자 이름 (또는 조직 이름)
    * 저장소(Repository) 이름
-   * 워크플로 파일 이름 (이 튜토리얼에서는 [publish.yml](#github-actions-워크플로-파일-생성하기)을 사용했습니다).
+   * 워크플로 파일 이름 (이 튜토리얼에서는 [publish.yml](#create-a-github-actions-workflow-file)을 사용했습니다).
 5. **Setup connection** 버튼을 클릭합니다.
 
 ![GitHub Actions를 위한 npm Trusted Publisher 설정](npm-trusted-publisher-github.png)

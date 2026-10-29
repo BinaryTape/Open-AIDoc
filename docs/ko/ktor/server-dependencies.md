@@ -167,7 +167,7 @@
     <list>
         <li>
             <p>
-                <a href="#embedded-server">embeddedServer</a>를 사용하는 경우 다음과 같이 메인 클래스를 지정합니다.
+                <a href="server-create-and-configure.topic#embedded-server">embeddedServer</a>를 사용하는 경우 다음과 같이 메인 클래스를 지정합니다.
             </p>
             <Tabs group="languages">
                 <TabItem title="Gradle (Kotlin)" group-key="kotlin">
@@ -183,7 +183,7 @@
         </li>
         <li>
             <p>
-                <a href="#engine-main">EngineMain</a>을 사용하는 경우 이를 메인 클래스로 구성해야 합니다.
+                <a href="server-create-and-configure.topic#engine-main">EngineMain</a>을 사용하는 경우 이를 메인 클래스로 구성해야 합니다.
                 Netty의 경우 다음과 같습니다.
             </p>
             <Tabs group="languages">

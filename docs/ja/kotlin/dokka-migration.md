@@ -7,7 +7,7 @@
 
 Dokka Gradle plugin (DGP) は、Gradle で構築された Kotlin プロジェクト向けの包括的な API ドキュメントを生成するためのツールです。
 
-DGP は、Kotlin の KDoc コメントと Java の Javadoc コメントの両方をシームレスに処理して情報を抽出し、[HTML または Javadoc](#ドキュメントの出力形式を選択する) 形式で構造化されたドキュメントを作成します。
+DGP は、Kotlin の KDoc コメントと Java の Javadoc コメントの両方をシームレスに処理して情報を抽出し、[HTML または Javadoc](#select-documentation-output-format) 形式で構造化されたドキュメントを作成します。
 
 Dokka Gradle plugin v2 モードはデフォルトで有効になっており、Gradle のベストプラクティスに準拠しています。
 
@@ -46,7 +46,7 @@ plugins {
 
 あるいは、[バージョンカタログ](https://docs.gradle.org/current/userguide/platforms.html#sub:version-catalog) を使用して Dokka Gradle plugin v2 を有効にすることもできます。
 
-> デフォルトでは、DGP v2 は HTML 形式でドキュメントを生成します。Javadoc、または HTML と Javadoc の両方の形式を生成するには、適切なプラグインを追加してください。プラグインの詳細については、[ドキュメントの出力形式を選択する](#ドキュメントの出力形式を選択する) を参照してください。
+> デフォルトでは、DGP v2 は HTML 形式でドキュメントを生成します。Javadoc、または HTML と Javadoc の両方の形式を生成するには、適切なプラグインを追加してください。プラグインの詳細については、[ドキュメントの出力形式を選択する](#select-documentation-output-format) を参照してください。
 >
 {style="tip"}
 
@@ -68,7 +68,7 @@ org.jetbrains.dokka.experimental.gradle.pluginMode=V2EnabledWithHelpers
 >
 {style="note"}
 
-移行が完了したら、[移行ヘルパーを無効にします](#オプトインフラグを設定する)。
+移行が完了したら、[移行ヘルパーを無効にします](#set-the-opt-in-flag)。
 
 ### プロジェクトを Gradle と同期する {id="sync-your-project-with-gradle"}
 
@@ -507,9 +507,9 @@ DGP v2 では、[カスタムプラグインを設定する](https://github.com/
 
 DGP v2 では、サブプロジェクト間で設定を共有するために `subprojects {}` や `allprojects {}` を使用することを避けています。将来の Gradle バージョンでは、これらのアプローチを使用すると [エラーが発生します](https://docs.gradle.org/current/userguide/isolated_projects.html)。
 
-[既存のコンベンションプラグインがある場合](#コンベンションプラグインを使用したマルチモジュールプロジェクト) または [コンベンションプラグインがない場合](#コンベンションプラグインのないマルチモジュールプロジェクト) のマルチモジュールプロジェクトで、Dokka 設定を適切に共有するには、以下の手順に従ってください。
+[既存のコンベンションプラグインがある場合](#multi-module-projects-with-convention-plugins) または [コンベンションプラグインがない場合](#multi-module-projects-without-convention-plugins) のマルチモジュールプロジェクトで、Dokka 設定を適切に共有するには、以下の手順に従ってください。
 
-Dokka 設定を共有した後、複数のサブプロジェクトからのドキュメントを単一の出力に集約できます。詳細については、[マルチモジュールプロジェクトでのドキュメント集約の更新](#マルチモジュールプロジェクトでのドキュメント集約の更新) を参照してください。
+Dokka 設定を共有した後、複数のサブプロジェクトからのドキュメントを単一の出力に集約できます。詳細については、[マルチモジュールプロジェクトでのドキュメント集約の更新](#update-documentation-aggregation-in-multi-module-projects) を参照してください。
 
 > マルチモジュールプロジェクトの例については、[Dokka GitHub リポジトリ](https://github.com/Kotlin/dokka/tree/master/examples/gradle-v2/multimodule-example) を参照してください。
 >
@@ -568,7 +568,7 @@ Dokka 設定を共有した後、複数のサブプロジェクトからのド�
     }
     ```
 
-   `dokka {}` ブロック内に、すべてのサブプロジェクトに共通の共有 Dokka [設定](#設定オプションの調整) を追加する必要があります。また、Dokka のバージョンを指定する必要はありません。バージョンはすでに `buildSrc/build.gradle.kts` ファイルで設定されています。
+   `dokka {}` ブロック内に、すべてのサブプロジェクトに共通の共有 Dokka [設定](#adjust-configuration-options) を追加する必要があります。また、Dokka のバージョンを指定する必要はありません。バージョンはすでに `buildSrc/build.gradle.kts` ファイルで設定されています。
 
 ##### サブプロジェクトへのコンベンションプラグインの適用 {id="apply-the-convention-plugin-to-your-subprojects"}
 
@@ -584,13 +584,13 @@ plugins {
 
 すでにコンベンションプラグインを使用している場合は、[Gradle のドキュメント](https://docs.gradle.org/current/userguide/custom_plugins.html#sec:convention_plugins) に従って、専用の Dokka コンベンションプラグインを作成してください。
 
-その後、[Dokka コンベンションプラグインのセットアップ](#dokka-コンベンションプラグインのセットアップ) と [サブプロジェクトへの適用](#サブプロジェクトへのコンベンションプラグインの適用) の手順に従ってください。
+その後、[Dokka コンベンションプラグインのセットアップ](#set-up-the-dokka-convention-plugin) と [サブプロジェクトへの適用](#apply-the-convention-plugin-to-your-subprojects) の手順に従ってください。
 
 ### マルチモジュールプロジェクトでのドキュメント集約の更新 {id="update-documentation-aggregation-in-multi-module-projects"}
 
 Dokka は、複数のサブプロジェクトからのドキュメントを単一の出力またはパブリケーションに集約できます。
 
-[前述のとおり](#サブプロジェクトへのコンベンションプラグインの適用)、ドキュメント化するすべてのサブプロジェクトに Dokka プラグインを適用してから、ドキュメントを集約してください。
+[前述のとおり](#apply-the-convention-plugin-to-your-subprojects)、ドキュメント化するすべてのサブプロジェクトに Dokka プラグインを適用してから、ドキュメントを集約してください。
 
 DGP v2 での集約は、タスクではなく `dependencies {}` ブロックを使用し、任意の `build.gradle.kts` ファイルに追加できます。
 
@@ -676,7 +676,7 @@ DGP v2 ででのタスク:
 
 `dokkaGenerate` タスクは、`build/dokka/` ディレクトリに API ドキュメントを生成します。
 
-DGP v2 バージョンでは、`dokkaGenerate` タスク名はシングルモジュールとマルチモジュールの両方のプロジェクトで機能します。HTML、Javadoc、またはその両方で出力を生成するために、異なるタスクを使用できます。詳細については、[ドキュメントの出力形式を選択する](#ドキュメントの出力形式を選択する) を参照してください。
+DGP v2 バージョンでは、`dokkaGenerate` タスク名はシングルモジュールとマルチモジュールの両方のプロジェクトで機能します。HTML、Javadoc、またはその両方で出力を生成するために、異なるタスクを使用できます。詳細については、[ドキュメントの出力形式を選択する](#select-documentation-output-format) を参照してください。
 
 ### ドキュメントの出力形式を選択する {id="select-documentation-output-format"}
 
@@ -718,7 +718,7 @@ IntelliJ IDEA を使用している場合、`dokkaGenerateHtml` という Gradle
 ### 非推奨および削除への対応 {id="address-deprecations-and-removals"}
 
 * **出力形式のサポート:** DGP v2 は HTML と Javadoc の出力のみをサポートしています。Markdown や Jekyll などの実験的な形式はサポートされなくなりました。
-* **コレクタータスク:** `DokkaCollectorTask` は削除されました。現在は、各サブプロジェクトごとに個別にドキュメントを生成し、必要に応じて [ドキュメントを集約](#マルチモジュールプロジェクトでのドキュメント集約の更新) する必要があります。
+* **コレクタータスク:** `DokkaCollectorTask` は削除されました。現在は、各サブプロジェクトごとに個別にドキュメントを生成し、必要に応じて [ドキュメントを集約](#update-documentation-aggregation-in-multi-module-projects) する必要があります。
 
 ## 移行の完了 {id="finalize-your-migration"}
 

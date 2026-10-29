@@ -10,7 +10,7 @@ Kotlin 在其标准库中仅提供了最基本的低级 API，以便其他库能
 
 为了使用协程并跟随本指南中的示例，您需要按照 [项目 README](https://github.com/Kotlin/kotlinx.coroutines/blob/master/README.md#using-in-your-projects) 中的说明，添加对 `kotlinx-coroutines-core` 模块的依赖项。
 
-## 目录
+## 目录 {id="table-of-contents"}
 
 * [协程基础](coroutines-basics.md)
 * [取消与超时](coroutines-cancellation.md)
@@ -25,7 +25,7 @@ Kotlin 在其标准库中仅提供了最基本的低级 API，以便其他库能
 * [教程：使用 IntelliJ IDEA 调试协程](debug-coroutines-with-idea.md)
 * [教程：使用 IntelliJ IDEA 调试 Kotlin 流](debug-flow-with-idea.md)
 
-## 其他参考资料
+## 其他参考资料 {id="additional-references"}
 
 * [使用协程进行 UI 编程指南](https://github.com/Kotlin/kotlinx.coroutines/blob/master/ui/coroutines-guide-ui.md)
 * [协程设计文档 (KEEP)](https://github.com/Kotlin/KEEP/blob/master/proposals/coroutines.md)

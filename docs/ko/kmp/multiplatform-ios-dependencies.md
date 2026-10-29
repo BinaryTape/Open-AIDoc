@@ -4,13 +4,13 @@ Apple SDK 의존성(Foundation 또는 Core Bluetooth 등)은 Kotlin Multiplatfor
 
 또한 iOS 소스 세트에서 iOS 생태계의 다른 라이브러리 및 프레임워크를 재사용할 수 있습니다. Kotlin은 Objective-C 의존성 및 API가 `@objc` 어트리뷰트와 함께 Objective-C로 내보내진 Swift 의존성과의 상호운용성을 지원합니다. 순수 Swift 의존성은 아직 지원되지 않습니다.
 
-Kotlin Multiplatform 프로젝트에서 iOS 의존성을 처리하려면, [cinterop 도구](#cinterop-사용하기)를 사용해 관리하거나 [CocoaPods 의존성 관리자](#cocoapods-사용하기)를 사용할 수 있습니다(순수 Swift Pod은 지원되지 않음).
+Kotlin Multiplatform 프로젝트에서 iOS 의존성을 처리하려면, [cinterop 도구](#with-cinterop)를 사용해 관리하거나 [CocoaPods 의존성 관리자](#with-cocoapods)를 사용할 수 있습니다(순수 Swift Pod은 지원되지 않음).
 
 ### cinterop 사용하기 {id="with-cinterop"}
 
 cinterop 도구를 사용하여 Objective-C 또는 Swift 선언에 대한 Kotlin 바인딩을 생성할 수 있습니다. 이를 통해 Kotlin 코드에서 해당 선언들을 호출할 수 있게 됩니다.
 
-단계는 [라이브러리](#라이브러리-추가하기)와 [프레임워크](#프레임워크-추가하기)에 따라 조금씩 다르지만, 일반적인 워크플로는 다음과 같습니다:
+단계는 [라이브러리](#add-a-library)와 [프레임워크](#add-a-framework)에 따라 조금씩 다르지만, 일반적인 워크플로는 다음과 같습니다:
 
 1. 의존성을 다운로드합니다.
 2. 바이너리를 얻기 위해 빌드합니다.

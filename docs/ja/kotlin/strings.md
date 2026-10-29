@@ -385,7 +385,7 @@ fun main() {
 
 ### 文字列の構築と書式設定 {id="build-and-format-strings"}
 
-> Kotlinでのほとんどの書式設定タスクには、[文字列テンプレート](#文字列テンプレート)を使用してください。
+> Kotlinでのほとんどの書式設定タスクには、[文字列テンプレート](#string-templates)を使用してください。
 >
 {style="tip"}
 

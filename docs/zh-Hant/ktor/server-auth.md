@@ -98,7 +98,7 @@ Ktor 還提供了一個[型別安全身份驗證配置 API](server-typed-auth.md
 ## 安裝 Authentication {id="install"}
 
 <p>
-    若要將 <code>%plugin_name%</code> 外掛程式<a href="#install">安裝</a>到應用程式，請將其傳遞給指定<Links href="/ktor/server-modules" summary="Modules allow you to structure your application by grouping routes.">模組</Links>中的 <code>install</code> 函式。
+    若要將 <code>%plugin_name%</code> 外掛程式<a href="server-plugins.md#install">安裝</a>到應用程式，請將其傳遞給指定<Links href="/ktor/server-modules" summary="Modules allow you to structure your application by grouping routes.">模組</Links>中的 <code>install</code> 函式。
     以下範例顯示了如何安裝 <code>%plugin_name%</code>：
 </p>
 <list>

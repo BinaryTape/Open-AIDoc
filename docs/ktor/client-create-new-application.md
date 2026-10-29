@@ -118,7 +118,7 @@
                 <code-block lang="kotlin" code="                    ktor_version=%ktor_version%"/>
                 <note id="eap-note">
                     <p>
-                        要使用 Ktor 的 EAP 版本，您需要添加 <a href="#repositories">Space 仓库</a>。
+                        要使用 Ktor 的 EAP 版本，您需要添加 <a href="server-dependencies.topic#repositories">Space 仓库</a>。
                     </p>
                 </note>
             </step>
@@ -199,7 +199,7 @@
             </step>
             <step>
                 <p>
-                    使用 <code>println()</code> 函数打印服务器返回的<a href="#status">状态码</a>，并使用 <code>close()</code> 函数关闭流并释放与其关联的所有资源。
+                    使用 <code>println()</code> 函数打印服务器返回的<a href="client-responses.md#status">状态码</a>，并使用 <code>close()</code> 函数关闭流并释放与其关联的所有资源。
                     <Path>Main.kt</Path>
                     文件应如下所示：
                 </p>
@@ -243,7 +243,7 @@
     </chapter>
     <chapter title="启用日志" id="enable-logging">
         <p>
-            由于 Ktor 在 JVM 上使用 SLF4J 抽象层进行日志记录，要启用日志记录，您需要<a href="#jvm">提供一个日志框架</a>，例如
+            由于 Ktor 在 JVM 上使用 SLF4J 抽象层进行日志记录，要启用日志记录，您需要<a href="client-logging.md#jvm">提供一个日志框架</a>，例如
             <a href="https://logback.qos.ch/">Logback</a>。
         </p>
         <procedure id="enable-logging-procedure">

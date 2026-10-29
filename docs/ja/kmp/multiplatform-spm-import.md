@@ -23,8 +23,8 @@ SwiftPM インポート統合を備えた Kotlin Gradle プラグインを使用
 
 プロジェクトを構成するには：
 
-1. [開発環境のセットアップ](#kotlin-multiplatform-gradle-プラグインのバージョン設定)
-2. [KMP モジュールでの SwiftPM 依存関係の追加と使用](#swiftpm-依存関係の追加と使用)
+1. [開発環境のセットアップ](#set-the-kotlin-multiplatform-gradle-plugin-version)
+2. [KMP モジュールでの SwiftPM 依存関係の追加と使用](#add-and-use-swiftpm-dependencies)
 
 ## Kotlin Multiplatform Gradle プラグインのバージョン設定 {id="set-the-kotlin-multiplatform-gradle-plugin-version"}
 
@@ -187,12 +187,12 @@ import swiftPMImport.groupName.subproject.FIRApp
 
 Swift パッケージに依存するビルドをより安定させるために、SwiftPM インポートツールは `Package.resolved` ファイルによるロックメカニズムを導入しています。これらは初回のパッケージ解決中に、各サブプロジェクトに対して生成されます。
 
-デフォルトでは、これらのファイルは単一の `Package.resolved` ファイルにマージされ、`.swiftpm-locks/default/swiftImport` ディレクトリ内の合成パッケージ内に配置されます。この共有ロックファイルはプロジェクトのビルドに使用され、すべてのサブプロジェクトが同じバージョンの Swift パッケージを使用することを保証します。サブプロジェクトをグループ化したり、同期から除外したりすることで、[ロックファイルのマージ動作をカスタマイズ](#swift-パッケージバージョンの集約設定のカスタマイズ)できます。
+デフォルトでは、これらのファイルは単一の `Package.resolved` ファイルにマージされ、`.swiftpm-locks/default/swiftImport` ディレクトリ内の合成パッケージ内に配置されます。この共有ロックファイルはプロジェクトのビルドに使用され、すべてのサブプロジェクトが同じバージョンの Swift パッケージを使用することを保証します。サブプロジェクトをグループ化したり、同期から除外したりすることで、[ロックファイルのマージ動作をカスタマイズ](#customize-aggregation-of-swift-package-versions)できます。
 
 すべてのビルドで同じ依存関係が使用されるように、ロックファイルをリポジトリにコミットする必要があります。ファイル管理を簡素化するために、`.swiftpm-locks` ディレクトリ全体をリポジトリにコミットすることもできます。依存関係の同期に不可欠なのは `Package.resolved` ファイルだけですが、ディレクトリ全体を保持することで最初のビルド時の解決プロセスを高速化できます。
 
 ロックファイルは、ビルドスクリプトで SwiftPM 依存関係のセットやバージョンを変更すると自動的に更新されます。
-また、[手動でロックファイルの更新を強制する](#ロックファイルの手動更新)こともできます。
+また、[手動でロックファイルの更新を強制する](#force-an-update-of-the-lock-file)こともできます。
 
 ### Swift パッケージバージョンの集約設定のカスタマイズ {id="customize-aggregation-of-swift-package-versions"}
 
@@ -285,7 +285,7 @@ kotlin {
 1. ロックファイルを更新する必要があるすべてのサブプロジェクトの `build` ディレクトリを削除します。
 2. 既存の `Package.resolved` ファイルを削除します。
    * 特定の同期設定がないサブプロジェクトの場合は、`.swiftpm-locks/default/` ディレクトリを削除します。
-   * [カスタム同期グループ](#swift-パッケージバージョンの集約設定のカスタマイズ)を持つサブプロジェクトの場合は、`.swiftpm-locks/<group-name>/` ディレクトリを探して削除します。
+   * [カスタム同期グループ](#customize-aggregation-of-swift-package-versions)を持つサブプロジェクトの場合は、`.swiftpm-locks/<group-name>/` ディレクトリを探して削除します。
    * `noSynchronization()` が設定されているサブプロジェクトの場合は、サブプロジェクトディレクトリ内の `Package.resolved` ファイルを探して削除します。
 3. 依存関係解決タスクを再度実行します： `./gradlew :yourModuleName:fetchSyntheticImportProjectPackages`。
 

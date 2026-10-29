@@ -33,13 +33,13 @@
             title="Ktorは、サーバーのシャットダウンを正常に処理できるように、IPCシグナル（SIGTERMやSIGINTなど）をキャッチする方法を提供していますか？"
             id="sigterm">
         <p>
-            <a href="#engine-main">EngineMain</a> を使用して実行している場合は、自動的に処理されます。
+            <a href="server-create-and-configure.topic#engine-main">EngineMain</a> を使用して実行している場合は、自動的に処理されます。
             それ以外の場合は、手動で処理する必要があります。JVMの機能である <code>Runtime.getRuntime().addShutdownHook</code> を使用できます。
         </p>
     </chapter>
     <chapter title="プロキシ経由でクライアントのIPを取得するにはどうすればよいですか？" id="proxy-ip">
         <p>
-            プロキシが適切なヘッダーを提供し、<Links href="//server-forward-headers" summary="必要な依存関係: io.ktor:%artifact_name%">ForwardedHeader</Links> プラグインがインストールされている場合、<code>call.request.origin</code> プロパティから元の呼び出し元（プロキシ）に関する <a href="#request_information">接続情報</a> を取得できます。
+            プロキシが適切なヘッダーを提供し、<Links href="//server-forward-headers" summary="必要な依存関係: io.ktor:%artifact_name%">ForwardedHeader</Links> プラグインがインストールされている場合、<code>call.request.origin</code> プロパティから元の呼び出し元（プロキシ）に関する <a href="server-requests.md#request_information">接続情報</a> を取得できます。
         </p>
     </chapter>
     <chapter title="mainブランチの最新コミットをテストするにはどうすればよいですか？" id="bleeding-edge">
@@ -57,7 +57,7 @@
     <chapter title="ルートが実行されません。どのようにデバッグすればよいですか？" id="route-not-executing">
         <p>
             Ktorはルーティングの決定に関するトラブルシューティングを支援するトレースメカニズムを提供しています。
-            <a href="#trace_routes">Tracing routes</a> セクションを確認してください。
+            <a href="server-routing.md#trace_routes">Tracing routes</a> セクションを確認してください。
         </p>
     </chapter>
     <chapter title="'Response has already been sent' を解決するにはどうすればよいですか？" id="response-already-sent">
@@ -99,7 +99,7 @@
     </chapter>
     <chapter title="Kotlin/Nativeで対応するエンジンを使用するために、Windowsに 'curl' をインストールするにはどうすればよいですか？" id="native-curl">
         <p>
-            <a href="#curl">Curl</a> クライアントエンジンには <code>curl</code> ライブラリのインストールが必要です。
+            <a href="client-engines.md#curl">Curl</a> クライアントエンジンには <code>curl</code> ライブラリのインストールが必要です。
             Windowsでは、MinGW/MSYS2の <code>curl</code> バイナリの利用を検討してください。
         </p>
         <procedure>

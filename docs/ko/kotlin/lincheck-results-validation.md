@@ -9,7 +9,7 @@
 
 ![Lincheck의 검증 과정 다이어그램. Lincheck은 동시성 실행을 여러 순차적 실행과 비교합니다.](verification-process.svg){width=700}
 
-[검증 모델](#검증-모델)에 따라 순차적 실행에 추가적인 제약 조건이 있을 수 있습니다. 검증 속성과 일치하는 순차적 실행이 관찰된 결과와 동일한 결과를 낼 수 없는 경우, Lincheck은 오류를 보고합니다.
+[검증 모델](#verification-models)에 따라 순차적 실행에 추가적인 제약 조건이 있을 수 있습니다. 검증 속성과 일치하는 순차적 실행이 관찰된 결과와 동일한 결과를 낼 수 없는 경우, Lincheck은 오류를 보고합니다.
 
 ### 순차 사양 (Sequential specification) {id="sequential-specification"}
 

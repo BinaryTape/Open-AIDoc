@@ -52,7 +52,7 @@ class CounterTest {
 | ------------------------------------------------------------------------------- |
 ```
 
-## Lincheck 的工作原理
+## Lincheck 的工作原理 {id="how-lincheck-works"}
 
 每次 JVM 运行并发代码时，跨线程的操作执行顺序可能会发生变化。例如，一个操作可能会被另一个线程中的不同操作中断。这本身并不是错误，但如果代码中存在并发错误（bug），则可能会导致错误。
 
@@ -68,12 +68,12 @@ Lincheck 实现了两种测试策略来寻找导致错误行为的执行调度�
 * **模型检查**。Lincheck 通过在程序中插入显式的线程切换指令来控制调度。这些指令被放置在同步点或共享内存访问处。模型检查使 Lincheck 能够生成导致错误的精确执行跟踪。
 * **压力测试**。由操作系统控制调度。Lincheck 会多次执行每个场景，以增加发现错误的几率。
 
-## 探索 Lincheck
+## 探索 Lincheck {id="explore-lincheck"}
 
 * 在 [Lincheck 快速入门](lincheck-getting-started.md) 中逐步学习 Lincheck 功能。
 * 在 Lincheck 中了解[测试并发数据结构的声明式方法](lincheck-how-to-test-data-structures.md)。
 
-## 了解详情
+## 了解详情 {id="learn-more"}
 
 * Nikita Koval 的 “我们如何在 Kotlin 协程中测试并发算法”：[视频](https://youtu.be/jZqkWfa11Js)。KotlinConf 2023
 * Maria Sokolova 的 “Lincheck：在 JVM 上测试并发” 工作坊：[第一部分](https://www.youtube.com/watch?v=YNtUK9GK4pA)，[第二部分](https://www.youtube.com/watch?v=EW7mkAOErWw)。Hydra 2021

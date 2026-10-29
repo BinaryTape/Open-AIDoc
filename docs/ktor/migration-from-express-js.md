@@ -98,7 +98,7 @@
 </td>
 <td>
 <p>
-                    在 Ktor 中，你可以使用 <a href="#embedded-server">embeddedServer</a> 函数在代码中配置服务器参数并快速运行应用程序。
+                    在 Ktor 中，你可以使用 <a href="server-create-and-configure.topic#embedded-server">embeddedServer</a> 函数在代码中配置服务器参数并快速运行应用程序。
                 </p>
 <code-block lang="kotlin" code="import io.ktor.server.engine.*&#10;import io.ktor.server.netty.*&#10;import io.ktor.server.application.*&#10;import io.ktor.server.response.*&#10;import io.ktor.server.routing.*&#10;&#10;fun main() {&#10;    embeddedServer(Netty, port = 8080, host = &quot;0.0.0.0&quot;) {&#10;        routing {&#10;            get(&quot;/&quot;) {&#10;                call.respondText(&quot;Hello World!&quot;)&#10;            }&#10;        }&#10;    }.start(wait = true)&#10;}"/>
 <p>
@@ -107,7 +107,7 @@
                     项目。
                 </p>
 <p>
-                    你还可以在使用 HOCON 或 YAML 格式的 <a href="#engine-main">外部配置文件</a> 中指定服务器设置。
+                    你还可以在使用 HOCON 或 YAML 格式的 <a href="server-create-and-configure.topic#engine-main">外部配置文件</a> 中指定服务器设置。
                 </p>
 </td>
 </tr>
@@ -148,7 +148,7 @@
 </td>
 <td>
 <p>
-                    在 Ktor 中，使用 <a href="#folders"><code>staticFiles()</code></a> 函数将对 <Path>/</Path> 路径发出的任何请求映射到 <Path>public</Path> 物理文件夹。此函数可以递归地提供 <Path>public</Path> 文件夹中的所有文件。
+                    在 Ktor 中，使用 <a href="server-static-content.md#folders"><code>staticFiles()</code></a> 函数将对 <Path>/</Path> 路径发出的任何请求映射到 <Path>public</Path> 物理文件夹。此函数可以递归地提供 <Path>public</Path> 文件夹中的所有文件。
                 </p>
 <code-block lang="kotlin" code="import io.ktor.server.application.*&#10;import io.ktor.server.http.content.*&#10;import io.ktor.server.routing.*&#10;import java.io.*&#10;&#10;fun main(args: Array&lt;String&gt;): Unit =&#10;    io.ktor.server.netty.EngineMain.main(args)&#10;&#10;fun Application.module() {&#10;    routing {&#10;        staticFiles(&quot;&quot;, File(&quot;public&quot;), &quot;index.html&quot;)&#10;    }&#10;}"/>
 <p>

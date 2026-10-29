@@ -3,8 +3,8 @@
 本教程展示了如何使用 Kotlin/JavaScript (Kotlin/JS) 创建一个针对浏览器的 Web 应用程序。
 要创建您的应用，请选择最适合您工作流的工具：
 
-* **[IntelliJ IDEA](#在-intellij-idea-中创建应用程序)**：从版本控制中克隆项目模板，并在 IntelliJ IDEA 中进行开发。
-* **[Gradle 构建系统](#使用-gradle-创建应用程序)**：手动为您的项目创建构建文件，以更好地了解底层设置的工作原理。
+* **[IntelliJ IDEA](#create-your-application-in-intellij-idea)**：从版本控制中克隆项目模板，并在 IntelliJ IDEA 中进行开发。
+* **[Gradle 构建系统](#create-your-application-using-gradle)**：手动为您的项目创建构建文件，以更好地了解底层设置的工作原理。
 
 > 除了针对浏览器外，您还可以使用 Kotlin/JS 为其他环境进行编译。
 > 欲了解更多信息，请参阅[执行环境](js-project-setup.md#execution-environments)。
@@ -125,7 +125,7 @@ Web 应用程序会自动在您的浏览器中打开。
    }
    ```
 
-3. [再次运行应用程序](#构建并运行应用程序)。
+3. [再次运行应用程序](#build-and-run-the-application)。
 
     您的应用程序如下所示：
 
@@ -160,7 +160,7 @@ Web 应用程序会自动在您的浏览器中打开。
     }
    ```
 
-#### 添加输出元素
+#### 添加输出元素 {id="add-an-output-element"}
 
 1. 定义一个创建段落的 [扩展函数](extensions.md#extension-functions)，添加一个用于显示输出的文本元素：
 
@@ -213,7 +213,7 @@ fun main() {
 
 #### 运行应用程序 {id="run-the-application"}
 
-1. [运行应用程序](#构建并运行应用程序)。
+1. [运行应用程序](#build-and-run-the-application)。
 2. 输入您的名字。
 3. 按下 <shortcut>输入</shortcut>。 
 
@@ -256,7 +256,7 @@ fun main() {
    }
    ```
 
-3. 按照步骤 [运行应用程序并输入您的名字](#运行应用程序)。
+3. 按照步骤 [运行应用程序并输入您的名字](#run-the-application)。
 
 您可以看到结果：
 
@@ -344,7 +344,7 @@ Gradle 是 Kotlin/JS 和 Kotlin 多平台项目的默认构建系统。它也广
 
 **对于 `browser` 环境**
 
-> 如果您使用的是 `browser` 环境，请遵循以下步骤。如果您使用的是 `nodejs` 环境，请转到 [构建并运行项目](#构建并运行项目) 部分。
+> 如果您使用的是 `browser` 环境，请遵循以下步骤。如果您使用的是 `nodejs` 环境，请转到 [构建并运行项目](#build-and-run-the-project) 部分。
 > 
 > {style="note"}
 

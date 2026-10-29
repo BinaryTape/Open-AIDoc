@@ -110,7 +110,7 @@
             </TabItem>
         </Tabs>
         <note>
-            除了使用 <code>EngineMain.main()</code> 立即啟動伺服器，您還可以使用 <code>EngineMain.createServer()</code> 手動建立伺服器執行個體。如需更多資訊，請參閱 <a href="#createServer"></a>。
+            除了使用 <code>EngineMain.main()</code> 立即啟動伺服器，您還可以使用 <code>EngineMain.createServer()</code> 手動建立伺服器執行個體。如需更多資訊，請參閱 <a href="server-engines.md#createServer"></a>。
         </note>
         <p>
             有關完整範例，請參閱

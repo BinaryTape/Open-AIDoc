@@ -10,7 +10,7 @@ Kotlinは、他のライブラリがコルーチンを利用できるように�
 
 コルーチンを使用したり、このガイドの例を試したりするには、[プロジェクトのREADME](https://github.com/Kotlin/kotlinx.coroutines/blob/master/README.md#using-in-your-projects) で説明されているように、`kotlinx-coroutines-core` モジュールへの依存関係を追加する必要があります。
 
-## 目次
+## 目次 {id="table-of-contents"}
 
 * [コルーチンの基本](coroutines-basics.md)
 * [キャンセルとタイムアウト](coroutines-cancellation.md)
@@ -25,7 +25,7 @@ Kotlinは、他のライブラリがコルーチンを利用できるように�
 * [チュートリアル：IntelliJ IDEAを使用したコルーチンのデバッグ](debug-coroutines-with-idea.md)
 * [チュートリアル：IntelliJ IDEAを使用したKotlin Flowのデバッグ](debug-flow-with-idea.md)
 
-## 追加リファレンス
+## 追加リファレンス {id="additional-references"}
 
 * [コルーチンを使用したUIプログラミングガイド](https://github.com/Kotlin/kotlinx.coroutines/blob/master/ui/coroutines-guide-ui.md)
 * [コルーチン設計ドキュメント (KEEP)](https://github.com/Kotlin/KEEP/blob/master/proposals/coroutines.md)

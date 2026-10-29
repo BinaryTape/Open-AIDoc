@@ -9,23 +9,23 @@
 
 继续阅读以了解以下主题的详细信息：
 
-* [导入生成的 `Res` 类和访问器](#导入生成的类)。
-* [自定义访问器类的生成](#自定义访问器类生成)：如何将其设为公开、指定到软件包或无条件生成。
+* [导入生成的 `Res` 类和访问器](#importing-the-generated-class)。
+* [自定义访问器类的生成](#customizing-accessor-class-generation)：如何将其设为公开、指定到软件包或无条件生成。
 * 处理特定资源类型： 
-  * [Drawable 资源](#图像)，如简单图像、光栅化图像或 XML 矢量图。
-  * 来自 Material Symbols 库的 [Android XML 矢量图标](#图标)。 
-  * [字符串](#字符串)，包括简单字符串、模板、数组和复数。
-  * [存储和加载自定义字体](#字体)。
-  * [原始文件](#原始文件)以及将字节数组转换为图像。 
-* [访问映射了字符串 ID 的资源](#为资源和字符串-id-生成的映射)。
-* [将多平台资源用作 Android 资产](#将-compose-multiplatform-资源用作-android-资产)。
+  * [Drawable 资源](#images)，如简单图像、光栅化图像或 XML 矢量图。
+  * 来自 Material Symbols 库的 [Android XML 矢量图标](#icons)。 
+  * [字符串](#strings)，包括简单字符串、模板、数组和复数。
+  * [存储和加载自定义字体](#fonts)。
+  * [原始文件](#raw-files)以及将字节数组转换为图像。 
+* [访问映射了字符串 ID 的资源](#generated-maps-for-resources-and-string-ids)。
+* [将多平台资源用作 Android 资产](#compose-multiplatform-resources-as-android-assets)。
 * 处理 Web 专属资源：
   * 使用浏览器功能和预加载 API [预加载资源](compose-web-resources.md#preloading-of-resources-for-web-targets)。
   * 针对缺失字符的[字体自动回退机制](compose-web-resources.md#automatic-font-fallback)。
   * [缓存 Web 资源](compose-web-resources.md#caching-web-resources)。
 * 使用外部资源： 
-  [来自外部库](#从外部库访问多平台资源)、
-  [远程文件](#远程文件)以及 [Java 资源](#使用-java-资源)。
+  [来自外部库](#accessing-multiplatform-resources-from-external-libraries)、
+  [远程文件](#remote-files)以及 [Java 资源](#using-java-resources)。
 
 ## 导入生成的类 {id="importing-the-generated-class"}
 
@@ -531,7 +531,7 @@ coroutineScope.launch {
 
 如果你读取的文件是位图（JPEG、PNG、BMP、WEBP）或 XML 矢量图像，可以使用以下函数将其转换为适用于 `Image()` 可组合项的 `ImageBitmap` 或 `ImageVector` 对象。
 
-按照[原始文件](#原始文件)部分所示访问原始文件，然后将结果传递给可组合项：
+按照[原始文件](#raw-files)部分所示访问原始文件，然后将结果传递给可组合项：
 
 ```kotlin
 // bytes = Res.readBytes("files/example.png")
@@ -638,7 +638,7 @@ val uri = Res.getUri("files/my_video.mp4")
 
 现在 `uri` 变量包含了文件的绝对路径，任何外部库都可以使用该路径以适合它的方式访问该文件。
 
-针对 Android 专属的用法，多平台资源也会[打包为 Android 资产](#将-compose-multiplatform-资源用作-android-资产)。
+针对 Android 专属的用法，多平台资源也会[打包为 Android 资产](#compose-multiplatform-resources-as-android-assets)。
 
 ### 远程文件 {id="remote-files"}
 
@@ -650,9 +650,9 @@ val uri = Res.getUri("files/my_video.mp4")
 * [Kamel](https://github.com/Kamel-Media/Kamel)
 * [Ktor client](https://ktor.io/)
 
-如果你手动下载图像或读取其字节，请使用资源库的[解码函数](#将字节数组转换为图像)进行转换。有关在桌面应用中加载网络图像的示例，请参阅[在 Compose Multiplatform 桌面端中使用图像](compose-desktop-images.md#loading-images-from-the-file-system-or-the-network)。
+如果你手动下载图像或读取其字节，请使用资源库的[解码函数](#convert-byte-arrays-into-images)进行转换。有关在桌面应用中加载网络图像的示例，请参阅[在 Compose Multiplatform 桌面端中使用图像](compose-desktop-images.md#loading-images-from-the-file-system-or-the-network)。
 
-如果你自行下载或读取图像的字节，请使用资源库的[解码函数](#将字节数组转换为图像)将其转换为图像。
+如果你自行下载或读取图像的字节，请使用资源库的[解码函数](#convert-byte-arrays-into-images)将其转换为图像。
 有关在桌面应用程序中从网络加载图像的示例，请参阅[在 Compose Multiplatform 桌面端中使用图像](compose-desktop-images.md#loading-images-from-the-file-system-or-the-network)教程。
 
 ### 使用 Java 资源 {id="using-java-resources"}

@@ -6,7 +6,7 @@
 Deferred 값은 코루틴 사이에 단일 값을 전달하는 편리한 방법을 제공합니다.
 채널(Channels)은 값의 스트림을 전달하는 방법을 제공합니다.
 
-## 채널 기초 (Channel basics)
+## 채널 기초 (Channel basics) {id="channel-basics"}
 
 [Channel]은 개념적으로 `BlockingQueue`와 매우 유사합니다. 한 가지 주요 차이점은 블로킹 작업인 `put` 대신 중단 가능한(suspending) [send][SendChannel.send]가 있고, 블로킹 작업인 `take` 대신 중단 가능한 [receive][ReceiveChannel.receive]가 있다는 점입니다.
 
@@ -47,7 +47,7 @@ Done!
 
 <!--- TEST -->
 
-## 채널 닫기와 반복문 (Closing and iteration over channels)
+## 채널 닫기와 반복문 (Closing and iteration over channels) {id="closing-and-iteration-over-channels"}
 
 큐와 달리 채널은 더 이상 요소가 오지 않음을 나타내기 위해 닫을(close) 수 있습니다.
 수신 측에서는 채널에서 요소를 받기 위해 일반적인 `for` 루프를 사용하는 것이 편리합니다.
@@ -87,7 +87,7 @@ fun main() = runBlocking {
 Done!
 -->
 
-## 채널 생산자 구축하기 (Building channel producers)
+## 채널 생산자 구축하기 (Building channel producers) {id="building-channel-producers"}
 
 코루틴이 일련의 요소를 생산하는 패턴은 꽤 일반적입니다.
 이는 동시성 코드에서 자주 발견되는 _생산자-소비자(producer-consumer)_ 패턴의 일부입니다.
@@ -126,7 +126,7 @@ fun main() = runBlocking {
 Done!
 -->
 
-## 파이프라인 (Pipelines)
+## 파이프라인 (Pipelines) {id="pipelines"}
 
 파이프라인은 한 코루틴이 (아마도 무한한) 값의 스트림을 생산하는 패턴입니다.
 
@@ -194,7 +194,7 @@ Done!
 >
 {style="note"}
 
-## 파이프라인으로 소수 구하기 (Prime numbers with pipeline)
+## 파이프라인으로 소수 구하기 (Prime numbers with pipeline) {id="prime-numbers-with-pipeline"}
 
 코루틴 파이프라인을 사용하여 소수를 생성하는 예제로 파이프라인을 극한까지 활용해 보겠습니다. 먼저 숫자의 무한 시퀀스로 시작합니다.
 
@@ -276,7 +276,7 @@ fun CoroutineScope.filter(numbers: ReceiveChannel<Int>, prime: Int) = produce<In
 
 어쨌든 이것은 소수를 찾는 매우 비실용적인 방법입니다. 실제로 파이프라인에는 다른 중단 호출(원격 서비스에 대한 비동기 호출 등)이 포함되며, 이러한 파이프라인은 완전 비동기인 `produce`와 달리 임의의 중단을 허용하지 않는 `sequence`/`iterator`를 사용하여 구축할 수 없습니다.
  
-## 팬아웃 (Fan-out)
+## 팬아웃 (Fan-out) {id="fan-out"}
 
 여러 코루틴이 동일한 채널로부터 수신하여 작업을 분산할 수 있습니다.
 정기적으로 정수를 생성하는(초당 10개) 생산자 코루틴부터 시작해 보겠습니다.
@@ -359,7 +359,7 @@ Processor #3 received 10
 
 또한, `launchProcessor` 코드에서 팬아웃을 수행하기 위해 `for` 루프를 사용하여 채널을 명시적으로 반복하는 방식에 주목하십시오. `consumeEach`와 달리 이 `for` 루프 패턴은 여러 코루틴에서 사용하기에 완벽하게 안전합니다. 처리기 코루틴 중 하나가 실패하더라도 다른 코루틴들은 여전히 채널을 처리하고 있을 것이지만, `consumeEach`를 통해 작성된 처리기는 정상 또는 비정상 종료 시 항상 기저 채널을 소비(취소)합니다.
 
-## 팬인 (Fan-in)
+## 팬인 (Fan-in) {id="fan-in"}
 
 여러 코루틴이 동일한 채널로 보낼 수 있습니다.
 예를 들어, 문자열 채널이 있고 지정된 지연 시간마다 지정된 문자열을 이 채널에 반복적으로 보내는 중단 함수가 있다고 가정해 봅시다.
@@ -419,7 +419,7 @@ BAR!
 
 <!--- TEST -->
 
-## 버퍼링된 채널 (Buffered channels)
+## 버퍼링된 채널 (Buffered channels) {id="buffered-channels"}
 
 지금까지 보여준 채널들은 버퍼가 없었습니다. 버퍼가 없는 채널은 송신자와 수신자가 서로 만날 때(일명 랑데부, rendezvous) 요소를 전달합니다. 만약 `send`가 먼저 호출되면 `receive`가 호출될 때까지 중단되고, 만약 `receive`가 먼저 호출되면 `send`가 호출될 때까지 중단됩니다.
 
@@ -466,7 +466,7 @@ Sending 4
 
 처음 4개의 요소는 버퍼에 추가되고, 송신자는 5번째 요소를 보내려고 할 때 중단됩니다.
 
-## 채널은 공정합니다 (Channels are fair)
+## 채널은 공정합니다 (Channels are fair) {id="channels-are-fair"}
 
 채널에 대한 송신 및 수신 작업은 여러 코루틴에서 호출된 순서에 대해 _공정(fair)_합니다. 이들은 선입선출(FIFO) 순서로 제공됩니다. 예를 들어, `receive`를 먼저 호출한 코루틴이 요소를 가져옵니다. 다음 예제에서는 "ping"과 "pong" 두 코루틴이 공유된 "table" 채널에서 "ball" 객체를 수신하고 있습니다.
 
@@ -515,7 +515,7 @@ pong Ball(hits=4)
 
 사용 중인 실행기(executor)의 특성에 따라 때때로 채널이 불공정해 보이는 실행 결과를 생성할 수 있다는 점에 유의하십시오. 자세한 내용은 [이 이슈](https://github.com/Kotlin/kotlinx.coroutines/issues/111)를 참조하십시오.
 
-## 티커 채널 (Ticker channels)
+## 티커 채널 (Ticker channels) {id="ticker-channels"}
 
 티커(Ticker) 채널은 마지막 소비 이후 지정된 지연 시간이 지날 때마다 `Unit`을 생성하는 특별한 랑데부 채널입니다.
 단독으로는 무의미해 보일 수 있지만, 윈도잉(windowing) 및 기타 시간에 의존적인 처리를 수행하는 복잡한 시간 기반 [produce] 파이프라인과 연산자를 생성하는 데 유용한 구성 요소입니다.

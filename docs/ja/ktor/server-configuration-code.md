@@ -122,7 +122,7 @@
     <tip>
         <p>
             カスタム環境を使用して
-            <a href="#embedded-server">
+            <a href="server-ssl.md#embedded-server">
                 HTTPSを提供
             </a>することもできます。
         </p>
@@ -158,7 +158,7 @@
     <tip>
         静的な設定については、設定ファイルまたは環境変数を使用できます。
         詳細については、
-        <a href="#command-line">
+        <a href="server-configuration-file.topic#command-line">
             ファイルによる設定
         </a>
         を参照してください。

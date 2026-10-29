@@ -302,7 +302,7 @@ __attribute__((swift_name("LibKt")))
 @end
 ```
 
-Kotlin `String`과 Objective-C `NSString*`은 투명하게 매핑됩니다. 마찬가지로 Kotlin의 `Unit` 타입은 `void`로 매핑됩니다. 프리미티브(primitive) 타입은 직접 매핑됩니다. 널 비허용(non-nullable) 프리미티브 타입은 투명하게 매핑되고, 널 허용 프리미티브 타입은 [표](#kotlin-숫자와-nsnumber)에 표시된 것처럼 `Kotlin<TYPE>*` 타입으로 매핑됩니다. 고차 함수(higher-order function)인 `acceptFunF`와 `supplyFun`이 모두 포함되어 있으며 Objective-C 블록을 허용합니다.
+Kotlin `String`과 Objective-C `NSString*`은 투명하게 매핑됩니다. 마찬가지로 Kotlin의 `Unit` 타입은 `void`로 매핑됩니다. 프리미티브(primitive) 타입은 직접 매핑됩니다. 널 비허용(non-nullable) 프리미티브 타입은 투명하게 매핑되고, 널 허용 프리미티브 타입은 [표](#kotlin-numbers-and-nsnumber)에 표시된 것처럼 `Kotlin<TYPE>*` 타입으로 매핑됩니다. 고차 함수(higher-order function)인 `acceptFunF`와 `supplyFun`이 모두 포함되어 있으며 Objective-C 블록을 허용합니다.
 
 타입 매핑에 대한 더 자세한 정보는 [Swift/Objective-C 상호 운용성](native-objc-interop.md#mappings)에서 확인할 수 있습니다.
 
@@ -353,7 +353,7 @@ Kotlin 소스의 전역 선언은 Objective-C의 `DemoLibKt` 클래스 하위에
 
 ## Swift에서 코드 사용하기 {id="use-code-from-swift"}
 
-생성된 프레임워크에는 Swift에서 더 쉽게 사용할 수 있도록 도와주는 헬퍼 속성들이 있습니다. [이전의 Objective-C 예제](#objective-c에서-코드-사용하기)를 Swift로 변환해 보겠습니다.
+생성된 프레임워크에는 Swift에서 더 쉽게 사용할 수 있도록 도와주는 헬퍼 속성들이 있습니다. [이전의 Objective-C 예제](#use-code-from-objective-c)를 Swift로 변환해 보겠습니다.
 
 프레임워크 디렉토리에 다음 코드가 포함된 `main.swift` 파일을 생성합니다:
 

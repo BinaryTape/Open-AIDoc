@@ -252,7 +252,7 @@ Compose Multiplatform은 `isSystemInDarkTheme()`을 통해 현재 테마를 정�
     }
     ```
 
-## 밀도
+## 밀도 {id="density"}
 
 애플리케이션의 해상도 `Density`를 변경하려면 모든 플랫폼에서 지원되는 공통 `LocalDensity` API를 사용할 수 있습니다:
 

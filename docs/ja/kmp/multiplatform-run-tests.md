@@ -112,7 +112,7 @@ fun grep(lines: List<String>, pattern: String, action: (String) -> Unit) {
 
 ご覧のとおり、インポートされたアノテーションやアサーションはプラットフォーム固有でもフレームワーク固有でもありません。後でこのテストを実行する際、プラットフォーム固有のフレームワークがテストランナーを提供します。
 
-#### `kotlin.test` APIの詳細 {initial-collapse-state="collapsed" collapsible="true"}
+#### `kotlin.test` APIの詳細 {initial-collapse-state="collapsed" collapsible="true" id="explore-the-kotlin-test-api"}
 
 [`kotlin.test`](https://kotlinlang.org/api/latest/kotlin.test/)ライブラリは、テストで使用するためのプラットフォームに依存しないアノテーションとアサーションを提供します。`Test`などのアノテーションは、選択されたフレームワークが提供するもの、またはそれに最も近い同等のものにマッピングされます。
 
@@ -120,7 +120,7 @@ fun grep(lines: List<String>, pattern: String, action: (String) -> Unit) {
 
 例えば、JVM上ではJUnit 4、JUnit 5、およびTestNGフレームワークがすべてサポートされています。Androidでは、`assertEquals()`の呼び出しによって`asserter.assertEquals()`が呼び出される場合があり、その際の`asserter`オブジェクトは`JUnit4Asserter`のインスタンスになります。iOSでは、`Asserter`型のデフォルト実装がKotlin/Nativeテストランナーと組み合わせて使用されます。
 
-### テストの実行
+### テストの実行 {id="run-tests"}
 
 テストは以下のいずれかの方法で実行できます:
 
@@ -139,9 +139,9 @@ fun grep(lines: List<String>, pattern: String, action: (String) -> Unit) {
 
 ![Test output](run-test-results.png){width=700}
 
-## より複雑なプロジェクトでの作業
+## より複雑なプロジェクトでの作業 {id="work-with-more-complex-projects"}
 
-### 共通コードのテストを書く
+### 共通コードのテストを書く {id="write-tests-for-common-code"}
 
 すでに`grep()`関数を使用して共通コードのテストを作成しました。次は、`CurrentRuntime`クラスを使ったより高度な共通コードのテストを考えてみましょう。このクラスには、コードが実行されているプラットフォームの詳細情報が含まれます。例えば、ローカルJVM上で実行されるAndroidユニットテストの場合、「OpenJDK」や「17.0」といった値を持つことがあります。
 
@@ -203,7 +203,7 @@ fun grep(lines: List<String>, pattern: String, action: (String) -> Unit) {
 
 [IDEで利用可能な任意の方法](#run-tests)を使用して、このテストを実行できます。
 
-### プラットフォーム固有のテストを追加する
+### プラットフォーム固有のテストを追加する {id="add-platform-specific-tests"}
 
 > ここでは、簡潔さとシンプルさのために[expect/actual宣言の仕組み](multiplatform-connect-to-apis.md)を使用しています。より複雑なコードでは、インターフェースとファクトリ関数を使用するアプローチの方が適しています。
 >

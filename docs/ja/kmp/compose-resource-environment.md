@@ -252,7 +252,7 @@ Compose Multiplatform は `isSystemInDarkTheme()` を通じて現在のテーマ
     }
     ```
 
-## 解像度密度
+## 解像度密度 {id="density"}
 
 アプリケーションの解像度 `Density` を変更するには、すべてのプラットフォームでサポートされている共通の `LocalDensity` API を使用できます。
 

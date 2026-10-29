@@ -12,7 +12,7 @@ Kotlin 1.4.30 では、新しい言語機能のプレビュー版が提供され
 >
 {style="tip"}
 
-## 言語機能
+## 言語機能 {id="language-features"}
 
 Kotlin 1.5.0 では、JVM レコード（records）のサポート、シールドインターフェース（sealed interfaces）、および安定版のインラインクラス（inline classes）という新しい言語機能が導入される予定です。
 Kotlin 1.4.30 では、これらの機能と改善をプレビューモードで試すことができます。1.5.0 のリリース前に対処できるよう、対応する YouTrack チケットでフィードバックを共有していただければ幸いです。
@@ -25,7 +25,7 @@ Kotlin 1.4.30 では、これらの機能と改善をプレビューモードで
 
 新機能のプレビューの詳細については、[こちらのブログ投稿](https://blog.jetbrains.com/kotlin/2021/02/new-language-features-preview-in-kotlin-1-4-30/)をご覧ください。
 
-### JVM レコードのサポート
+### JVM レコードのサポート {id="jvm-records-support"}
 
 > JVM レコード機能は[実験的（Experimental）](components-stability.md)です。将来的に削除または変更される可能性があります。
 > オプトインが必要であり（詳細は以下を参照）、評価目的でのみ使用してください。[YouTrack](https://youtrack.jetbrains.com/issue/KT-42430) でのフィードバックをお待ちしております。
@@ -49,7 +49,7 @@ JVM レコードのサポートについては引き続き作業を進めてお�
 
 実装、制限、および構文の詳細については、[KEEP](https://github.com/Kotlin/KEEP/blob/master/proposals/jvm-records.md) を参照してください。
 
-### シールドインターフェース
+### シールドインターフェース {id="sealed-interfaces"}
 
 > シールドインターフェースは[実験的（Experimental）](components-stability.md)です。将来的に削除または変更される可能性があります。
 > オプトインが必要であり（詳細は以下を参照）、評価目的でのみ使用してください。[YouTrack](https://youtrack.jetbrains.com/issue/KT-42433) でのフィードバックをお待ちしております。
@@ -94,7 +94,7 @@ class Rectangle(override val vertices: List<Point>): Fillable, Polygon {
 
 [シールドインターフェースの詳細](sealed-classes.md)。
 
-### パッケージ全体のシールドクラス階層
+### パッケージ全体のシールドクラス階層 {id="package-wide-sealed-class-hierarchies"}
 
 > パッケージ全体のシールドクラス階層は[実験적（Experimental）](components-stability.md)です。将来的に削除または変更される可能性があります。
 > オプトインが必要であり（詳細は以下を参照）、評価目的でのみ使用してください。[YouTrack](https://youtrack.jetbrains.com/issue/KT-42433) でのフィードバックをお待ちしております。
@@ -109,7 +109,7 @@ class Rectangle(override val vertices: List<Point>): Fillable, Polygon {
 
 [パッケージ全体のシールドクラス階層の詳細](sealed-classes.md#inheritance)。
 
-### 改善されたインラインクラス
+### 改善されたインラインクラス {id="improved-inline-classes"}
 
 > インラインバリュークラス（inline value classes）は [Beta](components-stability.md) です。ほぼ安定していますが、将来的に移行手順が必要になる可能性があります。変更を最小限に抑えるよう最善を尽くします。インラインクラス機能に関するフィードバックを [YouTrack](https://youtrack.jetbrains.com/issue/KT-42434) でお待ちしております。
 >
@@ -166,9 +166,9 @@ Kotlin 1.4.30 はインラインクラスを Beta に昇格させ、将来のリ
 
 [インラインクラスの詳細](inline-classes.md)。
 
-## Kotlin/JVM
+## Kotlin/JVM {id="kotlin-jvm"}
 
-### JVM IR コンパイラバックエンドが Beta に到達
+### JVM IR コンパイラバックエンドが Beta に到達 {id="jvm-ir-compiler-backend-reaches-beta"}
 
 1.4.0 で [Alpha](components-stability.md) として提供された Kotlin/JVM 用の [IR ベースのコンパイラバックエンド](whatsnew14.md#unified-backends-and-extensibility)が Beta に到達しました。これは、IR バックエンドが Kotlin/JVM コンパイラのデフォルトになる前の、最後のプレステータスレベルです。
 
@@ -210,24 +210,24 @@ IR コンパイラによって生成されたバイナリの使用制限を廃�
 
 JVM IR バックエンドがもたらす変更の詳細については、[こちらのブログ投稿](https://blog.jetbrains.com/kotlin/2021/02/the-jvm-backend-is-in-beta-let-s-make-it-stable-together/)をご覧ください。
 
-## Kotlin/Native
+## Kotlin/Native {id="kotlin-native"}
 
-### パフォーマンスの改善
+### パフォーマンスの改善 {id="performance-improvements"}
 
 Kotlin/Native では 1.4.30 でさまざまなパフォーマンスの改善が行われ、コンパイル時間が短縮されました。
 たとえば、[Networking and data storage with Kotlin Multiplatform Mobile](https://github.com/kotlin-hands-on/kmm-networking-and-data-storage/tree/final) サンプルでのフレームワークの再ビルドに必要な時間は、9.5秒（1.4.10）から4.5秒（1.4.30）に短縮されました。
 
-### Apple watchOS 64ビットシミュレータターゲット
+### Apple watchOS 64ビットシミュレータターゲット {id="apple-watchos-64-bit-simulator-target"}
 
 x86 シミュレータターゲットは、バージョン 7.0 以降の watchOS で非推奨になりました。最新の watchOS バージョンに対応するため、Kotlin/Native には 64ビットアーキテクチャでシミュレータを実行するための新しいターゲット `watchosX64` が追加されました。
 
-### Xcode 12.2 ライブラリのサポート
+### Xcode 12.2 ライブラリのサポート {id="support-for-xcode-12-2-libraries"}
 
 Xcode 12.2 で提供される新しいライブラリのサポートを追加しました。Kotlin コードからこれらを使用できるようになります。
 
-## Kotlin/JS
+## Kotlin/JS {id="kotlin-js"}
 
-### トップレベルプロパティの遅延初期化
+### トップレベルプロパティの遅延初期化 {id="lazy-initialization-of-top-level-properties"}
 
 > トップレベルプロパティの遅延初期化（Lazy initialization）は[実験的（Experimental）](components-stability.md)です。将来的に削除または変更される可能性があります。
 > オプトインが必要であり（詳細は以下を参照）、評価目的でのみ使用してください。[YouTrack](https://youtrack.jetbrains.com/issue/KT-44320) でのフィードバックをお待ちしております。
@@ -240,17 +240,17 @@ Kotlin/JS 用の [IR バックエンド](js-ir-compiler.md)に、トップレベ
 
 遅延初期化を使用するには、JS IR コンパイラでコードをコンパイルする際に `-Xir-property-lazy-initialization` コンパイラオプションを追加してください。
 
-## Gradle プロジェクトの改善
+## Gradle プロジェクトの改善 {id="gradle-project-improvements"}
 
-### Gradle 構成キャッシュ（Configuration cache）のサポート
+### Gradle 構成キャッシュ（Configuration cache）のサポート {id="support-the-gradle-configuration-cache"}
 
 1.4.30 以降、Kotlin Gradle プラグインは [構成キャッシュ](https://docs.gradle.org/current/userguide/configuration_cache.html) 機能をサポートします。これによりビルドプロセスが高速化されます。コマンドを実行すると、Gradle は構成フェーズを実行してタスクグラフを計算します。Gradle はその結果をキャッシュし、その後のビルドで再利用します。
 
 この機能の使用を開始するには、[Gradle コマンドを使用する](https://docs.gradle.org/current/userguide/configuration_cache.html#config_cache:usage)か、[IntelliJ ベースの IDE をセットアップ](https://docs.gradle.org/current/userguide/configuration_cache.html#config_cache:ide:intellij)してください。
 
-## 標準ライブラリ
+## 標準ライブラリ {id="standard-library"}
 
-### テキストの大文字・小文字変換用のロケールに依存しない API
+### テキストの大文字・小文字変換用のロケールに依存しない API {id="locale-agnostic-api-for-upper-lowercasing-text"}
 
 > ロケールに依存しない（locale-agnostic）API 機能は[実験的（Experimental）](components-stability.md)です。将来的に削除または変更される可能性があります。
 > 評価目的でのみ使用してください。
@@ -294,7 +294,7 @@ Kotlin 1.4.30 は以下の代替手段を提供します。
 
 テキスト処理関数の変更内容の完全なリストについては、[KEEP](https://github.com/Kotlin/KEEP/blob/master/proposals/stdlib/locale-agnostic-string-conversions.md) を参照してください。
 
-### 明確な Char-to-code および Char-to-digit 変換
+### 明確な Char-to-code および Char-to-digit 変換 {id="clear-char-to-code-and-char-to-digit-conversions"}
 
 > `Char` 変換用の明確な API 機能は[実験的（Experimental）](components-stability.md)です。将来的に削除または変更される可能性があります。
 > 評価目的でのみ使用してください。
@@ -341,7 +341,7 @@ Kotlin 1.4.30 と共に、いくつかの新機能を含む `kotlinx.serializati
 * インラインクラスのシリアル化サポート
 * 符号なしプリミティブ型のシリアル化サポート
 
-### インラインクラスのシリアル化サポート
+### インラインクラスのシリアル化サポート {id="inline-classes-serialization-support"}
 
 Kotlin 1.4.30 以降、インラインクラスを[シリアル化可能（serializable）](serialization.md)にできるようになりました。
 
@@ -358,7 +358,7 @@ inline class Color(val rgb: Int)
 
 詳細は `kotlinx.serialization` の[ドキュメント](https://github.com/Kotlin/kotlinx.serialization/blob/master/docs/inline-classes.md#serializable-inline-classes)をご覧ください。
 
-### 符号なしプリミティブ型のシリアル化サポート
+### 符号なしプリミティブ型のシリアル化サポート {id="unsigned-primitive-type-serialization-support"}
 
 1.4.30 からは、符号なしプリミティブ型（`UInt`、`ULong`、`UByte`、`UShort`）に対して [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization) の標準 JSON シリアライザーを使用できます。
 

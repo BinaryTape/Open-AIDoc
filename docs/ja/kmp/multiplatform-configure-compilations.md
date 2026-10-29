@@ -9,13 +9,13 @@ Kotlinマルチプラットフォームプロジェクトは、アーティフ�
 
 ![コンパイル](compilations.svg)
 
-プロダクションコードやユニットテスト以外のもの（例：統合テストやパフォーマンス性能テスト）をコンパイルする必要がある場合は、[カスタムコンパイルを作成](#カスタムコンパイルを作成する)できます。
+プロダクションコードやユニットテスト以外のもの（例：統合テストやパフォーマンス性能テスト）をコンパイルする必要がある場合は、[カスタムコンパイルを作成](#create-a-custom-compilation)できます。
 
 アーティファクトの生成方法は、以下のレベルで設定できます：
 
-* プロジェクト内の[全てのコンパイル](#全てのコンパイルを設定する)を一括で設定。
-* 1つのターゲットに複数のコンパイルが含まれる場合があるため、[特定のターゲットの全コンパイル](#1つのターゲットのコンパイルを設定する)を設定。
-* [特定のコンパイル](#特定のコンパイルを1つ設定する)を個別に設定。
+* プロジェクト内の[全てのコンパイル](#configure-all-compilations)を一括で設定。
+* 1つのターゲットに複数のコンパイルが含まれる場合があるため、[特定のターゲットの全コンパイル](#configure-compilations-for-one-target)を設定。
+* [特定のコンパイル](#configure-one-compilation)を個別に設定。
 
 全ターゲットまたは特定のターゲットで利用可能な[コンパイルパラメータのリスト](multiplatform-dsl-reference.md#compilation-parameters)および[コンパイラオプション](https://kotlinlang.org/docs/gradle-compiler-options.html)を参照してください。
 
@@ -189,7 +189,7 @@ kotlin {
 
 カスタムコンパイルは、他のケースでも必要になります。例えば、最終的なアーティファクトで異なるJVMバージョンのコンパイルを組み合わせたい場合や、既にGradleでソースセットを設定していてマルチプラットフォームプロジェクトに移行したい場合などです。
 
-> [`android`](#android用のコンパイル) 用のカスタムコンパイルを作成するには、[Android Gradle プラグイン](https://developer.android.com/build/build-variants)を通じてビルドバリアントを設定してください。
+> [`android`](#compilation-for-android) 用のカスタムコンパイルを作成するには、[Android Gradle プラグイン](https://developer.android.com/build/build-variants)を通じてビルドバリアントを設定してください。
 > 
 {style="tip"}
 

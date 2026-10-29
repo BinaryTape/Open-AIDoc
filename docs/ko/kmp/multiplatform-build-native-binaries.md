@@ -115,7 +115,7 @@ binaries {
 </TabItem>
 </Tabs>
 
-첫 번째 인자는 이름 접두사(name prefix)를 설정하며, 이는 바이너리 파일의 기본 이름이 됩니다. 예를 들어, Windows의 경우 위 코드는 `foo.exe` 및 `bar.exe` 파일을 생성합니다. 또한 이름 접두사를 사용하여 [빌드 스크립트에서 바이너리에 접근](#바이너리-접근)할 수도 있습니다.
+첫 번째 인자는 이름 접두사(name prefix)를 설정하며, 이는 바이너리 파일의 기본 이름이 됩니다. 예를 들어, Windows의 경우 위 코드는 `foo.exe` 및 `bar.exe` 파일을 생성합니다. 또한 이름 접두사를 사용하여 [빌드 스크립트에서 바이너리에 접근](#access-binaries)할 수도 있습니다.
 
 ## 바이너리 접근 {id="access-binaries"}
 
@@ -383,7 +383,7 @@ kotlin {
 
 ## XCFramework 빌드 {id="build-xcframeworks"}
 
-모든 Kotlin 멀티플랫폼 프로젝트는 XCFramework를 출력으로 사용하여 모든 타겟 플랫폼과 아키텍처에 대한 로직을 단일 번들에 모을 수 있습니다. [유니버설(fat) 프레임워크](#유니버설-프레임워크-빌드)와 달리, App Store에 애플리케이션을 배포하기 전에 모든 불필요한 아키텍처를 제거할 필요가 없습니다.
+모든 Kotlin 멀티플랫폼 프로젝트는 XCFramework를 출력으로 사용하여 모든 타겟 플랫폼과 아키텍처에 대한 로직을 단일 번들에 모을 수 있습니다. [유니버설(fat) 프레임워크](#build-universal-frameworks)와 달리, App Store에 애플리케이션을 배포하기 전에 모든 불필요한 아키텍처를 제거할 필요가 없습니다.
 
 <Tabs group="build-script">
 <TabItem title="Kotlin" group-key="kotlin">

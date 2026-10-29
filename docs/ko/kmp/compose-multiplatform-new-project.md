@@ -12,12 +12,12 @@ UI는 Compose Multiplatform을 사용하여 공통 코드에서 구현하고, �
 
 마법사로 생성된 프로젝트에서 최종 결과물까지 완성하기 위해 다음 단계를 진행합니다.
 
-1. [기본 Compose UI 레이아웃 구현](#기본-레이아웃-구현)
-2. [Compose Hot Reload 체험](#compose-hot-reload를-사용하여-빠르게-ui-반복-작업하기)
-3. [시간 계산을 위한 멀티플랫폼 라이브러리 의존성 추가](#kotlinx-datetime-의존성-추가)
+1. [기본 Compose UI 레이아웃 구현](#implement-the-basic-layout)
+2. [Compose Hot Reload 체험](#use-compose-hot-reload-to-quickly-iterate-on-the-ui)
+3. [시간 계산을 위한 멀티플랫폼 라이브러리 의존성 추가](#add-the-kotlinx-datetime-dependency)
 4. 앱 완성하기:
-   * [사용자 입력 지원](#사용자-입력-지원)
-   * [이미지 리소스 추가 및 임포트](#이미지-도입하기)
+   * [사용자 입력 지원](#support-user-input)
+   * [이미지 리소스 추가 및 임포트](#introduce-images)
 
 거의 모든 코드가 공유되므로, 이 튜토리얼을 통해 지원되는 모든 플랫폼용 데모 애플리케이션을 동시에 만들 수 있습니다.
 동일한 이유로 관심 있는 특정 플랫폼만 자유롭게 선택하여 작업할 수도 있습니다.
@@ -155,7 +155,7 @@ IDE와 Kotlin Multiplatform IDE 플러그인이 설치된 상태에서 새 Compo
 
 `kotlin.time`은 항상 표준 라이브러리의 일부로 제공되지만, `kotlinx-datetime`은 명시적인 의존성으로 구성해야 합니다.
 이 라이브러리는 멀티플랫폼 라이브러리이며 공통 코드에서만 사용합니다.
-따라서 [웹에만 필요한 추가 구성](#웹-앱을-위한-kotlinx-datetime-의존성-추가)을 제외하면 의존성을 한 번만 지정하면 됩니다.
+따라서 [웹에만 필요한 추가 구성](#add-the-kotlinx-datetime-dependency-for-the-web-app)을 제외하면 의존성을 한 번만 지정하면 됩니다.
 
 [라이브러리 저장소의 안내](https://github.com/Kotlin/kotlinx-datetime#gradle)를 따릅니다.
 
@@ -186,7 +186,7 @@ IDE와 Kotlin Multiplatform IDE 플러그인이 설치된 상태에서 새 Compo
 3. **Shift** 키를 두 번 누른 다음, **Sync Project with Gradle Files** 명령을 찾아 실행합니다.
 
 이제 공통 코드에서 `kotlinx-datetime` API를 사용할 수 있습니다.
-웹 타깃의 경우 [아래 섹션](#웹-앱을-위한-kotlinx-datetime-의존성-추가)에 설명된 대로 JavaScript 및 Wasm/JS의 시간대 지원 제한 사항을 해결해야 합니다.
+웹 타깃의 경우 [아래 섹션](#add-the-kotlinx-datetime-dependency-for-the-web-app)에 설명된 대로 JavaScript 및 Wasm/JS의 시간대 지원 제한 사항을 해결해야 합니다.
 
 > 멀티플랫폼 의존성을 관리하는 방법에 대한 일반적인 정보는 [멀티플랫폼 라이브러리 의존성 추가](multiplatform-add-dependencies.md)를 참고하세요.
 >

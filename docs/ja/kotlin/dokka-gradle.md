@@ -7,7 +7,7 @@
 
 Gradle ベースのプロジェクトのドキュメントを生成するには、[Dokka 用の Gradle プラグイン](https://plugins.gradle.org/plugin/org.jetbrains.dokka)を使用できます。
 
-Dokka Gradle プラグイン (DGP) には、プロジェクト用の基本的な自動構成が含まれており、ドキュメント生成用の [Gradle タスク](#ドキュメントの生成)が含まれています。また、出力をカスタマイズするための [構成オプション](dokka-gradle-configuration-options.md) も提供されています。
+Dokka Gradle プラグイン (DGP) には、プロジェクト用の基本的な自動構成が含まれており、ドキュメント生成用の [Gradle タスク](#generate-documentation)が含まれています。また、出力をカスタマイズするための [構成オプション](dokka-gradle-configuration-options.md) も提供されています。
 
 Dokka を試したり、さまざまなプロジェクトでの構成方法を確認したりするには、[Gradle サンプルプロジェクト](https://github.com/Kotlin/dokka/tree/2.0.0/examples/gradle-v2)を探索してください。
 
@@ -49,7 +49,7 @@ plugins {
 
 マルチプロジェクトビルドをドキュメント化する場合、ドキュメント化したいすべてのサブプロジェクトにプラグインを明示的に適用する必要があります。
 各サブプロジェクトで直接 Dokka を構成することも、コンベンションプラグインを使用してサブプロジェクト間で Dokka の構成を共有することもできます。
-詳細については、[シングルプロジェクト構成](#シングルプロジェクト構成) および [マルチプロジェクト構成](#マルチプロジェクト構成) の方法を参照してください。
+詳細については、[シングルプロジェクト構成](#single-project-configuration) および [マルチプロジェクト構成](#multi-project-configuration) の方法を参照してください。
 
 > * 内部的には、Dokka は [Kotlin Gradle プラグイン](https://kotlinlang.org/docs/gradle-configure-project.html#apply-the-plugin) を使用して、ドキュメントが生成される [ソースセット (source sets)](https://kotlinlang.org/docs/multiplatform-discover-project.html#source-sets) を自動的に構成します。Kotlin Gradle プラグインを適用するか、[ソースセットを手動で構成](dokka-gradle-configuration-options.md#source-set-configuration) してください。
 >
@@ -76,8 +76,8 @@ Dokka Gradle プラグインには、[HTML](dokka-html.md) および [Javadoc](d
 
 `dokkaGenerate` Gradle タスクの主な動作は以下の通りです。
 
-* このタスクは、[シングルプロジェクト](#シングルプロジェクト構成) および [マルチプロジェクト](#マルチプロジェクト構成) ビルドの両方でドキュメントを生成します。
-* デフォルトでは、ドキュメントの出力形式は HTML です。[適切なプラグインを追加](#ドキュメントの出力形式の構成) することで、Javadoc を生成したり、HTML と Javadoc の両方の形式を生成したりすることもできます。
+* このタスクは、[シングルプロジェクト](#single-project-configuration) および [マルチプロジェクト](#multi-project-configuration) ビルドの両方でドキュメントを生成します。
+* デフォルトでは、ドキュメントの出力形式は HTML です。[適切なプラグインを追加](#configure-documentation-output-format) することで、Javadoc を生成したり、HTML と Javadoc の両方の形式を生成したりすることもできます。
 * 生成されたドキュメントは、シングルプロジェクトおよびマルチプロジェクトビルドの両方で、自動的に `build/dokka/html` ディレクトリに配置されます。[場所 (`outputDirectory`) を変更](dokka-gradle-configuration-options.md#general-configuration) することも可能です。
 
 ### ドキュメントの出力形式の構成 {id="configure-documentation-output-format"}
@@ -126,7 +126,7 @@ IntelliJ IDEA を使用している場合、`dokkaGenerateHtml` という Gradle
 
 Dokka は、複数のサブプロジェクトからのドキュメントを単一の出力またはパブリケーションに集約 (aggregate) できます。
 
-ドキュメントを集約する前に、ドキュメント化可能なすべてのサブプロジェクトに [Dokka プラグインを適用](#コンベンションプラグインをサブプロジェクトに適用する) する必要があります。
+ドキュメントを集約する前に、ドキュメント化可能なすべてのサブプロジェクトに [Dokka プラグインを適用](#apply-the-convention-plugin-to-your-subprojects) する必要があります。
 
 複数のサブプロジェクトからドキュメントを集約するには、ルートプロジェクトの `build.gradle.kts` ファイルに `dependencies {}` ブロックを追加します。
 
@@ -242,9 +242,9 @@ tasks.register('dokkaJavadocJar', Jar) {
 
 お使いのプロジェクトの種類によって、Dokka の適用方法と構成方法が若干異なります。ただし、[構成オプション](dokka-gradle-configuration-options.md) 自体はプロジェクトの種類に関係なく同じです。
 
-プロジェクトのルートにある単一の `build.gradle.kts` または `build.gradle` ファイルを持つ、シンプルでフラットなプロジェクトについては、[シングルプロジェクト構成](#シングルプロジェクト構成) を参照してください。
+プロジェクトのルートにある単一の `build.gradle.kts` または `build.gradle` ファイルを持つ、シンプルでフラットなプロジェクトについては、[シングルプロジェクト構成](#single-project-configuration) を参照してください。
 
-サブプロジェクトや複数のネストされた `build.gradle.kts` または `build.gradle` ファイルを持つ、より複雑なビルドについては、[マルチプロジェクト構成](#マルチプロジェクト構成) を参照してください。
+サブプロジェクトや複数のネストされた `build.gradle.kts` または `build.gradle` ファイルを持つ、より複雑なビルドについては、[マルチプロジェクト構成](#multi-project-configuration) を参照してください。
 
 ### シングルプロジェクト構成 {id="single-project-configuration"}
 
@@ -430,15 +430,15 @@ dokka {
 </tab>
 </tabs>
 
-シングルプロジェクトとマルチプロジェクトのドキュメントは、同じ [トップレベル `dokka {}` DSL を使用した構成モデル](#シングルプロジェクト構成) を共有します。
+シングルプロジェクトとマルチプロジェクトのドキュメントは、同じ [トップレベル `dokka {}` DSL を使用した構成モデル](#single-project-configuration) を共有します。
 
 マルチプロジェクトビルドで Dokka を構成するには、2 つの方法があります。
 
-* **[コンベンションプラグインを介した共有構成](#コンベンションプラグインを介した共有構成) (推奨)**: コンベンションプラグインを定義し、それをすべてのサブプロジェクトに適用します。これにより、Dokka の設定が集中管理されます。
+* **[コンベンションプラグインを介した共有構成](#shared-configuration-via-a-convention-plugin) (推奨)**: コンベンションプラグインを定義し、それをすべてのサブプロジェクトに適用します。これにより、Dokka の設定が集中管理されます。
 
-* **[手動構成](#手動構成)**: 各サブプロジェクトで Dokka プラグインを適用し、同じ `dokka {}` ブロックを繰り返します。コンベンションプラグインは必要ありません。
+* **[手動構成](#manual-configuration)**: 各サブプロジェクトで Dokka プラグインを適用し、同じ `dokka {}` ブロックを繰り返します。コンベンションプラグインは必要ありません。
 
-サブプロジェクトを構成した後、複数のサブプロジェクトからのドキュメントを単一の出力に集約できます。詳細については、[マルチプロジェクトビルドでのドキュメント出力の集約](#マルチプロジェクトビルドでのドキュメント出力の集約) を参照してください。
+サブプロジェクトを構成した後、複数のサブプロジェクトからのドキュメントを単一の出力に集約できます。詳細については、[マルチプロジェクトビルドでのドキュメント出力の集約](#aggregate-documentation-output-in-multi-project-builds) を参照してください。
 
 > マルチプロジェクトの例については、[Dokka の GitHub リポジトリ](https://github.com/Kotlin/dokka/tree/master/examples/gradle-v2/multimodule-example) を参照してください。
 >

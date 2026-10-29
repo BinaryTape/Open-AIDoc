@@ -334,7 +334,7 @@ Kotlin 표준 라이브러리는 사용자가 API의 일부를 사용하기 전�
 
 * 옵트인 메커니즘을 사용하여 API의 서로 다른 부분에 서로 다른 보증을 제공하십시오. 예를 들어 기능을 _Preview_, _Experimental_, _Delicate_ 등으로 표시할 수 있습니다. 각 카테고리는 문서와 [KDoc 주석](kotlin-doc.md)에서 적절한 경고 메시지와 함께 명확하게 설명되어야 합니다.
 * 라이브러리에서 실험적(experimental) API를 사용하는 경우, 해당 애노테이션을 자체 사용자에게도 [전파(propagate)](opt-in-requirements.md#propagate-opt-in-requirements)하십시오. 이를 통해 사용자는 아직 진화 중인 의존성이 있음을 인지할 수 있습니다.
-* 라이브러리의 기존 선언을 지원 중단하는 용도로 옵트인 메커니즘을 사용하지 마십시오. 대신 [실용적인 API 발전시키기](#실용적인-api-발전시키기) 섹션에서 설명한 대로 `@Deprecated`를 사용하십시오.
+* 라이브러리의 기존 선언을 지원 중단하는 용도로 옵트인 메커니즘을 사용하지 마십시오. 대신 [실용적인 API 발전시키기](#evolve-apis-pragmatically) 섹션에서 설명한 대로 `@Deprecated`를 사용하십시오.
 
 ## 다음 단계 {id="what-s-next"}
 

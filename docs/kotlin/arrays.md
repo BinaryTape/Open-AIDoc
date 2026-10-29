@@ -3,7 +3,7 @@
 
 数组是一种数据结构，包含固定数量的相同类型或其子类型的值。数组元素是有序的，可以通过索引访问。
 
-Kotlin 提供了 [`Array<T>`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-array/) 类以及[原生类型数组](#原生类型数组)。
+Kotlin 提供了 [`Array<T>`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-array/) 类以及[原生类型数组](#primitive-type-arrays)。
 
 ## 何时使用数组 {id="when-to-use-arrays"}
 
@@ -21,7 +21,7 @@ Kotlin 提供了 [`Array<T>`](https://kotlinlang.org/api/latest/jvm/stdlib/kotli
 | Java 互操作性                             | 映射为 `T[]`                                                                                                                                        | 映射为 `java.util.List` 和<br/> `java.util.Set` |
 | 函数式风格的过滤与<br/> 转换                | 有限                                                                                                                                                 | 广泛                                              |
 
-了解如何[将数组转换为集合](#将数组转换为集合)。
+了解如何[将数组转换为集合](#convert-to-collections)。
 
 ## 创建数组 {id="create-arrays"}
 
@@ -60,7 +60,7 @@ val emptyArrayRight = emptyArray<String>()
 val emptyArrayLeft: Array<String> = emptyArray()
 ```
 
-了解[如何向数组添加元素](#添加和移除元素)。
+了解[如何向数组添加元素](#add-and-remove-elements)。
 
 ### 带有 null 的数组 {id="array-with-nulls"}
 

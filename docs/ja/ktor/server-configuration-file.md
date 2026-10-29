@@ -15,7 +15,7 @@
 </p>
 <chapter title="概要" id="configuration-file-overview">
     <p>
-        サーバーの起動に<a href="#engine-main">EngineMain</a>を使用する場合、Ktorは<code>resources</code>ディレクトリにある<Path>application.*</Path>という名前のファイルから設定を自動的に読み込みます。以下の2つの構成形式がサポートされています。
+        サーバーの起動に<a href="server-create-and-configure.topic#engine-main">EngineMain</a>を使用する場合、Ktorは<code>resources</code>ディレクトリにある<Path>application.*</Path>という名前のファイルから設定を自動的に読み込みます。以下の2つの構成形式がサポートされています。
     </p>
     <list>
         <li>
@@ -111,7 +111,7 @@
     </chapter>
     <chapter title="カスタム設定" id="config-custom">
         <p>
-            <a href="#predefined-properties">定義済みプロパティ</a>の指定以外に、Ktorでは構成ファイルにカスタム設定を保持することもできます。以下の構成ファイルには、<a href="#jwt-settings">JWT</a>設定を保持するために使用されるカスタム<code>jwt</code>グループが含まれています。
+            <a href="#predefined-properties">定義済みプロパティ</a>の指定以外に、Ktorでは構成ファイルにカスタム設定を保持することもできます。以下の構成ファイルには、<a href="server-jwt.md#jwt-settings">JWT</a>設定を保持するために使用されるカスタム<code>jwt</code>グループが含まれています。
         </p>
         <tabs group="config">
             <tab title="application.conf" group-key="hocon" id="application-conf-4">
@@ -170,7 +170,7 @@
         </def>
         <def title="ktor.deployment.watch" id="ktor-deployment-watch">
             <p>
-                <a href="#watch-paths">オートリロード</a>に使用される監視パス。
+                <a href="server-auto-reload.topic#watch-paths">オートリロード</a>に使用される監視パス。
             </p>
         </def>
         <def title="ktor.deployment.rootPath" id="ktor-deployment-root-path">
@@ -322,7 +322,7 @@
 </chapter>
 <chapter title="コマンドライン" id="command-line">
     <p>
-        サーバーの作成に<a href="#engine-main">EngineMain</a>を使用する場合、<Links href="/ktor/server-fatjar" summary="Ktor Gradleプラグインを使用して、実行可能なfat JARを作成して実行する方法について説明します。">パッケージ化されたアプリケーション</Links>をコマンドラインから実行し、対応するコマンドライン引数を渡すことで、必要なサーバーパラメータをオーバーライドできます。例えば、構成ファイルで指定されたポートを次のようにオーバーライドできます。
+        サーバーの作成に<a href="server-create-and-configure.topic#engine-main">EngineMain</a>を使用する場合、<Links href="/ktor/server-fatjar" summary="Ktor Gradleプラグインを使用して、実行可能なfat JARを作成して実行する方法について説明します。">パッケージ化されたアプリケーション</Links>をコマンドラインから実行し、対応するコマンドライン引数を渡すことで、必要なサーバーパラメータをオーバーライドできます。例えば、構成ファイルで指定されたポートを次のようにオーバーライドできます。
     </p>
     <code-block lang="shell" code="            java -jar sample-app.jar -port=8080"/>
     <p>
@@ -359,7 +359,7 @@
         </def>
         <def title="-watch" id="watch">
             <p>
-                <a href="#watch-paths">オートリロード</a>に使用される監視パス。
+                <a href="server-auto-reload.topic#watch-paths">オートリロード</a>に使用される監視パス。
             </p>
         </def>
     </deflist>

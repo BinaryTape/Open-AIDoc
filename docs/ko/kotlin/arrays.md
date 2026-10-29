@@ -4,7 +4,7 @@
 배열은 동일한 타입 또는 그 하위 타입의 값을 고정된 수만큼 보유하는 데이터 구조입니다.
 배열의 요소는 순서가 정해져 있으며 인덱스로 접근할 수 있습니다.
 
-Kotlin은 [`Array<T>`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-array/) 클래스와 [원시 타입 배열](#원시-타입-배열)을 제공합니다.
+Kotlin은 [`Array<T>`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-array/) 클래스와 [원시 타입 배열](#primitive-type-arrays)을 제공합니다.
 
 ## 배열 사용 시기 {id="when-to-use-arrays"}
 
@@ -22,7 +22,7 @@ Java API와의 상호 운용성이 필요하거나 로우레벨(low-level) 요�
 | Java 상호 운용성 | `T[]`로 매핑됨 | `java.util.List` 및<br/> `java.util.Set`으로 매핑됨 |
 | 함수형 스타일 필터링 및<br/> 변환 | 제한적임 | 광범위함 |
 
-[배열을 컬렉션으로 변환](#컬렉션으로-변환)하는 방법을 알아보세요.
+[배열을 컬렉션으로 변환](#convert-to-collections)하는 방법을 알아보세요.
 
 ## 배열 생성 {id="create-arrays"}
 
@@ -63,7 +63,7 @@ val emptyArrayRight = emptyArray<String>()
 val emptyArrayLeft: Array<String> = emptyArray()
 ```
 
-배열에 [요소를 추가하는 방법](#요소-추가-및-제거)을 알아보세요.
+배열에 [요소를 추가하는 방법](#add-and-remove-elements)을 알아보세요.
 
 ### null을 포함하는 배열 {id="array-with-nulls"}
 
@@ -327,7 +327,7 @@ fun main() {
   ```
   {kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
 
-> 요소를 빈번하게 추가하거나 제거해야 한다면 대신 [가변 컬렉션(mutable collections)](collections-overview.md#컬렉션-타입)을 사용하세요.
+> 요소를 빈번하게 추가하거나 제거해야 한다면 대신 [가변 컬렉션(mutable collections)](collections-overview.md#collection-types)을 사용하세요.
 >
 {style="tip"}
 
@@ -410,7 +410,7 @@ fun main() {
 
 ### 함수에 가변 인자 전달 {id="pass-variable-number-of-arguments-to-a-function"}
 
-Kotlin에서는 [`vararg`](functions.md#가변-인자-varargs) 파라미터를 통해 함수에 가변적인 개수의 인자를 전달할 수 있습니다. 이는 메시지를 포맷팅하거나 SQL 쿼리를 생성할 때와 같이 인자의 개수를 미리 알 수 없을 때 유용합니다.
+Kotlin에서는 [`vararg`](functions.md#variable-number-of-arguments-varargs) 파라미터를 통해 함수에 가변적인 개수의 인자를 전달할 수 있습니다. 이는 메시지를 포맷팅하거나 SQL 쿼리를 생성할 때와 같이 인자의 개수를 미리 알 수 없을 때 유용합니다.
 
 가변 인자를 포함하는 배열을 함수에 전달하려면 _스프레드 연산자(spread operator)_ (`*`)를 사용하세요. 스프레드 연산자는 배열의 각 요소를 개별 인자로 선택한 함수에 전달합니다:
 
@@ -429,7 +429,7 @@ fun printAllStrings(vararg strings: String) {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="arrays-vararg-array-kotlin"}
 
-자세한 내용은 [가변 인자 (varargs)](functions.md#가변-인자-varargs)를 참조하세요.
+자세한 내용은 [가변 인자 (varargs)](functions.md#variable-number-of-arguments-varargs)를 참조하세요.
 
 ## 컬렉션으로 변환 {id="convert-to-collections"}
 
@@ -478,7 +478,7 @@ fun main() {
 
 [`Pair<K,V>`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-pair/)의 배열만 `Map`으로 변환할 수 있습니다. `Pair` 인스턴스의 첫 번째 값은 키가 되고, 두 번째 값은 값이 됩니다. 동일한 키가 여러 번 나타나면 마지막 값이 사용됩니다.
 
-이 예제는 [중위 표기법(infix notation)](functions.md#중위-표기법-infix-notation)을 사용하여 [`.to`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/to.html) 함수를 호출해 `Pair` 튜플을 생성합니다:
+이 예제는 [중위 표기법(infix notation)](functions.md#infix-notation)을 사용하여 [`.to`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/to.html) 함수를 호출해 `Pair` 튜플을 생성합니다:
 
 ```kotlin
 fun main() {

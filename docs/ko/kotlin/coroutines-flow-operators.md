@@ -719,7 +719,7 @@ suspend fun main() {
 ## 종단 연산자 {id="terminal-operators"}
 
 종단 연산자는 플로우를 수집합니다.
-방출된 값을 소비하거나, 수집된 값을 기반으로 결과를 반환하거나, [특정 `CoroutineScope`에서 플로우를 수집](#특정-coroutinescope에서-플로우-수집하기)하는 데 사용할 수 있습니다.
+방출된 값을 소비하거나, 수집된 값을 기반으로 결과를 반환하거나, [특정 `CoroutineScope`에서 플로우를 수집](#collect-a-flow-in-a-specific-coroutinescope)하는 데 사용할 수 있습니다.
 
 플로우를 수집하려면 [`collect()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/collect.html) 연산자를 사용하세요.
 `collect()`에 람다를 전달하면 각 방출된 값을 전달받습니다:

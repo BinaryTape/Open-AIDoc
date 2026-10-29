@@ -65,7 +65,7 @@
 ## %plugin_name% 설치 {id="install_plugin"}
 
 <p>
-    애플리케이션에 <code>%plugin_name%</code> 플러그인을 <a href="#install">설치(install)</a>하려면,
+    애플리케이션에 <code>%plugin_name%</code> 플러그인을 <a href="server-plugins.md#install">설치(install)</a>하려면,
     지정된 <Links href="/ktor/server-modules" summary="Modules allow you to structure your application by grouping routes.">모듈(module)</Links>의 <code>install</code> 함수에 전달하세요.
     아래 코드 스니펫은 <code>%plugin_name%</code>을 설치하는 방법을 보여줍니다...
 </p>

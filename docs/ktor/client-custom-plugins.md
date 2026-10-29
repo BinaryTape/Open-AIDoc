@@ -151,7 +151,7 @@
 </td>
 <td>
 <p>
-允许您转换<a href="#body">请求主体</a>。
+允许您转换<a href="client-requests.md#body">请求主体</a>。
 在此处理程序中，您需要将主体序列化为 
 <a href="https://api.ktor.io/ktor-http/io.ktor.http.content/-outgoing-content/index.html">OutgoingContent</a> 
 （例如 <code>TextContent</code>、<code>ByteArrayContent</code> 或 <code>FormDataContent</code>），
@@ -187,7 +187,7 @@
 </td>
 <td>
 <p>
-允许您转换<a href="#body">响应主体</a>。
+允许您转换<a href="client-responses.md#body">响应主体</a>。
 此处理程序在每次 <code>HttpResponse.body</code> 调用时触发。
 您需要将主体反序列化为 <code>requestedType</code> 的实例，
 或者如果转换不适用，则返回 <code>null</code>。
@@ -206,7 +206,7 @@
 </td>
 <td>
 允许您清理此插件分配的资源。
-当客户端被<a href="#close-client">关闭</a>时，将调用此处理程序。
+当客户端被<a href="client-create-and-configure.md#close-client">关闭</a>时，将调用此处理程序。
 </td>
 </tr>
 
@@ -263,7 +263,7 @@
 </td>
 <td>
 <p>
-允许您转换<a href="#body">请求主体</a>。
+允许您转换<a href="client-requests.md#body">请求主体</a>。
 在此处理程序中，您需要将主体序列化为 
 <a href="https://api.ktor.io/ktor-http/io.ktor.http.content/-outgoing-content/index.html">OutgoingContent</a> 
 （例如 <code>TextContent</code>、<code>ByteArrayContent</code> 或 <code>FormDataContent</code>），
@@ -344,7 +344,7 @@
 </td>
 <td>
 <p>
-允许您转换<a href="#body">响应主体</a>。
+允许您转换<a href="client-responses.md#body">响应主体</a>。
 此处理程序在每次 <code>HttpResponse.body</code> 调用时触发。
 您需要将主体反序列化为 <code>requestedType</code> 的实例，
 或者如果转换不适用，则返回 <code>null</code>。
@@ -367,7 +367,7 @@
 </td>
 <td>
 允许您清理此插件分配的资源。
-当客户端被<a href="#close-client">关闭</a>时，将调用此处理程序。
+当客户端被<a href="client-create-and-configure.md#close-client">关闭</a>时，将调用此处理程序。
 </td>
 </tr>
 

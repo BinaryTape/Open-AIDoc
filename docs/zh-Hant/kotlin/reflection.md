@@ -259,7 +259,7 @@ fun main() {
 
 ## 呼叫函式 {id="call-a-function"}
 
-動態函式呼叫遵循與[屬性](#讀取屬性)相同的模式。如果所有引數均依其宣告順序提供，你可以使用 [`call()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/-k-callable/call.html)。首先宣告未繫結的成員函式及其物件執行個體，然後依序加入其常規引數：
+動態函式呼叫遵循與[屬性](#read-a-property)相同的模式。如果所有引數均依其宣告順序提供，你可以使用 [`call()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/-k-callable/call.html)。首先宣告未繫結的成員函式及其物件執行個體，然後依序加入其常規引數：
 
 ```kotlin
 import kotlin.reflect.full.memberFunctions

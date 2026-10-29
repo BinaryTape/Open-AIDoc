@@ -151,7 +151,7 @@
 </td>
 <td>
 <p>
-允許您轉換 <a href="#body">請求主體</a>。
+允許您轉換 <a href="client-requests.md#body">請求主體</a>。
 在此處理常式中，您需要將主體序列化為 
 <a href="https://api.ktor.io/ktor-http/io.ktor.http.content/-outgoing-content/index.html">OutgoingContent</a> 
 （例如 <code>TextContent</code>、<code>ByteArrayContent</code> 或 <code>FormDataContent</code>），
@@ -187,7 +187,7 @@
 </td>
 <td>
 <p>
-允許您轉換 <a href="#body">回應主體</a>。
+允許您轉換 <a href="client-responses.md#body">回應主體</a>。
 此處理常式會針對每個 <code>HttpResponse.body</code> 呼叫叫用。
 您需要將主體反序列化為 <code>requestedType</code> 的執行個體，如果您的轉換不適用，則傳回 <code>null</code>。
 </p>
@@ -204,7 +204,7 @@
 <code>onClose</code>
 </td>
 <td>
-允許您清理此外掛程式分配的資源。當用戶端被<a href="#close-client">關閉</a>時，會呼叫此處理常式。
+允許您清理此外掛程式分配的資源。當用戶端被<a href="client-create-and-configure.md#close-client">關閉</a>時，會呼叫此處理常式。
 </td>
 </tr>
 
@@ -261,7 +261,7 @@
 </td>
 <td>
 <p>
-允許您轉換 <a href="#body">請求主體</a>。
+允許您轉換 <a href="client-requests.md#body">請求主體</a>。
 在此處理常式中，您需要將主體序列化為 
 <a href="https://api.ktor.io/ktor-http/io.ktor.http.content/-outgoing-content/index.html">OutgoingContent</a> 
 （例如 <code>TextContent</code>、<code>ByteArrayContent</code> 或 <code>FormDataContent</code>），
@@ -340,7 +340,7 @@
 </td>
 <td>
 <p>
-允許您轉換 <a href="#body">回應主體</a>。
+允許您轉換 <a href="client-responses.md#body">回應主體</a>。
 此處理常式會針對每個 <code>HttpResponse.body</code> 呼叫叫用。
 您需要將主體反序列化為 <code>requestedType</code> 的執行個體，如果您的轉換不適用，則傳回 <code>null</code>。
 </p>
@@ -361,7 +361,7 @@
 <code>onClose</code>
 </td>
 <td>
-允許您清理此外掛程式分配的資源。當用戶端被<a href="#close-client">關閉</a>時，會呼叫此處理常式。
+允許您清理此外掛程式分配的資源。當用戶端被<a href="client-create-and-configure.md#close-client">關閉</a>時，會呼叫此處理常式。
 </td>
 </tr>
 

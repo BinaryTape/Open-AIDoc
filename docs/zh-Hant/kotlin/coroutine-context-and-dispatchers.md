@@ -7,7 +7,7 @@
 
 協同程式上下文是一組各種元素的集合。主要元素是協同程式的 [Job]（我們之前見過）以及它的分派器（本節將介紹）。
 
-## 分派器與執行緒
+## 分派器與執行緒 {id="dispatchers-and-threads"}
 
 協同程式上下文包含一個 *協同程式分派器*（參見 [CoroutineDispatcher]），它決定了對應的協同程式使用哪個或哪些執行緒來執行。協同程式分派器可以將協同程式的執行限制在特定的執行緒中、將其分派到執行緒池中，或讓其不受限地執行。
 
@@ -60,7 +60,7 @@ main runBlocking      : I'm working in thread main
   
 [newSingleThreadContext] 會為協同程式建立一個執行緒來執行。專用執行緒是非常昂貴的資源。在實際應用程式中，當不再需要時，必須使用 [close][ExecutorCoroutineDispatcher.close] 函式將其釋放，或者將其儲存在頂層變數中並在整個應用程式中重複使用。
 
-## 不受限與受限分派器
+## 不受限與受限分派器 {id="unconfined-vs-confined-dispatcher"}
  
 [Dispatchers.Unconfined] 協同程式分派器會在呼叫者執行緒中啟動協同程式，但僅持續到第一個掛起點。掛起之後，它會在由所調用的掛起函式完全決定的執行緒中恢復協同程式。不受限分派器適用於既不消耗 CPU 時間，也不更新受限於特定執行緒的任何共享資料（如 UI）的協同程式。
 
@@ -107,11 +107,11 @@ main runBlocking: After delay in thread main
 >
 {style="note"}
 
-## 偵錯協同程式與執行緒
+## 偵錯協同程式與執行緒 {id="debugging-coroutines-and-threads"}
 
 協同程式可以在一個執行緒上掛起，並在另一個執行緒上恢復。如果沒有專門的工具，即使使用單執行緒分派器，也可能很難弄清楚協同程式在何時、何地、正在做什麼。
 
-### 使用 IDEA 偵錯
+### 使用 IDEA 偵錯 {id="debugging-with-idea"}
 
 Kotlin 外掛程式的協同程式偵錯工具簡化了在 IntelliJ IDEA 中偵錯協同程式的過程。
 
@@ -133,7 +133,7 @@ Kotlin 外掛程式的協同程式偵錯工具簡化了在 IntelliJ IDEA 中偵�
 
 在[教學](https://kotlinlang.org/docs/tutorials/coroutines/debug-coroutines-with-idea.html)中進一步了解協同程式偵錯。
 
-### 使用日誌偵錯
+### 使用日誌偵錯 {id="debugging-using-logging"}
 
 在沒有協同程式偵錯工具的情況下，另一種偵錯帶有執行緒的應用程式的方法是在每條日誌陳述式的日誌檔案中印出執行緒名稱。日誌架構普遍支援此功能。在使用協同程式時，僅憑執行緒名稱無法提供太多上下文，因此 `kotlinx.coroutines` 包含了一些偵錯功能使其更容易。
 
@@ -180,9 +180,9 @@ fun main() = runBlocking<Unit> {
 >
 {style="note"}
 
-## 在執行緒之間跳轉
+## 在執行緒之間跳轉 {id="jumping-between-threads"}
 
-使用 `-Dkotlinx.coroutines.debug` JVM 選項執行以下程式碼（參見[偵錯](#偵錯協同程式與執行緒)）：
+使用 `-Dkotlinx.coroutines.debug` JVM 選項執行以下程式碼（參見[偵錯](#debugging-coroutines-and-threads)）：
 
 ```kotlin
 import kotlinx.coroutines.*
@@ -225,7 +225,7 @@ fun main() {
 
 上面的範例使用了 Kotlin 標準函式庫中的 `use` 函式，以便在不再需要時正確釋放由 [newSingleThreadContext] 建立的執行緒資源。
 
-## 上下文中的 Job
+## 上下文中的 Job {id="job-in-the-context"}
 
 協同程式的 [Job] 是其上下文的一部分，可以使用 `coroutineContext[Job]` 運算式從中檢索：
 
@@ -244,7 +244,7 @@ fun main() = runBlocking<Unit> {
 > 
 {style="note"}
 
-在[偵錯模式](#偵錯協同程式與執行緒)下，它會輸出如下內容：
+在[偵錯模式](#debugging-coroutines-and-threads)下，它會輸出如下內容：
 
 ```
 My job is "coroutine#1":BlockingCoroutine{Active}@6d311334
@@ -254,7 +254,7 @@ My job is "coroutine#1":BlockingCoroutine{Active}@6d311334
 
 請注意，[CoroutineScope] 中的 [isActive] 只是 `coroutineContext[Job]?.isActive == true` 的便捷簡寫。
 
-## 協同程式的子協同程式
+## 協同程式的子協同程式 {id="children-of-a-coroutine"}
 
 當一個協同程式在另一個協同程式的 [CoroutineScope] 中啟動時，它會透過 [CoroutineScope.coroutineContext] 繼承其上下文，並且新協同程式的 [Job] 會成為父協同程式 Job 的 *子項*。當父協同程式被取消時，它的所有子項也會被遞歸取消。
 
@@ -310,7 +310,7 @@ job1: I am not affected by cancellation of the request
 
 <!--- TEST -->
 
-## 父協同程式的職責
+## 父協同程式的職責 {id="parental-responsibilities"}
 
 父協同程式總是等待其所有子項完成。父協同程式不必顯式追蹤它啟動的所有子項，也不必在結束時使用 [Job.join] 來等待它們：
 
@@ -352,9 +352,9 @@ Now processing of the request is complete
 
 <!--- TEST -->
 
-## 為偵錯命名的協同程式
+## 為偵錯命名的協同程式 {id="naming-coroutines-for-debugging"}
 
-當協同程式頻繁記錄日誌，而您只需要關聯來自同一個協同程式的日誌記錄時，自動分配的 ID 很好用。然而，當協同程式與特定請求的處理相關聯或執行某些特定的背景任務時，最好為了偵錯目的顯式命名它。[CoroutineName] 上下文元素與執行緒名稱具有相同的作用。當[偵錯模式](#偵錯協同程式與執行緒)開啟時，它會包含在執行此協同程式的執行緒名稱中。
+當協同程式頻繁記錄日誌，而您只需要關聯來自同一個協同程式的日誌記錄時，自動分配的 ID 很好用。然而，當協同程式與特定請求的處理相關聯或執行某些特定的背景任務時，最好為了偵錯目的顯式命名它。[CoroutineName] 上下文元素與執行緒名稱具有相同的作用。當[偵錯模式](#debugging-coroutines-and-threads)開啟時，它會包含在執行此協同程式的執行緒名稱中。
 
 以下範例示範了這個概念：
 
@@ -398,7 +398,7 @@ fun main() = runBlocking(CoroutineName("main")) {
 
 <!--- TEST FLEXIBLE_THREAD -->
 
-## 組合上下文元素
+## 組合上下文元素 {id="combining-context-elements"}
 
 有時我們需要為協同程式上下文定義多個元素。我們可以使用 `+` 運算子來實現這一點。例如，我們可以同時啟動一個具有顯式指定分派器和顯式指定名稱的協同程式：
 
@@ -427,7 +427,7 @@ I'm working in thread DefaultDispatcher-worker-1 @test#2
 
 <!--- TEST FLEXIBLE_THREAD -->
 
-## 協同程式作用域
+## 協同程式作用域 {id="coroutine-scope"}
 
 讓我們將關於上下文、子項和 Job 的知識放在一起。假設我們的應用程式有一個具有生命週期的物件，但該物件不是協同程式。例如，我們正在編寫一個 Android 應用程式，並在 Android activity 的上下文中啟動各種協同程式，以執行非同步操作來獲取和更新資料、執行動畫等。當 activity 被銷毀時，必須取消這些協同程式，以避免記憶體洩漏。
 
@@ -521,7 +521,7 @@ Destroying activity!
 >
 {style="note"}
 
-### 執行緒區域資料
+### 執行緒區域資料 {id="thread-local-data"}
 
 有時能夠將某些執行緒區域資料傳遞給協同程式或在協同程式之間傳遞是很方便的。然而，由於它們不綁定到任何特定的執行緒，如果手動完成，這可能會導致樣板程式碼。
 
@@ -554,7 +554,7 @@ fun main() = runBlocking<Unit> {
 >
 {style="note"}
 
-在此範例中，我們使用 [Dispatchers.Default] 在背景執行緒池中啟動一個新協同程式，因此它在執行緒池的不同執行緒上運作，但它仍然具有我們使用 `threadLocal.asContextElement(value = "launch")` 指定的執行緒區域變數的值，無論協同程式在哪个執行緒上執行。因此，輸出（帶有[偵錯](#偵錯協同程式與執行緒)）為：
+在此範例中，我們使用 [Dispatchers.Default] 在背景執行緒池中啟動一個新協同程式，因此它在執行緒池的不同執行緒上運作，但它仍然具有我們使用 `threadLocal.asContextElement(value = "launch")` 指定的執行緒區域變數的值，無論協同程式在哪个執行緒上執行。因此，輸出（帶有[偵錯](#debugging-coroutines-and-threads)）為：
 
 ```text
 Pre-main, current thread: Thread[main @coroutine#1,5,main], thread local value: 'main'

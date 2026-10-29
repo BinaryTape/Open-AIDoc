@@ -7,7 +7,7 @@
 
 Gradle 기반 프로젝트의 문서를 생성하려면 [Dokka용 Gradle 플러그인](https://plugins.gradle.org/plugin/org.jetbrains.dokka)을 사용할 수 있습니다.
 
-Dokka Gradle 플러그인(DGP)은 프로젝트를 위한 기본 자동 구성을 제공하며, 문서 생성을 위한 [Gradle 태스크](#문서-생성)를 포함하고, 출력을 커스터마이징할 수 있는 [구성 옵션](dokka-gradle-configuration-options.md)을 제공합니다.
+Dokka Gradle 플러그인(DGP)은 프로젝트를 위한 기본 자동 구성을 제공하며, 문서 생성을 위한 [Gradle 태스크](#generate-documentation)를 포함하고, 출력을 커스터마이징할 수 있는 [구성 옵션](dokka-gradle-configuration-options.md)을 제공합니다.
 
 [Gradle 예제 프로젝트](https://github.com/Kotlin/dokka/tree/2.0.0/examples/gradle-v2)에서 Dokka를 직접 실행해 보고 다양한 프로젝트에 맞게 구성하는 방법을 살펴볼 수 있습니다.
 
@@ -46,7 +46,7 @@ plugins {
 </tab>
 </tabs>
 
-멀티 프로젝트 빌드(multi-project builds)를 문서화할 때는 문서화하려는 모든 서브프로젝트에 플러그인을 명시적으로 적용해야 합니다. 각 서브프로젝트에서 Dokka를 직접 구성하거나, 컨벤션 플러그인(convention plugin)을 사용하여 서브프로젝트 간에 Dokka 구성을 공유할 수 있습니다. 자세한 내용은 [단일 프로젝트](#단일-프로젝트-구성) 및 [멀티 프로젝트](#멀티-프로젝트-구성) 빌드 구성 방법을 참조하세요.
+멀티 프로젝트 빌드(multi-project builds)를 문서화할 때는 문서화하려는 모든 서브프로젝트에 플러그인을 명시적으로 적용해야 합니다. 각 서브프로젝트에서 Dokka를 직접 구성하거나, 컨벤션 플러그인(convention plugin)을 사용하여 서브프로젝트 간에 Dokka 구성을 공유할 수 있습니다. 자세한 내용은 [단일 프로젝트](#single-project-configuration) 및 [멀티 프로젝트](#multi-project-configuration) 빌드 구성 방법을 참조하세요.
 
 > * 내부적으로 Dokka는 [Kotlin Gradle 플러그인](https://kotlinlang.org/docs/gradle-configure-project.html#apply-the-plugin)을 사용하여 문서가 생성될 [소스 세트(source sets)](https://kotlinlang.org/docs/multiplatform-discover-project.html#source-sets)를 자동으로 구성합니다. 반드시 Kotlin Gradle 플러그인을 적용하거나 [소스 세트를 수동으로 구성](dokka-gradle-configuration-options.md#source-set-configuration)하세요.
 >
@@ -73,8 +73,8 @@ Dokka Gradle 플러그인에는 [HTML](dokka-html.md) 및 [Javadoc](dokka-javado
 
 `dokkaGenerate` Gradle 태스크의 주요 동작은 다음과 같습니다:
 
-* 이 태스크는 [단일](#단일-프로젝트-구성) 및 [멀티 프로젝트](#멀티-프로젝트-구성) 빌드 모두에 대해 문서를 생성합니다.
-* 기본적으로 문서 출력 형식은 HTML입니다. [적절한 플러그인을 추가](#문서-출력-형식-구성)하여 Javadoc을 생성하거나 HTML과 Javadoc 형식을 모두 생성할 수도 있습니다.
+* 이 태스크는 [단일](#single-project-configuration) 및 [멀티 프로젝트](#multi-project-configuration) 빌드 모두에 대해 문서를 생성합니다.
+* 기본적으로 문서 출력 형식은 HTML입니다. [적절한 플러그인을 추가](#configure-documentation-output-format)하여 Javadoc을 생성하거나 HTML과 Javadoc 형식을 모두 생성할 수도 있습니다.
 * 생성된 문서는 단일 및 멀티 프로젝트 빌드 모두에서 자동으로 `build/dokka/html` 디렉토리에 저장됩니다. [위치(`outputDirectory`)를 변경](dokka-gradle-configuration-options.md#general-configuration)할 수 있습니다.
 
 ### 문서 출력 형식 구성 {id="configure-documentation-output-format"}
@@ -119,7 +119,7 @@ IntelliJ IDEA를 사용 중이라면 `dokkaGenerateHtml` Gradle 태스크가 보
 
 Dokka는 여러 서브프로젝트의 문서를 하나의 출력물이나 퍼블리케이션(publication)으로 통합(aggregate)할 수 있습니다.
 
-문서를 통합하기 전에 문서화하려는 [모든 서브프로젝트에 Dokka 플러그인을 적용](#서브프로젝트에-컨벤션-플러그인-적용)해야 합니다.
+문서를 통합하기 전에 문서화하려는 [모든 서브프로젝트에 Dokka 플러그인을 적용](#apply-the-convention-plugin-to-your-subprojects)해야 합니다.
 
 여러 서브프로젝트의 문서를 통합하려면 루트 프로젝트의 `build.gradle.kts` 파일에 `dependencies {}` 블록을 추가하세요:
 
@@ -233,9 +233,9 @@ tasks.register('dokkaJavadocJar', Jar) {
 
 프로젝트 유형에 따라 Dokka를 적용하고 구성하는 방식이 약간씩 다릅니다. 하지만 [구성 옵션](dokka-gradle-configuration-options.md) 자체는 프로젝트 유형에 관계없이 동일합니다.
 
-프로젝트 루트에 단일 `build.gradle.kts` 또는 `build.gradle` 파일이 있는 단순하고 평면적인 프로젝트의 경우, [단일 프로젝트 구성](#단일-프로젝트-구성)을 참조하세요.
+프로젝트 루트에 단일 `build.gradle.kts` 또는 `build.gradle` 파일이 있는 단순하고 평면적인 프로젝트의 경우, [단일 프로젝트 구성](#single-project-configuration)을 참조하세요.
 
-서브프로젝트와 여러 개의 중첩된 `build.gradle.kts` 또는 `build.gradle` 파일이 있는 더 복잡한 빌드의 경우, [멀티 프로젝트 구성](#멀티-프로젝트-구성)을 참조하세요.
+서브프로젝트와 여러 개의 중첩된 `build.gradle.kts` 또는 `build.gradle` 파일이 있는 더 복잡한 빌드의 경우, [멀티 프로젝트 구성](#multi-project-configuration)을 참조하세요.
 
 ### 단일 프로젝트 구성 {id="single-project-configuration"}
 
@@ -418,15 +418,15 @@ dokka {
 </tab>
 </tabs>
 
-단일 및 멀티 프로젝트 문서는 [최상위 `dokka {}` DSL을 사용한 동일한 구성 모델](#단일-프로젝트-구성)을 공유합니다.
+단일 및 멀티 프로젝트 문서는 [최상위 `dokka {}` DSL을 사용한 동일한 구성 모델](#single-project-configuration)을 공유합니다.
 
 멀티 프로젝트 빌드에서 Dokka를 구성하는 방법에는 두 가지가 있습니다:
 
-* **[컨벤션 플러그인을 통한 공유 구성](#컨벤션-플러그인을-통한-공유-구성) (권장)**: 컨벤션 플러그인을 정의하고 이를 모든 서브프로젝트에 적용합니다. 이는 Dokka 설정을 중앙 집중화합니다.
+* **[컨벤션 플러그인을 통한 공유 구성](#shared-configuration-via-a-convention-plugin) (권장)**: 컨벤션 플러그인을 정의하고 이를 모든 서브프로젝트에 적용합니다. 이는 Dokka 설정을 중앙 집중화합니다.
 
-* **[수동 구성](#수동-구성)**: 각 서브프로젝트에 Dokka 플러그인을 적용하고 동일한 `dokka {}` 블록을 반복합니다. 컨벤션 플러그인이 필요하지 않습니다.
+* **[수동 구성](#manual-configuration)**: 각 서브프로젝트에 Dokka 플러그인을 적용하고 동일한 `dokka {}` 블록을 반복합니다. 컨벤션 플러그인이 필요하지 않습니다.
 
-서브프로젝트를 구성한 후, 여러 서브프로젝트의 문서를 하나의 출력으로 통합할 수 있습니다. 자세한 내용은 [멀티 프로젝트 빌드에서 문서 출력 통합](#멀티-프로젝트-빌드에서-문서-출력-통합)을 참조하세요.
+서브프로젝트를 구성한 후, 여러 서브프로젝트의 문서를 하나의 출력으로 통합할 수 있습니다. 자세한 내용은 [멀티 프로젝트 빌드에서 문서 출력 통합](#aggregate-documentation-output-in-multi-project-builds)을 참조하세요.
 
 > 멀티 프로젝트 예제는 [Dokka GitHub 저장소](https://github.com/Kotlin/dokka/tree/master/examples/gradle-v2/multimodule-example)를 참조하세요.
 >

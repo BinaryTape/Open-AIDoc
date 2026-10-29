@@ -9,7 +9,7 @@ Null 포인터 예외가 발생할 확률을 최소화하기 위해 코드를 �
 이 가이드는 null일 가능성이 있는 변수를 처리하는 Java와 Kotlin의 접근 방식 차이점을 다룹니다.
 이를 통해 Java에서 Kotlin으로 마이그레이션하고 Kotlin다운(authentic) 스타일로 코드를 작성하는 데 도움을 줄 것입니다.
 
-가이드의 첫 번째 부분에서는 가장 중요한 차이점인 Kotlin의 nullable 타입 지원과 Kotlin이 [Java 코드의 타입](#플랫폼-타입)을 처리하는 방식을 다룹니다. [함수 호출 결과 확인](#함수-호출-결과-확인)부터 시작되는 두 번째 부분에서는 몇 가지 구체적인 사례를 살펴보며 구체적인 차이점을 설명합니다.
+가이드의 첫 번째 부분에서는 가장 중요한 차이점인 Kotlin의 nullable 타입 지원과 Kotlin이 [Java 코드의 타입](#platform-types)을 처리하는 방식을 다룹니다. [함수 호출 결과 확인](#checking-the-result-of-a-function-call)부터 시작되는 두 번째 부분에서는 몇 가지 구체적인 사례를 살펴보며 구체적인 차이점을 설명합니다.
 
 [Kotlin의 null 안전성에 대해 더 알아보기](null-safety.md).
 

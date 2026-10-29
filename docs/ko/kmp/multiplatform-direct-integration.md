@@ -41,7 +41,7 @@ CocoaPods 플러그인에서 마이그레이션하려면:
 3. `build.gradle(.kts)` 파일에서 `cocoapods {}` 블록을 제거합니다.
 4. `.podspec` 파일과 Podfile을 삭제합니다.
 
-### 프로젝트에 프레임워크 연결
+### 프로젝트에 프레임워크 연결 {id="connect-the-framework-to-your-project"}
 
 다중 플랫폼 프로젝트에서 생성된 Kotlin 프레임워크를 Xcode 프로젝트에 연결하려면:
 

@@ -73,19 +73,19 @@
     <chapter title="啟用開發模式" id="enable">
         <p>
             要使用自動重新載入，您需要先啟用
-            <a href="#enable">開發模式</a>。
+            <a href="server-development-mode.topic#enable">開發模式</a>。
             這取決於您 <Links href="//server-create-and-configure" summary="了解如何根據您的應用程式部署需求建立伺服器。">建立並執行伺服器</Links> 的方式：
         </p>
         <list>
             <li>
                 <p>
-                    如果您使用 <code>EngineMain</code> 來執行伺服器，請在 <a href="#application-conf">組態檔</a> 中啟用開發模式。
+                    如果您使用 <code>EngineMain</code> 來執行伺服器，請在 <a href="server-development-mode.topic#application-conf">組態檔</a> 中啟用開發模式。
                 </p>
             </li>
             <li>
                 <p>
                     如果您使用 <code>embeddedServer</code> 執行伺服器，可以使用
-                    <a href="#system-property"><code>io.ktor.development</code></a>
+                    <a href="server-development-mode.topic#system-property"><code>io.ktor.development</code></a>
                     系統屬性。
                 </p>
             </li>

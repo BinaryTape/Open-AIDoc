@@ -59,7 +59,7 @@
     </TabItem>
 </Tabs>
 <p>
-    <code>%plugin_name%</code> 插件也可以<a href="#install-route">安装到特定路由</a>。
+    <code>%plugin_name%</code> 插件也可以<a href="server-plugins.md#install-route">安装到特定路由</a>。
     如果您需要为不同的应用程序资源使用不同的 <code>%plugin_name%</code> 配置，这可能会很有用。
 </p>
 

@@ -46,7 +46,7 @@
 ## 安装 %plugin_name% {id="install_plugin"}
 
 <p>
-    要将 <code>%plugin_name%</code> 插件<a href="#install">安装</a>到应用程序，请将其传递给指定<Links href="/ktor/server-modules" summary="模块允许您通过对路由进行分组来构建应用程序。">模块</Links>中的 <code>install</code> 函数。
+    要将 <code>%plugin_name%</code> 插件<a href="server-plugins.md#install">安装</a>到应用程序，请将其传递给指定<Links href="/ktor/server-modules" summary="模块允许您通过对路由进行分组来构建应用程序。">模块</Links>中的 <code>install</code> 函数。
     以下代码段展示了如何安装 <code>%plugin_name%</code> ……
 </p>
 <list>
@@ -66,7 +66,7 @@
     </TabItem>
 </Tabs>
 <p>
-    <code>%plugin_name%</code> 插件还可以<a href="#install-route">安装到特定路由</a>。
+    <code>%plugin_name%</code> 插件还可以<a href="server-plugins.md#install-route">安装到特定路由</a>。
     如果您需要为不同的应用程序资源使用不同的 <code>%plugin_name%</code> 配置，这会非常有用。
 </p>
 

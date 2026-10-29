@@ -8,7 +8,7 @@
     <list>
         <li>서버를 재시작하지 않고 애플리케이션 클래스를 다시 로드하기 위한 <Links href="//server-auto-reload" summary="Learn how to use Auto-reload to reload application classes on code changes.">자동 리로드(Auto-reload)</Links>.
         </li>
-        <li><a href="#pipelines">파이프라인(pipelines)</a> 디버깅을 위한 확장 정보(스택 트레이스 포함).
+        <li><a href="server-custom-plugins-base-api.md#pipelines">파이프라인(pipelines)</a> 디버깅을 위한 확장 정보(스택 트레이스 포함).
         </li>
         <li><emphasis>5**</emphasis> 서버 오류가 발생한 경우 <Links href="//server-status-pages" summary="%plugin_name% allows Ktor applications to respond appropriately to any failure state based on a thrown exception or status code.">응답 페이지(response page)</Links>에 표시되는 확장 디버깅 정보.
         </li>
@@ -69,7 +69,7 @@
         </chapter>
         <chapter title="'io.ktor.development' 환경 변수" id="environment-variable">
             <p>
-                <a href="#native">네이티브 클라이언트(Native client)</a>의 개발 모드를 활성화하려면 <code>io.ktor.development</code> 환경 변수를 사용하세요.
+                <a href="client-engines.md#native">네이티브 클라이언트(Native client)</a>의 개발 모드를 활성화하려면 <code>io.ktor.development</code> 환경 변수를 사용하세요.
             </p>
         </chapter>
     </chapter>

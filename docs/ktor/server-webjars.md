@@ -67,7 +67,7 @@
 
 <p>
     要将 <code>%plugin_name%</code> 插件安装到应用，
-    请将其传递给指定<Links href="/ktor/server-modules" summary="模块允许您通过对路由进行分组来构建应用程序。">模块</Links>中的 <a href="#install">install</a> 函数。
+    请将其传递给指定<Links href="/ktor/server-modules" summary="模块允许您通过对路由进行分组来构建应用程序。">模块</Links>中的 <a href="server-plugins.md#install">install</a> 函数。
     以下代码段展示了如何安装 <code>%plugin_name%</code> ...
 </p>
 <list>

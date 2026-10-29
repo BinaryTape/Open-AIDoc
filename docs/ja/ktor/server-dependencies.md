@@ -166,7 +166,7 @@
     <list>
         <li>
             <p>
-                <a href="#embedded-server">embeddedServer</a>を使用する場合、メインクラスを次のように指定します。
+                <a href="server-create-and-configure.topic#embedded-server">embeddedServer</a>を使用する場合、メインクラスを次のように指定します。
             </p>
             <Tabs group="languages">
                 <TabItem title="Gradle (Kotlin)" group-key="kotlin">
@@ -182,7 +182,7 @@
         </li>
         <li>
             <p>
-                <a href="#engine-main">EngineMain</a>を使用する場合、それをメインクラスとして設定する必要があります。
+                <a href="server-create-and-configure.topic#engine-main">EngineMain</a>を使用する場合、それをメインクラスとして設定する必要があります。
                 Nettyの場合、以下のようになります。
             </p>
             <Tabs group="languages">

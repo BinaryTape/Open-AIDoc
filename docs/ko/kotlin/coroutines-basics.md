@@ -227,7 +227,7 @@ dependencies {
 >
 {style="tip"}
 
-## 코루틴 스코프와 구조화된 동시성
+## 코루틴 스코프와 구조화된 동시성 {id="coroutine-scope-and-structured-concurrency"}
 
 애플리케이션에서 많은 코루틴을 실행할 때는 이를 그룹으로 관리할 방법이 필요합니다. 코틀린 코루틴은 이러한 구조를 제공하기 위해 _구조화된 동시성(structured concurrency)_이라는 원칙에 의존합니다.
 
@@ -239,7 +239,7 @@ dependencies {
 
 `CoroutineScope`에서 `CoroutineScope.launch()`와 같은 [코루틴 빌더 함수](#coroutine-builder-functions)를 호출하면 해당 스코프와 연결된 코루틴의 자식 코루틴이 시작됩니다. 빌더의 블록 내부에서 [수신 객체(receiver)](lambdas.md#function-literals-with-receiver)는 중첩된 `CoroutineScope`이므로, 거기서 시작하는 모든 코루틴은 그 자식이 됩니다.
 
-### `coroutineScope()` 함수로 코루틴 스코프 만들기
+### `coroutineScope()` 함수로 코루틴 스코프 만들기 {id="create-a-coroutine-scope-with-the-coroutinescope-function"}
 
 현재 코루틴 문맥을 사용하여 새로운 코루틴 스코프를 만들려면 [`coroutineScope()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/coroutine-scope.html) 함수를 사용합니다. 이 함수는 코루틴 하위 트리의 루트 코루틴을 생성합니다. 이는 블록 내부에서 시작된 코루틴의 직접적인 부모이자, 그들이 시작한 모든 코루틴의 간접적인 부모가 됩니다. `coroutineScope()`는 중단 블록을 실행하고 해당 블록과 그 안에서 시작된 모든 코루틴이 완료될 때까지 기다립니다.
 

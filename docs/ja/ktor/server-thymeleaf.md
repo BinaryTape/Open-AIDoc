@@ -45,7 +45,7 @@ Ktorでは、[Thymeleaf](https://api.ktor.io/ktor-server-thymeleaf/io.ktor.serve
 ## Thymeleafのインストール {id="install_plugin"}
 
 <p>
-    アプリケーションに<code>%plugin_name%</code>プラグインを<a href="#install">インストール</a>するには、指定された<Links href="/ktor/server-modules" summary="モジュールを使用すると、ルートをグループ化してアプリケーションを構造化できます。">モジュール</Links>内の<code>install</code>関数に渡します。
+    アプリケーションに<code>%plugin_name%</code>プラグインを<a href="server-plugins.md#install">インストール</a>するには、指定された<Links href="/ktor/server-modules" summary="モジュールを使用すると、ルートをグループ化してアプリケーションを構造化できます。">モジュール</Links>内の<code>install</code>関数に渡します。
     以下のコードスニペットは、<code>%plugin_name%</code>をインストールする方法を示しています。
 </p>
 <list>

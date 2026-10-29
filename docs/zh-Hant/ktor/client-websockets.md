@@ -46,7 +46,7 @@ Ktor 在伺服器端與用戶端均支援 WebSocket 協定。
     </tip>
 </chapter>
 <chapter title="安裝 WebSockets" id="install_plugin">
-    <p>若要安裝 <code>WebSockets</code> 外掛程式，請將其傳遞給 <a href="#configure-client">用戶端配置區塊</a>內的 <code>install</code> 函式：</p>
+    <p>若要安裝 <code>WebSockets</code> 外掛程式，請將其傳遞給 <a href="client-create-and-configure.md#configure-client">用戶端配置區塊</a>內的 <code>install</code> 函式：</p>
     <code-block lang="kotlin" code="            import io.ktor.client.*&#10;            import io.ktor.client.engine.cio.*&#10;            import io.ktor.client.plugins.websocket.*&#10;&#10;            //...&#10;            val client = HttpClient(CIO) {&#10;                install(WebSockets)&#10;            }"/>
 </chapter>
 <chapter title="配置" id="configure_plugin">
@@ -72,7 +72,7 @@ Ktor 在伺服器端與用戶端均支援 WebSocket 協定。
         </def>
     </deflist>
     <warning>
-        <p><code>pingInterval</code> 與 <code>pingIntervalMillis</code> 屬性不適用於 OkHttp 引擎。若要設定 OkHttp 的 ping 間隔，您可以使用<a href="#okhttp">引擎配置</a>：
+        <p><code>pingInterval</code> 與 <code>pingIntervalMillis</code> 屬性不適用於 OkHttp 引擎。若要設定 OkHttp 的 ping 間隔，您可以使用<a href="client-engines.md#okhttp">引擎配置</a>：
         </p>
         <code-block lang="kotlin" code="                import io.ktor.client.engine.okhttp.OkHttp&#10;&#10;                val client = HttpClient(OkHttp) {&#10;                    engine {&#10;                        preconfigured = OkHttpClient.Builder()&#10;                            .pingInterval(20, TimeUnit.SECONDS)&#10;                            .build()&#10;                    }&#10;                }"/>
     </warning>

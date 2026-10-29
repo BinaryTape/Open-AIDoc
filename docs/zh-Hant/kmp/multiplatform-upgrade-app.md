@@ -554,7 +554,7 @@ SwiftUI 將 ViewModel（`ContentView.ViewModel`）與視圖（`ContentView`）�
     }
     ```
 
-#### 在 Xcode 中使用 SwiftPM 匯入程式庫
+#### 在 Xcode 中使用 SwiftPM 匯入程式庫 {id="import-the-library-using-swiftpm-in-xcode"}
 
 安裝與 `async/await` 機制搭配運作所需的 KMP-NativeCoroutines Swift 套件組件：
 
@@ -577,7 +577,7 @@ SwiftUI 將 ViewModel（`ContentView.ViewModel`）與視圖（`ContentView`）�
    這會建立一個 `Package.resolved` 鎖定檔案，供 Kotlin Multiplatform 建置任務使用，
    並可提交至存儲庫以保持 Swift 套件版本的一致性。
 
-#### 使用 KMP-NativeCoroutines 程式庫取用 Flow
+#### 使用 KMP-NativeCoroutines 程式庫取用 Flow {id="consume-the-flow-using-the-kmp-nativecoroutines-library"}
 
 1. 在 `iosApp/ContentView.swift` 中更新 `startObserving()` 函式，以使用來自 KMP-NativeCoroutines 的 `asyncSequence()` 函式取用 Flow：
 
@@ -636,7 +636,7 @@ SwiftUI 將 ViewModel（`ContentView.ViewModel`）與視圖（`ContentView`）�
 >
 {style="warning"}
 
-### 選項 2. 設定 SKIE {initial-collapse-state="collapsed" collapsible="true"}
+### 選項 2. 設定 SKIE {initial-collapse-state="collapsed" collapsible="true" id="option-2-configure-skie"}
 
 若要設定該程式庫，請將 SKIE 版本與外掛程式參照新增至 Gradle 版本目錄：
 

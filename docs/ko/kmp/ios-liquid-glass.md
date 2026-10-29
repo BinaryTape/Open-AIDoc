@@ -5,7 +5,7 @@
 
 [리퀴드 글래스(Liquid Glass)](https://developer.apple.com/documentation/TechnologyOverviews/liquid-glass)는 iOS 26에서 도입된 Apple의 비주얼 디자인 시스템으로, UI 요소에 유리 같은 반투명함과 유동성을 제공합니다.
 Compose Multiplatform 앱에 이를 도입하려면 네이티브 SwiftUI 쉘(shell)이 필요합니다. 리퀴드 글래스 효과는 네이티브 `TabView`, `NavigationStack`, 그리고 툴바 API를 통해 시스템에 의해 렌더링되기 때문입니다.
-SwiftUI가 프로젝트에 적합하지 않은 경우, [대안 접근 방식](#대안-접근-방식)을 참조하세요.
+SwiftUI가 프로젝트에 적합하지 않은 경우, [대안 접근 방식](#alternative-approaches)을 참조하세요.
 
 이 튜토리얼에서는 각 화면의 콘텐츠 렌더링은 Compose가 담당하게 유지하면서, **iOS 앱의 내비게이션을 완전한 Compose 기반에서 iOS 26 리퀴드 글래스 스타일의 네이티브 SwiftUI 내비게이션으로 마이그레이션하는 방법**을 안내합니다.
 앱이 네이티브 `TabView`와 `NavigationStack` 뷰를 사용하면 시스템이 리퀴드 글래스 효과를 자동으로 적용하므로, 리퀴드 글래스 전용 코드를 별도로 작성할 필요는 없습니다.
@@ -739,7 +739,7 @@ struct ContentView: View {
 
 이 튜토리얼의 마이그레이션 방식은 네이티브 SwiftUI 내비게이션을 선호하며, 이를 통해 리퀴드 글래스 및 기타 시스템 동작을 즉시 사용할 수 있습니다. 이 방식이 프로젝트에 맞지 않는다면 다음 대안 중 하나를 고려해 보세요:
 
-* **Kotlin에서 조정되는 UIKit 내비게이션**: `commonMain`에서 내비게이션 계약을 `expect class` 코디네이터로 선언하고, 각 플랫폼에서 `actual` 구현을 통해 `UITabBarController` 및 `UINavigationController`를 명령적으로 구동합니다. SwiftUI 쉘 없이도 리퀴드 글래스와 단일 내비게이션 상태 소스를 얻을 수 있지만, UIKit 상호운용 코드를 작성해야 합니다. 자세한 내용은 [SwiftUI를 건너뛰고 Kotlin에서 UIKit 구동하기](#대안-swiftui를-건너뛰고-kotlin에서-uikit-구동하기)를 참조하세요.
+* **Kotlin에서 조정되는 UIKit 내비게이션**: `commonMain`에서 내비게이션 계약을 `expect class` 코디네이터로 선언하고, 각 플랫폼에서 `actual` 구현을 통해 `UITabBarController` 및 `UINavigationController`를 명령적으로 구동합니다. SwiftUI 쉘 없이도 리퀴드 글래스와 단일 내비게이션 상태 소스를 얻을 수 있지만, UIKit 상호운용 코드를 작성해야 합니다. 자세한 내용은 [SwiftUI를 건너뛰고 Kotlin에서 UIKit 구동하기](#alternative-skip-swiftui-and-drive-uikit-from-kotlin)를 참조하세요.
 * **네이티브 상호운용 컨트롤이 있는 Compose 기반 내비게이션**: 내비게이션은 Compose에 유지하되, `UITabBar` 및 `UINavigationBar`와 같은 네이티브 UI 컨트롤을 리퀴드 글래스 스타일링과 함께 임베딩합니다. 단점은 네이티브 오버레이와 Compose 콘텐츠 간의 일부 상호운용성 제한입니다.
 * **적응형 UI를 위한 서드파티 솔루션을 활용한 Compose 기반 내비게이션**: [Calf](https://klibs.io/project/MohamedRejeb/Calf)와 같은 라이브러리를 사용하여 앱이 실행 중인 플랫폼에 네이티브인 적응형 UI 컴포넌트를 렌더링합니다. 이 방식은 플랫폼 차이를 직접 처리하는 복잡성을 줄여주며 iOS의 리퀴드 글래스와 같은 네이티브 동작을 기본적으로 제공합니다.
 * **리퀴드 글래스 효과를 모방한 Compose 전용 내비게이션**: 모든 것을 Compose에서 렌더링하고 리퀴드 글래스를 시각적으로 근사하게 구현합니다. 예를 들어 [AndroidLiquidGlass](https://klibs.io/project/Kyant0/AndroidLiquidGlass) 또는 [Liquid](https://klibs.io/project/FletchMcKee/liquid)와 같은 라이브러리를 사용할 수 있습니다. 이 방식은 시스템 리퀴드 글래스와 완전히 동일하지는 않지만 시각적으로 유사한 효과를 내면서 모든 UI를 Compose 측에 유지합니다.

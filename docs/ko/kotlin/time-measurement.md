@@ -8,7 +8,7 @@ Kotlin 표준 라이브러리는 다양한 단위로 시간을 계산하고 측�
   * 디버깅
 
 기본적으로 시간은 단조 시간 소스(monotonic time source)를 사용하여 측정되지만, 다른 시간 소스를 구성할 수도 있습니다.
-자세한 내용은 [시간 소스 생성](#시간-소스-생성)을 참조하세요.
+자세한 내용은 [시간 소스 생성](#create-time-source)을 참조하세요.
 
 ## 기간(Duration) 계산 {id="calculate-duration"}
 

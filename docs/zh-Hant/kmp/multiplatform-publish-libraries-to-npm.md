@@ -216,13 +216,13 @@ jobs:
 
 現在你已經發佈了工作流程，可以使用 GitHub Action 為你的 npm 軟件包新增 [Trusted Publisher](https://docs.npmjs.com/trusted-publishers)：
 
-1. 開啟[已發佈的軟件包](#手動發佈)頁面。
+1. 開啟[已發佈的軟件包](#publish-manually)頁面。
 2. 開啟 **Settings** 分頁並找到 **Trusted Publisher** 區段。
 3. 在 **Select your publisher** 下方，點擊 **GitHub Actions** 按鈕。
 4. 填寫表單：
    * 你的 GitHub 名稱（或組織）
    * 存儲庫名稱
-   * 工作流程檔案名稱（在本教學中，我們使用了 [publish.yml](#建立-github-actions-工作流程檔案)）。
+   * 工作流程檔案名稱（在本教學中，我們使用了 [publish.yml](#create-a-github-actions-workflow-file)）。
 5. 點擊 **Setup connection** 按鈕。
 
 ![針對 GitHub Actions 的 npm Trusted Publisher 設定](npm-trusted-publisher-github.png)

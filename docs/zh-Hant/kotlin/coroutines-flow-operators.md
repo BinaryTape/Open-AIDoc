@@ -720,7 +720,7 @@ suspend fun main() {
 ## 終端運算子 {id="terminal-operators"}
 
 終端運算子收集 Flow。
-您可以使用它們來取用發出的值、根據收集的值傳回結果，或[在特定的 `CoroutineScope` 中收集 Flow](#在特定的-coroutinescope-中收集-flow)。
+您可以使用它們來取用發出的值、根據收集的值傳回結果，或[在特定的 `CoroutineScope` 中收集 Flow](#collect-a-flow-in-a-specific-coroutinescope)。
 
 若要收集 Flow，請使用 [`collect()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/collect.html) 運算子。
 如果您將 Lambda 傳遞給 `collect()`，它會接收每個發出的值：

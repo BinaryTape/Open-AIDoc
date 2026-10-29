@@ -144,7 +144,7 @@ Java 声明的类型在 Kotlin 中会被视为不可显式指明的类型，并�
 * 依赖类型推断。在这种情况下，变量将具有推断出的平台类型。
 * 明确指定你所期望的类型。Kotlin 允许使用可空类型和不可空类型。
 
-针对此类类型的 null 检查有所放宽，其安全保证与 Java 中相同（详见[下文](#映射的类型)）。
+针对此类类型的 null 检查有所放宽，其安全保证与 Java 中相同（详见[下文](#mapped-types)）。
 请参阅以下示例：
 
 ```kotlin
@@ -186,9 +186,9 @@ val notNull: String = item // 允许，但在运行时可能会失败
 
   * [JetBrains](https://www.jetbrains.com/idea/help/nullable-and-notnull-annotations.html)
 （来自 `org.jetbrains.annotations` 包的 `@Nullable` 和 `@NotNull`）
-  * [JSpecify](#jspecify-支持) (`org.jspecify.annotations`)
+  * [JSpecify](#jspecify-support) (`org.jspecify.annotations`)
   * Android (`com.android.annotations` 与 `android.support.annotations`)
-  * [JSR-305](#jsr-305-支持) (`javax.annotation`)
+  * [JSR-305](#jsr-305-support) (`javax.annotation`)
   * FindBugs (`edu.umd.cs.findbugs.annotations`)
   * Eclipse (`org.eclipse.jdt.annotation`)
   * [Lombok](lombok.md) (`lombok.NonNull`)
@@ -207,7 +207,7 @@ val notNull: String = item // 允许，但在运行时可能会失败
 * `warn`：报告警告
 * `strict`：报告错误。
 
-> [JSpecify](#jspecify-支持) 是唯一默认使用 `strict` 报告级别受支持的注解类型。
+> [JSpecify](#jspecify-support) 是唯一默认使用 `strict` 报告级别受支持的注解类型。
 > 使用它可以无需额外配置即可针对为 null 性注解报告错误。
 >
 {style="note"}
@@ -281,7 +281,7 @@ fun main() {
 
 `Derived` 的上限被设置为 `Base<String?>`，这与 `Base<String>` 不同。
 
-详细了解 [Kotlin 中的 Java 泛型](#kotlin-中的-java-泛型)。
+详细了解 [Kotlin 中的 Java 泛型](#java-generics-in-kotlin)。
 
 #### 类型形参 {id="type-parameters"}
 
@@ -333,7 +333,7 @@ Kotlin 支持 `org.jspecify.annotations` 包中的以下注解：
   该注解不适用于局部变量和[类型变量（泛型）](https://jspecify.dev/docs/user-guide/#using-type-variables-in-generic-types)。
   在提供特定的可空或不可空类型之前，类型变量始终保持“null 无感知”（null-agnostic）状态。
 
-* `@NullUnmarked` 反转 `@NullMarked` 的效果，使该作用域内的所有类型均成为[平台类型](#空安全与平台类型)。
+* `@NullUnmarked` 反转 `@NullMarked` 的效果，使该作用域内的所有类型均成为[平台类型](#null-safety-and-platform-types)。
 
 考虑以下带有 JSpecify 注解的 Java 类：
  
@@ -348,7 +348,7 @@ public class InventoryService {
 }
 ```
  
-在 Kotlin 中，这些类型会被视为常规的可空和不可空类型，而不是[平台类型](#空安全与平台类型)：
+在 Kotlin 中，这些类型会被视为常规的可空和不可空类型，而不是[平台类型](#null-safety-and-platform-types)：
  
 ```kotlin
 // Kotlin
@@ -381,7 +381,7 @@ fun test(inventory: InventoryService) {
 
 Kotlin 支持使用在 [JSR-305](https://jcp.org/en/jsr/detail?id=305) 中定义的 [`@Nonnull`](https://www.javadoc.io/doc/com.google.code.findbugs/jsr305/latest/javax/annotation/Nonnull.html) 注解来表示 Java 类型的为 null 性。
 
-如果 `@Nonnull(when = ...)` 的值为 `When.ALWAYS`，则被注解的类型将被视为不可空；`When.MAYBE` 和 `When.NEVER` 表示可空类型；而 `When.UNKNOWN` 则强制该类型成为[平台类型](#空安全与平台类型)。
+如果 `@Nonnull(when = ...)` 的值为 `When.ALWAYS`，则被注解的类型将被视为不可空；`When.MAYBE` 和 `When.NEVER` 表示可空类型；而 `When.UNKNOWN` 则强制该类型成为[平台类型](#null-safety-and-platform-types)。
 
 库可以针对 JSR-305 注解进行编译，但无需让库的使用者将注解构件（例如 `jsr305.jar`）作为编译依赖项。即使类路径上不存在这些注解，Kotlin 编译器也可以直接从库中读取 JSR-305 注解。
 
@@ -455,7 +455,7 @@ interface A {
 ```
 
 > 本例中的类型仅在启用严格模式时生效；否则平台类型依然保留。
-> 请参阅 [`@UnderMigration` 注解](#undermigration-注解)和[编译器配置](#编译器配置)章节。
+> 请参阅 [`@UnderMigration` 注解](#undermigration-annotation)和[编译器配置](#compiler-configuration)章节。
 >
 {style="note"}
 
@@ -522,7 +522,7 @@ public class Test {}
 
 Kotlin 对某些 Java 类型进行了特殊处理。这些类型并不是从 Java 中“照原样”加载的，而是被*映射*到相应的 Kotlin 类型。
 这种映射仅在编译时有效，运行时表示保持不变。
-Java 的基本类型被映射到相应的 Kotlin 类型（同时考虑[平台类型](#空安全与平台类型)）：
+Java 的基本类型被映射到相应的 Kotlin 类型（同时考虑[平台类型](#null-safety-and-platform-types)）：
 
 | **Java 类型** | **Kotlin 类型**  |
 |---------------|------------------|
@@ -579,7 +579,7 @@ Kotlin 中的集合类型可以是只读的或可变的，因此 Java 的集合�
 | `Map<K, V>`       | `Map<K, V>`               | `MutableMap<K, V>`             | `(Mutable)Map<K, V>!`                |
 | `Map.Entry<K, V>` | `Map.Entry<K, V>`         | `MutableMap.MutableEntry<K,V>` | `(Mutable)Map.(Mutable)Entry<K, V>!` |
 
-Java 的数组映射如[下文](#java-数组)所述：
+Java 的数组映射如[下文](#java-arrays)所述：
 
 | **Java 类型** | **Kotlin 类型**                |
 |---------------|--------------------------------|
@@ -614,7 +614,7 @@ if (a is List<*>) // 正常：不对列表的内容作任何保证
 
 ## Java 数组 {id="java-arrays"}
 
-与 Java 不同，Kotlin 中的数组是不型变的（invariant）。这意味着 Kotlin 不允许你将 `Array<String>` 赋值给 `Array<Any>`，从而避免了潜在的运行时故障。将子类的数组作为超类的数组传递给 Kotlin 方法也是被禁止的，但对于 Java 方法，这可以通过形如 `Array<(out) String>!` 的[平台类型](#空安全与平台类型)来允许。
+与 Java 不同，Kotlin 中的数组是不型变的（invariant）。这意味着 Kotlin 不允许你将 `Array<String>` 赋值给 `Array<Any>`，从而避免了潜在的运行时故障。将子类的数组作为超类的数组传递给 Kotlin 方法也是被禁止的，但对于 Java 方法，这可以通过形如 `Array<(out) String>!` 的[平台类型](#null-safety-and-platform-types)来允许。
 
 Java 平台上的数组配合基本数据类型使用，以避免装箱/拆箱操作的开销。
 由于 Kotlin 隐藏了这些实现细节，因此需要一种变通方案来与 Java 代码对接。
@@ -812,7 +812,7 @@ Java 类的 static 成员构成了这些类的“伴生对象”。你不能将�
 if (Character.isLetter(a)) { ... }
 ```
 
-要访问[映射](#映射的类型)到 Kotlin 类型的 Java 类型的 static 成员，请使用该 Java 类型的完全限定名称：`java.lang.Integer.bitCount(foo)`。
+要访问[映射](#mapped-types)到 Kotlin 类型的 Java 类型的 static 成员，请使用该 Java 类型的完全限定名称：`java.lang.Integer.bitCount(foo)`。
 
 ## Java 反射 {id="java-reflection"}
 

@@ -719,7 +719,7 @@ suspend fun main() {
 ## 終端オペレーター {id="terminal-operators"}
 
 終端オペレーターはFlowを収集します。
-放出された値を消費したり、収集された値に基づいて結果を返したり、[特定の `CoroutineScope` でFlowを収集](#特定の-coroutinescope-でflowを起動する)したりするために使用できます。
+放出された値を消費したり、収集された値に基づいて結果を返したり、[特定の `CoroutineScope` でFlowを収集](#collect-a-flow-in-a-specific-coroutinescope)したりするために使用できます。
 
 Flowを収集するには、[`collect()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/collect.html) オペレーターを使用します。
 `collect()` にラムダを渡すと、放出された各値を受け取ります：

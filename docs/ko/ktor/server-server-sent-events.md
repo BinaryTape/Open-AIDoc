@@ -66,7 +66,7 @@
 </chapter>
 <chapter title="SSE 설치" id="install_plugin">
         <p>
-            애플리케이션에 <code>%plugin_name%</code> 플러그인을 <a href="#install">설치</a>하려면,
+            애플리케이션에 <code>%plugin_name%</code> 플러그인을 <a href="server-plugins.md#install">설치</a>하려면,
             지정된 <Links href="/ktor/server-modules" summary="모듈을 사용하면 라우트를 그룹화하여 애플리케이션을 구조화할 수 있습니다.">모듈</Links>의 <code>install</code> 함수에 전달하세요.
             다음 예제는 <code>%plugin_name%</code>을(를) 설치하는 방법을 보여줍니다:
         </p>
@@ -90,7 +90,7 @@
 <chapter title="SSE 세션 처리" id="handle-sessions">
         <p>
             <code>SSE</code> 플러그인을 설치하고 나면 SSE 세션을 처리할 라우트를 추가할 수 있습니다.
-            이를 위해 <a href="#define_route">routing</a> 블록 내부에서 <code>sse()</code> 함수를 호출합니다. SSE 라우트를 설정하는 방법에는 두 가지가 있습니다:
+            이를 위해 <a href="server-routing.md#define_route">routing</a> 블록 내부에서 <code>sse()</code> 함수를 호출합니다. SSE 라우트를 설정하는 방법에는 두 가지가 있습니다:
         </p>
         <list type="decimal">
             <li>

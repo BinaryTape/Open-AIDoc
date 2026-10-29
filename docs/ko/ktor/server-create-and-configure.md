@@ -106,7 +106,7 @@
                 </TabItem>
             </Tabs>
             <note>
-                <code>EngineMain.main()</code>으로 서버를 즉시 시작하는 대신, <code>EngineMain.createServer()</code>를 사용하여 서버 인스턴스를 수동으로 생성할 수 있습니다. 자세한 내용은 <a href="#createServer"></a>를 참조하세요.
+                <code>EngineMain.main()</code>으로 서버를 즉시 시작하는 대신, <code>EngineMain.createServer()</code>를 사용하여 서버 인스턴스를 수동으로 생성할 수 있습니다. 자세한 내용은 <a href="server-engines.md#createServer"></a>를 참조하세요.
             </note>
             <p>
                 전체 예제는

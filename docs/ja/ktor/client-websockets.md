@@ -46,7 +46,7 @@ Ktorは、サーバー側とクライアント側の両方でWebSocketプロト�
     </tip>
 </chapter>
 <chapter title="WebSocketsのインストール" id="install_plugin">
-    <p><code>WebSockets</code>プラグインをインストールするには、<a href="#configure-client">クライアント設定ブロック</a>内の <code>install</code> 関数に渡します。</p>
+    <p><code>WebSockets</code>プラグインをインストールするには、<a href="client-create-and-configure.md#configure-client">クライアント設定ブロック</a>内の <code>install</code> 関数に渡します。</p>
     <code-block lang="kotlin" code="            import io.ktor.client.*&#10;            import io.ktor.client.engine.cio.*&#10;            import io.ktor.client.plugins.websocket.*&#10;&#10;            //...&#10;            val client = HttpClient(CIO) {&#10;                install(WebSockets)&#10;            }"/>
 </chapter>
 <chapter title="設定" id="configure_plugin">
@@ -71,7 +71,7 @@ Ktorは、サーバー側とクライアント側の両方でWebSocketプロト�
         </def>
     </deflist>
     <warning>
-        <p><code>pingInterval</code> および <code>pingIntervalMillis</code> プロパティは、OkHttpエンジンには適用されません。OkHttpのping間隔を設定するには、<a href="#okhttp">エンジン設定</a>を使用できます。
+        <p><code>pingInterval</code> および <code>pingIntervalMillis</code> プロパティは、OkHttpエンジンには適用されません。OkHttpのping間隔を設定するには、<a href="client-engines.md#okhttp">エンジン設定</a>を使用できます。
         </p>
         <code-block lang="kotlin" code="                import io.ktor.client.engine.okhttp.OkHttp&#10;&#10;                val client = HttpClient(OkHttp) {&#10;                    engine {&#10;                        preconfigured = OkHttpClient.Builder()&#10;                            .pingInterval(20, TimeUnit.SECONDS)&#10;                            .build()&#10;                    }&#10;                }"/>
     </warning>

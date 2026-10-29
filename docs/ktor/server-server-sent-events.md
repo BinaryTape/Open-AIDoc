@@ -64,7 +64,7 @@
     </chapter>
     <chapter title="安装 SSE" id="install_plugin">
         <p>
-            要将 <code>%plugin_name%</code> 插件<a href="#install">安装</a>到应用程序中，
+            要将 <code>%plugin_name%</code> 插件<a href="server-plugins.md#install">安装</a>到应用程序中，
             请将其传递给指定<Links href="/ktor/server-modules" summary="Modules allow you to structure your application by grouping routes.">模块</Links>中的 <code>install</code> 函数。
             以下示例演示了如何安装 <code>%plugin_name%</code>：
         </p>
@@ -88,7 +88,7 @@
     <chapter title="处理 SSE 会话" id="handle-sessions">
         <p>
             安装 <code>SSE</code> 插件后，即可添加路由来处理 SSE 会话。
-            为此，请在 <a href="#define_route">routing</a> 代码块中调用 <code>sse()</code> 函数。配置 SSE 路由有两种方式：
+            为此，请在 <a href="server-routing.md#define_route">routing</a> 代码块中调用 <code>sse()</code> 函数。配置 SSE 路由有两种方式：
         </p>
         <list type="decimal">
             <li>

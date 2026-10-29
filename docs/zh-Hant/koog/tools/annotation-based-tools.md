@@ -20,7 +20,7 @@
 ## @Tool 註解 {id="tool-annotation"}
 
 `@Tool` 註解用於標記應作為工具公開給 LLM 的函式 (Kotlin) 或方法 (Java)。
-標記了 `@Tool` 的函式與方法會透過反射 (reflection) 從實作了 `ToolSet` 介面的物件中收集。詳細資訊請參閱 [實作 ToolSet 介面](#1-實作-toolset-介面)。
+標記了 `@Tool` 的函式與方法會透過反射 (reflection) 從實作了 `ToolSet` 介面的物件中收集。詳細資訊請參閱 [實作 ToolSet 介面](#1-implement-the-toolset-interface)。
 
 ### 定義 {id="definition"}
 

@@ -27,7 +27,7 @@ Ktor 提供了使用 [Logging](https://api.ktor.io/ktor-client-logging/io.ktor.c
 
 <snippet id="jvm-logging">
   <p>
-    在 <a href="#jvm">JVM</a> 上，Ktor 使用 Java 简单日志门面 (<a href="http://www.slf4j.org/">SLF4J</a>) 作为日志记录的抽象层。SLF4J 将日志记录 API 与底层的日志记录实现解耦，允许您集成最适合应用程序要求的日志记录框架。
+    在 <a href="client-engines.md#jvm">JVM</a> 上，Ktor 使用 Java 简单日志门面 (<a href="http://www.slf4j.org/">SLF4J</a>) 作为日志记录的抽象层。SLF4J 将日志记录 API 与底层的日志记录实现解耦，允许您集成最适合应用程序要求的日志记录框架。
     常见的选择包括 <a href="https://logback.qos.ch/">Logback</a> 或 
     <a href="https://logging.apache.org/log4j">Log4j</a>。如果没有提供框架，SLF4J 将默认使用无操作 (NOP) 实现，这实际上会禁用日志记录。
   </p>

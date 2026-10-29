@@ -113,7 +113,7 @@ fun grep(lines: List<String>, pattern: String, action: (String) -> Unit) {
 如你所見，匯入的註解與斷言既不依賴特定平台，也不依賴特定架構。
 稍後當你執行此測試時，特定平台的架構將提供測試執行器。
 
-#### 探索 `kotlin.test` API {initial-collapse-state="collapsed" collapsible="true"}
+#### 探索 `kotlin.test` API {initial-collapse-state="collapsed" collapsible="true" id="explore-the-kotlin-test-api"}
 
 [`kotlin.test`](https://kotlinlang.org/api/latest/kotlin.test/) 程式庫提供了與平台無關的註解和斷言，供你在測試中使用。諸如 `Test` 等註解會對應到所選架構提供的註解或其最接近的對應項目。
 
@@ -121,7 +121,7 @@ fun grep(lines: List<String>, pattern: String, action: (String) -> Unit) {
 
 例如，JVM 上支援 JUnit 4、JUnit 5 和 TestNG 架構。在 Android 上，呼叫 `assertEquals()` 可能會導致呼叫 `asserter.assertEquals()`，其中的 `asserter` 物件是 `JUnit4Asserter` 的執行個體。在 iOS 上，`Asserter` 型別的預設實作則會與 Kotlin/Native 測試執行器搭配使用。
 
-### 執行測試
+### 執行測試 {id="run-tests"}
 
 你可以透過以下方式執行測試：
 
@@ -140,9 +140,9 @@ fun grep(lines: List<String>, pattern: String, action: (String) -> Unit) {
 
 ![測試輸出](run-test-results.png){width=700}
 
-## 處理更複雜的專案
+## 處理更複雜的專案 {id="work-with-more-complex-projects"}
 
-### 編寫共用程式碼的測試
+### 編寫共用程式碼的測試 {id="write-tests-for-common-code"}
 
 你已經針對 `grep()` 函式建立了共用程式碼的測試。現在，讓我們考慮使用 `CurrentRuntime` 類別進行更進階的共用程式碼測試。此類別包含程式碼執行所在平台的詳細資訊。例如，對於在本機 JVM 上執行的 Android 單元測試，它可能包含值 "OpenJDK" 和 "17.0"。
 
@@ -204,7 +204,7 @@ fun grep(lines: List<String>, pattern: String, action: (String) -> Unit) {
 
 你可以使用 [IDE 中提供的任何方式](#run-tests)來執行此測試。
 
-### 新增平台特定測試
+### 新增平台特定測試 {id="add-platform-specific-tests"}
 
 > 在此，為了簡潔明瞭，使用了 [expected 與 actual 宣告機制](multiplatform-connect-to-apis.md)。在更複雜的程式碼中，更好的做法是使用介面和工廠函式。
 >

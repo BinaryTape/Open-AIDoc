@@ -47,7 +47,7 @@ Sessions 插件提供了一种在不同 HTTP 请求之间持久化数据的机�
 ## 安装 Sessions {id="install_plugin"}
 
 <p>
-    要将 <code>%plugin_name%</code> 插件<a href="#install">安装</a>到应用中，
+    要将 <code>%plugin_name%</code> 插件<a href="server-plugins.md#install">安装</a>到应用中，
     请将其传递给指定<Links href="/ktor/server-modules" summary="模块允许您通过对路由进行分组来构建应用程序。">模块</Links>中的 <code>install</code> 函数。
     下面的代码片段显示了如何安装 <code>%plugin_name%</code> ...
 </p>
@@ -68,7 +68,7 @@ Sessions 插件提供了一种在不同 HTTP 请求之间持久化数据的机�
     </TabItem>
 </Tabs>
 <p>
-    <code>%plugin_name%</code> 插件也可以被<a href="#install-route">安装到特定路由</a>。
+    <code>%plugin_name%</code> 插件也可以被<a href="server-plugins.md#install-route">安装到特定路由</a>。
     如果您需要为不同的应用资源使用不同的 <code>%plugin_name%</code> 配置，这可能会很有用。
 </p>
 

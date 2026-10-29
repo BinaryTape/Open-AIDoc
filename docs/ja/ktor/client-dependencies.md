@@ -201,7 +201,7 @@ sourceSets {
 ### ロギング依存関係 {id="logging-dependency"}
 
   <p>
-    <a href="#jvm">JVM</a> 上では、Ktor はロギングの抽象化レイヤーとして Simple Logging Facade for Java (<a href="http://www.slf4j.org/">SLF4J</a>) を使用します。SLF4J はロギング API を基盤となるロギング実装から分離し、アプリケーションの要件に最適なロギングフレームワークを統合できるようにします。
+    <a href="client-engines.md#jvm">JVM</a> 上では、Ktor はロギングの抽象化レイヤーとして Simple Logging Facade for Java (<a href="http://www.slf4j.org/">SLF4J</a>) を使用します。SLF4J はロギング API を基盤となるロギング実装から分離し、アプリケーションの要件に最適なロギングフレームワークを統合できるようにします。
     一般的な選択肢には <a href="https://logback.qos.ch/">Logback</a> や <a href="https://logging.apache.org/log4j">Log4j</a> が含まれます。
     フレームワークが提供されない場合、SLF4J はデフォルトで no-operation (NOP) 実装になり、実質的にロギングが無効になります。
   </p>

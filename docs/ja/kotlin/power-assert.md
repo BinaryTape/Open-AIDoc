@@ -368,7 +368,7 @@ powerAssert {
 
 関数に `@PowerAssert` アノテーションが付加されている場合、Power-assert プラグインはその関数への呼び出しを自動的に変換します。ビルド設定で関数を登録する必要はありません。
 
-自身でアサーション関数を宣言する際に `@PowerAssert` アノテーションを追加することも、[Power-assert をサポートしているライブラリ](#ライブラリに-power-assert-のサポートを追加する)を使用してアノテーション付きの関数を利用することもできます。
+自身でアサーション関数を宣言する際に `@PowerAssert` アノテーションを追加することも、[Power-assert をサポートしているライブラリ](#add-support-for-power-assert-to-your-library)を使用してアノテーション付きの関数を利用することもできます。
 
 詳細な失敗メッセージを取得するには、プロジェクトで Power-assert プラグインを有効にした状態で関数を呼び出します：
 
@@ -716,7 +716,7 @@ assert(employee.age < 100) { "${employee.name} has an invalid age: ${employee.ag
 
 ライブラリに Power-assert のサポートを追加するには：
 
-1. ビルドファイルで [Power-assert プラグインを適用します](#プラグインの適用)。
+1. ビルドファイルで [Power-assert プラグインを適用します](#apply-the-plugin)。
 2. Maven の場合は、Power-assert ランタイムライブラリを依存関係として追加します：
 
    ```xml

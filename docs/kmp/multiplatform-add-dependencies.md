@@ -127,7 +127,7 @@ kotlinx 库是由 JetBrains 的 Kotlin 核心团队维护的多平台库（主�
 
 ### Gradle 版本目录示例 {id="sample-gradle-version-catalog"}
 
-使用 Gradle 时，建议使用[版本目录](#gradle-版本目录)。
+使用 Gradle 时，建议使用[版本目录](#gradle-version-catalogs)。
 以下版本目录定义了下文示例中使用的所有库：
 
 ```toml

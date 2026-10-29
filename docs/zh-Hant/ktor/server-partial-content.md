@@ -48,7 +48,7 @@
 ## 安裝 %plugin_name% {id="install_plugin"}
 
 <p>
-    若要在應用程式中<a href="#install">安裝</a> <code>%plugin_name%</code> 外掛程式，請將其傳遞給指定 <Links href="/ktor/server-modules" summary="模組允許您透過分組路由來建構應用程式。">模組</Links> 中的 <code>install</code> 函式。
+    若要在應用程式中<a href="server-plugins.md#install">安裝</a> <code>%plugin_name%</code> 外掛程式，請將其傳遞給指定 <Links href="/ktor/server-modules" summary="模組允許您透過分組路由來建構應用程式。">模組</Links> 中的 <code>install</code> 函式。
     下方的程式碼片段展示了如何安裝 <code>%plugin_name%</code> ...
 </p>
 <list>
@@ -68,7 +68,7 @@
     </TabItem>
 </Tabs>
 <p>
-    <code>%plugin_name%</code> 外掛程式也可以<a href="#install-route">安裝到特定路由</a>。
+    <code>%plugin_name%</code> 外掛程式也可以<a href="server-plugins.md#install-route">安裝到特定路由</a>。
     如果您需要為不同的應用程式資源使用不同的 <code>%plugin_name%</code> 配置，這可能會非常有用。
 </p>
 

@@ -358,7 +358,7 @@ fun <T> copyWhenGreater(list: List<T>, threshold: T): List<String>
 
 要將泛型型別 `T` 宣告為絕對不可為 null，請使用 `& Any` 宣告該型別。例如：`T & Any`。
 
-絕對不可為 null 型別必須具有可為 null 的[上限](#上限)。
+絕對不可為 null 型別必須具有可為 null 的[上限](#upper-bounds)。
 
 宣告絕對不可為 null 型別最常見的使用案例是當你想要覆寫包含 `@NotNull` 作為引數的 Java 方法時。例如，考慮 `load()` 方法：
 
@@ -475,7 +475,7 @@ val intsDictionary: Map<String, Int> = readDictionary(intsFile) as Map<String, I
 為了避免未經檢查的轉換，你可以重新設計程式結構。在上面的範例中，你可以使用
 `DictionaryReader<T>` 和 `DictionaryWriter<T>` 介面，並為不同型別提供型別安全的實作。
 你可以引入合理的抽象，將未經檢查的轉換從呼叫處移至實作細節中。
-正確使用[泛型變異](#變異)也會有所幫助。
+正確使用[泛型變異](#variance)也會有所幫助。
 
 對於泛型函式，使用[具現化型別參數](inline-functions.md#reified-type-parameters)可以使像
 `arg as T` 這樣的轉換變成受檢的，除非 `arg` 的型別具有*其自身*被擦除的型別引數。

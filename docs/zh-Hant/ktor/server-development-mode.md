@@ -8,7 +8,7 @@
     <list>
         <li>用於在不重新啟動伺服器的情況下重新載入應用程式類別的 <Links href="//server-auto-reload" summary="了解如何使用 Auto-reload 在程式碼變更時重新載入應用程式類別。">Auto-reload</Links>。
         </li>
-        <li>用於偵錯<a href="#pipelines">管線</a>的延伸資訊（包含堆疊追蹤）。
+        <li>用於偵錯<a href="server-custom-plugins-base-api.md#pipelines">管線</a>的延伸資訊（包含堆疊追蹤）。
         </li>
         <li>發生 <emphasis>5**</emphasis> 伺服器錯誤時，在 <Links href="//server-status-pages" summary="%plugin_name% 允許 Ktor 應用程式根據擲出的例外狀況或狀態碼，對任何失敗狀態做出適當的回應。">回應頁面</Links>上顯示延伸的偵錯資訊。
         </li>
@@ -68,7 +68,7 @@
         </chapter>
         <chapter title="'io.ktor.development' 環境變數" id="environment-variable">
             <p>
-                若要為 <a href="#native">原生用戶端</a>啟用開發模式，請使用 <code>io.ktor.development</code> 環境變數。
+                若要為 <a href="client-engines.md#native">原生用戶端</a>啟用開發模式，請使用 <code>io.ktor.development</code> 環境變數。
             </p>
         </chapter>
     </chapter>

@@ -59,7 +59,7 @@
 3. 从 `build.gradle(.kts)` 文件中移除 `cocoapods {}` 代码块。
 4. 删除 `.podspec` 文件和 Podfile。
 
-## 将框架连接到您的项目
+## 将框架连接到您的项目 {id="connect-the-framework-to-your-project"}
 
 > 目前不支持集成到 `swift build` 中。
 >
