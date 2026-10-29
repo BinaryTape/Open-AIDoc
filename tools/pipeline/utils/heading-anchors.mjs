@@ -10,7 +10,9 @@
  * anchor by hand.
  */
 
-const FENCE = /^\s{0,3}(`{3,}|~{3,})(.*)$/
+// Any indentation: a fence inside a list item is indented with the item, four
+// spaces and more under a nested one, and is a fence all the same.
+const FENCE = /^\s*(`{3,}|~{3,})(.*)$/
 const ATX = /^(\s{0,3})(#{1,6})\s+(.*)$/
 const ATTR_BLOCK = /\s*\{([^{}]*)\}\s*$/
 // markdown-it-attrs syntax: `#id`, `.class`, `key`, `key=value`, `key="value"`.
@@ -24,6 +26,8 @@ const SNIPPET_MARKER = /^-{2}8<-{2}(\s|$)/
 // The rendered page opens with an H1 built from the document title, so the
 // title claims an anchor even though it is not a heading in the file.
 const TITLE = [/^\[\/\/\]: # \(title:\s*(.*?)\)\s*$/m, /^---\n[\s\S]*?^title:\s*(.+?)\s*$/m]
+// Latin words a translation keeps from its source: names, identifiers, versions.
+const LATIN_WORD = /[a-z][a-z0-9]+|[0-9]+(?:\.[0-9]+)+/g
 
 /**
  * Derive the anchor an upstream heading would have had. Writerside and MkDocs
@@ -42,23 +46,11 @@ export function headingAnchor(text) {
  */
 export function listHeadings(markdown) {
   const lines = markdown.split('\n')
+  const code = codeLines(lines)
   const headings = []
-  let fence = null
 
   for (let index = 0; index < lines.length; index++) {
-    const fenceMatch = lines[index].match(FENCE)
-    if (fenceMatch) {
-      const [, marker, info] = fenceMatch
-      // A fence closes only on the same character, at least as many of it, and
-      // with nothing after it. So neither a ``` line inside a ```` block nor a
-      // ```kotlin line inside an unterminated ``` block ends the block — and an
-      // unterminated fence swallows the rest of the file, exactly as the
-      // Markdown renderer sees it.
-      if (!fence) fence = marker
-      else if (marker[0] === fence[0] && marker.length >= fence.length && !info.trim()) fence = null
-      continue
-    }
-    if (fence) continue
+    if (code[index]) continue
 
     const match = lines[index].match(ATX)
     if (!match) continue
@@ -80,34 +72,53 @@ export function listHeadings(markdown) {
 }
 
 /**
+ * For each line, whether it belongs to a fenced code block, fence lines included.
+ * @param {string[]} lines
+ * @returns {boolean[]}
+ */
+export function codeLines(lines) {
+  const code = []
+  let fence = null
+
+  for (const line of lines) {
+    const fenceMatch = line.match(FENCE)
+    // A backtick fence has no backtick in its info string: ```a``` opening a
+    // line is inline code.
+    if (fenceMatch && !(fenceMatch[1][0] === '`' && fenceMatch[2].includes('`'))) {
+      const [, marker, info] = fenceMatch
+      // A fence closes only on the same character, at least as many of it, and
+      // with nothing after it. So neither a ``` line inside a ```` block nor a
+      // ```kotlin line inside an unterminated ``` block ends the block — and an
+      // unterminated fence swallows the rest of the file, exactly as the
+      // Markdown renderer sees it.
+      if (!fence) fence = marker
+      else if (marker[0] === fence[0] && marker.length >= fence.length && !info.trim()) fence = null
+      code.push(true)
+      continue
+    }
+    code.push(fence !== null)
+  }
+
+  return code
+}
+
+/**
  * Copy the source document's heading anchors onto the translated document.
  *
  * Headings are paired by position: translation preserves document structure, so
- * heading N of the translation is heading N of the source. If the documents
- * disagree on how many headings there are, or on their levels, the translation
- * is returned untouched. Partial alignment is not worth attempting — heading
- * levels repeat, so a translation that dropped one heading would silently pair
- * every heading after it with the wrong anchor, and a wrong anchor is worse
- * than a missing one. Such a file needs re-translating, and the caller reports
- * it rather than papering over it.
+ * heading N of the translation is heading N of the source. When the documents
+ * disagree — the translation dropped a heading, or predates one upstream added —
+ * see pairHeadings: only the headings whose counterpart is certain get an
+ * anchor. A wrong anchor is worse than a missing one.
  *
- * @returns {{content: string, added: number, skipped: string | null}}
+ * @returns {{content: string, added: number, drift: string | null, unpaired: number}}
+ *   `drift` describes how the structures disagree, `unpaired` counts the
+ *   translated headings left without a counterpart because of it.
  */
 export function applySourceAnchors(translated, source) {
   const sourceHeadings = listHeadings(source)
   const targetHeadings = listHeadings(translated)
-
-  if (sourceHeadings.length !== targetHeadings.length) {
-    return {
-      content: translated,
-      added: 0,
-      skipped: `heading count differs (source ${sourceHeadings.length}, translation ${targetHeadings.length})`,
-    }
-  }
-  const levelDrift = targetHeadings.findIndex((h, i) => h.level !== sourceHeadings[i].level)
-  if (levelDrift !== -1) {
-    return { content: translated, added: 0, skipped: `heading level differs at #${levelDrift + 1}` }
-  }
+  const { pairs, drift } = pairHeadings(sourceHeadings, targetHeadings)
 
   const lines = translated.split('\n')
   const used = new Set(
@@ -118,13 +129,14 @@ export function applySourceAnchors(translated, source) {
   let added = 0
 
   targetHeadings.forEach((target, i) => {
+    const from = pairs.get(i)
+    if (!from) return
     // The H1 is the page title: VitePress reads its raw text for <title>, so an
     // attribute block there leaks into the browser tab. Nothing links to a
     // page's own title anchor anyway.
     if (target.level === 1) return
     if (target.attrs && /(^|\s)(id=|#)/.test(target.attrs)) return
 
-    const from = sourceHeadings[i]
     const anchor = from.attrs
       ? (from.attrs.match(/\bid="([^"]+)"/)?.[1] ?? headingAnchor(from.text))
       : headingAnchor(from.text)
@@ -144,7 +156,77 @@ export function applySourceAnchors(translated, source) {
     added++
   })
 
-  return { content: lines.join('\n'), added, skipped: null }
+  return {
+    content: lines.join('\n'),
+    added,
+    drift,
+    unpaired: targetHeadings.length - pairs.size,
+  }
+}
+
+/**
+ * Pair translated headings with source headings: translated index → source heading.
+ *
+ * Same count and levels throughout: heading N is heading N. Otherwise the
+ * headings are walked from the front and from the back while level and Latin
+ * words agree, which places one dropped or added heading exactly: the front
+ * walk is right up to it, the back walk from it on. Heading levels repeat, so
+ * the front walk can run on past the gap and pair the wrong headings — but the
+ * back walk then claims those same headings with other partners. A heading
+ * claimed differently by the two walks is ambiguous and left unpaired, as is
+ * anything neither walk reached.
+ */
+export function pairHeadings(sourceHeadings, targetHeadings) {
+  const pairs = new Map()
+  const sameShape =
+    sourceHeadings.length === targetHeadings.length &&
+    targetHeadings.every((h, i) => h.level === sourceHeadings[i].level)
+  if (sameShape) {
+    targetHeadings.forEach((_, i) => pairs.set(i, sourceHeadings[i]))
+    return { pairs, drift: null }
+  }
+
+  const drift =
+    sourceHeadings.length !== targetHeadings.length
+      ? `heading count differs (source ${sourceHeadings.length}, translation ${targetHeadings.length})`
+      : `heading level differs at #${targetHeadings.findIndex((h, i) => h.level !== sourceHeadings[i].level) + 1}`
+
+  const candidates = [] // [targetIndex, sourceIndex]
+  const shorter = Math.min(sourceHeadings.length, targetHeadings.length)
+  for (let i = 0; i < shorter && matches(sourceHeadings[i], targetHeadings[i]); i++) {
+    candidates.push([i, i])
+  }
+  for (let k = 1; k <= shorter; k++) {
+    const t = targetHeadings.length - k
+    const s = sourceHeadings.length - k
+    if (!matches(sourceHeadings[s], targetHeadings[t])) break
+    candidates.push([t, s])
+  }
+
+  const byTarget = new Map()
+  const bySource = new Map()
+  const claim = (map, key, value) => map.set(key, map.has(key) && map.get(key) !== value ? -1 : value)
+  for (const [t, s] of candidates) {
+    claim(byTarget, t, s)
+    claim(bySource, s, t)
+  }
+  for (const [t, s] of byTarget) {
+    if (s !== -1 && bySource.get(s) === t) pairs.set(t, sourceHeadings[s])
+  }
+  return { pairs, drift }
+}
+
+/**
+ * Whether two headings can be the same heading: same level, and every Latin
+ * word the translation kept comes from the source heading — give or take an
+ * ending: "API" translates "APIs".
+ */
+function matches(source, target) {
+  if (source.level !== target.level) return false
+  const words = source.text.toLowerCase().match(LATIN_WORD) ?? []
+  return (target.text.toLowerCase().match(LATIN_WORD) ?? []).every((kept) =>
+    words.some((word) => word.startsWith(kept) || kept.startsWith(word))
+  )
 }
 
 /** The trailing `{...}` of a heading, when it is an attribute block and not text. */

@@ -165,15 +165,15 @@ export async function processTopicContentAsync(currentFilePath, docsPath, topicC
         /<a\b\s*([^>]*)>([\s\S]*?)<\/a>/g,
         (match, attrs, inner) => {
             const anchor = attrs.match(/anchor="([^"]+)"/);
-            if (anchor) {
+            const hrefMatch = attrs.match(/href="([^"]+)"/);
+            if (anchor && !hrefMatch) {
                 return `<a href="#${anchor[1]}">${inner}</a>`;
             }
-
-            const hrefMatch = attrs.match(/href="([^"]+)"/);
             if (!hrefMatch) return match; // a link target: <a id="x"></a>
 
             const summaryMatch = attrs.match(/summary="([^"]+)"/);
-            const href = hrefMatch[1];
+            // <a href="server-plugins.md" anchor="install">: a section of another page
+            const href = anchor && !hrefMatch[1].includes('#') ? `${hrefMatch[1]}#${anchor[1]}` : hrefMatch[1];
             if (summaryMatch && summaryMatch[1] !== undefined) {
                 return `<card href="${docHref(href)}" summary="${summaryMatch[1]}">${inner}</card>`;
             }

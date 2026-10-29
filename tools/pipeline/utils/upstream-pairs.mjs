@@ -4,12 +4,29 @@
  *
  * Upstream clones are expected where the pipeline puts them (`cloneDir` in
  * repos.config.mjs); a docType with no clone available is reported and skipped.
+ * A translation was made from the clone as the strategy prepared it, so
+ * prepare fresh clones first (prepareClones): the Kotlin strategy replaces the
+ * "moved to topics/x.md" stubs with the pages they point to, and Ktor's
+ * `.topic` pages exist as Markdown only once converted.
  */
 import fs from "fs";
 import path from "path";
 import { glob } from "glob";
 import { REPOS } from "../repos.config.mjs";
 import { CONTENT_LOCALES, DEFAULT_LOCALE, splitLocalePath } from "../../../shared/content-paths.ts";
+
+/**
+ * Prepare each available clone the way a sync does before translating
+ * (the strategy's postDetect). Run it once, on clones fresh from git: the
+ * preparation rewrites files in place.
+ */
+export async function prepareClones({ onlyDocType = null } = {}) {
+  for (const repoConfig of REPOS) {
+    if (onlyDocType && repoConfig.docType !== onlyDocType) continue;
+    if (!fs.existsSync(repoConfig.cloneDir)) continue;
+    await repoConfig.syncStrategy.postDetect(repoConfig, { repoConfig, files: [] });
+  }
+}
 
 /**
  * Upstream candidates for one docType, indexed both by their path under the
@@ -37,8 +54,8 @@ async function indexUpstream(docType) {
     ).flat();
 
     for (const file of new Set(found)) {
-      // `.topic` files are Writerside XML that the pipeline converts to
-      // Markdown; there is no Markdown source to compare against.
+      // `.topic` files are Writerside XML; a prepared clone has the Markdown
+      // the pipeline converted them to, which is what was translated.
       if (!file.endsWith(".md")) continue;
       const absolute = path.resolve(repoConfig.cloneDir, file);
       const relative = path.relative(sourceRoot, absolute).replaceAll("\\", "/");

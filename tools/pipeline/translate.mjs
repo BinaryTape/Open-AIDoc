@@ -6,6 +6,7 @@ import pLimit from "p-limit";
 import { toContentRelPath } from "../../shared/content-paths.ts";
 import { loadPageCheck } from "./utils/page-check.mjs";
 import { applySourceAnchors } from "./utils/heading-anchors.mjs";
+import { applySourceLinkAnchors } from "./utils/link-anchors.mjs";
 import { restoreTitleComment } from "./utils/title-comment.mjs";
 import { stripWrapperFence } from "./utils/wrapper-fence.mjs";
 import { checkTranslation } from "./utils/translation-check.mjs";
@@ -449,18 +450,22 @@ async function translateUnit(filePath, targetLang, source, pageCheck = null) {
   // Translating a heading changes the anchor generated from it, which
   // would break every upstream `page.md#anchor` link pointing at it.
   const anchored = applySourceAnchors(translated, source);
-  if (anchored.skipped) {
-    console.warn(`⚠️ Keeping upstream anchors out of ${targetPath}: ${anchored.skipped}`);
+  if (anchored.unpaired > 0) {
+    console.warn(
+      `⚠️ ${anchored.unpaired} heading(s) of ${targetPath} keep no upstream anchor: ${anchored.drift}`
+    );
   }
+  // ...and a link whose anchor was translated with its text points at no heading.
+  const linked = applySourceLinkAnchors(anchored.content, source);
 
   // One page the site cannot compile stops the whole site from building.
-  const buildProblems = pageCheck ? await pageCheck(pagePath(targetPath), anchored.content) : [];
+  const buildProblems = pageCheck ? await pageCheck(pagePath(targetPath), linked.content) : [];
   if (buildProblems.length > 0) {
     throw new TranslationRejected(`does not build: ${summarizeProblems(buildProblems)}`);
   }
 
   fs.mkdirSync(path.dirname(targetPath), { recursive: true });
-  fs.writeFileSync(targetPath, anchored.content);
+  fs.writeFileSync(targetPath, linked.content);
   console.log(`Translated to ${targetLang}: ${targetPath}`);
   return targetPath;
 }
