@@ -1,0 +1,98 @@
+/**
+ * Writerside panels: <panels columns="2"><panel><title>…</title>…</panel>,
+ * restructured by structurePanels in config/vue-template.config.ts:
+ *
+ *   <div class="ws-panels" data-columns="2" data-columns-tablet="2" data-columns-mobile="1">
+ *     <div class="ws-panel"><div class="ws-title">…</div><div class="ws-panel__content">…</div></div>
+ *
+ * Values follow .article-panels on kotlinlang.org: a grid of bordered panels,
+ * one column on phones, and a button at the foot of its panel so the buttons
+ * of a row line up. The title is 600 rather than kotlinlang.org's 530, a
+ * JetBrains Sans weight the site's font does not have.
+ * -------------------------------------------------------------------------- */
+
+:root {
+  --ws-panel-border: rgba(25, 25, 28, 0.2);
+  --ws-panel-bg: rgba(25, 25, 28, 0.05);
+}
+
+.dark {
+  --ws-panel-border: rgba(255, 255, 255, 0.2);
+  --ws-panel-bg: rgba(255, 255, 255, 0.05);
+}
+
+.vp-doc .ws-panels {
+  display: grid;
+  gap: 22px;
+  margin: 32px 0;
+}
+
+.vp-doc .ws-panels[data-columns="1"] { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+.vp-doc .ws-panels[data-columns="2"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.vp-doc .ws-panels[data-columns="3"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.vp-doc .ws-panels[data-columns="4"] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+@media (max-width: 1000px) {
+  .vp-doc .ws-panels[data-columns-tablet="1"] { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+  .vp-doc .ws-panels[data-columns-tablet="2"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .vp-doc .ws-panels[data-columns-tablet="3"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .vp-doc .ws-panels[data-columns-tablet="4"] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+@media (max-width: 640px) {
+  .vp-doc .ws-panels[data-columns-mobile="1"] { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+  .vp-doc .ws-panels[data-columns-mobile="2"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .vp-doc .ws-panels[data-columns-mobile="3"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .vp-doc .ws-panels[data-columns-mobile="4"] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+.vp-doc .ws-panel {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  min-width: 0;
+  padding: 22px;
+  border: 1px solid var(--ws-panel-border);
+  border-radius: 8px;
+  background: var(--ws-panel-bg);
+}
+
+.vp-doc .ws-panel > .ws-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 28px;
+}
+
+.vp-doc .ws-panel__content {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  gap: 24px;
+}
+
+.vp-doc .ws-panel > .ws-title + .ws-panel__content {
+  margin-top: 24px;
+}
+
+.vp-doc .ws-panel__content > * {
+  margin: 0;
+}
+
+/* An icon in a line of text (the GitHub mark before "View on GitHub"). */
+.vp-doc .ws-panel__content img {
+  display: inline;
+  vertical-align: middle;
+}
+
+/* The button, with whatever shares its paragraph, sits at the foot of the panel. */
+.vp-doc .ws-panel__content > :last-child:has(.ws-button) {
+  margin-top: auto;
+}
+
+/* The Kotlin tour's start page drops the arrow on phones, as kotlinlang.org does. */
+@media (max-width: 640px) {
+  .vp-doc #kotlin-tour-starting-page a.ws-button::after {
+    display: none;
+  }
+}

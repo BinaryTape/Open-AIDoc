@@ -144,7 +144,86 @@ export function unwrapNestedParagraphs(node: TemplateNode): void {
   }
 }
 
+// Elements a paragraph can hold; any other element is a block of its own.
+const INLINE_TAGS = new Set([
+  'a', 'abbr', 'b', 'br', 'code', 'em', 'i', 'img', 'kbd', 'mark', 's', 'small', 'span', 'strong', 'sub', 'sup', 'u',
+])
+
+const isPlain = (node: TemplateNode, tag: string) =>
+  node.type === ELEMENT_NODE && node.tag === tag && node.tagType === PLAIN_ELEMENT
+
+const isInline = (node: TemplateNode) =>
+  node.type === TEXT_NODE || node.type === COMMENT_NODE ||
+  (node.type === ELEMENT_NODE && node.tagType === PLAIN_ELEMENT && INLINE_TAGS.has(node.tag!))
+
+const isBlank = (node: TemplateNode) =>
+  node.type === COMMENT_NODE || (node.type === TEXT_NODE && !(node as { content?: string }).content?.trim())
+
+const element = (tag: string, props: unknown[], children: TemplateNode[], loc: unknown) =>
+  ({ type: ELEMENT_NODE, ns: 0, tag, tagType: PLAIN_ELEMENT, props, children, isSelfClosing: false, loc, codegenNode: undefined }) as TemplateNode
+
+const attribute = (name: string, value: string, loc: unknown) =>
+  ({ type: ATTRIBUTE_NODE, name, nameLoc: loc, value: { type: TEXT_NODE, content: value, loc }, loc })
+
+const attributeValue = (node: TemplateNode, name: string) =>
+  ((node.props ?? []) as { type: number, name?: string, value?: { content: string } }[])
+    .find((prop) => prop.type === ATTRIBUTE_NODE && prop.name === name)?.value?.content
+
+const COLUMN_ATTRIBUTES = ['columns', 'columns-tablet', 'columns-mobile']
+
+/**
+ * Writerside lays out `<panels columns="2">` as a grid of bordered `<panel>`s,
+ * each a `<title>` over its content. Render the structure kotlinlang.org
+ * renders, which styles/ws-panels.css styles:
+ *
+ *   <div class="ws-panels" data-columns="2" data-columns-tablet="2" data-columns-mobile="1">
+ *     <div class="ws-panel"><div class="ws-title">…</div><div class="ws-panel__content">…</div></div>
+ *
+ * Content written straight into the panel (`<img/> <a>…</a><br/><br/><a as="button">`)
+ * goes into a `<p>`, one per run of inline content, as Writerside does: the
+ * stylesheet lays out the content's children, and an icon, its link and a
+ * button are one line of it, not three.
+ */
+export function structurePanels(node: TemplateNode): void {
+  if (isPlain(node, 'panels')) {
+    const columns = attributeValue(node, 'columns') ?? '1'
+    const tablet = attributeValue(node, 'columns-tablet') ?? columns
+    const mobile = attributeValue(node, 'columns-mobile') ?? '1'
+    node.tag = 'div'
+    node.props = [
+      ...((node.props ?? []) as AttributeNode[]).filter((prop) => !COLUMN_ATTRIBUTES.includes(prop.name!)),
+      attribute('class', 'ws-panels', node.loc),
+      attribute('data-columns', columns, node.loc),
+      attribute('data-columns-tablet', tablet, node.loc),
+      attribute('data-columns-mobile', mobile, node.loc),
+    ]
+    return
+  }
+  if (!isPlain(node, 'panel')) return
+
+  const titles: TemplateNode[] = []
+  const content: TemplateNode[] = []
+  let run: TemplateNode[] = []
+  const endRun = () => {
+    if (!run.every(isBlank)) content.push(element('p', [], run, run[0].loc))
+    run = []
+  }
+  for (const child of node.children ?? []) {
+    if (isPlain(child, 'title')) titles.push(child)
+    else if (isInline(child)) run.push(child)
+    else {
+      endRun()
+      content.push(child)
+    }
+  }
+  endRun()
+
+  node.tag = 'div'
+  node.props = [...(node.props ?? []), attribute('class', 'ws-panel', node.loc)]
+  node.children = [...titles, element('div', [attribute('class', 'ws-panel__content', node.loc)], content, node.loc)]
+}
+
 export const vueCompilerOptions = {
   isCustomElement: isPlainElement,
-  nodeTransforms: [wrapTableRows, renameBodyTitles, unwrapNestedParagraphs],
+  nodeTransforms: [wrapTableRows, structurePanels, renameBodyTitles, unwrapNestedParagraphs],
 }
