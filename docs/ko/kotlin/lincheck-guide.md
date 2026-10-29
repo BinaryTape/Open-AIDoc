@@ -52,7 +52,7 @@ class CounterTest {
 | ------------------------------------------------------------------------------- |
 ```
 
-## Lincheck의 작동 원리
+## Lincheck의 작동 원리 {id="how-lincheck-works"}
 
 JVM이 동시성 코드를 실행할 때마다 스레드 간의 연산 실행 순서가 변경될 수 있습니다.
 예를 들어, 한 연산이 다른 스레드의 연산에 의해 중단될 수 있습니다. 그 자체로는 오류가 아니지만, 코드에 동시성 버그가 있는 경우 오류로 이어질 수 있습니다.
@@ -69,12 +69,12 @@ Lincheck은 잘못된 동작으로 이어지는 실행 스케줄을 찾기 위�
 * **모델 체킹(Model checking)**. Lincheck은 프로그램에 명시적인 스레드 전환 명령을 삽입하여 스케줄링을 제어합니다. 이러한 명령은 동기화 지점이나 공유 메모리 액세스 지점에 배치됩니다. 모델 체킹을 통해 Lincheck은 오류를 유발하는 정확한 실행 추적(execution trace)을 생성할 수 있습니다.
 * **스트레스 테스트(Stress testing)**. 운영체제가 스케줄링을 제어합니다. Lincheck은 오류를 발견할 확률을 높이기 위해 각 시나리오를 여러 번 실행합니다.
 
-## Lincheck 살펴보기
+## Lincheck 살펴보기 {id="explore-lincheck"}
 
 * [Lincheck 시작하기](lincheck-getting-started.md)에서 Lincheck의 기능을 단계별로 알아보세요.
 * [테스트 전략](lincheck-how-to-test-data-structures.md) 문서에서 동시성 데이터 구조를 테스트하는 선언적 접근 방식에 대해 알아보세요.
 
-## 추가 참고 자료
+## 추가 참고 자료 {id="learn-more"}
 
 * Nikita Koval의 "How we test concurrent algorithms in Kotlin Coroutines": [Video](https://youtu.be/jZqkWfa11Js). KotlinConf 2023
 * Maria Sokolova의 "Lincheck: Testing concurrency on the JVM" 워크숍: [Part 1](https://www.youtube.com/watch?v=YNtUK9GK4pA), [Part 2](https://www.youtube.com/watch?v=EW7mkAOErWw). Hydra 2021

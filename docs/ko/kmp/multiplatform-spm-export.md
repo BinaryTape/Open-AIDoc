@@ -80,11 +80,11 @@ XCFramework 게시를 설정하려면:
    결과물인 프레임워크는 프로젝트 디렉토리의 `shared/build/XCFrameworks/release/Shared.xcframework` 폴더에 생성됩니다.
 
    > 프로젝트에서 SwiftPM 의존성을 사용하는 경우, Kotlin %kotlinEapVersion%부터 태스크가 XCFramework 옆에 일련의 SwiftPM 관련 파일도 생성합니다.
-   > [아래](#xcframework-및-swift-패키지-매니페스트-준비) 설명된 대로, 매니페스트를 처음부터 작성하는 대신 생성된 `Package.swift`를 프레임워크와 함께 배포할 수 있습니다.
+   > [아래](#prepare-the-xcframework-and-the-swift-package-manifest) 설명된 대로, 매니페스트를 처음부터 작성하는 대신 생성된 `Package.swift`를 프레임워크와 함께 배포할 수 있습니다.
    >
    {style="note"} 
 
-3. 내보내고 싶은 공통 코드가 포함된 모듈이 둘 이상인 경우(예: 공통 로직 모듈과 공통 UI 모듈), [이를 하나의 새로운 모듈로 결합](#여러-모듈을-xcframework로-내보내기)하고 대신 이 엄브렐러(umbrella) 모듈을 배포하세요.
+3. 내보내고 싶은 공통 코드가 포함된 모듈이 둘 이상인 경우(예: 공통 로직 모듈과 공통 UI 모듈), [이를 하나의 새로운 모듈로 결합](#exporting-multiple-modules-as-an-xcframework)하고 대신 이 엄브렐러(umbrella) 모듈을 배포하세요.
 
 ### XCFramework 및 Swift 패키지 매니페스트 준비 {id="prepare-the-xcframework-and-the-swift-package-manifest"}
 
@@ -267,6 +267,6 @@ XCFramework 게시를 설정하려면:
     ./gradlew :together:assembleTogetherReleaseXCFramework
     ```
 
-5. [이전 섹션](#xcframework-및-swift-패키지-매니페스트-준비)의 단계에 따라 `together.xcframework`를 준비합니다: 아카이브하고, 체크섬을 계산하고, 아카이브된 XCFramework를 파일 저장소에 업로드하고, `Package.swift` 파일을 생성하여 푸시합니다.
+5. [이전 섹션](#prepare-the-xcframework-and-the-swift-package-manifest)의 단계에 따라 `together.xcframework`를 준비합니다: 아카이브하고, 체크섬을 계산하고, 아카이브된 XCFramework를 파일 저장소에 업로드하고, `Package.swift` 파일을 생성하여 푸시합니다.
 
 이제 Xcode 프로젝트로 의존성을 임포트할 수 있습니다. `import together` 디렉티브를 추가한 후, Swift 코드에서 `network`와 `database` 모듈의 클래스를 모두 사용할 수 있습니다.

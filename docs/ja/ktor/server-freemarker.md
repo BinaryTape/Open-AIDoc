@@ -47,7 +47,7 @@ Ktor では、[FreeMarker](https://api.ktor.io/ktor-server-freemarker/io.ktor.se
 ## FreeMarker のインストール {id="install_plugin"}
 
 <p>
-    アプリケーションに <code>%plugin_name%</code> プラグインを<a href="#install">インストール</a>するには、指定された<Links href="/ktor/server-modules" summary="Modules allow you to structure your application by grouping routes.">モジュール</Links>内の <code>install</code> 関数に渡します。
+    アプリケーションに <code>%plugin_name%</code> プラグインを<a href="server-plugins.md#install">インストール</a>するには、指定された<Links href="/ktor/server-modules" summary="Modules allow you to structure your application by grouping routes.">モジュール</Links>内の <code>install</code> 関数に渡します。
     以下のコードスニペットは、<code>%plugin_name%</code> のインストール方法を示しています...
 </p>
 <list>

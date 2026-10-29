@@ -52,7 +52,7 @@ Ollama のエンベデディングモデルを使用するには、以下の前�
     ```
     <!--- KNIT example-embeddings-01.txt -->
 
-    `<ollama-model-id>` は、特定のモデルの Ollama 識別子に置き換えてください。利用可能なエンベデディングモデルとその識別子の詳細については、[Ollama モデルの概要](#ollama-モデルの概要)を参照してください。
+    `<ollama-model-id>` は、特定のモデルの Ollama 識別子に置き換えてください。利用可能なエンベデディングモデルとその識別子の詳細については、[Ollama モデルの概要](#ollama-models-overview)を参照してください。
 
 ### Ollama モデルの概要 {id="ollama-models-overview"}
 

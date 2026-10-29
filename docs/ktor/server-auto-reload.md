@@ -73,19 +73,19 @@
     <chapter title="启用开发模式" id="enable">
         <p>
             要使用自动重载，您需要先启用
-            <a href="#enable">开发模式</a>。
+            <a href="server-development-mode.topic#enable">开发模式</a>。
             这取决于您用于<Links href="//server-create-and-configure" summary="了解如何根据应用部署需求创建服务器。">创建和运行服务器</Links>的方式：
         </p>
         <list>
             <li>
                 <p>
-                    如果您使用 <code>EngineMain</code> 运行服务器，请在<a href="#application-conf">配置文件</a>中启用开发模式。
+                    如果您使用 <code>EngineMain</code> 运行服务器，请在<a href="server-development-mode.topic#application-conf">配置文件</a>中启用开发模式。
                 </p>
             </li>
             <li>
                 <p>
                     如果您使用 <code>embeddedServer</code> 运行服务器，可以使用
-                    <a href="#system-property"><code>io.ktor.development</code></a>
+                    <a href="server-development-mode.topic#system-property"><code>io.ktor.development</code></a>
                     系统属性。
                 </p>
             </li>

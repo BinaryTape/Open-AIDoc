@@ -128,7 +128,7 @@ kotlinx ライブラリは、JetBrains のコア Kotlin チームによって保
 
 ### Gradle バージョンカタログのサンプル {id="sample-gradle-version-catalog"}
 
-Gradle を使用する場合は、[バージョンカタログ](#gradle-バージョンカタログ)を使用することをお勧めします。
+Gradle を使用する場合は、[バージョンカタログ](#gradle-version-catalogs)を使用することをお勧めします。
 以下の例で使用されるすべてのライブラリを定義したバージョンカタログを次に示します。
 
 ```toml

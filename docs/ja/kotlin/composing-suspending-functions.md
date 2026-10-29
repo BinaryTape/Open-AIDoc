@@ -5,7 +5,7 @@
 
 このセクションでは、中断関数（suspending functions）を構成するためのさまざまなアプローチについて説明します。
 
-## デフォルトで逐次実行
+## デフォルトで逐次実行 {id="sequential-by-default"}
 
 リモートサービスの呼び出しや計算など、何か役立つことを行う2つの中断関数がどこかで定義されていると仮定します。ここではそれらが役立つものであると仮定しますが、実際にはこの例のためにそれぞれが1秒間遅延するだけのものです：
 
@@ -67,7 +67,7 @@ Completed in 2017 ms
 
 <!--- TEST ARBITRARY_TIME -->
 
-## async を使用した並行実行
+## async を使用した並行実行 {id="concurrent-using-async"}
 
 もし `doSomethingUsefulOne` と `doSomethingUsefulTwo` の呼び出しの間に依存関係がなく、両方を *並行して*（concurrently）行うことで、より早く答えを得たい場合はどうすればよいでしょうか？ここで [async] が役に立ちます。
 
@@ -115,7 +115,7 @@ Completed in 1017 ms
 
 2つのコルーチンが並行して実行されるため、2倍速くなります。コルーチンによる並行実行は常に明示的であることに注意してください。
 
-## 遅延開始される async
+## 遅延開始される async {id="lazily-started-async"}
 
 オプションとして、[async] の `start` パラメータを [CoroutineStart.LAZY] に設定することで、遅延実行（lazy）にすることができます。このモードでは、[await][Deferred.await] によって結果が必要とされたとき、またはその `Job` の [start][Job.start] 関数が呼び出されたときにのみコルーチンを開始します。次の例を実行してください：
 
@@ -166,7 +166,7 @@ Completed in 1017 ms
 
 個々のコルーチンに対して最初に [start][Job.start] を呼び出さずに `println` 内で [await][Deferred.await] を呼び出すと、[await][Deferred.await] がコルーチンの実行を開始して終了を待機するため、逐次的な動作になってしまうことに注意してください。これは遅延実行の意図したユースケースではありません。`async(start = CoroutineStart.LAZY)` のユースケースは、値の計算に中断関数が含まれる場合に、標準の [lazy](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/lazy.html) 関数の代わりとして使用することです。
 
-## async スタイルな関数
+## async スタイルな関数 {id="async-style-functions"}
 
 > この async 関数を使用したプログラミングスタイルは、他のプログラミング言語で一般的なスタイルであるため、説明のためにのみここに記載しています。Kotlin のコルーチンでこのスタイルを使用することは、以下で説明する理由により **強く非推奨** です。
 >
@@ -252,7 +252,7 @@ Completed in 1085 ms
 
 もし `val one = somethingUsefulOneAsync()` の行と `one.await()` 式の間にコードの論理エラーがあり、プログラムが例外をスローして実行中の操作が中断された場合に何が起こるか考えてみてください。通常、グローバルなエラーハンドラーがこの例外をキャッチし、ログを記録して開発者にエラーを報告できますが、プログラムは他の操作を続行できます。しかし、ここでは、それを開始した操作が中断されたにもかかわらず、`somethingUsefulOneAsync` はバックグラウンドで実行されたままになります。この問題は、次のセクションで示すように、構造化された並行性を使用すれば発生しません。
 
-## async を使用した構造化された並行性 
+## async を使用した構造化された並行性 {id="structured-concurrency-with-async"}
 
 [async を使用した並行実行](#concurrent-using-async) の例を、`doSomethingUsefulOne` と `doSomethingUsefulTwo` を並行して実行し、その結果を合計して返す関数にリファクタリングしてみましょう。[async] は [CoroutineScope] の拡張関数であるため、[coroutineScope][_coroutineScope] 関数を使用して必要なスコープを提供します：
 

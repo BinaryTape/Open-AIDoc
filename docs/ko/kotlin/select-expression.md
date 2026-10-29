@@ -9,7 +9,7 @@ Select 표현식은 여러 중단 함수(suspending functions)를 동시에 기�
 >
 {style="note"}
 
-## 채널에서 선택하기
+## 채널에서 선택하기 {id="selecting-from-channels"}
 
 문자열을 생성하는 두 개의 생산자 `fizz`와 `buzz`가 있다고 가정해 보겠습니다. `fizz`는 500ms마다 "Fizz" 문자열을 생성합니다:
 
@@ -113,7 +113,7 @@ fizz -> 'Fizz'
 
 <!--- TEST -->
 
-## 종료(close) 시 선택하기
+## 종료(close) 시 선택하기 {id="selecting-on-close"}
 
 채널이 닫혔을 때 `select`의 [onReceive][ReceiveChannel.onReceive] 절은 실패하며, 이로 인해 해당 `select`는 예외를 던집니다. 채널이 닫혔을 때 특정 동작을 수행하려면 [onReceiveCatching][ReceiveChannel.onReceiveCatching] 절을 사용할 수 있습니다. 다음 예제는 `select`가 선택된 절의 결과를 반환하는 표현식임을 보여줍니다:
 
@@ -210,7 +210,7 @@ Channel 'a' is closed
 
 둘째, 채널이 이미 닫혀 있는 경우 [onReceiveCatching][ReceiveChannel.onReceiveCatching]이 즉시 선택됩니다.
 
-## 전송 시 선택하기
+## 전송 시 선택하기 {id="selecting-to-send"}
 
 Select 표현식은 선택의 편향적인 특성과 결합하여 유용하게 사용할 수 있는 [onSend][SendChannel.onSend] 절을 가지고 있습니다.
 
@@ -286,7 +286,7 @@ Done consuming
 
 <!--- TEST -->
 
-## Deferred 값 선택하기
+## Deferred 값 선택하기 {id="selecting-deferred-values"}
 
 Deferred 값은 [onAwait][Deferred.onAwait] 절을 사용하여 선택할 수 있습니다. 무작위 지연 후에 Deferred 문자열 값을 반환하는 async 함수부터 시작해 보겠습니다:
 
@@ -356,7 +356,7 @@ Deferred 4 produced answer 'Waited for 128 ms'
 
 <!--- TEST -->
 
-## Deferred 값 채널의 전환(Switch over)
+## Deferred 값 채널의 전환(Switch over) {id="switch-over-a-channel-of-deferred-values"}
 
 Deferred 문자열 값의 채널을 소비하는 채널 생산자 함수를 작성해 보겠습니다. 이 함수는 수신된 각 Deferred 값을 기다리지만, 다음 Deferred 값이 오거나 채널이 닫힐 때까지만 기다립니다. 이 예제는 동일한 `select` 내에서 [onReceiveCatching][ReceiveChannel.onReceiveCatching]과 [onAwait][Deferred.onAwait] 절을 함께 사용합니다:
 

@@ -171,7 +171,7 @@ fun main() {
 
 ## 条件式での Boolean {id="boolean-in-conditions"}
 
-[`if`](control-flow.md#if-式)、[`when`](control-flow.md#when-式と文)、および [`while`](control-flow.md#while-ループ) は Boolean 式を評価してプログラムのフローを制御します。
+[`if`](control-flow.md#if-expression)、[`when`](control-flow.md#when-expressions-and-statements)、および [`while`](control-flow.md#while-loops) は Boolean 式を評価してプログラムのフローを制御します。
 
 ### if 式 {id="if-expressions"}
 

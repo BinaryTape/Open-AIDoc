@@ -150,7 +150,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
 
-결과 타입은 피연산자의 타입에 따라 달라집니다. 자세한 내용은 [](#혼합-숫자-표현식)에서 알아보세요.
+결과 타입은 피연산자의 타입에 따라 달라집니다. 자세한 내용은 [](#mixed-numeric-expressions)에서 알아보세요.
 
 > 커스텀 숫자 클래스에서 이러한 연산자를 오버라이드할 수 있습니다.
 > 자세한 내용은 [연산자 오버로딩](operator-overloading.md)을 참고하세요.

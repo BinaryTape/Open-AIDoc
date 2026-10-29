@@ -59,7 +59,7 @@ CocoaPodsプラグインから移行するには:
 3. `build.gradle(.kts)` ファイルから `cocoapods {}` ブロックを削除します。
 4. `.podspec` ファイルとPodfileを削除します。
 
-## プロジェクトへのフレームワークの接続
+## プロジェクトへのフレームワークの接続 {id="connect-the-framework-to-your-project"}
 
 > 現時点では、`swift build` への統合はサポートされていません。
 >

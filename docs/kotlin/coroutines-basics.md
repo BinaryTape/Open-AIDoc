@@ -222,7 +222,7 @@ dependencies {
 >
 {style="tip"}
 
-## 协程作用域与结构化并发
+## 协程作用域与结构化并发 {id="coroutine-scope-and-structured-concurrency"}
 
 当你在应用程序中运行许多协程时，需要一种将它们作为组进行管理的方法。Kotlin 协程依赖于一个称为**结构化并发**的原则来提供这种结构。
 
@@ -234,7 +234,7 @@ dependencies {
 
 在 `CoroutineScope` 上调用[协程构建器函数](#coroutine-builder-functions)（如 `CoroutineScope.launch()`）会启动一个与该作用域关联的协程的子协程。在构建器的代码块内部，[接收者](lambdas.md#function-literals-with-receiver)是一个嵌套的 `CoroutineScope`，因此你在其中启动的任何协程都会成为其子协程。
 
-### 使用 `coroutineScope()` 函数创建协程作用域
+### 使用 `coroutineScope()` 函数创建协程作用域 {id="create-a-coroutine-scope-with-the-coroutinescope-function"}
 
 要使用当前的协程上下文创建一个新的协程作用域，请使用 [`coroutineScope()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/coroutine-scope.html) 函数。此函数会创建一个协程子树的根协程。它是该代码块内启动的协程的直接父级，也是这些协程所启动的任何协程的间接父级。`coroutineScope()` 执行挂起块并等待该块及其中启动的所有协程完成。
 

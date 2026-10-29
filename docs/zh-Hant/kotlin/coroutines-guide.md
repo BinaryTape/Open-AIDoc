@@ -10,7 +10,7 @@ Kotlin 在其標準函式庫中僅提供最少量的底層 API，以便讓其他
 
 為了使用協同程式並操作本指南中的範例，您需要按照[專案 README 中所述](https://github.com/Kotlin/kotlinx.coroutines/blob/master/README.md#using-in-your-projects)新增對 `kotlinx-coroutines-core` 模組的相依性。
 
-## 目錄
+## 目錄 {id="table-of-contents"}
 
 * [協同程式基礎](coroutines-basics.md)
 * [取消與逾時](coroutines-cancellation.md)
@@ -25,7 +25,7 @@ Kotlin 在其標準函式庫中僅提供最少量的底層 API，以便讓其他
 * [教學：使用 IntelliJ IDEA 偵錯協同程式](debug-coroutines-with-idea.md)
 * [教學：使用 IntelliJ IDEA 偵錯 Kotlin Flow](debug-flow-with-idea.md)
 
-## 其他參考資料
+## 其他參考資料 {id="additional-references"}
 
 * [協同程式 UI 程式設計指南](https://github.com/Kotlin/kotlinx.coroutines/blob/master/ui/coroutines-guide-ui.md)
 * [協同程式設計文件 (KEEP)](https://github.com/Kotlin/KEEP/blob/master/proposals/coroutines.md)

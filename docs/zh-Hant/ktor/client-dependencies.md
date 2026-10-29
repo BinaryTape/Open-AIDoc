@@ -202,7 +202,7 @@ sourceSets {
 ### 記錄相依性 {id="logging-dependency"}
 
   <p>
-    在 <a href="#jvm">JVM</a> 上，Ktor 使用 Simple Logging Facade for Java
+    在 <a href="client-engines.md#jvm">JVM</a> 上，Ktor 使用 Simple Logging Facade for Java
     (<a href="http://www.slf4j.org/">SLF4J</a>) 作為記錄的抽象層。SLF4J 將記錄 API 與底層記錄實作解耦，讓您可以整合最符合應用程式需求的記錄架構。
     常見的選擇包括 <a href="https://logback.qos.ch/">Logback</a> 或 
     <a href="https://logging.apache.org/log4j">Log4j</a>。如果未提供架構，SLF4J 將預設為無操作 (NOP) 實作，這基本上會停用記錄功能。

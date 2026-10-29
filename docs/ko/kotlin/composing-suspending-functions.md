@@ -5,7 +5,7 @@
 
 이 섹션에서는 일시 중단 함수(suspending functions)를 구성하는 다양한 접근 방식을 다룹니다.
 
-## 기본적으로 순차적
+## 기본적으로 순차적 {id="sequential-by-default"}
 
 어딘가에 원격 서비스 호출이나 계산과 같은 유용한 작업을 수행하는 두 개의 일시 중단 함수가 정의되어 있다고 가정해 봅시다. 이 예제에서는 유용한 작업을 수행하는 것처럼 보이기 위해 각각 1초 동안 지연(delay)되도록 구현했습니다.
 
@@ -67,7 +67,7 @@ Completed in 2017 ms
 
 <!--- TEST ARBITRARY_TIME -->
 
-## async를 이용한 동시 실행
+## async를 이용한 동시 실행 {id="concurrent-using-async"}
 
 만약 `doSomethingUsefulOne`과 `doSomethingUsefulTwo` 호출 사이에 의존성이 없고, 두 함수를 _동시(concurrently)_ 에 실행하여 더 빠르게 결과를 얻고 싶다면 어떻게 해야 할까요? 이때 [async]가 도움이 됩니다.
 
@@ -115,7 +115,7 @@ Completed in 1017 ms
 
 두 코루틴이 동시에 실행되었기 때문에 시간이 절반으로 줄었습니다. 코루틴을 사용한 동시성은 항상 명시적이라는 점에 유의하세요.
 
-## 지연 시작하는 async
+## 지연 시작하는 async {id="lazily-started-async"}
 
 선택적으로, [async]의 `start` 파라미터를 [CoroutineStart.LAZY]로 설정하여 지연 시작하도록 만들 수 있습니다. 이 모드에서는 [await][Deferred.await]를 통해 결과가 필요하거나, `Job`의 [start][Job.start] 함수가 호출될 때만 코루틴을 시작합니다. 다음 예제를 실행해 보세요.
 
@@ -166,7 +166,7 @@ Completed in 1017 ms
 
 만약 개별 코루틴에 대해 [start][Job.start]를 먼저 호출하지 않고 `println`에서 [await][Deferred.await]를 호출하면, [await][Deferred.await]가 코루틴 실행을 시작하고 완료될 때까지 기다리므로 순차적으로 동작하게 됩니다. 이는 지연 실행(laziness)의 의도된 유스케이스가 아닙니다. `async(start = CoroutineStart.LAZY)`의 유스케이스는 값의 계산에 일시 중단 함수가 포함될 때 표준 [lazy](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/lazy.html) 함수를 대체하는 것입니다.
 
-## async 스타일 함수
+## async 스타일 함수 {id="async-style-functions"}
 
 > async 함수를 사용하는 이 프로그래밍 스타일은 다른 프로그래밍 언어에서 인기 있는 스타일이기 때문에 설명을 위해 여기에 제공됩니다. 하지만 코틀린 코루틴에서 이 스타일을 사용하는 것은 아래 설명된 이유로 **강력히 권장되지 않습니다**.
 >
@@ -252,9 +252,9 @@ Completed in 1085 ms
 
 `val one = somethingUsefulOneAsync()` 라인과 `one.await()` 표현식 사이에 코드 로직 오류가 발생하여 프로그램이 예외를 던지고 수행 중이던 작업이 중단된다고 가정해 봅시다. 보통 글로벌 에러 핸들러가 이 예외를 잡아 로그를 남기고 개발자에게 보고할 수 있지만, 프로그램은 다른 작업을 계속 수행할 수 있습니다. 그러나 여기서는 작업을 시작한 프로그램은 중단되었음에도 불구하고 `somethingUsefulOneAsync`가 백그라운드에서 여전히 실행 중인 상태가 됩니다. 아래 섹션에서 보여주듯, 구조화된 동시성에서는 이러한 문제가 발생하지 않습니다.
 
-## async를 이용한 구조화된 동시성
+## async를 이용한 구조화된 동시성 {id="structured-concurrency-with-async"}
 
-[async를 이용한 동시 실행](#async를-이용한-동시-실행) 예제를 `doSomethingUsefulOne`과 `doSomethingUsefulTwo`를 동시에 실행하고 그 합계 결과를 반환하는 함수로 리팩토링해 보겠습니다. [async]는 [CoroutineScope]의 확장 함수이므로, [coroutineScope][_coroutineScope] 함수를 사용하여 필요한 스코프를 제공합니다.
+[async를 이용한 동시 실행](#concurrent-using-async) 예제를 `doSomethingUsefulOne`과 `doSomethingUsefulTwo`를 동시에 실행하고 그 합계 결과를 반환하는 함수로 리팩토링해 보겠습니다. [async]는 [CoroutineScope]의 확장 함수이므로, [coroutineScope][_coroutineScope] 함수를 사용하여 필요한 스코프를 제공합니다.
 
 ```kotlin
 suspend fun concurrentSum(): Int = coroutineScope {

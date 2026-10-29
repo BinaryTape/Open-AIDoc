@@ -160,7 +160,7 @@ Gradle은 변경 사항이 생길 때마다 프로젝트를 자동으로 다시 
     }
    ```
 
-#### 출력 요소 추가
+#### 출력 요소 추가 {id="add-an-output-element"}
 
 1. 단락(paragraph)을 생성하는 [확장 함수](extensions.md#extension-functions)를 정의하여 출력을 표시할 텍스트 요소를 추가합니다:
 

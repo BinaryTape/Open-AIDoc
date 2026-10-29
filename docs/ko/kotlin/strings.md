@@ -385,7 +385,7 @@ fun main() {
 
 ### 문자열 구축 및 포매팅 {id="build-and-format-strings"}
 
-> Kotlin에서 대부분의 포매팅 작업에는 [문자열 템플릿](#문자열-템플릿-string-templates)을 사용하세요.
+> Kotlin에서 대부분의 포매팅 작업에는 [문자열 템플릿](#string-templates)을 사용하세요.
 >
 {style="tip"}
 

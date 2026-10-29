@@ -547,7 +547,7 @@ KMP-NativeCoroutines の依存関係を含めるようにビルドスクリプ�
     }
     ```
 
-#### Xcode で SwiftPM を使用してライブラリをインポート
+#### Xcode で SwiftPM を使用してライブラリをインポート {id="import-the-library-using-swiftpm-in-xcode"}
 
 `async/await` メカニズムの操作に必要な KMP-NativeCoroutines Swift パッケージのパーツをインストールします。
 
@@ -569,7 +569,7 @@ KMP-NativeCoroutines の依存関係を含めるようにビルドスクリプ�
 7. IntelliJ IDEA に戻り、**Tools | Swift Package Manager | Resolve Dependencies** を選択します。
    これにより、Kotlin Multiplatform ビルドタスクで使用される `Package.resolved` ロックファイルが作成されます。このファイルは、Swift パッケージのバージョンの一貫性を保つためにリポジトリにコミットできます。
 
-#### KMP-NativeCoroutines ライブラリを使用した Flow の利用
+#### KMP-NativeCoroutines ライブラリを使用した Flow の利用 {id="consume-the-flow-using-the-kmp-nativecoroutines-library"}
 
 1. `iosApp/ContentView.swift` で `startObserving()` 関数を更新し、KMP-NativeCoroutines の `asyncSequence()` 関数を使用して Flow を利用します。
 
@@ -626,7 +626,7 @@ KMP-NativeCoroutines の依存関係を含めるようにビルドスクリプ�
 >
 {style="warning"}
 
-### オプション 2: SKIE の設定 {initial-collapse-state="collapsed" collapsible="true"}
+### オプション 2: SKIE の設定 {initial-collapse-state="collapsed" collapsible="true" id="option-2-configure-skie"}
 
 ライブラリをセットアップするには、Gradle バージョンカタログに SKIE のバージョンとプラグイン参照を追加します。
 

@@ -49,7 +49,7 @@ Kotlin/JSは、[ESM](https://tc39.es/ecma262/#sec-modules)、[CommonJS](https://
 
 ### ユースケースの共有 {id="share-your-use-cases"}
 
-[Kotlin/JSのユースケース](#kotlinjsのユースケース)に挙げたリストがすべてではありません。さまざまなアプローチを試して、あなたのプロジェクトに最適な方法を見つけてください。
+[Kotlin/JSのユースケース](#use-cases-for-kotlin-js)に挙げたリストがすべてではありません。さまざまなアプローチを試して、あなたのプロジェクトに最適な方法を見つけてください。
 
 あなたのユースケース、経験、質問などは、[Kotlin Slack](https://surveys.jetbrains.com/s3/kotlin-slack-sign-up)の[#javascript](https://kotlinlang.slack.com/archives/C0B8L3U69)チャンネルでKotlin/JSコミュニティと共有してください。
 
@@ -58,7 +58,7 @@ Kotlin/JSは、[ESM](https://tc39.es/ecma262/#sec-modules)、[CommonJS](https://
 Kotlin/JSでの開発を始めるための基本事項と最初のステップを確認しましょう。
 
 * Kotlinが初めての場合は、まず[基本構文](basic-syntax.md)を復習し、[Kotlinツアー](kotlin-tour-welcome.md)を体験することをお勧めします。
-* インスピレーションを得るために、[Kotlin/JSサンプルプロジェクト](#kotlinjsのサンプルプロジェクト)のリストを確認してください。これらのサンプルには、プロジェクトを開始するのに役立つ便利なコードスニペットやパターンが含まれています。
+* インスピレーションを得るために、[Kotlin/JSサンプルプロジェクト](#sample-projects-for-kotlin-js)のリストを確認してください。これらのサンプルには、プロジェクトを開始するのに役立つ便利なコードスニペットやパターンが含まれています。
 * Kotlin/JSが初めての場合は、より高度なトピックを調べる前に[セットアップガイド](js-project-setup.md)から始めてください。
 
 Kotlin/JSを自分で試してみませんか？

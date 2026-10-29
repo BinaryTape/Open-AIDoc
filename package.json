@@ -9,7 +9,7 @@
     "test:all": "pnpm test && pnpm docs:check",
     "docs:dev": "vitepress dev docs",
     "docs:build": "node scripts/build-docs.mjs docs",
-    "docs:verify": "node scripts/verify-site-output.mjs && node scripts/verify-internal-links.mjs",
+    "docs:verify": "node scripts/verify-site-output.mjs && node scripts/verify-internal-links.mjs && node scripts/verify-anchors.mjs",
     "docs:check": "pnpm docs:build && pnpm docs:verify",
     "docs:preview": "vitepress preview docs",
     "kotlin-cn:prepare": "node sites/kotlin-cn/scripts/prepare-content.mjs",

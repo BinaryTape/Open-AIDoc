@@ -113,7 +113,7 @@ fun grep(lines: List<String>, pattern: String, action: (String) -> Unit) {
 如您所见，导入的注解和断言既不针对特定平台，也不针对特定框架。
 稍后运行此测试时，将由平台特定的框架提供测试运行程序。
 
-#### 探索 `kotlin.test` API {initial-collapse-state="collapsed" collapsible="true"}
+#### 探索 `kotlin.test` API {initial-collapse-state="collapsed" collapsible="true" id="explore-the-kotlin-test-api"}
 
 [`kotlin.test`](https://kotlinlang.org/api/latest/kotlin.test/) 库提供了与平台无关的注解和断言，供您在测试中使用。诸如 `Test` 之类的注解会映射到所选框架提供的注解或其最接近的对应项。
 
@@ -121,7 +121,7 @@ fun grep(lines: List<String>, pattern: String, action: (String) -> Unit) {
 
 例如，JVM 上支持 JUnit 4、JUnit 5 和 TestNG 框架。在 Android 上，对 `assertEquals()` 的调用可能会导致对 `asserter.assertEquals()` 的调用，其中 `asserter` 对象是 `JUnit4Asserter` 的一个实例。在 iOS 上，`Asserter` 类型的默认实现会与 Kotlin/Native 的测试运行程序结合使用。
 
-### 运行测试
+### 运行测试 {id="run-tests"}
 
 您可以通过以下方式执行测试：
 
@@ -140,9 +140,9 @@ fun grep(lines: List<String>, pattern: String, action: (String) -> Unit) {
 
 ![测试输出](run-test-results.png){width=700}
 
-## 处理更复杂的项目
+## 处理更复杂的项目 {id="work-with-more-complex-projects"}
 
-### 为公共代码编写测试
+### 为公共代码编写测试 {id="write-tests-for-common-code"}
 
 您已经为包含 `grep()` 函数的公共代码创建了测试。现在，让我们考虑使用 `CurrentRuntime` 类进行更高级的公共代码测试。此类包含运行该代码的平台的详细信息。
 例如，对于在本地 JVM 上运行的 Android 单元测试，它可能具有值 "OpenJDK" 和 "17.0"。
@@ -203,9 +203,9 @@ fun grep(lines: List<String>, pattern: String, action: (String) -> Unit) {
     }
     ```
 
-您可以使用 [IDE 中提供的](#运行测试)任意方式运行此测试。
+您可以使用 [IDE 中提供的](#run-tests)任意方式运行此测试。
 
-### 添加平台特定测试
+### 添加平台特定测试 {id="add-platform-specific-tests"}
 
 > 为简明起见，此处使用了[预期声明与实际声明机制](multiplatform-connect-to-apis.md)。在更复杂的代码中，更好的做法是使用接口和工厂函数。
 >

@@ -158,7 +158,7 @@ kotlin {
 
 #### 名称翻译 {id="name-translation"}
 
-Objective-C 类以原始名称导入 Kotlin。协议作为带有 `Protocol` 名称后缀的接口导入，例如 `@protocol Foo` -> `interface FooProtocol`。这些类和接口被放置在[构建配置中指定](#将-swiftobjective-c-库导入-kotlin)的软件包中（预配置的系统框架位于 `platform.*` 软件包中）。
+Objective-C 类以原始名称导入 Kotlin。协议作为带有 `Protocol` 名称后缀的接口导入，例如 `@protocol Foo` -> `interface FooProtocol`。这些类和接口被放置在[构建配置中指定](#importing-swift-objective-c-libraries-to-kotlin)的软件包中（预配置的系统框架位于 `platform.*` 软件包中）。
 
 Kotlin 类和接口的名称在导入到 Objective-C 时会添加前缀。前缀源自框架名称。
 
@@ -235,7 +235,7 @@ player.moveTo(UP, byInches = 42)
 
 [在 Kotlin-Swift interopedia 中查看数据类的示例](https://github.com/kotlin-hands-on/kotlin-swift-interopedia/blob/main/docs/classesandinterfaces/Data%20classes.md)。
 
-你可以在 Swift 或 Objective-C 中指定一个更符合语言习惯的名称，而不是使用 [`@ObjCName` 注解](#更改声明名称)来重命名 Kotlin 声明。
+你可以在 Swift 或 Objective-C 中指定一个更符合语言习惯的名称，而不是使用 [`@ObjCName` 注解](#change-declaration-names)来重命名 Kotlin 声明。
 
 ### 错误和异常 {id="errors-and-exceptions"}
 
@@ -303,7 +303,7 @@ Objective-C 分类和 Swift 扩展的成员通常作为扩展导入 Kotlin。这
 >
 {style="note"}
 
-针对“常规” Kotlin 类的 Kotlin 扩展会分别作为扩展和分类成员导入 Swift 和 Objective-C。针对其他类型的 Kotlin 扩展被视为带有额外接收者实参的[顶级声明](#顶级函数和属性)。这些类型包括：
+针对“常规” Kotlin 类的 Kotlin 扩展会分别作为扩展和分类成员导入 Swift 和 Objective-C。针对其他类型的 Kotlin 扩展被视为带有额外接收者实参的[顶级声明](#top-level-functions-and-properties)。这些类型包括：
 
 * Kotlin `String` 类型
 * Kotlin 集合类型及其子类型
@@ -358,13 +358,13 @@ MyClass.Companion.shared
 
 Kotlin 基元类型的装箱被映射到特殊的 Swift/Objective-C 类。例如，`kotlin.Int` 装箱在 Swift 中表现为 `KotlinInt` 类实例（在 Objective-C 中为 `${prefix}Int` 实例，其中 `prefix` 是框架的名称前缀）。这些类派生自 `NSNumber`，因此实例是合法的 `NSNumber`，支持所有相应的操作。
 
-当 `NSNumber` 类型用作 Swift/Objective-C 的形参类型或返回值时，它不会自动转换为 Kotlin 基元类型。原因是 `NSNumber` 类型没有提供关于所包装的基元值类型的足够信息，例如，静态地无法得知 `NSNumber` 是 `Byte`、`Boolean` 还是 `Double`。因此，Kotlin 基元值应[手动与 `NSNumber` 进行相互转换](#在映射类型之间转换)。
+当 `NSNumber` 类型用作 Swift/Objective-C 的形参类型或返回值时，它不会自动转换为 Kotlin 基元类型。原因是 `NSNumber` 类型没有提供关于所包装的基元值类型的足够信息，例如，静态地无法得知 `NSNumber` 是 `Byte`、`Boolean` 还是 `Double`。因此，Kotlin 基元值应[手动与 `NSNumber` 进行相互转换](#casting-between-mapped-types)。
 
 ### 字符串 {id="strings"}
 
 当 Kotlin `String` 传递给 Swift时，它首先被导出为 Objective-C 对象，然后 Swift 编译器会为了 Swift 转换再对其进行一次复制。这会导致额外的运行时开销。
 
-为了避免这种情况，可以在 Swift 中直接将 Kotlin 字符串作为 Objective-C `NSString` 访问。[查看转换示例](#查看转换示例)。
+为了避免这种情况，可以在 Swift 中直接将 Kotlin 字符串作为 Objective-C `NSString` 访问。[查看转换示例](#see-the-conversion-example)。
 
 #### NSMutableString {id="nsmutablestring"}
 
@@ -374,7 +374,7 @@ Objective-C 类 `NSMutableString` 在 Kotlin 中不可用。所有 `NSMutableStr
 
 #### Kotlin -> Objective-C -> Swift {id="kotlin-objective-c-swift"}
 
-当 Kotlin 集合传递给 Swift 时，它首先被转换为等效的 Objective-C 集合，然后 Swift 编译器会复制整个集合，并将其转换为 [映射表](#映射) 中所述的 Swift 原生集合。
+当 Kotlin 集合传递给 Swift 时，它首先被转换为等效的 Objective-C 集合，然后 Swift 编译器会复制整个集合，并将其转换为 [映射表](#mappings) 中所述的 Swift 原生集合。
 
 最后一次转换会带来性能成本。为了防止这种情况，在 Swift 中使用 Kotlin 集合时，可以显式地将它们转换为对应的 Objective-C 集合：`NSDictionary`、`NSArray` 或 `NSSet`。
 
@@ -405,7 +405,7 @@ let nsMap: NSDictionary = map as NSDictionary
 
 #### Swift -> Objective-C -> Kotlin {id="swift-objective-c-kotlin"}
 
-除了 `NSMutableSet` 和 `NSMutableDictionary` 外，Swift/Objective-C 集合会按照 [映射表](#映射) 中的说明映射到 Kotlin。
+除了 `NSMutableSet` 和 `NSMutableDictionary` 外，Swift/Objective-C 集合会按照 [映射表](#mappings) 中的说明映射到 Kotlin。
 
 `NSMutableSet` 不会被转换为 Kotlin 的 `MutableSet`。要将对象传递给 Kotlin `MutableSet`，请显式地创建此类 Kotlin 集合。为此，可以使用 Kotlin 中的 `mutableSetOf()` 函数，或者 Swift 中的 `KotlinMutableSet` 类以及 Objective-C 中的 `${prefix}MutableSet`（`prefix` 是框架名称前缀）。对于 `MutableMap` 也是如此。
 
@@ -415,7 +415,7 @@ let nsMap: NSDictionary = map as NSDictionary
 
 Kotlin 函数类型对象（例如 lambda）在 Swift 中被转换为闭包，在 Objective-C 中被转换为块。[在 Kotlin-Swift interopedia 中查看带有 lambda 的 Kotlin 函数示例](https://github.com/kotlin-hands-on/kotlin-swift-interopedia/blob/main/docs/functionsandproperties/Functions%20returning%20function%20type.md)。
 
-但是，在翻译函数和函数类型时，形参和返回值类型的映射方式存在差异。在后一种情况下，基元类型被映射到它们的装箱表示。Kotlin `Unit` 返回值在 Swift/Objective-C 中表现为相应的 `Unit` 单例。可以像访问任何其他 Kotlin `object` 一样检索此单例的值。请参阅[上表](#映射)中的单例。
+但是，在翻译函数和函数类型时，形参和返回值类型的映射方式存在差异。在后一种情况下，基元类型被映射到它们的装箱表示。Kotlin `Unit` 返回值在 Swift/Objective-C 中表现为相应的 `Unit` 单例。可以像访问任何其他 Kotlin `object` 一样检索此单例的值。请参阅[上表](#mappings)中的单例。
 
 考虑以下 Kotlin 函数：
 

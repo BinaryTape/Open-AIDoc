@@ -63,7 +63,7 @@
     </chapter>
     <chapter title="安裝 SSE" id="install_plugin">
         <p>
-            若要將 <code>%plugin_name%</code> 外掛程式<a href="#install">安裝</a>到您的應用程式中，請將其傳遞給指定<Links href="/ktor/server-modules" summary="模組允許您透過分組路由來組織應用程式結構。">模組</Links>中的 <code>install</code> 函式。
+            若要將 <code>%plugin_name%</code> 外掛程式<a href="server-plugins.md#install">安裝</a>到您的應用程式中，請將其傳遞給指定<Links href="/ktor/server-modules" summary="模組允許您透過分組路由來組織應用程式結構。">模組</Links>中的 <code>install</code> 函式。
             以下範例展示如何安裝 <code>%plugin_name%</code>：
         </p>
         <list>
@@ -86,7 +86,7 @@
     <chapter title="處理 SSE 工作階段" id="handle-sessions">
         <p>
             安裝 <code>SSE</code> 外掛程式後，您可以新增路由來處理 SSE 工作階段。
-            為此，請在 <a href="#define_route">routing</a> 區塊內呼叫 <code>sse()</code> 函式。設定 SSE 路由有兩種方式：
+            為此，請在 <a href="server-routing.md#define_route">routing</a> 區塊內呼叫 <code>sse()</code> 函式。設定 SSE 路由有兩種方式：
         </p>
         <list type="decimal">
             <li>

@@ -41,7 +41,7 @@ Kotlin 言語およびツールセットは、JVM、JS、Native ターゲット�
 各 Kotlin プロジェクトには、その安定性とサポートステータスを説明する 2 つの GitHub バッジがあります：
 
 * **Stability**（安定性）ステータス。各プロジェクトの進化速度と、採用時にユーザーが負うリスクの大きさを示します。
-  安定性ステータスは、[Kotlin 言語機能およびそのコンポーネントの安定性レベル](#各安定性レベルの説明)と完全に一致します：
+  安定性ステータスは、[Kotlin 言語機能およびそのコンポーネントの安定性レベル](#stability-levels-explained)と完全に一致します：
     * ![Experimental stability level](https://kotl.in/badges/experimental.svg){type="joined"} は **Experimental** を表します
     * ![Alpha stability level](https://kotl.in/badges/alpha.svg){type="joined"} は **Alpha** を表します
     * ![Beta stability level](https://kotl.in/badges/beta.svg){type="joined"} は **Beta** を表します

@@ -150,7 +150,7 @@
 - `NoPersistenceStorageProvider`: 체크포인트를 저장하지 않는 무동작(no-op) 구현체입니다. 기본 프로바이더입니다.
 
 또한 `PersistenceStorageProvider` 인터페이스를 구현하여 사용자 정의 스토리지 프로바이더를 만들 수도 있습니다.
-자세한 내용은 [사용자 정의 스토리지 프로바이더](#사용자-정의-스토리지-프로바이더)를 참조하세요.
+자세한 내용은 [사용자 정의 스토리지 프로바이더](#custom-storage-providers)를 참조하세요.
 
 ### 연속 지속성 (Continuous persistence) {id="continuous-persistence"}
 

@@ -104,7 +104,7 @@
             </TabItem>
         </Tabs>
         <note>
-            <code>EngineMain.main()</code>でサーバーを即座に起動する代わりに、<code>EngineMain.createServer()</code>を使用して手動でサーバーインスタンスを作成することもできます。詳細については、<a href="#createServer"></a>を参照してください。
+            <code>EngineMain.main()</code>でサーバーを即座に起動する代わりに、<code>EngineMain.createServer()</code>を使用して手動でサーバーインスタンスを作成することもできます。詳細については、<a href="server-engines.md#createServer"></a>を参照してください。
         </note>
         <p>
             完全な例については、

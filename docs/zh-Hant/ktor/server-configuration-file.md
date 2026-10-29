@@ -30,7 +30,7 @@
     <chapter title="概覽" id="configuration-file-overview">
         <p>
             如果您使用 
-            <a href="#engine-main">
+            <a href="server-create-and-configure.topic#engine-main">
                 EngineMain
             </a>
             來啟動伺服器，Ktor 會自動從位於 
@@ -157,7 +157,7 @@
                 除了指定 <a href="#predefined-properties">預定義屬性</a> 外，
                 Ktor 還允許您在組態檔案中保留自訂設定。
                 下方的組態檔案包含一個用於保留 
-                <a href="#jwt-settings">JWT</a>
+                <a href="server-jwt.md#jwt-settings">JWT</a>
                 設定的自訂 <code>jwt</code> 群組。
             </p>
             <tabs group="config">
@@ -224,7 +224,7 @@
             </def>
             <def title="ktor.deployment.watch" id="ktor-deployment-watch">
                 <p>
-                    用於 <a href="#watch-paths">自動重新載入</a> 的監看路徑。
+                    用於 <a href="server-auto-reload.topic#watch-paths">自動重新載入</a> 的監看路徑。
                 </p>
             </def>
             <def title="ktor.deployment.rootPath" id="ktor-deployment-root-path">
@@ -383,7 +383,7 @@
     </chapter>
     <chapter title="命令列" id="command-line">
         <p>
-            如果您使用 <a href="#engine-main">EngineMain</a> 建立伺服器，您可以從命令列執行 <Links href="/ktor/server-fatjar" summary="了解如何使用 Ktor Gradle 外掛程式建立並執行可執行 Fat JAR。">封裝好的應用程式</Links>，並透過傳遞對應的命令列引數來覆寫所需的伺服器參數。例如，您可以按以下方式覆寫組態檔案中指定的連接埠：
+            如果您使用 <a href="server-create-and-configure.topic#engine-main">EngineMain</a> 建立伺服器，您可以從命令列執行 <Links href="/ktor/server-fatjar" summary="了解如何使用 Ktor Gradle 外掛程式建立並執行可執行 Fat JAR。">封裝好的應用程式</Links>，並透過傳遞對應的命令列引數來覆寫所需的伺服器參數。例如，您可以按以下方式覆寫組態檔案中指定的連接埠：
         </p>
         <code-block lang="shell" code="            java -jar sample-app.jar -port=8080"/>
         <p>
@@ -424,7 +424,7 @@
             </def>
             <def title="-watch" id="watch">
                 <p>
-                    用於 <a href="#watch-paths">自動重新載入</a> 的監看路徑。
+                    用於 <a href="server-auto-reload.topic#watch-paths">自動重新載入</a> 的監看路徑。
                 </p>
             </def>
         </deflist>

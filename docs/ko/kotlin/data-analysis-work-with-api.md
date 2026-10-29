@@ -89,7 +89,7 @@ Kotlin DataFrame 라이브러리를 사용하여 API에서 데이터를 가져�
 
 데이터 정제(Cleaning) 및 가공(Refining)은 분석을 위해 데이터셋을 준비하는 중요한 단계입니다. [Kotlin DataFrame 라이브러리](https://kotlin.github.io/dataframe/home.html)는 이러한 작업을 위한 강력한 기능을 제공합니다. [`move`](https://kotlin.github.io/dataframe/move.html), [`concat`](https://kotlin.github.io/dataframe/concatdf.html), [`select`](https://kotlin.github.io/dataframe/select.html), [`parse`](https://kotlin.github.io/dataframe/parse.html), [`join`](https://kotlin.github.io/dataframe/join.html)과 같은 메서드들은 데이터를 정리하고 변환하는 데 유용합니다. 
 
-이미 [YouTube Data API를 사용하여 가져온](#api에서-데이터-가져오기) 데이터를 예로 들어보겠습니다. 목표는 심층 분석을 준비하기 위해 데이터셋을 정제하고 재구성하는 것입니다:
+이미 [YouTube Data API를 사용하여 가져온](#fetch-data-from-an-api) 데이터를 예로 들어보겠습니다. 목표는 심층 분석을 준비하기 위해 데이터셋을 정제하고 재구성하는 것입니다:
 
 1. 먼저 데이터를 재구성하고 정제하는 것으로 시작할 수 있습니다. 여기에는 특정 컬럼을 새 헤더 아래로 이동시키고 명확성을 위해 불필요한 컬럼을 제거하는 작업이 포함됩니다:
 
@@ -124,7 +124,7 @@ Kotlin DataFrame 라이브러리를 사용하여 API에서 데이터를 가져�
    joined
    ```
 
-이 예제는 Kotlin DataFrame의 다양한 함수를 사용하여 데이터셋을 정제, 재구성 및 향상시키는 방법을 보여줍니다. 각 단계는 데이터를 가공하여 [심층 분석](#kotlin-notebook에서-데이터-분석)에 더 적합하게 만들도록 설계되었습니다.
+이 예제는 Kotlin DataFrame의 다양한 함수를 사용하여 데이터셋을 정제, 재구성 및 향상시키는 방법을 보여줍니다. 각 단계는 데이터를 가공하여 [심층 분석](#fetch-data-from-an-api)에 더 적합하게 만들도록 설계되었습니다.
 
 ## Kotlin Notebook에서 데이터 분석 {id="analyze-data-in-kotlin-notebook"}
 

@@ -20,7 +20,7 @@
 ## @Tool 어노테이션 {id="tool-annotation"}
 
 `@Tool` 어노테이션은 LLM에 도구로 노출되어야 하는 함수(Kotlin) 또는 메서드(Java)를 표시하는 데 사용됩니다.
-`@Tool`로 어노테이션이 지정된 함수와 메서드는 `ToolSet` 인터페이스를 구현하는 객체에서 리플렉션을 통해 수집됩니다. 자세한 내용은 [ToolSet 인터페이스 구현](#1-toolset-인터페이스-구현)을 참조하세요.
+`@Tool`로 어노테이션이 지정된 함수와 메서드는 `ToolSet` 인터페이스를 구현하는 객체에서 리플렉션을 통해 수집됩니다. 자세한 내용은 [ToolSet 인터페이스 구현](#1-implement-the-toolset-interface)을 참조하세요.
 
 ### 정의 {id="definition"}
 

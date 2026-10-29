@@ -233,7 +233,7 @@ fun main() {
 
 #### 세트 직렬화 {id="serialize-sets"}
 
-[`Set`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-set/) 타입은 [`List` 타입](#리스트-직렬화)과 마찬가지로 JSON 배열로 직렬화됩니다.
+[`Set`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-set/) 타입은 [`List` 타입](#serialize-lists)과 마찬가지로 JSON 배열로 직렬화됩니다.
 
 ```kotlin
 import kotlinx.serialization.*

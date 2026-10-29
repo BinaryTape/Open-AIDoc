@@ -58,7 +58,7 @@
 
 <var name="plugin_name" value="ForwardedHeaders"/>
 <p>
-    要将 <code>%plugin_name%</code> 插件<a href="#install">安装</a>到应用，
+    要将 <code>%plugin_name%</code> 插件<a href="server-plugins.md#install">安装</a>到应用，
     请将其传递给指定 <Links href="/ktor/server-modules" summary="Modules allow you to structure your application by grouping routes.">模块</Links> 中的 <code>install</code> 函数。
     以下代码片段展示了如何安装 <code>%plugin_name%</code> ...
 </p>
@@ -85,7 +85,7 @@
 
 <var name="plugin_name" value="XForwardedHeaders"/>
 <p>
-    要将 <code>%plugin_name%</code> 插件<a href="#install">安装</a>到应用，
+    要将 <code>%plugin_name%</code> 插件<a href="server-plugins.md#install">安装</a>到应用，
     请将其传递给指定 <Links href="/ktor/server-modules" summary="Modules allow you to structure your application by grouping routes.">模块</Links> 中的 <code>install</code> 函数。
     以下代码片段展示了如何安装 <code>%plugin_name%</code> ...
 </p>

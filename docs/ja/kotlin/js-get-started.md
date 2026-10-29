@@ -158,7 +158,7 @@ Gradle は、変更を加えるたびにプロジェクトを自動的にリビ�
     }
    ```
 
-#### 出力要素の追加
+#### 出力要素の追加 {id="add-an-output-element"}
 
 1. 段落を作成する[拡張関数](extensions.md#extension-functions)を定義して、出力を表示するためのテキスト要素を追加します:
 

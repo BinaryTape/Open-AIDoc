@@ -30,7 +30,7 @@
     <chapter title="概览" id="configuration-file-overview">
         <p>
             如果您使用
-            <a href="#engine-main">
+            <a href="server-create-and-configure.topic#engine-main">
                 EngineMain
             </a>
             启动服务器，Ktor 会自动从位于
@@ -156,7 +156,7 @@
             <p>
                 除了指定 <a href="#predefined-properties">预定义属性</a> 外，Ktor 还允许您在配置文件中保留自定义设置。
                 下面的配置文件包含一个用于保留
-                <a href="#jwt-settings">JWT</a>
+                <a href="server-jwt.md#jwt-settings">JWT</a>
                 设置的自定义 <code>jwt</code> 组。
             </p>
             <tabs group="config">
@@ -224,7 +224,7 @@
             </def>
             <def title="ktor.deployment.watch" id="ktor-deployment-watch">
                 <p>
-                    用于 <a href="#watch-paths">自动重载</a> 的监听路径。
+                    用于 <a href="server-auto-reload.topic#watch-paths">自动重载</a> 的监听路径。
                 </p>
             </def>
             <def title="ktor.deployment.rootPath" id="ktor-deployment-root-path">
@@ -382,7 +382,7 @@
     </chapter>
     <chapter title="命令行" id="command-line">
         <p>
-            如果您使用 <a href="#engine-main">EngineMain</a> 创建服务器，您可以从命令行运行 <Links href="/ktor/server-fatjar" summary="了解如何使用 Ktor Gradle 插件创建并运行可执行的 fat JAR。">打包的应用程序</Links>，并通过传递相应的命令行参数来覆盖所需的服务器参数。例如，您可以通过以下方式覆盖配置文件中指定的端口：
+            如果您使用 <a href="server-create-and-configure.topic#engine-main">EngineMain</a> 创建服务器，您可以从命令行运行 <Links href="/ktor/server-fatjar" summary="了解如何使用 Ktor Gradle 插件创建并运行可执行的 fat JAR。">打包的应用程序</Links>，并通过传递相应的命令行参数来覆盖所需的服务器参数。例如，您可以通过以下方式覆盖配置文件中指定的端口：
         </p>
         <code-block lang="shell" code="            java -jar sample-app.jar -port=8080"/>
         <p>
@@ -422,7 +422,7 @@
             </def>
             <def title="-watch" id="watch">
                 <p>
-                    用于 <a href="#watch-paths">自动重载</a> 的监听路径。
+                    用于 <a href="server-auto-reload.topic#watch-paths">自动重载</a> 的监听路径。
                 </p>
             </def>
         </deflist>

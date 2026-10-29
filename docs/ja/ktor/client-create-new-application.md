@@ -102,7 +102,7 @@
             <code-block lang="kotlin" code="                    ktor_version=%ktor_version%"/>
             <note id="eap-note">
                 <p>
-                    Ktor の EAP バージョンを使用するには、<a href="#repositories">Space リポジトリ</a>を追加する必要があります。
+                    Ktor の EAP バージョンを使用するには、<a href="server-dependencies.topic#repositories">Space リポジトリ</a>を追加する必要があります。
                 </p>
             </note>
         </step>
@@ -170,7 +170,7 @@
         </step>
         <step>
             <p>
-                <code>println()</code> 関数を使用してサーバーから返された <a href="#status">ステータスコード</a> を出力し、<code>close()</code> 関数を使用してストリームを閉じ、関連するリソースを解放します。
+                <code>println()</code> 関数を使用してサーバーから返された <a href="client-responses.md#status">ステータスコード</a> を出力し、<code>close()</code> 関数を使用してストリームを閉じ、関連するリソースを解放します。
                 <Path>Main.kt</Path> ファイルは次のようになります。
             </p>
             <code-block lang="kotlin" code="import io.ktor.client.*&#10;import io.ktor.client.engine.cio.*&#10;import io.ktor.client.request.*&#10;import io.ktor.client.statement.*&#10;&#10;suspend fun main() {&#10;    val client = HttpClient(CIO)&#10;    val response: HttpResponse = client.get(&quot;https://ktor.io/&quot;)&#10;    println(response.status)&#10;    client.close()&#10;}"/>

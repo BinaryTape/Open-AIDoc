@@ -202,7 +202,7 @@ sourceSets {
 ### 日志依赖项 {id="logging-dependency"}
 
   <p>
-    在 <a href="#jvm">JVM</a> 上，Ktor 使用 Simple Logging Facade for Java
+    在 <a href="client-engines.md#jvm">JVM</a> 上，Ktor 使用 Simple Logging Facade for Java
     (<a href="http://www.slf4j.org/">SLF4J</a>) 作为日志记录的抽象层。SLF4J 将日志记录 API 与底层的日志记录实现解耦，
     允许您集成最适合应用程序要求的日志框架。
     常见的选择包括 <a href="https://logback.qos.ch/">Logback</a> 或 

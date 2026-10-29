@@ -57,7 +57,7 @@ fun modelCheckingTest() = ModelCheckingOptions()
 | `actorsBefore`            | `5`           | 시나리오의 병렬 섹션 이전에 호출되는 연산의 수입니다. |
 | `actorsPerThread`         | `5`           | 시나리오의 병렬 섹션에서 각 스레드에 포함된 연산의 수입니다. |
 | `actorsAfter`             | `5`           | 시나리오의 병렬 섹션 이후에 호출되는 연산의 수입니다. |
-| `customScenarios`         | –             | [사용자 정의 동시성 시나리오](#사용자-정의-시나리오-정의하기) 목록입니다. 사용자 정의 시나리오는 무작위로 생성된 시나리오보다 먼저 실행됩니다. |
+| `customScenarios`         | –             | [사용자 정의 동시성 시나리오](#defining-a-custom-scenario) 목록입니다. 사용자 정의 시나리오는 무작위로 생성된 시나리오보다 먼저 실행됩니다. |
 
 ### 사용자 정의 시나리오 정의하기 {id="defining-a-custom-scenario"}
 
@@ -124,7 +124,7 @@ fun test() = StressOptions()
     <td><code>10</code></td>
     <td>다른 스레드로 전환을 시도하기 전에 스레드가 수행할 수 있는 루프 반복 횟수입니다.<br/>
         <code>loopIterationsBeforeThreadSwitch</code> 값은 
-        <a href="#정지된-실행-감지"><code>loopBound</code></a>보다 작아야 합니다.<br/><br/>
+        <a href="#stalled-execution-detection"><code>loopBound</code></a>보다 작아야 합니다.<br/><br/>
         이 옵션은 <a href="lincheck-testing-strategies.md#model-checking">모델 검사(model checking)</a>에만 적용할 수 있습니다.</td></tr>
 </table>
 
@@ -170,7 +170,7 @@ fun test() = StressOptions()
 <tr>
     <td><code>addGuarantee</code></td>
     <td>–</td>
-    <td><code>addGuarantee</code> 옵션을 사용하여 스레드 안전하거나 분석과 무관한 메서드에 대한 <a href="#보장-정의하기">보장을 정의</a>하여 모델 검사에서 제외하십시오.<br/><br/>
+    <td><code>addGuarantee</code> 옵션을 사용하여 스레드 안전하거나 분석과 무관한 메서드에 대한 <a href="#defining-a-guarantee">보장을 정의</a>하여 모델 검사에서 제외하십시오.<br/><br/>
         이 옵션은 <a href="lincheck-testing-strategies.md#model-checking">모델 검사(model checking)</a>에만 적용할 수 있습니다.</td></tr>
 </table>
 

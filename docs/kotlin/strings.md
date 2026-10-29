@@ -384,7 +384,7 @@ fun main() {
 
 ### 构建与格式化字符串 {id="build-and-format-strings"}
 
-> 对于 Kotlin 中的大多数格式化任务，请使用[字符串模板](#字符串模板)。
+> 对于 Kotlin 中的大多数格式化任务，请使用[字符串模板](#string-templates)。
 >
 {style="tip"}
 

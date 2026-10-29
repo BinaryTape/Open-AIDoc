@@ -160,7 +160,7 @@ object TrayIcon : Painter() {
 
 ## 通知 {id="notifications"}
 
-如需发送系统通知，可以使用 `rememberNotification()` 创建通知并将其传递给 `TrayState.sendNotification()`，正如[系统托盘示例](#系统托盘)中所示。通知通过传递给 `Tray()` 可组合项的 `TrayState` 进行传递。如果该状态未附加到托盘，通知将会丢失。
+如需发送系统通知，可以使用 `rememberNotification()` 创建通知并将其传递给 `TrayState.sendNotification()`，正如[系统托盘示例](#system-tray)中所示。通知通过传递给 `Tray()` 可组合项的 `TrayState` 进行传递。如果该状态未附加到托盘，通知将会丢失。
 
 通知由标题、消息和类型组成，其中类型定义了通知的图标和声音。可用的类型包括 `None`（默认选项）、`Info`、`Warning` 和 `Error`。
 

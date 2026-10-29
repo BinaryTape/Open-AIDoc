@@ -9,7 +9,7 @@
 
 コルーチンコンテキストは、さまざまな要素のセットです。主な要素は、以前に見たコルーチンの [Job] と、このセクションで説明するディスパッチャです。
 
-## ディスパッチャとスレッド
+## ディスパッチャとスレッド {id="dispatchers-and-threads"}
 
 コルーチンコンテキストには、対応するコルーチンが実行に使用するスレッド（または複数のスレッド）を決定する *コルーチンディスパッチャ*（[CoroutineDispatcher] を参照）が含まれます。コルーチンディスパッチャは、コルーチンの実行を特定の物理スレッドに限定したり、スレッドプールにディスパッチしたり、あるいは限定せずに実行したりすることができます。
 
@@ -64,7 +64,7 @@ main runBlocking      : I'm working in thread main
 
 [newSingleThreadContext] は、コルーチンが実行されるためのスレッドを作成します。専用のスレッドは非常に高価なリソースです。実際のアプリケーションでは、不要になったときに [close][ExecutorCoroutineDispatcher.close] 関数を使用して解放するか、トップレベルの変数に保持してアプリケーション全体で再利用する必要があります。
 
-## 非限定ディスパッチャ vs 限定ディスパッチャ
+## 非限定ディスパッチャ vs 限定ディスパッチャ {id="unconfined-vs-confined-dispatcher"}
 
 [Dispatchers.Unconfined] コルーチンディスパッチャは、呼び出し元のスレッドでコルーチンを開始しますが、それは最初の懸架（サスペンション）ポイントまでです。中断された後は、呼び出された中断関数によって完全に決定されるスレッドでコルーチンを再開します。非限定ディスパッチャは、CPU時間を消費せず、特定の物理スレッドに限定された共有データ（UIなど）を更新しないコルーチンに適しています。
 
@@ -111,11 +111,11 @@ main runBlocking: After delay in thread main
 >
 {style="note"}
 
-## コルーチンとスレッドのデバッグ
+## コルーチンとスレッドのデバッグ {id="debugging-coroutines-and-threads"}
 
 コルーチンはあるスレッドで中断し、別のスレッドで再開することができます。シングルスレッドのディスパッチャであっても、特別なツールがなければ、コルーチンが「いつ」「どこで」「何を」していたのかを把握するのは難しい場合があります。
 
-### IntelliJ IDEA でのデバッグ
+### IntelliJ IDEA でのデバッグ {id="debugging-with-idea"}
 
 Kotlin プラグインのコルーチンデバッガーは、IntelliJ IDEA でのコルーチンのデバッグを簡素化します。
 
@@ -137,7 +137,7 @@ Kotlin プラグインのコルーチンデバッガーは、IntelliJ IDEA で�
 
 コルーチンのデバッグに関する詳細は、[チュートリアル](https://kotlinlang.org/docs/tutorials/coroutines/debug-coroutines-with-idea.html) を参照してください。
 
-### ログを使用したデバッグ
+### ログを使用したデバッグ {id="debugging-using-logging"}
 
 コルーチンデバッガーを使わずにスレッドを使用するアプリケーションをデバッグするもう一つの方法は、各ログステートメントでログファイルにスレッド名を出力することです。この機能は、ロギングフレームワークによって広くサポートされています。コルーチンを使用する場合、スレッド名だけでは十分なコンテキストが得られないため、`kotlinx.coroutines` にはそれを容易にするためのデバッグ機能が含まれています。
 
@@ -184,9 +184,9 @@ fun main() = runBlocking<Unit> {
 >
 {style="note"}
 
-## スレッド間のジャンプ
+## スレッド間のジャンプ {id="jumping-between-threads"}
 
-`-Dkotlinx.coroutines.debug` JVM オプションを指定して、次のコードを実行してください（[デバッグ](#コルーチンとスレッドのデバッグ) を参照）：
+`-Dkotlinx.coroutines.debug` JVM オプションを指定して、次のコードを実行してください（[デバッグ](#debugging-coroutines-and-threads) を参照）：
 
 ```kotlin
 import kotlinx.coroutines.*
@@ -229,7 +229,7 @@ fun main() {
 
 上記の例では、Kotlin 標準ライブラリの `use` 関数を使用して、[newSingleThreadContext] で作成されたスレッドリソースが不要になったときに適切に解放されるようにしています。
 
-## コンテキスト内の Job
+## コンテキスト内の Job {id="job-in-the-context"}
 
 コルーチンの [Job] はそのコンテキストの一部であり、`coroutineContext[Job]` 式を使用してコンテキストから取得できます：
 
@@ -248,7 +248,7 @@ fun main() = runBlocking<Unit> {
 > 
 {style="note"}
 
-[デバッグモード](#コルーチンとスレッドのデバッグ) では、次のように出力されます：
+[デバッグモード](#debugging-coroutines-and-threads) では、次のように出力されます：
 
 ```
 My job is "coroutine#1":BlockingCoroutine{Active}@6d311334
@@ -258,7 +258,7 @@ My job is "coroutine#1":BlockingCoroutine{Active}@6d311334
 
 [CoroutineScope] の [isActive] は、`coroutineContext[Job]?.isActive == true` の便利なショートカットに過ぎないことに注意してください。
 
-## コルーチンの子
+## コルーチンの子 {id="children-of-a-coroutine"}
 
 あるコルーチンが別のコルーチンの [CoroutineScope] で起動されると、[CoroutineScope.coroutineContext] を介してそのコンテキストを継承し、新しいコルーチンの [Job] は親コルーチンのジョブの *子* になります。親コルーチンがキャンセルされると、そのすべての子も再帰的にキャンセルされます。
 
@@ -314,7 +314,7 @@ job1: I am not affected by cancellation of the request
 
 <!--- TEST -->
 
-## 親の責任
+## 親の責任 {id="parental-responsibilities"}
 
 親コルーチンは常に、そのすべての子の完了を待ちます。親は起動したすべての子を明示的に追跡する必要はなく、最後にそれらを待つために [Job.join] を使用する必要もありません。
 
@@ -356,9 +356,9 @@ Now processing of the request is complete
 
 <!--- TEST -->
 
-## デバッグのためのコルーチンの命名
+## デバッグのためのコルーチンの命名 {id="naming-coroutines-for-debugging"}
 
-自動的に割り当てられる ID は、コルーチンが頻繁にログを出力し、同じコルーチンからのログ記録を関連付けるだけでよい場合には適しています。しかし、コルーチンが特定のリクエストの処理や特定のバックグラウンドタスクの実行に紐付けられている場合は、デバッグのために明示的に名前を付ける方が良いでしょう。[CoroutineName] コンテキスト要素は、スレッド名と同じ目的を果たします。これは、[デバッグモード](#コルーチンとスレッドのデバッグ) がオンのときに、このコルーチンを実行しているスレッド名に含まれます。
+自動的に割り当てられる ID は、コルーチンが頻繁にログを出力し、同じコルーチンからのログ記録を関連付けるだけでよい場合には適しています。しかし、コルーチンが特定のリクエストの処理や特定のバックグラウンドタスクの実行に紐付けられている場合は、デバッグのために明示的に名前を付ける方が良いでしょう。[CoroutineName] コンテキスト要素は、スレッド名と同じ目的を果たします。これは、[デバッグモード](#debugging-coroutines-and-threads) がオンのときに、このコルーチンを実行しているスレッド名に含まれます。
 
 次の例はこの概念を示しています：
 
@@ -402,7 +402,7 @@ fun main() = runBlocking(CoroutineName("main")) {
 
 <!--- TEST FLEXIBLE_THREAD -->
 
-## コンテキスト要素の組み合わせ
+## コンテキスト要素の組み合わせ {id="combining-context-elements"}
 
 時には、コルーチンコンテキストに対して複数の要素を定義する必要があります。そのために `+` 演算子を使用できます。例えば、明示的に指定されたディスパッチャと明示的に指定された名前を同時に指定してコルーチンを起動できます：
 
@@ -431,7 +431,7 @@ I'm working in thread DefaultDispatcher-worker-1 @test#2
 
 <!--- TEST FLEXIBLE_THREAD -->
 
-## コルーチンスコープ
+## コルーチンスコープ {id="coroutine-scope"}
 
 コンテキスト、子、ジョブに関する知識をまとめましょう。アプリケーションにライフサイクルを持つオブジェクトがあるが、そのオブジェクト自体がコルーチンではない場合を想定します。例えば、Android アプリケーションを作成しており、Android アクティビティのコンテキストでさまざまなコルーチンを起動して、データの取得や更新、アニメーションなどの非同期操作を実行しているとします。これらのコルーチンは、メモリリークを避けるためにアクティビティが破棄されるときにキャンセルされなければなりません。
 
@@ -525,7 +525,7 @@ Destroying activity!
 >
 {style="note"}
 
-### スレッドローカルデータ
+### スレッドローカルデータ {id="thread-local-data"}
 
 時には、スレッドローカルなデータをコルーチンに渡したり、コルーチン間で受け渡したりできると便利な場合があります。しかし、コルーチンは特定のスレッドに拘束されないため、これを手動で行うとボイラープレートコードが多くなりがちです。
 
@@ -559,7 +559,7 @@ fun main() = runBlocking<Unit> {
 {style="note"}
 
 この例では、[Dispatchers.Default] を使用してバックグラウンドスレッドプールで新しいコルーチンを起動しています。そのため、スレッドプールの異なるスレッドで動作しますが、コルーチンがどのスレッドで実行されていても、`threadLocal.asContextElement(value = "launch")` を使用して指定したスレッドローカル変数の値を保持し続けます。
-したがって、（[デバッグ](#コルーチンとスレッドのデバッグ) ありの）出力は次のようになります：
+したがって、（[デバッグ](#debugging-coroutines-and-threads) ありの）出力は次のようになります：
 
 ```text
 Pre-main, current thread: Thread[main @coroutine#1,5,main], thread local value: 'main'

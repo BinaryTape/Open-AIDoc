@@ -34,7 +34,7 @@
     </chapter>
     <chapter title="SSE のインストール" id="install_plugin">
         <p>
-            <code>SSE</code> プラグインをインストールするには、<a href="#configure-client">クライアント設定ブロック</a>内の <code>install</code> 関数に渡します。
+            <code>SSE</code> プラグインをインストールするには、<a href="client-create-and-configure.md#configure-client">クライアント設定ブロック</a>内の <code>install</code> 関数に渡します。
         </p>
         <code-block lang="kotlin" code="            import io.ktor.client.*&#10;            import io.ktor.client.engine.cio.*&#10;            import io.ktor.client.plugins.sse.*&#10;&#10;            //...&#10;            val client = HttpClient(CIO) {&#10;                install(SSE)&#10;            }"/>
     </chapter>

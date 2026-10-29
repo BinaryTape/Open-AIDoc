@@ -96,14 +96,14 @@
 </td>
 <td>
 <p>
-                        Ktor では、コード内でサーバーパラメータを構成し、アプリケーションを素早く実行するために <a href="#embedded-server">embeddedServer</a> 関数を使用できます。
+                        Ktor では、コード内でサーバーパラメータを構成し、アプリケーションを素早く実行するために <a href="server-create-and-configure.topic#embedded-server">embeddedServer</a> 関数を使用できます。
                     </p>
 <code-block lang="kotlin" code="import io.ktor.server.engine.*&#10;import io.ktor.server.netty.*&#10;import io.ktor.server.application.*&#10;import io.ktor.server.response.*&#10;import io.ktor.server.routing.*&#10;&#10;fun main() {&#10;    embeddedServer(Netty, port = 8080, host = &quot;0.0.0.0&quot;) {&#10;        routing {&#10;            get(&quot;/&quot;) {&#10;                call.respondText(&quot;Hello World!&quot;)&#10;            }&#10;        }&#10;    }.start(wait = true)&#10;}"/>
 <p>
                         完全な例については、<a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/migrating-express-ktor/1_hello/src/main/kotlin/com/example/Application.kt">1_hello</a> プロジェクトを参照してください。
                     </p>
 <p>
-                        また、HOCON または YAML 形式を使用する<a href="#engine-main">外部構成ファイル</a>でサーバー設定を指定することもできます。
+                        また、HOCON または YAML 形式を使用する<a href="server-create-and-configure.topic#engine-main">外部構成ファイル</a>でサーバー設定を指定することもできます。
                     </p>
 </td>
 </tr>
@@ -143,7 +143,7 @@
 </td>
 <td>
 <p>
-                        Ktor では、<a href="#folders"><code>staticFiles()</code></a> 関数を使用して、<Path>/</Path> パスに対して行われたリクエストを <Path>public</Path> 物理フォルダーにマッピングします。
+                        Ktor では、<a href="server-static-content.md#folders"><code>staticFiles()</code></a> 関数を使用して、<Path>/</Path> パスに対して行われたリクエストを <Path>public</Path> 物理フォルダーにマッピングします。
                         この関数により、<Path>public</Path> フォルダー内のすべてのファイルを再帰的に配信できます。
                     </p>
 <code-block lang="kotlin" code="import io.ktor.server.application.*&#10;import io.ktor.server.http.content.*&#10;import io.ktor.server.routing.*&#10;import java.io.*&#10;&#10;fun main(args: Array&lt;String&gt;): Unit =&#10;    io.ktor.server.netty.EngineMain.main(args)&#10;&#10;fun Application.module() {&#10;    routing {&#10;        staticFiles(&quot;&quot;, File(&quot;public&quot;), &quot;index.html&quot;)&#10;    }&#10;}"/>

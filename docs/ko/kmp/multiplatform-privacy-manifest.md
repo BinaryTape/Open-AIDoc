@@ -33,7 +33,7 @@ Apple의 App Store 제출 요구 사항이 [2024년 봄에 변경되었습니다
 
 결과 파일은 딕셔너리(dictionaries)의 모음입니다. 액세스한 각 API 유형에 대해 제공된 목록에서 사용 사유를 하나 이상 선택하세요. Xcode는 시각적 레이아웃과 각 필드에 유효한 값의 드롭다운 리스트를 제공하여 `.xcprivacy` 파일 편집을 도와줍니다.
 
-[특수 도구](#필수-사유-api-사용처-찾기)를 사용하여 Kotlin 프레임워크의 종속성에서 필수 사유 API 사용처를 찾을 수 있으며, [별도의 플러그인](#kotlin-아티팩트에-xcprivacy-파일-배치하기)을 사용하여 Kotlin 아티팩트(artifacts)에 `.xcprivacy` 파일을 포함할 수 있습니다.
+[특수 도구](#find-usages-of-required-reason-apis)를 사용하여 Kotlin 프레임워크의 종속성에서 필수 사유 API 사용처를 찾을 수 있으며, [별도의 플러그인](#place-the-xcprivacy-file-in-your-kotlin-artifacts)을 사용하여 Kotlin 아티팩트(artifacts)에 `.xcprivacy` 파일을 포함할 수 있습니다.
 
 새로운 개인정보 처리 매니페스트가 App Store 요구 사항을 충족하는 데 도움이 되지 않거나 단계를 진행하는 방법을 파악할 수 없는 경우, [이 YouTrack 이슈](https://youtrack.jetbrains.com/issue/KT-67603)에 사례를 공유하고 저희에게 연락해 주세요.
 

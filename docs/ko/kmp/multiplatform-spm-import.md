@@ -22,8 +22,8 @@ SwiftPM 임포트 통합 기능이 포함된 Kotlin Gradle 플러그인을 사�
 
 프로젝트를 구성하는 방법은 다음과 같습니다:
 
-1. [개발 환경 설정하기](#kotlin-multiplatform-gradle-플러그인-버전-설정하기)
-2. [KMP 모듈에 SwiftPM 의존성 추가 및 사용하기](#swiftpm-의존성-추가-및-사용)
+1. [개발 환경 설정하기](#set-the-kotlin-multiplatform-gradle-plugin-version)
+2. [KMP 모듈에 SwiftPM 의존성 추가 및 사용하기](#add-and-use-swiftpm-dependencies)
 
 ## Kotlin Multiplatform Gradle 플러그인 버전 설정하기 {id="set-the-kotlin-multiplatform-gradle-plugin-version"}
 
@@ -185,11 +185,11 @@ import swiftPMImport.groupName.subproject.FIRApp
 
 Swift 패키지에 의존하는 빌드를 더 안정적으로 만들기 위해, SwiftPM 임포트 도구는 `Package.resolved` 파일을 이용한 잠금 메커니즘(locking mechanism)을 도입했습니다. 이 파일들은 초기 패키지 확인(resolution) 중에 각 서브프로젝트에 대해 생성됩니다.
 
-기본적으로 이러한 파일들은 `.swiftpm-locks/default/swiftImport` 디렉토리 내의 합성 패키지 안에 위치한 단일 `Package.resolved` 파일로 병합됩니다. 이 공유 잠금 파일은 프로젝트를 빌드할 때 사용되며, 모든 서브프로젝트가 동일한 버전의 Swift 패키지를 사용하도록 보장합니다. [서브프로젝트를 그룹화하거나 동기화에서 제외](#swift-패키지-버전-집계-사용자-정의하기)하여 잠금 파일 병합 동작을 사용자 정의할 수 있습니다.
+기본적으로 이러한 파일들은 `.swiftpm-locks/default/swiftImport` 디렉토리 내의 합성 패키지 안에 위치한 단일 `Package.resolved` 파일로 병합됩니다. 이 공유 잠금 파일은 프로젝트를 빌드할 때 사용되며, 모든 서브프로젝트가 동일한 버전의 Swift 패키지를 사용하도록 보장합니다. [서브프로젝트를 그룹화하거나 동기화에서 제외](#customize-aggregation-of-swift-package-versions)하여 잠금 파일 병합 동작을 사용자 정의할 수 있습니다.
 
 모든 빌드에서 동일한 의존성을 사용하도록 잠금 파일을 저장소에 커밋해야 합니다. 파일 관리를 단순화하기 위해 전체 `.swiftpm-locks` 디렉토리를 저장소에 커밋할 수 있습니다. 의존성 동기화에는 `Package.resolved` 파일만 필수적이지만, 디렉토리 전체를 유지하면 첫 빌드 시 의존성 확인 속도를 높일 수 있습니다.
 
-잠금 파일은 빌드 스크립트에서 SwiftPM 의존성 구성이나 버전을 변경할 때 자동으로 업데이트됩니다. [잠금 파일을 수동으로 강제 업데이트](#잠금-파일-강제-업데이트)할 수도 있습니다.
+잠금 파일은 빌드 스크립트에서 SwiftPM 의존성 구성이나 버전을 변경할 때 자동으로 업데이트됩니다. [잠금 파일을 수동으로 강제 업데이트](#force-an-update-of-the-lock-file)할 수도 있습니다.
 
 ### Swift 패키지 버전 집계 사용자 정의하기 {id="customize-aggregation-of-swift-package-versions"}
 
@@ -280,7 +280,7 @@ kotlin {
 1. 잠금 파일을 업데이트해야 하는 모든 서브프로젝트의 `build` 디렉토리를 삭제합니다.
 2. 기존 `Package.resolved` 파일을 제거합니다:
    * 특정 동기화 구성이 없는 서브프로젝트의 경우, `.swiftpm-locks/default/` 디렉토리를 삭제합니다.
-   * [커스텀 동기화 그룹](#swift-패키지-버전-집계-사용자-정의하기)이 있는 서브프로젝트의 경우, `.swiftpm-locks/<group-name>/` 디렉토리를 찾아 삭제합니다.
+   * [커스텀 동기화 그룹](#customize-aggregation-of-swift-package-versions)이 있는 서브프로젝트의 경우, `.swiftpm-locks/<group-name>/` 디렉토리를 찾아 삭제합니다.
    * `noSynchronization()`이 설정된 서브프로젝트의 경우, 서브프로젝트 디렉토리에서 `Package.resolved` 파일을 찾아 삭제합니다.
 3. 의존성 확인 태스크를 다시 실행합니다: `./gradlew :yourModuleName:fetchSyntheticImportProjectPackages`
 

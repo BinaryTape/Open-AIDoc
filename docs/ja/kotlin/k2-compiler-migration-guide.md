@@ -10,8 +10,8 @@ K2コンパイラの登場により、Kotlinのフロントエンドは完全に
 
 * **呼び出し解決と型推論の改善**：コンパイラの動作がより一貫したものになり、コードをより深く理解できるようになります。
 * **新しい言語機能のためのシンタックスシュガーの導入が容易に**：将来的に新しい機能が導入される際、より簡潔で読みやすいコードを使用できるようになります。
-* **コンパイル時間の高速化**：コンパイル時間が[大幅に短縮](#パフォーマンスの向上)される可能性があります。
-* **IDEパフォーマンスの強化**：IntelliJ IDEAとAndroid StudioはKotlinコードの解析にK2コンパイラを使用し、安定性の向上とパフォーマンスの改善を提供します。詳細については、[IDEでのサポート](#ideでのサポート)を参照してください。
+* **コンパイル時間の高速化**：コンパイル時間が[大幅に短縮](#performance-improvements)される可能性があります。
+* **IDEパフォーマンスの強化**：IntelliJ IDEAとAndroid StudioはKotlinコードの解析にK2コンパイラを使用し、安定性の向上とパフォーマンスの改善を提供します。詳細については、[IDEでのサポート](#support-in-ides)を参照してください。
 
 このガイドでは、以下の内容について説明します。
 
@@ -35,7 +35,7 @@ K2コンパイラのパフォーマンスを評価するために、2つのオ�
 
 ## 言語機能の改善 {id="language-feature-improvements"}
 
-Kotlin K2コンパイラは、[スマートキャスト](#スマートキャスト)および[Kotlinマルチプラットフォーム](#kotlinマルチプラットフォーム)に関連する言語機能を改善しています。
+Kotlin K2コンパイラは、[スマートキャスト](#smart-casts)および[Kotlinマルチプラットフォーム](#kotlin-multiplatform)に関連する言語機能を改善しています。
 
 ### スマートキャスト {id="smart-casts"}
 
@@ -43,12 +43,12 @@ Kotlinコンパイラは、特定の場合にオブジェクトを型に自動�
 
 Kotlin 2.0.0では、以下の領域でスマートキャストに関する改善を行いました。
 
-* [ローカル変数と以降のスコープ](#ローカル変数と以降のスコープ)
-* [論理or演算子を使用した型チェック](#論理or演算子を使用した型チェック)
-* [インライン関数](#インライン関数)
-* [関数型を持つプロパティ](#関数型を持つプロパティ)
-* [例外処理](#例外処理)
-* [インクリメントおよびデクリメント演算子](#インクリメントおよびデクリメント演算子)
+* [ローカル変数と以降のスコープ](#local-variables-and-further-scopes)
+* [論理or演算子を使用した型チェック](#type-checks-with-the-logical-or-operator)
+* [インライン関数](#inline-functions)
+* [関数型を持つプロパティ](#properties-with-function-types)
+* [例外処理](#exception-handling)
+* [インクリメントおよびデクリメント演算子](#increment-and-decrement-operators)
 
 #### ローカル変数と以降のスコープ {id="local-variables-and-further-scopes"}
 
@@ -299,8 +299,8 @@ fun main(input: Rho) {
 
 K2コンパイラには、以下の領域でKotlinマルチプラットフォームに関連する改善があります。
 
-* [コンパイル中の共通ソースとプラットフォームソースの分離](#コンパイル中の共通ソースとプラットフォームソースの分離)
-* [expected宣言とactual宣言の異なる可視性レベル](#expected宣言とactual宣言の異なる可視性レベル)
+* [コンパイル中の共通ソースとプラットフォームソースの分離](#separation-of-common-and-platform-sources-during-compilation)
+* [expected宣言とactual宣言の異なる可視性レベル](#different-visibility-levels-of-expected-and-actual-declarations)
 
 #### コンパイル中の共通ソースとプラットフォームソースの分離 {id="separation-of-common-and-platform-sources-during-compilation"}
 
@@ -507,16 +507,16 @@ Kotlin 2.4.0以降は、以前のコンパイラにロールバックするこ�
 
 ## 変更点 {id="changes"}
 
-新しいフロントエンドの導入により、Kotlinコンパイラはいくつかの変更を受けました。まず、コードに影響を与える最も重要な修正点を挙げ、何が変わったのか、そして今後のベストプラクティスについて説明します。さらに詳しく知りたい場合は、読み進めやすいようにこれらの変更を[分野別](#分野別)にまとめています。
+新しいフロントエンドの導入により、Kotlinコンパイラはいくつかの変更を受けました。まず、コードに影響を与える最も重要な修正点を挙げ、何が変わったのか、そして今後のベストプラクティスについて説明します。さらに詳しく知りたい場合は、読み進めやすいようにこれらの変更を[分野別](#per-subject-area)にまとめています。
 
 このセクションでは、以下の変更点について説明します。
 
-* [バッキングフィールドを持つopenプロパティの即時初期化](#バッキングフィールドを持つopenプロパティの即時初期化)
-* [投影されたレシーバーでの合成セッターの非推奨化](#投影されたレシーバーでの合成セッターの非推奨化)
-* [アクセス不能なジェネリック型の使用禁止](#アクセス不能なジェネリック型の使用禁止)
-* [同じ名前のKotlinプロパティとJavaフィールドの一貫した解決順序](#同じ名前のkotlinプロパティとjavaフィールドの一貫した解決順序)
-* [Javaプリミティブ配列の null 安全性の向上](#javaプリミティブ配列の-null-安全性の向上)
-* [expectedクラス内の抽象メンバに対するより厳格なルール](#expectedクラス内の抽象メンバに対するより厳格なルール)
+* [バッキングフィールドを持つopenプロパティの即時初期化](#immediate-initialization-of-open-properties-with-backing-fields)
+* [投影されたレシーバーでの合成セッターの非推奨化](#deprecated-synthetics-setter-on-a-projected-receiver)
+* [アクセス不能なジェネリック型の使用禁止](#forbidden-use-of-inaccessible-generic-types)
+* [同じ名前のKotlinプロパティとJavaフィールドの一貫した解決順序](#consistent-resolution-order-of-kotlin-properties-and-java-fields-with-the-same-name)
+* [Javaプリミティブ配列の null 安全性の向上](#improved-null-safety-for-java-primitive-arrays)
+* [expectedクラス内の抽象メンバに対するより厳格なルール](#stricter-rules-for-abstract-members-in-expected-classes)
 
 ### バッキングフィールドを持つopenプロパティの即時初期化 {id="immediate-initialization-of-open-properties-with-backing-fields"}
 
@@ -977,7 +977,7 @@ expectedの非抽象クラスで抽象関数を継承している場合は、非
 
 | 課題 ID | タイトル |
 |------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [KT-54309](https://youtrack.jetbrains.com/issue/KT-54309)* | [投影されたレシーバーでの合成セッターの使用を非推奨化](#投影されたレシーバーでの合成セッターの非推奨化) |
+| [KT-54309](https://youtrack.jetbrains.com/issue/KT-54309)* | [投影されたレシーバーでの合成セッターの使用を非推奨化](#deprecated-synthetics-setter-on-a-projected-receiver) |
 | [KT-57600](https://youtrack.jetbrains.com/issue/KT-57600) | raw 型パラメータを持つ Java メソッドを、ジェネリック型パラメータでオーバーライドすることを禁止 |
 | [KT-54663](https://youtrack.jetbrains.com/issue/KT-54663) | null 許容の可能性がある型パラメータを `in` 投影された DNN パラメータに渡すことを禁止 |
 | [KT-54066](https://youtrack.jetbrains.com/issue/KT-54066) | typealias コンストラクタにおける上限（upper bound）違反を非推奨化 |
@@ -995,7 +995,7 @@ expectedの非抽象クラスで抽象関数を継承している場合は、非
 
 | 課題 ID | タイトル |
 |------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [KT-55017](https://youtrack.jetbrains.com/issue/KT-55017)* | [Java フィールドを持つベースクラスとのオーバーロード解決中に、派生クラスの Kotlin プロパティを選択](#同じ名前のkotlinプロパティとjavaフィールドの一貫した解決順序) |
+| [KT-55017](https://youtrack.jetbrains.com/issue/KT-55017)* | [Java フィールドを持つベースクラスとのオーバーロード解決中に、派生クラスの Kotlin プロパティを選択](#consistent-resolution-order-of-kotlin-properties-and-java-fields-with-the-same-name) |
 | [KT-58260](https://youtrack.jetbrains.com/issue/KT-58260) | invoke 規約が期待される脱糖（desugaring）と一貫して動作するようにする |
 | [KT-62866](https://youtrack.jetbrains.com/issue/KT-62866) | K2: コンパニオンオブジェクトが静的スコープよりも優先される場合の修飾子解決の動作を変更 |
 | [KT-57750](https://youtrack.jetbrains.com/issue/KT-57750) | 型を解決する際、同じ名前のクラスがスターインポートされている場合に曖昧さエラーを報告 |
@@ -1011,7 +1011,7 @@ expectedの非抽象クラスで抽象関数を継承している場合は、非
 
 | 課題 ID | タイトル |
 |-------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------|
-| [KT-64474](https://youtrack.jetbrains.com/issue/KT-64474/)* | [アクセス不能な型の使用を未指定の動作として宣言](#アクセス不能なジェネリック型の使用禁止) |
+| [KT-64474](https://youtrack.jetbrains.com/issue/KT-64474/)* | [アクセス不能な型の使用を未指定の動作として宣言](#forbidden-use-of-inaccessible-generic-types) |
 | [KT-55179](https://youtrack.jetbrains.com/issue/KT-55179) | internal インライン関数からプライベートクラスのコンパニオンオブジェクトメンバを呼び出す際の偽陰性 PRIVATE_CLASS_MEMBER_FROM_INLINE |
 | [KT-58042](https://youtrack.jetbrains.com/issue/KT-58042) | オーバーライドされた宣言が可視であっても、同等のゲッターが不可視であれば合成プロパティを不可視にする |
 | [KT-64255](https://youtrack.jetbrains.com/issue/KT-64255) | 別のモジュールの派生クラスから internal セッターにアクセスすることを禁止 |
@@ -1040,7 +1040,7 @@ expectedの非抽象クラスで抽象関数を継承している場合は、非
 
 | 課題 ID | タイトル |
 |------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------|
-| [KT-54521](https://youtrack.jetbrains.com/issue/KT-54521)* | [Java で Nullable とアノテーションされた配列型の安全でない使用を非推奨化](#javaプリミティブ配列の-null-安全性の向上) |
+| [KT-54521](https://youtrack.jetbrains.com/issue/KT-54521)* | [Java で Nullable とアノテーションされた配列型の安全でない使用を非推奨化](#improved-null-safety-for-java-primitive-arrays) |
 | [KT-41034](https://youtrack.jetbrains.com/issue/KT-41034) | K2: セーフコールと規約演算子の組み合わせに対する評価セマンティクスを変更 |
 | [KT-50850](https://youtrack.jetbrains.com/issue/KT-50850) | スーパータイプの順序が継承された関数の null 許容性パラメータを定義する |
 | [KT-53982](https://youtrack.jetbrains.com/issue/KT-53982) | パブリックシグネチャでローカル型を近似する際、null 許容性を保持する |
@@ -1061,7 +1061,7 @@ expectedの非抽象クラスで抽象関数を継承している場合は、非
 
 | 課題 ID | タイトル |
 |------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------|
-| [KT-57555](https://youtrack.jetbrains.com/issue/KT-57555)* | [[LC] バッキングフィールドを持つ open プロパティの遅延初期化を禁止](#バッキングフィールドを持つopenプロパティの即時初期化) |
+| [KT-57555](https://youtrack.jetbrains.com/issue/KT-57555)* | [[LC] バッキングフィールドを持つ open プロパティの遅延初期化を禁止](#immediate-initialization-of-open-properties-with-backing-fields) |
 | [KT-58589](https://youtrack.jetbrains.com/issue/KT-58589) | 基本コンストラクタが存在しない場合やクラスがローカルな場合に、欠落した MUST_BE_INITIALIZED を非推奨化 |
 | [KT-64295](https://youtrack.jetbrains.com/issue/KT-64295) | プロパティに対する潜在的な invoke 呼び出しが発生した場合の再帰的解決を禁止 |
 | [KT-57290](https://youtrack.jetbrains.com/issue/KT-57290) | ベースクラスが別のモジュールにある場合、不可視の派生クラスからのベースクラスプロパティに対するスマートキャストを非推奨化 |

@@ -34,7 +34,7 @@
     </chapter>
     <chapter title="安裝 SSE" id="install_plugin">
         <p>
-            要安裝 <code>SSE</code> 外掛程式，請將其傳遞給 <a href="#configure-client">用戶端配置區塊</a> 內的 <code>install</code> 函式：
+            要安裝 <code>SSE</code> 外掛程式，請將其傳遞給 <a href="client-create-and-configure.md#configure-client">用戶端配置區塊</a> 內的 <code>install</code> 函式：
         </p>
         <code-block lang="kotlin" code="            import io.ktor.client.*&#10;            import io.ktor.client.engine.cio.*&#10;            import io.ktor.client.plugins.sse.*&#10;&#10;            //...&#10;            val client = HttpClient(CIO) {&#10;                install(SSE)&#10;            }"/>
     </chapter>

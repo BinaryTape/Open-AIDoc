@@ -113,7 +113,7 @@ fun grep(lines: List<String>, pattern: String, action: (String) -> Unit) {
 보시다시피 임포트된 애너테이션과 단언문은 특정 플랫폼이나 프레임워크에 종속되지 않습니다.
 나중에 이 테스트를 실행할 때 플랫폼별 프레임워크가 테스트 러너를 제공하게 됩니다.
 
-#### `kotlin.test` API 살펴보기 {initial-collapse-state="collapsed" collapsible="true"}
+#### `kotlin.test` API 살펴보기 {initial-collapse-state="collapsed" collapsible="true" id="explore-the-kotlin-test-api"}
 
 [`kotlin.test`](https://kotlinlang.org/api/latest/kotlin.test/) 라이브러리는 테스트에서 사용할 수 있는 플랫폼 독립적인 애너테이션과 단언문을 제공합니다. `Test`와 같은 애너테이션은 선택한 프레임워크에서 제공하는 애너테이션이나 가장 유사한 애너테이션으로 매핑됩니다.
 
@@ -121,7 +121,7 @@ fun grep(lines: List<String>, pattern: String, action: (String) -> Unit) {
 
 예를 들어 JVM에서는 JUnit 4, JUnit 5, TestNG 프레임워크가 모두 지원됩니다. Android에서는 `assertEquals()` 호출이 `asserter.assertEquals()` 호출로 이어질 수 있으며, 이때 `asserter` 객체는 `JUnit4Asserter`의 인스턴스가 됩니다. iOS에서는 `Asserter` 타입의 기본 구현체가 Kotlin/Native 테스트 러너와 함께 사용됩니다.
 
-### 테스트 실행하기
+### 테스트 실행하기 {id="run-tests"}
 
 다음 방법 중 하나로 테스트를 실행할 수 있습니다:
 
@@ -140,9 +140,9 @@ fun grep(lines: List<String>, pattern: String, action: (String) -> Unit) {
 
 ![테스트 출력](run-test-results.png){width=700}
 
-## 더 복잡한 프로젝트 다루기
+## 더 복잡한 프로젝트 다루기 {id="work-with-more-complex-projects"}
 
-### 공통 코드용 테스트 작성하기
+### 공통 코드용 테스트 작성하기 {id="write-tests-for-common-code"}
 
 앞서 `grep()` 함수를 통해 공통 코드용 테스트를 작성해 보았습니다. 이제 `CurrentRuntime` 클래스를 사용해 더 발전된 공통 코드 테스트를 살펴보겠습니다. 이 클래스는 코드가 실행되는 플랫폼에 대한 세부 정보를 포함합니다. 예를 들어 로컬 JVM에서 실행되는 Android 단위 테스트의 경우 "OpenJDK" 및 "17.0"과 같은 값을 가질 수 있습니다.
 
@@ -204,7 +204,7 @@ fun grep(lines: List<String>, pattern: String, action: (String) -> Unit) {
 
 [IDE에서 제공하는 방식](#run-tests) 중 아무 방법이나 사용하여 이 테스트를 실행할 수 있습니다.
 
-### 플랫폼별 테스트 추가하기
+### 플랫폼별 테스트 추가하기 {id="add-platform-specific-tests"}
 
 > 여기서는 간결성과 단순함을 위해 [expected 및 actual 선언 메커니즘](multiplatform-connect-to-apis.md)을 사용합니다. 더 복잡한 코드에서는 인터페이스와 팩토리 함수를 사용하는 것이 더 나은 접근 방식입니다.
 >

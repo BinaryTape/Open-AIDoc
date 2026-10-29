@@ -93,7 +93,7 @@ fun main() {
 > 
 {type="tip"}
 
-## 型キャスト
+## 型キャスト {id="type-casts"}
 
 Kotlinでオブジェクトの型を別の型に変換することを**キャスト（casting）**と呼びます。
 
@@ -101,7 +101,7 @@ Kotlinでオブジェクトの型を別の型に変換することを**キャス
 
 明示的に型をキャストする必要がある場合は、`as?` または `as` [キャスト演算子](#unsafe-cast-operator)を使用します。
 
-## スマートキャスト
+## スマートキャスト {id="smart-casts"}
 
 コンパイラは、不変（immutable）な値に対する型チェックと[明示的なキャスト](#unsafe-cast-operator)を追跡し、必要に応じて暗黙的な（安全な）キャストを自動的に挿入します。
 
@@ -475,7 +475,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="2.0" id="kotlin-cast-nullable-types"}
 
-### アップキャストとダウンキャスト
+### アップキャストとダウンキャスト {id="up-and-downcasting"}
 
 Kotlinでは、オブジェクトをスーパータイプやサブタイプにキャストできます。
 

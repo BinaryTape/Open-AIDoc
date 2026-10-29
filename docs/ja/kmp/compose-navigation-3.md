@@ -64,7 +64,7 @@ navigation3-browser = { module = "com.github.terrakok:navigation3-browser", vers
 ## マルチプラットフォーム対応 {id="multiplatform-support"}
 
 Navigation 3 は Compose と密接に連携しているため、Android のナビゲーション実装を最小限の変更で共通の Compose Multiplatform コードで動作させることができます。
-ウェブや iOS などの非 JVM プラットフォームをサポートするために必要なのは、[デスティネーションキーのポリモーフィックなシリアル化](#デスティネーションキーのポリモーフィックなシリアル化) を実装することだけです。
+ウェブや iOS などの非 JVM プラットフォームをサポートするために必要なのは、[デスティネーションキーのポリモーフィックなシリアル化](#polymorphic-serialization-for-destination-keys) を実装することだけです。
 
 GitHub で、Navigation 3 を使用した Android 専用アプリとマルチプラットフォームアプリの広範な例を比較できます：
 * [Navigation 3 レシピが含まれるオリジナルの Android リポジトリ](https://github.com/android/nav3-recipes)
@@ -214,7 +214,7 @@ val backStack = rememberNavBackStack(config, RouteA1)
 ```
 
 この手法は高いレベルの柔軟性と非結合化を提供しますが、より多くの手動メンテナンスが必要になります。
-[集約された sealed 型を使用したマルチモジュール](#集約された-sealed-型を使用したマルチモジュール)手法と同様に、DI を使用してシリアライザーのリストを動的に組み立てることができ、これにより柔軟性が向上します。
+[集約された sealed 型を使用したマルチモジュール](#multi-module-with-aggregated-sealed-types)手法と同様に、DI を使用してシリアライザーのリストを動的に組み立てることができ、これにより柔軟性が向上します。
 
 ## 次のステップ {id="what-s-next"}
 

@@ -252,7 +252,7 @@ Compose Multiplatform 通过 `isSystemInDarkTheme()` 来定义当前主题。
     }
     ```
 
-## 密度 (Density)
+## 密度 (Density) {id="density"}
 
 要更改应用程序的分辨率 `Density`，可以使用在所有平台上都受支持的通用 `LocalDensity` API：
 

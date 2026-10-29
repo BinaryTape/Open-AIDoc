@@ -9,7 +9,7 @@ Select式を用いると、複数のサスペンド関数を同時に待機し�
 >
 {style="note"}
 
-## チャンネルからの選択（Selecting from channels）
+## チャンネルからの選択（Selecting from channels） {id="selecting-from-channels"}
 
 2つの文字列プロデューサー `fizz` と `buzz` があるとしましょう。`fizz` は500ミリ秒ごとに "Fizz" という文字列を生成します：
 
@@ -113,7 +113,7 @@ fizz -> 'Fizz'
 
 <!--- TEST -->
 
-## クローズ時の選択（Selecting on close）
+## クローズ時の選択（Selecting on close） {id="selecting-on-close"}
 
 チャンネルがクローズされている場合、`select` 内の [onReceive][ReceiveChannel.onReceive] 節は失敗し、対応する `select` は例外をスローします。チャンネルがクローズされたときに特定のアクションを実行するには、[onReceiveCatching][ReceiveChannel.onReceiveCatching] 節を使用できます。次の例は、`select` が選択された節の結果を返す式であることも示しています：
 
@@ -210,7 +210,7 @@ Channel 'a' is closed
 
 2つ目の観察は、チャンネルが既にクローズされている場合、[onReceiveCatching][ReceiveChannel.onReceiveCatching] が即座に選択されることです。
 
-## 送信の選択（Selecting to send）
+## 送信の選択（Selecting to send） {id="selecting-to-send"}
 
 Select式には [onSend][SendChannel.onSend] 節があり、これを選択のバイアス特性と組み合わせることで非常に有効に活用できます。
 
@@ -286,7 +286,7 @@ Done consuming
 
 <!--- TEST -->
 
-## Deferred値の選択（Selecting deferred values）
+## Deferred値の選択（Selecting deferred values） {id="selecting-deferred-values"}
 
 Deferred（遅延）値は、[onAwait][Deferred.onAwait] 節を使用して選択できます。
 ランダムな遅延の後に deferred な文字列値を返す非同期関数から始めましょう：
@@ -357,7 +357,7 @@ Deferred 4 produced answer 'Waited for 128 ms'
 
 <!--- TEST -->
 
-## Deferred値のチャンネルを切り替える（Switch over a channel of deferred values）
+## Deferred値のチャンネルを切り替える（Switch over a channel of deferred values） {id="switch-over-a-channel-of-deferred-values"}
 
 Deferred な文字列値のチャンネルを消費し、受信した各 deferred 値を待機するチャンネルプロデューサー関数を書いてみましょう。ただし、次の deferred 値が送られてくるか、チャンネルがクローズされるまでしか待機しません。この例では、同じ `select` 内で [onReceiveCatching][ReceiveChannel.onReceiveCatching] と [onAwait][Deferred.onAwait] 節を組み合わせています：
 

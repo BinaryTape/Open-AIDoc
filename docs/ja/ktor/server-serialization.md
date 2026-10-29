@@ -177,7 +177,7 @@ ProtoBuf をシリアライズ/デシリアライズするには、ビルドス�
 ## ContentNegotiation のインストール {id="install_plugin"}
 
 <p>
-    <code>%plugin_name%</code> プラグインをアプリケーションに <a href="#install">インストール</a> するには、
+    <code>%plugin_name%</code> プラグインをアプリケーションに <a href="server-plugins.md#install">インストール</a> するには、
     指定された <Links href="/ktor/server-modules" summary="モジュールを使用すると、ルートをグループ化してアプリケーションを構造化できます。">モジュール</Links> 内で <code>install</code> 関数に渡します。
     以下のコードスニペットは、<code>%plugin_name%</code> のインストール方法を示しています ...
 </p>

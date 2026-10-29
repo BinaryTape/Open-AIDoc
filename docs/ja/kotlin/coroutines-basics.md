@@ -234,7 +234,7 @@ OS がスレッドの実行タイミングを決定するため、実行する�
 >
 {style="tip"}
 
-## コルーチンスコープと構造化された並行性
+## コルーチンスコープと構造化された並行性 {id="coroutine-scope-and-structured-concurrency"}
 
 アプリケーションで多くのコルーチンを実行する場合、それらをグループとして管理する方法が必要になります。
 Kotlin のコルーチンは、この構造を提供するために「構造化された並行性（structured concurrency）」と呼ばれる原則に基づいています。
@@ -253,7 +253,7 @@ Kotlin のコルーチンは、この構造を提供するために「構造化�
 `CoroutineScope` に対して `CoroutineScope.launch()` などの[コルーチンビルダー関数](#coroutine-builder-functions)を呼び出すと、そのスコープに関連付けられたコルーチンの子コルーチンが開始されます。
 ビルダーのブロック内では、[レシーバー](lambdas.md#function-literals-with-receiver)はネストされた `CoroutineScope` になるため、そこで開始したすべてのコルーチンはその子になります。
 
-### `coroutineScope()` 関数でコルーチンスコープを作成する
+### `coroutineScope()` 関数でコルーチンスコープを作成する {id="create-a-coroutine-scope-with-the-coroutinescope-function"}
 
 現在のコルーチンコンテキストを使用して新しいコルーチンスコープを作成するには、[`coroutineScope()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/coroutine-scope.html) 関数を使用します。
 この関数は、コルーチンサブツリーのルートコルーチンを作成します。

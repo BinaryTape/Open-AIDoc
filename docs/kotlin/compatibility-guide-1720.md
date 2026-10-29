@@ -6,7 +6,7 @@ _[保持语言现代性](kotlin-evolution-principles.md)_ 和 _[舒适更新](ko
 
 本文档对这些变化进行了总结，为从 Kotlin 1.7.0 和 1.7.10 迁移到 Kotlin 1.7.20 提供参考。
 
-## 基本术语
+## 基本术语 {id="basic-terms"}
 
 在本文档中，我们引入了几种兼容性：
 
@@ -16,7 +16,7 @@ _[保持语言现代性](kotlin-evolution-principles.md)_ 和 _[舒适更新](ko
 
 请记住，这些定义仅针对纯 Kotlin。从其他语言的角度（例如 Java）来看 Kotlin 代码的兼容性不在本文档的讨论范围内。
 
-## 语言
+## 语言 {id="language"}
 
 ### 回退修复正确约束处理的尝试
 
@@ -32,7 +32,7 @@ _[保持语言现代性](kotlin-evolution-principles.md)_ 和 _[舒适更新](ko
 >
 > - 1.7.20：回退到 1.7.0 的行为
 
-### 禁止某些构建器推断情况，以避免与多个 lambda表达式和解析产生冲突
+### 禁止某些构建器推断情况，以避免与多个 lambda表达式和解析产生冲突 {id="forbid-some-builder-inference-cases-to-avoid-problematic-interaction-with-multiple-lambdas-and-resolution"}
 
 > **问题**：[KT-53797](https://youtrack.jetbrains.com/issue/KT-53797)
 >

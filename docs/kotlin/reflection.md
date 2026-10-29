@@ -259,7 +259,7 @@ fun main() {
 
 ## 调用函数 {id="call-a-function"}
 
-动态函数调用遵循与[属性](#读取属性)相同的模式。如果所有实参均按其声明顺序提供，你可以使用 [`call()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/-k-callable/call.html)。先传入对象实例来指定未绑定的成员函数，然后添加其常规实参：
+动态函数调用遵循与[属性](#read-a-property)相同的模式。如果所有实参均按其声明顺序提供，你可以使用 [`call()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/-k-callable/call.html)。先传入对象实例来指定未绑定的成员函数，然后添加其常规实参：
 
 ```kotlin
 import kotlin.reflect.full.memberFunctions

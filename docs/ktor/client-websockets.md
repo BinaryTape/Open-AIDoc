@@ -46,7 +46,7 @@
         </tip>
     </chapter>
     <chapter title="安装 WebSockets" id="install_plugin">
-        <p>要安装 <code>WebSockets</code> 插件，请在 <a href="#configure-client">客户端配置块</a> 内部将其传递给 <code>install</code> 函数：</p>
+        <p>要安装 <code>WebSockets</code> 插件，请在 <a href="client-create-and-configure.md#configure-client">客户端配置块</a> 内部将其传递给 <code>install</code> 函数：</p>
         <code-block lang="kotlin" code="            import io.ktor.client.*&#10;            import io.ktor.client.engine.cio.*&#10;            import io.ktor.client.plugins.websocket.*&#10;&#10;            //...&#10;            val client = HttpClient(CIO) {&#10;                install(WebSockets)&#10;            }"/>
     </chapter>
     <chapter title="配置" id="configure_plugin">
@@ -72,7 +72,7 @@
             </def>
         </deflist>
         <warning>
-            <p><code>pingInterval</code> 和 <code>pingIntervalMillis</code> 属性不适用于 OkHttp 引擎。要为 OkHttp 设置 ping 间隔，您可以使用 <a href="#okhttp">引擎配置</a>：
+            <p><code>pingInterval</code> 和 <code>pingIntervalMillis</code> 属性不适用于 OkHttp 引擎。要为 OkHttp 设置 ping 间隔，您可以使用 <a href="client-engines.md#okhttp">引擎配置</a>：
             </p>
             <code-block lang="kotlin" code="                import io.ktor.client.engine.okhttp.OkHttp&#10;&#10;                val client = HttpClient(OkHttp) {&#10;                    engine {&#10;                        preconfigured = OkHttpClient.Builder()&#10;                            .pingInterval(20, TimeUnit.SECONDS)&#10;                            .build()&#10;                    }&#10;                }"/>
         </warning>

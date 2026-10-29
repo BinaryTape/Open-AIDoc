@@ -47,7 +47,7 @@ Sessions プラグインは、異なる HTTP リクエスト間でデータを�
 ## Sessions のインストール {id="install_plugin"}
 
 <p>
-    <code>%plugin_name%</code> プラグインをアプリケーションに<a href="#install">インストール</a>するには、
+    <code>%plugin_name%</code> プラグインをアプリケーションに<a href="server-plugins.md#install">インストール</a>するには、
     指定された<Links href="/ktor/server-modules" summary="Modules allow you to structure your application by grouping routes.">モジュール</Links>内の <code>install</code> 関数に渡します。
     以下のコードスニペットは、<code>%plugin_name%</code> をインストールする方法を示しています。
 </p>
@@ -68,7 +68,7 @@ Sessions プラグインは、異なる HTTP リクエスト間でデータを�
     </TabItem>
 </Tabs>
 <p>
-    <code>%plugin_name%</code> プラグインは、<a href="#install-route">特定のルートにインストール</a>することもできます。
+    <code>%plugin_name%</code> プラグインは、<a href="server-plugins.md#install-route">特定のルートにインストール</a>することもできます。
     これは、アプリケーションの異なるリソースに対して異なる <code>%plugin_name%</code> 設定が必要な場合に便利です。
 </p>
 

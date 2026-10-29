@@ -3,8 +3,8 @@
 本教學展示如何使用 Kotlin/JavaScript (Kotlin/JS) 為瀏覽器建立 Web 應用程式。
 若要建立您的應用程式，請選擇最符合您工作流程的工具：
 
-* **[IntelliJ IDEA](#在-intellij-idea-中建立您的應用程式)**：從版本控制複製專案範本並在 IntelliJ IDEA 中進行開發。
-* **[Gradle 建置系統](#使用-gradle-建立您的應用程式)**：手動建立專案的建置檔案，以深入了解底層設定的運作方式。
+* **[IntelliJ IDEA](#create-your-application-in-intellij-idea)**：從版本控制複製專案範本並在 IntelliJ IDEA 中進行開發。
+* **[Gradle 建置系統](#create-your-application-using-gradle)**：手動建立專案的建置檔案，以深入了解底層設定的運作方式。
 
 > 除了以瀏覽器為目標平台外，使用 Kotlin/JS 您還可以編譯至其他環境。
 > 如需詳細資訊，請參閱[執行環境](js-project-setup.md#execution-environments)。
@@ -130,7 +130,7 @@ Gradle 都會自動對專案執行累加建置並對瀏覽器進行熱重新載�
    }
    ```
 
-3. [再次執行應用程式](#建置並執行應用程式)。
+3. [再次執行應用程式](#build-and-run-the-application)。
 
     您的應用程式外觀如下：
 
@@ -165,7 +165,7 @@ Gradle 都會自動對專案執行累加建置並對瀏覽器進行熱重新載�
     }
    ```
 
-#### 新增 output 元素
+#### 新增 output 元素 {id="add-an-output-element"}
 
 1. 透過定義建立段落的[擴充函式](extensions.md#extension-functions)來新增用於顯示輸出的文字元素：
 
@@ -219,7 +219,7 @@ fun main() {
 
 #### 執行應用程式 {id="run-the-application"}
 
-1. [執行應用程式](#建置並執行應用程式)。
+1. [執行應用程式](#build-and-run-the-application)。
 2. 輸入您的名字。
 3. 按下 <shortcut>Enter</shortcut>。
 
@@ -262,7 +262,7 @@ fun main() {
    }
    ```
 
-3. 依照步驟[執行應用程式並輸入您的名字](#執行應用程式)。
+3. 依照步驟[執行應用程式並輸入您的名字](#run-the-application)。
 
 您可以看到結果：
 
@@ -354,7 +354,7 @@ Gradle 是 Kotlin/JS 和 Kotlin Multiplatform 專案的預設建構系統。
 
 > 如果您使用的是 `browser` 環境，請遵循後續步驟。
 > 如果您使用的是 `nodejs` 環境，
-> 請前往[建置並執行專案](#建置並執行專案)章節。
+> 請前往[建置並執行專案](#build-and-run-the-project)章節。
 > 
 > {style="note"}
 

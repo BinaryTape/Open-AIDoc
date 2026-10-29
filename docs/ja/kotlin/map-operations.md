@@ -140,7 +140,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
 
-可変マップでの [`plusAssign`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/plus-assign.html) (`+=`) および [`minusAssign`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/minus-assign.html) (`-=`) 演算子の使用方法の詳細については、以下の[マップの書き込み操作](#マップの書き込み操作)を参照してください。
+可変マップでの [`plusAssign`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/plus-assign.html) (`+=`) および [`minusAssign`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/minus-assign.html) (`-=`) 演算子の使用方法の詳細については、以下の[マップの書き込み操作](#map-write-operations)を参照してください。
 
 ## マップの書き込み操作 {id="map-write-operations"}
 

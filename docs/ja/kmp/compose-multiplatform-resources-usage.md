@@ -9,23 +9,23 @@
 
 以下のトピックについての詳細は、読み進めて確認してください。
 
-* [生成された `Res` クラスとアクセサのインポート](#生成されたクラスのインポート)
-* [アクセサクラス生成のカスタマイズ](#アクセサクラス生成のカスタマイズ): publicにする方法、パッケージの割り当て、無条件での生成など。
+* [生成された `Res` クラスとアクセサのインポート](#importing-the-generated-class)
+* [アクセサクラス生成のカスタマイズ](#customizing-accessor-class-generation): publicにする方法、パッケージの割り当て、無条件での生成など。
 * 特定のリソースタイプの操作:
-  * 単純な画像、ラスタライズ画像、XMLベクターなどの[Drawableリソース](#画像)。
-  * Material Symbolsライブラリの[ベクターAndroid XMLアイコン](#アイコン)。
-  * 単純な文字列、テンプレート、配列、複数形を含む[文字列](#文字列)。
-  * [カスタムフォントの保存と読み込み](#フォント)。
-  * [Rawファイル](#rawファイル)およびバイト配列の画像への変換。
-* [文字列IDにマッピングされたリソースへのアクセス](#リソースと文字列id用に生成されたマップ)。
-* [マルチプラットフォームリソースをAndroidアセットとして使用](#androidアセットとしてのcompose-multiplatformリソース)。
+  * 単純な画像、ラスタライズ画像、XMLベクターなどの[Drawableリソース](#images)。
+  * Material Symbolsライブラリの[ベクターAndroid XMLアイコン](#icons)。
+  * 単純な文字列、テンプレート、配列、複数形を含む[文字列](#strings)。
+  * [カスタムフォントの保存と読み込み](#fonts)。
+  * [Rawファイル](#raw-files)およびバイト配列の画像への変換。
+* [文字列IDにマッピングされたリソースへのアクセス](#generated-maps-for-resources-and-string-ids)。
+* [マルチプラットフォームリソースをAndroidアセットとして使用](#compose-multiplatform-resources-as-android-assets)。
 * Web固有のリソースの処理:
   * ブラウザ機能とpreload APIを使用した[リソースの事前読み込み（プリロード）](compose-web-resources.md#preloading-of-resources-for-web-targets)。
   * 欠落している文字に対する[自動フォントフォールバック](compose-web-resources.md#automatic-font-fallback)。
   * [Webリソースのキャッシュ](compose-web-resources.md#caching-web-resources)。
 * 外部リソースの操作: 
-  [外部ライブラリから](#外部ライブラリからのマルチプラットフォームリソースへのアクセス)、
-  [リモートファイル](#リモートファイル)、および[Javaリソース](#javaリソースの使用)。
+  [外部ライブラリから](#accessing-multiplatform-resources-from-external-libraries)、
+  [リモートファイル](#remote-files)、および[Javaリソース](#using-java-resources)。
 
 ## 生成されたクラスのインポート {id="importing-the-generated-class"}
 
@@ -526,7 +526,7 @@ coroutineScope.launch {
 
 読み込んでいるファイルがビットマップ（JPEG、PNG、BMP、WEBP）またはXMLベクター画像である場合、以下の関数を使用して、`Image()` コンポーザブルに適した `ImageBitmap` または `ImageVector` オブジェクトに変換できます。
 
-[Rawファイル](#rawファイル) セクションで示したようにRawファイルにアクセスし、その結果をコンポーザブルに渡します。
+[Rawファイル](#raw-files) セクションで示したようにRawファイルにアクセスし、その結果をコンポーザブルに渡します。
 
 ```kotlin
 // bytes = Res.readBytes("files/example.png")
@@ -633,7 +633,7 @@ val uri = Res.getUri("files/my_video.mp4")
 
 これで `uri` 変数にファイルへの絶対パスが格納されたため、外部ライブラリはそのパスを使用して、適切な方法でファイルにアクセスできます。
 
-Android固有の用途では、マルチプラットフォームリソースは[Androidアセットとしてもパック](#androidアセットとしてのcompose-multiplatformリソース)されます。
+Android固有の用途では、マルチプラットフォームリソースは[Androidアセットとしてもパック](#compose-multiplatform-resources-as-android-assets)されます。
 
 ### リモートファイル {id="remote-files"}
 
@@ -645,9 +645,9 @@ URLを使用してインターネットからリモートファイルを読み�
 * [Kamel](https://github.com/Kamel-Media/Kamel)
 * [Ktor client](https://ktor.io/)
 
-画像を手動でダウンロードしたりそのバイトを読み込んだりした場合は、リソースライブラリの[デコード関数](#バイト配列から画像への変換)を使用して変換します。デスクトップアプリでネットワーク画像を読み込む例については、[デスクトップ向けCompose Multiplatformでの画像の使用](compose-desktop-images.md#loading-images-from-the-file-system-or-the-network)を参照してください。
+画像を手動でダウンロードしたりそのバイトを読み込んだりした場合は、リソースライブラリの[デコード関数](#convert-byte-arrays-into-images)を使用して変換します。デスクトップアプリでネットワーク画像を読み込む例については、[デスクトップ向けCompose Multiplatformでの画像の使用](compose-desktop-images.md#loading-images-from-the-file-system-or-the-network)を参照してください。
 
-画像のバイトを自身でダウンロードまたは読み込んだ場合は、リソースライブラリの[デコード関数](#バイト配列から画像への変換)を使用して画像に変換してください。
+画像のバイトを自身でダウンロードまたは読み込んだ場合は、リソースライブラリの[デコード関数](#convert-byte-arrays-into-images)を使用して画像に変換してください。
 デスクトップアプリケーションでネットワークから画像を読み込む例については、[デスクトップ向けCompose Multiplatformでの画像の使用](compose-desktop-images.md#loading-images-from-the-file-system-or-the-network) のチュートリアルを参照してください。
 
 ### Javaリソースの使用 {id="using-java-resources"}

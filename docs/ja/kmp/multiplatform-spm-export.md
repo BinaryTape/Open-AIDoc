@@ -80,11 +80,11 @@ XCFramework の公開を設定するには：
    生成されたフレームワークは、プロジェクトディレクトリ内の `shared/build/XCFrameworks/release/Shared.xcframework` フォルダとして作成されます。
 
    > プロジェクトで SwiftPM 依存関係を利用している場合、Kotlin %kotlinEapVersion% 以降、このタスクは XCFramework の隣に一連の SwiftPM 関連ファイルも生成します。
-   > [以下](#xcframework-と-swift-パッケージマニフェストの準備)で説明するように、マニフェストを一から作成する代わりに、生成された `Package.swift` をフレームワークと一緒に配布できます。
+   > [以下](#prepare-the-xcframework-and-the-swift-package-manifest)で説明するように、マニフェストを一から作成する代わりに、生成された `Package.swift` をフレームワークと一緒に配布できます。
    >
    {style="note"} 
 
-3. エクスポートしたい共有コードを持つモジュールが複数ある場合（例：共有ロジックモジュールと共有 UI モジュール）、それらを[単一の新しいモジュールに統合](#複数のモジュールを-xcframework-としてエクスポートする)し、代わりにこのアンブレラ (umbrella) モジュールを配布してください。
+3. エクスポートしたい共有コードを持つモジュールが複数ある場合（例：共有ロジックモジュールと共有 UI モジュール）、それらを[単一の新しいモジュールに統合](#exporting-multiple-modules-as-an-xcframework)し、代わりにこのアンブレラ (umbrella) モジュールを配布してください。
 
 ### XCFramework と Swift パッケージマニフェストの準備 {id="prepare-the-xcframework-and-the-swift-package-manifest"}
 
@@ -267,6 +267,6 @@ XCFramework の公開を設定するには：
     ./gradlew :together:assembleTogetherReleaseXCFramework
     ```
 
-5. [前のセクション](#xcframework-と-swift-パッケージマニフェストの準備)の手順に従って `together.xcframework` を準備します：アーカイブの作成、チェックサムの計算、アーカイブされた XCFramework のファイルストレージへのアップロード、`Package.swift` ファイルの作成とプッシュを行います。
+5. [前のセクション](#prepare-the-xcframework-and-the-swift-package-manifest)の手順に従って `together.xcframework` を準備します：アーカイブの作成、チェックサムの計算、アーカイブされた XCFramework のファイルストレージへのアップロード、`Package.swift` ファイルの作成とプッシュを行います。
 
 これで、Xcode プロジェクトに依存関係をインポートできます。`import together` ディレクティブを追加すると、Swift コードで `network` モジュールと `database` モジュールの両方のクラスをインポートして利用できるようになります。

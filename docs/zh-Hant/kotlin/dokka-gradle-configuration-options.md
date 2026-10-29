@@ -3,7 +3,7 @@
 Dokka 提供許多配置選項來建立您與讀者的體驗。
 
 以下是每個配置區塊的詳細說明與一些範例。 
-您也可以找到套用了 [所有配置選項](#完整配置) 的範例。
+您也可以找到套用了 [所有配置選項](#complete-configuration) 的範例。
 
 有關為單專案與多專案組建套用配置區塊的更多詳細資訊，
 請參閱 [配置範例](dokka-gradle.md#configuration-examples)。
@@ -201,7 +201,7 @@ dokka {
             無法解析來自相依項（包括標準程式庫）的類別與成員連結。
         </p>
         <p>注意：您可以將擷取的檔案快取到本機，並以本機路徑提供給 Dokka。請參閱 
-           <code><a href="#外部文件連結配置">externalDocumentationLinks</a></code> 章節。</p>
+           <code><a href="#external-documentation-links-configuration">externalDocumentationLinks</a></code> 章節。</p>
         <p>預設值：<code>false</code></p>
     </def>
      <def title="includes">

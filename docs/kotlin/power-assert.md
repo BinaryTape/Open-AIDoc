@@ -379,7 +379,7 @@ powerAssert {
 如果一个函数使用了 `@PowerAssert` 注解，Power-assert 插件会自动转换对它的调用。
 您不需要在构建配置中注册该函数。
 
-您可以在自己声明断言函数时添加 `@PowerAssert` 注解，或者使用[支持 Power-assert 的库](#为您的库添加对-power-assert-的支持)并使用其提供的注解函数。
+您可以在自己声明断言函数时添加 `@PowerAssert` 注解，或者使用[支持 Power-assert 的库](#add-support-for-power-assert-to-your-library)并使用其提供的注解函数。
 
 要获得详细的失败消息，请在项目中启用 Power-assert 插件的情况下调用该函数：
 
@@ -727,7 +727,7 @@ assert(employee.age < 100) { "${employee.name} has an invalid age: ${employee.ag
 
 要为您的库添加对 Power-assert 的支持：
 
-1. 在您的构建文件中，[应用 Power-assert 插件](#应用插件)。
+1. 在您的构建文件中，[应用 Power-assert 插件](#apply-the-plugin)。
 2. 对于 Maven，添加 Power-assert 运行时库作为依赖项：
 
    ```xml

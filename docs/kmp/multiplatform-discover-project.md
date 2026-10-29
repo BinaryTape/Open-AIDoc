@@ -77,7 +77,7 @@ kotlin {
 ![目标标签](target-labels-diagram.svg){width=700}
 
 这就是 Kotlin 编译器处理编译到所有已声明目标的公共代码的方式。
-请参阅[源集](#源集)以了解如何编写平台特化代码。
+请参阅[源集](#source-sets)以了解如何编写平台特化代码。
 
 ## 源集 {id="source-sets"}
 

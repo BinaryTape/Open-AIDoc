@@ -1,6 +1,6 @@
 [//]: # (title: Gradle 프로젝트 구성하기)
 
-[Gradle](https://docs.gradle.org/current/userguide/userguide.html)을 사용하여 Kotlin 프로젝트를 빌드하려면, 빌드 스크립트 파일인 `build.gradle(.kts)`에 [Kotlin Gradle 플러그인을 추가](#플러그인-적용)하고 [프로젝트 의존성을 구성](#의존성-구성)해야 합니다.
+[Gradle](https://docs.gradle.org/current/userguide/userguide.html)을 사용하여 Kotlin 프로젝트를 빌드하려면, 빌드 스크립트 파일인 `build.gradle(.kts)`에 [Kotlin Gradle 플러그인을 추가](#apply-the-plugin)하고 [프로젝트 의존성을 구성](#configure-dependencies)해야 합니다.
 
 > 빌드 스크립트의 내용에 대해 자세히 알아보려면 [빌드 스크립트 살펴보기](get-started-with-jvm-gradle-project.md#explore-the-build-script) 섹션을 참조하세요.
 >
@@ -211,12 +211,12 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile.class).configu
 </tab>
 </tabs>
 
-JVM 타깃 비호환성을 방지하려면 [툴체인을 구성](#gradle-java-툴체인-지원)하거나 JVM 버전을 수동으로 일치시키세요.
+JVM 타깃 비호환성을 방지하려면 [툴체인을 구성](#gradle-java-toolchains-support)하거나 JVM 버전을 수동으로 일치시키세요.
 
 #### 타깃이 호환되지 않을 때 발생할 수 있는 문제 {initial-collapse-state="collapsed" collapsible="true" id="what-can-go-wrong-if-targets-are-incompatible"}
 
 Kotlin 및 Java 소스 세트의 JVM 타깃을 수동으로 설정하는 방법에는 두 가지가 있습니다.
-* [Java 툴체인 설정](#gradle-java-툴체인-지원)을 통한 암시적 방법.
+* [Java 툴체인 설정](#gradle-java-toolchains-support)을 통한 암시적 방법.
 * `kotlin` 확장 또는 태스크의 `jvmTarget` 속성과 `java` 확장 또는 태스크의 `targetCompatibility`를 설정하는 명시적 방법.
 
 JVM 타깃 비호환성은 다음과 같은 경우에 발생합니다.
@@ -278,7 +278,7 @@ Gradle 6.7에서는 [Java 툴체인 지원](https://docs.gradle.org/current/user
 Kotlin Gradle 플러그인은 Kotlin/JVM 컴파일 태스크에 대해 Java 툴체인을 지원합니다. JS 및 Native 태스크는 툴체인을 사용하지 않습니다. Kotlin 컴파일러는 항상 Gradle 데몬이 실행 중인 JDK에서 실행됩니다.
 Java 툴체인은 다음 역할을 수행합니다.
 * JVM 타깃에 사용할 수 있는 [`-jdk-home` 옵션](compiler-reference.md#jdk-home-path)을 설정합니다.
-* 사용자가 `jvmTarget` 옵션을 명시적으로 설정하지 않은 경우 [`compilerOptions.jvmTarget`](gradle-compiler-options.md#attributes-specific-to-jvm)을 툴체인의 JDK 버전으로 설정합니다. 사용자가 툴체인을 구성하지 않은 경우 `jvmTarget` 필드는 기본값을 사용합니다. 자세한 내용은 [JVM 타깃 호환성 확인](#관련-컴파일-태스크의-jvm-타깃-호환성-확인)을 참조하세요.
+* 사용자가 `jvmTarget` 옵션을 명시적으로 설정하지 않은 경우 [`compilerOptions.jvmTarget`](gradle-compiler-options.md#attributes-specific-to-jvm)을 툴체인의 JDK 버전으로 설정합니다. 사용자가 툴체인을 구성하지 않은 경우 `jvmTarget` 필드는 기본값을 사용합니다. 자세한 내용은 [JVM 타깃 호환성 확인](#check-for-jvm-target-compatibility-of-related-compile-tasks)을 참조하세요.
 * 모든 Java 컴파일, 테스트 및 javadoc 태스크에서 사용할 툴체인을 설정합니다.
 * [`kapt` 워커](kapt.md#run-kapt-tasks-in-parallel)가 실행되는 JDK에 영향을 미칩니다.
 
@@ -375,7 +375,7 @@ plugins {
 >
 {style="note"}
 
-특정 태스크에 대해 원하는 JDK(로컬 JDK 포함)를 설정하려면 [Task DSL](#task-dsl로-jdk-버전-설정)을 사용하세요.
+특정 태스크에 대해 원하는 JDK(로컬 JDK 포함)를 설정하려면 [Task DSL](#set-jdk-version-with-the-task-dsl)을 사용하세요.
 
 자세한 내용은 [Kotlin 플러그인의 Gradle JVM 툴체인 지원](https://blog.jetbrains.com/kotlin/2021/11/gradle-jvm-toolchain-support-in-the-kotlin-plugin/)을 참조하세요.
 
@@ -759,7 +759,7 @@ project.plugins.withType(KotlinBasePlugin.class) {
 
 ## 의존성 구성 {id="configure-dependencies"}
 
-라이브러리에 대한 의존성을 추가하려면 소스 세트 DSL의 `dependencies{}` 블록에서 필요한 [유형](#의존성-유형)(예: `implementation`)의 의존성을 설정합니다.
+라이브러리에 대한 의존성을 추가하려면 소스 세트 DSL의 `dependencies{}` 블록에서 필요한 [유형](#dependency-types)(예: `implementation`)의 의존성을 설정합니다.
 
 <tabs group="build-script">
 <tab title="Kotlin" group-key="kotlin">

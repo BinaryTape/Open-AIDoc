@@ -64,7 +64,7 @@
 </chapter>
 <chapter title="SSE のインストール" id="install_plugin">
     <p>
-        <code>%plugin_name%</code> プラグインをアプリケーションに<a href="#install">インストール</a>するには、指定された<Links href="/ktor/server-modules" summary="Modules allow you to structure your application by grouping routes.">モジュール</Links>内の <code>install</code> 関数に渡します。
+        <code>%plugin_name%</code> プラグインをアプリケーションに<a href="server-plugins.md#install">インストール</a>するには、指定された<Links href="/ktor/server-modules" summary="Modules allow you to structure your application by grouping routes.">モジュール</Links>内の <code>install</code> 関数に渡します。
         以下の例は、<code>%plugin_name%</code> をインストールする方法を示しています。
     </p>
     <list>
@@ -87,7 +87,7 @@
 <chapter title="SSE セッションの処理" id="handle-sessions">
     <p>
         <code>SSE</code> プラグインをインストールしたら、SSE セッションを処理するルートを追加できます。
-        これを行うには、<a href="#define_route">routing</a> ブロック内で <code>sse()</code> 関数を呼び出します。SSE ルートを設定する方法は2つあります。
+        これを行うには、<a href="server-routing.md#define_route">routing</a> ブロック内で <code>sse()</code> 関数を呼び出します。SSE ルートを設定する方法は2つあります。
     </p>
     <list type="decimal">
         <li>

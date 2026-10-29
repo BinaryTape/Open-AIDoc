@@ -9,7 +9,7 @@
 [Dokka 的 Gradle 外掛程式](https://plugins.gradle.org/plugin/org.jetbrains.dokka)。
 
 Dokka Gradle 外掛程式 (DGP) 附帶專案的基本自動組態，
-包含用於產生文件的 [Gradle 任務](#產生文件)，並提供[組態選項](dokka-gradle-configuration-options.md)來
+包含用於產生文件的 [Gradle 任務](#generate-documentation)，並提供[組態選項](dokka-gradle-configuration-options.md)來
 自訂輸出。
 
 您可以在我們的 [Gradle 範例專案](https://github.com/Kotlin/dokka/tree/2.0.0/examples/gradle-v2)中
@@ -55,7 +55,7 @@ plugins {
 在為多專案組建編寫文件時，您需要將外掛程式明確套用到每個想要編寫文件的子專案中。
 您可以直接在每個子專案中配置 Dokka，或使用慣例外掛程式在子專案之間共用 Dokka 組態。
 如需詳細資訊，請參閱 
-如何配置[單一專案](#單一專案組態)和[多專案](#多專案組態)組建。
+如何配置[單一專案](#single-project-configuration)和[多專案](#multi-project-configuration)組建。
 
 > * 在底層，
 > Dokka 使用 [Kotlin Gradle 外掛程式](https://kotlinlang.org/docs/gradle-configure-project.html#apply-the-plugin) 
@@ -87,10 +87,10 @@ Dokka Gradle 外掛程式內建了 [HTML](dokka-html.md) 和 [Javadoc](dokka-jav
 
 `dokkaGenerate` Gradle 任務的主要行為是：
 
-* 此任務會同時為[單一](#單一專案組態)
-  和[多專案](#多專案組態)組建產生文件。
+* 此任務會同時為[單一](#single-project-configuration)
+  和[多專案](#multi-project-configuration)組建產生文件。
 * 預設情況下，文件輸出格式為 HTML。
-  您也可以透過[新增適當的外掛程式](#配置文件輸出格式)來產生 Javadoc 或同時產生 HTML 和 Javadoc 格式。
+  您也可以透過[新增適當的外掛程式](#configure-documentation-output-format)來產生 Javadoc 或同時產生 HTML 和 Javadoc 格式。
 * 對於單一和多專案組建，產生的文件都會自動放置在 `build/dokka/html` 
   目錄中。
   您可以[更改位置 (`outputDirectory`)](dokka-gradle-configuration-options.md#general-configuration)。
@@ -144,7 +144,7 @@ Dokka Gradle 外掛程式內建了 [HTML](dokka-html.md) 和 [Javadoc](dokka-jav
 
 Dokka 可以將多個子專案的文件彙總到單一輸出或發布中。
 
-您必須在彙總文件之前將 [Dokka 外掛程式套用](#將慣例外掛程式套用到您的子專案)至 
+您必須在彙總文件之前將 [Dokka 外掛程式套用](#apply-the-convention-plugin-to-your-subprojects)至 
 所有可編寫文件的子專案。
 
 若要彙總多個子專案的文件，請在根專案的 `build.gradle.kts` 檔案中新增 `dependencies {}` 
@@ -272,10 +272,10 @@ tasks.register('dokkaJavadocJar', Jar) {
 不論您的專案類型為何，[組態選項](dokka-gradle-configuration-options.md)本身都是相同的。
 
 對於在專案根目錄中只有單一 `build.gradle.kts` 或 `build.gradle` 檔案的簡單且扁平的專案，
-請參閱[單一專案組態](#單一專案組態)。
+請參閱[單一專案組態](#single-project-configuration)。
 
 對於具有子專案和多個巢狀 `build.gradle.kts` 或 `build.gradle` 檔案的更複雜組建，
-請參閱[多專案組態](#多專案組態)。
+請參閱[多專案組態](#multi-project-configuration)。
 
 ### 單一專案組態 {id="single-project-configuration"}
 
@@ -467,19 +467,19 @@ dokka {
 </tabs>
 
 單一專案和多專案文件共用相同的 
-[使用頂層 `dokka {}` DSL 的組態模型](#單一專案組態)。
+[使用頂層 `dokka {}` DSL 的組態模型](#single-project-configuration)。
 
 在多專案組建中配置 Dokka 有兩種方式：
 
-* **[透過慣例外掛程式共用組態](#透過慣例外掛程式共用組態)（偏好方式）**：定義一個慣例外掛程式並將其套用到所有子專案。
+* **[透過慣例外掛程式共用組態](#shared-configuration-via-a-convention-plugin)（偏好方式）**：定義一個慣例外掛程式並將其套用到所有子專案。
   這可以集中管理您的 Dokka 設定。
 
-* **[手動配置](#手動配置)**：套用 Dokka 外掛程式並在每個子專案中重複相同的 `dokka {}` 區塊。
+* **[手動配置](#manual-configuration)**：套用 Dokka 外掛程式並在每個子專案中重複相同的 `dokka {}` 區塊。
   您不需要慣例外掛程式。
 
 在配置子專案後，您可以將來自多個子專案的文件彙總至單一輸出。
 如需詳細資訊，請參閱
-[彙總多專案組建的文件輸出](#彙總多專案組建的文件輸出)。
+[彙總多專案組建的文件輸出](#aggregate-documentation-output-in-multi-project-builds)。
 
 > 如需多專案範例，請參閱 [Dokka GitHub 儲存庫](https://github.com/Kotlin/dokka/tree/master/examples/gradle-v2/multimodule-example)。
 >

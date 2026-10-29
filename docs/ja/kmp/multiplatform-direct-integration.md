@@ -41,7 +41,7 @@ CocoaPods プラグインから移行するには：
 3. `build.gradle(.kts)` ファイルから `cocoapods {}` ブロックを削除します。
 4. `.podspec` ファイルと Podfile を削除します。
 
-### フレームワークをプロジェクトに接続する
+### フレームワークをプロジェクトに接続する {id="connect-the-framework-to-your-project"}
 
 マルチプラットフォームプロジェクトから生成された Kotlin フレームワークを Xcode プロジェクトに接続するには：
 

@@ -7,7 +7,7 @@ Kotlinでは、デフォルトですべての例外を「非チェック例外�
 非チェック例外は例外処理のプロセスを簡素化します。例外をキャッチすることはできますが、明示的に処理したり[宣言](java-to-kotlin-interop.md#checked-exceptions)したりする必要はありません。
 
 > Java、Swift、Objective-Cとやり取りする際のKotlinの例外処理の詳細については、
-> [Java、Swift、Objective-Cとの例外の相互運用性](#java-swift-objective-cとの例外の相互運用性)セクションを参照してください。
+> [Java、Swift、Objective-Cとの例外の相互運用性](#exception-interoperability-with-java-swift-and-objective-c)セクションを参照してください。
 > 
 {style="tip"}
 
@@ -16,7 +16,7 @@ Kotlinでは、デフォルトですべての例外を「非チェック例外�
 * **例外のスロー（Throwing exceptions）：** 問題が発生したことを示します。
 * **例外のキャッチ（Catching exceptions）：** 問題を解決するか、開発者やアプリケーションのユーザーに通知することで、予期しない例外を手動で処理します。
 
-例外は [`Exception`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-exception/) クラスのサブクラスによって表されます。`Exception` 自体は [`Throwable`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-throwable/) クラスのサブクラスです。階層の詳細については、[例外の階層](#例外の階層)セクションを参照してください。`Exception` は [`openクラス`](inheritance.md) であるため、アプリケーションの特定のニーズに合わせて [カスタム例外](#カスタム例外の作成) を作成できます。
+例外は [`Exception`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-exception/) クラスのサブクラスによって表されます。`Exception` 自体は [`Throwable`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-throwable/) クラスのサブクラスです。階層の詳細については、[例外の階層](#exception-hierarchy)セクションを参照してください。`Exception` は [`openクラス`](inheritance.md) であるため、アプリケーションの特定のニーズに合わせて [カスタム例外](#create-custom-exceptions) を作成できます。
 
 ## 例外のスロー {id="throw-exceptions"}
 
@@ -43,7 +43,7 @@ if (userInput < 0) {
 ```
 
 この例では、ユーザーが負の値を入力したときに `IllegalArgumentException` がスローされます。
-カスタムエラーメッセージを作成し、例外の元の原因（`cause`）を保持できます。これらは [スタックトレース](#スタックトレース) に含まれます。
+カスタムエラーメッセージを作成し、例外の元の原因（`cause`）を保持できます。これらは [スタックトレース](#stack-trace) に含まれます。
 
 ### 事前条件関数による例外のスロー {id="throw-exceptions-with-precondition-functions"}
 
@@ -52,9 +52,9 @@ Kotlinでは、事前条件関数（precondition functions）を使用して自�
 
 | 事前条件関数 | ユースケース | スローされる例外 |
 |----------------------------------|------------------------------------------|------------------------------------------------------------------------------------------------------------------|
-| [`require()`](#require関数) | ユーザー入力の有効性をチェックする | [`IllegalArgumentException`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-illegal-argument-exception/)   |
-| [`check()`](#check関数) | オブジェクトまたは変数の状態の有効性をチェックする | [`IllegalStateException`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-illegal-state-exception/)         |
-| [`error()`](#error関数) | 不正な状態または条件を示す | [`IllegalStateException`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-illegal-state-exception/)         |
+| [`require()`](#require-function) | ユーザー入力の有効性をチェックする | [`IllegalArgumentException`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-illegal-argument-exception/)   |
+| [`check()`](#check-function) | オブジェクトまたは変数の状態の有効性をチェックする | [`IllegalStateException`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-illegal-state-exception/)         |
+| [`error()`](#error-function) | 不正な状態または条件を示す | [`IllegalStateException`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-illegal-state-exception/)         |
 
 これらの関数は、特定の条件が満たされない場合にプログラムのフローを継続できない状況に適しています。
 これによりコードが簡素化され、これらのチェックを効率的に処理できるようになります。
@@ -257,7 +257,7 @@ fun main() {
 複数の `catch` ブロックがある場合、コードの上から下の順序に従って、最も具体的な例外から最も一般的な例外の順に並べることが重要です。
 この順序はプログラムの実行フローと一致します。
 
-[カスタム例外](#カスタム例外の作成) を使用したこの例を考えてみましょう：
+[カスタム例外](#create-custom-exceptions) を使用したこの例を考えてみましょう：
 
 ```kotlin
 open class WithdrawalException(message: String) : Exception(message)
@@ -419,7 +419,7 @@ class MyException: Exception("My message")
 
 この例では、デフォルトのエラーメッセージ "My message" が設定されていますが、必要に応じて空にすることもできます。
 
-> Kotlinの例外は状態を持つ（stateful）オブジェクトであり、作成時のコンテキストに固有の情報（[スタックトレース](#スタックトレース)）を保持します。
+> Kotlinの例外は状態を持つ（stateful）オブジェクトであり、作成時のコンテキストに固有の情報（[スタックトレース](#stack-trace)）を保持します。
 > [オブジェクト宣言](object-declarations.md#object-declarations-overview)（`object`）を使用して例外を作成することは避けてください。
 > 代わりに、必要なときに毎回例外の新しいインスタンスを作成してください。
 > そうすることで、例外の状態が特定のコンテキストを正確に反映するようになります。

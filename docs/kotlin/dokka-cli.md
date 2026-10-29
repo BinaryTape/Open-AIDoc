@@ -61,7 +61,7 @@ java -jar dokka-cli-%dokkaVersion%.jar \
 
 执行给定的示例将以 [HTML](dokka-html.md) 输出格式生成文档。
 
-有关更多配置详细信息，请参阅[命令行选项](#命令行选项)。
+有关更多配置详细信息，请参阅[命令行选项](#command-line-options)。
 
 ### 使用 JSON 配置运行 {id="run-with-json-configuration"}
 
@@ -96,7 +96,7 @@ java -jar dokka-cli-%dokkaVersion%.jar dokka-configuration.json
 }
 ```
 
-有关更多详细信息，请参阅 [JSON 配置选项](#json-配置)。
+有关更多详细信息，请参阅 [JSON 配置选项](#json-configuration)。
 
 ### 其他输出格式 {id="other-output-formats"}
 
@@ -130,7 +130,7 @@ java -jar dokka-cli-%dokkaVersion%.jar \
 
 将 GFM 插件传递给 `pluginsClasspath` 后，CLI 运行器将以 GFM 输出格式生成文档。
 
-有关更多信息，请参阅 [GFM](https://github.com/Kotlin/dokka/blob/8e5c63d035ef44a269b8c43430f43f5c8eebfb63/dokka-subprojects/plugin-gfm/README.md) 和 [Javadoc](dokka-javadoc.md#生成-javadoc-文档) 页面。
+有关更多信息，请参阅 [GFM](https://github.com/Kotlin/dokka/blob/8e5c63d035ef44a269b8c43430f43f5c8eebfb63/dokka-subprojects/plugin-gfm/README.md) 和 [Javadoc](dokka-javadoc.md#generate-javadoc-documentation) 页面。
 
 ## 命令行选项 {id="command-line-options"}
 
@@ -200,7 +200,7 @@ java -jar dokka-cli-%dokkaVersion%.jar -sourceSet -help
 
 ## JSON 配置 {id="json-configuration"}
 
-下面是每个配置部分的示例和详细描述。你还可以在页面底部找到应用了[所有配置选项](#完整配置)的示例。
+下面是每个配置部分的示例和详细描述。你还可以在页面底部找到应用了[所有配置选项](#complete-configuration)的示例。
 
 ### 通用配置 {id="general-configuration"}
 
@@ -314,19 +314,19 @@ java -jar dokka-cli-%dokkaVersion%.jar -sourceSet -help
           Kotlin 
           <a href="https://kotlinlang.org/docs/multiplatform-discover-project.html#source-sets">源集</a>的单独及附加配置。
         </p>
-        <p>有关可能选项的列表，请参阅<a href="#源集配置">源集配置</a>。</p>
+        <p>有关可能选项的列表，请参阅<a href="#source-set-configuration">源集配置</a>。</p>
     </def>
     <def title="sourceLinks">
         <p>应用于所有源集的源码链接全局配置。</p>
-        <p>有关可能选项的列表，请参阅<a href="#源码链接配置">源码链接配置</a>。</p>
+        <p>有关可能选项的列表，请参阅<a href="#source-link-configuration">源码链接配置</a>。</p>
     </def>
     <def title="perPackageOptions">
         <p>无论匹配的软件包位于哪个源集中，对其进行的全局配置。</p>
-        <p>有关可能选项的列表，请参阅<a href="#按软件包配置">按软件包配置</a>。</p>
+        <p>有关可能选项的列表，请参阅<a href="#per-package-configuration">按软件包配置</a>。</p>
     </def>
     <def title="externalDocumentationLinks">
         <p>无论外部文档链接在哪个源集中使用，对其进行的全局配置。</p>
-        <p>有关可能选项的列表，请参阅<a href="#外部文档链接配置">外部文档链接配置</a>。</p>
+        <p>有关可能选项的列表，请参阅<a href="#external-documentation-links-configuration">外部文档链接配置</a>。</p>
     </def>
     <def title="pluginsClasspath">
         <p>包含 Dokka 插件及其依赖项的 JAR 文件列表。</p>
@@ -529,15 +529,15 @@ java -jar dokka-cli-%dokkaVersion%.jar -sourceSet -help
     </def>
     <def title="sourceLinks">
         <p>仅应用于此源集的源码链接参数集。</p>
-        <p>有关可能选项的列表，请参阅<a href="#源码链接配置">源码链接配置</a>。</p>
+        <p>有关可能选项的列表，请参阅<a href="#source-link-configuration">源码链接配置</a>。</p>
     </def>
     <def title="perPackageOptions">
         <p>仅针对此源集中匹配的软件包的特定参数集。</p>
-        <p>有关可能选项的列表，请参阅<a href="#按软件包配置">按软件包配置</a>。</p>
+        <p>有关可能选项的列表，请参阅<a href="#per-package-configuration">按软件包配置</a>。</p>
     </def>
     <def title="externalDocumentationLinks">
         <p>仅应用于此源集的外部文档链接参数集。</p>
-        <p>有关可能选项的列表，请参阅<a href="#外部文档链接配置">外部文档链接配置</a>。</p>
+        <p>有关可能选项的列表，请参阅<a href="#external-documentation-links-configuration">外部文档链接配置</a>。</p>
     </def>
 </deflist>
 
@@ -551,7 +551,7 @@ java -jar dokka-cli-%dokkaVersion%.jar -sourceSet -help
 [`count()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/count.html) 
 函数的文档。
 
-你可以同时为所有源集配置源码链接，也可以[单独配置](#源集配置)：
+你可以同时为所有源集配置源码链接，也可以[单独配置](#source-set-configuration)：
 
 ```json
 {
@@ -601,7 +601,7 @@ java -jar dokka-cli-%dokkaVersion%.jar -sourceSet -help
 
 `perPackageOptions` 配置块允许为通过 `matchingRegex` 匹配的特定软件包设置某些选项。
 
-你可以同时为所有源集添加软件包配置，也可以[单独配置](#源集配置)：
+你可以同时为所有源集添加软件包配置，也可以[单独配置](#source-set-configuration)：
 
 ```json
 {
@@ -656,7 +656,7 @@ java -jar dokka-cli-%dokkaVersion%.jar -sourceSet -help
 
 例如，如果你正在使用来自 `kotlinx.serialization` 的类型，默认情况下它们在你的文档中是无法点击的，就像它们未解析一样。但是，由于 `kotlinx.serialization` 的 API 参考文档是由 Dokka 构建并[发布在 kotlinlang.org 上的](https://kotlinlang.org/api/kotlinx.serialization/)，你可以为其配置外部文档链接。这样 Dokka 就能为该库中的类型生成链接，使它们能够成功解析并可点击。
 
-你可以同时为所有源集配置外部文档链接，也可以[单独配置](#源集配置)：
+你可以同时为所有源集配置外部文档链接，也可以[单独配置](#source-set-configuration)：
 
 ```json
 {

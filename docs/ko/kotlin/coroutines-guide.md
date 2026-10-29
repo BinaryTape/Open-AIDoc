@@ -10,7 +10,7 @@ Kotlin은 다른 라이브러리들이 코루틴을 활용할 수 있도록 표�
 
 코루틴을 사용하고 이 가이드의 예제를 따라 하려면, [프로젝트 README](https://github.com/Kotlin/kotlinx.coroutines/blob/master/README.md#using-in-your-projects)에 설명된 대로 `kotlinx-coroutines-core` 모듈에 대한 의존성을 추가해야 합니다.
 
-## 목차
+## 목차 {id="table-of-contents"}
 
 * [코루틴 기초(Coroutines basics)](coroutines-basics.md)
 * [취소와 타임아웃](coroutines-cancellation.md)
@@ -25,7 +25,7 @@ Kotlin은 다른 라이브러리들이 코루틴을 활용할 수 있도록 표�
 * [튜토리얼: IntelliJ IDEA를 사용하여 코루틴 디버깅하기](debug-coroutines-with-idea.md)
 * [튜토리얼: IntelliJ IDEA를 사용하여 Kotlin Flow 디버깅하기](debug-flow-with-idea.md)
 
-## 추가 참고 자료
+## 추가 참고 자료 {id="additional-references"}
 
 * [코루틴을 활용한 UI 프로그래밍 가이드](https://github.com/Kotlin/kotlinx.coroutines/blob/master/ui/coroutines-guide-ui.md)
 * [코루틴 디자인 문서 (KEEP)](https://github.com/Kotlin/KEEP/blob/master/proposals/coroutines.md)

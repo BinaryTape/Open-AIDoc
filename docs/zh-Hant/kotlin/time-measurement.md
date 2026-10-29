@@ -8,7 +8,7 @@ Kotlin 標準函式庫提供了以不同單位計算和測量時間的工具。
   * 偵錯
 
 預設情況下，時間是使用單調時間源 (monotonic time source) 測量的，但也可以配置其他時間源。
-如需更多資訊，請參閱[建立時間源](#建立時間源)。
+如需更多資訊，請參閱[建立時間源](#create-time-source)。
 
 ## 計算 duration {id="calculate-duration"}
 

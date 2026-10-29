@@ -99,7 +99,7 @@
 </td>
 <td>
 <p>
-                    在 Ktor 中，您可以使用 <a href="#embedded-server">embeddedServer</a>
+                    在 Ktor 中，您可以使用 <a href="server-create-and-configure.topic#embedded-server">embeddedServer</a>
                     函式在程式碼中配置伺服器參數並快速執行應用程式。
                 </p>
 <code-block lang="kotlin" code="import io.ktor.server.engine.*&#10;import io.ktor.server.netty.*&#10;import io.ktor.server.application.*&#10;import io.ktor.server.response.*&#10;import io.ktor.server.routing.*&#10;&#10;fun main() {&#10;    embeddedServer(Netty, port = 8080, host = &quot;0.0.0.0&quot;) {&#10;        routing {&#10;            get(&quot;/&quot;) {&#10;                call.respondText(&quot;Hello World!&quot;)&#10;            }&#10;        }&#10;    }.start(wait = true)&#10;}"/>
@@ -109,7 +109,7 @@
                     專案。
                 </p>
 <p>
-                    您也可以在採用 HOCON 或 YAML 格式的 <a href="#engine-main">外部配置檔案</a> 中指定伺服器設定。
+                    您也可以在採用 HOCON 或 YAML 格式的 <a href="server-create-and-configure.topic#engine-main">外部配置檔案</a> 中指定伺服器設定。
                 </p>
 </td>
 </tr>
@@ -154,7 +154,7 @@
 </td>
 <td>
 <p>
-                    在 Ktor 中，使用 <a href="#folders"><code>staticFiles()</code></a> 函式將對 <Path>/</Path> 路徑的任何請求對應到 <Path>public</Path> 實體資料夾。
+                    在 Ktor 中，使用 <a href="server-static-content.md#folders"><code>staticFiles()</code></a> 函式將對 <Path>/</Path> 路徑的任何請求對應到 <Path>public</Path> 實體資料夾。
                     此函式可以遞迴地提供 <Path>public</Path> 資料夾中的所有檔案。
                 </p>
 <code-block lang="kotlin" code="import io.ktor.server.application.*&#10;import io.ktor.server.http.content.*&#10;import io.ktor.server.routing.*&#10;import java.io.*&#10;&#10;fun main(args: Array&lt;String&gt;): Unit =&#10;    io.ktor.server.netty.EngineMain.main(args)&#10;&#10;fun Application.module() {&#10;    routing {&#10;        staticFiles(&quot;&quot;, File(&quot;public&quot;), &quot;index.html&quot;)&#10;    }&#10;}"/>

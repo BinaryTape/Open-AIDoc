@@ -34,7 +34,7 @@ Apple 對於提交至 App Store 的要求 [在 2024 年春季已發生變化](ht
 
 產生的檔案是一個字典集合。針對每個存取的 API 類型，從提供的列表中選擇一個或多個使用原因。Xcode 透過提供視覺化佈局和包含每個欄位有效值的下拉式功能表，協助編輯 `.xcprivacy` 檔案。
 
-您可以使用 [特殊工具](#尋找必須提供原因的-api-之用法) 來尋找 Kotlin 架構相依性中必須提供原因的 API 之用法，並使用 [獨立的外掛程式](#將-xcprivacy-檔案放置在您的-kotlin-產物中) 將 `.xcprivacy` 檔案與您的 Kotlin 產物打包在一起。
+您可以使用 [特殊工具](#find-usages-of-required-reason-apis) 來尋找 Kotlin 架構相依性中必須提供原因的 API 之用法，並使用 [獨立的外掛程式](#place-the-xcprivacy-file-in-your-kotlin-artifacts) 將 `.xcprivacy` 檔案與您的 Kotlin 產物打包在一起。
 
 如果新的隱私清單無法滿足 App Store 的要求，或者您無法確定如何完成這些步驟，請與我們聯絡並在 [此 YouTrack 問題](https://youtrack.jetbrains.com/issue/KT-67603) 中分享您的案例。
 

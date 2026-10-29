@@ -72,19 +72,19 @@
 </chapter>
 <chapter title="開発モードを有効にする" id="enable">
     <p>
-        オートリロードを使用するには、まず<a href="#enable">開発モード</a>を有効にする必要があります。
+        オートリロードを使用するには、まず<a href="server-development-mode.topic#enable">開発モード</a>を有効にする必要があります。
         これは、<Links href="//server-create-and-configure" summary="アプリケーションのデプロイニーズに応じたサーバーの作成方法を学びます。">サーバーの作成および実行</Links>に使用した方法によって異なります。
     </p>
     <list>
         <li>
             <p>
-                <code>EngineMain</code>を使用してサーバーを実行する場合は、<a href="#application-conf">設定ファイル</a>で開発モードを有効にします。
+                <code>EngineMain</code>を使用してサーバーを実行する場合は、<a href="server-development-mode.topic#application-conf">設定ファイル</a>で開発モードを有効にします。
             </p>
         </li>
         <li>
             <p>
                 <code>embeddedServer</code>を使用してサーバーを実行する場合は、
-                <a href="#system-property"><code>io.ktor.development</code></a>
+                <a href="server-development-mode.topic#system-property"><code>io.ktor.development</code></a>
                 システムプロパティを使用できます。
             </p>
         </li>

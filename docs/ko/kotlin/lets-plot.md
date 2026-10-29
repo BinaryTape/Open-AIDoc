@@ -91,7 +91,7 @@ scatterPlot
 
 ## 박스 플롯 생성하기 {id="create-a-box-plot"}
 
-[데이터](#데이터-준비하기)를 박스 플롯(Box plot)으로 시각화해 보겠습니다. LPK 라이브러리의 [`geomBoxplot()`](https://lets-plot.org/kotlin/api-reference/-lets--plot--kotlin/org.jetbrains.letsPlot.geom/geom-boxplot.html) 함수를 사용하여 플롯을 생성하고, [`scaleFillManual()`](https://lets-plot.org/kotlin/api-reference/-lets--plot--kotlin/org.jetbrains.letsPlot.scale/scale-fill-manual.html) 함수로 색상을 [사용자 정의](https://lets-plot.org/kotlin/aesthetics.html#point-shapes)합니다.
+[데이터](#prepare-the-data)를 박스 플롯(Box plot)으로 시각화해 보겠습니다. LPK 라이브러리의 [`geomBoxplot()`](https://lets-plot.org/kotlin/api-reference/-lets--plot--kotlin/org.jetbrains.letsPlot.geom/geom-boxplot.html) 함수를 사용하여 플롯을 생성하고, [`scaleFillManual()`](https://lets-plot.org/kotlin/api-reference/-lets--plot--kotlin/org.jetbrains.letsPlot.scale/scale-fill-manual.html) 함수로 색상을 [사용자 정의](https://lets-plot.org/kotlin/aesthetics.html#point-shapes)합니다.
 
 ```kotlin
 // X축과 Y축, 카테고리, 플롯 크기 및 플롯 유형을 지정합니다.

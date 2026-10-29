@@ -201,7 +201,7 @@ sourceSets {
 ### 로깅 의존성 {id="logging-dependency"}
 
   <p>
-    <a href="#jvm">JVM</a>에서 Ktor는 로깅을 위한 추상화 계층으로 Simple Logging Facade for Java
+    <a href="client-engines.md#jvm">JVM</a>에서 Ktor는 로깅을 위한 추상화 계층으로 Simple Logging Facade for Java
     (<a href="http://www.slf4j.org/">SLF4J</a>)를 사용합니다. SLF4J는 로깅 API를 기본 로깅 구현과 분리하여, 
     애플리케이션의 요구 사항에 가장 적합한 로깅 프레임워크를 통합할 수 있게 해줍니다. 
     일반적인 선택으로는 <a href="https://logback.qos.ch/">Logback</a> 또는 

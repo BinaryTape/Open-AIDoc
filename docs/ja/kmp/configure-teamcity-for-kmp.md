@@ -210,7 +210,7 @@ jobs:
 
 * **VCS 接続を使用したパイプラインの追加**
  
-  [プロジェクトに新しいパイプラインを追加](#新しいプロジェクトの作成)する際、**Any Git URL** の代わりに **GitHub** を選択します。
+  [プロジェクトに新しいパイプラインを追加](#create-a-new-project)する際、**Any Git URL** の代わりに **GitHub** を選択します。
   このアプローチでは、将来の GitHub ベースのプロジェクトで VCS アクセスの設定をスキップできるだけでなく、追加のパイプライン機能も利用できるようになります。
 
     * TeamCity は[実行ステータス](https://www.jetbrains.com/help/teamcity/create-and-edit-pipelines.html#Publish+Run+Statuses+to+VCS)（成功、失敗、または実行中）を GitHub に直接投稿できます。

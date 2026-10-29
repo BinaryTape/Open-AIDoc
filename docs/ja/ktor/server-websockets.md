@@ -67,7 +67,7 @@ Ktorでは以下のことが可能です。
 ## WebSocketsのインストール {id="install_plugin"}
 
 <p>
-    アプリケーションに<code>%plugin_name%</code>プラグインを<a href="#install">インストール</a>するには、指定された<Links href="/ktor/server-modules" summary="Modules allow you to structure your application by grouping routes.">モジュール</Links>内の<code>install</code>関数に渡します。
+    アプリケーションに<code>%plugin_name%</code>プラグインを<a href="server-plugins.md#install">インストール</a>するには、指定された<Links href="/ktor/server-modules" summary="Modules allow you to structure your application by grouping routes.">モジュール</Links>内の<code>install</code>関数に渡します。
     以下のコードスニペットは、<code>%plugin_name%</code>をインストールする方法を示しています。
 </p>
 <list>

@@ -6,7 +6,7 @@
 이 섹션은 예외 처리와 예외 발생 시의 취소에 대해 다룹니다.
 이미 알고 있듯이, 취소된 코루틴은 중단 지점(suspension points)에서 [CancellationException]을 던지며, 이는 코루틴 메커니즘에 의해 무시됩니다. 여기서는 취소 중에 예외가 발생하거나, 동일한 코루틴의 여러 자식 코루틴들이 예외를 던질 때 어떤 일이 발생하는지 살펴봅니다.
 
-## 예외 전파 (Exception propagation)
+## 예외 전파 (Exception propagation) {id="exception-propagation"}
 
 코루틴 빌더는 두 가지 형태가 있습니다: 예외를 자동으로 전파하는 것([launch])과 사용자에게 노출하는 것([async] 및 [produce])입니다.
 이러한 빌더들이 다른 코루틴의 자식(child)이 아닌 *루트(root)* 코루틴을 생성하는 데 사용될 때, 전자의 빌더들은 Java의 `Thread.uncaughtExceptionHandler`와 유사하게 예외를 **잡지 않은(uncaught)** 예외로 처리하는 반면, 후자의 빌더들은 사용자가 최종 예외를 소비(예: [await][Deferred.await] 또는 [receive][ReceiveChannel.receive]를 통해)하는 것에 의존합니다. ([produce]와 [receive][ReceiveChannel.receive]는 [Channels](https://github.com/Kotlin/kotlinx.coroutines/blob/master/docs/channels.md) 섹션에서 다룹니다).
@@ -60,7 +60,7 @@ Caught ArithmeticException
 
 <!--- TEST EXCEPTION-->
 
-## CoroutineExceptionHandler
+## CoroutineExceptionHandler {id="coroutineexceptionhandler"}
 
 **잡지 않은(uncaught)** 예외를 콘솔에 출력하는 기본 동작을 사용자 정의할 수 있습니다.
 *루트* 코루틴의 [CoroutineExceptionHandler] 컨텍스트 요소는 이 루트 코루틴과 모든 자식 코루틴에 대한 일반적인 `catch` 블록으로 사용될 수 있으며, 여기서 사용자 정의 예외 처리가 가능합니다.
@@ -108,7 +108,7 @@ CoroutineExceptionHandler got java.lang.AssertionError
 
 <!--- TEST-->
 
-## 취소와 예외 (Cancellation and exceptions)
+## 취소와 예외 (Cancellation and exceptions) {id="cancellation-and-exceptions"}
 
 취소는 예외와 밀접한 관련이 있습니다. 코루틴은 내부적으로 취소를 위해 `CancellationException`을 사용하며, 이러한 예외는 모든 핸들러에 의해 무시되므로 `catch` 블록을 통해 얻을 수 있는 추가적인 디버그 정보의 소스로만 사용되어야 합니다.
 [Job.cancel]을 사용하여 코루틴을 취소하면 종료되지만, 부모는 취소하지 않습니다.
@@ -211,7 +211,7 @@ CoroutineExceptionHandler got java.lang.ArithmeticException
 
 <!--- TEST-->
 
-## 예외 통합 (Exceptions aggregation)
+## 예외 통합 (Exceptions aggregation) {id="exceptions-aggregation"}
 
 코루틴의 여러 자식이 예외로 실패할 때 일반적인 규칙은 "첫 번째 예외가 우선한다"는 것입니다. 따라서 첫 번째 예외가 처리됩니다.
 첫 번째 예외 이후에 발생하는 모든 추가 예외는 첫 번째 예외의 억제된(suppressed) 예외로 첨부됩니다.
@@ -311,7 +311,7 @@ CoroutineExceptionHandler got java.io.IOException
 
 <!--- TEST-->
 
-## 슈퍼비전 (Supervision)
+## 슈퍼비전 (Supervision) {id="supervision"}
 
 앞서 공부했듯이, 취소는 코루틴의 전체 계층 구조를 통해 전파되는 양방향 관계입니다. 이제 단방향 취소가 필요한 경우를 살펴보겠습니다.
 
@@ -319,7 +319,7 @@ CoroutineExceptionHandler got java.io.IOException
 
 또 다른 예는 여러 자식 Job을 생성하고 실행을 *감독(supervise)* 하며, 실패를 추적하고 실패한 것만 다시 시작해야 하는 서버 프로세스입니다.
 
-### 슈퍼비전 Job (Supervision job)
+### 슈퍼비전 Job (Supervision job) {id="supervision-job"}
 
 이러한 목적으로 [SupervisorJob][SupervisorJob()]을 사용할 수 있습니다.
 이는 일반적인 [Job][Job()]과 유사하지만, 취소가 아래 방향으로만 전파된다는 점이 다릅니다. 이는 다음 예제를 통해 쉽게 확인할 수 있습니다:
@@ -374,7 +374,7 @@ The second child is cancelled because the supervisor was cancelled
 
 <!--- TEST-->
 
-### 슈퍼비전 스코프 (Supervision scope)
+### 슈퍼비전 스코프 (Supervision scope) {id="supervision-scope"}
 
 *범위가 지정된(scoped)* 동시성을 위해 [coroutineScope][_coroutineScope] 대신 [supervisorScope][_supervisorScope]를 사용할 수 있습니다. 이는 취소를 한 방향으로만 전파하며, 자기 자신이 실패했을 때만 모든 자식을 취소합니다. 또한 [coroutineScope][_coroutineScope]와 마찬가지로 완료되기 전에 모든 자식을 기다립니다.
 
@@ -422,7 +422,7 @@ Caught an assertion error
 
 <!--- TEST-->
 
-#### 슈퍼비전하의 코루틴 내 예외 (Exceptions in supervised coroutines)
+#### 슈퍼비전하의 코루틴 내 예외 (Exceptions in supervised coroutines) {id="exceptions-in-supervised-coroutines"}
 
 일반 Job과 Supervisor Job의 또 다른 중요한 차이점은 예외 처리 방식입니다.
 모든 자식 코루틴은 예외 처리 메커니즘을 통해 스스로 예외를 처리해야 합니다.

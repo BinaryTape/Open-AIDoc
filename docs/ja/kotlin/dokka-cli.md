@@ -61,7 +61,7 @@ java -jar dokka-cli-%dokkaVersion%.jar \
 
 この例を実行すると、[HTML](dokka-html.md) 形式でドキュメントが生成されます。
 
-設定の詳細については、[コマンドラインオプション](#コマンドラインオプション)を参照してください。
+設定の詳細については、[コマンドラインオプション](#command-line-options)を参照してください。
 
 ### JSON 設定による実行 {id="run-with-json-configuration"}
 
@@ -96,7 +96,7 @@ java -jar dokka-cli-%dokkaVersion%.jar dokka-configuration.json
 }
 ```
 
-詳細は [JSON 設定オプション](#json-設定)を参照してください。
+詳細は [JSON 設定オプション](#json-configuration)を参照してください。
 
 ### その他の出力形式 {id="other-output-formats"}
 
@@ -200,7 +200,7 @@ java -jar dokka-cli-%dokkaVersion%.jar -sourceSet -help
 
 ## JSON 設定 {id="json-configuration"}
 
-以下に、各設定セクションの例と詳細な説明を示します。ページの最後には、[すべての設定オプション](#完全な設定)を適用した例もあります。
+以下に、各設定セクションの例と詳細な説明を示します。ページの最後には、[すべての設定オプション](#complete-configuration)を適用した例もあります。
 
 ### 一般設定 {id="general-configuration"}
 
@@ -309,19 +309,19 @@ java -jar dokka-cli-%dokkaVersion%.jar -sourceSet -help
         <p>
           Kotlin <a href="https://kotlinlang.org/docs/multiplatform-discover-project.html#source-sets">ソースセット</a>の個別および追加設定です。
         </p>
-        <p>指定可能なオプションのリストについては、<a href="#ソースセットの設定">ソースセットの設定</a>を参照してください。</p>
+        <p>指定可能なオプションのリストについては、<a href="#source-set-configuration">ソースセットの設定</a>を参照してください。</p>
     </def>
     <def title="sourceLinks">
         <p>すべてのソースセットに適用されるソースリンクのグローバル設定です。</p>
-        <p>指定可能なオプションのリストについては、<a href="#ソースリンクの設定">ソースリンクの設定</a>を参照してください。</p>
+        <p>指定可能なオプションのリストについては、<a href="#source-link-configuration">ソースリンクの設定</a>を参照してください。</p>
     </def>
     <def title="perPackageOptions">
         <p>ソースセットに関係なく、一致するパッケージに適用されるグローバル設定です。</p>
-        <p>指定可能なオプションのリストについては、<a href="#パッケージごとの設定">パッケージごとの設定</a>を参照してください。</p>
+        <p>指定可能なオプションのリストについては、<a href="#per-package-configuration">パッケージごとの設定</a>を参照してください。</p>
     </def>
     <def title="externalDocumentationLinks">
         <p>ソースセットに関係なく、使用される外部ドキュメントリンクのグローバル設定です。</p>
-        <p>指定可能なオプションのリストについては、<a href="#外部ドキュメントリンクの設定">外部ドキュメントリンクの設定</a>を参照してください。</p>
+        <p>指定可能なオプションのリストについては、<a href="#external-documentation-links-configuration">外部ドキュメントリンクの設定</a>を参照してください。</p>
     </def>
     <def title="pluginsClasspath">
         <p>Dokka プラグインとその依存関係を含む JAR ファイルのリストです。</p>
@@ -516,15 +516,15 @@ Kotlin [ソースセット](https://kotlinlang.org/docs/multiplatform-discover-p
     </def>
     <def title="sourceLinks">
         <p>このソースセットにのみ適用されるソースリンクのパラメータセットです。</p>
-        <p>指定可能なオプションのリストについては、<a href="#ソースリンクの設定">ソースリンクの設定</a>を参照してください。</p>
+        <p>指定可能なオプションのリストについては、<a href="#source-link-configuration">ソースリンクの設定</a>を参照してください。</p>
     </def>
     <def title="perPackageOptions">
         <p>このソースセット内の一致するパッケージに特有のパラメータセットです。</p>
-        <p>指定可能なオプションのリストについては、<a href="#パッケージごとの設定">パッケージごとの設定</a>を参照してください。</p>
+        <p>指定可能なオプションのリストについては、<a href="#per-package-configuration">パッケージごとの設定</a>を参照してください。</p>
     </def>
     <def title="externalDocumentationLinks">
         <p>このソースセットにのみ適用される外部ドキュメントリンクのパラメータセットです。</p>
-        <p>指定可能なオプションのリストについては、<a href="#外部ドキュメントリンクの設定">外部ドキュメントリンクの設定</a>を参照してください。</p>
+        <p>指定可能なオプションのリストについては、<a href="#external-documentation-links-configuration">外部ドキュメントリンクの設定</a>を参照してください。</p>
     </def>
 </deflist>
 
@@ -536,7 +536,7 @@ Kotlin [ソースセット](https://kotlinlang.org/docs/multiplatform-discover-p
 
 例については、`kotlinx.coroutines` の [`count()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/count.html) 関数のドキュメントを参照してください。
 
-すべてのソースセットに対して一括でソースリンクを設定することも、[個別に](#ソースセットの設定)設定することも可能です。
+すべてのソースセットに対して一括でソースリンクを設定することも、[個別に](#source-set-configuration)設定することも可能です。
 
 ```json
 {
@@ -582,7 +582,7 @@ Kotlin [ソースセット](https://kotlinlang.org/docs/multiplatform-discover-p
 
 `perPackageOptions` 設定ブロックを使用すると、`matchingRegex` に一致する特定のパッケージに対してオプションを設定できます。
 
-すべてのソースセットに対して一括でパッケージ設定を追加することも、[個別に](#ソースセットの設定)追加することも可能です。
+すべてのソースセットに対して一括でパッケージ設定を追加することも、[個別に](#source-set-configuration)追加することも可能です。
 
 ```json
 {
@@ -636,7 +636,7 @@ Kotlin [ソースセット](https://kotlinlang.org/docs/multiplatform-discover-p
 
 例えば、`kotlinx.serialization` の型を使用している場合、デフォルトではそれらは解決されていないかのように、ドキュメント内でクリックできません。しかし、`kotlinx.serialization` の API リファレンスドキュメントは Dokka によって構築され、[kotlinlang.org で公開](https://kotlinlang.org/api/kotlinx.serialization/)されているため、それに対する外部ドキュメントリンクを設定できます。これにより、Dokka はそのライブラリの型に対するリンクを生成し、正常に解決されてクリック可能になります。
 
-すべてのソースセットに対して一括で外部ドキュメントリンクを設定することも、[個別に](#ソースセットの設定)設定することも可能です。
+すべてのソースセットに対して一括で外部ドキュメントリンクを設定することも、[個別に](#source-set-configuration)設定することも可能です。
 
 ```json
 {

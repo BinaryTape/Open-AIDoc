@@ -373,7 +373,7 @@ powerAssert {
 
 如果函式使用了 `@PowerAssert` 註解，Power-assert 外掛程式會自動轉換對該函式的呼叫。您無需在組建組態中註冊該函式。
 
-您可以在自行宣告斷言函式時加入 `@PowerAssert` 註解，或是使用 [支援 Power-assert 的程式庫](#為您的程式庫加入-power-assert-支援) 並提供帶有註解的函式。
+您可以在自行宣告斷言函式時加入 `@PowerAssert` 註解，或是使用 [支援 Power-assert 的程式庫](#add-support-for-power-assert-to-your-library) 並提供帶有註解的函式。
 
 若要獲得詳細的失敗訊息，請在專案中啟用 Power-assert 外掛程式的情況下呼叫該函式：
 
@@ -716,7 +716,7 @@ assert(employee.age < 100) { "${employee.name} has an invalid age: ${employee.ag
 
 若要為您的程式庫加入 Power-assert 支援：
 
-1. 在您的建置檔案中 [套用 Power-assert 外掛程式](#套用外掛程式)。
+1. 在您的建置檔案中 [套用 Power-assert 外掛程式](#apply-the-plugin)。
 2. 對於 Maven，將 Power-assert 執行時程式庫加入為相依性：
 
    ```xml

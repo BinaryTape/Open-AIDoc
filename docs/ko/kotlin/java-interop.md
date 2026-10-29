@@ -152,7 +152,7 @@ Java 선언의 타입은 Kotlin에서 명시적으로 표기할 수 없는(non-d
 * 타입 추론에 의존합니다. 이 경우 변수는 추론된 플랫폼 타입을 갖게 됩니다.
 * 예상하는 타입을 선택합니다. Kotlin에서는 널 불가능(non-nullable) 타입과 널 가능(nullable) 타입 모두 허용됩니다.
 
-이러한 타입에 대해서는 널 검사가 완화되므로 안전성 보장 수준은 Java와 동일합니다([아래](#매핑된-타입) 참조).
+이러한 타입에 대해서는 널 검사가 완화되므로 안전성 보장 수준은 Java와 동일합니다([아래](#mapped-types) 참조).
 다음 예제를 살펴보겠습니다.
 
 ```kotlin
@@ -201,9 +201,9 @@ Kotlin 타입으로 표현됩니다. 컴파일러는 다음을 포함하여 여�
 
   * [JetBrains](https://www.jetbrains.com/idea/help/nullable-and-notnull-annotations.html)
 (`org.jetbrains.annotations` 패키지의 `@Nullable` 및 `@NotNull`)
-  * [JSpecify](#jspecify-지원) (`org.jspecify.annotations`)
+  * [JSpecify](#jspecify-support) (`org.jspecify.annotations`)
   * Android (`com.android.annotations` 및 `android.support.annotations`)
-  * [JSR-305](#jsr-305-지원) (`javax.annotation`)
+  * [JSR-305](#jsr-305-support) (`javax.annotation`)
   * FindBugs (`edu.umd.cs.findbugs.annotations`)
   * Eclipse (`org.eclipse.jdt.annotation`)
   * [Lombok](lombok.md) (`lombok.NonNull`)
@@ -222,7 +222,7 @@ Kotlin 타입으로 표현됩니다. 컴파일러는 다음을 포함하여 여�
 * `warn`: 경고를 보고합니다.
 * `strict`: 오류를 보고합니다.
 
-> [JSpecify](#jspecify-지원)는 기본적으로 `strict` 보고 수준을 사용하는 유일하게 지원되는 형태입니다.
+> [JSpecify](#jspecify-support)는 기본적으로 `strict` 보고 수준을 사용하는 유일하게 지원되는 형태입니다.
 > 추가 구성 없이 널 가능성 애너테이션에 대한 오류를 보고하려면 JSpecify를 사용하세요.
 >
 {style="note"}
@@ -297,7 +297,7 @@ fun main() {
 
 `Derived`의 상위 바운드(upper bound)는 `Base<String?>`으로 설정되어 있으며, 이는 `Base<String>`과 다릅니다.
 
-[Kotlin에서의 Java 제네릭](#kotlin에서의-java-제네릭)에 대해 자세히 알아보세요.
+[Kotlin에서의 Java 제네릭](#java-generics-in-kotlin)에 대해 자세히 알아보세요.
 
 #### 타입 파라미터 {id="type-parameters"}
 
@@ -355,7 +355,7 @@ Kotlin은 `org.jspecify.annotations` 패키지의 다음 애너테이션을 지�
   이 애너테이션은 지역 변수 및 [타입 변수(제네릭)](https://jspecify.dev/docs/user-guide/#using-type-variables-in-generic-types)에는 적용되지 않습니다.
   타입 변수는 구체적인 널 가능 또는 널 불가능 타입이 제공될 때까지 "널 무관(null-agnostic)" 상태로 유지됩니다.
 
-* `@NullUnmarked`: `@NullMarked`의 효과를 되돌려 스코프 내의 모든 타입을 [플랫폼 타입](#널-안정성과-플랫폼-타입)으로 만듭니다.
+* `@NullUnmarked`: `@NullMarked`의 효과를 되돌려 스코프 내의 모든 타입을 [플랫폼 타입](#null-safety-and-platform-types)으로 만듭니다.
 
 JSpecify 애너테이션이 적용된 다음 Java 클래스를 살펴보겠습니다.
  
@@ -370,7 +370,7 @@ public class InventoryService {
 }
 ```
  
-Kotlin에서는 이들이 [플랫폼 타입](#널-안정성과-플랫폼-타입)이 아닌 일반적인 널 가능 및 널 불가능 타입으로 처리됩니다.
+Kotlin에서는 이들이 [플랫폼 타입](#null-safety-and-platform-types)이 아닌 일반적인 널 가능 및 널 불가능 타입으로 처리됩니다.
  
 ```kotlin
 // Kotlin
@@ -405,7 +405,7 @@ fun test(inventory: InventoryService) {
 Java 타입의 널 가능성을 표시하는 데 지원됩니다.
 
 `@Nonnull(when = ...)` 값이 `When.ALWAYS`인 경우 애너테이션이 지정된 타입은 널 불가능으로 처리되고, `When.MAYBE`와
-`When.NEVER`는 널 가능 타입을 나타내며, `When.UNKNOWN`은 해당 타입을 [플랫폼 타입](#널-안정성과-플랫폼-타입)으로 강제합니다.
+`When.NEVER`는 널 가능 타입을 나타내며, `When.UNKNOWN`은 해당 타입을 [플랫폼 타입](#null-safety-and-platform-types)으로 강제합니다.
 
 라이브러리는 JSR-305 애너테이션을 기반으로 컴파일될 수 있지만, 라이브러리 사용자를 위해 해당 애너테이션 아티팩트(예: `jsr305.jar`)를
 컴파일 의존성으로 추가할 필요는 없습니다. Kotlin 컴파일러는 클래스패스에 애너테이션이 없어도 라이브러리에서 JSR-305 애너테이션을 읽을 수 있습니다.
@@ -487,7 +487,7 @@ interface A {
 ```
 
 > 이 예제의 타입은 strict 모드가 활성화된 경우에만 적용되며, 그렇지 않으면 플랫폼 타입으로 유지됩니다.
-> [`@UnderMigration` 애너테이션](#undermigration-애너테이션) 및 [컴파일러 설정](#컴파일러-설정) 섹션을 참조하세요.
+> [`@UnderMigration` 애너테이션](#undermigration-annotation) 및 [컴파일러 설정](#compiler-configuration) 섹션을 참조하세요.
 >
 {style="note"}
 
@@ -569,7 +569,7 @@ public class Test {}
 
 Kotlin은 일부 Java 타입을 특별하게 처리합니다. 이러한 타입은 Java에서 "있는 그대로" 로드되지 않고 해당 Kotlin 타입으로 _매핑(mapped)_됩니다.
 매핑은 컴파일 시점에만 중요하며, 런타임 표현은 변경되지 않은 상태로 유지됩니다.
-Java의 기본형(primitive types)은 해당 Kotlin 타입으로 매핑됩니다([플랫폼 타입](#널-안정성과-플랫폼-타입) 고려).
+Java의 기본형(primitive types)은 해당 Kotlin 타입으로 매핑됩니다([플랫폼 타입](#null-safety-and-platform-types) 고려).
 
 | **Java 타입** | **Kotlin 타입**  |
 |---------------|------------------|
@@ -626,7 +626,7 @@ Java의 박싱된 기본형(boxed primitive types)은 널 가능 Kotlin 타입�
 | `Map<K, V>`       | `Map<K, V>`               | `MutableMap<K, V>`             | `(Mutable)Map<K, V>!`                |
 | `Map.Entry<K, V>` | `Map.Entry<K, V>`         | `MutableMap.MutableEntry<K,V>` | `(Mutable)Map.(Mutable)Entry<K, V>!` |
 
-Java 배열은 [아래](#java-배열)에 설명된 대로 매핑됩니다.
+Java 배열은 [아래](#java-arrays)에 설명된 대로 매핑됩니다.
 
 | **Java 타입** | **Kotlin 타입**                |
 |---------------|--------------------------------|
@@ -665,7 +665,7 @@ if (a is List<*>) // 정상: 리스트의 내용물에 대한 보장은 없음
 
 Kotlin의 배열은 Java와 달리 불변(invariant)입니다. 이는 Kotlin이 `Array<String>`을 `Array<Any>`에 할당하는 것을 허용하지 않음을 의미하며,
 이로써 발생 가능한 런타임 실패를 방지합니다. 하위 클래스의 배열을 상위 클래스의 배열로서 Kotlin 메서드에 전달하는 것 역시 금지되지만,
-Java 메서드의 경우에는 `Array<(out) String>!` 형태의 [플랫폼 타입](#널-안정성과-플랫폼-타입)을 통해 허용됩니다.
+Java 메서드의 경우에는 `Array<(out) String>!` 형태의 [플랫폼 타입](#null-safety-and-platform-types)을 통해 허용됩니다.
 
 배열은 박싱/언박싱 연산 비용을 피하기 위해 Java 플랫폼에서 기본 데이터 타입과 함께 사용됩니다.
 Kotlin은 이러한 구현 세부 사항을 숨기므로 Java 코드와 연동하기 위한 해결책이 필요합니다.
@@ -816,13 +816,13 @@ class SimpleBlockingQueue<T>(private val capacity: Int) {
 
 ### `getClass()` {id="getclass"}
 
-객체의 Java 클래스를 가져오려면 [클래스 참조(class reference)](reflection.md#런타임-클래스-가져오기)에서 `java` 확장 프로퍼티를 사용하세요.
+객체의 Java 클래스를 가져오려면 [클래스 참조(class reference)](reflection.md#obtain-a-runtime-class)에서 `java` 확장 프로퍼티를 사용하세요.
 
 ```kotlin
 val fooClass = foo::class.java
 ```
 
-위 코드는 [바인딩된 클래스 참조(bound class reference)](lambdas.md#바인딩된-참조와-바인딩되지-않은-참조)를 사용합니다. `javaClass` 확장 프로퍼티를 사용할 수도 있습니다.
+위 코드는 [바인딩된 클래스 참조(bound class reference)](lambdas.md#bound-and-unbound-references)를 사용합니다. `javaClass` 확장 프로퍼티를 사용할 수도 있습니다.
 
 ```kotlin
 val fooClass = foo.javaClass
@@ -868,7 +868,7 @@ Java 클래스의 정적 멤버는 해당 클래스의 "동반 객체(companion 
 if (Character.isLetter(a)) { ... }
 ```
 
-Kotlin 타입으로 [매핑](#매핑된-타입)된 Java 타입의 정적 멤버에 접근하려면
+Kotlin 타입으로 [매핑](#mapped-types)된 Java 타입의 정적 멤버에 접근하려면
 해당 Java 타입의 정규화된 이름을 사용하세요(예: `java.lang.Integer.bitCount(foo)`).
 
 ## Java 리플렉션 {id="java-reflection"}

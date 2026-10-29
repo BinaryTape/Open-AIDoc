@@ -35,14 +35,14 @@
         title="Ktor는 서버가 안정적으로 종료(graceful shutdown)될 수 있도록 IPC 시그널(예: SIGTERM 또는 SIGINT)을 캐치하는 방법을 제공하나요?"
         id="sigterm">
     <p>
-        <a href="#engine-main">EngineMain</a>을 실행 중이라면 자동으로 처리됩니다.
+        <a href="server-create-and-configure.topic#engine-main">EngineMain</a>을 실행 중이라면 자동으로 처리됩니다.
         그렇지 않으면 직접 처리해야 합니다.
         JVM의 <code>Runtime.getRuntime().addShutdownHook</code> 기능을 사용할 수 있습니다.
     </p>
 </chapter>
 <chapter title="프록시 뒤에 있는 클라이언트 IP를 어떻게 가져오나요?" id="proxy-ip">
     <p>
-        프록시가 적절한 헤더를 제공하고 <Links href="//server-forward-headers" summary="필요한 의존성: io.ktor:%artifact_name%">ForwardedHeader</Links> 플러그인이 설치된 경우, <code>call.request.origin</code> 속성은 원래 호출자(프록시)에 대한 <a href="#request_information">연결 정보</a>를 제공합니다.
+        프록시가 적절한 헤더를 제공하고 <Links href="//server-forward-headers" summary="필요한 의존성: io.ktor:%artifact_name%">ForwardedHeader</Links> 플러그인이 설치된 경우, <code>call.request.origin</code> 속성은 원래 호출자(프록시)에 대한 <a href="server-requests.md#request_information">연결 정보</a>를 제공합니다.
     </p>
 </chapter>
 <chapter title="main 브랜치의 최신 커밋을 어떻게 테스트할 수 있나요?" id="bleeding-edge">
@@ -60,7 +60,7 @@
 <chapter title="라우트가 실행되지 않습니다. 어떻게 디버깅하나요?" id="route-not-executing">
     <p>
         Ktor는 라우팅 결정을 문제 해결하는 데 도움이 되는 추적(tracing) 메커니즘을 제공합니다.
-        <a href="#trace_routes">Tracing routes</a> 섹션을 확인하세요.
+        <a href="server-routing.md#trace_routes">Tracing routes</a> 섹션을 확인하세요.
     </p>
 </chapter>
 <chapter title="'Response has already been sent' 오류를 어떻게 해결하나요?" id="response-already-sent">
@@ -103,7 +103,7 @@
 </chapter>
 <chapter title="Kotlin/Native에서 해당 엔진을 사용하기 위해 Windows에 'curl'을 설치하는 방법은 무엇인가요?" id="native-curl">
     <p>
-        <a href="#curl">Curl</a> 클라이언트 엔진은
+        <a href="client-engines.md#curl">Curl</a> 클라이언트 엔진은
         <code>curl</code> 라이브러리 설치가 필요합니다.
         Windows의 경우 MinGW/MSYS2 <code>curl</code> 바이너리 사용을 고려해 볼 수 있습니다.
     </p>

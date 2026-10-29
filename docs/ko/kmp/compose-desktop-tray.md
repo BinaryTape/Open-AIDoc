@@ -153,7 +153,7 @@ object TrayIcon : Painter() {
 
 ## 알림 {id="notifications"}
 
-시스템 알림을 보내려면 [시스템 트레이 예제](#시스템-트레이)와 같이 `rememberNotification()`으로 알림을 생성하고 `TrayState.sendNotification()`에 전달합니다. 알림은 `Tray()` 컴포저블에 전달된 `TrayState`를 통해 전달됩니다. 상태(state)가 트레이에 연결되어 있지 않으면 알림이 유실됩니다.
+시스템 알림을 보내려면 [시스템 트레이 예제](#system-tray)와 같이 `rememberNotification()`으로 알림을 생성하고 `TrayState.sendNotification()`에 전달합니다. 알림은 `Tray()` 컴포저블에 전달된 `TrayState`를 통해 전달됩니다. 상태(state)가 트레이에 연결되어 있지 않으면 알림이 유실됩니다.
 
 알림은 제목(title), 메시지(message), 그리고 알림의 아이콘과 소리를 정의하는 유형(type)으로 구성됩니다. 사용 가능한 유형은 `None`(기본 옵션), `Info`, `Warning`, `Error`입니다.
 

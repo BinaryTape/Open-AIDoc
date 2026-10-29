@@ -64,7 +64,7 @@
     </TabItem>
 </Tabs>
 <p>
-    <code>%plugin_name%</code> 插件也可以<a href="#install-route">安装到特定路由</a>。如果您需要为不同的应用程序资源使用不同的 <code>%plugin_name%</code> 配置，这可能会很有用。
+    <code>%plugin_name%</code> 插件也可以<a href="server-plugins.md#install-route">安装到特定路由</a>。如果您需要为不同的应用程序资源使用不同的 <code>%plugin_name%</code> 配置，这可能会很有用。
 </p>
 
 > 如果您将 `CORS` 插件安装到特定路由，则需要向该路由添加 `options` [处理程序](server-routing.md#define_route)。这允许 Ktor 正确响应 CORS 预检请求。

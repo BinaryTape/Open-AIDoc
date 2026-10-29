@@ -26,7 +26,7 @@ Ktor는 [Logging](https://api.ktor.io/ktor-client-logging/io.ktor.client.plugins
 
 <snippet id="jvm-logging">
   <p>
-    <a href="#jvm">JVM</a>에서 Ktor는 로깅을 위한 추상화 계층으로 Java용 단순 로깅 파사드(Simple Logging Facade for Java, <a href="http://www.slf4j.org/">SLF4J</a>)를 사용합니다. SLF4J는 로깅 API를 실제 로깅 구현체와 분리하여, 애플리케이션의 요구 사항에 가장 적합한 로깅 프레임워크를 통합할 수 있도록 해줍니다. 흔히 사용되는 선택지로는 <a href="https://logback.qos.ch/">Logback</a>이나 <a href="https://logging.apache.org/log4j">Log4j</a>가 있습니다. 프레임워크가 제공되지 않으면 SLF4J는 기본적으로 NOP(no-operation) 구현체를 사용하며, 이는 실질적으로 로깅을 비활성화합니다.
+    <a href="client-engines.md#jvm">JVM</a>에서 Ktor는 로깅을 위한 추상화 계층으로 Java용 단순 로깅 파사드(Simple Logging Facade for Java, <a href="http://www.slf4j.org/">SLF4J</a>)를 사용합니다. SLF4J는 로깅 API를 실제 로깅 구현체와 분리하여, 애플리케이션의 요구 사항에 가장 적합한 로깅 프레임워크를 통합할 수 있도록 해줍니다. 흔히 사용되는 선택지로는 <a href="https://logback.qos.ch/">Logback</a>이나 <a href="https://logging.apache.org/log4j">Log4j</a>가 있습니다. 프레임워크가 제공되지 않으면 SLF4J는 기본적으로 NOP(no-operation) 구현체를 사용하며, 이는 실질적으로 로깅을 비활성화합니다.
   </p>
 
   <p>

@@ -7,7 +7,7 @@
 
 코루틴 컨텍스트는 다양한 요소들의 집합입니다. 주요 요소로는 이전에 살펴보았던 코루틴의 [Job]과 이번 섹션에서 다룰 디스패처(dispatcher)가 있습니다.
 
-## 디스패처와 스레드
+## 디스패처와 스레드 {id="dispatchers-and-threads"}
 
 코루틴 컨텍스트에는 해당 코루틴이 실행될 때 사용할 스레드 또는 스레드들을 결정하는 *코루틴 디스패처*(참조 [CoroutineDispatcher])가 포함됩니다. 코루틴 디스패처는 코루틴 실행을 특정 스레드로 한정하거나, 스레드 풀로 전달하거나, 혹은 한정되지 않은(unconfined) 상태로 실행되게 할 수 있습니다.
 
@@ -60,7 +60,7 @@ main runBlocking      : I'm working in thread main
 
 [newSingleThreadContext]는 코루틴이 실행될 새로운 스레드를 생성합니다. 전용 스레드는 매우 비싼 자원입니다. 실제 애플리케이션에서는 더 이상 필요하지 않을 때 [close][ExecutorCoroutineDispatcher.close] 함수를 사용하여 해제하거나, 최상위 변수에 저장하여 애플리케이션 전체에서 재사용해야 합니다.
 
-## Unconfined vs confined 디스패처
+## Unconfined vs confined 디스패처 {id="unconfined-vs-confined-dispatcher"}
 
 [Dispatchers.Unconfined] 코루틴 디스패처는 호출한 스레드에서 코루틴을 시작하지만, 첫 번째 일시 중단점(suspension point)까지만 그렇게 합니다. 일시 중단 후에는 호출된 일시 중단 함수에 의해 완전히 결정된 스레드에서 코루틴을 재개합니다. Unconfined 디스패처는 CPU 시간을 소비하지 않거나 특정 스레드에 한정된 공유 데이터(예: UI)를 업데이트하지 않는 코루틴에 적합합니다.
 
@@ -107,11 +107,11 @@ main runBlocking: After delay in thread main
 >
 {style="note"}
 
-## 코루틴 및 스레드 디버깅
+## 코루틴 및 스레드 디버깅 {id="debugging-coroutines-and-threads"}
 
 코루틴은 한 스레드에서 일시 중단되고 다른 스레드에서 재개될 수 있습니다. 단일 스레드 디스패처를 사용하더라도 특별한 도구가 없다면 코루틴이 무엇을, 어디서, 언제 하고 있었는지 파악하기 어려울 수 있습니다.
 
-### IDEA를 사용한 디버깅
+### IDEA를 사용한 디버깅 {id="debugging-with-idea"}
 
 Kotlin 플러그인의 코루틴 디버거(Coroutine Debugger)는 IntelliJ IDEA에서 코루틴 디버깅을 간소화해 줍니다.
 
@@ -133,7 +133,7 @@ Kotlin 플러그인의 코루틴 디버거(Coroutine Debugger)는 IntelliJ IDEA�
 
 코루틴 디버깅에 대해 더 자세히 알아보려면 [튜토리얼](https://kotlinlang.org/docs/tutorials/coroutines/debug-coroutines-with-idea.html)을 참조하세요.
 
-### 로깅을 사용한 디버깅
+### 로깅을 사용한 디버깅 {id="debugging-using-logging"}
 
 코루틴 디버거 없이 스레드를 사용하는 애플리케이션을 디버깅하는 또 다른 방법은 각 로그 문에 스레드 이름을 출력하는 것입니다. 이 기능은 로깅 프레임워크에서 보편적으로 지원됩니다. 코루틴을 사용할 때 스레드 이름만으로는 충분한 컨텍스트를 제공하지 못할 수 있으므로, `kotlinx.coroutines`는 이를 쉽게 만들어주는 디버깅 기능을 포함하고 있습니다.
 
@@ -180,9 +180,9 @@ fun main() = runBlocking<Unit> {
 >
 {style="note"}
 
-## 스레드 간 전환
+## 스레드 간 전환 {id="jumping-between-threads"}
 
-다음 코드를 `-Dkotlinx.coroutines.debug` JVM 옵션과 함께 실행해 보세요 ([디버깅](#코루틴-및-스레드-디버깅) 참조):
+다음 코드를 `-Dkotlinx.coroutines.debug` JVM 옵션과 함께 실행해 보세요 ([디버깅](#debugging-coroutines-and-threads) 참조):
 
 ```kotlin
 import kotlinx.coroutines.*
@@ -225,7 +225,7 @@ fun main() {
 
 위 예제는 [newSingleThreadContext]로 생성된 스레드 자원이 더 이상 필요하지 않을 때 적절히 해제하기 위해 Kotlin 표준 라이브러리의 `use` 함수를 사용합니다.
 
-## 컨텍스트 내의 Job
+## 컨텍스트 내의 Job {id="job-in-the-context"}
 
 코루틴의 [Job]은 컨텍스트의 일부이며, `coroutineContext[Job]` 표현식을 사용하여 컨텍스트에서 가져올 수 있습니다.
 
@@ -244,7 +244,7 @@ fun main() = runBlocking<Unit> {
 > 
 {style="note"}
 
-[디버그 모드](#코루틴-및-스레드-디버깅)에서는 다음과 같은 내용이 출력됩니다:
+[디버그 모드](#debugging-coroutines-and-threads)에서는 다음과 같은 내용이 출력됩니다:
 
 ```
 My job is "coroutine#1":BlockingCoroutine{Active}@6d311334
@@ -254,7 +254,7 @@ My job is "coroutine#1":BlockingCoroutine{Active}@6d311334
 
 참고로 [CoroutineScope]의 [isActive]는 `coroutineContext[Job]?.isActive == true`를 편리하게 사용하기 위한 단축 표현일 뿐입니다.
 
-## 코루틴의 자식
+## 코루틴의 자식 {id="children-of-a-coroutine"}
 
 다른 코루틴의 [CoroutineScope] 내에서 코루틴이 실행될 때, [CoroutineScope.coroutineContext]를 통해 컨텍스트를 상속받으며, 새로운 코루틴의 [Job]은 부모 코루틴 Job의 *자식(child)*이 됩니다. 부모 코루틴이 취소되면 모든 자식 코루틴들도 재귀적으로 취소됩니다.
 
@@ -310,7 +310,7 @@ job1: I am not affected by cancellation of the request
 
 <!--- TEST -->
 
-## 부모의 책임
+## 부모의 책임 {id="parental-responsibilities"}
 
 부모 코루틴은 항상 모든 자식 코루틴이 완료될 때까지 기다립니다. 부모는 자신이 실행한 모든 자식을 명시적으로 추적할 필요가 없으며, 마지막에 자식들을 기다리기 위해 [Job.join]을 사용할 필요도 없습니다.
 
@@ -352,9 +352,9 @@ Now processing of the request is complete
 
 <!--- TEST -->
 
-## 디버깅을 위한 코루틴 명명
+## 디버깅을 위한 코루틴 명명 {id="naming-coroutines-for-debugging"}
 
-자동으로 할당된 ID는 코루틴이 자주 로그를 남기고 동일한 코루틴에서 오는 로그 기록들을 연관시켜야 할 때 유용합니다. 하지만 코루틴이 특정 요청의 처리나 특정 백그라운드 작업을 수행하는 경우, 디버깅 목적을 위해 명시적으로 이름을 지정하는 것이 좋습니다. [CoroutineName] 컨텍스트 요소는 스레드 이름과 동일한 용도로 사용됩니다. [디버깅 모드](#코루틴-및-스레드-디버깅)가 켜져 있을 때 이 코루틴을 실행 중인 스레드 이름에 포함됩니다.
+자동으로 할당된 ID는 코루틴이 자주 로그를 남기고 동일한 코루틴에서 오는 로그 기록들을 연관시켜야 할 때 유용합니다. 하지만 코루틴이 특정 요청의 처리나 특정 백그라운드 작업을 수행하는 경우, 디버깅 목적을 위해 명시적으로 이름을 지정하는 것이 좋습니다. [CoroutineName] 컨텍스트 요소는 스레드 이름과 동일한 용도로 사용됩니다. [디버깅 모드](#debugging-coroutines-and-threads)가 켜져 있을 때 이 코루틴을 실행 중인 스레드 이름에 포함됩니다.
 
 다음 예제는 이 개념을 보여줍니다:
 
@@ -398,7 +398,7 @@ fun main() = runBlocking(CoroutineName("main")) {
 
 <!--- TEST FLEXIBLE_THREAD -->
 
-## 컨텍스트 요소 결합하기
+## 컨텍스트 요소 결합하기 {id="combining-context-elements"}
 
 때로는 코루틴 컨텍스트에 여러 요소를 정의해야 할 때가 있습니다. 이 경우 `+` 연산자를 사용할 수 있습니다. 예를 들어, 명시적으로 지정된 디스패처와 명시적으로 지정된 이름을 동시에 사용하여 코루틴을 실행할 수 있습니다:
 
@@ -427,7 +427,7 @@ I'm working in thread DefaultDispatcher-worker-1 @test#2
 
 <!--- TEST FLEXIBLE_THREAD -->
 
-## 코루틴 스코프
+## 코루틴 스코프 {id="coroutine-scope"}
 
 컨텍스트, 자식, Job에 대한 지식을 하나로 합쳐 봅시다. 애플리케이션에 생명주기(lifecycle)를 가진 객체가 있지만 그 객체가 코루틴은 아니라고 가정해 보겠습니다. 예를 들어, Android 애플리케이션을 작성 중이며, 데이터를 가져오고 업데이트하거나 애니메이션을 수행하는 등의 비동기 작업을 수행하기 위해 Android activity 컨텍스트에서 다양한 코루틴을 실행하고 있습니다. 이러한 코루틴들은 메모리 누수를 방지하기 위해 activity가 종료될 때 취소되어야 합니다.
 
@@ -521,7 +521,7 @@ Destroying activity!
 >
 {style="note"}
 
-### Thread-local 데이터
+### Thread-local 데이터 {id="thread-local-data"}
 
 때로는 어떤 스레드 로컬(thread-local) 데이터를 코루틴에 전달하거나 코루틴 간에 전달할 수 있는 기능이 편리할 때가 있습니다. 하지만 코루틴은 특정 스레드에 묶여 있지 않기 때문에, 이를 수동으로 처리하려고 하면 상용구 코드(boilerplate)가 많이 발생할 수 있습니다.
 
@@ -554,7 +554,7 @@ fun main() = runBlocking<Unit> {
 >
 {style="note"}
 
-이 예제에서는 [Dispatchers.Default]를 사용하여 백그라운드 스레드 풀에서 새로운 코루틴을 실행하므로 스레드 풀의 서로 다른 스레드에서 작동하지만, 코루틴이 어느 스레드에서 실행되든 상관없이 `threadLocal.asContextElement(value = "launch")`를 사용하여 지정한 스레드 로컬 변수 값을 여전히 유지합니다. 따라서 출력([디버그](#코루틴-및-스레드-디버깅) 포함)은 다음과 같습니다:
+이 예제에서는 [Dispatchers.Default]를 사용하여 백그라운드 스레드 풀에서 새로운 코루틴을 실행하므로 스레드 풀의 서로 다른 스레드에서 작동하지만, 코루틴이 어느 스레드에서 실행되든 상관없이 `threadLocal.asContextElement(value = "launch")`를 사용하여 지정한 스레드 로컬 변수 값을 여전히 유지합니다. 따라서 출력([디버그](#debugging-coroutines-and-threads) 포함)은 다음과 같습니다:
 
 ```text
 Pre-main, current thread: Thread[main @coroutine#1,5,main], thread local value: 'main'

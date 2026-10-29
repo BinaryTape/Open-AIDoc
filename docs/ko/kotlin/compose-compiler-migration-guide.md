@@ -7,7 +7,7 @@ Compose 컴파일러는 Kotlin 2.0.0부터 Kotlin 레포지토리에 병합되�
 이는 프로젝트의 Kotlin 2.0.0 이상으로의 마이그레이션을 원활하게 합니다. Compose 컴파일러가 Kotlin과 동시에 출시되며 항상 동일한 버전의 Kotlin과 호환되기 때문입니다.
 
 프로젝트에서 새로운 Compose 컴파일러 플러그인을 사용하려면, Compose를 사용하는 각 모듈에 이를 적용하세요.
-[Jetpack Compose 프로젝트 마이그레이션하기](#jetpack-compose-프로젝트-마이그레이션하기)에서 자세한 내용을 확인하세요. Compose 멀티플랫폼 프로젝트의 경우, [멀티플랫폼 마이그레이션 가이드](https://kotlinlang.org/docs/multiplatform/compose-compiler.html#migrating-a-compose-multiplatform-project)를 참고하세요.
+[Jetpack Compose 프로젝트 마이그레이션하기](#migrating-a-jetpack-compose-project)에서 자세한 내용을 확인하세요. Compose 멀티플랫폼 프로젝트의 경우, [멀티플랫폼 마이그레이션 가이드](https://kotlinlang.org/docs/multiplatform/compose-compiler.html#migrating-a-compose-multiplatform-project)를 참고하세요.
 
 ## Jetpack Compose 프로젝트 마이그레이션하기 {id="migrating-a-jetpack-compose-project"}
 

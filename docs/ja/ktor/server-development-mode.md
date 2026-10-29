@@ -8,7 +8,7 @@
 <list>
     <li>サーバーを再起動せずにアプリケーションクラスをリロードするための<Links href="//server-auto-reload" summary="コードの変更時にアプリケーションクラスをリロードするためのオートリロードの使用方法について説明します。">オートリロード</Links>。
     </li>
-    <li><a href="#pipelines">パイプライン</a>をデバッグするための拡張情報（スタックトレースを含む）。
+    <li><a href="server-custom-plugins-base-api.md#pipelines">パイプライン</a>をデバッグするための拡張情報（スタックトレースを含む）。
     </li>
     <li><emphasis>5**</emphasis>サーバーエラーが発生した場合の<Links href="//server-status-pages" summary="%plugin_name%を使用すると、Ktorアプリケーションは、スローされた例外やステータスコードに基づいて、あらゆる失敗状態に対して適切に応答できるようになります。">レスポンスページ</Links>における拡張デバッグ情報。
     </li>
@@ -70,7 +70,7 @@
     </chapter>
     <chapter title="'io.ktor.development' 環境変数" id="environment-variable">
         <p>
-            <a href="#native">Nativeクライアント</a>で開発モードを有効にするには、<code>io.ktor.development</code>環境変数を使用します。
+            <a href="client-engines.md#native">Nativeクライアント</a>で開発モードを有効にするには、<code>io.ktor.development</code>環境変数を使用します。
         </p>
     </chapter>
 </chapter>

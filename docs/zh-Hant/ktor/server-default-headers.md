@@ -59,7 +59,7 @@
     </TabItem>
 </Tabs>
 <p>
-    <code>%plugin_name%</code> 外掛程式也可以 <a href="#install-route">安裝到特定路由</a>。
+    <code>%plugin_name%</code> 外掛程式也可以 <a href="server-plugins.md#install-route">安裝到特定路由</a>。
     如果您需要為不同的應用程式資源使用不同的 <code>%plugin_name%</code> 設定，這會非常有用。
 </p>
 

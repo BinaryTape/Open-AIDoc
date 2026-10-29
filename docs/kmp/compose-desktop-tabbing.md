@@ -180,7 +180,7 @@ fun FocusableBox(
 
 要按非出现顺序移动焦点，请结合使用两个修饰符：
 
-* `focusRequester()` 将 `FocusRequester` 句柄附加到可聚焦组件。如果该组件[默认不可聚焦](#自定义可获得焦点的组件)，请在 `focusRequester()` *之后*应用 `focusable()` 修饰符。
+* `focusRequester()` 将 `FocusRequester` 句柄附加到可聚焦组件。如果该组件[默认不可聚焦](#custom-focusable-components)，请在 `focusRequester()` *之后*应用 `focusable()` 修饰符。
 * `focusProperties()` 设置 Tab 键顺序中的 `next` 和 `previous` 元素：即通过按下 <shortcut>Tab</shortcut> 或 <shortcut>Shift+Tab</shortcut> 获得焦点的带有 `FocusRequester` 句柄的组件。
 
 以下示例为五个文本字段中的每一个创建了一个 `FocusRequester`，并反转了默认的 Tab 键顺序：
@@ -244,7 +244,7 @@ fun main() = application {
 
 ## 通过代码移动焦点 {id="moving-focus-from-code"}
 
-要在没有用户交互的情况下使组件获得焦点，请使用 `focusRequester()` 修饰符将 `FocusRequester` 附加到可聚焦组件，并调用 `FocusRequester.requestFocus()`。如果该组件[默认不可聚焦](#自定义可获得焦点的组件)，则应在 `focusRequester()` *之后*应用 `focusable()` 修饰符。
+要在没有用户交互的情况下使组件获得焦点，请使用 `focusRequester()` 修饰符将 `FocusRequester` 附加到可聚焦组件，并调用 `FocusRequester.requestFocus()`。如果该组件[默认不可聚焦](#custom-focusable-components)，则应在 `focusRequester()` *之后*应用 `focusable()` 修饰符。
 
 在以下示例中，一个按钮会将焦点移动到文本字段，然后移回其自身：
 

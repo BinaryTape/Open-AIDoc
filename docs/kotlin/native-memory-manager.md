@@ -9,9 +9,9 @@ Kotlin/Native 使用一种与 JVM、Go 以及其他主流技术类似的现代�
 
 Kotlin/Native 的垃圾回收器 (GC) 算法在不断演进。目前，它作为一个并发标记清除 (CMS) 回收器运行，不将堆分为分代。
 
-GC 在一个单独的线程上执行，并根据内存压力启发式或定时器启动。此外，也可以[手动调用](#手动启用垃圾回收)。
+GC 在一个单独的线程上执行，并根据内存压力启发式或定时器启动。此外，也可以[手动调用](#enable-garbage-collection-manually)。
 
-GC 在多个线程上并行处理标记队列，包括应用线程、GC 线程以及可选的标记线程。应用线程和至少一个 GC 线程会参与标记过程。默认情况下，标记阶段与应用线程并发运行，这减少了 GC 暂停时间。您可以通过 [GC 日志](#监控-gc-性能)监控 GC 性能。
+GC 在多个线程上并行处理标记队列，包括应用线程、GC 线程以及可选的标记线程。应用线程和至少一个 GC 线程会参与标记过程。默认情况下，标记阶段与应用线程并发运行，这减少了 GC 暂停时间。您可以通过 [GC 日志](#monitor-gc-performance)监控 GC 性能。
 
 > 您可以使用 `kotlin.native.binary.gcMarkSingleThreaded=true` 编译器选项禁用标记阶段的并行化。
 > 然而，这可能会增加大型堆上的垃圾回收器暂停时间。
@@ -138,7 +138,7 @@ fun test() {
 
 * **已启用分页**。应启用分配的分页（缓冲）。
 
-  如果您设置了 [`kotlin.native.binary.pagedAllocator=false`](#禁用分配器分页) Gradle 属性，则内存将改为按对象预留。
+  如果您设置了 [`kotlin.native.binary.pagedAllocator=false`](#disable-allocator-paging) Gradle 属性，则内存将改为按对象预留。
 
 ### 调整内存消耗 {id="adjust-memory-consumption"}
 
@@ -159,7 +159,7 @@ fun test() {
 kotlin.native.binary.pagedAllocator=false
 ```
 
-> 禁用分配器分页后，将无法[在 Apple 平台上跟踪内存消耗](#在-apple-平台上跟踪内存消耗)。
+> 禁用分配器分页后，将无法[在 Apple 平台上跟踪内存消耗](#track-memory-consumption-on-apple-platforms)。
 > 
 {style="note"}
 

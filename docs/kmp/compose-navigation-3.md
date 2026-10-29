@@ -64,7 +64,7 @@ navigation3-browser = { module = "com.github.terrakok:navigation3-browser", vers
 ## 多平台支持 {id="multiplatform-support"}
 
 Navigation 3 与 Compose 紧密对齐，允许 Android 导航实现只需极少的改动即可在通用的 Compose Multiplatform 代码中运行。
-为了支持 Web 和 iOS 等非 JVM 平台，您唯一需要做的就是实现[目的地键的多态序列化](#目的地键的多态序列化)。 
+为了支持 Web 和 iOS 等非 JVM 平台，您唯一需要做的就是实现[目的地键的多态序列化](#polymorphic-serialization-for-destination-keys)。 
 
 您可以在 GitHub 上对比使用 Navigation 3 的纯 Android 应用与多平台应用的详尽示例：
 * [包含 Navigation 3 方案的原始 Android 仓库](https://github.com/android/nav3-recipes)
@@ -216,7 +216,7 @@ val backStack = rememberNavBackStack(config, RouteA1)
 ```
 
 这种方法提供了高度的灵活性和解耦，但需要更多的手动维护。
-与[带有聚合密封类型的多模块](#带有聚合密封类型的多模块)方法类似， 
+与[带有聚合密封类型的多模块](#multi-module-with-aggregated-sealed-types)方法类似， 
 您可以使用 DI 动态组装序列化程序列表， 
 这可以提高灵活性。
 

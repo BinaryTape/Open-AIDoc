@@ -95,7 +95,7 @@ Ktor 还提供了[类型安全的认证方案 API](server-typed-auth.md)，用�
 ## 安装 Authentication {id="install"}
 
 <p>
-    要将 <code>%plugin_name%</code> 插件<a href="#install">安装</a>到应用程序中，请在指定的 <Links href="/ktor/server-modules" summary="模块允许你通过对路由进行分组来构建应用程序。">模块</Links>中将其传递给 <code>install</code> 函数。
+    要将 <code>%plugin_name%</code> 插件<a href="server-plugins.md#install">安装</a>到应用程序中，请在指定的 <Links href="/ktor/server-modules" summary="模块允许你通过对路由进行分组来构建应用程序。">模块</Links>中将其传递给 <code>install</code> 函数。
     以下示例展示了如何安装 <code>%plugin_name%</code>：
 </p>
 <list>

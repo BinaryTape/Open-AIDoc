@@ -46,7 +46,7 @@
         </tip>
     </chapter>
     <chapter title="WebSockets 설치" id="install_plugin">
-        <p><code>WebSockets</code> 플러그인을 설치하려면, <a href="#configure-client">클라이언트 설정 블록</a> 내의 <code>install</code> 함수에 전달하세요:</p>
+        <p><code>WebSockets</code> 플러그인을 설치하려면, <a href="client-create-and-configure.md#configure-client">클라이언트 설정 블록</a> 내의 <code>install</code> 함수에 전달하세요:</p>
         <code-block lang="kotlin" code="            import io.ktor.client.*&#10;            import io.ktor.client.engine.cio.*&#10;            import io.ktor.client.plugins.websocket.*&#10;&#10;            //...&#10;            val client = HttpClient(CIO) {&#10;                install(WebSockets)&#10;            }"/>
     </chapter>
     <chapter title="설정" id="configure_plugin">
@@ -71,7 +71,7 @@
             </def>
         </deflist>
         <warning>
-            <p><code>pingInterval</code> 및 <code>pingIntervalMillis</code> 속성은 OkHttp 엔진에는 적용되지 않습니다. OkHttp의 핑 간격을 설정하려면 <a href="#okhttp">엔진 설정</a>을 사용할 수 있습니다:
+            <p><code>pingInterval</code> 및 <code>pingIntervalMillis</code> 속성은 OkHttp 엔진에는 적용되지 않습니다. OkHttp의 핑 간격을 설정하려면 <a href="client-engines.md#okhttp">엔진 설정</a>을 사용할 수 있습니다:
             </p>
             <code-block lang="kotlin" code="                import io.ktor.client.engine.okhttp.OkHttp&#10;&#10;                val client = HttpClient(OkHttp) {&#10;                    engine {&#10;                        preconfigured = OkHttpClient.Builder()&#10;                            .pingInterval(20, TimeUnit.SECONDS)&#10;                            .build()&#10;                    }&#10;                }"/>
         </warning>

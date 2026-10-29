@@ -57,7 +57,7 @@ fun modelCheckingTest() = ModelCheckingOptions()
 | `actorsBefore`            | `5`           | シナリオの並列セクションの前に呼び出される操作の数。 |
 | `actorsPerThread`         | `5`           | シナリオの並列セクションにおける、各スレッド内の操作の数。 |
 | `actorsAfter`             | `5`           | シナリオの並列セクションの後に呼び出される操作の数。 |
-| `customScenarios`         | –             | [カスタム並行シナリオ](#カスタムシナリオの定義)のリスト。カスタムシナリオは、ランダムに生成されたシナリオの前に実行されます。 |
+| `customScenarios`         | –             | [カスタム並行シナリオ](#defining-a-custom-scenario)のリスト。カスタムシナリオは、ランダムに生成されたシナリオの前に実行されます。 |
 
 ### カスタムシナリオの定義 {id="defining-a-custom-scenario"}
 
@@ -124,7 +124,7 @@ fun test() = StressOptions()
     <td><code>loopIterationsBeforeThreadSwitch</code></td>
     <td><code>10</code></td>
     <td>別のスレッドへの切り替えを試みる前に、スレッドが実行できるループ反復回数。<br/>
-        <code>loopIterationsBeforeThreadSwitch</code> の値は、<a href="#実行のスタール検出"><code>loopBound</code></a> 未満である必要があります。<br/><br/>
+        <code>loopIterationsBeforeThreadSwitch</code> の値は、<a href="#stalled-execution-detection"><code>loopBound</code></a> 未満である必要があります。<br/><br/>
         このオプションは <a href="lincheck-testing-strategies.md#model-checking">モデルチェック</a> にのみ適用可能です。</td></tr>
 </table>
 
@@ -170,7 +170,7 @@ fun test() = StressOptions()
 <tr>
     <td><code>addGuarantee</code></td>
     <td>–</td>
-    <td><code>addGuarantee</code> オプションを使用して、スレッドセーフなメソッドや解析に無関係なメソッドの <a href="#保証の定義">保証を定義</a> し、それらをモデルチェックから除外します。<br/><br/>
+    <td><code>addGuarantee</code> オプションを使用して、スレッドセーフなメソッドや解析に無関係なメソッドの <a href="#defining-a-guarantee">保証を定義</a> し、それらをモデルチェックから除外します。<br/><br/>
         このオプションは <a href="lincheck-testing-strategies.md#model-checking">モデルチェック</a> にのみ適用可能です。</td></tr>
 </table>
 

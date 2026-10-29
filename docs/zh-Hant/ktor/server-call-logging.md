@@ -47,7 +47,7 @@ Ktor 提供了使用 [SLF4J](http://www.slf4j.org/) 程式庫記錄應用程式�
 ## 安裝 %plugin_name% {id="install_plugin"}
 
 <p>
-    若要將 <code>%plugin_name%</code> 外掛程式<a href="#install">安裝</a>到應用程式，請將其傳遞給指定<Links href="/ktor/server-modules" summary="模組允許您透過分組路由來建構您的應用程式。">模組</Links>中的 <code>install</code> 函式。
+    若要將 <code>%plugin_name%</code> 外掛程式<a href="server-plugins.md#install">安裝</a>到應用程式，請將其傳遞給指定<Links href="/ktor/server-modules" summary="模組允許您透過分組路由來建構您的應用程式。">模組</Links>中的 <code>install</code> 函式。
     以下程式碼片段展示了如何安裝 <code>%plugin_name%</code> ...
 </p>
 <list>

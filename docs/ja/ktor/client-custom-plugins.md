@@ -151,7 +151,7 @@ v2.2.0以降、Ktorはカスタムクライアント[プラグイン](client-plu
 </td>
 <td>
 <p>
-<a href="#body">リクエストボディ</a>を変換できます。
+<a href="client-requests.md#body">リクエストボディ</a>を変換できます。
 このハンドラーでは、ボディを 
 <a href="https://api.ktor.io/ktor-http/io.ktor.http.content/-outgoing-content/index.html">OutgoingContent</a> 
 （例: <code>TextContent</code>、<code>ByteArrayContent</code>、<code>FormDataContent</code>）にシリアライズするか、
@@ -188,7 +188,7 @@ v2.2.0以降、Ktorはカスタムクライアント[プラグイン](client-plu
 </td>
 <td>
 <p>
-<a href="#body">レスポンスボディ</a>を変換できます。
+<a href="client-responses.md#body">レスポンスボディ</a>を変換できます。
 このハンドラーは、<code>HttpResponse.body</code>が呼び出されるたびに呼び出されます。
 ボディを<code>requestedType</code>のインスタンスにデシリアライズするか、
 変換が適用されない場合は<code>null</code>を返す必要があります。
@@ -207,7 +207,7 @@ v2.2.0以降、Ktorはカスタムクライアント[プラグイン](client-plu
 </td>
 <td>
 このプラグインによって割り当てられたリソースをクリーンアップできます。
-このハンドラーは、クライアントが<a href="#close-client">クローズ</a>されたときに呼び出されます。
+このハンドラーは、クライアントが<a href="client-create-and-configure.md#close-client">クローズ</a>されたときに呼び出されます。
 </td>
 </tr>
 
@@ -264,7 +264,7 @@ v2.2.0以降、Ktorはカスタムクライアント[プラグイン](client-plu
 </td>
 <td>
 <p>
-<a href="#body">リクエストボディ</a>を変換できます。
+<a href="client-requests.md#body">リクエストボディ</a>を変換できます。
 このハンドラーでは、ボディを 
 <a href="https://api.ktor.io/ktor-http/io.ktor.http.content/-outgoing-content/index.html">OutgoingContent</a> 
 （例: <code>TextContent</code>、<code>ByteArrayContent</code>、<code>FormDataContent</code>）にシリアライズするか、
@@ -345,7 +345,7 @@ v2.2.0以降、Ktorはカスタムクライアント[プラグイン](client-plu
 </td>
 <td>
 <p>
-<a href="#body">レスポンスボディ</a>を変換できます。
+<a href="client-responses.md#body">レスポンスボディ</a>を変換できます。
 このハンドラーは、<code>HttpResponse.body</code>が呼び出されるたびに呼び出されます。
 ボディを<code>requestedType</code>のインスタンスにデシリアライズするか、
 変換が適用されない場合は<code>null</code>を返す必要があります。
@@ -368,7 +368,7 @@ v2.2.0以降、Ktorはカスタムクライアント[プラグイン](client-plu
 </td>
 <td>
 このプラグインによって割り当てられたリソースをクリーンアップできます。
-このハンドラーは、クライアントが<a href="#close-client">クローズ</a>されたときに呼び出されます。
+このハンドラーは、クライアントが<a href="client-create-and-configure.md#close-client">クローズ</a>されたときに呼び出されます。
 </td>
 </tr>
 

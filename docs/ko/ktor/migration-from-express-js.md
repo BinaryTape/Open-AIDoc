@@ -98,7 +98,7 @@
 </td>
 <td>
 <p>
-                    Ktor에서는 코드 내에서 서버 파라미터를 구성하고 애플리케이션을 빠르게 실행하기 위해 <a href="#embedded-server">embeddedServer</a> 함수를 사용할 수 있습니다.
+                    Ktor에서는 코드 내에서 서버 파라미터를 구성하고 애플리케이션을 빠르게 실행하기 위해 <a href="server-create-and-configure.topic#embedded-server">embeddedServer</a> 함수를 사용할 수 있습니다.
                 </p>
 <code-block lang="kotlin" code="import io.ktor.server.engine.*&#10;import io.ktor.server.netty.*&#10;import io.ktor.server.application.*&#10;import io.ktor.server.response.*&#10;import io.ktor.server.routing.*&#10;&#10;fun main() {&#10;    embeddedServer(Netty, port = 8080, host = &quot;0.0.0.0&quot;) {&#10;        routing {&#10;            get(&quot;/&quot;) {&#10;                call.respondText(&quot;Hello World!&quot;)&#10;            }&#10;        }&#10;    }.start(wait = true)&#10;}"/>
 <p>
@@ -107,7 +107,7 @@
                     프로젝트를 참조하세요.
                 </p>
 <p>
-                    HOCON 또는 YAML 형식을 사용하는 <a href="#engine-main">외부 구성 파일</a>에서 서버 설정을 지정할 수도 있습니다.
+                    HOCON 또는 YAML 형식을 사용하는 <a href="server-create-and-configure.topic#engine-main">외부 구성 파일</a>에서 서버 설정을 지정할 수도 있습니다.
                 </p>
 </td>
 </tr>
@@ -148,7 +148,7 @@
 </td>
 <td>
 <p>
-                    Ktor에서는 <a href="#folders"><code>staticFiles()</code></a> 함수를 사용하여 <Path>/</Path> 경로로 들어오는 모든 요청을 <Path>public</Path> 물리 폴더로 매핑합니다. 이 함수는 <Path>public</Path> 폴더의 모든 파일을 재귀적으로 제공할 수 있게 합니다.
+                    Ktor에서는 <a href="server-static-content.md#folders"><code>staticFiles()</code></a> 함수를 사용하여 <Path>/</Path> 경로로 들어오는 모든 요청을 <Path>public</Path> 물리 폴더로 매핑합니다. 이 함수는 <Path>public</Path> 폴더의 모든 파일을 재귀적으로 제공할 수 있게 합니다.
                 </p>
 <code-block lang="kotlin" code="import io.ktor.server.application.*&#10;import io.ktor.server.http.content.*&#10;import io.ktor.server.routing.*&#10;import java.io.*&#10;&#10;fun main(args: Array&lt;String&gt;): Unit =&#10;    io.ktor.server.netty.EngineMain.main(args)&#10;&#10;fun Application.module() {&#10;    routing {&#10;        staticFiles(&quot;&quot;, File(&quot;public&quot;), &quot;index.html&quot;)&#10;    }&#10;}"/>
 <p>

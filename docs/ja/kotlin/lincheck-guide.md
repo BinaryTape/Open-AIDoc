@@ -52,7 +52,7 @@ class CounterTest {
 | ------------------------------------------------------------------------------- |
 ```
 
-## Lincheckの仕組み
+## Lincheckの仕組み {id="how-lincheck-works"}
 
 JVMが並行コードを実行するたびに、スレッド間での操作の実行順序が変わる可能性があります。
 例えば、ある操作が別のスレッドの別の操作によって中断されることがあります。これ自体はエラーではありませんが、コードに並行性のバグがある場合、エラーにつながる可能性があります。
@@ -69,12 +69,12 @@ Lincheckは、誤った動作につながる実行スケジュールを見つけ
 * **モデル検査（Model checking）**。Lincheckは、プログラムに明示的なスレッド切り替え命令を挿入することで、スケジューリングを制御します。これらの命令は、同期ポイントや共有メモリへのアクセス箇所に配置されます。モデル検査により、Lincheckはエラーに至る正確な実行トレースを生成できます。
 * **ストレス・テスト（Stress testing）**。オペレーティングシステムがスケジューリングを制御します。Lincheckは、エラーを見つける可能性を高めるために、各シナリオを複数回実行します。
 
-## Lincheckを探索する
+## Lincheckを探索する {id="explore-lincheck"}
 
 * [Lincheckを使い始める](lincheck-getting-started.md) で、Lincheckの機能をステップバイステップで学習しましょう。
 * Lincheckにおける[並行データ構造をテストするための宣言的な手法](lincheck-how-to-test-data-structures.md)について学びましょう。
 
-## 詳細情報
+## 詳細情報 {id="learn-more"}
 
 * Nikita Kovalによる「How we test concurrent algorithms in Kotlin Coroutines」: [動画](https://youtu.be/jZqkWfa11Js)。KotlinConf 2023
 * Maria Sokolovaによる「Lincheck: Testing concurrency on the JVM」ワークショップ: [パート1](https://www.youtube.com/watch?v=YNtUK9GK4pA)、[パート2](https://www.youtube.com/watch?v=EW7mkAOErWw)。Hydra 2021

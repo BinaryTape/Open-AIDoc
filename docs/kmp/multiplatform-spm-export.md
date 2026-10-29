@@ -79,11 +79,11 @@
   
    生成的框架将在您的项目目录中创建为 `shared/build/XCFrameworks/release/Shared.xcframework` 文件夹。
 
-   > 如果您的项目使用 SwiftPM 依赖项，从 Kotlin %kotlinEapVersion% 开始，该任务还会在 XCFramework 旁边生成一组与 SwiftPM 相关的文件。正如[下文](#准备-xcframework-和-swift-软件包清单)所述，您可以将生成的 `Package.swift` 随框架一起分发，而无需从头编写清单。
+   > 如果您的项目使用 SwiftPM 依赖项，从 Kotlin %kotlinEapVersion% 开始，该任务还会在 XCFramework 旁边生成一组与 SwiftPM 相关的文件。正如[下文](#prepare-the-xcframework-and-the-swift-package-manifest)所述，您可以将生成的 `Package.swift` 随框架一起分发，而无需从头编写清单。
    >
    {style="note"} 
 
-3. 如果您有多个想要导出的包含共享代码的模块（例如，一个共享逻辑模块和一个共享 UI 模块），请[将它们组合成一个单独的新模块](#将多个模块导出为-xcframework)并改为分发该伞形模块。
+3. 如果您有多个想要导出的包含共享代码的模块（例如，一个共享逻辑模块和一个共享 UI 模块），请[将它们组合成一个单独的新模块](#exporting-multiple-modules-as-an-xcframework)并改为分发该伞形模块。
 
 ### 准备 XCFramework 和 Swift 软件包清单 {id="prepare-the-xcframework-and-the-swift-package-manifest"}
 
@@ -266,6 +266,6 @@
     ./gradlew :together:assembleTogetherReleaseXCFramework
     ```
 
-5. 按照[上一节](#准备-xcframework-和-swift-软件包清单)中的步骤准备 `together.xcframework`：将其归档、计算校验和、将归档后的 XCFramework 上传到文件存储、创建并推送 `Package.swift` 文件。
+5. 按照[上一节](#prepare-the-xcframework-and-the-swift-package-manifest)中的步骤准备 `together.xcframework`：将其归档、计算校验和、将归档后的 XCFramework 上传到文件存储、创建并推送 `Package.swift` 文件。
 
 现在，您可以将依赖项导入 Xcode 项目。添加 `import together` 指令后，您应该可以在 Swift 代码中导入来自 `network` 和 `database` 模块的类。

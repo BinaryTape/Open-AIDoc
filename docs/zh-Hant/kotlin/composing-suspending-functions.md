@@ -5,7 +5,7 @@
 
 本節涵蓋了組合掛起函式的各種方法。
 
-## 預設為順序執行
+## 預設為順序執行 {id="sequential-by-default"}
 
 假設我們有兩個在別處定義的掛起函式，它們執行一些有用的操作，例如某種遠端服務呼叫或計算。我們假裝它們是有用的，但實際上在本範例中，每個函式只是延遲了一秒鐘：
 
@@ -68,7 +68,7 @@ Completed in 2017 ms
 
 <!--- TEST ARBITRARY_TIME -->
 
-## 使用 async 進行並行
+## 使用 async 進行並行 {id="concurrent-using-async"}
 
 如果 `doSomethingUsefulOne` 和 `doSomethingUsefulTwo` 的叫用之間沒有相依性，且我們希望透過 _並行_（concurrently）執行這兩者來更快獲得答案，該怎麼辦？這就是 [async] 可以提供協助的地方。
 
@@ -117,7 +117,7 @@ Completed in 1017 ms
 這快了兩倍，因為這兩個協同程式是並行執行的。
 請注意，協同程式的並行執行始終是顯式的。
 
-## 延遲啟動的 async
+## 延遲啟動的 async {id="lazily-started-async"}
 
 （選用）透過將 `start` 參數設定為 [CoroutineStart.LAZY]，可以使 [async] 變為延遲執行。在此模式下，它僅在 [await][Deferred.await] 需要其結果時，或者叫用了其 `Job` 的 [start][Job.start] 函式時，才會啟動協同程式。執行以下範例：
 
@@ -169,7 +169,7 @@ Completed in 1017 ms
 請注意，如果我們只是在 `println` 中呼叫 [await][Deferred.await]，而沒有先對各個協同程式呼叫 [start][Job.start]，這將導致順序行為，因為 [await][Deferred.await] 會啟動協同程式執行並等待其完成，這並非延遲啟動（laziness）的預期使用案例。
 `async(start = CoroutineStart.LAZY)` 的使用案例是在計算值涉及掛起函式時，作為標準 [lazy](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/lazy.html) 函式的替代方案。
 
-## Async 風格的函式
+## Async 風格的函式 {id="async-style-functions"}
 
 > 此處提供使用 async 函式的程式設計風格僅用於說明，因為這在其他程式語言中是一種流行的風格。強烈**不建議**在 Kotlin 協同程式中使用此風格，原因如下所述。
 >
@@ -257,9 +257,9 @@ Completed in 1085 ms
 思考一下，如果在 `val one = somethingUsefulOneAsync()` 這一行與 `one.await()` 運算式之間，程式碼中出現了一些邏輯錯誤，程式拋出了例外，且程式正在執行的操作中止了。
 通常情況下，全域錯誤處理器可以擷取此例外，為開發人員記錄並回報錯誤，但程式在其他方面可以繼續執行其他操作。然而，在這裡，儘管啟動它的操作已經中止，`somethingUsefulOneAsync` 仍然在背景執行。這種問題在結構化並行中不會發生，如下一節所示。
 
-## 使用 async 的結構化並行
+## 使用 async 的結構化並行 {id="structured-concurrency-with-async"}
 
-讓我們將[使用 async 進行並行](#使用-async-進行並行)範例重構為一個函式，該函式並行執行 `doSomethingUsefulOne` 和 `doSomethingUsefulTwo` 並回傳它們的組合結果。
+讓我們將[使用 async 進行並行](#concurrent-using-async)範例重構為一個函式，該函式並行執行 `doSomethingUsefulOne` 和 `doSomethingUsefulTwo` 並回傳它們的組合結果。
 由於 [async] 是 [CoroutineScope] 擴充，我們將使用 [coroutineScope][_coroutineScope] 函式來提供必要的範圍：
 
 ```kotlin

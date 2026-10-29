@@ -9,7 +9,7 @@ Select 表達式使得同時等待多個暫停函式並 _select_（選擇）第�
 >
 {style="note"}
 
-## 從通道中選擇
+## 從通道中選擇 {id="selecting-from-channels"}
 
 讓我們有兩個字串生產者：`fizz` 與 `buzz`。`fizz` 每 500 ms 產生一個 "Fizz" 字串：
 
@@ -113,7 +113,7 @@ fizz -> 'Fizz'
 
 <!--- TEST -->
 
-## 關閉時的選擇
+## 關閉時的選擇 {id="selecting-on-close"}
 
 當通道關閉時，`select` 中的 [onReceive][ReceiveChannel.onReceive] 子句會失敗，導致對應的 `select` 拋出例外。我們可以使用 [onReceiveCatching][ReceiveChannel.onReceiveCatching] 子句在通道關閉時執行特定操作。以下範例還展示了 `select` 是一個表達式，它會回傳其所選子句的結果：
 
@@ -210,7 +210,7 @@ Channel 'a' is closed
 
 第二個觀察結果是，當通道已經關閉時，[onReceiveCatching][ReceiveChannel.onReceiveCatching] 會立即被選中。
 
-## 選擇傳送
+## 選擇傳送 {id="selecting-to-send"}
 
 Select 表達式具有 [onSend][SendChannel.onSend] 子句，將其與選擇的偏向性質結合使用會非常有益。
 
@@ -286,7 +286,7 @@ Done consuming
 
 <!--- TEST -->
 
-## 選擇 Deferred 值
+## 選擇 Deferred 值 {id="selecting-deferred-values"}
 
 可以使用 [onAwait][Deferred.onAwait] 子句來選擇 Deferred 值。讓我們從一個 async 函式開始，它在隨機延遲後傳回一個 Deferred 字串值：
 
@@ -356,7 +356,7 @@ Deferred 4 produced answer 'Waited for 128 ms'
 
 <!--- TEST -->
 
-## 切換 Deferred 值的通道
+## 切換 Deferred 值的通道 {id="switch-over-a-channel-of-deferred-values"}
 
 讓我們編寫一個通道生產者函式，它消費一個包含 Deferred 字串值的通道，等待每個接收到的 Deferred 值，但僅持續到下一個 Deferred 值到來或通道關閉為止。此範例將 [onReceiveCatching][ReceiveChannel.onReceiveCatching] 與 [onAwait][Deferred.onAwait] 子句放在同一個 `select` 中：
 

@@ -72,9 +72,9 @@ val agent = AIAgent(
 *   **`sessionId`**: 現在の会話セッションを識別する一意の文字列。
 *   **`protocol`**: 低レベルの通信に使用される [`com.agentclientprotocol.protocol.Protocol`](https://github.com/agentclientprotocol/kotlin-sdk/blob/master/acp/src/commonMain/kotlin/com/agentclientprotocol/protocol/Protocol.kt) のインスタンス。
 *   **`eventsProducer`**: ACP イベントが送信される `kotlinx.coroutines.channels.ProducerScope<Event>`。
-    詳細については、[イベントストリーミング](#イベントストリーミング)を参照してください。
+    詳細については、[イベントストリーミング](#event-streaming)を参照してください。
 *   **`setDefaultNotifications`**: エージェントのライフサイクルイベントに対してデフォルトの通知ハンドラーを登録するかどうか。
-    詳細については、[エージェント通知の処理](#エージェント通知の処理)を参照してください。
+    詳細については、[エージェント通知の処理](#handling-agent-notifications)を参照してください。
 
 このエージェントは、次の章で説明するように、ACP セッションのスコープ内で実行する必要があります。
 
@@ -279,7 +279,7 @@ private fun Prompt.appendPrompt(content: List<ContentBlock>): Prompt {
 
     メッセージにタイムスタンプを付与するために、`KoogClock` インスタンスが必要です。
 
-詳細については、[メッセージの変換](#メッセージの変換)を参照してください。
+詳細については、[メッセージの変換](#converting-messages)を参照してください。
 
 ## メッセージの変換 {id="converting-messages"}
 

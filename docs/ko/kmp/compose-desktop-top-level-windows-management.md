@@ -4,7 +4,7 @@
 
 데스크톱용 Compose Multiplatform은 창(window) 관리를 위한 다양한 기능을 제공합니다. 창을 트레이에 숨기거나, 드래그 가능하게 만들고, 콘텐츠에 맞게 크기를 조정하거나, 위치를 변경하는 등의 작업을 할 수 있습니다.
 
-새로운 실험적 [창 및 대화 상자 API v2](#창-및-대화-상자-api-v2)도 참조하세요.
+새로운 실험적 [창 및 대화 상자 API v2](#window-and-dialog-api-v2)도 참조하세요.
 
 ## 창 열기 및 닫기 {id="open-and-close-windows"}
 
@@ -150,7 +150,7 @@ fun main() = singleWindowApplication {
 }
 ```
 
-두 개 이상의 최상위 창이 필요하거나, 커스텀 닫기 로직을 사용하거나, 런타임에 창 속성을 변경해야 하는 경우에는 `application` 진입점에서 [`Window()` 컴포저블](#창-열기-및-닫기)을 사용하세요.
+두 개 이상의 최상위 창이 필요하거나, 커스텀 닫기 로직을 사용하거나, 런타임에 창 속성을 변경해야 하는 경우에는 `application` 진입점에서 [`Window()` 컴포저블](#open-and-close-windows)을 사용하세요.
 
 ## 창 상태 관리하기 {id="manage-window-state"}
 
@@ -726,7 +726,7 @@ private fun FileDialog(
 
 Compose Multiplatform 1.12.0부터 새롭게 설계된 `WindowState` 및 `DialogState` 클래스를 `androidx.compose.ui.window.v2` 하위 패키지에서 사용할 수 있습니다.
 
-v2 창 및 대화 상자 API는 상태 요청(requesting)과 창 관리자에 의해 실제로 적용된 상태를 관찰(observing)하는 것을 분리합니다. 또한 창이 커질 때 콘텐츠가 확장(예: `fillMaxSize()`와 같은 수정자 사용)되도록 하면서도 창 크기를 콘텐츠의 기본 크기에 맞추는 것과 같이 이전에는 불가능했던 시나리오를 가능하게 합니다. 자세한 내용은 [크기 지정](#크기-지정)을 참조하세요.
+v2 창 및 대화 상자 API는 상태 요청(requesting)과 창 관리자에 의해 실제로 적용된 상태를 관찰(observing)하는 것을 분리합니다. 또한 창이 커질 때 콘텐츠가 확장(예: `fillMaxSize()`와 같은 수정자 사용)되도록 하면서도 창 크기를 콘텐츠의 기본 크기에 맞추는 것과 같이 이전에는 불가능했던 시나리오를 가능하게 합니다. 자세한 내용은 [크기 지정](#specify-size)을 참조하세요.
 
 v2 API는 이 페이지의 나머지 부분에서 설명한 기존 API와 함께 사용할 수 있으므로, 각 창을 원하는 속도에 맞춰 마이그레이션할 수 있습니다.
 

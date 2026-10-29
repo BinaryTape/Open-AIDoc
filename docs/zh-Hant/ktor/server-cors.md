@@ -48,7 +48,7 @@ Ktor 外掛程式。此外掛程式可讓您設定允許的主機、HTTP 方法�
 ## 安裝 %plugin_name% {id="install_plugin"}
 
 <p>
-    要在應用程式中<a href="#install">安裝</a> <code>%plugin_name%</code> 外掛程式，
+    要在應用程式中<a href="server-plugins.md#install">安裝</a> <code>%plugin_name%</code> 外掛程式，
     請將其傳遞給指定<Links href="/ktor/server-modules" summary="Modules allow you to structure your application by grouping routes.">模組</Links>中的 <code>install</code> 函式。
     以下程式碼片段顯示如何安裝 <code>%plugin_name%</code> ...
 </p>
@@ -69,7 +69,7 @@ Ktor 外掛程式。此外掛程式可讓您設定允許的主機、HTTP 方法�
     </TabItem>
 </Tabs>
 <p>
-    <code>%plugin_name%</code> 外掛程式也可以<a href="#install-route">安裝到特定路由</a>。
+    <code>%plugin_name%</code> 外掛程式也可以<a href="server-plugins.md#install-route">安裝到特定路由</a>。
     如果您需要為不同的應用程式資源使用不同的 <code>%plugin_name%</code> 配置，這會很有用。
 </p>
 

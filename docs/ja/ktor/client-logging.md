@@ -27,7 +27,7 @@ Ktor は、[Logging](https://api.ktor.io/ktor-client-logging/io.ktor.client.plug
 
 <snippet id="jvm-logging">
   <p>
-    <a href="#jvm">JVM</a> では、Ktor はロギングの抽象化レイヤーとして Simple Logging Facade for Java
+    <a href="client-engines.md#jvm">JVM</a> では、Ktor はロギングの抽象化レイヤーとして Simple Logging Facade for Java
     (<a href="http://www.slf4j.org/">SLF4J</a>) を使用します。
     SLF4J はロギング API を基盤となるロギング実装から分離し、アプリケーションの要件に最適なロギングフレームワークを統合できるようにします。
     一般的な選択肢には <a href="https://logback.qos.ch/">Logback</a> や 

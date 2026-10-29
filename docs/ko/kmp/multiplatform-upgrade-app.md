@@ -552,7 +552,7 @@ KMP-NativeCoroutines 종속성을 포함하도록 빌드 스크립트를 업데�
     }
     ```
 
-#### Xcode에서 SwiftPM을 사용하여 라이브러리 임포트
+#### Xcode에서 SwiftPM을 사용하여 라이브러리 임포트 {id="import-the-library-using-swiftpm-in-xcode"}
 
 `async/await` 메커니즘을 사용하는 데 필요한 KMP-NativeCoroutines Swift 패키지 구성 요소를 설치합니다.
 
@@ -574,7 +574,7 @@ KMP-NativeCoroutines 종속성을 포함하도록 빌드 스크립트를 업데�
 7. IntelliJ IDEA로 돌아가 **Tools | Swift Package Manager | Resolve Dependencies**를 선택합니다.
    이렇게 하면 Kotlin Multiplatform 빌드 태스크에서 사용되며 Swift 패키지의 버전을 일관되게 유지하기 위해 저장소에 커밋할 수 있는 `Package.resolved` 락 파일이 생성됩니다.
 
-#### KMP-NativeCoroutines 라이브러리를 사용하여 Flow 소비
+#### KMP-NativeCoroutines 라이브러리를 사용하여 Flow 소비 {id="consume-the-flow-using-the-kmp-nativecoroutines-library"}
 
 1. `iosApp/ContentView.swift`에서 KMP-NativeCoroutines의 `asyncSequence()` 함수를 사용하여 Flow를 소비하도록 `startObserving()` 함수를 업데이트합니다.
 
@@ -631,7 +631,7 @@ KMP-NativeCoroutines 종속성을 포함하도록 빌드 스크립트를 업데�
 >
 {style="warning"}
 
-### 옵션 2. SKIE 구성 {initial-collapse-state="collapsed" collapsible="true"}
+### 옵션 2. SKIE 구성 {initial-collapse-state="collapsed" collapsible="true" id="option-2-configure-skie"}
 
 라이브러리를 설정하려면 Gradle 버전 카탈로그에 SKIE 버전과 플러그인 참조를 추가합니다.
 

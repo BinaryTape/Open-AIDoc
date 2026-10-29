@@ -46,7 +46,7 @@
 3. 从 `build.gradle(.kts)` 文件中移除 `cocoapods {}` 块。
 4. 删除 `.podspec` 文件和 Podfile。
 
-### 将框架连接到您的项目
+### 将框架连接到您的项目 {id="connect-the-framework-to-your-project"}
 
 要将从多平台项目生成的 Kotlin 框架连接到您的 Xcode 项目：
 
