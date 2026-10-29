@@ -28,38 +28,59 @@ export async function processMarkdownFile(filePath) {
     fs.writeFileSync(filePath, processedContent, "utf-8");
 }
 
-export async function processMarkdownContent(filePath, content) {
-    content = await replaceAsync(
+// Attributes kept on the expanded block: the site folds it (code-block-attrs.ts).
+// The others (src, include-lines, style, …) only shaped the block upstream.
+const KEPT_ATTRS = /\b(?:collapsible|initial-collapse-state|default-state|collapsed-title|collapsed-title-line-number)=(?:"[^"]*"|'[^']*')/g;
+
+/**
+ * Fills each empty code block followed by a `{src="…"}` attribute line with
+ * that file of the snippets directory (lines picked by `include-lines`).
+ * The folding attributes (collapsible, collapsed-title, …) stay on a line of
+ * their own after the block. A snippet that cannot be read leaves the block
+ * as it was and is reported, so the empty block does not go out unnoticed.
+ * @param {string} content
+ * @param {string} snippetsPath - Directory `src` is relative to
+ * @param {string} [label] - Page named in the report
+ */
+export async function expandCodeSnippets(content, snippetsPath, label = "") {
+    return replaceAsync(
         content,
         /```([^\n`]*)\n(\s*)```(?:\s*\n)?(\s*)\{([^}]*)\}/gm,
-        async (_, language, indent, endIndent, attr) => {
-            if (/\bsrc=/i.test(attr)) {
-                const src = /src="([^"]+)"/.exec(attr);
+        async (match, language, indent, endIndent, attr) => {
+            const src = /\bsrc="([^"]+)"/.exec(attr);
+            if (!src) return match;
 
-                const include_lines = /include-lines="([^"]+)"/.exec(attr);
-                const ranges = include_lines ? include_lines[1].split(',') : [];
-                const snippetsPath = resolveCodeSnippetsDir(path.dirname(filePath));
-
-                let code = await fetchSnippet(snippetsPath, src[1], ranges);
-                let lines = code.split("\n");
-
-                const minIndent = Math.min(
-                    ...lines.map(line => {
-                        const match = line.match(/^(\s*)/);
-                        return match ? match[1].length : 0;
-                    })
-                );
-
-                lines = lines.map(line => line.slice(minIndent));
-
-                const indentedCode = lines
-                    .map(line => indent + line)
-                    .join("\n");
-
-                return `\`\`\`${language}\n${indentedCode}\n${indent}\`\`\``
+            const include_lines = /include-lines="([^"]+)"/.exec(attr);
+            const ranges = include_lines ? include_lines[1].split(',') : [];
+            const code = await fetchSnippet(snippetsPath, src[1], ranges);
+            if (!code) {
+                console.error(`  ❌ Snippet not found or empty: ${src[1]} (in ${snippetsPath}), used by ${label || "a page"}`);
+                return match;
             }
+
+            let lines = code.split("\n");
+
+            const minIndent = Math.min(
+                ...lines.map(line => {
+                    const match = line.match(/^(\s*)/);
+                    return match ? match[1].length : 0;
+                })
+            );
+
+            lines = lines.map(line => line.slice(minIndent));
+
+            const indentedCode = lines
+                .map(line => indent + line)
+                .join("\n");
+
+            const rest = (attr.match(KEPT_ATTRS) ?? []).join(" ");
+            return `\`\`\`${language}\n${indentedCode}\n${indent}\`\`\`` + (rest ? `\n${endIndent}{${rest}}` : "");
         }
     );
+}
+
+export async function processMarkdownContent(filePath, content) {
+    content = await expandCodeSnippets(content, resolveCodeSnippetsDir(path.dirname(filePath)), filePath);
 
     content = content.replace(
         /\[\[\[([^\|\]]+)\|([^\]]+)\]\]\]/g,

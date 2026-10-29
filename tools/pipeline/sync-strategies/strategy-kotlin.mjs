@@ -6,6 +6,7 @@ import {processTopicFileAsync} from "../processors/TopicProcessor.mjs";
 import {syncSidebar} from "../processors/SidebarProcessor.mjs";
 import {expandIncludesForTask} from "../utils/writerside-include.mjs";
 import {movedPagesFromTree} from "../utils/moved-pages.mjs";
+import {expandCodeSnippets} from "../processors/MarkdownProcessor.mjs";
 
 // Upstream pages the site leaves out
 const REDUNDANT_FILES = ["kotlin-mascot.md", "debugging.md"];
@@ -110,6 +111,19 @@ export function kotlinFamilyStrategy(root, versionFile = () => null) {
             console.log(`  Running Kotlin postDetect: Expand includes - ${repoPath}`);
             expandIncludesForTask(task, docsPath, root);
 
+            // Writerside fills ```…``` {src="x"} blocks from the snippets
+            // directory named in writerside.cfg (kotlin-web-site: docs/snippets)
+            const snippetsPath = snippetsDirOf(docsPath);
+            if (snippetsPath) {
+                console.log(`  Running Kotlin postDetect: Expand code snippets from ${snippetsPath}`);
+                for (const doc of (await fs.readdir(docsPath)).filter(doc => doc.endsWith(".md"))) {
+                    const docPath = path.join(docsPath, doc);
+                    const content = await fs.readFile(docPath, "utf-8");
+                    const expanded = await expandCodeSnippets(content, snippetsPath, doc);
+                    if (expanded !== content) await fs.writeFile(docPath, expanded, "utf-8");
+                }
+            }
+
             console.log(` Running Kotlin postDetect: Convert topic files - ${repoPath}`);
             const docs = await fs.readdir(docsPath);
             const topicFiles = docs.filter(doc => doc.endsWith(".topic"));
@@ -147,6 +161,18 @@ export function kotlinFamilyStrategy(root, versionFile = () => null) {
             }
         },
     };
+}
+
+/**
+ * The snippets directory of a Writerside docs directory: `<snippets src="…"/>`
+ * of its writerside.cfg, relative to it. Null when it names none.
+ * @param {string} docsPath
+ */
+export function snippetsDirOf(docsPath) {
+    const cfg = path.join(docsPath, "writerside.cfg");
+    if (!fs.pathExistsSync(cfg)) return null;
+    const src = /<snippets\s+src="([^"]+)"/.exec(fs.readFileSync(cfg, "utf-8"));
+    return src ? path.join(docsPath, src[1]) : null;
 }
 
 /** kotlin-web-site, kotlinx.coroutines, dokka, lincheck, api-guidelines: docs in docs/ */
