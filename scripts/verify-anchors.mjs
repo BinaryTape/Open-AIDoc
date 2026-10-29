@@ -16,7 +16,7 @@ import { readdir, readFile } from 'node:fs/promises'
 import { dirname, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-const BASELINE = 600
+const BASELINE = 116
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const distDir = process.env.DIST_DIR

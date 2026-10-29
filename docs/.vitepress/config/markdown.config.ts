@@ -38,6 +38,7 @@ import markdownItRemoveScript from "../plugins/markdown/common/markdown-it-remov
 import markdownItRemoveContributeUrl from "../plugins/markdown/common/markdown-it-remove-contribute-url"
 import markdownItRemoveComments from "../plugins/markdown/common/markdown-it-remove-comments"
 import markdownItHtmlLinkLevel from "../plugins/markdown/common/markdown-it-html-link-level"
+import markdownItExplicitHash from "../plugins/markdown/common/markdown-it-explicit-hash"
 import markdownItFenceInfoTrim from "../plugins/markdown/common/markdown-it-fence-info-trim"
 import { markdownItCollapsed } from "../plugins/markdown/common/markdownItCollapsed.mts"
 import markdownItAutoTitle from "../plugins/markdown/common/markdown-it-auto-title"
@@ -125,6 +126,8 @@ export function registerMarkdownPlugins(md: any) {
   md.use(markdownItCollapsed)
   md.use(markdownItRemoveComments)
   md.use(markdownItHtmlLinkLevel)
+  // Wraps VitePress's link renderer, which slugifies link hashes.
+  md.use(markdownItExplicitHash)
   md.use(markdownItFenceInfoTrim)
   // After every other fence renderer (MkDocs hl_lines, diff titles): the
   // <details> wraps their output.
