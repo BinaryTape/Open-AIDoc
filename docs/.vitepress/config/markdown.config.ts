@@ -13,6 +13,7 @@ import markdownItWsClassstyles from "../plugins/markdown/writerside/markdown-it-
 import markdownItWsRenderInline from "../plugins/markdown/writerside/markdown-it-ws-render-inline"
 import markdownItWsRename from "../plugins/markdown/writerside/markdown-it-ws-rename"
 import markdownItWsTopicTitle from "../plugins/markdown/writerside/markdown-it-ws-topicTitle"
+import markdownItWsSecondaryLabel from "../plugins/markdown/writerside/markdown-it-ws-secondary-label"
 import markdownItWsRemoveCodeAttr from "../plugins/markdown/writerside/markdown-it-ws-remove-code-attr"
 import markdownItWsCollapsibleCode from "../plugins/markdown/writerside/markdown-it-ws-collapsible-code"
 import markdownItWsCodeblockCdata from "../plugins/markdown/writerside/markdown-it-ws-codeblock-cdata"
@@ -101,6 +102,7 @@ export function registerMarkdownPlugins(md: any) {
   md.use(markdownItWsVars)
   md.use(markdownItWsRename)
   md.use(markdownItWsTopicTitle)
+  md.use(markdownItWsSecondaryLabel)
   md.use(markdownItWsRemoveCodeAttr)
   // A core rule pushed after the link rewriter's: sees hrefs already rewritten.
   md.use(markdownItWsButtonLink)

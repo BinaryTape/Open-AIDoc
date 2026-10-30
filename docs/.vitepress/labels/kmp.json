@@ -1,0 +1,504 @@
+{
+  "primary": {
+    "EAP": {
+      "name": "Compose Multiplatform %org.jetbrains.compose-eap%",
+      "description": "This functionality is available only in the EAP version."
+    },
+    "Experimental": {
+      "name": "Experimental",
+      "color": "red",
+      "description": "This feature is at the experimental stage of development and can be significantly changed or removed in future releases."
+    },
+    "navEAP": {
+      "name": "Compose Multiplatform Navigation %composeNavigationEapVersion%",
+      "description": "Navigation library for the EAP version of Compose Multiplatform."
+    },
+    "beta": {
+      "name": "Beta",
+      "color": "tangerine",
+      "description": "The feature is in Beta. It is almost stable, but migration steps may be required in the future. We'll do our best to minimize any changes you have to make."
+    },
+    "alpha": {
+      "name": "Alpha",
+      "color": "strawberry",
+      "description": "The feature is in Alpha. It may change incompatibly and require manual migration in the future."
+    },
+    "advanced": {
+      "name": "Advanced",
+      "color": "purple"
+    }
+  },
+  "secondary": {
+    "Deprecated": {
+      "name": "Deprecated",
+      "color": "strawberry",
+      "description": "Still available, but deprecated."
+    },
+    "Experimental": {
+      "name": "Experimental",
+      "color": "red",
+      "description": "This feature is at the experimental stage of development and can be significantly changed or removed in future releases."
+    },
+    "Android": {
+      "name": "Android",
+      "description": "Available in Compose Multiplatform for Android"
+    },
+    "Desktop": {
+      "name": "Desktop",
+      "description": "Available in Compose Multiplatform for desktop"
+    },
+    "iOS": {
+      "name": "iOS",
+      "description": "Available in Compose Multiplatform for iOS"
+    },
+    "Web": {
+      "name": "Web",
+      "description": "Available in Compose Multiplatform for web"
+    },
+    "Information": {
+      "name": "Info",
+      "color": "blue"
+    },
+    "Weak warning": {
+      "name": "Info",
+      "color": "tangerine"
+    },
+    "Warning": {
+      "name": "Warning",
+      "color": "red"
+    },
+    "Error": {
+      "name": "Error",
+      "color": "red"
+    },
+    "New": {
+      "name": "New",
+      "color": "tangerine"
+    },
+    ".ignore (ignorelang)": {
+      "name": ".ignore (ignorelang)",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Blade": {
+      "name": "Blade",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "CSS": {
+      "name": "CSS",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Cmake": {
+      "name": "Cmake",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Coffeescript": {
+      "name": "Coffeescript",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Commandline": {
+      "name": "Commandline",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Cython": {
+      "name": "Cython",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Djangotemplate": {
+      "name": "Djangotemplate",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Dockerfile": {
+      "name": "Dockerfile",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "EJS": {
+      "name": "EJS",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "EL": {
+      "name": "EL",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Ecmascript 6": {
+      "name": "Ecmascript 6",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Editorconfig": {
+      "name": "Editorconfig",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "FTL": {
+      "name": "FTL",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Flow js": {
+      "name": "Flow js",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "GQL": {
+      "name": "GQL",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Gherkin": {
+      "name": "Gherkin",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Gotemplate": {
+      "name": "Gotemplate",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Groovy": {
+      "name": "Groovy",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Haml": {
+      "name": "Haml",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Handlebars": {
+      "name": "Handlebars",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Html": {
+      "name": "Html",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Htmlcompatible": {
+      "name": "Htmlcompatible",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Http request": {
+      "name": "Http request",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Ignorelang": {
+      "name": "Ignorelang",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Ini": {
+      "name": "Ini",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "JVM": {
+      "name": "JVM",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Jade": {
+      "name": "Jade",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Java": {
+      "name": "Java",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Javascript": {
+      "name": "Javascript",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Jpaql": {
+      "name": "Jpaql",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Json": {
+      "name": "Json",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Json5": {
+      "name": "Json5",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Jsonpath": {
+      "name": "Jsonpath",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Jupyter": {
+      "name": "Jupyter",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Kotlin": {
+      "name": "Kotlin",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Less": {
+      "name": "Less",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Makefile": {
+      "name": "Makefile",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Manifest": {
+      "name": "Manifest",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Markdown": {
+      "name": "Markdown",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Mongodb-json": {
+      "name": "Mongodb-json",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Mongojs": {
+      "name": "Mongojs",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Mongojsext": {
+      "name": "Mongojsext",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Msbuild": {
+      "name": "Msbuild",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Multiple": {
+      "name": "Multiple",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Mysql": {
+      "name": "Mysql",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Mysql based": {
+      "name": "Mysql based",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Ocstringsfile": {
+      "name": "Ocstringsfile",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Oracle": {
+      "name": "Oracle",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "PHP": {
+      "name": "PHP",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Pointcutexpression": {
+      "name": "Pointcutexpression",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Postcss": {
+      "name": "Postcss",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Properties": {
+      "name": "Properties",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Protobuf": {
+      "name": "Protobuf",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Pug (ex-jade)": {
+      "name": "Pug (ex-jade)",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Puppet": {
+      "name": "Puppet",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Python": {
+      "name": "Python",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Regexp": {
+      "name": "Regexp",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Rest": {
+      "name": "Rest",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Roomsql": {
+      "name": "Roomsql",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Ruby": {
+      "name": "Ruby",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Ruby.rbs": {
+      "name": "Ruby.rbs",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "SQL": {
+      "name": "SQL",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Scss": {
+      "name": "Scss",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Shell script": {
+      "name": "Shell script",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Shrinker_config": {
+      "name": "Shrinker_config",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Spel": {
+      "name": "Spel",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Spring-mongodb-json": {
+      "name": "Spring-mongodb-json",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Sqldatetime": {
+      "name": "Sqldatetime",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Swift": {
+      "name": "Swift",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Text": {
+      "name": "Text",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Thymeleafexpressions": {
+      "name": "Thymeleafexpressions",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Toml": {
+      "name": "Toml",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Typescript": {
+      "name": "Typescript",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Uast": {
+      "name": "Uast",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "VTL": {
+      "name": "VTL",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Vue": {
+      "name": "Vue",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Vue template": {
+      "name": "Vue template",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "XML": {
+      "name": "XML",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Xpath": {
+      "name": "Xpath",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "Yaml": {
+      "name": "Yaml",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "go": {
+      "name": "go",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "vgo": {
+      "name": "vgo",
+      "color": "purple",
+      "description": "Multiple means that the inspection performs checks on a set of languages, the support of which is determined by inspection internally."
+    },
+    "IntelliJ IDEA": {
+      "name": "IntelliJ IDEA",
+      "color": "blue",
+      "description": "This tutorial works with IntelliJ IDEA."
+    },
+    "Android Studio": {
+      "name": "Android Studio",
+      "color": "green",
+      "description": "This tutorial works with Android Studio."
+    }
+  }
+}

@@ -1,0 +1,42 @@
+/**
+ * Writerside secondary labels: a row of <secondary-label ref="…"/> under a
+ * heading, rendered by markdown-it-ws-secondary-label.ts:
+ *
+ *   <div class="ws-labels"><span class="ws-label ws-label--red">Maven</span></div>
+ *
+ * Values follow the labels under a heading on kotlinlang.org (.sub-title__labels,
+ * .label__content): white text on the label's colour, the colours measured
+ * there. A label labels.list gives no colour is grey.
+ * -------------------------------------------------------------------------- */
+
+.vp-doc .ws-labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 4px;
+  margin: 8px 0 16px;
+}
+
+.vp-doc .ws-label {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background-color: #8e8e93;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 20px;
+  white-space: nowrap;
+}
+
+.vp-doc .ws-label--black { background-color: #19191c; }
+.vp-doc .ws-label--blue { background-color: #087cfa; }
+.vp-doc .ws-label--green { background-color: #4dbb5f; }
+.vp-doc .ws-label--marine { background-color: #28b8a0; }
+.vp-doc .ws-label--purple { background-color: #6b57ff; }
+.vp-doc .ws-label--red { background-color: #f45c4a; }
+.vp-doc .ws-label--strawberry { background-color: #ff318c; }
+.vp-doc .ws-label--tangerine { background-color: #fc801d; }
+.vp-doc .ws-label--yellow { background-color: #f3c033; }
+
+/* Black on the dark background would vanish */
+.dark .vp-doc .ws-label--black { background-color: #3d3d42; }

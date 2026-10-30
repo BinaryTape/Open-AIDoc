@@ -7,6 +7,7 @@ import {syncSidebar} from "../processors/SidebarProcessor.mjs";
 import {processMarkdownFile} from "../processors/MarkdownProcessor.mjs";
 import {expandIncludesForTask} from "../utils/writerside-include.mjs";
 import {movedPagesFromTree} from "../utils/moved-pages.mjs";
+import {syncLabels} from "../utils/writerside-labels.mjs";
 
 /** topics/**\/x.md or .topic → topics/x.md: the pages are flattened into topics/. */
 function mapKmpDocPath(file) {
@@ -48,6 +49,7 @@ export const kmpStrategy = {
 
     postSync: async (repoPath, context, repoConfig) => {
         await syncSidebar(path.join(repoPath, "mpd.tree"), repoConfig.sidebarId, "", kotlinlangHref);
+        await syncLabels(repoPath, context, repoConfig.docType);
     },
 
     /**
