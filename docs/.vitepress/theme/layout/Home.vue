@@ -34,7 +34,7 @@ const docCardConfig = computed(() => [
       tags: [t('homepage.card.koog.tag.1'), t('homepage.card.koog.tag.2')],
     },
     {
-        href: 'koin/setup/koin',
+        href: 'koin/intro/',
         docType: 'koin',
         title: 'Koin',
         description: t('homepage.card.koin.description'),

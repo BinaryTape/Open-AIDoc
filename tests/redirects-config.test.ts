@@ -1,8 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
-import { pageUrl, redirectRules, writeRedirectsFile } from '../docs/.vitepress/config/redirects.config'
+import { entryRules, pageUrl, redirectRules, writeRedirectsFile } from '../docs/.vitepress/config/redirects.config'
+import { NAV_ITEMS } from '../docs/.vitepress/config/nav.config'
 
 describe('pageUrl', () => {
   it('gives the URL of a page in a locale', () => {
@@ -65,5 +66,71 @@ describe('writeRedirectsFile', () => {
       '/koog/a2a-protocol-overview /koog/a2a/ 301',
       '',
     ].join('\n'))
+  })
+})
+
+describe('entryRules', () => {
+  const built = new Set(['/kotlin/home', '/ja/kotlin/home', '/koin/intro/', '/koog/', '/ja/koog/', '/sqldelight/'])
+  const isBuilt = (url: string) => built.has(url)
+
+  it('sends the root of a doc to its entry page, with and without the slash, in every locale', () => {
+    expect(entryRules(['/kotlin/home', '/koin/intro/'], ['zh-Hans', 'ja'], isBuilt)).toEqual([
+      '/ja/kotlin /ja/kotlin/home 302',
+      '/ja/kotlin/ /ja/kotlin/home 302',
+      '/koin /koin/intro/ 302',
+      '/koin/ /koin/intro/ 302',
+      '/kotlin /kotlin/home 302',
+      '/kotlin/ /kotlin/home 302',
+    ])
+  })
+
+  it('leaves a root that is a page, or whose entry page is not built', () => {
+    // Koog and SQLDelight have an index page; Ktor's entry page is not built here
+    expect(entryRules(['/koog/', '/sqldelight/index', '/ktor/welcome'], ['zh-Hans', 'ja'], isBuilt)).toEqual([])
+  })
+})
+
+describe('writeRedirectsFile with entry pages', () => {
+  let dir: string
+  beforeEach(() => {
+    dir = mkdtempSync(join(tmpdir(), 'redirects-'))
+    for (const file of ['dist/kotlin/home.html', 'dist/kmp/kotlin-toolchain.html']) {
+      mkdirSync(dirname(join(dir, file)), { recursive: true })
+      writeFileSync(join(dir, file), '')
+    }
+    mkdirSync(join(dir, 'redirects'))
+    writeFileSync(join(dir, 'redirects/kmp.json'), JSON.stringify([{ from: 'kmp/amper.md', to: 'kmp/kotlin-toolchain.md' }]))
+  })
+  afterEach(() => rmSync(dir, { recursive: true, force: true }))
+
+  it('writes the doc roots after the moved pages', () => {
+    writeRedirectsFile(join(dir, 'dist'), join(dir, 'redirects'), ['/kotlin/home', '/ktor/welcome'])
+
+    expect(readFileSync(join(dir, 'dist/_redirects'), 'utf8')).toBe([
+      '# Pages moved upstream (docs/.vitepress/redirects)',
+      '/kmp/amper /kmp/kotlin-toolchain 301',
+      '',
+      '# Doc roots without a page, to their entry page (config/nav.config.ts)',
+      '/kotlin /kotlin/home 302',
+      '/kotlin/ /kotlin/home 302',
+      '',
+    ].join('\n'))
+  })
+})
+
+// A link to a page that a sync removed still answers on the server (its
+// redirect), but not when clicked in the site: VitePress routes in the browser.
+describe('entry links', () => {
+  const docs = join(import.meta.dirname, '../docs')
+  const sourceOf = (link: string) => join(docs, link.replace(/^\//, '').replace(/\/$/, '/index') + '.md')
+  const homeLinks = [...readFileSync(join(docs, '.vitepress/theme/layout/Home.vue'), 'utf8').matchAll(/href: '([^']+)'/g)]
+    .map((m) => m[1])
+    .filter((href) => !/^https?:/.test(href))
+    .map((href) => `/${href}`)
+
+  it('point at pages that exist, in the navigation bar and on the home page', () => {
+    const links = [...NAV_ITEMS.map((item) => item.link), ...homeLinks]
+    expect(homeLinks.length).toBeGreaterThan(5)
+    expect(links.filter((link) => !existsSync(sourceOf(link)))).toEqual([])
   })
 })

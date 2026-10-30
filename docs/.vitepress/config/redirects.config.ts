@@ -2,6 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { CONTENT_LOCALES } from '../../../shared/locales'
 import { toContentRelPath } from '../../../shared/content-paths'
+import { NAV_ITEMS } from './nav.config'
 
 /**
  * Redirects for pages removed because upstream moved them.
@@ -50,6 +51,33 @@ export function redirectRules(
   return [...rules.values()].sort()
 }
 
+/** Content path of a navigation link: `/kotlin/home` → `kotlin/home.md`, `/koog/` → `koog/index.md`. */
+const contentPathOf = (link: string) => link.replace(/^\//, '').replace(/\/$/, '/index') + '.md'
+
+/**
+ * `_redirects` lines sending the root of a doc (`/kotlin/`, `/ja/ktor`) to
+ * its entry page, the link of the navigation bar, as kotlinlang.org/docs/
+ * does to home.html. A root with a page of its own (Koog, SQLDelight) is left
+ * alone. 302: an entry page may change, and browsers keep a 301.
+ * @param links - Navigation links, e.g. `/kotlin/home`
+ */
+export function entryRules(
+  links: string[],
+  locales: readonly string[],
+  isBuilt: (url: string) => boolean
+): string[] {
+  const rules: string[] = []
+  for (const link of links) {
+    const docType = link.split('/')[1]
+    for (const locale of locales) {
+      const [root, target] = [pageUrl(locale, `${docType}/index.md`), pageUrl(locale, contentPathOf(link))]
+      if (target === root || isBuilt(root) || !isBuilt(target)) continue
+      rules.push(`${root} ${target} 302`, `${root.slice(0, -1)} ${target} 302`)
+    }
+  }
+  return rules.sort()
+}
+
 function readRedirects(dir: string): Redirect[] {
   if (!fs.existsSync(dir)) return []
   return fs.readdirSync(dir)
@@ -58,18 +86,26 @@ function readRedirects(dir: string): Redirect[] {
 }
 
 /** Write `_redirects` into the build output (VitePress buildEnd). */
-export function writeRedirectsFile(outDir: string, redirectsDir = REDIRECTS_DIR) {
+export function writeRedirectsFile(
+  outDir: string,
+  redirectsDir = REDIRECTS_DIR,
+  navLinks = NAV_ITEMS.map((item) => item.link)
+) {
   const isBuilt = (url: string) =>
     fs.existsSync(url.endsWith('/') ? path.join(outDir, url, 'index.html') : path.join(outDir, `${url}.html`))
   const rules = redirectRules(readRedirects(redirectsDir), CONTENT_LOCALES, isBuilt)
-  if (rules.length > CLOUDFLARE_LIMIT) {
-    console.warn(`_redirects: ${rules.length} rules, Cloudflare Pages reads only the first ${CLOUDFLARE_LIMIT}.`)
+  const entries = entryRules(navLinks, CONTENT_LOCALES, isBuilt)
+  if (rules.length + entries.length > CLOUDFLARE_LIMIT) {
+    console.warn(`_redirects: ${rules.length + entries.length} rules, Cloudflare Pages reads only the first ${CLOUDFLARE_LIMIT}.`)
   }
 
   const file = path.join(outDir, '_redirects')
   // Rules from docs/public/_redirects, if the site ever adds some by hand, come first.
   const existing = fs.existsSync(file) ? fs.readFileSync(file, 'utf8').trimEnd() : ''
-  const generated = rules.length > 0 ? `# Pages moved upstream (docs/.vitepress/redirects)\n${rules.join('\n')}` : ''
-  const content = [existing, generated].filter(Boolean).join('\n\n')
+  const generated = [
+    rules.length > 0 ? `# Pages moved upstream (docs/.vitepress/redirects)\n${rules.join('\n')}` : '',
+    entries.length > 0 ? `# Doc roots without a page, to their entry page (config/nav.config.ts)\n${entries.join('\n')}` : '',
+  ]
+  const content = [existing, ...generated].filter(Boolean).join('\n\n')
   if (content) fs.writeFileSync(file, content + '\n')
 }
