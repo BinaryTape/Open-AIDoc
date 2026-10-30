@@ -2,6 +2,7 @@ import matter from 'gray-matter'
 import { DOCS_TYPES } from '../../../docs.config'
 import { isWritersideDoc } from '../../../utils/doctype-utils'
 import { getSidebarTitle } from '../../../utils/sidebar-utils'
+import { evaluateLiquidConditions } from '../mkdocs/markdown-it-mk-liquid-condition'
 
 /**
  * Markdown-it plugin for auto-titling
@@ -14,17 +15,20 @@ export default function markdownItAutoTitle(md: any) {
   const originalParse = md.parse
 
   md.parse = function (src: string, env: any) {
-    // Pre-process: remove liquid conditional blocks
-    let modifiedSrc = src.replace(/{%\s*if\s+.*?%}[\s\S]*?{%\s*endif\s*%}/g, '')
-
     const parts = env.relativePath.split('/')
     const docType = parts.find((p: string) => DOCS_TYPES.includes(p))
 
     if (docType === undefined || isWritersideDoc(env)) {
-      return originalParse.call(this, modifiedSrc, env)
+      return originalParse.call(this, src, env)
     }
 
-    const lines = modifiedSrc.trim().split(/\r?\n/)
+    // The page as it renders: its Jinja conditions (MkDocs) evaluated with
+    // its front matter, as markdown-it-mk-liquid-condition does later. A
+    // foreign keys page of SQLDelight has its H1 in an {% else %} branch.
+    const parsed = matter(src)
+    const rendered = evaluateLiquidConditions(src, parsed.data).text
+
+    const lines = rendered.trim().split(/\r?\n/)
     let hasH1 = false
 
     // Check if document already has a level-1 heading
@@ -35,17 +39,16 @@ export default function markdownItAutoTitle(md: any) {
       }
     }
 
-    // If no H1 heading found, prepend one automatically
+    // If no H1 heading found, prepend one automatically. The front matter
+    // goes, so the conditions are evaluated here, while it is known.
     if (!hasH1) {
-      const parsed = matter(modifiedSrc)
       const title = parsed.data?.title || getSidebarTitle(env.relativePath)
 
       if (title) {
-        modifiedSrc = modifiedSrc.replace(/^---[\s\S]*?---\n*/, '')
-        modifiedSrc = `# ${title}\n\n${modifiedSrc}`
+        return originalParse.call(this, `# ${title}\n\n${rendered.replace(/^---[\s\S]*?---\n*/, '')}`, env)
       }
     }
 
-    return originalParse.call(this, modifiedSrc, env)
+    return originalParse.call(this, src, env)
   }
 }
