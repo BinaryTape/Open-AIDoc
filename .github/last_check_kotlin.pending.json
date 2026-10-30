@@ -16,5 +16,11 @@
       "zh-Hant"
     ],
     "reason": "manual: empty {src} code blocks, snippets now expanded (P0-18)"
+  },
+  "docs/whatsnew21.md": {
+    "langs": [
+      "zh-Hans"
+    ],
+    "reason": "audit: title comment lost"
   }
 }
