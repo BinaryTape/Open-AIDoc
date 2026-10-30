@@ -6,5 +6,14 @@
       "zh-Hans"
     ],
     "reason": "manual: \"undefined\" in a code block (P3-10)"
+  },
+  "topics/kmp-learning-resources.md": {
+    "langs": [
+      "ja",
+      "ko",
+      "zh-Hans",
+      "zh-Hant"
+    ],
+    "reason": "audit: links 34/68; paragraphs 225/501"
   }
 }
