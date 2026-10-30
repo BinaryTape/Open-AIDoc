@@ -11,6 +11,13 @@
 
 const FENCE_LINE = /^\s*(```|~~~)/
 
+// The title of a Writerside page is its `[//]: # (title: …)` comment, which
+// becomes the H1. A translation that lost its first lines loses it too, and
+// the page its heading, while too little is missing for the counts below to
+// notice (kotlin/whatsnew21 in zh-Hans lost its first ten lines). Checked
+// after restoreTitleComment has put back a title the model moved into YAML.
+const TITLE_COMMENT = /^\[\/\/\]: # \(title:/m
+
 /**
  * Count structural elements, in both Markdown and Writerside XML form.
  * @returns {{headings: number, codeBlocks: number, links: number, paragraphs: number, fenceLines: number}}
@@ -72,6 +79,9 @@ export function checkTranslation(translated, source) {
   const leftovers = undefinedLeftovers(translated, source)
   if (leftovers > 0) {
     strong.push(`"undefined" ${leftovers}`)
+  }
+  if (TITLE_COMMENT.test(source) && !TITLE_COMMENT.test(translated)) {
+    strong.push('title comment lost')
   }
 
   // One weak signal alone is too noisy: a translation may legitimately merge
