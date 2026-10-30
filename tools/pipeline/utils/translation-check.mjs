@@ -83,6 +83,10 @@ export function checkTranslation(translated, source) {
   if (TITLE_COMMENT.test(source) && !TITLE_COMMENT.test(translated)) {
     strong.push('title comment lost')
   }
+  const nested = nestedLinks(translated) - nestedLinks(source)
+  if (nested > 0) {
+    strong.push(`link inside a link ${nested}`)
+  }
 
   // One weak signal alone is too noisy: a translation may legitimately merge
   // paragraphs or drop a duplicated link.
@@ -107,6 +111,26 @@ export function undefinedLeftovers(translated, source) {
     return UNDEFINED_LEFTOVERS.reduce((sum, pattern) => sum + count(prose, pattern), 0)
   }
   return Math.max(0, placeholders(translated) - placeholders(source))
+}
+
+const OPEN_A = /<a\b[^>]*>/g
+const LINK_INSIDE = /<a\b|<Links\b|\]\(/
+
+/**
+ * How many `<a>` elements hold another link (an `<a>`, a `<Links>` or a
+ * Markdown link), outside code. Reordering a sentence, a model once moved a
+ * link into the next one (ko/ktor/server-integrate-database): the browser
+ * cuts the outer link short, and the page no longer hydrates.
+ */
+export function nestedLinks(text) {
+  const prose = proseOf(text).replace(/`[^`\n]*`/g, '``')
+  let nested = 0
+  for (const open of prose.matchAll(OPEN_A)) {
+    const start = open.index + open[0].length
+    const end = prose.indexOf('</a>', start)
+    if (end >= 0 && LINK_INSIDE.test(prose.slice(start, end))) nested++
+  }
+  return nested
 }
 
 /** The text outside fenced code blocks. */
