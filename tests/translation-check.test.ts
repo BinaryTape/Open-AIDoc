@@ -66,6 +66,19 @@ describe('checkTranslation', () => {
     const open = faithful.slice(0, lastFence) + faithful.slice(lastFence + 3)
     expect(checkTranslation(open, source)).toContain('unclosed code block')
   })
+
+  // kotlin/whatsnew21 in zh-Hans began mid-sentence: its title and first
+  // lines were gone, and the page had no H1.
+  it('rejects a page that lost its title comment, however little else is missing', () => {
+    const headless = faithful.slice(faithful.indexOf('Intro paragraph.'))
+    expect(checkTranslation(headless, source)).toEqual(['title comment lost'])
+  })
+
+  it('accepts a translated title, and a page that never had a title comment', () => {
+    expect(checkTranslation(faithful.replace('(title: Guide)', '(title: 指南)'), source)).toEqual([])
+    const untitled = source.replace('[//]: # (title: Guide)\n\n', '')
+    expect(checkTranslation(faithful.replace('[//]: # (title: Guide)\n\n', ''), untitled)).toEqual([])
+  })
 })
 
 // The pipeline once wrote "undefined" for content it could not find (#70);
