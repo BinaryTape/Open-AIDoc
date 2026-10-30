@@ -1,13 +1,30 @@
 /**
- * Writerside secondary labels: a row of <secondary-label ref="…"/> under a
- * heading, rendered by markdown-it-ws-secondary-label.ts:
+ * Writerside labels, in the colours of the docs' labels.list:
  *
- *   <div class="ws-labels"><span class="ws-label ws-label--red">Maven</span></div>
+ * - secondary labels, a row of <secondary-label ref="…"/> under a heading,
+ *   rendered by markdown-it-ws-secondary-label.ts:
+ *     <div class="ws-labels"><span class="ws-label ws-label--red">Maven</span></div>
+ * - primary labels, over a heading, rendered by component/TopicTitle.vue:
+ *     <div class="ws-topic-label ws-label--strawberry">…<span>Alpha</span></div>
  *
- * Values follow the labels under a heading on kotlinlang.org (.sub-title__labels,
+ * Values follow the labels on kotlinlang.org (.sub-title__labels,
  * .label__content): white text on the label's colour, the colours measured
- * there. A label labels.list gives no colour is grey.
+ * there. `ws-label--<colour>` sets --ws-label-color, which both draw with. A
+ * label labels.list gives no colour is grey.
  * -------------------------------------------------------------------------- */
+
+.ws-label--black { --ws-label-color: #19191c; }
+.ws-label--blue { --ws-label-color: #087cfa; }
+.ws-label--green { --ws-label-color: #4dbb5f; }
+.ws-label--marine { --ws-label-color: #28b8a0; }
+.ws-label--purple { --ws-label-color: #6b57ff; }
+.ws-label--red { --ws-label-color: #f45c4a; }
+.ws-label--strawberry { --ws-label-color: #ff318c; }
+.ws-label--tangerine { --ws-label-color: #fc801d; }
+.ws-label--yellow { --ws-label-color: #f3c033; }
+
+/* Black on the dark background would vanish */
+.dark .ws-label--black { --ws-label-color: #3d3d42; }
 
 .vp-doc .ws-labels {
   display: flex;
@@ -20,23 +37,10 @@
   display: inline-block;
   padding: 2px 8px;
   border-radius: 4px;
-  background-color: #8e8e93;
+  background-color: var(--ws-label-color, #8e8e93);
   color: #fff;
   font-size: 13px;
   font-weight: 400;
   line-height: 20px;
   white-space: nowrap;
 }
-
-.vp-doc .ws-label--black { background-color: #19191c; }
-.vp-doc .ws-label--blue { background-color: #087cfa; }
-.vp-doc .ws-label--green { background-color: #4dbb5f; }
-.vp-doc .ws-label--marine { background-color: #28b8a0; }
-.vp-doc .ws-label--purple { background-color: #6b57ff; }
-.vp-doc .ws-label--red { background-color: #f45c4a; }
-.vp-doc .ws-label--strawberry { background-color: #ff318c; }
-.vp-doc .ws-label--tangerine { background-color: #fc801d; }
-.vp-doc .ws-label--yellow { background-color: #f3c033; }
-
-/* Black on the dark background would vanish */
-.dark .vp-doc .ws-label--black { background-color: #3d3d42; }
