@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { checkTranslation, structureOf, undefinedLeftovers } from '../tools/pipeline/utils/translation-check.mjs'
+import { checkTranslation, nestedLinks, structureOf, undefinedLeftovers } from '../tools/pipeline/utils/translation-check.mjs'
 
 const section = (n: number) => [
   `## Section ${n}`,
@@ -113,5 +113,35 @@ describe('undefinedLeftovers', () => {
   it('ignores code blocks', () => {
     const code = '```javascript\nlet x\nundefined\n```'
     expect(undefinedLeftovers(code, '```javascript\nlet x\n```')).toBe(0)
+  })
+})
+
+// ko/ktor/server-integrate-database: reordering the sentence, the model moved
+// the <Links> into the <a> before it (P3-6).
+describe('nestedLinks', () => {
+  const settings = 'Start with <a href="docker-compose.topic#extract-db-settings">extracting the database settings</a> into a <Links href="/ktor/server-configuration-file" summary="Learn how to configure the server.">configuration file</Links>.'
+  const nestedKo = '<a href="docker-compose.topic#extract-db-settings">데이터베이스 연결 설정을 <Links href="/ktor/server-configuration-file" summary="구성 파일에서 …">구성 파일</Links>로 추출</a>하는 것부터 시작할 수 있습니다.'
+
+  it('counts a link inside an <a>: an <a>, a <Links> or a Markdown link', () => {
+    expect(nestedLinks(nestedKo)).toBe(1)
+    expect(nestedLinks('<a href="a">see <a href="b">b</a></a>')).toBe(1)
+    expect(nestedLinks('<a href="a">see [b](b.md) too</a>')).toBe(1)
+  })
+
+  it('leaves side by side links and code alone', () => {
+    expect(nestedLinks(settings)).toBe(0)
+    expect(nestedLinks('Write `<a href="x"><a href="y">` in HTML.')).toBe(0)
+    expect(nestedLinks('```html\n<a href="x"><Links href="y">y</Links></a>\n```')).toBe(0)
+  })
+
+  it('rejects a translation that nests a link its source does not', () => {
+    const source = [`[//]: # (title: Guide)`, '', settings].join('\n')
+    expect(checkTranslation(['[//]: # (title: 指南)', '', nestedKo].join('\n'), source)).toEqual(['link inside a link 1'])
+    expect(checkTranslation(['[//]: # (title: 指南)', '', settings].join('\n'), source)).toEqual([])
+  })
+
+  it('accepts a link the source nests too', () => {
+    const source = '<a href="a">see <a href="b">b</a></a>'
+    expect(checkTranslation('<a href="a">参见 <a href="b">b</a></a>', source)).toEqual([])
   })
 })
