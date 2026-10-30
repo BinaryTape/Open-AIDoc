@@ -9,7 +9,7 @@ export const NAV_ITEMS: Array<{ text: string; link: string }> = [
   { text: 'Kotlin Multiplatform', link: '/kmp/get-started' },
   { text: 'Ktor', link: '/ktor/welcome' },
   { text: 'Koog', link: '/koog/' },
-  { text: 'Koin', link: '/koin/setup/koin' },
+  { text: 'Koin', link: '/koin/intro/' },
   { text: 'SQLDelight', link: '/sqldelight/index' },
   { text: 'Coil', link: '/coil/overview' },
 ]
