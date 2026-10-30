@@ -1,5 +1,9 @@
 import { slugify } from '@mdit-vue/shared'
 
+// A heading's id, as Writerside writes it: {id="x"}, {id='x'} or {id=x}
+// (kotlin/whatsnew24: `## New features {id=new-stable-features}`).
+const TITLE_ID_RE = /\s*\{id=(?:"([^"]+)"|'([^']+)'|([^\s"'}]+))\}\s*$/
+
 export default function markdownItWsTopicTitle(md) {
     md.core.ruler.after('inline', 'ws_topic_title', state => {
         const tokens = state.tokens;
@@ -24,9 +28,9 @@ export default function markdownItWsTopicTitle(md) {
                     const labelRef = refMatch ? refMatch[1] : '';
 
                     const titleText = inlineTok.content;
-                    const titleIdMatch = titleText.match(/\s*\{id="([^"]+)"\}\s*$/);
-                    const titleId = titleIdMatch ? titleIdMatch[1] : slugify(titleText)
-                    const titleTextWithoutId = titleText.replace(/\s*\{id="([^"]+)"\}\s*$/, '');
+                    const titleIdMatch = titleText.match(TITLE_ID_RE);
+                    const titleId = titleIdMatch ? (titleIdMatch[1] ?? titleIdMatch[2] ?? titleIdMatch[3]) : slugify(titleText)
+                    const titleTextWithoutId = titleText.replace(TITLE_ID_RE, '');
 
                     // Heading text goes into attribute values: an unescaped quote
                     // would end the attribute early and fail the whole site build.
