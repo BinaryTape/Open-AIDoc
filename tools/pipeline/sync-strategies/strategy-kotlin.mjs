@@ -6,6 +6,7 @@ import {processTopicFileAsync} from "../processors/TopicProcessor.mjs";
 import {syncSidebar} from "../processors/SidebarProcessor.mjs";
 import {expandIncludesForTask} from "../utils/writerside-include.mjs";
 import {movedPagesFromTree} from "../utils/moved-pages.mjs";
+import {syncLabels} from "../utils/writerside-labels.mjs";
 import {expandCodeSnippets} from "../processors/MarkdownProcessor.mjs";
 
 // Upstream pages the site leaves out
@@ -75,6 +76,7 @@ export function kotlinFamilyStrategy(root, versionFile = () => null) {
 
         postSync: async (repoPath, context, repoConfig) => {
             await copyVersionFile(context, repoConfig);
+            await syncLabels(repoPath, context, repoConfig.docType);
 
             // Each repository of the family has one tree in its docs directory (kr.tree, kc.tree, ...)
             const tree = await findTree(repoPath);

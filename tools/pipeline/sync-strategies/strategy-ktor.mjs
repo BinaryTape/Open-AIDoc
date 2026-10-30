@@ -7,6 +7,7 @@ import {syncSidebar} from "../processors/SidebarProcessor.mjs";
 import {processMarkdownFile} from "../processors/MarkdownProcessor.mjs";
 import {expandIncludesForTask} from "../utils/writerside-include.mjs";
 import {movedPagesFromTree} from "../utils/moved-pages.mjs";
+import {syncLabels} from "../utils/writerside-labels.mjs";
 
 // lib*.topic files are libraries of snippets included by other topics, not pages.
 const isIncludeLibrary = (file) => /^lib.*\.topic$/.test(path.basename(file));
@@ -36,6 +37,7 @@ export const ktorStrategy = {
 
     postSync: async (repoPath, context, repoConfig) => {
         await syncSidebar(path.join(repoPath, "ktor.tree"), repoConfig.sidebarId);
+        await syncLabels(repoPath, context, repoConfig.docType);
     },
 
     /**

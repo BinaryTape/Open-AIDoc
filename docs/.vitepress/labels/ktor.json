@@ -1,0 +1,41 @@
+{
+  "primary": {
+    "client-plugin": {
+      "name": "Client Plugin",
+      "color": "strawberry",
+      "description": "Client Plugin"
+    },
+    "server-plugin": {
+      "name": "Server Plugin",
+      "color": "purple",
+      "description": "Server Plugin"
+    },
+    "experimental": {
+      "name": "Experimental",
+      "color": "tangerine",
+      "description": "This feature is experimental. It may be dropped or changed at any time. Opt-in is required (see details below)."
+    }
+  },
+  "secondary": {
+    "server-feature": {
+      "name": "Server",
+      "color": "purple",
+      "description": "Server"
+    },
+    "wip": {
+      "name": "WIP",
+      "color": "purple",
+      "description": "Work in progress"
+    },
+    "beta": {
+      "name": "β",
+      "color": "tangerine",
+      "description": "Beta"
+    },
+    "2023.3": {
+      "name": "2023.3",
+      "color": "blue",
+      "description": "New in version 2023.3"
+    }
+  }
+}

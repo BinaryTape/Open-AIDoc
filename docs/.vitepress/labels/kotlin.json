@@ -1,0 +1,92 @@
+{
+  "primary": {
+    "experimental-general": {
+      "name": "Experimental",
+      "color": "red",
+      "description": "The feature is Experimental. It may be dropped or changed at any time. Use it only for evaluation purposes."
+    },
+    "experimental-opt-in": {
+      "name": "Experimental",
+      "color": "red",
+      "description": "The feature is Experimental. It may be dropped or changed at any time. Opt-in is required (see the details below), and you should use it only for evaluation purposes."
+    },
+    "experimental-exp": {
+      "name": "Experimental",
+      "color": "red",
+      "description": "This includes features with Beta, Alpha, and Experimental status."
+    },
+    "stable": {
+      "name": "Stable",
+      "color": "green"
+    },
+    "alpha": {
+      "name": "Alpha",
+      "color": "strawberry",
+      "description": "The feature is in Alpha. It may change incompatibly and require manual migration in the future."
+    },
+    "beta": {
+      "name": "Beta",
+      "color": "tangerine",
+      "description": "The feature is in Beta. It is almost stable, but migration steps may be required in the future. We'll do our best to minimize any changes you have to make."
+    },
+    "advanced": {
+      "name": "Advanced",
+      "color": "purple"
+    },
+    "eap": {
+      "name": "EAP",
+      "color": "red",
+      "description": "This functionality is available only in the latest EAP version."
+    }
+  },
+  "secondary": {
+    "gradle": {
+      "name": "Gradle",
+      "color": "black"
+    },
+    "maven": {
+      "name": "Maven",
+      "color": "red"
+    },
+    "jvm": {
+      "name": "Kotlin/JVM",
+      "color": "green"
+    },
+    "native": {
+      "name": "Kotlin/Native",
+      "color": "strawberry"
+    },
+    "wasm": {
+      "name": "Kotlin/Wasm",
+      "color": "purple"
+    },
+    "js": {
+      "name": "Kotlin/JS",
+      "color": "yellow"
+    },
+    "language": {
+      "name": "Language",
+      "color": "marine"
+    },
+    "standard-library": {
+      "name": "Standard library",
+      "color": "blue"
+    },
+    "compiler": {
+      "name": "Compiler",
+      "color": "black"
+    },
+    "compose-compiler": {
+      "name": "Compose compiler",
+      "color": "blue"
+    },
+    "bta": {
+      "name": "Build tools API",
+      "color": "tangerine"
+    },
+    "multiplatform": {
+      "name": "Kotlin Multiplatform",
+      "color": "green"
+    }
+  }
+}
