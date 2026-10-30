@@ -37,4 +37,13 @@ describe('Writerside titled headings', () => {
     expect(errors).toEqual([])
     expect(html).toContain('title="-Xcompiler-plugin-order={plugin.before&gt;plugin.after}"')
   })
+
+  // Writerside takes the id unquoted too (kotlin/whatsnew24, P2-25)
+  it('reads an id written without quotes, and keeps it out of the title', async () => {
+    for (const block of ['{id=new-stable-features}', "{id='new-stable-features'}", '{id="new-stable-features"}']) {
+      const { html, errors } = await renderAsVueTemplate(`## 新功能 ${block}\n\n<primary-label ref="stable"/>\n\nText.`)
+      expect(errors, block).toEqual([])
+      expect(html, block).toContain('<TopicTitle id="new-stable-features" level="2" title="新功能" labelRef="stable"/>')
+    }
+  })
 })
