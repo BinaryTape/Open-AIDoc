@@ -1,0 +1,32 @@
+/**
+ * Writerside keys: <shortcut>Ctrl + S</shortcut>, rendered as
+ * <kbd class="ws-shortcut"> by renameShortcuts in config/vue-template.config.ts.
+ *
+ * Values follow kbd.keystroke on kotlinlang.org: a key cap one line high,
+ * in the text font rather than a monospace one, which never breaks.
+ * -------------------------------------------------------------------------- */
+
+:root {
+  --ws-shortcut-border: rgba(25, 25, 28, 0.2);
+  --ws-shortcut-bg: rgba(25, 25, 28, 0.05);
+}
+
+.dark {
+  --ws-shortcut-border: rgba(255, 255, 255, 0.2);
+  --ws-shortcut-bg: rgba(255, 255, 255, 0.05);
+}
+
+.vp-doc kbd.ws-shortcut {
+  display: inline-flex;
+  margin: 0 1px 2px;
+  padding: 3px;
+  border: 1px solid var(--ws-shortcut-border);
+  border-radius: 4px;
+  background-color: var(--ws-shortcut-bg);
+  color: var(--vp-c-text-1);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 14px;
+  white-space: nowrap;
+}

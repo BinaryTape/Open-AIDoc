@@ -127,6 +127,19 @@ describe('template compiler options', () => {
       expect(compile('<p>Plain.</p>')).toContain('<p>Plain.</p>')
     })
   })
+
+  describe('Writerside shortcuts', () => {
+    const compile = (source: string) => compileTemplate({ source: `<div>${source}</div>`, filename: 'page.md', id: 'page', ssr: true, ssrCssVars: [], compilerOptions: vueCompilerOptions }).code
+
+    it('render as key caps, as on kotlinlang.org', () => {
+      expect(compile('<p>Save (<shortcut>Ctrl + S</shortcut>/<shortcut>Cmd + S</shortcut>).</p>'))
+        .toContain('<p>Save (<kbd class="ws-shortcut">Ctrl + S</kbd>/<kbd class="ws-shortcut">Cmd + S</kbd>).</p>')
+    })
+
+    it('keep their attributes and translated text', () => {
+      expect(compile('<li>按下 <shortcut id="enter">输入</shortcut>。</li>')).toContain('<li>按下 <kbd id="enter" class="ws-shortcut">输入</kbd>。</li>')
+    })
+  })
 })
 
 describe('components', () => {

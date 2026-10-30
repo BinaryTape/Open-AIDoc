@@ -223,7 +223,18 @@ export function structurePanels(node: TemplateNode): void {
   node.children = [...titles, element('div', [attribute('class', 'ws-panel__content', node.loc)], content, node.loc)]
 }
 
+/**
+ * Writerside writes keys as `<shortcut>Ctrl + S</shortcut>`, which the
+ * browser shows as plain text. Render it as kotlinlang.org does, a key cap:
+ * `<kbd class="ws-shortcut">`, styled by styles/ws-shortcut.css.
+ */
+export function renameShortcuts(node: TemplateNode): void {
+  if (!isPlain(node, 'shortcut')) return
+  node.tag = 'kbd'
+  node.props = [...(node.props ?? []), attribute('class', 'ws-shortcut', node.loc)]
+}
+
 export const vueCompilerOptions = {
   isCustomElement: isPlainElement,
-  nodeTransforms: [wrapTableRows, structurePanels, renameBodyTitles, unwrapNestedParagraphs],
+  nodeTransforms: [wrapTableRows, structurePanels, renameBodyTitles, renameShortcuts, unwrapNestedParagraphs],
 }
