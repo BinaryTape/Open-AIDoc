@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { createSSRApp, h } from 'vue'
 import { renderToString } from 'vue/server-renderer'
 import TopicTitle from '../docs/.vitepress/component/TopicTitle.vue'
-import { findLabel, labelColorClass } from '../docs/.vitepress/utils/writerside-labels'
+import { findLabel, labelColorClass, labelsDocType } from '../docs/.vitepress/utils/writerside-labels'
 
 // TopicTitle reads the page path from VitePress to pick the doc type's labels.
 const page = vi.hoisted(() => ({ relativePath: '' }))
@@ -47,5 +47,7 @@ describe('primary labels', () => {
     expect(findLabel('primary', 'kotlin', 'experimental-general')?.color).toBe('red')
     expect(findLabel('primary', null, 'alpha')).toBeNull()
     expect(labelColorClass(findLabel('secondary', 'kotlin', 'maven'))).toBe('ws-label--red')
+    expect(labelsDocType('ja/kmp/compose-test.md')).toBe('kmp')
+    expect(labelsDocType('koin/setup.md')).toBeNull()
   })
 })

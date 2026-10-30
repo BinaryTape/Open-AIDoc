@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import {computed} from "vue";
 import {useData} from "vitepress";
-import {getDocType} from "../utils/doctype-utils";
-import {findLabel, labelColorClass} from "../utils/writerside-labels";
+import {findLabel, labelColorClass, labelsDocType} from "../utils/writerside-labels";
 
 const props = defineProps({
   id: {
@@ -27,7 +26,7 @@ const {page} = useData()
 
 // The label of the page's doc type, from its labels.list (utils/writerside-labels.ts);
 // colours in styles/ws-label.css. An id labels.list does not have shows as itself, in grey.
-const label = computed(() => findLabel('primary', getDocType(page.value), props.labelRef))
+const label = computed(() => findLabel('primary', labelsDocType(page.value.relativePath), props.labelRef))
 const labelText = computed(() => label.value?.name ?? props.labelRef)
 const colorClass = computed(() => labelColorClass(label.value))
 

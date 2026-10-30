@@ -21,6 +21,14 @@ interface Labels {
 
 const LABELS: Record<string, Labels> = { kotlin, kmp, ktor }
 
+/**
+ * The doc type of a page that has labels, from its path (`ja/kmp/x.md` → `kmp`).
+ * For the client: utils/doctype-utils.ts reaches docs.config.ts, which pulls in Node modules.
+ */
+export function labelsDocType(relativePath: string): string | null {
+  return relativePath.split('/').find((p) => p in LABELS) ?? null
+}
+
 /** A label of a doc type, or null when its labels.list has no such id. */
 export function findLabel(kind: 'primary' | 'secondary', docType: string | null, ref: string): Label | null {
   return (docType && LABELS[docType]?.[kind]?.[ref]) || null
