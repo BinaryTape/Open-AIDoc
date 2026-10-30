@@ -1,0 +1,8 @@
+{
+  "topics/server-integrate-database.md": {
+    "langs": [
+      "ko"
+    ],
+    "reason": "audit: link inside a link 1"
+  }
+}
