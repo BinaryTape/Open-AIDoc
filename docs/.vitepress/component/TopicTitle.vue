@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import {computed} from "vue";
+import {useData} from "vitepress";
+import {findLabel, labelColorClass, labelsDocType} from "../utils/writerside-labels";
 
 const props = defineProps({
   id: {
@@ -20,54 +22,22 @@ const props = defineProps({
   }
 })
 
-const refMapping = new Map([
-  ['server-plugin', 'Server Plugin'],
-  ['client-plugin', 'Client Plugin'],
-  ['experimental-general', 'Experimental'],
-  ['experimental-opt-in', 'Experimental'],
-  ['experimental', 'Experimental'],
-  ['advanced', 'Advanced'],
-  ['beta', 'Beta'],
-  ['alpha', 'Alpha'],
-  ['eap', "EAP"]
-]);
+const {page} = useData()
 
-const labelColor = new Map([
-    ['server-plugin', '#6b57ff'],
-    ['client-plugin', '#ff58a2'],
-    ['experimental-general', '#f45c4a'],
-    ['experimental-opt-in', '#f45c4a'],
-    ['experimental', '#f45c4a'],
-    ['advanced', '#6b57ff'],
-    ['alpha', '#ff58a2'],
-    ['beta', '#fc801d'],
-    ['eap', '#f45c4a']
-]);
-
-const labelBackground = new Map([
-    ['server-plugin', '#6b57ff33'],
-    ['client-plugin', '#ff58a233'],
-    ['experimental-general', '#f45c4a33'],
-    ['experimental-opt-in', '#f45c4a33'],
-    ['experimental', '#f45c4a33'],
-    ['advanced', '#6b57ff33'],
-    ['alpha', '#ff58a233'],
-    ['beta', '#fc801d33'],
-    ['eap', '#f45c4a33']
-])
-
-const label = refMapping.get(props.labelRef)
-const bgColor = labelColor.get(props.labelRef)
-const labelBackColor = labelBackground.get(props.labelRef)
+// The label of the page's doc type, from its labels.list (utils/writerside-labels.ts);
+// colours in styles/ws-label.css. An id labels.list does not have shows as itself, in grey.
+const label = computed(() => findLabel('primary', labelsDocType(page.value.relativePath), props.labelRef))
+const labelText = computed(() => label.value?.name ?? props.labelRef)
+const colorClass = computed(() => labelColorClass(label.value))
 
 const levelClass = computed(() => props.level ? `ws-topic-title--h${props.level}` : '')
 </script>
 
 <template>
   <div class="ws-topic-title" :class="levelClass">
-    <div v-if="labelRef" class="ws-topic-label">
-      <div class="ws-topic-label-background" :style="{ '--ws-label-background': labelBackColor }"></div>
-      <span class="ws-topic-label-text" :style="{ backgroundColor: bgColor }">{{ label }}</span>
+    <div v-if="labelRef" class="ws-topic-label" :class="colorClass">
+      <div class="ws-topic-label-background"></div>
+      <span class="ws-topic-label-text" :title="label?.description">{{ labelText }}</span>
     </div>
     <component
         :is="props.level ? 'h' + props.level : 'h1'"
@@ -98,8 +68,8 @@ const levelClass = computed(() => props.level ? `ws-topic-title--h${props.level}
   width: 100%;
 }
 
+/* As on kotlinlang.org: the label's colour at 20%, fading out towards the bottom right */
 .ws-topic-label-background {
-  --ws-label-background: #6b57ff33;
   position: absolute;
   z-index: -1;
   top: 0;
@@ -107,17 +77,19 @@ const levelClass = computed(() => props.level ? `ws-topic-title--h${props.level}
   width: 100%;
   height: 330px;
   border-radius: 4px;
-  background-image: linear-gradient(155deg,var(--ws-label-background),transparent 24%);
+  background-image: linear-gradient(155deg, color-mix(in srgb, var(--ws-label-color, #8e8e93) 20%, transparent), transparent 24%);
 }
 
+/* Values of .label__content on kotlinlang.org */
 .ws-topic-label-text {
   display: inline-block;
   padding: 2px 8px;
   border-radius: 4px;
   cursor: default;
-  font-size: 14px;
-  color: var(--vp-c-bg);
-  background-color: #6b57ff;
+  font-size: 13px;
   font-weight: 400;
+  line-height: 20px;
+  color: #fff;
+  background-color: var(--ws-label-color, #8e8e93);
 }
 </style>
