@@ -359,7 +359,7 @@ describe('docs pipeline', () => {
     const pending = JSON.parse(readSite('.github/last_check_demo.pending.json'))
     expect(Object.keys(pending)).toEqual(['docs/nested/setup.md'])
     expect(pending['docs/nested/setup.md'].langs).toEqual(['ja'])
-    expect(pending['docs/nested/setup.md'].reason).toMatch(/^incomplete translation: headings 0\/3/)
+    expect(pending['docs/nested/setup.md'].reason).toMatch(/^code protection:/)
     // The checkpoint still moves on; the pending file carries the gap
     expect(readSite('.github/last_check_demo.txt')).toBe(git(join(root, 'upstream/demo'), 'rev-parse', 'HEAD'))
     expect(originHas('.github/last_check_demo.pending.json')).toBe(true)
@@ -459,7 +459,7 @@ describe('docs pipeline split into per-repository CI jobs', () => {
     const pending = JSON.parse(readFileSync(join(dir, '.github/last_check_demo.pending.json'), 'utf8'))
     expect(pending['docs/nested/setup.md'].langs).toEqual(['ja'])
     expect(git(dir, 'ls-files', '.github/last_check_demo.pending.json')).not.toBe('')
-    expect(report).toMatch(/\| demo \| `docs\/nested\/setup\.md` \| ja \| incomplete translation/)
+    expect(report).toMatch(/\| demo \| `docs\/nested\/setup\.md` \| ja \| code protection:/)
   })
 
   it('carries the pages removed by each job, and lists them in the report', async () => {

@@ -26,14 +26,18 @@ export function countFenceLines(text) {
 export function stripWrapperFence(translated, source) {
   const lines = translated.trim().split('\n')
   let extra = countFenceLines(translated) - countFenceLines(source)
+  let changed = false
 
   if (extra > 0 && OPENING_WRAPPER.test(lines[0])) {
     lines.shift()
+    changed = true
     extra--
   }
   if (extra > 0 && lines.length > 0 && CLOSING_WRAPPER.test(lines[lines.length - 1])) {
     lines.pop()
+    changed = true
   }
+  if (!changed) return translated
   return lines.join('\n')
 }
 

@@ -2,6 +2,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vites
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import { protectCodeBlocks } from '../tools/pipeline/utils/code-protection.mjs'
 
 const generateContent = vi.hoisted(() => vi.fn())
 vi.mock('@google/genai', () => ({
@@ -16,7 +17,14 @@ const SOURCE = ['[//]: # (title: Guide)', '', ...[1, 2, 3, 4].map((n) => section
 const COMPLETE = ['[//]: # (title: 指南)', '', ...[1, 2, 3, 4].map((n) => section(n, `正文 ${n}。`))].join('\n')
 const SUMMARY = '本页介绍了四个部分。'
 
-const reply = (text: string, finishReason = 'STOP') => ({ text, candidates: [{ finishReason }] })
+// A faithful model copies request placeholders instead of receiving the code.
+const reply = (text: string, finishReason = 'STOP') => ({ contents }: { contents: string }) => {
+  const markers = contents.match(/<!--OPENAIDOC_CODE_BLOCK_[a-f0-9]+_\d+-->/g) ?? []
+  let i = 0
+  const masked = protectCodeBlocks(text).content.replace(/<!--OPENAIDOC_CODE_BLOCK_[a-f0-9]+_\d+-->/g,
+    (marker) => markers[i++] ?? marker)
+  return { text: masked, candidates: [{ finishReason }] }
+}
 const apiError = (status: number, message: string) => Object.assign(new Error(message), { status })
 
 const repoConfig = { id: 'demo', docType: 'demo', cloneDir: 'clone', sourceDocRoot: './docs' }
@@ -48,7 +56,7 @@ beforeEach(() => {
 
 describe('translateFiles', () => {
   it('asks again after an incomplete translation and writes the complete one', async () => {
-    generateContent.mockResolvedValueOnce(reply(SUMMARY)).mockResolvedValue(reply(COMPLETE))
+    generateContent.mockImplementationOnce(reply(SUMMARY)).mockImplementation(reply(COMPLETE))
 
     const { translatedPaths, pending } = await translateFiles(repoConfig, work(['zh-Hans']))
 
@@ -61,21 +69,22 @@ describe('translateFiles', () => {
   it('keeps the current translation when no complete one arrives, and leaves it pending', async () => {
     mkdirSync(join(dir, 'docs/ja/demo'), { recursive: true })
     writeFileSync(join(dir, 'docs/ja/demo/guide.md'), 'previous translation')
-    generateContent.mockResolvedValue(reply(SUMMARY))
+    generateContent.mockImplementation(reply(SUMMARY))
 
     const { translatedPaths, pending } = await translateFiles(repoConfig, work(['ja']))
 
     expect(generateContent).toHaveBeenCalledTimes(3)
     expect(translatedPaths).toEqual([])
     expect(pending['docs/guide.md'].langs).toEqual(['ja'])
-    expect(pending['docs/guide.md'].reason).toMatch(/^incomplete translation: headings 0\/4/)
+    expect(pending['docs/guide.md'].reason).toMatch(/^code protection:/)
     expect(readFileSync(join(dir, 'docs/ja/demo/guide.md'), 'utf8')).toBe('previous translation')
   })
 
   it('translates the other languages when one of them fails', async () => {
-    generateContent.mockImplementation(async ({ contents }: { contents: string }) => {
+    generateContent.mockImplementation(async (request: { contents: string }) => {
+      const { contents } = request
       if (contents.includes('Korean')) throw apiError(400, 'Request contains an invalid argument.')
-      return reply(COMPLETE)
+      return reply(COMPLETE)(request)
     })
 
     const { translatedPaths, pending } = await translateFiles(repoConfig, work(['zh-Hans', 'ko', 'ja']))
@@ -85,7 +94,7 @@ describe('translateFiles', () => {
   })
 
   it('does not retry an output cut off at the token limit', async () => {
-    generateContent.mockResolvedValue(reply(COMPLETE.slice(0, 40), 'MAX_TOKENS'))
+    generateContent.mockImplementation(reply(COMPLETE.slice(0, 40), 'MAX_TOKENS'))
 
     const { pending } = await translateFiles(repoConfig, work(['zh-Hans']))
 
@@ -124,7 +133,7 @@ describe('translateFiles, checking that pages build', () => {
   })
 
   it('asks again when the translation would not build, then writes one that does', async () => {
-    generateContent.mockResolvedValueOnce(reply(UNCLOSED)).mockResolvedValue(reply(COMPLETE))
+    generateContent.mockImplementationOnce(reply(UNCLOSED)).mockImplementation(reply(COMPLETE))
 
     const { translatedPaths, pending } = await translateFiles(repoConfig, work(['ja']), { pageCheck })
 
@@ -137,7 +146,7 @@ describe('translateFiles, checking that pages build', () => {
   it('keeps the current translation when no answer builds, and says why', async () => {
     mkdirSync(join(dir, 'docs/ja/demo'), { recursive: true })
     writeFileSync(join(dir, 'docs/ja/demo/guide.md'), 'previous translation')
-    generateContent.mockResolvedValue(reply(UNCLOSED))
+    generateContent.mockImplementation(reply(UNCLOSED))
 
     const { translatedPaths, pending } = await translateFiles(repoConfig, work(['ja']), { pageCheck })
 
@@ -151,11 +160,33 @@ describe('translateFiles, checking that pages build', () => {
   // doubled attribute, ...) while their translations, mended by the model, do.
   it('checks the translation, not a source that would not build itself', async () => {
     writeFileSync(join(dir, 'clone/docs/broken.md'), `${SOURCE}\n<div class="note">\n`)
-    generateContent.mockResolvedValue(reply(COMPLETE))
+    generateContent.mockImplementation(reply(COMPLETE))
 
     const { translatedPaths, pending } = await translateFiles(repoConfig, [{ file: 'docs/broken.md', langs: ['ja'] }], { pageCheck })
 
     expect(translatedPaths).toHaveLength(1)
     expect(pending).toEqual({})
+  })
+})
+
+describe('translateFiles, code escapes', () => {
+  it('keeps source escapes and code whitespace in the written translation', async () => {
+    const fence = String.fromCharCode(96).repeat(3)
+    const code = [
+      fence + 'kotlin', 'val newline = "\\n"', 'val literal = "\\\\n"',
+      '', '', 'println("\\t")', fence,
+    ].join('\n')
+    const original = '# English\n\n' + code + '\n\nEnd.'
+    writeFileSync(join(dir, 'clone/docs/escapes.md'), original)
+    generateContent.mockImplementation(({ contents }: { contents: string }) => {
+      expect(contents).not.toContain('val newline')
+      const marker = contents.match(/<!--OPENAIDOC_CODE_BLOCK_[a-f0-9]+_\d+-->/)![0]
+      return { text: '# 中文\n\n' + marker + '\n\n结束。', candidates: [{ finishReason: 'STOP' }] }
+    })
+
+    const { translatedPaths, pending } = await translateFiles(repoConfig, [{ file: 'docs/escapes.md', langs: ['ja'] }], { pageCheck: null })
+    expect(translatedPaths).toHaveLength(1)
+    expect(pending).toEqual({})
+    expect(readFileSync(join(dir, 'docs/ja/demo/escapes.md'), 'utf8')).toContain(code)
   })
 })
