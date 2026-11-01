@@ -5,7 +5,7 @@
 
 <tldr>
 <p>
-<b>必要的相依性</b>：<code>io.ktor:ktor-client-logging</code>
+<b>必要相依性</b>：<code>io.ktor:ktor-client-logging</code>
 </p>
 <var name="example_name" value="client-logging"/>
 <p>
@@ -16,27 +16,26 @@
 </p>
 </tldr>
 
-日誌記錄是一種追蹤程式執行情況，並透過記錄重要事件、錯誤或資訊訊息來診斷問題的方式。
+日誌記錄是一種透過記錄重要事件、錯誤或資訊性訊息，來追蹤程式正在執行的操作並診斷問題的方法。
 
 Ktor 提供了使用 [Logging](https://api.ktor.io/ktor-client-logging/io.ktor.client.plugins.logging/-logging) 外掛程式記錄 HTTP 呼叫的功能。
-此外掛程式為不同平台提供不同的日誌記錄器類型。
+此外掛程式針對不同平台提供了不同的記錄器 (logger) 類型。
 
-> 在伺服器端，Ktor 為應用程式日誌記錄提供 [Logging](server-logging.md) 外掛程式，並為記錄用戶端請求提供 [CallLogging](server-call-logging.md) 外掛程式。
+> 在伺服器端，Ktor 提供了用於應用程式日誌記錄的 [Logging](server-logging.md) 外掛程式，以及用於記錄用戶端請求的 [CallLogging](server-call-logging.md) 外掛程式。
 
 ## JVM {id="jvm"}
 
 <snippet id="jvm-logging">
   <p>
     在 <a href="client-engines.md#jvm">JVM</a> 上，Ktor 使用 Simple Logging Facade for Java
-    (<a href="http://www.slf4j.org/">SLF4J</a>) 作為日誌記錄的抽象層。SLF4J 將日誌記錄 API 與底層日誌記錄實作解耦，
-    讓您可以整合最符合應用程式需求的日誌記錄架構。
+    (<a href="http://www.slf4j.org/">SLF4J</a>) 作為日誌記錄的抽象層。SLF4J 將日誌 API 與底層的日誌實作分離，
+    讓你可以整合最符合應用程式需求的日誌架構。
     常見的選擇包括 <a href="https://logback.qos.ch/">Logback</a> 或 
-    <a href="https://logging.apache.org/log4j">Log4j</a>。若未提供架構，SLF4J 將預設使用無操作 (NOP) 實作，
-    這實際上會停用日誌記錄。
+    <a href="https://logging.apache.org/log4j">Log4j</a>。如果未提供任何架構，SLF4J 將預設使用無操作 (NOP) 實作，這基本上會停用日誌記錄。
   </p>
 
   <p>
-    若要啟用日誌記錄，請包含具有所需 SLF4J 實作的構件，例如 <a href="https://logback.qos.ch/">Logback</a>：
+    若要啟用日誌記錄，請引入包含所需 SLF4J 實作的構件，例如 <a href="https://logback.qos.ch/">Logback</a>：
   </p>
   <var name="group_id" value="ch.qos.logback"/>
   <var name="artifact_name" value="logback-classic"/>
@@ -73,35 +72,44 @@ Ktor 提供了使用 [Logging](https://api.ktor.io/ktor-client-logging/io.ktor.c
 
 ## Native {id="native"}
 
-對於 [Native 目標](client-engines.md#native)，`Logging` 外掛程式提供了一個將所有內容列印到標準輸出串流 (`STDOUT`) 的日誌記錄器。
+針對 [Native 目標](client-engines.md#native)，`Logging` 外掛程式提供了一個會將所有內容輸出至標準輸出串流 (`STDOUT`) 的記錄器。
 
-## 多平台 {id="multiplatform"}
+## 多平台 (Multiplatform) {id="multiplatform"}
 
-在 [多平台專案](client-create-multiplatform-application.md) 中，您可以指定 [自訂日誌記錄器](#custom_logger)，例如 [Napier](https://github.com/AAkira/Napier)。
+在[多平台專案](client-create-multiplatform-application.md)中，你可以指定[自訂記錄器](#custom_logger)，例如 [Napier](https://github.com/AAkira/Napier)。
 
 ## 新增相依性 {id="add_dependencies"}
 
-若要新增 `Logging` 外掛程式，請將以下構件包含在您的建置指令碼中：
+若要新增 `Logging` 外掛程式，請在建置指令碼中引入以下構件：
 
   <var name="artifact_name" value="ktor-client-logging"/>
+  <var name="ktor_version_catalog_name" value="ktorLibs.client.logging"/>
   <Tabs group="languages">
       <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-          <code-block lang="Kotlin" code="              implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+          <code-block lang="Kotlin" code="              implementation(%ktor_version_catalog_name%)"/>
+          <note>
+              上述程式碼片段使用 <a href="server-dependencies.topic#using-version-catalog">
+              Ktor version catalog</a> 來指定 Ktor 相依性。
+          </note>
       </TabItem>
       <TabItem title="Gradle (Groovy)" group-key="groovy">
-          <code-block lang="Groovy" code="              implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+          <code-block lang="Groovy" code="              implementation %ktor_version_catalog_name%"/>
+          <note>
+              上述程式碼片段使用 <a href="server-dependencies.topic#using-version-catalog">
+              Ktor version catalog</a> 來指定 Ktor 相依性。
+          </note>
       </TabItem>
       <TabItem title="Maven" group-key="maven">
           <code-block lang="XML" code="              &lt;dependency&gt;&#10;                  &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                  &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                  &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;              &lt;/dependency&gt;"/>
       </TabItem>
   </Tabs>
   <tip>
-      若要進一步了解 Ktor 用戶端所需的構件，請參閱 <Links href="/ktor/client-dependencies" summary="了解如何將用戶端相依性新增至現有專案。">新增用戶端相依性</Links>。
+      若要了解更多關於 Ktor 用戶端所需的構件，請參閱<Links href="client-dependencies.md" summary="了解如何向現有專案新增用戶端相依性。">新增用戶端相依性</Links>。
   </tip>
 
 ## 安裝 Logging {id="install_plugin"}
 
-若要安裝 `Logging`，請將其傳遞給 [用戶端配置區塊](client-create-and-configure.md#configure-client) 內的 `install` 函式：
+若要安裝 `Logging`，請在[用戶端設定區塊](client-create-and-configure.md#configure-client)內將其傳遞給 `install` 函式：
 
 ```kotlin
 import io.ktor.client.*
@@ -113,21 +121,21 @@ val client = HttpClient(CIO) {
 }
 ```
 
-## 配置 Logging {id="configure_plugin"}
+## 設定 Logging {id="configure_plugin"}
 
-`Logging` 外掛程式的配置是由 [Logging.Config](https://api.ktor.io/ktor-client-logging/io.ktor.client.plugins.logging/-logging-config) 類別提供的。以下範例顯示了配置範本：
+`Logging` 外掛程式的設定由 [Logging.Config](https://api.ktor.io/ktor-client-logging/io.ktor.client.plugins.logging/-logging-config) 類別提供。以下範例展示了一個組態範例：
 
 `logger`
-: 指定日誌記錄器執行個體。`Logger.DEFAULT` 使用 SLF4J 日誌記錄架構。對於 Native 目標，請將此屬性設定為 `Logger.SIMPLE`。
+: 指定 Logger 執行個體。`Logger.DEFAULT` 使用 SLF4J 日誌架構。針對 Native 目標，請將此屬性設定為 `Logger.SIMPLE`。
 
 `level`
-: 指定日誌記錄級別。`LogLevel.HEADERS` 將僅記錄請求/回應標頭。
+: 指定記錄等級。`LogLevel.HEADERS` 將僅記錄請求／回應標頭。
 
 `filter()`
-: 允許您為符合指定述句的請求篩選日誌訊息。在下面的範例中，只有發送到 `ktor.io` 的請求會進入日誌。
+: 允許你篩選符合指定述詞之請求的日誌訊息。在以下範例中，只有傳送至 `ktor.io` 的請求才會被記錄。
 
 `sanitizeHeader()`
-: 允許您淨化敏感標頭，以避免它們的值出現在日誌中。在下面的範例中，`Authorization` 標頭值在記錄時將被替換為 '***'。
+: 允許你清理敏感標頭，避免其值出現在日誌中。在以下範例中，`Authorization` 標頭的值在記錄時將被替換為「***」。
 
 ```kotlin
 package com.example
@@ -161,10 +169,10 @@ fun main() {
 
 如需完整範例，請參閱 [client-logging](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-logging)。
 
-### 提供自訂日誌記錄器 {id="custom_logger"}
+### 提供自訂記錄器 {id="custom_logger"}
 
-若要在您的用戶端應用程式中使用自訂日誌記錄器，您需要建立一個 `Logger` 執行個體並覆寫 `log` 函式。
-以下範例顯示如何使用 [Napier](https://github.com/AAkira/Napier) 程式庫來記錄 HTTP 呼叫：
+若要在用戶端應用程式中使用自訂記錄器，你需要建立一個 `Logger` 執行個體並覆寫 `log` 函式。
+以下範例展示了如何使用 [Napier](https://github.com/AAkira/Napier) 程式庫來記錄 HTTP 呼叫：
 
 ```kotlin
 package com.example

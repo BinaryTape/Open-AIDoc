@@ -4,169 +4,180 @@ title: Compose 中的作用域
 
 # Compose 中的作用域
 
-Koin 提供了多個 API 來管理 Compose 應用程式中的作用域，從簡單的與可組合項（composable）繫結的作用域到導航整合的作用域。
+本頁涵蓋了為部分 UI 樹開啟 Koin 作用域的 Compose 函式：`KoinScope`、`KoinNavigationScope`、`UnboundKoinScope`，以及 Android 的 `KoinActivityScope` 與 `KoinFragmentScope`。在此類區塊內，`koinInject()` 和 `koinViewModel()` 會從該作用域進行解析。關於作用域的運作方式以及如何宣告它們，請參閱[作用域](/docs/reference/koin-core/scopes)。
+
+本頁的大多數函式皆標記為 `@KoinExperimentalAPI`。請使用 `@OptIn(KoinExperimentalAPI::class)` 選擇加入。
 
 ## KoinScope {id="koinscope"}
 
-建立一個與 Composable 生命周期繫結的 Koin 作用域：
+`KoinScope` 會取得或建立一個作用域，並將其提供給其子項，在 Composable 離開組合時將其關閉。
 
+宣告作用域：
+
+**編譯器外掛程式 DSL**
 ```kotlin
+class FeatureScope
+
 val featureModule = module {
     scope<FeatureScope> {
         scoped<FeatureCache>()
         scoped<FeatureRepository>()
     }
 }
+```
+
+**註解**
+```kotlin
+class FeatureScope
+
+@Scope(FeatureScope::class)
+class FeatureCache
+
+@Scope(FeatureScope::class)
+class FeatureRepository(private val cache: FeatureCache)
+```
+
+**建構函式 / 傳統 DSL**
+```kotlin
+class FeatureScope
+
+val featureModule = module {
+    scope<FeatureScope> {
+        scopedOf(::FeatureCache)
+        scopedOf(::FeatureRepository)
+    }
+}
+```
+
+在 Compose 中開啟：
+
+```kotlin
+import org.koin.compose.scope.KoinScope
 
 @Composable
 fun FeatureScreen() {
-    KoinScope(scopeOf<FeatureScope>()) {
-        // 所有子項都可以存取作用域內的相依性
+    KoinScope<FeatureScope>(scopeID = "feature") {
         FeatureContent()
     }
 }
 
 @Composable
 fun FeatureContent() {
-    // 從父級 KoinScope 解析
-    val cache = koinInject<FeatureCache>()
+    val repository = koinInject<FeatureRepository>() // 從 FeatureScope 解析
 }
 ```
 
-當 Composable 離開組合（在 `onForgotten` 或 `onAbandoned` 時）時，作用域會自動關閉。
+`KoinScope` 有三種形式：
 
-## KoinNavigationScope {id="koinnavigationscope"}
+| 形式 | 作用域 |
+|------|-------|
+| `KoinScope<T>(scopeID) { }` | 取得或建立具有該 id 且由型別 `T` 限定的作用域 |
+| `KoinScope(scopeID, scopeQualifier) { }` | 取得或建立具有該 id 和限定詞的作用域 |
+| `KoinScope(scopeDefinition = { createScope(...) }) { }` | 由 Lambda 回傳的作用域，該 Lambda 在 `Koin` 執行個體上執行 |
 
-建立一個與導航返回堆疊項目（navigation back stack entry）繫結的作用域：
+當 Composable 被遺忘（離開組合）或被放棄時，該作用域會被關閉。根作用域永遠不會被關閉。
+
+### 多畫面流程 {id="multi-screen-flows"}
+
+將 `KoinScope` 放置在 `NavHost` 之上，以在流程的畫面之間（例如結帳流程）共用具有作用域的物件：
 
 ```kotlin
-val appModule = module {
-    // 定義導航作用域的相依性
-    navigationScope {
-        scoped<ScreenRepository>()
-        scoped<ScreenCache>()
-        viewModel<ScreenViewModel>()
-    }
-}
-
-// 在您的 NavHost 中
-NavHost(navController, startDestination = "home") {
-    composable("detail/{id}") { backStackEntry ->
-        KoinNavigationScope(backStackEntry) {
-            DetailScreen()
+@Composable
+fun CheckoutFlow() {
+    KoinScope<CheckoutFlowScope>(scopeID = "checkout") {
+        NavHost(navController, startDestination = CartRoute) {
+            composable<CartRoute> { CartScreen() }
+            composable<PaymentRoute> { PaymentScreen() }
         }
     }
 }
 
 @Composable
-fun DetailScreen() {
-    // 作用域限於此導航目的地的相依性
-    val repository = koinInject<ScreenRepository>()
-    val viewModel = koinViewModel<ScreenViewModel>()
+fun PaymentScreen() {
+    val state = koinInject<CheckoutState>() // 與 CartScreen 中的 CheckoutState 相同
 }
 ```
 
-**核心特性：**
-- 作用域 ID 源自 `NavBackStackEntry.id`
-- 僅在導航被捨棄時關閉作用域（而非在重組時）
-- 非常適合用於各個螢幕專屬的相依性
+當 `CheckoutFlow` 離開組合時，該作用域會關閉。
 
-:::info
-需要 `koin-compose-viewmodel-navigation` 套件。
+:::note
+在該作用域中宣告的 `viewModel` 仍儲存在目前的 `ViewModelStoreOwner` 中。在 `NavHost` 內，每個目的地都會取得自己的 ViewModel 執行個體。若要跨畫面共用狀態，請透過如 `CheckoutState` 等 `scoped` 物件，或使用 `sharedKoinViewModel()`（請參閱 [Compose 中的 ViewModel](/docs/reference/koin-compose/compose-viewmodel)）。
 :::
 
-### navigationScope DSL {id="navigationscope-dsl"}
+## rememberKoinScope {id="rememberkoinscope"}
 
-在模組中定義導航作用域的相依性：
+`rememberKoinScope(scope)` 將您建立的作用域繫結到組合中，但不會將其提供給子項。當 Composable 離開組合時，該作用域會被關閉：
 
 ```kotlin
+@Composable
+fun FeatureScreen() {
+    val koin = getKoin()
+    val scope = rememberKoinScope(remember { koin.createScope<FeatureScope>("feature") })
+    val repository = koinInject<FeatureRepository>(scope = scope)
+}
+```
+
+## KoinNavigationScope {id="koinnavigationscope"}
+
+`KoinNavigationScope` 會為每個 Navigation Compose 目的地開啟一個作用域。它位於 `io.insert-koin:koin-compose-viewmodel-navigation` 中。
+
+使用 `navigationScope { }` 宣告定義。它會建立一個由 `NavBackStackEntry` 限定的作用域：
+
+```kotlin
+import org.koin.module.dsl.navigationScope
+
 val appModule = module {
-    // 作用域限於導航目的地的相依性
     navigationScope {
-        scoped<ScreenRepository>()
         scoped<ScreenStateHolder>()
         viewModel<ScreenViewModel>()
     }
 }
 ```
 
-這會建立一個由 `NavBackStackEntry` 限定的作用域，供 `KoinNavigationScope()` 使用。
+使用註解或建構函式 DSL 時，請在 DSL 模組中使用相同的 `navigationScope { }` 區塊（在建構函式 DSL 中搭配 `scopedOf(::ScreenStateHolder)`）。此作用域沒有對應的註解。
 
-## UnboundKoinScope {id="unboundkoinscope"}
-
-提供一個不具備生命週期繫結、由外部管理的作用域：
+包裝每個目的地：
 
 ```kotlin
-@Composable
-fun MyFeature(externalScope: Scope) {
-    UnboundKoinScope(scope = externalScope) {
-        // 子項可以存取該作用域
-        val service = koinInject<MyService>()
-        FeatureContent()
+NavHost(navController, startDestination = ListRoute) {
+    composable<ListRoute> { entry ->
+        KoinNavigationScope(entry) {
+            ListScreen() // 擁有自己的 ScreenStateHolder
+        }
     }
-}
-```
-
-:::warning
-**敏感的 API** — 作用域**不會**自動關閉。您必須手動管理作用域生命週期以防止記憶體洩漏。
-:::
-
-**使用案例：**
-- 由外部系統管理的作用域
-- 跨多個可組合項樹共享的作用域
-- 當作用域生命週期與 Composable 生命周期不符時
-
-```kotlin
-@Composable
-fun MyFeature(externalScope: Scope, onClose: () -> Unit) {
-    UnboundKoinScope(scope = externalScope) {
-        FeatureContent()
-
-        // 需要時手動清理
-        DisposableEffect(Unit) {
-            onDispose { onClose() }
+    composable<DetailRoute> { entry ->
+        KoinNavigationScope(entry) {
+            DetailScreen() // 另一個 ScreenStateHolder
         }
     }
 }
 ```
 
-## currentKoinScope {id="currentkoinscope"}
+作用域 id 為 `NavBackStackEntry.id`。當目的地離開組合時，作用域不會被關閉，因此只要該項目保留在返回堆疊中，它就會繼續存活。只有在組合被放棄時，它才會被關閉。
 
-從組合（composition）中獲取目前的 Koin 作用域：
+:::warning
+`KoinNavigationScope` 會在全域 Koin 執行個體（`KoinPlatform.getKoin()`）中建立其作用域，而不是在組合的 Koin 中建立。它在 `KoinIsolatedContext` 內無法運作。
+:::
+
+## UnboundKoinScope {id="unboundkoinscope"}
+
+`UnboundKoinScope` 提供由您自行管理的作用域。Koin 永遠不會關閉它：
 
 ```kotlin
+@OptIn(KoinDelicateAPI::class, KoinExperimentalAPI::class)
 @Composable
-fun MyScreen() {
-    val scope = currentKoinScope()
-
-    // 直接使用作用域
-    val service = scope.get<MyService>()
+fun SessionArea(sessionScope: Scope) {
+    UnboundKoinScope(scope = sessionScope) {
+        SessionContent()
+    }
 }
 ```
 
-這會從 `LocalKoinScopeContext` 檢索作用域。它是 `koinInject()` 使用的預設作用域。
+當作用域的生命週期不遵循 UI 樹時使用它：例如在登入時開啟的使用者工作階段、多個組合根共用的作用域。它被標記為 `@KoinDelicateAPI`：您必須自行呼叫 `scope.close()`，否則該作用域及其執行個體將保留在記憶體中。
 
-## rememberKoinScope {id="rememberkoinscope"}
+## Android 作用域 {id="android-scopes"}
 
-在重組（recomposition）之間記住 Koin 作用域，並具備自動生命週期管理功能：
-
-```kotlin
-@Composable
-fun FeatureScreen() {
-    val scope = rememberKoinScope(scopeOf<FeatureScope>())
-
-    // 使用作用域進行注入
-    val repository = scope.get<FeatureRepository>()
-
-    // 當 FeatureScreen 離開組合時，作用域會關閉
-}
-```
-
-## Android 專屬作用域 {id="android-specific-scopes"}
-
-### KoinActivityScope {id="koinactivityscope"}
-
-將 Activity 作用域提供給可組合項階層結構：
+這些函式位於 `io.insert-koin:koin-androidx-compose`（`KoinActivityScope`、`KoinFragmentScope`）以及 `koin-compose` 的 Android 目標中（`koinActivityInject`）。Activity 或 Fragment 必須實作 `AndroidScopeComponent`。宣告 Activity 與 Fragment 作用域的說明請參閱 [Android 作用域](/docs/reference/koin-android/scope)。
 
 ```kotlin
 class MainActivity : ComponentActivity(), AndroidScopeComponent {
@@ -176,7 +187,6 @@ class MainActivity : ComponentActivity(), AndroidScopeComponent {
         super.onCreate(savedInstanceState)
         setContent {
             KoinActivityScope {
-                // 所有子項皆可存取 Activity 的作用域
                 MainScreen()
             }
         }
@@ -185,168 +195,38 @@ class MainActivity : ComponentActivity(), AndroidScopeComponent {
 
 @Composable
 fun MainScreen() {
-    // 從 Activity 的作用域解析
-    val presenter = koinInject<ActivityPresenter>()
+    val presenter = koinInject<MainPresenter>() // 從 Activity 作用域解析
 }
 ```
 
-### KoinFragmentScope {id="koinfragmentscope"}
+`KoinFragmentScope { }` 在由 Fragment 託管的 `ComposeView` 中執行相同操作。
 
-將 Fragment 作用域提供給可組合項階層結構：
-
-```kotlin
-class MyFragment : Fragment(), AndroidScopeComponent {
-    override val scope: Scope by fragmentScope()
-
-    override fun onCreateView(...): View {
-        return ComposeView(requireContext()).apply {
-            setContent {
-                KoinFragmentScope {
-                    FragmentScreen()
-                }
-            }
-        }
-    }
-}
-```
-
-### koinActivityInject {id="koinactivityinject"}
-
-在任何 Composable 中從 Activity 作用域進行注入：
+`koinActivityInject()` 可在任何層級深度從 Activity 作用域進行解析，不需要包裝區塊：
 
 ```kotlin
-val appModule = module {
-    scope<MainActivity> {
-        scoped<SessionManager>()
-    }
-}
-
 @Composable
 fun DeepNestedScreen() {
-    // 在樹中的任何位置從 Activity 的作用域解析
-    val sessionManager: SessionManager = koinActivityInject()
+    val session: SessionManager = koinActivityInject()
 }
 ```
 
-## 作用域比較 {id="scope-comparison"}
+若 `LocalActivity` 未實作 `AndroidScopeComponent`，它將會失敗。
 
-| API | 生命週期 | 使用案例 |
-|-----|-----------|----------|
-| `KoinScope` | Composable | 自訂作用域的可組合項 |
-| `KoinNavigationScope` | NavBackStackEntry | 各個目的地的作用域 |
-| `UnboundKoinScope` | 手動 | 外部作用域提供者 |
-| `KoinActivityScope` | Activity | Activity 範圍內的相依性 |
-| `KoinFragmentScope` | Fragment | Fragment 範圍內的相依性 |
+## 比較 {id="comparison"}
 
-## 使用案例 {id="use-cases"}
+| API | 作用域生命週期 | 關閉者 |
+|-----|----------------|-----------|
+| `KoinScope` | Composable | Koin，當 Composable 離開組合時 |
+| `rememberKoinScope` | Composable | Koin，當 Composable 離開組合時 |
+| `KoinNavigationScope` | 返回堆疊項目 | Koin，僅當組合被放棄時 |
+| `UnboundKoinScope` | 自行管理 | 使用者自行關閉 |
+| `KoinActivityScope` | Activity | Activity 作用域（`activityScope()`） |
+| `KoinFragmentScope` | Fragment | Fragment 作用域（`fragmentScope()`） |
 
-### 單一螢幕導航作用域 {id="per-screen-navigation-scopes"}
+## 相關內容 {id="related"}
 
-每個螢幕都有自己的作用域：
-
-```kotlin
-val appModule = module {
-    navigationScope {
-        scoped<ScreenStateHolder>()
-        viewModel<ScreenViewModel>()
-    }
-}
-
-NavHost(navController, startDestination = "list") {
-    composable("list") { entry ->
-        KoinNavigationScope(entry) {
-            ListScreen() // 擁有自己的 ScreenStateHolder
-        }
-    }
-    composable("detail/{id}") { entry ->
-        KoinNavigationScope(entry) {
-            DetailScreen() // 擁有自己的 ScreenStateHolder
-        }
-    }
-}
-```
-
-### 工作階段作用域資料 {id="session-scoped-data"}
-
-在一個工作階段內的螢幕之間共享資料：
-
-```kotlin
-val sessionModule = module {
-    scope<UserSession> {
-        scoped { ShoppingCart() }
-        scoped { UserPreferences() }
-    }
-}
-
-@Composable
-fun ShopApp() {
-    KoinScope(scopeOf<UserSession>()) {
-        NavHost(/*...*/) {
-            composable("catalog") { CatalogScreen() }
-            composable("cart") { CartScreen() }
-        }
-    }
-}
-
-@Composable
-fun CartScreen() {
-    // 在工作階段的所有螢幕中共享同一個購物車執行個體
-    val cart = koinInject<ShoppingCart>()
-}
-```
-
-### 共享的 ViewModel 作用域 {id="shared-viewmodel-scope"}
-
-在相關螢幕之間共享一個 ViewModel 及其相依性：
-
-```kotlin
-val appModule = module {
-    scope<CheckoutFlow> {
-        scoped<CheckoutState>()
-        viewModel<CheckoutViewModel>()
-    }
-}
-
-@Composable
-fun CheckoutFlow() {
-    KoinScope(scopeOf<CheckoutFlow>()) {
-        NavHost(/*...*/) {
-            composable("cart") { CartScreen() }
-            composable("shipping") { ShippingScreen() }
-            composable("payment") { PaymentScreen() }
-            composable("confirmation") { ConfirmationScreen() }
-        }
-    }
-}
-
-// 所有螢幕共用同一個 CheckoutViewModel 執行個體
-@Composable
-fun CartScreen() {
-    val viewModel = koinViewModel<CheckoutViewModel>()
-}
-```
-
-## 最佳實務 {id="best-practices"}
-
-1. **針對單一螢幕相依性使用 `KoinNavigationScope`** — 配合導航自動管理生命週期。
-
-2. **優先使用受控作用域而非 `UnboundKoinScope`** — 避免手動清理。
-
-3. **在模組中定義導航作用域** — 比在行內建立作用域更整潔。
-   ```kotlin
-   module {
-       navigationScope {
-           scoped<MyRepository>()
-       }
-   }
-   ```
-
-4. **針對多螢幕流程使用 `KoinScope`** — 例如結帳、新手引導、精靈介面。
-
-5. **結合 ViewModel 處理複雜狀態** — 作用域持有共享狀態，ViewModel 處理 UI 邏輯。
-
-## 後續步驟 {id="next-steps"}
-
-- **[動態模組](/docs/reference/koin-compose/compose-modules)** — 動態載入模組
-- **[Compose 概覽](/docs/reference/koin-compose/compose)** — 設定與基礎注入
-- **[核心作用域](/docs/reference/koin-core/scopes)** — 作用域概念
+- [作用域](/docs/reference/koin-core/scopes)：宣告作用域、連結它們、關閉它們。
+- [Android 作用域](/docs/reference/koin-android/scope)：Activity、Fragment 與 ViewModel 作用域。
+- [Compose 中的 ViewModel](/docs/reference/koin-compose/compose-viewmodel)：跨導覽圖共用 ViewModel。
+- [生命週期與狀態](/docs/reference/koin-compose/compose-lifecycle)：各個 Compose API 釋放的資源以及釋放的時機。
+- [動態模組](/docs/reference/koin-compose/compose-modules)：透過 Composable 載入模組。

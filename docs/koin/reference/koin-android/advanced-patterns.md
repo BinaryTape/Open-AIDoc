@@ -2,221 +2,142 @@
 title: 高级 Android 模式
 ---
 
-本指南涵盖了使用 Koin 的 Android 特有高级依赖项注入模式。
+# 高级 Android 模式
 
-:::info
-有关平台无关的模式（集合、装饰器、泛型类型、循环依赖），请参阅 [定义 (Definitions)](/docs/reference/koin-core/definitions) 和 [模块 (Modules)](/docs/reference/koin-core/modules)。
-:::
+本页面汇总了仅适用于 Android 的模式：按构建类型（build type）或 flavor 选择实现，以及声明需要当前 Activity 的 UI 帮助程序。适用于所有平台的模式（集合、泛型、装饰器、provider）请参阅[高级模式](/docs/reference/koin-core/advanced-patterns)。作用域链接请参阅[作用域](/docs/reference/koin-core/scopes)。
 
-## 单例中的 Android Context {id="android-context-in-singletons"}
+## 按构建变体的实现 {id="implementations-per-build-variant"}
 
-### 避免 Activity 泄漏 {id="avoiding-activity-leaks"}
+### 使用 BuildConfig {id="with-buildconfig"}
 
+在 provider 函数中选择实现：
+
+**编译器插件 DSL**
 ```kotlin
-// ❌ 错误 - Activity 通过单例泄漏
-module {
-    single { SomeService(get<Activity>()) }
-}
+import org.koin.plugin.module.dsl.create
 
-// ✅ 正确 - 使用 Application context
-module {
-    single { SomeService(androidContext()) }
-}
-
-// ✅ 正确 - 对绑定到 Activity 的依赖项使用作用域
-module {
-    activityScope {
-        scoped { ActivityBoundService() }
-    }
-}
-```
-
-### Context 类型 {id="context-types"}
-
-```kotlin
-module {
-    // Application context - 对单例安全
-    single { DatabaseHelper(androidContext()) }
-
-    // Application 实例
-    single { AppConfig(androidApplication()) }
-}
-```
-
-## 使用 BuildConfig 进行条件绑定 {id="conditional-bindings-with-buildconfig"}
-
-### 构建变体 {id="build-variant"}
-
-```kotlin
-fun createLogger(): Logger =
-    if (BuildConfig.DEBUG) DebugLogger() else ReleaseLogger()
-
-val loggingModule = module {
-    single { create(::createLogger) }
-}
-```
-
-或使用注解：
-
-```kotlin
-@Module
-class LoggingModule {
-    @Single
-    fun provideLogger(): Logger =
-        if (BuildConfig.DEBUG) DebugLogger() else ReleaseLogger()
-}
-```
-
-### 分析开关 {id="analytics-toggle"}
-
-```kotlin
-fun createAnalyticsService(): AnalyticsService =
-    if (BuildConfig.ENABLE_ANALYTICS) GoogleAnalytics() else NoOpAnalytics()
+fun analytics(context: Context): Analytics =
+    if (BuildConfig.ENABLE_ANALYTICS) FirebaseAnalyticsTracker(context) else NoOpAnalytics()
 
 val analyticsModule = module {
-    single { create(::createAnalyticsService) }
+    single { create(::analytics) }
 }
 ```
 
-### 功能标志 {id="feature-flags"}
-
+**注解**
 ```kotlin
-@Singleton
-class PaymentProcessor(
-    private val featureFlags: FeatureFlagService,
-    private val newProcessor: NewPaymentProcessor,
-    private val legacyProcessor: LegacyPaymentProcessor
-) {
-    fun process(amount: Double) {
-        if (featureFlags.isEnabled("new_payment_flow")) {
-            newProcessor.process(amount)
-        } else {
-            legacyProcessor.process(amount)
-        }
+@Module
+class AnalyticsModule {
+
+    @Singleton
+    fun analytics(context: Context): Analytics =
+        if (BuildConfig.ENABLE_ANALYTICS) FirebaseAnalyticsTracker(context) else NoOpAnalytics()
+}
+```
+
+**构造函数 / 经典 DSL**
+```kotlin
+val analyticsModule = module {
+    single<Analytics> {
+        if (BuildConfig.ENABLE_ANALYTICS) FirebaseAnalyticsTracker(androidContext()) else NoOpAnalytics()
     }
 }
 ```
 
-## Android Dialog 提供程序 {id="android-dialog-provider"}
+`ENABLE_ANALYTICS` 是按构建类型或 flavor 设置的 `buildConfigField`。`BuildConfig.DEBUG` 的工作方式与之相同。两种实现都会编译到每个变体中；但只会创建其中一个。
 
-为 Android UI 组件创建工厂：
+### 使用源集 {id="with-source-sets"}
+
+为了避免将仅用于调试的代码打包进发布版 APK 中，可以在各个变体源集中声明同名的 Koin 模块：
 
 ```kotlin
-@Factory
+// src/debug/kotlin/com/app/di/VariantModule.kt
+val variantModule = module {
+    single<Logger> { VerboseLogger() }
+    single<NetworkInspector> { ChuckerInspector(androidContext()) }
+}
+```
+
+```kotlin
+// src/release/kotlin/com/app/di/VariantModule.kt
+val variantModule = module {
+    single<Logger> { CrashlyticsLogger() }
+    single<NetworkInspector> { NoOpInspector() }
+}
+```
+
+```kotlin
+// src/main
+startKoin {
+    androidContext(this@MainApplication)
+    modules(appModule, variantModule)
+}
+```
+
+`src/main` 在每次构建时只会看到一个 `variantModule`，因此在两种变体中都能编译通过。每个变体仅包含自身的实现及其依赖库（对于仅用于调试的依赖项，请使用 `debugImplementation`）。
+
+## 需要 Activity 的 UI 帮助程序 {id="ui-helpers-that-need-the-activity"}
+
+某些帮助程序需要的是当前的 Activity，而不是 Application：例如对话框、权限请求，以及任何使用 Activity 主题的组件。使用 Application 上下文构建的 `AlertDialog` 在显示时会失败。请在 Activity 作用域中声明这些帮助程序，在该作用域内 `Context` 会解析为 Activity：
+
+**编译器插件 DSL**
+```kotlin
 class DialogProvider(private val context: Context) {
 
-    fun createConfirmDialog(title: String, onConfirm: () -> Unit): AlertDialog =
+    fun confirm(title: String, onConfirm: () -> Unit): AlertDialog =
         AlertDialog.Builder(context)
             .setTitle(title)
-            .setPositiveButton("OK") { _, _ -> onConfirm() }
-            .create()
-
-    fun createErrorDialog(message: String): AlertDialog =
-        AlertDialog.Builder(context)
-            .setTitle("Error")
-            .setMessage(message)
-            .setPositiveButton("OK", null)
+            .setPositiveButton(android.R.string.ok) { _, _ -> onConfirm() }
             .create()
 }
 
-class MainActivity : AppCompatActivity() {
-    private val dialogProvider: DialogProvider by inject()
-
-    fun showConfirmation() {
-        dialogProvider.createConfirmDialog("Confirm") { /* action */ }.show()
-    }
-}
-```
-
-## 分层作用域 {id="hierarchical-scopes"}
-
-链接 Android 作用域以实现共享访问：
-
-```kotlin
-val appModule = module {
-    single { Database() }
-
-    scope(named("session")) {
-        scoped { UserSession() }
-    }
-
-    scope(named("shopping")) {
-        scoped { ShoppingCart(get()) }
-    }
-}
-
-// 创建并链接作用域
-val sessionScope = getKoin().createScope("user_session", named("session"))
-val shoppingScope = getKoin().createScope("cart", named("shopping"))
-shoppingScope.linkTo(sessionScope)
-
-// 购物车可以从链接的作用域访问 UserSession
-val cart = shoppingScope.get<ShoppingCart>()
-```
-
-## 动态功能注册表 {id="dynamic-feature-registry"}
-
-根据配置构建集合：
-
-```kotlin
-@Singleton
-class FeatureRegistry(private val config: AppConfig) : KoinComponent {
-
-    fun getEnabledFeatures(): List<Feature> {
-        return config.enabledFeatures.mapNotNull { name ->
-            getKoin().getOrNull<Feature>(named(name))
-        }
-    }
-}
-```
-
-## 常见的 Android 陷阱 {id="common-android-pitfalls"}
-
-### 隐藏的循环调用 {id="hidden-circular-calls"}
-
-```kotlin
-// ⚠️ Lazy 隐藏了循环，但在运行时会导致死循环
-class ServiceA : KoinComponent {
-    private val serviceB: ServiceB by inject()
-    fun doA() { serviceB.doB() }
-}
-
-class ServiceB : KoinComponent {
-    private val serviceA: ServiceA by inject()
-    fun doB() { serviceA.doA() }  // 死循环！
-}
-```
-
-### ViewModel 作用域混淆 {id="viewmodel-scope-confusion"}
-
-```kotlin
-// ❌ 错误 - Activity 作用域中的 ViewModel 在屏幕旋转时会丢失状态
-module {
+val uiModule = module {
     activityScope {
-        scoped { UserViewModel(get()) }
+        scoped<DialogProvider>()
     }
 }
+```
 
-// ✅ 正确 - 使用 viewModel 以获得正确的生命周期
-module {
-    viewModel { UserViewModel(get()) }
+**注解**
+```kotlin
+@ActivityScope
+class DialogProvider(private val context: Context) {
+
+    fun confirm(title: String, onConfirm: () -> Unit): AlertDialog =
+        AlertDialog.Builder(context)
+            .setTitle(title)
+            .setPositiveButton(android.R.string.ok) { _, _ -> onConfirm() }
+            .create()
 }
 ```
 
-### 在单例中注入 Activity {id="injecting-activity-in-singleton"}
-
+**构造函数 / 经典 DSL**
 ```kotlin
-// ❌ 内存泄漏 - 单例中的 Activity 引用
-@Singleton
-class ImageLoader(private val activity: Activity)
-
-// ✅ 使用 Application context
-@Singleton
-class ImageLoader(private val context: Context)  // 通过 androidContext() 获取 Application context
+val uiModule = module {
+    activityScope {
+        scopedOf(::DialogProvider)
+    }
+}
 ```
 
-## 下一步 {id="next-steps"}
+```kotlin
+class SettingsActivity : ScopeActivity() {
 
-- **[Android 作用域](/docs/reference/koin-android/scope)** - 生命周期感知作用域
-- **[多模块应用](/docs/reference/koin-android/multi-module)** - 组织 Android 模块
-- **[最佳做法](/docs/reference/koin-android/best-practices)** - 内存管理与迁移
+    private val dialogs: DialogProvider by inject()
+
+    fun onResetClicked() {
+        dialogs.confirm("Reset settings?") { resetSettings() }.show()
+    }
+}
+```
+
+该 Activity 必须拥有作用域（`ScopeActivity` 或 `AndroidScopeComponent`）。如果从没有作用域的 Activity 中请求，将无法找到 `DialogProvider`。作用域会随 Activity 一同关闭，因此该帮助程序的生命周期绝不会超过 Activity。请参阅 [Android 作用域](/docs/reference/koin-android/scope)。
+
+切勿将此类帮助程序声明为 `single`：`single` 会从根作用域解析其依赖项（此时 `Context` 为 Application），而且无论如何它的生命周期都会超出 Activity。
+
+## 相关内容 {id="related"}
+
+- [高级模式](/docs/reference/koin-core/advanced-patterns)：适用于所有平台的集合、泛型、装饰器以及 provider。
+- [Android 作用域](/docs/reference/koin-android/scope)：Activity 和 Fragment 作用域，以及 `Context` 所解析到的目标。
+- [Android 最佳做法](/docs/reference/koin-android/best-practices)：Context 泄漏与内存。
+- [故障排除](/docs/reference/koin-core/troubleshooting)：循环依赖与解析错误。

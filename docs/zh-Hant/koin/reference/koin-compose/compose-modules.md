@@ -2,178 +2,99 @@
 title: 動態模組
 ---
 
-# Compose 中的動態模組
+# 動態模組
 
-Koin 提供的 API 可動態載入與卸載與 Composable 生命週期繫結的模組。這對於功能模組、延遲載入與按需相依性非常有用。
+本頁面介紹 `rememberKoinModules`，它會在 Composable 進入組合（composition）時載入 Koin 模組，並可在其離開時將其卸載。使用它可以僅在特定功能的畫面顯示時才載入該功能的定義。您應事先了解如何宣告[模組](/docs/reference/koin-core/modules)。
+
+`rememberKoinModules` 位於 `io.insert-koin:koin-compose`，並標記為 `@KoinExperimentalAPI`。
 
 ## rememberKoinModules {id="rememberkoinmodules"}
 
-當 Composable 進入組合 (composition) 時載入 Koin 模組：
-
 ```kotlin
-val featureModule = module {
-    factory<FeatureRepository>()
-    viewModel<FeatureViewModel>()
-}
+import org.koin.compose.module.rememberKoinModules
 
-@Composable
-fun FeatureScreen() {
-    // 當此 Composable 進入組合時載入模組
-    rememberKoinModules(featureModule)
-
-    val viewModel = koinViewModel<FeatureViewModel>()
-}
-```
-
-### 多個模組 {id="multiple-modules"}
-
-```kotlin
-@Composable
-fun FeatureScreen() {
-    rememberKoinModules(
-        featureDataModule,
-        featureDomainModule,
-        featureUiModule
-    )
-}
-```
-
-### 卸載模組 {id="unloading-modules"}
-
-控制何時卸載模組：
-
-```kotlin
-@Composable
-fun FeatureScreen() {
-    rememberKoinModules(
-        featureModule,
-        unloadOnForgotten = true,  // 當 Composable 離開時卸載
-        unloadOnAbandoned = true   // 如果組合失敗則卸載
-    )
-}
-```
-
-| 選項 | 觸發時機 |
-|--------|----------------|
-| `unloadOnForgotten` | Composable 從組合中移除 |
-| `unloadOnAbandoned` | 組合失敗或被捨棄 |
-
-## 使用案例 {id="use-cases"}
-
-### 功能模組 {id="feature-modules"}
-
-根據需求載入特定功能的相依性：
-
-```kotlin
-// 位於獨立 Gradle 模組中的功能模組
 val checkoutModule = module {
-    factory<PaymentProcessor>()
     factory<CheckoutRepository>()
     viewModel<CheckoutViewModel>()
 }
 
+@OptIn(KoinExperimentalAPI::class)
 @Composable
 fun CheckoutScreen() {
-    rememberKoinModules(checkoutModule, unloadOnForgotten = true)
+    rememberKoinModules(unloadOnForgotten = true) { listOf(checkoutModule) }
 
     val viewModel = koinViewModel<CheckoutViewModel>()
-    CheckoutContent(viewModel)
 }
 ```
 
-### 延遲功能載入 {id="lazy-feature-loading"}
+Lambda 會傳回要載入的模組。Koin 在首次組合 `CheckoutScreen` 時，會將它們載入到該組合的 Koin 執行個體中。重組（Recomposition）不會再次載入它們。
 
-與導航結合以進行延遲功能載入：
+請在呼叫需要其定義的 `koinInject()` 或 `koinViewModel()` 之前呼叫 `rememberKoinModules`。
+
+## 卸載 {id="unloading"}
+
+預設情況下，在 Composable 離開組合後，模組仍會保持載入狀態。有三個參數可以控制卸載：
+
+| 參數 | 預設值 | 效果 |
+|-----------|---------|--------|
+| `unloadOnForgotten` | `unloadModules` | 當 Composable 離開組合時卸載 |
+| `unloadOnAbandoned` | `unloadModules` | 若組合被放棄時卸載 |
+| `unloadModules` | `false` | 上述兩個參數的預設值 |
 
 ```kotlin
-NavHost(navController, startDestination = "home") {
-    composable("home") {
-        HomeScreen()  // 不需要額外模組
+// 兩種情況下皆卸載
+rememberKoinModules(unloadModules = true) { listOf(checkoutModule) }
+```
+
+卸載會移除定義並捨棄其 `single` 執行個體。仍然持有該執行個體參照的程式碼會保留該參照，但 Koin 無法再解析該型別。請勿卸載其他畫面仍在使用的模組。
+
+## 依目的地載入 {id="loading-per-destination"}
+
+在導覽目的地（navigation destination）中呼叫 `rememberKoinModules`，以便在使用者導覽至該處時載入功能：
+
+```kotlin
+NavHost(navController, startDestination = HomeRoute) {
+    composable<HomeRoute> {
+        HomeScreen()
     }
-    composable("checkout") {
-        // 僅在導航至此處時載入 checkout 模組
-        rememberKoinModules(checkoutModule, unloadOnForgotten = true)
+    composable<CheckoutRoute> {
+        rememberKoinModules(unloadOnForgotten = true) { listOf(checkoutModule) }
         CheckoutScreen()
     }
-    composable("profile") {
-        // 僅在導航至此處時載入 profile 模組
-        rememberKoinModules(profileModule, unloadOnForgotten = true)
-        ProfileScreen()
-    }
 }
 ```
 
-### 偵錯/預覽模組 {id="debug-preview-modules"}
+## 模組樣式 {id="module-styles"}
 
-為預覽切換實作：
-
+**編譯器外掛程式 DSL**
 ```kotlin
-val debugModule = module {
-    single<ApiClient> { MockApiClient() }
-}
-
-@Preview
-@Composable
-fun FeatureScreenPreview() {
-    rememberKoinModules(debugModule)
-    FeatureScreen()
+val checkoutModule = module {
+    factory<CheckoutRepository>()
+    viewModel<CheckoutViewModel>()
 }
 ```
 
-### 條件模組 {id="conditional-modules"}
+**註解**
+`rememberKoinModules` 接受 `Module` 值。帶有 `@Module` 註解的類別會在啟動時透過 `@KoinApplication` 載入（請參閱[模組](/docs/reference/koin-core/modules)）。若要隨需載入某個功能，請使用 DSL 宣告其模組。
 
-根據條件載入模組：
-
+**建構函式 / 傳統 DSL**
 ```kotlin
-@Composable
-fun App(isDebug: Boolean) {
-    if (isDebug) {
-        rememberKoinModules(debugModule)
-    }
-
-    MainScreen()
+val checkoutModule = module {
+    factoryOf(::CheckoutRepository)
+    viewModelOf(::CheckoutViewModel)
 }
 ```
 
-## 搭配延遲模組 (Lazy Modules) {id="with-lazy-modules"}
+## 限制 {id="limits"}
 
-結合 Koin 的延遲模組載入以獲得更好的效能：
+- **主執行緒**：模組是在組合期間同步載入的。龐大的模組會增加該幀的耗時。若要在啟動時於背景載入模組，請參閱 [Lazy Modules](/docs/reference/koin-core/lazy-modules)。
+- **覆寫**：較晚載入的模組會覆寫先前相同型別的定義（請參閱[定義](/docs/reference/koin-core/definitions)）。將其卸載並不會還原先前的定義。
+- **預覽**：`rememberKoinModules` 需要一個正在執行的 Koin 執行個體。對於預覽，請使用 `KoinApplicationPreview`（請參閱 [Compose 測試](/docs/reference/koin-compose/compose-testing)）。
 
-```kotlin
-val featureModule = lazyModule {
-    // 載入模組時才會延遲剖析定義
-    factory<HeavyService>()
-    viewModel<FeatureViewModel>()
-}
+## 相關內容 {id="related"}
 
-@Composable
-fun FeatureScreen() {
-    rememberKoinModules(featureModule, unloadOnForgotten = true)
-
-    val viewModel = koinViewModel<FeatureViewModel>()
-}
-```
-
-## 最佳實務 {id="best-practices"}
-
-1. **使用 `unloadOnForgotten = true`** - 防止記憶體洩漏
-   ```kotlin
-   rememberKoinModules(featureModule, unloadOnForgotten = true)
-   ```
-
-2. **每個功能一個模組** - 保持模組專注且獨立
-
-3. **結合延遲模組** - 適用於具有許多功能的大型應用程式
-   ```kotlin
-   val featureModule = lazyModule { /* ... */ }
-   ```
-
-4. **在導航層級載入** - 在 `NavHost` Composable 中載入模組
-
-5. **避免循環相依性** - 功能模組不應互相依賴
-
-## 後續步驟 {id="next-steps"}
-
-- **[Compose 中的作用域](/docs/reference/koin-compose/compose-scopes)** - 作用域 API
-- **[Compose 總覽](/docs/reference/koin-compose/compose)** - 設定與基礎注入
-- **[獨立上下文](/docs/reference/koin-compose/isolated-context)** - SDK 隔離
+- [模組](/docs/reference/koin-core/modules)：宣告與組合模組。
+- [Lazy Modules](/docs/reference/koin-core/lazy-modules)：在啟動時於背景載入模組。
+- [啟動 Koin](/docs/reference/koin-core/starting-koin)：在 Compose 外部載入與卸載模組。
+- [Compose 中的作用域](/docs/reference/koin-compose/compose-scopes)：繫結至 Composable 的執行個體。
+- [生命週期與狀態](/docs/reference/koin-compose/compose-lifecycle)：各個 Compose API 釋放的內容及其釋放時機。

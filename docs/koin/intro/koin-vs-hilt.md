@@ -1,80 +1,69 @@
 ---
-title: Koin vs Hilt/Dagger
+title: Koin vs Hilt
 ---
 
-# Koin vs Hilt/Dagger
+# Koin vs Hilt
 
-本页面将 Koin 与 Hilt 和 Dagger 进行对比，帮助您了解它们之间的差异，并决定哪种框架更符合您的需求。
+本页面向熟悉其中一种框架并希望了解另一种的 Android 开发者，对 Koin 与 Hilt（以及 Hilt 所基于的 Dagger）进行了对比。内容涵盖各框架如何构建依赖图、代码结构对比以及各自的优势所在。若要将项目从 Hilt 迁移到 Koin，请参阅[从 Hilt 迁移](/docs/reference/koin-android/hilt-migration)。
 
-:::info
-Koin 同时支持 **DSL 与注解 (Annotations)** —— 您可以根据团队偏好进行选择。两者均为一等公民，功能同样强大，且均由同一个编译器插件驱动。为了与 Hilt 进行公平对比，本对比示例使用了注解形式，但 Koin 的 DSL 提供了同等的功能，且模板代码更少。
-:::
+下文中的 Koin 示例使用了注解，因为这种方式最接近 Hilt。同样的定义也可以使用 Koin DSL 编写（请参阅[选择你的风格](/docs/intro/choosing-your-style)）。
 
-## 哲学差异 {id="philosophy-differences"}
+## 各自如何构建依赖图 {id="how-each-one-builds-the-graph"}
 
-| 维度 | Koin | Hilt/Dagger |
-|--------|------|-------------|
-| **学习曲线** | 数分钟即可上手 | 需要数小时或数天才能掌握 |
-| **代码复杂度** | 简单的 DSL 或注解 | 复杂的注解规则 |
-| **调试** | 错误清晰，没有代码生成迷宫 | 生成的代码可能难以跟踪 |
-| **设置** | 一个插件，极简配置 | 多个注解，严格的规则 |
-| **编译时安全** | ✅ 搭配编译器插件 | ✅ 始终支持 |
-| **运行时灵活性** | ✅ 动态功能 | ❌ 仅静态 |
+**Hilt** 在构建时通过注解处理（KSP 或 kapt）生成 Java 源代码形式的依赖图。在应用编译时，每个绑定、组件和作用域均已确定。在运行时，应用会直接调用生成的工厂，无需进行查找。
 
-## 注解对比 {id="annotation-comparison"}
+**Koin** 将依赖图保存在运行时容器中。定义在 Koin 启动时注册，实例在被请求时按类型进行解析。通过 [Koin 编译器插件](/docs/intro/koin-compiler-plugin)，在 `startKoin` 时装配的依赖图也会在构建时进行检查，并且插件会生成构造函数的装配代码。若未使用该插件，缺失的定义将在运行时或在[验证测试](/docs/reference/koin-test/verify)中被发现。
 
-即使是注解，Koin 也更为简洁：
+这种差异解释了下文中的大部分权衡取舍。
 
-| 任务 | Koin | Hilt |
-|------|------|------|
-| **单例 (Singleton)** | `@Singleton class MyService` | `@Singleton class MyService @Inject constructor(...)` |
-| **接口绑定** | 自动 | 需要在抽象模块中使用 `@Binds` |
-| **组件扫描** | `@ComponentScan("package")` | 不支持 |
-| **模块发现** | `@Configuration` - 自动发现 | 每个模块需手动标注 `@InstallIn` |
-| **提供第三方库** | `@Singleton fun provide()` | `@Module` 中的 `@Provides` + `@InstallIn` |
-| **ViewModel** | `@KoinViewModel class MyVM` | `@HiltViewModel class MyVM @Inject constructor` |
+## 一览表 {id="at-a-glance"}
 
-## 代码对比 {id="code-comparison"}
+| 切面 | Koin | Hilt |
+|--------|------|------|
+| 构建依赖图的时机 | 运行时构建，使用编译器插件在构建时检查 | 构建时通过生成代码构建 |
+| 缺失绑定的检测时机 | 使用编译器插件在构建时检测，否则在运行时或测试中检测 | 始终在构建时检测 |
+| 构建工具链 | Kotlin 编译器插件，使用构造函数或经典 DSL 时可选 | KSP 或 kapt，Hilt Gradle 插件 |
+| 支持平台 | Kotlin Multiplatform：Android、iOS、桌面、Web、JVM 服务器 | Android（仅 Dagger 可在 JVM 上运行） |
+| 支持语言 | Kotlin | Java 与 Kotlin |
+| 在运行时加载或卸载模块 | 支持（`loadKoinModules`、`unloadKoinModules`、惰性模块） | 不支持 |
+| 组件层次结构 | 根容器加上你声明的作用域，并提供 Android 作用域原型 | 标准组件的固定层次结构（`SingletonComponent`、`ActivityComponent` 等） |
+| Android 入口点 | 在任意 Activity 或 Fragment 中使用 `by inject()`、`by viewModel()` | 在每个类上使用 `@AndroidEntryPoint` |
+| Jetpack 集成 | 通过 Koin 库集成 ViewModel、WorkManager、Navigation、Compose | 通过 AndroidX Hilt 库集成 ViewModel、WorkManager、Navigation、Compose |
 
-### 简单单例 {id="simple-singleton"}
+## Hilt 的优势所在 {id="where-hilt-is-stronger"}
 
-**Koin：**
+- **构建时拥有完整的图**：Hilt 会生成完整的依赖图，因此每次构建都会对每个模块和作用域中的每个绑定进行验证。Koin 编译器插件仅在入口点验证依赖图，而对于在运行时加载的模块以及独立的库模块，则不在其检查范围内。
+- **无运行时查找**：直接调用生成的工厂。Koin 则通过其容器解析每个请求，每次解析都会产生查找开销，且在启动时需要进行注册操作。
+- **Java 支持**：Dagger 和 Hilt 适用于 Java 代码库。Koin 的 API 是专为 Kotlin 设计的。
+- **生态系统与官方指导**：Hilt 是 Android 官方指南中记录的依赖注入库，许多 AndroidX 库和示例均优先提供 Hilt 集成。
+- **详细的错误信息**：Dagger 错误会显示从入口点到缺失绑定的完整路径。
+
+## Koin 的优势所在 {id="where-koin-is-stronger"}
+
+- **Kotlin Multiplatform**：相同的模块可运行在 Android、iOS、桌面、Web 和 Ktor 服务器上。而 Hilt 仅支持 Android。
+- **运行时灵活性**：模块可以在启动后进行加载、卸载或在后台加载，非常适合功能开关（feature flags）、动态功能（dynamic features）和插件架构。
+- **配置更少**：无需注解处理器，无需生成源文件，无需 `@AndroidEntryPoint`。使用构造函数 DSL 或经典 DSL 时，构建插件是可选的。
+- **声明代码更少**：构造函数无需标注 `@Inject`，且接口可以直接绑定到其实现，无需单独的 `@Binds` 模块。
+- **自由选择风格**：可使用 DSL 或注解，两者亦可混用。
+
+## 代码对比 {id="code-side-by-side"}
+
+### 包含依赖项的类 {id="a-class-with-dependencies"}
+
+Koin：
+
 ```kotlin
 @Singleton
-class MyRepository(val api: ApiService)
-
-@Module
-@ComponentScan("com.app")
-class AppModule
+class UserRepositoryImpl(private val api: ApiService) : UserRepository
 ```
 
-**Hilt：**
+Koin 会将 `UserRepositoryImpl` 绑定到 `UserRepository`，因为前者实现了后者。
+
+Hilt：
+
 ```kotlin
 @Singleton
-class MyRepository @Inject constructor(val api: ApiService)
-
-@Module
-@InstallIn(SingletonComponent::class)
-abstract class AppModule {
-    @Binds
-    abstract fun bindRepository(impl: MyRepository): Repository
-}
-```
-
-### 接口绑定 {id="interface-binding"}
-
-**Koin - 自动绑定：**
-```kotlin
-@Singleton
-class UserRepositoryImpl(val db: Database) : UserRepository
-
-// 就这样！Koin 会自动绑定到 UserRepository 接口
-```
-
-**Hilt - 需要显式绑定：**
-```kotlin
-@Singleton
-class UserRepositoryImpl @Inject constructor(val db: Database) : UserRepository
+class UserRepositoryImpl @Inject constructor(private val api: ApiService) : UserRepository
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -84,277 +73,131 @@ abstract class RepositoryModule {
 }
 ```
 
-### 多模块应用 {id="multi-module-apps"}
+### 第三方类 {id="third-party-classes"}
 
-**Koin - 模块自动发现：**
-```kotlin
-// feature/auth/AuthModule.kt
-@Module
-@ComponentScan
-@Configuration  // 自动发现！
-class AuthModule
+Koin：
 
-// feature/profile/ProfileModule.kt
-@Module
-@ComponentScan
-@Configuration  // 自动发现！
-class ProfileModule
-
-// app/MyApp.kt
-@KoinApplication  // 无需列出模块
-class MyApp
-```
-
-**Hilt - 必须手动安装每个模块：**
-```kotlin
-// feature/auth/AuthModule.kt
-@Module
-@InstallIn(SingletonComponent::class)
-class AuthModule { ... }
-
-// feature/profile/ProfileModule.kt
-@Module
-@InstallIn(SingletonComponent::class)
-class ProfileModule { ... }
-
-// app/MyApp.kt
-@HiltAndroidApp
-class MyApp  // 仍然需要在各处使用正确的 @InstallIn
-```
-
-### ViewModel {id="viewmodel"}
-
-**Koin：**
-```kotlin
-@KoinViewModel
-class UserViewModel(
-    private val repository: UserRepository,
-    private val savedStateHandle: SavedStateHandle
-) : ViewModel()
-
-// 在 Activity/Fragment 中
-val viewModel: UserViewModel by viewModel()
-
-// 在 Compose 中
-val viewModel: UserViewModel = koinViewModel()
-```
-
-**Hilt：**
-```kotlin
-@HiltViewModel
-class UserViewModel @Inject constructor(
-    private val repository: UserRepository,
-    private val savedStateHandle: SavedStateHandle
-) : ViewModel()
-
-// 在 Activity/Fragment 中
-val viewModel: UserViewModel by viewModels()
-
-// 在 Compose 中
-val viewModel: UserViewModel = hiltViewModel()
-```
-
-### 提供第三方库 {id="providing-third-party-libraries"}
-
-**Koin：**
 ```kotlin
 @Module
 class NetworkModule {
     @Singleton
-    fun provideRetrofit(): Retrofit = Retrofit.Builder()
+    fun retrofit(): Retrofit = Retrofit.Builder()
         .baseUrl("https://api.example.com")
         .build()
 
     @Singleton
-    fun provideApi(retrofit: Retrofit): ApiService =
+    fun apiService(retrofit: Retrofit): ApiService =
         retrofit.create(ApiService::class.java)
 }
 ```
 
-**Hilt：**
+Hilt：
+
 ```kotlin
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
     @Provides
     @Singleton
-    fun provideRetrofit(): Retrofit = Retrofit.Builder()
+    fun retrofit(): Retrofit = Retrofit.Builder()
         .baseUrl("https://api.example.com")
         .build()
 
     @Provides
     @Singleton
-    fun provideApi(retrofit: Retrofit): ApiService =
+    fun apiService(retrofit: Retrofit): ApiService =
         retrofit.create(ApiService::class.java)
 }
 ```
 
-## 动态功能：Koin 的独特优势 {id="dynamic-features-koin-s-unique-advantage"}
+两者非常接近。Koin 不需要 `@InstallIn`，因为模块并未绑定到特定组件；它也不需要 `@Provides`，因为函数上的 `@Singleton` 本身就已经声明了定义。
 
-Koin **基于运行时，但具备高性能且编译时安全**。这使其能够提供 Hilt 无法实现的动态功能：
+### ViewModel {id="viewmodel"}
 
-| 动态功能 | Koin | Hilt |
-|-----------------|------|------|
-| 在运行时加载模块 | ✅ `loadKoinModules()` | ❌ 不可能 |
-| 卸载模块 | ✅ `unloadKoinModules()` | ❌ 不可能 |
-| 延迟后台加载 | ✅ `lazyModules()` | ❌ 不可能 |
-| 功能标志注入 | ✅ 简单实现 | ⚠️ 复杂的变通方法 |
-| 插件架构 | ✅ 天然契合 | ❌ 非常困难 |
-| A/B 测试实现 | ✅ 运行时切换 | ⚠️ 仅限编译时 |
-| 动态配置 | ✅ 支持 | ❌ 不支持，必须重新编译 |
-
-### 示例：动态模块加载 {id="example-dynamic-module-loading"}
+Koin：
 
 ```kotlin
-// KOIN - 动态模块加载
-if (userHasPremium) {
-    loadKoinModules(premiumFeatureModule)
-}
+@KoinViewModel
+class UserViewModel(
+    private val repository: UserRepository,
+    private val savedStateHandle: SavedStateHandle,
+) : ViewModel()
 
-// 稍后，如果订阅到期
-unloadKoinModules(premiumFeatureModule)
+// Activity 或 Fragment
+val viewModel: UserViewModel by viewModel()
 
-// 延迟加载以实现更快的启动
-startKoin {
-    modules(coreModule)
-    lazyModules(
-        analyticsModule,  // 在后台加载
-        heavyFeatureModule
-    )
-}
+// Compose
+val viewModel: UserViewModel = koinViewModel()
 ```
 
-**这在 Hilt 中是不可能实现的** —— 所有依赖关系都在编译时固定。
-
-### 示例：功能标志 (Feature Flags) {id="example-feature-flags"}
+Hilt：
 
 ```kotlin
-// KOIN - 在运行时切换实现
-val featureModule = module {
-    if (FeatureFlags.useNewApi) {
-        single<ApiService> { NewApiService() }
-    } else {
-        single<ApiService> { LegacyApiService() }
-    }
-}
+@HiltViewModel
+class UserViewModel @Inject constructor(
+    private val repository: UserRepository,
+    private val savedStateHandle: SavedStateHandle,
+) : ViewModel()
 
-// 或动态地
-fun updateApiImplementation(useNew: Boolean) {
-    unloadKoinModules(apiModule)
-    loadKoinModules(if (useNew) newApiModule else legacyApiModule)
-}
+// 使用 @AndroidEntryPoint 注解的 Activity 或 Fragment
+val viewModel: UserViewModel by viewModels()
+
+// Compose
+val viewModel: UserViewModel = hiltViewModel()
 ```
 
-## 设置对比 {id="setup-comparison"}
+### 多个 Gradle 模块 {id="several-gradle-modules"}
 
-### Koin 设置 {id="koin-setup"}
-
-有关详细说明，请参阅 **[编译器插件设置指南](/docs/setup/compiler-plugin)**。
-
-### Hilt 设置 {id="hilt-setup"}
+Koin：
 
 ```kotlin
-// settings.gradle.kts
-plugins {
-    id("com.google.dagger.hilt.android") version "2.x" apply false
-}
+// feature-auth
+@Module
+@ComponentScan
+@Configuration
+class AuthModule
 
-// app/build.gradle.kts
-plugins {
-    id("com.google.devtools.ksp")
-    id("dagger.hilt.android.plugin")
-}
-
-dependencies {
-    implementation("com.google.dagger:hilt-android:2.x")
-    ksp("com.google.dagger:hilt-compiler:2.x")
-}
+// app
+@KoinApplication
+class MyApp
 ```
 
-## 错误消息 {id="error-messages"}
+Hilt：
 
-### Koin {id="koin"}
+```kotlin
+// feature-auth
+@Module
+@InstallIn(SingletonComponent::class)
+class AuthModule { ... }
 
-```
-org.koin.core.error.NoBeanDefFoundException:
-No definition found for class 'com.app.UserRepository'.
-Check your module definitions.
-```
-
-清晰直观，直接指出问题所在。
-
-### Hilt/Dagger {id="hilt-dagger"}
-
-```
-error: [Dagger/MissingBinding] com.app.UserRepository cannot be provided
-without an @Inject constructor or an @Provides-annotated method.
-com.app.UserRepository is injected at
-    com.app.UserService(repository)
-com.app.UserService is injected at
-    com.app.UserActivity.service
-com.app.UserActivity is injected at
-    dagger.hilt.android.internal.managers.ActivityComponentManager.inject
+// app
+@HiltAndroidApp
+class MyApp : Application()
 ```
 
-较为冗长，需要理解组件图 (component graph)。
+两者都会在类路径（classpath）上发现特性模块：Koin 通过 `@Configuration`，Hilt 通过 `@InstallIn`。在 Koin 中，`@ComponentScan` 还会收集该包下所有带注解的类，因此特性模块通常不需要提供者函数。
 
-## 如何选择 {id="when-to-choose-each"}
-
-### 在以下情况选择 Koin： {id="choose-koin-when"}
-
-- 您重视 **开发效率与简单性**
-- 您需要 **运行时灵活性**（动态模块、功能标志）
-- 您正在构建 **Kotlin 多平台** 应用
-- 您的团队希望 **快速上手**
-- 您更喜欢 **更少的模板代码**
-- 您希望 **更容易调试**
-
-### 在以下情况选择 Hilt： {id="choose-hilt-when"}
-
-- 您的团队 **已经熟悉 Dagger**
-- 您需要与 **Google 优先的生态系统** 保持兼容
-- 您需要 **Dagger 的特定功能**
-
-## 从 Hilt 迁移到 Koin {id="migration-from-hilt-to-koin"}
-
-如果您正在考虑迁移：
-
-### 概念映射 {id="concept-mapping"}
+## 概念映射 {id="concept-mapping"}
 
 | Hilt | Koin |
 |------|------|
-| `@HiltAndroidApp` | `@KoinApplication` 和 `startKoin<T> { }` |
-| `@AndroidEntryPoint` | `by inject()` |
-| `@HiltViewModel` 配合 `by viewModels()` | `@KoinViewModel` 配合 `by viewModel()` |
-| `@Inject constructor` | 直接使用构造函数（自动检测） |
-| `@Binds` | 自动绑定或 `bind` |
-| `@InstallIn(SingletonComponent)` | `@Configuration` |
-| 函数上的 `@Provides` | 函数上的 `@Factory` |
+| `@HiltAndroidApp` | 搭配 `startKoin<MyApp>()` 使用的 `@KoinApplication`，或 `startKoin { }` |
+| `@AndroidEntryPoint` | 不需要：`by inject()` 和 `by viewModel()` 适用于任意 Activity 或 Fragment |
+| `@Inject constructor` | 不需要：构造函数由编译器插件读取 |
+| `@Binds` | 注解方式自动处理，DSL 中为 `bind` |
+| `@Provides` | 函数上的 `@Singleton` 或 `@Factory`，或 DSL 定义 |
+| `@InstallIn(SingletonComponent::class)` | `@Configuration` |
+| `@HiltViewModel` | `@KoinViewModel` |
+| `@Named` | `@Named` |
+| `@ActivityScoped`, `@ViewModelScoped` | `@ActivityScope`, `@ViewModelScope` |
+| `@AssistedInject` | `@InjectedParam` |
 
-### 渐进式迁移 {id="gradual-migration"}
+迁移指南提供了完整的映射、分步流程以及在迁移期间如何并行运行这两个框架的方法：请参阅[从 Hilt 迁移](/docs/reference/koin-android/hilt-migration)。
 
-您可以进行增量迁移：
+## 相关内容 {id="related"}
 
-1. 将 Koin 添加到您的项目中
-2. 每次迁移一个功能模块
-3. 在过渡期间，两个 DI 框架可以共存（Koin 可以通过 `@ComponentScan` 扫描目标包）
-4. 迁移完成后移除 Hilt
-
-请参阅 [从 Hilt 迁移](/docs/migration/from-hilt) 了解详细步骤。
-
-## 总结 {id="summary"}
-
-**Koin：简单且强大**
-
-- 像 Hilt 一样具备 **编译时安全**（配合编译器插件）
-- **DSL 或注解** —— 两者同样强大，任您选择
-- 拥有 Hilt 无法比拟的 **简单性与开发效率**
-- 支持 Hilt 无法实现的 **动态运行时功能**
-
-您不必在安全性与简单性之间做选择。使用 Koin，您可以两者兼得。
-
-## 后续步骤 {id="next-steps"}
-
-- **[什么是 Koin？](/docs/intro/what-is-koin)** —— 进一步了解 Koin
-- **[设置指南](/docs/setup/gradle)** —— 将 Koin 添加到您的项目
-- **[从 Hilt 迁移](/docs/migration/from-hilt)** —— 逐步迁移指南
+- [从 Hilt 迁移](/docs/reference/koin-android/hilt-migration)：分步迁移项目。
+- [JSR-330 兼容性](/docs/reference/koin-android/jsr330)：保留 `javax.inject` 注解。
+- [什么是 Koin？](/docs/intro/what-is-koin)：Koin 的运行时与编译时模型。
+- [编译时安全性](/docs/reference/koin-compiler/compile-safety)：Koin 在构建时检查的内容。
+- [选择你的风格](/docs/intro/choosing-your-style)：DSL 还是注解。

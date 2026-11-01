@@ -1,256 +1,172 @@
 ---
-title: 验证您的 Koin 配置
+title: 验证配置
 ---
 
-Koin 允许您验证您的配置模块，从而避免在运行时发现依赖项注入问题。
+# 验证配置
 
-:::tip 编译时安全性现已推出
-**Koin 编译器插件**现在提供编译时依赖项验证——在构建时捕获缺失的依赖项、限定符不匹配和损坏的调用站点。在大多数情况下，这取代了对 `verify()` 和 `checkModules()` 的需求。
+本页介绍 `verify()`（无需运行即可检查 Koin 配置的测试 API）以及已弃用的 `checkModules()`。此外，本文还会说明这两者与 Koin 编译器插件（Koin Compiler Plugin）的编译时检查之间的关系，以便你了解是否仍然需要它们。你应该已经了解如何编写[使用 Koin 的单元测试](/docs/reference/koin-test/testing)。
 
-请参阅 [编译时安全性](/docs/reference/koin-compiler/compile-safety) 进行迁移。
-:::
+## 你是否仍然需要 verify()？ {id="do-you-still-need-verify"}
 
-## Verify API - 仅限 JVM [3.3+] {id="verify-api-jvm-only-3-3"}
+[Koin 编译器插件](/docs/reference/koin-compiler/compile-safety)会在构建时检查完整的依赖图：缺失的定义、限定符不匹配、作用域错误以及 `get()` / `inject()` 调用站点。当它覆盖你的项目时，`verify()` 测试不会带来任何额外收益，你可以直接将其删除。
 
-在 Koin 模块上使用 `verify()` 扩展函数。在底层，这将验证所有构造函数类，并与 Koin 配置进行交叉检查，以了解是否为该依赖项声明了组件。如果失败，该函数将抛出 `MissingKoinDefinitionException`。
+在以下情况下，你仍然需要 `verify()`：
+
+- 未使用编译器插件：你的项目在不使用该插件的情况下使用 Constructor DSL 或 Classic DSL。（已弃用的注解版 KSP 处理程序拥有自己的 `KOIN_CONFIG_CHECK` 选项。）
+- 依赖图在构建时未知：该插件无法解析使用 `if` / `when` 或可变实参（varargs）构建的模块列表。它会报告 `KOIN-W003` 并跳过对该入口点的检查。
+- 库模块：没有自己的 `startKoin` / `@KoinApplication` 的库或特性模块，在被应用组装之前不会进行缺失依赖检查。库中的 `verify()` 测试可以独立对其进行检查。
+- 延迟模块：你使用[延迟模块](/docs/reference/koin-core/lazy-modules)加载部分依赖图，并希望针对完整配置运行一个测试（参见[同时使用模块与延迟模块](#modules-and-lazy-modules-together)）。
+
+## verify() {id="verify"}
+
+`verify()` 是 `Module` 上的一个扩展，在 `koin-test` 的 JVM 平台上可用。它会读取每个定义类的构造函数，并检查每个形参类型在当前模块或其包含的模块中是否都有对应的定义。它不会运行任何定义，也不需要任何 mock。
 
 ```kotlin
-val niaAppModule = module {
-    includes(
-        jankStatsKoinModule,
-        dataKoinModule,
-        syncWorkerKoinModule,
-        topicKoinModule,
-        authorKoinModule,
-        interestsKoinModule,
-        settingsKoinModule,
-        bookMarksKoinModule,
-        forYouKoinModule
-    )
-    viewModel<MainActivityViewModel>()
+val appModule = module {
+    includes(dataModule, networkModule)
+    viewModel<UserViewModel>()
 }
 ```
 
 ```kotlin
-class NiaAppModuleCheck {
+import org.koin.test.verify.verify
+
+class AppModuleCheck {
 
     @Test
     fun checkKoinModule() {
-        // 验证 Koin 配置
-        niaAppModule.verify()
+        appModule.verify()
     }
 }
 ```
 
-启动 JUnit 测试，大功告成！
+如果缺失依赖，`verify()` 会抛出 `MissingKoinDefinitionException` 并输出修复建议。如果两个构造函数之间存在循环依赖，它会抛出 `CircularInjectionException`。
 
-`verify()` API 运行起来非常轻巧，不需要任何类型的 mock/存根即可在您的配置上运行。
+要检查多个未通过 `includes()` 链接的模块，请使用 `listOf(dataModule, uiModule).verifyAll()`。
 
-### 使用注入形参进行验证 [4.0+] {id="verifying-with-injected-parameters-4-0"}
+### verify() 接受的内容 {id="what-verify-accepts"}
 
-当您的配置涉及使用 `parametersOf` 注入对象时，验证将失败，因为您的配置中没有该形参类型的定义。
-但是，您可以定义一个形参类型，以便通过给定的定义 `definition<Type>(Class1::class, Class2::class ...)` 进行注入。
+构造函数形参在满足以下条件时会通过检查：
+
+- 已声明：模块树中存在该类型的定义。
+- 可选：形参具有默认值。如果不存在定义，`verify()` 会输出一条警告。
+- 已包装：类型为 `Lazy<T>` 或 `List<T>`，且其 `T` 已声明。
+- 白名单：其类型包含在 `extraTypes` 中，或者是基本类型（`String`、`Int`、`Long`、`Double`）。
+- 注入或提供：形参带有 `@InjectedParam` 或 `@Provided` 注解，或者通过 `injections` 进行了声明。
+
+`verify()` 仅读取构造函数。它不会检查限定符、属性或写在定义 lambda 表达式内部的 `get()` 调用。
+
+### 运行时提供的类型 {id="types-provided-at-runtime"}
+
+某些类型永远不会在模块中声明：例如框架对象或由平台创建的值。可以将它们添加到 `extraTypes` 中：
 
 ```kotlin
-class ModuleCheck {
+appModule.verify(
+    extraTypes = listOf(HttpClientEngine::class, Clock::class)
+)
+```
 
-    // 给定一个带有注入定义的定义
-    val module = module {
-        single { (a: Simple.ComponentA) -> Simple.ComponentB(a) }
-    }
+在 Android 上，可以使用来自 `koin-android-test` 的 `androidVerify()`。它会为你自动添加 `Context`、`Activity`、`Fragment`、`Application`、`SavedStateHandle` 和 `WorkerParameters`：
 
-    @Test
-    fun checkKoinModule() {
+```kotlin
+import org.koin.android.test.verify.androidVerify
 
-        // 验证并声明注入形参
-        module.verify(
-            injections = injectedParameters(
-                definition<Simple.ComponentB>(Simple.ComponentA::class)
-            )
-        )
-    }
+@Test
+fun checkKoinModule() {
+    appModule.androidVerify()
 }
 ```
 
-### 类型白名单 {id="type-white-listing"}
+### 注入的形参 {id="injected-parameters"}
 
-我们可以将类型添加为“白名单”。这意味着该类型被认为存在于系统中，可用于任何定义：
-
-```kotlin
-class NiaAppModuleCheck {
-
-    @Test
-    fun checkKoinModule() {
-
-        // 验证 Koin 配置
-        niaAppModule.verify(
-            // 列出定义中使用的但未直接声明的类型（如形参注入）
-            extraTypes = listOf(MyType::class ...)
-        )
-    }
-}
-```
-
-### 使用注解进行验证 {id="using-annotations-for-verification"}
-
-来自 `koin-core-annotations` 的注解可以帮助 Koin 推断注入契约并验证配置。相比复杂的 DSL 配置，这有助于识别这些元素：
+通过 `parametersOf()` 传递的形参没有定义，因此 `verify()` 会将其报告为缺失。可以通过 `injections` 声明它：
 
 ```kotlin
-// 表示 "a" 是一个注入形参
-class ComponentB(@InjectedParam val a: ComponentA)
-// 表示 "a" 是动态提供的
-class ComponentBProvided(@Provided val a: ComponentA)
-```
+class UserPresenter(val userId: String, val repository: UserRepository)
 
-这有助于防止在测试或运行时出现微妙的问题，而无需编写自定义验证逻辑。
-
----
-
-## CheckModules API（已弃用） {id="checkmodules-api-deprecated"}
-
-:::warning
-`checkModules()` API 自 Koin 4.0 起已弃用。请改用 `verify()`，或迁移到 Koin 编译器插件以获得编译时安全性。
-:::
-
-`checkModules()` 函数会启动您的模块并尝试运行每个可能的定义。
-
-```kotlin
-class CheckModulesTest : KoinTest {
-
-    @Test
-    fun verifyKoinApp() {
-
-        koinApplication {
-            modules(module1, module2)
-            checkModules()
-        }
-    }
-}
-```
-
-或者使用 `checkKoinModules`：
-
-```kotlin
-class CheckModulesTest : KoinTest {
-
-    @Test
-    fun verifyKoinApp() {
-        checkKoinModules(listOf(module1, module2))
-    }
-}
-```
-
-### CheckModule DSL {id="checkmodule-dsl"}
-
-对于任何使用注入形参、属性或动态实例的定义：
-
-* `withInstance(value)` - 将 `value` 实例添加到 Koin 图中
-* `withInstance<MyType>()` - 将添加 `MyType` 的 mock 实例（需要 `MockProviderRule`）
-* `withParameter<Type>(qualifier){ qualifier -> value }` - 将添加要作为形参注入的 `value` 实例
-* `withProperty(key, value)` - 向 Koin 添加属性
-
-### 使用 JUnit 规则进行 Mocking {id="mocking-with-a-junit-rule"}
-
-要在 `checkModules` 中使用 mock，请提供一个 `MockProviderRule`：
-
-```kotlin
-@get:Rule
-val mockProvider = MockProviderRule.create { clazz ->
-    // 在此处根据给定的 clazz 使用您的框架进行 Mock
-    Mockito.mock(clazz.java)
-}
-```
-
-### 验证具有动态行为的模块 {id="verifying-modules-with-dynamic-behavior"}
-
-```kotlin
-val myModule = module {
-    factory { (id: String) -> FactoryPresenter(id) }
-}
-```
-
-验证方式：
-
-```kotlin
-class CheckModulesTest : KoinTest {
-
-    @Test
-    fun verifyKoinApp() {
-
-        koinApplication {
-            modules(myModule)
-            checkModules(){
-                // 要添加到 Koin 的值，由定义使用
-                withInstance("_my_id_value")
-            }
-        }
-    }
-}
-```
-
-### Android 示例 {id="android-example"}
-
-```kotlin
-class CheckModulesTest {
-
-    @get:Rule
-    val rule: TestRule = InstantTaskExecutorRule()
-
-    @get:Rule
-    val mockProvider = MockProviderRule.create { clazz ->
-        Mockito.mock(clazz.java)
-    }
-
-    @Test
-    fun `test DI modules`(){
-        checkKoinModules(allModules) {
-            withInstance<Context>()
-            withInstance<Application>()
-            withInstance<SavedStateHandle>()
-            withInstance<WorkerParameters>()
-        }
-    }
-}
-```
-
-### 提供作用域链接 {id="providing-scope-links"}
-
-使用 `withScopeLink` 链接作用域：
-
-```kotlin
-val myModule = module {
-    scope(named("scope1")) {
-        scoped { ComponentA() }
-    }
-    scope(named("scope2")) {
-        scoped { ComponentB(get()) }
-    }
+val presenterModule = module {
+    factory { (userId: String) -> UserPresenter(userId, get()) }
 }
 
 @Test
-fun `test DI modules`(){
-    koinApplication {
-        modules(myModule)
-        checkModules(){
-            withScopeLink(named("scope2"), named("scope1"))
-        }
-    }
+fun checkKoinModule() {
+    presenterModule.verify(
+        injections = injectedParameters(
+            definition<UserPresenter>(String::class)
+        )
+    )
 }
 ```
 
----
+或者为构造函数形参添加注解。`@InjectedParam` 用于标记通过 `parametersOf()` 传递的值，`@Provided` 用于标记在 Koin 模块外部提供的类型：
 
-## 迁移到编译时安全性 {id="migration-to-compile-time-safety"}
+```kotlin
+class UserPresenter(@InjectedParam val userId: String, val repository: UserRepository)
 
-Koin 编译器插件现在提供编译时依赖项验证，取代了对运行时验证的需求：
+class SyncWorker(@Provided val params: WorkerParameters, val repository: UserRepository)
+```
 
-| 之前 | 之后 |
-|--------|-------|
-| 测试中的 `module.verify()` | 编译器插件（自动） |
-| 测试中的 `checkModules()` | 编译器插件（自动） |
-| 运行时验证 | 编译时验证 |
-| 手动测试设置 | 不需要测试代码 |
+这两个注解都来自 `koin-core-annotations`，并且与编译器插件读取的注解相同（参见[注入的形参](/docs/reference/koin-core/injection-parameters)）。
 
-编译器在每次构建时进行验证——不需要测试代码。在启用编译器插件后，您可以安全地移除 `verify()` 和 `checkModules()` 测试。
+### 同时使用模块与延迟模块 {id="modules-and-lazy-modules-together"}
 
-请参阅 [编译时安全性](/docs/reference/koin-compiler/compile-safety) 了解完整详情，并参阅 [编译器插件设置](/docs/setup/compiler-plugin) 了解设置说明。
+`koin-test-coroutines` 在 `ModuleConfiguration` 上添加了 `verify()`，可将常规模块和[延迟模块](/docs/reference/koin-core/lazy-modules)作为一个整体依赖图进行检查：
+
+```kotlin
+val configuration = moduleConfiguration {
+    modules(coreModule)
+    lazyModules(featureModule)
+}
+
+@Test
+fun checkConfiguration() {
+    configuration.verify()
+}
+```
+
+`moduleConfiguration` 以及该 `verify()` 是实验性功能（`@KoinExperimentalAPI`）。
+
+## checkModules()（已弃用） {id="checkmodules-deprecated"}
+
+:::warning
+`checkModules()`、`checkKoinModules()` 及其 DSL 已弃用。请迁移到 `verify()` 或编译器插件。
+:::
+
+与 `verify()` 不同，`checkModules()` 会启动模块并创建每个定义，因此它需要为运行时解析的所有内容提供值。你可能会在较旧的项目中看到它：
+
+```kotlin
+@Test
+fun checkAllModules() {
+    koinApplication {
+        modules(appModule)
+        checkModules {
+            withInstance<Context>()
+            withParameter<UserPresenter> { "user-1" }
+            withProperty("api_url", "http://localhost")
+        }
+    }
+}
+
+// or
+@Test
+fun checkAllModules() {
+    checkKoinModules(listOf(appModule))
+}
+```
+
+检查 DSL：
+
+- `withInstance(value)`：将 `value` 添加到依赖图中。`withInstance<T>()` 会添加 `T` 的 mock，并且需要 `MockProviderRule`（参见[使用 declareMock 进行 Mock](/docs/reference/koin-test/testing#mocking-with-declaremock)）。
+- `withParameter<T> { value }`：用于创建 `T` 的注入形参。多个形参请使用 `withParameters<T> { parametersOf(a, b) }`。
+- `withProperty(key, value)`：添加一个 Koin 属性。
+- `withScopeLink(scope, targetScope)`：为检查[链接](/docs/reference/koin-core/scopes)两个作用域。
+
+迁移到 `verify()` 的方法：针对框架类型移除 `withInstance`（使用 `extraTypes` 或 `androidVerify()`），并将 `withParameter` 替换为 `injections` 或 `@InjectedParam`。
+
+## 相关内容 {id="related"}
+
+- [编译时安全性](/docs/reference/koin-compiler/compile-safety)：编译器插件在构建时检查的内容。
+- [单元测试](/docs/reference/koin-test/testing)：在测试中启动 Koin、重写和 mock 定义。
+- [注入的形参](/docs/reference/koin-core/injection-parameters)：`parametersOf` 与 `@InjectedParam`。
+- [延迟模块](/docs/reference/koin-core/lazy-modules)：在后台加载部分依赖图。
+- [故障排除](/docs/reference/koin-core/troubleshooting)：例如 `NoDefinitionFoundException` 等运行时错误。

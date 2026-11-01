@@ -1,28 +1,30 @@
 [//]: # (title: 排序)
 
-元素的顺序是某些集合类型的重要方面。例如，如果两个包含相同元素的列表顺序不同，则它们不相等。
+元素的顺序是某些集合类型的重要特征。
+例如，如果两个列表包含相同的元素，但元素的排序不同，则这两个列表不相等。
 
-在 Kotlin 中，可以通过几种方式定义对象的顺序。
+在 Kotlin 中，可以通过多种方式定义对象的顺序。
 
-首先是 *自然* 顺序。它是为 [`Comparable`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-comparable/index.html) 接口的实现定义的。当没有指定其他顺序时，自然顺序用于对它们进行排序。
+首先是*自然顺序*（natural order）。它是为 [`Comparable`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-comparable/index.html) 接口的实现所定义的。在未指定其他顺序时，自然顺序用于对它们进行排序。
 
 大多数内置类型都是可比较的：
 
-* 数值类型使用传统的数值顺序：`1` 大于 `0`；`-3.4f` 大于 `-5f`，依此类推。
-* `Char` 和 `String` 使用 [字典顺序](https://en.wikipedia.org/wiki/Lexicographical_order)：`b` 大于 `a`；`world` 大于 `hello`。
+* 数字类型使用传统的数值顺序：`1` 大于 `0`；`-3.4f` 大于 `-5f`，依此类推。
+* `Char` 与 `String` 使用[字典顺序](https://en.wikipedia.org/wiki/Lexicographical_order)：`b` 大于 `a`；`world` 大于 `hello`。
 
-要为用户定义类型定义自然顺序，请使该类型实现 `Comparable`。这需要实现 `compareTo()` 函数。`compareTo()` 必须接受另一个相同类型的对象作为实参，并返回一个整数值来显示哪个对象更大：
+要为用户定义类型定义自然顺序，请让该类型实现 `Comparable` 接口。
+这需要实现 `compareTo()` 函数。`compareTo()` 必须接受另一个相同类型的对象作为实参，并返回一个整数值以指示哪个对象更大：
 
 * 正值表示接收者对象更大。
 * 负值表示它小于实参。
 * 零表示对象相等。
 
-下面是一个用于对由主版本（major）和次版本（minor）组成的版本号进行排序的类。
+以下是一个用于对由主要部分和次要部分组成版本进行排序的类。
 
 ```kotlin
 class Version(val major: Int, val minor: Int): Comparable<Version> {
     override fun compareTo(other: Version): Int = when {
-        this.major != other.major -> this.major compareTo other.major // 中缀形式的 compareTo() 
+        this.major != other.major -> this.major compareTo other.major // 中缀形式的 compareTo()
         this.minor != other.minor -> this.minor compareTo other.minor
         else -> 0
     }
@@ -35,7 +37,11 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.6"}
 
-*自定义* 顺序允许您以自己喜欢的方式对任何类型的实例进行排序。特别是，您可以为不可比较的对象定义顺序，或者为可比较类型定义非自然顺序。要为类型定义自定义顺序，请为其创建一个 [`Comparator`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-comparator/index.html)。`Comparator` 包含 `compare()` 函数：它接受一个类的两个实例，并返回它们之间比较的整数结果。结果的解释方式与上述 `compareTo()` 的结果相同。 
+*自定义*顺序允许你按照喜欢的方式对任意类型的实例进行排序。
+特别是，你可以为不可比较的对象定义顺序，或者为可比较类型定义自然顺序之外的顺序。
+要为某种类型定义自定义顺序，请为其创建一个 [`Comparator`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-comparator/index.html)。
+`Comparator` 包含 `compare()` 函数：它接受一个类的两个实例，并返回它们之间比较的整数结果。
+该结果的解释方式与上述 `compareTo()` 的结果相同。
 
 ```kotlin
 fun main() {
@@ -45,13 +51,13 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-有了 `lengthComparator`，您就能够按照字符串的长度而不是默认的字典顺序来排列它们。
+有了 `lengthComparator`，你就可以根据字符串的长度对其进行排列，而不是使用默认的字典顺序。
 
-定义 `Comparator` 的一种更简便的方法是使用标准库中的 [`compareBy()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.comparisons/compare-by.html) 函数。`compareBy()` 接受一个 lambda函数，该函数从实例中生成一个 `Comparable` 值，并将自定义顺序定义为生成值的自然顺序。
+定义 `Comparator` 的一种更简短的方法是使用标准库中的 [`compareBy()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.comparisons/compare-by.html) 函数。`compareBy()` 接受一个从实例生成 `Comparable` 值的 lambda 函数，并将自定义顺序定义为所生成值的自然顺序。
 
-使用 `compareBy()`，上述示例中的长度比较器如下所示：
+使用 `compareBy()` 时，上述示例中的长度比较器如下所示：
 
 ```kotlin
 fun main() {
@@ -60,9 +66,10 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-您还可以根据多个标准定义顺序。例如，要按长度对字符串进行排序，并在长度相等时按字母顺序排序，可以这样写：
+你还可以基于多个条件定义顺序。
+例如，若要按字符串长度排序，并在长度相同时按字母顺序排序，可以编写：
 
 ```kotlin
 fun main() {
@@ -80,11 +87,11 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-由于按多个标准排序是一种常见场景，Kotlin 标准库提供了 [`.thenBy()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.comparisons/then-by.html) 函数，您可以使用它来添加次要排序规则。
+由于按多个条件排序是一个常见场景，Kotlin 标准库提供了 [`.thenBy()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.comparisons/then-by.html) 函数，可用于添加次要排序规则。
 
-例如，您可以将 `compareBy()` 与 `.thenBy()` 结合使用，先按长度对字符串进行排序，然后再按字母顺序排序，就像前面的示例一样：
+例如，你可以将 `compareBy()` 与 `.thenBy()` 结合使用，先按字符串长度排序，再按字母顺序排序，就像前面的示例一样：
 
 ```kotlin
 fun main() {
@@ -97,13 +104,17 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-Kotlin 集合软件包提供了按自然、自定义甚至随机顺序对集合进行排序的函数。在此页面上，我们将介绍适用于 [只读](collections-overview.md#collection-types) 集合的排序函数。这些函数将其结果作为包含原始集合元素的新集合返回，并按要求的顺序排列。要了解有关对 [可变](collections-overview.md#collection-types) 集合进行原地排序的函数，请参阅 [List 特有操作](list-operations.md#sort)。
+Kotlin 集合包提供了用于按自然顺序、自定义顺序甚至随机顺序对集合进行排序的函数。
+在本页面中，我们将介绍适用于[只读](collections-overview.md#collection-types)集合的排序函数。
+这些函数将其结果作为新集合返回，其中包含按所请求顺序排列的原始集合元素。
+要了解用于就地对[可变](collections-overview.md#collection-types)集合进行排序的函数，请参阅 [List 专属操作](list-operations.md#sort)。
 
 ## 自然顺序 {id="natural-order"}
 
-基础函数 [`.sorted()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/sorted.html) 和 [`.sortedDescending()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/sorted-descending.html) 返回按其自然顺序升序和降序排列的集合元素。这些函数适用于 `Comparable` 元素的集合。
+基本函数 [`.sorted()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/sorted.html) 和 [`.sortedDescending()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/sorted-descending.html) 会根据集合元素的自然顺序，返回按升序和降序排列的元素序列。
+这些函数适用于 `Comparable` 元素的集合。
 
 ```kotlin
 fun main() {
@@ -115,11 +126,12 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
 ## 自定义顺序 {id="custom-orders"}
  
-对于按自定义顺序排序或对不可比较对象进行排序，可以使用函数 [`.sortedBy()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/sorted-by.html) 和 [`.sortedByDescending()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/sorted-by-descending.html)。它们接受一个选择器函数，该函数将集合元素映射到 `Comparable` 值，并按这些值的自然顺序对集合进行排序。
+对于按自定义顺序排序或对不可比较的对象排序，提供了 [`.sortedBy()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/sorted-by.html) 和 [`.sortedByDescending()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/sorted-by-descending.html) 函数。
+它们接受一个将集合元素映射为 `Comparable` 值的选择器函数，并按这些值的自然顺序对集合进行排序。
 
 ```kotlin
 fun main() {
@@ -133,9 +145,11 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-要为集合排序定义自定义顺序，您可以提供自己的 `Comparator`。为此，请调用 [`.sortedWith()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/sorted-with.html) 扩展函数并传入您的 `Comparator`。使用此函数，按字符串长度排序如下所示：
+要为集合排序定义自定义顺序，可以提供自己的 `Comparator`。
+为此，请调用 [`.sortedWith()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/sorted-with.html) 扩展函数并传入你的 `Comparator`。
+使用此函数，按长度对字符串排序如下所示：
 
 ```kotlin
 fun main() {
@@ -145,11 +159,11 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
 ## 检查排序顺序 {id="check-sorted-order"}
 
-您可以使用以下扩展函数来检查元素是否已遵循指定的顺序：
+你可以使用以下扩展函数来检查元素是否已经遵循指定的顺序：
 
 * `.isSorted()`
 * `.isSortedDescending()`
@@ -157,19 +171,25 @@ fun main() {
 * `.isSortedBy(selector)`
 * `.isSortedByDescending(selector)`
 
-如果元素按指定顺序排列或者元素少于两个，这些扩展函数将返回 `true`。一旦发现乱序对，它们将返回 `false` 并停止检查。
+如果元素按指定顺序排列或元素少于两个，这些扩展函数将返回 `true`。
+一旦发现无序对，它们就会停止检查并返回 `false`。
 
-对于没有保证迭代顺序的集合（例如 `HashSet`），结果在不同调用之间可能会有所不同。这同样适用于不产生一致顺序元素的序列。要使不同调用的结果相同，请仅在具有保证迭代顺序的集合（如 `List`）上使用这些函数。
+对于不保证迭代顺序的集合（例如 `HashSet`），不同调用之间的结果可能会有所不同。
+这同样适用于不按一致顺序生成元素的序列。
+若要在各次调用中获得相同的结果，请仅在具有保证迭代顺序的集合（如 `List`）上使用这些函数。
 
-在检查 `Double` 和 `Float` 值时，这些函数将 `NaN` 视为大于任何其他值，并将 `-0.0` 视为小于 `0.0`。此外，`.isSortedBy()` 和 `.isSortedByDescending()` 函数将 `null` 选择器结果视为小于任何非 null 值。
+在检查 `Double` 和 `Float` 值时，这些函数将 `NaN` 视为大于任何其他值，将 `-0.0` 视为小于 `0.0`。
+此外，`.isSortedBy()` 和 `.isSortedByDescending()` 函数将 `null` 选择器结果视为小于任何非 null 值。
 
-当您在序列上调用这些函数时，该操作是终端操作。它会消耗序列以生成 `Boolean` 值，而不是返回另一个序列。
+当你在序列上调用这些函数时，该操作是终端操作。
+它会消费该序列以生成一个 `Boolean` 值，而不是返回另一个序列。
 
-> 这些排序顺序函数也适用于数组、原始类型数组和无符号数组。无符号数组及其操作是[实验性功能](components-stability.md#stability-levels-explained)，需要使用 `@ExperimentalUnsignedTypes` 注解进行启用。
+> 这些排序顺序函数也可用于数组、基本类型数组和无符号数组。
+> 无符号数组及其操作是[实验性的](components-stability.md#stability-levels-explained)，需要使用 `@ExperimentalUnsignedTypes` 注解进行选择加入。
 > 
 {style="note"}
 
-下面是使用 `.isSorted()` 和 `.isSortedBy()` 函数检查排序顺序的示例：
+以下是使用 `.isSorted()` 和 `.isSortedBy()` 函数检查排序顺序的示例：
 
 ```kotlin
 data class User(val name: String, val age: Int)
@@ -197,9 +217,9 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="2.4"}
 
-## 反转顺序 {id="reverse-order"}
+## 倒序 {id="reverse-order"}
 
-您可以使用 [`.reversed()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/reversed.html) 函数以反转顺序获取集合。 
+你可以使用 [`.reversed()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/reversed.html) 函数获取按倒序排列的集合。
 
 ```kotlin
 fun main() {
@@ -209,11 +229,12 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-`.reversed()` 扩展函数返回一个包含元素副本的新集合。因此，如果您以后更改原始集合，这不会影响之前获得的 `.reversed()` 结果。
+`.reversed()` 扩展函数返回一个包含元素副本的新集合。
+因此，如果你稍后更改原始集合，这不会影响先前获取的 `.reversed()` 结果。
 
-另一个反转函数 —— [`.asReversed()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/as-reversed.html) —— 返回同一集合实例的反转视图，因此如果原始列表不会改变，它可能比 `.reversed()` 更轻量且更受青睐。 
+另一个反转函数——[`.asReversed()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/as-reversed.html)——返回同一个集合实例的反转视图，因此如果原始列表不会改变，它可能比 `.reversed()` 更轻量且更优先选择。
 
 ```kotlin
 fun main() {
@@ -224,9 +245,9 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-如果原始列表是可变的，则其所有更改都会反映在其反转视图中，反之亦然。
+如果原始列表是可变的，其所有更改都会反映在它的反转视图中，反之亦然。
 
 ```kotlin
 fun main() {
@@ -239,13 +260,14 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-然而，如果列表的可变性未知或者源代码根本不是列表，则 `.reversed()` 更为合适，因为其结果是一个在未来不会改变的副本。
+但是，如果列表的可变性未知，或者源根本不是列表，则 `.reversed()` 更为合适，因为它的结果是一个将来不会改变的副本。
 
 ## 随机顺序 {id="random-order"}
 
-最后，还有一个函数可以返回一个包含按随机顺序排列的集合元素的新 `List` —— [`.shuffled()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/shuffled.html)。您可以不带参数调用它，也可以传入一个 [`Random`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.random/-random/index.html) 对象。
+最后，还有一个函数可以返回一个新的 `List`，其中包含按随机顺序排列的集合元素——[`.shuffled()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/shuffled.html)。
+你可以不带实参调用它，也可以传入一个 [`Random`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.random/-random/index.html) 对象。
 
 ```kotlin
 fun main() {
@@ -255,4 +277,4 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}

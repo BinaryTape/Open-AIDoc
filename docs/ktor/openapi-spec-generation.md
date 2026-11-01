@@ -4,11 +4,12 @@
 <secondary-label ref="server-feature"/>
 
 <var name="artifact_name" value="ktor-server-routing-openapi"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.server.routingOpenapi"/>
 <var name="package_name" value="io.ktor.server.routing.openapi"/>
 
 <tldr>
 <p>
-<b>必要依赖项</b>：<code>io.ktor:%artifact_name%</code>
+<b>必需依赖项</b>：<code>io.ktor:%artifact_name%</code>
 </p>
 <p>
 <b>代码示例</b>：
@@ -23,19 +24,19 @@
 
 Ktor 支持在运行时从一个或多个文档源构建 OpenAPI 规范。
 
-该功能通过以下方式提供：
-* **OpenAPI 编译器扩展**（包含在 Ktor Gradle 插件中）：在编译时分析路由代码，并生成在运行时注册 OpenAPI 元数据的 Kotlin 代码。
-* **路由注解运行时 API**：在运行中的应用程序中将 OpenAPI 元数据直接附加到路由。
+此功能可通过以下方式提供：
+* OpenAPI 编译器扩展程序（包含在 Ktor Gradle 插件中），它在编译时分析路由代码，并生成在运行时注册 OpenAPI 元数据的 Kotlin 代码。
+* 路由注解运行时 API，它在运行中的应用程序中直接将 OpenAPI 元数据附加到路由。
 
-您可以单独使用其中之一，也可以两者结合使用，并配合 [OpenAPI](server-openapi.md) 和 [SwaggerUI](server-swagger-ui.md) 插件来提供交互式 API 文档。
+你可以使用其中之一或两者兼顾，并将其与 [OpenAPI](server-openapi.md) 和 [SwaggerUI](server-swagger-ui.md) 插件结合使用，以提供交互式 API 文档服务。
 
-> OpenAPI Gradle 扩展需要 Kotlin 2.2.20。使用其他版本可能会导致编译错误。
+> OpenAPI Gradle 扩展程序需要 Kotlin 2.2.20。使用其他版本可能会导致编译错误。
 >
 {style="note"}
 
 ## 添加依赖项 {id="add-dependencies"}
 
-* 要启用 OpenAPI 元数据生成，请在您的项目中应用 Ktor 编译器插件。
+* 要启用 OpenAPI 元数据生成，请将 Ktor 编译器插件应用于你的项目。
 
   <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin" id="add-ktor-plugin-gradle-kotlin">
@@ -58,9 +59,9 @@ Ktor 支持在运行时从一个或多个文档源构建 OpenAPI 规范。
     </TabItem>
     <TabItem title="Maven" group-key="maven" id="add-ktor-plugin-maven">
 
-    与 Gradle 不同，Maven 不提供对 Ktor 编译器插件的内置集成。要启用 OpenAPI 规范生成，您需要手动配置编译器插件。
+    与 Gradle 不同，Maven 未针对 Ktor 编译器插件提供内置集成。要启用 OpenAPI 规范生成，你需要手动配置编译器插件。
 
-    1. 应用 Ktor Maven 插件（运行和打包您的应用程序所需）：
+    1. 应用 Ktor Maven 插件（运行和打包应用程序所必需）：
        ```xml
        <build>
            <plugins>
@@ -72,7 +73,7 @@ Ktor 支持在运行时从一个或多个文档源构建 OpenAPI 规范。
            </plugins>
        </build>
        ```
-    2. 编译器插件必须以 JAR 文件形式可用。添加以下配置以自动下载并将其复制到稳定的位置：
+    2. 编译器插件必须以 JAR 文件形式提供。添加以下配置以自动下载并将其复制到稳定位置：
 
        ```xml
        <plugin>
@@ -165,29 +166,35 @@ Ktor 支持在运行时从一个或多个文档源构建 OpenAPI 规范。
    </TabItem>
   </Tabs>
 
-* 要使用运行时路由注解，请将 `%artifact_name%` 构件添加到您的构建脚本中：
+* 要使用运行时路由注解，请将 `%artifact_name%` 工件添加到你的构建脚本中：
 
   <Tabs group="languages">
       <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-          <code-block lang="Kotlin" code="              implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+          <code-block lang="Kotlin" code="              implementation(%ktor_version_catalog_name%)"/>
+          <note>
+              上述代码段使用 <a href="server-dependencies.topic#using-version-catalog">Ktor 版本目录</a>来指定 Ktor 依赖项。
+          </note>
       </TabItem>
       <TabItem title="Gradle (Groovy)" group-key="groovy">
-          <code-block lang="Groovy" code="              implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+          <code-block lang="Groovy" code="              implementation %ktor_version_catalog_name%"/>
+          <note>
+              上述代码段使用 <a href="server-dependencies.topic#using-version-catalog">Ktor 版本目录</a>来指定 Ktor 依赖项。
+          </note>
       </TabItem>
       <TabItem title="Maven" group-key="maven">
           <code-block lang="XML" code="              &lt;dependency&gt;&#10;                  &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                  &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                  &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;              &lt;/dependency&gt;"/>
       </TabItem>
   </Tabs>
 
-## 配置 OpenAPI 编译器扩展 {id="configure-the-extension"}
+## 配置 OpenAPI 编译器扩展程序 {id="configure-the-extension"}
 
-OpenAPI 编译器扩展控制在编译时如何收集路由元数据。它本身并不定义最终的 OpenAPI 文档。
+OpenAPI 编译器扩展程序控制如何在编译时收集路由元数据。它本身并不定义最终的 OpenAPI 文档。
 
-在编译期间，该插件会生成 Kotlin 代码，这些代码使用 OpenAPI 运行时 API 来注册从路由声明、代码模式和注释中派生出的元数据。
+在编译期间，该插件会生成使用 OpenAPI 运行时 API 注册元数据的 Kotlin 代码，这些元数据派生自路由声明、代码模式和注释。
 
-通用的 OpenAPI 信息——如 API 标题、版本、服务器、安全方案和详细架构——是在[生成规范时](#generate-and-serve-the-specification)于运行时提供的。
+常规 OpenAPI 信息（例如 API 标题、版本、服务器、安全方案以及详细模式）会在[生成规范时](#generate-and-serve-the-specification)在运行时提供。
 
-要配置编译器插件扩展，请在 <Path>build.gradle.kts</Path> 文件的 `ktor` 扩展内使用 `openApi {}` 块：
+要配置编译器插件扩展程序，请使用 <Path>build.gradle.kts</Path> 文件中 `ktor` 扩展内的 `openApi {}` 代码块：
 
 ```kotlin
 ktor {
@@ -204,26 +211,26 @@ ktor {
 <deflist>
 <def>
 <title><code>enabled</code></title>
-启用或禁用 OpenAPI 路由注解代码生成。默认为 <code>false</code>。
+启用或禁用 OpenAPI 路由注解代码生成。默认值为 <code>false</code>。
 </def>
 <def>
 <title><code>codeInferenceEnabled</code></title>
-控制编译器是否尝试从路由代码中推断 OpenAPI 元数据。默认为 <code>true</code>。如果推断产生的结果不正确，或者您更倾向于使用注解显式定义元数据，请禁用此选项。更多详情请参阅 <a href="#code-inference">代码推断规则</a>。
+控制编译器是否尝试从路由代码推断 OpenAPI 元数据。默认值为 <code>true</code>。如果推断产生了不正确的结果，或者你倾向于使用注解显式定义元数据，请禁用此选项。有关更多详情，请参阅<a href="#code-inference">代码推断规则</a>。
 </def>
 <def>
 <title><code>onlyCommented</code></title>
-将元数据生成限制为包含注释注解的路由。默认为 <code>false</code>，意味着除了显式标记为 <code>@ignore</code> 的调用外，所有路由调用都会被处理。
+将元数据生成限制为包含注释注解的路由。默认值为 <code>false</code>，意味着除显式标记为 <code>@ignore</code> 的路由外，将处理所有路由调用。
 </def>
 </deflist>
 
 ### 路由结构分析 {id="routing-structure-analysis"}
 
-Ktor 编译器插件会分析您的服务器路由 DSL 以确定 API 的结构形状。此分析仅基于路由声明，不会检查路由处理程序的内容。
+Ktor 编译器插件会分析你的服务器路由 DSL，以确定 API 的结构形态。该分析仅基于路由声明，不会检查路由处理程序的内容。
 
-以下内容会自动从路由 API 树的选择器中推断出来：
+以下内容会自动从路由 API 树中的选择器推断出来：
 - 合并后的路径（例如 `/api/v1/users/{id}`）。
-- HTTP 方法（如 `GET` 和 `POST`）。
-- 路径参数。
+- HTTP 方法（例如 `GET` 和 `POST`）。
+- 路径形参。
 
 ```kotlin
 routing {
@@ -235,29 +242,29 @@ routing {
 }
 ```
 
-由于请求参数、请求体和响应是在路由 lambda 内部处理的，因此编译器无法仅凭路由结构推断出完整的 OpenAPI 描述。为了丰富生成的元数据，Ktor 支持基于常见请求处理模式的[注解](#annotate-routes)和[自动推断](#code-inference)。
+由于请求形参、请求体和响应都是在路由 lambda 表达式内部处理的，因此编译器无法仅凭路由结构推断出完整的 OpenAPI 描述。为了丰富生成的元数据，Ktor 支持基于常见请求处理模式的[注解](#annotate-routes)和[自动推断](#code-inference)。
 
 ### 代码推断 {id="code-inference"}
 
-当启用代码推断时，编译器插件会识别常见的 Ktor 使用模式并自动生成等效的运行时注解。
+启用代码推断后，编译器插件会识别常见的 Ktor 使用模式并自动生成等效的运行时注解。
 
 下表总结了支持的推断规则：
 
-| 规则 | 描述 | 输入 | 输出（来自注解作用域） |
+| 规则 | 说明 | 输入 | 输出（来自 annotate 作用域） |
 |---------------------|----------------------------------------------------------------|----------------------------------------------------------------------------|--------------------------------------------------------------------------|
-| 请求体 | 从 `ContentNegotiation` 读取操作中提供请求体架构 | `call.receive<T>()` | `requestBody { schema = jsonSchema<T>() }` |
-| 响应体 | 从 `ContentNegotiation` 写入操作中提供响应体架构 | `call.respond<T>()` | `responses { HttpStatusCode.OK { schema = jsonSchema<T>() } }` |
-| 响应头 | 包含响应的自定义标头 | `call.response.header("X-Foo", "Bar")` | `responses { HttpStatusCode.OK { headers { header("X-Foo", "Bar") } } }` |
-| 路径参数 | 查找路径参数引用 | `call.parameters["id"]` | `parameters { path("id") }` |
-| 查询参数 | 查找查询参数引用 | `call.queryParameters["name"]` | `parameters { query("name") }` |
-| 请求头 | 查找请求头引用 | `call.request.headers["X-Foo"]` | `parameters { header("X-Foo") }` |
-| Resource API 路由 | 推断 Resources 路由 API 的调用结构 | `call.get<List> { /**/ }; @Resource("/list") class List(val name: String)` | `parameters { query("name") }` |
+| 请求体 (Request Body) | 从 `ContentNegotiation` 读取操作中提供请求体模式 (schema) | `call.receive<T>()` | `requestBody { schema = jsonSchema<T>() }` |
+| 响应体 (Response Body) | 从 `ContentNegotiation` 写入操作中提供响应体模式 (schema) | `call.respond<T>()` | `responses { HttpStatusCode.OK { schema = jsonSchema<T>() } }` |
+| 响应标头 (Response Headers) | 为响应包含自定义标头 | `call.response.header("X-Foo", "Bar")` | `responses { HttpStatusCode.OK { headers { header("X-Foo", "Bar") } } }` |
+| 路径形参 (Path Parameters) | 查找路径形参引用 | `call.parameters["id"]` | `parameters { path("id") }` |
+| 查询形参 (Query Parameters) | 查找查询形参引用 | `call.queryParameters["name"]` | `parameters { query("name") }` |
+| 请求标头 (Request Headers) | 查找请求标头引用 | `call.request.headers["X-Foo"]` | `parameters { header("X-Foo") }` |
+| Resource API 路由 (Resource API routes) | 推断 Resources 路由 API 的调用结构 | `call.get<List> { /**/ }; @Resource("/list") class List(val name: String)` | `parameters { query("name") }` |
 
 推断会尽可能跟踪提取的函数，并尝试为典型的请求和响应流程生成一致的文档。
 
-#### 为端点禁用推断 {id="disable-inference-for-an-endpoint"}
+#### 禁用端点的推断 {id="disable-inference-for-an-endpoint"}
 
-如果推断为特定端点生成了错误的元数据，您可以通过添加 `ignore` 标记来排除它：
+如果推断为特定端点生成了不正确的元数据，你可以通过添加 `ignore` 标记来排除它：
 
 ```kotlin
 // ignore!
@@ -266,33 +273,33 @@ get("/comments") {
 }
 ```
 
-## 为路由添加注解 {id="annotate-routes"}
+## 注解路由 {id="annotate-routes"}
 
-为了丰富规范内容，Ktor 支持两种路由注解方式：
+为了丰富规范内容，Ktor 支持两种注解路由的方式：
 
-- [基于注释的注解](#comment-annotations)，由编译器插件分析。
-- [运行时路由注解](#runtime-route-annotations)，使用 `.describe {}` DSL 定义。
+- 基于注释的注解（[Comment-based annotations](#comment-annotations)），由编译器插件进行分析。
+- 运行时路由注解（[Runtime route annotations](#runtime-route-annotations)），使用 `.describe {}` DSL 定义。
 
-您可以采用其中任一方式，也可以将两者结合。
+你可以使用其中一种方法，也可以两者结合使用。
 
 ### 基于注释的路由注解 {id="comment-annotations"}
 
 基于注释的注解提供了无法从代码中推断的元数据，并能与现有路由无缝集成。
 
-元数据的定义方式是在行首放置一个关键字，后跟冒号（`:`）及其值。
+元数据是通过在行首放置关键字，后跟冒号（`:`）及其值来定义的。
 
-您可以直接在路由声明上附加注释：
+你可以将注释直接附加到路由声明上：
 
 ```kotlin
 /**
- * 获取 ID 对应的单个用户。
+ * Get a single user by ID.
  *
- * Path: id [ULong] 用户 ID
+ * Path: id [ULong] the ID of the user
  *
  * Responses:
- *   – 400 ID 参数格式错误或缺失。
- *   – 404 给定 ID 对应的用户不存在。
- *   – 200 [User] 找到的给定 ID 对应的用户。
+ *   – 400 The ID parameter is malformatted or missing.
+ *   – 404 The user for the given ID does not exist.
+ *   – 200 [User] The user found with the given ID.
  */
 get("/{id}") {
     val id = call.parameters["id"]?.toULongOrNull()
@@ -303,13 +310,13 @@ get("/{id}") {
 }
 ```
 
-#### 格式规则 {id="formatting-rules"}
+#### 格式设置规则 {id="formatting-rules"}
 
 - 关键字必须出现在行首。
-- 冒号（`:`）将关键字与其值分隔开。
+- 冒号（`:`）用于分隔关键字与其值。
 - 复数形式（例如 `Tags`、`Responses`）允许分组定义。
-- 单数形式（例如 `Tag`、`Response`）同样受支持。
-- 顶层项目符号（`-`）是可选的，仅影响格式设置。
+- 同样支持单数形式（例如 `Tag`、`Response`）。
+- 顶级项目符号（`-`）是可选的，仅影响格式设置。
 
 以下变体是等效的：
 
@@ -327,17 +334,17 @@ get("/{id}") {
 
 #### 支持的注释字段 {id="supported-comment-fields"}
 
-| 标签 | 格式 | 描述 |
+| 标记 | 格式 | 说明 |
 |----------------|-------------------------------------------------|----------------------------------|
-| `Tag` | `Tag: name` | 将端点归入某个标签组 |
-| `Path` | `Path: [Type] name description` | 路径参数 |
-| `Query` | `Query: [Type] name description` | 查询参数 |
-| `Header` | `Header: [Type] name description` | 请求头参数 |
-| `Cookie` | `Cookie: [Type] name description` | Cookie 参数 |
+| `Tag` | `Tag: name` | 将端点归组到标签下 |
+| `Path` | `Path: [Type] name description` | 路径形参 |
+| `Query` | `Query: [Type] name description` | 查询形参 |
+| `Header` | `Header: [Type] name description` | 请求头形参 |
+| `Cookie` | `Cookie: [Type] name description` | Cookie 形参 |
 | `Body` | `Body: contentType [Type] description` | 请求体 |
 | `Response` | `Response: code contentType [Type] description` | 响应定义 |
 | `Deprecated` | `Deprecated: reason` | 将端点标记为已弃用 |
-| `Description` | `Description: text` | 详细描述 |
+| `Description` | `Description: text` | 扩展说明 |
 | `Security` | `Security: scheme` | 安全要求 |
 | `ExternalDocs` | `ExternalDocs: href` | 外部文档链接 |
 
@@ -345,13 +352,13 @@ get("/{id}") {
 
 <primary-label ref="experimental"/>
 
-在编译时分析不足的情况下，例如使用动态路由、拦截器或条件逻辑时，您可以使用 `.describe {}` 扩展函数在运行时将 OpenAPI 操作元数据直接附加到路由。
+如果编译时分析不够充分（例如使用动态路由、拦截器或条件逻辑时），可以使用 `.describe {}` 扩展函数在运行时将 OpenAPI 操作元数据直接附加到路由。
 
-每个添加了注解的路由都定义了一个 OpenAPI [操作对象 (Operation object)](https://swagger.io/specification/#operation-object)，它代表生成的 OpenAPI 规范中的单个 HTTP 操作（例如 `GET /users`）。元数据在运行时附加到路由树，并由 OpenAPI 和 Swagger UI 插件使用。
+每个带有注解的路由都会定义一个 OpenAPI [Operation 对象 (Operation object)](https://swagger.io/specification/#operation-object)，该对象在生成的 OpenAPI 规范中表示单个 HTTP 操作（例如 `GET /users`）。元数据在运行时附加到路由树，并供 OpenAPI 和 Swagger UI 插件使用。
 
-`.describe {}` DSL 直接映射到 OpenAPI 规范。属性名称和结构与为操作对象定义的字段相对应，包括参数、请求体、响应、安全要求、服务器、回调和规范扩展（`x-*`）。
+`.describe {}` DSL 直接映射到 OpenAPI 规范。属性名称和结构对应于为 Operation 对象定义的字段，包括形参、请求体、响应、安全要求、服务器、回调以及规范扩展（`x-*`）。
 
-运行时路由注解 API 是实验性的，需要使用 `@OptIn(ExperimentalKtorApi::class)` 启用：
+运行时路由注解 API 处于实验性阶段，需要使用 `@OptIn(ExperimentalKtorApi::class)` 进行选择加入：
 
 ```kotlin
                 @OptIn(ExperimentalKtorApi::class)
@@ -365,21 +372,21 @@ get("/{id}") {
 
                     call.respond(result)
                 }.describe {
-                    summary = "获取用户"
-                    description = "检索用户列表。"
+                    summary = "Get users"
+                    description = "Retrieves a list of users."
                     parameters {
                         query("q") {
-                            description = "已编码的查询"
+                            description = "An encoded query"
                             required = false
                         }
                     }
                     responses {
                         HttpStatusCode.OK {
-                            description = "用户列表"
+                            description = "A list of users"
                             schema = jsonSchema<List<User>>()
                         }
                         HttpStatusCode.BadRequest {
-                            description = "无效查询"
+                            description = "Invalid query"
                             ContentType.Text.Plain()
                         }
                     }
@@ -390,11 +397,11 @@ get("/{id}") {
 >
 {style="tip"}
 
-运行时注解会与编译器生成的元数据以及基于注释的元数据合并。当同一个 OpenAPI 字段由多个来源定义时，运行时注解提供的值具有[最高优先级](#metadata-precedence)。
+运行时注解会与编译器生成的元数据和基于注释的元数据合并。当同一 OpenAPI 字段由多个源定义时，运行时注解提供的值具有[最高优先级](#metadata-precedence)。
 
 ## 在 OpenAPI 规范中隐藏路由 {id="hide-routes-from-the-openapi-specification"}
 
-要将某个路由及其子路由从生成的 OpenAPI 文档中排除，请使用 `Route.hide()` 函数：
+要从生成的 OpenAPI 文档中排除某个路由及其子路由，请使用 `Route.hide()` 函数：
 
 ```kotlin
 @OptIn(ExperimentalKtorApi::class)
@@ -403,34 +410,34 @@ get("/routes") {
 }.hide()
 ```
 
-这对于不应公开的内部、管理或诊断端点非常有用，包括用于[生成 OpenAPI 规范](#assemble-and-serve-the-specification)本身的路由。
+这对于不应公开发布的内部、管理或诊断端点非常有用，包括用于[生成 OpenAPI 规范](#assemble-and-serve-the-specification)本身的路由。
 
-OpenAPI 和 Swagger UI 插件会自动调用 `.hide()`，因此它们的路由会从生成的文档中排除。
+OpenAPI 和 Swagger UI 插件会自动调用 `.hide()`，因此它们的路由会被排除在生成的文档之外。
 
-## 架构推断 {id="schema-inference"}
+## 模式推断 {id="schema-inference"}
 
-Ktor 在构建 OpenAPI 规范时会自动为请求和响应类型生成 JSON 架构。默认情况下，架构是从数据类上的 `kotlinx-serialization` 描述符通过类型引用推断出来的。这使得大多数常见数据模型无需额外工作即可被记录。
+在构建 OpenAPI 规范时，Ktor 会自动为请求和响应类型生成 JSON 模式 (JSON schema)。默认情况下，模式是从数据类上使用 `kotlinx-serialization` 描述符的类型引用推断出来的。这样无需额外工作即可为大多数常见数据模型生成文档。
 
-### 通过注解自定义架构 {id="customize-schemas-with-annotations"}
+### 使用注解自定义模式 {id="customize-schemas-with-annotations"}
 
-您可以通过在数据类中添加 [`@JsonSchema`](https://api.ktor.io/ktor-openapi-schema/io.ktor.openapi/-json-schema/index.html) 注解来覆盖自动生成的 JSON 架构字段。这允许您添加描述、将字段标记为必填等：
+你可以通过向数据类添加 [`@JsonSchema`](https://api.ktor.io/ktor-openapi-schema/io.ktor.openapi/-json-schema/index.html) 注解来重写自动生成的 JSON 模式字段。这允许你添加说明、将属性标记为必需等：
 
 ```kotlin
-@JsonSchema.Description("表示一篇新闻文章")
+@JsonSchema.Description("Represents a news article")
 data class Article(
     val title: String,
     val content: String
 )
 ```
 
-### 使用基于反射的架构推断 {id="use-reflection-based-schema-inference"}
+### 使用基于反射的模式推断 {id="use-reflection-based-schema-inference"}
 
-对于使用 Jackson 或 Gson 而非 `kotlinx-serialization` 的项目，您可以使用基于反射的架构推断。为此，请在 OpenAPI 或 SwaggerUI 插件的 `Routing` 源中设置 `schemaInference` 字段：
+对于使用 Jackson 或 Gson 而非 `kotlinx-serialization` 的项目，你可以使用基于反射的模式推断。为此，请在 OpenAPI 或 SwaggerUI 插件的 `Routing` 源中设置 `schemaInference` 字段：
 
 ```kotlin
 openAPI("docs") {
     outputPath = "docs/routes"
-    info = OpenApiInfo("来自路由的 Books API", "1.0.0")
+    info = OpenApiInfo("Books API from routes", "1.0.0")
     source = OpenApiDocSource.Routing(
         contentType = ContentType.Application.Json,
         schemaInference = ReflectionJsonSchemaInference.Default,
@@ -440,11 +447,11 @@ openAPI("docs") {
 
 ### 自定义反射行为 {id="customize-reflection-behavior"}
 
-您可以提供一个自定义的 `SchemaReflectionAdapter` 来处理不被直接支持的注解或命名约定。
+你可以提供自定义的 `SchemaReflectionAdapter` 来处理未直接支持的注解或命名约定。
 
-`SchemaReflectionAdapter` 是 `ReflectionJsonSchemaInference` 的一个字段，允许您覆盖默认行为，例如属性名称、忽略的字段或可为 null 性规则。
+`SchemaReflectionAdapter` 是 `ReflectionJsonSchemaInference` 的一个字段，它允许你重写默认行为，例如属性名称、忽略的字段或为 null 性规则。
 
-例如，您可以自定义行为以支持 Gson 的 `@SerializedName` 注解：
+例如，你可以自定义行为以支持 Gson 的 `@SerializedName` 注解：
 
 ```kotlin
 ReflectionJsonSchemaInference(object : SchemaReflectionAdapter {
@@ -456,30 +463,30 @@ ReflectionJsonSchemaInference(object : SchemaReflectionAdapter {
 })
 ```
 
-### 提供自定义架构 {id="custom-schemas"}
+### 提供自定义模式 {id="custom-schemas"}
 
-如果自动架构推断或注解不足以满足需求，您可以使用 [`JsonSchema`](https://api.ktor.io/ktor-openapi-schema/io.ktor.openapi/-json-schema/index.html) 类手动构建 JSON 架构。
+如果自动模式推断或注解无法满足需求，可以使用 [`JsonSchema`](https://api.ktor.io/ktor-openapi-schema/io.ktor.openapi/-json-schema/index.html) 类手动构建 JSON 模式。
 
-这允许您显式定义所有受支持的架构属性，例如类型、格式、嵌套结构，或高级构造（如用于类似元组的数组定义的 `prefixItems`）。
+这允许你显式定义所有受支持的模式属性，例如类型、格式、嵌套结构，或诸如针对类元组数组定义的 `prefixItems` 等高级构造。
 
 有关可用属性的完整列表，请参阅 [`JsonSchema` API 文档](https://api.ktor.io/ktor-openapi-schema/io.ktor.openapi/-json-schema/index.html)。
 
-## 生成并提供规范 {id="generate-and-serve-the-specification"}
+## 生成并提供规范服务 {id="generate-and-serve-the-specification"}
 
-OpenAPI 规范在运行时根据运行时路由注解和编译器插件生成的元数据进行组装。
+OpenAPI 规范是在运行时根据运行时路由注解和编译器插件生成的元数据组装而成的。
 
-您可以通过以下方式公开规范：
+你可以通过以下方式公开该规范：
 
-- [手动组装并提供 OpenAPI 文档](#assemble-and-serve-the-specification)。
-- 使用 [OpenAPI](server-openapi.md) 或 [SwaggerUI](server-swagger-ui.md) 插件来提供规范和交互式文档。
+- [手动组装并提供 OpenAPI 文档服务](#assemble-and-serve-the-specification)。
+- 使用 [OpenAPI](server-openapi.md) 或 [SwaggerUI](server-swagger-ui.md) 插件来提供规范和交互式文档服务。
 
-### 组装并提供规范 {id="assemble-and-serve-the-specification"}
+### 组装并提供规范服务 {id="assemble-and-serve-the-specification"}
 
-要在运行时组装完整的 OpenAPI 文档，请创建一个 `OpenApiDoc` 实例并提供应包含在规范中的路由。
+要在运行时组装完整的 OpenAPI 文档，请创建一个 `OpenApiDoc` 实例，并提供应包含在规范中的路由。
 
-文档是从编译器生成的元数据和路由树中的运行时路由注解组装而成的。生成的 `OpenApiDoc` 实例始终反映应用程序的当前状态。
+文档是根据编译器生成的元数据以及来自路由树的运行时路由注解组装的。生成的 `OpenApiDoc` 实例始终反映应用程序的当前状态。
 
-您通常会在路由处理程序中构建文档并直接返回它：
+通常，你可以在路由处理程序中构建文档并直接返回它：
 
 ```kotlin
 
@@ -488,11 +495,11 @@ OpenAPI 规范在运行时根据运行时路由注解和编译器插件生成的
             call.respond(doc)
 ```
 
-在此示例中，OpenAPI 文档使用 [`ContentNegotiation`](server-serialization.md) 插件进行序列化。这假定已安装 JSON 序列化程序（例如 `kotlinx.serialization`）。
+在此示例中，OpenAPI 文档使用 [`ContentNegotiation`](server-serialization.md) 插件进行序列化。这假设已安装 JSON 序列化器（例如 `kotlinx.serialization`）。
 
-无需额外的构建或生成步骤。路由或注解的更改将在下次请求规范时自动反映。
+无需额外的构建或生成步骤。路由或注解的更改会在下次请求规范时自动反映出来。
 
-> 如果您想让序列化过程更加明确，或避免依赖 `ContentNegotiation`，您可以手动编码文档并响应 JSON：
+> 如果你希望使序列化更加显式，或者避免依赖 `ContentNegotiation`，可以手动对文档进行编码并返回 JSON：
 > 
 > ```kotlin
 > call.respondText(
@@ -503,19 +510,19 @@ OpenAPI 规范在运行时根据运行时路由注解和编译器插件生成的
 >
 {style="note"}
 
-### 提供交互式文档 {id="serve-interactive-documentation"}
+### 提供交互式文档服务 {id="serve-interactive-documentation"}
 
 要通过交互式 UI 公开 OpenAPI 规范，请使用 [OpenAPI](server-openapi.md) 和 [Swagger UI](server-swagger-ui.md) 插件。
 
-这两个插件都在运行时组装规范，并能直接从路由树读取元数据。它们的区别在于文档的渲染方式：
-- OpenAPI 插件在服务器上渲染文档并提供预生成的 HTML。
-- Swagger UI 插件以 JSON 或 YAML 格式提供 OpenAPI 规范，并使用 Swagger UI 在浏览器中渲染 UI。
+这两个插件都在运行时组装规范，并可以直接从路由树中读取元数据。它们在呈现文档的方式上有所不同：
+- OpenAPI 插件在服务器上呈现文档，并提供预生成的 HTML 服务。
+- Swagger UI 插件将 OpenAPI 规范作为 JSON 或 YAML 提供，并使用 Swagger UI 在浏览器中呈现 UI。
 
 ```kotlin
-// 提供 OpenAPI UI
+// Serves the OpenAPI UI
 openAPI("/openApi")
 
-// 提供 Swagger UI
+// Serves the Swagger UI
 swaggerUI("/swaggerUI") {
     info = OpenApiInfo("My API", "1.0")
     source = OpenApiDocSource.Routing(
@@ -526,9 +533,9 @@ swaggerUI("/swaggerUI") {
 
 ### 元数据优先级 {id="metadata-precedence"}
 
-最终的 OpenAPI 规范在运行时通过合并来自多个源的元数据来组装。
+最终的 OpenAPI 规范是在运行时通过合并来自多个源的元数据组装而成的。
 
-这些来源按以下顺序应用：
+按顺序应用以下来源：
 
 1. 编译器生成的元数据，包括：
     - [路由结构分析](#routing-structure-analysis)
@@ -536,6 +543,6 @@ swaggerUI("/swaggerUI") {
 2. [基于注释的路由注解](#comment-annotations)
 3. [运行时路由注解](#runtime-route-annotations)
 
-当同一个 OpenAPI 字段由多个来源定义时，运行时注解提供的值优先级高于基于注释的注解和编译器生成的元数据。
+当同一 OpenAPI 字段由多个源定义时，运行时注解提供的值优先于基于注释的注解和编译器生成的元数据。
 
-未被显式覆盖的元数据将被保留并合并到最终文档中。
+未显式重写的元数据将被保留并合并到最终文档中。

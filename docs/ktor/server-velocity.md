@@ -8,36 +8,45 @@
 <var name="plugin_name" value="Velocity"/>
 <var name="package_name" value="io.ktor.server.velocity"/>
 <var name="artifact_name" value="ktor-server-velocity"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.server.velocity"/>
 
 <tldr>
 <p>
-<b>所需依赖项</b>：<code>io.ktor:%artifact_name%</code>
+<b>必需依赖项</b>：<code>io.ktor:%artifact_name%</code>
 </p>
 <var name="example_name" value="velocity"/>
 <p>
     <b>代码示例</b>：
-    <a href="https://github.com/ktorio/ktor-documentation/tree/%ktor_version%/codeSnippets/snippets/%example_name%">
+    <a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/%example_name%">
         %example_name%
     </a>
 </p>
 <p>
-    <b><Links href="/ktor/server-native" summary="Ktor 支持 Kotlin/Native，允许您在没有额外运行时或虚拟机的情况下运行服务器。">原生服务器</Links>支持</b>：✖️
+    <b><Links href="server-native.md" summary="Ktor 支持 Kotlin/Native，允许你在无需额外运行时或虚拟机的情况下运行服务器。">原生服务器</Links>支持</b>：✖️
 </p>
 </tldr>
 
-Ktor 允许您通过安装 [Velocity](https://api.ktor.io/ktor-server-velocity/io.ktor.server.velocity/-velocity) 插件，在应用程序中将 [Velocity 模板](https://velocity.apache.org/engine/)用作视图。
+Ktor 允许你通过安装 [Velocity](https://api.ktor.io/ktor-server-velocity/io.ktor.server.velocity/-velocity) 插件，在应用程序中将 [Velocity 模板](https://velocity.apache.org/engine/)用作视图。
 
 ## 添加依赖项 {id="add_dependencies"}
 
 <p>
-    要使用 <code>%plugin_name%</code>，您需要在构建脚本中包含 <code>%artifact_name%</code> 构件：
+    要使用 <code>%plugin_name%</code>，请将 <code>%artifact_name%</code> 工件添加到构建脚本中：
 </p>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上述代码段使用 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 版本目录</a> 来指定 Ktor 依赖项。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上述代码段使用 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 版本目录</a> 来指定 Ktor 依赖项。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
@@ -47,15 +56,16 @@ Ktor 允许您通过安装 [Velocity](https://api.ktor.io/ktor-server-velocity/i
 ## 安装 Velocity {id="install_plugin"}
 
 <p>
-    要将 <code>%plugin_name%</code> 插件安装到应用程序，请将其传递给指定<Links href="/ktor/server-modules" summary="模块允许您通过对路由进行分组来构建应用程序结构。">模块</Links>中的 <code>install</code> 函数。
-    以下代码段演示了如何安装 <code>%plugin_name%</code> ...
+    要将 <code>%plugin_name%</code> 插件<a href="server-plugins.md#install">安装</a>到应用程序中，
+    请将其传递给指定<Links href="server-modules.md" summary="模块允许你通过对路由进行分组来构建应用程序结构。">模块</Links>中的 <code>install</code> 函数。
+    以下示例展示了如何安装 <code>%plugin_name%</code>：
 </p>
 <list>
     <li>
-        ... 在 <code>embeddedServer</code> 函数调用内部。
+        在 <code>embeddedServer()</code> 函数调用中。
     </li>
     <li>
-        ... 在显式定义的 <code>module</code> 内部，该模块是 <code>Application</code> 类的一个扩展函数。
+        在 <code>Application</code> 类上显式定义的 <code>module()</code> 扩展函数中。
     </li>
 </list>
 <Tabs>
@@ -67,11 +77,11 @@ Ktor 允许您通过安装 [Velocity](https://api.ktor.io/ktor-server-velocity/i
     </TabItem>
 </Tabs>
 
-可选地，您可以安装 `VelocityTools` 插件，以便能够添加标准和自定义 [Velocity 工具](#velocity_tools)。
+作为可选项，你还可以安装 `VelocityTools` 插件，以便能够添加标准和自定义 [Velocity 工具](#velocity_tools)。
 
 ## 配置 Velocity {id="configure"}
 ### 配置模板加载 {id="template_loading"}
-在 `install` 代码块内部，您可以配置 [VelocityEngine][velocity_engine]。例如，如果您想使用来自类路径 (classpath) 的模板，请为 `classpath` 使用资源加载器：
+在 `install` 块内，你可以配置 [VelocityEngine][velocity_engine]。例如，如果你想使用 classpath 中的模板，请使用适用于 `classpath` 的资源加载器：
 ```kotlin
 import io.ktor.server.application.*
 import io.ktor.server.velocity.*
@@ -87,7 +97,7 @@ fun Application.module() {
 ```
 
 ### 在响应中发送模板 {id="use_template"}
-假设您在 `resources/templates` 中有一个 `index.vl` 模板：
+假设你在 `resources/templates` 中有一个 `index.vl` 模板：
 ```html
 <html>
     <body>
@@ -96,12 +106,12 @@ fun Application.module() {
 </html>
 ```
 
-用户的模型如下所示：
+用户的数据模型如下所示：
 ```kotlin
 data class User(val id: Int, val name: String)
 ```
 
-要为指定[路由](server-routing.md)使用该模板，请按以下方式将 `VelocityContent` 传递给 `call.respond` 方法：
+要为指定的[路由](server-routing.md)使用该模板，请按以下方式将 `VelocityContent` 传递给 `call.respond` 方法：
 ```kotlin
 get("/index") {
     val sampleUser = User(1, "John")
@@ -111,7 +121,7 @@ get("/index") {
 
 ### 添加 Velocity 工具 {id="velocity_tools"}
 
-如果您已[安装](#install_plugin)了 `VelocityTools` 插件，则可以在 `install` 代码块内访问 `EasyFactoryConfiguration` 实例，以添加标准和自定义 Velocity 工具，例如：
+如果你已[安装](#install_plugin)了 `VelocityTools` 插件，可以在 `install` 块内访问 `EasyFactoryConfiguration` 实例以添加标准和自定义 Velocity 工具，例如：
 
 ```kotlin
 install(VelocityTools) {

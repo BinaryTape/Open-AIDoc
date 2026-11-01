@@ -6,6 +6,7 @@
 <var name="plugin_name" value="Thymeleaf"/>
 <var name="package_name" value="io.ktor.server.thymeleaf"/>
 <var name="artifact_name" value="ktor-server-thymeleaf"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.server.thymeleaf"/>
 
 <tldr>
 <p>
@@ -19,41 +20,49 @@
     </a>
 </p>
 <p>
-    <b><Links href="/ktor/server-native" summary="KtorはKotlin/Nativeをサポートしており、追加のランタイムや仮想マシンなしでサーバーを実行できます。">ネイティブサーバー</Links>のサポート</b>: ✖️
+    <b><Links href="server-native.md" summary="Ktor は Kotlin/Native をサポートしており、追加のランタイムや仮想マシンなしでサーバーを実行できます。">Native サーバー</Links>のサポート</b>: ✖️
 </p>
 </tldr>
 
-Ktorでは、[Thymeleaf](https://api.ktor.io/ktor-server-thymeleaf/io.ktor.server.thymeleaf/-thymeleaf)プラグインをインストールすることで、[Thymeleafテンプレート](https://www.thymeleaf.org/)をアプリケーション内のビューとして使用できます。
+Ktor では、[Thymeleaf](https://api.ktor.io/ktor-server-thymeleaf/io.ktor.server.thymeleaf/-thymeleaf) プラグインをインストールすることで、アプリケーション内で [Thymeleaf テンプレート](https://www.thymeleaf.org/) をビューとして使用できます。
 
 ## 依存関係の追加 {id="add_dependencies"}
 
 <p>
-    <code>%plugin_name%</code>を使用するには、ビルドスクリプトに<code>%artifact_name%</code>アーティファクトを含める必要があります。
+    <code>%plugin_name%</code> を使用するには、ビルドスクリプトに <code>%artifact_name%</code> アーティファクトを追加します:
 </p>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上記のコードスニペットでは、Ktor の依存関係を指定するために <a href="server-dependencies.topic#using-version-catalog">
+            Ktor バージョンカタログ</a> を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上記のコードスニペットでは、Ktor の依存関係を指定するために <a href="server-dependencies.topic#using-version-catalog">
+            Ktor バージョンカタログ</a> を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
     </TabItem>
 </Tabs>
 
-## Thymeleafのインストール {id="install_plugin"}
+## Thymeleaf のインストール {id="install_plugin"}
 
 <p>
-    アプリケーションに<code>%plugin_name%</code>プラグインを<a href="server-plugins.md#install">インストール</a>するには、指定された<Links href="/ktor/server-modules" summary="モジュールを使用すると、ルートをグループ化してアプリケーションを構造化できます。">モジュール</Links>内の<code>install</code>関数に渡します。
-    以下のコードスニペットは、<code>%plugin_name%</code>をインストールする方法を示しています。
+    アプリケーションに <code>%plugin_name%</code> プラグインを<a href="server-plugins.md#install">インストール</a>するには、指定された<Links href="server-modules.md" summary="モジュールを使用すると、ルートをグループ化してアプリケーションを構造化できます。">モジュール</Links>内の <code>install</code> 関数に渡します。
+    以下の例は、<code>%plugin_name%</code> をインストールする方法を示しています:
 </p>
 <list>
     <li>
-        ... <code>embeddedServer</code>関数の呼び出し内。
+        <code>embeddedServer()</code> 関数呼び出し内。
     </li>
     <li>
-        ... <code>Application</code>クラスの拡張関数である、明示的に定義された<code>module</code>内。
+        <code>Application</code> クラスで明示的に定義された <code>module()</code> 拡張関数内。
     </li>
 </list>
 <Tabs>
@@ -65,9 +74,9 @@ Ktorでは、[Thymeleaf](https://api.ktor.io/ktor-server-thymeleaf/io.ktor.serve
     </TabItem>
 </Tabs>
 
-## Thymeleafの設定 {id="configure"}
+## Thymeleaf の設定 {id="configure"}
 ### テンプレート読み込みの設定 {id="template_loading"}
-`install`ブロック内で、`ClassLoaderTemplateResolver`を設定できます。例えば、以下のコードスニペットは、Ktorが現在のクラスパスに関連する`templates`パッケージ内で`*.html`テンプレートを検索できるようにします。
+`install` ブロック内で、`ClassLoaderTemplateResolver` を設定できます。例えば、以下のコードスニペットは、Ktor が現在のクラスパスを基準として `templates` パッケージ内の `*.html` テンプレートを検索できるようにします:
 ```kotlin
 import io.ktor.server.application.*
 import io.ktor.server.thymeleaf.*
@@ -85,7 +94,7 @@ fun Application.module() {
 ```
 
 ### レスポンスとしてテンプレートを送信する {id="use_template"}
-`resources/templates`に`index.html`テンプレートがあるとします。
+`resources/templates` に `index.html` テンプレートがあるとします:
 ```html
 <html xmlns:th="http://www.thymeleaf.org">
     <body>
@@ -94,12 +103,12 @@ fun Application.module() {
 </html>
 ```
 
-ユーザーのデータモデルは次のようになります。
+ユーザーのデータモデルは以下のようになります:
 ```kotlin
 data class User(val id: Int, val name: String)
 ```
 
-指定された[ルート](server-routing.md)にテンプレートを使用するには、次のように`call.respond`メソッドに[ThymeleafContent](https://api.ktor.io/ktor-server-thymeleaf/io.ktor.server.thymeleaf/-thymeleaf-content/index.html)を渡します。
+指定された[ルート](server-routing.md)でテンプレートを使用するには、次のように [ThymeleafContent](https://api.ktor.io/ktor-server-thymeleaf/io.ktor.server.thymeleaf/-thymeleaf-content/index.html) を `call.respond` メソッドに渡します:
 ```kotlin
 get("/index") {
     val sampleUser = User(1, "John")
@@ -107,9 +116,9 @@ get("/index") {
 }
 ```
 
-## 例: Thymeleafテンプレートの自動リロード {id="auto-reload"}
+## 例: Thymeleaf テンプレートの自動リロード {id="auto-reload"}
 
-以下の例は、[開発モード](server-development-mode.topic)が使用されているときに、Thymeleafテンプレートを自動的にリロードする方法を示しています。
+以下の例は、[開発モード](server-development-mode.topic)が使用されているときに Thymeleaf テンプレートを自動的にリロードする方法を示しています。
 
 ```kotlin
 package com.example
@@ -150,4 +159,4 @@ data class User(val id: Int, val name: String)
 
 ```
 
-完全な例はこちらにあります: [thymeleaf-auto-reload](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/thymeleaf-auto-reload)
+完全な例はこちらで確認できます: [thymeleaf-auto-reload](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/thymeleaf-auto-reload)。

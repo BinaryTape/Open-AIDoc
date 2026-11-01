@@ -1,60 +1,96 @@
 ---
-title: Compose Multiplatform 및 어노테이션 - 공유 UI
+title: Compose Multiplatform 및 어노테이션
 ---
 
-> 이 튜토리얼에서는 Metropolitan Museum of Art Collection API의 박물관 예술품을 표시하는 Compose Multiplatform 애플리케이션을 시연합니다. 공유 UI와 함께 Android 및 iOS 플랫폼 전반에서 의존성 주입(Dependency Injection)을 위해 Koin 어노테이션을 사용합니다.
-> 이 튜토리얼을 완료하는 데 약 **20분**이 소요됩니다.
+# Compose Multiplatform & Annotations
 
-:::note
-업데이트 - 2024-11-12
-:::
+이 튜토리얼에서는 메트로폴리탄 미술관(The Metropolitan Museum of Art)의 예술품 목록을 표시하고 세부 정보를 보여주는 Android 및 iOS용 Compose Multiplatform 앱을 빌드합니다. 두 개의 Gradle 모듈에 걸쳐 클래스에 어노테이션을 지정하고, 플랫폼별 정의를 제공하며, 컴포저블(composable)에 ViewModel을 주입하고, 루트 컴포저블에서 Koin을 시작하는 방법을 배웁니다. 약 20분이 소요되며 Android Studio와 iOS용 Xcode가 필요합니다.
+
+이 튜토리얼은 어노테이션을 사용합니다. Compiler Plugin DSL을 사용한 동일한 앱을 보려면 [Compose Multiplatform](/docs/quickstart/cmp)을 참조하세요. 스타일을 비교하려면 [스타일 선택하기](/docs/intro/choosing-your-style)를 참조하세요.
 
 ## 코드 가져오기 {id="get-the-code"}
 
-:::info
-[Github에서 소스 코드를 확인할 수 있습니다](https://github.com/InsertKoinIO/koin-getting-started/tree/main/compose-annotations)
-:::
+전체 샘플 코드는 [koin-getting-started/compose-annotations](https://github.com/InsertKoinIO/koin-getting-started/tree/main/compose-annotations)에 있습니다. 저장소를 클론하고 Android Studio에서 `compose-annotations` 폴더를 엽니다. 이 프로젝트에는 데이터 레이어를 위한 `data` 모듈과 UI를 위한 `composeApp` 모듈 등 두 개의 Gradle 모듈이 있습니다. iOS 앱은 `iosApp`에 있습니다.
 
 ## Gradle 설정 {id="gradle-setup"}
 
-먼저, Koin 어노테이션 의존성을 추가합니다:
+두 Gradle 모듈 모두 Koin 컴파일러 플러그인(Compiler Plugin)을 적용합니다. 버전은 버전 카탈로그(version catalog)에서 관리됩니다.
+
+```toml
+# gradle/libs.versions.toml
+[versions]
+# Kotlin, Compose Multiplatform, Ktor, navigation and Coil entries omitted
+koin = "<KOIN_VERSION>"
+koin-plugin = "<KOIN_PLUGIN_VERSION>"
+
+[libraries]
+koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
+koin-annotations = { module = "io.insert-koin:koin-annotations", version.ref = "koin" }
+koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", version.ref = "koin" }
+
+[plugins]
+koin-compiler = { id = "io.insert-koin.compiler.plugin", version.ref = "koin-plugin" }
+```
 
 ```kotlin
+// data/build.gradle.kts
 plugins {
-    id("com.google.devtools.ksp") version kspVersion
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.koin.compiler)
+    alias(libs.plugins.kotlin.serialization)
 }
 
-dependencies {
-    // Koin for Compose Multiplatform
-    implementation("io.insert-koin:koin-core:$koin_version")
-    implementation("io.insert-koin:koin-compose-viewmodel:$koin_version")
-
-    // Koin Annotations
-    implementation("io.insert-koin:koin-annotations:$koin_annotations_version")
-    ksp("io.insert-koin:koin-ksp-compiler:$koin_annotations_version")
+kotlin {
+    sourceSets {
+        commonMain.dependencies {
+            implementation(libs.koin.core)
+            api(libs.koin.annotations)
+            ...
+        }
+    }
 }
 ```
 
-## 애플리케이션 개요 {id="application-overview"}
+```kotlin
+// composeApp/build.gradle.kts
+plugins {
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.compose.multiplatform)
+    alias(libs.plugins.koin.compiler)
+    alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
+}
 
-이 애플리케이션은 원격 API에서 박물관 예술품 객체를 가져와 리스트로 표시합니다. 사용자는 항목을 탭하여 상세 정보를 볼 수 있습니다:
+kotlin {
+    sourceSets {
+        commonMain.dependencies {
+            api(project(":data"))
+            implementation(libs.koin.core)
+            implementation(libs.koin.compose.viewmodel)
+            implementation(libs.koin.annotations)
+            ...
+        }
+    }
+}
+```
 
-`MuseumAPI -> MuseumStorage -> MuseumRepository -> ViewModels -> Compose UI`
+컴파일러 플러그인은 타깃별 개별 설정 없이 모든 타깃에서 어노테이션을 처리합니다. Kotlin 2.3.20 이상이 필요하며, `koin-annotations`는 Koin 버전과 동일한 버전을 공유합니다. 자세한 내용은 [Gradle 설정](/docs/setup/gradle) 및 [Compiler Plugin 설정](/docs/setup/compiler-plugin)을 참조하세요.
 
-**사용된 기술:**
-- 공유 UI를 위한 Compose Multiplatform (Android 및 iOS)
-- HTTP 네트워킹을 위한 Ktor
-- 의존성 주입을 위한 Koin 어노테이션
-- 비동기 작업을 위한 Kotlin Coroutines 및 Flow
-- 라우팅을 위한 Navigation Compose
+## 애플리케이션 구조 {id="the-application"}
 
-## 데이터 레이어 (The Data Layer) {id="the-data-layer"}
+이 앱은 원격 API에서 예술품 목록을 가져와 메모리에 캐시한 다음, 목록 화면과 상세 화면에 표시합니다.
 
-> 모든 공통/공유 코드는 `composeApp` Gradle 프로젝트에 위치합니다.
+```
+MuseumApi -> MuseumStorage -> MuseumRepository -> ListViewModel / DetailViewModel -> Compose UI
+```
 
-### MuseumObject 모델 {id="museumobject-model"}
+HTTP 통신에는 Ktor를, 데이터 스트림에는 Kotlin Flow를, 라우팅에는 Navigation Compose를 사용합니다. 제목이나 주석에 별도의 언급이 없는 한 코드는 `commonMain`에 작성됩니다.
 
-박물관 예술품 객체 데이터 클래스:
+## 데이터 레이어 작성하기 {id="let-s-write-the-data-layer"}
+
+이 코드는 `data` Gradle 모듈에 작성합니다. `MuseumObject` 데이터 클래스는 API 응답을 매핑합니다.
 
 ```kotlin
 @Serializable
@@ -74,17 +110,22 @@ data class MuseumObject(
 )
 ```
 
-### MuseumApi - 네트워크 레이어 {id="museumapi-network-layer"}
-
-데이터를 가져오기 위한 API 인터페이스를 생성합니다:
+`KtorMuseumApi`는 Ktor의 `HttpClient`를 사용하여 목록을 가져옵니다. 여기에 `@Singleton` 어노테이션을 추가합니다.
 
 ```kotlin
+import org.koin.core.annotation.Singleton
+
 interface MuseumApi {
     suspend fun getData(): List<MuseumObject>
 }
 
-@Single
+@Singleton
 class KtorMuseumApi(private val client: HttpClient) : MuseumApi {
+    companion object {
+        private const val API_URL =
+            "https://raw.githubusercontent.com/Kotlin/KMP-App-Template/main/list.json"
+    }
+
     override suspend fun getData(): List<MuseumObject> {
         return try {
             client.get(API_URL).body()
@@ -97,7 +138,7 @@ class KtorMuseumApi(private val client: HttpClient) : MuseumApi {
 }
 ```
 
-### MuseumStorage - 로컬 캐싱 {id="museumstorage-local-caching"}
+`InMemoryMuseumStorage`는 객체들을 `MutableStateFlow`에 캐시합니다.
 
 ```kotlin
 interface MuseumStorage {
@@ -106,7 +147,7 @@ interface MuseumStorage {
     fun getObjects(): Flow<List<MuseumObject>>
 }
 
-@Single
+@Singleton
 class InMemoryMuseumStorage : MuseumStorage {
     private val storedObjects = MutableStateFlow(emptyList<MuseumObject>())
 
@@ -124,12 +165,10 @@ class InMemoryMuseumStorage : MuseumStorage {
 }
 ```
 
-### MuseumRepository {id="museumrepository"}
-
-레포지토리는 API와 스토리지 사이를 조율합니다:
+`MuseumRepository`는 생성될 때 API로부터 저장소를 새로고침합니다.
 
 ```kotlin
-@Single(createdAtStart = true)
+@Singleton
 class MuseumRepository(
     private val museumApi: MuseumApi,
     private val museumStorage: MuseumStorage,
@@ -156,22 +195,24 @@ class MuseumRepository(
 }
 ```
 
-:::note
-`@Single(createdAtStart = true)` 어노테이션은 Koin이 시작될 때 레포지토리가 생성되도록 보장하여, 즉시 데이터 페칭(fetching)을 트리거합니다.
-:::
+Koin은 각 클래스를 해당 상위 타입에 바인딩하므로, `KtorMuseumApi`는 `MuseumApi`에 대한 요청을 처리하게 됩니다. 자세한 내용은 [정의(Definitions)](/docs/reference/koin-core/definitions)를 참조하세요.
 
-## Koin 모듈 {id="the-koin-modules"}
+## 데이터 모듈 선언하기 {id="let-s-declare-the-data-module"}
 
-의존성을 별도의 모듈로 구성합니다:
-
-### 데이터 모듈 (Data Module) {id="data-module"}
+`HttpClient`는 직접 소유하지 않은 외부 클래스이므로, 모듈 클래스 내의 함수를 통해 제공합니다.
 
 ```kotlin
+import org.koin.core.annotation.ComponentScan
+import org.koin.core.annotation.Configuration
+import org.koin.core.annotation.Module
+import org.koin.core.annotation.Singleton
+
 @Module
-@ComponentScan
+@Configuration
+@ComponentScan("com.jetbrains.kmpapp.data")
 class DataModule {
 
-    @Single
+    @Singleton
     fun providesHttpClient(): HttpClient {
         val json = Json { ignoreUnknownKeys = true }
         return HttpClient {
@@ -183,14 +224,15 @@ class DataModule {
 }
 ```
 
-`@ComponentScan` 어노테이션은 이 패키지 내의 모든 `@Single` 어노테이션이 달린 클래스(MuseumApi, MuseumStorage, MuseumRepository)를 자동으로 검색합니다.
+`@ComponentScan`은 data 패키지에서 어노테이션이 달린 클래스들을 등록합니다. `@Configuration`은 `DataModule`이 다른 Gradle 모듈에 위치해 있더라도 앱의 진입점에서 검색할 수 있도록 해줍니다. 자세한 내용은 [모듈(Modules)](/docs/reference/koin-core/modules)을 참조하세요.
 
-### ViewModel 모듈 {id="viewmodel-module"}
+## ViewModel 작성하기 {id="let-s-write-the-viewmodels"}
 
-두 화면을 위한 ViewModel을 만들어 보겠습니다:
+이 코드와 이후의 튜토리얼 내용은 `composeApp` Gradle 모듈에서 진행됩니다. 각 ViewModel에 `@KoinViewModel` 어노테이션을 추가합니다.
 
 ```kotlin
-// 리스트 화면 ViewModel
+import org.koin.core.annotation.KoinViewModel
+
 @KoinViewModel
 class ListViewModel(museumRepository: MuseumRepository) : ViewModel() {
     val objects: StateFlow<List<MuseumObject>> =
@@ -198,17 +240,14 @@ class ListViewModel(museumRepository: MuseumRepository) : ViewModel() {
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 }
 
-// 상세 화면 ViewModel
 @KoinViewModel
 class DetailViewModel(private val museumRepository: MuseumRepository) : ViewModel() {
-    fun getObject(objectId: Int): StateFlow<MuseumObject?> {
-        return museumRepository.getObjectById(objectId)
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
-    }
+    fun getObject(objectId: Int): Flow<MuseumObject?> =
+        museumRepository.getObjectById(objectId)
 }
 ```
 
-모듈에 이들을 선언합니다:
+`screens` 패키지에 모듈 클래스를 만들어 이들을 스캔합니다.
 
 ```kotlin
 @ComponentScan
@@ -216,79 +255,161 @@ class DetailViewModel(private val museumRepository: MuseumRepository) : ViewMode
 class ViewModelModule
 ```
 
-`@KoinViewModel` 어노테이션은 이들을 ViewModel 정의로 자동으로 등록하며, `@ComponentScan`이 이를 검색합니다.
+인자 없이 `@ComponentScan`을 사용하면 해당 모듈 클래스가 위치한 패키지와 하위 패키지를 스캔합니다. 자세한 내용은 [ViewModel](/docs/reference/koin-core/viewmodel)을 참조하세요.
 
-### 플랫폼별 모듈 (Platform-Specific Module) {id="platform-specific-module"}
+## 플랫폼별 정의 추가하기 {id="let-s-add-platform-specific-definitions"}
 
-플랫폼별 컴포넌트(Android vs iOS)의 경우:
+이 샘플에서는 플랫폼별로 서로 다른 구현을 제공하는 두 가지 방법을 보여줍니다. 첫 번째 방법은 공용 모듈에서 스캔하는 어노테이션이 적용된 `expect` 클래스를 사용하는 것입니다.
 
 ```kotlin
-@ComponentScan
+// commonMain
+@Singleton
+expect class NativeComponent() {
+    fun getInfo(): String
+}
+
 @Module
-class PlatformComponentModule
+@ComponentScan
+class NativeComponentModule
 ```
 
-### 메인 앱 모듈 (Main App Module) {id="main-app-module"}
-
-모든 모듈을 결합합니다:
-
 ```kotlin
-@Configuration
-@Module(includes = [DataModule::class, ViewModelModule::class, PlatformComponentModule::class])
-class AppModule
-```
-
-* `@Configuration` - `@KoinApplication`을 통한 자동 모듈 검색을 활성화합니다.
-* `@Module(includes = [...])` - 포함할 모듈을 선언합니다.
-
-## Koin Application 객체 {id="koin-application-object"}
-
-`@KoinApplication` 객체를 생성합니다:
-
-```kotlin
-@KoinApplication
-object KoinApp
-
-fun initKoin(configuration: KoinAppDeclaration? = null) {
-    KoinApp.startKoin {
-        includes(configuration)
-    }
-
-    val platformInfo = KoinPlatform.getKoin().get<PlatformComponent>().getInfo()
-    println("Running on: $platformInfo")
+// androidMain
+@Singleton
+actual class NativeComponent actual constructor() {
+    actual fun getInfo(): String = "Android NativeComponent"
 }
 ```
 
-`@KoinApplication` 어노테이션은 모든 모듈을 자동으로 로드하는 `startKoin()` 확장 함수를 생성합니다.
+```kotlin
+// nativeMain
+@Singleton
+actual class NativeComponent actual constructor() {
+    actual fun getInfo(): String = "iOS NativeComponent"
+}
+```
 
-## Compose에서 ViewModel 주입하기 {id="injecting-viewmodels-in-compose"}
-
-> 모든 공통 Compose 앱 코드는 `composeApp` Gradle 모듈의 `commonMain`에 위치합니다.
-
-ViewModel은 Compose에서 `koinViewModel()`을 사용하여 주입됩니다:
+두 번째 방법은 `expect` 모듈 클래스를 사용하는 것입니다. 각 플랫폼의 `actual` 모듈이 공유 인터페이스를 구현한 자체 구현체를 스캔합니다.
 
 ```kotlin
+// commonMain
+interface PlatformComponent {
+    fun getInfo(): String
+}
+
+@Module
+expect class PlatformComponentModule
+```
+
+```kotlin
+// androidMain
+@Module
+@ComponentScan
+actual class PlatformComponentModule
+
+@Singleton
+class AndroidPlatformComponent : PlatformComponent {
+    override fun getInfo(): String = "Android PlatformComponent"
+}
+```
+
+```kotlin
+// iosMain
+@Module
+@ComponentScan
+actual class PlatformComponentModule
+
+@Singleton
+class IOSPlatformComponent : PlatformComponent {
+    override fun getInfo(): String = "iOS PlatformComponent"
+}
+```
+
+플랫폼 클래스는 플랫폼 종속적인 의존성을 가질 수도 있습니다. Android에서는 `AndroidContextWrapper`가 Koin으로부터 Android `Context`를 전달받습니다.
+
+```kotlin
+// commonMain
+interface ContextWrapper {
+    fun getContextInfo(): String
+}
+
+@Singleton
+class NativeContextComponent(val ctx: ContextWrapper) {
+    fun getInfo(): String = "NativeContextComponent with ctx: ${ctx.getContextInfo()}"
+}
+```
+
+```kotlin
+// androidMain
+@Singleton
+class AndroidContextWrapper(val context: Context) : ContextWrapper {
+    override fun getContextInfo(): String = "Android Context: $context"
+}
+```
+
+```kotlin
+// nativeMain
+@Singleton
+class IOSContextWrapper : ContextWrapper {
+    override fun getContextInfo(): String = "iOS Context"
+}
+```
+
+공통 코드는 인터페이스를 요청하고, 각 플랫폼에 맞는 적절한 구현체를 주입받습니다. 이러한 패턴은 [KMP 공유 모듈](/docs/reference/koin-core/kmp-shared-modules)에서 자세히 다룹니다.
+
+## 모듈 조립하기 {id="let-s-assemble-the-modules"}
+
+포함할 모듈들과 함께 앱 모듈을 선언하고, 진입점 역할을 할 `@KoinApplication` 객체를 선언합니다.
+
+```kotlin
+import org.koin.core.annotation.Configuration
+import org.koin.core.annotation.KoinApplication
+import org.koin.core.annotation.Module
+
+@Module(includes = [ViewModelModule::class, NativeComponentModule::class, PlatformComponentModule::class])
+@Configuration
+class AppModule
+
+@KoinApplication
+object KoinApp
+```
+
+`KoinApp`은 모든 `@Configuration` 모듈을 수집합니다. 여기에는 포함된 하위 모듈들을 가진 `AppModule`과 `data` Gradle 모듈의 `DataModule`이 포함됩니다. 컴파일러 플러그인은 빌드 타임에 전체 의존성 그래프를 검증합니다.
+
+## Koin 시작 및 ViewModel 주입하기 {id="let-s-start-koin-and-inject-the-viewmodels"}
+
+루트 컴포저블에서 `KoinApplication`과 `koinConfiguration<KoinApp>()`을 사용하여 Koin을 시작합니다.
+
+```kotlin
+import org.koin.compose.KoinApplication
+import org.koin.plugin.module.dsl.koinConfiguration
+
+@Serializable
+object ListDestination
+
+@Serializable
+data class DetailDestination(val objectId: Int)
+
 @Composable
 fun App() {
-    MaterialTheme(
-        colorScheme = if (isSystemInDarkTheme()) darkColorScheme() else lightColorScheme()
-    ) {
-        Surface {
-            val navController: NavHostController = rememberNavController()
-            NavHost(navController = navController, startDestination = ListDestination) {
-                composable<ListDestination> {
-                    val vm = koinViewModel<ListViewModel>()
-                    ListScreen(viewModel = vm, navigateToDetails = { objectId ->
-                        navController.navigate(DetailDestination(objectId))
-                    })
-                }
-                composable<DetailDestination> { backStackEntry ->
-                    val vm = koinViewModel<DetailViewModel>()
-                    DetailScreen(
-                        objectId = backStackEntry.toRoute<DetailDestination>().objectId,
-                        viewModel = vm,
-                        navigateBack = { navController.popBackStack() }
-                    )
+    KoinApplication(configuration = koinConfiguration<KoinApp>()) {
+        MaterialTheme(
+            colorScheme = if (isSystemInDarkTheme()) darkColorScheme() else lightColorScheme()
+        ) {
+            Surface {
+                val navController: NavHostController = rememberNavController()
+                NavHost(navController = navController, startDestination = ListDestination) {
+                    composable<ListDestination> {
+                        ListScreen(navigateToDetails = { objectId ->
+                            navController.navigate(DetailDestination(objectId))
+                        })
+                    }
+                    composable<DetailDestination> { backStackEntry ->
+                        DetailScreen(
+                            objectId = backStackEntry.toRoute<DetailDestination>().objectId,
+                            navigateBack = { navController.popBackStack() }
+                        )
+                    }
                 }
             }
         }
@@ -296,86 +417,39 @@ fun App() {
 }
 ```
 
-:::info
-`koinViewModel()` 함수는 `@KoinViewModel`을 통해 자동으로 등록된 ViewModel 인스턴스를 조회합니다.
-:::
-
-## Koin 시작하기 {id="starting-koin"}
-
-### Android 설정 {id="android-setup"}
-
-Android에서 Koin은 메인 진입점에서 초기화됩니다:
+각 화면에서는 `koinViewModel()`을 사용하여 ViewModel을 가져옵니다.
 
 ```kotlin
-// Android 진입점에서 호출
-initKoin()
-```
+import org.koin.compose.viewmodel.koinViewModel
 
-### iOS 설정 {id="ios-setup"}
+@Composable
+fun ListScreen(navigateToDetails: (objectId: Int) -> Unit) {
+    val viewModel = koinViewModel<ListViewModel>()
+    val objects by viewModel.objects.collectAsStateWithLifecycle()
+    ...
+}
 
-> 모든 iOS 앱 코드는 `iosApp` 폴더에 위치합니다.
-
-iOS에서는 SwiftUI 앱 진입점에서 Koin을 초기화합니다:
-
-```swift
-@main
-struct iOSApp: App {
-    init() {
-        KoinKt.doInitKoin()
-    }
-
-    var body: some Scene {
-        WindowGroup {
-            ContentView()
-        }
-    }
+@Composable
+fun DetailScreen(objectId: Int, navigateBack: () -> Unit) {
+    val viewModel = koinViewModel<DetailViewModel>()
+    val obj by viewModel.getObject(objectId).collectAsStateWithLifecycle(initialValue = null)
+    ...
 }
 ```
 
-Compose UI는 다음과 같이 시작됩니다:
+`KoinApplication`은 전체 앱에 대해 Koin을 한 번 시작합니다. Android에서는 Android 컨텍스트와 로거도 설정해주며, 이를 통해 `AndroidContextWrapper`가 `Context`를 가져올 수 있게 됩니다. 두 플랫폼 모두 동일한 `App` 컴포저블을 호스팅하므로, Android의 `Application` 클래스나 iOS 앱 코드에 별도의 시작 코드를 작성할 필요가 없습니다.
 
 ```kotlin
+// iosMain
 fun MainViewController() = ComposeUIViewController { App() }
 ```
 
-## 어노테이션 vs 컴파일러 플러그인 DSL {id="annotations-vs-compiler-plugin-dsl"}
+Android Studio에서 Android 앱을 실행하거나 Xcode에서 iOS 앱을 실행하면 예술품 목록이 표시됩니다. Compose 외부에서는 `org.koin.plugin.module.dsl`의 `startKoin<KoinApp>()`을 대신 사용하세요. 자세한 내용은 [Compose용 Koin](/docs/reference/koin-compose/compose) 및 [Compose ViewModel](/docs/reference/koin-compose/compose-viewmodel)을 참조하세요.
 
-어노테이션 방식과 컴파일러 플러그인 DSL 방식을 비교하면 다음과 같습니다:
+## 다음 단계 {id="next-steps"}
 
-**어노테이션 사용 시 (compose-annotations/):**
-```kotlin
-@Configuration
-@Module(includes = [DataModule::class, ViewModelModule::class])
-class AppModule
-
-@Single
-class MuseumRepository(api: MuseumApi, storage: MuseumStorage)
-
-@KoinViewModel
-class ListViewModel(repository: MuseumRepository) : ViewModel()
-
-// Koin 시작
-KoinApp.startKoin()
-```
-
-**컴파일러 플러그인 DSL 사용 시 (compose/):**
-```kotlin
-val appModule = module {
-    includes(dataModule, viewModelModule)
-}
-
-val dataModule = module {
-    single<MuseumRepository>() withOptions { createdAtStart() }
-}
-
-val viewModelModule = module {
-    viewModel<ListViewModel>()
-}
-
-// Koin 시작
-startKoin { modules(appModule) }
-```
-
-두 방식 모두 동일한 결과를 얻습니다:
-- **어노테이션**: KSP를 통한 컴파일 타임 검증, 자동 모듈 검색
-- **컴파일러 플러그인 DSL**: 컴파일 타임 자동 연결(Auto-wiring), 더 깔끔한 `single<T>()` 구문
+- [핵심 개념](/docs/intro/core-concepts): 모듈, 정의, 주입의 기반이 되는 멘탈 모델을 알아봅니다.
+- [KMP 공유 모듈](/docs/reference/koin-core/kmp-shared-modules): 여러 플랫폼에 걸쳐 Koin 모듈을 공유하고 분리하는 방법을 알아봅니다.
+- [어노테이션 레퍼런스](/docs/reference/koin-annotations/annotations-inventory): 모든 어노테이션과 해당 매개변수를 살펴봅니다.
+- [Compose 테스팅](/docs/reference/koin-compose/compose-testing): Koin을 사용하는 컴포저블을 테스트하는 방법을 알아봅니다.
+- [도구(Tooling)](/docs/tooling): Koin용 IDE 플러그인 및 모니터링 도구를 확인해 보세요.

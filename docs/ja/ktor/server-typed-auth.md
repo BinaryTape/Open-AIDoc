@@ -4,6 +4,7 @@
 <primary-label ref="experimental"/>
 
 <var name="artifact_name" value="ktor-server-auth"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.server.auth"/>
 
 <tldr>
 <p>
@@ -12,25 +13,31 @@
 </tldr>
 
 <link-summary>
-型安全な認証スキームAPIはプリンシパルの型をルートにバインドするため、キャストやnullチェックを行わずに非nullのプリンシパルを読み取ることができます。
+型安全な認証スキームAPIはプリンシパル型をルートにバインドするため、キャストやnullチェックを行わずに非nullのプリンシパルを読み取ることができます。
 </link-summary>
 
-Ktorは、認証スキームをプリンシパルの型にバインドする型安全な認証スキームAPIを提供しています。スキームを一度作成してルートに渡すだけで、キャストやnullチェックを行わずにプリンシパルを読み取ることができます。
+Ktorは、認証スキームをプリンシパル型にバインドする型安全な認証スキームAPIを提供します。スキームを一度作成してルートに渡せば、キャストやnullチェックなしでプリンシパルを読み取ることができます。
 
-> このAPIは、[`install(Authentication)`](server-auth.md) アプローチの代替手段です。両方のAPIを同じアプリケーション内で使用でき、一方のAPIを使用するルートをもう一方のAPIを使用するルートの内側にネストすることも可能です。
+> このAPIは、[`install(Authentication)`](server-auth.md) アプローチの代替となるものです。両方のAPIを同じアプリケーション内で使用でき、一方のAPIを使用するルートをもう一方のAPIを使用するルートの内側にネストすることも可能です。
 > 
 {style="tip"}
 
 ## 依存関係の追加 {id="add_dependencies"}
 
-型安全な認証を使用するには、ビルドスクリプトに `ktor-server-auth` アーティファクトを追加します。
+型付き認証を使用するには、ビルドスクリプトに `ktor-server-auth` アーティファクトを追加します。
 
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上記のスニペットでは、Ktorの依存関係を指定するために<a href="server-dependencies.topic#using-version-catalog">Ktorバージョンカタログ</a>を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上記のスニペットでは、Ktorの依存関係を指定するために<a href="server-dependencies.topic#using-version-catalog">Ktorバージョンカタログ</a>を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
@@ -40,12 +47,19 @@ Ktorは、認証スキームをプリンシパルの型にバインドする型�
 `jwt` スキームを使用する場合は、`ktor-server-auth-jwt` アーティファクトを追加します。
 
 <var name="artifact_name" value="ktor-server-auth-jwt"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.server.auth.jwt"/>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上記のスニペットでは、Ktorの依存関係を指定するために<a href="server-dependencies.topic#using-version-catalog">Ktorバージョンカタログ</a>を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上記のスニペットでは、Ktorの依存関係を指定するために<a href="server-dependencies.topic#using-version-catalog">Ktorバージョンカタログ</a>を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
@@ -55,21 +69,28 @@ Ktorは、認証スキームをプリンシパルの型にバインドする型�
 `apiKey` スキームを使用する場合は、`ktor-server-auth-api-key` アーティファクトを追加します。
 
 <var name="artifact_name" value="ktor-server-auth-api-key"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.server.auth.apiKey"/>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上記のスニペットでは、Ktorの依存関係を指定するために<a href="server-dependencies.topic#using-version-catalog">Ktorバージョンカタログ</a>を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上記のスニペットでは、Ktorの依存関係を指定するために<a href="server-dependencies.topic#using-version-catalog">Ktorバージョンカタログ</a>を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
     </TabItem>
 </Tabs>
 
-## APIを有効化する {id="prerequisites"}
+## APIの有効化 {id="prerequisites"}
 
-このAPIには `@ExperimentalKtorApi` のアノテーションが付与されているため、オプトインする必要があります。
+このAPIには `@ExperimentalKtorApi` がマークされているため、オプトインする必要があります。
 
 ```kotlin
 @OptIn(ExperimentalKtorApi::class)
@@ -78,7 +99,7 @@ fun Application.module() {
 }
 ```
 
-ルートビルダーはKotlinの[コンテキストパラメータ](https://kotlinlang.org/docs/context-parameters.html)（context parameters）を使用します。Kotlin 2.4.0ではコンテキストパラメータがデフォルトで有効になっています。Kotlin 2.2.xまたは2.3.xを使用している場合は、ビルドスクリプトで有効化してください。
+ルートビルダーはKotlinの[コンテキストパラメータ（context parameters）](https://kotlinlang.org/docs/context-parameters.html)を使用します。Kotlin 2.4.0ではコンテキストパラメータがデフォルトで有効になっています。Kotlin 2.2.xまたは2.3.xを使用している場合は、ビルドスクリプトでこれらを有効にしてください。
 
 ```kotlin
 kotlin {
@@ -90,7 +111,7 @@ kotlin {
 
 ## プリンシパルの定義 {id="principal"}
 
-プリンシパル（Principal）は、アプリケーションが認証された呼び出し元に関連付けるアイデンティティやその他の情報を表します。プリンシパルの型は非nullでなければなりません。
+プリンシパルは、認証された呼び出し元に関連付ける識別情報やその他の情報を表します。プリンシパル型は非nullでなければなりません。
 
 ```kotlin
 data class User(
@@ -101,7 +122,7 @@ data class User(
 
 ## スキームの作成 {id="create-scheme"}
 
-各認証方式には、プリンシパルの型、名前、および設定ブロックを受け取るファクトリ関数が用意されています。`validate {}` ブロックはプリンシパル型を返し、クレデンシャルが拒否された場合は `null` を返します。
+各認証方式は、プリンシパル型、名前、および設定ブロックを受け取るファクトリ関数を提供します。`validate {}` ブロックはプリンシパル型を返すか、クレデンシャルが拒否された場合は `null` を返します。
 
 ```kotlin
 val jwtAuth = jwt<User>("my-jwt") {
@@ -117,24 +138,24 @@ val jwtAuth = jwt<User>("my-jwt") {
 }
 ```
 
-ファクトリは値を返します。それを保持し、必要とするルートに渡します。
+ファクトリは値を返します。それを保持し、それを必要とするルートに渡します。
 
-| Factory                             | Artifact                   | Notes                                   |
+| ファクトリ | アーティファクト | 備考 |
 |-------------------------------------|----------------------------|-----------------------------------------|
-| `basic<P>()`                        | `ktor-server-auth`         | [Ktor ServerでのBasic認証](server-basic-auth.md)を参照            |
+| `basic<P>()`                        | `ktor-server-auth`         | [Ktor ServerでのBasic認証](server-basic-auth.md)を参照 |
 | `digest<P>()`                       | `ktor-server-auth`         | JVMのみ。[Ktor ServerでのDigest認証](server-digest-auth.md)を参照 |
-| `bearer<P>()`                       | `ktor-server-auth`         | [Ktor ServerでのBearer認証](server-bearer-auth.md)を参照           |
-| `form<P>()`                         | `ktor-server-auth`         | [Ktor Serverでのフォームベース認証](server-form-based-auth.md)を参照       |
-| `session<S, P>()`                   | `ktor-server-auth`         | [型安全なセッション認証](server-typed-session-auth.md)を参照    |
-| `apiKey<P>()`                       | `ktor-server-auth-api-key` | [APIキー認証](server-api-key-auth.md)を参照          |
-| `jwt<P>()`                          | `ktor-server-auth-jwt`     | JVMのみ。[JSON Web Token](server-jwt.md)を参照         |
-| `oauth2()`, `oauth2Session<P, S>()` | `ktor-server-auth`         | [OAuth 2.0フロー](server-oauth2-flows.md)を参照          |
+| `bearer<P>()`                       | `ktor-server-auth`         | [Ktor ServerでのBearer認証](server-bearer-auth.md)を参照 |
+| `form<P>()`                         | `ktor-server-auth`         | [Ktor Serverでのフォームベース認証](server-form-based-auth.md)を参照 |
+| `session<S, P>()`                   | `ktor-server-auth`         | [型安全なセッション認証](server-typed-session-auth.md)を参照 |
+| `apiKey<P>()`                       | `ktor-server-auth-api-key` | [APIキー認証](server-api-key-auth.md)を参照 |
+| `jwt<P>()`                          | `ktor-server-auth-jwt`     | JVMのみ。[JSON Web Tokens](server-jwt.md)を参照 |
+| `oauth2()`, `oauth2Session<P, S>()` | `ktor-server-auth`         | [OAuth 2.0フロー](server-oauth2-flows.md)を参照 |
 
-スキーム名は一意である必要があります。同じ名前で異なる2つのスキームを作成した場合、ルートがそれを使用しようとした際に2つ目のスキームが失敗します。
+スキーム名は一意である必要があります。同じ名前で2つの異なるスキームを作成すると、ルートがそれを使用しようとした際に2つ目のスキームが失敗します。
 
 ## ルートの保護 {id="protect-routes"}
 
-ルートを保護するには、`authenticateWith()` 関数にスキームを渡します。ブロック内では、`call.principal` はスキームで定義されたプリンシパル型を持ち、非nullであることが保証されます。
+ルートを保護するには、`authenticateWith()` 関数にスキームを渡します。ブロック内では、`call.principal` はスキームによって定義されたプリンシパル型を持ち、非nullであることが保証されます。
 
 ```kotlin
 routing {
@@ -147,9 +168,9 @@ routing {
 }
 ```
 
-## 認証をオプショナルにする {id="optional"}
+## 認証をオプションにする {id="optional"}
 
-サインイン済みの呼び出し元と匿名の呼び出し元の両方を処理するルートには、`authenticateWithOptional()` 関数を使用します。ブロック内では、`call.principalOrNull` を使用してプリンシパルにアクセスします。
+ルートでサインイン済みの呼び出し元と匿名の呼び出し元の両方を処理する場合は、`authenticateWithOptional()` 関数を使用します。ブロック内では、`call.principalOrNull` を使用してプリンシパルにアクセスします。
 
 ```kotlin
 routing {
@@ -162,13 +183,13 @@ routing {
 }
 ```
 
-クレデンシャルのないリクエストは成功し、`call.principalOrNull` は `null` のままになります。無効なクレデンシャルを含むリクエストは引き続き失敗します。
+クレデンシャルを持たないリクエストは成功し、`call.principalOrNull` は `null` になります。無効なクレデンシャルを持つリクエストは引き続き失敗します。
 
-## 複数のスキームを受け付ける {id="any-of"}
+## 複数のスキームを受け入れる {id="any-of"}
 
-同じルートで複数のスキームを受け付けるには、`authenticateWithAnyOf()` 関数を使用します。Ktorは指定された順序でスキームを試行し、最初に成功したスキームがプリンシパルを提供します。
+同じルートで複数のスキームを受け入れるには、`authenticateWithAnyOf()` 関数を使用します。Ktorはリストされた順序でスキームを試行し、最初に成功したスキームがプリンシパルを提供します。
 
-すべてのスキームは共通の型に適合するプリンシパルを生成する必要があり、その共通の型を呼び出し時に宣言します。
+すべてのスキームは、共通の型に適合するプリンシパルを生成する必要があり、その型を呼び出し時に宣言します。
 
 ```kotlin
 interface AppUser {
@@ -195,15 +216,15 @@ routing {
 }
 ```
 
-> `authenticateWithAnyOf()` の内部では、`call.principal` のみを利用できます。[セッションスキーム](server-typed-session-auth.md)の `call.session` など、単一のスキームに固有の追加プロパティは利用できません。
+> `authenticateWithAnyOf()` の内部では、`call.principal` のみが利用可能です。[セッションスキーム](server-typed-session-auth.md)の `call.session` のように、単一のスキームに属する追加機能は利用できません。
 >
 {style="note"}
 
-## 匿名呼び出し元を許可する {id="anonymous"}
+## 匿名の呼び出し元を許可する {id="anonymous"}
 
-クレデンシャルのない呼び出し元を処理するスキームを構築するには、`orAnonymous()` 関数を使用します。クレデンシャルのないリクエストは、指定したブロックが返すプリンシパルを取得します。無効なクレデンシャルを含むリクエストは引き続き失敗します。
+クレデンシャルを持たない呼び出し元を処理するスキームを構築するには、`orAnonymous()` 関数を使用します。クレデンシャルのないリクエストは、ブロックが返したプリンシパルを取得します。無効なクレデンシャルを持つリクエストは引き続き失敗します。
 
-その結果、プリンシパルの型が両者の共通スーパータイプであるスキームが得られます。
+結果として、2つの共通のスーパータイプをプリンシパル型とするスキームが得られます。
 
 ```kotlin
 interface Identity
@@ -234,7 +255,7 @@ routing {
 
 ## プリンシパルの変換 {id="map-principal"}
 
-`mapPrincipal()` 関数を使用して、データベースからユーザーレコードを読み込むなどして、プリンシパルを別の型に変換します。
+データベースからユーザーレコードを読み込むなどしてプリンシパルを別の型に変換するには、`mapPrincipal()` 関数を使用します。
 
 ```kotlin
 data class AppUser(val id: String, val email: String)
@@ -246,11 +267,11 @@ val appAuth = jwtAuth.mapPrincipal { jwtUser ->
 }
 ```
 
-この変換処理は、スキームがプリンシパルを生成した後にのみ実行されます。変換が `null` を返した場合、リクエストは `401 Unauthorized` で拒否されます。
+変換は、スキームがプリンシパルを生成した後にのみ実行されます。変換が `null` を返した場合、リクエストは `401 Unauthorized` で拒否されます。
 
-## ロールのチェック {id="roles"}
+## ロールの確認 {id="roles"}
 
-ロールチェックはオプトインです。`AuthenticationRole` を実装するロール型を定義し、`withRoles()` を使用してロールを認識するスキームを構築します。
+ロールチェックはオプトインです。`AuthenticationRole` を実装するロール型を定義し、`withRoles()` を使用してロール対応スキームを構築します。
 
 ```kotlin
 enum class Role : AuthenticationRole {
@@ -262,7 +283,7 @@ val roleAuth = jwtAuth.withRoles { user ->
 }
 ```
 
-`withRoles {}` ブロックは、認証が成功した後にすべてのリクエストで実行されます。データベース、キャッシュ、またはプリンシパル自体からロールを読み込むために使用します。
+`withRoles {}` ブロックは、認証が成功した後に各リクエストで実行されます。データベース、キャッシュ、またはプリンシパル自体からロールをロードするために使用します。
 
 ルートが必要とするロールを `roles` パラメータで宣言します。
 
@@ -279,7 +300,7 @@ routing {
 
 認証されたものの必要なロールを持たない呼び出し元は、`403 Forbidden` を受け取ります。呼び出し元は、いずれか1つだけでなく、セットに含まれるすべてのロールを持っている必要があります。
 
-特定のロールを必須とせずにロールを解決するには、`roles = null` を渡します。これはハンドラー自身が判断を下す場合に便利です。
+ロールを要求せずに解決したい場合は、`roles = null` を渡します。これはハンドラ自体で判断を行いたい場合に役立ちます。
 
 ```kotlin
 authenticateWith(roleAuth, roles = null) {
@@ -293,7 +314,7 @@ authenticateWith(roleAuth, roles = null) {
 }
 ```
 
-`roles` プロパティは、ロール対応ルートの内部にのみ存在します。通常のスキームで保護されたルート上ではコンパイルエラーになります。
+`roles` プロパティは、ロール対応ルートの内部にのみ存在します。通常のスキームで保護されたルート上ではコンパイルされません。
 
 ## 失敗の処理 {id="failures"}
 
@@ -302,7 +323,7 @@ authenticateWith(roleAuth, roles = null) {
 * `onUnauthorized` は認証が失敗したときに実行されます。デフォルトのレスポンスは `401 Unauthorized` です。
 * `onForbidden` は認証には成功したものの、呼び出し元に必要なロールがない場合に実行されます。デフォルトのレスポンスは `403 Forbidden` です。
 
-スキームにハンドラーを設定して、そのスキームを使用するすべてのルートをカバーします。
+そのスキームを使用するすべてのルートに適用するには、スキーム側でハンドラを設定します。
 
 ```kotlin
 val jwtAuth = jwt<User>("my-jwt") {
@@ -324,7 +345,7 @@ val roleAuth = jwtAuth.withRoles(
 }
 ```
 
-または、個別のルートにハンドラーを設定して、スキームレベルのハンドラーをオーバーライドします。
+あるいは、個別のルートにハンドラを設定して、スキームレベルのハンドラを上書きすることもできます。
 
 ```kotlin
 authenticateWith(
@@ -342,15 +363,15 @@ authenticateWith(
 }
 ```
 
-Ktorは以下の順序でunauthorizedハンドラーを検索します。
+Ktorは次の順序で未認証ハンドラを検索します。
 
-1. `authenticateWith()` に渡されたハンドラー。
-2. スキームに設定された `onUnauthorized` ハンドラー。
+1. `authenticateWith()` に渡されたハンドラ。
+2. スキームに設定された `onUnauthorized` ハンドラ。
 3. プロバイダーのデフォルトのチャレンジ。
 
 いずれも応答しない場合、リクエストは `401 Unauthorized` で失敗します。
 
-`authenticateWithAnyOf()` の場合、ハンドラーはスキーム名と失敗原因のマップを受け取るため、各スキームがなぜ失敗したかを報告できます。
+`authenticateWithAnyOf()` の場合、ハンドラはスキーム名と失敗原因のマッピングを受け取るため、それぞれが失敗した理由を報告できます。
 
 ```kotlin
 authenticateWithAnyOf<AppUser>(
@@ -365,7 +386,7 @@ authenticateWithAnyOf<AppUser>(
 }
 ```
 
-## クラシックAPIとの組み合わせ {id="mixing"}
+## 従来のAPIとの組み合わせ {id="mixing"}
 
 両方の認証APIを同じアプリケーション内で使用できます。名前付きプロバイダーAPIによって保護されたルートの内側に型安全なルートをネストしたり、型安全なルートの内側にプロバイダーベースのルートをネストしたりできます。
 
@@ -399,7 +420,7 @@ routing {
 
 ## 制限事項 {id="limitations"}
 
-* このAPIは実験的（Experimental）です。マイナーリリースで変更される可能性があります。
+* このAPIは実験的（experimental）です。マイナーリリースで変更される可能性があります。
 * このAPIはKotlinのコンテキストパラメータを使用しており、Kotlin 2.4.0または `-Xcontext-parameters` コンパイラオプションが必要です。
-* `authenticateWithAnyOf()` 関数は `call.principal` のみを提供します。その内部では、`call.session` などのスキーム固有のプロパティは利用できません。
-* LDAPプロバイダーに相当する型安全な実装はありません。代わりに型付きの `validate {}` ブロック内で [`ldapAuthenticate()`](server-ldap.md) を呼び出してください。
+* `authenticateWithAnyOf()` 関数は `call.principal` のみを提供します。その内部では `call.session` などのスキーム固有のプロパティは利用できません。
+* LDAPプロバイダーに相当する型安全な実装はありません。代わりに、型付きの `validate {}` ブロック内で [`ldapAuthenticate()`](server-ldap.md) を呼び出してください。

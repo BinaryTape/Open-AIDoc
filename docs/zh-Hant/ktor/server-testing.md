@@ -1,24 +1,24 @@
-[//]: # (title: Ktor Server 中的測試)
+[//]: # (title: 在 Ktor Server 中進行測試)
 
 <show-structure for="chapter" depth="3"/>
 
 <tldr>
 <p>
-<b>必要的相依性</b>：<code>io.ktor:ktor-server-test-host</code>、<code>org.jetbrains.kotlin:kotlin-test</code>
+<b>必要的相依性</b>: <code>io.ktor:ktor-server-test-host</code>, <code>org.jetbrains.kotlin:kotlin-test</code>
 </p>
 </tldr>
 
 <link-summary>
-了解如何使用特殊的測試引擎來測試您的伺服器應用程式。
+了解如何使用專門的測試引擎來測試您的伺服器應用程式。
 </link-summary>
 
-Ktor 提供了一個測試引擎，可以直接執行應用程式呼叫，而無需啟動真實的 Web 伺服器或繫結到通訊端 (sockets)。請求是在內部處理的，這使得測試與執行完整伺服器相比，速度更快且更可靠。
+Ktor 提供了一個測試引擎，可以直接執行應用程式呼叫，而無需啟動真正的 Web 伺服器或繫結至 socket。請求會在內部進行處理，相較於執行完整的伺服器，這使得測試速度更快且更可靠。
 
 ## 新增相依性 {id="add-dependencies"}
 
-若要測試 Ktor 伺服器應用程式，請在您的建置指令碼中包含以下相依性：
+若要測試 Ktor 伺服器應用程式，請在組建指令碼中加入以下相依性：
 
-* `ktor-server-test-host` 相依性提供了測試引擎：
+* `ktor-server-test-host` 相依性提供測試引擎：
 
    <var name="artifact_name" value="ktor-server-test-host"/>
    <Tabs group="languages">
@@ -50,19 +50,19 @@ Ktor 提供了一個測試引擎，可以直接執行應用程式呼叫，而無
       </TabItem>
   </Tabs>
 
-> 對於 [Native 伺服器](server-native.md#add-dependencies) 測試，請將這些構件新增到 `nativeTest` 原始碼集。
+> 對於 [Native 伺服器](server-native.md#add-dependencies)測試，請將這些構件加入 `nativeTest` 原始碼集中。
 
-## 測試概覽 {id="overview"}
+## 測試總覽 {id="overview"}
 
-您可以使用 [`testApplication {}`](https://api.ktor.io/ktor-server-test-host/io.ktor.server.testing/test-application.html) 函式和提供的 [HTTP 用戶端](client-create-and-configure.md) 來測試 Ktor 應用程式。典型的流程包含以下步驟：
+您可以使用 [`testApplication {}`](https://api.ktor.io/ktor-server-test-host/io.ktor.server.testing/test-application.html) 函式以及所提供的 [HTTP 用戶端](client-create-and-configure.md)來測試 Ktor 應用程式。一般的工作流程包含以下步驟：
 
 1. 使用 `testApplication {}` [定義測試](#junit-test-class)。
-2. [配置並執行測試執行個體](#configure-test-app)。
-3. （選填）[配置 HTTP 用戶端](#configure-client)。
-4. 使用用戶端向您的測試應用程式 [發送 HTTP 請求](#make-request) 並接收回應。
-5. 使用來自 `kotlin.test` 的斷言來 [驗證回應](#assert)，包括狀態碼、標頭和主體內容。
+2. [配置並執行](#configure-test-app)應用程式的測試執行個體。
+3. （選用）[配置 HTTP 用戶端](#configure-client)。
+4. 使用該用戶端向您的測試應用程式[發送 HTTP 請求](#make-request)並接收回應。
+5. 使用來自 `kotlin.test` 的斷言[驗證回應](#assert)，包括狀態碼、標頭與內文內容。
 
-以下範例測試了一個簡單的 Ktor 應用程式，該程式會以純文字回應 `GET /` 請求：
+以下範例測試一個對 `GET /` 請求回應純文字的簡易 Ktor 應用程式：
 
 <Tabs>
 <TabItem title="ApplicationTest.kt">
@@ -121,19 +121,19 @@ fun Application.module() {
 
 ## 設定 JUnit 測試類別 {id="junit-test-class"}
 
-在為您的 Ktor 應用程式編寫測試之前，請建立一個測試檔案和一個 JUnit 測試類別。
+在為 Ktor 應用程式撰寫測試之前，請先建立測試檔案和 JUnit 測試類別。
 
 <procedure>
 
-1. 在您的專案中尋找或建立 `src/test/kotlin` 目錄。
-2. 建立一個新的 Kotlin 檔案（例如 `ApplicationTest.kt`）。
+1. 在專案中尋找或建立 `src/test/kotlin` 目錄。
+2. 建立新的 Kotlin 檔案（例如 `ApplicationTest.kt`）。
 3. 定義一個將包含測試的 Kotlin 類別：
     ```kotlin 
     class ApplicationTest {
-        // 測試函式放在這裡
+        // 測試函式置於此處
     }
     ```
-4. 新增一個帶有 `@Test` 註解的測試函式。在測試內部，使用 `testApplication {}` 函式在測試環境中執行您的應用程式：
+4. 新增一個帶有 `@Test` 註解的測試函式。在測試內部，使用 `testApplication {}` 函式在測試環境中執行應用程式：
    ```kotlin 
     class ApplicationTest {
         @Test
@@ -144,11 +144,11 @@ fun Application.module() {
     ```
 </procedure>
 
-`testApplication {}` 函式是 Ktor 伺服器測試的進入點。它會建立一個隔離的測試環境，在不啟動真實 Web 伺服器的情況下執行您的應用程式，並提供一個預先配置的 HTTP 用戶端用於發送請求和斷言回應。
+`testApplication {}` 函式是 Ktor 中伺服器測試的進入點。它會建立一個隔離的測試環境，在不啟動真實 Web 伺服器的情況下執行應用程式，並提供預先配置的 HTTP 用戶端，用於發送請求與斷言回應。
 
-在 `testApplication {}` 區塊內，您可以配置測試應用程式的行為，例如要載入哪些模組、要公開哪些路由、如何設定環境，或是要模擬哪些外部服務。
+在 `testApplication {}` 區塊內部，您可以配置測試應用程式的行為，例如載入哪些模組、公開哪些路由、如何設定環境，或是模擬哪些外部服務。
 
-下一節將介紹可用的配置選項。
+下一節將說明可用的配置選項。
 
 ## 配置測試應用程式 {id="configure-test-app"}
 
@@ -159,17 +159,17 @@ fun Application.module() {
 - [自訂環境](#environment)
 - [模擬外部服務](#external-services)
 
-> 預設情況下，配置的測試應用程式會在 [第一次用戶端呼叫](#make-request) 時啟動。
-> 您也可以選擇呼叫 `startApplication()` 函式來手動啟動應用程式。
-> 當您需要測試應用程式的 [生命週期事件](server-events.md#predefined-events) 時，這會非常有用。
+> 預設情況下，已配置的測試應用程式會在[第一次用戶端呼叫](#make-request)時啟動。
+> （選用）您可以呼叫 `startApplication()` 函式手動啟動應用程式。
+> 如果您需要測試應用程式的[生命週期事件](server-events.md#predefined-events)，這會很有用。
 
 ### 新增應用程式模組 {id="add-modules"}
 
-必須透過 [明確載入模組](#explicit-module-loading) 或 [配置環境](#configure-env) 將 [模組](server-modules.md) 載入到測試應用程式中。
+必須透過[明確載入](#explicit-module-loading)或[配置環境](#configure-env)的方式，將[模組](server-modules.md)載入至測試應用程式中。
 
 #### 明確載入模組 {id="explicit-module-loading"}
 
-若要手動將模組新增到測試應用程式，請使用 `application {}` 區塊：
+若要手動將模組新增至測試應用程式，請使用 `application {}` 區塊：
 
 ```kotlin
 package com.example
@@ -206,15 +206,15 @@ class ApplicationTest {
         // 存取 application 屬性
         val app: Application = application
 
-        // 斷言其為同一個執行個體
+        // 斷言它是同一個執行個體
         assertSame(configuredApplication, app)
     }
 }
 ```
 
-#### 從配置文件載入模組 {id="configure-env"}
+#### 從組態檔載入模組 {id="configure-env"}
 
-若要從配置文件載入模組，請使用 `environment {}` 區塊為您的測試指定配置文件：
+若要從組態檔載入模組，請使用 `environment {}` 區塊為測試指定組態檔：
 
 ```kotlin
 @Test
@@ -227,21 +227,21 @@ fun testHello() = testApplication {
 }
 ```
 
-當您需要在測試期間模擬不同環境或使用自訂配置設定時，此方法非常有用。
+當您需要在測試期間模擬不同環境或使用自訂配置設定時，此方法非常實用。
 
 ### 存取應用程式執行個體 {id="access-application"}
 
-在 `application {}` 區塊內，您可以存取正在配置的 `Application` 執行個體：
+在 `application {}` 區塊內部，您可以存取正在配置的 `Application` 執行個體：
 
 ```kotlin
 testApplication {
     application {
         val app: Application = this
-        // 在此處與應用程式執行個體互動
+        // 在此處與應用程式執行個體進行互動
     }
 }
 ```
-此外，`testApplication` 作用域會公開 `application` 屬性，該屬性會傳回測試所使用的同一個 `Application` 執行個體。這允許您直接從測試程式碼中檢查或與應用程式互動。
+此外，`testApplication` 作用域公開了 `application` 屬性，該屬性會傳回測試所使用的同一個 `Application` 執行個體。這允許您直接從測試程式碼檢查應用程式或與其互動。
 
 ```kotlin
 package com.example
@@ -278,21 +278,21 @@ class ApplicationTest {
         // 存取 application 屬性
         val app: Application = application
 
-        // 斷言其為同一個執行個體
+        // 斷言它是同一個執行個體
         assertSame(configuredApplication, app)
     }
 }
 ```
 
-> 在呼叫 `startApplication()` 或發出第一個用戶端請求之前存取 `application` 屬性會傳回 `Application` 執行個體，但它可能尚未啟動。
+> 在呼叫 `startApplication()` 或發送第一個用戶端請求之前存取 `application` 屬性會傳回 `Application` 執行個體，但此時應用程式可能尚未啟動。
 > 
 {style="note"}
 
 ### 新增路由 {id="add-routing"}
 
-您可以使用 `routing {}` 區塊將路由新增到測試應用程式。這種方法對於在不載入完整模組的情況下測試路由，或新增測試特定的端點非常有用。
+您可以使用 `routing {}` 區塊將路由新增至測試應用程式。這種方法非常適合用於在不載入完整模組的情況下測試路由，或是新增測試專用的端點。
 
-以下範例新增了在測試中用於初始化使用者工作階段的 `/login-test` 端點：
+以下範例新增了 `/login-test` 端點，用於在測試中初始化使用者工作階段：
 
 ```kotlin
 fun testHello() = testApplication {
@@ -309,9 +309,9 @@ fun testHello() = testApplication {
 
 ### 自訂環境 {id="environment"}
 
-若要為您的測試應用程式配置自訂環境，請使用 `environment {}` 函式。
+若要為測試應用程式配置自訂環境，請使用 `environment {}` 函式。
 
-例如，若要從 `test/resources` 資料夾載入配置文件：
+例如，從 `test/resources` 資料夾載入組態檔：
 
 ```kotlin
 @Test
@@ -324,7 +324,7 @@ fun testHello() = testApplication {
 }
 ```
 
-或者，您可以使用 [`MapApplicationConfig`](https://api.ktor.io/ktor-server-core/io.ktor.server.config/-map-application-config/index.html) 以程式化方式提供配置屬性。當您需要在應用程式啟動前存取應用程式配置時，這很有用。
+或者，您可以透過程式設計方式使用 [`MapApplicationConfig`](https://api.ktor.io/ktor-server-core/io.ktor.server.config/-map-application-config/index.html) 來提供配置屬性。當您需要在應用程式啟動前存取應用程式配置時，這很有用。
 
 ```kotlin
 @Test
@@ -337,9 +337,9 @@ fun testDevEnvironment() = testApplication {
 
 ### 模擬外部服務 {id="external-services"}
 
-您可以使用 `externalServices {}` 函式模擬外部服務。在其區塊內，針對您要模擬的每個服務使用 `hosts() {}` 函式。在 `hosts() {}` 區塊中，您可以透過定義路由和安裝外掛程式來配置一個充當模擬服務的 `Application`。
+您可以使用 `externalServices {}` 函式來模擬外部服務。在其區塊內，針對每個要模擬的服務使用 `hosts() {}` 函式。在 `hosts() {}` 區塊中，您可以透過定義路由和安裝外掛程式，來配置一個作為模擬服務的 `Application`。
 
-以下範例模擬了來自 Google API 的 JSON 回應：
+以下範例模擬來自 Google API 的 JSON 回應：
 
 ```kotlin
 @Test
@@ -368,10 +368,9 @@ fun testHello() = testApplication {
 
 ## 配置用戶端 {id="configure-client"}
 
-`testApplication {}` 函式透過 `client` 屬性提供了一個已配置的 HTTP 用戶端。
-若要自訂用戶端並安裝額外的外掛程式，請使用 `createClient {}` 函式。
+`testApplication {}` 函式透過 `client` 屬性提供已配置的 HTTP 用戶端。若要自訂用戶端並安裝其他外掛程式，請使用 `createClient {}` 函式。
 
-例如，您可以安裝 [`ContentNegotiation`](client-serialization.md) 外掛程式，以便在 `POST/PUT` 請求中 [發送 JSON 資料](#json-data)：
+例如，您可以安裝 [`ContentNegotiation`](client-serialization.md) 外掛程式，以在 `POST/PUT` 請求中[傳送 JSON 資料](#json-data)：
 
 ```kotlin
 @Test
@@ -389,9 +388,9 @@ fun testPostCustomer() = testApplication {
 
 ## 發送請求 {id="make-request"}
 
-使用配置好的用戶端來 [發送請求](client-requests.md) 並 [接收回應](client-responses.md)。
+使用配置好的用戶端來[發送請求](client-requests.md)並[接收回應](client-responses.md)。
 
-以下範例測試了處理 `POST` 請求的 `/customer` 端點：
+以下範例測試處理 `POST` 請求的 `/customer` 端點：
 
 ```kotlin
 @Test
@@ -441,11 +440,11 @@ fun testPostCustomer() = testApplication {
 
 ### 傳送表單資料 {id="form-data"}
 
-要在測試請求中傳送表單資料，請使用 [`header()`](client-requests.md#headers) 和 [`setBody()`](client-requests.md#body) 函式設定 `Content-Type` 標頭和請求主體。
+若要在測試請求中傳送表單資料，請使用 [`header()`](client-requests.md#headers) 與 [`setBody()`](client-requests.md#body) 函式設定 `Content-Type` 標頭及請求內文。
 
-#### 鍵值對 {id="x-www-form-urlencoded"}
+#### 鍵/值配對 {id="x-www-form-urlencoded"}
 
-要在 POST 請求中傳送鍵值對表單參數，請將 `Content-Type` 標頭設定為 `application/x-www-form-urlencoded`，並使用 [`formUrlEncode()`](https://api.ktor.io/ktor-http/io.ktor.http/form-url-encode.html) 函式對參數進行編碼：
+若要在 POST 請求中傳送鍵/值表單參數，請將 `Content-Type` 標頭設為 `application/x-www-form-urlencoded`，並使用 [`formUrlEncode()`](https://api.ktor.io/ktor-http/io.ktor.http/form-url-encode.html) 函式對參數進行編碼：
 
 <Tabs>
 <TabItem title="ApplicationTest.kt">
@@ -503,9 +502,9 @@ fun Application.main() {
 
 > 如需完整的程式碼範例，請參閱 [post-form-parameters](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/post-form-parameters)。
 
-#### 多部分表單資料 (Multipart form data) {id="multipart-form-data"}
+#### Multipart 表單資料 {id="multipart-form-data"}
 
-您可以使用 `multipart/form-data` 內容型別來建構多部分表單資料並測試檔案上傳：
+您可以使用 `multipart/form-data` 內容類型來建置 multipart 表單資料並測試檔案上傳：
 
 <Tabs>
 <TabItem title="ApplicationTest.kt">
@@ -610,9 +609,9 @@ fun Application.main() {
 
 ### 傳送 JSON 資料 {id="json-data"}
 
-若要在 `POST/PUT` 請求中序列化和反序列化 JSON 資料，請為新用戶端安裝 [`ContentNegotiation`](client-serialization.md) 外掛程式。
+若要在 `POST/PUT` 請求中序列化與反序列化 JSON 資料，請在新的用戶端中安裝 [`ContentNegotiation`](client-serialization.md) 外掛程式。
 
-在請求內部，您可以使用 `contentType()` 函式指定 `Content-Type` 標頭，並使用 `setBody()` 函式指定請求主體。
+在請求內部，您可以使用 `contentType()` 函式指定 `Content-Type` 標頭，並使用 `setBody()` 函式指定請求內文。
 
 <Tabs>
 <TabItem title="ApplicationTest.kt">
@@ -684,13 +683,13 @@ data class Customer(val id: Int, val firstName: String, val lastName: String)
 </TabItem>
 </Tabs>
 
-> 如需完整範例，請參閱 [json-kotlinx](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/json-kotlinx)。
+> 如需完整的範例，請參閱 [json-kotlinx](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/json-kotlinx)。
 
 ## 在測試期間保留 Cookie {id="preserving-cookies"}
 
-若要在請求之間保留 Cookie，請為新用戶端安裝 [`HttpCookies`](client-cookies.md) 外掛程式。
+若要在多次請求之間保留 Cookie，請在新的用戶端中安裝 [`HttpCookies`](client-cookies.md) 外掛程式。
 
-在以下範例中，由於保留了 Cookie，每次請求後重載次數都會增加：
+在以下範例中，由於 Cookie 得以保留，重新載入計數會在每次請求後遞增：
 
 <Tabs>
 <TabItem title="ApplicationTest.kt">
@@ -774,11 +773,11 @@ fun Application.main() {
 </TabItem>
 </Tabs>
 
-> 如需完整範例，請參閱 [session-cookie-client](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/session-cookie-client)。
+> 如需完整的範例，請參閱 [session-cookie-client](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/session-cookie-client).
 
 ## 測試 HTTPS {id="https"}
 
-若要測試 [HTTPS 端點](server-ssl.md)，請使用 [`URLBuilder.protocol`](client-requests.md#url) 屬性設定請求協定：
+若要測試 [HTTPS 端點](server-ssl.md)，請使用 [`URLBuilder.protocol`](client-requests.md#url) 屬性來設定請求協定：
 
 ```kotlin
 package com.example
@@ -806,9 +805,9 @@ class ApplicationTest {
 
 ```
 
-> 如需完整範例，請參閱 [ssl-engine-main](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/ssl-engine-main)。
+> 如需完整的範例，請參閱 [ssl-engine-main](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/ssl-engine-main)。
 
-## 測試 WebSockets {id="testing-ws"}
+## 測試 WebSocket {id="testing-ws"}
 
 您可以使用 [`WebSockets`](client-websockets.topic) 用戶端外掛程式來測試 [WebSocket 對話](server-websockets.md)：
 
@@ -844,11 +843,11 @@ class ModuleTest {
 }
 ```
 
-## 使用 HttpClient 進行端對端測試 {id="end-to-end"}
+## 使用 HttpClient 進行端到端測試 {id="end-to-end"}
 
-您可以使用 [Ktor HTTP 用戶端](client-create-and-configure.md) 對您的伺服器應用程式進行完整的端對端測試。
+您可以使用 [Ktor HTTP 用戶端](client-create-and-configure.md)對伺服器應用程式進行完整的端到端測試。
 
-在下面的範例中，HTTP 用戶端向 `TestServer` 發送測試請求：
+在下方的範例中，HTTP 用戶端會向 `TestServer` 發送測試請求：
 
 ```kotlin
 import e2e.TestServer
@@ -869,4 +868,4 @@ class EmbeddedServerTest: TestServer() {
 }
 ```
 
-> 如需完整的端對端測試範例，請參閱 [embedded-server](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/embedded-server) 和 [e2e](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/e2e)。
+> 如需完整的端到端測試範例，請參閱 [embedded-server](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/embedded-server) 與 [e2e](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/e2e)。

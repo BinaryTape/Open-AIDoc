@@ -1,17 +1,17 @@
 [//]: # (title: 함수)
 
-Kotlin에서 함수를 선언하려면 다음을 수행합니다:
+Kotlin에서 함수를 선언하려면 다음과 같이 합니다.
 * `fun` 키워드를 사용합니다.
-* 괄호 `()` 안에 파라미터를 지정합니다.
+* 괄호 `()` 안에 매개변수를 지정합니다.
 * 필요한 경우 [반환 타입](#return-types)을 포함합니다.
 
-예를 들어:
+예를 들면 다음과 같습니다.
 
 ```kotlin
 //sampleStart
 // 'double'은 함수의 이름입니다.
-// 'x'는 Int 타입의 파라미터입니다.
-// 예상되는 반환 값 역시 Int 타입입니다.
+// 'x'는 Int 타입의 매개변수입니다.
+// 반환값 또한 Int 타입입니다.
 fun double(x: Int): Int {
     return 2 * x
 }
@@ -22,47 +22,47 @@ fun main() {
     // 10
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" validate="false" id="kotlin-function-double"}
+{kotlin-runnable="true" validate="false" id="kotlin-function-double"}
 
-## 함수 사용법 {id="function-usage"}
+## 함수 사용 {id="function-usage"}
 
-함수는 표준 방식으로 호출합니다:
+함수는 일반적인 방식으로 호출합니다.
 
 ```kotlin
 val result = double(2)
 ```
 
-[멤버](classes.md) 또는 [확장 함수](extensions.md#extension-functions)를 호출하려면 마침표 `.`를 사용합니다:
+[멤버 함수](classes.md) 또는 [확장 함수](extensions.md#extension-functions)를 호출할 때는 점 `.` 표기법을 사용합니다.
 
 ```kotlin
 // Stream 클래스의 인스턴스를 생성하고 read()를 호출합니다.
 Stream().read()
 ```
 
-### 파라미터 {id="parameters"}
+### 매개변수 {id="parameters"}
 
-함수 파라미터는 파스칼 표기법(Pascal notation)인 `name: Type` 형식을 사용하여 선언합니다.
-파라미터는 쉼표로 구분해야 하며, 각 파라미터에 명시적으로 타입을 지정해야 합니다:
+함수 매개변수는 파스칼 표기법인 `name: Type` 형태로 선언합니다.
+매개변수는 쉼표로 구분해야 하며, 각 매개변수의 타입을 명시적으로 지정해야 합니다.
 
 ```kotlin
 fun powerOf(number: Int, exponent: Int): Int { /*...*/ }
 ```
 
-객체를 함수에 전달할 때, 컴파일러는 해당 객체에 대한 참조의 복사본을 전달합니다.
-복사된 참조는 동일한 객체를 가리키므로, 함수는 해당 객체의 가변(mutable) 상태를 수정할 수 있습니다.
+객체를 함수로 전달하면 컴파일러는 해당 객체에 대한 참조의 복사본을 전달합니다.
+복사된 참조는 동일한 객체를 가리키므로, 함수 내에서 해당 객체의 가변(mutable) 상태를 수정할 수 있습니다.
 
-함수 파라미터는 함수 본문 내에서 읽기 전용입니다(암시적으로 `val`로 선언됨). 따라서 재할당할 수 없습니다:
+함수 매개변수는 함수 본문 내에서 읽기 전용(암묵적으로 `val`로 선언됨)이므로 재할당할 수 없습니다.
 
 ```kotlin
 class Counter(var value: Int)
 
 fun reset(counter: Counter) {
-    counter.value = 0    // 허용됨: 객체를 수정함
-    counter = Counter(0) // 오류: 'val'은 재할당할 수 없음
+    counter.value = 0    // 허용됨: 객체의 상태를 수정합니다.
+    counter = Counter(0) // 오류: 'val'은 재할당할 수 없습니다.
 }
 ```
 
-함수 파라미터를 선언할 때 [후행 쉼표(trailing comma)](coding-conventions.md#trailing-commas)를 사용할 수 있습니다:
+함수 매개변수를 선언할 때 [후행 쉼표(trailing comma)](coding-conventions.md#trailing-commas)를 사용할 수 있습니다.
 
 ```kotlin
 fun powerOf(
@@ -71,23 +71,23 @@ fun powerOf(
 ) { /*...*/ }
 ```
 
-후행 쉼표는 리팩터링과 코드 유지보수에 도움이 됩니다.
-어떤 파라미터가 마지막이 될지 걱정하지 않고 선언 내에서 파라미터의 위치를 옮길 수 있습니다.
+후행 쉼표는 리팩터링 및 코드 유지보수에 유용합니다.
+어떤 매개변수가 마지막이 될지 신경 쓰지 않고도 선언 내에서 매개변수의 순서를 쉽게 변경할 수 있습니다.
 
-> Kotlin 함수는 다른 함수를 파라미터로 받을 수 있으며, 인자로 전달될 수도 있습니다.
+> Kotlin 함수는 다른 함수를 매개변수로 받을 수 있으며, 인자로 전달될 수도 있습니다.
 > 자세한 내용은 [](lambdas.md)를 참조하세요.
 > 
 {style="note"}
 
-### 기본값을 가진 파라미터 {id="parameters-with-default-values"}
+### 기본값이 있는 매개변수 {id="parameters-with-default-values"}
 
-함수 파라미터에 기본값을 지정하여 선택적(optional)으로 만들 수 있습니다.
-Kotlin은 파라미터에 대응하는 인자를 제공하지 않고 함수를 호출할 때 기본값을 사용합니다.
-기본값이 있는 파라미터는 _선택적 파라미터(optional parameters)_라고도 합니다.
+함수 매개변수에 기본값을 지정하여 선택적 매개변수로 만들 수 있습니다.
+해당 매개변수에 대응하는 인자를 전달하지 않고 함수를 호출하면 Kotlin은 기본값을 사용합니다.
+기본값이 있는 매개변수를 _선택적 매개변수(optional parameters)_라고도 합니다.
 
-선택적 파라미터를 사용하면 적절한 기본값으로 파라미터를 생략할 수 있게 해주므로, 단순히 파라미터 생략을 허용하기 위해 함수를 여러 번 오버로드할 필요성이 줄어듭니다.
+선택적 매개변수를 사용하면 적절한 기본값을 건너뛰기 위해 여러 버전의 함수를 오버로드할 필요가 없으므로 오버로드 횟수를 줄일 수 있습니다.
 
-파라미터 선언 뒤에 `=`를 붙여 기본값을 설정합니다:
+매개변수 선언 뒤에 `=`를 붙여 기본값을 설정합니다.
 
 ```kotlin
 fun read(
@@ -100,7 +100,7 @@ fun read(
 ) { /*...*/ }
 ```
 
-기본값이 **있는** 파라미터를 기본값이 **없는** 파라미터보다 먼저 선언하는 경우, [이름 붙은 인자(named arguments)](#named-arguments)를 사용해야만 기본값을 사용할 수 있습니다:
+기본값이 **있는** 매개변수를 기본값이 **없는** 매개변수보다 앞에 선언한 경우, [이름 있는 인자](#named-arguments)를 사용해야만 기본값을 적용할 수 있습니다.
 
 ```kotlin
 fun greeting(
@@ -109,16 +109,17 @@ fun greeting(
 ) { /*...*/ }
 
 fun main() {
-    // 'userId'에 기본값 0을 사용합니다.
+    // 'userId'의 기본값으로 0을 사용합니다.
     greeting(message = "Hello!")
     
-    // 오류: 'message' 파라미터에 값이 전달되지 않았습니다.
+    // 오류: 'message' 매개변수에 전달된 값이 없습니다.
     greeting("Hello!")
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" validate="false" id="default-before-ordinary"}
+{kotlin-runnable="true" validate="false" id="default-before-ordinary"}
 
-마지막 파라미터가 전달된 함수와 일치해야 하는 [후행 람다(trailing lambdas)](lambdas.md#passing-trailing-lambdas)는 이 규칙의 예외입니다:
+[후행 람다(trailing lambdas)](lambdas.md#passing-trailing-lambdas)는 이 규칙의 예외이며,
+마지막 매개변수는 전달된 함수에 대응해야 합니다.
 
 ```kotlin
 fun main () {
@@ -130,17 +131,17 @@ fun greeting(
 { println(userId)
   message() }
     
-// 'userId'에 기본값을 사용합니다.
+// 'userId'의 기본값을 사용합니다.
 greeting() { println ("Hello!") }
 // 0
 // Hello!
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="default-before-trailing-lambda"}
+{kotlin-runnable="true" id="default-before-trailing-lambda"}
 
-[메서드 오버라이딩](inheritance.md#overriding-methods) 시에는 항상 기본 메서드의 기본 파라미터 값을 사용합니다.
-기본 파라미터 값이 있는 메서드를 오버라이드할 때는 시그니처에서 기본 파라미터 값을 생략해야 합니다:
+[오버라이딩 메서드](inheritance.md#overriding-methods)는 항상 상위 메서드의 기본 매개변수 값을 사용합니다.
+기본 매개변수 값이 있는 메서드를 재정의할 때는 메서드 시그니처에서 기본 매개변수 값을 생략해야 합니다.
 
 ```kotlin
 open class Shape {
@@ -148,17 +149,17 @@ open class Shape {
 }
 
 class Rectangle : Shape() {
-    // 여기에서 기본값을 지정하는 것은 허용되지 않지만,
-    // 이 함수도 기본적으로 'width'에 10, 'height'에 5를
+    // 여기서는 기본값을 지정할 수 없지만,
+    // 이 함수 역시 기본적으로 'width'에 10, 'height'에 5를
     // 사용합니다.
     override fun draw(width: Int, height: Int) { /*...*/ }
 }
 ```
 
-#### 기본값으로 사용되는 비상수 표현식 {id="non-constant-expressions-as-default-values"}
+#### 비상수 표현식을 기본값으로 사용 {id="non-constant-expressions-as-default-values"}
 
-파라미터에 상수가 아닌 기본값을 할당할 수 있습니다.
-예를 들어, 기본값은 아래 예제의 `len` 파라미터처럼 함수 호출 결과나 다른 인자의 값을 사용하는 계산 결과가 될 수 있습니다:
+매개변수에 상수가 아닌 기본값을 지정할 수도 있습니다.
+예를 들어, 다음 예제의 `len` 매개변수처럼 다른 인자의 값을 사용하는 계산이나 함수 호출의 결과를 기본값으로 지정할 수 있습니다.
 
 ```kotlin
 fun read(
@@ -168,12 +169,12 @@ fun read(
 ) { /*...*/ }
 ```
 
-다른 파라미터의 값을 참조하는 파라미터는 순서상 나중에 선언되어야 합니다.
-이 예제에서 `len`은 `b` 다음에 선언되어야 합니다.
+다른 매개변수의 값을 참조하는 매개변수는 순서상 나중에 선언되어야 합니다.
+이 예제에서 `len`은 반드시 `b` 뒤에 선언되어야 합니다.
 
-일반적으로 파라미터의 기본값으로 모든 표현식을 할당할 수 있습니다.
-하지만 기본값은 해당 파라미터 **없이** 함수가 호출되어 기본값을 할당해야 할 때만 평가됩니다.
-예를 들어, 다음 함수는 `print` 파라미터 없이 호출될 때만 한 줄을 출력합니다:
+일반적으로 매개변수의 기본값으로 모든 표현식을 지정할 수 있습니다.
+그러나 기본값은 해당 매개변수 **없이** 함수가 호출되어 기본값을 대입해야 할 때만 평가됩니다.
+예를 들어, 다음 함수는 `print` 매개변수 없이 호출될 때만 문자열을 출력합니다.
 
 ```kotlin
 fun main() {
@@ -190,9 +191,9 @@ fun main() {
     //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="non-constant-default"}
+{kotlin-runnable="true" id="non-constant-default"}
 
-함수 선언의 마지막 파라미터가 함수형 타입(functional type)인 경우, 대응하는 [람다](lambdas.md#lambda-expression-syntax) 인자를 이름 붙은 인자로 전달하거나 [괄호 밖](lambdas.md#passing-trailing-lambdas)으로 전달할 수 있습니다:
+함수 선언의 마지막 매개변수가 함수형 타입인 경우, 해당하는 [람다](lambdas.md#lambda-expression-syntax) 인자를 이름 있는 인자로 전달하거나 [괄호 바깥으로](lambdas.md#passing-trailing-lambdas) 전달할 수 있습니다.
 
 ```kotlin
 fun main() {
@@ -205,28 +206,28 @@ fun main() {
         println (code)
         action() }
     
-    // 'level'에 1을 전달하고 'code'에 기본값 1을 사용합니다.
+    // 'level'에는 1을 전달하고 'code'에는 기본값 1을 사용합니다.
     log(1) { println("Connection established") }
     
-    // 'level'에 0, 'code'에 1인 두 기본값을 모두 사용합니다.
+    // 두 기본값을 모두 사용합니다. 'level'에는 0, 'code'에는 1을 사용합니다.
     log(action = { println("Connection established") })
     
-    // 이전 호출과 동일하게 두 기본값을 모두 사용합니다.
+    // 이전 호출과 동일하며 두 기본값을 모두 사용합니다.
     log { println("Connection established") }
     //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="lambda-outside-parentheses"}
+{kotlin-runnable="true" id="lambda-outside-parentheses"}
 
-### 이름 붙은 인자 {id="named-arguments"}
+### 이름 있는 인자 {id="named-arguments"}
 
-함수를 호출할 때 하나 이상의 함수 인자에 이름을 붙일 수 있습니다.
-이는 함수 호출에 인자가 많을 때 유용할 수 있습니다.
-특히 값이 `null`이거나 불리언 값인 경우 값을 인자와 연관 짓기 어렵기 때문에 이런 상황에서 도움이 됩니다.
+함수를 호출할 때 하나 이상의 인자에 이름을 지정할 수 있습니다.
+이는 함수 호출에 전달해야 할 인자가 많을 때 유용합니다.
+인자가 많은 경우, 특히 `null`이나 불리언 값인 경우 어떤 값이 어떤 인자에 대응하는지 파악하기 어렵기 때문입니다.
 
-함수 호출에서 이름 붙은 인자를 사용할 때, 순서에 상관없이 나열할 수 있습니다.
+함수 호출 시 이름 있는 인자를 사용하면 원하는 순서대로 나열할 수 있습니다.
 
-기본값을 가진 4개의 인자가 있는 `reformat()` 함수를 고려해 보세요:
+기본값이 있는 4개의 인자를 가진 `reformat()` 함수를 살펴보겠습니다.
 
 ```kotlin
 fun reformat(
@@ -238,7 +239,7 @@ fun reformat(
 ) { /*...*/ }
 ```
 
-이 함수를 호출할 때 인자 일부에 이름을 붙일 수 있습니다:
+이 함수를 호출할 때 일부 인자에 이름을 지정할 수 있습니다.
 
 ```kotlin
 reformat(
@@ -250,14 +251,14 @@ reformat(
 )
 ```
 
-기본값이 있는 모든 인자를 생략할 수 있습니다:
+기본값이 있는 모든 인자를 건너뛸 수도 있습니다.
 
 ```kotlin
 reformat("This is a long String!")
 ```
 
-또한 모든 인자를 생략하는 대신 기본값이 있는 _일부_ 인자만 생략할 수도 있습니다.
-하지만 첫 번째로 생략된 인자 이후의 모든 후속 인자에는 이름을 붙여야 합니다:
+기본값이 있는 인자를 전부 생략하는 대신 _일부만_ 건너뛸 수도 있습니다.
+다만, 첫 번째로 건너뛴 인자 이후의 모든 인자에는 이름을 지정해야 합니다.
 
 ```kotlin
 reformat(
@@ -267,8 +268,8 @@ reformat(
 )
 ```
 
-대응하는 인자에 이름을 붙여서 [가변 인자(varargs)](#variable-number-of-arguments-varargs)(`vararg`)를 전달할 수 있습니다.
-이 예제에서는 배열입니다:
+해당 인자의 이름을 지정하여 [가변 인자](#variable-number-of-arguments-varargs)(`vararg`)를 전달할 수도 있습니다.
+이 예제에서는 배열을 전달합니다.
 
 ```kotlin
 fun mergeStrings(vararg strings: String) { /*...*/ }
@@ -278,21 +279,21 @@ mergeStrings(strings = arrayOf("a", "b", "c"))
 
 <!-- Rationale for named arguments interaction with varargs is here https://youtrack.jetbrains.com/issue/KT-52505#focus=Comments-27-6147916.0-0 -->
 
-> JVM에서 Java 함수를 호출할 때는 Java 바이트코드가 함수 파라미터의 이름을 항상 보존하지 않기 때문에 이름 붙은 인자 구문을 사용할 수 없습니다.
+> JVM에서 Java 함수를 호출할 때는 이름 있는 인자 구문을 사용할 수 없습니다. Java 바이트코드가 함수 매개변수의 이름을 항상 보존하지는 않기 때문입니다.
 >
 {style="note"}
 
 ### 반환 타입 {id="return-types"}
 
-중괄호 `{}` 안에 명령문을 넣는 블록 본문을 사용하여 함수를 선언할 때는 항상 반환 타입을 명시적으로 지정해야 합니다. 유일한 예외는 함수가 `Unit`을 반환하는 경우이며, [이 경우 반환 타입 지정은 선택 사항입니다](#unit-returning-functions).
+중괄호 `{}` 안에 명령문을 배치하는 블록 본문(block body)으로 함수를 선언할 때는 항상 반환 타입을 명시적으로 지정해야 합니다. 유일한 예외는 함수가 `Unit`을 반환하는 경우이며, [이 경우에는 반환 타입 지정을 생략할 수 있습니다](#unit-returning-functions).
 
-Kotlin은 블록 본문을 가진 함수의 반환 타입을 추론하지 않습니다. 블록 본문은 제어 흐름이 복잡할 수 있어 읽는 사람이나 때로는 컴파일러에게도 반환 타입이 명확하지 않을 수 있기 때문입니다. 하지만 [단일 표현식 함수](#single-expression-functions)의 경우 반환 타입을 명시하지 않아도 Kotlin이 반환 타입을 추론할 수 있습니다.
+Kotlin은 블록 본문을 가진 함수의 반환 타입을 추론하지 않습니다. 이러한 함수는 제어 흐름이 복잡할 수 있어 읽는 사람뿐만 아니라 컴파일러에게도 반환 타입이 불분명할 수 있기 때문입니다. 그러나 [단일 표현식 함수](#single-expression-functions)의 경우 반환 타입을 명시하지 않아도 Kotlin이 추론할 수 있습니다.
 
-Kotlin 함수는 단일 값을 반환하지만, 해당 값에는 여러 개의 데이터 조각이 포함될 수 있습니다. 이러한 값을 표현하는 방법은 [여러 값 반환하기](#return-multiple-values)를 참조하세요.
+Kotlin 함수는 단일 값을 반환하지만, 그 값에 여러 데이터 조각이 포함될 수 있습니다. 이러한 값을 표현하는 방법은 [여러 값 반환하기](#return-multiple-values)를 참조하세요.
 
 #### 여러 값 반환하기 {id="return-multiple-values"}
 
-구별되는 의미를 가진 여러 관련 값을 반환해야 하는 경우, 단 하나의 함수에서만 사용하더라도 [데이터 클래스(data class)](data-classes.md)를 선언하세요:
+의미가 서로 다른 여러 관련 값을 반환해야 할 때는 단 하나의 함수에서만 사용하더라도 [데이터 클래스(data class)](data-classes.md)를 선언하세요.
 
 ```kotlin
 data class OrderSummary(
@@ -315,9 +316,9 @@ fun main() {
     // 5.0
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="return-multiple-values-data-class"}
+{kotlin-runnable="true" id="return-multiple-values-data-class"}
 
-데이터 클래스는 명확한 의미를 가진 여러 값을 반환해야 할 때 유용합니다. 반환되는 값들이 동일한 종류이고 이를 하나의 그룹으로 처리하려는 경우, 대신 컬렉션을 반환하는 것을 고려해 보세요:
+데이터 클래스는 의미가 구분되는 여러 값을 반환할 때 적합합니다. 반환되는 값들이 동일한 종류이고 이를 하나의 그룹으로 다루고자 한다면 컬렉션을 반환하는 것을 고려해 보세요.
 
 ```kotlin
 data class Person(val name: String)
@@ -341,9 +342,9 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.4" id="return-multiple-values-list"}
 
-고정된 개수의 값을 반환해야 하는 경우, 표준 라이브러리의 [`Pair`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-pair/) 또는 [`Triple`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-triple/) 데이터 클래스를 사용할 수도 있습니다. 하지만 이들의 프로퍼티는 `first`, `second`, `third`와 같은 제네릭한 이름을 가지고 있어 결과를 이해하기 어렵게 만들 수 있습니다.
+정해진 개수의 값을 반환해야 한다면 표준 라이브러리의 [`Pair`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-pair/) 또는 [`Triple`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-triple/) 데이터 클래스를 사용할 수도 있습니다. 그러나 이들의 프로퍼티는 `first`, `second`, `third`와 같은 일반적인 이름을 가지므로 결과를 이해하기 어려울 수 있습니다.
 
-예를 들어, `calculateOrderTotals()` 함수가 `Pair`를 반환하더라도 각 `Double`이 무엇을 나타내는지 명확하지 않습니다:
+예를 들어 `calculateOrderTotals()` 함수가 `Pair`를 반환하더라도 각 `Double`이 무엇을 나타내는지 명확하지 않습니다.
 
 ```kotlin
 fun calculateOrderTotals(prices: List<Double>): Pair<Double, Double> {
@@ -355,42 +356,42 @@ fun calculateOrderTotals(prices: List<Double>): Pair<Double, Double> {
 fun main() {
     val totals = calculateOrderTotals(listOf(12.50, 8.00, 4.50))
 
-    // 'first'가 무엇을 의미하나요?
+    // 'first'가 무엇을 의미하는가?
     println(totals.first)
     // 25.0
   
-    // 'second'가 무엇을 의미하나요?
+    // 'second'가 무엇을 의미하는가?
     println(totals.second)
     // 5.0
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="return-multiple-values-pair"}
+{kotlin-runnable="true" id="return-multiple-values-pair"}
 
-구별되는 의미를 가진 결과의 경우, [`OrderSummary` 데이터 클래스 예제](#return-multiple-values)에 나와 있는 것처럼 설명적인 프로퍼티 이름을 가진 데이터 클래스를 선호하는 것이 좋습니다.
+명확한 의미를 가진 결과를 반환할 때는 [`OrderSummary` 데이터 클래스 예제](#return-multiple-values)에서 본 것처럼 설명적인 프로퍼티 이름을 가진 데이터 클래스를 사용하는 것이 좋습니다.
 
 ### 단일 표현식 함수 {id="single-expression-functions"}
 
-함수 본문이 단일 표현식으로 구성된 경우, 중괄호를 생략하고 `=` 기호 뒤에 본문을 지정할 수 있습니다:
+함수 본문이 단일 표현식으로 구성된 경우 중괄호를 생략하고 `=` 기호 뒤에 본문을 지정할 수 있습니다.
 
 ```kotlin
 fun double(x: Int): Int = x * 2
 ```
 
-대부분의 경우 [반환 타입](#return-types)을 명시적으로 선언하지 않아도 됩니다:
+대부분의 경우 [반환 타입](#return-types)을 명시적으로 선언하지 않아도 됩니다.
 
 ```kotlin
 // 컴파일러가 함수가 Int를 반환함을 추론합니다.
 fun double(x: Int) = x * 2
 ```
 
-단일 표현식에서 반환 타입을 추론할 때 컴파일러가 문제를 겪는 경우가 가끔 있습니다.
-이러한 경우에는 반환 타입을 명시적으로 추가해야 합니다.
-예를 들어, 재귀 함수나 상호 재귀 함수(서로 호출하는 함수), 그리고 `fun empty() = null`과 같이 타입이 없는 표현식이 있는 함수는 항상 반환 타입이 필요합니다.
+컴파일러가 단일 표현식에서 반환 타입을 추론할 때 간혹 문제가 발생할 수 있습니다.
+이러한 경우에는 반환 타입을 명시적으로 작성해야 합니다.
+예를 들어 재귀 함수나 상호 재귀(서로를 호출하는) 함수, 그리고 `fun empty() = null`과 같이 타입이 없는 표현식을 가진 함수는 항상 반환 타입이 필요합니다.
 
-추론된 반환 타입을 사용할 때는 컴파일러가 덜 유용한 타입을 추론할 수 있으므로 실제 결과를 반드시 확인해야 합니다.
-위의 예에서 `double()` 함수가 `Int` 대신 `Number`를 반환하도록 하려면 이를 명시적으로 선언해야 합니다.
+추론된 반환 타입을 사용할 때는 실제 결과를 반드시 확인하세요. 컴파일러가 의도와 다른 덜 유용한 타입을 추론할 수도 있기 때문입니다.
+위의 예제에서 `double()` 함수가 `Int` 대신 `Number`를 반환하도록 하려면 이를 명시적으로 선언해야 합니다.
 
-표현식 본문 내에서 `return` 문을 사용하는 경우 반환 타입을 명시적으로 지정해야 합니다:
+표현식 본문 내에서 `return` 문을 사용하는 경우에는 반환 타입을 명시적으로 지정해야 합니다.
 
 ```kotlin
 fun getDisplayNameOrDefault(userId: String?): String =
@@ -399,16 +400,16 @@ fun getDisplayNameOrDefault(userId: String?): String =
 
 ### Unit을 반환하는 함수 {id="unit-returning-functions"}
 
-함수가 블록 본문을 가지고 있고 명시적인 반환 타입이 없는 경우, 컴파일러는 반환 타입을 `Unit`으로 추론합니다.
+함수에 블록 본문이 있고 명시적인 반환 타입이 지정되지 않은 경우, 컴파일러는 반환 타입을 `Unit`으로 추론합니다.
 
-`Unit`은 `Unit`이라는 단 하나의 값만 가지는 타입입니다. 이 값은 [객체(object)](object-declarations.md)이므로 단 하나의 `Unit` 인스턴스만 존재합니다.
-다른 프로그래밍 언어의 `void`와 달리 `Unit`은 실제 타입이며, 코드에서 필요한 경우 그 값을 사용할 수 있습니다.
-이러한 방식을 통해 결과를 생성하는 함수와 작업만 수행하는 함수가 동일한 타입 모델에 들어맞게 됩니다. 즉, 두 경우 모두 값을 반환하며 함수 타입으로 표현하거나 제네릭 API와 함께 사용할 수 있습니다.
+`Unit`은 `Unit`이라는 단 하나의 값만 가지는 타입입니다. 이 값은 [객체](object-declarations.md)이므로 단 하나의 `Unit` 인스턴스만 존재합니다.
+다른 프로그래밍 언어의 `void`와 달리 `Unit`은 실제 타입이며, 코드에서 값이 필요할 때 이 값을 사용할 수 있습니다.
+따라서 결과를 생성하는 함수와 작업만 수행하는 함수가 동일한 타입 모델에 들어맞게 됩니다. 즉, 둘 다 값을 반환하며 함수 타입으로 표현되거나 제네릭 API와 함께 사용될 수 있습니다.
 
-함수 선언에서 `Unit`을 지정하거나 그 값을 명시적으로 반환할 필요는 없습니다. 하지만 `() -> Unit`과 같이 함수 타입의 일부일 때는 `Unit`을 명시해야 합니다. 예를 들어, `Unit`을 반환하지 않고 `printHello()` 함수를 선언해 보겠습니다:
+함수 선언에서 `Unit`을 지정하거나 그 값을 명시적으로 반환할 필요는 없습니다. 그러나 `() -> Unit`과 같이 함수 타입의 일부일 때는 반드시 `Unit`을 지정해야 합니다. 예를 들어, `Unit`을 반환하지 않고 `printHello()` 함수를 선언해 보겠습니다.
 
 ```kotlin
-// 함수형 타입 파라미터('action')의 선언에는 
+// 함수형 타입 매개변수('action')의 선언에는 
 // 여전히 명시적인 반환 타입이 필요합니다.
 fun printHello(name: String?, action: () -> Unit) {
     if (name != null)
@@ -433,9 +434,9 @@ fun main() {
     }
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" validate="false" id="return-unit-implicit"}
+{kotlin-runnable="true" validate="false" id="return-unit-implicit"}
 
-이는 반환 타입과 반환 값을 명시적으로 지정하는 다음과 같은 더 장황한 선언과 동일합니다:
+이는 반환 타입과 값을 명시적으로 지정한 아래의 더 장황한 선언과 동일합니다.
 
 ```kotlin
 //sampleStart
@@ -465,12 +466,12 @@ fun main() {
     }
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" validate="false" id="return-unit-explicit"}
+{kotlin-runnable="true" validate="false" id="return-unit-explicit"}
 
 ### 가변 인자 (varargs) {id="variable-number-of-arguments-varargs"}
 
-함수에 가변 개수의 인자를 전달하려면 파라미터(보통 마지막 파라미터) 중 하나에 `vararg` 수정자를 표시할 수 있습니다.
-함수 내부에서 `T` 타입의 `vararg` 파라미터는 `T`의 배열로 사용할 수 있습니다:
+함수에 가변 개수의 인자를 전달하려면 매개변수 중 하나(보통 마지막 매개변수)를 `vararg` 수식어로 표시할 수 있습니다.
+함수 내부에서 `T` 타입의 `vararg` 매개변수는 `T`의 배열로 사용할 수 있습니다.
 
 ```kotlin
 fun <T> asList(vararg ts: T): List<T> {
@@ -481,7 +482,7 @@ fun <T> asList(vararg ts: T): List<T> {
 }
 ```
 
-그런 다음 가변 개수의 인자를 함수에 전달할 수 있습니다:
+이제 함수에 가변 개수의 인자를 전달할 수 있습니다.
 
 ```kotlin
 fun <T> asList(vararg ts: T): List<T> {
@@ -499,14 +500,14 @@ fun main() {
     //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" validate="false" id="varargs-aslist"}
+{kotlin-runnable="true" validate="false" id="varargs-aslist"}
 
-단 하나의 파라미터만 `vararg`로 표시할 수 있습니다.
-`vararg` 파라미터가 파라미터 리스트의 마지막이 아닌 곳에 선언된 경우, 후속 파라미터의 값은 이름 붙은 인자를 사용하여 전달해야 합니다.
-파라미터가 함수 타입인 경우 괄호 밖에 람다를 배치하여 값을 전달할 수도 있습니다.
+단 하나의 매개변수만 `vararg`로 표시할 수 있습니다.
+매개변수 목록의 마지막이 아닌 위치에 `vararg` 매개변수를 선언하는 경우, 뒤따르는 매개변수들의 값은 이름 있는 인자를 사용하여 전달해야 합니다.
+매개변수가 함수형 타입인 경우 괄호 바깥에 람다를 배치하여 값을 전달할 수도 있습니다.
 
-`vararg` 함수를 호출할 때 `asList(1, 2, 3)` 예제처럼 인자를 개별적으로 전달할 수 있습니다.
-이미 배열이 있고 그 내용을 `vararg` 파라미터로 또는 그 일부로 함수에 전달하려는 경우, 배열 이름 앞에 `*`를 붙여 [스프레드 연산자(spread operator)](arrays.md#pass-variable-number-of-arguments-to-a-function)를 사용합니다:
+`vararg` 함수를 호출할 때는 `asList(1, 2, 3)` 예제처럼 인자를 개별적으로 전달할 수 있습니다.
+이미 배열이 있고 그 내용을 `vararg` 매개변수 또는 그 일부로 함수에 전달하려면 배열 이름 앞에 `*`를 붙여 [스프레드 연산자(spread operator)](arrays.md#pass-variable-number-of-arguments-to-a-function)를 사용하세요.
 
 ```kotlin
 fun <T> asList(vararg ts: T): List<T> {
@@ -520,7 +521,7 @@ fun main() {
     //sampleStart
     val a = arrayOf(1, 2, 3)
 
-    // 함수는 배열 [-1, 0, 1, 2, 3, 4]를 받습니다.
+    // 함수는 [-1, 0, 1, 2, 3, 4] 배열을 받습니다.
     list = asList(-1, 0, *a, 4)
 
     println(list)
@@ -528,9 +529,9 @@ fun main() {
     //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" validate="false" id="varargs-aslist-with-array"}
+{kotlin-runnable="true" validate="false" id="varargs-aslist-with-array"}
 
-[원시 타입 배열(primitive type arrays)](arrays.md#primitive-type-arrays)을 `vararg`로 전달하려면 [`.toTypedArray()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/to-typed-array.html) 함수를 사용하여 일반(타입이 지정된) 배열로 변환해야 합니다:
+[원시 타입 배열(primitive type array)](arrays.md#primitive-type-arrays)을 `vararg`로 전달하려면 [`.toTypedArray()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/to-typed-array.html) 함수를 사용하여 일반(타입이 지정된) 배열로 변환해야 합니다.
 
 ```kotlin
 // 'a'는 원시 타입 배열인 IntArray입니다.
@@ -540,40 +541,39 @@ val list = asList(-1, 0, *a.toTypedArray(), 4)
 
 ### 중위 표기법 (Infix notation) {id="infix-notation"}
 
-`infix` 키워드를 사용하여 괄호나 마침표 없이 호출할 수 있는 함수를 선언할 수 있습니다.
-이를 통해 코드에서 간단한 함수 호출을 더 읽기 쉽게 만들 수 있습니다.
+`infix` 키워드를 사용하면 괄호나 점 없이 호출할 수 있는 함수를 선언할 수 있습니다.
+이를 통해 코드 내의 간단한 함수 호출을 더 읽기 쉽게 만들 수 있습니다.
 
 ```kotlin
 infix fun Int.shl(x: Int): Int { /*...*/ }
 
-// 일반적인 표기법을 사용하여 함수를 호출합니다. 
+// 일반적인 표기법을 사용하여 함수를 호출합니다.
 1.shl(2)
 
 // 중위 표기법을 사용하여 함수를 호출합니다.
 1 shl 2
 ```
 
-중위 함수(Infix functions)는 다음 요구 사항을 충족해야 합니다:
+중위 함수는 다음 요구 사항을 충족해야 합니다.
 
 * 클래스의 멤버 함수이거나 [확장 함수](extensions.md)여야 합니다.
-* 단일 파라미터를 가져야 합니다.
-* 파라미터는 [가변 인자](#variable-number-of-arguments-varargs)(`vararg`)를 허용하지 않아야 하며 [기본값](#parameters-with-default-values)이 없어야 합니다.
+* 단 하나의 매개변수만 가져야 합니다.
+* 매개변수는 [가변 인자](#variable-number-of-arguments-varargs)(`vararg`)를 받지 않아야 하며 [기본값](#parameters-with-default-values)을 가질 수 없습니다.
 
 > 중위 함수 호출은 산술 연산자, 타입 캐스트 및 `rangeTo` 연산자보다 우선순위가 낮습니다.
-> 다음 표현식은 서로 동일합니다:
-> * `1 shl 2 + 3`은 `1 shl (2 + 3)`과 동일합니다.
-> * `0 until n * 2`는 `0 until (n * 2)`와 동일합니다.
-> * `xs union ys as Set<*>`는 `xs union (ys as Set<*>)`과 동일합니다.
+> 다음 표현식들은 서로 동일합니다.
+> * `1 shl 2 + 3`은 `1 shl (2 + 3)`과 같습니다.
+> * `0 until n * 2`는 `0 until (n * 2)`와 같습니다.
+> * `xs union ys as Set<*>`는 `xs union (ys as Set<*>)`과 같습니다.
 >
-> 반면, 중위 함수 호출의 우선순위는 불리언 연산자 `&&` 및 `||`, `is`- 및 `in`-검사 및 일부 다른 연산자보다 높습니다. 다음 표현식도 서로 동일합니다:
-> * `a && b xor c`는 `a && (b xor c)`와 동일합니다.
-> * `a xor b in c`는 `(a xor b) in c`와 동일합니다.
+> 반면, 중위 함수 호출의 우선순위는 불리언 연산자 `&&` 및 `||`, `is` 및 `in` 검사, 그리고 일부 다른 연산자보다 높습니다. 다음 표현식들 역시 서로 동일합니다.
+> * `a && b xor c`는 `a && (b xor c)`와 같습니다.
+> * `a xor b in c`는 `(a xor b) in c`와 같습니다.
 >
 {style="note"}
 
-중위 함수는 항상 수신 객체(receiver)와 파라미터가 모두 지정되어야 합니다.
-중위 표기법을 사용하여 현재 수신 객체에서 메서드를 호출할 때는 `this`를 명시적으로 사용하세요.
-이는 모호하지 않은 파싱을 보장하기 위함입니다.
+중위 함수는 항상 수신 객체(receiver)와 매개변수를 모두 명시해야 합니다.
+중위 표기법을 사용하여 현재 수신 객체에서 메서드를 호출할 때는 모호하지 않은 파싱을 위해 `this`를 명시적으로 사용하세요.
 
 ```kotlin
 class MyStringCollection {
@@ -586,7 +586,7 @@ class MyStringCollection {
 
     fun build() {
         add("first")      // 올바름: 일반적인 함수 호출
-        this add "second" // 올바름: 명시적 수신 객체를 사용한 중위 호출
+        this add "second" // 올바름: 명시적 수신 객체가 있는 중위 호출
         // add "third"    // 컴파일러 오류: 명시적 수신 객체가 필요함
     }
 
@@ -604,18 +604,18 @@ fun main() {
     // Items = [first, second]
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="infix-notation-example"}
+{kotlin-runnable="true" id="infix-notation-example"}
 
-## 함수 범위 {id="function-scope"}
+## 함수 스코프 {id="function-scope"}
 
-Kotlin 함수는 파일의 최상위 레벨에서 선언할 수 있습니다. 즉, 함수를 담기 위해 클래스를 만들 필요가 없습니다.
-함수는 _멤버 함수_ 또는 _확장 함수_로서 로컬로 선언될 수도 있습니다.
+Kotlin 함수는 파일의 최상위(top level)에서 선언할 수 있으므로, 함수를 담기 위한 클래스를 생성할 필요가 없습니다.
+함수는 _멤버 함수_나 _확장 함수_뿐만 아니라 로컬 함수로도 선언할 수 있습니다.
 
 ### 로컬 함수 {id="local-functions"}
 
-Kotlin은 다른 함수 안에 선언된 함수인 로컬 함수를 지원합니다.
+Kotlin은 다른 함수 내부에 선언된 함수인 로컬 함수(local functions)를 지원합니다.
 예를 들어, 다음 코드는 주어진 그래프에 대한 깊이 우선 탐색(DFS) 알고리즘을 구현합니다.
-외부 `dfs()` 함수 내부의 로컬 `dfs()` 함수는 구현을 숨기고 재귀 호출을 처리합니다:
+외부 `dfs()` 함수 내부의 로컬 `dfs()` 함수는 구현 세부 사항을 숨기고 재귀 호출을 처리합니다.
 
 ```kotlin
 class Person(val name: String) {
@@ -644,10 +644,10 @@ fun main() {
     dfs(network)
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="local-functions-dfs"}
+{kotlin-runnable="true" id="local-functions-dfs"}
 
 로컬 함수는 외부 함수의 로컬 변수(클로저)에 접근할 수 있습니다.
-위의 경우, `visited` 함수 파라미터는 로컬 변수가 될 수 있습니다:
+위의 경우 `visited` 함수 매개변수를 다음과 같이 로컬 변수로 변경할 수 있습니다.
 
 ```kotlin
 class Person(val name: String) {
@@ -677,11 +677,11 @@ fun main() {
     dfs(network)
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="local-functions-dfs-with-local-variable"}
+{kotlin-runnable="true" id="local-functions-dfs-with-local-variable"}
 
 ### 멤버 함수 {id="member-functions"}
 
-멤버 함수는 클래스나 객체 내부에서 정의된 함수입니다:
+멤버 함수는 클래스나 객체 내부에 정의된 함수입니다.
 
 ```kotlin
 class Sample {
@@ -689,51 +689,51 @@ class Sample {
 }
 ```
 
-멤버 함수를 호출하려면 인스턴스 또는 객체 이름을 쓴 다음 `.`을 추가하고 함수 이름을 씁니다:
+멤버 함수를 호출하려면 인스턴스 또는 객체 이름을 작성한 후 점 `.`을 찍고 함수 이름을 적습니다.
 
 ```kotlin
 // Stream 클래스의 인스턴스를 생성하고 read()를 호출합니다.
 Stream().read()
 ```
 
-클래스 및 멤버 오버라이딩에 대한 자세한 정보는 [클래스](classes.md) 및 [상속](classes.md#inheritance)을 참조하세요.
+클래스 및 멤버 재정의에 대한 자세한 내용은 [클래스](classes.md) 및 [상속](classes.md#inheritance)을 참조하세요.
 
 ## 제네릭 함수 {id="generic-functions"}
 
-함수 이름 앞에 꺾쇠괄호 `<>`를 사용하여 함수의 제네릭 파라미터를 지정할 수 있습니다:
+함수 이름 앞에 꺾쇠괄호 `<>`를 사용하여 함수의 제네릭 매개변수를 지정할 수 있습니다.
 
 ```kotlin
 fun <T> singletonList(item: T): List<T> { /*...*/ }
 ```
 
-제네릭 함수에 대한 자세한 내용은 [제네릭(Generics)](generics.md)을 참조하세요.
+제네릭 함수에 대한 자세한 내용은 [제네릭](generics.md)을 참조하세요.
 
 ## 꼬리 재귀 함수 {id="tail-recursive-functions"}
 
-Kotlin은 [꼬리 재귀(tail recursion)](https://en.wikipedia.org/wiki/Tail_call)라고 알려진 함수형 프로그래밍 스타일을 지원합니다.
-보통 루프를 사용하는 일부 알고리즘의 경우, 스택 오버플로의 위험 없이 재귀 함수를 대신 사용할 수 있습니다.
-함수가 `tailrec` 수정자로 표시되고 필요한 공식 조건을 충족하면, 컴파일러는 재귀를 제거하고 빠르고 효율적인 루프 기반 버전으로 최적화합니다:
+Kotlin은 [꼬리 재귀(tail recursion)](https://en.wikipedia.org/wiki/Tail_call)로 알려진 함수형 프로그래밍 스타일을 지원합니다.
+보통 루프를 사용하는 일부 알고리즘의 경우, 스택 오버플로 위험 없이 재귀 함수를 대신 사용할 수 있습니다.
+함수에 `tailrec` 수식어가 지정되고 필요한 정형 조건을 만족하면, 컴파일러가 재귀를 최적화하여 빠르고 효율적인 루프 기반 버전으로 대체합니다.
 
 ```kotlin
 import kotlin.math.cos
 import kotlin.math.abs
 
-// 임의의 "충분한" 정밀도
+// 임의의 "충분히 정밀한" 정밀도 값
 val eps = 1E-10
 
 tailrec fun findFixPoint(x: Double = 1.0): Double =
     if (abs(x - cos(x)) < eps) x else findFixPoint(cos(x))
 ```
 
-이 코드는 코사인(수학 상수)의 고정점을 계산합니다.
-결과가 더 이상 변하지 않을 때까지 `1.0`부터 시작하여 `cos()`를 반복적으로 호출하며, 지정된 `eps` 정밀도에 대해 `0.7390851332151611`이라는 결과를 산출합니다.
-이 코드는 다음과 같은 보다 전통적인 스타일과 동일합니다:
+이 코드는 코사인 함수의 고정점(수학 상수)을 계산합니다.
+이 함수는 결과가 더 이상 변하지 않을 때까지 `1.0`부터 시작하여 `cos()`를 반복 호출하며, 지정된 `eps` 정밀도에 대해 `0.7390851332151611`이라는 결과를 냅니다.
+이 코드는 전통적인 스타일의 다음 코드와 동일합니다.
 
 ```kotlin
 import kotlin.math.cos
 import kotlin.math.abs
 
-// 임의의 "충분한" 정밀도
+// 임의의 "충분히 정밀한" 정밀도 값
 val eps = 1E-10
 
 private fun findFixPoint(): Double {
@@ -746,10 +746,10 @@ private fun findFixPoint(): Double {
 }
 ```
 
-`tailrec` 수정자는 함수가 마지막 작업으로 자기 자신을 호출할 때만 적용할 수 있습니다.
-재귀 호출 이후에 더 많은 코드가 있거나, [`try`/`catch`/`finally` 블록](exceptions.md#handle-exceptions-using-try-catch-blocks) 내에 있거나, 함수가 [open](inheritance.md)인 경우에는 꼬리 재귀를 사용할 수 없습니다.
+`tailrec` 수식어는 함수가 마지막 작업으로 자기 자신을 호출할 때만 적용할 수 있습니다.
+재귀 호출 뒤에 추가 코드가 있는 경우, [`try`/`catch`/`finally` 블록](exceptions.md#handle-exceptions-using-try-catch-blocks) 내에 있는 경우, 또는 함수가 [open](inheritance.md)되어 있는 경우에는 꼬리 재귀를 사용할 수 없습니다.
 
-**참고 항목**:
-* [인라인 함수(Inline functions)](inline-functions.md)
-* [확장 함수(Extension functions)](extensions.md)
-* [고차 함수와 람다(Higher-order functions and lambdas)](lambdas.md)
+**함께 보기**:
+* [인라인 함수](inline-functions.md)
+* [확장 함수](extensions.md)
+* [고차 함수 및 람다](lambdas.md)

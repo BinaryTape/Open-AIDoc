@@ -1,77 +1,63 @@
 ---
-title: セットアップとバージョン
+title: セットアップ
 ---
 
-# Koin のセットアップ
+# セットアップ
 
-このガイドでは、プロジェクトに Koin を追加するために必要なすべての事項について説明します。
+このセクションでは、Koinを使用するためにGradleビルドへ追加する内容について説明します。以下から対象のプラットフォームを選択し、リンク先の[Gradleのセットアップ](/docs/setup/gradle)のセクションに従ってください。宣言スタイルをまだ決めていない場合は、まず[スタイルの選択](/docs/intro/choosing-your-style)をお読みください。スタイルによってCompiler Pluginが必要かどうかが決まります。
 
-## クイックセットアップ {id="quick-setup"}
+## インストール対象 {id="what-to-install"}
 
-開始するには、プラットフォームを選択してください：
+| プラットフォーム | アーティファクト | セットアップ |
+|----------|-----------|-------|
+| Kotlin/JVM | `koin-core` | [Kotlin/JVM](/docs/setup/gradle#kotlin) |
+| Android | `koin-android` | [Android](/docs/setup/gradle#android) |
+| Jetpack Composeを使用するAndroid | `koin-android`, `koin-compose`, `koin-compose-viewmodel` | [Jetpack Compose](/docs/setup/gradle#compose-android) |
+| Compose Multiplatform | `koin-compose`, `koin-compose-viewmodel` | [Compose Multiplatform](/docs/setup/gradle#compose) |
+| Kotlin Multiplatform | `commonMain` 内の `koin-core` | [Kotlin Multiplatform](/docs/setup/gradle#kotlin-multiplatform) |
+| Ktor | `koin-ktor`, `koin-logger-slf4j` | [Ktor](/docs/setup/gradle#ktor) |
+| テスト | `koin-test`, `koin-test-junit4` または `koin-test-junit5` | [テスト](/docs/setup/gradle#testing) |
 
-| プラットフォーム | パッケージ | ガイド |
-|----------|---------|-------|
-| **Kotlin/JVM** | `koin-core` | [Gradle のセットアップ](/docs/setup/gradle#kotlin) |
-| **Android** | `koin-android` | [Gradle のセットアップ](/docs/setup/gradle#android) |
-| **Android + Jetpack Compose** | `koin-android` + `koin-compose` | [Gradle のセットアップ](/docs/setup/gradle#compose-android) |
-| **Compose Multiplatform** | `koin-compose` | [Gradle のセットアップ](/docs/setup/gradle#compose) |
-| **Kotlin Multiplatform** | `koin-core` | [Gradle のセットアップ](/docs/setup/gradle#kotlin-multiplatform) |
-| **Ktor** | `koin-ktor` | [Gradle のセットアップ](/docs/setup/gradle#ktor) |
+## 推奨セットアップ {id="recommended-setup"}
 
-## 推奨セットアップ: BOM + コンパイラプラグイン {id="recommended-setup-bom-compiler-plugin"}
+新規プロジェクトの場合:
 
-最良のエクスペリエンスを得るために、以下を推奨します：
+1. **Koin BOM**: `io.insert-koin:koin-bom` をインポートし、バージョンを指定せずにKoinアーティファクトを宣言することで、バージョンが常に一致するようにします。[Gradleのセットアップ](/docs/setup/gradle)を参照してください。
+2. **Koin Compiler Plugin**: Gradleプラグイン `io.insert-koin.compiler.plugin` を適用して、コンパイル時チェックを備えたCompiler Plugin DSLまたはアノテーションを利用できるようにします。これにはKotlin 2.3.20以降が必要です。[Compiler Pluginのセットアップ](/docs/setup/compiler-plugin)を参照してください。
 
-1. **Koin BOM を使用する** - すべての Koin ライブラリのバージョンを一括管理します
-2. **Koin コンパイラプラグインを使用する** - コンパイル時の安全性を確保します
+Constructor DSLまたはClassic DSLのみを使用する場合、ステップ1だけで十分です。ただし、これらの定義にもコンパイル時チェックが追加されるため、ステップ2も推奨されます。
 
-詳細な手順については、**[コンパイラプラグインのセットアップガイド](/docs/setup/compiler-plugin)**を参照してください。
+:::warning
+KSPプロセッサ `koin-ksp-compiler` は非推奨（deprecated）です。既存プロジェクト向けにのみ、そのセットアップ手順が[KSPプロセッサのセットアップ](/docs/setup/annotations-ksp)に残されています。新規プロジェクトではCompiler Pluginを使用してください。
+:::
 
-## セットアップガイド {id="setup-guides"}
+## バージョン {id="versions"}
 
-### [Gradle のセットアップ](/docs/setup/gradle) {id="gradle-setup"}
+| コンポーネント | 現在のバージョン | Kotlin |
+|-----------|-----------------|----------|
+| Koin（`koin-annotations` を含むすべてのライブラリ） | 4.2.2 | 2.3.20でビルド |
+| Koin Compiler Plugin | 1.2.1 | 2.3.20、2.4.0、2.4.10、2.4.20で検証済み（Koin 4.2.0以上が必要） |
 
-すべてのプラットフォーム向けの完全な依存関係設定：
-- Koin BOM (推奨)
-- バージョンカタログ (Version catalogs)
-- プラットフォーム固有のパッケージ
-- テスト用の依存関係
+最新の公開バージョン:
 
-### [コンパイラプラグインのセットアップ](/docs/setup/compiler-plugin) {id="compiler-plugin-setup"}
+- Koin: [![Maven Central](https://img.shields.io/maven-central/v/io.insert-koin/koin-core?label=latest)](https://mvnrepository.com/artifact/io.insert-koin/koin-core)
+- Koin Compiler Plugin: [![Maven Central](https://img.shields.io/maven-central/v/io.insert-koin/koin-compiler-plugin?label=latest)](https://mvnrepository.com/artifact/io.insert-koin/koin-compiler-plugin)
 
-Koin コンパイラプラグインの詳細ガイド：
-- Gradle プラグインの設定
-- 設定オプション
-- Kotlin バージョンの要件
-- トラブルシューティング
+以前のKoinバージョン系列:
 
-### [KSP プロセッサのセットアップ](/docs/setup/annotations-ksp) (非推奨) {id="ksp-processor-setup-deprecated"}
+| Koin | Kotlin | Compiler Plugin |
+|------|--------|-----------------|
+| 4.2.x | 2.3.20+ | 対応 |
+| 4.1.x | 2.1+ | 非対応（KSPプロセッサのみ） |
+| 4.0.x | 1.9+ | 非対応（KSPプロセッサのみ） |
+| 3.5.x | 1.8+ | 非対応 |
 
-Koin Annotations 向けの KSP ベースのプロセッサである `koin-ksp-compiler` のレガシーなセットアップ：
-- ⚠️ `koin-ksp-compiler` は非推奨です — Koin コンパイラプラグインへ移行してください
-- Koin Annotations 自体は非推奨ではありません。`koin-annotations` は現在、メインの Koin プロジェクトの一部となっています
-- 移行ガイドが含まれています
+バージョン間の変更点およびアップグレード方法については、[リリース](/docs/support/releases)を参照してください。
 
-## バージョンの互換性 {id="version-compatibility"}
+## 関連情報 {id="related"}
 
-| Koin バージョン | Kotlin バージョン | Koin コンパイラプラグイン |
-|--------------|----------------|----------------------|
-| 4.2.x | 2.3+ | ✅ 推奨 |
-| 4.1.x | 2.1/2.2+ | ⚠️ KSP プロセッサのみ |
-| 4.0.x | 1.9/2.0+ | ⚠️ KSP プロセッサのみ |
-| 3.5.x | 1.8+ | ❌ 利用不可 |
-
-## 現在のバージョン {id="current-version"}
-
-- **Koin**: [![Maven Central](https://img.shields.io/maven-central/v/io.insert-koin/koin-core?label=latest)](https://mvnrepository.com/artifact/io.insert-koin/koin-core)
-- **Koin コンパイラプラグイン**: [![Maven Central](https://img.shields.io/maven-central/v/io.insert-koin/koin-compiler-plugin?label=latest)](https://mvnrepository.com/artifact/io.insert-koin/koin-compiler-plugin)
-
-[Maven Central](https://central.sonatype.com/search?q=io.insert-koin+koin-core&sort=name) ですべての Koin パッケージを確認できます。
-
-## 次のステップ {id="next-steps"}
-
-セットアップの後に：
-- **[コアコンセプト](/docs/reference/koin-core/starting-koin)** - Koin の使い方を学ぶ
-- **[チュートリアル](/docs/quickstart/kotlin)** - 初めてのアプリを作成する
-- **[Android との統合](/docs/reference/koin-android/start)** - Android 固有の機能
+- [Gradleのセットアップ](/docs/setup/gradle): BOMおよび各Koinアーティファクトについて。
+- [Compiler Pluginのセットアップ](/docs/setup/compiler-plugin): プラグインのインストールと設定。
+- [スタイルの選択](/docs/intro/choosing-your-style): 各スタイルに必要なものについて。
+- [チュートリアル](/docs/quickstart/kotlin): 各プラットフォーム向けの最初のアプリケーション作成。
+- [リリース](/docs/support/releases): バージョン情報とアップグレードの注意事項。

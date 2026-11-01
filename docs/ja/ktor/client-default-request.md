@@ -14,18 +14,18 @@
 </tldr>
 
 <link-summary>
-DefaultRequestプラグインを使用すると、すべてのリクエストのデフォルトパラメーターを設定できます。
+DefaultRequest プラグインを使用すると、すべてのリクエストに対するデフォルトのパラメータを設定できます。
 </link-summary>
 
-[`DefaultRequest`](https://api.ktor.io/ktor-client-core/io.ktor.client.plugins/-default-request/index.html) プラグインを使用すると、すべての[リクエスト](client-requests.md)のデフォルトパラメーターを設定できます。ベースURLの指定、ヘッダーの追加、クエリパラメーターの設定などが可能です。
+[`DefaultRequest`](https://api.ktor.io/ktor-client-core/io.ktor.client.plugins/-default-request/index.html) プラグインを使用すると、すべての[リクエスト](client-requests.md)に対するデフォルトパラメータを設定できます。ベース URL の指定、ヘッダーの追加、クエリパラメータの設定などが行えます。
 
 ## 依存関係の追加 {id="add_dependencies"}
 
-`DefaultRequest` は [ktor-client-core](client-dependencies.md) アーティファクトのみを必要とし、特定の依存関係は必要ありません。
+`DefaultRequest` は [ktor-client-core](client-dependencies.md) アーティファクトのみを必要とし、特定の依存関係を追加する必要はありません。
 
-## DefaultRequestのインストール {id="install_plugin"}
+## DefaultRequest のインストール {id="install_plugin"}
 
-`DefaultRequest` をインストールするには、[クライアント設定ブロック](client-create-and-configure.md#configure-client)内の `install` 関数に渡します。
+`DefaultRequest` をインストールするには、[クライアント設定ブロック](client-create-and-configure.md#configure-client)内で `install` 関数に渡します。
 
 ```kotlin
 import io.ktor.client.*
@@ -37,7 +37,7 @@ val client = HttpClient(CIO) {
 }
 ```
 
-または、`defaultRequest()` 関数を呼び出して必要なリクエストパラメーターを[設定](#configure)します。
+または、`defaultRequest()` 関数を呼び出して必要なリクエストパラメータを[設定](#configure)します。
 
 ```kotlin
 import io.ktor.client.*
@@ -53,9 +53,9 @@ val client = HttpClient(CIO) {
 
 ### 既存の設定の置き換え {id="default_request_replace"}
 
-`DefaultRequest` プラグインがすでにインストールされている場合は、次のいずれかの方法で既存の設定を置き換えることができます。
+`DefaultRequest` プラグインがすでにインストールされている場合、以下のいずれかの方法で既存の設定を置き換えることができます。
 
-- `defaultRequest()` 関数の `replace` パラメーターを使用する：
+- `defaultRequest()` 関数の `replace` パラメータを使用する:
 
 ```kotlin
 val client = HttpClient(CIO) {
@@ -65,7 +65,7 @@ val client = HttpClient(CIO) {
 }
 ```
 
-- ジェネリックな `installOrReplace()` 関数を使用する：
+- 汎用の `installOrReplace()` 関数を使用する:
 
 ```kotlin
 val client = HttpClient(CIO) {
@@ -75,12 +75,12 @@ val client = HttpClient(CIO) {
 }
 ```
 
-## DefaultRequestの設定 {id="configure"}
+## DefaultRequest の設定 {id="configure"}
 
-### ベースURL {id="url"}
+### ベース URL {id="url"}
 
-`DefaultRequest` では、[リクエストURL](client-requests.md#url)とマージされるURLのベース部分を設定できます。
-例えば、以下の `url` 関数は、すべてのリクエストのベースURLを指定します。
+`DefaultRequest` を使用すると、[リクエスト URL](client-requests.md#url) とマージされる URL のベース部分を設定できます。
+たとえば、以下の `url` 関数はすべてのリクエストのベース URL を指定します。
 
 ```kotlin
 defaultRequest {
@@ -88,26 +88,26 @@ defaultRequest {
 }
 ```
 
-上記の設定を持つクライアントを使用して、次のようなリクエストを行うと...
+上記の設定を行ったクライアントを使用して以下のリクエストを行うと、...
 
 ```kotlin
 val response: HttpResponse = client.get("welcome.html")
 ```
 
-...結果として得られるURLは `https://ktor.io/docs/welcome.html` となります。
-ベースURLとリクエストURLがどのようにマージされるかについては、[DefaultRequest](https://api.ktor.io/ktor-client-core/io.ktor.client.plugins/-default-request/index.html) を参照してください。
+... 解決される URL は次のようになります: `https://ktor.io/docs/welcome.html`。
+ベース URL とリクエスト URL がどのようにマージされるかについては、[DefaultRequest](https://api.ktor.io/ktor-client-core/io.ktor.client.plugins/-default-request/index.html) を参照してください。
 
-> ベースURLパスは末尾のスラッシュで終わる必要があります。そうしないと、[RFC 3986](https://www.rfc-editor.org/rfc/rfc3986#section-5.2)のURL解決ルールに従って、リクエストパスがベースパスの最後のセグメントを置き換えてしまいます。たとえば、`path("v1")`はファイルとして扱われ、リクエストパスが追加されるときに削除されますが、`path("v1/")`はディレクトリのプレフィックスとして保持されます。
+> ベース URL のパスは末尾のスラッシュで終わる必要があります。そうでない場合、[RFC 3986](https://www.rfc-editor.org/rfc/rfc3986#section-5.2) の URL 解決ルールに従って、リクエストパスによってベースパスの最後のセグメントが置き換えられます。たとえば、`path("v1")` はファイルとして扱われ、リクエストパスが追加されたときに破棄されますが、`path("v1/")` はディレクトリプレフィックスとして保持されます。
 >
 {style="note"}
 
-### URLパラメーター {id="url-params"}
+### URL パラメータ {id="url-params"}
 
-`url` 関数では、URLコンポーネントを個別に指定することもできます。例：
-- HTTPスキーム
+`url` 関数を使用すると、次のように URL コンポーネントを個別に指定することもできます。
+- HTTP スキーム
 - ホスト名
-- ベースURLパス
-- クエリパラメーター
+- ベース URL パス
+- クエリパラメータ
 
 ```kotlin
 url {
@@ -128,7 +128,7 @@ defaultRequest {
 }
 ```
 
-ヘッダーの重複を避けるために、`appendIfNameAbsent`、`appendIfNameAndValueAbsent`、`contains` 関数を使用することもできます。
+ヘッダーの重複を避けるために、`appendIfNameAbsent`、`appendIfNameAndValueAbsent`、`contains` 関数を使用できます。
 
 ```kotlin
 defaultRequest {
@@ -136,25 +136,25 @@ defaultRequest {
 }
 ```
 
-### Unixドメインソケット {id="unix-domain-sockets"}
+### Unix ドメインソケット {id="unix-domain-sockets"}
 
-> Unixドメインソケットは CIO エンジンでのみサポートされています。
+> Unix ドメインソケットは CIO エンジンでのみサポートされています。
 >
 {style="note"}
 
-[個別のリクエストをUnixドメインソケットで構築](client-requests.md#specify-a-unix-domain-socket)することもできますが、ソケットパラメーターを使用してデフォルトリクエストを設定することも可能です。
+[Unix ドメインソケットを使用して個別のリクエストを構築](client-requests.md#specify-a-unix-domain-socket)することもできますが、ソケットパラメータを持つデフォルトリクエストを設定することも可能です。
 
-これを行うには、`defaultRequest` 関数にソケットへのパスを指定して `unixSocket` 呼び出しを渡します。例：
+これを行うには、たとえばソケットへのパスを指定した `unixSocket` を `defaultRequest` 関数内で呼び出します。
 
 ```kotlin
 val client = HttpClient(CIO)
 
-// Unixドメインソケットへ単一のリクエストを送信する
+// Unix ドメインソケットへ単一のリクエストを送信
 val response: HttpResponse = client.get("/") {
     unixSocket("/tmp/test-unix-socket-ktor.sock")
 }
 
-// そのクライアントからのすべてのリクエストに対してソケットを設定する
+// そのクライアントからのすべてのリクエストに対してソケットを設定
 val clientDefault = HttpClient(CIO) {
     defaultRequest {
         unixSocket("/tmp/test-unix-socket-ktor.sock")
@@ -167,8 +167,8 @@ val response: HttpResponse = clientDefault.get("/")
 ## 例 {id="example"}
 
 以下の例では、次の `DefaultRequest` 設定を使用しています。
-* `url` 関数は、HTTPスキーム、ホスト、ベースURLパス、クエリパラメーターを定義します。
-* `header` 関数は、すべてのリクエストにカスタムヘッダーを追加します。
+* `url` 関数で HTTP スキーム、ホスト、ベース URL パス、クエリパラメータを定義しています。
+* `header` 関数ですべてのリクエストにカスタムヘッダーを追加しています。
 
 ```kotlin
 val client = HttpClient(CIO) {
@@ -184,7 +184,7 @@ val client = HttpClient(CIO) {
 }
 ```
 
-このクライアントによる以下のリクエストは、パスの最後のセグメントのみを指定しており、`DefaultRequest` に設定されたパラメーターが自動的に適用されます。
+このクライアントによる以下のリクエストは後半のパスセグメントのみを指定しており、`DefaultRequest` に設定されたパラメータが自動的に適用されます。
 
 ```kotlin
 val response: HttpResponse = client.get("welcome.html")

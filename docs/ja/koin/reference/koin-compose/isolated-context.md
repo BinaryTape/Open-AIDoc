@@ -1,293 +1,138 @@
 ---
-title: 隔離されたコンテキスト
+title: Composeにおける分離コンテキスト (Isolated Context)
 ---
 
-# Composeにおける隔離されたコンテキスト
+# Composeにおける分離コンテキスト (Isolated Context)
 
-Koinの隔離されたコンテキスト（isolated context）を使用すると、ホストアプリケーションのKoin設定に干渉することなく、別のKoinインスタンスを実行できます。これは、SDK、ライブラリ、およびホワイトラベルアプリケーションにとって不可欠です。
+このページでは、`KoinIsolatedContext` を使用して、Compose関数が分離されたKoinインスタンスから依存関係を解決（resolve）する方法を説明します。Composableを提供するSDKやライブラリを構築しており、ホストアプリのKoinコンテナを共有してはならない場合に使用してください。分離コンテキストとは何か、およびその作成方法については、[Context Isolation](/docs/reference/koin-core/context-isolation) で解説されています。
 
-## ユースケース {id="use-cases"}
+## KoinIsolatedContext {id="koinisolatedcontext"}
 
-- **SDK開発** - ホストアプリに影響を与えずに、SDK独自の依存関係を持たせることができます。
-- **ホワイトラベルアプリ** - 構成の異なる複数のアプリバリアントを扱えます。
-- **テスト** - 隔離されたテスト設定を利用できます。
-- **機能モジュール** - 独自のDIを備えた自己完結型の機能モジュールを構築できます。
+[Context Isolation](/docs/reference/koin-core/context-isolation) で説明されているように、分離された `KoinApplication` を静的ホルダーに保持します:
 
-## 隔離されたコンテキストの作成 {id="creating-an-isolated-context"}
-
-### コンテキストホルダーの定義 {id="define-the-context-holder"}
-
-隔離されたKoinインスタンスを保持するためのオブジェクトを作成します：
-
+**Compiler Plugin DSL**
 ```kotlin
-object MySDKKoinContext {
+object PaymentSdkKoin {
     val koinApp = koinApplication {
-        // SDKのモジュール
-        modules(
-            sdkCoreModule,
-            sdkNetworkModule,
-            sdkRepositoryModule
-        )
+        modules(paymentModule)
     }
+}
 
-    // 便利なアクセサ
-    val koin: Koin get() = koinApp.koin
+internal val paymentModule = module {
+    single<PaymentProcessor>()
+    viewModel<PaymentViewModel>()
 }
 ```
 
-### SDKモジュールの例 {id="sdk-module-example"}
+**Annotations**
+```kotlin
+import org.koin.plugin.module.dsl.koinApplication
+
+@Module
+@ComponentScan("com.example.paymentsdk")
+internal class PaymentModule
+
+@KoinApplication(modules = [PaymentModule::class])
+internal object PaymentSdkApp
+
+object PaymentSdkKoin {
+    val koinApp = koinApplication<PaymentSdkApp>()
+}
+```
+
+**Constructor / Classic DSL**
+```kotlin
+object PaymentSdkKoin {
+    val koinApp = koinApplication {
+        modules(paymentModule)
+    }
+}
+
+internal val paymentModule = module {
+    singleOf(::PaymentProcessor)
+    viewModelOf(::PaymentViewModel)
+}
+```
+
+SDKのUIを `KoinIsolatedContext` でラップします:
 
 ```kotlin
-val sdkCoreModule = module {
-    single<SDKConfiguration>()
-    single<SDKLogger>()
+import org.koin.compose.KoinIsolatedContext
+
+@Composable
+fun PaymentScreen(amount: Double, onDone: (PaymentResult) -> Unit) {
+    KoinIsolatedContext(context = PaymentSdkKoin.koinApp) {
+        PaymentFlow(amount, onDone)
+    }
 }
 
-val sdkNetworkModule = module {
-    single<SDKApiClient>()
-    single<SDKAuthManager>()
-}
-
-val sdkRepositoryModule = module {
-    single<SDKDataRepository>()
+@Composable
+private fun PaymentFlow(amount: Double, onDone: (PaymentResult) -> Unit) {
+    val viewModel = koinViewModel<PaymentViewModel>() // SDKのKoinから解決される
+    // ...
 }
 ```
 
-## Composeでの使用 {id="using-with-compose"}
+ブロック内では、`koinInject()`、`koinViewModel()`、`getKoin()`、`currentKoinScope()`、および `rememberKoinModules()` が分離されたインスタンスを使用します。ブロックの外側では、ホストアプリ自身のKoinが保持されます。
 
-### KoinIsolatedContext {id="koinisolatedcontext"}
+## 同じ画面内でのホストとSDKの共存 {id="host-and-sdk-in-the-same-screen"}
 
-SDKのCompose UIを `KoinIsolatedContext` でラップします：
+ホストの依存関係はブロックの外側で解決し、SDKの依存関係は内側で解決します:
 
 ```kotlin
 @Composable
-fun MySDKScreen() {
-    KoinIsolatedContext(context = MySDKKoinContext.koinApp) {
-        // すべてのKoin APIは隔離されたコンテキストを使用します
-        SDKContent()
-    }
-}
+fun CheckoutScreen() {
+    val analytics = koinInject<HostAnalytics>() // ホストアプリのKoin
 
-@Composable
-private fun SDKContent() {
-    // これらは隔離されたコンテキストから解決されます
-    val config = koinInject<SDKConfiguration>()
-    val viewModel = koinViewModel<SDKViewModel>()
-
-    Column {
-        Text("SDK Version: ${config.version}")
-        SDKFeatureScreen(viewModel)
+    KoinIsolatedContext(context = PaymentSdkKoin.koinApp) {
+        val processor = koinInject<PaymentProcessor>() // SDKのKoin
+        PaymentButton(processor, onEvent = { analytics.track(it) })
     }
 }
 ```
 
-### ネストされたコンテキスト {id="nested-contexts"}
+2つのコンテナは互いを認識しません。境界を越えて値を渡すには、パラメータやコールバックを使用します。
 
-隔離されたコンテキストを入れ子にすることができます：
+## 初期化とシャットダウン {id="initialization-and-shutdown"}
 
-```kotlin
-@Composable
-fun HostApp() {
-    // ホストアプリのKoinコンテキスト（startKoinから）
-    val hostService = koinInject<HostService>()
-
-    Column {
-        Text("Host App")
-
-        // SDKは独自の隔離されたコンテキストを使用
-        KoinIsolatedContext(context = MySDKKoinContext.koinApp) {
-            MySDKScreen()
-        }
-
-        // ホストコンテキストに戻る
-        AnotherHostScreen()
-    }
-}
-```
-
-## ライフサイクル管理 {id="lifecycle-management"}
-
-### 手動初期化 {id="manual-initialization"}
-
-必要に応じてSDKコンテキストを初期化します：
+SDKがホストからの設定を必要とする場合は、`initialize` 関数内で `KoinApplication` を作成し、シャットダウン時にクローズします:
 
 ```kotlin
-object MySDK {
-    private var _koinContext: KoinApplication? = null
-    val koinContext: KoinApplication
-        get() = _koinContext ?: error("SDK not initialized")
+object PaymentSdk {
+    private var koinApp: KoinApplication? = null
 
-    fun initialize(config: SDKConfig) {
-        _koinContext = koinApplication {
-            modules(
-                module {
-                    single { config }
-                },
-                sdkCoreModule,
-                sdkNetworkModule
-            )
+    fun initialize(config: PaymentConfig) {
+        koinApp = koinApplication {
+            modules(module { single { config } }, paymentModule)
         }
     }
 
     fun shutdown() {
-        _koinContext?.close()
-        _koinContext = null
-    }
-}
-```
-
-### 手動ライフサイクルでの使用 {id="usage-with-manual-lifecycle"}
-
-```kotlin
-// ホストアプリがSDKを初期化
-class HostApplication : Application() {
-    override fun onCreate() {
-        super.onCreate()
-
-        // ホストアプリのKoin
-        startKoin {
-            androidContext(this@HostApplication)
-            modules(hostAppModule)
-        }
-
-        // SDKの隔離されたKoin
-        MySDK.initialize(SDKConfig(apiKey = "xxx"))
-    }
-
-    override fun onTerminate() {
-        super.onTerminate()
-        MySDK.shutdown()
-    }
-}
-
-// Compose内
-@Composable
-fun SDKFeature() {
-    KoinIsolatedContext(context = MySDK.koinContext) {
-        SDKScreen()
-    }
-}
-```
-
-## 両方のコンテキストへのアクセス {id="accessing-both-contexts"}
-
-ホストとSDKの両方の依存関係にアクセスする必要がある場合があります：
-
-```kotlin
-@Composable
-fun BridgeScreen() {
-    // ホストコンテキストから取得（KoinIsolatedContextの外側）
-    val hostAnalytics = koinInject<HostAnalytics>()
-
-    KoinIsolatedContext(context = MySDKKoinContext.koinApp) {
-        // SDKコンテキストから取得（KoinIsolatedContextの内側）
-        val sdkService = koinInject<SDKService>()
-
-        // 両方を使用
-        SDKFeature(
-            service = sdkService,
-            onEvent = { hostAnalytics.track(it) }
-        )
-    }
-}
-```
-
-## SDKの完全な例 {id="complete-sdk-example"}
-
-```kotlin
-// SDKのパブリックAPI
-object PaymentSDK {
-    private lateinit var koinApp: KoinApplication
-
-    fun initialize(config: PaymentConfig) {
-        koinApp = koinApplication {
-            modules(
-                module { single { config } },
-                paymentCoreModule,
-                paymentUIModule
-            )
-        }
+        koinApp?.close()
+        koinApp = null
     }
 
     @Composable
-    fun PaymentScreen(
-        amount: Double,
-        onSuccess: (PaymentResult) -> Unit,
-        onCancel: () -> Unit
-    ) {
-        KoinIsolatedContext(context = koinApp) {
-            PaymentFlow(
-                amount = amount,
-                onSuccess = onSuccess,
-                onCancel = onCancel
-            )
-        }
-    }
-}
-
-// SDKの内部モジュール
-private val paymentCoreModule = module {
-    single<PaymentProcessor>()
-    single<PaymentValidator>()
-}
-
-private val paymentUIModule = module {
-    viewModel<PaymentViewModel>()
-}
-
-// SDKの内部UI
-@Composable
-private fun PaymentFlow(
-    amount: Double,
-    onSuccess: (PaymentResult) -> Unit,
-    onCancel: () -> Unit
-) {
-    val viewModel = koinViewModel<PaymentViewModel>()
-
-    PaymentUI(
-        amount = amount,
-        state = viewModel.state,
-        onPay = { viewModel.processPayment(amount, onSuccess) },
-        onCancel = onCancel
-    )
-}
-
-// ホストアプリでの使用
-@Composable
-fun CheckoutScreen() {
-    var showPayment by remember { mutableStateOf(false) }
-
-    if (showPayment) {
-        PaymentSDK.PaymentScreen(
-            amount = 99.99,
-            onSuccess = { result ->
-                showPayment = false
-                // 成功時の処理
-            },
-            onCancel = { showPayment = false }
-        )
-    } else {
-        Button(onClick = { showPayment = true }) {
-            Text("Pay Now")
+    fun PaymentScreen(amount: Double, onDone: (PaymentResult) -> Unit) {
+        val app = koinApp ?: error("PaymentSdk.initialize() was not called")
+        KoinIsolatedContext(context = app) {
+            PaymentFlow(amount, onDone)
         }
     }
 }
 ```
 
-## ベストプラクティス {id="best-practices"}
+ホストは、SDKの画面が表示される前に、例えば `Application.onCreate()` などで `PaymentSdk.initialize(...)` を1度だけ呼び出します。
 
-1. **早期に初期化する** - Composeがレンダリングされる前に、隔離されたコンテキストをセットアップします。
+## 制限事項 {id="limits"}
 
-2. **リソースをクリーンアップする** - 終了時に `KoinApplication` の `close()` を呼び出します。
+- **KoinNavigationScope**: グローバルのKoinインスタンス内にスコープを作成するため、`KoinIsolatedContext` には追従しません。代わりに分離ブロック内で `KoinScope` を使用してください（[Scopes in Compose](/docs/reference/koin-compose/compose-scopes) を参照）。
+- **Compose外のコード**: SDKのクラスは、分離されたインスタンスからコンストラクタ経由で依存関係を受け取ります。Compose外のSDKエントリポイント（`Service` やホストから呼び出されるコールバックなど）で自身で依存関係を取得する必要がある場合は、`getKoin()` をオーバーライドした `KoinComponent` を使用します。[Context Isolation](/docs/reference/koin-core/context-isolation) を参照してください。
+- **ライフサイクル**: `KoinIsolatedContext` はインスタンスの開始や停止を行いません。ライフタイムの管理は開発者自身が行う必要があります。
 
-3. **インスタンスを共有しない** - SDKとホストの依存関係を分離したままにします。
+## 関連情報 {id="related"}
 
-4. **インターフェース境界を使用する** - 共有されたKoinインスタンスではなく、コールバックまたはインターフェースを介して通信します。
-
-5. **初期化をドキュメント化する** - ホストアプリの開発者に対して、SDKのセットアップ要件を明確にします。
-
-## 次のステップ {id="next-steps"}
-
-- **[Composeの概要](/docs/reference/koin-compose/compose)** - 基本的なComposeのセットアップ
-- **[コンテキストの隔離](/docs/reference/koin-core/context-isolation)** - 隔離のコア概念
-- **[スコープ](/docs/reference/koin-compose/compose-scopes)** - Composeにおけるスコープ管理
+- [Context Isolation](/docs/reference/koin-core/context-isolation): 分離されたKoinインスタンスとカスタム `KoinComponent` の作成。
+- [Koin for Compose](/docs/reference/koin-compose/compose): `KoinApplication` と `koinInject()`。
+- [Scopes in Compose](/docs/reference/koin-compose/compose-scopes): 分離ブロック内でのスコープ。
+- [Isolated Context in Ktor](/docs/reference/koin-ktor/ktor-isolated): Ktorサーバーにおける同様のコンセプト。

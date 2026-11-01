@@ -1,25 +1,25 @@
 [//]: # (title: マップ固有の操作)
 
-[マップ](collections-overview.md#map)では、キーと値の両方の型がユーザー定義です。
-キーに基づいたマップエントリへのアクセスにより、キーによる値の取得から、キーと値を個別にフィルタリングする機能まで、マップ固有のさまざまな処理が可能になります。
-このページでは、標準ライブラリのマップ処理関数について説明します。
+[マップ](collections-overview.md#map)では、キーと値の両方の型をユーザーが定義します。
+マップのエントリに対するキーベースのアクセスにより、キーによる値の取得からキーと値の個別のフィルタリングまで、マップ固有の様々な処理機能が利用可能になります。
+このページでは、標準ライブラリが提供するマップ処理関数について説明します。
 
 ## キーと値の取得 {id="retrieve-keys-and-values"}
 
-マップから値を取得するには、[`get()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/get.html) 関数の引数としてそのキーを渡す必要があります。
-短縮形の `[key]` 構文もサポートされています。指定されたキーが見つからない場合、`null` を返します。
-また、[`getValue()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/get-value.html) 関数もあります。これは少し動作が異なり、キーがマップ内に見つからない場合に例外をスローします。
-さらに、キーが存在しない場合を処理するためのオプションが他にあります。
+マップから値を取得するには、[`get()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/get.html) 関数の引数としてキーを渡す必要があります。
+省略形の `[key]` 構文もサポートされています。指定されたキーが見つからない場合、`null` が返されます。
+また、動作がわずかに異なる [`getValue()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/get-value.html) 関数もあります。これは、マップ内にキーが見つからない場合に例外をスローします。
+さらに、キーが存在しない場合を処理するためのオプションがいくつか用意されています。
 
-* [`getOrElse()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/get-or-else.html) はリストの場合と同じように動作します。存在しないキーに対する値が、指定されたラムダ関数から返されます。
+* [`getOrElse()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/get-or-else.html) はリストの場合と同様に動作します。存在しないキーに対する値は、渡されたラムダ関数から返されます。
 * [`getOrDefault()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/get-or-default.html) は、キーが見つからない場合に指定されたデフォルト値を返します。
 
-値に null を許容する（nullable な）マップの場合は、代わりに以下の関数を使用して、欠落しているキーと `null` 値を明示的に処理します：
+null許容値（nullable values）を持つマップの場合は、キーの欠落と `null` 値を明示的に処理する以下の関数を代わりに使用してください。
 
-* `getOrElseIfNull()` は、キーが欠落しているか、値が `null` の場合に、指定されたデフォルト値の結果を返します。
-* `getOrElseIfMissing()` は、キーが欠落している場合にのみ、指定されたデフォルト値の結果を返します。
+* `getOrElseIfNull()` は、キーが存在しないか、値が `null` の場合に、指定されたデフォルト値の結果を返します。
+* `getOrElseIfMissing()` は、キーが存在しない場合に、指定されたデフォルト値の結果を返します。
 
-以下の例は、これらの関数の違いを示しています：
+これらの関数の違いを示す例を以下に示します。
 
 ```kotlin
 @OptIn(ExperimentalStdlibApi::class)
@@ -45,7 +45,7 @@ fun main() {
     println(nullableMap.getOrElseIfMissing("two") { 0 })
     // null
 
-    // "six" がマップに存在しないため、例外をスローします
+    // "six" がマップに存在しないため例外をスローします
     // numbersMap.getValue("six")
 
 //sampleEnd
@@ -53,8 +53,8 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="2.4"}
 
-マップのすべてのキーまたはすべての値に対して操作を実行するには、プロパティ `keys` および `values` からそれぞれ取得できます。
-`keys` はマップのすべてのキーのセット（set）であり、`values` はマップのすべての値のコレクション（collection）です。
+マップのすべてのキーまたはすべての値に対して操作を実行するには、それぞれ `keys` プロパティおよび `values` プロパティから取得できます。
+`keys` はマップのすべてのキーのセット（Set）であり、`values` はマップのすべての値のコレクションです。
 
 ```kotlin
 
@@ -66,13 +66,13 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
 ## フィルタリング {id="filter"}
 
 他のコレクションと同様に、[`filter()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/filter.html) 関数を使用してマップを[フィルタリング](collection-filtering.md)できます。
-マップで `filter()` を呼び出すときは、`Pair` を引数とする述語（predicate）を渡します。
-これにより、フィルタリングの述語内でキーと値の両方を使用できるようになります。
+マップで `filter()` を呼び出すときは、`Pair` を引数に取る述語（predicate）を渡します。
+これにより、フィルタリング述語内でキーと値の両方を使用できるようになります。
 
 ```kotlin
 
@@ -84,12 +84,12 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-マップをフィルタリングするための、キーによる方法と値による方法の2つの特定の方法もあります。
-それぞれの方法に対して、[`filterKeys()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/filter-keys.html) と [`filterValues()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/filter-values.html) 関数があります。
+マップをフィルタリングするための特定の方法として、キーによるものと値によるものの2つもあります。
+それぞれの方法に対して、[`filterKeys()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/filter-keys.html) と [`filterValues()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/filter-values.html) という関数があります。
 どちらも、指定された述語に一致するエントリの新しいマップを返します。
-`filterKeys()` の述語は要素의 キーのみをチェックし、`filterValues()` の述語は値のみをチェックします。
+`filterKeys()` の述語は要素のキーのみをチェックし、`filterValues()` の述語は値のみをチェックします。
 
 ```kotlin
 
@@ -104,13 +104,13 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-## plus および minus 演算子 {id="plus-and-minus-operators"}
+## plus演算子とminus演算子 {id="plus-and-minus-operators"}
 
-要素へのキーアクセスがあるため、[`plus`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/plus.html) (`+`) および [`minus`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/minus.html) (`-`) 演算子は、他のコレクションとは異なる動作をマップに対して行います。
-`plus` は、両方のオペランド（左側の `Map` と、右側の `Pair` または別の `Map`）の要素を含む `Map` を返します。
-右側のオペランドに、左側の `Map` に存在するキーを持つエントリが含まれている場合、結果のマップには右側のエントリが含まれます。
+要素へのキーアクセスがあるため、[`plus`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/plus.html)（`+`）演算子および [`minus`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/minus.html)（`-`）演算子は、他のコレクションとは異なる動作をします。
+`plus` は、左辺の `Map` と右辺の `Pair` または別の `Map` の両方のオペランドの要素を含む `Map` を返します。
+右辺のオペランドに、左辺の `Map` に存在するキーを持つエントリが含まれている場合、結果のマップには右辺のエントリが含まれます。
 
 ```kotlin
 
@@ -123,10 +123,10 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-`minus` は、左側の `Map` のエントリから、右側のオペランドにあるキーを持つエントリを除外した `Map` を作成します。
-したがって、右側のオペランドは単一のキー、またはリストやセットなどのキーのコレクションのいずれかにすることができます。
+`minus` は、左辺の `Map` のエントリから、右辺のオペランドにあるキーを持つものを除外した `Map` を作成します。
+したがって、右辺のオペランドには、単一のキー、またはリストやセットなどのキーのコレクションを指定できます。
 
 ```kotlin
 
@@ -138,26 +138,26 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-可変マップでの [`plusAssign`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/plus-assign.html) (`+=`) および [`minusAssign`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/minus-assign.html) (`-=`) 演算子の使用方法の詳細については、以下の[マップの書き込み操作](#map-write-operations)を参照してください。
+可変マップでの [`plusAssign`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/plus-assign.html)（`+=`）および [`minusAssign`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/minus-assign.html)（`-=`）演算子の使用の詳細については、後述の[マップの書き込み操作](#map-write-operations)を参照してください。
 
 ## マップの書き込み操作 {id="map-write-operations"}
 
 [可変（Mutable）](collections-overview.md#collection-types)マップは、マップ固有の書き込み操作を提供します。
-これらの操作により、キーに基づいた値へのアクセスを使用してマップの内容を変更できます。
+これらの操作を使用すると、値へのキーベースのアクセスによってマップの内容を変更できます。
 
-マップの書き込み操作を定義する特定のルールがあります：
+マップに対する書き込み操作を定義する特定のルールがあります：
 
-* 値は更新できます。一方で、キーは決して変わりません。一度エントリを追加すると、そのキーは固定されます。
-* 各キーに対して、常に関連付けられている値は1つだけです。エントリ全体を追加したり削除したりできます。
+* 値は更新できます。一方、キーが変更されることはありません。一度エントリを追加すると、そのキーは不変です。
+* 各キーに対して、関連付けられる値は常に1つだけです。エントリ全体を追加または削除できます。
 
-以下は、可変マップで使用できる書き込み操作用の標準ライブラリ関数の説明です。
+以下では、可変マップで利用可能な書き込み操作のための標準ライブラリ関数について説明します。
 
 ### エントリの追加と更新 {id="add-and-update-entries"}
 
 可変マップに新しいキーと値のペアを追加するには、[`put()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-map/put.html) を使用します。
-新しいエントリが `LinkedHashMap`（デフォルトのマップ実装）に入れられると、マップを反復処理する際に最後に来るように追加されます。ソートされたマップでは、新しい要素の位置はキーの順序によって定義されます。
+新しいエントリが `LinkedHashMap`（デフォルトのマップ実装）に追加されると、マップのイテレーション時に最後に来るように追加されます。ソートされたマップでは、新しい要素の位置はキーの順序によって定義されます。
 
 ```kotlin
 
@@ -169,10 +169,10 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
 一度に複数のエントリを追加するには、[`putAll()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/put-all.html) を使用します。
-その引数は、`Map` または `Pair` のグループ（`Iterable`、`Sequence`、または `Array`）にすることができます。
+その引数には、`Map` または `Pair` のグループ（`Iterable`、`Sequence`、または `Array`）を指定できます。
 
 ```kotlin
 
@@ -184,9 +184,9 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-`put()` と `putAll()` の両方は、指定されたキーが既にマップ内に存在する場合、値を上書きします。したがって、これらを使用してマップエントリの値を更新できます。
+指定されたキーが既にマップ内に存在する場合、`put()` と `putAll()` はどちらも値を上書きします。したがって、これらを使用してマップエントリの値を更新できます。
 
 ```kotlin
 
@@ -199,11 +199,11 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-短縮演算子形式を使用して、マップに新しいエントリを追加することもできます。2つの方法があります。
+省略形の演算子形式を使用してマップに新しいエントリを追加することもできます。2つの方法があります：
 
-* [`plusAssign`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/plus-assign.html) (`+=`) 演算子。
+* [`plusAssign`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/plus-assign.html)（`+=`）演算子。
 * `set()` のエイリアスである `[]` 演算子。
 
 ```kotlin
@@ -217,24 +217,24 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-マップ内に存在するキーを指定して呼び出された場合、演算子は対応するエントリの値を上書きします。
+マップ内に存在するキーで呼び出された場合、演算子は対応するエントリの値を上書きします。
 
-#### 欠落しているエントリへのデフォルト値の追加 {id="add-default-values-for-missing-entries"}
+#### 存在しないエントリへのデフォルト値の追加 {id="add-default-values-for-missing-entries"}
 
-既存の値を返すか、値が利用できない場合にデフォルト値を追加するには、[`.getOrPut()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/get-or-put.html) 拡張関数を使用します。
-キーが欠落しているか、値が `null` の場合、`.getOrPut()` はデフォルト値を保存してそれを返します。
+既存の値を返すか、値が存在しない場合にデフォルト値を追加するには、[`.getOrPut()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/get-or-put.html) 拡張関数を使用します。
+キーが存在しない場合、または `null` 値を持つ場合、`.getOrPut()` はデフォルト値を格納してそれを返します。
 
-値に null を許容するマップの場合、`null` 値の扱いを制御するために `.getOrPutIfNull()` および `.getOrPutIfMissing()` 関数を使用できます：
+null許容値を持つマップでは、`.getOrPutIfNull()` および `.getOrPutIfMissing()` 関数を使用して、`null` 値の処理方法を制御できます：
 
-* `getOrPutIfNull()` は `getOrPut()` と同様に動作し、キーが欠落しているか値が `null` の場合にデフォルト値を使用します。
-* `getOrPutIfMissing()` は、キーが欠落している場合にのみデフォルト値を使用します。
+* `getOrPutIfNull()` は `getOrPut()` と同様に動作し、キーが存在しないか `null` 値を持つ場合にデフォルト値を使用します。
+* `getOrPutIfMissing()` は、キーが存在しない場合にのみデフォルト値を使用します。
 
-`getOrPutIfNull()` および `getOrPutIfMissing()` 関数は[試験的（Experimental）](components-stability.md#stability-levels-explained)です。
-オプトインするには、`@OptIn(ExperimentalStdlibApi::class)` アノテーションを使用してください。
+`getOrPutIfNull()` および `getOrPutIfMissing()` 関数は[実験的（Experimental）](components-stability.md#stability-levels-explained)です。
+オプトインするには、`@OptIn(ExperimentalStdlibApi::class)` アノテーションを使用します。
 
-以下に例を示します：
+例を示します：
 
 ```kotlin
 @OptIn(ExperimentalStdlibApi::class)
@@ -243,13 +243,13 @@ fun main() {
     val mapForNull = mutableMapOf<String, Int?>("one" to null)
     val mapForMissing = mutableMapOf<String, Int?>("one" to null)
 
-    // "one" の値が null の場合、値を置き換える
+    // "one" が null 値を持つ場合は値を置き換える
     mapForNull.getOrPutIfNull("one") { 1 }
 
     println(mapForNull)
     // {one=1}
 
-    // "one" がマップに存在するため、null 値を保持する
+    // "one" がマップに存在するため null 値を保持する
     mapForMissing.getOrPutIfMissing("one") { 1 }
 
     println(mapForMissing)
@@ -262,8 +262,8 @@ fun main() {
 ### エントリの削除 {id="remove-entries"}
 
 可変マップからエントリを削除するには、[`remove()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-map/remove.html) 関数を使用します。
-`remove()` を呼び出すときは、キーまたはキーと値のペア全体を渡すことができます。
-キーと値の両方を指定した場合、そのキーを持つ要素は、その値が第2引数と一致する場合にのみ削除されます。
+`remove()` を呼び出すときは、キーまたはキーと値のペア全体のいずれかを渡すことができます。
+キーと値の両方を指定した場合、そのキーを持つ要素は、値が第2引数と一致する場合にのみ削除されます。
 
 ```kotlin
 
@@ -277,7 +277,7 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
 キーまたは値によって可変マップからエントリを削除することもできます。
 これを行うには、エントリのキーまたは値を指定して、マップの `keys` または `values` に対して `remove()` を呼び出します。
@@ -295,9 +295,9 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-[`minusAssign`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/minus-assign.html) (`-=`) 演算子も可変マップで使用できます。
+可変マップでは、[`minusAssign`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/minus-assign.html)（`-=`）演算子も使用できます。
 
 ```kotlin
 
@@ -311,4 +311,4 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}

@@ -6,10 +6,11 @@
 <var name="plugin_name" value="StatusPages"/>
 <var name="package_name" value="io.ktor.server.plugins.statuspages"/>
 <var name="artifact_name" value="ktor-server-status-pages"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.server.statusPages"/>
 
 <tldr>
 <p>
-<b>必要相依性</b>：<code>io.ktor:%artifact_name%</code>
+<b>必要的相依性</b>：<code>io.ktor:%artifact_name%</code>
 </p>
 <var name="example_name" value="status-pages"/>
 <p>
@@ -19,27 +20,35 @@
     </a>
 </p>
 <p>
-    <b><Links href="/ktor/server-native" summary="Ktor 支援 Kotlin/Native，並允許您在沒有額外執行階段或虛擬機的情況下執行伺服器。">原生伺服器</Links> 支援</b>：✅
+    <b><Links href="server-native.md" summary="Ktor 支援 Kotlin/Native，並允許你在無需額外執行階段或虛擬機的情況下執行伺服器。">Native 伺服器</Links> 支援</b>：✅
 </p>
 </tldr>
 
 <link-summary>
-%plugin_name% 允許 Ktor 應用程式根據拋出的例外或狀態碼，對任何失敗狀態做出適當的回應。
+%plugin_name% 允許 Ktor 應用程式根據擲出的例外或狀態碼，對任何失敗狀態做出適當的回應。
 </link-summary>
 
-[%plugin_name%](https://api.ktor.io/ktor-server-status-pages/io.ktor.server.plugins.statuspages/-status-pages.html) 外掛程式允許 Ktor 應用程式根據拋出的例外或狀態碼，對任何失敗狀態做出適當的[回應](server-responses.md)。
+[%plugin_name%](https://api.ktor.io/ktor-server-status-pages/io.ktor.server.plugins.statuspages/-status-pages.html) 外掛程式允許 Ktor 應用程式根據擲出的例外或狀態碼，對任何失敗狀態做出適當的[回應](server-responses.md)。
 
 ## 新增相依性 {id="add_dependencies"}
 
 <p>
-    若要使用 <code>%plugin_name%</code>，您需要在組建指令碼中包含 <code>%artifact_name%</code> 構件：
+    若要使用 <code>%plugin_name%</code>，請將 <code>%artifact_name%</code> 構件新增至你的建置指令碼：
 </p>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上述程式碼片段使用 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 版本目錄</a> 來指定 Ktor 相依性。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上述程式碼片段使用 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 版本目錄</a> 來指定 Ktor 相依性。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
@@ -49,15 +58,14 @@
 ## 安裝 %plugin_name% {id="install_plugin"}
 
 <p>
-    若要將 <code>%plugin_name%</code> 外掛程式<a href="server-plugins.md#install">安裝</a>到應用程式，請將其傳遞給指定<Links href="/ktor/server-modules" summary="模組允許您透過分組路由來組織您的應用程式。">模組</Links>中的 <code>install</code> 函式。
-    以下程式碼片段顯示如何安裝 <code>%plugin_name%</code> ...
+    若要將 <code>%plugin_name%</code> 外掛程式<a href="server-plugins.md#install">安裝</a>至你的應用程式，請將其傳遞給指定<Links href="server-modules.md" summary="模組允許你透過對路由進行分組來組織應用程式結構。">模組</Links>中的 <code>install</code> 函式。以下範例展示了如何安裝 <code>%plugin_name%</code>：
 </p>
 <list>
     <li>
-        ... 在 <code>embeddedServer</code> 函式呼叫內。
+        在 <code>embeddedServer()</code> 函式呼叫中。
     </li>
     <li>
-        ... 在明確定義的 <code>module</code> 內，該模組是 <code>Application</code> 類別的擴充函式。
+        在 <code>Application</code> 類別上明確定義的 <code>module()</code> 擴充函式中。
     </li>
 </list>
 <Tabs>
@@ -69,17 +77,17 @@
     </TabItem>
 </Tabs>
 
-## 配置 %plugin_name% {id="configure"}
+## 設定 %plugin_name% {id="configure"}
 
 `%plugin_name%` 外掛程式提供了三個主要的配置選項：
 
-- [exceptions](#exceptions)：根據對應的例外類別配置回應
-- [status](#status)：針對狀態碼值配置回應
-- [statusFile](#status-file)：從類別路徑配置檔案回應
+- [exceptions](#exceptions)：根據對應的例外類別設定回應
+- [status](#status)：針對狀態碼數值設定回應
+- [statusFile](#status-file)：從類別路徑 (classpath) 設定檔案回應
 
 ### 例外 {id="exceptions"}
 
-`exception` 處理常式允許您處理導致 `Throwable` 例外的呼叫。在最基本的情況下，可以為任何例外配置 `500` HTTP 狀態碼：
+`exception` 處理常式允許你處理導致 `Throwable` 例外的呼叫。在最基本的情況下，可以為任何例外配置 `500` HTTP 狀態碼：
 
 ```kotlin
 install(StatusPages) {
@@ -89,7 +97,7 @@ install(StatusPages) {
 }
 ```
 
-您還可以檢查特定例外並回應所需的內容：
+你也可以檢查特定的例外並回應所需的內容：
 
 ```kotlin
 install(StatusPages) {
@@ -103,9 +111,9 @@ install(StatusPages) {
 }
 ```
 
-### 狀態 {id="status"}
+### 狀態碼 {id="status"}
 
-`status` 處理常式提供根據狀態碼回應特定內容的功能。以下範例顯示當伺服器上缺少資源（`404` 狀態碼）時，如何對請求做出回應：
+`status` 處理常式提供了根據狀態碼回應特定內容的功能。以下範例展示了當伺服器上缺少資源時（`404` 狀態碼），該如何回應請求：
 
 ```kotlin
 install(StatusPages) {
@@ -117,13 +125,13 @@ install(StatusPages) {
 
 ### 狀態檔案 {id="status-file"}
 
-`statusFile` 處理常式允許您根據狀態碼提供 HTML 頁面。假設您的專案在 `resources` 資料夾中包含 `error401.html` 和 `error402.html` HTML 頁面。在這種情況下，您可以按如下方式使用 `statusFile` 處理 `401` 和 `402` 狀態碼：
+`statusFile` 處理常式允許你根據狀態碼提供 HTML 頁面。假設你的專案在 `resources` 資料夾中包含 `error401.html` 與 `error402.html` HTML 頁面。在此情況下，你可以使用 `statusFile` 處理 `401` 與 `402` 狀態碼，如下所示：
 ```kotlin
 install(StatusPages) {
     statusFile(HttpStatusCode.Unauthorized, HttpStatusCode.PaymentRequired, filePattern = "error#.html")
 }
 ```
 
-`statusFile` 處理常式會將已配置狀態清單中的任何 `#` 字元替換為狀態碼的值。
+`statusFile` 處理常式會將已設定狀態清單內的任何 `#` 字元替換為該狀態碼的值。
 
-> 您可以在此處找到完整的範例：[status-pages](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/status-pages)。
+> 你可以在此處找到完整的範例：[status-pages](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/status-pages)。

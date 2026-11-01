@@ -1,184 +1,176 @@
 ---
-title: Kotlin 多平台设置
+title: Kotlin Multiplatform 配置
 ---
 
-# Kotlin 多平台设置
+# Kotlin Multiplatform 配置
 
-Koin 为 Kotlin 多平台 (KMP) 项目提供一等支持。本指南涵盖了相关设置与配置。
+本页介绍如何在 Kotlin Multiplatform (KMP) 项目中配置 Koin：Gradle 依赖项、Koin 代码的放置位置、用于启动 Koin 的单个共享函数，以及各平台如何调用它。本文假设你已了解[模块](/docs/reference/koin-core/modules)和[启动 Koin](/docs/reference/koin-core/starting-koin)。关于如何为每个平台提供各自的实现，请参阅 [KMP 共享模式](/docs/reference/koin-core/kmp-shared-modules)。
 
-:::info
-关于定义类型（Single、Factory、ViewModel）和三种声明方式（编译器插件 DSL、注解、经典 DSL），请参阅 [定义](/docs/reference/koin-core/definitions)。
-:::
+## 支持的目标 {id="supported-targets"}
 
-## 支持的平台 {id="supported-platforms"}
+`koin-core` 和编译器插件支持所有 Kotlin 目标：
 
-| 平台 | 状态 |
-|----------|--------|
-| Android | ✅ 完全支持 |
-| iOS (arm64, x64, simulatorArm64) | ✅ 完全支持 |
-| JVM | ✅ 完全支持 |
-| JS | ✅ 完全支持 |
-| Wasm | ✅ 完全支持 |
-| macOS | ✅ 完全支持 |
-| Linux | ✅ 完全支持 |
-| Windows | ✅ 完全支持 |
+| 目标 | 是否支持 |
+|--------|-----------|
+| Android | 是 |
+| iOS (`iosArm64`、`iosX64`、`iosSimulatorArm64`) | 是 |
+| JVM（桌面、服务器） | 是 |
+| JS 与 Wasm (`js`、`wasmJs`) | 是 |
+| macOS、Linux、Windows (Kotlin/Native) | 是 |
 
-## 依赖项设置 {id="dependencies-setup"}
+Compose 构件遵循 Compose Multiplatform 的目标。请参阅 [Gradle 配置](/docs/setup/gradle)中的构件表。
 
-### shared/build.gradle.kts {id="shared-build-gradle-kts"}
+## 依赖项 {id="dependencies"}
+
+将 [Koin 编译器插件](/docs/setup/compiler-plugin)应用于共享模块，并将 Koin 添加到源集中：
 
 ```kotlin
+// shared/build.gradle.kts
 plugins {
     kotlin("multiplatform")
-    id("io.insert-koin.compiler.plugin")  // 可选：用于编译器插件
+    alias(libs.plugins.koin.compiler)
 }
 
 kotlin {
     androidTarget()
-    iosX64()
     iosArm64()
     iosSimulatorArm64()
     jvm()
-    js(IR) { browser() }
 
     sourceSets {
         commonMain.dependencies {
-            implementation(platform("io.insert-koin:koin-bom:4.2.0"))
-            implementation("io.insert-koin:koin-core")
-        }
+            implementation(project.dependencies.platform(libs.koin.bom))
+            implementation(libs.koin.core)
+            implementation(libs.koin.annotations) // 仅在使用注解时添加
 
-        commonTest.dependencies {
-            implementation("io.insert-koin:koin-test")
+            // Compose Multiplatform
+            implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel)
         }
-
         androidMain.dependencies {
-            implementation("io.insert-koin:koin-android")
+            implementation(libs.koin.android)
+        }
+        commonTest.dependencies {
+            implementation(libs.koin.test)
         }
     }
 }
 ```
 
-### 配合 Compose 多平台使用 {id="with-compose-multiplatform"}
-
-```kotlin {
-    sourceSets {
-        commonMain.dependencies {
-            implementation(platform("io.insert-koin:koin-bom:4.2.0"))
-            implementation("io.insert-koin:koin-core")
-            implementation("io.insert-koin:koin-compose")
-            implementation("io.insert-koin:koin-compose-viewmodel")
-        }
-    }
-}
-```
+编译器插件只需一次声明即可在每个目标上运行。与 Koin Annotations 1.x 的 KSP 配置不同，它不需要针对每个目标单独配置（请参阅[从 KSP 迁移](/docs/migration/from-ksp-to-compiler-plugin)）。
 
 ## 项目结构 {id="project-structure"}
 
 ```
-project/
-├── shared/
-│   ├── src/
-│   │   ├── commonMain/
-│   │   │   └── kotlin/
-│   │   │       ├── di/
-│   │   │       │   └── KoinModules.kt
-│   │   │       └── domain/
-│   │   │           └── UserRepository.kt
-│   │   ├── androidMain/
-│   │   │   └── kotlin/
-│   │   │       └── di/
-│   │   │           └── PlatformModule.android.kt
-│   │   └── iosMain/
-│   │       └── kotlin/
-│   │           └── di/
-│   │               └── PlatformModule.ios.kt
-│   └── build.gradle.kts
-├── androidApp/
-│   └── src/main/kotlin/
-│       └── MainApplication.kt
-└── iosApp/
-    └── iOSApp.swift
+shared/
+└── src/
+    ├── commonMain/kotlin/di/
+    │   ├── Koin.kt              // 模块与 initKoin()
+    │   └── PlatformModule.kt    // expect 声明
+    ├── androidMain/kotlin/di/
+    │   └── PlatformModule.android.kt
+    └── iosMain/kotlin/di/
+        └── PlatformModule.ios.kt
+androidApp/   // Application 类调用 initKoin()
+iosApp/       // Swift App 调用 initKoin()
 ```
 
-## 通用模块定义 {id="common-module-definition"}
+共享定义位于 `commonMain`。每个平台的源集仅包含因平台而异的内容。
 
-### commonMain/kotlin/di/KoinModules.kt {id="commonmain-kotlin-di-koinmodules-kt"}
+## 共享启动函数 {id="shared-start-function"}
 
+在 `commonMain` 中编写一个启动 Koin 的函数。每个平台调用该函数，并可通过 `config` 形参添加自己的配置：
+
+**编译器插件 DSL**
 ```kotlin
-import org.koin.dsl.module
-
-// 共享定义 (编译器插件 DSL)
-val sharedModule = module {
-    single<UserRepository>()
-    single<ApiClient>()
-    factory<GetUserUseCase>()
-}
-
-// 平台特定模块 (在每个平台中定义)
-expect val platformModule: Module
-```
-
-:::note
-建议在共享模块中使用编译器插件 DSL (`single<Type>()`)。它需要编译器插件，但能提供最简洁的语法，且无需按平台进行 KSP 配置。
-:::
-
-## 平台特定模块 {id="platform-specific-modules"}
-
-平台模块可以使用任何方式。此处展示了在需要自定义构建逻辑时使用的带 lambda 的经典 DSL。
-
-### androidMain/kotlin/di/PlatformModule.android.kt {id="androidmain-kotlin-di-platformmodule-android-kt"}
-
-```kotlin
-import org.koin.dsl.module
-
-actual val platformModule = module {
-    // 带 lambda 的经典 DSL，用于自定义构建
-    single<PlatformHelper> { AndroidPlatformHelper(get()) }
-    single<DatabaseDriver> { AndroidDatabaseDriver(get()) }
-}
-```
-
-### iosMain/kotlin/di/PlatformModule.ios.kt {id="iosmain-kotlin-di-platformmodule-ios-kt"}
-
-```kotlin
-import org.koin.dsl.module
-
-actual val platformModule = module {
-    // 如果不需要自定义逻辑，也可以使用编译器插件 DSL / 注解
-    single<IosPlatformHelper>() bind PlatformHelper::class
-    single<IosDatabaseDriver>() bind DatabaseDriver::class
-}
-```
-
-## 共享初始化 {id="shared-initialization"}
-
-### commonMain/kotlin/di/KoinInit.kt {id="commonmain-kotlin-di-koininit-kt"}
-
-```kotlin
+// commonMain/kotlin/di/Koin.kt
 import org.koin.core.context.startKoin
-import org.koin.core.KoinApplication
+import org.koin.dsl.KoinAppDeclaration
+import org.koin.dsl.includes
+import org.koin.dsl.module
+import org.koin.plugin.module.dsl.*
 
-fun initKoin(config: KoinAppDeclaration? = null): KoinApplication {
-    return startKoin {
+val dataModule = module {
+    single<UserRepository>()
+    viewModel<UserViewModel>()
+}
+
+val appModule = module {
+    includes(dataModule, platformModule())
+}
+
+fun initKoin(config: KoinAppDeclaration? = null) {
+    startKoin {
         includes(config)
-        modules(
-            sharedModule,
-            platformModule
-        )
+        modules(appModule)
     }
 }
 ```
+
+**注解**
+```kotlin
+// commonMain/kotlin/di/Koin.kt
+import org.koin.core.annotation.*
+import org.koin.dsl.KoinAppDeclaration
+import org.koin.dsl.includes
+import org.koin.plugin.module.dsl.startKoin
+
+@Module(includes = [PlatformModule::class])
+@ComponentScan("com.example.app")
+@Configuration
+class AppModule
+
+@KoinApplication
+object KoinApp
+
+fun initKoin(config: KoinAppDeclaration? = null) {
+    startKoin<KoinApp> {
+        includes(config)
+    }
+}
+```
+
+`@Configuration` 模块会在构建时被 `@KoinApplication` 发现。`PlatformModule` 是一个 `expect` 模块类，请参阅 [KMP 共享模式](/docs/reference/koin-core/kmp-shared-modules)。
+
+**构造函数 / 经典 DSL**
+```kotlin
+// commonMain/kotlin/di/Koin.kt
+import org.koin.core.context.startKoin
+import org.koin.core.module.dsl.*
+import org.koin.dsl.KoinAppDeclaration
+import org.koin.dsl.includes
+import org.koin.dsl.module
+
+val dataModule = module {
+    singleOf(::UserRepository)
+    viewModelOf(::UserViewModel)
+}
+
+val appModule = module {
+    includes(dataModule, platformModule())
+}
+
+fun initKoin(config: KoinAppDeclaration? = null) {
+    startKoin {
+        includes(config)
+        modules(appModule)
+    }
+}
+```
+
+`includes(config)` 会将平台配置（Android 上下文、记录器、额外模块）应用到同一个 Koin 启动过程中。`platformModule()` 是一个 `expect` 函数，请参阅 [KMP 共享模式](/docs/reference/koin-core/kmp-shared-modules)。
 
 ## 平台入口点 {id="platform-entry-points"}
 
 ### Android {id="android"}
 
+从你的 `Application` 类中调用 `initKoin` 并传递 Android 上下文：
+
 ```kotlin
-// androidApp/src/main/kotlin/MainApplication.kt
+// androidApp
 class MainApplication : Application() {
     override fun onCreate() {
         super.onCreate()
-
         initKoin {
             androidContext(this@MainApplication)
             androidLogger()
@@ -187,67 +179,106 @@ class MainApplication : Application() {
 }
 ```
 
+这样 Android 定义就可以将 `Context` 用作构造函数形参。请参阅 [Android 启动](/docs/reference/koin-android/start)。
+
 ### iOS {id="ios"}
 
+在 `iosMain` 中添加一个无形参函数，并从 Swift `App` 初始化器中调用它：
+
 ```kotlin
-// shared/src/iosMain/kotlin/di/KoinInitIos.kt
-fun initKoinIos() {
-    initKoin()
-}
+// iosMain/kotlin/di/KoinIos.kt
+fun initKoinIos() = initKoin()
 ```
 
 ```swift
 // iosApp/iOSApp.swift
-import shared
+import Shared
 
 @main
 struct iOSApp: App {
     init() {
-        KoinInitIosKt.initKoinIos()
+        KoinIosKt.doInitKoinIos()
     }
 
     var body: some Scene {
-        WindowGroup {
-            ContentView()
-        }
+        WindowGroup { ContentView() }
     }
 }
 ```
 
-### JVM {id="jvm"}
+Kotlin/Native 命名规则解释了这种 Swift 调用方式。`KoinIos.kt` 的顶层函数会导出到一个名为 `KoinIosKt` 的类中。名称以 `init` 开头的函数会获得 `do` 前缀，因此 `initKoinIos` 会变成 `doInitKoinIos`。该帮助程序函数避免了从 Swift 传递 Kotlin lambda 表达式 (`config`)。
+
+关于从 Swift 代码调用 Koin，请参阅 [KMP 平台集成](/docs/reference/koin-mp/kmp)。
+
+### JVM 桌面 {id="jvm-desktop"}
 
 ```kotlin
-fun main() {
+// jvmMain
+fun main() = application {
     initKoin {
         printLogger()
     }
-
-    val repository: UserRepository = get()
+    Window(onCloseRequest = ::exitApplication) {
+        App()
+    }
 }
 ```
 
-## KMP 中的 DSL 方式 {id="dsl-approaches-in-kmp"}
+### Web {id="web"}
 
-| 方式 | 何时使用 |
-|----------|-------------|
-| **编译器插件 DSL** | 默认选择 - 适用于所有平台，语法最简洁 |
-| **注解** | 默认选择 - 适用于所有平台，无需编写模块代码 |
-| **带 lambda 的经典 DSL** | 构建器模式、自定义工厂逻辑、Mock |
+```kotlin
+// jsMain 或 wasmJsMain
+fun main() {
+    initKoin()
+    // 启动你的 UI
+}
+```
 
-:::info
-**编译器插件 DSL** 和 **注解** 适用于所有平台。仅在需要自定义构建逻辑时才使用 **带 lambda 的经典 DSL**。详情请参阅 [编译器插件设置](/docs/setup/compiler-plugin)。
-:::
+## Compose Multiplatform {id="compose-multiplatform"}
 
-## 最佳做法 {id="best-practices"}
+使用 Compose Multiplatform 时，你可以通过根 Composable 中的 `KoinApplication` 来启动 Koin，而无需在每个平台上调用 `initKoin`。在 Android 上，它会自动为你设置 Android 上下文：
 
-1. **将共享代码放在 commonMain 中** - 业务逻辑、仓库、用例
-2. **对平台特定内容使用 expect/actual** - 文件系统、设备 API、平台库
-3. **按平台初始化 Koin** - 每个平台都有其入口点
-4. **保持平台模块精简** - 仅保留真正属于平台特定的内容
+**编译器插件 DSL**
+```kotlin
+// commonMain
+@Composable
+fun App() {
+    KoinApplication(configuration = koinConfiguration { modules(appModule) }) {
+        MainScreen()
+    }
+}
+```
 
-## 后续步骤 {id="next-steps"}
+**注解**
+```kotlin
+// commonMain
+@Composable
+fun App() {
+    KoinApplication(configuration = koinConfiguration<KoinApp>()) {
+        MainScreen()
+    }
+}
+```
 
-- **[共享模式](/docs/reference/koin-core/kmp-shared-modules)** - 模块组织、expect/actual 模式
-- **[ViewModel](/docs/reference/koin-core/viewmodel)** - 多平台 ViewModel
-- **[高级模式](/docs/reference/koin-mp/kmp)** - 架构模式、测试、平台集成
-- **[测试](/docs/reference/koin-test/testing)** - 测试 KMP 项目
+`koinConfiguration<T>()` 来自 `org.koin.plugin.module.dsl`。
+
+**构造函数 / 经典 DSL**
+```kotlin
+// commonMain
+@Composable
+fun App() {
+    KoinApplication(configuration = koinConfiguration { modules(appModule) }) {
+        MainScreen()
+    }
+}
+```
+
+如果 Compose 外部的代码在显示第一个屏幕之前需要使用 Koin（例如后台服务、Swift 代码），请保留 `initKoin`。这两种方式在 [Koin for Compose](/docs/reference/koin-compose/compose) 中进行了对比。
+
+## 相关内容 {id="related"}
+
+- [KMP 共享模式](/docs/reference/koin-core/kmp-shared-modules)：平台模块与 `expect`/`actual` 定义。
+- [KMP 平台集成](/docs/reference/koin-mp/kmp)：共享代码中的 Android 上下文、Swift 互操作、桌面与 Web。
+- [Koin for Compose](/docs/reference/koin-compose/compose)：`KoinApplication` 与 `koinInject()`。
+- [ViewModel](/docs/reference/koin-core/viewmodel)：Android 和 Compose Multiplatform 共享的 ViewModel。
+- [Gradle 配置](/docs/setup/gradle)：BOM、版本目录、构件列表。

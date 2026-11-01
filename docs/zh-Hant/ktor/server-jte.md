@@ -6,43 +6,52 @@
 <var name="plugin_name" value="Jte"/>
 <var name="package_name" value="io.ktor.server.jte"/>
 <var name="artifact_name" value="ktor-server-jte"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.server.jte"/>
 
 <tldr>
 <p>
-<b>必要的相依性</b>：<code>io.ktor:%artifact_name%</code>
+<b>必要相依性</b>: <code>io.ktor:%artifact_name%</code>
 </p>
 <var name="example_name" value="jte"/>
 <p>
-    <b>程式碼範例</b>：
-    <a href="https://github.com/ktorio/ktor-documentation/tree/%ktor_version%/codeSnippets/snippets/%example_name%">
+    <b>程式碼範例</b>:
+    <a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/%example_name%">
         %example_name%
     </a>
 </p>
 <p>
-    <b><Links href="/ktor/server-native" summary="Ktor 支援 Kotlin/Native，並允許您在沒有額外執行階段或虛擬機的情況下執行伺服器。">Native 伺服器</Links> 支援</b>：✖️
+    <b><Links href="server-native.md" summary="Ktor 支援 Kotlin/Native，並允許您在沒有額外執行階段或虛擬機的情況下執行伺服器。">原生伺服器</Links>支援</b>: ✖️
 </p>
 </tldr>
 
-Ktor 允許您透過安裝 [%plugin_name%](https://api.ktor.io/ktor-server-jte/io.ktor.server.jte/-jte.html) 外掛程式，在您的應用程式中將 [JTE 範本](https://github.com/casid/jte) 作為檢視使用。
+Ktor 允許您透過安裝 [%plugin_name%](https://api.ktor.io/ktor-server-jte/io.ktor.server.jte/-jte.html) 外掛程式，在應用程式中使用 [JTE 範本](https://github.com/casid/jte) 作為檢視。
 
 ## 新增相依性 {id="add_dependencies"}
 
 <p>
-    若要使用 <code>%plugin_name%</code>，您需要在組建指令碼中包含 <code>%artifact_name%</code> 構件：
+    若要使用 <code>%plugin_name%</code>，請將 <code>%artifact_name%</code> 構件新增至您的組建指令碼中：
 </p>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上述程式碼片段使用 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 版本目錄</a> 來指定 Ktor 相依性。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上述程式碼片段使用 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 版本目錄</a> 來指定 Ktor 相依性。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
     </TabItem>
 </Tabs>
 
-若要處理 `.kte` 檔案，請將 `gg.jte:jte-kotlin` 構件新增至您的專案：
+若要處理 `.kte` 檔案，請將 `gg.jte:jte-kotlin` 構件新增至您的專案中：
 
 <var name="group_id" value="gg.jte"/>
 <var name="artifact_name" value="jte-kotlin"/>
@@ -60,24 +69,26 @@ Ktor 允許您透過安裝 [%plugin_name%](https://api.ktor.io/ktor-server-jte/i
 </Tabs>
 
 > 目前的 `jte‑kotlin` 編譯器外掛程式與 Kotlin 2.3.x 不相容。
-> 由於 Ktor 3.4.0 使用 Kotlin 2.3 工具鏈，在 `jte‑kotlin` 外掛程式增加對 Kotlin 2.3 的支援之前，無法使用 Ktor JTE 外掛程式。
+> 由於 Ktor 3.4.0 使用 Kotlin 2.3 工具鏈，在 `jte‑kotlin`
+> 外掛程式新增對 Kotlin 2.3 的支援之前，無法使用 Ktor JTE 外掛程式。
 > 
-> 如果您依賴 JTE，請在 `jte‑kotlin` 針對 Kotlin 2.3 更新之前，使用 Kotlin 2.2.x 與相容的 Ktor 版本。
+> 如果您依賴 JTE，請在 `jte‑kotlin` 針對 Kotlin 2.3 進行更新之前，使用 Kotlin 2.2.x 以及相容的 Ktor 版本。
 > 
 {style="warning"}
 
 ## 安裝 %plugin_name% {id="install_plugin"}
 
 <p>
-    若要將 <code>%plugin_name%</code> 外掛程式安裝到應用程式，請將其傳遞給指定<Links href="/ktor/server-modules" summary="模組允許您透過將路由分組來組織您的應用程式。">模組</Links>中的 <code>install</code> 函式。
-    下方的程式碼片段展示了如何安裝 <code>%plugin_name%</code> ...
+    若要將 <code>%plugin_name%</code> 外掛程式<a href="server-plugins.md#install">安裝</a>至應用程式中，
+    請將其傳遞給指定<Links href="server-modules.md" summary="模組允許您透過將路由分組來組織應用程式的結構。">模組</Links>中的 <code>install</code> 函式。
+    以下範例展示如何安裝 <code>%plugin_name%</code>：
 </p>
 <list>
     <li>
-        ... 在 <code>embeddedServer</code> 函式呼叫內。
+        在 <code>embeddedServer()</code> 函式呼叫中。
     </li>
     <li>
-        ... 在明確定義的 <code>module</code> 內，它是 <code>Application</code> 類別的擴充函式。
+        在 <code>Application</code> 類別上明確定義的 <code>module()</code> 擴充函式中。
     </li>
 </list>
 <Tabs>
@@ -89,15 +100,15 @@ Ktor 允許您透過安裝 [%plugin_name%](https://api.ktor.io/ktor-server-jte/i
     </TabItem>
 </Tabs>
 
-在 `install` 區塊內，您可以[配置](#configure)如何載入 JTE 範本。
+在 `install` 區塊內，您可以[設定](#configure)如何載入 JTE 範本。
 
-## 配置 %plugin_name% {id="configure"}
-### 配置範本載入 {id="template_loading"}
+## 設定 %plugin_name% {id="configure"}
+### 設定範本載入 {id="template_loading"}
 若要載入 JTE 範本，您需要：
-1. 建立一個 `CodeResolver` 用於解析範本程式碼。例如，您可以配置 `DirectoryCodeResolver` 從給定目錄載入範本，或使用 `ResourceCodeResolver` 從應用程式資源載入範本。
-2. 使用 `templateEngine` 屬性來指定範本引擎，該引擎使用建立的 `CodeResolver` 將範本轉換為原生 Java/Kotlin 程式碼。
+1. 建立用於解析範本程式碼的 `CodeResolver`。例如，您可以設定 `DirectoryCodeResolver` 從給定目錄載入範本，或是設定 `ResourceCodeResolver` 從應用程式資源載入範本。
+2. 使用 `templateEngine` 屬性指定範本引擎，該引擎會使用已建立的 `CodeResolver` 將範本轉換為原生 Java/Kotlin 程式碼。
 
-例如，下方的程式碼片段讓 Ktor 在 `templates` 目錄中尋找 JTE 範本：
+例如，以下程式碼片段讓 Ktor 能夠在 `templates` 目錄中尋找 JTE 範本：
 
 ```kotlin
 import gg.jte.TemplateEngine
@@ -114,8 +125,8 @@ fun Application.module() {
 }
 ```
 
-### 在回應中發送範本 {id="use_template"}
-假設您在 `templates` 目錄中擁有 `index.kte` 範本：
+### 在回應中傳送範本 {id="use_template"}
+假設您在 `templates` 目錄中有一個 `index.kte` 範本：
 ```html
 @param id: Int
 @param name: String
@@ -126,7 +137,7 @@ fun Application.module() {
 </html>
 ```
 
-若要將此範本用於指定的[路由](server-routing.md)，請按照以下方式將 `JteContent` 傳遞給 `call.respond` 方法：
+若要將該範本用於指定的[路由](server-routing.md)，請透過以下方式將 `JteContent` 傳遞給 `call.respond` 方法：
 ```kotlin
 get("/index") {
     val params = mapOf("id" to 1, "name" to "John")

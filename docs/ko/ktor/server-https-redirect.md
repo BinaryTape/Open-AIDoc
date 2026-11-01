@@ -5,10 +5,11 @@
 <var name="plugin_name" value="HttpsRedirect"/>
 <var name="package_name" value="io.ktor.server.plugins.httpsredirect"/>
 <var name="artifact_name" value="ktor-server-http-redirect"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.server.httpRedirect"/>
 
 <tldr>
 <p>
-<b>필수 의존성</b>: <code>io.ktor:%artifact_name%</code>
+<b>필요한 의존성</b>: <code>io.ktor:%artifact_name%</code>
 </p>
 <var name="example_name" value="ssl-engine-main-redirect"/>
 <p>
@@ -18,23 +19,31 @@
     </a>
 </p>
 <p>
-    <b><Links href="/ktor/server-native" summary="Ktor supports Kotlin/Native and allows you to run a server without an additional runtime or virtual machine.">네이티브 서버</Links> 지원</b>: ✅
+    <b><Links href="server-native.md" summary="Ktor는 Kotlin/Native를 지원하며 추가 런타임이나 가상 머신 없이도 서버를 실행할 수 있습니다.">네이티브 서버</Links> 지원</b>: ✅
 </p>
 </tldr>
 
-[%plugin_name%](https://api.ktor.io/ktor-server-http-redirect/io.ktor.server.plugins.httpsredirect/-https-redirect.html) 플러그인은 모든 HTTP 요청을 처리하기 전에 해당 [HTTPS 대응부](server-ssl.md)로 리다이렉트합니다. 기본적으로 리소스는 `301 Moved Permanently`를 반환하지만, `302 Found`를 반환하도록 설정할 수도 있습니다.
+[%plugin_name%](https://api.ktor.io/ktor-server-http-redirect/io.ktor.server.plugins.httpsredirect/-https-redirect.html) 플러그인은 호출을 처리하기 전에 모든 HTTP 요청을 [해당 HTTPS 요청](server-ssl.md)으로 리다이렉트합니다. 기본적으로 리소스는 `301 Moved Permanently`를 반환하지만, `302 Found`로 구성할 수도 있습니다.
 
 ## 의존성 추가 {id="add_dependencies"}
 
 <p>
-    <code>%plugin_name%</code>을 사용하려면 빌드 스크립트에 <code>%artifact_name%</code> 아티팩트를 포함해야 합니다:
+    <code>%plugin_name%</code>을 사용하려면 빌드 스크립트에 <code>%artifact_name%</code> 아티팩트를 추가합니다:
 </p>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            위 코드 스니펫은 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 버전 카탈로그</a>를 사용하여 Ktor 의존성을 지정합니다.
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            위 코드 스니펫은 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 버전 카탈로그</a>를 사용하여 Ktor 의존성을 지정합니다.
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
@@ -44,15 +53,16 @@
 ## %plugin_name% 설치 {id="install_plugin"}
 
 <p>
-    애플리케이션에 <code>%plugin_name%</code> 플러그인을 <a href="server-plugins.md#install">설치</a>하려면, 지정된 <Links href="/ktor/server-modules" summary="Modules allow you to structure your application by grouping routes.">모듈(module)</Links> 내의 <code>install</code> 함수에 이를 전달하세요.
-    아래 코드 스니펫은 <code>%plugin_name%</code>을 설치하는 방법을 보여줍니다...
+    애플리케이션에 <code>%plugin_name%</code> 플러그인을 <a href="server-plugins.md#install">설치</a>하려면,
+    지정된 <Links href="server-modules.md" summary="모듈을 사용하면 라우트를 그룹화하여 애플리케이션을 구조화할 수 있습니다.">모듈</Links>의 <code>install</code> 함수에 전달하세요.
+    다음 예제는 <code>%plugin_name%</code>을 설치하는 방법을 보여줍니다:
 </p>
 <list>
     <li>
-        ... <code>embeddedServer</code> 함수 호출 내부에서.
+        <code>embeddedServer()</code> 함수 호출 내에서 설치.
     </li>
     <li>
-        ... <code>Application</code> 클래스의 확장 함수인 명시적으로 정의된 <code>module</code> 내부에서.
+        <code>Application</code> 클래스에 명시적으로 정의된 <code>module()</code> 확장 함수 내에서 설치.
     </li>
 </list>
 <Tabs>
@@ -64,13 +74,13 @@
     </TabItem>
 </Tabs>
 
-위의 코드는 기본 설정으로 `%plugin_name%` 플러그인을 설치합니다.
+위 코드는 기본 구성으로 `%plugin_name%` 플러그인을 설치합니다.
 
->리버스 프록시(reverse proxy) 뒤에 있는 경우, HTTPS 요청을 올바르게 감지하려면 `ForwardedHeader` 또는 `XForwardedHeader` 플러그인을 설치해야 합니다. 이러한 플러그인 중 하나를 설치한 후 무한 리다이렉트가 발생하면, 자세한 내용은 [이 FAQ 항목](FAQ.topic#infinite-redirect)을 확인하세요.
+>리버스 프록시 뒤에 있는 경우, HTTPS 요청을 올바르게 감지하려면 `ForwardedHeader` 또는 `XForwardedHeader` 플러그인을 설치해야 합니다. 이 플러그인 중 하나를 설치한 후 무한 리다이렉트가 발생하는 경우 자세한 내용은 [이 FAQ 항목](FAQ.topic#infinite-redirect)을 확인하세요.
 >
 {type="note"}
 
-## %plugin_name% 설정 {id="configure"}
+## %plugin_name% 구성 {id="configure"}
 
 아래 코드 스니펫은 원하는 HTTPS 포트를 구성하고 요청된 리소스에 대해 `301 Moved Permanently`를 반환하도록 설정하는 방법을 보여줍니다:
 
@@ -81,4 +91,4 @@ install(HttpsRedirect) {
 }
 ```
 
-전체 예제는 여기에서 찾을 수 있습니다: [ssl-engine-main-redirect](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/ssl-engine-main-redirect).
+전체 예제는 여기에서 확인할 수 있습니다: [ssl-engine-main-redirect](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/ssl-engine-main-redirect).

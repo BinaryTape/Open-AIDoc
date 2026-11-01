@@ -2,253 +2,119 @@
 title: 요청 스코프 (Request Scopes)
 ---
 
-# Ktor의 요청 스코프 (Request Scopes in Ktor)
+# 요청 스코프 (Request Scopes)
 
-요청 스코프(Request scopes)는 단일 HTTP 요청 기간 동안 유지되는 인스턴스를 생성하며, 요청별 데이터 및 처리에 적합합니다.
+이 페이지에서는 Koin Ktor 플러그인의 요청 스코프(request scope)를 다룹니다. 요청 스코프는 각 HTTP 호출마다 열리고 응답이 전송될 때 닫히는 Koin 스코프입니다. 요청 로거(request logger)나 현재 사용자와 같이 요청별 상태를 유지하는 객체에 사용합니다. 스코프가 일반적으로 어떻게 동작하는지는 [Scopes](/docs/reference/koin-core/scopes)에 설명되어 있습니다. [Koin for Ktor](/docs/reference/koin-ktor/ktor)에 설명된 대로 플러그인이 설치되어 있어야 합니다.
 
-## 요청 스코프 컴포넌트 선언하기 (Declaring Request-Scoped Components) {id="declaring-request-scoped-components"}
+## 요청 스코프 정의 선언하기 {id="declaring-request-scoped-definitions"}
 
-요청 생명 주기(request lifecycle)에 바인딩된 컴포넌트를 선언하려면 `requestScope`를 사용하세요:
-
+**Compiler Plugin DSL**
 ```kotlin
-val appModule = module {
-    // 싱글톤 - 모든 요청에서 공유됨
-    single { UserRepository() }
+import org.koin.module.requestScope
 
-    // 요청 스코프 - 요청당 새로운 인스턴스 생성
+val appModule = module {
+    single<UserRepository>() // shared by all requests
+
+    requestScope {
+        scoped<RequestLogger>()
+        scoped<UserSessionHandler>()
+    }
+}
+```
+
+**어노테이션(Annotations)**
+```kotlin
+import org.koin.ktor.plugin.RequestScope
+
+@Scope(RequestScope::class)
+class RequestLogger(private val call: ApplicationCall)
+
+@Scope(RequestScope::class)
+class UserSessionHandler(private val call: ApplicationCall)
+```
+
+`requestScope { }`는 `RequestScope` 타입으로 한정(qualified)된 스코프이므로, `@Scope(RequestScope::class)`도 동일한 스코프를 대상으로 지정합니다.
+
+**Constructor / Classic DSL**
+```kotlin
+import org.koin.module.requestScope
+
+val appModule = module {
+    singleOf(::UserRepository) // shared by all requests
+
     requestScope {
         scopedOf(::RequestLogger)
-        scopedOf(::RequestMetrics)
         scopedOf(::UserSessionHandler)
     }
 }
 ```
 
-## 요청 스코프 컴포넌트 접근하기 (Accessing Request-Scoped Components) {id="accessing-request-scoped-components"}
+## 핸들러에서 해결하기 (Resolving in a handler) {id="resolving-in-a-handler"}
 
-요청 스코프 의존성을 해결(resolve)하려면 `call.scope.get()`을 사용하세요:
+`call.scope`는 현재 호출의 요청 스코프입니다:
 
 ```kotlin
 routing {
     get("/users/{id}") {
-        val requestLogger = call.scope.get<RequestLogger>()
-        val metrics = call.scope.get<RequestMetrics>()
+        val logger = call.scope.get<RequestLogger>()
+        val userService = call.get<UserService>()
 
-        metrics.start()
-        requestLogger.log("Processing user request")
-
-        val userId = call.parameters["id"]!!
-        val userService = get<UserService>()
-        val user = userService.getUser(userId)
-
-        requestLogger.log("Request completed")
-        metrics.end()
-
-        call.respond(user)
+        logger.log("Fetching user")
+        call.respond(userService.getUser(call.parameters["id"]!!))
     }
 }
 ```
 
-## ApplicationCall 주입하기 (Injecting ApplicationCall) {id="injecting-applicationcall"}
+단일 호출 내에서는 모든 `call.scope.get<RequestLogger>()`가 동일한 인스턴스를 반환합니다. 다음 호출에서는 새로운 인스턴스를 가져옵니다. 요청 스코프는 루트 스코프로 폴백(fall back)되므로, 요청 스코프 정의는 싱글톤(singleton)에 의존할 수 있습니다.
 
-요청 스코프 컴포넌트는 `ApplicationCall`을 자동으로 주입받을 수 있습니다:
+예를 들어 `Koin`이나 `KoinIsolated`가 모두 설치되지 않아 호출에 스코프가 없는 경우, `call.scope`는 "Koin Request Scope is not ready" 예외를 던집니다.
+
+## ApplicationCall 주입하기 {id="injecting-the-applicationcall"}
+
+호출(call)은 해당 요청 스코프의 소스(source)이므로, 요청 스코프 클래스는 별도로 선언하지 않고도 생성자 파라미터로 `ApplicationCall`을 받을 수 있습니다:
 
 ```kotlin
 class RequestLogger(private val call: ApplicationCall) {
     fun log(message: String) {
-        val requestPath = call.request.path()
-        val method = call.request.httpMethod.value
-        println("[$method $requestPath] $message")
+        println("[${call.request.httpMethod.value} ${call.request.path()}] $message")
     }
 }
 
 class UserSessionHandler(private val call: ApplicationCall) {
-    fun getUserId(): String? {
-        return call.request.headers["X-User-ID"]
-    }
-
-    fun isAuthenticated(): Boolean {
-        return call.request.headers["Authorization"] != null
-    }
+    fun userId(): String? = call.request.headers["X-User-ID"]
 }
 ```
 
-## 스코프 생명 주기 콜백 (Scope Lifecycle Callbacks) {id="scope-lifecycle-callbacks"}
+스코프 소스에 대한 설명은 [Scopes](/docs/reference/koin-core/scopes)에 나와 있습니다. `ApplicationCall`은 요청 스코프 내에서만 사용할 수 있으며, `single`에서는 받을 수 없습니다.
 
-요청 스코프가 닫힐 때 정리 작업을 실행하려면 `scoped` 정의에 `onClose` 콜백을 연결하세요. `onClose`는 정의에 대한 중위 함수(infix function)이며 (`requestScope { }` 내부의 블록이 아님), 인스턴스 파라미터는 Null 허용(`T?`)입니다:
+## 수명 주기 (Lifecycle) {id="lifecycle"}
+
+| 단계 | 시점 |
+|------|------|
+| 스코프 생성됨 (Scope created) | 라우팅 이전, Ktor `CallSetup` |
+| 스코프 ID (Scope id) | `request_` 뒤에 고유 카운터가 붙음 |
+| 스코프 닫힘 (Scope closed) | 응답이 전송된 후, Ktor `ResponseSent` |
+
+스코프가 닫히면 해당 스코프의 모든 인스턴스가 폐기됩니다. 정리 코드를 실행하려면 정의에 `onClose`를 추가하세요:
 
 ```kotlin
 requestScope {
-    scoped { RequestContext() } onClose { context ->
-        val duration = System.currentTimeMillis() - (context?.startTime ?: 0L)
-        println("Request completed in ${duration}ms")
+    scoped { RequestMetrics() } onClose { metrics ->
+        metrics?.recordDuration()
     }
 }
 ```
 
-`withOptions { onClose { ... } }`를 사용할 수도 있습니다:
+`onClose`는 인스턴스를 널 허용(nullable) 값으로 전달받습니다. `onCreate` 콜백은 제공되지 않으므로, 초기화 작업은 생성자 또는 정의 람다 내에서 실행하세요. 콜백에 관한 자세한 내용은 [Definitions](/docs/reference/koin-core/definitions)를 참조하세요.
 
-```kotlin
-requestScope {
-    scoped { RequestContext() } withOptions {
-        onClose { context ->
-            context?.cleanup()
-        }
-    }
-}
-```
+## 주의사항 (Pitfalls) {id="pitfalls"}
 
-:::note
-Koin의 스코프 DSL은 각 정의마다 `onClose`를 제공하며, `onCreate` 콜백은 별도로 존재하지 않습니다. 초기화는 `scoped { }` 생성자 블록 내에서 이루어져야 합니다.
-:::
+- **싱글톤 내의 요청 객체**: 요청 스코프 클래스를 `single`에 주입하지 마세요. 싱글톤은 한 번만 생성되므로 첫 번째 요청의 인스턴스를 계속 유지하게 됩니다. 요청 스코프 객체는 핸들러의 `call.scope`에서 해결하거나 인자로 전달하세요.
+- **백그라운드 작업**: 핸들러에서 시작되어 호출 수명보다 오래 지속되는 코루틴은 응답이 전송된 후에 `call.scope`를 사용해서는 안 됩니다. 그 시점에는 이미 스코프가 닫혀 있습니다.
 
-:::note
-요청 스코프는 **각 HTTP 요청마다 생성되고 소멸됩니다**. 인스턴스는 요청 간에 공유되지 않으므로 스레드 안전성(thread safety)을 보장하고 상태 누수(state leakage)를 방지합니다.
-:::
+## 관련 문서 {id="related"}
 
-## Ktor에서 모듈 선언하기 (Declaring Modules in Ktor) {id="declaring-modules-in-ktor"}
-
-Koin은 Ktor 애플리케이션 내에서 직접 모듈을 선언할 수 있는 편리한 함수를 제공합니다.
-
-### koinModule 사용하기 {id="using-koinmodule"}
-
-모듈을 인라인으로 선언합니다:
-
-```kotlin
-fun Application.configureRouting() {
-    koinModule {
-        singleOf(::CustomerRepository)
-        singleOf(::CustomerService)
-    }
-
-    routing {
-        customerRoutes()
-    }
-}
-```
-
-### koinModules 사용하기 {id="using-koinmodules"}
-
-기존의 여러 모듈을 로드합니다:
-
-```kotlin
-fun Application.configureCustomerFeature() {
-    koinModules(
-        customerRepositoryModule,
-        customerServiceModule,
-        customerRoutesModule
-    )
-
-    routing {
-        customerRoutes()
-    }
-}
-```
-
-## 모듈화된 애플리케이션 구조 (Modular Application Structure) {id="modular-application-structure"}
-
-기능별로 Ktor 앱을 구성하세요:
-
-```kotlin
-// 기능 1: 고객 관리 (Customer Management)
-fun Application.customerModule() {
-    koinModule {
-        singleOf(::CustomerRepository)
-        singleOf(::CustomerService)
-    }
-
-    routing {
-        route("/api/customers") {
-            customerRoutes()
-        }
-    }
-}
-
-// 기능 2: 주문 관리 (Order Management)
-fun Application.orderModule() {
-    koinModule {
-        singleOf(::OrderRepository)
-        singleOf(::OrderService)
-    }
-
-    routing {
-        route("/api/orders") {
-            orderRoutes()
-        }
-    }
-}
-
-// 메인 애플리케이션
-fun Application.module() {
-    install(Koin) {
-        slf4jLogger()
-        modules(coreModule)
-    }
-
-    customerModule()
-    orderModule()
-}
-```
-
-## 어노테이션을 사용한 요청 스코프 (Request Scope with Annotations) {id="request-scope-with-annotations"}
-
-요청 스코프 컴포넌트에 어노테이션을 사용하세요:
-
-```kotlin
-@Scope(RequestScope::class)
-class RequestLogger(private val call: ApplicationCall) {
-    fun log(message: String) {
-        println("[${call.request.path()}] $message")
-    }
-}
-```
-
-## 전체 예제 (Complete Example) {id="complete-example"}
-
-```kotlin
-val appModule = module {
-    singleOf(::UserRepositoryImpl) bind UserRepository::class
-    singleOf(::UserService)
-
-    requestScope {
-        scopedOf(::RequestLogger)
-        scopedOf(::RequestMetrics) onClose { metrics ->
-            metrics?.recordDuration()
-        }
-    }
-}
-
-fun Application.module() {
-    install(Koin) {
-        slf4jLogger()
-        modules(appModule)
-    }
-
-    routing {
-        get("/api/users/{id}") {
-            val logger = call.scope.get<RequestLogger>()
-            val userService = get<UserService>()
-
-            logger.log("Fetching user")
-            val user = userService.getUser(call.parameters["id"]!!)
-
-            call.respond(user)
-        }
-    }
-}
-```
-
-## API 레퍼런스 (API Reference) {id="api-reference"}
-
-| 함수 | 설명 |
-|----------|-------------|
-| `requestScope { }` | 요청 스코프 컴포넌트 선언 |
-| `call.scope.get<T>()` | 요청 스코프 인스턴스 가져오기 |
-| `scoped { } onClose { }` | 정의별 정리(cleanup) 콜백 (인스턴스는 Null 허용) |
-| `koinModule { }` | 인라인 모듈 선언 |
-| `koinModules(...)` | 기존 모듈 로드 |
-
-## 함께 보기 (See Also) {id="see-also"}
-
-- **[Ktor용 Koin (Koin for Ktor)](/docs/reference/koin-ktor/ktor)** - 메인 Ktor 문서
-- **[스코프 (Scopes)](/docs/reference/koin-core/scopes)** - 핵심 스코프 개념
+- [Scopes](/docs/reference/koin-core/scopes): 스코프 개념, 스코프 소스, 링킹(linking).
+- [Koin for Ktor](/docs/reference/koin-ktor/ktor): 플러그인 설치 및 라우트에서의 주입.
+- [Definitions](/docs/reference/koin-core/definitions): `onClose` 및 기타 정의 옵션.
+- [Ktor Testing](/docs/reference/koin-ktor/ktor-testing): 요청 스코프를 사용하는 라우트 테스트.

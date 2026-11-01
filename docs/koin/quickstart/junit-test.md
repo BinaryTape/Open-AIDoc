@@ -2,34 +2,50 @@
 title: JUnit 测试
 ---
 
-> 本教程将指导您测试 Kotlin 应用程序，并使用 Koin 注入和检索组件。
+# JUnit 测试
 
-:::note
-更新 - 2025-01-28
-:::
+在本教程中，你将为来自 [Kotlin 教程](/docs/quickstart/kotlin) 的应用编写 JUnit 4 测试。你将学习如何通过 `KoinTestRule` 为每个测试启动 Koin、使用 `verify()` 检查模块，以及使用 Mockito mock 替换依赖项。整个过程大约需要 10 分钟。请先完成 Kotlin 教程，或者直接从其示例代码开始。
+
+本教程基于编译器插件 DSL 应用。所有测试 API 均在[单元测试](/docs/reference/koin-test/testing)中进行了说明。
 
 ## 获取代码 {id="get-the-code"}
 
-:::info
-[源代码可在 GitHub 上获得](https://github.com/InsertKoinIO/koin-getting-started/tree/main/kotlin)
-:::
+测试位于 [koin-getting-started/kotlin](https://github.com/InsertKoinIO/koin-getting-started/tree/main/kotlin) 示例的 `app/src/test` 目录下。克隆仓库并在 `kotlin` 文件夹中运行它们：
 
-## Gradle 设置 {id="gradle-setup"}
+```bash
+./gradlew test
+```
 
-首先，如下添加 Koin 依赖项：
+## Gradle 配置 {id="gradle-setup"}
 
-```groovy
+该示例将 `koin-test`、`koin-test-junit4` 以及 Mockito 添加为测试依赖项：
+
+```toml
+# gradle/libs.versions.toml
+[versions]
+koin = "<KOIN_VERSION>"
+mockito = "<MOCKITO_VERSION>"
+
+[libraries]
+koin-test = { module = "io.insert-koin:koin-test", version.ref = "koin" }
+koin-test-junit4 = { module = "io.insert-koin:koin-test-junit4", version.ref = "koin" }
+mockito = { module = "org.mockito:mockito-inline", version.ref = "mockito" }
+```
+
+```kotlin
+// app/build.gradle.kts
 dependencies {
-    // Koin 测试工具
-    testImplementation "io.insert-koin:koin-test:$koin_version"
-    // 所需的 JUnit 版本
-    testImplementation "io.insert-koin:koin-test-junit4:$koin_version"
+    testImplementation(libs.koin.test)
+    testImplementation(libs.koin.test.junit4)
+    testImplementation(libs.mockito)
 }
 ```
 
-## 声明依赖项 {id="declared-dependencies"}
+`koin-test` 不依赖于任何 mock 库，因此你需要自行添加所使用的库。对于 JUnit 5，请改用 `koin-test-junit5`（参见[单元测试](/docs/reference/koin-test/testing)）。
 
-我们重复使用 `koin-core` 快速入门项目，以使用 koin 模块：
+## 被测模块 {id="the-module-under-test"}
+
+测试将加载来自 Kotlin 教程中的模块：
 
 ```kotlin
 val appModule = module {
@@ -39,15 +55,16 @@ val appModule = module {
 }
 ```
 
-## 验证您的模块 {id="verifying-your-modules"}
+每个测试都会使用此模块启动 Koin，因此它运行在与应用相同的图（graph）之上。
 
-:::tip
-Koin 编译器插件现在提供编译时依赖项验证，可以在构建时捕获缺失的依赖项，而无需编写测试代码。请参阅[编译时安全](/docs/reference/koin-compiler/compile-safety)。
-:::
+## 验证模块 {id="let-s-verify-the-module"}
 
-如果您没有使用编译器插件，可以在运行时验证模块。`verify()` 函数执行空运行检查，以确保所有依赖项都可以被解析：
+`verify()` 会检查模块中的每个构造函数形参是否都具有对应的定义，而无需创建任何实例：
 
 ```kotlin
+import org.koin.test.AutoCloseKoinTest
+import org.koin.test.verify.verify
+
 class ModuleVerificationTest : AutoCloseKoinTest() {
 
     @Test
@@ -57,90 +74,67 @@ class ModuleVerificationTest : AutoCloseKoinTest() {
 }
 ```
 
-如果任何依赖项定义无效或缺少任何必需的依赖项，此测试将失败。
+如果存在缺失或无效的定义，测试将会失败。编译器插件已在构建时运行此检查，因此 `verify()` 对插件未覆盖的模块最为关键。请参阅[验证配置](/docs/reference/koin-test/verify)以决定是否需要使用它。
 
-## 编写使用 KoinTestRule 的测试 {id="writing-tests-with-kointestrule"}
+## 在测试中启动 Koin {id="let-s-start-koin-in-a-test"}
 
-要编写注入依赖项的测试，请扩展 `KoinTest` 并使用 `KoinTestRule`：
+实现 `KoinTest` 并添加 `KoinTestRule`。该规则会在每个测试执行前启动 Koin，并在测试结束后将其停止：
 
 ```kotlin
-class UserAppTest : KoinTest {
+import org.koin.test.KoinTest
+import org.koin.test.KoinTestRule
 
-    val userService by inject<UserService>()
-    val userRepository by inject<UserRepository>()
+class HelloMockTest : KoinTest {
 
     @get:Rule
     val koinTestRule = KoinTestRule.create {
-        printLogger()
         modules(appModule)
-    }
-
-    @Test
-    fun `test user service`() {
-        // 通过 service 加载用户
-        userService.loadUsers()
-
-        // 验证是否可以找到用户
-        val user = userService.getUserOrNull("Alice")
-        assertNotNull(user)
-        assertEquals("Alice", user?.name)
     }
 }
 ```
 
-> 我们使用 `KoinTestRule` 为每个测试启动/停止 Koin 上下文
+`KoinTest` 为测试类提供了 `get()` 和 `by inject()`，例如 `val userService: UserService by inject()`。每个测试启动全新的容器可以防止实例在测试之间发生泄漏。
 
-## 模拟依赖项 {id="mocking-dependencies"}
+## Mock 依赖项 {id="let-s-mock-a-dependency"}
 
-您可以使用 `declareMock` 在测试中模拟依赖项。这会用 mock 替换真实的实现：
+添加 `MockProviderRule` 以告知 Koin 如何构建 mock，然后使用 `declareMock` 替换 `UserRepository`：
 
 ```kotlin
-class UserMockTest : KoinTest {
+import org.koin.test.mock.MockProviderRule
+import org.koin.test.mock.declareMock
+import org.mockito.ArgumentMatchers.anyString
+import org.mockito.BDDMockito.given
+import org.mockito.Mockito
+import org.mockito.Mockito.times
+
+class HelloMockTest : KoinTest {
 
     @get:Rule
     val koinTestRule = KoinTestRule.create {
-        printLogger(Level.DEBUG)
         modules(appModule)
     }
 
     @get:Rule
-    val mockProvider = MockProviderRule.create { clazz ->
-        Mockito.mock(clazz.java)
-    }
+    val mockProvider = MockProviderRule.create { clazz -> Mockito.mock(clazz.java) }
 
     @Test
     fun `mock test`() {
-        // 为 UserRepository 声明一个 mock
-        val repository = declareMock<UserRepository> {
-            given(findUserOrNull(anyString())).willReturn(
-                User("Mock", "mock@example.com")
-            )
+        val service = declareMock<UserRepository> {
+            given(findUserOrNull(anyString())).willReturn(User("Mock", "mock@example.com"))
         }
 
-        // 使用带有 mock 仓库的应用程序
         getKoin().get<UserApplication>().sayHello("Mock")
-
-        // 验证 mock 是否被调用
-        Mockito.verify(repository, times(1)).findUserOrNull(anyString())
+        Mockito.verify(service, times(1)).findUserOrNull(anyString())
     }
 }
 ```
 
-`MockProviderRule` 将 Mockito 配置为模拟框架，而 `declareMock` 则将真实的 `UserRepository` 替换为返回受控数据的 mock。
+`declareMock` 仅针对当前测试替换 `UserRepository` 的定义。`UserApplication` 和 `UserService` 依然是真实的，因此该测试会验证调用是否通过 `UserService` 传递至仓库一次。
 
-## 关键测试概念 {id="key-testing-concepts"}
+## 后续步骤 {id="next-steps"}
 
-| 概念 | 描述 |
-|---------|-------------|
-| `KoinTest` | 扩展以获得 Koin 测试支持的接口 |
-| `AutoCloseKoinTest` | 在每次测试后自动关闭 Koin |
-| `KoinTestRule` | 用于启动/停止 Koin 上下文的 JUnit 规则 |
-| `MockProviderRule` | 配置模拟框架 |
-| `verify()` | 在不运行的情况下验证模块配置 |
-| `declareMock<T>()` | 使用 mock 替换定义 |
-| `by inject<T>()` | 在测试中延迟注入依赖项 |
-
-## 另请参阅 {id="see-also"}
-
-- **[测试参考](/docs/reference/koin-test/testing)** - 完整的测试文档
-- **[模块验证](/docs/reference/koin-test/verify)** - verify() 和 checkModules() 详情
+- [单元测试](/docs/reference/koin-test/testing)：所有测试 API、JUnit 5 以及覆盖定义。
+- [验证配置](/docs/reference/koin-test/verify)：`verify()` 选项以及编译器插件何时可以替代它。
+- [插桩测试](/docs/reference/koin-android/instrumented-testing)：测试使用 Koin 的 Android 应用。
+- [Ktor 测试](/docs/reference/koin-ktor/ktor-testing)：使用 Koin 测试 Ktor 路由。
+- [工具](/docs/tooling)：适用于 Koin 的 IDE 插件与监控工具。

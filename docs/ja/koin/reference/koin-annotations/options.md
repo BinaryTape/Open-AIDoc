@@ -2,112 +2,11 @@
 title: コンパイラプラグインオプション
 ---
 
-Koin コンパイラプラグインは、その動作をカスタマイズするための設定オプションをサポートしています。
+# コンパイラプラグインオプション
 
-## 設定 {id="configuration"}
+このページでは、`build.gradle.kts` の `koinCompiler { }` ブロックで設定可能な Koin コンパイラプラグインのすべてのオプションを一覧で示します。本ページはプラグインがインストールされていることを前提としています（[コンパイラプラグインのセットアップ](/docs/setup/compiler-plugin)を参照）。これらのオプションは、コンパイラプラグイン DSL とアノテーションの双方に適用されます。
 
-`build.gradle.kts` でコンパイラプラグインを構成します：
-
-```kotlin
-koinCompiler {
-    userLogs = true
-    debugLogs = false
-    compileSafety = true
-    strictSafety = true       // デフォルトでは自動検出されます
-    skipDefaultValues = true
-    unsafeDslChecks = true
-}
-```
-
-## 利用可能なオプション {id="available-options"}
-
-### userLogs {id="userlogs"}
-
-- **型**: Boolean
-- **デフォルト**: `false`
-- **説明**: コンポーネント検出および DSL/アノテーション処理のログを有効にします。プラグインによってどのコンポーネントが検出され、処理されたかを表示します。
-- **用途**: コンポーネント検出の問題をデバッグするために、開発中に有効にします。
-
-```kotlin
-koinCompiler {
-    userLogs = true
-}
-```
-
-### debugLogs {id="debuglogs"}
-
-- **型**: Boolean
-- **デフォルト**: `false`
-- **説明**: 内部プラグイン処理（FIR/IR フェーズ、モジュール検出）の詳細なデバッグログを有効にします。
-- **用途**: プラグインの問題をトラブルシューティングする場合や、バグを報告する場合に有効にします。
-
-```kotlin
-koinCompiler {
-    debugLogs = true
-}
-```
-
-### compileSafety {id="compilesafety"}
-
-- **型**: Boolean
-- **デフォルト**: `true`
-- **説明**: コンパイル時の依存関係検証を有効にします。有効にすると、ビルド時にすべての依存関係が解決可能であることをプラグインが検証します。これにより、実行前に定義の欠落、クオリファイアの不一致、および壊れた呼び出し箇所を特定できます。
-- **用途**: デフォルトで有効です。移行中に検証を回避する必要がある場合は、一時的に無効にします。
-
-```kotlin
-koinCompiler {
-    compileSafety = true
-}
-```
-
-検証対象の詳細については、[コンパイル時の安全性](/docs/reference/koin-compiler/compile-safety)を参照してください。
-
-### strictSafety {id="strictsafety"}
-
-- **型**: Boolean
-- **デフォルト**: 自動検出（`startKoin`、`koinApplication`、または `@KoinApplication` を含むアグリゲーターモジュールで有効になります）
-- **Description**: ビルドごとにフルグラフの安全性パス（A3）の再実行を強制し、アグリゲーターモジュールにおける Kotlin の増分コンパイルキャッシュをバイパスします。ライブラリモジュールおよび機能モジュールは完全に増分（incremental）な状態を維持します。
-- **用途**: デフォルトのままにしてください。自動検出がアグリゲーターを見逃す場合は明示的に `true` に設定し、オプトアウトする場合は `false` に設定します（例：テストフィクスチャがコメント内でのみ `startKoin` を参照しており、検出器が誤動作する場合など）。
-
-```kotlin
-koinCompiler {
-    strictSafety = true   // 強制的に有効化
-    // または
-    strictSafety = false  // 自動検出をオプトアウト
-}
-```
-
-**なぜこのオプションが必要なのか**: K2 の増分コンパイル（AGP が使用する Build Tools API 経由）は現在、DI グラフが依存する 2 つの事項を追跡しません。それは、`module { … }` ラムダ本体内の DSL 定義（宣言の ABI の一部ではない）と、`@ComponentScan` パッケージスコープ検出（スキャナーから新しく追加されたクラスへのソースレベルのエッジがない）です。アグリゲーターの `compileKotlin` タスクは、グラフが変更された場合でも UP-TO-DATE（最新）とマークされることがあります。`strictSafety` は、現在の K2 IC（増分コンパイル）の仕様に対する、最小限の正しい回避策です。毎回のビルドでアグリゲーターのみが再実行されるため、コストは限定的です。
-
-`compileSafety = false` の場合は効果がありません。背景については [koin-compiler-plugin issue #32](https://github.com/InsertKoinIO/koin-compiler-plugin/issues/32) を参照してください。
-
-### skipDefaultValues {id="skipdefaultvalues"}
-
-- **型**: Boolean
-- **デフォルト**: `true`
-- **説明**: 有効にすると、Kotlin のデフォルト値を持つパラメータは、DI コンテナから解決される代わりにデフォルト値を使用します。Nullable なパラメータやアノテーション付きのパラメータ（`@Named`、`@InjectedParam` など）は、引き続き通常通り解決されます。
-- **用途**: デフォルトで有効です。常にすべてのパラメータを DI コンテナから注入する場合は、無効にします。
-
-```kotlin
-koinCompiler {
-    skipDefaultValues = true
-}
-```
-
-### unsafeDslChecks {id="unsafedslchecks"}
-
-- **型**: Boolean
-- **デフォルト**: `true`
-- **説明**: ラムダ内の DSL 関数呼び出し（`create()` など）が唯一の命令であることを検証します。よくある間違いを防ぐのに役立ちます。
-- **用途**: 必要に応じて、従来の DSL からの移行中に一時的に無効にします。
-
-```kotlin
-koinCompiler {
-    unsafeDslChecks = false  // 移行中に無効にする
-}
-```
-
-## 完全な例 {id="complete-example"}
+## すべてのオプション {id="all-options"}
 
 ```kotlin
 // build.gradle.kts
@@ -116,26 +15,139 @@ plugins {
 }
 
 koinCompiler {
-    userLogs = true           // コンポーネント検出をログ出力
-    debugLogs = false         // 詳細ログ（デフォルトはオフ）
-    compileSafety = true      // コンパイル時の依存関係検証
-    strictSafety = true       // アグリゲーターに安全性パスの再実行を強制（デフォルトで自動検出）
-    skipDefaultValues = true  // DI 解決の代わりに Kotlin のデフォルト値を使用
-    unsafeDslChecks = true    // DSL の使用法を検証
+    compileSafety = true
+    skipDefaultValues = true
+    unsafeDslChecks = true
+    userLogs = false
+    debugLogs = false
 }
 ```
 
-## ベストプラクティス {id="best-practices"}
+| オプション | 型 | デフォルト値 | 効果 |
+|---|---|---|---|
+| `compileSafety` | Boolean | `true` | ビルド時に依存関係グラフを検証します |
+| `strictSafety` | Boolean | 自動検出 | アグリゲーターモジュールのビルドごとにフルグラフチェックを再実行します |
+| `strictSafetyForceOff` | Boolean | `false` | `strictSafety` の誤った自動検出を確認し、それをオフにします |
+| `skipDefaultValues` | Boolean | `true` | パラメータを解決する代わりに Kotlin のデフォルト値を使用します |
+| `unsafeDslChecks` | Boolean | `true` | `create()` がラムダ内の唯一の命令であることを要求します |
+| `userLogs` | Boolean | `false` | プラグインが検出したコンポーネントをログ出力します |
+| `debugLogs` | Boolean | `false` | プラグインの内部情報をログ出力します |
+| `logSeverity` | String | `"warning"` | プラグインの情報出力の重要度（Severity） |
+| `versionCheckSeverity` | String | `"warning"` | Kotlin バージョン互換性警告の重要度（Severity） |
+| `aiAssist` | Boolean | `true` | Koin の診断情報があるビルドの末尾にヘルプ行を1行追加します |
 
-- コンパイル時の依存関係検証のために、**`compileSafety` を有効**（デフォルト）のままにする。
-- **`strictSafety` は自動検出のまま**にする。検出器がアグリゲーターを見逃したり、アグリゲーター以外のファイルで誤動作したりする場合のみオーバーライドする。
-- Kotlin のデフォルト値を尊重するために、**`skipDefaultValues` を有効**（デフォルト）のままにする。
-- どのコンポーネントが検出されているかを確認するために、開発中は **`userLogs` を有効**にする。
-- より安全な DSL の使用のために、**`unsafeDslChecks` を有効**（デフォルト）のままにする。
-- **`debugLogs` はプラグインの問題をトラブルシューティングする場合のみ**使用する。
+## compileSafety {id="compilesafety"}
 
-## 関連項目 {id="see-also"}
+有効にすると、プラグインはビルド時にグラフ内のすべての依存関係が解決可能かどうかをチェックします。定義の欠落、修飾子（qualifier）の不一致、循環依存関係、一致する定義のない `get()` や `inject()` の呼び出し箇所などが対象です。問題がある場合は、実行時にクラッシュするのではなく、ビルドが失敗します。
 
-- **[コンパイル時の安全性](/docs/reference/koin-compiler/compile-safety)** — 何がどのように検証されるか
-- **[コンパイラプラグインのセットアップ](/docs/setup/compiler-plugin)** — 完全なセットアップガイド
-- **[アノテーションの使用開始](/docs/reference/koin-annotations/start)** — クイックスタートガイド
+```kotlin
+koinCompiler {
+    compileSafety = false
+}
+```
+
+この設定は有効のままにしておくことを推奨します。無効にすると、すべてのコンパイル時チェックが削除され、`strictSafety` も効果を発揮しなくなります。何がチェックされるかについては、[コンパイル時の安全性](/docs/reference/koin-compiler/compile-safety)で説明されています。
+
+## strictSafety {id="strictsafety"}
+
+フルグラフチェックは、Koin を起動するモジュール（アグリゲーター: `startKoin`、`koinApplication`、または `@KoinApplication` を含む Gradle モジュール）で実行されます。Kotlin のインクリメンタルコンパイルでは、`module { }` ラムダ本体内の編集後など、グラフが他の場所で変更された場合でも、そのモジュールを「最新（up-to-date）」としてマークすることがあります。その場合チェックが再実行されず、エラーは実行時に発生することになります。
+
+`strictSafety` を設定すると、ビルドキャッシュや up-to-date によるスキップを行わず、アグリゲーターの `compileKotlin` タスクがビルドごとに必ず再実行されます。ライブラリや機能（feature）モジュールはインクリメンタルな状態を維持します。
+
+このオプションは手動で設定する必要はありません。未設定の場合、Gradle プラグインはモジュールのソースコードから `startKoin`、`koinApplication`、または `@KoinApplication` をスキャンし、該当モジュールで自動的に有効化します。この決定はライフサイクルログで通知されます:
+
+```
+[Koin] Auto-enabling strictSafety on :app (detected startKoin / @KoinApplication / koinApplication).
+```
+
+検出が見逃されたモジュールで強制的に有効化するには、`strictSafety = true` を設定します:
+
+```kotlin
+koinCompiler {
+    strictSafety = true
+}
+```
+
+エントリーポイントが検出されたモジュールでは、`strictSafety = false` を設定しても効果はありません（コンパイラプラグイン 1.1.0 以降）。これはエントリーポイントが検出されなかったモジュールでのみ意味を持ちます。また、`compileSafety = false` の場合、このオプションは効果がありません。
+
+トレードオフとして、ビルドごとにアグリゲーターモジュールの完全な再コンパイルが1回発生します。インクリメンタルコンパイルのギャップに関する背景については、[koin-compiler-plugin issue #32](https://github.com/InsertKoinIO/koin-compiler-plugin/issues/32) を参照してください。
+
+## strictSafetyForceOff {id="strictsafetyforceoff"}
+
+検出はテキスト一致によって行われます。コメントや文字列リテラル内の `startKoin` にも一致してしまうため、アグリゲーターではないモジュールで `strictSafety` が有効になってしまう場合があります。誤検出であることを確認した場合は、両方のオプションを設定します:
+
+```kotlin
+koinCompiler {
+    strictSafety = false
+    strictSafetyForceOff = true
+}
+```
+
+両方の設定が必要です。`strictSafetyForceOff` は `strictSafety = false` と併用した場合にのみ適用されます。必ず誤検出であることが確認できた場合のみ使用してください。実際のエントリーポイントでこれを使用すると再実行が無効になり、インクリメンタルビルド後にグラフのエラーが実行時に持ち越される可能性があります。
+
+## skipDefaultValues {id="skipdefaultvalues"}
+
+有効にすると、Kotlin のデフォルト値を持つ非 null パラメータはデフォルト値を維持し、Koin からは解決されません:
+
+```kotlin
+@Singleton
+class ApiClient(
+    val repository: UserRepository,                         // Koin から解決
+    val timeout: Int = 30_000,                              // Kotlin のデフォルト値
+    @Property("api_url") val url: String = "https://...",   // アノテーションが付いているため解決される
+    val logger: Logger? = null,                             // getOrNull() で解決
+)
+```
+
+Null 許容パラメータは引き続き `getOrNull()` で解決されます。`@Named`、`@Qualifier`、`@InjectedParam`、または `@Property` が付与されたパラメータは、デフォルト値の有無にかかわらず常に解決されます。すべてのパラメータを Koin から解決したい場合は、`skipDefaultValues = false` を設定してください。
+
+## unsafeDslChecks {id="unsafedslchecks"}
+
+有効にすると、`create(::T)` の呼び出しはその定義ラムダ内の唯一の命令である必要があります。これにより、ラムダがプラグインで解析および検証可能な状態に保たれます。違反するとビルドが失敗します:
+
+```
+[Koin][KOIN-S001] create(::UserRepository) must be the only instruction in the lambda. Other statements are not allowed when using create(). To disable this check, set koinCompiler { unsafeDslChecks = false } in your build.gradle.kts
+```
+
+`create()` ラムダ内で他のステートメントを実行している Classic DSL コードを移行する間は一時的に `false` に設定し、移行完了後に再度有効化してください。
+
+## userLogs と debugLogs {id="userlogs-and-debuglogs"}
+
+`userLogs = true` は、プラグインが検出および処理した内容を出力します。インターセプトした DSL 定義（`single<T>()`、`factory<T>()`）、アノテーション付きクラス（`@Singleton`、`@Module`）、および生成されたモジュールなどです。定義が認識されない場合に使用してください。
+
+`debugLogs = true` は、プラグインの内部情報（FIR および IR フェーズ、モジュール検出）を出力します。プラグインのバグを報告する場合に使用してください。
+
+どちらも `[Koin]` プレフィックスが付いた行を、`logSeverity` で設定された重要度で出力します。
+
+## logSeverity と versionCheckSeverity {id="logseverity-and-versioncheckseverity"}
+
+どちらも `"warning"`（デフォルト）または `"info"` を受け入れます。
+
+```kotlin
+koinCompiler {
+    logSeverity = "info"
+    versionCheckSeverity = "info"
+}
+```
+
+- **logSeverity**: 情報出力（`userLogs`、`debugLogs`、「Koin エントリーポイントがありません」の通知、`@Monitor` の概要）の重要度。ビルドで `allWarningsAsErrors` を使用している場合、これらの出力によってビルドが失敗しないように `"info"` に設定してください。
+- **versionCheckSeverity**: プラグインが検証されていない Kotlin バージョンでビルドした際に表示される警告の重要度。ログ出力を抑制しても互換性のリスクが隠れてしまわないよう、独立した設定になっています。Kotlin バージョンが正常に動作することを確認した後にのみ `"info"` に設定してください。
+
+どちらのオプションも、実際の診断（`KOIN-D001`、`KOIN-W003` など）の重要度は変更せず、独自の重要度が維持されます。
+
+## aiAssist {id="aiassist"}
+
+ビルドで少なくとも1つの Koin 診断情報が報告された場合、プラグインはコンパイルの最後に1行追加し、AI コーディングアシスタントがエラーを分類して修正を提案するために使用できる Kotzilla MCP サーバーを案内します:
+
+```
+[Koin] → Fix with AI: set up Kotzilla MCP at https://kotzilla.io/koin-mcp
+```
+
+この行はエラーごとではなく、1回のビルドにつき1回表示されます。非表示にするには `aiAssist = false` を設定してください。
+
+## 関連情報 {id="related"}
+
+- [コンパイル時の安全性](/docs/reference/koin-compiler/compile-safety): `compileSafety` がチェックする内容とレポートされる診断情報。
+- [コンパイラプラグインのセットアップ](/docs/setup/compiler-plugin): プラグインとその依存関係のインストール。
+- [Koin コンパイラプラグイン](/docs/intro/koin-compiler-plugin): プラグインの機能と仕組み。
+- [トラブルシューティング](/docs/reference/koin-core/troubleshooting): 実行時エラーとデバッグ。

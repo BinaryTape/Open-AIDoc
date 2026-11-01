@@ -6,7 +6,7 @@
 <tldr>
 <var name="example_name" value="client-default-request"/>
 <p>
-    <b>程式碼範例</b>：
+    <b>程式碼範例</b>:
     <a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/%example_name%">
         %example_name%
     </a>
@@ -14,12 +14,12 @@
 </tldr>
 
 <link-summary>
-DefaultRequest 外掛程式可讓您為所有請求配置預設參數。
+DefaultRequest 外掛程式可讓您為所有請求設定預設參數。
 </link-summary>
 
-[`DefaultRequest`](https://api.ktor.io/ktor-client-core/io.ktor.client.plugins/-default-request/index.html) 外掛程式可讓您為所有[請求](client-requests.md)配置預設參數：指定基礎 URL、添加標頭、配置查詢參數等。
+[`DefaultRequest`](https://api.ktor.io/ktor-client-core/io.ktor.client.plugins/-default-request/index.html) 外掛程式可讓您為所有[請求](client-requests.md)設定預設參數：指定基礎 URL、新增標頭、配置查詢參數等等。
 
-## 添加相依性 {id="add_dependencies"}
+## 新增相依性 {id="add_dependencies"}
 
 `DefaultRequest` 僅需要 [ktor-client-core](client-dependencies.md) 構件，不需要任何特定的相依性。
 
@@ -37,7 +37,7 @@ val client = HttpClient(CIO) {
 }
 ```
 
-或呼叫 `defaultRequest()` 函式並[配置](#configure)所需的請求參數：
+或者呼叫 `defaultRequest()` 函式並[配置](#configure)所需的請求參數：
 
 ```kotlin
 import io.ktor.client.*
@@ -53,7 +53,7 @@ val client = HttpClient(CIO) {
 
 ### 替換現有配置 {id="default_request_replace"}
 
-如果 `DefaultRequest` 外掛程式已經安裝，您可以使用以下任一方式替換其現有配置：
+如果已經安裝了 `DefaultRequest` 外掛程式，您可以透過以下其中一種方式替換其現有配置：
 
 - 使用 `defaultRequest()` 函式的 `replace` 參數：
 
@@ -79,8 +79,8 @@ val client = HttpClient(CIO) {
 
 ### 基礎 URL {id="url"}
 
-`DefaultRequest` 可讓您配置 URL 的基礎部分，該部分會與[請求 URL](client-requests.md#url) 合併。
-例如，下方的 `url` 函式為所有請求指定了基礎 URL：
+`DefaultRequest` 可讓您配置 URL 的基礎部分，該部分會與[請求 URL](client-requests.md#url) 進行合併。
+例如，下方的 `url` 函式為所有請求指定了一個基礎 URL：
 
 ```kotlin
 defaultRequest {
@@ -88,23 +88,24 @@ defaultRequest {
 }
 ```
 
-如果您使用具有上述配置的用戶端發出以下請求，...
+如果您使用具有上述配置的用戶端發送以下請求，……
 
 ```kotlin
 val response: HttpResponse = client.get("welcome.html")
 ```
 
-... 產生的 URL 將如下所示：`https://ktor.io/docs/welcome.html`。
+……產生的 URL 將會是：`https://ktor.io/docs/welcome.html`。
 若要了解基礎 URL 與請求 URL 如何合併，請參閱 [DefaultRequest](https://api.ktor.io/ktor-client-core/io.ktor.client.plugins/-default-request/index.html)。
 
-> 基礎 URL 路徑必須以結尾斜線（trailing slash）結束。否則，根據 [RFC 3986](https://www.rfc-editor.org/rfc/rfc3986#section-5.2) 的 URL 解析規則，請求路徑會替換基礎路徑的最後一個區段 —— 例如，`path("v1")` 會被視為檔案，並在附加請求路徑時被捨棄，而 `path("v1/")` 則會保留為目錄前綴。
+> 基礎 URL 路徑必須以結尾斜線結尾。否則，根據 [RFC 3986](https://www.rfc-editor.org/rfc/rfc3986#section-5.2)
+> 的 URL 解析規則，請求路徑將會取代基礎路徑的最後一個片段——例如，`path("v1")` 會被視為檔案，並在附加請求路徑時被捨棄，而 `path("v1/")` 則會保留為目錄前綴。
 >
 {style="note"}
 
 ### URL 參數 {id="url-params"}
 
-`url` 函式還允許您個別指定 URL 元件，例如：
-- HTTP 配置方案（scheme）；
+`url` 函式還允許您分別指定 URL 組件，例如：
+- HTTP scheme；
 - 主機名稱；
 - 基礎 URL 路徑；
 - 查詢參數。
@@ -120,7 +121,7 @@ url {
 
 ### 標頭 {id="headers"}
 
-若要向每個請求添加特定的標頭，請使用 `header` 函式：
+若要為每個請求新增特定標頭，請使用 `header` 函式：
 
 ```kotlin
 defaultRequest {
@@ -128,7 +129,7 @@ defaultRequest {
 }
 ```
 
-若要避免標頭重複，您可以使用 `appendIfNameAbsent`、`appendIfNameAndValueAbsent` 和 `contains` 函式：
+為了避免重複標頭，您可以使用 `appendIfNameAbsent`、`appendIfNameAndValueAbsent` 和 `contains` 函式：
 
 ```kotlin
 defaultRequest {
@@ -136,25 +137,26 @@ defaultRequest {
 }
 ```
 
-### Unix 網域通訊端 {id="unix-domain-sockets"}
+### Unix domain socket {id="unix-domain-sockets"}
 
-> Unix 網域通訊端僅在 CIO 引擎中支援。
+> 僅 CIO 引擎支援 Unix domain socket。
 >
 {style="note"}
 
-您可以[使用 Unix 網域通訊端建置個別請求](client-requests.md#specify-a-unix-domain-socket)，但也可以使用通訊端參數配置預設請求。
+您可以[使用 Unix domain socket 建置個別請求](client-requests.md#specify-a-unix-domain-socket)，
+但也可以使用 socket 參數來配置預設請求。
 
-若要執行此操作，請將帶有通訊端路徑的 `unixSocket` 呼叫傳遞給 `defaultRequest` 函式，例如：
+為此，請將包含 socket 路徑的 `unixSocket` 呼叫傳遞給 `defaultRequest` 函式，例如：
 
 ```kotlin
 val client = HttpClient(CIO)
 
-// 向 Unix 網域通訊端發送單個請求
+// 發送單一請求至 Unix domain socket
 val response: HttpResponse = client.get("/") {
     unixSocket("/tmp/test-unix-socket-ktor.sock")
 }
 
-// 為該用戶端的所有請求設定通訊端
+// 為該用戶端的所有請求設定 socket
 val clientDefault = HttpClient(CIO) {
     defaultRequest {
         unixSocket("/tmp/test-unix-socket-ktor.sock")
@@ -166,9 +168,9 @@ val response: HttpResponse = clientDefault.get("/")
 
 ## 範例 {id="example"}
 
-下方的範例使用了以下 `DefaultRequest` 配置：
-* `url` 函式定義了 HTTP 配置方案、主機、基礎 URL 路徑和一個查詢參數。
-* `header` 函式為所有請求添加了一個自訂標頭。
+以下範例使用了下列 `DefaultRequest` 配置：
+* `url` 函式定義了 HTTP scheme、主機、基礎 URL 路徑以及查詢參數。
+* `header` 函式為所有請求新增自訂標頭。
 
 ```kotlin
 val client = HttpClient(CIO) {
@@ -184,7 +186,7 @@ val client = HttpClient(CIO) {
 }
 ```
 
-下方由該用戶端發出的請求僅指定了路徑的後半部分，並會自動套用為 `DefaultRequest` 配置的參數：
+此用戶端所發出的以下請求僅指定了後續的路徑片段，並會自動套用為 `DefaultRequest` 所配置的參數：
 
 ```kotlin
 val response: HttpResponse = client.get("welcome.html")

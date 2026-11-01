@@ -6,6 +6,7 @@
 <var name="plugin_name" value="Resources"/>
 <var name="package_name" value="io.ktor.server.resources"/>
 <var name="artifact_name" value="ktor-server-resources"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.server.resources"/>
 
 <tldr>
 <p>
@@ -19,33 +20,41 @@
     </a>
 </p>
 <p>
-    <b><Links href="/ktor/server-native" summary="KtorはKotlin/Nativeをサポートしており、追加のランタイムや仮想マシンなしでサーバーを実行できます。">Nativeサーバー</Links>のサポート</b>: ✅
+    <b><Links href="server-native.md" summary="KtorはKotlin/Nativeをサポートしており、追加のランタイムや仮想マシンなしでサーバーを実行できます。">Native サーバー</Links>のサポート</b>: ✅
 </p>
 </tldr>
 
 <link-summary>Resourcesプラグインを使用すると、型安全なルーティングを実装できます。</link-summary>
 
-Ktorは、型安全な[ルーティング](server-routing.md)を実装できる[Resources](https://api.ktor.io/ktor-resources/io.ktor.resources/-resources/index.html)プラグインを提供しています。これを実現するには、型付きルートとして機能するクラスを作成し、そのクラスに`@Resource`キーワードを使用してアノテーションを付加する必要があります。`@Resource`アノテーションは、kotlinx.serializationライブラリによって提供される`@Serializable`の振る舞いを持つことに注意してください。
+Ktorは、型安全な[ルーティング](server-routing.md)を実装できる [Resources](https://api.ktor.io/ktor-resources/io.ktor.resources/-resources/index.html) プラグインを提供しています。これを行うには、型付きルートとして機能するクラスを作成し、そのクラスに `@Resource` キーワードでアノテーションを付加する必要があります。なお、`@Resource` アノテーションは kotlinx.serialization ライブラリによって提供される `@Serializable` の振る舞いを持ちます。
 
-> Ktorクライアントは、サーバーに対して[型付きリクエスト](client-resources.md)を行う機能を提供しています。
+> Ktorクライアントは、サーバーに対して[型付きリクエスト](client-resources.md)を送信する機能を提供します。
 
 ## 依存関係の追加 {id="add_dependencies"}
 
-### kotlinx.serializationの追加 {id="add_serialization"}
+### kotlinx.serialization の追加 {id="add_serialization"}
 
-[リソースクラス](#resource_classes)は`@Serializable`の振る舞いを持つ必要があるため、[Setup](https://github.com/Kotlin/kotlinx.serialization#setup)セクションの記述に従ってKotlin serializationプラグインを追加する必要があります。
+[リソースクラス](#resource_classes)は `@Serializable` の振る舞いを持つ必要があるため、[Setup](https://github.com/Kotlin/kotlinx.serialization#setup) セクションで説明されているようにKotlinシリアライゼーションプラグインを追加する必要があります。
 
 ### %plugin_name% 依存関係の追加 {id="add_plugin_dependencies"}
 
 <p>
-    <code>%plugin_name%</code>を使用するには、ビルドスクリプトに<code>%artifact_name%</code>アーティファクトを含める必要があります。
+    <code>%plugin_name%</code> を使用するには、ビルドスクリプトに <code>%artifact_name%</code> アーティファクトを追加します。
 </p>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上記のコードスニペットでは、Ktorの依存関係を指定するために <a href="server-dependencies.topic#using-version-catalog">
+            Ktor バージョンカタログ</a> を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上記のコードスニペットでは、Ktorの依存関係を指定するために <a href="server-dependencies.topic#using-version-catalog">
+            Ktor バージョンカタログ</a> を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
@@ -55,16 +64,15 @@ Ktorは、型安全な[ルーティング](server-routing.md)を実装できる[
 ## %plugin_name% のインストール {id="install_plugin"}
 
 <p>
-    アプリケーションに<code>%plugin_name%</code>プラグインを<a href="server-plugins.md#install">インストール</a>するには、
-    指定された<Links href="/ktor/server-modules" summary="モジュールを使用すると、ルートをグループ化してアプリケーションを構造化できます。">モジュール</Links>内の<code>install</code>関数に渡します。
-    以下のコードスニペットは、<code>%plugin_name%</code>をインストールする方法を示しています。
+    アプリケーションに <code>%plugin_name%</code> プラグインを<a href="server-plugins.md#install">インストール</a>するには、指定された<Links href="server-modules.md" summary="モジュールを使用すると、ルートをグループ化してアプリケーションを構造化できます。">モジュール</Links>内の <code>install</code> 関数に渡します。
+    次の例は、<code>%plugin_name%</code> をインストールする方法を示しています。
 </p>
 <list>
     <li>
-        ... <code>embeddedServer</code>関数の呼び出し内。
+        <code>embeddedServer()</code> 関数の呼び出し内。
     </li>
     <li>
-        ... <code>Application</code>クラスの拡張関数である、明示的に定義された<code>module</code>内。
+        <code>Application</code> クラスで明示的に定義された <code>module()</code> 拡張関数内。
     </li>
 </list>
 <Tabs>
@@ -80,12 +88,12 @@ Ktorは、型安全な[ルーティング](server-routing.md)を実装できる[
 
 <snippet id="resource_classes_server">
 
-各リソースクラスには`@Resource`アノテーションを付ける必要があります。
-以下では、単一のパスセグメントの定義、クエリおよびパスパラメーターなど、リソースクラスのいくつかの例を見ていきます。
+各リソースクラスには `@Resource` アノテーションを付加する必要があります。
+以下では、単一のパスセグメントの定義、クエリパラメータやパスパラメータなど、リソースクラスのいくつかの例を見ていきます。
 
-### リソースURL {id="resource_url"}
+### リソースのURL {id="resource_url"}
 
-以下の例は、`/articles`パスに応答するリソースを指定する`Articles`クラスを定義する方法を示しています。
+以下の例は、`/articles` パスに応答するリソースを指定する `Articles` クラスを定義する方法を示しています。
 
 ```kotlin
 import io.ktor.resources.*
@@ -94,9 +102,9 @@ import io.ktor.resources.*
 class Articles()
 ```
 
-### クエリパラメーターを持つリソース {id="resource_query_param"}
+### クエリパラメータを持つリソース {id="resource_query_param"}
 
-以下の`Articles`クラスは、[クエリパラメーター](server-requests.md#query_parameters)として機能する`sort`文字列プロパティを持っており、`/articles?sort=new`のような`sort`クエリパラメーターを持つパスに応答するリソースを定義できます。
+以下の `Articles` クラスには、[クエリパラメータ](server-requests.md#query_parameters)として機能する文字列プロパティ `sort` があり、`sort` クエリパラメータを持つパス `/articles?sort=new` に応答するリソースを定義できます。
 
 ```kotlin
 @Resource("/articles")
@@ -105,8 +113,8 @@ class Articles(val sort: String? = "new")
 
 ### ネストされたクラスを持つリソース {id="resource_nested"}
 
-クラスをネストして、複数のパスセグメントを含むリソースを作成できます。この場合、ネストされたクラスは外部クラスの型のプロパティを持つ必要があることに注意してください。
-以下の例は、`/articles/new`パスに応答するリソースを示しています。
+クラスをネストして、複数のパスセグメントを含むリソースを作成できます。この場合、ネストされたクラスには外部クラスの型を持つプロパティが必要であることに注意してください。
+以下の例は、`/articles/new` パスに応答するリソースを示しています。
 
 ```kotlin
 @Resource("/articles")
@@ -116,9 +124,9 @@ class Articles() {
 }
 ```
 
-### パスパラメーターを持つリソース {id="resource_path_param"}
+### パスパラメータを持つリソース {id="resource_path_param"}
 
-以下の例は、パスセグメントに一致し、`id`という名前のパラメーターとしてキャプチャする、[ネストされた](#resource_nested) `{id}` 整数[パスパラメーター](server-routing.md#path_parameter)を追加する方法を示しています。
+以下の例は、パスセグメントに一致し、それを `id` という名前のパラメータとしてキャプチャする[ネストされた](#resource_nested) `{id}` 整数[パスパラメータ](server-routing.md#path_parameter)を追加する方法を示しています。
 
 ```kotlin
 @Resource("/articles")
@@ -128,13 +136,13 @@ class Articles() {
 }
 ```
 
-例として、このリソースは`/articles/12`への応答に使用できます。
+例として、このリソースは `/articles/12` への応答に使用できます。
 
 </snippet>
 
 ### 例: CRUD操作用のリソース {id="example_crud"}
 
-上記の例をまとめて、CRUD操作用の`Articles`リソースを作成してみましょう。
+上記の例をまとめて、CRUD操作用の `Articles` リソースを作成してみましょう。
 
 ```kotlin
 @Resource("/articles")
@@ -150,14 +158,14 @@ class Articles(val sort: String? = "new") {
 }
 ```
 
-このリソースは、すべての記事の一覧表示、新しい記事の投稿、編集などに使用できます。このリソースに対する[ルートハンドラーの定義](#define_route)については、次の章で説明します。
+このリソースは、すべての記事の一覧表示、新しい記事の投稿、編集などに使用できます。次のセクションで、このリソースに対する[ルートハンドラーの定義](#define_route)方法を見ていきます。
 
-> 完全な例はこちらにあります: [resource-routing](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/resource-routing)
+> 完全な例はこちらで確認できます: [resource-routing](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/resource-routing)。
 
 ## ルートハンドラーの定義 {id="define_route"}
 
-型付きリソースの[ルートハンドラーを定義](server-routing.md#define_route)するには、動詞関数（`get`、`post`、`put`など）にリソースクラスを渡す必要があります。
-例えば、以下のルートハンドラーは`/articles`パスに応答します。
+型付きリソースに対する[ルートハンドラーを定義](server-routing.md#define_route)するには、動詞関数（`get`、`post`、`put` など）にリソースクラスを渡す必要があります。
+例えば、以下のルートハンドラーは `/articles` パスに応答します。
 
 ```kotlin
 @Resource("/articles")
@@ -174,7 +182,7 @@ fun Application.module() {
 }
 ```
 
-以下の例は、[例: CRUD操作用のリソース](#example_crud)で作成した`Articles`リソースのルートハンドラーを定義する方法を示しています。ルートハンドラー内では、`Article`をパラメーターとしてアクセスし、そのプロパティ値を取得できることに注意してください。
+以下の例は、[例: CRUD操作用のリソース](#example_crud) で作成した `Articles` リソースに対してルートハンドラーを定義する方法を示しています。ルートハンドラー内では、パラメータとして `Article` にアクセスし、そのプロパティ値を取得できる点に注意してください。
 
 ```kotlin
 fun Application.module() {
@@ -193,7 +201,7 @@ fun Application.module() {
             call.respondText("An article is saved", status = HttpStatusCode.Created)
         }
         get<Articles.Id> { article ->
-            // ID ${article.id} の記事を表示 ...
+            // idが ${article.id} の記事を表示 ...
             call.respondText("An article with id ${article.id}", status = HttpStatusCode.OK)
         }
         get<Articles.Id.Edit> { article ->
@@ -212,56 +220,56 @@ fun Application.module() {
 }
 ```
 
-各エンドポイントのリクエスト処理に関するいくつかのヒントを以下に示します。
+各エンドポイントでのリクエスト処理に関するヒントをいくつか紹介します。
 
 - `get<Articles>`
 
-   このルートハンドラーは、`sort`クエリパラメーターに従ってソートされたすべての記事を返すことが想定されています。
+   このルートハンドラーは、`sort` クエリパラメータに従ってソートされたすべての記事を返すことが想定されています。
    例えば、これはすべての記事を含む[HTMLページ](server-responses.md#html)や[JSONオブジェクト](server-responses.md#object)になります。
 
 - `get<Articles.New>`
 
-   このエンドポイントは、新しい記事を作成するためのフィールドを含む[ウェブフォーム](server-responses.md#html)で応答します。
+   このエンドポイントは、新しい記事を作成するためのフィールドを含む[Webフォーム](server-responses.md#html)を応答として返します。
 - `post<Articles>`
 
-   `post<Articles>`エンドポイントは、ウェブフォームを使用して送信された[パラメーター](server-requests.md#form_parameters)を受信することが想定されています。
-   Ktorでは、`ContentNegotiation`プラグインを使用してJSONデータを[オブジェクト](server-requests.md#objects)として受信することもできます。
+   `post<Articles>` エンドポイントは、Webフォームを使用して送信された[パラメータ](server-requests.md#form_parameters)を受け取ることが想定されています。
+   Ktorでは、`ContentNegotiation` プラグインを使用してJSONデータを[オブジェクト](server-requests.md#objects)として受け取ることもできます。
 - `get<Articles.Id>`
 
    このルートハンドラーは、指定された識別子を持つ記事を返すことが想定されています。
-   これは、記事を表示する[HTMLページ](server-responses.md#html)や、記事データを含む[JSONオブジェクト](server-responses.md#object)になります。
+   これは記事を表示する[HTMLページ](server-responses.md#html)や、記事データを含む[JSONオブジェクト](server-responses.md#object)になります。
 - `get<Articles.Id.Edit>`
 
-  このエンドポイントは、既存の記事を編集するためのフィールドを含む[ウェブフォーム](server-responses.md#html)で応答します。
+  このエンドポイントは、既存の記事を編集するためのフィールドを含む[Webフォーム](server-responses.md#html)を応答として返します。
 - `put<Articles.Id>`
 
-   `post<Articles>`エンドポイントと同様に、`put`ハンドラーはウェブフォームを使用して送信された[フォームパラメーター](server-requests.md#form_parameters)を受信します。
+   `post<Articles>` エンドポイントと同様に、`put` ハンドラーはWebフォームを使用して送信された[フォームパラメータ](server-requests.md#form_parameters)を受け取ります。
 - `delete<Articles.Id>`
 
    このルートハンドラーは、指定された識別子を持つ記事を削除します。
 
-完全な例はこちらにあります: [resource-routing](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/resource-routing)
+完全な例はこちらで確認できます: [resource-routing](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/resource-routing)。
 
-## リソースからのリンク構築 {id="resource_links"}
+## リソースからのリンクの構築 {id="resource_links"}
 
-ルーティングにリソース定義を使用するだけでなく、リンクの構築にも使用できます。
-これは*リバースルーティング（reverse routing）*と呼ばれることもあります。
-リソースからのリンク構築は、[HTML DSL](server-html-dsl.md)で作成されたHTMLドキュメントにこれらのリンクを追加する必要がある場合や、[リダイレクトレスポンス](server-responses.md#redirect)を生成する必要がある場合に役立ちます。
+リソース定義はルーティングに使用するだけでなく、リンクの構築にも使用できます。
+これは_リバースルーティング_（reverse routing）と呼ばれることもあります。
+リソースからのリンクの構築は、[HTML DSL](server-html-dsl.md) で作成されたHTMLドキュメントにリンクを追加する必要がある場合や、[リダイレクトレスポンス](server-responses.md#redirect)を生成する必要がある場合に役立ちます。
 
-`Resources`プラグインは、オーバーロードされた[href](https://api.ktor.io/ktor-server-resources/io.ktor.server.resources/href.html)メソッドで`Application`を拡張しており、これにより`Resource`からリンクを生成できます。例えば、以下のコードスニペットは、[上記で定義した](#example_crud)`Edit`リソースのリンクを作成します。
+`Resources` プラグインは `Application` をオーバーロードされた [href](https://api.ktor.io/ktor-server-resources/io.ktor.server.resources/href.html) メソッドで拡張し、`Resource` からリンクを生成できるようにします。例えば、以下のコードスニペットは[上記で定義した](#example_crud) `Edit` リソース用のリンクを作成します。
 
 ```kotlin
 val link: String = href(Articles.Id.Edit(Articles.Id(id = 123)))
 ```
 
-親リソースである`Articles`が`sort`クエリパラメーターをデフォルト値`new`で定義しているため、`link`変数には以下が含まれます。
+祖父母にあたる `Articles` リソースがデフォルト値 `new` を持つ `sort` クエリパラメータを定義しているため、`link` 変数には以下が含まれます。
 
 ```
 /articles/123/edit?sort=new
 ```
 
-ホストとプロトコルを指定するURLを生成するには、`href`メソッドに`URLBuilder`を渡すことができます。
-この例に示すように、追加のクエリパラメーターも`URLBuilder`を使用して指定できます。
+ホストとプロトコルを指定するURLを生成するには、`href` メソッドに `URLBuilder` を渡すことができます。
+この例に示すように、`URLBuilder` を使用して追加のクエリパラメータを指定することもできます。
 
 ```kotlin
 val urlBuilder = URLBuilder(URLProtocol.HTTPS, "ktor.io", parameters = parametersOf("token", "123"))
@@ -269,7 +277,7 @@ href(Articles(sort = null), urlBuilder)
 val link: String = urlBuilder.buildString()
 ```
 
-その後、`link`変数には以下が含まれます。
+その結果、`link` 変数には以下が含まれます。
 
 ```
 https://ktor.io/articles?token=123
@@ -308,4 +316,4 @@ get {
 }
 ```
 
-完全な例はこちらにあります: [resource-routing](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/resource-routing)
+完全な例はこちらで確認できます: [resource-routing](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/resource-routing)。

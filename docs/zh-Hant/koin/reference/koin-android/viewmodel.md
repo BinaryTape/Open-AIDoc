@@ -2,92 +2,60 @@
 title: Android ViewModel
 ---
 
-本頁面涵蓋 Android 特有的 ViewModel 功能。關於核心 ViewModel DSL 與多平台支援，請參閱 [ViewModel](/docs/reference/koin-core/viewmodel)。
+# Android ViewModel
 
-## 概覽 {id="overview"}
+本頁面介紹在 Activity 或 Fragment 中檢索 ViewModel 的 Android API：`by viewModel()`、`activityViewModel()`、導航圖（navigation graph）ViewModel 以及 Java API。如何在各個平台上宣告 ViewModel、傳遞參數以及使用 `SavedStateHandle` 均相同：請參閱 [ViewModel](/docs/reference/koin-core/viewmodel)。關於 Compose，請參閱 [ViewModel in Compose](/docs/reference/koin-compose/compose-viewmodel)。
 
-[ViewModel](https://developer.android.com/topic/libraries/architecture/viewmodel) 是架構元件，旨在於設定變更（configuration changes）後繼續存在並管理 UI 相關資料。Koin 為 ViewModel 提供特殊支援，具備生命週期感知的注入功能。
+無論你使用哪種風格宣告 ViewModel（`viewModel<UserViewModel>()`、`@KoinViewModel` 或 `viewModelOf(::UserViewModel)`），下方的取得程式碼都完全相同。
 
-### 核心概念 {id="key-concepts"}
-
-- **在設定變更後繼續存在** — ViewModel 在旋轉螢幕與佈景主題變更時仍會保留
-- **限定於生命週期作用域** — 綁定到 Activity、Fragment 或 Navigation 圖表的生命週期
-- **延遲建立** — 僅在首次存取時建立
-- **共享執行個體** — 可在 Fragment 及其宿主 Activity 之間共享
-
-:::info
-**多平台 ViewModel** — Koin ViewModel DSL 透過 `koin-core-viewmodel` 完全支援多平台。關於 Compose Multiplatform，請參閱 [Compose ViewModel](/docs/reference/koin-compose/compose#viewmodel-for-composable)。
-:::
-
-### ViewModel 作用域限制 {id="viewmodel-scope-limitations"}
-
-:::warning
-**重要事項：** ViewModel 是針對根 Koin 作用域建立的，**無法存取** Activity 或 Fragment 作用域的相依性。這可防止記憶體洩漏，因為 ViewModel 的壽命比 Activity 和 Fragment 更長。
-
-**需要在 ViewModel 中使用作用域相依性？** 請使用 [ViewModel 作用域](/docs/reference/koin-core/scopes#viewmodel-scope) 來建立一個與您的 ViewModel 生命週期綁定的專用作用域。
-:::
-
-## 宣告 ViewModel {id="declaring-viewmodels"}
-
-### 編譯器外掛程式 DSL {id="compiler-plugin-dsl"}
+## 在 Activity 中 {id="in-an-activity"}
 
 ```kotlin
-val appModule = module {
-    viewModel<DetailViewModel>()
-    viewModel<UserViewModel>()
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.androidx.viewmodel.ext.android.getViewModel
+
+class UserActivity : AppCompatActivity() {
+
+    private val viewModel: UserViewModel by viewModel()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        viewModel.loadUser()
+
+        // 積極載入替代方案，位於函式內部
+        val sameViewModel: UserViewModel = getViewModel()
+    }
 }
 ```
 
-### 註解 {id="annotations"}
+`by viewModel()` 是延遲載入（lazy）的：ViewModel 會在首次存取時建立或取得。這兩個函式都會透過 Activity 的 `ViewModelStore`，因此在旋轉螢幕後，你仍會取回相同的執行個體。切勿使用 `by inject()` 或 `get()` 來檢索 ViewModel：這會導致每次都取得不受管理的新執行個體。
+
+這些函式都在主執行緒（`@MainThread`）上執行。請在 `onCreate()` 中或之後讀取該屬性。
+
+## 在 Fragment 中 {id="in-a-fragment"}
 
 ```kotlin
-@KoinViewModel
-class DetailViewModel(
-    private val repository: DetailRepository
-) : ViewModel()
+import org.koin.androidx.viewmodel.ext.android.activityViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-@KoinViewModel
-class UserViewModel(
-    private val userRepository: UserRepository
-) : ViewModel()
-```
+class UserDetailFragment : Fragment() {
 
-### 經典 DSL {id="classic-dsl"}
+    // 由此 Fragment 所擁有
+    private val detailViewModel: UserDetailViewModel by viewModel()
 
-```kotlin
-val appModule = module {
-    // 使用建構函式參考
-    viewModelOf(::DetailViewModel)
-
-    // 使用 Lambda
-    viewModel { DetailViewModel(get()) }
+    // 由宿主 Activity 所擁有，並與該 Activity 及其其他 Fragment 共享
+    private val userViewModel: UserViewModel by activityViewModel()
 }
 ```
 
-## 注入 ViewModel {id="injecting-viewmodels"}
+| 函式 | ViewModel 的擁有者 | 積極載入版本 |
+|----------|------------------------|---------------|
+| `by viewModel()` | 此 Fragment | `getViewModel()` |
+| `by activityViewModel()` | 宿主 Activity | `getActivityViewModel()` |
 
-在 `Activity`、`Fragment` 或 `Service` 中，使用：
+### 在 Fragment 之間共享 {id="sharing-between-fragments"}
 
-* `by viewModel()` — 延遲委派屬性
-* `getViewModel()` — 立即獲取
-
-```kotlin
-class DetailActivity : AppCompatActivity() {
-
-    // 延遲注入 ViewModel
-    private val viewModel: DetailViewModel by viewModel()
-
-    // 或立即獲取
-    // private val viewModel: DetailViewModel = getViewModel()
-}
-```
-
-## 共享 ViewModel (Activity) {id="shared-viewmodel-activity"}
-
-在 Fragment 及其宿主 Activity 之間共享 ViewModel：
-
-* `by activityViewModel()` — 用於共享 ViewModel 的延遲委派
-* `getActivityViewModel()` — 立即獲取
+對同一個類別使用 `activityViewModel()` 的多個 Fragment 都會取得相同的執行個體，使用 `by viewModel()` 的 Activity 也是如此：
 
 ```kotlin
 class WeatherActivity : AppCompatActivity() {
@@ -95,196 +63,118 @@ class WeatherActivity : AppCompatActivity() {
 }
 
 class WeatherHeaderFragment : Fragment() {
-    // 與 Activity 共享
     private val weatherViewModel: WeatherViewModel by activityViewModel()
 }
 
 class WeatherListFragment : Fragment() {
-    // 與 WeatherHeaderFragment 相同的執行個體
     private val weatherViewModel: WeatherViewModel by activityViewModel()
 }
 ```
 
-## 傳遞參數 {id="passing-parameters"}
+### 其他擁有者 {id="another-owner"}
 
-### 編譯器外掛程式 DSL
+`viewModel()` 接受 `ownerProducer`。使用它可在同一個父 Fragment 的子 Fragment 之間共享 ViewModel：
 
 ```kotlin
-class DetailViewModel(
-    @InjectedParam val itemId: String,
-    private val repository: DetailRepository
-) : ViewModel()
-
-val appModule = module {
-    viewModel<DetailViewModel>()
+class ChildFragment : Fragment() {
+    private val parentViewModel: ParentViewModel by viewModel(ownerProducer = { requireParentFragment() })
 }
 ```
 
-### 註解
+## 參數與限定詞 {id="parameters-and-qualifiers"}
+
+透過 `parametersOf` 的 Lambda 運算式將值傳遞給 ViewModel，並使用限定詞挑選定義：
 
 ```kotlin
-@KoinViewModel
-class DetailViewModel(
-    @InjectedParam val itemId: String,
-    private val repository: DetailRepository
-) : ViewModel()
-```
+class ItemActivity : AppCompatActivity() {
 
-### 經典 DSL
+    private val itemId: String by lazy { intent.getStringExtra("ITEM_ID").orEmpty() }
 
-```kotlin
-val appModule = module {
-    viewModel { params ->
-        DetailViewModel(
-            itemId = params.get(),
-            repository = get()
-        )
-    }
+    private val viewModel: ItemViewModel by viewModel { parametersOf(itemId) }
+    private val draftViewModel: EditorViewModel by viewModel(qualifier = named("draft"))
 }
 ```
 
-### 注入呼叫點 {id="injection-site"}
+如何在 ViewModel 端宣告參數（`@InjectedParam`、`params.get()`）已在 [ViewModel](/docs/reference/koin-core/viewmodel) 中說明。參數僅在首次建立 ViewModel 時使用：在螢幕旋轉後，ViewModel 會從 store 中檢索出來，而新的參數會被忽略。
 
-```kotlin
-class DetailActivity : AppCompatActivity() {
-
-    private val itemId: String by lazy { intent.getStringExtra("ITEM_ID")!! }
-
-    // 在注入時傳遞參數
-    private val viewModel: DetailViewModel by viewModel { parametersOf(itemId) }
-}
-```
+使用限定詞時，Koin 會將 ViewModel 存儲在專屬的鍵值下。在同一個擁有者中，對同一個類別使用兩個限定詞將產生兩個獨立的執行個體。
 
 ## SavedStateHandle {id="savedstatehandle"}
 
-在您的 ViewModel 建構函式中新增 `SavedStateHandle` — Koin 會自動注入它：
+在 ViewModel 建構函式中新增 `SavedStateHandle` 參數，Koin 便會提供它。相關宣告已在 [ViewModel](/docs/reference/koin-core/viewmodel) 中說明。在 Android 上，handle 是從擁有者的 `CreationExtras` 建構而成：它包含 Activity intent 的 extras 或 Fragment 的引數。若你需要其他 extras，請將 `extrasProducer` 傳遞給 `viewModel()`。
 
-### 註解
+舊版 Koin 中的 `stateViewModel()` 函式已被移除。請改用 `viewModel()`。
 
-```kotlin
-@KoinViewModel
-class MyStateViewModel(
-    private val handle: SavedStateHandle,
-    private val repository: MyRepository
-) : ViewModel()
-```
+## Navigation 圖 ViewModel {id="navigation-graph-viewmodel"}
 
-### DSL {id="dsl"}
+使用 `io.insert-koin:koin-androidx-navigation` 構件，將 ViewModel 的作用域限定在 Navigation 元件圖中：
 
 ```kotlin
-class MyStateViewModel(
-    private val handle: SavedStateHandle,
-    private val repository: MyRepository
-) : ViewModel()
+import org.koin.androidx.navigation.koinNavGraphViewModel
 
-val appModule = module {
-    viewModel<MyStateViewModel>()  // 編譯器外掛程式 DSL
-    // 或
-    viewModelOf(::MyStateViewModel)  // 經典 DSL
+class CheckoutStepFragment : Fragment() {
+    private val checkoutViewModel: CheckoutViewModel by koinNavGraphViewModel(R.id.checkout_graph)
 }
 ```
 
-### 使用方式 {id="usage"}
+該 ViewModel 由 `R.id.checkout_graph` 的返回堆疊項目（back stack entry）所擁有：
 
-```kotlin
-class DetailActivity : AppCompatActivity() {
-    // SavedStateHandle 會自動注入
-    private val viewModel: MyStateViewModel by viewModel()
-}
-```
+- 建立：當該導航圖中的任一 Fragment 首次讀取此屬性時。
+- 共享：該導航圖中請求該 ViewModel 的每個 Fragment 都會取得相同的執行個體。
+- 清除：當該導航圖從返回堆疊中彈出時。
 
-:::info
-所有 `stateViewModel` 函式皆已棄用。請使用一般的 `viewModel` 函式 — `SavedStateHandle` 會自動注入。
+`koinNavGraphViewModel()` 接受與 `viewModel()` 相同的 `qualifier`、`extrasProducer` 和 `parameters` 引數。關於 Navigation Compose，請參閱 [ViewModel in Compose](/docs/reference/koin-compose/compose-viewmodel)。
+
+## ViewModel 與 Android 作用域 {id="viewmodels-and-android-scopes"}
+
+當 Activity 或 Fragment 具有 Koin 作用域（`ScopeActivity`、`AndroidScopeComponent`）時，`by viewModel()` 會從該作用域解析 ViewModel。這樣一來，ViewModel 就能接收限定於該 Activity 作用域的相依性。
+
+:::warning
+請勿將 Activity 作用域或 Fragment 作用域的執行個體注入到 ViewModel 中。ViewModel 在螢幕旋轉後仍能存活，但 Activity 作用域則否：ViewModel 會保留對已關閉物件的參照，從而導致舊的 Activity 發生記憶體洩漏。對於生命週期與 ViewModel 相同的執行個體，請使用 ViewModel 作用域（請參閱 [Android Scopes](/docs/reference/koin-android/scope#viewmodel-scope)）。
 :::
 
-## Navigation 圖表 ViewModel {id="navigation-graph-viewmodel"}
+## 底層 API {id="lower-level-api"}
 
-將 ViewModel 的作用域限定在 Navigation 圖表中：
+`viewModelForClass()` 接受 `KClass` 而非具體化型別。當類別只能在執行時期得知時，請使用此函式：
 
 ```kotlin
-class NavFragment : Fragment() {
-
-    // 限定於 navigation 圖表作用域
-    private val navViewModel: NavViewModel by koinNavGraphViewModel(R.id.my_graph)
-}
+val viewModel: UserViewModel by viewModelForClass(
+    clazz = UserViewModel::class,
+    owner = this,
+    key = "user_42",
+    parameters = { parametersOf("42") },
+)
 ```
 
-此 ViewModel 會：
-- 在圖表中的第一個 Fragment 存取它時建立
-- 在圖表中的所有 Fragment 之間共享
-- 在 Navigation 圖表被彈出（popped）時銷毀
+`key` 讓您可以在同一個擁有者中保留相同類別的多個執行個體。與 `viewModel()` 不同的是，它起始於空的 `CreationExtras`：如果 ViewModel 需要 `SavedStateHandle`，請傳入 `state` 引數。
 
-## 具有作用域相依性的 ViewModel {id="viewmodel-with-scoped-dependencies"}
+## Java {id="java"}
 
-如果您的 ViewModel 需要其專屬的作用域相依性，請使用 [ViewModel 作用域](/docs/reference/koin-core/scopes#viewmodel-scope)：
+新增 `io.insert-koin:koin-android-compat` 構件並使用 `ViewModelCompat` 的 static 方法：
 
-```kotlin
-val appModule = module {
-    viewModelScope {
-        scoped<UserCache>()
-        scoped<UserRepository>()
-        viewModel<UserViewModel>()
+```java
+import kotlin.Lazy;
+import org.koin.android.compat.ViewModelCompat;
+
+public class UserJavaActivity extends AppCompatActivity {
+
+    private final Lazy<UserViewModel> viewModel =
+        ViewModelCompat.viewModel(this, UserViewModel.class);
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        UserViewModel vm = ViewModelCompat.getViewModel(this, UserViewModel.class);
     }
 }
 ```
 
-```kotlin
-@ViewModelScope
-class UserCache
+`SharedViewModelCompat` 可以從 Fragment 取得宿主 Activity 的 ViewModel，而 `ScopeCompat` 則從指定的作用域中進行解析。`ViewModelCompat` 和 `SharedViewModelCompat` 始終從根作用域解析，絕不會從 Activity 作用域解析。
 
-@ViewModelScope
-class UserRepository(private val cache: UserCache)
+## 相關內容 {id="related"}
 
-@KoinViewModel
-@ViewModelScope
-class UserViewModel(
-    private val repository: UserRepository
-) : ViewModel()
-```
-
-## ViewModel 泛型 API {id="viewmodel-generic-api"}
-
-對於進階使用案例，Koin 提供了更底層的 API：
-
-```kotlin
-// 來自 ComponentActivity 或 Fragment
-val viewModel = viewModelForClass(
-    clazz = MyViewModel::class,
-    qualifier = null,
-    owner = this,
-    key = null,
-    parameters = { parametersOf("param") }
-)
-```
-
-## Java 相容性 {id="java-compatibility"}
-
-新增相容性相依性：
-
-```groovy
-implementation "io.insert-koin:koin-android-compat:$koin_version"
-```
-
-使用 `ViewModelCompat` 靜態方法：
-
-```java
-MyViewModel viewModel = ViewModelCompat.getViewModel(this, MyViewModel.class);
-```
-
-## 快速參考 {id="quick-reference"}
-
-| 操作 | 程式碼 |
-|--------|------|
-| 宣告 ViewModel | `viewModel<MyVM>()` / `@KoinViewModel` |
-| 在 Activity/Fragment 中注入 | `by viewModel()` |
-| 與 Activity 共享 | `by activityViewModel()` |
-| 傳遞參數 | `by viewModel { parametersOf(id) }` |
-| Navigation 圖表作用域 | `by koinNavGraphViewModel(R.id.graph)` |
-| 使用 SavedStateHandle | 直接新增至建構函式即可 |
-
-## 下一步 {id="next-steps"}
-
-- **[核心 ViewModel](/docs/reference/koin-core/viewmodel)** — 多平台 ViewModel DSL
-- **[作用域](/docs/reference/koin-core/scopes#viewmodel-scope)** — 用於作用域相依性的 ViewModel 作用域
-- **[測試](/docs/reference/koin-test/testing)** — 測試 ViewModel
-- **[Compose](/docs/reference/koin-compose/compose)** — Compose 中的 ViewModel
+- [ViewModel](/docs/reference/koin-core/viewmodel)：在所有平台上宣告 ViewModel、參數與 `SavedStateHandle`。
+- [Android Scopes](/docs/reference/koin-android/scope)：Activity、Fragment 與 ViewModel 作用域。
+- [Android Entry Points](/docs/reference/koin-android/entry-points)：在 Activity 與 Fragment 中注入其他相依性。
+- [ViewModel in Compose](/docs/reference/koin-compose/compose-viewmodel)：Composable 中的 `koinViewModel()`。
+- [Unit Testing](/docs/reference/koin-test/testing)：使用 Koin 測試 ViewModel。

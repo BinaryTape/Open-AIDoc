@@ -2,332 +2,257 @@
 title: Android 作用域
 ---
 
-本指南涵盖了 Android 特定的作用域实现。
+# Android 作用域
 
-:::info
-有关核心作用域概念，请参阅 [作用域](/docs/reference/koin-core/scopes)。
-:::
+Android 作用域让实例的存活时间与某个组件（Activity、Fragment、Service 或 ViewModel）保持一致，并在该组件关闭时将其一并关闭。本页涵盖了 Android 作用域 API：作用域原型（scope archetypes）、`ScopeActivity`、`ScopeFragment`、`AndroidScopeComponent`、保留（retained）作用域以及 Service 作用域。关于作用域的概念、`scoped`、链接（linking）以及关闭的常规说明，请参阅[作用域](/docs/reference/koin-core/scopes)。
 
-## 概览 {id="overview"}
+## 作用域生命周期 {id="scope-lifetimes"}
 
-Koin 中的作用域允许您管理依赖项的生命周期，以匹配 Android 组件的生命周期。这可以防止内存泄漏并确保正确的资源管理。
+| 作用域 | 开启时机 | 关闭时机 | 屏幕旋转后存活 |
+|-------|--------|--------|-------------------|
+| `activityScope` | 在 Activity 中首次访问时 | Activity 的 `ON_DESTROY` | 否 |
+| `activityRetainedScope` | 在 Activity 中首次访问时 | Activity 结束（由 ViewModel 支持） | 是 |
+| `fragmentScope` | 在 Fragment 中首次访问时 | Fragment 的 `ON_DESTROY` | 否 |
+| Service 作用域 | `Service.onCreate()` | `Service.onDestroy()` | 不适用 |
+| `viewModelScope` | ViewModel 创建时 | ViewModel 被清理时 | 是 |
 
-### 作用域层次结构 {id="scope-hierarchy"}
+`single` 的生命周期与应用程序相同，因此它是所有这些作用域的外层级别。
 
-| 作用域类型 | 生命周期 | 在旋转后存续 | DSL | 注解 |
-|------------|----------|-------------------|-----|------------|
-| **应用程序** | 整个应用 | ✅ 是 | `single { }` | `@Singleton` |
-| **Activity** | Activity 生命周期 | ❌ 否 | `activityScope { }` | `@ActivityScope` |
-| **Activity 保留** | 直到 finish() | ✅ 是 | `activityRetainedScope { }` | `@ActivityRetainedScope` |
-| **Fragment** | Fragment 生命周期 | ❌ 否 | `fragmentScope { }` | `@FragmentScope` |
-| **ViewModel** | ViewModel 生命周期 | ✅ 是 | `viewModelScope { }` | `@ViewModelScope` |
+## 声明作用域定义 {id="declaring-scoped-definitions"}
 
-### 作用域关系 {id="scope-relationships"}
+Android 为每种组件类型提供了一个作用域原型。原型是一种作用域声明，每个具有作用域的 Activity（或 Fragment）都可以使用它，因此你无需为每个类单独编写作用域：
 
-```
-应用程序作用域 (single { })
-    └── Activity 保留作用域 (在旋转后存续)
-            └── Activity 作用域
-                    ├── Fragment 作用域 1
-                    └── Fragment 作用域 2
-            └── ViewModel 作用域 (无法访问 Activity/Fragment 作用域)
-```
-
-:::info
-**核心原则：** 子作用域可以访问父作用域的定义，但反之则不行。
-:::
-
-## 声明作用域依赖项 {id="declaring-scoped-dependencies"}
-
-### 编译器插件 DSL {id="compiler-plugin-dsl"}
-
+**Compiler Plugin DSL**
 ```kotlin
-val appModule = module {
-    // Activity 作用域
+import org.koin.androidx.scope.dsl.activityRetainedScope
+import org.koin.androidx.scope.dsl.activityScope
+import org.koin.androidx.scope.dsl.fragmentScope
+
+val screenModule = module {
     activityScope {
-        scoped<ActivityPresenter>()
-        scoped<ActivityNavigator>()
+        scoped<ScreenNavigator>()
     }
-
-    // Fragment 作用域
+    activityRetainedScope {
+        scoped<FormState>()
+    }
     fragmentScope {
-        scoped<FragmentPresenter>()
-    }
-
-    // ViewModel 作用域
-    viewModelScope {
-        scoped<UserCache>()
-        viewModel<UserViewModel>()
+        scoped<DetailPresenter>()
     }
 }
 ```
 
-### 注解 {id="annotations"}
-
+**Annotations**
 ```kotlin
-// Activity 作用域
-@ActivityScope
-class ActivityPresenter(private val repository: UserRepository)
+import org.koin.android.annotation.ActivityRetainedScope
+import org.koin.android.annotation.ActivityScope
+import org.koin.android.annotation.FragmentScope
 
 @ActivityScope
-class ActivityNavigator
+class ScreenNavigator(private val activity: Activity)
 
-// Activity 保留作用域 (在旋转后存续)
 @ActivityRetainedScope
-class RetainedPresenter
+class FormState
 
-// Fragment 作用域
 @FragmentScope
-class FragmentPresenter
-
-// ViewModel 作用域
-@ViewModelScope
-class UserCache
-
-@KoinViewModel
-@ViewModelScope
-class UserViewModel(private val cache: UserCache) : ViewModel()
+class DetailPresenter(private val repository: UserRepository)
 ```
 
-### 经典 DSL {id="classic-dsl"}
-
+**Constructor / Classic DSL**
 ```kotlin
-val appModule = module {
+import org.koin.androidx.scope.dsl.activityRetainedScope
+import org.koin.androidx.scope.dsl.activityScope
+import org.koin.androidx.scope.dsl.fragmentScope
+
+val screenModule = module {
     activityScope {
-        scoped { ActivityPresenter(get()) }
-        scoped { ActivityNavigator() }
+        scopedOf(::ScreenNavigator)
     }
-
+    activityRetainedScope {
+        scopedOf(::FormState)
+    }
     fragmentScope {
-        scoped { FragmentPresenter(get()) }
-    }
-
-    viewModelScope {
-        scoped { UserCache() }
-        viewModel { UserViewModel(get()) }
+        scopedOf(::DetailPresenter)
     }
 }
 ```
 
-## 在 Android 组件中使用作用域 {id="using-scopes-in-android-components"}
+若要将定义限制在特定的 Activity 类，请改用基于类型的作用域（在 DSL 中使用 `scope<UserActivity> { }`，在注解中使用带有 `@Scoped` 的 `@Scope(UserActivity::class)`）。Koin 会优先在基于类型的作用域中查找，然后再在原型中查找。基于类型的作用域在[作用域](/docs/reference/koin-core/scopes)中进行了说明。
 
-### Activity 作用域 {id="activity-scope"}
+## Activity 作用域 {id="activity-scope"}
+
+继承 `ScopeActivity`，或者实现 `AndroidScopeComponent` 并通过 `activityScope()` 创建作用域：
 
 ```kotlin
-class MyActivity : AppCompatActivity(), AndroidScopeComponent {
+import org.koin.androidx.scope.ScopeActivity
 
-    // 创建绑定到 Activity 生命周期的作用域
+class UserActivity : ScopeActivity() {
+
+    private val navigator: ScreenNavigator by inject()
+}
+```
+
+```kotlin
+import org.koin.android.scope.AndroidScopeComponent
+import org.koin.androidx.scope.activityScope
+
+class UserActivity : AppCompatActivity(), AndroidScopeComponent {
+
     override val scope: Scope by activityScope()
 
-    // 从作用域注入
-    private val presenter: ActivityPresenter by inject()
+    private val navigator: ScreenNavigator by inject()
 }
 ```
 
-或者使用便捷基类：
+拥有作用域后，Activity 中的 `inject()`、`get()` 和 `viewModel()` 会优先从 Activity 作用域进行解析，然后再从根作用域进行解析。该作用域会在 Activity 的 `ON_DESTROY` 生命周期事件发生时关闭，因此在你的 `onDestroy()` 代码运行时，它就已经关闭了。
+
+Activity 是其作用域的源对象。处于该作用域内的定义可以请求 `Activity` 或 `Context`，并接收当前的 Activity 实例：
 
 ```kotlin
-class MyActivity : ScopeActivity() {
-
-    // 作用域已设置完成
-    private val presenter: ActivityPresenter by inject()
+@ActivityScope
+class ScreenNavigator(private val activity: Activity) {
+    fun openSettings() = activity.startActivity(Intent(activity, SettingsActivity::class.java))
 }
 ```
 
-### Activity 保留作用域 {id="activity-retained-scope"}
+`activityScope()`（委托函数，位于 `org.koin.androidx.scope`）和 `activityScope { }`（模块 DSL，位于 `org.koin.androidx.scope.dsl`）同名。当编译器选取错误时，请检查导入语句。
 
-在配置更改（旋转、主题更改）后存续：
+### 保留的 Activity 作用域 {id="retained-activity-scope"}
+
+`activityRetainedScope()` 可以在配置变更期间保持相同的作用域。Koin 会将其存储在 Activity 的 ViewModel 中，并在该 ViewModel 被清理时（即 Activity 结束时）关闭它：
 
 ```kotlin
-class MyActivity : AppCompatActivity(), AndroidScopeComponent {
+import org.koin.androidx.scope.RetainedScopeActivity
 
-    // 由 ViewModel 生命周期支持 - 在旋转后存续
-    override val scope: Scope by activityRetainedScope()
+class FormActivity : RetainedScopeActivity() {
 
-    private val presenter: RetainedPresenter by inject()
+    private val formState: FormState by inject()
 }
 ```
 
-或者使用便捷基类：
+或者，配合 `AndroidScopeComponent` 使用：`override val scope: Scope by activityRetainedScope()`。
+
+保留作用域中的定义生命周期长于 Activity 实例。它们不得保留对 Activity、其 View 或 Fragment 的引用。保留作用域没有源对象：其中的 `Context` 会解析为 `Application`。
+
+## Fragment 作用域 {id="fragment-scope"}
+
+继承 `ScopeFragment`，或者通过 `fragmentScope()` 实现 `AndroidScopeComponent`：
 
 ```kotlin
-class MyActivity : RetainedScopeActivity() {
+import org.koin.androidx.scope.ScopeFragment
 
-    private val presenter: RetainedPresenter by inject()
+class DetailFragment : ScopeFragment() {
+
+    private val presenter: DetailPresenter by inject()
+
+    // 从父 Activity 作用域解析
+    private val navigator: ScreenNavigator by inject()
 }
 ```
 
-### Fragment 作用域 {id="fragment-scope"}
-
-Fragment 作用域会自动链接到父 Activity 作用域：
-
 ```kotlin
-class MyFragment : Fragment(), AndroidScopeComponent {
+import org.koin.androidx.scope.fragmentScope
+
+class DetailFragment : Fragment(), AndroidScopeComponent {
 
     override val scope: Scope by fragmentScope()
-
-    // 来自 Fragment 作用域
-    private val presenter: FragmentPresenter by inject()
-
-    // 也可以访问 Activity 作用域的依赖项
-    private val activityPresenter: ActivityPresenter by inject()
 }
 ```
 
-或者使用便捷基类：
+Fragment 作用域已链接到宿主 Activity 作用域，因此它可以感知到 Activity 作用域内的实例。这仅在宿主 Activity 拥有作用域（`ScopeActivity` 或 `AndroidScopeComponent`）时才有效；否则该链接会被跳过并且 Koin 会记录日志。传入 `fragmentScope(useParentActivityScope = false)` 可以主动跳过该链接。
 
+:::warning
+Fragment 作用域遵循 Fragment 生命周期（`ON_DESTROY`），而非视图（view）生命周期。持有 View 或绑定的作用域实例会在 `onDestroyView()` 之后继续保留它，直到 Fragment 被销毁。请在 `onDestroyView()` 中释放 View 引用。
+:::
+
+## Service 作用域 {id="service-scope"}
+
+继承 `ScopeService`。其作用域在 `onCreate()` 中开启，并在 `onDestroy()` 中关闭。Service 没有作用域原型：需要为 Service 类声明基于类型的作用域。
+
+**Compiler Plugin DSL**
 ```kotlin
-class MyFragment : ScopeFragment() {
-
-    private val presenter: FragmentPresenter by inject()
-}
-```
-
-## 基于类型的作用域 vs 原型作用域 {id="type-based-vs-archetype-scopes"}
-
-### 原型作用域 (推荐) {id="archetype-scope-recommended"}
-
-适用于任何 Activity/Fragment 的通用作用域：
-
-```kotlin
-module {
-    activityScope {
-        scoped<MyPresenter>()
+val playerModule = module {
+    scope<MusicService> {
+        scoped<PlaybackSession>()
     }
 }
-
-// 适用于任何 Activity
-class ActivityA : ScopeActivity() {
-    private val presenter: MyPresenter by inject()
-}
-
-class ActivityB : ScopeActivity() {
-    private val presenter: MyPresenter by inject()
-}
 ```
 
-### 基于类型的作用域 {id="type-based-scope"}
-
-绑定到特定类的工作作用域：
-
+**Annotations**
 ```kotlin
-module {
-    scope<MyActivity> {
-        scoped<MyPresenter>()
+@Scope(MusicService::class)
+@Scoped
+class PlaybackSession
+```
+
+**Constructor / Classic DSL**
+```kotlin
+val playerModule = module {
+    scope<MusicService> {
+        scopedOf(::PlaybackSession)
     }
 }
+```
 
-// 仅适用于 MyActivity
-class MyActivity : AppCompatActivity(), AndroidScopeComponent {
-    override val scope: Scope by activityScope()
-    private val presenter: MyPresenter by inject()
+```kotlin
+import org.koin.android.scope.ScopeService
+
+class MusicService : ScopeService() {
+
+    private val session: PlaybackSession by inject()
+
+    override fun onBind(intent: Intent?): IBinder? = null
 }
 ```
+
+如果你的 Service 无法继承 `ScopeService`，请实现 `AndroidScopeComponent` 并使用 `override val scope: Scope by serviceScope()`，然后在 `onDestroy()` 中调用 `destroyServiceScope()`。
 
 ## ViewModel 作用域 {id="viewmodel-scope"}
 
-ViewModel 无法访问 Activity 或 Fragment 作用域（以防止内存泄漏）。请为作用域内依赖项使用 ViewModel 作用域：
+ViewModel 作用域容纳的实例存活时间与某个 ViewModel 完全一致。可以通过 `viewModelScope { }` 或 `@ViewModelScope` 来声明它们。然后启用 `viewModelScopeFactory()` 选项让 Koin 为每个 ViewModel 创建作用域，或者继承 `ScopeViewModel`：
 
 ```kotlin
-module {
-    viewModelScope {
-        scoped<UserCache>()
-        scoped<UserRepository>()
-        viewModel<UserViewModel>()
-    }
+import org.koin.core.option.viewModelScopeFactory
+
+startKoin {
+    androidContext(this@MainApplication)
+    options(viewModelScopeFactory())
+    modules(appModule)
 }
 ```
 
-```kotlin
-@ViewModelScope
-class UserCache
+声明方式、该选项以及 `ScopeViewModel` 均在[作用域](/docs/reference/koin-core/scopes)中进行了说明。在 Android 上，照常使用 `by viewModel()` 获取 ViewModel（参见 [Android ViewModel](/docs/reference/koin-android/viewmodel)）。
 
-@ViewModelScope
-class UserRepository(private val cache: UserCache)
+不要在 `activityScope` 中使用 `scoped` 声明 ViewModel：这样你会得到一个不受 `ViewModelStore` 管理的普通对象，并且会在每次屏幕旋转时重新创建。请使用 `viewModel` 声明它，并通过 `by viewModel()` 获取。
 
-@KoinViewModel
-@ViewModelScope
-class UserViewModel(
-    private val repository: UserRepository
-) : ViewModel()
-```
+## 在作用域关闭之前进行清理 {id="cleaning-up-before-the-scope-closes"}
 
-有关详细的 ViewModel 作用域用法，请参阅 [作用域 - ViewModel 作用域](/docs/reference/koin-core/scopes#viewmodel-scope)。
-
-## 作用域生命周期 {id="scope-lifecycle"}
-
-### 处理作用域关闭 {id="handling-scope-close"}
-
-重写 `onCloseScope()` 以在作用域销毁之前运行清理代码：
+在 `AndroidScopeComponent` 中重写 `onCloseScope()`。Koin 会在关闭 Activity 或 Fragment 作用域之前调用它，此时作用域内的实例仍然可用：
 
 ```kotlin
-class MyActivity : AppCompatActivity(), AndroidScopeComponent {
-
-    override val scope: Scope by activityScope()
+class UserActivity : ScopeActivity() {
 
     override fun onCloseScope() {
-        // 在 scope.close() 之前调用
-        // 此处仍可访问作用域
+        get<ScreenNavigator>().clear()
     }
 }
 ```
 
-:::warning
-不要在 `onDestroy()` 中访问作用域 - 该作用域在此时已经关闭。
+保留作用域或 Service 作用域不会调用 `onCloseScope()`。对于与单个定义绑定的清理操作，请在定义上使用 `onClose { }`（参见[定义](/docs/reference/koin-core/definitions#release-callback)）。
+
+## 限制 {id="limits"}
+
+- 必需具有作用域：注入了作用域定义的类必须拥有作用域（`ScopeActivity`、`ScopeFragment`、`ScopeService` 或 `AndroidScopeComponent`）。如果没有，`inject()` 会从根作用域进行解析，并抛出 `NoDefinitionFoundException` 异常失败。
+- 主线程：请从主线程创建 Activity 和 Fragment 作用域（属性委托在 `onCreate()` 中或之后读取）。
+- 自定义作用域：使用 `getKoin().createScope()` 自行创建的作用域未绑定到任何生命周期。需要自行关闭它。
+
+:::tip
+若要查看真实用户会话中的作用域生命周期和泄漏实例，请参阅[生产环境监控](/docs/tooling/production-monitoring)。
 :::
 
-## 作用域链接 {id="scope-links"}
+## 相关内容 {id="related"}
 
-在具有自定义作用域的组件之间共享实例：
-
-```kotlin
-module {
-    scope(named("session")) {
-        scoped<UserSession>()
-    }
-}
-```
-
-```kotlin
-class MyActivity : ScopeActivity() {
-
-    fun startSession() {
-        val sessionScope = getKoin().createScope("session", named("session"))
-
-        // 链接到当前作用域
-        scope.linkTo(sessionScope)
-
-        // 现在可以访问 UserSession
-        val session: UserSession = get()
-    }
-}
-```
-
-## 快速参考 {id="quick-reference"}
-
-| 组件 | 委托 | 基类 |
-|-----------|----------|------------|
-| Activity | `by activityScope()` | `ScopeActivity` |
-| Activity (保留) | `by activityRetainedScope()` | `RetainedScopeActivity` |
-| Fragment | `by fragmentScope()` | `ScopeFragment` |
-
-| 作用域 | 在旋转后存续 | 用例 |
-|-------|-------------------|----------|
-| `activityScope` | ❌ 否 | UI 状态、Presenter |
-| `activityRetainedScope` | ✅ 是 | 表单状态、待处理请求 |
-| `fragmentScope` | ❌ 否 | Fragment 特定的 Presenter |
-| `viewModelScope` | ✅ 是 | ViewModel 依赖项 |
-
-## 最佳做法 {id="best-practices"}
-
-1. **使用原型** - 优先使用 `activityScope { }` 而非 `scope<MyActivity> { }` 以提高可重用性。
-2. **为旋转保留** - 对应该在旋转后存续的状态使用 `activityRetainedScope`。
-3. **防止泄漏** - 严禁将 Activity/Fragment 注入到单例中。
-4. **关闭自定义作用域** - 始终手动关闭手动创建的作用域。
-5. **使用 onCloseScope** - 用于在作用域销毁前进行清理。
-
-## 下一步 {id="next-steps"}
-
-- **[核心作用域](/docs/reference/koin-core/scopes)** - 作用域基础和 ViewModel 作用域
-- **[ViewModel](/docs/reference/koin-android/viewmodel)** - ViewModel 注入
-- **[测试](/docs/reference/koin-test/testing)** - 测试作用域内的依赖项
+- [作用域](/docs/reference/koin-core/scopes)：作用域概念、链接、`@Scope` 与 ViewModel 作用域。
+- [Android ViewModel](/docs/reference/koin-android/viewmodel)：结合 Activity 和 Fragment 作用域的 ViewModel。
+- [Android 入口点](/docs/reference/koin-android/entry-points)：在 Android 组件中进行注入。
+- [Fragment 工厂](/docs/reference/koin-android/fragment-factory)：从 Activity 作用域创建 Fragment。
+- [Android 最佳实践](/docs/reference/koin-android/best-practices)：避免 Context 与 Activity 泄漏。

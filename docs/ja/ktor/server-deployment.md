@@ -5,45 +5,45 @@
 <tldr>
 <var name="example_name" value="deployment-ktor-plugin"/>
 <p>
-    <b>コード例</b>:
-    <a href="https://github.com/ktorio/ktor-documentation/tree/%ktor_version%/codeSnippets/snippets/%example_name%">
+    <b>Code example</b>:
+    <a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/%example_name%">
         %example_name%
     </a>
 </p>
 </tldr>
 
-このトピックでは、Ktorアプリケーションをデプロイする方法の概要を説明します。
+このトピックでは、Ktorアプリケーションをデプロイする方法の概要について説明します。
 
-> サーバーKtorアプリケーションのデプロイプロセスを簡素化するために、Gradle用の [Ktor](https://github.com/ktorio/ktor-build-plugins) プラグインを使用できます。このプラグインは以下の機能を提供します：
-> - fat JARのビルド。
-> - アプリケーションのDocker化。
+> サーバーKtorアプリケーションのデプロイプロセスを簡素化するために、以下の機能を提供するGradle用[Ktor](https://github.com/ktorio/ktor-build-plugins)プラグインを使用できます。
+> - Fat JARのビルド
+> - アプリケーションのDocker化
 
-## Ktorデプロイメントの固有事項 {id="ktor-specifics"}
-サーバーKtorアプリケーションのデプロイプロセスは、以下の事項によって異なります。
-* アプリケーションを自己完結型のパッケージとしてデプロイするか、サーブレットコンテナ内にデプロイするか。
-* サーバーの作成と構成にどのアプローチを使用するか。
+## Ktorデプロイの仕様 {id="ktor-specifics"}
+サーバーKtorアプリケーションのデプロイプロセスは、以下の仕様によって異なります。
+* アプリケーションを自己完結型のパッケージとしてデプロイするのか、それともサーブレットコンテナ内にデプロイするのか。
+* サーバーの作成と設定にどちらのアプローチを使用するか。
 
 ### 自己完結型アプリ vs サーブレットコンテナ {id="self-contained-vs-servlet"}
 
-Ktorでは、アプリケーション内で直接、目的のネットワーク[エンジン](server-engines.md)（Netty、Jetty、Tomcatなど）を使用してサーバーを作成し、起動することができます。この場合、エンジンはアプリケーションの一部となります。アプリケーションは、エンジン設定、接続、SSLオプションを制御できます。アプリケーションをデプロイするには、[パッケージ化](#packaging)して fat JAR または実行可能なJVMアプリケーションとして出力します。
+Ktorを使用すると、アプリケーション内で直接、希望するネットワーク[エンジン](server-engines.md)（Netty、Jetty、Tomcatなど）を含むサーバーを作成して起動できます。この場合、エンジンはアプリケーションの一部となります。アプリケーションはエンジンの設定、接続、およびSSLオプションを制御できます。アプリケーションをデプロイするには、Fat JARまたは実行可能JVMアプリケーションとして[パッケージ化](#packaging)できます。
 
-上記のアプローチとは対照的に、サーブレットコンテナがアプリケーションのライフサイクルと接続設定を制御する必要があります。Ktorは、アプリケーションの制御をサーブレットコンテナに委譲する特別な `ServletApplicationEngine` エンジンを提供しています。サーブレットコンテナ内にデプロイするには、[WARアーカイブ](server-war.md)を生成する必要があります。
+上記のアプローチとは対照的に、サーブレットコンテナではコンテナ側がアプリケーションのライフサイクルと接続設定を制御する必要があります。Ktorは、アプリケーションの制御をサーブレットコンテナに委任する特別な`ServletApplicationEngine`エンジンを提供します。サーブレットコンテナ内にデプロイするには、[WARアーカイブ](server-war.md)を生成する必要があります。
 
-### 構成：コード vs 設定ファイル {id="code-vs-config"}
+### 設定：コード vs 設定ファイル {id="code-vs-config"}
 
-デプロイ用の自己完結型Ktorアプリケーションの構成は、[サーバーの作成と構成](server-create-and-configure.topic)に使用する方法（コード内で行うか、[設定ファイル](server-configuration-file.topic)を使用するか）によって異なる場合があります。例として、[ホスティングプロバイダー](#publishing)が受信リクエストをリッスンするために使用するポートの指定を要求する場合があります。この場合、コード内または `application.conf`/`application.yaml` のいずれかでポートを[構成](server-configuration-file.topic)する必要があります。
+自己完結型のKtorアプリケーションをデプロイ用に設定する方法は、[サーバーの作成と設定](server-create-and-configure.topic)に使用したアプローチ（コード内で行うか、[設定ファイル](server-configuration-file.topic)を使用するか）によって異なる場合があります。例えば、[ホスティングプロバイダー](#publishing)によっては、受信リクエストをリッスンするために使用するポートの指定を要求する場合があります。この場合、コードまたは`application.conf`/`application.yaml`のいずれかでポートを[設定](server-configuration-file.topic)する必要があります。
 
 ## パッケージ化 {id="packaging"}
 
-アプリケーションをデプロイする前に、以下のいずれかの方法でパッケージ化する必要があります：
+アプリケーションをデプロイする前に、以下のいずれかの方法でパッケージ化する必要があります。
 
 * **Fat JAR**
 
-  fat JARは、すべてのコード依存関係を含む実行可能なJARです。fat JARをサポートする任意の[クラウドサービス](#publishing)にデプロイできます。また、GraalVM用のネイティブバイナリを生成する必要がある場合も、fat JARが必要です。fat JARを作成するには、Gradle用の[Ktor](server-fatjar.md)プラグインまたはMaven用の[Assembly](maven-assembly-plugin.md)プラグインを使用できます。
+  Fat JARは、すべてのコード依存関係を含む実行可能なJARです。Fat JARをサポートする任意の[クラウドサービス](#publishing)にデプロイできます。また、GraalVM用のネイティブバイナリを生成する必要がある場合にもFat JARが必要です。Fat JARを作成するには、Gradle用[Ktor](server-fatjar.md)プラグインまたはMaven用[Assembly](maven-assembly-plugin.md)プラグインを使用できます。
 
-* **実行可能なJVMアプリケーション**
+* **実行可能JVMアプリケーション**
 
-   実行可能なJVMアプリケーションは、コードの依存関係と生成された起動スクリプトを含むパッケージ化されたアプリケーションです。Gradleの場合、[Application](server-packaging.md)プラグインを使用してアプリケーションを生成できます。 
+   実行可能JVMアプリケーションは、コードの依存関係と生成された起動スクリプトを含むパッケージ化されたアプリケーションです。Gradleの場合、[Application](server-packaging.md)プラグインを使用してアプリケーションを生成できます。
 
 * **WAR**
 
@@ -51,15 +51,15 @@ Ktorでは、アプリケーション内で直接、目的のネットワーク[
 
 * **GraalVM**
 
-   Ktorサーバーアプリケーションは、さまざまなプラットフォーム向けのネイティブイメージを作成するために[GraalVM](graalvm.md)を利用できます。
+   Ktorサーバーアプリケーションでは、さまざまなプラットフォーム用のネイティブイメージを取得するために[GraalVM](graalvm.md)を利用できます。
 
 ## コンテナ化 {id="containerizing"}
 
-アプリケーションをパッケージ化（例：実行可能なJVMアプリケーションまたはfat JAR）した後、そのアプリケーションを含む[Dockerイメージ](docker.md)を作成できます。このイメージを使用して、Kubernetes、Swarm、または必要なクラウドサービスのコンテナインスタンス上でアプリケーションを実行できます。
+アプリケーションをパッケージ化（例えば、実行可能JVMアプリケーションまたはFat JARに）した後、このアプリケーションを含む[Dockerイメージ](docker.md)を準備できます。このイメージは、Kubernetes、Swarm、または必要なクラウドサービスのコンテナインスタンスでアプリケーションを実行するために使用できます。
 
 ## 公開 {id="publishing"}
 
-以下のチュートリアルでは、特定のクラウドプロバイダーにKtorアプリケーションをデプロイする方法を示しています：
+以下のチュートリアルでは、特定のクラウドプロバイダーにKtorアプリケーションをデプロイする方法を示しています。
 * [Google App Engine](google-app-engine.md)
 * [Heroku](heroku.md)
 * [Dokku](dokku.md)
@@ -67,6 +67,6 @@ Ktorでは、アプリケーション内で直接、目的のネットワーク[
 
 ## SSL {id="ssl"}
 
-Ktorサーバーがリバースプロキシ（NginxやApacheなど）の背後に配置されている場合、またはサーブレットコンテナ（TomcatやJetty）内で動作している場合、SSL設定はリバースプロキシまたはサーブレットコンテナによって管理されます。必要に応じて、Java KeyStoreを使用して[SSLを直接提供](server-ssl.md)するようにKtorを構成することもできます。
+Ktorサーバーがリバースプロキシ（NginxやApacheなど）の背後に配置されている場合、またはサーブレットコンテナ（TomcatやJetty）内で実行されている場合、SSL設定はリバースプロキシまたはサーブレットコンテナによって管理されます。必要に応じて、Java KeyStoreを使用して[直接SSLを提供する](server-ssl.md)ようにKtorを設定できます。
 
 > Ktorアプリケーションがサーブレットコンテナ内にデプロイされている場合、SSL設定は有効にならないことに注意してください。

@@ -1,44 +1,73 @@
 ---
-title: Compose Multiplatform - 共有 UI
+title: Compose Multiplatform
 ---
 
-> このチュートリアルでは、メトロポリタン美術館（The Metropolitan Museum of Art）のコレクション API から美術品を表示する Compose Multiplatform アプリケーションについて説明します。共有 UI を備えた Android および iOS プラットフォーム間で、依存関係注入（Dependency Injection）に Koin を使用します。
-> チュートリアルの所要時間は約 **20分** です。
+# Compose Multiplatform
 
-:::note
-更新 - 2024-11-12
-:::
+このチュートリアルでは、メトロポリタン美術館のアート作品を一覧表示し、その詳細を表示する Android および iOS 向けの Compose Multiplatform アプリを作成します。`commonMain` で Koin モジュールを共有する方法、プラットフォーム固有の定義を提供する方法、Composable 内で ViewModel をインジェクト（注入）する方法、そして両方のプラットフォームで Koin を起動する方法を学びます。所要時間は約20分で、Android Studio に加えて iOS 向けに Xcode が必要です。
 
-:::tip
-このチュートリアルの **アノテーション版（annotations version）** をお探しですか？コンパイル時の検証と自動モジュール検出に Koin Annotations を使用する [Compose Multiplatform & Annotations](./compose-multiplatform-annotations.md) を確認してください。
-:::
+このチュートリアルでは Compiler Plugin DSL を使用します。アノテーションを使用した同じアプリについては、[Compose Multiplatform & Annotations](/docs/quickstart/compose-multiplatform-annotations) を参照してください。スタイルの比較については、[Choosing your style](/docs/intro/choosing-your-style) を参照してください。
 
 ## コードの取得 {id="get-the-code"}
 
-:::info
-[ソースコードは GitHub で公開されています](https://github.com/InsertKoinIO/koin-getting-started/tree/main/compose)
-:::
+完全なサンプルは [koin-getting-started/compose](https://github.com/InsertKoinIO/koin-getting-started/tree/main/compose) にあります。リポジトリをクローンし、Android Studio で `compose` フォルダを開いてください。共有コードは `composeApp` Gradle モジュールにあり、iOS アプリは `iosApp` にあります。
 
-## アプリケーションの概要 {id="application-overview"}
+## Gradle のセットアップ {id="gradle-setup"}
 
-このアプリケーションは、リモート API から美術館の美術品オブジェクトを取得し、それらをリストに表示します。ユーザーはアイテムをタップして詳細情報を表示できます。
+このサンプルでは Koin Compiler Plugin を適用し、`commonMain` に `koin-core` と `koin-compose-viewmodel-navigation` を追加しています。バージョンはバージョンカタログで管理されています。
 
-`MuseumAPI -> MuseumStorage -> MuseumRepository -> ViewModels -> Compose UI`
+```toml
+# gradle/libs.versions.toml
+[versions]
+# Kotlin, Compose Multiplatform, Ktor, navigation, Coil のエントリは省略
+koin = "<KOIN_VERSION>"
+koin-plugin = "<KOIN_PLUGIN_VERSION>"
 
-**使用されている技術：**
-- 共有 UI のための Compose Multiplatform (Android & iOS)
-- HTTP ネットワークのための Ktor
-- 依存関係注入のための Koin
-- 非同期処理のための Kotlin Coroutines & Flow
-- ルーティングのための Navigation Compose
+[libraries]
+koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
+koin-compose-viewmodel-navigation = { module = "io.insert-koin:koin-compose-viewmodel-navigation", version.ref = "koin" }
 
-## データレイヤー {id="the-data-layer"}
+[plugins]
+koin-compiler = { id = "io.insert-koin.compiler.plugin", version.ref = "koin-plugin" }
+```
 
-> すべての共通/共有コードは `composeApp` Gradle プロジェクト内にあります。
+```kotlin
+// composeApp/build.gradle.kts
+plugins {
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.compose.multiplatform)
+    alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.koin.compiler)
+    alias(libs.plugins.kotlin.serialization)
+}
 
-### MuseumObject モデル {id="museumobject-model"}
+kotlin {
+    sourceSets {
+        commonMain.dependencies {
+            implementation(libs.koin.core)
+            implementation(libs.koin.compose.viewmodel.navigation)
+            ...
+        }
+    }
+}
+```
 
-美術館の美術品オブジェクトのデータクラスです：
+Compiler Plugin には Kotlin 2.3.20 以降が必要であり、すべてのターゲットで動作します。最新のバージョンについては、[Gradle setup](/docs/setup/gradle) を参照してください。マルチプラットフォームのプロジェクト構成については、[KMP setup](/docs/reference/koin-core/kmp-setup) を参照してください。
+
+## アプリケーションの概要 {id="the-application"}
+
+このアプリは、リモート API からアート作品を取得してメモリ内にキャッシュし、一覧画面と詳細画面に表示します。
+
+```
+MuseumApi -> MuseumStorage -> MuseumRepository -> ListViewModel / DetailViewModel -> Compose UI
+```
+
+HTTP クライアントには Ktor、データストリームには Kotlin Flow、ルーティングには Navigation Compose を使用しています。このチュートリアルのすべてのコードは、見出しで特に指定がない限り `commonMain` に配置されます。
+
+## データレイヤーを作成する {id="let-s-write-the-data-layer"}
+
+`MuseumObject` データクラスは、API レスポンスをマッピングします。
 
 ```kotlin
 @Serializable
@@ -58,9 +87,7 @@ data class MuseumObject(
 )
 ```
 
-### MuseumApi - ネットワークレイヤー {id="museumapi-network-layer"}
-
-メトロポリタン美術館の API からデータを取得するための API インターフェースを作成します：
+`MuseumApi` は Ktor の `HttpClient` を使用して一覧を取得します。
 
 ```kotlin
 interface MuseumApi {
@@ -68,8 +95,9 @@ interface MuseumApi {
 }
 
 class KtorMuseumApi(private val client: HttpClient) : MuseumApi {
-    private companion object {
-        const val API_URL = "https://raw.githubusercontent.com/Kotlin/KMP-App-Template/main/list.json"
+    companion object {
+        private const val API_URL =
+            "https://raw.githubusercontent.com/Kotlin/KMP-App-Template/main/list.json"
     }
 
     override suspend fun getData(): List<MuseumObject> {
@@ -84,9 +112,7 @@ class KtorMuseumApi(private val client: HttpClient) : MuseumApi {
 }
 ```
 
-### MuseumStorage - ローカルキャッシュ {id="museumstorage-local-caching"}
-
-美術館のオブジェクトをローカルにキャッシュするためのストレージインターフェースを作成します：
+`MuseumStorage` は、オブジェクトを `MutableStateFlow` にキャッシュします。
 
 ```kotlin
 interface MuseumStorage {
@@ -112,9 +138,7 @@ class InMemoryMuseumStorage : MuseumStorage {
 }
 ```
 
-### MuseumRepository {id="museumrepository"}
-
-リポジトリは API とストレージの間を調整します：
+`MuseumRepository` は、作成時に API からストレージをリフレッシュします。
 
 ```kotlin
 class MuseumRepository(
@@ -143,22 +167,22 @@ class MuseumRepository(
 }
 ```
 
-## 共有 Koin モジュール {id="the-shared-koin-modules"}
+各クラスはコンストラクタで依存関係を受け取るため、Koin がそれらすべてを連携させることができます。
 
-Koin モジュールを宣言するには `module` 関数を使用します。構造を良くするために、依存関係を個別のモジュールに整理します。
+## データモジュールを宣言する {id="let-s-declare-the-data-module"}
 
-:::info
-このチュートリアルでは、コンパイル時に自動配線（auto-wiring）を提供する **Koin Compiler Plugin DSL** (`single<T>()`, `viewModel<T>()`) を使用します。設定については [Compiler Plugin Setup](/docs/setup/compiler-plugin) を参照してください。
-:::
-
-### データモジュール {id="data-module"}
+モジュールとは、Koin が生成するコンポーネントを宣言する場所です（[Core Concepts](/docs/intro/core-concepts) を参照）。`dataModule` でデータレイヤーを宣言します。
 
 ```kotlin
-val dataModule = module {
-    // Ktor 用の HttpClient
-    single { create(::buildClient) }
+import org.koin.core.module.dsl.createdAtStart
+import org.koin.core.module.dsl.withOptions
+import org.koin.dsl.bind
+import org.koin.dsl.module
+import org.koin.plugin.module.dsl.create
+import org.koin.plugin.module.dsl.single
 
-    // API、ストレージ、およびリポジトリ
+val dataModule = module {
+    single { create(::buildClient) }
     single<KtorMuseumApi>() bind MuseumApi::class
     single<InMemoryMuseumStorage>() bind MuseumStorage::class
     single<MuseumRepository>() withOptions { createdAtStart() }
@@ -174,88 +198,150 @@ private fun buildClient(): HttpClient {
 }
 ```
 
-### ViewModel モジュール {id="viewmodel-module"}
+`create(::buildClient)` を使用すると、自身が所有していないクラス（ここでは `HttpClient`）のビルダー関数を Koin に呼び出させることができます。`createdAtStart()` は、Koin の起動時に `MuseumRepository` を生成するため、データの取得が即座に開始されます。どちらについても [Definitions](/docs/reference/koin-core/definitions) で解説されています。
 
-2つの画面用の ViewModel を作成しましょう：
+## ViewModel を作成する {id="let-s-write-the-viewmodels"}
+
+一覧画面と詳細画面のそれぞれに対応する ViewModel を作成します。
 
 ```kotlin
-// リスト画面の ViewModel
 class ListViewModel(museumRepository: MuseumRepository) : ViewModel() {
     val objects: StateFlow<List<MuseumObject>> =
         museumRepository.getObjects()
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 }
 
-// 詳細画面の ViewModel
 class DetailViewModel(private val museumRepository: MuseumRepository) : ViewModel() {
-    fun getObject(objectId: Int): StateFlow<MuseumObject?> {
-        return museumRepository.getObjectById(objectId)
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
-    }
+    fun getObject(objectId: Int): Flow<MuseumObject?> =
+        museumRepository.getObjectById(objectId)
 }
 ```
 
-これらを ViewModel モジュールで宣言します：
+これらを `viewModelModule` で宣言します。
 
 ```kotlin
+import org.koin.plugin.module.dsl.viewModel
+
 val viewModelModule = module {
     viewModel<ListViewModel>()
     viewModel<DetailViewModel>()
 }
 ```
 
-### プラットフォーム固有のモジュール {id="platform-specific-module"}
+Koin はマルチプラットフォームの ViewModel API を通じて各 ViewModel を生成するため、同じ宣言が Android と iOS の両方で機能します。詳細は [ViewModel](/docs/reference/koin-core/viewmodel) を参照してください。
 
-プラットフォーム固有のコンポーネント（Android 対 iOS）用です：
+## プラットフォーム固有の定義を追加する {id="let-s-add-platform-specific-definitions"}
+
+このサンプルでは、プラットフォームごとに異なる実装を提供するための2つの方法を示しています。1つ目は、共有モジュール内で一度宣言される `expect` クラスです。
 
 ```kotlin
+// commonMain
+expect class NativeComponent() {
+    fun getInfo(): String
+}
+
 val nativeComponentModule = module {
     single<NativeComponent>()
 }
 ```
 
-### メインアプリモジュール {id="main-app-module"}
-
-すべてのモジュールを結合します：
-
 ```kotlin
-val appModule = module {
-    includes(dataModule, viewModelModule, nativeComponentModule)
+// androidMain
+actual class NativeComponent actual constructor() {
+    actual fun getInfo(): String = "Android OS"
 }
 ```
 
-:::note
-Koin モジュールは整理されており、`initKoin()` 関数を使用して Android と iOS の両方から初期化できます。
-:::
+```kotlin
+// nativeMain
+actual class NativeComponent actual constructor() {
+    actual fun getInfo(): String = "iOS"
+}
+```
 
-## ネイティブコンポーネント {id="native-component"}
-
-プラットフォーム固有の情報（Android 対 iOS）については、expect/actual パターンを使用します：
+2つ目は、`expect` モジュール関数です。各プラットフォームが独自のモジュールを返し、共有インターフェースの実装をバインドします。
 
 ```kotlin
 // commonMain
-interface NativeComponent {
+interface PlatformComponent {
     fun getInfo(): String
 }
 
+expect fun platformModule(): Module
+```
+
+```kotlin
 // androidMain
-class NativeComponent {
-    fun getInfo(): String = "Android ${android.os.Build.VERSION.SDK_INT}"
+class AndroidComponent() : PlatformComponent {
+    override fun getInfo(): String = "Android OS"
 }
 
-// iosMain
-class NativeComponent {
-    fun getInfo(): String = "iOS ${UIDevice.currentDevice.systemVersion}"
+actual fun platformModule(): Module = module {
+    single<AndroidComponent>() bind PlatformComponent::class
 }
 ```
 
-## Compose での ViewModel の注入 {id="injecting-viewmodels-in-compose"}
+```kotlin
+// iosMain
+class IOSComponent() : PlatformComponent {
+    override fun getInfo(): String = "iOS OS"
+}
 
-> すべての共通 Compose アプリは `composeApp` Gradle モジュールの `commonMain` に配置されています。
+actual fun platformModule(): Module = module {
+    single<IOSComponent>() bind PlatformComponent::class
+}
+```
 
-ViewModel は Compose で `koinViewModel()` を使用して注入されます：
+共有コードは `NativeComponent` または `PlatformComponent` を要求し、各プラットフォームで適切な実装を取得します。これらのパターンは [KMP shared modules](/docs/reference/koin-core/kmp-shared-modules) で解説されています。
+
+## モジュールをまとめる {id="let-s-assemble-the-modules"}
+
+`includes()` を使用して、すべてのモジュールを `appModule` に集約します。
 
 ```kotlin
+val appModule = module {
+    includes(dataModule, viewModelModule, nativeComponentModule, platformModule())
+}
+```
+
+これで、起動時に単一のモジュールをロードするだけで、他のすべてのモジュールも取り込まれるようになります。[Modules](/docs/reference/koin-core/modules) を参照してください。
+
+## Compose で ViewModel をインジェクトする {id="let-s-inject-the-viewmodels-in-compose"}
+
+各画面は、デフォルト引数として `koinViewModel()` を使用して ViewModel を取得します。
+
+```kotlin
+import org.koin.compose.viewmodel.koinViewModel
+
+@Composable
+fun ListScreen(
+    viewModel: ListViewModel = koinViewModel(),
+    navigateToDetails: (objectId: Int) -> Unit
+) {
+    val objects by viewModel.objects.collectAsStateWithLifecycle()
+    ...
+}
+
+@Composable
+fun DetailScreen(
+    objectId: Int,
+    viewModel: DetailViewModel = koinViewModel(),
+    navigateBack: () -> Unit,
+) {
+    val obj by viewModel.getObject(objectId).collectAsStateWithLifecycle(initialValue = null)
+    ...
+}
+```
+
+`App` Composable は、2つの画面間のナビゲーションを設定します。
+
+```kotlin
+@Serializable
+object ListDestination
+
+@Serializable
+data class DetailDestination(val objectId: Int)
+
 @Composable
 fun App() {
     MaterialTheme(
@@ -265,16 +351,13 @@ fun App() {
             val navController: NavHostController = rememberNavController()
             NavHost(navController = navController, startDestination = ListDestination) {
                 composable<ListDestination> {
-                    val vm = koinViewModel<ListViewModel>()
-                    ListScreen(viewModel = vm, navigateToDetails = { objectId ->
+                    ListScreen(navigateToDetails = { objectId ->
                         navController.navigate(DetailDestination(objectId))
                     })
                 }
                 composable<DetailDestination> { backStackEntry ->
-                    val vm = koinViewModel<DetailViewModel>()
                     DetailScreen(
                         objectId = backStackEntry.toRoute<DetailDestination>().objectId,
-                        viewModel = vm,
                         navigateBack = { navController.popBackStack() }
                     )
                 }
@@ -284,42 +367,44 @@ fun App() {
 }
 ```
 
-:::info
-`koinViewModel()` 関数は ViewModel インスタンスを取得し、それを Compose のライフサイクルにバインドします。
-:::
+`NavHost` のデスティネーション内部では、`koinViewModel()` が ViewModel をそのナビゲーションエントリに紐付けるため、画面ごとに独自のインスタンスが保持されます。[Compose ViewModel](/docs/reference/koin-compose/compose-viewmodel) を参照してください。
 
-## Koin の開始 {id="starting-koin"}
+## Koin を起動する {id="let-s-start-koin"}
 
-`initKoin()` 関数を使用して Koin を初期化します：
+両方のプラットフォームから呼び出す共有の `initKoin()` 関数を作成します。この関数は、プラットフォーム固有のセットアップを行うための任意の構成を受け取ります。
 
 ```kotlin
+import org.koin.core.context.startKoin
+import org.koin.dsl.KoinAppDeclaration
+import org.koin.dsl.includes
+
 fun initKoin(configuration: KoinAppDeclaration? = null) {
     startKoin {
         includes(configuration)
         modules(appModule)
+        printLogger(Level.DEBUG)
     }
-
-    val platformInfo = KoinPlatform.getKoin().get<NativeComponent>().getInfo()
-    println("Running on: $platformInfo")
 }
 ```
 
-### Android での設定 {id="android-setup"}
-
-Android では、メインの Activity または Application クラスから Koin を初期化します：
+Android では、`Application` クラスから呼び出し、Android のコンテキストを渡します。
 
 ```kotlin
-// Android のエントリポイントから呼び出す
-initKoin()
+// androidMain
+class MuseumApp : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        initKoin {
+            androidContext(this@MuseumApp)
+        }
+    }
+}
 ```
 
-### iOS での設定 {id="ios-setup"}
-
-> すべての iOS アプリは `iosApp` フォルダにあります。
-
-iOS では、SwiftUI アプリのエントリポイントから Koin を初期化します：
+iOS では、SwiftUI アプリのエントリポイントから呼び出します。Kotlin は `initKoin()` を `doInitKoin()` としてエクスポートします。
 
 ```swift
+// iosApp
 @main
 struct iOSApp: App {
     init() {
@@ -334,8 +419,19 @@ struct iOSApp: App {
 }
 ```
 
-Compose UI は以下で開始されます：
+iOS のビューコントローラは、同じ `App` Composable をホストします。
 
 ```kotlin
+// iosMain
 fun MainViewController() = ComposeUIViewController { App() }
 ```
+
+Android Studio から Android アプリを実行するか、Xcode から iOS アプリを実行すると、アート作品の一覧が表示されます。その他の起動オプションについては、[Starting Koin](/docs/reference/koin-core/starting-koin) を参照してください。
+
+## 次のステップ {id="next-steps"}
+
+- [Core Concepts](/docs/intro/core-concepts): モジュール、定義、インジェクションの背景にあるメンタルモデル。
+- [KMP setup](/docs/reference/koin-core/kmp-setup): Kotlin Multiplatform 向けのプロジェクト構成と Koin の依存関係。
+- [Koin for Compose](/docs/reference/koin-compose/compose): `KoinApplication`、`koinInject()`、Compose のセットアップ。
+- [Compose testing](/docs/reference/koin-compose/compose-testing): Koin を使用する Composable のテスト。
+- [Tooling](/docs/tooling): Koin 向けの IDE プラグインとモニタリングツール。

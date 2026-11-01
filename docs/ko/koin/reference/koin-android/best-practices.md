@@ -2,255 +2,129 @@
 title: Android 모범 사례
 ---
 
-이 가이드는 메모리 관리, 보안 및 Hilt로부터의 마이그레이션을 위한 Android 전용 모범 사례를 다룹니다.
+# Android 모범 사례
 
-:::info
-일반적인 모듈 개념은 **[모듈](/docs/reference/koin-core/modules)**을 참고하세요. 스코핑에 대해서는 **[스코프](/docs/reference/koin-core/scopes)** 및 **[Android 스코프](/docs/reference/koin-android/scope)**를 참고하세요.
-:::
+이 페이지에서는 Koin 사용 시 누수, 크래시 또는 시크릿(secret) 노출을 유발하는 Android 관련 실수와 이를 방지하는 방법을 설명합니다. 이 문서는 [Android Scopes](/docs/reference/koin-android/scope) 및 [Starting Koin on Android](/docs/reference/koin-android/start)를 이미 숙지하고 있다고 가정합니다. 일반적인 모듈 구성 방법은 [Modules](/docs/reference/koin-core/modules)에서, 오류 메시지에 대한 설명은 [Troubleshooting](/docs/reference/koin-core/troubleshooting)에서 확인할 수 있습니다.
 
-## 메모리 관리 {id="memory-management"}
+## 메모리 및 Context 누수 {id="memory-and-context-leaks"}
 
-### Activity/Fragment 누수 방지 {id="avoid-activity-fragment-leaks"}
+더 긴 수명주기를 가진 대상이 어떤 인스턴스에 대한 참조를 유지할 때 해당 인스턴스의 누수가 발생합니다. Android에서 흔히 발생하는 대상은 Activity입니다. `single`은 프로세스가 유지되는 동안 계속 살아있지만, Activity는 다음 화면 회전까지만 유지됩니다.
+
+### single에 전달된 Activity {id="activity-passed-into-a-single"}
 
 ```kotlin
-// ❌ 나쁨 - Activity 누수
-module {
-    single { SomeService(get<Activity>()) }  // 싱글톤에 Activity 참조가 포함됨!
+// 누수 발생: single이 첫 번째 Activity를 영구적으로 유지함
+class UserActivity : AppCompatActivity() {
+    private val tracker: ScreenTracker by inject { parametersOf(this) }
 }
 
-// ✅ 좋음 - 애플리케이션 컨텍스트 사용
-module {
-    single { SomeService(androidContext()) }  // 애플리케이션 컨텍스트, 안전함
-}
-
-// ✅ 좋음 - activity 스코프 사용
-module {
-    activityScope {
-        scoped { SomeService(/* activity 스코프 의존성 */) }
-    }
+val appModule = module {
+    single { params -> ScreenTracker(params.get<Activity>()) }
 }
 ```
 
-### 스코프를 올바르게 닫기 {id="close-scopes-properly"}
+`single`은 첫 번째 호출 시의 파라미터를 사용하여 단 한 번만 생성됩니다. 이후의 호출에서는 여전히 첫 번째 Activity를 참조하고 있는 동일한 인스턴스를 반환받게 됩니다. 대신 다음 방법 중 하나를 사용하세요:
+
+- Application context: 클래스에 리소스나 시스템 서비스만 필요한 경우, `Context`를 사용하는 `single`로 선언합니다. `single` 내부에서 `Context`는 `Application`입니다.
+- Activity scope: 클래스에 Activity가 필요한 경우, `activityScope { }` 또는 `@ActivityScope`로 선언합니다. 이는 Activity별로 생성되며 Activity와 함께 해제됩니다.
+- Factory with parameters: 호출자가 Activity를 전달하는 경우 `factory`를 사용하고, Activity 수명주기를 넘어서 결과를 유지하지 않도록 합니다.
+
+Compiler Plugin은 `Context`, `Activity`, `Application`, `Fragment`, `SavedStateHandle`을 플랫폼에서 제공하는 타입으로 처리하므로 누락된 것으로 보고하지 않습니다. 또한 주어진 정의에서 `Activity` 파라미터가 안전한지 여부를 판단할 수 없으므로, 코드 리뷰에서 이를 직접 확인해야 합니다.
+
+### 싱글톤이 보유한 리스너 {id="listeners-held-by-singletons"}
 
 ```kotlin
-// ✅ 좋음 - 자동 스코프 관리
-class MyActivity : ScopeActivity() {
-    override val scope: Scope by activityScope()
-    // onDestroy에서 스코프가 자동으로 닫힘
-}
-
-// ❌ 나쁨 - 정리 작업 없는 수동 스코프
-class MyActivity : AppCompatActivity() {
-    private val myScope = createScope<MyActivity>()
-    // 스코프가 닫히지 않음 - 메모리 누수 발생!
-}
-
-// ✅ 좋음 - 정리 작업을 포함한 수동 스코프
-class MyActivity : AppCompatActivity() {
-    private lateinit var myScope: Scope
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        myScope = createScope<MyActivity>()
-    }
-
-    override fun onDestroy() {
-        myScope.close()
-        super.onDestroy()
-    }
-}
-```
-
-### 수명이 긴 객체의 참조 해제하기 {id="clear-references-in-long-lived-objects"}
-
-```kotlin
-// ❌ 나쁨 - UI에 대한 참조 유지
 class UserRepository {
-    private val listeners = mutableListOf<UserUpdateListener>()  // Activity 참조를 보유할 수 있음
+    private val listeners = mutableListOf<UserListener>()
 
-    fun addListener(listener: UserUpdateListener) {
-        listeners.add(listener)
-    }
-}
-
-// ✅ 좋음 - 약한 참조(Weak references) 또는 수동 정리
-class UserRepository {
-    private val listeners = mutableListOf<WeakReference<UserUpdateListener>>()
-
-    fun addListener(listener: UserUpdateListener) {
-        listeners.add(WeakReference(listener))
-    }
-
-    fun removeListener(listener: UserUpdateListener) {
-        listeners.removeAll { it.get() == listener || it.get() == null }
-    }
+    fun addListener(listener: UserListener) { listeners += listener }
+    fun removeListener(listener: UserListener) { listeners -= listener }
 }
 ```
 
-## Android 디버깅 {id="android-debugging"}
+Repository는 `single`입니다. Activity나 Fragment가 자신을 리스너로 등록하고 이를 제거하지 않으면, Repository가 화면 인스턴스를 계속 메모리에 유지하게 됩니다. 대응하는 수명주기 콜백(`onStart()`에 대해 `onStop()`, `onViewCreated()`에 대해 `onDestroyView()`)에서 리스너를 제거하거나, `Flow`를 노출하고 수집(collection)을 자동으로 취소해 주는 `repeatOnLifecycle`로 수집하세요.
 
-### Android 로거(Logger) 활성화 {id="enable-android-logger"}
+### 소유자보다 오래 유지되는 스코프 인스턴스 {id="scoped-instances-that-outlive-their-owner"}
+
+- Retained scope: `activityRetainedScope`는 화면 회전 시에도 유지됩니다. 이 스코프의 인스턴스는 Activity, View 또는 Fragment를 참조해서는 안 됩니다.
+- Fragment scope: 이는 `onDestroyView()` 이후인 `onDestroy()` 시점에 닫힙니다. Fragment 스코프의 인스턴스에 View나 바인딩을 유지하지 마세요.
+- ViewModel: Activity 스코프나 Fragment 스코프의 인스턴스를 ViewModel에 절대 주입하지 마세요. ViewModel은 화면 회전 시에도 유지되지만, Activity 스코프는 유지되지 않습니다.
+
+이러한 규칙은 [Android Scopes](/docs/reference/koin-android/scope)에서 자세히 설명합니다.
+
+### 직접 생성하는 스코프 {id="scopes-you-create-yourself"}
+
+`activityScope()`, `fragmentScope()`, `ScopeActivity`, `ScopeFragment`, `ScopeService`는 수명주기에 맞춰 스코프를 닫습니다. `getKoin().createScope()`로 생성한 스코프에는 수명주기가 없으므로, 직접 닫아주지 않으면 스코프 내부의 모든 인스턴스가 메모리에 계속 남게 됩니다.
+
+```kotlin
+// 로그인 시
+val sessionScope = getKoin().createScope<UserSession>(userId)
+
+// 로그아웃 시
+sessionScope.close()
+```
+
+## Android에서 디버깅하기 {id="debugging-on-android"}
+
+문제를 조사하는 동안에는 디버그 레벨로 Logcat 로거를 활성화하세요:
 
 ```kotlin
 startKoin {
-    androidLogger(Level.DEBUG)  // 모든 Koin 동작 확인
-    androidContext(this@MyApplication)
-    modules(appModules)
+    androidLogger(Level.DEBUG)
+    androidContext(this@MainApplication)
+    modules(appModule)
 }
 ```
 
-### 디버그 빌드에서 모듈 검증 {id="verify-modules-in-debug-builds"}
+Logcat에서 `[Koin]` 태그로 필터링합니다. 디버그 레벨에서 Koin은 각 모듈 로드, 각 의존성 해결(resolution) 및 소요 시간, 열리거나 닫히는 각 스코프를 기록합니다. 릴리스 빌드에서는 `Level.ERROR` 또는 `Level.NONE`을 사용하세요.
 
-```kotlin
-class MyApplication : Application() {
-    override fun onCreate() {
-        super.onCreate()
+Android에서만 발생하는 오류:
 
-        startKoin {
-            androidContext(this@MyApplication)
-            modules(allModules)
-        }
+| 오류 | 일반적인 원인 |
+|-------|-------------|
+| `MissingAndroidContextException` | `startKoin`에 `androidContext()`가 누락됨 |
+| `KoinApplication has not been started` | 매니페스트에 `Application` 클래스가 선언되지 않았거나, ContentProvider의 `onCreate()`에서 주입을 수행함 ([Android Entry Points](/docs/reference/koin-android/entry-points#contentprovider) 참조) |
+| 스코프 타입에 대한 `NoDefinitionFoundException` | Activity 또는 Fragment에 스코프가 없음 (`ScopeActivity`, `AndroidScopeComponent`) |
+| `ClosedScopeException` | 스코프가 이미 닫힌 `onDestroy()` 도중 또는 이후에 코드에서 스코프 인스턴스를 해결하려고 시도함. 해당 정리는 `onCloseScope()`에서 수행해야 함 |
+| Worker가 "Could not instantiate" 오류로 실패함 | 기본 WorkManager 초기화 도구(initializer)가 매니페스트에 여전히 남아 있음 ([WorkManager](/docs/reference/koin-android/workmanager) 참조) |
 
-        // 컴파일 타임 검증을 위해 Koin 컴파일러 플러그인을 사용하거나
-        // 단위 테스트에서 verify()를 사용하세요: appModule.verify()
-    }
-}
-```
+Compiler Plugin을 사용하면 누락된 정의가 빌드 시점에 대신 보고됩니다 ([Compile-Time Safety](/docs/reference/koin-compiler/compile-safety) 참조).
 
-### 디버깅을 위한 스코프 콜백 {id="scope-callbacks-for-debugging"}
-
-```kotlin
-class DebugActivity : ScopeActivity() {
-    override val scope: Scope by activityScope()
-
-    init {
-        scope.registerCallback(object : ScopeCallback {
-            override fun onScopeClose(scope: Scope) {
-                Log.d("Koin", "Scope ${scope.id} closing")
-            }
-        })
-    }
-}
-```
-
-## 보안 모범 사례 {id="security-best-practices"}
-
-### 모듈에 비밀 정보를 저장하지 마세요 {id="don-t-store-secrets-in-modules"}
-
-```kotlin
-// ❌ 나쁨 - 하드코딩된 비밀 정보
-module {
-    single {
-        Retrofit.Builder()
-            .addInterceptor { chain ->
-                chain.proceed(
-                    chain.request().newBuilder()
-                        .header("API-Key", "super-secret-key")  // 안 됩니다!
-                        .build()
-                )
-            }
-            .build()
-    }
-}
-
-// ✅ 좋음 - 안전한 저장소의 비밀 정보
-module {
-    single {
-        val securePrefs = get<SecurePreferences>()
-        Retrofit.Builder()
-            .addInterceptor(AuthInterceptor(securePrefs))
-            .build()
-    }
-}
-```
-
-## Dagger/Hilt로부터의 마이그레이션 {id="migration-from-dagger-hilt"}
-
-:::info
-Koin은 `jakarta.inject`의 JSR-330 어노테이션(`@Singleton`, `@Inject`, `@Named`)을 지원합니다. 익숙한 어노테이션을 계속 사용할 수 있습니다. [JSR-330 호환성](/docs/reference/koin-android/jsr330)을 참고하세요.
+:::tip
+실제 사용자 세션에서의 해결 시간, 스코프 수명 및 Koin 오류를 확인하려면 [Production Monitoring](/docs/tooling/production-monitoring)을 참조하세요.
 :::
 
-### 어노테이션 매핑 {id="annotation-mapping"}
+## 시크릿 (Secrets) {id="secrets"}
 
-| Hilt | Koin 어노테이션 |
-|------|------------------|
-| `@Singleton` | `@Singleton` (JSR-330 호환) |
-| `@Provides` | `@Factory` |
-| `@Binds` | `@Singleton ... bind Interface::class` |
-| `@Inject` | `@Inject` (JSR-330 호환) |
-| `@HiltViewModel` | `@KoinViewModel` |
-| `@InstallIn(SingletonComponent)` | `@Module` + `@ComponentScan` |
-| `@InstallIn(ActivityComponent)` | `@Scope(ActivityScope::class)` |
+APK는 압축을 풀 수 있습니다. 컴파일되어 포함된 내용이나 `assets/`에 저장된 모든 내용은 읽힐 수 있습니다:
 
-### 마이그레이션 예시 {id="example-migration"}
+- 하드코딩된 키: 모듈에 API 키를 문자열 리터럴로 직접 작성하지 마세요.
+- Koin 프로퍼티: `androidFileProperties()`는 APK 내부에 포함되어 배포되는 `assets/koin.properties`를 읽습니다. 이는 설정 용도로만 사용해야 하며, 절대 시크릿 용도로 사용해서는 안 됩니다.
+- `BuildConfig` 필드: 이 또한 APK 내부로 컴파일됩니다. 버전 관리 시스템(Git 등)으로부터 값을 숨길 수는 있지만, APK로부터 숨길 수는 없습니다.
+
+런타임에 백엔드로부터 시크릿을 가져오거나 암호화된 스토리지에 토큰을 보관하고, 값 자체 대신 스토리지를 주입하세요:
 
 ```kotlin
-// 변경 전 (Hilt)
-@HiltViewModel
-class HomeViewModel @Inject constructor(
-    private val repository: UserRepository
-) : ViewModel()
-
-@Singleton
-class UserRepositoryImpl @Inject constructor(
-    private val api: ApiService
-) : UserRepository
-
-// 변경 후 (Koin) - 최소한의 변경!
-@KoinViewModel
-class HomeViewModel(
-    private val repository: UserRepository
-) : ViewModel()
-
-@Singleton  // JSR-330 계속 사용 가능
-class UserRepositoryImpl(
-    private val api: ApiService
-) : UserRepository
-```
-
-### 모듈 마이그레이션 {id="module-migration"}
-
-```kotlin
-// 변경 전 (Hilt)
-@InstallIn(SingletonComponent::class)
-@Module
-object NetworkModule {
-    @Provides
-    @Singleton
-    fun provideRetrofit(): Retrofit = Retrofit.Builder().build()
-}
-
-// 변경 후 (Koin 어노테이션)
-@Module
-class NetworkModule {
-    @Singleton
-    fun provideRetrofit(): Retrofit = Retrofit.Builder().build()
+class AuthInterceptor(private val tokens: TokenStore) : Interceptor {
+    override fun intercept(chain: Interceptor.Chain): Response =
+        chain.proceed(
+            chain.request().newBuilder()
+                .header("Authorization", "Bearer ${tokens.currentToken()}")
+                .build()
+        )
 }
 ```
 
-### 단계적 마이그레이션 {id="gradual-migration"}
+`TokenStore`는 암호화된 스토리지를 기반으로 하는 `single`이며, `AuthInterceptor`는 `OkHttpClient` 정의에 추가됩니다 ([Android Library Integration](/docs/reference/koin-android/binding-patterns) 참조).
 
-```kotlin
-// 1단계: 새로운 기능을 위해 Hilt와 함께 Koin 추가
-@KoinViewModel
-class NewFeatureViewModel(
-    private val repository: NewFeatureRepository
-) : ViewModel()
+## Hilt 또는 Dagger에서 마이그레이션하기 {id="migrating-from-hilt-or-dagger"}
 
-@Singleton
-class NewFeatureRepository(private val api: ApiService)
+애노테이션 매핑, 모듈 마이그레이션 및 점진적 마이그레이션은 [Migrating from Hilt](/docs/reference/koin-android/hilt-migration)에서 다룹니다. `@Inject` 및 `jakarta.inject` 애노테이션을 유지하려면 [JSR-330 Annotations](/docs/reference/koin-android/jsr330)를 참조하세요.
 
-// 2단계: 기존 기능을 하나씩 마이그레이션
-@Singleton
-class MigratedRepository(private val api: ApiService) : UserRepository
+## 관련 문서 {id="related"}
 
-// 3단계: 마이그레이션이 완료되면 Hilt 제거
-```
-
-## 함께 보기 {id="see-also"}
-
-- **[스코프](/docs/reference/koin-core/scopes)** - 핵심 스코핑 개념
-- **[Android 스코프](/docs/reference/koin-android/scope)** - Android 수명 주기 스코프
-- **[테스트](/docs/reference/koin-android/instrumented-testing)** - Android 테스트 가이드
-- **[멀티 모듈 앱](/docs/reference/koin-android/multi-module)** - Android 모듈 구성하기
+- [Android Scopes](/docs/reference/koin-android/scope): Activity, Fragment, retained 및 ViewModel 스코프의 수명주기.
+- [Starting Koin on Android](/docs/reference/koin-android/start): `androidContext()`, 로깅 및 프로퍼티.
+- [Troubleshooting](/docs/reference/koin-core/troubleshooting): 의존성 해결 오류 및 순환 참조(circular dependencies).
+- [Lazy Modules](/docs/reference/koin-core/lazy-modules): 앱 시작 시 Koin 작업 줄이기.
+- [Migrating from Hilt](/docs/reference/koin-android/hilt-migration): 기존 Hilt 앱을 Koin으로 전환하기.

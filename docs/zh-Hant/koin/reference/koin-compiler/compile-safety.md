@@ -2,116 +2,107 @@
 title: 編譯期安全性
 ---
 
-Koin 外掛程式會在編譯期驗證您的相依性圖表 — 在應用程式執行前攔截缺失的相依性、限定符不比對以及損毀的呼叫點。
+# 編譯期安全性
 
-這取代了 `verify()` 和 `checkModules()` 等執行時驗證工具。只要能通過編譯，就能正常運作。
+Koin Compiler Plugin 會在編譯程式碼時檢查您的相依關係圖。遺漏的定義、錯誤的限定詞或循環相依都會導致組建失敗，並精確指出檔案與行數，而不是在執行時期發生當機。本頁面涵蓋檢查項目、確切的診斷資訊，以及外掛程式無法檢查的情況。本文假設外掛程式已安裝完成（請參閱 [Compiler Plugin Setup](/docs/setup/compiler-plugin)）。
 
-## 運作原理 {id="how-it-works"}
+編譯期安全性預設為啟用（`compileSafety = true`，請參閱 [Compiler Plugin Options](/docs/reference/koin-annotations/options)）。
 
-外掛程式在編譯期間會從三個層級驗證您的圖表：
+## 檢查執行的位置 {id="where-the-checks-run"}
 
-### A2 — 每個模組（早期回饋） {id="a2-per-module-early-feedback"}
+外掛程式會在兩個層級進行檢查：
 
-每個模組的定義都會針對可見的定義進行檢查：其自身的定義、明確包含的模組，以及 `@Configuration` 同級模組。
+**完整圖（Full graph）**：在每個 Koin 入口點，外掛程式會從您的原始碼和相依 JAR 中組裝該入口點載入的每個模組，並根據該完整圖檢查每個定義。
 
-```kotlin
-@Module(includes = [DataModule::class])
-@ComponentScan("app")
-class AppModule
-// 驗證：來自 AppModule + DataModule 的定義
-```
+**呼叫點（Call sites）**：每個 `get<T>()`、`inject<T>()`、`koinInject<T>()`、`koinViewModel<T>()`、`by viewModel()` 以及類似的呼叫都會受到檢查：`T` 必須存在於組裝完成的圖中。如果功能模組發出該呼叫但無法看到完整圖，外掛程式會在編譯後的模組中留下提示。app 模組會在編譯時從其相依項讀取這些提示並進行檢查。
 
-共享同一個 `@Configuration` 標籤的模組是相互可見的：
+可識別的入口點：
 
-```kotlin
-@Module @ComponentScan("core") @Configuration("prod")
-class CoreModule  // 提供 Repository
+| 入口點 | 範例 |
+|-------------|---------|
+| `startKoin` | `startKoin<MyApp>()`, `startKoin { modules(appModule) }` |
+| `koinApplication` | `koinApplication { modules(appModule) }` |
+| `koinConfiguration` | `koinConfiguration<MyApp>()` |
+| `@KoinApplication` | `@KoinApplication object MyApp` |
+| `withConfiguration<T>()` | `startKoin { withConfiguration<MyApp>() }` |
+| Ktor `install(Koin)` | `install(Koin) { modules(appModule) }` |
 
-@Module @ComponentScan("service") @Configuration("prod")
-class ServiceModule  // Service(repo: Repository) → OK，從 CoreModule 可見
-```
-
-不同的標籤則是隔離的：
+`modules(...)` 接受外掛程式可追蹤的清單：`listOf(...)`、`+`、`.toList()`、頂層 `val`，或是傳回 `List<Module>` 的函式：
 
 ```kotlin
-@Configuration("core")
-class CoreModule
+val dataModules = listOf(databaseModule, networkModule)
+fun featureModules(): List<Module> = listOf(loginModule, profileModule)
 
-@Configuration("service")  // 標籤不同 — CoreModule 不可見
-class ServiceModule         // Service(repo: Repository) → 錯誤
-```
-
-**A2 攔截的內容：**
-
-- 缺失的相依性
-- 限定符不比對（請求 `@Named("prod")` 但僅提供 `@Named("test")`）
-- 跨作用域違規
-- `Lazy<T>` 但未提供 `T`
-- 未標記為 `@Provided` 的外部相依性
-
-### A3 — 完整圖表（完整保證） {id="a3-full-graph-complete-guarantee"}
-
-在 `startKoin<T>()` 處，來自所有來源的所有模組都會被組合，並驗證完整的圖表。A2 無法看到的內容 — 跨模組相依性、來自 JAR 的定義 — 都會在此處進行檢查。
-
-```kotlin
-@KoinApplication(modules = [CoreModule::class, ServiceModule::class])
-object MyApp
-
-startKoin<MyApp> { }
-// 驗證：結合 CoreModule + ServiceModule 的「所有」定義
-```
-
-當 DSL 定義（`single<T>()`、`factory<T>()` 等）是圖表的一部分時，A3 也會對其進行驗證。
-
-### A4 — 呼叫點驗證 {id="a4-call-site-validation"}
-
-程式碼庫中的每個 `koinViewModel<T>()`、`get<T>()`、`inject<T>()` 呼叫都會被攔截。外掛程式會擷取目標型別、檔案、行號和欄位 — 然後檢查 `T` 是否存在於組合後的圖表中。
-
-```kotlin
-@Composable
-fun UserScreen() {
-    val viewModel: UserViewModel = koinViewModel()  // ← A4 驗證此處
-}
-
-class MyFragment : Fragment() {
-    val service: PaymentService by inject()  // ← A4 驗證此處
+startKoin {
+    modules(dataModules + featureModules())
 }
 ```
 
-如果 `UserViewModel` 不在圖表中 → 拋出包含精確檔案、行號和欄位的組建錯誤。
+宣告為函式的模組（`fun dataModule(): Module = module { ... }`）會像頂層 `val` 一樣被追蹤。
 
-**跨模組呼叫點：** 如果功能模組呼叫了 `koinViewModel<T>()` 但不具備完整圖表的可見性，外掛程式會產生呼叫點提示。當應用程式模組編譯時，它會從相依性 JAR 中發現這些提示，並根據完整圖表對其進行驗證。
+:::note
+本身沒有入口點的 Gradle 模組（程式庫、大多數功能模組）在自身的編譯過程中不會獲得相依項遺漏的診斷資訊。單獨檢查的模組無法知道 app 將如何裝配它。其定義會在 app 模組組裝圖時進行檢查。外掛程式會在組建輸出中說明這一點：
 
-## 驗證內容 {id="what-gets-validated"}
+```
+[Koin] compile-safety validation skipped — no Koin entry point in this compilation.
+```
+:::
 
-| 場景 | 結果 |
-|----------|--------|
-| 非可 null 參數，無定義 | **錯誤** |
-| 可 null 參數 (`T?`)，無定義 | OK — 使用 `getOrNull()` |
-| 具有預設值的參數，無定義 | OK — 使用 Kotlin 預設值（當 `skipDefaultValues=true` 時） |
-| `@InjectedParam`，無定義 | OK — 執行時透過 `parametersOf()` 提供 |
-| `@Property("key")` 參數 | OK — 屬性注入（若無 `@PropertyValue` 預設值則會發出警告） |
-| `List<T>` 參數 | OK — 若無則 `getAll()` 回傳空清單 |
-| `Lazy<T>`，無 `T` 的定義 | **錯誤** — 解開包裝以驗證內部型別 |
-| `@Named("x")` 參數，無匹配的限定符 | **錯誤** — 若存在無限定符的繫結則提供提示 |
-| 來自錯誤作用域的限定範圍相依性 | **錯誤** |
-| 帶有 `@Named` 限定符的預設值參數 | **錯誤** — 限定符會強制進行注入 |
-| `@Provided` 型別或參數，無定義 | OK — 執行時由外部提供 |
-| `@ScopeId(name = "x")` 參數 | OK — 執行時從具名作用域解析 |
-| `Scope` 型別參數 | OK — 直接傳遞作用域接收者 |
-| Android 架構型別（例如 `Context`） | OK — 硬編碼白名單 |
-| 循環相依 (A → B → A) | **錯誤** — 在 A2/A3 圖表遍歷期間偵測到 |
+## 檢查項目 {id="what-is-checked"}
 
-## 使用註解確保安全性 {id="safety-with-annotations"}
+| 情況 | 結果 |
+|------|--------|
+| 不可為 null 的參數，無定義 | Error |
+| 可為 null 的參數（`T?`），無定義 | OK，使用 `getOrNull()` 解析 |
+| 具有預設值的參數，無定義 | OK，使用 Kotlin 預設值（在 `skipDefaultValues = true` 時） |
+| 具有預設值與限定詞（`@Named`）的參數 | Error，限定詞會強制進行解析 |
+| `@InjectedParam` 參數 | OK，在執行時期透過 `parametersOf()` 傳入 |
+| `@Property("key")` 參數 | OK。如果不存在 `@PropertyValue("key")` 預設值則發出 Warning |
+| `List<T>` 參數 | OK，若無相符項目則 `getAll()` 傳回空清單 |
+| `Lazy<T>`，無 `T` 的定義 | Error，內部型別會被檢查 |
+| `@Named("x")` 參數，無帶有該限定詞的定義 | Error，若該型別存在其他限定詞則附帶提示 |
+| 宣告在另一個作用域中的作用域相依項 | Error |
+| 循環相依（A 需要 B，B 需要 A） | Error |
+| `@Provided` 型別或參數 | OK，在圖之外提供 |
+| `@ScopeId` 參數 | OK，在執行時期從具名作用域解析 |
+| `Scope` 參數 | OK，傳入目前作用域 |
+| Android 架構型別（`Context`、`SavedStateHandle` 等） | OK，內建清單 |
+| `get<T>()` / `inject<T>()` 且無 `T` 的定義 | Error |
+| 當 `T` 擁有 `@InjectedParam` 時呼叫 `get<T>()` 卻未附帶 `parametersOf()` | Error |
+| `parametersOf(...)` 帶有錯誤的數量或型別 | Error |
 
-標註您的類別，將它們組織在模組中，編譯器就會驗證一切：
+有關每個參數型別如何解析的規則，請參閱 [Definitions](/docs/reference/koin-core/definitions#constructor-parameters)。
 
+## 各宣告樣式的檢查 {id="checks-per-declaration-style"}
+
+每一種樣式和 DSL 形式都會針對同一個圖進行檢查。它們可以共存於同一個專案中：DSL 定義可以相依於帶有註解的類別，反之亦然。
+
+**Compiler Plugin DSL**
+```kotlin
+val appModule = module {
+    single<Database>()
+    single<UserRepository>()      // 已檢查：Database 存在
+    viewModel<UserViewModel>()    // 已檢查：UserRepository 存在
+}
+```
+
+外掛程式會讀取建構函式，產生解析呼叫並檢查每個參數。`create(::function)` 也以相同的方式檢查函式參數：
+
+```kotlin
+fun buildUserRepository(db: Database): UserRepository = UserRepository(db)
+
+val appModule = module {
+    single { create(::buildUserRepository) }    // 已檢查：Database 存在
+}
+```
+
+**註解（Annotations）**
 ```kotlin
 @Singleton
 class Database
 
 @Singleton
-class UserRepository(private val db: Database)
+class UserRepository(private val db: Database)    // 已檢查：Database 存在
 
 @KoinViewModel
 class UserViewModel(private val repo: UserRepository) : ViewModel()
@@ -119,337 +110,251 @@ class UserViewModel(private val repo: UserRepository) : ViewModel()
 @Module
 @ComponentScan("com.myapp")
 class AppModule
-```
 
-外掛程式透過 `@ComponentScan` 發現標註的類別，在 A2 驗證每個模組的定義，並在您宣告應用程式進入點時在 A3 驗證完整圖表：
-
-```kotlin
 @KoinApplication(modules = [AppModule::class])
 object MyApp
-
-startKoin<MyApp> { }  // ← 觸發 A3 完整圖表驗證
 ```
 
-同時也支援**頂層函式**。標註的頂層函式會由 `@ComponentScan` 發現，並像類別定義一樣進行驗證：
+`startKoin<MyApp>()` 是入口點：外掛程式會檢查 `@ComponentScan` 找到的每個定義。帶有註解的頂層函式會像類別一樣被檢查：
 
 ```kotlin
-@Singleton
-fun provideDatabase(): DatabaseService = PostgresDatabase()
-
 @Factory
-fun provideCache(db: DatabaseService): CacheService = RedisCache(db)
-// ← 驗證通過：DatabaseService 存在
+fun provideCache(db: Database): CacheService = RedisCache(db)    // 已檢查：Database 存在
 ```
 
-使用 `@Configuration` 標籤將模組組織成一組進行共同驗證：
+標記為 `@Configuration` 的模組會跨 Gradle 模組與請求其標籤的 `@KoinApplication` 一起組裝並進行聯合檢查。
 
-```kotlin
-@Module @ComponentScan("core") @Configuration("prod")
-class CoreModule
-
-@Module @ComponentScan("feature") @Configuration("prod")
-class FeatureModule  // 可見 CoreModule 的定義
-```
-
-## 使用 DSL 確保安全性 {id="safety-with-dsl"}
-
-編譯器外掛程式也會驗證 DSL 定義。當您撰寫 `single<T>()`、`factory<T>()` 或 `viewModel<T>()` 時，外掛程式會攔截該呼叫，自動裝配建構函式，並驗證所有參數：
+**建構函式 / 傳統 DSL（Constructor / Classic DSL）**
+建構函式參照會如同 Compiler Plugin DSL 一樣受到檢查：
 
 ```kotlin
 val appModule = module {
-    single<Database>()
-    single<UserRepository>()       // ← 驗證通過：Database 存在
-    viewModel<UserViewModel>()     // ← 驗證通過：UserRepository 存在
-}
-```
-
-不需要手動呼叫 `get()` — 外掛程式會產生它們並同時進行驗證。
-
-`create(::T)` 函式也會被驗證。它呼叫一個函式參考（通常是 builder 函式，但也可以是建構函式）並驗證其所有參數：
-
-```kotlin
-fun buildUserRepository(db: Database): UserRepository = UserRepository(db)
-
-val appModule = module {
+    singleOf(::Database)
+    singleOf(::UserRepository)        // 已檢查：Database 存在
+    viewModelOf(::UserViewModel)      // 已檢查：UserRepository 存在
     scope<UserSession> {
-        scoped { create(::buildUserRepository) }  // ← 驗證通過：Database 存在
+        scopedOf(::SessionCache)
     }
 }
 ```
 
-DSL 定義會參與 A3 驗證（完整圖表）和 A4 驗證（呼叫點）。如果您使用 `startKoin { modules(appModule) }`，外掛程式會根據組合後的圖表驗證所有 DSL 定義。
+`singleOf`、`factoryOf`、`scopedOf`、`viewModelOf` 和 `new(::T)` 會保留其執行時期行為。外掛程式僅加入檢查，不會重寫它們。
 
-## 兩種風格結合使用 {id="both-styles-together"}
-
-您可以在同一個專案中混合使用註解和 DSL。兩者都會被收集到同一個驗證圖表中：
+對於自行撰寫的 Lambda，外掛程式不會讀取建構函式。它會檢查 Lambda 內部的 `get()`、`inject()` 和 `getOrNull()` 呼叫，如同處理一般的呼叫點：
 
 ```kotlin
-// 註解
-@Singleton class Database
-
-// DSL
-val featureModule = module {
-    single<UserRepository>()  // ← 驗證通過：來自註解的 Database 是可見的
+val appModule = module {
+    single { UserRepository(get()) }  // 已檢查：get() 呼叫需要 Database
 }
 ```
 
-## 錯誤訊息 {id="error-messages"}
+:::warning
+自 Compiler Plugin 1.2.0 起，`singleOf`、`factoryOf`、`scopedOf` 和 `viewModelOf` 也會受到檢查。依賴這些函式中遺漏相依項的程式碼將無法再編譯。過往的組建隱藏了執行時期的當機問題。
+:::
 
-錯誤會報告缺失的型別、需要該型別的定義，以及所在的模組：
+## 診斷資訊 {id="diagnostics"}
 
-```
-[Koin] Missing dependency: Repository
-  required by: Service (parameter 'repo')
-  in module: ServiceModule
-```
+每則診斷資訊都有一個穩定的代碼，輸出格式為 `[Koin][CODE]`。您可以搜尋該代碼或訊息的第一行。
 
-當存在不同限定符的繫結時，會顯示提示：
+### 缺少相依項 (KOIN-D001) {id="missing-dependency-koin-d001"}
 
-```
-[Koin] Missing dependency: NetworkClient (qualifier: @Named("http"))
-  required by: ApiService (parameter 'client')
-  in module: AppModule
-  Hint: Found NetworkClient without qualifier — did you mean to add @Named("http")?
-```
-
-呼叫點錯誤包含確切位置：
+定義中的參數在圖中找不到對應的定義：
 
 ```
-[Koin] Missing definition: com.app.UserRepository
-  resolved by: koinViewModel<UserViewModel>()
-  No matching definition found in any declared module.
-  → file: UserScreen.kt, line: 12, column: 5
+[Koin][KOIN-D001] Missing dependency: com.myapp.Database
+  required by: com.myapp.UserRepository (parameter 'db')
+  in module: com.myapp.AppModule
 ```
 
-## 禁止的定義 {id="forbidden-definitions"}
+對於 DSL 定義，`required by:` 會以 `dsl:` 開頭。當該型別存在其他限定詞時，隨後會附帶提示：
 
-某些回傳型別永遠無法透過 Koin 進行有意義的解析，因此在編譯期會被拒絕：
+```
+[Koin][KOIN-D001] Missing dependency: com.myapp.NetworkClient qualified with @Named("http")
+  required by: com.myapp.ApiService (parameter 'client')
+  in module: com.myapp.AppModule
+  Hint: Found similar binding: com.myapp.NetworkClient (no qualifier)
+```
 
-### KOIN-D007：`@Factory` 回傳 suspend `fun interface` {id="koin-d007-factory-returning-a-suspend-fun-interface"}
+解決方法：宣告遺漏的定義、將宣告該定義的模組新增至 `modules()` 或 `includes()`，或是修正限定詞（請參閱 [Qualifiers](/docs/reference/koin-core/qualifiers)）。
 
-回傳繼承自 suspend `fun interface` 型別的 `@Factory` 無法透過 Koin 的同步 `get<T>()` API 調用。外掛程式會在編譯期阻斷此行為。
+### 呼叫點缺少定義 (KOIN-D002, KOIN-D003) {id="missing-definition-at-a-call-site-koin-d002-koin-d003"}
+
+`get<T>()`、`inject<T>()` 或 `koinViewModel<T>()` 呼叫請求了一個未在任何已載入模組中宣告的型別：
+
+```
+[Koin][KOIN-D002] Missing definition: com.myapp.Tracker
+  resolved by: get<Tracker>()
+  No matching definition found in any loaded module.
+  Check your declaration with Annotation or DSL.
+```
+
+`KOIN-D003` 是在相依模組中發出呼叫時的相同錯誤，會在 app 模組編譯時回報。其第二行顯示為 `required by a call site in a dependency module`。
+
+### 循環相依 (KOIN-D004) {id="circular-dependency-koin-d004"}
+
+```
+[Koin][KOIN-D004] Circular dependency detected:
+  com.myapp.A → com.myapp.B → com.myapp.A
+  Break with Lazy<T> injection or refactor to remove the cycle.
+```
+
+`Lazy<T>`、可為 null、`List<T>`、`@InjectedParam`、`@Provided`、`@Property`、`@ScopeId` 或具有預設值的參數不會被計為循環中的邊。將其中一個參數改為 `Lazy<T>` 即可打破循環。請參閱 [Troubleshooting](/docs/reference/koin-core/troubleshooting) 了解消除循環的方法。
+
+### 注入參數 (KOIN-D005, KOIN-D006) {id="injected-parameters-koin-d005-koin-d006"}
+
+定義中宣告了 `@InjectedParam` 參數，但呼叫點未傳入這些參數：
+
+```
+[Koin][KOIN-D006] com.myapp.Greeter requires 1 injected param(s) but get<Greeter>() has no parametersOf(...) at the call site.
+  Expected @InjectedParam slots: name: kotlin.String
+  Pass them via parametersOf(...) inside the trailing lambda.
+```
+
+`KOIN-D005` 回報帶有錯誤引數數量或錯誤型別的 `parametersOf(...)`（`Mismatched parametersOf(...) for ...`）。這兩項檢查僅在外掛程式能夠讀取呼叫所包含的 `parametersOf(...)` 時才會執行。請參閱 [Injected Parameters](/docs/reference/koin-core/injection-parameters)。
+
+### 不支援的 suspend 繫結 (KOIN-D007) {id="unsupported-suspend-binding-koin-d007"}
+
+型別繼承自 suspend 函式型別的定義會被拒絕，因為 Koin 無法在執行時期對其進行解析：
 
 ```kotlin
-fun interface AsyncTask { suspend operator fun invoke(): Result }
+fun interface SetUsernameUseCase : suspend (String) -> Unit
 
 @Factory
-fun provideTask(): AsyncTask = AsyncTask { ... }
-// KOIN-D007 — 錯誤：@Factory 回傳型別不能繼承 suspend fun interface
+fun provideSetUsernameUseCase(repository: UserRepository): SetUsernameUseCase =
+    SetUsernameUseCase(repository::setUsername)
 ```
 
-請重構為一般介面，或透過具有 suspend 方法的類別公開 suspend 作業。
+```
+[Koin][KOIN-D007] Unsupported binding: com.myapp.SetUsernameUseCase extends kotlin.coroutines.SuspendFunction1
+  Suspend function injection is not yet supported by Koin runtime.
+  Remove the @Single / @Factory / @Scoped registration, or refactor the binding type to not extend a suspend function.
+  Tracked at https://github.com/InsertKoinIO/koin-compiler-plugin/issues/16
+```
 
-## 泛型 DSL 型別 {id="generic-dsl-types"}
+解決方法：使用包含 `suspend` 方法的常規介面，或是使用類別。
 
-執行時 Koin 會在**抹除後的原始類別（erased raw class）**上解析定義 — 型別參數不是查閱鍵（lookup key）的一部分。編譯安全性遵循此原則：`get<Box<X>>()` 呼叫會針對圖表中的任何 `Box<*>` 提供者進行驗證，而兩個 `single<Box<A>>()` / `single<Box<B>>()` 宣告會發生衝突（原始類別相同，且無限定符）。
+### 所有代碼 {id="all-codes"}
+
+| 代碼 | 嚴重程度 | 訊息開頭 |
+|------|----------|---------------------|
+| `KOIN-D001` | Error | `Missing dependency:` |
+| `KOIN-D002` | Error | `Missing definition:`（本模組中的呼叫點） |
+| `KOIN-D003` | Error | `Missing definition:`（相依模組中的呼叫點） |
+| `KOIN-D004` | Error | `Circular dependency detected:` |
+| `KOIN-D005` | Error | `Mismatched parametersOf(...) for` |
+| `KOIN-D006` | Error | `<Type> requires N injected param(s) but` |
+| `KOIN-D007` | Error | `Unsupported binding:` |
+| `KOIN-D008` | Error | `Module id collision:`（兩個模組名稱編碼成相同的提示名稱：請重新命名其中一個） |
+| `KOIN-W001` | Warning | `Module '<name>' is not loaded at startKoin` |
+| `KOIN-W003` | Warning | `Graph not verifiable at compile time:` |
+| `KOIN-W004` | Warning | `Custom @Configuration label '<label>' requested by` |
+| `KOIN-W005` | Warning | `Definition '<name>' in dependency module` |
+| `KOIN-W006` | Warning | `<definition>'s bind(...) argument could not be resolved` |
+| `KOIN-A001` | Error | `@KoinViewModel definition '<name>' cannot be generated`（請新增 `io.insert-koin:koin-core-viewmodel`） |
+| `KOIN-A002` | Error | `@KoinWorker definition '<name>' cannot be generated`（請新增 `io.insert-koin:koin-android-workmanager`） |
+| `KOIN-A003` | Error | `Cannot generate <Module>.module()`（請新增 `io.insert-koin:koin-core`） |
+| `KOIN-S001` | Error | `create(::<Type>) must be the only instruction in the lambda`（請參閱 [unsafeDslChecks](/docs/reference/koin-annotations/options#unsafedslchecks)） |
+| `KOIN-P001` | Warning | `Missing @PropertyValue default:` |
+| `KOIN-M001` | Warning | `@Monitor: Kotzilla SDK not found on classpath` |
+
+這些警告說明了外掛程式無法檢查的內容。`KOIN-W003`、`KOIN-W004` 與 `KOIN-W005` 於 [限制](#limits) 中說明。`KOIN-W006` 表示 `bind`/`binds` 引數不是常值 `X::class`（或其常值陣列或清單）：請使用常值。
+
+## 外部型別：`@Provided` {id="external-types-provided"}
+
+某些型別是從 Koin 宣告之外進入圖中的：例如平台物件、SDK 執行個體、在執行時期手動新增的定義。請將它們標記為 `@Provided`，這樣外掛程式就不會將它們回報為遺漏：
 
 ```kotlin
-class Box<T>(val value: T)
+// 標註在類別上：跳過此型別的所有使用處
+@Provided
+class FirebaseAnalytics
 
-val appModule = module {
-    single { Box(42) }   // 註冊為 Box (raw)
-}
-
-koin.get<Box<Int>>()    // → 回傳單一的 Box 註冊
-koin.get<Box<String>>() // → 回傳同一個註冊（型別抹除）
+// 標註在參數上：僅跳過此參數
+@Singleton
+class PaymentProcessor(@Provided val gateway: PaymentGateway)
 ```
 
-在原始類別上驗證也避免了 Kotlin/Native klib 簽章修飾（signature mangling）失敗的問題，該問題以前在 DSL 定義攜帶未替換的型別參數時會導致 iOS 組建崩潰。
+`@Provided`（`org.koin.core.annotation`）適用於所有宣告樣式：即使定義位於 DSL 模組中，也可以在類別或建構函式參數上加上註解。它僅會改變編譯期檢查。在執行時期，該型別仍會透過 `get()` 解析，若無人宣告則會失敗。建議優先使用參數形式：在類別上使用時，會關閉該型別所有使用處的檢查。
 
-### 區分泛型執行個體：泛型參數上的型別限定符 {id="discriminating-generic-instances-type-qualifier-on-the-generic-parameter"}
+以下型別一律接受，無需加上 `@Provided`：
 
-當同一個泛型類別的多個執行個體必須共存時，慣用的模式是註冊一個**具體的包裝型別**，並使用**衍生自泛型參數的型別限定符** — `named<T>()`。這正是 `koin-compose-navigation3` 在內部將每個導航路線與其路線型別關聯時所做的：
+- `android.content.Context`
+- `android.app.Application`
+- `android.app.Activity`
+- `androidx.activity.ComponentActivity`
+- `androidx.fragment.app.Fragment`
+- `androidx.lifecycle.SavedStateHandle`
+- `androidx.work.WorkerParameters`
+
+### 在執行時期載入的模組 {id="modules-loaded-at-runtime"}
+
+在 `startKoin` 之後透過 `loadKoinModules(...)` 載入的模組不屬於外掛程式組裝圖的一部分。外掛程式無法得知該呼叫何時執行，或是否會執行。僅來自此類模組的型別必須標記為 `@Provided`：
 
 ```kotlin
-inline fun <reified T : Any> Module.navigation(
-    noinline definition: @Composable Scope.(T) -> Unit,
-): KoinDefinition<EntryProviderInstaller> {
-    // 註冊一個「具體」型別 (EntryProviderInstaller)，
-    // 透過衍生自泛型參數 T 的型別限定符進行區分。
-    return _singleInstanceFactory<EntryProviderInstaller>(named<T>(), { ... })
-}
+val featureModule = module { single<Repository>() }   // 稍後載入
+val appModule = module { single<Service>() }          // Service(@Provided val repo: Repository)
+
+startKoin { modules(appModule) }
+loadKoinModules(featureModule)
 ```
 
-用於兩端：
+外掛程式仍會透過 `KOIN-W001` 將執行時期載入的模組回報為無法到達。將其新增至 `modules()` 會失去按需載入的目的，因此您可以忽略此警告（僅在啟用 `allWarningsAsErrors` 時才會導致組建失敗）。
 
-```kotlin
-// 宣告 — T 是一個具體型別 (HomeRoute, SettingsRoute, ...)
-module {
-    navigation<HomeRoute> { route -> HomeScreen() }
-    navigation<SettingsRoute> { route -> SettingsScreen() }
-}
+## 特殊參數 {id="special-parameters"}
 
-// 解析 — 使用相同的型別限定符作為查閱鍵
-koin.get<EntryProviderInstaller>(named<HomeRoute>())
-```
-
-`named<T>()` 從具現化（reified）的 `T` 產生型別限定符，因此每個泛型具現化都會獲得一個穩定且唯一的限定符。執行時 Koin 會匹配（原始類別 + 限定符），這重新引入了型別抹除所移除的辨別能力。
-
-每當您需要區分泛型具現化時，請優先使用此模式而非直接使用 `single<Box<X>>()`。
-
-## 作用域參數注入 {id="scope-parameter-injection"}
-
-型別為 `org.koin.core.scope.Scope` 的參數會自動被注入作用域接收者 — 不需要註解。驗證會被跳過，因為注入作用域可以進行動態查閱。
+**Scope**：型別為 `org.koin.core.scope.Scope` 的參數會接收目前的作用域。它不會受到檢查，因為程式碼會動態地從中解析型別。
 
 ```kotlin
 @Scoped
 class ScopedService(val scope: Scope) {
-    fun dynamicLookup() = scope.get<SomeDep>()
+    fun load() = scope.get<SomeDependency>()
 }
-// 產生：ScopedService(scope)  — 直接傳遞作用域接收者
 ```
 
-## 具名作用域解析：`@ScopeId` {id="named-scope-resolution-scopeid"}
+**@ScopeId**：參數是從另一個作用域中解析的，依名稱（`@ScopeId(name = "user_session")`）或依型別（`@ScopeId(UserSessionScope::class)`，作用域 ID 為完整類名）。它不會受到檢查，因為該作用域僅在執行時期存在。請參閱 [Scopes](/docs/reference/koin-core/scopes)。
 
-使用 `@ScopeId` 從具名的 Koin 作用域（而非目前作用域）解析相依性。驗證會被跳過，因為作用域是在執行時解析的。
-
-```kotlin
-@Factory
-class ProfileService(@ScopeId(name = "user_session") val session: UserSession)
-// 產生：ProfileService(scope.getScope("user_session").get<UserSession>())
-```
-
-`@ScopeId` 支援兩種形式：
-
-| 形式 | 範例 | 作用域 ID |
-|------|---------|----------|
-| 字串名稱 | `@ScopeId(name = "user_session")` | `"user_session"` |
-| 型別參考 | `@ScopeId(UserSessionScope::class)` | 完整限定類名 |
-
-## 屬性驗證 {id="property-validation"}
-
-`@Property("key")` 參數是從 Koin 屬性（透過啟動時的 `properties()` 設定）中解析。當不存在 `@PropertyValue("key")` 預設值時，外掛程式會在編譯期發出警告：
+**@Property**：此參數會讀取 Koin 屬性。若未宣告 `@PropertyValue("key")` 預設值，組建會收到警告，且該屬性必須在啟動時設定：
 
 ```kotlin
 @PropertyValue("api.timeout")
 val defaultTimeout = 30
 
 @Factory
-class ApiClient(@Property("api.timeout") val timeout: Int)
-// OK — @PropertyValue("api.timeout") 提供編譯期預設值
+class ApiClient(@Property("api.timeout") val timeout: Int)    // OK
 
 @Factory
 class Other(@Property("missing.key") val value: String)
-// 警告 — 找不到 @PropertyValue("missing.key")
-// （仍可編譯 — 屬性可能在執行時提供）
+// [Koin][KOIN-P001] Missing @PropertyValue default: "missing.key" ...
 ```
 
-## 外部型別：`@Provided` {id="external-types-provided"}
+**預設值**：在 `skipDefaultValues = true`（預設值）的情況下，具有 Kotlin 預設值的參數會直接採用該預設值而不進行檢查。請參閱 [skipDefaultValues](/docs/reference/koin-annotations/options#skipdefaultvalues)。
 
-某些型別是由平台或外部架構在執行時提供的，且永遠不會宣告為 Koin 定義。請使用 `@Provided` 標記它們以跳過驗證。
+## 泛型型別 {id="generic-types"}
 
-`@Provided` 可用於**類別**（所有用法均跳過驗證）及**參數**（僅該參數跳過）：
+Koin 是在抹除後的類別（erased class）上解析定義：型別引數不是尋找索引鍵的一部分。外掛程式也遵循相同的規則。`get<Box<Int>>()` 會針對任何 `Box` 定義進行檢查，而 `single<Box<A>>()` 和 `single<Box<B>>()` 屬於相同的定義，因此第二個會覆寫第一個。
 
-```kotlin
-// 用在類別上 — 該型別的所有用法皆跳過驗證
-@Provided
-class SavedStateHandle
+若要保留同一個泛型型別的多個執行個體，請使用 `named<T>()` 為每個執行個體指定衍生自其型別引數的型別限定詞。該模式在 [Advanced Patterns](/docs/reference/koin-core/advanced-patterns) 中有詳細說明。
 
-// 用在參數上 — 僅此參數跳過驗證
-@Singleton
-class MyViewModel(@Provided val handle: SavedStateHandle)
-```
+## 累加組建 {id="incremental-builds"}
 
-**何時使用 `@Provided`：**
+完整圖檢查會在聚合模組（包含入口點的模組）編譯時執行。在其他地方發生變更時（例如在 `module { }` 的 Lambda 主體內），Kotlin 累加編譯可能會跳過該模組。外掛程式會在偵測到入口點的模組中啟用 `strictSafety`，以確保每次組建都會執行檢查。詳細資訊與應對方式請參閱：[strictSafety](/docs/reference/koin-annotations/options#strictsafety)。
 
-- 不在白名單中的 **Android 架構型別** — 例如，自訂 Android 服務
-- 外部注入的 **第三方 SDK 型別** — 例如，Firebase、分析 SDK
-- **來自非 Koin 模組的跨模組型別** — 當相依性來自不使用 Koin 的程式庫時
-- **測試替身** — 在測試配置中取代真實實作時
-- **手動提供的型別** — `androidContext()`、手動 `single { }` 註冊
+## 限制 {id="limits"}
 
-```kotlin
-// 外部 SDK — 不受 Koin 管理
-@Singleton
-class AnalyticsService(@Provided val firebaseAnalytics: FirebaseAnalytics)
+- **動態模組清單**：無法追蹤 `modules(if (debug) a else b)`、`modules(*list)` 或在執行時期建立的清單。外掛程式會回報 `KOIN-W003` 並跳過該入口點的完整圖檢查。請直接傳入模組以維持檢查機制。
+- **手寫 Lambda 與循環**：`single { A(get()) }` Lambda 不會在循環檢查中加入邊，因此無法偵測透過手寫 Lambda 產生的循環相依。在需要注意循環的地方，請使用 `single<T>()`、`singleOf(::T)` 或 `create(::T)`。
+- **自訂設定標籤**：標記有非 `"default"` 標籤的模組，最多只能在一層 `implementation` 相依性範圍內被搜尋到（`KOIN-W004`）。請新增直接相依性，或將該模組列於 `@KoinApplication(modules = [...])` 中。
+- **相距過遠的函式定義**：在兩層或更多層 `implementation` 躍點之外的模組中，`@Module` 函式定義或限定的頂層函式對檢查不可見（`KOIN-W005`）。它在執行時期仍可正常運作。請新增直接相依性以進行檢查。
+- **在執行時期載入的模組**：請參閱 [在執行時期載入的模組](#modules-loaded-at-runtime)。
 
-// 跨模組：執行時由另一個團隊的模組提供
-@Factory
-class PaymentProcessor(@Provided val paymentGateway: PaymentGateway)
-```
+## 取代 verify() 和 checkModules() {id="replacing-verify-and-checkmodules"}
 
-**常見的 Android 架構型別會自動列入白名單**，不需要 `@Provided`：
+啟用編譯期安全性後，組建會在每次編譯時檢查 `verify()` 和 `checkModules()` 測試所檢查的項目。對於外掛程式完全檢查的圖，您可以移除這些測試。若圖被外掛程式回報為無法驗證（`KOIN-W003`）或使用了在執行時期載入的模組，請保留這些測試。請參閱 [Verifying modules](/docs/reference/koin-test/verify)。
 
-- `android.content.Context`
-- `android.app.Application`
-- `android.app.Activity`
-- `androidx.fragment.app.Fragment`
-- `androidx.lifecycle.SavedStateHandle`
-- `androidx.work.WorkerParameters`
+## 相關內容 {id="related"}
 
-## 預設值與 skipDefaultValues {id="default-values-and-skipdefaultvalues"}
-
-當啟用 `skipDefaultValues` 時（預設），具有 Kotlin 預設值的參數會使用該預設值，而不是從 DI 容器中解析：
-
-```kotlin
-// 當 skipDefaultValues = true (預設值)：
-@Singleton
-class ServiceWithDefault(val timeout: Int = 5000)
-// → 使用 Kotlin 預設值 (5000)，不進行 DI 解析
-
-// 可 null 參數仍會被注入：
-@Singleton
-class Service(val dep: Dependency? = null)
-// → 使用來自 DI 的 getOrNull()
-
-// 標註過的參數一律使用 DI，無論是否有預設值：
-@Singleton
-class Service(@Named("custom") val name: String = "fallback")
-// → 使用 @Named("custom") 限定符從 DI 解析
-
-// 混合使用：部分來自 DI，部分來自預設值
-@Singleton
-class ApiClient(
-    val repo: UserRepository,                        // → 從 DI 解析
-    val timeout: Int = 30_000,                       // → 使用 Kotlin 預設值
-    @Property("api_url") val url: String = "https://api.example.com"  // → 從 DI 解析（已標註）
-)
-```
-
-將 `skipDefaultValues = false` 設定為一律從 DI 容器注入所有參數，忽略 Kotlin 預設值。
-
-## 配置 {id="configuration"}
-
-編譯期安全性預設為啟用。若要停用：
-
-```kotlin
-koinCompiler {
-    compileSafety = false  // 停用編譯期安全性檢查
-}
-```
-
-其他相關選項：
-
-```kotlin
-koinCompiler {
-    compileSafety = true       // 編譯期相依性驗證（預設：true）
-    strictSafety = true        // 強制聚合器（aggregator）的安全性階段在每次組建時重新執行
-                               // （預設：在具有 startKoin / @KoinApplication 的模組上自動偵測）
-    skipDefaultValues = true   // 跳過具有預設值參數的注入（預設：true）
-    unsafeDslChecks = true     // 驗證 create() 是 lambda 中唯一的指令（預設：true）
-}
-```
-
-:::info 增量編譯與 `strictSafety`
-完整圖表階段 (A3) 僅在聚合器的 `compileKotlin` 中執行。K2 下的 Kotlin 增量編譯不會追蹤 `module { }` lambda 主體內部的 DSL 變更，也不會追蹤新加入 `@ComponentScan` 套件的類別 — 因此即使圖表已變更，聚合器仍可能被標記為 UP-TO-DATE。外掛程式會在偵測到的聚合器模組上自動啟用 [`strictSafety`](/docs/reference/koin-annotations/options#strictsafety) 以強制 A3 重新執行；程式庫和功能模組則保持完全增量。
-:::
-
-## 從 verify() / checkModules() 遷移 {id="migrating-from-verify-checkmodules"}
-
-編譯器外掛程式取代了執行時驗證。您可以移除驗證測試：
-
-| 之前 | 之後 |
-|--------|-------|
-| 測試中的 `module.verify()` | 編譯器外掛程式（自動） |
-| 測試中的 `checkModules()` | 編譯器外掛程式（自動） |
-| 執行時驗證 | 編譯期驗證 |
-| 手動測試設定 | 不需要測試程式碼 |
-
-編譯器會在每次組建時進行驗證 — 不需要測試程式碼。
-
-## 另請參閱 {id="see-also"}
-
-- **[編譯器外掛程式選項](/docs/reference/koin-annotations/options)** - 所有配置選項
-- **[編譯器外掛程式設定](/docs/setup/compiler-plugin)** - 安裝指南
-- **[從註解開始](/docs/reference/koin-annotations/start)** - 入門指南
-- **[Playground 應用程式](https://github.com/InsertKoinIO/koin-compiler-plugin/tree/main/playground-apps)** - 包含註解 (`app-annotations/`) 和 DSL (`app-dsl/`) 方法的完整參考應用程式
+- [Compiler Plugin Options](/docs/reference/koin-annotations/options)：`compileSafety`、`strictSafety`、`skipDefaultValues` 及其他選項。
+- [Koin Compiler Plugin](/docs/intro/koin-compiler-plugin)：外掛程式的功能與運作方式。
+- [Definitions](/docs/reference/koin-core/definitions)：建構函式參數的解析方式。
+- [Troubleshooting](/docs/reference/koin-core/troubleshooting)：執行時期錯誤、記錄器（logger）與循環相依。
+- [IDE Plugin](/docs/tooling/ide-plugin)：在 IDE 中檢視圖並巡訪定義。
+- [Playground apps](https://github.com/InsertKoinIO/koin-compiler-plugin/tree/main/playground-apps)：包含使用註解（`app-annotations/`）和 DSL（`app-dsl/`）的範例應用程式。

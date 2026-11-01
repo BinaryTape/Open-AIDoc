@@ -1,12 +1,12 @@
-[//]: # (title: 反覆運算器)
+[//]: # (title: 迭代器)
 
-為了遍歷集合元素，Kotlin 標準函式庫支援常用的反覆運算器機——這類物件可以按順序存取元素，而無需暴露集合的底層結構。當您需要逐一處理集合的所有元素時（例如：列印值或對其進行類似的更新），反覆運算器非常有用。
+為了遍歷集合元素，Kotlin 標準函式庫支援常用的 _迭代器_（iterators）機制——此物件提供循序存取元素的方式，且不會暴露集合的底層結構。當需要逐一處理集合中的所有元素時（例如列印值或對它們進行類似的更新），迭代器非常有用。
 
-可以透過呼叫 [`iterator()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-iterable/iterator.html) 函式，為 [`Iterable<T>`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-iterable/index.html) 介面的繼承者（包括 `Set` 與 `List`）獲取反覆運算器。
+可以透過呼叫 [`iterator()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-iterable/iterator.html) 函式，為 [`Iterable<T>`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-iterable/index.html) 介面的繼承者（包括 `Set` 與 `List`）取得迭代器。
 
-一旦獲取反覆運算器，它會指向集合的第一個元素；呼叫 [`next()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-iterator/next.html) 函式會傳回此元素，並將反覆運算器的位置移動至下一個元素（如果存在）。
+一旦取得迭代器，它會指向集合的第一個元素；呼叫 [`next()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-iterator/next.html) 函式會傳回該元素，並在存在下一個元素時將迭代器位置移至後續元素。
 
-一旦反覆運算器通過最後一個元素，它就不能再用於獲取元素，也無法重設為之前的任何位置。若要再次遍歷集合，請建立一個新的反覆運算器。
+一旦迭代器遍歷過最後一個元素，就無法再用於擷取元素，也無法重設回先前的任何位置。若要再次遍歷集合，請建立一個新的迭代器。
 
 ```kotlin
 
@@ -24,9 +24,9 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-另一種遍歷 `Iterable` 集合的方式是眾所周知的 `for` 迴圈。在集合上使用 `for` 時，您會隱含地獲取反覆運算器。因此，以下程式碼與上述範例等效：
+遍歷 `Iterable` 集合的另一種方式是廣為人知的 `for` 迴圈。在集合上使用 `for` 時，你會隱式取得迭代器。因此，以下程式碼等同於上述範例：
 
 ```kotlin
 
@@ -43,9 +43,9 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-最後，還有一個很有用的 `forEach()` 函式，它讓您可以自動遍歷集合，並為每個元素執行指定的程式碼。因此，同樣的範例看起來會像這樣：
+最後，還有一個實用的 `forEach()` 函式，可讓你自動遍歷集合，並為每個元素執行指定的程式碼。因此，相同的範例如下：
 
 ```kotlin
 
@@ -62,13 +62,13 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-## 列表反覆運算器 (List iterators) {id="list-iterators"}
+## List 迭代器 {id="list-iterators"}
 
-對於列表，有一種特殊的反覆運算器實作：[`ListIterator`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list-iterator/index.html)。它支援雙向遍歷集合：向前與向後。
+對於 List，有一個特殊的迭代器實作：[`ListIterator`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list-iterator/index.html)。它支援雙向遍歷 List：向前與向後。
 
-反向遍歷是透過 [`hasPrevious()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list-iterator/has-previous.html) 與 [`previous()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list-iterator/previous.html) 函式實作的。此外，`ListIterator` 還透過 [`nextIndex()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list-iterator/next-index.html) 與 [`previousIndex()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list-iterator/previous-index.html) 函式提供關於元素索引的資訊。
+向後遍歷由函式 [`hasPrevious()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list-iterator/has-previous.html) 與 [`previous()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list-iterator/previous.html) 實作。此外，`ListIterator` 透過函式 [`nextIndex()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list-iterator/next-index.html) 與 [`previousIndex()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list-iterator/previous-index.html) 提供有關元素索引的資訊。
 
 ```kotlin
 
@@ -90,13 +90,13 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
 具備雙向遍歷的能力，意味著 `ListIterator` 在到達最後一個元素後仍然可以使用。
 
-## 可變反覆運算器 (Mutable iterators) {id="mutable-iterators"}
+## 可變迭代器 {id="mutable-iterators"}
 
-為了遍歷可變集合，提供了 [`MutableIterator`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-iterator/index.html)，它擴充了 `Iterator` 並增加了元素移除函式 [`remove()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-iterator/remove.html)。因此，您可以在遍歷集合的同時移除其中的元素。
+為了遍歷可變集合，提供了擴充自 `Iterator` 並具備元素移除函式 [`remove()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-iterator/remove.html) 的 [`MutableIterator`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-iterator/index.html)。因此，你可以在遍歷集合時從中移除元素。
 
 ```kotlin
 
@@ -112,9 +112,9 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-除了移除元素之外，[`MutableListIterator`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-list-iterator/index.html) 還可以在遍歷列表時，透過 [`add()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-list-iterator/add.html) 與 [`set()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-list-iterator/set.html) 函式插入與替換元素。
+除了移除元素之外，[`MutableListIterator`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-list-iterator/index.html) 還可以使用 [`add()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-list-iterator/add.html) 與 [`set()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-list-iterator/set.html) 函式在遍歷 List 時插入和替換元素。
 
 ```kotlin
 
@@ -134,4 +134,4 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}

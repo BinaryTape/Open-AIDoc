@@ -1,42 +1,50 @@
 ---
-title: 延迟加载模块与后台加载
+title: 延迟模块
 ---
 
-延迟加载模块支持异步、并行模块加载，以提高启动性能。您可以推迟并并行执行模块初始化，而不是在启动时同步加载所有模块。
+# 延迟模块
 
-:::info
-本页面使用 **Koin 编译器插件 DSL** (`single<T>()`)。有关配置请参阅 [编译器插件设置](/docs/setup/compiler-plugin)。
-:::
+延迟模块（lazy module）是指 Koin 在后台协程中注册，而不是在 `startKoin` 期间注册的模块。本页面涵盖延迟模块的声明、并行加载、等待其完成，以及该功能的限制。本文假设你已了解[模块](/docs/reference/koin-core/modules)和[启动 Koin](/docs/reference/koin-core/starting-koin)。
 
-## 什么是延迟加载模块？ {id="what-are-lazy-modules"}
+## 依赖项 {id="dependency"}
 
-延迟加载模块会延迟模块注册和实例创建，直到被显式加载。它们特别适用于：
-
-- **大型应用程序** - 将初始化拆分到多个线程中
-- **性能优化** - 减少启动时间
-- **条件性功能** - 仅在需要时加载模块
-- **后台初始化** - 异步加载非关键模块
-
-## 定义延迟加载模块 {id="defining-lazy-modules"}
-
-使用 `lazyModule` 函数创建延迟加载模块：
+延迟模块包含在 `koin-core-coroutines` 构件中：
 
 ```kotlin
-// 延迟加载模块 - 除非显式请求，否则不会加载
-val networkModule = lazyModule {
-    single<ApiClient>()
-    single<NetworkMonitor>()
-}
+// build.gradle.kts
+implementation("io.insert-koin:koin-core-coroutines")
+```
 
-val databaseModule = lazyModule {
-    single<Database>()
-    single<UserDao>()
+## 声明延迟模块 {id="declaring-a-lazy-module"}
+
+`lazyModule` 接收与 `module` 相同的内容。在 Koin 加载它之前，不会创建或分配任何内容。
+
+**编译器插件 DSL**
+```kotlin
+import org.koin.dsl.lazyModule
+import org.koin.plugin.module.dsl.*
+
+val analyticsModule = lazyModule {
+    single<AnalyticsService>()
+    single<EventTracker>()
 }
 ```
 
-### 组合延迟加载模块 {id="composing-lazy-modules"}
+**注解**
+注解模块（`@Module`）在启动时加载，无法声明为延迟模块。若要在后台加载某些定义，请在 `lazyModule` 中使用任意 DSL 形式（编译器插件、构造函数或经典 DSL）进行声明。
 
-延迟加载模块与常规模块一样支持 `includes()`：
+**构造函数 / 经典 DSL**
+```kotlin
+import org.koin.dsl.lazyModule
+import org.koin.core.module.dsl.*
+
+val analyticsModule = lazyModule {
+    singleOf(::AnalyticsService)
+    singleOf(::EventTracker)
+}
+```
+
+延迟模块可以包含其他延迟模块：
 
 ```kotlin
 val dataModule = lazyModule {
@@ -44,272 +52,106 @@ val dataModule = lazyModule {
 }
 
 val featureModule = lazyModule {
-    includes(dataModule)  // 包含其他延迟加载模块
+    includes(dataModule)
     single<FeatureService>()
 }
 ```
 
-:::info
-延迟加载模块在通过 `lazyModules()` 函数加载之前不会分配任何资源。
-:::
+## 加载延迟模块 {id="loading-lazy-modules"}
 
-## 加载延迟加载模块 {id="loading-lazy-modules"}
-
-在 Koin 配置中使用 `lazyModules()` 加载延迟加载模块。
-
-### 基础加载 {id="basic-loading"}
+在 `startKoin` 中将延迟模块传递给 `lazyModules()`。`modules()` 中的模块会在调用线程上加载，且在 `startKoin` 返回之前完成。延迟模块则在后台协程中加载：
 
 ```kotlin
-val analyticsModule = lazyModule {
-    single<AnalyticsService>()
-}
-
-val reportingModule = lazyModule {
-    single<CrashReporter>()
-}
-
 startKoin {
-    // 立即加载关键模块
-    modules(coreModule, networkModule)
-
-    // 在后台加载非关键模块
+    modules(coreModule)
     lazyModules(analyticsModule, reportingModule)
 }
 ```
 
-### 并行加载 (4.2.0+) {id="parallel-loading-4-2-0"}
+自 Koin 4.2 起，每个延迟模块都在各自的协程中加载，因此多个延迟模块会并行加载。在 4.2 之前，它们是按顺序依次加载的。
 
-自 4.2.0 版本起，多个延迟加载模块会**并行**加载，每个模块都在自己的协程中运行：
-
-```kotlin
-val module1 = lazyModule { single<DatabaseService>() }
-val module2 = lazyModule { single<NetworkService>() }
-val module3 = lazyModule { single<AnalyticsService>() }
-
-startKoin {
-    // 所有三个模块同时加载！
-    lazyModules(module1, module2, module3)
-}
-```
-
-**性能影响：**
-
-| 场景 | 4.2.0 之前 (顺序加载) | 4.2.0 之后 (并行加载) |
-|----------|--------------------------|------------------------|
-| 1 个模块 @ 100ms | 100ms | 100ms |
-| 3 个模块每个 @ 100ms | 300ms | 约 100ms |
-| 10 个模块每个 @ 100ms | 1000ms | 约 100ms |
-
-### 等待完成 {id="waiting-for-completion"}
-
-#### 所有平台：`waitAllStartJobs()` {id="all-platforms-waitallstartjobs"}
+`lazyModules()` 会在需要时配置 Koin 协程引擎。它在平台默认调度器上运行（在 JVM 和 Native 上为 `Dispatchers.Default`）。若要选择其他调度器，请传递 `dispatcher`：
 
 ```kotlin
 startKoin {
-    lazyModules(module1, module2, module3)
+    lazyModules(databaseModule, networkModule, dispatcher = Dispatchers.IO)
 }
-
-val koin = KoinPlatform.getKoin()
-
-// 阻塞直到所有延迟加载模块加载完成
-koin.waitAllStartJobs()
-
-// 现在可以安全地使用延迟加载模块中的依赖项
-val service = koin.get<AnalyticsService>()
 ```
 
-**平台行为：**
-- **JVM/Native**：使用 `runBlocking` 进行真正的阻塞
-- **JS**：使用 `GlobalScope.promise`（并非真正阻塞，会记录警告日志）
+调度器是在首次调用 `lazyModules()` 创建协程引擎时设置的。在后续调用中传入的 `dispatcher` 不会生效。
 
-#### 仅限 JVM：`runOnKoinStarted()` {id="jvm-only-runonkoinstarted"}
+## 等待延迟模块 {id="waiting-for-lazy-modules"}
+
+延迟模块中的定义在其模块加载完成之前不可用。解析定义前请先等待加载完成：
+
+| 函数 | 平台 | 行为 |
+|----------|----------|----------|
+| `Koin.awaitAllStartJobs()` | 全部 | 挂起直到所有延迟模块加载完成 |
+| `Koin.onKoinStarted { koin -> }` | 全部 | 挂起直到加载完成，然后执行代码块 |
+| `Koin.waitAllStartJobs()` | 全部 | 阻塞线程直到加载完成。在 JS 上不会阻塞并会记录一条警告 |
+| `Koin.runOnKoinStarted { koin -> }` | JVM | 阻塞直到加载完成，然后执行代码块 |
+| `Koin.isAllStartedJobsDone()` | 全部 | 当所有延迟模块加载完成时返回 `true` |
+
+在协程中：
+
+```kotlin
+suspend fun trackAppStart() {
+    val koin = KoinPlatform.getKoin()
+    koin.awaitAllStartJobs()
+    koin.get<AnalyticsService>().trackAppStart()
+}
+```
+
+在阻塞式代码中：
 
 ```kotlin
 startKoin {
     lazyModules(analyticsModule)
 }
 
-// 仅限 JVM 的回调
-KoinPlatform.getKoin().runOnKoinStarted { koin ->
-    // 在所有延迟加载模块完成加载后执行
-    koin.get<AnalyticsService>().trackAppStart()
-}
+KoinPlatform.getKoin().waitAllStartJobs()
+val analytics = KoinPlatform.getKoin().get<AnalyticsService>()
 ```
 
-#### 挂起替代方案：`awaitAllStartJobs()` {id="suspending-alternative-awaitallstartjobs"}
-
-适用于协程上下文或不支持阻塞的平台：
-
-```kotlin
-suspend fun initializeApp() {
-    startKoin {
-        lazyModules(module1, module2)
-    }
-
-    // 无阻塞等待
-    KoinPlatform.getKoin().awaitAllStartJobs()
-
-    // 可以安全继续执行
-    println("所有模块已加载！")
-}
-```
-
-## 自定义调度器 (Dispatchers) {id="custom-dispatchers"}
-
-控制运行延迟加载模块加载的调度器：
-
-```kotlin
-import kotlinx.coroutines.Dispatchers
-
-startKoin {
-    // 在 IO 调度器上加载，而不是使用 Default
-    lazyModules(
-        databaseModule,
-        networkModule,
-        dispatcher = Dispatchers.IO
-    )
-}
-```
-
-**常见的调度器选择：**
-- `Dispatchers.Default` - CPU 密集型工作（默认）
-- `Dispatchers.IO` - I/O 操作、文件访问、网络
-- `Dispatchers.Main` - UI 更新 (Android/Desktop)
-
-:::info
-如果未指定，默认调度器为 `Dispatchers.Default`。
+:::warning
+请勿在启动期间于 Android 主线程上调用 `waitAllStartJobs()`：它会阻塞 UI 直到每个延迟模块加载完成，从而抵消延迟加载带来的好处。请改在协程中等待。
 :::
 
-## 实际案例 {id="real-world-example"}
+## Android 示例 {id="android-example"}
+
+使用 `modules()` 加载首屏所需的内容，其余内容在后台加载：
 
 ```kotlin
-// 核心模块 - 立即加载
-val coreModule = module {
-    single<AppConfig>()
-    single<UserSession>()
-}
-
-// 功能模块 - 在后台加载
-val analyticsModule = lazyModule {
-    single<AnalyticsEngine>()
-    single<EventTracker>()
-}
-
-val networkingModule = lazyModule {
-    single<ApiClient>()
-    single<WebSocketManager>()
-}
-
-val databaseModule = lazyModule {
-    single<Database>()
-    single<UserDao>()
-}
-
-// Android 应用程序
-class MyApp : Application() {
+class MainApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
         startKoin {
-            androidLogger()
-            androidContext(this@MyApp)
-
-            // 立即加载关键模块
+            androidContext(this@MainApplication)
             modules(coreModule)
-
-            // 在后台并行加载非关键模块
-            lazyModules(
-                analyticsModule,
-                networkingModule,
-                databaseModule,
-                dispatcher = Dispatchers.IO
-            )
-        }
-
-        // 可选：等待后台加载完成
-        lifecycleScope.launch {
-            KoinPlatform.getKoin().awaitAllStartJobs()
-            Log.d("Koin", "所有模块已加载！")
+            lazyModules(analyticsModule, databaseModule, dispatcher = Dispatchers.IO)
         }
     }
 }
 ```
 
-## 重要限制 {id="important-limitations"}
+适合作为延迟模块的候选对象：数据分析（analytics）、崩溃报告、导航步骤之后的功能，以及模块主体耗时较长的定义。首屏解析所需的任何内容请保留在 `modules()` 中。
 
-### 避免交叉依赖 {id="avoid-cross-dependencies"}
+## 限制 {id="limits"}
 
-延迟加载模块和常规模块应该是独立的。不要创建常规模块对延迟加载模块的依赖：
+- **常规模块不能依赖延迟模块**：如果常规模块中的定义依赖于延迟模块中的定义，在延迟模块加载完成之前解析它将会失败并抛出 `NoDefinitionFoundException`。Koin 不会自动为你检查此问题。
+- **延迟模块在启动时加载**：`lazyModules()` 会立即在后台开始加载。它不会在首次使用时才加载模块。
+- **仅模块注册**：延迟加载只是将模块注册移出了主线程。`single` 仍会在首次请求时，在发起请求的线程上创建。避免在延迟模块中使用 `createdAtStart`：Koin 会在 `startKoin` 结束时创建预加载实例，因此尚未加载完成的延迟模块会错过该步骤。
+- **不支持注解**：`@Module` 类不能声明为延迟模块。
 
-```kotlin
-// ❌ 错误做法 - mainModule 依赖于延迟加载模块
-val lazyAnalytics = lazyModule {
-    single { AnalyticsService() }
-}
-
-val mainModule = module {
-    single { AppController(get<AnalyticsService>()) }  // 可能会失败！
-}
-
-startKoin {
-    modules(mainModule)
-    lazyModules(lazyAnalytics)
-}
-```
-
-```kotlin
-// ✅ 正确做法 - 保持依赖分离
-val lazyAnalytics = lazyModule {
-    single { AnalyticsService() }
-}
-
-val mainModule = module {
-    single { AppController() }
-}
-
-startKoin {
-    modules(mainModule)
-    lazyModules(lazyAnalytics)
-}
-```
-
-:::warning
-目前 Koin 不会验证常规模块与延迟加载模块之间的依赖关系。请确保常规模块不依赖于延迟加载模块的定义。
+:::tip
+若要测量真实设备上的启动和模块加载耗时，请参阅[生产环境监控](/docs/tooling/production-monitoring)。
 :::
 
-### 最佳实践：加载顺序 {id="best-practice-load-order"}
+## 相关内容 {id="related"}
 
-1. **立即加载模块** - 启动时需要的关键服务
-2. **延迟加载模块** - 非关键、可延迟的服务
-3. **根据需要等待** - 在访问延迟定义之前使用 `waitAllStartJobs()`
-
-## 何时使用延迟加载模块 {id="when-to-use-lazy-modules"}
-
-### 适用场景 {id="good-use-cases"}
-
-- **分析/追踪** - 核心功能不需要
-- **崩溃报告** - 可以在后台初始化
-- **功能模块** - 按需加载的模块化功能
-- **数据库/网络** - 可以推迟的重型初始化
-- **大型应用** - 将启动负载拆分到多个线程中
-
-### 不建议使用场景 {id="not-recommended"}
-
-- **核心服务** - 立即需要的关键依赖项
-- **小型应用** - 开销可能超过收益
-- **紧密耦合的模块** - 当模块之间存在大量交叉依赖时
-
-## API 参考 {id="api-reference"}
-
-| 函数 | 平台 | 描述 |
-|----------|----------|-------------|
-| `lazyModules()` | 所有 | 在后台加载延迟加载模块 |
-| `waitAllStartJobs()` | 所有 | 阻塞直到所有延迟加载模块加载完成 |
-| `awaitAllStartJobs()` | 所有 | 挂起直到所有延迟加载模块加载完成 |
-| `runOnKoinStarted()` | 仅限 JVM | 加载完成后执行的回调 |
-
-## 另请参阅 {id="see-also"}
-
-- **[模块](/docs/reference/koin-core/modules)** - 使用 `includes()` 进行模块组合
-- **[定义](/docs/reference/koin-core/definitions)** - 立即与延迟加载的单例
-- **[启动 Koin](/docs/reference/koin-core/starting-koin)** - Koin 启动配置
+- [模块](/docs/reference/koin-core/modules)：模块声明与 `includes()`。
+- [启动 Koin](/docs/reference/koin-core/starting-koin)：`startKoin` 与应用程序 DSL。
+- [定义](/docs/reference/koin-core/definitions#eager-creation)：`createdAtStart` 与预加载。
+- [Android 设置](/docs/reference/koin-android/start)：在 Android `Application` 中启动 Koin。
+- [DSL 参考](/docs/reference/koin-core/dsl)：所有 DSL 关键字。

@@ -7,34 +7,34 @@
 
 <tldr>
 <p>
-<b>必需依赖项</b>：<code>io.ktor:%artifact_name%</code>、<code>io.ktor:ktor-server-sessions</code>
+<b>所需依赖项</b>：<code>io.ktor:%artifact_name%</code>、<code>io.ktor:ktor-server-sessions</code>
 </p>
 </tldr>
 
 <link-summary>
-类型安全身份验证方案 API 的会话方案为路由提供了非 null 凭据，并支持对存储会话的读写访问。
+类型安全身份验证方案 API 的 session 方案为路由提供了非 null 主体以及对已存储 session 的读写访问权限。
 </link-summary>
 
-`session` 方案是[类型安全身份验证方案 API](server-typed-auth.md) 的一部分。它将命名提供程序的[会话身份验证](server-session-auth.md)组合在一起的两项内容分离开来：
+`session` 方案是[类型安全身份验证方案 API](server-typed-auth.md)的一部分。它分开了具名提供程序[会话身份验证](server-session-auth.md)中绑定在一起的两项内容：
 
-* **会话 (session)** 是您为调用方存储的值，例如访问令牌或用户 ID。
-* **凭据 (principal)** 是路由处理程序所处理的内容，例如完整的用户记录。
+* **session** 是为您调用方存储的值，例如访问令牌或用户 ID。
+* **principal** 是路由处理程序所处理的内容，例如完整的用户记录。
 
-在受保护的路由内部，`call.session` 为您提供存储的会话，`call.principal` 为您提供凭据。两者均为非 null 且具有正确的类型。
+在受保护的路由内部，`call.session` 为您提供已存储的 session，`call.principal` 为您提供 principal。两者均为非 null 且类型正确。
 
 <note>
     <p>
-        类型安全身份验证方案 API 属于实验性功能。可能随时会被弃用或更改。
-        使用需要选择启用 (Opt-in)。如需了解更多详情，请参阅
-        <a href="server-typed-auth.md#prerequisites">启用 API</a>。
+        类型安全身份验证方案 API 是实验性的。它可能会随时被弃用或更改。
+        需要选择启用（Opt-in）。有关更多详细信息，请参阅
+        <a href="server-typed-auth.md#prerequisites">类型安全身份验证文档</a>。
     </p>
 </note>
 
-## 创建会话方案 {id="create-scheme"}
+## 创建 session 方案 {id="create-scheme"}
 
-`session<S, P>()` 工厂函数第一个参数接收会话类型，第二个参数接收凭据类型。`validate` 块用于将会话转换为凭据，或者返回 `null` 以拒绝该会话。
+`session<S, P>()` 工厂函数首先接收 session 类型，其次接收 principal 类型。`validate` 代码块将 session 转换为 principal，或者返回 `null` 以拒绝该 session。
 
-默认情况下，没有有效会话的请求会收到 `401 Unauthorized` 响应。对于浏览器应用程序，您可以将调用方重定向到登录页面。设置 `onUnauthorized` 处理程序以更改响应：
+默认情况下，缺少有效 session 的请求会收到 `401 Unauthorized`。对于浏览器应用程序，您可以改为将调用方重定向至登录页面。设置 `onUnauthorized` 处理程序即可更改该响应：
 
 ```kotlin
 data class UserSession(val userId: String)
@@ -50,20 +50,20 @@ val sessionAuth = session<UserSession, User>("auth-session") {
 }
 ```
 
-传递给 `authenticateWith()` 的处理程序会覆盖对应路由上的该处理程序。有关完整的优先级顺序，请参阅[处理失败](server-typed-auth.md#failures)。
+传递给 `authenticateWith()` 的处理程序会针对该路由覆盖此处理程序。有关完整的执行顺序，请参阅[处理失败](server-typed-auth.md#failures)。
 
 ## 选择传输方式 {id="transport"}
 
-`transport` 属性控制会话在客户端与服务器之间的传输方式：
+`transport` 属性控制 session 如何在客户端与服务器之间传输：
 
-| 传输方式                            | 客户端持有的内容                       | 会话数据存放位置                      |
+| 传输方式 | 客户端持有的内容 | session 数据的存放位置 |
 |---------------------------------|------------------------------------|--------------------------------------|
-| `SessionTransportType.CookieId` | Cookie 中的会话 ID                  | 在服务器上的 `SessionStorage` 中      |
-| `SessionTransportType.HeaderId` | Header 中的会话 ID                  | 在服务器上的 `SessionStorage` 中      |
-| `SessionTransportType.Cookie`   | Cookie 中序列化后的会话             | 在客户端                             |
-| `SessionTransportType.Header`   | Header 中序列化后的会话             | 在客户端                             |
+| `SessionTransportType.CookieId` | Cookie 中的 session ID | 服务器端的 `SessionStorage` 中 |
+| `SessionTransportType.HeaderId` | 请求头中的 session ID | 服务器端的 `SessionStorage` 中 |
+| `SessionTransportType.Cookie` | Cookie 中序列化的 session | 客户端 |
+| `SessionTransportType.Header` | 请求头中序列化的 session | 客户端 |
 
-默认方式是基于内存存储的 `CookieId`，它将数据保存在服务器上：
+默认是由内存存储支持的 `CookieId`，它将 session 数据保存在服务器上：
 
 ```kotlin
 val storage = SessionStorageMemory()
@@ -80,10 +80,9 @@ val sessionAuth = session<UserSession, User>("auth-session") {
 }
 ```
 
-`SessionStorageMemory` 在重启时会丢失所有内容，且不能在实例之间共享，因此仅适用于本地开发。
-在生产环境中，请使用持久化存储（如 `directorySessionStorage()`）或您自定义的 `SessionStorage` 实现。
+`SessionStorageMemory` 在重启时会丢失所有内容，且不在实例之间共享，因此适用于本地开发。在生产环境中，请使用持久化存储，例如 `directorySessionStorage()`，或您自己的 `SessionStorage` 实现。
 
-> `Cookie` 和 `Header` 传输方式会将实际会话值发送到客户端。该值代表调用方的身份，因此若缺乏保护措施，客户端可能会伪造该值并冒充任何人登录。如果使用按值传输方式，请添加类似 `SessionTransportTransformerEncrypt` 的转换器：
+> `Cookie` 与 `Header` 传输方式会将 session 值发送至客户端。该值代表了调用方的身份，因此在没有保护的情况下，客户端可以伪造它并以任意身份登录。如果您使用按值（by-value）传输方式，请添加一个转换器，例如 `SessionTransportTransformerEncrypt`：
 > ```kotlin
 > val transformer = SessionTransportTransformerEncrypt(
 >     encryptKey, 
@@ -98,7 +97,7 @@ val sessionAuth = session<UserSession, User>("auth-session") {
 
 ## 安装 Sessions 插件 {id="install-sessions"}
 
-会话方案通过 [Sessions](server-sessions.md) 插件读取会话，因此必须在任何路由使用该方案之前安装该插件。将方案传递给 `install()`，Ktor 就会应用您配置的传输方式：
+session 方案通过 [Sessions](server-sessions.md) 插件读取 session，因此在任何路由使用该方案之前，必须先安装该插件。将该方案传递给 `install()`，Ktor 就会应用您配置的传输方式：
 
 ```kotlin
 fun Application.module() {
@@ -128,7 +127,7 @@ routing {
 }
 ```
 
-如果您自行配置 `Sessions`，请在配置块内部调用 `applyTransport()`，以便方案与插件在名称、类型和传输方式上保持一致：
+如果您自行配置 `Sessions`，请在配置块内部调用 `applyTransport()`，以使方案和插件在名称、类型和传输方式上保持一致：
 
 ```kotlin
 install(Sessions) {
@@ -137,11 +136,11 @@ install(Sessions) {
 }
 ```
 
-如果缺少该插件，或者它没有与方案名称和会话类型匹配的提供程序，则该方案将在启动时失败。
+如果缺少该插件，或者该插件没有与方案名称和 session 类型相匹配的提供程序，方案将在启动时失败。
 
-## 读取和更改会话 {id="read-write"}
+## 读取并更改 session {id="read-write"}
 
-在受会话方案保护的路由内部，`call.session` 是一个可读写属性：
+在受 session 方案保护的路由内部，`call.session` 是一个可读写属性：
 
 ```kotlin
 routing {
@@ -162,11 +161,11 @@ routing {
 
 在同一代码块中可以使用以下访问器：
 
-| 访问器                      | 用途                                                        |
-|--------------------------|------------------------------------------------------------|
-| `call.session`           | 读取或替换会话。                                             |
-| `call.updateSession { }` | 读取会话，应用您的更改，存储结果并将其返回。                   |
-| `call.clearSession()`    | 移除会话，这会退出调用方的登录状态。                           |
+| 访问器 | 用途 |
+|--------------------------|----------------------------------------------------------------------------|
+| `call.session` | 读取或替换 session。 |
+| `call.updateSession { }` | 读取 session，应用更改，存储结果并将其返回。 |
+| `call.clearSession()` | 移除 session，即注销调用方。 |
 
 当新值依赖于旧值时，请使用 `updateSession`：
 
@@ -179,7 +178,7 @@ post("/increment") {
 }
 ```
 
-在 `authenticateWithOptional()` 内部可能根本不存在会话，因此 `call.session` 不可用。此时请使用 `call.sessionOrNull`：
+在 `authenticateWithOptional()` 内部，可能完全没有 session，因此 `call.session` 不可用。请改用 `call.sessionOrNull`：
 
 ```kotlin
 routing {
@@ -195,11 +194,11 @@ routing {
 }
 ```
 
-## 登录与退出登录 {id="login-logout"}
+## 用户登录与注销 {id="login-logout"}
 
-方案上的 `setSession()` 和 `clearSession()` 可以在任何路由上工作，无论该路由是否受该方案保护。
+方案上的 `setSession()` 与 `clearSession()` 可在任意路由上使用，无论该路由是否受此方案保护。
 
-登录应放置在不受该方案保护的路由上。因为调用方此时还没有会话，受保护的路由会在处理程序运行之前拒绝该请求：
+登录操作应位于不受该方案保护的路由上。因为调用方此时还没有 session，受保护的路由会在处理程序运行之前就拒绝该请求：
 
 ```kotlin
 routing {
@@ -221,11 +220,11 @@ routing {
 }
 ```
 
-## 在身份验证期间更新会话 {id="transform-session"}
+## 在身份验证期间更新 session {id="transform-session"}
 
-使用 `transformSession` 可以在执行 `validate` 之前，作为身份验证过程的一部分更改存储的会话。这对于携带即将过期令牌的会话非常有用。
+使用 `transformSession` 在 `validate` 运行之前更改已存储的 session（作为身份验证的一部分）。这对于携带具有过期时间的令牌的 session 非常有用。
 
-返回本次请求要使用的会话，或者返回 `null` 以拒绝它。仅当您返回的值与传入的值不同时，Ktor 才会将会话写回：
+返回要用于本次请求的 session，或者返回 `null` 以拒绝它。仅当您返回的值与传入的值不同时，Ktor 才会将 session 写回：
 
 ```kotlin
 val sessionAuth = session<UserSession, User>("auth-session") {
@@ -242,9 +241,9 @@ val sessionAuth = session<UserSession, User>("auth-session") {
 }
 ```
 
-## 添加 CSRF 保护 {id="csrf"}
+## 添加 CSRF 防护 {id="csrf"}
 
-Cookie 传输方式会在每次请求时自动发送会话，包括由其他网站发起的请求。使用 `csrfProtection {}` 块为该方案保护的路由安装 [CSRF](https://api.ktor.io/ktor-server/ktor-server-plugins/ktor-server-csrf/io.ktor.server.plugins.csrf/-c-s-r-f.html) 插件：
+Cookie 传输方式会在每次请求中自动发送 session，包括从其他站点发起的请求。使用 `csrfProtection {}` 代码块为该方案所保护的路由安装 [CSRF](https://api.ktor.io/ktor-server/ktor-server-plugins/ktor-server-csrf/io.ktor.server.plugins.csrf/-c-s-r-f.html) 插件：
 
 ```kotlin
 val sessionAuth = session<UserSession, User>("auth-session") {
@@ -258,8 +257,8 @@ val sessionAuth = session<UserSession, User>("auth-session") {
 }
 ```
 
-> 要了解有关角色、可选身份验证以及该 API 其余部分的更多信息，请参阅[类型安全身份验证](server-typed-auth.md)。
+> 要了解更多信息，请参阅[类型安全身份验证](server-typed-auth.md)了解角色、可选身份验证以及该 API 其余内容。
 > 
-> 有关使用 `Sessions` 插件的更多详情，请参阅 [Sessions](server-sessions.md)。
+> 有关使用 `Sessions` 插件的更多详细信息，请参阅 [Sessions](server-sessions.md)。
 > 
 {style="tip"}

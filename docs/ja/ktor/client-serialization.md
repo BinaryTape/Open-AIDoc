@@ -1,10 +1,11 @@
-[//]: # (title: Ktor Client におけるコンテントネゴシエーションとシリアライズ)
+[//]: # (title: Ktor Client におけるコンテンツネゴシエーションとシリアライゼーション)
 
 <show-structure for="chapter" depth="2"/>
 <primary-label ref="client-plugin"/>
 
 <var name="plugin_name" value="ContentNegotiation"/>
 <var name="artifact_name" value="ktor-client-content-negotiation"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.client.contentNegotiation"/>
 
 <tldr>
 <p>
@@ -20,53 +21,62 @@
 </tldr>
 
 <link-summary>
-ContentNegotiation プラグインは、主に 2 つの目的を果たします。クライアントとサーバー間でのメディアタイプのネゴシエーションと、リクエストの送信時やレスポンスの受信時に特定のフォーマットでコンテンツをシリアライズ/デシリアライズすることです。
+ContentNegotiation プラグインには、クライアントとサーバー間のメディアタイプのネゴシエーション、およびリクエストの送信時やレスポンスの受信時に特定の形式でコンテンツをシリアライズ/デシリアライズするという2つの主な目的があります。
 </link-summary>
 
-[`ContentNegotiation`](https://api.ktor.io/ktor-client-content-negotiation/io.ktor.client.plugins.contentnegotiation/-content-negotiation) プラグインは、主に 2 つの目的を果たします。
-* クライアントとサーバー間でのメディアタイプのネゴシエーション。これには、`Accept` および `Content-Type` ヘッダーを使用します。
-* サポートされているフォーマットでの[リクエスト](client-requests.md)ボディのシリアライズと[レスポンス](client-responses.md)ボディのデシリアライズ。Ktor は、JSON、XML、CBOR、ProtoBuf を標準でサポートしています。
+[`ContentNegotiation`](https://api.ktor.io/ktor-client-content-negotiation/io.ktor.client.plugins.contentnegotiation/-content-negotiation)
+プラグインには、主に2つの目的があります。
+* `Accept` および `Content-Type` ヘッダーを使用した、クライアントとサーバー間のメディアタイプのネゴシエーション。
+* サポートされている形式での[リクエスト](client-requests.md)ボディのシリアライズおよび[レスポンス](client-responses.md)ボディのデシリアライズ。Ktor は JSON、XML、CBOR、および ProtoBuf の組み込みサポートを提供しています。
 
-> サーバー側では、Ktor はコンテンツをシリアライズ/デシリアライズするために [`ContentNegotiation`](server-serialization.md) プラグインを提供しています。
+> サーバー側では、Ktor はコンテンツのシリアライズとデシリアライズのために [`ContentNegotiation`](server-serialization.md) プラグインを提供しています。
 >
 {style="tip"}
 
 ## 依存関係の追加 {id="add_dependencies"}
 
-### ContentNegotiation {id="add_content_negotiation_dependency"}
+### コンテンツネゴシエーション {id="add_content_negotiation_dependency"}
 
 <p>
     <code>%plugin_name%</code> を使用するには、ビルドスクリプトに <code>%artifact_name%</code> アーティファクトを追加します。
 </p>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上記のコードスニペットでは、Ktor の依存関係を指定するために <a href="server-dependencies.topic#using-version-catalog">
+            Ktor バージョンカタログ</a> を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上記のコードスニペットでは、Ktor の依存関係を指定するために <a href="server-dependencies.topic#using-version-catalog">
+            Ktor バージョンカタログ</a> を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
     </TabItem>
 </Tabs>
 
-> 特定のフォーマットのシリアライザーには追加のアーティファクトが必要です。
+> 特定の形式のシリアライザーには追加のアーティファクトが必要です。
 > 
-> 例えば、`kotlinx.serialization` の JSON には `ktor-serialization-kotlinx-json` 依存関係が必要です。含まれているアーティファクトに応じて、Ktor は自動的にデフォルトのシリアライザーを選択します。必要に応じて、シリアライザーを明示的に[指定](#configure_serializer)して設定することもできます。
+> 例えば、`kotlinx.serialization` で JSON を扱うには `ktor-serialization-kotlinx-json` 依存関係が必要です。含まれているアーティファクトに応じて、Ktor はデフォルトのシリアライザーを自動的に選択します。必要に応じて、シリアライザーを明示的に[指定](#configure_serializer)して設定することもできます。
 > 
 {style="note"}
 
 <tip>
-    Ktor クライアントに必要なアーティファクトの詳細については、<Links href="/ktor/client-dependencies" summary="既存のプロジェクトにクライアントの依存関係を追加する方法を学びます。">クライアントの依存関係の追加</Links>を参照してください。
+    Ktor クライアントで必要なアーティファクトの詳細については、<Links href="client-dependencies.md" summary="既存のプロジェクトにクライアントの依存関係を追加する方法を学びます。">クライアントの依存関係の追加</Links> を参照してください。
 </tip>
 
-### シリアライズ {id="serialization_dependency"}
+### シリアライゼーション {id="serialization_dependency"}
 
-`kotlinx.serialization` コンバーターを使用する前に、[Setup](https://github.com/Kotlin/kotlinx.serialization#setup) セクションの説明に従って Kotlin serialization プラグインを追加してください。
+`kotlinx.serialization` コンバーターを使用する前に、[セットアップ (Setup)](https://github.com/Kotlin/kotlinx.serialization#setup) セクションの説明に従って Kotlin serialization プラグインを追加してください。
 
 #### JSON {id="add_json_dependency"}
 
-JSON データをシリアライズおよびデシリアライズするには、プロジェクトにシリアライズライブラリを追加します。Ktor は `kotlinx.serialization`、Gson、または Jackson をサポートしています。
+JSON データのシリアライズとデシリアライズを行うには、プロジェクトにシリアライゼーションライブラリを追加します。Ktor は `kotlinx.serialization`、Gson、または Jackson をサポートしています。
 
 <Tabs group="json-libraries">
 <TabItem title="kotlinx.serialization" group-key="kotlinx">
@@ -74,12 +84,21 @@ JSON データをシリアライズおよびデシリアライズするには、
 ビルドスクリプトに `ktor-serialization-kotlinx-json` アーティファクトを追加します。
 
 <var name="artifact_name" value="ktor-serialization-kotlinx-json"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.serialization.kotlinx.json"/>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上記のコードスニペットでは、Ktor の依存関係を指定するために <a href="server-dependencies.topic#using-version-catalog">
+            Ktor バージョンカタログ</a> を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上記のコードスニペットでは、Ktor の依存関係を指定するために <a href="server-dependencies.topic#using-version-catalog">
+            Ktor バージョンカタログ</a> を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
@@ -92,12 +111,21 @@ JSON データをシリアライズおよびデシリアライズするには、
 ビルドスクリプトに `ktor-serialization-gson` アーティファクトを追加します。
 
 <var name="artifact_name" value="ktor-serialization-gson"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.serialization.gson"/>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上記のコードスニペットでは、Ktor の依存関係を指定するために <a href="server-dependencies.topic#using-version-catalog">
+            Ktor バージョンカタログ</a> を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上記のコードスニペットでは、Ktor の依存関係を指定するために <a href="server-dependencies.topic#using-version-catalog">
+            Ktor バージョンカタログ</a> を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
@@ -110,12 +138,21 @@ JSON データをシリアライズおよびデシリアライズするには、
 ビルドスクリプトに `ktor-serialization-jackson` アーティファクトを追加します。
 
 <var name="artifact_name" value="ktor-serialization-jackson"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.serialization.jackson"/>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上記のコードスニペットでは、Ktor の依存関係を指定するために <a href="server-dependencies.topic#using-version-catalog">
+            Ktor バージョンカタログ</a> を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上記のコードスニペットでは、Ktor の依存関係を指定するために <a href="server-dependencies.topic#using-version-catalog">
+            Ktor バージョンカタログ</a> を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
@@ -127,15 +164,24 @@ JSON データをシリアライズおよびデシリアライズするには、
 
 #### XML {id="add_xml_dependency"}
 
-XML をシリアライズおよびデシリアライズするには、ビルドスクリプトに `ktor-serialization-kotlinx-xml` アーティファクトを追加します。
+XML のシリアライズとデシリアライズを行うには、ビルドスクリプトに `ktor-serialization-kotlinx-xml` アーティファクトを追加します。
 
 <var name="artifact_name" value="ktor-serialization-kotlinx-xml"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.serialization.kotlinx.xml"/>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上記のコードスニペットでは、Ktor の依存関係を指定するために <a href="server-dependencies.topic#using-version-catalog">
+            Ktor バージョンカタログ</a> を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上記のコードスニペットでは、Ktor の依存関係を指定するために <a href="server-dependencies.topic#using-version-catalog">
+            Ktor バージョンカタログ</a> を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
@@ -144,15 +190,24 @@ XML をシリアライズおよびデシリアライズするには、ビルド�
 
 #### CBOR {id="add_cbor_dependency"}
 
-CBOR をシリアライズおよびデシリアライズするには、ビルドスクリプトに `ktor-serialization-kotlinx-cbor` アーティファクトを追加します。
+CBOR のシリアライズとデシリアライズを行うには、ビルドスクリプトに `ktor-serialization-kotlinx-cbor` アーティファクトを追加します。
 
 <var name="artifact_name" value="ktor-serialization-kotlinx-cbor"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.serialization.kotlinx.cbor"/>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上記のコードスニペットでは、Ktor の依存関係を指定するために <a href="server-dependencies.topic#using-version-catalog">
+            Ktor バージョンカタログ</a> を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上記のコードスニペットでは、Ktor の依存関係を指定するために <a href="server-dependencies.topic#using-version-catalog">
+            Ktor バージョンカタログ</a> を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
@@ -161,15 +216,24 @@ CBOR をシリアライズおよびデシリアライズするには、ビルド
 
 #### ProtoBuf {id="add_protobuf_dependency"}
 
-ProtoBuf をシリアライズおよびデシリアライズするには、ビルドスクリプトに `ktor-serialization-kotlinx-protobuf` アーティファクトを追加します。
+ProtoBuf のシリアライズとデシリアライズを行うには、ビルドスクリプトに `ktor-serialization-kotlinx-protobuf` アーティファクトを追加します。
 
 <var name="artifact_name" value="ktor-serialization-kotlinx-protobuf"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.serialization.kotlinx.protobuf"/>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上記のコードスニペットでは、Ktor の依存関係を指定するために <a href="server-dependencies.topic#using-version-catalog">
+            Ktor バージョンカタログ</a> を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上記のコードスニペットでは、Ktor の依存関係を指定するために <a href="server-dependencies.topic#using-version-catalog">
+            Ktor バージョンカタログ</a> を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
@@ -178,7 +242,7 @@ ProtoBuf をシリアライズおよびデシリアライズするには、ビ�
 
 ## `ContentNegotiation` のインストール {id="install_plugin"}
 
-`ContentNegotiation` プラグインをインストールするには、[クライアント設定ブロック](client-create-and-configure.md#configure-client)内で `install` 関数に渡します。
+`ContentNegotiation` プラグインをインストールするには、[クライアント設定ブロック](client-create-and-configure.md#configure-client) で `install` 関数に渡します。
 
 ```kotlin
 val client = HttpClient(CIO) {
@@ -186,7 +250,7 @@ val client = HttpClient(CIO) {
 }
 ```
 
-これで、必要な JSON シリアライザーを[設定](#configure_serializer)できるようになります。
+その後、必要な JSON シリアライザーを[設定](#configure_serializer)できます。
 
 ## シリアライザーの設定 {id="configure_serializer"}
 
@@ -208,7 +272,7 @@ val client = HttpClient(CIO) {
 }
 ```
 
-JSON シリアライズをカスタマイズするには、`json()` コンストラクタで `Json` 設定を渡します。
+JSON シリアライゼーションをカスタマイズするには、`json()` コンストラクターに `Json` 設定を渡します。
 
 ```kotlin
 val client = HttpClient(CIO) {
@@ -243,7 +307,7 @@ val client = HttpClient(CIO) {
 }
 ```
 
-Gson シリアライズをカスタマイズするには、`gson()` 関数に設定ブロックを渡します。利用可能な設定オプションについては、[`GsonBuilder`](https://www.javadoc.io/doc/com.google.code.gson/gson/latest/com.google.gson/com/google/gson/GsonBuilder.html) を参照してください。
+Gson シリアライゼーションをカスタマイズするには、`gson()` 関数に設定ブロックを渡します。利用可能な設定オプションについては、[`GsonBuilder`](https://www.javadoc.io/doc/com.google.code.gson/gson/latest/com.google.gson/com/google/gson/GsonBuilder.html) を参照してください。
 
 </TabItem>
 <TabItem title="Jackson" group-key="jackson">
@@ -261,7 +325,7 @@ val client = HttpClient(CIO) {
 }
 ```
 
-Jackson シリアライズをカスタマイズするには、[`ObjectMapper`](https://fasterxml.github.io/jackson-databind/javadoc/2.17.2/com/fasterxml/jackson/databind/ObjectMapper.html) によって提供される設定を使用します。
+Jackson シリアライゼーションをカスタマイズするには、[`ObjectMapper`](https://fasterxml.github.io/jackson-databind/javadoc/2.17.2/com/fasterxml/jackson/databind/ObjectMapper.html) が提供する設定を使用します。
 
 ```kotlin
 import io.ktor.client.plugins.contentnegotiation.*
@@ -297,7 +361,7 @@ val client = HttpClient(CIO) {
 }
 ```
 
-XML シリアライズをカスタマイズするには、`xml()` 関数に必要なオプションを渡します。
+XML シリアライゼーションをカスタマイズするには、必要なオプションを `xml()` 関数に渡します。
 
 ```kotlin
 import io.ktor.client.plugins.contentnegotiation.*
@@ -329,7 +393,7 @@ val client = HttpClient(CIO) {
 }
 ```
 
-CBOR シリアライズをカスタマイズするには、`cbor()` コンストラクタで `Cbor` 設定を渡します。
+CBOR シリアライゼーションをカスタマイズするには、`cbor()` コンストラクターに `Cbor` 設定を渡します。
 
 ```kotlin
 import io.ktor.client.plugins.contentnegotiation.*
@@ -362,7 +426,7 @@ val client = HttpClient(CIO) {
 }
 ```
 
-ProtoBuf シリアライズをカスタマイズするには、`protobuf()` 関数に `ProtoBuf` 設定を渡します。
+ProtoBuf シリアライゼーションをカスタマイズするには、`protobuf()` 関数に `ProtoBuf` 設定を渡します。
 
 ```kotlin
 import io.ktor.client.plugins.contentnegotiation.*
@@ -384,7 +448,7 @@ val client = HttpClient(CIO) {
 
 デフォルトでは、`ContentNegotiation` プラグインは登録されたコンテンツタイプを送信リクエストの `Accept` ヘッダーに追加します。
 
-`Accept` ヘッダーを明示的に設定しており、プラグインが登録されたコンテンツタイプを追加しないようにしたい場合は、`acceptHeaderMergeStrategy` プロパティを `ContentTypeMergeStrategy.SkipIfPresent` に設定します。
+`Accept` ヘッダーを明示的に設定しており、プラグインによって登録済みコンテンツタイプを追加したくない場合は、`acceptHeaderMergeStrategy` プロパティを `ContentTypeMergeStrategy.SkipIfPresent` に設定します。
 
 ```kotlin
 val client = HttpClient(CIO) {
@@ -395,26 +459,26 @@ val client = HttpClient(CIO) {
 }
 ```
 
-`SkipIfPresent` を指定すると、プラグインは既存の `Accept` ヘッダーを保持します。リクエストに `Accept` ヘッダーが含まれていない場合、プラグインは通常どおり登録されたコンテンツタイプを追加します。
+`SkipIfPresent` を使用すると、プラグインは既存の `Accept` ヘッダーを保持します。リクエストに `Accept` ヘッダーが含まれていない場合、プラグインは通常どおり登録されたコンテンツタイプを追加します。
 
 ## データの送受信 {id="receive_send_data"}
 
 ### データクラスの作成 {id="create_data_class"}
 
-以下の例では、クライアントが送受信するデータを表すために `Customer` データクラスを使用します。
+以下の例では、クライアントが送受信するデータを表すために `Customer` データクラスを使用しています。
 
 ```kotlin
 data class Customer(val id: Int, val firstName: String, val lastName: String)
 ```
 
-`kotlinx.serialization` を使用する場合は、このクラスに `@Serializable` アノテーションを付加してください。
+`kotlinx.serialization` を使用する場合は、クラスに `@Serializable` アノテーションを付加します。
 
 ```kotlin
 @Serializable
 data class Customer(val id: Int, val firstName: String, val lastName: String)
 ```
 
-以下の型のシリアライズ/デシリアライズは、kotlinx.serialization ライブラリによってサポートされています。
+kotlinx.serialization ライブラリでは、以下の型のシリアライズ/デシリアライズがサポートされています。
 
 - [組み込みクラス (Builtin classes)](https://github.com/Kotlin/kotlinx.serialization/blob/master/docs/builtin-classes.md)
 - [Sequence](https://kotlinlang.org/docs/sequences.html) のデシリアライズ
@@ -422,9 +486,9 @@ data class Customer(val id: Int, val firstName: String, val lastName: String)
 
 ### データの送信 {id="send_data"}
 
-[リクエスト](client-requests.md)ボディ内で[クラスインスタンス](#create_data_class)を送信するには、`setBody()` 関数を使用してこのインスタンスを割り当て、`contentType()` 関数を使用してコンテンツタイプを設定します。
+[リクエスト](client-requests.md)ボディで[クラスのインスタンス](#create_data_class)を送信するには、`setBody()` 関数を使用してこのインスタンスを割り当て、`contentType()` 関数を使用してコンテンツタイプを設定します。
 
-以下の例では、`Customer` オブジェクトを JSON として送信します。
+以下の例は、`Customer` オブジェクトを JSON として送信します。
 
 ```kotlin
 val response: HttpResponse = client.post("http://localhost:8080/customer") {
@@ -433,13 +497,13 @@ val response: HttpResponse = client.post("http://localhost:8080/customer") {
 }
 ```
 
-`ContentNegotiation` プラグインは、設定されたシリアライザーを使用してリクエストボディを指定されたフォーマットに変換します。
+`ContentNegotiation` プラグインは、設定されたシリアライザーを使用してリクエストボディを指定された形式に変換します。
 
-他の登録されたフォーマットでデータを送信するには、`ContentType.Application.Xml` や `ContentType.Application.Cbor` など、対応するコンテンツタイプを指定します。
+他の登録済み形式でデータを送信するには、`ContentType.Application.Xml` や `ContentType.Application.Cbor` などの対応するコンテンツタイプを指定します。
 
 ### データの受信 {id="receive_data"}
 
-サーバーがサポートされているコンテンツタイプを含む[レスポンス](client-responses.md)を返した場合、`ContentNegotiation` プラグインはレスポンスボディを期待される型へとデシリアライズできます。
+サーバーがサポートされているコンテンツタイプを含む[レスポンス](client-responses.md)を返すと、`ContentNegotiation` プラグインはレスポンスボディを期待される型にデシリアライズできます。
 
 例えば、JSON レスポンスを `Customer` オブジェクトにデシリアライズするには、`body()` 関数を呼び出します。
 

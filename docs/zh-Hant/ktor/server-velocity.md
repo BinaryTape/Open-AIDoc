@@ -8,36 +8,45 @@
 <var name="plugin_name" value="Velocity"/>
 <var name="package_name" value="io.ktor.server.velocity"/>
 <var name="artifact_name" value="ktor-server-velocity"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.server.velocity"/>
 
 <tldr>
 <p>
-<b>必要相依性</b>：<code>io.ktor:%artifact_name%</code>
+<b>必要相依性</b>: <code>io.ktor:%artifact_name%</code>
 </p>
 <var name="example_name" value="velocity"/>
 <p>
-    <b>程式碼範例</b>：
-    <a href="https://github.com/ktorio/ktor-documentation/tree/%ktor_version%/codeSnippets/snippets/%example_name%">
+    <b>程式碼範例</b>:
+    <a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/%example_name%">
         %example_name%
     </a>
 </p>
 <p>
-    <b><Links href="/ktor/server-native" summary="Ktor 支援 Kotlin/Native，允許您在沒有額外執行階段或虛擬機的情況下執行伺服器。">原生伺服器</Links> 支援</b>：✖️
+    <b><Links href="server-native.md" summary="Ktor supports Kotlin/Native and allows you to run a server without an additional runtime or virtual machine.">原生伺服器</Links> 支援</b>: ✖️
 </p>
 </tldr>
 
-Ktor 透過安裝 [Velocity](https://api.ktor.io/ktor-server-velocity/io.ktor.server.velocity/-velocity) 外掛程式，讓您能在應用程式中使用 [Velocity 範本](https://velocity.apache.org/engine/) 作為視圖。
+透過安裝 [Velocity](https://api.ktor.io/ktor-server-velocity/io.ktor.server.velocity/-velocity) 外掛程式，Ktor 允許你在應用程式中使用 [Velocity 範本](https://velocity.apache.org/engine/) 作為檢視。
 
 ## 新增相依性 {id="add_dependencies"}
 
 <p>
-    若要使用 <code>%plugin_name%</code>，您需要在建置指令碼中包含 <code>%artifact_name%</code> 構件：
+    若要使用 <code>%plugin_name%</code>，請將 <code>%artifact_name%</code> 構件新增至你的組建指令碼中：
 </p>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上述程式碼片段使用 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 版本目錄</a> 來指定 Ktor 相依性。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上述程式碼片段使用 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 版本目錄</a> 來指定 Ktor 相依性。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
@@ -47,15 +56,16 @@ Ktor 透過安裝 [Velocity](https://api.ktor.io/ktor-server-velocity/io.ktor.se
 ## 安裝 Velocity {id="install_plugin"}
 
 <p>
-    若要將 <code>%plugin_name%</code> 外掛程式安裝到應用程式，請將其傳遞給指定 <Links href="/ktor/server-modules" summary="模組允許您透過對路由進行分組來建構應用程式結構。">模組</Links> 中的 <code>install</code> 函式。
-    下方的程式碼片段展示了如何安裝 <code>%plugin_name%</code> ...
+    若要將 <code>%plugin_name%</code> 外掛程式<a href="server-plugins.md#install">安裝</a>至你的應用程式中，
+    請將其傳遞給指定 <Links href="server-modules.md" summary="Modules allow you to structure your application by grouping routes.">模組</Links> 中的 <code>install</code> 函式。
+    以下範例展示如何安裝 <code>%plugin_name%</code>：
 </p>
 <list>
     <li>
-        ... 在 <code>embeddedServer</code> 函式呼叫內。
+        在 <code>embeddedServer()</code> 函式呼叫中。
     </li>
     <li>
-        ... 在明確定義的 <code>module</code> 內，該模組是 <code>Application</code> 類別的擴充函式。
+        在 <code>Application</code> 類別上明確定義的 <code>module()</code> 擴充函式中。
     </li>
 </list>
 <Tabs>
@@ -67,11 +77,11 @@ Ktor 透過安裝 [Velocity](https://api.ktor.io/ktor-server-velocity/io.ktor.se
     </TabItem>
 </Tabs>
 
-此外，您也可以安裝 `VelocityTools` 外掛程式，以便獲得新增標準和自訂 [Velocity 工具](#velocity_tools) 的能力。
+此外，你也可以安裝 `VelocityTools` 外掛程式，以獲得新增標準與自訂 [Velocity 工具](#velocity_tools) 的能力。
 
 ## 配置 Velocity {id="configure"}
 ### 配置範本載入 {id="template_loading"}
-在 `install` 區塊內，您可以配置 [VelocityEngine][velocity_engine]。例如，如果您想使用來自 classpath 的範本，請為 `classpath` 使用資源載入器：
+在 `install` 區塊內，你可以配置 [VelocityEngine][velocity_engine]。例如，如果你想從 classpath 使用範本，可以使用 `classpath` 的資源載入器：
 ```kotlin
 import io.ktor.server.application.*
 import io.ktor.server.velocity.*
@@ -87,7 +97,7 @@ fun Application.module() {
 ```
 
 ### 在回應中傳送範本 {id="use_template"}
-假設您在 `resources/templates` 中有一個 `index.vl` 範本：
+假設你在 `resources/templates` 中有一個 `index.vl` 範本：
 ```html
 <html>
     <body>
@@ -101,7 +111,7 @@ fun Application.module() {
 data class User(val id: Int, val name: String)
 ```
 
-若要將範本用於指定的 [路由](server-routing.md)，請按以下方式將 `VelocityContent` 傳遞給 `call.respond` 方法：
+若要將該範本用於指定的 [路由](server-routing.md)，請依以下方式將 `VelocityContent` 傳遞給 `call.respond` 方法：
 ```kotlin
 get("/index") {
     val sampleUser = User(1, "John")
@@ -111,7 +121,7 @@ get("/index") {
 
 ### 新增 Velocity 工具 {id="velocity_tools"}
 
-如果您已[安裝](#install_plugin)了 `VelocityTools` 外掛程式，則可以在 `install` 區塊內存取 `EasyFactoryConfiguration` 執行個體，以新增標準和自訂的 Velocity 工具，例如：
+如果你已[安裝](#install_plugin)了 `VelocityTools` 外掛程式，可以在 `install` 區塊內存取 `EasyFactoryConfiguration` 執行個體以新增標準及自訂的 Velocity 工具，例如：
 
 ```kotlin
 install(VelocityTools) {

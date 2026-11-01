@@ -17,17 +17,17 @@
 了解如何在 Ktor 中使用 Netty 伺服器引擎啟用並配置實驗性 HTTP/3 支援。
 </link-summary>
 
-[HTTP/3](https://www.rfc-editor.org/rfc/rfc9114.html) 是一種建構於 [QUIC](https://www.rfc-editor.org/rfc/rfc9000.html) 而非 TCP 之上的 HTTP 協定。
+[HTTP/3](https://www.rfc-editor.org/rfc/rfc9114.html) 是一種透過 [QUIC](https://www.rfc-editor.org/rfc/rfc9000.html) 而非 TCP 運行的 HTTP 協定。
 
-Ktor 透過 [Netty 伺服器引擎](server-engines.md#) 提供實驗性的 HTTP/3 支援。
+Ktor 透過 [Netty 伺服器引擎](server-engines.md#) 提供實驗性 HTTP/3 支援。
 
-> HTTP/3 支援使用實驗性 Ktor API。若要使用，請選擇加入 `ExperimentalKtorApi`。
+> HTTP/3 支援使用實驗性 Ktor API。若要使用它，請加入 `ExperimentalKtorApi`。
 > 
 {style="note"}
 
 ## 啟用 HTTP/3 {id="ssl"}
 
-HTTP/3 始終使用 TLS，因此您至少需要配置一個 [SSL 連接器](server-ssl.md)。
+HTTP/3 始終使用 TLS，因此您需要配置至少一個 [SSL 連接器](server-ssl.md)。
 
 若要啟用 HTTP/3，請在 Netty 引擎配置中呼叫 `enableHttp3()` 函式：
 
@@ -60,9 +60,9 @@ fun main(args: Array<String>) {
 }
 ```
 
-對於每個 SSL 連接器，Ktor 會透過 UDP 將 HTTP/3 端點繫結至相同的 host 與 port。HTTP/1.1 和 HTTP/2 則繼續在該 port 上使用 TCP。
+對於每個 SSL 連接器，Ktor 都會透過 UDP 將 HTTP/3 端點繫結到相同的主機和連接埠。HTTP/1.1 和 HTTP/2 則繼續在該連接埠上使用 TCP。
 
-> 如需更多關於配置憑證與 SSL 連接器的資訊，請參閱 [Ktor Server 中的 SSL 與憑證](server-ssl.md)。
+> 如需配置憑證和 SSL 連接器的更多資訊，請參閱 [Ktor Server 中的 SSL 與憑證](server-ssl.md)。
 > 
 {style="tip"}
 
@@ -84,7 +84,7 @@ enableHttp3 {
 }
 ```
 
-可用的選項如下：
+提供以下選項：
 
 <deflist type="full">
 <def>
@@ -92,14 +92,14 @@ enableHttp3 {
 
 預設為 `null`。
 
-指定用於 QUIC 位址驗證的 `QuicTokenHandler`。使用 `HmacQuicTokenHandler` 來啟用基於 HMAC 的重試權杖 (retry tokens)。
+指定用於 QUIC 位址驗證的 `QuicTokenHandler`。使用 `HmacQuicTokenHandler` 可啟用基於 HMAC 的重試權杖 (retry token)。
 </def>
 <def>
 <title><code>quicMaxIdleTimeout</code></title>
 
 預設為 `30.seconds`。
 
-指定 QUIC 連線在關閉前可維持閒置的時間。必須大於 `0`。
+指定 QUIC 連線在關閉前可維持閒置的最長時間。必須大於 `0`。
 </def>
 <def>
 <title><code>quicInitialMaxData</code></title>
@@ -113,14 +113,14 @@ enableHttp3 {
 
 預設為 `1_000_000`。
 
-指定由本機端發起的雙向串流之初始流量控制限制。必須大於 `0`。
+指定本機發起的雙向串流的初始流量控制限制。必須大於 `0`。
 </def>
 <def>
 <title><code>quicInitialMaxStreamDataBidirectionalRemote</code></title>
 
 預設為 `1_000_000`。
 
-指定由遠端發起的雙向串流之初始流量控制限制。必須大於 `0`。
+指定遠端發起的雙向串流的初始流量控制限制。必須大於 `0`。
 </def>
 <def>
 <title><code>quicInitialMaxStreamsBidirectional</code></title>
@@ -156,7 +156,7 @@ enableHttp3 {
 
 ## 配置 QUIC 伺服器編解碼器 {id="quic-server-codec"}
 
-對於進階 Netty 配置，請使用 `configureQuicServerCodec` 選項來自訂底層的 `QuicServerCodecBuilder`：
+如需進階 Netty 配置，請使用 `configureQuicServerCodec` 選項來自訂底層的 `QuicServerCodecBuilder`：
 
 ```kotlin
 enableHttp3 {
@@ -166,4 +166,4 @@ enableHttp3 {
 }
 ```
 
-僅在需要低階 QUIC 傳輸配置時才使用此選項。
+僅在需要低階 QUIC 傳輸配置時使用此選項。

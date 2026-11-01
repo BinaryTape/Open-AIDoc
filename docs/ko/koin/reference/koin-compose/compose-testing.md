@@ -1,83 +1,45 @@
 ---
-title: Composable 테스트하기
+title: Composable 테스트
 ---
 
-# Koin으로 Composable 테스트하기
+# Composable 테스트
 
-이 가이드는 안드로이드 스튜디오 프리뷰부터 포괄적인 단위 테스트에 이르기까지, Koin을 사용하는 Compose 애플리케이션의 테스트 전략을 다룹니다.
+이 페이지에서는 Koin으로 테스트할 때 Compose와 관련된 특화 내용을 다룹니다. `KoinApplicationPreview`를 사용한 프리뷰, `ComposeTestRule`을 사용한 UI 테스트, 그리고 멀티플랫폼 UI 테스트를 다룹니다. 독자가 `koinInject()` 및 `koinViewModel()`을 사용하여 Composable 내에서 주입하는 방법을 알고 있다고 가정합니다([Koin for Compose](/docs/reference/koin-compose/compose) 참조). 테스트 설정, 오버라이드 및 `declareMock`에 대한 설명은 [단위 테스트(Unit Testing)](/docs/reference/koin-test/testing)를 참조하세요.
 
-## KoinApplicationPreview {id="koinapplicationpreview"}
+## KoinApplicationPreview를 사용한 프리뷰 {id="previews-with-koinapplicationpreview"}
 
-Koin 의존성이 포함된 안드로이드 스튜디오 프리뷰에는 `KoinApplicationPreview`를 사용하세요:
+프리뷰는 `Application` 클래스를 실행하지 않으므로 Koin 컨테이너가 존재하지 않습니다. `KoinApplicationPreview`는 프리뷰를 위한 컨테이너를 생성합니다.
 
 ```kotlin
+import org.koin.compose.KoinApplicationPreview
+
+val previewModule = module {
+    single<UserRepository> { FakeUserRepository(sampleUsers) }
+    viewModel { UserViewModel(get()) }
+}
+
 @Preview
 @Composable
 fun UserScreenPreview() {
-    KoinApplicationPreview(application = {
-        modules(module {
-            viewModel { UserViewModel(FakeUserRepository()) }
-        })
-    }) {
+    KoinApplicationPreview(application = { modules(previewModule) }) {
         UserScreen()
     }
 }
 ```
 
-### 다중 프리뷰 (Multiple Previews) {id="multiple-previews"}
+`KoinApplicationPreview`는 `startKoin`으로 시작되는 전역 컨테이너가 아닌, `koinApplication`을 사용한 로컬 컨테이너를 생성합니다. 각 프리뷰마다 고유한 인스턴스를 가지므로 Android Studio에서 여러 프리뷰를 병렬로 렌더링할 수 있습니다.
+
+`single<UserRepository> { FakeUserRepository(sampleUsers) }`와 같은 람다 정의는 어떤 스타일에서도 동작합니다. `application` 람다는 `startKoin { }` 내에 작성하는 모든 것을 허용하므로, 프로덕션 모듈을 로드하고 프리뷰에 필요한 부분만 오버라이드할 수도 있습니다.
+
+여러 상태를 미리 보려면 각 프리뷰에 서로 다른 페이크(fake)를 가진 모듈을 제공하세요.
 
 ```kotlin
-@Preview(name = "Light Mode")
-@Preview(name = "Dark Mode", uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Preview(name = "Large Font", fontScale = 1.5f)
-@Composable
-fun UserCardPreviews() {
-    KoinApplicationPreview(application = {
-        modules(previewModule)
-    }) {
-        UserCard(user = sampleUser)
-    }
-}
-
-val previewModule = module {
-    single<UserRepository> { FakeUserRepository() }
-    viewModel { UserViewModel(get()) }
-}
-```
-
-### 다양한 상태의 프리뷰 {id="preview-with-different-states"}
-
-```kotlin
-@Preview(name = "Loading")
-@Composable
-fun LoadingPreview() {
-    KoinApplicationPreview(application = {
-        modules(module {
-            viewModel { UserViewModel(LoadingRepository()) }
-        })
-    }) {
-        UserScreen()
-    }
-}
-
 @Preview(name = "Error")
 @Composable
-fun ErrorPreview() {
+fun UserScreenErrorPreview() {
     KoinApplicationPreview(application = {
-        modules(module {
-            viewModel { UserViewModel(ErrorRepository()) }
-        })
-    }) {
-        UserScreen()
-    }
-}
-
-@Preview(name = "Success")
-@Composable
-fun SuccessPreview() {
-    KoinApplicationPreview(application = {
-        modules(module {
-            viewModel { UserViewModel(SuccessRepository(sampleUsers)) }
+        modules(previewModule, module {
+            single<UserRepository> { FailingUserRepository() }
         })
     }) {
         UserScreen()
@@ -85,22 +47,24 @@ fun SuccessPreview() {
 }
 ```
 
-## ComposeTestRule을 사용한 단위 테스트 {id="unit-testing-with-composetestrule"}
+동일한 함수에 지정된 여러 `@Preview` 어노테이션(라이트 모드 및 다크 모드, 폰트 배율)은 동일한 모듈을 공유합니다.
 
-### 기본 설정 {id="basic-setup"}
+## ComposeTestRule을 사용한 UI 테스트 {id="ui-tests-with-composetestrule"}
+
+컴포지션(composition)에서 Koin 인스턴스가 제공되지 않으면 `koinInject()`와 `koinViewModel()`은 전역 컨텍스트에서 의존성을 해결(resolve)합니다. `KoinTestRule`로 Koin을 시작하고 콘텐츠를 설정하세요.
 
 ```kotlin
 class UserScreenTest : KoinTest {
 
-    @get:Rule
+    @get:Rule(order = 0)
     val koinTestRule = KoinTestRule.create {
         modules(module {
-            single<UserRepository> { FakeUserRepository() }
+            single<UserRepository> { FakeUserRepository(sampleUsers) }
             viewModel { UserViewModel(get()) }
         })
     }
 
-    @get:Rule
+    @get:Rule(order = 1)
     val composeTestRule = createComposeRule()
 
     @Test
@@ -110,183 +74,26 @@ class UserScreenTest : KoinTest {
         }
 
         composeTestRule.onNodeWithText("Alice").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Bob").assertIsDisplayed()
     }
 }
 ```
 
-### 사용자 상호작용 테스트 {id="testing-user-interactions"}
+테스트하려는 Composable에 `KoinApplication(configuration = ...)`이 포함되어 있다면, 룰(rule)에 의해 시작된 컨테이너에 연결되고 자체 설정은 무시됩니다. 즉, 테스트 모듈이 사용됩니다.
+
+`KoinContext { }`는 지원 중단(deprecated)되었으며 필요하지 않습니다. 테스트 콘텐츠를 이것으로 감싸지 마세요.
+
+Android에서 이러한 테스트는 계측 테스트(instrumented tests, 또는 Robolectric)로 실행됩니다. 그래프에 `Context`가 필요하다면 [Android 계측 테스트](/docs/reference/koin-android/instrumented-testing#restart-koin-with-a-test-rule)에 나온 것처럼 룰에 `androidContext(...)`를 추가하세요.
+
+### 페이크와 목(Fakes and mocks) {id="fakes-and-mocks"}
+
+페이크(fake)를 사용하여 화면을 각 상태로 유도할 수 있습니다.
 
 ```kotlin
-@Test
-fun clickingUserShowsDetails() {
-    composeTestRule.setContent {
-        UserScreen()
-    }
-
-    // 사용자 클릭
-    composeTestRule.onNodeWithText("Alice").performClick()
-
-    // 내비게이션 또는 상태 변경 확인
-    composeTestRule.onNodeWithText("alice@example.com").assertIsDisplayed()
-}
-
-@Test
-fun searchFiltersUsers() {
-    composeTestRule.setContent {
-        UserScreen()
-    }
-
-    // 검색어 입력
-    composeTestRule.onNodeWithTag("searchField").performTextInput("Ali")
-
-    // 필터링된 결과 확인
-    composeTestRule.onNodeWithText("Alice").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Bob").assertDoesNotExist()
-}
-```
-
-### ViewModel 상태 테스트 {id="testing-with-viewmodel-states"}
-
-```kotlin
-@Test
-fun showsLoadingIndicator() {
-    val loadingRepository = object : UserRepository {
-        override suspend fun getUsers(): List<User> {
-            delay(Long.MAX_VALUE) // 절대 완료되지 않음
-            return emptyList()
-        }
-    }
-
-    startKoin {
-        modules(module {
-            single<UserRepository> { loadingRepository }
-            viewModel { UserViewModel(get()) }
-        })
-    }
-
-    composeTestRule.setContent {
-        UserScreen()
-    }
-
-    composeTestRule.onNodeWithTag("loadingIndicator").assertIsDisplayed()
-
-    stopKoin()
-}
-
-@Test
-fun showsErrorMessage() {
-    val errorRepository = object : UserRepository {
-        override suspend fun getUsers(): List<User> {
-            throw IOException("Network error")
-        }
-    }
-
-    startKoin {
-        modules(module {
-            single<UserRepository> { errorRepository }
-            viewModel { UserViewModel(get()) }
-        })
-    }
-
-    composeTestRule.setContent {
-        UserScreen()
-    }
-
-    composeTestRule.waitUntil(5000) {
-        composeTestRule
-            .onAllNodesWithText("Network error")
-            .fetchSemanticsNodes()
-            .isNotEmpty()
-    }
-
-    stopKoin()
-}
-```
-
-## 의존성 모킹 (Mocking Dependencies) {id="mocking-dependencies"}
-
-### MockK 사용하기 {id="using-mockk"}
-
-```kotlin
-class UserScreenMockTest : KoinTest {
-
-    private val mockRepository = mockk<UserRepository>()
-
-    @get:Rule
-    val koinTestRule = KoinTestRule.create {
-        modules(module {
-            single { mockRepository }
-            viewModel { UserViewModel(get()) }
-        })
-    }
-
-    @get:Rule
-    val composeTestRule = createComposeRule()
-
-    @Test
-    fun loadsUsersOnStart() = runTest {
-        coEvery { mockRepository.getUsers() } returns listOf(
-            User("Test User", "test@example.com")
-        )
-
-        composeTestRule.setContent {
-            UserScreen()
-        }
-
-        composeTestRule.waitUntil(5000) {
-            composeTestRule
-                .onAllNodesWithText("Test User")
-                .fetchSemanticsNodes()
-                .isNotEmpty()
-        }
-
-        coVerify { mockRepository.getUsers() }
-    }
-
-    @Test
-    fun refreshCallsRepository() = runTest {
-        coEvery { mockRepository.getUsers() } returns emptyList()
-
-        composeTestRule.setContent {
-            UserScreen()
-        }
-
-        // 새로고침 트리거
-        composeTestRule.onNodeWithTag("refreshButton").performClick()
-
-        coVerify(exactly = 2) { mockRepository.getUsers() }
-    }
-}
-```
-
-### 가짜 구현체(Fake Implementation) 사용하기 {id="using-fake-implementations"}
-
-```kotlin
-class FakeUserRepository : UserRepository {
-    private val users = mutableListOf<User>()
-    var shouldFail = false
-
-    override suspend fun getUsers(): List<User> {
-        if (shouldFail) throw IOException("Fake error")
-        return users.toList()
-    }
-
-    override suspend fun addUser(user: User) {
-        users.add(user)
-    }
-
-    fun setUsers(vararg newUsers: User) {
-        users.clear()
-        users.addAll(newUsers)
-    }
-}
-
-class UserScreenFakeTest : KoinTest {
+class UserScreenStatesTest : KoinTest {
 
     private val fakeRepository = FakeUserRepository()
 
-    @get:Rule
+    @get:Rule(order = 0)
     val koinTestRule = KoinTestRule.create {
         modules(module {
             single<UserRepository> { fakeRepository }
@@ -294,191 +101,96 @@ class UserScreenFakeTest : KoinTest {
         })
     }
 
-    @get:Rule
+    @get:Rule(order = 1)
     val composeTestRule = createComposeRule()
 
-    @Before
-    fun setup() {
-        fakeRepository.setUsers(
-            User("Alice", "alice@example.com"),
-            User("Bob", "bob@example.com")
-        )
-    }
-
     @Test
-    fun displaysUsers() {
-        composeTestRule.setContent {
-            UserScreen()
-        }
-
-        composeTestRule.onNodeWithText("Alice").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Bob").assertIsDisplayed()
-    }
-
-    @Test
-    fun handlesError() {
+    fun showsErrorMessage() {
         fakeRepository.shouldFail = true
 
-        composeTestRule.setContent {
-            UserScreen()
-        }
+        composeTestRule.setContent { UserScreen() }
 
-        composeTestRule.waitUntil(5000) {
-            composeTestRule
-                .onAllNodesWithText("Error")
-                .fetchSemanticsNodes()
-                .isNotEmpty()
+        composeTestRule.waitUntil(timeoutMillis = 5_000) {
+            composeTestRule.onAllNodesWithText("Network error")
+                .fetchSemanticsNodes().isNotEmpty()
         }
     }
 }
 ```
 
-## 내비게이션 테스트 {id="testing-navigation"}
+`setContent`를 호출하기 전에 페이크를 변경하세요. ViewModel은 첫 번째 컴포지션에서 생성되며 해당 시점의 데이터를 로드합니다.
+
+대신 모킹(mocking) 라이브러리를 사용하려면 `setContent` 전에 `declareMock<UserRepository> { ... }`를 호출하세요([declareMock으로 모킹하기](/docs/reference/koin-test/testing#mocking-with-declaremock) 참조).
+
+### 격리된 컨텍스트를 사용하는 화면 {id="screens-using-an-isolated-context"}
+
+화면이 `KoinIsolatedContext`에서 Koin 인스턴스를 가져오는 경우([격리된 컨텍스트](/docs/reference/koin-compose/isolated-context) 참조), 테스트에 전역 컨텍스트가 필요하지 않습니다. 테스트 컨테이너를 빌드하고 동일한 방식으로 제공하세요.
 
 ```kotlin
-class NavigationTest : KoinTest {
-
-    @get:Rule
-    val koinTestRule = KoinTestRule.create {
-        modules(testModule)
+@Test
+fun sdkScreenUsesTestContainer() {
+    val testKoin = koinApplication {
+        modules(module { single<SdkApi> { FakeSdkApi() } })
     }
 
-    @get:Rule
-    val composeTestRule = createComposeRule()
-
-    @Test
-    fun navigatesToDetail() {
-        lateinit var navController: NavHostController
-
-        composeTestRule.setContent {
-            navController = rememberNavController()
-            AppNavigation(navController)
+    composeTestRule.setContent {
+        KoinIsolatedContext(context = testKoin) {
+            SdkScreen()
         }
-
-        // 상세 페이지로 이동
-        composeTestRule.onNodeWithText("View Details").performClick()
-
-        // 내비게이션 확인
-        assertEquals("detail/123", navController.currentDestination?.route)
     }
 
-    @Test
-    fun backNavigationWorks() {
-        lateinit var navController: NavHostController
-
-        composeTestRule.setContent {
-            navController = rememberNavController()
-            AppNavigation(navController)
-        }
-
-        // 앞으로 이동
-        composeTestRule.onNodeWithText("View Details").performClick()
-
-        // 뒤로 이동
-        composeTestRule.onNodeWithContentDescription("Back").performClick()
-
-        // 홈으로 돌아왔는지 확인
-        assertEquals("home", navController.currentDestination?.route)
-    }
+    composeTestRule.onNodeWithText("Connected").assertIsDisplayed()
+    testKoin.close()
 }
 ```
 
-## 코루틴 테스트 {id="testing-with-coroutines"}
+전역 상태가 관여하지 않으므로 이러한 테스트는 병렬로 실행할 수 있습니다.
 
-```kotlin
-class CoroutineTest : KoinTest {
+## 멀티플랫폼 UI 테스트 {id="multiplatform-ui-tests"}
 
-    @get:Rule
-    val koinTestRule = KoinTestRule.create {
-        modules(module {
-            single<UserRepository> { FakeUserRepository() }
-            viewModel { UserViewModel(get()) }
-        })
-    }
-
-    @get:Rule
-    val composeTestRule = createComposeRule()
-
-    @Test
-    fun asyncOperationCompletes() = runTest {
-        composeTestRule.setContent {
-            UserScreen()
-        }
-
-        // 비동기 작업 대기
-        composeTestRule.waitUntil(timeoutMillis = 5000) {
-            composeTestRule
-                .onAllNodesWithTag("userList")
-                .fetchSemanticsNodes()
-                .isNotEmpty()
-        }
-
-        // 결과 확인
-        composeTestRule.onNodeWithText("Alice").assertIsDisplayed()
-    }
-}
-```
-
-## 멀티플랫폼 테스트 {id="multiplatform-testing"}
-
-Compose Multiplatform의 경우, `expect`/`actual` 테스트 헬퍼를 생성하세요:
+`commonTest`에서는 JUnit 룰을 사용할 수 없습니다. Compose Multiplatform 테스트 라이브러리의 `runComposeUiTest`를 사용하고, `kotlin.test` 어노테이션으로 Koin을 시작하고 중지하세요.
 
 ```kotlin
 // commonTest
-expect fun createTestComposeRule(): ComposeTestRule
+@OptIn(ExperimentalTestApi::class)
+class UserScreenCommonTest : KoinTest {
 
-// androidTest
-actual fun createTestComposeRule(): ComposeTestRule = createComposeRule()
+    @BeforeTest
+    fun before() {
+        startKoin {
+            modules(module {
+                single<UserRepository> { FakeUserRepository(sampleUsers) }
+                viewModel { UserViewModel(get()) }
+            })
+        }
+    }
 
-// Common test
-class CommonUserScreenTest : KoinTest {
-
-    @get:Rule
-    val composeTestRule = createTestComposeRule()
+    @AfterTest
+    fun after() {
+        stopKoin()
+    }
 
     @Test
-    fun displaysContent() {
-        startKoin {
-            modules(testModule)
-        }
+    fun displaysUserList() = runComposeUiTest {
+        setContent { UserScreen() }
 
-        composeTestRule.setContent {
-            UserScreen()
-        }
-
-        // 단언문(Assertions)...
-
-        stopKoin()
+        onNodeWithText("Alice").assertIsDisplayed()
     }
 }
 ```
 
-## 권장 사항 (Best Practices) {id="best-practices"}
+`KoinTest`, `startKoin`, `declareMock`은 멀티플랫폼을 지원합니다. `KoinTestRule`과 `MockProviderRule`은 JVM 전용입니다. [Compose Multiplatform 테스트 가이드](https://kotlinlang.org/docs/multiplatform/compose-test.html)에 설명된 대로 테스트 의존성을 설정하고, `commonTest`에 `io.insert-koin:koin-test`를 추가하세요.
 
-1. **KoinTestRule 사용** - 설정(setup) 및 해제(teardown)를 자동으로 처리합니다.
-   ```kotlin
-   @get:Rule
-   val koinTestRule = KoinTestRule.create { modules(testModule) }
-   ```
+## 주의점 {id="pitfalls"}
 
-2. **Mock보다 Fake 선호** - 더 예측 가능하고 이해하기 쉽습니다.
+- 룰 순서: Koin은 콘텐츠가 설정되기 전에 시작되어야 합니다. `createAndroidComposeRule<MainActivity>()`를 사용할 경우 액티비티가 룰에 의해 실행되므로, `KoinTestRule`에 더 낮은 `order` 값을 지정해야 합니다.
+- ViewModel이 이미 생성된 경우: 이전 컴포지션에서 생성된 ViewModel은 의존성을 그대로 유지합니다. 페이크나 목은 `setContent` 전에 변경하세요.
+- 프리뷰 컨테이너는 로컬입니다: 전역 컨텍스트를 읽는 코드(`KoinPlatform.getKoin()`, Compose 외부의 `KoinComponent`)는 `KoinApplicationPreview` 컨테이너를 볼 수 없습니다.
 
-3. **한 번에 하나의 동작만 테스트** - 집중된 테스트가 유지보수하기 더 쉽습니다.
+## 관련 문서 {id="related"}
 
-4. **시맨틱(Semantic) 테스트 태그 사용** - UI 변경에도 견고한 테스트를 만듭니다.
-   ```kotlin
-   Modifier.testTag("submitButton")
-   ```
-
-5. **비동기 작업 대기** - 비동기 상태에 대해서는 `waitUntil`을 사용하세요.
-   ```kotlin
-   composeTestRule.waitUntil(5000) { condition }
-   ```
-
-6. **Koin 정리** - Rule을 사용하지 않는 경우, `@After`에서 `stopKoin()`을 호출하세요.
-
-## 다음 단계 {id="next-steps"}
-
-- **[Compose 개요](/docs/reference/koin-compose/compose)** - 설정 및 기본 주입
-- **[테스트 레퍼런스](/docs/reference/koin-test/testing)** - 일반적인 Koin 테스트
-- **[모듈 검증](/docs/reference/koin-test/verify)** - 모듈 구성 검증
+- [단위 테스트](/docs/reference/koin-test/testing): `KoinTestRule`, 오버라이드 및 `declareMock`.
+- [Android 계측 테스트](/docs/reference/koin-android/instrumented-testing): 테스트 Application, Activity 관련 룰 순서.
+- [Koin for Compose](/docs/reference/koin-compose/compose): `koinInject()` 및 `KoinApplication`.
+- [Compose에서의 ViewModel](/docs/reference/koin-compose/compose-viewmodel): `koinViewModel()`이 ViewModel을 생성하고 유지하는 방법.
+- [격리된 컨텍스트](/docs/reference/koin-compose/isolated-context): SDK 및 라이브러리를 위한 `KoinIsolatedContext`.

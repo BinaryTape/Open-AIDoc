@@ -1,15 +1,15 @@
 [//]: # (title: 类型检查与转换)
 
-在 Kotlin 中，你可以在运行时对类型执行两项操作：检查一个对象是否为特定类型，或者将其转换为另一种类型。
-类型**检查**可帮助你确认正在处理的对象种类，而类型**转换**则尝试将对象转换为另一种类型。
+在 Kotlin 中，可以在运行时对类型进行两项操作：检查对象是否为特定类型，或者将其转换为另一种类型。
+类型**检查**有助于确认正在处理的对象种类，而类型**转换**则尝试将对象转换为另一种类型。
 
-> 要专门了解**泛型**（generics）的类型检查与转换，例如 `List<T>`、`Map<K,V>`，请参阅[泛型的类型检查与转换](generics.md#generics-type-checks-and-casts)。
+> 要具体了解**泛型**类型检查与转换（例如 `List<T>`、`Map<K,V>`），请参阅[泛型类型检查与转换](generics.md#generics-type-checks-and-casts)。
 >
 {style="tip"}
 
-## 使用 `is` 与 `!is` 操作符进行检查 {id="is-and-is-operators"}
+## 使用 `is` 与 `!is` 运算符进行检查 {id="is-and-is-operators"}
 
-使用 `is` 操作符（或其否定形式 `!is`）在运行时检查对象是否符合某种类型：
+使用 `is` 运算符（或其否定形式 `!is`）在运行时检查对象是否符合某种类型：
 
 ```kotlin
 fun main() {
@@ -28,9 +28,9 @@ fun main() {
     }
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-typecasts-is-operator"}
+{kotlin-runnable="true" id="kotlin-typecasts-is-operator"}
 
-你也可以使用 `is` 和 `!is` 操作符来检查对象是否符合某种子类型：
+还可以使用 `is` 与 `!is` 运算符来检查对象是否符合某个子类型：
 
 ```kotlin
 interface Animal {
@@ -50,7 +50,7 @@ fun handleAnimal(animal: Animal) {
     println("Handling animal: ${animal.name}")
     animal.speak()
     
-    // 使用 is 操作符检查子类型
+    // 使用 is 运算符检查子类型
     if (animal is Dog) {
         println("Special care instructions: This is a dog.")
     } else if (animal is Cat) {
@@ -83,11 +83,11 @@ fun main() {
     // ---
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-typecasts-is-operator-subtype"}
+{kotlin-runnable="true" id="kotlin-typecasts-is-operator-subtype"}
 
-本例使用 `is` 操作符检查 `Animal` 类实例是否具有子类型 `Dog` 或 `Cat`，以便打印相关的护理说明。
+该示例使用 `is` 运算符检查 `Animal` 类实例是否属于子类型 `Dog` 或 `Cat`，以输出相应的照料说明。
 
-你可以检查一个对象是否为其声明类型的父类型，但这没有意义，因为结果始终为 true。每个类实例本身就是其父类型的实例。
+你可以检查对象是否是其声明类型的超类型，但这没有必要，因为结果始终为 true。每个类实例本身就已经属于其超类型的实例。
 
 > 要在运行时识别对象的类型，请参阅[反射](reflection.md)。
 > 
@@ -95,11 +95,11 @@ fun main() {
 
 ## 类型转换 {id="type-casts"}
 
-在 Kotlin 中将对象的类型转换为另一种类型被称为**转换**（casting）。
+在 Kotlin 中，将对象的类型转换为另一种类型称为**转换**（casting）。
 
-在某些情况下，编译器会自动为你转换对象。这被称为智能转换。
+在某些情况下，编译器会自动为你转换对象。这称为智能转换（smart-casting）。
 
-如果你需要显式转换类型，请使用 `as?` 或 `as` [转换操作符](#unsafe-cast-operator)。 
+如果需要显式转换类型，请使用 `as?` 或 `as` [转换运算符](#unsafe-cast-operator)。
 
 ## 智能转换 {id="smart-casts"}
 
@@ -107,7 +107,7 @@ fun main() {
 
 ```kotlin
 fun logMessage(data: Any) {
-    // data 被自动转换为 String
+    // data 会自动转换为 String
     if (data is String) {
         println("Received text: ${data.length} characters")
     }
@@ -119,13 +119,13 @@ fun main() {
     logMessage(404)
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-typecasts-smartcast"}
+{kotlin-runnable="true" id="kotlin-typecasts-smartcast"}
 
-编译器甚至足够聪明，知道如果负面检查导致了返回，那么转换也是安全的：
+编译器甚至足够智能，如果否定检查会导致返回，它能识别出此时进行转换是安全的：
 
 ```kotlin
 fun logMessage(data: Any) {
-    // data 被自动转换为 String
+    // data 会自动转换为 String
     if (data !is String) return
 
     println("Received text: ${data.length} characters")
@@ -137,7 +137,7 @@ fun main() {
     logMessage(true)
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-typecasts-smartcast-negative"}
+{kotlin-runnable="true" id="kotlin-typecasts-smartcast-negative"}
 
 ### 控制流 {id="control-flow"}
 
@@ -146,11 +146,11 @@ fun main() {
 ```kotlin
 fun processInput(data: Any) {
     when (data) {
-        // data 被自动转换为 Int
+        // data 会自动转换为 Int
         is Int -> println("Log: Assigned new ID ${data + 1}")
-        // data 被自动转换为 String
+        // data 会自动转换为 String
         is String -> println("Log: Received message \"$data\"")
-        // data 被自动转换为 IntArray
+        // data 会自动转换为 IntArray
         is IntArray -> println("Log: Processed scores, total = ${data.sum()}")
     }
 }
@@ -164,7 +164,7 @@ fun main() {
     // Log: Processed scores, total = 60
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-typecasts-smartcast-when"}
+{kotlin-runnable="true" id="kotlin-typecasts-smartcast-when"}
 
 以及 [`while` 循环](control-flow.md#while-loops)：
 
@@ -193,8 +193,8 @@ fun main() {
 
     var status: Status = robo.status()
     while (status is Ok) {
-        // 编译器将 status 智能转换为 OK 类型，
-        // 因此 currentRoom 属性是可访问的。
+        // 编译器将 status 智能转换为 Ok 类型，因此 currentRoom
+        // 属性可供访问。
         println("Cleaning ${status.currentRoom}...")
         status = robo.clean()
     }
@@ -207,13 +207,13 @@ fun main() {
     //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-typecasts-smartcast-while"}
+{kotlin-runnable="true" id="kotlin-typecasts-smartcast-while"}
 
-在本例中，密封接口 `Status` 有两个实现：数据类 `Ok` 和数据对象 `Error`。只有 `Ok` 数据类具有 `currentRoom` 属性。当 `while` 循环条件的计算结果为 true 时，编译器会将 `status` 变量智能转换为 `Ok` 类型，从而使 `currentRoom` 属性在循环体内可供访问。
+在此示例中，密封接口 `Status` 有两个实现：数据类 `Ok` 和数据对象 `Error`。只有 `Ok` 数据类具有 `currentRoom` 属性。当 `while` 循环条件求值为 true 时，编译器会将 `status` 变量智能转换为 `Ok` 类型，从而使 `currentRoom` 属性在循环体内可供访问。
 
-如果你在 `if`、`when` 或 `while` 条件中使用 `Boolean` 类型的变量之前对其进行了声明，那么编译器收集到的关于该变量的任何信息都可以在相应的块中用于智能转换。
+如果在将 `Boolean` 类型的变量用于 `if`、`when` 或 `while` 条件之前声明它，编译器收集到的关于该变量的任何信息都可以在相应代码块中用于智能转换。
 
-当你想要将布尔条件提取到变量中时，这会非常有用。这样你就可以给变量起一个有意义的名字，从而提高代码的可读性，并使得在代码后续部分重用该变量成为可能。例如：
+这在需要将布尔条件提取到变量中等场景下非常有用。随后，你可以为变量指定有意义的名称，从而提高代码的可读性，并使其能在后续代码中复用。例如：
 
 ```kotlin
 class Cat {
@@ -226,8 +226,9 @@ fun petAnimal(animal: Any) {
     val isCat = animal is Cat
     if (isCat) {
         // 编译器可以访问有关 isCat 的信息，
-        // 因此它知道 animal 已被智能转换为 Cat 类型。
-        // 因此，可以调用 purr() 函数。
+        // 因此它知道 animal 已被智能转换
+        // 为 Cat 类型。
+        // 因此可以调用 purr() 函数。
         animal.purr()
     }
 }
@@ -241,23 +242,23 @@ fun main(){
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="2.0" id="kotlin-smart-casts-local-variables" validate="false"}
 
-### 逻辑操作符 {id="logical-operators"}
+### 逻辑运算符 {id="logical-operators"}
 
-如果 `&&` 或 `||` 操作符左侧有类型检查（正常或否定），编译器可以在其右侧执行智能转换：
+如果 `&&` 或 `||` 运算符的左侧存在类型检查（常规检查或否定检查），编译器可以在其右侧执行智能转换：
 
 ```kotlin
-// x 在 `||` 的右侧被自动转换为 String
+// 在 `||` 右侧，x 会自动转换为 String
 if (x !is String || x.length == 0) return
 
-// x 在 `&&` 的右侧被自动转换为 String
+// 在 `&&` 右侧，x 会自动转换为 String
 if (x is String && x.length > 0) {
-    print(x.length) // x 被自动转换为 String
+    print(x.length) // x 会自动转换为 String
 }
 ```
 
-如果你使用 `and` 操作符 (`&&`) 组合对象的类型检查，编译器会同时将对象智能转换为所有已检查的类型。欲了解更多信息，请参阅[交叉类型](#intersection-types)。
+如果使用“与”运算符（`&&`）组合对对象的类型检查，编译器会将该对象同时智能转换为所有经过检查的类型。在[交叉类型](#intersection-types)中了解详情。
 
-如果你使用 `or` 操作符 (`||`) 组合对象的类型检查，则会智能转换为它们最近的公共父类型：
+如果使用“或”运算符（`||`）组合对对象的类型检查，则会智能转换为它们最近的公共超类型：
 
 ```kotlin
 interface Status {
@@ -270,19 +271,19 @@ interface Declined : Status
 
 fun signalCheck(signalStatus: Any) {
     if (signalStatus is Postponed || signalStatus is Declined) {
-        // signalStatus 被智能转换为公共父类型 Status
+        // signalStatus 智能转换为公共超类型 Status
         signalStatus.signal()
     }
 }
 ```
 
-> 公共父类型是 [联合类型](https://en.wikipedia.org/wiki/Union_type) 的一种**近似**。联合类型[目前在 Kotlin 中暂不受支持](https://youtrack.jetbrains.com/issue/KT-13108/Denotable-union-and-intersection-types)。
+> 公共超类型是[联合类型](https://en.wikipedia.org/wiki/Union_type)的**近似**表示。Kotlin 当前[不支持联合类型](https://youtrack.jetbrains.com/issue/KT-13108/Denotable-union-and-intersection-types)。
 >
 {style="note"}
 
 ### 交叉类型 {id="intersection-types"}
 
-当编译器通过多个 `&&` 检查对一个对象进行智能转换时，它会推断出一个[*交叉类型*](https://kotlinlang.org/spec/type-system.html#intersection-types)。这是一种内部类型，它同时满足所有已检查的约束：
+当编译器通过多个 `&&` 检查对对象进行智能转换时，它会推断出一个[*交叉类型*](https://kotlinlang.org/spec/type-system.html#intersection-types)。这是一种同时满足所有已检查约束的内部类型：
 
 ```kotlin
 interface Bird {
@@ -303,8 +304,7 @@ fun describe(animal: Any) {
 }
 ```
 
-交叉类型是不可表示的。它们仅存在于编译器的内部类型系统中，用于在类型检查期间保留类型信息。你无法在 Kotlin 代码中直接编写它们。你可能会在编译器错误消息和 IDE 工具提示中遇到交叉类型，通常显示为 `A & B`。
-唯一的例外是 `T & Any`，它声明了一个[绝对不可为空类型](generics.md#definitely-non-nullable-types)。此语法专门预留用于将类型参数与 `Any` 结合。
+交叉类型是不可表示的（non-denotable）。它们仅存在于编译器的内部类型系统中，用于在类型检查期间保留类型信息。你不能在 Kotlin 代码中直接编写它们。你可能会在编译器错误消息和 IDE 工具提示中遇到交叉类型，通常显示为 `A & B`。唯一的例外是用于声明[明确不可为空类型](generics.md#definitely-non-nullable-types)的 `T & Any`。此语法专用于将类型形参与 `Any` 结合。
 
 ```kotlin
 fun  <T> T.assertNotNull(): T & Any = this ?: throw IllegalStateException("null value")
@@ -312,11 +312,11 @@ fun  <T> T.assertNotNull(): T & Any = this ?: throw IllegalStateException("null 
 
 ### 内联函数 {id="inline-functions"}
 
-对于传递给[内联函数](inline-functions.md)的 lambda 函数中捕获的变量，编译器可以对其进行智能转换。
+编译器可以对传递给[内联函数](inline-functions.md)的 lambda 函数中捕获的变量进行智能转换。
 
-内联函数被视为具有隐式的 [`callsInPlace`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.contracts/-contract-builder/calls-in-place.html) 契约。这意味着传递给内联函数的任何 lambda 函数都会在原地调用。由于 lambda 函数是在原地调用的，编译器知道 lambda 函数不会泄露对其函数体内包含的任何变量的引用。
+内联函数被视为具有隐式的 [`callsInPlace`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.contracts/-contract-builder/calls-in-place.html) 契约。这意味着传递给内联函数的任何 lambda 函数都会被就地调用。由于 lambda 函数是就地调用的，编译器知道该 lambda 函数不会泄露其函数体内包含的任何变量的引用。
 
-编译器利用这一知识结合其他分析，来决定对任何捕获的变量进行智能转换是否安全。例如：
+编译器利用这一特性并结合其他分析，来判定对被捕获的变量进行智能转换是否安全。例如：
 
 ```kotlin
 interface Processor {
@@ -330,13 +330,13 @@ fun nextProcessor(): Processor? = null
 fun runProcessor(): Processor? {
     var processor: Processor? = null
     inlineAction {
-        // 编译器知道 processor 是一个局部变量，且 inlineAction() 是一个内联函数，
-        // 因此对 processor 的引用不会被泄露。
-        // 因此，对 processor 进行智能转换是安全的。
+        // 编译器知道 processor 是一个局部变量，且 inlineAction() 
+        // 是一个内联函数，因此不会泄露对 processor 的引用。
+        // 因此，可以安全地对 processor 进行智能转换。
       
-        // 如果 processor 不为 null，则 processor 会被智能转换
+        // 如果 processor 不为 null，则对 processor 进行智能转换
         if (processor != null) {
-            // 编译器知道 processor 不为 null，因此不需要安全调用
+            // 编译器知道 processor 不为 null，因此无需安全调用
             processor.process()
         }
 
@@ -349,29 +349,29 @@ fun runProcessor(): Processor? {
 
 ### 异常处理 {id="exception-handling"}
 
-智能转换信息会被传递到 `catch` 和 `finally` 块中。由于编译器会跟踪你的对象是否具有可空类型，这使你的代码更加安全。例如：
+智能转换信息会传递到 `catch` 和 `finally` 块中。这使代码更加安全，因为编译器会跟踪对象是否具有可空类型。例如：
 
 ```kotlin
 //sampleStart
 fun testString() {
     var stringInput: String? = null
-    // stringInput 被智能转换为 String 类型
+    // stringInput 智能转换为 String 类型
     stringInput = ""
     try {
         // 编译器知道 stringInput 不为 null
         println(stringInput.length)
         // 0
 
-        // 编译器拒绝 stringInput 之前的智能转换信息。
-        // 现在 stringInput 的类型为 String?。
+        // 编译器废弃了之前针对 stringInput 的智能转换信息。
+        // 现在 stringInput 具有 String? 类型。
         stringInput = null
 
-        // 触发一个异常
+        // 触发异常
         if (2 > 1) throw Exception()
         stringInput = ""
     } catch (exception: Exception) {
         // 编译器知道 stringInput 可能为 null，
-        // 因此 stringInput 保持可空状态。
+        // 因此 stringInput 保持为可空类型。
         println(stringInput?.length)
         // null
     }
@@ -385,7 +385,7 @@ fun main() {
 
 ### 智能转换的前提条件 {id="smart-cast-prerequisites"}
 
-只有当编译器能够保证变量在检查和使用之间不会发生变化时，智能转换才有效。它们可以在以下条件下使用：
+只有当编译器能够保证变量在检查和使用之间不会发生改变时，智能转换才会生效。它们可在以下条件下使用：
 
 <table style="none">
     <tr>
@@ -393,7 +393,7 @@ fun main() {
             <code>val</code> 局部变量
         </td>
         <td>
-            始终可以，但<a href="delegated-properties.md">本地委托属性</a>除外。
+            始终可用，<a href="delegated-properties.md">局部委托属性</a>除外。
         </td>
     </tr>
     <tr>
@@ -401,7 +401,7 @@ fun main() {
             <code>val</code> 属性
         </td>
         <td>
-            如果属性是 <code>private</code>、<code>internal</code>，或者检查是在声明该属性的同一个<a href="visibility-modifiers.md#modules">模块</a>中执行的。智能转换不能用于 <code>open</code> 属性或具有自定义 getter 的属性。
+            如果属性为 <code>private</code>、<code>internal</code>，或者检查是在声明该属性的同一<a href="visibility-modifiers.md#modules">模块</a>中执行的。智能转换不能用于 <code>open</code> 属性或具有自定义 getter 的属性。
         </td>
     </tr>
     <tr>
@@ -409,7 +409,7 @@ fun main() {
             <code>var</code> 局部变量
         </td>
         <td>
-            如果变量在检查和使用之间未被修改，未在修改它的 lambda 中被捕获，且不是本地委托属性。
+            如果变量在检查与使用之间未被修改，未在修改它的 lambda 中被捕获，并且不是局部委托属性。
         </td>
     </tr>
     <tr>
@@ -417,17 +417,16 @@ fun main() {
             <code>var</code> 属性
         </td>
         <td>
-            从不可以，因为该变量随时可能被其他代码修改。
+            绝不可用，因为该变量随时可能被其他代码修改。
         </td>
     </tr>
 </table>
 
-## `as` 与 `as?` 转换操作符 {id="unsafe-cast-operator"}
+## `as` 与 `as?` 转换运算符 {id="unsafe-cast-operator"}
 
-Kotlin 有两个转换操作符：`as` 和 `as?`。你可以使用两者进行转换，但它们的行为不同。
+Kotlin 有两个转换运算符：`as` 和 `as?`。二者均可用于类型转换，但行为不同。
 
-如果使用 `as` 操作符转换失败，则会在运行时抛出 `ClassCastException`。这就是为什么它也被称为**不安全**操作符。
-在转换为非空类型时，可以使用 `as`：
+如果使用 `as` 运算符转换失败，则会在运行时抛出 `ClassCastException`。这也是它被称为**不安全**运算符的原因。当转换为非空类型时，可以使用 `as`：
 
 ```kotlin
 fun main() {
@@ -446,7 +445,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="2.0" id="kotlin-unsafe-cast-operator" validate="false"}
 
-如果改用 `as?` 操作符，且转换失败，则该操作符会返回 `null`。这就是为什么它也被称为**安全**操作符：
+如果改用 `as?` 运算符且转换失败，该运算符会返回 `null`。这也是它被称为**安全**运算符的原因：
 
 ```kotlin
 fun main() {
@@ -457,7 +456,7 @@ fun main() {
     println("Logging in user with ID: $userId")
     // Logging in user with ID: user-1234
 
-    // 向 wrongCast 赋值 null
+    // 将 null 值赋给 wrongCast
     val wrongCast = rawInput as? Int
     println("wrongCast contains: $wrongCast")
     // wrongCast contains: null
@@ -465,9 +464,9 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="2.0" id="kotlin-safe-cast-operator"}
 
-要安全地转换可空类型，请使用 `as?` 操作符，以防止在转换失败时触发 `ClassCastException`。
+要安全地转换可空类型，请使用 `as?` 运算符，以防止转换失败时触发 `ClassCastException`。
 
-你*可以*对可空类型使用 `as`。这允许结果为 `null`，但如果转换不成功，它仍然会抛出 `ClassCastException`。出于这个原因，`as?` 是更安全的选择：
+你*可以*对可空类型使用 `as`。这允许结果为 `null`，但如果转换失败，它仍然会抛出 `ClassCastException`。因此，`as?` 是更安全的选择：
 
 ```kotlin
 fun main() {
@@ -477,22 +476,22 @@ fun main() {
         "loginAttempts" to 3
     )
 
-    // 不安全地转换为可空 String
+    // 不安全地转换为可空的 String
     val username: String? = config["username"] as String?
     println("Username: $username")
     // Username: kodee
 
-    // 不安全地将 null 值转换为可空 String
+    // 不安全地将 null 值转换为可空的 String
     val alias: String? = config["alias"] as String?
     println("Alias: $alias")
     // Alias: null
 
-    // 转换为可空 String 失败并抛出 ClassCastException
+    // 转换为可空的 String 失败并抛出 ClassCastException
     // val unsafeAttempts: String? = config["loginAttempts"] as String?
     // println("Login attempts (unsafe): $unsafeAttempts")
     // Exception in thread "main" java.lang.ClassCastException
 
-    // 转换为可空 String 失败并返回 null
+    // 转换为可空的 String 失败并返回 null
     val safeAttempts: String? = config["loginAttempts"] as? String
     println("Login attempts (safe): $safeAttempts")
     // Login attempts (safe): null
@@ -500,11 +499,11 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="2.0" id="kotlin-cast-nullable-types"}
 
-### 向上转型与向下转型 {id="up-and-downcasting"}
+### 向上转换与向下转换 {id="up-and-downcasting"}
 
-在 Kotlin 中，你可以将对象转换为父类型和子类型。 
+在 Kotlin 中，可以将对象转换为超类型和子类型。
 
-将对象转换为其超类的实例称为**向上转型**（upcasting）。向上转型不需要任何特殊语法或转换操作符。例如：
+将对象转换为其超类的实例称为**向上转换**（upcasting）。向上转换不需要任何特殊语法或转换运算符。例如：
 
 ```kotlin
 interface Animal {
@@ -524,31 +523,31 @@ fun printAnimalInfo(animal: Animal) {
 
 fun main() {
     val dog = Dog()
-    // 将 Dog 实例向上转型为 Animal
+    // 将 Dog 实例向上转换为 Animal
     printAnimalInfo(dog)  
     // Dog says woof!
 }
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="2.0" id="kotlin-upcast"}
 
-在本例中，当使用 `Dog` 实例调用 `printAnimalInfo()` 函数时，编译器会将其向上转型为 `Animal`，因为那是预期的参数类型。由于实际对象仍然是一个 `Dog` 实例，编译器会动态解析 `Dog` 类中的 `makeSound()` 函数，打印出 `"Dog says woof!"`。
+在此示例中，当使用 `Dog` 实例调用 `printAnimalInfo()` 函数时，编译器会将其向上转换为 `Animal`，因为这是预期的形参类型。由于实际对象仍然是 `Dog` 实例，编译器会动态解析 `Dog` 类中的 `makeSound()` 函数，并输出 `"Dog says woof!"`。
 
-在行为取决于抽象类型的 Kotlin API 中，你经常会看到显式向上转型。这在 Jetpack Compose 和 UI 工具包中也很常见，它们通常将所有 UI 元素视为父类型，随后再对具体的子类进行操作：
+在行为取决于抽象类型的 Kotlin API 中，经常会看到显式的向上转换。这在 Jetpack Compose 和 UI 工具包中也很常见，它们通常将所有 UI 元素视为超类型，随后再针对特定子类进行操作：
 
 ```kotlin
     val textView = TextView(this)
     textView.text = "Hello, View!"
 
-    // 从 TextView 向上转型为 View
+    // 从 TextView 向上转换为 View
     val view: View = textView  
 
     // 使用 View 的函数
     view.setPadding(20, 20, 20, 20)
-    // Activity 预期一个 View 类型
+    // Activity 需要一个 View 类型
     setContentView(view)
 ```
 
-将对象转换为子类的实例称为**向下转型**（downcasting）。由于向下转型可能是不安全的，你需要使用显式转换操作符。为了避免在转换失败时抛出异常，我们建议使用安全转换操作符 `as?`，以便在转换失败时返回 `null`：
+将对象转换为子类的实例称为**向下转换**（downcasting）。由于向下转换可能是不安全的，因此需要使用显式转换运算符。为避免在转换失败时抛出异常，建议使用安全转换运算符 `as?`，以便在转换失败时返回 `null`：
 
 ```kotlin
 interface Animal {
@@ -566,19 +565,19 @@ class Dog : Animal {
 }
 
 fun main() {
-    // 创建一个 animal 变量，它是具有 Animal 类型的 Dog 实例
+    // 创建 animal 作为带有 Animal 类型的 Dog 实例
     val animal: Animal = Dog()
     
-    // 将 animal 安全向下转型为 Dog 类型
+    // 将 animal 安全向下转换为 Dog 类型
     val dog: Dog? = animal as? Dog
 
-    // 使用安全调用，如果 dog 不为 null 则调用 bark()
+    // 如果 dog 不为 null，则使用安全调用调用 bark()
     dog?.bark()
     // "BARK!"
 }
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="2.0" id="kotlin-downcast"}
 
-在本例中，`animal` 被声明为 `Animal` 类型，但它持有 `Dog` 实例。代码安全地将 `animal` 转换为 `Dog` 类型，并使用[安全调用](null-safety.md#safe-call-operator) (`?.`) 来访问 `bark()` 函数。
+在此示例中，`animal` 被声明为 `Animal` 类型，但它持有一个 `Dog` 实例。代码安全地将 `animal` 转换为 `Dog` 类型，并使用[安全调用](null-safety.md#safe-call-operator)（`?.`）来访问 `bark()` 函数。
 
-你会在序列化中将基类反序列化为特定子类型时使用向下转型。在处理返回父类型对象的 Java 库时，这也非常常见，你可能需要在 Kotlin 中对其进行向下转型。
+在序列化中将基类反序列化为特定子类型时，会用到向下转换。在处理返回超类型对象的 Java 库时也很常见，在 Kotlin 中可能需要对其进行向下转换。

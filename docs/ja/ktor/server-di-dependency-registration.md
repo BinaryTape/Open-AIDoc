@@ -9,21 +9,21 @@
 <var name="example_name" value="server-di"/>
 <p>
     <b>コード例</b>:
-    <a href="https://github.com/ktorio/ktor-documentation/tree/%ktor_version%/codeSnippets/snippets/%example_name%">
+    <a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/%example_name%">
         %example_name%
     </a>
 </p>
 </tldr>
 
-Ktorの[依存性の注入 (DI)](server-dependency-injection.md)コンテナは、アプリケーションが依存するオブジェクトを作成する方法を知る必要があります。このプロセスは「依存関係の登録」と呼ばれます。
+Ktorの[依存性注入（DI）](server-dependency-injection.md)コンテナは、アプリケーションが依存するオブジェクトをどのように作成するかを認識している必要があります。このプロセスは依存関係の登録（dependency registration）と呼ばれます。
 
 ### 基本的な依存関係の登録 {id="basic-dependency-registration"}
 
-基本的な依存関係の登録は、通常、`Application`モジュール内の`dependencies {}`ブロックを使用してコード内で行われます。
+基本的な依存関係の登録はコード内で行われ、通常は `Application` モジュール内で `dependencies {}` ブロックを使用して行います。
 
-依存関係は、[ラムダ](#lambda-registration)、[関数参照](#function-reference)、[クラス参照](#class-reference)、または[コンストラクタ参照](#constructor-reference)を提供することで登録できます。
+[ラムダ](#lambda-registration)、[関数参照](#function-reference)、[クラス参照](#class-reference)、または[コンストラクタ参照](#constructor-reference)を提供することで、依存関係を登録できます。
 
-#### ラムダを使用する {id="lambda-registration"}
+#### ラムダの使用 {id="lambda-registration"}
 
 インスタンスの作成方法を完全に制御したい場合は、ラムダを使用します。
 
@@ -32,32 +32,31 @@ dependencies {
     provide<GreetingService> { GreetingServiceImpl() }
 }
 ```
-これは `GreetingService` のプロバイダーを登録します。`GreetingService` が要求されるたびに、ラムダが実行されてインスタンスが作成されます。
+これにより、`GreetingService` のプロバイダーが登録されます。`GreetingService` が要求されるたびに、ラムダが実行されてインスタンスが作成されます。
 
-#### コンストラクタ参照を使用する {id="constructor-reference"}
+#### コンストラクタ参照の使用 {id="constructor-reference"}
 
-クラスがコンストラクタを使用して作成でき、かつすべてのコンストラクタパラメータがすでにDIコンテナに登録されている場合は、コンストラクタ参照を使用できます。
+クラスがそのコンストラクタを使用して作成可能であり、すべてのコンストラクタパラメータがすでにDIコンテナに登録されている場合は、コンストラクタ参照を使用できます。
 
 ```kotlin
 dependencies {
     provide<GreetingService>(::GreetingServiceImpl)
 }
 ```
-これは、アプリケーションに `GreetingServiceImpl` のコンストラクタを使用するように指示し、パラメータの解決はDIに任せます。
+これにより、アプリケーションは `GreetingServiceImpl` のコンストラクタを使用し、そのパラメータをDIに解決させます。
 
-#### クラス参照を使用する {id="class-reference"}
+#### クラス参照の使用 {id="class-reference"}
 
-インターフェースにバインドせずに、具象クラスを登録できます。
+インターフェースにバインドすることなく、具体的なクラスを登録できます。
 
 ```kotlin
 dependencies {
     provide(BankServiceImpl::class)
 }
 ```
-この場合、依存関係は `BankServiceImpl` 型によって解決されます。
-これは、実装型が直接注入され、抽象化が必要ない場合に便利です。
+この場合、依存関係はその `BankServiceImpl` 型によって解決されます。これは、実装型が直接注入され、抽象化が必要ない場合に便利です。
 
-#### 関数参照を使用する {id="function-reference"}
+#### 関数参照の使用 {id="function-reference"}
 
 インスタンスを作成して返す関数を登録できます。
 
@@ -67,9 +66,9 @@ dependencies {
 }
 ```
 
-DIコンテナは関数のパラメータを解決し、戻り値を依存関係のインスタンスとして使用します。
+DIコンテナは関数のパラメータを解決し、その戻り値を依存関係のインスタンスとして使用します。
 
-#### ファクトリラムダを使用する {id="factory-lambda-registration"}
+#### ファクトリラムダの使用 {id="factory-lambda-registration"}
 
 関数自体を依存関係として登録できます。
 
@@ -81,15 +80,15 @@ dependencies {
 }
 ```
 
-これにより、手動で呼び出して新しいインスタンスを作成できる、注入可能な関数が登録されます。
+これにより、注入して手動で呼び出すことで新しいインスタンスを作成できる関数が登録されます。
 
-### 名前付き依存関係の登録 {id="named-registration"}
+### 名前付きの依存関係の登録 {id="named-registration"}
 
-登録時に依存関係に名前を割り当てることで、同じ型の複数のプロバイダーを区別できます。
+同じ型のプロバイダーが複数ある場合にそれらを区別するため、登録時に依存関係に名前を割り当てることができます。
 
-これは、単一の型に対して複数の実装またはインスタンスを登録し、解決時にそれらを明示的に選択する必要がある場合に便利です。
+これは、単一の型に対して複数の実装やインスタンスを登録し、解決時にそれらを明示的に選択する必要がある場合に便利です。
 
-依存関係に名前を割り当てるには、`provide()` 関数の最初の引数として名前を渡します。
+依存関係に名前を割り当てるには、`provide()` 関数の第1引数として名前を渡します。
 
 ```kotlin
 dependencies {
@@ -98,13 +97,13 @@ dependencies {
 }
 ```
 
-名前付き依存関係は、[`@Named`アノテーションを使用して明示的に解決](server-di-dependency-resolution.md#resolve-named)する必要があります。
+名前付きの依存関係は、[`@Named` アノテーションを使用して明示的に解決](server-di-dependency-resolution.md#resolve-named)する必要があります。
 
 ### 設定ベースの依存関係の登録 {id="configuration-based-dependency-registration"}
 
-設定ファイル内のクラスパス参照を使用して、宣言的に依存関係を設定できます。オブジェクトを返す関数、または解決可能なコンストラクタを持つクラスをリストできます。
+設定ファイル内のクラスパス参照を使用して、宣言的に依存関係を設定できます。オブジェクトを返す関数や、解決可能なコンストラクタを持つクラスを指定できます。
 
-設定ファイルの `ktor.application.dependencies` グループの下に依存関係をリストします。
+設定ファイルの `ktor.application.dependencies` グループ配下に依存関係を記述します。
 
 <Tabs>
 <TabItem title="application.yaml">

@@ -4,317 +4,144 @@ title: Compose における ViewModel
 
 # Compose における ViewModel
 
-Koin は、Compose アプリケーションで ViewModel を注入（inject）するためのいくつかの API を提供しています。このガイドでは、すべての ViewModel 注入パターンについて説明します。
+このページでは、ViewModel を取得する Compose 関数（`koinViewModel()`、`sharedKoinViewModel()`、`koinActivityViewModel()`）について説明します。モジュール内での ViewModel の宣言、パラメータ、`SavedStateHandle`、または ViewModel スコープの扱いは、すべてのプラットフォームで共通です。[ViewModel](/docs/reference/koin-core/viewmodel) を参照してください。
 
-:::info
-モジュールでの ViewModel の宣言については、[Core ViewModel](/docs/reference/koin-core/viewmodel) を参照してください。このページでは、Compose での ViewModel の取得に焦点を当てています。
-:::
+このページのすべての関数は `io.insert-koin:koin-compose-viewmodel` に含まれていますが、`sharedKoinViewModel()` のみ `io.insert-koin:koin-compose-viewmodel-navigation` に含まれています。パッケージについては [Koin for Compose](/docs/reference/koin-compose/compose) を参照してください。
 
-## セットアップ {id="setup"}
+## koinViewModel {id="koinviewmodel"}
 
 ```kotlin
-// Compose Multiplatform (または Android)
-implementation("io.insert-koin:koin-compose-viewmodel:$koin_version")
+import org.koin.compose.viewmodel.koinViewModel
 
-// Android 向けの便利なパッケージ (koin-compose + koin-compose-viewmodel を含む)
-implementation("io.insert-koin:koin-androidx-compose:$koin_version")
-
-// Navigation 連携を使用する場合
-implementation("io.insert-koin:koin-compose-viewmodel-navigation:$koin_version")
-```
-
-:::info
-すべての ViewModel API は `koin-compose-viewmodel` に含まれています。`koin-androidx-compose` パッケージにはこれが自動的に含まれます。
-:::
-
-## ViewModel の宣言 {id="declaring-viewmodels"}
-
-### コンパイラプラグイン DSL {id="compiler-plugin-dsl"}
-
-```kotlin
-class UserViewModel(
-    private val repository: UserRepository
-) : ViewModel()
-
-val appModule = module {
-    viewModel<UserViewModel>()
-}
-```
-
-### アノテーション {id="annotations"}
-
-```kotlin
-@KoinViewModel
-class UserViewModel(
-    private val repository: UserRepository
-) : ViewModel()
-```
-
-### クラシック DSL {id="classic-dsl"}
-
-```kotlin
-val appModule = module {
-    viewModelOf(::UserViewModel)
-    // またはラムダを使用
-    viewModel { UserViewModel(get()) }
-}
-```
-
-## ViewModel 注入 API {id="viewmodel-injection-apis"}
-
-### koinViewModel() - 基本的な注入 {id="koinviewmodel-basic-injection"}
-
-Compose で ViewModel を注入するための主要な API です。
-
-```kotlin
 @Composable
-fun UserScreen() {
-    val viewModel = koinViewModel<UserViewModel>()
-    // viewModel を使用...
-}
-```
-
-**ベストプラクティス** - テスト容易性（Testability）のためにデフォルトパラメータとして注入します：
-
-```kotlin
-@Composable
-fun UserScreen(
-    viewModel: UserViewModel = koinViewModel()
-) {
+fun UserScreen(viewModel: UserViewModel = koinViewModel()) {
     val state by viewModel.state.collectAsState()
-    // UI...
+    // ...
 }
 ```
 
-### koinNavViewModel() - Navigation 引数を使用する場合 {id="koinnavviewmodel-with-navigation-arguments"}
+`koinViewModel()` は、現在の `ViewModelStoreOwner`（`LocalViewModelStoreOwner`）から ViewModel を取得し、初回時に Koin を使ってインスタンスを作成します。このインスタンスは、そのオーナー（Activity、Fragment、またはナビゲーションデスティネーション）と同じ期間生存します。
 
-Navigation Compose を使用する場合、`koinNavViewModel()` を使用すると、`SavedStateHandle` を介してナビゲーション引数を自動的に受け取ることができます。
+これをデフォルト引数として宣言しておくことで、Composable のテスト容易性を維持できます。テストやプレビューでは独自のインスタンスを渡すことができます。
 
-```kotlin
-// 引数付きのルート
-NavHost(navController, startDestination = "list") {
-    composable("detail/{itemId}") { backStackEntry ->
-        DetailScreen()
-    }
-}
+`koinViewModel()` は Composable 関数です。`onClick` などのコールバック内ではなく、Composable の関数本体で呼び出してください。
 
-// ViewModel は自動的に引数を受け取る
-class DetailViewModel(
-    private val savedStateHandle: SavedStateHandle
-) : ViewModel() {
-    val itemId: String = savedStateHandle["itemId"] ?: ""
-}
+### パラメータ {id="parameters"}
 
-@Composable
-fun DetailScreen(
-    viewModel: DetailViewModel = koinNavViewModel()
-) {
-    // viewModel.itemId にはナビゲーション引数の値が入っている
-}
-```
+| パラメータ | デフォルト | 用途 |
+|-----------|---------|-----|
+| `qualifier` | `null` | 名前付き（[named](/docs/reference/koin-core/qualifiers)）ViewModel 定義を選択する |
+| `viewModelStoreOwner` | `LocalViewModelStoreOwner.current` | ViewModel を別のオーナーに保存する |
+| `key` | `null` | 1つのオーナー内で同じクラスの複数のインスタンスを保持する |
+| `extras` | オーナーの Extras | `SavedStateHandle` の構築に使用される `CreationExtras` |
+| `scope` | `currentKoinScope()` | ViewModel の解決に使用される Koin スコープ |
+| `parameters` | `null` | [注入されるパラメータ](/docs/reference/koin-core/injection-parameters) を返すラムダ |
 
-### koinActivityViewModel() - Activity スコープ (Android) {id="koinactivityviewmodel-activity-scoped-android"}
-
-同じ Activity 内のすべての Composable で ViewModel を共有します。
-
-```kotlin
-@Composable
-fun ScreenA() {
-    // Activity 全体で同じインスタンス
-    val sharedVM = koinActivityViewModel<SharedViewModel>()
-}
-
-@Composable
-fun ScreenB() {
-    // ScreenA と同じインスタンス
-    val sharedVM = koinActivityViewModel<SharedViewModel>()
-}
-```
-
-:::note
-バージョン 4.1 以降の `koin-androidx-compose` で利用可能です。
-:::
-
-### sharedKoinViewModel() - ナビゲーショングラフスコープ {id="sharedkoinviewmodel-navigation-graph-scoped"}
-
-ナビゲーショングラフ内で ViewModel を共有します（実験的機能）。
-
-```kotlin
-navigation<Route.BookGraph>(startDestination = Route.BookList) {
-    composable<Route.BookList> { backStackEntry ->
-        val sharedVM = backStackEntry.sharedKoinViewModel<BookSharedViewModel>(navController)
-        BookListScreen(sharedVM)
-    }
-    composable<Route.BookDetail> { backStackEntry ->
-        // BookGraph 内で同じインスタンス
-        val sharedVM = backStackEntry.sharedKoinViewModel<BookSharedViewModel>(navController)
-        BookDetailScreen(sharedVM)
-    }
-}
-```
-
-## パラメータ付きの ViewModel {id="viewmodel-with-parameters"}
-
-### @InjectedParam の使用 {id="using-injectedparam"}
-
-ランタイムパラメータに `@InjectedParam` を付けます。
-
-```kotlin
-class DetailViewModel(
-    @InjectedParam val itemId: String,
-    private val repository: DetailRepository
-) : ViewModel()
-
-// コンパイラプラグイン DSL
-val appModule = module {
-    viewModel<DetailViewModel>()
-}
-```
-
-パラメータを指定して注入します：
+### パラメータの受け渡し {id="passing-parameters"}
 
 ```kotlin
 @Composable
 fun DetailScreen(itemId: String) {
-    val viewModel = koinViewModel<DetailViewModel> {
+    val viewModel = koinViewModel<DetailViewModel> { parametersOf(itemId) }
+}
+```
+
+パラメータは ViewModel の作成時のみ使用されます。同じオーナーがすでに `DetailViewModel` を保持している場合、異なる `itemId` を指定してもその既存のインスタンスが返されます。1つのオーナーが値ごとに1つの ViewModel を保持する必要がある場合は、`key` を追加します。
+
+```kotlin
+@Composable
+fun DetailScreen(itemId: String) {
+    val viewModel = koinViewModel<DetailViewModel>(key = itemId) {
         parametersOf(itemId)
     }
 }
 ```
 
-識別子（例：ナビゲーション引数）ごとに異なる ViewModel インスタンスを作成するには、`key` パラメータを使用します：
+Navigation Compose を使用する場合、各デスティネーションが独自のオーナーを持つため、バックスタック上の画面に対して `key` を指定する必要はありません。
+
+## Navigation Compose との併用 {id="with-navigation-compose"}
+
+`composable { }` デスティネーション内では、現在の `ViewModelStoreOwner` は `NavBackStackEntry` になります。`koinViewModel()` はデスティネーションごとに1つの ViewModel を作成し、デスティネーションがバックスタックからポップされたときにクリアされます。その `SavedStateHandle` にはナビゲーション引数が保持されます。
 
 ```kotlin
+@Serializable
+data class DetailRoute(val itemId: String)
+
+class DetailViewModel(handle: SavedStateHandle) : ViewModel() {
+    val itemId: String = handle.toRoute<DetailRoute>().itemId
+}
+
+NavHost(navController, startDestination = HomeRoute) {
+    composable<DetailRoute> {
+        DetailScreen(viewModel = koinViewModel())
+    }
+}
+```
+
+Koin は自動的に `SavedStateHandle` を注入します。コンストラクタパラメータとして宣言してください。宣言側については [ViewModel](/docs/reference/koin-core/viewmodel) を参照してください。
+
+:::warning
+`koinNavViewModel()` は、`koin-compose-viewmodel-navigation` と `koin-androidx-compose-navigation` の両方で非推奨（deprecated）になりました。同じパラメータを指定して `koinViewModel()` に置き換えてください。ナビゲーション引数は同様の方法で `SavedStateHandle` に届きます。
+:::
+
+### ナビゲーショングラフ内での ViewModel の共有 {id="sharing-a-viewmodel-in-a-navigation-graph"}
+
+`sharedKoinViewModel()` は、親グラフのバックスタックエントリに ViewModel を保存します。そのグラフのすべてのデスティネーションが同じインスタンスを取得します。
+
+```kotlin
+import org.koin.compose.viewmodel.sharedKoinViewModel
+
+navigation<BookGraph>(startDestination = BookList) {
+    composable<BookList> { entry ->
+        val shared = entry.sharedKoinViewModel<BookSharedViewModel>(navController)
+        BookListScreen(shared)
+    }
+    composable<BookDetail> { entry ->
+        val shared = entry.sharedKoinViewModel<BookSharedViewModel>(navController)
+        BookDetailScreen(shared)
+    }
+}
+```
+
+親グラフはデフォルトで `destination.parent?.route` です。別のグラフを対象にするには `navGraphRoute` を渡します。デスティネーションに親グラフがない場合、`sharedKoinViewModel()` は `koinViewModel()` にフォールバックします。
+
+## Activity 全体での ViewModel（Android） {id="activity-wide-viewmodel-android"}
+
+`koinActivityViewModel()` は、現在の `ComponentActivity` に ViewModel を保存します。その Activity のすべての Composable は、どのナビゲーションデスティネーションにあるかに関係なく、同じインスタンスを取得します。
+
+```kotlin
+import org.koin.compose.viewmodel.koinActivityViewModel
+
 @Composable
-fun DetailScreen(newsId: String) {
-    val viewModel = koinViewModel<DetailViewModel>(key = newsId) {
-        parametersOf(newsId)
-    }
+fun CartBadge() {
+    val cart = koinActivityViewModel<CartViewModel>()
+}
+
+@Composable
+fun CartScreen() {
+    val cart = koinActivityViewModel<CartViewModel>() // CartBadge と同じインスタンス
 }
 ```
 
-`key` を使用することで、一意な `newsId` ごとに専用の ViewModel インスタンスが確実に作成されます。これは、異なる引数を持つ複数の画面がバックスタックに保持される場合に重要です。
+これは Android でのみ利用可能で、`LocalActivity` が `ComponentActivity` でない場合は失敗します。`koinViewModel()` と同じ `qualifier`、`key`、`scope`、`parameters` 引数を受け取ります。
 
-### クラシック DSL でのパラメータ指定 {id="classic-dsl-with-parameters"}
+## スコープ付き依存関係 {id="scoped-dependencies"}
 
-```kotlin
-val appModule = module {
-    viewModel { params ->
-        DetailViewModel(
-            itemId = params.get(),
-            repository = get()
-        )
-    }
-}
-```
+ViewModel は、その依存関係のためのスコープ（`viewModelScope { }` または `@ViewModelScope`）を持つことができます。Compose 側では何も変更はありません。`koinViewModel()` が ViewModel とそのスコープを作成します。宣言方法については [ViewModel](/docs/reference/koin-core/viewmodel) に記載されています。
 
-## SavedStateHandle {id="savedstatehandle"}
+## API の概要 {id="api-summary"}
 
-Koin は `SavedStateHandle` を自動的に ViewModel に提供します。
+| API | インスタンスのオーナー | パッケージ |
+|-----|-----------------------|---------|
+| `koinViewModel()` | `LocalViewModelStoreOwner`（Activity、Fragment、デスティネーション） | `koin-compose-viewmodel` |
+| `NavBackStackEntry.sharedKoinViewModel()` | 親ナビゲーショングラフのエントリ | `koin-compose-viewmodel-navigation` |
+| `koinActivityViewModel()` | 現在の `ComponentActivity`（Android） | `koin-compose-viewmodel` |
+| `koinNavViewModel()` | 非推奨。`koinViewModel()` を使用 | `koin-compose-viewmodel-navigation` |
 
-```kotlin
-@KoinViewModel
-class MyViewModel(
-    private val handle: SavedStateHandle,
-    private val repository: UserRepository
-) : ViewModel() {
-    // ナビゲーション引数にアクセス
-    val userId: String? = handle["userId"]
+## 関連情報 {id="related"}
 
-    // プロセスの終了（Process death）をまたいで状態を保持する
-    var query by handle.saveable { mutableStateOf("") }
-}
-```
-
-```kotlin
-val appModule = module {
-    viewModel<MyViewModel>()  // SavedStateHandle は自動的に注入される
-}
-```
-
-:::info
-`SavedStateHandle` は、コンテキストに応じて ViewModel の `CreationExtras` または Navigation の `BackStackEntry` から注入されます。
-:::
-
-## ViewModel スコープ {id="viewmodel-scope"}
-
-`viewModelScope` を使用して、依存関係を ViewModel のライフサイクルにスコープします。
-
-### コンパイラプラグイン DSL
-
-```kotlin
-val appModule = module {
-    viewModelScope {
-        scoped<UserCache>()
-        scoped<UserRepository>()
-        viewModel<UserViewModel>()
-    }
-}
-```
-
-### アノテーション
-
-```kotlin
-@ViewModelScope
-class UserCache
-
-@ViewModelScope
-class UserRepository(private val cache: UserCache)
-
-@KoinViewModel
-@ViewModelScope
-class UserViewModel(private val repository: UserRepository) : ViewModel()
-```
-
-### クラシック DSL
-
-```kotlin
-val appModule = module {
-    viewModelScope {
-        scoped { UserCache() }
-        scoped { UserRepository(get()) }
-        viewModel { UserViewModel(get()) }
-    }
-}
-```
-
-:::caution viewModelScopeFactory() オプションが必要です
-`viewModelScope { }` 内で ViewModel を宣言するには、Koin 設定で `options(viewModelScopeFactory())` を有効にする必要があります。そうしないと、`koinViewModel()` は `No definition found … on scope '['_root_']'` というエラーで失敗します。詳細は [ViewModel Scope](/docs/reference/koin-core/viewmodel#viewmodel-scope) を参照してください。
-:::
-
-## クイックリファレンス {id="quick-reference"}
-
-| API | ユースケース | パッケージ |
-|-----|----------|---------|
-| `koinViewModel()` | 基本的な ViewModel 注入 | `koin-compose-viewmodel` |
-| `koinNavViewModel()` | Navigation 引数を使用する場合 | `koin-compose-viewmodel-navigation` |
-| `koinActivityViewModel()` | Activity 全体で共有 (Android) | `koin-androidx-compose` |
-| `sharedKoinViewModel()` | ナビゲーショングラフ内で共有 | `koin-compose-viewmodel-navigation` |
-
-## ベストプラクティス {id="best-practices"}
-
-1. **デフォルトパラメータとして注入する** - Koin なしでのテストが可能になります。
-   ```kotlin
-   @Composable
-   fun MyScreen(viewModel: MyViewModel = koinViewModel())
-   ```
-
-2. **Navigation では koinNavViewModel() を使用する** - 引数の処理が自動化されます。
-
-3. **ViewModel 固有の依存関係には viewModelScope を優先する** - クリーンなライフサイクル管理が可能になります。
-
-4. **コールバック内で ViewModel を注入しない** - Composable レベルで注入してください。
-   ```kotlin
-   // 非推奨 (Bad)
-   Button(onClick = { val vm = koinViewModel<MyVM>() })
-
-   // 推奨 (Good)
-   val vm = koinViewModel<MyVM>()
-   Button(onClick = { vm.doSomething() })
-   ```
-
-## 次のステップ {id="next-steps"}
-
-- **[Compose ライフサイクル](/docs/reference/koin-compose/compose-lifecycle)** - 状態と再コンポジション
-- **[Core ViewModel](/docs/reference/koin-core/viewmodel)** - ViewModel 宣言 DSL
-- **[Android ViewModel](/docs/reference/koin-android/viewmodel)** - Android 固有の機能
+- [ViewModel](/docs/reference/koin-core/viewmodel): ViewModel の宣言、パラメータ、`SavedStateHandle`、ViewModel スコープ。
+- [Android ViewModel](/docs/reference/koin-android/viewmodel): Activity および Fragment での `by viewModel()`。
+- [Navigation 3](/docs/reference/koin-compose/navigation3): Navigation 3 エントリでの ViewModel。
+- [Lifecycle and State](/docs/reference/koin-compose/compose-lifecycle): Compose における各要素のライフサイクルと生存期間。
+- [Compose Testing](/docs/reference/koin-compose/compose-testing): `koinViewModel()` を使用する Composable のテスト。

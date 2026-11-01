@@ -1,208 +1,140 @@
 ---
-title: Extensionマネージャー
+title: Extension Manager
 ---
 
-# Extensionマネージャー
+# Extension Manager
 
-Koinは、フレームワークに新機能を追加するためのエクステンションシステムを提供しています。これは、Koinを外部システムと統合したり、カスタム機能を追加したりする場合に便利です。
+Koinには、ライブラリおよびフレームワークの開発者向けに2つの拡張ポイント（Extension points）が用意されています。`KoinExtension`はKoinコンテナに機能を追加し、登録時および終了時のフックを提供します。`ResolutionExtension`は、一致する定義が存在しない場合に、Koinへインスタンスの別の取得元を提供します。ほとんどのアプリケーションではどちらも必要ありません。まずは[定義（definitions）](/docs/reference/koin-core/definitions)を使用してください。
 
 ## KoinExtension {id="koinextension"}
 
-Koinエクステンションは、`KoinExtension`インターフェースを実装するクラスです。
+`KoinExtension`は、IDを指定してコンテナに登録されるオブジェクトです。
 
 ```kotlin
 interface KoinExtension {
-    /**
-     * エクステンションが登録されたときに呼び出されます
-     */
     fun onRegister(koin: Koin)
-
-    /**
-     * Koinの終了時に呼び出されます
-     */
     fun onClose()
 }
 ```
 
-### エクステンションの作成 {id="creating-an-extension"}
+Koinは、拡張機能が登録されたときに`onRegister`を呼び出し、コンテナが終了するとき（`stopKoin()`または`koinApplication.close()`）に`onClose`を呼び出します。
+
+Koin自体もこのメカニズムを利用しています。[Lazyモジュール](/docs/reference/koin-core/lazy-modules)の基盤となっているコルーチンエンジンは、`KoinCoroutinesEngine`拡張機能です。
+
+### 拡張機能の実装 {id="writing-an-extension"}
 
 ```kotlin
-class MyCustomExtension : KoinExtension {
+class AuditExtension : KoinExtension {
     private lateinit var koin: Koin
 
     override fun onRegister(koin: Koin) {
         this.koin = koin
-        // エクステンションの初期化
     }
 
     override fun onClose() {
-        // リソースのクリーンアップ
+        // リソースを解放
     }
 
-    fun doSomething() {
-        // エクステンションのロジック
-    }
+    fun record(event: String) { ... }
 }
 ```
 
-### エクステンションの登録 {id="registering-an-extension"}
+### 拡張機能の登録と取得 {id="registering-and-reading-it"}
 
-エクステンションを登録するには、`ExtensionManager`を使用します。
+拡張機能を登録するための関数を`KoinApplication`に追加し、それを取得するためのプロパティを`Koin`に公開します。
 
 ```kotlin
-fun KoinApplication.myExtension() {
+private const val AUDIT_EXTENSION = "audit"
+
+fun KoinApplication.audit() {
     with(koin.extensionManager) {
-        if (getExtensionOrNull<MyCustomExtension>(EXTENSION_ID) == null) {
-            registerExtension(EXTENSION_ID, MyCustomExtension())
+        if (getExtensionOrNull<AuditExtension>(AUDIT_EXTENSION) == null) {
+            registerExtension(AUDIT_EXTENSION, AuditExtension())
         }
     }
 }
 
-private const val EXTENSION_ID = "my-extension"
+val Koin.audit: AuditExtension
+    get() = extensionManager.getExtension(AUDIT_EXTENSION)
 ```
-
-### エクステンションへのアクセス {id="accessing-an-extension"}
-
-```kotlin
-val Koin.myExtension: MyCustomExtension
-    get() = extensionManager.getExtension(EXTENSION_ID)
-
-// 使用方法
-val extension = getKoin().myExtension
-extension.doSomething()
-```
-
-### Koinのセットアップでの使用 {id="using-in-koin-setup"}
 
 ```kotlin
 startKoin {
-    myExtension()  // エクステンションの登録
+    audit()
     modules(appModule)
 }
+
+getKoin().audit.record("app_started")
 ```
 
-:::note
-`ExtensionManager`は`@KoinInternalApi`としてマークされています。これは、バージョン間でAPIが変更される可能性があることを意味します。本番環境のコードでは注意して使用してください。
+| 関数 | 動作 |
+|----------|----------|
+| `registerExtension(id, extension)` | 拡張機能を保存し、`onRegister`を呼び出します。同じIDを持つ拡張機能は置き換えられます |
+| `getExtension<T>(id)` | 拡張機能を返します。存在しない場合は「Koin extension 'id' not found.」というエラーで失敗します |
+| `getExtensionOrNull<T>(id)` | 拡張機能を返します。存在しない場合は`null`を返します |
+
+:::warning
+`ExtensionManager`には`@KoinInternalApi`が付与されています。オプトインが必要であり、非推奨化（deprecation）プロセスを経ることなくバージョン間でAPIが変更される可能性があります。
 :::
 
 ## ResolutionExtension {id="resolutionextension"}
 
-より高度なユースケースのために、Koinは依存関係の解決（resolution）プロセスにフックするための`ResolutionExtension`を提供しています。これにより、外部ソースからインスタンスを提供できるようになります。
+`ResolutionExtension`は、カレントスコープ、スコープソース、およびルートスコープを含むリンクされたスコープの定義を検索した後に、他に一致するものがない場合にインスタンスの解決を要求されます。
 
 ```kotlin
 interface ResolutionExtension {
-    /**
-     * 識別用のエクステンション名
-     */
     val name: String
-
-    /**
-     * 依存関係の解決中に呼び出されます
-     * @param scope 現在の解決スコープ
-     * @param instanceContext 型情報を含む解決コンテキスト
-     * @return インスタンスが見つかった場合はそのインスタンス、それ以外はnull
-     */
     fun resolve(scope: Scope, instanceContext: ResolutionContext): Any?
 }
 ```
 
-### ユースケース {id="use-cases"}
+`instanceContext.clazz`（修飾子を使用する場合は`instanceContext.qualifier`も含む）に対応するインスタンスを返すか、Koinに解決処理を継続させて`NoDefinitionFoundException`で失敗させるために`null`を返します。
 
-- 外部DIコンテナとの統合
-- キャッシュやプールからのインスタンス提供
-- 実行時の条件に基づいた動的なインスタンス解決
-- モックプロバイダーを使用したテスト
+Koinは、[Ktor DI bridge](/docs/reference/koin-ktor/ktor-bridge)においてKtorの依存関係注入からインスタンスを読み取るためにこれを使用しています。
 
-### 例：外部インスタンスプロバイダー {id="example-external-instance-provider"}
+### 例：別のコンテナからのインスタンス取得 {id="example-instances-from-another-container"}
 
 ```kotlin
-class ExternalInstanceProvider : ResolutionExtension {
-    private val externalInstances = mutableMapOf<KClass<*>, Any>()
+class LegacyContainerResolution(
+    private val legacy: Map<KClass<*>, Any>,
+) : ResolutionExtension {
 
-    override val name: String = "external-provider"
+    override val name: String = "legacy-container"
 
-    override fun resolve(scope: Scope, instanceContext: ResolutionContext): Any? {
-        return externalInstances[instanceContext.clazz]
-    }
-
-    fun <T : Any> registerInstance(clazz: KClass<T>, instance: T) {
-        externalInstances[clazz] = instance
-    }
+    override fun resolve(scope: Scope, instanceContext: ResolutionContext): Any? =
+        legacy[instanceContext.clazz]
 }
 ```
 
-### ResolutionExtensionの登録 {id="registering-a-resolutionextension"}
-
-```kotlin
-val externalProvider = ExternalInstanceProvider()
-externalProvider.registerInstance(MyService::class, MyServiceImpl())
-
-startKoin {
-    // resolution extensionの登録
-    koin.addResolutionExtension(externalProvider)
-
-    modules(module {
-        // これにより、外部プロバイダーからMyServiceを解決できるようになります
-        single<MyComponent>()  // MyComponentはMyServiceに依存
-    })
-}
-```
-
-:::warning Experimental API
-`ResolutionExtension` APIは`@KoinExperimentalAPI`としてマークされています。このAPIは将来のバージョンで変更される可能性があります。
-:::
-
-### 完全な例 {id="complete-example"}
+アプリケーションの`koin`インスタンス上で`addResolutionExtension`を使用して登録します。
 
 ```kotlin
 @OptIn(KoinExperimentalAPI::class)
-fun resolutionExtensionExample() {
-    val resolutionExtension = object : ResolutionExtension {
-        val instanceMap = mapOf<KClass<*>, Any>(
-            ComponentA::class to ComponentA()
-        )
-
-        override val name: String = "custom-resolver"
-
-        override fun resolve(
-            scope: Scope,
-            instanceContext: ResolutionContext
-        ): Any? {
-            return instanceMap[instanceContext.clazz]
-        }
+fun startApp(legacy: Map<KClass<*>, Any>) {
+    startKoin {
+        koin.addResolutionExtension(LegacyContainerResolution(legacy))
+        modules(appModule)
     }
-
-    val koin = koinApplication {
-        printLogger(Level.DEBUG)
-        koin.addResolutionExtension(resolutionExtension)
-        modules(module {
-            // ComponentBはComponentAに依存
-            // ComponentAはエクステンションから解決される
-            single { ComponentB(get()) }
-        })
-    }.koin
-
-    val componentB = koin.get<ComponentB>()
-    // componentB.a は resolutionExtension から提供されたインスタンス
 }
 ```
 
-## エクステンションの使用タイミング {id="when-to-use-extensions"}
+これにより、レガシーマップにのみ存在する型を必要とする`appModule`内の定義が、拡張機能からそのインスタンスを取得できるようになります。
 
-| エクステンションの種類 | ユースケース |
-|---------------|----------|
-| `KoinExtension` | Koinへの機能追加（ロギング、モニタリング、カスタムスコープなど） |
-| `ResolutionExtension` | 解決プロセス中に外部ソースからインスタンスを提供する場合 |
+Compiler Pluginを使用している場合、拡張機能のみから提供される型はビルド時点では不明であるため、コンパイル時の安全性チェックで不足している依存関係として報告されます。これを外部から提供されるものとしてマークしてください。詳細は[コンパイル時の安全性（Compile-Time Safety）](/docs/reference/koin-compiler/compile-safety)を参照してください。
 
-## ベストプラクティス {id="best-practices"}
+`addResolutionExtension`には`@KoinExperimentalAPI`が付与されています。
 
-1. **控えめに使用する** - エクステンションは複雑さを増大させます。可能な限り標準のKoin定義を優先してください。
-2. **エクステンションをドキュメント化する** - エクステンションが何を行うのか、どのように使用するのかを明確にしてください。
-3. **クリーンアップを処理する** - リソース漏洩を避けるため、常に`onClose()`を実装してください。
-4. **スレッドセーフを考慮する** - エクステンションは複数のスレッドから呼び出される可能性があります。
+## 制限事項 {id="limits"}
 
-## 次のステップ {id="next-steps"}
+- **内部および実験的API**：どちらの拡張ポイントも、Koinのバージョン間で変更される可能性があります。
+- **解決用拡張機能のライフサイクルが存在しない**：Koinは`ResolutionExtension`が返したインスタンスをキャッシュしません。必要に応じて独自にキャッシュしてください。
+- **解決順序の最後**：定義に一致するものがある場合、解決用拡張機能が呼び出されることはありません。既存の定義をオーバーライドすることはできません。
+- **スレッドセーフティ**：`resolve`は複数のスレッドから同時に呼び出される可能性があります。
 
-- **[スコープ (Scopes)](/docs/reference/koin-core/scopes)** - カスタムスコープ管理
-- **[モジュール (Modules)](/docs/reference/koin-core/modules)** - モジュールの構成
-- **[高度なパターン (Advanced Patterns)](/docs/reference/koin-core/advanced-patterns)** - より高度なパターン
+## 関連情報 {id="related"}
+
+- [Lazyモジュール](/docs/reference/koin-core/lazy-modules)：コルーチンエンジン拡張機能に基づいて構築された機能。
+- [Ktor DI Bridge](/docs/reference/koin-ktor/ktor-bridge)：解決用拡張機能の実践例。
+- [コンパイル時の安全性](/docs/reference/koin-compiler/compile-safety)：Koinの外部から提供される依存関係の宣言。
+- [Koinの起動](/docs/reference/koin-core/starting-koin)：拡張機能を登録するアプリケーションDSL。
+- [スコープ](/docs/reference/koin-core/scopes)：スコープ内での解決順序。

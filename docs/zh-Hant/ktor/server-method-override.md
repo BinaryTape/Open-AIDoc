@@ -5,10 +5,11 @@
 <var name="plugin_name" value="XHttpMethodOverride"/>
 <var name="package_name" value="io.ktor.server.plugins.methodoverride"/>
 <var name="artifact_name" value="ktor-server-method-override"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.server.methodOverride"/>
 
 <tldr>
 <p>
-<b>必要的相依性</b>：<code>io.ktor:%artifact_name%</code>
+<b>必要相依性</b>：<code>io.ktor:%artifact_name%</code>
 </p>
 <var name="example_name" value="json-kotlinx-method-override"/>
 <p>
@@ -18,29 +19,37 @@
     </a>
 </p>
 <p>
-    <b><Links href="/ktor/server-native" summary="Ktor 支援 Kotlin/Native，允許您在不需要額外執行環境或虛擬機的情況下執行伺服器。">原生伺服器</Links> 支援</b>：✅
+    <b><Links href="server-native.md" summary="Ktor 支援 Kotlin/Native，可讓您在無需額外執行階段或虛擬機的情況下執行伺服器。">Native 伺服器</Links>支援</b>：✅
 </p>
 </tldr>
 
 <link-summary>
-%plugin_name% 賦予了在 X-HTTP-Method-Override 標頭中傳遞 HTTP 動詞的能力。
+%plugin_name% 提供了在 X-HTTP-Method-Override 標頭內部建立 HTTP 動詞通道的功能。
 </link-summary>
 
-[%plugin_name%](https://api.ktor.io/ktor-server-method-override/io.ktor.server.plugins.methodoverride/-x-http-method-override.html) 外掛程式賦予了在 `X-HTTP-Method-Override` 標頭中傳遞 HTTP 動詞的能力。
-如果您的伺服器 API 處理多個 HTTP 動詞（`GET`、`PUT`、`POST`、`DELETE` 等），但用戶端由於特定限制僅能使用有限的動詞集（例如 `GET` 和 `POST`），這將會非常有用。
-例如，如果用戶端發送一個將 `X-Http-Method-Override` 標頭設定為 `DELETE` 的請求，Ktor 將使用 `delete` [路由處理常式](server-routing.md#define_route)來處理此請求。
+[%plugin_name%](https://api.ktor.io/ktor-server-method-override/io.ktor.server.plugins.methodoverride/-x-http-method-override.html) 外掛程式提供了在 `X-HTTP-Method-Override` 標頭中建立 HTTP 動詞通道的功能。
+如果您的伺服器 API 處理多種 HTTP 動詞（`GET`、`PUT`、`POST`、`DELETE` 等），但用戶端由於特定限制只能使用有限的動詞集合（例如 `GET` 和 `POST`），此功能便非常實用。
+例如，若用戶端發送的請求中將 `X-Http-Method-Override` 標頭設定為 `DELETE`，Ktor 就會使用 `delete` [路由處理常式](server-routing.md#define_route) 來處理此請求。
 
 ## 新增相依性 {id="add_dependencies"}
 
 <p>
-    若要使用 <code>%plugin_name%</code>，您需要在建置指令碼中包含 <code>%artifact_name%</code> 構件：
+    若要使用 <code>%plugin_name%</code>，請將 <code>%artifact_name%</code> 構件新增至您的建置指令碼中：
 </p>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上述程式碼片段使用 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 版本目錄</a> 來指定 Ktor 相依性。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上述程式碼片段使用 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 版本目錄</a> 來指定 Ktor 相依性。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
@@ -50,15 +59,16 @@
 ## 安裝 %plugin_name% {id="install_plugin"}
 
 <p>
-    若要將 <code>%plugin_name%</code> 外掛程式安裝到應用程式，請將其傳遞給指定 <Links href="/ktor/server-modules" summary="模組允許您透過分組路由來建構您的應用程式。">模組</Links> 中的 <code>install</code> 函式。
-    下方的程式碼片段展示了如何安裝 <code>%plugin_name%</code> ...
+    若要在您的應用程式中<a href="server-plugins.md#install">安裝</a> <code>%plugin_name%</code> 外掛程式，
+    請將其傳遞給指定<Links href="server-modules.md" summary="模組可讓您透過群組化路由來建構應用程式。">模組</Links>中的 <code>install</code> 函式。
+    以下範例展示了如何安裝 <code>%plugin_name%</code>：
 </p>
 <list>
     <li>
-        ... 在 <code>embeddedServer</code> 函式呼叫內。
+        在 <code>embeddedServer()</code> 函式呼叫中。
     </li>
     <li>
-        ... 在明確定義的 <code>module</code> 內，該模組是 <code>Application</code> 類別的擴充函式。
+        在 <code>Application</code> 類別上明確定義的 <code>module()</code> 擴充函式中。
     </li>
 </list>
 <Tabs>
@@ -70,9 +80,9 @@
     </TabItem>
 </Tabs>
 
-## 配置 %plugin_name% {id="configure"}
+## 設定 %plugin_name% {id="configure"}
 
-預設情況下，`%plugin_name%` 會檢查 `X-Http-Method-Override` 標頭以決定應處理該請求的路由。
+預設情況下，`%plugin_name%` 會檢查 `X-Http-Method-Override` 標頭，以決定應該由哪個路由處理該請求。
 您可以使用 `headerName` 屬性自訂標頭名稱。
 
 ## 範例 {id="example"}
@@ -85,7 +95,7 @@ X-Http-Method-Override: DELETE
 
 ```
 
-若要使用 `delete` [路由處理常式](server-routing.md#define_route)處理此類請求，您需要安裝 `%plugin_name%`：
+若要使用 `delete` [路由處理常式](server-routing.md#define_route) 處理此類請求，您需要安裝 `%plugin_name%`：
 
 ```kotlin
 package com.example

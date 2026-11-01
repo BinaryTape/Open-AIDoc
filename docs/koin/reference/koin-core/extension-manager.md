@@ -2,207 +2,139 @@
 title: 扩展管理器
 ---
 
-# 扩展管理器
+# 扩展管理器 (Extension Manager)
 
-Koin 提供了一个扩展系统，允许您向框架添加新功能。这对于将 Koin 与外部系统集成或添加自定义功能非常有用。
+Koin 为库和框架的作者提供了两个扩展点。`KoinExtension` 用于向 Koin 容器附加功能，并在注册和关闭时提供钩子函数。`ResolutionExtension` 则在没有匹配定义时，为 Koin 提供另一种获取实例的来源。大多数应用程序通常都不需要这二者：请优先使用[定义](/docs/reference/koin-core/definitions)。
 
 ## KoinExtension {id="koinextension"}
 
-Koin 扩展是一个实现 `KoinExtension` 接口的类：
+`KoinExtension` 是在容器中以指定 ID 注册的对象：
 
 ```kotlin
 interface KoinExtension {
-    /**
-     * 在注册扩展时调用
-     */
     fun onRegister(koin: Koin)
-
-    /**
-     * 在 Koin 关闭时调用
-     */
     fun onClose()
 }
 ```
 
-### 创建扩展 {id="creating-an-extension"}
+当你注册该扩展时，Koin 会调用 `onRegister`，并在容器关闭（`stopKoin()` 或 `koinApplication.close()`）时调用 `onClose`。
+
+Koin 自身也使用了这一机制：[延迟加载模块](/docs/reference/koin-core/lazy-modules)背后的协程引擎就是 `KoinCoroutinesEngine` 扩展。
+
+### 编写扩展 {id="writing-an-extension"}
 
 ```kotlin
-class MyCustomExtension : KoinExtension {
+class AuditExtension : KoinExtension {
     private lateinit var koin: Koin
 
     override fun onRegister(koin: Koin) {
         this.koin = koin
-        // 初始化您的扩展
     }
 
     override fun onClose() {
-        // 清理资源
+        // release resources
     }
 
-    fun doSomething() {
-        // 您的扩展逻辑
-    }
+    fun record(event: String) { ... }
 }
 ```
 
-### 注册扩展 {id="registering-an-extension"}
+### 注册并读取 {id="registering-and-reading-it"}
 
-使用 `ExtensionManager` 来注册扩展：
+在 `KoinApplication` 上公开一个函数来注册该扩展，并在 `Koin` 上公开一个属性以将其读取：
 
 ```kotlin
-fun KoinApplication.myExtension() {
+private const val AUDIT_EXTENSION = "audit"
+
+fun KoinApplication.audit() {
     with(koin.extensionManager) {
-        if (getExtensionOrNull<MyCustomExtension>(EXTENSION_ID) == null) {
-            registerExtension(EXTENSION_ID, MyCustomExtension())
+        if (getExtensionOrNull<AuditExtension>(AUDIT_EXTENSION) == null) {
+            registerExtension(AUDIT_EXTENSION, AuditExtension())
         }
     }
 }
 
-private const val EXTENSION_ID = "my-extension"
+val Koin.audit: AuditExtension
+    get() = extensionManager.getExtension(AUDIT_EXTENSION)
 ```
-
-### 访问扩展 {id="accessing-an-extension"}
-
-```kotlin
-val Koin.myExtension: MyCustomExtension
-    get() = extensionManager.getExtension(EXTENSION_ID)
-
-// 用法
-val extension = getKoin().myExtension
-extension.doSomething()
-```
-
-### 在 Koin 设置中使用 {id="using-in-koin-setup"}
 
 ```kotlin
 startKoin {
-    myExtension()  // 注册扩展
+    audit()
     modules(appModule)
 }
+
+getKoin().audit.record("app_started")
 ```
 
-:::note
-`ExtensionManager` 被标记为 `@KoinInternalApi`。这意味着 API 可能会在版本之间发生变化。在生产代码中请谨慎使用。
+| 函数 | 行为 |
+|----------|----------|
+| `registerExtension(id, extension)` | 存储该扩展并调用 `onRegister`。同名 ID 的扩展将被替换 |
+| `getExtension<T>(id)` | 返回该扩展。若缺失则失败并提示 "Koin extension 'id' not found." |
+| `getExtensionOrNull<T>(id)` | 返回该扩展，或者返回 `null` |
+
+:::warning
+`ExtensionManager` 被标记为 `@KoinInternalApi`：你需要显式选择启用（opt in），并且该 API 可能会在各版本之间发生变化，且不经过弃用周期。
 :::
 
 ## ResolutionExtension {id="resolutionextension"}
 
-对于更高级的用例，Koin 提供了 `ResolutionExtension` 来挂钩到依赖解析过程。这允许您提供来自外部源的实例。
+当其他途径均无法匹配时，Koin 会向 `ResolutionExtension` 请求实例：即在当前作用域、作用域源以及关联作用域（包括根作用域）的定义之后。
 
 ```kotlin
 interface ResolutionExtension {
-    /**
-     * 用于识别的扩展名称
-     */
     val name: String
-
-    /**
-     * 在依赖解析期间调用
-     * @param scope 当前解析作用域
-     * @param instanceContext 包含类型信息的解析上下文
-     * @return 如果找到则返回实例，否则返回 null
-     */
     fun resolve(scope: Scope, instanceContext: ResolutionContext): Any?
 }
 ```
 
-### 用例 {id="use-cases"}
+返回与 `instanceContext.clazz`（如果使用了限定符，还包括 `instanceContext.qualifier`）相对应的实例，或者返回 `null` 让 Koin 继续并失败报错抛出 `NoDefinitionFoundException`。
 
-- 与外部 DI 容器集成
-- 从缓存或池中提供实例
-- 根据运行时条件进行动态实例解析
-- 使用模拟提供者进行测试
+Koin 在 [Ktor DI 桥接](/docs/reference/koin-ktor/ktor-bridge)中使用此机制来读取来自 Ktor 依赖注入的实例。
 
-### 示例：外部实例提供者 {id="example-external-instance-provider"}
+### 示例：来自另一个容器的实例 {id="example-instances-from-another-container"}
 
 ```kotlin
-class ExternalInstanceProvider : ResolutionExtension {
-    private val externalInstances = mutableMapOf<KClass<*>, Any>()
+class LegacyContainerResolution(
+    private val legacy: Map<KClass<*>, Any>,
+) : ResolutionExtension {
 
-    override val name: String = "external-provider"
+    override val name: String = "legacy-container"
 
-    override fun resolve(scope: Scope, instanceContext: ResolutionContext): Any? {
-        return externalInstances[instanceContext.clazz]
-    }
-
-    fun <T : Any> registerInstance(clazz: KClass<T>, instance: T) {
-        externalInstances[clazz] = instance
-    }
+    override fun resolve(scope: Scope, instanceContext: ResolutionContext): Any? =
+        legacy[instanceContext.clazz]
 }
 ```
 
-### 注册 ResolutionExtension {id="registering-a-resolutionextension"}
-
-```kotlin
-val externalProvider = ExternalInstanceProvider()
-externalProvider.registerInstance(MyService::class, MyServiceImpl())
-
-startKoin {
-    // 注册解析扩展
-    koin.addResolutionExtension(externalProvider)
-
-    modules(module {
-        // 现在可以从外部提供者解析 MyService
-        single<MyComponent>()  // MyComponent 依赖于 MyService
-    })
-}
-```
-
-:::warning 实验性 API
-`ResolutionExtension` API 被标记为 `@KoinExperimentalAPI`。该 API 可能会在未来的版本中发生变化。
-:::
-
-### 完整示例 {id="complete-example"}
+在应用程序的 `koin` 上使用 `addResolutionExtension` 对其进行注册：
 
 ```kotlin
 @OptIn(KoinExperimentalAPI::class)
-fun resolutionExtensionExample() {
-    val resolutionExtension = object : ResolutionExtension {
-        val instanceMap = mapOf<KClass<*>, Any>(
-            ComponentA::class to ComponentA()
-        )
-
-        override val name: String = "custom-resolver"
-
-        override fun resolve(
-            scope: Scope,
-            instanceContext: ResolutionContext
-        ): Any? {
-            return instanceMap[instanceContext.clazz]
-        }
+fun startApp(legacy: Map<KClass<*>, Any>) {
+    startKoin {
+        koin.addResolutionExtension(LegacyContainerResolution(legacy))
+        modules(appModule)
     }
-
-    val koin = koinApplication {
-        printLogger(Level.DEBUG)
-        koin.addResolutionExtension(resolutionExtension)
-        modules(module {
-            // ComponentB 依赖于 ComponentA
-            // ComponentA 将从扩展中解析
-            single { ComponentB(get()) }
-        })
-    }.koin
-
-    val componentB = koin.get<ComponentB>()
-    // componentB.a 是来自 resolutionExtension 的实例
 }
 ```
 
-## 何时使用扩展 {id="when-to-use-extensions"}
+此时，`appModule` 中需要某种仅存在于旧版 Map 中的类型的定义，便可以从该扩展中获取。
 
-| 扩展类型 | 用例 |
-|---------------|----------|
-| `KoinExtension` | 向 Koin 添加功能（日志记录、监控、自定义作用域） |
-| `ResolutionExtension` | 在解析期间从外部源提供实例 |
+如果使用编译器插件，仅由扩展提供的类型在构建时是未知的，因此编译时安全性检查会将其报告为缺失。需要将其标记为已提供：请参阅[编译时安全性](/docs/reference/koin-compiler/compile-safety)。
 
-## 最佳做法 {id="best-practices"}
+`addResolutionExtension` 被标记为 `@KoinExperimentalAPI`。
 
-1. **谨慎使用** - 扩展会增加复杂性；尽可能首选标准 Koin 定义。
-2. **为您的扩展编写文档** - 明确说明扩展的作用以及如何使用它。
-3. **处理清理** - 始终实现 `onClose()` 以避免资源泄漏。
-4. **考虑线程安全性** - 扩展可能会从多个线程调用。
+## 限制 {id="limits"}
 
-## 后续步骤 {id="next-steps"}
+- **内部与实验性 API**：这两个扩展点都可能在 Koin 版本之间发生变更。
+- **解析扩展没有生命周期**：Koin 不会缓存 `ResolutionExtension` 返回的实例。如有需要，请自行缓存。
+- **优先级末位**：只要存在匹配的定义，就绝不会请求解析扩展。它无法重写定义。
+- **线程安全**：`resolve` 可能会同时在多个线程中被调用。
 
-- **[作用域](/docs/reference/koin-core/scopes)** - 自定义作用域管理
-- **[模块](/docs/reference/koin-core/modules)** - 模块组织
-- **[高级模式](/docs/reference/koin-core/advanced-patterns)** - 更多高级模式
+## 相关内容 {id="related"}
+
+- [延迟加载模块](/docs/reference/koin-core/lazy-modules)：基于协程引擎扩展构建的功能。
+- [Ktor DI 桥接](/docs/reference/koin-ktor/ktor-bridge)：解析扩展的实际应用。
+- [编译时安全性](/docs/reference/koin-compiler/compile-safety)：声明在 Koin 外部提供的依赖项。
+- [启动 Koin](/docs/reference/koin-core/starting-koin)：用于注册扩展的应用程序 DSL。
+- [作用域](/docs/reference/koin-core/scopes)：作用域内的解析顺序。

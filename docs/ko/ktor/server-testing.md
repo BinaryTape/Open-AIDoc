@@ -1,10 +1,10 @@
-[//]: # (title: Ktor 서버 테스트)
+[//]: # (title: Ktor Server 테스트)
 
 <show-structure for="chapter" depth="3"/>
 
 <tldr>
 <p>
-<b>필수 의존성</b>: <code>io.ktor:ktor-server-test-host</code>, <code>org.jetbrains.kotlin:kotlin-test</code>
+<b>필요한 의존성</b>: <code>io.ktor:ktor-server-test-host</code>, <code>org.jetbrains.kotlin:kotlin-test</code>
 </p>
 </tldr>
 
@@ -12,11 +12,11 @@
 특별한 테스트 엔진을 사용하여 서버 애플리케이션을 테스트하는 방법을 알아봅니다.
 </link-summary>
 
-Ktor는 실제 웹 서버를 시작하거나 소켓에 바인딩하지 않고 애플리케이션 호출을 직접 실행하는 테스트 엔진을 제공합니다. 요청이 내부적으로 처리되므로, 전체 서버를 실행하는 것보다 테스트가 더 빠르고 안정적입니다.
+Ktor는 실제 웹 서버를 시작하거나 소켓에 바인딩하지 않고도 애플리케이션 호출을 직접 실행하는 테스트 엔진을 제공합니다. 요청이 내부적으로 처리되므로 전체 서버를 실행하는 것에 비해 테스트가 더 빠르고 안정적입니다.
 
 ## 의존성 추가 {id="add-dependencies"}
 
-Ktor 서버 애플리케이션을 테스트하려면 빌드 스크립트에 다음 의존성을 포함하세요:
+Ktor 서버 애플리케이션을 테스트하려면 빌드 스크립트에 다음 의존성을 포함하세요.
 
 * `ktor-server-test-host` 의존성은 테스트 엔진을 제공합니다:
 
@@ -33,7 +33,7 @@ Ktor 서버 애플리케이션을 테스트하려면 빌드 스크립트에 다�
        </TabItem>
    </Tabs>
 
-* `kotlin-test` 의존성은 어설션(assertion)을 수행하기 위한 유틸리티 함수 세트를 제공합니다:
+* `kotlin-test` 의존성은 단언(assertion)을 수행하기 위한 일련의 유틸리티 함수를 제공합니다:
 
   <var name="group_id" value="org.jetbrains.kotlin"/>
   <var name="artifact_name" value="kotlin-test"/>
@@ -50,19 +50,19 @@ Ktor 서버 애플리케이션을 테스트하려면 빌드 스크립트에 다�
       </TabItem>
   </Tabs>
 
-> [Native 서버](server-native.md#add-dependencies) 테스트의 경우, 이러한 아티팩트들을 `nativeTest` 소스 세트에 추가하세요.
+> [Native 서버](server-native.md#add-dependencies) 테스트의 경우, 이러한 아티팩트를 `nativeTest` 소스 세트에 추가하세요.
 
 ## 테스트 개요 {id="overview"}
 
-[`testApplication {}`](https://api.ktor.io/ktor-server-test-host/io.ktor.server.testing/test-application.html) 함수와 제공된 [HTTP 클라이언트](client-create-and-configure.md)를 사용하여 Ktor 애플리케이션을 테스트할 수 있습니다. 일반적인 워크플로우는 다음 단계로 구성됩니다:
+[`testApplication {}`](https://api.ktor.io/ktor-server-test-host/io.ktor.server.testing/test-application.html) 함수와 제공된 [HTTP 클라이언트](client-create-and-configure.md)를 사용하여 Ktor 애플리케이션을 테스트할 수 있습니다. 일반적인 워크플로는 다음 단계로 진행됩니다:
 
 1. `testApplication {}`을 사용하여 [테스트를 정의](#junit-test-class)합니다.
 2. 애플리케이션의 [테스트 인스턴스를 구성하고 실행](#configure-test-app)합니다.
 3. 선택적으로, [HTTP 클라이언트를 구성](#configure-client)합니다.
 4. 클라이언트를 사용하여 테스트 애플리케이션에 [HTTP 요청을 보내고](#make-request) 응답을 받습니다.
-5. 상태 코드, 헤더, 본문 내용 등을 포함하여 `kotlin.test`의 어설션을 사용해 [응답을 검증](#assert)합니다.
+5. 상태 코드, 헤더, 본문 내용 등을 포함하여 `kotlin.test`의 단언을 사용해 [응답을 검증](#assert)합니다.
 
-다음 예제는 `GET /` 요청에 대해 일반 텍스트로 응답하는 간단한 Ktor 애플리케이션을 테스트합니다:
+다음 예제는 `GET /` 요청에 일반 텍스트로 응답하는 간단한 Ktor 애플리케이션을 테스트합니다:
 
 <Tabs>
 <TabItem title="ApplicationTest.kt">
@@ -121,16 +121,16 @@ fun Application.module() {
 
 ## JUnit 테스트 클래스 설정 {id="junit-test-class"}
 
-Ktor 애플리케이션에 대한 테스트를 작성하기 전에 테스트 파일과 JUnit 테스트 클래스를 생성하세요.
+Ktor 애플리케이션용 테스트를 작성하기 전에 테스트 파일과 JUnit 테스트 클래스를 생성하세요.
 
 <procedure>
 
-1. 프로젝트에서 `src/test/kotlin` 디렉토리를 찾거나 생성합니다.
+1. 프로젝트에서 `src/test/kotlin` 디렉터리를 찾거나 생성합니다.
 2. 새 Kotlin 파일(예: `ApplicationTest.kt`)을 생성합니다.
 3. 테스트를 포함할 Kotlin 클래스를 정의합니다:
     ```kotlin 
     class ApplicationTest {
-        // 테스트 함수가 여기에 들어갑니다.
+        // 테스트 함수가 여기에 위치합니다
     }
     ```
 4. `@Test` 어노테이션이 달린 테스트 함수를 추가합니다. 테스트 내부에서 `testApplication {}` 함수를 사용하여 테스트 환경에서 애플리케이션을 실행합니다:
@@ -144,11 +144,11 @@ Ktor 애플리케이션에 대한 테스트를 작성하기 전에 테스트 파
     ```
 </procedure>
 
-`testApplication {}` 함수는 Ktor 서버 테스트의 진입점입니다. 이 함수는 격리된 테스트 환경을 생성하고, 실제 웹 서버를 시작하지 않고 애플리케이션을 실행하며, 요청을 보내고 응답을 검증할 수 있도록 미리 구성된 HTTP 클라이언트를 제공합니다.
+`testApplication {}` 함수는 Ktor 서버 테스트의 진입점입니다. 이 함수는 격리된 테스트 환경을 생성하고, 실제 웹 서버를 시작하지 않고 애플리케이션을 실행하며, 요청을 보내고 응답을 단언하기 위한 사전 구성된 HTTP 클라이언트를 제공합니다.
 
-`testApplication {}` 블록 내부에서 로드할 모듈, 노출할 라우트, 환경 설정 방법 또는 모킹할 외부 서비스 등 테스트 애플리케이션이 어떻게 작동해야 하는지 구성합니다.
+`testApplication {}` 블록 내부에서 로드할 모듈, 노출할 라우트, 환경 설정 방법 또는 모킹할 외부 서비스 등 테스트 애플리케이션이 어떻게 동작해야 하는지 구성합니다.
 
-다음 섹션에서는 사용 가능한 구성 옵션에 대해 설명합니다.
+다음 섹션에서는 사용 가능한 구성 옵션을 설명합니다.
 
 ## 테스트 애플리케이션 구성 {id="configure-test-app"}
 
@@ -156,12 +156,12 @@ Ktor 애플리케이션에 대한 테스트를 작성하기 전에 테스트 파
 
 - [애플리케이션 모듈 추가](#add-modules)
 - [라우트 추가](#add-routing)
-- [환경 사용자 정의](#environment)
+- [환경 커스터마이즈](#environment)
 - [외부 서비스 모킹](#external-services)
 
 > 기본적으로 구성된 테스트 애플리케이션은 [첫 번째 클라이언트 호출](#make-request) 시 시작됩니다.
-> 선택적으로 `startApplication()` 함수를 호출하여 애플리케이션을 수동으로 시작할 수 있습니다.
-> 이는 애플리케이션의 [수명 주기 이벤트](server-events.md#predefined-events)를 테스트해야 할 때 유용할 수 있습니다.
+> 선택적으로 `startApplication()` 함수를 호출하여 애플리케이션을 수동으로 시작할 수도 있습니다.
+> 이는 애플리케이션의 [라이프사이클 이벤트](server-events.md#predefined-events)를 테스트해야 할 때 유용할 수 있습니다.
 
 ### 애플리케이션 모듈 추가 {id="add-modules"}
 
@@ -169,7 +169,7 @@ Ktor 애플리케이션에 대한 테스트를 작성하기 전에 테스트 파
 
 #### 명시적 모듈 로딩 {id="explicit-module-loading"}
 
-테스트 애플리케이션에 모듈을 수동으로 추가하려면 `application {}` 블록을 사용하세요:
+수동으로 테스트 애플리케이션에 모듈을 추가하려면 `application {}` 블록을 사용합니다:
 
 ```kotlin
 package com.example
@@ -212,9 +212,9 @@ class ApplicationTest {
 }
 ```
 
-#### 설정 파일에서 모듈 로드 {id="configure-env"}
+#### 구성 파일에서 모듈 로드 {id="configure-env"}
 
-설정 파일에서 모듈을 로드하려면 `environment {}` 블록을 사용하여 테스트를 위한 설정 파일을 지정하세요:
+구성 파일에서 모듈을 로드하려면 `environment {}` 블록을 사용하여 테스트를 위한 구성 파일을 지정합니다:
 
 ```kotlin
 @Test
@@ -227,7 +227,7 @@ fun testHello() = testApplication {
 }
 ```
 
-이 방법은 테스트 중에 다양한 환경을 흉내 내거나 사용자 정의 구성 설정을 사용해야 할 때 유용합니다.
+이 방법은 테스트 중에 다른 환경을 흉내 내거나 커스텀 구성 설정을 사용해야 할 때 유용합니다.
 
 ### 애플리케이션 인스턴스 접근 {id="access-application"}
 
@@ -241,7 +241,7 @@ testApplication {
     }
 }
 ```
-또한 `testApplication` 스코프는 테스트에서 사용하는 것과 동일한 `Application` 인스턴스를 반환하는 `application` 프로퍼티를 노출합니다. 이를 통해 테스트 코드에서 직접 애플리케이션을 검사하거나 상호작용할 수 있습니다.
+또한 `testApplication` 스코프는 테스트에서 사용하는 동일한 `Application` 인스턴스를 반환하는 `application` 프로퍼티를 노출합니다. 이를 통해 테스트 코드에서 직접 애플리케이션을 검사하거나 상호작용할 수 있습니다.
 
 ```kotlin
 package com.example
@@ -284,13 +284,13 @@ class ApplicationTest {
 }
 ```
 
-> `startApplication()`을 호출하거나 첫 번째 클라이언트 요청을 하기 전에 `application` 프로퍼티에 접근하면 `Application` 인스턴스를 반환하지만, 아직 시작되지 않았을 수 있습니다.
+> `startApplication()`을 호출하거나 첫 번째 클라이언트 요청을 보내기 전에 `application` 프로퍼티에 접근하면 `Application` 인스턴스가 반환되지만, 아직 시작되지 않은 상태일 수 있습니다.
 > 
 {style="note"}
 
 ### 라우트 추가 {id="add-routing"}
 
-`routing {}` 블록을 사용하여 테스트 애플리케이션에 라우트를 추가할 수 있습니다. 이 방식은 전체 모듈을 로드하지 않고 라우트를 테스트하거나 테스트 전용 엔드포인트를 추가하는 데 유용합니다.
+`routing {}` 블록을 사용하여 테스트 애플리케이션에 라우트를 추가할 수 있습니다. 이 방식은 전체 모듈을 로드하지 않고 라우트를 테스트하거나 테스트 전용 엔드포인트를 추가할 때 유용합니다.
 
 다음 예제는 테스트에서 사용자 세션을 초기화하는 데 사용되는 `/login-test` 엔드포인트를 추가합니다:
 
@@ -307,11 +307,11 @@ fun testHello() = testApplication {
    
 > 전체 테스트 예제는 [auth-oauth-google](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/auth-oauth-google)을 참조하세요.
 
-### 환경 사용자 정의 {id="environment"}
+### 환경 커스터마이즈 {id="environment"}
 
-테스트 애플리케이션을 위한 사용자 정의 환경을 구성하려면 `environment {}` 함수를 사용하세요.
+테스트 애플리케이션을 위한 커스텀 환경을 구성하려면 `environment {}` 함수를 사용합니다.
 
-예를 들어, `test/resources` 폴더에서 설정 파일을 로드하려면 다음과 같이 합니다:
+예를 들어, `test/resources` 폴더에서 구성 파일을 로드하려면 다음과 같이 합니다:
 
 ```kotlin
 @Test
@@ -324,7 +324,7 @@ fun testHello() = testApplication {
 }
 ```
 
-또는 [`MapApplicationConfig`](https://api.ktor.io/ktor-server-core/io.ktor.server.config/-map-application-config/index.html)를 사용하여 프로그래밍 방식으로 구성 속성을 제공할 수 있습니다. 이는 애플리케이션이 시작되기 전에 애플리케이션 구성에 접근해야 할 때 유용합니다.
+또는 [`MapApplicationConfig`](https://api.ktor.io/ktor-server-core/io.ktor.server.config/-map-application-config/index.html)를 사용하여 프로그래밍 방식으로 구성 프로퍼티를 제공할 수도 있습니다. 이는 애플리케이션이 시작되기 전에 애플리케이션 구성에 접근해야 하는 경우 유용합니다.
 
 ```kotlin
 @Test
@@ -335,9 +335,9 @@ fun testDevEnvironment() = testApplication {
 }
 ```
 
-### 외부 서비스 모킹 {id="external-services"}
+### 외부 서비스 모의(Mock) {id="external-services"}
 
-`externalServices {}` 함수를 사용하여 외부 서비스를 시뮬레이션할 수 있습니다. 이 블록 내부에서 모킹하려는 각 서비스에 대해 `hosts() {}` 함수를 사용합니다. `hosts() {}` 블록 내에서 라우트를 정의하고 플러그인을 설치하여 모의 서비스 역할을 하는 `Application`을 구성할 수 있습니다.
+`externalServices {}` 함수를 사용하여 외부 서비스를 시뮬레이션할 수 있습니다. 블록 내부에서 모의하려는 각 서비스에 대해 `hosts() {}` 함수를 사용합니다. `hosts() {}` 블록 내에서는 라우트를 정의하고 플러그인을 설치하여 모의 서비스 역할을 하는 `Application`을 구성할 수 있습니다.
 
 다음 예제는 Google API의 JSON 응답을 시뮬레이션합니다:
 
@@ -368,10 +368,10 @@ fun testHello() = testApplication {
 
 ## 클라이언트 구성 {id="configure-client"}
 
-`testApplication {}` 함수는 `client` 프로퍼티를 통해 구성된 HTTP 클라이언트를 제공합니다. 
-클라이언트를 사용자 정의하고 추가 플러그인을 설치하려면 `createClient {}` 함수를 사용하세요.
+`testApplication {}` 함수는 `client` 프로퍼티를 통해 사전 구성된 HTTP 클라이언트를 제공합니다. 
+클라이언트를 커스터마이즈하고 추가 플러그인을 설치하려면 `createClient {}` 함수를 사용하세요.
 
-예를 들어, `POST/PUT` 요청에서 [JSON 데이터](#json-data)를 보내기 위해 [`ContentNegotiation`](client-serialization.md) 플러그인을 설치할 수 있습니다:
+예를 들어, `POST/PUT` 요청에서 [JSON 데이터를 전송](#json-data)하기 위해 [`ContentNegotiation`](client-serialization.md) 플러그인을 설치할 수 있습니다:
 
 ```kotlin
 @Test
@@ -387,7 +387,7 @@ fun testPostCustomer() = testApplication {
 }
 ```
 
-## 요청 수행 {id="make-request"}
+## 요청 보내기 {id="make-request"}
 
 구성된 클라이언트를 사용하여 [요청을 보내고](client-requests.md) [응답을 받습니다](client-responses.md).
 
@@ -413,9 +413,9 @@ fun testPostCustomer() = testApplication {
 
 > 전체 테스트 예제는 [json-kotlinx](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/json-kotlinx)를 참조하세요.
 
-## 결과 검증 {id="assert"}
+## 결과 단언(Assert) {id="assert"}
 
-응답을 받은 후, [`kotlin.test`](https://kotlinlang.org/api/latest/kotlin.test/) 라이브러리의 어설션을 사용하여 결과를 확인할 수 있습니다:
+응답을 받은 후, [`kotlin.test`](https://kotlinlang.org/api/latest/kotlin.test/) 라이브러리의 단언을 사용하여 결과를 검증할 수 있습니다:
 
 ```kotlin
 @Test
@@ -441,11 +441,11 @@ fun testPostCustomer() = testApplication {
 
 ### 폼 데이터 전송 {id="form-data"}
 
-테스트 요청에서 폼 데이터를 보내려면 [`header()`](client-requests.md#headers) 및 [`setBody()`](client-requests.md#body) 함수를 사용하여 `Content-Type` 헤더와 요청 본문을 설정합니다.
+테스트 요청에서 폼 데이터를 전송하려면 [`header()`](client-requests.md#headers) 및 [`setBody()`](client-requests.md#body) 함수를 사용하여 `Content-Type` 헤더와 요청 본문을 설정합니다.
 
 #### 키/값 쌍 {id="x-www-form-urlencoded"}
 
-POST 요청에서 키/값 폼 파라미터를 보내려면 `Content-Type` 헤더를 `application/x-www-form-urlencoded`로 설정하고 [`formUrlEncode()`](https://api.ktor.io/ktor-http/io.ktor.http/form-url-encode.html) 함수를 사용하여 파라미터를 인코딩합니다:
+POST 요청에서 키/값 폼 파라미터를 전송하려면 `Content-Type` 헤더를 `application/x-www-form-urlencoded`로 설정하고 [`formUrlEncode()`](https://api.ktor.io/ktor-http/io.ktor.http/form-url-encode.html) 함수를 사용하여 파라미터를 인코딩합니다:
 
 <Tabs>
 <TabItem title="ApplicationTest.kt">
@@ -505,7 +505,7 @@ fun Application.main() {
 
 #### 멀티파트 폼 데이터 {id="multipart-form-data"}
 
-`multipart/form-data` 콘텐츠 타입을 사용하여 멀티파트 폼 데이터를 작성하고 파일 업로드를 테스트할 수 있습니다:
+`multipart/form-data` 컨텐츠 타입을 사용하여 멀티파트 폼 데이터를 생성하고 파일 업로드를 테스트할 수 있습니다:
 
 <Tabs>
 <TabItem title="ApplicationTest.kt">
@@ -612,7 +612,7 @@ fun Application.main() {
 
 `POST/PUT` 요청에서 JSON 데이터를 직렬화 및 역직렬화하려면 새 클라이언트에 [`ContentNegotiation`](client-serialization.md) 플러그인을 설치하세요.
 
-요청 내부에서 `contentType()` 함수를 사용하여 `Content-Type` 헤더를 지정하고, `setBody()` 함수를 사용하여 요청 본문을 지정할 수 있습니다.
+요청 내에서 `contentType()` 함수를 사용하여 `Content-Type` 헤더를 지정하고, `setBody()` 함수를 사용하여 요청 본문을 지정할 수 있습니다.
 
 <Tabs>
 <TabItem title="ApplicationTest.kt">
@@ -686,11 +686,11 @@ data class Customer(val id: Int, val firstName: String, val lastName: String)
 
 > 전체 예제는 [json-kotlinx](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/json-kotlinx)를 참조하세요.
 
-## 테스트 중 쿠키 유지하기 {id="preserving-cookies"}
+## 테스트 중 쿠키 유지 {id="preserving-cookies"}
 
 요청 간에 쿠키를 유지하려면 새 클라이언트에 [`HttpCookies`](client-cookies.md) 플러그인을 설치하세요.
 
-다음 예제에서는 쿠키가 유지되므로 각 요청 후에 리로드 횟수가 증가합니다:
+다음 예제에서는 쿠키가 유지되기 때문에 각 요청 후 리로드 횟수(reload count)가 증가합니다:
 
 <Tabs>
 <TabItem title="ApplicationTest.kt">
@@ -778,7 +778,7 @@ fun Application.main() {
 
 ## HTTPS 테스트 {id="https"}
 
-[HTTPS 엔드포인트](server-ssl.md)를 테스트하려면 [`URLBuilder.protocol`](client-requests.md#url) 프로퍼티를 사용하여 요청 프로토콜을 설정하세요:
+[HTTPS 엔드포인트](server-ssl.md)를 테스트하려면 [`URLBuilder.protocol`](client-requests.md#url) 프로퍼티를 사용하여 요청 프로토콜을 설정합니다:
 
 ```kotlin
 package com.example
@@ -810,7 +810,7 @@ class ApplicationTest {
 
 ## WebSocket 테스트 {id="testing-ws"}
 
-[`WebSockets`](client-websockets.topic) 클라이언트 플러그인을 사용하여 [WebSocket 대화](server-websockets.md)를 테스트할 수 있습니다:
+[`WebSockets`](client-websockets.topic) 클라이언트 플러그인을 사용하여 [WebSocket 대화(conversation)](server-websockets.md)를 테스트할 수 있습니다:
 
 ```kotlin
 package com.example
@@ -844,11 +844,11 @@ class ModuleTest {
 }
 ```
 
-## HttpClient를 사용한 엔드투엔드(E2E) 테스트 {id="end-to-end"}
+## HttpClient를 사용한 엔드투엔드(End-to-end) 테스트 {id="end-to-end"}
 
-[Ktor HTTP 클라이언트](client-create-and-configure.md)를 사용하여 서버 애플리케이션의 완전한 엔드투엔드 테스트를 수행할 수 있습니다.
+[Ktor HTTP 클라이언트](client-create-and-configure.md)를 사용하여 서버 애플리케이션의 완전한 엔드투엔드(End-to-end) 테스트를 수행할 수 있습니다.
 
-아래 예제에서 HTTP 클라이언트는 `TestServer`에 테스트 요청을 보냅니다:
+아래 예제에서 HTTP 클라이언트는 `TestServer`로 테스트 요청을 보냅니다:
 
 ```kotlin
 import e2e.TestServer

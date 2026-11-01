@@ -1,4 +1,4 @@
-[//]: # (title: キャッシングヘッダー)
+[//]: # (title: キャッシュヘッダー)
 
 <show-structure for="chapter" depth="2"/>
 <primary-label ref="server-plugin"/>
@@ -6,10 +6,11 @@
 <var name="plugin_name" value="CachingHeaders"/>
 <var name="package_name" value="io.ktor.server.plugins.cachingheaders"/>
 <var name="artifact_name" value="ktor-server-caching-headers"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.server.cachingHeaders"/>
 
 <tldr>
 <p>
-<b>必須の依存関係</b>: <code>io.ktor:%artifact_name%</code>
+<b>必要な依存関係</b>: <code>io.ktor:%artifact_name%</code>
 </p>
 <var name="example_name" value="caching-headers"/>
 <p>
@@ -19,25 +20,31 @@
     </a>
 </p>
 <p>
-    <b><Links href="/ktor/server-native" summary="KtorはKotlin/Nativeをサポートしており、追加のランタイムや仮想マシンなしでサーバーを実行できます。">ネイティブサーバー</Links>のサポート</b>: ✅
+    <b><Links href="server-native.md" summary="KtorはKotlin/Nativeをサポートしており、追加のランタイムや仮想マシンなしでサーバーを実行できます。">Nativeサーバー</Links>のサポート</b>: ✅
 </p>
 </tldr>
 
-[CachingHeaders](https://api.ktor.io/ktor-server-caching-headers/io.ktor.server.plugins.cachingheaders/-caching-headers.html) プラグインは、HTTP キャッシングに使用される `Cache-Control` および `Expires` ヘッダーを設定する機能を追加します。キャッシングは以下の方法で[設定](#configure)できます：
-- 画像、CSS、JavaScript ファイルなどの特定のコンテンツタイプに対して、異なるキャッシュ戦略を設定する。
-- アプリケーションレベルでのグローバル、ルートレベル、または特定のコールといった、さまざまなレベルでキャッシングオプションを指定する。
+[CachingHeaders](https://api.ktor.io/ktor-server-caching-headers/io.ktor.server.plugins.cachingheaders/-caching-headers.html) プラグインは、HTTPキャッシュに使用される `Cache-Control` および `Expires` ヘッダーを設定する機能を追加します。以下の方法で[キャッシュを設定](#configure)できます：
+- 画像、CSS、JavaScriptファイルなどの特定のコンテンツタイプに対して異なるキャッシュ戦略を設定する。
+- アプリケーションレベルのグローバル、ルートレベル、または特定の呼び出し（コール）など、異なるレベルでキャッシュオプションを指定する。
 
 ## 依存関係の追加 {id="add_dependencies"}
 
 <p>
-    <code>%plugin_name%</code> を使用するには、ビルドスクリプトに <code>%artifact_name%</code> アーティファクトを含める必要があります。
+    <code>%plugin_name%</code> を使用するには、ビルドスクリプトに <code>%artifact_name%</code> アーティファクトを追加します：
 </p>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上記のコードスニペットでは、Ktorの依存関係を指定するために<a href="server-dependencies.topic#using-version-catalog">Ktorバージョンカタログ</a>を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上記のコードスニペットでは、Ktorの依存関係を指定するために<a href="server-dependencies.topic#using-version-catalog">Ktorバージョンカタログ</a>を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
@@ -47,15 +54,15 @@
 ## %plugin_name% のインストール {id="install_plugin"}
 
 <p>
-    <code>%plugin_name%</code> プラグインをアプリケーションに<a href="server-plugins.md#install">インストール</a>するには、指定された<Links href="/ktor/server-modules" summary="モジュールを使用すると、ルートをグループ化してアプリケーションを構造化できます。">モジュール</Links>内の <code>install</code> 関数に渡します。
-    以下のコードスニペットは、<code>%plugin_name%</code> をインストールする方法を示しています...
+    <code>%plugin_name%</code> プラグインをアプリケーションに<a href="server-plugins.md#install">インストール</a>するには、指定された<Links href="server-modules.md" summary="モジュールを使用すると、ルートをグループ化してアプリケーションを構造化できます。">モジュール</Links>内の <code>install</code> 関数に渡します。
+    以下の例は、<code>%plugin_name%</code> をインストールする方法を示しています：
 </p>
 <list>
     <li>
-        ... <code>embeddedServer</code> 関数の呼び出し内。
+        <code>embeddedServer()</code> 関数の呼び出し内。
     </li>
     <li>
-        ... <code>Application</code> クラスの拡張関数である、明示的に定義された <code>module</code> 内。
+        <code>Application</code> クラスに明示的に定義された <code>module()</code> 拡張関数内。
     </li>
 </list>
 <Tabs>
@@ -68,13 +75,13 @@
 </Tabs>
 <p>
     <code>%plugin_name%</code> プラグインは、<a href="server-plugins.md#install-route">特定のルートにインストール</a>することもできます。
-    これは、アプリケーションのリソースごとに異なる <code>%plugin_name%</code> 設定が必要な場合に便利です。
+    これは、アプリケーションの異なるリソースに対して異なる <code>%plugin_name%</code> 設定が必要な場合に便利です。
 </p>
 
-`%plugin_name%` をインストールした後、さまざまなコンテンツタイプに対してキャッシング設定を[構成](#configure)できます。
+`%plugin_name%` をインストールした後、さまざまなコンテンツタイプのキャッシュ設定を[構成](#configure)できます。
 
-## キャッシングの設定 {id="configure"}
-`%plugin_name%` プラグインを設定するには、特定の `ApplicationCall` とコンテンツタイプに対して指定されたキャッシングオプションを提供するために、[options](https://api.ktor.io/ktor-server-caching-headers/io.ktor.server.plugins.cachingheaders/-caching-headers-config/options.html) 関数を定義する必要があります。[caching-headers](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/caching-headers) の例のコードスニペットは、プレーンテキストと HTML に対して `max-age` オプションを含む `Cache-Control` ヘッダーを追加する方法を示しています：
+## キャッシュの設定 {id="configure"}
+`%plugin_name%` プラグインを設定するには、特定の `ApplicationCall` およびコンテンツタイプに対して指定のキャッシュオプションを提供する [options](https://api.ktor.io/ktor-server-caching-headers/io.ktor.server.plugins.cachingheaders/-caching-headers-config/options.html) 関数を定義する必要があります。[caching-headers](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/caching-headers) の例にある以下のコードスニペットは、プレーンテキストとHTMLに対して `max-age` オプション付きの `Cache-Control` ヘッダーを追加する方法を示しています：
 
 ```kotlin
 fun Application.module() {
@@ -92,14 +99,14 @@ fun Application.module() {
 }
 ```
 
-[CachingOptions](https://api.ktor.io/ktor-http/io.ktor.http.content/-caching-options/index.html) オブジェクトは、パラメータとして `Cache-Control` および `Expires` ヘッダーの値を受け入れます：
+[CachingOptions](https://api.ktor.io/ktor-http/io.ktor.http.content/-caching-options/index.html) オブジェクトは、パラメータとして `Cache-Control` および `Expires` ヘッダーの値を受け取ります：
 
-* `cacheControl` パラメータは [CacheControl](https://api.ktor.io/ktor-http/io.ktor.http/-cache-control/index.html) 値を受け入れます。`CacheControl.MaxAge` を使用して `max-age` パラメータと、可視性、再検証オプションなどの関連設定を指定できます。`CacheControl.NoCache`/`CacheControl.NoStore` を使用してキャッシングを無効にすることもできます。
-* `expires` パラメータを使用すると、`Expires` ヘッダーを `GMTDate` または `ZonedDateTime` 値として指定できます。
+* `cacheControl` パラメータは [CacheControl](https://api.ktor.io/ktor-http/io.ktor.http/-cache-control/index.html) の値を受け取ります。`CacheControl.MaxAge` を使用して、`max-age` パラメータや可視性、再検証オプションなどの関連設定を指定できます。キャッシュを無効にするには `CacheControl.NoCache`/`CacheControl.NoStore` を使用できます。
+* `expires` パラメータを使用すると、`Expires` ヘッダーを `GMTDate` または `ZonedDateTime` の値として指定できます。
 
 ### ルートレベル {id="configure-route"}
 
-プラグインはグローバルだけでなく、[特定のルート](server-plugins.md#install-route)にもインストールできます。例えば、以下の例は `/index` ルートに対して指定されたキャッシングヘッダーを追加する方法を示しています：
+プラグインはグローバルだけでなく、[特定のルート](server-plugins.md#install-route)にインストールすることもできます。例えば、以下の例は `/index` ルートに対して指定したキャッシュヘッダーを追加する方法を示しています：
 
 ```kotlin
 route("/index") {
@@ -112,9 +119,9 @@ route("/index") {
 }
 ```
 
-### コールレベル {id="configure-call"}
+### 呼び出しレベル {id="configure-call"}
 
-より詳細なキャッシング設定が必要な場合は、`ApplicationCall.caching` プロパティを使用してコールレベルでキャッシングオプションを設定できます。以下の例は、ユーザーがログインしているかどうかに応じてキャッシングオプションを設定する方法を示しています：
+よりきめ細かなキャッシュ設定が必要な場合は、`ApplicationCall.caching` プロパティを使用して呼び出しレベルでキャッシュオプションを設定できます。以下の例は、ユーザーがログインしているかどうかに応じてキャッシュオプションを設定する方法を示しています：
 
 ```kotlin
 route("/profile") {

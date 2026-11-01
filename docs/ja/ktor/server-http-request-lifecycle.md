@@ -19,19 +19,17 @@
 <b>サポートされているエンジン</b>: <code>Netty</code>, <code>CIO</code>
 </p>
 <p>
-    <b><Links href="/ktor/server-native" summary="KtorはKotlin/Nativeをサポートしており、追加のランタイムや仮想マシンなしでサーバーを実行できます。">Nativeサーバー</Links>のサポート</b>: ✖️
+    <b><Links href="server-native.md" summary="KtorはKotlin/Nativeをサポートしており、追加のランタイムや仮想マシンなしでサーバーを実行できます。">Nativeサーバー</Links>のサポート</b>: ✖️
 </p>
 </tldr>
 
-デフォルトでは、Ktorはクライアントが切断された場合でもリクエストの処理を継続します。
-[`%plugin_name%`](https://api.ktor.io/ktor-http/io.ktor.http/-http-request-lifecycle.html)
-プラグインを使用すると、クライアントが切断されるとすぐにリクエスト処理をキャンセルできます。
+デフォルトでは、Ktorはクライアントが切断した場合でもリクエストの処理を継続します。[`%plugin_name%`](https://api.ktor.io/ktor-http/io.ktor.http/-http-request-lifecycle.html)プラグインを使用すると、クライアントが切断された直後にリクエストの処理をキャンセルできます。
 
-これは、クライアントが応答を待たなくなったときに実行を停止すべき、長時間実行されるリクエストやリソースを大量に消費するリクエストに役立ちます。
+これは、クライアントがレスポンスを待たなくなった時点で処理を停止すべき、長時間実行されるリクエストやリソース集約型のリクエストに役立ちます。
 
-## %plugin_name%のインストールと設定 {id="install_plugin"}
+## %plugin_name% のインストールと設定 {id="install_plugin"}
 
-`HttpRequestLifecycle`プラグインを有効にするには、`install`関数を使用してアプリケーションモジュールにインストールし、`cancelCallOnClose`プロパティを設定します。
+`HttpRequestLifecycle` プラグインを有効にするには、`install` 関数を使用してアプリケーションモジュールにインストールし、`cancelCallOnClose` プロパティを設定します。
 
 ```kotlin
 import io.ktor.server.application.*
@@ -44,13 +42,13 @@ fun Application.module() {
 }
 ```
 
-`cancelCallOnClose`プロパティが有効になると、`%plugin_name%`プラグインはリクエストごとにキャンセルハンドラーをインストールします。クライアントが切断されると、その特定のルートを処理しているコルーチンのみがキャンセルされます。
+`cancelCallOnClose` プロパティが有効になっている場合、`%plugin_name%` プラグインはリクエストごとにキャンセルハンドラーをインストールします。クライアントが切断されると、その特定のルートを処理しているコルーチンのみがキャンセルされます。
 
-キャンセルは構造化された並行性（structured concurrency）を通じて伝播するため、リクエストコルーチンから開始されたすべての子コルーチン（たとえば、`launch`や`async`を使用したもの）もキャンセルされます。次のサスペンションポイント（中断点）で`CancellationException`がスローされます。
+キャンセルは構造化並行性（structured concurrency）を通じて伝播するため、リクエストコルーチンから開始された子コルーチン（たとえば `launch` や `async` を使用して開始されたもの）もすべてキャンセルされます。次のサスペンションポイント（中断点）で `CancellationException` がスローされます。
 
 ## キャンセルの処理 {id="handle_cancellation"}
 
-`CancellationException`をキャッチして、リソースの解放やバックグラウンド作業の停止などのクリーンアップ操作を実行できます。
+`CancellationException` をキャッチして、リソースの解放やバックグラウンド処理の停止などのクリーンアップ操作を実行できます。
 
 ```kotlin
 fun Application.module() {
@@ -74,16 +72,14 @@ fun Application.module() {
 }
 ```
 
-> コルーチンのキャンセルは協調的（cooperative）です。ブロッキングコードやCPU負荷の高いコードは自動的には中断されません。
-> リクエスト処理で長時間実行される作業を行う場合は、
-> `call.coroutineContext.ensureActive()`を呼び出してキャンセルに対応してください。
+> コルーチンのキャンセルは協調的（cooperative）です。ブロッキングコードやCPUバウンドなコードは自動的には中断されません。
+> リクエスト処理で長時間実行される処理を行う場合は、`call.coroutineContext.ensureActive()` を呼び出してキャンセルに対応してください。
 >
-> 詳細については、
-> [コルーチンのキャンセル](https://kotlinlang.org/docs/cancellation-and-timeouts.html)を参照してください。
+> 詳細については、[コルーチンのキャンセル](https://kotlinlang.org/docs/cancellation-and-timeouts.html)を参照してください。
 {style="note"}
 
-> 完全な例については、[%example_name%](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/%example_name%)を参照してください。
+> 完全な例については、[%example_name%](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/%example_name%) を参照してください。
 
 ## 制限事項 {id="limitations"}
 
-このプラグインは、`CIO`および`Netty`エンジンでのみ完全にサポートされています。サーブレットベースのエンジン（またはその他のサポートされていないエンジン）では、クライアントの切断を確実に検出できません。キャンセルは、サーバーがレスポンスを書き込もうとしたときにのみ検出されます。
+このプラグインは、`CIO` および `Netty` エンジンでのみ完全にサポートされています。サーブレットベースのエンジン（またはその他のサポートされていないエンジン）では、クライアントの切断を確実に検出できません。キャンセルは、サーバーがレスポンスの書き込みを試行したときにのみ検出できます。

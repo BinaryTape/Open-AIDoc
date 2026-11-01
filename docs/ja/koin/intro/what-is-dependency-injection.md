@@ -1,16 +1,16 @@
 ---
-title: 依存性の注入（Dependency Injection）とは？
+title: 依存性の注入（DI）とは？
 ---
 
-# 依存性の注入（Dependency Injection）とは？
+# 依存性の注入（DI）とは？
 
-依存性の注入（Dependency Injection: DI）は、オブジェクトが自身の依存関係を内部で作成するのではなく、外部から受け取るようにするデザインパターンです。これにより、疎結合（loose coupling）、テスト可能性の向上、そしてよりクリーンなコードアーキテクチャが促進されます。
+依存性の注入（Dependency Injection: DI）は、オブジェクトが自身で必要なオブジェクトを生成するのではなく、外部から受け取るようにするデザインパターンです。このページでは、特定のフレームワークを前提とせずにこのパターンについて解説し、その後KoinのようなDIコンテナがどのように活用されるかを示します。すでにDIについて理解している場合は、[Core Concepts](/docs/intro/core-concepts) に進んでください。
 
-## 依存関係（Dependency）とは？ {id="what-is-a-dependency"}
+## 依存関係とは？ {id="what-is-a-dependency"}
 
-依存関係とは、あるオブジェクトが機能するために必要とする別のオブジェクトのことです。例えば、`Car`（車）が走行するためには `Engine`（エンジン）に依存します。
+依存関係（依存オブジェクト）とは、あるオブジェクトが処理を行うために必要とするオブジェクトのことです。例えば、`Car`（車）が走行するには `Engine`（エンジン）が必要です。
 
-### 依存性の注入を使用しない場合 {id="without-dependency-injection"}
+### 依存性の注入を用いない場合 {id="without-dependency-injection"}
 
 ```kotlin
 class Engine {
@@ -20,7 +20,7 @@ class Engine {
 }
 
 class Car {
-    private val engine = Engine()  // Car が自身でエンジンを作成している
+    private val engine = Engine() // Car自身がエンジンを生成している
 
     fun drive() {
         engine.start()
@@ -29,151 +29,99 @@ class Car {
 }
 ```
 
-**このアプローチの問題点:**
-- `Car` が特定の `Engine` 実装に密結合している
-- `Car` を単体でテストするのが困難
-- エンジンの種類（電気、ディーゼルなど）を切り替えるのが難しい
-- `Car` が `Engine` のライフサイクルを制御してしまっている
+これは正しく動作しますが、以下のような問題点（コスト）があります：
 
-### 依存性の注入を使用する場合 {id="with-dependency-injection"}
+- **密結合**: `Car` が特定の `Engine` 実装に固定されてしまいます。
+- **テストが困難**: `Car` をテスト用のフェイクエンジンでテストすることができません。
+- **変更が困難**: 電気エンジンに切り替えるには、`Car` 自体を修正する必要があります。
+- **ライフサイクルの管理場所が不適切**: `Engine` がいつ生成され、いくつ存在するかを `Car` が決定してしまいます。
+
+### 依存性の注入を用いる場合 {id="with-dependency-injection"}
 
 ```kotlin
-class Car(private val engine: Engine) {  // Engine が注入される
+class Car(private val engine: Engine) {
     fun drive() {
         engine.start()
         println("Car is driving")
     }
 }
 
-// これにより、異なるエンジンを簡単に提供できる
 val gasolineCar = Car(GasEngine())
 val electricCar = Car(ElectricEngine())
 ```
 
-**メリット:**
-- `Car` は `Engine` がどのように作成されるかを知る必要がない
-- モックエンジンを使用して簡単にテストできる
-- 柔軟性が高く、実装を入れ替えることができる
-- コンストラクタで依存関係が明確に可視化される
+`Car` は `Engine` がどのように構築されるかを知る必要がなくなりました。テスト時のフェイクを含め、あらゆる実装を渡すことができ、コンストラクタを見れば `Car` が何を必要としているかが一目でわかります。
 
-## 依存関係を提供するための3つの方法 {id="three-ways-to-provide-dependencies"}
+## 依存関係を提供する方法 {id="ways-to-provide-dependencies"}
 
-### 1. コンストラクタ注入（推奨） {id="1-constructor-injection-recommended"}
+### コンストラクタ注入（Constructor injection） {id="constructor-injection"}
 
-依存関係がコンストラクタを通じて渡されます。
+依存関係をコンストラクタのパラメータとして渡します：
 
 ```kotlin
 class UserRepository(
     private val database: Database,
-    private val apiClient: ApiClient
+    private val apiClient: ApiClient,
 ) {
-    fun getUser(id: String): User {
-        return database.query(id) ?: apiClient.fetchUser(id)
-    }
+    fun getUser(id: String): User =
+        database.query(id) ?: apiClient.fetchUser(id)
 }
 ```
 
-**利点:**
-- 依存関係が明示的かつ必須となる
-- 不変（`val` を使用）
-- テストが容易
-- 依存関係グラフが明確
+依存関係が明示的かつ必須になり、不変（`val`）にできます。このクラスはフレームワークなしで生成およびテストが可能です。原則としてこのアプローチを使用します。
 
-**Koin を使用した場合:**
+### フィールド注入（Field injection） {id="field-injection"}
 
-```kotlin
-val appModule = module {
-    single<Database>()
-    single<ApiClient>()
-    single<UserRepository>()  // Koin が依存関係を自動的に解決（自動配線）します
-}
-```
-
-:::info
-コンストラクタ注入は Koin において **推奨される手法** です。これにより、ユニットテストにおいて Koin を必要とせずにコードをテストできるようになります。
-:::
-
-### 2. フィールド注入 {id="2-field-injection"}
-
-依存関係がクラスのプロパティに注入されます。
+オブジェクトが作成された後に、プロパティへ依存関係を割り当てます。これはAndroidの `Activity` のように、フレームワークがオブジェクトを生成し、コンストラクタを制御できない場合に必要な手法です：
 
 ```kotlin
 class UserActivity : AppCompatActivity() {
-    // 遅延注入 - 最初にアクセスされたときにインスタンスが作成される
-    private val viewModel: UserViewModel by viewModel()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        viewModel.loadUser()  // ここで ViewModel インスタンスが作成される
-    }
+    private val viewModel: UserViewModel by viewModel() // 初回アクセス時にKoinによって注入される
 }
 ```
 
-**いつ使用するか:**
-- コンストラクション（生成）を自分自身で制御できない Android フレームワークのクラス（Activity、Fragment、Service など）
-- コンストラクタ注入が不可能な場合
+これは、上記のようなフレームワークのエントリポイントでのみ使用してください。それより下層のコンポーネントでは、コンストラクタ注入を使用します。
 
-**Koin を使用した場合:**
+### メソッド注入（Method injection） {id="method-injection"}
 
-```kotlin
-// 遅延注入（Lazy injection）
-val presenter: Presenter by inject()
-
-// 即時注入（Eager injection）
-val presenter: Presenter = get()
-```
-
-### 3. メソッド注入 {id="3-method-injection"}
-
-依存関係がメソッドを通じて渡されます（あまり一般的ではありません）。
+依存関係をそれを必要とするメソッドに渡します：
 
 ```kotlin
 class ReportGenerator {
     fun generateReport(data: DataSource) {
-        // data を使用してレポートを生成
+        ...
     }
 }
 ```
 
-**いつ使用するか:**
-- オプションの依存関係
-- オブジェクトの生存期間中に変化する依存関係
-- コールバックパターン
+これは、呼び出しごとに変化する依存関係や、特定のメソッドだけが使用する依存関係に適しています。
 
-## 手動 DI vs 自動 DI {id="manual-vs-automated-dependency-injection"}
+## 手動DIと自動DI {id="manual-and-automated-dependency-injection"}
 
-### 手動 DI の問題点 {id="the-problem-with-manual-di"}
+### 手動でのオブジェクトグラフ構築 {id="wiring-by-hand"}
 
-アプリケーションが成長するにつれて、手動での依存関係管理は複雑になります。
+ライブラリを一切使わずに、オブジェクトグラフ（依存関係の構造）を自前で構築してDIを適用することも可能です：
 
 ```kotlin
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // 依存関係グラフ全体を手動で作成している
         val database = Database()
         val apiClient = ApiClient()
         val userRepository = UserRepository(database, apiClient)
         val authRepository = AuthRepository(database, apiClient)
         val userService = UserService(userRepository, authRepository)
         val viewModel = UserViewModel(userService)
-
-        // ようやく viewModel が使える...
     }
 }
 ```
 
-**問題点:**
-- 多くの Activity/Fragment で同様のコードが繰り返される
-- 依存関係の順序を間違えやすい
-- アプリの成長に伴いメンテナンスが困難になる
-- ライフサイクルの管理（シングルトン、スコープオブジェクトなど）が難しい
-- 中央集権的な設定が存在しない
+アプリが成長するにつれて、このコードは多くの場所で重複し、コンストラクタが変更されるたびに更新が必要になります。また、各オブジェクトの生存期間を制御することも困難です。
 
-### コンテナパターン（手動アプローチ） {id="the-container-pattern-manual-approach"}
+### 手作りのコンテナ {id="a-container-written-by-hand"}
 
-開発者はオブジェクト作成を集中管理するためにコンテナを作成することがよくあります。
+次のステップとして一般的なのは、生成処理を一元化するコンテナオブジェクトを作成することです：
 
 ```kotlin
 object AppContainer {
@@ -188,24 +136,19 @@ object AppContainer {
     )
 }
 
-// 使用例
 class MainActivity : AppCompatActivity() {
     private val viewModel = AppContainer.createUserViewModel()
 }
 ```
 
-**依然として残る課題:**
-- 依存関係の手動接続（wiring）
-- 自動的なライフサイクル管理がない
-- グローバルな状態（シングルトンコンテナ）
-- 複雑なグラフになると依然として反復作業が発生する
+これにより重複は解消されますが、依然としてすべてのコンストラクタ呼び出しを手作業で記述および維持する必要があり、「単一インスタンス」や「都度新しいインスタンス」以上のライフサイクル（画面ごと、セッションごとのインスタンスなど）を扱うには、さらに多くのコードを手動で記述する必要があります。
 
-### Koin がどのように解決するか {id="how-koin-solves-this"}
+### DIコンテナ {id="a-di-container"}
 
-Koin は、**DSL またはアノテーション** のどちらか好きな方を選択して、依存関係の自動解決を提供します。
+DIライブラリはコンテナの役割を自動化します。どのクラスが存在し、どのくらいの期間生存するかを宣言するだけで、ライブラリがオブジェクトグラフを構築します。Koinを使用した場合：
 
+**Compiler Plugin DSL**
 ```kotlin
-// 依存関係を一度だけ定義する
 val appModule = module {
     single<Database>()
     single<ApiClient>()
@@ -214,210 +157,163 @@ val appModule = module {
     single<UserService>()
     viewModel<UserViewModel>()
 }
+```
 
-// Koin を一度だけ起動する
-class MyApplication : Application() {
-    override fun onCreate() {
-        super.onCreate()
-        startKoin {
-            modules(appModule)
-        }
-    }
-}
+**Annotations**
+```kotlin
+@Singleton
+class UserRepository(private val database: Database, private val apiClient: ApiClient)
 
-// どこでも使用可能 - Koin が依存関係グラフ全体を処理
-class MainActivity : AppCompatActivity() {
-    private val viewModel: UserViewModel by viewModel()
-    // これだけです！ Koin が UserViewModel とそのすべての依存関係を作成します
+@Singleton
+class UserService(private val userRepository: UserRepository, private val authRepository: AuthRepository)
+
+@KoinViewModel
+class UserViewModel(private val userService: UserService) : ViewModel()
+
+// Database、ApiClient、AuthRepository も同様にアノテーションを付与
+
+@Module
+@ComponentScan("com.example.app")
+class AppModule
+```
+
+**Constructor / Classic DSL**
+```kotlin
+val appModule = module {
+    singleOf(::Database)
+    singleOf(::ApiClient)
+    singleOf(::UserRepository)
+    singleOf(::AuthRepository)
+    singleOf(::UserService)
+    viewModelOf(::UserViewModel)
 }
 ```
 
-**Koin の利点:**
-- 宣言的な依存関係設定
-- 自動的な依存関係解決
-- ライフサイクル管理（シングルトン、ファクトリ、スコープ）
-- 型安全な注入
-- 簡単なテストとモジュールの差し替え
+その後、Activityはオブジェクトグラフのトップレベルの要素を要求します：
 
-## 自動 DI ソリューション {id="automated-di-solutions"}
+```kotlin
+class MainActivity : AppCompatActivity() {
+    private val viewModel: UserViewModel by viewModel()
+}
+```
 
-自動化された依存性の注入には、さまざまなアプローチがあります。
+コンテナは `UserViewModel` とその配下にあるすべてのオブジェクトを生成し、アプリ全体で1つの `Database` を保持しながら、画面ごとに新しい `UserViewModel` を提供します。[Core Concepts](/docs/intro/core-concepts) でこれらの要素について解説しています。
 
-| アプローチ | 例 | 仕組み |
-|----------|----------|--------------|
-| **リフレクションベース** | (古いフレームワーク) | 実行時にリフレクションを使用する |
-| **コード生成** | Dagger, Hilt | コンパイル時にコードを生成する (アノテーション処理) |
-| **コンパイラプラグイン** | Koin コンパイラプラグイン | DSL とアノテーションのためのネイティブコンパイラ統合 |
-| **DSLベース** | Koin (クラシック) | 実行時の DSL 設定 |
+## DIライブラリがグラフを構築する仕組み {id="how-di-libraries-build-the-graph"}
 
-**Koin のアプローチ - DSL とアノテーションの両方が同様に強力:**
-- **DSL スタイル:** クリーンな Kotlin DSL 設定 (`single<MyService>()`, `viewModel<MyVM>()`)
-- **アノテーションスタイル:** 使い慣れたアノテーション (`@Singleton`, `@KoinViewModel`)
-- どちらも同じコンパイラプラグインによって駆動され、コンパイル時の安全性が確保される
-- リフレクションを使用せず、軽量
-- チームに合ったスタイルを選択可能
+DIライブラリによって、いつ、どのようにグラフを構築するかが異なります：
 
-## サービスロケーター vs 依存性の注入 {id="service-locator-vs-dependency-injection"}
+| アプローチ | 仕組み | 例 |
+|------------|--------|----|
+| リフレクション | 実行時にコンストラクタを読み取り、リフレクションによって呼び出す | Guice, Spring |
+| アノテーションプロセッシング | ビルド時にファクトリのソースコードを生成する | Dagger, Hilt |
+| コンパイラプラグイン | コンパイラ内部でコードを書き換え、ビルド時にグラフを検証する | Koin Compiler Plugin |
+| ランタイムDSL | ファクトリをKotlinラムダとして記述し、コンテナが実行時に実行する | Koin Classic DSL |
 
-これらの違いを理解することが重要です。
+Koinはいずれの場合でもランタイムコンテナを維持します。Compiler Pluginは、その上に配線処理とビルド時チェックを追加します。これが実際に何を意味するのかについては、[What is Koin?](/docs/intro/what-is-koin) を参照してください。
 
-### サービスロケーターパターン {id="service-locator-pattern"}
+## サービスロケータと依存性の注入 {id="service-locator-and-dependency-injection"}
 
-コンポーネントがレジストリに対して能動的に依存関係を要求します。
+この2つのパターンはよく混同されます。
+
+**サービスロケータ（Service Locator）** では、クラス自身がレジストリに対して依存関係を要求します：
 
 ```kotlin
 class UserService : KoinComponent {
-    private val repository: UserRepository by inject()  // 依存関係を「引き出す」
+    private val repository: UserRepository by inject() // コンテナから引き出す（pull）
 }
 ```
 
-### 依存性の注入パターン {id="dependency-injection-pattern"}
-
-依存関係が外部から提供されます。
+**依存性の注入（Dependency Injection）** では、依存関係が外部からクラスに渡されます：
 
 ```kotlin
 class UserService(
-    private val repository: UserRepository  // コンポーネントに「押し込まれる」
+    private val repository: UserRepository // 外部から注入される（push）
 )
 ```
 
-### 比較 {id="comparison"}
+| 観点 | サービスロケータ | 依存性の注入 |
+|------|------------------|--------------|
+| 依存関係の可視性 | クラスの内部に隠蔽される | コンストラクタで明示される |
+| テスト | コンテナ、またはそのテスト用バージョンが必要 | コンストラクタにフェイクを渡すだけでよい |
+| 結合度 | クラスがコンテナに依存する | クラスはそのパラメータのみに依存する |
+| Koinでの表現 | `get()`, `by inject()`, `KoinComponent` | モジュールによって解決されるコンストラクタパラメータ |
+| 適した用途 | 自身でインスタンス化しないフレームワークのクラス | ビジネスロジック、リポジトリ、サービス |
 
-| 項目 | サービスロケーター | 依存性の注入 |
-|--------|----------------|---------------------|
-| 依存関係の可視性 | クラス内部に隠蔽される | コンストラクタで明示される |
-| テスト | フレームワークを必要とする | 容易 - テストダブルを渡すだけ |
-| 結合度 | コンテナに依存する | インターフェースに依存する |
-| Koin での用法 | `get()`, `by inject()` | Koin モジュールでのコンストラクタ定義 |
-| 適した用途 | Android フレームワーククラス | ビジネスロジック、サービス |
-
-### Koin におけるベストプラクティス {id="best-practices-with-koin"}
-
-1. ビジネスロジックには **コンストラクタ注入を優先** する:
+Koinは両方をサポートしています。自身で作成するクラスには依存性の注入を使用し、フレームワークがオブジェクトを生成する場所（`Activity`、`Fragment`、Ktorのルートなど）でのみサービスロケータスタイルを使用してください：
 
 ```kotlin
-// 良好 - Koin なしでテスト可能
-class UserViewModel(private val userService: UserService) : ViewModel()
-
-val appModule = module {
-    viewModel<UserViewModel>()  // Koin が依存関係を解決する
-}
-```
-
-2. **サービスロケーター** は必要な場合にのみ使用する:
-
-```kotlin
-// 許容範囲 - Activity の生成は Android によって制御されるため
-class UserActivity : AppCompatActivity() {
-    private val viewModel: UserViewModel by viewModel()
-}
-```
-
-3. **ビジネスロジック内での `KoinComponent` の使用を避ける:**
-
-```kotlin
-// 非推奨 - テストが困難
+// 非推奨: 依存関係が隠蔽され、テストにKoinが必要になる
 class UserService : KoinComponent {
     private val repository: UserRepository = get()
 }
 
-// 推奨 - 明示的な依存関係
+// 推奨: 依存関係が明示的
 class UserService(private val repository: UserRepository)
 ```
 
-## 依存性の注入のメリット {id="benefits-of-dependency-injection"}
+## DIのメリット {id="what-you-gain"}
 
-### 1. テスト可能性 {id="1-testability"}
-
-DI がないと、テストは困難になります。
-
-```kotlin
-class UserService {
-    private val repository = UserRepository()  // モック化できない！
-}
-```
-
-DI があれば、テストは簡単です。
+### テスタビリティ（テスト容易性） {id="testability"}
 
 ```kotlin
 class UserService(private val repository: UserRepository)
 
 @Test
-fun testGetUser() {
-    val mockRepository = mockk<UserRepository>()
-    val service = UserService(mockRepository)  // 完全に制御可能
+fun getUser() {
+    val repository = mockk<UserRepository>()
+    every { repository.findUser("123") } returns testUser
 
-    every { mockRepository.findUser("123") } returns testUser
+    val service = UserService(repository)
+
     assertEquals(testUser, service.getUser("123"))
 }
 ```
 
-### 2. 柔軟性 {id="2-flexibility"}
+依存関係を受け取るクラスは、コンストラクタを呼び出すだけでテストできます。コンテナは不要です。
 
-実装を簡単に切り替えることができます。
+### 実装の差し替えやすさ {id="swappable-implementations"}
 
 ```kotlin
 val appModule = module {
-    single<EmailService> { GmailService() }  // 本番環境用
+    single<EmailService> { SmtpEmailService() }
 }
 
 val testModule = module {
-    single<EmailService> { MockEmailService() }  // テスト用
+    single<EmailService> { FakeEmailService() }
 }
 ```
 
-### 3. コードの整理 {id="3-code-organization"}
+利用側は `EmailService` に依存します。どちらの実装を受け取るかは、モジュールという1箇所で決定されます。
 
-依存関係の設定を一元管理できます。
+### 設定の一元管理 {id="central-configuration"}
 
 ```kotlin
-val dataModule = module {
-    single<Database>()
-    single<ApiClient>()
-}
-
-val domainModule = module {
-    single<UserRepository>()
-    single<AuthRepository>()
-}
-
-val presentationModule = module {
-    viewModel<UserViewModel>()
-}
-
 startKoin {
     modules(dataModule, domainModule, presentationModule)
 }
 ```
 
-### 4. ライフサイクル管理 {id="4-lifecycle-management"}
+オブジェクトグラフ全体がコードのあちこちに分散することなく、通常はレイヤーや機能ごとに分かれたいくつかのモジュールによって一元的に記述されます。
 
-Koin がオブジェクトのライフサイクルを処理します。
+### ライフサイクル管理 {id="lifecycle-management"}
 
 ```kotlin
 val appModule = module {
-    single<Database>()       // アプリ全体で1つのインスタンス
-    factory<Presenter>()     // 毎回新しいインスタンス
-    scoped<SessionData>()    // スコープごとのインスタンス
+    single<Database>()     // アプリ全体で1つのインスタンス
+    factory<Presenter>()   // リクエストごとに新しいインスタンス
+
+    scope<UserSession> {
+        scoped<CartRepository>() // セッションごとに1つのインスタンス
+    }
 }
 ```
 
-## まとめ {id="summary"}
+コンテナが各オブジェクトの生存期間を決定するため、クラス自身が依存関係のライフサイクルを管理する必要がなくなります。[Scopes](/docs/reference/koin-core/scopes) を参照してください。
 
-依存性の注入は、以下のことを実現する強力なパターンです。
-- コンポーネントをその依存関係から **分離（デカップリング）** する
-- 依存関係の差し替えを可能にし、 **テスト可能性を向上** させる
-- 中央集権的な設定により **メンテナンスを簡素化** する
-- 手動の依存関係管理よりも **スケーラビリティに優れる**
+## 関連情報 {id="related"}
 
-Koin は、以下の方法で Kotlin における DI をシンプルにします。
-- **2つの強力なスタイル**（DSL またはアノテーション）を自由に選択可能
-- **コンストラクタ注入**（推奨）と **フィールド注入**（必要な場合）の両方をサポート
-- コンパイラプラグインによる **コンパイル時の安全性** の提供
-- **リフレクションを一切使用しない** 純粋な Kotlin 実装
-
-## 次のステップ {id="next-steps"}
-
-- **[Koin とは？](/docs/intro/what-is-koin)** - Koin のアプローチについて学ぶ
-- **[Koin コンパイラプラグイン](/docs/intro/koin-compiler-plugin)** - 推奨される、より安全なアプローチ
-- **[セットアップガイド](/docs/setup/gradle)** - プロジェクトに Koin を追加する
+- [What is Koin?](/docs/intro/what-is-koin): KoinがどのようにDIコンテナを実装しているか。
+- [Core Concepts](/docs/intro/core-concepts): Koinにおける定義、モジュール、インジェクション、スコープ。
+- [Retrieving Dependencies](/docs/reference/koin-core/injection): `get()` と `inject()` の詳細。
+- [Injecting in Tests](/docs/reference/koin-test/testing): Koinを使用したコードのテスト。

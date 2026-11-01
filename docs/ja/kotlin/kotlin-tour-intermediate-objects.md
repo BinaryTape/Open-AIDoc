@@ -2,31 +2,31 @@
 
 <no-index/>
 
-この章では、オブジェクト宣言を学ぶことでクラスへの理解を深めます。この知識は、プロジェクト全体で振る舞いを効率的に管理するのに役立ちます。
+この章では、オブジェクト宣言について学ぶことで、クラスへの理解を深めます。この知識は、プロジェクト全体で振る舞いを効率的に管理するのに役立ちます。
 
 ## オブジェクト宣言 {id="object-declarations"}
 
-Kotlinでは、**オブジェクト宣言（object declaration）**を使用して、単一のインスタンスを持つクラスを宣言できます。ある意味では、クラスの宣言と単一インスタンスの作成を_同時に_行います。オブジェクト宣言は、プログラム全体の単一の参照ポイントとして使用するクラスを作成したい場合や、システム全体の振る舞いを調整したい場合に便利です。
+Kotlinでは、**オブジェクト宣言（object declaration）**を使用して、単一のインスタンスを持つクラスを宣言できます。ある意味では、クラスの宣言と単一インスタンスの生成を*同時に*行います。オブジェクト宣言は、プログラムの単一の参照ポイントとして使用するクラスを作成したい場合や、システム全体で振る舞いを調整したい場合に便利です。
 
-> 簡単にアクセスできる単一のインスタンスのみを持つクラスは、**シングルトン（singleton）**と呼ばれます。
+> 容易にアクセス可能なインスタンスが1つだけ存在するクラスは、**シングルトン（singleton）**と呼ばれます。
 >
 {style="tip"}
 
-Kotlinのオブジェクトは**遅延（lazy）**生成されます。つまり、アクセスされたときに初めて作成されます。また、Kotlinはすべてのオブジェクトがスレッドセーフな方法で作成されることを保証しているため、これを手動で確認する必要はありません。
+Kotlinのオブジェクトは**遅延（lazy）**生成されます。つまり、アクセスされたときにのみ生成されます。また、Kotlinはすべてのオブジェクトがスレッドセーフな方法で生成されることを保証するため、これらを手動でチェックする必要はありません。
 
-オブジェクト宣言を作成するには、`object` キーワードを使用します。
+オブジェクト宣言を作成するには、`object` キーワードを使用します:
 
 ```kotlin
 object DoAuth {}
 ```
 
-`object` の名前に続けて、波括弧 `{}` で定義されたオブジェクト本文（body）内にプロパティやメンバー関数を追加します。
+`object` の名前に続けて、波括弧 `{}` で定義されるオブジェクト本文内にプロパティやメンバー関数を追加します。
 
-> オブジェクトはコンストラクタを持つことができないため、クラスのようなヘッダーはありません。
+> オブジェクトはコンストラクタを持てないため、クラスのようなヘッダーはありません。
 >
 {style="note"}
 
-例えば、認証を担当する `DoAuth` というオブジェクトを作成したいとします。
+例えば、認証を担当する `DoAuth` というオブジェクトを作成したいとします:
 
 ```kotlin
 object DoAuth {
@@ -36,16 +36,16 @@ object DoAuth {
 }
 
 fun main(){
-    // takeParams() 関数が呼び出されたときにオブジェクトが作成されます
+    // takeParams() 関数が呼び出されたときにオブジェクトが生成されます
     DoAuth.takeParams("coding_ninja", "N1njaC0ding!")
     // input Auth parameters = coding_ninja:N1njaC0ding!
 }
 ```
 {kotlin-runnable="true" id="kotlin-tour-object-declarations"}
 
-このオブジェクトには、`username` と `password` 変数をパラメータとして受け取り、コンソールに文字列を出力する `takeParams` というメンバー関数があります。`DoAuth` オブジェクトは、この関数が初めて呼び出されたときにのみ作成されます。
+このオブジェクトには、`username` と `password` 変数をパラメータとして受け取り、コンソールに文字列を出力する `takeParams` というメンバー関数があります。`DoAuth` オブジェクトは、この関数が初めて呼び出されたときにのみ生成されます。
 
-> オブジェクトはクラスやインターフェースを継承できます。例えば：
+> オブジェクトはクラスやインターフェースを継承できます。例えば:
 > 
 > ```kotlin
 > interface Auth {
@@ -63,19 +63,19 @@ fun main(){
 
 #### データオブジェクト {id="data-objects"}
 
-オブジェクト宣言の内容を簡単に出力できるようにするために、Kotlinには**データ**オブジェクト（data object）があります。初級ツアーで学んだデータクラスと同様に、データオブジェクトには追加のメンバー関数として `toString()` と `equals()` が自動的に提供されます。
+オブジェクト宣言の内容を出力しやすくするために、Kotlinには**データ**オブジェクト（data object）が用意されています。入門ツアーで学んだデータクラスと同様に、データオブジェクトには追加のメンバー関数である `toString()` と `equals()` が自動的に提供されます。
 
 > データクラスとは異なり、データオブジェクトにはコピーできない単一のインスタンスしか存在しないため、`copy()` メンバー関数は自動的には提供されません。
 >
 {type ="note"}
 
-データオブジェクトを作成するには、オブジェクト宣言と同じ構文を使用しますが、先頭に `data` キーワードを付けます。
+データオブジェクトを作成するには、オブジェクト宣言と同じ構文を使用しますが、先頭に `data` キーワードを付けます:
 
 ```kotlin
 data object AppConfig {}
 ```
 
-例えば：
+例えば:
 
 ```kotlin
 data object AppConfig {
@@ -97,21 +97,21 @@ fun main() {
 
 #### コンパニオンオブジェクト {id="companion-objects"}
 
-Kotlinでは、クラスがオブジェクトを持つことができます。それが**コンパニオン**オブジェクト（companion object）です。1つのクラスにつきコンパニオンオブジェクトは**1つ**しか持てません。コンパニオンオブジェクトは、そのクラスが初めて参照されたときにのみ作成されます。
+Kotlinでは、クラスがオブジェクトを持つことができます。それが**コンパニオン**オブジェクト（companion object）です。1つのクラスにつき**1つ**のコンパニオンオブジェクトのみを持つことができます。コンパニオンオブジェクトは、そのクラスが初めて参照されたときにのみ生成されます。
 
-コンパニオンオブジェクト内で宣言されたプロパティや関数は、クラスのすべてのインスタンス間で共有されます。
+コンパニオンオブジェクト内で宣言されたプロパティや関数は、すべてのクラスインスタンス間で共有されます。
 
-クラス内にコンパニオンオブジェクトを作成するには、オブジェクト宣言と同じ構文を使用し、先頭に `companion` キーワードを付けます。
+クラス内にコンパニオンオブジェクトを作成するには、オブジェクト宣言と同じ構文を使用しますが、先頭に `companion` キーワードを付けます:
 
 ```kotlin
 companion object Bonger {}
 ```
 
-> コンパニオンオブジェクトには名前を付ける必要はありません。名前を定義しない場合、デフォルトで `Companion` になります。
+> コンパニオンオブジェクトには必ずしも名前をつける必要はありません。名前を定義しない場合のデフォルトは `Companion` です。
 > 
 {style="note"}
 
-コンパニオンオブジェクトのプロパティや関数にアクセスするには、クラス名を参照します。例えば：
+コンパニオンオブジェクトのプロパティや関数にアクセスするには、クラス名を参照します。例えば:
 
 ```kotlin
 class BigBen {
@@ -123,25 +123,25 @@ class BigBen {
     }
 
 fun main() {
-    // クラスが初めて参照されたときにコンパニオンオブジェクトが作成されます。
+    // クラスが初めて参照されたときにコンパニオンオブジェクトが生成されます。
     BigBen.getBongs(12)
     // BONG BONG BONG BONG BONG BONG BONG BONG BONG BONG BONG BONG 
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-classes-companion-object"}
+{kotlin-runnable="true" id="kotlin-tour-classes-companion-object"}
 
-この例では、`Bonger` というコンパニオンオブジェクトを含む `BigBen` というクラスを作成しています。コンパニオンオブジェクトには、整数を受け取り、その整数の回数だけ `"BONG"` をコンソールに出力する `getBongs()` というメンバー関数があります。
+この例では、`Bonger` というコンパニオンオブジェクトを含む `BigBen` というクラスを作成しています。コンパニオンオブジェクトには、整数を受け取り、その整数の回数だけコンソールに `"BONG"` を出力する `getBongs()` というメンバー関数があります。
 
-`main()` 関数では、クラス名を参照して `getBongs()` 関数を呼び出しています。この時点でコンパニオンオブジェクトが作成されます。`getBongs()` 関数は引数 `12` で呼び出されます。
+`main()` 関数では、クラス名を参照することで `getBongs()` 関数が呼び出されます。この時点でコンパニオンオブジェクトが生成されます。`getBongs()` 関数は引数 `12` で呼び出されます。
 
 詳細については、[](object-declarations.md#companion-objects) を参照してください。
 
 ## 練習問題 {completion-point="true" id="practice"}
 
 <deflist appearance="clear" collapsible="true" numbered="true">
-<def title="注文追跡用のデータオブジェクトの実装" id="objects-exercise-1">
+<def title="注文追跡用のデータオブジェクトを実装する" id="objects-exercise-1">
 
-あなたはコーヒーショップを経営しており、顧客の注文を追跡するシステムを持っています。以下のコードを確認し、`main()` 関数のコードが正常に動作するように2つ目のデータオブジェクトの宣言を完成させてください。
+あなたはコーヒーショップを経営しており、顧客の注文を追跡するシステムを持っています。以下のコードを確認し、`main()` 関数のコードが正常に実行されるように、2つ目のデータオブジェクトの宣言を完成させてください:
 
 ```kotlin
 interface Order {
@@ -165,7 +165,7 @@ fun main() {
     println("Order name: $OrderTwo")
     // Order name: OrderTwo
 
-    // 注文が同一かどうかをチェック
+    // 注文が同一かどうかを確認
     println("Are the two orders identical? ${OrderOne == OrderTwo}")
     // Are the two orders identical? false
 
@@ -180,7 +180,7 @@ fun main() {
     // Do the orders have the same customer name? false
 }
 ```
-{validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-objects-exercise-1"}
+{kotlin-runnable="true" kotlin-target-platform="exercise" kotlin-hidden-files="ExerciseUtils.kt,tour/intermediate/OrderTwoTest.kt" validate="false" id="kotlin-tour-objects-exercise-1"}
 
 ```kotlin
 interface Order {
@@ -208,7 +208,7 @@ fun main() {
     println("Order name: $OrderTwo")
     // Order name: OrderTwo
 
-    // 注文が同一かどうかをチェック
+    // 注文が同一かどうかを確認
     println("Are the two orders identical? ${OrderOne == OrderTwo}")
     // Are the two orders identical? false
 
@@ -223,12 +223,12 @@ fun main() {
     // Do the orders have the same customer name? false
 }
 ```
-{initial-collapse-state="collapsed" collapsible="true" collapsed-title="解答例" id="kotlin-tour-objects-solution-1"}
+{kotlin-runnable="true" kotlin-target-platform="exercise" kotlin-hidden-files="ExerciseUtils.kt,tour/intermediate/OrderTwoTest.kt" initial-collapse-state="collapsed" collapsible="true" collapsed-title="解答例" id="kotlin-tour-objects-solution-1"}
 
 </def>
-<def title="オブジェクト宣言の作成" id="objects-exercise-2">
+<def title="オブジェクト宣言を作成する" id="objects-exercise-2">
 
-`Vehicle` インターフェースを継承したオブジェクト宣言を作成し、独自の乗り物タイプ `FlyingSkateboard` を作成してください。`main()` 関数のコードが正常に動作するように、オブジェクト内で `name` プロパティと `move()` 関数を実装してください。
+`Vehicle` インターフェースを継承したオブジェクト宣言を作成し、ユニークな乗り物タイプである `FlyingSkateboard` を作成してください。`main()` 関数のコードが正常に実行されるように、オブジェクト内に `name` プロパティと `move()` 関数を実装してください:
 
 ```kotlin
 interface Vehicle {
@@ -245,7 +245,7 @@ fun main() {
     // Flying Skateboard: Woooooooo
 }
 ```
-{validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-objects-exercise-2"}
+{kotlin-runnable="true" kotlin-target-platform="exercise" kotlin-hidden-files="ExerciseUtils.kt,tour/intermediate/FlyingSkateboardTest.kt" validate="false" id="kotlin-tour-objects-exercise-2"}
 
 ```kotlin
 interface Vehicle {
@@ -267,18 +267,18 @@ fun main() {
     // Flying Skateboard: Woooooooo
 }
 ```
-{initial-collapse-state="collapsed" collapsible="true" collapsed-title="解答例" id="kotlin-tour-objects-solution-2"}
+{kotlin-runnable="true" kotlin-target-platform="exercise" kotlin-hidden-files="ExerciseUtils.kt,tour/intermediate/FlyingSkateboardTest.kt" initial-collapse-state="collapsed" collapsible="true" collapsed-title="解答例" id="kotlin-tour-objects-solution-2"}
 
 </def>
-<def title="ユーザー作成前のメールアドレスのバリデーション" id="objects-exercise-3">
+<def title="ユーザーを作成する前にメールアドレスを検証する" id="objects-exercise-3">
 
-アプリのユーザー登録モジュールを構築しています。メールアドレスのバリデーションは `User` クラスに関連付けたいものの、メールアドレスが無効な場合に不要な `User` インスタンスを作成したくありません。
+アプリ用のユーザー登録モジュールを構築しています。メールアドレスのバリデーションを `User` クラスに関連付けたいものの、メールアドレスが無効な場合に不要な `User` インスタンスを生成したくありません。
 
-この練習問題では、メールアドレスに `@` と `.` の両方が含まれている場合に有効とみなします。`main()` 関数のコードが正常に動作するように、データクラスを完成させてください。
+この練習問題では、メールアドレスに `@` と `.` の両方が含まれている場合に有効であるとみなします。`main()` 関数のコードが正常に実行されるように、データクラスを完成させてください:
 
 <deflist collapsible="true">
     <def title="ヒント">
-        `User` クラスのコンパニオンオブジェクト内にメールのバリデーション関数を追加することで、`User` から直接その関数を呼び出せるようにします。
+        関数を `User` から直接呼び出せるように、`User` クラスのコンパニオンオブジェクト内にメールアドレスの検証関数を追加してください。
     </def>
 </deflist>
 
@@ -305,7 +305,7 @@ fun main() {
     }
 }
 ```
-{validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-objects-exercise-3"}
+{kotlin-runnable="true" kotlin-target-platform="exercise" kotlin-hidden-files="ExerciseUtils.kt,tour/intermediate/UserTest.kt" validate="false" id="kotlin-tour-objects-exercise-3"}
 
 ```kotlin
 data class User(val name: String, val email: String) {
@@ -333,9 +333,9 @@ fun main() {
     }
 }
 ```
-{initial-collapse-state="collapsed" collapsible="true" collapsed-title="解答例" id="kotlin-tour-objects-solution-3"}
+{kotlin-runnable="true" kotlin-target-platform="exercise" kotlin-hidden-files="ExerciseUtils.kt,tour/intermediate/UserTest.kt" initial-collapse-state="collapsed" collapsible="true" collapsed-title="解答例" id="kotlin-tour-objects-solution-3"}
 
-> この練習問題の発展として、コンパニオンオブジェクト内の関数をファクトリメソッドとして使用し、クラスのインスタンスを生成してみてください。このパターンの例や詳細については、[](object-declarations.md#companion-objects) を参照してください。
+> この練習問題の発展として、コンパニオンオブジェクト内の関数をファクトリメソッドとして使用し、クラスのインスタンスを生成してみてください。このパターンの例と詳細については、[](object-declarations.md#companion-objects) を参照してください。
 >
 {style="tip"}
 

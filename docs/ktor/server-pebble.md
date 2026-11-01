@@ -8,6 +8,7 @@
 <var name="plugin_name" value="Pebble"/>
 <var name="package_name" value="io.ktor.server.pebble"/>
 <var name="artifact_name" value="ktor-server-pebble"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.server.pebble"/>
 
 <tldr>
 <p>
@@ -16,28 +17,36 @@
 <var name="example_name" value="pebble"/>
 <p>
     <b>代码示例</b>：
-    <a href="https://github.com/ktorio/ktor-documentation/tree/%ktor_version%/codeSnippets/snippets/%example_name%">
+    <a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/%example_name%">
         %example_name%
     </a>
 </p>
 <p>
-    <b><Links href="/ktor/server-native" summary="Ktor 支持 Kotlin/Native，允许你在没有额外运行时或虚拟机的情况下运行服务器。">原生服务器</Links>支持</b>：✖️
+    <b><Links href="server-native.md" summary="Ktor 支持 Kotlin/Native，允许您在没有额外运行时或虚拟机的情况下运行服务器。">原生服务器</Links>支持</b>：✖️
 </p>
 </tldr>
 
-Ktor 允许你通过安装 [Pebble](https://api.ktor.io/ktor-server-pebble/io.ktor.server.pebble/-pebble) 插件，在应用中使用 [Pebble 模板](https://pebbletemplates.io/) 作为视图。
+通过安装 [Pebble](https://api.ktor.io/ktor-server-pebble/io.ktor.server.pebble/-pebble) 插件，Ktor 允许您在应用程序中将 [Pebble 模板](https://pebbletemplates.io/)用作视图。
 
 ## 添加依赖项 {id="add_dependencies"}
 
 <p>
-    要使用 <code>%plugin_name%</code>，你需要在构建脚本中包含 <code>%artifact_name%</code> 构件：
+    要使用 <code>%plugin_name%</code>，请将 <code>%artifact_name%</code> 工件添加到您的构建脚本中：
 </p>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上述代码段使用 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 版本目录</a>来指定 Ktor 依赖项。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上述代码段使用 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 版本目录</a>来指定 Ktor 依赖项。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
@@ -47,15 +56,14 @@ Ktor 允许你通过安装 [Pebble](https://api.ktor.io/ktor-server-pebble/io.kt
 ## 安装 Pebble {id="install_plugin"}
 
 <p>
-    要将 <code>%plugin_name%</code> 插件<a href="server-plugins.md#install">安装</a>到应用中，请将其传递给指定<Links href="/ktor/server-modules" summary="模块允许你通过对路由进行分组来构建应用程序结构。">模块</Links>中的 <code>install</code> 函数。
-    下面的代码片段展示了如何安装 <code>%plugin_name%</code> ...
+    要将 <code>%plugin_name%</code> 插件<a href="server-plugins.md#install">安装</a>到您的应用程序中，请将其传递给指定<Links href="server-modules.md" summary="模块允许您通过对路由进行分组来构建应用程序结构。">模块</Links>中的 <code>install</code> 函数。以下示例演示了如何安装 <code>%plugin_name%</code>：
 </p>
 <list>
     <li>
-        ... 在 <code>embeddedServer</code> 函数调用内部。
+        在 <code>embeddedServer()</code> 函数调用中。
     </li>
     <li>
-        ... 在明确定义的 <code>module</code> 内部，该模块是 <code>Application</code> 类的扩展函数。
+        在 <code>Application</code> 类上显式定义的 <code>module()</code> 扩展函数中。
     </li>
 </list>
 <Tabs>
@@ -67,11 +75,11 @@ Ktor 允许你通过安装 [Pebble](https://api.ktor.io/ktor-server-pebble/io.kt
     </TabItem>
 </Tabs>
 
-在 `install` 块中，你可以[配置](#configure)用于加载 Pebble 模板的 [PebbleEngine.Builder][pebble_engine_builder]。
+在 `install` 块内，您可以[配置](#configure)用于加载 Pebble 模板的 [PebbleEngine.Builder][pebble_engine_builder]。
 
 ## 配置 Pebble {id="configure"}
 ### 配置模板加载 {id="template_loading"}
-要加载模板，你需要使用 [PebbleEngine.Builder][pebble_engine_builder] 配置如何加载模板。例如，以下代码片段使 Ktor 能够相对于当前类路径在 `templates` 软件包中查找模板：
+要加载模板，您需要使用 [PebbleEngine.Builder][pebble_engine_builder] 配置模板的加载方式。例如，以下代码段使 Ktor 能够在相对于当前类路径的 `templates` 包中查找模板：
 
 ```kotlin
 import io.ktor.server.application.*
@@ -88,7 +96,7 @@ fun Application.module() {
 ```
 
 ### 在响应中发送模板 {id="use_template"}
-假设你在 `resources/templates` 中有一个 `index.html` 模板：
+假设您在 `resources/templates` 中有名为 `index.html` 的模板：
 
 ```html
 <html>
@@ -104,7 +112,7 @@ fun Application.module() {
 data class User(val id: Int, val name: String)
 ```
 
-要为指定的[路由](server-routing.md)使用该模板，请按以下方式将 `PebbleContent` 传递给 `call.respond` 方法：
+要在指定的[路由](server-routing.md)中使用该模板，请按以下方式将 `PebbleContent` 传递给 `call.respond` 方法：
 
 ```kotlin
 get("/index") {

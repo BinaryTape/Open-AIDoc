@@ -6,20 +6,20 @@
 
 <tldr>
 <p>
-<b>必要な依存関係</b>: <code>io.ktor:ktor-server-auth</code>, <code>io.ktor:%artifact_name%</code>
+<b>必須の依存関係</b>: <code>io.ktor:ktor-server-auth</code>, <code>io.ktor:%artifact_name%</code>
 </p>
 <p>
-    <b><Links href="/ktor/server-native" summary="Ktor supports Kotlin/Native and allows you to run a server without an additional runtime or virtual machine.">Nativeサーバー</Links>のサポート</b>: ✅
+    <b><Links href="server-native.md" summary="KtorはKotlin/Nativeをサポートしており、追加のランタイムや仮想マシンなしでサーバーを実行できます。">ネイティブサーバー</Links>のサポート</b>: ✅
 </p>
 </tldr>
 
-APIキー認証は、クライアントがリクエストの一部（通常はヘッダー）として秘密鍵を渡す、シンプルな認証方法です。このキーは識別子と認証メカニズムの両方の役割を果たします。
+APIキー認証は、クライアントがリクエストの一部（通常はヘッダー内）として秘密キーを送信するシンプルな認証方式です。このキーは、識別子と認証メカニズムの両方として機能します。
 
-Ktorでは、[ルート](server-routing.md)を保護し、クライアントのリクエストを検証するためにAPIキー認証を使用できます。
+Ktorでは、[ルート](server-routing.md)を保護しクライアントリクエストを検証するためにAPIキー認証を使用できます。
 
-> Ktorにおける認証の全般的な情報は、[Ktor Serverでの認証と認可](server-auth.md)セクションで確認できます。
+> Ktorにおける認証に関する一般的な情報は、[Ktor Serverでの認証と認可](server-auth.md)セクションを参照してください。
 
-> APIキーは機密として扱い、安全に送信する必要があります。転送中のAPIキーを保護するために、[HTTPS/TLS](server-ssl.md)を使用することをお勧めします。
+> APIキーは秘密として保持し、安全に送信する必要があります。転送中のAPIキーを保護するために[HTTPS/TLS](server-ssl.md)を使用することをお勧めします。
 >
 {style="note"}
 
@@ -62,13 +62,13 @@ implementation "io.ktor:ktor-server-auth:$ktor_version"
 </TabItem>
 </Tabs>
 
-## APIキー認証のフロー {id="flow"}
+## APIキー認証フロー {id="flow"}
 
-APIキー認証のフローは以下の通りです。
+APIキー認証のフローは以下のようになります。
 
-1. クライアントが、サーバーアプリケーションの特定の[ルート](server-routing.md)に対して、ヘッダー（通常は `X-API-Key`）にAPIキーを含めてリクエストを送信します。
-2. サーバーはカスタムの検証ロジックを使用してAPIキーを検証します。
-3. キーが有効な場合、サーバーはリクエストされたコンテンツを応答します。キーが無効または欠落している場合、サーバーは `401 Unauthorized` ステータスを応答します。
+1. クライアントがサーバーアプリケーションの特定の[ルート](server-routing.md)に対して、ヘッダー（通常は `X-API-Key`）にAPIキーを含めてリクエストを送信します。
+2. サーバーはカスタム検証ロジックを使用してAPIキーを検証します。
+3. キーが有効な場合、サーバーは要求されたコンテンツを返します。キーが無効または不足している場合、サーバーは `401 Unauthorized` ステータスを返します。
 
 ## APIキー認証のインストール {id="install"}
 
@@ -80,12 +80,12 @@ import io.ktor.server.auth.*
 // ...
 install(Authentication) {
     apiKey {
-        // APIキー認証を設定する
+        // APIキー認証の設定
     }
 }
 ```
 
-オプションで、[プロバイダー名](server-auth.md#provider-name)を指定して、[特定のルートを認証](#authenticate-route)するために使用することもできます。
+オプションで、[特定のルートを認証する](#authenticate-route)ために使用できる[プロバイダー名](server-auth.md#provider-name)を指定することもできます。
 
 ## APIキー認証の設定 {id="configure"}
 
@@ -93,16 +93,16 @@ install(Authentication) {
 
 > Ktorでさまざまな認証プロバイダーを設定する方法については、[認証の設定](server-auth.md#configure)を参照してください。
 
-### ステップ 1: APIキープロバイダーの設定 {id="configure-provider"}
+### ステップ 1: APIキープロバイダーを設定する {id="configure-provider"}
 
 <Tabs group="auth-dsl">
-<TabItem title="クラシック" group-key="classic">
+<TabItem title="Classic" group-key="classic">
 
-`apiKey` 認証プロバイダーの設定は、[`ApiKeyAuthenticationProvider.Config`](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-api-key-authentication-provider/-config/index.html) クラスを通じて公開されます。以下の例では、次の設定が指定されています。
+`apiKey` 認証プロバイダーは、[`ApiKeyAuthenticationProvider.Config`](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-api-key-authentication-provider/-config/index.html) クラスを介して設定を公開します。以下の例では、次の設定が指定されています。
 
 * `validate` 関数はリクエストから抽出されたAPIキーを受け取り、認証に成功した場合は `Principal` を返し、失敗した場合は `null` を返します。
 
-最小限の例を次に示します。
+最小限の例を以下に示します。
 
 ```kotlin
 data class AppPrincipal(val key: String) : Principal
@@ -120,17 +120,15 @@ install(Authentication) {
 ```
 
 </TabItem>
-<TabItem title="型安全" group-key="typed">
+<TabItem title="Type-safe" group-key="typed">
 
 <note>
     <p>
-        型安全な認証スキームAPIは実験的（Experimental）です。予告なく削除または変更される可能性があります。
-        オプトインが必要です。詳細については、
-        <a href="server-typed-auth.md#prerequisites">APIの有効化</a>を参照してください。
+        タイプセーフ認証スキームAPIは実験的（experimental）です。いつでも削除または変更される可能性があります。オプトインが必要です。詳細については、<a href="server-typed-auth.md#prerequisites">タイプセーフ認証のドキュメント</a>を参照してください。
     </p>
 </note>
 
-`apiKey()` 関数は、選択したプリンシパル型のスキームを作成します。`install(Authentication)` のステップは不要です。スキームは、それを必要とするルートに渡す値となります。
+`apiKey()` 関数は、選択したプリンシパルタイプのスキームを作成します。`install(Authentication)` ステップはありません。スキームは、それを必要とするルートに渡す値となります。
 
 ```kotlin
 data class AppPrincipal(val key: String)
@@ -145,7 +143,7 @@ val apiKeyAuth = apiKey<AppPrincipal>("api-key") {
 }
 ```
 
-クラシックプロバイダーとは異なり、名前の指定が必須です。完全なAPIについては、[型安全な認証](server-typed-auth.md)を参照してください。
+クラシックプロバイダーとは異なり、名前が必須です。完全なAPIについては、[タイプセーフ認証](server-typed-auth.md)を参照してください。
 
 </TabItem>
 </Tabs>
@@ -157,7 +155,7 @@ val apiKeyAuth = apiKey<AppPrincipal>("api-key") {
 `headerName` を使用してカスタムヘッダーを指定できます。
 
 <Tabs group="auth-dsl">
-<TabItem title="クラシック" group-key="classic">
+<TabItem title="Classic" group-key="classic">
 
 ```kotlin
 apiKey("api-key-header") {
@@ -169,7 +167,7 @@ apiKey("api-key-header") {
 ```
 
 </TabItem>
-<TabItem title="型安全" group-key="typed">
+<TabItem title="Type-safe" group-key="typed">
 
 ```kotlin
 val apiKeyAuth = apiKey<AppPrincipal>("api-key-header") {
@@ -183,13 +181,13 @@ val apiKeyAuth = apiKey<AppPrincipal>("api-key-header") {
 </TabItem>
 </Tabs>
 
-### ステップ 2: APIキーの検証 {id="validate"}
+### ステップ 2: APIキーを検証する {id="validate"}
 
-検証ロジックはアプリケーションの要件によって異なります。一般的なアプローチは以下の通りです。
+検証ロジックはアプリケーションの要件によって異なります。一般的なアプローチを以下に示します。
 
-#### 静的なキーの比較 {id="static-key"}
+#### 静的キーの比較 {id="static-key"}
 
-単純なケースでは、定義済みのキーと比較できます。
+単純なケースでは、事前定義されたキーと比較できます。
 
 ```kotlin
 apiKey {
@@ -203,18 +201,18 @@ apiKey {
 }
 ```
 
-> 機密性の高いAPIキーは、ソースコードではなく設定ファイルや環境変数に保存してください。
+> 機密性の高いAPIキーは、ソースコード内ではなく、設定ファイルや環境変数に保存してください。
 >
 {style="note"}
 
-#### データベースでの検索 {id="database-lookup"}
+#### データベース検索 {id="database-lookup"}
 
-複数のAPIキーがある場合は、データベースに対して検証します。
+複数のAPIキーを扱う場合は、データベースと照合して検証します。
 
 ```kotlin
 apiKey {
     validate { keyFromHeader ->
-        // データベースでキーを検索する
+        // データベースでキーを検索
         val user = database.findUserByApiKey(keyFromHeader)
         user?.let { UserIdPrincipal(it.username) }
     }
@@ -223,14 +221,14 @@ apiKey {
 
 #### 複数の検証基準 {id="multiple-criteria"}
 
-複雑な検証ロジックを実装できます。
+複雑な検証ロジックを実装することもできます。
 
 ```kotlin
 apiKey {
     validate { keyFromHeader ->
         val apiKey = database.findApiKey(keyFromHeader)
 
-        // キーが存在し、アクティブで、期限切れでないかを確認する
+        // キーが存在し、アクティブで、有効期限が切れていないか確認
         if (apiKey != null &&
             apiKey.isActive &&
             apiKey.expiresAt > Clock.System.now()
@@ -245,7 +243,7 @@ apiKey {
 
 ### ステップ 3: チャレンジの設定 {id="challenge"}
 
-`challenge` 関数を使用して、認証が失敗したときに送信されるレスポンスをカスタマイズできます。
+`challenge` 関数を使用すると、認証に失敗したときに送信されるレスポンスをカスタマイズできます。
 
 ```kotlin
 apiKey {
@@ -261,12 +259,12 @@ apiKey {
 }
 ```
 
-### ステップ 4: 特定のリソースの保護 {id="authenticate-route"}
+### ステップ 4: 特定のリソースを保護する {id="authenticate-route"}
 
 <Tabs group="auth-dsl">
-<TabItem title="クラシック" group-key="classic">
+<TabItem title="Classic" group-key="classic">
 
-`apiKey` プロバイダーを設定した後、[`authenticate`](server-auth.md#authenticate-route) 関数を使用してアプリケーション内の特定のリソースを保護できます。認証に成功した場合、ルートハンドラー内で `call.principal` 関数を使用して認証済みのプリンシパルを取得できます。
+`apiKey` プロバイダーを設定した後、[`authenticate`](server-auth.md#authenticate-route) 関数を使用してアプリケーション内の特定のリソースを保護できます。認証に成功した場合、ルートハンドラー内で `call.principal` 関数を使用して認証されたプリンシパルを取得できます。
 
 ```kotlin
 routing {
@@ -281,9 +279,9 @@ routing {
 ```
 
 </TabItem>
-<TabItem title="型安全" group-key="typed">
+<TabItem title="Type-safe" group-key="typed">
 
-スキームを `authenticateWith()` に渡します。ブロック内では、`call.principal` は指定したプリンシパル型となり、`null` になることはないため、`!!` は不要です。
+スキームを `authenticateWith()` に渡します。ブロック内では、`call.principal` は指定したプリンシパルタイプになり、決して `null` にはならないため、`!!` は不要です。
 
 ```kotlin
 routing {
@@ -301,7 +299,7 @@ routing {
 
 ## APIキー認証の例 {id="complete-example"}
 
-APIキー認証の完全な最小構成の例は以下の通りです。
+以下は、APIキー認証の完全な最小限の例です。
 
 ```kotlin
 import io.ktor.server.application.*
@@ -339,11 +337,11 @@ fun Application.module() {
 
 APIキー認証を実装する際は、以下のベストプラクティスを考慮してください。
 
-1. **HTTPSを使用する**: 傍受を防ぐため、APIキーは常にHTTPS経由で送信してください。
-2. **安全に保存する**: APIキーをソースコードにハードコードしないでください。環境変数または安全な設定管理を使用してください。
-3. **キーのローテーション**: APIキーを定期的にローテーションするためのメカニズムを実装してください。
-4. **レート制限**: 悪用を防ぐために、APIキー認証をレート制限（Rate limiting）と組み合わせてください。
-5. **ロギング**: セキュリティ監視のために認証の失敗をログに記録しますが、実際のAPIキーは決してログに記録しないでください。
-6. **キーの形式**: APIキーには暗号学的に安全なランダム文字列（例：UUIDやBase64エンコードされたランダムバイト）を使用してください。
-7. **複数のキー**: アプリケーションや目的ごとに、ユーザーあたり複数のAPIキーをサポートすることを検討してください。
+1. **HTTPSを使用する**: 傍受を防ぐため、常にHTTPS経由でAPIキーを送信してください。
+2. **安全に保存する**: APIキーをソースコード内に直接ハードコードしないでください。環境変数や安全な設定管理機能を使用してください。
+3. **キーのローテーション**: APIキーを定期的にローテーションするメカニズムを実装してください。
+4. **レート制限**: 悪用を防ぐために、APIキー認証とレート制限（Rate limiting）を組み合わせてください。
+5. **ロギング**: セキュリティ監視のために認証失敗をログに記録しますが、実際のAPIキー自体は決してログ出力しないでください。
+6. **キーの形式**: APIキーには暗号学的に安全なランダム文字列を使用してください（例: UUIDやBase64エンコードされたランダムバイト列）。
+7. **複数のキー**: 用途やアプリケーションごとに、ユーザー1人あたり複数のAPIキーをサポートすることを検討してください。
 8. **有効期限**: セキュリティを強化するために、キーの有効期限を実装してください。

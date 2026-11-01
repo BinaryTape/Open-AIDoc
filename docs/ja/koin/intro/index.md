@@ -1,121 +1,132 @@
 ---
-title: はじめに
+title: ようこそ
 ---
 
-# Koin へようこそ
+# ようこそ
 
-**Kotlin のための実用的な依存性注入（DI）フレームワーク - シンプル、かつパワフル**
+Koin は Kotlin 向けの依存性注入（Dependency Injection）フレームワークです。モジュール内でクラスの構築方法を宣言すると、Koin が実行時にインスタンスを生成して依存関係を結びつけます。また、オプションの Koin Compiler Plugin を使用すれば、ビルド時に依存関係グラフ全体をチェックできます。Android、Compose、Kotlin Multiplatform、Ktor、およびあらゆる Kotlin/JVM アプリケーションで動作します。
 
-Koin は Kotlin 開発者のための軽量な依存性注入フレームワークです。Android アプリ、Kotlin Multiplatform プロジェクト、Ktor を使用したバックエンドサービス、あるいはその他のあらゆる Kotlin アプリケーションを構築している場合でも、Koin は依存性注入をシンプルかつ直感的なものにします。
-
-## なぜ Koin なのか？ {id="why-koin"}
-
-Koin は明確な哲学に基づいて設計されました。それは、**「シンプルさ」と「機能性」のどちらかを選ぶ必要はない**ということです。Koin を使えば、その両方が手に入ります。
-
-### DSL とアノテーション - 好きな方を選択可能 {id="dsl-annotations-choose-what-you-want"}
-
-Koin はどちらのアプローチでも強力です。クリーンな Kotlin DSL を好みますか？ それなら DSL を使いましょう。アノテーションが好きですか？ それならアノテーションを使いましょう。どちらも第一級市民（ファーストクラス・シチズン）であり、同等に強力です。
-
-| 価値 | 意味 |
-|-------|---------------|
-| **高い生産性** | 習得しやすく、書きやすい。数時間ではなく、数分で DI を動作させることができます |
-| **開発者に優しい** | DSL またはアノテーション、お好みのほうを。明確なエラー、容易なデバッグ、最高の開発者体験（DX） |
-| **スケーラブル** | 複雑な依存関係グラフを持つ大規模なエンタープライズアプリケーションにも対応可能 |
-| **安全** | Koin Compiler Plugin によるコンパイル時の安全性 |
-| **ダイナミック** | ランタイムの柔軟性：モジュールの動的ロード、遅延読み込み（Lazy loading）、フィーチャーフラグ |
-
-## どこから始める？ {id="where-to-start"}
-
-あなたの経験レベルに合わせてパスを選択してください：
-
-### 依存性注入（DI）が初めての方 {id="new-to-dependency-injection"}
-
-まずは基本から始めましょう：
-- **[依存性注入とは？](/docs/intro/what-is-dependency-injection)** - コアコンセプトを理解する
-
-### DI は知っているが、Koin は初めての方 {id="know-di-new-to-koin"}
-
-すぐに Koin の詳細に進みましょう：
-- **[Koin とは？](/docs/intro/what-is-koin)** - Koin の DI へのアプローチを知る
-- **[Koin Compiler Plugin](/docs/intro/koin-compiler-plugin)** - 推奨される、より安全な Koin の使用方法
-
-### Hilt や Dagger から移行する方 {id="coming-from-hilt-dagger"}
-
-Koin との比較を確認してください：
-- **[Koin vs Hilt/Dagger](/docs/intro/koin-vs-hilt)** - 違いと移行パスを理解する
-
-### すぐにコードを書きたい方 {id="ready-to-code"}
-
-- **[セットアップガイド](/docs/setup/gradle)** - プロジェクトに Koin を追加する
-- **[チュートリアル](/docs/tutorials/your-first-app)** - 初めての Koin アプリを構築する
-- **[Koin IDE Plugin](https://plugins.jetbrains.com/plugin/26131-koin-dependency-injection-official-)** - Android Studio および IntelliJ IDEA 用の公式プラグインをインストール：コードナビゲーション、ライブセーフティチェック、依存関係グラフの可視化が可能になります
-
-## Koin のアプローチ {id="koin-s-approaches"}
-
-Koin は、依存関係の定義方法に柔軟性を提供します：
-
-| アプローチ | ステータス | 説明 |
-|----------|--------|-------------|
-| **Koin Compiler Plugin** (Kotlin 2.x) | 推奨 | DSL: `single<MyService>()`, `factory<MyRepo>()`, `viewModel<MyVM>()` |
-| **Koin Compiler Plugin** (Kotlin 2.x) | 推奨 | アノテーション: `@Singleton`, `@Factory`, `@KoinViewModel`。依存関係を自動検出し、コンパイル時の安全性を確保 |
-| **Classic DSL** | フルサポート | `singleOf(::MyService)`, `single { MyService(get()) }`。任意の Kotlin バージョンで動作。準備ができたら Compiler Plugin を追加して安全性を強化可能 |
-| **KSP Processor** (`koin-ksp-compiler`) | 非推奨 | Koin Annotations 用のレガシープロセッサ。Compiler Plugin への移行を推奨（同じアノテーション、ネイティブなコンパイラ統合） |
-
-詳細は [Koin とは？](/docs/intro/what-is-koin) および [Koin Compiler Plugin](/docs/intro/koin-compiler-plugin) をご覧ください。
-
-## プラットフォームのサポート {id="platform-support"}
-
-Koin は Kotlin が動作するすべての場所で利用可能です：
-
-| プラットフォーム | パッケージ | ステータス |
-|----------|---------|--------|
-| **Kotlin/JVM** | `koin-core` | ✅ フルサポート |
-| **Android** | `koin-android` | ✅ フルサポート |
-| **Compose (Android & Multiplatform)** | `koin-compose` | ✅ フルサポート |
-| **iOS** | `koin-core` | ✅ フルサポート |
-| **Desktop** | `koin-core` | ✅ フルサポート |
-| **Web (JS/Wasm)** | `koin-core` | ✅ フルサポート |
-| **Ktor** | `koin-ktor` | ✅ フルサポート |
-
-## クイック例 {id="quick-example"}
-
-Koin のコードがどのようなものか、以下に示します：
+このページはドキュメントの全体マップです。以下の各セクションでは、どのような疑問に答えているか、そしてどこから読み始めるべきかを紹介しています。
 
 ```kotlin
-// クラスを定義する
 class UserRepository(private val api: ApiService)
-class UserViewModel(private val repository: UserRepository) : ViewModel()
 
-// Compiler Plugin DSL を使用してモジュールを定義する
 val appModule = module {
     single<ApiService>()
     single<UserRepository>()
-    viewModel<UserViewModel>()
 }
 
-// Koin を開始する
-startKoin {
-    modules(appModule)
-}
-
-// Activity で注入する
-class MainActivity : AppCompatActivity() {
-    private val viewModel: UserViewModel by viewModel()
+fun main() {
+    startKoin { modules(appModule) }
 }
 ```
 
-またはアノテーションを使用する場合：
+## やりたいことから探す {id="i-want-to"}
 
-```kotlin
-@Singleton
-class UserRepository(private val api: ApiService)
+- まず依存性注入を理解したい: [依存性注入とは？](/docs/intro/what-is-dependency-injection)
+- 5分でKoinの仕組みを理解したい: [コアコンセプト](/docs/intro/core-concepts)
+- DSLとアノテーションのどちらを使うか選びたい: [スタイルの選択](/docs/intro/choosing-your-style)
+- GradleビルドにKoinを追加したい: [Gradleのセットアップ](/docs/setup/gradle)
+- Composable内でViewModelを注入したい: [ComposeでのViewModel](/docs/reference/koin-compose/compose-viewmodel)
+- Activity、Fragment、Serviceで注入したい: [Androidのエントリーポイント](/docs/reference/koin-android/entry-points)
+- Retrofit、Room、OkHttpを連携させたい: [Androidライブラリの統合](/docs/reference/koin-android/binding-patterns)
+- AndroidとiOS間でモジュールを共有したい: [KMPの共有パターン](/docs/reference/koin-core/kmp-shared-modules)
+- IDなどの実行時値を定義に渡したい: [注入パラメータ](/docs/reference/koin-core/injection-parameters)
+- Koinの設定をテストしたい: [Koin設定の検証](/docs/reference/koin-test/verify) および [コンパイル時の安全性](/docs/reference/koin-compiler/compile-safety)
+- 「No definition found」エラーを修正したい: [トラブルシューティング](/docs/reference/koin-core/troubleshooting)
+- Hiltから移行したい: [Hiltからの移行](/docs/reference/koin-android/hilt-migration)
+- アノテーションをKSPからCompiler Pluginに移行したい: [KSPからの移行](/docs/migration/from-ksp-to-compiler-plugin)
+- 本番環境でのKoinの動作を確認したい: [本番環境でのモニタリング](/docs/tooling/production-monitoring)
 
-@KoinViewModel
-class UserViewModel(private val repository: UserRepository) : ViewModel()
+## 各セクションの案内 {id="where-to-go"}
 
-@Module
-@ComponentScan("com.myapp")
-class AppModule
-```
+### はじめに {id="get-started"}
 
-準備はできましたか？ [セットアップガイド](/docs/setup/gradle) へ進みましょう。
+Koinとは何か、どのように動作するのか、どのスタイルを使うべきか？
+
+- [Koinとは何か？](/docs/intro/what-is-koin): Koinの概要と仕組み（ランタイムおよびコンパイル時）。
+- [コアコンセプト](/docs/intro/core-concepts): 定義、モジュール、コンテナ、注入、スコープ。
+- [スタイルの選択](/docs/intro/choosing-your-style): アノテーションまたはDSL（Compiler Plugin、Constructor DSL、Classic DSL）。
+- [Koin Compiler Plugin](/docs/intro/koin-compiler-plugin): ビルド時にプラグインが行う処理。
+
+### セットアップ {id="setup"}
+
+ビルド設定に何を追加すればよいか？
+
+- [セットアップ](/docs/setup): 各プラットフォーム向けの導入手順。
+- [Gradleのセットアップ](/docs/setup/gradle): BOMと各Koinアーティファクト。
+- [Compiler Pluginのセットアップ](/docs/setup/compiler-plugin): Gradleプラグインの導入と設定。
+
+### チュートリアル {id="tutorials"}
+
+Koinを使った最初のアプリをステップバイステップで構築するには？
+
+- [Kotlin](/docs/quickstart/kotlin): 純粋なKotlinアプリケーション。
+- [Android - ViewModel](/docs/quickstart/android-viewmodel) および [Android - Jetpack Compose](/docs/quickstart/android-compose)。
+- [Compose Multiplatform](/docs/quickstart/cmp): AndroidとiOSでの共通UI。
+- [Ktor](/docs/quickstart/ktor): サーバーアプリケーション。
+
+### コア機能 {id="core"}
+
+任意のプラットフォームで依存関係を宣言、整理、取得するには？
+
+- [Koinの起動](/docs/reference/koin-core/starting-koin): `startKoin`、ロギング、プロパティ。
+- [モジュール](/docs/reference/koin-core/modules) および [定義](/docs/reference/koin-core/definitions): Koinが生成するコンポーネントの宣言。
+- [スコープ](/docs/reference/koin-core/scopes): ライフサイクルに紐づくインスタンス。
+- [トラブルシューティング](/docs/reference/koin-core/troubleshooting): エラーとその対処法。
+
+### プラットフォーム {id="platforms"}
+
+特定のプラットフォームやフレームワークでKoinを使用するには？
+
+- Android: [AndroidでKoinを起動する](/docs/reference/koin-android/start)、[Android ViewModel](/docs/reference/koin-android/viewmodel)、[マルチモジュールAndroidアプリ](/docs/reference/koin-android/multi-module)。
+- Compose: [Koin for Compose](/docs/reference/koin-compose/compose)、[ComposeでのViewModel](/docs/reference/koin-compose/compose-viewmodel)、[Navigation 3](/docs/reference/koin-compose/navigation3)。
+- Kotlin Multiplatform: [KMPのセットアップ](/docs/reference/koin-core/kmp-setup)、[共有パターン](/docs/reference/koin-core/kmp-shared-modules)。
+- Ktor: [Koin for Ktor](/docs/reference/koin-ktor/ktor)、[リクエストスコープ](/docs/reference/koin-ktor/ktor-scopes)。
+
+### テスト {id="testing"}
+
+Koinを使用するコードのテストや、Koin設定自体のテストを行うには？
+
+- [テストでの注入](/docs/reference/koin-test/testing): `KoinTest`、定義のテスト用フェイクへの置き換え。
+- [Koin設定の検証](/docs/reference/koin-test/verify): 単体テストでのモジュールのチェック。
+- [Android計装テスト](/docs/reference/koin-android/instrumented-testing) および [Composableのテスト](/docs/reference/koin-compose/compose-testing)。
+
+### 本番運用とツール {id="production-tooling"}
+
+Koinアプリの作成、検証、実行を支援するツールは？
+
+- [ツール](/docs/tooling): Koin関連ツールの概要。
+- [IDEプラグイン](/docs/tooling/ide-plugin): Android StudioおよびIntelliJ IDEAでのコードジャンプとチェック。
+- [Monitor](/docs/tooling/monitor) および [本番環境でのモニタリング](/docs/tooling/production-monitoring): 実行時におけるKoinの動作の可視化。
+
+### 移行 {id="migration"}
+
+他のフレームワークや古いKoin環境から移行するには？
+
+- [Koin vs Hilt](/docs/intro/koin-vs-hilt): 両フレームワークの比較。
+- [Hiltからの移行](/docs/reference/koin-android/hilt-migration): ステップバイステップの移行ガイド。
+- [JSR-330互換性](/docs/reference/koin-android/jsr330): `javax.inject` の `@Inject` や `@Singleton` をそのまま維持。
+- [KSPからの移行](/docs/migration/from-ksp-to-compiler-plugin): アノテーションをCompiler Pluginへ移行。
+
+### リファレンス {id="reference"}
+
+すべてのキーワード、アノテーション、設定オプションの一覧は？
+
+- [DSLリファレンス](/docs/reference/koin-core/dsl): すべてのDSLキーワード。
+- [アノテーションリファレンス](/docs/reference/koin-annotations/annotations-inventory): すべてのアノテーションとそのパラメータ。
+- [Compiler Pluginオプション](/docs/reference/koin-annotations/options): プラグインのすべてのGradleオプション。
+
+### サポート {id="support"}
+
+どのバージョンを使うべきか、何が変更されたか、どこでサポートを受けられるか？
+
+- [リリース](/docs/support/releases): バージョン、変更点、アップグレードに関する注意事項。
+- [APIの安定性](/docs/support/api-stability): 安定版（stable）、実験的（experimental）、内部用（internal）の意味。
+- [サポート](/docs/support): ロードマップ、コミュニティ、サポートオプション。
+
+## 関連情報 {id="related"}
+
+- [Koinとは何か？](/docs/intro/what-is-koin): Koinを初めて使う方向けの推奨ガイド。
+- [コアコンセプト](/docs/intro/core-concepts): 他のすべてのページの基礎となる設計思想。
+- [セットアップ](/docs/setup): 使用するプラットフォームへのKoinのインストール。

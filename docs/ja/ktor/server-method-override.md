@@ -5,10 +5,11 @@
 <var name="plugin_name" value="XHttpMethodOverride"/>
 <var name="package_name" value="io.ktor.server.plugins.methodoverride"/>
 <var name="artifact_name" value="ktor-server-method-override"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.server.methodOverride"/>
 
 <tldr>
 <p>
-<b>必須の依存関係</b>: <code>io.ktor:%artifact_name%</code>
+<b>必要な依存関係</b>: <code>io.ktor:%artifact_name%</code>
 </p>
 <var name="example_name" value="json-kotlinx-method-override"/>
 <p>
@@ -18,29 +19,37 @@
     </a>
 </p>
 <p>
-    <b><Links href="/ktor/server-native" summary="Ktor は Kotlin/Native をサポートしており、追加のランタイムや仮想マシンなしでサーバーを実行できます。">Native サーバー</Links>のサポート</b>: ✅
+    <b><Links href="server-native.md" summary="Ktor は Kotlin/Native をサポートしており、追加のランタイムや仮想マシンなしでサーバーを実行できます。">ネイティブサーバー</Links>のサポート</b>: ✅
 </p>
 </tldr>
 
 <link-summary>
-%plugin_name% は、X-HTTP-Method-Override ヘッダー内で HTTP 動詞をトンネリングする機能を提供します。
+%plugin_name% は、X-HTTP-Method-Override ヘッダー内で HTTP 動詞をトンネリングする機能を有効にします。
 </link-summary>
 
-[%plugin_name%](https://api.ktor.io/ktor-server-method-override/io.ktor.server.plugins.methodoverride/-x-http-method-override.html) プラグインは、`X-HTTP-Method-Override` ヘッダー内で HTTP 動詞をトンネリング（tunneling）する機能を提供します。
-これは、サーバー API が複数の HTTP 動詞（`GET`、`PUT`、`POST`、`DELETE` など）を処理するものの、特定の制限によりクライアントが限られた一連の動詞（例えば `GET` と `POST` のみ）しか使用できない場合に役立ちます。
-例えば、クライアントが `X-Http-Method-Override` ヘッダーを `DELETE` に設定してリクエストを送信した場合、Ktor はこのリクエストを `delete` [ルートハンドラー](server-routing.md#define_route)を使用して処理します。
+[%plugin_name%](https://api.ktor.io/ktor-server-method-override/io.ktor.server.plugins.methodoverride/-x-http-method-override.html) プラグインは、`X-HTTP-Method-Override` ヘッダー内で HTTP 動詞をトンネリングする機能を有効にします。
+これは、サーバー API が複数の HTTP 動詞（`GET`、`PUT`、`POST`、`DELETE` など）を処理するものの、クライアント側の特定の制限により使用できる動詞が限られている場合（たとえば `GET` と `POST` のみ）に役立ちます。
+たとえば、クライアントが `X-Http-Method-Override` ヘッダーを `DELETE` に設定してリクエストを送信した場合、Ktor は `delete` [ルートハンドラー](server-routing.md#define_route)を使用してこのリクエストを処理します。
 
 ## 依存関係の追加 {id="add_dependencies"}
 
 <p>
-    <code>%plugin_name%</code> を使用するには、ビルドスクリプトに <code>%artifact_name%</code> アーティファクトを含める必要があります。
+    <code>%plugin_name%</code> を使用するには、ビルドスクリプトに <code>%artifact_name%</code> アーティファクトを追加します。
 </p>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上記のコードスニペットでは、Ktor の依存関係を指定するために <a href="server-dependencies.topic#using-version-catalog">
+            Ktor バージョンカタログ</a>を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上記のコードスニペットでは、Ktor の依存関係を指定するために <a href="server-dependencies.topic#using-version-catalog">
+            Ktor バージョンカタログ</a>を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
@@ -50,15 +59,16 @@
 ## %plugin_name% のインストール {id="install_plugin"}
 
 <p>
-    <code>%plugin_name%</code> プラグインをアプリケーションに<a href="server-plugins.md#install">インストール</a>するには、指定された<Links href="/ktor/server-modules" summary="モジュールを使用すると、ルートをグループ化してアプリケーションを構造化できます。">モジュール</Links>内の <code>install</code> 関数に渡します。
-    以下のコードスニペットは、<code>%plugin_name%</code> をインストールする方法を示しています...
+    <code>%plugin_name%</code> プラグインをアプリケーションに<a href="server-plugins.md#install">インストール</a>するには、
+    指定された<Links href="server-modules.md" summary="モジュールを使用すると、ルートをグループ化してアプリケーションを構造化できます。">モジュール</Links>内の <code>install</code> 関数に渡します。
+    次の例は、<code>%plugin_name%</code> をインストールする方法を示しています。
 </p>
 <list>
     <li>
-        ... <code>embeddedServer</code> 関数の呼び出し内。
+        <code>embeddedServer()</code> 関数呼び出し内。
     </li>
     <li>
-        ... <code>Application</code> クラスの拡張関数である、明示的に定義された <code>module</code> 内。
+        <code>Application</code> クラスで明示的に定義された <code>module()</code> 拡張関数内。
     </li>
 </list>
 <Tabs>
@@ -72,12 +82,12 @@
 
 ## %plugin_name% の設定 {id="configure"}
 
-デフォルトでは、`%plugin_name%` は `X-Http-Method-Override` ヘッダーをチェックして、リクエストを処理するべきルートを決定します。
-`headerName` プロパティを使用して、ヘッダー名をカスタマイズできます。
+デフォルトでは、`%plugin_name%` は `X-Http-Method-Override` ヘッダーをチェックして、リクエストを処理すべきルートを決定します。
+`headerName` プロパティを使用してヘッダー名をカスタマイズできます。
 
 ## 例 {id="example"}
 
-以下の HTTP リクエストは、`X-Http-Method-Override` ヘッダーを `DELETE` に設定して `POST` 動詞を使用しています。
+以下の HTTP リクエストは、`X-Http-Method-Override` ヘッダーを `DELETE` に設定した `POST` 動詞を使用しています。
 
 ```http request
 POST http://0.0.0.0:8080/customer/3
@@ -85,7 +95,7 @@ X-Http-Method-Override: DELETE
 
 ```
 
-`delete` [ルートハンドラー](server-routing.md#define_route)を使用してこのようなリクエストを処理するには、`%plugin_name%` をインストールする必要があります。
+このようなリクエストを `delete` [ルートハンドラー](server-routing.md#define_route)を使用して処理するには、`%plugin_name%` をインストールする必要があります。
 
 ```kotlin
 package com.example
@@ -135,4 +145,4 @@ fun Application.main() {
 
 ```
 
-完全な例はこちらで確認できます: [json-kotlinx-method-override](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/json-kotlinx-method-override)
+完全なサンプルは、こちらにあります: [json-kotlinx-method-override](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/json-kotlinx-method-override)。

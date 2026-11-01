@@ -2,17 +2,17 @@
 
 <no-index/>
 
-在本章中，你將透過探索物件宣告來擴展對類別的理解。這些知識將幫助你有效率地管理整個專案中的行為。
+在本章中，你將透過探索物件宣告來加深對類別的理解。這些知識將幫助你在專案中更有效率地管理各種行為。
 
 ## 物件宣告 {id="object-declarations"}
 
-在 Kotlin 中，你可以使用**物件宣告**來宣告一個只有單一執行個體的類別。在某種意義上，你是在宣告類別的_同時_建立了該單一執行個體。當你想建立一個類別作為程式的單一參考點，或者在整個系統中協調行為時，物件宣告非常有用。
+在 Kotlin 中，你可以使用**物件宣告**（object declaration）來宣告只有單一執行個體的類別。在某種意義上，你宣告了類別並_同時_建立了該單一執行個體。當你想建立一個類別作為程式的單一參考點，或用來協調系統中的行為時，物件宣告非常實用。
 
-> 只有一個執行個體且易於存取的類別稱為**單例 (singleton)**。
+> 只有一個執行個體且便於存取的類別稱為**單例 (singleton)**。
 >
 {style="tip"}
 
-Kotlin 中的物件是**延遲載入 (lazy)** 的，這意味著它們只有在被存取時才會被建立。Kotlin 還確保所有物件都是以執行緒安全的方式建立，因此你無需手動檢查這一點。
+Kotlin 中的物件是**延遲**初始化的，這意味著它們只有在被存取時才會被建立。Kotlin 還能確保所有物件都以執行緒安全的方式建立，因此你不必手動檢查這點。
 
 若要建立物件宣告，請使用 `object` 關鍵字：
 
@@ -20,13 +20,13 @@ Kotlin 中的物件是**延遲載入 (lazy)** 的，這意味著它們只有在�
 object DoAuth {}
 ```
 
-在 `object` 名稱之後，於花括號 `{}` 定義的物件主體內新增任何屬性或成員函式。
+在 `object` 名稱之後，於花括號 `{}` 定義的物件主體中加入任何屬性或成員函式。
 
-> 物件不能有建構函式，因此它們不像類別那樣擁有標頭。
+> 物件不能擁有建構函式，因此它們不像類別那樣具有標頭。
 >
 {style="note"}
 
-例如，假設你想建立一個名為 `DoAuth` 的物件，負責處理驗證：
+例如，假設你想建立一個名為 `DoAuth` 的物件來負責驗證：
 
 ```kotlin
 object DoAuth {
@@ -36,16 +36,16 @@ object DoAuth {
 }
 
 fun main(){
-    // 物件在呼叫 takeParams() 函式時建立
+    // 物件在 takeParams() 函式被呼叫時建立
     DoAuth.takeParams("coding_ninja", "N1njaC0ding!")
     // input Auth parameters = coding_ninja:N1njaC0ding!
 }
 ```
 {kotlin-runnable="true" id="kotlin-tour-object-declarations"}
 
-該物件具有名為 `takeParams` 的成員函式，接受 `username` 和 `password` 變數作為參數，並將字串列印至主控台。`DoAuth` 物件僅在首次呼叫該函式時才會被建立。
+該物件具有一個名為 `takeParams` 的成員函式，它接受 `username` 和 `password` 變數作為參數，並在主控台輸出字串。`DoAuth` 物件只有在該函式首次被呼叫時才會被建立。
 
-> 物件可以繼承類別和介面。例如：
+> 物件可以繼承類別與介面。例如：
 > 
 > ```kotlin
 > interface Auth {
@@ -63,9 +63,9 @@ fun main(){
 
 #### 資料物件 {id="data-objects"}
 
-為了讓列印物件宣告的內容更加容易，Kotlin 提供了**資料**物件。類似於你在初學者導覽中學到的資料類別，資料物件會自動附帶額外的成員函式：`toString()` 和 `equals()`。
+為了更輕鬆地輸出物件宣告的內容，Kotlin 提供了**資料**物件（data object）。與初學者教學中介紹的資料類別類似，資料物件會自動附帶額外的成員函式：`toString()` 與 `equals()`。
 
-> 與資料類別不同的是，資料物件不會自動附帶 `copy()` 成員函式，因為它們只有一個不能被複製的單一執行個體。
+> 與資料類別不同，資料物件不會自動附帶 `copy()` 成員函式，因為它們只有一個無法被複製的單一執行個體。
 >
 {type ="note"}
 
@@ -93,25 +93,25 @@ fun main() {
 ```
 {kotlin-runnable="true" id="kotlin-tour-data-objects"}
 
-若要了解更多有關資料物件的資訊，請參閱 [](object-declarations.md#data-objects)。
+若要進一步了解資料物件的相關資訊，請參閱 [](object-declarations.md#data-objects)。
 
-#### 伴隨物件 {id="companion-objects"}
+#### 伴生物件 {id="companion-objects"}
 
-在 Kotlin 中，類別可以擁有一個物件：**伴隨 (companion)** 物件。每個類別只能有**一個**伴隨物件。伴隨物件僅在其所屬類別首次被參照時才會建立。
+在 Kotlin 中，類別可以擁有一個物件：**伴生**物件（companion object）。每個類別只能擁有**一個**伴生物件。伴生物件僅在該類別首次被參照時建立。
 
-在伴隨物件內部宣告的任何屬性或函式都會在所有類別執行個體之間共享。
+在伴生物件內部宣告的任何屬性或函式都會在所有類別執行個體之間共享。
 
-若要在類別中建立伴隨物件，請使用與物件宣告相同的語法，但在前面加上 `companion` 關鍵字：
+若要在類別中建立伴生物件，請使用與物件宣告相同的語法，但在前面加上 `companion` 關鍵字：
 
 ```kotlin
 companion object Bonger {}
 ```
 
-> 伴隨物件不一定要有名稱。如果未定義名稱，預設為 `Companion`。
+> 伴生物件不一定需要具備名稱。如果沒有自訂名稱，預設名稱為 `Companion`。
 > 
 {style="note"}
 
-若要存取伴隨物件的任何屬性或函式，請參照類別名稱。例如：
+若要存取伴生物件的任何屬性或函式，直接參照類別名稱即可。例如：
 
 ```kotlin
 class BigBen {
@@ -123,25 +123,25 @@ class BigBen {
     }
 
 fun main() {
-    // 伴隨物件在該類別首次被參照時建立。
+    // 伴生物件在類別首次被參照時建立。
     BigBen.getBongs(12)
     // BONG BONG BONG BONG BONG BONG BONG BONG BONG BONG BONG BONG 
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-classes-companion-object"}
+{kotlin-runnable="true" id="kotlin-tour-classes-companion-object"}
 
-此範例建立了一個名為 `BigBen` 的類別，其中包含名為 `Bonger` 的伴隨物件。伴隨物件具有名為 `getBongs()` 的成員函式，該函式接受一個整數，並將 `"BONG"` 列印至主控台與該整數相同的次數。
+此範例建立了一個名為 `BigBen` 的類別，其中包含一個名為 `Bonger` 的伴生物件。該伴生物件具有一個名為 `getBongs()` 的成員函式，該函式接受一個整數，並在主控台輸出與該整數相同次數的 `"BONG"`。
 
-在 `main()` 函式中，透過參照類別名稱來呼叫 `getBongs()` 函式。伴隨物件此時被建立。`getBongs()` 函式以參數 `12` 進行呼叫。
+在 `main()` 函式中，透過參照類別名稱來呼叫 `getBongs()` 函式。伴生物件會在此時被建立。呼叫 `getBongs()` 函式時傳入了參數 `12`。
 
-若要了解更多資訊，請參閱 [](object-declarations.md#companion-objects)。
+若要進一步了解，請參閱 [](object-declarations.md#companion-objects)。
 
 ## 練習 {completion-point="true" id="practice"}
 
 <deflist appearance="clear" collapsible="true" numbered="true">
 <def title="實作訂單追蹤的資料物件" id="objects-exercise-1">
 
-你經營一家咖啡店，並且有一個用於追蹤顧客訂單的系統。參考下面的程式碼並完成第二個資料物件的宣告，以便 `main()` 函式中的以下程式碼能順利執行：
+你經營一家咖啡店，並且擁有一套用於追蹤顧客訂單的系統。請參考下方程式碼並完成第二個資料物件的宣告，讓 `main()` 函式中的後續程式碼能夠成功執行：
 
 ```kotlin
 interface Order {
@@ -159,7 +159,7 @@ data object OrderOne: Order {
 data object // 在此處編寫你的程式碼
 
 fun main() {
-    // 列印每個資料物件的名稱
+    // 輸出每個資料物件的名稱
     println("Order name: $OrderOne")
     // Order name: OrderOne
     println("Order name: $OrderTwo")
@@ -180,7 +180,7 @@ fun main() {
     // Do the orders have the same customer name? false
 }
 ```
-{validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-objects-exercise-1"}
+{kotlin-runnable="true" kotlin-target-platform="exercise" kotlin-hidden-files="ExerciseUtils.kt,tour/intermediate/OrderTwoTest.kt" validate="false" id="kotlin-tour-objects-exercise-1"}
 
 ```kotlin
 interface Order {
@@ -202,7 +202,7 @@ data object OrderTwo: Order {
 }
 
 fun main() {
-    // 列印每個資料物件的名稱
+    // 輸出每個資料物件的名稱
     println("Order name: $OrderOne")
     // Order name: OrderOne
     println("Order name: $OrderTwo")
@@ -223,13 +223,12 @@ fun main() {
     // Do the orders have the same customer name? false
 }
 ```
-{initial-collapse-state="collapsed" collapsible="true" collapsed-title="範例解答" id="kotlin-tour-objects-solution-1"}
+{kotlin-runnable="true" kotlin-target-platform="exercise" kotlin-hidden-files="ExerciseUtils.kt,tour/intermediate/OrderTwoTest.kt" initial-collapse-state="collapsed" collapsible="true" collapsed-title="範例解答" id="kotlin-tour-objects-solution-1"}
 
 </def>
 <def title="建立物件宣告" id="objects-exercise-2">
 
-建立一個繼承自 `Vehicle` 介面的物件宣告，以建立獨特的載具類型：`FlyingSkateboard`。
-在你的物件中實作 `name` 屬性和 `move()` 函式，以便 `main()` 函式中的以下程式碼能順利執行：
+建立一個繼承自 `Vehicle` 介面的物件宣告，以打造一種獨特的載具類型：`FlyingSkateboard`。在你的物件中實作 `name` 屬性與 `move()` 函式，讓 `main()` 函式中的後續程式碼能夠成功執行：
 
 ```kotlin
 interface Vehicle {
@@ -246,7 +245,7 @@ fun main() {
     // Flying Skateboard: Woooooooo
 }
 ```
-{validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-objects-exercise-2"}
+{kotlin-runnable="true" kotlin-target-platform="exercise" kotlin-hidden-files="ExerciseUtils.kt,tour/intermediate/FlyingSkateboardTest.kt" validate="false" id="kotlin-tour-objects-exercise-2"}
 
 ```kotlin
 interface Vehicle {
@@ -268,18 +267,18 @@ fun main() {
     // Flying Skateboard: Woooooooo
 }
 ```
-{initial-collapse-state="collapsed" collapsible="true" collapsed-title="範例解答" id="kotlin-tour-objects-solution-2"}
+{kotlin-runnable="true" kotlin-target-platform="exercise" kotlin-hidden-files="ExerciseUtils.kt,tour/intermediate/FlyingSkateboardTest.kt" initial-collapse-state="collapsed" collapsible="true" collapsed-title="範例解答" id="kotlin-tour-objects-solution-2"}
 
 </def>
-<def title="在建立使用者之前驗證電子郵件地址" id="objects-exercise-3">
+<def title="在建立使用者前驗證電子郵件地址" id="objects-exercise-3">
 
-你正在為應用程式建置使用者註冊模組。你希望將電子郵件驗證與 `User` 類別保持關聯，但如果電子郵件地址無效，則不想建立不必要的 `User` 執行個體。
+你正在為應用程式建置使用者註冊模組。你希望將電子郵件驗證邏輯與 `User` 類別保持關聯，但在電子郵件地址無效時，不希望建立不必要的 `User` 執行個體。
 
-在此練習中，若電子郵件地址同時包含 `@` 和 `.`，則視為有效。完成資料類別，使 `main()` 函式中的以下程式碼能順利執行：
+在此練習中，若電子郵件地址同時包含 `@` 和 `.`，即視為有效。請補全資料類別，讓 `main()` 函式中的後續程式碼能夠成功執行：
 
 <deflist collapsible="true">
     <def title="提示">
-        在 `User` 類別的伴隨物件中新增電子郵件驗證函式，以便可以直接在 `User` 上呼叫該函式。
+        在 `User` 類別的伴生物件中新增一個電子郵件驗證函式，以便直接透過 `User` 呼叫該函式。
     </def>
 </deflist>
 
@@ -306,7 +305,7 @@ fun main() {
     }
 }
 ```
-{validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-objects-exercise-3"}
+{kotlin-runnable="true" kotlin-target-platform="exercise" kotlin-hidden-files="ExerciseUtils.kt,tour/intermediate/UserTest.kt" validate="false" id="kotlin-tour-objects-exercise-3"}
 
 ```kotlin
 data class User(val name: String, val email: String) {
@@ -334,9 +333,9 @@ fun main() {
     }
 }
 ```
-{initial-collapse-state="collapsed" collapsible="true" collapsed-title="範例解答" id="kotlin-tour-objects-solution-3"}
+{kotlin-runnable="true" kotlin-target-platform="exercise" kotlin-hidden-files="ExerciseUtils.kt,tour/intermediate/UserTest.kt" initial-collapse-state="collapsed" collapsible="true" collapsed-title="範例解答" id="kotlin-tour-objects-solution-3"}
 
-> 作為本練習的擴展，嘗試使用伴隨物件中的函式作為工廠方法來建構類別的執行個體。有關此模式的範例和更多資訊，請參閱 [](object-declarations.md#companion-objects)。
+> 作為本練習的延伸，請嘗試使用伴生物件中的函式作為工廠方法來建構類別的執行個體。如需此模式的範例與詳細資訊，請參閱 [](object-declarations.md#companion-objects)。
 >
 {style="tip"}
 

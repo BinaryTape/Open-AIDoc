@@ -1,58 +1,95 @@
 ---
-title: Ktor & Annotations
+title: Ktor とアノテーション
 ---
 
-> Ktorは、強力なKotlinプログラミング言語を使用して、接続されたシステムで非同期サーバーおよびクライアントを構築するためのフレームワークです。ここでは、Ktorを使用してシンプルなウェブアプリケーションを構築します。
+# Ktor とアノテーション
 
-さあ、始めましょう 🚀
+このチュートリアルでは、リストから選択されたユーザーに挨拶する `/hello` エンドポイントを持つ Ktor Web アプリケーションを構築します。クラスにアノテーションを付与し、それらをスキャンしてモジュールに登録し、`@KoinApplication` オブジェクトから Koin Ktor プラグインに読み込む方法を学びます。所要時間は約10分で、JDK 17 と Gradle が必要です。
 
-:::note
-更新 - 2024-10-21
-:::
+このチュートリアルではアノテーションを使用します。Compiler Plugin DSL を使用した同じアプリケーションについては、[Ktor](/docs/quickstart/ktor) を参照してください。スタイルの比較については、[スタイルの選択 (Choosing your style)](/docs/intro/choosing-your-style) を参照してください。
 
-## コードを取得する {id="get-the-code"}
+## コードの取得 {id="get-the-code"}
 
-:::info
-[ソースコードはGitHubで公開されています](https://github.com/InsertKoinIO/koin-getting-started/tree/main/ktor-annotations)
-:::
+完全なサンプルコードは [koin-getting-started/ktor-annotations](https://github.com/InsertKoinIO/koin-getting-started/tree/main/ktor-annotations) にあります。リポジトリをクローンし、`ktor-annotations` フォルダから `app` モジュールを実行してください。
 
-## Gradleのセットアップ {id="gradle-setup"}
+## Gradle のセットアップ {id="gradle-setup"}
 
-まず、以下のようにKoinの依存関係を追加します。
+このサンプルでは Koin Compiler Plugin を適用し、`koin-ktor`、`koin-annotations`、`koin-logger-slf4j` を追加します。バージョンはバージョンカタログ (Version Catalog) で管理されています。
+
+```toml
+# gradle/libs.versions.toml
+[versions]
+# Kotlin、Ktor、Logback のエントリは省略
+koin = "<KOIN_VERSION>"
+koin-plugin = "<KOIN_PLUGIN_VERSION>"
+
+[libraries]
+koin-ktor = { module = "io.insert-koin:koin-ktor", version.ref = "koin" }
+koin-annotations = { module = "io.insert-koin:koin-annotations", version.ref = "koin" }
+koin-logger-slf4j = { module = "io.insert-koin:koin-logger-slf4j", version.ref = "koin" }
+koin-test = { module = "io.insert-koin:koin-test", version.ref = "koin" }
+koin-test-junit4 = { module = "io.insert-koin:koin-test-junit4", version.ref = "koin" }
+
+[plugins]
+koin-compiler = { id = "io.insert-koin.compiler.plugin", version.ref = "koin-plugin" }
+```
 
 ```kotlin
+// app/build.gradle.kts
 plugins {
-
-    id("com.google.devtools.ksp") version kspVersion
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.koin.compiler)
+    application
 }
 
 dependencies {
-    // Kotlinアプリ用Koin
-    implementation("io.insert-koin:koin-ktor:$koin_version")
-    implementation("io.insert-koin:koin-logger-slf4j:$koin_version")
+    implementation(libs.ktor.server)
+    implementation(libs.logback)
+    implementation(libs.koin.ktor)
+    implementation(libs.koin.annotations)
+    implementation(libs.koin.logger.slf4j)
 
-    implementation("io.insert-koin:koin-annotations:$koinAnnotationsVersion")
-    ksp("io.insert-koin:koin-ksp-compiler:$koinAnnotationsVersion")
+    testImplementation(libs.ktor.test)
+    testImplementation(libs.koin.test)
+    testImplementation(libs.koin.test.junit4)
 }
 ```
 
-## アプリケーションの概要 {id="application-overview"}
+Compiler Plugin はアノテーションを処理するため、Kotlin 2.3.20 以降が必要です。`koin-annotations` は Koin と同じバージョンを使用します。詳細については、[Gradle のセットアップ](/docs/setup/gradle) および [Compiler Plugin のセットアップ](/docs/setup/compiler-plugin) を参照してください。
 
-このアプリケーションの目的は、ユーザーのリストを管理し、それを `UserApplication` クラスで表示することです。
+## アプリケーションの構成 {id="the-application"}
 
-> Users -> UserRepository -> UserService -> UserApplication
+`/hello` ルートは `UserService` にユーザーを要求し、`UserService` は `UserRepository` からデータを読み取ります。
 
-## 「User」データ {id="the-user-data"}
+```
+User -> UserRepository -> UserService -> /hello route
+```
 
-ユーザーのコレクションを管理します。データクラスは以下の通りです。
+## ユーザーデータの作成 {id="let-s-write-the-user-data"}
+
+まずはデータクラスとデフォルトのユーザーリストの定義から始めます。
 
 ```kotlin
 data class User(val name: String, val email: String)
+
+val DEFAULT_USER = User("Alice", "alice@example.com")
+
+val DEFAULT_USERS = listOf(
+    DEFAULT_USER,
+    User("Bob", "bob@example.com"),
+    User("Charlie", "charlie@example.com")
+)
 ```
 
-ユーザーのリストを管理（ユーザーの追加や名前による検索）するための「Repository」コンポーネントを作成します。以下は、`UserRepository` インターフェースとその実装です。
+これらのユーザーが、リポジトリに保存されるデータとなります。
+
+## リポジトリの作成 {id="let-s-write-the-repository"}
+
+リポジトリはユーザーをメモリ内に保持します。実装クラスに `@Singleton` アノテーションを付与します。
 
 ```kotlin
+import org.koin.core.annotation.Singleton
+
 interface UserRepository {
     fun findUserOrNull(name: String): User?
     fun addUsers(users: List<User>)
@@ -73,39 +110,15 @@ class UserRepositoryImpl : UserRepository {
 }
 ```
 
-## Koinモジュール {id="the-koin-module"}
+Koin は `UserRepositoryImpl` をそのスーパータイプにバインドするため、`UserRepository` が要求されるとこのインスタンスが注入されます。`@Singleton` は `org.koin.core.annotation` パッケージのものであり、`@Single` と同等です（[定義 (Definitions)](/docs/reference/koin-core/definitions) を参照）。
 
-指定されたKotlinクラスからKoinモジュールを宣言するには、`@Module` アノテーションを使用します。Koinモジュールは、注入（Inject）されるすべてのコンポーネントを定義する場所です。
+## サービスの作成 {id="let-s-write-the-service"}
 
-```kotlin
-@Module
-@ComponentScan("org.koin.sample")
-@Configuration
-class AppModule
-```
-
-* `@Module` - これをKoinモジュールとして宣言します
-* `@ComponentScan("org.koin.sample")` - パッケージからアノテーション付きのクラスをスキャンして登録します
-* `@Configuration` - `@KoinApplication` による自動モジュール検出を有効にします
-
-:::note
-このプロジェクトでは、シングルトン（Singleton）コンポーネントを宣言するために（`org.koin.core.annotation` の）Koinの `@Singleton` アノテーションを使用しています。
-:::
-
-最初のコンポーネントを宣言しましょう。`UserRepositoryImpl` のインスタンスを作成して、`UserRepository` のシングルトンを作成します。これに `@Singleton` とタグ付けします。
-
-```kotlin
-@Singleton
-class UserRepositoryImpl : UserRepository
-```
-
-## UserServiceコンポーネント {id="the-userservice-component"}
-
-ユーザー操作を管理するための `UserService` コンポーネントを作成しましょう。
+`UserService` はユーザーを読み込み、挨拶メッセージを準備します。これも `@Singleton` です。
 
 ```kotlin
 interface UserService {
-    fun getUserOrNull(name: String): User?
+    fun getUserOrNull(name: String = DEFAULT_USER.name): User?
     fun loadUsers()
     fun prepareHelloMessage(user: User?): String
 }
@@ -118,51 +131,57 @@ class UserServiceImpl(
     override fun getUserOrNull(name: String): User? = userRepository.findUserOrNull(name)
 
     override fun loadUsers() {
-        userRepository.addUsers(listOf(
-            User("Alice", "alice@example.com"),
-            User("Bob", "bob@example.com"),
-            User("Charlie", "charlie@example.com")
-        ))
+        userRepository.addUsers(DEFAULT_USERS)
     }
 
     override fun prepareHelloMessage(user: User?): String {
-        return user?.let { "Hello '${user.name}' (${user.email})! 👋" } ?: "❌ User not found"
+        return user?.let { "Hello '${user.name}' (${user.email})!" } ?: "User not found"
     }
 }
 ```
 
-> UserRepositoryは `UserServiceImpl` のコンストラクターで参照されています。
+Compiler Plugin がコンストラクタを解析し、`UserRepository` インスタンスを自動的に渡します。
 
-`@Singleton` アノテーションを使用して `UserService` を宣言します。
+## Koin モジュールの宣言 {id="let-s-declare-the-koin-module"}
 
-## HTTPコントローラーとKoinアプリケーション {id="http-controller-and-koin-application"}
-
-最後に、`@KoinApplication` オブジェクトを作成し、HTTPルートを設定する必要があります。
+モジュールは定義をグループ化します（[主要な概念 (Core Concepts)](/docs/intro/core-concepts) を参照）。サンプルのパッケージをスキャンするモジュールクラスを宣言します。
 
 ```kotlin
-@KoinApplication
-object KoinUserApplication
+import org.koin.core.annotation.ComponentScan
+import org.koin.core.annotation.Configuration
+import org.koin.core.annotation.Module
+
+@Module
+@ComponentScan("org.koin.sample")
+@Configuration
+class AppModule
 ```
 
-`@KoinApplication` アノテーションは、これをKoinのアノテーションベースの設定のエントリポイントとしてマークします。KSPプロセッサは、Koinを初期化するために `withConfiguration<T>()` で使用できる設定を生成します。
+`@ComponentScan` は、`org.koin.sample` およびそのサブパッケージ内のすべてのアノテーション付きクラスを登録します。`@Configuration` は、このモジュールを `@KoinApplication` エントリポイントから検出可能にします。どちらの詳細も [モジュール (Modules)](/docs/reference/koin-core/modules) で解説されています。
 
-## 起動と注入 {id="start-and-inject"}
+## Koin のインストールとルートの作成 {id="let-s-install-koin-and-write-the-route"}
 
-それでは、KtorアプリケーションでKoinを設定しましょう。
+`@KoinApplication` オブジェクトを宣言します。`Koin` プラグインをインストールし、`withConfiguration<T>()` で設定を読み込んだ後、`/hello` ルートで `UserService` をインジェクトします。
 
 ```kotlin
+import org.koin.core.annotation.KoinApplication
+import org.koin.ktor.ext.inject
+import org.koin.ktor.plugin.Koin
+import org.koin.logger.slf4jLogger
+import org.koin.plugin.module.dsl.withConfiguration
+
+@KoinApplication
+object KoinUserApplication
+
 fun Application.main() {
-    // 生成された設定を使用してKoinをインストール
     install(Koin) {
         slf4jLogger()
         withConfiguration<KoinUserApplication>()
     }
 
-    // UserServiceを遅延注入（Lazy inject）
     val service by inject<UserService>()
     service.loadUsers()
 
-    // ルーティングセクション
     routing {
         get("/hello") {
             val userName = call.queryParameters["name"] ?: "Alice"
@@ -174,12 +193,11 @@ fun Application.main() {
 }
 ```
 
-**主なポイント:**
-* `withConfiguration<KoinUserApplication>()` - アノテーションが付与されたアプリケーションオブジェクトから生成されたKoin設定を使用します。
-* 手動で `modules(AppModule().module)` を呼び出す必要はありません。自動的に含まれます！
-* `/hello` エンドポイントは、オプションの `name` クエリパラメータを受け取ります。
+`withConfiguration<KoinUserApplication>()` はすべての `@Configuration` モジュールを読み込むため、手動で `modules()` を呼び出す必要はありません。また、プラグインはビルド時に依存関係グラフ全体を検証します。`slf4jLogger()` は Koin のログを SLF4J に送信します。Ktor 固有の API については、[Koin for Ktor](/docs/reference/koin-ktor/ktor) を参照してください。
 
-Ktorを起動しましょう。
+## サーバーの起動 {id="let-s-start-the-server"}
+
+アプリケーションモジュールを実行する組み込み Netty サーバーを起動します。
 
 ```kotlin
 fun main(args: Array<String>) {
@@ -189,10 +207,15 @@ fun main(args: Array<String>) {
 }
 ```
 
-以上です！これで準備が整いました。以下のURLを確認してください：
-- `http://localhost:8080/hello` - Alice（デフォルトユーザー）に挨拶します
-- `http://localhost:8080/hello?name=Bob` - Bobに挨拶します
+アプリケーションを実行し、次の URL を開きます。
 
-:::info
-モジュール上の `@Configuration` と併用される `@KoinApplication` アノテーションは、コンパイル時にすべてのアノテーション付き依存関係を自動的に検出し、ロードします。
-:::
+- `http://localhost:8080/hello`: デフォルトユーザーである Alice への挨拶が表示されます。
+- `http://localhost:8080/hello?name=Bob`: Bob への挨拶が表示されます。
+
+## 次のステップ {id="next-steps"}
+
+- [コアコンセプト (Core Concepts)](/docs/intro/core-concepts): モジュール、定義、インジェクションの背景にあるメンタルモデル。
+- [Koin for Ktor](/docs/reference/koin-ktor/ktor): インストールオプション、ルートでのインジェクション、および Ktor イベント。
+- [アノテーションリファレンス (Annotations Reference)](/docs/reference/koin-annotations/annotations-inventory): 各アノテーションとそのパラメータ。
+- [Ktor テスト (Ktor testing)](/docs/reference/koin-ktor/ktor-testing): `testApplication` と Koin を使用したルートのテスト。
+- [ツーリング (Tooling)](/docs/tooling): Koin 用の IDE プラグインおよびモニタリングツール。

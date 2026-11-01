@@ -1,42 +1,50 @@
 ---
-title: 延遲模組與背景載入
+title: Lazy 模組
 ---
 
-延遲模組（Lazy modules）支援非同步、平行的模組載入，以提升啟動效能。您可以延遲並平行化模組初始化，而不是在啟動時同步載入所有模組。
+# Lazy 模組
 
-:::info
-本頁面使用 **Koin 編譯器外掛程式 DSL** (`single<T>()`)。請參閱 [編譯器外掛程式設定](/docs/setup/compiler-plugin) 以進行配置。
-:::
+Lazy 模組是指 Koin 在背景協同程式（而不是在 `startKoin` 期間）中註冊的模組。本頁面涵蓋宣告 Lazy 模組、並行載入模組、等待模組載入完成，以及此功能的限制。本文預設您已瞭解[模組](/docs/reference/koin-core/modules)與[啟動 Koin](/docs/reference/koin-core/starting-koin)。
 
-## 什麼是延遲模組？ {id="what-are-lazy-modules"}
+## 相依性 {id="dependency"}
 
-延遲模組會延遲模組註冊和執行個體建立，直到明確載入為止。它們特別適用於：
-
-- **大型應用程式** - 將初始化拆分到多個執行緒中。
-- **效能最佳化** - 減少啟動時間。
-- **條件式功能** - 僅在需要時載入模組。
-- **背景初始化** - 非同步載入非關鍵模組。
-
-## 定義延遲模組 {id="defining-lazy-modules"}
-
-使用 `lazyModule` 函式建立延遲模組：
+Lazy 模組包含在 `koin-core-coroutines` 構件中：
 
 ```kotlin
-// 延遲模組 - 直到明確要求時才會載入
-val networkModule = lazyModule {
-    single<ApiClient>()
-    single<NetworkMonitor>()
-}
+// build.gradle.kts
+implementation("io.insert-koin:koin-core-coroutines")
+```
 
-val databaseModule = lazyModule {
-    single<Database>()
-    single<UserDao>()
+## 宣告 Lazy 模組 {id="declaring-a-lazy-module"}
+
+`lazyModule` 接收與 `module` 相同的內容。在 Koin 載入它之前，不會建立或分配任何內容。
+
+**編譯器外掛程式 DSL**
+```kotlin
+import org.koin.dsl.lazyModule
+import org.koin.plugin.module.dsl.*
+
+val analyticsModule = lazyModule {
+    single<AnalyticsService>()
+    single<EventTracker>()
 }
 ```
 
-### 組合延遲模組 {id="composing-lazy-modules"}
+**註解**
+註解模組（`@Module`）會在啟動時載入，無法宣告為 Lazy 模組。若要在背景載入某些定義，請使用任何一種 DSL 形式（編譯器外掛程式、建構函式或傳統 DSL）在 `lazyModule` 中宣告它們。
 
-延遲模組與一般模組一樣支援 `includes()`：
+**建構函式／傳統 DSL**
+```kotlin
+import org.koin.dsl.lazyModule
+import org.koin.core.module.dsl.*
+
+val analyticsModule = lazyModule {
+    singleOf(::AnalyticsService)
+    singleOf(::EventTracker)
+}
+```
+
+Lazy 模組可以包含其他 Lazy 模組：
 
 ```kotlin
 val dataModule = lazyModule {
@@ -44,272 +52,106 @@ val dataModule = lazyModule {
 }
 
 val featureModule = lazyModule {
-    includes(dataModule)  // 包含其他延遲模組
+    includes(dataModule)
     single<FeatureService>()
 }
 ```
 
-:::info
-延遲模組在透過 `lazyModules()` 函式載入之前，不會分配任何資源。
-:::
+## 載入 Lazy 模組 {id="loading-lazy-modules"}
 
-## 載入延遲模組 {id="loading-lazy-modules"}
-
-在您的 Koin 配置中使用 `lazyModules()` 載入延遲模組。
-
-### 基本載入 {id="basic-loading"}
+在 `startKoin` 中將 Lazy 模組傳遞給 `lazyModules()`。位於 `modules()` 中的模組會在 `startKoin` 返回之前於呼叫端執行緒上載入。Lazy 模組則會在背景協同程式中載入：
 
 ```kotlin
-val analyticsModule = lazyModule {
-    single<AnalyticsService>()
-}
-
-val reportingModule = lazyModule {
-    single<CrashReporter>()
-}
-
 startKoin {
-    // 立即載入關鍵模組
-    modules(coreModule, networkModule)
-
-    // 在背景載入非關鍵模組
+    modules(coreModule)
     lazyModules(analyticsModule, reportingModule)
 }
 ```
 
-### 平行載入 (4.2.0+) {id="parallel-loading-4-2-0"}
+自 Koin 4.2 起，每個 Lazy 模組都會在各自的協同程式中載入，因此多個 Lazy 模組會並行載入。在 4.2 之前，它們是一個接一個依序載入的。
 
-自 4.2.0 版本起，多個延遲模組會**平行**載入，每個模組都在自己的協同程式中執行：
-
-```kotlin
-val module1 = lazyModule { single<DatabaseService>() }
-val module2 = lazyModule { single<NetworkService>() }
-val module3 = lazyModule { single<AnalyticsService>() }
-
-startKoin {
-    // 所有三個模組同時載入！
-    lazyModules(module1, module2, module3)
-}
-```
-
-**效能影響：**
-
-| 情境 | 4.2.0 之前（循序） | 4.2.0 之後（平行） |
-|----------|--------------------------|------------------------|
-| 1 個模組 @ 100ms | 100ms | 100ms |
-| 3 個模組 @ 每個 100ms | 300ms | ~100ms |
-| 10 個模組 @ 每個 100ms | 1000ms | ~100ms |
-
-### 等待完成 {id="waiting-for-completion"}
-
-#### 所有平台：`waitAllStartJobs()` {id="all-platforms-waitallstartjobs"}
+如有需要，`lazyModules()` 會設定 Koin 協同程式引擎。它在平台預設的 Dispatcher 上執行（JVM 與 Native 上為 `Dispatchers.Default`）。若要選擇其他 Dispatcher，請傳入 `dispatcher`：
 
 ```kotlin
 startKoin {
-    lazyModules(module1, module2, module3)
+    lazyModules(databaseModule, networkModule, dispatcher = Dispatchers.IO)
 }
-
-val koin = KoinPlatform.getKoin()
-
-// 阻塞直到所有延遲模組載入完成
-koin.waitAllStartJobs()
-
-// 現在可以安全地使用來自延遲模組的相依性
-val service = koin.get<AnalyticsService>()
 ```
 
-**平台行為：**
-- **JVM/Native**：使用 `runBlocking` 進行真正的阻塞。
-- **JS**：使用 `GlobalScope.promise`（非真正阻塞，會記錄警告）。
+Dispatcher 是在首次呼叫 `lazyModules()` 建立協同程式引擎時設定的。後續呼叫中所傳入的 `dispatcher` 將不起作用。
 
-#### 僅限 JVM：`runOnKoinStarted()` {id="jvm-only-runonkoinstarted"}
+## 等待 Lazy 模組 {id="waiting-for-lazy-modules"}
+
+來自 Lazy 模組的定義在其模組載入完成之前是無法使用的。在解析該定義之前，請等待載入完成：
+
+| 函式 | 平台 | 行為 |
+|----------|----------|----------|
+| `Koin.awaitAllStartJobs()` | 全部 | 掛起直到每個 Lazy 模組都載入完成 |
+| `Koin.onKoinStarted { koin -> }` | 全部 | 掛起直到載入完成，接著執行該程式碼區塊 |
+| `Koin.waitAllStartJobs()` | 全部 | 阻塞執行緒直到載入完成。在 JS 上不會阻塞並會記錄警告 |
+| `Koin.runOnKoinStarted { koin -> }` | JVM | 阻塞直到載入完成，接著執行該程式碼區塊 |
+| `Koin.isAllStartedJobsDone()` | 全部 | 當每個 Lazy 模組都載入完成時傳回 `true` |
+
+從協同程式中：
+
+```kotlin
+suspend fun trackAppStart() {
+    val koin = KoinPlatform.getKoin()
+    koin.awaitAllStartJobs()
+    koin.get<AnalyticsService>().trackAppStart()
+}
+```
+
+從阻塞式程式碼中：
 
 ```kotlin
 startKoin {
     lazyModules(analyticsModule)
 }
 
-// 僅限 JVM 的回呼
-KoinPlatform.getKoin().runOnKoinStarted { koin ->
-    // 在所有延遲模組完成載入後執行
-    koin.get<AnalyticsService>().trackAppStart()
-}
+KoinPlatform.getKoin().waitAllStartJobs()
+val analytics = KoinPlatform.getKoin().get<AnalyticsService>()
 ```
 
-#### 暫停替代方案：`awaitAllStartJobs()` {id="suspending-alternative-awaitallstartjobs"}
-
-適用於協同程式上下文或不支援阻塞的平台：
-
-```kotlin
-suspend fun initializeApp() {
-    startKoin {
-        lazyModules(module1, module2)
-    }
-
-    // 等待且不阻塞
-    KoinPlatform.getKoin().awaitAllStartJobs()
-
-    // 安全地繼續執行
-    println("所有模組已載入！")
-}
-```
-
-## 自訂發送器 {id="custom-dispatchers"}
-
-控制在哪個發送器（dispatcher）上執行延遲模組載入：
-
-```kotlin
-import kotlinx.coroutines.Dispatchers
-
-startKoin {
-    // 在 IO 發送器上載入，而不是 Default
-    lazyModules(
-        databaseModule,
-        networkModule,
-        dispatcher = Dispatchers.IO
-    )
-}
-```
-
-**常見的發送器選擇：**
-- `Dispatchers.Default` - CPU 密集型工作（預設）。
-- `Dispatchers.IO` - I/O 操作、檔案存取、網路。
-- `Dispatchers.Main` - UI 更新（Android/Desktop）。
-
-:::info
-如果未指定，預設發送器為 `Dispatchers.Default`。
+:::warning
+請勿在啟動期間於 Android 主執行緒上呼叫 `waitAllStartJobs()`：這會阻塞 UI 直到每個 Lazy 模組都載入完成，從而抵消了此功能的好處。請改為從協同程式中等待。
 :::
 
-## 實際範例 {id="real-world-example"}
+## Android 範例 {id="android-example"}
+
+使用 `modules()` 載入第一個畫面所需的項目，其餘則在背景載入：
 
 ```kotlin
-// 核心模組 - 立即載入
-val coreModule = module {
-    single<AppConfig>()
-    single<UserSession>()
-}
-
-// 功能模組 - 在背景載入
-val analyticsModule = lazyModule {
-    single<AnalyticsEngine>()
-    single<EventTracker>()
-}
-
-val networkingModule = lazyModule {
-    single<ApiClient>()
-    single<WebSocketManager>()
-}
-
-val databaseModule = lazyModule {
-    single<Database>()
-    single<UserDao>()
-}
-
-// Android 應用程式
-class MyApp : Application() {
+class MainApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
         startKoin {
-            androidLogger()
-            androidContext(this@MyApp)
-
-            // 關鍵模組立即載入
+            androidContext(this@MainApplication)
             modules(coreModule)
-
-            // 非關鍵模組在背景平行載入
-            lazyModules(
-                analyticsModule,
-                networkingModule,
-                databaseModule,
-                dispatcher = Dispatchers.IO
-            )
-        }
-
-        // 選用：等待背景載入完成
-        lifecycleScope.launch {
-            KoinPlatform.getKoin().awaitAllStartJobs()
-            Log.d("Koin", "所有模組已載入！")
+            lazyModules(analyticsModule, databaseModule, dispatcher = Dispatchers.IO)
         }
     }
 }
 ```
 
-## 重要限制 {id="important-limitations"}
+適合做為 Lazy 模組的對象：數據分析 (analytics)、當機報告 (crash reporting)、導覽步驟後續的功能，以及模組主體開銷較高的定義。任何第一個畫面需要解析的內容都應保留在 `modules()` 中。
 
-### 避免交叉相依 {id="avoid-cross-dependencies"}
+## 限制 {id="limits"}
 
-延遲模組與一般模組應保持獨立。不要建立從一般模組到延遲模組的相依性：
+- **常規模組不能相依於 Lazy 模組**：如果常規模組中的定義相依於 Lazy 模組中的定義，在 Lazy 模組載入完成前進行解析將會失敗並拋出 `NoDefinitionFoundException`。Koin 不會為您檢查此情況。
+- **Lazy 模組在啟動時載入**：`lazyModules()` 會立即在背景開始載入。它不會在首次使用時才載入模組。
+- **僅限模組註冊**：延遲載入只是將模組註冊移出主執行緒。`single` 仍會在首次請求時，於發出請求的執行緒上建立。請避免在 Lazy 模組中使用 `createdAtStart`：Koin 會在 `startKoin` 結束時建立預先載入的執行個體，因此尚未載入的 Lazy 模組會錯過該步驟。
+- **不支援註解**：`@Module` 類別不能宣告為 Lazy。
 
-```kotlin
-// ❌ 錯誤範例 - mainModule 依賴於延遲模組
-val lazyAnalytics = lazyModule {
-    single { AnalyticsService() }
-}
-
-val mainModule = module {
-    single { AppController(get<AnalyticsService>()) }  // 可能會失敗！
-}
-
-startKoin {
-    modules(mainModule)
-    lazyModules(lazyAnalytics)
-}
-```
-
-```kotlin
-// ✅ 正確範例 - 保持相依性分離
-val lazyAnalytics = lazyModule {
-    single { AnalyticsService() }
-}
-
-val mainModule = module {
-    single { AppController() }
-}
-
-startKoin {
-    modules(mainModule)
-    lazyModules(lazyAnalytics)
-}
-```
-
-:::warning
-Koin 目前不會驗證一般模組與延遲模組之間的相依性。請確保一般模組不依賴於延遲模組的定義。
+:::tip
+若要在真實裝置上測量啟動與模組載入所需的時間，請參閱[生產環境監控](/docs/tooling/production-monitoring)。
 :::
 
-### 最佳實務：載入順序 {id="best-practice-load-order"}
+## 相關內容 {id="related"}
 
-1. **立即模組** - 啟動時需要的關鍵服務。
-2. **延遲模組** - 非關鍵、可延後的服務。
-3. **必要時等待** - 在存取延遲定義之前，使用 `waitAllStartJobs()`。
-
-## 何時使用延遲模組 {id="when-to-use-lazy-modules"}
-
-### 適合的使用案例 {id="good-use-cases"}
-
-- **分析／追蹤** - 並非核心功能所需。
-- **損毀報告** - 可以在背景初始化。
-- **功能模組** - 按需載入的模組化功能。
-- **資料庫／網路** - 可以延後的重量級初始化。
-- **大型應用程式** - 將啟動負載拆分到不同執行緒。
-
-### 不建議使用 {id="not-recommended"}
-
-- **核心服務** - 立即需要的關鍵相依性。
-- **小型應用程式** - 額外開銷可能會超過其收益。
-- **緊密耦合的模組** - 當模組之間有許多交叉相依時。
-
-## API 參考 {id="api-reference"}
-
-| 函式 | 平台 | 描述 |
-|----------|----------|-------------|
-| `lazyModules()` | 全部 | 在背景載入延遲模組 |
-| `waitAllStartJobs()` | 全部 | 阻塞直到所有延遲模組載入完成 |
-| `awaitAllStartJobs()` | 全部 | 暫停直到所有延遲模組載入完成 |
-| `runOnKoinStarted()` | 僅限 JVM | 載入完成後的回呼 |
-
-## 延伸閱讀 {id="see-also"}
-
-- **[模組](/docs/reference/koin-core/modules)** - 使用 `includes()` 進行模組組合
-- **[定義](/docs/reference/koin-core/definitions)** - 積極 vs 延遲單例
-- **[啟動 Koin](/docs/reference/koin-core/starting-koin)** - Koin 啟動配置
+- [模組](/docs/reference/koin-core/modules)：模組宣告與 `includes()`。
+- [啟動 Koin](/docs/reference/koin-core/starting-koin)：`startKoin` 與應用程式 DSL。
+- [定義](/docs/reference/koin-core/definitions#eager-creation)：`createdAtStart` 與預先載入建立。
+- [Android 設定](/docs/reference/koin-android/start)：在 Android `Application` 中啟動 Koin。
+- [DSL 參考](/docs/reference/koin-core/dsl)：所有 DSL 關鍵字。

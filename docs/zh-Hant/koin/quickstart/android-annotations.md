@@ -1,63 +1,89 @@
 ---
-title: Android 與註解
+title: Android & 註解
 ---
 
-> 本教學將帶領您編寫一個 Android 應用程式，並使用 Koin 相依注入來取得您的組建。
-> 您大約需要 **10 分鐘** 來完成此教學。
+# Android & 註解
 
-:::note
-更新 - 2024-10-21
-:::
+在本教學中，你將建置一個 Android 應用程式，用來向從清單中選取的使用者打招呼。你將學習如何為類別加上註解、將它們掃描進模組中、為 ViewModel 提供其專屬的作用域相依性，並從 `@KoinApplication` 類別啟動 Koin。這大約需要 10 分鐘，且需要 Android Studio。
+
+本教學使用註解。若要查看使用編譯器外掛程式 DSL 的相同應用程式，請參閱 [Android](/docs/quickstart/android) 和 [Android ViewModel](/docs/quickstart/android-viewmodel)。若要比較這兩種風格，請參閱[選擇你的風格](/docs/intro/choosing-your-style)。
 
 ## 取得程式碼 {id="get-the-code"}
 
-:::info
-[原始碼已發佈於 GitHub](https://github.com/InsertKoinIO/koin-getting-started/tree/main/android-annotations)
-:::
+完整範例位於 [koin-getting-started/android-annotations](https://github.com/InsertKoinIO/koin-getting-started/tree/main/android-annotations)。複製該存儲庫並在 Android Studio 中開啟 `android-annotations` 資料夾。
 
 ## Gradle 設定 {id="gradle-setup"}
 
-讓我們如下配置 KSP 外掛程式，以及下列相依性：
+此範例套用了 Koin 編譯器外掛程式，並新增了 `koin-android` 與 `koin-annotations`。版本資訊維護在版本目錄（version catalog）中：
 
-```groovy
+```toml
+# gradle/libs.versions.toml
+[versions]
+# Kotlin, Android Gradle Plugin and AndroidX entries omitted
+koin = "<KOIN_VERSION>"
+koin-plugin = "<KOIN_PLUGIN_VERSION>"
+
+[libraries]
+koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
+koin-annotations = { module = "io.insert-koin:koin-annotations", version.ref = "koin" }
+koin-test-junit4 = { module = "io.insert-koin:koin-test-junit4", version.ref = "koin" }
+
+[plugins]
+koin-compiler = { id = "io.insert-koin.compiler.plugin", version.ref = "koin-plugin" }
+```
+
+```kotlin
+// app/build.gradle.kts
 plugins {
-    alias(libs.plugins.ksp)
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.koin.compiler)
 }
 
 dependencies {
-    // ...
-
+    implementation(libs.android.appcompat)
+    implementation(libs.koin.android)
     implementation(libs.koin.annotations)
-    ksp(libs.koin.ksp)
-}
 
-// 編譯期檢查
-ksp {
-    arg("KOIN_CONFIG_CHECK","true")
+    testImplementation(libs.koin.test.junit4)
 }
 ```
 
-:::note
-請參閱 `libs.versions.toml` 以了解目前版本
-:::
+編譯器外掛程式負責處理註解，並需要 Kotlin 2.3.20 或更高版本。`koin-annotations` 共享 Koin 的版本。編譯期安全性預設為啟用。詳細資訊請參閱 [Gradle 設定](/docs/setup/gradle)與[編譯器外掛程式設定](/docs/setup/compiler-plugin)。
 
-## 應用程式總覽 {id="application-overview"}
+## 應用程式架構 {id="the-application"}
 
-這個應用程式的概念是管理一個使用者列表，並透過 Presenter 或 ViewModel 將其顯示在我們的 `MainActivity` 類別中：
+Activity 向 ViewModel 請求問候語。ViewModel 使用從 `UserRepository` 讀取資料的 `UserService`，並擁有限定於其生命週期作用域的 `UserPresenter`：
 
-> Users -> UserRepository -> UserService -> (Presenter 或 ViewModel) -> MainActivity
+```
+User -> UserRepository -> UserService -> UserViewModel (+ UserPresenter) -> MainActivity
+```
 
-## 「User」資料 {id="the-user-data"}
+## 編寫使用者資料 {id="let-s-write-the-user-data"}
 
-我們將管理 User 的集合。這是資料類別：
+首先從資料類別（data class）與預設的使用者清單開始：
 
 ```kotlin
 data class User(val name: String, val email: String)
+
+val DEFAULT_USER = User("Alice", "alice@example.com")
+
+val DEFAULT_USERS = listOf(
+    DEFAULT_USER,
+    User("Bob", "bob@example.com"),
+    User("Charlie", "charlie@example.com")
+)
 ```
 
-我們建立一個「存儲庫」組建來管理使用者列表（新增使用者或按名稱尋找）。下方是 `UserRepository` 介面及其實作：
+這些使用者就是存儲庫所儲存的資料。
+
+## 編寫存儲庫 {id="let-s-write-the-repository"}
+
+存儲庫將使用者保留在記憶體中。使用 `@Singleton` 為其實作加上註解：
 
 ```kotlin
+import org.koin.core.annotation.Singleton
+
 interface UserRepository {
     fun findUserOrNull(name: String): User?
     fun addUsers(users: List<User>)
@@ -78,13 +104,15 @@ class UserRepositoryImpl : UserRepository {
 }
 ```
 
-## UserService 組建 {id="the-userservice-component"}
+Koin 會將 `UserRepositoryImpl` 繫結至其基底型別，因此請求 `UserRepository` 時會獲取此執行個體。`@Singleton` 等同於 `@Single`（請參閱[定義](/docs/reference/koin-core/definitions)）。
 
-讓我們編寫一個服務組建來管理使用者操作：
+## 編寫服務 {id="let-s-write-the-service"}
+
+`UserService` 在建立時載入使用者並準備問候語：
 
 ```kotlin
 interface UserService {
-    fun getUserOrNull(name: String): User?
+    fun getUserOrNull(name: String = DEFAULT_USER.name): User?
     fun loadUsers()
     fun prepareHelloMessage(user: User?): String
 }
@@ -101,57 +129,28 @@ class UserServiceImpl(
     override fun getUserOrNull(name: String): User? = userRepository.findUserOrNull(name)
 
     override fun loadUsers() {
-        userRepository.addUsers(listOf(
-            User("Alice", "alice@example.com"),
-            User("Bob", "bob@example.com"),
-            User("Charlie", "charlie@example.com")
-        ))
+        userRepository.addUsers(DEFAULT_USERS)
     }
 
     override fun prepareHelloMessage(user: User?): String {
-        return user?.let { "Hello '${user.name}' (${user.email})! 👋" } ?: "❌ User not found"
+        return user?.let { "Hello '${user.name}' (${user.email})!" } ?: "User not found"
     }
 }
 ```
 
-## Koin 模組 {id="the-koin-module"}
+編譯器外掛程式會讀取建構函式，並自動為你傳入 `UserRepository` 執行個體。
 
-讓我們如下宣告一個 `AppModule` 模組類別：
+## 編寫 Presenter 與 ViewModel {id="let-s-write-the-presenter-and-the-viewmodel"}
 
-```kotlin
-@Module
-@ComponentScan("org.koin.sample")
-@Configuration
-class AppModule
-```
-
-* `@Module` - 將此類別宣告為 Koin 模組
-* `@ComponentScan("org.koin.sample")` - 自動掃描並註冊 `"org.koin.sample"` 套件中的所有 Koin 定義
-* `@Configuration` - 與 `@KoinApplication` 配合使用時，啟用自動模組探索
-
-啟用組建掃描後，我們只需在類別中加入註解：
+Presenter 負責格式化問候語。使用 `@ViewModelScope` 為其加上註解，這樣每個 ViewModel 都會獲得其專屬的執行個體：
 
 ```kotlin
-@Singleton
-class UserRepositoryImpl : UserRepository {
-    // ...
-}
+import org.koin.core.annotation.ViewModelScope
 
-@Singleton
-class UserServiceImpl(private val userRepository: UserRepository) : UserService {
-    // ...
-}
-```
-
-`@Singleton` 註解將這些類別宣告為 Koin 中的單例。
-
-## 使用 Presenter 顯示使用者 {id="displaying-user-with-presenter"}
-
-讓我們編寫一個 Presenter 組建來顯示使用者：
-
-```kotlin
-@Factory
-class UserPresenter(private val userService: UserService) {
+@ViewModelScope
+class UserPresenter(
+    private val userService: UserService
+) {
 
     fun sayHello(name: String): String {
         val user = userService.getUserOrNull(name)
@@ -161,79 +160,18 @@ class UserPresenter(private val userService: UserService) {
 }
 ```
 
-> `UserService` 在 `UserPresenter` 的建構函式中被引用
-
-我們使用 `@Factory` 註解宣告 `UserPresenter`，以便在每次請求時建立新執行個體（避免 Android 生命週期造成的記憶體洩漏）：
+ViewModel 加上了 `@KoinViewModel` 註解，並加上 `@ViewModelScope` 註解以便接收具作用域限定的 Presenter：
 
 ```kotlin
-@Factory
-class UserPresenter(private val userService: UserService) {
-    // ...
-}
-```
+import org.koin.core.annotation.KoinViewModel
+import org.koin.core.annotation.ViewModelScope
 
-## 在 Android 中注入相依性 {id="injecting-dependencies-in-android"}
-
-將會建立 `UserPresenter` 組建，並隨之解析 `UserService` 執行個體。若要在 Activity 中取得它，讓我們使用 `by inject()` 委託函式進行注入：
-
-```kotlin
-class MainActivity : AppCompatActivity() {
-
-    private val presenter: UserPresenter by inject()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        
-        //...
-    }
-}
-```
-
-就是這樣，您的應用程式已準備就緒。
-
-:::info
-`by inject()` 函式讓我們能在 Android 組建執行階段（Activity、Fragment、Service...）中取得 Koin 執行個體。
-:::
-
-## 啟動 Koin {id="start-koin"}
-
-我們需要在 Android 應用程式中啟動 Koin。透過 `@KoinApplication` 註解，Koin 會自動探索並載入所有標記為 `@Configuration` 的模組：
-
-```kotlin
-import org.koin.android.ext.koin.androidContext
-import org.koin.core.annotation.KoinApplication
-import org.koin.ksp.generated.*
-
-@KoinApplication
-class MainApplication : Application() {
-
-    override fun onCreate() {
-        super.onCreate()
-
-        startKoin {
-            androidContext(this@MainApplication)
-        }
-    }
-}
-```
-
-**關鍵點：**
-* `@KoinApplication` - 自動探索所有標記有 `@Module` 與 `@Configuration` 的模組
-* 不需要手動呼叫 `modules(AppModule().module)` —— 模組會自動載入！
-* 需要 `import org.koin.ksp.generated.*` 才能使用產生的 Koin 內容
-* 您只需要配置 Android 特定的設定，例如 `androidContext`
-
-:::info
-`@KoinApplication` 註解配合模組上的 `@Configuration`，可透過 KSP 在編譯期自動探索並載入所有相依性。
-:::
-
-## 使用 ViewModel 顯示使用者 {id="displaying-user-with-viewmodel"}
-
-讓我們編寫一個 ViewModel 組建來顯示使用者：
-
-```kotlin
+@ViewModelScope
 @KoinViewModel
-class UserViewModel(private val userService: UserService) : ViewModel() {
+class UserViewModel(
+    private val userService: UserService,
+    private val userPresenter: UserPresenter
+) : ViewModel() {
 
     fun sayHello(name: String): String {
         val user = userService.getUserOrNull(name)
@@ -243,37 +181,95 @@ class UserViewModel(private val userService: UserService) : ViewModel() {
 }
 ```
 
-> `UserService` 在 `UserViewModel` 的建構函式中被引用
+Presenter 的存活時間與 ViewModel 相同，並在 ViewModel 被清除時釋放。ViewModel 作用域的詳細說明請參閱 [ViewModel](/docs/reference/koin-core/viewmodel)，一般作用域請參閱[作用域](/docs/reference/koin-core/scopes)。
 
-`UserViewModel` 標記有 `@KoinViewModel` 註解，用以宣告 Koin ViewModel 定義。這可確保正確的生命週期管理並避免記憶體洩漏。
+## 宣告 Koin 模組 {id="let-s-declare-the-koin-module"}
 
-## 在 Android 中注入 ViewModel {id="injecting-viewmodel-in-android"}
-
-將會建立 `UserViewModel` 組建，並隨之解析 `UserService` 執行個體。若要在 Activity 中取得它，讓我們使用 `by viewModel()` 委託函式進行注入：
+模組用於分組定義（請參閱[核心概念](/docs/intro/core-concepts)）。宣告一個掃描範例套件的模組類別：
 
 ```kotlin
+import org.koin.core.annotation.ComponentScan
+import org.koin.core.annotation.Configuration
+import org.koin.core.annotation.Module
+
+@Module
+@ComponentScan("org.koin.sample")
+@Configuration
+class AppModule
+```
+
+`@ComponentScan` 會註冊 `org.koin.sample` 及其子套件中所有帶有註解的類別。`@Configuration` 讓該模組能夠被 `@KoinApplication` 入口點偵測到。兩者的詳細說明請參閱[模組](/docs/reference/koin-core/modules)。
+
+## 在 Activity 中注入 ViewModel {id="let-s-inject-the-viewmodel-in-the-activity"}
+
+在 `MainActivity` 中使用 `by viewModel()` 委託：
+
+```kotlin
+import org.koin.androidx.viewmodel.ext.android.viewModel
+
 class MainActivity : AppCompatActivity() {
 
     private val viewModel: UserViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        
-        //...
+        setContentView(R.layout.activity_simple)
+
+        val nameInput = findViewById<EditText>(R.id.nameInput)
+        val sayHelloButton = findViewById<Button>(R.id.sayHelloButton)
+        val textField = findViewById<TextView>(R.id.text)
+
+        sayHelloButton.setOnClickListener {
+            val userName = nameInput.text.toString().trim().ifEmpty { "Alice" }
+            textField.text = viewModel.sayHello(userName)
+        }
     }
 }
 ```
 
-## 編譯期檢查 {id="compile-time-checks"}
+`by viewModel()` 會自動為你建立 ViewModel 工廠，並將執行個體繫結到 Activity 的生命週期。其他委託請參閱 [Android ViewModel](/docs/reference/koin-android/viewmodel)。
 
-Koin 註解允許在編譯期檢查您的 Koin 配置。這可以透過使用下列 Gradle 選項來實現：
+## 啟動 Koin {id="let-s-start-koin"}
 
-```groovy
-ksp {
-    arg("KOIN_CONFIG_CHECK","true")
+為你的 `Application` 類別加上 `@KoinApplication` 註解，並使用具型別的 `startKoin<T>()` 啟動 Koin。在 `AndroidManifest.xml` 中註冊該類別：
+
+```kotlin
+import org.koin.android.ext.koin.androidContext
+import org.koin.android.ext.koin.androidLogger
+import org.koin.core.annotation.KoinApplication
+import org.koin.core.annotation.KoinViewModelScopeApi
+import org.koin.core.logger.Level
+import org.koin.core.option.viewModelScopeFactory
+import org.koin.plugin.module.dsl.startKoin
+
+@OptIn(KoinViewModelScopeApi::class)
+@KoinApplication
+class MainApplication : Application() {
+
+    override fun onCreate() {
+        super.onCreate()
+
+        startKoin<MainApplication> {
+            androidContext(this@MainApplication)
+            androidLogger(level = Level.DEBUG)
+            options(viewModelScopeFactory())
+        }
+    }
 }
 ```
 
-:::tip
-這個基於 KSP 的選項將被 **Koin 編譯器外掛程式**（Koin Compiler Plugin）取代，它將提供原生編譯期安全性。請參閱 [編譯期安全性](/docs/reference/koin-compiler/compile-safety) 與 [編譯器外掛程式設定](/docs/setup/compiler-plugin)。
-:::
+`startKoin<MainApplication>` 會載入所有 `@Configuration` 模組，因此無需呼叫 `modules()`。`viewModelScopeFactory()` 會告知 Koin 為每個 ViewModel 建立一個作用域，這是 `@ViewModelScope` 所必需的。這是一個需要明確啟用（opt-in）的 API（`@KoinViewModelScopeApi`）。有關其他選項，請參閱[在 Android 上啟動 Koin](/docs/reference/koin-android/start)。
+
+## 在建置期檢查相依圖 {id="let-s-check-the-graph-at-build-time"}
+
+建置專案。編譯器外掛程式會驗證完整的相依圖：若遺失相依性、限定詞不相符，或是對未宣告的 ViewModel 呼叫 `by viewModel()`，都會導致建置失敗，並指出檔案與行號。
+
+執行應用程式，輸入名稱並輕觸按鈕即可看到問候語。該外掛程式檢查的項目列於[編譯期安全性](/docs/reference/koin-compiler/compile-safety)中。
+
+## 後續步驟 {id="next-steps"}
+
+- [核心概念](/docs/intro/core-concepts)：模組、定義與注入背後的心智模型。
+- [Android 作用域](/docs/reference/koin-android/scope)：Android 上的 Activity、Fragment 與 ViewModel 作用域。
+- [註解參考](/docs/reference/koin-annotations/annotations-inventory)：所有註解及其參數。
+- [檢測測試 (Instrumented testing)](/docs/reference/koin-android/instrumented-testing)：使用 Koin 測試你的 Android 應用程式。
+- [工具](/docs/tooling)：適用於 Koin 的 IDE 外掛程式與監控工具。

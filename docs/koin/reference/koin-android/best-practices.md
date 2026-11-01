@@ -2,255 +2,129 @@
 title: Android 最佳实践
 ---
 
-本指南涵盖了针对 Android 特定的内存管理、安全以及从 Hilt 迁移的最佳实践。
+# Android 最佳实践
 
-:::info
-有关通用模块概念，请参阅 **[模块](/docs/reference/koin-core/modules)**。有关作用域，请参阅 **[作用域](/docs/reference/koin-core/scopes)** 和 **[Android 作用域](/docs/reference/koin-android/scope)**。
-:::
+本页列出了在 Android 上使用 Koin 时会导致内存泄漏、崩溃或敏感信息泄露的特有问题，以及如何避免它们。本文假设你已了解 [Android 作用域](/docs/reference/koin-android/scope) 与 [在 Android 上启动 Koin](/docs/reference/koin-android/start)。常规模块组织方式请参阅 [模块](/docs/reference/koin-core/modules)，错误消息的说明请参阅 [故障排除](/docs/reference/koin-core/troubleshooting)。
 
-## 内存管理 {id="memory-management"}
+## 内存与 Context 泄漏 {id="memory-and-context-leaks"}
 
-### 避免 Activity/Fragment 内存泄漏 {id="avoid-activity-fragment-leaks"}
+当生命周期更长的对象持有了生命周期较短对象的引用时，就会发生实例泄漏。在 Android 上，最常见的受害者是 Activity：`single` 的生命周期与进程相同，而 Activity 仅能存活至下一次屏幕旋转。
+
+### 将 Activity 传递给 single {id="activity-passed-into-a-single"}
 
 ```kotlin
-// ❌ 错误 - Activity 内存泄漏
-module {
-    single { SomeService(get<Activity>()) }  // 在单例中持有 Activity 引用！
+// 导致泄漏：该 single 将永久持有第一个 Activity
+class UserActivity : AppCompatActivity() {
+    private val tracker: ScreenTracker by inject { parametersOf(this) }
 }
 
-// ✅ 正确 - 使用 Application 上下文
-module {
-    single { SomeService(androidContext()) }  // Application 上下文，安全
-}
-
-// ✅ 正确 - 使用 activity 作用域
-module {
-    activityScope {
-        scoped { SomeService(/* activity 作用域的依赖项 */) }
-    }
+val appModule = module {
+    single { params -> ScreenTracker(params.get<Activity>()) }
 }
 ```
 
-### 正确关闭作用域 {id="close-scopes-properly"}
+`single` 仅会被创建一次，并使用首次调用时的形参。后续调用将获取同一个实例，且仍持有第一个 Activity。请改用以下替代方案之一：
+
+- Application 上下文：如果类仅需要访问资源或系统服务，请将其声明为带有 `Context` 的 `single`。在 `single` 中，`Context` 即为 `Application`。
+- Activity 作用域：当类需要 Activity 时，请在 `activityScope { }` 中或通过 `@ActivityScope` 进行声明。它会针对每个 Activity 创建，并随之释放。
+- 带形参的 Factory：当调用方传递 Activity 时，请使用 `factory`，并且不要使结果的存活期超出该 Activity 的生命周期。
+
+编译器插件将 `Context`、`Activity`、`Application`、`Fragment` 和 `SavedStateHandle` 视为平台提供的类型，因此不会将它们报告为缺失。但它也无法判断在给定的定义中 `Activity` 形参是否安全：请在代码审查时对此进行检查。
+
+### 被单例持有的监听器 {id="listeners-held-by-singletons"}
 
 ```kotlin
-// ✅ 正确 - 自动作用域管理
-class MyActivity : ScopeActivity() {
-    override val scope: Scope by activityScope()
-    // 作用域会在 onDestroy 中自动关闭
-}
-
-// ❌ 错误 - 手动创建作用域但未清理
-class MyActivity : AppCompatActivity() {
-    private val myScope = createScope<MyActivity>()
-    // 作用域从未关闭 - 导致内存泄漏！
-}
-
-// ✅ 正确 - 手动创建作用域并进行清理
-class MyActivity : AppCompatActivity() {
-    private lateinit var myScope: Scope
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        myScope = createScope<MyActivity>()
-    }
-
-    override fun onDestroy() {
-        myScope.close()
-        super.onDestroy()
-    }
-}
-```
-
-### 在长生命周期对象中清除引用 {id="clear-references-in-long-lived-objects"}
-
-```kotlin
-// ❌ 错误 - 持有 UI 引用
 class UserRepository {
-    private val listeners = mutableListOf<UserUpdateListener>()  // 可能持有 Activity 引用
+    private val listeners = mutableListOf<UserListener>()
 
-    fun addListener(listener: UserUpdateListener) {
-        listeners.add(listener)
-    }
-}
-
-// ✅ 正确 - 使用弱引用或手动清理
-class UserRepository {
-    private val listeners = mutableListOf<WeakReference<UserUpdateListener>>()
-
-    fun addListener(listener: UserUpdateListener) {
-        listeners.add(WeakReference(listener))
-    }
-
-    fun removeListener(listener: UserUpdateListener) {
-        listeners.removeAll { it.get() == listener || it.get() == null }
-    }
+    fun addListener(listener: UserListener) { listeners += listener }
+    fun removeListener(listener: UserListener) { listeners -= listener }
 }
 ```
 
-## Android 调试 {id="android-debugging"}
+Repository 通常为 `single`。如果 Activity 或 Fragment 将自身注册为监听器且从未将其移除，该 Repository 就会导致该页面无法被回收。请在对应的生命周期回调中移除监听器（在 `onStart()` 注册的在 `onStop()` 中移除，在 `onViewCreated()` 注册的在 `onDestroyView()` 中移除），或者公开一个 `Flow` 并使用 `repeatOnLifecycle` 进行收集，它会自动为你取消收集。
 
-### 启用 Android 日志记录器 {id="enable-android-logger"}
+### 存活时间超出其所有者的作用域实例 {id="scoped-instances-that-outlive-their-owner"}
+
+- Retained 作用域：`activityRetainedScope` 在屏幕旋转时仍然存活。其内部实例绝不能引用 Activity、View 或 Fragment。
+- Fragment 作用域：它在 `onDestroyView()` 之后的 `onDestroy()` 中关闭。切勿在 Fragment 作用域的实例中持有 View 或 Binding。
+- ViewModel：切勿将 Activity 作用域或 Fragment 作用域的实例注入到 ViewModel 中。ViewModel 在屏幕旋转后仍然存活，而 Activity 作用域则不会。
+
+这些规则已在 [Android 作用域](/docs/reference/koin-android/scope) 中进行了说明。
+
+### 自行创建的作用域 {id="scopes-you-create-yourself"}
+
+`activityScope()`、`fragmentScope()`、`ScopeActivity`、`ScopeFragment` 和 `ScopeService` 会随生命周期关闭其作用域。通过 `getKoin().createScope()` 创建的作用域没有关联生命周期：必须自行关闭它，否则其中的所有实例都会常驻内存。
+
+```kotlin
+// 登录时
+val sessionScope = getKoin().createScope<UserSession>(userId)
+
+// 注销时
+sessionScope.close()
+```
+
+## 在 Android 上进行调试 {id="debugging-on-android"}
+
+在排查问题时，可启用调试级别的 Logcat 日志记录器：
 
 ```kotlin
 startKoin {
-    androidLogger(Level.DEBUG)  // 查看所有 Koin 操作
-    androidContext(this@MyApplication)
-    modules(appModules)
+    androidLogger(Level.DEBUG)
+    androidContext(this@MainApplication)
+    modules(appModule)
 }
 ```
 
-### 在 Debug 构建中验证模块 {id="verify-modules-in-debug-builds"}
+根据 `[Koin]` 标记筛选 Logcat。在 debug 级别下，Koin 会记录每次模块加载、每次解析及其耗时，以及每个作用域的打开或关闭。在 release 构建中，请使用 `Level.ERROR` 或 `Level.NONE`。
 
-```kotlin
-class MyApplication : Application() {
-    override fun onCreate() {
-        super.onCreate()
+仅在 Android 上出现的错误：
 
-        startKoin {
-            androidContext(this@MyApplication)
-            modules(allModules)
-        }
+| 错误 | 常见原因 |
+|-------|-------------|
+| `MissingAndroidContextException` | `startKoin` 中缺少 `androidContext()` |
+| `KoinApplication has not been started` | 清单文件中未声明 `Application` 类，或者某个 ContentProvider 在其 `onCreate()` 中执行了注入（参见 [Android 入口点](/docs/reference/koin-android/entry-points#contentprovider)） |
+| 作用域类型的 `NoDefinitionFoundException` | Activity 或 Fragment 没有作用域（`ScopeActivity`、`AndroidScopeComponent`） |
+| `ClosedScopeException` | 代码在作用域已关闭的 `onDestroy()` 中或之后解析作用域实例。请在 `onCloseScope()` 中执行清理工作 |
+| Workers 失败并显示 "Could not instantiate" | 默认的 WorkManager 初始化器仍保留在清单文件中（参见 [WorkManager](/docs/reference/koin-android/workmanager)） |
 
-        // 使用 Koin 编译器插件进行编译时验证
-        // 或在单元测试中使用 verify()：appModule.verify()
-    }
-}
-```
+如果使用编译器插件，缺失的定义将在构建时被报告（参见 [编译时安全性](/docs/reference/koin-compiler/compile-safety)）。
 
-### 用于调试的作用域回调 {id="scope-callbacks-for-debugging"}
-
-```kotlin
-class DebugActivity : ScopeActivity() {
-    override val scope: Scope by activityScope()
-
-    init {
-        scope.registerCallback(object : ScopeCallback {
-            override fun onScopeClose(scope: Scope) {
-                Log.d("Koin", "作用域 ${scope.id} 正在关闭")
-            }
-        })
-    }
-}
-```
-
-## 安全最佳实践 {id="security-best-practices"}
-
-### 不要在模块中存储机密信息 {id="don-t-store-secrets-in-modules"}
-
-```kotlin
-// ❌ 错误 - 硬编码机密信息
-module {
-    single {
-        Retrofit.Builder()
-            .addInterceptor { chain ->
-                chain.proceed(
-                    chain.request().newBuilder()
-                        .header("API-Key", "super-secret-key")  // 禁止！
-                        .build()
-                )
-            }
-            .build()
-    }
-}
-
-// ✅ 正确 - 从安全存储中获取机密信息
-module {
-    single {
-        val securePrefs = get<SecurePreferences>()
-        Retrofit.Builder()
-            .addInterceptor(AuthInterceptor(securePrefs))
-            .build()
-    }
-}
-```
-
-## 从 Dagger/Hilt 迁移 {id="migration-from-dagger-hilt"}
-
-:::info
-Koin 支持来自 `jakarta.inject` 的 JSR-330 注解（`@Singleton`、`@Inject`、`@Named`）。您可以继续使用熟悉的注解。请参阅 [JSR-330 兼容性](/docs/reference/koin-android/jsr330)。
+:::tip
+若要查看真实用户会话中的解析时间、作用域生命周期和 Koin 错误，请参阅 [生产环境监控](/docs/tooling/production-monitoring)。
 :::
 
-### 注解映射 {id="annotation-mapping"}
+## 敏感信息 {id="secrets"}
 
-| Hilt | Koin 注解 |
-|------|------------------|
-| `@Singleton` | `@Singleton` (兼容 JSR-330) |
-| `@Provides` | `@Factory` |
-| `@Binds` | `@Singleton ... bind Interface::class` |
-| `@Inject` | `@Inject` (兼容 JSR-330) |
-| `@HiltViewModel` | `@KoinViewModel` |
-| `@InstallIn(SingletonComponent)` | `@Module` + `@ComponentScan` |
-| `@InstallIn(ActivityComponent)` | `@Scope(ActivityScope::class)` |
+APK 可以被解压缩。编译进 APK 或存储在 `assets/` 中的任何内容都可以被读取：
 
-### 迁移示例 {id="example-migration"}
+- 硬编码密钥：切勿在模块中将 API 密钥写为字符串文字。
+- Koin 属性：`androidFileProperties()` 会读取打包在 APK 内的 `assets/koin.properties`。只能将其用于配置，绝不能用于机密。
+- `BuildConfig` 字段：它们同样会被编译进 APK 中。它们只能对源代码管理隐藏对应的值，而无法在 APK 中隐藏。
+
+请在运行时从后端获取机密，或将令牌保存在加密存储中，并注入存储对象而非直接注入该值：
 
 ```kotlin
-// 迁移前 (Hilt)
-@HiltViewModel
-class HomeViewModel @Inject constructor(
-    private val repository: UserRepository
-) : ViewModel()
-
-@Singleton
-class UserRepositoryImpl @Inject constructor(
-    private val api: ApiService
-) : UserRepository
-
-// 迁移后 (Koin) - 改动极小！
-@KoinViewModel
-class HomeViewModel(
-    private val repository: UserRepository
-) : ViewModel()
-
-@Singleton  // 继续使用 JSR-330
-class UserRepositoryImpl(
-    private val api: ApiService
-) : UserRepository
-```
-
-### 模块迁移 {id="module-migration"}
-
-```kotlin
-// 迁移前 (Hilt)
-@InstallIn(SingletonComponent::class)
-@Module
-object NetworkModule {
-    @Provides
-    @Singleton
-    fun provideRetrofit(): Retrofit = Retrofit.Builder().build()
-}
-
-// 迁移后 (Koin 注解)
-@Module
-class NetworkModule {
-    @Singleton
-    fun provideRetrofit(): Retrofit = Retrofit.Builder().build()
+class AuthInterceptor(private val tokens: TokenStore) : Interceptor {
+    override fun intercept(chain: Interceptor.Chain): Response =
+        chain.proceed(
+            chain.request().newBuilder()
+                .header("Authorization", "Bearer ${tokens.currentToken()}")
+                .build()
+        )
 }
 ```
 
-### 逐步迁移 {id="gradual-migration"}
+`TokenStore` 是一个由加密存储支持的 `single`，而 `AuthInterceptor` 会被添加到 `OkHttpClient` 的定义中（参见 [Android 库集成](/docs/reference/koin-android/binding-patterns)）。
 
-```kotlin
-// 第 1 步：在现有 Hilt 项目中为新功能添加 Koin
-@KoinViewModel
-class NewFeatureViewModel(
-    private val repository: NewFeatureRepository
-) : ViewModel()
+## 从 Hilt 或 Dagger 迁移 {id="migrating-from-hilt-or-dagger"}
 
-@Singleton
-class NewFeatureRepository(private val api: ApiService)
+注解映射、模块迁移及渐进式迁移均在 [从 Hilt 迁移](/docs/reference/koin-android/hilt-migration) 中有详细介绍。若要保留 `@Inject` 和 `jakarta.inject` 注解，请参阅 [JSR-330 注解](/docs/reference/koin-android/jsr330)。
 
-// 第 2 步：逐个迁移现有功能
-@Singleton
-class MigratedRepository(private val api: ApiService) : UserRepository
+## 相关内容 {id="related"}
 
-// 第 3 步：迁移完成后移除 Hilt
-```
-
-## 另请参阅 {id="see-also"}
-
-- **[作用域](/docs/reference/koin-core/scopes)** - 核心作用域概念
-- **[Android 作用域](/docs/reference/koin-android/scope)** - Android 生命周期作用域
-- **[测试](/docs/reference/koin-android/instrumented-testing)** - Android 测试指南
-- **[多模块应用](/docs/reference/koin-android/multi-module)** - 组织 Android 模块
+- [Android 作用域](/docs/reference/koin-android/scope)：Activity、Fragment、retained 以及 ViewModel 作用域的生命周期。
+- [在 Android 上启动 Koin](/docs/reference/koin-android/start)：`androidContext()`、日志记录和属性。
+- [故障排除](/docs/reference/koin-core/troubleshooting)：解析错误和循环依赖。
+- [延迟模块](/docs/reference/koin-core/lazy-modules)：减少应用启动时 Koin 的工作量。
+- [从 Hilt 迁移](/docs/reference/koin-android/hilt-migration)：将现有的 Hilt 应用迁移到 Koin。

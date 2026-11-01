@@ -4,6 +4,7 @@
 <primary-label ref="client-plugin"/>
 
 <var name="artifact_name" value="ktor-client-call-id"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.client.callId"/>
 <var name="package_name" value="io.ktor.client.plugins.callid"/>
 <var name="plugin_name" value="CallId"/>
 
@@ -21,28 +22,34 @@
 </tldr>
 
 <link-summary>
-%plugin_name% クライアントプラグインを使用すると、ユニークなコール ID を使用してクライアントリクエストをトレースできます。
+%plugin_name% クライアントプラグインを使用すると、一意のコール ID を使用してクライアントリクエストをトレースできます。
 </link-summary>
 
-%plugin_name% プラグインを使用すると、ユニークなコール ID を使用して、クライアントリクエストをエンドツーエンドでトレースできます。これは、リクエストがいくつのサービスを通過するかに関係なくコールを追跡し続ける必要があるマイクロサービスアーキテクチャにおいて特に有用です。
+%plugin_name% プラグインを使用すると、一意のコール ID を使ってクライアントリクエストをエンドツーエンドでトレースできます。リクエストがいくつのサービスを経由するかに関係なく呼び出しを追跡できるため、マイクロサービスアーキテクチャで特に役立ちます。
 
-呼び出しスコープのコルーチンコンテキストに、すでにコール ID が含まれている場合があります。デフォルトでは、プラグインは現在のコンテキストを使用してコール ID を取得し、`HttpHeaders.XRequestId` ヘッダーを使用して特定のコールのコンテキストにそれを追加します。
+呼び出し元のスコープには、すでにコルーチンコンテキスト内にコール ID が存在している場合があります。デフォルトでは、プラグインは現在のコンテキストを使用してコール ID を取得し、`HttpHeaders.XRequestId` ヘッダーを使用して特定の呼び出しのコンテキストに追加します。
 
-さらに、スコープにコール ID が含まれていない場合、新しいコール ID を生成して適用するようにプラグインを[設定](#configure)することもできます。
+さらに、スコープにコール ID がない場合でも、[プラグインを設定](#configure)して新しいコール ID を生成および適用できます。
 
 > サーバー側では、Ktor はクライアントリクエストをトレースするための [CallId](server-call-id.md) プラグインを提供しています。
 
 ## 依存関係の追加 {id="add_dependencies"}
 
 <p>
-    <code>%plugin_name%</code> を使用するには、ビルドスクリプトに <code>%artifact_name%</code> アーティファクトを含める必要があります。
+    <code>%plugin_name%</code> を使用するには、ビルドスクリプトに <code>%artifact_name%</code> アーティファクトを追加します。
 </p>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上記コードスニペットでは、Ktor の依存関係を指定するために <a href="server-dependencies.topic#using-version-catalog">Ktor バージョンカタログ</a> を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上記コードスニペットでは、Ktor の依存関係を指定するために <a href="server-dependencies.topic#using-version-catalog">Ktor バージョンカタログ</a> を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
@@ -52,15 +59,15 @@
 ## %plugin_name% のインストール {id="install_plugin"}
 
 <p>
-    <code>%plugin_name%</code> プラグインをアプリケーションに<a href="server-plugins.md#install">インストール</a>するには、指定された<Links href="/ktor/server-modules" summary="モジュールを使用すると、ルートをグループ化してアプリケーションを構造化できます。">モジュール</Links>内の <code>install</code> 関数に渡します。
-    以下のコードスニペットは、<code>%plugin_name%</code> をインストールする方法を示しています。
+    <code>%plugin_name%</code> プラグインをアプリケーションに<a href="server-plugins.md#install">インストール</a>するには、指定された<Links href="server-modules.md" summary="Modules allow you to structure your application by grouping routes.">モジュール</Links>内の <code>install</code> 関数に渡します。
+    以下の例は、<code>%plugin_name%</code> をインストールする方法を示しています。
 </p>
 <list>
     <li>
-        ... <code>embeddedServer</code> 関数の呼び出し内。
+        <code>embeddedServer()</code> 関数呼び出し内。
     </li>
     <li>
-        ... <code>Application</code> クラスの拡張関数である、明示的に定義された <code>module</code> 内。
+        <code>Application</code> クラスで明示的に定義された <code>module()</code> 拡張関数内。
     </li>
 </list>
 <Tabs>
@@ -74,11 +81,11 @@
 
 ## %plugin_name% の設定 {id="configure"}
 
-[CallIdConfig](https://api.ktor.io/ktor-client-call-id/io.ktor.client.plugins.callid/-call-id-config/index.html) クラスによって提供される %plugin_name% プラグインの設定では、コール ID を生成してコールコンテキストに追加することができます。
+[CallIdConfig](https://api.ktor.io/ktor-client-call-id/io.ktor.client.plugins.callid/-call-id-config/index.html) クラスによって提供される %plugin_name% プラグインの設定を使用すると、コール ID を生成して呼び出しコンテキストに追加できます。
 
 ### コール ID の生成 {id="generate-a-call-id"}
 
-以下のいずれかの方法で、特定のリクエストに対してコール ID を生成します。
+特定のリクエストに対して、次のいずれかの方法でコール ID を生成します。
 
 * デフォルトで有効になっている `useCoroutineContext` プロパティは、現在の `CoroutineContext` を使用してコール ID を取得するジェネレーターを追加します。この機能を無効にするには、`useCoroutineContext` を `false` に設定します。
 
@@ -90,7 +97,7 @@
 
 > Ktor サーバーでは、[CallId プラグイン](server-call-id.md)を使用して `CoroutineContext` にコール ID を追加します。
 
-* `generate()` 関数を使用すると、送信リクエストのコール ID を生成できます。コール ID の生成に失敗した場合は `null` を返します。
+* `generate()` 関数を使用すると、送信リクエスト用のコール ID を生成できます。コール ID の生成に失敗した場合は、`null` を返します。
 
  ```kotlin
  install(CallId) {
@@ -98,11 +105,11 @@
  }
  ```
 
-複数の方法を使用してコール ID を生成できます。その場合、最初の非 null 値が適用されます。
+コール ID を生成するために複数のメソッドを使用できます。この場合、最初の null 以外の値が適用されます。
 
 ### コール ID の追加 {id="add-a-call-id"}
 
-コール ID を取得した後、それをリクエストに追加するために以下のオプションを利用できます。
+コール ID を取得した後、リクエストに追加するための次のオプションが利用可能です。
 
 * `intercept()` 関数を使用すると、`CallIdInterceptor` を使用してリクエストにコール ID を追加できます。
 
@@ -114,7 +121,7 @@
  }
  ```
 
-* `addToHeader()` 関数は、指定されたヘッダーにコール ID を追加します。パラメータとしてヘッダーを受け取り、デフォルトは `HttpHeaders.XRequestId` です。
+* `addToHeader()` 関数は、指定されたヘッダーにコール ID を追加します。ヘッダーをパラメータとして受け取り、デフォルトは `HttpHeaders.XRequestId` です。
 
  ```kotlin
  install(CallId) {
@@ -124,7 +131,7 @@
 
 ## 例 {id="example"}
 
-以下の例では、Ktor クライアント用の `%plugin_name%` プラグインが、新しいコール ID を生成してヘッダーに追加するように設定されています。
+以下の例では、Ktor クライアント用の `%plugin_name%` プラグインを設定して、新しいコール ID を生成し、それをヘッダーに追加します。
 
  ```kotlin
  val client = HttpClient(CIO) {
@@ -135,9 +142,9 @@
  }
  ```
 
-プラグインはコルーチンコンテキストを使用してコール ID を取得しようとし、`generate()` 関数を利用して新しい ID を生成します。その後、最初の非 null のコール ID が `addToHeader()` 関数を使用してリクエストヘッダーに適用されます。
+このプラグインは、コルーチンコンテキストを使用してコール ID を取得し、`generate()` 関数を利用して新しいコール ID を生成します。その後、最初の null 以外のコール ID が `addToHeader()` 関数を使用してリクエストヘッダーに適用されます。
 
-Ktor サーバーでは、[サーバー用の CallId プラグイン](server-call-id.md)の [retrieve](server-call-id.md#retrieve) 関数を使用して、ヘッダーからコール ID を取得できます。
+Ktor サーバー側では、[サーバー用 CallId プラグイン](server-call-id.md)の [retrieve](server-call-id.md#retrieve) 関数を使用して、ヘッダーからコール ID を取得できます。
 
  ```kotlin
  install(CallId) {
@@ -145,6 +152,6 @@ Ktor サーバーでは、[サーバー用の CallId プラグイン](server-cal
  }
  ```
 
-このようにして、Ktor サーバーはリクエストの指定されたヘッダーから ID を取得し、コールの `callId` プロパティに適用します。
+このようにして、Ktor サーバーはリクエストの指定されたヘッダーから ID を取得し、それを呼び出しの `callId` プロパティに適用します。
 
 完全な例については、[client-call-id](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-call-id) を参照してください。

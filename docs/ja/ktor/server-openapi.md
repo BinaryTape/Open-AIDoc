@@ -3,12 +3,13 @@
 <primary-label ref="server-plugin"/>
 
 <var name="artifact_name" value="ktor-server-openapi"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.server.openapi"/>
 <var name="package_name" value="io.ktor.server.plugins.openapi"/>
 <var name="plugin_api_link" value="https://api.ktor.io/ktor-server-openapi/io.ktor.server.plugins.openapi/open-a-p-i.html"/>
 
 <tldr>
 <p>
-<b>必須の依存関係</b>: <code>io.ktor:%artifact_name%</code>
+<b>必要な依存関係</b>: <code>io.ktor:%artifact_name%</code>
 </p>
 <var name="example_name" value="json-kotlinx-openapi"/>
 <p>
@@ -18,40 +19,48 @@
     </a>
 </p>
 <p>
-    <b><Links href="/ktor/server-native" summary="Ktor supports Kotlin/Native and allows you to run a server without an additional runtime or virtual machine.">Nativeサーバー</Links>のサポート</b>: ✖️
+    <b><Links href="server-native.md" summary="KtorはKotlin/Nativeをサポートしており、追加のランタイムや仮想マシンなしでサーバーを実行できます。">ネイティブサーバー</Links>のサポート</b>: ✖️
 </p>
 </tldr>
 
 <link-summary>
-OpenAPIプラグインを使用すると、プロジェクトのOpenAPIドキュメントを生成できます。
+OpenAPIプラグインを使用すると、プロジェクト用のOpenAPIドキュメントを生成できます。
 </link-summary>
 
-Ktorを使用すると、OpenAPI仕様に基づいたOpenAPIドキュメントを提供できます。
+Ktorを使用すると、OpenAPI仕様に基づいてOpenAPIドキュメントを提供できます。
 
-OpenAPI仕様は、次のいずれかの方法で提供できます。
+OpenAPI仕様は、次のいずれかの方法で提供できます:
 
 * [既存のYAMLまたはJSONファイルを提供する](#static-openapi-file)。
-* [OpenAPIコンパイラ拡張およびランタイムAPIを使用して、ランタイムに仕様を生成する](#generate-runtime-openapi-metadata)。
+* [OpenAPIコンパイラ拡張とランタイムAPIを使用して、実行時に仕様を生成する](#generate-runtime-openapi-metadata)。
 
-どちらの場合も、OpenAPIプラグインはサーバー上で仕様を組み立て、HTMLとしてドキュメントをレンダリングします。
+どちらの場合も、OpenAPIプラグインがサーバー上で仕様を組み立て、ドキュメントをHTMLとしてレンダリングします。
 
 ## 依存関係の追加 {id="add_dependencies"}
 
-* OpenAPIドキュメントを提供するには、ビルドスクリプトに `%artifact_name%` アーティファクトを追加する必要があります。
+* OpenAPIドキュメントを提供するには、ビルドスクリプトに`%artifact_name%`アーティファクトを追加する必要があります:
 
   <Tabs group="languages">
       <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-          <code-block lang="Kotlin" code="              implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+          <code-block lang="Kotlin" code="              implementation(%ktor_version_catalog_name%)"/>
+          <note>
+              上記のコードスニペットでは、Ktorの依存関係を指定するために<a href="server-dependencies.topic#using-version-catalog">
+              Ktorバージョンカタログ</a>を使用しています。
+          </note>
       </TabItem>
       <TabItem title="Gradle (Groovy)" group-key="groovy">
-          <code-block lang="Groovy" code="              implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+          <code-block lang="Groovy" code="              implementation %ktor_version_catalog_name%"/>
+          <note>
+              上記のコードスニペットでは、Ktorの依存関係を指定するために<a href="server-dependencies.topic#using-version-catalog">
+              Ktorバージョンカタログ</a>を使用しています。
+          </note>
       </TabItem>
       <TabItem title="Maven" group-key="maven">
           <code-block lang="XML" code="              &lt;dependency&gt;&#10;                  &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                  &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                  &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;              &lt;/dependency&gt;"/>
       </TabItem>
   </Tabs>
 
-* オプションで、[コードジェネレーター](https://github.com/swagger-api/swagger-codegen-generators)をカスタマイズしたい場合は、`swagger-codegen-generators` 依存関係を追加します。
+* 必要に応じて、[コードジェネレーター](https://github.com/swagger-api/swagger-codegen-generators)をカスタマイズしたい場合は`swagger-codegen-generators`依存関係を追加します:
 
   <var name="group_id" value="io.swagger.codegen.v3"/>
   <var name="artifact_name" value="swagger-codegen-generators"/>
@@ -68,13 +77,13 @@ OpenAPI仕様は、次のいずれかの方法で提供できます。
       </TabItem>
   </Tabs>
 
-  `$swagger_codegen_version` は、`swagger-codegen-generators` アーティファクトの必要なバージョン（例：`%swagger_codegen_version%`）に置き換えることができます。
+  `$swagger_codegen_version`は、必要な`swagger-codegen-generators`アーティファクトのバージョン（例: `%swagger_codegen_version%`）に置き換えることができます。
 
-## 静的なOpenAPIファイルを使用する {id="static-openapi-file"}
+## 静的OpenAPIファイルの使用 {id="static-openapi-file"}
 
-既存の仕様からOpenAPIドキュメントを提供するには、OpenAPIドキュメントへのパスを指定して [`openAPI()`](%plugin_api_link%) 関数を使用します。
+既存の仕様からOpenAPIドキュメントを提供するには、OpenAPIドキュメントへのパスを指定して[`openAPI()`](%plugin_api_link%)関数を使用します。
 
-次の例では、`openapi` パスに `GET` エンドポイントを作成し、提供されたOpenAPI仕様ファイルからSwagger UIをレンダリングします。
+以下の例では、`openapi`パスに`GET`エンドポイントを作成し、提供されたOpenAPI仕様ファイルからSwagger UIをレンダリングします:
 
 ```kotlin
 import io.ktor.server.plugins.openapi.*
@@ -85,13 +94,13 @@ routing {
 }
 ```
 
-プラグインはまずアプリケーションのリソースから仕様を探します。見つからない場合は、`java.io.File` を使用してファイルシステムからの読み込みを試みます。
+プラグインはまずアプリケーションリソース内で仕様を検索します。見つからない場合は、`java.io.File`を使用してファイルシステムからのロードを試みます。
 
-## ランタイムOpenAPIメタデータを生成する {id="generate-runtime-openapi-metadata"}
+## ランタイムOpenAPIメタデータの生成 {id="generate-runtime-openapi-metadata"}
 
-静的ファイルに依存する代わりに、OpenAPIコンパイラプラグインとルートアノテーションによって生成されたメタデータを使用して、ランタイムにOpenAPI仕様を生成できます。
+静的ファイルに頼る代わりに、OpenAPIコンパイラプラグインとルートアノテーションによって生成されたメタデータを使用して、実行時にOpenAPI仕様を生成できます。
 
-このモードでは、OpenAPIプラグインはルーティングツリーから直接仕様を組み立てます。
+このモードでは、OpenAPIプラグインがルーティングツリーから直接仕様を組み立てます:
 
 ```kotlin
  openAPI(path = "openapi") {
@@ -102,7 +111,7 @@ routing {
 }
 ```
 
-これにより、アプリケーションの現在の状態を反映した、生成されたOpenAPIドキュメントに `/openapi` パスでアクセスできます。
+これにより、アプリケーションの現在の状態を反映した、生成されたOpenAPIドキュメントに`/openapi`パスからアクセスできます。
 
 > OpenAPIコンパイラ拡張およびランタイムAPIの詳細については、[OpenAPI仕様の生成](openapi-spec-generation.md)を参照してください。
 > 
@@ -110,13 +119,13 @@ routing {
 
 ## OpenAPIの設定 {id="configure-openapi"}
 
-`openAPI {}` 設定ブロックを使用すると、生成されるOpenAPIドキュメントおよびKtorがドキュメントをレンダリングする方法を設定できます。
+`openAPI {}`設定ブロックを使用すると、生成されるOpenAPIドキュメントと、Ktorがドキュメントをレンダリングする方法を設定できます。
 
 ### ドキュメントメタデータの設定 {id="configure-document-metadata"}
 
-設定ブロック内でトップレベルのOpenAPIメタデータを直接定義できます。
+トップレベルのOpenAPIメタデータは、設定ブロック内で直接定義できます。
 
-例えば、`info` を使用して一般的なAPI情報を指定したり、`tag()` を使用してタグとその説明を定義したりできます。
+たとえば、一般的なAPI情報を指定するには`info`を使用し、タグとその説明を定義するには`tag()`を使用します:
 
 ```kotlin
 openAPI("openapi") {
@@ -128,7 +137,7 @@ openAPI("openapi") {
 }
 ```
 
-また、サーバー、セキュリティ要件、再利用可能なコンポーネント、外部ドキュメント、仕様拡張など、他のトップレベルのOpenAPIプロパティも設定できます。
+また、サーバー、セキュリティ要件、再利用可能なコンポーネント、外部ドキュメント、仕様拡張など、他のトップレベルのOpenAPIプロパティを設定することもできます。
 
 > 利用可能なすべてのオプションについては、[`OpenAPIConfig`](https://api.ktor.io/ktor-server-openapi/io.ktor.server.plugins.openapi/-open-a-p-i-config/index.html) APIリファレンスを参照してください。
 >
@@ -136,9 +145,9 @@ openAPI("openapi") {
 
 ### ドキュメントレンダラーの設定 {id="configure-the-document-renderer"}
 
-デフォルトでは、ドキュメントは `StaticHtml2Codegen` を使用してレンダリングされます。
+デフォルトでは、ドキュメントは`StaticHtml2Codegen`を使用してレンダリングされます。
 
-別のレンダラーを使用するには、`codegen` プロパティに割り当てます。
+別のレンダラーを使用するには、`codegen`プロパティに割り当てます:
 
 ```kotlin
 routing {
@@ -148,6 +157,6 @@ routing {
 }
 ```
 
-> `StaticHtmlCodegen` および `StaticHtml2Codegen` は OpenAPI 3.0.x ドキュメントのみをサポートしています。これらを OpenAPI 3.1 ドキュメントで使用すると、不完全または不正確な HTML が生成される可能性があります。OpenAPI 3.1 の場合は、Swagger UI 5.x を備えた [`swaggerUI()`](server-swagger-ui.md) 関数を使用してください。OpenAPI プラグインの HTML レンダラーを引き続き使用する必要がある場合は、仕様を OpenAPI 3.0.3 のままにしてください。
+> `StaticHtmlCodegen`および`StaticHtml2Codegen`はOpenAPI 3.0.xドキュメントのみをサポートしています。これらをOpenAPI 3.1ドキュメントで使用すると、不完全または不正確なHTMLが生成される可能性があります。OpenAPI 3.1の場合は、Swagger UI 5.xとともに[`swaggerUI()`](server-swagger-ui.md)関数を使用してください。引き続きOpenAPIプラグインのHTMLレンダラーを使用する必要がある場合は、仕様をOpenAPI 3.0.3のままにしてください。
 >
 {style="note"}

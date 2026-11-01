@@ -237,6 +237,10 @@
         "link": "compose-popups"
       },
       {
+        "text": "kmp.compose-pdf",
+        "link": "compose-pdf"
+      },
+      {
         "text": "kmp.compose-test",
         "link": "compose-test"
       },
@@ -265,6 +269,10 @@
       {
         "text": "kmp.compose-accessibility",
         "link": "compose-accessibility"
+      },
+      {
+        "text": "kmp.compose-share-feature",
+        "link": "compose-share-feature"
       },
       {
         "text": "kmp.ios-specific-features",

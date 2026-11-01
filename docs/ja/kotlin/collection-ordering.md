@@ -1,30 +1,30 @@
-[//]: # (title: 順序付け)
+[//]: # (title: 並び替え)
 
-要素の順序は、特定のコレクション型において重要な側面です。
-例えば、同じ要素を持つ 2 つのリストであっても、要素の順序が異なれば、それらは等価ではありません。
+要素の順序は、特定のコレクション型において重要な要素です。
+例えば、同じ要素を持つ2つのリストであっても、要素の並び順が異なっていれば等価とはみなされません。
 
-Kotlin では、オブジェクトの順序をいくつかの方法で定義できます。
+Kotlinでは、オブジェクトの順序をいくつかの方法で定義できます。
 
-まず、「自然順序（natural order）」があります。これは [`Comparable`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-comparable/index.html) インターフェースの実装に対して定義されます。自然順序は、他に順序が指定されていない場合のソートに使用されます。
+まず、*自然順序*（natural order）があります。これは、[`Comparable`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-comparable/index.html) インターフェースの実装に対して定義されます。自然順序は、他の順序が指定されていない場合のソートに使用されます。
 
-ほとんどの組み込み型は比較可能です：
+ほとんどの組み込み型は比較可能（comparable）です：
 
-*   数値型は伝統的な数値の順序を使用します：`1` は `0` より大きく、`-3.4f` は `-5f` より大きい、など。
-*   `Char` と `String` は [辞書順（lexicographical order）](https://en.wikipedia.org/wiki/Lexicographical_order) を使用します：`b` は `a` より大きく、`world` は `hello` より大きくなります。
+* 数値型は従来の数値の順序を使用します：`1` は `0` より大きく、`-3.4f` は `-5f` より大きくなります。
+* `Char` と `String` は[辞書順](https://en.wikipedia.org/wiki/Lexicographical_order)を使用します：`b` は `a` より大きく、`world` は `hello` より大きくなります。
 
-ユーザー定義型に自然順序を定義するには、その型に `Comparable` を実装させます。
-これには `compareTo()` 関数の実装が必要です。`compareTo()` は、同じ型の別のオブジェクトを引数として受け取り、どちらのオブジェクトが大きいかを示す整数値を返す必要があります：
+ユーザー定義型に自然順序を定義するには、その型で `Comparable` を実装します。
+これには `compareTo()` 関数の実装が必要です。`compareTo()` は同じ型の別のオブジェクトを引数として受け取り、どちらのオブジェクトが大きいかを示す整数値を返す必要があります：
 
-*   正の値は、レシーバーオブジェクトの方が大きいことを示します。
-*   負の値は、引数よりも小さいことを示します。
-*   ゼロは、オブジェクトが等しいことを示します。
+* 正の値はレシーバーオブジェクトの方が大きいことを示します。
+* 負の値は引数よりも小さいことを示します。
+* ゼロはオブジェクト同士が等しいことを示します。
 
-以下は、メジャー（major）パートとマイナー（minor）パートで構成されるバージョンを順序付けするためのクラスです。
+以下は、メジャーバージョンとマイナーバージョンから構成されるバージョンを順序付けるためのクラスです。
 
 ```kotlin
 class Version(val major: Int, val minor: Int): Comparable<Version> {
     override fun compareTo(other: Version): Int = when {
-        this.major != other.major -> this.major compareTo other.major // 中置形式での compareTo()
+        this.major != other.major -> this.major compareTo other.major // 中置形式の compareTo() 
         this.minor != other.minor -> this.minor compareTo other.minor
         else -> 0
     }
@@ -37,11 +37,11 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.6"}
 
-「カスタム順序（custom orders）」を使用すると、任意の型のインスタンスを好きなようにソートできます。
-特に、比較可能（comparable）ではないオブジェクトに対して順序を定義したり、比較可能な型に対して自然順序以外の順序を定義したりできます。
-ある型にカスタム順序を定義するには、その型のための [`Comparator`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-comparator/index.html) を作成します。
-`Comparator` には `compare()` 関数が含まれており、クラスの 2 つのインスタンスを受け取り、それらの比較結果を整数で返します。
-結果の解釈は、上述の `compareTo()` の結果と同じです。
+*カスタム*順序（Custom order）を使用すると、任意の型のインスタンスを好みの方法でソートできます。
+特に、比較可能でないオブジェクトに対して順序を定義したり、比較可能な型に対して自然順序以外の順序を定義したりできます。
+ある型にカスタム順序を定義するには、その型に対する [`Comparator`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-comparator/index.html) を作成します。
+`Comparator` は `compare()` 関数を含んでおり、クラスの2つのインスタンスを受け取ってそれらの比較結果を整数で返します。
+この結果は、上で説明した `compareTo()` の結果と同じように解釈されます。
 
 ```kotlin
 fun main() {
@@ -51,13 +51,14 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-`lengthComparator` を使用することで、デフォルトの辞書順ではなく、長さによって文字列を並べ替えることができます。
+`lengthComparator` を使用することで、デフォルトの辞書順ではなく、文字列をその長さ順に並べ替えることができます。
 
-`Comparator` を定義するより短い方法は、標準ライブラリの [`compareBy()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.comparisons/compare-by.html) 関数を使用することです。`compareBy()` は、インスタンスから `Comparable` な値を生成するラムダ関数を受け取り、その生成された値の自然順序としてカスタム順序を定義します。
+`Comparator` をより簡潔に定義する方法として、標準ライブラリの [`compareBy()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.comparisons/compare-by.html) 関数があります。
+`compareBy()` はインスタンスから `Comparable` な値を生成するラムダ関数を受け取り、生成された値の自然順序としてカスタム順序を定義します。
 
-`compareBy()` を使用すると、上記の例の長さコンパレータは以下のようになります：
+`compareBy()` を使用すると、上記の例の長さ比較用のコンパレータは次のようになります：
 
 ```kotlin
 fun main() {
@@ -66,10 +67,10 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
 複数の基準に基づいて順序を定義することもできます。
-例えば、文字列を長さでソートし、長さが同じ場合はアルファベット順でソートするには、次のように記述できます：
+例えば、文字列を長さ順にソートし、長さが等しい場合はアルファベット順にソートするには、次のように記述できます：
 
 ```kotlin
 fun main() {
@@ -87,11 +88,11 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-複数の基準によるソートは一般的なシナリオであるため、Kotlin 標準ライブラリは、二次的なソート規則を追加するために使用できる [`.thenBy()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.comparisons/then-by.html) 関数を提供しています。
+複数の基準によるソートは一般的なシナリオであるため、Kotlin標準ライブラリには2番目のソート規則を追加するために使用できる [`.thenBy()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.comparisons/then-by.html) 関数が用意されています。
 
-例えば、`compareBy()` と `.thenBy()` を組み合わせて、前の例と同じように文字列をまず長さでソートし、次にアルファベット順でソートすることができます：
+例えば、`compareBy()` と `.thenBy()` を組み合わせることで、前の例と同様に、まず文字列を長さ順にソートし、次にアルファベット順にソートすることができます：
 
 ```kotlin
 fun main() {
@@ -104,17 +105,17 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-Kotlin のコレクションパッケージには、自然順序、カスタム順序、さらにはランダムな順序でコレクションをソートするための関数が用意されています。
+Kotlinのコレクションパッケージには、コレクションを自然順序、カスタム順序、さらにはランダムな順序でソートするための関数が用意されています。
 このページでは、[読み取り専用](collections-overview.md#collection-types)コレクションに適用されるソート関数について説明します。
-これらの関数は、元のコレクションの要素を要求された順序で保持する新しいコレクションとして結果を返します。
-[ミュータブル（変更可能）](collections-overview.md#collection-types)なコレクションをその場でソートする関数については、[リスト固有の操作](list-operations.md#sort)を参照してください。
+これらの関数は、要求された順序で元のコレクションの要素を含む新しいコレクションとして結果を返します。
+[可変](collections-overview.md#collection-types)コレクションをその場でソートする関数については、[List特有の操作](list-operations.md#sort)を参照してください。
 
 ## 自然順序 {id="natural-order"}
 
-基本となる関数 [`.sorted()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/sorted.html) および [`.sortedDescending()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/sorted-descending.html) は、自然順序に従って昇順および降順にソートされたコレクションの要素を返します。
-これらの関数は `Comparable` 要素のコレクションに適用されます。
+基本的な関数である [`.sorted()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/sorted.html) および [`.sortedDescending()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/sorted-descending.html) は、コレクションの要素を自然順序に従って昇順および降順にソートして返します。
+これらの関数は、`Comparable` な要素のコレクションに適用されます。
 
 ```kotlin
 fun main() {
@@ -126,12 +127,12 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
 ## カスタム順序 {id="custom-orders"}
-
-カスタム順序でのソートや、比較可能ではないオブジェクトのソートには、[`.sortedBy()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/sorted-by.html) および [`.sortedByDescending()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/sorted-by-descending.html) 関数があります。
-これらは、コレクションの要素を `Comparable` な値にマッピングするセレクター関数を受け取り、それらの値の自然順序でコレクションをソートします。
+ 
+カスタム順序でソートする場合や、比較可能でないオブジェクトをソートする場合は、[`.sortedBy()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/sorted-by.html) および [`.sortedByDescending()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/sorted-by-descending.html) 関数があります。
+これらは、コレクションの要素を `Comparable` な値にマッピングするセレクタ関数を受け取り、その値の自然順序でコレクションをソートします。
 
 ```kotlin
 fun main() {
@@ -145,11 +146,11 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-コレクションのソートにカスタム順序を定義するには、独自の `Comparator` を提供できます。
+コレクションのソート用にカスタム順序を定義するには、独自の `Comparator` を渡すことができます。
 これを行うには、`Comparator` を渡して [`.sortedWith()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/sorted-with.html) 拡張関数を呼び出します。
-この関数を使用して文字列を長さでソートすると、以下のようになります：
+この関数を使用すると、文字列を長さ順にソートする処理は次のようになります：
 
 ```kotlin
 fun main() {
@@ -159,11 +160,11 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-## ソート順のチェック {id="check-sorted-order"}
+## ソート済み順序のチェック {id="check-sorted-order"}
 
-以下の拡張関数を使用して、要素がすでに指定された順序に従っているかどうかを確認できます：
+要素が指定された順序に既に従っているかどうかを確認するには、以下の拡張関数を使用できます：
 
 * `.isSorted()`
 * `.isSortedDescending()`
@@ -171,25 +172,24 @@ fun main() {
 * `.isSortedBy(selector)`
 * `.isSortedByDescending(selector)`
 
-これらの拡張関数は、要素が指定された順序である場合、または要素が 2 つ未満の場合に `true` を返します。
-順序に沿わないペアが見つかると、すぐに `false` を返し、チェックを停止します。
+これらの拡張関数は、要素が指定された順序で並んでいる場合、または要素が2個未満の場合に `true` を返します。
+順序が崩れているペアが見つかり次第、チェックを停止して `false` を返します。
 
-`HashSet` のようにイテレーション（反復）の順序が保証されていないコレクションでは、呼び出しごとに結果が異なる場合があります。
-同様のことが、一貫した順序で要素を生成しないシーケンスにも当てはまります。
-呼び出し間で同じ結果を得るには、`List` などのイテレーション順序が保証されているコレクションに対してのみ、これらの関数を使用してください。
+`HashSet` のように反復順序が保証されていないコレクションの場合、呼び出しごとに結果が異なる可能性があります。
+一貫した順序で要素を生成しないシーケンスについても同様です。
+呼び出し間で同じ結果を得るには、`List` など反復順序が保証されているコレクションに対してのみこれらの関数を使用してください。
 
-`Double` および `Float` の値をチェックする場合、これらの関数は `NaN` を他のどの値よりも大きく、`-0.0` を `0.0` よりも小さいものとして扱います。
-さらに、`.isSortedBy()` および `.isSortedByDescending()` 関数は、セレクターの結果が `null` である場合を、非 `null` のどの値よりも小さいものとして扱います。
+`Double` および `Float` の値をチェックする場合、これらの関数は `NaN` を他のどの値よりも大きいものとして扱い、`-0.0` を `0.0` よりも小さいものとして扱います。
+さらに、`.isSortedBy()` および `.isSortedByDescending()` 関数は、セレクタの結果が `null` である場合、非nullの値よりも小さいものとして扱います。
 
-これらの関数をシーケンス（sequence）に対して呼び出す場合、その操作は「終端操作（terminal operation）」となります。
-別のシーケンスを返すのではなく、シーケンスを消費して `Boolean` 値を生成します。
+シーケンスに対してこれらの関数を呼び出した場合、その操作は終端操作（terminal operation）になります。別のシーケンスを返すのではなく、シーケンスを消費して `Boolean` 値を生成します。
 
-> これらのソート順チェック関数は、配列（arrays）、プリミティブ配列（primitive arrays）、および符号なし配列（unsigned arrays）でも利用可能です。
-> 符号なし配列とその操作は[実験的（Experimental）](components-stability.md#stability-levels-explained)であり、`@ExperimentalUnsignedTypes` アノテーションによるオプトインが必要です。
+> これらのソート順序関数は、配列、プリミティブ配列、符号なし配列でも利用できます。
+> 符号なし配列およびそれらに対する操作は[実験的（Experimental）](components-stability.md#stability-levels-explained)であり、`@ExperimentalUnsignedTypes` アノテーションによるオプトインが必要です。
 > 
 {style="note"}
 
-以下は、`.isSorted()` および `.isSortedBy()` 関数を使用してソート順をチェックする例です：
+以下は、`.isSorted()` および `.isSortedBy()` 関数を使用してソート順序をチェックする例です：
 
 ```kotlin
 data class User(val name: String, val age: Int)
@@ -219,7 +219,7 @@ fun main() {
 
 ## 逆順 {id="reverse-order"}
 
-[`.reversed()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/reversed.html) 関数を使用すると、コレクションを逆順で取得できます。 
+[`.reversed()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/reversed.html) 関数を使用すると、逆順になったコレクションを取得できます。
 
 ```kotlin
 fun main() {
@@ -229,12 +229,12 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
 `.reversed()` 拡張関数は、要素のコピーを含む新しいコレクションを返します。
-そのため、後で元のコレクションを変更しても、以前に取得した `.reversed()` の結果には影響しません。
+そのため、後から元のコレクションを変更しても、以前に取得した `.reversed()` の結果には影響しません。
 
-もう一つの逆転関数である [`.asReversed()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/as-reversed.html) は、同じコレクションインスタンスの逆順の「ビュー（view）」を返します。そのため、元のリストが変更されない予定であれば、`.reversed()` よりも軽量で好ましい場合があります。
+もう一つの反転関数である [`.asReversed()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/as-reversed.html) は、同じコレクションインスタンスの反転されたビューを返します。そのため、元のリストが変更されない場合は、`.reversed()` よりも軽量で望ましい場合があります。
 
 ```kotlin
 fun main() {
@@ -245,9 +245,9 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-元のリストがミュータブルな場合、そのすべての変更が逆順ビューに反映され、その逆も同様です。
+元のリストが可変である場合、その変更はすべて反転されたビューに反映され、その逆も同様です。
 
 ```kotlin
 fun main() {
@@ -260,14 +260,14 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-ただし、リストの可変性が不明な場合や、ソースがリストでない場合は、結果が将来変更されないコピーである `.reversed()` の方が好ましいです。
+ただし、リストの可変性が不明な場合や、元のソースがそもそもリストではない場合は、結果が将来変更されないコピーである `.reversed()` の方が適しています。
 
-## ランダム順 {id="random-order"}
+## ランダムな順序 {id="random-order"}
 
 最後に、コレクションの要素をランダムな順序で含む新しい `List` を返す関数 [`.shuffled()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/shuffled.html) があります。
-引数なしで呼び出すか、[`Random`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.random/-random/index.html) オブジェクトを指定して呼び出すことができます。
+引数なしで呼び出すことも、[`Random`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.random/-random/index.html) オブジェクトを渡して呼び出すこともできます。
 
 ```kotlin
 fun main() {
@@ -277,4 +277,4 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}

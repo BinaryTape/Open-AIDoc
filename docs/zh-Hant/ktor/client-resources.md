@@ -5,14 +5,15 @@
 
 <var name="plugin_name" value="Resources"/>
 <var name="artifact_name" value="ktor-client-resources"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.client.resources"/>
 
 <tldr>
 <p>
-<b>必要相依性</b>：<code>io.ktor:%artifact_name%</code>
+<b>必要相依性</b>: <code>io.ktor:%artifact_name%</code>
 </p>
 <var name="example_name" value="client-type-safe-requests"/>
 <p>
-    <b>程式碼範例</b>：
+    <b>程式碼範例</b>:
     <a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/%example_name%">
         %example_name%
     </a>
@@ -20,15 +21,15 @@
 </tldr>
 
 <link-summary>
-了解如何使用 Resources 外掛程式發送型別安全請求。
+了解如何使用 Resources 外掛程式發起型別安全請求。
 </link-summary>
 
-Ktor 提供 `%plugin_name%` 外掛程式，用於發送型別安全[用戶端請求](client-requests.md)。
-為此，您需要定義代表伺服器端點的類別，並使用 `@Resource` 關鍵字對其進行註解。
+Ktor 提供了 `%plugin_name%` 外掛程式來發起型別安全[用戶端請求](client-requests.md)。
+為此，您需要定義代表伺服器端點的類別，並使用 `@Resource` 關鍵字加上註解。
 
 資源類別使用 `kotlinx.serialization` 將其屬性轉換為路徑與查詢參數。
 
-> 在伺服器端，Ktor 提供[型別安全路由](server-resources.md)。
+> 在伺服器端，Ktor 提供了[型別安全路由](server-resources.md)。
 >
 {style="tip"}
 
@@ -42,26 +43,34 @@ Ktor 提供 `%plugin_name%` 外掛程式，用於發送型別安全[用戶端請
 ### 新增 %plugin_name% 相依性 {id="add_plugin_dependencies"}
 
 <p>
-    若要使用 <code>%plugin_name%</code>，請在建置指令碼中新增 <code>%artifact_name%</code> 構件：
+    若要使用 <code>%plugin_name%</code>，請將 <code>%artifact_name%</code> 構件新增至您的組建指令碼中：
 </p>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上述程式碼片段使用 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 版本目錄 (version catalog)</a> 來指定 Ktor 相依性。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上述程式碼片段使用 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 版本目錄 (version catalog)</a> 來指定 Ktor 相依性。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
     </TabItem>
 </Tabs>
 <tip>
-    若要進一步了解 Ktor 用戶端所需的構件，請參閱 <Links href="/ktor/client-dependencies" summary="了解如何向現有專案新增用戶端相依性。">新增用戶端相依性</Links>。
+    若要進一步了解 Ktor 用戶端所需的構件，請參閱<Links href="client-dependencies.md" summary="了解如何將用戶端相依性新增至現有專案。">新增用戶端相依性</Links>。
 </tip>
 
 ## 安裝 %plugin_name% {id="install_plugin"}
 
-若要安裝 `%plugin_name%` 外掛程式，請將其傳遞給[用戶端配置區塊](client-create-and-configure.md#configure-client)內的 `install` 函式：
+若要安裝 `%plugin_name%` 外掛程式，請在[用戶端設定區塊](client-create-and-configure.md#configure-client)中將其傳入 `install` 函式：
 
 ```kotlin
 import io.ktor.client.*
@@ -75,12 +84,12 @@ val client = HttpClient(CIO) {
 
 ## 建立資源類別 {id="resource_classes"}
 
-每個資源類別都應具有 `@Resource` 註解。
-下面我們將查看幾個資源類別的範例 —— 定義單一路徑區段、查詢與路徑參數等。
+每個資源類別都應包含 `@Resource` 註解。
+接下來，我們將探討幾個資源類別的範例——定義單一路徑片段、查詢與路徑參數等。
 
 ### 資源 URL {id="resource_url"}
 
-下列範例示範如何定義 `Articles` 類別，該類別指定了回應 `/articles` 路徑的資源。
+以下範例示範如何定義 `Articles` 類別，以指定在 `/articles` 路徑上做出回應的資源。
 
 ```kotlin
 import io.ktor.resources.*
@@ -89,19 +98,19 @@ import io.ktor.resources.*
 class Articles()
 ```
 
-### 具備查詢參數的資源 {id="resource_query_param"}
+### 具有查詢參數的資源 {id="resource_query_param"}
 
-下方的 `Articles` 類別具有 `sort` 字串屬性，該屬性充當[查詢參數](server-requests.md#query_parameters)，並允許您定義一個回應以下路徑且帶有 `sort` 查詢參數的資源：`/articles?sort=new`。
+下方的 `Articles` 類別具有 `sort` 字串屬性，該屬性可作為[查詢參數](server-requests.md#query_parameters)，並允許您定義一個在以下路徑附帶 `sort` 查詢參數時做出回應的資源：`/articles?sort=new`。
 
 ```kotlin
 @Resource("/articles")
 class Articles(val sort: String? = "new")
 ```
 
-### 具備巢狀類別的資源 {id="resource_nested"}
+### 包含巢狀類別的資源 {id="resource_nested"}
 
-您可以透過巢狀類別來建立包含多個路徑區段的資源。請注意，在此情況下，巢狀類別應具備一個型別為外部類別的屬性。
-下方的範例顯示了回應 `/articles/new` 路徑的資源。
+您可以透過巢狀類別來建立包含多個路徑片段的資源。請注意，在這種情況下，巢狀類別應包含一個具有外層類別型別的屬性。
+以下範例示範了一個在 `/articles/new` 路徑上做出回應的資源。
 
 ```kotlin
 @Resource("/articles")
@@ -111,9 +120,9 @@ class Articles() {
 }
 ```
 
-### 具備路徑參數的資源 {id="resource_path_param"}
+### 具有路徑參數的資源 {id="resource_path_param"}
 
-下列範例展示了如何新增[巢狀](#resource_nested)的 `{id}` 整數[路徑參數](server-routing.md#path_parameter)，該參數會配對路徑區段並將其擷取為名為 `id` 的參數。
+以下範例示範如何新增[巢狀](#resource_nested) `{id}` 整數[路徑參數](server-routing.md#path_parameter)，該參數會比對路徑片段並將其擷取為名為 `id` 的參數。
 
 ```kotlin
 @Resource("/articles")
@@ -123,11 +132,11 @@ class Articles() {
 }
 ```
 
-例如，此資源可用於回應 `/articles/12`。
+例如，此資源可用於在 `/articles/12` 上做出回應。
 
 ### 範例：用於 CRUD 操作的資源 {id="example_crud"}
 
-下列範例建立了用於 CRUD 操作的 `Articles` 資源：
+以下範例建立了用於 CRUD 操作的 `Articles` 資源：
 
 ```kotlin
 @Resource("/articles")
@@ -143,19 +152,19 @@ class Articles() {
 }
 ```
 
-此資源可用於列出所有文章、發佈新文章，以及編輯現有文章。
+此資源可用於列出所有文章、發布新文章以及編輯現有文章。
 
-下一節將示範如何使用此資源[發送型別安全請求](#make_requests)。
+下一節將示範如何使用此資源[發起型別安全請求](#make_requests)。
 
-> 若要查看完整範例，請參閱 [client-type-safe-requests](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-type-safe-requests)。
+> 如需完整範例，請參閱 [client-type-safe-requests](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-type-safe-requests)。
 >
 {style="tip"}
 
-## 發送型別安全請求 {id="make_requests"}
+## 發起型別安全請求 {id="make_requests"}
 
-若要對具備型別的資源[發送請求](client-requests.md)，請將資源類別執行個體傳遞給請求函式，例如 `request()`、`get()`、`post()` 或 `put()`。
+若要對型別化資源[發起請求](client-requests.md)，請將資源類別執行個體傳遞給請求函式，例如 `request()`、`get()`、`post()` 或 `put()`。
 
-下列範例對 `/articles` 路徑發送請求：
+以下範例發起對 `/articles` 路徑的請求：
 
 ```kotlin
 @Resource("/articles")
@@ -172,7 +181,7 @@ fun main() {
 }
 ```
 
-下列範例對[範例：用於 CRUD 操作的資源](#example_crud)中建立的 `Articles` 資源發送具備型別的請求。
+以下範例對在[範例：用於 CRUD 操作的資源](#example_crud)中建立的 `Articles` 資源發起型別化請求。
 
 ```kotlin
 fun main() {
@@ -197,7 +206,7 @@ fun main() {
 }
 ```
 
-[`defaultRequest()`](client-default-request.md) 函式用於為所有請求指定預設 URL。
+[`defaultRequest()`](client-default-request.md) 函式為所有請求指定預設 URL。
 
 > 在開發用戶端外掛程式或檢測工具時，您可以透過 `RESOURCE` 請求屬性存取用於型別安全請求的資源執行個體：
 >  ```kotlin
@@ -208,6 +217,6 @@ fun main() {
 > 
 {style="tip"}
 
-> 若要查看完整範例，請參閱 [client-type-safe-requests](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-type-safe-requests)。
+> 如需完整範例，請參閱 [client-type-safe-requests](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-type-safe-requests)。
 >
 {style="tip"}

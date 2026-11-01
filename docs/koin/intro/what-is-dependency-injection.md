@@ -4,11 +4,11 @@ title: 什么是依赖注入？
 
 # 什么是依赖注入？
 
-依赖注入 (Dependency Injection，简称 DI) 是一种设计模式，在这种模式下，对象从外部源接收其依赖项，而不是在内部创建它们。这促进了松耦合、更好的可测试性以及更整洁的代码架构。
+依赖注入 (Dependency Injection，简称 DI) 是一种设计模式：对象从外部接收它所需要的对象，而不是自行创建它们。本文在不依赖任何框架的前提下解释该模式，并展示 Koin 等 DI 容器在其中的作用。如果你已经了解 DI，可以直接阅读[核心概念](/docs/intro/core-concepts)。
 
-## 什么是依赖项？ {id="what-is-a-dependency"}
+## 什么是依赖？ {id="what-is-a-dependency"}
 
-依赖项是另一个对象正常运行所需的任何对象。例如，`Car`（汽车）依赖于 `Engine`（发动机）才能行驶。
+依赖是指一个对象完成其工作所需要的另一个对象。例如，`Car` 需要 `Engine` 才能行驶。
 
 ### 不使用依赖注入 {id="without-dependency-injection"}
 
@@ -20,7 +20,7 @@ class Engine {
 }
 
 class Car {
-    private val engine = Engine()  // Car 自行创建发动机
+    private val engine = Engine() // Car 自行创建 engine
 
     fun drive() {
         engine.start()
@@ -29,151 +29,99 @@ class Car {
 }
 ```
 
-**这种方法存在的问题：**
-- `Car` 与特定的 `Engine` 实现紧耦合。
-- 难以对 `Car` 进行独立测试。
-- 难以更换发动机类型（电动、柴油等）。
-- `Car` 控制着 `Engine` 的生命周期。
+这种方式可以运行，但存在以下代价：
+
+- **紧密耦合**：`Car` 与单一的 `Engine` 实现绑定。
+- **难以测试**：无法使用假（fake）引擎来测试 `Car`。
+- **难以变更**：若要换成电动引擎，就必须修改 `Car` 的代码。
+- **生命周期位置错误**：由 `Car` 决定 `Engine` 何时创建以及存在多少个实例。
 
 ### 使用依赖注入 {id="with-dependency-injection"}
 
 ```kotlin
-class Car(private val engine: Engine) {  // Engine 被注入
+class Car(private val engine: Engine) {
     fun drive() {
         engine.start()
         println("Car is driving")
     }
 }
 
-// 现在我们可以轻松提供不同的发动机
 val gasolineCar = Car(GasEngine())
 val electricCar = Car(ElectricEngine())
 ```
 
-**好处：**
-- `Car` 不知道 `Engine` 是如何创建的。
-- 易于使用模拟 (Mock) 发动机进行测试。
-- 灵活——可以更换实现。
-- 构造函数中可见清晰的依赖项。
+`Car` 不再需要知道 `Engine` 是如何构建的。你可以传入任意实现（包括测试中的模拟实现），并且构造函数能清晰表明 `Car` 需要什么。
 
-## 提供依赖项的三种方式 {id="three-ways-to-provide-dependencies"}
+## 提供依赖项的方式 {id="ways-to-provide-dependencies"}
 
-### 1. 构造函数注入（推荐） {id="1-constructor-injection-recommended"}
+### 构造函数注入 {id="constructor-injection"}
 
-依赖项通过构造函数传递：
+依赖项作为构造函数形参传入：
 
 ```kotlin
 class UserRepository(
     private val database: Database,
-    private val apiClient: ApiClient
+    private val apiClient: ApiClient,
 ) {
-    fun getUser(id: String): User {
-        return database.query(id) ?: apiClient.fetchUser(id)
-    }
+    fun getUser(id: String): User =
+        database.query(id) ?: apiClient.fetchUser(id)
 }
 ```
 
-**优点：**
-- 依赖项是显式且必需的。
-- 不可变（使用 `val`）。
-- 易于测试。
-- 依赖图清晰。
+依赖项是显式的、必需的，并且可以是不可变的 (`val`)。无需借助任何框架即可创建和测试该类。这是默认推荐使用的方法。
 
-**使用 Koin：**
+### 字段注入 {id="field-injection"}
 
-```kotlin
-val appModule = module {
-    single<Database>()
-    single<ApiClient>()
-    single<UserRepository>()  // Koin 自动装配依赖项
-}
-```
-
-:::info
-构造函数注入是 Koin 中**首选的方法**。它使您的代码具有可测试性，且在单元测试中无需使用 Koin。
-:::
-
-### 2. 字段注入 {id="2-field-injection"}
-
-依赖项被注入到类属性中：
+在对象创建后将依赖项赋值给属性。当对象由框架创建且你无法控制其构造函数时，就需要使用这种方式，例如 Android 的 `Activity`：
 
 ```kotlin
 class UserActivity : AppCompatActivity() {
-    // 延迟注入 - 实例在首次访问时创建
-    private val viewModel: UserViewModel by viewModel()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        viewModel.loadUser()  // ViewModel 实例在此处创建
-    }
+    private val viewModel: UserViewModel by viewModel() // 首次访问时由 Koin 填充
 }
 ```
 
-**适用场景：**
-- 无法控制构造过程的 Android 框架类（Activity、Fragment、Service）。
-- 无法使用构造函数注入时。
+请仅在这些框架入口点使用字段注入。在入口点之下的层级，均应使用构造函数注入。
 
-**使用 Koin：**
+### 方法注入 {id="method-injection"}
 
-```kotlin
-// 延迟注入
-val presenter: Presenter by inject()
-
-// 立即注入
-val presenter: Presenter = get()
-```
-
-### 3. 方法注入 {id="3-method-injection"}
-
-依赖项通过方法传递（较不常见）：
+将依赖项直接传递给需要它的方法：
 
 ```kotlin
 class ReportGenerator {
     fun generateReport(data: DataSource) {
-        // 使用 data 生成报告
+        ...
     }
 }
 ```
 
-**适用场景：**
-- 可选依赖项。
-- 在对象生命周期内会发生变化的依赖项。
-- 回调模式。
+这种方式适用于每次调用都会发生变化的依赖项，或者仅有单个方法会用到的依赖项。
 
-## 手动 vs 自动依赖注入 {id="manual-vs-automated-dependency-injection"}
+## 手动与自动化依赖注入 {id="manual-and-automated-dependency-injection"}
 
-### 手动 DI 的问题 {id="the-problem-with-manual-di"}
+### 手动装配 {id="wiring-by-hand"}
 
-随着应用程序的增长，手动管理依赖项变得非常复杂：
+你可以在不使用任何库的情况下应用 DI，完全由自己构建对象图：
 
 ```kotlin
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // 手动创建整个依赖图
         val database = Database()
         val apiClient = ApiClient()
         val userRepository = UserRepository(database, apiClient)
         val authRepository = AuthRepository(database, apiClient)
         val userService = UserService(userRepository, authRepository)
         val viewModel = UserViewModel(userService)
-
-        // 最终才能使用 viewModel...
     }
 }
 ```
 
-**问题：**
-- 在各 Activity/Fragment 之间存在重复代码。
-- 容易在依赖顺序上出错。
-- 随着应用增长难以维护。
-- 难以管理生命周期（单例、作用域对象）。
-- 缺乏集中式配置。
+随着应用规模的增长，这类代码会在许多地方重复出现；每当构造函数发生变动时都必须更新，并且无法控制每个对象的存活周期。
 
-### 容器模式（手动方法） {id="the-container-pattern-manual-approach"}
+### 手写容器 {id="a-container-written-by-hand"}
 
-开发者通常会创建一个容器来集中处理对象的创建：
+通常下一步是引入一个容器对象来集中管理对象的创建：
 
 ```kotlin
 object AppContainer {
@@ -188,24 +136,19 @@ object AppContainer {
     )
 }
 
-// 用法
 class MainActivity : AppCompatActivity() {
     private val viewModel = AppContainer.createUserViewModel()
 }
 ```
 
-**仍然存在的问题：**
-- 手动装配依赖项。
-- 没有自动生命周期管理。
-- 全局状态（单例容器）。
-- 对于复杂的依赖图仍然存在重复操作。
+这消除了代码重复，但你仍然需要编写并维护每一次构造函数调用；对于超出“单一实例”或“全新实例”之外的生命周期（例如每个屏幕一个实例、每个会话一个实例），仍需要编写更多手动代码。
 
-### Koin 如何解决这一问题 {id="how-koin-solves-this"}
+### DI 容器 {id="a-di-container"}
 
-Koin 提供自动依赖解析，您可以选择使用 **DSL 或注解**：
+DI 库可以实现容器的自动化。你只需声明存在哪些类以及它们的存活周期，库便会自动构建对象图。在 Koin 中：
 
+**编译器插件 DSL**
 ```kotlin
-// 一次性定义依赖项
 val appModule = module {
     single<Database>()
     single<ApiClient>()
@@ -214,210 +157,163 @@ val appModule = module {
     single<UserService>()
     viewModel<UserViewModel>()
 }
+```
 
-// 启动一次 Koin
-class MyApplication : Application() {
-    override fun onCreate() {
-        super.onCreate()
-        startKoin {
-            modules(appModule)
-        }
-    }
-}
+**注解**
+```kotlin
+@Singleton
+class UserRepository(private val database: Database, private val apiClient: ApiClient)
 
-// 随处使用 - Koin 处理整个依赖图
-class MainActivity : AppCompatActivity() {
-    private val viewModel: UserViewModel by viewModel()
-    // 就这样！Koin 会创建 UserViewModel 及其所有依赖项
+@Singleton
+class UserService(private val userRepository: UserRepository, private val authRepository: AuthRepository)
+
+@KoinViewModel
+class UserViewModel(private val userService: UserService) : ViewModel()
+
+// Database、ApiClient 和 AuthRepository 也以相同方式添加注解
+
+@Module
+@ComponentScan("com.example.app")
+class AppModule
+```
+
+**构造函数 / 经典 DSL**
+```kotlin
+val appModule = module {
+    singleOf(::Database)
+    singleOf(::ApiClient)
+    singleOf(::UserRepository)
+    singleOf(::AuthRepository)
+    singleOf(::UserService)
+    viewModelOf(::UserViewModel)
 }
 ```
 
-**Koin 的优点：**
-- 声明式依赖配置。
-- 自动依赖解析。
-- 生命周期管理（单例、工厂、作用域）。
-- 类型安全的注入。
-- 易于测试和模块替换。
+随后 Activity 只需请求对象图的顶层对象：
 
-## 自动 DI 解决方案 {id="automated-di-solutions"}
+```kotlin
+class MainActivity : AppCompatActivity() {
+    private val viewModel: UserViewModel by viewModel()
+}
+```
 
-自动依赖注入有不同的实现方法：
+容器会自动创建 `UserViewModel` 及其依赖的所有底层对象，为整个应用保留一个 `Database` 单例，并为每个屏幕提供一个新的 `UserViewModel`。[核心概念](/docs/intro/core-concepts)详细解释了这些组成部分。
 
-| 方法 | 示例 | 工作原理 |
-|----------|----------|--------------|
-| **基于反射** | （旧版框架） | 在运行时使用反射 |
-| **代码生成** | Dagger, Hilt | 在编译时生成代码（注解处理） |
-| **编译器插件** | Koin 编译器插件 | 针对 DSL 和注解的原生编译器集成 |
-| **基于 DSL** | Koin (经典版) | 运行时 DSL 配置 |
+## DI 库如何构建对象图 {id="how-di-libraries-build-the-graph"}
 
-**Koin 的方法 - DSL 和注解，两者同样强大：**
-- **DSL 风格：** 整洁的 Kotlin DSL 配置 (`single<MyService>()`, `viewModel<MyVM>()`)。
-- **注解风格：** 开发者熟悉的注解 (`@Singleton`, `@KoinViewModel`)。
-- 两者均由同一个编译器插件驱动，以确保编译时安全性。
-- 无反射，轻量级。
-- 选择适合您团队的风格。
+不同 DI 库在构建对象图的时机与方式上有所差异：
 
-## 服务定位器 vs 依赖注入 {id="service-locator-vs-dependency-injection"}
+| 方式 | 工作原理 | 示例 |
+|------|----------|------|
+| 反射 | 在运行时读取构造函数并通过反射进行调用 | Guice、Spring |
+| 注解处理 | 在构建时生成工厂源代码 | Dagger、Hilt |
+| 编译器插件 | 在编译器内部重写代码并在构建时检查对象图 | Koin 编译器插件 |
+| 运行时 DSL | 由你将工厂编写为 Kotlin lambda 表达式，容器在运行时执行它们 | Koin 经典 DSL |
 
-了解两者之间的区别非常重要：
+Koin 在所有情况下都会保留一个运行时容器。编译器插件在此基础上进一步提供了自动装配和构建期检查功能。关于其在实际开发中的意义，请参阅[什么是 Koin？](/docs/intro/what-is-koin)。
 
-### 服务定位器模式 {id="service-locator-pattern"}
+## 服务定位器与依赖注入 {id="service-locator-and-dependency-injection"}
 
-组件主动从注册表中请求依赖项：
+这两种模式经常被混淆。
+
+使用**服务定位器**时，类会向注册中心请求获取其依赖项：
 
 ```kotlin
 class UserService : KoinComponent {
-    private val repository: UserRepository by inject()  // “拉取”依赖项
+    private val repository: UserRepository by inject() // 从容器中拉取
 }
 ```
 
-### 依赖注入模式 {id="dependency-injection-pattern"}
-
-依赖项从外部提供：
+使用**依赖注入**时，依赖项是由外部提供给该类的：
 
 ```kotlin
 class UserService(
-    private val repository: UserRepository  // 被“推入”组件
+    private val repository: UserRepository // 从外部注入
 )
 ```
 
-### 比较 {id="comparison"}
-
 | 维度 | 服务定位器 | 依赖注入 |
-|--------|----------------|---------------------|
-| 依赖可见性 | 隐藏在类内部 | 在构造函数中显式可见 |
-| 测试 | 需要框架支持 | 简单 - 传递测试替身 |
-| 耦合度 | 依赖于容器 | 依赖于接口 |
-| 在 Koin 中的用法 | `get()`, `by inject()` | 在 Koin 模块中使用构造函数 |
-| 最佳适用场景 | Android 框架类 | 业务逻辑、服务 |
+|------|------------|----------|
+| 依赖项可见性 | 隐藏在类内部 | 在构造函数中清晰可见 |
+| 测试 | 需要容器或其测试版本 | 向构造函数传入测试替身即可 |
+| 耦合度 | 类依赖于容器 | 类仅依赖于其形参 |
+| 在 Koin 中的体现 | `get()`、`by inject()`、`KoinComponent` | 由模块解析的构造函数形参 |
+| 适用场景 | 无法由你自行构造的框架类 | 业务逻辑、仓库、服务 |
 
-### Koin 最佳实践 {id="best-practices-with-koin"}
-
-1. 对于业务逻辑，**优先使用构造函数注入**：
+Koin 对这两种模式均提供支持。对于你自己编写的类，请使用依赖注入；仅在框架创建对象的位置（如 `Activity`、`Fragment`、Ktor 路由）使用服务定位器风格：
 
 ```kotlin
-// 优选 - 无需 Koin 即可进行测试
-class UserViewModel(private val userService: UserService) : ViewModel()
-
-val appModule = module {
-    viewModel<UserViewModel>()  // Koin 解析依赖项
-}
-```
-
-2. 仅在必要时**使用服务定位器**：
-
-```kotlin
-// 可接受 - Activity 的构造由 Android 控制
-class UserActivity : AppCompatActivity() {
-    private val viewModel: UserViewModel by viewModel()
-}
-```
-
-3. **避免在业务逻辑中使用 `KoinComponent`**：
-
-```kotlin
-// 差 - 难以测试
+// 不推荐：依赖关系隐蔽，测试时需要 Koin
 class UserService : KoinComponent {
     private val repository: UserRepository = get()
 }
 
-// 优 - 显式依赖项
+// 推荐：显式依赖
 class UserService(private val repository: UserRepository)
 ```
 
-## 依赖注入的好处 {id="benefits-of-dependency-injection"}
+## 优势与收益 {id="what-you-gain"}
 
-### 1. 可测试性 {id="1-testability"}
-
-如果没有 DI，测试会非常困难：
-
-```kotlin
-class UserService {
-    private val repository = UserRepository()  // 无法模拟 (Mock)！
-}
-```
-
-有了 DI，测试变得简单直接：
+### 可测试性 {id="testability"}
 
 ```kotlin
 class UserService(private val repository: UserRepository)
 
 @Test
-fun testGetUser() {
-    val mockRepository = mockk<UserRepository>()
-    val service = UserService(mockRepository)  // 完全控制
+fun getUser() {
+    val repository = mockk<UserRepository>()
+    every { repository.findUser("123") } returns testUser
 
-    every { mockRepository.findUser("123") } returns testUser
+    val service = UserService(repository)
+
     assertEquals(testUser, service.getUser("123"))
 }
 ```
 
-### 2. 灵活性 {id="2-flexibility"}
+接收依赖项的类可以通过直接调用其构造函数来进行测试，完全不需要容器介入。
 
-轻松更换实现：
+### 可替换的实现 {id="swappable-implementations"}
 
 ```kotlin
 val appModule = module {
-    single<EmailService> { GmailService() }  // 生产环境
+    single<EmailService> { SmtpEmailService() }
 }
 
 val testModule = module {
-    single<EmailService> { MockEmailService() }  // 测试环境
+    single<EmailService> { FakeEmailService() }
 }
 ```
 
-### 3. 代码组织 {id="3-code-organization"}
+调用方依赖于 `EmailService` 接口。它们具体获得哪种实现，由模块这一个位置统一定义。
 
-集中式的依赖配置：
+### 集中配置 {id="central-configuration"}
 
 ```kotlin
-val dataModule = module {
-    single<Database>()
-    single<ApiClient>()
-}
-
-val domainModule = module {
-    single<UserRepository>()
-    single<AuthRepository>()
-}
-
-val presentationModule = module {
-    viewModel<UserViewModel>()
-}
-
 startKoin {
     modules(dataModule, domainModule, presentationModule)
 }
 ```
 
-### 4. 生命周期管理 {id="4-lifecycle-management"}
+整个对象图通过少数几个模块即可完成描述（通常按层级或功能划分模块），而无需分散在代码各处。
 
-Koin 处理对象的生命周期：
+### 生命周期管理 {id="lifecycle-management"}
 
 ```kotlin
 val appModule = module {
-    single<Database>()       // 整个应用只有一个实例
-    factory<Presenter>()     // 每次都是新实例
-    scoped<SessionData>()    // 每个作用域内一个实例
+    single<Database>()     // 应用级单例
+    factory<Presenter>()   // 每次请求时创建新实例
+
+    scope<UserSession> {
+        scoped<CartRepository>() // 每个会话一个实例
+    }
 }
 ```
 
-## 总结 {id="summary"}
+由容器决定每个对象的存活周期，因此各个类无需管理其依赖项的生命周期。请参阅[作用域](/docs/reference/koin-core/scopes)。
 
-依赖注入是一种强大的模式，它能够：
-- 将组件与其依赖项**解耦**。
-- 通过允许替换依赖项来**提高可测试性**。
-- 通过集中式配置**简化维护**。
-- 比手动依赖管理**更好地扩展**。
+## 相关内容 {id="related"}
 
-Koin 通过以下方式简化了 Kotlin 中的 DI：
-- 提供**两种同样强大的风格**：DSL 或注解 - 任您选择。
-- 同时支持**构造函数注入**（推荐）和**字段注入**（必要时）。
-- 通过编译器插件提供**编译时安全性**。
-- **无需反射** - 纯 Kotlin 实现。
-
-## 下一步 {id="next-steps"}
-
-- **[什么是 Koin？](/docs/intro/what-is-koin)** - 了解 Koin 的方法。
-- **[Koin 编译器插件](/docs/intro/koin-compiler-plugin)** - 推荐的更安全的方法。
-- **[安装指南](/docs/setup/gradle)** - 将 Koin 添加到您的项目。
+- [什么是 Koin？](/docs/intro/what-is-koin)：Koin 如何实现 DI 容器。
+- [核心概念](/docs/intro/core-concepts)：Koin 中的定义、模块、注入与作用域。
+- [获取依赖项](/docs/reference/koin-core/injection)：详解 `get()` 与 `inject()`。
+- [在测试中进行注入](/docs/reference/koin-test/testing)：测试使用 Koin 的代码。

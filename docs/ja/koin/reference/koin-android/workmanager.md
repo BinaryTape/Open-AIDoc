@@ -2,22 +2,29 @@
 title: WorkManager
 ---
 
-Koinは、Workerでのコンストラクタインジェクションを可能にするために、[Android WorkManager](https://developer.android.com/topic/libraries/architecture/workmanager)と統合されています。
+# WorkManager
+
+Koinは `WorkerFactory` を [Android WorkManager](https://developer.android.com/topic/libraries/architecture/workmanager) に接続し、Workerがコンストラクタ経由で依存関係を取得できるようにします。このページでは、セットアップ、Workerの宣言方法、および入力データの渡し方について説明します。ここでは、Koinが `Application` 内で開始されていることを前提としています（[Starting Koin on Android](/docs/reference/koin-android/start) を参照）。
 
 ## セットアップ {id="setup"}
 
-### 依存関係の追加 {id="add-dependencies"}
-
-```groovy
-implementation "io.insert-koin:koin-android:$koin_version"
-implementation "io.insert-koin:koin-androidx-workmanager:$koin_version"
-```
-
-### WorkManagerの設定 {id="configure-workmanager"}
-
-ApplicationクラスでKoin WorkManagerファクトリをセットアップします：
+`koin-android` に加えて WorkManager アーティファクトを追加します：
 
 ```kotlin
+// build.gradle.kts
+dependencies {
+    implementation("io.insert-koin:koin-android")
+    implementation("io.insert-koin:koin-androidx-workmanager")
+}
+```
+
+バージョンは Koin BOM から取得されます（[Gradle Setup](/docs/setup/gradle) を参照）。
+
+`startKoin` 内で、`androidContext()` の後に `workManagerFactory()` を呼び出します：
+
+```kotlin
+import org.koin.androidx.workmanager.koin.workManagerFactory
+
 class MainApplication : Application() {
 
     override fun onCreate() {
@@ -32,9 +39,7 @@ class MainApplication : Application() {
 }
 ```
 
-### デフォルトの初期化子の無効化 {id="disable-default-initializer"}
-
-デフォルトのWorkManager初期化子を無効にするために、`AndroidManifest.xml`に以下を追加します：
+`workManagerFactory()` は、Koinの `WorkerFactory` を使用する構成で WorkManager を初期化します。デフォルトの AndroidX イニシャライザが先に実行される場合など、WorkManager がすでに初期化されている場合は何もしません。`AndroidManifest.xml` でそのイニシャライザを削除してください：
 
 ```xml
 <provider
@@ -49,84 +54,91 @@ class MainApplication : Application() {
 </provider>
 ```
 
-## Workerの宣言 {id="declaring-workers"}
+:::warning
+デフォルトのイニシャライザを残しておくと、WorkManager は Koin ファクトリなしで起動します。その場合、WorkManager は追加のコンストラクタパラメータを持つクラスを作成できないため、実行時に Worker が失敗します。
+:::
 
-### コンパイラプラグインDSL {id="compiler-plugin-dsl"}
+## Workerの宣言 {id="declaring-a-worker"}
+
+Worker は WorkManager から `Context` と `WorkerParameters` を受け取り、さらに Koin から任意の依存関係を受け取ります：
 
 ```kotlin
-class MyWorker(
+class SyncWorker(
     context: Context,
-    workerParams: WorkerParameters,
-    private val myService: MyService
-) : CoroutineWorker(context, workerParams) {
+    params: WorkerParameters,
+    private val repository: SyncRepository,
+) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
-        myService.performTask()
+        repository.sync()
         return Result.success()
     }
 }
+```
 
-val appModule = module {
-    single<MyService>()
-    worker<MyWorker>()
+Worker として宣言します：
+
+**コンパイラプラグイン DSL**
+```kotlin
+import org.koin.plugin.module.dsl.worker
+
+val workModule = module {
+    single<SyncRepository>()
+    worker<SyncWorker>()
 }
 ```
 
-### アノテーション {id="annotations"}
-
+**アノテーション**
 ```kotlin
-@KoinWorker
-class MyWorker(
-    context: Context,
-    workerParams: WorkerParameters,
-    private val myService: MyService
-) : CoroutineWorker(context, workerParams) {
+import org.koin.android.annotation.KoinWorker
 
-    override suspend fun doWork(): Result {
-        myService.performTask()
-        return Result.success()
-    }
-}
-
-@Singleton
-class MyService
-```
-
-### クラシックDSL {id="classic-dsl"}
-
-```kotlin
-val appModule = module {
-    single { MyService() }
-    worker { params ->
-        MyWorker(
-            context = params.get(),
-            workerParams = params.get(),
-            myService = get()
-        )
-    }
-}
-```
-
-## Workのエンキュー {id="enqueuing-work"}
-
-WorkManagerを通常通り使用して、workerをエンキューします：
-
-```kotlin
-val workRequest = OneTimeWorkRequestBuilder<MyWorker>().build()
-WorkManager.getInstance(context).enqueue(workRequest)
-```
-
-## パラメータを持つWorker {id="worker-with-parameters"}
-
-WorkManagerのinput dataを介してパラメータを渡します：
-
-```kotlin
 @KoinWorker
 class SyncWorker(
     context: Context,
-    workerParams: WorkerParameters,
-    private val repository: DataRepository
-) : CoroutineWorker(context, workerParams) {
+    params: WorkerParameters,
+    private val repository: SyncRepository,
+) : CoroutineWorker(context, params) {
+    ...
+}
+```
+
+**Constructor / Classic DSL**
+```kotlin
+import org.koin.androidx.workmanager.dsl.worker
+import org.koin.androidx.workmanager.dsl.workerOf
+
+val workModule = module {
+    singleOf(::SyncRepository)
+    workerOf(::SyncWorker)
+
+    // またはコンストラクタ呼び出しを直接記述
+    worker { params -> SyncWorker(androidContext(), params.get(), get()) }
+}
+```
+
+`WorkerParameters` はインジェクションされる唯一のパラメータです。`params.get()` または `get()` で読み取り、`Context` は `androidContext()` で取得します。
+
+Worker の定義は、Worker クラス名に基づいて名前が付けられ、`ListenableWorker` にバインドされた `factory` です。WorkManager が Worker クラスを要求すると、Koin ファクトリはその名前を検索します。一致する定義がない場合、Koin は `null` を返し、WorkManager はデフォルトのファクトリにフォールバックします。
+
+## Workのエンキュー {id="enqueuing-work"}
+
+WorkManager 側では何も変更する必要はありません：
+
+```kotlin
+val request = OneTimeWorkRequestBuilder<SyncWorker>().build()
+WorkManager.getInstance(context).enqueue(request)
+```
+
+## 入力データ {id="input-data"}
+
+実行ごとに変化する値は、Koin 経由ではなく WorkManager の入力データ（Input data）経由で渡します：
+
+```kotlin
+class UserSyncWorker(
+    context: Context,
+    params: WorkerParameters,
+    private val repository: UserRepository,
+) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
         val userId = inputData.getString("USER_ID") ?: return Result.failure()
@@ -136,31 +148,19 @@ class SyncWorker(
 }
 ```
 
-データとともにエンキュー：
-
 ```kotlin
-val workRequest = OneTimeWorkRequestBuilder<SyncWorker>()
+val request = OneTimeWorkRequestBuilder<UserSyncWorker>()
     .setInputData(workDataOf("USER_ID" to "123"))
     .build()
 
-WorkManager.getInstance(context).enqueue(workRequest)
+WorkManager.getInstance(context).enqueue(request)
 ```
 
-## クイックリファレンス {id="quick-reference"}
+入力データは WorkManager によって保存され、プロセスの強制終了（Process death）が発生しても保持されますが、Koin のパラメータは保持されません。
 
-| アプローチ | 宣言 |
-|----------|-------------|
-| コンパイラプラグインDSL | `worker<MyWorker>()` |
-| アノテーション | `@KoinWorker` |
-| クラシックDSL | `worker { params -> MyWorker(params.get(), params.get(), get()) }` |
+## 関連情報 {id="related"}
 
-| セットアップ | コード |
-|-------|------|
-| ファクトリを有効化 | startKoin内で `workManagerFactory()` |
-| デフォルトを無効化 | マニフェスト内で `WorkManagerInitializer` を削除 |
-
-## 次のステップ {id="next-steps"}
-
-- **[Android WorkManager](https://developer.android.com/topic/libraries/architecture/workmanager)** - WorkManager公式ドキュメント
-- **[Scopes](/docs/reference/koin-android/scope)** - Androidのスコープ
-- **[ViewModel](/docs/reference/koin-android/viewmodel)** - ViewModelのインジェクション
+- [Starting Koin on Android](/docs/reference/koin-android/start): `startKoin` および `androidContext()`。
+- [Definitions](/docs/reference/koin-core/definitions): `worker` を含む定義タイプ。
+- [Android Entry Points](/docs/reference/koin-android/entry-points): BroadcastReceiver から WorkManager への処理の引き渡し。
+- [Android WorkManager guide](https://developer.android.com/topic/libraries/architecture/workmanager): WorkManager API。

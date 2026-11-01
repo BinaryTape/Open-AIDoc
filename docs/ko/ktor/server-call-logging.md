@@ -1,4 +1,4 @@
-[//]: # (title: 콜 로깅)
+[//]: # (title: 호출 로깅)
 
 <show-structure for="chapter" depth="2"/>
 <primary-label ref="server-plugin"/>
@@ -6,6 +6,7 @@
 <var name="plugin_name" value="CallLogging"/>
 <var name="package_name" value="io.ktor.server.plugins.calllogging"/>
 <var name="artifact_name" value="ktor-server-call-logging"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.server.callLogging"/>
 
 <tldr>
 <p>
@@ -19,25 +20,33 @@
     </a>
 </p>
 <p>
-    <b><Links href="/ktor/server-native" summary="Ktor는 Kotlin/Native를 지원하며 추가적인 런타임이나 가상 머신 없이 서버를 실행할 수 있게 해줍니다.">네이티브 서버</Links> 지원</b>: ✖️
+    <b><Links href="server-native.md" summary="Ktor는 Kotlin/Native를 지원하며 추가 런타임이나 가상 머신 없이 서버를 실행할 수 있도록 합니다.">네이티브 서버</Links> 지원</b>: ✖️
 </p>
 </tldr>
 
-Ktor는 [SLF4J](http://www.slf4j.org/) 라이브러리를 사용하여 애플리케이션 이벤트를 로깅하는 기능을 제공합니다. 일반적인 로깅 구성에 대해서는 [Ktor 서버의 로깅](server-logging.md) 주제에서 확인할 수 있습니다.
+Ktor는 [SLF4J](http://www.slf4j.org/) 라이브러리를 사용하여 애플리케이션 이벤트를 로깅하는 기능을 제공합니다. 일반적인 로깅 구성에 대한 자세한 내용은 [Ktor Server의 로깅](server-logging.md) 문서에서 확인할 수 있습니다.
 
-`%plugin_name%` 플러그인을 사용하면 들어오는 클라이언트 요청을 로깅할 수 있습니다.
+`%plugin_name%` 플러그인을 사용하면 수신되는 클라이언트 요청을 로깅할 수 있습니다.
 
 ## 의존성 추가 {id="add_dependencies"}
 
 <p>
-    <code>%plugin_name%</code>을 사용하려면 빌드 스크립트에 <code>%artifact_name%</code> 아티팩트를 포함해야 합니다:
+    <code>%plugin_name%</code>을(를) 사용하려면 빌드 스크립트에 <code>%artifact_name%</code> 아티팩트를 추가합니다:
 </p>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            위 코드 조각은 Ktor 의존성을 지정하기 위해 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 버전 카탈로그</a>를 사용합니다.
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            위 코드 조각은 Ktor 의존성을 지정하기 위해 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 버전 카탈로그</a>를 사용합니다.
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
@@ -47,15 +56,16 @@ Ktor는 [SLF4J](http://www.slf4j.org/) 라이브러리를 사용하여 애플리
 ## %plugin_name% 설치 {id="install_plugin"}
 
 <p>
-    애플리케이션에 <code>%plugin_name%</code> 플러그인을 <a href="server-plugins.md#install">설치</a>하려면, 지정된 <Links href="/ktor/server-modules" summary="모듈을 사용하면 경로를 그룹화하여 애플리케이션을 구조화할 수 있습니다.">모듈</Links> 내의 <code>install</code> 함수에 해당 플러그인을 전달하세요.
-    아래 코드 스니펫은 <code>%plugin_name%</code>을 설치하는 방법을 보여줍니다...
+    애플리케이션에 <code>%plugin_name%</code> 플러그인을 <a href="server-plugins.md#install">설치</a>하려면,
+    지정된 <Links href="server-modules.md" summary="모듈을 사용하면 라우트를 그룹화하여 애플리케이션을 구조화할 수 있습니다.">모듈</Links>의 <code>install</code> 함수에 플러그인을 전달합니다.
+    다음 예제는 <code>%plugin_name%</code>을 설치하는 방법을 보여줍니다:
 </p>
 <list>
     <li>
-        ... <code>embeddedServer</code> 함수 호출 내부에서.
+        <code>embeddedServer()</code> 함수 호출 내부에서 설치.
     </li>
     <li>
-        ... <code>Application</code> 클래스의 확장 함수인 명시적으로 정의된 <code>module</code> 내부에서.
+        <code>Application</code> 클래스에 명시적으로 정의된 <code>module()</code> 확장 함수 내부에서 설치.
     </li>
 </list>
 <Tabs>
@@ -69,11 +79,11 @@ Ktor는 [SLF4J](http://www.slf4j.org/) 라이브러리를 사용하여 애플리
 
 ## 로깅 설정 구성 {id="configure"}
 
-`%plugin_name%`은 로깅 수준 지정, 특정 조건에 따른 요청 필터링, 로그 메시지 사용자 정의 등 다양한 방법으로 구성할 수 있습니다. 사용 가능한 구성 설정은 [CallLoggingConfig](https://api.ktor.io/ktor-server-call-logging/io.ktor.server.plugins.calllogging/-call-logging-config/index.html)에서 확인할 수 있습니다.
+`%plugin_name%`은 여러 가지 방법으로 구성할 수 있습니다. 로깅 수준 지정, 특정 조건에 따른 요청 필터링, 로그 메시지 사용자 정의 등이 가능합니다. 사용 가능한 구성 설정은 [CallLoggingConfig](https://api.ktor.io/ktor-server-call-logging/io.ktor.server.plugins.calllogging/-call-logging-config/index.html)에서 확인할 수 있습니다.
 
 ### 로깅 수준 설정 {id="logging_level"}
 
-기본적으로 Ktor는 `Level.INFO` 로깅 수준을 사용합니다. 이를 변경하려면 `level` 속성을 사용하세요:
+기본적으로 Ktor는 `Level.INFO` 로깅 수준을 사용합니다. 이를 변경하려면 `level` 속성을 사용합니다:
 
 ```kotlin
 install(CallLogging) {
@@ -83,7 +93,7 @@ install(CallLogging) {
 
 ### 로그 요청 필터링 {id="filter"}
 
-`filter` 속성을 사용하면 요청 필터링을 위한 조건을 추가할 수 있습니다. 아래 예제에서는 `/api/v1`으로 들어오는 요청만 로그에 기록됩니다:
+`filter` 속성을 사용하면 요청을 필터링하기 위한 조건을 추가할 수 있습니다. 아래 예제에서는 `/api/v1`로 들어오는 요청만 로그에 기록됩니다:
 
 ```kotlin
 install(CallLogging) {
@@ -93,9 +103,9 @@ install(CallLogging) {
 }
 ```
 
-### 로그 메시지 포맷 사용자 정의 {id="format"}
+### 로그 메시지 형식 사용자 정의 {id="format"}
 
-`format` 함수를 사용하면 요청/응답과 관련된 모든 데이터를 로그에 담을 수 있습니다. 아래 예제는 각 요청에 대해 응답 상태, HTTP 메서드, `User-Agent` 헤더 값을 로깅하는 방법을 보여줍니다.
+`format` 함수를 사용하면 요청/응답과 관련된 모든 데이터를 로그에 기록할 수 있습니다. 아래 예제는 각 요청에 대한 응답 상태, 요청 HTTP 메서드 및 `User-Agent` 헤더 값을 로깅하는 방법을 보여줍니다.
 
 ```kotlin
 install(CallLogging) {
@@ -108,11 +118,11 @@ install(CallLogging) {
 }
 ```
 
-전체 예제는 여기에서 확인할 수 있습니다: [logging](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/logging).
+전체 예제는 [logging](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/logging)에서 확인할 수 있습니다.
 
-### MDC에 콜 파라미터 넣기 {id="mdc"}
+### MDC에 호출 매개변수 넣기 {id="mdc"}
 
-`%plugin_name%` 플러그인은 MDC(Mapped Diagnostic Context)를 지원합니다. `mdc` 함수를 사용하여 원하는 컨텍스트 값을 지정된 이름으로 MDC에 넣을 수 있습니다. 예를 들어, 아래 코드 스니펫에서는 `name` 쿼리 파라미터가 MDC에 추가됩니다:
+`%plugin_name%` 플러그인은 MDC(Mapped Diagnostic Context)를 지원합니다. `mdc` 함수를 사용하여 지정된 이름으로 원하는 컨텍스트 값을 MDC에 넣을 수 있습니다. 예를 들어, 아래 코드 조각에서는 `name` 쿼리 매개변수가 MDC에 추가됩니다:
 
 ```kotlin
 install(CallLogging) {

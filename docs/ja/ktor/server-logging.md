@@ -13,19 +13,19 @@
 </tldr>
 
 <link-summary>
-Ktor は、さまざまなロギングフレームワーク（Logback や Log4j など）のファサードとして SLF4J API を使用し、アプリケーションイベントをログに記録できるようにします。
+Ktor はさまざまなロギングフレームワーク（例えば Logback や Log4j）のファサードとして SLF4J API を使用し、アプリケーションイベントのログ出力を可能にします。
 </link-summary>
 
-Ktor は、使用するプラットフォームに応じて、アプリケーションをロギングするためのさまざまな手段を提供します。
+Ktor は、使用するプラットフォームに応じてアプリケーションのログを記録するさまざまな手段を提供します。
 
-- JVM では、Ktor はさまざまなロギングフレームワーク（[Logback](https://logback.qos.ch/) や [Log4j](https://logging.apache.org/log4j) など）のファサードとして [SLF4J API](http://www.slf4j.org/) を使用し、アプリケーションイベントをログに記録できるようにします。
-ロギングを有効にするには、目的のフレームワークの[依存関係](#add_dependencies)を追加し、そのフレームワーク固有の[設定](#configure-logger)を行う必要があります。
-  > クライアントのリクエストをログに記録するために、[CallLogging](server-call-logging.md) プラグインをインストールして設定することもできます。
-- [Native サーバー](server-native.md)の場合、Ktor はすべてを標準出力にプリントするロガーを提供します。
+- JVM 上では、Ktor はさまざまなロギングフレームワーク（例えば [Logback](https://logback.qos.ch/) や [Log4j](https://logging.apache.org/log4j)）のファサードとして [SLF4J API](http://www.slf4j.org/) を使用し、アプリケーションイベントのログ出力を可能にします。
+ログ出力を有効にするには、目的のフレームワークの[依存関係を追加](#add_dependencies)し、そのフレームワークに応じた[設定](#configure-logger)を行う必要があります。
+  > クライアントリクエストをログに記録するために、[CallLogging](server-call-logging.md) プラグインをインストールして構成することもできます。
+- [Native サーバー](server-native.md)の場合、Ktor はすべてを標準出力に出力するロガーを提供します。
 
 ## JVM {id="jvm"}
 ### ロガーの依存関係の追加 {id="add_dependencies"}
-ロギングを有効にするには、目的のロギングフレームワークのアーティファクトを含める必要があります。
+ログ出力を有効にするには、目的のロギングフレームワークのアーティファクトを含める必要があります。
 例えば、Logback には以下の依存関係が必要です。
 
 <var name="group_id" value="ch.qos.logback"/>
@@ -43,16 +43,16 @@ Ktor は、使用するプラットフォームに応じて、アプリケーシ
     </TabItem>
 </Tabs>
 
-Log4j を使用するには、`org.apache.logging.log4j:log4j-core` と `org.apache.logging.log4j:log4j-slf4j2-impl` アーティファクトを追加する必要があります。
+Log4j を使用するには、`org.apache.logging.log4j:log4j-core` および `org.apache.logging.log4j:log4j-slf4j2-impl` アーティファクトを追加する必要があります。
 
 ### ロガーの設定 {id="configure-logger"}
 
-選択したロギングフレームワークの設定方法については、そのドキュメントを参照してください。例：
-- [Logback configuration](http://logback.qos.ch/manual/configuration.html)
-- [Log4j configuration](https://logging.apache.org/log4j/2.x/manual/configuration.html)
+選択したロギングフレームワークの設定方法については、該当するドキュメントを参照してください。例えば以下があります。
+- [Logback の設定](http://logback.qos.ch/manual/configuration.html)
+- [Log4j の設定](https://logging.apache.org/log4j/2.x/manual/configuration.html)
 
-例えば、Logback を設定するには、クラスパスのルート（`src/main/resources` など）に `logback.xml` ファイルを配置する必要があります。
-以下の例は、ログをコンソールに出力する `STDOUT` アペンダーを使用した Logback 設定のサンプルです。
+例えば、Logback を設定するには、クラスパスのルート（例: `src/main/resources`）に `logback.xml` ファイルを配置する必要があります。
+以下の例は、ログをコンソールに出力する `STDOUT` アペンダーを備えた Logback 設定のサンプルを示しています。
 
 ```xml
 <configuration>
@@ -86,7 +86,7 @@ Log4j を使用するには、`org.apache.logging.log4j:log4j-core` と `org.apa
 </configuration>
 ```
 
-完全な例はこちらにあります：[logging](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/logging)
+完全なコード例はこちらで確認できます: [logging](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/logging)
 
 ## Native {id="native"}
 
@@ -97,10 +97,10 @@ Native サーバーのログレベルを設定するには、アプリケーシ�
 - _WARN_
 - _ERROR_
 
-例えば、_TRACE_ レベルを有効にすると、一部のルートが実行されない理由を特定するのに役立つ[ルートトレース](server-routing.md#trace_routes)が有効になります。
+例えば、_TRACE_ レベルを有効にすると、一部のルートが実行されない理由を特定するのに役立つ[ルートトレース（route tracing）](server-routing.md#trace_routes)が有効になります。
 
-## コード内でのロガーへのアクセス {id="access_logger"}
-Logger インスタンスは、[Logger](https://api.ktor.io/ktor-utils/io.ktor.util.logging/-logger/index.html) インターフェースを実装するクラスによって表されます。[Application.log](https://api.ktor.io/ktor-server-core/io.ktor.server.application/log.html) プロパティを使用して、`Application` 内で Logger インスタンスにアクセスできます。例えば、以下のコードスニペットは、[モジュール](server-modules.md)内でログにメッセージを追加する方法を示しています。
+## コード内でロガーにアクセスする {id="access_logger"}
+Logger インスタンスは、[Logger](https://api.ktor.io/ktor-utils/io.ktor.util.logging/-logger/index.html) インターフェースを実装するクラスによって表されます。`Application` 内では、[Application.log](https://api.ktor.io/ktor-server-core/io.ktor.server.application/log.html) プロパティを使用して Logger インスタンスにアクセスできます。例えば、以下のコードスニペットは、[モジュール](server-modules.md)内でログにメッセージを追加する方法を示しています。
 
 ```kotlin
 import io.ktor.server.application.*
@@ -110,7 +110,7 @@ fun Application.module() {
 }
 ```
 
-また、`call.application.environment.log` プロパティを使用して、[ApplicationCall](https://api.ktor.io/ktor-server-core/io.ktor.server.application/-application-call/index.html) から Logger にアクセスすることもできます。
+また、`call.application.environment.log` プロパティを使用して [ApplicationCall](https://api.ktor.io/ktor-server-core/io.ktor.server.application/-application-call/index.html) から Logger にアクセスすることもできます。
 
 ```kotlin
 routing {
@@ -120,9 +120,9 @@ routing {
 }
 ```
 
-## プラグインおよびファイルでのロギング {id="plugins_and_files"}
+## プラグインやファイルでのロギング {id="plugins_and_files"}
 
-プラグインやファイル内でアプリケーションログを使用することは推奨されません。プラグインやファイルごとに個別のロガーを使用することをお勧めします。これを行うには、任意のロギングライブラリを使用できます。
+プラグインやファイル内でアプリケーションのログ（`Application.log`）を使用することは推奨されません。各プラグインまたはファイルごとに個別のロガーを使用することをお勧めします。これを行うには、任意のロギングライブラリを使用できます。
 
 マルチプラットフォームプロジェクトの場合は、[KtorSimpleLogger](https://api.ktor.io/ktor-utils/io.ktor.util.logging/-ktor-simple-logger.html) クラスを使用できます。
 

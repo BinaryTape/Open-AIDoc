@@ -12,51 +12,60 @@
 </tldr>
 
 <link-summary>
-了解如何使用 WAR 封存檔在 Servlet 容器中執行並部署 Ktor 應用程式。
+了解如何使用 WAR 封存檔在 Servlet 容器內執行並部署 Ktor 應用程式。
 </link-summary>
 
-您可以在 Tomcat 或 Jetty 等 Servlet 容器中執行 Ktor 應用程式。為此，您需要將應用程式封裝為 WAR 封存檔，並將其部署到支援 WAR 部署的伺服器或雲端服務。
+你可以在 Servlet 容器（例如 Tomcat 或 Jetty）中執行 Ktor 應用程式。為此，你需要將應用程式封裝為 WAR 封存檔，並將其部署到支援 WAR 部署的伺服器或雲端服務上。
 
-在本主題中，您將學習如何：
-* [配置 Ktor](#configure-ktor) 以用於 Servlet 應用程式。
-* 套用 [Gretty](#configure-gretty) 與 [War](#configure-war) 外掛程式來執行與封裝 WAR 應用程式。
+在本主題中，你將學習如何：
+* [在 Servlet 應用程式中設定 Ktor](#configure-ktor)。
+* 套用 [Gretty](#configure-gretty) 和 [War](#configure-war) 外掛程式來執行與封裝 WAR 應用程式。
 * [在 Servlet 容器中執行 Ktor 應用程式](#run)。
 * [產生並部署 WAR 封存檔](#generate-war)。
 
-## 在 Servlet 應用程式中配置 Ktor {id="configure-ktor"}
+## 在 Servlet 應用程式中設定 Ktor {id="configure-ktor"}
 
-Ktor 允許您在應用程式中直接使用特定引擎（例如 Netty、Jetty 或 Tomcat）[建立並啟動伺服器](server-create-and-configure.topic)。在此設定中，您的應用程式會控制引擎配置、連線與 SSL 設定。
+Ktor 允許你直接在應用程式中[建立並啟動伺服器](server-create-and-configure.topic)，使用特定的引擎（例如 Netty、Jetty 或 Tomcat）。在此配置下，你的應用程式控制著引擎設定、連線以及 SSL 設定。
 
-當部署到 Servlet 容器時，容器會控制應用程式生命週期與連線配置。為此，Ktor 提供了 [`ServletApplicationEngine`](https://api.ktor.io/ktor-server-servlet-jakarta/io.ktor.server.servlet.jakarta/-servlet-application-engine/index.html) 引擎，這會將應用程式的控制權委託給 Servlet 容器。
+當部署至 Servlet 容器時，容器會控制應用程式生命週期與連線設定。為此，Ktor 提供了 [`ServletApplicationEngine`](https://api.ktor.io/ktor-server-servlet-jakarta/io.ktor.server.servlet.jakarta/-servlet-application-engine/index.html) 引擎，將應用程式的控制權委託給 Servlet 容器。
 
-> 在 Servlet 容器內執行時，[在配置檔案中定義](server-configuration-file.topic)的 Ktor 連線與 SSL 設定將不會生效。
+> 在 Servlet 容器內執行時，[組態檔中定義的](server-configuration-file.topic) Ktor 連線與 SSL 設定將不會生效。
 > 
-> 有關在 Tomcat 中配置 SSL 的資訊，請參閱 [tomcat-war-ssl](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/tomcat-war-ssl) 範例。
+> 如需在 Tomcat 中設定 SSL，請參閱 [tomcat-war-ssl](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/tomcat-war-ssl) 範例。
 > 
 {style="note"}
 
 ### 新增相依性 {id="add-dependencies"}
 
-要在 Servlet 應用程式中使用 Ktor，請將 `ktor-server-servlet-jakarta` 構件新增至您的建置指令碼：
+若要在 Servlet 應用程式中使用 Ktor，請將 `ktor-server-servlet-jakarta` 構件新增至你的建置指令碼中：
 
 <var name="artifact_name" value="ktor-server-servlet-jakarta"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.server.servlet"/>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上述程式碼片段使用 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 版本目錄</a> 來指定 Ktor 相依性。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上述程式碼片段使用 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 版本目錄</a> 來指定 Ktor 相依性。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
     </TabItem>
 </Tabs>
 
-部署到 Servlet 容器時，您不需要另外新增 [Jetty 或 Tomcat 引擎相依性](server-engines.md#dependencies)。
+當部署至 Servlet 容器時，無需個別新增 [Jetty 或 Tomcat 引擎相依性](server-engines.md#dependencies)。
 
-### 配置 Servlet {id="configure-servlet"}
+### 設定 Servlet {id="configure-servlet"}
 
-要在您的應用程式中註冊 Ktor Servlet，請開啟 <Path>WEB-INF/web.xml</Path> 檔案，並將 `ServletApplicationEngine` 指派給 `servlet-class` 屬性：
+若要在應用程式中註冊 Ktor Servlet，請開啟 <Path>WEB-INF/web.xml</Path> 檔案並將 `servlet-class` 屬性指定為 `ServletApplicationEngine`：
 
 <Tabs>
 <TabItem title="Tomcat/Jetty v10.x+">
@@ -80,7 +89,7 @@ Ktor 允許您在應用程式中直接使用特定引擎（例如 Netty、Jetty 
 </TabItem>
 </Tabs>
 
-接著，為此 Servlet 配置 URL 模式：
+接著，為此 Servlet 設定 URL 模式：
 
 ```xml
 <servlet-mapping>
@@ -89,19 +98,29 @@ Ktor 允許您在應用程式中直接使用特定引擎（例如 Netty、Jetty 
 </servlet-mapping>
 ```
 
-## 配置 Gretty 外掛程式 {id="configure-gretty"}
+## 設定 Gretty 外掛程式 {id="configure-gretty"}
 
-[Gretty](https://plugins.gradle.org/plugin/org.gretty) 外掛程式允許您在 Jetty 與 Tomcat 上[執行](#run) Servlet 應用程式。
+[Gretty](https://plugins.gradle.org/plugin/org.gretty) 外掛程式允許你在 Jetty 和 Tomcat 上[執行](#run) Servlet 應用程式。
 
-要套用此外掛程式，請開啟您的 <Path>build.gradle.kts</Path> 檔案，並將以下項目新增至 `plugins` 區塊：
+首先，開啟 <Path>gradle/libs.versions.toml</Path> 檔案並定義 Gretty 版本及其外掛程式別名：
+
+```toml
+[versions]
+gretty = "5.0.1"
+
+[plugins]
+gretty = { id = "org.gretty", version.ref = "gretty" }
+```
+
+在你的 <Path>build.gradle.kts</Path> 檔案中，將下列項目新增至 `plugins {}` 區塊：
 
 ```groovy
 plugins {
-    id("org.gretty") version "5.0.1"
+    alias(libs.plugins.gretty)
 }
 ```
 
-然後，您可以按如下方式在 `gretty` 區塊中進行配置：
+接著，你可以在 `gretty {}` 區塊中設定 Gretty：
 
 <Tabs>
 <TabItem title="Jetty">
@@ -126,7 +145,7 @@ gretty {
 </TabItem>
 </Tabs>
 
-最後，配置 `run` 任務：
+最後，設定 `run` 任務：
 
 ```groovy
 afterEvaluate {
@@ -136,11 +155,11 @@ afterEvaluate {
 }
 ```
 
-## 配置 War 外掛程式 {id="configure-war"}
+## 設定 War 外掛程式 {id="configure-war"}
 
-War 外掛程式允許您[產生](#generate-war)用於部署至 Servlet 容器的 WAR 封存檔。
+War 外掛程式允許你[產生](#generate-war)用於部署至 Servlet 容器的 WAR 封存檔。
 
-要套用此外掛程式，請開啟您的 <Path>build.gradle.kts</Path> 檔案，並將以下項目新增至 `plugins` 區塊：
+若要套用此外掛程式，請開啟你的 <Path>build.gradle.kts</Path> 檔案，並將下列項目新增至 `plugins {}` 區塊：
 
 ```groovy
 plugins {
@@ -150,7 +169,7 @@ plugins {
 
 ## 執行應用程式 {id="run"}
 
-您可以使用 `run` 任務執行已[配置 Gretty 外掛程式](#configure-gretty)的 Servlet 應用程式。例如，要執行 [`jetty-war`](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/jetty-war) 範例專案，請執行以下指令：
+你可以使用 `run` 任務來執行包含[已設定 Gretty 外掛程式](#configure-gretty)的 Servlet 應用程式。例如，若要執行 [`jetty-war`](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/jetty-war) 範例專案，請執行以下指令：
 
 ```Bash
 ./gradlew :jetty-war:run
@@ -158,17 +177,17 @@ plugins {
 
 ## 產生並部署 WAR 封存檔 {id="generate-war"}
 
-要使用 [`War`](#configure-war) 外掛程式產生 WAR 封存檔，請執行 `war` 任務。對於 [`jetty-war`](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/jetty-war) 範例專案，指令如下：
+若要使用 [`War`](#configure-war) 外掛程式產生 WAR 封存檔，請執行 `war` 任務。對於 [`jetty-war`](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/jetty-war) 範例專案，指令如下：
 
 ```Bash
 ./gradlew :jetty-war:war
 ```
 
-任務完成後，`jetty-war.war` 會出現在對應模組的 <Path>build/libs</Path> 目錄中。
+任務完成後，`jetty-war.war` 將產生在對應模組的 <Path>build/libs</Path> 目錄中。
 
-要部署產生的封存檔，請將檔案複製到您 Servlet 容器中的 <Path>jetty/webapps</Path> 目錄。
+若要部署產生的封存檔，請將檔案複製到 Servlet 容器中的 <Path>jetty/webapps</Path> 目錄。
 
-以下 `Dockerfile` 範例展示了如何在 Jetty 或 Tomcat Servlet 容器內執行產生的 WAR 檔案：
+以下 `Dockerfile` 範例示範如何在 Jetty 或 Tomcat Servlet 容器中執行產生的 WAR 檔案：
 
 <Tabs>
 <TabItem title="Jetty">
@@ -197,4 +216,6 @@ CMD ["catalina.sh", "run"]
 </TabItem>
 </Tabs>
 
-有關完整的範例，請參閱 [jetty-war](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/jetty-war) 與 [tomcat-war](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/tomcat-war)。
+> 如需完整的程式碼範例，請參閱 [jetty-war](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/jetty-war) 與 [tomcat-war](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/tomcat-war)。
+>
+{style="tip"}

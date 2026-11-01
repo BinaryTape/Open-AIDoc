@@ -1,31 +1,35 @@
 [//]: # (title: 数値)
-[//]: # (description: 数値型、リテラル、変換、算術演算、オーバーフロー、JVM固有の挙動など、Kotlinでの数値の使用方法について学びます。)
+[//]: # (description: Kotlin での数値の扱い方（数値型、リテラル、型変換、算術演算、オーバーフロー、JVM 固有の動作など）について学びます。)
 
-Kotlinの数値型は以下を表現します：
-* 整数値 ([Byte](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-byte/)、[Short](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-short/)、[Int](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/)、[Long](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/))
-* 浮動小数点数値 ([Float](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/)、[Double](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-double/))
+Kotlin の数値型は以下を表します：
+* 整数値 ([Byte](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-byte/)、
+  [Short](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-short/)、
+  [Int](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/)、
+  および [Long](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/))
+* 浮動小数点数値 ([Float](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/)
+  および [Double](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-double/))
 
-数値型は、算術演算、カウンタ、測定、その他の計算などの数値データの格納と処理に使用します。
+数値型は、算術演算、カウンター、測定値、その他の計算など、数値データの保存や処理に使用します。
 
 ## 数値型の選択 {id="choose-a-number-type"}
 
-ほとんどの場合、タスクに適した数値型を決定するために、以下のルールを参考にできます：
+ほとんどの場合、タスクに適した数値型を決定するために次のルールを参考にできます：
 
-* 整数には `Int` を使用する。
-* `Int` の範囲を超える整数には `Long` を使用する。
-* 小数には `Double` を使用する。
-* 低い精度が許容される場合や必要な場合には `Float` を使用する。
-* APIやデータ形式で要求される場合には `Byte` や `Short` を使用する。
+* 整数には `Int` を使用します。
+* `Int` の範囲外の整数には `Long` を使用します。
+* 小数には `Double` を使用します。
+* より低い精度で十分な場合や、それが必要な場合は `Float` を使用します。
+* API やデータフォーマットで要求される場合は `Byte` および `Short` を使用します。
 
-> Kotlinでは、ベータ機能として [](unsigned-integer-types.md) も提供されています。 
+> Kotlin はベータ機能として[](unsigned-integer-types.md)も提供しています。
 >
 {style="tip"}
 
 ## 整数型 {id="integer-types"}
 
-Kotlinは、サイズと値の範囲が異なる4つの整数型を提供しています：
+Kotlin は、サイズと値の範囲が異なる 4 つの整数型を提供しています：
 
-| 型        | サイズ (ビット) | 最小値                                         | 最大値                                           |
+| 型        | サイズ（ビット） | 最小値                                       | 最大値                                         |
 |----------|-------------|----------------------------------------------|------------------------------------------------|
 | `Byte`   | 8           | -128                                         | 127                                            |
 | `Short`  | 16          | -32768                                       | 32767                                          |
@@ -34,22 +38,22 @@ Kotlinは、サイズと値の範囲が異なる4つの整数型を提供して�
 
 ### 整数値の宣言 {id="declare-integer-values"}
 
-Kotlinは整数値に対して以下のリテラル形式をサポートしています：
+Kotlin は、整数値に対して次のリテラル形式をサポートしています：
 
 * 10進数: `123`
 * 16進数: `0x0F`
 * 2進数: `0b00001011`
 
-> Kotlinでは、8進数のリテラルはサポートされていません。
+> Kotlin は8進数リテラルをサポートしていません。
 >
 {style="note"}
 
-数値変数を宣言するには、型を明示的に指定します： 
+数値を宣言するには、型を明示的に指定します：
 
 ```kotlin
 val one: Int = 1
 
-// 読みやすさを向上させるためにアンダースコアを使用できます
+// 可読性を高めるためにアンダースコアを使用できます
 val oneBillion: Long = 1_000_000_000
 val hexBytes: Int = 0x7F_EC_DE_5E
 val bytes: Int = 0b01010010_01101001_10010100_10010010
@@ -58,30 +62,30 @@ val oneByte: Byte = 1
 val oneShort: Short = 1
 ```
 
-`Long` 値を宣言するために、サフィックス `L` を付けることもできます：
+また、`L` サフィックスを付加して `Long` 値を宣言することもできます：
 
 ```kotlin
 val oneLong = 1L
 ```
 
-数値型を明示的に宣言すると、コンパイラは値がその型の範囲内に収まっているかチェックします：
+数値型を明示的に宣言すると、コンパイラはその値がその型の範囲に収まっているかをチェックします：
 
 ```kotlin
-// 値がByteに収まる場合
+// 値が Byte の範囲に収まる
 val oneByte: Byte = 1
 
-// エラー：値がByteに収まらない場合
+// エラー: 値が Byte の範囲に収まらない
 val tooBig: Byte = 128
 ```
 
-数値型を指定しない場合、Kotlinは値が `Int` の範囲に収まれば `Int` と推論します。それ以外の場合は `Long` と推論します：
+数値型を指定しない場合、Kotlin は値が `Int` の範囲に収まるのであれば `Int` と推論します。それ以外の場合は `Long` と推論します：
 
 ```kotlin
 val million = 1_000_000 // Int
 val threeBillion = 3_000_000_000 // Long
 ```
 
-値が存在しない可能性がある場合は、Null 許容型を使用します：
+値が存在しない可能性がある場合は、Nullable 型（null 許容型）を使用します：
 
 ```kotlin
 val maybeAbsent: Int? = null
@@ -89,40 +93,38 @@ val maybeAbsent: Int? = null
 
 ## 浮動小数点型 {id="floating-point-types"}
 
-小数部分を持つ数値のために、Kotlinは `Float` と `Double` を提供しています。
+小数部を持つ数値のために、Kotlin は `Float` と `Double` を提供しています。
 
-浮動小数点型は [IEEE 754 標準](https://en.wikipedia.org/wiki/IEEE_754)に従います。
-`Float` は「単精度（single precision）」を、`Double` は「倍精度（double precision）」を反映しています。
+浮動小数点型は [IEEE 754 標準](https://en.wikipedia.org/wiki/IEEE_754) に準拠しています。`Float` は_単精度_を、`Double` は_倍精度_を表します。
 
 浮動小数点型はサイズと精度が異なります：
 
-| 型        | サイズ (ビット) | 有効桁（ビット） | 指数（ビット） | 10進数での桁数 |
+| 型        | サイズ（ビット） | 有効数字ビット | 指数部ビット | 10進桁数 |
 |----------|-------------|------------------|---------------|----------------|
 | `Float`  | 32          | 24               | 8             | 6-7            |
 | `Double` | 64          | 53               | 11            | 15-16          |    
 
-### 浮動小数点数値の宣言 {id="declare-floating-point-values"}
+### 浮動小数点値の宣言 {id="declare-floating-point-values"}
 
-浮動小数点リテラルを宣言するには、小数点 (`.`) を含めるか、指数表記を使用します：
+浮動小数点リテラルを宣言するには、小数点（`.`）を含めるか、指数表記を使用します：
 
 ```kotlin
 val pi = 3.14
 val avogadro = 6.02214076e23
 ```
 
-デフォルトでは、Kotlinは浮動小数点リテラルを `Double` として推論します。 
-`Float` を宣言するには、サフィックス `f` または `F` を付けます：
+デフォルトでは、Kotlin は浮動小数点リテラルを `Double` として推論します。`Float` を宣言するには、`f` または `F` サフィックスを追加します：
 
 ```kotlin
 val pi = 3.14 // Double
 val eFloat = 2.7182817f // Float
 ```
 
-> `Float` が保持できる以上の精度を持つ `Float` リテラルは、Kotlinによって丸められます。
+> Kotlin は、`Float` で格納可能な精度を超える `Float` リテラルを丸めます。
 >
 {style="note"}
 
-値が存在しない可能性がある場合は、Null 許容型を使用します：
+値が存在しない可能性がある場合は、Nullable 型を使用します：
 
 ```kotlin
 val maybeAbsent: Double? = null
@@ -130,9 +132,9 @@ val maybeAbsent: Double? = null
 
 ## 算術演算 {id="arithmetic-operations"}
 
-Kotlinは数値に対する標準的な算術演算 `+`、`-`、`*`、`/`、`%` をサポートしています。
+Kotlin は数値に対する標準的な算術演算をサポートしています：`+`、`-`、`*`、`/`、`%`。
 
-これらの演算子を使用して一般的な計算を行います：
+これらの演算子を使用して一般的な計算を実行します：
 
 ```kotlin
 fun main() {
@@ -144,18 +146,18 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-結果の型はオペランドの型に依存します。詳細は [](#mixed-numeric-expressions) で確認してください。
+演算結果の型はオペランドの型に依存します。詳細は[](#mixed-numeric-expressions)を参照してください。
 
-> カスタム数値クラスでこれらの演算子をオーバーライドできます。
-> 詳細は [演算子のオーバーロード](operator-overloading.md) を参照してください。
+> これらの演算子はカスタムの数値クラスでオーバーライドできます。
+> 詳細については、[演算子のオーバーロード](operator-overloading.md)を参照してください。
 >
 {style="tip"}
 
 ### 整数の除算 {id="integer-division"}
 
-整数値同士の除算は常に整数の結果を返します。コンパイラは小数部分を切り捨てます：
+整数値同士の除算は常に整数の結果を返します。コンパイラは小数部を切り捨てます：
 
 ```kotlin
 fun main() {
@@ -168,9 +170,9 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-浮動小数点の値を返すには、少なくとも1つのオペランドを `Float` または `Double` にしてください：
+浮動小数点の結果を返すには、少なくとも一方のオペランドを `Float` または `Double` にします：
 
 ```kotlin
 fun main() {
@@ -183,13 +185,13 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
 ## 型変換 {id="type-conversion"}
 
-数値型は互いのサブタイプではありません。Kotlinは、暗黙的なデータ損失や予期しない動作を避けるために、明示的な変換を必要とします。
+数値型同士は互いのサブタイプではありません。Kotlin では、暗黙的なデータ損失や予期しない動作を防ぐために明示的な変換が必要です。
 
-例えば、`Double` を期待する関数は、変換なしに `Int` や `Float` の値を受け取ることはできません：
+たとえば、`Double` を期待する関数は、型変換なしに `Int` や `Float` の値を受け取ることはできません：
 
 ```kotlin
 fun main() {
@@ -201,18 +203,17 @@ fun main() {
     val x = 1.0
     val xInt = 1
     val xFloat = 1.0f
-    val one: Double = 1 // エラー：初期化子の型不一致（initializer type mismatch）
+    val one: Double = 1 // エラー: 初期化子の型が一致しません
 
     printDouble(x) // OK
-    printDouble(xInt) // エラー：引数の型不一致（argument type mismatch）
-    printDouble(xFloat) // エラー：引数の型不一致（argument type mismatch）
+    printDouble(xInt) // エラー: 引数の型が一致しません
+    printDouble(xFloat) // エラー: 引数の型が一致しません
 //sampleEnd
 }
 ```
 {kotlin-runnable="true" validate="false"}
 
-すべての数値型は、他の数値型への変換をサポートしています。
-数値を別の型に変換するには、明示的な変換関数を使用します：
+すべての数値型は他の数値型への変換をサポートしています。数値を別の型に変換するには、明示的な変換関数を使用します：
 
 * `toByte()`
 * `toShort()`
@@ -221,7 +222,7 @@ fun main() {
 * `toFloat()`
 * `toDouble()`
 
-例えば、以下のコードは `Int` 値を `Double` に変換します：
+たとえば、次のコードは `Int` 値を `Double` に変換します：
 
 ```kotlin
 fun main() {
@@ -233,9 +234,9 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-浮動小数点値を整数型に変換する場合、コンパイラは小数部分を切り捨てます：
+浮動小数点値を整数型に変換すると、コンパイラは小数部を切り捨てます：
 
 ```kotlin
 fun main() {
@@ -247,14 +248,12 @@ fun main() {
 //sampleEnd    
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-### 混合数値式 {id="mixed-numeric-expressions"}
+### 数値の混合式 {id="mixed-numeric-expressions"}
 
-Kotlinは代入や関数の引数における暗黙的な変換をサポートしていません。 
-しかし、算術式の中で異なる数値型を組み合わせることはできます。その場合、 
-Kotlinはオペランドの型に基づいて結果の型を決定し、 
-算術演算子が自動的に変換を処理します：
+Kotlin は、代入や関数の引数における暗黙的な型変換をサポートしていません。
+しかし、算術式の中では異なる数値型を混在させることができます。そのような場合、Kotlin はオペランドの型に基づいて結果の型を決定し、算術演算子が自動的に型変換を処理します：
 
 ```kotlin
 val intNumber: Int = 1
@@ -262,18 +261,18 @@ val longNumber: Long = 1000
 val result = intNumber + longNumber // 1001, Long
 ```
 
-結果をより小さな型に代入しようとすると、コンパイラはエラーを報告します：
+結果をより小さい型に代入しようとすると、コンパイラはエラーを報告します：
 
 ```kotlin
 val intNumber: Int = 1
 val longNumber: Long = 1000
 val result: Int = intNumber + longNumber 
-// エラー：初期化子の型不一致（Initializer type mismatch）
+// エラー: 初期化子の型が一致しません
 ```
 
 ### 整数リテラル型 {id="integer-literal-types"}
 
-型推論の間、Kotlinはサフィックスのない整数リテラルを、周囲のコンテキストが特定の型を決定するまで、特別な「整数リテラル型（[Integer Literal Type: ILT](https://kotlinlang.org/spec/type-system.html#integer-literal-types)）」として扱います。
+型推論中、Kotlin は周囲のコンテキストによって具体的な型が決定されるまで、サフィックスのない整数リテラルを特別な [整数リテラル型 (ILT: Integer Literal Type)](https://kotlinlang.org/spec/type-system.html#integer-literal-types) として扱います：
 
 ```kotlin
 //sampleStart
@@ -288,7 +287,7 @@ fun main() {
     listOf(1L, 2L).log()
     // Long | Long
     
-    // コンパイラは 1 を ILT として解釈し、Long として解決します
+    // コンパイラは 1 を ILT として解釈し、Long に解決します
     listOf(1, 2L).log()
     // Long | Long
     
@@ -300,7 +299,7 @@ fun main() {
 ```
 {kotlin-runnable="true"}
 
-実行時に同じ文字列表現を持つため、`Int` と `Long` の値については特に見落としやすくなります。これを避けるには、期待される型を指定するか、値を明示的に変換してください：
+実行時には同じ文字列表現を持つため、特に `Int` と `Long` の値では見落としが生じやすくなります。これを防ぐには、期待される型を指定するか、値を明示的に変換します：
 
 ```kotlin
 //sampleStart
@@ -321,56 +320,55 @@ fun main() {
 ```
 {kotlin-runnable="true"}
 
-また、意図しない型推論を捕捉するために明示的な型を使用することもできます：
+意図しない型推論を検出するために、明示的な型を使用することもできます：
 
 ```kotlin
 fun main() {
 //sampleStart
     val intValues: List<Int> = listOf(1, 2L)
-    // エラー：初期化子の型不一致（initializer type mismatch）
+    // エラー: 初期化子の型が一致しません
 //sampleEnd
 }
 ```
 {kotlin-runnable="true" validate="false"}
 
-> 整数リテラル型の詳細は [Integer literal types](https://kotlinlang.org/spec/type-system.html#integer-literal-types) を参照してください。
+> [整数リテラル型](https://kotlinlang.org/spec/type-system.html#integer-literal-types) についての詳細を参照してください。
 > 
 {style="tip"}
 
-## データオーバーフロー {id="data-overflow"}
+## データのオーバーフロー {id="data-overflow"}
 
 数値型は、定義された範囲内の値のみを表現できます。
 
-演算の結果がその範囲外になった場合、オーバーフローが発生します。 
-値をより小さな数値型に変換した場合、変換後の値が元の数値を保持できない場合があります。
+演算結果がその範囲外になった場合、オーバーフローが発生します。値をより小さい数値型に変換した場合、変換後の値が元の数値を保持できないことがあります。
 
-この動作は、コンパイラがそれを受け入れたとしても、コードの結果に影響を与える可能性があります。
+この動作は、コンパイラがエラーを出さずにコードを受け付けた場合でも、コードの実行結果に影響を与える可能性があります。
 
 ### 演算におけるオーバーフロー {id="overflow-in-operations"}
 
-各整数型は、定義された範囲内の値のみを格納できます。算術演算の結果がその範囲を超えると、「データオーバーフロー（data overflow）」が発生します：
+各整数型は、定義された範囲内の値のみを格納できます。算術演算の結果がその範囲を超えると、_データオーバーフロー_ が発生します：
 
 ```kotlin
 fun main(){
 //sampleStart
     val intNumber: Int = 2147483647
-    // Intの最大値は 2147483647
+    // Int の最大値は 2147483647
     println(intNumber + 1) // -2147483648
 //sampleEnd    
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-ここでは、値が `Int` に収まらなくなったため、結果がラップアラウンド（最小値に循環）しています。
+ここでは、値が `Int` に収まらなくなったため、結果がラップアラウンド（循環）しています。
 
-> 整数オーバーフローが発生しても、コンパイラは自動的にエラーを出すことはありません。
+> コンパイラは、整数のオーバーフローが発生しても自動的にエラーを出しません。
 >
 {style="note"}
 
 ### 符号反転におけるオーバーフロー {id="overflow-in-negation"}
 
-符号反転（否定）の間にもオーバーフローが発生する可能性があります。 
-例えば、`Int.MIN_VALUE` の正の対応する値を `Int` として表現することはできません。
+オーバーフローは符号反転（negation）の際にも発生する可能性があります。
+たとえば、`Int.MIN_VALUE` の正の対応値を `Int` として表現することはできません。
 
 ```kotlin
 fun main(){
@@ -380,11 +378,11 @@ fun main(){
 //sampleEnd    
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
 ### 縮小変換 {id="narrowing-conversions"}
 
-値をより小さな整数型に変換すると、結果が元の数値を保持できない場合があります：
+値をより小さい整数型に変換すると、元の数値が保持されないことがあります：
 
 ```kotlin
 fun main() {
@@ -396,9 +394,9 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-ただし、浮動小数点型は [IEEE 754 標準](https://en.wikipedia.org/wiki/IEEE_754)に従っているため、非常に大きな結果は `Infinity`（無限大）になります：
+ただし、浮動小数点型は [IEEE 754 標準](https://en.wikipedia.org/wiki/IEEE_754) に準拠しているため、非常に大きな結果は `Infinity` になる可能性があります：
 
 ```kotlin
 fun main() {
@@ -407,11 +405,11 @@ fun main() {
 //sampleEnd    
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
 ## ビット演算 {id="bitwise-operations"}
 
-Kotlinは `Int` と `Long` に対して「ビット演算」を提供しています。これらの演算は、一連の[中置関数（infix functions）](functions.md#infix-notation)および `inv()` で表されます。
+Kotlin は `Int` および `Long` に対して_ビット演算_を提供しています。これらの演算は、一連の[中置関数 (infix function)](functions.md#infix-notation)および `inv()` によって表されます。
 
 ```kotlin
 fun main() {
@@ -423,33 +421,33 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
 ビット演算には以下が含まれます：
 
 * `shl()` – 符号付き左シフト
 * `shr()` – 符号付き右シフト
 * `ushr()` – 符号なし右シフト
-* `and()` – ビット単位の AND
-* `or()` – ビット単位の OR
-* `xor()` – ビット単位の XOR
-* `inv()` – ビット単位の反転
+* `and()` – ビット論理積 (AND)
+* `or()` – ビット論理和 (OR)
+* `xor()` – ビット排他的論理和 (XOR)
+* `inv()` – ビット反転
 
 ## 浮動小数点数の比較 {id="floating-point-number-comparison"}
 
-Kotlinにおける浮動小数点数の比較は、オペランドの静的な型に依存します。
+Kotlin では、浮動小数点数の比較はオペランドの静的型（static type）に依存します。
 
-オペランドが `Float` または `Double` であることが静的にわかっている場合、数値およびそれらが形成する範囲に対する演算は [IEEE 754 浮動小数点演算標準](https://en.wikipedia.org/wiki/IEEE_754)に従います。
+オペランドが静的に `Float` または `Double` であることが分かっている場合、数値に対する演算とその数値が形成する範囲は、[浮動小数点演算に関する IEEE 754 標準](https://en.wikipedia.org/wiki/IEEE_754) に準拠します。
 
-しかし、ジェネリックなユースケース（`Any`、`Comparable<...>`、`Collection<T>` など）において、静的に浮動小数点型として型付けされていないオペランドに対しては挙動が異なります。これらの場合、Kotlinは `Float` と `Double` のための `equals()` および `compareTo()` 実装を使用します。 
+しかし、ジェネリックなユースケース（`Any`、`Comparable<...>`、`Collection<T>` など）では、静的に浮動小数点型として型付けされていないオペランドに対して動作が異なります。これらの場合、Kotlin は `Float` および `Double` の `equals()` と `compareTo()` の実装を使用します。
 
 その結果：
 
 * `NaN` は自分自身と等しいとみなされます
-* `NaN` は `POSITIVE_INFINITY` を含む他のどの要素よりも大きいとみなされます
-* `-0.0` は `0.0` よりも小さいとみなされます
+* `NaN` は `POSITIVE_INFINITY` を含む他の任意の要素よりも大きいとみなされます
+* `-0.0` は `0.0` より小さいとみなされます
 
-以下の例は、静的に浮動小数点型として型付けされたオペランドと、ジェネリック型を通じて使用されるオペランドの違いを示しています：
+次の例は、静的に浮動小数点型として型付けされたオペランドと、ジェネリック型を通して使用されるオペランドの違いを示しています：
 
 ```kotlin
 //sampleStart  
@@ -462,22 +460,21 @@ fun main() {
     println(Double.NaN == Double.NaN) // false
     println(0.0 == -0.0) // true
 
-    // 浮動小数点ではない静的型を通じて使用されるオペランド
+    // 非浮動小数点の静的型を通して使用されるオペランド
     println(generalizedEquals(Double.NaN, Double.NaN)) // true
     println(generalizedEquals(0.0, -0.0)) // false
 }
 //sampleEnd  
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-numbers-floating-comp"}
+{kotlin-runnable="true" id="kotlin-numbers-floating-comp"}
 
-## JVMにおける数値のボックス化とキャッシュ {id="boxing-and-caching-numbers-on-the-jvm"}
+## JVM 上での数値のボクシングとキャッシュ {id="boxing-and-caching-numbers-on-the-jvm"}
 
-JVMでは、Null 許容ではない数値は通常、`int`、`long`、`double` などのプリミティブ型を使用して格納されます。
-しかし、[ジェネリック型](generics.md)を使用する場合や、`Int?` のような Null 許容の数値型を使用する場合、値はボックス化され、オブジェクトとして表現されます。
+JVM 上では、null 非許容の数値は通常、`int`、`long`、`double` などのプリミティブ型を使用して格納されます。しかし、[ジェネリクス](generics.md)や `Int?` などの Nullable な数値型を使用すると、値はボクシングされ、オブジェクトとして表現されます。
 
-JVMは、小さな数値に対してボックス化された表現をキャッシュすることで、[メモリ最適化手法](https://docs.oracle.com/javase/specs/jls/se22/html/jls-5.html#jls-5.1.7)を適用します。その結果、同じ値を持つボックス化された数値は [参照の等価性](equality.md#referential-equality)が認められる場合があります。
+JVM は、ボクシングされた表現をキャッシュすることにより、小さな数値に対して[メモリ最適化手法](https://docs.oracle.com/javase/specs/jls/se22/html/jls-5.html#jls-5.1.7)を適用します。その結果、同じ値を持つボクシングされた数値が[参照等価 (referentially equal)](equality.md#referential-equality)になることがあります。
 
-例えば、JVMは `-128` から `127` までの範囲のボックス化された `Integer` 値をキャッシュします。そのため、以下のコードは `true` を返します：
+たとえば、JVM は `-128` から `127` の範囲のボクシングされた `Integer` 値をキャッシュします。そのため、次のコードは `true` を返します：
 
 ```kotlin
 fun main() {
@@ -490,9 +487,9 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" validate="false"}
+{kotlin-runnable="true" validate="false"}
 
-キャッシュされる範囲外の値の場合、ボックス化された値は個別のオブジェクトになります。その場合、値が [構造的に等しく](equality.md#structural-equality)ても、参照の等価性は認められません。そのため、数値の比較には `==` を使用してください：
+キャッシュされる範囲外の値の場合、ボクシングされた値は別々のオブジェクトになります。その場合、値が[構造等価 (structurally equal)](equality.md#structural-equality)であっても、参照等価にはなりません。このため、数値の比較には `==` を使用してください：
 
 ```kotlin
 fun main() {
@@ -506,4 +503,4 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" validate="false"}
+{kotlin-runnable="true" validate="false"}

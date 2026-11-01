@@ -1,320 +1,239 @@
 ---
-title: 테스트
+title: Ktor 테스팅
 ---
 
-# Koin을 사용한 Ktor 테스트하기
+# Ktor 테스팅
 
-의존성 주입(Dependency Injection)을 위해 Koin을 사용하는 Ktor 애플리케이션을 테스트할 때의 모범 사례입니다.
+이 페이지에서는 Koin을 사용하는 Ktor 서버 테스팅을 다룹니다: `testApplication`으로 라우트 실행하기, 정의(definition)를 테스트 모듈로 교체하기, 그리고 테스트 간 격리하기 등입니다. [Ktor에 Koin 설치하기](/docs/reference/koin-ktor/ktor) 방법을 이미 알고 있다고 가정합니다. HTTP 계층이 없는 일반 클래스의 테스트는 [단위 테스팅(Unit Testing)](/docs/reference/koin-test/testing) 기법을 사용하세요.
 
-## 테스트 설정 {id="test-configuration"}
-
-### 기본 테스트 설정 {id="basic-test-setup"}
+## 의존성 설정 {id="dependencies"}
 
 ```kotlin
-class UserServiceTest : KoinTest {
-
-    @get:Rule
-    val koinTestRule = KoinTestRule.create {
-        modules(testModule)
-    }
-
-    private val userService: UserService by inject()
-
-    @Test
-    fun `should return user`() {
-        val user = userService.getUser("123")
-        assertNotNull(user)
-    }
-}
-
-val testModule = module {
-    single<UserRepository> { MockUserRepository() }
-    singleOf(::UserService)
+dependencies {
+    testImplementation("io.ktor:ktor-server-test-host")
+    testImplementation("io.insert-koin:koin-test")
+    testImplementation("io.insert-koin:koin-test-junit4") // 또는 koin-test-junit5
 }
 ```
 
-## Ktor testApplication으로 테스트하기 {id="testing-with-ktor-testapplication"}
+## testApplication으로 라우트 실행 {id="run-routes-with-testapplication"}
 
-```kotlin
-class ApplicationTest {
-    @Test
-    fun `test hello endpoint`() = testApplication {
-        application {
-            install(Koin) {
-                modules(testModule)
-            }
-            configureRouting()
-        }
+`install(Koin)`은 프로덕션 환경과 마찬가지로 `testApplication` 내부에서도 동작합니다. 테스트 모듈과 함께 설치한 후 라우트를 추가하세요:
 
-        client.get("/hello?name=Test").apply {
-            assertEquals(HttpStatusCode.OK, status)
-            assertContains(bodyAsText(), "Test")
-        }
-    }
-}
-```
-
-## 테스트를 위한 격리된 컨텍스트(Isolated Context) 사용 {id="using-isolated-context-for-tests"}
-
-각 테스트는 고유의 격리된 Koin 인스턴스를 갖습니다.
-
+**Compiler Plugin DSL**
 ```kotlin
 class UserRoutesTest {
+
     @Test
-    fun `test user endpoint`() = testApplication {
+    fun `returns a user`() = testApplication {
         application {
-            install(KoinIsolated) {
+            install(Koin) {
+                modules(appModule, testModule)
+            }
+            configureRouting()
+        }
+
+        val response = client.get("/users/1")
+        assertEquals(HttpStatusCode.OK, response.status)
+    }
+}
+```
+
+**Annotations**
+```kotlin
+import org.koin.plugin.module.dsl.withConfiguration
+
+class UserRoutesTest {
+
+    @Test
+    fun `returns a user`() = testApplication {
+        application {
+            install(Koin) {
+                withConfiguration<MyApp>()
                 modules(testModule)
             }
             configureRouting()
         }
 
-        client.get("/users/123").apply {
-            assertEquals(HttpStatusCode.OK, status)
-        }
+        val response = client.get("/users/1")
+        assertEquals(HttpStatusCode.OK, response.status)
     }
 }
 ```
 
-### 병렬 테스트 실행 {id="parallel-test-execution"}
+**Constructor / Classic DSL**
+```kotlin
+class UserRoutesTest {
 
-격리된 컨텍스트를 사용하면 테스트가 서로 간섭 없이 병렬로 실행될 수 있습니다.
+    @Test
+    fun `returns a user`() = testApplication {
+        application {
+            install(Koin) {
+                modules(appModule, testModule)
+            }
+            configureRouting()
+        }
+
+        val response = client.get("/users/1")
+        assertEquals(HttpStatusCode.OK, response.status)
+    }
+}
+```
 
 ```kotlin
-class ParallelTests {
-    @Test
-    fun `test A`() = testApplication {
-        application {
-            install(KoinIsolated) {
-                modules(moduleA)
-            }
-        }
-        // ...
-    }
-
-    @Test
-    fun `test B`() = testApplication {
-        application {
-            install(KoinIsolated) {
-                modules(moduleB)
-            }
-        }
-        // ...
-    }
+val testModule = module {
+    single<UserRepository> { InMemoryUserRepository(User("1", "Alice")) }
 }
 ```
 
-## 모듈 검증 {id="module-verification"}
+테스트 모듈은 가장 마지막에 로드되므로, 해당 모듈의 `UserRepository`가 프로덕션의 것을 대체합니다([정의(Definitions)](/docs/reference/koin-core/definitions#overriding-a-definition) 참조). 이와 같은 람다 정의는 모든 스타일에서 작동합니다.
 
-애노테이션을 사용하여 컴파일 타임에 모듈을 검증하거나 테스트 타임에 검증할 수 있습니다.
+라우트는 프로덕션 환경과 마찬가지로 `org.koin.ktor.ext`의 `inject()` 및 `get()`을 통해 의존성을 해결(resolve)합니다. `testApplication`이 종료되면 Ktor가 애플리케이션을 중지하고 Koin 플러그인이 컨테이너를 닫습니다.
+
+## 애플리케이션 모듈 재사용 {id="reuse-your-application-module"}
+
+프로덕션의 `Application.module()`에서 Koin을 설치하는 경우, 테스트에서 이를 호출하고 `koinModules()`로 오버라이드를 추가하세요:
 
 ```kotlin
-class ModuleVerificationTest : KoinTest {
-    @Test
-    fun `verify all modules`() {
-        appModule.verify()
+// 프로덕션
+fun Application.module() {
+    install(Koin) {
+        modules(appModule)
     }
+    configureRouting()
+}
+
+// 테스트
+@Test
+fun `returns a user`() = testApplication {
+    application {
+        module()
+        koinModules(testModule)
+    }
+
+    assertEquals(HttpStatusCode.OK, client.get("/users/1").status)
 }
 ```
 
-### 추가 타입과 함께 사용 {id="with-extra-types"}
+`koinModules()`는 `install(Koin)`으로 생성된 컨테이너에 모듈을 로드합니다. Ktor 플러그인은 한 번만 설치할 수 있으므로 테스트에서 두 번째 `install(Koin)`을 호출하면 실패합니다.
+
+`koinModules()`는 `install(Koin)` 이후에 오버라이드를 로드합니다. 설치 시점에 생성되는 정의(예: `createdAtStart` 사용)는 프로덕션 의존성을 유지합니다.
+
+## 테스트 격리 {id="isolate-tests"}
+
+`install(Koin)`은 전역 컨텍스트(global context)에서 Koin을 시작합니다. 컨테이너가 이미 실행 중인 경우 플러그인이 이를 먼저 중지합니다. 순차적으로 실행되는 테스트는 문제없지만, 동시에 실행되는 두 테스트는 전역 컨텍스트를 공유하여 서로에게 영향을 줄 수 있습니다.
+
+애플리케이션이 종료되기 전에 테스트가 실패하더라도 각 테스트 후 Koin을 중지할 수 있도록 `AutoCloseKoinTest`를 상속하세요:
+
+```kotlin
+class UserRoutesTest : AutoCloseKoinTest() {
+    // 테스트 코드
+}
+```
+
+병렬 테스트의 경우 대신 `KoinIsolated`를 설치하세요. 각 애플리케이션은 전역 컨텍스트 외부에서 자체 컨테이너를 갖게 됩니다:
 
 ```kotlin
 @Test
-fun `verify modules with extra types`() {
-    appModule.verify(
-        extraTypes = listOf(
-            ApplicationCall::class,
-            Application::class
-        )
-    )
-}
-```
-
-## 의존성 모킹 (Mocking Dependencies) {id="mocking-dependencies"}
-
-### 테스트 모듈 사용 {id="using-test-modules"}
-
-```kotlin
-val productionModule = module {
-    singleOf(::UserRepositoryImpl) bind UserRepository::class
-    singleOf(::UserService)
-}
-
-val testModule = module {
-    single<UserRepository> { MockUserRepository() }
-    singleOf(::UserService)
-}
-```
-
-### Mockk 사용 {id="using-mockk"}
-
-```kotlin
-class UserServiceTest : KoinTest {
-    private val mockRepository = mockk<UserRepository>()
-
-    @get:Rule
-    val koinTestRule = KoinTestRule.create {
-        modules(module {
-            single { mockRepository }
-            singleOf(::UserService)
-        })
+fun `returns a user`() = testApplication {
+    application {
+        install(KoinIsolated) {
+            modules(appModule, testModule)
+        }
+        configureRouting()
     }
 
-    @Test
-    fun `should call repository`() {
-        val userService: UserService by inject()
-
-        every { mockRepository.findById("123") } returns User("123", "Test")
-
-        val user = userService.getUser("123")
-
-        verify { mockRepository.findById("123") }
-        assertEquals("Test", user?.name)
-    }
+    assertEquals(HttpStatusCode.OK, client.get("/users/1").status)
 }
 ```
 
-## 리퀘스트 스코프 (Request Scopes) 테스트 {id="testing-request-scopes"}
+`KoinIsolated`를 사용하면 Ktor 확장 함수(`inject()`, `get()`, `call.scope`)를 통해 의존성을 해결합니다. `KoinComponent`나 `GlobalContext.get()`은 격리된 컨테이너를 참조할 수 없습니다. [Ktor의 격리된 컨텍스트(Isolated Context in Ktor)](/docs/reference/koin-ktor/ktor-isolated)를 참조하세요.
+
+## 의존성 모킹(Mocking) {id="mock-a-dependency"}
+
+테스트 모듈에 목(mock)을 배치합니다:
 
 ```kotlin
-class RequestScopeTest {
-    @Test
-    fun `test request scoped component`() = testApplication {
-        application {
-            install(Koin) {
-                modules(module {
-                    singleOf(::UserService)
-                    requestScope {
-                        scopedOf(::RequestLogger)
-                    }
-                })
-            }
+@Test
+fun `returns 404 for an unknown user`() = testApplication {
+    val repository = mockk<UserRepository> {
+        every { findById(any()) } returns null
+    }
 
-            routing {
-                get("/test") {
-                    val logger = call.scope.get<RequestLogger>()
-                    logger.log("Test message")
-                    call.respondText("OK")
+    application {
+        install(Koin) {
+            modules(appModule, module { single { repository } })
+        }
+        configureRouting()
+    }
+
+    assertEquals(HttpStatusCode.NotFound, client.get("/users/999").status)
+    verify { repository.findById("999") }
+}
+```
+
+`declareMock`([declareMock을 사용한 모킹](/docs/reference/koin-test/testing#mocking-with-declaremock) 참조) 역시 전역 컨텍스트를 사용하므로 `install(Koin)`과 함께 동작합니다. 단, `KoinIsolated`에서는 작동하지 않습니다.
+
+## 요청 스코프(Request scope) {id="request-scope"}
+
+`requestScope { }`에 선언된 정의는 각 호출마다 생성되며 응답이 전송될 때 닫힙니다([Ktor의 요청 스코프](/docs/reference/koin-ktor/ktor-scopes) 참조). 요청을 통해 이를 테스트하세요:
+
+```kotlin
+@Test
+fun `each call gets its own request logger`() = testApplication {
+    application {
+        install(Koin) {
+            modules(module {
+                requestScope {
+                    scoped { RequestLogger() }
                 }
+            })
+        }
+        routing {
+            get("/id") {
+                call.respondText(call.scope.get<RequestLogger>().id)
             }
         }
-
-        client.get("/test").apply {
-            assertEquals(HttpStatusCode.OK, status)
-        }
     }
+
+    val first = client.get("/id").bodyAsText()
+    val second = client.get("/id").bodyAsText()
+    assertNotEquals(first, second)
 }
 ```
 
-## DI 브리지 (Bridge)로 테스트하기 {id="testing-with-di-bridge"}
+`call.scope`는 호출이 처리되는 동안에만 존재합니다. 라우트 외부에서 요청 스코프 정의를 해결하려고 하면 실패합니다.
+
+## Ktor DI 브리지 {id="ktor-di-bridge"}
+
+[Ktor DI 브리지](/docs/reference/koin-ktor/ktor-bridge)가 활성화되어 있으면, 프로덕션 환경과 동일하게 테스트 애플리케이션에서 Ktor의 `dependencies { }`를 사용하여 테스트 값을 제공합니다. `koinToKtor()`를 통해 Koin 정의가 이를 해결할 수 있습니다:
 
 ```kotlin
-class BridgeTest {
-    @Test
-    fun `test with bridge`() = testApplication {
-        application {
-            dependencies {
-                provide<Database> { MockDatabase() }
-            }
-
-            install(Koin) {
-                bridge {
-                    koinToKtor()
-                }
-                modules(appModule)
-            }
-
-            configureRouting()
+@Test
+fun `uses the Ktor-provided database`() = testApplication {
+    application {
+        dependencies {
+            provide<Database> { InMemoryDatabase() }
         }
-
-        client.get("/users").apply {
-            assertEquals(HttpStatusCode.OK, status)
+        install(Koin) {
+            bridge { koinToKtor() }
+            modules(appModule)
         }
+        configureRouting()
     }
+
+    assertEquals(HttpStatusCode.OK, client.get("/users").status)
 }
 ```
 
-## 전체 테스트 예시 {id="complete-test-example"}
+## 구성(Configuration) 검증 {id="check-your-configuration"}
 
-```kotlin
-class UserApiTest : KoinTest {
+서버를 시작하지 않고 모든 정의의 의존성이 올바르게 선언되었는지 확인하려면 [구성 검증(Verifying your Configuration)](/docs/reference/koin-test/verify)을 참조하세요. 요청 스코프의 `ApplicationCall`과 같이 런타임에 Ktor가 제공하는 타입은 `extraTypes`에 지정합니다.
 
-    @Test
-    fun `should return all users`() = testApplication {
-        application {
-            install(KoinIsolated) {
-                modules(testModule)
-            }
+## 관련 문서 {id="related"}
 
-            routing {
-                val userService by inject<UserService>()
-
-                get("/api/users") {
-                    call.respond(userService.getAllUsers())
-                }
-            }
-        }
-
-        client.get("/api/users").apply {
-            assertEquals(HttpStatusCode.OK, status)
-            val users = Json.decodeFromString<List<User>>(bodyAsText())
-            assertEquals(2, users.size)
-        }
-    }
-
-    @Test
-    fun `should return user by id`() = testApplication {
-        application {
-            install(KoinIsolated) {
-                modules(testModule)
-            }
-
-            routing {
-                val userService by inject<UserService>()
-
-                get("/api/users/{id}") {
-                    val id = call.parameters["id"]!!
-                    val user = userService.getUser(id)
-                        ?: return@get call.respond(HttpStatusCode.NotFound)
-                    call.respond(user)
-                }
-            }
-        }
-
-        client.get("/api/users/1").apply {
-            assertEquals(HttpStatusCode.OK, status)
-        }
-
-        client.get("/api/users/999").apply {
-            assertEquals(HttpStatusCode.NotFound, status)
-        }
-    }
-}
-
-val testModule = module {
-    single<UserRepository> {
-        MockUserRepository(
-            listOf(
-                User("1", "Alice", "alice@example.com"),
-                User("2", "Bob", "bob@example.com")
-            )
-        )
-    }
-    singleOf(::UserService)
-}
-```
-
-## 모범 사례 {id="best-practices"}
-
-1. **격리된 컨텍스트(Isolated context) 사용** - 테스트 간의 간섭을 방지합니다.
-2. **테스트 모듈 생성** - 프로덕션 의존성을 모크(mock)로 오버라이드합니다.
-3. **모듈 검증** - 구성 오류를 조기에 발견합니다.
-4. **정리(Clean up)** - 글로벌 컨텍스트를 사용하는 테스트는 완료 후 Koin을 중지해야 합니다.
-5. **병렬 안전성** - 병렬 테스트 실행을 위해 `KoinIsolated`를 사용합니다.
-
-## 참고 항목 {id="see-also"}
-
-- **[Ktor용 Koin](/docs/reference/koin-ktor/ktor)** - 메인 Ktor 문서
-- **[격리된 컨텍스트](/docs/reference/koin-ktor/ktor-isolated)** - 격리된 Koin 인스턴스
-- **[테스트](/docs/reference/koin-test/testing)** - 핵심 테스트 문서
+- [Ktor용 Koin(Koin for Ktor)](/docs/reference/koin-ktor/ktor): 플러그인 설치 및 라우트에서의 주입.
+- [Ktor의 격리된 컨텍스트(Isolated Context in Ktor)](/docs/reference/koin-ktor/ktor-isolated): `KoinIsolated` 및 사용 시점.
+- [Ktor의 요청 스코프(Request Scopes in Ktor)](/docs/reference/koin-ktor/ktor-scopes): 호출에 바인딩된 정의.
+- [단위 테스팅(Unit Testing)](/docs/reference/koin-test/testing): `KoinTest`, 오버라이드 및 `declareMock`.
+- [구성 검증(Verifying your Configuration)](/docs/reference/koin-test/verify): 테스트에서 모듈 검증하기.

@@ -11,45 +11,50 @@
 </tldr>
 
 <link-summary>
-Ktor は Kotlin/Native をサポートしており、追加のランタイムや仮想マシンなしでサーバーを実行できます。
+KtorはKotlin/Nativeをサポートしており、追加のランタイムや仮想マシンなしでサーバーを実行できます。
 </link-summary>
 
-Ktor は [Kotlin/Native](https://kotlinlang.org/docs/native-overview.html) をサポートしており、追加のランタイムや仮想マシンなしでサーバーを実行できます。現在、Kotlin/Native で Ktor サーバーを実行する際には、以下の制限事項があります:
-* [サーバーの作成](server-create-and-configure.topic)には `embeddedServer` を使用する必要がある
-* [CIO エンジン](server-engines.md)のみがサポートされている
-* リバースプロキシなしの [HTTPS](server-ssl.md) はサポートされていない
+Ktorは[Kotlin/Native](https://kotlinlang.org/docs/native-overview.html)をサポートしており、追加のランタイムや仮想マシンなしでサーバーを実行できます。現在、Kotlin/Native環境でKtorサーバーを実行することには、以下の制限事項があります:
+* サーバーは`embeddedServer`を使用して[作成する必要がある](server-create-and-configure.topic)
+* [CIOエンジン](server-engines.md)のみがサポートされている
+* リバースプロキシなしの[HTTPS](server-ssl.md)はサポートされていない
 
-> Kotlin/Native プロジェクトで Ktor を使用するには、[新しいメモリマネージャー](https://kotlinlang.org/docs/native-memory-manager.html)が必要です。これは Kotlin 1.7.20 以降でデフォルトで有効になっています。
+> Kotlin/NativeプロジェクトでKtorを使用するには、[新しいメモリマネージャー](https://kotlinlang.org/docs/native-memory-manager.html)が必要です。これはKotlin 1.7.20以降でデフォルトで有効になっています。
 >
 {id="newmm-note" style="note"}
 
 ## 依存関係の追加 {id="add-dependencies"}
 
-Kotlin/Native プロジェクトの Ktor サーバーには、少なくとも2つの依存関係が必要です:
+Kotlin/NativeプロジェクトのKtorサーバーには、少なくとも2つの依存関係が必要です:
 * `ktor-server-core`（コア依存関係）
-* `ktor-server-cio`（CIO エンジン）
+* `ktor-server-cio`（CIOエンジン）
 
-以下のコードスニペットは、<Path>build.gradle.kts</Path> ファイルの `nativeMain` ソースセットに依存関係を追加する方法を示しています:
+以下の例では、<Path>build.gradle.kts</Path>ファイルの`nativeMain`ソースセットに依存関係を追加します:
 
 ```kotlin
 kotlin {
     sourceSets {
         nativeMain.dependencies {
-            implementation("io.ktor:ktor-server-core:$ktor_version")
-            implementation("io.ktor:ktor-server-cio:$ktor_version")
+            implementation(ktorLibs.server.core)
+            implementation(ktorLibs.server.cio)
         }
     }
 }
 ```
 
-Native サーバーを[テスト](server-testing.md)するには、`nativeTest` ソースセットに `ktor-server-test-host` アーティファクトを追加します:
+<note>
+    上記のコードスニペットでは、Ktorの依存関係を指定するために<a href="server-dependencies.topic#using-version-catalog">
+    Ktorバージョンカタログ</a>を使用しています。
+</note>
+
+ネイティブサーバーを[テスト](server-testing.md)するには、`nativeTest`ソースセットに`ktor-server-test-host`アーティファクトを追加します:
 
 ```kotlin
 kotlin {
     sourceSets {
         nativeTest.dependencies {
-            implementation(kotlin("test"))
-            implementation("io.ktor:ktor-server-test-host:$ktor_version")
+            implementation(libs.kotlin.test)
+            implementation(ktorLibs.server.testHost)
         }
     }
 }
@@ -57,7 +62,7 @@ kotlin {
 
 ## ネイティブターゲットの設定 {id="native-target"}
 
-必要なネイティブターゲットを指定し、`binaries` プロパティを使用して[ネイティブバイナリを宣言](https://kotlinlang.org/docs/mpp-build-native-binaries.html)します:
+必要なネイティブターゲットを指定し、`binaries`プロパティを使用して[ネイティブバイナリを宣言](https://kotlinlang.org/docs/mpp-build-native-binaries.html)します:
 
 ```kotlin
 kotlin {
@@ -83,10 +88,10 @@ kotlin {
 }
 ```
 
-> 完全なサンプルについては、[embedded-server-native](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/embedded-server-native) を参照してください。
+> 完全な例については、[embedded-server-native](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/embedded-server-native)を参照してください。
 >
 {style="tip"}
 
 ## 次のステップ {id="create-server"}
 
-Gradle ビルドスクリプトを設定したら、続いて [Ktor サーバーの作成](server-create-and-configure.topic)を行うことができます。
+Gradleビルドスクリプトを設定したら、続けて[Ktorサーバーの作成](server-create-and-configure.topic)に進むことができます。

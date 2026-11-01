@@ -1,12 +1,12 @@
-[//]: # (title: 基本语法概览)
+[//]: # (title: 基本语法概述)
 
-这是基本语法元素的集合及示例。在每个部分的末尾，您都会找到指向相关主题详细说明的链接。
+本文汇集了基础语法元素及示例。在每个小节末尾，你都可以找到指向相关主题详细说明的链接。
 
-您还可以通过 JetBrains Academy 免费的 [Kotlin 核心轨道](https://hyperskill.org/tracks?category=4&utm_source=jbkotlin_hs&utm_medium=referral&utm_campaign=kotlinlang-docs&utm_content=button_1&utm_term=22.03.23) 学习所有 Kotlin 核心知识。
+你还可以通过 JetBrains Academy 提供的免费 [Kotlin Core track](https://hyperskill.org/tracks?category=4&utm_source=jbkotlin_hs&utm_medium=referral&utm_campaign=kotlinlang-docs&utm_content=button_1&utm_term=22.03.23) 学习 Kotlin 的所有核心知识。
 
 ## 包定义与导入 {id="package-definition-and-imports"}
 
-包规范应位于源文件的顶部：
+包规范应位于源文件的最顶部：
 
 ```kotlin
 package my.demo
@@ -16,9 +16,9 @@ import kotlin.text.*
 // ...
 ```
 
-不要求目录与包匹配：源文件可以任意放置在文件系统中。
+目录结构无需与包匹配：源文件可以任意存放在文件系统中。
 
-请参阅[包](packages.md)。
+参见[包](packages.md)。
 
 ## 程序入口点 {id="program-entry-point"}
 
@@ -29,16 +29,16 @@ fun main() {
     println("Hello world!")
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-basic-syntax-hello-world"}
+{kotlin-runnable="true" id="kotlin-basic-syntax-hello-world"}
 
-`main` 的另一种形式接受可变实参数量 的 `String` 实参： 
+`main` 的另一种形式接受可变实参数量的 `String` 实参： 
 
 ```kotlin
 fun main(args: Array<String>) {
     println(args.contentToString())
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
 ## 打印到标准输出 {id="print-to-the-standard-output"}
 
@@ -52,9 +52,9 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-basic-syntax-print"}
+{kotlin-runnable="true" id="kotlin-basic-syntax-print"}
 
-`println` 打印其实参并添加换行符，以便下次打印的内容出现在下一行：
+`println` 会打印其实参并添加换行，使下一次打印的内容显示在下一行：
 
 ```kotlin
 fun main() {
@@ -64,16 +64,16 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-basic-syntax-println"}
+{kotlin-runnable="true" id="kotlin-basic-syntax-println"}
 
 ## 从标准输入读取 {id="read-from-the-standard-input"}
 
-`readln()` 函数从标准输入读取。该函数将用户输入的整行内容读取为字符串。
+`readln()` 函数从标准输入读取内容。该函数将用户输入的整行内容读取为字符串。
 
-您可以将 `println()`、`readln()` 和 `print()` 函数结合使用，以打印请求和显示用户输入的消息：
+你可以结合使用 `println()`、`readln()` 与 `print()` 函数来输出提示信息，以请求并显示用户输入：
 
 ```kotlin
-// 打印一条消息以请求输入
+// 打印提示输入的消息
 println("Enter any word: ")
 
 // 读取并存储用户输入。例如：Happiness
@@ -85,11 +85,11 @@ print(yourWord)
 // You entered the word: Happiness
 ```
 
-欲了解更多信息，请参阅[读取标准输入](read-standard-input.md)。
+要了解更多信息，请参阅[读取标准输入](read-standard-input.md)。
 
 ## 函数 {id="functions"}
 
-一个包含两个 `Int` 形参且返回值类型为 `Int` 的函数：
+带有两个 `Int` 形参且返回值类型为 `Int` 的函数：
 
 ```kotlin
 //sampleStart
@@ -103,9 +103,9 @@ fun main() {
     println(sum(3, 5))
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-basic-syntax-return-int"}
+{kotlin-runnable="true" id="kotlin-basic-syntax-return-int"}
 
-函数体可以是表达式。其返回值类型是推断出来的：
+函数体可以是表达式。其返回值类型可被自动推断：
 
 ```kotlin
 //sampleStart
@@ -116,7 +116,7 @@ fun main() {
     println("sum of 19 and 23 is ${sum(19, 23)}")
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-basic-syntax-function-expression"}
+{kotlin-runnable="true" id="kotlin-basic-syntax-function-expression"}
 
 不返回有意义值的函数：
 
@@ -131,7 +131,7 @@ fun main() {
     printSum(-1, 8)
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-basic-syntax-return-unit"}
+{kotlin-runnable="true" id="kotlin-basic-syntax-return-unit"}
 
 `Unit` 返回值类型可以省略：
 
@@ -146,34 +146,34 @@ fun main() {
     printSum(-1, 8)
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-basic-syntax-function-omit-unit"}
+{kotlin-runnable="true" id="kotlin-basic-syntax-function-omit-unit"}
 
-请参阅[函数](functions.md)。
+参见[函数](functions.md)。
 
 ## 变量 {id="variables"}
 
 在 Kotlin 中，声明变量时以关键字 `val` 或 `var` 开头，后跟变量名称。
 
-使用 `val` 关键字声明只能赋值一次的变量。它们是不可变的、只读的局部变量，在初始化后无法重新赋值为不同的值： 
+使用 `val` 关键字声明只能赋值一次的变量。它们是不可变的只读局部变量，初始化后不能再重新赋值： 
 
 ```kotlin
 fun main() {
 //sampleStart
-    // 声明变量 x 并使用值 5 进行初始化
+    // 声明变量 x 并使用值 5 对其进行初始化
     val x: Int = 5
     // 5
 //sampleEnd
     println(x)
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-basic-syntax-val"}
+{kotlin-runnable="true" id="kotlin-basic-syntax-val"}
 
-使用 `var` 关键字声明可以重新赋值的变量。这些是可变变量，您可以在初始化后更改它们的值：
+使用 `var` 关键字声明可以重新赋值的变量。它们是可变变量，初始化后可以修改其值：
 
 ```kotlin
 fun main() {
 //sampleStart
-    // 声明变量 x 并使用值 5 进行初始化
+    // 声明变量 x 并使用值 5 对其进行初始化
     var x: Int = 5
     // 为变量 x 重新赋值为 6
     x += 1
@@ -182,23 +182,23 @@ fun main() {
     println(x)
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-basic-syntax-var"}
+{kotlin-runnable="true" id="kotlin-basic-syntax-var"}
 
-Kotlin 支持类型推断并自动识别声明变量的数据类型。声明变量时，可以省略变量名后的类型：
+Kotlin 支持类型推断，并会自动识别所声明变量的数据类型。声明变量时，可以省略变量名后的类型：
 
 ```kotlin
 fun main() {
 //sampleStart
-    // 声明变量 x，值为 5；推断为 `Int` 类型
+    // 声明值为 5 的变量 x；推断为 `Int` 类型
     val x = 5
     // 5
 //sampleEnd
     println(x)
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-basic-syntax-inference"}
+{kotlin-runnable="true" id="kotlin-basic-syntax-inference"}
 
-您只能在初始化变量后使用它们。您可以在声明时初始化变量，也可以先声明变量然后再初始化。在第二种情况下，必须指定数据类型：
+变量只有在初始化后才能使用。你可以在声明变量的同时对其进行初始化，也可以先声明变量再在后续进行初始化。在第二种情况下，必须指定数据类型：
 
 ```kotlin
 fun main() {
@@ -216,9 +216,9 @@ fun main() {
     println(c)
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-basic-syntax-initialize"}
+{kotlin-runnable="true" id="kotlin-basic-syntax-initialize"}
 
-您可以在顶层声明变量：
+你可以在顶层声明变量：
 
 ```kotlin
 //sampleStart
@@ -240,7 +240,7 @@ fun main() {
     println("x = $x; PI = $PI")
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-basic-syntax-variable-top-level"}
+{kotlin-runnable="true" id="kotlin-basic-syntax-variable-top-level"}
 
 有关声明属性的信息，请参阅[属性](properties.md)。
 
@@ -251,7 +251,7 @@ fun main() {
 class Shape
 ```
 
-类的属性可以列在其声明或正文中： 
+类的属性可以在其声明或类体中列出： 
 
 ```kotlin
 class Rectangle(val height: Double, val length: Double) {
@@ -259,7 +259,7 @@ class Rectangle(val height: Double, val length: Double) {
 }
 ```
 
-类声明中列出的带形参默认构造函数可自动使用：
+类声明中列出形参的默认构造函数会自动可用：
 
 ```kotlin
 class Rectangle(val height: Double, val length: Double) {
@@ -270,9 +270,9 @@ fun main() {
     println("The perimeter is ${rectangle.perimeter}")
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-basic-syntax-class-constructor"}
+{kotlin-runnable="true" id="kotlin-basic-syntax-class-constructor"}
 
-类之间的继承由冒号 (`:`) 声明。类默认是 `final` 的；要使类可继承，请将其标记为 `open`：
+类之间的继承使用冒号（`:`）声明。类默认是 `final` 的；要使类可继承，请将其标记为 `open`：
 
 ```kotlin
 open class Shape
@@ -282,28 +282,28 @@ class Rectangle(val height: Double, val length: Double): Shape() {
 }
 ```
 
-欲了解有关构造函数和继承的更多信息，请参阅[类](classes.md)以及[对象与实例](object-declarations.md)。
+要了解关于构造函数和继承的更多信息，请参阅[类](classes.md)和[对象与实例](object-declarations.md)。
 
 ## 注释 {id="comments"}
 
-与大多数现代语言一样，Kotlin 支持单行（或行末）注释和多行（块）注释：
+与大多数现代语言一样，Kotlin 支持单行（或_行尾_）注释以及多行（_块_）注释：
 
 ```kotlin
-// 这是一条行末注释
+// 这是一个行尾注释
 
-/* 这是一条多行
-   块注释。 */
+/* 这是一个块注释
+   占用多行。 */
 ```
 
 Kotlin 中的块注释可以嵌套：
 
 ```kotlin
 /* 注释从这里开始
-/* 包含一个嵌套注释 *​/  
-到这里结束。 */
+/* 包含嵌套注释 *​/  
+并在这里结束。 */
 ```
 
-有关文档注释语法的详细信息，请参阅[编写 Kotlin 代码文档](kotlin-doc.md)。
+有关文档注释语法的信息，请参阅[编写 Kotlin 代码文档](kotlin-doc.md)。
 
 ## 字符串模板 {id="string-templates"}
 
@@ -321,7 +321,7 @@ fun main() {
     println(s2)
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-basic-syntax-string-templates"}
+{kotlin-runnable="true" id="kotlin-basic-syntax-string-templates"}
 
 详情请参阅[字符串模板](strings.md#string-templates)。
 
@@ -342,7 +342,7 @@ fun main() {
     println("max of 0 and 42 is ${maxOf(0, 42)}")
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-basic-syntax-conditional-expressions"}
+{kotlin-runnable="true" id="kotlin-basic-syntax-conditional-expressions"}
 
 在 Kotlin 中，`if` 也可以用作表达式：
 
@@ -355,9 +355,9 @@ fun main() {
     println("max of 0 and 42 is ${maxOf(0, 42)}")
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-basic-syntax-if-expression"}
+{kotlin-runnable="true" id="kotlin-basic-syntax-if-expression"}
 
-请参阅 [`if` 表达式](control-flow.md#if-expression)。
+参见 [`if` 表达式](control-flow.md#if-expression)。
 
 ## for 循环 {id="for-loop"}
 
@@ -371,7 +371,7 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-basic-syntax-for-loop"}
+{kotlin-runnable="true" id="kotlin-basic-syntax-for-loop"}
 
 或者：
 
@@ -385,9 +385,9 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-basic-syntax-for-loop-indices"}
+{kotlin-runnable="true" id="kotlin-basic-syntax-for-loop-indices"}
 
-请参阅 [for 循环](control-flow.md#for-loops)。
+参见 [for 循环](control-flow.md#for-loops)。
 
 ## while 循环 {id="while-loop"}
 
@@ -403,9 +403,9 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-basic-syntax-while-loop"}
+{kotlin-runnable="true" id="kotlin-basic-syntax-while-loop"}
 
-请参阅 [while 循环](control-flow.md#while-loops)。
+参见 [while 循环](control-flow.md#while-loops)。
 
 ## when 表达式 {id="when-expression"}
 
@@ -429,9 +429,9 @@ fun main() {
     println(describe("other"))
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-basic-syntax-when-expression"}
+{kotlin-runnable="true" id="kotlin-basic-syntax-when-expression"}
 
-请参阅 [when 表达式与语句](control-flow.md#when-expressions-and-statements)。
+参见 [when 表达式与语句](control-flow.md#when-expressions-and-statements)。
 
 ## 区间 {id="ranges"}
 
@@ -448,9 +448,9 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-basic-syntax-range-in"}
+{kotlin-runnable="true" id="kotlin-basic-syntax-range-in"}
 
-检查数字是否在区间外：
+检查数字是否超出区间范围：
 
 ```kotlin
 fun main() {
@@ -466,9 +466,9 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-basic-syntax-out-of-range"}
+{kotlin-runnable="true" id="kotlin-basic-syntax-out-of-range"}
 
-在区间上进行迭代：
+遍历区间：
 
 ```kotlin
 fun main() {
@@ -479,9 +479,9 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-basic-syntax-iterate-range"}
+{kotlin-runnable="true" id="kotlin-basic-syntax-iterate-range"}
 
-或者在级数上进行迭代：
+或遍历数列：
 
 ```kotlin
 fun main() {
@@ -496,13 +496,13 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-basic-syntax-iterate-progression"}
+{kotlin-runnable="true" id="kotlin-basic-syntax-iterate-progression"}
 
-请参阅[区间与级数](ranges.md)。
+参见[区间与数列](ranges.md)。
 
 ## 集合 {id="collections"}
 
-在集合上进行迭代：
+遍历集合：
 
 ```kotlin
 fun main() {
@@ -514,7 +514,7 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-basic-syntax-iterate-collection"}
+{kotlin-runnable="true" id="kotlin-basic-syntax-iterate-collection"}
 
 使用 `in` 运算符检查集合是否包含某个对象：
 
@@ -529,9 +529,9 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-basic-syntax-collection-in"}
+{kotlin-runnable="true" id="kotlin-basic-syntax-collection-in"}
 
-使用 [lambda表达式](lambdas.md) 过滤和映射集合：
+使用 [lambda表达式](lambdas.md)对集合进行过滤与映射：
 
 ```kotlin
 fun main() {
@@ -545,13 +545,13 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-basic-syntax-collection-filter-map"}
+{kotlin-runnable="true" id="kotlin-basic-syntax-collection-filter-map"}
 
-请参阅[集合概览](collections-overview.md)。
+参见[集合概述](collections-overview.md)。
 
 ## 可空值与 null 检查 {id="nullable-values-and-null-checks"}
 
-当可能出现 `null` 值时，引用必须显式标记为可空。可空类型的名称末尾带有 `?`。
+当可能出现 `null` 值时，引用必须显式标记为可空。可空类型的名称以 `?` 结尾。
 例如，`Int?`。
 
 如果 `str` 不包含整数，则返回 `null`：
@@ -574,9 +574,9 @@ fun printProduct(arg1: String, arg2: String) {
     val x = parseInt(arg1)
     val y = parseInt(arg2)
 
-    // 使用 `x * y` 会报错，因为它们可能持有 null。
+    // 使用 `x * y` 会报错，因为它们可能包含 null。
     if (x != null && y != null) {
-        // x 和 y 在进行 null 检查后会自动转换为非空类型
+        // 经过 null 检查后，x 和 y 会自动转换为非空类型
         println(x * y)
     }
     else {
@@ -591,7 +591,7 @@ fun main() {
     printProduct("a", "b")
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-basic-syntax-function-nullable-value"}
+{kotlin-runnable="true" id="kotlin-basic-syntax-function-nullable-value"}
 
 或者：
 
@@ -615,7 +615,7 @@ fun printProduct(arg1: String, arg2: String) {
         return
     }
 
-    // x 和 y 在进行 null 检查后会自动转换为非空类型
+    // 经过 null 检查后，x 和 y 会自动转换为非空类型
     println(x * y)
 //sampleEnd
 }
@@ -626,24 +626,24 @@ fun main() {
     printProduct("99", "b")
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-basic-syntax-function-null-check"}
+{kotlin-runnable="true" id="kotlin-basic-syntax-function-null-check"}
 
-请参阅 [Null 安全](null-safety.md)。
+参见 [Null 安全性](null-safety.md)。
 
 ## 类型检查与自动转换 {id="type-checks-and-automatic-casts"}
 
-`is` 运算符检查表达式是否为某种类型的实例。
-如果对不可变的局部变量或属性进行了特定类型的检查，则无需显式进行转换：
+`is` 运算符用于检查表达式是否为某类型的实例。
+如果对不可变的局部变量或属性进行了特定类型的检查，则无需显式对其进行类型转换：
 
 ```kotlin
 //sampleStart
 fun getStringLength(obj: Any): Int? {
     if (obj is String) {
-        // `obj` 在此分支中自动转换为 `String`
+        // 在此分支中，`obj` 会自动转换为 `String`
         return obj.length
     }
 
-    // 在类型检查分支外，`obj` 仍为 `Any` 类型
+    // 在类型检查分支之外，`obj` 仍然是 `Any` 类型
     return null
 }
 //sampleEnd
@@ -657,7 +657,7 @@ fun main() {
     printLength(listOf(Any()))
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-basic-syntax-is-operator"}
+{kotlin-runnable="true" id="kotlin-basic-syntax-is-operator"}
 
 或者：
 
@@ -666,7 +666,7 @@ fun main() {
 fun getStringLength(obj: Any): Int? {
     if (obj !is String) return null
 
-    // `obj` 在此分支中自动转换为 `String`
+    // 在此分支中，`obj` 会自动转换为 `String`
     return obj.length
 }
 //sampleEnd
@@ -680,14 +680,14 @@ fun main() {
     printLength(listOf(Any()))
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-basic-syntax-is-operator-expression"}
+{kotlin-runnable="true" id="kotlin-basic-syntax-is-operator-expression"}
 
-甚至可以：
+甚至还可以：
 
 ```kotlin
 //sampleStart
 fun getStringLength(obj: Any): Int? {
-    // `obj` 在 `&&` 的右侧自动转换为 `String`
+    // 在 `&&` 右侧，`obj` 会自动转换为 `String`
     if (obj is String && obj.length >= 0) {
         return obj.length
     }
@@ -705,6 +705,6 @@ fun main() {
     printLength(1000)
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-basic-syntax-is-operator-logic"}
+{kotlin-runnable="true" id="kotlin-basic-syntax-is-operator-logic"}
 
-请参阅[类](classes.md)和[类型转换](typecasts.md)。
+参见[类](classes.md)和[类型转换](typecasts.md)。

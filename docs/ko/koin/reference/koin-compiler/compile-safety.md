@@ -1,117 +1,108 @@
 ---
-title: 컴파일 타임 안정성
+title: 컴파일 타임 안전성 (Compile-Time Safety)
 ---
 
-Koin 컴파일러 플러그인은 컴파일 타임에 의존성 그래프를 검증하여, 앱이 실행되기 전에 누락된 의존성, 한정자(qualifier) 불일치 및 잘못된 호출 지점(call site)을 찾아냅니다.
+# 컴파일 타임 안전성 (Compile-Time Safety)
 
-이는 `verify()` 및 `checkModules()`와 같은 런타임 검증 도구를 대체합니다. 컴파일이 된다면, 정상적으로 작동함을 의미합니다.
+Koin 컴파일러 플러그인은 코드가 컴파일되는 동안 의존성 그래프(dependency graph)를 검사합니다. 누락된 정의(definition), 잘못된 한정자(qualifier) 또는 순환 의존성(circular dependency)이 발생하면 런타임에 비정상 종료(crash)되는 대신 파일과 라인 번호를 표시하며 빌드가 실패합니다. 이 문서에서는 검사되는 항목, 정확한 진단(diagnostics) 메시지, 플러그인이 검사할 수 없는 사례에 대해 다룹니다. 이 문서는 플러그인이 이미 설치되어 있다고 가정합니다([컴파일러 플러그인 설정](/docs/setup/compiler-plugin) 참조).
 
-## 작동 방식 {id="how-it-works"}
+컴파일 타임 안전성은 기본적으로 활성화되어 있습니다(`compileSafety = true`, [컴파일러 플러그인 옵션](/docs/reference/koin-annotations/options) 참조).
 
-플러그인은 컴파일 중에 세 가지 수준에서 그래프를 검증합니다.
+## 검사가 실행되는 위치 {id="where-the-checks-run"}
 
-### A2 — 모듈별 검증 (조기 피드백) {id="a2-per-module-early-feedback"}
+플러그인은 두 가지 수준에서 검사를 수행합니다.
 
-각 모듈의 정의는 해당 모듈에서 볼 수 있는 정의(자신의 정의, 명시적으로 포함된 모듈, `@Configuration` 형제 모듈)를 기준으로 체크됩니다.
+**전체 그래프 (Full graph)**: 각 Koin 진입점(entry point)에서 플러그인은 소스 코드 및 의존성 JAR로부터 진입점이 로드하는 모든 모듈을 수집하고, 완성된 전체 그래프를 기준으로 모든 정의를 검사합니다.
 
-```kotlin
-@Module(includes = [DataModule::class])
-@ComponentScan("app")
-class AppModule
-// 검증: AppModule + DataModule의 정의들
-```
+**호출 지점 (Call sites)**: 모든 `get<T>()`, `inject<T>()`, `koinInject<T>()`, `koinViewModel<T>()`, `by viewModel()` 및 이와 유사한 호출이 검사됩니다. 즉, `T`가 구성된 그래프에 반드시 존재해야 합니다. 만약 기능 모듈(feature module)이 호출을 수행하지만 전체 그래프를 볼 수 없는 경우, 플러그인은 컴파일된 모듈에 힌트를 남깁니다. 앱 모듈은 컴파일 시 이러한 힌트를 의존성으로부터 읽어와 검사합니다.
 
-`@Configuration` 레이블을 공유하는 모듈은 서로를 볼 수 있습니다.
+인식되는 진입점:
 
-```kotlin
-@Module @ComponentScan("core") @Configuration("prod")
-class CoreModule  // Repository 제공
+| 진입점 | 예시 |
+|-------------|---------|
+| `startKoin` | `startKoin<MyApp>()`, `startKoin { modules(appModule) }` |
+| `koinApplication` | `koinApplication { modules(appModule) }` |
+| `koinConfiguration` | `koinConfiguration<MyApp>()` |
+| `@KoinApplication` | `@KoinApplication object MyApp` |
+| `withConfiguration<T>()` | `startKoin { withConfiguration<MyApp>() }` |
+| Ktor `install(Koin)` | `install(Koin) { modules(appModule) }` |
 
-@Module @ComponentScan("service") @Configuration("prod")
-class ServiceModule  // Service(repo: Repository) → OK, CoreModule에서 보임
-```
-
-서로 다른 레이블은 격리됩니다.
+`modules(...)`는 플러그인이 추적할 수 있는 리스트 형태를 지원합니다: `listOf(...)`, `+`, `.toList()`, 최상위(top-level) `val` 또는 `List<Module>`을 반환하는 함수:
 
 ```kotlin
-@Configuration("core")
-class CoreModule
+val dataModules = listOf(databaseModule, networkModule)
+fun featureModules(): List<Module> = listOf(loginModule, profileModule)
 
-@Configuration("service")  // 다른 레이블 — CoreModule을 볼 수 없음
-class ServiceModule         // Service(repo: Repository) → 오류(ERROR)
-```
-
-**A2가 포착하는 사항:**
-
-- 누락된 의존성
-- 한정자 불일치 (`@Named("prod")`를 요청했지만 `@Named("test")`만 제공된 경우 등)
-- 크로스 스코프(Cross-scope) 위반
-- `T`가 제공되지 않은 `Lazy<T>`
-- `@Provided`로 표시되지 않은 외부 의존성
-
-### A3 — 전체 그래프 (완전한 보장) {id="a3-full-graph-complete-guarantee"}
-
-`startKoin<T>()` 호출 시, 모든 소스의 모든 모듈이 조립되어 전체 그래프가 검증됩니다. A2에서 볼 수 없었던 모듈 간 의존성, JAR의 정의 등이 여기서 체크됩니다.
-
-```kotlin
-@KoinApplication(modules = [CoreModule::class, ServiceModule::class])
-object MyApp
-
-startKoin<MyApp> { }
-// 검증: CoreModule + ServiceModule이 결합된 모든 정의
-```
-
-A3는 DSL 정의(`single<T>()`, `factory<T>()` 등)가 그래프의 일부일 때 이들도 함께 검증합니다.
-
-### A4 — 호출 지점 검증 (Call-Site Validation) {id="a4-call-site-validation"}
-
-코드베이스의 모든 `koinViewModel<T>()`, `get<T>()`, `inject<T>()` 호출을 가로챕니다. 플러그인은 대상 타입, 파일, 라인 및 컬럼 정보를 캡처한 다음, 조립된 그래프에 `T`가 존재하는지 확인합니다.
-
-```kotlin
-@Composable
-fun UserScreen() {
-    val viewModel: UserViewModel = koinViewModel()  // ← A4가 이를 검증함
-}
-
-class MyFragment : Fragment() {
-    val service: PaymentService by inject()  // ← A4가 이를 검증함
+startKoin {
+    modules(dataModules + featureModules())
 }
 ```
 
-만약 `UserViewModel`이 그래프에 없다면, 정확한 파일, 라인, 컬럼 정보와 함께 빌드 오류가 발생합니다.
+함수로 선언된 모듈(`fun dataModule(): Module = module { ... }`)은 최상위 `val`과 동일하게 추적됩니다.
 
-**모듈 간 호출 지점:** 기능 모듈이 `koinViewModel<T>()`을 호출하지만 전체 그래프에 대한 가시성이 없는 경우, 플러그인은 호출 지점 힌트(call-site hint)를 생성합니다. 앱 모듈이 컴파일될 때 의존성 JAR에서 이러한 힌트들을 발견하고 전체 그래프를 기준으로 검증합니다.
+:::note
+자체적인 진입점이 없는 Gradle 모듈(라이브러리, 대부분의 기능 모듈)은 자체 컴파일 시 누락된 의존성에 대한 진단이 발생하지 않습니다. 모듈을 단독으로 검사할 때는 앱이 이를 어떻게 연결할지 알 수 없기 때문입니다. 해당 모듈의 정의는 앱 모듈이 그래프를 구성할 때 검사됩니다. 플러그인은 빌드 출력에 다음과 같이 표시합니다:
 
-## 검증 대상 {id="what-gets-validated"}
+```
+[Koin] compile-safety validation skipped — no Koin entry point in this compilation.
+```
+:::
 
-| 시나리오 | 결과 |
-|----------|--------|
-| Null 허용 안 함 파라미터, 정의 없음 | **오류(ERROR)** |
-| Null 허용 파라미터(`T?`), 정의 없음 | OK — `getOrNull()` 사용 |
-| 기본값이 있는 파라미터, 정의 없음 | OK — Kotlin 기본값 사용 (`skipDefaultValues=true`인 경우) |
-| `@InjectedParam`, 정의 없음 | OK — 런타임에 `parametersOf()`를 통해 제공됨 |
-| `@Property("key")` 파라미터 | OK — 프로퍼티 주입 (`@PropertyValue` 기본값이 없으면 경고) |
-| `List<T>` 파라미터 | OK — 정의가 없으면 `getAll()`이 빈 리스트 반환 |
-| `Lazy<T>`, `T`에 대한 정의 없음 | **오류(ERROR)** — 내부 타입을 검증하기 위해 래핑을 해제함 |
-| `@Named("x")` 파라미터, 일치하는 한정자 없음 | **오류(ERROR)** — 한정자가 없는 바인딩이 존재하면 힌트 제공 |
-| 잘못된 스코프의 스코프 의존성 | **오류(ERROR)** |
-| `@Named` 한정자가 있는 기본값 파라미터 | **오류(ERROR)** — 한정자가 주입을 강제함 |
-| `@Provided` 타입 또는 파라미터, 정의 없음 | OK — 런타임에 외부에서 제공됨 |
-| `@ScopeId(name = "x")` 파라미터 | OK — 런타임에 이름이 지정된 스코프에서 확인됨 |
-| `Scope` 타입 파라미터 | OK — 스코프 리시버가 직접 전달됨 |
-| Android 프레임워크 타입 (예: `Context`) | OK — 하드코딩된 화이트리스트 |
-| 순환 의존성 (A → B → A) | **오류(ERROR)** — A2/A3 그래프 탐색 중에 감지됨 |
+## 검사 항목 {id="what-is-checked"}
 
-## 애노테이션을 통한 안정성 {id="safety-with-annotations"}
+| 케이스 | 결과 |
+|------|--------|
+| Non-nullable 파라미터, 정의 없음 | 에러 (Error) |
+| Nullable 파라미터 (`T?`), 정의 없음 | 정상 (OK), `getOrNull()`로 해결됨 |
+| 기본값(default value)이 있는 파라미터, 정의 없음 | 정상 (OK), Kotlin 기본값 사용 (`skipDefaultValues = true`인 경우) |
+| 기본값과 한정자(`@Named`)가 함께 있는 파라미터 | 에러 (Error), 한정자가 강제로 의존성을 해결하도록 함 |
+| `@InjectedParam` 파라미터 | 정상 (OK), 런타임에 `parametersOf()`로 전달됨 |
+| `@Property("key")` 파라미터 | 정상 (OK). `@PropertyValue("key")` 기본값이 없으면 경고(Warning) 발생 |
+| `List<T>` 파라미터 | 정상 (OK), 일치하는 항목이 없으면 `getAll()`이 빈 리스트 반환 |
+| `Lazy<T>`, `T`에 대한 정의 없음 | 에러 (Error), 내부 타입이 검사됨 |
+| `@Named("x")` 파라미터, 해당 한정자를 가진 정의 없음 | 에러 (Error), 해당 타입이 다른 한정자로 존재하는 경우 힌트 제공 |
+| 다른 스코프에 선언된 스코프 의존성(Scoped dependency) | 에러 (Error) |
+| 순환 의존성 (A가 B를 필요로 하고, B가 A를 필요로 함) | 에러 (Error) |
+| `@Provided` 타입 또는 파라미터 | 정상 (OK), 그래프 외부에서 제공됨 |
+| `@ScopeId` 파라미터 | 정상 (OK), 런타임에 명명된 스코프(named scope)로부터 해결됨 |
+| `Scope` 파라미터 | 정상 (OK), 현재 스코프가 전달됨 |
+| Android 프레임워크 타입 (`Context`, `SavedStateHandle`, ...) | 정상 (OK), 내장 목록 지원 |
+| `T`에 대한 정의가 없는 `get<T>()` / `inject<T>()` | 에러 (Error) |
+| `T`에 `@InjectedParam`이 있지만 `parametersOf()`가 없는 `get<T>()` | 에러 (Error) |
+| 개수나 타입이 일치하지 않는 `parametersOf(...)` | 에러 (Error) |
 
-클래스에 애노테이션을 달고 모듈로 구성하면 컴파일러가 모든 것을 검증합니다.
+각 파라미터 타입이 해결되는 방식에 대한 규칙은 [정의(Definitions)](/docs/reference/koin-core/definitions#constructor-parameters)를 참조하세요.
 
+## 선언 스타일별 검사 {id="checks-per-declaration-style"}
+
+모든 스타일과 DSL 형태는 동일한 그래프를 기준으로 검사됩니다. 이들은 한 프로젝트 내에 공존할 수 있으며, DSL 정의가 애너테이션이 적용된 클래스에 의존하거나 그 반대의 경우도 가능합니다.
+
+**컴파일러 플러그인 DSL (Compiler Plugin DSL)**
+```kotlin
+val appModule = module {
+    single<Database>()
+    single<UserRepository>()      // 검사됨: Database가 존재하는지 확인
+    viewModel<UserViewModel>()    // 검사됨: UserRepository가 존재하는지 확인
+}
+```
+
+플러그인은 생성자를 읽어 의존성 해결 호출을 생성하고 모든 파라미터를 검사합니다. `create(::function)`도 함수의 파라미터에 대해 동일한 방식으로 검사됩니다:
+
+```kotlin
+fun buildUserRepository(db: Database): UserRepository = UserRepository(db)
+
+val appModule = module {
+    single { create(::buildUserRepository) }    // 검사됨: Database가 존재하는지 확인
+}
+```
+
+**애너테이션 (Annotations)**
 ```kotlin
 @Singleton
 class Database
 
 @Singleton
-class UserRepository(private val db: Database)
+class UserRepository(private val db: Database)    // 검사됨: Database가 존재하는지 확인
 
 @KoinViewModel
 class UserViewModel(private val repo: UserRepository) : ViewModel()
@@ -119,337 +110,251 @@ class UserViewModel(private val repo: UserRepository) : ViewModel()
 @Module
 @ComponentScan("com.myapp")
 class AppModule
-```
 
-플러그인은 `@ComponentScan`을 통해 애노테이션이 달린 클래스를 찾아내고, A2에서 각 모듈의 정의를 검증하며, 애플리케이션 진입점을 선언할 때 A3에서 전체 그래프를 검증합니다.
-
-```kotlin
 @KoinApplication(modules = [AppModule::class])
 object MyApp
-
-startKoin<MyApp> { }  // ← A3 전체 그래프 검증을 트리거함
 ```
 
-**최상위 함수(Top-level functions)**도 지원됩니다. 애노테이션이 달린 최상위 함수는 `@ComponentScan`에 의해 발견되며 클래스 정의와 동일하게 검증됩니다.
+`startKoin<MyApp>()`이 진입점이 됩니다. 플러그인은 `@ComponentScan`으로 발견된 모든 정의를 검사합니다. 애너테이션이 지정된 최상위 함수도 클래스와 마찬가지로 검사됩니다:
 
 ```kotlin
-@Singleton
-fun provideDatabase(): DatabaseService = PostgresDatabase()
-
 @Factory
-fun provideCache(db: DatabaseService): CacheService = RedisCache(db)
-// ← 검증됨: DatabaseService가 존재함
+fun provideCache(db: Database): CacheService = RedisCache(db)    // 검사됨: Database가 존재하는지 확인
 ```
 
-`@Configuration` 레이블을 사용하여 모듈을 함께 검증할 그룹으로 구성할 수 있습니다.
+`@Configuration` 태그가 지정된 모듈은 여러 Gradle 모듈에 걸쳐 해당 라벨을 요청하는 `@KoinApplication`과 함께 수집되어 함께 검사됩니다.
 
-```kotlin
-@Module @ComponentScan("core") @Configuration("prod")
-class CoreModule
-
-@Module @ComponentScan("feature") @Configuration("prod")
-class FeatureModule  // CoreModule의 정의를 볼 수 있음
-```
-
-## DSL을 통한 안정성 {id="safety-with-dsl"}
-
-컴파일러 플러그인은 DSL 정의도 검증합니다. `single<T>()`, `factory<T>()` 또는 `viewModel<T>()`를 작성하면 플러그인이 호출을 가로채서 생성자를 자동으로 연결(auto-wire)하고 모든 파라미터를 검증합니다.
+**생성자 / 클래식 DSL (Constructor / Classic DSL)**
+생성자 참조는 컴파일러 플러그인 DSL과 동일하게 검사됩니다:
 
 ```kotlin
 val appModule = module {
-    single<Database>()
-    single<UserRepository>()       // ← 검증됨: Database가 존재함
-    viewModel<UserViewModel>()     // ← 검증됨: UserRepository가 존재함
-}
-```
-
-수동으로 `get()`을 호출할 필요가 없습니다. 플러그인이 이를 생성하는 동시에 검증합니다.
-
-`create(::T)` 함수도 검증됩니다. 이 함수는 함수 참조(일반적으로 빌더 함수이지만 생성자일 수도 있음)를 호출하고 모든 파라미터를 검증합니다.
-
-```kotlin
-fun buildUserRepository(db: Database): UserRepository = UserRepository(db)
-
-val appModule = module {
+    singleOf(::Database)
+    singleOf(::UserRepository)        // 검사됨: Database가 존재하는지 확인
+    viewModelOf(::UserViewModel)      // 검사됨: UserRepository가 존재하는지 확인
     scope<UserSession> {
-        scoped { create(::buildUserRepository) }  // ← 검증됨: Database가 존재함
+        scopedOf(::SessionCache)
     }
 }
 ```
 
-DSL 정의는 A3 검증(전체 그래프) 및 A4 검증(호출 지점)에 참여합니다. `startKoin { modules(appModule) }`을 사용하면 플러그인은 조립된 그래프를 기반으로 모든 DSL 정의를 검증합니다.
+`singleOf`, `factoryOf`, `scopedOf`, `viewModelOf` 및 `new(::T)`는 기존의 런타임 동작을 그대로 유지합니다. 플러그인은 검사 기능만 추가할 뿐 코드를 재작성하지 않습니다.
 
-## 두 스타일의 혼용 {id="both-styles-together"}
-
-한 프로젝트 내에서 애노테이션과 DSL을 혼합하여 사용할 수 있습니다. 둘 다 동일한 검증 그래프로 수집됩니다.
+직접 작성한 람다식의 경우 플러그인이 생성자를 직접 읽지 않습니다. 대신 일반적인 호출 지점과 마찬가지로 람다 내부의 `get()`, `inject()`, `getOrNull()` 호출을 검사합니다:
 
 ```kotlin
-// 애노테이션
-@Singleton class Database
-
-// DSL
-val featureModule = module {
-    single<UserRepository>()  // ← 검증됨: 애노테이션으로 생성된 Database가 보임
+val appModule = module {
+    single { UserRepository(get()) }  // 검사됨: get() 호출에 Database가 필요한지 확인
 }
 ```
 
-## 오류 메시지 {id="error-messages"}
+:::warning
+컴파일러 플러그인 1.2.0부터 `singleOf`, `factoryOf`, `scopedOf`, `viewModelOf`가 검사됩니다. 이러한 함수에서 누락된 의존성에 의존하던 코드는 더 이상 컴파일되지 않습니다. 이전 빌드에서는 런타임 크래시가 숨겨져 있었습니다.
+:::
 
-오류는 누락된 타입, 해당 타입이 필요한 정의, 그리고 어떤 모듈에 있는지 보고합니다.
+## 진단 (Diagnostics) {id="diagnostics"}
 
-```
-[Koin] Missing dependency: Repository
-  required by: Service (parameter 'repo')
-  in module: ServiceModule
-```
+모든 진단 메시지에는 `[Koin][CODE]` 형식으로 출력되는 고유 코드가 있습니다. 해당 코드나 메시지의 첫 줄로 검색할 수 있습니다.
 
-다른 한정자로 바인딩이 존재하는 경우 힌트가 표시됩니다.
+### 의존성 누락 (KOIN-D001) {id="missing-dependency-koin-d001"}
 
-```
-[Koin] Missing dependency: NetworkClient (qualifier: @Named("http"))
-  required by: ApiService (parameter 'client')
-  in module: AppModule
-  Hint: Found NetworkClient without qualifier — did you mean to add @Named("http")?
-```
-
-호출 지점 오류에는 정확한 위치가 포함됩니다.
+정의의 파라미터에 해당하는 정의가 그래프 내에 없습니다:
 
 ```
-[Koin] Missing definition: com.app.UserRepository
-  resolved by: koinViewModel<UserViewModel>()
-  No matching definition found in any declared module.
-  → file: UserScreen.kt, line: 12, column: 5
+[Koin][KOIN-D001] Missing dependency: com.myapp.Database
+  required by: com.myapp.UserRepository (parameter 'db')
+  in module: com.myapp.AppModule
 ```
 
-## 금지된 정의 {id="forbidden-definitions"}
+DSL 정의의 경우 `required by:` 부분이 `dsl:`로 시작합니다. 동일한 타입이 다른 한정자로 존재하는 경우 다음과 같이 힌트가 함께 표시됩니다:
 
-일부 반환 타입은 Koin을 통해 의미 있게 해석될 수 없으며 컴파일 타임에 거부됩니다.
+```
+[Koin][KOIN-D001] Missing dependency: com.myapp.NetworkClient qualified with @Named("http")
+  required by: com.myapp.ApiService (parameter 'client')
+  in module: com.myapp.AppModule
+  Hint: Found similar binding: com.myapp.NetworkClient (no qualifier)
+```
 
-### KOIN-D007: suspend `fun interface`를 반환하는 `@Factory` {id="koin-d007-factory-returning-a-suspend-fun-interface"}
+해결 방법: 누락된 정의를 선언하거나, 해당 정의를 선언한 모듈을 `modules()` 또는 `includes()`에 추가하거나, 한정자를 수정합니다([한정자(Qualifiers)](/docs/reference/koin-core/qualifiers) 참조).
 
-suspend `fun interface`를 확장하는 타입을 반환하는 `@Factory`는 Koin의 동기식 `get<T>()` API를 통해 호출될 수 없습니다. 플러그인은 이를 컴파일 타임에 차단합니다.
+### 호출 지점의 정의 누락 (KOIN-D002, KOIN-D003) {id="missing-definition-at-a-call-site-koin-d002-koin-d003"}
+
+`get<T>()`, `inject<T>()` 또는 `koinViewModel<T>()` 호출이 로드된 모듈에 선언되지 않은 타입을 요청합니다:
+
+```
+[Koin][KOIN-D002] Missing definition: com.myapp.Tracker
+  resolved by: get<Tracker>()
+  No matching definition found in any loaded module.
+  Check your declaration with Annotation or DSL.
+```
+
+`KOIN-D003`은 의존성 모듈에서 발생한 호출에 대한 동일한 에러로, 앱 모듈이 컴파일될 때 보고됩니다. 두 번째 줄에 `required by a call site in a dependency module`이라고 표시됩니다.
+
+### 순환 의존성 (KOIN-D004) {id="circular-dependency-koin-d004"}
+
+```
+[Koin][KOIN-D004] Circular dependency detected:
+  com.myapp.A → com.myapp.B → com.myapp.A
+  Break with Lazy<T> injection or refactor to remove the cycle.
+```
+
+`Lazy<T>`, nullable, `List<T>`, `@InjectedParam`, `@Provided`, `@Property`, `@ScopeId` 또는 기본값이 있는 파라미터는 순환 고리의 엣지(edge)로 간주되지 않습니다. 파라미터 중 하나를 `Lazy<T>`로 변경하면 순환 고리를 끊을 수 있습니다. 순환을 제거하는 방법은 [문제 해결(Troubleshooting)](/docs/reference/koin-core/troubleshooting)을 참조하세요.
+
+### 주입 파라미터 (KOIN-D005, KOIN-D006) {id="injected-parameters-koin-d005-koin-d006"}
+
+정의에는 `@InjectedParam` 파라미터가 선언되어 있지만, 호출 지점에서 이를 전달하지 않았습니다:
+
+```
+[Koin][KOIN-D006] com.myapp.Greeter requires 1 injected param(s) but get<Greeter>() has no parametersOf(...) at the call site.
+  Expected @InjectedParam slots: name: kotlin.String
+  Pass them via parametersOf(...) inside the trailing lambda.
+```
+
+`KOIN-D005`는 `parametersOf(...)`의 인자 개수나 타입이 일치하지 않을 때 보고됩니다(`Mismatched parametersOf(...) for ...`). 두 검사 모두 플러그인이 읽을 수 있는 `parametersOf(...)`가 호출에 포함된 경우에만 실행됩니다. 자세한 내용은 [주입 파라미터(Injected Parameters)](/docs/reference/koin-core/injection-parameters)를 참조하세요.
+
+### 지원되지 않는 suspend 바인딩 (KOIN-D007) {id="unsupported-suspend-binding-koin-d007"}
+
+타입이 suspend 함수 타입을 확장하는 정의는 Koin이 런타임에 이를 해결할 수 없기 때문에 거부됩니다:
 
 ```kotlin
-fun interface AsyncTask { suspend operator fun invoke(): Result }
+fun interface SetUsernameUseCase : suspend (String) -> Unit
 
 @Factory
-fun provideTask(): AsyncTask = AsyncTask { ... }
-// KOIN-D007 — 오류: @Factory 반환 타입은 suspend fun interface를 확장할 수 없습니다.
+fun provideSetUsernameUseCase(repository: UserRepository): SetUsernameUseCase =
+    SetUsernameUseCase(repository::setUsername)
 ```
 
-일반 인터페이스로 리팩터링하거나, suspend 메서드가 있는 클래스를 통해 suspend 작업을 노출하세요.
+```
+[Koin][KOIN-D007] Unsupported binding: com.myapp.SetUsernameUseCase extends kotlin.coroutines.SuspendFunction1
+  Suspend function injection is not yet supported by Koin runtime.
+  Remove the @Single / @Factory / @Scoped registration, or refactor the binding type to not extend a suspend function.
+  Tracked at https://github.com/InsertKoinIO/koin-compiler-plugin/issues/16
+```
 
-## 제네릭 DSL 타입 {id="generic-dsl-types"}
+해결 방법: `suspend` 메서드를 포함한 일반 인터페이스나 클래스를 사용하세요.
 
-런타임 Koin은 **소거된 로우 클래스(erased raw class)**를 기반으로 정의를 해석합니다. 즉, 타입 파라미터는 조회 키의 일부가 아닙니다. 컴파일 안정성도 이를 따릅니다. `get<Box<X>>()` 호출은 그래프 내의 모든 `Box<*>` 공급자를 대상으로 검증되며, `single<Box<A>>()`와 `single<Box<B>>()`라는 두 개의 선언은 충돌합니다(동일한 로우 클래스, 한정자 없음).
+### 전체 코드 목록 {id="all-codes"}
+
+| 코드 | 심각도 | 메시지 시작 문구 |
+|------|----------|---------------------|
+| `KOIN-D001` | Error | `Missing dependency:` |
+| `KOIN-D002` | Error | `Missing definition:` (현재 모듈 내의 호출 지점) |
+| `KOIN-D003` | Error | `Missing definition:` (의존성 모듈 내의 호출 지점) |
+| `KOIN-D004` | Error | `Circular dependency detected:` |
+| `KOIN-D005` | Error | `Mismatched parametersOf(...) for` |
+| `KOIN-D006` | Error | `<Type> requires N injected param(s) but` |
+| `KOIN-D007` | Error | `Unsupported binding:` |
+| `KOIN-D008` | Error | `Module id collision:` (두 모듈 이름이 동일한 힌트 이름으로 인코딩됨: 둘 중 하나의 이름을 변경하세요) |
+| `KOIN-W001` | Warning | `Module '<name>' is not loaded at startKoin` |
+| `KOIN-W003` | Warning | `Graph not verifiable at compile time:` |
+| `KOIN-W004` | Warning | `Custom @Configuration label '<label>' requested by` |
+| `KOIN-W005` | Warning | `Definition '<name>' in dependency module` |
+| `KOIN-W006` | Warning | `<definition>'s bind(...) argument could not be resolved` |
+| `KOIN-A001` | Error | `@KoinViewModel definition '<name>' cannot be generated` (`io.insert-koin:koin-core-viewmodel` 추가 필요) |
+| `KOIN-A002` | Error | `@KoinWorker definition '<name>' cannot be generated` (`io.insert-koin:koin-android-workmanager` 추가 필요) |
+| `KOIN-A003` | Error | `Cannot generate <Module>.module()` (`io.insert-koin:koin-core` 추가 필요) |
+| `KOIN-S001` | Error | `create(::<Type>) must be the only instruction in the lambda` ([unsafeDslChecks](/docs/reference/koin-annotations/options#unsafedslchecks) 참조) |
+| `KOIN-P001` | Warning | `Missing @PropertyValue default:` |
+| `KOIN-M001` | Warning | `@Monitor: Kotzilla SDK not found on classpath` |
+
+경고(Warning)는 플러그인이 검사할 수 없었던 항목을 설명합니다. `KOIN-W003`, `KOIN-W004`, `KOIN-W005`는 [제한 사항](#limits)에서 다룹니다. `KOIN-W006`은 `bind`/`binds` 인자가 `X::class` 리터럴(또는 이들의 리터럴 배열/리스트)이 아님을 의미합니다. 리터럴을 사용하세요.
+
+## 외부 타입: `@Provided` {id="external-types-provided"}
+
+어떤 타입들은 플랫폼 객체, SDK 인스턴스, 런타임에 수동으로 추가된 정의 등 Koin 선언 외부로부터 그래프에 유입되기도 합니다. 플러그인이 이를 누락된 것으로 보고하지 않도록 `@Provided`로 표시하세요:
 
 ```kotlin
-class Box<T>(val value: T)
+// 클래스에 적용: 이 타입의 모든 사용에 대해 검사를 건너뜁니다
+@Provided
+class FirebaseAnalytics
 
-val appModule = module {
-    single { Box(42) }   // Box(raw)로 등록됨
-}
-
-koin.get<Box<Int>>()    // → 등록된 단일 Box를 반환
-koin.get<Box<String>>() // → 동일한 등록을 반환 (타입 소거)
+// 파라미터에 적용: 이 파라미터에 대해서만 검사를 건너뜁니다
+@Singleton
+class PaymentProcessor(@Provided val gateway: PaymentGateway)
 ```
 
-로우 클래스에서 검증하면 DSL 정의에 치환되지 않은 타입 파라미터가 포함될 때 iOS 빌드에서 크래시를 일으키던 Kotlin/Native klib 시그니처 맹글링(mangling) 오류도 방지할 수 있습니다.
+`@Provided`(`org.koin.core.annotation`)는 모든 선언 스타일과 함께 작동합니다. 정의가 DSL 모듈에 있더라도 클래스나 생성자 파라미터에 애너테이션을 추가할 수 있습니다. 이는 컴파일 타임 검사에만 영향을 미칩니다. 런타임에는 여전히 `get()`을 통해 타입이 해결되며, 아무도 선언하지 않은 경우 실패합니다. 가급적 파라미터 형태를 사용하는 것이 좋습니다. 클래스에 적용하면 해당 타입이 사용되는 모든 위치에서 검사가 비활성화되기 때문입니다.
 
-### 제네릭 인스턴스 구별: 제네릭 파라미터의 타입 한정자 사용 {id="discriminating-generic-instances-type-qualifier-on-the-generic-parameter"}
+다음 타입들은 `@Provided` 없이도 항상 허용됩니다:
 
-동일한 제네릭 클래스의 여러 인스턴스가 공존해야 할 때 관용적인 패턴은 **구체적인 래퍼 타입**을 등록하고 **제네릭 파라미터에서 파생된 타입 한정자**(`named<T>()`)를 사용하는 것입니다. 이는 `koin-compose-navigation3`가 각 내비게이션 경로를 해당 경로 타입에 매핑하기 위해 내부적으로 사용하는 방식입니다.
+- `android.content.Context`
+- `android.app.Application`
+- `android.app.Activity`
+- `androidx.activity.ComponentActivity`
+- `androidx.fragment.app.Fragment`
+- `androidx.lifecycle.SavedStateHandle`
+- `androidx.work.WorkerParameters`
+
+### 런타임에 로드되는 모듈 {id="modules-loaded-at-runtime"}
+
+`startKoin` 이후에 `loadKoinModules(...)`로 로드되는 모듈은 플러그인이 구성하는 그래프의 일부가 아닙니다. 플러그인은 해당 호출이 언제 실행되는지, 또는 실제로 실행되는지 여부를 알 수 없습니다. 이러한 모듈에서만 제공되는 타입은 `@Provided`로 표시해야 합니다:
 
 ```kotlin
-inline fun <reified T : Any> Module.navigation(
-    noinline definition: @Composable Scope.(T) -> Unit,
-): KoinDefinition<EntryProviderInstaller> {
-    // 제네릭 파라미터 T에서 파생된 타입 한정자로 구별되는
-    // 구체적인 타입(EntryProviderInstaller)을 등록합니다.
-    return _singleInstanceFactory<EntryProviderInstaller>(named<T>(), { ... })
-}
+val featureModule = module { single<Repository>() }   // 나중에 로드됨
+val appModule = module { single<Service>() }          // Service(@Provided val repo: Repository)
+
+startKoin { modules(appModule) }
+loadKoinModules(featureModule)
 ```
 
-양쪽에서 사용되는 예시:
+플러그인은 런타임 로드 모듈에 대해 여전히 `KOIN-W001`을 통해 도달할 수 없음(unreachable)으로 보고합니다. 이 모듈을 `modules()`에 추가하면 온디맨드 로딩 목적에 어긋나므로, 이 경고는 무시해도 됩니다(`allWarningsAsErrors`가 활성화된 경우에만 빌드가 실패합니다).
 
-```kotlin
-// 선언 — T는 구체적인 타입임 (HomeRoute, SettingsRoute, ...)
-module {
-    navigation<HomeRoute> { route -> HomeScreen() }
-    navigation<SettingsRoute> { route -> SettingsScreen() }
-}
+## 특수 파라미터 {id="special-parameters"}
 
-// 해석 — 동일한 타입 한정자가 조회를 위한 키가 됨
-koin.get<EntryProviderInstaller>(named<HomeRoute>())
-```
-
-`named<T>()`는 구체화된(reified) `T`로부터 타입 한정자를 생성하므로, 각 제네릭 인스턴스는 안정적이고 고유한 한정자를 갖게 됩니다. 런타임 Koin은 (로우 클래스 + 한정자)를 매칭하여 타입 소거로 인해 사라진 변별력을 다시 도입합니다.
-
-제네릭 인스턴스를 구분해야 할 때마다 `single<Box<X>>()`를 직접 사용하는 것보다 이 패턴을 권장합니다.
-
-## 스코프 파라미터 주입 {id="scope-parameter-injection"}
-
-`org.koin.core.scope.Scope` 타입의 파라미터는 애노테이션 없이도 스코프 리시버와 함께 자동으로 주입됩니다. 스코프를 주입하면 동적 조회가 가능해지므로 검증은 생략됩니다.
+**Scope**: `org.koin.core.scope.Scope` 타입의 파라미터는 현재 스코프를 받습니다. 코드에서 동적으로 타입을 해결하므로 검사되지 않습니다.
 
 ```kotlin
 @Scoped
 class ScopedService(val scope: Scope) {
-    fun dynamicLookup() = scope.get<SomeDep>()
+    fun load() = scope.get<SomeDependency>()
 }
-// 생성됨: ScopedService(scope) — 스코프 리시버를 직접 전달함
 ```
 
-## 명명된 스코프 해석: `@ScopeId` {id="named-scope-resolution-scopeid"}
+**@ScopeId**: 파라미터가 다른 스코프에서 이름(`@ScopeId(name = "user_session")`) 또는 타입(`@ScopeId(UserSessionScope::class)`, 스코프 ID는 전체 클래스 이름임)으로 해결됩니다. 해당 스코프는 런타임에만 존재하므로 검사되지 않습니다. 자세한 내용은 [스코프(Scopes)](/docs/reference/koin-core/scopes)를 참조하세요.
 
-현재 스코프 대신 명명된 Koin 스코프에서 의존성을 해석하려면 `@ScopeId`를 사용하세요. 스코프는 런타임에 해석되므로 검증은 생략됩니다.
-
-```kotlin
-@Factory
-class ProfileService(@ScopeId(name = "user_session") val session: UserSession)
-// 생성됨: ProfileService(scope.getScope("user_session").get<UserSession>())
-```
-
-`@ScopeId`는 두 가지 형태를 지원합니다.
-
-| 형태 | 예시 | 스코프 ID |
-|------|---------|----------|
-| 문자열 이름 | `@ScopeId(name = "user_session")` | `"user_session"` |
-| 타입 참조 | `@ScopeId(UserSessionScope::class)` | FQ(전체 경로) 클래스 이름 |
-
-## 프로퍼티 검증 {id="property-validation"}
-
-`@Property("key")` 파라미터는 Koin 프로퍼티(시작 시 `properties()`를 통해 설정됨)에서 해석됩니다. 플러그인은 `@PropertyValue("key")` 기본값이 존재하지 않을 때 컴파일 타임에 경고를 표시합니다.
+**@Property**: 파라미터가 Koin 프로퍼티를 읽습니다. `@PropertyValue("key")` 기본값이 선언되지 않은 경우 빌드 시 경고가 발생하며, 시작 시 프로퍼티를 설정해야 합니다:
 
 ```kotlin
 @PropertyValue("api.timeout")
 val defaultTimeout = 30
 
 @Factory
-class ApiClient(@Property("api.timeout") val timeout: Int)
-// OK — @PropertyValue("api.timeout")이 컴파일 타임 기본값을 제공함
+class ApiClient(@Property("api.timeout") val timeout: Int)    // 정상 (OK)
 
 @Factory
 class Other(@Property("missing.key") val value: String)
-// 경고(WARNING) — @PropertyValue("missing.key")를 찾을 수 없음
-// (여전히 컴파일됨 — 프로퍼티는 런타임에 제공될 수 있음)
+// [Koin][KOIN-P001] Missing @PropertyValue default: "missing.key" ...
 ```
 
-## 외부 타입: `@Provided` {id="external-types-provided"}
+**기본값 (Default values)**: `skipDefaultValues = true`(기본값)인 경우, Kotlin 기본값을 가진 파라미터는 해당 값을 사용하며 검사되지 않습니다. [skipDefaultValues](/docs/reference/koin-annotations/options#skipdefaultvalues)를 참조하세요.
 
-일부 타입은 런타임에 플랫폼이나 외부 프레임워크에 의해 제공되며 Koin 정의로 선언되지 않습니다. 검증을 건너뛰려면 이들에 `@Provided` 표시를 하세요.
+## 제네릭 타입 {id="generic-types"}
 
-`@Provided`는 **클래스**(해당 타입의 모든 사용에 대해 검증 건너뜀)와 **파라미터**(해당 파라미터만 건너뜀) 모두에 사용할 수 있습니다.
+Koin은 타입 소거(type erasure)된 클래스를 기준으로 정의를 해결합니다. 즉, 타입 인자는 조회 키의 일부가 아닙니다. 플러그인도 동일한 규칙을 따릅니다. `get<Box<Int>>()`는 모든 `Box` 정의에 대해 검사되며, `single<Box<A>>()`와 `single<Box<B>>()`는 동일한 정의로 취급되어 두 번째 정의가 첫 번째 정의를 덮어씁니다.
 
-```kotlin
-// 클래스에 사용 — 이 타입의 모든 사용은 검증을 건너뜀
-@Provided
-class SavedStateHandle
+하나의 제네릭 타입에 대해 여러 인스턴스를 유지하려면 `named<T>()`를 사용하여 타입 인자로부터 파생된 타입 한정자를 각각 부여하세요. 이 패턴은 [고급 패턴(Advanced Patterns)](/docs/reference/koin-core/advanced-patterns)에 설명되어 있습니다.
 
-// 파라미터에 사용 — 이 파라미터만 검증을 건너뜀
-@Singleton
-class MyViewModel(@Provided val handle: SavedStateHandle)
-```
+## 증분 빌드 (Incremental builds) {id="incremental-builds"}
 
-**`@Provided`를 사용해야 하는 경우:**
+전체 그래프 검사는 애그리게이터 모듈(진입점이 있는 모듈)이 컴파일될 때 실행됩니다. 다른 곳(예: `module { }` 람다 본문 내부)이 변경된 후 Kotlin 증분 컴파일이 해당 모듈을 건너뛸 수 있습니다. 플러그인은 진입점을 감지한 모듈에서 `strictSafety`를 활성화하여 모든 빌드에서 검사가 실행되도록 합니다. 자세한 내용과 예외 설정 방법은 [strictSafety](/docs/reference/koin-annotations/options#strictsafety)를 참조하세요.
 
-- 화이트리스트에 없는 **Android 프레임워크 타입** — 예: 커스텀 Android 서비스
-- 외부에서 주입되는 **서드 파티 SDK 타입** — 예: Firebase, 분석(analytics) SDK
-- **Koin을 사용하지 않는 모듈의 교차 모듈 타입** — Koin을 사용하지 않는 라이브러리에서 의존성이 오는 경우
-- **테스트 더블(Test doubles)** — 테스트 구성에서 실제 구현을 대체할 때
-- **수동으로 제공되는 타입** — `androidContext()`, 수동 `single { }` 등록
+## 제한 사항 {id="limits"}
 
-```kotlin
-// 외부 SDK — Koin에 의해 관리되지 않음
-@Singleton
-class AnalyticsService(@Provided val firebaseAnalytics: FirebaseAnalytics)
+- **동적 모듈 리스트**: `modules(if (debug) a else b)`, `modules(*list)` 또는 런타임에 빌드된 리스트는 추적할 수 없습니다. 플러그인은 `KOIN-W003`을 보고하고 해당 진입점에 대한 전체 그래프 검사를 건너뜁니다. 검사를 유지하려면 모듈을 직접 전달하세요.
+- **직접 작성한 람다와 순환 의존성**: `single { A(get()) }` 형태의 람다는 순환 검사에 엣지를 추가하지 않으므로, 직접 작성한 람다를 통한 순환 의존성은 감지되지 않습니다. 순환 검사가 중요한 위치에는 `single<T>()`, `singleOf(::T)` 또는 `create(::T)`를 사용하세요.
+- **커스텀 구성 라벨 (Custom configuration labels)**: `"default"` 이외의 라벨이 지정된 모듈은 최대 1단계의 `implementation` 의존성까지만 감지됩니다(`KOIN-W004`). 직접 의존성을 추가하거나 `@KoinApplication(modules = [...])`에 모듈을 명시하세요.
+- **멀리 떨어진 함수 정의**: 2단계 이상의 `implementation` 홉(hop)으로 떨어진 모듈에 있는 `@Module` 함수 정의나 한정자가 지정된 최상위 함수는 검사에 표시되지 않습니다(`KOIN-W005`). 런타임에는 정상 작동합니다. 이를 검사하려면 직접 의존성을 추가하세요.
+- **런타임 로드 모듈**: [런타임에 로드되는 모듈](#modules-loaded-at-runtime)을 참조하세요.
 
-// 모듈 간 의존성: 런타임에 다른 팀의 모듈에 의해 제공됨
-@Factory
-class PaymentProcessor(@Provided val paymentGateway: PaymentGateway)
-```
+## verify() 및 checkModules() 대체하기 {id="replacing-verify-and-checkmodules"}
 
-**일반적인 Android 프레임워크 타입은 자동으로 화이트리스트에 포함**되어 있으며 `@Provided`가 필요하지 않습니다.
+컴파일 타임 안전성이 활성화되면 빌드 시 매 컴파일마다 `verify()` 및 `checkModules()` 테스트가 검사하는 내용을 자동으로 검사합니다. 플러그인이 완전히 검사하는 그래프에 대해서는 이러한 테스트를 제거해도 됩니다. 플러그인이 검증 불가능으로 보고하거나(`KOIN-W003`) 런타임 로드 모듈을 사용하는 그래프에 대해서는 테스트를 유지하세요. 자세한 내용은 [모듈 검증(Verifying modules)](/docs/reference/koin-test/verify)을 참조하세요.
 
-- `android.content.Context`
-- `android.app.Application`
-- `android.app.Activity`
-- `androidx.fragment.app.Fragment`
-- `androidx.lifecycle.SavedStateHandle`
-- `androidx.work.WorkerParameters`
+## 관련 문서 {id="related"}
 
-## 기본값과 skipDefaultValues {id="default-values-and-skipdefaultvalues"}
-
-`skipDefaultValues`가 활성화된 경우(기본값), Kotlin 기본값이 있는 파라미터는 DI 컨테이너에서 해석되는 대신 기본값을 사용합니다.
-
-```kotlin
-// skipDefaultValues = true (기본값)인 경우:
-@Singleton
-class ServiceWithDefault(val timeout: Int = 5000)
-// → DI 해석 대신 Kotlin 기본값(5000)을 사용함
-
-// Null 허용 파라미터는 여전히 주입됩니다:
-@Singleton
-class Service(val dep: Dependency? = null)
-// → DI에서 getOrNull()을 사용함
-
-// 애노테이션이 달린 파라미터는 기본값과 상관없이 항상 DI를 사용합니다:
-@Singleton
-class Service(@Named("custom") val name: String = "fallback")
-// → @Named("custom") 한정자로 DI에서 해석함
-
-// 혼합: 일부는 DI에서, 일부는 기본값에서
-@Singleton
-class ApiClient(
-    val repo: UserRepository,                        // → DI에서 해석됨
-    val timeout: Int = 30_000,                       // → Kotlin 기본값 사용
-    @Property("api_url") val url: String = "https://api.example.com"  // → DI에서 해석됨 (애노테이션됨)
-)
-```
-
-Kotlin 기본값을 무시하고 항상 DI 컨테이너에서 모든 파라미터를 주입하려면 `skipDefaultValues = false`로 설정하세요.
-
-## 설정 {id="configuration"}
-
-컴파일 타임 안정성은 기본적으로 활성화되어 있습니다. 비활성화하려면 다음과 같이 설정합니다.
-
-```kotlin
-koinCompiler {
-    compileSafety = false  // 컴파일 타임 안정성 검사 비활성화
-}
-```
-
-기타 관련 옵션:
-
-```kotlin
-koinCompiler {
-    compileSafety = true       // 컴파일 타임 의존성 검증 (기본값: true)
-    strictSafety = true        // 모든 빌드 시 애그리게이터(aggregator)의 안정성 패스를 강제로 다시 실행
-                               // (기본값: startKoin / @KoinApplication이 있는 모듈에서 자동 감지됨)
-    skipDefaultValues = true   // 기본값이 있는 파라미터의 주입 건너뛰기 (기본값: true)
-    unsafeDslChecks = true     // create()가 람다의 유일한 명령인지 검증 (기본값: true)
-}
-```
-
-:::info 증분 컴파일 & `strictSafety`
-전체 그래프 패스(A3)는 애그리게이터의 `compileKotlin`에서만 실행됩니다. K2 기반의 Kotlin 증분 컴파일은 `module { }` 람다 본문 내부의 DSL 변경 사항이나 `@ComponentScan` 패키지에 새로 추가된 클래스를 추적하지 않습니다. 따라서 그래프가 변경되었음에도 애그리게이터가 UP-TO-DATE로 표시될 수 있습니다. 플러그인은 감지된 애그리게이터 모듈에서 [`strictSafety`](/docs/reference/koin-annotations/options#strictsafety)를 자동으로 활성화하여 A3가 다시 실행되도록 강제합니다. 라이브러리 및 기능 모듈은 계속해서 완전한 증분 컴파일을 유지합니다.
-:::
-
-## verify() / checkModules()에서 마이그레이션하기 {id="migrating-from-verify-checkmodules"}
-
-컴파일러 플러그인은 런타임 검증을 대체합니다. 기존 검증 테스트를 제거할 수 있습니다.
-
-| 이전 | 이후 |
-|--------|-------|
-| 테스트 내 `module.verify()` | 컴파일러 플러그인 (자동) |
-| 테스트 내 `checkModules()` | 컴파일러 플러그인 (자동) |
-| 런타임 검증 | 컴파일 타임 검증 |
-| 수동 테스트 설정 | 테스트 코드 불필요 |
-
-컴파일러가 매 빌드 시 검증하므로 테스트 코드가 필요하지 않습니다.
-
-## 관련 내용 {id="see-also"}
-
-- **[컴파일러 플러그인 옵션](/docs/reference/koin-annotations/options)** - 모든 구성 옵션
-- **[컴파일러 플러그인 설정](/docs/setup/compiler-plugin)** - 설치 가이드
-- **[애노테이션 시작하기](/docs/reference/koin-annotations/start)** - 시작 가이드
-- **[Playground 앱](https://github.com/InsertKoinIO/koin-compiler-plugin/tree/main/playground-apps)** - 애노테이션(`app-annotations/`) 및 DSL(`app-dsl/`) 방식을 모두 사용하는 전체 참조 앱
+- [컴파일러 플러그인 옵션](/docs/reference/koin-annotations/options): `compileSafety`, `strictSafety`, `skipDefaultValues` 및 기타 옵션.
+- [Koin 컴파일러 플러그인](/docs/intro/koin-compiler-plugin): 플러그인의 역할 및 동작 방식.
+- [정의 (Definitions)](/docs/reference/koin-core/definitions): 생성자 파라미터가 해결되는 방식.
+- [문제 해결 (Troubleshooting)](/docs/reference/koin-core/troubleshooting): 런타임 에러, 로거 및 순환 의존성.
+- [IDE 플러그인](/docs/tooling/ide-plugin): IDE에서 그래프를 확인하고 정의 간 이동하기.
+- [Playground 앱](https://github.com/InsertKoinIO/koin-compiler-plugin/tree/main/playground-apps): 애너테이션(`app-annotations/`) 및 DSL(`app-dsl/`)을 사용한 샘플 앱.

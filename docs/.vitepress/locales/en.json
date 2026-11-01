@@ -708,5 +708,15 @@
   "kotlin.reflection": "Reflection (kotlin-reflect)",
   "kotlin.kotlin-jpa-plugin": "JPA",
   "kotlin.kotlin-spring-plugin": "Spring",
-  "kmp.whats-new-compose-113": "Compose Multiplatform %org.jetbrains.compose-eap%"
+  "kmp.whats-new-compose-113": "Compose Multiplatform %org.jetbrains.compose-eap%",
+  "koin.get-started": "Get Started",
+  "koin.platforms": "Platforms",
+  "koin.platforms-android": "Android",
+  "koin.platforms-compose": "Compose",
+  "koin.platforms-kotlin-multiplatform": "Kotlin Multiplatform",
+  "koin.platforms-ktor": "Ktor",
+  "koin.production-tooling": "Production & Tooling",
+  "ktor.google-app-engine": "Google App Engine",
+  "ktor.elastic-beanstalk": "AWS Elastic Beanstalk",
+  "kmp.compose-pdf": "Display PDF files"
 }

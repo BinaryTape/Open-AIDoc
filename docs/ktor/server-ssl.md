@@ -8,43 +8,50 @@
 <b>所需依赖项</b>：<code>io.ktor:ktor-network-tls-certificates</code>
 </p>
 <p>
-<b>代码示例</b>： 
-<a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/ssl-engine-main">ssl-engine-main</a>, 
+<b>代码示例</b>：
+<a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/ssl-engine-main">ssl-engine-main</a>、
 <a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/ssl-embedded-server">ssl-embedded-server</a>
 </p>
 </tldr>
 
-在大多数情况下，您的 Ktor 服务会部署在 Nginx 或 Apache 等反向代理之后。
-这意味着反向代理服务器负责处理安全事务，包括 SSL。
+在大多数情况下，您的 Ktor 服务都会置于 Nginx 或 Apache 等反向代理之后。
+这意味着反向代理服务器会处理包括 SSL 在内的安全考量。
 
-如有必要，您可以通过提供证书路径将 Ktor 配置为直接提供 SSL 服务。
-Ktor 使用 [Java KeyStore (JKS)](https://docs.oracle.com/javase/8/docs/api/java/security/KeyStore.html) 作为证书的存储设施。
-您可以使用 [keytool](https://docs.oracle.com/javase/8/docs/technotes/tools/unix/keytool.html) 来转换和管理存储在密钥库中的证书。
-如果您需要将证书颁发机构颁发的 PEM 证书转换为 Ktor 支持的 JKS 格式，这可能会非常有用。
+如有必要，您可以通过提供证书路径，将 Ktor 配置为直接提供 SSL 服务。
+Ktor 使用 [Java KeyStore (JKS)](https://docs.oracle.com/javase/8/docs/api/java/security/KeyStore.html) 作为证书的存储机制。
+您可以使用 [keytool](https://docs.oracle.com/javase/8/docs/technotes/tools/unix/keytool.html) 转换和管理存储在 KeyStore 中的证书。
+当您需要将证书颁发机构签发的 PEM 证书转换为 Ktor 支持的 JKS 格式时，该工具会非常有用。
 
-> 您可以使用 _Let's Encrypt_ 获取免费证书，以便在 Ktor 中处理 `https://` 和 `wss://` 请求。
+> 您可以使用 _Let's Encrypt_ 获取免费证书，以便通过 Ktor 提供 `https://` 和 `wss://` 请求服务。
 
 ## 生成自签名证书 {id="self-signed"}
 
 ### 在代码中生成证书 {id="self-signed-code"}
 
-Ktor 提供了通过调用 [buildKeyStore](https://api.ktor.io/ktor-network-tls-certificates/io.ktor.network.tls.certificates/build-key-store.html) 函数生成用于测试目的的自签名证书的能力，该函数会返回一个 [KeyStore](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/security/KeyStore.html) 实例。
+Ktor 提供了通过调用 [buildKeyStore](https://api.ktor.io/ktor-network-tls-certificates/io.ktor.network.tls.certificates/build-key-store.html) 函数生成用于测试目的的自签名证书的功能，该函数会返回一个 [KeyStore](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/security/KeyStore.html) 实例。
 要使用此函数，您需要在构建脚本中添加 `ktor-network-tls-certificates` 构件：
 
 <var name="artifact_name" value="ktor-network-tls-certificates"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.network.tls.certificates"/>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上述代码段使用 <a href="server-dependencies.topic#using-version-catalog">Ktor 版本目录</a> 来指定 Ktor 依赖项。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上述代码段使用 <a href="server-dependencies.topic#using-version-catalog">Ktor 版本目录</a> 来指定 Ktor 依赖项。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
     </TabItem>
 </Tabs>
 
-下面的代码片段展示了如何生成证书并将其保存到密钥库文件中：
+以下代码段展示了如何生成证书并将其保存到密钥库文件中：
 
 ```kotlin
 private fun ApplicationEngine.Configuration.envConfig() {
@@ -60,8 +67,8 @@ private fun ApplicationEngine.Configuration.envConfig() {
 }
 ```
 
-由于 Ktor 在启动时需要证书，因此您必须在启动服务器之前创建证书。
-您可以在此处找到完整的示例：[ssl-embedded-server](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/ssl-embedded-server)。
+由于 Ktor 在启动时需要证书，因此您必须在启动服务器之前创建好证书。
+您可以在此处找到完整示例：[ssl-embedded-server](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/ssl-embedded-server)。
 
 ### 使用 keytool 生成证书 {id="self-signed-keytool"}
 
@@ -75,22 +82,22 @@ keytool -keystore keystore.jks -alias sampleAlias -genkeypair -keyalg RSA -keysi
 
 ## 将 PEM 证书转换为 JKS {id="convert-certificate"}
 
-如果您的证书颁发机构以 PEM 格式颁发证书，您需要在[在 Ktor 中配置 SSL](#configure-ssl-ktor) 之前将其转换为 JKS 格式。
+如果您的证书颁发机构以 PEM 格式签发证书，则在[在 Ktor 中配置 SSL](#configure-ssl-ktor) 之前，需要先将其转换为 JKS 格式。
 您可以使用 `openssl` 和 `keytool` 工具来完成此操作。
-例如，如果您的私钥位于 `key.pem` 文件中，公钥证书位于 `cert.pem` 中，转换过程如下所示：
+例如，如果您的私钥保存在 `key.pem` 文件中，公钥证书保存在 `cert.pem` 中，则转换流程如下所示：
 
 1. 使用 `openssl` 通过以下命令将 PEM 转换为 PKCS12 格式：
    ```Bash
    openssl pkcs12 -export -in cert.pem -inkey key.pem -out keystore.p12 -name "sampleAlias"
    ```
-   系统将提示您输入 `key.pem` 的密码短语以及 `keystore.p12` 的新密码。
+   系统会提示您输入 `key.pem` 的密码短语以及 `keystore.p12` 的新密码。
 
 2. 使用 `keytool` 将 PKCS12 转换为 JKS 格式：
    ```Bash
    keytool -importkeystore -srckeystore keystore.p12 -srcstoretype pkcs12 -destkeystore keystore.jks
    ```
-   系统将提示您输入 `keystore.p12` 文件的密码以及 `keystore.jks` 的新密码。
-   随后将生成 `keystore.jks`。
+   系统会提示您输入 `keystore.p12` 文件的密码以及 `keystore.jks` 的新密码。
+   随后将生成 `keystore.jks` 文件。
 
 ## 在 Ktor 中配置 SSL {id="configure-ssl-ktor"}
 
@@ -98,7 +105,7 @@ keytool -keystore keystore.jks -alias sampleAlias -genkeypair -keyalg RSA -keysi
 
 ### 配置文件 {id="config-file"}
 
-如果您的服务器是在 `application.conf` 或 `application.yaml` [配置文件](server-configuration-file.topic)中配置的，您可以使用以下[属性](server-configuration-file.topic#predefined-properties)启用 SSL：
+如果您的服务器是在 `application.conf` 或 `application.yaml` [配置文件](server-configuration-file.topic)中配置的，则可以使用以下[属性](server-configuration-file.topic#predefined-properties)启用 SSL：
 
 1. 使用 `ktor.deployment.sslPort` 属性指定 SSL 端口：
 
@@ -125,7 +132,7 @@ keytool -keystore keystore.jks -alias sampleAlias -genkeypair -keyalg RSA -keysi
    </TabItem>
    </Tabs>
 
-2. 在单独的 `security` 组中提供密钥库设置：
+2. 在单独的 `security` 分组中提供密钥库设置：
 
    <Tabs group="config">
    <TabItem title="application.conf" group-key="hocon">
@@ -159,7 +166,7 @@ keytool -keystore keystore.jks -alias sampleAlias -genkeypair -keyalg RSA -keysi
                privateKeyPassword: foobar
                trustStore: truststore.jks
                trustStorePassword: foobar
-               enabledProtocols: ["TLSv1.2", "TLSv1.3"]
+               enabledProtocols = ["TLSv1.2", "TLSv1.3"]
    ```
 
    </TabItem>
@@ -169,7 +176,7 @@ keytool -keystore keystore.jks -alias sampleAlias -genkeypair -keyalg RSA -keysi
 
 ### embeddedServer {id="embedded-server"}
 
-如果您使用 `embeddedServer` 函数运行服务器，则需要在 [ApplicationEngine.Configuration](https://api.ktor.io/ktor-server-core/io.ktor.server.engine/-application-engine/-configuration/index.html) 中配置[自定义环境](server-configuration-code.topic#embedded-custom)，并使用 [sslConnector](https://api.ktor.io/ktor-server-core/io.ktor.server.engine/ssl-connector.html) 在该处提供 SSL 设置：
+如果您使用 `embeddedServer` 函数运行服务器，则需要在 [ApplicationEngine.Configuration](https://api.ktor.io/ktor-server-core/io.ktor.server.engine/-application-engine/-configuration/index.html) 中配置[自定义环境](server-configuration-code.topic#embedded-custom)，并在其中使用 [sslConnector](https://api.ktor.io/ktor-server-core/io.ktor.server.engine/ssl-connector.html) 提供 SSL 设置：
 
 ```kotlin
 import io.ktor.network.tls.certificates.*

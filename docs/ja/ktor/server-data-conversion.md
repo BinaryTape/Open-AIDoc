@@ -3,6 +3,7 @@
 <primary-label ref="server-plugin"/>
 
 <var name="artifact_name" value="ktor-server-data-conversion"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.server.dataConversion"/>
 <var name="package_name" value="io.ktor.server.plugins.dataconversion"/>
 <var name="plugin_name" value="DataConversion"/>
 <var name="example_name" value="data-conversion"/>
@@ -18,17 +19,17 @@
 <b>必要な依存関係</b>: <code>io.ktor:%artifact_name%</code>
 </p>
 <p>
-    <b><Links href="/ktor/server-native" summary="KtorはKotlin/Nativeをサポートしており、追加のランタイムや仮想マシンなしでサーバーを実行できます。">Nativeサーバー</Links>のサポート</b>: ✅
+    <b><Links href="server-native.md" summary="Ktor supports Kotlin/Native and allows you to run a server without an additional runtime or virtual machine.">ネイティブサーバー</Links>のサポート</b>: ✅
 </p>
 </tldr>
 
 <link-summary>
-Ktorサーバーの %plugin_name% プラグインを使用すると、値のリストをシリアライズおよびデシリアライズするためのカスタムコンバーターを追加できます。
+Ktor サーバー用の %plugin_name% プラグインを使用すると、値のリストをシリアライズおよびデシリアライズするためのカスタムコンバーターを追加できます。
 </link-summary>
 
-[%plugin_name%](https://api.ktor.io/ktor-utils/io.ktor.util.converters/-data-conversion/index.html) プラグインを使用すると、値のリストをシリアライズおよびデシリアライズできます。デフォルトでは、Ktorは [`DefaultConversionService`](https://api.ktor.io/ktor-utils/io.ktor.util.converters/-default-conversion-service/index.html) を通じて文字列や、数値型、符号なし整数型、`Uuid`、列挙型（enum）などの一般的な型を処理します。
+[%plugin_name%](https://api.ktor.io/ktor-utils/io.ktor.util.converters/-data-conversion/index.html) プラグインを使用すると、値のリストをシリアライズおよびデシリアライズできます。デフォルトでは、Ktor は [`DefaultConversionService`](https://api.ktor.io/ktor-utils/io.ktor.util.converters/-default-conversion-service/index.html) を介して、文字列や、数値型、符号なし整数型、`Uuid`、enum などの一般的な型を処理します。
 
-`%plugin_name%` プラグインをインストールして構成することで、このサービスを拡張して追加の型を処理できるようになります。
+`%plugin_name%` プラグインをインストールして設定することで、このサービスを拡張して追加の型を処理できるようになります。
 
 ## 依存関係の追加 {id="add_dependencies"}
 
@@ -37,10 +38,16 @@ Ktorサーバーの %plugin_name% プラグインを使用すると、値のリ�
 </p>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上記のスニペットでは、Ktor の依存関係を指定するために <a href="server-dependencies.topic#using-version-catalog">Ktor バージョンカタログ</a> を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上記のスニペットでは、Ktor の依存関係を指定するために <a href="server-dependencies.topic#using-version-catalog">Ktor バージョンカタログ</a> を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
@@ -50,7 +57,7 @@ Ktorサーバーの %plugin_name% プラグインを使用すると、値のリ�
 ## %plugin_name% のインストール {id="install_plugin"}
 
 <p>
-    アプリケーションに <code>%plugin_name%</code> プラグインを<a href="server-plugins.md#install">インストール</a>するには、指定された <Links href="/ktor/server-modules" summary="モジュールを使用すると、ルートをグループ化してアプリケーションを構造化できます。">モジュール</Links>内の <code>install</code> 関数に渡します。
+    アプリケーションに <code>%plugin_name%</code> プラグインを<a href="server-plugins.md#install">インストール</a>するには、指定した <Links href="server-modules.md" summary="Modules allow you to structure your application by grouping routes.">モジュール</Links> 内の <code>install</code> 関数に渡します。
     以下の例は、<code>%plugin_name%</code> をインストールする方法を示しています。
 </p>
 <list>
@@ -58,7 +65,7 @@ Ktorサーバーの %plugin_name% プラグインを使用すると、値のリ�
         <code>embeddedServer()</code> 関数の呼び出し内。
     </li>
     <li>
-        <code>Application</code> クラスの拡張関数である、明示的に定義された <code>module()</code> 内。
+        <code>Application</code> クラスに明示的に定義された <code>module()</code> 拡張関数内。
     </li>
 </list>
 <Tabs>
@@ -72,21 +79,21 @@ Ktorサーバーの %plugin_name% プラグインを使用すると、値のリ�
 
 ## コンバーターの追加 {id="add-converters"}
 
-`%plugin_name%` の構成内で型変換を定義できます。指定した型に対して `convert<T>` メソッドを提供し、利用可能な関数を使用して値のリストをシリアライズおよびデシリアライズします。
+`%plugin_name%` の設定内で型変換を定義できます。指定した型に対して `convert<T>` メソッドを提供し、利用可能な関数を使用して値のリストをシリアライズおよびデシリアライズします。
 
-* 値のリストをデシリアライズするには、`decode()` 関数を使用します。これは、URL内の繰り返される値を表す文字列のリストを受け取り、デコードされた値を返します。
+* 値のリストをデシリアライズするには、`decode()` 関数を使用します。これは URL 内の重複する値を表す文字列のリストを受け取り、デコードされた値を返します。
 
   ```kotlin
-  decode { values -> // コンバーター: (values: List<String>) -> Any?
-    // 値をデシリアライズする
+  decode { values -> // converter: (values: List<String>) -> Any?
+    //deserialize values
   }
   ```
 
 * 値をシリアライズするには、`encode()` 関数を使用します。この関数は任意の値を受け取り、それを表す文字列のリストを返します。
 
   ```kotlin
-     encode { value -> // コンバーター: (value: Any?) -> List<String>
-       // 値をシリアライズする
+     encode { value -> // converter: (value: Any?) -> List<String>
+       //serialize value
       }
   ```
 
@@ -100,13 +107,13 @@ val dataConversion = application.conversionService
 
 その後、コンバーターサービスを使用してコールバック関数を呼び出すことができます。
 
-* `fromValues(values: List<String>, type: TypeInfo)` コールバック関数は、文字列のリストとしての `values` と、値を変換する先の `TypeInfo` を受け取り、デコードされた値を返します。
+* `fromValues(values: List<String>, type: TypeInfo)` コールバック関数は、文字列のリストとしての `values` と、変換先の型を表す `TypeInfo` を受け取り、デコードされた値を返します。
 * `toValues(value: Any?)` コールバック関数は、任意の値を受け取り、それを表す文字列のリストを返します。
 
 ## 例 {id="example"}
 
-次の例では、`LocalDate` 型のコンバーターが定義され、値をシリアライズおよびデシリアライズするように構成されています。`encode` 関数が呼び出されると、サービスは `SimpleDateFormat` を使用して値を変換し、フォーマットされた値を含むリストを返します。
-`decode` 関数が呼び出されると、サービスは日付を `LocalDate` としてフォーマットして返します。
+以下の例では、`LocalDate` 型のコンバーターを定義し、値をシリアライズおよびデシリアライズするように設定しています。`encode` 関数が呼び出されると、サービスは `SimpleDateFormat` を使用して値を変換し、フォーマットされた値を含むリストを返します。
+`decode` 関数が呼び出されると、サービスは日付を `LocalDate` として変換して返します。
 
 ```kotlin
     install(DataConversion) {
@@ -117,18 +124,18 @@ val dataConversion = application.conversionService
                 .appendValue(ChronoField.DAY_OF_MONTH, 2)
                 .toFormatter(Locale.ROOT)
 
-            decode { values -> // コンバーター: (values: List<String>) -> Any?
+            decode { values -> // converter: (values: List<String>) -> Any?
                 LocalDate.from(formatter.parse(values.single()))
             }
 
-            encode { value -> // コンバーター: (value: Any?) -> List<String>
+            encode { value -> // converter: (value: Any?) -> List<String>
                 listOf(SimpleDateFormat.getInstance().format(value))
             }
         }
     }
 ```
 
-その後、変換サービスを手動で呼び出して、エンコードおよびデコードされた値を取得できます。
+その後、変換サービスを手動で呼び出して、エンコードされた値およびデコードされた値を取得できます。
 
 ```kotlin
 val encodedDate = application.conversionService.toValues(call.parameters["date"])

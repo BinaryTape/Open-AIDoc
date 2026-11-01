@@ -6,11 +6,11 @@
 
 ## 条件表达式 {id="conditional-expressions"}
 
-Kotlin 提供了 `if` 与 `when` 来检查条件表达式。 
+Kotlin 提供了 `if` 和 `when` 来检查条件表达式。 
 
-> 如果必须在 `if` 和 `when` 之间做出选择，我们建议使用 `when`，因为它：
+> 如果你需要在 `if` 和 `when` 之间做出选择，我们建议使用 `when`，因为它可以：
 > 
-> * 使代码更易阅读。
+> * 使代码更易于阅读。
 > * 更易于添加其他分支。
 > * 减少代码中的错误。
 > 
@@ -18,7 +18,7 @@ Kotlin 提供了 `if` 与 `when` 来检查条件表达式。
 
 ### If {id="if"}
 
-要使用 `if`，请将条件表达式放在圆括号 `()` 内，并将结果为 true 时要执行的操作放在花括号 `{}` 内：
+若要使用 `if`，请将条件表达式置于圆括号 `()` 内，并将结果为 true 时要执行的操作置于花括号 `{}` 内：
 
 ```kotlin
 fun main() {
@@ -37,9 +37,9 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-if"}
+{kotlin-runnable="true" id="kotlin-tour-if"}
 
-Kotlin 中没有三元运算符 `condition ? then : else`。相反，`if` 可以用作表达式。如果每个操作只有一行代码，则花括号 `{}` 是可选的：
+Kotlin 中没有三元运算符 `condition ? then : else`。取而代之的是，`if` 可以用作表达式。如果每个操作只有一行代码，花括号 `{}` 是可选的：
 
 ```kotlin
 fun main() { 
@@ -47,21 +47,21 @@ fun main() {
     val a = 1
     val b = 2
 
-    println(if (a > b) a else b) // 返回值：2
+    println(if (a > b) a else b) // 返回一个值：2
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-if-expression"}
+{kotlin-runnable="true" id="kotlin-tour-if-expression"}
 
 ### When {id="when"}
 
-当包含多个分支的条件表达式时，请使用 `when`。
+当条件表达式包含多个分支时，请使用 `when`。
 
-要使用 `when`：
+若要使用 `when`：
 
-* 将要计算的值放在圆括号 `()` 内。
-* 将各个分支放在花括号 `{}` 内。
-* 在每个分支中使用 `->`，将每次检查与检查成功时要执行的操作分隔开。
+* 将要计算的值置于圆括号 `()` 内。
+* 将分支置于花括号 `{}` 内。
+* 在每个分支中使用 `->` 将每次检查与检查成功后要执行的操作分隔开。
 
 `when` 既可以用作语句，也可以用作表达式。**语句**不返回任何内容，而是执行操作。
 
@@ -84,15 +84,15 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-when-statement"}
+{kotlin-runnable="true" id="kotlin-tour-when-statement"}
 
 > 请注意，所有分支条件都会按顺序进行检查，直到满足其中一个条件为止。因此，只有第一个符合条件的分支会被执行。
 >
 {style="note"}
 
-**表达式**会返回一个值，该值可以在后续代码中使用。
+**表达式**会返回一个可以在后续代码中使用的值。
 
-以下是将 `when` 用作表达式的示例。`when` 表达式会立即赋值给一个变量，该变量随后在 `println()` 函数中使用：
+以下是将 `when` 用作表达式的示例。`when` 表达式会立即赋值给一个变量，该变量随后用于 `println()` 函数：
 
 ```kotlin
 fun main() {
@@ -104,7 +104,7 @@ fun main() {
         "1" -> "One"
         // 如果 obj 等于 "Hello"，则将 result 设置为 "Greeting"
         "Hello" -> "Greeting"
-        // 如果之前的条件均不满足，则将 result 设置为 "Unknown"
+        // 如果前面的条件均不满足，则将 result 设置为 "Unknown"
         else -> "Unknown"
     }
     println(result)
@@ -112,11 +112,11 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-when-expression"}
+{kotlin-runnable="true" id="kotlin-tour-when-expression"}
 
 到目前为止你所看到的 `when` 示例都有一个主体：`obj`。但 `when` 也可以在没有主体的情况下使用。
 
-此示例使用**没有**主体的 `when` 表达式来检查一系列布尔表达式：
+本例使用**没有**主体的 `when` 表达式来检查一系列布尔表达式：
 
 ```kotlin
 fun main() {
@@ -133,9 +133,9 @@ fun main() {
     // Stop
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-when-expression-boolean"}
+{kotlin-runnable="true" id="kotlin-tour-when-expression-boolean"}
 
-不过，你也可以实现相同的代码，但将 `trafficLightState` 作为主体：
+不过，你也可以编写同样的代码，但将 `trafficLightState` 作为主体：
 
 ```kotlin
 fun main() {
@@ -152,24 +152,25 @@ fun main() {
     // Stop
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-when-expression-boolean-subject"}
+{kotlin-runnable="true" id="kotlin-tour-when-expression-boolean-subject"}
 
-在使用 `when` 时带有主体可以使代码更易于阅读和维护。当在 `when` 表达式中使用主体时，它还有助于 Kotlin 检查是否覆盖了所有可能的情况。否则，如果不在 `when` 表达式中使用主体，则需要提供一个 else 分支。
+带有主体的 `when` 可以使代码更易于阅读和维护。当你在 `when` 表达式中使用主体时，它还有助于 Kotlin 检查是否涵盖了所有可能的情况。否则，如果不在 `when` 表达式中使用主体，则需要提供 else 分支。
 
 ## 练习：条件表达式 {id="practice-conditional-expressions"}
 
 <deflist appearance="clear" collapsible="true" numbered="true">
-<def title="检查两次掷骰子的结果是否匹配" id="conditional-expressions-exercise-1">
+<def title="检查掷两次骰子的结果是否匹配" id="conditional-expressions-exercise-1">
 
-创建一个简单的小游戏，如果掷出两个骰子的点数相同，则获胜。使用 `if` 在骰子点数相同时输出 `You win :)`，否则输出 `You lose :(`。
+创建一个简单的小游戏：如果投掷两次骰子得到相同的点数，则获胜。如果骰子点数匹配，使用 `if` 打印 `You win :)`；否则打印 `You lose :(`。
 
-> 在本练习中，你将导入一个软件包，以便使用 `Random.nextInt()` 函数来获取一个随机的 `Int`。有关导入软件包的更多信息，请参阅[软件包和导入](packages.md)。
+> 在本练习中，你将导入一个软件包，以便使用 `Random.nextInt()` 函数获取随机 `Int`。
+> 有关导入软件包的更多信息，请参阅[软件包和导入](packages.md)。
 >
 {style="tip"}
 
 <deflist collapsible="true">
     <def title="提示">
-        使用<a href="operator-overloading.md#equality-and-inequality-operators">相等运算符</a> (<code>==</code>) 比较骰子的结果。 
+        使用<a href="operator-overloading.md#equality-and-inequality-operators">相等运算符</a>（<code>==</code>）比较骰子结果。 
     </def>
 </deflist>
 
@@ -182,7 +183,7 @@ fun main() {
     // 在此处编写你的代码
 }
 ```
-{validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-control-flow-conditional-exercise-1"}
+{kotlin-runnable="true" kotlin-target-platform="exercise" kotlin-hidden-files="ExerciseUtils.kt,tour/basics/ControlFlowConditionalExercise1Test.kt" validate="false" id="kotlin-tour-control-flow-conditional-exercise-1"}
 
 ```kotlin
 import kotlin.random.Random
@@ -196,36 +197,36 @@ fun main() {
         println("You lose :(")
 }
 ```
-{initial-collapse-state="collapsed" collapsible="true" collapsed-title="参考解决方案" id="kotlin-tour-control-flow-conditional-solution-1"}
+{kotlin-runnable="true" kotlin-target-platform="exercise" kotlin-hidden-files="ExerciseUtils.kt,tour/basics/ControlFlowConditionalExercise1Test.kt" initial-collapse-state="collapsed" collapsible="true" collapsed-title="示例解决方案" id="kotlin-tour-control-flow-conditional-solution-1"}
 
 </def>
-<def title="输出游戏机按键对应的操作" id="conditional-expressions-exercise-2">
+<def title="打印游戏手柄按钮对应的操作" id="conditional-expressions-exercise-2">
 
-使用 `when` 表达式更新以下程序，以便在输入游戏机按键名称时输出对应的操作。
+使用 `when` 表达式更新以下程序，使其打印表中任意游戏手柄按钮对应的操作。`button` 的初始值为 `"A"`，但你可以更改它来尝试其他按钮。
 
-| **按键** | **操作**                 |
+| **按钮** | **操作**                 |
 |------------|-------------------------|
 | A          | Yes                     |
 | B          | No                      |
 | X          | Menu                    |
 | Y          | Nothing                 |
-| 其他       | There is no such button |
+| Other      | There is no such button |
 
 ```kotlin
-fun main() {
-    val button = "A"
+var button = "A"
 
+fun main() {
     println(
         // 在此处编写你的代码
     )
 }
 ```
-{validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-control-flow-conditional-exercise-2"}
+{kotlin-runnable="true" kotlin-target-platform="exercise" kotlin-hidden-files="ExerciseUtils.kt,tour/basics/ControlFlowConditionalExercise2Test.kt" validate="false" id="kotlin-tour-control-flow-conditional-exercise-2"}
 
 ```kotlin
+var button = "A"
+
 fun main() {
-    val button = "A"
-    
     println(
         when (button) {
             "A" -> "Yes"
@@ -237,14 +238,14 @@ fun main() {
     )
 }
 ```
-{initial-collapse-state="collapsed" collapsible="true" collapsed-title="参考解决方案" id="kotlin-tour-control-flow-conditional-solution-2"}
+{kotlin-runnable="true" kotlin-target-platform="exercise" kotlin-hidden-files="ExerciseUtils.kt,tour/basics/ControlFlowConditionalExercise2Test.kt" initial-collapse-state="collapsed" collapsible="true" collapsed-title="示例解决方案" id="kotlin-tour-control-flow-conditional-solution-2"}
 
 </def>
 </deflist>
 
 ## 区间 {id="ranges"}
 
-在讨论循环之前，了解如何构造供循环遍历的区间（Range）会很有帮助。
+在讨论循环之前，了解如何构建供循环遍历的区间会很有帮助。
 
 在 Kotlin 中创建区间最常见的方法是使用 `..` 运算符。例如，`1..4` 等同于 `1, 2, 3, 4`。
 
@@ -252,35 +253,36 @@ fun main() {
 
 要以倒序声明区间，请使用 [`downTo`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.ranges/down-to.html)。例如，`4 downTo 1` 等同于 `4, 3, 2, 1`。
 
-要声明步长不为 1 递增的区间，请使用 [`step`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.ranges/step.html) 以及所需的增量值。例如，`1..5 step 2` 等同于 `1, 3, 5`。
+要声明步长不为 1 的递增区间，请使用 [`step`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.ranges/step.html) 和所需的增量值。
+例如，`1..5 step 2` 等同于 `1, 3, 5`。
 
-你也可以对 `Char` 区间执行相同操作：
+对于 `Char` 区间，也可以执行相同的操作：
 
 * `'a'..'d'` 等同于 `'a', 'b', 'c', 'd'`
 * `'z' downTo 's' step 2` 等同于 `'z', 'x', 'v', 't'`
 
 ## 循环 {id="loops"}
 
-编程中最常见的两种循环结构是 `for` 和 `while`。使用 `for` 遍历一系列值并执行操作。使用 `while` 持续执行操作，直到满足特定条件。
+编程中最常见的两种循环结构是 `for` 和 `while`。使用 `for` 遍历一系列值并执行操作。使用 `while` 持续执行操作，直到满足特定条件为止。
 
 ### For {id="for"}
 
-利用刚学到的区间知识，你可以创建一个 `for` 循环，遍历数字 1 到 5 并每次输出该数字。
+利用刚刚学到的区间知识，你可以创建一个 `for` 循环来遍历数字 1 到 5，并每次打印该数字。
 
-使用关键字 `in` 将迭代变量与区间放在圆括号 `()` 内。将想要执行的操作放在花括号 `{}` 内：
+将迭代器和区间置于带有关键字 `in` 的圆括号 `()` 内。将要完成的操作置于花括号 `{}` 内：
 
 ```kotlin
 fun main() {
 //sampleStart
     for (number in 1..5) { 
-        // number 是迭代变量，1..5 是区间
+        // number 是迭代器，1..5 是区间
         print(number)
     }
     // 12345
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-for-loop"}
+{kotlin-runnable="true" id="kotlin-tour-for-loop"}
 
 集合也可以通过循环进行遍历：
 
@@ -298,7 +300,7 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-for-collection-loop"}
+{kotlin-runnable="true" id="kotlin-tour-for-collection-loop"}
 
 ### While {id="while"}
 
@@ -307,12 +309,12 @@ fun main() {
   * 当条件表达式为 true 时执行代码块。（`while`）
   * 先执行代码块，然后再检查条件表达式。（`do-while`）
 
-在第一种用法中（`while`）：
+在第一种用例（`while`）中：
 
-* 在圆括号 `()` 中声明 while 循环继续执行所需的条件表达式。 
-* 将要执行的操作添加到花括号 `{}` 内。
+* 在圆括号 `()` 内声明供 while 循环继续执行的条件表达式。 
+* 在花括号 `{}` 内添加要完成的操作。
 
-> 以下示例使用[自增运算符](operator-overloading.md#increments-and-decrements) `++` 来递增 `cakesEaten` 变量的值。
+> 以下示例使用[递增运算符](operator-overloading.md#increments-and-decrements) `++` 来递增 `cakesEaten` 变量的值。
 >
 {style="tip"}
 
@@ -330,12 +332,12 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-while-loop"}
+{kotlin-runnable="true" id="kotlin-tour-while-loop"}
 
-在第二种用法中（`do-while`）：
+在第二种用例（`do-while`）中：
 
-* 在圆括号 `()` 中声明 while 循环继续执行所需的条件表达式。
-* 使用关键字 `do`，并在花括号 `{}` 内定义要执行的操作。
+* 在圆括号 `()` 内声明供 while 循环继续执行的条件表达式。
+* 使用关键字 `do` 在花括号 `{}` 内定义要完成的操作。
 
 ```kotlin
 fun main() {
@@ -359,18 +361,18 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-while-do-loop"}
+{kotlin-runnable="true" id="kotlin-tour-while-do-loop"}
 
-有关条件表达式和循环的更多信息和示例，请参阅[条件与循环](control-flow.md)。
+有关条件表达式和循环的更多信息与示例，请参阅[条件与循环](control-flow.md)。
 
-现在你已经了解了 Kotlin 控制流的基础知识，接下来是时候学习如何编写自定义[函数](kotlin-tour-functions.md)了。
+现在你已经掌握了 Kotlin 控制流的基础知识，接下来可以学习如何编写自己的[函数](kotlin-tour-functions.md)。
 
 ## 练习：循环 {completion-point="true" id="practice-loops"}
 
 <deflist appearance="clear" collapsible="true" numbered="true">
-<def title="使用 while 与 do-while 循环统计披萨块数" id="loops-exercise-1">
+<def title="使用 while 和 do-while 循环计算披萨切片数" id="loops-exercise-1">
 
-你有一个统计披萨块数的程序，直到凑齐一整张包含 8 块切片的披萨。请用以下两种方式重构该程序：
+你有一个程序用来计算披萨切片数，直到凑齐一整张包含 8 块切片的披萨。请通过以下两种方式重构该程序：
 
 * 使用 `while` 循环。
 * 使用 `do-while` 循环。
@@ -398,7 +400,7 @@ fun main() {
     println("There are $pizzaSlices slices of pizza. Hooray! We have a whole pizza! :D")
 }
 ```
-{validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-control-flow-loops-exercise-1"}
+{kotlin-runnable="true" kotlin-target-platform="exercise" kotlin-hidden-files="ExerciseUtils.kt,tour/basics/ControlFlowLoopsExercise1Test.kt" validate="false" id="kotlin-tour-control-flow-loops-exercise-1"}
 
 ```kotlin
 fun main() {
@@ -411,7 +413,7 @@ fun main() {
     println("There are $pizzaSlices slices of pizza. Hooray! We have a whole pizza! :D")
 }
 ```
-{initial-collapse-state="collapsed" collapsible="true" collapsed-title="参考解决方案 1" id="kotlin-tour-control-flow-loops-exercise-1-solution-1"}
+{kotlin-runnable="true" kotlin-target-platform="exercise" kotlin-hidden-files="ExerciseUtils.kt,tour/basics/ControlFlowLoopsExercise1Test.kt" initial-collapse-state="collapsed" collapsible="true" collapsed-title="示例解决方案 1" id="kotlin-tour-control-flow-loops-exercise-1-solution-1"}
 
 ```kotlin
 fun main() {
@@ -423,25 +425,23 @@ fun main() {
     } while ( pizzaSlices < 8 )
     println("There are $pizzaSlices slices of pizza. Hooray! We have a whole pizza! :D")
 }
-
 ```
-{initial-collapse-state="collapsed" collapsible="true" collapsed-title="参考解决方案 2" id="kotlin-tour-control-flow-loops-exercise-1-solution-2"}
+{kotlin-runnable="true" kotlin-target-platform="exercise" kotlin-hidden-files="ExerciseUtils.kt,tour/basics/ControlFlowLoopsExercise1Test.kt" initial-collapse-state="collapsed" collapsible="true" collapsed-title="示例解决方案 2" id="kotlin-tour-control-flow-loops-exercise-1-solution-2"}
 
 </def>
-<def title="实现 Fizz buzz 游戏" id="loops-exercise-2">
+<def title="玩 Fizz buzz 游戏" id="loops-exercise-2">
 
-编写一个模拟 [Fizz buzz](https://en.wikipedia.org/wiki/Fizz_buzz) 游戏的程序。你的任务是按递增顺序输出 1 到 100 之间的数字，将任何能被 3 整除的数字替换为单词 "fizz"，将任何能被 5 整除的数字替换为单词 "buzz"。任何能同时被 3 和 5 整除的数字必须替换为单词 "fizzbuzz"。
+编写一个模拟 [Fizz buzz](https://en.wikipedia.org/wiki/Fizz_buzz) 游戏的程序。你的任务是按递增顺序打印从 1 到 100 的数字；如果数字能被 3 整除，则替换为单词 "fizz"；如果能被 5 整除，则替换为单词 "buzz"；如果能同时被 3 和 5 整除，则必须替换为单词 "fizzbuzz"。
 
 <deflist collapsible="true">
     <def title="提示 1">
-        使用 <code>for</code> 循环计数，并使用 <code>when</code> 表达式决定每一步要输出的内容。 
+        使用 <code>for</code> 循环对数字进行计数，并使用 <code>when</code> 表达式来决定每一步打印的内容。 
     </def>
 </deflist>
 
 <deflist collapsible="true">
     <def title="提示 2">
-        使用取模运算符 (<code>%</code>) 返回除法的余数。使用<a href="operator-overloading.md#equality-and-inequality-operators">相等运算符</a> 
-        (<code>==</code>) 检查余数是否为零。
+        使用取模运算符（<code>%</code>）返回数字相除的余数。使用<a href="operator-overloading.md#equality-and-inequality-operators">相等运算符</a>（<code>==</code>）检查余数是否为零。
     </def>
 </deflist>
 
@@ -450,7 +450,7 @@ fun main() {
     // 在此处编写你的代码
 }
 ```
-{validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-control-flow-loops-exercise-2"}
+{kotlin-runnable="true" kotlin-target-platform="exercise" kotlin-hidden-files="ExerciseUtils.kt,tour/basics/ControlFlowLoopsExercise2Test.kt" validate="false" id="kotlin-tour-control-flow-loops-exercise-2"}
 
 ```kotlin
 fun main() {
@@ -466,17 +466,16 @@ fun main() {
     }
 }
 ```
-{initial-collapse-state="collapsed" collapsible="true" collapsed-title="参考解决方案" id="kotlin-tour-control-flow-loops-solution-2"}
+{kotlin-runnable="true" kotlin-target-platform="exercise" kotlin-hidden-files="ExerciseUtils.kt,tour/basics/ControlFlowLoopsExercise2Test.kt" initial-collapse-state="collapsed" collapsible="true" collapsed-title="示例解决方案" id="kotlin-tour-control-flow-loops-solution-2"}
 
 </def>
-<def title="输出以指定字母开头的单词" id="loops-exercise-3">
+<def title="打印以指定字母开头的单词" id="loops-exercise-3">
 
-你有一个单词列表。使用 `for` 和 `if` 仅输出以字母 `l` 开头的单词。
+你有一个单词列表。使用 `for` 和 `if` 仅打印以字母 `l` 开头的单词。
 
 <deflist collapsible="true">
     <def title="提示">
-        使用 <code>String</code> 类型的 <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.text/starts-with.html"> <code>.startsWith()</code>
-        </a> 函数。 
+        使用 <code>String</code> 类型的 <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.text/starts-with.html"><code>.startsWith()</code></a> 函数。 
     </def>
 </deflist>
 
@@ -486,7 +485,7 @@ fun main() {
     // 在此处编写你的代码
 }
 ```
-{validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-control-flow-loops-exercise-3"}
+{kotlin-runnable="true" kotlin-target-platform="exercise" kotlin-hidden-files="ExerciseUtils.kt,tour/basics/ControlFlowLoopsExercise3Test.kt" validate="false" id="kotlin-tour-control-flow-loops-exercise-3"}
 
 ```kotlin
 fun main() {
@@ -497,7 +496,7 @@ fun main() {
     }
 }
 ```
-{initial-collapse-state="collapsed" collapsible="true" collapsed-title="参考解决方案" id="kotlin-tour-control-flow-loops-solution-3"}
+{kotlin-runnable="true" kotlin-target-platform="exercise" kotlin-hidden-files="ExerciseUtils.kt,tour/basics/ControlFlowLoopsExercise3Test.kt" initial-collapse-state="collapsed" collapsible="true" collapsed-title="示例解决方案" id="kotlin-tour-control-flow-loops-solution-3"}
 
 </def>
 </deflist>

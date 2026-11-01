@@ -2,116 +2,107 @@
 title: コンパイル時の安全性
 ---
 
-Koin Compiler Pluginは、コンパイル時に依存関係グラフを検証します。これにより、アプリが実行される前に、依存関係の欠落、クオリファイア（qualifier）の不一致、および壊れたコールサイト（呼び出し箇所）をキャッチできます。
+# コンパイル時の安全性
 
-これは、`verify()` や `checkModules()` といった実行時の検証ツールに代わるものです。コンパイルが通れば、動作が保証されます。
+Koin Compiler Pluginは、コードのコンパイル時に依存関係グラフをチェックします。定義の不足、修飾子（qualifier）の誤り、循環依存などがある場合、実行時にクラッシュするのではなく、該当するファイルと行番号を示してビルドを失敗させます。このページでは、チェックされる内容、詳細な診断情報、およびプラグインがチェックできないケースについて説明します。なお、プラグインがインストールされていることを前提としています（[Compiler Plugin Setup](/docs/setup/compiler-plugin) を参照）。
 
-## 仕組み {id="how-it-works"}
+コンパイル時の安全性チェックは、デフォルトで有効になっています（`compileSafety = true`、[Compiler Plugin Options](/docs/reference/koin-annotations/options) を参照）。
 
-プラグインは、コンパイル中に以下の3つのレベルでグラフを検証します。
+## チェックが実行される場所 {id="where-the-checks-run"}
 
-### A2 — モジュール単位（早期フィードバック） {id="a2-per-module-early-feedback"}
+プラグインは2つのレベルでチェックを行います。
 
-各モジュールの定義が、可視性のある定義（そのモジュール自身の定義、明示的にインクルードされたモジュール、および `@Configuration` ラベルを共有する兄弟モジュール）に対してチェックされます。
+**フルグラフ**: 各Koinエントリーポイントにおいて、プラグインはソースコードおよび依存関係のJARからエントリーポイントがロードするすべてのモジュールを組み立て、その完全なグラフに対してすべての定義をチェックします。
 
-```kotlin
-@Module(includes = [DataModule::class])
-@ComponentScan("app")
-class AppModule
-// 検証対象: AppModule + DataModule の定義
-```
+**呼び出し箇所（Call sites）**: すべての `get<T>()`、`inject<T>()`、`koinInject<T>()`、`koinViewModel<T>()`、`by viewModel()` および同様の呼び出しがチェックされます。すなわち、組み立てられたグラフ内に `T` が存在している必要があります。機能モジュール（feature module）が呼び出しを行っているもののフルグラフを参照できない場合、プラグインはコンパイルされたモジュール内にヒントを残します。アプリモジュールは依存関係からこれらのヒントを読み取り、自身のコンパイル時にそれらをチェックします。
 
-`@Configuration` ラベルを共有するモジュールは、相互に可視性があります。
+認識されるエントリーポイント:
 
-```kotlin
-@Module @ComponentScan("core") @Configuration("prod")
-class CoreModule  // Repository を提供
+| エントリーポイント | 例 |
+|-------------|---------|
+| `startKoin` | `startKoin<MyApp>()`, `startKoin { modules(appModule) }` |
+| `koinApplication` | `koinApplication { modules(appModule) }` |
+| `koinConfiguration` | `koinConfiguration<MyApp>()` |
+| `@KoinApplication` | `@KoinApplication object MyApp` |
+| `withConfiguration<T>()` | `startKoin { withConfiguration<MyApp>() }` |
+| Ktor `install(Koin)` | `install(Koin) { modules(appModule) }` |
 
-@Module @ComponentScan("service") @Configuration("prod")
-class ServiceModule  // Service(repo: Repository) → OK、CoreModule から可視
-```
-
-異なるラベルは隔離されます。
+`modules(...)` は、プラグインが追跡可能なリスト（`listOf(...)`、`+`、`.toList()`、トップレベルの `val`、または `List<Module>` を返す関数）を受け付けます。
 
 ```kotlin
-@Configuration("core")
-class CoreModule
+val dataModules = listOf(databaseModule, networkModule)
+fun featureModules(): List<Module> = listOf(loginModule, profileModule)
 
-@Configuration("service")  // 異なるラベル — CoreModule は不可視
-class ServiceModule         // Service(repo: Repository) → エラー
-```
-
-**A2で検出される内容:**
-
-- 依存関係の欠落
-- クオリファイアの不一致（`@Named("prod")` が要求されているが、`@Named("test")` しか提供されていないなど）
-- スコープを跨ぐ違反（Cross-scope violations）
-- `T` が提供されていない `Lazy<T>`
-- `@Provided` がマークされていない外部依存関係
-
-### A3 — フルグラフ（完全な保証） {id="a3-full-graph-complete-guarantee"}
-
-`startKoin<T>()` において、すべてのソースからの全モジュールが組み立てられ、完全なグラフが検証されます。A2では確認できなかった、モジュール間の依存関係やJARからの定義など、すべてがここでチェックされます。
-
-```kotlin
-@KoinApplication(modules = [CoreModule::class, ServiceModule::class])
-object MyApp
-
-startKoin<MyApp> { }
-// 検証対象: CoreModule + ServiceModule を組み合わせた「すべて」の定義
-```
-
-A3では、グラフの一部である場合のDSL定義（`single<T>()`、`factory<T>()` など）も検証されます。
-
-### A4 — コールサイトの検証 {id="a4-call-site-validation"}
-
-コードベース内のすべての `koinViewModel<T>()`、`get<T>()`、`inject<T>()` の呼び出しがインターセプトされます。プラグインはターゲットの型、ファイル、行、列をキャプチャし、組み立てられたグラフ内に `T` が存在するかをチェックします。
-
-```kotlin
-@Composable
-fun UserScreen() {
-    val viewModel: UserViewModel = koinViewModel()  // ← A4 がこれを検証
-}
-
-class MyFragment : Fragment() {
-    val service: PaymentService by inject()  // ← A4 がこれを検証
+startKoin {
+    modules(dataModules + featureModules())
 }
 ```
 
-もし `UserViewModel` がグラフ内に存在しない場合、正確なファイル、行、列の情報と共にビルドエラーが発生します。
+関数として宣言されたモジュール（`fun dataModule(): Module = module { ... }`）は、トップレベルの `val` と同様に追跡されます。
 
-**モジュールを跨ぐコールサイト:** 機能（feature）モジュールが `koinViewModel<T>()` を呼び出しているが、フルグラフへの可視性がない場合、プラグインはコールサイトのヒント（hint）を生成します。アプリモジュールがコンパイルされる際に、依存関係にあるJARからこれらのヒントを見つけ出し、完全なグラフに対して検証を行います。
+:::note
+自身のエントリーポイントを持たないGradleモジュール（ライブラリやほとんどの機能モジュール）は、自身のコンパイル時には依存関係不足に関する診断を受けません。単独でチェックされるモジュールは、アプリがそれをどのように接続（ワイヤリング）するかを知ることができないためです。その定義は、アプリモジュールがグラフを組み立てるときにチェックされます。プラグインはビルド出力に次のように表示します。
 
-## 検証される内容 {id="what-gets-validated"}
+```
+[Koin] compile-safety validation skipped — no Koin entry point in this compilation.
+```
+:::
 
-| シナリオ | 結果 |
-|----------|--------|
-| 非 null パラメータ、定義なし | **エラー** |
-| Null 許容パラメータ (`T?`)、定義なし | OK — `getOrNull()` を使用 |
-| デフォルト値を持つパラメータ、定義なし | OK — Kotlin のデフォルト値を使用 (`skipDefaultValues=true` の場合) |
-| `@InjectedParam`、定義なし | OK — 実行時に `parametersOf()` 経由で提供 |
-| `@Property("key")` パラメータ | OK — プロパティ注入 (`@PropertyValue` デフォルトがない場合は警告) |
-| `List<T>` パラメータ | OK — 定義がなければ `getAll()` は空リストを返す |
-| `Lazy<T>`、`T` の定義なし | **エラー** — 内部の型を検証するために展開 |
-| `@Named("x")` パラメータ、一致するクオリファイアなし | **エラー** — 修飾なしのバインディングが存在する場合はヒントを表示 |
-| 誤ったスコープからのスコープ依存関係 | **エラー** |
-| `@Named` クオリファイア付きのデフォルト値パラメータ | **エラー** — クオリファイアは強制的に注入を行う |
-| `@Provided` 型またはパラメータ、定義なし | OK — 実行時に外部から提供 |
-| `@ScopeId(name = "x")` パラメータ | OK — 実行時に名前付きスコープから解決 |
-| `Scope` 型のパラメータ | OK — スコープのレシーバーが直接渡される |
-| Android フレームワークの型 (例: `Context`) | OK — ハードコードされたホワイトリスト |
-| 循環参照 (A → B → A) | **エラー** — A2/A3 のグラフ探索中に検出 |
+## チェック対象 {id="what-is-checked"}
 
-## アノテーションによる安全性 {id="safety-with-annotations"}
+| ケース | 結果 |
+|------|--------|
+| 非null許容パラメータで、定義が存在しない | エラー |
+| null許容パラメータ（`T?`）で、定義が存在しない | OK（`getOrNull()` で解決） |
+| デフォルト値を持つパラメータで、定義が存在しない | OK（Kotlinのデフォルト値を使用、`skipDefaultValues = true` の場合） |
+| デフォルト値と修飾子（`@Named`）を持つパラメータ | エラー（修飾子によって解決が強制される） |
+| `@InjectedParam` パラメータ | OK（実行時に `parametersOf()` で渡される） |
+| `@Property("key")` パラメータ | OK（`@PropertyValue("key")` のデフォルト値が存在しない場合は警告） |
+| `List<T>` パラメータ | OK（一致するものがない場合、`getAll()` は空のリストを返す） |
+| `Lazy<T>` で、`T` の定義が存在しない | エラー（内部の型がチェックされる） |
+| `@Named("x")` パラメータで、その修飾子を持つ定義が存在しない | エラー（その型が別の修飾子で存在する場合はヒントを表示） |
+| 別のスコープで宣言されたスコープ依存関係 | エラー |
+| 循環依存（AがBを必要とし、BがAを必要とする） | エラー |
+| `@Provided` の型またはパラメータ | OK（グラフの外部から提供される） |
+| `@ScopeId` パラメータ | OK（実行時に名前付きスコープから解決される） |
+| `Scope` パラメータ | OK（現在のスコープが渡される） |
+| Androidフレームワークの型（`Context`, `SavedStateHandle`, ...） | OK（組み込みリスト） |
+| `T` の定義がない状態での `get<T>()` / `inject<T>()` | エラー |
+| `T` に `@InjectedParam` があるにもかかわらず `parametersOf()` を伴わない `get<T>()` | エラー |
+| 引数の数または型が誤っている `parametersOf(...)` | エラー |
 
-クラスにアノテーションを付け、それらをモジュールに整理することで、コンパイラがすべてを検証します。
+各パラメータ型がどのように解決されるかに関するルールについては、[Definitions](/docs/reference/koin-core/definitions#constructor-parameters) を参照してください。
 
+## 宣言スタイルごとのチェック {id="checks-per-declaration-style"}
+
+あらゆるスタイルやDSL形式が同じグラフに対してチェックされます。これらは1つのプロジェクト内に混在させることができます。DSL定義がアノテーション付きクラスに依存することも、その逆も可能です。
+
+**Compiler Plugin DSL**
+```kotlin
+val appModule = module {
+    single<Database>()
+    single<UserRepository>()      // チェック対象: Database が存在すること
+    viewModel<UserViewModel>()    // チェック対象: UserRepository が存在すること
+}
+```
+
+プラグインはコンストラクタを読み取り、解決呼び出しを生成してすべてのパラメータをチェックします。`create(::function)` も同様に関数のパラメータに対してチェックされます。
+
+```kotlin
+fun buildUserRepository(db: Database): UserRepository = UserRepository(db)
+
+val appModule = module {
+    single { create(::buildUserRepository) }    // チェック対象: Database が存在すること
+}
+```
+
+**アノテーション**
 ```kotlin
 @Singleton
 class Database
 
 @Singleton
-class UserRepository(private val db: Database)
+class UserRepository(private val db: Database)    // チェック対象: Database が存在すること
 
 @KoinViewModel
 class UserViewModel(private val repo: UserRepository) : ViewModel()
@@ -119,337 +110,251 @@ class UserViewModel(private val repo: UserRepository) : ViewModel()
 @Module
 @ComponentScan("com.myapp")
 class AppModule
-```
 
-プラグインは `@ComponentScan` を介してアノテーション付きクラスを検出し、A2で各モジュールの定義を検証し、アプリケーションのエントリポイントを宣言した際のA3でフルグラフを検証します。
-
-```kotlin
 @KoinApplication(modules = [AppModule::class])
 object MyApp
-
-startKoin<MyApp> { }  // ← A3 のフルグラフ検証をトリガー
 ```
 
-**トップレベル関数**もサポートされています。アノテーション付きのトップレベル関数は `@ComponentScan` によって検出され、クラス定義と同様に検証されます。
+`startKoin<MyApp>()` がエントリーポイントとなります。プラグインは `@ComponentScan` によって見つかったすべての定義をチェックします。アノテーションが付与されたトップレベル関数も、クラスと同様にチェックされます。
 
 ```kotlin
-@Singleton
-fun provideDatabase(): DatabaseService = PostgresDatabase()
-
 @Factory
-fun provideCache(db: DatabaseService): CacheService = RedisCache(db)
-// ← 検証済み: DatabaseService が存在することを確認
+fun provideCache(db: Database): CacheService = RedisCache(db)    // チェック対象: Database が存在すること
 ```
 
-`@Configuration` ラベルを使用して、まとめて検証されるモジュールのグループを整理できます。
+`@Configuration` でタグ付けされたモジュールは、Gradleモジュールをまたいでそのラベルを要求する `@KoinApplication` と共に組み立てられ、一括してチェックされます。
 
-```kotlin
-@Module @ComponentScan("core") @Configuration("prod")
-class CoreModule
-
-@Module @ComponentScan("feature") @Configuration("prod")
-class FeatureModule  // CoreModule の定義を参照可能
-```
-
-## DSL による安全性 {id="safety-with-dsl"}
-
-コンパイラプラグインは DSL 定義も検証します。`single<T>()`、`factory<T>()`、または `viewModel<T>()` を記述すると、プラグインはその呼び出しをインターセプトし、コンストラクタを自動でワイヤリング（接続）し、すべてのパラメータを検証します。
+**コンストラクタ / クラシックDSL**
+コンストラクタ参照は、Compiler Plugin DSLと同様にチェックされます。
 
 ```kotlin
 val appModule = module {
-    single<Database>()
-    single<UserRepository>()       // ← 検証済み: Database が存在することを確認
-    viewModel<UserViewModel>()     // ← 検証済み: UserRepository が存在することを確認
-}
-```
-
-手動での `get()` 呼び出しは不要です。プラグインがそれらを生成し、同時に検証も行います。
-
-`create(::T)` 関数も検証されます。これは関数参照（通常はビルダー関数ですが、コンストラクタも可能）を呼び出し、そのすべてのパラメータを検証します。
-
-```kotlin
-fun buildUserRepository(db: Database): UserRepository = UserRepository(db)
-
-val appModule = module {
+    singleOf(::Database)
+    singleOf(::UserRepository)        // チェック対象: Database が存在すること
+    viewModelOf(::UserViewModel)      // チェック対象: UserRepository が存在すること
     scope<UserSession> {
-        scoped { create(::buildUserRepository) }  // ← 検証済み: Database が存在することを確認
+        scopedOf(::SessionCache)
     }
 }
 ```
 
-DSL 定義は A3 検証（フルグラフ）および A4 検証（コールサイト）に参加します。`startKoin { modules(appModule) }` を使用すると、プラグインは組み立てられたグラフに対してすべての DSL 定義を検証します。
+`singleOf`、`factoryOf`、`scopedOf`、`viewModelOf`、および `new(::T)` は実行時の動作をそのまま維持します。プラグインはチェックを追加するだけであり、コードを書き換えることはありません。
 
-## 両方のスタイルの併用 {id="both-styles-together"}
-
-同じプロジェクト内でアノテーションと DSL を混在させることができます。両方は同じ検証グラフに集約されます。
+独自に記述したラムダの場合、プラグインはコンストラクタを読み取りません。通常の呼び出し箇所と同様に、ラムダ内の `get()`、`inject()`、`getOrNull()` の呼び出しをチェックします。
 
 ```kotlin
-// アノテーション
-@Singleton class Database
-
-// DSL
-val featureModule = module {
-    single<UserRepository>()  // ← 検証済み: アノテーションからの Database が可視
+val appModule = module {
+    single { UserRepository(get()) }  // チェック対象: get() の呼び出しに Database が必要
 }
 ```
 
-## エラーメッセージ {id="error-messages"}
+:::warning
+Compiler Plugin 1.2.0以降、`singleOf`、`factoryOf`、`scopedOf`、`viewModelOf` がチェックされるようになりました。これらの関数で依存関係が不足していたコードはコンパイルできなくなります。以前のビルドでは実行時クラッシュが隠蔽されていました。
+:::
 
-エラーは、欠落している型、それを必要としている定義、およびどのモジュールにあるかを報告します。
+## 診断情報 {id="diagnostics"}
 
-```
-[Koin] Missing dependency: Repository
-  required by: Service (parameter 'repo')
-  in module: ServiceModule
-```
+すべての診断情報には固定のコードがあり、`[Koin][CODE]` の形式で出力されます。コードまたはメッセージの最初の行で検索できます。
 
-異なるクオリファイアを持つバインディングが存在する場合、ヒントが表示されます。
+### 依存関係の不足 (KOIN-D001) {id="missing-dependency-koin-d001"}
 
-```
-[Koin] Missing dependency: NetworkClient (qualifier: @Named("http"))
-  required by: ApiService (parameter 'client')
-  in module: AppModule
-  Hint: Found NetworkClient without qualifier — did you mean to add @Named("http")?
-```
-
-コールサイトのエラーには正確な場所が含まれます。
+定義のパラメータに対する定義がグラフ内に存在しません。
 
 ```
-[Koin] Missing definition: com.app.UserRepository
-  resolved by: koinViewModel<UserViewModel>()
-  No matching definition found in any declared module.
-  → file: UserScreen.kt, line: 12, column: 5
+[Koin][KOIN-D001] Missing dependency: com.myapp.Database
+  required by: com.myapp.UserRepository (parameter 'db')
+  in module: com.myapp.AppModule
 ```
 
-## 禁止されている定義 {id="forbidden-definitions"}
+DSL定義の場合、`required by:` は `dsl:` で始まります。その型が別の修飾子で存在する場合は、ヒントが続きます。
 
-一部の戻り値の型は Koin を通じて意味のある解決ができず、コンパイル時に拒否されます。
+```
+[Koin][KOIN-D001] Missing dependency: com.myapp.NetworkClient qualified with @Named("http")
+  required by: com.myapp.ApiService (parameter 'client')
+  in module: com.myapp.AppModule
+  Hint: Found similar binding: com.myapp.NetworkClient (no qualifier)
+```
 
-### KOIN-D007: suspend `fun interface` を返す `@Factory` {id="koin-d007-factory-returning-a-suspend-fun-interface"}
+解決策: 不足している定義を宣言する、それを宣言しているモジュールを `modules()` または `includes()` に追加する、あるいは修飾子を修正する（[Qualifiers](/docs/reference/koin-core/qualifiers) を参照）。
 
-suspend `fun interface` を拡張する型を返す `@Factory` は、Koin の同期的な `get<T>()` API を通じて呼び出すことができません。プラグインはこれをコンパイル時にブロックします。
+### 呼び出し箇所における定義の不足 (KOIN-D002, KOIN-D003) {id="missing-definition-at-a-call-site-koin-d002-koin-d003"}
+
+`get<T>()`、`inject<T>()`、または `koinViewModel<T>()` の呼び出しが、ロードされたどのモジュールにも宣言されていない型を要求しています。
+
+```
+[Koin][KOIN-D002] Missing definition: com.myapp.Tracker
+  resolved by: get<Tracker>()
+  No matching definition found in any loaded module.
+  Check your declaration with Annotation or DSL.
+```
+
+`KOIN-D003` は依存関係モジュール内で行われた呼び出しに対する同様のエラーで、アプリモジュールのコンパイル時に報告されます。2行目には `required by a call site in a dependency module` と表示されます。
+
+### 循環依存 (KOIN-D004) {id="circular-dependency-koin-d004"}
+
+```
+[Koin][KOIN-D004] Circular dependency detected:
+  com.myapp.A → com.myapp.B → com.myapp.A
+  Break with Lazy<T> injection or refactor to remove the cycle.
+```
+
+`Lazy<T>`、null許容型、`List<T>`、`@InjectedParam`、`@Provided`、`@Property`、`@ScopeId`、またはデフォルト値を持つパラメータは、循環のエッジ（結びつき）としてカウントされません。いずれか1つのパラメータを `Lazy<T>` に変更することで循環を解消できます。解消方法の詳細については、[Troubleshooting](/docs/reference/koin-core/troubleshooting) を参照してください。
+
+### 注入パラメータ (KOIN-D005, KOIN-D006) {id="injected-parameters-koin-d005-koin-d006"}
+
+定義が `@InjectedParam` パラメータを宣言しているにもかかわらず、呼び出し箇所でそれらが渡されていません。
+
+```
+[Koin][KOIN-D006] com.myapp.Greeter requires 1 injected param(s) but get<Greeter>() has no parametersOf(...) at the call site.
+  Expected @InjectedParam slots: name: kotlin.String
+  Pass them via parametersOf(...) inside the trailing lambda.
+```
+
+`KOIN-D005` は、引数の数や型が一致しない `parametersOf(...)` を報告します（`Mismatched parametersOf(...) for ...`）。どちらのチェックも、呼び出しにプラグインが読み取れる `parametersOf(...)` が含まれている場合にのみ実行されます。[Injected Parameters](/docs/reference/koin-core/injection-parameters) を参照してください。
+
+### サポートされていない suspend バインディング (KOIN-D007) {id="unsupported-suspend-binding-koin-d007"}
+
+suspend 関数型を継承している型の定義は、Koinが実行時に解決できないため拒否されます。
 
 ```kotlin
-fun interface AsyncTask { suspend operator fun invoke(): Result }
+fun interface SetUsernameUseCase : suspend (String) -> Unit
 
 @Factory
-fun provideTask(): AsyncTask = AsyncTask { ... }
-// KOIN-D007 — エラー: @Factory の戻り値の型は suspend fun interface を拡張できません
+fun provideSetUsernameUseCase(repository: UserRepository): SetUsernameUseCase =
+    SetUsernameUseCase(repository::setUsername)
 ```
 
-通常のインターフェースにリファクタリングするか、suspend メソッドを持つクラスを通じて suspend 操作を公開してください。
+```
+[Koin][KOIN-D007] Unsupported binding: com.myapp.SetUsernameUseCase extends kotlin.coroutines.SuspendFunction1
+  Suspend function injection is not yet supported by Koin runtime.
+  Remove the @Single / @Factory / @Scoped registration, or refactor the binding type to not extend a suspend function.
+  Tracked at https://github.com/InsertKoinIO/koin-compiler-plugin/issues/16
+```
 
-## ジェネリック DSL 型 {id="generic-dsl-types"}
+解決策: `suspend` メソッドを持つ通常のインターフェース、またはクラスを使用してください。
 
-実行時の Koin は、**型消去された生のクラス (erased raw class)** に基づいて定義を解決します。型パラメータはルックアップキーの一部ではありません。コンパイル時の安全性もこれに従います。`get<Box<X>>()` の呼び出しはグラフ内の任意の `Box<*>` プロバイダーに対して検証され、2つの `single<Box<A>>()` / `single<Box<B>>()` 宣言は衝突します（生のクラスが同じで、クオリファイアがないため）。
+### すべてのコード一覧 {id="all-codes"}
+
+| コード | 重要度 | メッセージの開始部分 |
+|------|----------|---------------------|
+| `KOIN-D001` | Error | `Missing dependency:` |
+| `KOIN-D002` | Error | `Missing definition:`（このモジュール内の呼び出し箇所） |
+| `KOIN-D003` | Error | `Missing definition:`（依存関係モジュール内の呼び出し箇所） |
+| `KOIN-D004` | Error | `Circular dependency detected:` |
+| `KOIN-D005` | Error | `Mismatched parametersOf(...) for` |
+| `KOIN-D006` | Error | `<Type> requires N injected param(s) but` |
+| `KOIN-D007` | Error | `Unsupported binding:` |
+| `KOIN-D008` | Error | `Module id collision:`（2つのモジュール名が同じヒント名にエンコードされた場合: 一方の名前を変更してください） |
+| `KOIN-W001` | Warning | `Module '<name>' is not loaded at startKoin` |
+| `KOIN-W003` | Warning | `Graph not verifiable at compile time:` |
+| `KOIN-W004` | Warning | `Custom @Configuration label '<label>' requested by` |
+| `KOIN-W005` | Warning | `Definition '<name>' in dependency module` |
+| `KOIN-W006` | Warning | `<definition>'s bind(...) argument could not be resolved` |
+| `KOIN-A001` | Error | `@KoinViewModel definition '<name>' cannot be generated`（`io.insert-koin:koin-core-viewmodel` を追加してください） |
+| `KOIN-A002` | Error | `@KoinWorker definition '<name>' cannot be generated`（`io.insert-koin:koin-android-workmanager` を追加してください） |
+| `KOIN-A003` | Error | `Cannot generate <Module>.module()`（`io.insert-koin:koin-core` を追加してください） |
+| `KOIN-S001` | Error | `create(::<Type>) must be the only instruction in the lambda`（[unsafeDslChecks](/docs/reference/koin-annotations/options#unsafedslchecks) を参照） |
+| `KOIN-P001` | Warning | `Missing @PropertyValue default:` |
+| `KOIN-M001` | Warning | `@Monitor: Kotzilla SDK not found on classpath` |
+
+警告（Warning）は、プラグインがチェックできなかった内容を示しています。`KOIN-W003`、`KOIN-W004`、`KOIN-W005` については [制限事項](#limits) で説明しています。`KOIN-W006` は、`bind`/`binds` の引数がリテラルの `X::class`（またはそのリテラル配列/リスト）ではないことを意味します。リテラルを使用してください。
+
+## 外部の型: `@Provided` {id="external-types-provided"}
+
+一部の型は、Koinの宣言の外部からグラフに入り込みます（プラットフォームのオブジェクト、SDKインスタンス、実行時に手動で追加された定義など）。これらを `@Provided` でマークすることで、プラグインが不足として報告しないようにします。
 
 ```kotlin
-class Box<T>(val value: T)
+// クラスに付与: この型のすべての使用がスキップされます
+@Provided
+class FirebaseAnalytics
 
-val appModule = module {
-    single { Box(42) }   // Box (raw) として登録
-}
-
-koin.get<Box<Int>>()    // → 登録された単一の Box を返す
-koin.get<Box<String>>() // → 同じ登録を返す (型消去のため)
+// パラメータに付与: このパラメータのみがスキップされます
+@Singleton
+class PaymentProcessor(@Provided val gateway: PaymentGateway)
 ```
 
-生のクラスで検証することにより、DSL 定義が置換されていない型パラメータを保持していた場合に iOS ビルドをクラッシュさせていた Kotlin/Native の klib シグネチャ・マングリングの失敗も回避できます。
+`@Provided`（`org.koin.core.annotation`）はあらゆる宣言スタイルで機能します。定義がDSLモジュール内にある場合でも、クラスまたはコンストラクタパラメータにアノテーションを付与できます。これはコンパイル時のチェックのみを変更します。実行時には通常通り `get()` で型が解決されるため、誰も宣言していなければ失敗します。パラメータ形式を使用することをお勧めします。クラスに付与すると、その型が使用されているすべての箇所でチェックが無効化されてしまうためです。
 
-### ジェネリックインスタンスの識別: ジェネリックパラメータによる型クオリファイア {id="discriminating-generic-instances-type-qualifier-on-the-generic-parameter"}
+以下の型は、`@Provided` がなくても常に受け入れられます。
 
-同じジェネリッククラスの複数のインスタンスが共存する必要がある場合の慣用的なパターンは、**具体的なラッパー型**を登録し、**ジェネリックパラメータから派生した型クオリファイア**（`named<T>()`）を使用することです。これは `koin-compose-navigation3` が内部で行っていることで、各ナビゲーションルートをそのルート型に関連付けています。
+- `android.content.Context`
+- `android.app.Application`
+- `android.app.Activity`
+- `androidx.activity.ComponentActivity`
+- `androidx.fragment.app.Fragment`
+- `androidx.lifecycle.SavedStateHandle`
+- `androidx.work.WorkerParameters`
+
+### 実行時にロードされるモジュール {id="modules-loaded-at-runtime"}
+
+`startKoin` の後に `loadKoinModules(...)` でロードされるモジュールは、プラグインが組み立てるグラフには含まれません。プラグインはその呼び出しがいつ実行されるか、あるいは実行されるかどうかを知ることができません。このようなモジュールからのみ提供される型には、`@Provided` を付ける必要があります。
 
 ```kotlin
-inline fun <reified T : Any> Module.navigation(
-    noinline definition: @Composable Scope.(T) -> Unit,
-): KoinDefinition<EntryProviderInstaller> {
-    // 具体的な型 (EntryProviderInstaller) を登録し、
-    // ジェネリックパラメータ T から派生した型クオリファイアで識別する。
-    return _singleInstanceFactory<EntryProviderInstaller>(named<T>(), { ... })
-}
+val featureModule = module { single<Repository>() }   // 後からロードされる
+val appModule = module { single<Service>() }          // Service(@Provided val repo: Repository)
+
+startKoin { modules(appModule) }
+loadKoinModules(featureModule)
 ```
 
-両方の側で使用されます。
+プラグインは実行時にロードされるモジュールを到達不能として `KOIN-W001` で報告します。これを `modules()` に追加するとオンデマンドロードの目的が失われてしまうため、この警告は無視して構いません（`allWarningsAsErrors` が有効な場合のみビルドが失敗します）。
 
-```kotlin
-// 宣言 — T は具体的な型 (HomeRoute, SettingsRoute, ...)
-module {
-    navigation<HomeRoute> { route -> HomeScreen() }
-    navigation<SettingsRoute> { route -> SettingsScreen() }
-}
+## 特殊なパラメータ {id="special-parameters"}
 
-// 解決 — 同じ型クオリファイアをキーにルックアップ
-koin.get<EntryProviderInstaller>(named<HomeRoute>())
-```
-
-`named<T>()` は具体化された `T` から型クオリファイアを生成するため、各ジェネリックのインスタンス化に対して安定した個別のクオリファイアが付与されます。実行時の Koin は（生のクラス + クオリファイア）でマッチングを行い、型消去によって失われた識別能力を再導入します。
-
-ジェネリックのインスタンス化を区別する必要がある場合は、直接 `single<Box<X>>()` を使用するよりも、常にこのパターンを優先してください。
-
-## スコープパラメータの注入 {id="scope-parameter-injection"}
-
-`org.koin.core.scope.Scope` 型のパラメータには、自動的にスコープのレシーバーが注入されます。アノテーションは不要です。スコープを注入することで動的なルックアップが可能になるため、検証はスキップされます。
+**Scope**: `org.koin.core.scope.Scope` 型のパラメータは現在のスコープを受け取ります。コードがそのスコープから動的に型を解決するため、チェックは行われません。
 
 ```kotlin
 @Scoped
 class ScopedService(val scope: Scope) {
-    fun dynamicLookup() = scope.get<SomeDep>()
+    fun load() = scope.get<SomeDependency>()
 }
-// 生成内容: ScopedService(scope) — スコープのレシーバーを直接渡す
 ```
 
-## 名前付きスコープの解決: `@ScopeId` {id="named-scope-resolution-scopeid"}
+**@ScopeId**: パラメータは別のスコープから名前（`@ScopeId(name = "user_session")`）または型（`@ScopeId(UserSessionScope::class)`、スコープIDは完全修飾クラス名）によって解決されます。そのスコープは実行時にのみ存在するため、チェックは行われません。[Scopes](/docs/reference/koin-core/scopes) を参照してください。
 
-現在のスコープではなく、名前付き Koin スコープから依存関係を解決するには `@ScopeId` を使用します。スコープは実行時に解決されるため、検証はスキップされます。
-
-```kotlin
-@Factory
-class ProfileService(@ScopeId(name = "user_session") val session: UserSession)
-// 生成内容: ProfileService(scope.getScope("user_session").get<UserSession>())
-```
-
-`@ScopeId` は2つの形式をサポートしています。
-
-| 形式 | 例 | スコープ ID |
-|------|---------|----------|
-| 文字列名 | `@ScopeId(name = "user_session")` | `"user_session"` |
-| 型参照 | `@ScopeId(UserSessionScope::class)` | 完全修飾クラス名 (FQ class name) |
-
-## プロパティの検証 {id="property-validation"}
-
-`@Property("key")` パラメータは Koin プロパティ（起動時に `properties()` 経由で設定）から解決されます。`@PropertyValue("key")` によるデフォルト値が存在しない場合、プラグインはコンパイル時に警告を表示します。
+**@Property**: パラメータはKoinプロパティを読み取ります。`@PropertyValue("key")` のデフォルト値が宣言されていない場合、ビルド時に警告が出力され、起動時にプロパティを設定する必要があります。
 
 ```kotlin
 @PropertyValue("api.timeout")
 val defaultTimeout = 30
 
 @Factory
-class ApiClient(@Property("api.timeout") val timeout: Int)
-// OK — @PropertyValue("api.timeout") がコンパイル時のデフォルトを提供
+class ApiClient(@Property("api.timeout") val timeout: Int)    // OK
 
 @Factory
 class Other(@Property("missing.key") val value: String)
-// 警告 — @PropertyValue("missing.key") が見つからない
-// (コンパイル自体は可能 — プロパティは実行時に提供される可能性があるため)
+// [Koin][KOIN-P001] Missing @PropertyValue default: "missing.key" ...
 ```
 
-## 外部の型: `@Provided` {id="external-types-provided"}
+**デフォルト値**: `skipDefaultValues = true`（デフォルト）の場合、Kotlinのデフォルト値を持つパラメータはそのデフォルト値を使用し、チェックされません。[skipDefaultValues](/docs/reference/koin-annotations/options#skipdefaultvalues) を参照してください。
 
-一部の型は、実行時にプラットフォームや外部フレームワークによって提供され、Koin の定義として宣言されることはありません。これらを検証から除外するには、`@Provided` をマークします。
+## ジェネリック型 {id="generic-types"}
 
-`@Provided` は **クラス**（その型のすべての使用箇所で検証をスキップ）と **パラメータ**（そのパラメータのみスキップ）の両方で機能します。
+Koinは型消去されたクラスに基づいて定義を解決します。型引数は検索キーの一部にはなりません。プラグインも同じルールに従います。`get<Box<Int>>()` は任意の `Box` 定義に対してチェックされ、`single<Box<A>>()` と `single<Box<B>>()` は同一の定義とみなされるため、後者が前者を上書きします。
 
-```kotlin
-// クラスに付与 — この型のすべての使用箇所で検証をスキップ
-@Provided
-class SavedStateHandle
+1つのジェネリック型のインスタンスを複数保持するには、`named<T>()` を使用して型引数から派生した型修飾子をそれぞれに付与します。このパターンについては [Advanced Patterns](/docs/reference/koin-core/advanced-patterns) で説明されています。
 
-// パラメータに付与 — このパラメータのみ検証をスキップ
-@Singleton
-class MyViewModel(@Provided val handle: SavedStateHandle)
-```
+## インクリメンタルビルド {id="incremental-builds"}
 
-**`@Provided` を使用すべきケース:**
+フルグラフチェックは、集約モジュール（エントリーポイントを持つモジュール）がコンパイルされる際に実行されます。Kotlinのインクリメンタルコンパイルでは、他の場所（例えば `module { }` のラムダ本体内）を変更した後に、そのモジュールのコンパイルがスキップされることがあります。プラグインはエントリーポイントを検出したモジュールで `strictSafety` を有効にし、ビルドごとにチェックが実行されるようにします。詳細および回避策については [strictSafety](/docs/reference/koin-annotations/options#strictsafety) を参照してください。
 
-- ホワイトリストに含まれていない **Android フレームワークの型**（例: カスタム Android サービス）
-- 外部から注入される **サードパーティ SDK の型**（例: Firebase、アナリティクス SDK）
-- **Koin を使用していないモジュールからの型**（依存関係が Koin を使用していないライブラリから提供される場合）
-- **テストダブル**（テスト構成で実際の実装を置き換える場合）
-- **手動で提供される型**（`androidContext()`、手動での `single { }` 登録）
+## 制限事項 {id="limits"}
 
-```kotlin
-// 外部 SDK — Koin によって管理されていない
-@Singleton
-class AnalyticsService(@Provided val firebaseAnalytics: FirebaseAnalytics)
+- **動的なモジュールリスト**: `modules(if (debug) a else b)`、`modules(*list)`、または実行時に構築されたリストは追跡できません。プラグインは `KOIN-W003` を報告し、そのエントリーポイントに対するフルグラフチェックをスキップします。チェックを維持するには、モジュールを直接渡してください。
+- **手書きのラムダと循環**: `single { A(get()) }` のようなラムダは循環チェックにエッジを追加しないため、手書きのラムダを通る循環依存は検出されません。循環が懸念される箇所では、`single<T>()`、`singleOf(::T)`、または `create(::T)` を使用してください。
+- **カスタム設定ラベル**: `"default"` 以外のラベルでタグ付けされたモジュールは、最大で1ホップ離れた `implementation` 依存関係までしか検出されません（`KOIN-W004`）。直接の依存関係を追加するか、`@KoinApplication(modules = [...])` にモジュールをリストしてください。
+- **遠く離れた関数定義**: 2ホップ以上離れた `implementation` 依存関係モジュール内にある `@Module` 関数定義や修飾されたトップレベル関数は、チェック時に参照できません（`KOIN-W005`）。実行時には引き続き動作します。チェック対象に含めるには、直接の依存関係を追加してください。
+- **実行時にロードされるモジュール**: [実行時にロードされるモジュール](#modules-loaded-at-runtime) を参照してください。
 
-// モジュール間: 実行時に別のチームのモジュールから提供される
-@Factory
-class PaymentProcessor(@Provided val paymentGateway: PaymentGateway)
-```
+## verify() および checkModules() の置き換え {id="replacing-verify-and-checkmodules"}
 
-**一般的な Android フレームワークの型は自動的にホワイトリストに登録されているため**、`@Provided` は不要です。
+コンパイル時の安全性を有効にすると、`verify()` や `checkModules()` のテストで検証していた内容が毎回のコンパイル時にビルドによってチェックされるようになります。プラグインによって完全にチェックされるグラフについては、それらのテストを削除できます。プラグインが検証不可として報告するグラフ（`KOIN-W003`）や、実行時にロードされるモジュールを使用するグラフについては、テストを残しておいてください。[Verifying modules](/docs/reference/koin-test/verify) を参照してください。
 
-- `android.content.Context`
-- `android.app.Application`
-- `android.app.Activity`
-- `androidx.fragment.app.Fragment`
-- `androidx.lifecycle.SavedStateHandle`
-- `androidx.work.WorkerParameters`
+## 関連情報 {id="related"}
 
-## デフォルト値と skipDefaultValues {id="default-values-and-skipdefaultvalues"}
-
-`skipDefaultValues` が有効な場合（デフォルト）、Kotlin のデフォルト値を持つパラメータは、DI コンテナから解決される代わりにデフォルト値を使用します。
-
-```kotlin
-// skipDefaultValues = true (デフォルト) の場合:
-@Singleton
-class ServiceWithDefault(val timeout: Int = 5000)
-// → DI 解決ではなく、Kotlin のデフォルト値 (5000) を使用
-
-// Null 許容パラメータは引き続き注入される:
-@Singleton
-class Service(val dep: Dependency? = null)
-// → DI から getOrNull() を使用
-
-// アノテーション付きのパラメータは、デフォルト値に関わらず常に DI を使用する:
-@Singleton
-class Service(@Named("custom") val name: String = "fallback")
-// → @Named("custom") クオリファイアを使用して DI から解決
-
-// 混合: 一部は DI から、一部はデフォルト値から
-@Singleton
-class ApiClient(
-    val repo: UserRepository,                        // → DI から解決
-    val timeout: Int = 30_000,                       // → Kotlin のデフォルト値を使用
-    @Property("api_url") val url: String = "https://api.example.com"  // → DI から解決 (アノテーション付き)
-)
-```
-
-`skipDefaultValues = false` に設定すると、Kotlin のデフォルト値を無視して、すべてのパラメータを常に DI コンテナから注入します。
-
-## 設定 {id="configuration"}
-
-コンパイル時の安全性はデフォルトで有効になっています。無効にするには以下のように記述します。
-
-```kotlin
-koinCompiler {
-    compileSafety = false  // コンパイル時の安全性チェックを無効化
-}
-```
-
-その他の関連オプション:
-
-```kotlin
-koinCompiler {
-    compileSafety = true       // コンパイル時の依存関係検証 (デフォルト: true)
-    strictSafety = true        // ビルドのたびにアグリゲーターの安全性パスを強制的に再実行する
-                               // (デフォルト: startKoin / @KoinApplication があるモジュールで自動検出)
-    skipDefaultValues = true   // デフォルト値を持つパラメータの注入をスキップする (デフォルト: true)
-    unsafeDslChecks = true     // create() がラムダ内の唯一の命令であることを検証する (デフォルト: true)
-}
-```
-
-:::info インクリメンタルコンパイルと `strictSafety`
-フルグラフパス（A3）は、アグリゲーターの `compileKotlin` でのみ実行されます。K2 における Kotlin のインクリメンタルコンパイルは、`module { }` ラムダ内の DSL の変更や、`@ComponentScan` パッケージに新しく追加されたクラスを追跡しません。そのため、グラフが変更された場合でもアグリゲーターが UP-TO-DATE とマークされる可能性があります。プラグインは、検出されたアグリゲーターモジュールで [`strictSafety`](/docs/reference/koin-annotations/options#strictsafety) を自動的に有効にし、A3 の再実行を強制します。ライブラリや機能モジュールは、完全なインクリメンタル状態を維持します。
-:::
-
-## verify() / checkModules() からの移行 {id="migrating-from-verify-checkmodules"}
-
-コンパイラプラグインは、実行時の検証を置き換えます。検証テストを削除することができます。
-
-| 以前 | 以後 |
-|--------|-------|
-| テスト内での `module.verify()` | コンパイラプラグイン (自動) |
-| テスト内での `checkModules()` | コンパイラプラグイン (自動) |
-| 実行時の検証 | コンパイル時の検証 |
-| 手動のテストセットアップ | テストコード不要 |
-
-コンパイラはビルドのたびに検証を行うため、テストコードは不要になります。
-
-## 関連項目 {id="see-also"}
-
-- **[Compiler Plugin Options](/docs/reference/koin-annotations/options)** - すべての設定オプション
-- **[Compiler Plugin Setup](/docs/setup/compiler-plugin)** - インストールガイド
-- **[Starting with Annotations](/docs/reference/koin-annotations/start)** - はじめに
-- **[Playground Apps](https://github.com/InsertKoinIO/koin-compiler-plugin/tree/main/playground-apps)** - アノテーション方式 (`app-annotations/`) と DSL 方式 (`app-dsl/`) の両方を備えた完全なリファレンスアプリ
+- [Compiler Plugin Options](/docs/reference/koin-annotations/options): `compileSafety`、`strictSafety`、`skipDefaultValues`、およびその他のオプション。
+- [Koin Compiler Plugin](/docs/intro/koin-compiler-plugin): プラグインの機能とその仕組み。
+- [Definitions](/docs/reference/koin-core/definitions): コンストラクタパラメータの解決方法。
+- [Troubleshooting](/docs/reference/koin-core/troubleshooting): 実行時エラー、ロガー、および循環依存。
+- [IDE Plugin](/docs/tooling/ide-plugin): IDE内でのグラフの可視化と定義へのナビゲーション。
+- [Playground apps](https://github.com/InsertKoinIO/koin-compiler-plugin/tree/main/playground-apps): アノテーション（`app-annotations/`）およびDSL（`app-dsl/`）を使用したサンプルアプリ。

@@ -1,119 +1,95 @@
 ---
-title: HiltからKoinへの移行
+title: Hiltからの移行
 ---
 
-このガイドでは、AndroidアプリケーションをDagger HiltからKoinに移行する方法を説明します。Koin DSLとKoin Annotationsのどちらを使用する場合でも、このガイドでは主要な違いと移行ステップを網羅しています。
+# Hiltからの移行
 
-:::info
-実践的な完全な例については、[Now in Androidの移行](https://blog.insert-koin.io/migrating-now-in-android-to-koin-annotations-2-3-67d252dbb97d)を確認してください。30個のGradleモジュールを持つGoogleのプロダクション対応ニュースアプリが、HiltからKoin Annotationsにどのように移行されたかが示されています。
+このガイドでは、Gradle、`Application` クラス、モジュール、バインディング、ViewModel、エントリーポイント、クォリファイア、Compose、テストと、ステップごとにAndroidアプリをDagger HiltからKoinへと移行します。各Koinサンプルには3つのKoinスタイルが用意されています。どれを選ぶべきか迷った場合は、[Choosing your style](/docs/intro/choosing-your-style)（スタイルの選択）をお読みください。2つのフレームワークの比較については、[Koin vs Hilt](/docs/intro/koin-vs-hilt) を参照してください。
+
+:::note
+実際のアプリでの完全な移行事例については、[Migrating Now in Android to Koin](https://blog.insert-koin.io/migrating-now-in-android-to-koin-annotations-2-3-67d252dbb97d) をお読みください。30個のGradleモジュールを持つGoogleのサンプルアプリをHiltからKoin Annotationsへと移行した事例です。
 :::
 
-## なぜKoinに移行するのか？ {id="why-migrate-to-koin"}
+## 概念のマッピング {id="concept-mapping"}
 
-**Koinの主な利点：**
+| Hilt | Compiler Plugin DSL | Annotations | Constructor / Classic DSL |
+|------|---------------------|-------------|-------------|
+| `@HiltAndroidApp` | `Application.onCreate()` 内の `startKoin { }` | `@KoinApplication` + `startKoin<T>()` | `Application.onCreate()` 内の `startKoin { }` |
+| `@AndroidEntryPoint` | 不要: `by inject()`, `by viewModel()` | 不要 | 不要 |
+| `@Inject constructor` | `single<T>()` / `factory<T>()` | クラスに `@Singleton` / `@Factory` | `singleOf(::T)` / `factoryOf(::T)` |
+| `@Module` + `@InstallIn` | `module { }` | `@Module` + `@ComponentScan` | `module { }` |
+| `@Provides` | `single { create(::fn) }` | 関数に `@Singleton` / `@Factory` | `single { ... }` |
+| `@Binds` | `bind Interface::class` | 自動（スーパータイプ）または `binds = [...]` | `bind Interface::class` |
+| `@Singleton` | `single` | `@Singleton` / `@Single` | `single` |
+| `@HiltViewModel` | `viewModel<T>()` | `@KoinViewModel` | `viewModelOf(::T)` |
+| `@HiltWorker` | `worker<T>()` | `@KoinWorker` | `workerOf(::T)` |
+| `@Named`, カスタム `@Qualifier` | `named("x")`, パラメータに `@Named` | `@Named`, カスタム `@Qualifier` | `named("x")` |
+| `@ApplicationContext` | `Context` パラメータ（`androidContext()` により提供） | 同様 | `androidContext()` |
+| `@AssistedInject` | 注入パラメータ（Injected parameters） | `@InjectedParam` | 注入パラメータ（Injected parameters） |
+| 自作クラス内の `@Inject` フィールド | コンストラクタパラメータ | コンストラクタパラメータ | コンストラクタパラメータ |
+| `@EntryPoint`（Hiltが注入できないフレームワーククラス） | そのエントリーポイントでのみ `KoinComponent` | 同様 | 同様 |
+| `@HiltAndroidTest` | `KoinTestRule` | `KoinTestRule` | `KoinTestRule` |
 
-- **コード生成なし** - Koinはアノテーションプロセッサを使用せず、実行時に依存関係を解決します。
-- **シンプルなセットアップ** - 複雑なコンポーネント階層や `@InstallIn` 宣言は不要です。
-- **Kotlinファースト** - 自然に感じられる、慣習的なKotlin DSLを提供します。
-- **軽量** - kapt/KSPによるコード生成がないため、ビルド時間が短縮されます（DSLアプローチの場合）。
-- **マルチモジュールに最適** - `@EntryPoint` インターフェースは必要ありません。
-- **JSR-330のサポート** - 既存の `@Inject` コンストラクタを修正なしでそのまま利用できます。
+### スコープのマッピング {id="scope-mapping"}
 
-## クイックリファレンス：Hilt vs Koin {id="quick-reference-hilt-vs-koin"}
+| Hilt | Koin DSL | Annotations | ライフタイム |
+|------|----------|-------------|----------|
+| `@Singleton` (`SingletonComponent`) | `single` | `@Singleton` | アプリケーション |
+| `@ActivityRetainedScoped` | `activityRetainedScope { }` | `@ActivityRetainedScope` | 構成変更（Configuration changes）をまたいで生存 |
+| `@ViewModelScoped` | `viewModelScope { }` | `@ViewModelScope` | ViewModel |
+| `@ActivityScoped` | `activityScope { }` | `@ActivityScope` | Activity |
+| `@FragmentScoped` | `fragmentScope { }` | `@FragmentScope` | Fragment |
 
-### アノテーションのマッピング {id="annotation-mappings"}
+スコープDSLとアノテーションの詳細は、[Android Scopes](/docs/reference/koin-android/scope) で解説されています。
 
-| Hilt | Koin DSL                                 | Koin Annotations                                                                                    |
-|------|------------------------------------------|-----------------------------------------------------------------------------------------------------|
-| `@HiltAndroidApp` | Application内での `startKoin {}`            | `@KoinApplication`                                                                                  |
-| `@AndroidEntryPoint` | `by inject()` / `by viewModel()`         | `by inject()` / `by viewModel()`                                                                    |
-| `@HiltViewModel` | `viewModel { MyViewModel(...) }`         | `@KoinViewModel`                                                                                    |
-| `@Inject` コンストラクタ | DSLでコンストラクタパラメータを指定    | コンストラクタパラメータを自動検出 (JSR-330)                                                           |
-| `@Module` + `@InstallIn` | `module { }`                             | `@Module` + `@ComponentScan`                                                                        |
-| `@Provides` | `single { }` または `factory { }`            | `@Single` / `@Factory`                                                                              |
-| `@Binds` | `single<Interface> { Implementation() }` | `@Single` または `@Singleton` はバインディングを検出します。また、これらのアノテーションの `binds` プロパティも使用可能です。 |
-| `@Singleton` | `single { }`                             | `@Single` または `@Singleton`                                                                                           |
-| `@Named("qualifier")` | `named("qualifier")`                     | `@Named("qualifier")`                                                                               |
-| `@ApplicationContext` | コンテキストの自動注入              | コンテキストの自動注入                                                                         |
-| `@EntryPoint` | 不要                               | 不要                                                                                          |
+## ステップ 1: Gradle {id="step-1-gradle"}
 
-### スコープのマッピング {id="scope-mappings"}
-
-| Hiltスコープ | Koin DSL | Koin Annotations | 備考 |
-|------------|----------|------------------|-------|
-| `@Singleton` | `single { }` | `@Single` / `@Singleton` | アプリケーション全体のシングルトン |
-| `@ActivityScoped` | `activityScope { scoped { } }` | `@ActivityScope` | Activityのライフサイクルに紐づく |
-| `@ViewModelScoped` | `viewModelScope { scoped { } }` | `@ViewModelScope` | ViewModelのライフサイクルに紐づく |
-| `@ActivityRetainedScoped` | `activityRetainedScope { scoped { } }` | `@ActivityRetainedScope` | 設定変更（Configuration changes）をまたいで維持される |
-
-## 移行ステップ {id="migration-steps"}
-
-### ステップ 1: 依存関係の更新 {id="step-1-update-dependencies"}
-
-**Hiltの依存関係を削除する：**
+Hiltプラグイン、`hilt-android`、および `hilt-compiler`（kaptまたはKSP）を削除します。その後、Koinを追加します:
 
 ```kotlin
-// build.gradle.kts からこれらを削除
-plugins {
-    id("com.google.dagger.hilt.android") // 削除
-}
-
 dependencies {
-    // Hiltの依存関係を削除
-    implementation("com.google.dagger:hilt-android:...")
-    kapt("com.google.dagger:hilt-compiler:...")
+    implementation(platform("io.insert-koin:koin-bom:$koin_version"))
+    implementation("io.insert-koin:koin-android")
+    implementation("io.insert-koin:koin-androidx-compose") // Composeを使用する場合
 }
 ```
 
-**Koinの依存関係を追加する：**
+Compiler Plugin DSLまたはアノテーションを使用する場合は、[Koin Compiler Plugin](/docs/setup/compiler-plugin) も適用してください。これはKotlinコンパイラ内で動作し、KoinにおけるkaptやKSPの代わりとなります。アーティファクトの完全な一覧は [Gradle Setup](/docs/setup/gradle) にあります。
 
-```kotlin
-// build.gradle.kts (appモジュール)
-dependencies {
-    // Android用Koin
-    implementation("io.insert-koin:koin-android:$koin_version")
-    implementation("io.insert-koin:koin-androidx-compose:$koin_version")
+## ステップ 2: Application クラス {id="step-2-application-class"}
 
-    // オプション: Koin Annotations
-    implementation("io.insert-koin:koin-annotations:$koin_ksp_version")
-    ksp("io.insert-koin:koin-ksp-compiler:$koin_ksp_version")
-}
-```
-
-### ステップ 2: Applicationの設定 {id="step-2-application-setup"}
-
-**Hilt:**
+Hilt:
 
 ```kotlin
 @HiltAndroidApp
 class MyApplication : Application()
 ```
 
-**Koin DSL:**
+Koin:
 
+**Compiler Plugin DSL**
 ```kotlin
 class MyApplication : Application() {
     override fun onCreate() {
         super.onCreate()
-
         startKoin {
             androidLogger()
             androidContext(this@MyApplication)
-            modules(appModule, dataModule, domainModule)
+            modules(appModule)
         }
     }
 }
 ```
 
-**Koin Annotations:**
-
+**Annotations**
 ```kotlin
+import org.koin.plugin.module.dsl.startKoin
+
 @KoinApplication
 class MyApplication : Application() {
     override fun onCreate() {
         super.onCreate()
-
-        startKoin {
+        startKoin<MyApplication> {
             androidLogger()
             androidContext(this@MyApplication)
         }
@@ -121,13 +97,27 @@ class MyApplication : Application() {
 }
 ```
 
-:::info
-`@KoinApplication` を使用すると、`@Configuration` が付与されたモジュールが自動的に検出されます。また、`modules` プロパティを使用して明示的にモジュールを含めることもできます： `@KoinApplication(modules = [AppModule::class])`。
-:::
+`@KoinApplication` は、`@Configuration` がタグ付けされたすべてのモジュールを読み込みます。モジュールを明示的に指定する場合は、`@KoinApplication(modules = [AppModule::class])` を使用します。
 
-### ステップ 3: モジュールの移行 {id="step-3-migrate-modules"}
+**Constructor / Classic DSL**
+```kotlin
+class MyApplication : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        startKoin {
+            androidLogger()
+            androidContext(this@MyApplication)
+            modules(appModule)
+        }
+    }
+}
+```
 
-**Hilt:**
+`androidContext()` は、すべての定義で `Context` を利用できるようにします。[Starting Koin on Android](/docs/reference/koin-android/start) を参照してください。
+
+## ステップ 3: モジュールと @Provides {id="step-3-modules-and-provides"}
+
+Hilt:
 
 ```kotlin
 @Module
@@ -136,626 +126,407 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(): OkHttpClient {
-        return OkHttpClient.Builder()
-            .connectTimeout(30, TimeUnit.SECONDS)
-            .build()
-    }
+    fun provideOkHttpClient(): OkHttpClient = OkHttpClient.Builder().build()
 
     @Provides
     @Singleton
-    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
-        return Retrofit.Builder()
-            .baseUrl("https://api.example.com")
-            .client(okHttpClient)
-            .build()
-    }
-
-    @Provides
-    @Singleton
-    fun provideApiService(retrofit: Retrofit): ApiService {
-        return retrofit.create(ApiService::class.java)
-    }
-}
-```
-
-**Koin DSL:**
-
-```kotlin
-val networkModule = module {
-
-    single {
-        OkHttpClient.Builder()
-            .connectTimeout(30, TimeUnit.SECONDS)
-            .build()
-    }
-
-    single {
+    fun provideApiService(client: OkHttpClient): ApiService =
         Retrofit.Builder()
             .baseUrl("https://api.example.com")
-            .client(get()) // 自動依存関係解決
+            .client(client)
             .build()
-    }
-
-    single {
-        get<Retrofit>().create(ApiService::class.java)
-    }
+            .create(ApiService::class.java)
 }
 ```
 
-**Koin Annotations:**
+Koin:
 
+**Compiler Plugin DSL**
+```kotlin
+import org.koin.plugin.module.dsl.create
+
+fun okHttpClient(): OkHttpClient = OkHttpClient.Builder().build()
+
+fun apiService(client: OkHttpClient): ApiService =
+    Retrofit.Builder()
+        .baseUrl("https://api.example.com")
+        .client(client)
+        .build()
+        .create(ApiService::class.java)
+
+val networkModule = module {
+    single { create(::okHttpClient) }
+    single { create(::apiService) }
+}
+```
+
+**Annotations**
 ```kotlin
 @Module
 class NetworkModule {
 
-    @Single
-    fun provideOkHttpClient(): OkHttpClient {
-        return OkHttpClient.Builder()
-            .connectTimeout(30, TimeUnit.SECONDS)
-            .build()
-    }
+    @Singleton
+    fun okHttpClient(): OkHttpClient = OkHttpClient.Builder().build()
 
-    @Single
-    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
-        return Retrofit.Builder()
+    @Singleton
+    fun apiService(client: OkHttpClient): ApiService =
+        Retrofit.Builder()
             .baseUrl("https://api.example.com")
-            .client(okHttpClient)
+            .client(client)
             .build()
-    }
-
-    @Single
-    fun provideApiService(retrofit: Retrofit): ApiService {
-        return retrofit.create(ApiService::class.java)
-    }
+            .create(ApiService::class.java)
 }
 ```
 
-### ステップ 4: ViewModelの移行 {id="step-4-migrate-viewmodels"}
-
-**Hilt:**
-
+**Constructor / Classic DSL**
 ```kotlin
-@HiltViewModel
-class MyViewModel @Inject constructor(
-    private val repository: MyRepository,
-    private val savedStateHandle: SavedStateHandle
-) : ViewModel() {
-    // ...
-}
-
-@Composable
-fun MyScreen() {
-    val viewModel = hiltViewModel<MyViewModel>()
-    // ...
-}
-```
-
-**Koin DSL:**
-
-```kotlin
-class MyViewModel(
-    private val repository: MyRepository,
-    private val savedStateHandle: SavedStateHandle
-) : ViewModel() {
-    // ...
-}
-
-val appModule = module {
-    viewModelOf(::MyViewModel)
-}
-
-@Composable
-fun MyScreen() {
-    val viewModel = koinViewModel<MyViewModel>()
-    // ...
-}
-```
-
-**Koin Annotations:**
-
-```kotlin
-@KoinViewModel
-class MyViewModel(
-    private val repository: MyRepository,
-    private val savedStateHandle: SavedStateHandle
-) : ViewModel() {
-    // ...
-}
-
-@Composable
-fun MyScreen() {
-    val viewModel = koinViewModel<MyViewModel>()
-    // ...
-}
-```
-
-:::info
-`viewModelOf` DSL関数は、コンストラクタパラメータの自動配線（autowiring）を使用します。`SavedStateHandle` はKoinによって自動的に提供されるため、明示的に渡す必要はありません。これはViewModelの定義を簡素化するKoinのautowire DSLの一部です。
-:::
-
-### ステップ 5: ActivityとFragmentの移行 {id="step-5-migrate-activities-and-fragments"}
-
-**Hilt:**
-
-```kotlin
-@AndroidEntryPoint
-class MainActivity : ComponentActivity() {
-
-    @Inject
-    lateinit var analytics: AnalyticsService
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        analytics.logEvent("screen_view")
+val networkModule = module {
+    single { OkHttpClient.Builder().build() }
+    single {
+        Retrofit.Builder()
+            .baseUrl("https://api.example.com")
+            .client(get())
+            .build()
+            .create(ApiService::class.java)
     }
 }
 ```
 
-**Koin:**
+`@InstallIn` は存在しません。定義のライフタイムは、インストールされるコンポーネントからではなく、その定義の型（`single`、`factory`、`scoped`）によって決まります。`@Inject constructor` を持つクラスは、`single<T>()` / `factory<T>()`、クラスへのアノテーション、または `singleOf(::T)` に置き換わります。ライブラリオブジェクトの詳細は [Definitions](/docs/reference/koin-core/definitions#classes-you-dont-own) を参照してください。
 
-```kotlin
-class MainActivity : ComponentActivity() {
+## ステップ 4: インターフェースのバインディング {id="step-4-interface-bindings"}
 
-    // プロパティ委譲 - アノテーションは不要
-    private val analytics: AnalyticsService by inject()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        analytics.logEvent("screen_view")
-    }
-}
-```
-
-:::info
-Koinでは `@AndroidEntryPoint` は必要ありません。`by inject()` または `by viewModel()` プロパティ委譲を使用するだけです。
-:::
-
-### ステップ 6: インターフェース・バインディングの移行 {id="step-6-migrate-interface-bindings"}
-
-**Hilt:**
+Hilt:
 
 ```kotlin
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class DataModule {
-
     @Binds
     @Singleton
-    abstract fun bindRepository(
-        impl: MyRepositoryImpl
-    ): MyRepository
-}
-
-class MyRepositoryImpl @Inject constructor(
-    private val apiService: ApiService
-) : MyRepository {
-    // ...
+    abstract fun bindUserRepository(impl: UserRepositoryImpl): UserRepository
 }
 ```
 
-**Koin DSL:**
+Koin:
 
+**Compiler Plugin DSL**
 ```kotlin
 val dataModule = module {
-    single<MyRepository> { MyRepositoryImpl(get()) }
-}
-
-class MyRepositoryImpl(
-    private val apiService: ApiService
-) : MyRepository {
-    // ...
+    single<UserRepositoryImpl>() bind UserRepository::class
 }
 ```
 
-**Koin Annotations (自動バインディング検出):**
-
+**Annotations**
 ```kotlin
-// オプション 1: 自動 - Koinがインターフェース・バインディングを検出
 @Singleton
-class MyRepositoryImpl(
-    private val apiService: ApiService
-) : MyRepository {
-    // ...
-}
-// Koinは自動的にMyRepositoryImplをMyRepositoryにバインドします
-
-// オプション 2: bindsプロパティで明示的に指定
-@Single(binds = [MyRepository::class])
-class MyRepositoryImpl(
-    private val apiService: ApiService
-) : MyRepository {
-    // ...
-}
+class UserRepositoryImpl(private val api: ApiService) : UserRepository
 ```
 
-:::info
-Koin Annotationsは、クラスがインターフェースを実装している場合、自動的にインターフェース・バインディングを検出します。複数のインターフェースを明示的に指定したり、バインディングの動作を制御したりする必要がある場合は、`binds` プロパティを使用してください。
-:::
+クラスはそのすべてのスーパータイプにバインドされます。一部のみをバインドする場合は、`@Singleton(binds = [UserRepository::class])` を使用します。
 
-### ステップ 7: Qualifier（限定子）の移行 {id="step-7-migrate-qualifiers"}
-
-**Hilt:**
-
+**Constructor / Classic DSL**
 ```kotlin
-@Qualifier
-@Retention(AnnotationRetention.BINARY)
-annotation class IoDispatcher
-
-@Module
-@InstallIn(SingletonComponent::class)
-object DispatcherModule {
-
-    @Provides
-    @IoDispatcher
-    fun provideIoDispatcher(): CoroutineDispatcher {
-        return Dispatchers.IO
-    }
-}
-
-class MyRepository @Inject constructor(
-    @IoDispatcher private val dispatcher: CoroutineDispatcher
-)
-```
-
-**Koin DSL (文字列ベース):**
-
-```kotlin
-val dispatcherModule = module {
-    single(named("io")) { Dispatchers.IO }
-}
-
-class MyRepository(
-    private val dispatcher: CoroutineDispatcher
-)
-
 val dataModule = module {
-    single { MyRepository(get(named("io"))) }
+    singleOf(::UserRepositoryImpl) bind UserRepository::class
 }
 ```
 
-**Koin DSL (型安全):**
+## ステップ 5: ViewModel {id="step-5-viewmodels"}
+
+Hilt:
 
 ```kotlin
-// 限定子の型を定義
-object IoDispatcher
-
-val dispatcherModule = module {
-    single(named<IoDispatcher>()) { Dispatchers.IO }
-}
-
-class MyRepository(
-    private val dispatcher: CoroutineDispatcher
-)
-
-val dataModule = module {
-    single { MyRepository(get(named<IoDispatcher>())) }
-}
+@HiltViewModel
+class UserViewModel @Inject constructor(
+    private val repository: UserRepository,
+    private val savedStateHandle: SavedStateHandle,
+) : ViewModel()
 ```
 
-**Koin Annotations (文字列ベース):**
+Koin:
 
+**Compiler Plugin DSL**
 ```kotlin
-@Module
-class DispatcherModule {
-    @Single
-    @Named("io")
-    fun provideIoDispatcher(): CoroutineDispatcher = Dispatchers.IO
-}
-
-@Single
-class MyRepository(
-    @InjectedParam @Named("io") private val dispatcher: CoroutineDispatcher
-)
-```
-
-**Koin Annotations (JSR-330 @Qualifier 使用 - 完全互換！):**
-
-```kotlin
-// 既存のJSR-330限定子アノテーションをそのまま使用可能！
-@Qualifier
-@Retention(AnnotationRetention.BINARY)
-annotation class IoDispatcher
-
-@Module
-class DispatcherModule {
-    @Single
-    @IoDispatcher
-    fun provideIoDispatcher(): CoroutineDispatcher = Dispatchers.IO
-}
-
-@Single
-class MyRepository @Inject constructor(
-    @IoDispatcher private val dispatcher: CoroutineDispatcher
-)
-```
-
-:::info
-Koin AnnotationsはJSR-330の `@Qualifier` アノテーションを完全にサポートしています！これは標準的なJava/KotlinのDIアノテーションであり（Hilt固有ではありません）、移行時に既存の限定子アノテーションをそのまま維持できます。また、DSLも文字列ベースの `named("string")` の代わりに `named<T>()` を使用した型安全な限定子をサポートしています。
-:::
-
-### ステップ 8: Compose連携の移行 {id="step-8-migrate-compose-integration"}
-
-**Hilt:**
-
-```kotlin
-@Composable
-fun MyScreen(
-    viewModel: MyViewModel = hiltViewModel()
-) {
-    val dependency: SomeDependency = EntryPointAccessors
-        .fromActivity<MyEntryPoint>(LocalContext.current as Activity)
-        .dependency()
-}
-```
-
-**Koin:**
-
-```kotlin
-@Composable
-fun MyScreen(
-    viewModel: MyViewModel = koinViewModel()
-) {
-    // 直接注入 - EntryPointは不要
-    val dependency: SomeDependency = koinInject()
-}
-```
-
-### ステップ 9: テストの移行 {id="step-9-migrate-testing"}
-
-**Hilt:**
-
-```kotlin
-@HiltAndroidTest
-class MyTest {
-
-    @get:Rule
-    var hiltRule = HiltAndroidRule(this)
-
-    @Inject
-    lateinit var repository: MyRepository
-
-    @Before
-    fun init() {
-        hiltRule.inject()
-    }
-
-    @Test
-    fun myTest() {
-        // ...
-    }
-}
-```
-
-**Koin:**
-
-```kotlin
-class MyTest : KoinTest {
-
-    private val repository: MyRepository by inject()
-
-    @Before
-    fun before() {
-        startKoin {
-            modules(testModule)
-        }
-    }
-
-    @After
-    fun after() {
-        stopKoin()
-    }
-
-    @Test
-    fun myTest() {
-        // ...
-    }
-}
-```
-
-## マルチモジュール・プロジェクト {id="multi-module-projects"}
-
-### Hiltのアプローチ {id="hilt-approach"}
-
-Hiltでは以下が必要です：
-- コンポーネント階層を指定するための `@InstallIn`
-- モジュールをまたいでアクセスするための `@EntryPoint` インターフェース
-- 複雑なコンポーネント依存関係
-
-### Koinのアプローチ {id="koin-approach"}
-
-Koinでは：
-- 各モジュールが独自のKoinモジュールを宣言します
-- すべてのモジュールをApplicationクラスでインポートします
-- 特別なインターフェースは不要です
-
-**Koinを使用した機能モジュール：**
-
-```kotlin
-// :feature:home モジュール
-val homeModule = module {
-    viewModel { HomeViewModel(get()) }
-    factory { HomeRepository(get()) }
-}
-
-// :app モジュール
-class MyApplication : Application() {
-    override fun onCreate() {
-        super.onCreate()
-
-        startKoin {
-            androidLogger()
-            androidContext(this@MyApplication)
-            modules(
-                coreModule,
-                dataModule,
-                homeModule,  // 機能モジュール
-                profileModule // 別の機能モジュール
-            )
-        }
-    }
-}
-```
-
-詳細は [マルチモジュール・アーキテクチャ](/docs/reference/koin-android/multi-module) を参照してください。
-
-## 一般的なパターン {id="common-patterns"}
-
-### コンストラクタ・インジェクション (JSR-330) {id="constructor-injection-jsr-330"}
-
-最大の利点の一つは、**既存の `@Inject` コンストラクタがKoin Annotationsでもそのまま動作する**ことです！
-
-```kotlin
-// これはHiltとKoin Annotationsの両方で動作します
-class MyRepository @Inject constructor(
-    private val apiService: ApiService,
-    private val database: AppDatabase
-) {
-    // ...
-}
-```
-
-Koin Annotationsでは、`@Inject` コンストラクタをそのままに、クラスに `@Single`、`@Singleton`、または `@Factory` を追加するだけです：
-
-```kotlin
-@Single // または @Singleton
-class MyRepository @Inject constructor(
-    private val apiService: ApiService,
-    private val database: AppDatabase
-) {
-    // ...
-}
-```
-
-### AssistedInject {id="assistedinject"}
-
-**Hilt:**
-
-```kotlin
-class MyViewModel @AssistedInject constructor(
-    private val repository: MyRepository,
-    @Assisted private val userId: String
-) : ViewModel() {
-
-    @AssistedFactory
-    interface Factory {
-        fun create(userId: String): MyViewModel
-    }
-}
-```
-
-**Koin:**
-
-```kotlin
-class MyViewModel(
-    private val repository: MyRepository,
-    private val userId: String
+class UserViewModel(
+    private val repository: UserRepository,
+    private val savedStateHandle: SavedStateHandle,
 ) : ViewModel()
 
 val appModule = module {
-    viewModelOf(::MyViewModel)
+    viewModel<UserViewModel>()
+}
+```
+
+**Annotations**
+```kotlin
+@KoinViewModel
+class UserViewModel(
+    private val repository: UserRepository,
+    private val savedStateHandle: SavedStateHandle,
+) : ViewModel()
+```
+
+**Constructor / Classic DSL**
+```kotlin
+class UserViewModel(
+    private val repository: UserRepository,
+    private val savedStateHandle: SavedStateHandle,
+) : ViewModel()
+
+val appModule = module {
+    viewModelOf(::UserViewModel)
+}
+```
+
+KoinはViewModelの定義に `SavedStateHandle` を提供します。ActivityやFragmentでは、`by viewModels()` を `by viewModel()` に置き換えてください。Composeでは、`hiltViewModel()` を `koinViewModel()` に置き換えます。[Android ViewModel](/docs/reference/koin-android/viewmodel) を参照してください。
+
+## ステップ 6: Activity、Fragment、その他のエントリーポイント {id="step-6-activities-fragments-and-other-entry-points"}
+
+Hilt:
+
+```kotlin
+@AndroidEntryPoint
+class MainActivity : ComponentActivity() {
+    @Inject lateinit var analytics: Analytics
+}
+```
+
+Koin:
+
+```kotlin
+class MainActivity : ComponentActivity() {
+    private val analytics: Analytics by inject()
+}
+```
+
+`@AndroidEntryPoint` を削除します。フレームワークによって生成されるActivity、Fragment、その他のAndroidコンポーネントでは、`@Inject lateinit var` のフィールドは `by inject()`（遅延）または `get()`（即時）に置き換わります。これはどのスタイルでも同様です。ServiceやBroadcastReceiverなどの他のコンポーネントについては、[Entry Points](/docs/reference/koin-android/entry-points) で解説されています。
+
+自身で作成したクラス（リポジトリ、サービス、ユースケース、ViewModel）では、`@Inject` フィールドをコンストラクタパラメータに移動し、[ステップ 3](#step-3-modules-and-provides) のようにクラスを宣言します。これらのクラスが `get()` や `by inject()` を呼び出すことはありません:
+
+```kotlin
+// Hilt: 自作クラスでのフィールドインジェクション
+class SyncService @Inject constructor() {
+    @Inject lateinit var repository: UserRepository
 }
 
-// 使用方法
-val viewModel: MyViewModel by viewModel { parametersOf("user123") }
+// Koin: コンストラクタインジェクション
+class SyncService(private val repository: UserRepository)
 ```
 
-### 遅延インジェクション (Lazy Injection) {id="lazy-injection"}
+Hiltの `@EntryPoint` は、`ContentProvider` やライブラリのコールバックなど、Hiltが注入できないフレームワーククラスのために存在します。そのようなエントリーポイントでのみ [KoinComponent](/docs/reference/koin-core/koin-component) を実装し、`by inject()` を呼び出します。アプリクラス内の `@Inject` フィールドを置き換えるために `KoinComponent` を使用しないでください。
 
-**Hilt:**
+## ステップ 7: クォリファイア {id="step-7-qualifiers"}
+
+Hilt:
 
 ```kotlin
-@Inject
-lateinit var heavyService: HeavyService
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class IoDispatcher
+
+@Provides
+@IoDispatcher
+fun provideIoDispatcher(): CoroutineDispatcher = Dispatchers.IO
+
+class SyncRepository @Inject constructor(
+    @IoDispatcher private val dispatcher: CoroutineDispatcher,
+)
 ```
 
-**Koin:**
+Koin:
+
+**Compiler Plugin DSL**
+```kotlin
+import org.koin.core.annotation.Named
+
+class SyncRepository(
+    @Named("io") private val dispatcher: CoroutineDispatcher,
+)
+
+val dispatcherModule = module {
+    single<CoroutineDispatcher>(named("io")) { Dispatchers.IO }
+    single<SyncRepository>()
+}
+```
+
+**Annotations**
+既存のクォリファイアアノテーションをそのまま保持できます。Koinは `@Qualifier`（Koin独自、`jakarta.inject`、または `javax.inject`）が付与されたカスタムアノテーションを読み取ります:
 
 ```kotlin
-// プロパティ委譲によりデフォルトで遅延評価されます
-private val heavyService: HeavyService by inject()
+import javax.inject.Qualifier
 
-// または明示的なlazy
-private val heavyService: Lazy<HeavyService> by lazy { get() }
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class IoDispatcher
+
+@Module
+class DispatcherModule {
+    @Singleton
+    @IoDispatcher
+    fun ioDispatcher(): CoroutineDispatcher = Dispatchers.IO
+}
+
+@Singleton
+class SyncRepository(
+    @IoDispatcher private val dispatcher: CoroutineDispatcher,
+)
 ```
 
-## 移行チェックリスト {id="migration-checklist"}
+**Constructor / Classic DSL**
+```kotlin
+val dispatcherModule = module {
+    single<CoroutineDispatcher>(named("io")) { Dispatchers.IO }
+    single { SyncRepository(get(named("io"))) }
+}
+```
 
-移行の進捗確認にこのリストを使用してください：
+型クォリファイア（`named<IoDispatcher>()`）やすべてのオプションについては、[Qualifiers](/docs/reference/koin-core/qualifiers) に記載されています。Hiltの `@ApplicationContext` に対応するクォリファイアは不要です。`Context` パラメータは `androidContext()` に渡されたコンテキストを受け取ります。
 
-- [ ] **依存関係**
-  - [ ] Hilt Gradleプラグインを削除
-  - [ ] Hiltの依存関係を削除
-  - [ ] Koinの依存関係を追加
-  - [ ] 他で必要なければ `kapt` を削除
+## ステップ 8: Compose {id="step-8-compose"}
 
-- [ ] **Applicationクラス**
-  - [ ] `@HiltAndroidApp` を削除
-  - [ ] `onCreate()` に `startKoin {}` を追加
-  - [ ] `androidContext()` とモジュールを設定
+HiltではComposableからViewModel以外の依存関係にアクセスするためにエントリーポイントが必要ですが、Koinでは直接解決できます:
 
-- [ ] **モジュール**
-  - [ ] `@Module` + `@InstallIn` を `module { }` に変換
-  - [ ] `@Provides` を `single { }` または `factory { }` に変換
-  - [ ] `@Binds` をインターフェース・バインディングに変換
-  - [ ] 限定子を `named()` に更新
+```kotlin
+@Composable
+fun UserScreen(viewModel: UserViewModel = koinViewModel()) {
+    val analytics: Analytics = koinInject()
+}
+```
 
-- [ ] **ViewModel**
-  - [ ] `@HiltViewModel` を削除
-  - [ ] `viewModel { }` を使用してモジュールに追加
-  - [ ] Composableを `koinViewModel()` を使用するように更新
+[Koin for Compose](/docs/reference/koin-compose/compose) を参照してください。
 
-- [ ] **Activity/Fragment**
-  - [ ] `@AndroidEntryPoint` を削除
-  - [ ] フィールド注入を `by inject()` に変換
+## ステップ 9: テスト {id="step-9-tests"}
 
-- [ ] **テスト**
-  - [ ] `@HiltAndroidTest` を削除
-  - [ ] `KoinTest` を実装
-  - [ ] setup/teardownに `startKoin` / `stopKoin` を追加
+Hilt:
 
-- [ ] **検証**
-  - [ ] プロジェクトが正常にビルドできること
-  - [ ] すべてのテストを実行
-  - [ ] アプリ内の依存関係注入をテスト
-  - [ ] ランタイムクラッシュがないことを確認
+```kotlin
+@HiltAndroidTest
+class UserRepositoryTest {
+    @get:Rule
+    val hiltRule = HiltAndroidRule(this)
+
+    @Inject lateinit var repository: UserRepository
+
+    @Before
+    fun init() = hiltRule.inject()
+}
+```
+
+Koin:
+
+```kotlin
+class UserRepositoryTest : KoinTest {
+
+    @get:Rule
+    val koinTestRule = KoinTestRule.create {
+        modules(appModule, testModule)
+    }
+
+    private val repository: UserRepository by inject()
+}
+```
+
+Hiltの `@TestInstallIn` や `@UninstallModules` は、本番モジュールの後に読み込まれるテストモジュールに置き換わります。`HiltTestApplication` とHiltテストランナーを削除してください。[Unit Testing](/docs/reference/koin-test/testing) および [Android Instrumented Testing](/docs/reference/koin-android/instrumented-testing) を参照してください。
+
+## @Inject を使用した段階的な移行 {id="migrate-gradually-with-inject"}
+
+アノテーションを使用する場合、Compiler PluginはJSR-330アノテーションを読み取ります。`@ComponentScan` の対象パッケージ内では、`@Inject constructor` を持つクラスはファクトリになり、`@Singleton`（`jakarta.inject` または `javax.inject`）が付与されたクラスはシングルになります。これらのクラスを変更せずに維持したまま、Gradleモジュール単位で段階的に移行できます。[JSR-330 Annotations](/docs/reference/koin-android/jsr330) を参照してください。
+
+## マルチモジュールプロジェクト {id="multi-module-projects"}
+
+各Gradleモジュールは独自のKoinモジュールを宣言し、アプリモジュールが `startKoin` 内ですべてを読み込みます。設定すべきコンポーネント階層はなく、モジュール間アクセス用の `@EntryPoint` も不要です。`:feature:home` 内の定義は、アプリによって読み込まれた任意の定義を使用できます。
+
+アノテーションを使用する場合、各機能モジュールクラスに `@Module`、`@ComponentScan`、`@Configuration` を付与します。アプリモジュールの `@KoinApplication` は、明示的に列挙することなくそれらを自動検出します。
+
+モジュールの構成、可視性、機能モジュールについては、[Multi-Module Apps](/docs/reference/koin-android/multi-module) で解説されています。
+
+## よくあるパターン {id="common-patterns"}
+
+### アシステッドインジェクション（Assisted injection） {id="assisted-injection"}
+
+Hiltの `@AssistedInject` と `@AssistedFactory` は、注入パラメータ（Injected parameters）に置き換わります。呼び出し元が実行時の値を渡します:
+
+**Compiler Plugin DSL**
+```kotlin
+class UserDetailViewModel(
+    @InjectedParam private val userId: String,
+    private val repository: UserRepository,
+) : ViewModel()
+
+val appModule = module {
+    viewModel<UserDetailViewModel>()
+}
+```
+
+**Annotations**
+```kotlin
+@KoinViewModel
+class UserDetailViewModel(
+    @InjectedParam private val userId: String,
+    private val repository: UserRepository,
+) : ViewModel()
+```
+
+**Constructor / Classic DSL**
+```kotlin
+class UserDetailViewModel(
+    private val userId: String,
+    private val repository: UserRepository,
+) : ViewModel()
+
+val appModule = module {
+    viewModel { (userId: String) -> UserDetailViewModel(userId, get()) }
+}
+```
+
+```kotlin
+val viewModel: UserDetailViewModel by viewModel { parametersOf("user-42") }
+```
+
+[Injected Parameters](/docs/reference/koin-core/injection-parameters) を参照してください。
+
+### Lazy と Provider {id="lazy-and-provider"}
+
+- `dagger.Lazy<T>`: Kotlinの `Lazy<T>` コンストラクタパラメータを使用するか、Androidエントリーポイントで `by inject()` を使用します（[Injection](/docs/reference/koin-core/injection) を参照）。
+- `Provider<T>`: 自作クラスからの呼び出しごとに新しいインスタンスを生成するには、[Advanced Patterns](/docs/reference/koin-core/advanced-patterns) のプロバイダパターンを使用します。
+
+### WorkManager {id="workmanager"}
+
+`@HiltWorker` ワーカーは `worker` 定義に置き換わり、`HiltWorkerFactory` は `startKoin` 内の `workManagerFactory()` に置き換わります。[WorkManager](/docs/reference/koin-android/workmanager) を参照してください。
+
+## チェックリスト {id="checklist"}
+
+- [ ] Gradle: Hiltプラグイン、`hilt-android`、`hilt-compiler` を削除する。Koinを追加し、使用する場合は Compiler Plugin も追加する。他に必要がなければkaptを削除する。
+- [ ] Application: `@HiltAndroidApp` を削除し、`onCreate()` で `androidContext()` を指定してKoinを開始（`startKoin`）する。
+- [ ] モジュール: `@Module` / `@InstallIn` / `@Provides` / `@Binds` をKoinモジュールに変換する。
+- [ ] ViewModel: `@HiltViewModel` を削除し、ViewModelを宣言して、`by viewModel()` / `koinViewModel()` を使用する。
+- [ ] エントリーポイント: `@AndroidEntryPoint` を削除し、Androidコンポーネントでは `by inject()` を使用する。自作クラスの `@Inject` フィールドはコンストラクタパラメータに移動する。Koinが生成できないフレームワーククラスでのみ `@EntryPoint` を `KoinComponent` に置き換える。
+- [ ] クォリファイア: カスタム `@Qualifier` アノテーションを維持する（アノテーションスタイル）、または `named()` に切り替える。
+- [ ] ワーカー: `@HiltWorker` と `HiltWorkerFactory` を置き換える。
+- [ ] テスト: `@HiltAndroidTest`、`HiltAndroidRule`、Hiltテストランナーを削除し、`KoinTestRule` を使用する。
+- [ ] ビルド: Compiler Plugin を使用している場合、ビルドが成功すればグラフが完全であることを意味する。使用していない場合は、[verify()](/docs/reference/koin-test/verify) テストを追加する。
+- [ ] 実行: アプリとテストスイートを実行する。
 
 ## トラブルシューティング {id="troubleshooting"}
 
-### "No definition found for X" {id="no-definition-found-for-x"}
+### NoDefinitionFoundException {id="nodefinitionfoundexception"}
 
-**問題**: Koinが型の定義を見つけられません。
+リクエストされた型の定義がKoin内に見つかりません。その定義を宣言しているモジュールが `startKoin` で読み込まれているか（または `@Configuration` で検出されているか）、およびリクエストされた型が宣言またはバインドされた型と一致しているかを確認してください。`@Inject constructor` のみを持っていてHiltによって注入されていたクラスも、`@ComponentScan` がJSR-330アノテーション経由で検出しない限り、Koinの定義が必要です。
 
-**解決策**:
-- モジュールが `startKoin { modules(...) }` でロードされているか確認してください。
-- 定義が存在するか確認してください（`single { }` または `factory { }` を使用）。
-- 正しい型が指定されているか確認してください。
+### 同一の型に対して2つの定義がある場合に誤ったインスタンスが返される {id="wrong-instance-with-two-definitions-of-the-same-type"}
 
-### "DefinitionOverrideException" {id="definitionoverrideexception"}
+Hiltではクォリファイアの指定漏れはビルドエラーになります。Koinでは、`allowOverride(false)` を指定してKoinを開始しない限り、最後に読み込まれた定義が優先されます。両方の定義と注入ポイントに [クォリファイア](/docs/reference/koin-core/qualifiers) を追加してください。
 
-**問題**: 同じ型に対して複数の定義が存在します。
+### 循環依存 {id="circular-dependency"}
 
-**解決策**:
-- 限定子を使用してください： `single(named("qualifier")) { }`
-- オーバーライドを有効にしてください： `startKoin { allowOverride(true) }`
+2つのクラスが相互に依存しています。循環を解消するようにリファクタリングするか、片方を `Lazy<T>` パラメータにして遅延初期化してください。Compiler Pluginはビルド時に循環依存を報告します。詳細は [Troubleshooting](/docs/reference/koin-core/troubleshooting) を参照してください。
 
-### 循環依存 (Circular Dependencies) {id="circular-dependencies"}
+## 関連情報 {id="related"}
 
-**問題**: 2つのクラスが互いに依存しています。
-
-**解決策**:
-- `lazy` インジェクションを使用してください： `private val service by lazy { get<MyService>() }`
-- 循環依存を解消するようにリファクタリングしてください。
-- スコープを使用してサイクルを断ち切ってください。
-
-## その他のリソース {id="additional-resources"}
-
-- **実践的な移行事例**: [Migrating Now in Android to Koin](https://blog.insert-koin.io/migrating-now-in-android-to-koin-annotations-2-3-67d252dbb97d)
-- **Koinドキュメント**: [はじめに](/docs/setup/koin)
-- **Koin Annotations**: [Android Annotations ガイド](/docs/quickstart/android-annotations)
-
-## ヘルプが必要ですか？ {id="need-help"}
-
-- **GitHub Discussions**: [Koinリポジトリ](https://github.com/InsertKoinIO/koin/discussions)で質問する
-- **Slack**: SlackのKoinコミュニティに参加する
-- **Stack Overflow**: `koin` タグを付けて質問する
+- [Koin vs Hilt](/docs/intro/koin-vs-hilt): 2つのフレームワークの違い。
+- [JSR-330 Annotations](/docs/reference/koin-android/jsr330): 移行中に `@Inject` と `@Singleton` を維持する方法。
+- [Starting Koin on Android](/docs/reference/koin-android/start): `startKoin`、`androidContext()`、ロギングについて。
+- [Android Scopes](/docs/reference/koin-android/scope): Activity、Fragment、ViewModelのスコープ。
+- [Unit Testing](/docs/reference/koin-test/testing): Hiltテストルールの置き換え。
+- [Compile-Time Safety](/docs/reference/koin-compiler/compile-safety): Compiler Plugin が検証する内容。

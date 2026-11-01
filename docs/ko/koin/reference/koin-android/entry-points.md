@@ -1,176 +1,82 @@
 ---
-title: 안드로이드 진입점
+title: Android 진입점
 ---
 
-이 가이드는 Koin을 사용하여 다양한 안드로이드 컴포넌트에 의존성을 주입하는 방법을 다룹니다. 각 안드로이드 컴포넌트 유형은 의존성 주입 방식에 영향을 미치는 고유한 생명주기(lifecycle) 특성을 가지고 있습니다.
+# Android 진입점
 
-:::info
-이 페이지는 **어디에** 주입할 것인지(진입점)에 초점을 맞춥니다. 주입 API(`by inject()`, `get()`, `by viewModel()`)는 정의를 어떻게 선언하느냐와 상관없이 동일하게 작동합니다. 정의 선언에 대해서는 [정의 (Definitions)](/docs/reference/koin-core/definitions)를 참조하세요.
-:::
+Android는 컴포넌트(Activity, Fragment, Service, BroadcastReceiver)를 직접 생성하므로, Koin이 이 컴포넌트들에 생성자 주입(constructor injection)을 사용할 수 없습니다. 이러한 클래스들은 진입점(entry points) 역할을 합니다. 즉, 이들이 Koin에 필요한 의존성을 요청하면 그 하위의 모든 항목은 생성자 주입을 사용하게 됩니다. 이 페이지에서는 각 Android 컴포넌트에서 이를 수행하는 방법을 설명합니다. Koin이 이미 시작되었고([Android에서 Koin 시작하기](/docs/reference/koin-android/start) 참조) 정의(definition)가 선언되어 있다고([Definitions](/docs/reference/koin-core/definitions) 참조) 가정합니다.
 
-## 개요 (Overview) {id="overview"}
+주입 코드는 정의를 선언할 때 어떤 스타일을 사용하든 동일합니다.
 
-안드로이드 애플리케이션은 다양한 컴포넌트 유형으로 구성되며, 각 컴포넌트는 고유한 생명주기와 초기화 패턴을 가집니다. Koin은 이 모든 컴포넌트에 의존성을 주입할 수 있는 유연한 방법을 제공합니다.
+## 컴포넌트 한눈에 보기 {id="components-at-a-glance"}
 
-### 빠른 참조 (Quick Reference) {id="quick-reference"}
+| 컴포넌트 | 주입 방법 | 내장 Koin 확장 기능 제공 여부 |
+|-----------|---------------|--------------------------|
+| `Application` | `startKoin` 이후 `by inject()` | 예 |
+| `Activity` | `by inject()`, `get()`, `by viewModel()` | 예 |
+| `Fragment` | `by inject()`, `get()`, `by viewModel()`, `by activityViewModel()` | 예 |
+| `Service` | `by inject()`, `get()` | 예 |
+| `ContentProvider` | `by inject()`, 타이밍 제약 있음 | 예 |
+| `BroadcastReceiver` | `KoinComponent` 구현 | 아니요 |
+| 커스텀 `View` | `KoinComponent` 구현, 또는 외부에서 데이터 전달 | 아니요 |
 
-| 컴포넌트 | 주입 방법 | 내장 지원 | 참고 사항 |
-|-----------|-----------------|------------------|-------|
-| **Application** | `onCreate()`에서 `startKoin {}` | ✅ 예 | Koin 설정의 진입점 |
-| **Activity** | `by inject()` 또는 `get()` | ✅ 예 | 직접 주입 지원 |
-| **Fragment** | `by inject()` 또는 `get()` | ✅ 예 | 직접 주입 지원 |
-| **ViewModel** | `by viewModel()` | ✅ 예 | 생명주기 인식 주입 |
-| **Service** | `by inject()` 또는 `get()` | ✅ 예 | 직접 주입 지원 |
-| **BroadcastReceiver** | `KoinComponent` + `get()` | ⚠️ 수동 | `KoinComponent` 구현 필요 |
-| **ContentProvider** | `KoinComponent` + `get()` | ⚠️ 수동 | 특별한 타이밍 고려 사항 있음 |
-| **Custom View** | 생성자 또는 `KoinComponent` | ⚠️ 수동 | DI 사용 지양 권장 |
+Koin은 모든 Android `ComponentCallbacks` 클래스(`Application`, `Activity`, `Fragment`, `Service`, `ContentProvider`)에 `inject()`와 `get()`을 추가합니다. 프레임워크가 생성하는 다른 클래스(리시버, XML로부터 인플레이트된 View)는 동일한 함수를 사용하기 위해 [`KoinComponent`](/docs/reference/koin-core/koin-component)를 구현합니다. 직접 작성한 클래스(리포지토리, 유스케이스, ViewModel)는 이를 구현할 필요가 없으며, 항상 생성자를 통해 의존성을 전달받습니다.
 
-## Application 클래스 {id="application-class"}
-
-Application 클래스는 Koin을 초기화하는 곳입니다. 이는 앱의 모든 의존성 주입을 위한 기반이 됩니다.
+## Activity {id="activity"}
 
 ```kotlin
-class MyApplication : Application() {
-    override fun onCreate() {
-        super.onCreate()
+import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-        startKoin {
-            androidLogger()
-            androidContext(this@MyApplication)
-            modules(appModule, networkModule, dataModule)
-        }
-    }
-}
-```
-
-:::info
-전체 Application 설정 지침은 [안드로이드에서 Koin 시작하기](/docs/reference/koin-android/start)를 참조하세요.
-:::
-
-## Activity 주입 {id="activity-injection"}
-
-Activity는 확장 함수를 통해 Koin 내장 지원을 제공받습니다.
-
-### by inject() 사용하기 {id="using-by-inject"}
-
-```kotlin
 class UserActivity : AppCompatActivity() {
-    // 지연 주입(Lazy injection) - 처음 접근할 때 생성됨
+
     private val presenter: UserPresenter by inject()
+    private val viewModel: UserViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_user)
-
-        presenter.loadUser()  // Presenter가 여기서 생성됨
-    }
-}
-```
-
-### get() 사용하기 {id="using-get"}
-
-```kotlin
-class UserActivity : AppCompatActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_user)
-
-        // 즉시 주입(Eager injection) - 즉시 생성됨
-        val presenter: UserPresenter = get()
         presenter.loadUser()
     }
 }
 ```
 
-### 파라미터와 함께 사용하기 {id="with-parameters"}
+`by viewModel()`은 `by inject()`와 다릅니다. Android `ViewModelStore`를 거치기 때문에 화면 회전 시에도 인스턴스가 유지됩니다. 모든 ViewModel에는 이 방식을 사용하세요. 자세한 내용은 [Android ViewModel](/docs/reference/koin-android/viewmodel)을 참조하세요.
+
+## Fragment {id="fragment"}
 
 ```kotlin
-class UserDetailActivity : AppCompatActivity() {
-    private val userId: String by lazy { intent.getStringExtra("USER_ID") ?: "" }
+import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.activityViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-    // 런타임 파라미터 전달
-    private val presenter: UserDetailPresenter by inject { parametersOf(userId) }
+class UserFragment : Fragment() {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        presenter.loadUserDetails()
-    }
-}
-```
-
-파라미터가 있는 정의를 선언하는 방법은 [주입된 파라미터 (Injected Parameters)](/docs/reference/koin-core/definitions#injected-parameters)를 참조하세요.
-
-:::info
-더 많은 Activity 주입 패턴은 [안드로이드에서 주입하기](/docs/reference/koin-android/get-instances)를 참조하세요.
-:::
-
-## Fragment 주입 {id="fragment-injection"}
-
-Fragment는 Koin 확장 기능을 통해 Activity와 동일하게 작동합니다.
-
-```kotlin
-class UserListFragment : Fragment() {
-    private val viewModel: UserListViewModel by viewModel()
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        return inflater.inflate(R.layout.fragment_user_list, container, false)
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        viewModel.loadUsers()
-    }
-}
-```
-
-### 공유 ViewModel (Shared ViewModels) {id="shared-viewmodels"}
-
-Activity와 Fragment 간에 ViewModel을 공유합니다.
-
-```kotlin
-class UserDetailFragment : Fragment() {
-    // Activity 스코프의 ViewModel 가져오기
+    private val presenter: UserPresenter by inject()
+    private val viewModel: UserDetailViewModel by viewModel()
     private val sharedViewModel: UserViewModel by activityViewModel()
-
-    // 이 Fragment 스코프의 ViewModel 가져오기
-    private val fragmentViewModel: DetailViewModel by viewModel()
 }
 ```
 
-:::info
-Fragment 및 ViewModel 주입에 대한 자세한 내용은 다음을 참조하세요:
-- [안드로이드에서 주입하기](/docs/reference/koin-android/get-instances)
-- [안드로이드 ViewModel](/docs/reference/koin-android/viewmodel)
-:::
+`by viewModel()`은 Fragment가 소유하는 ViewModel을 제공합니다. `by activityViewModel()`은 호스트 Activity가 소유하며, 해당 Activity 및 그 하위의 다른 Fragment들과 공유되는 ViewModel을 제공합니다.
 
-## Service 주입 {id="service-injection"}
+생성자 주입을 사용하여 Fragment를 생성하려면 [Fragment Factory](/docs/reference/koin-android/fragment-factory)를 참조하세요.
 
-Service는 Activity나 Fragment와 마찬가지로 확장 함수를 통해 Koin 내장 지원을 제공받습니다.
-
-### by inject() 사용하기
+## Service {id="service"}
 
 ```kotlin
 class MusicPlayerService : Service() {
-    // 지연 주입 - 처음 접근할 때 생성됨
-    private val player: MediaPlayer by inject()
+
+    private val player: MusicPlayer by inject()
     private val repository: MusicRepository by inject()
 
-    override fun onBind(intent: Intent?): IBinder? {
-        return null
-    }
-
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val songId = intent?.getStringExtra("SONG_ID")
-        if (songId != null) {
-            val song = repository.getSong(songId)
-            player.play(song)
+        intent?.getStringExtra("SONG_ID")?.let { songId ->
+            player.play(repository.getSong(songId))
         }
         return START_NOT_STICKY
     }
+
+    override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onDestroy() {
         player.release()
@@ -179,181 +85,56 @@ class MusicPlayerService : Service() {
 }
 ```
 
-### get() 사용하기
+Service는 오랫동안 유지될 수 있습니다. `onDestroy()`에서 보유하고 있는 리소스를 해제하세요. Service의 수명 주기와 정확히 일치해야 하는 인스턴스의 경우 `ScopeService`를 상속하세요([Android Scopes](/docs/reference/koin-android/scope#service-scope) 참조). 지연된 백그라운드 작업의 경우에는 Worker에서 생성자 주입을 지원하는 [WorkManager](/docs/reference/koin-android/workmanager)를 사용하는 것이 좋습니다.
 
-```kotlin
-class DownloadService : Service() {
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        // 즉시 주입 - 즉시 생성됨
-        val downloader: FileDownloader = get()
-        val url = intent?.getStringExtra("URL") ?: ""
+## BroadcastReceiver {id="broadcastreceiver"}
 
-        downloader.start(url)
-        return START_STICKY
-    }
-}
-```
-
-### 생명주기 고려 사항 {id="lifecycle-considerations"}
-
-- **Service는 수명이 깁니다**: 비용이 많이 드는 리소스에는 `single`을 사용하세요.
-- **정리는 필수입니다**: `onDestroy()`에서 리소스를 해제하세요.
-- **백그라운드 스레드**: 백그라운드 작업의 스코프를 적절히 지정하는 것을 고려하세요.
-
-### 권장 사항 (Best Practices) {id="best-practices"}
-
-```kotlin
-class DownloadService : Service() {
-    // 초기화를 늦추기 위해 지연 주입 사용
-    private val downloader: FileDownloader by inject()
-    private val notificationManager: NotificationManager by inject()
-
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        // 서비스가 실제로 시작될 때만 의존성이 생성됨
-        downloader.start(intent?.getStringExtra("URL") ?: "")
-        return START_STICKY
-    }
-
-    override fun onDestroy() {
-        // 항상 정리 수행
-        downloader.cancel()
-        super.onDestroy()
-    }
-}
-```
-
-:::note
-**대안:** `WorkManager` 백그라운드 작업의 경우, Service 대신 Koin의 내장 `WorkManager` 지원을 사용하세요. [WorkManager 통합](/docs/reference/koin-android/workmanager)을 참조하세요.
-:::
-
-## BroadcastReceiver 주입 {id="broadcastreceiver-injection"}
-
-BroadcastReceiver에서도 의존성 주입을 위해 `KoinComponent`가 필요합니다.
-
-### 동적으로 등록된 Receiver {id="dynamically-registered-receiver"}
-
-```kotlin
-class NetworkChangeReceiver : BroadcastReceiver(), KoinComponent {
-    // 즉시 주입을 위해 get() 사용 (receiver는 수명이 짧음)
-    private val networkMonitor: NetworkMonitor by inject()
-
-    override fun onReceive(context: Context?, intent: Intent?) {
-        when (intent?.action) {
-            ConnectivityManager.CONNECTIVITY_ACTION -> {
-                networkMonitor.checkConnectivity()
-            }
-        }
-    }
-}
-
-// Activity 또는 Service에서 등록
-class MainActivity : AppCompatActivity() {
-    private val receiver = NetworkChangeReceiver()
-
-    override fun onResume() {
-        super.onResume()
-        val filter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
-        registerReceiver(receiver, filter)
-    }
-
-    override fun onPause() {
-        unregisterReceiver(receiver)
-        super.onPause()
-    }
-}
-```
-
-### 정적으로 등록된 Receiver (Manifest) {id="statically-registered-receiver-manifest"}
+Android는 빈 생성자를 사용하여 리시버를 직접 생성하며, `BroadcastReceiver`에는 Koin 확장 기능이 없습니다. 진입점으로 만들기 위해 `KoinComponent`를 구현하세요:
 
 ```kotlin
 class BootReceiver : BroadcastReceiver(), KoinComponent {
-    override fun onReceive(context: Context?, intent: Intent?) {
-        if (intent?.action == Intent.ACTION_BOOT_COMPLETED) {
-            // Koin이 초기화되었는지 확인
-            val app = context?.applicationContext as? MyApplication
 
-            // 이제 주입 가능
-            val scheduler: JobScheduler by inject()
-            scheduler.scheduleWork()
+    private val scheduler: SyncScheduler by inject()
+
+    override fun onReceive(context: Context, intent: Intent) {
+        if (intent.action == Intent.ACTION_BOOT_COMPLETED) {
+            scheduler.scheduleSync()
         }
     }
 }
 ```
 
-```xml
-<!-- AndroidManifest.xml -->
-<receiver android:name=".BootReceiver"
-    android:exported="false">
-    <intent-filter>
-        <action android:name="android.intent.action.BOOT_COMPLETED" />
-    </intent-filter>
-</receiver>
-```
+매니페스트에 선언된 리시버와 런타임에 등록된 리시버 모두 `onReceive()` 시점에 Koin이 준비되어 있습니다. Android는 브로드캐스트를 전달하기 전에 `Application`을 생성하고 `startKoin`을 실행하기 때문입니다.
 
-### 중요한 고려 사항 {id="important-considerations"}
-
-**생명주기:**
-- Receiver는 **매우 짧은 수명**을 가집니다 (일반적으로 10초 미만).
-- 빠른 초기화를 위해 `by inject()` 대신 `get()`을 사용하세요.
-- `onReceive()`에서 무거운 작업을 수행하지 마세요.
-
-**Koin 초기화:**
-- Manifest에 선언된 receiver의 경우, `Application.onCreate()`에서 Koin이 초기화되었는지 확인하세요.
-- 동적으로 등록된 receiver의 경우, Koin은 이미 초기화되어 있습니다.
-
-**권장 사항 (Best Practices):**
+`onReceive()`는 메인 스레드에서 실행되며, 시스템이 리시버 차단(ANR)으로 간주하기 전까지 약 10초의 시간이 주어집니다. 작업을 짧게 유지하고, 오래 걸리는 작업은 WorkManager에 위임하세요:
 
 ```kotlin
 class AlarmReceiver : BroadcastReceiver(), KoinComponent {
-    override fun onReceive(context: Context?, intent: Intent?) {
-        // 즉각적인 액세스를 위해 get() 사용 (receiver에 더 효율적임)
-        val repository: AlarmRepository = get()
 
-        // 작업을 Service나 WorkManager로 위임
-        val workRequest = OneTimeWorkRequestBuilder<AlarmWorker>()
-            .setInputData(workDataOf("alarm_id" to intent?.getIntExtra("ID", -1)))
+    private val workManager: WorkManager by inject()
+
+    override fun onReceive(context: Context, intent: Intent) {
+        val request = OneTimeWorkRequestBuilder<AlarmWorker>()
+            .setInputData(workDataOf("alarm_id" to intent.getIntExtra("ID", -1)))
             .build()
-
-        WorkManager.getInstance(context!!).enqueue(workRequest)
+        workManager.enqueue(request)
     }
 }
 ```
 
-:::warning
-BroadcastReceiver에는 엄격한 시간 제한(~10초)이 있습니다. 중요한 작업의 경우 `Service`, `WorkManager` 또는 `JobScheduler`를 대신 사용하세요.
-:::
+이 코드는 모듈에 `single { WorkManager.getInstance(androidContext()) }`와 같은 `WorkManager` 정의가 등록되어 있다고 가정합니다.
 
-## ContentProvider 주입 {id="contentprovider-injection"}
+## ContentProvider {id="contentprovider"}
 
-ContentProvider는 `Application.onCreate()` **이전**에 생성되기 때문에 특별한 타이밍 고려 사항이 있습니다.
-
-### 문제 상황 (The Challenge) {id="the-challenge"}
+`ContentProvider`에는 Koin 확장 기능이 있지만, Android는 `Application.onCreate()`보다 먼저 이를 생성합니다. 이 시점에는 아직 `startKoin`이 실행되지 않았습니다.
 
 ```kotlin
-// ❌ 문제: 작동하지 않습니다!
-class MyContentProvider : ContentProvider(), KoinComponent {
-    // ContentProvider가 생성될 때 Koin이 아직 초기화되지 않았습니다!
-    private val database: Database by inject()  // 크래시 발생
+class UserContentProvider : ContentProvider() {
+
+    private val repository: UserRepository by inject()
 
     override fun onCreate(): Boolean {
-        // 이 메서드는 Application.onCreate() 이전에 실행됩니다.
-        return true
-    }
-}
-```
-
-### 해결책 1: 지연 초기화 (Lazy Initialization) {id="solution-1-lazy-initialization"}
-
-```kotlin
-class UserContentProvider : ContentProvider(), KoinComponent {
-    // 초기화를 늦추기 위해 lazy 사용
-    private val database: Database by lazy {
-        // 첫 번째 쿼리가 발생할 때쯤이면 Koin은 준비되어 있습니다.
-        get<Database>()
-    }
-
-    override fun onCreate(): Boolean {
-        // 여기에서 주입된 의존성에 접근하지 마세요!
+        // 아직 Koin이 시작되지 않았으므로 여기서 repository에 접근하지 마세요.
         return true
     }
 
@@ -362,220 +143,135 @@ class UserContentProvider : ContentProvider(), KoinComponent {
         projection: Array<out String>?,
         selection: String?,
         selectionArgs: Array<out String>?,
-        sortOrder: String?
-    ): Cursor? {
-        // 여기서 database를 사용하는 것은 안전합니다 (Application.onCreate 이후).
-        return database.query(uri)
-    }
+        sortOrder: String?,
+    ): Cursor? = repository.query(uri)
+
+    ...
 }
 ```
 
-### 해결책 2: 수동 Koin 초기화 {id="solution-2-manual-koin-initialization"}
+`by inject()`는 지연(lazy) 초기화되므로 `Application.onCreate()` 이후인 첫 번째 `query()` 호출 시 인스턴스가 확인(resolve)됩니다. `onCreate()`에서 `get()`을 호출하거나 `repository`를 읽으려고 하면 "KoinApplication has not been started" 오류와 함께 실패합니다.
+
+ContentProvider 자체의 `onCreate()`에서 Koin이 필요하다면, Koin이 그보다 먼저 시작되어야 합니다. 한 번만 실행되도록 보호 조치를 취한 후 해당 위치에서 Koin을 시작하고, `Application`에서 `startKoin`을 제거하세요:
 
 ```kotlin
-class UserContentProvider : ContentProvider(), KoinComponent {
-    private lateinit var database: Database
-
-    override fun onCreate(): Boolean {
-        // 아직 초기화되지 않았다면 Koin을 초기화합니다.
-        val context = context ?: return false
-
-        if (GlobalContext.getOrNull() == null) {
-            startKoin {
-                androidContext(context.applicationContext)
-                modules(databaseModule)
-            }
+override fun onCreate(): Boolean {
+    val appContext = context?.applicationContext ?: return false
+    if (GlobalContext.getOrNull() == null) {
+        startKoin {
+            androidContext(appContext)
+            modules(appModule)
         }
-
-        // 이제 주입 가능
-        database = get()
-        return true
     }
-
-    override fun query(/* ... */): Cursor? {
-        return database.query(uri)
-    }
-}
-```
-
-### 권장 사항 (Best Practices)
-
-```kotlin
-class DataContentProvider : ContentProvider(), KoinComponent {
-    // 지연 초기화 패턴
-    private val repository: DataRepository by lazy { get() }
-
-    override fun onCreate(): Boolean {
-        // 최소한의 초기화만 수행
-        // 여기서 Koin에 접근하지 마세요.
-        return true
-    }
-
-    override fun query(
-        uri: Uri,
-        projection: Array<out String>?,
-        selection: String?,
-        selectionArgs: Array<out String>?,
-        sortOrder: String?
-    ): Cursor? {
-        // 이제 Koin은 확실히 준비된 상태입니다.
-        return repository.getData(uri)
-    }
-
-    override fun insert(uri: Uri, values: ContentValues?): Uri? {
-        return repository.insert(uri, values)
-    }
+    return true
 }
 ```
 
 :::warning
-**중요:** ContentProvider는 `Application.onCreate()` **이전**에 생성됩니다. 항상 지연 초기화를 사용하거나 의존성을 주입하기 전에 Koin이 초기화되었는지 확인하세요.
+동일한 프로세스에서 `startKoin`을 두 번 호출하면 `KoinApplicationAlreadyStartedException`과 함께 실패합니다. ContentProvider에서 Koin을 시작하는 경우, `Application` 클래스에서 다시 시작해서는 안 됩니다.
 :::
 
-## 커스텀 뷰(Custom View) 주입 {id="custom-view-injection"}
+## 커스텀 View {id="custom-view"}
 
-커스텀 뷰에서도 의존성 주입을 사용할 수 있지만, 신중하게 접근해야 합니다.
-
-### 옵션 1: 생성자 주입 (비즈니스 로직에 권장) {id="option-1-constructor-injection-recommended-for-business-logic"}
+View는 데이터를 가져오는 것이 아니라 표시하는 역할을 해야 합니다. 대부분의 View에는 주입이 필요하지 않습니다. Activity나 Fragment가 ViewModel을 주입받아 View에 데이터를 전달합니다.
 
 ```kotlin
-// 도메인/ViewModel 레이어 - 생성자 주입 사용
-class ChartViewModel(
-    private val dataRepository: ChartDataRepository
-) : ViewModel() {
-    fun loadChartData(): LiveData<ChartData> {
-        return dataRepository.getChartData()
-    }
-}
-
-// 뷰 레이어 - 데이터를 받기만 하며 DI는 필요 없음
 class ChartView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
-) : View(context, attrs, defStyleAttr) {
+) : View(context, attrs) {
 
-    // 주입된 의존성 없음 - 제공된 데이터만 그림
     fun setData(data: ChartData) {
-        // 차트 그리기
+        ...
         invalidate()
     }
 }
+```
 
-// Activity에서 이들을 연결
-class ChartActivity : AppCompatActivity() {
-    private val viewModel: ChartViewModel by viewModel()
+XML에서 인플레이트된 View에 공유 헬퍼(렌더러, 이미지 로더 등)가 필요한 경우, Android가 View의 생성자를 호출하므로 Koin이 헬퍼를 직접 주입해 줄 수 없습니다. 이때는 `KoinComponent`를 구현하세요:
+
+```kotlin
+class AvatarView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+) : AppCompatImageView(context, attrs), KoinComponent {
+
+    private val imageLoader: ImageLoader by inject()
+
+    fun load(url: String) {
+        if (!isInEditMode) imageLoader.load(url, this)
+    }
+}
+```
+
+Android Studio 레이아웃 미리보기에서는 Koin이 시작되지 않습니다. `isInEditMode`가 `true`일 때는 의존성을 확인하지 마세요.
+
+## Application 클래스 {id="application-class"}
+
+`Application` 클래스에도 Koin 확장 기능이 있습니다. `startKoin` 이후에 사용하세요:
+
+```kotlin
+class MainApplication : Application() {
+
+    private val crashReporter: CrashReporter by inject()
+
+    override fun onCreate() {
+        super.onCreate()
+        startKoin {
+            androidContext(this@MainApplication)
+            modules(appModule)
+        }
+        crashReporter.install()
+    }
+}
+```
+
+## 지연(lazy) 주입과 즉시(eager) 주입 {id="lazy-or-eager"}
+
+```kotlin
+class UserActivity : AppCompatActivity() {
+
+    // 지연(lazy): 처음 접근할 때 확인됨
+    private val presenter: UserPresenter by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val chartView = findViewById<ChartView>(R.id.chart)
-
-        viewModel.loadChartData().observe(this) { data ->
-            chartView.setData(data)
-        }
+        // 즉시(eager): 지금 바로 확인됨
+        val analytics: Analytics = get()
     }
 }
 ```
 
-### 옵션 2: KoinComponent (뷰에 복잡한 로직이 있는 경우) {id="option-2-koincomponent-when-view-has-complex-logic"}
+| 함수 | 인스턴스 확인 시점 | 주 사용 대상 |
+|----------|----------|------------|
+| `by inject()` | 프로퍼티에 처음 접근할 때 | 프로퍼티: 실제로 사용하기 전까지는 아무것도 생성되지 않음 |
+| `get()` | 호출될 때 | 함수 내부의 로컬 변수 |
+
+프로퍼티 초기화 식에서 `get()`을 사용하면 Android가 Activity 또는 Fragment를 생성할 때(`onCreate()` 이전) 실행되며, 화면에서 해당 인스턴스를 전혀 사용하지 않더라도 인스턴스가 생성됩니다. 프로퍼티에는 `by inject()`를 사용하는 것이 좋습니다. 지연 위임 프로퍼티는 기본적으로 스레드 안전(thread-safe)합니다(`LazyThreadSafetyMode.SYNCHRONIZED`). 프로퍼티를 메인 스레드에서만 읽는다면 `inject(mode = LazyThreadSafetyMode.NONE)`을 전달할 수 있습니다.
+
+모든 플랫폼에서 `inject()`와 `get()`이 동작하는 방식은 [Injection](/docs/reference/koin-core/injection)에 설명되어 있습니다.
+
+## 호출부에서의 파라미터 및 한정자(qualifier) {id="parameters-and-qualifiers-at-the-call-site"}
+
+두 함수 모두 [한정자(qualifier)](/docs/reference/koin-core/qualifiers)와 [주입 파라미터(injected parameters)](/docs/reference/koin-core/injection-parameters)를 전달받을 수 있습니다:
 
 ```kotlin
-class SmartChartView @JvmOverloads constructor(
-    context: Context,
-    attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
-) : View(context, attrs, defStyleAttr), KoinComponent {
+class UserDetailActivity : AppCompatActivity() {
 
-    // 뷰에 상당한 로직이 있는 경우에만 주입
-    private val chartRenderer: ChartRenderer by inject()
-    private val colorScheme: ColorScheme by inject()
+    private val userId: String by lazy { intent.getStringExtra("USER_ID").orEmpty() }
 
-    override fun onDraw(canvas: Canvas) {
-        super.onDraw(canvas)
-        chartRenderer.render(canvas, colorScheme)
-    }
+    private val presenter: UserDetailPresenter by inject { parametersOf(userId) }
+    private val localDatabase: Database by inject(named("local"))
 }
 ```
 
-### 뷰에서 DI를 피해야 할 때 {id="when-to-avoid-di-in-views"}
+파라미터 람다는 프로퍼티를 처음 읽을 때 실행됩니다. 이는 `onCreate()` 이후에 발생하므로 그 안에서 `intent`를 읽어도 안전합니다.
 
-❌ **다음과 같은 경우 뷰에서 주입을 피하세요:**
-- 뷰가 단순히 데이터를 보여주기만 하는 경우 (프레젠테이션 전용)
-- 레이아웃 프리뷰에서 뷰를 사용하는 경우 (프리뷰에서는 DI를 사용할 수 없음)
-- 뷰가 XML에서 인플레이트되는 경우 (생성자 파라미터를 전달할 수 없음)
-- 의존성을 메서드 파라미터로 전달할 수 있는 경우
+## 관련 내용 {id="related"}
 
-✅ **다음과 같은 경우 뷰에서 주입을 고려하세요:**
-- 앱 전체에서 공유되는 복잡한 렌더링 로직을 뷰가 가지고 있는 경우
-- 빌드 변리에 따라 달라지는 설정이 뷰에 필요한 경우
-- 뷰가 상당한 상태나 비즈니스 로직을 관리하는 경우 (단, ViewModel로 옮기는 것을 먼저 고려하세요)
-
-### 권장 사항: 뷰를 단순하게 유지하기 {id="best-practice-keep-views-simple"}
-
-```kotlin
-// ❌ 뷰에 로직이 너무 많음
-class UserCardView(context: Context) : FrameLayout(context), KoinComponent {
-    private val userRepository: UserRepository by inject()
-    private val imageLoader: ImageLoader by inject()
-
-    fun loadUser(userId: String) {
-        val user = userRepository.getUser(userId)  // 뷰에 비즈니스 로직이 있음!
-        imageLoader.load(user.imageUrl, imageView)
-    }
-}
-
-// ✅ 개선: 로직을 ViewModel로 이동
-class UserViewModel(
-    private val userRepository: UserRepository,
-    private val imageLoader: ImageLoader
-) : ViewModel() {
-    fun loadUser(userId: String): UserUiState {
-        val user = userRepository.getUser(userId)
-        return UserUiState(user, imageLoader.load(user.imageUrl))
-    }
-}
-
-class UserCardView(context: Context) : FrameLayout(context) {
-    // 데이터만 표시 - DI 불필요
-    fun bind(state: UserUiState) {
-        textView.text = state.name
-        imageView.setImageBitmap(state.image)
-    }
-}
-```
-
-:::info
-**권장 사항:** 뷰는 가능한 데이터를 표시만 하는 "단순한(dumb)" 프레젠테이션 컴포넌트로 유지하는 것이 좋습니다. 비즈니스 로직은 생성자 주입이 더 깔끔하고 테스트하기 쉬운 ViewModel이나 Presenter로 옮기세요.
-:::
-
-## 요약 (Summary) {id="summary"}
-
-### 적절한 주입 방식 선택하기 {id="choosing-the-right-injection-approach"}
-
-| 컴포넌트 | 권장 방식 | 이유 |
-|-----------|---------------------|-----------|
-| **Application** | `startKoin {}` | 진입점 - 여기서 Koin을 초기화함 |
-| **Activity/Fragment** | `by inject()` 또는 `by viewModel()` | 내장 지원, 깔끔한 구문 |
-| **ViewModel** | `viewModel {}`을 통한 생성자 주입 | 최고의 테스트 가능성 |
-| **Service** | `by inject()` 또는 `get()` | 내장 지원, 긴 수명 |
-| **BroadcastReceiver** | `KoinComponent` + `get()` | 내장 지원 없음, 짧은 수명 |
-| **ContentProvider** | `KoinComponent` + `lazy { get() }` | 타이밍 문제, 지연 초기화 사용 |
-| **Custom View** | DI 지양, 메서드를 통해 데이터 전달 | 뷰를 단순하게 유지, 로직은 ViewModel로 이동 |
-
-### 일반적인 권장 사항 {id="general-best-practices"}
-
-1. 비즈니스 로직 클래스(Repository, UseCase, ViewModel)에는 **생성자 주입을 선호**하세요.
-2. 안드로이드 프레임워크 클래스(Activity, Fragment, Service)에는 **필드 주입**(`by inject()`)을 사용하세요.
-3. 필요한 경우에만 **KoinComponent를 구현**하세요 (BroadcastReceiver, ContentProvider, Custom View).
-4. 수명이 짧은 컴포넌트(BroadcastReceiver)에는 **`by inject()`보다 `get()`을 사용**하세요.
-5. **뷰를 단순하게 유지**하세요. 가능한 한 뷰에 주입하는 것을 피하세요.
-6. **생명주기 타이밍을 주의**하세요. ContentProvider는 특별한 처리가 필요합니다.
-
-## 다음 단계 {id="next-steps"}
-
-- **[정의 (Definitions)](/docs/reference/koin-core/definitions)** - 의존성 선언하기
-- **[안드로이드에서 주입하기](/docs/reference/koin-android/get-instances)** - 상세한 Activity/Fragment 주입
-- **[안드로이드 ViewModel](/docs/reference/koin-android/viewmodel)** - ViewModel 관련 패턴
-- **[WorkManager 통합](/docs/reference/koin-android/workmanager)** - Koin을 사용한 백그라운드 작업
-- **[안드로이드 스코프](/docs/reference/koin-android/scope)** - 컴포넌트 생명주기에 의존성 스코프 지정하기
+- [Android ViewModel](/docs/reference/koin-android/viewmodel): `by viewModel()`, `activityViewModel()` 및 내비게이션 그래프 ViewModel.
+- [Android Scopes](/docs/reference/koin-android/scope): Activity, Fragment 또는 Service에 바인딩된 인스턴스.
+- [Injection](/docs/reference/koin-core/injection): 모든 플랫폼에서의 `inject()`, `get()`, nullable 및 지연(lazy) 주입.
+- [KoinComponent](/docs/reference/koin-core/koin-component): Android 컴포넌트 외부에서 사용하는 시기와 방법.
+- [WorkManager](/docs/reference/koin-android/workmanager): Worker에서의 생성자 주입.

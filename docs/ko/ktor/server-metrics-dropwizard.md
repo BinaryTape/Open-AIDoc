@@ -6,6 +6,7 @@
 <var name="plugin_name" value="DropwizardMetrics"/>
 <var name="package_name" value="io.ktor.server.metrics.dropwizard"/>
 <var name="artifact_name" value="ktor-server-metrics"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.server.metrics"/>
 
 <tldr>
 <p>
@@ -19,31 +20,39 @@
     </a>
 </p>
 <p>
-    <b><Links href="/ktor/server-native" summary="Ktor supports Kotlin/Native and allows you to run a server without an additional runtime or virtual machine.">Native 서버</Links> 지원</b>: ✖️
+    <b><Links href="server-native.md" summary="Ktor supports Kotlin/Native and allows you to run a server without an additional runtime or virtual machine.">Native 서버</Links> 지원</b>: ✖️
 </p>
 </tldr>
 
-<link-summary>%plugin_name% 플러그인을 사용하면 Metrics 라이브러리를 구성하여 서버 및 들어오는 요청에 대한 유용한 정보를 얻을 수 있습니다.</link-summary>
+<link-summary>%plugin_name% 플러그인을 사용하면 Metrics 라이브러리를 구성하여 서버 및 수신 요청에 대한 유용한 정보를 얻을 수 있습니다.</link-summary>
 
-[%plugin_name%](https://api.ktor.io/ktor-server-metrics/io.ktor.server.metrics.dropwizard/-dropwizard-metrics.html) 플러그인을 사용하면 [Metrics](http://metrics.dropwizard.io/) 라이브러리를 구성하여 서버 및 들어오는 요청에 대한 유용한 정보를 얻을 수 있습니다.
+[%plugin_name%](https://api.ktor.io/ktor-server-metrics/io.ktor.server.metrics.dropwizard/-dropwizard-metrics.html) 플러그인을 사용하면 [Metrics](http://metrics.dropwizard.io/) 라이브러리를 구성하여 서버 및 수신 요청에 대한 유용한 정보를 얻을 수 있습니다.
 
 ## 의존성 추가 {id="add_dependencies"}
-`%plugin_name%`을 활성화하려면 빌드 스크립트에 다음 아티팩트를 포함해야 합니다:
-* `%artifact_name%` 의존성을 추가합니다:
+`%plugin_name%`을(를) 활성화하려면 빌드 스크립트에 다음 아티팩트를 포함해야 합니다:
+* `%artifact_name%` 의존성 추가:
 
   <Tabs group="languages">
       <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-          <code-block lang="Kotlin" code="              implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+          <code-block lang="Kotlin" code="              implementation(%ktor_version_catalog_name%)"/>
+          <note>
+              위 코드 스니펫은 <a href="server-dependencies.topic#using-version-catalog">
+              Ktor 버전 카탈로그</a>를 사용하여 Ktor 의존성을 지정합니다.
+          </note>
       </TabItem>
       <TabItem title="Gradle (Groovy)" group-key="groovy">
-          <code-block lang="Groovy" code="              implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+          <code-block lang="Groovy" code="              implementation %ktor_version_catalog_name%"/>
+          <note>
+              위 코드 스니펫은 <a href="server-dependencies.topic#using-version-catalog">
+              Ktor 버전 카탈로그</a>를 사용하여 Ktor 의존성을 지정합니다.
+          </note>
       </TabItem>
       <TabItem title="Maven" group-key="maven">
           <code-block lang="XML" code="              &lt;dependency&gt;&#10;                  &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                  &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                  &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;              &lt;/dependency&gt;"/>
       </TabItem>
   </Tabs>
 
-* 선택적으로, 특정 리포터에 필요한 의존성을 추가합니다. 아래 예제는 JMX를 통해 메트릭을 보고하는 데 필요한 아티팩트를 추가하는 방법을 보여줍니다:
+* 선택 사항으로, 특정 리포터(reporter)에 필요한 의존성을 추가합니다. 아래 예제는 JMX를 통해 메트릭을 보고하는 데 필요한 아티팩트를 추가하는 방법을 보여줍니다:
 
   <var name="group_id" value="io.dropwizard.metrics"/>
   <var name="artifact_name" value="metrics-jmx"/>
@@ -60,21 +69,21 @@
       </TabItem>
   </Tabs>
   
-  `$dropwizard_version`을 `metrics-jmx` 아티팩트의 필요한 버전(예: `%dropwizard_version%`)으로 교체할 수 있습니다.
+  `$dropwizard_version`을 `metrics-jmx` 아티팩트의 필요한 버전(예: `%dropwizard_version%`)으로 바꿀 수 있습니다.
 
 ## %plugin_name% 설치 {id="install_plugin"}
 
 <p>
-    애플리케이션에 <code>%plugin_name%</code> 플러그인을 <a href="server-plugins.md#install">설치(install)</a>하려면,
-    지정된 <Links href="/ktor/server-modules" summary="Modules allow you to structure your application by grouping routes.">모듈(module)</Links>의 <code>install</code> 함수에 전달하세요.
-    아래 코드 스니펫은 <code>%plugin_name%</code>을 설치하는 방법을 보여줍니다...
+    애플리케이션에 <code>%plugin_name%</code> 플러그인을 <a href="server-plugins.md#install">설치</a>하려면,
+    지정된 <Links href="server-modules.md" summary="Modules allow you to structure your application by grouping routes.">모듈</Links>의 <code>install</code> 함수에 전달하세요.
+    다음 예제는 <code>%plugin_name%</code>을(를) 설치하는 방법을 보여줍니다:
 </p>
 <list>
     <li>
-        ... <code>embeddedServer</code> 함수 호출 내부에서.
+        <code>embeddedServer()</code> 함수 호출 내부.
     </li>
     <li>
-        ... <code>Application</code> 클래스의 확장 함수인 명시적으로 정의된 <code>module</code> 내부에서.
+        <code>Application</code> 클래스에 명시적으로 정의된 <code>module()</code> 확장 함수 내부.
     </li>
 </list>
 <Tabs>
@@ -88,12 +97,12 @@
 
 ## %plugin_name% 구성 {id="configure_plugin"}
 
-`%plugin_name%`은 `registry` 프로퍼티를 사용하여 지원되는 모든 [Metric 리포터](http://metrics.dropwizard.io/)를 사용할 수 있게 해줍니다. SLF4J 및 JMX 리포터를 구성하는 방법을 살펴보겠습니다.
+`%plugin_name%`에서는 `registry` 프로퍼티를 사용하여 지원되는 모든 [Metric 리포터](http://metrics.dropwizard.io/)를 사용할 수 있습니다. SLF4J 및 JMX 리포터를 구성하는 방법을 살펴보겠습니다.
 
 ### SLF4J 리포터 {id="slf4j"}
 
-SLF4J 리포터를 사용하면 SLF4J가 지원하는 모든 출력으로 보고서를 주기적으로 내보낼 수 있습니다.
-예를 들어, 10초마다 메트릭을 출력하려면 다음과 같이 합니다:
+SLF4J 리포터를 사용하면 SLF4J가 지원하는 모든 출력으로 주기적인 보고서를 내보낼 수 있습니다.
+예를 들어 10초마다 메트릭을 출력하려면 다음과 같이 작성합니다:
 
 ```kotlin
 install(DropwizardMetrics) {
@@ -106,9 +115,9 @@ install(DropwizardMetrics) {
 }
 ```
 
-전체 예제는 여기에서 찾을 수 있습니다: [dropwizard-metrics](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/dropwizard-metrics).
+전체 예제는 여기에서 확인할 수 있습니다: [dropwizard-metrics](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/dropwizard-metrics).
 
-애플리케이션을 실행하고 [http://0.0.0.0:8080](http://0.0.0.0:8080)을 열면, 출력은 다음과 같습니다:
+애플리케이션을 실행하고 [http://0.0.0.0:8080](http://0.0.0.0:8080)을 열면 다음과 같은 출력이 표시됩니다:
 
 ```Bash
 [DefaultDispatcher-worker-1] INFO  Application - Responding at http://0.0.0.0:8080
@@ -123,7 +132,7 @@ install(DropwizardMetrics) {
 
 ### JMX 리포터 {id="jmx"}
 
-JMX 리포터를 사용하면 모든 메트릭을 JMX에 노출하여 `jconsole`을 통해 해당 메트릭을 볼 수 있습니다.
+JMX 리포터를 사용하면 모든 메트릭을 JMX에 노출하여 `jconsole`을 사용해 해당 메트릭을 확인할 수 있습니다.
 
 ```kotlin
 install(DropwizardMetrics) {
@@ -135,29 +144,29 @@ install(DropwizardMetrics) {
 }
 ```
 
-전체 예제는 여기에서 찾을 수 있습니다: [dropwizard-metrics](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/dropwizard-metrics).
+전체 예제는 여기에서 확인할 수 있습니다: [dropwizard-metrics](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/dropwizard-metrics).
 
-애플리케이션을 실행하고 [JConsole](https://docs.oracle.com/en/java/javase/17/management/using-jconsole.html)을 사용하여 해당 프로세스에 연결하면, 메트릭은 다음과 같이 표시됩니다:
+애플리케이션을 실행하고 [JConsole](https://docs.oracle.com/en/java/javase/17/management/using-jconsole.html)을 사용하여 해당 프로세스에 연결하면 메트릭이 다음과 같이 표시됩니다:
 
 ![Ktor Metrics: JMX](jmx.png){width="758"}
 
-## 노출된 메트릭 {id="exposed-metrics"}
+## 노출되는 메트릭 {id="exposed-metrics"}
 
-`%plugin_name%`은 다음 메트릭을 노출합니다:
+`%plugin_name%`은(는) 다음 메트릭을 노출합니다:
 
-- Ktor 전용 및 [JVM 메트릭](#jvm-metrics)을 포함하는 [전역 메트릭](#global-metrics).
-- [엔드포인트용 메트릭](#endpoint-metrics).
+- Ktor 전용 메트릭 및 [JVM 메트릭](#jvm-metrics)을 포함하는 [전역 메트릭](#global-metrics).
+- [엔드포인트별 메트릭](#endpoint-metrics).
 
 ### 전역 메트릭 {id="global-metrics"}
 
-전역 메트릭에는 다음과 같은 Ktor 전용 메트릭이 포함됩니다:
+전역 메트릭에는 다음 Ktor 전용 메트릭이 포함됩니다:
 
-* `ktor.calls.active`:`Count` - 완료되지 않은 활성 요청의 수.
-* `ktor.calls.duration` - 호출 기간에 대한 정보.
+* `ktor.calls.active`:`Count` - 아직 완료되지 않은 활성 요청 수.
+* `ktor.calls.duration` - 호출 소요 시간에 대한 정보.
 * `ktor.calls.exceptions` - 예외 발생 횟수에 대한 정보.
 * `ktor.calls.status.NNN` - 특정 HTTP 상태 코드 `NNN`이 발생한 횟수에 대한 정보.
 
-메트릭 이름은 `ktor.calls` 접두사로 시작됩니다. `baseName` 프로퍼티를 사용하여 이를 커스텀할 수 있습니다:
+메트릭 이름은 `ktor.calls` 접두사로 시작합니다. `baseName` 프로퍼티를 사용하여 이 접두사를 커스터마이즈할 수 있습니다:
 
 ```kotlin
 install(DropwizardMetrics) {
@@ -167,9 +176,9 @@ install(DropwizardMetrics) {
 
 ### 엔드포인트별 메트릭 {id="endpoint-metrics"}
 
-* `"/uri(method:VERB).NNN"` - 이 경로와 동사(verb)에 대해 특정 HTTP 상태 코드 `NNN`이 발생한 횟수에 대한 정보.
-* `"/uri(method:VERB).meter"` - 이 경로와 동사에 대한 호출 횟수에 대한 정보.
-* `"/uri(method:VERB).timer"` - 이 엔드포인트의 기간(duration)에 대한 정보.
+* `"/uri(method:VERB).NNN"` - 해당 경로 및 HTTP 메서드(verb)에서 특정 HTTP 상태 코드 `NNN`이 발생한 횟수에 대한 정보.
+* `"/uri(method:VERB).meter"` - 해당 경로 및 HTTP 메서드에 대한 호출 횟수 정보.
+* `"/uri(method:VERB).timer"` - 해당 엔드포인트의 소요 시간에 대한 정보.
 
 ### JVM 메트릭 {id="jvm-metrics"}
 
@@ -181,4 +190,4 @@ install(DropwizardMetrics) {
 }
 ```
 
-전체 예제는 여기에서 찾을 수 있습니다: [dropwizard-metrics](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/dropwizard-metrics).
+전체 예제는 여기에서 확인할 수 있습니다: [dropwizard-metrics](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/dropwizard-metrics).

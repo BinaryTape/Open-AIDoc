@@ -1,47 +1,85 @@
 ---
-title: Android - ViewModel
+title: Android ViewModel
 ---
 
-> このチュートリアルでは、Androidアプリケーションを作成し、Koinの依存性注入（DI）を使用してコンポーネントを取得する方法について説明します。
-> このチュートリアルの所要時間は約 **10分** です。
+# Android ViewModel
 
-:::note
-更新日 - 2024-10-21
-:::
+このチュートリアルでは、リストから選択したユーザーに挨拶するAndroidアプリを構築します。KoinモジュールでViewModelを宣言し、それをActivityに注入（インジェクト）して、`Application`クラスからKoinを開始する方法を学びます。所要時間は約10分で、Android Studioが必要です。
+
+このチュートリアルではCompiler Plugin DSLを使用します。アノテーションを使用した同じアプリの実装については、[Android & Annotations](/docs/quickstart/android-annotations)を参照してください。スタイルの比較については、[Choosing your style](/docs/intro/choosing-your-style)を参照してください。
 
 ## コードの取得 {id="get-the-code"}
 
-:::info
-[ソースコードはGitHubで公開されています](https://github.com/InsertKoinIO/koin-getting-started/tree/main/android)
-:::
+完全なサンプルコードは [koin-getting-started/android](https://github.com/InsertKoinIO/koin-getting-started/tree/main/android) にあります。リポジトリをクローンし、Android Studioで`android`フォルダを開いてください。
 
-## Gradleの設定 {id="gradle-setup"}
+## Gradleのセットアップ {id="gradle-setup"}
 
-以下のようにKoin Androidの依存関係を追加します。
+サンプルではKoin Compiler Pluginを適用し、ViewModelのサポートを含む`koin-android`を追加しています。バージョンはバージョンカタログ（version catalog）で管理されています。
 
-```groovy
+```toml
+# gradle/libs.versions.toml
+[versions]
+# Kotlin、Android Gradle Plugin、AndroidXのエントリは省略
+koin = "<KOIN_VERSION>"
+koin-plugin = "<KOIN_PLUGIN_VERSION>"
+
+[libraries]
+koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
+koin-test-junit4 = { module = "io.insert-koin:koin-test-junit4", version.ref = "koin" }
+koin-android-test = { module = "io.insert-koin:koin-android-test", version.ref = "koin" }
+
+[plugins]
+koin-compiler = { id = "io.insert-koin.compiler.plugin", version.ref = "koin-plugin" }
+```
+
+```kotlin
+// app/build.gradle.kts
+plugins {
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.koin.compiler)
+}
+
 dependencies {
+    implementation(libs.android.appcompat)
+    implementation(libs.koin.android)
 
-    // Koin for Android
-    implementation("io.insert-koin:koin-android:$koin_version")
+    testImplementation(libs.koin.test.junit4)
+    testImplementation(libs.koin.android.test)
 }
 ```
 
-## アプリケーションの概要 {id="application-overview"}
+Compiler PluginにはKotlin 2.3.20以降が必要です。最新バージョンやBOMについては、[Gradle setup](/docs/setup/gradle)を参照してください。プラグインのオプションについては、[Compiler Plugin setup](/docs/setup/compiler-plugin)を参照してください。
 
-このアプリケーションの目的は、ユーザーのリストを管理し、PresenterまたはViewModelを使用して `MainActivity` クラスに表示することです。
+## アプリケーションの構成 {id="the-application"}
 
-> Users -> UserRepository -> UserService -> (Presenter or ViewModel) -> MainActivity
+ActivityはViewModelに挨拶メッセージを要求します。ViewModelは`UserRepository`からデータを読み取る`UserService`を使用します。
 
-## 「User」データ {id="the-user-data"}
+```
+User -> UserRepository -> UserService -> UserViewModel -> MainActivity
+```
 
-ユーザーのコレクションを管理します。データクラスは以下の通りです。
+## ユーザーデータの作成 {id="let-s-write-the-user-data"}
+
+まずはデータクラスとユーザーのデフォルトリストから作成します。
 
 ```kotlin
 data class User(val name: String, val email: String)
+
+val DEFAULT_USER = User("Alice", "alice@example.com")
+
+val DEFAULT_USERS = listOf(
+    DEFAULT_USER,
+    User("Bob", "bob@example.com"),
+    User("Charlie", "charlie@example.com")
+)
 ```
 
-ユーザーリストを管理する（ユーザーの追加や名前による検索を行う）「Repository」コンポーネントを作成します。以下に `UserRepository` インターフェースとその実装を示します。
+これらのユーザーデータが、リポジトリに保存される対象となります。
+
+## リポジトリの作成 {id="let-s-write-the-repository"}
+
+リポジトリはメモリ上にユーザーを保持し、名前でユーザーを検索します。
 
 ```kotlin
 interface UserRepository {
@@ -63,13 +101,15 @@ class UserRepositoryImpl : UserRepository {
 }
 ```
 
-## UserServiceコンポーネント {id="the-userservice-component"}
+`UserRepositoryImpl`には依存関係がないため、Koinは追加情報なしでインスタンスを作成できます。
 
-ユーザー操作を管理するためのサービスコンポーネントを記述しましょう。
+## サービスの作成 {id="let-s-write-the-service"}
+
+`UserService`は作成時にユーザーを読み込み、挨拶メッセージを準備します。
 
 ```kotlin
 interface UserService {
-    fun getUserOrNull(name: String): User?
+    fun getUserOrNull(name: String = DEFAULT_USER.name): User?
     fun loadUsers()
     fun prepareHelloMessage(user: User?): String
 }
@@ -78,51 +118,49 @@ class UserServiceImpl(
     private val userRepository: UserRepository
 ) : UserService {
 
+    init {
+        loadUsers()
+    }
+
     override fun getUserOrNull(name: String): User? = userRepository.findUserOrNull(name)
 
     override fun loadUsers() {
-        userRepository.addUsers(listOf(
-            User("Alice", "alice@example.com"),
-            User("Bob", "bob@example.com"),
-            User("Charlie", "charlie@example.com")
-        ))
+        userRepository.addUsers(DEFAULT_USERS)
     }
 
     override fun prepareHelloMessage(user: User?): String {
-        return user?.let { "Hello '${user.name}' (${user.email})! 👋" } ?: "❌ User not found"
+        return user?.let { "Hello '${user.name}' (${user.email})!" } ?: "User not found"
     }
 }
 ```
 
-## Koinモジュール {id="the-koin-module"}
+`UserServiceImpl`は`UserRepository`に依存しています。Koinはコンストラクタ経由でこの依存関係を注入します。
 
-Koinモジュールを宣言するには `module` 関数を使用します。Koinモジュールは、注入するすべてのコンポーネントを定義する場所です。
+## Koinモジュールの宣言 {id="let-s-declare-the-koin-module"}
 
-```kotlin
-val appModule = module {
-
-}
-```
-
-コンポーネントを宣言しましょう。`UserRepository` と `UserService` のシングルトンを定義します。
+モジュールは、Koinが作成するコンポーネントを宣言する場所です（[Core Concepts](/docs/intro/core-concepts)を参照）。両方のコンポーネントをそれぞれのインターフェースにバインドされたシングルトンとして宣言します。
 
 ```kotlin
+import org.koin.dsl.bind
+import org.koin.dsl.module
+import org.koin.plugin.module.dsl.single
+
 val appModule = module {
     single<UserRepositoryImpl>() bind UserRepository::class
     single<UserServiceImpl>() bind UserService::class
 }
 ```
 
-:::info
-このチュートリアルでは、コンパイル時に自動配線（auto-wiring）を提供する **Koin Compiler Plugin DSL** (`single<T>()`, `viewModel<T>()`) を使用しています。設定については [Compiler Plugin Setup](/docs/setup/compiler-plugin) を参照してください。
-:::
+これで、`UserService`を要求するコンポーネントは常に同じ`UserServiceImpl`インスタンスを取得するようになります。`single`と`bind`の詳細については、[Definitions](/docs/reference/koin-core/definitions)を参照してください。
 
-## ViewModelを使用したユーザーの表示 {id="displaying-user-with-viewmodel"}
+## ViewModelの作成 {id="let-s-write-the-viewmodel"}
 
-ユーザーを表示するためのViewModelコンポーネントを記述しましょう。
+ViewModelは名前を受け取って挨拶メッセージに変換します。
 
 ```kotlin
-class UserViewModel(private val userService: UserService) : ViewModel() {
+class UserViewModel(
+    private val userService: UserService
+) : ViewModel() {
 
     fun sayHello(name: String): String {
         val user = userService.getUserOrNull(name)
@@ -132,11 +170,11 @@ class UserViewModel(private val userService: UserService) : ViewModel() {
 }
 ```
 
-> `UserService` は `UserViewModel` のコンストラクタで参照されます。
-
-Koinモジュールで `UserViewModel` を宣言します。インスタンスをメモリに保持し続けないように（Androidのライフサイクルによるメモリリークを避けるため）、`viewModel` 定義として宣言します。
+これを`viewModel`を使って宣言します。
 
 ```kotlin
+import org.koin.plugin.module.dsl.viewModel
+
 val appModule = module {
     single<UserRepositoryImpl>() bind UserRepository::class
     single<UserServiceImpl>() bind UserService::class
@@ -144,40 +182,54 @@ val appModule = module {
 }
 ```
 
-## AndroidでのViewModelの注入 {id="injecting-viewmodel-in-android"}
+これで、AndroidのViewModel機構がインスタンスを管理するようになります。画面回転などの設定変更（configuration changes）をまたいでインスタンスが保持され、オーナーが破棄されると同時にクリアされます。パラメータや`SavedStateHandle`の扱いについては、[ViewModel](/docs/reference/koin-core/viewmodel)を参照してください。
 
-`UserViewModel` コンポーネントが作成され、その際に `UserService` インスタンスが解決（注入）されます。これをActivityで取得するには、`by viewModel()` デリゲート関数を使用して注入します。
+## ActivityへのViewModelの注入 {id="let-s-inject-the-viewmodel-in-the-activity"}
+
+`MainActivity`で`by viewModel()`デリゲートを使用します。
 
 ```kotlin
+import org.koin.androidx.viewmodel.ext.android.viewModel
+
 class MainActivity : AppCompatActivity() {
 
     private val viewModel: UserViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        
-        //...
+        setContentView(R.layout.activity_simple)
+
+        val nameInput = findViewById<EditText>(R.id.nameInput)
+        val sayHelloButton = findViewById<Button>(R.id.sayHelloButton)
+        val textField = findViewById<TextView>(R.id.text)
+
+        sayHelloButton.setOnClickListener {
+            val userName = nameInput.text.toString().trim().ifEmpty { "Alice" }
+            textField.text = viewModel.sayHello(userName)
+        }
     }
 }
 ```
 
-これでアプリの準備は完了です。
+`by viewModel()`は内部でViewModelファクトリを生成し、インスタンスをActivityのライフサイクルにバインドします。Fragment向けの`activityViewModel()`など、その他のデリゲートについては[Android ViewModel](/docs/reference/koin-android/viewmodel)を参照してください。
 
-:::info
-`by viewModel()` 関数を使用すると、ViewModelのインスタンスを取得し、適切なViewModel Factoryを自動的に作成してライフサイクルにバインドします。
-:::
+## Koinの開始 {id="let-s-start-koin"}
 
-## Koinの開始 {id="start-koin"}
-
-AndroidアプリケーションでKoinを開始する必要があります。アプリケーションのメインエントリーポイントである `MainApplication` クラスで `startKoin()` 関数を呼び出します。
+`Application`クラスでKoinを開始し、そのクラスを`AndroidManifest.xml`に登録します。
 
 ```kotlin
-class MainApplication : Application(){
+import org.koin.android.ext.koin.androidContext
+import org.koin.android.ext.koin.androidLogger
+import org.koin.core.context.startKoin
+import org.koin.core.logger.Level
+
+class MainApplication : Application() {
+
     override fun onCreate() {
         super.onCreate()
-        
-        startKoin{
-            androidLogger()
+
+        startKoin {
+            androidLogger(Level.DEBUG)
             androidContext(this@MainApplication)
             modules(appModule)
         }
@@ -185,32 +237,12 @@ class MainApplication : Application(){
 }
 ```
 
-:::info
-`startKoin` 内の `modules()` 関数は、指定されたモジュールのリストをロードします。
-:::
+`androidContext()`によって定義内でAndroidの`Context`が利用可能になり、`androidLogger()`によってKoinのログがLogcatに出力されます。アプリを実行し、名前を入力してボタンをタップすると、挨拶が表示されます。その他のオプションについては[Starting Koin on Android](/docs/reference/koin-android/start)を参照してください。
 
-## Koinモジュール：DSLの比較 {id="koin-module-dsl-comparison"}
+## 次のステップ {id="next-steps"}
 
-**従来のDSL**（手動配線）を使用したKoinモジュールの宣言は以下の通りです。
-
-```kotlin
-val appModule = module {
-    single<UserRepository> { UserRepositoryImpl() }
-    single<UserService> { UserServiceImpl(get()) }
-    viewModel { UserViewModel(get()) }
-}
-```
-
-**Compiler Plugin DSL**（コンパイル時の自動配線）を使用した場合：
-
-```kotlin
-val appModule = module {
-    single<UserRepositoryImpl>() bind UserRepository::class
-    single<UserServiceImpl>() bind UserService::class
-    viewModel<UserViewModel>()
-}
-```
-
-:::tip
-Compiler Plugin DSLを使用するには、[Koin Compiler Plugin](/docs/setup/compiler-plugin) が必要です。これにより、コンパイル時の依存関係解決とよりクリーンな構文が提供されます。
-:::
+- [Core Concepts](/docs/intro/core-concepts): モジュール、定義、注入の基本概念。
+- [Android ViewModel](/docs/reference/koin-android/viewmodel): すべてのViewModelデリゲート、共有ViewModel、ナビゲーショングラフ。
+- [Android Jetpack Compose](/docs/quickstart/android-compose): Compose UIを使用した同じアプリの実装。
+- [Instrumented testing](/docs/reference/koin-android/instrumented-testing): Koinを使用したAndroidアプリのインストルメンテーションテスト。
+- [Tooling](/docs/tooling): Koin用のIDEプラグインおよびモニタリングツール。

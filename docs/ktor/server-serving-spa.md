@@ -1,4 +1,4 @@
-[//]: # (title: 提供单页应用程序服务)
+[//]: # (title: 托管单页应用程序)
 
 <show-structure for="chapter" depth="2"/>
 
@@ -13,25 +13,25 @@
 </tldr>
 
 <link-summary>
-Ktor 提供了提供单页应用程序服务的能力，包括 React、Angular、Vue 等。
+Ktor 提供了托管单页应用程序的能力，包括 React、Angular、Vue 等。
 </link-summary>
 
-Ktor 提供了提供单页应用程序服务的能力，包括 React、Angular 或 Vue。
+Ktor 提供了托管单页应用程序的能力，包括 React、Angular 或 Vue。
 
 ## 添加依赖项 {id="add_dependencies"}
 
-要提供单页应用程序服务，您只需要 [ktor-server-core](server-dependencies.topic#add-ktor-dependencies) 依赖项。
+要托管单页应用程序，你只需要 [ktor-server-core](server-dependencies.topic#add-ktor-dependencies) 依赖项。
 不需要任何特定的依赖项。
 
-## 提供应用程序服务 {id="configure"}
+## 托管应用程序 {id="configure"}
 
-要提供单页应用程序服务，您需要定义希望从何处提供内容：本地文件系统或 classpath。
-您至少需要指定一个包含单页应用程序的文件夹/资源包。
+要托管单页应用程序，你需要定义要从何处提供内容：本地文件系统还是类路径（classpath）。
+你至少需要指定包含单页应用程序的文件夹/资源包。
 
-### 提供特定框架的应用程序服务 {id="serve-framework"}
+### 托管特定框架的应用程序 {id="serve-framework"}
 
-您可以提供使用特定框架（例如 React、Angular、Vue 等）创建的单页应用程序构建版本。 
-假设我们的项目根目录中有一个包含 React 应用程序的 `react-app` 文件夹。
+你可以托管使用特定框架（如 React、Angular、Vue 等）构建的单页应用程序。
+假设项目根目录中有一个包含 React 应用程序的 `react-app` 文件夹。
 该应用程序具有以下结构，并将 `index.html` 文件作为主页面：
 
 ```text
@@ -42,7 +42,7 @@ react-app
     └── ...
 ```
 
-要提供此应用程序，请在 [routing](server-routing.md) 块内调用 [singlePageApplication](https://api.ktor.io/ktor-server-core/io.ktor.server.http.content/single-page-application.html)，并将文件夹名称传递给 `react` 函数：
+要托管此应用程序，请在 [routing](server-routing.md) 块内调用 [singlePageApplication](https://api.ktor.io/ktor-server-core/io.ktor.server.http.content/single-page-application.html)，并将文件夹名称传递给 `react` 函数：
 
 ```kotlin
 import io.ktor.server.application.*
@@ -58,14 +58,14 @@ fun Application.module() {
 }
 ```
 
-Ktor 会自动查找 `index.html`。 
-要了解如何自定义默认页面，请参阅[自定义服务设置](#serve-customize)。
+Ktor 会自动查找 `index.html`。
+要了解如何自定义默认页面，请参阅[自定义托管设置](#serve-customize)。
 
 > 对于其他框架，请使用相应的函数，例如 `angular`、`vue`、`ember` 等。
 
-### 自定义服务设置 {id="serve-customize"}
+### 自定义托管设置 {id="serve-customize"}
 
-为了演示如何从资源中提供单页应用程序服务，让我们假设我们的应用程序位于 `sample-web-app` 资源包中，其结构如下：
+为了演示如何从资源中托管单页应用程序，假设我们的应用程序放置在 `sample-web-app` 资源包中，其结构如下：
 
 ```text
 sample-web-app
@@ -77,7 +77,7 @@ sample-web-app
     └── script.js
 ```
 
-要提供此应用程序，可以使用以下配置：
+要托管此应用程序，可以使用以下配置：
 
 ```kotlin
 import io.ktor.server.application.*
@@ -96,9 +96,9 @@ fun Application.module() {
 }
 ```
 
-- `useResources`：启用从资源包提供应用程序服务的功能。
+- `useResources`：启用从资源包托管应用程序。
 - `filesPath`：指定应用程序所在的路径。
-- `defaultPage`：将 `main.html` 指定为要提供的默认资源。
-- `ignoreFiles`：忽略以 `.txt` 结尾的路径。
+- `defaultPage`：指定 `main.html` 作为默认提供的资源。
+- `ignoreFiles`：忽略末尾包含 `.txt` 的路径。
 
-您可以在此处找到完整的示例：[single-page-application](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/single-page-application)。
+你可以在此处找到完整示例：[single-page-application](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/single-page-application)。

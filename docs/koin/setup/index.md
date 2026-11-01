@@ -1,77 +1,63 @@
 ---
-title: 设置与版本
+title: 配置
 ---
 
-# 设置 Koin
+# 配置
 
-本指南涵盖了将 Koin 添加到项目所需的一切内容。
+本节说明了使用 Koin 时需要向 Gradle 构建中添加的内容。请在下方选择你的平台，然后按照 [Gradle 配置](/docs/setup/gradle)中对应的链接章节进行操作。如果你尚未选择声明样式，请先阅读[选择你的样式](/docs/intro/choosing-your-style)：该内容决定了你是否还需要编译器插件。
 
-## 快速设置 {id="quick-setup"}
+## 需要安装的内容 {id="what-to-install"}
 
-选择您的平台以开始使用：
+| 平台 | 构件 | 配置 |
+|----------|-----------|-------|
+| Kotlin/JVM | `koin-core` | [Kotlin/JVM](/docs/setup/gradle#kotlin) |
+| Android | `koin-android` | [Android](/docs/setup/gradle#android) |
+| 带有 Jetpack Compose 的 Android | `koin-android`, `koin-compose`, `koin-compose-viewmodel` | [Jetpack Compose](/docs/setup/gradle#compose-android) |
+| Compose Multiplatform | `koin-compose`, `koin-compose-viewmodel` | [Compose Multiplatform](/docs/setup/gradle#compose) |
+| Kotlin Multiplatform | `commonMain` 中的 `koin-core` | [Kotlin Multiplatform](/docs/setup/gradle#kotlin-multiplatform) |
+| Ktor | `koin-ktor`, `koin-logger-slf4j` | [Ktor](/docs/setup/gradle#ktor) |
+| 测试 | `koin-test`、`koin-test-junit4` 或 `koin-test-junit5` | [测试](/docs/setup/gradle#testing) |
 
-| 平台 | 软件包 | 指南 |
-|----------|---------|-------|
-| **Kotlin/JVM** | `koin-core` | [Gradle 设置](/docs/setup/gradle#kotlin) |
-| **Android** | `koin-android` | [Gradle 设置](/docs/setup/gradle#android) |
-| **Android + Jetpack Compose** | `koin-android` + `koin-compose` | [Gradle 设置](/docs/setup/gradle#compose-android) |
-| **Compose Multiplatform** | `koin-compose` | [Gradle 设置](/docs/setup/gradle#compose) |
-| **Kotlin Multiplatform** | `koin-core` | [Gradle 设置](/docs/setup/gradle#kotlin-multiplatform) |
-| **Ktor** | `koin-ktor` | [Gradle 设置](/docs/setup/gradle#ktor) |
+## 推荐配置 {id="recommended-setup"}
 
-## 推荐设置：BOM + 编译器插件 {id="recommended-setup-bom-compiler-plugin"}
+对于新项目：
 
-为了获得最佳体验，我们建议：
+1. **Koin BOM**：导入 `io.insert-koin:koin-bom` 并声明不带版本的 Koin 构件，以确保它们始终匹配。请参阅 [Gradle 配置](/docs/setup/gradle)。
+2. **Koin 编译器插件**：应用 Gradle 插件 `io.insert-koin.compiler.plugin` 以获取编译器插件 DSL 或注解，并获得编译时检查。它需要 Kotlin 2.3.20 或更高版本。请参阅[编译器插件配置](/docs/setup/compiler-plugin)。
 
-1. **使用 Koin BOM** —— 管理所有 Koin 库版本
-2. **使用 Koin 编译器插件** —— 提供编译时安全
+如果你仅使用 Constructor 或 Classic DSL，则执行步骤 1 就足够了。但仍推荐执行步骤 2：它会为这些定义添加编译时检查。
 
-有关详细说明，请参阅 **[编译器插件设置指南](/docs/setup/compiler-plugin)**。
+:::warning
+KSP 处理器 `koin-ksp-compiler` 已弃用。其配置仅在 [KSP 处理器配置](/docs/setup/annotations-ksp)中针对现有项目保留。新项目请使用编译器插件。
+:::
 
-## 设置指南 {id="setup-guides"}
+## 版本 {id="versions"}
 
-### [Gradle 设置](/docs/setup/gradle) {id="gradle-setup"}
+| 组件 | 当前版本 | Kotlin |
+|-----------|-----------------|----------|
+| Koin（所有库，包括 `koin-annotations`） | 4.2.2 | 使用 2.3.20 构建 |
+| Koin 编译器插件 | 1.2.1 | 已在 2.3.20、2.4.0、2.4.10、2.4.20 上验证（需要 Koin 4.2.0+） |
 
-适用于所有平台的完整依赖项配置：
-- Koin BOM（推荐）
-- 版本编目 (Version catalogs)
-- 平台特定软件包
-- 测试依赖项
+最新发布的版本：
 
-### [编译器插件设置](/docs/setup/compiler-plugin) {id="compiler-plugin-setup"}
+- Koin: [![Maven Central](https://img.shields.io/maven-central/v/io.insert-koin/koin-core?label=latest)](https://mvnrepository.com/artifact/io.insert-koin/koin-core)
+- Koin 编译器插件: [![Maven Central](https://img.shields.io/maven-central/v/io.insert-koin/koin-compiler-plugin?label=latest)](https://mvnrepository.com/artifact/io.insert-koin/koin-compiler-plugin)
 
-Koin 编译器插件详细指南：
-- Gradle 插件配置
-- 配置选项
-- Kotlin 版本要求
-- 故障排除
+较旧的 Koin 系列：
 
-### [KSP 处理器设置](/docs/setup/annotations-ksp)（已弃用） {id="ksp-processor-setup-deprecated"}
+| Koin | Kotlin | 编译器插件 |
+|------|--------|-----------------|
+| 4.2.x | 2.3.20+ | 是 |
+| 4.1.x | 2.1+ | 否，仅限 KSP 处理器 |
+| 4.0.x | 1.9+ | 否，仅限 KSP 处理器 |
+| 3.5.x | 1.8+ | 否 |
 
-`koin-ksp-compiler`（基于 KSP 的 Koin 注解处理器）的旧版设置：
-- ⚠️ `koin-ksp-compiler` 已弃用 — 请迁移到 Koin 编译器插件
-- Koin 注解本身**并未**弃用；`koin-annotations` 现在是 Koin 主项目的一部分
-- 包含迁移指南
+版本之间的变更及升级方法请参阅[发布版本](/docs/support/releases)。
 
-## 版本兼容性 {id="version-compatibility"}
+## 相关内容 {id="related"}
 
-| Koin 版本 | Kotlin 版本 | Koin 编译器插件 |
-|--------------|----------------|----------------------|
-| 4.2.x | 2.3+ | ✅ 推荐 |
-| 4.1.x | 2.1/2.2+ | ⚠️ 仅限 KSP 处理器 |
-| 4.0.x | 1.9/2.0+ | ⚠️ 仅限 KSP 处理器 |
-| 3.5.x | 1.8+ | ❌ 不可用 |
-
-## 当前版本 {id="current-version"}
-
-- **Koin**: [![Maven Central](https://img.shields.io/maven-central/v/io.insert-koin/koin-core?label=latest)](https://mvnrepository.com/artifact/io.insert-koin/koin-core)
-- **Koin 编译器插件**: [![Maven Central](https://img.shields.io/maven-central/v/io.insert-koin/koin-compiler-plugin?label=latest)](https://mvnrepository.com/artifact/io.insert-koin/koin-compiler-plugin)
-
-在 [Maven Central](https://central.sonatype.com/search?q=io.insert-koin+koin-core&sort=name) 上查找所有 Koin 软件包。
-
-## 后续步骤 {id="next-steps"}
-
-设置完成后：
-- **[核心概念](/docs/reference/koin-core/starting-koin)** —— 了解如何使用 Koin
-- **[教程](/docs/quickstart/kotlin)** —— 构建您的第一个应用
-- **[Android 集成](/docs/reference/koin-android/start)** —— Android 特定功能
+- [Gradle 配置](/docs/setup/gradle)：BOM 及所有 Koin 构件。
+- [编译器插件配置](/docs/setup/compiler-plugin)：安装与配置插件。
+- [选择你的样式](/docs/intro/choosing-your-style)：不同样式所需的内容。
+- [教程](/docs/quickstart/kotlin)：各平台上的第一个应用程序。
+- [发布版本](/docs/support/releases)：版本与升级说明。

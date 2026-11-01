@@ -1,56 +1,47 @@
 ---
-title: DI 桥接
+title: Ktor DI 桥接
 ---
 
 # Ktor DI 桥接
 
-Koin 4.2+ 通过可配置的桥接，提供了与 **Ktor 3.4+** 内置依赖项注入系统的无缝集成。
+Ktor 3.4 提供了自带的依赖注入插件（`dependencies { provide<T> { } }` 与 `by dependencies`）。本页介绍如何使用 Koin 插件的 `bridge { }` 选项将其连接到 Koin，支持单向或双向连接。你需要按照 [Koin for Ktor](/docs/reference/koin-ktor/ktor) 中所述安装 Koin 插件。
 
-:::info 实验性功能
-Ktor DI 桥接是一项实验性功能，可实现 Koin 与 Ktor DI 之间的双向依赖项解析。
-:::
+该桥接自 Koin 4.2 起可用。其函数均标记为 `@KoinExperimentalAPI`。
 
-## 桥接配置 {id="bridge-configuration"}
-
-使用 `bridge { }` DSL 来启用双向依赖项解析：
+## 配置桥接 {id="configuring-the-bridge"}
 
 ```kotlin
 fun Application.module() {
     install(Koin) {
         slf4jLogger()
-
         bridge {
-            ktorToKoin()  // Ktor DI 可以解析 Koin 依赖项
-            koinToKtor()  // Koin 可以解析 Ktor DI 依赖项
+            ktorToKoin()
+            koinToKtor()
         }
-
         modules(appModule)
     }
 
-    // Ktor DI 依赖项
     dependencies {
         provide<KtorSpecificService> { KtorSpecificServiceImpl() }
     }
 }
 ```
 
-## 桥接选项 {id="bridge-options"}
+| 选项 | 效果 |
+|--------|--------|
+| `ktorToKoin()` | Ktor 的 `by dependencies` 可以解析 Koin 定义 |
+| `koinToKtor()` | Koin 的 `get()`、`inject()` 以及构造函数注入可以解析 Ktor DI 依赖项 |
 
-| 选项 | 描述 |
-|--------|-------------|
-| `ktorToKoin()` | 允许 Ktor 的 `by dependencies` 委托从 Koin 中解析 |
-| `koinToKtor()` | 允许 Koin 的 `inject()` 和 `get()` 从 Ktor DI 中解析 |
+仅启用你使用的方向。
 
-## 使用 ktorToKoin() {id="using-ktortokoin"}
+## Ktor 从 Koin 中解析依赖 {id="ktor-resolving-from-koin"}
 
-使用 Ktor 的 `by dependencies` 委托解析 Koin 依赖项：
+在使用 `ktorToKoin()` 时，该插件会安装 Ktor 的 `DI` 插件，并由 Koin 提供底层依赖映射：
 
 ```kotlin
 fun Application.module() {
     install(Koin) {
-        bridge {
-            ktorToKoin()
-        }
+        bridge { ktorToKoin() }
         modules(module {
             single<HelloService> { HelloServiceImpl() }
         })
@@ -58,150 +49,77 @@ fun Application.module() {
 
     routing {
         get("/hello") {
-            // 使用 Ktor 的委托解析 Koin 依赖项
-            val helloService: HelloService by dependencies
+            val helloService: HelloService by dependencies // 在 Koin 中声明
             call.respondText(helloService.sayHello())
         }
     }
 }
 ```
 
-## 使用 koinToKtor() {id="using-kointoktor"}
+带名称的 Ktor 依赖键会映射到具有相同值的 Koin `named()` 限定符。
 
-使用 Koin 的 `inject()` 解析 Ktor DI 依赖项：
+## Koin 从 Ktor DI 中解析依赖 {id="koin-resolving-from-ktor-di"}
+
+在使用 `koinToKtor()` 时，Koin 会添加一个解析扩展：当某个类型没有对应的 Koin 定义时，Koin 会向 Ktor DI 请求该类型。
 
 ```kotlin
 fun Application.module() {
     install(Koin) {
-        bridge {
-            koinToKtor()
-        }
+        bridge { koinToKtor() }
         modules(appModule)
     }
 
-    // 在 Ktor DI 中声明
     dependencies {
         provide<DatabaseConnection> { DatabaseConnectionImpl() }
     }
 
     routing {
         get("/data") {
-            // 使用 Koin 解析 Ktor DI 依赖项
-            val database: DatabaseConnection by inject()
+            val database: DatabaseConnection by inject() // 在 Ktor DI 中声明
             call.respondText(database.query())
         }
     }
 }
 ```
 
-## 完整双向示例 {id="full-bidirectional-example"}
+Koin 定义也可以将 Ktor DI 类型作为构造函数形参。Koin 限定符会作为依赖项名称传递给 Ktor。如果 Ktor DI 中也没有此类依赖项，Koin 会记录一条警告，并且解析会失败，如同任何缺失的定义一样。
 
-启用两个方向以获得最大的灵活性：
+## 拆分基础架构与应用程序代码 {id="splitting-infrastructure-and-application-code"}
 
-```kotlin
-fun Application.module() {
-    install(Koin) {
-        slf4jLogger()
-
-        bridge {
-            ktorToKoin()
-            koinToKtor()
-        }
-
-        modules(module {
-            single<HelloService> { HelloServiceImpl() }
-        })
-    }
-
-    dependencies {
-        provide<KtorSpecificService> { KtorSpecificServiceImpl() }
-    }
-
-    routing {
-        // 对两者都使用 Koin 的 inject()
-        get("/mixed-koin") {
-            val helloService: HelloService by inject()        // 来自 Koin
-            val ktorService: KtorSpecificService by inject()  // 来自 Ktor DI
-            call.respondText("${helloService.sayHello()} - ${ktorService.process()}")
-        }
-
-        // 对两者都使用 Ktor 的 dependencies 委托
-        get("/mixed-ktor") {
-            val helloService: HelloService by dependencies        // 来自 Koin
-            val ktorService: KtorSpecificService by dependencies  // 来自 Ktor DI
-            call.respondText("${helloService.sayHello()} - ${ktorService.process()}")
-        }
-    }
-}
-```
-
-## 架构模式 {id="architecture-pattern"}
-
-将基础架构与应用程序逻辑分离：
-
-- **Ktor DI** - 框架级依赖项（数据库、配置、基础架构）
-- **Koin** - 应用程序级依赖项（仓库、服务、用例）
+一种常见的划分方式是将框架级对象保留在 Ktor DI 中，将应用程序类保留在 Koin 中，且仅使用 `koinToKtor()`：
 
 ```kotlin
 fun Application.module() {
-    // Ktor DI - 基础架构层
-    val config = environment.config
-    val database = Database(config)
+    // Ktor DI: 基础架构
+    val database = Database(environment.config)
     dependencies {
         provide<Database> { database }
-        provide<ApplicationConfig> { config }
+        provide<ApplicationConfig> { environment.config }
     }
 
-    // Koin - 应用程序层
+    // Koin: 应用程序类
     install(Koin) {
         slf4jLogger()
-
-        bridge {
-            koinToKtor()  // Koin 可以解析基础架构依赖项
-        }
-
+        bridge { koinToKtor() }
         modules(appModule)
     }
 }
 
 val appModule = module {
-    // 这些可以通过桥接从 Ktor DI 注入 Database
-    singleOf(::CustomerRepository)
-    singleOf(::OrderRepository)
+    singleOf(::CustomerRepository) // 从 Ktor DI 接收 Database
     singleOf(::CustomerService)
 }
 ```
 
-## 最佳做法 {id="best-practices"}
+## 限制 {id="limits"}
 
-1. **在 Ktor DI 中存放基础架构** - 数据库连接、配置、外部客户端。
-2. **在 Koin 中存放业务逻辑** - 仓库、服务、用例。
-3. **仅启用需要的方向** - 除非必要，否则仅使用 `koinToKtor()`，不要同时启用两者。
-4. **记录边界** - 明确哪个系统拥有哪些依赖项。
+- **编译时检查**：Koin 编译器插件无法感知 Ktor DI 声明。如果编译时安全性检查提示缺少某个 Ktor DI 类型，请将其标记为 `@Provided`，如[编译时安全](/docs/reference/koin-compiler/compile-safety)中所述。
+- **KoinIsolated**：在 Koin 4.2 中，`KoinIsolated` 插件接受 `bridge { }` 代码块，但不会应用它。当需要桥接功能时，请使用 `install(Koin)`。
+- **实验性**：桥接 API 可能会在未来的版本中发生更改。
 
-## 使用隔离上下文 {id="with-isolated-context"}
+## 相关内容 {id="related"}
 
-该桥接也适用于 `KoinIsolated`：
-
-```kotlin
-fun Application.module() {
-    dependencies {
-        provide<Database> { Database(environment.config) }
-    }
-
-    install(KoinIsolated) {
-        slf4jLogger()
-
-        bridge {
-            koinToKtor()
-        }
-
-        modules(appModule)
-    }
-}
-```
-
-## 另请参阅 {id="see-also"}
-
-- **[Koin for Ktor](/docs/reference/koin-ktor/ktor)** - 主要 Ktor 文档
-- **[隔离上下文](/docs/reference/koin-ktor/ktor-isolated)** - 隔离的 Koin 实例
+- [Koin for Ktor](/docs/reference/koin-ktor/ktor)：安装插件并在路由中进行注入。
+- [Ktor 中的隔离上下文](/docs/reference/koin-ktor/ktor-isolated)：在全局上下文之外使用 Koin。
+- [请求作用域](/docs/reference/koin-ktor/ktor-scopes)：每次调用的实例。
+- [Ktor 依赖注入](https://ktor.io/docs/server-dependency-injection.html)：Ktor 自带的 DI 插件。

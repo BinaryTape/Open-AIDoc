@@ -2,82 +2,44 @@
 title: 测试 Composable
 ---
 
-# 使用 Koin 测试 Composable
+# 测试 Composable
 
-本指南涵盖了使用 Koin 测试 Compose 应用程序的策略，从 Android Studio 预览到全面的单元测试。
+本页面涵盖了使用 Koin 进行测试时与 Compose 相关的特定内容：使用 `KoinApplicationPreview` 的预览、使用 `ComposeTestRule` 的 UI 测试，以及多平台 UI 测试。本文假定你已了解如何通过 `koinInject()` 和 `koinViewModel()` 在 Composable 中进行注入（请参阅 [Koin for Compose](/docs/reference/koin-compose/compose)）。有关测试设置、重写以及 `declareMock` 的说明，请参阅[单元测试](/docs/reference/koin-test/testing)。
 
-## KoinApplicationPreview {id="koinapplicationpreview"}
+## 使用 KoinApplicationPreview 进行预览 {id="previews-with-koinapplicationpreview"}
 
-在带有 Koin 依赖项的 Android Studio 预览中使用 `KoinApplicationPreview`：
+预览不会运行你的 `Application` 类，因此不存在 Koin 容器。`KoinApplicationPreview` 会为预览创建一个容器：
 
 ```kotlin
+import org.koin.compose.KoinApplicationPreview
+
+val previewModule = module {
+    single<UserRepository> { FakeUserRepository(sampleUsers) }
+    viewModel { UserViewModel(get()) }
+}
+
 @Preview
 @Composable
 fun UserScreenPreview() {
-    KoinApplicationPreview(application = {
-        modules(module {
-            viewModel { UserViewModel(FakeUserRepository()) }
-        })
-    }) {
+    KoinApplicationPreview(application = { modules(previewModule) }) {
         UserScreen()
     }
 }
 ```
 
-### 多个预览 {id="multiple-previews"}
+`KoinApplicationPreview` 会使用 `koinApplication` 创建一个局部容器，而不是由 `startKoin` 启动的全局容器。每个预览都有自己的实例，因此 Android Studio 可以并行渲染多个预览。
+
+类似于 `single<UserRepository> { FakeUserRepository(sampleUsers) }` 的 lambda 表达式定义适用于各种风格。`application` 的 lambda 表达式接受你在 `startKoin { }` 中编写的任何内容，因此你也可以加载生产模块并仅重写预览所需的部分。
+
+如需预览多种状态，请为每个预览提供包含不同 Fake 实现的模块：
 
 ```kotlin
-@Preview(name = "Light Mode")
-@Preview(name = "Dark Mode", uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Preview(name = "Large Font", fontScale = 1.5f)
-@Composable
-fun UserCardPreviews() {
-    KoinApplicationPreview(application = {
-        modules(previewModule)
-    }) {
-        UserCard(user = sampleUser)
-    }
-}
-
-val previewModule = module {
-    single<UserRepository> { FakeUserRepository() }
-    viewModel { UserViewModel(get()) }
-}
-```
-
-### 不同状态的预览 {id="preview-with-different-states"}
-
-```kotlin
-@Preview(name = "Loading")
-@Composable
-fun LoadingPreview() {
-    KoinApplicationPreview(application = {
-        modules(module {
-            viewModel { UserViewModel(LoadingRepository()) }
-        })
-    }) {
-        UserScreen()
-    }
-}
-
 @Preview(name = "Error")
 @Composable
-fun ErrorPreview() {
+fun UserScreenErrorPreview() {
     KoinApplicationPreview(application = {
-        modules(module {
-            viewModel { UserViewModel(ErrorRepository()) }
-        })
-    }) {
-        UserScreen()
-    }
-}
-
-@Preview(name = "Success")
-@Composable
-fun SuccessPreview() {
-    KoinApplicationPreview(application = {
-        modules(module {
-            viewModel { UserViewModel(SuccessRepository(sampleUsers)) }
+        modules(previewModule, module {
+            single<UserRepository> { FailingUserRepository() }
         })
     }) {
         UserScreen()
@@ -85,22 +47,24 @@ fun SuccessPreview() {
 }
 ```
 
-## 使用 ComposeTestRule 进行单元测试 {id="unit-testing-with-composetestrule"}
+同一个函数上的多个 `@Preview` 注解（浅色和深色模式、字体缩放）将共享同一个模块。
 
-### 基本设置 {id="basic-setup"}
+## 使用 ComposeTestRule 进行 UI 测试 {id="ui-tests-with-composetestrule"}
+
+当组合（composition）未提供 Koin 实例时，`koinInject()` 和 `koinViewModel()` 会从全局上下文中进行解析。使用 `KoinTestRule` 启动 Koin 并设置内容：
 
 ```kotlin
 class UserScreenTest : KoinTest {
 
-    @get:Rule
+    @get:Rule(order = 0)
     val koinTestRule = KoinTestRule.create {
         modules(module {
-            single<UserRepository> { FakeUserRepository() }
+            single<UserRepository> { FakeUserRepository(sampleUsers) }
             viewModel { UserViewModel(get()) }
         })
     }
 
-    @get:Rule
+    @get:Rule(order = 1)
     val composeTestRule = createComposeRule()
 
     @Test
@@ -110,183 +74,26 @@ class UserScreenTest : KoinTest {
         }
 
         composeTestRule.onNodeWithText("Alice").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Bob").assertIsDisplayed()
     }
 }
 ```
 
-### 测试用户交互 {id="testing-user-interactions"}
+如果你测试的 Composable 包含 `KoinApplication(configuration = ...)`，它将附加到由规则启动的容器，并忽略自身的配置。系统将使用你的测试模块。
+
+`KoinContext { }` 已弃用且不再需要：请勿使用它包裹测试内容。
+
+在 Android 上，这些测试将作为插桩测试（或使用 Robolectric）运行。如果依赖图需要 `Context`，请在规则中添加 `androidContext(...)`，如 [Android 插桩测试](/docs/reference/koin-android/instrumented-testing#restart-koin-with-a-test-rule)中所示。
+
+### Fake 与 Mock {id="fakes-and-mocks"}
+
+使用 Fake 驱动屏幕进入各种状态：
 
 ```kotlin
-@Test
-fun clickingUserShowsDetails() {
-    composeTestRule.setContent {
-        UserScreen()
-    }
-
-    // 点击用户
-    composeTestRule.onNodeWithText("Alice").performClick()
-
-    // 验证导航或状态更改
-    composeTestRule.onNodeWithText("alice@example.com").assertIsDisplayed()
-}
-
-@Test
-fun searchFiltersUsers() {
-    composeTestRule.setContent {
-        UserScreen()
-    }
-
-    // 输入搜索查询
-    composeTestRule.onNodeWithTag("searchField").performTextInput("Ali")
-
-    // 验证筛选后的结果
-    composeTestRule.onNodeWithText("Alice").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Bob").assertDoesNotExist()
-}
-```
-
-### 使用 ViewModel 状态进行测试 {id="testing-with-viewmodel-states"}
-
-```kotlin
-@Test
-fun showsLoadingIndicator() {
-    val loadingRepository = object : UserRepository {
-        override suspend fun getUsers(): List<User> {
-            delay(Long.MAX_VALUE) // 永不完成
-            return emptyList()
-        }
-    }
-
-    startKoin {
-        modules(module {
-            single<UserRepository> { loadingRepository }
-            viewModel { UserViewModel(get()) }
-        })
-    }
-
-    composeTestRule.setContent {
-        UserScreen()
-    }
-
-    composeTestRule.onNodeWithTag("loadingIndicator").assertIsDisplayed()
-
-    stopKoin()
-}
-
-@Test
-fun showsErrorMessage() {
-    val errorRepository = object : UserRepository {
-        override suspend fun getUsers(): List<User> {
-            throw IOException("Network error")
-        }
-    }
-
-    startKoin {
-        modules(module {
-            single<UserRepository> { errorRepository }
-            viewModel { UserViewModel(get()) }
-        })
-    }
-
-    composeTestRule.setContent {
-        UserScreen()
-    }
-
-    composeTestRule.waitUntil(5000) {
-        composeTestRule
-            .onAllNodesWithText("Network error")
-            .fetchSemanticsNodes()
-            .isNotEmpty()
-    }
-
-    stopKoin()
-}
-```
-
-## 模拟 (Mocking) 依赖项 {id="mocking-dependencies"}
-
-### 使用 MockK {id="using-mockk"}
-
-```kotlin
-class UserScreenMockTest : KoinTest {
-
-    private val mockRepository = mockk<UserRepository>()
-
-    @get:Rule
-    val koinTestRule = KoinTestRule.create {
-        modules(module {
-            single { mockRepository }
-            viewModel { UserViewModel(get()) }
-        })
-    }
-
-    @get:Rule
-    val composeTestRule = createComposeRule()
-
-    @Test
-    fun loadsUsersOnStart() = runTest {
-        coEvery { mockRepository.getUsers() } returns listOf(
-            User("Test User", "test@example.com")
-        )
-
-        composeTestRule.setContent {
-            UserScreen()
-        }
-
-        composeTestRule.waitUntil(5000) {
-            composeTestRule
-                .onAllNodesWithText("Test User")
-                .fetchSemanticsNodes()
-                .isNotEmpty()
-        }
-
-        coVerify { mockRepository.getUsers() }
-    }
-
-    @Test
-    fun refreshCallsRepository() = runTest {
-        coEvery { mockRepository.getUsers() } returns emptyList()
-
-        composeTestRule.setContent {
-            UserScreen()
-        }
-
-        // 触发刷新
-        composeTestRule.onNodeWithTag("refreshButton").performClick()
-
-        coVerify(exactly = 2) { mockRepository.getUsers() }
-    }
-}
-```
-
-### 使用 Fake 实现 {id="using-fake-implementations"}
-
-```kotlin
-class FakeUserRepository : UserRepository {
-    private val users = mutableListOf<User>()
-    var shouldFail = false
-
-    override suspend fun getUsers(): List<User> {
-        if (shouldFail) throw IOException("Fake error")
-        return users.toList()
-    }
-
-    override suspend fun addUser(user: User) {
-        users.add(user)
-    }
-
-    fun setUsers(vararg newUsers: User) {
-        users.clear()
-        users.addAll(newUsers)
-    }
-}
-
-class UserScreenFakeTest : KoinTest {
+class UserScreenStatesTest : KoinTest {
 
     private val fakeRepository = FakeUserRepository()
 
-    @get:Rule
+    @get:Rule(order = 0)
     val koinTestRule = KoinTestRule.create {
         modules(module {
             single<UserRepository> { fakeRepository }
@@ -294,191 +101,96 @@ class UserScreenFakeTest : KoinTest {
         })
     }
 
-    @get:Rule
+    @get:Rule(order = 1)
     val composeTestRule = createComposeRule()
 
-    @Before
-    fun setup() {
-        fakeRepository.setUsers(
-            User("Alice", "alice@example.com"),
-            User("Bob", "bob@example.com")
-        )
-    }
-
     @Test
-    fun displaysUsers() {
-        composeTestRule.setContent {
-            UserScreen()
-        }
-
-        composeTestRule.onNodeWithText("Alice").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Bob").assertIsDisplayed()
-    }
-
-    @Test
-    fun handlesError() {
+    fun showsErrorMessage() {
         fakeRepository.shouldFail = true
 
-        composeTestRule.setContent {
-            UserScreen()
-        }
+        composeTestRule.setContent { UserScreen() }
 
-        composeTestRule.waitUntil(5000) {
-            composeTestRule
-                .onAllNodesWithText("Error")
-                .fetchSemanticsNodes()
-                .isNotEmpty()
+        composeTestRule.waitUntil(timeoutMillis = 5_000) {
+            composeTestRule.onAllNodesWithText("Network error")
+                .fetchSemanticsNodes().isNotEmpty()
         }
     }
 }
 ```
 
-## 测试导航 {id="testing-navigation"}
+在 `setContent` 之前修改 Fake：ViewModel 会在首次组合时创建并从此处加载数据。
+
+如需改用 Mock 库，请在 `setContent` 之前调用 `declareMock<UserRepository> { ... }`（请参阅[使用 declareMock 进行 Mock](/docs/reference/koin-test/testing#mocking-with-declaremock)）。
+
+### 使用隔离上下文的屏幕 {id="screens-using-an-isolated-context"}
+
+如果屏幕从 `KoinIsolatedContext` 获取其 Koin 实例（请参阅[隔离上下文](/docs/reference/koin-compose/isolated-context)），则测试无需使用全局上下文。构建一个测试容器并以相同的方式提供它：
 
 ```kotlin
-class NavigationTest : KoinTest {
-
-    @get:Rule
-    val koinTestRule = KoinTestRule.create {
-        modules(testModule)
+@Test
+fun sdkScreenUsesTestContainer() {
+    val testKoin = koinApplication {
+        modules(module { single<SdkApi> { FakeSdkApi() } })
     }
 
-    @get:Rule
-    val composeTestRule = createComposeRule()
-
-    @Test
-    fun navigatesToDetail() {
-        lateinit var navController: NavHostController
-
-        composeTestRule.setContent {
-            navController = rememberNavController()
-            AppNavigation(navController)
+    composeTestRule.setContent {
+        KoinIsolatedContext(context = testKoin) {
+            SdkScreen()
         }
-
-        // 导航到详情
-        composeTestRule.onNodeWithText("View Details").performClick()
-
-        // 验证导航
-        assertEquals("detail/123", navController.currentDestination?.route)
     }
 
-    @Test
-    fun backNavigationWorks() {
-        lateinit var navController: NavHostController
-
-        composeTestRule.setContent {
-            navController = rememberNavController()
-            AppNavigation(navController)
-        }
-
-        // 向前导航
-        composeTestRule.onNodeWithText("View Details").performClick()
-
-        // 返回导航
-        composeTestRule.onNodeWithContentDescription("Back").performClick()
-
-        // 验证回到主页
-        assertEquals("home", navController.currentDestination?.route)
-    }
+    composeTestRule.onNodeWithText("Connected").assertIsDisplayed()
+    testKoin.close()
 }
 ```
 
-## 使用协程进行测试 {id="testing-with-coroutines"}
+由于不涉及全局状态，这些测试可以并行运行。
 
-```kotlin
-class CoroutineTest : KoinTest {
+## 多平台 UI 测试 {id="multiplatform-ui-tests"}
 
-    @get:Rule
-    val koinTestRule = KoinTestRule.create {
-        modules(module {
-            single<UserRepository> { FakeUserRepository() }
-            viewModel { UserViewModel(get()) }
-        })
-    }
-
-    @get:Rule
-    val composeTestRule = createComposeRule()
-
-    @Test
-    fun asyncOperationCompletes() = runTest {
-        composeTestRule.setContent {
-            UserScreen()
-        }
-
-        // 等待异步操作
-        composeTestRule.waitUntil(timeoutMillis = 5000) {
-            composeTestRule
-                .onAllNodesWithTag("userList")
-                .fetchSemanticsNodes()
-                .isNotEmpty()
-        }
-
-        // 验证结果
-        composeTestRule.onNodeWithText("Alice").assertIsDisplayed()
-    }
-}
-```
-
-## 多平台测试 {id="multiplatform-testing"}
-
-对于 Compose Multiplatform，创建 expect/actual 测试帮助程序：
+在 `commonTest` 中，JUnit 规则不可用。请使用 Compose Multiplatform 测试库中的 `runComposeUiTest`，并通过 `kotlin.test` 注解来启动和停止 Koin：
 
 ```kotlin
 // commonTest
-expect fun createTestComposeRule(): ComposeTestRule
+@OptIn(ExperimentalTestApi::class)
+class UserScreenCommonTest : KoinTest {
 
-// androidTest
-actual fun createTestComposeRule(): ComposeTestRule = createComposeRule()
+    @BeforeTest
+    fun before() {
+        startKoin {
+            modules(module {
+                single<UserRepository> { FakeUserRepository(sampleUsers) }
+                viewModel { UserViewModel(get()) }
+            })
+        }
+    }
 
-// 通用测试
-class CommonUserScreenTest : KoinTest {
-
-    @get:Rule
-    val composeTestRule = createTestComposeRule()
+    @AfterTest
+    fun after() {
+        stopKoin()
+    }
 
     @Test
-    fun displaysContent() {
-        startKoin {
-            modules(testModule)
-        }
+    fun displaysUserList() = runComposeUiTest {
+        setContent { UserScreen() }
 
-        composeTestRule.setContent {
-            UserScreen()
-        }
-
-        // 断言...
-
-        stopKoin()
+        onNodeWithText("Alice").assertIsDisplayed()
     }
 }
 ```
 
-## 最佳做法 {id="best-practices"}
+`KoinTest`、`startKoin` 和 `declareMock` 是多平台的。`KoinTestRule` 和 `MockProviderRule` 仅限 JVM。请按照 [Compose Multiplatform 测试指南](https://kotlinlang.org/docs/multiplatform/compose-test.html)中的说明设置测试依赖项，并将 `io.insert-koin:koin-test` 添加到 `commonTest` 中。
 
-1. **使用 KoinTestRule** - 自动处理设置/拆卸
-   ```kotlin
-   @get:Rule
-   val koinTestRule = KoinTestRule.create { modules(testModule) }
-   ```
+## 常见陷阱 {id="pitfalls"}
 
-2. **优先使用 Fake 而非 Mock** - 更可预测，更易于理解
+- 规则顺序：Koin 必须在设置内容之前启动。使用 `createAndroidComposeRule<MainActivity>()` 时，Activity 是由该规则启动的，因此请为 `KoinTestRule` 指定较小的 `order` 值。
+- ViewModel 已创建：在较早的组合中创建的 ViewModel 会保留其依赖项。请在 `setContent` 之前修改 Fake 或 Mock。
+- 预览容器是局部的：读取全局上下文的代码（`KoinPlatform.getKoin()`，或 Compose 外部的 `KoinComponent`）无法识别 `KoinApplicationPreview` 容器。
 
-3. **一次只测试一个行为** - 专注的测试更容易维护
+## 相关内容 {id="related"}
 
-4. **使用语义化测试标签** - 使测试对 UI 更改具有弹性
-   ```kotlin
-   Modifier.testTag("submitButton")
-   ```
-
-5. **等待异步操作** - 对异步状态使用 `waitUntil`
-   ```kotlin
-   composeTestRule.waitUntil(5000) { condition }
-   ```
-
-6. **清理 Koin** - 如果不使用规则 (rule)，请在 `@After` 中调用 `stopKoin()`
-
-## 下一步 {id="next-steps"}
-
-- **[Compose 概览](/docs/reference/koin-compose/compose)** - 设置与基础注入
-- **[测试参考](/docs/reference/koin-test/testing)** - 常规 Koin 测试
-- **[模块验证](/docs/reference/koin-test/verify)** - 验证模块配置
+- [单元测试](/docs/reference/koin-test/testing)：`KoinTestRule`、重写以及 `declareMock`。
+- [Android 插桩测试](/docs/reference/koin-android/instrumented-testing)：测试 Application、与 Activity 相关的规则顺序。
+- [Koin for Compose](/docs/reference/koin-compose/compose)：`koinInject()` 与 `KoinApplication`。
+- [Compose 中的 ViewModel](/docs/reference/koin-compose/compose-viewmodel)：`koinViewModel()` 如何创建和保留 ViewModel。
+- [隔离上下文](/docs/reference/koin-compose/isolated-context)：面向 SDK 和库的 `KoinIsolatedContext`。

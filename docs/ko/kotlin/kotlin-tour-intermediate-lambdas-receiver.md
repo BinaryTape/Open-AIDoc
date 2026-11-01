@@ -2,28 +2,28 @@
 
 <no-index/>
 
-이 챕터에서는 또 다른 유형의 함수인 람다 식에서 수신 객체(receiver)를 사용하는 방법과, 이를 통해 도메인 특화 언어(DSL, domain-specific language)를 만드는 방법을 배웁니다.
+이 챕터에서는 또 다른 유형의 함수인 람다 식에서 수신 객체(receiver)를 사용하는 방법과, 이를 통해 도메인 특화 언어(DSL, domain-specific language)를 구축하는 방법을 배웁니다.
 
 ## 수신 객체가 있는 람다 식 {id="lambda-expressions-with-receiver"}
 
-기초 둘러보기(beginner tour)에서 [람다 식](kotlin-tour-functions.md#lambda-expressions)을 사용하는 방법을 배웠습니다. 람다 식 또한 수신 객체를 가질 수 있습니다.
-이 경우, 람다 식 내에서 매번 수신 객체를 명시적으로 지정하지 않고도 수신 객체의 모든 멤버 함수나 프로퍼티에 접근할 수 있습니다. 이러한 불필요한 참조가 사라지므로 코드를 읽고 유지보수하기가 더 쉬워집니다.
+입문 투어에서는 [람다 식](kotlin-tour-functions.md#lambda-expressions)을 사용하는 방법을 배웠습니다. 람다 식에도 수신 객체가 있을 수 있습니다. 
+이 경우 람다 식은 매번 수신 객체를 명시적으로 지정하지 않고도 수신 객체의 모든 멤버 함수나 프로퍼티에 접근할 수 있습니다. 이러한 부가적인 참조가 없으므로 코드를 읽고 유지보수하기가 더 쉬워집니다.
 
 > 수신 객체가 있는 람다 식은 수신 객체 지정 함수 리터럴(function literals with receiver)로도 알려져 있습니다.
 >
 {style="tip"}
 
-수신 객체가 있는 람다 식의 문법은 함수 타입을 정의할 때 차이가 있습니다. 먼저 확장하고자 하는 수신 객체를 작성합니다. 그 다음 `.`을 찍고 나머지 함수 타입 정의를 작성합니다. 예를 들면 다음과 같습니다.
+수신 객체가 있는 람다 식은 함수 타입을 정의할 때의 문법이 다릅니다. 먼저 확장하려는 수신 객체를 작성합니다. 그런 다음 `.`을 찍고 나머지 함수 타입 정의를 완성합니다. 예를 들면 다음과 같습니다.
 
 ```kotlin
 MutableList<Int>.() -> Unit
 ```
 
-이 함수 타입의 구성은 다음과 같습니다.
+이 함수 타입은 다음과 같이 구성됩니다.
 
-* `MutableList<Int>`가 수신 객체입니다.
-* 괄호 `()` 안에 함수 매개변수가 없습니다.
-* 반환값이 없습니다: `Unit`.
+* 수신 객체: `MutableList<Int>`
+* 괄호 `()` 안의 함수 파라미터: 없음
+* 반환값 없음: `Unit`
 
 캔버스에 도형을 그리는 다음 예제를 살펴보겠습니다.
 
@@ -50,25 +50,26 @@ fun main() {
     }
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-intermediate-tour-lambda-expression-with-receiver"}
+{kotlin-runnable="true" id="kotlin-intermediate-tour-lambda-expression-with-receiver"}
 
 이 예제에서:
 
 * `Canvas` 클래스에는 원이나 사각형 그리기를 시뮬레이션하는 두 개의 함수가 있습니다.
-* `render()` 함수는 `block` 매개변수를 받아 `Canvas` 클래스의 인스턴스를 반환합니다.
-* `block` 매개변수는 수신 객체가 있는 람다 식이며, 여기서 `Canvas` 클래스가 수신 객체입니다.
+* `render()` 함수는 `block` 파라미터를 받아 `Canvas` 클래스의 인스턴스를 반환합니다.
+* `block` 파라미터는 `Canvas` 클래스를 수신 객체로 갖는 수신 객체 지정 람다 식입니다.
 * `render()` 함수는 `Canvas` 클래스의 인스턴스를 생성하고, `canvas` 인스턴스를 수신 객체로 사용하여 `block()` 람다 식을 호출합니다.
-* `main()` 함수는 `render()` 함수를 람다 식과 함께 호출하며, 이 람다 식이 `block` 매개변수로 전달됩니다.
-* `render()` 함수에 전달된 람다 내부에서 프로그램은 `Canvas` 클래스 인스턴스의 `drawCircle()` 및 `drawSquare()` 함수를 호출합니다.
+* `main()` 함수는 `block` 파라미터로 전달되는 람다 식과 함께 `render()` 함수를 호출합니다.
+* `render()` 함수로 전달된 람다 내부에서 프로그램은 `Canvas` 클래스의 인스턴스에 있는 `drawCircle()` 및 `drawSquare()` 함수를 호출합니다.
 
-  `drawCircle()`과 `drawSquare()` 함수는 수신 객체가 있는 람다 식 내에서 호출되므로, 마치 `Canvas` 클래스 내부인 것처럼 직접 호출할 수 있습니다.
+  `drawCircle()`과 `drawSquare()` 함수는 수신 객체가 있는 람다 식 내에서 호출되므로, 마치 `Canvas` 클래스 내부에 있는 것처럼 직접 호출할 수 있습니다.
 
-수신 객체가 있는 람다 식은 도메인 특화 언어(DSL)를 만들 때 유용합니다. 수신 객체를 명시적으로 참조하지 않고도 수신 객체의 멤버 함수와 프로퍼티에 접근할 수 있으므로 코드가 훨씬 간결해집니다.
+수신 객체가 있는 람다 식은 도메인 특화 언어(DSL)를 만들 때 유용합니다. 수신 객체를 명시적으로 참조하지 않고도 수신 객체의 멤버 함수와 프로퍼티에 접근할 수 있어 코드가 훨씬 간결해집니다.
 
-이를 확인하기 위해 메뉴의 항목을 구성하는 예제를 살펴보겠습니다. 먼저 `MenuItem` 클래스와, 메뉴에 항목을 추가하는 `item()` 함수 및 모든 메뉴 항목의 목록인 `items`를 포함하는 `Menu` 클래스로 시작하겠습니다.
+이를 확인하기 위해 메뉴 항목을 구성하는 예제를 살펴보겠습니다. 먼저 `MenuItem` 클래스와 메뉴에 항목을 추가하는 `item()` 함수, 그리고 모든 메뉴 항목의 목록인 `items`를 포함하는 `Menu` 클래스로 시작하겠습니다.
 
 ```kotlin
-class MenuItem(val name: String)
+class MenuItem(val name: String) {
+}
 
 class Menu(val name: String) {
     val items = mutableListOf<MenuItem>()
@@ -79,13 +80,13 @@ class Menu(val name: String) {
 }
 ```
 
-시작점으로, 메뉴를 빌드하는 `menu()` 함수에 수신 객체가 있는 람다 식을 함수 매개변수(`init`)로 전달해 보겠습니다.
+시작점으로, 메뉴를 빌드하는 `menu()` 함수에 함수 파라미터(`init`)로 전달되는 수신 객체 지정 람다 식을 사용해 보겠습니다.
 
 ```kotlin
 fun menu(name: String, init: Menu.() -> Unit): Menu {
-    // Menu 클래스의 인스턴스 생성
+    // Menu 클래스의 인스턴스를 생성합니다
     val menu = Menu(name)
-    // 클래스 인스턴스에서 수신 객체가 있는 람다 식 init() 호출
+    // 클래스 인스턴스에서 수신 객체가 있는 람다 식 init()을 호출합니다
     menu.init()
     return menu
 }
@@ -135,22 +136,22 @@ fun main() {
 }
 //sampleEnd
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-intermediate-tour-lambda-expression-with-receiver-dsl"}
+{kotlin-runnable="true" id="kotlin-intermediate-tour-lambda-expression-with-receiver-dsl"}
 
-보시다시피, 수신 객체가 있는 람다 식을 사용하면 메뉴를 생성하는 데 필요한 코드가 크게 단순화됩니다. 람다 식은 초기 설정 및 생성뿐만 아니라 구성(configuration) 작업에도 유용합니다. API, UI 프레임워크, 구성 빌더 등을 위한 DSL을 구축할 때 널리 사용되어 코드를 간결하게 만들어 주며, 개발자가 기반 코드 구조와 로직에 더 쉽게 집중할 수 있도록 돕습니다.
+보시다시피, 수신 객체가 있는 람다 식을 사용하면 메뉴를 생성하는 데 필요한 코드가 크게 단순해집니다. 람다 식은 초기 설정 및 생성뿐만 아니라 구성(configuration) 작업에도 유용합니다. API, UI 프레임워크 및 구성 빌더를 위한 DSL을 구축할 때 널리 사용되어 간결한 코드를 작성할 수 있도록 돕고, 개발자가 기반 코드 구조와 로직에 더욱 쉽게 집중할 수 있게 합니다.
 
-Kotlin 생태계에는 표준 라이브러리의 [`buildList()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/build-list.html) 및 [`buildString()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.text/build-string.html) 함수와 같이 이러한 디자인 패턴이 적용된 예시가 많이 있습니다.
+Kotlin 생태계에는 표준 라이브러리의 [`buildList()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/build-list.html) 및 [`buildString()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.text/build-string.html) 함수와 같이 이러한 디자인 패턴의 수많은 예제가 있습니다.
 
-> Kotlin에서는 수신 객체가 있는 람다 식을 **타입 안전 빌더(type-safe builder)**와 결합하여 런타임이 아닌 컴파일 타임에 타입 관련 문제를 감지하는 DSL을 만들 수 있습니다. 자세한 내용은 [타입 안전 빌더](type-safe-builders.md)를 참고하세요.
+> Kotlin에서는 수신 객체가 있는 람다 식을 **타입 안전한 빌더(type-safe builder)**와 결합하여, 런타임이 아닌 컴파일 타임에 타입 관련 문제를 감지하는 DSL을 만들 수 있습니다. 자세한 내용은 [타입 안전한 빌더](type-safe-builders.md)를 참고하세요.
 >
 {style="tip"}
 
-## 실습 {completion-point="true" id="practice"}
+## 연습 문제 {completion-point="true" id="practice"}
 
 <deflist appearance="clear" collapsible="true" numbered="true">
 <def title="수신 객체가 있는 람다 식으로 데이터 처리하기" id="lambda-receivers-exercise-1">
 
-수신 객체가 있는 람다 식을 인수로 받는 `fetchData()` 함수가 있습니다. 코드의 출력 결과가 `Data received - Processed`가 되도록 `append()` 함수를 사용해 람다 식을 수정하세요.
+수신 객체가 있는 람다 식을 받는 `fetchData()` 함수가 있습니다. 코드의 출력 결과가 `Data received - Processed`가 되도록 `append()` 함수를 사용하여 람다 식을 업데이트하세요.
 
 ```kotlin
 fun fetchData(callback: StringBuilder.() -> Unit) {
@@ -165,7 +166,7 @@ fun main() {
     }
 }
 ```
-{validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-lambda-receivers-exercise-1"}
+{kotlin-runnable="true" kotlin-target-platform="exercise" kotlin-hidden-files="ExerciseUtils.kt,tour/intermediate/FetchDataTest.kt" validate="false" id="kotlin-tour-lambda-receivers-exercise-1"}
 
 ```kotlin
 fun fetchData(callback: StringBuilder.() -> Unit) {
@@ -181,17 +182,17 @@ fun main() {
     }
 }
 ```
-{initial-collapse-state="collapsed" collapsible="true" collapsed-title="해결 방법 예시" id="kotlin-tour-lambda-receivers-solution-1"}
+{kotlin-runnable="true" kotlin-target-platform="exercise" kotlin-hidden-files="ExerciseUtils.kt,tour/intermediate/FetchDataTest.kt" initial-collapse-state="collapsed" collapsible="true" collapsed-title="Example solution" id="kotlin-tour-lambda-receivers-solution-1"}
 
 </def>
 <def title="더블 클릭 이벤트 처리하기" id="lambda-receivers-exercise-2">
 
-`Button` 클래스와 `ButtonEvent`, `Position` 데이터 클래스가 주어졌습니다. `Button` 클래스의 `onEvent()` 멤버 함수를 호출하여 더블 클릭 이벤트를 트리거하는 코드를 작성하세요. 코드는 `"Double click!"`을 출력해야 합니다.
+`Button` 클래스와 `ButtonEvent`, `Position` 데이터 클래스가 있습니다. `Button` 클래스의 `onEvent()` 멤버 함수를 호출하여 더블 클릭 이벤트를 트리거하는 코드를 작성하세요. 코드는 `"Double click!"`을 출력해야 합니다.
 
 ```kotlin
 class Button {
     fun onEvent(action: ButtonEvent.() -> Unit) {
-        // 더블 클릭 이벤트 시뮬레이션 (우클릭 아님)
+        // 더블 클릭 이벤트를 시뮬레이션합니다 (우클릭 아님)
         val event = ButtonEvent(isRightClick = false, amount = 2, position = Position(100, 200))
         event.action() // 이벤트 콜백 트리거
     }
@@ -217,12 +218,12 @@ fun main() {
     }
 }
 ```
-{validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-lambda-receivers-exercise-2"}
+{kotlin-runnable="true" kotlin-target-platform="exercise" kotlin-hidden-files="ExerciseUtils.kt,tour/intermediate/ButtonEventTest.kt" validate="false" id="kotlin-tour-lambda-receivers-exercise-2"}
 
 ```kotlin
 class Button {
     fun onEvent(action: ButtonEvent.() -> Unit) {
-        // 더블 클릭 이벤트 시뮬레이션 (우클릭 아님)
+        // 더블 클릭 이벤트를 시뮬레이션합니다 (우클릭 아님)
         val event = ButtonEvent(isRightClick = false, amount = 2, position = Position(100, 200))
         event.action() // 이벤트 콜백 트리거
     }
@@ -250,12 +251,12 @@ fun main() {
     }
 }
 ```
-{initial-collapse-state="collapsed" collapsible="true" collapsed-title="해결 방법 예시" id="kotlin-tour-lambda-receivers-solution-2"}
+{kotlin-runnable="true" kotlin-target-platform="exercise" kotlin-hidden-files="ExerciseUtils.kt,tour/intermediate/ButtonEventTest.kt" initial-collapse-state="collapsed" collapsible="true" collapsed-title="Example solution" id="kotlin-tour-lambda-receivers-solution-2"}
 
 </def>
-<def title="각 요소가 증가된 리스트 생성하기" id="lambda-receivers-exercise-3">
+<def title="1씩 증가된 리스트 생성하기" id="lambda-receivers-exercise-3">
 
-모든 요소가 1씩 증가된 정수 리스트의 복사본을 생성하는 함수를 작성하세요. `List<Int>`를 확장하는 제공된 `incremented` 함수 골격을 활용하세요.
+모든 요소가 1씩 증가된 정수 리스트의 복사본을 생성하는 함수를 작성하세요. `List<Int>`를 `incremented` 함수로 확장하는 제공된 함수 스켈레톤을 사용하세요.
 
 ```kotlin
 fun List<Int>.incremented(): List<Int> {
@@ -272,7 +273,7 @@ fun main() {
     // [2, 3, 4]
 }
 ```
-{validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-lambda-receivers-exercise-3"}
+{kotlin-runnable="true" kotlin-target-platform="exercise" kotlin-hidden-files="ExerciseUtils.kt,tour/intermediate/IncrementedTest.kt" validate="false" id="kotlin-tour-lambda-receivers-exercise-3"}
 
 ```kotlin
 fun List<Int>.incremented(): List<Int> {
@@ -289,7 +290,7 @@ fun main() {
     // [2, 3, 4]
 }
 ```
-{initial-collapse-state="collapsed" collapsible="true" collapsed-title="해결 방법 예시" id="kotlin-tour-lambda-receivers-solution-3"}
+{kotlin-runnable="true" kotlin-target-platform="exercise" kotlin-hidden-files="ExerciseUtils.kt,tour/intermediate/IncrementedTest.kt" initial-collapse-state="collapsed" collapsible="true" collapsed-title="Example solution" id="kotlin-tour-lambda-receivers-solution-3"}
 
 </def>
 </deflist>

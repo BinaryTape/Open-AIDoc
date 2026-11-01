@@ -2,7 +2,7 @@
 
 <no-index/>
 
-這是一個列印「Hello, world!」的簡單程式：
+這是一個印出 "Hello, world!" 的簡單程式：
 
 ```kotlin
 fun main() {
@@ -10,25 +10,25 @@ fun main() {
     // Hello, world!
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="hello-world-kotlin"}
+{kotlin-runnable="true" id="hello-world-kotlin"}
 
 在 Kotlin 中：
 
 * `fun` 用於宣告函式
-* `main()` 函式是程式的起始入口點
-* 函式的主體寫在花括號 `{}` 內
-* [`println()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.io/println.html) 與 [`print()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.io/print.html) 函式會將其引數列印至標準輸出
+* `main()` 函式是程式開始執行的起點
+* 函式主體寫在花括號 `{}` 內
+* [`println()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.io/println.html) 與 [`print()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.io/print.html) 函式會將其引數輸出至標準輸出
 
-函式是一組執行特定任務的指令集合。一旦建立了函式，每當需要執行該任務時就可以直接使用它，而不需要重新編寫所有指令。後續章節將更詳細地討論函式。在此之前，所有範例都將使用 `main()` 函式。
+函式是一組執行特定任務的指令。一旦建立了函式，每當需要執行該任務時就可以直接使用它，而不需要重新編寫所有指令。後續的章節將會更詳細地討論函式。在那之前，所有範例都會使用 `main()` 函式。
 
 ## 變數 {id="variables"}
 
-所有程式都需要儲存資料，而變數正是用來實現這一點。在 Kotlin 中，你可以宣告：
+所有程式都需要能夠儲存資料，而變數正是用來達成此目的。在 Kotlin 中，你可以宣告：
 
 * 使用 `val` 宣告唯讀變數
 * 使用 `var` 宣告可變變數
 
-> 一旦為唯讀變數賦予了值，就無法再更改它。
+> 唯讀變數一旦賦值後就無法再更改。
 >
 {style="note"}
 
@@ -50,25 +50,23 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-variables"}
+{kotlin-runnable="true" id="kotlin-tour-variables"}
 
-> 變數可以在程式開頭宣告於 `main()` 函式之外。以這種方式宣告的變數稱為宣告在**頂層 (top level)**。
+> 變數可以在程式開頭、於 `main()` 函式之外進行宣告。以此方式宣告的變數稱為宣告在**頂層** (top level)。
 > 
 {style="tip"}
 
-由於 `customers` 是一個可變變數，因此在宣告後可以重新指派其值。
+由於 `customers` 是可變變數，因此在宣告後可以重新為其指派值。
 
-> 我們建議預設將所有變數宣告為唯讀 (`val`)。只有在確實需要時才使用可變變數 (`var`)。這樣一來，可以減少意外修改不應變更之內容的機會。
+> 我們建議預設將所有變數都宣告為唯讀 (`val`)。只有在確實有需要時才使用可變變數 (`var`)。如此一來，你就不太可能會意外修改到原本不應變更的內容。
 > 
 {style="note"}
 
 ## 字串範本 {id="string-templates"}
 
-了解如何將變數的內容列印到標準輸出非常實用。你可以透過**字串範本**來做到這一點。
-你可以使用範本運算式來存取儲存在變數和其他物件中的資料，並將它們轉換為字串。
-字串值是一串包含在雙引號 `"` 內的字元序列。範本運算式一律以錢字號 `$` 開頭。
+了解如何將變數的內容輸出至標準輸出非常有用。你可以透過**字串範本** (string templates) 來達成此目的。你可以使用範本運算式來存取儲存在變數和其他物件中的資料，並將其轉換為字串。字串值是以雙引號 `"` 包裹的一連串字元。範本運算式一律以錢字號 `$` 開頭。
 
-若要在範本運算式中對一段程式碼求值，請將該程式碼置於錢字號 `$` 後方的花括號 `{}` 中。
+若要在範本運算式中求值一段程式碼，請將該程式碼置於錢字號 `$` 後方的花括號 `{}` 內。
 
 例如：
 
@@ -84,18 +82,18 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-string-templates"}
+{kotlin-runnable="true" id="kotlin-tour-string-templates"}
 
-如需更多資訊，請參閱[字串範本](strings.md#string-templates)。
+若要了解更多，請參閱 [字串範本](strings.md#string-templates)。
 
-你會注意到變數並沒有宣告任何型別。這是因為 Kotlin 自行推論出了型別：`Int`。本導覽將在[下一章](kotlin-tour-basic-types.md)中介紹不同的 Kotlin 基本型別以及如何宣告它們。
+你會注意到，這些變數都沒有宣告任何型別。Kotlin 自行推論出了型別：`Int`。本導覽將在[下一章](kotlin-tour-basic-types.md)中介紹不同的 Kotlin 基本型別以及如何宣告它們。
 
 ## 練習 {completion-point="true" id="practice"}
 
 <deflist appearance="clear" collapsible="true">
-<def title="使用字串範本列印陳述式" id="hello-world-exercise-1">
+<def title="使用字串範本印出陳述式" id="hello-world-exercise-1">
 
-完成程式碼，使程式將 `"Mary is 20 years old"` 列印至標準輸出：
+完成程式碼，使程式輸出 `"Mary is 20 years old"` 至標準輸出：
 
 ```kotlin
 fun main() {
@@ -104,7 +102,7 @@ fun main() {
     // 在此處編寫你的程式碼
 }
 ```
-{validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-hello-world-exercise"}
+{validate="false" kotlin-runnable="true" kotlin-target-platform="exercise" kotlin-hidden-files="ExerciseUtils.kt,tour/basics/HelloWorldTest.kt" id="kotlin-tour-hello-world-exercise"}
 
 ```kotlin
 fun main() {
@@ -113,7 +111,7 @@ fun main() {
     println("$name is $age years old")
 }
 ```
-{initial-collapse-state="collapsed" collapsible="true" collapsed-title="參考解答" id="kotlin-tour-hello-world-solution"}
+{kotlin-runnable="true" kotlin-target-platform="exercise" kotlin-hidden-files="ExerciseUtils.kt,tour/basics/HelloWorldTest.kt" initial-collapse-state="collapsed" collapsible="true" collapsed-title="範例解答" id="kotlin-tour-hello-world-solution"}
 
 </def>
 </deflist>

@@ -1,4 +1,4 @@
-[//]: # (title: JSON Web Tokens)
+[//]: # (title: JSON Web Token)
 
 <show-structure for="chapter" depth="2"/>
 <primary-label ref="server-plugin"/>
@@ -11,32 +11,32 @@
 </p>
 <p>
 <b>程式碼範例</b>： 
-<a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/auth-jwt-hs256">auth-jwt-hs256</a>, 
+<a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/auth-jwt-hs256">auth-jwt-hs256</a>、 
 <a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/auth-jwt-rs256">auth-jwt-rs256</a>
 </p>
 <p>
-    <b><Links href="/ktor/server-native" summary="Ktor 支援 Kotlin/Native，並允許您在沒有額外執行階段或虛擬機的情況下執行伺服器。">原生伺服器</Links> 支援</b>：✖️
+    <b><Links href="server-native.md" summary="Ktor 支援 Kotlin/Native，並允許你在沒有額外執行階段或虛擬機的情況下執行伺服器。">Native 伺服器</Links>支援</b>：✖️
 </p>
 </tldr>
 
 <link-summary>
-%plugin_name% 外掛程式允許您使用 JSON Web Token 驗證用戶端。 
+%plugin_name% 外掛程式允許你使用 JSON Web Token 驗證用戶端。
 </link-summary>
 
-[JSON Web Token (JWT)](https://jwt.io/) 是一個開放標準，定義了一種將資訊作為 JSON 物件在各方之間安全傳輸的方式。由於此資訊使用共用金鑰（使用 `HS256` 演算法）或公鑰/私鑰對（例如 `RS256`）進行簽名，因此可以被驗證和信任。
+[JSON Web Token (JWT)](https://jwt.io/) 是一項開放標準，定義了一種以 JSON 物件在雙方之間安全傳輸資訊的方法。由於此資訊是使用共用密鑰（透過 `HS256` 演算法）或公開/私有金鑰組（例如 `RS256`）進行簽署的，因此可以被驗證與信任。
 
-Ktor 處理在 `Authorization` 標頭中以 `Bearer` 配置傳遞的 JWT，並允許您：
-* 驗證 JSON Web Token 的簽名；
-* 對 JWT 承載內容 (payload) 執行額外的驗證。
+Ktor 處理在 `Authorization` 標頭中使用 `Bearer` 配置傳遞的 JWT，並允許你：
+* 驗證 JSON web token 的簽章；
+* 對 JWT 負載（payload）執行額外的驗證。
 
-> 您可以在 [Ktor Server 中的驗證與授權](server-auth.md) 章節中取得有關 Ktor 驗證與授權的一般資訊。
+> 你可以在 [Ktor Server 中的驗證與授權](server-auth.md) 章節中取得關於 Ktor 驗證與授權的一般資訊。
 
-> 如果權杖來自 OpenID Connect 提供程式，`Oidc` 外掛程式會從發行者 URL 解析 JWKS 端點，並在金鑰輪換時重新整理，因此您不需要手動設定 `JwkProvider`。它還會拒絕作為存取權杖出示的 ID 權杖。請參閱 [OpenID Connect 資源伺服器](server-oidc-resource-server.md)。
+> 如果權杖來自 OpenID Connect 提供者，`Oidc` 外掛程式會從發行者 URL 解析 JWKS 端點，並在金鑰輪換時重新整理它，因此你不需要手動設定 `JwkProvider`。它還會拒絕作為存取權杖提供的 ID 權杖。請參閱 [OpenID Connect 資源伺服器](server-oidc-resource-server.md)。
 >
 {style="tip"}
 
 ## 新增相依性 {id="add_dependencies"}
-要啟用 `JWT` 驗證，您需要在建置指令碼中包含 `ktor-server-auth` 和 `ktor-server-auth-jwt` 構件：
+若要啟用 `JWT` 驗證，你需要在建置指令碼中包含 `ktor-server-auth` 與 `ktor-server-auth-jwt` 構件：
 
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
@@ -51,8 +51,8 @@ Ktor 處理在 `Authorization` 標頭中以 `Bearer` 配置傳遞的 JWT，並�
 </Tabs>
 
 ## JWT 授權流程 {id="flow"}
-Ktor 中的 JWT 授權流程如下所示：
-1. 用戶端向伺服器應用程式中的特定驗證[路由](server-routing.md)發送帶有憑據的 `POST` 請求。下面的範例顯示了一個 [HTTP 用戶端](https://www.jetbrains.com/help/idea/http-client-in-product-code-editor.html) 的 `POST` 請求，憑據以 JSON 格式傳遞：
+Ktor 中的 JWT 授權流程可能如下所示：
+1. 用戶端向伺服器應用程式中特定的驗證[路由](server-routing.md)發出帶有憑據的 `POST` 請求。下方的範例顯示了使用 JSON 傳遞憑據的 [HTTP 用戶端](https://www.jetbrains.com/help/idea/http-client-in-product-code-editor.html) `POST` 請求：
    ```HTTP
    POST http://localhost:8080/login
    Content-Type: application/json
@@ -62,20 +62,20 @@ Ktor 中的 JWT 授權流程如下所示：
      "password": "foobar"
    }
    ```
-2. 如果憑據有效，伺服器會產生一個 JSON Web Token 並使用指定的演算法對其進行簽名。例如，這可能是帶有特定共用金鑰的 `HS256`，或是帶有公鑰/私鑰對的 `RS256`。
+2. 如果憑據有效，伺服器會產生 JSON web token 並使用指定的演算法對其進行簽署。例如，這可以是使用特定共用密鑰的 `HS256`，或是使用公開/私有金鑰組的 `RS256`。
 3. 伺服器將產生的 JWT 發送給用戶端。
-4. 用戶端現在可以使用在 `Authorization` 標頭中以 `Bearer` 配置傳遞的 JSON Web Token，向受保護的資源發送請求。
+4. 用戶端現在可以向受保護的資源發出請求，並在 `Authorization` 標頭中使用 `Bearer` 配置傳遞 JSON web token。
    ```HTTP
    GET http://localhost:8080/hello
    Authorization: Bearer {{auth_token}}
    ```
 5. 伺服器接收請求並執行以下驗證：
-   * 驗證權杖 (token) 的簽名。請注意，[驗證方式](#configure-verifier)取決於用於簽名權杖的演算法。
-   * 對 JWT 承載內容 (payload) 執行[額外的驗證](#validate-payload)。
-6. 驗證後，伺服器會回應受保護資源的內容。
+   * 驗證權杖的簽章。請注意，[驗證方式](#configure-verifier)取決於用於簽署權杖的演算法。
+   * 對 JWT 負載執行[額外驗證](#validate-payload)。
+6. 驗證完成後，伺服器會回應受保護資源的內容。
 
 ## 安裝 JWT {id="install"}
-要安裝 `jwt` 驗證提供程式，請在 `install` 區塊內呼叫 [jwt](https://api.ktor.io/ktor-server-auth-jwt/io.ktor.server.auth.jwt/jwt.html) 函式：
+若要安裝 `jwt` 驗證提供者，請在 `install` 區塊內呼叫 [jwt](https://api.ktor.io/ktor-server-auth-jwt/io.ktor.server.auth.jwt/jwt.html) 函式：
 
 ```kotlin
 import io.ktor.server.application.*
@@ -84,22 +84,22 @@ import io.ktor.server.auth.jwt.*
 //...
 install(Authentication) {
     jwt {
-        // 配置 jwt 驗證
+        // Configure jwt authentication
     }
 }
 ```
-您可以選擇性地指定一個[提供程式名稱 (provider name)](server-auth.md#provider-name)，該名稱可用於[驗證指定的路由](#authenticate-route)。
+你可以選擇性指定一個[提供者名稱](server-auth.md#provider-name)，可用於[驗證指定的路由](#authenticate-route)。
 
 ## 設定 JWT {id="configure-jwt"}
-在本節中，我們將了解如何在伺服器端 Ktor 應用程式中使用 JSON Web Token。我們將展示兩種簽名權杖的方法，因為它們需要稍微不同的方式來驗證權杖：
-* 使用帶有指定共用金鑰的 `HS256`。 
-* 使用帶有公鑰/私鑰對的 `RS256`。
+在本節中，我們將探討如何在伺服器端 Ktor 應用程式中使用 JSON web token。我們將示範兩種簽署權杖的方法，因為它們驗證權杖的方式略有不同：
+* 使用帶有指定共用密鑰的 `HS256`。 
+* 使用帶有公開/私有金鑰組的 `RS256`。
 
-您可以在此處找到完整的專案：[auth-jwt-hs256](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/auth-jwt-hs256)、[auth-jwt-rs256](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/auth-jwt-rs256)。
+你可以在此處找到完整的專案：[auth-jwt-hs256](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/auth-jwt-hs256)、[auth-jwt-rs256](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/auth-jwt-rs256)。
 
-### 步驟 1：設定 JWT 設定 {id="jwt-settings"}
+### 步驟 1：配置 JWT 設定 {id="jwt-settings"}
 
-要設定 JWT 相關設定，您可以在 [設定檔](server-configuration-file.topic) 中建立一個自訂的 `jwt` 群組。例如，`application.conf` 檔案可能如下所示：
+若要配置與 JWT 相關的設定，你可以在[設定檔](server-configuration-file.topic)中建立自訂的 `jwt` 群組。例如，`application.conf` 檔案可能如下所示：
 
 <Tabs group="sign-alg">
 <TabItem title="HS256" group-key="hs256">
@@ -128,11 +128,11 @@ jwt {
 </TabItem>
 </Tabs>
 
-> 請注意，秘密資訊不應以純文字形式儲存在設定檔中。請考慮使用[環境變數](server-configuration-file.topic#environment-variables)來指定這些參數。
+> 請注意，機密資訊不應以純文字形式儲存在設定檔中。請考慮使用[環境變數](server-configuration-file.topic#environment-variables)來指定此類參數。
 >
 {type="warning"}
 
-您可以透過以下方式[在程式碼中存取這些設定](server-configuration-file.topic#read-configuration-in-code)：
+你可以透過以下方式[在程式碼中存取這些設定](server-configuration-file.topic#read-configuration-in-code)：
 
 <Tabs group="sign-alg">
 <TabItem title="HS256" group-key="hs256">
@@ -164,7 +164,7 @@ val myRealm = jwtConfig.property("jwt.realm").getString()
 
 ### 步驟 2：產生權杖 {id="generate"}
 
-要產生 JSON Web Token，您可以使用 [JWTCreator.Builder](https://javadoc.io/doc/com.auth0/java-jwt/latest/com/auth0/jwt/JWTCreator.Builder.html)。下面的程式碼片段顯示了如何針對 `HS256` 和 `RS256` 演算法執行此操作：
+若要產生 JSON web token，可以使用 [JWTCreator.Builder](https://javadoc.io/doc/com.auth0/java-jwt/latest/com/auth0/jwt/JWTCreator.Builder.html)。下方的程式碼片段展示了如何針對 `HS256` 與 `RS256` 演算法進行此操作：
 
 <Tabs group="sign-alg">
 <TabItem title="HS256" group-key="hs256">
@@ -172,7 +172,7 @@ val myRealm = jwtConfig.property("jwt.realm").getString()
 ```kotlin
 post("/login") {
     val user = call.receive<User>()
-    // 檢查使用者名稱和密碼
+    // Check username and password
     // ...
     val expiresAt = System.currentTimeMillis() + 60000
     val token = JWT.create()
@@ -191,7 +191,7 @@ post("/login") {
 ```kotlin
 post("/login") {
     val user = call.receive<User>()
-    // 檢查使用者名稱和密碼
+    // Check username and password
     // ...
     val keyId = "6f8856ed-9189-488f-9011-0ff4b6c08edc"
     val publicKey = jwkProvider.get(keyId).publicKey
@@ -218,15 +218,15 @@ post("/login") {
 </TabItem>
 </Tabs>
 
-1. `post("/login")` 定義了一個用於接收 `POST` 請求的驗證[路由](server-routing.md)。
+1. `post("/login")` 定義了用於接收 `POST` 請求的驗證[路由](server-routing.md)。
 2. `call.receive<User>()` [接收](server-serialization.md#receive_data)以 JSON 物件發送的使用者憑據，並將其轉換為 `User` 類別物件。
-3. `JWT.create()` 使用指定的 JWT 設定產生權杖，新增一個包含所接收使用者名稱的自訂宣告 (claim)，並使用指定的演算法對權杖進行簽名：
-   * 對於 `HS256`，使用共用金鑰對權杖進行簽名。
-   * 對於 `RS256`，使用公鑰/私鑰對進行簽名。
-4. `call.respond` 將權杖作為 JSON 物件[發送](server-serialization.md#send_data)給用戶端。
+3. `JWT.create()` 使用指定的 JWT 設定產生權杖，新增帶有接收到的使用者名稱的自訂宣告（claim），並使用指定的演算法對權杖進行簽署：
+   * 對於 `HS256`，使用共用密鑰簽署權杖。
+   * 對於 `RS256`，使用公開/私有金鑰組。
+4. `call.respond` 將權杖以 JSON 物件形式[發送](server-serialization.md#send_data)給用戶端。
 
-### 步驟 3：設定領域 (realm) {id="realm"}
-`realm` 屬性允許您設定存取[受保護路由](#authenticate-route)時要在 `WWW-Authenticate` 標頭中傳遞的領域。
+### 步驟 3：設定 realm {id="realm"}
+`realm` 屬性允許你設定在存取[受保護路由](#authenticate-route)時，於 `WWW-Authenticate` 標頭中傳遞的 realm。
 
 ```kotlin
 val myRealm = jwtConfig.property("jwt.realm").getString()
@@ -239,9 +239,9 @@ install(Authentication) {
 
 ### 步驟 4：設定權杖驗證器 {id="configure-verifier"}
 
-`verifier` 函式允許您驗證權杖格式及其簽名：
-* 對於 `HS256`，您需要傳遞一個 [JWTVerifier](https://www.javadoc.io/doc/com.auth0/java-jwt/latest/com/auth0/jwt/JWTVerifier.html) 執行個體來驗證權杖。
-* 對於 `RS256`，您需要傳遞 [JwkProvider](https://www.javadoc.io/doc/com.auth0/jwks-rsa/latest/com/auth0/jwk/JwkProvider.html)，它指定一個 JWKS 端點，用於存取驗證權杖所需的公鑰。在我們的案例中，發行者是 `http://0.0.0.0:8080`，因此 JWKS 端點位址將是 `http://0.0.0.0:8080/.well-known/jwks.json`。
+`verifier` 函式允許你驗證權杖格式及其簽章：
+* 對於 `HS256`，你需要傳遞 [JWTVerifier](https://www.javadoc.io/doc/com.auth0/java-jwt/latest/com/auth0/jwt/JWTVerifier.html) 執行個體以驗證權杖。
+* 對於 `RS256`，你需要傳遞 [JwkProvider](https://www.javadoc.io/doc/com.auth0/jwks-rsa/latest/com/auth0/jwk/JwkProvider.html)，它指定了用於存取驗證權杖所需公鑰的 JWKS 端點。在我們的例子中，發行者是 `http://0.0.0.0:8080`，因此 JWKS 端點位址將是 `http://0.0.0.0:8080/.well-known/jwks.json`。
 
 <Tabs group="sign-alg">
 <TabItem title="HS256" group-key="hs256">
@@ -290,12 +290,12 @@ install(Authentication) {
 </TabItem>
 </Tabs>
 
-### 步驟 5：驗證 JWT 承載內容 (payload) {id="validate-payload"}
+### 步驟 5：驗證 JWT 負載 {id="validate-payload"}
 
 <Tabs group="auth-dsl">
 <TabItem title="Classic" group-key="classic">
 
-1. `validate` 函式允許您對 JWT 承載內容執行驗證。此函式是必需的：如果您沒有配置它，提供程式初始化將拋出 `IllegalArgumentException`。請檢查 `credential` 參數，它代表一個 [JWTCredential](https://api.ktor.io/ktor-server-auth-jwt/io.ktor.server.auth.jwt/-j-w-t-credential/index.html) 物件並包含 JWT 承載內容。在下面的範例中，會檢查自訂 `username` 宣告的值。
+1. `validate` 函式允許你對 JWT 負載執行驗證。此函式是必要的：如果未進行設定，提供者初始化時將擲出 `IllegalArgumentException`。請檢查 `credential` 參數，它代表一個 [JWTCredential](https://api.ktor.io/ktor-server-auth-jwt/io.ktor.server.auth.jwt/-j-w-t-credential/index.html) 物件並包含 JWT 負載。在下方的範例中，檢查了自訂 `username` 宣告的值。
    ```kotlin
    install(Authentication) {
        jwt("auth-jwt") {
@@ -313,7 +313,7 @@ install(Authentication) {
    ```
    
    驗證成功時，傳回 [JWTPrincipal](https://api.ktor.io/ktor-server-auth-jwt/io.ktor.server.auth.jwt/-j-w-t-principal/index.html)。 
-2. `challenge` 函式允許您設定在驗證失敗時發送的回應。
+2. `challenge` 函式允許你設定在驗證失敗時要發送的回應。
    ```kotlin
    install(Authentication) {
        jwt("auth-jwt") {
@@ -331,15 +331,14 @@ install(Authentication) {
 
 <note>
     <p>
-        型別安全的驗證配置 API 是實驗性的。它可能隨時被移除或更改。
-        需要明確宣告選擇加入 (Opt-in)。如需更多詳細資訊，請參閱
-        <a href="server-typed-auth.md#prerequisites">啟用 API</a>。
+        型別安全驗證方案 API 仍處於實驗階段，可能隨時被移除或變更。需要明確選擇啟用（Opt-in）。如需更多詳細資訊，請參閱
+        <a href="server-typed-auth.md#prerequisites">型別安全驗證說明文件</a>。
     </p>
 </note>
 
-`jwt()` 函式會為您選擇的 principal 型別建立一個配置 (scheme)。這裡沒有 `install(Authentication)` 步驟：該配置是一個值，您可以將其傳遞給需要的路由。
+`jwt()` 函式會為你選擇的 principal 型別建立方案。這裡沒有 `install(Authentication)` 步驟：該方案是一個值，你可以將其傳遞給需要的路由。
 
-在 `validate` 內讀取您需要的宣告 (claims) 並傳回您自己的型別。然後路由處理常式就可以使用該型別，而不是 `JWTPrincipal`：
+在 `validate` 內讀取你需要的宣告，並傳回自訂型別。接著路由處理常式便可使用該型別，而不是 `JWTPrincipal`：
 
 ```kotlin
 data class User(val username: String, val expiresAt: Long?)
@@ -378,7 +377,7 @@ val jwtAuth = jwt<User>("auth-jwt") {
 <Tabs group="auth-dsl">
 <TabItem title="Classic" group-key="classic">
 
-設定完 `jwt` 提供程式後，您可以使用 **[authenticate](server-auth.md#authenticate-route)** 函式保護應用程式中的特定資源。在驗證成功的情況下，您可以使用 `call.principal` 函式在路由處理常式內部擷取已驗證的 [JWTPrincipal](https://api.ktor.io/ktor-server-auth-jwt/io.ktor.server.auth.jwt/-j-w-t-principal/index.html) 並取得 JWT 承載內容。在下面的範例中，會擷取自訂 `username` 宣告的值和權杖到期時間。
+設定 `jwt` 提供者後，你可以使用 **[authenticate](server-auth.md#authenticate-route)** 函式來保護應用程式中的特定資源。在驗證成功的情況下，你可以在路由處理常式內使用 `call.principal` 函式擷取已驗證的 [JWTPrincipal](https://api.ktor.io/ktor-server-auth-jwt/io.ktor.server.auth.jwt/-j-w-t-principal/index.html) 並取得 JWT 負載。在下方的範例中，擷取了自訂 `username` 宣告的值以及權杖到期時間。
 
 ```kotlin
 routing {
@@ -403,7 +402,7 @@ routing {
 </TabItem>
 <TabItem title="Type-safe" group-key="typed">
 
-將配置傳遞給 `authenticateWith()`。由於宣告已經在 `validate` 中讀取，因此處理常式可以使用您自己的型別，且不需要進行 null 檢查：
+將方案傳遞給 `authenticateWith()`。宣告已在 `validate` 中讀取，因此處理常式會使用自訂型別，且不需要 null 檢查：
 
 ```kotlin
 routing {

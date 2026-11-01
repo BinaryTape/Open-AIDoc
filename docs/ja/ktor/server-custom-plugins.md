@@ -16,15 +16,15 @@
 独自のカスタムプラグインを作成する方法を学びます。
 </link-summary>
 
-Ktorでは、独自のカスタム[プラグイン](server-plugins.md)を作成できます。一般的に、このAPIではパイプラインやフェーズなどのKtor内部の概念を理解する必要はありません。代わりに、`onCall()`、`onCallReceive()`、`onCallRespond()`などのハンドラーを使用して、[リクエストとレスポンスの処理](#call-handling)のさまざまな段階にアクセスできます。
+Ktor では、独自のカスタム[プラグイン](server-plugins.md)を作成できます。一般的に、この API ではパイプラインやフェーズといった Ktor 内部の概念を理解する必要はありません。代わりに、`onCall()`、`onCallReceive()`、`onCallRespond()` などのハンドラーを使用して、[リクエストとレスポンス処理](#call-handling)のさまざまなステージにアクセスします。
 
 ## 最初のプラグインを作成してインストールする {id="first-plugin"}
 
-このセクションでは、最初のプラグインを作成してインストールする方法を説明します。
+このセクションでは、最初のプラグインを作成してインストールする方法を学びます。
 
-[Ktorプロジェクトの作成、開封、実行](server-create-a-new-project.topic)チュートリアルで作成したアプリケーションを開始プロジェクトとして使用できます。
+スタート用プロジェクトとして、[新規 Ktor プロジェクトの作成、オープン、実行](server-create-a-new-project.topic)チュートリアルで作成したアプリケーションを使用できます。
 
-1. プラグインを作成するには、[`createApplicationPlugin()`](https://api.ktor.io/ktor-server-core/io.ktor.server.application/create-application-plugin.html)関数を呼び出し、プラグイン名を指定します。
+1. プラグインを作成するには、[`createApplicationPlugin()`](https://api.ktor.io/ktor-server-core/io.ktor.server.application/create-application-plugin.html) 関数を呼び出し、プラグイン名を指定します。
 
    ```kotlin
    import io.ktor.server.application.*
@@ -34,13 +34,13 @@ Ktorでは、独自のカスタム[プラグイン](server-plugins.md)を作成�
    }
    ```
 
-   この関数は、アプリケーションにインストールできる`ApplicationPlugin`インスタンスを返します。
+   この関数は、アプリケーションにインストール可能な `ApplicationPlugin` インスタンスを返します。
    
-   > [特定のルートにインストール](server-plugins.md#install-route)できるプラグインを作成するために、[`createRouteScopedPlugin()`](https://api.ktor.io/ktor-server-core/io.ktor.server.application/create-route-scoped-plugin.html)関数を使用することもできます。
+   > [`createRouteScopedPlugin()`](https://api.ktor.io/ktor-server-core/io.ktor.server.application/create-route-scoped-plugin.html) 関数を使用して、[特定のルートにインストール](server-plugins.md#install-route)できるプラグインを作成することもできます。
    >
    {style="tip"}
 
-2. [プラグインをインストール](server-plugins.md#install)するには、アプリケーションの初期化コードで作成した`ApplicationPlugin`インスタンスを`Application.install()`関数に渡します。
+2. [プラグインをインストール](server-plugins.md#install)するには、作成した `ApplicationPlugin` インスタンスをアプリケーションの初期化コード内の `Application.install()` 関数に渡します。
 
    ```kotlin
    fun Application.module() {
@@ -48,7 +48,7 @@ Ktorでは、独自のカスタム[プラグイン](server-plugins.md)を作成�
    }
    ```
 
-3. アプリケーションを[実行](server-run.md)して、コンソール出力にプラグインのメッセージが表示されることを確認します。
+3. アプリケーションを[実行](server-run.md)し、コンソール出力でプラグインのメッセージを確認します。
 
    ```Bash
    2021-10-14 14:54:08.269 [main] INFO  Application - Autoreload is disabled because the development mode is off.
@@ -56,31 +56,31 @@ Ktorでは、独自のカスタム[プラグイン](server-plugins.md)を作成�
    2021-10-14 14:54:08.900 [main] INFO  Application - Responding at http://0.0.0.0:8080
    ```
 
-> 完全な例については、[SimplePlugin.kt](https://github.com/ktorio/ktor-documentation/blob/%ktor_version%/codeSnippets/snippets/custom-plugin/src/main/kotlin/com/example/plugins/SimplePlugin.kt)を参照してください。
+> 完全な例については、[SimplePlugin.kt](https://github.com/ktorio/ktor-documentation/blob/%ktor_version%/codeSnippets/snippets/custom-plugin/src/main/kotlin/com/example/plugins/SimplePlugin.kt) を参照してください。
 > 
 {style="tip"}
 
 ## コールを処理する {id="call-handling"}
 
-カスタムプラグインでは、コールのさまざまな段階へのアクセスを提供する一連のハンドラーを使用して、[リクエスト](server-requests.md)と[レスポンス](server-responses.md)を処理できます。
+カスタムプラグインでは、コールのさまざまなステージへのアクセスを提供する一連のハンドラーを使用して、[リクエスト](server-requests.md)と[レスポンス](server-responses.md)を処理できます。
 
-* [`onCall()`](#on-call)を使用すると、リクエストとレスポンスの情報へのアクセスや、ヘッダーなどのレスポンスパラメータの変更が可能です。
-* [`onCallValidators()`](#on-call-validators)を使用すると、コールのバリデーションを実行できます。ルートスコープのプラグインの場合、バリデータはルートのネストに従って実行されます。
-* [`onCallReceive()`](#on-call-receive)を使用すると、クライアントから受信したデータを変換できます。
-* [`onCallRespond()`](#on-call-respond)を使用すると、クライアントに送信する前にデータを変換できます。
-* [`on()`](#other)を使用すると、コール処理の他の段階やコール中に発生した例外に対する特定のフックを処理できます。
+* [`onCall()`](#on-call): リクエストおよびレスポンス情報にアクセスし、ヘッダーなどのレスポンスパラメータを変更できます。
+* [`onCallValidators()`](#on-call-validators): コールの検証を実行できます。ルートスコーププラグインの場合、バリデータはルートのネスト順に従って実行されます。
+* [`onCallReceive()`](#on-call-receive): クライアントから受信したデータを変換できます。
+* [`onCallRespond()`](#on-call-respond): クライアントへ送信する前にデータを変換できます。
+* [`on()`](#other): コール処理の他のステージや、コール中に発生した例外に対する特定のフックを処理できます。
 
-また、`call.attributes`を使用してハンドラー間で[コールの状態を共有](#call-state)することもできます。
+また、`call.attributes` を使用してハンドラー間で[コールの状態を共有](#call-state)することもできます。
 
 ### `onCall()` {id="on-call"}
 
-`onCall()`ハンドラーは、ラムダ引数として`ApplicationCall`を受け取ります。これにより、リクエストとレスポンスの情報にアクセスし、[カスタムヘッダーの追加](#custom-header)などのレスポンスパラメータを変更できます。
+`onCall()` ハンドラーは、ラムダ引数として `ApplicationCall` を受け取ります。これにより、リクエストおよびレスポンス情報にアクセスし、[カスタムヘッダーの追加](#custom-header)などのレスポンスパラメータの変更を行うことができます。
 
-リクエストまたはレスポンスのボディを変換するには、[`onCallReceive()`](#on-call-receive)および[`onCallRespond()`](#on-call-respond)を使用してください。
+リクエストまたはレスポンスのボディを変換するには、[`onCallReceive()`](#on-call-receive) および [`onCallRespond()`](#on-call-respond) を使用します。
 
-#### 例1: リクエストのロギング {id="request-logging"}
+#### 例 1: リクエストをログに記録する {id="request-logging"}
 
-以下の例では、`onCall()`を使用して受信リクエストのURLをログに記録するプラグインを作成しています。
+次の例では、`onCall()` を使用して、受信したリクエストの URL をログに記録するプラグインを作成します。
 
 ```kotlin
 val RequestLoggingPlugin = createApplicationPlugin(name = "RequestLoggingPlugin") {
@@ -92,16 +92,16 @@ val RequestLoggingPlugin = createApplicationPlugin(name = "RequestLoggingPlugin"
 }
 ```
 
-このプラグインをインストールすると、リクエストされたURLがコンソールに出力されます。
+このプラグインをインストールすると、リクエストされた URL がコンソールに出力されます。
 
 ```Bash
 Request URL: http://0.0.0.0:8080/
 Request URL: http://0.0.0.0:8080/index
 ```
 
-#### 例2: カスタムヘッダーの追加 {id="custom-header"}
+#### 例 2: カスタムヘッダーを追加する {id="custom-header"}
 
-以下の例では、各レスポンスにカスタムヘッダーを追加するプラグインを作成します。
+次の例では、各レスポンスにカスタムヘッダーを追加するプラグインを作成します。
 
 ```kotlin
 val CustomHeaderPlugin = createApplicationPlugin(name = "CustomHeaderPlugin") {
@@ -111,20 +111,20 @@ val CustomHeaderPlugin = createApplicationPlugin(name = "CustomHeaderPlugin") {
 }
 ```
 
-結果として、レスポンスにカスタムヘッダーが含まれます。
+結果のレスポンスにはカスタムヘッダーが含まれます。
 
 ```HTTP
 HTTP/1.1 200 OK
 X-Custom-Header: Hello, world!
 ```
 
-この例では、ヘッダー名と値がハードコードされています。設定可能にするには、[プラグインの設定](#plugin-configuration)を提供します。
+この例では、ヘッダー名と値がハードコードされています。これらを設定可能にするには、[プラグイン設定](#plugin-configuration)を提供します。
 
 ### `onCallReceive()` {id="on-call-receive"}
 
-`onCallReceive()`ハンドラーを使用すると、クライアントから受信したデータを変換できます。ハンドラー内で`transformBody()`を呼び出し、リクエストボディが`call.receive()`に渡される前に変換します。
+`onCallReceive()` ハンドラーを使用すると、クライアントから受信したデータを変換できます。ハンドラー内で `transformBody()` を呼び出し、リクエストボディが `call.receive()` に渡される前に変換します。
 
-クライアントがボディに`text/plain`として`10`を含む以下の`POST`リクエストを送信すると仮定します。
+クライアントが `text/plain` ボディとして `10` を含む以下の `POST` リクエストを送信したとします。
 
 ```HTTP
 POST http://localhost:8080/transform-data
@@ -134,7 +134,7 @@ Content-Type: text/plain
 
 ```
 
-この[ボディを整数値として受信](server-requests.md#objects)するには、`POST`リクエスト用のルートハンドラーを作成し、`Int`パラメータを指定して`call.receive()`を呼び出す必要があります。
+この[ボディを整数値として受信](server-requests.md#objects)するには、`POST` リクエスト用のルートハンドラーを作成し、`Int` パラメータを指定して `call.receive()` を呼び出す必要があります。
 
 ```kotlin
 post("/transform-data") {
@@ -142,7 +142,7 @@ post("/transform-data") {
 }
 ```
 
-以下のプラグインは、ボディを整数値として受け取り、それに`1`を加算します。
+以下のプラグインは、ボディを整数値として受信し、それに `1` を加算します。
 
 ```kotlin
 val DataTransformationPlugin = createApplicationPlugin(name = "DataTransformationPlugin") {
@@ -159,22 +159,22 @@ val DataTransformationPlugin = createApplicationPlugin(name = "DataTransformatio
 }
 ```
 
-上記の例では、次のようになります。
+上記の例では:
 
-* `TransformBodyContext`は[ラムダレシーバー](https://kotlinlang.org/docs/scope-functions.html#context-object-this-or-it)です。その`requestedType`プロパティには、`call.receive()`によって要求された型に関する情報が含まれています。
-* `data`引数には、現在のリクエストボディが含まれます。この場合、それは[`ByteReadChannel`](https://api.ktor.io/ktor-io/io.ktor.utils.io/-byte-read-channel/index.html)であり、`ByteReadChannel.readLine()`でその内容を読み取ります。
-* 要求された型が`Int`の場合、プラグインは受信した値を整数に変換し、`1`を加算して変換後の値を返します。それ以外の場合は、ボディを変更せずにそのまま返します。
+* `TransformBodyContext` が[ラムダレシーバー](https://kotlinlang.org/docs/scope-functions.html#context-object-this-or-it)です。その `requestedType` プロパティには、`call.receive()` によって要求された型に関する情報が含まれています。
+* `data` 引数には現在のリクエストボディが含まれます。この場合、それは [`ByteReadChannel`](https://api.ktor.io/ktor-io/io.ktor.utils.io/-byte-read-channel/index.html) であり、`ByteReadChannel.readLine()` がその内容を読み取ります。
+* 要求された型が `Int` の場合、プラグインは受信した値を整数に変換して `1` を加え、変換された値を返します。それ以外の場合は、ボディを変更せずにそのまま返します。
 
-> 完全な例については、[DataTransformationPlugin.kt](https://github.com/ktorio/ktor-documentation/blob/%ktor_version%/codeSnippets/snippets/custom-plugin/src/main/kotlin/com/example/plugins/DataTransformationPlugin.kt)を参照してください。
+> 完全な例については、[DataTransformationPlugin.kt](https://github.com/ktorio/ktor-documentation/blob/%ktor_version%/codeSnippets/snippets/custom-plugin/src/main/kotlin/com/example/plugins/DataTransformationPlugin.kt) を参照してください。
 >
 {style="tip"}
 
 ### `onCallRespond()` {id="on-call-respond"}
 
-`onCallRespond()`ハンドラーを使用すると、クライアントに送信される前にデータを変換できます。
-このハンドラーは、ルートハンドラーで`call.respond`関数が呼び出されたときに実行されます。
+`onCallRespond()` ハンドラーを使用すると、データをクライアントに送信する前に変換できます。
+このハンドラーは、ルートハンドラーで `call.respond` 関数が呼び出されたときに実行されます。
 
-例えば、以下のルートを考えてみます。
+例えば、次のルートを考えてみましょう。
 
 ```kotlin
 post("/transform-data") {
@@ -183,9 +183,9 @@ post("/transform-data") {
 }
 ```
 
-`call.respond`を呼び出すと`onCallRespond()`が呼び出され、クライアントに送信されるデータを変換できるようになります。
+`call.respond` を呼び出すと `onCallRespond()` がトリガーされ、クライアントに送信されるデータを変換できるようになります。
 
-`onCallRespond()`内では、`transformBody()`を使用してレスポンスボディを変換します。以下の例では、整数のレスポンスに`1`を加算し、それを文字列に変換します。
+`onCallRespond()` の内部では、`transformBody()` を使用してレスポンスボディを変換します。次の例では、整数のレスポンスに `1` を加算し、それを文字列に変換します。
 
 ```kotlin
 onCallRespond { call ->
@@ -199,17 +199,17 @@ onCallRespond { call ->
 }
 ```
 
-> 完全な例については、[DataTransformationPlugin.kt](https://github.com/ktorio/ktor-documentation/blob/%ktor_version%/codeSnippets/snippets/custom-plugin/src/main/kotlin/com/example/plugins/DataTransformationPlugin.kt)を参照してください。
+> 完全な例については、[DataTransformationPlugin.kt](https://github.com/ktorio/ktor-documentation/blob/%ktor_version%/codeSnippets/snippets/custom-plugin/src/main/kotlin/com/example/plugins/DataTransformationPlugin.kt) を参照してください。
 >
 {style="tip"}
 
 ### `onCallValidators()` {id="on-call-validators"}
 
-`onCallValidators()`ハンドラーを使用すると、受信コールごとにバリデーションを実行できます。
+`onCallValidators()` ハンドラーを使用すると、着信する各コールに対して検証を実行できます。
 
-複数のバリデータがネストされたルートに適用されている場合、親ルートのバリデータは子ルートのバリデータの前に実行されます。これにより、バリデータは認証されたプリンシパルなど、ルート階層のより上位で生成された情報を使用できます。
+複数のバリデータがネストされたルートに適用されている場合、親ルートのバリデータが子ルートのバリデータよりも前に実行されます。これにより、バリデータは認証されたプリンシパルなど、ルート階層の上位で生成された情報を利用できます。
 
-例えば、以下のルートスコーププラグインは、認証ルートによって提供されたプリンシパルにアクセスできます。
+例えば、次のルートスコーププラグインは、認証ルートによって提供されたプリンシパルにアクセスできます。
 
 ```kotlin
 package com.example.plugins
@@ -230,7 +230,7 @@ val UserValidationPlugin = createRouteScopedPlugin("UserValidationPlugin") {
 
 ```
 
-認証後に実行されるよう、認証ルート内にプラグインをインストールします。
+認証後にプラグインを実行するには、認証ルート内にプラグインをインストールします。
 
 ```kotlin
 routing {
@@ -243,21 +243,21 @@ routing {
 }
 ```
 
-ルートスコープのバリデーションの順序が重要な場合は、`onCallValidators()`を使用してください。他のバリデータに依存しない一般的なリクエストおよびレスポンスの処理には、代わりに`onCall()`を使用します。
+ルートスコープの検証の順序が重要である場合は、`onCallValidators()` を使用してください。他のバリデータに依存しない一般的なリクエストおよびレスポンス処理には、代わりに `onCall()` を使用します。
 
 ### その他の便利なハンドラー {id="other"}
 
-上記のコールハンドラーに加えて、Ktorはコール処理の他の段階を処理するための一連のフックを提供します。特定の`Hook`に対するハンドラーを登録するには、`on()`関数を使用します。
+上記で説明したコールハンドラーに加えて、Ktor はコール処理の他のステージを処理するための一連のフックを提供しています。特定の `Hook` に対するハンドラーを登録するには、`on()` 関数を使用します。
 
 利用可能なフックには以下が含まれます。
 
 - `CallSetup`: コール処理の開始時に呼び出されます。
 - `ResponseBodyReadyForSend`: レスポンスボディがすべての変換を通過し、送信準備が整った後に呼び出されます。
 - `ResponseSent`: レスポンスがクライアントに正常に送信された後に呼び出されます。
-- `CallFailed`: コール処理が例外で失敗したときに呼び出されます。
-- [`AuthenticationChecked`](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-authentication-checked/index.html): [認証](server-auth.md)の資格情報が確認された後に呼び出されます。このフックを使用して認可を実装できます。例については、[custom-plugin-authorization](https://github.com/ktorio/ktor-documentation/blob/%ktor_version%/codeSnippets/snippets/custom-plugin-authorization)を参照してください。
+- `CallFailed`: コール処理が例外により失敗したときに呼び出されます。
+- [`AuthenticationChecked`](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-authentication-checked/index.html): [認証](server-auth.md)資格情報がチェックされた後に呼び出されます。このフックを使用して認可（Authorization）を実装できます。例については、[custom-plugin-authorization](https://github.com/ktorio/ktor-documentation/blob/%ktor_version%/codeSnippets/snippets/custom-plugin-authorization) を参照してください。
 
-以下の例は、`CallSetup`フックを処理する方法を示しています。
+次の例では、`CallSetup` フックを処理します。
 
 ```kotlin
 on(CallSetup) { call->
@@ -265,16 +265,16 @@ on(CallSetup) { call->
 }
 ```
 
-> アプリケーションの起動や停止などの[アプリケーションイベントを処理](#handle-app-events)するために、`MonitoringEvent`を使用することもできます。
+> `MonitoringEvent` を使用して、アプリケーションの起動やシャットダウンなどの[アプリケーションイベントを処理](#handle-app-events)することもできます。
 > 
 {style="tip"}
 
 ### コールの状態を共有する {id="call-state"}
 
-カスタムプラグインでは、異なるハンドラー間でコールに関連付けられた値を共有できます。
-これらの値は、一意の`AttributeKey`を使用して`call.attributes`コレクションに保存されます。
+カスタムプラグインは、固有の `AttributeKey` を使用して、コールに関連付けられた値を異なるハンドラー間で共有できます。
+これらの値は、`call.attributes` コレクションに保存されます。
 
-以下の例では、`onCall()`が呼び出された時刻を保存し、それを`onCallReceive()`で使用してリクエストボディが読み取られるまでの遅延を計算しています。
+次の例では、`onCall()` が呼び出された時刻を保存し、`onCallReceive()` でそれを使用してリクエストボディが読み取られるまでの遅延を計算します。
 
 ```kotlin
 val DataTransformationBenchmarkPlugin = createApplicationPlugin(name = "DataTransformationBenchmarkPlugin") {
@@ -292,26 +292,26 @@ val DataTransformationBenchmarkPlugin = createApplicationPlugin(name = "DataTran
 }
 ```
 
-`POST`リクエストを送信すると、プラグインはコンソールに遅延を表示します。
+`POST` リクエストを送信すると、プラグインはコンソールに遅延を出力します。
 
 ```Bash
 Request URL: http://localhost:8080/transform-data
 Read body delay (ms): 52
 ```
 
-> 完全な例については、[DataTransformationBenchmarkPlugin.kt](https://github.com/ktorio/ktor-documentation/blob/%ktor_version%/codeSnippets/snippets/custom-plugin/src/main/kotlin/com/example/plugins/DataTransformationBenchmarkPlugin.kt)を参照してください。
+> 完全な例については、[DataTransformationBenchmarkPlugin.kt](https://github.com/ktorio/ktor-documentation/blob/%ktor_version%/codeSnippets/snippets/custom-plugin/src/main/kotlin/com/example/plugins/DataTransformationBenchmarkPlugin.kt) を参照してください。
 >
 {style="tip"}
 
-> [ルートハンドラー](server-requests.md#request_information)からコールの属性にアクセスすることもできます。
+> コール属性には[ルートハンドラー](server-requests.md#request_information)からもアクセスできます。
 > 
 {style="tip"}
 
 ## アプリケーションイベントを処理する {id="handle-app-events"}
 
-[`on()`](#other)ハンドラーは、`MonitoringEvent`フックを使用してアプリケーションのライフサイクルに関連するイベントを処理する機能を提供します。
+[`on()`](#other) ハンドラーを使用すると、`MonitoringEvent` フックを使用してアプリケーションのライフサイクルに関連するイベントを処理できます。
 
-Ktorは、以下の[事前定義されたイベント](server-events.md#predefined-events)を`on()`ハンドラーに提供します。
+Ktor は、`on()` ハンドラー向けに以下の[定義済みイベント](server-events.md#predefined-events)を提供しています。
 
 - `ApplicationStarting`
 - `ApplicationStarted`
@@ -319,7 +319,7 @@ Ktorは、以下の[事前定義されたイベント](server-events.md#predefin
 - `ApplicationStopping`
 - `ApplicationStopped`
 
-以下の例は、`ApplicationStopped`イベントを使用してアプリケーションのシャットダウンを処理する方法を示しています。
+次の例では、`ApplicationStopped` イベントを使用してアプリケーションのシャットダウンを処理します。
 
 ```kotlin
 package com.example.plugins
@@ -350,12 +350,12 @@ val NotFoundEvent: EventDefinition<ApplicationCall> = EventDefinition()
 
 ```
 
-このアプローチは、接続の切断、バックグラウンドタスクの停止、バッファリングされたデータのフラッシュなど、プラグインが保持するリソースをクリーンアップするのに役立ちます。
+このアプローチは、接続の切断、バックグラウンドタスクの停止、バッファリングされたデータのフラッシュなど、プラグインが所有するリソースをクリーンアップするのに役立ちます。
 
-## プラグインの設定を提供する {id="plugin-configuration"}
+## プラグイン設定を提供する {id="plugin-configuration"}
 
 [カスタムヘッダー](#custom-header)の例では、各レスポンスに定義済みのヘッダーを追加するプラグインを作成しました。
-このプラグインを再利用可能にするために、ユーザーがヘッダー名と値を指定できるようにする設定を定義します。
+このプラグインを再利用可能にするには、ユーザーがヘッダーの名前と値を指定できる設定を定義します。
 
 1. 設定クラスを定義します。
 
@@ -366,7 +366,7 @@ val NotFoundEvent: EventDefinition<ApplicationCall> = EventDefinition()
    }
    ```
 
-2. 設定クラスの参照を`createApplicationPlugin()`に渡します。
+2. 設定クラスの参照を `createApplicationPlugin()` に渡します。
 
    ```kotlin
    val CustomHeaderPlugin = createApplicationPlugin(
@@ -383,7 +383,7 @@ val NotFoundEvent: EventDefinition<ApplicationCall> = EventDefinition()
    }
    ```
 
-   プラグインの設定プロパティはプラグインのインストール時に変更可能です（mutable）。プラグインがハンドラー内でこれらの値を使用する場合は、プラグイン本体内のローカル変数に保存してください。
+   プラグイン設定のプロパティは、プラグインのインストール中に変更可能です。プラグインがハンドラー内でこれらの値を使用する場合は、プラグインのボディ内でローカル変数に格納してください。
 
 3. プラグインをインストールして設定します。
 
@@ -394,17 +394,17 @@ val NotFoundEvent: EventDefinition<ApplicationCall> = EventDefinition()
    }
    ```
 
-> 完全な例については、[CustomHeaderPlugin.kt](https://github.com/ktorio/ktor-documentation/blob/%ktor_version%/codeSnippets/snippets/custom-plugin/src/main/kotlin/com/example/plugins/CustomHeaderPlugin.kt)を参照してください。
+> 完全な例については、[CustomHeaderPlugin.kt](https://github.com/ktorio/ktor-documentation/blob/%ktor_version%/codeSnippets/snippets/custom-plugin/src/main/kotlin/com/example/plugins/CustomHeaderPlugin.kt) を参照してください。
 >
 {style="tip"}
 
 ### ファイルでの設定 {id="configuration-file"}
 
-Ktorは[設定ファイル](server-create-and-configure.topic#engine-main)からプラグイン設定を読み込むことができます。
+Ktor は、[設定ファイル](server-create-and-configure.topic#engine-main)からプラグイン設定を読み込むことができます。
 
-以下の例は、ファイルから`CustomHeaderPlugin`を設定する方法を示しています。
+以下の例は、ファイルから `CustomHeaderPlugin` を設定する方法を示しています。
 
-1. `application.conf`または`application.yaml`ファイルに、プラグイン設定を含む新しいグループを追加します。
+1. `application.conf` または `application.yaml` ファイルに、プラグイン設定を含む新しいグループを追加します。
 
    <Tabs group="config">
    <TabItem title="application.conf" group-key="hocon">
@@ -431,10 +431,10 @@ Ktorは[設定ファイル](server-create-and-configure.topic#engine-main)から
    </TabItem>
    </Tabs>
 
-   この例では、プラグイン設定は`http.custom_header`グループに保存されています。
+   この例では、プラグイン設定は `http.custom_header` グループに格納されています。
 
-2. 設定ファイルのプロパティにアクセスするには、設定クラスのコンストラクタに`ApplicationConfig`を渡します。
-   `tryGetString()`関数は、指定されたプロパティの値を返します。
+2. 設定ファイルのプロパティにアクセスするには、設定クラスのコンストラクタに `ApplicationConfig` を渡します。
+   `tryGetString()` 関数は、指定されたプロパティの値を返します。
 
    ```kotlin
    class CustomHeaderConfiguration(config: ApplicationConfig) {
@@ -443,7 +443,7 @@ Ktorは[設定ファイル](server-create-and-configure.topic#engine-main)から
    }
    ```
 
-3. `createApplicationPlugin()`関数の`configurationPath`パラメータに`http.custom_header`の値を割り当てます。
+3. `createApplicationPlugin()` 関数の `configurationPath` パラメータに `http.custom_header` の値を割り当てます。
 
    ```kotlin
    val CustomHeaderPluginConfigurable = createApplicationPlugin(
@@ -461,19 +461,19 @@ Ktorは[設定ファイル](server-create-and-configure.topic#engine-main)から
    }
    ```
 
-> 完全な例については、[CustomHeaderPluginConfigurable.kt](https://github.com/ktorio/ktor-documentation/blob/%ktor_version%/codeSnippets/snippets/custom-plugin/src/main/kotlin/com/example/plugins/CustomHeaderPluginConfigurable.kt)を参照してください。
+> 完全な例については、[CustomHeaderPluginConfigurable.kt](https://github.com/ktorio/ktor-documentation/blob/%ktor_version%/codeSnippets/snippets/custom-plugin/src/main/kotlin/com/example/plugins/CustomHeaderPluginConfigurable.kt) を参照してください。
 >
 {style="tip"}
 
-## アプリケーション設定へのアクセス {id="app-settings"}
+## アプリケーション設定にアクセスする {id="app-settings"}
 
-カスタムプラグインは、プラグイン本体からアプリケーションレベルの設定にアクセスできます。これは、プラグインの動作がサーバーの設定や環境に依存する場合に役立ちます。
+カスタムプラグインは、プラグインのボディからアプリケーションレベルの設定にアクセスできます。これは、プラグインの動作がサーバーの設定や環境に依存する場合に役立ちます。
 
 ### 設定 {id="config"}
 
-サーバー設定にアクセスするには、`applicationConfig`プロパティを使用します。このプロパティは[`ApplicationConfig`](https://api.ktor.io/ktor-server-core/io.ktor.server.config/-application-config/index.html)インスタンスを返します。
+サーバー設定にアクセスするには、`applicationConfig` プロパティを使用します。このプロパティは [`ApplicationConfig`](https://api.ktor.io/ktor-server-core/io.ktor.server.config/-application-config/index.html) インスタンスを返します。
 
-以下の例は、サーバーで使用されているホストとポートを読み取ります。
+次の例では、サーバーで使用されているホストとポートを読み取ります。
 
 ```kotlin
 val SimplePlugin = createApplicationPlugin(name = "SimplePlugin") {
@@ -485,7 +485,7 @@ val SimplePlugin = createApplicationPlugin(name = "SimplePlugin") {
 
 ### 環境 {id="environment"}
 
-アプリケーションの環境にアクセスするには、`environment`プロパティを使用します。例えば、[開発モード](server-development-mode.topic)が有効になっているかどうかを確認できます。
+アプリケーションの環境にアクセスするには、`environment` プロパティを使用します。例えば、[開発モード](server-development-mode.topic)が有効になっているかどうかを確認できます。
 
 ```kotlin
 val SimplePlugin = createApplicationPlugin(name = "SimplePlugin") {
@@ -500,11 +500,11 @@ val SimplePlugin = createApplicationPlugin(name = "SimplePlugin") {
 
 ## その他 {id="misc"}
 
-### プラグインの状態を保存する {id="plugin-state"}
+### プラグインの状態を保持する {id="plugin-state"}
 
-プラグインは、プラグイン本体で値をキャプチャし、それをハンドラーのラムダから使用することで状態を保存できます。
+プラグインは、プラグインのボディで値をキャプチャし、それをハンドラーのラムダから使用することで状態を保持できます。
 
-プラグインは複数のコールを同時に処理できるため、共有される可変（mutable）な状態は、並行コレクションやアトミック型などのスレッドセーフな構造に保存してください。
+プラグインは複数のコールを同時に処理できるため、共有される可変状態は並行コレクションやアトミック型などのスレッドセーフな構造に格納してください。
 
 ```kotlin
 val SimplePlugin = createApplicationPlugin(name = "SimplePlugin") {
@@ -520,23 +520,23 @@ val SimplePlugin = createApplicationPlugin(name = "SimplePlugin") {
 
 ### データベース {id="databases"}
 
-#### 中断可能なデータベースAPIを使用する {id="use-suspending-database-apis"}
+#### 中断データベース API を使用する {id="use-suspending-database-apis"}
 
-カスタムプラグインのすべてのハンドラーは中断関数（suspending function）です。これは、ハンドラーから中断可能なデータベースAPIを直接呼び出せることを意味します。
+すべてのカスタムプラグインハンドラーは中断関数（suspending function）です。つまり、ハンドラーから直接中断データベース API を呼び出すことができます。
 
-特定のコールにスコープされたリソースの解放を忘れないようにしてください。例えば、レスポンスが送信された後にリソースをクリーンアップするために[`on(ResponseSent)`](#other)を使用できます。
+特定のコールにスコープされたリソースは必ず解放してください。例えば、[`on(ResponseSent)`](#other) を使用して、レスポンスが送信された後にリソースをクリーンアップできます。
 
-#### ブロッキングデータベースAPIを使用する {id="use-blocking-database-apis"}
+#### ブロッキングデータベース API を使用する {id="use-blocking-database-apis"}
 
-Ktorはコルーチンを使用しているため、ブロッキングなデータベース呼び出しはデフォルトのコルーチンディスパッチャで実行すべきではありません。ブロッキング呼び出しはスレッドを占有し、他のコルーチンの進行を妨げる可能性があります。
+Ktor はコルーチンを使用しているため、ブロッキングを伴うデータベースの呼び出しをデフォルトのコルーチンディスパッチャーで実行するべきではありません。ブロッキング呼び出しはスレッドを占有し、他のコルーチンの進行を妨げる可能性があります。
 
-ブロッキングなデータベースAPIを呼び出すには、ブロッキング処理用に別の[`CoroutineContext`](https://kotlinlang.org/docs/coroutine-context-and-dispatchers.html)を作成します。
+ブロッキングデータベース API を呼び出すには、ブロッキング処理用に別の [`CoroutineContext`](https://kotlinlang.org/docs/coroutine-context-and-dispatchers.html) を作成します。
 
 ```kotlin
 val databaseContext = Dispatchers.IO
 ```
 
-次に、ブロッキングなデータベース呼び出しをそれぞれ`withContext()`でラップします。
+その後、各ブロッキングデータベース呼び出しを `withContext()` でラップします。
 
 ```kotlin
 onCall {

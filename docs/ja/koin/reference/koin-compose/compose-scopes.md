@@ -4,169 +4,180 @@ title: Compose におけるスコープ
 
 # Compose におけるスコープ
 
-Koin は、シンプルな Composable に紐づくスコープから、ナビゲーションに統合されたスコープまで、Compose アプリケーション内のスコープを管理するためのいくつかの API を提供します。
+このページでは、UI ツリーの一部に対して Koin スコープを開く Compose 関数（`KoinScope`、`KoinNavigationScope`、`UnboundKoinScope`、および Android 向けの `KoinActivityScope`、`KoinFragmentScope`）について説明します。このようなブロック内では、`koinInject()` や `koinViewModel()` はそのスコープから解決されます。スコープの仕組みや宣言方法については、[スコープ](/docs/reference/koin-core/scopes)で解説しています。
+
+このページにあるほとんどの関数には `@KoinExperimentalAPI` のアノテーションが付いています。`@OptIn(KoinExperimentalAPI::class)` を使用してオプトインしてください。
 
 ## KoinScope {id="koinscope"}
 
-Composable のライフサイクルに紐づく Koin スコープを作成します：
+`KoinScope` はスコープを取得または作成し、それを子要素に提供し、Composable がコンポジションから離脱したときにスコープをクローズします。
 
+スコープを宣言します:
+
+**コンパイラプラグイン DSL**
 ```kotlin
+class FeatureScope
+
 val featureModule = module {
     scope<FeatureScope> {
         scoped<FeatureCache>()
         scoped<FeatureRepository>()
     }
 }
+```
+
+**アノテーション**
+```kotlin
+class FeatureScope
+
+@Scope(FeatureScope::class)
+class FeatureCache
+
+@Scope(FeatureScope::class)
+class FeatureRepository(private val cache: FeatureCache)
+```
+
+**コンストラクタ / クラシック DSL**
+```kotlin
+class FeatureScope
+
+val featureModule = module {
+    scope<FeatureScope> {
+        scopedOf(::FeatureCache)
+        scopedOf(::FeatureRepository)
+    }
+}
+```
+
+Compose 内でスコープを開きます:
+
+```kotlin
+import org.koin.compose.scope.KoinScope
 
 @Composable
 fun FeatureScreen() {
-    KoinScope(scopeOf<FeatureScope>()) {
-        // すべての子コンポーネントがスコープ内の依存関係にアクセスできます
+    KoinScope<FeatureScope>(scopeID = "feature") {
         FeatureContent()
     }
 }
 
 @Composable
 fun FeatureContent() {
-    // 親の KoinScope から解決されます
-    val cache = koinInject<FeatureCache>()
+    val repository = koinInject<FeatureRepository>() // FeatureScope から解決される
 }
 ```
 
-スコープは、Composable が Composition から離れるとき（`onForgotten` または `onAbandoned` 時）に自動的にクローズされます。
+`KoinScope` には 3 つの形式があります:
 
-## KoinNavigationScope {id="koinnavigationscope"}
+| 形式 | スコープ |
+|------|-------|
+| `KoinScope<T>(scopeID) { }` | その ID を持ち、型 `T` で修飾されたスコープを取得または作成する |
+| `KoinScope(scopeID, scopeQualifier) { }` | その ID と修飾子を持つスコープを取得または作成する |
+| `KoinScope(scopeDefinition = { createScope(...) }) { }` | `Koin` インスタンス上で実行されるラムダによって返されるスコープ |
 
-ナビゲーションのバックスタックエントリに紐づくスコープを作成します：
+スコープは、Composable が忘れられた（コンポジションから離脱した）場合、または破棄（abandon）された場合にクローズされます。ルートスコープがクローズされることはありません。
+
+### 複数画面のフロー {id="multi-screen-flows"}
+
+チェックアウトなどのフローの画面間でスコープ付きオブジェクトを共有するには、`NavHost` の上に `KoinScope` を配置します:
 
 ```kotlin
-val appModule = module {
-    // ナビゲーションスコープの依存関係を定義
-    navigationScope {
-        scoped<ScreenRepository>()
-        scoped<ScreenCache>()
-        viewModel<ScreenViewModel>()
-    }
-}
-
-// NavHost 内
-NavHost(navController, startDestination = "home") {
-    composable("detail/{id}") { backStackEntry ->
-        KoinNavigationScope(backStackEntry) {
-            DetailScreen()
+@Composable
+fun CheckoutFlow() {
+    KoinScope<CheckoutFlowScope>(scopeID = "checkout") {
+        NavHost(navController, startDestination = CartRoute) {
+            composable<CartRoute> { CartScreen() }
+            composable<PaymentRoute> { PaymentScreen() }
         }
     }
 }
 
 @Composable
-fun DetailScreen() {
-    // このナビゲーション先にスコープされた依存関係
-    val repository = koinInject<ScreenRepository>()
-    val viewModel = koinViewModel<ScreenViewModel>()
+fun PaymentScreen() {
+    val state = koinInject<CheckoutState>() // CartScreen と同じ CheckoutState
 }
 ```
 
-**主な特徴:**
-- スコープ ID は `NavBackStackEntry.id` から派生します。
-- スコープはナビゲーションが破棄されたときにのみクローズされます（再構成（recomposition）時ではありません）。
-- 画面ごとの依存関係に最適です。
+`CheckoutFlow` がコンポジションから離脱すると、スコープはクローズされます。
 
-:::info
-`koin-compose-viewmodel-navigation` パッケージが必要です。
+:::note
+スコープ内で宣言された `viewModel` は、引き続き現在の `ViewModelStoreOwner` に保存されます。`NavHost` 内では、各デスティネーションが独自の ViewModel インスタンスを取得します。画面間で状態を共有するには、`CheckoutState` などの `scoped` オブジェクトを使用するか、`sharedKoinViewModel()` を使用してください（[Compose における ViewModel](/docs/reference/koin-compose/compose-viewmodel) を参照）。
 :::
 
-### navigationScope DSL {id="navigationscope-dsl"}
+## rememberKoinScope {id="rememberkoinscope"}
 
-モジュール内でナビゲーションスコープの依存関係を定義します：
+`rememberKoinScope(scope)` は、作成したスコープを子要素に提供することなく、コンポジションにバインドします。スコープは Composable がコンポジションから離脱したときにクローズされます:
 
 ```kotlin
+@Composable
+fun FeatureScreen() {
+    val koin = getKoin()
+    val scope = rememberKoinScope(remember { koin.createScope<FeatureScope>("feature") })
+    val repository = koinInject<FeatureRepository>(scope = scope)
+}
+```
+
+## KoinNavigationScope {id="koinnavigationscope"}
+
+`KoinNavigationScope` は、Navigation Compose のデスティネーションごとに 1 つのスコープを開きます。これは `io.insert-koin:koin-compose-viewmodel-navigation` に含まれています。
+
+`navigationScope { }` を使用して定義を宣言します。これにより、`NavBackStackEntry` で修飾されたスコープが作成されます:
+
+```kotlin
+import org.koin.module.dsl.navigationScope
+
 val appModule = module {
-    // ナビゲーション先にスコープされた依存関係
     navigationScope {
-        scoped<ScreenRepository>()
         scoped<ScreenStateHolder>()
         viewModel<ScreenViewModel>()
     }
 }
 ```
 
-これにより、`KoinNavigationScope()` で使用するための `NavBackStackEntry` で修飾されたスコープが作成されます。
+アノテーションやコンストラクタ DSL を使用する場合は、DSL モジュール内で同じ `navigationScope { }` ブロックを使用します（コンストラクタ DSL では `scopedOf(::ScreenStateHolder)` を使用）。このスコープ用のアノテーションはありません。
 
-## UnboundKoinScope {id="unboundkoinscope"}
-
-ライフサイクルの紐付けなしで、外部で管理されるスコープを提供します：
+各デスティネーションをラップします:
 
 ```kotlin
-@Composable
-fun MyFeature(externalScope: Scope) {
-    UnboundKoinScope(scope = externalScope) {
-        // 子コンポーネントはスコープにアクセス可能
-        val service = koinInject<MyService>()
-        FeatureContent()
+NavHost(navController, startDestination = ListRoute) {
+    composable<ListRoute> { entry ->
+        KoinNavigationScope(entry) {
+            ListScreen() // 独自の ScreenStateHolder
+        }
     }
-}
-```
-
-:::warning
-**注意が必要な API** - スコープは自動的にクローズされません。メモリリークを防ぐために、スコープのライフサイクルを手動で管理する必要があります。
-:::
-
-**ユースケース:**
-- 外部システムによって管理されるスコープ
-- 複数の Composable ツリー間で共有されるスコープ
-- スコープのライフサイクルが Composable のライフサイクルと一致しない場合
-
-```kotlin
-@Composable
-fun MyFeature(externalScope: Scope, onClose: () -> Unit) {
-    UnboundKoinScope(scope = externalScope) {
-        FeatureContent()
-
-        // 必要に応じて手動でクリーンアップ
-        DisposableEffect(Unit) {
-            onDispose { onClose() }
+    composable<DetailRoute> { entry ->
+        KoinNavigationScope(entry) {
+            DetailScreen() // 別の ScreenStateHolder
         }
     }
 }
 ```
 
-## currentKoinScope {id="currentkoinscope"}
+スコープ ID は `NavBackStackEntry.id` です。デスティネーションがコンポジションから離脱してもスコープはクローズされないため、エントリがバックスタックに残っている間は存続します。コンポジションが破棄（abandon）された場合にのみクローズされます。
 
-Composition から現在の Koin スコープを取得します：
+:::warning
+`KoinNavigationScope` は、コンポジションの Koin ではなく、グローバルの Koin インスタンス（`KoinPlatform.getKoin()`）内にスコープを作成します。そのため、`KoinIsolatedContext` 内では動作しません。
+:::
+
+## UnboundKoinScope {id="unboundkoinscope"}
+
+`UnboundKoinScope` は、独自に管理するスコープを提供します。Koin がこれをクローズすることはありません:
 
 ```kotlin
+@OptIn(KoinDelicateAPI::class, KoinExperimentalAPI::class)
 @Composable
-fun MyScreen() {
-    val scope = currentKoinScope()
-
-    // スコープを直接使用
-    val service = scope.get<MyService>()
+fun SessionArea(sessionScope: Scope) {
+    UnboundKoinScope(scope = sessionScope) {
+        SessionContent()
+    }
 }
 ```
 
-これは `LocalKoinScopeContext` からスコープを取得します。`koinInject()` で使用されるデフォルトのスコープです。
+スコープのライフタイムが UI ツリーに従わない場合（ログイン時に開かれるユーザーセッション、複数のコンポジションルートで共有されるスコープなど）に使用します。これには `@KoinDelicateAPI` のマークが付いています。手動で `scope.close()` を呼び出さない限り、スコープとそのインスタンスがメモリ上に残り続けます。
 
-## rememberKoinScope {id="rememberkoinscope"}
+## Android のスコープ {id="android-scopes"}
 
-自動ライフサイクル管理機能を備えた、再構成（recomposition）をまたいで Koin スコープを保持（remember）します：
-
-```kotlin
-@Composable
-fun FeatureScreen() {
-    val scope = rememberKoinScope(scopeOf<FeatureScope>())
-
-    // インジェクションにスコープを使用
-    val repository = scope.get<FeatureRepository>()
-
-    // FeatureScreen が Composition から離れるとき、スコープはクローズされます
-}
-```
-
-## Android 固有のスコープ {id="android-specific-scopes"}
-
-### KoinActivityScope {id="koinactivityscope"}
-
-Activity スコープを Composable 階層に提供します：
+これらの関数は `io.insert-koin:koin-androidx-compose`（`KoinActivityScope`、`KoinFragmentScope`）および `koin-compose` の Android ターゲット（`koinActivityInject`）に含まれています。Activity または Fragment は `AndroidScopeComponent` を実装している必要があります。Activity および Fragment スコープの宣言については、[Android のスコープ](/docs/reference/koin-android/scope)で解説しています。
 
 ```kotlin
 class MainActivity : ComponentActivity(), AndroidScopeComponent {
@@ -176,7 +187,6 @@ class MainActivity : ComponentActivity(), AndroidScopeComponent {
         super.onCreate(savedInstanceState)
         setContent {
             KoinActivityScope {
-                // すべての子コンポーネントが Activity のスコープにアクセス可能
                 MainScreen()
             }
         }
@@ -185,168 +195,38 @@ class MainActivity : ComponentActivity(), AndroidScopeComponent {
 
 @Composable
 fun MainScreen() {
-    // Activity のスコープから解決
-    val presenter = koinInject<ActivityPresenter>()
+    val presenter = koinInject<MainPresenter>() // Activity スコープから解決される
 }
 ```
 
-### KoinFragmentScope {id="koinfragmentscope"}
+`KoinFragmentScope { }` は、Fragment がホストする `ComposeView` 内で同様の動作をします。
 
-Fragment スコープを Composable 階層に提供します：
-
-```kotlin
-class MyFragment : Fragment(), AndroidScopeComponent {
-    override val scope: Scope by fragmentScope()
-
-    override fun onCreateView(...): View {
-        return ComposeView(requireContext()).apply {
-            setContent {
-                KoinFragmentScope {
-                    FragmentScreen()
-                }
-            }
-        }
-    }
-}
-```
-
-### koinActivityInject {id="koinactivityinject"}
-
-任意の Composable 内で Activity スコープからインジェクトします：
+`koinActivityInject()` は、ラッピングブロックなしで、任意の深さから Activity スコープを解決します:
 
 ```kotlin
-val appModule = module {
-    scope<MainActivity> {
-        scoped<SessionManager>()
-    }
-}
-
 @Composable
 fun DeepNestedScreen() {
-    // ツリー内のどこからでも Activity のスコープから解決
-    val sessionManager: SessionManager = koinActivityInject()
+    val session: SessionManager = koinActivityInject()
 }
 ```
 
-## スコープの比較 {id="scope-comparison"}
+`LocalActivity` が `AndroidScopeComponent` を実装していない場合、これは失敗します。
 
-| API | ライフサイクル | ユースケース |
-|-----|-----------|----------|
-| `KoinScope` | Composable | カスタムスコープを持つ Composable |
-| `KoinNavigationScope` | NavBackStackEntry | ナビゲーション先ごとのスコープ |
-| `UnboundKoinScope` | 手動 | 外部スコーププロバイダー |
-| `KoinActivityScope` | Activity | Activity 全体の依存関係 |
-| `KoinFragmentScope` | Fragment | Fragment 全体の依存関係 |
+## 比較 {id="comparison"}
 
-## ユースケース {id="use-cases"}
+| API | スコープのライフタイム | クローズを行う主体 |
+|-----|----------------|-----------|
+| `KoinScope` | Composable | Koin（Composable がコンポジションから離脱したとき） |
+| `rememberKoinScope` | Composable | Koin（Composable がコンポジションから離脱したとき） |
+| `KoinNavigationScope` | バックスタックエントリ | Koin（コンポジションが破棄された場合のみ） |
+| `UnboundKoinScope` | ユーザー自身 | ユーザー |
+| `KoinActivityScope` | Activity | Activity スコープ（`activityScope()`） |
+| `KoinFragmentScope` | Fragment | Fragment スコープ（`fragmentScope()`） |
 
-### 画面ごとのナビゲーションスコープ {id="per-screen-navigation-scopes"}
+## 関連ドキュメント {id="related"}
 
-各画面が独自のスコープを持ちます：
-
-```kotlin
-val appModule = module {
-    navigationScope {
-        scoped<ScreenStateHolder>()
-        viewModel<ScreenViewModel>()
-    }
-}
-
-NavHost(navController, startDestination = "list") {
-    composable("list") { entry ->
-        KoinNavigationScope(entry) {
-            ListScreen() // 独自の ScreenStateHolder を持つ
-        }
-    }
-    composable("detail/{id}") { entry ->
-        KoinNavigationScope(entry) {
-            DetailScreen() // 独自の ScreenStateHolder を持つ
-        }
-    }
-}
-```
-
-### セッションスコープのデータ {id="session-scoped-data"}
-
-セッション内の画面間でデータを共有します：
-
-```kotlin
-val sessionModule = module {
-    scope<UserSession> {
-        scoped { ShoppingCart() }
-        scoped { UserPreferences() }
-    }
-}
-
-@Composable
-fun ShopApp() {
-    KoinScope(scopeOf<UserSession>()) {
-        NavHost(/*...*/) {
-            composable("catalog") { CatalogScreen() }
-            composable("cart") { CartScreen() }
-        }
-    }
-}
-
-@Composable
-fun CartScreen() {
-    // セッション内のすべての画面で同じ ShoppingCart インスタンスを使用
-    val cart = koinInject<ShoppingCart>()
-}
-```
-
-### 共有 ViewModel スコープ {id="shared-viewmodel-scope"}
-
-関連する画面間で ViewModel とその依存関係を共有します：
-
-```kotlin
-val appModule = module {
-    scope<CheckoutFlow> {
-        scoped<CheckoutState>()
-        viewModel<CheckoutViewModel>()
-    }
-}
-
-@Composable
-fun CheckoutFlow() {
-    KoinScope(scopeOf<CheckoutFlow>()) {
-        NavHost(/*...*/) {
-            composable("cart") { CartScreen() }
-            composable("shipping") { ShippingScreen() }
-            composable("payment") { PaymentScreen() }
-            composable("confirmation") { ConfirmationScreen() }
-        }
-    }
-}
-
-// すべての画面で同じ CheckoutViewModel インスタンスを共有
-@Composable
-fun CartScreen() {
-    val viewModel = koinViewModel<CheckoutViewModel>()
-}
-```
-
-## ベストプラクティス {id="best-practices"}
-
-1. **画面ごとの依存関係には `KoinNavigationScope` を使用する** - ナビゲーションに伴う自動ライフサイクル。
-
-2. **`UnboundKoinScope` よりも管理されたスコープを優先する** - 手動クリーンアップを避ける。
-
-3. **モジュール内でナビゲーションスコープを定義する** - インラインでのスコープ作成よりもクリーン。
-   ```kotlin
-   module {
-       navigationScope {
-           scoped<MyRepository>()
-       }
-   }
-   ```
-
-4. **複数画面のフローには `KoinScope` を使用する** - チェックアウト、オンボーディング、ウィザードなど。
-
-5. **複雑な状態には ViewModel と組み合わせる** - スコープは共有状態を保持し、ViewModel は UI ロジックを処理する。
-
-## 次のステップ {id="next-steps"}
-
-- **[動的モジュール](/docs/reference/koin-compose/compose-modules)** - モジュールを動的にロードする
-- **[Compose の概要](/docs/reference/koin-compose/compose)** - セットアップと基本的なインジェクション
-- **[コアスコープ](/docs/reference/koin-core/scopes)** - スコープの概念
+- [スコープ](/docs/reference/koin-core/scopes): スコープの宣言、リンク、クローズ。
+- [Android のスコープ](/docs/reference/koin-android/scope): Activity、Fragment、ViewModel のスコープ。
+- [Compose における ViewModel](/docs/reference/koin-compose/compose-viewmodel): ナビゲーショングラフ全体での ViewModel の共有。
+- [ライフサイクルと状態](/docs/reference/koin-compose/compose-lifecycle): 各 Compose API が何をいつ解放するか。
+- [動的モジュール](/docs/reference/koin-compose/compose-modules): Composable と共にモジュールをロードする。

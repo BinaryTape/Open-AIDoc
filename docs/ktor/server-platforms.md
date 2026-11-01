@@ -1,9 +1,9 @@
-[//]: # (title: 支持的平台)
+[//]: # (title: 受支持的平台)
 
-Ktor 服务器可用于以下由 Kotlin 支持的平台：
+Ktor 服务器可在 Kotlin 支持的以下平台上使用：
 - JVM
 - [Native](server-native.md)
-   > 在 Kotlin/Native 项目中使用 Ktor 需要[新的内存管理器](https://kotlinlang.org/docs/native-memory-manager.html)，该管理器自 Kotlin 1.7.20 起默认启用。
+   > 在 Kotlin/Native 项目中使用 Ktor 需要[新内存管理器](https://kotlinlang.org/docs/native-memory-manager.html)，自 Kotlin 1.7.20 起默认启用。
    >
    {id="newmm-note" style="note"}
 - [JavaScript](https://kotlinlang.org/docs/js-overview.html)

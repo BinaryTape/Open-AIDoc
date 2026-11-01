@@ -1,6 +1,7 @@
 [//]: # (title: HTML DSL)
 
 <var name="artifact_name" value="ktor-server-html-builder"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.server.htmlBuilder"/>
 <tldr>
 <p>
 <b>必要な依存関係</b>: <code>io.ktor:%artifact_name%</code>
@@ -13,21 +14,29 @@
     </a>
 </p>
 <p>
-    <b><Links href="/ktor/server-native" summary="Ktor supports Kotlin/Native and allows you to run a server without an additional runtime or virtual machine.">Native サーバー</Links>のサポート</b>: ✅
+    <b><Links href="server-native.md" summary="KtorはKotlin/Nativeをサポートしており、追加のランタイムや仮想マシンなしでサーバーを実行できます。">Nativeサーバー</Links>のサポート</b>: ✅
 </p>
 </tldr>
 
-HTML DSL は [kotlinx.html](https://github.com/Kotlin/kotlinx.html) ライブラリを Ktor に統合し、HTML ブロックを使用してクライアントにレスポンスを返すことを可能にします。HTML DSL を使用すると、Kotlin で純粋な HTML を記述したり、ビューに変数を挿入したり、テンプレートを使用して複雑な HTML レイアウトを構築したりできます。
+HTML DSLは、[kotlinx.html](https://github.com/Kotlin/kotlinx.html)ライブラリをKtorに統合し、HTMLブロックを使用してクライアントに応答できるようにします。HTML DSLを使用すると、Kotlinで純粋なHTMLを記述したり、変数をビューに埋め込んだり、テンプレートを使用して複雑なHTMLレイアウトを構築したりすることができます。
 
 ## 依存関係の追加 {id="add_dependencies"}
-HTML DSL は[インストール](server-plugins.md#install)の必要はありませんが、`%artifact_name%` アーティファクトが必要です。以下のようにビルドスクリプトに含めることができます。
+HTML DSLは[インストール](server-plugins.md#install)を必要としませんが、`%artifact_name%`アーティファクトが必要です。次のようにビルドスクリプトに含めることができます。
 
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上記のスニペットでは、Ktorの依存関係を指定するために<a href="server-dependencies.topic#using-version-catalog">
+            Ktorバージョンカタログ</a>を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上記のスニペットでは、Ktorの依存関係を指定するために<a href="server-dependencies.topic#using-version-catalog">
+            Ktorバージョンカタログ</a>を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
@@ -35,9 +44,9 @@ HTML DSL は[インストール](server-plugins.md#install)の必要はありま
 </Tabs>
   
 
-## レスポンスで HTML を送信する {id="html_response"}
-HTML レスポンスを送信するには、必要な[ルート](server-routing.md)内で [respondHtml](https://api.ktor.io/ktor-server-html-builder/io.ktor.server.html/respond-html.html) メソッドを呼び出します。
-以下の例は、サンプルの HTML DSL と、クライアントに送信される対応する HTML を示しています。
+## レスポンスでHTMLを送信する {id="html_response"}
+HTMLレスポンスを送信するには、必要な[ルート（route）](server-routing.md)内で[respondHtml](https://api.ktor.io/ktor-server-html-builder/io.ktor.server.html/respond-html.html)メソッドを呼び出します。
+以下の例は、HTML DSLのサンプルと、クライアントに送信される対応するHTMLを示しています。
 
 <Tabs>
 <TabItem title="Kotlin">
@@ -89,7 +98,7 @@ fun Application.module() {
 </TabItem>
 </Tabs>
 
-次の例は、ユーザーから[認証情報](server-form-based-auth.md)を収集するために使用される HTML フォームでレスポンスを返す方法を示しています。
+次の例は、ユーザーから[認証情報](server-form-based-auth.md)を収集するために使用されるHTMLフォームで応答する方法を示しています。
 
 <Tabs>
 <TabItem title="Kotlin">
@@ -140,17 +149,17 @@ get("/login") {
 </TabItem>
 </Tabs>
 
-完全な例については、[auth-form-html-dsl](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/auth-form-html-dsl) を参照してください。
+完全な例については、[auth-form-html-dsl](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/auth-form-html-dsl)を参照してください。
 
-> サーバー側でフォームパラメータを受け取る方法の詳細については、[フォームパラメータ](server-requests.md#form_parameters)を参照してください。
+> サーバー側でのフォームパラメーターの受け取りについての詳細は、[フォームパラメーター](server-requests.md#form_parameters)を参照してください。
 > 
-> kotlinx.html を使用した HTML 生成の詳細については、[kotlinx.html wiki](https://github.com/Kotlin/kotlinx.html/wiki) を参照してください。
+> kotlinx.htmlを使用したHTMLの生成についての詳細は、[kotlinx.html wiki](https://github.com/Kotlin/kotlinx.html/wiki)を参照してください。
 
-## 部分的な HTML の送信 {id="html_fragments"}
+## 部分的なHTMLの送信 {id="html_fragments"}
 
-完全な HTML ドキュメントの生成に加えて、`.respondHtmlPartial()` 関数を使用して HTML フラグメントでレスポンスを返すこともできます。
+完全なHTMLドキュメントの生成に加えて、`.respondHtmlPartial()`関数を使用してHTMLフラグメント（断片）で応答することもできます。
 
-HTML フラグメントは、HTMX のようなライブラリで使用される動的な更新など、完全な `<html>` ドキュメントを必要としない部分的なマークアップを返す場合に便利です。
+HTMLフラグメントは、HTMXのようなライブラリで使用される動的更新など、完全な`<html>`ドキュメントを必要としない部分的なマークアップを返す場合に役立ちます。
 
 <Tabs>
 <TabItem title="Kotlin">
@@ -192,21 +201,21 @@ fun Application.module() {
 </TabItem>
 </Tabs>
 
-この関数は `.respondHtml()` と同様に動作しますが、ルート HTML 要素を追加せずに、ビルダー内で定義したコンテンツのみをレンダリングします。
+この関数は`.respondHtml()`と同様に機能しますが、ルートHTML要素を追加せず、ビルダー内で定義したコンテンツのみをレンダリングします。
 
 ## テンプレート {id="templates"}
 
-単純な HTML の生成に加えて、Ktor は複雑なレイアウトを構築するために使用できるテンプレートエンジンを提供します。HTML ページのさまざまな部分に対してテンプレートの階層を作成できます。たとえば、ページ全体のルートテンプレート、ページヘッダーやフッターの子テンプレートなどです。Ktor はテンプレートを操作するための以下の API を提供しています。
+プレーンなHTMLの生成に加えて、Ktorは複雑なレイアウトを構築するために使用できるテンプレートエンジンを提供しています。ページ全体用のルートテンプレート、ページヘッダーやフッター用の子テンプレートなど、HTMLページのさまざまな部分に対してテンプレートの階層を作成できます。Ktorは、テンプレートを操作するための次のAPIを公開しています。
 
-1. 指定されたテンプレートに基づいて構築された HTML でレスポンスを返すには、[respondHtmlTemplate](https://api.ktor.io/ktor-server-html-builder/io.ktor.server.html/respond-html-template.html) メソッドを呼び出します。
-2. テンプレートを作成するには、[Template](https://api.ktor.io/ktor-server-html-builder/io.ktor.server.html/-template/index.html) インターフェースを実装し、HTML を提供する `Template.apply` メソッドをオーバーライドする必要があります。
-3. 作成されたテンプレートクラス内で、さまざまなコンテンツタイプのプレースホルダーを定義できます。
-    * [Placeholder](https://api.ktor.io/ktor-server-html-builder/io.ktor.server.html/-placeholder/index.html) はコンテンツを挿入するために使用されます。[PlaceholderList](https://api.ktor.io/ktor-server-html-builder/io.ktor.server.html/-placeholder-list/index.html) は、複数回表示されるコンテンツ（例：リストアイテム）を挿入するために使用できます。
-    * [TemplatePlaceholder](https://api.ktor.io/ktor-server-html-builder/io.ktor.server.html/-template-placeholder/index.html) は、子テンプレートを挿入してネストされたレイアウトを作成するために使用できます。
+1. 指定されたテンプレートに基づいて構築されたHTMLで応答するには、[respondHtmlTemplate](https://api.ktor.io/ktor-server-html-builder/io.ktor.server.html/respond-html-template.html)メソッドを呼び出します。
+2. テンプレートを作成するには、[Template](https://api.ktor.io/ktor-server-html-builder/io.ktor.server.html/-template/index.html)インターフェースを実装し、HTMLを提供する`Template.apply`メソッドをオーバーライドする必要があります。
+3. 作成したテンプレートクラス内では、さまざまなコンテンツタイプに対応するプレースホルダーを定義できます。
+    * [Placeholder](https://api.ktor.io/ktor-server-html-builder/io.ktor.server.html/-placeholder/index.html)はコンテンツを挿入するために使用されます。[PlaceholderList](https://api.ktor.io/ktor-server-html-builder/io.ktor.server.html/-placeholder-list/index.html)は、複数回出現するコンテンツ（リスト項目など）を挿入するために使用できます。
+    * [TemplatePlaceholder](https://api.ktor.io/ktor-server-html-builder/io.ktor.server.html/-template-placeholder/index.html)は、子テンプレートを挿入してネストされたレイアウトを作成するために使用できます。
     
 
 ### 例 {id="example"}
-テンプレートを使用して階層的なレイアウトを作成する方法の[例](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/html-templates)を見てみましょう。次のような HTML があると仮定します。
+テンプレートを使用して階層的なレイアウトを作成する方法の[例](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/html-templates)を見てみましょう。次のようなHTMLがあるとします。
 ```html
 <body>
 <h1>Ktor</h1>
@@ -220,13 +229,13 @@ fun Application.module() {
 </article>
 </body>
 ```
-このページのレイアウトを 2 つの部分に分けることができます。
-* ページヘッダー用のルートレイアウトテンプレートと、記事用の子テンプレート。
+このページのレイアウトは2つの部分に分割できます。
+* ページヘッダー用のルートレイアウトテンプレートと記事用の子テンプレート。
 * 記事コンテンツ用の子テンプレート。
 
-これらのレイアウトをステップバイステップで実装してみましょう。
+これらのレイアウトを段階的に実装してみましょう。
   
-1. `respondHtmlTemplate` メソッドを呼び出し、パラメータとしてテンプレートクラスを渡します。この例では、`Template` インターフェースを実装する必要がある `LayoutTemplate` クラスです。
+1. `respondHtmlTemplate`メソッドを呼び出し、パラメーターとしてテンプレートクラスを渡します。この場合、`Template`インターフェースを実装する必要がある`LayoutTemplate`クラスになります。
    ```kotlin
    get("/") {
        call.respondHtmlTemplate(LayoutTemplate()) {
@@ -234,9 +243,9 @@ fun Application.module() {
        }
    }
    ```
-   ブロック内では、テンプレートにアクセスしてそのプロパティ値を指定できます。これらの値は、テンプレートクラスで指定されたプレースホルダーを置き換えます。次のステップで `LayoutTemplate` を作成し、そのプロパティを定義します。
+   ブロック内では、テンプレートにアクセスしてそのプロパティ値を指定できます。これらの値は、テンプレートクラスで指定されたプレースホルダーを置き換えます。次のステップで`LayoutTemplate`を作成し、そのプロパティを定義します。
   
-2. ルートレイアウトテンプレートは以下のようになります。
+2. ルートレイアウトテンプレートは次のようになります。
    ```kotlin
    class LayoutTemplate: Template<HTML> {
        val header = Placeholder<FlowContent>()
@@ -252,11 +261,11 @@ fun Application.module() {
    }
    ```
 
-   このクラスは 2 つのプロパティを公開しています。
-   * `header` プロパティは、`h1` タグ内に挿入されるコンテンツを指定します。
-   * `content` プロパティは、記事コンテンツ用の子テンプレートを指定します。
+   このクラスは2つのプロパティを公開します。
+   * `header`プロパティは、`h1`タグ内に挿入されるコンテンツを指定します。
+   * `content`プロパティは、記事コンテンツ用の子テンプレートを指定します。
 
-3. 子テンプレートは以下のようになります。
+3. 子テンプレートは次のようになります。
    ```kotlin
    class ArticleTemplate : Template<FlowContent> {
        val articleTitle = Placeholder<FlowContent>()
@@ -276,9 +285,9 @@ fun Application.module() {
    }
    ```
 
-   このテンプレートは `articleTitle`、`articleText`、`list` プロパティを公開しており、それらの値は `article` 内に挿入されます。
+   このテンプレートは`articleTitle`、`articleText`、`list`プロパティを公開し、それらの値は`article`の内部に挿入されます。
 
-4. テンプレートとして値のリストを提供するには、次の新しいクラスを作成します。 
+4. テンプレートとして値のリストを提供するには、次のように新しいクラスを作成します。
    ```kotlin
    class ListTemplate : Template<FlowContent> {
        val item = PlaceholderList<UL, FlowContent>()
@@ -302,9 +311,10 @@ fun Application.module() {
    }
    ```
 
-   このテンプレートは、`PlaceholderList` クラスを使用して、提供されたアイテムから順序なしリスト (`UL`) を生成します。また、強調のために最初のアイテムを `<b>` 要素で囲みます。
+   このテンプレートは、`PlaceholderList`クラスを使用して、提供された項目から順不同リスト（`UL`）を生成します。
+   また、強調のために最初の項目を`<b>`要素でラップします。
 
-5. これで、指定されたプロパティ値を使用して構築された HTML を送信する準備が整いました。
+5. これで、指定したプロパティ値を使用して構築されたHTMLを送信する準備が整いました。
    ```kotlin
    get("/") {
        call.respondHtmlTemplate(LayoutTemplate()) {
@@ -327,4 +337,4 @@ fun Application.module() {
    }
    ```
 
-完全な例はこちらで見つけることができます: [html-templates](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/html-templates)。
+完全な例はこちらで確認できます: [html-templates](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/html-templates)。

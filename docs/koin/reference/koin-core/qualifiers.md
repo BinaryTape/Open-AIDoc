@@ -4,369 +4,244 @@ title: 限定符
 
 # 限定符
 
-限定符允许您在 Koin 模块中区分相同类型的多个定义。
+限定符为定义赋予了一个名称，以便你可以声明同一类型的多个定义并请求特定的一个。本页涵盖字符串、类型和枚举限定符、自定义限定符注解以及常见错误。本文假设你已知晓如何声明定义（请参阅[定义](/docs/reference/koin-core/definitions)）。
 
-## 何时需要限定符 {id="when-you-need-qualifiers"}
+## 何时需要限定符 {id="when-you-need-a-qualifier"}
 
-在以下情况下，您需要使用限定符：
-- 同一个接口有多个实现
-- 同一个类型需要不同的配置
-- 您想要区分具有不同用途的实例
+Koin 通过其类型来查找定义。如果两个定义提供了相同的类型（例如两个 `Database` 实例），对 `Database` 的普通请求将无法在它们之间做出选择。限定符可以将它们区分开来。
 
-```kotlin
-// 没有限定符 - 冲突！
-val networkModule = module {
-    single { OkHttpClient.Builder()...build() }
-    single { OkHttpClient.Builder()...build() }  // 哪一个？
-}
-```
+如果这两个对象扮演不同的角色，请考虑为它们赋予不同的类型（例如将 `LocalDatabase` 和 `RemoteDatabase` 分别作为它们各自的接口）。类型不匹配会在编译器阶段被捕获，而错误的限定符字符串则不会。
 
 ## 命名限定符 {id="named-qualifiers"}
 
-使用 `named()` 来区分定义：
+声明每个定义时指定一个名称，然后在注入它的位置请求该名称：
 
-### 定义 {id="defining"}
+**Compiler Plugin DSL**
+```kotlin
+import org.koin.core.annotation.Named
+import org.koin.core.qualifier.named
+import org.koin.plugin.module.dsl.*
 
+class UserRepository(
+    @Named("local") private val localDb: Database,
+    @Named("remote") private val remoteDb: Database,
+)
+
+val dataModule = module {
+    single<Database>(named("local")) { create(::LocalDatabase) }
+    single<Database>(named("remote")) { create(::RemoteDatabase) }
+    single<UserRepository>()
+}
+```
+
+`single<UserRepository>()` 会读取构造函数形参上的 `@Named` 并解析带限定符的定义。你也可以将 `@Named("local")` 直接置于 `LocalDatabase` 类本身：随后 `single<LocalDatabase>()` 便会使用该名称进行注册。`@Named` 注解来自 `koin-annotations` 构件。
+
+**Annotations**
+```kotlin
+import org.koin.core.annotation.Named
+import org.koin.core.annotation.Singleton
+
+@Singleton
+@Named("local")
+class LocalDatabase : Database
+
+@Singleton
+@Named("remote")
+class RemoteDatabase : Database
+
+@Singleton
+class UserRepository(
+    @Named("local") private val localDb: Database,
+    @Named("remote") private val remoteDb: Database,
+)
+```
+
+`@Named` 可用于类、提供程序函数以及形参。
+
+**Constructor / Classic DSL**
 ```kotlin
 import org.koin.core.qualifier.named
 
-val networkModule = module {
-    single(named("encrypted")) {
-        OkHttpClient.Builder()
-            .addInterceptor(EncryptionInterceptor())
-            .build()
-    }
-
-    single(named("logging")) {
-        OkHttpClient.Builder()
-            .addInterceptor(HttpLoggingInterceptor())
-            .build()
-    }
-}
-```
-
-### 注入 {id="injecting"}
-
-```kotlin
-// 在模块定义中
-val apiModule = module {
+val dataModule = module {
+    single<Database>(named("local")) { LocalDatabase() }
+    single<Database>(named("remote")) { RemoteDatabase() }
     single {
-        ApiService(
-            encryptedClient = get(named("encrypted")),
-            loggingClient = get(named("logging"))
-        )
-    }
-}
-
-// 使用 KoinComponent
-class MyService : KoinComponent {
-    private val encryptedClient: OkHttpClient by inject(named("encrypted"))
-}
-```
-
-### 使用注解 {id="with-annotations"}
-
-```kotlin
-import org.koin.core.annotation.Named
-import org.koin.core.annotation.Single
-
-@Single
-@Named("encrypted")
-class EncryptedHttpClient : OkHttpClient()
-
-@Single
-@Named("logging")
-class LoggingHttpClient : OkHttpClient()
-
-@Single
-class ApiService(
-    @Named("encrypted") private val encryptedClient: OkHttpClient,
-    @Named("logging") private val loggingClient: OkHttpClient
-)
-```
-
-:::note
-对于编译器插件 DSL 和经典 DSL 自动装配（`singleOf`、`factoryOf`），限定符无法自动解析。当定义需要限定符时，请使用带有 lambda 的经典 DSL 或注解。
-:::
-
-## 类型安全限定符 {id="type-safe-qualifiers"}
-
-### 使用类型 {id="using-types"}
-
-可以使用任何类型作为限定符配合 `named<T>()` 使用：
-
-```kotlin
-// 定义限定符类型
-object EncryptedClient
-object LoggingClient
-
-val networkModule = module {
-    single(named<EncryptedClient>()) {
-        OkHttpClient.Builder()
-            .addInterceptor(EncryptionInterceptor())
-            .build()
-    }
-
-    single(named<LoggingClient>()) {
-        OkHttpClient.Builder()
-            .addInterceptor(HttpLoggingInterceptor())
-            .build()
-    }
-}
-
-// 注入
-val client: OkHttpClient = get(named<EncryptedClient>())
-```
-
-### 使用枚举 {id="using-enums"}
-
-为了获得更好的 IDE 支持，请使用枚举：
-
-```kotlin
-enum class NetworkClient {
-    ENCRYPTED,
-    LOGGING,
-    FAST
-}
-
-val networkModule = module {
-    single(named(NetworkClient.ENCRYPTED)) {
-        OkHttpClient.Builder()
-            .addInterceptor(EncryptionInterceptor())
-            .build()
-    }
-
-    single(named(NetworkClient.LOGGING)) {
-        OkHttpClient.Builder()
-            .addInterceptor(HttpLoggingInterceptor())
-            .build()
-    }
-}
-
-// 注入 - 不可能出现拼写错误！
-val client: OkHttpClient = get(named(NetworkClient.ENCRYPTED))
-```
-
-**类型安全限定符的优点：**
-- 编译时类型安全
-- 没有字符串拼写错误
-- IDE 自动补全和重构支持
-
-## JSR-330 @Qualifier {id="jsr-330-qualifier"}
-
-Koin 支持标准的 JSR-330 `@Qualifier` 注解：
-
-```kotlin
-import jakarta.inject.Qualifier
-
-@Qualifier
-@Retention(AnnotationRetention.BINARY)
-annotation class IoDispatcher
-
-@Qualifier
-@Retention(AnnotationRetention.BINARY)
-annotation class EncryptedClient
-
-// 在定义中使用
-@Single
-@IoDispatcher
-fun provideIoDispatcher(): CoroutineDispatcher = Dispatchers.IO
-
-// 在注入中使用
-@Single
-class MyRepository(
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
-)
-```
-
-## 常见用例 {id="common-use-cases"}
-
-### 多个 API 版本 {id="multiple-api-versions"}
-
-```kotlin
-val networkModule = module {
-    single(named("api_v1")) {
-        Retrofit.Builder()
-            .baseUrl("https://api.example.com/v1/")
-            .build()
-    }
-
-    single(named("api_v2")) {
-        Retrofit.Builder()
-            .baseUrl("https://api.example.com/v2/")
-            .build()
-    }
-}
-```
-
-### 不同的超时配置 {id="different-timeout-configurations"}
-
-```kotlin
-val networkModule = module {
-    single(named("fast")) {
-        OkHttpClient.Builder()
-            .connectTimeout(5, TimeUnit.SECONDS)
-            .build()
-    }
-
-    single(named("slow")) {
-        OkHttpClient.Builder()
-            .connectTimeout(30, TimeUnit.SECONDS)
-            .build()
-    }
-}
-```
-
-### 环境配置 {id="environment-configurations"}
-
-```kotlin
-val configModule = module {
-    single(named("debug")) {
-        AppConfig(apiUrl = "https://dev.example.com", loggingEnabled = true)
-    }
-
-    single(named("release")) {
-        AppConfig(apiUrl = "https://api.example.com", loggingEnabled = false)
-    }
-
-    // 根据环境选择
-    single<AppConfig> {
-        if (isDebug) get(named("debug")) else get(named("release"))
-    }
-}
-```
-
-## 最佳做法 {id="best-practices"}
-
-### 1. 克制地使用限定符 {id="1-use-qualifiers-sparingly"}
-
-```kotlin
-// 推荐 - 仅在必要时使用限定符
-val appModule = module {
-    single { UserRepository(get()) }  // 无需限定符
-    single { AuthRepository(get()) }   // 不同的类型
-}
-
-// 过度限定 - 应当避免
-val appModule = module {
-    single(named("user_repository")) { UserRepository(get()) }
-    single(named("auth_repository")) { AuthRepository(get()) }
-    // 没必要 - 类型本身已经不同了
-}
-```
-
-### 2. 优先考虑类型区分 {id="2-prefer-type-differentiation"}
-
-```kotlin
-// 更好 - 使用不同的类型
-interface EncryptedHttpClient
-interface LoggingHttpClient
-
-class EncryptedOkHttpClient : OkHttpClient(), EncryptedHttpClient
-class LoggingOkHttpClient : OkHttpClient(), LoggingHttpClient
-
-val networkModule = module {
-    single<EncryptedHttpClient> { EncryptedOkHttpClient() }
-    single<LoggingHttpClient> { LoggingOkHttpClient() }
-}
-```
-
-### 3. 避免限定符链 {id="3-avoid-qualifier-chains"}
-
-```kotlin
-// 糟糕 - 复杂的限定符依赖
-val badModule = module {
-    single(named("a")) { A() }
-    single(named("b")) { B(get(named("a"))) }
-    single(named("c")) { C(get(named("b"))) }
-}
-
-// 更好 - 扁平化或使用不同类型
-val goodModule = module {
-    single { A() }
-    single { B(get()) }
-    single { C(get()) }
-}
-```
-
-### 4. 为限定符编写文档 {id="4-document-qualifiers"}
-
-```kotlin
-val networkModule = module {
-    // 用于带加密的安全 API 调用客户端
-    single(named("encrypted")) { ... }
-
-    // 用于带完整请求/响应日志记录的调试客户端
-    single(named("logging")) { ... }
-}
-```
-
-## 命名约定 {id="naming-conventions"}
-
-### 基于字符串 {id="string-based"}
-
-```kotlin
-// 推荐 - 描述性强，小写并使用下划线
-single(named("encrypted_client")) { ... }
-single(named("user_database")) { ... }
-single(named("api_v2")) { ... }
-
-// 避免 - 不明确或不一致
-single(named("client1")) { ... }  // "1" 代表什么意思？
-```
-
-### 基于枚举 {id="enum-based"}
-
-```kotlin
-// 推荐 - 清晰的枚举名称
-enum class DatabaseType {
-    USER_DATA,
-    CACHE,
-    ANALYTICS
-}
-
-enum class ApiVersion {
-    V1, V2, V3
-}
-```
-
-## 常见陷阱 {id="common-pitfalls"}
-
-### 注入时忘记限定符 {id="forgetting-qualifiers-on-injection"}
-
-```kotlin
-val module = module {
-    single(named("encrypted")) { OkHttpClient() }
-}
-
-val repoModule = module {
-    single {
-        MyRepository(get())  // ❌ 错误：找不到 OkHttpClient 的定义
-        // 应当为：get(named("encrypted"))
-    }
-}
-```
-
-### 限定符名称不匹配 {id="mismatched-qualifier-names"}
-
-```kotlin
-val module = module {
-    single(named("encrypted_client")) { OkHttpClient() }
-}
-
-val repoModule = module {
-    single {
-        ApiService(
-            get(named("encrypted"))  // ❌ 拼写错误！应当为 "encrypted_client"
+        UserRepository(
+            localDb = get(named("local")),
+            remoteDb = get(named("remote")),
         )
     }
 }
 ```
 
-请使用枚举限定符来避免拼写错误！
+`singleOf(::UserRepository)` 仅按类型解析形参，因此无法传递限定符。请如示例所示，使用 `get(named(...))` 编写构造函数调用。
 
-## 后续步骤 {id="next-steps"}
+在定义之外，将限定符传递给 `get()` 或 `inject()`：
 
-- **[定义](/docs/reference/koin-core/definitions)** - 定义类型与绑定
-- **[模块](/docs/reference/koin-core/modules)** - 模块组织
-- **[注入](/docs/reference/koin-core/injection)** - 检索依赖项
+```kotlin
+val localDb: Database by inject(named("local"))
+val remoteDb: Database = get(named("remote"))
+```
+
+相同的限定符实参存在于所有注入 API 中，例如 Compose 中的 `koinInject(named("local"))`。请参阅[注入](/docs/reference/koin-core/injection)。
+
+## 类型限定符 {id="type-qualifiers"}
+
+类型也可以充当限定符。拼写错误会变为编译错误，并且在 IDE 中重命名该类型会自动更新所有使用之处：
+
+**Compiler Plugin DSL**
+```kotlin
+import org.koin.core.annotation.Qualifier
+
+object LocalDb
+object RemoteDb
+
+class UserRepository(
+    @Qualifier(LocalDb::class) private val localDb: Database,
+    @Qualifier(RemoteDb::class) private val remoteDb: Database,
+)
+
+val dataModule = module {
+    single<Database>(named<LocalDb>()) { create(::LocalDatabase) }
+    single<Database>(named<RemoteDb>()) { create(::RemoteDatabase) }
+    single<UserRepository>()
+}
+```
+
+**Annotations**
+```kotlin
+object LocalDb
+object RemoteDb
+
+@Singleton
+@Qualifier(LocalDb::class)
+class LocalDatabase : Database
+
+@Singleton
+@Qualifier(RemoteDb::class)
+class RemoteDatabase : Database
+
+@Singleton
+class UserRepository(
+    @Qualifier(LocalDb::class) private val localDb: Database,
+    @Qualifier(RemoteDb::class) private val remoteDb: Database,
+)
+```
+
+`@Qualifier(name = "local")` 是字符串形式，等同于 `@Named("local")`。
+
+**Constructor / Classic DSL**
+```kotlin
+object LocalDb
+object RemoteDb
+
+val dataModule = module {
+    single<Database>(named<LocalDb>()) { LocalDatabase() }
+    single<Database>(named<RemoteDb>()) { RemoteDatabase() }
+    single { UserRepository(get(named<LocalDb>()), get(named<RemoteDb>())) }
+}
+```
+
+在调用站点：`get<Database>(named<LocalDb>())`。`qualifier<LocalDb>()` 是 `named<LocalDb>()` 的别名。
+
+## 枚举限定符 {id="enum-qualifiers"}
+
+枚举成员也可以作为限定符：
+
+```kotlin
+enum class DbType { LOCAL, REMOTE }
+
+val dataModule = module {
+    single<Database>(named(DbType.LOCAL)) { LocalDatabase() }
+    single<Database>(named(DbType.REMOTE)) { RemoteDatabase() }
+}
+
+val localDb: Database = get(named(DbType.LOCAL))
+```
+
+`named(DbType.LOCAL)` 是由小写成员名称构成的字符串限定符。它与 `named("local")` 是相同的限定符。
+
+## 自定义限定符注解 {id="custom-qualifier-annotations"}
+
+使用注解时，你可以创建自己的限定符注解。使用 `@Qualifier`（或 `@Named`）对其进行注解，然后像使用 `@Named` 一样使用它：
+
+```kotlin
+import org.koin.core.annotation.Qualifier
+
+@Qualifier
+annotation class BaseUrl
+
+@Qualifier
+annotation class AuthUrl
+
+@Singleton
+@BaseUrl
+fun baseUrl(): String = "https://api.example.com"
+
+@Singleton
+@AuthUrl
+fun authUrl(): String = "https://auth.example.com"
+
+@Singleton
+class ApiClient(
+    @BaseUrl private val baseUrl: String,
+    @AuthUrl private val authUrl: String,
+)
+```
+
+不带形参的注解将成为该注解类上的类型限定符。在代码中，可通过 `get<String>(named<BaseUrl>())` 进行获取。
+
+自定义限定符可以接受形参，以便通过一个注解定义一组限定符：
+
+```kotlin
+enum class AppDispatchers { Default, IO }
+
+@Qualifier
+annotation class Dispatcher(val dispatcher: AppDispatchers)
+
+@Module
+class DispatchersModule {
+
+    @Singleton
+    @Dispatcher(AppDispatchers.IO)
+    fun ioDispatcher(): CoroutineDispatcher = Dispatchers.IO
+
+    @Singleton
+    @Dispatcher(AppDispatchers.Default)
+    fun defaultDispatcher(): CoroutineDispatcher = Dispatchers.Default
+
+    @Singleton
+    fun applicationScope(
+        @Dispatcher(AppDispatchers.Default) dispatcher: CoroutineDispatcher,
+    ): CoroutineScope = CoroutineScope(SupervisorJob() + dispatcher)
+}
+```
+
+形参的值将成为限定符：
+
+- 字符串形参：`@ApiName("users")` 是字符串限定符 `"users"`，与 `@Named("users")` 相同。
+- 枚举形参：`@Dispatcher(AppDispatchers.IO)` 是由枚举的完全限定类名和成员构成的字符串限定符，即 `named("com.myapp.AppDispatchers.IO")`。它与使用小写成员名称的 `named(AppDispatchers.IO)` 不同。
+
+编译器插件会在构建时检查自定义限定符：提供程序和注入点具有不同的限定符将导致构建错误。自定义限定符注解也可用于编译器插件 DSL，作用于构造函数形参以及传递给 `single<T>()` 的类上。
+
+自定义限定符注解在构造函数或传统 DSL 中不可用。在这些地方请使用 `named()`。
+
+## JSR-330 限定符 {id="jsr-330-qualifiers"}
+
+`jakarta.inject.Named`、`javax.inject.Named` 以及标记有 `jakarta.inject.Qualifier` 的注解其工作方式与 Koin 的对等项类似。请参阅 [JSR-330 支持](/docs/reference/koin-android/jsr330)。
+
+## 常见错误 {id="common-mistakes"}
+
+- 注入点缺少限定符：当每个 `Database` 定义都带有限定符时，`get<Database>()` 将失败并抛出 `NoDefinitionFoundException`。带有限定符的定义只能通过该限定符来查找到。
+- 拼写不同：`named("encrypted")` 和 `named("encrypted_client")` 是两个不同的限定符。使用类型或枚举限定符，或者将字符串保存在常量中，以避免出现此类情况。
+- 为每个定义都添加限定符：如果类型本身已经不同，限定符不会带来任何益处。仅在两个定义共享相同类型时才使用限定符。
+
+借助编译器插件，前两个错误会成为构建错误。当带限定符的形参没有匹配项但存在同一类型的无限定符定义时，错误信息会指向该定义。
+
+## 相关内容 {id="related"}
+
+- [定义](/docs/reference/koin-core/definitions)：声明定义并将其绑定到接口。
+- [注入](/docs/reference/koin-core/injection)：将限定符传递给 `get()` 和 `inject()`。
+- [注入形参](/docs/reference/koin-core/injection-parameters)：在解析时传递值，而不是声明变体。
+- [编译时安全性](/docs/reference/koin-compiler/compile-safety)：编译器插件针对限定符所做的检查。
+- [注解参考](/docs/reference/koin-annotations/annotations-inventory)：`@Named` 和 `@Qualifier` 的形参。

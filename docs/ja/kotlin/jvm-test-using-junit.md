@@ -1,25 +1,25 @@
-[//]: # (title: KotlinとJUnitを使用したJavaコードのテスト – チュートリアル)
+[//]: # (title: Kotlin と JUnit を使用して Java コードをテストする – チュートリアル)
 
-<web-summary>MavenまたはGradleでビルドされたJavaプロジェクトを設定し、Kotlinで記述されたJUnitテストを統合します。</web-summary>
+<web-summary>Maven または Gradle でビルドされた Java プロジェクトをセットアップし、Kotlin で記述された JUnit テストを統合します。</web-summary>
 
-KotlinはJavaと完全に相互運用可能であるため、Kotlinを使用してJavaコードのテストを作成し、同じプロジェクト内で既存のJavaテストと一緒に実行できます。
+Kotlin は Java と完全な相互運用性があるため、Kotlin を使用して Java コードのテストを記述し、同じプロジェクト内で既存の Java テストと一緒に実行できます。
 
 このチュートリアルでは、次の方法を学びます：
 
-* [JUnit](https://junit.org/)を使用してテストを実行するための、JavaとKotlinの混在プロジェクトの設定。
-* Javaコードを検証するKotlinテストの追加。
-* MavenまたはGradleを使用したテストの実行。
+* [JUnit](https://junit.org/) を使用してテストを実行するように Java と Kotlin の混在プロジェクトを設定する。
+* Java コードを検証する Kotlin テストを追加する。
+* Maven または Gradle を使用してテストを実行する。
 
 > 開始する前に、以下が準備されていることを確認してください：
 >
-> * [IntelliJ IDEA](https://www.jetbrains.com/idea/download/)、または[Kotlin拡張機能](https://github.com/Kotlin/kotlin-lsp/tree/main?tab=readme-ov-file#vs-code-quick-start)がインストールされた[VS Code](https://code.visualstudio.com/Download)。
-> * Java 17以降。
+> * [IntelliJ IDEA](https://www.jetbrains.com/idea/download/)、または [Kotlin 拡張機能](https://github.com/Kotlin/kotlin-lsp/tree/main?tab=readme-ov-file#vs-code-quick-start) がインストールされた [VS Code](https://code.visualstudio.com/Download)。
+> * Java 17 以降。
 >
 {style="note"}
 
 ## プロジェクトの設定 {id="configure-the-project"}
 
-1. IDEで、バージョン管理からサンプルプロジェクトをクローンします：
+1. IDE で、バージョン管理からサンプルプロジェクトをクローンします：
 
    ```text
    https://github.com/kotlin-hands-on/kotlin-junit-sample.git
@@ -31,27 +31,135 @@ KotlinはJavaと完全に相互運用可能であるため、Kotlinを使用し�
     kotlin-junit-sample/
     ├── initial/
     │   ├── src/
-    │   │   ├── main/java/    # Java ソースコード
-    │   │   └── test/java/    # Java で書かれた JUnit テスト
-    │   ├── pom.xml           # Maven 設定
-    │   └── build.gradle.kts  # Gradle 設定
+    │   │   ├── main/java/    # Java source code
+    │   │   └── test/java/    # JUnit test in Java
+    │   ├── pom.xml           # Maven configuration
+    │   └── build.gradle.kts  # Gradle configuration
     ```
 
-   `initial` モジュールには、単一のテストを含むJavaのシンプルなTodoアプリケーションが含まれています。
+   `initial` モジュールには、単一のテストを含む Java のシンプルな Todo アプリケーションが含まれています。
 
-3. 同じディレクトリでビルドファイルを開き、Kotlinをサポートするように内容を更新します：
+3. 同じディレクトリでビルドファイルを開き、Kotlin をサポートするように内容を更新します：
 
     <tabs group="build-system">
     <tab title="Maven" group-key="maven">
 
     ```xml
+    <?xml version="1.0" encoding="UTF-8"?>
+    <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+        <modelVersion>4.0.0</modelVersion>
+    
+        <groupId>org.jetbrains.kotlin</groupId>
+        <artifactId>kotlin-junit-complete</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    
+        <name>kotlin-junit-complete</name>
+        <url>https://kotlinlang.org/docs/jvm-test-using-junit.htm</url>
+    
+        <properties>
+            <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+            <maven.compiler.release>17</maven.compiler.release>
+            <jexer.version>1.6.0</jexer.version>
+            <kotlin.version>%kotlinVersion%</kotlin.version>
+        </properties>
+    
+        <dependencyManagement>
+            <dependencies>
+                <dependency>
+                    <groupId>org.junit</groupId>
+                    <artifactId>junit-bom</artifactId>
+                    <version>6.0.3</version>
+                    <type>pom</type>
+                    <scope>import</scope>
+                </dependency>
+            </dependencies>
+        </dependencyManagement>
+    
+        <dependencies>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-api</artifactId>
+                <scope>test</scope>
+            </dependency>
+            <!-- Add JUnit Jupiter engine for test runtime -->
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-engine</artifactId>
+                <scope>test</scope>
+            </dependency>
+            <!-- Optionally: parameterized tests support -->
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-params</artifactId>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.gitlab.klamonte</groupId>
+                <artifactId>jexer</artifactId>
+                <version>${jexer.version}</version>
+            </dependency>
+        </dependencies>
+    
+        <build>
+            <pluginManagement><!-- Lock down plugin versions to avoid using Maven defaults (can be moved to a parent pom file) -->
+                <plugins>
+                    <!-- Clean lifecycle, see https://maven.apache.org/ref/current/maven-core/lifecycles.html#clean_Lifecycle -->
+                    <plugin>
+                        <artifactId>maven-clean-plugin</artifactId>
+                        <version>3.4.0</version>
+                    </plugin>
+                    <!-- Default lifecycle, jar packaging: see https://maven.apache.org/ref/current/maven-core/default-bindings.html#Plugin_bindings_for_jar_packaging -->
+                    <plugin>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <version>3.3.1</version>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <version>3.3.0</version>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <version>3.4.2</version>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-install-plugin</artifactId>
+                        <version>3.1.2</version>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-deploy-plugin</artifactId>
+                        <version>3.1.2</version>
+                    </plugin>
+                    <!-- Site lifecycle, see https://maven.apache.org/ref/current/maven-core/lifecycles.html#site_Lifecycle -->
+                    <plugin>
+                        <artifactId>maven-site-plugin</artifactId>
+                        <version>3.12.1</version>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-project-info-reports-plugin</artifactId>
+                        <version>3.6.1</version>
+                    </plugin>
+                    <!-- No maven-compiler-plugin needed with Kotlin extensions -->
+                </plugins>
+            </pluginManagement>
+            <plugins>
+                <!-- Activate Kotlin Maven plugin for main and test sources -->
+                <plugin>
+                    <groupId>org.jetbrains.kotlin</groupId>
+                    <artifactId>kotlin-maven-plugin</artifactId>
+                    <version>${kotlin.version}</version>
+                    <extensions>true</extensions>
+                </plugin>
+            </plugins>
+        </build>
+    </project>
     ```
-   {src="jvm-test-tutorial/pom.xml" initial-collapse-state="collapsed" collapsible="true" ignore-vars="false" collapsed-title="pom.xml ファイル"}
+   {initial-collapse-state="collapsed" collapsible="true" collapsed-title="pom.xml file"}
 
-    * `<properties>` セクションで、Kotlinのバージョンを設定します。
-    * `<dependencies>` セクションに、テストを実行するためのJUnit Jupiterの依存関係を追加します。
-    * `<build><plugins>` セクションで、`<extensions>` を `true` に設定して `kotlin-maven-plugin` を適用します。これにより、対応する実行構成と `kotlin-stdlib` の依存関係がビルドに自動的に追加されます。
-    * extensionsを有効にしてKotlin Mavenプラグインを使用する場合、`<build><pluginManagement>` セクションに `maven-compiler-plugin` を追加する必要はありません。
+    * `<properties>` セクションで、Kotlin のバージョンを設定します。
+    * `<dependencies>` セクションで、テストを実行するための JUnit Jupiter の依存関係を追加します。
+    * `<build><plugins>` セクションで、`<extensions>` を `true` に設定して `kotlin-maven-plugin` を適用します。これにより、対応する execution と `kotlin-stdlib` の依存関係がビルドに自動的に追加されます。
+    * extensions を有効にした Kotlin Maven プラグインを使用する場合、`<build><pluginManagement>` セクションに `maven-compiler-plugin` を追加する必要はありません。
 
     </tab>
     <tab title="Gradle" group-key="gradle">
@@ -96,13 +204,13 @@ KotlinはJavaと完全に相互運用可能であるため、Kotlinを使用し�
     ```
    {initial-collapse-state="collapsed" collapsible="true" collapsed-title="build.gradle.kts"}
 
-    * `plugins {}` ブロックに、`kotlin("jvm")` プラグインを追加します。
-    * JVMツールチェーンのバージョンをJavaのバージョンに合わせて設定します。
-    * `dependencies {}` ブロックに、Kotlinのテストユーティリティを提供し、JUnitと統合する `kotlin.test` ライブラリを追加します。
+    * `plugins {}` ブロックで、`kotlin("jvm")` プラグインを追加します。
+    * Java のバージョンに合わせて JVM ツールチェーンのバージョンを設定します。
+    * `dependencies {}` ブロックで、Kotlin のテストユーティリティを提供し、JUnit と統合する `kotlin.test` ライブラリを追加します。
       
-    Kotlin/JVMは、最新の安定版JUnitであるJUnit 6をサポートしています。これは `gradle/libs.versions.toml` バージョンカタログに記述されています。
+    Kotlin/JVM は最新の安定版 JUnit バージョンである JUnit 6 をサポートしています。これは `gradle/libs.versions.toml` バージョンカタログで確認できます。
    
-    通常バージョンカタログを使用したい場合は、`kotlin("jvm")` プラグインをバージョンカタログに追加することもできます：
+    バージョンカタログの使用を好む場合は、そこに `kotlin("jvm")` プラグインを追加することもできます：
 
     ```toml
     # gradle/libs.versions.toml
@@ -124,18 +232,18 @@ KotlinはJavaと完全に相互運用可能であるため、Kotlinを使用し�
     </tab>
     </tabs>
 
-4. IDEでビルドファイルを再読み込み（リロード）します。
+4. IDE でビルドファイルを再読み込みします。
 
-ビルドファイルの設定に関する詳細な手順については、[プロジェクト設定](mixing-java-kotlin-intellij.md#project-configuration)を参照してください。
+ビルドファイルの設定に関する詳細な手順については、[プロジェクトの設定](mixing-java-kotlin-intellij.md#project-configuration) を参照してください。
 
-## 最初のKotlinテストを追加する {id="add-your-first-kotlin-test"}
+## 初めての Kotlin テストを追加する {id="add-your-first-kotlin-test"}
 
-`initial/src/test/java` 内の `TodoItemTest.java` テストでは、アイテムの作成、デフォルト値、一意のID、状態の変化といったアプリケーションの基本的な動作がすでに検証されています。
+`initial/src/test/java` 内の `TodoItemTest.java` テストは、アイテムの作成、デフォルト値、一意の ID、状態の変化など、アプリの基本的な動作をすでに検証しています。
 
-リポジトリレベルの振る舞いを検証するKotlinテストを追加することで、テストカバレッジを広げることができます：
+リポジトリレベルの振る舞いを検証する Kotlin テストを追加することで、テストカバレッジを広げることができます：
 
-1. 同じテストソースディレクトリ `initial/src/test/java` に移動します。
-2. Javaテストと同じパッケージ内に `TodoRepositoryTest.kt` ファイルを作成します。
+1. 同じテストソースディレクトリである `initial/src/test/java` に移動します。
+2. Java テストと同じパッケージ内に `TodoRepositoryTest.kt` ファイルを作成します。
 3. フィールド宣言とセットアップ関数を含むテストクラスを作成します：
 
    ```kotlin
@@ -160,10 +268,10 @@ KotlinはJavaと完全に相互運用可能であるため、Kotlinを使用し�
    }
    ```
 
-    * JUnitのアノテーションは、Javaと同様にKotlinでも機能します。
-    * Kotlinでは、[`lateinit` キーワード](properties.md#late-initialized-properties-and-variables)を使用することで、後から初期化される非nullプロパティを宣言できます。これにより、テスト内でnullable型（`TodoRepository?`）を使用する必要がなくなります。
+    * JUnit のアノテーションは Java と同様に Kotlin でも動作します。
+    * Kotlin では、[`lateinit` キーワード](properties.md#late-initialized-properties-and-variables) により、後から初期化される非 null プロパティを宣言できます。これにより、テスト内で null 許容型（`TodoRepository?`）を使用する必要がなくなります。
 
-4. `TodoRepositoryTest` クラス内に、リポジトリの初期状態とそのサイズを確認するテストを追加します：
+4. リポジトリの初期状態とそのサイズを確認するテストを `TodoRepositoryTest` クラス内に追加します：
 
    ```kotlin
    @Test
@@ -174,10 +282,10 @@ KotlinはJavaと完全に相互運用可能であるため、Kotlinを使用し�
    }
    ```
 
-    * Javaのstaticインポートとは異なり、Jupiterの `Assertions` はクラスとしてインポートされ、アサーション関数の修飾子として使用されます。
-    * `.getAll()` を呼び出す代わりに、Kotlinでは `repository.all` のようにJavaのゲッターにプロパティとしてアクセスできます。
+    * Java の static インポートとは異なり、Jupiter の `Assertions` はクラスとしてインポートされ、アサーション関数の修飾子として使用されます。
+    * `.getAll()` を呼び出す代わりに、Kotlin では `repository.all` のようにプロパティとして Java のゲッターにアクセスできます。
 
-5. すべてのアイテムに対するコピーの振る舞いを検証する別のテストを作成します：
+5. すべてのアイテムのコピーの振る舞いを検証する別のテストを記述します：
 
    ```kotlin
    @Test
@@ -196,10 +304,10 @@ KotlinはJavaと完全に相互運用可能であるため、Kotlinを使用し�
    }
    ```
 
-    * KotlinクラスからJavaのクラスオブジェクトを取得するには、`::class.java` を使用します。
-    * 特別な行継続文字を使用せずに、複雑なアサーションを複数行に分割できます。
+    * Kotlin クラスから Java のクラスオブジェクトを取得するには、`::class.java` を使用します。
+    * 複雑なアサーションは、特殊な行継続文字を使用せずに複数行に分割できます。
 
-6. IDによるアイテムの検索を検証するテストを追加します：
+6. ID によるアイテムの検索を検証するテストを追加します：
 
    ```kotlin
    @Test
@@ -215,9 +323,9 @@ KotlinはJavaと完全に相互運用可能であるため、Kotlinを使用し�
    }
    ```
 
-   KotlinはJavaの [`Optional` API](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html) とスムーズに連携します。ゲッターメソッドが自動的にプロパティに変換されるため、ここでは `isPresent()` メソッドがプロパティとしてアクセスされています。
+   Kotlin は Java の [`Optional` API](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html) とスムーズに連携します。ゲッターメソッドが自動的にプロパティに変換されるため、ここでは `isPresent()` メソッドがプロパティとしてアクセスされています。
 
-7. アイテムの削除メカニズムを検証するテストを作成します：
+7. アイテムの削除メカニズムを検証するテストを記述します：
 
    ```kotlin
     @Test
@@ -246,21 +354,21 @@ KotlinはJavaと完全に相互運用可能であるため、Kotlinを使用し�
     }
    ```
 
-   Kotlinでは、`repository.getById(id).isEmpty` のようにメソッド呼び出しとプロパティアクセスをチェーンさせることができます。
+   Kotlin では、`repository.getById(id).isEmpty` のようにメソッド呼び出しとプロパティアクセスをチェーンさせることができます。
 
-> `TodoRepositoryTest` テストクラスにさらにテストを追加して、追加の機能をカバーすることもできます。完全なソースコードは、サンプルプロジェクトの [`complete`](https://github.com/kotlin-hands-on/kotlin-junit-sample/blob/main/complete/src/test/java/org/jetbrains/kotlin/junit/TodoRepositoryTest.kt) モジュールで確認できます。
+> `TodoRepositoryTest` テストクラスにさらにテストを追加して、追加機能をカバーすることもできます。完全なソースコードは、サンプルプロジェクトの [`complete`](https://github.com/kotlin-hands-on/kotlin-junit-sample/blob/main/complete/src/test/java/org/jetbrains/kotlin/junit/TodoRepositoryTest.kt) モジュールで確認できます。
 >
 {style="tip"}
 
 ## テストの実行 {id="run-tests"}
 
-JavaとKotlinの両方のテストを実行して、プロジェクトが期待どおりに動作することを確認します：
+Java と Kotlin の両方のテストを実行して、プロジェクトが期待どおりに動作することを確認します：
 
 1. ガターアイコンを使用してテストを実行します：
 
    ![テストの実行](run-test.png)
 
-   コマンドラインを使用して、`initial` ディレクトリからすべてのプロジェクトテストを実行することもできます：
+   コマンドラインを使用して、`initial` ディレクトリからプロジェクトのすべてのテストを実行することもできます：
 
     <tabs group="build-system">
     <tab title="Maven" group-key="maven">
@@ -279,7 +387,7 @@ JavaとKotlinの両方のテストを実行して、プロジェクトが期待�
     </tab>
     </tabs>
 
-2. 変数の値のいずれかを変更して、テストが正しく動作することを確認します。たとえば、`shouldAddItem` テストを変更して、誤ったリポジトリサイズを期待するようにします：
+2. 変数の値の 1 つを変更して、テストが正しく動作することを確認します。たとえば、`shouldAddItem` テストを変更して、誤ったリポジトリサイズを期待するようにします：
 
    ```kotlin
    @Test
@@ -287,20 +395,20 @@ JavaとKotlinの両方のテストを実行して、プロジェクトが期待�
    fun shouldAddItem() {
        repository.add(testItem1)
 
-       Assertions.assertEquals(2, repository.size())  // 1 から 2 に変更
+       Assertions.assertEquals(2, repository.size())  // Changed from 1 to 2
        Assertions.assertTrue(repository.all.contains(testItem1))
    }
    ```
 
 3. テストを再度実行し、失敗することを確認します：
 
-   ![テスト結果の確認。テストは失敗](test-failed.png)
+   ![テスト結果の確認。テストは失敗しました](test-failed.png)
 
-> テストが含まれる完全に設定されたプロジェクトは、サンプルプロジェクトの [`complete`](https://github.com/kotlin-hands-on/kotlin-junit-sample/tree/main/complete) モジュールにあります。
+> テストを含め完全に設定されたプロジェクトは、サンプルプロジェクトの [`complete`](https://github.com/kotlin-hands-on/kotlin-junit-sample/tree/main/complete) モジュールで確認できます。
 >
 {style="tip"}
 
 ## 次のステップ {id="what-s-next"}
 
-* [Mavenを使用したKotlinプロジェクトのテスト](jvm-test-maven.md)について詳しく学びます。
-* [Kotlinバックエンド開発のFAQ](jvm-backend-faq.md)でよくある質問の回答を確認します。
+* [Maven を使用した Kotlin プロジェクトのテスト](jvm-test-maven.md) について詳しく学ぶ。
+* [Kotlin バックエンド開発の FAQ](jvm-backend-faq.md) でよくある質問の回答を見つける。

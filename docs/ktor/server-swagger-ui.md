@@ -3,12 +3,13 @@
 <primary-label ref="server-plugin"/>
 
 <var name="artifact_name" value="ktor-server-swagger"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.server.swagger"/>
 <var name="package_name" value="io.ktor.server.plugins.swagger"/>
 <var name="plugin_api_link" value="https://api.ktor.io/ktor-server-swagger/io.ktor.server.plugins.swagger/swagger-u-i.html"/>
 
 <tldr>
 <p>
-<b>必需的依赖项</b>：<code>io.ktor:%artifact_name%</code>
+<b>所需依赖项</b>：<code>io.ktor:%artifact_name%</code>
 </p>
 <var name="example_name" value="json-kotlinx-openapi"/>
 <p>
@@ -18,7 +19,7 @@
     </a>
 </p>
 <p>
-    <b><Links href="/ktor/server-native" summary="Ktor 支持 Kotlin/Native，允许您在没有额外运行时或虚拟机的情况下运行服务器。">原生服务器</Links>支持</b>：✖️
+    <b><Links href="server-native.md" summary="Ktor 支持 Kotlin/Native，允许您在没有额外运行时或虚拟机的情况下运行服务器。">Native 服务器</Links>支持</b>：✖️
 </p>
 </tldr>
 
@@ -26,24 +27,32 @@
 SwaggerUI 插件允许您为项目生成 Swagger UI。
 </link-summary>
 
-Ktor 允许您基于 OpenAPI 规范为项目生成并提供 Swagger UI。
-借助 Swagger UI，您可以直接在浏览器中可视化您的 API 端点并与其交互。 
+Ktor 允许您根据 OpenAPI 规范为项目生成并提供 Swagger UI。
+借助 Swagger UI，您可以直接在浏览器中可视化 API 端点并与之交互。
 
-您可以通过以下方式之一提供 OpenAPI 规范：
+您可以通过以下任一方式提供 OpenAPI 规范：
 
 * [提供现有的 YAML 或 JSON 文件](#static-openapi-file)。
-* [使用 OpenAPI 编译器扩展和运行时 API 在运行时生成规范](#generate-runtime-openapi-metadata)。
+* [使用 OpenAPI 编译器扩展程序和运行时 API 在运行时生成规范](#generate-runtime-openapi-metadata)。
 
 ## 添加依赖项 {id="add_dependencies"}
 
-提供 Swagger UI 需要在构建脚本中添加 `%artifact_name%` 构件：
+提供 Swagger UI 需要在构建脚本中添加 `%artifact_name%` 工件：
 
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上述代码段使用 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 版本目录</a>来指定 Ktor 依赖项。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上述代码段使用 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 版本目录</a>来指定 Ktor 依赖项。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
@@ -54,7 +63,7 @@ Ktor 允许您基于 OpenAPI 规范为项目生成并提供 Swagger UI。
 
 要从现有的 OpenAPI 规范文件提供 Swagger UI，请使用 [`swaggerUI()`](%plugin_api_link%) 函数并指定文件位置。
 
-以下示例在 `swagger` 路径处创建了一个 `GET` 端点，并根据提供的 OpenAPI 规范文件渲染 Swagger UI：
+以下示例在 `swagger` 路径下创建一个 `GET` 端点，并根据提供的 OpenAPI 规范文件渲染 Swagger UI：
 
 ```kotlin
 import io.ktor.server.plugins.swagger.*
@@ -65,11 +74,11 @@ routing {
 }
 ```
 
-该插件首先在应用程序资源中查找规范。如果未找到，它会尝试使用 `java.io.File` 从文件系统加载。
+该插件首先会在应用程序资源中查找该规范。如果未找到，则会尝试使用 `java.io.File` 从文件系统中加载它。
 
-## 在运行时生成 OpenAPI 元数据 {id="generate-runtime-openapi-metadata"}
+## 生成运行时 OpenAPI 元数据 {id="generate-runtime-openapi-metadata"}
 
-除了依赖静态文件外，您还可以使用 OpenAPI 编译器插件生成的元数据和路由注解在运行时生成 OpenAPI 规范：
+除了依赖静态文件之外，您还可以使用 OpenAPI 编译器插件和路由注解生成的元数据在运行时生成 OpenAPI 规范：
 
 ```kotlin
 swaggerUI("/swaggerUI") {
@@ -80,9 +89,9 @@ swaggerUI("/swaggerUI") {
 }
 ```
 
-借助此功能，您可以在 `/swaggerUI` 路径处访问生成的 OpenAPI 文档，该文档反映了应用程序的当前状态。
+这样，您就可以在 `/swaggerUI` 路径访问生成的 OpenAPI 文档，该文档反映了应用程序的当前状态。
 
-> 有关 OpenAPI 编译器扩展和运行时 API 的更多信息，请参阅 [OpenAPI 规范生成](openapi-spec-generation.md)。
+> 有关 OpenAPI 编译器扩展程序和运行时 API 的更多信息，请参阅 [OpenAPI 规范生成](openapi-spec-generation.md)。
 >
 {style="tip"}
 
@@ -105,7 +114,7 @@ swaggerUI("/swagger") {
     )
 }
 ```
-您还可以配置其他顶级 OpenAPI 属性，例如服务器、安全要求、可复用组件、外部文档和规范扩展。
+您还可以配置其他顶级 OpenAPI 属性，例如服务器、安全要求、可重用组件、外部文档和规范扩展。
 
 > 有关可用选项的完整集合，请参阅 [`SwaggerConfig`](https://api.ktor.io/ktor-server-swagger/io.ktor.server.plugins.swagger/-swagger-config/index.html) API 参考。
 > 
@@ -113,7 +122,7 @@ swaggerUI("/swagger") {
 
 ### 配置 Swagger UI 版本 {id="configure-the-swagger-ui-version"}
 
-默认情况下，Ktor 使用预定义的 Swagger UI 版本。若要使用其他版本，请设置 `version` 属性：
+默认情况下，Ktor 使用预定义的 Swagger UI 版本。要使用其他版本，请设置 `version` 属性：
 
 ```kotlin
 routing {
@@ -129,10 +138,10 @@ routing {
 
 ## 配置 CORS {id="configure-cors"}
 
-为了确保 Swagger UI 能够正确访问您的 API 端点，您需要先配置[跨源资源共享 (CORS)](server-cors.md)。
+为了确保 Swagger UI 能够正确访问您的 API 端点，您需要首先配置[跨源资源共享 (CORS)](server-cors.md)。
 
-下面的示例应用了以下 CORS 配置：
-* `anyHost` 允许来自任何主机的跨源请求。
+以下示例应用了以下 CORS 配置：
+* `anyHost` 允许来自任意主机的跨源请求。
 * `allowHeader` 允许用于[内容协商](server-serialization.md)的 `Content-Type` 客户端标头。
 
 ```kotlin

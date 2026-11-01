@@ -1,438 +1,365 @@
 ---
-title: Koin の開始
+title: Koinの開始
 ---
 
-# Koin の開始
+# Koinの開始
 
-このガイドでは、Koin コンテナを初期化し、アプリケーション用に設定する方法について説明します。
+このページでは、Koinコンテナの起動方法、起動時に渡せるオプション、`@KoinApplication` を使用した型付き起動、ロギング、プロパティ、および後からモジュールをロード/アンロードする方法について説明します。モジュールとは何かを理解していることを前提としています（[Modules](/docs/reference/koin-core/modules) を参照）。
 
-## `startKoin` 関数 {id="the-startkoin-function"}
+コードサンプルには、Compiler Plugin DSL、Annotations、Constructor / Classic DSL の3つのタブがあります。使用するものを選んでください。その選択はすべてのページに適用されます。
 
-`startKoin` は Koin を起動するためのメインのエントリポイントです。これはコンテナを `GlobalContext` に登録し、アプリケーション全体からアクセス可能にします。
+## Koinの起動 {id="start-koin"}
 
+**Compiler Plugin DSL**
 ```kotlin
-startKoin {
-    modules(appModule)
+import org.koin.core.context.startKoin
+
+fun main() {
+    startKoin {
+        printLogger()
+        modules(appModule)
+    }
 }
 ```
 
-一度起動すると、`get()` や `by inject()` を通じて依存関係を解決（resolution）できるようになります。
+**Annotations**
+```kotlin
+import org.koin.plugin.module.dsl.startKoin
 
-### 設定オプション {id="configuration-options"}
+@KoinApplication(modules = [AppModule::class])
+class MyApp
+
+fun main() {
+    startKoin<MyApp> {
+        printLogger()
+    }
+}
+```
+
+Koin Compiler Pluginは、`startKoin<MyApp>()` を、`@KoinApplication` に記載されたモジュールおよび自動検出された `@Configuration` モジュールをロードする `startKoin { }` の呼び出しに置き換えます。[@KoinApplicationによる型付き起動](#typed-startup-with-koinapplication) を参照してください。
+
+**Constructor / Classic DSL**
+```kotlin
+import org.koin.core.context.startKoin
+
+fun main() {
+    startKoin {
+        printLogger()
+        modules(appModule)
+    }
+}
+```
+
+`startKoin` はコンテナを作成し、プロセスのデフォルトコンテキストである `GlobalContext` に登録します。この処理が完了すると、すべての `get()`、`by inject()`、またはプラットフォームAPI（`by viewModel()`、`koinInject()`）がこのコンテナから解決されるようになります。
+
+`startKoin` はプロセスごとに1回しか呼び出せません。2回目の呼び出しは `KoinApplicationAlreadyStartedException` をスローします。起動後にモジュールを追加するには、[`loadKoinModules`](#load-and-unload-modules-at-runtime) を使用してください。
+
+## 起動オプション {id="start-options"}
+
+`startKoin { }` ブロック内のすべてがコンテナを設定します。
 
 ```kotlin
 startKoin {
-    // ロギング
-    logger(Level.INFO)
-
-    // プロパティ
-    environmentProperties()
-    fileProperties()
-    properties(mapOf("env" to "production"))
-
-    // モジュール
-    modules(
-        coreModule,
-        networkModule,
-        dataModule
-    )
-
-    // 遅延モジュール (バックグラウンド読み込み)
-    lazyModules(analyticsModule, reportingModule)
-
-    // Eager シングルトンの作成
-    createEagerInstances()
-
-    // オーバーライドの制御
+    printLogger(Level.DEBUG)
+    properties(mapOf("server_url" to "https://api.example.com"))
     allowOverride(false)
+    modules(coreModule, networkModule)
+    lazyModules(analyticsModule)
 }
 ```
 
 | オプション | 説明 |
-|--------|-------------|
-| `logger()` | ログレベルと実装を設定する |
-| `modules()` | モジュールを即座にロードする |
-| `lazyModules()` | バックグラウンドでモジュールをロードする |
-| `properties()` | Map からプロパティをロードする |
-| `fileProperties()` | koin.properties ファイルからロードする |
-| `environmentProperties()` | システム/環境変数からロードする |
-| `createEagerInstances()` | すべての `createdAtStart` シングルトンを作成する |
-| `allowOverride()` | 定義のオーバーライドの有効/無効を切り替える |
+|--------|--------------|
+| `modules(...)` | モジュールを即座にロードします。単一のモジュール、複数のモジュール、または `List<Module>` を受け取ります |
+| `lazyModules(...)` | バックグラウンドでモジュールをロードします。`koin-core-coroutines` が必要です。[Lazy Modules](/docs/reference/koin-core/lazy-modules) を参照してください |
+| `printLogger(level)` | コンソールにログを出力します。[ロギング](#logging) を参照してください |
+| `logger(logger)` | 独自の `Logger` 実装を使用します |
+| `properties(map)` | マップからプロパティを追加します。[プロパティ](#properties) を参照してください |
+| `fileProperties(file)` | クラスパスのファイルからプロパティをロードします。デフォルトは `/koin.properties` です（JVMのみ） |
+| `environmentProperties()` | システムプロパティおよび環境変数をロードします（JVMのみ） |
+| `allowOverride(false)` | 2つの定義が `.override()` なしで同じ型を宣言した場合に失敗します。[定義のオーバーライド](/docs/reference/koin-core/definitions#overriding-a-definition) を参照してください |
+| `strictOverride()` | `allowOverride(false)` と同じです |
+| `createEagerInstances()` | `createdAtStart` な定義を直ちに生成します。`startKoin` と `koinApplication` はすでにブロックの最後でこれを行うため、`koinApplication(createEagerInstances = false)` を使用する場合にのみ必要です |
 
-:::info
-`startKoin` は **1回** しか呼び出すことができません。後で追加のモジュールをロードするには、`loadKoinModules()` を使用してください。
-:::
+`startKoin` ブロックは呼び出し元のスレッドで実行されます。そこでロードする各モジュールや、各 `createdAtStart` 定義は、起動時間を増加させます。
 
-## Koin コンテナの起動 {id="starting-the-koin-container"}
+## @KoinApplicationによる型付き起動 {id="typed-startup-with-koinapplication"}
 
-| メソッド | ユースケース |
-|--------|----------|
-| `startKoin { }` | 標準的なアプリ - GlobalContext に登録する |
-| `koinApplication { }` | テスト、SDK、隔離されたコンテキスト - ローカルインスタンス |
-| `koinConfiguration { }` | 専用 API 用の設定ホルダー (Compose, Ktor) |
-
-:::tip
-**Koin Compiler Plugin** を使用すると、`startKoin<T>()`、`koinApplication<T>()`、`koinConfiguration<T>()` といった型指定されたバリアントが利用可能です。詳細は以下の [Compiler Plugin を使用した Koin の開始](#compiler-plugin-を使用した-koin-の開始) を参照してください。
-:::
-
-### `startKoin` - グローバルインスタンス {id="startkoin-global-instance"}
-
-最も一般的なアプローチで、Koin をグローバルに開始します。
-
-```kotlin
-fun main() {
-    startKoin {
-        modules(appModule)
-    }
-
-    // どこでも使用可能
-    val service: MyService = get()
-}
-```
-
-### `koinApplication` - 隔離されたインスタンス {id="koinapplication-isolated-instance"}
-
-（GlobalContext ではない）隔離された Koin インスタンスを作成します。
-
-```kotlin
-val myKoin = koinApplication {
-    modules(myModule)
-}.koin
-
-// 隔離されたインスタンスを使用する
-val service: MyService = myKoin.get()
-```
-
-**ユースケース:**
-- 隔離されたコンテキストでのテスト
-- SDK 開発（ホストアプリへの影響を避けるため）
-- 複数の Koin インスタンスの保持
-
-### `koinConfiguration` - 設定ホルダー {id="koinconfiguration-configuration-holder"}
-
-専用の API（Compose の `KoinApplication`、Ktor プラグインなど）で使用される設定を作成します。
-
-```kotlin
-val config = koinConfiguration {
-    modules(appModule)
-}
-
-// Compose の KoinApplication や Ktor などで使用される
-```
-
-## Compiler Plugin を使用した Koin の開始 {id="starting-koin-with-compiler-plugin"}
-
-アノテーションと共に **Koin Compiler Plugin** を使用すると、生成されたコードを意識することなく、**型指定された API** を使用して Koin を開始できます。
-
-:::info
-これには [Koin Compiler Plugin](/docs/setup/compiler-plugin) が必要です。アプリケーションクラスに `@KoinApplication` アノテーションを付与する必要があります。
-:::
-
-### アプリケーションの定義 {id="define-your-application"}
+[Koin Compiler Plugin](/docs/setup/compiler-plugin) を使用すると、`@KoinApplication` アノテーションが付与されたアプリケーションクラスがロードするモジュールを記述します。型付きの呼び出しを使用して、そのクラスからKoinを起動できます。
 
 ```kotlin
 @Module
-@Configuration
-@ComponentScan("com.myapp")
-class MyModule
+@ComponentScan("com.myapp.data")
+class DataModule
 
-@KoinApplication
+@Module(includes = [DataModule::class])
+class AppModule
+
+@KoinApplication(modules = [AppModule::class])
 class MyApp
 ```
 
-### 型指定された起動 API {id="typed-startup-apis"}
+| 呼び出し | 結果 |
+|------|--------|
+| `startKoin<MyApp>()` | `MyApp` のモジュールを使用して `GlobalContext` 内でKoinを起動します |
+| `startKoin<MyApp> { ... }` | 同様ですが、設定ブロック（ロガー、プロパティ、追加のDSLモジュール）を指定できます |
+| `koinApplication<MyApp>()` | グローバルに登録されない、独立した `KoinApplication` を作成します |
+| `koinConfiguration<MyApp>()` | 自身でKoinを起動するAPI（Composeの `KoinApplication`、Ktorなど）向けに `KoinConfiguration` を作成します |
+| `withConfiguration<MyApp>()` | 既存の `KoinApplication`（例: Ktorの `install(Koin) { }` 内）に `MyApp` のモジュールを追加します |
 
-| API | 説明 |
-|-----|-------------|
-| `startKoin<T>()` | アプリケーション T を使用して Koin をグローバルに開始する |
-| `startKoin<T> { }` | アプリケーション T と追加設定を使用して開始する |
-| `koinApplication<T>()` | T を使用して隔離された KoinApplication を作成する |
-| `koinConfiguration<T>()` | T から KoinConfiguration を作成する (Compose, Ktor 用) |
+これらの関数は `org.koin.plugin.module.dsl` からインポートされます。これらはコンパイラスタブであり、Compiler Pluginが適用されていない場合、プラグインが見つからないことを示すメッセージとともに実行時に例外をスローします。
 
-ここで `T` は `@KoinApplication` が付与されたクラスです。
+`@KoinApplication` は2つのパラメータを受け取ります:
 
-### 例 {id="examples"}
+- `modules`: 明示的にロードする `@Module` クラス。
+- `configurations`: 自動検出する設定ラベル。[設定ラベル](#configuration-labels) を参照してください。
+
+各 `@Module` クラスは、その `includes` と `@ComponentScan` 定義を持ち込みます。`startKoin<MyApp> { }` の設定ブロックは通常の `startKoin` ブロックであるため、アノテーションベースのモジュールとDSLモジュールを混在させることができます。
 
 ```kotlin
-// シンプルな起動
-startKoin<MyApp>()
-
-// 追加設定あり
 startKoin<MyApp> {
     printLogger()
-}
-
-// 隔離されたインスタンス
-val myKoin = koinApplication<MyApp>().koin
-
-// Compose/Ktor 用の設定
-val config = koinConfiguration<MyApp>()
-```
-
-### マルチモジュールプロジェクト {id="multi-module-projects"}
-
-```kotlin
-// feature/src/main/kotlin/FeatureModule.kt
-@Module
-@Configuration
-@ComponentScan("com.myapp.feature")
-class FeatureModule
-
-// app/src/main/kotlin/MyApp.kt
-@KoinApplication
-class MyApp
-
-// Koin の開始
-startKoin<MyApp>()
-```
-
-## プラットフォーム統合 {id="platform-integrations"}
-
-### Android {id="android"}
-
-```kotlin
-class MainApplication : Application() {
-    override fun onCreate() {
-        super.onCreate()
-
-        startKoin {
-            androidLogger()
-            androidContext(this@MainApplication)
-            modules(appModule)
-        }
-    }
+    modules(legacyDslModule)
 }
 ```
 
-**Compiler Plugin を使用する場合:**
+### @KoinApplicationなしで@Moduleクラスをロードする {id="loading-module-classes-without-koinapplication"}
+
+通常の `startKoin { }` または `koinApplication { }` ブロックの内部で、`@Module` クラスを直接ロードできます。
 
 ```kotlin
-@KoinApplication
-class MyApp
+import org.koin.plugin.module.dsl.module
+import org.koin.plugin.module.dsl.modules
 
-class MainApplication : Application() {
-    override fun onCreate() {
-        super.onCreate()
-
-        startKoin<MyApp> {
-            androidLogger()
-            androidContext(this@MainApplication)
-        }
-    }
+startKoin {
+    module<NetworkModule>()
+    modules(DataModule::class, CacheModule::class)
 }
 ```
 
-### Compose {id="compose"}
+これは、一部のモジュールのみが必要なテストで役立ちます。`module<T>()` と `modules(vararg KClass)` もコンパイラスタブであり、プラグインによってすでに書き換えられる `startKoin<T> { }` の内部では動作しません。
 
-`koinConfiguration` と共に `KoinApplication` Composable を使用します。
-
-```kotlin
-@Composable
-fun App() {
-    KoinApplication(
-        configuration = koinConfiguration { modules(appModule) }
-    ) {
-        MainScreen()
-    }
-}
-```
-
-**Compiler Plugin を使用する場合:**
-
-```kotlin
-@KoinApplication
-class MyApp
-
-@Composable
-fun App() {
-    KoinApplication(
-        configuration = koinConfiguration<MyApp>()
-    ) {
-        MainScreen()
-    }
-}
-```
-
-### Ktor {id="ktor"}
-
-```kotlin
-fun Application.module() {
-    install(Koin) {
-        slf4jLogger()
-        modules(appModule)
-    }
-}
-```
-
-**Compiler Plugin を使用する場合:**
-
-```kotlin
-@KoinApplication
-class MyApp
-
-fun Application.module() {
-    install(Koin) {
-        slf4jLogger()
-        withConfiguration<MyApp>()
-    }
-}
-```
-
-:::info
-詳細は [Ktor Integration](/docs/reference/koin-ktor/ktor) を参照してください。
+:::note
+Compiler Pluginを使用する場合、呼び出すべき `AppModule().module` 拡張関数は存在しません。アノテーション付きモジュールは、`@KoinApplication` と `startKoin<T>()`、または上記のように `module<T>()` を使用してロードしてください。
 :::
 
-### Kotlin Multiplatform {id="kotlin-multiplatform"}
+### 設定ラベル {id="configuration-labels"}
 
-プラットフォーム間で設定を共有します。
+`@Configuration` が付けられた `@Module` は、クラスパス上の他のGradleモジュールからも含め、`@KoinApplication` によって自動的に検出されます（[@Configurationによる自動検出](/docs/reference/koin-core/modules#auto-discovery-with-configuration) を参照）。ラベルを使用すると、これらのモジュールのうちどれをロードするかを選択できます。
 
 ```kotlin
-// commonMain
-fun initKoin(config: KoinAppDeclaration? = null) {
-    startKoin {
-        config?.invoke(this)
-        modules(sharedModule)
-    }
-}
+@Module
+@Configuration
+class CoreModule
 
-// androidMain
-class MainApplication : Application() {
-    override fun onCreate() {
-        super.onCreate()
-        initKoin {
-            androidContext(this@MainApplication)
-            androidLogger()
-        }
-    }
-}
+@Module
+@Configuration("prod")
+class ProdDatabaseModule
 
-// iosMain
-fun initKoinIos() = initKoin()
+@Module
+@Configuration("test")
+class TestDatabaseModule
+
+@Module
+@Configuration("default", "test")
+class LoggingModule
 ```
 
-## 動的なモジュール管理 {id="dynamic-module-management"}
+```kotlin
+@KoinApplication
+class MyApp // CoreModuleとLoggingModuleをロード
 
-### 起動後のモジュールのロード {id="loading-modules-after-startup"}
+@KoinApplication(configurations = ["default", "prod"])
+class ProdApp // CoreModule、LoggingModule、ProdDatabaseModuleをロード
+
+@KoinApplication(configurations = ["test"])
+class TestApp // TestDatabaseModuleとLoggingModuleをロード
+```
+
+ルール:
+
+- 値のない `@Configuration` は `"default"` ラベルになります。`@Configuration("default")` も同様です。
+- `configurations` を指定しない `@KoinApplication` は、`"default"` ラベルのみをロードします。
+- ラベルをリストした場合、それらのラベルのみがロードされます。デフォルトのモジュールもロードしたい場合は、リストに `"default"` を追加してください。
+- 1つのモジュールに複数のラベルを設定できます。
+
+## koinApplicationによる独立したインスタンス {id="isolated-instance-with-koinapplication"}
+
+`koinApplication { }` は、`GlobalContext` に登録されないコンテナを作成します。
 
 ```kotlin
-// 最初の起動
-startKoin {
-    modules(coreModule)
+val koinApp = koinApplication {
+    modules(sdkModule)
 }
 
-// 後で追加のモジュールをロードする
-loadKoinModules(featureModule)
+val service = koinApp.koin.get<SdkService>()
 ```
 
-### モジュールのアンロード {id="unloading-modules"}
+グローバルAPI（Activity内の `KoinComponent` や `by inject()` など）からは、このコンテナは見えません。ホストアプリのコンテナを共有してはならないライブラリやSDK、または独自のインスタンスが必要なテストに使用してください。完全なパターンは [Context Isolation](/docs/reference/koin-core/context-isolation) に記載されています。
+
+`koinConfiguration { }` は、何も開始せずに設定のみを構築します。Composeの `KoinApplication` やKtorプラグインなど、自身でKoinを起動するAPIに渡して使用します。
+
+## 各プラットフォームでの起動 {id="starting-on-each-platform"}
+
+- Android: `Application.onCreate()` 内で `androidContext()` および `androidLogger()` を使用してKoinを起動します。[Starting Koin on Android](/docs/reference/koin-android/start) を参照してください。
+- Compose: コンポーザブル関数から `KoinApplication` または `KoinMultiplatformApplication` を使用してKoinを起動します。[Koin for Compose](/docs/reference/koin-compose/compose) を参照してください。
+- Ktor: `Application` モジュールに `Koin` プラグインをインストールします。[Koin for Ktor](/docs/reference/koin-ktor/ktor) を参照してください。
+- Kotlin Multiplatform: `commonMain` で `initKoin()` 関数を共有し、各プラットフォームから呼び出します。[KMP Setup](/docs/reference/koin-core/kmp-setup) を参照してください。
+
+## 実行時のモジュールのロードとアンロード {id="load-and-unload-modules-at-runtime"}
+
+起動後、グローバルコンテナ内のモジュールを追加および削除できます。
 
 ```kotlin
-unloadKoinModules(featureModule)
-```
+import org.koin.core.context.loadKoinModules
+import org.koin.core.context.unloadKoinModules
 
-### 機能トグル (Feature Toggle) の例 {id="feature-toggle-example"}
-
-```kotlin
-if (isFeatureEnabled) {
-    loadKoinModules(premiumFeatureModule)
+if (premiumEnabled) {
+    loadKoinModules(premiumModule)
 }
 
-// 後で無効になった場合
-unloadKoinModules(premiumFeatureModule)
+// 後で
+unloadKoinModules(premiumModule)
 ```
 
-## Koin の停止 {id="stopping-koin"}
+どちらの関数も、単一のモジュールまたは `List<Module>` を受け取ります。`unloadKoinModules` はモジュールの定義を削除し、そのインスタンスを破棄するため、その後これらの型に対する `get()` を呼び出すと失敗します。
 
-コンテナを閉じ、リソースを解放します。
+Compiler Pluginは実行時に構築されるグラフを検証できません。モジュールがいつロードされるか、あるいは本当にロードされるかどうかを判断できないためです。実行時にロードされるモジュールから他の定義が必要とする型には `@Provided` をマークする必要があり、プラグインはそのモジュール自体が起動時にロードされていないものとして報告します。[Compile-Time Safety](/docs/reference/koin-compiler/compile-safety) を参照してください。単に起動時間を短縮する目的で後からモジュールをロードする場合は、通常 [Lazy Modules](/docs/reference/koin-core/lazy-modules) を使用する方が適しています。
+
+## Koinの停止 {id="stop-koin"}
 
 ```kotlin
+import org.koin.core.context.stopKoin
+
 stopKoin()
 ```
 
-隔離されたインスタンスの場合:
+`stopKoin()` はグローバルコンテナをクローズします。すべてのインスタンスを解放し、定義の `onClose` コールバックを呼び出し、`GlobalContext` をクリアします。その後、再び `startKoin` を呼び出すことができます。独立したコンテナの場合は、`KoinApplication` の `close()` を呼び出します。
 
 ```kotlin
-val koinApp = koinApplication { modules(myModule) }
 koinApp.close()
 ```
 
+テストでは、各テストの後にKoinを停止して、次のテストがクリーンな状態で開始されるようにしてください。[Testing](/docs/reference/koin-test/testing) では、これを自動的に行うJUnitルールを紹介しています。
+
 ## ロギング {id="logging"}
 
-### ロギングの有効化 {id="enable-logging"}
+Koinはデフォルトでは何もログを出力しません（`EmptyLogger`）。起動ブロックでロギングを有効にします。
 
 ```kotlin
 startKoin {
-    logger(Level.INFO)  // または DEBUG, WARNING, ERROR, NONE
+    printLogger(Level.DEBUG)
+    modules(appModule)
 }
 ```
 
-### 利用可能なロガー {id="available-loggers"}
+`Level` には `DEBUG`、`INFO`、`WARNING`、`ERROR`、または `NONE` があります。各ロガーのデフォルトレベルは `INFO` です。
 
-| ロガー | プラットフォーム | 説明 |
-|--------|----------|-------------|
-| `EmptyLogger` | 全て | ログ出力なし (デフォルト) |
-| `PrintLogger` | 全て | コンソール出力 |
-| `AndroidLogger` | Android | Android Logcat |
-| `SLF4JLogger` | JVM | SLF4J 統合 |
+| ロガー | 起動オプション | プラットフォーム | アーティファクト |
+|--------|--------------|----------|----------|
+| `EmptyLogger` | (デフォルト) | すべて | `koin-core` |
+| `PrintLogger` | `printLogger()` | すべて | `koin-core` |
+| `AndroidLogger` | `androidLogger()` | Android (Logcat) | `koin-android` |
+| `SLF4JLogger` | `slf4jLogger()` | JVM | `koin-logger-slf4j` |
 
-### プラットフォーム固有のロガー {id="platform-specific-loggers"}
+`DEBUG` レベルでは、Koinは各モジュールのロードと各依存解決をその所要時間とともに出力します。これは処理の遅い定義を特定するのに役立ちますが、本番環境には冗長すぎます。
+
+ログを別の場所に出力するには、`Logger` を継承して `logger()` に渡します。
 
 ```kotlin
-// Android
-startKoin {
-    androidLogger(Level.DEBUG)
+import org.koin.core.logger.Level
+import org.koin.core.logger.Logger
+import org.koin.core.logger.MESSAGE
+
+class AppLogger : Logger(Level.INFO) {
+    override fun display(level: Level, msg: MESSAGE) {
+        MyLogSystem.log(level.name, msg)
+    }
 }
 
-// Ktor
-install(Koin) {
-    slf4jLogger()
+startKoin {
+    logger(AppLogger())
 }
 ```
 
 ## プロパティ {id="properties"}
 
+プロパティはコンテナ内に保存されるキーと値のペアです。URLやキーなどの設定値に使用します。
+
 ### プロパティのロード {id="loading-properties"}
 
 ```kotlin
 startKoin {
-    // 環境変数から
-    environmentProperties()
-
-    // ファイルから (koin.properties)
-    fileProperties()
-
-    // コードから
-    properties(mapOf(
-        "server_url" to "https://api.example.com",
-        "api_key" to "secret123"
-    ))
+    properties(mapOf("server_url" to "https://api.example.com"))
+    fileProperties()          // JVM: クラスパスから /koin.properties を読み込む
+    environmentProperties()   // JVM: システムプロパティおよび環境変数
 }
 ```
 
-### プロパティの使用 {id="using-properties"}
+Androidでは、`androidFileProperties()` が `assets` フォルダから `koin.properties` を読み込みます。実行時に `Koin` インスタンスでプロパティを設定・取得することもできます。
 
 ```kotlin
-val appModule = module {
-    single {
-        ApiClient(
-            url = getProperty("server_url"),
-            key = getProperty("api_key", "default")
-        )
-    }
+val koin = KoinPlatform.getKoin()
+koin.setProperty("session_token", token)
+val token: String? = koin.getProperty("session_token")
+```
+
+ファイルや環境変数からロードされた値は `String` になります。必要に応じて手動で変換してください（`getProperty<String>("timeout").toInt()`）。
+
+### プロパティのインジェクション {id="injecting-properties"}
+
+**Compiler Plugin DSL**
+コンストラクタパラメータに `@Property`（`koin-annotations` 提供）を付与します:
+
+```kotlin
+class ApiClient(@Property("server_url") val url: String)
+
+val networkModule = module {
+    single<ApiClient>()
 }
 ```
 
-## ベストプラクティス {id="best-practices"}
+**Annotations**
+```kotlin
+@Singleton
+class ApiClient(@Property("server_url") val url: String)
+```
 
-1. **`startKoin` は一度だけ呼び出す** - アプリケーションのエントリポイントで行います。
-2. **重要なモジュールは即座にロードする** - `modules()` を使用します。
-3. **遅延モジュールを活用する** - `lazyModules()` で重要度の低いもののロードを遅らせます。
-4. **開発中はロギングを有効にする** - `logger(Level.DEBUG)` を使用します。
-5. **本番環境では strict モードを使用する** - `allowOverride(false)` を設定します。
-6. **テスト間では Koin を停止する** - 状態をリセットするために `stopKoin()` を呼び出します。
+プロパティにデフォルト値を設定するには、同じキーを持つトップレベルの値に `@PropertyValue` を付与します:
 
-## 次のステップ {id="next-steps"}
+```kotlin
+@PropertyValue("server_url")
+val defaultServerUrl = "https://api.example.com"
+```
 
-- **[モジュール](/docs/reference/koin-core/modules)** - 定義を整理する
-- **[定義](/docs/reference/koin-core/definitions)** - DSL またはアノテーションで定義を作成する
-- **[インジェクション](/docs/reference/koin-core/injection)** - 依存関係を取得する
+生成されたコードは `getProperty("server_url", defaultServerUrl)` を読み出すため、プロパティが設定されていない場合は `ApiClient` にデフォルト値が渡されます。
+
+**Constructor / Classic DSL**
+```kotlin
+val networkModule = module {
+    single { ApiClient(url = getProperty("server_url")) }
+
+    // デフォルト値あり
+    single { ApiClient(url = getProperty("server_url", "https://api.example.com")) }
+}
+```
+
+`getProperty(key)` はプロパティが存在しない場合に例外をスローします。代わりに `getPropertyOrNull(key)` を使用すると `null` が返されます。
+
+さまざまな場所で `getProperty` を呼び出すのではなく、1つの設定クラスでプロパティを読み込み、そのクラスをインジェクトするようにしてください。そうすることでキーを1つのファイルに集約できます。
+
+## 制限事項 {id="limits"}
+
+- `startKoin` はプロセスごとに1回のみ実行されます。再起動する前に `stopKoin()` を呼び出してください。
+- `fileProperties()` および `environmentProperties()` はJVMでのみ使用可能です。その他のプラットフォームでは、`properties()` でマップを渡してください。
+- 型付き起動（`startKoin<T>()`、`module<T>()`）には Compiler Plugin が必要です。KSPプロセッサは非推奨になりました。[Migrating from KSP](/docs/migration/from-ksp-to-compiler-plugin) を参照してください。
+- 起動後に `loadKoinModules` でロードされたモジュールは、コンパイル時の依存関係グラフチェックの対象外となります。
+
+## 関連ドキュメント {id="related"}
+
+- [Modules](/docs/reference/koin-core/modules): 定義の整理、`includes()`、`@Module`、および `@Configuration`。
+- [Definitions](/docs/reference/koin-core/definitions): Koinが作成するものの宣言、先行作成（eager creation）、オーバーライド。
+- [Lazy Modules](/docs/reference/koin-core/lazy-modules): バックグラウンドでモジュールをロードして起動時間を短縮。
+- [Context Isolation](/docs/reference/koin-core/context-isolation): SDK向けに独立したコンテナでKoinを実行。
+- [Compiler Plugin Setup](/docs/setup/compiler-plugin): `startKoin<T>()` に必要なプラグインのセットアップ。
+- [Starting Koin on Android](/docs/reference/koin-android/start): `androidContext()`、`androidLogger()`、および AndroidX Startup。

@@ -1,124 +1,174 @@
 ---
-title: パラメータの渡し方 - インジェクションパラメータ
+title: 注入パラメータ (Injected Parameters)
 ---
 
-どのような定義においても、インジェクションパラメータ（定義によって注入され、使用されるパラメータ）を使用できます。
+# 注入パラメータ (Injected Parameters)
 
-## 注入する値の渡し方 {id="passing-values-to-inject"}
+一部のオブジェクトは、ユーザーIDや現在の画面など、呼び出し元だけが知っている値を必要とします。注入パラメータ（Injected parameters）を使用すると、呼び出し元がKoinにインスタンスを要求する際にこれらの値を渡すことができます。このページでは、定義内でパラメータを宣言する方法、それを渡す方法、そしてKoinが値をパラメータにどのようにマッチングするかについて解説します。なお、定義の宣言方法を理解していることを前提としています（[定義 (Definitions)](/docs/reference/koin-core/definitions) を参照）。
 
-定義に対して、以下のようにパラメータを渡すことができます：
+## パラメータの宣言と受け渡し {id="declare-and-pass-a-parameter"}
 
+どのコンストラクタパラメータが呼び出し元から渡されるかを指定します。その他のパラメータは通常どおりコンテナから解決されます。
+
+**コンパイラプラグインDSL**
 ```kotlin
-class Presenter(val a : A, val b : B)
+import org.koin.core.annotation.InjectedParam
 
-val myModule = module {
-    single { params -> Presenter(a = params.get(), b = params.get()) }
+class UserPresenter(
+    @InjectedParam val userId: String,
+    val repository: UserRepository,
+)
+
+val appModule = module {
+    single<UserRepository>()
+    factory<UserPresenter>()
 }
 ```
 
-パラメータは `parametersOf()` 関数（各値をカンマで区切る）を使用して定義に送られます：
+`@InjectedParam` は `koin-annotations` アーティファクトから提供されます。これにより、`userId` が定義ではないことをコンパイラプラグインに伝え、ビルド時のチェックで不足していると報告されないようにします。
+
+**アノテーション**
+```kotlin
+@Factory
+class UserPresenter(
+    @InjectedParam val userId: String,
+    val repository: UserRepository,
+)
+```
+
+`@InjectedParam` はプロバイダ関数のパラメータに対しても機能します。
+
+**コンストラクタ / クラシックDSL**
+定義ラムダはパラメータを `params` として受け取ります。
 
 ```kotlin
-class MyComponent : View, KoinComponent {
-
-    val a : A ...
-    val b : B ... 
-
-    // これを View の値として注入する
-    val presenter : Presenter by inject { parametersOf(a, b) }
+val appModule = module {
+    singleOf(::UserRepository)
+    factory { params -> UserPresenter(userId = params.get(), repository = get()) }
 }
 ```
 
-## 「インジェクションパラメータ」の定義 {id="defining-an-injected-parameter"}
-
-以下はインジェクションパラメータの例です。`Presenter` クラスを構築するために `view` パラメータが必要であると仮定します。`params` 関数の引数を使用して、注入されたパラメータを取得します：
+呼び出し元は、パラメータと同じ順序で `parametersOf()` を使用して値を渡します。
 
 ```kotlin
-class Presenter(val view : View)
+import org.koin.core.parameter.parametersOf
 
-val myModule = module {
-    single { params -> Presenter(view = params.get()) }
+val presenter: UserPresenter = get { parametersOf("user-42") }
+
+// または遅延取得
+val presenter: UserPresenter by inject { parametersOf("user-42") }
+```
+
+パラメータブロックはラムダであるため、値はインスタンスが作成されるときに読み取られます。`by inject()` を使用する場合、これは初回アクセス時になります。
+
+注入パラメータは `factory` 定義を対象としています。`single` は1度だけ作成されるため、初回に渡された値が使用され、以降の値は無視されます。
+
+各プラットフォームのAPIも同じブロックを受け取ります。Composeでは `koinInject { parametersOf(userId) }`（[Koin for Compose](/docs/reference/koin-compose/compose) を参照）、ViewModelでは `by viewModel { parametersOf(userId) }` または `koinViewModel { parametersOf(userId) }` となります（[ViewModel](/docs/reference/koin-core/viewmodel) を参照）。
+
+## 複数のパラメータ {id="several-parameters"}
+
+**コンパイラプラグインDSL**
+```kotlin
+class OrderPresenter(
+    @InjectedParam val userId: String,
+    @InjectedParam val orderId: Long,
+    val repository: OrderRepository,
+)
+
+val appModule = module {
+    factory<OrderPresenter>()
 }
 ```
 
-また、分割代入（destructured declaration）を使用して、パラメータオブジェクトから直接インジェクションパラメータを記述することもできます：
+**アノテーション**
+```kotlin
+@Factory
+class OrderPresenter(
+    @InjectedParam val userId: String,
+    @InjectedParam val orderId: Long,
+    val repository: OrderRepository,
+)
+```
+
+**コンストラクタ / クラシックDSL**
+ラムダ内でパラメータを分割代入します。
 
 ```kotlin
-class Presenter(val view : View)
-
-val myModule = module {
-    single { (view : View) -> Presenter(view) }
+val appModule = module {
+    factory { (userId: String, orderId: Long) ->
+        OrderPresenter(userId, orderId, get())
+    }
 }
 ```
 
-:::caution
- 「分割代入」による宣言は便利で読みやすいですが、型安全ではありません。複数の値がある場合、渡された型の順序が正しいかどうかを Kotlin は検出できません。
+または、`params[i]` や `params.get<T>(i)` を使ってインデックスで読み取ることもできます。
+
+```kotlin
+val appModule = module {
+    factory { params -> OrderPresenter(params[0], params[1], get()) }
+}
+```
+
+分割代入は最大5つの値に制限されており、宣言された型は呼び出し元が渡した値に対してチェックされません。順序が間違っている場合、キャストは実行時に失敗します。
+
+```kotlin
+val presenter: OrderPresenter = get { parametersOf("user-42", 1001L) }
+```
+
+## Koinが値をマッチングする仕組み {id="how-koin-matches-values"}
+
+`params.get<T>()` および生成されたコードは、以下のルールに基づいて各値を検索します。
+
+- Koinはまず現在の位置にある値を確認します。要求された型と一致する場合、Koinはその値を返して次の位置に進みます。
+- 一致しない場合、Koinはどこにあっても要求された型の最初の値を返します。
+- `params.getOrNull<T>()` はその型の値が渡されなかった場合に `null` を返します。`get<T>()` は `DefinitionParameterException` をスローします。
+
+実際には、コンストラクタの順序で値を渡します。`parametersOf("user-42", 1001L)` は `userId`、続いて `orderId` を設定し、2つの `String` パラメータは順序どおりに2つの `String` 値を受け取ります。
+
+特定の動作のみが必要な場合は、別の関数を使用してパラメータを構築します。
+
+| 関数 | マッチング方法 |
+|----------|----------|
+| `parametersOf(...)` | 位置を優先、その後に型（デフォルト、上記のルール） |
+| `parameterArrayOf(...)` | 位置のみ。現在の位置の値が要求された型である必要があります |
+| `parameterSetOf(...)` | 型のみ。すべての `get<T>()` はその型の最初の値を返します |
+
+```kotlin
+val byIndex = parameterArrayOf(1, 2, 3)
+byIndex.get<Int>() // 1
+byIndex.get<Int>() // 2
+
+val byType = parameterSetOf("a_string", 42)
+byType.get<Int>()    // 42
+byType.get<Int>()    // 42
+```
+
+## パラメータから解決される値 {id="values-resolved-from-parameters"}
+
+Koinがパラメータを指定してインスタンスを作成する場合、定義内の通常の `get()` はコンテナよりも前に渡された値をチェックします。マークされていないパラメータであっても、渡された値を受け取ることができます。
+
+```kotlin
+val appModule = module {
+    factory { UserPresenter(userId = get(), repository = get()) }
+}
+
+get<UserPresenter> { parametersOf("user-42") } // userId = "user-42"
+```
+
+これは依存関係のさらに奥にある依存先に対しても機能します。たとえば、`UserPresenter` が画面名を必要とする `Tracker` を必要としている場合、プレゼンター用に渡された値が `Tracker` の定義にまで到達することが可能です。
+
+いずれにしても、`@InjectedParam` または `params.get()` の使用をお勧めします。これらを使用することで値がどこから来るのかが明確になり、コンパイラプラグインがグラフの残りの部分をチェックできるようになります。
+
+:::warning
+渡された値が要求された定義と同じ型を持つ場合、Koinはその値を直接返し、定義を実行しません。`get<String> { parametersOf("x") }` は `"x"` を返します。定義の型と競合する場合は、そのようなパラメータを独自の型（value class など）でラップしてください。
 :::
 
-## インジェクションパラメータを順序で解決する {id="resolving-injected-parameters-in-order"}
+`get(named("local"))` のような修飾子付きのリクエストは、パラメータから値を取得することは決してありません。パラメータには修飾子（qualifier）が付与されないためです。
 
-パラメータを解決するために `get()` を使用する代わりに、同じ型のパラメータが複数ある場合は、以下のようにインデックス `get(index)`（`[ ]` 演算子と同じ）を使用できます：
+## 関連情報 {id="related"}
 
-```kotlin
-class Presenter(val view : View)
-
-val myModule = module {
-    
-    single { p -> Presenter(p[0], p[1]) }
-}
-```
-
-## インジェクションパラメータをグラフから解決する {id="resolving-injected-parameters-from-graph"}
-
-Koin のグラフ解決（すべての定義を解決するためのメインツリー）でも、インジェクションパラメータを見つけることができます。通常通り `get()` 関数を使用するだけです：
-
-```kotlin
-class Presenter(val view : View)
-
-val myModule = module {
-    single { Presenter(get()) }
-}
-```
-
-## インジェクションパラメータ：インデックス値またはセット (`3.4.3`) {id="injected-parameters-indexed-values-or-set-3-4-3"}
-
-`parametersOf` に加えて、以下の API が利用可能です：
-
-- `parameterArrayOf`: 値の配列を使用します。データはそのインデックスによって使用されます。
-
-```kotlin
-val params = parameterArrayOf(1, 2, 3)
-params.get<Int>() == 1
-params.get<Int>() == 2
-params.get<Int>() == 3
-params.get<Int>() == 3
-```
-
-- `parameterSetOf`: 異なる種類の値のセットを使用します。値を順番に取り出すためにインデックスは使用しません。
-
-```kotlin
-val params = parameterSetOf("a_string", 42)
-params.get<Int>() == 42
-params.get<String>() == "a_string"
-params.get<Int>() == 42
-params.get<String>() == "a_string"
-```
-
-デフォルトの関数 `parametersOf` は、インデックスと値のセットの両方で動作します：
-
-```kotlin
-val params = parametersOf(1, 2, "a_string")
-params.get<String>() == "a_string"
-params.get<Int>() == 1
-params.get<Int>() == 2
-params.get<Int>() == 2
-params.get<String>() == "a_string"
-```
-
-:::note
-  `parametersOf` または `parameterArrayOf` を使用して、インデックスに基づいて値を消費するようにパラメータ注入を「カスケード（連鎖）」させることができます。あるいは、`parametersOf` または `parameterSetOf` を使用して、解決する型に基づいてカスケードさせることもできます。
-:::
-
-:::caution
-`parametersOf` を介して渡された値が、要求された定義（requested definition）と同じ型を持つ場合、Koin はその値を直接返し、ファクトリブロックをスキップします。パラメータが定義の戻り値の型と衝突する場合は、ラッパー型（例：value class）を使用してください。
-:::
+- [インジェクション (Injection)](/docs/reference/koin-core/injection): パラメータを渡す場所である `get()` と `inject()` について。
+- [定義 (Definitions)](/docs/reference/koin-core/definitions#constructor-parameters): その他のコンストラクタパラメータがどのように解決されるかについて。
+- [ViewModel](/docs/reference/koin-core/viewmodel): ViewModelのパラメータと `SavedStateHandle` について。
+- [修飾子 (Qualifiers)](/docs/reference/koin-core/qualifiers): 値を渡す代わりに定義を選択する方法について。
+- [アノテーションリファレンス](/docs/reference/koin-annotations/annotations-inventory): `@InjectedParam` およびその他のパラメータアノテーションについて。

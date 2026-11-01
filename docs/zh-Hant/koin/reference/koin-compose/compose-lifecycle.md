@@ -2,281 +2,87 @@
 title: 生命週期與狀態
 ---
 
-# Compose 中的生命週期與狀態 (Lifecycle & State)
+# 生命週期與狀態
 
-本指南涵蓋 Koin 如何與 Compose 的生命週期和狀態管理整合。瞭解這些概念有助於您編寫高效且無錯誤的 Compose 應用程式。
+本頁說明使用 Koin 注入的物件在 Compose 生命週期中的行為表現：重組（recomposition）時會發生什麼事、當 Composable 離開組合（composition）時各個 Koin API 會釋放什麼，以及應該在哪裡放置注入呼叫。本篇假設你已了解 `koinInject()` 與 `koinViewModel()`（請參閱 [Koin for Compose](/docs/reference/koin-compose/compose)）以及 [Compose 生命週期](https://developer.android.com/develop/ui/compose/lifecycle)。
 
-:::info
-本指南與 [Android 的官方 Compose 生命週期文件](https://developer.android.com/develop/ui/compose/lifecycle) 保持一致。
-:::
+## 重組 (Recomposition) {id="recomposition"}
 
-## Compose 生命週期概覽 {id="compose-lifecycle-overview"}
-
-一個 Composable 具有三個生命週期事件：
-
-1. **進入 Composition** - Composable 首次被呼叫
-2. **重組 (Recomposition)** - 當狀態改變時，Composable 重新執行（0 次或多次）
-3. **離開 Composition** - Composable 從樹狀結構中移除
-
-Koin 的 Compose API 旨在與此生命週期高效配合。
-
-## 注入與重組 (Injection and Recomposition) {id="injection-and-recomposition"}
-
-### koinInject() 如何運作 {id="how-koininject-works"}
-
-`koinInject()` 從 Koin 檢索執行個體，並在重組之間**記住 (remembers)** 它們：
+`koinInject()` 只會解析相依性一次，並使用 `remember` 保留它，並以限定詞（qualifier）、作用域（scope）和參數作為鍵值：
 
 ```kotlin
 @Composable
-fun MyScreen() {
-    // 僅解析一次，並在重組之間記住
-    val repository = koinInject<UserRepository>()
-
-    // 安全 - 使用相同的執行個體
-    val users by repository.users.collectAsState()
+fun UserScreen(userId: String) {
+    val repository = koinInject<UserRepository>() // 僅解析一次
+    val presenter = koinInject<UserPresenter> { parametersOf(userId) } // 當 userId 變更時會再次解析
 }
 ```
 
-### 注入時機 {id="injection-timing"}
+在鍵值相同的重組中，你會取得相同的物件。當鍵值變更（例如新的 `userId`）時，Koin 會重新解析。對於 `single`，這會傳回同一個執行個體。對於 `factory`，則會建立一個新的執行個體。
 
-請在 **Composable 函式層級**注入相依性，而不是在回呼內部：
+`koinViewModel()` 不使用 `remember`：ViewModel 儲存在 `ViewModelStoreOwner` 中，並能在重組與 Android 設定變更後繼續存活。其參數僅在建立時使用（請參閱 [ViewModel in Compose](/docs/reference/koin-compose/compose-viewmodel)）。
+
+兩者都是 Composable 函式，因此不能在 `remember { }`、`LaunchedEffect` 或 `onClick` Lambda 內部呼叫。請在 Composable 主體中呼叫它們，並在 Lambda 內使用其結果：
 
 ```kotlin
 @Composable
-fun MyScreen() {
-    // 正確 - 在 composition 時解析
+fun SaveButton() {
     val repository = koinInject<UserRepository>()
-    val viewModel = koinViewModel<MyViewModel>()
 
-    Button(onClick = {
-        // 錯誤 - 不要在回呼中注入
-        val service = koinInject<Service>() // 應避免！
-
-        // 正確 - 使用已經注入的執行個體
-        repository.save()
-    }) {
+    Button(onClick = { repository.save() }) {
         Text("Save")
     }
 }
 ```
 
-### 搭配參數的效能 {id="performance-with-parameters"}
+## 釋放內容與時機 {id="what-is-released-and-when"}
 
-當 `koinInject` 使用參數時，偏好使用顯式參數形式：
+| API | 在重組時 | 當 Composable 離開組合時 |
+|-----|------------------|--------------------------------------------|
+| `koinInject()` | 若鍵值未變更則為相同物件 | 捨棄參照。Koin 會保留 `single` 或 `scoped` 執行個體 |
+| `koinViewModel()` | 相同 ViewModel | 不釋放任何內容。ViewModel 會隨其 `ViewModelStoreOwner` 一起清除 |
+| `KoinApplication` | 相同 Koin 執行個體 | Koin 保持執行。僅在組合被放棄時才會停止 |
+| `KoinScope`, `rememberKoinScope` | 相同作用域 | 關閉作用域 |
+| `KoinNavigationScope` | 相同作用域 | 保留作用域。僅在組合被放棄時才會關閉 |
+| `UnboundKoinScope` | 相同作用域 | 不做任何事。由你自行關閉作用域 |
+| `rememberKoinModules` | 模組僅載入一次 | 僅在你設定了 `unloadOnForgotten` 時才會卸載模組 |
+
+詳細資訊：[Compose 中的作用域](/docs/reference/koin-compose/compose-scopes)、[動態模組](/docs/reference/koin-compose/compose-modules)。
+
+## 注入的位置 {id="where-to-inject"}
+
+在畫面（screen）層級進行注入，並將純資料和 Lambda 向下傳遞。這樣一來，子 Composable 就不會相依於 Koin，且預覽與測試也不需要 Koin 執行個體：
 
 ```kotlin
 @Composable
-fun MyScreen(userId: String) {
-    // 更高效 - 參數僅評估一次
-    val presenter = koinInject<UserPresenter>(
-        parameters = parametersOf(userId)
-    )
-
-    // 較低效 - Lambda 在重組時會重新評估
-    val presenter = koinInject<UserPresenter> {
-        parametersOf(userId)
-    }
-}
-```
-
-## 使用 Koin 進行狀態管理 {id="state-management-with-koin"}
-
-### StateFlow 與 collectAsState {id="stateflow-and-collectasstate"}
-
-使用 Koin 進行響應式 UI 的標準模式：
-
-```kotlin
-@KoinViewModel
-class UserViewModel(
-    private val repository: UserRepository
-) : ViewModel() {
-    private val _state = MutableStateFlow<UiState>(UiState.Loading)
-    val state: StateFlow<UiState> = _state.asStateFlow()
-
-    init {
-        loadUsers()
-    }
-
-    private fun loadUsers() {
-        viewModelScope.launch {
-            _state.value = UiState.Success(repository.getUsers())
-        }
-    }
+fun UserListScreen(viewModel: UserListViewModel = koinViewModel()) {
+    val users by viewModel.users.collectAsState()
+    UserList(users = users, onDelete = viewModel::delete)
 }
 
 @Composable
-fun UserScreen(
-    viewModel: UserViewModel = koinViewModel()
-) {
-    val state by viewModel.state.collectAsState()
-
-    when (val s = state) {
-        is UiState.Loading -> LoadingIndicator()
-        is UiState.Success -> UserList(s.users)
-        is UiState.Error -> ErrorMessage(s.message)
-    }
-}
-```
-
-### 直接注入存儲庫 (Repository) {id="direct-repository-injection"}
-
-對於較簡單的情況，直接注入存儲庫：
-
-```kotlin
-@Singleton
-class UserRepository {
-    private val _users = MutableStateFlow<List<User>>(emptyList())
-    val users: StateFlow<List<User>> = _users.asStateFlow()
-}
-
-@Composable
-fun UserListScreen() {
-    val repository = koinInject<UserRepository>()
-    val users by repository.users.collectAsState()
-
+fun UserList(users: List<User>, onDelete: (User) -> Unit) {
     LazyColumn {
-        items(users) { user ->
-            UserCard(user)
-        }
+        items(users) { user -> UserCard(user, onDelete) }
     }
 }
 ```
 
-### remember() vs koinInject() {id="remember-vs-koininject"}
+避免在 `LazyColumn` 項目內部使用 `koinInject()`：每個項目都會執行自己的解析與 `remember`。請在父層注入一次，並傳遞該物件或 Lambda。
 
-為每項工作使用正確的工具：
-
-```kotlin
-@Composable
-fun MyScreen() {
-    // 由 Koin 管理的相依性
-    val viewModel = koinViewModel<MyViewModel>()
-    val repository = koinInject<Repository>()
-
-    // 由 Compose 管理的狀態
-    val scrollState = rememberScrollState()
-    val coroutineScope = rememberCoroutineScope()
-    var text by remember { mutableStateOf("") }
-
-    // 不要將 koinInject 包裝在 remember 中（這是不必要的）
-    val service = remember { koinInject<Service>() } // 冗餘！
-}
-```
-
-## 使用 Koin 處理副作用 (Side Effects) {id="side-effects-with-koin"}
-
-### LaunchedEffect {id="launchedeffect"}
-
-在進入 composition 或 key 更改時執行暫停程式碼：
-
-```kotlin
-@Composable
-fun UserDetailScreen(userId: String) {
-    val repository = koinInject<UserRepository>()
-    var user by remember { mutableStateOf<User?>(null) }
-
-    // 當 userId 改變時執行
-    LaunchedEffect(userId) {
-        user = repository.getUser(userId)
-    }
-
-    user?.let { UserContent(it) }
-}
-```
-
-### DisposableEffect {id="disposableeffect"}
-
-在離開 composition 時清理資源：
-
-```kotlin
-@Composable
-fun EventScreen() {
-    val eventBus = koinInject<EventBus>()
-
-    DisposableEffect(Unit) {
-        val listener = eventBus.subscribe { event ->
-            // 處理事件
-        }
-
-        onDispose {
-            eventBus.unsubscribe(listener)
-        }
-    }
-}
-```
-
-### SideEffect {id="sideeffect"}
-
-在每次成功的重組後執行非暫停副作用：
-
-```kotlin
-@Composable
-fun AnalyticsScreen(screenName: String) {
-    val analytics = koinInject<Analytics>()
-
-    SideEffect {
-        analytics.logScreenView(screenName)
-    }
-}
-```
-
-## 穩定性與跳過 (Stability and Skipping) {id="stability-and-skipping"}
-
-### 瞭解穩定類型 (Stable Types) {id="understanding-stable-types"}
-
-當輸入未更改時，Compose 可以跳過重組。為了使此功能運作，參數型別必須是**穩定 (stable)** 的：
-
-```kotlin
-// 穩定 - Compose 可以跳過
-@Composable
-fun UserCard(
-    name: String,                    // 基本型別 - 穩定
-    onClick: () -> Unit,             // Lambda - 穩定
-    viewModel: UserViewModel = koinViewModel()  // 被視為穩定
-)
-
-// 可能不穩定 - 可能不會跳過
-@Composable
-fun UserCard(
-    user: User  // 資料類別 - 如果所有屬性都穩定，則穩定
-)
-```
-
-### Koin 注入與穩定性 {id="koin-injections-and-stability"}
-
-Koin 注入被視為穩定的，因為它們傳回相同的執行個體（對於單例而言）或是被記住的：
-
-```kotlin
-@Composable
-fun MyScreen() {
-    // 穩定 - 單例傳回相同的執行個體
-    val repository = koinInject<UserRepository>()
-
-    // 穩定 - ViewModel 被記住
-    val viewModel = koinViewModel<MyViewModel>()
-}
-```
-
-## 傳遞參數 vs 注入 {id="passing-parameters-vs-injection"}
-
-### 決策指南 {id="decision-guide"}
+### 作為參數傳遞還是進行注入？ {id="pass-as-a-parameter-or-inject"}
 
 | 作為參數傳遞 | 使用 Koin 注入 |
-|-------------------|------------------|
-| 頻繁變動 (userId, query) | 穩定的相依性 (存儲庫, 服務) |
-| UI 狀態 (所選項目) | 基礎結構 (資料庫, 網路) |
-| 導覽引數 | 業務邏輯 (案例) |
-| 父級提供的資料 | ViewModel |
-
-### 範例模式 {id="example-pattern"}
+|---------------------|------------------|
+| 會變更的值：ID、搜尋查詢、選取項目 | 長期存活的服務：repository、use case |
+| 導覽引數 | 基礎結構：資料庫、HTTP 用戶端 |
+| 父層已擁有的資料 | ViewModel |
 
 ```kotlin
-// userId 會變動 - 作為參數傳遞
-// repository 是穩定的 - 注入
 @Composable
 fun UserProfile(
-    userId: String,
-    repository: UserRepository = koinInject()
+    userId: String,                              // 會變更：作為參數傳遞
+    repository: UserRepository = koinInject()   // 服務：進行注入
 ) {
     var user by remember { mutableStateOf<User?>(null) }
 
@@ -286,92 +92,32 @@ fun UserProfile(
 
     user?.let { ProfileContent(it) }
 }
+```
 
-// 純粹的 Composable - 不需要注入
+## 注入的物件與穩定性 {id="injected-objects-and-stability"}
+
+Koin 不會改變 Compose 看待型別的方式。型別為 `UserRepository` 或 `UserViewModel` 的 Composable 參數，與任何其他類別一樣，會根據 Compose 編譯器規則被判定為穩定（stable）或不穩定（unstable）。如果跳過重組（skipping）對某個 Composable 很重要，請傳遞穩定值（狀態、基本型別、Lambda）給它，而不是注入的物件。
+
+## 副作用 {id="side-effects"}
+
+注入的物件是標準的 Kotlin 物件：可以像其他任何值一樣在 `LaunchedEffect`、`DisposableEffect` 或 `SideEffect` 中使用它們。請先在 Composable 主體中解析它們：
+
+```kotlin
 @Composable
-fun ProfileContent(user: User) {
-    Column {
-        Text(user.name)
-        Text(user.email)
+fun EventScreen() {
+    val eventBus = koinInject<EventBus>()
+
+    DisposableEffect(eventBus) {
+        val listener = eventBus.subscribe { event -> /* ... */ }
+        onDispose { eventBus.unsubscribe(listener) }
     }
 }
 ```
 
-## 最佳實務 {id="best-practices"}
+## 相關內容 {id="related"}
 
-### 1. 在頂層注入 {id="1-inject-at-the-top-level"}
-
-```kotlin
-@Composable
-fun FeatureScreen() {
-    // 在這裡注入
-    val viewModel = koinViewModel<FeatureViewModel>()
-    val repository = koinInject<FeatureRepository>()
-
-    // 向下傳遞給子元件
-    FeatureContent(
-        state = viewModel.state,
-        onAction = viewModel::handleAction
-    )
-}
-```
-
-### 2. 保持子 Composable 的純粹性 {id="2-keep-child-composables-pure"}
-
-```kotlin
-// 純粹 - 接收所有資料作為參數
-@Composable
-fun UserCard(
-    user: User,
-    onEdit: () -> Unit,
-    onDelete: () -> Unit
-) {
-    // 這裡不要注入
-}
-```
-
-### 3. 使用 ViewModel 處理複雜狀態 {id="3-use-viewmodel-for-complex-state"}
-
-```kotlin
-// 在 ViewModel 中進行複雜的狀態管理
-@KoinViewModel
-class SearchViewModel(
-    private val searchRepository: SearchRepository
-) : ViewModel() {
-    var query by mutableStateOf("")
-        private set
-
-    private val _results = MutableStateFlow<List<Result>>(emptyList())
-    val results = _results.asStateFlow()
-
-    fun updateQuery(newQuery: String) {
-        query = newQuery
-        viewModelScope.launch {
-            _results.value = searchRepository.search(newQuery)
-        }
-    }
-}
-```
-
-### 4. 避免在迴圈中注入 {id="4-avoid-injection-in-loops"}
-
-```kotlin
-@Composable
-fun UserList(userIds: List<String>) {
-    // 在迴圈外注入一次
-    val repository = koinInject<UserRepository>()
-
-    LazyColumn {
-        items(userIds) { userId ->
-            // 不要在 items 內部注入！
-            UserCard(userId, repository)
-        }
-    }
-}
-```
-
-## 下一步 {id="next-steps"}
-
-- **[Compose 中的 ViewModel](/docs/reference/koin-compose/compose-viewmodel)** - ViewModel API
-- **[動態模組](/docs/reference/koin-compose/compose-modules)** - 模組的載入與卸載
-- **[測試](/docs/reference/koin-compose/compose-testing)** - 測試 Composable
+- [Koin for Compose](/docs/reference/koin-compose/compose)：`koinInject()` 與啟動 Koin。
+- [ViewModel in Compose](/docs/reference/koin-compose/compose-viewmodel)：ViewModel 擁有者與參數。
+- [Scopes in Compose](/docs/reference/koin-compose/compose-scopes)：繫結至 UI 樹的作用域。
+- [Dynamic Modules](/docs/reference/koin-compose/compose-modules)：隨 Composable 載入與卸載模組。
+- [Compose Testing](/docs/reference/koin-compose/compose-testing)：預覽與 UI 測試。

@@ -1,39 +1,25 @@
 ---
-title: KSP プロセッサのセットアップ (非推奨)
+title: KSPプロセッサのセットアップ（非推奨）
 ---
 
-# Koin Annotations のための KSP プロセッサのセットアップ
+# KSPプロセッサのセットアップ（非推奨）
+
+このページでは、以前Koinアノテーションの読み取りに使用されていたKSPプロセッサである `koin-ksp-compiler` のGradleセットアップについて説明します。本ドキュメントは、現在もこれを使用しているプロジェクトのために残されています。新規プロジェクトでは [Koin Compiler Plugin](/docs/setup/compiler-plugin) を使用してください。
 
 :::warning
-**`koin-ksp-compiler` は非推奨となりました。** Koin Annotations 用の KSP ベースのプロセッサは [Koin Compiler Plugin](/docs/setup/compiler-plugin) に置き換えられました。**Koin Annotations 自体は非推奨ではありません** — `koin-annotations` ライブラリは現在 Koin のメインプロジェクトの一部となり、引き続き完全にサポートされます。プロセッサのみが変更されます。
+`koin-ksp-compiler` は非推奨であり、将来のKoinバージョンで削除される予定です。アノテーション自体は非推奨ではありません。`koin-annotations` はメインのKoinプロジェクトの一部であり、Koin Compiler Pluginによって処理されます。変更されるのはプロセッサのみです。詳細は [KSPからCompiler Pluginへの移行](/docs/migration/from-ksp-to-compiler-plugin) を参照してください。
 :::
 
-:::info
-**アノテーションはそのまま維持されます** — ビルド設定のみが変更されます。詳細は以下の [移行ガイド](#koin-compiler-plugin-への移行) を参照してください。
-:::
+## KSPプロセッサを引き続き使用すべきケース {id="when-to-keep-the-ksp-processor"}
 
-## なぜ移行するのか？ {id="why-migrate"}
+以下のような場合に限り、一時的にのみ使用を継続してください:
 
-| 項目 | KSP プロセッサ (`koin-ksp-compiler`) | Koin Compiler Plugin |
-|--------|-------------------------------------|----------------------|
-| **生成ファイル** | build/ 内に表示される | なし |
-| **ビルド速度** | ⚠️ 低速 | 高速 |
-| **KMP のセットアップ** | ⚠️ 複雑 | シンプル |
-| **今後のサポート** | ⚠️ 非推奨 | ✅ 活発な開発 |
-| **コード** | ⚠️ 生成された拡張機能を使用 | Kotlin Compiler Plugin 専用 API を使用 |
+- **Kotlinのバージョン**: プロジェクトが、Compiler Pluginで要求されるKotlin 2.3.20以降にまだ移行できない場合。
+- **移行の途中**: ビルド構成を切り替える前にリリース（出荷）する必要がある場合。
 
-## KSP プロセッサを使用する場合 (一時的) {id="when-to-use-the-ksp-processor-temporary"}
+Compiler Pluginと比較して、KSPプロセッサは可視ソースファイルを生成し、Kotlin MultiplatformのターゲットごとにKSPの設定が必要であり、Koinを開始するために `AppModule().module` などの生成された拡張関数を使用します。
 
-以下の場合にのみ `koin-ksp-compiler` を使用してください：
-- Kotlin 1.x から更新できない場合 (アップグレードを推奨)
-- 移行の途中で、まだ切り替えられない場合
-- 特定の KSP 要件がある場合
-
-## 現在の KSP プロセッサのセットアップ (リファレンス) {id="current-ksp-processor-setup-reference"}
-
-KSP プロセッサを使用する必要がある場合のセットアップは以下の通りです：
-
-### Gradle のセットアップ {id="gradle-setup"}
+## Gradleのセットアップ {id="gradle-setup"}
 
 ```kotlin
 // build.gradle.kts
@@ -49,26 +35,30 @@ dependencies {
 }
 ```
 
-### バージョンの互換性 {id="version-compatibility"}
+KSPを使用する場合、`koin-annotations` と `koin-ksp-compiler` はKoinのバージョンではなく、Koin Annotationsのバージョン（`$koin_ksp_version`）を使用します。Compiler Pluginを使用する場合、`koin-annotations` はKoinのバージョンに従います。
 
-| Koin Annotations | KSP バージョン | Kotlin バージョン |
-|------------------|-------------|----------------|
+### バージョン互換性 {id="version-compatibility"}
+
+| Koin Annotations | KSP | Kotlin |
+|------------------|-----|--------|
 | 1.4 | 1.9 | 1.9 |
 | 2.0 | 2.0 | 2.0 |
-| 2.1/2.2 | 2.1/2.2 | 2.1/2.2 |
+| 2.1, 2.2 | 2.1, 2.2 | 2.1, 2.2 |
 | 2.3 | 2.3 | 依存なし |
 
-### 基本的な使い方 {id="basic-usage"}
+## 生成されたモジュールを使用してKoinを開始する {id="starting-koin-with-generated-modules"}
+
+KSPは、各 `@Module` クラスに対して `.module` 拡張を生成します:
 
 ```kotlin
+import org.koin.ksp.generated.*
+
 @Single
 class MyComponent
 
 @Module
+@ComponentScan
 class MyModule
-
-// 生成された拡張機能をインポート
-import org.koin.ksp.generated.*
 
 fun main() {
     startKoin {
@@ -77,20 +67,22 @@ fun main() {
 }
 ```
 
-### KSP オプション {id="ksp-options"}
+## コンパイル時のチェック {id="compile-time-check"}
+
+KSPプロセッサには独自の設定チェック機能があり、KSP引数を使用して有効化できます:
 
 ```kotlin
 // build.gradle.kts
 ksp {
-    arg("KOIN_CONFIG_CHECK", "true")  // コンパイル時の検証を有効にする
+    arg("KOIN_CONFIG_CHECK", "true")
 }
 ```
 
-:::tip
-この KSP ベースのコンパイル時チェックは、**Koin Compiler Plugin** におけるネイティブのコンパイル時安全性に置き換えられました。[コンパイル時の安全性](/docs/reference/koin-compiler/compile-safety) および [Compiler Plugin セットアップガイド](/docs/setup/compiler-plugin) を参照してください。
-:::
+Compiler Pluginではこれが置き換えられ、グラフ全体やすべての `get()` 呼び出し箇所のチェックが行われます。[Compile-Time Safety](/docs/reference/koin-compiler/compile-safety) を参照してください。
 
-### KMP のセットアップ (複雑) {id="kmp-setup-complex"}
+## Kotlin Multiplatform {id="kotlin-multiplatform"}
+
+KSPではターゲットごとに1つの設定が必要です:
 
 ```kotlin
 // shared/build.gradle.kts
@@ -108,7 +100,6 @@ kotlin {
 }
 
 dependencies {
-    // プラットフォームごとの KSP 設定が必要
     add("kspAndroid", "io.insert-koin:koin-ksp-compiler:$koin_ksp_version")
     add("kspIosX64", "io.insert-koin:koin-ksp-compiler:$koin_ksp_version")
     add("kspIosArm64", "io.insert-koin:koin-ksp-compiler:$koin_ksp_version")
@@ -116,144 +107,17 @@ dependencies {
 }
 ```
 
-## Koin Compiler Plugin への移行 {id="migration-to-koin-compiler-plugin"}
+Compiler Pluginを使用すると、プラグインを1度適用し、`commonMain` に `koin-annotations` を追加するだけで済みます。
 
-### ステップ 1: Kotlin の更新 {id="step-1-update-kotlin"}
+## Compiler Pluginへの移行 {id="moving-to-the-compiler-plugin"}
 
-Kotlin 2.3.20 以降を使用していることを確認してください：
+移行しても、アノテーションが付与されたクラスはそのまま維持されます。KSPと `koin-ksp-compiler` を削除し、Compiler Pluginを適用し、生成されたソースを削除して、`modules(MyModule().module)` を `startKoin<MyApp>()` に置き換えます。段階的な手順については、[KSPからCompiler Pluginへの移行](/docs/migration/from-ksp-to-compiler-plugin) を参照してください。
 
-```kotlin
-// build.gradle.kts
-plugins {
-    kotlin("jvm") version "2.3.20-Beta1" // またはそれ以前
-}
-```
+問題が発生した場合は、[Kotlin Slackの#koinチャンネル](https://kotlinlang.slack.com/messages/koin/)で質問するか、[InsertKoinIO/koin-annotations](https://github.com/InsertKoinIO/koin-annotations)でIssueを作成してください。
 
-### ステップ 2: KSP の削除 {id="step-2-remove-ksp"}
+## 関連情報 {id="related"}
 
-KSP プラグインと依存関係を削除します：
-
-```kotlin
-// これらを削除:
-plugins {
-    // id("com.google.devtools.ksp")  // 削除
-}
-
-dependencies {
-    // ksp("io.insert-koin:koin-ksp-compiler:...")  // 削除
-}
-```
-
-### ステップ 3: Compiler Plugin の追加 {id="step-3-add-compiler-plugin"}
-
-詳細な手順については、**[Compiler Plugin セットアップガイド](/docs/setup/compiler-plugin)** を参照してください。
-
-### ステップ 4: コードの維持 {id="step-4-keep-your-code"}
-
-**アノテーションは全く同じままです 👍**
-
-```kotlin
-// このコードは変わりません！
-@Singleton
-class MyService(val repository: MyRepository)
-
-@Factory
-class MyRepository
-
-@KoinViewModel
-class MyViewModel(val service: MyService)
-
-@Module
-@ComponentScan("com.myapp")
-class AppModule
-```
-
-### ステップ 5: Koin の起動処理を更新する {id="step-5-update-koin-startup"}
-
-Compiler Plugin では、**生成されたコードは使用されません**。生成された拡張機能を型付けされた API に置き換えます：
-
-**以前 (KSP):**
-```kotlin
-import org.koin.ksp.generated.*
-
-startKoin {
-    modules(AppModule().module)  // 生成された拡張機能を使用
-}
-```
-
-**以降 (Compiler Plugin):**
-```kotlin
-@KoinApplication
-@ComponentScan("com.myapp")
-class MyApp
-
-// 型付けされた API を使用 - 生成されたコードは不要！
-startKoin<MyApp>()
-
-// または設定を伴う場合
-startKoin<MyApp> {
-    androidContext(this@MyApplication)
-}
-```
-
-利用可能な型付けされた API:
-- `startKoin<T>()` - アプリケーション T を使用して Koin をグローバルに開始する
-- `koinApplication<T>()` - T を使用して分離された KoinApplication を作成する
-- `koinConfiguration<T>()` - T から KoinConfiguration を作成する (Compose の KoinApplication や Ktor など用)
-
-ここで `T` は `@KoinApplication` が付与されたクラスです。
-
-### ステップ 6: クリーンアップ {id="step-6-clean-up"}
-
-生成されたファイルを削除します：
-
-```bash
-rm -rf build/generated/ksp
-```
-
-プロジェクトをリビルドします。
-
-### 変わらないもの {id="what-stays-the-same"}
-
-| アノテーション | ステータス |
-|------------|--------|
-| `@Singleton` / `@Single` | ✅ 同じ |
-| `@Factory` | ✅ 同じ |
-| `@Scoped` | ✅ 同じ |
-| `@KoinViewModel` | ✅ 同じ |
-| `@KoinWorker` | ✅ 同じ |
-| `@Named` | ✅ 同じ |
-| `@InjectedParam` | ✅ 同じ |
-| `@Property` | ✅ 同じ |
-| `@Module` | ✅ 同じ |
-| `@ComponentScan` | ✅ 同じ |
-| `@Configuration` | ✅ 同じ |
-
-### 変わるもの {id="what-changes"}
-
-| 項目 | KSP プロセッサ | Koin Compiler Plugin |
-|--------|---------------|----------------------|
-| ビルドプラグイン | `com.google.devtools.ksp` | `io.insert-koin.compiler.plugin` |
-| 依存関係 | `ksp("io.insert-koin:koin-ksp-compiler")` | 不要 (プラグインのみ) |
-| `koin-annotations` のバージョン | 個別 (`koin-ksp` バージョン) | Koin のメインバージョンと同じ |
-| 生成ファイル | `build/` 内に表示される | なし |
-| Koin の起動処理 | `modules(AppModule().module)` | `startKoin<MyApp>()` |
-| KMP のセットアップ | プラットフォームごとの KSP | プラグインのみ |
-
-## タイムライン {id="timeline"}
-
-:::warning
-`koin-ksp-compiler` プロセッサは将来の Koin バージョンで削除される予定です。できるだけ早い Koin Compiler Plugin への移行を推奨します。`koin-annotations` ライブラリおよび `@Singleton` / `@Factory` / `@Module` などのアノテーションはなくなりません。これらは今後 Koin Compiler Plugin によって処理されます。
-:::
-
-## ヘルプ {id="help"}
-
-移行中に問題が発生した場合は：
-- [トラブルシューティング](/docs/reference/troubleshooting) を確認
-- [Slack](https://kotlinlang.slack.com/messages/koin/) で質問
-- [GitHub](https://github.com/InsertKoinIO/koin) で issue を作成
-
-## 次のステップ {id="next-steps"}
-
-- **[移行ガイド](/docs/migration/from-ksp-to-compiler-plugin)** - Compiler Plugin へのステップバイステップの移行
-- **[Compiler Plugin のセットアップ](/docs/setup/compiler-plugin)** - 完全なセットアップガイド
+- [KSPからの移行](/docs/migration/from-ksp-to-compiler-plugin): ステップバイステップの移行ガイド。
+- [Compiler Pluginのセットアップ](/docs/setup/compiler-plugin): 後継プラグインの導入。
+- [スタイルの選択](/docs/intro/choosing-your-style): アノテーションおよびその他のスタイル。
+- [アノテーションリファレンス](/docs/reference/koin-annotations/annotations-inventory): 全アノテーションの一覧。

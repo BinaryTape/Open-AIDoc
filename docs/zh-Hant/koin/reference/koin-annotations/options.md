@@ -2,112 +2,11 @@
 title: 編譯器外掛程式選項
 ---
 
-Koin 編譯器外掛程式支援配置選項，以自訂其行為。
+# 編譯器外掛程式選項
 
-## 配置 {id="configuration"}
+此頁面列出了 Koin 編譯器外掛程式的所有選項，這些選項設定於 `build.gradle.kts` 的 `koinCompiler { }` 區塊中。本文假設外掛程式已安裝（請參閱 [Compiler Plugin Setup](/docs/setup/compiler-plugin)）。這些選項同時適用於編譯器外掛程式 DSL 與註解。
 
-在您的 `build.gradle.kts` 中配置編譯器外掛程式：
-
-```kotlin
-koinCompiler {
-    userLogs = true
-    debugLogs = false
-    compileSafety = true
-    strictSafety = true       // 預設為自動偵測
-    skipDefaultValues = true
-    unsafeDslChecks = true
-}
-```
-
-## 可用選項 {id="available-options"}
-
-### userLogs {id="userlogs"}
-
-- **類型**：布林值
-- **預設值**：`false`
-- **說明**：啟用組件偵測與 DSL/註解處理的記錄。顯示有哪些組件被外掛程式發現並處理。
-- **使用情況**：在開發期間啟用，以偵錯組件探索問題。
-
-```kotlin
-koinCompiler {
-    userLogs = true
-}
-```
-
-### debugLogs {id="debuglogs"}
-
-- **類型**：布林值
-- **預設值**：`false`
-- **說明**：啟用外掛程式內部處理（FIR/IR 階段、模組探索）的詳細偵錯記錄。
-- **使用情況**：在對外掛程式問題進行疑難排解或回報錯誤 (bug) 時啟用。
-
-```kotlin
-koinCompiler {
-    debugLogs = true
-}
-```
-
-### compileSafety {id="compilesafety"}
-
-- **類型**：布林值
-- **預設值**：`true`
-- **說明**：啟用編譯期相依性驗證。啟用後，外掛程式會驗證所有相依性是否能在組建時解析 —— 在執行前擷取缺失的定義、限定詞 (qualifier) 不匹配以及損壞的呼叫點 (call site)。
-- **使用情況**：預設啟用。如果需要在遷移期間繞過驗證，可暫時停用。
-
-```kotlin
-koinCompiler {
-    compileSafety = true
-}
-```
-
-請參閱 [編譯期安全性 (Compile-Time Safety)](/docs/reference/koin-compiler/compile-safety) 以了解驗證內容的完整詳細資訊。
-
-### strictSafety {id="strictsafety"}
-
-- **類型**：布林值
-- **預設值**：自動偵測（在聚合器模組 (aggregator module) 上啟用 —— 即包含 `startKoin`、`koinApplication` 或 `@KoinApplication` 的模組）
-- **說明**：強制在每次組建時重新執行完整的圖安全性檢查 (A3)，繞過聚合器模組上的 Kotlin 累加編譯 (incremental compilation) 快取。程式庫與功能模組仍保持完全累加。
-- **使用情況**：保持預設值。如果自動偵測漏掉了您的聚合器，請明確設定為 `true`；若要退出則設定為 `false`（例如當測試夾具僅在註解中引用 `startKoin` 並觸發了偵測器時）。
-
-```kotlin
-koinCompiler {
-    strictSafety = true   // 強制啟用
-    // 或
-    strictSafety = false  // 退出自動偵測
-}
-```
-
-**為什麼需要此選項**：目前的 K2 累加編譯（透過 AGP 使用的 Build Tools API）無法追蹤 DI 圖所依賴的兩件事 —— `module { … }` Lambda 主體內的 DSL 定義（不屬於任何宣告的 ABI），以及 `@ComponentScan` 套件範圍探索（從掃描器到新增類別之間沒有原始碼層級的關聯）。即使圖已變更，聚合器的 `compileKotlin` 任務仍可能被標記為 UP-TO-DATE。`strictSafety` 是基於目前 K2 IC 所呈現資訊之上最小且正確的因應措施；由於每次組建僅重新執行聚合器，因此成本有限。
-
-當 `compileSafety = false` 時無效。相關背景請參閱 [koin-compiler-plugin 問題 (issue) #32](https://github.com/InsertKoinIO/koin-compiler-plugin/issues/32)。
-
-### skipDefaultValues {id="skipdefaultvalues"}
-
-- **類型**：布林值
-- **預設值**：`true`
-- **說明**：啟用時，具有 Kotlin 預設值的參數將使用該預設值，而不是從 DI 容器中解析。可為 null 的參數和帶有註解的參數（`@Named`、`@InjectedParam` 等）仍會正常解析。
-- **使用情況**：預設啟用。停用此選項可始終從 DI 容器注入所有參數。
-
-```kotlin
-koinCompiler {
-    skipDefaultValues = true
-}
-```
-
-### unsafeDslChecks {id="unsafedslchecks"}
-
-- **類型**：布林值
-- **預設值**：`true`
-- **說明**：驗證 Lambda 內部的 DSL 函式呼叫（例如 `create()`）是否為唯一的指令。有助於防止常見錯誤。
-- **使用情況**：如有需要，可在從傳統 DSL 遷移期間暫時停用。
-
-```kotlin
-koinCompiler {
-    unsafeDslChecks = false  // 在遷移期間停用
-}
-```
-
-## 完整範例 {id="complete-example"}
+## 所有選項 {id="all-options"}
 
 ```kotlin
 // build.gradle.kts
@@ -116,26 +15,139 @@ plugins {
 }
 
 koinCompiler {
-    userLogs = true           // 記錄組件偵測
-    debugLogs = false         // 詳細記錄（預設關閉）
-    compileSafety = true      // 編譯期相依性驗證
-    strictSafety = true       // 強制聚合器重新執行安全性檢查（預設為自動偵測）
-    skipDefaultValues = true  // 使用 Kotlin 預設值而不是 DI 解析
-    unsafeDslChecks = true    // 驗證 DSL 使用情況
+    compileSafety = true
+    skipDefaultValues = true
+    unsafeDslChecks = true
+    userLogs = false
+    debugLogs = false
 }
 ```
 
-## 最佳實務 {id="best-practices"}
+| 選項 | 型別 | 預設值 | 效果 |
+|--------|------|---------|--------|
+| `compileSafety` | Boolean | `true` | 在建置期驗證相依圖 |
+| `strictSafety` | Boolean | 自動偵測 | 在聚合模組的每次建置中重新執行完整圖檢查 |
+| `strictSafetyForceOff` | Boolean | `false` | 確認錯誤的 `strictSafety` 自動偵測並將其關閉 |
+| `skipDefaultValues` | Boolean | `true` | 使用 Kotlin 預設值，而不是解析這些參數 |
+| `unsafeDslChecks` | Boolean | `true` | 要求 `create()` 必須是其 Lambda 中的唯一指令 |
+| `userLogs` | Boolean | `false` | 記錄外掛程式偵測到的組建 |
+| `debugLogs` | Boolean | `false` | 記錄外掛程式內部資訊 |
+| `logSeverity` | String | `"warning"` | 外掛程式資訊輸出的嚴重等級 |
+| `versionCheckSeverity` | String | `"warning"` | Kotlin 版本相容性警告的嚴重等級 |
+| `aiAssist` | Boolean | `true` | 在包含 Koin 診斷的建置結尾新增一行說明 |
 
-- **保持 `compileSafety` 啟用**（預設值），以進行編譯期相依性驗證
-- **將 `strictSafety` 保持在自動偵測** — 僅當偵測器漏掉了您的聚合器或在非聚合器檔案上誤判時才覆寫
-- **保持 `skipDefaultValues` 啟用**（預設值），以尊重 Kotlin 預設值
-- 在開發期間 **啟用 `userLogs`** 以查看偵測到哪些組件
-- **保持 `unsafeDslChecks` 啟用**（預設值），以確保更安全的 DSL 使用
-- **僅在對外掛程式問題進行疑難排解時使用 `debugLogs`**
+## compileSafety {id="compilesafety"}
 
-## 另請參閱 {id="see-also"}
+啟用時，外掛程式會在建置期檢查圖中的每個相依項是否都能被解析：遺漏的定義、限定詞不符、循環相依性，以及沒有相符定義的 `get()` 或 `inject()` 呼叫點。發生問題時會使建置失敗，而不是在執行階段發生崩潰。
 
-- **[編譯期安全性 (Compile-Time Safety)](/docs/reference/koin-compiler/compile-safety)** – 驗證內容與方式
-- **[編譯器外掛程式設定](/docs/setup/compiler-plugin)** – 完整設定指南
-- **[開始使用註解](/docs/reference/koin-annotations/start)** – 快速入門指南
+```kotlin
+koinCompiler {
+    compileSafety = false
+}
+```
+
+請保持其啟用狀態。關閉它會移除所有編譯期檢查，並使 `strictSafety` 失效。檢查內容在 [Compile-Time Safety](/docs/reference/koin-compiler/compile-safety) 中有詳細說明。
+
+## strictSafety {id="strictsafety"}
+
+完整圖檢查會在啟動 Koin 的模組中執行（即聚合器：包含 `startKoin`、`koinApplication` 或 `@KoinApplication` 的 Gradle 模組）。當圖在其他位置變更時（例如編輯 `module { }` Lambda 主體後），Kotlin 累加編譯可能會將該模組標記為最新（up to date）。此時檢查將不會再次執行，錯誤將會在執行階段才顯現。
+
+`strictSafety` 會使聚合器的 `compileKotlin` 任務在每次建置時重新執行，不使用建置快取且不跳過最新狀態。程式庫與功能模組則保持累加編譯。
+
+您不需要設定它。當未設定此選項時，Gradle 外掛程式會掃描模組原始碼中的 `startKoin`、`koinApplication` 或 `@KoinApplication`，並為該模組啟用它。生命週期記錄會宣告此決策：
+
+```
+[Koin] Auto-enabling strictSafety on :app (detected startKoin / @KoinApplication / koinApplication).
+```
+
+在偵測遺漏的模組上設定 `strictSafety = true` 來強制啟用：
+
+```kotlin
+koinCompiler {
+    strictSafety = true
+}
+```
+
+在已偵測到入口點的模組上設定 `strictSafety = false` 沒有效果（自編譯器外掛程式 1.1.0 起）。它僅對未偵測到入口點的模組有作用。當 `compileSafety = false` 時，此選項沒有作用。
+
+其代價是每次建置都要對聚合模組進行一次完整重新編譯。有關累加編譯落差的背景資訊，請參閱 [koin-compiler-plugin issue #32](https://github.com/InsertKoinIO/koin-compiler-plugin/issues/32)。
+
+## strictSafetyForceOff {id="strictsafetyforceoff"}
+
+偵測採用的是文字比對。它也會比對註解或字串常值中的 `startKoin`，從而為非聚合模組啟用 `strictSafety`。如果您已確認此比對有誤，請同時設定這兩個選項：
+
+```kotlin
+koinCompiler {
+    strictSafety = false
+    strictSafetyForceOff = true
+}
+```
+
+兩者都需要：`strictSafetyForceOff` 僅在與 `strictSafety = false` 一起使用時生效。請僅在確認誤觸時使用。如果是在真正的入口點上使用，它會停用重新執行，導致累加編譯後的圖錯誤可能延遲至執行階段才暴露。
+
+## skipDefaultValues {id="skipdefaultvalues"}
+
+啟用時，具有 Kotlin 預設值的不可為 null 參數會保留其預設值，而不會從 Koin 解析：
+
+```kotlin
+@Singleton
+class ApiClient(
+    val repository: UserRepository,                         // resolved from Koin
+    val timeout: Int = 30_000,                              // Kotlin default
+    @Property("api_url") val url: String = "https://...",   // resolved, it is annotated
+    val logger: Logger? = null,                             // resolved with getOrNull()
+)
+```
+
+可為 null 的參數仍會使用 `getOrNull()` 進行解析。帶有 `@Named`、`@Qualifier`、`@InjectedParam` 或 `@Property` 的參數無論其預設值為何，一律會進行解析。設定 `skipDefaultValues = false` 可從 Koin 解析所有參數。
+
+## unsafeDslChecks {id="unsafedslchecks"}
+
+啟用時，`create(::T)` 呼叫必須是其定義 Lambda 中的唯一指令。這能讓 Lambda 保持為外掛程式可分析與驗證的形式。違規將會導致建置失敗：
+
+```
+[Koin][KOIN-S001] create(::UserRepository) must be the only instruction in the lambda. Other statements are not allowed when using create(). To disable this check, set koinCompiler { unsafeDslChecks = false } in your build.gradle.kts
+```
+
+當您遷移在 `create()` Lambda 中執行其他陳述式的傳統 DSL 程式碼時，請將其設為 `false`，遷移完成後再將其重新開啟。
+
+## userLogs 與 debugLogs {id="userlogs-and-debuglogs"}
+
+`userLogs = true` 會印出外掛程式偵測並處理的內容：它攔截的 DSL 定義（`single<T>()`、`factory<T>()`）、帶有註解的類別（`@Singleton`、`@Module`）以及產生的模組。當定義未被採納時可以使用此選項。
+
+`debugLogs = true` 會印出外掛程式內部資訊（FIR 與 IR 階段、模組探索）。當您回報外掛程式錯誤時可以使用此選項。
+
+兩者都會印出帶有 `[Koin]` 前置詞的行，嚴重等級由 `logSeverity` 設定。
+
+## logSeverity 與 versionCheckSeverity {id="logseverity-and-versioncheckseverity"}
+
+兩者皆接受 `"warning"`（預設值）或 `"info"`。
+
+```kotlin
+koinCompiler {
+    logSeverity = "info"
+    versionCheckSeverity = "info"
+}
+```
+
+- **logSeverity**：資訊輸出的嚴重等級（`userLogs`、`debugLogs`、「無 Koin 入口點」通知、`@Monitor` 摘要）。如果您的組建使用 `allWarningsAsErrors`，請將其設為 `"info"`，以免此輸出導致建置失敗。
+- **versionCheckSeverity**：使用外掛程式尚未驗證過的 Kotlin 版本進行建置時所顯示的警告嚴重等級。此設定為獨立分開的，因此將記錄輸出靜音時不會同時隱藏相容性風險。僅在您確認您的 Kotlin 版本能正常運作後，才將其設為 `"info"`。
+
+這兩個選項都不會改變實際的診斷（`KOIN-D001`、`KOIN-W003` 等）：它們會保留自己的嚴重等級。
+
+## aiAssist {id="aiassist"}
+
+當建置回報至少一個 Koin 診斷時，外掛程式會在編譯結尾新增一行，指向 Kotzilla MCP Server，AI 編碼協助工具可使用該伺服器來對錯誤進行分類並提出修復建議：
+
+```
+[Koin] → Fix with AI: set up Kotzilla MCP at https://kotzilla.io/koin-mcp
+```
+
+此行在每次建置中僅出現一次，而非每個錯誤出現一次。設定 `aiAssist = false` 可將其隱藏。
+
+## 相關內容 {id="related"}
+
+- [Compile-Time Safety](/docs/reference/koin-compiler/compile-safety)：`compileSafety` 檢查的項目及其回報的診斷。
+- [Compiler Plugin Setup](/docs/setup/compiler-plugin)：安裝外掛程式及其相依性。
+- [Koin Compiler Plugin](/docs/intro/koin-compiler-plugin)：外掛程式的功能與運作原理。
+- [Troubleshooting](/docs/reference/koin-core/troubleshooting)：執行階段錯誤與偵錯。
