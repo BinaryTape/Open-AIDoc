@@ -15,13 +15,15 @@
 .vp-doc .ws-runnable .executable-fragment-wrapper {
   position: relative;
   margin: 16px 0;
+  /* The box holds the compiler line too, which follows the editor */
+  border-radius: 8px;
+  background-color: var(--vp-code-block-bg);
+  transition: background-color 0.5s;
 }
 
 .vp-doc .ws-runnable .executable-fragment {
   border: 0;
   border-radius: 8px;
-  /* Room for the compiler line, which sits at the bottom of the wrapper. */
-  padding-bottom: 32px;
   background-color: var(--vp-code-block-bg);
   transition: background-color 0.5s;
 }
@@ -54,14 +56,21 @@
 }
 
 .vp-doc .ws-runnable .compiler-info {
-  top: auto;
-  bottom: 4px;
-  left: 24px;
-  right: 24px;
+  /* In the flow, so that on a narrow screen the line wraps and the box grows
+     instead of "Running on …" running past its edge */
+  position: static;
+  flex-wrap: wrap;
   width: auto;
-  padding: 0;
+  padding: 4px 24px;
+  column-gap: 15px;
   font-size: 12px;
   color: var(--vp-c-text-3);
+}
+
+/* Playground's 15px left margins, as a gap instead, so that an item wrapped
+   onto the next line is not indented; it stays on the right, as on one line */
+.vp-doc .ws-runnable .compiler-info > :not(:first-child) {
+  margin-left: auto;
 }
 
 .vp-doc .ws-runnable .compiler-info a {
