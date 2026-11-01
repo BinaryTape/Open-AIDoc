@@ -2,50 +2,88 @@
 title: Kotlin
 ---
 
-> 이 튜토리얼에서는 Kotlin 애플리케이션을 작성하고, Koin 의존성 주입(dependency injection)을 사용하여 컴포넌트를 가져오는 방법을 알아봅니다.
-> 이 튜토리얼을 완료하는 데 약 __10분__ 정도 소요됩니다.
+# Kotlin
 
-:::note
-업데이트 - 2024-10-21
-:::
+이 튜토리얼에서는 사용자 목록을 불러오고 인사말을 출력하는 Kotlin 콘솔 앱을 빌드합니다. Koin 모듈을 선언하고, 인터페이스에 구현체를 바인딩하며, Koin을 시작하는 방법을 배웁니다. 약 10분 정도 소요되며 JDK 17 및 Gradle이 필요합니다.
 
-:::tip
-이 튜토리얼의 **어노테이션 버전(annotations version)**을 찾고 계신가요? 컴파일 타임 검증과 자동 모듈 검색을 위해 Koin 어노테이션을 사용하는 [Kotlin & Annotations](./kotlin-annotations.md)를 확인해 보세요.
-:::
+이 튜토리얼은 Compiler Plugin DSL을 사용합니다. 어노테이션(Annotation)을 사용하는 동일한 앱에 대해서는 [Kotlin & Annotations](/docs/quickstart/kotlin-annotations)를 참고하세요. 각 스타일을 비교하려면 [Choosing your style](/docs/intro/choosing-your-style)을 확인하세요.
 
 ## 코드 가져오기 {id="get-the-code"}
 
-:::info
-[소스 코드는 Github에서 확인하실 수 있습니다](https://github.com/InsertKoinIO/koin-getting-started/tree/main/kotlin)
-:::
+전체 샘플 코드는 [koin-getting-started/kotlin](https://github.com/InsertKoinIO/koin-getting-started/tree/main/kotlin)에 있습니다. 저장소를 클론(clone)하고 `kotlin` 폴더에서 실행하세요:
 
-## 설정 {id="setup"}
+```bash
+./gradlew run
+```
 
-먼저, 아래와 같이 `koin-core` 의존성이 추가되었는지 확인하세요.
+## Gradle 설정 {id="gradle-setup"}
 
-```groovy
+이 샘플은 Koin Compiler Plugin을 적용하고 `koin-core`를 추가합니다. 버전 관리는 버전 카탈로그(Version Catalog)를 사용합니다:
+
+```toml
+# gradle/libs.versions.toml
+[versions]
+kotlin = "<KOTLIN_VERSION>"
+koin = "<KOIN_VERSION>"
+koin-plugin = "<KOIN_PLUGIN_VERSION>"
+
+[libraries]
+koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
+koin-test = { module = "io.insert-koin:koin-test", version.ref = "koin" }
+koin-test-junit4 = { module = "io.insert-koin:koin-test-junit4", version.ref = "koin" }
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+koin-compiler = { id = "io.insert-koin.compiler.plugin", version.ref = "koin-plugin" }
+```
+
+```kotlin
+// app/build.gradle.kts
+plugins {
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.koin.compiler)
+    application
+}
+
 dependencies {
-    
-    // Kotlin 앱을 위한 Koin
-    implementation "io.insert-koin:koin-core:$koin_version"
+    implementation(libs.koin.core)
+
+    testImplementation(libs.koin.test)
+    testImplementation(libs.koin.test.junit4)
 }
 ```
 
-## 애플리케이션 개요 {id="application-overview"}
+Compiler Plugin을 사용하려면 Kotlin 2.3.20 이상이 필요합니다. 최신 버전 및 BOM에 대해서는 [Gradle setup](/docs/setup/gradle)을 참고하세요. 플러그인 옵션에 대해서는 [Compiler Plugin setup](/docs/setup/compiler-plugin)을 참고하세요.
 
-이 애플리케이션의 아이디어는 사용자 목록을 관리하고, 이를 `UserApplication` 클래스에서 표시하는 것입니다.
+## 애플리케이션 구조 {id="the-application"}
 
-> Users -> UserRepository -> UserService -> UserApplication
+이 앱은 세 개의 컴포넌트를 연결합니다. `UserApplication`은 `UserService`에 사용자를 요청하고, `UserService`는 `UserRepository`에서 데이터를 읽어옵니다:
 
-## "User" 데이터 {id="the-user-data"}
+```
+User -> UserRepository -> UserService -> UserApplication
+```
 
-사용자 컬렉션을 관리할 것입니다. 다음은 데이터 클래스입니다.
+## 사용자 데이터 작성하기 {id="let-s-write-the-user-data"}
+
+데이터 클래스와 기본 사용자 목록부터 시작합니다:
 
 ```kotlin
 data class User(val name: String, val email: String)
+
+val DEFAULT_USER = User("Alice", "alice@example.com")
+
+val DEFAULT_USERS = listOf(
+    DEFAULT_USER,
+    User("Bob", "bob@example.com"),
+    User("Charlie", "charlie@example.com")
+)
 ```
 
-사용자 목록을 관리(사용자 추가 또는 이름으로 검색)하기 위한 "Repository" 컴포넌트를 만듭니다. 아래는 `UserRepository` 인터페이스와 그 구현체입니다.
+이 사용자 데이터는 리포지토리가 저장할 데이터입니다.
+
+## 리포지토리 작성하기 {id="let-s-write-the-repository"}
+
+리포지토리는 사용자를 메모리에 유지하고 이름으로 사용자를 찾습니다:
 
 ```kotlin
 interface UserRepository {
@@ -67,35 +105,31 @@ class UserRepositoryImpl : UserRepository {
 }
 ```
 
-## Koin 모듈 {id="the-koin-module"}
+`UserRepositoryImpl`은 의존성이 없으므로, Koin이 별도의 추가 정보 없이 생성할 수 있습니다.
 
-`module` 함수를 사용하여 Koin 모듈을 선언합니다. Koin 모듈은 주입될 모든 컴포넌트를 정의하는 공간입니다.
+## Koin 모듈 선언하기 {id="let-s-declare-the-koin-module"}
 
-```kotlin
-val appModule = module {
-
-}
-```
-
-첫 번째 컴포넌트를 선언해 봅시다. `UserRepositoryImpl` 인스턴스를 생성하여 `UserRepository`의 싱글톤(singleton)을 만들고자 합니다.
+모듈은 Koin이 생성할 컴포넌트를 선언하는 곳입니다([Core Concepts](/docs/intro/core-concepts) 참고). `UserRepositoryImpl`을 싱글톤으로 선언하고 `UserRepository`로 바인딩하여 사용할 수 있도록 합니다:
 
 ```kotlin
+import org.koin.dsl.bind
+import org.koin.dsl.module
+import org.koin.plugin.module.dsl.single
+
 val appModule = module {
     single<UserRepositoryImpl>() bind UserRepository::class
 }
 ```
 
-:::info
-이 튜토리얼은 컴파일 타임에 자동 연결(auto-wiring)을 제공하는 **Koin 컴파일러 플러그인 DSL**(`single<T>()`)을 사용합니다. 구성 방법은 [컴파일러 플러그인 설정](/docs/setup/compiler-plugin)을 참조하세요.
-:::
+이제 `UserRepository`를 요청하는 모든 컴포넌트는 동일한 `UserRepositoryImpl` 인스턴스를 받게 됩니다. `single`과 `bind`에 대한 자세한 내용은 [Definitions](/docs/reference/koin-core/definitions)에 설명되어 있습니다.
 
-## UserService 컴포넌트 {id="the-userservice-component"}
+## 서비스 작성하기 {id="let-s-write-the-service"}
 
-사용자 작업을 관리하기 위한 `UserService` 컴포넌트를 작성해 봅시다.
+`UserService`는 사용자를 불러오고 인사말을 준비합니다:
 
 ```kotlin
 interface UserService {
-    fun getUserOrNull(name: String): User?
+    fun getUserOrNull(name: String = DEFAULT_USER.name): User?
     fun loadUsers()
     fun prepareHelloMessage(user: User?): String
 }
@@ -107,22 +141,16 @@ class UserServiceImpl(
     override fun getUserOrNull(name: String): User? = userRepository.findUserOrNull(name)
 
     override fun loadUsers() {
-        userRepository.addUsers(listOf(
-            User("Alice", "alice@example.com"),
-            User("Bob", "bob@example.com"),
-            User("Charlie", "charlie@example.com")
-        ))
+        userRepository.addUsers(DEFAULT_USERS)
     }
 
     override fun prepareHelloMessage(user: User?): String {
-        return user?.let { "Hello '${user.name}' (${user.email})! 👋" } ?: "❌ User not found"
+        return user?.let { "Hello '${user.name}' (${user.email})!" } ?: "User not found"
     }
 }
 ```
 
-> UserRepository는 UserServiceImpl의 생성자에서 참조됩니다.
-
-Koin 모듈에 `UserService`를 선언합니다. 이를 `single` 정의로 선언합니다.
+이를 모듈에 추가합니다:
 
 ```kotlin
 val appModule = module {
@@ -131,9 +159,11 @@ val appModule = module {
 }
 ```
 
-## UserApplication에서 의존성 주입하기 {id="injecting-dependencies-in-userapplication"}
+`UserServiceImpl`은 생성자에서 `UserRepository`를 받습니다. Compiler Plugin이 이 생성자를 분석하여 `UserRepositoryImpl` 인스턴스를 자동으로 전달해 줍니다.
 
-`UserApplication` 클래스는 Koin에서 인스턴스를 부트스트랩(bootstrap)하는 데 도움이 됩니다. 생성자 주입(constructor injection)을 통해 `UserService`를 해결(resolve)합니다.
+## 애플리케이션 클래스 작성하기 {id="let-s-write-the-application-class"}
+
+`UserApplication`은 생성자를 통해 `UserService`를 주입받고, 사용자를 불러온 뒤 인사말을 출력합니다:
 
 ```kotlin
 class UserApplication(
@@ -144,7 +174,6 @@ class UserApplication(
         userService.loadUsers()
     }
 
-    // 데이터 표시
     fun sayHello(name: String) {
         val user = userService.getUserOrNull(name)
         val message = userService.prepareHelloMessage(user)
@@ -153,15 +182,7 @@ class UserApplication(
 }
 ```
 
-이제 애플리케이션이 준비되었습니다.
-
-:::info
-생성자 주입은 Kotlin 애플리케이션에서 의존성을 주입하는 권장되는 방법입니다. Koin은 `UserApplication`을 생성할 때 `UserService`를 자동으로 해결하고 주입합니다.
-:::
-
-## Koin 시작하기 {id="start-koin"}
-
-애플리케이션과 함께 Koin을 시작하고 `UserApplication`을 모듈에 추가해야 합니다. 애플리케이션의 메인 진입점인 `main` 함수에서 `startKoin()` 함수를 호출하기만 하면 됩니다.
+이 클래스 역시 모듈에 선언합니다:
 
 ```kotlin
 val appModule = module {
@@ -169,6 +190,17 @@ val appModule = module {
     single<UserRepositoryImpl>() bind UserRepository::class
     single<UserServiceImpl>() bind UserService::class
 }
+```
+
+이제 세 개의 컴포넌트가 모두 모듈에 등록되었습니다. 플러그인은 빌드 시점에 각 생성자 매개변수에 대한 정의가 존재하는지 검사합니다.
+
+## Koin 시작하기 {id="let-s-start-koin"}
+
+`main()`에서 모듈과 함께 Koin을 시작한 다음 컨테이너에서 `UserApplication`을 가져옵니다:
+
+```kotlin
+import org.koin.core.context.startKoin
+import org.koin.mp.KoinPlatform
 
 fun main() {
     startKoin {
@@ -180,32 +212,12 @@ fun main() {
 }
 ```
 
-:::info
-`startKoin`의 `modules()` 함수는 주어진 모듈 목록을 로드합니다. `KoinPlatform.getKoin().get<UserApplication>()`을 사용하여 Koin에서 `UserApplication` 인스턴스를 가져옵니다.
-:::
+`./gradlew run`을 실행하면 앱이 `Hello 'Alice' (alice@example.com)!`을 출력합니다. `startKoin` 및 관련 옵션은 [Starting Koin](/docs/reference/koin-core/starting-koin)에서 다룹니다.
 
-## Koin 모듈: DSL 비교 {id="koin-module-dsl-comparison"}
+## 다음 단계 {id="next-steps"}
 
-다음은 **클래식 DSL(Classic DSL)**(수동 연결)을 사용한 Koin 모듈 선언입니다.
-
-```kotlin
-val appModule = module {
-    single { UserApplication(get()) }
-    single<UserRepository> { UserRepositoryImpl() }
-    single<UserService> { UserServiceImpl(get()) }
-}
-```
-
-**컴파일러 플러그인 DSL(Compiler Plugin DSL)**(컴파일 타임 자동 연결) 사용 시:
-
-```kotlin
-val appModule = module {
-    single<UserApplication>()
-    single<UserRepositoryImpl>() bind UserRepository::class
-    single<UserServiceImpl>() bind UserService::class
-}
-```
-
-:::tip
-컴파일러 플러그인 DSL을 사용하려면 [Koin 컴파일러 플러그인](/docs/setup/compiler-plugin)이 필요합니다. 이는 컴파일 타임 의존성 해결과 더 깔끔한 구문을 제공합니다.
-:::
+- [Core Concepts](/docs/intro/core-concepts): 모듈, 정의(definition), 주입의 기반이 되는 핵심 개념.
+- [Definitions](/docs/reference/koin-core/definitions): 모든 정의 유형 및 바인딩 옵션.
+- [JUnit Tests](/docs/quickstart/junit-test): Koin Test를 사용하여 동일한 앱 테스트하기.
+- [Compile-Time Safety](/docs/reference/koin-compiler/compile-safety): Compiler Plugin이 의존성 그래프에서 검사하는 항목.
+- [Tooling](/docs/tooling): Koin을 위한 IDE 플러그인 및 모니터링 도구.

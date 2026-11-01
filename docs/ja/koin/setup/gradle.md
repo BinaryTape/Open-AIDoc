@@ -4,267 +4,230 @@ title: Gradleのセットアップ
 
 # Gradleのセットアップ
 
-このガイドでは、Koinの依存関係をGradleプロジェクトに追加する方法について説明します。
+このページでは、各プラットフォーム向けのGradle依存関係と、公開されているすべてのKoinアーティファクトを一覧で示します。サンプルではKotlin DSL（`build.gradle.kts`）およびバージョンカタログを使用しています。コンパイル時チェックやCompiler Plugin DSLを追加する場合は、[Compiler Plugin Setup](/docs/setup/compiler-plugin)の手順もあわせて参照してください。
 
-## Koin BOM (推奨) {id="koin-bom-recommended"}
+## バージョン {id="versions"}
 
-**Bill of Materials (BOM)** は、Koinの依存関係を管理するための推奨される方法です。これにより、すべてのKoinライブラリが互換性のあるバージョンを使用していることが保証されます。
+`koin-annotations` を含むすべてのKoinライブラリは、共通のバージョンを共有しています。現在の安定版バージョンは 4.2.2 です。
 
-:::info
-**ベストプラクティス**: Koinライブラリ間のバージョン競合を避けるため、常にKoin BOMを使用してください。
-:::
+- Koin: [![Maven Central](https://img.shields.io/maven-central/v/io.insert-koin/koin-core?label=latest)](https://mvnrepository.com/artifact/io.insert-koin/koin-core)
 
-### Version Catalogの使用 (推奨) {id="using-version-catalogs-recommended"}
+すべてのアーティファクトは、グループ `io.insert-koin` の下で [Maven Central](https://central.sonatype.com/search?q=io.insert-koin) に公開されています。バージョンの履歴やアップグレードに関する注意事項は [Releases](/docs/support/releases) に記載されています。
 
-`gradle/libs.versions.toml` 内:
+## Koin BOM {id="koin-bom"}
+
+Koin BOM（Bill of Materials）は、すべてのKoinライブラリを同じバージョンに固定します。BOMのバージョンを一度宣言すれば、Koinライブラリをバージョン指定なしで追加できます。BOMを更新すると、すべてのKoinライブラリが一括で更新されます。
+
+`gradle/libs.versions.toml` の場合：
 
 ```toml
 [versions]
-koin-bom = "4.2.0"
+koin = "4.2.2"
 
 [libraries]
-koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koin-bom" }
+koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koin" }
 koin-core = { module = "io.insert-koin:koin-core" }
 koin-android = { module = "io.insert-koin:koin-android" }
 koin-compose = { module = "io.insert-koin:koin-compose" }
 koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel" }
+koin-compose-viewmodel-navigation = { module = "io.insert-koin:koin-compose-viewmodel-navigation" }
 koin-ktor = { module = "io.insert-koin:koin-ktor" }
+koin-logger-slf4j = { module = "io.insert-koin:koin-logger-slf4j" }
+koin-annotations = { module = "io.insert-koin:koin-annotations" }
 koin-test = { module = "io.insert-koin:koin-test" }
+koin-test-junit4 = { module = "io.insert-koin:koin-test-junit4" }
 ```
 
-`build.gradle.kts` 内:
+モジュールの `build.gradle.kts` の場合：
 
 ```kotlin
 dependencies {
     implementation(platform(libs.koin.bom))
-    implementation(libs.koin.android)  // バージョン指定は不要
+    implementation(libs.koin.android)
 }
 ```
 
-### BOMを直接使用する {id="using-bom-directly"}
+バージョンカタログを使用しない場合：
 
 ```kotlin
 dependencies {
-    implementation(platform("io.insert-koin:koin-bom:$koin_version"))
-
-    // バージョン指定なしで依存関係を追加
+    implementation(platform("io.insert-koin:koin-bom:4.2.2"))
     implementation("io.insert-koin:koin-android")
-    implementation("io.insert-koin:koin-compose")  // Androidおよびマルチプラットフォームで動作
+    testImplementation("io.insert-koin:koin-test-junit4")
 }
 ```
 
-## プラットフォーム固有のセットアップ {id="platform-specific-setup"}
+特定の依存関係にバージョンを記述すると、その依存関係についてのみBOMの設定が上書きされます。特定のライブラリのより新しいリリースに含まれる修正が必要な場合を除き、これは避けてください。
 
-### Kotlin/JVM {#kotlin}
+### BOMを使用しない場合 {id="without-the-bom"}
 
-純粋なKotlinアプリケーションの場合:
+各ライブラリに個別にバージョンを指定することもできます。[Koin samples](https://github.com/InsertKoinIO/koin-getting-started) ではこの方法が採用されており、Kotlin Multiplatformのソースセットでも同様に動作します。
+
+```toml
+[versions]
+koin = "4.2.2"
+
+[libraries]
+koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
+koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
+```
+
+すべてのKoinライブラリで単一の `koin` バージョンを維持してください。異なるバージョンの混在はサポートされていません。
+
+## Kotlin/JVM {#kotlin}
 
 ```kotlin
 dependencies {
-    implementation(platform("io.insert-koin:koin-bom:$koin_version"))
-    implementation("io.insert-koin:koin-core")
+    implementation(platform(libs.koin.bom))
+    implementation(libs.koin.core)
 }
 ```
 
-アプリケーションでKoinを開始する:
+その後、`main` でKoinを起動します。[Starting Koin](/docs/reference/koin-core/starting-koin) および [Kotlin tutorial](/docs/quickstart/kotlin) を参照してください。
 
-```kotlin
-fun main() {
-    startKoin {
-        modules(appModule)
-    }
-}
-```
-
-**テスト用の依存関係:**
+## Android {#android}
 
 ```kotlin
 dependencies {
-    testImplementation("io.insert-koin:koin-test")
-    testImplementation("io.insert-koin:koin-test-junit5")  // または junit4
+    implementation(platform(libs.koin.bom))
+    implementation(libs.koin.android)
 }
 ```
 
-### Android {#android}
+`koin-android` には `koin-core` とViewModelサポートが含まれています。`Application` クラスでKoinを起動してください。[Start Koin on Android](/docs/reference/koin-android/start) を参照してください。
 
-Androidアプリケーションの場合:
+任意のAndroidライブラリ：
+
+| アーティファクト | 追加される機能 |
+|----------|------|
+| `koin-androidx-workmanager` | WorkManagerのワーカー：[WorkManager](/docs/reference/koin-android/workmanager) を参照 |
+| `koin-androidx-navigation` | ナビゲーショングラフにスコープされたViewModel（Fragment向け） |
+| `koin-androidx-startup` | AndroidX App StartupによるKoinの起動 |
+| `koin-android-compat` | JavaクラスからインジェクトするためのJavaヘルパー |
+| `koin-dagger-bridge` | 移行期間中にKoinからDaggerコンポーネントを使用 |
+
+## Android with Jetpack Compose {#compose-android}
 
 ```kotlin
 dependencies {
-    implementation(platform("io.insert-koin:koin-bom:$koin_version"))
-    implementation("io.insert-koin:koin-android")
+    implementation(platform(libs.koin.bom))
+    implementation(libs.koin.android)
+    implementation(libs.koin.compose)
+    implementation(libs.koin.compose.viewmodel)
 }
 ```
 
-ApplicationクラスでKoinを開始する:
+`koin-androidx-compose` は、`koin-compose` と `koin-compose-viewmodel` を1つの依存関係にまとめたAndroid専用のアーティファクトです。どちらの設定でも動作します。
 
-```kotlin
-class MainApplication : Application() {
-    override fun onCreate() {
-        super.onCreate()
+ナビゲーションを利用する場合は、次のいずれかを追加してください：
 
-        startKoin {
-            androidLogger()
-            androidContext(this@MainApplication)
-            modules(appModule)
-        }
-    }
-}
-```
+| アーティファクト | ナビゲーションライブラリ |
+|----------|--------------------|
+| `koin-androidx-compose-navigation` | Navigation Compose 2（Android専用） |
+| `koin-compose-viewmodel-navigation` | Navigation Compose 2（マルチプラットフォーム） |
+| `koin-compose-navigation3` | Navigation 3：[Navigation 3](/docs/reference/koin-compose/navigation3) を参照 |
 
-**オプションのAndroidパッケージ:**
+APIの詳細については [Koin for Compose](/docs/reference/koin-compose/compose) を参照してください。
 
-```kotlin
-dependencies {
-    // Jetpack WorkManager
-    implementation("io.insert-koin:koin-androidx-workmanager")
+## Compose Multiplatform {#compose}
 
-    // Navigation Graph
-    implementation("io.insert-koin:koin-androidx-navigation")
-
-    // AndroidX Startup
-    implementation("io.insert-koin:koin-androidx-startup")
-
-    // Java Compatibility
-    implementation("io.insert-koin:koin-android-compat")
-}
-```
-
-### AndroidとJetpack Compose {#compose-android}
-
-Jetpack Composeを使用するAndroidアプリの場合:
-
-```kotlin
-dependencies {
-    implementation(platform("io.insert-koin:koin-bom:$koin_version"))
-    implementation("io.insert-koin:koin-android")
-    implementation("io.insert-koin:koin-compose")
-    implementation("io.insert-koin:koin-compose-viewmodel")
-}
-```
-
-**Navigationを使用する場合:**
-
-```kotlin
-dependencies {
-    // Navigation 2 (Androidのみ)
-    implementation("io.insert-koin:koin-androidx-compose-navigation")
-
-    // または Navigation 3
-    implementation("io.insert-koin:koin-compose-navigation3")
-}
-```
-
-:::info
-`koin-androidx-compose` は現在 `koin-compose` に統合されています。
-:::
-
-### Compose Multiplatform {#compose}
-
-Compose Multiplatformプロジェクト（Android, iOS, Desktop, Web）の場合:
-
-```kotlin
-dependencies {
-    implementation(platform("io.insert-koin:koin-bom:$koin_version"))
-    implementation("io.insert-koin:koin-compose")
-    implementation("io.insert-koin:koin-compose-viewmodel")
-    implementation("io.insert-koin:koin-compose-viewmodel-navigation")
-}
-```
-
-:::info
-`koin-compose` にはAndroidサポートが自動的に含まれています。Compose Multiplatformプロジェクトで個別に `koin-android` を追加する必要はありません。
-:::
-
-### Kotlin Multiplatform {#kotlin-multiplatform}
-
-共有モジュールの `build.gradle.kts` 内:
+共有モジュールでは、Composeライブラリを `commonMain` に追加します。マルチプラットフォームのソースセットでは、バージョン情報を持つカタログエントリを使用してください（[BOMを使用しない場合](#without-the-bom) を参照）：
 
 ```kotlin
 kotlin {
     sourceSets {
         commonMain.dependencies {
-            implementation(platform("io.insert-koin:koin-bom:$koin_version"))
-            implementation("io.insert-koin:koin-core")
+            implementation(libs.koin.core)
+            implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel)
+            implementation(libs.koin.compose.viewmodel.navigation) // Navigation Composeを使用する場合
         }
+    }
+}
+```
 
-        commonTest.dependencies {
-            implementation("io.insert-koin:koin-test")
+Androidでは `koin-compose` が自動的に `koin-android` を取り込むため、追加する必要はありません。[Compose Multiplatform tutorial](/docs/quickstart/cmp) を参照してください。
+
+## Kotlin Multiplatform {#kotlin-multiplatform}
+
+共有モジュールの `build.gradle.kts` で、バージョン情報を持つカタログエントリを使用します（[BOMを使用しない場合](#without-the-bom) を参照）：
+
+```kotlin
+kotlin {
+    sourceSets {
+        commonMain.dependencies {
+            implementation(libs.koin.core)
         }
-
         androidMain.dependencies {
-            implementation("io.insert-koin:koin-android")
+            implementation(libs.koin.android)
+        }
+        commonTest.dependencies {
+            implementation(libs.koin.test)
         }
     }
 }
 ```
 
-### Ktor {#ktor}
+`koin-core` は、JVM、Android、Appleターゲット（iOS、macOS、tvOS、watchOS）、Linux、Windows、JS、およびWasm（`wasmJs`）をサポートしています。プロジェクト構成やプラットフォーム固有の定義については、[Kotlin Multiplatform Setup](/docs/reference/koin-core/kmp-setup) で解説されています。
 
-Ktorサーバーアプリケーションの場合:
-
-```kotlin
-dependencies {
-    implementation(platform("io.insert-koin:koin-bom:$koin_version"))
-    implementation("io.insert-koin:koin-ktor")
-    implementation("io.insert-koin:koin-logger-slf4j")
-}
-```
-
-KtorアプリケーションにKoinをインストールする:
-
-```kotlin
-fun Application.module() {
-    install(Koin) {
-        slf4jLogger()
-        modules(appModule)
-    }
-}
-```
-
-## 利用可能なすべてのパッケージ {id="all-available-packages"}
-
-現在の最新バージョンは以下の通りです: [![Maven Central](https://img.shields.io/maven-central/v/io.insert-koin/koin-core?label=latest)](https://mvnrepository.com/artifact/io.insert-koin/koin-core)
-
-| パッケージ | 説明 |
-|---------|-------------|
-| `koin-core` | Koinコアライブラリ |
-| `koin-core-coroutines` | Coroutinesサポート |
-| `koin-android` | Androidサポート |
-| `koin-android-compat` | Android向けJava互換性 |
-| `koin-androidx-navigation` | Navigation Componentサポート |
-| `koin-androidx-workmanager` | WorkManagerサポート |
-| `koin-androidx-startup` | AndroidX Startupサポート |
-| `koin-compose` | Compose (Androidおよびマルチプラットフォーム) |
-| `koin-compose-viewmodel` | Compose向けViewModel |
-| `koin-compose-viewmodel-navigation` | Compose MP向けNavigation + ViewModel |
-| `koin-androidx-compose` | ⚠️ 代替済み - 代わりに `koin-compose` を使用してください |
-| `koin-androidx-compose-navigation` | Android向けNavigation 2 (KMP非対応) |
-| `koin-compose-navigation3` | Navigation 3 |
-| `koin-ktor` | Ktorサーバーサポート |
-| `koin-logger-slf4j` | SLF4Jロギング |
-| `koin-test` | テスト用ユーティリティ |
-| `koin-test-junit4` | JUnit 4サポート |
-| `koin-test-junit5` | JUnit 5サポート |
-| `koin-android-test` | Androidインストルメンテーションテスト |
-
-## バージョンの直接指定 {id="direct-version-specification"}
-
-BOMを使用したくない場合:
+## Ktor {#ktor}
 
 ```kotlin
 dependencies {
-    implementation("io.insert-koin:koin-core:$koin_version")
-    implementation("io.insert-koin:koin-android:$koin_version")
+    implementation(platform(libs.koin.bom))
+    implementation(libs.koin.ktor)
+    implementation(libs.koin.logger.slf4j)
 }
 ```
 
-:::note
-このアプローチでは、すべての依存関係を手動で同期させる必要があります。**BOMの使用を強くお勧めします。**
-:::
+KtorアプリケーションにKoinプラグインをインストールします。[Koin for Ktor](/docs/reference/koin-ktor/ktor) を参照してください。
 
-## 次のステップ {id="next-steps"}
+## テスト {#testing}
 
-- **[コンパイラプラグインのセットアップ](/docs/setup/compiler-plugin)** - コンパイル時の安全性を追加
-- **[Koinの開始](/docs/reference/koin-core/starting-koin)** - アプリケーションの設定
-- **[チュートリアル](/docs/quickstart/kotlin)** - 初めてのアプリを作成する
+```kotlin
+dependencies {
+    testImplementation(libs.koin.test)
+    testImplementation(libs.koin.test.junit4) // または koin-test-junit5
+}
+```
+
+Androidのインストゥルメンテッドテスト（Instrumented tests）の場合は、`androidTestImplementation` に `koin-android-test` を追加してください。[Injecting in Tests](/docs/reference/koin-test/testing) および [Android Instrumented Testing](/docs/reference/koin-android/instrumented-testing) を参照してください。
+
+## すべてのアーティファクト {id="all-artifacts"}
+
+| アーティファクト | プラットフォーム | 説明 |
+|----------|-----------|-------------|
+| `koin-bom` | 全プラットフォーム | 下記のすべてのアーティファクト向けBill of Materials（部品表） |
+| `koin-core` | 全プラットフォーム | コンテナ、DSL、スコープ、Compiler Plugin DSL |
+| `koin-core-coroutines` | 全プラットフォーム | 遅延ロードモジュールとバックグラウンドロード |
+| `koin-core-viewmodel` | 全プラットフォーム | AndroidおよびCompose Multiplatform用のViewModel定義 |
+| `koin-annotations` | 全プラットフォーム | コンパイラプラグイン用アノテーション（`@Singleton`、`@Module`、`@Named` など） |
+| `koin-android` | Android | Androidコンテキスト、ActivityおよびFragment用API、ViewModel |
+| `koin-android-compat` | Android | Java互換性ヘルパー |
+| `koin-androidx-navigation` | Android | ナビゲーショングラフにスコープされたViewModel |
+| `koin-androidx-workmanager` | Android | WorkManagerの統合 |
+| `koin-androidx-startup` | Android | AndroidX App Startupの統合 |
+| `koin-dagger-bridge` | Android | KoinからDaggerコンポーネントへのアクセス |
+| `koin-compose` | 全Composeターゲット | `koinInject()`、`KoinApplication`、およびComposeコンテキスト |
+| `koin-compose-viewmodel` | 全Composeターゲット | `koinViewModel()` |
+| `koin-compose-viewmodel-navigation` | 全Composeターゲット | Navigation ComposeのバックスタックエントリにスコープされたViewModel |
+| `koin-compose-navigation3` | 全Composeターゲット | Navigation 3の統合 |
+| `koin-androidx-compose` | Android | Android向けの `koin-compose` と `koin-compose-viewmodel` のバンドル |
+| `koin-androidx-compose-navigation` | Android | Android向けNavigation Compose 2 |
+| `koin-ktor` | JVM、JS、Wasm、iOS、macOS（Ktorサーバーターゲット） | Ktorサーバープラグイン |
+| `koin-logger-slf4j` | JVM | SLF4Jロガー |
+| `koin-test` | 全プラットフォーム | テストAPI：`KoinTest`、`verify()` |
+| `koin-test-coroutines` | JVM | 遅延ロードモジュールの検証 |
+| `koin-test-junit4` | JVM | JUnit 4ルール |
+| `koin-test-junit5` | JVM | JUnit 5拡張機能 |
+| `koin-android-test` | Android | インストゥルメンテッドテスト用ヘルパー |
+
+Koin Compiler PluginはライブラリではなくGradleプラグインであり、独自のバージョンを持っています。[Compiler Plugin Setup](/docs/setup/compiler-plugin) を参照してください。
+
+## 関連情報 {id="related"}
+
+- [Compiler Plugin Setup](/docs/setup/compiler-plugin)：コンパイラプラグインとコンパイル時チェックの追加。
+- [Setup](/docs/setup)：プラットフォームごとにインストールするもの。
+- [Starting Koin](/docs/reference/koin-core/starting-koin)：依存関係の設定完了後にコンテナを起動する方法。
+- [Tutorials](/docs/quickstart/kotlin)：各プラットフォームでの最初のアプリ構築。
+- [Releases](/docs/support/releases)：バージョン情報とアップグレードに関する注意事項。

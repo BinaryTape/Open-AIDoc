@@ -1,473 +1,125 @@
 ---
-title: 의존성 조회하기
+title: 주입
 ---
 
-# 의존성 조회하기
+# 주입
 
-이 가이드는 다양한 컨텍스트에서 Koin으로부터 의존성을 조회하는 방법을 설명합니다.
+대부분의 클래스는 생성자를 통해 의존성을 전달받으며, Koin이 이를 채워줍니다([생성자 파라미터](/docs/reference/koin-core/definitions#constructor-parameters) 참고). 하지만 안드로이드 `Activity`, `main()` 함수, 프레임워크가 직접 생성하는 클래스 같은 일부 코드는 그렇게 할 수 없습니다. 이 페이지에서는 이러한 코드에서 Koin으로부터 인스턴스를 가져오는 함수들인 `get()`, `inject()`, 이들의 널 허용(nullable) 변형, 그리고 `getAll()`에 대해 다룹니다.
 
-## 접근 방식 {id="approaches"}
+## 생성자 주입 우선 {id="constructor-injection-first"}
 
-| 방식 | 사용 시점 | 예시 |
-|----------|-------------|---------|
-| **생성자 주입 (Constructor Injection)** | 비즈니스 로직, 서비스, 레포지토리 | `class MyService(val repo: Repository)` |
-| **함수 주입 (Function Injection)** | 팩토리 함수, 빌더 | `fun createHttpClient(val ds: DataSource): HttpClient` |
-| **필드 주입 (Field Injection)** | 안드로이드 프레임워크 클래스, 엔트리 포인트 | `val viewModel: MyViewModel by viewModel()` |
-
-:::info
-**권장 사항:** 더 나은 테스트 가능성을 위해 생성자 주입이나 함수 주입을 우선적으로 사용하세요. 클래스 생성을 직접 제어할 수 없는 경우(Activities, Fragments 등)에만 필드 주입을 사용하세요.
-:::
-
-## 생성자 주입 (권장) {id="constructor-injection-recommended"}
-
-의존성은 생성자에서 선언되며 Koin에 의해 해결됩니다.
+이 페이지에서 다루는 함수들은 Koin이 직접 클래스를 생성할 수 없는 경우에만 사용하세요.
 
 ```kotlin
-class UserRepository(
-    private val database: Database,
-    private val apiClient: ApiClient
-)
-
-class UserViewModel(
-    private val repository: UserRepository
-) : ViewModel()
-```
-
-```kotlin
-val appModule = module {
-    single<Database>()
-    single<ApiClient>()
-    single<UserRepository>()
-    viewModel<UserViewModel>()
-}
-```
-
-Koin은 모든 생성자 파라미터를 자동으로 해결(resolve)합니다.
-
-## 함수 주입 {id="function-injection"}
-
-커스텀 생성 로직이 필요한 경우 함수를 사용하여 인스턴스를 생성합니다.
-
-### 컴파일러 플러그인 DSL {id="compiler-plugin-dsl"}
-
-```kotlin
-fun createHttpClient(dataSource: DataSource): HttpClient {
-    return HttpClient {
-        install(ContentNegotiation) { json() }
-        defaultRequest { url(dataSource.baseUrl) }
-    }
-}
-
-val appModule = module {
-    single<DataSource>()
-    single { create(::createHttpClient) }
-}
-```
-
-### 어노테이션 {id="annotations"}
-
-```kotlin
-@Module
-class NetworkModule {
-
-    @Singleton
-    fun createHttpClient(dataSource: DataSource): HttpClient {
-        return HttpClient {
-            install(ContentNegotiation) { json() }
-            defaultRequest { url(dataSource.baseUrl) }
-        }
-    }
-}
-```
-
-함수 주입은 다음과 같은 경우에 유용합니다:
-- 직접 제어할 수 없는 외부 라이브러리의 인스턴스를 생성할 때
-- 복잡한 초기화 로직이 필요할 때
-- 빌더나 DSL을 설정해야 할 때
-
-## 필드 주입 {id="field-injection"}
-
-### `by inject()`를 사용한 지연 주입 (Lazy Injection) {id="lazy-injection-with-by-inject"}
-
-처음 접근할 때 인스턴스를 생성합니다.
-
-```kotlin
-class MyActivity : AppCompatActivity() {
-    // Lazy - 처음 접근할 때 생성됨
-    private val viewModel: UserViewModel by viewModel()
-    private val service: MyService by inject()
-}
-```
-
-### `get()`을 사용한 즉시 주입 (Eager Injection) {id="eager-injection-with-get"}
-
-인스턴스를 즉시 생성합니다.
-
-```kotlin
-class MyActivity : AppCompatActivity() {
-    // Eager - 즉시 생성됨
-    private val service: MyService = get()
-}
-```
-
-### 비교 {id="comparison"}
-
-| 메서드 | 생성 시점 | 스레드 안전성 |
-|--------|--------------|---------------|
-| `by inject()` | 처음 접근 시 | 스레드 안전한 지연 로딩 (Thread-safe lazy) |
-| `get()` | 즉시 | 직접 호출 |
-
-## KoinComponent {id="koincomponent"}
-
-의존성을 주입받아야 하지만 안드로이드 컴포넌트가 아닌 클래스의 경우:
-
-```kotlin
-class MyHelper : KoinComponent {
-    private val service: MyService by inject()
-    private val database: Database = get()
-
-    fun doSomething() {
-        service.process(database.query())
-    }
-}
-```
-
-:::warning
-비즈니스 로직 클래스에서 `KoinComponent`를 사용하는 것은 피하세요. 이는 Koin과의 강한 결합(tight coupling)을 유발합니다. 대신 생성자 주입을 사용하는 것이 좋습니다.
-:::
-
-## 플랫폼별 주입 {id="platform-specific-injection"}
-
-### 안드로이드 (Android) {id="android"}
-
-Activity와 Fragment는 내장된 지원 기능을 제공합니다.
-
-```kotlin
-class MainActivity : AppCompatActivity() {
-    // ViewModel 주입
-    private val viewModel: UserViewModel by viewModel()
-
-    // 일반 주입
-    private val analytics: AnalyticsService by inject()
-}
-
-class UserFragment : Fragment() {
-    // Fragment 자체의 ViewModel
-    private val viewModel: UserViewModel by viewModel()
-
-    // Activity와 공유되는 ViewModel
-    private val sharedVM: SharedViewModel by activityViewModels()
-}
-```
-
-### 컴포즈 (Compose) {id="compose"}
-
-```kotlin
-@Composable
-fun UserScreen() {
-    // ViewModel 주입
-    val viewModel: UserViewModel = koinViewModel()
-
-    // 모든 의존성 주입
-    val analytics: AnalyticsService = koinInject()
-
-    // Activity 스코프의 ViewModel
-    val sharedVM: SharedViewModel = koinActivityViewModel()
-}
-```
-
-### Ktor {id="ktor"}
-
-```kotlin
-fun Route.userRoutes() {
-    val repository: UserRepository by inject()
-
-    get("/users") {
-        call.respond(repository.getAll())
-    }
-}
-```
-
-## 한정자를 사용한 주입 (Injection with Qualifiers) {id="injection-with-qualifiers"}
-
-동일한 타입의 정의가 여러 개 있는 경우, 한정자(qualifier)를 사용하여 구분합니다.
-
-### 문자열 한정자 (String Qualifier) {id="string-qualifier"}
-
-| DSL | 어노테이션 |
-|-----|------------|
-| `named("local")` | `@Named("local")` |
-
-```kotlin
-// DSL
-val module = module {
-    single<Database>(named("local")) { LocalDatabase() }
-    single<Database>(named("remote")) { RemoteDatabase() }
-}
-
-// 주입
-private val localDb: Database by inject(named("local"))
-private val remoteDb: Database by inject(named("remote"))
-```
-
-```kotlin
-// 어노테이션
-@Singleton
-@Named("local")
-class LocalDatabase : Database
-
-@Singleton
-@Named("remote")
-class RemoteDatabase : Database
-```
-
-### 타입 한정자 (Type Qualifier) {id="type-qualifier"}
-
-컴파일 타임 안전성을 위해 타입(클래스, 객체 또는 열거형)을 한정자로 사용합니다.
-
-| DSL | 어노테이션 |
-|-----|------------|
-| `named<LocalDb>()` | `@Qualifier(LocalDb::class)` |
-
-```kotlin
-// 한정자 타입 정의
-object LocalDb
-object RemoteDb
-
-// DSL
-val module = module {
-    single<Database>(named<LocalDb>()) { LocalDatabase() }
-    single<Database>(named<RemoteDb>()) { RemoteDatabase() }
-}
-
-// 주입
-private val localDb: Database by inject(named<LocalDb>())
-private val remoteDb: Database by inject(named<RemoteDb>())
-```
-
-```kotlin
-// 어노테이션
-@Singleton
-@Qualifier(LocalDb::class)
-class LocalDatabase : Database
-
-@Singleton
-@Qualifier(RemoteDb::class)
-class RemoteDatabase : Database
-```
-
-### 컴포즈에서 사용 {id="in-compose"}
-
-```kotlin
-@Composable
-fun MyScreen() {
-    // 문자열 한정자 사용
-    val localDb: Database = koinInject(named("local"))
-
-    // 타입 한정자 사용
-    val remoteDb: Database = koinInject(named<RemoteDb>())
-}
-```
-
-## 파라미터를 사용한 주입 {id="injection-with-parameters"}
-
-주입 시점에 파라미터를 전달합니다.
-
-### 정의 {id="definition"}
-
-```kotlin
-@Factory
-class UserPresenter(
-    @InjectedParam val userId: String,
-    val repository: UserRepository
-)
-
-// 또는 DSL 사용
-factory<UserPresenter>()
-```
-
-### 주입 {id="injection"}
-
-```kotlin
-// by inject()
-private val presenter: UserPresenter by inject { parametersOf("user123") }
-
-// get()
-val presenter: UserPresenter = get { parametersOf("user123") }
-```
-
-### 컴포즈에서 사용
-
-```kotlin
-@Composable
-fun UserScreen(userId: String) {
-    val presenter: UserPresenter = koinInject { parametersOf(userId) }
-}
-```
-
-### 여러 파라미터 전달 {id="multiple-parameters"}
-
-```kotlin
-@Factory
-class OrderPresenter(
-    @InjectedParam val userId: String,
-    @InjectedParam val orderId: String,
-    val repository: OrderRepository
-)
-
-val presenter = get<OrderPresenter> { parametersOf("user123", "order456") }
-```
-
-## Koin 직접 접근 {id="direct-koin-access"}
-
-필요한 경우 Koin 인스턴스에 직접 접근할 수 있습니다.
-
-```kotlin
-// GlobalContext에서 접근
-val koin = KoinPlatform.getKoin()
-val service: MyService = koin.get()
-
-// KoinComponent 내부에서 접근
-class MyClass : KoinComponent {
-    fun doSomething() {
-        val service: MyService = getKoin().get()
-    }
-}
-```
-
-## Null 가능한 주입 (Nullable Injection) {id="nullable-injection"}
-
-선택적 의존성의 경우:
-
-```kotlin
-// 찾지 못하면 null을 반환
-val optional: MyService? = getKoinOrNull()?.getOrNull()
-
-// KoinComponent 내부에서
-class MyClass : KoinComponent {
-    private val optional: MyService? = getOrNull()
-}
-```
-
-## 다양한 컨텍스트에서의 주입 {id="injection-in-different-contexts"}
-
-### ViewModel에서 {id="in-viewmodel"}
-
-```kotlin
-class UserViewModel(
-    private val repository: UserRepository,
-    private val savedStateHandle: SavedStateHandle
-) : ViewModel() {
-    // 생성자 주입 - KoinComponent가 필요하지 않음
-}
-```
-
-### Service에서 {id="in-service"}
-
-```kotlin
-class MyService : Service() {
-    private val repository: UserRepository by inject()
-
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        repository.doSomething()
-        return START_STICKY
-    }
-}
-```
-
-### BroadcastReceiver에서 {id="in-broadcastreceiver"}
-
-```kotlin
-class MyReceiver : BroadcastReceiver(), KoinComponent {
-    private val service: NotificationService by inject()
-
-    override fun onReceive(context: Context, intent: Intent) {
-        service.handleNotification(intent)
-    }
-}
-```
-
-### WorkManager Worker에서 {id="in-workmanager-worker"}
-
-```kotlin
-class MyWorker(
-    context: Context,
-    params: WorkerParameters,
-    private val repository: UserRepository  // Koin에 의해 주입됨
-) : CoroutineWorker(context, params) {
-
-    override suspend fun doWork(): Result {
-        repository.syncData()
-        return Result.success()
-    }
-}
-
-// 모듈
-val workerModule = module {
-    worker<MyWorker>()
-}
-```
-
-## 베스트 프랙티스 {id="best-practices"}
-
-### 권장: 비즈니스 로직에는 생성자 주입 사용 {id="do-constructor-injection-for-business-logic"}
-
-```kotlin
-// 좋음 - Koin 없이도 테스트 가능
+// Koin이 이 클래스를 생성합니다. 의존성은 생성자를 통해 주입됩니다.
 class UserService(
     private val repository: UserRepository,
-    private val validator: UserValidator
-) {
-    fun createUser(data: UserData) = validator.validate(data).let {
-        repository.save(it)
-    }
-}
-
-// Koin 없이 테스트
-@Test
-fun testCreateUser() {
-    val mockRepo = mockk<UserRepository>()
-    val mockValidator = mockk<UserValidator>()
-    val service = UserService(mockRepo, mockValidator)
-    // 직접 테스트
-}
-```
-
-### 권장: 프레임워크 클래스에는 필드 주입 사용 {id="do-field-injection-for-framework-classes"}
-
-```kotlin
-// 좋음 - Activity 생성은 안드로이드에 의해 제어됨
-class MainActivity : AppCompatActivity() {
-    private val viewModel: UserViewModel by viewModel()
-}
-```
-
-### 지양: 비즈니스 로직에서의 KoinComponent 사용 {id="don-t-koincomponent-in-business-logic"}
-
-```kotlin
-// 나쁨 - Koin과의 강한 결합
-class UserService : KoinComponent {
-    private val repository: UserRepository by inject()
-}
-
-// 좋음 - 생성자 주입
-class UserService(private val repository: UserRepository)
-```
-
-### 지양: 생성자 내에서 get() 사용 {id="don-t-get-in-constructors"}
-
-```kotlin
-// 나쁨 - 생성자 내에서의 부수 효과(side effects)
-class MyService(
-    private val repo: UserRepository = get()  // 이렇게 하지 마세요!
+    private val validator: UserValidator,
 )
 
-// 좋음 - Koin이 주입하도록 설정
-class MyService(private val repo: UserRepository)
+// Android가 이 클래스를 생성합니다. inject()를 사용하여 의존성을 가져옵니다.
+class UserActivity : AppCompatActivity() {
+    private val userService: UserService by inject()
+}
 ```
 
-## 다음 단계 {id="next-steps"}
+생성자 파라미터가 있는 클래스는 Koin 컨테이너 없이도 테스트 대역(fake)을 전달하여 테스트할 수 있습니다. 반면 `get()`을 호출하는 클래스는 테스트 시 실행 중인 컨테이너가 필요합니다. 기본 파라미터 값에서 `get()`을 호출하지 마세요(`class UserService(val repository: UserRepository = get())`). 대신 모듈에 클래스를 선언하세요.
 
-- **[Scopes](/docs/reference/koin-core/scopes)** - 의존성 생명주기 관리
-- **[Koin for Android](/docs/integrations/android/index)** - 안드로이드 전용 주입
-- **[Koin for Compose](/docs/integrations/compose/index)** - 컴포즈 주입
+## 지연(Lazy) 및 즉시(Eager) 조회 {id="lazy-and-eager-retrieval"}
+
+조회 코드는 스타일에 관계없이 동일합니다.
+
+```kotlin
+class UserActivity : AppCompatActivity() {
+
+    // 지연(lazy): 프로퍼티에 처음 접근할 때 의존성이 해결(resolve)됩니다.
+    private val userService: UserService by inject()
+
+    // 즉시(eager): 프로퍼티가 초기화되는 시점에 즉시 해결됩니다.
+    private val analytics: Analytics = get()
+}
+```
+
+| 함수 | 반환값 | 해결 시점 |
+|------|--------|-----------|
+| `by inject<T>()` | 프로퍼티 위임(property delegate)으로 사용되는 `Lazy<T>` | 최초 접근 시 |
+| `get<T>()` | `T` | 즉시 |
+
+프로퍼티에는 `by inject()`를 사용하세요. Koin이 모든 준비를 마치기 전에 클래스가 생성될 수 있으며(`Activity` 필드는 `onCreate()` 이전에 초기화됨), 사용되지 않는 인스턴스는 절대 생성되지 않습니다. 함수 본문 내부처럼 값이 즉시 필요한 경우에는 `get()`을 사용하세요.
+
+`inject()`는 Kotlin의 `LazyThreadSafetyMode`인 `mode` 파라미터를 받습니다. JVM에서의 기본값은 `SYNCHRONIZED`입니다.
+
+## get()과 inject()를 사용할 수 있는 위치 {id="where-get-and-inject-are-available"}
+
+다음 위치에서 `get()` 및 `by inject()`를 호출할 수 있습니다.
+
+- Android 클래스: 별도의 인터페이스 없이 `Activity`, `Fragment`, `Service` 및 기타 `ComponentCallbacks`에서 사용할 수 있습니다. [Android 진입점](/docs/reference/koin-android/entry-points)을 참고하세요.
+- `KoinComponent`를 구현하는 모든 클래스. [KoinComponent](/docs/reference/koin-core/koin-component)를 참고하세요.
+- `Koin` 인스턴스: `KoinPlatform.getKoin().get<UserService>()`는 전역 컨테이너를 사용하고, `koinApp.koin.get<UserService>()`는 격리된 컨테이너를 사용합니다.
+- 정의(Definition) 내부(Classic DSL): `get()`, `inject()`, `getOrNull()`, `injectOrNull()`, `getAll()`은 현재 스코프에서 의존성을 해결합니다.
+
+플랫폼 API도 고유한 이름을 통해 동일한 규칙을 따릅니다.
+
+- Compose: `koinInject()` 및 `koinViewModel()`. [Koin for Compose](/docs/reference/koin-compose/compose)를 참고하세요.
+- Android ViewModel: `by viewModel()` 및 `by activityViewModel()`. [Android ViewModel](/docs/reference/koin-android/viewmodel)을 참고하세요.
+- Ktor: `Application`, `Route`, `ApplicationCall` 내의 `by inject()`. [Koin for Ktor](/docs/reference/koin-ktor/ktor)를 참고하세요.
+
+## 선택적 의존성 {id="optional-dependencies"}
+
+정의가 누락될 가능성이 있는 경우, 널 허용 변형을 사용하세요. 이 함수들은 `NoDefinitionFoundException`을 던지는 대신 `null`을 반환합니다.
+
+```kotlin
+val koin = KoinPlatform.getKoin()
+
+val tracker: Tracker? = koin.getOrNull()
+val crashReporter: CrashReporter? by koin.injectOrNull()
+```
+
+`getOrNull()`과 `injectOrNull()`은 `Koin`, `Scope`, 그리고 정의 내부에서 제공됩니다. `KoinComponent` 인터페이스는 `get()`과 `inject()`만 제공하므로, 해당 위치에서는 `getKoin().getOrNull<T>()`를 호출하세요.
+
+생성자 파라미터의 경우 널 허용 타입(`tracker: Tracker?`)으로 선언하면 정의가 없을 때 Koin이 `null`을 전달합니다. [생성자 파라미터](/docs/reference/koin-core/definitions#constructor-parameters)를 참고하세요.
+
+라이브러리 등에서 Koin 자체가 시작되지 않았을 가능성이 있는 경우, `KoinPlatform.getKoinOrNull()`은 예외를 던지는 대신 `null`을 반환합니다.
+
+## 특정 타입의 모든 인스턴스 {id="all-instances-of-a-type"}
+
+`getAll<T>()`는 모든 정의에 걸쳐 `T` 타입에 바인딩된 모든 인스턴스를 반환합니다.
+
+```kotlin
+val koin = KoinPlatform.getKoin()
+
+val interceptors: List<Interceptor> = koin.getAll()
+```
+
+반환되는 리스트에는 한정자(qualifier) 유무와 관계없이 메인 타입 또는 바인딩된 타입이 `T`인 각 정의가 포함됩니다. 일치하는 정의가 없으면 빈 리스트가 됩니다. 생성자 파라미터에서도 `List<Interceptor>` 파라미터가 동일하게 동작합니다. 컬렉션 패턴은 [고급 패턴](/docs/reference/koin-core/advanced-patterns)에서 다룹니다.
+
+## 호출부의 한정자와 파라미터 {id="qualifiers-and-parameters-at-the-call-site"}
+
+모든 조회 함수는 한정자와 파라미터 블록을 전달받을 수 있습니다.
+
+```kotlin
+val localDb: Database by inject(named("local"))
+
+val presenter: UserPresenter = get { parametersOf(userId) }
+
+val detail: DetailPresenter = get(named("compact")) { parametersOf(itemId) }
+```
+
+- 한정자(Qualifier): 동일한 타입의 여러 정의 중 하나를 선택합니다. [한정자](/docs/reference/koin-core/qualifiers)를 참고하세요.
+- 파라미터(Parameters): 호출자만 알고 있는 값으로, 정의에 전달됩니다. [주입 파라미터](/docs/reference/koin-core/injection-parameters)를 참고하세요.
+
+`by inject()`를 사용할 경우 파라미터 블록은 프로퍼티에 처음 접근할 때 실행되므로, 객체 생성 후에 설정된 프로퍼티도 읽을 수 있습니다.
+
+## 의존성 해결에 실패하는 경우 {id="when-resolution-fails"}
+
+해당 타입 및 한정자와 일치하는 정의가 없으면 `get()`은 `NoDefinitionFoundException`을 발생시킵니다. `by inject()`의 경우, 프로퍼티가 선언된 시점이 아니라 해당 프로퍼티에 처음 접근할 때 예외가 발생합니다. Compiler Plugin을 사용하면 빌드 시점에 시작 호출(start call)의 그래프를 기준으로 `get()` 및 `inject()` 호출을 검증할 수도 있습니다.
+
+자주 발생하는 오류와 Koin 메시지를 읽는 방법은 [문제 해결](/docs/reference/koin-core/troubleshooting)을 참고하세요.
+
+## 관련 문서 {id="related"}
+
+- [정의](/docs/reference/koin-core/definitions): 생성자 주입 및 파라미터가 해결되는 방식.
+- [KoinComponent](/docs/reference/koin-core/koin-component): 모든 클래스에 `get()` 및 `inject()`에 대한 접근 권한 부여.
+- [Android 진입점](/docs/reference/koin-android/entry-points): Activity, Fragment, Service, Receiver, View에서의 주입.
+- [Koin for Compose](/docs/reference/koin-compose/compose): `koinInject()` 및 기타 Compose API.
+- [스코프](/docs/reference/koin-core/scopes): 루트 컨테이너 대신 특정 스코프에서 인스턴스 가져오기.

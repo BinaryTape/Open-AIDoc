@@ -4,7 +4,7 @@
 
 <tldr>
 <p>
-<b>必需依赖项</b>：<code>io.ktor:ktor-server-di</code>
+<b>所需依赖项</b>：<code>io.ktor:ktor-server-di</code>
 </p>
 <var name="example_name" value="server-di"/>
 <p>
@@ -15,13 +15,13 @@
 </p>
 </tldr>
 
-在您[注册依赖项](server-di-dependency-registration.md)后，可以从依赖注入 (DI) 容器中解析它们并将其注入到应用程序代码中。
+在[注册依赖项](server-di-dependency-registration.md)后，你可以从依赖注入 (DI) 容器中解析它们，并将其注入到应用程序代码中。
 
-您可以使用[属性委托](#property-delegation)或[直接解析](#direct-resolution)从 DI 容器中显式解析依赖项。
+你可以通过[属性委托](#property-delegation)或[直接解析](#direct-resolution)从 DI 容器中显式解析依赖项。
 
 ### 使用属性委托 {id="property-delegation"}
 
-使用属性委托时，依赖项仅在启动验证阶段解析：
+使用属性委托时，依赖项仅在启动验证阶段被解析：
 
 ```kotlin
 val service: GreetingService by dependencies
@@ -37,13 +37,13 @@ val service = dependencies.resolve<GreetingService>()
 
 ### 形参解析 {id="parameter-resolution"}
 
-解析构造函数或函数时，Ktor 使用 DI 容器解析形参。默认情况下按类型解析形参。
+在解析构造函数或函数时，Ktor 会使用 DI 容器解析形参。默认情况下，形参按类型进行解析。
 
-如果基于类型的解析不足，可以使用注解显式绑定形参。
+如果基于类型的解析无法满足需求，你可以使用注解来显式绑定形参。
 
 #### 使用命名依赖项 {id="resolve-named"}
 
-使用 `@Named` 注解解析[以指定名称注册](server-di-dependency-registration.md#named-registration)的依赖项：
+使用 `@Named` 注解来解析[以指定名称注册](server-di-dependency-registration.md#named-registration)的依赖项：
 
 ```kotlin
 fun Application.userRepository(@Named("mongo") database: Database) {
@@ -68,7 +68,7 @@ open class UserRepository(val db: Database)
 
 ```
 
-在上述示例中，`database.connectionUrl` 属性从应用程序配置中解析：
+在上述示例中，`database.connectionUrl` 属性是从应用程序配置中解析出来的：
 
 <Tabs>
 <TabItem title="application.yaml">
@@ -83,7 +83,7 @@ database:
 
 ### 异步依赖项解析 {id="async-dependency-resolution"}
 
-为了支持异步加载，可以使用挂起函数：
+为支持异步加载，你可以使用挂起函数：
 
 ```kotlin
 data class EventsConnection(val connected: Boolean)
@@ -95,19 +95,19 @@ suspend fun Application.installEvents() {
 
 suspend fun Application.loadEventsConnection() {
     dependencies.provide {
-        delay(200) // 模拟异步工作
+        delay(200) // 模拟异步操作
         EventsConnection(true)
     }
 }
 ```
 
-DI 插件将自动挂起 `resolve()` 调用，直到所有依赖项准备就绪。
+DI 插件会自动挂起 `resolve()` 调用，直到所有依赖项准备就绪。
 
-### 将依赖项注入到应用程序模块 {id="inject-into-modules"}
+### 将依赖项注入到应用程序模块中 {id="inject-into-modules"}
 
-您可以通过在模块函数中指定形参，直接将依赖项注入到应用程序模块中。Ktor 将根据类型匹配从 DI 容器中解析这些依赖项。
+你可以通过在模块函数中指定形参，直接将依赖项注入到应用程序模块中。Ktor 将根据类型匹配从 DI 容器中解析这些依赖项。
 
-首先，在配置文件中的 `ktor.application.dependencies` 组中注册您的依赖项提供程序：
+首先，在配置文件中的 `ktor.application.dependencies` 组下注册你的依赖项提供程序：
 
 <Tabs>
 <TabItem title="application.yaml">
@@ -124,7 +124,7 @@ ktor:
 </TabItem>
 </Tabs>
 
-为您想要注入的依赖项定义带有形参的依赖项提供程序和模块函数。然后，您可以直接在模块函数中使用注入的依赖项：
+定义依赖项提供程序和模块函数，并为要注入的依赖项指定形参。随后你便可以直接在模块函数中使用注入的依赖项：
 
 <Tabs>
 <TabItem title="PrintStreamProvider.kt">
@@ -168,9 +168,9 @@ fun Application.logging(printStreamProvider: () -> PrintStream) {
 
 ## 高级依赖项解析 {id="advanced-dependency-resolution"}
 
-### 可选和可空依赖项 {id="optional-dependencies"}
+### 可选与可空依赖项 {id="optional-dependencies"}
 
-使用可空类型优雅地处理可选依赖项：
+使用可空类型从容处理可选依赖项：
 
 ```kotlin
 // 使用属性委托
@@ -182,16 +182,16 @@ val config = dependencies.resolve<Config?>()
 
 ### 协变泛型 {id="covariant-generics"}
 
-Ktor 的 DI 系统支持类型协变，这允许在类型形参协变时将值作为其超类型之一进行注入。这对于处理子类型的集合和接口特别有用。
+Ktor 的 DI 系统支持类型协变，当类型形参是协变的时，允许将值作为其超类型之一注入。这对于与子类型一起使用的集合和接口特别有用。
 
 ```kotlin
 dependencies {
   provide<List<String>> { listOf("one", "two") }
 }
 
-// 由于支持类型形参协变，这将可以工作
+// 由于支持类型形参协变，这可以正常工作
 val stringList: List<CharSequence> by dependencies
-// 这也可以工作
+// 这也可以正常工作
 val stringCollection: Collection<CharSequence> by dependencies
 ```
 
@@ -202,13 +202,13 @@ dependencies {
     provide<BufferedOutputStream> { BufferedOutputStream(System.out) }
 }
 
-// 这可以工作，因为 BufferedOutputStream 是 OutputStream 的子类型
+// 这可以正常工作，因为 BufferedOutputStream 是 OutputStream 的子类型
 val outputStream: OutputStream by dependencies
 ```
 
 #### 局限性 {id="limitations"}
 
-虽然 DI 系统支持泛型类型的协变，但目前不支持跨类型实参子类型解析参数化类型。这意味着您无法使用比注册类型更具体或更宽泛的类型来检索依赖项。
+虽然 DI 系统支持泛型类型的协变，但目前不支持跨类型实参子类型解析参数化类型。这意味着你无法使用比已注册类型更具体或更宽泛的类型来获取依赖项。
 
 例如，以下代码将无法解析：
 
@@ -217,6 +217,6 @@ dependencies {
     provide<Sink<CharSequence>> { CsqSink() }
 }
 
-// 将无法解析
+// 无法解析
 val charSequenceSink: Sink<String> by dependencies
 ```

@@ -1,14 +1,15 @@
-[//]: # (title: Forwarded 标头)
+[//]: # (title: 转发标头)
 
 <show-structure for="chapter" depth="2"/>
 <primary-label ref="server-plugin"/>
 
 <var name="artifact_name" value="ktor-server-forwarded-header"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.server.forwardedHeader"/>
 <var name="package_name" value="io.ktor.server.plugins.forwardedheaders"/>
 
 <tldr>
 <p>
-<b>所需依赖项</b>：<code>io.ktor:%artifact_name%</code>
+<b>必需依赖项</b>：<code>io.ktor:%artifact_name%</code>
 </p>
 <var name="example_name" value="forwarded-header"/>
 <p>
@@ -18,33 +19,39 @@
     </a>
 </p>
 <p>
-    <b><Links href="/ktor/server-native" summary="Ktor supports Kotlin/Native and allows you to run a server without an additional runtime or virtual machine.">原生服务器</Links> 支持</b>：✅
+    <b><Links href="server-native.md" summary="Ktor 支持 Kotlin/Native，允许您在没有额外运行时或虚拟机的情况下运行服务器。">原生服务器</Links>支持</b>：✅
 </p>
 </tldr>
 
-[ForwardedHeaders](https://api.ktor.io/ktor-server-forwarded-header/io.ktor.server.plugins.forwardedheaders/-forwarded-headers.html) 和 [XForwardedHeaders](https://api.ktor.io/ktor-server-forwarded-header/io.ktor.server.plugins.forwardedheaders/-x-forwarded-headers.html) 插件允许您在 Ktor 服务器位于反向代理之后时，通过处理反向代理标头来获取有关原始[请求](server-requests.md)的信息。这对于[日志](server-logging.md)记录很有用。
+当 Ktor 服务器部署在反向代理之后时，[ForwardedHeaders](https://api.ktor.io/ktor-server-forwarded-header/io.ktor.server.plugins.forwardedheaders/-forwarded-headers.html) 和 [XForwardedHeaders](https://api.ktor.io/ktor-server-forwarded-header/io.ktor.server.plugins.forwardedheaders/-x-forwarded-headers.html) 插件允许您处理反向代理标头，以获取有关原始[请求](server-requests.md)的信息。这在[日志记录](server-logging.md)等场景中非常有用。
 
-* `ForwardedHeaders` 处理 `Forwarded` 标头 ([RFC 7239](https://tools.ietf.org/html/rfc7239))
-* `XForwardedHeaders` 处理以下 `X-Forwarded-` 标头：
+* `ForwardedHeaders` 用于处理 `Forwarded` 标头（[RFC 7239](https://tools.ietf.org/html/rfc7239)）
+* `XForwardedHeaders` 用于处理以下 `X-Forwarded-` 标头：
    - `X-Forwarded-Host`/`X-Forwarded-Server` 
    - `X-Forwarded-For` 
    - `X-Forwarded-By`
    - `X-Forwarded-Proto`/`X-Forwarded-Protocol`
    - `X-Forwarded-SSL`/`Front-End-Https`
 
-> 为了防止 `Forwarded` 标头被篡改，请仅在您的应用程序只接受反向代理连接时安装这些插件。
+> 为防止 `Forwarded` 标头被篡改，请仅在您的应用程序仅接受反向代理连接的情况下安装这些插件。
 > 
 {type="note"}
 
 ## 添加依赖项 {id="add_dependencies"}
-要使用 `ForwardedHeaders`/`XForwardedHeaders` 插件，您需要在构建脚本中包含 `%artifact_name%` 构件：
+要使用 `ForwardedHeaders`/`XForwardedHeaders` 插件，您需要在构建脚本中包含 `%artifact_name%` 工件：
 
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上述代码段使用 <a href="server-dependencies.topic#using-version-catalog">Ktor 版本目录 (Version Catalog)</a> 来指定 Ktor 依赖项。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上述代码段使用 <a href="server-dependencies.topic#using-version-catalog">Ktor 版本目录 (Version Catalog)</a> 来指定 Ktor 依赖项。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
@@ -58,16 +65,14 @@
 
 <var name="plugin_name" value="ForwardedHeaders"/>
 <p>
-    要将 <code>%plugin_name%</code> 插件<a href="server-plugins.md#install">安装</a>到应用，
-    请将其传递给指定 <Links href="/ktor/server-modules" summary="Modules allow you to structure your application by grouping routes.">模块</Links> 中的 <code>install</code> 函数。
-    以下代码片段展示了如何安装 <code>%plugin_name%</code> ...
+    要将 <code>%plugin_name%</code> 插件<a href="server-plugins.md#install">安装</a>到您的应用程序中，请在指定的 <Links href="server-modules.md" summary="模块允许您通过对路由进行分组来构建应用程序结构。">模块</Links>内将其传递给 <code>install</code> 函数。以下示例展示了如何安装 <code>%plugin_name%</code>：
 </p>
 <list>
     <li>
-        ... 在 <code>embeddedServer</code> 函数调用内部。
+        在 <code>embeddedServer()</code> 函数调用中。
     </li>
     <li>
-        ... 在显式定义的 <code>module</code> 内部，该模块是 <code>Application</code> 类的扩展函数。
+        在 <code>Application</code> 类上显式定义的 <code>module()</code> 扩展函数中。
     </li>
 </list>
 <Tabs>
@@ -85,16 +90,14 @@
 
 <var name="plugin_name" value="XForwardedHeaders"/>
 <p>
-    要将 <code>%plugin_name%</code> 插件<a href="server-plugins.md#install">安装</a>到应用，
-    请将其传递给指定 <Links href="/ktor/server-modules" summary="Modules allow you to structure your application by grouping routes.">模块</Links> 中的 <code>install</code> 函数。
-    以下代码片段展示了如何安装 <code>%plugin_name%</code> ...
+    要将 <code>%plugin_name%</code> 插件<a href="server-plugins.md#install">安装</a>到您的应用程序中，请在指定的 <Links href="server-modules.md" summary="模块允许您通过对路由进行分组来构建应用程序结构。">模块</Links>内将其传递给 <code>install</code> 函数。以下示例展示了如何安装 <code>%plugin_name%</code>：
 </p>
 <list>
     <li>
-        ... 在 <code>embeddedServer</code> 函数调用内部。
+        在 <code>embeddedServer()</code> 函数调用中。
     </li>
     <li>
-        ... 在显式定义的 <code>module</code> 内部，该模块是 <code>Application</code> 类的扩展函数。
+        在 <code>Application</code> 类上显式定义的 <code>module()</code> 扩展函数中。
     </li>
 </list>
 <Tabs>
@@ -109,14 +112,14 @@
 </TabItem>
 </Tabs>
 
-安装 `ForwardedHeaders`/`XForwardedHeaders` 后，您可以使用 [call.request.origin](#request_info) 属性获取有关原始请求的信息。
+安装 `ForwardedHeaders`/`XForwardedHeaders` 之后，您可以使用 [call.request.origin](#request_info) 属性获取有关原始请求的信息。
 
 ## 获取请求信息 {id="request_info"}
 
 ### 代理请求信息 {id="proxy_request_info"}
 
 要获取有关代理请求的信息，请在[路由处理程序](server-routing.md#define_route)中使用 [call.request.local](https://api.ktor.io/ktor-server-core/io.ktor.server.request/-application-request/local.html) 属性。
-以下代码片段展示了如何获取有关代理地址和发出请求的主机的信息：
+以下代码段演示了如何获取有关代理地址以及发出请求的目标主机的信息：
 
 ```kotlin
 get("/hello") {
@@ -136,11 +139,11 @@ get("/hello") {
 }
 ```
 
-下表显示了 `call.request.origin` 公开的不同属性的值，具体取决于是否安装了 `ForwardedHeaders`/`XForwardedHeaders`。
+下表展示了在安装与未安装 `ForwardedHeaders`/`XForwardedHeaders` 的情况下，`call.request.origin` 所公开的不同属性对应的值。
 
 ![请求图示](forwarded-headers.png){width="706"}
 
-| 属性 | 未安装 ForwardedHeaders | 已安装 ForwarderHeaders |
+| 属性                   | 未安装 ForwardedHeaders   | 已安装 ForwardedHeaders  |
 |------------------------|--------------------------|-----------------------|
 | `origin.localHost`     | _web-server_             | _web-server_          |
 | `origin.localPort`     | _8080_                   | _8080_                |
@@ -154,25 +157,25 @@ get("/hello") {
 ## 配置 ForwardedHeaders {id="configure"}
 
 如果请求经过多个代理，您可能需要配置 `ForwardedHeaders`/`XForwardedHeaders`。
-在这种情况下，`X-Forwarded-For` 包含每个连续代理的所有 IP 地址，例如：
+在这种情况下，`X-Forwarded-For` 将包含每个连续代理的所有 IP 地址，例如：
 
 ```HTTP
 X-Forwarded-For: <client>, <proxy1>, <proxy2>
 ```
 
-默认情况下，`XForwardedHeader` 将 `X-Forward-For` 中的第一个条目分配给 `call.request.origin.remoteHost` 属性。
-您还可以提供[选择 IP 地址](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forward-For#selecting_an_ip_address)的自定义逻辑。
+默认情况下，`XForwardedHeader` 会将 `X-Forwarded-For` 中的第一个条目分配给 `call.request.origin.remoteHost` 属性。
+您也可以为[选择 IP 地址](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For#selecting_an_ip_address)提供自定义逻辑。
 [XForwardedHeadersConfig](https://api.ktor.io/ktor-server-forwarded-header/io.ktor.server.plugins.forwardedheaders/-x-forwarded-headers-config/index.html) 为此公开了以下 API：
 
 - `useFirstProxy` 和 `useLastProxy` 分别允许您从 IP 地址列表中获取第一个或最后一个值。
 - `skipLastProxies` 从右侧开始跳过指定数量的条目，并获取下一个条目。
-   例如，如果 `proxiesCount` 参数等于 `3`，对于下方的标头，`origin.remoteHost` 将返回 `10.0.0.123`：
+   例如，如果 `proxiesCount` 形参等于 `3`，对于以下标头，`origin.remoteHost` 将返回 `10.0.0.123`：
    ```HTTP
    X-Forwarded-For: 10.0.0.123, proxy-1, proxy-2, proxy-3
    ```
 - `skipKnownProxies` 从列表中移除指定的条目并获取最后一个条目。
-   例如，如果您将 `listOf("proxy-1", "proxy-3")` 传递给此函数，对于下方的标头，`origin.remoteHost` 将返回 `proxy-2`：
+   例如，如果您将 `listOf("proxy-1", "proxy-3")` 传递给此函数，对于以下标头，`origin.remoteHost` 将返回 `proxy-2`：
    ```HTTP
    X-Forwarded-For: 10.0.0.123, proxy-1, proxy-2, proxy-3
    ```
-- `extractEdgeProxy` 允许您提供从 `X-Forward-*` 标头中提取值的自定义逻辑。
+- `extractEdgeProxy` 允许您提供用于从 `X-Forward-*` 标头中提取值的自定义逻辑。

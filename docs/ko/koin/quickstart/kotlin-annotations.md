@@ -2,55 +2,94 @@
 title: Kotlin & 어노테이션
 ---
 
-> 이 튜토리얼에서는 Kotlin 애플리케이션을 작성하고, 어노테이션(annotations)과 함께 Koin 의존성 주입을 사용하여 컴포넌트를 가져오는 방법을 알아봅니다.
-> 이 튜토리얼을 완료하는 데는 약 **10분**이 소요됩니다.
+# Kotlin & 어노테이션
 
-:::note
-업데이트 - 2024-11-12
-:::
+이 튜토리얼에서는 사용자 목록을 불러와 인사말을 출력하는 Kotlin 콘솔 앱을 빌드합니다. 클래스에 어노테이션을 추가하고, 이를 모듈로 스캔하며, `@KoinApplication` 객체에서 Koin을 시작하는 방법을 배웁니다. 약 10분 정도 소요되며 JDK 17 및 Gradle이 필요합니다.
+
+이 튜토리얼은 어노테이션을 사용합니다. Compiler Plugin DSL을 사용한 동일한 앱은 [Kotlin](/docs/quickstart/kotlin) 문서를 참고하세요. 두 스타일을 비교해 보려면 [스타일 선택하기(Choosing your style)](/docs/intro/choosing-your-style)를 참고하세요.
 
 ## 코드 가져오기 {id="get-the-code"}
 
-:::info
-[소스 코드는 GitHub에서 확인할 수 있습니다](https://github.com/InsertKoinIO/koin-getting-started/tree/main/kotlin-annotations)
-:::
+전체 샘플 코드는 [koin-getting-started/kotlin-annotations](https://github.com/InsertKoinIO/koin-getting-started/tree/main/kotlin-annotations)에 있습니다. 리포지토리를 클론하고 `kotlin-annotations` 폴더에서 실행하세요:
 
-## 설정 {id="setup"}
+```bash
+./gradlew run
+```
 
-먼저, 다음과 같이 Koin 어노테이션 의존성이 추가되었는지 확인하세요:
+## Gradle 설정 {id="gradle-setup"}
 
-```groovy
+이 샘플은 Koin Compiler Plugin을 적용하고 `koin-core` 및 `koin-annotations` 의존성을 추가합니다. 버전 관리는 버전 카탈로그(version catalog)를 사용합니다:
+
+```toml
+# gradle/libs.versions.toml
+[versions]
+kotlin = "<KOTLIN_VERSION>"
+koin = "<KOIN_VERSION>"
+koin-plugin = "<KOIN_PLUGIN_VERSION>"
+
+[libraries]
+koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
+koin-annotations = { module = "io.insert-koin:koin-annotations", version.ref = "koin" }
+koin-test = { module = "io.insert-koin:koin-test", version.ref = "koin" }
+koin-test-junit4 = { module = "io.insert-koin:koin-test-junit4", version.ref = "koin" }
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+koin-compiler = { id = "io.insert-koin.compiler.plugin", version.ref = "koin-plugin" }
+```
+
+```kotlin
+// app/build.gradle.kts
 plugins {
-    id("com.google.devtools.ksp") version kspVersion
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.koin.compiler)
+    application
 }
 
 dependencies {
-    // Koin for Kotlin apps
-    implementation("io.insert-koin:koin-core:$koin_version")
+    implementation(libs.koin.core)
+    implementation(libs.koin.annotations)
 
-    // Koin Annotations
-    implementation("io.insert-koin:koin-annotations:$koin_annotations_version")
-    ksp("io.insert-koin:koin-ksp-compiler:$koin_annotations_version")
+    testImplementation(libs.koin.test)
+    testImplementation(libs.koin.test.junit4)
 }
 ```
 
-## 애플리케이션 개요 {id="application-overview"}
+Compiler Plugin은 어노테이션을 처리하며 Kotlin 2.3.20 이상이 필요합니다. `koin-annotations`는 Koin 버전과 동일한 버전을 사용합니다. 자세한 내용은 [Gradle 설정](/docs/setup/gradle) 및 [Compiler Plugin 설정](/docs/setup/compiler-plugin)을 참고하세요.
 
-이 애플리케이션의 아이디어는 사용자 목록을 관리하고 이를 `UserApplication` 클래스에 표시하는 것입니다:
+## 애플리케이션 구조 {id="the-application"}
 
-> Users -> UserRepository -> UserService -> UserApplication
+이 앱은 세 개의 컴포넌트를 연결합니다. `UserApplication`은 `UserService`에 사용자를 요청하고, `UserService`는 `UserRepository`에서 데이터를 읽어옵니다:
 
-## "User" 데이터 {id="the-user-data"}
+```
+User -> UserRepository -> UserService -> UserApplication
+```
 
-사용자 컬렉션을 관리할 것입니다. 다음은 데이터 클래스입니다:
+## 사용자 데이터 작성하기 {id="let-s-write-the-user-data"}
+
+데이터 클래스와 기본 사용자 목록부터 시작합니다:
 
 ```kotlin
 data class User(val name: String, val email: String)
+
+val DEFAULT_USER = User("Alice", "alice@example.com")
+
+val DEFAULT_USERS = listOf(
+    DEFAULT_USER,
+    User("Bob", "bob@example.com"),
+    User("Charlie", "charlie@example.com")
+)
 ```
 
-사용자 목록을 관리(사용자 추가 또는 이름으로 검색)하기 위한 "Repository" 컴포넌트를 생성합니다. 아래는 `UserRepository` 인터페이스와 그 구현체입니다:
+이 사용자들이 리포지토리에 저장될 데이터입니다.
+
+## 리포지토리 작성하기 {id="let-s-write-the-repository"}
+
+리포지토리는 메모리에 사용자를 유지합니다. 구현체에 `@Singleton` 어노테이션을 붙여 싱글톤으로 선언합니다:
 
 ```kotlin
+import org.koin.core.annotation.Singleton
+
 interface UserRepository {
     fun findUserOrNull(name: String): User?
     fun addUsers(users: List<User>)
@@ -71,41 +110,15 @@ class UserRepositoryImpl : UserRepository {
 }
 ```
 
-:::note
-이 프로젝트는 싱글톤(singleton) 컴포넌트를 선언하기 위해 Koin의 `@Singleton` 어노테이션(`org.koin.core.annotation` 패키지)을 사용합니다.
-:::
+Koin은 `UserRepositoryImpl`을 상위 타입에 바인딩하므로, `UserRepository`를 요청하면 이 인스턴스를 가져옵니다. `@Singleton`은 `org.koin.core.annotation` 패키지에서 제공되며 `@Single`과 동일합니다([정의(Definitions)](/docs/reference/koin-core/definitions) 참조).
 
-## Koin 모듈 {id="the-koin-module"}
+## 서비스 작성하기 {id="let-s-write-the-service"}
 
-Koin 모듈을 선언하려면 `@Module` 어노테이션을 사용하세요:
-
-```kotlin
-@Module
-@ComponentScan("org.koin.sample")
-@Configuration
-class AppModule
-```
-
-* `@Module` - 이를 Koin 모듈로 선언합니다.
-* `@ComponentScan("org.koin.sample")` - 해당 패키지에서 어노테이션이 달린 클래스들을 스캔하고 등록합니다.
-* `@Configuration` - `@KoinApplication`과 함께 자동 모듈 탐색(automatic module discovery)을 활성화합니다.
-
-`@Singleton` 어노테이션을 추가하여 컴포넌트를 선언해 봅시다:
-
-```kotlin
-@Singleton
-class UserRepositoryImpl : UserRepository {
-    // ...
-}
-```
-
-## UserService 컴포넌트 {id="the-userservice-component"}
-
-사용자 작업을 관리하는 `UserService` 컴포넌트를 작성해 봅시다:
+`UserService`는 사용자를 불러오고 인사말을 준비합니다. 이 클래스 역시 `@Singleton`으로 선언합니다:
 
 ```kotlin
 interface UserService {
-    fun getUserOrNull(name: String): User?
+    fun getUserOrNull(name: String = DEFAULT_USER.name): User?
     fun loadUsers()
     fun prepareHelloMessage(user: User?): String
 }
@@ -118,26 +131,20 @@ class UserServiceImpl(
     override fun getUserOrNull(name: String): User? = userRepository.findUserOrNull(name)
 
     override fun loadUsers() {
-        userRepository.addUsers(listOf(
-            User("Alice", "alice@example.com"),
-            User("Bob", "bob@example.com"),
-            User("Charlie", "charlie@example.com")
-        ))
+        userRepository.addUsers(DEFAULT_USERS)
     }
 
     override fun prepareHelloMessage(user: User?): String {
-        return user?.let { "Hello '${user.name}' (${user.email})! 👋" } ?: "❌ User not found"
+        return user?.let { "Hello '${user.name}' (${user.email})!" } ?: "User not found"
     }
 }
 ```
 
-> `UserRepository`는 `UserServiceImpl`의 생성자에서 참조됩니다.
+Compiler Plugin이 생성자를 분석하여 `UserRepository` 인스턴스를 알아서 전달해 줍니다.
 
-`@Singleton` 어노테이션으로 `UserService`를 선언합니다.
+## 애플리케이션 클래스 작성하기 {id="let-s-write-the-application-class"}
 
-## UserApplication {id="the-userapplication"}
-
-`UserApplication` 클래스는 생성자 주입(constructor injection)을 사용하여 `UserService`를 전달받습니다:
+`UserApplication`은 생성자를 통해 `UserService`를 주입받아 사용자를 불러오고 인사말을 출력합니다:
 
 ```kotlin
 @Singleton
@@ -157,73 +164,51 @@ class UserApplication(
 }
 ```
 
-:::info
-생성자 주입은 의존성을 주입하는 권장되는 방법입니다. Koin은 `UserApplication`을 생성할 때 `UserService`를 자동으로 해결(resolve)하고 주입합니다.
-:::
+이제 세 컴포넌트 모두에 어노테이션을 추가했습니다. 다음으로 이들을 모듈로 묶어보겠습니다.
 
-## Koin Application 객체 {id="koin-application-object"}
+## Koin 모듈 선언하기 {id="let-s-declare-the-koin-module"}
 
-Koin의 어노테이션 기반 구성을 위한 진입점(entry point)을 표시하기 위해 `@KoinApplication` 객체를 생성합니다:
+모듈은 정의들을 그룹화합니다([핵심 개념(Core Concepts)](/docs/intro/core-concepts) 참조). 샘플 패키지를 스캔하는 모듈 클래스를 선언합니다:
 
 ```kotlin
-@KoinApplication
-object KoinUserApplication
+import org.koin.core.annotation.ComponentScan
+import org.koin.core.annotation.Configuration
+import org.koin.core.annotation.Module
+
+@Module
+@ComponentScan("org.koin.sample")
+@Configuration
+class AppModule
 ```
 
-`@KoinApplication` 어노테이션은 KSP 프로세서와 함께 작동하여 이 객체에 대한 `startKoin()` 확장 함수를 생성합니다.
+`@ComponentScan`은 `org.koin.sample` 및 하위 패키지에 있는 어노테이션이 달린 모든 클래스를 등록합니다. `@Configuration`은 이 모듈을 `@KoinApplication` 진입점에서 감지할 수 있도록 만듭니다. 두 어노테이션에 대한 자세한 내용은 [모듈(Modules)](/docs/reference/koin-core/modules)을 참고하세요.
 
-## Koin 시작하기 {id="start-koin"}
+## Koin 시작하기 {id="let-s-start-koin"}
 
-애플리케이션과 함께 Koin을 시작해야 합니다. 애플리케이션의 메인 진입점에서 생성된 `startKoin()` 함수를 호출하기만 하면 됩니다:
+`@KoinApplication` 객체를 선언하고 타입 지정 함수인 `startKoin<T>()`로 Koin을 시작합니다:
 
 ```kotlin
+import org.koin.core.annotation.KoinApplication
+import org.koin.mp.KoinPlatform
+import org.koin.plugin.module.dsl.startKoin
+
+@KoinApplication
+object KoinUserApplication
+
 fun main() {
-    KoinUserApplication.startKoin()
+    startKoin<KoinUserApplication>()
 
     val userApplication = KoinPlatform.getKoin().get<UserApplication>()
     userApplication.sayHello("Alice")
 }
 ```
 
-**주요 포인트:**
-* `KoinUserApplication.startKoin()` - 모든 모듈을 자동으로 탐색하고 로드하는 생성된 함수입니다.
-* `modules()`를 수동으로 호출할 필요가 없습니다. 어노테이션이 달린 모든 의존성은 컴파일 타임에 탐색됩니다!
-* `KoinPlatform.getKoin().get<UserApplication>()`을 사용하여 Koin에서 `UserApplication` 인스턴스를 가져옵니다.
+`startKoin<KoinUserApplication>()`은 모든 `@Configuration` 모듈을 로드하므로 직접 `modules()`를 호출하지 않아도 됩니다. 플러그인이 빌드 타임에 전체 의존성 그래프를 검증하며, `./gradlew run`을 실행하면 `Hello 'Alice' (alice@example.com)!`이 출력됩니다. 다른 옵션에 대해서는 [Koin 시작하기(Starting Koin)](/docs/reference/koin-core/starting-koin) 문서를 참고하세요.
 
-:::info
-모듈의 `@Configuration`과 함께 사용된 `@KoinApplication` 어노테이션은 KSP를 통해 컴파일 타임에 어노테이션이 달린 모든 의존성을 자동으로 탐색하고 로드합니다.
-:::
+## 다음 단계 {id="next-steps"}
 
-## 어노테이션 vs 컴파일러 플러그인 DSL {id="annotations-vs-compiler-plugin-dsl"}
-
-어노테이션 기반 구성과 컴파일러 플러그인(Compiler Plugin) DSL을 비교하면 다음과 같습니다:
-
-**어노테이션 사용 시:**
-```kotlin
-@Module
-@ComponentScan("org.koin.sample")
-@Configuration
-class AppModule
-
-@Singleton
-class UserApplication(private val userService: UserService)
-
-@Singleton
-class UserRepositoryImpl : UserRepository
-
-@Singleton
-class UserServiceImpl(private val userRepository: UserRepository) : UserService
-```
-
-**컴파일러 플러그인 DSL (`kotlin.md`의 내용):**
-```kotlin
-val appModule = module {
-    single<UserApplication>()
-    single<UserRepositoryImpl>() bind UserRepository::class
-    single<UserServiceImpl>() bind UserService::class
-}
-```
-
-두 접근 방식 모두 동일한 결과를 얻습니다:
-- **어노테이션 (Annotations)**: KSP를 통한 컴파일 타임 검증, 자동 모듈 탐색.
-- **컴파일러 플러그인 DSL (Compiler Plugin DSL)**: 컴파일 타임 자동 연결(Auto-wiring), 더 깔끔한 `single<T>()` 문법.
+- [핵심 개념(Core Concepts)](/docs/intro/core-concepts): 모듈, 정의, 주입의 멘탈 모델
+- [모듈(Modules)](/docs/reference/koin-core/modules): `@Module`, `@ComponentScan`, `@Configuration` 및 모듈 포함(include)
+- [어노테이션 레퍼런스(Annotations Reference)](/docs/reference/koin-annotations/annotations-inventory): 모든 어노테이션과 파라미터 상세 정보
+- [테스팅(Testing)](/docs/reference/koin-test/testing): Koin Test를 활용한 테스트 작성
+- [도구(Tooling)](/docs/tooling): Koin용 IDE 플러그인 및 모니터링 도구

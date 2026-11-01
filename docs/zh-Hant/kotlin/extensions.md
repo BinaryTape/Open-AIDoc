@@ -1,21 +1,23 @@
-[//]: # (title: 擴充套件)
+[//]: # (title: 擴充功能)
 
-Kotlin 的 _擴充套件_ 讓你不需要使用繼承或像 _Decorator_ 之類的設計模式，就能為類別或介面擴充新的功能。當你使用無法直接修改的第三方程式庫時，這項功能非常有用。建立後，你可以像呼叫原始類別或介面的成員一樣呼叫這些擴充套件。
+Kotlin 的「擴充功能 (extensions)」讓您能夠在不使用繼承或「裝飾者 (Decorator)」等設計模式的情況下，為類別或介面擴充新功能。當您使用的第三方程式庫無法直接修改時，這項功能特別實用。建立完成後，您可以像呼叫原始類別或介面的成員一樣呼叫這些擴充。
 
-最常見的擴充套件形式是 [擴充函式](#extension-functions) 和 [擴充屬性](#extension-properties)。
+最常見的擴充形式是[擴充函式](#extension-functions)與[擴充屬性](#extension-properties)。
 
-重要的是，擴充套件不會修改它們所擴充的類別或介面。當你定義擴充套件時，並不會加入新的成員，而是讓新的函式可被呼叫，或讓新的屬性可使用相同的語法存取。
+重要的是，擴充功能並不會修改它們所擴充的類別或介面。定義擴充時，您並不會新增成員，而是使用相同的語法讓新函式變得可呼叫，或是讓新屬性變得可存取。
 
-## 接收者 {id="receivers"}
+## 接收者 (Receivers) {id="receivers"}
 
-擴充套件一律在接收者（receiver）上呼叫。接收者必須具有與被擴充的類別或介面相同的型別。要使用擴充套件，請在擴充套件名稱前加上接收者，後跟 `.` 以及函式或屬性名稱。
+擴充一律在接收者 (receiver) 上呼叫。接收者必須具有與被擴充的類別或介面相同的型別。
+若要使用擴充，請在接收者後加上 `.` 以及函式或屬性名稱作為前綴。
 
-例如，來自標準程式庫的 [`.appendLine()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/append-line.html) 擴充函式擴充了 `StringBuilder` 類別。因此在這種情況下，接收者是一個 `StringBuilder` 執行個體，而 _接收者型別_ 是 `StringBuilder`：
+例如，標準函式庫中的 [`.appendLine()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/append-line.html) 擴充函式擴充了 `StringBuilder` 類別。
+因此在此情況下，接收者是一個 `StringBuilder` 執行個體，而「接收者型別 (receiver type)」即為 `StringBuilder`：
 
 ```kotlin
 fun main() { 
 //sampleStart
-    // builder 是 StringBuilder 的一個執行個體
+    // builder 是 StringBuilder 的執行個體
     val builder = StringBuilder()
         // 在 builder 上呼叫 .appendLine() 擴充函式
         .appendLine("Hello")
@@ -28,17 +30,18 @@ fun main() {
 }
 //sampleEnd
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-extension-function-stringbuilder"}
+{kotlin-runnable="true" id="kotlin-extension-function-stringbuilder"}
 
-## 擴充函式 {id="extension-functions"}
+## 擴充函式 (Extension functions) {id="extension-functions"}
 
-在建立自己的擴充函式之前，請先查看你需要的的功能是否已在 Kotlin [標準程式庫](https://kotlinlang.org/api/core/kotlin-stdlib/) 中提供。標準程式庫為以下用途提供了許多實用的擴充函式：
+在建立自己的擴充函式之前，請先確認您所需的功能是否已存在於 Kotlin [標準函式庫](https://kotlinlang.org/api/core/kotlin-stdlib/)中。
+標準函式庫針對以下用途提供了許多實用的擴充函式：
 
 * 操作集合：[`.map()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/map.html)、[`.filter()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/filter.html)、[`.reduce()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/reduce.html)、[`.fold()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/fold.html)、[`.groupBy()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/group-by.html)。
 * 轉換為字串：[`.joinToString()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/join-to-string.html)。
 * 處理 null 值：[`.filterNotNull()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/filter-not-null.html)。
 
-若要建立你自己的擴充函式，請在函式名稱前加上接收者型別，後跟一個 `.`。在此範例中，`.truncate()` 函式擴充了 `String` 類別，因此接收者型別為 `String`：
+若要建立自己的擴充函式，請在其名稱前加上接收者型別並緊隨一個 `.`。在此範例中，`.truncate()` 函式擴充了 `String` 類別，因此接收者型別為 `String`：
 
 ```kotlin
 fun String.truncate(maxLength: Int): String {
@@ -55,9 +58,10 @@ fun main() {
     // JetBrainsLov...
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-extension-function-truncate"}
+{kotlin-runnable="true" id="kotlin-extension-function-truncate"}
 
-`.truncate()` 函式會根據 `maxLength` 引數中的數值截斷呼叫它的任何字串，並加上省略號 `...`。如果字串短於 `maxLength`，該函式則傳回原始字串。
+`.truncate()` 函式會根據 `maxLength` 引數中的數字截斷呼叫它的字串，並附加省略號 `...`。
+如果字串長度小於 `maxLength`，該函式將傳回原始字串。
 
 在此範例中，`.displayInfo()` 函式擴充了 `User` 介面：
 
@@ -78,9 +82,9 @@ fun main() {
     // User(name=Alice, email=alice@example.com)
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-extension-function-interface"}
+{kotlin-runnable="true" id="kotlin-extension-function-interface"}
 
-`.displayInfo()` 函式傳回包含 `RegularUser` 執行個體的 `name` 與 `email` 的字串。當你想為所有實作某介面的型別僅一次性地加入功能時，像這樣在介面上定義擴充套件非常有用。
+`.displayInfo()` 函式會傳回包含 `RegularUser` 執行個體的 `name` 與 `email` 的字串。像這樣在介面上定義擴充，非常適合用於一次性為所有實作該介面的型別新增功能。
 
 在此範例中，`.mostVoted()` 函式擴充了 `Map<String, Int>` 類別：
 
@@ -100,13 +104,13 @@ fun main() {
     // Dogs
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-extension-function-mostvoted"}
+{kotlin-runnable="true" id="kotlin-extension-function-mostvoted"}
 
-`.mostVoted()` 函式會遍歷其所呼叫之 Map 的鍵值配對，並使用 [`maxByOrNull()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/max-by-or-null.html) 函式來傳回包含最高值的配對之鍵。如果 Map 為空，`maxByOrNull()` 函式會傳回 `null`。`mostVoted()` 函式使用安全呼叫 `?.`，僅在 `maxByOrNull()` 函式傳回非 null 值時才存取 `key` 屬性。
+`.mostVoted()` 函式會遍歷呼叫它的 Map 的鍵值組，並使用 [`maxByOrNull()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/max-by-or-null.html) 函式傳回包含最大值的鍵值組的鍵。如果 Map 為空，`maxByOrNull()` 函式會傳回 `null`。`.mostVoted()` 函式使用安全呼叫 `?.`，僅在 `maxByOrNull()` 函式傳回非 null 值時存取 `key` 屬性。
 
-### 泛型擴充函式 {id="generic-extension-functions"}
+### 泛型擴充函式 (Generic extension functions) {id="generic-extension-functions"}
 
-若要建立泛型擴充函式，請在函式名稱之前宣告泛型型別參數，使其在接收者型別運算式中可用。在此範例中，`.endpoints()` 函式擴充了 `List<T>`，其中 `T` 可以是任何型別：
+若要建立泛型擴充函式，請在函式名稱之前宣告泛型型別參數，以便在接收者型別運算式中使用它。在此範例中，`.endpoints()` 函式擴充了 `List<T>`，其中 `T` 可以是任何型別：
 
 ```kotlin
 fun <T> List<T>.endpoints(): Pair<T, T> {
@@ -126,26 +130,27 @@ fun main() {
     // (21.0, 22.3)
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-extension-function-endpoints"}
+{kotlin-runnable="true" id="kotlin-extension-function-endpoints"}
 
-`.endpoints()` 函式傳回一個包含其呼叫列表之第一個和最後一個元素的配對（Pair）。在函式主體內部，它呼叫 `first()` 和 `last()` 函式，並使用 `to` 中綴函式將它們的傳回值組合成一個 `Pair`。
+`.endpoints()` 函式會傳回包含呼叫它的清單中第一個與最後一個元素的一組 Pair。
+在函式主體內，它呼叫了 `first()` 與 `last()` 函式，並使用 `to` 中綴函式將它們的傳回值組合成一個 `Pair`。
 
-有關泛型的更多資訊，請參閱 [泛型函式](generics.md)。
+有關泛型的更多資訊，請參閱[泛型函式](generics.md)。
 
-### 可 null 接收者 {id="nullable-receivers"}
+### 可為 null 的接收者 (Nullable receivers) {id="nullable-receivers"}
 
-你可以定義具有可 null 接收者型別的擴充函式，這允許你在變數值為 null 的情況下仍能呼叫它們。當接收者為 `null` 時，`this` 也是 `null`。請確保在函式內部正確處理可 null 性。例如，在函式主體內使用 `this == null` 檢查、[安全呼叫 `?.`](null-safety.md#safe-call-operator) 或 [Elvis 運算子 `?:`](null-safety.md#elvis-operator)。
+您可以定義具有可為 null 接收者型別的擴充函式，這讓您即使變數的值為 null 也能在其上呼叫擴充。當接收者為 `null` 時，`this` 也會是 `null`。請確保在您的函式內部妥善處理可 null 性。例如，在函式主體內使用 `this == null` 檢查、[安全呼叫 `?.`](null-safety.md#safe-call-operator) 或 [Elvis 運算子 `?:`](null-safety.md#elvis-operator)。
 
-在此範例中，你可以直接呼叫 `.toString()` 函式而無需檢查 `null`，因為檢查已經發生在擴充函式內部：
+在此範例中，您可以在呼叫 `.toString()` 函式時無需檢查 `null`，因為檢查已經在擴充函式內部完成：
 
 ```kotlin
 fun main() {
     //sampleStart
-    // 可 null Any 的擴充函式
+    // 可為 null 的 Any 上的擴充函式
     fun Any?.toString(): String {
         if (this == null) return "null"
-        // 經過 null 檢查後，`this` 會被智慧轉換（smart-cast）為非 null Any
-        // 因此此呼叫會解析為一般的 toString() 函式
+        // 經過 null 檢查後，`this` 會被智慧轉型為不可為 null 的 Any
+        // 因此這個呼叫會解析為一般的 toString() 函式
         return toString()
     }
     
@@ -159,11 +164,12 @@ fun main() {
     //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-extension-function-nullable-receiver"}
+{kotlin-runnable="true" id="kotlin-extension-function-nullable-receiver"}
 
-### 擴充函式還是成員函式？ {id="extension-or-member-functions"}
+### 是擴充函式還是成員函式？ {id="extension-or-member-functions"}
 
-由於擴充函式和成員函式的呼叫表示法相同，編譯器如何知道該使用哪一個？擴充函式是 _靜態地_ 分派的，這意味著編譯器在編譯期間根據接收者型別決定呼叫哪個函式。例如：
+由於擴充函式與成員函式的呼叫具有相同的表示法，編譯器如何知道要使用哪一個？
+擴充函式是「靜態 (statically)」分派的，這代表編譯器會在編譯期根據接收者型別來決定呼叫哪一個函式。例如：
 
 ```kotlin
 fun main() {
@@ -183,13 +189,13 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-extension-function-shape"}
+{kotlin-runnable="true" id="kotlin-extension-function-shape"}
 
-在此範例中，編譯器呼叫 `Shape.getName()` 擴充函式，因為參數 `shape` 被宣告為 `Shape` 型別。因為擴充函式是靜態解析的，編譯器會根據宣告的型別而非實際執行個體來選擇函式。
+在此範例中，編譯器會呼叫 `Shape.getName()` 擴充函式，因為參數 `shape` 被宣告為 `Shape` 型別。由於擴充函式是靜態解析的，編譯器會根據宣告的型別而非實際的執行個體來選擇函式。
 
-因此，即使範例中傳入的是 `Rectangle` 執行個體，由於變數被宣告為 `Shape` 型別，`.getName()` 函式仍會解析為 `Shape.getName()`。
+因此，即使該範例傳入了 `Rectangle` 執行個體，由於該變數宣告為 `Shape` 型別，`.getName()` 函式仍會解析為 `Shape.getName()`。
 
-如果一個類別具有成員函式，且存在一個具有相同接收者型別、相同名稱且參數相容的擴充函式，則成員函式優先。例如：
+如果某個類別擁有一個成員函式，且同時存在一個接收者型別相同、名稱相同且引數相容的擴充函式，則成員函式具有優先權。例如：
 
 ```kotlin
 fun main() {
@@ -205,9 +211,9 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-extension-function-member-function"}
+{kotlin-runnable="true" id="kotlin-extension-function-member-function"}
 
-然而，擴充函式可以多載具有相同名稱但 _不同_ 簽章的成員函式：
+然而，擴充函式可以多載具有相同名稱但「簽章不同」的成員函式：
 
 ```kotlin
 fun main() {
@@ -224,15 +230,15 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-extension-function-member-function-overload"}
+{kotlin-runnable="true" id="kotlin-extension-function-member-function-overload"}
 
-在此範例中，由於傳入了一個 `Int` 給 `.printFunctionType()` 函式，編譯器會選擇擴充函式，因為它符合簽章。編譯器會忽略不帶引數的成員函式。
+在此範例中，由於傳遞了一個 `Int` 給 `.printFunctionType()` 函式，編譯器會選擇擴充函式，因為它符合簽章。編譯器會忽略不接受引數的成員函式。
 
-### 匿名擴充函式 {id="anonymous-extension-functions"}
+### 匿名擴充函式 (Anonymous extension functions) {id="anonymous-extension-functions"}
 
-你可以定義不具名的擴充函式。這在你不想弄亂全域命名空間，或需要將某些擴充行為作為參數傳遞時非常有用。
+您可以定義沒有名稱的擴充函式。當您想避免污染全域命名空間，或需要將某些擴充行為作為參數傳遞時，這非常實用。
 
-例如，假設你想為一個資料類別擴充一個一次性的運算運費函式，但不給它起名字：
+例如，假設您想為資料類別擴充一個計算運費的一次性函式，且不為其指定名稱：
 
 ```kotlin
 fun main() {
@@ -246,9 +252,10 @@ fun main() {
     // Shipping cost: 7.5
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-extension-function-anonymous"}
+{kotlin-runnable="true" id="kotlin-extension-function-anonymous"}
 
-要將擴充行為作為參數傳遞，請使用帶有型別註解的 [Lambda 運算式](lambdas.md#lambda-expression-syntax)。例如，假設你想在不定義具名函式的情況下檢查一個數字是否在某個範圍內：
+若要將擴充行為作為參數傳遞，請使用帶有型別註解的 [Lambda 運算式](lambdas.md#lambda-expression-syntax)。
+例如，假設您想要在不定義具名函式的情況下檢查數字是否在某個範圍內：
 
 ```kotlin
 fun main() {
@@ -260,26 +267,26 @@ fun main() {
     // false
 }
 ```
- {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-extension-function-anonymous-lambda"}
+ {kotlin-runnable="true" id="kotlin-extension-function-anonymous-lambda"}
 
-在此範例中，`isInRange` 變數持有型別為 `Int.(min: Int, max: Int) -> Boolean` 的函式。該型別是 `Int` 類別上的擴充函式，接受 `min` 和 `max` 參數並傳回 `Boolean`。
+在此範例中，`isInRange` 變數保存了一個型別為 `Int.(min: Int, max: Int) -> Boolean` 的函式。該型別是 `Int` 類別上的擴充函式，接受 `min` 與 `max` 參數並傳回 `Boolean`。
 
-Lambda 主體 `{ min, max -> this in min..max }` 會檢查呼叫該函式的 `Int` 值是否落在 `min` 和 `max` 參數之間的範圍內。如果檢查成功，Lambda 會傳回 `true`。
+Lambda 主體 `{ min, max -> this in min..max }` 會檢查呼叫該函式的 `Int` 值是否落在 `min` 與 `max` 參數之間的範圍內。如果檢查成功，Lambda 會傳回 `true`。
 
-欲了解更多資訊，請參閱 [Lambda 運算式與匿名函式](lambdas.md)。
+如需更多資訊，請參閱 [Lambda 運算式與匿名函式](lambdas.md)。
 
-## 擴充屬性 {id="extension-properties"}
+## 擴充屬性 (Extension properties) {id="extension-properties"}
 
-Kotlin 支援擴充屬性，這對於執行資料轉換或建立 UI 顯示輔助工具非常有用，且不會弄亂你正在處理的類別。
+Kotlin 支援擴充屬性，這對於執行資料轉換或建立 UI 顯示幫助程式非常實用，而且不會使您正在處理的類別變得雜亂。
 
-要建立擴充屬性，請寫下你想要擴充的類別名稱，後跟一個 `.` 和你的屬性名稱。
+若要建立擴充屬性，請寫入您要擴充的類別名稱，後接 `.` 以及您的屬性名稱。
 
-例如，假設你有一個代表使用者（包含名字和姓氏）的資料類別，並且你想建立一個在存取時傳回電子郵件樣式使用者名稱的屬性。你的程式碼可能如下所示：
+例如，假設您有一個表示具有名字和姓氏的使用者的資料類別，並且希望建立一個在存取時傳回電子郵件樣式使用者名稱的屬性。您的程式碼可能會像這樣：
 
 ```kotlin
 data class User(val firstName: String, val lastName: String)
 
-// 取得使用者名稱樣式電子郵件帳號的擴充屬性
+// 用於獲取使用者名稱樣式電子郵件 handle 的擴充屬性
 val User.emailUsername: String
     get() = "${firstName.lowercase()}.${lastName.lowercase()}"
 
@@ -290,16 +297,16 @@ fun main() {
     // Generated email username: mickey.mouse
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-extension-function-property"}
+{kotlin-runnable="true" id="kotlin-extension-function-property"}
 
-由於擴充套件實際上並未向類別加入成員，因此擴充屬性沒有有效的方法來擁有 [支援欄位](properties.md#backing-fields)。這就是為什麼擴充屬性不允許使用初始設定式的原因。你只能透過明確提供 getter 和 setter 來定義它們的行為。例如：
+由於擴充實際上並不會向類別新增成員，因此沒有有效的方法讓擴充屬性擁有[支援欄位](properties.md#backing-fields)。這就是為什麼擴充屬性不允許使用初始設定式。您只能透過明確提供 getter 與 setter 來定義它們的行為。例如：
 
 ```kotlin
 data class House(val streetName: String)
 
 // 無法編譯，因為沒有 getter 和 setter
 // var House.number = 1
-// Error: Initializers are not allowed for extension properties
+// 錯誤：初始設定式不允許用於擴充屬性
 
 // 編譯成功
 val houseNumbers = mutableMapOf<House, Int>()
@@ -320,18 +327,18 @@ fun main() {
     house.number = 99
     // Setting house number for Maple Street to 99
 
-    // 顯示更新後的號碼
+    // 顯示更新後的數值
     println("Updated number: ${house.number} ${house.streetName}") 
     // Updated number: 99 Maple Street
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-extension-function-property-error"}
+{kotlin-runnable="true" id="kotlin-extension-function-property-error"}
 
-在此範例中，getter 使用 [Elvis 運算子](null-safety.md#elvis-operator)，如果 `houseNumbers` 地圖中存在門牌號碼則傳回該號碼，否則傳回 `1`。欲了解更多有關如何編寫 getter 和 setter 的資訊，請參閱 [自訂 getter 與 setter](properties.md#custom-getters-and-setters)。
+在此範例中，getter 使用 [Elvis 運算子](null-safety.md#elvis-operator)傳回門牌號碼（如果存在於 `houseNumbers` 映射中），否則傳回 `1`。若要深入了解如何編寫 getter 與 setter，請參閱[自訂 getter 與 setter](properties.md#custom-getters-and-setters)。
 
-## 伴隨物件擴充套件 {id="companion-object-extensions"}
+## 隨伴物件擴充 (Companion object extensions) {id="companion-object-extensions"}
 
-如果類別定義了 [伴隨物件](object-declarations.md#companion-objects)，你也可以為伴隨物件定義擴充函式和屬性。就像伴隨物件的一般成員一樣，你可以僅使用類別名稱作為限定符來呼叫它們。編譯器預設將伴隨物件命名為 `Companion`：
+如果類別定義了[隨伴物件](object-declarations.md#companion-objects)，您也可以為該隨伴物件定義擴充函式與屬性。就像隨伴物件的一般成員一樣，您可以僅使用類別名稱作為限定詞來呼叫它們。編譯器預設將隨伴物件命名為 `Companion`：
 
 ```kotlin
 class Logger {
@@ -347,16 +354,17 @@ fun main() {
     // Application started.
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-extension-function-companion-object"}
+{kotlin-runnable="true" id="kotlin-extension-function-companion-object"}
 
-## 將擴充套件宣告為成員 {id="declaring-extensions-as-members"}
+## 將擴充宣告為成員 (Declaring extensions as members) {id="declaring-extensions-as-members"}
 
-你可以在一個類別內部為另一個類別宣告擴充套件。像這樣的擴充套件具有多個 _隱含接收者_。隱含接收者是一個物件，你可以在不使用 [`this`](this-expressions.md#qualified-this) 限定的情況下存取其成員：
+您可以在一個類別內部為另一個類別宣告擴充。像這樣的擴充擁有多個「隱式接收者 (implicit receivers)」。
+隱式接收者是指其成員在存取時無需以 [`this`](this-expressions.md#qualified-this) 進行限定的物件：
 
-* 宣告擴充套件的類別是 _分派接收者（dispatch receiver）_。
-* 擴充函式的接收者型別是 _擴充接收者（extension receiver）_。
+* 宣告該擴充的類別稱為「分派接收者 (dispatch receiver)」。
+* 擴充函式的接收者型別稱為「擴充接收者 (extension receiver)」。
 
-請考慮以下範例，其中 `Connection` 類別為 `Host` 類別提供了一個名為 `printConnectionString()` 的擴充函式：
+請參考以下範例，其中 `Connection` 類別為 `Host` 類別定義了一個名為 `printConnectionString()` 的擴充函式：
 
 ```kotlin
 class Host(val hostname: String) {
@@ -387,16 +395,16 @@ fun main() {
     Connection(Host("kotl.in"), 443).connect()
     // kotl.in:443
     
-    // 會觸發錯誤，因為擴充函式在 Connection 外部不可用
+    // 會觸發錯誤，因為擴充函式在 Connection 外部無法使用
     // Host("kotl.in").printConnectionString()
     // Unresolved reference 'printConnectionString'.
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-extension-function-members"}
+{kotlin-runnable="true" id="kotlin-extension-function-members"}
 
-此範例在 `Connection` 類別內部宣告了 `printConnectionString()` 函式，因此 `Connection` 類別是分派接收者。擴充函式的接收者型別是 `Host` 類別，因此 `Host` 類別是擴充接收者。
+此範例在 `Connection` 類別內部宣告了 `printConnectionString()` 函式，因此 `Connection` 類別是分派接收者。該擴充函式的接收者型別是 `Host` 類別，因此 `Host` 類別是擴充接收者。
 
-如果分派接收者和擴充接收者具有同名的成員，則擴充接收者的成員優先。若要明確存取分派接收者，請使用 [限定的 `this` 語法](this-expressions.md#qualified-this)：
+如果分派接收者與擴充接收者擁有同名成員，則擴充接收者的成員具有優先權。若要明確存取分派接收者，請使用[限定的 `this` 語法](this-expressions.md#qualified-this)：
 
 ```kotlin
 class Connection {
@@ -409,16 +417,16 @@ class Connection {
 }
 ```
 
-### 覆寫成員擴充套件 {id="overriding-member-extensions"}
+### 覆寫成員擴充 (Overriding member extensions) {id="overriding-member-extensions"}
 
-你可以將成員擴充套件宣告為 `open`，並在子類別中覆寫它們，這在你想要為每個子類別自訂擴充行為時非常有用。編譯器對每種接收者型別的處理方式不同：
+您可以將成員擴充宣告為 `open` 並在子類別中覆寫它們，當您想要針對每個子類別自訂擴充的行為時，這非常有用。編譯器對待每種接收者型別的方式不同：
 
-| 接收者型別      | 解析時間 | 分派型別 |
-|--------------------|-----------------|---------------|
-| 分派接收者  | 執行時         | 虛擬       |
-| 擴充接收者 | 編譯時    | 靜態        |
+| 接收者型別 | 解析時機 | 分派型別 |
+|---|---|---|
+| 分派接收者 | 執行階段 | 虛擬 (Virtual) |
+| 擴充接收者 | 編譯期 | 靜態 (Static) |
 
-請考慮以下範例，其中 `User` 類別是 `open` 的，而 `Admin` 類別繼承自它。`NotificationSender` 類別為 `User` 和 `Admin` 類別定義了 `sendNotification()` 擴充函式，而 `SpecialNotificationSender` 類別則覆寫了它們：
+請參考這個範例，其中 `User` 類別為 `open`，而 `Admin` 類別繼承自它。`NotificationSender` 類別為 `User` 與 `Admin` 類別定義了 `sendNotification()` 擴充函式，而 `SpecialNotificationSender` 類別則覆寫了它們：
 
 ```kotlin
 open class User
@@ -470,15 +478,15 @@ fun main() {
     // Sending user notification from special sender 
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-extension-open"}
+{kotlin-runnable="true" id="kotlin-extension-open"}
 
-分派接收者是在執行時使用虛擬分派（virtual dispatch）解析的，這使得 `main()` 函式中的行為更容易理解。可能會讓你感到驚訝的是，當你在 `Admin` 執行個體上呼叫 `notify()` 函式時，編譯器會根據宣告的型別 `user: User` 來選擇擴充套件，因為它會靜態解析擴充接收者。
+分派接收者在執行階段使用虛擬分派解析，這使得 `main()` 函式中的行為更容易理解。可能會讓您感到意外的是，當您在 `Admin` 執行個體上呼叫 `notify()` 函式時，編譯器會根據宣告的型別：`user: User` 來選擇擴充，因為它會靜態解析擴充接收者。
 
-## 擴充套件與可見性修飾符 {id="extensions-and-visibility-modifiers"}
+## 擴充與可見性修飾詞 (Extensions and visibility modifiers) {id="extensions-and-visibility-modifiers"}
 
-擴充套件使用與在相同作用域內宣告的一般函式相同的 [可見性修飾符](visibility-modifiers.md)，這包括宣告為其他類別成員的擴充套件。
+擴充使用與在相同作用域中宣告的一般函式相同的[可見性修飾詞](visibility-modifiers.md)，包括宣告為其他類別成員的擴充。
 
-例如，在檔案頂層宣告的擴充套件可以存取同一個檔案中的其他 `private` 頂層宣告：
+例如，在檔案最頂層宣告的擴充可以存取同一檔案中的其他 `private` 頂層宣告：
 
 ```kotlin
 // 檔案：StringUtils.kt
@@ -502,9 +510,9 @@ fun main() {
     // Looks like an email: true
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-extension-visibility-top-level"}
+{kotlin-runnable="true" id="kotlin-extension-visibility-top-level"}
 
-而如果擴充套件是在其接收者型別之外宣告的，則無法存取該接收者的 `private` 或 `protected` 成員：
+如果擴充是宣告在其接收者型別之外，則它無法存取接收者的 `private` 或 `protected` 成員：
 
 ```kotlin
 class User(private val password: String) {
@@ -512,12 +520,12 @@ class User(private val password: String) {
     fun passwordLength(): Int = password.length
 }
 
-// 在類別外宣告的擴充套件
+// 宣告在類別外部的擴充
 fun User.isSecure(): Boolean {
-    // 無法存取 password，因為它是 private 的：
+    // 無法存取 password，因為它是 private：
     // return password.length >= 8
 
-    // 相反地，我們依賴公開成員：
+    // 相反地，我們依賴 public 成員：
     return passwordLength() >= 8 && isLoggedIn()
 }
 
@@ -527,21 +535,21 @@ fun main() {
     // Is user secure: true
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-extension-visibility-outside-receiver"}
+{kotlin-runnable="true" id="kotlin-extension-visibility-outside-receiver"}
 
-如果擴充套件被標記為 `internal`，則僅在其 [模組](visibility-modifiers.md#modules) 內可存取：
+如果擴充被標記為 `internal`，則只能在其[模組](visibility-modifiers.md#modules)內部進行存取：
 
 ```kotlin
-// Networking 模組
+// 網路模組
 // JsonParser.kt
 internal fun String.parseJson(): Map<String, Any> {
     return mapOf("fakeKey" to "fakeValue")
 }
 ```
 
-## 擴充套件的作用域 {id="scope-of-extensions"}
+## 擴充的作用域 (Scope of extensions) {id="scope-of-extensions"}
 
-在大多數情況下，你會在頂層直接於套件下定義擴充套件：
+在大多數情況下，您會在最頂層（即直接在套件底下）定義擴充：
 
 ```kotlin
 package org.example.declarations
@@ -549,7 +557,7 @@ package org.example.declarations
 fun List<String>.getLongestString() { /*...*/}
 ```
 
-要在宣告它的套件之外使用擴充套件，請在呼叫處將其匯入：
+若要在宣告擴充的套件之外使用它，請在呼叫點進行匯入：
 
 ```kotlin
 package org.example.usage
@@ -562,4 +570,4 @@ fun main() {
 }
 ```
 
-欲了解更多資訊，請參閱 [匯入](packages.md#imports)。
+如需更多資訊，請參閱[匯入](packages.md#imports)。

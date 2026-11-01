@@ -1,102 +1,39 @@
 ---
-title: Ktor를 위한 Koin
+title: Ktor용 Koin
 ---
 
-`koin-ktor` 모듈은 Ktor의 내장 DI 시스템과 함께 작동하며, Ktor 애플리케이션에 의존성 주입(dependency injection) 통합 기능을 제공합니다.
+# Ktor용 Koin
 
-## 왜 Ktor에서 Koin을 사용해야 하나요? {id="why-koin-for-ktor"}
-
-Ktor 3.4 버전 이상에는 내장 DI 시스템이 포함되어 있습니다. Ktor DI와 Koin의 비교는 다음과 같습니다:
-
-| 기능 | Ktor DI | Koin |
-|---------|---------|------|
-| 기본 주입 | 지원 | 지원 |
-| 한정자(Qualifiers, `@Named`) | 지원 | 지원 |
-| 속성 주입(Property injection) | 지원 (`@Property`) | 지원 |
-| Null 허용/선택적 의존성 | 지원 | 지원 |
-| 스코프 (요청, 커스텀) | 미지원 | 지원 |
-| 모듈 구성 | 미지원 | 지원 |
-| 지연 모듈(Lazy modules) | 미지원 | 지원 |
-| 어노테이션 기반 컴포넌트 | 미지원 | 지원 |
-| 컴파일러 플러그인 검증 | 미지원 | 지원 |
-
-### Ktor DI의 한계 {id="ktor-di-limitations"}
-
-- **스코프 지정 불가** - 요청(request) 또는 커스텀 스코프를 지원하지 않으며, 정리 순서(cleanup ordering)가 있는 싱글톤 방식의 동작만 가능합니다.
-- **어노테이션 기반 컴포넌트 없음** - Koin Annotations와 같은 `@Singleton`, `@Factory` 컴포넌트 스캐닝을 지원하지 않습니다.
-- **컴파일 타임 검증 없음** - 런타임 전에 DI 구성을 확인하는 컴파일러 플러그인이 없습니다.
-- **제한적인 매개변수화된 타입(parameterized types)** - 타입 인자 하위 타입(type argument subtypes) 간의 매개변수화된 타입을 해결할 수 없습니다.
-
-**Koin을 사용해야 할 때:**
-- 스코프가 지정된 의존성(요청 스코프, 커스텀 스코프)이 필요한 경우
-- 모듈 기반의 구성이 필요한 경우
-- 어노테이션 기반의 컴포넌트 스캐닝을 원하는 경우
-- 컴파일러 플러그인을 통한 컴파일 타임 검증이 필요한 경우
-
-**Ktor DI로 충분할 때:**
-- 의존성이 적은 단순한 애플리케이션인 경우
-- 스코프 지정 요구 사항이 없는 경우
-- 기본적인 한정자(qualifier) 기능만 필요한 경우
+이 페이지에서는 Ktor 서버 애플리케이션에 Koin을 추가하는 방법을 설명합니다. `Koin` 플러그인 설치, 라우트에서의 의존성 주입, 기능 함수(feature functions)에서 모듈 로드, 그리고 Koin 수명 주기(lifecycle) 이벤트 수신 방법을 다룹니다. 먼저 [정의(definitions)](/docs/reference/koin-core/definitions) 및 [모듈(modules)](/docs/reference/koin-core/modules)을 선언하는 방법을 숙지하는 것이 좋습니다. 단계별 프로젝트 튜토리얼은 [Ktor 튜토리얼](/docs/quickstart/ktor)을 참고하세요.
 
 ## 설정 {id="setup"}
 
-Koin Ktor 의존성을 추가합니다:
-
 ```kotlin
+// build.gradle.kts
 dependencies {
-    implementation("io.insert-koin:koin-ktor:$koin_version")
-    implementation("io.insert-koin:koin-logger-slf4j:$koin_version") // 선택 사항
+    implementation(platform(libs.koin.bom))
+    implementation(libs.koin.ktor)
+    implementation(libs.koin.logger.slf4j) // 선택 사항, SLF4J 로거
 }
 ```
 
-## 의존성 선언하기 {id="declaring-dependencies"}
-
-Koin은 여러 가지 DSL 방식을 지원합니다.
-
-### 컴파일러 플러그인 DSL {id="compiler-plugin-dsl"}
-
-가장 단순한 구문입니다:
-
-```kotlin
-val appModule = module {
-    single<UserRepositoryImpl>() bind UserRepository::class
-    single<UserServiceImpl>() bind UserService::class
-}
-```
-
-### 어노테이션 {id="annotations"}
-
-컴파일 타임 검증을 지원하며 Spring과 유사한 방식입니다:
-
-```kotlin
-@Module
-@ComponentScan("com.example")
-class AppModule
-
-@Singleton
-class UserRepositoryImpl : UserRepository
-
-@Singleton
-class UserService(private val repository: UserRepository)
-```
-
-### 클래식 DSL {id="classic-dsl"}
-
-생성자 참조를 사용하는 방식입니다:
-
-```kotlin
-val appModule = module {
-    singleOf(::UserRepositoryImpl) bind UserRepository::class
-    singleOf(::UserService)
-}
-```
+카탈로그 항목 및 버전은 [Gradle 설정](/docs/setup/gradle)에서 확인할 수 있습니다. `koin-ktor` 플러그인은 Ktor 3를 대상으로 합니다.
 
 ## Koin 플러그인 설치 {id="installing-the-koin-plugin"}
 
-`Application` 모듈에 Koin을 설치합니다:
+애플리케이션 모듈에 `Koin`을 설치합니다. 구성 블록은 `startKoin { }`과 동일합니다:
 
+**Compiler Plugin DSL**
 ```kotlin
-fun Application.main() {
+import org.koin.ktor.plugin.Koin
+import org.koin.logger.slf4jLogger
+
+val appModule = module {
+    single<UserRepositoryImpl>() bind UserRepository::class
+    single<UserService>()
+}
+
+fun Application.module() {
     install(Koin) {
         slf4jLogger()
         modules(appModule)
@@ -104,130 +41,172 @@ fun Application.main() {
 }
 ```
 
-### 전체 구성 예시 {id="complete-configuration"}
-
+**어노테이션**
 ```kotlin
-fun Application.main() {
+import org.koin.ktor.plugin.Koin
+import org.koin.logger.slf4jLogger
+import org.koin.plugin.module.dsl.withConfiguration
+
+@Module
+@ComponentScan("com.example")
+@Configuration
+class AppModule
+
+@KoinApplication
+object KoinUserApplication
+
+fun Application.module() {
     install(Koin) {
         slf4jLogger()
-        fileProperties("/application.conf")
-        modules(
-            networkModule,
-            repositoryModule,
-            serviceModule
-        )
-        createEagerInstances()
+        withConfiguration<KoinUserApplication>()
     }
 }
 ```
 
-## 의존성 주입 {id="dependency-injection"}
+`withConfiguration<T>()`는 `@KoinApplication` 클래스에 의해 조합된 모듈을 로드합니다.
 
-Koin은 Ktor의 핵심 타입들을 위한 확장 함수를 제공합니다.
+**생성자 / 클래식 DSL**
+```kotlin
+import org.koin.ktor.plugin.Koin
+import org.koin.logger.slf4jLogger
 
-### 주입 가능 지점 {id="injection-points"}
+val appModule = module {
+    singleOf(::UserRepositoryImpl) bind UserRepository::class
+    singleOf(::UserService)
+}
 
-`inject()` 및 `get()`은 다음에서 사용할 수 있습니다:
-- `Application`
-- `Route`
-- `Routing`
-- `ApplicationCall` (라우트 핸들러 내)
+fun Application.module() {
+    install(Koin) {
+        slf4jLogger()
+        modules(appModule)
+    }
+}
+```
 
-### 애플리케이션 레벨 {id="application-level"}
+플러그인이 수행하는 작업:
+
+- **전역 시작**: `startKoin`과 마찬가지로 전역 컨텍스트에서 Koin을 시작합니다. 이미 전역 Koin 인스턴스가 실행 중인 경우(예: Ktor 자동 리로드 후), 플러그인이 이를 먼저 중지합니다. Koin을 전역 컨텍스트에 두지 않으려면 [`KoinIsolated`](/docs/reference/koin-ktor/ktor-isolated)를 사용하세요.
+- **즉시 인스턴스화(Eager instances)**: `createdAtStart`로 표시된 정의는 플러그인 설치 시점에 생성됩니다.
+- **요청 스코프(Request scope)**: 각 호출마다 Koin 스코프를 엽니다. 자세한 내용은 [요청 스코프](/docs/reference/koin-ktor/ktor-scopes)를 참고하세요.
+- **종료**: Ktor에서 `ApplicationStopping`이 발생하면 플러그인이 Koin 인스턴스를 닫습니다.
+
+구성 블록의 로깅, 프로퍼티 및 기타 옵션에 대한 설명은 [Koin 시작하기](/docs/reference/koin-core/starting-koin)를 참고하세요.
+
+## 의존성 주입하기 {id="injecting-dependencies"}
+
+`inject()`(지연 주입) 및 `get()`(즉시 주입)은 `Application`, `Route`, `Routing`, `ApplicationCall`에 제공되는 `org.koin.ktor.ext`의 확장 함수입니다:
 
 ```kotlin
-fun Application.main() {
-    val helloService by inject<HelloService>()  // 지연 주입(Lazy)
-    val configService = get<ConfigService>()     // 즉시 주입(Eager)
+import org.koin.ktor.ext.inject
+
+fun Application.module() {
+    install(Koin) { modules(appModule) }
+
+    val userService by inject<UserService>()
 
     routing {
-        get("/hello") {
-            call.respondText(helloService.sayHello())
+        get("/users") {
+            call.respond(userService.getAllUsers())
         }
     }
 }
 ```
 
-### 라우트 레벨 {id="route-level"}
+라우트 확장 함수에서 사용:
 
 ```kotlin
 fun Route.customerRoutes() {
     val customerService by inject<CustomerService>()
 
-    get("/customers") {
-        call.respond(customerService.getAllCustomers())
-    }
-
     get("/customers/{id}") {
-        val id = call.parameters["id"]?.toInt()
-            ?: return@get call.respond(HttpStatusCode.BadRequest)
+        val id = call.parameters["id"] ?: return@get call.respond(HttpStatusCode.BadRequest)
         call.respond(customerService.getCustomer(id))
     }
 }
 ```
 
-### 요청 핸들러 {id="request-handler"}
+핸들러 내부에서는 call로부터 의존성을 조회합니다:
 
 ```kotlin
-routing {
-    get("/users/{id}") {
-        val userService = get<UserService>()
-        val userId = call.parameters["id"]!!
-        call.respond(userService.getUser(userId))
-    }
+get("/users/{id}") {
+    val userService = call.get<UserService>()
+    call.respond(userService.getUser(call.parameters["id"]!!))
 }
 ```
 
-## Ktor 이벤트 {id="ktor-events"}
+네 가지 수신 객체(receiver) 모두 `Application`에 저장된 Koin 인스턴스(`Koin`을 사용한 전역 인스턴스 또는 `KoinIsolated`를 사용한 격리된 인스턴스)에서 의존성을 조회합니다. 코어 함수와 마찬가지로 `qualifier` 및 `parameters`를 전달받을 수 있습니다([의존성 주입](/docs/reference/koin-core/injection) 참고). `getProperty(key)` 및 `getProperty(key, defaultValue)` 또한 동일한 수신 객체에서 Koin 프로퍼티를 읽어옵니다.
 
-Koin 라이프사이클 이벤트를 모니터링할 수 있습니다:
+## 기능 함수에서 모듈 로드하기 {id="loading-modules-from-feature-functions"}
 
-| 이벤트 | 설명 |
-|-------|-------------|
-| `KoinApplicationStarted` | Koin 컨테이너 시작됨 |
-| `KoinApplicationStopPreparing` | Koin 중지 준비 중 |
-| `KoinApplicationStopped` | Koin 컨테이너 중지됨 |
+플러그인이 설치되고 나면, 기능 함수(feature function)에서 자체 정의를 추가할 수 있습니다:
 
 ```kotlin
-fun Application.main() {
+import org.koin.ktor.plugin.koinModule
+import org.koin.ktor.plugin.koinModules
+
+fun Application.customerFeature() {
+    koinModule {
+        singleOf(::CustomerRepository)
+        singleOf(::CustomerService)
+    }
+
+    routing { customerRoutes() }
+}
+
+fun Application.orderFeature() {
+    koinModules(orderDataModule, orderServiceModule)
+
+    routing { orderRoutes() }
+}
+
+fun Application.module() {
+    install(Koin) {
+        slf4jLogger()
+        modules(coreModule)
+    }
+    customerFeature()
+    orderFeature()
+}
+```
+
+`koinModule { }`은 인라인으로 모듈을 선언하며, `koinModules(...)`는 기존 `Module` 값들을 로드합니다. 두 함수 모두 `install(Koin)`이 먼저 호출되지 않았다면 "Koin plugin is not installed properly" 오류와 함께 실패합니다.
+
+## 수명 주기 이벤트 {id="lifecycle-events"}
+
+플러그인은 애플리케이션 모니터에서 세 가지 이벤트를 발생시킵니다:
+
+| 이벤트 | 발생 시점 |
+|-------|--------|
+| `KoinApplicationStarted` | 플러그인이 설치되고 Koin이 시작될 때 |
+| `KoinApplicationStopPreparing` | `ApplicationStopping` 발생 시, Koin이 닫히기 전 |
+| `KoinApplicationStopped` | Koin이 닫힌 후 |
+
+```kotlin
+fun Application.module() {
+    monitor.subscribe(KoinApplicationStarted) { koinApp ->
+        log.info("Koin started")
+    }
+    monitor.subscribe(KoinApplicationStopped) {
+        log.info("Koin stopped")
+    }
+
     install(Koin) {
         slf4jLogger()
         modules(appModule)
     }
-
-    environment.monitor.subscribe(KoinApplicationStarted) {
-        log.info("Koin started")
-        get<CacheWarmer>().warmUp()
-    }
-
-    environment.monitor.subscribe(KoinApplicationStopped) {
-        log.info("Koin stopped")
-    }
 }
 ```
 
-## 빠른 참조 {id="quick-reference"}
+`KoinApplicationStarted`는 `install(Koin)` 중에 발생합니다. 플러그인을 설치하기 전에 구독해야 하며, 그렇지 않으면 핸들러가 실행되지 않습니다. 각 핸들러는 `KoinApplication`을 전달받습니다.
 
-| 함수 | 설명 |
-|----------|-------------|
-| `install(Koin) { }` | Koin 플러그인 설치 |
-| `inject<T>()` | 지연 주입(Lazy injection) |
-| `get<T>()` | 즉시 주입(Eager injection) |
-| `koinModule { }` | 인라인 모듈 선언 |
-| `koinModules(...)` | 기존 모듈 로드 |
+## Ktor 자체 DI {id="ktor-s-own-di"}
 
-## 문서 {id="documentation"}
+Ktor 3.4에는 내장 의존성 주입 플러그인이 포함되어 있습니다. Koin은 양방향으로 이 플러그인과 의존성을 공유할 수 있습니다. 자세한 내용은 [Ktor DI Bridge](/docs/reference/koin-ktor/ktor-bridge)를 참고하세요.
 
-| 주제 | 설명 |
-|-------|-------------|
-| **[DI 브릿지](/docs/reference/koin-ktor/ktor-bridge)** | Koin ↔ Ktor DI 통합 |
-| **[요청 스코프](/docs/reference/koin-ktor/ktor-scopes)** | 요청 스코프(Request-scoped) 의존성 |
-| **[테스트](/docs/reference/koin-ktor/ktor-testing)** | Koin을 사용한 Ktor 테스트 |
-| **[격리된 컨텍스트](/docs/reference/koin-ktor/ktor-isolated)** | 격리된 Koin 인스턴스 |
+## 관련 문서 {id="related"}
 
-## 관련 항목 {id="related"}
-
-- **[튜토리얼: Ktor](/docs/quickstart/ktor)** - 단계별 튜토리얼
-- **[튜토리얼: 어노테이션을 사용한 Ktor](/docs/quickstart/ktor-annotations)** - 어노테이션 튜토리얼
-- **[Koin 어노테이션](/docs/reference/koin-annotations/start)** - 어노테이션 레퍼런스
-- **[Ktor 문서](https://ktor.io/)** - 공식 Ktor 문서
+- [요청 스코프(Request Scopes)](/docs/reference/koin-ktor/ktor-scopes): 단일 HTTP 호출 동안 유지되는 인스턴스.
+- [Ktor DI Bridge](/docs/reference/koin-ktor/ktor-bridge): Koin과 Ktor DI 간의 상호 의존성 해결.
+- [Ktor에서의 격리된 컨텍스트(Isolated Context in Ktor)](/docs/reference/koin-ktor/ktor-isolated): 전역 컨텍스트 없이 Koin 사용하기.
+- [Ktor 테스팅](/docs/reference/koin-ktor/ktor-testing): Koin을 사용한 라우트 테스트.
+- [Ktor 튜토리얼](/docs/quickstart/ktor) 및 [어노테이션 기반 Ktor 튜토리얼](/docs/quickstart/ktor-annotations): Koin을 사용하여 단계별로 Ktor 앱 구축하기.

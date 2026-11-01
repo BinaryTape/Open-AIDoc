@@ -1,4 +1,4 @@
-[//]: # (title: サーバプラグイン)
+[//]: # (title: サーバープラグイン)
 
 <show-structure for="chapter" depth="2"/>
 
@@ -6,57 +6,66 @@
 プラグインは、シリアライゼーション、コンテンツエンコーディング、圧縮などの一般的な機能を提供します。
 </link-summary>
 
-Ktor における典型的なリクエスト/レスポンスパイプラインは次のようになります。
+Ktorにおける一般的なリクエスト/レスポンスパイプラインは次のようになります。
 
 ![Request Response Pipeline](request-response-pipeline.png){width="600"}
 
-リクエストはサーバによって受信され、リクエストパイプラインを通じて処理されます。Ktor はリクエストを適切なハンドラにルーティングし、そこでアプリケーションロジックがリクエストを処理します。その後、レスポンスはレスポンスパイプラインを通過してからクライアントに送信されます。
+リクエストはサーバーによって受信され、リクエストパイプラインを通じて処理されます。Ktorはリクエストを適切なハンドラーにルーティングし、アプリケーションロジックがそれを処理します。その後、レスポンスはクライアントに送信される前にレスポンスパイプラインを通過します。
 
 ## プラグインによる機能の追加 {id="add_functionality"}
 
-多くのアプリケーションでは、アプリケーションロジックとは切り離された機能が必要になります。これには、認証、シリアライゼーション、コンテンツエンコーディング、圧縮、ヘッダー、Cookie などが含まれます。Ktor では、これらの機能は_プラグイン_によって提供されます。
+多くのアプリケーションでは、アプリケーションロジックとは切り離された機能が必要になります。これには認証、シリアライゼーションやコンテンツエンコーディング、圧縮、ヘッダー、Cookieなどが含まれます。Ktorでは、このような機能は _プラグイン_ によって提供されます。
 
-プラグインは、リクエストおよびレスポンス処理のさまざまなステージをインターセプトできます。そのため、リクエスト/レスポンスパイプライン内のさまざまなポイントで適用できます。
+プラグインは、リクエストおよびレスポンス処理のさまざまなステージをインターセプトできます。そのため、リクエスト/レスポンスパイプラインのさまざまなポイントに適用できます。
 
 ![Plugin pipeline](plugin-pipeline.png){width="600"}
 
-プラグインが実行される正確なステージは、プラグイン自体や、それが使用するフックまたはパイプラインフェーズによって異なります。一般的に、リクエストは次のように処理されます。
+プラグインが実行される正確なステージは、プラグイン自体、およびそれが使用するフックやパイプラインフェーズによって異なります。一般的に、リクエストは次のように処理されます。
 
-* ルーティングメカニズムが、どのハンドラがリクエストを処理すべきかを決定します。
-* ハンドラに渡される前に、リクエストは1つ以上のプラグインによって処理されます。
-* ハンドラがアプリケーションロジックを使用してレスポンスを生成します。
-* レスポンスがクライアントに送信される前に、レスポンスは1つ以上のプラグインによって処理されます。
+* ルーティング機構が、どのハンドラーがリクエストを処理すべきかを決定します。
+* ハンドラーに渡される前に、リクエストは1つ以上のプラグインによって処理されます。
+* ハンドラーはアプリケーションロジックを使用してレスポンスを生成します。
+* レスポンスがクライアントに送信される前に、1つ以上のプラグインによって処理されます。
 
-## ルーティングもプラグインの1つ {id="routing"}
+## ルーティングもプラグイン {id="routing"}
 
-プラグインは最大限の柔軟性を提供し、リクエスト/レスポンスパイプラインの任意のセグメントに存在できるように設計されています。Ktor では、`routing` 自体もプラグインとして実装されています。
+プラグインは最大限の柔軟性を提供し、リクエスト/レスポンスパイプラインの任意のセグメントに存在できるように設計されています。Ktorでは、`routing` 自体もプラグインとして実装されています。
 
 ![Routing as a Plugin](plugin-pipeline-routing.png){width="600"}
 
-## プラグインの依存関係の追加 {id="dependency"}
+## プラグインの依存関係を追加する {id="dependency"}
 
-ほとんどのプラグインには、個別の依存関係が必要です。たとえば、[`CORS`](server-cors.md) プラグインを使用するには、ビルドスクリプトに `ktor-server-cors` アーティファクトが必要です。
+ほとんどのプラグインには個別の依存関係が必要です。たとえば、[`CORS`](server-cors.md) プラグインを使用するには、ビルドスクリプトに `ktor-server-cors` アーティファクトが必要です。
 
 <var name="artifact_name" value="ktor-server-cors"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.server.cors"/>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上記のスニペットでは、Ktorの依存関係を指定するために<a href="server-dependencies.topic#using-version-catalog">
+            Ktorバージョンカタログ</a>を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上記のスニペットでは、Ktorの依存関係を指定するために<a href="server-dependencies.topic#using-version-catalog">
+            Ktorバージョンカタログ</a>を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
     </TabItem>
 </Tabs>
 
-> 利用可能なプラグインの完全なリストについては、[Ktor Project Generator](https://start.ktor.io/settings) を参照してください。特定のプラグインに必要な依存関係については、該当するプラグインのドキュメントを参照してください。
+> 利用可能なプラグインの完全なリストについては、[Ktor Project Generator](https://start.ktor.io/settings)を参照してください。特定のプラグインに必要な依存関係については、該当するプラグインのドキュメントを参照してください。
 > 
 {style="tip"}
 
 ## プラグインのインストール {id="install"}
 
-プラグインは通常、サーバの初期化フェーズ中に `install()` 関数を使用して設定されます。[サーバの作成方法](server-create-and-configure.topic)に応じて、`embeddedServer()` 関数の内部または[アプリケーションモジュール](server-modules.md)内でプラグインをインストールできます。
+プラグインは通常、サーバーの初期化フェーズで `install()` 関数を使用して設定されます。[サーバーの作成](server-create-and-configure.topic)方法に応じて、`embeddedServer()` 関数内または[アプリケーションモジュール](server-modules.md)内でプラグインをインストールできます。
 
 <Tabs>
 <TabItem title="embeddedServer()">
@@ -93,9 +102,9 @@ fun Application.module() {
 </TabItem>
 </Tabs>
 
-プラグインをインストールする際、`install()` 関数に設定ブロックを渡すことで設定を行うことができます。
+`install()` 関数に設定ブロックを渡すことで、プラグインのインストール時に設定を行えます。
 
-たとえば、[`Sessions` プラグイン](server-sessions.md)をインストールする場合、セッションタイプと Cookie 名を指定することで Cookie ベースのセッションを設定できます。
+たとえば、[`Sessions` プラグイン](server-sessions.md)をインストールする際、セッションタイプとCookie名を指定することでCookieベースのセッションを設定できます。
 
 ```kotlin
 install(Sessions) {
@@ -103,11 +112,11 @@ install(Sessions) {
 } 
 ```
 
-### 特定のルートへのプラグインのインストール {id="install-route"}
+### 特定のルートにプラグインをインストールする {id="install-route"}
 
-Ktor では、グローバルだけでなく特定の[ルート](server-routing.md)にもプラグインをインストールできます。これは、リソースごとに異なるプラグイン設定が必要な場合に便利です。
+Ktorでは、プラグインをグローバルだけでなく特定の[ルート](server-routing.md)にインストールすることもできます。これは、リソースごとに異なるプラグイン設定が必要な場合に便利です。
 
-たとえば、次のコードは `/index` ルートに [`CachingHeaders` プラグイン](server-caching-headers.md)をインストールし、キャッシュヘッダーを追加するように設定します。
+たとえば、次のコードは `/index` ルートに [`CachingHeader` プラグイン](server-caching-headers.md)をインストールし、キャッシュヘッダーを追加するように設定する例を示しています。
 
 ```kotlin
 route("/index") {
@@ -120,12 +129,12 @@ route("/index") {
 }
 ```
 
-同じプラグインが複数のレベルでインストールされている場合、Ktor は次のルールを適用します。
+同じプラグインが複数のレベルでインストールされている場合、Ktorは次のルールを適用します。
 
-* 特定のルートにインストールされたプラグインの設定は、対応する[グローバルプラグイン設定](#install)をオーバーライドします。
-* 同じルートが複数回定義され、同じプラグインのインストールが複数含まれている場合、ルーティングはそのルートのインストールをマージします。この際、最後のインストールが優先されます。
+* 特定のルートにインストールされたプラグインの設定は、対応する[グローバルなプラグイン設定](#install)をオーバーライドします。
+* 同じルートが複数回定義され、同じプラグインのインストールが複数含まれている場合、ルーティングはそのルートに対するインストールをマージします。その際、最後のインストールが優先されます。
 
-次の例では、`/index/a` と `/index/b` への呼び出しは両方とも、2番目の `CachingHeaders` のインストールによってのみ処理されます。
+次の例では、`/index/a` と `/index/b` への呼び出しは両方とも、2番目の `CachingHeaders` インストールによってのみ処理されます。
    
  ```kotlin
  routing {
@@ -145,10 +154,10 @@ route("/index") {
  ```
  {initial-collapse-state="collapsed" collapsed-title="install(CachingHeaders) { // First configuration }"}
 
-## デフォルトプラグイン、利用可能なプラグイン、カスタムプラグイン {id="default_available_custom"}
+## デフォルト、利用可能、およびカスタムプラグイン {id="default_available_custom"}
 
-Ktor はデフォルトではアプリケーションプラグインをインストールしません。アプリケーションに必要な機能を提供するプラグインをインストールしてください。
+Ktorはデフォルトではアプリケーションプラグインをインストールしません。アプリケーションに必要な機能を提供するプラグインをインストールしてください。
 
-Ktor は幅広いプラグインを提供しています。利用可能なプラグインの完全なリストは、[Ktor Project Generator](https://start.ktor.io/settings) で確認できます。
+Ktorは幅広いプラグインを提供しています。利用可能なプラグインの完全なリストは、[Ktor Project Generator](https://start.ktor.io/settings)で確認できます。
 
-また、アプリケーション全体で再利用したり、他のアプリケーションと共有したりできる機能をカプセル化するために、独自の[カスタムプラグイン](server-custom-plugins.md)を作成することもできます。
+また、独自の[カスタムプラグイン](server-custom-plugins.md)を作成して、アプリケーション全体で再利用したり、他のアプリケーションと共有したりできる機能をカプセル化することもできます。

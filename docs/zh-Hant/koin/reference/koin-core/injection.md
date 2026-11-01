@@ -1,473 +1,125 @@
 ---
-title: 獲取相依性
+title: 注入
 ---
 
-# 獲取相依性
+# 注入
 
-本指南介紹如何在不同情境下從 Koin 獲取相依性。
+大部分的類別都會透過建構函式接收其相依性，並由 Koin 進行填入（請參閱 [Constructor parameters](/docs/reference/koin-core/definitions#constructor-parameters)）。但有些程式碼無法做到這點：例如 Android 的 `Activity`、`main()` 函式，或是由架構所建立的類別。本頁面涵蓋了在這些程式碼中從 Koin 擷取執行個體的函式：`get()`、`inject()`、它們的可為 null 變體，以及 `getAll()`。
 
-## 方式 {id="approaches"}
+## 優先使用建構函式注入 {id="constructor-injection-first"}
 
-| 方式 | 何時使用 | 範例 |
-|----------|-------------|---------|
-| **建構函式注入** | 商業邏輯、服務、存儲庫 | `class MyService(val repo: Repository)` |
-| **函式注入** | 工廠函式、產生器 | `fun createHttpClient(val ds: DataSource): HttpClient` |
-| **欄位注入** | Android 架構類別、入口點 | `val viewModel: MyViewModel by viewModel()` |
-
-:::info
-**最佳實務：** 優先使用建構函式或函式注入，以獲得更好的可測試性。僅在您無法控制類別實作化（如 Activity、Fragment 等）時才使用欄位注入。
-:::
-
-## 建構函式注入（建議使用） {id="constructor-injection-recommended"}
-
-相依性在建構函式中宣告，並由 Koin 解析：
+僅在 Koin 無法建立該類別的情況下，才使用本頁面介紹的函式：
 
 ```kotlin
-class UserRepository(
-    private val database: Database,
-    private val apiClient: ApiClient
-)
-
-class UserViewModel(
-    private val repository: UserRepository
-) : ViewModel()
-```
-
-```kotlin
-val appModule = module {
-    single<Database>()
-    single<ApiClient>()
-    single<UserRepository>()
-    viewModel<UserViewModel>()
-}
-```
-
-Koin 會自動解析所有建構函式參數。
-
-## 函式注入 {id="function-injection"}
-
-當您需要自訂建立邏輯時，請使用函式來建立執行個體：
-
-### 編譯器外掛程式 DSL {id="compiler-plugin-dsl"}
-
-```kotlin
-fun createHttpClient(dataSource: DataSource): HttpClient {
-    return HttpClient {
-        install(ContentNegotiation) { json() }
-        defaultRequest { url(dataSource.baseUrl) }
-    }
-}
-
-val appModule = module {
-    single<DataSource>()
-    single { create(::createHttpClient) }
-}
-```
-
-### 註解 {id="annotations"}
-
-```kotlin
-@Module
-class NetworkModule {
-
-    @Singleton
-    fun createHttpClient(dataSource: DataSource): HttpClient {
-        return HttpClient {
-            install(ContentNegotiation) { json() }
-            defaultRequest { url(dataSource.baseUrl) }
-        }
-    }
-}
-```
-
-函式注入在以下情況非常有用：
-- 從您無法控制的外部程式庫建立執行個體
-- 需要複雜的初始化邏輯
-- 需要設定產生器或 DSL
-
-## 欄位注入 {id="field-injection"}
-
-### 使用 `by inject()` 進行延遲注入 {id="lazy-injection-with-by-inject"}
-
-在第一次存取時建立執行個體：
-
-```kotlin
-class MyActivity : AppCompatActivity() {
-    // 延遲注入 - 在第一次存取時建立
-    private val viewModel: UserViewModel by viewModel()
-    private val service: MyService by inject()
-}
-```
-
-### 使用 `get()` 進行立即注入 {id="eager-injection-with-get"}
-
-立即建立執行個體：
-
-```kotlin
-class MyActivity : AppCompatActivity() {
-    // 立即注入 - 立即建立
-    private val service: MyService = get()
-}
-```
-
-### 比較 {id="comparison"}
-
-| 方法 | 何時建立 | 執行緒安全 |
-|--------|--------------|---------------|
-| `by inject()` | 第一次存取時 | 執行緒安全的延遲載入 |
-| `get()` | 立即 | 直接呼叫 |
-
-## KoinComponent {id="koincomponent"}
-
-適用於需要注入相依性但非 Android 組件的類別：
-
-```kotlin
-class MyHelper : KoinComponent {
-    private val service: MyService by inject()
-    private val database: Database = get()
-
-    fun doSomething() {
-        service.process(database.query())
-    }
-}
-```
-
-:::warning
-避免在商業邏輯類別中使用 `KoinComponent`。它會與 Koin 產生強耦合。請改用建構函式注入。
-:::
-
-## 平台特定注入 {id="platform-specific-injection"}
-
-### Android {id="android"}
-
-Activity 與 Fragment 有內建支援：
-
-```kotlin
-class MainActivity : AppCompatActivity() {
-    // ViewModel 注入
-    private val viewModel: UserViewModel by viewModel()
-
-    // 一般注入
-    private val analytics: AnalyticsService by inject()
-}
-
-class UserFragment : Fragment() {
-    // Fragment 自己的 ViewModel
-    private val viewModel: UserViewModel by viewModel()
-
-    // 與 Activity 共用
-    private val sharedVM: SharedViewModel by activityViewModels()
-}
-```
-
-### Compose {id="compose"}
-
-```kotlin
-@Composable
-fun UserScreen() {
-    // 注入 ViewModel
-    val viewModel: UserViewModel = koinViewModel()
-
-    // 注入任何相依性
-    val analytics: AnalyticsService = koinInject()
-
-    // Activity 作用域的 ViewModel
-    val sharedVM: SharedViewModel = koinActivityViewModel()
-}
-```
-
-### Ktor {id="ktor"}
-
-```kotlin
-fun Route.userRoutes() {
-    val repository: UserRepository by inject()
-
-    get("/users") {
-        call.respond(repository.getAll())
-    }
-}
-```
-
-## 使用限定詞進行注入 {id="injection-with-qualifiers"}
-
-當您有多個相同型別的定義時，請使用限定詞（qualifier）來區分它們。
-
-### 字串限定詞 {id="string-qualifier"}
-
-| DSL | 註解 |
-|-----|------------|
-| `named("local")` | `@Named("local")` |
-
-```kotlin
-// DSL
-val module = module {
-    single<Database>(named("local")) { LocalDatabase() }
-    single<Database>(named("remote")) { RemoteDatabase() }
-}
-
-// 注入
-private val localDb: Database by inject(named("local"))
-private val remoteDb: Database by inject(named("remote"))
-```
-
-```kotlin
-// 註解
-@Singleton
-@Named("local")
-class LocalDatabase : Database
-
-@Singleton
-@Named("remote")
-class RemoteDatabase : Database
-```
-
-### 型別限定詞 {id="type-qualifier"}
-
-使用型別（類別、物件或列舉）作為限定詞以確保編譯時期安全：
-
-| DSL | 註解 |
-|-----|------------|
-| `named<LocalDb>()` | `@Qualifier(LocalDb::class)` |
-
-```kotlin
-// 定義限定詞型別
-object LocalDb
-object RemoteDb
-
-// DSL
-val module = module {
-    single<Database>(named<LocalDb>()) { LocalDatabase() }
-    single<Database>(named<RemoteDb>()) { RemoteDatabase() }
-}
-
-// 注入
-private val localDb: Database by inject(named<LocalDb>())
-private val remoteDb: Database by inject(named<RemoteDb>())
-```
-
-```kotlin
-// 註解
-@Singleton
-@Qualifier(LocalDb::class)
-class LocalDatabase : Database
-
-@Singleton
-@Qualifier(RemoteDb::class)
-class RemoteDatabase : Database
-```
-
-### 在 Compose 中 {id="in-compose"}
-
-```kotlin
-@Composable
-fun MyScreen() {
-    // 使用字串限定詞
-    val localDb: Database = koinInject(named("local"))
-
-    // 使用型別限定詞
-    val remoteDb: Database = koinInject(named<RemoteDb>())
-}
-```
-
-## 帶參數的注入 {id="injection-with-parameters"}
-
-在注入時傳遞參數：
-
-### 定義 {id="definition"}
-
-```kotlin
-@Factory
-class UserPresenter(
-    @InjectedParam val userId: String,
-    val repository: UserRepository
-)
-
-// 或使用 DSL
-factory<UserPresenter>()
-```
-
-### 注入 {id="injection"}
-
-```kotlin
-// by inject()
-private val presenter: UserPresenter by inject { parametersOf("user123") }
-
-// get()
-val presenter: UserPresenter = get { parametersOf("user123") }
-```
-
-### 在 Compose 中
-
-```kotlin
-@Composable
-fun UserScreen(userId: String) {
-    val presenter: UserPresenter = koinInject { parametersOf(userId) }
-}
-```
-
-### 多個參數 {id="multiple-parameters"}
-
-```kotlin
-@Factory
-class OrderPresenter(
-    @InjectedParam val userId: String,
-    @InjectedParam val orderId: String,
-    val repository: OrderRepository
-)
-
-val presenter = get<OrderPresenter> { parametersOf("user123", "order456") }
-```
-
-## 直接存取 Koin {id="direct-koin-access"}
-
-在需要時直接存取 Koin 執行個體：
-
-```kotlin
-// 從 GlobalContext
-val koin = KoinPlatform.getKoin()
-val service: MyService = koin.get()
-
-// 在 KoinComponent 中
-class MyClass : KoinComponent {
-    fun doSomething() {
-        val service: MyService = getKoin().get()
-    }
-}
-```
-
-## 可為 null 的注入 {id="nullable-injection"}
-
-對於選用相依性：
-
-```kotlin
-// 如果找不到則傳回 null
-val optional: MyService? = getKoinOrNull()?.getOrNull()
-
-// 在 KoinComponent 中
-class MyClass : KoinComponent {
-    private val optional: MyService? = getOrNull()
-}
-```
-
-## 在不同情境下的注入 {id="injection-in-different-contexts"}
-
-### 在 ViewModel 中 {id="in-viewmodel"}
-
-```kotlin
-class UserViewModel(
-    private val repository: UserRepository,
-    private val savedStateHandle: SavedStateHandle
-) : ViewModel() {
-    // 建構函式注入 - 不需要 KoinComponent
-}
-```
-
-### 在 Service 中 {id="in-service"}
-
-```kotlin
-class MyService : Service() {
-    private val repository: UserRepository by inject()
-
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        repository.doSomething()
-        return START_STICKY
-    }
-}
-```
-
-### 在 BroadcastReceiver 中 {id="in-broadcastreceiver"}
-
-```kotlin
-class MyReceiver : BroadcastReceiver(), KoinComponent {
-    private val service: NotificationService by inject()
-
-    override fun onReceive(context: Context, intent: Intent) {
-        service.handleNotification(intent)
-    }
-}
-```
-
-### 在 WorkManager Worker 中 {id="in-workmanager-worker"}
-
-```kotlin
-class MyWorker(
-    context: Context,
-    params: WorkerParameters,
-    private val repository: UserRepository  // 由 Koin 注入
-) : CoroutineWorker(context, params) {
-
-    override suspend fun doWork(): Result {
-        repository.syncData()
-        return Result.success()
-    }
-}
-
-// 模組
-val workerModule = module {
-    worker<MyWorker>()
-}
-```
-
-## 最佳實務 {id="best-practices"}
-
-### 應執行：商業邏輯使用建構函式注入 {id="do-constructor-injection-for-business-logic"}
-
-```kotlin
-// 良好 - 無需 Koin 即可測試
+// Koin 建立此類別：相依性透過建構函式傳入
 class UserService(
     private val repository: UserRepository,
-    private val validator: UserValidator
-) {
-    fun createUser(data: UserData) = validator.validate(data).let {
-        repository.save(it)
-    }
-}
-
-// 無需 Koin 的測試
-@Test
-fun testCreateUser() {
-    val mockRepo = mockk<UserRepository>()
-    val mockValidator = mockk<UserValidator>()
-    val service = UserService(mockRepo, mockValidator)
-    // 直接測試
-}
-```
-
-### 應執行：架構類別使用欄位注入 {id="do-field-injection-for-framework-classes"}
-
-```kotlin
-// 良好 - Activity 的建構由 Android 控制
-class MainActivity : AppCompatActivity() {
-    private val viewModel: UserViewModel by viewModel()
-}
-```
-
-### 切勿執行：在商業邏輯中使用 KoinComponent {id="don-t-koincomponent-in-business-logic"}
-
-```kotlin
-// 不良 - 與 Koin 強耦合
-class UserService : KoinComponent {
-    private val repository: UserRepository by inject()
-}
-
-// 良好 - 建構函式注入
-class UserService(private val repository: UserRepository)
-```
-
-### 切勿執行：在建構函式中使用 get() {id="don-t-get-in-constructors"}
-
-```kotlin
-// 不良 - 建構函式中的副作用
-class MyService(
-    private val repo: UserRepository = get()  // 請勿這樣做！
+    private val validator: UserValidator,
 )
 
-// 良好 - 讓 Koin 注入
-class MyService(private val repo: UserRepository)
+// Android 建立此類別：使用 inject() 擷取相依性
+class UserActivity : AppCompatActivity() {
+    private val userService: UserService by inject()
+}
 ```
 
-## 後續步驟 {id="next-steps"}
+具有建構函式參數的類別可以透過傳入假物件 (fake) 進行測試，而無需 Koin 容器。但在測試中呼叫 `get()` 的類別則需要一個執行中的容器。切勿在預設參數值中呼叫 `get()`（例如 `class UserService(val repository: UserRepository = get())`）：請改為在模組中宣告該類別。
 
-- **[作用域 (Scopes)](/docs/reference/koin-core/scopes)** - 管理相依性生命週期
-- **[Android 版 Koin](/docs/integrations/android/index)** - Android 特定的注入
-- **[Compose 版 Koin](/docs/integrations/compose/index)** - Compose 注入
+## 延遲與即時擷取 {id="lazy-and-eager-retrieval"}
+
+在任何風格中，擷取程式碼的方式都相同：
+
+```kotlin
+class UserActivity : AppCompatActivity() {
+
+    // lazy: 首次存取該屬性時解析
+    private val userService: UserService by inject()
+
+    // eager: 當屬性初始化時立即解析
+    private val analytics: Analytics = get()
+}
+```
+
+| 函式 | 回傳 | 解析時機 |
+|----------|---------|----------|
+| `by inject<T>()` | 作為屬性委託使用的 `Lazy<T>` | 首次存取時 |
+| `get<T>()` | `T` | 立即 |
+
+對於屬性，請使用 `by inject()`。類別可以在 Koin 準備好所有項目之前就被建立（例如 `Activity` 欄位在 `onCreate()` 之前就被初始化），且從未使用的執行個體永遠不會被建立。當你在函式主體內需要立即取得該值時，請使用 `get()`。
+
+`inject()` 接受一個 `mode` 參數，即 Kotlin 的 `LazyThreadSafetyMode`。在 JVM 上預設為 `SYNCHRONIZED`。
+
+## get() 與 inject() 的可用位置 {id="where-get-and-inject-are-available"}
+
+你可以從以下位置呼叫 `get()` 和 `by inject()`：
+
+- Android 類別：`Activity`、`Fragment`、`Service` 以及其他 `ComponentCallbacks`，無需額外的介面。請參閱 [Android Entry Points](/docs/reference/koin-android/entry-points)。
+- 任何實作了 `KoinComponent` 的類別。請參閱 [KoinComponent](/docs/reference/koin-core/koin-component)。
+- `Koin` 執行個體：`KoinPlatform.getKoin().get<UserService>()` 使用全域容器，而 `koinApp.koin.get<UserService>()` 則使用隔離的容器。
+- 在定義內部 (Classic DSL)：`get()`、`inject()`、`getOrNull()`、`injectOrNull()` 和 `getAll()` 會從當前作用域解析。
+
+平台 API 遵循相同的規則，但使用各自的專用名稱：
+
+- Compose：`koinInject()` 與 `koinViewModel()`。請參閱 [Koin for Compose](/docs/reference/koin-compose/compose)。
+- Android ViewModel：`by viewModel()` 與 `by activityViewModel()`。請參閱 [Android ViewModel](/docs/reference/koin-android/viewmodel)。
+- Ktor：在 `Application`、`Route` 與 `ApplicationCall` 中使用 `by inject()`。請參閱 [Koin for Ktor](/docs/reference/koin-ktor/ktor)。
+
+## 可選相依性 {id="optional-dependencies"}
+
+當某個定義可能缺失時，請使用可為 null 的變體。它們會回傳 `null`，而不會拋出 `NoDefinitionFoundException`：
+
+```kotlin
+val koin = KoinPlatform.getKoin()
+
+val tracker: Tracker? = koin.getOrNull()
+val crashReporter: CrashReporter? by koin.injectOrNull()
+```
+
+`getOrNull()` 和 `injectOrNull()` 存在於 `Koin`、`Scope` 以及定義內部。`KoinComponent` 介面僅提供 `get()` 和 `inject()`：在該處請呼叫 `getKoin().getOrNull<T>()`。
+
+對於建構函式參數，請將其宣告為可為 null（`tracker: Tracker?`），當不存在任何定義時，Koin 會傳入 `null`。請參閱 [Constructor parameters](/docs/reference/koin-core/definitions#constructor-parameters)。
+
+如果 Koin 本身可能尚未啟動（例如在程式庫中），`KoinPlatform.getKoinOrNull()` 會回傳 `null`，而不會拋出例外。
+
+## 特定型別的所有執行個體 {id="all-instances-of-a-type"}
+
+`getAll<T>()` 會回傳跨所有定義中綁定到型別 `T` 的每一個執行個體：
+
+```kotlin
+val koin = KoinPlatform.getKoin()
+
+val interceptors: List<Interceptor> = koin.getAll()
+```
+
+該清單包含主要型別或綁定型別為 `T` 的每個定義（無論是否有限定詞）。當沒有符合項目時，清單為空。對於建構函式參數，`List<Interceptor>` 參數也有相同效果。集合模式已在 [Advanced Patterns](/docs/reference/koin-core/advanced-patterns) 中說明。
+
+## 呼叫點的限定詞與參數 {id="qualifiers-and-parameters-at-the-call-site"}
+
+每個擷取函式都可以接收限定詞與參數區塊：
+
+```kotlin
+val localDb: Database by inject(named("local"))
+
+val presenter: UserPresenter = get { parametersOf(userId) }
+
+val detail: DetailPresenter = get(named("compact")) { parametersOf(itemId) }
+```
+
+- 限定詞 (Qualifier)：在相同型別的多個定義中挑選一個。請參閱 [Qualifiers](/docs/reference/koin-core/qualifiers)。
+- 參數 (Parameters)：僅呼叫端知道的值，傳遞給該定義。請參閱 [Injected Parameters](/docs/reference/koin-core/injection-parameters)。
+
+使用 `by inject()` 時，參數區塊會在首次存取時執行，因此它可以讀取在建構完成後才設定的屬性。
+
+## 當解析失敗時 {id="when-resolution-fails"}
+
+當沒有任何定義符合型別與限定詞時，`get()` 會拋出 `NoDefinitionFoundException`。使用 `by inject()` 時，例外會在首次存取該屬性時發生，而不是在你宣告它的地方。搭配編譯器外掛程式 (Compiler Plugin) 時，`get()` 與 `inject()` 的呼叫也會在建置期根據啟動呼叫的依賴圖進行檢查。
+
+如需常見錯誤以及如何解讀 Koin 訊息的說明，請參閱 [Troubleshooting](/docs/reference/koin-core/troubleshooting)。
+
+## 相關內容 {id="related"}
+
+- [Definitions](/docs/reference/koin-core/definitions)：建構函式注入以及參數如何解析。
+- [KoinComponent](/docs/reference/koin-core/koin-component)：讓任何類別都能存取 `get()` 和 `inject()`。
+- [Android Entry Points](/docs/reference/koin-android/entry-points)：在 Activity、Fragment、Service、Receiver 和 View 中注入。
+- [Koin for Compose](/docs/reference/koin-compose/compose)：`koinInject()` 及其他 Compose API。
+- [Scopes](/docs/reference/koin-core/scopes)：從作用域而非根容器中擷取執行個體。

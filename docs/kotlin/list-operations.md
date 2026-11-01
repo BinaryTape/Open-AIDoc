@@ -1,18 +1,18 @@
 [//]: # (title: List 特有操作)
 
-[`List`](collections-overview.md#list) 是 Kotlin 中最常用的内置集合类型。通过索引访问列表元素为列表提供了一套强大的操作。
+[`List`](collections-overview.md#list) 是 Kotlin 中最常用的内置集合类型。通过索引访问列表中的元素为列表提供了一组强大的操作。 
 
-## 通过索引检索元素 {id="retrieve-elements-by-index"}
+## 按索引检索元素 {id="retrieve-elements-by-index"}
 
-List 支持所有常见的元素检索操作：`elementAt()`、`first()`、`last()` 以及 [检索单个元素](collection-elements.md) 中列出的其他操作。
-List 的特性在于可以通过索引访问元素，因此读取元素最简单的方法是通过索引检索它。
-这可以通过 [`get()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/get.html) 函数（将索引作为实参传递）或简写的 `[index]` 语法来完成。
+列表支持所有常见的元素检索操作：`elementAt()`、`first()`、`last()` 以及[检索单个元素](collection-elements.md)中列出的其他操作。
+列表的特有之处在于可以通过索引访问元素，因此读取元素的最简单方式就是按索引检索它。
+这可以通过 [`get()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/get.html) 函数（将索引作为实参传入）或简写的 `[index]` 语法来完成。
 
 如果列表大小小于指定的索引，则会抛出异常。
-还有另外两个函数可以帮助您避免此类异常：
+还有另外两个函数可以帮助你避免此类异常： 
 
-* [`getOrElse()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/get-or-else.html) 允许您提供一个函数，用于在集合中不存在该索引时计算要返回的默认值。
-* [`getOrNull()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/get-or-null.html) 返回 `null` 作为默认值。
+* [`getOrElse()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/get-or-else.html) 允许你提供一个函数，用于在集合中不存在该索引时计算要返回的默认值。
+* [`getOrNull()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/get-or-null.html) 返回 `null` 作为默认值。 
 
 ```kotlin
 
@@ -27,12 +27,12 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-## 检索列表部分 {id="retrieve-list-parts"}
+## 检索列表的部分 {id="retrieve-list-parts"}
 
-除了 [检索集合部分](collection-parts.md) 的常用操作外，列表还提供了 [`subList()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/sub-list.html) 函数，该函数以列表形式返回指定元素范围的视图。
-因此，如果原始集合的元素发生变化，之前创建的子列表中的元素也会随之变化，反之亦然。
+除[检索集合的部分](collection-parts.md)中的常见操作外，列表还提供了 [`subList()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/sub-list.html) 函数，该函数以列表形式返回指定元素范围的视图。
+因此，如果原始集合中的某个元素发生改变，先前创建的子列表中该元素也会发生改变，反之亦然。
 
 ```kotlin
 
@@ -43,15 +43,15 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
 ## 查找元素位置 {id="find-element-positions"}
 
-### 线性搜索 {id="linear-search"}
+### 线性查找 {id="linear-search"}
 
-在任何列表中，您都可以使用 [`indexOf()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/index-of.html) 和 [`lastIndexOf()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/last-index-of.html) 函数查找元素的位置。
+在任何列表中，都可以使用 [`indexOf()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/index-of.html) 和 [`lastIndexOf()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/last-index-of.html) 函数来查找元素的位置。
 它们返回列表中与给定实参相等的元素的第一个和最后一个位置。
-如果没有这样的元素，这两个函数都会返回 `-1`。
+如果不存在此类元素，这两个函数都返回 `-1`。
 
 ```kotlin
 
@@ -63,12 +63,12 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
 还有一对接收谓词并搜索与之匹配的元素的函数：
 
-* [`indexOfFirst()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/index-of-first.html) 返回与谓词匹配的 *第一个元素* 的索引，如果没有这样的元素则返回 `-1`。
-* [`indexOfLast()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/index-of-last.html) 返回与谓词匹配的 *最后一个元素* 的索引，如果没有这样的元素则返回 `-1`。
+* [`indexOfFirst()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/index-of-first.html) 返回与谓词匹配的*第一个元素的索引*，如果不存在此类元素则返回 `-1`。
+* [`indexOfLast()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/index-of-last.html) 返回与谓词匹配的*最后一个元素的索引*，如果不存在此类元素则返回 `-1`。
 
 ```kotlin
 
@@ -80,19 +80,19 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-### 在已排序列表中进行二分搜索 {id="binary-search-in-sorted-lists"}
+### 已排序列表中的二分查找 {id="binary-search-in-sorted-lists"}
 
-还有一种在列表中搜索元素的方法——[二分搜索](https://en.wikipedia.org/wiki/Binary_search_algorithm)。
-它的运行速度明显快于其他内置搜索函数，但 *要求列表按照某种顺序（自然顺序或函数参数中提供的另一种顺序）升序 [排序](collection-ordering.md)*。
-否则，结果将是未定义的。
+在列表中搜索元素还有另一种方法——[二分查找](https://en.wikipedia.org/wiki/Binary_search_algorithm)。
+它的运行速度明显快于其他内置搜索函数，但*要求列表按特定排序规则（自然顺序或函数形参中提供的其他规则）升序[排序](collection-ordering.md)*。
+否则，结果是未定义的。 
 
-要在已排序列表中搜索元素，请调用 [`binarySearch()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/binary-search.html) 函数，并将值作为实参传递。
-如果该元素存在，函数返回其索引；否则，它返回 `(-insertionPoint - 1)`，其中 `insertionPoint` 是为了保持列表有序而应插入该元素的索引。
-如果有多个元素具有给定值，则搜索可以返回其中任何一个元素的索引。
+要在已排序列表中搜索元素，请调用 [`binarySearch()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/binary-search.html) 函数并将该值作为实参传入。
+如果存在该元素，函数会返回其索引；否则，它会返回 `(-insertionPoint - 1)`，其中 `insertionPoint` 是应当插入此元素以使列表保持有序的索引。
+如果存在多个具有给定值的元素，搜索可能会返回它们中任意一个的索引。
 
-您还可以指定要搜索的索引范围：在这种情况下，函数仅在提供的两个索引之间进行搜索。
+你还可以指定要搜索的索引范围：在此情况下，函数仅在提供的两个索引之间进行搜索。
 
 ```kotlin
 
@@ -107,12 +107,12 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-#### 使用 Comparator 进行二分搜索 {id="comparator-binary-search"}
+#### Comparator 二分查找 {id="comparator-binary-search"}
 
-当列表元素不是 `Comparable` 时，您应该提供一个在二分搜索中使用的 [`Comparator`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-comparator/)。
-列表必须根据此 `Comparator` 按升序排序。让我们看一个例子：
+当列表元素不是 `Comparable` 时，应提供一个 [`Comparator`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-comparator/) 用于二分查找。
+列表必须按照此 `Comparator` 升序排序。来看一个示例：
 
 ```kotlin
 
@@ -130,12 +130,12 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-这里有一个 `Product` 实例列表（它们不是 `Comparable`）和一个定义顺序的 `Comparator`：如果产品 `p1` 的价格低于产品 `p2` 的价格，则 `p1` 排在 `p2` 之前。
-因此，在拥有一个根据此顺序升序排序的列表后，我们使用 `binarySearch()` 来查找指定 `Product` 的索引。
+这里有一个非 `Comparable` 的 `Product` 实例列表，以及一个定义顺序的 `Comparator`：如果产品 `p1` 的价格低于产品 `p2` 的价格，则产品 `p1` 排在产品 `p2` 之前。
+因此，在拥有一个按此顺序升序排列的列表后，我们使用 `binarySearch()` 来查找指定 `Product` 的索引。
 
-当列表使用与自然顺序不同的顺序时（例如，`String` 元素的忽略大小写顺序），自定义比较器也非常方便。
+当列表使用不同于自然顺序的排序规则时，自定义比较器也很方便，例如对 `String` 元素使用不区分大小写的顺序。 
 
 ```kotlin
 
@@ -146,13 +146,13 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-#### 使用比较函数进行二分搜索 {id="comparison-binary-search"}
+#### Comparison 二分查找 {id="comparison-binary-search"}
 
-使用 *比较* 函数的二分搜索允许您在不提供显式搜索值的情况下查找元素。
-相反，它接收一个将元素映射到 `Int` 值的比较函数，并搜索函数返回零的元素。
-列表必须根据提供的函数按升序排序；换句话说，比较的返回值必须从列表的一个元素到下一个元素递增。
+使用 _comparison_（比较）函数的二分查找允许你在不提供显式搜索值的情况下查找元素。
+相反，它接收一个将元素映射为 `Int` 值的比较函数，并搜索该函数返回零的元素。
+列表必须根据提供的函数按升序排列；换句话说，比较的返回值必须从一个列表元素到下一个列表元素依次递增。
 
 ```kotlin
 
@@ -173,18 +173,18 @@ fun main() {
 }
 //sampleEnd
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-基于比较器和比较函数的二分搜索也可以针对列表范围执行。
+基于 comparator 和 comparison 的二分查找同样可以在列表的特定范围内执行。
 
-## List 写入操作 {id="list-write-operations"}
+## 列表写操作 {id="list-write-operations"}
 
-除了 [集合写入操作](collection-write.md) 中描述的集合修改操作外，[可变](collections-overview.md#collection-types) 列表还支持特定的写入操作。
-此类操作使用索引访问元素，从而扩展了列表修改功能。
+除[集合写操作](collection-write.md)中描述的集合修改操作之外，[可变](collections-overview.md#collection-types)列表还支持特有的写操作。
+这些操作通过使用索引访问元素来扩展列表的修改能力。
 
 ### 添加 {id="add"}
 
-要将元素添加到列表中的特定位置，请使用 [`add()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-list/add.html) 和 [`addAll()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/add-all.html)，并将元素插入位置作为额外实参提供。
+要将元素添加到列表中的特定位置，请使用 [`add()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-list/add.html) 和 [`addAll()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/add-all.html)，并将元素插入的位置作为额外实参提供。
 该位置之后的所有元素都会向右移动。
 
 ```kotlin
@@ -198,11 +198,11 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
 ### 更新 {id="update"}
 
-列表还提供了一个函数来替换给定位置的元素 - [`set()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-list/set.html) 及其运算符形式 `[]`。`set()` 不会改变其他元素的索引。
+列表还提供了一个用于替换指定位置元素的函数——[`set()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-list/set.html) 及其运算符形式 `[]`。`set()` 不会改变其他元素的索引。
 
 ```kotlin
 
@@ -214,9 +214,9 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-[`fill()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/fill.html) 简单地将所有集合元素替换为指定的值。
+[`fill()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/fill.html) 会将集合中的所有元素直接替换为指定的值。
 
 ```kotlin
 
@@ -228,12 +228,12 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-### 删除 {id="remove"}
+### 移除 {id="remove"}
 
-要从列表中的特定位置删除元素，请使用 [`removeAt()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-list/remove-at.html) 函数，并将位置作为实参提供。
-被删除元素之后的所有元素的索引都将减 1。
+要从列表中移除特定位置的元素，请使用 [`removeAt()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-list/remove-at.html) 函数，并将该位置作为实参提供。
+被移除元素之后的所有元素的索引都会减 1。
 
 ```kotlin
 
@@ -245,22 +245,22 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
 ### 排序 {id="sort"}
 
-在 [集合排序](collection-ordering.md) 中，我们描述了以特定顺序检索集合元素的操作。
-对于可变列表，标准库提供了类似的扩展函数，可以在原地执行相同的排序操作。
-当您对列表实例应用此类操作时，它会改变该特定实例中的元素顺序。
+在[集合排序](collection-ordering.md)中，我们介绍了按特定顺序检索集合元素的操作。
+对于可变列表，标准库提供了类似的扩展函数，用于就地执行相同的排序操作。
+当你对一个列表实例应用此类操作时，它会直接改变该实例中元素的顺序。
 
-原地排序函数的名称与适用于只读列表的函数名称类似，但没有 `ed/d` 后缀：
+就地排序函数的名称与适用于只读列表的函数类似，但没有 `ed/d` 后缀：
 
-* 所有排序函数名称中的 `sort*` 而不是 `sorted*`：[`sort()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/sort.html)、[`sortDescending()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/sort-descending.html)、[`sortBy()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/sort-by.html) 等。
-* [`shuffle()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/shuffle.html) 而不是 `shuffled()`。
-* [`reverse()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/reverse.html) 而不是 `reversed()`。
+* 所有排序函数名称中使用 `sort*` 代替 `sorted*`：[`sort()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/sort.html)、[`sortDescending()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/sort-descending.html)、[`sortBy()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/sort-by.html) 等。
+* 使用 [`shuffle()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/shuffle.html) 代替 `shuffled()`。
+* 使用 [`reverse()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/reverse.html) 代替 `reversed()`。
 
-对可变列表调用的 [`asReversed()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/as-reversed.html) 返回另一个可变列表，该列表是原始列表的反转视图。该视图中的更改会反映在原始列表中。
-以下示例显示了可变列表的排序函数：
+在可变列表上调用 [`asReversed()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/as-reversed.html) 会返回另一个可变列表，它是原始列表的反转视图。该视图中的更改会反映在原始列表中。
+以下示例展示了可变列表的排序函数：
 
 ```kotlin
 
@@ -289,4 +289,4 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}

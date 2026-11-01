@@ -6,59 +6,68 @@
 <var name="plugin_name" value="ContentNegotiation"/>
 <var name="package_name" value="io.ktor.server.plugins.contentnegotiation"/>
 <var name="artifact_name" value="ktor-server-content-negotiation"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.server.contentNegotiation"/>
 
 <tldr>
 <p>
-<b>必需的依赖项</b>：<code>io.ktor:%artifact_name%</code>
+<b>所需依赖项</b>: <code>io.ktor:%artifact_name%</code>
 </p>
 <var name="example_name" value="json-kotlinx"/>
 <p>
-    <b>代码示例</b>：
+    <b>代码示例</b>:
     <a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/%example_name%">
         %example_name%
     </a>
 </p>
 <p>
-    <b><Links href="/ktor/server-native" summary="Ktor 支持 Kotlin/Native，允许您在无需额外运行时或虚拟机的情况下运行服务器。">原生服务器</Links>支持</b>：✅
+    <b><Links href="server-native.md" summary="Ktor 支持 Kotlin/Native，允许您在无需额外运行时或虚拟机的情况下运行服务器。">原生服务器</Links>支持</b>: ✅
 </p>
 </tldr>
 
 <link-summary>
-ContentNegotiation 插件有两个主要用途：在客户端与服务器之间协商媒体类型，以及以特定格式序列化/反序列化内容。
+ContentNegotiation 插件有两个主要用途：在客户端和服务器之间协商媒体类型，以及以特定格式序列化/反序列化内容。
 </link-summary>
 
 [ContentNegotiation](https://api.ktor.io/ktor-server-content-negotiation/io.ktor.server.plugins.contentnegotiation/-content-negotiation.html) 插件有两个主要用途：
-* 在客户端与服务器之间协商媒体类型。为此，它使用 `Accept` 和 `Content-Type` 标头。
+* 在客户端和服务器之间协商媒体类型。为此，它使用 `Accept` 和 `Content-Type` 标头。
 * 以特定格式序列化/反序列化内容。Ktor 开箱即用支持以下格式：JSON、XML、CBOR 和 ProtoBuf。
 
-> 在客户端，Ktor 提供了 [ContentNegotiation](client-serialization.md) 插件用于序列化/反序列化内容。
+> 在客户端上，Ktor 提供了用于序列化/反序列化内容的 [ContentNegotiation](client-serialization.md) 插件。
 
 ## 添加依赖项 {id="add_dependencies"}
 
 ### ContentNegotiation {id="add_content_negotiation_dependency"}
 
 <p>
-    要使用 <code>%plugin_name%</code>，您需要在构建脚本中包含 <code>%artifact_name%</code> 构件：
+    要使用 <code>%plugin_name%</code>，请将 <code>%artifact_name%</code> 工件添加到您的构建脚本中：
 </p>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上述代码段使用 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 版本目录 (version catalog)</a> 来指定 Ktor 依赖项。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上述代码段使用 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 版本目录 (version catalog)</a> 来指定 Ktor 依赖项。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
     </TabItem>
 </Tabs>
 
-请注意，特定格式的序列化程序需要额外的构件。例如，kotlinx.serialization 需要 `ktor-serialization-kotlinx-json` 依赖项来处理 JSON。
+请注意，特定格式的序列化器需要额外的工件。例如，kotlinx.serialization 处理 JSON 需要 `ktor-serialization-kotlinx-json` 依赖项。
 
 ### 序列化 {id="serialization_dependency"}
 
 <snippet id="add_serialization_dependency">
 
-在使用 kotlinx.serialization 转换器之前，您需要按照 [安装 (Setup)](https://github.com/Kotlin/kotlinx.serialization#setup) 部分的说明添加 Kotlin 序列化插件。
+在使用 kotlinx.serialization 转换器之前，您需要按照 [Setup](https://github.com/Kotlin/kotlinx.serialization#setup) 部分中的说明添加 Kotlin 序列化插件。
 
 #### JSON {id="add_json_dependency"}
 
@@ -67,15 +76,24 @@ ContentNegotiation 插件有两个主要用途：在客户端与服务器之间�
 <Tabs group="json-libraries">
 <TabItem title="kotlinx.serialization" group-key="kotlinx">
 
-在构建脚本中添加 `ktor-serialization-kotlinx-json` 构件：
+在构建脚本中添加 `ktor-serialization-kotlinx-json` 工件：
 
 <var name="artifact_name" value="ktor-serialization-kotlinx-json"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.serialization.kotlinx.json"/>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上述代码段使用 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 版本目录 (version catalog)</a> 来指定 Ktor 依赖项。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上述代码段使用 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 版本目录 (version catalog)</a> 来指定 Ktor 依赖项。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
@@ -85,15 +103,24 @@ ContentNegotiation 插件有两个主要用途：在客户端与服务器之间�
 </TabItem>
 <TabItem title="Gson" group-key="gson">
 
-在构建脚本中添加 `ktor-serialization-gson` 构件：
+在构建脚本中添加 `ktor-serialization-gson` 工件：
 
 <var name="artifact_name" value="ktor-serialization-gson"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.serialization.gson"/>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上述代码段使用 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 版本目录 (version catalog)</a> 来指定 Ktor 依赖项。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上述代码段使用 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 版本目录 (version catalog)</a> 来指定 Ktor 依赖项。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
@@ -103,15 +130,24 @@ ContentNegotiation 插件有两个主要用途：在客户端与服务器之间�
 </TabItem>
 <TabItem title="Jackson" group-key="jackson">
 
-在构建脚本中添加 `ktor-serialization-jackson` 构件：
+在构建脚本中添加 `ktor-serialization-jackson` 工件：
 
 <var name="artifact_name" value="ktor-serialization-jackson"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.serialization.jackson"/>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上述代码段使用 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 版本目录 (version catalog)</a> 来指定 Ktor 依赖项。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上述代码段使用 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 版本目录 (version catalog)</a> 来指定 Ktor 依赖项。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
@@ -126,12 +162,21 @@ ContentNegotiation 插件有两个主要用途：在客户端与服务器之间�
 要序列化/反序列化 XML，请在构建脚本中添加 `ktor-serialization-kotlinx-xml`：
 
 <var name="artifact_name" value="ktor-serialization-kotlinx-xml"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.serialization.kotlinx.xml"/>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上述代码段使用 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 版本目录 (version catalog)</a> 来指定 Ktor 依赖项。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上述代码段使用 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 版本目录 (version catalog)</a> 来指定 Ktor 依赖项。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
@@ -143,12 +188,21 @@ ContentNegotiation 插件有两个主要用途：在客户端与服务器之间�
 要序列化/反序列化 CBOR，请在构建脚本中添加 `ktor-serialization-kotlinx-cbor`：
 
 <var name="artifact_name" value="ktor-serialization-kotlinx-cbor"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.serialization.kotlinx.cbor"/>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上述代码段使用 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 版本目录 (version catalog)</a> 来指定 Ktor 依赖项。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上述代码段使用 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 版本目录 (version catalog)</a> 来指定 Ktor 依赖项。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
@@ -160,12 +214,21 @@ ContentNegotiation 插件有两个主要用途：在客户端与服务器之间�
 要序列化/反序列化 ProtoBuf，请在构建脚本中添加 `ktor-serialization-kotlinx-protobuf`：
 
 <var name="artifact_name" value="ktor-serialization-kotlinx-protobuf"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.serialization.kotlinx.protobuf"/>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上述代码段使用 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 版本目录 (version catalog)</a> 来指定 Ktor 依赖项。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上述代码段使用 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 版本目录 (version catalog)</a> 来指定 Ktor 依赖项。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
@@ -177,15 +240,16 @@ ContentNegotiation 插件有两个主要用途：在客户端与服务器之间�
 ## 安装 ContentNegotiation {id="install_plugin"}
 
 <p>
-    要将 <code>%plugin_name%</code> 插件安装到应用程序，请将其传递给指定<Links href="/ktor/server-modules" summary="模块允许您通过对路由进行分组来构建应用程序结构。">模块</Links>中的 <code>install</code> 函数。
-    下面的代码片段展示了如何安装 <code>%plugin_name%</code> ...
+    要将 <code>%plugin_name%</code> 插件<a href="server-plugins.md#install">安装</a>到应用程序中，
+    请将其传递给指定<Links href="server-modules.md" summary="模块允许您通过对路由进行分组来构建应用程序结构。">模块</Links>中的 <code>install</code> 函数。
+    以下示例展示了如何安装 <code>%plugin_name%</code>：
 </p>
 <list>
     <li>
-        ... 在 <code>embeddedServer</code> 函数调用内部。
+        在 <code>embeddedServer()</code> 函数调用中。
     </li>
     <li>
-        ... 在显式定义的 <code>module</code> 内部，该模块是 <code>Application</code> 类的扩展函数。
+        在 <code>Application</code> 类上显式定义的 <code>module()</code> 扩展函数中。
     </li>
 </list>
 <Tabs>
@@ -197,16 +261,16 @@ ContentNegotiation 插件有两个主要用途：在客户端与服务器之间�
     </TabItem>
 </Tabs>
 
-## 配置序列化程序 {id="configure_serializer"}
+## 配置序列化器 {id="configure_serializer"}
 
-Ktor 开箱即用支持以下格式：[JSON](#register_json)、[XML](#register_xml)、[CBOR](#register_cbor)。您还可以实现自己的自定义序列化程序。
+Ktor 开箱即用支持以下格式：[JSON](#register_json)、[XML](#register_xml)、[CBOR](#register_cbor)。您还可以实现自己的自定义序列化器。
 
-### JSON 序列化程序 {id="register_json"}
+### JSON 序列化器 {id="register_json"}
 
 <Tabs group="json-libraries">
 <TabItem title="kotlinx.serialization" group-key="kotlinx">
 
-要在应用程序中注册 JSON 序列化程序，请调用 `json` 方法：
+要在应用程序中注册 JSON 序列化器，请调用 `json` 方法：
 ```kotlin
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
@@ -230,7 +294,7 @@ install(ContentNegotiation) {
 </TabItem>
 <TabItem title="Gson" group-key="gson">
 
-要在应用程序中注册 Gson 序列化程序，请调用 `gson` 方法：
+要在应用程序中注册 Gson 序列化器，请调用 `gson` 方法：
 ```kotlin
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.serialization.gson.*
@@ -254,7 +318,7 @@ install(ContentNegotiation) {
 </TabItem>
 <TabItem title="Jackson" group-key="jackson">
 
-要在应用程序中注册 Jackson 序列化程序，请调用 `jackson` 方法：
+要在应用程序中注册 Jackson 序列化器，请调用 `jackson` 方法：
 
 ```kotlin
 import io.ktor.server.plugins.contentnegotiation.*
@@ -273,8 +337,7 @@ install(ContentNegotiation) {
         configure(SerializationFeature.INDENT_OUTPUT, true)
         setDefaultPrettyPrinter(DefaultPrettyPrinter().apply {
             indentArraysWith(DefaultPrettyPrinter.FixedSpaceIndenter.instance)
-            indentObjectsWith(DefaultIndenter("  ", "
-"))
+            indentObjectsWith(DefaultIndenter("  ", "\n"))
         })
         registerModule(JavaTimeModule())  // 支持 java.time.* 类型
     }
@@ -284,9 +347,9 @@ install(ContentNegotiation) {
 </TabItem>
 </Tabs>
 
-### XML 序列化程序 {id="register_xml"}
+### XML 序列化器 {id="register_xml"}
 
-要在应用程序中注册 XML 序列化程序，请调用 `xml` 方法：
+要在应用程序中注册 XML 序列化器，请调用 `xml` 方法：
 ```kotlin
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.xml.*
@@ -311,8 +374,8 @@ install(ContentNegotiation) {
 }
 ```
 
-### CBOR 序列化程序 {id="register_cbor"}
-要在应用程序中注册 CBOR 序列化程序，请调用 `cbor` 方法：
+### CBOR 序列化器 {id="register_cbor"}
+要在应用程序中注册 CBOR 序列化器，请调用 `cbor` 方法：
 ```kotlin
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.cbor.*
@@ -336,8 +399,8 @@ install(ContentNegotiation) {
 }
 ```
 
-### ProtoBuf 序列化程序 {id="register_protobuf"}
-要在应用程序中注册 ProtoBuf 序列化程序，请调用 `protobuf` 方法：
+### ProtoBuf 序列化器 {id="register_protobuf"}
+要在应用程序中注册 ProtoBuf 序列化器，请调用 `protobuf` 方法：
 ```kotlin
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.protobuf.*
@@ -361,9 +424,9 @@ install(ContentNegotiation) {
 }
 ```
 
-### 自定义序列化程序 {id="register_custom"}
+### 自定义序列化器 {id="register_custom"}
 
-要为指定的 `Content-Type` 注册自定义序列化程序，您需要调用 `register` 方法。在下面的示例中，注册了两个[自定义序列化程序](#implement_custom_serializer)来反序列化 `application/json` 和 `application/xml` 数据：
+要为指定的 `Content-Type` 注册自定义序列化器，需要调用 `register` 方法。在下面的示例中，注册了两个[自定义序列化器](#implement_custom_serializer)来反序列化 `application/json` 和 `application/xml` 数据：
 
 ```kotlin
 install(ContentNegotiation) {
@@ -372,7 +435,7 @@ install(ContentNegotiation) {
 }
 ```
 
-## 接收与发送数据 {id="receive_send_data"}
+## 接收和发送数据 {id="receive_send_data"}
 
 ### 创建数据类 {id="create_data_class"}
 要将接收到的数据反序列化为对象，您需要创建一个数据类，例如：
@@ -380,7 +443,7 @@ install(ContentNegotiation) {
 data class Customer(val id: Int, val firstName: String, val lastName: String)
 ```
 
-如果您使用 kotlinx.serialization，请确保该类具有 `@Serializable` 注解：
+如果您使用 kotlinx.serialization，请确保该类带有 `@Serializable` 注解：
 ```kotlin
 import kotlinx.serialization.*
 @Serializable
@@ -392,13 +455,13 @@ data class Customer(val id: Int, val firstName: String, val lastName: String)
 kotlinx.serialization 库支持以下类型的序列化/反序列化：
 
 - [内置类](https://github.com/Kotlin/kotlinx.serialization/blob/master/docs/builtin-classes.md)
-- [序列 (Sequences)](https://kotlinlang.org/docs/sequences.html) 的反序列化
-- [流 (Flows)](https://kotlinlang.org/docs/flow.html) 的序列化
+- [Sequence](https://kotlinlang.org/docs/sequences.html) 的反序列化
+- [Flow](https://kotlinlang.org/docs/flow.html) 的序列化
 
 </snippet>
 
 ### 接收数据 {id="receive_data"}
-要接收并转换请求内容，请调用接受数据类作为参数的 `receive` 方法：
+要接收并转换请求的内容，请调用接受数据类作为形参的 `receive` 方法：
 ```kotlin
 
         post("/customer") {
@@ -407,7 +470,7 @@ kotlinx.serialization 库支持以下类型的序列化/反序列化：
             call.respondText("Customer stored correctly", status = HttpStatusCode.Created)
 ```
 
-请求的 `Content-Type` 将被用于选择[序列化程序](#configure_serializer)以处理请求。下面的示例展示了一个示例 [HTTP 客户端](https://www.jetbrains.com/help/idea/http-client-in-product-code-editor.html)请求，其中包含在服务器端转换为 `Customer` 对象的 JSON 或 XML 数据：
+请求的 `Content-Type` 将用于选择处理该请求的[序列化器](#configure_serializer)。以下示例展示了一个包含 JSON 或 XML 数据的示例 [HTTP 客户端](https://www.jetbrains.com/help/idea/http-client-in-product-code-editor.html)请求，该数据会在服务器端转换为 `Customer` 对象：
 
 <Tabs>
 <TabItem title="JSON">
@@ -440,7 +503,7 @@ Content-Type: application/xml
 您可以在此处找到完整示例：[json-kotlinx](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/json-kotlinx)。
 
 ### 发送数据 {id="send_data"}
-要在响应中传递数据对象，您可以使用 `respond` 方法：
+要在响应中传递数据对象，可以使用 `respond` 方法：
 ```kotlin
 routing {
     get("/customer/{id}") {
@@ -449,15 +512,15 @@ routing {
         call.respond(customer)
 ```
 
-在这种情况下，Ktor 使用 `Accept` 标头来选择所需的[序列化程序](#configure_serializer)。您可以在此处找到完整示例：[json-kotlinx](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/json-kotlinx)。
+在这种情况下，Ktor 使用 `Accept` 标头来选择所需的[序列化器](#configure_serializer)。您可以在此处找到完整示例：[json-kotlinx](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/json-kotlinx)。
 
-## 实现自定义序列化程序 {id="implement_custom_serializer"}
+## 实现自定义序列化器 {id="implement_custom_serializer"}
 
-在 Ktor 中，您可以编写自己的[序列化程序](#configure_serializer)来序列化/反序列化数据。为此，您需要实现 [ContentConverter](https://api.ktor.io/ktor-serialization/io.ktor.serialization/-content-converter/index.html) 接口：
+在 Ktor 中，您可以编写自己的[序列化器](#configure_serializer)来序列化/反序列化数据。为此，您需要实现 [ContentConverter](https://api.ktor.io/ktor-serialization/io.ktor.serialization/-content-converter/index.html) 接口：
 ```kotlin
 interface ContentConverter {
     suspend fun serialize(contentType: ContentType, charset: Charset, typeInfo: TypeInfo, value: Any): OutgoingContent?
     suspend fun deserialize(charset: Charset, typeInfo: TypeInfo, content: ByteReadChannel): Any?
 }
 ```
-请查看 [GsonConverter](https://github.com/ktorio/ktor/blob/main/ktor-shared/ktor-serialization/ktor-serialization-gson/jvm/src/GsonConverter.kt) 类作为实现示例。
+请参阅 [GsonConverter](https://github.com/ktorio/ktor/blob/main/ktor-shared/ktor-serialization/ktor-serialization-gson/jvm/src/GsonConverter.kt) 类作为实现示例。

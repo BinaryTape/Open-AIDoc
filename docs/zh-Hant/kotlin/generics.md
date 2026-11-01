@@ -1,6 +1,6 @@
-[//]: # (title: 泛型：in, out, where)
+[//]: # (title: 泛型：in、out、where)
 
-Kotlin 中的類別可以具有型別參數，就像在 Java 中一樣：
+Kotlin 中的類別可以擁有型別參數，就像 Java 一樣：
 
 ```kotlin
 class Box<T>(t: T) {
@@ -8,48 +8,47 @@ class Box<T>(t: T) {
 }
 ```
 
-要建立此類類別的執行個體，只需提供型別引數：
+若要建立此類別的執行個體，只需提供型別引數：
 
 ```kotlin
 val box: Box<Int> = Box<Int>(1)
 ```
 
-如果編譯器可以從建構函式引數等內容推論出型別引數，則不需要明確指定它們：
+如果編譯器可以推論出型別引數（例如從建構函式引數中推論），則不需要明確指定它們：
 
 ```kotlin
-val box = Box(1) // 1 的型別為 Int，因此編譯器會推斷出它是 Box<Int>
+val box = Box(1) // 1 的型別為 Int，因此編譯器能推斷出它是 Box<Int>
 ```
 
-## 變異 (Variance) {id="variance"}
+## 差異 (Variance) {id="variance"}
 
-Java 型別系統中最棘手的面向之一是萬用字元型別 (wildcard types)（請參閱 [Java Generics FAQ](http://www.angelikalanger.com/GenericsFAQ/JavaGenericsFAQ.html)）。
-Kotlin 沒有這些。相反地，Kotlin 擁有宣告處變異 (declaration-site variance) 與型別投影 (type projections)。
+Java 型別系統中最棘手的層面之一是萬用字元型別（請參閱 [Java Generics FAQ](http://www.angelikalanger.com/GenericsFAQ/JavaGenericsFAQ.html)）。
+Kotlin 沒有這些。相反地，Kotlin 具備宣告處差異（declaration-site variance）與型別投影（type projection）。
 
-### Java 中的變異與萬用字元 {id="variance-and-wildcards-in-java"}
+### Java 中的差異與萬用字元 {id="variance-and-wildcards-in-java"}
 
 讓我們思考一下為什麼 Java 需要這些神秘的萬用字元。首先，Java 中的泛型型別是*不變的 (invariant)*，
-這意味著 `List<String>` *不是* `List<Object>` 的子型別。如果 `List` 不是*不變的*，它將
-不會比 Java 的陣列好到哪裡去，因為以下程式碼可以通過編譯，但在執行期會引發例外：
+這意味著 `List<String>` *不是* `List<Object>` 的子型別。如果 `List` 不是*不變的*，它就不會比 Java 的陣列好到哪裡去，因為以下程式碼雖然可以通過編譯，但在執行階段會引發例外狀況：
 
 ```java
 // Java
 List<String> strs = new ArrayList<String>();
 
-// Java 在編譯期會回報型別不符。
+// Java 在編譯期會在此回報型別不符。
 List<Object> objs = strs;
 
-// 如果沒有回報會發生什麼事？
-// 我們就能將一個 Integer 放入 String 串列中。
+// 如果沒有回報呢？
+// 我們就能夠將 Integer 放進 String 清單中。
 objs.add(1);
 
-// 然後在執行期，Java 會拋出
+// 然後在執行時期，Java 就會擲出
 // ClassCastException: Integer cannot be cast to String
 String s = strs.get(0); 
 ```
 
-Java 禁止此類行為以保證執行期安全。但這也產生了一些影響。例如，
+Java 禁止此類操作以確保執行時期的安全性。但這會帶來一些影響。例如，
 考慮 `Collection` 介面中的 `addAll()` 方法。這個方法的簽章是什麼？直覺上，
-你會這樣寫：
+您可能會這樣寫：
 
 ```java
 // Java
@@ -58,19 +57,19 @@ interface Collection<E> ... {
 }
 ```
 
-但這樣一來，你就無法執行以下操作（而這完全是安全的）：
+但如此一來，您將無法執行以下操作（而這完全是安全的）：
 
 ```java
 // Java
 
-// 使用 addAll 的原始宣告，以下內容將無法編譯：
+// 若使用 addAll 的單純宣告，下列程式碼將無法編譯：
 // Collection<String> 不是 Collection<Object> 的子型別
 void copyAll(Collection<Object> to, Collection<String> from) {
     to.addAll(from);
 }
 ```
 
-這就是為什麼 `addAll()` 實際的簽章如下：
+這就是為什麼 `addAll()` 的實際簽章如下：
 
 ```java
 // Java
@@ -79,38 +78,35 @@ interface Collection<E> ... {
 }
 ```
 
-*萬用字元型別引數* `? extends E` 表示此方法接受 `E` *或其子型別*的物件集合，而不僅僅是 `E` 本身。這意味著你可以安全地從 items 中*讀取* `E`（此集合的元素是 E 子類別的執行個體），但*不能寫入*
-到其中，因為你不知道哪些物件符合該未知的 `E` 子型別。
-作為此限制的回報，你獲得了所需的行為：`Collection<String>` *是* `Collection<? extends Object>` 的子型別。
-換句話說，帶有 *extends* 邊界（*上限*）的萬用字元使型別成為*協變的 (covariant)*。
+*萬用字元型別引數* `? extends E` 表示此方法接受由 `E` 的物件*或 `E` 的子型別*組成的集合，
+而不僅僅是 `E` 本身。這意味著您可以安全地從項目中*讀取* `E`
+（此集合的元素是 E 的子類別的執行個體），但*無法對其進行寫入*，
+因為您不知道有哪些物件符合 `E` 的該未知子型別。
+作為此限制的交換，您獲得了期望的行為：`Collection<String>` *是* `Collection<? extends Object>` 的子型別。
+換句話說，帶有 *extends* 界限（*上*界）的萬用字元使該型別具備*協變性 (covariant)*。
 
-理解這為何有效的關鍵其實很簡單：如果你只能從集合中*取出*項目，
-那麼使用 `String` 的集合並從中讀取 `Object` 是沒問題的。反之，如果你只能向集合中*放入*項目，
-那麼拿一個 `Object` 的集合並放入 `String` 也是可以的：在 Java 中有
-`List<? super String>`，它接受 `String` 或其任何父型別。
+理解其運作原理的關鍵相當簡單：如果您只能從集合中*取出*項目，
+那麼使用 `String` 的集合並從中讀取 `Object` 是完全沒有問題的。相反地，如果您只能將項目*放入*集合中，那麼取得一個 `Object` 的集合並將 `String` 放入其中也是可以的：Java 中有 `List<? super String>`，它接受 `String` 或其任何超型別。
 
-後者稱為*逆變性 (contravariance)*，你只能在 `List<? super String>` 上呼叫以 `String` 作為引數的方法
-（例如，你可以呼叫 `add(String)` 或 `set(int, String)`）。如果你在 `List<T>` 中呼叫回傳 `T` 的方法，
-你得到的不會是 `String`，而是一個 `Object`。
+後者稱為*逆變性 (contravariance)*，而且您只能在 `List<? super String>` 上呼叫以 `String` 作為引數的方法（例如，您可以呼叫 `add(String)` 或 `set(int, String)`）。如果您呼叫 `List<T>` 中傳回 `T` 的方法，您得到的不是 `String`，而是 `Object`。
 
-Joshua Bloch 在他的著作 [Effective Java, 3rd Edition](http://www.oracle.com/technetwork/java/effectivejava-136174.html) 中很好地解釋了這個問題
-（第 31 條：「使用受限萬用字元增加 API 靈活性」）。他將你只從中*讀取*的物件命名為*生產者 (Producers)*，將你只向其中*寫入*的物件命名為*消費者 (Consumers)*。他建議：
+Joshua Bloch 在其著作《[Effective Java, 3rd Edition](http://www.oracle.com/technetwork/java/effectivejava-136174.html)》中詳細解釋了這個問題（第 31 條：「使用有限制萬用字元增加 API 的靈活性」）。他將僅供*讀取*的物件稱為*生產者 (Producers)*，將僅供*寫入*的物件稱為*消費者 (Consumers)*。他建議：
 
 >「為了獲得最大的靈活性，請在代表生產者或消費者的輸入參數上使用萬用字元型別。」
 
-隨後他提出了以下助記詞：*PECS* 代表 *Producer-Extends, Consumer-Super*。
+接著他提出了以下記憶口訣：*PECS* 代表 *Producer-Extends, Consumer-Super*（生產者對應 extends，消費者對應 super）。
 
-> 如果你使用一個生產者物件，例如 `List<? extends Foo>`，你不被允許在此物件上呼叫 `add()` 或 `set()`，
-> 但這並不代表它是*不可變的 (immutable)*：例如，沒什麼能阻止你呼叫 `clear()`
-> 來移除串列中的所有項目，因為 `clear()` 完全不帶任何參數。
+> 如果您使用生產者物件，例如 `List<? extends Foo>`，您不能在此物件上呼叫 `add()` 或 `set()`，
+> 但這並不意味著它是*不可變的 (immutable)*：例如，沒有任何規定能阻止您呼叫 `clear()`
+> 來移除清單中的所有項目，因為 `clear()` 完全不需要任何參數。
 >
-> 萬用字元（或其他類型的變異）唯一保證的是*型別安全*。不可變性則是完全不同的另一回事。
+> 萬用字元（或其他型別的差異）唯一保證的是*型別安全*。不可變性則是完全不同的另一回事。
 >
 {style="note"}
 
-### 宣告處變異 (Declaration-site variance) {id="declaration-site-variance"}
+### 宣告處差異 {id="declaration-site-variance"}
 
-假設有一個泛型介面 `Source<T>`，它沒有任何以 `T` 作為參數的方法，只有回傳 `T` 的方法：
+假設有一個泛型介面 `Source<T>`，它沒有任何以 `T` 作為參數的方法，只有傳回 `T` 的方法：
 
 ```java
 // Java
@@ -119,23 +115,24 @@ interface Source<T> {
 }
 ```
 
-那麼，將 `Source<String>` 執行個體的參考儲存在 `Source<Object>` 型別的變數中應該是完全安全的 —— 因為沒有消費者方法可以呼叫。但 Java 並不知道這一點，仍然禁止這樣做：
+那麼，將 `Source<String>` 執行個體的參考儲存在型別為 `Source<Object>` 的變數中是完全安全的——因為沒有任何消費者方法可供呼叫。但 Java 並不知道這一點，仍然禁止這樣做：
 
 ```java
 // Java
 void demo(Source<String> strs) {
-    Source<Object> objects = strs; // !!! Java 中不允許
+    Source<Object> objects = strs; // !!! 在 Java 中不允許
     // ...
 }
 ```
 
-為了解決這個問題，你必須宣告型別為 `Source<? extends Object>` 的物件。這樣做毫無意義，
-因為你可以在此類變數上呼叫與以前完全相同的所有方法，所以更複雜的型別並沒有帶來額外的價值。
-但編譯器並不知道這一點。
+若要修復此問題，您必須宣告型別為 `Source<? extends Object>` 的物件。但這樣做毫無意義，
+因為您在該變數上能呼叫的方法與之前完全相同，更複雜的型別並沒有帶來任何附加價值。
+只是編譯器並不知道這一點。
 
-在 Kotlin 中，有一種方法可以向編譯器解釋這類事情。這稱為*宣告處變異*：
-你可以對 `Source` 的*型別參數* `T` 加上註解，以確保它僅從 `Source<T>` 的成員中*回傳*（生產），而從不被消費。
-為此，請使用 `out` 修飾詞：
+在 Kotlin 中，有一種方法可以向編譯器解釋這種情況。這稱為*宣告處差異 (declaration-site variance)*：
+您可以對 `Source` 的*型別參數* `T` 加上註解，以確保它只會由 `Source<T>` 的成員*傳回*（生產），
+而絕不會被消費。
+若要達成此目的，請使用 `out` 修飾詞：
 
 ```kotlin
 interface Source<out T> {
@@ -143,22 +140,20 @@ interface Source<out T> {
 }
 
 fun demo(strs: Source<String>) {
-    val objects: Source<Any> = strs // 這是可以的，因為 T 是一個 out-參數
+    val objects: Source<Any> = strs // 這是可行的，因為 T 是一個 out 參數
     // ...
 }
 ```
 
-一般規則是：當類別 `C` 的型別參數 `T` 被宣告為 `out` 時，它只能出現在 `C` 成員的 *out* 位置，但作為回報，`C<Base>` 可以安全地作為 `C<Derived>` 的父型別。
+一般規則如下：當類別 `C` 的型別參數 `T` 被宣告為 `out` 時，它只能出現在 `C` 成員的 *out* 位置，但作為回報，`C<Base>` 可以安全地成為 `C<Derived>` 的超型別。
 
-換句話說，你可以說類別 `C` 在參數 `T` 上是*協變的*，或者 `T` 是一個*協變*型別參數。
-你可以將 `C` 視為 `T` 的*生產者*，而不是 `T` 的*消費者*。
+換句話說，您可以說類別 `C` 在參數 `T` 上是*協變的 (covariant)*，或者說 `T` 是一個*協變*型別參數。
+您可以將 `C` 視為 `T` 的*生產者*，而*不是* `T` 的*消費者*。
 
-`out` 修飾詞被稱為*變異註解*，由於它是在型別參數宣告處提供的，
-因此它提供了*宣告處變異*。
-這與 Java 的*使用處變異*形成對比，在 Java 中，型別使用處的萬用字元使型別變為協變。
+`out` 修飾詞被稱為*差異註解 (variance annotation)*，因為它是在型別參數的宣告處提供，所以提供了*宣告處差異*。
+這與 Java 的*使用處差異 (use-site variance)* 形成對比，在 Java 中是透過型別使用時的萬用字元使型別具備協變性。
 
-除了 `out` 之外，Kotlin 還提供了一個互補的變異註解：`in`。它使型別參數變為*逆變的 (contravariant)*，這意味著
-它只能被消費而不能被生產。逆變型別的一個很好的例子是 `Comparable`：
+除了 `out` 之外，Kotlin 還提供了一個互補的差異註解：`in`。它使型別參數*逆變 (contravariant)*，意味著它只能被消費，而絕不能被生產。逆變型別的一個良好範例是 `Comparable`：
 
 ```kotlin
 interface Comparable<in T> {
@@ -166,24 +161,23 @@ interface Comparable<in T> {
 }
 
 fun demo(x: Comparable<Number>) {
-    x.compareTo(1.0) // 1.0 的型別是 Double，它是 Number 的子型別
-    // 因此，你可以將 x 指派給 Comparable<Double> 型別的變數
-    val y: Comparable<Double> = x // OK!
+    x.compareTo(1.0) // 1.0 的型別為 Double，它是 Number 的子型別
+    // 因此，您可以將 x 指派給型別為 Comparable<Double> 的變數
+    val y: Comparable<Double> = x // 正確！
 }
 ```
 
-`in` 和 `out` 這兩個詞似乎不言自明（因為它們已在 C# 中成功使用相當長一段時間），
-因此上述的助記詞其實不再需要。事實上，它可以在更高層次的抽象上重新表述：
+*in* 和 *out* 這兩個字詞似乎不言自明（因為它們已經在 C# 中成功使用相當長一段時間），因此實際上不需要上述的口訣。事實上，它可以在更高的抽象層次上重新詮釋：
 
-**[存在主義](https://en.wikipedia.org/wiki/Existentialism) 轉型：Consumer in, Producer out!** :-)
+**[存在主義](https://en.wikipedia.org/wiki/Existentialism)轉變：Consumer in, Producer out！（消費者 in，生產者 out！）** :-)
 
-## 型別投影 (Type projections) {id="type-projections"}
+## 型別投影 {id="type-projections"}
 
-### 使用處變異：型別投影 {id="use-site-variance-type-projections"}
+### 使用處差異：型別投影 {id="use-site-variance-type-projections"}
 
 將型別參數 `T` 宣告為 `out` 並避免在使用處出現子型別化問題非常容易，
-但有些類別實際上*無法*被限制為僅回傳 `T`！
-`Array` 就是一個很好的例子：
+但有些類別實際上*無法*被限制為僅傳回 `T`！
+`Array` 就是一個很好的範例：
 
 ```kotlin
 class Array<T>(val size: Int) {
@@ -192,7 +186,7 @@ class Array<T>(val size: Int) {
 }
 ```
 
-這個類別在 `T` 上既不能協變也不能逆變。而這造成了某些不靈活性。考慮以下函式：
+這個類別在 `T` 上既不能協變也不能逆變。這帶來了一定的僵化。考慮以下函式：
 
 ```kotlin
 fun copy(from: Array<Any>, to: Array<Any>) {
@@ -202,68 +196,62 @@ fun copy(from: Array<Any>, to: Array<Any>) {
 }
 ```
 
-這個函式應該是將項目從一個陣列複製到另一個陣列。讓我們嘗試在實作中應用它：
+此函式旨在將項目從一個陣列複製到另一個陣列。讓我們嘗試在實務中應用它：
 
 ```kotlin
 val ints: Array<Int> = arrayOf(1, 2, 3)
 val any = Array<Any>(3) { "" } 
 copy(ints, any)
-//   ^ 型別為 Array<Int> 但預期為 Array<Any>
+//   ^ 型別為 Array<Int>，但預期的是 Array<Any>
 ```
 
-在這裡，你遇到了同樣熟悉的問題：`Array<T>` 在 `T` 上是*不變的*，因此 `Array<Int>` 和 `Array<Any>`
-都不是對方的子型別。為什麼不呢？同樣地，這是因為 `copy` 可能會有預期之外的行為，例如，它可能會嘗試
-向 `from` 寫入一個 `String`，而如果你實際傳遞的是一個 `Int` 陣列，稍後將會拋出 `ClassCastException`。
+在這裡，您遇到了同樣熟悉的問題：`Array<T>` 在 `T` 上是*不變的 (invariant)*，因此 `Array<Int>` 和 `Array<Any>` 互不為子型別。為什麼不呢？這同樣是因為 `copy` 可能會有非預期的行為，例如它可能會嘗試向 `from` 寫入一個 `String`，而如果您實際上傳入的是 `Int` 陣列，之後就會擲出 `ClassCastException`。
 
-為了禁止 `copy` 函式向 `from` *寫入*，你可以這樣做：
+若要禁止 `copy` 函式*寫入* `from`，您可以執行以下操作：
 
 ```kotlin
 fun copy(from: Array<out Any>, to: Array<Any>) { ... }
 ```
 
-這就是*型別投影*，這意味著 `from` 不是一個簡單的陣列，而是一個受限（*被投影*）的陣列。
-你只能呼叫回傳型別參數 `T` 的方法，在這種情況下意味著你只能呼叫 `get()`。
-這是我們處理*使用處變異*的方法，它對應於 Java 的 `Array<? extends Object>`，但更為簡潔。
+這就是*型別投影 (type projection)*，這表示 `from` 不是一個單純的陣列，而是一個受到限制（*受投影*）的陣列。
+您只能呼叫傳回型別參數 `T` 的方法，在此情況下表示您只能呼叫 `get()`。
+這是我們處理*使用處差異*的方法，它對應於 Java 的 `Array<? extends Object>`，但更為簡潔。
 
-你也可以使用 `in` 來投影型別：
+您也可以使用 `in` 來投影型別：
 
 ```kotlin
 fun fill(dest: Array<in String>, value: String) { ... }
 ```
 
-`Array<in String>` 對應於 Java 的 `Array<? super String>`。這意味著你可以將 `String` 陣列、`CharSequence` 陣列
-或 `Object` 陣列傳遞給 `fill()` 函式。
+`Array<in String>` 對應於 Java 的 `Array<? super String>`。這意味著您可以將 `String`、`CharSequence` 或 `Object` 的陣列傳遞給 `fill()` 函式。
 
 ### 星號投影 (Star-projections) {id="star-projections"}
 
-有時你想要表示你對型別引數一無所知，但仍想以安全的方式使用它。
-這裡的安全方式是定義泛型型別的投影，使得該泛型型別的每個具體具現化都將是該投影的子型別。
+有時候您想表示對型別引數一無所知，但仍希望以安全的方式使用它。
+這裡的安全方式是為該泛型型別定義這樣一種投影：該泛型型別的每個具體具現化都將是該投影的子型別。
 
-Kotlin 為此提供了所謂的*星號投影*語法：
+Kotlin 為此提供了所謂的*星號投影 (star-projection)* 語法：
 
-- 對於 `Foo<out T : TUpper>`，其中 `T` 是一個協變型別參數，其上限為 `TUpper`，`Foo<*>`
-  等同於 `Foo<out TUpper>`。這意味著當 `T` 未知時，你可以安全地從 `Foo<*>` *讀取* `TUpper` 的值。
-- 對於 `Foo<in T>`，其中 `T` 是一個逆變型別參數，`Foo<*>` 等同於 `Foo<in Nothing>`。這意味著
-  當 `T` 未知時，沒有任何方式可以安全地*寫入*到 `Foo<*>`。
-- 對於 `Foo<T : TUpper>`，其中 `T` 是一個不變型別參數，其上限為 `TUpper`，`Foo<*>` 對於讀取值等同於
-  `Foo<out TUpper>`，而對於寫入值等同於 `Foo<in Nothing>`。
+- 對於 `Foo<out T : TUpper>`（其中 `T` 是上界為 `TUpper` 的協變型別參數），`Foo<*>` 等同於 `Foo<out TUpper>`。這意味著當 `T` 未知時，您可以安全地從 `Foo<*>` *讀取* `TUpper` 的值。
+- 對於 `Foo<in T>`（其中 `T` 是逆變型別參數），`Foo<*>` 等同於 `Foo<in Nothing>`。這意味著當 `T` 未知時，您無法以安全的方式向 `Foo<*>` *寫入*任何內容。
+- 對於 `Foo<T : TUpper>`（其中 `T` 是上界為 `TUpper` 的不變型別參數），`Foo<*>` 在讀取值時等同於 `Foo<out TUpper>`，而在寫入值時等同於 `Foo<in Nothing>`。
 
-如果一個泛型型別具有多個型別參數，則每個型別參數都可以獨立投影。
-例如，如果型別宣告為 `interface Function<in T, out U>`，你可以使用以下星號投影：
+如果泛型型別具有多個型別參數，則每個參數都可以獨立投影。
+例如，如果型別宣告為 `interface Function<in T, out U>`，您可以使用以下星號投影：
 
-* `Function<*, String>` 表示 `Function<in Nothing, String>`。
-* `Function<Int, *>` 表示 `Function<Int, out Any?>`。
-* `Function<*, *>` 表示 `Function<in Nothing, out Any?>`。
+* `Function<*, String>` 代表 `Function<in Nothing, String>`。
+* `Function<Int, *>` 代表 `Function<Int, out Any?>`。
+* `Function<*, *>` 代表 `Function<in Nothing, out Any?>`。
 
-> 星號投影非常類似於 Java 的原始型別 (raw types)，但是是安全的。
+> 星號投影非常類似於 Java 的原始型別（raw types），但更加安全。
 >
 {style="note"}
 
 ### 捕獲型別 (Captured types) {id="captured-types"}
 
-當你使用型別投影（例如 `out T` 或 `in T`）時，編譯器會在內部將未知的具體型別表示為一個 [捕獲型別 (captured type)](https://kotlinlang.org/spec/type-system.html#type-capturing)。捕獲型別是一種具有已知上限和下限的未知型別。
+當您使用型別投影（例如 `out T` 或 `in T`）時，編譯器會在內部將未知的具體型別表示為[*捕獲型別* (captured type)](https://kotlinlang.org/spec/type-system.html#type-capturing)。捕獲型別是具有已知上界與下界的未知型別。
 
-捕獲型別是不可直接表示的 (non-denotable)，因此你無法在 Kotlin 程式碼中直接撰寫它們。相反地，你最常在編譯器診斷資訊中看到捕獲型別，例如 `CapturedType(out X)`。例如，以下型別不符的診斷資訊包含了一個捕獲型別：
+捕獲型別是無法明確表示的（non-denotable），因此您無法在 Kotlin 程式碼中直接撰寫它們。相反地，您最常會在編譯器診斷訊息中看到捕獲型別，例如 `CapturedType(out X)`。例如，以下型別不符的診斷訊息包含了一個捕獲型別：
 
 ```kotlin
 val array: Array<out CharSequence> = arrayOf("str")
@@ -271,16 +259,17 @@ val item: Int = array.get(0)
 // Initializer type mismatch: expected 'Int', actual 'CapturedType(out CharSequence)'
 ```
 
-編譯器使用捕獲型別的上限來進行讀取操作，並使用其下限來確定哪些值對於寫入操作是型別安全的：
+編譯器在讀取操作時使用捕獲型別的上界，而在寫入操作時使用其下界來判斷哪些值是型別安全的：
 
 ```kotlin
 // 投影型別為 Array<out CharSequence>
 val array: Array<out CharSequence> = arrayOf("Kotlin")
 
-// get() 讀取操作使用捕獲型別的上限 CharSequence
+// get() 讀取操作使用捕獲型別的上界 CharSequence
 val item = array.get(0)
 
-// set() 寫入操作使用捕獲型別的下限 Nothing，這會導致錯誤
+// set() 寫入操作使用捕獲型別的下界 Nothing，
+// 這會導致錯誤
 array.set(0, "New value")
 // Receiver type 'Array<out CharSequence>' contains out projection
 // which prohibits the use of 'fun set(index: Int, value: T): Unit'
@@ -288,31 +277,31 @@ array.set(0, "New value")
 
 在此範例中：
 
-* 變數 `array` 具有投影型別 `Array<out CharSequence>`。編譯器將投影型別引數 `out CharSequence` 表示為一個以 `CharSequence` 為上限、`Nothing` 為下限的捕獲型別。
-* 對於 `get()` 操作，編譯器將捕獲型別近似為其上限 `CharSequence`，並將 `item` 的型別推論為 `CharSequence`。
-* 對於 `set()` 操作，捕獲型別的下限為 `Nothing`。由於 `Nothing` 沒有執行個體，因此向投影型別寫入值是不安全的，會導致錯誤。
+* 變數 `array` 具有投影型別 `Array<out CharSequence>`。編譯器將投影型別引數 `out CharSequence` 表示為捕獲型別，以 `CharSequence` 為其上界，`Nothing` 為其下界。
+* 對於 `get()` 操作，編譯器將捕獲型別近似為其上界 `CharSequence`，並推論出 `item` 的型別為 `CharSequence`。
+* 對於 `set()` 操作，捕獲型別以 `Nothing` 為其下界。由於 `Nothing` 沒有任何執行個體，因此向投影型別寫入值是不具型別安全性的，會導致錯誤。
 
 ## 泛型函式 {id="generic-functions"}
 
-不僅僅是類別可以擁有型別參數，函式也可以。型別參數放在函式名稱*之前*：
+類別不是唯一可以擁有型別參數的宣告。函式也可以。型別參數放置在函式名稱的*前面*：
 
 ```kotlin
 fun <T> singletonList(item: T): List<T> {
     // ...
 }
 
-fun <T> T.basicToString(): String { // 擴充方法
+fun <T> T.basicToString(): String { // 擴充函式
     // ...
 }
 ```
 
-要呼叫泛型函式，請在呼叫處的函式名稱*之後*指定型別引數：
+若要呼叫泛型函式，請在呼叫點的函式名稱*後面*指定型別引數：
 
 ```kotlin
 val l = singletonList<Int>(1)
 ```
 
-如果型別引數可以從上下文中推論出來，則可以省略，因此以下範例也可以運作：
+如果可以從上下文中推論出型別引數，則可以省略它們，因此以下範例也可以正常運作：
 
 ```kotlin
 val l = singletonList(1)
@@ -320,25 +309,25 @@ val l = singletonList(1)
 
 ## 泛型約束 {id="generic-constraints"}
 
-可以取代給定型別參數的所有可能型別的集合，可能會受到*泛型約束*的限制。
+可用於取代給定型別參數的所有可能型別的集合，可能會受到*泛型約束 (generic constraints)* 的限制。
 
-### 上限 (Upper bounds) {id="upper-bounds"}
+### 上界 {id="upper-bounds"}
 
-最常見的約束類型是*上限*，這對應於 Java 的 `extends` 關鍵字：
+最常見的約束型別是*上界 (upper bound)*，對應於 Java 的 `extends` 關鍵字：
 
 ```kotlin
 fun <T : Comparable<T>> sort(list: List<T>) {  ... }
 ```
 
-冒號後指定的型別即為*上限*，表示只有 `Comparable<T>` 的子型別可以取代 `T`。例如：
+冒號後指定的型別即為*上界*，表示只有 `Comparable<T>` 的子型別可以用來取代 `T`。例如：
 
 ```kotlin
-sort(listOf(1, 2, 3)) // OK。Int 是 Comparable<Int> 的子型別
+sort(listOf(1, 2, 3)) // 正確。Int 是 Comparable<Int> 的子型別
 sort(listOf(HashMap<Int, String>())) // 錯誤：HashMap<Int, String> 不是 Comparable<HashMap<Int, String>> 的子型別
 ```
 
-預設的上限（如果未指定）是 `Any?`。在角括號內只能指定一個上限。
-如果同一個型別參數需要多個上限，則需要一個單獨的 *where* 子句：
+預設的上界（若未指定）是 `Any?`。尖括號內只能指定一個上界。
+如果同一個型別參數需要多個上界，您需要獨立的 *where* 子句：
 
 ```kotlin
 fun <T> copyWhenGreater(list: List<T>, threshold: T): List<String>
@@ -348,19 +337,17 @@ fun <T> copyWhenGreater(list: List<T>, threshold: T): List<String>
 }
 ```
 
-傳遞的型別必須同時滿足 `where` 子句的所有條件。在上述範例中，`T` 型別
-必須*同時*實作 `CharSequence` 和 `Comparable`。
+傳入的型別必須同時滿足 `where` 子句的所有條件。在上述範例中，`T` 型別必須*同時*實作 `CharSequence` 和 `Comparable`。
 
-## 絕對不可為 null 型別 (Definitely non-nullable types) {id="definitely-non-nullable-types"}
+## 絕對非 null 型別 {id="definitely-non-nullable-types"}
 
-為了讓與泛型 Java 類別和介面的互通更加容易，Kotlin 支援將泛型型別參數宣告為
-**絕對不可為 null**。 
+為了使與泛型 Java 類別和介面的互通更加容易，Kotlin 支援將泛型型別參數宣告為**絕對非 null (definitely non-nullable)**。
 
-要將泛型型別 `T` 宣告為絕對不可為 null，請使用 `& Any` 宣告該型別。例如：`T & Any`。
+若要將泛型型別 `T` 宣告為絕對非 null，請使用 `& Any` 宣告該型別。例如：`T & Any`。
 
-絕對不可為 null 型別必須具有可為 null 的[上限](#upper-bounds)。
+絕對非 null 型別必須具有可為 null 的[上界](#upper-bounds)。
 
-宣告絕對不可為 null 型別最常見的使用案例是當你想要覆寫包含 `@NotNull` 作為引數的 Java 方法時。例如，考慮 `load()` 方法：
+宣告絕對非 null 型別最常見的使用案例，是當您想要覆寫包含 `@NotNull` 作為引數的 Java 方法時。例如，考慮 `load()` 方法：
 
 ```java
 import org.jetbrains.annotations.*;
@@ -372,58 +359,47 @@ public interface Game<T> {
 }
 ```
 
-要在 Kotlin 中成功覆寫 `load()` 方法，你需要將 `T1` 宣告為絕對不可為 null：
+要在 Kotlin 中成功覆寫 `load()` 方法，您需要將 `T1` 宣告為絕對非 null：
 
 ```kotlin
 interface ArcadeGame<T1> : Game<T1> {
     override fun save(x: T1): T1
-    // T1 是絕對不可為 null
+    // T1 是絕對非 null 的
     override fun load(x: T1 & Any): T1 & Any
 }
 ```
 
-當僅使用 Kotlin 開發時，你不太需要顯式宣告絕對不可為 null 型別，因為 
-Kotlin 的型別推論會為你處理好這一切。
+如果僅使用 Kotlin 開發，您不太需要明確宣告絕對非 null 型別，因為 Kotlin 的型別推論會為您處理好這件事。
 
-## 型別擦除 (Type erasure) {id="type-erasure"}
+## 型別消除 {id="type-erasure"}
 
-Kotlin 對泛型宣告使用所執行的型別安全檢查是在編譯期完成的。
-在執行期，泛型型別的執行個體不持有關於其實際型別引數的任何資訊。
-該型別資訊被稱為被*擦除*了。例如，`Foo<Bar>` 和 `Foo<Baz?>` 的執行個體都會被擦除為
-僅僅是 `Foo<*>`。
+Kotlin 針對泛型宣告使用情況所執行的型別安全檢查是在編譯期完成的。
+在執行時期，泛型型別的執行個體不會保留有關其實際型別引數的任何資訊。
+該型別資訊被稱為已被*消除 (erased)*。例如，`Foo<Bar>` 和 `Foo<Baz?>` 的執行個體都會被消除為僅僅是 `Foo<*>`。
 
 ### 泛型型別檢查與轉換 {id="generics-type-checks-and-casts"}
 
-由於型別擦除的存在，在執行期沒有通用的方法來檢查一個泛型型別的執行個體是否是使用某些型別引數建立的，
-且編譯器禁止此類 `is` 檢查，例如
-`ints is List<Int>` 或 `list is T`（型別參數）。但是，你可以針對星號投影型別檢查執行個體：
+由於型別消除，在執行時期沒有通用的方法可以檢查泛型型別的執行個體是否是使用特定型別引數建立的，且編譯器禁止諸如 `ints is List<Int>` 或 `list is T`（型別參數）之類的 `is` 檢查。但是，您可以針對星號投影型別來檢查執行個體：
 
 ```kotlin
 if (something is List<*>) {
-    something.forEach { println(it) } // 項目被視為 `Any?` 型別
+    something.forEach { println(it) } // 項目型別為 `Any?`
 }
 ```
 
-同樣地，當你已經靜態地（在編譯期）檢查過執行個體的型別引數時，
-你可以進行涉及該型別非泛型部分的 `is` 檢查或轉換。請注意，
-在這種情況下角括號會被省略：
+同樣地，當您已經在靜態（編譯期）檢查過執行個體的型別引數時，您可以進行涉及該型別非泛型部分的 `is` 檢查或轉換。請注意，在這種情況下會省略尖括號：
 
 ```kotlin
 fun handleStrings(list: MutableList<String>) {
     if (list is ArrayList) {
-        // `list` 會被智慧轉換為 `ArrayList<String>`
+        // `list` 智慧轉換為 `ArrayList<String>`
     }
 }
 ```
 
-省略型別引數的相同語法也可用於不考慮型別引數的轉換：`list as ArrayList`。
+相同的語法（但省略型別引數）可用於不考慮型別引數的轉換：`list as ArrayList`。
 
-泛型函式呼稱的型別引數也僅在編譯期檢查。在函式體內部，
-型別參數不能用於型別檢查，且轉換為型別參數的型別轉換 (`foo as T`) 是未經檢查的。
-唯一的例外是帶有[具現化型別參數](inline-functions.md#reified-type-parameters)的內嵌函式，
-它們的實際型別引數會在每個呼叫處被內嵌。這使得針對型別參數的型別檢查與轉換成為可能。
-然而，上述限制仍然適用於在檢查或轉換內部使用的泛型型別執行個體。
-例如，在型別檢查 `arg is T` 中，如果 `arg` 本身是泛型型別的執行個體，其型別引數仍然會被擦除。
+泛型函式呼叫的型別引數也僅在編譯期進行檢查。在函式主體內部，型別參數不能用於型別檢查，且轉換為型別參數的型別轉換（`foo as T`）是未受檢的 (unchecked)。唯一的例外是帶有[具體化型別參數](inline-functions.md#reified-type-parameters)的 inline 函式，它們會在每個呼叫點將其實際型別引數內嵌。這使得能夠對型別參數進行型別檢查和轉換。然而，上述限制仍然適用於在檢查或轉換內部使用的泛型型別執行個體。例如，在型別檢查 `arg is T` 中，如果 `arg` 本身就是泛型型別的執行個體，它的型別引數仍然會被消除。
 
 ```kotlin
 //sampleStart
@@ -437,7 +413,7 @@ val somePair: Pair<Any?, Any?> = "items" to listOf(1, 2, 3)
 val stringToSomething = somePair.asPairOf<String, Any>()
 val stringToInt = somePair.asPairOf<String, Int>()
 val stringToList = somePair.asPairOf<String, List<*>>()
-val stringToStringList = somePair.asPairOf<String, List<String>>() // 可編譯但會破壞型別安全！
+val stringToStringList = somePair.asPairOf<String, List<String>>() // 可編譯但破壞了型別安全！
 // 展開範例以查看更多詳細資訊
 
 //sampleEnd
@@ -447,40 +423,34 @@ fun main() {
     println("stringToInt = " + stringToInt)
     println("stringToList = " + stringToList)
     println("stringToStringList = " + stringToStringList)
-    //println(stringToStringList?.second?.forEach() {it.length}) // 這會拋出 ClassCastException，因為串列項目不是 String
+    //println(stringToStringList?.second?.forEach() {it.length}) // 這將擲出 ClassCastException，因為清單項目不是 String
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-### 未經檢查的轉換 (Unchecked casts) {id="unchecked-casts"}
+### 未受檢轉換 {id="unchecked-casts"}
 
-針對具有具體型別引數的泛型型別轉換（例如 `foo as List<String>`）在執行期無法進行檢查。  
-當高層級程式邏輯隱含了型別安全，但編譯器無法直接推論時，
-可以使用這些未經檢查的轉換。請參閱下面的範例。
+轉換為具有具體型別引數的泛型型別（例如 `foo as List<String>`）無法在執行時期進行檢查。  
+當高階程式邏輯隱含了型別安全，但編譯器無法直接推論時，可以使用這些未受檢轉換。請參閱以下範例。
 
 ```kotlin
 fun readDictionary(file: File): Map<String, *> = file.inputStream().use { 
-    TODO("讀取字串到任意元素的映射。")
+    TODO("Read a mapping of strings to arbitrary elements.")
 }
 
-// 我們在這個檔案中儲存了一個帶有 `Int` 的映射
+// 我們將包含 `Int` 的 Map 儲存到此檔案中
 val intsFile = File("ints.dictionary")
 
-// 警告：未經檢查的轉換：從 `Map<String, *>` 到 `Map<String, Int>`
+// 警告：Unchecked cast: `Map<String, *>` to `Map<String, Int>`
 val intsDictionary: Map<String, Int> = readDictionary(intsFile) as Map<String, Int>
 ```
-最後一行的轉換會出現警告。編譯器無法在執行期完全檢查它，
-且無法保證映射中的值都是 `Int`。
+最後一行的轉換會出現警告。編譯器無法在執行時期對其進行完整檢查，且不保證 Map 中的值為 `Int`。
 
-為了避免未經檢查的轉換，你可以重新設計程式結構。在上面的範例中，你可以使用
-`DictionaryReader<T>` 和 `DictionaryWriter<T>` 介面，並為不同型別提供型別安全的實作。
-你可以引入合理的抽象，將未經檢查的轉換從呼叫處移至實作細節中。
-正確使用[泛型變異](#variance)也會有所幫助。
+若要避免未受檢轉換，您可以重新設計程式結構。在上述範例中，您可以針對不同型別使用具有型別安全實作的 `DictionaryReader<T>` 和 `DictionaryWriter<T>` 介面。您可以引進合理的抽象化，將未受檢轉換從呼叫點轉移到實作細節中。正確使用[泛型差異](#variance)也能有所幫助。
 
-對於泛型函式，使用[具現化型別參數](inline-functions.md#reified-type-parameters)可以使像
-`arg as T` 這樣的轉換變成受檢的，除非 `arg` 的型別具有*其自身*被擦除的型別引數。
+對於泛型函式，使用[具體化型別參數](inline-functions.md#reified-type-parameters)會讓類似 `arg as T` 的轉換成為受檢轉換，除非 `arg` 的型別擁有*其自身*被消除的型別引數。
 
-可以透過在陳述式或發生警告的宣告處加上 `@Suppress("UNCHECKED_CAST")` [註解](annotations.md)來隱藏未經檢查的轉換警告：
+未受檢轉換的警告可以透過在發生該警告的陳述式或宣告上使用 `@Suppress("UNCHECKED_CAST")` 進行[註解](annotations.md)來隱藏：
 
 ```kotlin
 inline fun <reified T> List<*>.asListOfType(): List<T>? =
@@ -490,15 +460,13 @@ inline fun <reified T> List<*>.asListOfType(): List<T>? =
         null
 ```
 
->**在 JVM 上**：[陣列型別](arrays.md) (`Array<Foo>`) 會保留關於其元素被擦除型別的資訊，
->且轉換為陣列型別是部分受檢的：元素型別的可 null 性和實際型別引數仍然會被擦除。例如，
->如果 `foo` 是持有任何 `List<*>` 的陣列（無論是否可為 null），轉換 `foo as Array<List<String>?>` 都會成功。
+>**在 JVM 上**：[陣列型別](arrays.md)（`Array<Foo>`）會保留有關其元素消除型別的資訊，且對陣列型別的型別轉換是部分受檢的：元素型別的可 null 性和實際型別引數仍會被消除。例如，如果 `foo` 是一個持有任何 `List<*>` 的陣列，則轉換 `foo as Array<List<String>?>` 都將成功，無論其是否可為 null。
 >
 {style="note"}
 
 ## 型別引數的底線運算子 {id="underscore-operator-for-type-arguments"}
 
-底線運算子 `_` 可用於型別引數。當明確指定其他型別時，使用它來自動推論該引數的型別：
+底線運算子 `_` 可用於型別引數。當其他型別已明確指定時，使用它可以自動推論該引數的型別：
 
 ```kotlin
 abstract class SomeClass<T> {

@@ -4,22 +4,22 @@
 
 <tldr>
 <p>
-<b>必須の依存関係</b>: <code>io.ktor:ktor-server-di</code>
+<b>必要な依存関係</b>: <code>io.ktor:ktor-server-di</code>
 </p>
 <var name="example_name" value="server-di"/>
 <p>
     <b>コード例</b>:
-    <a href="https://github.com/ktorio/ktor-documentation/tree/%ktor_version%/codeSnippets/snippets/%example_name%">
+    <a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/%example_name%">
         %example_name%
     </a>
 </p>
 </tldr>
 
-[依存性注入（DI）プラグイン](server-dependency-injection.md)は、アプリケーションのシャットダウン時に、ライフサイクルとクリーンアップを自動的に処理します。
+[依存性注入（DI）プラグイン](server-dependency-injection.md)は、アプリケーションのシャットダウン時にライフサイクルとクリーンアップを自動的に処理します。
 
-### AutoCloseableのサポート {id="autocloseable-support"}
+### AutoCloseable のサポート {id="autocloseable-support"}
 
-デフォルトでは、`AutoCloseable`を実装している依存関係は、アプリケーションの停止時に自動的にクローズされます。
+デフォルトでは、`AutoCloseable` を実装している依存関係は、アプリケーション停止時に自動的にクローズされます。
 
 ```kotlin
 class DatabaseConnection : AutoCloseable {
@@ -35,7 +35,7 @@ dependencies {
 
 ### カスタムクリーンアップロジック {id="custom-cleanup-logic"}
 
-`cleanup`関数を指定することで、カスタムのクリーンアップロジックを定義できます。
+`cleanup` 関数を指定することで、カスタムクリーンアップロジックを定義できます。
 
 ```kotlin
 dependencies {
@@ -45,9 +45,9 @@ dependencies {
 }
 ```
 
-### キーによるスコープ指定されたクリーンアップ {id="scoped-cleanup-with-key"}
+### キーを使用したスコープ付きクリーンアップ {id="scoped-cleanup-with-key"}
 
-名前付きリソースとそのクリーンアップを管理するには、`key`を使用します。
+名前付きリソースとそのクリーンアップを管理するには、`key` を使用します。
 
 ```kotlin
 dependencies {
@@ -58,4 +58,4 @@ dependencies {
 }
 ```
 
-適切なティアダウン（終了処理）を確実にするために、依存関係は宣言された順序とは逆の順序でクリーンアップされます。
+適切な終了処理を確実に行うため、依存関係は宣言された逆の順序でクリーンアップされます。

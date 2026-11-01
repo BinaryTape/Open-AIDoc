@@ -1,179 +1,100 @@
 ---
-title: 다이나믹 모듈
+title: 동적 모듈
 ---
 
-# Compose의 다이나믹 모듈 (Dynamic Modules)
+# 동적 모듈
 
-Koin은 Composable 생명주기에 연결된 모듈을 동적으로 로드하고 언로드할 수 있는 API를 제공합니다. 이는 기능 모듈(feature modules), 지연 로딩(lazy loading), 그리고 온디맨드(on-demand) 의존성을 처리할 때 유용합니다.
+이 페이지에서는 컴포저블(Composable)이 컴포지션(composition)에 진입할 때 Koin 모듈을 로드하고 컴포지션을 벗어날 때 언로드할 수 있는 `rememberKoinModules`에 대해 다룹니다. 이를 사용하여 특정 기능의 화면이 표시될 때만 해당 기능의 정의(definition)를 로드할 수 있습니다. 먼저 [모듈](/docs/reference/koin-core/modules)을 선언하는 방법을 숙지하고 있어야 합니다.
+
+`rememberKoinModules`는 `io.insert-koin:koin-compose`에 포함되어 있으며 `@KoinExperimentalAPI`로 표시되어 있습니다.
 
 ## rememberKoinModules {id="rememberkoinmodules"}
 
-Composable이 컴포지션(composition)에 진입할 때 Koin 모듈을 로드합니다:
-
 ```kotlin
-val featureModule = module {
-    factory<FeatureRepository>()
-    viewModel<FeatureViewModel>()
-}
+import org.koin.compose.module.rememberKoinModules
 
-@Composable
-fun FeatureScreen() {
-    // 이 Composable이 컴포지션에 진입할 때 모듈 로드
-    rememberKoinModules(featureModule)
-
-    val viewModel = koinViewModel<FeatureViewModel>()
-}
-```
-
-### 여러 모듈 사용 {id="multiple-modules"}
-
-```kotlin
-@Composable
-fun FeatureScreen() {
-    rememberKoinModules(
-        featureDataModule,
-        featureDomainModule,
-        featureUiModule
-    )
-}
-```
-
-### 모듈 언로드 {id="unloading-modules"}
-
-모듈이 언로드되는 시점을 제어할 수 있습니다:
-
-```kotlin
-@Composable
-fun FeatureScreen() {
-    rememberKoinModules(
-        featureModule,
-        unloadOnForgotten = true,  // Composable이 컴포지션을 떠날 때 언로드
-        unloadOnAbandoned = true   // 컴포지션이 실패하거나 중단될 때 언로드
-    )
-}
-```
-
-| 옵션 | 트리거 시점 |
-|--------|----------------|
-| `unloadOnForgotten` | Composable이 컴포지션에서 제거될 때 |
-| `unloadOnAbandoned` | 컴포지션이 실패하거나 중단(abandoned)될 때 |
-
-## 활용 사례 (Use Cases) {id="use-cases"}
-
-### 기능 모듈 (Feature Modules) {id="feature-modules"}
-
-기능별 의존성을 필요에 따라 로드합니다:
-
-```kotlin
-// 별도의 Gradle 모듈에 정의된 기능 모듈
 val checkoutModule = module {
-    factory<PaymentProcessor>()
     factory<CheckoutRepository>()
     viewModel<CheckoutViewModel>()
 }
 
+@OptIn(KoinExperimentalAPI::class)
 @Composable
 fun CheckoutScreen() {
-    rememberKoinModules(checkoutModule, unloadOnForgotten = true)
+    rememberKoinModules(unloadOnForgotten = true) { listOf(checkoutModule) }
 
     val viewModel = koinViewModel<CheckoutViewModel>()
-    CheckoutContent(viewModel)
 }
 ```
 
-### 지연 기능 로딩 (Lazy Feature Loading) {id="lazy-feature-loading"}
+람다는 로드할 모듈 목록을 반환합니다. Koin은 `CheckoutScreen`이 처음 컴포지션될 때 해당 모듈들을 컴포지션의 Koin 인스턴스에 로드합니다. 리컴포지션(Recomposition) 시에는 모듈을 다시 로드하지 않습니다.
 
-네비게이션과 결합하여 기능을 지연 로딩할 수 있습니다:
+해당 정의가 필요한 `koinInject()` 또는 `koinViewModel()` 호출보다 먼저 `rememberKoinModules`를 호출하세요.
+
+## 언로드 {id="unloading"}
+
+기본적으로 컴포저블이 컴포지션을 벗어난 후에도 모듈은 로드된 상태로 유지됩니다. 언로드는 세 가지 파라미터로 제어합니다:
+
+| 파라미터 | 기본값 | 동작 |
+|-----------|---------|--------|
+| `unloadOnForgotten` | `unloadModules` | 컴포저블이 컴포지션을 벗어날 때 언로드 |
+| `unloadOnAbandoned` | `unloadModules` | 컴포지션이 중단(abandoned)될 때 언로드 |
+| `unloadModules` | `false` | 위 두 파라미터의 기본값 |
 
 ```kotlin
-NavHost(navController, startDestination = "home") {
-    composable("home") {
-        HomeScreen()  // 추가 모듈이 필요 없음
+// 두 경우 모두 언로드
+rememberKoinModules(unloadModules = true) { listOf(checkoutModule) }
+```
+
+언로드하면 정의가 제거되고 해당 `single` 인스턴스가 삭제(drop)됩니다. 해당 인스턴스에 대한 참조를 여전히 보유하고 있는 코드는 이를 계속 유지하지만, Koin은 더 이상 해당 타입을 해결(resolve)할 수 없습니다. 다른 화면에서 여전히 사용 중인 모듈은 언로드하지 마세요.
+
+## 목적지별 로딩 (Loading per destination) {id="loading-per-destination"}
+
+사용자가 특정 목적지로 이동할 때 해당 기능을 로드하려면 네비게이션 목적지(navigation destination)에서 `rememberKoinModules`를 호출하세요:
+
+```kotlin
+NavHost(navController, startDestination = HomeRoute) {
+    composable<HomeRoute> {
+        HomeScreen()
     }
-    composable("checkout") {
-        // "checkout" 화면으로 이동할 때만 모듈 로드
-        rememberKoinModules(checkoutModule, unloadOnForgotten = true)
+    composable<CheckoutRoute> {
+        rememberKoinModules(unloadOnForgotten = true) { listOf(checkoutModule) }
         CheckoutScreen()
     }
-    composable("profile") {
-        // "profile" 화면으로 이동할 때만 모듈 로드
-        rememberKoinModules(profileModule, unloadOnForgotten = true)
-        ProfileScreen()
-    }
 }
 ```
 
-### 디버그/프리뷰 모듈 (Debug/Preview Modules) {id="debug-preview-modules"}
+## 모듈 스타일 {id="module-styles"}
 
-프리뷰를 위해 구현체를 교체할 수 있습니다:
-
+**컴파일러 플러그인 DSL**
 ```kotlin
-val debugModule = module {
-    single<ApiClient> { MockApiClient() }
-}
-
-@Preview
-@Composable
-fun FeatureScreenPreview() {
-    rememberKoinModules(debugModule)
-    FeatureScreen()
+val checkoutModule = module {
+    factory<CheckoutRepository>()
+    viewModel<CheckoutViewModel>()
 }
 ```
 
-### 조건부 모듈 (Conditional Modules) {id="conditional-modules"}
+**어노테이션**
+`rememberKoinModules`는 `Module` 값을 받습니다. `@Module` 어노테이션이 달린 클래스는 시작 시 `@KoinApplication`을 통해 로드됩니다([모듈](/docs/reference/koin-core/modules) 참조). 필요할 때 기능을 동적으로 로드하려면 DSL을 사용해 모듈을 선언하세요.
 
-조건에 따라 모듈을 로드합니다:
-
+**생성자 / 클래식 DSL**
 ```kotlin
-@Composable
-fun App(isDebug: Boolean) {
-    if (isDebug) {
-        rememberKoinModules(debugModule)
-    }
-
-    MainScreen()
+val checkoutModule = module {
+    factoryOf(::CheckoutRepository)
+    viewModelOf(::CheckoutViewModel)
 }
 ```
 
-## Lazy Modules와 함께 사용 {id="with-lazy-modules"}
+## 제한 사항 {id="limits"}
 
-더 나은 성능을 위해 Koin의 `lazyModule` 로딩과 결합할 수 있습니다:
+- **메인 스레드**: 모듈은 컴포지션 도중 동기적으로 로드됩니다. 모듈의 크기가 크면 해당 프레임의 소요 시간이 늘어납니다. 시작 시 백그라운드에서 모듈을 로드하려면 [Lazy 모듈](/docs/reference/koin-core/lazy-modules)을 참조하세요.
+- **오버라이드**: 나중에 로드된 모듈이 동일한 타입의 이전 정의보다 우선권을 갖습니다([정의](/docs/reference/koin-core/definitions) 참조). 해당 모듈을 언로드하더라도 이전 정의가 복원되지는 않습니다.
+- **미리보기**: `rememberKoinModules`를 사용하려면 실행 중인 Koin 인스턴스가 필요합니다. 프리뷰를 위해서는 `KoinApplicationPreview`를 사용하세요([Compose 테스트](/docs/reference/koin-compose/compose-testing) 참조).
 
-```kotlin
-val featureModule = lazyModule {
-    // 모듈이 로드될 때 정의가 지연 파싱(lazy parse)됨
-    factory<HeavyService>()
-    viewModel<FeatureViewModel>()
-}
+## 관련 항목 {id="related"}
 
-@Composable
-fun FeatureScreen() {
-    rememberKoinModules(featureModule, unloadOnForgotten = true)
-
-    val viewModel = koinViewModel<FeatureViewModel>()
-}
-```
-
-## 권장 사항 (Best Practices) {id="best-practices"}
-
-1. **`unloadOnForgotten = true` 사용** - 메모리 누수를 방지합니다.
-   ```kotlin
-   rememberKoinModules(featureModule, unloadOnForgotten = true)
-   ```
-
-2. **기능당 하나의 모듈 구성** - 모듈을 집중되고 독립적으로 유지하세요.
-
-3. **지연 모듈(lazy modules)과 결합** - 기능이 많은 대규모 앱에 적합합니다.
-   ```kotlin
-   val featureModule = lazyModule { /* ... */ }
-   ```
-
-4. **네비게이션 수준에서 로드** - `NavHost` 컴포저블 내에서 모듈을 로드하세요.
-
-5. **순환 의존성 방지** - 기능 모듈끼리는 서로 의존하지 않아야 합니다.
-
-## 다음 단계 {id="next-steps"}
-
-- **[Compose의 Scope](/docs/reference/koin-compose/compose-scopes)** - Scope API
-- **[Compose 개요](/docs/reference/koin-compose/compose)** - 설정 및 기본 주입
-- **[격리된 컨텍스트 (Isolated Context)](/docs/reference/koin-compose/isolated-context)** - SDK 격리
+- [모듈](/docs/reference/koin-core/modules): 모듈 선언 및 구성
+- [Lazy 모듈](/docs/reference/koin-core/lazy-modules): 시작 시 백그라운드에서 모듈 로드
+- [Koin 시작하기](/docs/reference/koin-core/starting-koin): Compose 외부에서 모듈 로드 및 언로드
+- [Compose의 스코프](/docs/reference/koin-compose/compose-scopes): 컴포저블에 바인딩된 인스턴스
+- [수명 주기 및 상태](/docs/reference/koin-compose/compose-lifecycle): 각 Compose API가 해제하는 대상 및 시점

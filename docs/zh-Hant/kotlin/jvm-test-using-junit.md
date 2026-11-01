@@ -1,31 +1,31 @@
-[//]: # (title: 使用 Kotlin 和 JUnit 測試 Java 程式碼 – 教學)
+[//]: # (title: 使用 Kotlin 與 JUnit 測試 Java 程式碼 – 教學)
 
-<web-summary>設定以 Maven 或 Gradle 建置的 Java 專案，以整合用 Kotlin 編寫的 JUnit 測試。</web-summary>
+<web-summary>設定使用 Maven 或 Gradle 建置的 Java 專案，以整合用 Kotlin 編寫的 JUnit 測試。</web-summary>
 
-Kotlin 與 Java 完全互通，這意味著你可以使用 Kotlin 為 Java 程式碼撰寫測試，並在同一個專案中與現有的 Java 測試一起執行。
+Kotlin 與 Java 完全互通，這意味著你可以使用 Kotlin 為 Java 程式碼編寫測試，並在同一個專案中與現有的 Java 測試一同執行。
 
 在本教學中，你將學習如何：
 
-* 配置混合 Java–Kotlin 的專案以使用 [JUnit](https://junit.org/) 執行測試。
+* 配置 Java–Kotlin 混合專案以使用 [JUnit](https://junit.org/) 執行測試。
 * 新增驗證 Java 程式碼的 Kotlin 測試。
 * 使用 Maven 或 Gradle 執行測試。
 
-> 開始之前，請確認你具備：
+> 開始之前，請確認你已具備：
 >
-> * 已安裝 [Kotlin 擴充套件](https://github.com/Kotlin/kotlin-lsp/tree/main?tab=readme-ov-file#vs-code-quick-start) 的 [IntelliJ IDEA](https://www.jetbrains.com/idea/download/) 或 [VS Code](https://code.visualstudio.com/Download)。
+> * [IntelliJ IDEA](https://www.jetbrains.com/idea/download/) 或已安裝 [Kotlin 擴充套件](https://github.com/Kotlin/kotlin-lsp/tree/main?tab=readme-ov-file#vs-code-quick-start)的 [VS Code](https://code.visualstudio.com/Download)。
 > * Java 17 或更新版本。
 >
 {style="note"}
 
 ## 配置專案 {id="configure-the-project"}
 
-1. 在你的 IDE 中，從版本控制系統複製範例專案：
+1. 在你的 IDE 中，從版本控制複製範例專案：
 
    ```text
    https://github.com/kotlin-hands-on/kotlin-junit-sample.git
    ```
 
-2. 導覽至 `initial` 模組並檢視專案結構：
+2. 前往 `initial` 模組並檢視專案結構：
 
     ```text
     kotlin-junit-sample/
@@ -37,21 +37,129 @@ Kotlin 與 Java 完全互通，這意味著你可以使用 Kotlin 為 Java 程�
     │   └── build.gradle.kts  # Gradle 配置
     ```
 
-   `initial` 模組包含一個使用 Java 編寫的簡易 Todo 應用程式，並附帶一個單一測試。
+   `initial` 模組包含一個以 Java 編寫且帶有單一測試的簡易 Todo 應用程式。
 
-3. 在同一個目錄下，開啟你的組建檔案並更新其內容以支援 Kotlin：
+3. 在同一個目錄中，開啟你的建置檔並更新其內容以支援 Kotlin：
 
     <tabs group="build-system">
     <tab title="Maven" group-key="maven">
 
     ```xml
+    <?xml version="1.0" encoding="UTF-8"?>
+    <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+        <modelVersion>4.0.0</modelVersion>
+    
+        <groupId>org.jetbrains.kotlin</groupId>
+        <artifactId>kotlin-junit-complete</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    
+        <name>kotlin-junit-complete</name>
+        <url>https://kotlinlang.org/docs/jvm-test-using-junit.htm</url>
+    
+        <properties>
+            <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+            <maven.compiler.release>17</maven.compiler.release>
+            <jexer.version>1.6.0</jexer.version>
+            <kotlin.version>%kotlinVersion%</kotlin.version>
+        </properties>
+    
+        <dependencyManagement>
+            <dependencies>
+                <dependency>
+                    <groupId>org.junit</groupId>
+                    <artifactId>junit-bom</artifactId>
+                    <version>6.0.3</version>
+                    <type>pom</type>
+                    <scope>import</scope>
+                </dependency>
+            </dependencies>
+        </dependencyManagement>
+    
+        <dependencies>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-api</artifactId>
+                <scope>test</scope>
+            </dependency>
+            <!-- Add JUnit Jupiter engine for test runtime -->
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-engine</artifactId>
+                <scope>test</scope>
+            </dependency>
+            <!-- Optionally: parameterized tests support -->
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-params</artifactId>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.gitlab.klamonte</groupId>
+                <artifactId>jexer</artifactId>
+                <version>${jexer.version}</version>
+            </dependency>
+        </dependencies>
+    
+        <build>
+            <pluginManagement><!-- Lock down plugin versions to avoid using Maven defaults (can be moved to a parent pom file) -->
+                <plugins>
+                    <!-- Clean lifecycle, see https://maven.apache.org/ref/current/maven-core/lifecycles.html#clean_Lifecycle -->
+                    <plugin>
+                        <artifactId>maven-clean-plugin</artifactId>
+                        <version>3.4.0</version>
+                    </plugin>
+                    <!-- Default lifecycle, jar packaging: see https://maven.apache.org/ref/current/maven-core/default-bindings.html#Plugin_bindings_for_jar_packaging -->
+                    <plugin>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <version>3.3.1</version>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <version>3.3.0</version>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <version>3.4.2</version>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-install-plugin</artifactId>
+                        <version>3.1.2</version>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-deploy-plugin</artifactId>
+                        <version>3.1.2</version>
+                    </plugin>
+                    <!-- Site lifecycle, see https://maven.apache.org/ref/current/maven-core/lifecycles.html#site_Lifecycle -->
+                    <plugin>
+                        <artifactId>maven-site-plugin</artifactId>
+                        <version>3.12.1</version>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-project-info-reports-plugin</artifactId>
+                        <version>3.6.1</version>
+                    </plugin>
+                    <!-- No maven-compiler-plugin needed with Kotlin extensions -->
+                </plugins>
+            </pluginManagement>
+            <plugins>
+                <!-- Activate Kotlin Maven plugin for main and test sources -->
+                <plugin>
+                    <groupId>org.jetbrains.kotlin</groupId>
+                    <artifactId>kotlin-maven-plugin</artifactId>
+                    <version>${kotlin.version}</version>
+                    <extensions>true</extensions>
+                </plugin>
+            </plugins>
+        </build>
+    </project>
     ```
-   {src="jvm-test-tutorial/pom.xml" initial-collapse-state="collapsed" collapsible="true" ignore-vars="false" collapsed-title="pom.xml file"}
+   {initial-collapse-state="collapsed" collapsible="true" collapsed-title="pom.xml file"}
 
     * 在 `<properties>` 區段中，設定 Kotlin 版本。
-    * 在 `<dependencies>` 區段中，新增 JUnit Jupiter 相依性以執行測試。
-    * 在 `<build><plugins>` 區段中，套用 `kotlin-maven-plugin` 並將 `<extensions>` 設定為 `true`。它會自動向組建新增對應的 execution 和 `kotlin-stdlib` 相依性。
-    * 當使用啟用了 extensions 的 Kotlin Maven 外掛程式時，你不需要將 `maven-compiler-plugin` 新增至 `<build><pluginManagement>` 區段。
+    * 在 `<dependencies>` 區段中，新增用於執行測試的 JUnit Jupiter 相依性。
+    * 在 `<build><plugins>` 區段中，套用 `kotlin-maven-plugin` 並將 `<extensions>` 設為 `true`。它會自動在組建中新增相應的執行作業以及 `kotlin-stdlib` 相依性。
+    * 當使用帶有擴充套件的 Kotlin Maven 外掛程式時，無需在 `<build><pluginManagement>` 區段中新增 `maven-compiler-plugin`。
 
     </tab>
     <tab title="Gradle" group-key="gradle">
@@ -98,11 +206,11 @@ Kotlin 與 Java 完全互通，這意味著你可以使用 Kotlin 為 Java 程�
 
     * 在 `plugins {}` 區塊中，新增 `kotlin("jvm")` 外掛程式。
     * 設定 JVM toolchain 版本以符合你的 Java 版本。
-    * 在 `dependencies {}` 區塊中，新增提供 Kotlin 測試公用程式並與 JUnit 整合的 `kotlin.test` 程式庫。
+    * 在 `dependencies {}` 區塊中，新增提供 Kotlin 測試工具並與 JUnit 整合的 `kotlin.test` 程式庫。
       
-    Kotlin/JVM 支援最新的穩定 JUnit 版本 JUnit 6。你可以在 `gradle/libs.versions.toml` 版本目錄（version catalog）中找到它。
+    Kotlin/JVM 支援最新的穩定 JUnit 版本（JUnit 6）。你可以在 `gradle/libs.versions.toml` 版本目錄 (version catalog) 中找到它。
    
-    如果你通常偏好使用版本目錄，你甚至可以將 `kotlin("jvm")` 外掛程式新增至其中：
+    如果你通常偏好使用版本目錄，甚至也可以將 `kotlin("jvm")` 外掛程式新增至該處：
 
     ```toml
     # gradle/libs.versions.toml
@@ -124,19 +232,19 @@ Kotlin 與 Java 完全互通，這意味著你可以使用 Kotlin 為 Java 程�
     </tab>
     </tabs>
 
-4. 在 IDE 中重新載入組建檔案。
+4. 在你的 IDE 中重新載入建置檔。
 
-如需組建檔案設定的更詳細指示，請參閱[專案配置](mixing-java-kotlin-intellij.md#project-configuration)。
+如需有關建置檔設定的更詳細說明，請參閱[專案配置](mixing-java-kotlin-intellij.md#project-configuration)。
 
 ## 新增你的第一個 Kotlin 測試 {id="add-your-first-kotlin-test"}
 
-`initial/src/test/java` 中的 `TodoItemTest.java` 測試已經驗證了應用程式的基本功能：項目建立、預設值、唯一識別碼和狀態變更。
+`initial/src/test/java` 中的 `TodoItemTest.java` 測試已經驗證了應用程式的基礎功能：項目建立、預設值、唯一 ID 以及狀態變更。
 
-你可以透過新增驗證存儲庫層級行為的 Kotlin 測試來擴展測試涵蓋率：
+你可以透過新增一個驗證 repository 層級行為的 Kotlin 測試來擴充測試涵蓋率：
 
-1. 導覽至同一個測試原始碼目錄：`initial/src/test/java`。
+1. 前往相同的測試原始碼目錄 `initial/src/test/java`。
 2. 在與 Java 測試相同的套件中建立 `TodoRepositoryTest.kt` 檔案。
-3. 建立帶有欄位宣告和設定函式的測試類別：
+3. 建立帶有欄位宣告與設定函式的測試類別：
 
    ```kotlin
    package org.jetbrains.kotlin.junit
@@ -161,9 +269,9 @@ Kotlin 與 Java 完全互通，這意味著你可以使用 Kotlin 為 Java 程�
    ```
 
     * JUnit 註解在 Kotlin 中的運作方式與在 Java 中相同。
-    * 在 Kotlin 中，[`lateinit` 關鍵字](properties.md#late-initialized-properties-and-variables)允許宣告稍後才初始化的非 null 屬性。這有助於避免在測試中使用可 null 型別（`TodoRepository?`）。
+    * 在 Kotlin 中，[`lateinit` 關鍵字](properties.md#late-initialized-properties-and-variables)允許宣告稍後才初始化的非 null 屬性。這有助於避免在測試中必須使用可 null 型別 (`TodoRepository?`)。
 
-4. 在 `TodoRepositoryTest` 類別內新增一個測試，以檢查初始存儲庫狀態及其大小：
+4. 在 `TodoRepositoryTest` 類別內新增一個測試，以檢查儲存庫的初始狀態及其大小：
 
    ```kotlin
    @Test
@@ -174,10 +282,10 @@ Kotlin 與 Java 完全互通，這意味著你可以使用 Kotlin 為 Java 程�
    }
    ```
 
-    * 與 Java 的 static 匯入不同，Jupiter 的 `Assertions` 作為類別匯入，並用作斷言函式的限定詞。
-    * 在 Kotlin 中，你可以透過 `repository.all` 將 Java getter 作為屬性存取，而不是呼叫 `.getAll()`。
+    * 與 Java 的靜態匯入不同，Jupiter 的 `Assertions` 是作為類別匯入，並作為斷言函式的限定詞使用。
+    * 你可以使用 `repository.all` 在 Kotlin 中將 Java getter 作為屬性存取，而不必呼叫 `.getAll()`。
 
-5. 撰寫另一個測試以驗證所有項目的複本行為：
+5. 編寫另一個測試以驗證所有項目的複製行為：
 
    ```kotlin
    @Test
@@ -196,10 +304,10 @@ Kotlin 與 Java 完全互通，這意味著你可以使用 Kotlin 為 Java 程�
    }
    ```
 
-    * 要從 Kotlin 類別取得 Java 類別物件，請使用 `::class.java`。
+    * 若要從 Kotlin 類別取得 Java 類別物件，請使用 `::class.java`。
     * 你可以將複雜的斷言拆分成多行，而無需使用任何特殊的接續字元。
 
-6. 新增測試以驗證透過 ID 尋找項目：
+6. 新增一個測試以驗證依 ID 尋找項目：
 
    ```kotlin
    @Test
@@ -215,9 +323,9 @@ Kotlin 與 Java 完全互通，這意味著你可以使用 Kotlin 為 Java 程�
    }
    ```
 
-   Kotlin 能順暢地與 Java [`Optional` API](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html) 協同運作。它會自動將 getter 方法轉換為屬性，這就是為什麼此處將 `isPresent()` 方法作為屬性來存取。
+   Kotlin 能與 Java 的 [`Optional` API](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html) 無縫搭配運作。它會自動將 getter 方法轉換為屬性，這就是為什麼這裡將 `isPresent()` 方法作為屬性存取的原因。
 
-7. 撰寫測試以驗證項目移除機制：
+7. 編寫一個測試以驗證項目移除機制：
 
    ```kotlin
     @Test
@@ -246,21 +354,22 @@ Kotlin 與 Java 完全互通，這意味著你可以使用 Kotlin 為 Java 程�
     }
    ```
 
-   在 Kotlin 中，你可以鏈式呼叫方法與屬性存取，例如 `repository.getById(id).isEmpty`。
+   在 Kotlin 中，你可以串接方法呼叫與屬性存取，例如 `repository.getById(id).isEmpty`。
 
-> 你可以在 `TodoRepositoryTest` 測試類別中新增更多測試以涵蓋其他功能。請在範例專案的 [`complete`](https://github.com/kotlin-hands-on/kotlin-junit-sample/blob/main/complete/src/test/java/org/jetbrains/kotlin/junit/TodoRepositoryTest.kt) 模組中查看完整原始碼。
+> 你可以在 `TodoRepositoryTest` 測試類別中新增更多測試以涵蓋額外功能。
+> 請參閱範例專案的 [`complete`](https://github.com/kotlin-hands-on/kotlin-junit-sample/blob/main/complete/src/test/java/org/jetbrains/kotlin/junit/TodoRepositoryTest.kt) 模組以取得完整原始碼。
 >
 {style="tip"}
 
 ## 執行測試 {id="run-tests"}
 
-執行 Java 和 Kotlin 測試以驗證專案是否如預期運作：
+執行 Java 和 Kotlin 測試以驗證你的專案是否如預期運作：
 
 1. 使用裝訂邊圖示執行測試：
 
    ![執行測試](run-test.png)
 
-   你也可以在命令列中於 `initial` 目錄下執行所有專案測試：
+   你也可以在 `initial` 目錄中使用命令列執行所有專案測試：
 
     <tabs group="build-system">
     <tab title="Maven" group-key="maven">
@@ -279,7 +388,8 @@ Kotlin 與 Java 完全互通，這意味著你可以使用 Kotlin 為 Java 程�
     </tab>
     </tabs>
 
-2. 透過變更其中一個變數的值來確認測試能正常發揮作用。例如，修改 `shouldAddItem` 測試以預期不正確的存儲庫大小：
+2. 藉由修改其中一個變數值來確認測試是否能正確運作。
+   例如，修改 `shouldAddItem` 測試以預期不正確的儲存庫大小：
 
    ```kotlin
    @Test
@@ -292,15 +402,15 @@ Kotlin 與 Java 完全互通，這意味著你可以使用 Kotlin 為 Java 程�
    }
    ```
 
-3. 再次執行測試並確認它失敗：
+3. 再次執行測試並確認其失敗：
 
-   ![檢查測試結果。測試已失敗](test-failed.png)
+   ![檢查測試結果。測試失敗](test-failed.png)
 
-> 你可以在範例專案的 [`complete`](https://github.com/kotlin-hands-on/kotlin-junit-sample/tree/main/complete) 模組中找到完整配置好測試的專案。
+> 你可以在範例專案的 [`complete`](https://github.com/kotlin-hands-on/kotlin-junit-sample/tree/main/complete) 模組中找到包含測試且完整配置好的專案。
 >
 {style="tip"}
 
 ## 後續步驟 {id="what-s-next"}
 
-* 進一步了解[使用 Maven 測試 Kotlin 專案](jvm-test-maven.md)。
+* 深入了解[使用 Maven 測試 Kotlin 專案](jvm-test-maven.md)。
 * 在 [Kotlin 後端開發常見問題](jvm-backend-faq.md)中尋找常見問題的解答。

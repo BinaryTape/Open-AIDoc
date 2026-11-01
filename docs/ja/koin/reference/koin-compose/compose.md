@@ -1,239 +1,225 @@
 ---
-title: Compose向けのKoin
+title: Koin for Compose
 ---
 
-# Compose向けのKoin
+# Koin for Compose
 
-Koinは、依存関係を注入するための専用パッケージにより、Jetpack ComposeおよびCompose Multiplatformアプリケーションを完全にサポートしています。
+このページでは、Compose 向けパッケージ、Compose アプリで Koin を開始する 2 つの方法、および Composable 内で依存関係を取得するための `koinInject()` について説明します。これは Jetpack Compose (Android) と Compose Multiplatform の両方で同様に動作します。事前に[定義 (definitions)](/docs/reference/koin-core/definitions) と[モジュール (modules)](/docs/reference/koin-core/modules) の宣言方法を理解しておく必要があります。
 
-## パッケージの概要 {id="packages-overview"}
+## パッケージ {id="packages"}
 
-| パッケージ | ユースケース |
-|---------|----------|
-| `koin-compose` | Compose基本API (マルチプラットフォーム) |
-| `koin-compose-viewmodel` | ViewModelの注入 (マルチプラットフォーム) |
-| `koin-compose-viewmodel-navigation` | ViewModel + Navigation 2.x |
-| `koin-compose-navigation3` | Navigation 3との統合 (マルチプラットフォーム) |
-| `koin-androidx-compose` | Android向けの便利なパッケージ (`koin-compose` + `koin-compose-viewmodel` を含む) |
+| パッケージ | 内容 | プラットフォーム |
+|---------|----------|-----------|
+| `io.insert-koin:koin-compose` | `KoinApplication`、`koinInject`、スコープおよびモジュール API | Multiplatform |
+| `io.insert-koin:koin-compose-viewmodel` | `koinViewModel`、`koinActivityViewModel` (Android) | Multiplatform |
+| `io.insert-koin:koin-compose-viewmodel-navigation` | `sharedKoinViewModel`、`KoinNavigationScope`、`navigationScope` | Multiplatform |
+| `io.insert-koin:koin-compose-navigation3` | Navigation 3 のエントリー | Multiplatform |
+| `io.insert-koin:koin-androidx-compose` | `koin-compose` + `koin-compose-viewmodel`、および `KoinActivityScope`、`KoinFragmentScope` | Android |
+| `io.insert-koin:koin-androidx-compose-navigation` | 非推奨の `koinNavViewModel` のみ | Android |
 
-:::info
-すべてのCompose APIは `koin-compose` と `koin-compose-viewmodel` で定義されています。`koin-androidx-compose` パッケージは、Androidプロジェクト向けにこれら両方を含む便利なラッパーです。
-:::
+すべての Compose API はマルチプラットフォーム向けパッケージに含まれています。`koin-androidx-compose` は Android プロジェクト向けの便利なアーティファクトです：
 
-### どのパッケージを使用すべきか？ {id="which-package-should-i-use"}
-
-**Androidのみのプロジェクトの場合：**
 ```kotlin
-// オプション 1: Android向けの便利なパッケージ (koin-compose + koin-compose-viewmodel を含む)
-implementation("io.insert-koin:koin-androidx-compose:$koin_version")
+// Android アプリ
+dependencies {
+    implementation("io.insert-koin:koin-androidx-compose:$koin_version")
+}
 
-// オプション 2: マルチプラットフォームパッケージを直接使用する
-implementation("io.insert-koin:koin-compose:$koin_version")
-implementation("io.insert-koin:koin-compose-viewmodel:$koin_version")
-
-// オプション: Navigationとの統合
-implementation("io.insert-koin:koin-androidx-compose-navigation:$koin_version")
-```
-
-**Compose Multiplatformプロジェクトの場合：**
-```kotlin
+// Compose Multiplatform (commonMain 内)
 commonMain.dependencies {
     implementation("io.insert-koin:koin-compose:$koin_version")
     implementation("io.insert-koin:koin-compose-viewmodel:$koin_version")
-
-    // オプション: Navigationとの統合
-    implementation("io.insert-koin:koin-compose-viewmodel-navigation:$koin_version")
 }
 ```
 
-## プラットフォームのサポート {id="platform-support"}
+BOM およびバージョンカタログについては、[Gradle のセットアップ](/docs/setup/gradle)を参照してください。
 
-| プラットフォーム | Composeの種類 | ステータス |
-|----------|-------------|--------|
-| Android | Jetpack Compose | フルサポート |
-| iOS | Compose Multiplatform | フルサポート |
-| Desktop | Compose Desktop | フルサポート |
-| Web | Compose for Web | 実験的 |
+## Koin の開始 {id="starting-koin"}
 
-## Koinを開始する {id="starting-koin"}
+2 つのオプションがあります。アプリごとにいずれか 1 つを選択してください。
 
-### オプション1: startKoin (Androidのみ、または外部セットアップ) {id="option-1-startkoin-android-only-or-external-setup"}
+### Compose の外部で開始する {id="start-outside-compose"}
 
-完全に制御するために、Composeの外側でKoinを初期化します。
+各プラットフォームが起動する場所で Koin を開始します。Android では `Application` クラス、KMP プロジェクトでは共有の `initKoin()` 関数です（[KMP のセットアップ](/docs/reference/koin-core/kmp-setup)を参照）。これにより、Compose は追加のセットアップなしで実行中の Koin インスタンスを使用できます：
 
 ```kotlin
-// Android Applicationクラス
-class MyApplication : Application() {
+class MainApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         startKoin {
-            androidContext(this@MyApplication)
-            androidLogger()
+            androidContext(this@MainApplication)
             modules(appModule)
         }
     }
 }
 
-// Compose UIは自動的にKoinを使用します
 @Composable
 fun App() {
-    val viewModel = koinViewModel<MyViewModel>()
+    val repository = koinInject<UserRepository>()
 }
 ```
 
-**使用場面：** Koinのライフサイクル、カスタム設定、または他のフレームワークとの統合を完全に制御する必要がある場合。
+Compose の外部のコード（`Service`、`WorkManager` の Worker、iOS の Swift コードなど）でも Koin を必要とする場合は、Composable なしで実行されるため、このオプションを使用してください。
 
-### オプション2: KoinApplication (Composeによる管理) {id="option-2-koinapplication-compose-managed"}
+### KoinApplication を使用して Composable から開始する {id="start-from-a-composable-with-koinapplication"}
 
-ComposeにKoinのセットアップを自動的に処理させます。
+`KoinApplication` はルートの Composable から Koin を開始し、すべての子コンポーネントに提供します：
 
+**コンパイラプラグイン DSL**
 ```kotlin
+import org.koin.compose.KoinApplication
+import org.koin.dsl.koinConfiguration
+
 @Composable
 fun App() {
-    KoinApplication(configuration = koinConfiguration {
-        modules(appModule)
-    }) {
-        MyScreen()
+    KoinApplication(
+        configuration = koinConfiguration { modules(appModule) }
+    ) {
+        MainScreen()
     }
 }
 ```
 
-**利点：**
-- 外部セットアップが不要（Applicationクラスが不要）
-- Androidの `Context` が自動的に注入される
-- コンポジションのライフサイクルに基づいて開始/停止を処理する
-- Androidでの設定変更（configuration changes）を管理する
+**アノテーション**
+```kotlin
+// di/Koin.kt
+import org.koin.core.annotation.KoinApplication
 
-**使用場面：** 制御を少なくし、最もシンプルなセットアップを行いたい場合。
+@KoinApplication
+object KoinApp
+```
 
-Androidでは自動的に `androidContext` と `androidLogger` を注入します。
-
-:::note
-`KoinMultiplatformApplication` は非推奨（deprecated）です。代わりに `KoinApplication` と `koinConfiguration` を使用してください。
-:::
-
-## 基本的な注入 {id="basic-injection"}
-
-### koinInject() - 依存関係の取得 {id="koininject-get-dependencies"}
-
-Koinが管理する任意の依存関係を注入します。
+アノテーションと Composable の名前はどちらも `KoinApplication` であるため、別々のファイルに保持してください。
 
 ```kotlin
+// App.kt
+import org.koin.compose.KoinApplication
+import org.koin.plugin.module.dsl.koinConfiguration
+
+@Composable
+fun App() {
+    KoinApplication(configuration = koinConfiguration<KoinApp>()) {
+        MainScreen()
+    }
+}
+```
+
+`koinConfiguration<KoinApp>()` は `@KoinApplication` クラスのモジュールを読み込みます。オプションを追加するにはラムダを渡します: `koinConfiguration<KoinApp> { printLogger() }`。
+
+**コンストラクタ / クラシック DSL**
+```kotlin
+import org.koin.compose.KoinApplication
+import org.koin.dsl.koinConfiguration
+
+@Composable
+fun App() {
+    KoinApplication(
+        configuration = koinConfiguration { modules(appModule) }
+    ) {
+        MainScreen()
+    }
+}
+```
+
+`KoinApplication` が自動的に行う処理：
+
+- **プラットフォームのセットアップ**: Android ではアプリケーションコンテキストで `androidContext()` を呼び出し、`androidLogger()` をセットアップします。その他のプラットフォームでは `printLogger()` をセットアップします。ログレベルは `logLevel` パラメータ（デフォルトは `Level.INFO`）で変更できます。
+- **既存のインスタンス**: Koin がすでに開始されている場合、`KoinApplication` は実行中のインスタンスにアタッチし、自身の設定を無視します。
+- **ライフサイクル**: `KoinApplication` が composition を離れても Koin は停止しないため、Android の構成変更 (Configuration changes) や Activity の再生成後も存続します。composition が破棄（abandon）された場合にのみ停止します。
+
+`koinConfiguration { }` は再利用可能な [KoinConfiguration](/docs/reference/koin-core/starting-koin) を構築するため、`KoinApplication`、`startKoin`、およびテスト間で同じ設定を共有できます。
+
+### 非推奨のエントリーポイント {id="deprecated-entry-points"}
+
+| API | ステータス | 代わりに使用するもの |
+|-----|--------|-------------|
+| `KoinApplication(application = { ... })` | 非推奨 (Deprecated) | `KoinApplication(configuration = koinConfiguration { ... })` |
+| `KoinMultiplatformApplication(config)` | 非推奨 (Deprecated) | `KoinApplication(configuration)` |
+| `KoinContext { }` | 非推奨、不要 | なし。Compose は `startKoin` で開始されたインスタンスを自動的に検出します |
+| `KoinAndroidContext { }` | 非推奨、不要 | なし |
+
+## koinInject によるインジェクション {id="injecting-with-koininject"}
+
+`koinInject()` は、現在の Koin スコープ（[Compose スコープ](/docs/reference/koin-compose/compose-scopes)がアクティブでない限り、ルートスコープ）から依存関係を解決します：
+
+```kotlin
+import org.koin.compose.koinInject
+
 @Composable
 fun UserScreen() {
     val repository = koinInject<UserRepository>()
-    // repositoryを使用...
 }
 ```
 
-**ベストプラクティス** - デフォルト引数として注入する：
+デフォルトパラメータとして宣言することもできます。これにより、Composable は引き続き Koin と連携しつつ、テストやプレビューでは独自のインスタンスを渡すことができます：
 
 ```kotlin
 @Composable
-fun UserScreen(
-    repository: UserRepository = koinInject()
-) {
-    // Koinなしでテスト可能
+fun UserScreen(repository: UserRepository = koinInject()) {
+    // ...
 }
 ```
 
-### koinViewModel() - ViewModelの取得 {id="koinviewmodel-get-viewmodels"}
+`koinInject()` は、修飾子 (qualifier)、スコープ、およびパラメータをキーとして、解決処理を `remember` でラップします。同じキーを使用した再コンポジション (recomposition) では、再解決することなく同じオブジェクトが返されます。
 
-適切なライフサイクル管理でViewModelを注入します。
+### 修飾子 (Qualifier) とスコープ {id="qualifier-and-scope"}
 
 ```kotlin
 @Composable
-fun UserScreen() {
-    val viewModel = koinViewModel<UserViewModel>()
-    val state by viewModel.state.collectAsState()
+fun SyncScreen() {
+    val localDb = koinInject<Database>(qualifier = named("local"))
+    val cache = koinInject<SessionCache>(scope = sessionScope)
 }
 ```
 
-:::info
-すべてのViewModel APIについては、[ComposeでのViewModel](/docs/reference/koin-compose/compose-viewmodel) を参照してください。
-:::
+名前付き定義の宣言については、[修飾子 (Qualifiers)](/docs/reference/koin-core/qualifiers) を参照してください。
 
-### パラメータを使用する場合 {id="with-parameters"}
+### パラメータ {id="parameters"}
 
-実行時パラメータを渡します。
+[注入パラメータ (injected parameters)](/docs/reference/koin-core/injection-parameters) は、ラムダまたは `ParametersHolder` を使用して渡します：
 
 ```kotlin
 @Composable
-fun DetailScreen(itemId: String) {
-    val viewModel = koinViewModel<DetailViewModel> {
-        parametersOf(itemId)
-    }
+fun UserDetail(userId: String) {
+    // ラムダ形式
+    val presenter = koinInject<UserPresenter> { parametersOf(userId) }
+
+    // holder 形式
+    val presenter2 = koinInject<UserPresenter>(parametersHolder = parametersOf(userId))
 }
 ```
 
-頻繁な再コンポーズ（recomposition）が発生する場合のパフォーマンス向上のために：
+ラムダ形式では、Koin は値を比較するために再コンポジションごとにラムダを呼び出します。holder 形式はそのステップをスキップするため、Koin のソースコードではパフォーマンス向上のために推奨されています。パラメータは値によって比較されます。`userId` が変更されると、`koinInject()` は新しいインスタンスを解決します。
 
-```kotlin
-@Composable
-fun DetailScreen(itemId: String) {
-    val viewModel = koinViewModel<DetailViewModel>(
-        parameters = parametersOf(itemId)
-    )
-}
-```
+## Koin への直接アクセス {id="accessing-koin-directly"}
 
-## モジュールの定義 {id="defining-modules"}
-
-### コンパイラプラグインDSL {id="compiler-plugin-dsl"}
-
-```kotlin
-val appModule = module {
-    single<UserRepository>()
-    viewModel<UserViewModel>()
-}
-```
-
-### アノテーション {id="annotations"}
-
-```kotlin
-@Singleton
-class UserRepository
-
-@KoinViewModel
-class UserViewModel(
-    private val repository: UserRepository
-) : ViewModel()
-```
-
-### クラシックDSL {id="classic-dsl"}
-
-```kotlin
-val appModule = module {
-    singleOf(::UserRepository)
-    viewModelOf(::UserViewModel)
-}
-```
-
-## クイックリファレンス {id="quick-reference"}
-
-| 関数 | 目的 |
+| 関数 | 戻り値 |
 |----------|---------|
-| `koinInject<T>()` | 任意の依存関係を注入する |
-| `koinViewModel<T>()` | ViewModelを注入する |
-| `koinNavViewModel<T>()` | Navigation引数を持つViewModelを注入する |
-| `koinActivityViewModel<T>()` | ActivityスコープのViewModelを注入する (Android) |
-| `rememberKoinModules()` | コンポジションに合わせてモジュールをロードする |
-| `KoinScope {}` | スコープ設定されたコンテキストを作成する |
+| `getKoin()` | 現在の composition の `Koin` インスタンス |
+| `currentKoinScope()` | `koinInject()` がデフォルトで使用するスコープ |
 
-## ドキュメント {id="documentation"}
+どちらも `org.koin.compose` の Composable 関数です。UI コードでは `koinInject()` を優先してください。
 
-| トピック | 説明 |
-|-------|-------------|
-| **[ViewModel](/docs/reference/koin-compose/compose-viewmodel)** | すべてのViewModel注入API |
-| **[ライフサイクルと状態](/docs/reference/koin-compose/compose-lifecycle)** | 再コンポーズ、状態、サイドエフェクト |
-| **[動的モジュール](/docs/reference/koin-compose/compose-modules)** | rememberKoinModules、遅延ロード |
-| **[スコープ](/docs/reference/koin-compose/compose-scopes)** | KoinScope, KoinNavigationScope, UnboundKoinScope |
-| **[テスト](/docs/reference/koin-compose/compose-testing)** | プレビュー、ユニットテスト |
-| **[分離されたコンテキスト](/docs/reference/koin-compose/isolated-context)** | SDKの分離 |
-| **[Navigation 3](/docs/reference/koin-compose/navigation3)** | 型安全なナビゲーション (マルチプラットフォーム) |
+## プレビュー {id="previews"}
 
-## 関連 {id="related"}
+Compose のプレビューでは `Application` クラスは実行されません。プレビューに独自の Koin インスタンスを提供するには、`KoinApplicationPreview` を使用します。[Compose のテスト](/docs/reference/koin-compose/compose-testing)を参照してください。
 
-- **[コアViewModel](/docs/reference/koin-core/viewmodel)** - ViewModel宣言DSL
-- **[Android ViewModel](/docs/reference/koin-android/viewmodel)** - Android固有の機能
-- **[KMPセットアップ](/docs/reference/koin-core/kmp-setup)** - マルチプラットフォーム設定
+## API サマリー {id="api-summary"}
+
+| API | 目的 | ページ |
+|-----|---------|------|
+| `KoinApplication(configuration) { }` | Compose から Koin を開始 | このページ |
+| `koinInject<T>()` | 任意の依存関係を解決 | このページ |
+| `koinViewModel<T>()` | ViewModel を解決 | [Compose における ViewModel](/docs/reference/koin-compose/compose-viewmodel) |
+| `KoinScope`, `KoinNavigationScope` | Composable またはディスティネーションにバインドされたスコープ | [Compose におけるスコープ](/docs/reference/koin-compose/compose-scopes) |
+| `rememberKoinModules { }` | Composable とともにモジュールをロード | [動的モジュール](/docs/reference/koin-compose/compose-modules) |
+| `KoinIsolatedContext` | 隔離された Koin インスタンスを使用 | [分離されたコンテキスト](/docs/reference/koin-compose/isolated-context) |
+| `navigation<T> { }`, `koinEntryProvider()` | Navigation 3 のエントリー | [Navigation 3](/docs/reference/koin-compose/navigation3) |
+
+## 関連情報 {id="related"}
+
+- [Compose における ViewModel](/docs/reference/koin-compose/compose-viewmodel): `koinViewModel()` およびナビゲーションスコープの ViewModel。
+- [ライフサイクルと状態](/docs/reference/koin-compose/compose-lifecycle): インジェクトされたオブジェクトの再コンポジションをまたぐ挙動。
+- [KMP のセットアップ](/docs/reference/koin-core/kmp-setup): Compose Multiplatform プロジェクトでの Koin の開始。
+- [Android での開始](/docs/reference/koin-android/start): `androidContext()` と Android の `Application` クラス。
+- [Compose のテスト](/docs/reference/koin-compose/compose-testing): プレビューと UI テスト。

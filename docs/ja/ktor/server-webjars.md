@@ -5,6 +5,7 @@
 <var name="plugin_name" value="Webjars"/>
 <var name="package_name" value="io.ktor.server.webjars"/>
 <var name="artifact_name" value="ktor-server-webjars"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.server.webjars"/>
 
 <tldr>
 <p>
@@ -18,33 +19,39 @@
     </a>
 </p>
 <p>
-    <b><Links href="/ktor/server-native" summary="Ktor は Kotlin/Native をサポートしており、追加のランタイムや仮想マシンなしでサーバーを実行できます。">Native サーバー</Links>のサポート</b>: ✖️
+    <b><Links href="server-native.md" summary="KtorはKotlin/Nativeをサポートしており、追加のランタイムや仮想マシンなしでサーバーを実行できます。">Nativeサーバー</Links>のサポート</b>: ✖️
 </p>
 </tldr>
 
 <link-summary>
-%plugin_name% プラグインは、WebJars によって提供されるクライアントサイドライブラリの配信を可能にします。
+%plugin_name%プラグインを使用すると、WebJarsによって提供されるクライアントサイドライブラリを配信できます。
 </link-summary>
 
-[%plugin_name%](https://api.ktor.io/ktor-server-webjars/io.ktor.server.webjars/-webjars.html) プラグインは、[WebJars](https://www.webjars.org/) によって提供されるクライアントサイドライブラリの配信を可能にします。これにより、JavaScript や CSS ライブラリなどのアセットを [fat JAR](server-fatjar.md) の一部としてパッケージ化できます。
+[%plugin_name%](https://api.ktor.io/ktor-server-webjars/io.ktor.server.webjars/-webjars.html)プラグインを使用すると、[WebJars](https://www.webjars.org/)によって提供されるクライアントサイドライブラリを配信できるようになります。JavaScriptやCSSライブラリなどのアセットを[fat JAR](server-fatjar.md)の一部としてパッケージ化できます。
 
 ## 依存関係の追加 {id="add_dependencies"}
-`%plugin_name%` を有効にするには、ビルドスクリプトに以下のアーティファクトを含める必要があります。
-* `%artifact_name%` の依存関係を追加します。
+`%plugin_name%`を有効にするには、ビルドスクリプトに以下のアーティファクトを含める必要があります:
+* `%artifact_name%`の依存関係を追加します:
 
   <Tabs group="languages">
       <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-          <code-block lang="Kotlin" code="              implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+          <code-block lang="Kotlin" code="              implementation(%ktor_version_catalog_name%)"/>
+          <note>
+              上記のコードスニペットでは、Ktorの依存関係を指定するために<a href="server-dependencies.topic#using-version-catalog">Ktorバージョンカタログ</a>を使用しています。
+          </note>
       </TabItem>
       <TabItem title="Gradle (Groovy)" group-key="groovy">
-          <code-block lang="Groovy" code="              implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+          <code-block lang="Groovy" code="              implementation %ktor_version_catalog_name%"/>
+          <note>
+              上記のコードスニペットでは、Ktorの依存関係を指定するために<a href="server-dependencies.topic#using-version-catalog">Ktorバージョンカタログ</a>を使用しています。
+          </note>
       </TabItem>
       <TabItem title="Maven" group-key="maven">
           <code-block lang="XML" code="              &lt;dependency&gt;&#10;                  &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                  &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                  &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;              &lt;/dependency&gt;"/>
       </TabItem>
   </Tabs>
 
-* 必要なクライアントサイドライブラリの依存関係を追加します。以下の例は、Bootstrap アーティファクトを追加する方法を示しています。
+* 必要なクライアントサイドライブラリの依存関係を追加します。以下の例では、Bootstrapアーティファクトを追加する方法を示しています:
 
   <var name="group_id" value="org.webjars"/>
   <var name="artifact_name" value="bootstrap"/>
@@ -61,21 +68,20 @@
       </TabItem>
   </Tabs>
   
-  `$bootstrap_version` は、`bootstrap` アーティファクトの必要なバージョン（例: `%bootstrap_version%`）に置き換えることができます。
+  `$bootstrap_version`は、必要な`bootstrap`アーティファクトのバージョン（例: `%bootstrap_version%`）に置き換えることができます。
 
-## %plugin_name% のインストール {id="install_plugin"}
+## %plugin_name%のインストール {id="install_plugin"}
 
 <p>
-    <code>%plugin_name%</code> プラグインをアプリケーションに<a href="server-plugins.md#install">インストール</a>するには、
-    指定された <Links href="/ktor/server-modules" summary="モジュールを使用すると、ルートをグループ化してアプリケーションを構造化できます。">モジュール</Links> 内の <code>install</code> 関数に渡します。
-    以下のコードスニペットは、<code>%plugin_name%</code> をインストールする方法を示しています...
+    アプリケーションに<code>%plugin_name%</code>プラグインを<a href="server-plugins.md#install">インストール</a>するには、指定された<Links href="server-modules.md" summary="モジュールを使用すると、ルートをグループ化してアプリケーションを構造化できます。">モジュール</Links>内の<code>install</code>関数に渡します。
+    以下の例は、<code>%plugin_name%</code>をインストールする方法を示しています:
 </p>
 <list>
     <li>
-        ... <code>embeddedServer</code> 関数の呼び出し内。
+        <code>embeddedServer()</code>関数の呼び出し内。
     </li>
     <li>
-        ... <code>Application</code> クラスの拡張関数である、明示的に定義された <code>module</code> 内。
+        <code>Application</code>クラスの明示的に定義された<code>module()</code>拡張関数内。
     </li>
 </list>
 <Tabs>
@@ -87,9 +93,9 @@
     </TabItem>
 </Tabs>
 
-## %plugin_name% の設定 {id="configure"}
+## %plugin_name%の設定 {id="configure"}
 
-デフォルトでは、`%plugin_name%` は WebJars のアセットを `/webjars` パスで配信します。以下の例は、これを変更して WebJars のアセットを `/assets` パスで配信する方法を示しています。
+デフォルトでは、`%plugin_name%`はWebJarsのアセットを`/webjars`パスで配信します。以下の例は、これを変更してWebJarsのアセットを`/assets`パスで配信する方法を示しています:
 
 ```kotlin
 import io.ktor.server.application.*
@@ -102,7 +108,7 @@ fun Application.module() {
 }
 ```
 
-例えば、`org.webjars:bootstrap` の依存関係をインストールしている場合、以下のように `bootstrap.css` を追加できます。
+例えば、`org.webjars:bootstrap`の依存関係をインストールしている場合、以下のように`bootstrap.css`を追加できます:
 
 ```html
 <head>
@@ -110,6 +116,6 @@ fun Application.module() {
 </head>
 ```
 
-`%plugin_name%` を使用すると、アセットの読み込みに使用するパスを変更することなく、依存関係のバージョンを変更できることに注目してください。
+`%plugin_name%`を使用すると、アセットの読み込みに使用するパスを変更することなく、依存関係のバージョンを変更できる点に注意してください。
 
-> 完全な例はこちらで見つけることができます: [webjars](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/webjars)。
+> 完全な例はこちらで確認できます: [webjars](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/webjars)。

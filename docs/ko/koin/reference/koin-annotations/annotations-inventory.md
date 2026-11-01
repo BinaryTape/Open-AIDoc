@@ -1,934 +1,438 @@
-# Koin 어노테이션 목록 (Inventory)
-
-이 문서는 모든 Koin 어노테이션, 매개변수, 동작 및 사용 예제에 대한 포괄적인 목록을 제공합니다.
-
-## 목차 {id="table-of-contents"}
-
-- [정의 어노테이션 (Definition Annotations)](#definition-annotations)
-  - [@Single](#single)
-  - [@Factory](#factory)
-  - [@Scoped](#scoped)
-- [스코프 어노테이션 (Scope Annotations)](#scope-annotations)
-  - [@Scope](#scope)
-  - [@ViewModelScope](#viewmodelscope)
-  - [@ActivityScope](#activityscope)
-  - [@ActivityRetainedScope](#activityretainedscope)
-  - [@FragmentScope](#fragmentscope)
-  - [@ScopeId](#scopeid)
-- [ViewModel 및 Android 전용 어노테이션](#viewmodel--android-specific-annotations)
-  - [@KoinViewModel](#koinviewmodel)
-  - [@KoinWorker](#koinworker)
-- [한정자 어노테이션 (Qualifier Annotations)](#qualifier-annotations)
-  - [@Named](#named)
-  - [@Qualifier](#qualifier)
-- [매개변수 어노테이션 (Parameter Annotations)](#parameter-annotations)
-  - [@InjectedParam](#injectedparam)
-  - [@Property](#property)
-  - [@PropertyValue](#propertyvalue)
-- [안정성 어노테이션 (Safety Annotations)](#safety-annotations)
-  - [@Provided](#provided)
-- [모듈 및 애플리케이션 어노테이션](#module--application-annotations)
-  - [@Module](#module)
-  - [@ComponentScan](#componentscan)
-  - [@Configuration](#configuration)
-  - [@KoinApplication](#koinapplication)
-- [모니터링 어노테이션](#monitoring-annotations)
-  - [@Monitor](#monitor)
-- [메타 어노테이션 (Internal)](#meta-annotations-internal)
-  - [@ExternalDefinition](#externaldefinition)
-  - [@MetaDefinition](#metadefinition)
-  - [@MetaModule](#metamodule)
-  - [@MetaApplication](#metaapplication)
-
+---
+title: 어노테이션 레퍼런스
 ---
 
-## 정의 어노테이션 (Definition Annotations) {id="definition-annotations"}
+# 어노테이션 레퍼런스
 
-### @Single / @Singleton {id="single-singleton"}
+이 페이지에는 모든 Koin 어노테이션의 패키지 위치, 적용 대상, 매개변수 및 예제가 정리되어 있습니다. 각 항목은 해당 개념을 설명하는 페이지로 연결됩니다. 어노테이션 설정 방법은 [컴파일러 플러그인 설정](/docs/setup/compiler-plugin)을, 어노테이션과 DSL의 비교는 [스타일 선택하기](/docs/intro/choosing-your-style)를 참조하세요.
 
-**패키지:** `org.koin.core.annotation`
+이 어노테이션들은 `io.insert-koin:koin-annotations` 아티팩트(Koin과 동일한 버전)에서 제공됩니다. Koin 컴파일러 플러그인이 빌드 시점에 이를 읽어 정의(definition)를 생성합니다. 대부분의 어노테이션은 `org.koin.core.annotation`에 속하며, Android 전용 어노테이션은 `org.koin.android.annotation`에 속합니다.
 
-**대상:** `CLASS`, `FUNCTION`
+## 한눈에 보기 {id="at-a-glance"}
 
-**설명:** Koin에서 타입이나 함수를 `single`(싱글톤) 정의로 선언합니다. 단일 인스턴스가 생성되어 애플리케이션 전체에서 공유됩니다. `@Singleton`이 권장되는 이름(표준 명명 규칙)이며, `@Single`은 별칭(Alias)입니다.
+| 어노테이션 | 패키지 | 선언 내용 |
+|------------|---------|----------|
+| [`@Singleton` / `@Single`](#singleton--single) | `org.koin.core.annotation` | `single` 정의 |
+| [`@Factory`](#factory) | `org.koin.core.annotation` | `factory` 정의 |
+| [`@Scoped`](#scoped) | `org.koin.core.annotation` | `scoped` 정의 |
+| [`@KoinViewModel`](#koinviewmodel) | `org.koin.core.annotation` | `viewModel` 정의 |
+| [`@KoinWorker`](#koinworker) | `org.koin.android.annotation` | WorkManager `worker` 정의 |
+| [`@Scope`](#scope) | `org.koin.core.annotation` | 정의가 속하는 스코프 |
+| [`@ViewModelScope`](#viewmodelscope) | `org.koin.core.annotation` | ViewModel 스코프 내의 정의 |
+| [`@ActivityScope`](#activityscope) | `org.koin.android.annotation` | Activity 스코프 내의 정의 |
+| [`@ActivityRetainedScope`](#activityretainedscope) | `org.koin.android.annotation` | 유지되는(retained) Activity 스코프 내의 정의 |
+| [`@FragmentScope`](#fragmentscope) | `org.koin.android.annotation` | Fragment 스코프 내의 정의 |
+| [`@ScopeId`](#scopeid) | `org.koin.core.annotation` | 특정 스코프로부터 해결(resolve)되는 파라미터 |
+| [`@Named`](#named) | `org.koin.core.annotation` | 문자열 한정자(qualifier) |
+| [`@Qualifier`](#qualifier) | `org.koin.core.annotation` | 타입 또는 문자열 한정자 |
+| [`@InjectedParam`](#injectedparam) | `org.koin.core.annotation` | 호출자가 전달하는 파라미터 |
+| [`@Property`](#property) | `org.koin.core.annotation` | Koin 프로퍼티에서 읽어오는 파라미터 |
+| [`@PropertyValue`](#propertyvalue) | `org.koin.core.annotation` | 프로퍼티의 기본값 |
+| [`@Provided`](#provided) | `org.koin.core.annotation` | 검증 그래프 외부에서 제공되는 타입 |
+| [`@Module`](#module) | `org.koin.core.annotation` | 모듈 클래스 |
+| [`@ComponentScan`](#componentscan) | `org.koin.core.annotation` | 정의를 검색할 패키지 |
+| [`@Configuration`](#configuration) | `org.koin.core.annotation` | 모듈의 구성 레이블 |
+| [`@KoinApplication`](#koinapplication) | `org.koin.core.annotation` | 애플리케이션 진입점 |
+| [`@Monitor`](#monitor) | `org.koin.core.annotation` | Kotzilla SDK로 추적되는 함수 |
 
-**매개변수:**
-- `binds: Array<KClass<*>> = [Unit::class]` - 이 정의에 바인딩할 명시적 타입입니다. 상위 타입(Supertypes)은 자동으로 감지됩니다.
-- `createdAtStart: Boolean = false` - `true`인 경우, Koin이 시작될 때 인스턴스가 생성됩니다.
+## 정의 (Definitions) {id="definitions"}
 
-**동작:**
-모든 의존성은 생성자 주입(Constructor Injection)을 통해 채워집니다.
+정의 어노테이션은 클래스(Koin이 생성자를 호출) 또는 함수(Koin이 함수를 호출하며 최상위 함수이거나 `@Module` 클래스 내부 함수)에 지정합니다. 생성자 및 함수 파라미터는 컨테이너로부터 해결(resolve)됩니다. 각 파라미터 타입이 어떻게 해결되는지는 [정의](/docs/reference/koin-core/definitions#constructor-parameters)를 참조하세요.
 
-**예제:**
+`binds`가 비어 있으면 해당 정의는 클래스 자체 및 모든 상위 타입(supertype)에 바인딩됩니다. 특정 타입에만 바인딩하려면 `binds`에 해당 타입들을 나열하세요.
+
+### @Singleton / @Single {id="singleton-single"}
+
+타깃: `CLASS`, `FUNCTION`
+
+| 파라미터 | 타입 | 기본값 | 설명 |
+|-----------|------|---------|-------------|
+| `binds` | `Array<KClass<*>>` | `[]` | 바인딩할 타입. 비어 있으면 모든 상위 타입을 바인딩함 |
+| `createdAtStart` | `Boolean` | `false` | Koin 시작 시 인스턴스 생성 여부 |
+
 ```kotlin
-@Single
-class MyClass(val d : MyDependency)
+@Singleton(binds = [UserRepository::class])
+class UserRepositoryImpl(private val api: ApiService) : UserRepository
 ```
 
-**생성된 Koin DSL:**
-```kotlin
-single { MyClass(get()) }
-```
-
-**명시적 바인딩 사용:**
-```kotlin
-@Single(binds = [MyInterface::class])
-class MyClass(val d : MyDependency) : MyInterface
-```
-
-**시작 시 생성 사용:**
-```kotlin
-@Single(createdAtStart = true)
-class MyClass(val d : MyDependency)
-```
-
----
+`@Singleton`과 `@Single`은 동일합니다. JSR-330 표준 이름인 `@Singleton`을 권장합니다. 컨테이너의 수명 주기 동안 하나의 인스턴스가 유지됩니다. 관련 개념: [정의](/docs/reference/koin-core/definitions).
 
 ### @Factory {id="factory"}
 
-**패키지:** `org.koin.core.annotation`
+타깃: `CLASS`, `FUNCTION`
 
-**대상:** `CLASS`, `FUNCTION`
+| 파라미터 | 타입 | 기본값 | 설명 |
+|-----------|------|---------|-------------|
+| `binds` | `Array<KClass<*>>` | `[]` | 바인딩할 타입. 비어 있으면 모든 상위 타입을 바인딩함 |
 
-**설명:** Koin에서 타입이나 함수를 `factory` 정의로 선언합니다. 요청될 때마다 새로운 인스턴스가 생성됩니다.
-
-**매개변수:**
-- `binds: Array<KClass<*>> = [Unit::class]` - 이 정의에 바인딩할 명시적 타입입니다. 상위 타입은 자동으로 감지됩니다.
-
-**동작:**
-모든 의존성은 생성자 주입을 통해 채워집니다. 각 요청마다 새로운 인스턴스를 생성합니다.
-
-**예제:**
 ```kotlin
 @Factory
-class MyClass(val d : MyDependency)
+class UserPresenter(private val repository: UserRepository)
 ```
 
-**생성된 Koin DSL:**
-```kotlin
-factory { MyClass(get()) }
-```
-
----
+요청할 때마다 새 인스턴스가 생성됩니다. 관련 개념: [정의](/docs/reference/koin-core/definitions).
 
 ### @Scoped {id="scoped"}
 
-**패키지:** `org.koin.core.annotation`
+타깃: `CLASS`, `FUNCTION`
 
-**대상:** `CLASS`, `FUNCTION`
+| 파라미터 | 타입 | 기본값 | 설명 |
+|-----------|------|---------|-------------|
+| `binds` | `Array<KClass<*>>` | `[]` | 바인딩할 타입. 비어 있으면 모든 상위 타입을 바인딩함 |
 
-**설명:** Koin에서 타입이나 함수를 `scoped` 정의로 선언합니다. 반드시 `@Scope` 어노테이션과 함께 사용해야 합니다. 인스턴스는 특정 스코프 내에서 공유됩니다.
-
-**매개변수:**
-- `binds: Array<KClass<*>> = [Unit::class]` - 이 정의에 바인딩할 명시적 타입입니다. 상위 타입은 자동으로 감지됩니다.
-
-**동작:**
-정의된 스코프의 수명 주기 내에 존재하는 스코프 인스턴스를 생성합니다.
-
-**예제:**
 ```kotlin
-@Scope(MyScope::class)
+@Scope(UserSession::class)
 @Scoped
-class MyClass(val d : MyDependency)
+class SessionCache(private val repository: UserRepository)
 ```
 
-**참고:** [@Scope](#scope)
-
----
-
-## 스코프 어노테이션 (Scope Annotations) {id="scope-annotations"}
-
-### @Scope {id="scope"}
-
-**패키지:** `org.koin.core.annotation`
-
-**대상:** `CLASS`, `FUNCTION`
-
-**설명:** 클래스를 Koin 스코프에 선언합니다. 스코프 이름은 값(클래스) 또는 이름(문자열)으로 기술됩니다. 기본적으로 `scoped` 정의를 선언합니다. 명시적 바인딩을 위해 `@Scoped`, `@Factory`, `@KoinViewModel` 어노테이션으로 재정의할 수 있습니다.
-
-**매개변수:**
-- `value: KClass<*> = Unit::class` - 스코프 클래스 값
-- `name: String = ""` - 스코프 문자열 값
-
-**동작:**
-지정된 스코프 타입 또는 이름과 연결된 스코프 정의를 생성합니다.
-
-**클래스 사용 예제:**
-```kotlin
-@Scope(MyScope::class)
-class MyClass(val d : MyDependency)
-```
-
-**생성된 Koin DSL:**
-```kotlin
-scope<MyScope> {
-    scoped { MyClass(get()) }
-}
-```
-
-**문자열 이름 사용 예제:**
-```kotlin
-@Scope(name = "my_custom_scope")
-class MyClass(val d : MyDependency)
-```
-
----
-
-### @ViewModelScope {id="viewmodelscope"}
-
-**패키지:** `org.koin.core.annotation`
-
-**대상:** `CLASS`, `FUNCTION`
-
-**설명:** 클래스를 ViewModelScope Koin 스코프에 선언합니다. 이는 ViewModel의 수명 주기 내에 존재해야 하는 컴포넌트를 위한 스코프 원형(Archetype)입니다.
-
-**매개변수:** 없음
-
-**동작:**
-`viewModelScope` 내에 스코프 정의를 생성합니다.
-
-**예제:**
-```kotlin
-@ViewModelScope
-class MyClass(val d : MyDependency)
-```
-
-**생성된 Koin DSL:**
-```kotlin
-viewModelScope {
-    scoped { MyClass(get()) }
-}
-```
-
-**사용법:**
-태그된 클래스는 ViewModel 및 `viewModelScope` 함수와 함께 사용되어 스코프를 활성화하도록 설계되었습니다.
-
----
-
-### @ActivityScope {id="activityscope"}
-
-**패키지:** `org.koin.android.annotation`
-
-**대상:** `CLASS`, `FUNCTION`
-
-**설명:** 클래스를 Activity Koin 스코프에 선언합니다.
-
-**매개변수:** 없음
-
-**동작:**
-`activityScope` 내에 스코프 정의를 생성합니다.
-
-**예제:**
-```kotlin
-@ActivityScope
-class MyClass(val d : MyDependency)
-```
-
-**생성된 Koin DSL:**
-```kotlin
-activityScope {
-    scoped { MyClass(get()) }
-}
-```
-
-**사용법:**
-태그된 클래스는 Activity 및 `activityScope` 함수와 함께 사용되어 스코프를 활성화하도록 설계되었습니다.
-
----
-
-### @ActivityRetainedScope {id="activityretainedscope"}
-
-**패키지:** `org.koin.android.annotation`
-
-**대상:** `CLASS`, `FUNCTION`
-
-**설명:** 클래스를 Activity Koin 스코프에 선언하지만, 구성 변경(Configuration changes) 시에도 유지되도록 합니다.
-
-**매개변수:** 없음
-
-**동작:**
-`activityRetainedScope` 내에 스코프 정의를 생성합니다.
-
-**예제:**
-```kotlin
-@ActivityRetainedScope
-class MyClass(val d : MyDependency)
-```
-
-**생성된 Koin DSL:**
-```kotlin
-activityRetainedScope {
-    scoped { MyClass(get()) }
-}
-```
-
-**사용법:**
-태그된 클래스는 Activity 및 `activityRetainedScope` 함수와 함께 사용되어 스코프를 활성화하도록 설계되었습니다.
-
----
-
-### @FragmentScope {id="fragmentscope"}
-
-**패키지:** `org.koin.android.annotation`
-
-**대상:** `CLASS`, `FUNCTION`
-
-**설명:** 클래스를 Fragment Koin 스코프에 선언합니다.
-
-**매개변수:** 없음
-
-**동작:**
-`fragmentScope` 내에 스코프 정의를 생성합니다.
-
-**예제:**
-```kotlin
-@FragmentScope
-class MyClass(val d : MyDependency)
-```
-
-**생성된 Koin DSL:**
-```kotlin
-fragmentScope {
-    scoped { MyClass(get()) }
-}
-```
-
-**사용법:**
-태그된 클래스는 Fragment 및 `fragmentScope` 함수와 함께 사용되어 스코프를 활성화하도록 설계되었습니다.
-
----
-
-### @ScopeId {id="scopeid"}
-
-**패키지:** `org.koin.core.annotation`
-
-**대상:** `VALUE_PARAMETER`
-
-**설명:** 클래스 생성자 또는 함수의 매개변수에 어노테이션을 달아, 지정된 스코프 ID를 가진 스코프에서 의존성을 해결(Resolution)하도록 요청합니다.
-
-**매개변수:**
-- `value: KClass<*> = Unit::class` - 스코프 타입
-- `name: String = ""` - 스코프 문자열 식별자
-
-**동작:**
-타입 또는 이름으로 식별되는 특정 스코프에서 의존성을 해결합니다.
-
-**문자열 이름 사용 예제:**
-```kotlin
-@Factory
-class MyClass(@ScopeId(name = "my_scope_id") val d : MyDependency)
-```
-
-**생성된 Koin DSL:**
-```kotlin
-factory { MyClass(getScope("my_scope_id").get()) }
-```
-
-**타입 사용 예제:**
-```kotlin
-@Factory
-class MyClass(@ScopeId(MyScope::class) val d : MyDependency)
-```
-
----
-
-## ViewModel 및 Android 전용 어노테이션 {id="viewmodel-android-specific-annotations"}
+스코프당 하나의 인스턴스가 생성되며, 스코프가 닫힐 때 해제됩니다. `@Scope` 또는 스코프 아키타입(`@ViewModelScope`, `@ActivityScope` 등)과 함께 사용합니다. 관련 개념: [스코프](/docs/reference/koin-core/scopes).
 
 ### @KoinViewModel {id="koinviewmodel"}
 
-**패키지:** `org.koin.android.annotation`
+타깃: `CLASS`, `FUNCTION`
 
-**대상:** `CLASS`, `FUNCTION`
+| 파라미터 | 타입 | 기본값 | 설명 |
+|-----------|------|---------|-------------|
+| `binds` | `Array<KClass<*>>` | `[]` | 바인딩할 타입. 비어 있으면 모든 상위 타입을 바인딩함 |
 
-**설명:** Koin 정의를 위한 ViewModel 어노테이션입니다. Koin에서 타입이나 함수를 `viewModel` 정의로 선언합니다.
-
-**플랫폼 지원:**
-- ✅ Android
-- ✅ Kotlin Multiplatform (KMP)
-- ✅ Compose Multiplatform (CMP)
-
-**매개변수:**
-- `binds: Array<KClass<*>> = []` - 이 정의에 바인딩할 명시적 타입입니다. 상위 타입은 자동으로 감지됩니다.
-
-**동작:**
-모든 의존성은 생성자 주입을 통해 채워집니다. Koin에 의해 관리되는 ViewModel 인스턴스를 생성합니다. Compose Multiplatform을 사용할 때 Android, iOS, Desktop, Web을 포함한 모든 플랫폼에서 작동합니다.
-
-**예제 (Android/CMP):**
 ```kotlin
 @KoinViewModel
-class MyViewModel(val d : MyDependency) : ViewModel()
+class UserViewModel(private val repository: UserRepository) : ViewModel()
 ```
 
-**예제 (KMP/CMP 공통):**
-```kotlin
-@KoinViewModel
-class SharedViewModel(
-    val repository: Repository,
-    val analytics: Analytics
-) : ViewModel()
-```
+Android 및 Compose Multiplatform 타깃에서 작동합니다. 클래스패스에 `io.insert-koin:koin-core-viewmodel`이 필요합니다(그렇지 않으면 `KOIN-A001` 오류와 함께 빌드가 실패합니다). 관련 개념: [ViewModel](/docs/reference/koin-core/viewmodel).
 
-**생성된 Koin DSL:**
-```kotlin
-viewModel { MyViewModel(get()) }
-```
-
----
+:::note
+컴파일러 플러그인을 사용할 때 `@KoinViewModel`은 `org.koin.core.annotation`에 위치합니다. KSP 프로세서는 `org.koin.android.annotation.KoinViewModel`을 사용했으므로 마이그레이션 시 import 문을 업데이트하세요([KSP에서 마이그레이션하기](/docs/migration/from-ksp-to-compiler-plugin) 참조).
+:::
 
 ### @KoinWorker {id="koinworker"}
 
-**패키지:** `org.koin.android.annotation`
+패키지: `org.koin.android.annotation` (Android 전용). 타깃: `CLASS`, `FUNCTION`
 
-**대상:** `CLASS`, `FUNCTION`
+| 파라미터 | 타입 | 기본값 | 설명 |
+|-----------|------|---------|-------------|
+| `binds` | `Array<KClass<*>>` | `[]` | 바인딩할 타입 |
 
-**설명:** Koin 정의를 위한 Worker 어노테이션입니다. WorkManager 워커를 위한 `worker` 정의로 타입을 선언합니다.
-
-**매개변수:**
-- `binds: Array<KClass<*>> = []` - 이 정의에 바인딩할 명시적 타입입니다.
-
-**동작:**
-Android WorkManager 연동을 위한 워커 정의를 생성합니다.
-
-**예제:**
 ```kotlin
 @KoinWorker
-class MyWorker() : Worker()
+class SyncWorker(
+    context: Context,
+    params: WorkerParameters,
+    private val repository: UserRepository,
+) : CoroutineWorker(context, params)
 ```
 
----
+`io.insert-koin:koin-android-workmanager`가 필요합니다(그렇지 않으면 `KOIN-A002` 오류와 함께 빌드가 실패합니다). 관련 개념: [WorkManager](/docs/reference/koin-android/workmanager).
 
-## 한정자 어노테이션 (Qualifier Annotations) {id="qualifier-annotations"}
+## 스코프 (Scopes) {id="scopes"}
+
+### @Scope {id="scope"}
+
+타깃: `CLASS`, `FUNCTION`
+
+| 파라미터 | 타입 | 기본값 | 설명 |
+|-----------|------|---------|-------------|
+| `value` | `KClass<*>` | `Unit::class` | 스코프 타입 |
+| `name` | `String` | `""` | 타입 대신 사용할 스코프 이름 |
+
+```kotlin
+@Scope(UserSession::class)
+class SessionCache(private val repository: UserRepository)
+
+@Scope(name = "checkout")
+class CheckoutState
+```
+
+정의를 지정된 스코프에 할당합니다. `@Scope` 단독으로 사용하면 `scoped` 정의를 선언합니다. 다른 종류를 선택하거나 `binds`를 설정하려면 `@Scoped`, `@Factory` 또는 `@KoinViewModel`을 추가하세요. 관련 개념: [스코프](/docs/reference/koin-core/scopes).
+
+### @ViewModelScope {id="viewmodelscope"}
+
+타깃: `CLASS`, `FUNCTION`. 파라미터 없음.
+
+```kotlin
+@ViewModelScope
+class UserSessionCache(private val repository: UserRepository)
+```
+
+ViewModel의 스코프 내에서 범위가 지정된(scoped) 정의를 선언합니다. ViewModel과 함께 생성되고 ViewModel이 지워질(cleared) 때 함께 닫힙니다. 관련 개념: [스코프](/docs/reference/koin-core/scopes).
+
+### @ActivityScope {id="activityscope"}
+
+패키지: `org.koin.android.annotation` (Android 전용). 타깃: `CLASS`, `FUNCTION`. 파라미터 없음.
+
+```kotlin
+@ActivityScope
+class ScreenTracker(private val analytics: Analytics)
+```
+
+Activity 스코프 내에서 범위가 지정된(scoped) 정의를 선언합니다. Activity가 해당 스코프를 제공해야 합니다([Android 스코프](/docs/reference/koin-android/scope) 참조).
+
+### @ActivityRetainedScope {id="activityretainedscope"}
+
+패키지: `org.koin.android.annotation` (Android 전용). 타깃: `CLASS`, `FUNCTION`. 파라미터 없음.
+
+```kotlin
+@ActivityRetainedScope
+class FormState
+```
+
+설정 변경(configuration changes) 시에도 유지되는 Activity 스코프 내에서 범위가 지정된(scoped) 정의를 선언합니다. [Android 스코프](/docs/reference/koin-android/scope)를 참조하세요.
+
+### @FragmentScope {id="fragmentscope"}
+
+패키지: `org.koin.android.annotation` (Android 전용). 타깃: `CLASS`, `FUNCTION`. 파라미터 없음.
+
+```kotlin
+@FragmentScope
+class ListAdapterFactory
+```
+
+Fragment 스코프 내에서 범위가 지정된(scoped) 정의를 선언합니다. [Android 스코프](/docs/reference/koin-android/scope)를 참조하세요.
+
+### @ScopeId {id="scopeid"}
+
+타깃: `VALUE_PARAMETER`
+
+| 파라미터 | 타입 | 기본값 | 설명 |
+|-----------|------|---------|-------------|
+| `value` | `KClass<*>` | `Unit::class` | 스코프 타입. 스코프 ID는 클래스의 전체 이름(full name)입니다 |
+| `name` | `String` | `""` | 스코프 ID |
+
+```kotlin
+@Factory
+class ProfileService(@ScopeId(name = "user_session") val session: UserSession)
+```
+
+현재 스코프 대신 해당 ID를 가진 스코프로부터 파라미터를 해결합니다(`getScope("user_session").get()`으로 생성됨). 스코프는 런타임에만 존재하므로 컴파일 타임 안전성 검사에서는 이를 확인하지 않습니다. 관련 개념: [스코프](/docs/reference/koin-core/scopes).
+
+## 한정자 (Qualifiers) {id="qualifiers"}
 
 ### @Named {id="named"}
 
-**패키지:** `org.koin.core.annotation`
+타깃: `CLASS`, `FUNCTION`, `VALUE_PARAMETER`
 
-**대상:** `CLASS`, `FUNCTION`, `VALUE_PARAMETER`
+| 파라미터 | 타입 | 기본값 | 설명 |
+|-----------|------|---------|-------------|
+| `value` | `String` | `""` | 문자열 한정자 |
+| `type` | `KClass<*>` | `Unit::class` | 타입 한정자. 컴파일러 플러그인에서는 대신 `@Qualifier(Type::class)`를 사용하세요 |
 
-**설명:** 주어진 정의에 대한 한정자(Qualifier)를 정의합니다. `StringQualifier("...")` 또는 타입 기반 한정자를 생성합니다.
-
-**매개변수:**
-- `value: String = ""` - 문자열 한정자
-- `type: KClass<*> = Unit::class` - 클래스 한정자
-
-**동작:**
-동일한 타입의 여러 정의를 구분하는 데 사용됩니다.
-
-**문자열 사용 예제:**
 ```kotlin
-@Single
-@Named("special")
-class MyClass(val d : MyDependency)
+@Singleton
+@Named("local")
+class LocalDatabase : Database
+
+@Singleton
+class UserRepository(@Named("local") private val database: Database)
 ```
 
-**매개변수에서 사용:**
-```kotlin
-@Single
-class Consumer(@Named("special") val myClass: MyClass)
-```
-
-**타입 사용 예제:**
-```kotlin
-@Single
-@Named(type = MyType::class)
-class MyClass(val d : MyDependency)
-```
-
----
+정의와 파라미터에 동일한 문자열을 지정하여 서로를 연결합니다. `jakarta.inject.Named` 및 `javax.inject.Named`도 동일한 방식으로 해석됩니다. 관련 개념: [한정자](/docs/reference/koin-core/qualifiers).
 
 ### @Qualifier {id="qualifier"}
 
-**패키지:** `org.koin.core.annotation`
+타깃: `CLASS`, `FUNCTION`, `VALUE_PARAMETER`
 
-**대상:** `CLASS`, `FUNCTION`, `VALUE_PARAMETER`
+| 파라미터 | 타입 | 기본값 | 설명 |
+|-----------|------|---------|-------------|
+| `value` | `KClass<*>` | `Unit::class` | 타입 한정자 |
+| `name` | `String` | `""` | 문자열 한정자 |
 
-**설명:** 주어진 정의에 대한 한정자를 정의합니다. `@Named`와 유사하지만 매개변수 우선순위가 반대입니다.
-
-**매개변수:**
-- `value: KClass<*> = Unit::class` - 클래스 한정자
-- `name: String = ""` - 문자열 한정자
-
-**동작:**
-동일한 타입의 여러 정의를 구분하는 데 사용됩니다.
-
-**예제:**
 ```kotlin
-@Single
-@Qualifier(name = "special")
-class MyClass(val d : MyDependency)
+@Singleton
+@Qualifier(Remote::class)
+class RemoteDataSource : DataSource
+
+@Singleton
+class UserRepository(@Qualifier(Remote::class) private val source: DataSource)
 ```
 
----
+`@Qualifier`는 직접 커스텀 한정자 어노테이션을 지정할 때도 사용됩니다. `@Qualifier` 또는 `@Named`(또는 `jakarta.inject.Qualifier`, `javax.inject.Qualifier`)로 주석이 달린 모든 어노테이션 클래스는 한정자가 됩니다.
 
-## 매개변수 어노테이션 (Parameter Annotations) {id="parameter-annotations"}
+```kotlin
+@Qualifier
+annotation class IoDispatcher
+
+@Singleton
+@IoDispatcher
+fun ioDispatcher(): CoroutineDispatcher = Dispatchers.IO
+```
+
+인자가 없는 커스텀 한정자는 어노테이션 클래스에 대한 타입 한정자가 됩니다. 문자열 또는 enum 인자가 있는 경우(`@Dispatcher(AppDispatchers.IO)`), 해당 인자 값이 한정자가 됩니다. 관련 개념: [한정자](/docs/reference/koin-core/qualifiers).
+
+## 파라미터 (Parameters) {id="parameters"}
 
 ### @InjectedParam {id="injectedparam"}
 
-**패키지:** `org.koin.core.annotation`
+타깃: `VALUE_PARAMETER`. 파라미터 없음.
 
-**대상:** `VALUE_PARAMETER`
-
-**설명:** 생성자 또는 함수 매개변수를 DI 컨테이너 대신 `ParametersHolder`(호출 지점에서 `parametersOf()`를 통해 전달됨)에서 해결하도록 표시합니다.
-
-**매개변수:** 없음
-
-**동작:**
-런타임 시 Koin 정의가 아닌 `ParametersHolder.get()`에서 매개변수 값을 해결합니다. 컴파일 타임 안정성 검증 시 `@InjectedParam` 매개변수는 건너뜁니다.
-
-**예제:**
 ```kotlin
 @Factory
-class MyClass(@InjectedParam val id: Int, val service: Service)
+class UserPresenter(@InjectedParam val userId: String, private val repository: UserRepository)
+
+// 호출 측
+val presenter: UserPresenter = get { parametersOf("user-42") }
 ```
 
-**생성된 Koin DSL:**
-```kotlin
-factory { params -> MyClass(params.get(), get()) }
-```
-
-**사용법:**
-```kotlin
-val instance = koin.get<MyClass> { parametersOf(42) }
-```
-
----
+이 값은 컨테이너가 아니라 호출 위치의 `parametersOf(...)`에서 제공됩니다. 컴파일 타임 안전성 검사를 통해 호출 측에서 올바른 개수와 타입의 값을 전달하는지 확인합니다(`KOIN-D005`, `KOIN-D006`). 관련 개념: [주입 파라미터](/docs/reference/koin-core/injection-parameters).
 
 ### @Property {id="property"}
 
-**패키지:** `org.koin.core.annotation`
+타깃: `VALUE_PARAMETER`
 
-**대상:** `VALUE_PARAMETER`
+| 파라미터 | 타입 | 기본값 | 설명 |
+|-----------|------|---------|-------------|
+| `value` | `String` | 필수 | 프로퍼티 키 |
 
-**설명:** 생성자 매개변수나 함수 매개변수에 어노테이션을 달아 Koin 프로퍼티로 해결하도록 합니다.
-
-**매개변수:**
-- `value: String` - 프로퍼티 이름
-
-**동작:**
-의존성 주입 대신 Koin 프로퍼티에서 매개변수 값을 해결합니다.
-
-**예제:**
 ```kotlin
 @Factory
-class MyClass(@Property("name") val name : String)
+class ApiClient(@Property("api_url") val url: String)
 ```
 
-**생성된 Koin DSL:**
-```kotlin
-factory { MyClass(getProperty("name")) }
-```
-
-**기본값과 함께 사용:**
-```kotlin
-@PropertyValue("name")
-val defaultName = "MyName"
-
-@Factory
-class MyClass(@Property("name") val name : String)
-```
-
-**생성된 Koin DSL:**
-```kotlin
-factory { MyClass(getProperty("name", defaultName)) }
-```
-
----
+`getProperty("api_url")`을 통해 파라미터를 해결합니다. 동일한 키를 가진 `@PropertyValue`가 존재하면 폴백(fallback) 값으로 사용됩니다. 그렇지 않은 경우 빌드 시 경고 `KOIN-P001`이 표시되며 시작 시에 해당 프로퍼티를 반드시 설정해야 합니다. 관련 개념: [프로퍼티](/docs/reference/koin-core/starting-koin#properties).
 
 ### @PropertyValue {id="propertyvalue"}
 
-**패키지:** `org.koin.core.annotation`
+타깃: `FIELD`
 
-**대상:** `FIELD`
+| 파라미터 | 타입 | 기본값 | 설명 |
+|-----------|------|---------|-------------|
+| `value` | `String` | 필수 | 프로퍼티 키 |
 
-**설명:** 프로퍼티의 기본값이 될 필드 값에 어노테이션을 답니다.
-
-**매개변수:**
-- `value: String` - 프로퍼티 이름
-
-**동작:**
-프로퍼티를 찾을 수 없을 때 사용할 기본값을 정의합니다.
-
-**예제:**
 ```kotlin
-@PropertyValue("name")
-val defaultName = "MyName"
+@PropertyValue("api_url")
+val defaultApiUrl = "https://api.example.com"
 
 @Factory
-class MyClass(@Property("name") val name : String)
+class ApiClient(@Property("api_url") val url: String)
 ```
 
-**생성된 Koin DSL:**
-```kotlin
-factory { MyClass(getProperty("name", defaultName)) }
-```
-
----
-
-## 안정성 어노테이션 (Safety Annotations) {id="safety-annotations"}
+프로퍼티가 설정되지 않았을 때 사용할 기본값을 선언합니다(`getProperty("api_url", defaultApiUrl)`로 생성됨).
 
 ### @Provided {id="provided"}
 
-**패키지:** `org.koin.core.annotation`
+타깃: `CLASS`, `FUNCTION`, `VALUE_PARAMETER`. 파라미터 없음.
 
-**대상:** `CLASS`, `VALUE_PARAMETER`
-
-**설명:** 타입이나 매개변수가 런타임에 외부에서 제공됨(예: Android 프레임워크 타입, 타사 SDK)을 표시합니다. 컴파일 타임 안정성 검증 시 이러한 타입들은 건너뜁니다.
-
-**매개변수:** 없음
-
-**동작:**
-- **클래스**에 적용 시: 해당 타입의 모든 사용에 대해 컴파일 안정성 검증을 건너뜁니다.
-- **매개변수**에 적용 시: 해당 특정 매개변수에 대해서만 검증을 건너뜁니다.
-- 타입은 여전히 런타임에 `scope.get<T>()`를 통해 해결됩니다. `@Provided`는 컴파일 타임 검사에만 영향을 미칩니다.
-
-**클래스 사용 예제:**
 ```kotlin
-@Provided
-class FirebaseAnalytics  // 모든 사용 시 검증 건너뜀
-
 @Singleton
-class AnalyticsService(val analytics: FirebaseAnalytics)
-// 컴파일 오류 없음 — FirebaseAnalytics가 @Provided임
+class AnalyticsService(@Provided val firebase: FirebaseAnalytics)
 ```
 
-**매개변수 사용 예제:**
-```kotlin
-@Factory
-class PaymentProcessor(@Provided val gateway: PaymentGateway)
-// 컴파일 오류 없음 — 이 매개변수만 검증 건너뜀
-```
+컴파일러 플러그인이 볼 수 있는 선언 없이도(플랫폼 객체, SDK, 나중에 로드되는 모듈 등) 런타임에 해당 타입을 사용할 수 있음을 컴파일 타임 안전성 검사에 알립니다. 클래스에 적용하면 해당 타입의 모든 사용에 대한 검사가 생략됩니다. 파라미터에 적용하면 해당 파라미터만 생략됩니다. 런타임 해결 방식에는 영향을 주지 않습니다. 일반적인 Android 타입(`Context`, `Activity`, `Fragment`, `SavedStateHandle`, `WorkerParameters` 등)에는 이 어노테이션을 사용할 필요가 없습니다. 관련 개념: [컴파일 타임 안전성](/docs/reference/koin-compiler/compile-safety#external-types-provided).
 
-**참고:** 일반적인 Android 프레임워크 타입(`Context`, `Application`, `Activity`, `Fragment`, `SavedStateHandle`, `WorkerParameters`)은 자동으로 화이트리스트에 포함되므로 `@Provided`가 필요하지 않습니다.
-
-**참고:** [컴파일 타임 안정성 (Compile-Time Safety)](/docs/reference/koin-compiler/compile-safety#external-types-provided)
-
----
-
-## 모듈 및 애플리케이션 어노테이션 {id="module-application-annotations"}
+## 모듈 및 애플리케이션 (Modules and application) {id="modules-and-application"}
 
 ### @Module {id="module"}
 
-**패키지:** `org.koin.core.annotation`
+타깃: `CLASS`
 
-**대상:** `CLASS`
+| 파라미터 | 타입 | 기본값 | 설명 |
+|-----------|------|---------|-------------|
+| `includes` | `Array<KClass<*>>` | `[]` | 포함할 다른 `@Module` 클래스들 |
+| `createdAtStart` | `Boolean` | `false` | Koin 시작 시 모듈의 `single` 정의 생성 여부 |
 
-**설명:** Koin 모듈 내부의 정의들을 모으는 데 도움을 주는 클래스 어노테이션입니다. 각 함수는 Koin 정의 어노테이션을 가질 수 있습니다.
-
-**매개변수:**
-- `includes: Array<KClass<*>> = []` - 포함할 모듈 클래스들
-- `createdAtStart: Boolean = false` - `true`인 경우, 모듈 인스턴스가 시작 시 생성됩니다.
-
-**동작:**
-모듈 내의 모든 어노테이션된 함수와 클래스를 수집합니다.
-
-**예제:**
 ```kotlin
-@Module
-class MyModule {
-    @Single
-    fun myClass(d : MyDependency) = MyClass(d)
+@Module(includes = [NetworkModule::class])
+class DataModule {
+
+    @Singleton
+    fun database(context: Context): AppDatabase =
+        Room.databaseBuilder(context, AppDatabase::class.java, "app-db").build()
 }
 ```
 
-**생성된 Koin DSL:**
-```kotlin
-val MyModule.module = module {
-    val moduleInstance = MyModule()
-    single { moduleInstance.myClass(get()) }
-}
-```
-
-**includes와 함께 사용:**
-```kotlin
-@Module(includes = [OtherModule::class])
-class MyModule {
-    // 정의들
-}
-```
-
----
+정의들을 그룹화합니다. 클래스 내부의 어노테이션된 함수들과 `@ComponentScan`에 의해 검색된 어노테이션 클래스들이 포함됩니다. 관련 개념: [모듈](/docs/reference/koin-core/modules).
 
 ### @ComponentScan {id="componentscan"}
 
-**패키지:** `org.koin.core.annotation`
+타깃: `CLASS`, `FIELD`
 
-**대상:** `CLASS`, `FIELD`
+| 파라미터 | 타입 | 기본값 | 설명 |
+|-----------|------|---------|-------------|
+| `value` | `vararg String` | 비어 있음 | 검색할 패키지. 비어 있으면 어노테이션이 적용된 클래스의 패키지를 검색함 |
 
-**설명:** Koin 정의 어노테이션으로 선언된 정의들을 수집합니다. 현재 패키지나 명시적인 패키지 이름을 스캔합니다.
-
-**매개변수:**
-- `value: vararg String = []` - 스캔할 패키지 (glob 패턴 지원)
-
-**동작:**
-지정된 패키지에서 어노테이션이 달린 클래스를 스캔합니다. 정확한 패키지 이름과 glob 패턴을 모두 지원합니다.
-
-**Glob 패턴 지원:**
-
-1. **정확한 패키지 이름 (와일드카드 없음):**
-   - `com.example.service` - 패키지와 모든 하위 패키지를 스캔합니다 (`com.example**`와 동일).
-
-2. **루트를 포함한 다중 레벨 스캔:**
-   - `com.example**` - `com.example` 및 모든 하위 패키지를 스캔합니다.
-
-3. **루트를 제외한 다중 레벨 스캔:**
-   - `com.example.**` - `com.example`의 하위 패키지만 스캔하고 루트는 제외합니다.
-
-4. **단일 레벨 와일드카드:**
-   - `com.example.*.service` - 정확히 한 레벨만 일치시킵니다 (예: `com.example.user.service`).
-
-5. **복합 와일드카드:**
-   - `com.**.service.*data` - 복잡한 패턴 매칭
-   - `com.*.service.**` - 패턴 하위의 패키지들을 스캔
-
-**예제 - 현재 패키지 스캔:**
 ```kotlin
-@ComponentScan
-class MyApp
+@Module
+@ComponentScan("com.myapp.data", "com.myapp.domain")
+class AppModule
 ```
 
-**예제 - 특정 패키지 스캔:**
-```kotlin
-@ComponentScan("com.example.services", "com.example.repositories")
-class MyApp
-```
+지정된 패키지 및 그 하위 패키지에 있는 모든 어노테이션 적용 클래스와 최상위 함수를 여러 Gradle 모듈에 걸쳐 모듈에 추가합니다. 관련 개념: [모듈](/docs/reference/koin-core/modules).
 
-**예제 - glob 패턴 사용:**
-```kotlin
-@ComponentScan("com.example.**", "org.app.*.services")
-class MyApp
-```
-
----
+:::note
+컴파일러 플러그인은 패키지 이름 및 그 하위 패키지와 매칭됩니다. KSP 프로세서의 glob 패턴(`com.example.**`, `com.*.service`)은 지원되지 않으므로 대신 패키지를 나열해야 합니다.
+:::
 
 ### @Configuration {id="configuration"}
 
-**패키지:** `org.koin.core.annotation`
+타깃: `CLASS`, `FIELD`
 
-**대상:** `CLASS`, `FIELD`
+| 파라미터 | 타입 | 기본값 | 설명 |
+|-----------|------|---------|-------------|
+| `value` | `vararg String` | 비어 있음 | 구성 레이블. 비어 있으면 `"default"`를 의미함 |
 
-**설명:** `@Module` 클래스에 적용하여 하나 이상의 구성(태그/플레이버)과 연결합니다.
-
-**매개변수:**
-- `value: vararg String = []` - 구성 이름
-
-**동작:**
-조건부 로딩을 위해 모듈을 구성별로 그룹화할 수 있습니다.
-
-**기본 구성:**
 ```kotlin
 @Module
+@ComponentScan
 @Configuration
-class MyModule
-```
-이 모듈은 "default" 구성의 일부입니다.
+class CoreModule            // 레이블 "default"
 
-**다중 구성:**
-```kotlin
-@Module
-@Configuration("prod", "test")
-class MyModule
-```
-이 모듈은 "prod" 및 "test" 구성 모두에서 사용 가능합니다.
-
-**기본값과 함께 사용:**
-```kotlin
 @Module
 @Configuration("default", "test")
-class MyModule
+class FakeDataModule        // 레이블 "default" 및 "test"
 ```
-default 및 test 구성에서 사용 가능합니다.
 
-**참고:** `@Configuration("default")`는 `@Configuration`과 동일합니다.
-
----
+`@KoinApplication`은 일일이 나열하지 않아도 자신의 구성 레이블 중 하나를 포함하는 모든 모듈(다른 Gradle 모듈의 모듈 포함)을 로드합니다. `@Configuration("default")`는 `@Configuration`과 동일합니다. 관련 개념: [모듈](/docs/reference/koin-core/modules).
 
 ### @KoinApplication {id="koinapplication"}
 
-**패키지:** `org.koin.core.annotation`
+타깃: `CLASS`
 
-**대상:** `CLASS`
+| 파라미터 | 타입 | 기본값 | 설명 |
+|-----------|------|---------|-------------|
+| `configurations` | `Array<String>` | `[]` | 로드할 구성 레이블. 비어 있으면 `"default"` 로드 |
+| `modules` | `Array<KClass<*>>` | `[Unit::class]` (없음) | 추가로 로드할 `@Module` 클래스들 |
 
-**설명:** 클래스를 Koin 애플리케이션 진입점으로 태그합니다. `startKoin()` 또는 `koinApplication()` 함수로 Koin 애플리케이션 부트스트랩을 생성합니다.
-
-**매개변수:**
-- `configurations: Array<String> = []` - 스캔할 구성 이름 목록
-- `modules: Array<KClass<*>> = [Unit::class]` - 구성 외에 로드할 모듈 목록
-
-**동작:**
-구성과 포함된 모듈을 스캔하는 부트스트랩 함수를 생성합니다.
-
-**예제 - 기본 구성:**
 ```kotlin
-@KoinApplication
-class MyApp
-```
+@KoinApplication(modules = [AppModule::class])
+object MyApp
 
-**생성된 함수:**
-```kotlin
-MyApp.startKoin()
-MyApp.koinApplication()
-```
-
-**예제 - 특정 구성:**
-```kotlin
-@KoinApplication(configurations = ["default", "prod"])
-class MyApp
-```
-
-**예제 - 모듈과 함께 사용:**
-```kotlin
-@KoinApplication(
-    configurations = ["default"],
-    modules = [CoreModule::class, ApiModule::class]
-)
-class MyApp
-```
-
-**사용자 정의 구성과 함께 사용:**
-```kotlin
-MyApp.startKoin {
-    printLogger()
-    // 추가 구성
+fun main() {
+    startKoin<MyApp> {
+        printLogger()
+    }
 }
 ```
 
----
+애플리케이션 진입점을 표시합니다. `startKoin<MyApp>()`, `koinApplication<MyApp>()` 또는 `koinConfiguration<MyApp>()`(`org.koin.plugin.module.dsl` 패키지)을 사용하여 시작합니다. 여기에서 컴파일 타임 안전성 검사가 전체 그래프를 검증합니다. `@Configuration`에서 가져온 모듈이 먼저 로드된 다음, `modules` 목록이 해당 순서대로 로드되므로 명시적 목록이 오버라이드 우선권을 갖습니다. 관련 개념: [Koin 시작하기](/docs/reference/koin-core/starting-koin).
 
-## 모니터링 어노테이션 {id="monitoring-annotations"}
+## 모니터링 (Monitoring) {id="monitoring"}
 
 ### @Monitor {id="monitor"}
 
-**패키지:** `org.koin.core.annotation`
+타깃: `CLASS`, `FUNCTION`. 파라미터 없음.
 
-**대상:** `CLASS`, `FUNCTION`
-
-**설명:** Koin의 공식 툴링 플랫폼인 Kotzilla Platform을 통해 자동 모니터링 및 성능 추적을 수행하도록 클래스나 함수를 표시합니다.
-
-**매개변수:** 없음
-
-**동작:**
-- 클래스에 적용 시: 모든 public 메서드 호출을 모니터링하는 Koin 프록시를 생성합니다.
-- 함수에 적용 시: Koin 관리 컴포넌트 내의 해당 특정 메서드를 모니터링합니다.
-- 성능 메트릭, 오류율 및 사용 패턴을 자동으로 캡처합니다.
-- 실시간 분석을 위해 데이터를 Kotzilla 워크스페이스로 전송합니다.
-
-**요구 사항:**
-- `implementation 'io.kotzilla:kotzilla-core:latest.version'`
-- 유효한 Kotzilla Platform 계정 및 API 키
-
-**예제:**
 ```kotlin
 @Monitor
-class UserService(private val userRepository: UserRepository) {
-    fun findUser(id: String): User? = userRepository.findById(id)
+class UserService(private val repository: UserRepository) {
+    fun findUser(id: String): User? = repository.findById(id)
 }
 ```
 
-**리소스:**
-- [Kotzilla Platform](https://kotzilla.io)
-- [전체 문서](https://doc.kotzilla.io)
-- [최신 버전](https://doc.kotzilla.io/docs/releaseNotes/changelogSDK)
+컴파일러 플러그인이 함수 본문(또는 클래스의 모든 공개 함수)을 Kotzilla SDK 추적 코드로 래핑합니다. 클래스패스에 Kotzilla SDK(`io.kotzilla:kotzilla-core`)가 필요합니다. 없으면 빌드 시 경고 `KOIN-M001`이 표시되고 아무것도 추적되지 않습니다. 설정 및 수집되는 데이터: [모니터링](/docs/tooling/monitor).
 
-**도입 버전:** Kotzilla 1.2.1
+## JSR-330 어노테이션 {id="jsr-330-annotations"}
 
----
+컴파일러 플러그인은 `jakarta.inject` 및 `javax.inject` 어노테이션인 `@Singleton`, `@Named`, `@Inject`, `@Qualifier`도 함께 읽습니다. [JSR-330](/docs/reference/koin-android/jsr330)을 참조하세요.
 
-## 메타 어노테이션 (Internal) {id="meta-annotations-internal"}
+## 제거된 어노테이션 {id="removed-annotations"}
 
-이 어노테이션들은 Koin 컴파일러 및 코드 생성에 의한 내부 용도로만 사용됩니다.
+`@ExternalDefinition`, `@MetaDefinition`, `@MetaModule`, `@MetaApplication`(`org.koin.meta.annotations` 패키지)은 KSP 프로세서가 내부 사용을 위해 자체 생성하던 어노테이션이었습니다. 컴파일러 플러그인은 이를 사용하지 않으며, 사용자가 직접 작성할 일도 없습니다.
 
-### @ExternalDefinition {id="externaldefinition"}
+## 관련 문서 {id="related"}
 
-**패키지:** `org.koin.meta.annotations`
-
-**대상:** `CLASS`, `FIELD`, `FUNCTION`
-
-**설명:** 생성된 패키지에서의 컴포넌트 탐색을 위한 내부 용도입니다.
-
-**매개변수:**
-- `value: String = ""` - 선언된 정의의 패키지
-
----
-
-### @MetaDefinition {id="metadefinition"}
-
-**패키지:** `org.koin.meta.annotations`
-
-**대상:** `CLASS`, `FUNCTION`, `PROPERTY`
-
-**설명:** 정의 메타데이터를 표현하는 데 도움을 주는 메타 정의 어노테이션입니다.
-
-**매개변수:**
-- `value: String = ""` - 정의의 전체 경로
-- `moduleTagId: String = ""` - 모듈 태그 + ID ("module_id:module_tag" 형식)
-- `dependencies: Array<String> = []` - 확인할 매개변수 태그들
-- `binds: Array<String> = []` - 바인딩된 타입들
-- `qualifier: String = ""` - 한정자
-- `scope: String = ""` - 선언된 스코프
-
----
-
-### @MetaModule {id="metamodule"}
-
-**패키지:** `org.koin.meta.annotations`
-
-**대상:** `CLASS`
-
-**설명:** 모듈 메타데이터를 표현하는 데 도움을 주는 메타 모듈 어노테이션입니다.
-
-**매개변수:**
-- `value: String = ""` - 모듈 전체 경로
-- `id: String = ""` - 모듈 ID
-- `includes: Array<String> = []` - 확인할 포함된 모듈 태그들
-- `configurations: Array<String> = []` - 확인할 모듈 구성들
-- `isObject: Boolean = false` - 모듈이 객체(object)인지 여부
-
----
-
-### @MetaApplication {id="metaapplication"}
-
-**패키지:** `org.koin.meta.annotations`
-
-**대상:** `CLASS`
-
-**설명:** 애플리케이션 메타데이터를 표현하는 데 도움을 주는 메타 애플리케이션 어노테이션입니다.
-
-**매개변수:**
-- `value: String = ""` - 애플리케이션 전체 경로
-- `includes: Array<String> = []` - 확인할 사용된 모듈 태그들
-- `configurations: Array<String> = []` - 확인할 사용된 구성 모듈들
-
----
-
-## 요약 표 {id="summary-table"}
-
-| 어노테이션 | 패키지 | 목적 | 일반적인 유스케이스 |
-|------------|---------|---------|-----------------|
-| `@Singleton` / `@Single` | `org.koin.core.annotation` | 싱글톤 정의 | 공유 애플리케이션 서비스 |
-| `@Factory` | `org.koin.core.annotation` | 팩토리 정의 | 요청당 인스턴스 |
-| `@Scoped` | `org.koin.core.annotation` | 스코프 정의 | 스코프별 인스턴스 |
-| `@Scope` | `org.koin.core.annotation` | 스코프 선언 | 사용자 정의 스코프 |
-| `@ViewModelScope` | `org.koin.core.annotation` | ViewModel 스코프 | ViewModel 스코프 의존성 |
-| `@ActivityScope` | `org.koin.android.annotation` | Activity 스코프 | Activity 스코프 의존성 |
-| `@ActivityRetainedScope` | `org.koin.android.annotation` | 유지되는 Activity 스코프 | 구성 변경 시 유지되는 의존성 |
-| `@FragmentScope` | `org.koin.android.annotation` | Fragment 스코프 | Fragment 스코프 의존성 |
-| `@ScopeId` | `org.koin.core.annotation` | 스코프 해결 | 특정 스코프에서 해결 |
-| `@KoinViewModel` | `org.koin.android.annotation` | ViewModel 정의 | Android/KMP/CMP ViewModel |
-| `@KoinWorker` | `org.koin.android.annotation` | Worker 정의 | WorkManager 워커 |
-| `@Named` | `org.koin.core.annotation` | 문자열/타입 한정자 | 동일 타입 빈 구분 |
-| `@Qualifier` | `org.koin.core.annotation` | 타입/문자열 한정자 | 동일 타입 빈 구분 |
-| `@InjectedParam` | `org.koin.core.annotation` | 런타임 매개변수 | `parametersOf()` 값 |
-| `@Property` | `org.koin.core.annotation` | 프로퍼티 주입 | 구성 값 |
-| `@PropertyValue` | `org.koin.core.annotation` | 프로퍼티 기본값 | 기본 구성 값 |
-| `@Provided` | `org.koin.core.annotation` | 안정성 검증 건너뛰기 | 외부/프레임워크 타입 |
-| `@Module` | `org.koin.core.annotation` | 모듈 선언 | 정의 그룹화 |
-| `@ComponentScan` | `org.koin.core.annotation` | 패키지 스캔 | 정의 자동 탐색 |
-| `@Configuration` | `org.koin.core.annotation` | 모듈 구성 | 빌드 변체/플레이버 |
-| `@KoinApplication` | `org.koin.core.annotation` | 앱 진입점 | Koin 부트스트랩 |
-| `@Monitor` | `org.koin.core.annotation` | 성능 모니터링 | 프로덕션 모니터링 |
-
----
-
-**문서 버전:** 1.0
-**최종 업데이트:** 2025-10-20
-**Koin Annotations 버전:** 2.2.x+
+- [정의](/docs/reference/koin-core/definitions): 정의 타입, 바인딩, 생성자 파라미터.
+- [모듈](/docs/reference/koin-core/modules): 실제 환경에서의 `@Module`, `@ComponentScan`, `@Configuration`.
+- [컴파일 타임 안전성](/docs/reference/koin-compiler/compile-safety): 플러그인이 이 어노테이션들로부터 검사하는 내용.
+- [컴파일러 플러그인 옵션](/docs/reference/koin-annotations/options): 플러그인의 Gradle 옵션.
+- [DSL 레퍼런스](/docs/reference/koin-core/dsl): 각 어노테이션에 대응하는 DSL.

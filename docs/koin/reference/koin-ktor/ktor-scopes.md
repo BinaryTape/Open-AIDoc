@@ -2,253 +2,119 @@
 title: 请求作用域
 ---
 
-# Ktor 中的请求作用域
+# 请求作用域
 
-请求作用域创建的实例仅在单个 HTTP 请求期间存续，非常适合处理特定于请求的数据和处理过程。
+本页介绍 Koin Ktor 插件的请求作用域 (request scope)：为每个 HTTP 调用开启并在发送响应后关闭的 Koin 作用域。将其用于保存每个请求状态的对象，例如请求日志记录器或当前用户。有关作用域的一般工作原理，请参阅[作用域](/docs/reference/koin-core/scopes)。你需要按照 [Koin for Ktor](/docs/reference/koin-ktor/ktor) 中的说明安装该插件。
 
-## 声明请求作用域组件 {id="declaring-request-scoped-components"}
+## 声明请求作用域定义 {id="declaring-request-scoped-definitions"}
 
-使用 `requestScope` 声明绑定到请求生命周期的组件：
-
+**编译器插件 DSL**
 ```kotlin
-val appModule = module {
-    // 单例 - 在所有请求之间共享
-    single { UserRepository() }
+import org.koin.module.requestScope
 
-    // 请求作用域 - 每个请求一个新实例
+val appModule = module {
+    single<UserRepository>() // 由所有请求共享
+
+    requestScope {
+        scoped<RequestLogger>()
+        scoped<UserSessionHandler>()
+    }
+}
+```
+
+**注解**
+```kotlin
+import org.koin.ktor.plugin.RequestScope
+
+@Scope(RequestScope::class)
+class RequestLogger(private val call: ApplicationCall)
+
+@Scope(RequestScope::class)
+class UserSessionHandler(private val call: ApplicationCall)
+```
+
+`requestScope { }` 是由 `RequestScope` 类型限定的作用域，因此 `@Scope(RequestScope::class)` 针对的也是同一个作用域。
+
+**构造函数 / 传统 DSL**
+```kotlin
+import org.koin.module.requestScope
+
+val appModule = module {
+    singleOf(::UserRepository) // 由所有请求共享
+
     requestScope {
         scopedOf(::RequestLogger)
-        scopedOf(::RequestMetrics)
         scopedOf(::UserSessionHandler)
     }
 }
 ```
 
-## 访问请求作用域组件 {id="accessing-request-scoped-components"}
+## 在处理程序中解析 {id="resolving-in-a-handler"}
 
-使用 `call.scope.get()` 来解析请求作用域的依赖项：
+`call.scope` 是当前调用的请求作用域：
 
 ```kotlin
 routing {
     get("/users/{id}") {
-        val requestLogger = call.scope.get<RequestLogger>()
-        val metrics = call.scope.get<RequestMetrics>()
+        val logger = call.scope.get<RequestLogger>()
+        val userService = call.get<UserService>()
 
-        metrics.start()
-        requestLogger.log("Processing user request")
-
-        val userId = call.parameters["id"]!!
-        val userService = get<UserService>()
-        val user = userService.getUser(userId)
-
-        requestLogger.log("Request completed")
-        metrics.end()
-
-        call.respond(user)
+        logger.log("Fetching user")
+        call.respond(userService.getUser(call.parameters["id"]!!))
     }
 }
 ```
 
-## 注入 ApplicationCall {id="injecting-applicationcall"}
+在单次调用内，每次执行 `call.scope.get<RequestLogger>()` 都会返回同一个实例。下一次调用则会获取一个新实例。请求作用域定义可以依赖单例，因为请求作用域会回退到根作用域。
 
-请求作用域组件可以自动注入 `ApplicationCall`：
+如果调用没有作用域，例如在既未安装 `Koin` 也未安装 `KoinIsolated` 的情况下，`call.scope` 会抛出 "Koin Request Scope is not ready"。
+
+## 注入 ApplicationCall {id="injecting-the-applicationcall"}
+
+call 是其请求作用域的来源，因此请求作用域类可以将 `ApplicationCall` 作为构造函数形参接收，而无需额外声明：
 
 ```kotlin
 class RequestLogger(private val call: ApplicationCall) {
     fun log(message: String) {
-        val requestPath = call.request.path()
-        val method = call.request.httpMethod.value
-        println("[$method $requestPath] $message")
+        println("[${call.request.httpMethod.value} ${call.request.path()}] $message")
     }
 }
 
 class UserSessionHandler(private val call: ApplicationCall) {
-    fun getUserId(): String? {
-        return call.request.headers["X-User-ID"]
-    }
-
-    fun isAuthenticated(): Boolean {
-        return call.request.headers["Authorization"] != null
-    }
+    fun userId(): String? = call.request.headers["X-User-ID"]
 }
 ```
 
-## 作用域生命周期回调 {id="scope-lifecycle-callbacks"}
+作用域源在[作用域](/docs/reference/koin-core/scopes)中进行了说明。`ApplicationCall` 仅在请求作用域中可用：`single` 无法接收它。
 
-为作用域定义附加 `onClose` 回调，以便在请求作用域关闭时运行清理操作。`onClose` 是定义上的中缀函数（而不是 `requestScope { }` 内部的一个块），且实例参数是可空的 (`T?`)：
+## 生命周期 {id="lifecycle"}
+
+| 步骤 | 时间点 |
+|------|------|
+| 作用域创建 | Ktor `CallSetup`，在路由之前 |
+| 作用域 ID | `request_` 后跟一个唯一的计数器 |
+| 作用域关闭 | Ktor `ResponseSent`，在发送响应之后 |
+
+关闭作用域会丢弃其中的所有实例。要运行清理代码，请向定义中添加 `onClose`：
 
 ```kotlin
 requestScope {
-    scoped { RequestContext() } onClose { context ->
-        val duration = System.currentTimeMillis() - (context?.startTime ?: 0L)
-        println("Request completed in ${duration}ms")
+    scoped { RequestMetrics() } onClose { metrics ->
+        metrics?.recordDuration()
     }
 }
 ```
 
-您也可以使用 `withOptions { onClose { ... } }`：
+`onClose` 接收该实例作为可空值。没有 `onCreate` 回调：请在构造函数或定义 lambda 表达式中运行初始化。有关回调的详细信息，请参阅[定义](/docs/reference/koin-core/definitions)。
 
-```kotlin
-requestScope {
-    scoped { RequestContext() } withOptions {
-        onClose { context ->
-            context?.cleanup()
-        }
-    }
-}
-```
+## 常见陷阱 {id="pitfalls"}
 
-:::note
-Koin 的作用域 DSL 针对每个定义公开了 `onClose`；没有 `onCreate` 回调。初始化应在 `scoped { }` 构造函数块中进行。
-:::
+- **单例中的请求对象**：不要将请求作用域类注入到 `single` 中。单例仅创建一次，并将一直持有第一个请求的实例。应在处理程序中从 `call.scope` 解析请求作用域对象，或者将其作为实参传递。
+- **后台任务**：在发送响应后，从处理程序启动且生命周期超出该调用的协程不得使用 `call.scope`：因为此时作用域已关闭。
 
-:::note
-请求作用域会**为每个 HTTP 请求创建并销毁**。实例不会在请求之间共享，从而确保线程安全并防止状态泄漏。
-:::
+## 相关内容 {id="related"}
 
-## 在 Ktor 中声明模块 {id="declaring-modules-in-ktor"}
-
-Koin 提供了便捷的函数，可以直接在 Ktor 应用程序中声明模块。
-
-### 使用 koinModule {id="using-koinmodule"}
-
-内联声明模块：
-
-```kotlin
-fun Application.configureRouting() {
-    koinModule {
-        singleOf(::CustomerRepository)
-        singleOf(::CustomerService)
-    }
-
-    routing {
-        customerRoutes()
-    }
-}
-```
-
-### 使用 koinModules {id="using-koinmodules"}
-
-加载多个现有模块：
-
-```kotlin
-fun Application.configureCustomerFeature() {
-    koinModules(
-        customerRepositoryModule,
-        customerServiceModule,
-        customerRoutesModule
-    )
-
-    routing {
-        customerRoutes()
-    }
-}
-```
-
-## 模块化应用程序结构 {id="modular-application-structure"}
-
-按功能组织您的 Ktor 应用：
-
-```kotlin
-// 功能 1：客户管理
-fun Application.customerModule() {
-    koinModule {
-        singleOf(::CustomerRepository)
-        singleOf(::CustomerService)
-    }
-
-    routing {
-        route("/api/customers") {
-            customerRoutes()
-        }
-    }
-}
-
-// 功能 2：订单管理
-fun Application.orderModule() {
-    koinModule {
-        singleOf(::OrderRepository)
-        singleOf(::OrderService)
-    }
-
-    routing {
-        route("/api/orders") {
-            orderRoutes()
-        }
-    }
-}
-
-// 主应用程序
-fun Application.module() {
-    install(Koin) {
-        slf4jLogger()
-        modules(coreModule)
-    }
-
-    customerModule()
-    orderModule()
-}
-```
-
-## 在请求作用域中使用注解 {id="request-scope-with-annotations"}
-
-为请求作用域组件使用注解：
-
-```kotlin
-@Scope(RequestScope::class)
-class RequestLogger(private val call: ApplicationCall) {
-    fun log(message: String) {
-        println("[${call.request.path()}] $message")
-    }
-}
-```
-
-## 完整示例 {id="complete-example"}
-
-```kotlin
-val appModule = module {
-    singleOf(::UserRepositoryImpl) bind UserRepository::class
-    singleOf(::UserService)
-
-    requestScope {
-        scopedOf(::RequestLogger)
-        scopedOf(::RequestMetrics) onClose { metrics ->
-            metrics?.recordDuration()
-        }
-    }
-}
-
-fun Application.module() {
-    install(Koin) {
-        slf4jLogger()
-        modules(appModule)
-    }
-
-    routing {
-        get("/api/users/{id}") {
-            val logger = call.scope.get<RequestLogger>()
-            val userService = get<UserService>()
-
-            logger.log("Fetching user")
-            val user = userService.getUser(call.parameters["id"]!!)
-
-            call.respond(user)
-        }
-    }
-}
-```
-
-## API 参考 {id="api-reference"}
-
-| 函数 | 描述 |
-|----------|-------------|
-| `requestScope { }` | 声明请求作用域组件 |
-| `call.scope.get<T>()` | 获取请求作用域实例 |
-| `scoped { } onClose { }` | 每个定义的清理回调（实例可为空） |
-| `koinModule { }` | 声明内联模块 |
-| `koinModules(...)` | 加载现有模块 |
-
-## 另请参阅 {id="see-also"}
-
-- **[Koin for Ktor](/docs/reference/koin-ktor/ktor)** - Ktor 主文档
-- **[作用域](/docs/reference/koin-core/scopes)** - 核心作用域概念
+- [作用域](/docs/reference/koin-core/scopes)：作用域概念、作用域源、链接。
+- [Koin for Ktor](/docs/reference/koin-ktor/ktor)：安装插件并在路由中进行注入。
+- [定义](/docs/reference/koin-core/definitions)：`onClose` 及其他定义选项。
+- [Ktor 测试](/docs/reference/koin-ktor/ktor-testing)：测试使用请求作用域的路由。

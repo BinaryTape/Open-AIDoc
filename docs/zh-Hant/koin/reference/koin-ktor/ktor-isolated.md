@@ -1,24 +1,20 @@
 ---
-title: 隔離上下文
+title: Ktor 中的隔離上下文
 ---
 
 # Ktor 中的隔離上下文
 
-`KoinIsolated` 外掛程式在隔離上下文中執行 Koin，與全域 Koin 執行個體分開。這對於測試、多租戶應用程式以及執行多個 Koin 執行個體非常有用。
+本頁介紹 `KoinIsolated` 外掛程式，它會為單一 Ktor 應用程式啟動 Koin，而不會將其註冊到全域上下文中。每個應用程式隨後都擁有自己的容器。關於什麼是隔離上下文以及何時使用它，請參閱[上下文隔離](/docs/reference/koin-core/context-isolation)。常規的 `Koin` 外掛程式則在 [Koin for Ktor](/docs/reference/koin-ktor/ktor) 中說明。
 
-## 何時使用隔離上下文 {id="when-to-use-isolated-context"}
+## 安裝 KoinIsolated {id="installing-koinisolated"}
 
-- **測試** — 每個測試都獲得自己隔離的 Koin 執行個體
-- **多租戶應用程式** — 具有不同配置的不同租戶
-- **外掛程式/模組系統** — 具有其自身相依性的獨立模組
-- **嵌入式 Ktor 伺服器** — 在同一個 JVM 中執行多個 Ktor 執行個體
+安裝 `KoinIsolated` 來取代 `Koin`。配置區塊完全相同：
 
-## 基本設定 {id="basic-setup"}
-
-安裝 `KoinIsolated` 而非 `Koin`：
-
+**Compiler Plugin DSL**
 ```kotlin
-fun Application.main() {
+import org.koin.ktor.plugin.KoinIsolated
+
+fun Application.module() {
     install(KoinIsolated) {
         slf4jLogger()
         modules(appModule)
@@ -26,246 +22,100 @@ fun Application.main() {
 }
 ```
 
-## 全域與隔離上下文 {id="global-vs-isolated-context"}
-
-### 全域上下文 (預設) {id="global-context-default"}
-
+**Annotations**
 ```kotlin
-// 使用 GlobalContext - 在應用程式中共享
-install(Koin) {
-    modules(appModule)
-}
+import org.koin.ktor.plugin.KoinIsolated
+import org.koin.plugin.module.dsl.withConfiguration
 
-// 可以透過 GlobalContext 在任何地方存取 Koin
-val service = GlobalContext.get().get<UserService>()
-```
-
-### 隔離上下文 {id="isolated-context"}
-
-```kotlin
-// 使用隔離上下文 - 無法透過 GlobalContext 存取
-install(KoinIsolated) {
-    modules(appModule)
-}
-
-// GlobalContext.get() 將不會傳回此 Koin 執行個體
-// 僅能在 Ktor 應用程式作用域內存取
-```
-
-:::warning
-使用 `KoinIsolated` 時，您無法透過 `GlobalContext` 存取 Koin。所有注入都必須在 Ktor 應用程式作用域內使用 `inject()` 或 `get()` 進行。
-:::
-
-## 完整範例 {id="complete-example"}
-
-```kotlin
-val appModule = module {
-    singleOf(::UserRepository)
-    singleOf(::UserService)
-
-    requestScope {
-        scopedOf(::RequestLogger)
+fun Application.module() {
+    install(KoinIsolated) {
+        slf4jLogger()
+        withConfiguration<KoinUserApplication>()
     }
 }
+```
 
-fun Application.main() {
-    // 以隔離模式安裝 Koin
+**Constructor / Classic DSL**
+```kotlin
+import org.koin.ktor.plugin.KoinIsolated
+
+fun Application.module() {
     install(KoinIsolated) {
         slf4jLogger()
         modules(appModule)
     }
+}
+```
 
-    // 在 Application 作用域內可以進行注入
+## 與 Koin 相比的變化 {id="what-changes-compared-to-koin"}
+
+| | `install(Koin)` | `install(KoinIsolated)` |
+|---|---|---|
+| 註冊於全域上下文 | 是 | 否 |
+| 在 `Application`、`Route`、`Routing`、`ApplicationCall` 上的 `inject()` / `get()` | 是 | 是，來自該應用程式的執行個體 |
+| 請求作用域與 `call.scope` | 是 | 是 |
+| 生命週期事件，在 `ApplicationStopping` 時關閉 | 是 | 是 |
+| 至 Ktor DI 的 `bridge { }` | 是 | 在 Koin 4.2 中不套用 |
+| `KoinComponent` 類別、`KoinPlatform.getKoin()` | 看得到此執行個體 | 看不到此執行個體 |
+
+Ktor 擴充功能會讀取儲存在應用程式屬性中的 Koin 執行個體，因此路由中的注入運作方式完全相同：
+
+```kotlin
+fun Application.module() {
+    install(KoinIsolated) {
+        modules(appModule)
+    }
+
     val userService by inject<UserService>()
+    val koin = getKoin() // 該應用程式的 Koin 執行個體
 
     routing {
         get("/users/{id}") {
             val logger = call.scope.get<RequestLogger>()
-            val id = call.parameters["id"]!!
-
-            logger.log("Fetching user $id")
-            val user = userService.getUser(id)
-
-            call.respond(user)
+            call.respond(userService.getUser(call.parameters["id"]!!))
         }
     }
 }
 ```
 
-## 配合 DI 橋接 {id="with-di-bridge"}
+:::warning
+Ktor 接收者（receiver）外部的程式碼無法存取隔離的執行個體。實作 `KoinComponent` 的類別，或呼叫 `KoinPlatform.getKoin()`，均會使用全域上下文並失敗，顯示「KoinApplication has not been started」。請透過在隔離模組中宣告的建構函式參數，將相依性傳遞給你的類別。對於必須自行取得相依性的互通入口點，請覆寫 `getKoin()`，如[上下文隔離](/docs/reference/koin-core/context-isolation)所示。
+:::
 
-隔離上下文也支援 Ktor DI 橋接：
+## 在單一 JVM 中執行多個伺服器 {id="several-servers-in-one-jvm"}
 
-```kotlin
-fun Application.main() {
-    // Ktor DI - 基礎結構
-    val database = Database(environment.config)
-    dependencies {
-        provide<Database> { database }
-    }
-
-    // 帶有橋接的 Koin Isolated
-    install(KoinIsolated) {
-        slf4jLogger()
-
-        bridge {
-            koinToKtor()  // 允許 Koin 從 Ktor DI 中解析
-        }
-
-        modules(appModule)
-    }
-
-    routing {
-        userRoutes()
-    }
-}
-
-val appModule = module {
-    // 可以透過橋接從 Ktor DI 注入 Database
-    singleOf(::UserRepository)
-    singleOf(::UserService)
-}
-```
-
-## 使用隔離上下文進行測試 {id="testing-with-isolated-context"}
-
-隔離上下文對於測試特別有用：
-
-```kotlin
-class UserServiceTest {
-    @Test
-    fun `test user endpoint`() = testApplication {
-        application {
-            // 每個測試獲得其專屬的隔離 Koin 執行個體
-            install(KoinIsolated) {
-                modules(testModule)
-            }
-            configureRouting()
-        }
-
-        client.get("/users/123").apply {
-            assertEquals(HttpStatusCode.OK, status)
-        }
-    }
-}
-
-val testModule = module {
-    single<UserRepository> { MockUserRepository() }
-    singleOf(::UserService)
-}
-```
-
-### 並行測試執行 {id="parallel-test-execution"}
-
-使用隔離上下文，測試可以並行執行而不會互相干擾：
-
-```kotlin
-class ParallelTests {
-    @Test
-    fun `test A`() = testApplication {
-        application {
-            install(KoinIsolated) {
-                modules(moduleA)  // 專屬的隔離執行個體
-            }
-        }
-        // ...
-    }
-
-    @Test
-    fun `test B`() = testApplication {
-        application {
-            install(KoinIsolated) {
-                modules(moduleB)  // 不同的隔離執行個體
-            }
-        }
-        // ...
-    }
-}
-```
-
-## 多個 Ktor 伺服器 {id="multiple-ktor-servers"}
-
-執行具有獨立 Koin 執行個體的多個 Ktor 伺服器：
+每個嵌入式伺服器都會獲得自己的容器：
 
 ```kotlin
 fun main() {
-    // 伺服器 1 - 使用者服務
     val userServer = embeddedServer(Netty, port = 8080) {
-        install(KoinIsolated) {
-            modules(userServiceModule)
-        }
+        install(KoinIsolated) { modules(userServiceModule) }
         userRouting()
     }
 
-    // 伺服器 2 - 訂單服務 (不同的 Koin 執行個體)
     val orderServer = embeddedServer(Netty, port = 8081) {
-        install(KoinIsolated) {
-            modules(orderServiceModule)
-        }
+        install(KoinIsolated) { modules(orderServiceModule) }
         orderRouting()
     }
 
-    // 兩個伺服器都有獨立的 Koin 容器
     userServer.start(wait = false)
     orderServer.start(wait = true)
 }
 ```
 
-## 生命週期 {id="lifecycle"}
+使用 `install(Koin)` 時，第二個伺服器會停止第一個伺服器的全域 Koin，因為該外掛程式在啟動前會先停止正在執行的全域執行個體。
 
-隔離的 Koin 執行個體遵循 Ktor 應用程式的生命週期：
+## 測試 {id="tests"}
 
-```kotlin
-fun Application.main() {
-    install(KoinIsolated) {
-        slf4jLogger()
-        modules(appModule)
-    }
+每個安裝了 `KoinIsolated` 的 `testApplication` 都擁有自己的容器，因此測試不會透過全域上下文共用狀態，並且可以平行執行。測試設定在 [Ktor 測試](/docs/reference/koin-ktor/ktor-testing)中有詳細說明。
 
-    // 監控 Koin 生命週期
-    environment.monitor.subscribe(KoinApplicationStarted) {
-        log.info("Isolated Koin started")
-    }
+## 何時保留全域上下文 {id="when-to-keep-the-global-context"}
 
-    environment.monitor.subscribe(KoinApplicationStopped) {
-        log.info("Isolated Koin stopped")
-    }
-}
-```
+當處理程序（process）中只執行一個 Ktor 應用程式，且該處理程序的其他入口點（例如從 `main()` 啟動的排程工作）必須使用同一個容器，或者當你需要 Ktor DI 橋接器時，請繼續使用 `install(Koin)`。
 
-## 存取隔離的 Koin 執行個體 {id="accessing-the-isolated-koin-instance"}
+## 相關內容 {id="related"}
 
-在 Ktor 應用程式中，您可以存取隔離的 Koin 執行個體：
-
-```kotlin
-fun Application.main() {
-    install(KoinIsolated) {
-        modules(appModule)
-    }
-
-    // 從 Application 存取 Koin 執行個體
-    val koin = getKoin()
-
-    // 或透過外掛程式屬性
-    val koinApp = attributes[KoinPluginKey]
-}
-```
-
-## 何時不要使用隔離上下文 {id="when-not-to-use-isolated-context"}
-
-- **單一 Ktor 應用程式** — 全域上下文更簡單
-- **跨模組共享相依性** — 全域上下文允許共享
-- **存取 Koin 的背景工作** — 它們需要 GlobalContext
-
-## 最佳實務 {id="best-practices"}
-
-1. **用於測試** — 隔離上下文可防止測試干擾
-2. **用於多租戶** — 每個租戶可以有不同的配置
-3. **對於簡單應用程式，請避免使用** — 全域上下文對於大多數使用案例來說更簡單
-4. **記錄選擇原因** — 明確說明為什麼使用隔離上下文
-
-## 另請參閱 {id="see-also"}
-
-- **[Ktor 整合](/docs/reference/koin-ktor/ktor)** — 主要 Ktor 文件
-- **[上下文隔離](/docs/reference/koin-core/context-isolation)** — 核心隔離概念
-- **[測試](/docs/reference/koin-test/testing)** — 使用 Koin 進行測試
+- [上下文隔離](/docs/reference/koin-core/context-isolation)：隔離上下文概念與自訂 `KoinComponent`。
+- [Koin for Ktor](/docs/reference/koin-ktor/ktor)：`Koin` 外掛程式與路由中的注入。
+- [Ktor 測試](/docs/reference/koin-ktor/ktor-testing)：使用 Koin 測試 Ktor 應用程式。
+- [Ktor DI 橋接器](/docs/reference/koin-ktor/ktor-bridge)：與 Ktor DI 共享相依性。

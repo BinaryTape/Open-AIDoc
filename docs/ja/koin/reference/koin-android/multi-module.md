@@ -1,168 +1,190 @@
 ---
-title: マルチモジュールAndroidアプリ
+title: マルチモジュールアプリ
 ---
 
-このガイドでは、Koinを使用したマルチモジュールアーキテクチャのAndroid特有の側面について説明します。
+# マルチモジュールアプリ
 
-:::info
-モジュールの中心的な概念（`includes()`、構成、オーバーライド）については、[Modules](/docs/reference/koin-core/modules)を参照してください。
-:::
+このページでは、Gradleモジュール（`:app`、`:feature:*`、`:core:*）に分割されたAndroidアプリでKoinを構成する方法について説明します。各Koinモジュールの配置場所、アプリによるモジュールの読み込み方法、機能間で型を共有する方法、およびDynamic Featureモジュールについて扱います。モジュールの合成（`includes()`、パブリックおよびプライベートモジュール、`@Configuration`）については、[モジュール](/docs/reference/koin-core/modules)で説明しています。
 
-## Androidアプリケーションのセットアップ {id="android-application-setup"}
+## プロジェクト構成 {id="project-layout"}
 
-### アノテーションを使用する場合 {id="with-annotations"}
-
-```kotlin
-@KoinApplication(AppModule::class)
-class MyApplication : Application() {
-    override fun onCreate() {
-        super.onCreate()
-
-        startKoin<MyApplication> {
-            androidLogger()
-            androidContext(this@MyApplication)
-        }
-    }
-}
-
-// ルートモジュールにすべての機能を含めます
-@Module(includes = [LoginModule::class, HomeModule::class, ProfileModule::class])
-class AppModule
+```
+:app                  Application class, startKoin, appModule
+:feature:login        LoginViewModel, LoginUseCase, loginModule
+:feature:profile      ProfileViewModel, profileModule
+:core:data            repositories, Retrofit, Room, dataModule
+:core:domain          interfaces shared by features (UserRepository)
 ```
 
-### DSLを使用する場合 {id="with-dsl"}
+各Gradleモジュールは、自身のクラスに対応するKoinモジュールを宣言します。これにより、クラスをそのGradleモジュールに対して`internal`のままに維持でき、Koinモジュールのみを公開（public）にすることができます。`:app`モジュールだけがすべての機能（feature）を認識しているため、Koinの開始処理はここで行われます。
+
+## 機能モジュールの宣言とロード {id="declaring-and-loading-feature-modules"}
+
+**Compiler Plugin DSL**
+```kotlin
+// Gradle module ":feature:login"
+internal class LoginUseCase(private val auth: AuthService)
+internal class LoginViewModel(private val login: LoginUseCase) : ViewModel()
+
+val loginModule = module {
+    factory<LoginUseCase>()
+    viewModel<LoginViewModel>()
+}
+```
 
 ```kotlin
-class MyApplication : Application() {
+// Gradle module ":app"
+val appModule = module {
+    includes(dataModule, loginModule, profileModule)
+}
+
+class MainApplication : Application() {
     override fun onCreate() {
         super.onCreate()
-
         startKoin {
             androidLogger()
-            androidContext(this@MyApplication)
-            modules(appModule)  // 単一のルートモジュール
+            androidContext(this@MainApplication)
+            modules(appModule)
         }
     }
 }
-
-// ルートモジュールにすべての機能を含めます
-val appModule = module {
-    includes(
-        loginModule,
-        homeModule,
-        profileModule
-    )
-}
 ```
 
-## フィーチャーモジュールの例 {id="feature-module-example"}
-
+**Annotations**
 ```kotlin
-// :feature:login モジュール
-@KoinViewModel
-class LoginViewModel(
-    private val loginUseCase: LoginUseCase,
-    private val userRepository: UserRepository
-) : ViewModel()
+// Gradle module ":feature:login"
+@Module
+@ComponentScan("com.app.feature.login")
+@Configuration
+class LoginModule
 
 @Factory
-class LoginUseCase(private val authService: AuthService)
+internal class LoginUseCase(private val auth: AuthService)
 
-@Module(includes = [DataModule::class])
-@ComponentScan("com.app.feature.login")
-class LoginModule
+@KoinViewModel
+internal class LoginViewModel(private val login: LoginUseCase) : ViewModel()
 ```
 
 ```kotlin
-// DSLでの同等コード
-val loginModule = module {
-    includes(dataModule)
-    viewModel<LoginViewModel>()
-    factory<LoginUseCase>()
+// Gradle module ":app"
+@KoinApplication
+class MainApplication : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        startKoin<MainApplication> {
+            androidLogger()
+            androidContext(this@MainApplication)
+        }
+    }
 }
 ```
 
-## 動的なフィーチャーのロード {id="dynamic-feature-loading"}
+`startKoin<MainApplication>()`は、機能のGradleモジュールからのものを含め、アプリのクラスパス上にあるすべての`@Configuration`モジュールを検出します。機能を追加する作業は、Gradleの依存関係を追加するだけで済み、それ以外の作業は不要です。代わりにモジュールを明示的に指定してリストアップするには、`@KoinApplication(modules = [LoginModule::class, ProfileModule::class])`を使用します。
 
-Activityのライフサイクルに合わせて、必要に応じて（オンデマンドで）フィーチャーモジュールをロードします。
+**Constructor / Classic DSL**
+```kotlin
+// Gradle module ":feature:login"
+internal class LoginUseCase(private val auth: AuthService)
+internal class LoginViewModel(private val login: LoginUseCase) : ViewModel()
+
+val loginModule = module {
+    factoryOf(::LoginUseCase)
+    viewModelOf(::LoginViewModel)
+}
+```
 
 ```kotlin
-class FeatureActivity : AppCompatActivity() {
+// Gradle module ":app"
+val appModule = module {
+    includes(dataModule, loginModule, profileModule)
+}
+
+class MainApplication : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        startKoin {
+            androidLogger()
+            androidContext(this@MainApplication)
+            modules(appModule)
+        }
+    }
+}
+```
+
+## 機能間での型の共有 {id="sharing-types-between-features"}
+
+機能が別の機能に依存するべきではありません。`:feature:profile`が現在のユーザー（current user）を必要とする場合、coreモジュール内のインターフェースに依存し、その実装はそのクラスが存在する場所でバインドされます。
+
+```kotlin
+// Gradle module ":core:domain"
+interface UserRepository {
+    suspend fun currentUser(): User
+}
+```
+
+**Compiler Plugin DSL**
+```kotlin
+// Gradle module ":core:data"
+internal class UserRepositoryImpl(private val api: ApiService) : UserRepository
+
+val dataModule = module {
+    single<UserRepositoryImpl>() bind UserRepository::class
+}
+```
+
+**Annotations**
+```kotlin
+// Gradle module ":core:data"
+@Singleton
+internal class UserRepositoryImpl(private val api: ApiService) : UserRepository
+```
+
+**Constructor / Classic DSL**
+```kotlin
+// Gradle module ":core:data"
+internal class UserRepositoryImpl(private val api: ApiService) : UserRepository
+
+val dataModule = module {
+    singleOf(::UserRepositoryImpl) bind UserRepository::class
+}
+```
+
+これにより、`:feature:profile`内の`ProfileViewModel(private val users: UserRepository)`は、実行時に`UserRepositoryImpl`を解決します。すべてのKoinモジュールがロードされている限り、KoinはGradleモジュールをまたいで解決するため、機能側はインターフェース型を参照できるだけで十分です。機能ごとに追加のエントリポイントインターフェースやコンポーネントを用意する必要はありません。
+
+Compiler Pluginを使用する場合、機能モジュール自身には`startKoin`がないため、`:app`がコンパイルされて完全なグラフを組み立てる際に依存関係がチェックされます。[コンパイル時の安全性](/docs/reference/koin-compiler/compile-safety)を参照してください。
+
+## Dynamic Featureモジュール {id="dynamic-feature-modules"}
+
+Play Feature Deliveryでは、ベースアプリからDynamic Featureモジュールのコードを参照することはできません。依存関係は機能からアプリに向かうためです。機能のエントリActivity内で、`loadKoinModules()`を使用して機能自身のKoinモジュールを機能自身からロードします。
+
+```kotlin
+// Dynamic feature module ":feature:premium"
+internal object PremiumKoin {
+    private val modules = lazy { loadKoinModules(premiumModule) }
+    fun load() = modules.value
+}
+
+class PremiumActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        loadKoinModules(featureModule)
+        PremiumKoin.load()
         super.onCreate(savedInstanceState)
     }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        unloadKoinModules(featureModule)
-    }
 }
 ```
 
-## KoinとHiltの比較 {id="koin-vs-hilt-comparison"}
+`lazy`により、モジュールがプロセスごとに1回、`super.onCreate()`の前に確実にロードされます。これら双方が重要である理由やアンロード方法については、[AndroidでのKoinの開始](/docs/reference/koin-android/start#loading-modules-after-start)で説明しています。
 
-| Hilt | Koin |
-|------|------|
-| `@HiltAndroidApp` | `startKoin { androidContext() }` |
-| `@InstallIn(SingletonComponent)` | `startKoin {}` 内でロードされたモジュール |
-| モジュール間連携のための `@EntryPoint` | 自動解決 |
-| コンポーネントの依存関係 | `includes()` |
-| `@ApplicationContext` | `androidContext()` (自動) |
+Compiler Pluginはこの方法でロードされたモジュールを認識できません。ベースアプリで使用される型で、このようなモジュールからのみ提供されるものには、`@Provided`を付与する必要があります（[コンパイル時の安全性](/docs/reference/koin-compiler/compile-safety)を参照）。
 
-:::info
-**Koinの利点:** `@EntryPoint` インターフェースは不要です。すべてのモジュールがロードされている限り、依存関係はモジュールをまたいで自動的に解決されます。
-:::
+## 機能モジュールのテスト {id="testing-feature-modules"}
 
-## Androidでのテスト {id="android-testing"}
+他のモジュールが提供するものに対してフェイク（Fake）を使用し、各機能モジュールを単独でテストします。Compiler Pluginを使用すると、ビルド時にグラフ全体がチェックされます。使用しない場合は、`verify()`を使用して各モジュールをチェックします（[設定の検証](/docs/reference/koin-test/verify)を参照）。Koinを使用した単体テストについては[ユニットテスト](/docs/reference/koin-test/testing)で、実機（オンデバイス）テストについては[インストゥルメンテッドテスト](/docs/reference/koin-android/instrumented-testing)で解説しています。
 
-### モジュールを単体でテストする {id="test-module-in-isolation"}
+## 関連情報 {id="related"}
 
-```kotlin
-class LoginViewModelTest : KoinTest {
-
-    @get:Rule
-    val koinTestRule = KoinTestRule.create {
-        modules(
-            loginModule,
-            module {
-                single<UserRepository> { mockk() }
-                single<AuthService> { mockk() }
-            }
-        )
-    }
-
-    private val viewModel: LoginViewModel by inject()
-
-    @Test
-    fun `test login`() {
-        // モック化された依存関係を使用してテストする
-    }
-}
-```
-
-### すべてのモジュールを検証する {id="verify-all-modules"}
-
-:::tip
-Koinコンパイラプラグインは、コンパイル時に完全な依存関係グラフを検証するようになったため、ランタイムでの検証が不要になりました。[Compile-Time Safety](/docs/reference/koin-compiler/compile-safety) を参照してください。
-:::
-
-コンパイラプラグインを使用していない場合は、ランタイムでモジュールを検証できます。
-
-```kotlin
-class ModuleCheckTest : KoinTest {
-
-    @Test
-    fun `verify all modules`() {
-        appModule.verify()  // 含まれているモジュールも検証します
-    }
-}
-```
-
-## 関連項目 {id="see-also"}
-
-- **[Modules](/docs/reference/koin-core/modules)** - `includes()` を使用したコアモジュールの概念
-- **[Android Module Loading](/docs/reference/koin-android/modules-android)** - 動的なモジュールのロード
-- **[Lazy Modules](/docs/reference/koin-core/lazy-modules)** - バックグラウンドでのモジュールのロード
-- **[Testing](/docs/reference/koin-android/instrumented-testing)** - Androidテストガイド
+- [モジュール](/docs/reference/koin-core/modules): `includes()`、モジュールの可視性、および`@Configuration`の検出。
+- [AndroidでのKoinの開始](/docs/reference/koin-android/start): `startKoin`と実行時におけるモジュールのロード。
+- [コンパイル時の安全性](/docs/reference/koin-compiler/compile-safety): Gradleモジュールをまたいでグラフをチェックする方法。
+- [遅延モジュール](/docs/reference/koin-core/lazy-modules): 起動時にバックグラウンドで機能モジュールをロードする。
+- [Androidライブラリの統合](/docs/reference/koin-android/binding-patterns): データ層、ドメイン層、UI層。

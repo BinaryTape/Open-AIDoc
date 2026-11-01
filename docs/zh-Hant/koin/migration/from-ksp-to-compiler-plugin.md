@@ -1,51 +1,46 @@
 ---
-title: 將 Koin 註解從 KSP 遷移至編譯器外掛程式
+title: 從 KSP 遷移至編譯器外掛程式
 ---
 
-# 將 Koin 註解從 KSP 遷移至編譯器外掛程式
+# 從 KSP 遷移至編譯器外掛程式
 
-本指南將協助您將 Koin 註解專案從基於 KSP 的處理方式遷移至新的 Koin 編譯器外掛程式。
+本指南將引導你將 Koin Annotations 專案從 KSP 處理器（`koin-ksp-compiler`）遷移至 Koin 編譯器外掛程式（Compiler Plugin）。帶有註解的類別維持不變：僅需變更 Gradle 配置、啟動 Koin 的方式以及少數匯入陳述式。若想了解編譯器外掛程式是什麼及其運作方式，請參閱 [Koin Compiler Plugin](/docs/intro/koin-compiler-plugin)。
 
-:::info 好消息！
-**您的註解將保持完全相同。** 僅有組建組態與 Koin 啟動程式碼會發生變更。
-:::
+## 變更內容 {id="what-changes"}
 
-## 有何不同？ {id="what-s-different"}
+| 項目 | KSP 處理器 | 編譯器外掛程式 |
+|--------|---------------|-----------------|
+| 處理方式 | KSP，編譯前的獨立步驟 | 在 Kotlin K2 編譯器內部 |
+| 產生的檔案 | 在 `build/generated/ksp` 中可見 | 無，程式碼直接在編譯器中產生 |
+| KMP 設定 | 每個目標需要一個 KSP 配置 | 所有目標共用一個外掛程式 |
+| `koin-annotations` 版本 | 獨立版本（`koin-ksp`） | 與 `koin-core` 版本相同 |
+| 啟動 Koin | `modules(AppModule().module)` | `startKoin<MyApp>()` |
+| 編譯期檢查 | `KOIN_CONFIG_CHECK` 選項 | 預設啟用，涵蓋完整依賴圖與呼叫點 |
+| 狀態 | 已棄用 | 積極開發中 |
 
-| 面向 | KSP 處理 | 編譯器外掛程式 |
-|--------|----------------|-----------------|
-| **處理** | KSP (獨立步驟) | K2 編譯器 (整合) |
-| **產生的檔案** | 在 `build/generated/ksp` 中可見 | 無 — 內嵌轉換 (inline transformations) |
-| **組建速度** | 較慢 | 較快 |
-| **KMP 設定** | 每一平台專屬的 KSP 配置 | 套用單一外掛程式 |
-| **Koin 啟動** | `modules(AppModule().module)` | `startKoin<MyApp>()` |
-| **未來支援** | 已棄用 | 積極開發中 |
+## 需求 {id="requirements"}
 
-## 系統需求 {id="requirements"}
+- Kotlin 2.3.20 或更高版本（K2 編譯器）。
+- Gradle 8 或更高版本。
+- Koin 4.2 或更高版本。
 
-- **Kotlin 2.3.20+** (需要 K2 編譯器)
-- **Gradle 8.x+**
-
-## 遷移步驟 {id="migration-steps"}
-
-### 步驟 1：更新 Kotlin 版本 {id="step-1-update-kotlin-version"}
-
-編譯器外掛程式需要 Kotlin 2.3.20+：
+## 步驟 1：更新 Kotlin {id="step-1-update-kotlin"}
 
 ```kotlin
 // build.gradle.kts
 plugins {
-    kotlin("jvm") version "2.3.20" // 最低要求為 2.3.20
+    kotlin("jvm") version "2.3.20"
 }
 ```
 
-### 步驟 2：更新版本目錄 (Version Catalog) {id="step-2-update-version-catalog"}
+## 步驟 2：更新 Version Catalog {id="step-2-update-the-version-catalog"}
 
-**遷移前 (KSP)：**
+遷移前（KSP）：
+
 ```toml
 [versions]
 koin = "4.0.0"
-koin-ksp = "2.0.0"  # KSP 註解的獨立版本控制
+koin-ksp = "2.0.0"
 ksp = "2.0.0-1.0.22"
 
 [libraries]
@@ -57,11 +52,12 @@ koin-ksp-compiler = { module = "io.insert-koin:koin-ksp-compiler", version.ref =
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 ```
 
-**遷移後 (編譯器外掛程式)：**
+遷移後（編譯器外掛程式）：
+
 ```toml
 [versions]
 koin = "4.2.0"
-koin-plugin = "1.0.0"
+koin-plugin = "1.2.1"
 
 [libraries]
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
@@ -71,22 +67,20 @@ koin-annotations = { module = "io.insert-koin:koin-annotations", version.ref = "
 koin-compiler = { id = "io.insert-koin.compiler.plugin", version.ref = "koin-plugin" }
 ```
 
-:::note
-`koin-annotations` 現在是 Koin 主專案的一部分，並使用與 `koin-core` 相同的版本。
-:::
+`koin-annotations` 現在是 Koin 主專案的一部分，並使用與 `koin-core` 相同的版本。請在 [Compiler Plugin Setup](/docs/setup/compiler-plugin) 中確認最新外掛程式版本。
 
-### 步驟 3：更新組建組態 {id="step-3-update-build-configuration"}
+## 步驟 3：更新組建組態 {id="step-3-update-the-build-configuration"}
 
-**遷移前 (KSP)：**
+遷移前（KSP）：
+
 ```kotlin
-// build.gradle.kts
 plugins {
     alias(libs.plugins.ksp)
 }
 
 dependencies {
     implementation(libs.koin.core)
-    implementation(libs.koin.annotations)  // KSP 版本 (獨立版本控制)
+    implementation(libs.koin.annotations)
     ksp(libs.koin.ksp.compiler)
 }
 
@@ -95,237 +89,32 @@ ksp {
 }
 ```
 
-**遷移後 (編譯器外掛程式)：**
+遷移後（編譯器外掛程式）：
+
 ```kotlin
-// build.gradle.kts
 plugins {
     alias(libs.plugins.koin.compiler)
 }
 
 dependencies {
     implementation(libs.koin.core)
-    implementation(libs.koin.annotations)  // 與 koin-core 版本相同
+    implementation(libs.koin.annotations)
 }
 
-// 選用配置
+// 選填
 koinCompiler {
-    userLogs = true  // 記錄組件偵測
+    userLogs = true // 記錄偵測到的組件
 }
 ```
 
-### 步驟 4：更新 Koin 啟動 {id="step-4-update-koin-startup"}
+移除 `ksp { }` 區塊：編譯期檢查現在預設啟用。所有外掛程式選項請參閱 [Compiler Plugin Options](/docs/reference/koin-annotations/options)。
 
-這是主要的程式碼變更。KSP 方式使用產生的 `.module` 擴充套件，而編譯器外掛程式則使用具備 `@KoinApplication` 的具型別 API。
+### Kotlin Multiplatform {id="kotlin-multiplatform"}
 
-**遷移前 (KSP)：**
-```kotlin
-import org.koin.ksp.generated.*  // 產生的擴充套件
-
-@Module
-@ComponentScan("com.myapp")
-class AppModule
-
-fun main() {
-    startKoin {
-        modules(AppModule().module)  // 產生的 .module 擴充套件
-    }
-}
-```
-
-**遷移後 (編譯器外掛程式)：**
+使用 KSP 時，每個目標都需要自己的處理器配置：
 
 ```kotlin
-// 不需要產生的匯入
-
-@Module
-@ComponentScan("com.myapp")
-class AppModule
-
-@KoinApplication(modules = [AppModule::class])
-class MyApp
-
-fun main() {
-    startKoin<MyApp>()  // 具型別 API
-}
-```
-
-#### Android 範例 {id="android-example"}
-
-**遷移前 (KSP)：**
-```kotlin
-import org.koin.ksp.generated.*
-
-class MyApplication : Application() {
-    override fun onCreate() {
-        super.onCreate()
-        startKoin {
-            androidContext(this@MyApplication)
-            modules(AppModule().module)
-        }
-    }
-}
-```
-
-**遷移後 (編譯器外掛程式)：**
-```kotlin
-@KoinApplication(modules = [AppModule::class])
-class MyApp
-
-class MyApplication : Application() {
-    override fun onCreate() {
-        super.onCreate()
-        startKoin<MyApp> {
-            androidContext(this@MyApplication)
-        }
-    }
-}
-```
-
-### 步驟 5：清理 {id="step-5-clean-up"}
-
-移除 KSP 產生的檔案並重新組建：
-
-```bash
-rm -rf build/generated/ksp
-./gradlew clean build
-```
-
-## 註解保持不變 {id="annotations-stay-the-same"}
-
-所有加上註解的類別皆維持不變：
-
-```kotlin
-// 無需變更！
-@Singleton
-class UserRepository(private val database: Database)
-
-@Factory
-class GetUserUseCase(private val repository: UserRepository)
-
-@KoinViewModel
-class UserViewModel(private val useCase: GetUserUseCase) : ViewModel()
-
-@Module
-@ComponentScan("com.myapp")
-class AppModule
-```
-
-所有註解的功能完全相同。請參閱 **[註解參考](/docs/reference/koin-annotations/definitions)** 以取得完整清單。
-
-### 匯入變更：`@KoinViewModel` {id="import-change-koinviewmodel"}
-
-`@KoinViewModel` 註解的套件已變更：
-
-```kotlin
-// 遷移前 (KSP)
-import org.koin.android.annotation.KoinViewModel
-
-// 遷移後 (編譯器外掛程式)
-import org.koin.core.annotation.KoinViewModel
-```
-
-### 頂層函式定義 (新增) {id="top-level-function-definitions-new"}
-
-編譯器外掛程式支援在頂層函式上使用註解，並透過 `@ComponentScan` 進行偵測：
-
-```kotlin
-@Singleton
-fun provideDatabase(): DatabaseService = PostgresDatabase()
-
-@Factory
-fun provideCache(db: DatabaseService): CacheService = RedisCache(db)
-
-@Module
-@ComponentScan("com.myapp")
-class AppModule
-```
-
-函式傳回型別決定了繫結型別。函式參數將作為相依性注入。
-
-## DSL 語法變更 {id="dsl-syntax-changes"}
-
-如果您在註解之外也使用 Koin DSL 模組，編譯器外掛程式引入了更簡潔的語法：
-
-| KSP / 經典風格 | 編譯器外掛程式風格 |
-|---------------------|----------------------|
-| `singleOf(::MyService)` | `single<MyService>()` |
-| `factoryOf(::MyRepo)` | `factory<MyRepo>()` |
-| `viewModelOf(::MyVM)` | `viewModel<MyVM>()` |
-| `scopedOf(::MyScoped)` | `scoped<MyScoped>()` |
-| `workerOf(::MyWorker)` | `worker<MyWorker>()` |
-| `single { fn(get()) }` | `single { create(::fn) }` |
-
-```kotlin
-// 遷移前
-val myModule = module {
-    singleOf(::MyService)
-    factoryOf(::MyRepository)
-    viewModelOf(::MyViewModel)
-}
-
-// 遷移後
-import org.koin.plugin.module.dsl.*
-
-val myModule = module {
-    single<MyService>()
-    factory<MyRepository>()
-    viewModel<MyViewModel>()
-}
-
-// 函式建置器 — 用於外部程式庫 (Room, Retrofit 等)
-fun createDatabase(context: Context): AppDatabase =
-    Room.databaseBuilder(context, AppDatabase::class.java, "db").build()
-
-val dbModule = module {
-    single { create(::createDatabase) }
-}
-```
-
-:::note
-編譯器外掛程式 DSL 位於 **`org.koin.plugin.module.dsl`** 套件中。傳統 DSL 則保留在 `org.koin.dsl` 中。
-:::
-
-## 跨模組偵測 {id="cross-module-discovery"}
-
-使用 `@Configuration` 在 Gradle 模組之間進行自動模組偵測：
-
-```kotlin
-// 在 feature 模組中
-@Module
-@ComponentScan
-@Configuration
-class FeatureModule
-
-// 在 app 模組中 - FeatureModule 會被自動偵測
-@KoinApplication
-object MyApp
-
-startKoin<MyApp>()  // FeatureModule 會自動被包含進來
-```
-
-## KMP 遷移 {id="kmp-migration"}
-
-編譯器外掛程式大幅簡化了 KMP 設定。
-
-**遷移前 (KSP) — 每一平台專屬的配置：**
-```kotlin
-// shared/build.gradle.kts
-plugins {
-    kotlin("multiplatform")
-    id("com.google.devtools.ksp")
-}
-
-kotlin {
-    sourceSets {
-        commonMain.dependencies {
-            implementation("io.insert-koin:koin-core:$koin_version")
-            implementation("io.insert-koin:koin-annotations:$koin_ksp_version")  // 獨立版本
-        }
-    }
-}
-
 dependencies {
-    // 每一平台都需要 KSP 編譯器
     add("kspAndroid", "io.insert-koin:koin-ksp-compiler:$koin_ksp_version")
     add("kspIosX64", "io.insert-koin:koin-ksp-compiler:$koin_ksp_version")
     add("kspIosArm64", "io.insert-koin:koin-ksp-compiler:$koin_ksp_version")
@@ -333,7 +122,8 @@ dependencies {
 }
 ```
 
-**遷移後 (編譯器外掛程式) — 單一外掛程式：**
+使用編譯器外掛程式時，只需在共用模組中套用一次外掛程式，並移除所有 `ksp...` 項目：
+
 ```kotlin
 // shared/build.gradle.kts
 plugins {
@@ -351,63 +141,165 @@ kotlin {
 }
 ```
 
-## 具型別的啟動 API {id="typed-startup-apis"}
+## 步驟 4：更新 Koin 的啟動方式 {id="step-4-update-how-koin-starts"}
 
-編譯器外掛程式提供了具型別 API：`startKoin<T>()`、`koinApplication<T>()`、`koinConfiguration<T>()`。
+KSP 會為每個 `@Module` 類別產生一個 `.module` 擴充。編譯器外掛程式則沒有此擴充：你需要宣告一個 `@KoinApplication` 類別，並透過型別化 API 來啟動。
 
-詳情請參閱 **[從註解開始](/docs/reference/koin-annotations/start)**。
+遷移前（KSP）：
 
-## 配置標籤 (新增) {id="configuration-labels-new"}
+```kotlin
+import org.koin.ksp.generated.*
 
-編譯器外掛程式新增了配置標籤，用於條件式模組載入。
+@Module
+@ComponentScan("com.myapp")
+class AppModule
 
-詳情請參閱 **[模組 - 配置](/docs/reference/koin-annotations/modules)**。
+fun main() {
+    startKoin {
+        modules(AppModule().module)
+    }
+}
+```
 
-## 編譯器外掛程式選項 {id="compiler-plugin-options"}
+遷移後（編譯器外掛程式）：
 
-請參閱 **[編譯器外掛程式選項](/docs/reference/koin-annotations/options)** 以了解所有配置選項。
+```kotlin
+import org.koin.plugin.module.dsl.startKoin
+
+@Module
+@ComponentScan("com.myapp")
+class AppModule
+
+@KoinApplication(modules = [AppModule::class])
+class MyApp
+
+fun main() {
+    startKoin<MyApp>()
+}
+```
+
+在 Android 上，可在 Lambda 運算式中傳入一般選項：
+
+```kotlin
+@KoinApplication(modules = [AppModule::class])
+class MyApp
+
+class MyApplication : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        startKoin<MyApp> {
+            androidContext(this@MyApplication)
+        }
+    }
+}
+```
+
+其他型別化 API 包括現有 `startKoin { }` 或測試規則內的 `koinApplication<T>()`、`koinConfiguration<T>()` 與 `withConfiguration<T>()`。若要載入單一模組類別，請在一般的 `startKoin { }` 內使用 `module<AppModule>()`。請參閱 [Starting Koin](/docs/reference/koin-core/starting-koin)。
+
+## 步驟 5：更新匯入項目 {id="step-5-update-imports"}
+
+`@KoinViewModel` 已移至核心註解套件：
+
+```kotlin
+// 遷移前 (KSP)
+import org.koin.android.annotation.KoinViewModel
+
+// 遷移後 (編譯器外掛程式)
+import org.koin.core.annotation.KoinViewModel
+```
+
+移除所有 `import org.koin.ksp.generated.*`。
+
+## 步驟 6：清理並重新建置 {id="step-6-clean-and-rebuild"}
+
+刪除 KSP 產生的檔案，然後重新建置：
+
+```bash
+rm -rf build/generated/ksp
+./gradlew clean build
+```
+
+首次建置將執行完整的編譯期檢查。KSP 過去未回報的缺失定義現在會導致建置失敗：錯誤訊息與 `@Provided` 的使用方式請參閱 [Compile-Time Safety](/docs/reference/koin-compiler/compile-safety)。
+
+## 維持不變的內容 {id="what-stays-the-same"}
+
+你帶有註解的類別不需要變更：
+
+```kotlin
+@Singleton
+class UserRepository(private val database: Database)
+
+@Factory
+class GetUserUseCase(private val repository: UserRepository)
+
+@KoinViewModel
+class UserViewModel(private val useCase: GetUserUseCase) : ViewModel()
+```
+
+所有註解均列於 [Annotations Reference](/docs/reference/koin-annotations/annotations-inventory) 中。
+
+## 遷移後可使用的功能 {id="what-you-can-use-after-migrating"}
+
+以下功能需要編譯器外掛程式支援：
+
+- 頂層函式：`@Singleton fun database(): Database` 會如同類別一樣被 `@ComponentScan` 發現（請參閱 [Definitions](/docs/reference/koin-core/definitions#classes-you-dont-own)）。
+- 模組探索：在任何 Gradle 模組中標記為 `@Configuration` 的模組，都會被 `@KoinApplication` 自動載入，無需手動列出。
+- 配置標籤：搭配 `@Configuration("test")` 與 `@KoinApplication(configurations = ["test"])`，只會載入帶有該標籤的模組（請參閱 [Modules](/docs/reference/koin-core/modules)）。
+- 編譯器外掛程式 DSL：若你也有使用 DSL 模組，可將其切換為編譯器外掛程式 DSL：
+
+| 建構函式 / 傳統 DSL | 編譯器外掛程式 DSL |
+|---------------------------|---------------------|
+| `singleOf(::MyService)` | `single<MyService>()` |
+| `factoryOf(::MyRepository)` | `factory<MyRepository>()` |
+| `viewModelOf(::MyViewModel)` | `viewModel<MyViewModel>()` |
+| `scopedOf(::MyScoped)` | `scoped<MyScoped>()` |
+| `workerOf(::MyWorker)` | `worker<MyWorker>()` |
+| `single { build(get()) }` | `single { create(::build) }` |
+
+編譯器外掛程式 DSL 位於 `org.koin.plugin.module.dsl`。建構函式 DSL 仍保留在 `org.koin.core.module.dsl`，傳統 DSL 則在 `org.koin.dsl`。兩者均可繼續運作並會受到外掛程式的檢查：你無需對其進行遷移。
 
 ## 疑難排解 {id="troubleshooting"}
 
-### 移除 KSP 後組建失敗 {id="build-fails-after-removing-ksp"}
+### 移除 KSP 後建置失敗 {id="the-build-fails-after-removing-ksp"}
 
-1. `./gradlew clean`
-2. `rm -rf build/generated/ksp`
-3. 失效 IDE 快取 (Invalidate IDE caches)
-4. 重新組建
+過期且殘留的生成程式碼仍在 Classpath 中。請執行 `./gradlew clean`、刪除 `build/generated/ksp`、清除 IDE 快取（Invalidate Caches），然後重新建置。
 
-### 未偵測到註解 {id="annotations-not-detected"}
+### 未偵測到帶有註解的類別 {id="annotated-classes-are-not-detected"}
 
-啟用記錄功能：
+啟用外掛程式記錄以查看找到了哪些類別：
+
 ```kotlin
 koinCompiler {
     userLogs = true
 }
 ```
 
-### 執行時缺少相依性 {id="missing-dependencies-at-runtime"}
+檢查 `@ComponentScan` 中的套件是否與你的類別套件相符。
 
-1. 檢查 `@ComponentScan` 套件
-2. 驗證 `@KoinApplication(modules = [...])` 中的模組
-3. 對外部相依性使用 `@Provided`
+### 執行階段缺少相依性 {id="a-dependency-is-missing-at-runtime"}
 
-## 遷移檢查表 {id="migration-checklist"}
+- 檢查該模組是否列在 `@KoinApplication(modules = [...])` 中，或標記為 `@Configuration`。
+- 檢查 `@ComponentScan` 套件。
+- 對於在 Koin 外部建立的型別，請將其標記為 `@Provided`（請參閱 [Compile-Time Safety](/docs/reference/koin-compiler/compile-safety)）。
 
-- [ ] 將 Kotlin 更新至 2.3.20+
-- [ ] 將 Koin 更新至 4.2.0+
+## 檢查表 {id="checklist"}
+
+- [ ] 將 Kotlin 更新至 2.3.20 或更高版本
+- [ ] 將 Koin 更新至 4.2.0 或更高版本
 - [ ] 移除 KSP 外掛程式
-- [ ] 移除 `koin-ksp-compiler` 相依性
-- [ ] 將 `koin-annotations` 更新至 Koin 主版本 (`io.insert-koin:koin-annotations:$koin_version`)
-- [ ] 新增 Koin 編譯器外掛程式 (`io.insert-koin.compiler.plugin`)
-- [ ] 將 `@KoinViewModel` 的匯入更新為 `org.koin.core.annotation`
-- [ ] 建立 `@KoinApplication` 類別，並將 `modules(X().module)` 替換為 `startKoin<MyApp>()`
-- [ ] 如果有使用 DSL 模組，將 DSL 匯入更新為 `org.koin.plugin.module.dsl.*`
-- [ ] 更新 DSL 語法：`singleOf(::X)` → `single<X>()`
+- [ ] 移除 `koin-ksp-compiler` 相依項與 `ksp { }` 區塊
+- [ ] `koin-annotations` 改用 Koin 主要版本（`io.insert-koin:koin-annotations:$koin_version`）
+- [ ] 套用 Koin 編譯器外掛程式（`io.insert-koin.compiler.plugin`）
+- [ ] 將 `@KoinViewModel` 匯入變更為 `org.koin.core.annotation`
+- [ ] 建立一個 `@KoinApplication` 類別，並將 `modules(X().module)` 替換為 `startKoin<MyApp>()`
 - [ ] 移除 `import org.koin.ksp.generated.*`
-- [ ] 清理並重新組建 (`rm -rf build/generated/ksp && ./gradlew clean build`)
+- [ ] 選用：將 DSL 模組切換為 `org.koin.plugin.module.dsl.*` 與 `single<X>()`
+- [ ] 清理並重新建置（`rm -rf build/generated/ksp && ./gradlew clean build`）
 
-## 另請參閱 {id="see-also"}
+## 相關內容 {id="related"}
 
-- **[編譯器外掛程式設定](/docs/setup/compiler-plugin)** — 完整設定指南
-- **[註解參考](/docs/reference/koin-annotations/start)** — 所有註解
-- **[KSP 處理器設定 (已棄用)](/docs/setup/annotations-ksp)** — 舊版 `koin-ksp-compiler` 參考
+- [Compiler Plugin Setup](/docs/setup/compiler-plugin)：安裝外掛程式並選擇其版本。
+- [Compile-Time Safety](/docs/reference/koin-compiler/compile-safety)：外掛程式檢查的項目及其錯誤代碼。
+- [Starting Koin](/docs/reference/koin-core/starting-koin)：`startKoin<T>()` 與其他型別化 API。
+- [Compiler Plugin Options](/docs/reference/koin-annotations/options)：完整的 Gradle 選項。
+- [KSP Processor Setup](/docs/setup/annotations-ksp)：已棄用的 KSP 設定，供參考。

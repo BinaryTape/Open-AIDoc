@@ -1,24 +1,24 @@
 [//]: # (title: リターンとジャンプ)
 
-Kotlinには3つの構造的なジャンプ式（jump expressions）があります。
+Kotlinには、3つの構造化ジャンプ式があります。
 
-* `return`: デフォルトでは、最も内側の囲んでいる関数または[匿名関数](lambdas.md#anonymous-functions)から戻ります。
-* `break`: 最も内側の囲んでいるループを終了します。
-* `continue`: 最も内側の囲んでいるループの次のステップに進みます。
+* `return`: デフォルトでは、最も近い外側の関数または[無名関数](lambdas.md#anonymous-functions)からリターンします。
+* `break`: 最も近い外側のループを終了します。
+* `continue`: 最も近い外側のループの次のステップに進みます。
 
-これらの式はすべて、より大きな式の一部として使用できます。
+これらすべての式は、より大きな式の一部として使用できます。
 
 ```kotlin
 val s = person.name ?: return
 ```
 
-これらの式の型は[Nothing型](exceptions.md#the-nothing-type)です。
+これらの式の型は [Nothing 型](exceptions.md#the-nothing-type) です。
 
-## Breakとcontinueのラベル {id="break-and-continue-labels"}
+## break と continue のラベル {id="break-and-continue-labels"}
 
-Kotlinの任意の式には*ラベル*（label）を付けることができます。
-ラベルは、`abc@` や `fooBar@` のように、識別子の後に `@` 記号が付いた形式です。
-式にラベルを付けるには、式の前にラベルを追加するだけです。
+Kotlinの任意の式には、*ラベル*を付けることができます。
+ラベルは `abc@` や `fooBar@` のように、識別子の後に `@` 記号が付く形式をとります。
+式にラベルを付けるには、その式の前にラベルを追加するだけです。
 
 ```kotlin
 loop@ for (i in 1..100) {
@@ -26,7 +26,7 @@ loop@ for (i in 1..100) {
 }
 ```
 
-これで、ラベルを指定して `break` や `continue` を使用できるようになります。
+これで、ラベルで修飾した `break` や `continue` を使用できるようになります。
 
 ```kotlin
 loop@ for (i in 1..100) {
@@ -36,25 +36,26 @@ loop@ for (i in 1..100) {
 }
 ```
 
-ラベルが指定された `break` は、そのラベルが付いたループの直後の実行ポイントまでジャンプします。
-`continue` は、そのループの次のイテレーション（反復）に進みます。
+ラベルで修飾された `break` は、そのラベルが付いたループの直後の実行ポイントへジャンプします。
+ラベルで修飾された `continue` は、そのループの次のイテレーションへ進みます。
 
-> 場合によっては、ラベルを明示的に定義せずに *非局所的*（non-locally）に `break` や `continue` を適用できることがあります。このような非局所的な使用法は、囲んでいる[インライン関数](inline-functions.md#break-and-continue)で使用されるラムダ式内で有効です。
+> 場合によっては、明示的にラベルを定義することなく、*非ローカル*（non-locally）に `break` や `continue` を適用できます。
+> このような非ローカルでの使用は、それを囲む[インライン関数](inline-functions.md#break-and-continue)内で使用されるラムダ式で有効です。
 >
 {style="note"}
 
 ## ラベルへのリターン {id="return-to-labels"}
 
 Kotlinでは、関数リテラル、ローカル関数、オブジェクト式を使用して関数をネストできます。
-ラベル指定された `return` を使用すると、外側の関数から戻ることができます。
+修飾された `return` を使用すると、外側の関数からリターンすることができます。
 
-最も重要なユースケースは、ラムダ式からのリターンです。ラムダ式から戻るには、ラベルを付けて `return` を修飾します。
+最も重要なユースケースは、ラムダ式からのリターンです。ラムダ式からリターンするには、ラムダ式にラベルを付け、`return` を修飾します。
 
 ```kotlin
 //sampleStart
 fun foo() {
     listOf(1, 2, 3, 4, 5).forEach lit@{
-        if (it == 3) return@lit // ラムダの呼び出し元（forEachループ）への局所的なリターン
+        if (it == 3) return@lit // ラムダの呼び出し元（forEach ループ）へのローカルリターン
         print(it)
     }
     print(" done with explicit label")
@@ -65,15 +66,15 @@ fun main() {
     foo()
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-これにより、ラムダ式からのみ戻るようになります。多くの場合、*暗黙的なラベル*（implicit labels）を使用する方が便利です。そのようなラベルは、ラムダが渡される関数と同じ名前になります。
+これで、ラムダ式からのみリターンするようになります。多くの場合、*暗黙のラベル*を使用する方が便利です。そのようなラベルは、ラムダが渡される関数と同じ名前を持つためです。
 
 ```kotlin
 //sampleStart
 fun foo() {
     listOf(1, 2, 3, 4, 5).forEach {
-        if (it == 3) return@forEach // ラムダの呼び出し元（forEachループ）への局所的なリターン
+        if (it == 3) return@forEach // ラムダの呼び出し元（forEach ループ）へのローカルリターン
         print(it)
     }
     print(" done with implicit label")
@@ -84,16 +85,16 @@ fun main() {
     foo()
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-あるいは、ラムダ式を[匿名関数](lambdas.md#anonymous-functions)に置き換えることもできます。
-匿名関数内の `return` 文は、その匿名関数自体から戻ります。
+あるいは、ラムダ式を[無名関数](lambdas.md#anonymous-functions)に置き換えることもできます。
+無名関数内の `return` 文は、その無名関数自体からリターンします。
 
 ```kotlin
 //sampleStart
 fun foo() {
     listOf(1, 2, 3, 4, 5).forEach(fun(value: Int) {
-        if (value == 3) return  // 匿名関数の呼び出し元（forEachループ）への局所的なリターン
+        if (value == 3) return  // 無名関数の呼び出し元（forEach ループ）へのローカルリターン
         print(value)
     })
     print(" done with anonymous function")
@@ -104,18 +105,18 @@ fun main() {
     foo()
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-前述の3つの例における局所的なリターンの使用は、通常のループにおける `continue` の使用に似ていることに注意してください。
+前の3つの例におけるローカルリターンの使用法は、通常のループにおける `continue` の使用法と似ている点に注意してください。
 
-`break` に直接相当するものはありませんが、外側に `run` ラムダを追加し、そこから非局所的にリターンすることでシミュレートできます。
+`break` に直接相当するものはありませんが、外側に `run` ラムダを追加し、そこから非ローカルにリターンすることでシミュレートできます。
 
 ```kotlin
 //sampleStart
 fun foo() {
     run loop@{
         listOf(1, 2, 3, 4, 5).forEach {
-            if (it == 3) return@loop // runに渡されたラムダからの非局所的なリターン
+            if (it == 3) return@loop // run に渡されたラムダからの非ローカルリターン
             print(it)
         }
     }
@@ -127,18 +128,18 @@ fun main() {
     foo()
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-ここでの非局所的なリターンは、ネストされた `forEach()` ラムダが[インライン関数](inline-functions.md)として動作するため可能です。
+ここで非ローカルリターンが可能なのは、ネストされた `forEach()` のラムダが[インライン関数](inline-functions.md)として機能するためです。
 
-値を返す際、パーサーはラベル指定されたリターンを優先します。
+値を返す際、パーサーは修飾されたリターンを優先します。
 
 ```kotlin
 return@a 1
 ```
 
-これは「ラベル `@a` に `1` を返す」という意味であり、「ラベル付きの式 `(@a 1)` を返す」という意味ではありません。
+これは「ラベル付けされた式 `(@a 1)` をリターンする」ではなく、「ラベル `@a` で `1` をリターンする」を意味します。
 
-> 場合によっては、ラベルを使用せずにラムダ式から戻ることができます。このような *非局所的*（non-local）なリターンは、ラムダ内に配置されますが、それを囲んでいる[インライン関数](inline-functions.md#returns)を終了します。
+> 場合によっては、ラベルを使用せずにラムダ式からリターンすることができます。このような*非ローカル*リターンは、ラムダ内に配置されながら、それを囲む[インライン関数](inline-functions.md#returns)を終了します。
 >
 {style="note"}

@@ -9,7 +9,7 @@
 
 <tldr>
 <p>
-<b>必須の依存関係</b>: <code>io.ktor:ktor-server-metrics-micrometer</code>
+<b>必要な依存関係</b>: <code>io.ktor:ktor-server-metrics-micrometer</code>
 </p>
 <var name="example_name" value="micrometer-metrics"/>
 <p>
@@ -19,32 +19,41 @@
     </a>
 </p>
 <p>
-    <b><Links href="/ktor/server-native" summary="Ktor は Kotlin/Native をサポートしており、追加のランタイムや仮想マシンなしでサーバーを実行できます。">Native サーバー</Links>のサポート</b>: ✖️
+    <b><Links href="server-native.md" summary="KtorはKotlin/Nativeをサポートしており、追加のランタイムや仮想マシンなしでサーバーを実行できます。">Nativeサーバー</Links>のサポート</b>: ✖️
 </p>
 </tldr>
 
 <link-summary>MicrometerMetrics プラグインは、Ktor サーバーアプリケーションで Micrometer メトリクスを有効にし、Prometheus、JMX、Elastic などの必要なモニタリングシステムを選択できるようにします。</link-summary>
 
-[MicrometerMetrics](https://api.ktor.io/ktor-server-metrics-micrometer/io.ktor.server.metrics.micrometer/-micrometer-metrics) プラグインは、Ktor サーバーアプリケーションで [Micrometer](https://micrometer.io/docs) メトリクスを有効にし、Prometheus、JMX、Elastic などの必要なモニタリングシステムを選択できるようにします。デフォルトでは、Ktor は HTTP リクエストをモニタリングするためのメトリクスと、[JVM をモニタリングする][micrometer_jvm_metrics]ための一連の低レベルメトリクスを公開します。これらのメトリクスをカスタマイズしたり、新しいメトリクスを作成したりすることもできます。
+[MicrometerMetrics](https://api.ktor.io/ktor-server-metrics-micrometer/io.ktor.server.metrics.micrometer/-micrometer-metrics) プラグインは、Ktor サーバーアプリケーションで [Micrometer](https://micrometer.io/docs) メトリクスを有効にし、Prometheus、JMX、Elastic などの必要なモニタリングシステムを選択できるようにします。デフォルトでは、Ktor は HTTP リクエストを監視するためのメトリクスと、[JVM を監視するための][micrometer_jvm_metrics]一連の低レベルメトリクスを公開します。これらのメトリクスをカスタマイズしたり、新しいメトリクスを作成したりできます。
 
 ## 依存関係の追加 {id="add_dependencies"}
-`MicrometerMetrics` を有効にするには、ビルドスクリプトに以下のアーティファクトを含める必要があります。
-* `ktor-server-metrics-micrometer` 依存関係を追加します。
+`MicrometerMetrics` を有効にするには、ビルドスクリプトに以下のアーティファクトを含める必要があります:
+* `ktor-server-metrics-micrometer` 依存関係を追加します:
 
   <var name="artifact_name" value="ktor-server-metrics-micrometer"/>
+  <var name="ktor_version_catalog_name" value="ktorLibs.server.metrics.micrometer"/>
   <Tabs group="languages">
       <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-          <code-block lang="Kotlin" code="              implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+          <code-block lang="Kotlin" code="              implementation(%ktor_version_catalog_name%)"/>
+          <note>
+              上記のコードスニペットでは、<a href="server-dependencies.topic#using-version-catalog">
+              Ktor バージョンカタログ</a>を使用して Ktor の依存関係を指定しています。
+          </note>
       </TabItem>
       <TabItem title="Gradle (Groovy)" group-key="groovy">
-          <code-block lang="Groovy" code="              implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+          <code-block lang="Groovy" code="              implementation %ktor_version_catalog_name%"/>
+          <note>
+              上記のコードスニペットでは、<a href="server-dependencies.topic#using-version-catalog">
+              Ktor バージョンカタログ</a>を使用して Ktor の依存関係を指定しています。
+          </note>
       </TabItem>
       <TabItem title="Maven" group-key="maven">
           <code-block lang="XML" code="              &lt;dependency&gt;&#10;                  &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                  &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                  &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;              &lt;/dependency&gt;"/>
       </TabItem>
   </Tabs>
   
-* モニタリングシステムに必要な依存関係を追加します。以下の例は、Prometheus 用のアーティファクトを追加する方法を示しています。
+* モニタリングシステムに必要な依存関係を追加します。以下の例は、Prometheus 用のアーティファクトを追加する方法を示しています:
 
   <var name="group_id" value="io.micrometer"/>
   <var name="artifact_name" value="micrometer-registry-prometheus"/>
@@ -67,16 +76,15 @@
 
 <var name="plugin_name" value="MicrometerMetrics"/>
 <p>
-    アプリケーションに <code>%plugin_name%</code> プラグインを<a href="server-plugins.md#install">インストール</a>するには、
-    指定された<Links href="/ktor/server-modules" summary="モジュールを使用すると、ルートをグループ化してアプリケーションを構造化できます。">モジュール</Links>内の <code>install</code> 関数に渡します。
-    以下のコードスニペットは、<code>%plugin_name%</code> をインストールする方法を示しています。
+    アプリケーションに <code>%plugin_name%</code> プラグインを<a href="server-plugins.md#install">インストール</a>するには、指定された<Links href="server-modules.md" summary="モジュールを使用すると、ルートをグループ化してアプリケーションを構造化できます。">モジュール</Links>内の <code>install</code> 関数に渡します。
+    以下の例は、<code>%plugin_name%</code> をインストールする方法を示しています:
 </p>
 <list>
     <li>
-        ... <code>embeddedServer</code> 関数の呼び出し内。
+        <code>embeddedServer()</code> 関数の呼び出し内。
     </li>
     <li>
-        ... <code>Application</code> クラスの拡張関数である明示的に定義された <code>module</code> 内。
+        <code>Application</code> クラスで明示的に定義された <code>module()</code> 拡張関数内。
     </li>
 </list>
 <Tabs>
@@ -89,19 +97,19 @@
 </Tabs>
 
 ### 公開されるメトリクス {id="ktor_metrics"}
-Ktor は HTTP リクエストをモニタリングするために以下のメトリクスを公開します。
-* `ktor.http.server.requests.active`: 同時実行 HTTP リクエストの数をカウントする [gauge (ゲージ)](https://micrometer.io/docs/concepts#_gauges)。このメトリクスにはタグはありません。
-* `ktor.http.server.requests`: 各リクエストの時間を測定する [timer (タイマー)](https://micrometer.io/docs/concepts#_timers)。このメトリクスは、リクエストされた URL の `address`、HTTP メソッドの `method`、リクエストを処理する Ktor ルートの `route` など、リクエストデータをモニタリングするための一連のタグを提供します。
+Ktor は HTTP リクエストを監視するために以下のメトリクスを公開します:
+* `ktor.http.server.requests.active`: 同時実行中の HTTP リクエスト数をカウントする [gauge](https://micrometer.io/docs/concepts#_gauges)（ゲージ）。このメトリクスにはタグは提供されません。
+* `ktor.http.server.requests`: 各リクエストの時間を測定するための [timer](https://micrometer.io/docs/concepts#_timers)（タイマー）。このメトリクスは、リクエストされた URL の `address`、HTTP メソッドの `method`、リクエストを処理する Ktor ルートの `route` など、リクエストデータを監視するための一連のタグを提供します。
 
-デフォルトの `ktor.http.server.requests` プレフィックスは、`metricName` [設定](#configure_metrics)プロパティを使用してカスタマイズできます。
+`metricName` [設定](#configure_metrics)プロパティを使用して、デフォルトの `ktor.http.server.requests` プレフィックスをカスタマイズできます。
 
 > メトリクス名は、設定されたモニタリングシステムによって[異なる](https://micrometer.io/docs/concepts#_naming_meters)場合があります。
 
-HTTP メトリクスに加えて、Ktor は [JVM をモニタリングする](#jvm_metrics)ための一連のメトリクスを公開します。
+HTTP メトリクスに加えて、Ktor は [JVM を監視するための](#jvm_metrics)一連のメトリクスも公開します。
 
 ## レジストリの作成 {id="create_registry"}
 
-`MicrometerMetrics` をインストールした後、[モニタリングシステムのレジストリ](https://micrometer.io/docs/concepts#_registry)を作成し、それを `registry` プロパティに割り当てる必要があります。以下の例では、このレジストリを異なる[ルートハンドラー](server-routing.md)で再利用できるように、`PrometheusMeterRegistry` を `install` ブロックの外側で作成しています。
+`MicrometerMetrics` をインストールした後、[モニタリングシステム用のレジストリ](https://micrometer.io/docs/concepts#_registry)を作成し、それを `registry` プロパティに割り当てる必要があります。以下の例では、異なる[ルートハンドラー](server-routing.md)でこのレジストリを再利用できるように、`install` ブロックの外側で `PrometheusMeterRegistry` を作成しています:
 
 ```kotlin
 fun Application.module() {
@@ -117,7 +125,7 @@ fun Application.module() {
 `MicrometerMetrics` プラグインは、[MicrometerMetricsConfig](https://api.ktor.io/ktor-server-metrics-micrometer/io.ktor.server.metrics.micrometer/-micrometer-metrics-config/index.html) を使用してアクセスできるさまざまな設定オプションを提供します。
 
 ### タイマー {id="timers"}
-各タイマーのタグをカスタマイズするには、リクエストごとに呼び出される `timers` 関数を使用できます。
+各タイマーのタグをカスタマイズするには、リクエストごとに呼び出される `timers` 関数を使用できます:
 ```kotlin
 install(MicrometerMetrics) {
     // ...
@@ -128,7 +136,7 @@ install(MicrometerMetrics) {
 ```
 
 ### 分布統計 {id="distribution_statistics"}
-`distributionStatisticConfig` プロパティを使用して、[分布統計](https://micrometer.io/docs/concepts#_configuring_distribution_statistics)を設定します。例：
+`distributionStatisticConfig` プロパティを使用して[分布統計](https://micrometer.io/docs/concepts#_configuring_distribution_statistics)を設定できます。例えば、次のようになります:
 
 ```kotlin
 install(MicrometerMetrics) {
@@ -144,7 +152,7 @@ install(MicrometerMetrics) {
 ```
 
 ### JVM およびシステムメトリクス {id="jvm_metrics"}
-[HTTP メトリクス](#ktor_metrics)に加えて、Ktor は [JVM をモニタリングする][micrometer_jvm_metrics]ための一連のメトリクスを公開します。`meterBinders` プロパティを使用して、これらのメトリクスのリストをカスタマイズできます。例：
+[HTTP メトリクス](#ktor_metrics)に加えて、Ktor は [JVM を監視するための][micrometer_jvm_metrics]一連のメトリクスを公開します。`meterBinders` プロパティを使用して、これらのメトリクスのリストをカスタマイズできます。例えば、次のようになります:
 
 ```kotlin
 install(MicrometerMetrics) {
@@ -156,11 +164,11 @@ install(MicrometerMetrics) {
 }
 ```
 
-また、空のリストを割り当てて、これらのメトリクスを完全に無効にすることもできます。
+空のリストを割り当てて、これらのメトリクスを完全に無効にすることもできます。
 
 ## Prometheus: スクレイプエンドポイントの公開 {id="prometheus_endpoint"}
-モニタリングシステムとして Prometheus を使用する場合、HTTP エンドポイントを Prometheus スクレイパーに公開する必要があります。Ktor では、以下の方法で行うことができます。
-1. 必要なアドレス（以下の例では `/metrics`）で GET リクエストを受け取る専用の[ルート](server-routing.md)を作成します。
+モニタリングシステムとして Prometheus を使用する場合、Prometheus スクレイパーに HTTP エンドポイントを公開する必要があります。Ktor では、以下の方法でこれを行うことができます:
+1. 必要なアドレス（以下の例では `/metrics`）で GET リクエストを受け付ける専用の[ルート](server-routing.md)を作成します。
 2. `call.respond` を使用して、スクレイピングデータを Prometheus に送信します。
 
    ```kotlin
@@ -177,4 +185,4 @@ install(MicrometerMetrics) {
    }
    ```
 
-   完全な例はこちらにあります: [micrometer-metrics](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/micrometer-metrics)
+   完全な例はここから確認できます: [micrometer-metrics](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/micrometer-metrics)。

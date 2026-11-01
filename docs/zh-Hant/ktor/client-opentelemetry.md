@@ -6,7 +6,7 @@
 
 <tldr>
 <p>
-<b>必要相依性</b>：<code>io.opentelemetry.instrumentation:opentelemetry-ktor-3.0</code>
+<b>必要的相依性</b>：<code>io.opentelemetry.instrumentation:opentelemetry-ktor-3.0</code>
 </p>
 <var name="example_name" value="opentelemetry"/>
 <p>
@@ -17,7 +17,7 @@
 </p>
 </tldr>
 
-Ktor 與 [OpenTelemetry](https://opentelemetry.io/) 整合 — 這是一個開源的可觀測性架構，用於收集追蹤（traces）、指標（metrics）和記錄（logs）等遙測資料。它提供了一種標準方法來檢測應用程式，並將資料匯出到 Grafana 或 Jaeger 等監控與可觀測性工具。
+Ktor 與 [OpenTelemetry](https://opentelemetry.io/) 整合——這是一個開源的可觀測性架構，用於收集追蹤（traces）、指標（metrics）和記錄（logs）等遙測資料。它提供了一種標準方法來檢測（instrument）應用程式，並將資料匯出到 Grafana 或 Jaeger 等監控與可觀測性工具。
 
 `%plugin_name%` 外掛程式可讓您自動追蹤傳出的 HTTP 請求。它會擷取方法、URL 和狀態碼等元資料，並跨服務傳播追蹤上下文。您還可以自訂 span 屬性或使用自己的 OpenTelemetry 配置。
 
@@ -26,7 +26,7 @@ Ktor 與 [OpenTelemetry](https://opentelemetry.io/) 整合 — 這是一個開�
 ## 新增相依性 {id="add_dependencies"}
 
 <p>
-    若要使用 <code>%plugin_name%</code>，請將 <code>%artifact_name%</code> 構件新增至您的建置指令碼中：
+    若要使用 <code>%plugin_name%</code>，請將 <code>%artifact_name%</code> 構件新增至您的組建指令碼中：
 </p>
 
 <Tabs group="languages">
@@ -46,11 +46,9 @@ Ktor 與 [OpenTelemetry](https://opentelemetry.io/) 整合 — 這是一個開�
 
 ### 自動配置 {id="automatic-configuration"}
 
-配置 OpenTelemetry 的常見方式是使用
-[`AutoConfiguredOpenTelemetrySdk`](https://javadoc.io/doc/io.opentelemetry/opentelemetry-sdk-extension-autoconfigure/latest/io/opentelemetry/sdk/autoconfigure/AutoConfiguredOpenTelemetrySdk.html)。
-這會根據系統屬性和環境變數自動配置 exporter 和資源，進而簡化設定。
+配置 OpenTelemetry 的常見方法是使用 [`AutoConfiguredOpenTelemetrySdk`](https://javadoc.io/doc/io.opentelemetry/opentelemetry-sdk-extension-autoconfigure/latest/io/opentelemetry/sdk/autoconfigure/AutoConfiguredOpenTelemetrySdk.html)。這會根據系統屬性與環境變數自動配置匯出器（exporters）和資源，從而簡化設定流程。
 
-您仍然可以自訂自動偵測到的配置 — 例如，新增一個 `service.name` 資源屬性：
+您仍然可以自訂自動偵測到的配置——例如，新增 `service.name` 資源屬性：
 
 ```kotlin
 package com.example
@@ -73,9 +71,9 @@ fun getOpenTelemetry(serviceName: String): OpenTelemetry {
 
 ### 程式化配置 {id="programmatic-configuration"}
 
-若要在程式碼中定義 exporter、processor 和 propagator，而不是依賴以環境為基礎的配置，您可以使用 [`OpenTelemetrySdk`](https://javadoc.io/doc/io.opentelemetry/opentelemetry-sdk/latest/io/opentelemetry/sdk/OpenTelemetrySdk.html)。
+若要在程式碼中定義匯出器、處理器和傳播器，而不是依賴基於環境的配置，可以使用 [`OpenTelemetrySdk`](https://javadoc.io/doc/io.opentelemetry/opentelemetry-sdk/latest/io/opentelemetry/sdk/OpenTelemetrySdk.html)。
 
-以下範例示範如何透過程式碼配置包含 OTLP exporter、span processor 和追蹤上下文 propagator 的 OpenTelemetry：
+以下範例展示如何以程式化方式配置帶有 OTLP 匯出器、span 處理器和追蹤上下文傳播器的 OpenTelemetry：
 
 ```kotlin
 import io.opentelemetry.api.OpenTelemetry
@@ -102,16 +100,15 @@ fun configureOpenTelemetry(): OpenTelemetry {
 }
 ```
 
-如果您需要完全掌控遙測設定，或者您的部署環境無法依賴自動配置，請使用此方法。
+如果您需要完全控制遙測設定，或者部署環境無法依賴自動配置時，請使用此方法。
 
-> 如需更多資訊，請參閱
-> [OpenTelemetry SDK 元件文件](https://opentelemetry.io/docs/languages/java/sdk/#sdk-components)。
+> 若要了解更多資訊，請參閱 [OpenTelemetry SDK 元件文件](https://opentelemetry.io/docs/languages/java/sdk/#sdk-components)。
 >
 {style="tip"}
 
 ## 安裝 %plugin_name% {id="install_plugin"}
 
-若要安裝 `%plugin_name%` 外掛程式，請將其傳入[用戶端配置區塊](client-create-and-configure.md#configure-client)內的 `install` 函式中，並設定[已配置的 `OpenTelemetry` 執行個體](#configure-otel)：
+若要安裝 `%plugin_name%` 外掛程式，請將其傳遞給[用戶端配置區塊](client-create-and-configure.md#configure-client)內的 `install` 函式，並設定[已配置的 `OpenTelemetry` 執行個體](#configure-otel)：
 
 ```kotlin
 import io.ktor.client.*
@@ -130,10 +127,9 @@ val client = HttpClient(CIO) {
 
 ## 配置追蹤 {id="configure-tracing"}
 
-您可以自訂 Ktor 用戶端如何記錄並匯出傳出 HTTP 呼叫的 OpenTelemetry span。以下選項允許您調整追蹤哪些請求、span 如何命名、包含哪些屬性、擷取哪些標頭，以及如何決定 span 的種類（kind）。
+您可以自訂 Ktor 用戶端如何針對傳出的 HTTP 呼叫記錄並匯出 OpenTelemetry span。下列選項可讓您調整要追蹤哪些請求、span 的命名方式、包含哪些屬性、擷取哪些標頭，以及如何確定 span 類型（span kinds）。
 
-> 如需有關這些概念的更多資訊，請參閱
-> [OpenTelemetry 追蹤文件](https://opentelemetry.io/docs/concepts/signals/traces/)。
+> 若要了解有關這些概念的更多資訊，請參閱 [OpenTelemetry 追蹤文件](https://opentelemetry.io/docs/concepts/signals/traces/)。
 
 ### 追蹤其他 HTTP 方法 {id="config-known-methods"}
 
@@ -147,7 +143,7 @@ install(%plugin_name%) {
 ```
 ### 擷取標頭 {id="config-request-headers"}
 
-若要將特定的 HTTP 請求標頭作為 span 屬性包含在內，請使用 `capturedRequestHeaders` 屬性：
+若要將特定的 HTTP 請求標頭納入為 span 屬性，請使用 `capturedRequestHeaders` 屬性：
 
 ```kotlin
 install(%plugin_name%) {
@@ -187,4 +183,4 @@ install(%plugin_name%) {
 
 ## 後續步驟 {id="next-steps"}
 
-安裝並配置好 %plugin_name% 後，您可以透過向同時啟用了遙測的服務（例如使用 [`KtorServerTelemetry`](server-opentelemetry.md) 的服務）發送請求，來驗證 span 是否正在建立並傳播。在 [Jaeger](https://www.jaegertracing.io/)、[Zipkin](https://zipkin.io/) 或 [Grafana Tempo](https://grafana.com/oss/tempo/) 等可觀測性後端中檢視追蹤的兩端，即可確認分散式追蹤是否正常進行端到端運作。
+安裝並配置好 %plugin_name% 之後，您可以透過向同樣啟用了遙測的服務（例如使用 [`KtorServerTelemetry`](server-opentelemetry.md) 的服務）發送請求，來驗證 span 是否正確建立並傳播。在 [Jaeger](https://www.jaegertracing.io/)、[Zipkin](https://zipkin.io/) 或 [Grafana Tempo](https://grafana.com/oss/tempo/) 等可觀測性後端中查看追蹤的兩端，即可確認分散式追蹤是否正常進行端到端運作。

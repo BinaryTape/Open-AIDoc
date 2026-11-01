@@ -6,6 +6,7 @@
 <var name="plugin_name" value="DropwizardMetrics"/>
 <var name="package_name" value="io.ktor.server.metrics.dropwizard"/>
 <var name="artifact_name" value="ktor-server-metrics"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.server.metrics"/>
 
 <tldr>
 <p>
@@ -19,31 +20,39 @@
     </a>
 </p>
 <p>
-    <b><Links href="/ktor/server-native" summary="Ktor 支援 Kotlin/Native，並允許您在沒有額外執行階段或虛擬機的情況下執行伺服器。">原生伺服器</Links> 支援</b>：✖️
+    <b><Links href="server-native.md" summary="Ktor 支援 Kotlin/Native，並允許您在不需要額外執行階段或虛擬機的情況下執行伺服器。">原生伺服器 (Native server)</Links> 支援</b>：✖️
 </p>
 </tldr>
 
-<link-summary>%plugin_name% 外掛程式讓您可以配置 Metrics 程式庫，以獲取有關伺服器和傳入請求的有用資訊。</link-summary>
+<link-summary>%plugin_name% 外掛程式讓您可以設定 Metrics 程式庫，以取得關於伺服器和傳入請求的實用資訊。</link-summary>
 
-[%plugin_name%](https://api.ktor.io/ktor-server-metrics/io.ktor.server.metrics.dropwizard/-dropwizard-metrics.html) 外掛程式讓您可以配置 [Metrics](http://metrics.dropwizard.io/) 程式庫，以獲取有關伺服器和傳入請求的有用資訊。
+[%plugin_name%](https://api.ktor.io/ktor-server-metrics/io.ktor.server.metrics.dropwizard/-dropwizard-metrics.html) 外掛程式讓您可以設定 [Metrics](http://metrics.dropwizard.io/) 程式庫，以取得關於伺服器和傳入請求的實用資訊。
 
 ## 新增相依性 {id="add_dependencies"}
-要啟用 `%plugin_name%`，您需要在建置指令碼中包含以下構件：
+若要啟用 `%plugin_name%`，您需要在建置指令碼中包含以下構件：
 * 新增 `%artifact_name%` 相依性：
 
   <Tabs group="languages">
       <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-          <code-block lang="Kotlin" code="              implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+          <code-block lang="Kotlin" code="              implementation(%ktor_version_catalog_name%)"/>
+          <note>
+              上述程式碼片段使用 <a href="server-dependencies.topic#using-version-catalog">
+              Ktor version catalog</a> 來指定 Ktor 相依性。
+          </note>
       </TabItem>
       <TabItem title="Gradle (Groovy)" group-key="groovy">
-          <code-block lang="Groovy" code="              implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+          <code-block lang="Groovy" code="              implementation %ktor_version_catalog_name%"/>
+          <note>
+              上述程式碼片段使用 <a href="server-dependencies.topic#using-version-catalog">
+              Ktor version catalog</a> 來指定 Ktor 相依性。
+          </note>
       </TabItem>
       <TabItem title="Maven" group-key="maven">
           <code-block lang="XML" code="              &lt;dependency&gt;&#10;                  &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                  &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                  &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;              &lt;/dependency&gt;"/>
       </TabItem>
   </Tabs>
 
-* （選填）新增特定報告器所需的相依性。以下範例顯示如何新增透過 JMX 報告指標所需的構件：
+* （選用）新增特定回報器 (reporter) 所需的相依性。以下範例展示如何新增透過 JMX 回報指標所需的構件：
 
   <var name="group_id" value="io.dropwizard.metrics"/>
   <var name="artifact_name" value="metrics-jmx"/>
@@ -60,20 +69,20 @@
       </TabItem>
   </Tabs>
   
-  您可以將 `$dropwizard_version` 替換為所需的 `metrics-jmx` 構件版本，例如 `%dropwizard_version%`。
+  您可以將 `$dropwizard_version` 替換為 `metrics-jmx` 構件所需的版本，例如 `%dropwizard_version%`。
 
 ## 安裝 %plugin_name% {id="install_plugin"}
 
 <p>
-    要將 <code>%plugin_name%</code> 外掛程式<a href="server-plugins.md#install">安裝</a>到應用程式，請將其傳遞給指定<Links href="/ktor/server-modules" summary="模組允許您透過分組路由來建構應用程式。">模組</Links>中的 <code>install</code> 函式。
-    以下程式碼片段顯示如何安裝 <code>%plugin_name%</code> ...
+    若要將 <code>%plugin_name%</code> 外掛程式<a href="server-plugins.md#install">安裝</a>至您的應用程式，請在指定的 <Links href="server-modules.md" summary="模組允許您透過將路由分組來建構應用程式。">模組</Links> 中將其傳遞給 <code>install</code> 函式。
+    以下範例展示如何安裝 <code>%plugin_name%</code>：
 </p>
 <list>
     <li>
-        ... 在 <code>embeddedServer</code> 函式呼叫內。
+        在 <code>embeddedServer()</code> 函式呼叫中。
     </li>
     <li>
-        ... 在明確定義的 <code>module</code> 內，該模組是 <code>Application</code> 類別的擴充函式。
+        在 <code>Application</code> 類別上明確定義的 <code>module()</code> 擴充函式中。
     </li>
 </list>
 <Tabs>
@@ -85,14 +94,14 @@
     </TabItem>
 </Tabs>
 
-## 配置 %plugin_name% {id="configure_plugin"}
+## 設定 %plugin_name% {id="configure_plugin"}
 
-`%plugin_name%` 讓您可以透過 `registry` 屬性使用任何受支援的[指標報告器](http://metrics.dropwizard.io/)。讓我們來看看如何配置 SLF4J 和 JMX 報告器。
+`%plugin_name%` 允許您透過 `registry` 屬性使用任何受支援的 [Metric 回報器](http://metrics.dropwizard.io/)。讓我們來看看如何設定 SLF4J 與 JMX 回報器。
 
-### SLF4J 報告器 {id="slf4j"}
+### SLF4J 回報器 {id="slf4j"}
 
-SLF4J 報告器讓您可以定期向 SLF4J 支援的任何輸出發送報告。
-例如，要每 10 秒輸出一次指標，您可以：
+SLF4J 回報器允許您定期向 SLF4J 支援的任何輸出發送報告。
+例如，若要每 10 秒輸出一次指標，您可以：
 
 ```kotlin
 install(DropwizardMetrics) {
@@ -105,7 +114,7 @@ install(DropwizardMetrics) {
 }
 ```
 
-您可以在這裡找到完整範例：[dropwizard-metrics](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/dropwizard-metrics)。
+您可以在此處找到完整的範例：[dropwizard-metrics](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/dropwizard-metrics)。
 
 如果您執行應用程式並開啟 [http://0.0.0.0:8080](http://0.0.0.0:8080)，輸出將如下所示：
 
@@ -120,9 +129,9 @@ install(DropwizardMetrics) {
 ... type=TIMER, name=ktor.calls.duration, count=6, min=0.732149, max=33.735719, mean=6.238046092985701, stddev=12.169258340009847, p50=0.778864, p75=1.050454, p95=33.735719, p98=33.735719, p99=33.735719, p999=33.735719, m1_rate=0.2, m5_rate=0.2, m15_rate=0.2, mean_rate=0.6040311229887146, rate_unit=events/second, duration_unit=milliseconds
 ```
 
-### JMX 報告器 {id="jmx"}
+### JMX 回報器 {id="jmx"}
 
-JMX 報告器讓您可以將所有指標公開給 JMX，讓您可以使用 `jconsole` 查看這些指標。
+JMX 回報器允許您將所有指標公開至 JMX，讓您可以使用 `jconsole` 檢視這些指標。
 
 ```kotlin
 install(DropwizardMetrics) {
@@ -134,29 +143,29 @@ install(DropwizardMetrics) {
 }
 ```
 
-您可以在這裡找到完整範例：[dropwizard-metrics](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/dropwizard-metrics)。
+您可以在此處找到完整的範例：[dropwizard-metrics](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/dropwizard-metrics)。
 
-如果您執行應用程式並使用 [JConsole](https://docs.oracle.com/en/java/javase/17/management/using-jconsole.html) 連接到其程序，指標將如下所示：
+如果您執行應用程式並使用 [JConsole](https://docs.oracle.com/en/java/javase/17/management/using-jconsole.html) 連線至其處理程序，指標將如下所示：
 
-![Ktor 指標：JMX](jmx.png){width="758"}
+![Ktor Metrics: JMX](jmx.png){width="758"}
 
 ## 公開的指標 {id="exposed-metrics"}
 
 `%plugin_name%` 公開以下指標：
 
-- [全域指標](#global-metrics)，包括 Ktor 特有指標和 [JVM 指標](#jvm-metrics)。
+- [全域指標](#global-metrics)，包含 Ktor 專屬指標以及 [JVM 指標](#jvm-metrics)。
 - [端點指標](#endpoint-metrics)。
 
 ### 全域指標 {id="global-metrics"}
 
-全域指標包括以下 Ktor 特有指標：
+全域指標包含以下 Ktor 專屬指標：
 
-* `ktor.calls.active`：`Count` - 未完成的活動中請求數量。
-* `ktor.calls.duration` - 有關呼叫持續時間的資訊。
-* `ktor.calls.exceptions` - 有關例外狀況數量的資訊。
-* `ktor.calls.status.NNN` - 有關特定 HTTP 狀態碼 `NNN` 出現次數的資訊。
+* `ktor.calls.active`:`Count` - 尚未完成的活躍請求數。
+* `ktor.calls.duration` - 關於呼叫持續時間的資訊。
+* `ktor.calls.exceptions` - 關於例外數量的資訊。
+* `ktor.calls.status.NNN` - 關於特定 HTTP 狀態碼 `NNN` 發生次數的資訊。
 
-請注意，指標名稱以 `ktor.calls` 前綴開頭。您可以透過 `baseName` 屬性自訂它：
+請注意，指標名稱以 `ktor.calls` 前綴開頭。您可以使用 `baseName` 屬性自訂它：
 
 ```kotlin
 install(DropwizardMetrics) {
@@ -166,13 +175,13 @@ install(DropwizardMetrics) {
 
 ### 每個端點的指標 {id="endpoint-metrics"}
 
-* `"/uri(method:VERB).NNN"` - 有關此路徑和動詞出現特定 HTTP 狀態碼 `NNN` 次數的資訊。
-* `"/uri(method:VERB).meter"` - 有關此路徑和動詞呼叫次數的資訊。
-* `"/uri(method:VERB).timer"` - 有關此端點持續時間的資訊。
+* `"/uri(method:VERB).NNN"` - 針對此路徑與動詞發生特定 HTTP 狀態碼 `NNN` 次數的資訊。
+* `"/uri(method:VERB).meter"` - 針對此路徑與動詞的呼叫次數資訊。
+* `"/uri(method:VERB).timer"` - 針對此端點持續時間的資訊。
 
 ### JVM 指標 {id="jvm-metrics"}
 
-除了 HTTP 指標外，Ktor 還公開了一組用於監控 JVM 的指標。您可以透過 `registerJvmMetricSets` 屬性停用這些指標：
+除了 HTTP 指標之外，Ktor 還公開了一組用於監控 JVM 的指標。您可以使用 `registerJvmMetricSets` 屬性停用這些指標：
 
 ```kotlin
 install(DropwizardMetrics) {
@@ -180,4 +189,4 @@ install(DropwizardMetrics) {
 }
 ```
 
-您可以在這裡找到完整範例：[dropwizard-metrics](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/dropwizard-metrics)。
+您可以在此處找到完整的範例：[dropwizard-metrics](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/dropwizard-metrics)。

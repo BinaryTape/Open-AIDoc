@@ -1,119 +1,95 @@
 ---
-title: 从 Hilt 迁移到 Koin
+title: 从 Hilt 迁移
 ---
 
-本指南将帮助您将 Android 应用程序从 Dagger Hilt 迁移到 Koin。无论您使用的是 Koin DSL 还是 Koin Annotations，本指南都涵盖了关键差异和迁移步骤。
+# 从 Hilt 迁移
 
-:::info
-有关完整的真实案例，请查看 [Now in Android 迁移](https://blog.insert-koin.io/migrating-now-in-android-to-koin-annotations-2-3-67d252dbb97d)，该案例展示了如何将 Google 拥有 30 个 Gradle 模块的生产级新闻应用从 Hilt 迁移到 Koin Annotations。
+本指南将引导你逐步将 Android 应用从 Dagger Hilt 迁移到 Koin：Gradle、`Application` 类、模块、绑定、ViewModel、入口点、限定符、Compose 以及测试。每个 Koin 示例均提供了三种 Koin 风格；如果不确定选择哪一种，请阅读[选择你的风格](/docs/intro/choosing-your-style)。有关这两个框架的对比，请参阅 [Koin vs Hilt](/docs/intro/koin-vs-hilt)。
+
+:::note
+如需查看完整的实际项目迁移案例，请阅读 [Migrating Now in Android to Koin](https://blog.insert-koin.io/migrating-now-in-android-to-koin-annotations-2-3-67d252dbb97d)：Google 包含 30 个 Gradle 模块的示例应用从 Hilt 迁移到 Koin Annotations 的全过程。
 :::
 
-## 为什么迁移到 Koin？ {id="why-migrate-to-koin"}
+## 概念映射 {id="concept-mapping"}
 
-**Koin 的关键优势：**
+| Hilt | 编译器插件 DSL | 注解 | 构造函数 / 经典 DSL |
+|------|---------------------|-------------|-------------|
+| `@HiltAndroidApp` | `Application.onCreate()` 中的 `startKoin { }` | `@KoinApplication` + `startKoin<T>()` | `Application.onCreate()` 中的 `startKoin { }` |
+| `@AndroidEntryPoint` | 不需要：`by inject()`、`by viewModel()` | 不需要 | 不需要 |
+| `@Inject constructor` | `single<T>()` / `factory<T>()` | 类上的 `@Singleton` / `@Factory` | `singleOf(::T)` / `factoryOf(::T)` |
+| `@Module` + `@InstallIn` | `module { }` | `@Module` + `@ComponentScan` | `module { }` |
+| `@Provides` | `single { create(::fn) }` | 函数上的 `@Singleton` / `@Factory` | `single { ... }` |
+| `@Binds` | `bind Interface::class` | 自动（超类型）或 `binds = [...]` | `bind Interface::class` |
+| `@Singleton` | `single` | `@Singleton` / `@Single` | `single` |
+| `@HiltViewModel` | `viewModel<T>()` | `@KoinViewModel` | `viewModelOf(::T)` |
+| `@HiltWorker` | `worker<T>()` | `@KoinWorker` | `workerOf(::T)` |
+| `@Named`、自定义 `@Qualifier` | `named("x")`、形参上的 `@Named` | `@Named`、自定义 `@Qualifier` | `named("x")` |
+| `@ApplicationContext` | 由 `androidContext()` 提供的 `Context` 形参 | 同左 | `androidContext()` |
+| `@AssistedInject` | 注入形参 | `@InjectedParam` | 注入形参 |
+| 自有类中的 `@Inject` 字段 | 构造函数形参 | 构造函数形参 | 构造函数形参 |
+| `@EntryPoint`（Hilt 无法注入的框架类） | 仅在该入口点使用 `KoinComponent` | 同左 | 同左 |
+| `@HiltAndroidTest` | `KoinTestRule` | `KoinTestRule` | `KoinTestRule` |
 
-- **无代码生成** - Koin 使用运行时依赖解析，无需注解处理器。
-- **更简单的设置** - 没有复杂的组件层次结构或 `@InstallIn` 声明。
-- **Kotlin 优先** - 自然且符合惯例的 Kotlin DSL。
-- **更轻量** - 无需 kapt/KSP 代码生成（针对 DSL 方式），构建时间更短。
-- **多模块友好** - 无需 `@EntryPoint` 接口。
-- **JSR-330 支持** - 现有的 `@Inject` 构造函数无需修改即可工作。
+### 作用域映射 {id="scope-mapping"}
 
-## 快速参考：Hilt vs Koin {id="quick-reference-hilt-vs-koin"}
+| Hilt | Koin DSL | 注解 | 生命周期 |
+|------|----------|-------------|----------|
+| `@Singleton`（`SingletonComponent`） | `single` | `@Singleton` | Application |
+| `@ActivityRetainedScoped` | `activityRetainedScope { }` | `@ActivityRetainedScope` | 在配置变更后依然保留 |
+| `@ViewModelScoped` | `viewModelScope { }` | `@ViewModelScope` | ViewModel |
+| `@ActivityScoped` | `activityScope { }` | `@ActivityScope` | Activity |
+| `@FragmentScoped` | `fragmentScope { }` | `@FragmentScope` | Fragment |
 
-### 注解映射 {id="annotation-mappings"}
+作用域 DSL 与注解详见 [Android 作用域](/docs/reference/koin-android/scope)。
 
-| Hilt | Koin DSL                                 | Koin Annotations                                                                                    |
-|------|------------------------------------------|-----------------------------------------------------------------------------------------------------|
-| `@HiltAndroidApp` | Application 中的 `startKoin {}`            | `@KoinApplication`                                                                                  |
-| `@AndroidEntryPoint` | `by inject()` / `by viewModel()`         | `by inject()` / `by viewModel()`                                                                    |
-| `@HiltViewModel` | `viewModel { MyViewModel(...) }`         | `@KoinViewModel`                                                                                    |
-| `@Inject` 构造函数 | DSL 指定构造函数形参    | 自动检测构造函数形参 (JSR-330)                                                           |
-| `@Module` + `@InstallIn` | `module { }`                             | `@Module` + `@ComponentScan`                                                                        |
-| `@Provides` | `single { }` 或 `factory { }`            | `@Single` / `@Factory`                                                                              |
-| `@Binds` | `single<Interface> { Implementation() }` | `@Single` 或 `@Singleton` 会检测绑定。也可以使用这些注解的 `binds` 属性。 |
-| `@Singleton` | `single { }`                             | `@Single` 或 `@Singleton`                                                                                           |
-| `@Named("qualifier")` | `named("qualifier")`                     | `@Named("qualifier")`                                                                               |
-| `@ApplicationContext` | 自动 Context 注入              | 自动 Context 注入                                                                         |
-| `@EntryPoint` | 不需要                               | 不需要                                                                                          |
+## 第 1 步：Gradle {id="step-1-gradle"}
 
-### 作用域映射 {id="scope-mappings"}
-
-| Hilt 作用域 | Koin DSL | Koin Annotations | 说明 |
-|------------|----------|------------------|-------|
-| `@Singleton` | `single { }` | `@Single` / `@Singleton` | 全局单例 |
-| `@ActivityScoped` | `activityScope { scoped { } }` | `@ActivityScope` | 绑定到 Activity 生命周期 |
-| `@ViewModelScoped` | `viewModelScope { scoped { } }` | `@ViewModelScope` | 绑定到 ViewModel 生命周期 |
-| `@ActivityRetainedScoped` | `activityRetainedScope { scoped { } }` | `@ActivityRetainedScope` | 在配置更改后继续存在 |
-
-## 迁移步骤 {id="migration-steps"}
-
-### 第 1 步：更新依赖项 {id="step-1-update-dependencies"}
-
-**移除 Hilt 依赖项：**
+移除 Hilt 插件、`hilt-android` 和 `hilt-compiler`（kapt 或 KSP）。然后添加 Koin：
 
 ```kotlin
-// 从 build.gradle.kts 中移除这些内容
-plugins {
-    id("com.google.dagger.hilt.android") // 移除
-}
-
 dependencies {
-    // 移除 Hilt 依赖项
-    implementation("com.google.dagger:hilt-android:...")
-    kapt("com.google.dagger:hilt-compiler:...")
+    implementation(platform("io.insert-koin:koin-bom:$koin_version"))
+    implementation("io.insert-koin:koin-android")
+    implementation("io.insert-koin:koin-androidx-compose") // 如果使用 Compose
 }
 ```
 
-**添加 Koin 依赖项：**
+若要使用编译器插件 DSL 或注解，还需应用 [Koin 编译器插件](/docs/setup/compiler-plugin)。它在 Kotlin 编译器内部运行，并为 Koin 替代 kapt 或 KSP。完整的构件列表请参阅 [Gradle 设置](/docs/setup/gradle)。
 
-```kotlin
-// build.gradle.kts (app 模块)
-dependencies {
-    // Koin for Android
-    implementation("io.insert-koin:koin-android:$koin_version")
-    implementation("io.insert-koin:koin-androidx-compose:$koin_version")
+## 第 2 步：Application 类 {id="step-2-application-class"}
 
-    // 可选：Koin Annotations
-    implementation("io.insert-koin:koin-annotations:$koin_ksp_version")
-    ksp("io.insert-koin:koin-ksp-compiler:$koin_ksp_version")
-}
-```
-
-### 第 2 步：应用程序设置 {id="step-2-application-setup"}
-
-**Hilt：**
+Hilt：
 
 ```kotlin
 @HiltAndroidApp
 class MyApplication : Application()
 ```
 
-**Koin DSL：**
+Koin：
 
+**编译器插件 DSL**
 ```kotlin
 class MyApplication : Application() {
     override fun onCreate() {
         super.onCreate()
-
         startKoin {
             androidLogger()
             androidContext(this@MyApplication)
-            modules(appModule, dataModule, domainModule)
+            modules(appModule)
         }
     }
 }
 ```
 
-**Koin Annotations：**
-
+**注解**
 ```kotlin
+import org.koin.plugin.module.dsl.startKoin
+
 @KoinApplication
 class MyApplication : Application() {
     override fun onCreate() {
         super.onCreate()
-
-        startKoin {
+        startKoin<MyApplication> {
             androidLogger()
             androidContext(this@MyApplication)
         }
@@ -121,13 +97,27 @@ class MyApplication : Application() {
 }
 ```
 
-:::info
-使用 `@KoinApplication` 时，如果模块被标记为 `@Configuration`，它们将被自动发现。您也可以使用 `modules` 属性显式包含模块：`@KoinApplication(modules = [AppModule::class])`。
-:::
+`@KoinApplication` 会加载每个标记有 `@Configuration` 的模块。如需显式列出模块，请使用 `@KoinApplication(modules = [AppModule::class])`。
 
-### 第 3 步：迁移模块 {id="step-3-migrate-modules"}
+**构造函数 / 经典 DSL**
+```kotlin
+class MyApplication : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        startKoin {
+            androidLogger()
+            androidContext(this@MyApplication)
+            modules(appModule)
+        }
+    }
+}
+```
 
-**Hilt：**
+`androidContext()` 使 `Context` 对每个定义均可用。请参阅[在 Android 上启动 Koin](/docs/reference/koin-android/start)。
+
+## 第 3 步：模块与 @Provides {id="step-3-modules-and-provides"}
+
+Hilt：
 
 ```kotlin
 @Module
@@ -136,626 +126,407 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(): OkHttpClient {
-        return OkHttpClient.Builder()
-            .connectTimeout(30, TimeUnit.SECONDS)
-            .build()
-    }
+    fun provideOkHttpClient(): OkHttpClient = OkHttpClient.Builder().build()
 
     @Provides
     @Singleton
-    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
-        return Retrofit.Builder()
-            .baseUrl("https://api.example.com")
-            .client(okHttpClient)
-            .build()
-    }
-
-    @Provides
-    @Singleton
-    fun provideApiService(retrofit: Retrofit): ApiService {
-        return retrofit.create(ApiService::class.java)
-    }
-}
-```
-
-**Koin DSL：**
-
-```kotlin
-val networkModule = module {
-
-    single {
-        OkHttpClient.Builder()
-            .connectTimeout(30, TimeUnit.SECONDS)
-            .build()
-    }
-
-    single {
+    fun provideApiService(client: OkHttpClient): ApiService =
         Retrofit.Builder()
             .baseUrl("https://api.example.com")
-            .client(get()) // 自动依赖解析
+            .client(client)
             .build()
-    }
-
-    single {
-        get<Retrofit>().create(ApiService::class.java)
-    }
+            .create(ApiService::class.java)
 }
 ```
 
-**Koin Annotations：**
+Koin：
 
+**编译器插件 DSL**
+```kotlin
+import org.koin.plugin.module.dsl.create
+
+fun okHttpClient(): OkHttpClient = OkHttpClient.Builder().build()
+
+fun apiService(client: OkHttpClient): ApiService =
+    Retrofit.Builder()
+        .baseUrl("https://api.example.com")
+        .client(client)
+        .build()
+        .create(ApiService::class.java)
+
+val networkModule = module {
+    single { create(::okHttpClient) }
+    single { create(::apiService) }
+}
+```
+
+**注解**
 ```kotlin
 @Module
 class NetworkModule {
 
-    @Single
-    fun provideOkHttpClient(): OkHttpClient {
-        return OkHttpClient.Builder()
-            .connectTimeout(30, TimeUnit.SECONDS)
-            .build()
-    }
+    @Singleton
+    fun okHttpClient(): OkHttpClient = OkHttpClient.Builder().build()
 
-    @Single
-    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
-        return Retrofit.Builder()
+    @Singleton
+    fun apiService(client: OkHttpClient): ApiService =
+        Retrofit.Builder()
             .baseUrl("https://api.example.com")
-            .client(okHttpClient)
+            .client(client)
             .build()
-    }
-
-    @Single
-    fun provideApiService(retrofit: Retrofit): ApiService {
-        return retrofit.create(ApiService::class.java)
-    }
+            .create(ApiService::class.java)
 }
 ```
 
-### 第 4 步：迁移 ViewModel {id="step-4-migrate-viewmodels"}
-
-**Hilt：**
-
+**构造函数 / 经典 DSL**
 ```kotlin
-@HiltViewModel
-class MyViewModel @Inject constructor(
-    private val repository: MyRepository,
-    private val savedStateHandle: SavedStateHandle
-) : ViewModel() {
-    // ...
-}
-
-@Composable
-fun MyScreen() {
-    val viewModel = hiltViewModel<MyViewModel>()
-    // ...
-}
-```
-
-**Koin DSL：**
-
-```kotlin
-class MyViewModel(
-    private val repository: MyRepository,
-    private val savedStateHandle: SavedStateHandle
-) : ViewModel() {
-    // ...
-}
-
-val appModule = module {
-    viewModelOf(::MyViewModel)
-}
-
-@Composable
-fun MyScreen() {
-    val viewModel = koinViewModel<MyViewModel>()
-    // ...
-}
-```
-
-**Koin Annotations：**
-
-```kotlin
-@KoinViewModel
-class MyViewModel(
-    private val repository: MyRepository,
-    private val savedStateHandle: SavedStateHandle
-) : ViewModel() {
-    // ...
-}
-
-@Composable
-fun MyScreen() {
-    val viewModel = koinViewModel<MyViewModel>()
-    // ...
-}
-```
-
-:::info
-`viewModelOf` DSL 函数使用构造函数形参自动装配。`SavedStateHandle` 由 Koin 自动提供，因此您无需显式传递它。这是 Koin 自动装配 DSL 的一部分，它简化了 ViewModel 定义。
-:::
-
-### 第 5 步：迁移 Activity 和 Fragment {id="step-5-migrate-activities-and-fragments"}
-
-**Hilt：**
-
-```kotlin
-@AndroidEntryPoint
-class MainActivity : ComponentActivity() {
-
-    @Inject
-    lateinit var analytics: AnalyticsService
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        analytics.logEvent("screen_view")
+val networkModule = module {
+    single { OkHttpClient.Builder().build() }
+    single {
+        Retrofit.Builder()
+            .baseUrl("https://api.example.com")
+            .client(get())
+            .build()
+            .create(ApiService::class.java)
     }
 }
 ```
 
-**Koin：**
+这里没有 `@InstallIn`：定义的生命周期取决于其类型（`single`、`factory`、`scoped`），而不是安装它的组件。带有 `@Inject constructor` 的类将转换为 `single<T>()` / `factory<T>()`、类上的注解，或 `singleOf(::T)`。有关库对象的更多内容，请参阅[定义](/docs/reference/koin-core/definitions#classes-you-dont-own)。
 
-```kotlin
-class MainActivity : ComponentActivity() {
+## 第 4 步：接口绑定 {id="step-4-interface-bindings"}
 
-    // 属性委托 - 不需要注解
-    private val analytics: AnalyticsService by inject()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        analytics.logEvent("screen_view")
-    }
-}
-```
-
-:::info
-使用 Koin，您不需要 `@AndroidEntryPoint` - 只需使用 `by inject()` 或 `by viewModel()` 属性委托即可。
-:::
-
-### 第 6 步：迁移接口绑定 {id="step-6-migrate-interface-bindings"}
-
-**Hilt：**
+Hilt：
 
 ```kotlin
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class DataModule {
-
     @Binds
     @Singleton
-    abstract fun bindRepository(
-        impl: MyRepositoryImpl
-    ): MyRepository
-}
-
-class MyRepositoryImpl @Inject constructor(
-    private val apiService: ApiService
-) : MyRepository {
-    // ...
+    abstract fun bindUserRepository(impl: UserRepositoryImpl): UserRepository
 }
 ```
 
-**Koin DSL：**
+Koin：
 
+**编译器插件 DSL**
 ```kotlin
 val dataModule = module {
-    single<MyRepository> { MyRepositoryImpl(get()) }
-}
-
-class MyRepositoryImpl(
-    private val apiService: ApiService
-) : MyRepository {
-    // ...
+    single<UserRepositoryImpl>() bind UserRepository::class
 }
 ```
 
-**Koin Annotations（自动绑定检测）：**
-
+**注解**
 ```kotlin
-// 选项 1：自动 - Koin 检测接口绑定
 @Singleton
-class MyRepositoryImpl(
-    private val apiService: ApiService
-) : MyRepository {
-    // ...
-}
-// Koin 自动将 MyRepositoryImpl 绑定到 MyRepository
-
-// 选项 2：通过 binds 属性显式指定
-@Single(binds = [MyRepository::class])
-class MyRepositoryImpl(
-    private val apiService: ApiService
-) : MyRepository {
-    // ...
-}
+class UserRepositoryImpl(private val api: ApiService) : UserRepository
 ```
 
-:::info
-当一个类实现一个接口时，Koin Annotations 会自动检测接口绑定。当您需要显式指定多个接口或控制绑定行为时，请使用 `binds` 属性。
-:::
+该类会自动绑定到其所有的超类型。若只需绑定部分类型，请使用 `@Singleton(binds = [UserRepository::class])`。
 
-### 第 7 步：迁移限定符 {id="step-7-migrate-qualifiers"}
-
-**Hilt：**
-
+**构造函数 / 经典 DSL**
 ```kotlin
-@Qualifier
-@Retention(AnnotationRetention.BINARY)
-annotation class IoDispatcher
-
-@Module
-@InstallIn(SingletonComponent::class)
-object DispatcherModule {
-
-    @Provides
-    @IoDispatcher
-    fun provideIoDispatcher(): CoroutineDispatcher {
-        return Dispatchers.IO
-    }
-}
-
-class MyRepository @Inject constructor(
-    @IoDispatcher private val dispatcher: CoroutineDispatcher
-)
-```
-
-**Koin DSL（基于字符串）：**
-
-```kotlin
-val dispatcherModule = module {
-    single(named("io")) { Dispatchers.IO }
-}
-
-class MyRepository(
-    private val dispatcher: CoroutineDispatcher
-)
-
 val dataModule = module {
-    single { MyRepository(get(named("io"))) }
+    singleOf(::UserRepositoryImpl) bind UserRepository::class
 }
 ```
 
-**Koin DSL（类型安全）：**
+## 第 5 步：ViewModel {id="step-5-viewmodels"}
+
+Hilt：
 
 ```kotlin
-// 定义限定符类型
-object IoDispatcher
-
-val dispatcherModule = module {
-    single(named<IoDispatcher>()) { Dispatchers.IO }
-}
-
-class MyRepository(
-    private val dispatcher: CoroutineDispatcher
-)
-
-val dataModule = module {
-    single { MyRepository(get(named<IoDispatcher>())) }
-}
+@HiltViewModel
+class UserViewModel @Inject constructor(
+    private val repository: UserRepository,
+    private val savedStateHandle: SavedStateHandle,
+) : ViewModel()
 ```
 
-**Koin Annotations（基于字符串）：**
+Koin：
 
+**编译器插件 DSL**
 ```kotlin
-@Module
-class DispatcherModule {
-    @Single
-    @Named("io")
-    fun provideIoDispatcher(): CoroutineDispatcher = Dispatchers.IO
-}
-
-@Single
-class MyRepository(
-    @InjectedParam @Named("io") private val dispatcher: CoroutineDispatcher
-)
-```
-
-**Koin Annotations（使用 JSR-330 @Qualifier - 完全兼容！）：**
-
-```kotlin
-// 保留您现有的 JSR-330 限定符注解！
-@Qualifier
-@Retention(AnnotationRetention.BINARY)
-annotation class IoDispatcher
-
-@Module
-class DispatcherModule {
-    @Single
-    @IoDispatcher
-    fun provideIoDispatcher(): CoroutineDispatcher = Dispatchers.IO
-}
-
-@Single
-class MyRepository @Inject constructor(
-    @IoDispatcher private val dispatcher: CoroutineDispatcher
-)
-```
-
-:::info
-Koin Annotations 完全支持 JSR-330 `@Qualifier` 注解！这是一种标准的 Java/Kotlin DI 注解（并非 Hilt 特有），因此您可以在迁移过程中保持现有的限定符注解不变。DSL 还支持使用 `named<T>()` 代替基于字符串的 `named("string")` 来实现类型安全限定符。
-:::
-
-### 第 8 步：迁移 Compose 集成 {id="step-8-migrate-compose-integration"}
-
-**Hilt：**
-
-```kotlin
-@Composable
-fun MyScreen(
-    viewModel: MyViewModel = hiltViewModel()
-) {
-    val dependency: SomeDependency = EntryPointAccessors
-        .fromActivity<MyEntryPoint>(LocalContext.current as Activity)
-        .dependency()
-}
-```
-
-**Koin：**
-
-```kotlin
-@Composable
-fun MyScreen(
-    viewModel: MyViewModel = koinViewModel()
-) {
-    // 直接注入 - 不需要 EntryPoint
-    val dependency: SomeDependency = koinInject()
-}
-```
-
-### 第 9 步：迁移测试 {id="step-9-migrate-testing"}
-
-**Hilt：**
-
-```kotlin
-@HiltAndroidTest
-class MyTest {
-
-    @get:Rule
-    var hiltRule = HiltAndroidRule(this)
-
-    @Inject
-    lateinit var repository: MyRepository
-
-    @Before
-    fun init() {
-        hiltRule.inject()
-    }
-
-    @Test
-    fun myTest() {
-        // ...
-    }
-}
-```
-
-**Koin：**
-
-```kotlin
-class MyTest : KoinTest {
-
-    private val repository: MyRepository by inject()
-
-    @Before
-    fun before() {
-        startKoin {
-            modules(testModule)
-        }
-    }
-
-    @After
-    fun after() {
-        stopKoin()
-    }
-
-    @Test
-    fun myTest() {
-        // ...
-    }
-}
-```
-
-## 多模块项目 {id="multi-module-projects"}
-
-### Hilt 方式 {id="hilt-approach"}
-
-使用 Hilt，您需要：
-- `@InstallIn` 来指定组件层次结构
-- 跨模块访问的 `@EntryPoint` 接口
-- 复杂的组件依赖关系
-
-### Koin 方式 {id="koin-approach"}
-
-使用 Koin：
-- 每个模块声明自己的 Koin 模块
-- 在 Application 类中导入所有模块
-- 不需要特殊的接口
-
-**使用 Koin 的功能模块：**
-
-```kotlin
-// :feature:home 模块
-val homeModule = module {
-    viewModel { HomeViewModel(get()) }
-    factory { HomeRepository(get()) }
-}
-
-// :app 模块
-class MyApplication : Application() {
-    override fun onCreate() {
-        super.onCreate()
-
-        startKoin {
-            androidLogger()
-            androidContext(this@MyApplication)
-            modules(
-                coreModule,
-                dataModule,
-                homeModule,  // 功能模块
-                profileModule // 另一个功能模块
-            )
-        }
-    }
-}
-```
-
-有关更多详细信息，请参阅[多模块架构](/docs/reference/koin-android/multi-module)。
-
-## 通用模式 {id="common-patterns"}
-
-### 构造函数注入 (JSR-330) {id="constructor-injection-jsr-330"}
-
-最大的优势之一：**现有的 `@Inject` 构造函数可以与 Koin Annotations 配合使用！**
-
-```kotlin
-// 这同时适用于 Hilt 和 Koin Annotations
-class MyRepository @Inject constructor(
-    private val apiService: ApiService,
-    private val database: AppDatabase
-) {
-    // ...
-}
-```
-
-使用 Koin Annotations，您可以保持 `@Inject` 构造函数不变，只需在类中添加 `@Single`、`@Singleton` 或 `@Factory`：
-
-```kotlin
-@Single // 或 @Singleton
-class MyRepository @Inject constructor(
-    private val apiService: ApiService,
-    private val database: AppDatabase
-) {
-    // ...
-}
-```
-
-### 辅助注入 (AssistedInject) {id="assistedinject"}
-
-**Hilt：**
-
-```kotlin
-class MyViewModel @AssistedInject constructor(
-    private val repository: MyRepository,
-    @Assisted private val userId: String
-) : ViewModel() {
-
-    @AssistedFactory
-    interface Factory {
-        fun create(userId: String): MyViewModel
-    }
-}
-```
-
-**Koin：**
-
-```kotlin
-class MyViewModel(
-    private val repository: MyRepository,
-    private val userId: String
+class UserViewModel(
+    private val repository: UserRepository,
+    private val savedStateHandle: SavedStateHandle,
 ) : ViewModel()
 
 val appModule = module {
-    viewModelOf(::MyViewModel)
+    viewModel<UserViewModel>()
+}
+```
+
+**注解**
+```kotlin
+@KoinViewModel
+class UserViewModel(
+    private val repository: UserRepository,
+    private val savedStateHandle: SavedStateHandle,
+) : ViewModel()
+```
+
+**构造函数 / 经典 DSL**
+```kotlin
+class UserViewModel(
+    private val repository: UserRepository,
+    private val savedStateHandle: SavedStateHandle,
+) : ViewModel()
+
+val appModule = module {
+    viewModelOf(::UserViewModel)
+}
+```
+
+Koin 会向 ViewModel 定义提供 `SavedStateHandle`。在 Activity 或 Fragment 中，将 `by viewModels()` 替换为 `by viewModel()`。在 Compose 中，将 `hiltViewModel()` 替换为 `koinViewModel()`。请参阅 [Android ViewModel](/docs/reference/koin-android/viewmodel)。
+
+## 第 6 步：Activity、Fragment 与其他入口点 {id="step-6-activities-fragments-and-other-entry-points"}
+
+Hilt：
+
+```kotlin
+@AndroidEntryPoint
+class MainActivity : ComponentActivity() {
+    @Inject lateinit var analytics: Analytics
+}
+```
+
+Koin：
+
+```kotlin
+class MainActivity : ComponentActivity() {
+    private val analytics: Analytics by inject()
+}
+```
+
+移除 `@AndroidEntryPoint`。在框架创建的 Activity、Fragment 及其他 Android 组件中，带有 `@Inject lateinit var` 的字段将转换为 `by inject()`（延迟加载）或 `get()`（立即获取）。这在各种风格中都是相同的。Service、BroadcastReceiver 以及其他组件的用法请参阅[入口点](/docs/reference/koin-android/entry-points)。
+
+在你自己的类（仓库、服务、用例、ViewModel）中，将 `@Inject` 字段移至构造函数形参，并按照[第 3 步](#step-3-modules-and-provides)中的方式声明该类。这些类绝不需要调用 `get()` 或 `by inject()`：
+
+```kotlin
+// Hilt：自有类中的字段注入
+class SyncService @Inject constructor() {
+    @Inject lateinit var repository: UserRepository
 }
 
-// 用法
-val viewModel: MyViewModel by viewModel { parametersOf("user123") }
+// Koin：构造函数注入
+class SyncService(private val repository: UserRepository)
 ```
 
-### 延迟注入 {id="lazy-injection"}
+Hilt 的 `@EntryPoint` 是为 Hilt 无法注入的框架类（例如 `ContentProvider` 或第三方库回调）而设计的。仅在此类入口点中，才应实现 [KoinComponent](/docs/reference/koin-core/koin-component) 并调用 `by inject()`。切勿使用 `KoinComponent` 来替换应用类中的 `@Inject` 字段。
 
-**Hilt：**
+## 第 7 步：限定符 {id="step-7-qualifiers"}
+
+Hilt：
 
 ```kotlin
-@Inject
-lateinit var heavyService: HeavyService
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class IoDispatcher
+
+@Provides
+@IoDispatcher
+fun provideIoDispatcher(): CoroutineDispatcher = Dispatchers.IO
+
+class SyncRepository @Inject constructor(
+    @IoDispatcher private val dispatcher: CoroutineDispatcher,
+)
 ```
 
-**Koin：**
+Koin：
+
+**编译器插件 DSL**
+```kotlin
+import org.koin.core.annotation.Named
+
+class SyncRepository(
+    @Named("io") private val dispatcher: CoroutineDispatcher,
+)
+
+val dispatcherModule = module {
+    single<CoroutineDispatcher>(named("io")) { Dispatchers.IO }
+    single<SyncRepository>()
+}
+```
+
+**注解**
+保留你的限定符注解。Koin 支持读取标有 `@Qualifier` 的自定义注解（Koin 的、`jakarta.inject` 或 `javax.inject`）：
 
 ```kotlin
-// 属性委托默认是延迟执行的
-private val heavyService: HeavyService by inject()
+import javax.inject.Qualifier
 
-// 或显式延迟加载
-private val heavyService: Lazy<HeavyService> by lazy { get() }
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class IoDispatcher
+
+@Module
+class DispatcherModule {
+    @Singleton
+    @IoDispatcher
+    fun ioDispatcher(): CoroutineDispatcher = Dispatchers.IO
+}
+
+@Singleton
+class SyncRepository(
+    @IoDispatcher private val dispatcher: CoroutineDispatcher,
+)
 ```
 
-## 迁移核对清单 {id="migration-checklist"}
+**构造函数 / 经典 DSL**
+```kotlin
+val dispatcherModule = module {
+    single<CoroutineDispatcher>(named("io")) { Dispatchers.IO }
+    single { SyncRepository(get(named("io"))) }
+}
+```
 
-使用此核对清单跟踪您的迁移进度：
+类型限定符（`named<IoDispatcher>()`）及所有其他选项详见[限定符](/docs/reference/koin-core/qualifiers)。Hilt 的 `@ApplicationContext` 不需要限定符：`Context` 形参会自动接收传递给 `androidContext()` 的上下文。
 
-- [ ] **依赖项**
-  - [ ] 移除 Hilt Gradle 插件
-  - [ ] 移除 Hilt 依赖项
-  - [ ] 添加 Koin 依赖项
-  - [ ] 移除 `kapt`（如果其他地方不需要）
+## 第 8 步：Compose {id="step-8-compose"}
 
-- [ ] **Application 类**
-  - [ ] 移除 `@HiltAndroidApp`
-  - [ ] 在 `onCreate()` 中添加 `startKoin {}`
-  - [ ] 配置 `androidContext()` 和模块
+Hilt 需要借助入口点才能从 Composable 中访问非 ViewModel 依赖项。Koin 则可以直接解析：
 
-- [ ] **模块**
-  - [ ] 将 `@Module` + `@InstallIn` 转换为 `module { }`
-  - [ ] 将 `@Provides` 转换为 `single { }` 或 `factory { }`
-  - [ ] 将 `@Binds` 转换为接口绑定
-  - [ ] 将限定符更新为 `named()`
+```kotlin
+@Composable
+fun UserScreen(viewModel: UserViewModel = koinViewModel()) {
+    val analytics: Analytics = koinInject()
+}
+```
 
-- [ ] **ViewModel**
-  - [ ] 移除 `@HiltViewModel`
-  - [ ] 使用 `viewModel { }` 添加到模块
-  - [ ] 更新 Composable 以使用 `koinViewModel()`
+请参阅 [Koin for Compose](/docs/reference/koin-compose/compose)。
 
-- [ ] **Activity/Fragment**
-  - [ ] 移除 `@AndroidEntryPoint`
-  - [ ] 将字段注入转换为 `by inject()`
+## 第 9 步：测试 {id="step-9-tests"}
 
-- [ ] **测试**
-  - [ ] 移除 `@HiltAndroidTest`
-  - [ ] 实现 `KoinTest`
-  - [ ] 在设置/卸载中添加 `startKoin` / `stopKoin`
+Hilt：
 
-- [ ] **验证**
-  - [ ] 项目构建成功
-  - [ ] 运行所有测试
-  - [ ] 测试应用内依赖注入
-  - [ ] 验证没有运行时崩溃
+```kotlin
+@HiltAndroidTest
+class UserRepositoryTest {
+    @get:Rule
+    val hiltRule = HiltAndroidRule(this)
+
+    @Inject lateinit var repository: UserRepository
+
+    @Before
+    fun init() = hiltRule.inject()
+}
+```
+
+Koin：
+
+```kotlin
+class UserRepositoryTest : KoinTest {
+
+    @get:Rule
+    val koinTestRule = KoinTestRule.create {
+        modules(appModule, testModule)
+    }
+
+    private val repository: UserRepository by inject()
+}
+```
+
+Hilt 的 `@TestInstallIn` 和 `@UninstallModules` 会转换为在生产模块之后加载的测试模块。移除 `HiltTestApplication` 和 Hilt 测试运行程序。请参阅[单元测试](/docs/reference/koin-test/testing)和 [Android 插桩测试](/docs/reference/koin-android/instrumented-testing)。
+
+## 使用 @Inject 渐进式迁移 {id="migrate-gradually-with-inject"}
+
+使用注解时，编译器插件支持读取 JSR-330 注解：在 `@ComponentScan` 覆盖的包中，带有 `@Inject constructor` 的类会成为 factory，而带有 `@Singleton` 注解（来自 `jakarta.inject` 或 `javax.inject`）的类会成为 single。你可以保持这些类不变，按 Gradle 模块逐一进行迁移。请参阅 [JSR-330 注解](/docs/reference/koin-android/jsr330)。
+
+## 多模块项目 {id="multi-module-projects"}
+
+每个 Gradle 模块声明各自的 Koin 模块，而 app 模块在 `startKoin` 中统一加载它们。无需配置组件层次结构，跨模块访问也不需要 `@EntryPoint`：`:feature:home` 中的定义可以使用应用所加载的任意定义。
+
+使用注解时，为每个功能模块类添加 `@Module`、`@ComponentScan` 和 `@Configuration` 标记。app 模块中的 `@KoinApplication` 无需手动列出即可自动发现它们。
+
+模块组织、可见性以及功能模块详见[多模块应用](/docs/reference/koin-android/multi-module)。
+
+## 常见模式 {id="common-patterns"}
+
+### 辅助注入 {id="assisted-injection"}
+
+Hilt 的 `@AssistedInject` 和 `@AssistedFactory` 会转换为注入形参。由调用方传入运行时值：
+
+**编译器插件 DSL**
+```kotlin
+class UserDetailViewModel(
+    @InjectedParam private val userId: String,
+    private val repository: UserRepository,
+) : ViewModel()
+
+val appModule = module {
+    viewModel<UserDetailViewModel>()
+}
+```
+
+**注解**
+```kotlin
+@KoinViewModel
+class UserDetailViewModel(
+    @InjectedParam private val userId: String,
+    private val repository: UserRepository,
+) : ViewModel()
+```
+
+**构造函数 / 经典 DSL**
+```kotlin
+class UserDetailViewModel(
+    private val userId: String,
+    private val repository: UserRepository,
+) : ViewModel()
+
+val appModule = module {
+    viewModel { (userId: String) -> UserDetailViewModel(userId, get()) }
+}
+```
+
+```kotlin
+val viewModel: UserDetailViewModel by viewModel { parametersOf("user-42") }
+```
+
+请参阅[注入形参](/docs/reference/koin-core/injection-parameters)。
+
+### Lazy 与 Provider {id="lazy-and-provider"}
+
+- `dagger.Lazy<T>`：使用 Kotlin 的 `Lazy<T>` 构造函数形参，或在 Android 入口点中使用 `by inject()`（请参阅[注入](/docs/reference/koin-core/injection)）。
+- `Provider<T>`：若要在自有类中实现每次调用均创建新实例，请使用[高级模式](/docs/reference/koin-core/advanced-patterns)中的 Provider 模式。
+
+### WorkManager {id="workmanager"}
+
+`@HiltWorker` worker 会转换为 `worker` 定义，`HiltWorkerFactory` 会转换为 `startKoin` 中的 `workManagerFactory()`。请参阅 [WorkManager](/docs/reference/koin-android/workmanager)。
+
+## 核对清单 {id="checklist"}
+
+- [ ] Gradle：移除 Hilt 插件、`hilt-android` 和 `hilt-compiler`。添加 Koin，如果使用编译器插件也请一并添加。若无其他依赖需要，移除 kapt。
+- [ ] Application：移除 `@HiltAndroidApp`，在 `onCreate()` 中通过 `androidContext()` 启动 Koin。
+- [ ] 模块：将 `@Module` / `@InstallIn` / `@Provides` / `@Binds` 转换为 Koin 模块。
+- [ ] ViewModel：移除 `@HiltViewModel`，声明它们，改用 `by viewModel()` / `koinViewModel()`。
+- [ ] 入口点：移除 `@AndroidEntryPoint`，在 Android 组件中使用 `by inject()`。将自有类中的 `@Inject` 字段移至构造函数形参。仅在 Koin 无法创建的框架类中将 `@EntryPoint` 替换为 `KoinComponent`。
+- [ ] 限定符：保留自定义 `@Qualifier` 注解（注解风格）或切换为 `named()`。
+- [ ] Worker：替换 `@HiltWorker` 和 `HiltWorkerFactory`。
+- [ ] 测试：移除 `@HiltAndroidTest`、`HiltAndroidRule` 和 Hilt 测试运行程序，改用 `KoinTestRule`。
+- [ ] 构建：使用编译器插件时，构建成功即表明依赖图是完整的。如果不使用编译器插件，请添加 [verify()](/docs/reference/koin-test/verify) 测试。
+- [ ] 运行：启动应用并执行测试套件。
 
 ## 故障排除 {id="troubleshooting"}
 
-### "No definition found for X" {id="no-definition-found-for-x"}
+### NoDefinitionFoundException {id="nodefinitionfoundexception"}
 
-**问题**：Koin 找不到类型的定义。
+Koin 找不到所请求类型的定义。请检查声明该类型的模块是否已在 `startKoin` 中加载（或被 `@Configuration` 发现），以及请求的类型是否与声明或绑定的类型匹配。此前仅包含 `@Inject constructor` 且由 Hilt 注入的类同样需要 Koin 定义，除非 `@ComponentScan` 通过其 JSR-330 注解自动拾取了它。
 
-**解决方案**：
-- 确保模块已加载到 `startKoin { modules(...) }` 中。
-- 检查定义是否存在（使用 `single { }` 或 `factory { }`）。
-- 验证是否指定了正确的类型。
+### 相同类型的两个定义导致解析出错误实例 {id="wrong-instance-with-two-definitions-of-the-same-type"}
 
-### "DefinitionOverrideException" {id="definitionoverrideexception"}
+在 Hilt 中，缺少限定符属于构建错误。而在 Koin 中，默认情况下最后加载的定义会胜出（覆盖前面的定义），除非在启动 Koin 时设置了 `allowOverride(false)`。请为这两个定义以及各个注入点添加[限定符](/docs/reference/koin-core/qualifiers)。
 
-**问题**：同一类型有多个定义。
+### 循环依赖 {id="circular-dependency"}
 
-**解决方案**：
-- 使用限定符：`single(named("qualifier")) { }`。
-- 启用重写：`startKoin { allowOverride(true) }`。
+两个类相互依赖。请重构以消除循环依赖，或使用 `Lazy<T>` 形参使其中一方变为延迟加载。编译器插件会在构建期报告循环依赖。详情请参阅[故障排除](/docs/reference/koin-core/troubleshooting)。
 
-### 循环依赖 {id="circular-dependencies"}
+## 相关内容 {id="related"}
 
-**问题**：两个类相互依赖。
-
-**解决方案**：
-- 使用 `lazy` 注入：`private val service by lazy { get<MyService>() }`。
-- 重构以移除循环依赖。
-- 使用作用域来打破循环。
-
-## 更多资源 {id="additional-resources"}
-
-- **真实迁移案例**：[将 Now in Android 迁移到 Koin](https://blog.insert-koin.io/migrating-now-in-android-to-koin-annotations-2-3-67d252dbb97d)
-- **Koin 文档**：[入门指南](/docs/setup/koin)
-- **Koin Annotations**：[Android Annotations 指南](/docs/quickstart/android-annotations)
-
-## 需要帮助？ {id="need-help"}
-
-- **GitHub Discussions**：在 [Koin 仓库](https://github.com/InsertKoinIO/koin/discussions)中提问
-- **Slack**：加入 Slack 上的 Koin 社区
-- **Stack Overflow**：使用 `koin` 标签提问
+- [Koin vs Hilt](/docs/intro/koin-vs-hilt)：两个框架的区别。
+- [JSR-330 注解](/docs/reference/koin-android/jsr330)：在迁移期间保留 `@Inject` 和 `@Singleton`。
+- [在 Android 上启动 Koin](/docs/reference/koin-android/start)：`startKoin`、`androidContext()` 与日志记录。
+- [Android 作用域](/docs/reference/koin-android/scope)：Activity、Fragment 与 ViewModel 作用域。
+- [单元测试](/docs/reference/koin-test/testing)：替换 Hilt 测试规则。
+- [编译期安全性](/docs/reference/koin-compiler/compile-safety)：编译器插件的检查项。

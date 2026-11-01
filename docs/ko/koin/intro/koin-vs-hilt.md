@@ -1,80 +1,69 @@
 ---
-title: Koin vs Hilt/Dagger
+title: Koin vs Hilt
 ---
 
-# Koin vs Hilt/Dagger
+# Koin vs Hilt
 
-이 페이지에서는 Koin과 Hilt, Dagger를 비교하여 차이점을 이해하고 어떤 프레임워크가 여러분의 요구 사항에 적합한지 결정하는 데 도움을 줍니다.
+이 문서는 둘 중 하나를 알고 있으면서 다른 하나를 이해하고자 하는 Android 개발자를 위해 Koin과 Hilt(및 Hilt의 기반인 Dagger)를 비교합니다. 각 프레임워크가 의존성 그래프를 빌드하는 방식, 코드의 형태, 각 프레임워크가 가진 장점을 다룹니다. 프로젝트를 Hilt에서 Koin으로 이전하려면 [Hilt에서 마이그레이션하기](/docs/reference/koin-android/hilt-migration)를 참고하세요.
 
-:::info
-Koin은 **DSL과 어노테이션(Annotations)**을 모두 지원하므로 팀에 적합한 방식을 선택할 수 있습니다. 두 방식 모두 동일한 컴파일러 플러그인(Compiler Plugin)을 기반으로 하며 동등하게 강력한 기능을 제공합니다. 이 비교에서는 Hilt와의 공정한 비교를 위해 어노테이션 예시를 보여주지만, Koin의 DSL은 더 적은 보일러플레이트(boilerplate)로 동일한 기능을 제공합니다.
-:::
+아래의 Koin 예제는 Hilt와 가장 유사한 어노테이션 방식을 사용합니다. 동일한 정의를 Koin DSL로도 작성할 수 있습니다([스타일 선택하기](/docs/intro/choosing-your-style) 참고).
 
-## 철학의 차이 (Philosophy Differences) {id="philosophy-differences"}
+## 의존성 그래프를 빌드하는 방식 {id="how-each-one-builds-the-graph"}
 
-| 측면 | Koin | Hilt/Dagger |
-|--------|------|-------------|
-| **학습 곡선** | 배우는 데 몇 분이면 충분함 | 익히는 데 몇 시간 또는 며칠이 걸림 |
-| **코드 복잡성** | 단순한 DSL 또는 어노테이션 | 복잡한 어노테이션 규칙 |
-| **디버깅** | 명확한 에러, 생성된 코드의 미로가 없음 | 생성된 코드는 추적이 어려울 수 있음 |
-| **설정** | 하나의 플러그인, 최소한의 설정 | 다수의 어노테이션, 엄격한 규칙 |
-| **컴파일 안전성** | ✅ 컴파일러 플러그인 사용 시 | ✅ 항상 지원 |
-| **런타임 유연성** | ✅ 동적 기능 (Dynamic features) | ❌ 정적 기능만 제공 |
+**Hilt**는 어노테이션 프로세싱(KSP 또는 kapt)을 통해 빌드 타임에 의존성 그래프를 Java 소스 코드로 생성합니다. 앱을 컴파일할 때 모든 바인딩, 컴포넌트, 스코프가 확정됩니다. 런타임에는 앱이 조회(lookup) 과정 없이 생성된 팩토리를 직접 호출합니다.
 
-## 어노테이션 비교 (Annotation Comparison) {id="annotation-comparison"}
+**Koin**은 런타임 컨테이너에 그래프를 유지합니다. Koin이 시작될 때 정의가 등록되며, 인스턴스는 요청 시 타입에 따라 확인(resolve)됩니다. [Koin Compiler Plugin](/docs/intro/koin-compiler-plugin)을 사용하면 `startKoin`에서 조립되는 그래프를 빌드 타임에도 검사할 수 있으며, 플러그인이 생성자 연결 코드를 생성합니다. 플러그인이 없으면 누락된 정의는 런타임이나 [검증 테스트](/docs/reference/koin-test/verify)를 통해 발견됩니다.
 
-Koin은 어노테이션조차 더 단순합니다.
+이러한 차이점이 아래에 설명된 대부분의 트레이드오프를 결정짓습니다.
 
-| 작업 | Koin | Hilt |
+## 한눈에 보기 {id="at-a-glance"}
+
+| 항목 | Koin | Hilt |
 |------|------|------|
-| **싱글톤 (Singleton)** | `@Singleton class MyService` | `@Singleton class MyService @Inject constructor(...)` |
-| **인터페이스 바인딩** | 자동 | 추상 모듈에서 `@Binds` 필요 |
-| **컴포넌트 스캔** | `@ComponentScan("package")` | 지원하지 않음 |
-| **모듈 탐색** | `@Configuration` - 자동 탐색됨 | 모듈별로 `@InstallIn` 수동 지정 |
-| **외부 라이브러리 제공** | `@Singleton fun provide()` | `@Module` 내의 `@Provides` + `@InstallIn` |
-| **ViewModel** | `@KoinViewModel class MyVM` | `@HiltViewModel class MyVM @Inject constructor` |
+| 그래프 빌드 시점 | 런타임, Compiler Plugin 사용 시 빌드 타임 검사 | 빌드 타임, 코드 생성 방식 |
+| 누락된 바인딩 감지 | Compiler Plugin 사용 시 빌드 타임, 미사용 시 런타임 또는 테스트 | 항상 빌드 타임 |
+| 빌드 툴링 | Kotlin 컴파일러 플러그인, Constructor 또는 Classic DSL 사용 시 선택 사항 | KSP 또는 kapt, Hilt Gradle 플러그인 |
+| 지원 플랫폼 | Kotlin Multiplatform: Android, iOS, 데스크톱, 웹, JVM 서버 | Android (Dagger 단독으로는 JVM에서 실행 가능) |
+| 언어 | Kotlin | Java 및 Kotlin |
+| 런타임 모듈 로드/언로드 | 지원 (`loadKoinModules`, `unloadKoinModules`, 지연 로딩 모듈) | 미지원 |
+| 컴포넌트 계층 구조 | 루트 컨테이너 및 직접 선언한 스코프 (Android 스코프 원형 포함) | 표준 컴포넌트의 고정된 계층 구조 (`SingletonComponent`, `ActivityComponent` 등) |
+| Android 진입점 | 모든 Activity나 Fragment에서 `by inject()`, `by viewModel()` 사용 | 각 클래스에 `@AndroidEntryPoint` 지정 |
+| Jetpack 연동 | Koin 라이브러리를 통한 ViewModel, WorkManager, Navigation, Compose 지원 | AndroidX Hilt 라이브러리를 통한 ViewModel, WorkManager, Navigation, Compose 지원 |
 
-## 코드 비교 (Code Comparison) {id="code-comparison"}
+## Hilt의 강점 {id="where-hilt-is-stronger"}
 
-### 단순 싱글톤 (Simple Singleton) {id="simple-singleton"}
+- **빌드 타임의 완전한 그래프 검증**: Hilt는 전체 그래프를 생성하므로 모든 빌드마다 모든 모듈과 스코프의 각 바인딩이 검증됩니다. Koin Compiler Plugin도 진입점에서 그래프를 검증하지만, 런타임에 로드되는 모듈이나 라이브러리 모듈 단독으로는 검사 범위에서 벗어납니다.
+- **런타임 룩업 없음**: 생성된 팩토리를 직접 호출합니다. 반면 Koin은 컨테이너를 통해 각 요청을 확인하므로, 해결(resolution) 시점의 룩업 비용과 시작(startup) 시점의 등록 작업이 발생합니다.
+- **Java 지원**: Dagger와 Hilt는 Java 코드베이스에서도 동작합니다. Koin의 API는 Kotlin 전용으로 설계되었습니다.
+- **생태계 및 가이드라인**: Hilt는 공식 Android 가이드에 수록된 DI 라이브러리이며, 수많은 AndroidX 라이브러리와 샘플에서 Hilt 연동을 우선적으로 제공합니다.
+- **상세한 에러 메시지**: Dagger 에러는 진입점부터 누락된 바인딩까지의 전체 경로를 명확하게 보여줍니다.
 
-**Koin:**
+## Koin의 강점 {id="where-koin-is-stronger"}
+
+- **Kotlin Multiplatform**: 동일한 모듈을 Android, iOS, 데스크톱, 웹, Ktor 서버에서 그대로 실행할 수 있습니다. Hilt는 Android만 지원합니다.
+- **런타임 유연성**: 시작 후에도 모듈을 로드하거나 언로드하고, 백그라운드에서 로드할 수 있어 기능 플래그(feature flags), 동적 기능(dynamic features), 플러그인 아키텍처에 적합합니다.
+- **간소한 설정**: 어노테이션 프로세서, 생성된 소스 코드, `@AndroidEntryPoint`가 필요하지 않습니다. Constructor 또는 Classic DSL을 사용할 경우 빌드 플러그인조차 선택 사항입니다.
+- **적은 선언 코드**: 생성자에 `@Inject`를 붙일 필요가 없으며, 별도의 `@Binds` 모듈 없이도 인터페이스가 구현체에 자동으로 바인딩됩니다.
+- **스타일 선택의 자유**: DSL 또는 어노테이션을 자유롭게 선택할 수 있으며, 두 방식을 혼용할 수도 있습니다.
+
+## 코드 비교 {id="code-side-by-side"}
+
+### 의존성을 가진 클래스 {id="a-class-with-dependencies"}
+
+Koin:
+
 ```kotlin
 @Singleton
-class MyRepository(val api: ApiService)
-
-@Module
-@ComponentScan("com.app")
-class AppModule
+class UserRepositoryImpl(private val api: ApiService) : UserRepository
 ```
 
-**Hilt:**
+Koin은 `UserRepositoryImpl`이 `UserRepository`를 구현하고 있으므로 자동으로 바인딩합니다.
+
+Hilt:
+
 ```kotlin
 @Singleton
-class MyRepository @Inject constructor(val api: ApiService)
-
-@Module
-@InstallIn(SingletonComponent::class)
-abstract class AppModule {
-    @Binds
-    abstract fun bindRepository(impl: MyRepository): Repository
-}
-```
-
-### 인터페이스 바인딩 (Interface Binding) {id="interface-binding"}
-
-**Koin - 자동 방식:**
-```kotlin
-@Singleton
-class UserRepositoryImpl(val db: Database) : UserRepository
-
-// 이게 끝입니다! Koin은 자동으로 UserRepository 인터페이스에 바인딩합니다.
-```
-
-**Hilt - 명시적 바인딩 필요:**
-```kotlin
-@Singleton
-class UserRepositoryImpl @Inject constructor(val db: Database) : UserRepository
+class UserRepositoryImpl @Inject constructor(private val api: ApiService) : UserRepository
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -84,277 +73,131 @@ abstract class RepositoryModule {
 }
 ```
 
-### 멀티 모듈 앱 (Multi-Module Apps) {id="multi-module-apps"}
+### 서드파티 클래스 {id="third-party-classes"}
 
-**Koin - 모듈 자동 탐색:**
-```kotlin
-// feature/auth/AuthModule.kt
-@Module
-@ComponentScan
-@Configuration  // 자동으로 탐색됩니다!
-class AuthModule
+Koin:
 
-// feature/profile/ProfileModule.kt
-@Module
-@ComponentScan
-@Configuration  // 자동으로 탐색됩니다!
-class ProfileModule
-
-// app/MyApp.kt
-@KoinApplication  // 모듈을 일일이 나열할 필요가 없습니다.
-class MyApp
-```
-
-**Hilt - 각 모듈을 수동으로 설치해야 함:**
-```kotlin
-// feature/auth/AuthModule.kt
-@Module
-@InstallIn(SingletonComponent::class)
-class AuthModule { ... }
-
-// feature/profile/ProfileModule.kt
-@Module
-@InstallIn(SingletonComponent::class)
-class ProfileModule { ... }
-
-// app/MyApp.kt
-@HiltAndroidApp
-class MyApp  // 여전히 모든 곳에 올바른 @InstallIn이 필요합니다.
-```
-
-### ViewModel {id="viewmodel"}
-
-**Koin:**
-```kotlin
-@KoinViewModel
-class UserViewModel(
-    private val repository: UserRepository,
-    private val savedStateHandle: SavedStateHandle
-) : ViewModel()
-
-// Activity/Fragment에서
-val viewModel: UserViewModel by viewModel()
-
-// Compose에서
-val viewModel: UserViewModel = koinViewModel()
-```
-
-**Hilt:**
-```kotlin
-@HiltViewModel
-class UserViewModel @Inject constructor(
-    private val repository: UserRepository,
-    private val savedStateHandle: SavedStateHandle
-) : ViewModel()
-
-// Activity/Fragment에서
-val viewModel: UserViewModel by viewModels()
-
-// Compose에서
-val viewModel: UserViewModel = hiltViewModel()
-```
-
-### 외부 라이브러리 제공 (Providing Third-Party Libraries) {id="providing-third-party-libraries"}
-
-**Koin:**
 ```kotlin
 @Module
 class NetworkModule {
     @Singleton
-    fun provideRetrofit(): Retrofit = Retrofit.Builder()
+    fun retrofit(): Retrofit = Retrofit.Builder()
         .baseUrl("https://api.example.com")
         .build()
 
     @Singleton
-    fun provideApi(retrofit: Retrofit): ApiService =
+    fun apiService(retrofit: Retrofit): ApiService =
         retrofit.create(ApiService::class.java)
 }
 ```
 
-**Hilt:**
+Hilt:
+
 ```kotlin
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
     @Provides
     @Singleton
-    fun provideRetrofit(): Retrofit = Retrofit.Builder()
+    fun retrofit(): Retrofit = Retrofit.Builder()
         .baseUrl("https://api.example.com")
         .build()
 
     @Provides
     @Singleton
-    fun provideApi(retrofit: Retrofit): ApiService =
+    fun apiService(retrofit: Retrofit): ApiService =
         retrofit.create(ApiService::class.java)
 }
 ```
 
-## 동적 기능: Koin만의 고유한 장점 {id="dynamic-features-koin-s-unique-advantage"}
+두 방식은 매우 유사합니다. Koin은 모듈이 특정 컴포넌트에 종속되지 않으므로 `@InstallIn`이 필요 없으며, 함수에 붙은 `@Singleton` 자체가 이미 정의를 선언하므로 `@Provides`도 필요하지 않습니다.
 
-Koin은 **런타임 기반이면서도 성능이 뛰어나고 컴파일 안전성**을 보장합니다. 이를 통해 Hilt가 제공할 수 없는 동적 기능들을 사용할 수 있습니다.
+### ViewModel {id="viewmodel"}
 
-| 동적 기능 | Koin | Hilt |
-|-----------------|------|------|
-| 런타임에 모듈 로드 | ✅ `loadKoinModules()` | ❌ 불가능 |
-| 모듈 언로드 | ✅ `unloadKoinModules()` | ❌ 불가능 |
-| 지연 백그라운드 로딩 | ✅ `lazyModules()` | ❌ 불가능 |
-| 피처 플래그 주입 | ✅ 간편함 | ⚠️ 복잡한 우회 방법 필요 |
-| 플러그인 아키텍처 | ✅ 자연스럽게 적합 | ❌ 매우 어려움 |
-| A/B 테스트 구현 | ✅ 런타임 스왑 | ⚠️ 컴파일 타임에만 가능 |
-| 동적 구성 (Configuration) | ✅ 지원됨 | ❌ 불가, 다시 컴파일해야 함 |
-
-### 예시: 동적 모듈 로딩 (Dynamic Module Loading) {id="example-dynamic-module-loading"}
+Koin:
 
 ```kotlin
-// KOIN - 동적 모듈 로딩
-if (userHasPremium) {
-    loadKoinModules(premiumFeatureModule)
-}
+@KoinViewModel
+class UserViewModel(
+    private val repository: UserRepository,
+    private val savedStateHandle: SavedStateHandle,
+) : ViewModel()
 
-// 나중에 구독이 만료되면
-unloadKoinModules(premiumFeatureModule)
+// Activity 또는 Fragment
+val viewModel: UserViewModel by viewModel()
 
-// 빠른 시작을 위한 지연 로딩
-startKoin {
-    modules(coreModule)
-    lazyModules(
-        analyticsModule,  // 백그라운드에서 로드됨
-        heavyFeatureModule
-    )
-}
+// Compose
+val viewModel: UserViewModel = koinViewModel()
 ```
 
-**이것은 Hilt에서는 불가능합니다.** 모든 의존성이 컴파일 타임에 연결되기 때문입니다.
-
-### 예시: 피처 플래그 (Feature Flags) {id="example-feature-flags"}
+Hilt:
 
 ```kotlin
-// KOIN - 런타임에 구현체 교체
-val featureModule = module {
-    if (FeatureFlags.useNewApi) {
-        single<ApiService> { NewApiService() }
-    } else {
-        single<ApiService> { LegacyApiService() }
-    }
-}
+@HiltViewModel
+class UserViewModel @Inject constructor(
+    private val repository: UserRepository,
+    private val savedStateHandle: SavedStateHandle,
+) : ViewModel()
 
-// 또는 동적으로 교체
-fun updateApiImplementation(useNew: Boolean) {
-    unloadKoinModules(apiModule)
-    loadKoinModules(if (useNew) newApiModule else legacyApiModule)
-}
+// @AndroidEntryPoint가 적용된 Activity 또는 Fragment
+val viewModel: UserViewModel by viewModels()
+
+// Compose
+val viewModel: UserViewModel = hiltViewModel()
 ```
 
-## 설정 비교 (Setup Comparison) {id="setup-comparison"}
+### 여러 Gradle 모듈 {id="several-gradle-modules"}
 
-### Koin 설정 {id="koin-setup"}
-
-자세한 지침은 **[컴파일러 플러그인 설정 가이드](/docs/setup/compiler-plugin)**를 참조하세요.
-
-### Hilt 설정 {id="hilt-setup"}
+Koin:
 
 ```kotlin
-// settings.gradle.kts
-plugins {
-    id("com.google.dagger.hilt.android") version "2.x" apply false
-}
+// feature-auth
+@Module
+@ComponentScan
+@Configuration
+class AuthModule
 
-// app/build.gradle.kts
-plugins {
-    id("com.google.devtools.ksp")
-    id("dagger.hilt.android.plugin")
-}
-
-dependencies {
-    implementation("com.google.dagger:hilt-android:2.x")
-    ksp("com.google.dagger:hilt-compiler:2.x")
-}
+// app
+@KoinApplication
+class MyApp
 ```
 
-## 에러 메시지 (Error Messages) {id="error-messages"}
+Hilt:
 
-### Koin {id="koin"}
+```kotlin
+// feature-auth
+@Module
+@InstallIn(SingletonComponent::class)
+class AuthModule { ... }
 
-```
-org.koin.core.error.NoBeanDefFoundException:
-No definition found for class 'com.app.UserRepository'.
-Check your module definitions.
-```
-
-명확하며 문제의 원인을 직접적으로 가리킵니다.
-
-### Hilt/Dagger {id="hilt-dagger"}
-
-```
-error: [Dagger/MissingBinding] com.app.UserRepository cannot be provided
-without an @Inject constructor or an @Provides-annotated method.
-com.app.UserRepository is injected at
-    com.app.UserService(repository)
-com.app.UserService is injected at
-    com.app.UserActivity.service
-com.app.UserActivity is injected at
-    dagger.hilt.android.internal.managers.ActivityComponentManager.inject
+// app
+@HiltAndroidApp
+class MyApp : Application()
 ```
 
-내용이 길며 컴포넌트 그래프에 대한 이해가 필요합니다.
+두 프레임워크 모두 클래스패스에서 기능 모듈을 탐색합니다. Koin은 `@Configuration`을 통해, Hilt는 `@InstallIn`을 통해 탐색합니다. Koin에서는 `@ComponentScan`이 해당 패키지의 어노테이션이 지정된 모든 클래스를 수집하므로, 기능 모듈에 프로바이더 함수가 전혀 필요 없는 경우가 많습니다.
 
-## 선택 기준 (When to Choose Each) {id="when-to-choose-each"}
-
-### 다음과 같은 경우 Koin을 선택하세요: {id="choose-koin-when"}
-
-- **생산성과 단순성**을 중요하게 생각할 때
-- **런타임 유연성**(동적 모듈, 피처 플래그 등)이 필요할 때
-- **Kotlin Multiplatform** 앱을 개발할 때
-- 팀이 **빠르게 배우기**를 원할 때
-- **적은 보일러플레이트 코드**를 선호할 때
-- **더 쉬운 디버깅**을 원할 때
-
-### 다음과 같은 경우 Hilt를 선택하세요: {id="choose-hilt-when"}
-
-- 팀이 **이미 Dagger에 익숙할** 때
-- **구글 우선 생태계(Google-first ecosystem)**와의 호환성이 필요할 때
-- **Dagger만의 특정 기능**이 필요할 때
-
-## Hilt에서 Koin으로 마이그레이션 (Migration from Hilt to Koin) {id="migration-from-hilt-to-koin"}
-
-마이그레이션을 고려 중이라면 다음을 참고하세요:
-
-### 개념 매핑 (Concept Mapping) {id="concept-mapping"}
+## 개념 매핑 {id="concept-mapping"}
 
 | Hilt | Koin |
 |------|------|
-| `@HiltAndroidApp` | `@KoinApplication` 및 `startKoin<T> { }` |
-| `@AndroidEntryPoint` | `by inject()` |
-| `by viewModels()`가 적용된 `@HiltViewModel` | `by viewModel()`이 적용된 `@KoinViewModel` |
-| `@Inject constructor` | 일반 생성자 (자동 감지됨) |
-| `@Binds` | 자동 또는 `bind` |
-| `@InstallIn(SingletonComponent)` | `@Configuration` |
-| 함수에 붙은 `@Provides` | 함수에 붙은 `@Factory` |
+| `@HiltAndroidApp` | `startKoin<MyApp>()`와 함께 사용하는 `@KoinApplication`, 또는 `startKoin { }` |
+| `@AndroidEntryPoint` | 불필요: 모든 Activity나 Fragment에서 `by inject()` 및 `by viewModel()` 사용 가능 |
+| `@Inject constructor` | 불필요: Compiler Plugin이 생성자를 분석함 |
+| `@Binds` | 어노테이션 사용 시 자동 처리, DSL에서는 `bind` 사용 |
+| `@Provides` | 함수의 `@Singleton` 또는 `@Factory`, 혹은 DSL 정의 |
+| `@InstallIn(SingletonComponent::class)` | `@Configuration` |
+| `@HiltViewModel` | `@KoinViewModel` |
+| `@Named` | `@Named` |
+| `@ActivityScoped`, `@ViewModelScoped` | `@ActivityScope`, `@ViewModelScope` |
+| `@AssistedInject` | `@InjectedParam` |
 
-### 점진적 마이그레이션 {id="gradual-migration"}
+마이그레이션 가이드에서는 전체 매핑, 단계별 절차, 마이그레이션 도중 두 프레임워크를 병행 실행하는 방법을 다룹니다. 자세한 내용은 [Hilt에서 마이그레이션하기](/docs/reference/koin-android/hilt-migration)를 참고하세요.
 
-점진적으로 마이그레이션할 수 있습니다:
+## 관련 문서 {id="related"}
 
-1. 프로젝트에 Koin을 추가합니다.
-2. 한 번에 하나의 피처 모듈씩 마이그레이션합니다.
-3. 전환 기간 동안 두 DI 프레임워크를 공존시킬 수 있습니다 (Koin은 `@ComponentScan`을 통해 대상 패키지를 스캔할 수 있습니다).
-4. 마이그레이션이 완료되면 Hilt를 제거합니다.
-
-자세한 단계는 [Hilt에서 마이그레이션하기](/docs/migration/from-hilt)를 참조하세요.
-
-## 요약 {id="summary"}
-
-**Koin: 단순하면서도 강력함**
-
-- Hilt와 같은 **컴파일 타임 안전성** (컴파일러 플러그인 사용 시)
-- **DSL 또는 어노테이션** - 두 방식 모두 강력하며 선택 가능
-- Hilt가 따라올 수 없는 **단순함과 생산성**
-- Hilt로는 불가능한 **동적 런타임 기능**
-
-안전성과 단순성 사이에서 고민할 필요가 없습니다. Koin과 함께라면 두 가지 모두를 얻을 수 있습니다.
-
-## 다음 단계 {id="next-steps"}
-
-- **[Koin이란 무엇인가요?](/docs/intro/what-is-koin)** - Koin에 대해 더 알아보기
-- **[설정 가이드](/docs/setup/gradle)** - 프로젝트에 Koin 추가하기
-- **[Hilt에서 마이그레이션하기](/docs/migration/from-hilt)** - 단계별 마이그레이션 가이드
+- [Hilt에서 마이그레이션하기](/docs/reference/koin-android/hilt-migration): 프로젝트를 단계별로 마이그레이션하기.
+- [JSR-330 호환성](/docs/reference/koin-android/jsr330): `javax.inject` 어노테이션 유지하기.
+- [Koin이란?](/docs/intro/what-is-koin): Koin의 런타임 및 컴파일 타임 모델.
+- [컴파일 타임 안전성](/docs/reference/koin-compiler/compile-safety): Koin이 빌드 타임에 검사하는 항목.
+- [스타일 선택하기](/docs/intro/choosing-your-style): DSL 또는 어노테이션.

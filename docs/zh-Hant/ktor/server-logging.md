@@ -1,4 +1,4 @@
-[//]: # (title: Ktor 伺服器中的日誌記錄)
+[//]: # (title: Ktor 伺服器中的記錄)
 
 <show-structure for="chapter" depth="2"/>
 
@@ -13,19 +13,19 @@
 </tldr>
 
 <link-summary>
-Ktor 使用 SLF4J API 作為各種日誌框架（例如 Logback 或 Log4j）的門面，並允許您記錄應用程式事件。
+Ktor 使用 SLF4J API 作為各種記錄架構（例如 Logback 或 Log4j）的 facade，讓您能夠記錄應用程式事件。
 </link-summary>
 
-Ktor 根據所使用的平台提供不同的方式來記錄您的應用程式：
+Ktor 根據所使用的平台，提供了不同的應用程式記錄方式：
 
-- 在 JVM 上，Ktor 使用 [SLF4J API](http://www.slf4j.org/) 作為各種日誌框架（例如 [Logback](https://logback.qos.ch/) 或 [Log4j](https://logging.apache.org/log4j)）的門面，並允許您記錄應用程式事件。
-要啟用日誌記錄，您需要為所需的框架新增 [相依性](#add_dependencies) 並提供該框架特定的 [配置](#configure-logger)。
+- 在 JVM 上，Ktor 使用 [SLF4J API](http://www.slf4j.org/) 作為各種記錄架構（例如 [Logback](https://logback.qos.ch/) 或 [Log4j](https://logging.apache.org/log4j)）的 facade，讓您能夠記錄應用程式事件。
+若要啟用記錄功能，您需要為所需的架構新增[相依性](#add_dependencies)，並提供該架構專用的[配置](#configure-logger)。
   > 您也可以安裝並配置 [CallLogging](server-call-logging.md) 外掛程式來記錄用戶端請求。
-- 對於 [原生伺服器](server-native.md)，Ktor 提供了一個將所有內容列印到標準輸出的記錄器。
+- 對於 [Native 伺服器](server-native.md)，Ktor 提供了一個會將所有內容輸出至標準輸出的記錄器。
 
 ## JVM {id="jvm"}
 ### 新增記錄器相依性 {id="add_dependencies"}
-要啟用日誌記錄，您需要包含所需日誌框架的構件。
+若要啟用記錄功能，您需要加入所需記錄架構的構件。
 例如，Logback 需要以下相依性：
 
 <var name="group_id" value="ch.qos.logback"/>
@@ -43,16 +43,16 @@ Ktor 根據所使用的平台提供不同的方式來記錄您的應用程式：
     </TabItem>
 </Tabs>
 
-要使用 Log4j，您需要新增 `org.apache.logging.log4j:log4j-core` 和 `org.apache.logging.log4j:log4j-slf4j2-impl` 構件。
+若要使用 Log4j，您需要新增 `org.apache.logging.log4j:log4j-core` 與 `org.apache.logging.log4j:log4j-slf4j2-impl` 構件。
 
 ### 配置記錄器 {id="configure-logger"}
 
-要了解如何配置所選的日誌框架，請參閱其文件，例如：
+若要了解如何配置所選的記錄架構，請參閱其說明文件，例如：
 - [Logback 配置](http://logback.qos.ch/manual/configuration.html)
 - [Log4j 配置](https://logging.apache.org/log4j/2.x/manual/configuration.html)
 
-例如，要配置 Logback，您需要將 `logback.xml` 檔案放在類別路徑的根目錄中（例如 `src/main/resources`）。
-下方的範例顯示了一個使用 `STDOUT` appender 的 Logback 配置範例，它將日誌輸出到主控台。
+例如，若要配置 Logback，您需要將 `logback.xml` 檔案放置在 classpath 的根目錄下（例如 `src/main/resources`）。
+以下範例展示了包含 `STDOUT` appender 的 Logback 配置範例，它會將記錄輸出至主控台。
 
 ```xml
 <configuration>
@@ -68,7 +68,7 @@ Ktor 根據所使用的平台提供不同的方式來記錄您的應用程式：
 </configuration>
 ```
 
-如果您想將日誌輸出到檔案，可以使用 `FILE` appender。
+如果您想要將記錄輸出至檔案，可以使用 `FILE` appender。
 
 ```xml
 <configuration>
@@ -90,17 +90,17 @@ Ktor 根據所使用的平台提供不同的方式來記錄您的應用程式：
 
 ## Native {id="native"}
 
-要為原生伺服器配置日誌層級，請在 [執行](server-run.md) 應用程式時將以下值之一指派給 `KTOR_LOG_LEVEL` 環境變數：
+若要為 Native 伺服器配置記錄層級，請在[執行](server-run.md)應用程式時將下列其中一個值指派給 `KTOR_LOG_LEVEL` 環境變數：
 - _TRACE_
 - _DEBUG_
 - _INFO_
 - _WARN_
 - _ERROR_
 
-例如，_TRACE_ 層級會啟用 [路由追蹤](server-routing.md#trace_routes)，這有助於您確定某些路由未被執行的原因。
+例如，_TRACE_ 層級會啟用[路由追蹤](server-routing.md#trace_routes)，這有助於您判斷為何某些路由未被執行。
 
 ## 在程式碼中存取記錄器 {id="access_logger"}
-Logger 執行個體由一個實作 [Logger](https://api.ktor.io/ktor-utils/io.ktor.util.logging/-logger/index.html) 介面的類別來表示。您可以使用 [Application.log](https://api.ktor.io/ktor-server-core/io.ktor.server.application/log.html) 屬性在 `Application` 內部存取 Logger 執行個體。例如，下方的程式碼片段顯示了如何在 [模組](server-modules.md) 內部將訊息新增到日誌中。
+Logger 執行個體由實作 [Logger](https://api.ktor.io/ktor-utils/io.ktor.util.logging/-logger/index.html) 介面的類別表示。您可以使用 [Application.log](https://api.ktor.io/ktor-server-core/io.ktor.server.application/log.html) 屬性在 `Application` 內部存取 Logger 執行個體。例如，下方的程式碼片段展示了如何在[模組](server-modules.md)內將訊息新增至記錄中。
 
 ```kotlin
 import io.ktor.server.application.*
@@ -120,9 +120,9 @@ routing {
 }
 ```
 
-## 在外掛程式與檔案中進行日誌記錄 {id="plugins_and_files"}
+## 在外掛程式與檔案中進行記錄 {id="plugins_and_files"}
 
-不建議在外掛程式和檔案中使用應用程式日誌。最好為每個外掛程式或檔案使用單獨的記錄器。為此，您可以使用任何日誌程式庫。
+不建議在外掛程式與檔案內部使用應用程式記錄。最好為每個外掛程式或檔案使用獨立的記錄器。為此，您可以使用任何記錄程式庫。
 
 對於多平台專案，您可以使用 [KtorSimpleLogger](https://api.ktor.io/ktor-utils/io.ktor.util.logging/-ktor-simple-logger.html) 類別：
 

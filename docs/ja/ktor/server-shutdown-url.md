@@ -1,4 +1,4 @@
-[//]: # (title: シャットダウンURL)
+[//]: # (title: シャットダウン URL)
 
 <primary-label ref="server-plugin"/>
 
@@ -12,15 +12,15 @@
 </p>
 </tldr>
 
-[ShutDownUrl](https://api.ktor.io/ktor-server-core/io.ktor.server.engine/-shut-down-url/index.html) プラグインを使用すると、サーバーをシャットダウンするために使用するURLを設定できます。
-このプラグインを有効にするには、次の2つの方法があります。
+[ShutDownUrl](https://api.ktor.io/ktor-server-core/io.ktor.server.engine/-shut-down-url/index.html) プラグインを使用すると、サーバーをシャットダウンするために使用する URL を設定できます。
+このプラグインを有効にするには、主に 2 つの方法があります。
 
-- [設定ファイル](#config-file)で行う。
-- [プラグインをインストール](#install)して行う。
+- [設定ファイル](#config-file)で設定する
+- [プラグインをインストール](#install)する
 
-## 設定ファイルでシャットダウンURLを設定する {id="config-file"}
+## 設定ファイルでシャットダウン URL を設定する {id="config-file"}
 
-[設定ファイル](server-configuration-file.topic)内で、[ktor.deployment.shutdown.url](server-configuration-file.topic#predefined-properties) プロパティを使用してシャットダウンURLを設定できます。
+[設定ファイル](server-configuration-file.topic)内で [ktor.deployment.shutdown.url](server-configuration-file.topic#predefined-properties) プロパティを使用して、シャットダウン URL を設定できます。
 
 <Tabs group="config">
 <TabItem title="application.conf" group-key="hocon">
@@ -46,9 +46,9 @@ ktor:
 </TabItem>
 </Tabs>
 
-## プラグインをインストールしてシャットダウンURLを設定する {id="install"}
+## プラグインをインストールしてシャットダウン URL を設定する {id="install"}
 
-コード内でシャットダウンURLを[インストール](server-plugins.md#install)および設定するには、`ShutDownUrl.ApplicationCallPlugin` を `install` 関数に渡し、`shutDownUrl` プロパティを使用します。
+コード内でシャットダウン URL を[インストール](server-plugins.md#install)して設定するには、`install` 関数に `ShutDownUrl.ApplicationCallPlugin` を渡し、`shutDownUrl` プロパティを使用します。
 
 ```kotlin
 install(ShutDownUrl.ApplicationCallPlugin) {
@@ -57,4 +57,4 @@ install(ShutDownUrl.ApplicationCallPlugin) {
 }
 ```
 
-完全な例については、[shutdown-url](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/shutdown-url) を参照してください。
+完全なコード例については、[shutdown-url](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/shutdown-url) を参照してください。

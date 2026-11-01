@@ -1,56 +1,47 @@
 ---
-title: DIブリッジ
+title: Ktor DI Bridge
 ---
 
-# Ktor DIブリッジ
+# Ktor DI Bridge
 
-Koin 4.2+ は、設定可能なブリッジを介して、**Ktor 3.4+** の組み込み依存性注入（DI）システムとのシームレスな統合を提供します。
+Ktor 3.4 には、独自の依存関係注入（DI）プラグイン（`dependencies { provide<T> { } }` および `by dependencies`）が同梱されています。このページでは、Koin プラグインの `bridge { }` オプションを使用して、Ktor DI と Koin を一方向または双方向に連携させる方法について説明します。[Koin for Ktor](/docs/reference/koin-ktor/ktor) に記載されている手順に従って Koin プラグインをインストールしておく必要があります。
 
-:::info 実験的機能
-Ktor DIブリッジは、KoinとKtor DIの間の双方向の依存性解決を可能にする実験的機能です。
-:::
+このブリッジは Koin 4.2 以降で利用可能です。その関数には `@KoinExperimentalAPI` が付与されています。
 
-## ブリッジの設定 {id="bridge-configuration"}
-
-双方向の依存性解決を有効にするには、`bridge { }` DSLを使用します。
+## ブリッジの設定 {id="configuring-the-bridge"}
 
 ```kotlin
 fun Application.module() {
     install(Koin) {
         slf4jLogger()
-
         bridge {
-            ktorToKoin()  // Ktor DIがKoinの依存関係を解決できるようにする
-            koinToKtor()  // KoinがKtor DIの依存関係を解決できるようにする
+            ktorToKoin()
+            koinToKtor()
         }
-
         modules(appModule)
     }
 
-    // Ktor DIの依存関係
     dependencies {
         provide<KtorSpecificService> { KtorSpecificServiceImpl() }
     }
 }
 ```
 
-## ブリッジのオプション {id="bridge-options"}
+| オプション | 効果 |
+|---|---|
+| `ktorToKoin()` | Ktor の `by dependencies` で Koin の定義を解決可能 |
+| `koinToKtor()` | Koin の `get()`、`inject()`、およびコンストラクタインジェクションで Ktor DI の依存関係を解決可能 |
 
-| オプション | 説明 |
-|--------|-------------|
-| `ktorToKoin()` | Ktorの `by dependencies` デリゲートを使用してKoinから解決できるようにします |
-| `koinToKtor()` | Koinの `inject()` や `get()` を使用してKtor DIから解決できるようにします |
+使用する方向のみを有効にしてください。
 
-## ktorToKoin() の使用 {id="using-ktortokoin"}
+## Ktor から Koin の定義を解決する {id="ktor-resolving-from-koin"}
 
-Ktorの `by dependencies` デリゲートを使用してKoinの依存関係を解決します。
+`ktorToKoin()` を使用すると、プラグインは Koin を基盤とする依存関係マップを備えた Ktor の `DI` プラグインをインストールします。
 
 ```kotlin
 fun Application.module() {
     install(Koin) {
-        bridge {
-            ktorToKoin()
-        }
+        bridge { ktorToKoin() }
         modules(module {
             single<HelloService> { HelloServiceImpl() }
         })
@@ -58,150 +49,77 @@ fun Application.module() {
 
     routing {
         get("/hello") {
-            // Ktorのデリゲートを使用してKoinの依存関係を解決する
-            val helloService: HelloService by dependencies
+            val helloService: HelloService by dependencies // Koin で宣言
             call.respondText(helloService.sayHello())
         }
     }
 }
 ```
 
-## koinToKtor() の使用 {id="using-kointoktor"}
+名前付きの Ktor 依存関係キーは、同じ値を持つ Koin の `named()` クオリファイアにマッピングされます。
 
-Koinの `inject()` を使用してKtor DIの依存関係を解決します。
+## Koin から Ktor DI の依存関係を解決する {id="koin-resolving-from-ktor-di"}
+
+`koinToKtor()` を使用すると、Koin に解決拡張が追加されます。ある型に対する Koin 定義が存在しない場合、Koin は Ktor DI にその解決を要求します。
 
 ```kotlin
 fun Application.module() {
     install(Koin) {
-        bridge {
-            koinToKtor()
-        }
+        bridge { koinToKtor() }
         modules(appModule)
     }
 
-    // Ktor DIで宣言する
     dependencies {
         provide<DatabaseConnection> { DatabaseConnectionImpl() }
     }
 
     routing {
         get("/data") {
-            // Koinを使用してKtor DIの依存関係を解決する
-            val database: DatabaseConnection by inject()
+            val database: DatabaseConnection by inject() // Ktor DI で宣言
             call.respondText(database.query())
         }
     }
 }
 ```
 
-## 双方向のフルサンプル {id="full-bidirectional-example"}
+Koin 定義では、Ktor DI の型をコンストラクタパラメータとして受け取ることもできます。Koin のクオリファイアは、依存関係名として Ktor に渡されます。Ktor DI にも該当する依存関係が存在しない場合、Koin は警告をログに出力し、通常の定義欠落時と同様に解決に失敗します。
 
-最大限の柔軟性を得るために、両方の方向を有効にします。
+## インフラストラクチャとアプリケーションコードの分離 {id="splitting-infrastructure-and-application-code"}
 
-```kotlin
-fun Application.module() {
-    install(Koin) {
-        slf4jLogger()
-
-        bridge {
-            ktorToKoin()
-            koinToKtor()
-        }
-
-        modules(module {
-            single<HelloService> { HelloServiceImpl() }
-        })
-    }
-
-    dependencies {
-        provide<KtorSpecificService> { KtorSpecificServiceImpl() }
-    }
-
-    routing {
-        // 両方にKoinの inject() を使用
-        get("/mixed-koin") {
-            val helloService: HelloService by inject()        // Koinから取得
-            val ktorService: KtorSpecificService by inject()  // Ktor DIから取得
-            call.respondText("${helloService.sayHello()} - ${ktorService.process()}")
-        }
-
-        // 両方にKtorの dependencies デリゲートを使用
-        get("/mixed-ktor") {
-            val helloService: HelloService by dependencies        // Koinから取得
-            val ktorService: KtorSpecificService by dependencies  // Ktor DIから取得
-            call.respondText("${helloService.sayHello()} - ${ktorService.process()}")
-        }
-    }
-}
-```
-
-## アーキテクチャパターン {id="architecture-pattern"}
-
-インフラストラクチャをアプリケーションロジックから分離します。
-
-- **Ktor DI** - フレームワークレベルの依存関係（データベース、設定、インフラストラクチャ）
-- **Koin** - アプリケーションレベルの依存関係（リポジトリ、サービス、ユースケース）
+一般的な分離パターンとして、フレームワークレベルのオブジェクトを Ktor DI に保持し、アプリケーションクラスを Koin に保持して、`koinToKtor()` のみを有効にする構成があります。
 
 ```kotlin
 fun Application.module() {
-    // Ktor DI - インフラストラクチャ層
-    val config = environment.config
-    val database = Database(config)
+    // Ktor DI: インフラストラクチャ
+    val database = Database(environment.config)
     dependencies {
         provide<Database> { database }
-        provide<ApplicationConfig> { config }
+        provide<ApplicationConfig> { environment.config }
     }
 
-    // Koin - アプリケーション層
+    // Koin: アプリケーションクラス
     install(Koin) {
         slf4jLogger()
-
-        bridge {
-            koinToKtor()  // Koinがインフラストラクチャの依存関係を解決できるようにする
-        }
-
+        bridge { koinToKtor() }
         modules(appModule)
     }
 }
 
 val appModule = module {
-    // これらはブリッジを介してKtor DIからDatabaseを注入できる
-    singleOf(::CustomerRepository)
-    singleOf(::OrderRepository)
+    singleOf(::CustomerRepository) // Ktor DI から Database を受け取る
     singleOf(::CustomerService)
 }
 ```
 
-## ベストプラクティス {id="best-practices"}
+## 制限事項 {id="limits"}
 
-1. **インフラストラクチャはKtor DIに** - データベース接続、設定、外部クライアントなど。
-2. **ビジネスロジックはKoinに** - リポジトリ、サービス、ユースケースなど。
-3. **必要な方向のみを有効にする** - 必要な場合を除き、両方ではなく `koinToKtor()` のみを使用することを検討してください。
-4. **境界を文書化する** - どのシステムがどの依存関係を所有しているかを明確にします。
+- **コンパイル時のチェック**: Koin Compiler Plugin は Ktor DI の宣言を認識しません。コンパイル時セーフティ機能によって Ktor DI の型が見つからないと報告された場合は、[コンパイル時セーフティ（Compile-Time Safety）](/docs/reference/koin-compiler/compile-safety) に記載されているように、その型に `@Provided` を付与してください。
+- **KoinIsolated**: Koin 4.2 では、`KoinIsolated` プラグインは `bridge { }` ブロックを受け入れますが、適用されません。ブリッジが必要な場合は `install(Koin)` を使用してください。
+- **実験的機能**: ブリッジ API は将来のリリースで変更される可能性があります。
 
-## 隔離されたコンテキスト（Isolated Context）での使用 {id="with-isolated-context"}
+## 関連情報 {id="related"}
 
-ブリッジは `KoinIsolated` でも動作します。
-
-```kotlin
-fun Application.module() {
-    dependencies {
-        provide<Database> { Database(environment.config) }
-    }
-
-    install(KoinIsolated) {
-        slf4jLogger()
-
-        bridge {
-            koinToKtor()
-        }
-
-        modules(appModule)
-    }
-}
-```
-
-## 関連項目 {id="see-also"}
-
-- **[Koin for Ktor](/docs/reference/koin-ktor/ktor)** - Ktorのメインドキュメント
-- **[Isolated Context](/docs/reference/koin-ktor/ktor-isolated)** - 隔離されたKoinインスタンス
+- [Koin for Ktor](/docs/reference/koin-ktor/ktor): プラグインのインストールとルーティングでのインジェクション。
+- [Ktor における Isolated Context](/docs/reference/koin-ktor/ktor-isolated): グローバルコンテキスト外での Koin の利用。
+- [リクエストスコープ（Request Scopes）](/docs/reference/koin-ktor/ktor-scopes): コールごとのインスタンス。
+- [Ktor dependency injection](https://ktor.io/docs/server-dependency-injection.html): Ktor 独自の DI プラグイン。

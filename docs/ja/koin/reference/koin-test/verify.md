@@ -1,256 +1,172 @@
 ---
-title: Koin 設定の検証
+title: 設定の検証
 ---
 
-Koin では設定モジュールを検証することができ、実行時に依存関係注入（dependency injection）の問題が発見されるのを防ぐことができます。
+# 設定の検証
 
-:::tip コンパイル時の安全性が利用可能に
-**Koin Compiler Plugin** は現在、コンパイル時の依存関係検証を提供しています。これにより、欠落している依存関係、クオリファイアの不一致、壊れた呼び出し箇所をビルド時にキャッチできます。多くの場合、これにより `verify()` や `checkModules()` の必要性がなくなります。
+このページでは、Koin の設定を実行せずに検証するテスト API である `verify()` と、非推奨となった `checkModules()` について解説します。また、これらが Koin Compiler Plugin のコンパイル時チェックとどのように関連しているかを説明し、引き続きテストが必要かどうかを判断できるようにします。事前に [Koin を使用したユニットテスト](/docs/reference/koin-test/testing) の書き方を把握しておくことを推奨します。
 
-移行については [コンパイル時の安全性](/docs/reference/koin-compiler/compile-safety) を参照してください。
-:::
+## verify() はまだ必要ですか？ {id="do-you-still-need-verify"}
 
-## Verify API - JVM 限定 [3.3+] {id="verify-api-jvm-only-3-3"}
+[Koin Compiler Plugin](/docs/reference/koin-compiler/compile-safety) は、不足している定義、クオリファイアの不一致、スコープエラー、`get()` / `inject()` の呼び出し箇所など、ビルド時に依存関係グラフ全体をチェックします。プラグインがプロジェクトをカバーしている場合、`verify()` によるテストを追加するメリットはないため、削除しても問題ありません。
 
-Koin モジュールで `verify()` 拡張関数を使用します。内部的には、これはすべてのコンストラクタクラスを検証し、Koin 設定と照合して、その依存関係に対して宣言されたコンポーネントがあるかどうかを確認します。失敗した場合、この関数は `MissingKoinDefinitionException` をスローします。
+以下のような場合は、引き続き `verify()` が必要です。
+
+- Compiler Plugin を使用していない場合：プラグインなしで Constructor DSL または Classic DSL を使用しているプロジェクト。（アノテーション用の非推奨の KSP プロセッサには、独自の `KOIN_CONFIG_CHECK` オプションがあります。）
+- ビルド時にグラフが特定できない場合：プラグインは `if` / `when` や可変長引数（varargs）で構築されたモジュールリストを解決できません。この場合、`KOIN-W003` を報告し、そのエントリーポイントのチェックをスキップします。
+- ライブラリモジュール：独自の `startKoin` / `@KoinApplication` を持たないライブラリや機能モジュール（feature module）は、アプリがそれを組み込むまで依存関係の欠落チェックが行われません。ライブラリ内に `verify()` テストを用意することで、単体でチェックできます。
+- 遅延モジュール（Lazy modules）：グラフの一部を[遅延モジュール](/docs/reference/koin-core/lazy-modules)でロードしており、設定全体に対して1つのテストを実行したい場合（[通常モジュールと遅延モジュールの併用](#modules-and-lazy-modules-together)を参照）。
+
+## verify() {id="verify"}
+
+`verify()` は `Module` の拡張関数であり、`koin-test` の JVM 環境で利用できます。各定義のクラスのコンストラクタを読み取り、すべてのパラメータの型に対応する定義がそのモジュールまたはインクルードされたモジュール内に存在するかをチェックします。定義を実行することはなく、モックも不要です。
 
 ```kotlin
-val niaAppModule = module {
-    includes(
-        jankStatsKoinModule,
-        dataKoinModule,
-        syncWorkerKoinModule,
-        topicKoinModule,
-        authorKoinModule,
-        interestsKoinModule,
-        settingsKoinModule,
-        bookMarksKoinModule,
-        forYouKoinModule
-    )
-    viewModel<MainActivityViewModel>()
+val appModule = module {
+    includes(dataModule, networkModule)
+    viewModel<UserViewModel>()
 }
 ```
 
 ```kotlin
-class NiaAppModuleCheck {
+import org.koin.test.verify.verify
+
+class AppModuleCheck {
 
     @Test
     fun checkKoinModule() {
-        // Koin 設定を検証する
-        niaAppModule.verify()
+        appModule.verify()
     }
 }
 ```
 
-JUnit テストを実行すれば完了です！
+依存関係が不足している場合、`verify()` は `MissingKoinDefinitionException` をスローし、修正案を出力します。2つのコンストラクタ間に循環依存がある場合は、`CircularInjectionException` をスローします。
 
-`verify()` API は動作が非常に軽量で、設定に対して実行するためにモックやスタブの類を一切必要としません。
+`includes()` でリンクされていない複数のモジュールをチェックするには、`listOf(dataModule, uiModule).verifyAll()` を使用します。
 
-### 注入パラメータを使用した検証 [4.0+] {id="verifying-with-injected-parameters-4-0"}
+### verify() が合格と判定する条件 {id="what-verify-accepts"}
 
-`parametersOf` を使用してオブジェクトを注入する設定がある場合、設定内にパラメータ型の定義がないため、検証は失敗します。
-しかし、`definition<Type>(Class1::class, Class2::class ...)` を使用して、指定された定義で注入されるパラメータ型を定義できます。
+コンストラクタパラメータは、以下のいずれかに該当する場合にチェックを通過します。
+
+- 宣言済み（Declared）：モジュールツリー内にその型の定義が存在する。
+- オプショナル（Optional）：パラメータにデフォルト値がある。定義が存在しない場合、`verify()` は警告を出力します。
+- ラップされている（Wrapped）：`T` が宣言されている `Lazy<T>` または `List<T>` である。
+- ホワイトリスト登録済み（Whitelisted）：その型が `extraTypes` に含まれているか、基本型（`String`、`Int`、`Long`、`Double`）である。
+- インジェクトまたは外部提供（Injected or provided）：パラメータに `@InjectedParam` または `@Provided` アノテーションが付与されているか、`injections` で宣言されている。
+
+`verify()` はコンストラクタのみを読み取ります。クオリファイア、プロパティ、または定義ラムダ内に記述された `get()` の呼び出しはチェックしません。
+
+### 実行時に提供される型 {id="types-provided-at-runtime"}
+
+フレームワークのオブジェクトやプラットフォームによって生成される値など、一部の型はモジュール内で宣言されません。これらは `extraTypes` に追加します。
 
 ```kotlin
-class ModuleCheck {
+appModule.verify(
+    extraTypes = listOf(HttpClientEngine::class, Clock::class)
+)
+```
 
-    // 注入された定義を持つ定義がある場合
-    val module = module {
-        single { (a: Simple.ComponentA) -> Simple.ComponentB(a) }
-    }
+Android では、`koin-android-test` の `androidVerify()` を使用してください。`Context`、`Activity`、`Fragment`、`Application`、`SavedStateHandle`、および `WorkerParameters` が自動的に追加されます。
 
-    @Test
-    fun checkKoinModule() {
+```kotlin
+import org.koin.android.test.verify.androidVerify
 
-        // 注入パラメータ（Injected Parameters）を検証および宣言する
-        module.verify(
-            injections = injectedParameters(
-                definition<Simple.ComponentB>(Simple.ComponentA::class)
-            )
-        )
-    }
+@Test
+fun checkKoinModule() {
+    appModule.androidVerify()
 }
 ```
 
-### 型のホワイトリスト登録 (Type White-Listing) {id="type-white-listing"}
+### インジェクトされるパラメータ {id="injected-parameters"}
 
-型を「ホワイトリスト」として追加できます。これは、その型がいかなる定義に対してもシステム内に存在するものとみなされることを意味します。
-
-```kotlin
-class NiaAppModuleCheck {
-
-    @Test
-    fun checkKoinModule() {
-
-        // Koin 設定を検証する
-        niaAppModule.verify(
-            // 定義で使用されているが直接宣言されていない型（パラメータ注入など）をリストアップする
-            extraTypes = listOf(MyType::class ...)
-        )
-    }
-}
-```
-
-### 検証のためのアノテーションの使用 {id="using-annotations-for-verification"}
-
-`koin-core-annotations` のアノテーションは、Koin が注入コントラクト（injection contracts）を推論し、設定を検証するのに役立ちます。複雑な DSL 設定を使用する代わりに、これらのアノテーションが要素の特定に役立ちます。
+`parametersOf()` で渡されるパラメータには定義が存在しないため、`verify()` は不足していると報告します。これらは `injections` で宣言します。
 
 ```kotlin
-// "a" が注入パラメータであることを示す
-class ComponentB(@InjectedParam val a: ComponentA)
-// "a" が動的に提供されることを示す
-class ComponentBProvided(@Provided val a: ComponentA)
-```
+class UserPresenter(val userId: String, val repository: UserRepository)
 
-これにより、カスタムの検証ロジックを記述することなく、テスト中や実行時の微妙な問題を防止できます。
-
----
-
-## CheckModules API (非推奨) {id="checkmodules-api-deprecated"}
-
-:::warning
-`checkModules()` API は Koin 4.0 以降、非推奨となりました。代わりに `verify()` を使用するか、コンパイル時の安全性のために Koin Compiler Plugin へ移行してください。
-:::
-
-`checkModules()` 関数はモジュールを起動し、可能な限りの各定義の実行を試みます。
-
-```kotlin
-class CheckModulesTest : KoinTest {
-
-    @Test
-    fun verifyKoinApp() {
-
-        koinApplication {
-            modules(module1, module2)
-            checkModules()
-        }
-    }
-}
-```
-
-または `checkKoinModules` を使用します：
-
-```kotlin
-class CheckModulesTest : KoinTest {
-
-    @Test
-    fun verifyKoinApp() {
-        checkKoinModules(listOf(module1, module2))
-    }
-}
-```
-
-### CheckModule DSL {id="checkmodule-dsl"}
-
-注入パラメータ、プロパティ、または動的インスタンスを使用する定義の場合：
-
-* `withInstance(value)` - `value` インスタンスを Koin グラフに追加します。
-* `withInstance<MyType>()` - `MyType` のモックインスタンスを追加します（`MockProviderRule` が必要です）。
-* `withParameter<Type>(qualifier){ qualifier -> value }` - パラメータとして注入される `value` インスタンスを追加します。
-* `withProperty(key, value)` - Koin にプロパティを追加します。
-
-### JUnit ルールによるモック {id="mocking-with-a-junit-rule"}
-
-`checkModules` でモックを使用するには、`MockProviderRule` を提供します。
-
-```kotlin
-@get:Rule
-val mockProvider = MockProviderRule.create { clazz ->
-    // 指定された clazz に対して、使用しているフレームワークでモックを作成します
-    Mockito.mock(clazz.java)
-}
-```
-
-### 動的な振る舞いを持つモジュールの検証 {id="verifying-modules-with-dynamic-behavior"}
-
-```kotlin
-val myModule = module {
-    factory { (id: String) -> FactoryPresenter(id) }
-}
-```
-
-次のように検証します：
-
-```kotlin
-class CheckModulesTest : KoinTest {
-
-    @Test
-    fun verifyKoinApp() {
-
-        koinApplication {
-            modules(myModule)
-            checkModules(){
-                // 定義で使用される、Koin に追加する値
-                withInstance("_my_id_value")
-            }
-        }
-    }
-}
-```
-
-### Android の例 {id="android-example"}
-
-```kotlin
-class CheckModulesTest {
-
-    @get:Rule
-    val rule: TestRule = InstantTaskExecutorRule()
-
-    @get:Rule
-    val mockProvider = MockProviderRule.create { clazz ->
-        Mockito.mock(clazz.java)
-    }
-
-    @Test
-    fun `test DI modules`(){
-        checkKoinModules(allModules) {
-            withInstance<Context>()
-            withInstance<Application>()
-            withInstance<SavedStateHandle>()
-            withInstance<WorkerParameters>()
-        }
-    }
-}
-```
-
-### スコープリンクの提供 {id="providing-scope-links"}
-
-`withScopeLink` を使用してスコープをリンクします：
-
-```kotlin
-val myModule = module {
-    scope(named("scope1")) {
-        scoped { ComponentA() }
-    }
-    scope(named("scope2")) {
-        scoped { ComponentB(get()) }
-    }
+val presenterModule = module {
+    factory { (userId: String) -> UserPresenter(userId, get()) }
 }
 
 @Test
-fun `test DI modules`(){
-    koinApplication {
-        modules(myModule)
-        checkModules(){
-            withScopeLink(named("scope2"), named("scope1"))
-        }
-    }
+fun checkKoinModule() {
+    presenterModule.verify(
+        injections = injectedParameters(
+            definition<UserPresenter>(String::class)
+        )
+    )
 }
 ```
 
----
+または、コンストラクタパラメータにアノテーションを付与します。`@InjectedParam` は `parametersOf()` で渡される値を表し、`@Provided` は Koin モジュール外から提供される型を表します。
 
-## コンパイル時の安全性への移行 {id="migration-to-compile-time-safety"}
+```kotlin
+class UserPresenter(@InjectedParam val userId: String, val repository: UserRepository)
 
-Koin Compiler Plugin は現在、コンパイル時の依存関係検証を提供しており、実行時の検証の必要性を置き換えています。
+class SyncWorker(@Provided val params: WorkerParameters, val repository: UserRepository)
+```
 
-| 以前 | 以降 |
-|--------|-------|
-| テスト内での `module.verify()` | Compiler Plugin (自動) |
-| テスト内での `checkModules()` | Compiler Plugin (自動) |
-| 実行時の検証 | コンパイル時の検証 |
-| 手動のテスト設定 | テストコードは不要 |
+どちらのアノテーションも `koin-core-annotations` で提供されており、Compiler Plugin が読み取るものと同じです（[注入パラメータ](/docs/reference/koin-core/injection-parameters)を参照）。
 
-コンパイラはビルドごとに検証を行うため、テストコードは不要です。コンパイラプラグインを有効にした後は、`verify()` や `checkModules()` のテストを安全に削除できます。
+### 通常モジュールと遅延モジュールの併用 {id="modules-and-lazy-modules-together"}
 
-詳細は [コンパイル時の安全性](/docs/reference/koin-compiler/compile-safety) を、セットアップ手順については [Compiler Plugin のセットアップ](/docs/setup/compiler-plugin) を参照してください。
+`koin-test-coroutines` は `ModuleConfiguration` に対する `verify()` を追加します。これにより、通常のモジュールと[遅延モジュール](/docs/reference/koin-core/lazy-modules)を1つのグラフとしてチェックできます。
+
+```kotlin
+val configuration = moduleConfiguration {
+    modules(coreModule)
+    lazyModules(featureModule)
+}
+
+@Test
+fun checkConfiguration() {
+    configuration.verify()
+}
+```
+
+`moduleConfiguration` およびこの `verify()` は実験的（`@KoinExperimentalAPI`）です。
+
+## checkModules()（非推奨） {id="checkmodules-deprecated"}
+
+:::warning
+`checkModules()`、`checkKoinModules()`、およびそれらの DSL は非推奨です。`verify()` または Compiler Plugin への移行を行ってください。
+:::
+
+`verify()` とは異なり、`checkModules()` はモジュールを開始してすべての定義をインスタンス化するため、実行時に解決されるすべての値を用意する必要があります。古いプロジェクトで見かけることがあるかもしれません。
+
+```kotlin
+@Test
+fun checkAllModules() {
+    koinApplication {
+        modules(appModule)
+        checkModules {
+            withInstance<Context>()
+            withParameter<UserPresenter> { "user-1" }
+            withProperty("api_url", "http://localhost")
+        }
+    }
+}
+
+// または
+@Test
+fun checkAllModules() {
+    checkKoinModules(listOf(appModule))
+}
+```
+
+チェック用 DSL：
+
+- `withInstance(value)`: グラフに `value` を追加します。`withInstance<T>()` は `T` のモックを追加し、`MockProviderRule` が必要になります（[declareMock によるモック](/docs/reference/koin-test/testing#mocking-with-declaremock)を参照）。
+- `withParameter<T> { value }`: `T` を生成するために使用されるインジェクトパラメータを指定します。複数ある場合は `withParameters<T> { parametersOf(a, b) }` を使用します。
+- `withProperty(key, value)`: Koin プロパティを追加します。
+- `withScopeLink(scope, targetScope)`: チェックのために2つのスコープを[リンク](/docs/reference/koin-core/scopes)します。
+
+`verify()` への移行手順：フレームワークの型に対する `withInstance` を削除し（`extraTypes` または `androidVerify()` を使用）、`withParameter` を `injections` または `@InjectedParam` に置き換えます。
+
+## 関連情報 {id="related"}
+
+- [コンパイル時の安全性](/docs/reference/koin-compiler/compile-safety): Compiler Plugin がビルド時にチェックする内容。
+- [ユニットテスト](/docs/reference/koin-test/testing): テストでの Koin の起動、定義のオーバーライドとモック。
+- [注入パラメータ](/docs/reference/koin-core/injection-parameters): `parametersOf` と `@InjectedParam`。
+- [遅延モジュール](/docs/reference/koin-core/lazy-modules): バックグラウンドでグラフの一部をロードする。
+- [トラブルシューティング](/docs/reference/koin-core/troubleshooting): `NoDefinitionFoundException` などのランタイムエラー。

@@ -4,223 +4,112 @@ title: 什么是 Koin？
 
 # 什么是 Koin？
 
-### 务实的 Kotlin 依赖注入框架 - 简单且强大 {id="the-pragmatic-kotlin-dependency-injection-framework-simple-and-powerful"}
+Koin 是面向 Kotlin 的依赖注入框架。本文将介绍其工作原理、优缺点（开销与收益），以及该项目的组织方式。如果您还不熟悉依赖注入，请先阅读[什么是依赖注入？](/docs/intro/what-is-dependency-injection)。
 
-Koin 是一个专为 Kotlin 设计的轻量级依赖注入框架。与依赖代码生成或反射的传统 DI 框架不同，Koin 提供了两种同样强大的方式：简洁的 **Kotlin DSL** 和直观的 **注解**。您可以选择适合您团队的方式——两者都是一等公民。
+## Koin 的工作原理 {id="how-koin-works"}
 
-## Koin 的核心价值 {id="koin-s-core-values"}
-
-| 价值 | 含义 |
-|-------|---------------|
-| **高效** | 易于学习，易于编写。几分钟内即可完成 DI 工作，而不是几小时 |
-| **开发者友好** | DSL 或注解 - 随您选择。清晰的错误提示，简单的调试，最佳的 DX（开发者体验） |
-| **可扩展性** | 为具有复杂依赖关系图的大型企业级应用程序提供动力 |
-| **安全** | 通过 Koin 编译器插件实现编译时安全 |
-| **动态** | 运行时灵活性：动态加载模块、延迟加载、功能标志 |
-
-## 为什么开发者喜欢 Koin {id="why-developers-love-koin"}
-
-- **数分钟内即可上手** - 没有复杂的概念，直观的 DSL 和简单的注解
-- **编写更少的代码** - 无论是 DSL 还是注解，编译器插件都会自动装配依赖项
-- **选择您的风格** - 为 Kotlin 纯粹主义者提供 DSL，为熟悉模式的人提供注解——两者同样强大
-- **轻松调试** - 清晰的错误消息，无需追踪生成的代码
-- **自信地扩展** - 已被全球企业用于生产环境
-- **保持安全** - 编译时验证在运行时之前捕获错误
-- **保持灵活** - 基于运行时但性能卓越。支持动态模块、延迟加载、功能标志
-- **IDE 支持** - 针对 Android Studio 和 IntelliJ IDEA 的官方插件——支持导航定义、实时安全检查、图表可视化
-
-## 两种风格，一个框架 - 两者同样强大 {id="two-styles-one-framework-both-equally-powerful"}
-
-Koin 支持两种定义依赖项的风格。两者都是一等公民，具有完全的功能对等。选择适合您团队的方式：
-
-### DSL 风格 {id="dsl-style"}
-
-使用 Kotlin DSL 语法定义依赖项：
+您可以在模块中声明类，启动一次 Koin，并在需要的地方请求实例：
 
 ```kotlin
+class ApiService
+class UserRepository(private val api: ApiService)
+
 val appModule = module {
-    single<Database>()
-    single<ApiClient>()
+    single<ApiService>()
     single<UserRepository>()
-    viewModel<UserViewModel>()
+}
+
+fun main() {
+    startKoin {
+        modules(appModule)
+    }
 }
 ```
 
-### 注解风格 {id="annotation-style"}
+两个部分协同工作：
 
-使用注解定义依赖项：
+- **运行时容器**：`startKoin` 会将您的模块加载到容器中。每个定义都是一个用于构建某种类型的 Kotlin 函数。当有代码请求 `UserRepository` 时，Koin 会运行该函数，从容器中解析其构造函数形参，并根据定义类型（`single`、`factory`、`scoped`）保留或丢弃该实例。Koin 不通过反射构建对象。
+- **编译时检查（可选）**：[Koin Compiler Plugin](/docs/intro/koin-compiler-plugin) 是一个 Kotlin 编译器插件。它通过读取构造函数来生成装配逻辑，然后在构建时检查所组装的图中的每个依赖项是否均已声明。缺失定义将表现为构建错误，而不会导致运行时崩溃。
+
+[核心概念](/docs/intro/core-concepts)通过一个完整的示例讲解了模块、定义、作用域以及注入。
+
+## 运行时模型的开销与收益 {id="what-the-runtime-model-costs-and-gives"}
+
+由于依赖图存在于运行时容器中，Koin 可以在应用程序运行期间对其进行更改：
+
+- **动态模块**：在启动后使用 `loadKoinModules()` 和 `unloadKoinModules()` 加载与卸载模块，适用于功能特性开关或按需加载的功能。请参阅[启动 Koin](/docs/reference/koin-core/starting-koin)。
+- **延迟加载模块**：在后台加载部分依赖图，以减少启动开销。请参阅[延迟加载模块](/docs/reference/koin-core/lazy-modules)。
+- **运行时创建的作用域**：为会话、屏幕或请求开启和关闭作用域。请参阅[作用域](/docs/reference/koin-core/scopes)。
+- **无生成源文件**：无需向版本库提交生成代码，也无需为每个 Kotlin Multiplatform 目标单独配置。
+
+但该模型也有一些您应当了解的开销：
+
+- **启动开销**：模块在 Koin 启动时进行注册，且每次查找都要经过容器。对大多数应用程序来说这微不足道，但及早求值定义（`createdAtStart`）会在启动 Koin 的线程上运行。
+- **未搭配插件时的运行时错误**：若使用构造函数 DSL 或经典 DSL 且未使用插件，只有在代码运行时才会发现缺失的定义。您可以在单元测试中通过 [`verify()`](/docs/reference/koin-test/verify) 捕获它，或通过编译器插件在构建时捕获。
+- **编译时检查的局限性**：插件会验证在 Koin 入口点（例如 `startKoin`）组装的图。之后通过 `loadKoinModules()` 加载的模块无法在构建时完成验证，而没有入口点的库模块只有在应用程序组装它时才会接受检查。请参阅[编译时安全性](/docs/reference/koin-compiler/compile-safety)。
+- **Kotlin 版本耦合**：编译器插件依赖编译器内部实现，因此每个插件版本都针对一系列特定的 Kotlin 版本进行过验证。请参阅[编译器插件配置](/docs/setup/compiler-plugin)。
+
+## 构造函数注入与服务定位器 {id="constructor-injection-and-service-locator"}
+
+您的类通过构造函数接收其依赖项。Koin 仅在无法自行创建对象的入口点处检索实例：
 
 ```kotlin
-@Singleton
-class Database
-
-@Singleton
-class ApiClient
-
-@Singleton
-class UserRepository(
-    private val database: Database,
-    private val apiClient: ApiClient
-)
-
-@KoinViewModel
+// Koin 创建这些对象：依赖项通过构造函数传入
+class UserRepository(private val api: UserApi)
 class UserViewModel(private val repository: UserRepository) : ViewModel()
-```
 
-这两种风格都由 **Koin 编译器插件** 处理，以确保编译时安全。
-
-## Koin 的注解更简单 {id="koin-s-annotations-are-simpler"}
-
-如果您使用过 Hilt 或 Dagger，您会发现 Koin 注解需要的样板代码更少：
-
-| 任务 | Koin | Hilt |
-|------|------|------|
-| **单例 (Singleton)** | `@Singleton class MyService` | `@Singleton class MyService @Inject constructor(...)` |
-| **接口绑定** | 自动（只需实现接口） | 需要在抽象模块中使用 `@Binds` |
-| **组件扫描** | `@ComponentScan("package")` | 不可用 |
-| **模块发现** | `@Configuration` - 自动发现 | 每个模块都需要手动标注 `@InstallIn` |
-
-**示例对比：**
-
-```kotlin
-// KOIN - 就这么简单！
-@Singleton
-class MyRepository(val api: ApiService)
-
-@Module
-@ComponentScan("com.app")
-class AppModule
-```
-
-```kotlin
-// HILT - 更多样板代码
-@Singleton
-class MyRepository @Inject constructor(val api: ApiService)
-
-@Module
-@InstallIn(SingletonComponent::class)
-abstract class AppModule {
-    @Binds
-    abstract fun bindRepository(impl: MyRepository): Repository
+// Android 创建 Activity：它从 Koin 检索其 ViewModel
+class UserActivity : AppCompatActivity() {
+    private val viewModel: UserViewModel by viewModel()
 }
 ```
 
-## 由 Koin 编译器插件驱动 {id="powered-by-koin-compiler-plugin"}
+依赖项在签名中清晰可见，您无需 Koin 即可测试 `UserRepository` 和 `UserViewModel`。诸如 `by inject()`、`by viewModel()` 或 `koinInject()` 等检索函数属于入口点：例如 `Activity`、`Fragment`、根 Composable、`main()`、Ktor 路由或测试。[什么是依赖注入？](/docs/intro/what-is-dependency-injection)对比了这两种模式，而[检索依赖项](/docs/reference/koin-core/injection)涵盖了 `get()` 和 `inject()` 的用法。
 
-对于所有新项目，推荐使用 **Koin 编译器插件**：
+## 两种风格，同一个容器 {id="two-styles-one-container"}
 
-- **原生 Kotlin 编译器插件 (K2)** - 不是 KSP，而是直接的编译器集成
-- **自动检测构造函数参数** - 减少手动装配
-- **编译时安全** - 在构建过程中捕获错误
-- **同时支持 DSL 和注解** - 随您选择
-- **配置简单** - 仅需一个 Gradle 插件
+| 风格 | 示例 | 所需配置 |
+|-------|---------|-------|
+| 编译器插件 DSL | `single<UserRepository>()` | Koin Compiler Plugin |
+| 注解 | `@Singleton class UserRepository(...)` | Koin Compiler Plugin、`koin-annotations` |
+| 构造函数 DSL | `singleOf(::UserRepository)` | 无需额外配置（插件可增加编译时检查） |
+| 经典 DSL | `single { UserRepository(get()) }` | 无需额外配置（插件可增加编译时检查） |
 
-### 使用编译器插件获得更简洁的语法 {id="cleaner-syntax-with-compiler-plugin"}
+注解是一种风格；编译器插件 DSL、构造函数 DSL 和经典 DSL 则是另一种风格（即 Koin DSL）的三种形式。它们都会在同一个容器中生成相同的定义。每个项目选择一种风格即可。[选择您的风格](/docs/intro/choosing-your-style)对它们进行了对比，并给出了默认推荐。
 
-| 经典 DSL | 编译器插件 DSL |
-|-------------|---------------------|
-| `singleOf(::MyService)` | `single<MyService>()` |
-| `single { MyService(get(), get()) }` | `single<MyService>()` |
-| `factoryOf(::MyRepo)` | `factory<MyRepo>()` |
-| `viewModelOf(::MyVM)` | `viewModel<MyVM>()` |
+## 注解的状态 {id="annotations-status"}
 
-在 [Koin 编译器插件](/docs/intro/koin-compiler-plugin) 中了解更多信息。
+`koin-annotations` 库（`@Singleton`、`@Factory`、`@KoinViewModel`、`@Module`、`@ComponentScan`）是 Koin 主项目的一部分：位于同一仓库、采用同一版本、使用同一 BOM。它并未被弃用。已被弃用的是此前用于读取这些注解的 KSP 处理器 `koin-ksp-compiler`。Koin Compiler Plugin 取代了它，且沿用相同的注解。请参阅[从 KSP 迁移到编译器插件](/docs/migration/from-ksp-to-compiler-plugin)。
 
-## 经典 DSL（完全支持） {id="classic-dsl-fully-supported"}
+## 支持的平台 {id="platforms"}
 
-经典 DSL 对所有 Kotlin 版本保持完全支持：
+Koin 是一个 Kotlin Multiplatform 库。核心库可在所有 Kotlin 目标平台上运行，集成库则增添了平台专有 API：
 
-```kotlin
-val appModule = module {
-    singleOf(::Database)
-    singleOf(::ApiClient)
-    singleOf(::UserRepository)
-    viewModelOf(::UserViewModel)
-}
-```
+| 平台 | 主要构件 | 入门指南 |
+|----------|---------------|------------|
+| Kotlin/JVM | `koin-core` | [Kotlin 教程](/docs/quickstart/kotlin) |
+| Android | `koin-android` | [在 Android 上启动 Koin](/docs/reference/koin-android/start) |
+| Jetpack Compose、Compose Multiplatform | `koin-compose`、`koin-compose-viewmodel` | [适用于 Compose 的 Koin](/docs/reference/koin-compose/compose) |
+| Kotlin Multiplatform（iOS、桌面端、Web、原生） | `koin-core` | [Kotlin Multiplatform 配置](/docs/reference/koin-core/kmp-setup) |
+| Ktor 服务器 | `koin-ktor` | [适用于 Ktor 的 Koin](/docs/reference/koin-ktor/ktor) |
 
-或者使用显式装配：
+完整的构件列表请参见 [Gradle 配置](/docs/setup/gradle)。
 
-```kotlin
-val appModule = module {
-    single { Database() }
-    single { ApiClient() }
-    single { UserRepository(get(), get()) }
-    viewModel { UserViewModel(get()) }
-}
-```
+## Koin 项目 {id="the-koin-project"}
 
-:::info
-经典 DSL 尚未弃用。Koin 与其完美配合。当您准备好迁移时，编译器插件会在其之上添加编译时分析。
-:::
+Koin 基于 Apache 2.0 许可证开源。它包含以下组成部分：
 
-## Koin Annotations 现已成为 Koin 项目的一部分 {id="koin-annotations-is-now-part-of-the-koin-project"}
+- **Koin 库**：包括核心库（core）、Android、Compose、Ktor、测试（test）以及注解（annotations），全部在同一个版本号下发布。源码：[InsertKoinIO/koin](https://github.com/InsertKoinIO/koin)。
+- **Koin 编译器插件**：Kotlin 编译器插件及其 Gradle 插件，拥有独立的版本号。源码：[InsertKoinIO/koin-compiler-plugin](https://github.com/InsertKoinIO/koin-compiler-plugin)。
+- **Koin IDE 插件**：在 Android Studio 和 IntelliJ IDEA 中提供导航和检查功能。请参阅 [IDE 插件](/docs/tooling/ide-plugin)。
+- **示例**：各个教程对应的可运行的应用程序，位于 [InsertKoinIO/koin-getting-started](https://github.com/InsertKoinIO/koin-getting-started)。
 
-`koin-annotations` 库——包括 `@Singleton`、`@Factory`、`@KoinViewModel`、`@Module`、`@ComponentScan` 等——随 Koin 主版本一起发布并得到完全支持。它**没有**被弃用。
+如果您熟悉 Hilt 或 Dagger，[Koin 与 Hilt 对比](/docs/intro/koin-vs-hilt)比较了这两种方案。
 
-```kotlin
-dependencies {
-    implementation(platform("io.insert-koin:koin-bom:$koin_version"))
-    implementation("io.insert-koin:koin-core")
-    implementation("io.insert-koin:koin-annotations") // 相同的 Koin 版本
-}
-```
+## 相关内容 {id="related"}
 
-您的注解由 **Koin 编译器插件** 处理——请参阅 [Koin 编译器插件](/docs/intro/koin-compiler-plugin) 和 [注解参考](/docs/reference/koin-annotations/start)。
-
-## Koin KSP 编译器已弃用，建议使用 Koin 编译器插件 {id="koin-ksp-compiler-is-deprecated-in-favor-of-koin-compiler-plugin"}
-
-:::info
-旧版 KSP 处理器 `koin-ksp-compiler` 已**弃用**，并将在未来的 Koin 版本中移除。替代方案是 **Koin 编译器插件**——原生 K2 编译器集成，无生成文件，更简单的 KMP 配置。
-:::
-
-如果您正在将 Koin Annotations 与 `koin-ksp-compiler` 配合使用，请迁移到编译器插件：
-
-- **相同的注解** —— 无需更改代码
-- **更好的处理** —— 原生编译器集成，无生成文件
-- **更简单的配置** —— 无需 KSP 配置
-
-请参阅 [从 KSP 迁移到编译器插件](/docs/migration/from-ksp-to-compiler-plugin)。
-
-## 运行时 + 编译安全 = 两全其美 {id="runtime-compile-safe-best-of-both-worlds"}
-
-Koin 是**基于运行时但性能卓越且编译安全**的。这种独特的结合实现了：
-
-**编译时安全**（配合编译器插件）：
-- 在构建期间验证您的依赖关系图
-- 自动检测构造函数参数
-- 在运行时之前捕获缺失的依赖项
-
-**运行时灵活性**（仅限编译时的框架无法提供）：
-- 动态模块加载/卸载
-- 延迟模块加载（后台）
-- 功能标志驱动的注入
-- 插件架构
-- 使用不同实现进行 A/B 测试
-
-```kotlin
-// 动态模块加载 - Hilt 无法实现
-if (featureEnabled) {
-    loadKoinModules(premiumFeatureModule)
-}
-
-// 稍后，如果功能被禁用
-unloadKoinModules(premiumFeatureModule)
-```
-
-## Koin 适用于谁？ {id="who-is-koin-for"}
-
-Koin 是以下人群的理想选择：
-
-- **重视效率的团队** - 更少的模板代码，更快的开发速度
-- **想要比 Hilt/Dagger 更简洁 DI 的 Android 开发者**
-- **Kotlin 多平台项目** - Android、iOS、桌面端、Web、后端
-- **需要扩展的企业项目**
-- **任何认为 DI 不应该复杂化的人**
-
-## 下一步 {id="next-steps"}
-
-- **[什么是依赖注入？](/docs/intro/what-is-dependency-injection)** - 学习 DI 基础知识
-- **[Koin 编译器插件](/docs/intro/koin-compiler-plugin)** - 推荐的方法
-- **[设置指南](/docs/setup/gradle)** - 将 Koin 添加到您的项目
-- **[教程](/docs/tutorials/your-first-app)** - 使用 Koin 构建您的第一个应用
+- [核心概念](/docs/intro/core-concepts)：心智模型，通过一个示例逐步构建讲解。
+- [选择您的风格](/docs/intro/choosing-your-style)：应使用哪种声明风格。
+- [Koin 编译器插件](/docs/intro/koin-compiler-plugin)：构建时的工作机制。
+- [配置指南](/docs/setup)：将 Koin 添加到您的项目中。
+- [教程](/docs/quickstart/kotlin)：构建您的第一个应用程序。

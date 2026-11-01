@@ -13,15 +13,15 @@
 </p>
 </tldr>
 
-Ktor クライアントで SSL を構成するには、クライアントが使用する[エンジンの構成](client-engines.md#configure)をカスタマイズする必要があります。
-このトピックでは、[JVM](client-engines.md#jvm) および [Android](client-engines.md#jvm-android) をターゲットとするエンジンに対して SSL 証明書を追加する方法を紹介します。
+Ktor クライアントで SSL を設定するには、クライアントで使用される[エンジンの設定](client-engines.md#configure)をカスタマイズする必要があります。
+このトピックでは、[JVM](client-engines.md#jvm) および [Android](client-engines.md#jvm-android) をターゲットとするエンジンに SSL 証明書を追加する方法について説明します。
 
 > Ktor API を使用して自己署名証明書を生成する方法については、[自己署名証明書の生成](server-ssl.md#self-signed)を参照してください。
 
 ## SSL 設定の読み込み {id="ssl-settings"}
 
-このトピックでは、Ktor クライアントは、サーバー用に生成された既存の KeyStore ファイル（`keystore.jks`）から読み込まれた証明書を使用します。
-異なるエンジンが SSL を構成するために異なる [JSSE API](https://docs.oracle.com/en/java/javase/17/security/java-secure-socket-extension-jsse-reference-guide.html#GUID-B7AB25FA-7F0C-4EFA-A827-813B2CE7FBDC) を使用する（例えば、Apache では `SSLContext`、Jetty では `TrustManager`）ことを考慮し、対応する SSL 構成を取得できるようにしておく必要があります。以下のコードスニペットは、既存の KeyStore ファイル（`keystore.jks`）から証明書を読み込み、SSL 構成を読み込むための関数を提供する `SslSettings` オブジェクトを作成します。
+このトピックでは、Ktor クライアントはサーバー用に生成された既存の KeyStore ファイル（`keystore.jks`）から読み込まれた証明書を使用します。
+異なるエンジンは SSL を設定するために異なる [JSSE API](https://docs.oracle.com/en/java/javase/17/security/java-secure-socket-extension-jsse-reference-guide.html#GUID-B7AB25FA-7F0C-4EFA-A827-813B2CE7FBDC) を使用するため（例: Apache の場合は `SSLContext`、Jetty の場合は `TrustManager`）、対応する SSL 設定を取得する機能を用意する必要があります。以下のコードスニペットは、既存の KeyStore ファイル（`keystore.jks`）から証明書を読み込み、SSL 設定を取得するための関数を提供する `SslSettings` オブジェクトを作成します。
 
 ```kotlin
 object SslSettings {
@@ -51,10 +51,10 @@ object SslSettings {
 }
 ```
 
-## Ktor での SSL 構成 {id="configure-ssl"}
+## Ktor での SSL の設定 {id="configure-ssl"}
 
-このセクションでは、さまざまなエンジンに対して SSL を構成する方法を見ていきます。
-完全な例はこちらで見ることができます: [client-ssl-config](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-ssl-config)
+このセクションでは、さまざまなエンジンで SSL を設定する方法を見ていきます。
+完全なサンプルはこちらで確認できます: [client-ssl-config](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-ssl-config)。
 
 ### JVM {id="jvm"}
 
@@ -100,13 +100,13 @@ val jettyClient = HttpClient(Jetty) {
 
 ### JVM および Android {id="jvm-android"}
 
-> Android をターゲットとするすべてのエンジンは、[ネットワークセキュリティ構成](https://developer.android.com/training/articles/security-config)を使用します。
+> Android 向けのすべてのエンジンは [ネットワーク セキュリティ構成](https://developer.android.com/training/articles/security-config) を使用します。
 
 #### CIO {id="cio"}
 
 CIO エンジンでは、`https` ブロック内で HTTPS 設定を構成できます。
-このブロック内では、[TLSConfigBuilder](https://api.ktor.io/ktor-network-tls/io.ktor.network.tls/-t-l-s-config-builder/index.html) によって提供される TLS パラメータにアクセスできます。
-この例では、`TrustManager` インスタンスを使用して証明書を構成しています。
+このブロック内では、[TLSConfigBuilder](https://api.ktor.io/ktor-network-tls/io.ktor.network.tls/-t-l-s-config-builder/index.html) によって提供される TLS パラメーターにアクセスできます。
+この例では、証明書を設定するために `TrustManager` インスタンスが使用されています。
 
 ```kotlin
 val cioClient = HttpClient(CIO) {
@@ -119,12 +119,12 @@ val cioClient = HttpClient(CIO) {
 ```
 
 > [sockets-client-tls](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/sockets-client-tls) の例では、すべての証明書を信頼する方法を示しています。
-> このアプローチは開発目的のみに使用してください。
+> この方法は開発目的でのみ使用してください。
 
 #### Android {id="android"}
 
-Android エンジンは、SSL 設定を構成するために `sslManager` プロパティを使用します。 
-このプロパティは、`SSLSocketFactory` を渡すことができる `HttpsURLConnection` をパラメータとして受け取ります。
+Android エンジンは SSL 設定を構成するために `sslManager` プロパティを使用します。
+このプロパティは `HttpsURLConnection` をパラメーターとして受け取り、これにより `SSLSocketFactory` を渡すことができます。
 
 ```kotlin
 val androidClient = HttpClient(Android) {
@@ -138,7 +138,7 @@ val androidClient = HttpClient(Android) {
 
 #### OkHttp {id="okhttp"}
 
-OkHttp で SSL を使用するように構成するには、`sslSocketFactory` 関数に `SSLSocketFactory` と `X509TrustManager` を渡す必要があります。
+SSL を使用するように OkHttp を設定するには、`sslSocketFactory` 関数に `SSLSocketFactory` と `X509TrustManager` を渡す必要があります。
 
 ```kotlin
 val okHttpClient = HttpClient(OkHttp) {
@@ -152,4 +152,4 @@ val okHttpClient = HttpClient(OkHttp) {
 
 ### Darwin {id="darwin"}
 
-Darwin エンジンで信頼済み証明書を構成するには、[CertificatePinner](https://api.ktor.io/ktor-client-darwin/io.ktor.client.engine.darwin.certificates/-certificate-pinner/index.html) を使用します。
+Darwin エンジンで信頼済み証明書を設定するには、[CertificatePinner](https://api.ktor.io/ktor-client-darwin/io.ktor.client.engine.darwin.certificates/-certificate-pinner/index.html) を使用します。

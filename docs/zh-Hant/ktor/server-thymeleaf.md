@@ -6,10 +6,11 @@
 <var name="plugin_name" value="Thymeleaf"/>
 <var name="package_name" value="io.ktor.server.thymeleaf"/>
 <var name="artifact_name" value="ktor-server-thymeleaf"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.server.thymeleaf"/>
 
 <tldr>
 <p>
-<b>必要相依性</b>：<code>io.ktor:%artifact_name%</code>
+<b>必要的相依性</b>：<code>io.ktor:%artifact_name%</code>
 </p>
 <var name="example_name" value="thymeleaf"/>
 <p>
@@ -19,23 +20,31 @@
     </a>
 </p>
 <p>
-    <b><Links href="/ktor/server-native" summary="Ktor supports Kotlin/Native and allows you to run a server without an additional runtime or virtual machine.">原生伺服器</Links> 支援</b>：✖️
+    <b><Links href="server-native.md" summary="Ktor 支援 Kotlin/Native，並允許你在沒有額外執行階段或虛擬機的情況下執行伺服器。">原生伺服器</Links> 支援</b>：✖️
 </p>
 </tldr>
 
-Ktor 允許您透過安裝 [Thymeleaf](https://api.ktor.io/ktor-server-thymeleaf/io.ktor.server.thymeleaf/-thymeleaf) 外掛程式，在應用程式中使用 [Thymeleaf 範本](https://www.thymeleaf.org/) 作為視圖（view）。
+Ktor 允許你透過安裝 [Thymeleaf](https://api.ktor.io/ktor-server-thymeleaf/io.ktor.server.thymeleaf/-thymeleaf) 外掛程式，在應用程式中將 [Thymeleaf 範本](https://www.thymeleaf.org/) 作為檢視使用。
 
 ## 新增相依性 {id="add_dependencies"}
 
 <p>
-    若要使用 <code>%plugin_name%</code>，您需要在組建指令碼中包含 <code>%artifact_name%</code> 構件：
+    若要使用 <code>%plugin_name%</code>，請將 <code>%artifact_name%</code> 構件新增至你的建置指令碼中：
 </p>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上述程式碼片段使用 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 版本目錄</a> 來指定 Ktor 相依性。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上述程式碼片段使用 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 版本目錄</a> 來指定 Ktor 相依性。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
@@ -45,15 +54,16 @@ Ktor 允許您透過安裝 [Thymeleaf](https://api.ktor.io/ktor-server-thymeleaf
 ## 安裝 Thymeleaf {id="install_plugin"}
 
 <p>
-    若要將 <code>%plugin_name%</code> 外掛程式安裝到應用程式中，請將其傳遞給指定<Links href="/ktor/server-modules" summary="Modules allow you to structure your application by grouping routes.">模組</Links>中的 <code>install</code> 函式。
-    下方的程式碼片段展示了如何安裝 <code>%plugin_name%</code> ...
+    若要在應用程式中<a href="server-plugins.md#install">安裝</a> <code>%plugin_name%</code> 外掛程式，
+    請將其傳遞給指定<Links href="server-modules.md" summary="模組允許你透過分組路由來組織應用程式架構。">模組</Links>中的 <code>install</code> 函式。
+    以下範例示範如何安裝 <code>%plugin_name%</code>：
 </p>
 <list>
     <li>
-        ... 在 <code>embeddedServer</code> 函式呼叫內。
+        在 <code>embeddedServer()</code> 函式呼叫中。
     </li>
     <li>
-        ... 在明確定義的 <code>module</code> 內，該模組是 <code>Application</code> 類別的擴充方法。
+        在 <code>Application</code> 類別上明確定義的 <code>module()</code> 擴充方法中。
     </li>
 </list>
 <Tabs>
@@ -65,9 +75,9 @@ Ktor 允許您透過安裝 [Thymeleaf](https://api.ktor.io/ktor-server-thymeleaf
     </TabItem>
 </Tabs>
 
-## 配置 Thymeleaf {id="configure"}
-### 配置範本載入 {id="template_loading"}
-在 `install` 區塊內，您可以配置 `ClassLoaderTemplateResolver`。例如，下方的程式碼片段讓 Ktor 能夠在相對於目前類別路徑的 `templates` 套件中尋找 `*.html` 範本：
+## 設定 Thymeleaf {id="configure"}
+### 設定範本載入 {id="template_loading"}
+在 `install` 區塊內，你可以設定 `ClassLoaderTemplateResolver`。例如，以下程式碼片段讓 Ktor 能夠相對於目前的 classpath，在 `templates` 套件中查詢 `*.html` 範本：
 ```kotlin
 import io.ktor.server.application.*
 import io.ktor.server.thymeleaf.*
@@ -85,7 +95,7 @@ fun Application.module() {
 ```
 
 ### 在回應中傳送範本 {id="use_template"}
-假設您在 `resources/templates` 中有一個 `index.html` 範本：
+假設你在 `resources/templates` 中有一個 `index.html` 範本：
 ```html
 <html xmlns:th="http://www.thymeleaf.org">
     <body>
@@ -99,7 +109,7 @@ fun Application.module() {
 data class User(val id: Int, val name: String)
 ```
 
-若要為指定的[路由](server-routing.md)使用範本，請按照以下方式將 [ThymeleafContent](https://api.ktor.io/ktor-server-thymeleaf/io.ktor.server.thymeleaf/-thymeleaf-content/index.html) 傳遞給 `call.respond` 方法：
+若要將範本用於指定的[路由](server-routing.md)，請透過以下方式將 [ThymeleafContent](https://api.ktor.io/ktor-server-thymeleaf/io.ktor.server.thymeleaf/-thymeleaf-content/index.html) 傳遞給 `call.respond` 方法：
 ```kotlin
 get("/index") {
     val sampleUser = User(1, "John")
@@ -109,7 +119,7 @@ get("/index") {
 
 ## 範例：自動重新載入 Thymeleaf 範本 {id="auto-reload"}
 
-下方的範例展示了在使用的[開發模式](server-development-mode.topic)下，如何自動重新載入 Thymeleaf 範本。
+以下範例示範在使用[開發模式](server-development-mode.topic)時如何自動重新載入 Thymeleaf 範本。
 
 ```kotlin
 package com.example
@@ -150,4 +160,4 @@ data class User(val id: Int, val name: String)
 
 ```
 
-您可以在這裡找到完整的範例：[thymeleaf-auto-reload](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/thymeleaf-auto-reload)。
+你可以在此處找到完整的範例：[thymeleaf-auto-reload](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/thymeleaf-auto-reload)。

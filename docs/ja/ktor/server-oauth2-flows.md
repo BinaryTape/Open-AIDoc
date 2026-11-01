@@ -7,53 +7,53 @@
 
 <tldr>
 <p>
-<b>必要な依存関係</b>: <code>io.ktor:%artifact_name%</code>、<code>io.ktor:ktor-server-sessions</code>
+<b>必要な依存関係</b>: <code>io.ktor:%artifact_name%</code>, <code>io.ktor:ktor-server-sessions</code>
 </p>
 </tldr>
 
 <link-summary>
-型付き OAuth 2.0 フローは独自のログインおよびコールバックルートをインストールし、型付きセッションを通じてユーザーのサインイン状態を維持できます。
+型付きの OAuth 2.0 フローは、独自のログインルートとコールバックルートをインストールし、型付きセッションを通じてユーザーのサインイン状態を維持できます。
 </link-summary>
 
-Ktor は、[型安全な認証スキーム API](server-typed-auth.md) の一部として 2 つの型付き OAuth 2.0 フローを提供します。
+Ktor は、[型安全な認証スキーム API](server-typed-auth.md) の一部として、2 つの型付き OAuth 2.0 フローを提供しています。
 
-* `oauth2Session` はユーザーをサインインさせ、セッションを保存し、アプリケーションのルートを保護するためのスキームを提供します。特別な理由がない限り、こちらを使用してください。
+* `oauth2Session` はユーザーをサインインさせてセッションを保存し、アプリケーションのルートを保護するためのスキームを提供します。特別な理由がない限り、こちらを使用してください。
 * `oauth2` はユーザーをサインインさせ、コールバック内でトークンを渡します。その後のルートは保護しません。
 
 フローは `authenticateWith()` に渡すスキームではありません。ルーティングに `install()` する値であり、ログインルートとコールバックルートを自動的に作成します。
 
 <note>
     <p>
-        型安全な認証スキーム API は実験的（experimental）です。予告なしに削除または変更される可能性があります。
+        型安全な認証スキーム API は実験的（experimental）です。いつでも廃止または変更される可能性があります。
         オプトインが必要です。詳細については、
-        <a href="server-typed-auth.md#prerequisites">API を有効にする</a>を参照してください。
+        <a href="server-typed-auth.md#prerequisites">型安全な認証のドキュメント</a>を参照してください。
     </p>
 </note>
 
-> このトピックでは型付き API について説明します。クラシックな `oauth` プロバイダーについては、[OAuth](server-oauth.md) を参照してください。
+> このトピックでは型付き API について説明します。従来の `oauth` プロバイダーについては、[OAuth](server-oauth.md) を参照してください。
 >
 {style="note"}
 
 ## フローの仕組み {id="flow"}
 
 1. ユーザーがログインパスにアクセスします。Ktor はユーザーを OAuth プロバイダーにリダイレクトします。
-2. ユーザーはプロバイダー側で要求された権限を承認します。
-3. プロバイダーは認可コード（authorization code）を付けてコールバックパスにリダイレクトして戻します。
-4. Ktor はコードをアクセストークンと交換します。
-5. `oauth2Session` の場合、Ktor はセッションを保存してプリンシパル（principal）を解決し、コールバックハンドラーを実行します。
+2. ユーザーがプロバイダー側で要求された権限を承認します。
+3. プロバイダーが認可コードとともにコールバックパスにリダイレクトして戻します。
+4. Ktor がそのコードをアクセストークンと交換します。
+5. `oauth2Session` の場合、Ktor はセッションを保存してプリンシパルを解決し、コールバックハンドラーを実行します。
 
-## oauth2Session でユーザーをサインインさせる {id="oauth2-session"}
+## oauth2Session を使用してユーザーをサインインさせる {id="oauth2-session"}
 
-フローがプロバイダーのトークンエンドポイントを呼び出すには [HttpClient](client-create-and-configure.md) が必要なため、`io.ktor:ktor-client-cio` などのクライアントエンジン依存関係も追加してください。
+フローがプロバイダーのトークンエンドポイントを呼び出すには [HttpClient](client-create-and-configure.md) が必要となるため、`io.ktor:ktor-client-cio` などのクライアントエンジンの依存関係も追加してください。
 
-ルートが処理するプリンシパルと、Ktor が呼び出し元のために保存するセッションの 2 つの型を宣言します。
+ルートで処理するプリンシパルと、Ktor が呼び出し元用に保存するセッションの 2 つの型を宣言します。
 
 ```kotlin
 data class User(val id: String, val email: String)
 data class UserSession(val accessToken: String)
 ```
 
-次にフローを作成します。型引数の順序に注意してください。プリンシパルが最初で、セッションが 2 番目です。
+次にフローを作成します。型引数の順序に注意してください。第 1 引数がプリンシパル、第 2 引数がセッションです。
 
 ```kotlin
 val googleAuthorizeUrl =
@@ -88,10 +88,10 @@ val googleAuth = oauth2Session<User, UserSession>("google") {
 }
 ```
 
-`sessions` ブロックは 2 つの役割を果たします。
+`sessions` ブロックには 2 つの役割があります。
 
-* `sessionCreator` はトークンレスポンスを保存したいセッションに変換します。トークン交換の直後に 1 回実行されます。
-* `validate` は保存されたセッションをプリンシパルに変換します。保護されたルートへのリクエストごとに実行されます。
+* `sessionCreator` は、トークンレスポンスを保存したいセッションに変換します。これはトークン交換の直後に 1 回だけ実行されます。
+* `validate` は、保存されたセッションをプリンシパルに変換します。これは保護されたルートへのリクエストごとに実行されます。
 
 どちらも必須です。
 
@@ -112,18 +112,18 @@ routing {
 }
 ```
 
-`install()` はログインルートとコールバックルートを作成し、セッションスキーム用の [Sessions](server-sessions.md) プラグインをインストールします。ご自身で `Sessions` をインストールする必要はありません。
+`install()` はログインルートを作成し、コールバックルートを作成し、セッションスキーム用の [Sessions](server-sessions.md) プラグインをインストールします。ご自身で `Sessions` をインストールする必要はありません。
 
-保護されたルート内では、`call.principal` は `User` になり、`call.session` は `UserSession` になります。セッションで実行できるすべての機能については、[型安全なセッション認証](server-typed-session-auth.md)を参照してください。
+保護されたルート内では、`call.principal` が `User` となり、`call.session` が `UserSession` となります。セッションでできることの詳細については、[型安全なセッション認証](server-typed-session-auth.md) を参照してください。
 
 ## 保護されたルートはリダイレクトしない {id="redirects"}
 
-フローによって作成されるログインパスとコールバックパスのルートは、未認証の訪問者を OAuth プロバイダーにリダイレクトします。`authenticateWith(flow.session)` で保護されたルートは**リダイレクトしません**。有効なセッションがないリクエストには `401 Unauthorized` が返されます。
+フローによって自動作成されるルート（ログインパスおよびコールバックパス）は、未認証のアクセス者を OAuth プロバイダーにリダイレクトします。一方、`authenticateWith(flow.session)` で保護されたルートは**リダイレクトしません**。有効なセッションのないリクエストには `401 Unauthorized` が返されます。
 
-ユーザーをプロバイダーに送るには、以下の 2 つの方法があります。
+ユーザーをプロバイダーに送るには、次の 2 つの方法があります。
 
-* サインインページから `loginPath` へのリンクを設置する。
-* セッションが存在しない場合に、自分でそこへリダイレクトする。
+* サインインページから `loginPath` へのリンクを設ける。
+* セッションが存在しない場合に、手動でそこへリダイレクトする:
 
   ```kotlin
   val googleAuth = oauth2Session<User, UserSession>("google") {
@@ -140,11 +140,11 @@ routing {
   }
   ```
 
-## サインイン失敗の処理 {id="errors"}
+## サインインの失敗を処理する {id="errors"}
 
-サインインが失敗する 2 つのケースに対応する 2 つのハンドラーが用意されています。
+2 つのハンドラーが、サインインが失敗する 2 つのケースをカバーします。
 
-フローの `onUnauthorized` は、ユーザーによる同意の拒否、トークン交換の失敗、`sessionCreator` や `validate` が `null` を返すといった OAuth エラーを処理します。
+フロー上の `onUnauthorized` は、ユーザーによる同意拒否、トークン交換の失敗、`sessionCreator` や `validate` が `null` を返した場合などの OAuth エラーを処理します。
 
 ```kotlin
 val googleAuth = oauth2Session<User, UserSession>("google") {
@@ -157,7 +157,7 @@ val googleAuth = oauth2Session<User, UserSession>("google") {
 
 ## 複数のプロバイダーを使用する {id="provider-lookup"}
 
-リクエストごとにプロバイダーを選択するには、`settings` の代わりに `providerLookup` を設定します。このブロックはルーティングコンテキスト内で実行されるため、パス、クエリパラメータ、ヘッダーを読み取ることができます。
+リクエストごとにプロバイダーを選択するには、`settings` の代わりに `providerLookup` を設定します。このブロックはルーティングコンテキストで実行されるため、パス、クエリパラメータ、ヘッダーを読み取ることができます。
 
 ```kotlin
 val socialAuth = oauth2Session<User, UserSession>("social") {
@@ -184,11 +184,11 @@ val socialAuth = oauth2Session<User, UserSession>("social") {
 }
 ```
 
-`settings` または `providerLookup` のいずれか一方のみを設定してください。両方を設定することはできません。
+`settings` または `providerLookup` のいずれか一方のみを設定してください。両方を同時に設定することはできません。
 
-## セッションなしでのサインイン {id="oauth2"}
+## セッションなしでサインインする {id="oauth2"}
 
-サインイン後に独自の JWT を発行する場合など、その後のルートを Ktor に保護させる必要がない場合は、`oauth2` を使用します。コールバックハンドラーがトークンレスポンスを受け取ります。
+サインイン後に独自の JWT を発行する場合など、Ktor が以降のルートを保護する必要がない場合は `oauth2` を使用します。コールバックハンドラーはトークンレスポンスを受け取ります。
 
 ```kotlin
 val githubAuthorizeUrl =
@@ -218,16 +218,16 @@ routing {
 }
 ```
 
-ここには `flow.session` がないため、`authenticateWith()` に渡すものはありません。[`jwt`](server-jwt.md) など、別のスキームを使用してルートを保護してください。
+ここには `flow.session` がないため、`authenticateWith()` に渡すものはありません。[`jwt`](server-jwt.md) などの別のスキームでルートを保護してください。
 
 ## セキュリティに関する注意事項 {id="security"}
 
-* `clientSecret` はソースコード管理に含めないでください。環境変数または[設定ファイル](server-configuration-file.topic)から読み取ってください。
-* コールバックは新しく生成されたセッション ID のもとでセッションを保存し、コールバックリクエストと一緒に届いた既存のセッション ID は破棄します。これによりセッション固定化攻撃（session fixation）を防ぎます。
-* デフォルトのセッショントランスポートはセッションデータをサーバー側に保持し、クライアントには ID のみを送信します。値渡し（by-value）のトランスポートに切り替える場合は、トランスフォーマーを追加してください。[トランスポートの選択](server-typed-session-auth.md#transport)を参照してください。
+* `clientSecret` はソース管理に含めないでください。環境変数または[設定ファイル](server-configuration-file.topic)から読み取ります。
+* コールバックは、新しく生成されたセッション ID でセッションを保存し、コールバックリクエストとともに届いたセッション ID は破棄します。これにより、セッション固定化攻撃（Session Fixation）を防止します。
+* デフォルトのセッショントランスポートはセッションデータをサーバー側に保持し、クライアントには ID のみを送信します。値によるトランスポート（by-value transport）に切り替える場合は、トランスフォーマーを追加してください。[トランスポートの選択](server-typed-session-auth.md#transport)を参照してください。
 
 ## 次のステップ {id="next"}
 
-* [型安全な認証](server-typed-auth.md)では、ロール、オプション認証、およびその他の API について説明しています。
-* [型安全なセッション認証](server-typed-session-auth.md)では、セッション、トランスポート、およびユーザーのサインアウトについて説明しています。
-* [OpenID Connect](server-oidc.md) は、OpenID Connect 発行者 URL からこれらのフローを自動的に構成します。
+* [型安全な認証](server-typed-auth.md) では、ロール、オプションの認証、および API のその他の機能について説明しています。
+* [型安全なセッション認証](server-typed-session-auth.md) では、セッション、トランスポート、およびユーザーのサインアウトについて説明しています。
+* [OpenID Connect](server-oidc.md) では、OpenID Connect 発行者（issuer）URL からこれらのフローを自動的に構成する方法について説明しています。

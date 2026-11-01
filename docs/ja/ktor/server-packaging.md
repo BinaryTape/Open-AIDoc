@@ -1,56 +1,63 @@
-[//]: # (title: アプリケーション配布物の作成)
+[//]: # (title: アプリケーションディストリビューションの作成)
 
 <tldr>
 <var name="example_name" value="deployment-ktor-plugin"/>
 <p>
-    <b>コード例</b>:
-    <a href="https://github.com/ktorio/ktor-documentation/tree/%ktor_version%/codeSnippets/snippets/%example_name%">
+    <b>Code example</b>:
+    <a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/%example_name%">
         %example_name%
     </a>
 </p>
 </tldr>
 
-[Ktor Gradle プラグイン](https://github.com/ktorio/ktor-build-plugins)は、コードの依存関係や生成された起動スクリプトを含むアプリケーションのパッケージ化機能を提供する Gradle の [Application プラグイン](https://docs.gradle.org/current/userguide/application_plugin.html)を自動的に適用します。
-このトピックでは、Ktor アプリケーションをパッケージ化して実行する方法について説明します。
+[Ktor Gradleプラグイン](https://github.com/ktorio/ktor-build-plugins)は、Gradleの[Applicationプラグイン](https://docs.gradle.org/current/userguide/application_plugin.html)を自動的に適用します。これにより、コードの依存関係や生成された起動スクリプトを含むアプリケーションのパッケージング機能が提供されます。
 
-## Ktor プラグインの設定 {id="configure-plugin"}
-アプリケーションの配布物を作成するには、まず Ktor プラグインを適用する必要があります。
-1. `build.gradle.kts` ファイルを開き、`plugins` ブロックにプラグインを追加します。
+このトピックでは、Ktorアプリケーションをパッケージ化して実行する方法について学びます。
+
+## Ktorプラグインの設定 {id="configure-plugin"}
+
+アプリケーションディストリビューションを作成するには、まずKtorプラグインを適用する必要があります。
+1. <Path>build.gradle.kts</Path> ファイルを開き、`plugins {}` ブロックにプラグインを追加します:
    ```kotlin
    plugins {
-       id("io.ktor.plugin") version "3.4.0"
+       alias(ktorLibs.plugins.ktor)
    }
    ```
 
-2. [メインアプリケーションクラス](server-dependencies.topic#create-entry-point)が設定されていることを確認します。
+   <note>
+       上記のコードスニペットでは、Ktorの依存関係を指定するために<a href="server-dependencies.topic#using-version-catalog">Ktorバージョンカタログ</a>を使用しています。
+   </note>
+
+2. [メインアプリケーションクラス](server-dependencies.topic#create-entry-point)が設定されていることを確認します:
    ```kotlin
    application {
        mainClass.set("com.example.ApplicationKt")
    }
    ```
 
-## アプリケーションのパッケージ化 {id="package"}
-Application プラグインは、アプリケーションをパッケージ化するためのさまざまな方法を提供しています。例えば、`installDist` タスクは、すべてのランタイム依存関係と起動スクリプトを含めてアプリケーションをインストールします。完全な配布アーカイブを作成するには、`distZip` タスクや `distTar` タスクを使用できます。
+## アプリケーションのパッケージング {id="package"}
 
-このトピックでは、`installDist` を使用します。
-1. ターミナルを開きます。
-2. オペレーティングシステムに応じて、次のいずれかの方法で `installDist` タスクを実行します。
+Applicationプラグインは、アプリケーションをパッケージ化するためのさまざまな方法を提供します。例えば、`installDist` タスクは、すべてのランタイム依存関係と起動スクリプトを含めてアプリケーションをインストールします。完全なディストリビューションアーカイブを作成するには、`distZip` および `distTar` タスクを使用できます。
+
+すべてのランタイム依存関係と起動スクリプトを含めてアプリケーションをインストールするには、新しいターミナルウィンドウを開いて `installDist` タスクを実行します:
    
-   <Tabs group="os">
-   <TabItem title="Linux/macOS" group-key="unix">
-   <code-block code="./gradlew installDist"/>
-   </TabItem>
-   <TabItem title="Windows" group-key="windows">
-   <code-block code="gradlew.bat installDist"/>
-   </TabItem>
-   </Tabs>
+<Tabs group="os">
+<TabItem title="Linux/macOS" group-key="unix">
+<code-block code="./gradlew installDist"/>
+</TabItem>
+<TabItem title="Windows" group-key="windows">
+<code-block code="gradlew.bat installDist"/>
+</TabItem>
+</Tabs>
 
-   Application プラグインは、`build/install/<project_name>` フォルダにアプリケーションのイメージを作成します。
+Applicationプラグインによって、<Path>build/install/<project_name></Path> フォルダ内にアプリケーションのイメージが作成されます。 
 
 ## アプリケーションの実行 {id="run"}
-[パッケージ化されたアプリケーション](#package)を実行するには：
-1. ターミナルで `build/install/<project_name>/bin` フォルダに移動します。
-2. オペレーティングシステムに応じて、`<project_name>` または `<project_name>.bat` 実行ファイルを実行します。例：
+
+[パッケージ化されたアプリケーション](#package)を実行するには、以下の手順に従います:
+
+1. ターミナルで <Path>build/install/<project_name>/bin</Path> フォルダに移動します。
+2. オペレーティングシステムに応じて、`<project_name>` または `<project_name>.bat` 実行可能ファイルを実行します（例）:
 
    <snippet id="run_executable">
    <Tabs group="os">
@@ -63,10 +70,10 @@ Application プラグインは、アプリケーションをパッケージ化�
    </Tabs>
    </snippet>
    
-3. 次のメッセージが表示されるまで待ちます。
+3. 次のメッセージが表示されるまで待ちます:
    ```Bash
    [main] INFO  Application - Responding at http://0.0.0.0:8080
    ```
-   ブラウザでリンクを開き、実行中のアプリケーションを確認します。
+   ブラウザでリンクを開き、実行中のアプリケーションを確認します:
 
    <img src="ktor_idea_new_project_browser.png" alt="Ktor app in a browser" width="430"/>

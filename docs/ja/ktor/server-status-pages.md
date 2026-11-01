@@ -6,10 +6,11 @@
 <var name="plugin_name" value="StatusPages"/>
 <var name="package_name" value="io.ktor.server.plugins.statuspages"/>
 <var name="artifact_name" value="ktor-server-status-pages"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.server.statusPages"/>
 
 <tldr>
 <p>
-<b>必須の依存関係</b>: <code>io.ktor:%artifact_name%</code>
+<b>必要な依存関係</b>: <code>io.ktor:%artifact_name%</code>
 </p>
 <var name="example_name" value="status-pages"/>
 <p>
@@ -19,27 +20,35 @@
     </a>
 </p>
 <p>
-    <b><Links href="/ktor/server-native" summary="Ktor は Kotlin/Native をサポートしており、追加のランタイムや仮想マシンなしでサーバーを実行できます。">Native サーバー</Links>のサポート</b>: ✅
+    <b><Links href="server-native.md" summary="KtorはKotlin/Nativeをサポートしており、追加のランタイムや仮想マシンなしでサーバーを実行できます。">ネイティブサーバー</Links>のサポート</b>: ✅
 </p>
 </tldr>
 
 <link-summary>
-%plugin_name% は、スローされた例外やステータスコードに基づいて、Ktor アプリケーションがあらゆる失敗状態に対して適切に応答できるようにします。
+%plugin_name% により、Ktor アプリケーションはスローされた例外やステータスコードに基づいて、あらゆる障害状態に適切に応答できるようになります。
 </link-summary>
 
-[%plugin_name%](https://api.ktor.io/ktor-server-status-pages/io.ktor.server.plugins.statuspages/-status-pages.html) プラグインを使用すると、Ktor アプリケーションはスローされた例外やステータスコードに基づいて、あらゆる失敗状態に対して適切に[応答](server-responses.md)できるようになります。
+[%plugin_name%](https://api.ktor.io/ktor-server-status-pages/io.ktor.server.plugins.statuspages/-status-pages.html) プラグインを使用すると、Ktor アプリケーションはスローされた例外やステータスコードに基づいて、あらゆる障害状態に適切に[応答](server-responses.md)できるようになります。
 
 ## 依存関係の追加 {id="add_dependencies"}
 
 <p>
-    <code>%plugin_name%</code> を使用するには、ビルドスクリプトに <code>%artifact_name%</code> アーティファクトを含める必要があります。
+    <code>%plugin_name%</code> を使用するには、ビルドスクリプトに <code>%artifact_name%</code> アーティファクトを追加します:
 </p>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上記のコードスニペットでは、Ktorの依存関係を指定するために <a href="server-dependencies.topic#using-version-catalog">
+            Ktor バージョンカタログ</a> を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上記のコードスニペットでは、Ktorの依存関係を指定するために <a href="server-dependencies.topic#using-version-catalog">
+            Ktor バージョンカタログ</a> を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
@@ -49,15 +58,15 @@
 ## %plugin_name% のインストール {id="install_plugin"}
 
 <p>
-    <code>%plugin_name%</code> プラグインをアプリケーションに<a href="server-plugins.md#install">インストール</a>するには、指定された<Links href="/ktor/server-modules" summary="モジュールを使用すると、ルートをグループ化してアプリケーションを構造化できます。">モジュール</Links>内の <code>install</code> 関数に渡します。
-    以下のコードスニペットは、<code>%plugin_name%</code> をインストールする方法を示しています。
+    <code>%plugin_name%</code> プラグインをアプリケーションに<a href="server-plugins.md#install">インストール</a>するには、指定された<Links href="server-modules.md" summary="モジュールを使用すると、ルートをグループ化してアプリケーションを構造化できます。">モジュール</Links>内の <code>install</code> 関数に渡します。
+    以下の例は、<code>%plugin_name%</code> をインストールする方法を示しています:
 </p>
 <list>
     <li>
-        ... <code>embeddedServer</code> 関数の呼び出し内。
+        <code>embeddedServer()</code> 関数呼び出し内。
     </li>
     <li>
-        ... <code>Application</code> クラスの拡張関数である、明示的に定義された <code>module</code> 内。
+        <code>Application</code> クラスに明示的に定義された <code>module()</code> 拡張関数内。
     </li>
 </list>
 <Tabs>
@@ -71,15 +80,15 @@
 
 ## %plugin_name% の設定 {id="configure"}
 
-`%plugin_name%` プラグインには、主に 3 つの設定オプションがあります。
+`%plugin_name%` プラグインには、主に3つの設定オプションが用意されています:
 
 - [exceptions](#exceptions): マッピングされた例外クラスに基づいてレスポンスを設定します
 - [status](#status): ステータスコードの値に対するレスポンスを設定します
 - [statusFile](#status-file): クラスパスからのファイルレスポンスを設定します
 
-### 例外 (Exceptions) {id="exceptions"}
+### 例外 {id="exceptions"}
 
-`exception` ハンドラーを使用すると、`Throwable` 例外が発生したコールを処理できます。最も基本的なケースでは、任意の例外に対して `500` HTTP ステータスコードを設定できます。
+`exception` ハンドラーを使用すると、`Throwable` 例外が発生した呼び出しを処理できます。最も基本的なケースでは、任意の例外に対して `500` HTTP ステータスコードを設定できます:
 
 ```kotlin
 install(StatusPages) {
@@ -89,7 +98,7 @@ install(StatusPages) {
 }
 ```
 
-特定の例外をチェックし、必要なコンテンツで応答することもできます。
+また、特定の例外をチェックして、必要なコンテンツで応答することもできます:
 
 ```kotlin
 install(StatusPages) {
@@ -103,9 +112,9 @@ install(StatusPages) {
 }
 ```
 
-### ステータス (Status) {id="status"}
+### ステータス {id="status"}
 
-`status` ハンドラーは、ステータスコードに基づいて特定のコンテンツで応答する機能を提供します。以下の例は、サーバー上にリソースが見つからない場合（`404` ステータスコード）のリクエストに応答する方法を示しています。
+`status` ハンドラーは、ステータスコードに基づいて特定のコンテンツで応答する機能を提供します。以下の例は、サーバー上にリソースが存在しない場合（ステータスコード `404`）にリクエストへ応答する方法を示しています:
 
 ```kotlin
 install(StatusPages) {
@@ -115,15 +124,15 @@ install(StatusPages) {
 }
 ```
 
-### ステータスファイル (Status file) {id="status-file"}
+### ステータスファイル {id="status-file"}
 
-`statusFile` ハンドラーを使用すると、ステータスコードに基づいて HTML ページを返すことができます。プロジェクトの `resources` フォルダに `error401.html` と `error402.html` という HTML ページが含まれているとします。この場合、以下のように `statusFile` を使用して `401` および `402` ステータスコードを処理できます。
+`statusFile` ハンドラーを使用すると、ステータスコードに基づいて HTML ページを返すことができます。プロジェクトの `resources` フォルダーに `error401.html` と `error402.html` という HTML ページが含まれているとします。この場合、次のように `statusFile` を使用して `401` および `402` ステータスコードを処理できます:
 ```kotlin
 install(StatusPages) {
     statusFile(HttpStatusCode.Unauthorized, HttpStatusCode.PaymentRequired, filePattern = "error#.html")
 }
 ```
 
-`statusFile` ハンドラーは、設定されたステータスのリスト内で `#` 文字をステータスコードの値に置き換えます。
+`statusFile` ハンドラーは、設定されたステータスのリスト内にあるステータスコードの値で、任意の `#` 文字を置き換えます。
 
 > 完全な例はこちらで確認できます: [status-pages](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/status-pages)。

@@ -5,15 +5,15 @@
 <no-index/>
 
 <tldr>
-   <p>これは画像付きのブロックです（<strong>Compose Multiplatform の入門</strong>チュートリアルから引用）。</p>
-   <p><img src="icon-1-done.svg" width="20" alt="第1ステップ"/> <a href="jvm-create-project-with-spring-boot.md">Kotlin を使用して Spring Boot プロジェクトを作成する</a><br/>
-      <img src="icon-2-done.svg" width="20" alt="第2ステップ"/> <a href="jvm-spring-boot-add-data-class.md">Spring Boot プロジェクトにデータクラスを追加する</a><br/>
-      <img src="icon-3.svg" width="20" alt="第3ステップ"/> <strong>Spring Boot プロジェクトにデータベースサポートを追加する</strong><br/>
+   <p>これは画像付きのブロックです（<strong>Compose Multiplatform の基本</strong>チュートリアルより引用）。</p>
+   <p><img src="icon-1-done.svg" width="20" alt="第1ステップ"/> <a href="jvm-create-project-with-spring-boot.md">Kotlin を使った Spring Boot プロジェクトの作成</a><br/>
+      <img src="icon-2-done.svg" width="20" alt="第2ステップ"/> <a href="jvm-spring-boot-add-data-class.md">Spring Boot プロジェクトへのデータクラスの追加</a><br/>
+      <img src="icon-3.svg" width="20" alt="第3ステップ"/> <strong>Spring Boot プロジェクトへのデータベースサポートの追加</strong><br/>
       <img src="icon-4-todo.svg" width="20" alt="第4ステップ"/> データベースアクセスに Spring Data CrudRepository を使用する><br/>
     </p>
 </tldr>
 
-## 同期タブ {id="synchronized-tabs"}
+## 同期されたタブ {id="synchronized-tabs"}
 
 <tabs group="build-script">
 <tab title="Kotlin" group-key="kotlin">
@@ -61,7 +61,7 @@ plugins {
 
 ### 折りたたまれたセクション {initial-collapse-state="collapsed" collapsible="true" id="collapsed-section"}
 
-ここにテキストとコードブロックがあります:
+ここにテキストとコードブロックが入ります:
 
 ```kotlin
 plugins {
@@ -71,7 +71,7 @@ plugins {
 
 ## コードブロック {id="codeblocks"}
 
-単なるコードブロック:
+通常のコードブロック:
 
 ```kotlin
     import java.util.*
@@ -126,19 +126,19 @@ fun main() {
     val user = User("Alex", 1)
     
     //sampleStart
-    // 出力が読みやすくなるよう自動的に toString() 関数を使用します
+    // 出力が読みやすくなるよう、自動的に toString() 関数を使用します
     println(user)            
     // User(name=Alex, id=1)
     //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
 ## テーブル {id="tables"}
 
 ### Markdown テーブル {id="markdown-table"}
 
-| プリミティブ型配列                                                                     | Java での同等物        |
+| プリミティブ型配列                                                                     | Java における同等物 |
 |---------------------------------------------------------------------------------------|--------------------|
 | [`BooleanArray`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean-array/) | `boolean[]`        |
 | [`ByteArray`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-byte-array/)       | `byte[]`           |
@@ -157,12 +157,12 @@ fun main() {
         <td><strong>2023年12月</strong></td>
     </tr>
     <tr>
-        <td><strong>次回アップデート</strong></td>
+        <td><strong>次回更新</strong></td>
         <td><strong>2024年6月</strong></td>
     </tr>
 </table>
 
-### コードブロックを含む XML テーブル {id="xml-table-with-codeblocks-inside"}
+### 内部にコードブロックを含む XML テーブル {id="xml-table-with-codeblocks-inside"}
 
 シンプルなテーブル:
 
@@ -298,7 +298,7 @@ jvmTest<Scope>
     2. 3.2
     3. 3.3
         1. 3.1.1
-4. コードブロックを含む項目:
+4. 内部にコードブロックを含む場合:
 
    ```kotlin
    jvmTest<Scope>
@@ -306,13 +306,13 @@ jvmTest<Scope>
 
 ### 順不同リスト {id="non-ordered-list"}
 
-* 1つ目の箇条書き
-* 2つ目の箇条書き
-* 3つ目の箇条書き
+* 最初の項目
+* 2番目の項目
+* 3番目の項目
+    * さらにもう1つ
     * もう1つ
-    * さらに1つ
-        * おっと、もう1つ
-* コードブロックを含む項目:
+        * おっと、さらにもう1つ
+* 内部にコードブロックを含む場合:
 
    ```kotlin
    jvmTest<Scope>
@@ -322,92 +322,92 @@ jvmTest<Scope>
 
 <deflist collapsible="true">
    <def title="折りたたみ可能な項目 #1">
-      <p><code>CrudRepository</code> インターフェースの <code>findById()</code> 関数の戻り値の型は、<code>Optional</code> クラスのインスタンスです。しかし、一貫性を保つために単一のメッセージを含む <code>List</code> を返す方が便利です。そのためには、<code>Optional</code> の値が存在する場合はアンラップし、その値を含むリストを返す必要があります。これは、<code>Optional</code> 型への<a href="extensions.md#extension-functions">拡張関数</a>として実装できます。</p>
-      <p>コード内の <code>Optional&lt;out T&gt;.toList()</code> では、<code>.toList()</code> が <code>Optional</code> に対する拡張関数です。拡張関数を使用すると、任意のクラスに機能を追加する関数を作成できます。これは、ライブラリクラスの機能を拡張したい場合に特に便利です。</p>
+      <p><code>CrudRepository</code> インターフェースの <code>findById()</code> 関数の戻り値の型は、<code>Optional</code> クラスのインスタンスです。しかし、一貫性を保つためには、単一のメッセージを含む <code>List</code> を返す方が便利です。そのためには、<code>Optional</code> の値が存在する場合はそれをアンラップし、その値を含むリストを返す必要があります。これは <code>Optional</code> 型に対する<a href="extensions.md#extension-functions">拡張関数</a>として実装できます。</p>
+      <p>コード内の <code>Optional&lt;out T&gt;.toList()</code> では、<code>.toList()</code> が <code>Optional</code> に対する拡張関数です。拡張関数を使用すると、任意のクラスに対して追加の関数を記述できます。これは、特定のライブラリクラスの機能を拡張したい場合に特に便利です。</p>
    </def>
    <def title="折りたたみ可能な項目 #2">
-      <p><a href="https://docs.spring.io/spring-data/relational/reference/#jdbc.entity-persistence">この関数</a>は、新しいオブジェクトがデータベース内に id を持っていないという前提で動作します。そのため、挿入時には id が <b>null である必要</b>があります。</p>
-      <p>id が <i>null</i> でない場合、<code>CrudRepository</code> はオブジェクトがデータベースにすでに存在すると想定し、<i>insert</i> 操作ではなく <i>update</i> 操作とみなします。insert 操作の後、<code>id</code> はデータストアによって生成され、<code>Message</code> インスタンスに再代入されます。これが、<code>id</code> プロパティを <code>var</code> キーワードを使用して宣言する必要がある理由です。</p>
+      <p><a href="https://docs.spring.io/spring-data/relational/reference/#jdbc.entity-persistence">この関数は</a>、新しいオブジェクトがデータベース内にまだ id を持っていないという前提で動作します。そのため、挿入時には id が <b>null である必要があります</b>。</p>
+      <p>id が <i>null</i> でない場合、<code>CrudRepository</code> はそのオブジェクトがすでにデータベースに存在しているとみなし、<i>insert</i>（挿入）操作ではなく <i>update</i>（更新）操作であると判断します。insert 操作の後、<code>id</code> はデータストアによって生成され、<code>Message</code> インスタンスに再割り当てされます。これが、<code>id</code> プロパティを <code>var</code> キーワードを使用して宣言する必要がある理由です。</p>
       <p></p>
    </def>
 </deflist>
 
-### Clear 定義リスト {id="clear-definition-list"}
+### クリア定義リスト {id="clear-definition-list"}
 
 <deflist appearance="clear" collapsible="true">
 <def title="展開可能な項目 #1">
 
-番号なしの展開可能な項目です。ウィジェットの外枠のみをテストするため、本文はプレーンテキストになっています。
+番号のない展開可能な項目です。ウィジェットのクロム（外枠）のみをテストするため、本文はプレーンテキストになっています。
 
 </def>
 <def title="展開可能な項目 #2">
 
-2つ目の展開可能な項目です。これを展開しても、兄弟項目の状態が変化してはなりません。
+2番目の展開可能な項目です。これを展開しても、兄弟項目の状態が変化してはなりません。
 
 </def>
 <def title="展開可能な項目 #3">
 
-番号なしリストを締めくくる、3つ目の展開可能な項目です。
+3番目の展開可能な項目で、番号なしリストを締めくくります。
 
 </def>
 </deflist>
 
-### 番号付き Clear 定義リスト {id="numbered-clear-definition-list"}
+### 番号付きクリア定義リスト {id="numbered-clear-definition-list"}
 
 <deflist appearance="clear" collapsible="true" numbered="true">
 <def title="番号付き項目 #1">
 
-生成された番号 1 とともに描画される番号付き項目の説明です。
+生成された番号 1 とともにレンダリングされる番号付き項目の説明。
 
 </def>
 <def title="番号付き項目 #2">
 
-生成された番号 2 とともに描画される番号付き項目の説明です。
+生成された番号 2 とともにレンダリングされる番号付き項目の説明。
 
 </def>
 <def title="番号付き項目 #3">
 
-生成された番号 3 とともに描画される番号付き項目の説明です。
+生成された番号 3 とともにレンダリングされる番号付き項目の説明。
 
 </def>
 <def title="番号付き項目 #4">
 
-生成された番号 4 とともに描画される番号付き項目の説明です。
+生成された番号 4 とともにレンダリングされる番号付き項目の説明。
 
 </def>
 <def title="番号付き項目 #5">
 
-生成された番号 5 とともに描画される番号付き項目の説明です。
+生成された番号 5 とともにレンダリングされる番号付き項目の説明。
 
 </def>
 <def title="番号付き項目 #6">
 
-生成された番号 6 とともに描画される番号付き項目の説明です。
+生成された番号 6 とともにレンダリングされる番号付き項目の説明。
 
 </def>
-<def title="生成された番号のぶら下げインデントが崩れないことを確認するために、狭いビューポートで複数行に折り返す必要がある意図的に長い項目のタイトル">
+<def title="生成された番号のぶら下げインデントが維持されるよう、狭いビューポートで複数行に折り返される必要のある意図的に長い項目のタイトル">
 
-生成された番号 7 とともに描画される番号付き項目の説明です。
+生成された番号 7 とともにレンダリングされる番号付き項目の説明。
 
 </def>
 <def title="番号付き項目 #8">
 
-生成された番号 8 とともに描画される番号付き項目の説明です。
+生成された番号 8 とともにレンダリングされる番号付き項目の説明。
 
 </def>
 <def title="番号付き項目 #9">
 
-生成された番号 9 とともに描画される番号付き項目の説明です。
+生成された番号 9 とともにレンダリングされる番号付き項目の説明。
 
 </def>
 <def title="番号付き項目 #10">
 
-生成された番号 10 とともに描画される番号付き項目の説明です。
+生成された番号 10 とともにレンダリングされる番号付き項目の説明。
 
 </def>
 <def title="番号付き項目 #11">
 
-生成された番号 11 とともに描画される番号付き項目の説明です。
+生成された番号 11 とともにレンダリングされる番号付き項目の説明。
 
 </def>
 </deflist>
@@ -426,7 +426,7 @@ fun main() {
     // ここにコードを記述してください
 }
 ```
-{validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="test-page-exercise-1"}
+{validate="false" kotlin-runnable="true" id="test-page-exercise-1"}
 
 ```kotlin
 fun main() {
@@ -440,15 +440,15 @@ fun main() {
 </def>
 <def title="2つの結果が一致するかどうかを確認する" id="test-page-practice-2">
 
-両方の結果が等しい場合は `You win :)` を、それ以外の場合は `You lose :(` を出力するように `if` を使用してください。
+両方の結果が等しい場合は `You win :)` を、そうでない場合は `You lose :(` を出力するために `if` を使用してください。
 
-> この演習にはネストされたヒントも含まれているため、演習自体を折りたたむことなく内側の折りたたみリストが開く必要があります。
+> この演習にはネストされたヒントも含まれているため、内側の折りたたみ可能リストは演習自体を折りたたむことなく開く必要があります。
 >
 {style="tip"}
 
 <deflist collapsible="true">
     <def title="ヒント">
-        結果を比較するには等価演算子 (<code>==</code>) を使用します。
+        結果を比較するには等価演算子（<code>==</code>）を使用します。
     </def>
 </deflist>
 
@@ -459,7 +459,7 @@ fun main() {
     // ここにコードを記述してください
 }
 ```
-{validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="test-page-exercise-2"}
+{validate="false" kotlin-runnable="true" id="test-page-exercise-2"}
 
 ```kotlin
 fun main() {
@@ -485,7 +485,7 @@ fun main() {
     // ここにコードを記述してください
 }
 ```
-{validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="test-page-exercise-3"}
+{validate="false" kotlin-runnable="true" id="test-page-exercise-3"}
 
 ```kotlin
 fun main() {
@@ -516,17 +516,17 @@ fun main() {
 
 ### YouTube からの動画 {id="video-from-youtube"}
 
-<video src="https://www.youtube.com/v/Ol_96CHKqg8" title="What's new in Kotlin 1.9.20"/>
+<video src="https://www.youtube.com/v/Ol_96CHKqg8" title="Kotlin 1.9.20 の新機能"/>
 
 ### 画像 {id="pictures"}
 
-標準 (Markdown):
+通常（Markdown）:
 
-![テストを作成する](create-test.png){width="700"}
+![テストの作成](create-test.png){width="700"}
 
-標準 (XML):
+通常（XML）:
 
-<img src="multiplatform-web-wizard.png" alt="Multiplatform web wizard" width="400"/>
+<img src="multiplatform-web-wizard.png" alt="Multiplatform ウェブウィザード" width="400"/>
 
 インライン:
 
@@ -539,28 +539,28 @@ fun main() {
 ボタンスタイル:
 
 <a href="https://kmp.jetbrains.com">
-   <img src="multiplatform-create-project-button.png" alt="プロジェクトを作成" style="block"/>
+   <img src="multiplatform-create-project-button.png" alt="プロジェクトの作成" style="block"/>
 </a>
 
 ## ノート {id="notes"}
 
 警告:
 
-> kapt コンパイラープラグインでの K2 のサポートは[実験的 (Experimental)](components-stability.md)です。
-> オプトインが必要です（詳細は以下を参照）。評価目的のみに使用してください。
+> kapt コンパイラプラグインにおける K2 のサポートは[実験的](components-stability.md)です。
+> オプトインが必要です（詳細は下記を参照）。また、評価目的でのみ使用してください。
 >
 {style="warning"}
 
-注記:
+注意:
 
-> Kotlin/Native に同梱されているネイティブプラットフォームライブラリ（Foundation、UIKit、POSIX など）については、一部の API のみ
-> `@ExperimentalForeignApi` によるオプトインが必要です。そのような場合、オプトインを要求する警告が表示されます。
+> Kotlin/Native に同梱されているネイティブプラットフォームライブラリ（Foundation、UIKit、POSIX など）については、
+> 一部の API のみ `@ExperimentalForeignApi` によるオプトインが必要です。そのような場合、オプトインを要求する警告が表示されます。
 >
 {style="note"}
 
 ヒント:
 
-> Kotlin/Native に同梱されているネイティブプラットフォームライブラリ（Foundation、UIKit、POSIX など）については、一部の API のみ
-> `@ExperimentalForeignApi` によるオプトインが必要です。そのような場合、オプトインを要求する警告が表示されます。
+> Kotlin/Native に同梱されているネイティブプラットフォームライブラリ（Foundation、UIKit、POSIX など）については、
+> 一部の API のみ `@ExperimentalForeignApi` によるオプトインが必要です。そのような場合、オプトインを要求する警告が表示されます。
 >
 {style="tip"}

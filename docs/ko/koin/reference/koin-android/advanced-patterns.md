@@ -1,222 +1,143 @@
 ---
-title: 고급 안드로이드 패턴
+title: 고급 Android 패턴
 ---
 
-이 가이드는 Koin을 사용한 안드로이드 전용 고급 의존성 주입(dependency injection) 패턴을 다룹니다.
+# 고급 Android 패턴
 
-:::info
-플랫폼에 독립적인 패턴(컬렉션, 데코레이터, 제네릭 타입, 순환 의존성)에 대해서는 [정의(Definitions)](/docs/reference/koin-core/definitions) 및 [모듈(Modules)](/docs/reference/koin-core/modules)을 참조하세요.
-:::
+이 페이지에서는 빌드 타입(Build Type) 또는 플레이버(Flavor)별 구현체 선택, 현재 Activity가 필요한 UI 헬퍼 선언 등 Android 전용 패턴을 다룹니다. 모든 플랫폼에서 공통으로 동작하는 패턴(컬렉션, 제네릭, 데코레이터, 프로바이더)은 [Advanced Patterns](/docs/reference/koin-core/advanced-patterns)에서, 스코프 연결은 [Scopes](/docs/reference/koin-core/scopes)에서 확인할 수 있습니다.
 
-## 싱글톤에서의 안드로이드 컨텍스트(Context) {id="android-context-in-singletons"}
+## 빌드 변체(Build Variant)별 구현체 {id="implementations-per-build-variant"}
 
-### Activity 누수 방지 {id="avoiding-activity-leaks"}
+### BuildConfig 사용하기 {id="with-buildconfig"}
 
+프로바이더 함수 내에서 구현체를 선택합니다.
+
+**Compiler Plugin DSL**
 ```kotlin
-// ❌ 나쁨 - 싱글톤을 통한 Activity 누수 발생
-module {
-    single { SomeService(get<Activity>()) }
-}
+import org.koin.plugin.module.dsl.create
 
-// ✅ 좋음 - Application 컨텍스트 사용
-module {
-    single { SomeService(androidContext()) }
-}
-
-// ✅ 좋음 - Activity에 종속된 의존성에는 scoped 사용
-module {
-    activityScope {
-        scoped { ActivityBoundService() }
-    }
-}
-```
-
-### 컨텍스트 타입 {id="context-types"}
-
-```kotlin
-module {
-    // Application 컨텍스트 - 싱글톤에 안전함
-    single { DatabaseHelper(androidContext()) }
-
-    // Application 인스턴스
-    single { AppConfig(androidApplication()) }
-}
-```
-
-## BuildConfig를 이용한 조건부 바인딩 {id="conditional-bindings-with-buildconfig"}
-
-### 빌드 변리언트(Build Variant) {id="build-variant"}
-
-```kotlin
-fun createLogger(): Logger =
-    if (BuildConfig.DEBUG) DebugLogger() else ReleaseLogger()
-
-val loggingModule = module {
-    single { create(::createLogger) }
-}
-```
-
-또는 어노테이션 사용 시:
-
-```kotlin
-@Module
-class LoggingModule {
-    @Single
-    fun provideLogger(): Logger =
-        if (BuildConfig.DEBUG) DebugLogger() else ReleaseLogger()
-}
-```
-
-### 애널리틱스 토글 {id="analytics-toggle"}
-
-```kotlin
-fun createAnalyticsService(): AnalyticsService =
-    if (BuildConfig.ENABLE_ANALYTICS) GoogleAnalytics() else NoOpAnalytics()
+fun analytics(context: Context): Analytics =
+    if (BuildConfig.ENABLE_ANALYTICS) FirebaseAnalyticsTracker(context) else NoOpAnalytics()
 
 val analyticsModule = module {
-    single { create(::createAnalyticsService) }
+    single { create(::analytics) }
 }
 ```
 
-### 피처 플래그(Feature Flags) {id="feature-flags"}
-
+**Annotations**
 ```kotlin
-@Singleton
-class PaymentProcessor(
-    private val featureFlags: FeatureFlagService,
-    private val newProcessor: NewPaymentProcessor,
-    private val legacyProcessor: LegacyPaymentProcessor
-) {
-    fun process(amount: Double) {
-        if (featureFlags.isEnabled("new_payment_flow")) {
-            newProcessor.process(amount)
-        } else {
-            legacyProcessor.process(amount)
-        }
+@Module
+class AnalyticsModule {
+
+    @Singleton
+    fun analytics(context: Context): Analytics =
+        if (BuildConfig.ENABLE_ANALYTICS) FirebaseAnalyticsTracker(context) else NoOpAnalytics()
+}
+```
+
+**Constructor / Classic DSL**
+```kotlin
+val analyticsModule = module {
+    single<Analytics> {
+        if (BuildConfig.ENABLE_ANALYTICS) FirebaseAnalyticsTracker(androidContext()) else NoOpAnalytics()
     }
 }
 ```
 
-## 안드로이드 Dialog 프로바이더 {id="android-dialog-provider"}
+`ENABLE_ANALYTICS`는 빌드 타입 또는 플레이버별로 설정된 `buildConfigField`입니다. `BuildConfig.DEBUG`도 동일한 방식으로 동작합니다. 두 구현체 모두 모든 변체에 컴파일되지만, 인스턴스는 하나만 생성됩니다.
 
-안드로이드 UI 컴포넌트를 위한 팩토리를 생성합니다:
+### 소스 세트(Source Set) 사용하기 {id="with-source-sets"}
+
+릴리스 APK에 디버그 전용 코드가 포함되지 않도록 하려면, 각 변체 소스 세트에 동일한 Koin 모듈을 선언하세요.
 
 ```kotlin
-@Factory
+// src/debug/kotlin/com/app/di/VariantModule.kt
+val variantModule = module {
+    single<Logger> { VerboseLogger() }
+    single<NetworkInspector> { ChuckerInspector(androidContext()) }
+}
+```
+
+```kotlin
+// src/release/kotlin/com/app/di/VariantModule.kt
+val variantModule = module {
+    single<Logger> { CrashlyticsLogger() }
+    single<NetworkInspector> { NoOpInspector() }
+}
+```
+
+```kotlin
+// src/main
+startKoin {
+    androidContext(this@MainApplication)
+    modules(appModule, variantModule)
+}
+```
+
+`src/main`은 빌드마다 하나의 `variantModule`만 참조하므로 양쪽 빌드에서 모두 정상적으로 컴파일됩니다. 각 변체는 자체 구현체와 해당 라이브러리만 포함하여 패키징됩니다(디버그 전용 의존성에는 `debugImplementation` 사용).
+
+## Activity가 필요한 UI 헬퍼 {id="ui-helpers-that-need-the-activity"}
+
+다이얼로그, 권한 요청, Activity 테마를 사용하는 기능 등 일부 헬퍼는 Application이 아닌 현재 Activity를 필요로 합니다. Application 컨텍스트로 생성된 `AlertDialog`는 화면에 표시될 때 오류가 발생합니다. 이러한 헬퍼는 `Context`가 Activity로 확인(resolve)되는 Activity 스코프에 선언해야 합니다.
+
+**Compiler Plugin DSL**
+```kotlin
 class DialogProvider(private val context: Context) {
 
-    fun createConfirmDialog(title: String, onConfirm: () -> Unit): AlertDialog =
+    fun confirm(title: String, onConfirm: () -> Unit): AlertDialog =
         AlertDialog.Builder(context)
             .setTitle(title)
-            .setPositiveButton("OK") { _, _ -> onConfirm() }
-            .create()
-
-    fun createErrorDialog(message: String): AlertDialog =
-        AlertDialog.Builder(context)
-            .setTitle("Error")
-            .setMessage(message)
-            .setPositiveButton("OK", null)
+            .setPositiveButton(android.R.string.ok) { _, _ -> onConfirm() }
             .create()
 }
 
-class MainActivity : AppCompatActivity() {
-    private val dialogProvider: DialogProvider by inject()
-
-    fun showConfirmation() {
-        dialogProvider.createConfirmDialog("Confirm") { /* action */ }.show()
-    }
-}
-```
-
-## 계층적 스코프(Hierarchical Scopes) {id="hierarchical-scopes"}
-
-공유 액세스를 위해 안드로이드 스코프를 연결합니다:
-
-```kotlin
-val appModule = module {
-    single { Database() }
-
-    scope(named("session")) {
-        scoped { UserSession() }
-    }
-
-    scope(named("shopping")) {
-        scoped { ShoppingCart(get()) }
-    }
-}
-
-// 스코프 생성 및 연결
-val sessionScope = getKoin().createScope("user_session", named("session"))
-val shoppingScope = getKoin().createScope("cart", named("shopping"))
-shoppingScope.linkTo(sessionScope)
-
-// 장바구니는 연결된 스코프에서 UserSession에 접근 가능
-val cart = shoppingScope.get<ShoppingCart>()
-```
-
-## 동적 피처 레지스트리(Dynamic Feature Registry) {id="dynamic-feature-registry"}
-
-설정을 기반으로 컬렉션을 빌드합니다:
-
-```kotlin
-@Singleton
-class FeatureRegistry(private val config: AppConfig) : KoinComponent {
-
-    fun getEnabledFeatures(): List<Feature> {
-        return config.enabledFeatures.mapNotNull { name ->
-            getKoin().getOrNull<Feature>(named(name))
-        }
-    }
-}
-```
-
-## 흔한 안드로이드 실수(Pitfalls) {id="common-android-pitfalls"}
-
-### 숨겨진 순환 호출 {id="hidden-circular-calls"}
-
-```kotlin
-// ⚠️ Lazy는 순환을 숨기지만 런타임에 무한 루프가 발생합니다
-class ServiceA : KoinComponent {
-    private val serviceB: ServiceB by inject()
-    fun doA() { serviceB.doB() }
-}
-
-class ServiceB : KoinComponent {
-    private val serviceA: ServiceA by inject()
-    fun doB() { serviceA.doA() }  // 무한 루프!
-}
-```
-
-### ViewModel 스코프 혼동 {id="viewmodel-scope-confusion"}
-
-```kotlin
-// ❌ 나쁨 - Activity 스코프 내의 ViewModel은 회전 시 상태를 잃음
-module {
+val uiModule = module {
     activityScope {
-        scoped { UserViewModel(get()) }
+        scoped<DialogProvider>()
     }
 }
+```
 
-// ✅ 좋음 - 올바른 생명주기를 위해 viewModel 사용
-module {
-    viewModel { UserViewModel(get()) }
+**Annotations**
+```kotlin
+@ActivityScope
+class DialogProvider(private val context: Context) {
+
+    fun confirm(title: String, onConfirm: () -> Unit): AlertDialog =
+        AlertDialog.Builder(context)
+            .setTitle(title)
+            .setPositiveButton(android.R.string.ok) { _, _ -> onConfirm() }
+            .create()
 }
 ```
 
-### 싱글톤에 Activity 주입 {id="injecting-activity-in-singleton"}
-
+**Constructor / Classic DSL**
 ```kotlin
-// ❌ 메모리 누수 - 싱글톤 내 Activity 참조
-@Singleton
-class ImageLoader(private val activity: Activity)
-
-// ✅ Application 컨텍스트 사용
-@Singleton
-class ImageLoader(private val context: Context)  // androidContext()를 통한 Application 컨텍스트
+val uiModule = module {
+    activityScope {
+        scopedOf(::DialogProvider)
+    }
+}
 ```
 
-## 다음 단계 {id="next-steps"}
+```kotlin
+class SettingsActivity : ScopeActivity() {
 
-- **[안드로이드 스코프](/docs/reference/koin-android/scope)** - 생명주기 인식 스코핑
-- **[멀티 모듈 앱](/docs/reference/koin-android/multi-module)** - 안드로이드 모듈 구성
-- **[베스트 프랙티스](/docs/reference/koin-android/best-practices)** - 메모리 관리 및 마이그레이션
+    private val dialogs: DialogProvider by inject()
+
+    fun onResetClicked() {
+        dialogs.confirm("Reset settings?") { resetSettings() }.show()
+    }
+}
+```
+
+Activity는 반드시 스코프를 가져야 합니다(`ScopeActivity` 또는 `AndroidScopeComponent`). 스코프가 없는 Activity에서는 `DialogProvider`를 찾을 수 없습니다. 스코프는 Activity와 함께 닫히므로, 헬퍼가 Activity보다 오래 유지되지 않습니다. 자세한 내용은 [Android Scopes](/docs/reference/koin-android/scope)를 참조하세요.
+
+이러한 헬퍼를 `single`로 선언하지 마세요. `single`은 `Context`가 Application인 루트 스코프에서 의존성을 해결하며, 결과적으로 Activity의 수명 주기보다 오래 남게 됩니다.
+
+## 관련 문서 {id="related"}
+
+- [Advanced Patterns](/docs/reference/koin-core/advanced-patterns): 모든 플랫폼에서의 컬렉션, 제네릭, 데코레이터 및 프로바이더 활용법.
+- [Android Scopes](/docs/reference/koin-android/scope): Activity 및 Fragment 스코프와 `Context` 해결 방식.
+- [Android Best Practices](/docs/reference/koin-android/best-practices): Context 누수 및 메모리 관리.
+- [Troubleshooting](/docs/reference/koin-core/troubleshooting): 순환 참조 및 의존성 해결 오류 해결.

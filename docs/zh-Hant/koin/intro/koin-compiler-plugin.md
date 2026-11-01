@@ -1,459 +1,122 @@
 ---
-title: Koin 編譯器外掛程式
+title: Koin Compiler Plugin
 ---
 
-# Koin 編譯器外掛程式
+# Koin Compiler Plugin
 
-**Koin 編譯器外掛程式**是所有新 Kotlin 2.x 專案的推薦做法。它是一個原生的 Kotlin 編譯器外掛程式，為 **DSL 與註解**提供支援，具備自動裝配（auto-wiring）、編譯期安全性以及更簡潔的語法。
+Koin Compiler Plugin 是一個在 Kotlin 編譯器 (K2) 內部執行的 Kotlin 編譯器外掛程式。它會為您的定義編寫建構函式裝配程式碼，並在組建期檢查相依圖。它同時支援 Compiler Plugin DSL 與註解。本頁面將說明它的功能與運作方式。若要進行安裝，請參閱 [Compiler Plugin Setup](/docs/setup/compiler-plugin)。若要將其與 Constructor DSL 和 Classic DSL 進行比較，請參閱 [Choosing your style](/docs/intro/choosing-your-style)。
 
-## 什麼是編譯器外掛程式？ {id="what-is-the-compiler-plugin"}
+## 它對程式碼的作用 {id="what-it-does-to-your-code"}
 
-Koin 編譯器外掛程式是一個**原生的 Kotlin 編譯器外掛程式 (K2)** — 而非 KSP 或註解處理。它直接與 Kotlin 編譯器整合，以達成：
+您只需編寫型別，外掛程式就會為您編寫建構函式呼叫：
 
-- **自動偵測建構函式參數** — 無需手動呼叫 `get()`
-- **在編譯期轉換程式碼** — 在組建過程中擷取錯誤
-- **同時支援 DSL 與註解** — 由您選擇風格
-- **不產生可見檔案** — 保持專案結構簡潔
-
-## 為什麼要使用編譯器外掛程式？ {id="why-use-the-compiler-plugin"}
-
-### 1. 更安全的程式碼 {id="1-safer-code"}
-
-此外掛程式會自動偵測建構函式相依性，減少手動連線錯誤：
-
+**Compiler Plugin DSL**
 ```kotlin
-// 不使用編譯器外掛程式 - 容易出錯
+class UserRepository(private val api: ApiService, private val cache: UserCache)
+
 val appModule = module {
-    single { UserService(get(), get(), get()) }  // 希望你的順序是對的！
-}
-
-// 使用編譯器外掛程式 - 自動裝配
-val appModule = module {
-    single<UserService>()  // 外掛程式會偵測所有建構函式參數
-}
-```
-
-### 2. 更簡潔的語法 {id="2-cleaner-syntax"}
-
-更少的樣板程式碼，更高的可讀性：
-
-| 經典 DSL | 編譯器外掛程式 DSL |
-|-------------|---------------------|
-| `singleOf(::MyService)` | `single<MyService>()` |
-| `single { MyService(get(), get()) }` | `single<MyService>()` |
-| `factoryOf(::MyRepo)` | `factory<MyRepo>()` |
-| `viewModelOf(::MyVM)` | `viewModel<MyVM>()` |
-| `scopedOf(::MyPresenter)` | `scoped<MyPresenter>()` |
-| `workerOf(::MyWorker)` | `worker<MyWorker>()` |
-
-### 3. 編譯期安全性 {id="3-compile-time-safety"}
-
-Koin 編譯器外掛程式為 DSL 與註解提供**編譯期相依性驗證**：
-
-- **A2 — 每個模組：** 根據可見範圍驗證定義（早期回饋）
-- **A3 — 完整圖譜：** 在 `startKoin<T>()` 時驗證完整的組裝圖譜
-- **A4 — 呼叫點：** 驗證每個 `get<T>()`、`inject<T>()`、`koinViewModel<T>()` 呼叫
-
-如果程式碼通過編譯，則每個相依性與每個注入呼叫點都已滿足。這取代了 `verify()` 與 `checkModules()` — 無需執行期測試套件。
-
-請參閱[編譯期安全性](/docs/reference/koin-compiler/compile-safety)了解完整詳細資訊。
-
-### 4. DSL 與註解 — 兩者同樣強大 {id="4-dsl-annotations-both-equally-powerful"}
-
-使用您偏好的風格 — 同一個外掛程式為兩者提供相同的功能：
-
-**DSL 風格：**
-```kotlin
-val appModule = module {
-    single<Database>()
     single<UserRepository>()
-    viewModel<UserViewModel>()
 }
 ```
 
-:::info DSL + 參數註解
-使用 DSL 風格時，您仍然可以在類別上使用**參數註解**來引導外掛程式：
+**註解**
+```kotlin
+@Singleton
+class UserRepository(private val api: ApiService, private val cache: UserCache)
+```
+
+**Constructor / Classic DSL**
+Classic DSL 不需要外掛程式：您需要自行撰寫裝配程式碼。Constructor DSL (`singleOf(::T)`) 也不需要它。
+
+```kotlin
+val appModule = module {
+    single { UserRepository(get(), get()) }
+}
+```
+
+若套用了外掛程式，它仍會在組建期檢查這些 `get()` 呼叫與 `singleOf(::T)` 定義。
+
+在編譯期間，外掛程式會將 `single<UserRepository>()`（或 `@Singleton` 類別）取代為等價的：
+
+```kotlin
+single { UserRepository(get(), get()) }
+```
+
+產生的程式碼與 Classic DSL 所使用的執行階段程式碼完全相同。在執行階段沒有任何改變：定義會放入相同的容器中，且 Koin 以相同的方式解析它們。每個參數型別都會被妥善處理：可 null 型別使用 `getOrNull()`、`Lazy<T>` 使用 `inject()`、`List<T>` 使用 `getAll()`，而帶有註解的參數（`@Named`、`@InjectedParam`、`@Property`）則使用相對應的呼叫。完整對照表請參閱 [Definitions](/docs/reference/koin-core/definitions#constructor-parameters)。
+
+在 DSL 風格中，模組指定了類別註冊的位置，而類別參數上的註解則指定了它們被解析的方式：
 
 ```kotlin
 class UserPresenter(
-    @InjectedParam val userId: String,      // 執行期參數
-    @Named("api") val client: ApiClient,    // 限定相依性
-    val repository: UserRepository          // 自動解析
+    @InjectedParam val userId: String,
+    @Named("remote") val api: ApiService,
+    val repository: UserRepository,
 )
 
 val appModule = module {
-    factory<UserPresenter>()  // 外掛程式會讀取類別中的註解
+    factory<UserPresenter>()
 }
-```
-
-DSL 定義了相依性在**何處**註冊。參數註解則定義了它們**如何**被解析。
-:::
-
-**註解風格：**
-```kotlin
-@Singleton
-class Database
-
-@Singleton
-class UserRepository(private val database: Database)
-
-@KoinViewModel
-class UserViewModel(private val repository: UserRepository) : ViewModel()
-```
-
-## 快速入門 {id="getting-started"}
-
-### 設定 {id="setup"}
-
-將編譯器外掛程式新增至您的專案。
-
-:::info
-    請參閱 **[編譯器外掛程式設定指南](/docs/setup/compiler-plugin)** 了解詳細指示。
-:::
-
-### 使用編譯器外掛程式 DSL {id="using-the-compiler-plugin-dsl"}
-
-從編譯器外掛程式封裝匯入：
-
-```kotlin
-import org.koin.plugin.module.dsl.*
-import org.koin.dsl.module
-
-val appModule = module {
-    single<Database>()
-    single<ApiClient>()
-    single<UserRepository>()
-    viewModel<UserViewModel>()
-}
-```
-
-:::note
-編譯器外掛程式 DSL 位於 `org.koin.plugin.module.dsl` 中。經典 DSL 仍保留在 `org.koin.dsl` 中。
-:::
-
-### 使用註解 {id="using-annotations"}
-
-註解的使用方式與之前相同：
-
-```kotlin
-@Singleton
-class Database
-
-@Singleton
-class ApiClient
-
-@Singleton
-class UserRepository(
-    private val database: Database,
-    private val apiClient: ApiClient
-)
-
-@KoinViewModel
-class UserViewModel(private val repository: UserRepository) : ViewModel()
-
-@Module
-@ComponentScan("com.myapp")
-class AppModule
 ```
 
 ## 運作原理 {id="how-it-works"}
 
-編譯器外掛程式分為兩個階段運作：
+此外掛程式掛鉤至 Kotlin K2 編譯器的兩個階段：
 
-### 1. FIR 階段（分析） {id="1-fir-phase-analysis"}
-
-在前端中間表示（Frontend Intermediate Representation）階段，外掛程式會：
-- 分析您的模組定義
-- 偵測建構函式參數
-- 驗證相依性宣告
-
-### 2. IR 階段（轉換） {id="2-ir-phase-transformation"}
-
-在中間表示（Intermediate Representation）階段，外掛程式會：
-- 為每個參數產生正確的 `get()` 呼叫
-- 處理限定符 (`@Named`)
-- 處理注入參數 (`@InjectedParam`)
-- 處理可 null 與 Lazy 類型
-
-### 產生的內容 {id="what-gets-generated"}
-
-當您撰寫：
-
-```kotlin
-single<UserRepository>()
+```text
+Kotlin sources
+     │
+     ▼
+  FIR (frontend)   finds @Module, @ComponentScan, @Configuration and declares
+                   the generated module properties and cross-module hints
+     │
+     ▼
+  IR (backend)     1. collects annotated definitions and fills the modules
+                   2. rewrites DSL calls: single<T>() becomes single { T(get()) }
+                   3. at entry points (startKoin, @KoinApplication), assembles
+                      the full graph and validates it
+                   4. validates get(), inject(), koinViewModel() call sites
+     │
+     ▼
+  Bytecode (JVM, Android, Native, JS, Wasm)
 ```
 
-外掛程式會將其轉換為：
+專案中不會產生任何原始程式碼檔案。為了能夠跨 Gradle 模組檢視，外掛程式會在每個編譯後的模組中加入小型的合成標記函式（「提示」或 "hints"）。下游模組透過讀取這些標記來尋找宣告在其相依項中的定義。這也是為什麼每個宣告 Koin 定義的 Gradle 模組都必須套用此外掛程式。
 
-```kotlin
-single { UserRepository(get(), get()) }  // 自動偵測參數
+## 驗證項目 {id="what-it-validates"}
+
+外掛程式會在每個 Koin 入口點驗證相依圖：`startKoin`、`koinApplication`、`@KoinApplication`、`KoinApplication.withConfiguration<T>()` 以及 Ktor 的 `install(Koin) {}`。針對每個定義，它會檢查每個不可為 null 的建構函式參數是否具有相符的定義、正確的限定詞，並且處於可存取的作用域中。它還會檢查每個 `get<T>()`、`inject<T>()` 與 `koinViewModel<T>()` 呼叫。
+
+缺少相依項將導致建置失敗：
+
+```text
+[Koin][KOIN-D001] Missing dependency: ApiService
+  required by: UserRepository (parameter 'api')
+  in module: ...
 ```
 
-針對更複雜的情況：
+檢查項目、錯誤碼以及 `@Provided` 規避機制的完整清單請參閱 [Compile-Time Safety](/docs/reference/koin-compiler/compile-safety)。
 
-```kotlin
-// 您的程式碼
-@Singleton
-class MyService(
-    val required: RequiredDep,
-    val optional: OptionalDep?,
-    @Named("special") val named: NamedDep,
-    val lazy: Lazy<LazyDep>,
-    @InjectedParam val param: String
-)
-```
+## 限制 {id="limits"}
 
-外掛程式會為每種參數型別產生正確的處理方式：
-- 必填 (Required)：`get()`
-- 選填 (Optional)：`getOrNull()`
-- 具名 (Named)：`get(named("special"))`
-- 延遲 (Lazy)：`inject()`
-- 注入參數 (InjectedParam)：`params.get()`
-
-## 編譯器外掛程式 DSL 參考 {id="compiler-plugin-dsl-reference"}
-
-### 定義類型 {id="definition-types"}
-
-```kotlin
-import org.koin.plugin.module.dsl.*
-
-val appModule = module {
-    // Singleton - 單一執行個體
-    single<MyService>()
-
-    // Factory - 每次都是新的執行個體
-    factory<MyPresenter>()
-
-    // Scoped - 每個作用域一個執行個體
-    scope<MyActivity> {
-        scoped<ActivityPresenter>()
-    }
-
-    // ViewModel
-    viewModel<MyViewModel>()
-
-    // Worker (Android WorkManager)
-    worker<MyWorker>()
-}
-```
-
-### 使用 `create()` 安全地建立執行個體 {id="safe-instance-creation-with-create"}
-
-在定義 lambda 內部使用 `create(::T)`，以透過自動解析的建構函式相依性安全地建置執行個體：
-
-```kotlin
-val appModule = module {
-    single { create(::MyService) }
-}
-```
-
-編譯器外掛程式會將 `create(::MyService)` 轉換為 `MyService(get(), get(), ...)`，自動裝配所有建構函式參數。
-
-### 使用限定符 {id="with-qualifiers"}
-
-在您的類別上使用 `@Named` 來定義限定符，並在參數上指定要注入哪個相依性：
-
-```kotlin
-// 使用 @Named 限定符定義實作
-@Named("local")
-class LocalDatabase : Database
-
-@Named("remote")
-class RemoteDatabase : Database
-
-// 在參數上使用 @Named 指定要注入哪一個
-class SyncService(
-    @Named("local") val localDb: Database,
-    @Named("remote") val remoteDb: Database
-)
-
-// DSL - 外掛程式會從類別與參數中讀取 @Named
-val appModule = module {
-    single<LocalDatabase>()
-    single<RemoteDatabase>()
-    single<SyncService>()
-}
-```
-
-您也可以使用 `@Qualifier` 建立自訂限定符：
-
-```kotlin
-@Qualifier
-annotation class LocalDb
-
-@Qualifier
-annotation class RemoteDb
-
-@LocalDb
-class LocalDatabase : Database
-
-@RemoteDb
-class RemoteDatabase : Database
-
-class SyncService(
-    @LocalDb val localDb: Database,
-    @RemoteDb val remoteDb: Database
-)
-```
-
-### 使用參數 {id="with-parameters"}
-
-在您的類別上使用 `@InjectedParam` 來標記在注入時傳遞的參數：
-
-```kotlin
-// 類別上的註解 - 告訴外掛程式如何處理此參數
-class UserPresenter(
-    @InjectedParam val userId: String,    // 透過 parametersOf() 傳遞
-    val repository: UserRepository        // 由 Koin 自動解析
-)
-
-// 模組中的 DSL - 告訴 Koin 在何處註冊
-val appModule = module {
-    factory<UserPresenter>()
-}
-
-// 用法 - 傳遞執行期參數
-val presenter: UserPresenter = get { parametersOf("user123") }
-```
-
-### 介面繫結 {id="interface-binding"}
-
-```kotlin
-val appModule = module {
-    single<UserRepositoryImpl>() bind UserRepository::class
-
-    // 或多重繫結
-    single<MyServiceImpl>() binds arrayOf(
-        ServiceA::class,
-        ServiceB::class
-    )
-}
-```
-
-## 註解參考 {id="annotations-reference"}
-
-### 定義註解 {id="definition-annotations"}
-
-| 註解 | 描述 |
-|------------|-------------|
-| `@Singleton` / `@Single` | 單一執行個體 |
-| `@Factory` | 每次都是新的執行個體 |
-| `@Scoped` | 每個作用域一個執行個體 |
-| `@KoinViewModel` | Android ViewModel |
-| `@KoinWorker` | Android WorkManager Worker |
-
-### 參數註解 {id="parameter-annotations"}
-
-| 註解 | 描述 |
-|------------|-------------|
-| `@Named("qualifier")` | 具名限定符 |
-| `@InjectedParam` | 執行期參數（透過 `parametersOf()`） |
-| `@Property("key")` | Koin 屬性值 |
-| `@Provided` | 外部相依性（跳過驗證） |
-
-### 模組註解 {id="module-annotations"}
-
-| 註解 | 描述 |
-|------------|-------------|
-| `@Module` | 宣告一個 Koin 模組 |
-| `@ComponentScan("package")` | 掃描套件中的註解類別 |
-| `@Configuration` | 自動發現的模組 |
-
-## 方式比較 {id="comparison-approaches"}
-
-| 方式 | 狀態 | 封裝 | 語法 |
-|----------|--------|---------|--------|
-| **編譯器外掛程式 DSL** | 推薦 | 位於 Koin **`org.koin.plugin.module.dsl`** | `single<MyService>()`, `factory<MyRepo>()`, `viewModel<MyVM>()` |
-| **編譯器外掛程式註解** | 推薦 | 註解位於 **`koin-annotations`** | `@Singleton`, `@Factory`, `@KoinViewModel ` |
-| **經典 DSL** | 完全支援 | `org.koin.dsl` | `singleOf(::MyService)`, `single { MyService(get()) }`, `viewModelOf(::MyVM)` |
-| **KSP 處理器** | 已棄用 | `koin-ksp-compiler` | Koin 註解的舊版處理器 — 相同的註解，**請遷移至編譯器外掛程式 ⚠️** |
-
-### 編譯器外掛程式 DSL（推薦） {id="compiler-plugin-dsl-recommended"}
-
-- 自動偵測相依性
-- 編譯期分析
-- 最簡潔的語法
-
-### 編譯器外掛程式 註解（推薦） {id="compiler-plugin-annotations-recommended"}
-
-- 自動偵測相依性
-- 編譯期分析
-- 熟悉的註解風格
-
-### 經典 DSL（完全支援） {id="classic-dsl-fully-supported"}
-
-- 適用於任何 Kotlin 版本
-- 完全控制裝配過程
-- 準備就緒時可遷移至外掛程式 DSL
-
-### KSP 處理器 `koin-ksp-compiler`（已棄用） {id="ksp-processor-koin-ksp-compiler-deprecated"}
-
-- `koin-annotations` 程式庫**並未棄用** — 它現在是 Koin 專案的一部分
-- 僅棄用舊版的基於 KSP 的處理器 (`koin-ksp-compiler`)
-- 請遷移至 Koin 編譯器外掛程式 — 您的註解保持不變
-- `koin-ksp-compiler` 將在未來的 Koin 版本中移除
-
-## 遷移 {id="migration"}
-
-### 從經典 DSL 遷移 {id="from-classic-dsl"}
-
-如果您正在使用經典 DSL，遷移是選用的，但建議進行：
-
-1. 將編譯器外掛程式新增至 Gradle
-2. 將匯入更新為 `org.koin.plugin.module.dsl.*`
-3. 將 `singleOf(::Class)` 替換為 `single<Class>()`
-4. 移除手動的 `get()` 呼叫
-
-請參閱[編譯器外掛程式 DSL 參考](/docs/setup/compiler-plugin#dsl-style)以了解編譯期安全的語法。
-
-### 從 KSP 處理器 (`koin-ksp-compiler`) 遷移 {id="from-the-ksp-processor-koin-ksp-compiler"}
-
-如果您正在使用帶有舊版 KSP 處理器的 Koin 註解，建議現在進行遷移：
-
-1. 將 Kotlin 更新至 2.x
-2. 將 `koin-ksp-compiler` 替換為 Koin 編譯器外掛程式
-3. **您的註解保持不變** — 無需修改程式碼！
-4. 刪除產生的檔案
-
-請參閱[從 KSP 遷移至編譯器外掛程式](/docs/migration/from-ksp-to-compiler-plugin)。
+- **執行階段載入的模組**：稍後透過 `loadKoinModules()` 加入的模組不屬於外掛程式可見的圖的一部分。由它們提供的型別必須標記為 `@Provided`。
+- **單獨的程式庫模組**：沒有 Koin 入口點的 Gradle 模組不會自行進行驗證。它會在應用程式模組進行組裝時才被檢查。
+- **增量編譯**：如同其他 IR 編譯器外掛程式，某些變更（在掃描的套件之間移動類別、更改限定詞）可能會留下過時的結果。執行乾淨組建 (clean build) 即可解決。詳細資訊請參閱 [Compiler Plugin Setup](/docs/setup/compiler-plugin)。
+- **Kotlin 版本**：外掛程式使用的編譯器 API 在不同的 Kotlin 版本之間可能會有所改變。每個外掛程式版本都會在一組已驗證的 Kotlin 版本清單上進行驗證，其餘版本則會顯示警告。
 
 ## 需求 {id="requirements"}
 
-- **Kotlin 2.x** (K2 編譯器)
-- Gradle 8.x+
+- Kotlin 2.3.20 或更高版本（K2 編譯器）。外掛程式 1.2.1 版已在 Kotlin 2.3.20、2.4.0、2.4.10 與 2.4.20 上完成驗證。
+- Koin 4.2.0 或更高版本。
+- Gradle 外掛程式 `io.insert-koin.compiler.plugin`，需套用至每個宣告定義的 Gradle 模組中。
 
-## 組態選項 {id="configuration-options"}
+Compiler Plugin DSL 位於隨 `koin-core` 一同提供的 `org.koin.plugin.module.dsl` 套件中。Classic DSL 仍位於 `org.koin.dsl`，Constructor DSL 則位於 `org.koin.core.module.dsl`。
 
-```kotlin
-// build.gradle.kts
-koinCompiler {
-    // 選項將在此處說明
-}
-```
+此外掛程式取代了已棄用的 KSP 處理器 `koin-ksp-compiler`，並使用相同的註解。請參閱 [Migrating from KSP](/docs/migration/from-ksp-to-compiler-plugin)。原始碼託管於 GitHub：[InsertKoinIO/koin-compiler-plugin](https://github.com/InsertKoinIO/koin-compiler-plugin)。
 
-## 經典 DSL：仍完全支援 {id="classic-dsl-still-fully-supported"}
+## 相關內容 {id="related"}
 
-編譯器外掛程式並非取代經典 DSL — 它是在其之上增加了分析與產生功能。經典 DSL 仍完全支援：
-
-```kotlin
-// 仍然可以完美運作
-val appModule = module {
-    singleOf(::Database)
-    singleOf(::ApiClient)
-    single { CustomService(get(), get(), configValue) }  // 自訂邏輯
-    viewModelOf(::UserViewModel)
-}
-```
-
-在以下情況使用經典 DSL：
-- 自訂工廠邏輯
-- 針對選填相依性使用 `getOrNull()`
-- 條件式具現化
-- 與 Kotlin 1.x 的回溯相容性
-
-## 後續步驟 {id="next-steps"}
-
-- **[設定指南](/docs/setup/compiler-plugin)** — 詳細設定說明
-- **[DSL 參考](/docs/reference/dsl-reference)** — 完整的 DSL 文件
-- **[註解參考](/docs/reference/annotations-reference)** — 完整的註解文件
-- **[遷移指南](/docs/migration/from-ksp-to-compiler-plugin)** — 升級您的專案
+- [Compiler Plugin Setup](/docs/setup/compiler-plugin)：安裝並設定外掛程式。
+- [Choosing your style](/docs/intro/choosing-your-style)：註解或 DSL（Compiler Plugin、Constructor 或 Classic DSL）。
+- [Compile-Time Safety](/docs/reference/koin-compiler/compile-safety)：所有檢查項目與錯誤碼。
+- [Compiler Plugin Options](/docs/reference/koin-annotations/options)：所有 Gradle 選項。
+- [Definitions](/docs/reference/koin-core/definitions)：建構函式參數的解析方式。

@@ -25,7 +25,7 @@ Ktor は、エンドポイントに接続することなく HTTP 呼び出しを
 MockEngine を使用して HTTP 呼び出しをシミュレートし、クライアントをテストする方法を学びます。
 </link-summary>
 
-Ktor は、エンドポイントに接続することなく HTTP 呼び出しをシミュレートする [MockEngine](https://api.ktor.io/ktor-client-mock/io.ktor.client.engine.mock/-mock-engine/index.html) を提供します。
+Ktor は、エンドポイントに実際に接続することなく HTTP 呼び出しをシミュレートする [MockEngine](https://api.ktor.io/ktor-client-mock/io.ktor.client.engine.mock/-mock-engine/index.html) を提供します。
 
 ## 依存関係の追加 {id="add_dependencies"}
 `MockEngine` を使用する前に、ビルドスクリプトに `%artifact_name%` アーティファクトを含める必要があります。
@@ -44,13 +44,13 @@ Ktor は、エンドポイントに接続することなく HTTP 呼び出しを
 
 ## 使用方法 {id="usage"}
 
-### クライアント構成の共有 {id="share-config"}
+### クライアント設定の共有 {id="share-config"}
 
-`MockEngine` を使用してクライアントをテストする方法を見てみましょう。クライアントに次の構成があると仮定します:
-* リクエストの実行に `CIO` [エンジン](client-engines.md) を使用している。
-* 受信した JSON データをデシリアライズするために [Json](client-serialization.md) プラグインがインストールされている。
+`MockEngine` を使用してクライアントをテストする方法を見てみましょう。クライアントに以下の設定があるとします。
+* リクエストの実行に `CIO` [エンジン](client-engines.md) を使用する。
+* 受信する JSON データをデシリアライズするために [Json](client-serialization.md) プラグインがインストールされている。
 
-このクライアントをテストするには、その構成を `MockEngine` を使用するテスト用クライアントと共有する必要があります。構成を共有するには、エンジンをコンストラクターのパラメーターとして受け取り、クライアント構成を含むクライアントラッパークラスを作成します。
+このクライアントをテストするには、その設定を `MockEngine` を使用するテスト用クライアントと共有する必要があります。設定を共有するには、コンストラクタパラメータとしてエンジンを受け取り、クライアント設定を含むラッパークラスを作成します。
 
 ```kotlin
 @Serializable
@@ -70,7 +70,7 @@ class ApiClient(engine: HttpClientEngine) {
 }
 ```
 
-その後、以下のように `ApiClient` を使用して `CIO` エンジンを持つ HTTP クライアントを作成し、リクエストを実行できます。
+その後、`CIO` エンジンを備えた HTTP クライアントを作成してリクエストを実行するために、`ApiClient` を次のように使用できます。
 
 ```kotlin
 fun main() {
@@ -83,7 +83,7 @@ fun main() {
 
 ### クライアントのテスト {id="test-client"}
 
-クライアントをテストするには、リクエストパラメーターを確認し、必要なコンテンツ（今回の例では JSON オブジェクト）で応答できるハンドラーを持つ `MockEngine` インスタンスを作成する必要があります。
+クライアントをテストするには、リクエストパラメータをチェックし、必要なコンテンツ（今回の例では JSON オブジェクト）で応答できるハンドラーを持つ `MockEngine` インスタンスを作成する必要があります。
 
 ```kotlin
 val mockEngine = MockEngine { request ->
@@ -95,7 +95,7 @@ val mockEngine = MockEngine { request ->
 }
 ```
 
-次に、作成した `MockEngine` を渡して `ApiClient` を初期化し、必要なアサーションを実行します。
+その後、作成した `MockEngine` を渡して `ApiClient` を初期化し、必要なアサーションを実行できます。
 
 ```kotlin
 class ApiClientTest {
@@ -118,7 +118,7 @@ class ApiClientTest {
 
 ### 複数のエンドポイントのモック {id="multiple-endpoints"}
 
-クライアントが複数の URL を呼び出す場合は、単一の再利用可能なハンドラーを使用し、リクエスト（例えば `request.url.encodedPath` やホスト）に基づいて分岐します。これにより、モックを呼び出し順序に依存しないように保つことができます:
+クライアントが複数の URL を呼び出す場合は、単一の再利用可能なハンドラーを使用し、リクエストに応じて分岐します（例: `request.url.encodedPath` やホスト名による分岐）。これにより、モックを呼び出し順序に依存しない状態に保つことができます。
 
 ```kotlin
 val mockEngine = MockEngine { request ->
@@ -130,12 +130,11 @@ val mockEngine = MockEngine { request ->
 }
 ```
 
-`else` 分岐では予期しない URL に対してエラーを発生させ、モックの欠落がテストで暗黙的に許容されないようにします。
-また、異なるホストで同じパスが使用されている場合は、`request.url.host` でマッチングすることもできます。
+`else` ブランチでは、想定外の URL に対して失敗するようにして、モックの不足をテストが見過ごさないようにします。また、異なるホストで同じパスが使用されている場合は、`request.url.host` でマッチングすることもできます。
 
 ### 呼び出しチェーンのモック {id="call-chain"}
 
-固定された順序での連続した呼び出しに対して異なるレスポンスを返すには、[`addHandler()`](https://api.ktor.io/ktor-client-mock/io.ktor.client.engine.mock/-mock-engine-config/add-handler.html) 関数を使用して複数のハンドラーを登録し、`reuseHandlers` プロパティを `false` に設定して各ハンドラーを 1 回だけ使用するようにします:
+固定された順序での連続した呼び出しに対して異なるレスポンスを返すには、[`addHandler()`](https://api.ktor.io/ktor-client-mock/io.ktor.client.engine.mock/-mock-engine-config/add-handler.html) 関数を使用して複数のハンドラーを登録し、`reuseHandlers` プロパティを `false` に設定して各ハンドラーが一度だけ使用されるようにします。
 
 ```kotlin
 val mockEngine = MockEngine.config {
@@ -145,11 +144,11 @@ val mockEngine = MockEngine.config {
 }
 ```
 
-デフォルトでは `reuseHandlers` プロパティは `true` に設定されており、ハンドラーは循環して再利用されます。
+デフォルトでは、`reuseHandlers` プロパティは `true` に設定されており、ハンドラーは循環して再利用されます。
 
-`reuseHandlers` プロパティを `false` に設定すると、ハンドラーは 1 回だけ使用されます。すべてのハンドラーが使用された場合、次のリクエストはエラーをスローして拒否されます。
+`reuseHandlers` プロパティを `false` に設定すると、ハンドラーは一度だけ使用されます。すべてのハンドラーが使用された場合、次のリクエストはエラーをスローして拒否されます。
 
-クライアントを先に構築し、後からレスポンスをエンキューするテストの場合は、[`MockEngine.Queue`](https://api.ktor.io/ktor-client-mock/io.ktor.client.engine.mock/-mock-engine/-queue/index.html) を使用します:
+クライアントを先に構築し、後からレスポンスをキューに追加するテストの場合は、[`MockEngine.Queue`](https://api.ktor.io/ktor-client-mock/io.ktor.client.engine.mock/-mock-engine/-queue/index.html) を使用します。
 
 ```kotlin
             val engine = MockEngine.Queue()
@@ -159,4 +158,4 @@ val mockEngine = MockEngine.config {
             engine += { respondOk("second") }
 ```
 
-完全なサンプルはこちらで確認できます: [client-testing-mock](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-testing-mock)。
+完全なコード例はこちらで確認できます: [client-testing-mock](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-testing-mock)

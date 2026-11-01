@@ -3,12 +3,13 @@
 <primary-label ref="server-plugin"/>
 
 <var name="artifact_name" value="ktor-server-openapi"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.server.openapi"/>
 <var name="package_name" value="io.ktor.server.plugins.openapi"/>
 <var name="plugin_api_link" value="https://api.ktor.io/ktor-server-openapi/io.ktor.server.plugins.openapi/open-a-p-i.html"/>
 
 <tldr>
 <p>
-<b>必要相依性</b>：<code>io.ktor:%artifact_name%</code>
+<b>必要的相依性</b>：<code>io.ktor:%artifact_name%</code>
 </p>
 <var name="example_name" value="json-kotlinx-openapi"/>
 <p>
@@ -18,40 +19,48 @@
     </a>
 </p>
 <p>
-    <b><Links href="/ktor/server-native" summary="Ktor supports Kotlin/Native and allows you to run a server without an additional runtime or virtual machine.">原生伺服器</Links> 支援</b>：✖️
+    <b><Links href="server-native.md" summary="Ktor 支援 Kotlin/Native，並允許你在沒有額外執行環境或虛擬機的情況下執行伺服器。">原生伺服器</Links>支援</b>：✖️
 </p>
 </tldr>
 
 <link-summary>
-OpenAPI 外掛程式允許您為專案產生 OpenAPI 文件。
+OpenAPI 外掛程式可讓你為專案產生 OpenAPI 文件。
 </link-summary>
 
-Ktor 允許您根據 OpenAPI 規格提供 OpenAPI 文件。
+Ktor 允許你根據 OpenAPI 規格提供 OpenAPI 文件服務。
 
-您可以使用以下其中一種方式提供 OpenAPI 規格：
+你可以透過以下其中一種方式提供 OpenAPI 規格：
 
 * [提供現有的 YAML 或 JSON 檔案](#static-openapi-file)。
-* [使用 OpenAPI 編譯器擴充套件與執行時 API 在執行時產生規格](#generate-runtime-openapi-metadata)。
+* [使用 OpenAPI 編譯器擴充套件與執行階段 API 於執行階段產生規格](#generate-runtime-openapi-metadata)。
 
-在上述兩種情況下，OpenAPI 外掛程式都會在伺服器上組合規格，並將文件算繪為 HTML。
+在這兩種情況下，OpenAPI 外掛程式都會在伺服器端組裝規格並將文件呈現為 HTML。
 
-## 加入相依性 {id="add_dependencies"}
+## 新增相依性 {id="add_dependencies"}
 
-* 提供 OpenAPI 文件需要在建置指令碼中加入 `%artifact_name%` 構件：
+* 提供 OpenAPI 文件服務需要在建置指令碼中新增 `%artifact_name%` 構件：
 
   <Tabs group="languages">
       <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-          <code-block lang="Kotlin" code="              implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+          <code-block lang="Kotlin" code="              implementation(%ktor_version_catalog_name%)"/>
+          <note>
+              上述程式碼片段使用 <a href="server-dependencies.topic#using-version-catalog">
+              Ktor 版本目錄</a> 來指定 Ktor 相依性。
+          </note>
       </TabItem>
       <TabItem title="Gradle (Groovy)" group-key="groovy">
-          <code-block lang="Groovy" code="              implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+          <code-block lang="Groovy" code="              implementation %ktor_version_catalog_name%"/>
+          <note>
+              上述程式碼片段使用 <a href="server-dependencies.topic#using-version-catalog">
+              Ktor 版本目錄</a> 來指定 Ktor 相依性。
+          </note>
       </TabItem>
       <TabItem title="Maven" group-key="maven">
           <code-block lang="XML" code="              &lt;dependency&gt;&#10;                  &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                  &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                  &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;              &lt;/dependency&gt;"/>
       </TabItem>
   </Tabs>
 
-* （選填）如果您想要自訂 [程式碼產生器](https://github.com/swagger-api/swagger-codegen-generators)，請加入 `swagger-codegen-generators` 相依性：
+* （選用）如果你想要自訂[程式碼產生器](https://github.com/swagger-api/swagger-codegen-generators)，請新增 `swagger-codegen-generators` 相依性：
 
   <var name="group_id" value="io.swagger.codegen.v3"/>
   <var name="artifact_name" value="swagger-codegen-generators"/>
@@ -68,13 +77,13 @@ Ktor 允許您根據 OpenAPI 規格提供 OpenAPI 文件。
       </TabItem>
   </Tabs>
 
-  您可以將 `$swagger_codegen_version` 替換為所需的 `swagger-codegen-generators` 構件版本，例如 `%swagger_codegen_version%`。
+  你可以將 `$swagger_codegen_version` 替換為所需的 `swagger-codegen-generators` 構件版本，例如 `%swagger_codegen_version%`。
 
 ## 使用靜態 OpenAPI 檔案 {id="static-openapi-file"}
 
-若要從現有規格提供 OpenAPI 文件，請使用 [`openAPI()`](%plugin_api_link%) 函式並提供 OpenAPI 文件的路徑。
+若要從現有的規格提供 OpenAPI 文件服務，請使用 [`openAPI()`](%plugin_api_link%) 函式並指定 OpenAPI 文件的路徑。
 
-以下範例在 `openapi` 路徑建立了一個 `GET` 端點，並從提供的 OpenAPI 規格檔案算繪 Swagger UI：
+以下範例在 `openapi` 路徑建立一個 `GET` 端點，並從提供的 OpenAPI 規格檔案呈現 Swagger UI：
 
 ```kotlin
 import io.ktor.server.plugins.openapi.*
@@ -85,13 +94,13 @@ routing {
 }
 ```
 
-外掛程式會首先在應用程式資源中尋找規格。若未找到，則會嘗試使用 `java.io.File` 從檔案系統載入。
+此外掛程式會先在應用程式資源中尋找該規格。如果找不到，它會嘗試使用 `java.io.File` 從檔案系統載入。
 
-## 產生執行時 OpenAPI 元資料 {id="generate-runtime-openapi-metadata"}
+## 於執行階段產生 OpenAPI 元資料 {id="generate-runtime-openapi-metadata"}
 
-您可以改為使用 OpenAPI 編譯器外掛程式與路由註解產生的元資料在執行時產生 OpenAPI 規格，而不必依賴靜態檔案。
+除了依賴靜態檔案之外，你還可以利用 OpenAPI 編譯器外掛程式所產生的元資料以及路由註解，在執行階段產生 OpenAPI 規格。
 
-在此模式下，OpenAPI 外掛程式會直接從路由樹組合規格：
+在此模式下，OpenAPI 外掛程式會直接從路由樹組裝規格：
 
 ```kotlin
  openAPI(path = "openapi") {
@@ -102,19 +111,19 @@ routing {
 }
 ```
 
-如此一來，您便可以在 `/openapi` 路徑存取產生的 OpenAPI 文件，該文件反映了應用程式的當前狀態。
+如此一來，你就可以在 `/openapi` 路徑存取產生的 OpenAPI 文件，該文件反映了應用程式的目前狀態。
 
-> 如需更多關於 OpenAPI 編譯器擴充套件與執行時 API 的資訊，請參閱 [OpenAPI 規格產生](openapi-spec-generation.md)。
+> 有關 OpenAPI 編譯器擴充套件與執行階段 API 的詳細資訊，請參閱 [OpenAPI 規格產生](openapi-spec-generation.md)。
 > 
 {style="tip"}
 
 ## 設定 OpenAPI {id="configure-openapi"}
 
-`openAPI {}` 設定區塊可讓您設定產生的 OpenAPI 文件以及 Ktor 如何算繪文件。
+`openAPI {}` 配置區塊可讓你設定產生的 OpenAPI 文件以及 Ktor 呈現文件的方式。
 
 ### 設定文件元資料 {id="configure-document-metadata"}
 
-您可以直接在設定區塊中定義頂層 OpenAPI 元資料。
+你可以直接在配置區塊中定義頂層 OpenAPI 元資料。
 
 例如，使用 `info` 指定一般 API 資訊，並使用 `tag()` 定義標籤及其說明：
 
@@ -128,17 +137,17 @@ openAPI("openapi") {
 }
 ```
 
-您也可以設定其他頂層 OpenAPI 屬性，例如伺服器、安全需求、可重複使用的元件、外部文件以及規格擴充。
+你也可以設定其他頂層 OpenAPI 屬性，例如伺服器、安全需求、可重複使用的組件、外部文件和規格擴充套件。
 
-> 如需可用選項的完整清單，請參閱 [`OpenAPIConfig`](https://api.ktor.io/ktor-server-openapi/io.ktor.server.plugins.openapi/-open-a-p-i-config/index.html) API 參考。
+> 如需所有可用選項的完整清單，請參閱 [`OpenAPIConfig`](https://api.ktor.io/ktor-server-openapi/io.ktor.server.plugins.openapi/-open-a-p-i-config/index.html) API 參考。
 >
 {style="tip"}
 
-### 設定文件算繪器 {id="configure-the-document-renderer"}
+### 設定文件呈現器 {id="configure-the-document-renderer"}
 
-預設情況下，文件會使用 `StaticHtml2Codegen` 進行算繪。
+預設情況下，文件會使用 `StaticHtml2Codegen` 呈現。
 
-若要使用不同的算繪器，請將其指派給 `codegen` 屬性：
+若要使用不同的呈現器，請將其指派給 `codegen` 屬性：
 
 ```kotlin
 routing {
@@ -148,6 +157,6 @@ routing {
 }
 ```
 
-> `StaticHtmlCodegen` 與 `StaticHtml2Codegen` 僅支援 OpenAPI 3.0.x 文件。將其用於 OpenAPI 3.1 文件可能會產生不完整或不正確的 HTML。對於 OpenAPI 3.1，請搭配 Swagger UI 5.x 使用 [`swaggerUI()`](server-swagger-ui.md) 函式。如果您需要繼續使用 OpenAPI 外掛程式的 HTML 算繪器，請將規格保持在 OpenAPI 3.0.3。
+> `StaticHtmlCodegen` 與 `StaticHtml2Codegen` 僅支援 OpenAPI 3.0.x 文件。將其用於 OpenAPI 3.1 文件可能會產生不完整或不正確的 HTML。針對 OpenAPI 3.1，請使用 [`swaggerUI()`](server-swagger-ui.md) 函式搭配 Swagger UI 5.x。如果你需要繼續使用 OpenAPI 外掛程式的 HTML 呈現器，請將規格保持在 OpenAPI 3.0.3。
 >
 {style="note"}

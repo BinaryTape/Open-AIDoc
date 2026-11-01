@@ -1,4 +1,4 @@
-[//]: # (title: Ktor Server에서의 인증 및 인가)
+[//]: # (title: Ktor Server의 인증 및 인가)
 
 <show-structure for="chapter" depth="2"/>
 <primary-label ref="server-plugin"/>
@@ -6,6 +6,7 @@
 <var name="plugin_name" value="Authentication"/>
 <var name="package_name" value="io.ktor.server.auth"/>
 <var name="artifact_name" value="ktor-server-auth"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.server.auth"/>
 
 <tldr>
 <p>
@@ -14,96 +15,104 @@
 </tldr>
 
 <link-summary>
-Authentication 플러그인은 Ktor에서의 인증 및 인가를 처리합니다.
+Authentication 플러그인은 Ktor에서 인증 및 인가를 처리합니다.
 </link-summary>
 
-Ktor는 인증 및 인가를 처리하기 위해 [Authentication](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-authentication/index.html) 플러그인을 제공합니다. 일반적인 사용 시나리오에는 사용자 로그인, 특정 리소스에 대한 접근 권한 부여, 당사자 간의 안전한 정보 전송 등이 포함됩니다. 또한 `Authentication`을 [세션(Sessions)](server-sessions.md)과 함께 사용하여 요청 간에 사용자의 정보를 유지할 수도 있습니다.
+Ktor는 인증(authentication) 및 인가(authorization)를 처리하기 위해 [Authentication](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-authentication/index.html) 플러그인을 제공합니다. 일반적인 사용 시나리오에는 사용자 로그인, 특정 리소스에 대한 접근 권한 부여, 당사자 간의 안전한 정보 전송 등이 포함됩니다. 또한 `Authentication`을 [Sessions](server-sessions.md)와 함께 사용하여 요청 간에 사용자 정보를 유지할 수도 있습니다.
 
-> 클라이언트 측에서 Ktor는 인증 및 인가 처리를 위한 [Authentication](client-auth.md) 플러그인을 제공합니다.
+> 클라이언트 측에서 Ktor는 인증 및 인가를 처리하기 위한 [Authentication](client-auth.md) 플러그인을 제공합니다.
 
 ## 지원되는 인증 유형 {id="supported"}
-Ktor는 다음과 같은 인증 및 인가 스킴을 지원합니다:
+Ktor는 다음과 같은 인증 및 인가 스키마를 지원합니다.
 
 ### HTTP 인증 {id="http-auth"}
-HTTP는 접근 제어 및 인증을 위한 [일반적인 프레임워크](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication)를 제공합니다. Ktor에서는 다음과 같은 HTTP 인증 스킴을 사용할 수 있습니다:
-* [Basic](server-basic-auth.md) - `Base64` 인코딩을 사용하여 사용자 이름과 비밀번호를 제공합니다. HTTPS와 함께 사용하지 않는 한 일반적으로 권장되지 않습니다.
-* [Digest](server-digest-auth.md) - 사용자 이름과 비밀번호에 해시 함수를 적용하여 암호화된 형태로 사용자 자격 증명을 통신하는 인증 방법입니다.
-* [Bearer](server-bearer-auth.md) - 전달자 토큰(bearer tokens)이라는 보안 토큰이 포함된 인증 스킴입니다.
-  Bearer 인증 스킴은 [OAuth](server-oauth.md) 또는 [JWT](server-jwt.md)의 일부로 사용되지만, Bearer 토큰 인증을 위한 커스텀 로직을 제공할 수도 있습니다.
-* [API Key](server-api-key-auth.md) - 클라이언트가 헤더에 비밀 키를 전달하는 간단한 인증 방법입니다.
+HTTP는 접근 제어와 인증을 위한 [일반적인 프레임워크](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication)를 제공합니다. Ktor에서는 다음과 같은 HTTP 인증 스키마를 사용할 수 있습니다.
+* [Basic](server-basic-auth.md) - `Base64` 인코딩을 사용하여 사용자 이름과 비밀번호를 제공합니다. 일반적으로 HTTPS와 함께 사용하지 않는 한 권장되지 않습니다.
+* [Digest](server-digest-auth.md) - 사용자 이름과 비밀번호에 해시 함수를 적용하여 암호화된 형태로 사용자 자격 증명(credentials)을 전달하는 인증 방식입니다.
+* [Bearer](server-bearer-auth.md) - 베어러 토큰(bearer token)이라 불리는 보안 토큰을 사용하는 인증 스키마입니다. Bearer 인증 스키마는 [OAuth](server-oauth.md) 또는 [JWT](server-jwt.md)의 일부로 사용되지만, 베어러 토큰을 인가하기 위한 커스텀 로직을 직접 제공할 수도 있습니다.
+* [API Key](server-api-key-auth.md) - 클라이언트가 헤더에 비밀 키(secret key)를 전달하는 간단한 인증 방식입니다.
 
 ### 폼 기반 인증 {id="form-auth"}
-[폼 기반(Form-based)](server-form-based-auth.md) 인증은 [웹 폼](https://developer.mozilla.org/en-US/docs/Learn/Forms)을 사용하여 크리덴셜 정보를 수집하고 사용자를 인증합니다.
+[폼 기반(Form-based)](server-form-based-auth.md) 인증은 [웹 폼](https://developer.mozilla.org/en-US/docs/Learn/Forms)을 사용하여 자격 증명 정보를 수집하고 사용자를 인증합니다.
 
-### JSON Web Tokens (JWT) {id="jwt"}
-[JSON Web Token](server-jwt.md)은 당사자 간에 정보를 JSON 객체로 안전하게 전송하기 위한 개방형 표준입니다. 인가를 위해 JSON Web Token을 사용할 수 있습니다. 사용자가 로그인하면 각 요청에 토큰이 포함되어, 해당 토큰으로 허용된 리소스에 사용자가 접근할 수 있게 합니다. Ktor에서는 `jwt` 인증을 사용하여 토큰을 검증하고 그 안에 포함된 클레임(claims)을 확인할 수 있습니다.
+### JSON 웹 토큰 (JWT) {id="jwt"}
+[JSON Web Token](server-jwt.md)은 당사자 간에 정보를 JSON 객체로 안전하게 전송하기 위한 개방형 표준입니다. JSON Web Token을 인가(authorization)에 사용할 수 있습니다. 사용자가 로그인하면 이후 각 요청에 토큰이 포함되어 사용자가 해당 토큰으로 허용된 리소스에 접근할 수 있게 됩니다. Ktor에서는 `jwt` 인증을 사용하여 토큰을 검증하고 토큰에 포함된 클레임(claim)의 유효성을 검사할 수 있습니다.
 
 ### LDAP {id="ldap"}
-[LDAP](server-ldap.md)는 디렉터리 서비스 인증에 사용되는 개방형 크로스 플랫폼 프로토콜입니다. Ktor는 지정된 LDAP 서버에 대해 사용자 크리덴셜을 인증하는 [ldapAuthenticate](https://api.ktor.io/ktor-server-auth-ldap/io.ktor.server.auth.ldap/ldap-authenticate.html) 함수를 제공합니다.
+[LDAP](server-ldap.md)는 디렉터리 서비스 인증에 사용되는 개방형 크로스 플랫폼 프로토콜입니다. Ktor는 지정된 LDAP 서버에 대해 사용자 자격 증명을 인증하는 [ldapAuthenticate](https://api.ktor.io/ktor-server-auth-ldap/io.ktor.server.auth.ldap/ldap-authenticate.html) 함수를 제공합니다.
 
 ### OAuth {id="oauth"}
-[OAuth](server-oauth.md)는 API 접근 보안을 위한 개방형 표준입니다. Ktor의 `oauth` 프로바이더를 사용하면 Google, Facebook, Twitter 등과 같은 외부 프로바이더를 사용하여 인증을 구현할 수 있습니다.
+[OAuth](server-oauth.md)는 API 접근 보안을 위한 개방형 표준입니다. Ktor의 `oauth` 프로바이더를 사용하면 Google, Facebook, Twitter 등과 같은 외부 프로바이더를 이용한 인증을 구현할 수 있습니다.
 
 ### OpenID Connect {id="oidc"}
 
-[OpenID Connect](server-oidc.md)는 OAuth 2.0 기반의 신원 계층(identity layer)입니다. `Oidc` 플러그인은 프로바이더의 디스커버리 문서를 읽어오므로, 엔드포인트와 서명 키 대신 발급자(issuer) URL을 구성할 수 있습니다. [API](server-oidc-resource-server.md)에서 액세스 토큰을 검증하고 PKCE, 세션 및 로그아웃을 포함한 [브라우저 로그인](server-oidc-browser-login.md)을 실행할 수 있습니다.
+[OpenID Connect](server-oidc.md)는 OAuth 2.0 위에 구축된 아이덴티티 계층(identity layer)입니다. `Oidc` 플러그인은 프로바이더의 디스커버리 문서(discovery document)를 읽으므로 엔드포인트 및 서명 키 대신 발급자(issuer) URL을 구성합니다. [API](server-oidc-resource-server.md)에서 액세스 토큰을 검증하고, PKCE, 세션, 로그아웃을 포함한 [브라우저 로그인](server-oidc-browser-login.md)을 실행할 수 있습니다.
 
-이 플러그인은 실험적(experimental) 단계이며 JVM에서만 사용할 수 있습니다.
+이 플러그인은 실험적(experimental)이며 JVM에서만 사용할 수 있습니다.
 
 ### 세션 {id="sessions"}
-[세션(Sessions)](server-sessions.md)은 서로 다른 HTTP 요청 간에 데이터를 유지하는 메커니즘을 제공합니다. 일반적인 사용 사례로는 로그인한 사용자의 ID, 장바구니 내용 저장 또는 클라이언트에 사용자 기본 설정 유지 등이 있습니다. Ktor에서 이미 연결된 세션이 있는 사용자는 `session` 프로바이더를 사용하여 인증될 수 있습니다. 자세한 방법은 [Ktor Server의 세션 인증](server-session-auth.md)에서 확인하세요.
+[Sessions](server-sessions.md)는 서로 다른 HTTP 요청 간에 데이터를 유지하는 메커니즘을 제공합니다. 일반적인 사용 사례로는 로그인한 사용자의 ID 저장, 장바구니 내용 보관 또는 클라이언트의 사용자 환경설정 유지 등이 있습니다. Ktor에서는 이미 연결된 세션이 있는 사용자를 `session` 프로바이더를 사용하여 인증할 수 있습니다. 자세한 방법은 [Ktor Server의 세션 인증](server-session-auth.md)에서 확인할 수 있습니다.
 
 ### 커스텀 {id="custom"}
 
-Ktor는 인증 및 인가 동작을 커스터마이징하는 두 가지 방법을 제공합니다:
+Ktor는 인증 및 인가 동작을 커스터마이즈하는 두 가지 방법을 제공합니다.
 
 * [커스텀 인증 프로바이더](#custom-auth-provider)를 사용합니다.
-* [커스텀 플러그인](server-custom-plugins.md)을 사용하여 인가 로직을 구현합니다. 예를 들어, `AuthenticationChecked` [훅(hook)](server-custom-plugins.md#call-handling)을 사용하여 접근 권한을 확인할 수 있습니다. 자세한 내용은 [custom-plugin-authorization](https://github.com/ktorio/ktor-documentation/blob/%ktor_version%/codeSnippets/snippets/custom-plugin-authorization) 예제를 참조하십시오.
+* [커스텀 플러그인](server-custom-plugins.md)을 사용하여 인가 로직을 구현합니다. 예를 들어, 접근 권한을 확인하기 위해 `AuthenticationChecked` [훅(hook)](server-custom-plugins.md#call-handling)을 사용할 수 있습니다. 자세한 내용은 [custom-plugin-authorization](https://github.com/ktorio/ktor-documentation/blob/%ktor_version%/codeSnippets/snippets/custom-plugin-authorization) 예제를 참조하십시오.
 
-## 타입 안전한 인증 스킴 API {id="type-safe"}
+## 타입 세이프 인증 스키마 API {id="type-safe"}
 
 <primary-label ref="experimental"/>
 
-Ktor는 스킴을 프린시펄 타입에 바인딩하는 [타입 안전한 인증 스킴 API(type-safe authentication scheme API)](server-typed-auth.md)도 제공합니다.
-보호된 라우트 내부에서 `call.principal`은 해당 프린시펄 타입이 되며 `null`이 아님이 보장되므로, 캐스팅이나 null 검사가 필요하지 않습니다.
-이 API는 선택적 [역할 검사(role checks)](server-typed-auth.md#roles), [익명 대체(anonymous fallback)](server-typed-auth.md#anonymous), 타입이 지정된 [세션](server-typed-session-auth.md), 그리고 [OAuth 2.0 플로우](server-oauth2-flows.md)도 지원합니다.
+Ktor는 스키마를 프린시펄(principal) 타입에 바인딩하는 [타입 세이프(type-safe) 인증 스키마 API](server-typed-auth.md)도 제공합니다.
+보호된 라우트 내부에서 `call.principal`은 해당 프린시펄 타입이며 non-`null`임이 보장되므로 캐스팅이나 null 검사가 필요하지 않습니다.
+이 API는 선택적 [역할 검사](server-typed-auth.md#roles), [익명 대체(anonymous fallback)](server-typed-auth.md#anonymous), 타입이 지정된 [세션](server-typed-session-auth.md), 그리고 [OAuth 2.0 플로우](server-oauth2-flows.md)도 지원합니다.
 
-> 이 API는 본 문서에서 설명하는 이름 지정 프로바이더(named provider) 방식의 대안입니다.
-> 두 API 모두 동일한 애플리케이션에서 함께 사용할 수 있습니다. 자세한 내용은 [타입 안전한 인증(Type-safe authentication)](server-typed-auth.md)을 참조하십시오.
+> 이 API는 본 문서에서 설명하는 명명된 프로바이더(named provider) 방식의 대안입니다.
+> 두 API는 동일한 애플리케이션에서 함께 사용할 수 있습니다. 자세한 내용은 [타입 세이프 인증](server-typed-auth.md)을 참조하십시오.
 >
 {style="note"}
 
 ## 의존성 추가 {id="add_dependencies"}
 
 <p>
-    <code>%plugin_name%</code>을 사용하려면 빌드 스크립트에 <code>%artifact_name%</code> 아티팩트를 추가하십시오:
+    <code>%plugin_name%</code>을 사용하려면 빌드 스크립트에 <code>%artifact_name%</code> 아티팩트를 추가합니다.
 </p>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            위 코드 스니펫은 Ktor 의존성을 지정하기 위해 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 버전 카탈로그</a>를 사용합니다.
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            위 코드 스니펫은 Ktor 의존성을 지정하기 위해 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 버전 카탈로그</a>를 사용합니다.
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
     </TabItem>
 </Tabs>
 
-[JWT](server-jwt.md) 및 [LDAP](server-ldap.md)와 같은 일부 인증 프로바이더는 추가 아티팩트가 필요하다는 점에 유의하세요.
+[JWT](server-jwt.md) 및 [LDAP](server-ldap.md)와 같은 일부 인증 프로바이더는 추가 아티팩트가 필요하다는 점에 유의하십시오.
 
 ## Authentication 설치 {id="install"}
 
 <p>
-    애플리케이션에 <code>%plugin_name%</code> 플러그인을 <a href="server-plugins.md#install">설치</a>하려면, 지정된 <Links href="/ktor/server-modules" summary="모듈을 사용하면 라우트를 그룹화하여 애플리케이션을 구조화할 수 있습니다.">모듈</Links>의 <code>install</code> 함수에 전달하십시오.
-    아래의 예제는 <code>%plugin_name%</code>을 설치하는 방법을 보여줍니다:
+    애플리케이션에 <code>%plugin_name%</code> 플러그인을 <a href="server-plugins.md#install">설치</a>하려면,
+    지정된 <Links href="server-modules.md" summary="모듈을 사용하면 라우트를 그룹화하여 애플리케이션을 구조화할 수 있습니다.">모듈</Links>의 <code>install</code> 함수에 플러그인을 전달합니다.
+    다음 예제는 <code>%plugin_name%</code>을 설치하는 방법을 보여줍니다.
 </p>
 <list>
     <li>
-        <code>embeddedServer()</code> 함수 호출 내부에서.
+        <code>embeddedServer()</code> 함수 호출 내부에서 설치
     </li>
     <li>
-        <code>Application</code> 클래스의 명시적으로 정의된 <code>module()</code> 확장 함수 내부에서.
+        <code>Application</code> 클래스에 명시적으로 정의된 <code>module()</code> 확장 함수 내부에서 설치
     </li>
 </list>
 <Tabs>
@@ -115,12 +124,12 @@ Ktor는 스킴을 프린시펄 타입에 바인딩하는 [타입 안전한 인�
     </TabItem>
 </Tabs>
 
-## Authentication 설정 {id="configure"}
-[Authentication 설치](#install) 후, 다음과 같이 `Authentication`을 설정하고 사용할 수 있습니다:
+## Authentication 구성 {id="configure"}
+[Authentication을 설치](#install)한 후 다음과 같이 `Authentication`을 구성하고 사용할 수 있습니다.
 
 ### 1단계: 인증 프로바이더 선택 {id="choose-provider"}
 
-[basic](server-basic-auth.md), [digest](server-digest-auth.md), 또는 [form](server-form-based-auth.md)과 같은 특정 인증 프로바이더를 사용하려면 `install` 블록 내부에서 해당 함수를 호출해야 합니다. 예를 들어, 기본 인증(basic authentication)을 사용하려면 [`.basic()`](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/basic.html) 함수를 호출합니다:
+[basic](server-basic-auth.md), [digest](server-digest-auth.md), [form](server-form-based-auth.md)과 같은 특정 인증 프로바이더를 사용하려면 `install` 블록 내부에서 해당 함수를 호출해야 합니다. 예를 들어 기본(basic) 인증을 사용하려면 [`.basic()`](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/basic.html) 함수를 호출합니다.
 
 ```kotlin
 import io.ktor.server.application.*
@@ -128,42 +137,42 @@ import io.ktor.server.auth.*
 // ...
 install(Authentication) {
     basic {
-        // 기본 인증(basic authentication) 설정
+        // 기본 인증 구성
     }
 }
 ```
 
-이 함수 내부에서 해당 프로바이더에 특정한 설정을 [구성](#configure-provider)할 수 있습니다.
+이 함수 내부에서 해당 프로바이더에 특화된 설정을 [구성](#configure-provider)할 수 있습니다.
 
-> 기본 제공 프로바이더가 요구 사항에 맞지 않는 경우, [커스텀 인증 프로바이더](#custom-auth-provider)를 구현할 수 있습니다.
+> 내장 프로바이더가 요구사항에 맞지 않는 경우, [커스텀 인증 프로바이더](#custom-auth-provider)를 구현할 수 있습니다.
 > 
 {style="note"}
 
 ### 2단계: 프로바이더 이름 지정 {id="provider-name"}
 
-[특정 프로바이더를 사용](#choose-provider)하기 위한 함수에서는 선택적으로 프로바이더 이름을 지정할 수 있습니다. 아래의 코드 샘플은 [basic](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/basic.html) 및 [form](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/form.html) 프로바이더를 각각 `"auth-basic"` 및 `"auth-form"`이라는 이름으로 설치합니다:
+[특정 프로바이더를 사용하는](#choose-provider) 함수에는 선택적으로 프로바이더 이름을 지정할 수 있습니다. 아래 코드 샘플은 각각 `"auth-basic"` 및 `"auth-form"`이라는 이름으로 [basic](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/basic.html) 및 [form](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/form.html) 프로바이더를 설치합니다.
 
 ```kotlin
 install(Authentication) {
     basic("auth-basic") {
-        // 기본 인증 설정
+        // 기본 인증 구성
     }
     form("auth-form") {
-        // 폼 인증 설정
+        // 폼 인증 구성
     }
     // ...
 }
 ```
 {disable-links="false"}
 
-이 이름들은 나중에 서로 다른 프로바이더를 사용하여 [서로 다른 라우트를 인증](#authenticate-route)하는 데 사용될 수 있습니다.
+이 이름들은 나중에 서로 다른 프로바이더를 사용하여 [서로 다른 라우트를 인증](#authenticate-route)하는 데 사용할 수 있습니다.
 > 프로바이더 이름은 고유해야 하며, 이름이 없는 프로바이더는 하나만 정의할 수 있습니다.
 >
 {style="note"}
 
-### 3단계: 프로바이더 설정 {id="configure-provider"}
+### 3단계: 프로바이더 구성 {id="configure-provider"}
 
-각 [프로바이더 유형](#choose-provider)은 고유한 설정을 가집니다. 예를 들어, [`BasicAuthenticationProvider.Config`](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-basic-authentication-provider/-config/index.html) 클래스는 [`.basic()`](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/basic.html) 함수에 대한 옵션을 제공합니다. 이 클래스의 핵심 함수는 사용자 이름과 비밀번호의 유효성을 검사하는 책임을 지는 [`validate()`](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-basic-authentication-provider/-config/validate.html)입니다. 다음 코드 예제는 그 사용법을 보여줍니다:
+각 [프로바이더 유형](#choose-provider)은 고유한 구성을 가집니다. 예를 들어, [`BasicAuthenticationProvider.Config`](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-basic-authentication-provider/-config/index.html) 클래스는 [`.basic()`](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/basic.html) 함수에 대한 옵션을 제공합니다. 이 클래스의 핵심 함수는 사용자 이름과 비밀번호의 유효성을 검사하는 [`validate()`](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-basic-authentication-provider/-config/validate.html)입니다. 다음 코드 예제는 이 함수의 사용법을 보여줍니다.
 
 ```kotlin
 install(Authentication) {
@@ -182,18 +191,19 @@ install(Authentication) {
 }
 ```
 
-`validate()` 함수가 어떻게 작동하는지 이해하려면 두 가지 용어를 알아야 합니다:
+`validate()` 함수가 어떻게 작동하는지 이해하려면 두 가지 용어를 알아야 합니다.
 
-* **프린시펄(principal)**은 인증될 수 있는 개체입니다: 사용자, 컴퓨터, 서비스 등. Ktor에서 다양한 인증 프로바이더는 서로 다른 프린시펄을 사용할 수 있습니다. 예를 들어, `basic`, `digest`, `form` 프로바이더는 [`UserIdPrincipal`](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-user-id-principal/index.html)을 인증하는 반면, `jwt` 프로바이더는 [`JWTPrincipal`](https://api.ktor.io/ktor-server-auth-jwt/io.ktor.server.auth.jwt/-j-w-t-principal/index.html)을 검증합니다.
-  > 커스텀 프린시펄을 생성할 수도 있습니다. 이는 다음과 같은 경우에 유용할 수 있습니다:
-  > - 크리덴셜을 커스텀 프린시펄에 매핑하면 [라우트 핸들러](#get-principal) 내부에서 인증된 프린시펄에 대한 추가 정보를 가질 수 있습니다.
+* _프린시펄(Principal)_은 인증될 수 있는 주체(entity)를 의미합니다. 사용자, 컴퓨터, 서비스 등이 될 수 있습니다. Ktor에서 다양한 인증 프로바이더는 서로 다른 프린시펄을 사용할 수 있습니다. 예를 들어 `basic`, `digest`, `form` 프로바이더는 [`UserIdPrincipal`](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-user-id-principal/index.html)을 인증하는 반면, `jwt` 프로바이더는 [`JWTPrincipal`](https://api.ktor.io/ktor-server-auth-jwt/io.ktor.server.auth.jwt/-j-w-t-principal/index.html)을 검증합니다.
+  > 커스텀 프린시펄을 생성할 수도 있습니다. 이는 다음과 같은 경우에 유용할 수 있습니다.
+  > - 자격 증명을 커스텀 프린시펄로 매핑하면 [라우트 핸들러](#get-principal) 내부에서 인증된 프린시펄에 대한 추가 정보를 얻을 수 있습니다.
   > - [세션 인증](server-session-auth.md)을 사용하는 경우, 프린시펄은 세션 데이터를 저장하는 데이터 클래스일 수 있습니다.
-* **크리덴셜(credential)**은 서버가 프린시펄을 인증하기 위한 속성 집합입니다: 사용자/비밀번호 쌍, API 키 등. 예를 들어, `basic` 및 `form` 프로바이더는 [`UserPasswordCredential`](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-user-password-credential/index.html)을 사용하여 사용자 이름과 비밀번호를 검증하는 반면, `jwt`는 [`JWTCredential`](https://api.ktor.io/ktor-server-auth-jwt/io.ktor.server.auth.jwt/-j-w-t-credential/index.html)을 검증합니다.
+* _자격 증명(Credential)_은 서버가 프린시펄을 인증하기 위한 속성 집합입니다. 사용자/비밀번호 쌍, API 키 등이 있습니다. 예를 들어 `basic` 및 `form` 프로바이더는 [`UserPasswordCredential`](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-user-password-credential/index.html)을 사용하여 사용자 이름과 비밀번호를 검증하며, `jwt`는 [`JWTCredential`](https://api.ktor.io/ktor-server-auth-jwt/io.ktor.server.auth.jwt/-j-w-t-credential/index.html)을 검증합니다.
 
-따라서 `validate()` 함수는 지정된 크리덴셜을 확인하고 인증에 성공하면 프린시펄 `Any`를 반환하고, 인증에 실패하면 `null`을 반환합니다.
+따라서 `validate()` 함수는 지정된 자격 증명을 확인하고 인증에 성공하면 프린시펄 `Any`를 반환하며, 인증에 실패하면 `null`을 반환합니다.
 
-> 특정 기준에 따라 인증을 건너뛰려면 [`skipWhen()`](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-authentication-provider/-config/skip-when.html)을 사용하십시오.
-> 예를 들어, [세션](server-sessions.md)이 이미 존재하는 경우 `basic` 인증을 건너뛸 수 있습니다:
+> 특정 기준에 따라 인증을 건너뛰려면
+> [`skipWhen()`](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-authentication-provider/-config/skip-when.html)을 사용하십시오.
+> 예를 들어 [세션](server-sessions.md)이 이미 존재하는 경우 `basic` 인증을 건너뛸 수 있습니다:
 > ```kotlin
 > basic {
 >     skipWhen { call -> call.sessions.get<UserSession>() != null }
@@ -201,10 +211,10 @@ install(Authentication) {
 
 ### 4단계: 특정 리소스 보호 {id="authenticate-route"}
 
-마지막 단계는 애플리케이션의 특정 리소스를 보호하는 것입니다. 이는 [`authenticate()`](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/authenticate.html) 함수를 사용하여 수행할 수 있습니다. 이 함수는 두 개의 선택적 매개변수를 받습니다:
+마지막 단계는 애플리케이션의 특정 리소스를 보호하는 것입니다. 이는 [`authenticate()`](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/authenticate.html) 함수를 사용하여 수행할 수 있습니다. 이 함수는 두 개의 선택적 매개변수를 받습니다.
 
-- 중첩된 라우트를 인증하는 데 사용되는 [프로바이더 이름](#provider-name).
-  아래 코드 스니펫은 _auth-basic_ 이라는 이름의 프로바이더를 사용하여 `/login` 및 `/orders` 라우트를 보호합니다:
+- 중첩된 라우트를 인증하는 데 사용되는 [프로바이더의 이름](#provider-name)입니다.
+  아래 코드 스니펫은 _auth-basic_이라는 이름의 프로바이더를 사용하여 `/login` 및 `/orders` 라우트를 보호합니다.
    ```kotlin
    routing {
        authenticate("auth-basic") {
@@ -220,11 +230,11 @@ install(Authentication) {
        }
    }
    ```
-- 중첩된 인증 프로바이더를 해결하는 데 사용되는 전략.
-  이 전략은 [`AuthenticationStrategy`](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-authentication-strategy/index.html) 열거형 값으로 표현됩니다.
+- 중첩된 인증 프로바이더를 해결(resolve)하는 데 사용되는 전략입니다.
+  이 전략은 [`AuthenticationStrategy`](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-authentication-strategy/index.html) 열거형(enumeration) 값으로 표시됩니다.
 
-  예를 들어, 클라이언트는 `AuthenticationStrategy.Required` 전략으로 등록된 모든 프로바이더에 대해 인증 데이터를 제공해야 합니다.
-  아래 코드 스니펫에서는 [세션 인증](server-session-auth.md)을 통과한 사용자만이 기본 인증을 사용하여 `/admin` 라우트에 접근을 시도할 수 있습니다:
+  예를 들어, 클라이언트는 `AuthenticationStrategy.Required` 전략으로 등록된 모든 프로바이더에 대한 인증 데이터를 제공해야 합니다.
+  아래 코드 스니펫에서는 [세션 인증](server-session-auth.md)을 통과한 사용자만이 기본 인증을 사용하여 `/admin` 라우트에 접근을 시도할 수 있습니다.
    ```kotlin
    routing {
        val required = AuthenticationStrategy.Required
@@ -243,9 +253,9 @@ install(Authentication) {
 
 > 전체 예제는 [auth-form-session-nested](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/auth-form-session-nested)를 참조하십시오.
 
-### 5단계: 라우트 핸들러 내에서 프린시펄 가져오기 {id="get-principal"}
+### 5단계: 라우트 핸들러 내부에서 프린시펄 가져오기 {id="get-principal"}
 
-인증에 성공하면 `call.principal()` 함수를 사용하여 라우트 핸들러 내부에서 인증된 프린시펄을 검색할 수 있습니다. 이 함수는 [설정된 인증 프로바이더](#configure-provider)가 반환하는 특정 프린시펄 유형을 인자로 받습니다. 다음 예제에서 `call.principal()`은 `UserIdPrincipal`을 얻고 인증된 사용자의 이름을 가져오는 데 사용됩니다.
+인증에 성공하면 `call.principal()` 함수를 사용하여 라우트 핸들러 내부에서 인증된 프린시펄을 가져올 수 있습니다. 이 함수는 [구성된 인증 프로바이더](#configure-provider)가 반환하는 특정 프린시펄 타입을 매개변수로 받습니다. 다음 예제에서는 `call.principal()`을 사용하여 `UserIdPrincipal`을 가져오고 인증된 사용자의 이름을 얻습니다.
 
 ```kotlin
 routing {
@@ -258,7 +268,8 @@ routing {
 }
 ```
 
-[세션 인증](server-session-auth.md)을 사용하는 경우, 프린시펄은 세션 데이터를 저장하는 데이터 클래스일 수 있습니다. 따라서 이 데이터 클래스를 `call.principal()`에 전달해야 합니다:
+[세션 인증](server-session-auth.md)을 사용하는 경우, 프린시펄은 세션 데이터를 저장하는 데이터 클래스일 수 있습니다.
+따라서 이 데이터 클래스를 `call.principal()`에 전달해야 합니다.
 
 ```kotlin
 authenticate("auth-session") {
@@ -268,9 +279,9 @@ authenticate("auth-session") {
 }
 ```
 
-[중첩된 인증 프로바이더](#authenticate-route)의 경우, `call.principal()`에 [프로바이더 이름](#provider-name)을 전달하여 원하는 프로바이더의 프린시펄을 가져올 수 있습니다.
+[중첩된 인증 프로바이더](#authenticate-route)의 경우, 원하는 프로바이더의 프린시펄을 가져오기 위해 `call.principal()`에 [프로바이더 이름](#provider-name)을 전달할 수 있습니다.
 
-아래 예제에서는 최상위 세션 프로바이더의 프린시펄을 가져오기 위해 `"auth-session"` 값이 전달됩니다:
+아래 예제에서는 최상위 세션 프로바이더의 프린시펄을 가져오기 위해 `"auth-session"` 값을 전달합니다.
 
 ```kotlin
 val required = AuthenticationStrategy.Required
@@ -288,7 +299,7 @@ authenticate("auth-session", strategy = required) {
 
 ## 커스텀 인증 프로바이더 {id="custom-auth-provider"}
 
-기본 제공 프로바이더가 요구 사항에 맞지 않는 경우 [`provider()`](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-authentication-config/provider.html) 함수를 사용하여 커스텀 인증 로직을 구현하십시오:
+내장 프로바이더가 요구사항에 맞지 않을 때 커스텀 인증 로직을 구현하려면 [`provider()`](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-authentication-config/provider.html) 함수를 사용합니다.
 
 ```kotlin
 provider("custom") {
@@ -307,8 +318,8 @@ provider("custom") {
 }
 ```
 
-위의 예제에서 `provider("custom")` 함수는 나중에 `authenticate("custom")`를 사용하여 라우트에 적용할 수 있는 이름이 지정된 인증 프로바이더를 등록합니다.
+위 예제에서 `provider("custom")` 함수는 나중에 `authenticate("custom")`을 사용하여 라우트에 적용할 수 있는 이름이 지정된 인증 프로바이더를 등록합니다.
 
-프로바이더 내부의 `authenticate {}` 블록은 모든 들어오는 요청에 대해 실행되며, 컨텍스트 객체를 통해 인증 프로세스에 대한 전체 제어권을 부여합니다. 여기에는 현재 호출(`context.call`)에 대한 접근과 헤더, 매개변수 또는 기타 요청 데이터를 검사할 수 있는 기능이 포함됩니다.
+프로바이더 내부의 `authenticate {}` 블록은 들어오는 모든 요청에 대해 실행되며, 컨텍스트 객체를 통해 인증 프로세스에 대한 완전한 제어를 제공합니다. 여기에는 현재 호출에 대한 접근(`context.call`)과 헤더, 매개변수 또는 기타 요청 데이터를 검사하는 기능이 포함됩니다.
 
 [`DynamicProviderConfig`](https://api.ktor.io/ktor-server-auth/io.ktor.server.auth/-dynamic-provider-config/index.html) 클래스에서 제공하는 옵션을 사용하여 추가적인 프로바이더 동작을 구성할 수 있습니다.

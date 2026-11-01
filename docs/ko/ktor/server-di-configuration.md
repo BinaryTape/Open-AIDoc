@@ -9,17 +9,17 @@
 <var name="example_name" value="server-di"/>
 <p>
     <b>코드 예제</b>:
-    <a href="https://github.com/ktorio/ktor-documentation/tree/%ktor_version%/codeSnippets/snippets/%example_name%">
+    <a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/%example_name%">
         %example_name%
     </a>
 </p>
 </tldr>
 
-애플리케이션 설정 파일에서 [의존성 주입(DI) 플러그인](server-dependency-injection.md)을 구성할 수 있습니다. 이 설정은 전역적으로 의존성 해결(resolution) 동작에 영향을 미치며 등록된 모든 의존성에 적용됩니다.
+애플리케이션 구성 파일에서 [의존성 주입(DI) 플러그인](server-dependency-injection.md)을 구성할 수 있습니다. 이러한 설정은 의존성 확인(resolution) 동작에 전역적으로 영향을 미치며, 등록된 모든 의존성에 적용됩니다.
 
-### 의존성 키 매핑 (Dependency key mapping) {id="dependency-key-mapping"}
+### 의존성 키 매핑 {id="dependency-key-mapping"}
 
-`ktor.di.keyMapping` 속성은 의존성 해결 중에 의존성 키가 일반화(generalized)되고 일치(matched)되는 방식을 정의합니다. 이는 요청된 타입을 해결할 때 어떤 등록된 의존성이 호환 가능한 것으로 간주될지를 결정합니다.
+`ktor.di.keyMapping` 속성은 의존성 확인 과정에서 키를 일반화하고 매칭하는 방식을 정의합니다. 이는 요청된 타입을 확인할 때 등록된 어떤 의존성을 호환 가능한 것으로 간주할지 결정합니다.
 
 ```yaml
 ktor:
@@ -27,7 +27,7 @@ ktor:
     keyMapping: Supertypes * Nullables * OutTypeArgumentsSupertypes * RawTypes
 ```
 
-위의 예제는 DI 플러그인에서 사용하는 기본 키 매핑과 일치합니다.
+위 예제는 DI 플러그인이 사용하는 기본 키 매핑과 일치합니다.
 
 #### 사용 가능한 키 매핑 옵션 {id="available-key-mapping-options"}
 
@@ -39,31 +39,31 @@ ktor:
 </def>
 <def>
 <title><code>Supertypes</code></title>
-의존성의 상위 타입(supertypes) 중 하나를 사용하여 의존성을 해결할 수 있도록 허용합니다.
+상위 타입(supertype) 중 어느 것으로든 의존성을 확인할 수 있도록 허용합니다.
 </def>
 <def>
 <title><code>Nullables</code></title>
-타입의 Nullable 및 Non-nullable 변형을 일치시킬 수 있도록 허용합니다.
+타입의 널 허용(nullable) 및 널 불허(non-nullable) 변형 매칭을 허용합니다.
 </def>
 <def>
 <title><code>OutTypeArgumentsSupertypes</code></title>
-<code>out</code> 타입 파라미터에 대한 공변성(covariance)을 허용합니다.
+<code>out</code> 타입 매개변수에 대한 공변성(covariance)을 허용합니다.
 </def>
 <def>
 <title><code>RawTypes</code></title>
-타입 인자(type arguments)를 고려하지 않고 제네릭 타입을 해결할 수 있도록 허용합니다.
+타입 인자를 고려하지 않고 제네릭 타입을 확인할 수 있도록 허용합니다.
 </def>
 <def>
 <title><code>Unnamed</code></title>
-일치 여부를 확인할 때 의존성 이름(<code>@Named</code>)을 무시합니다.
+매칭 시 의존성 이름(<code>@Named</code>)을 무시합니다.
 </def>
 </deflist>
 
 #### 키 매핑 옵션 조합 {id="combine-key-mapping-options"}
 
-집합 연산자인 `*`(교집합), `+`(합집합) 및 `()`(그룹화)를 사용하여 키 매핑 옵션을 조합할 수 있습니다.
+집합 연산자인 `*`(교집합), `+`(합집합), `()`(그룹화)를 사용하여 키 매핑 옵션을 조합할 수 있습니다.
 
-다음 예제에서 `List<String>`으로 등록된 의존성은 `Collection<String>`(`Supertypes`), `List` 또는 `List?`(`RawTypes` 및 `Nullables`)로 해결될 수 있습니다:
+다음 예제에서 `List<String>`으로 등록된 의존성은 `Collection<String>`(`Supertypes`), `List` 또는 `List?`(`RawTypes` 및 `Nullables`)로 확인할 수 있습니다:
 
 ```yaml
 ktor:
@@ -71,11 +71,11 @@ ktor:
     keyMapping: Supertypes + (Nullables * RawTypes)
 ```
 
-이 조합은 표현식에 포함되지 않았으므로 `Collection?`으로는 해결되지 않습니다.
+이 조합은 표현식에 포함되지 않았으므로 `Collection?`으로는 확인되지 않습니다.
 
-### 충돌 해결 정책 (Conflict resolution policy) {id="conflict-resolution-policy"}
+### 충돌 해결 정책 {id="conflict-resolution-policy"}
 
-`ktor.di.conflictPolicy` 속성은 동일한 의존성 키에 대해 여러 프로바이더가 등록되었을 때 DI 컨테이너가 어떻게 동작할지를 제어합니다.
+`ktor.di.conflictPolicy` 속성은 동일한 의존성 키에 대해 여러 프로바이더가 등록되었을 때 DI 컨테이너가 동작하는 방식을 제어합니다:
 
 ```yaml
 ktor:
@@ -92,7 +92,7 @@ ktor:
 </def>
 <def>
 <title><code>OverridePrevious</code></title>
-기존 의존성을 새로 제공된 의존성으로 재정의(override)합니다.
+이전 의존성을 새로 제공된 의존성으로 덮어씁니다.
 </def>
 <def>
 <title><code>IgnoreConflicts</code></title>

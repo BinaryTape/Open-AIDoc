@@ -3,6 +3,7 @@
 <primary-label ref="server-plugin"/>
 
 <var name="artifact_name" value="ktor-server-data-conversion"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.server.dataConversion"/>
 <var name="package_name" value="io.ktor.server.plugins.dataconversion"/>
 <var name="plugin_name" value="DataConversion"/>
 <var name="example_name" value="data-conversion"/>
@@ -18,29 +19,35 @@
 <b>所需依赖项</b>：<code>io.ktor:%artifact_name%</code>
 </p>
 <p>
-    <b><Links href="/ktor/server-native" summary="Ktor 支持 Kotlin/Native，允许您在没有额外运行时或虚拟机的情况下运行服务器。">Native 服务器</Links>支持</b>：✅
+    <b><Links href="server-native.md" summary="Ktor 支持 Kotlin/Native，允许您在无需额外运行时或虚拟机的情况下运行服务器。">原生服务器</Links>支持</b>：✅
 </p>
 </tldr>
 
 <link-summary>
-用于 Ktor 服务器的 %plugin_name% 插件允许您为序列化和反序列化值列表添加自定义转换器。
+适用于 Ktor 服务器的 %plugin_name% 插件允许您添加自定义转换器，以序列化和反序列化值列表。
 </link-summary>
 
-[%plugin_name%](https://api.ktor.io/ktor-utils/io.ktor.util.converters/-data-conversion/index.html) 插件允许您序列化和反序列化值列表。默认情况下，Ktor 通过 [`DefaultConversionService`](https://api.ktor.io/ktor-utils/io.ktor.util.converters/-default-conversion-service/index.html) 处理字符串和常用类型，包括数值类型、无符号整数类型、`Uuid` 以及枚举。
+[%plugin_name%](https://api.ktor.io/ktor-utils/io.ktor.util.converters/-data-conversion/index.html) 插件允许您序列化和反序列化值列表。默认情况下，Ktor 通过 [`DefaultConversionService`](https://api.ktor.io/ktor-utils/io.ktor.util.converters/-default-conversion-service/index.html) 处理字符串以及常见类型，包括数值类型、无符号整数类型、`Uuid` 和枚举。
 
-您可以通过安装和配置 `%plugin_name%` 插件来扩展此服务以处理其他类型。
+您可以通过安装并配置 `%plugin_name%` 插件来扩展此服务，以处理其他类型。
 
 ## 添加依赖项 {id="add_dependencies"}
 
 <p>
-    要使用 <code>%plugin_name%</code>，请在构建脚本中添加 <code>%artifact_name%</code> 构件：
+    要使用 <code>%plugin_name%</code>，请将 <code>%artifact_name%</code> 工件添加到构建脚本中：
 </p>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上述代码段使用 <a href="server-dependencies.topic#using-version-catalog">Ktor 版本目录</a>来指定 Ktor 依赖项。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上述代码段使用 <a href="server-dependencies.topic#using-version-catalog">Ktor 版本目录</a>来指定 Ktor 依赖项。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
@@ -50,8 +57,7 @@
 ## 安装 %plugin_name% {id="install_plugin"}
 
 <p>
-    要在应用程序中<a href="server-plugins.md#install">安装</a> <code>%plugin_name%</code> 插件，请将其传递给指定<Links href="/ktor/server-modules" summary="模块允许您通过对路由进行分组来构建应用程序。">模块</Links>中的 <code>install</code> 函数。
-    以下示例展示了如何安装 <code>%plugin_name%</code>：
+    要将 <code>%plugin_name%</code> 插件<a href="server-plugins.md#install">安装</a>到应用程序中，请将其传递给指定<Links href="server-modules.md" summary="模块允许您通过对路由进行分组来组织应用程序结构。">模块</Links>中的 <code>install</code> 函数。以下示例展示了如何安装 <code>%plugin_name%</code>：
 </p>
 <list>
     <li>
@@ -74,7 +80,7 @@
 
 您可以在 `%plugin_name%` 配置中定义类型转换。为指定类型提供 `convert<T>` 方法，并使用可用函数来序列化和反序列化值列表：
 
-* 使用 `decode()` 函数来反序列化值列表。它接受一个字符串列表（代表 URL 中的重复值），并返回解码后的值。
+* 使用 `decode()` 函数反序列化值列表。它接收一个表示 URL 中重复值的字符串列表，并返回解码后的值。
 
   ```kotlin
   decode { values -> // 转换器: (values: List<String>) -> Any?
@@ -82,7 +88,7 @@
   }
   ```
 
-* 使用 `encode()` 函数来序列化一个值。该函数接受一个任意值并返回一个代表该值的字符串列表。
+* 使用 `encode()` 函数序列化值。该函数接收任意值并返回表示该值的字符串列表。
 
   ```kotlin
      encode { value -> // 转换器: (value: Any?) -> List<String>
@@ -98,14 +104,14 @@
 val dataConversion = application.conversionService
 ```
 
-然后，您可以使用转换器服务来调用回调函数：
+随后您可以使用转换器服务来调用回调函数：
 
-* `fromValues(values: List<String>, type: TypeInfo)` 回调函数接受 `values` 字符串列表以及要转换到的目标 `TypeInfo`，并返回解码后的值。
-* `toValues(value: Any?)` 回调函数接受一个任意值，并返回代表该值的字符串列表。
+* `fromValues(values: List<String>, type: TypeInfo)` 回调函数接收作为字符串列表的 `values` 以及要将值转换为的目标 `TypeInfo`，并返回解码后的值。
+* `toValues(value: Any?)` 回调函数接收任意值，并返回表示该值的字符串列表。
 
 ## 示例 {id="example"}
 
-在以下示例中，定义并配置了 `LocalDate` 类型的转换器，用于序列化和反序列化值。当调用 `encode` 函数时，该服务将使用 `SimpleDateFormat` 转换该值，并返回包含格式化值的列表。当调用 `decode` 函数时，该服务将日期格式化为 `LocalDate` 并将其返回。
+在以下示例中，定义并配置了针对 `LocalDate` 类型的转换器，用于序列化和反序列化值。当调用 `encode` 函数时，该服务将使用 `SimpleDateFormat` 转换该值，并返回包含格式化后值的列表。当调用 `decode` 函数时，该服务会将日期格式化为 `LocalDate` 并将其返回。
 
 ```kotlin
     install(DataConversion) {
@@ -127,7 +133,7 @@ val dataConversion = application.conversionService
     }
 ```
 
-随后可以手动调用转换服务来获取编码和解码后的值：
+随后可以手动调用该转换服务来获取编码和解码后的值：
 
 ```kotlin
 val encodedDate = application.conversionService.toValues(call.parameters["date"])

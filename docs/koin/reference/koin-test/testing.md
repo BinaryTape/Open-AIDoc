@@ -1,254 +1,326 @@
 ---
-title: 在测试中注入
+title: 单元测试
 ---
 
-## 使用 KoinTest 让你的测试成为 KoinComponent {id="making-your-test-a-koincomponent-with-kointest"}
+# 单元测试
 
-*注意*：这不适用于 Android 仪器化测试。关于使用 Koin 进行仪器化测试，请参阅 [Android 仪器化测试](/docs/reference/koin-android/instrumented-testing)
+本指南介绍了如何使用 Koin 编写 JVM 单元测试：为每个测试启动和停止容器、检索实例、重写定义以及使用 mock 替换依赖项。它是所有测试技术的参考文档；各平台页面（[Android 插桩测试](/docs/reference/koin-android/instrumented-testing)、[Compose](/docs/reference/koin-compose/compose-testing)、[Ktor](/docs/reference/koin-ktor/ktor-testing)）仅涵盖其特有的内容。你应该先了解如何[启动 Koin](/docs/reference/koin-core/starting-koin) 以及声明[定义](/docs/reference/koin-core/definitions)。
 
-通过为你的类标记 `KoinTest`，你的类将成为 `KoinComponent` 并为你带来：
+## 依赖项 {id="dependencies"}
 
-* `by inject()` 和 `get()` —— 从 Koin 获取实例的函数
-* `verify()` —— 帮助你验证模块配置
-* `declareMock` 和 `declare` —— 在当前上下文中声明一个 Mock 或新定义
+将 `koin-test` 以及对应 JUnit 版本的构件添加到测试依赖项中：
 
 ```kotlin
-class ComponentA
-class ComponentB(val a: ComponentA)
+dependencies {
+    testImplementation("io.insert-koin:koin-test")
+    // 任选其一
+    testImplementation("io.insert-koin:koin-test-junit4")
+    testImplementation("io.insert-koin:koin-test-junit5")
+}
+```
 
-class MyTest : KoinTest {
+版本来源于 Koin BOM，请参阅 [Gradle 配置](/docs/setup/gradle)。`koin-test` 本身不依赖任何 mocking 库：你可以接入 Mockito、MockK 或其他任何库（请参阅[使用 declareMock 进行 Mock](#mocking-with-declaremock)）。
 
-    // Lazy inject property
-    val componentB : ComponentB by inject()
+## KoinTest {id="kointest"}
+
+在你的测试类中实现 `KoinTest`。这会使该类成为一个 [KoinComponent](/docs/reference/koin-core/koin-component)，从而可以直接在测试中使用 `get()` 和 `by inject()`：
+
+```kotlin
+import org.koin.test.KoinTest
+import org.koin.test.get
+import org.koin.test.inject
+
+class UserServiceTest : KoinTest {
+
+    // 首次访问时解析
+    private val userService: UserService by inject()
 
     @Test
-    fun `should inject my components`() {
-        startKoin {
-            modules(
-                module {
-                    single { ComponentA() }
-                    single { ComponentB(get()) }
-                })
-        }
+    fun `finds a known user`() {
+        startKoin { modules(appModule) }
 
-        // directly request an instance
-        val componentA = get<ComponentA>()
+        val repository = get<UserRepository>()
 
-        assertNotNull(a)
-        assertEquals(componentA, componentB.a)
+        assertNotNull(userService.findUser("alice"))
+        assertSame(repository, userService.repository)
+
+        stopKoin()
     }
+}
 ```
 
-:::note
- 不要犹豫去重载 Koin 模块配置，以帮助你部分构建应用。
-:::
+`KoinTest` 适用于全局 Koin 上下文（即由 `startKoin` 创建的上下文）。它不适用于 Android 插桩测试，因为在插桩测试中是由 `Application` 类启动 Koin：请参阅 [Android 插桩测试](/docs/reference/koin-android/instrumented-testing)。
 
-## JUnit 规则 (Rules) {id="junit-rules"}
+## 为每个测试启动和停止 Koin {id="start-and-stop-koin-for-each-test"}
 
-### 为你的测试创建一个 Koin 上下文 {id="create-a-koin-context-for-your-test"}
+每个测试都应该启动自己的容器，并在结束时将其停止。处于运行状态未被停止的容器会导致下一次调用 `startKoin` 时抛出 `KoinApplicationAlreadyStartedException` 异常失败，并在测试之间泄漏实例。
 
-你可以使用以下规则轻松地为每个测试创建并持有 Koin 上下文：
+加载与应用相同的配置：
+
+**编译器插件 DSL**
+```kotlin
+class UserServiceTest : KoinTest {
+
+    @Before
+    fun before() {
+        startKoin { modules(appModule) }
+    }
+
+    @After
+    fun after() {
+        stopKoin()
+    }
+}
+```
+
+**注解**
+使用类型化 API 启动应用的 `@KoinApplication` 类：
 
 ```kotlin
+import org.koin.plugin.module.dsl.startKoin
+
+class UserServiceTest : KoinTest {
+
+    @Before
+    fun before() {
+        startKoin<MyApp>()
+    }
+
+    @After
+    fun after() {
+        stopKoin()
+    }
+}
+```
+
+如果只需加载部分模块，请在普通的 `startKoin { }` 中使用 `module<DataModule>()` 或 `modules(DataModule::class, CacheModule::class)`。
+
+**构造函数 / 传统 DSL**
+```kotlin
+class UserServiceTest : KoinTest {
+
+    @Before
+    fun before() {
+        startKoin { modules(appModule) }
+    }
+
+    @After
+    fun after() {
+        stopKoin()
+    }
+}
+```
+
+如果不想编写 `@After` 来停止 Koin，可以继承 `AutoCloseKoinTest` 或实现 `ClosingKoinTest`。两者都会在每次测试后调用 `stopKoin()`。JUnit 5 版本位于 `org.koin.test.junit5` 中。
+
+下文介绍的 JUnit 规则（Rule）和扩展程序（Extension）可以代为你完成启动和停止操作，是更简洁的选择。
+
+## JUnit 4：KoinTestRule {id="junit-4-kointestrule"}
+
+`KoinTestRule`（来自 `koin-test-junit4`）会在每次测试前启动 Koin，并在测试后停止它：
+
+```kotlin
+import org.koin.test.KoinTestRule
+
+class UserServiceTest : KoinTest {
+
+    @get:Rule
+    val koinTestRule = KoinTestRule.create {
+        printLogger()
+        modules(appModule)
+    }
+
+    private val userService: UserService by inject()
+
+    @Test
+    fun `finds a known user`() {
+        assertNotNull(userService.findUser("alice"))
+    }
+}
+```
+
+该 lambda 是一个标准的 `KoinApplication` 声明：在 `startKoin { }` 中编写的所有内容均可在此处使用。在使用注解时，可通过 `withConfiguration<MyApp>()` 加载应用：
+
+```kotlin
+import org.koin.plugin.module.dsl.withConfiguration
+
 @get:Rule
 val koinTestRule = KoinTestRule.create {
-    // Your KoinApplication instance here
-    modules(myModule)
+    withConfiguration<MyApp>()
 }
 ```
 
-### 指定你的 Mock 提供者 (Mock Provider) {id="specify-your-mock-provider"}
+如果测试开始时已有 Koin 容器在运行，该规则会先将其关闭。已启动的实例可以通过 `koinTestRule.koin` 访问。
 
-为了让你能够使用 `declareMock` API，你需要指定一个规则来让 Koin 知道如何构建你的 Mock 实例。这让你能够根据需求选择合适的 Mock 框架。
+## JUnit 5：KoinTestExtension {id="junit-5-kointestextension"}
 
-使用 Mockito 创建 Mock：
+`KoinTestExtension`（来自 `koin-test-junit5`）为 JUnit 5 提供了相同的功能。使用 `@JvmField` 和 `@RegisterExtension` 对其进行注册：
 
 ```kotlin
+import org.koin.test.junit5.KoinTestExtension
+
+class UserServiceTest : KoinTest {
+
+    @JvmField
+    @RegisterExtension
+    val koinTestExtension = KoinTestExtension.create {
+        modules(appModule)
+    }
+
+    private val userService: UserService by inject()
+
+    @Test
+    fun `finds a known user`() {
+        assertNotNull(userService.findUser("alice"))
+    }
+}
+```
+
+该扩展程序还可以将 `Koin` 实例作为测试函数形参传入：
+
+```kotlin
+@Test
+fun `resolves from the test container`(koin: Koin) {
+    assertNotNull(koin.get<UserRepository>())
+}
+```
+
+## 为测试重写定义 {id="override-definitions-for-a-test"}
+
+要替换生产环境中的定义，请在生产模块之后加载测试模块。最后加载的模块生效：
+
+```kotlin
+val testModule = module {
+    single<ApiService> { FakeApiService() }
+}
+
+@get:Rule
+val koinTestRule = KoinTestRule.create {
+    modules(appModule, testModule)
+}
+```
+
+像 `single<ApiService> { FakeApiService() }` 这样的 lambda 定义适用于所有风格，因此即使你的应用使用了编译器插件 DSL 或注解，也可以采用这种方式编写测试模块。
+
+如果你的应用通过 `allowOverride(false)` 启动 Koin，请使用 `.override()` 标记每个测试定义。重写规则详见[定义](/docs/reference/koin-core/definitions#overriding-a-definition)。
+
+## 使用 declareMock 进行 Mock {id="mocking-with-declaremock"}
+
+`declareMock<T>()` 会创建 `T` 的 mock，将其注册到正在运行的容器中以替换现有定义，并返回该 mock 对象。此后，所有依赖 `T` 的定义都会接收到该 mock。
+
+Koin 本身不创建 mock。需要先注册一个 mock 提供程序：
+
+```kotlin
+// JUnit 4, Mockito
 @get:Rule
 val mockProvider = MockProviderRule.create { clazz ->
-    // Your way to build a Mock here
     Mockito.mock(clazz.java)
 }
-```
 
-使用 MockK 创建 Mock：
-
-```kotlin
+// JUnit 4, MockK
 @get:Rule
 val mockProvider = MockProviderRule.create { clazz ->
-    // Your way to build a Mock here
+    mockkClass(clazz)
+}
+
+// JUnit 5
+@JvmField
+@RegisterExtension
+val mockProvider = MockProviderExtension.create { clazz ->
     mockkClass(clazz)
 }
 ```
 
-!> koin-test 项目不再与 Mockito 强绑定
-
-## 开箱即用的 Mock 支持 {id="mocking-out-of-the-box"}
-
-无需在每次需要 Mock 时都创建一个新模块，你可以使用 `declareMock` 实时声明 Mock：
+然后在测试中声明 mock，并可附加可选的打桩代码块：
 
 ```kotlin
-class ComponentA
-class ComponentB(val a: ComponentA)
+import org.koin.test.mock.declareMock
 
-class MyTest : KoinTest {
+class UserServiceTest : KoinTest {
 
     @get:Rule
     val koinTestRule = KoinTestRule.create {
-        modules(
-            module {
-                single { ComponentA() }
-                single { ComponentB(get()) }
-            })
+        modules(appModule)
     }
 
     @get:Rule
-    val mockProvider = MockProviderRule.create { clazz ->
-        Mockito.mock(clazz.java)
-    }
-    
+    val mockProvider = MockProviderRule.create { clazz -> mockkClass(clazz) }
+
+    private val userService: UserService by inject()
+
     @Test
-    fun `should inject my components`() {
-    
-    }
-        // Replace current definition by a Mock
-        val mock = declareMock<ComponentA>()
-
-        // retrieve mock, same as variable above 
-        assertNotNull(get<ComponentA>())
-
-        // is built with mocked ComponentA
-        assertNotNull(get<ComponentB>())
-    }
-```
-
-:::note
- `declareMock` 可以指定你想要的是 single 还是 factory，以及是否想要将其置于某个模块路径中。
-:::
-
-## 实时声明组件 {id="declaring-a-component-on-the-fly"}
-
-当 Mock 不够用且不想仅为此创建一个模块时，你可以使用 `declare`：
-
-```kotlin
-    @Test
-    fun `successful declare an expression mock`() {
-        startKoin { }
-
-        declare {
-            factory { ComponentA("Test Params") }
+    fun `returns the user from the repository`() {
+        val repository = declareMock<UserRepository> {
+            every { findUser("alice") } returns User("alice")
         }
 
-        Assert.assertNotEquals(get<ComponentA>(), get<ComponentA>())
+        assertEquals("alice", userService.findUser("alice")?.name)
+        verify { repository.findUser("alice") }
     }
+}
 ```
 
-## 检查你的 Koin 模块 {id="checking-your-koin-modules"}
+`declareMock` 支持与普通定义相同的选项：
 
-Koin 提供了一种方法来测试你的 Koin 模块是否正常：`verify()` —— 遍历你的定义树并检查每个定义是否已绑定。
+- `qualifier`：替换[带限定符的](/docs/reference/koin-core/qualifiers)定义，例如 `declareMock<Database>(named("local"))`。
+- `secondaryTypes`：同时将 mock 绑定到其他类型，例如 `declareMock<UserRepositoryImpl>(secondaryTypes = listOf(UserRepository::class))`。
+
+该 mock 作为单例实例保存在根作用域中。要对作用域内的定义进行 mock，请在该作用域上调用 `declareMock`：`scope.declareMock<CartState>()`。
+
+:::warning
+请在首次解析使用该 mock 的类之前声明它。已创建的 `single` 会保留其先前接收到的依赖项。
+:::
+
+## 使用 declare 声明实例 {id="declare-an-instance-with-declare"}
+
+当你需要真实实例或手动创建的实例而非 mock 时，`declare` 可以将其注册到正在运行的容器中：
+
+```kotlin
+import org.koin.test.mock.declare
+
+@Test
+fun `uses a fixed clock`() {
+    declare<Clock> { FixedClock(at = "2026-01-01T00:00:00Z") }
+
+    assertEquals(2026, get<ReportService>().currentYear())
+}
+```
+
+`declare` 会重写该类型的任何现有定义，接受 `qualifier`，并返回已声明的实例。它使用的是全局上下文，因此必须在 Koin 启动之后调用。
+
+## 测试具有作用域的定义 {id="test-scoped-definitions"}
+
+自行创建作用域，从中解析实例，然后将其关闭：
 
 ```kotlin
 @Test
-fun checkKoinModules() {
-    myModule.verify()
+fun `cart state lives in its scope`() {
+    val scope = getKoin().createScope<CheckoutSession>("checkout-1")
+
+    val state = scope.get<CartState>()
+    assertSame(state, scope.get<CartState>())
+
+    scope.close()
 }
 ```
 
-:::tip
-`checkModules()` API 已弃用。Koin 编译器插件现在提供编译时依赖验证，取代了对 `verify()` 和 `checkModules()` 的需求。请参阅[编译时安全](/docs/reference/koin-compiler/compile-safety)。
-:::
+有关作用域 API 的信息，请参阅[作用域](/docs/reference/koin-core/scopes)。在 Android 上，绑定到 Activity 或 Fragment 的作用域会随组件本身一起测试：请参阅 [Android 插桩测试](/docs/reference/koin-android/instrumented-testing#scopes)。
 
-## 为你的测试启动与停止 Koin {id="starting-stopping-koin-for-your-tests"}
+## 检查你的配置 {id="check-your-configuration"}
 
-请注意在每个测试之间停止你的 Koin 实例（如果你在测试中使用了 `startKoin`）。否则，请确保使用 `koinApplication` 获取局部 Koin 实例，或者使用 `stopKoin()` 停止当前的全局实例。
+单元测试主要检验行为。若要检查每个定义的各项依赖是否均已声明，可以在构建时使用 [Koin 编译器插件](/docs/reference/koin-compiler/compile-safety)，或者使用 `verify()` 测试 API：请参阅[验证你的配置](/docs/reference/koin-test/verify)。
 
-## 使用 JUnit5 进行测试 {id="testing-with-junit5"}
-JUnit 5 支持提供的[扩展 (Extensions)](https://junit.org/junit5/docs/current/user-guide/#extensions)将处理 Koin 上下文的启动和停止。这意味着如果你正在使用该扩展，则无需使用 `AutoCloseKoinTest`。
+## 限制 {id="limits"}
 
-### 依赖项 {id="dependency"}
-对于使用 JUnit5 进行测试，你需要使用 `koin-test-junit5` 依赖项。
+- 全局上下文：`startKoin`、`KoinTestRule` 和 `KoinTestExtension` 都使用单一的全局上下文。启动 Koin 的测试无法在同一 JVM 中并行运行。对于并行测试，请使用[独立上下文](/docs/reference/koin-core/context-isolation)。除非重写 `getKoin()`，否则 `KoinTest` 的 `get()` 和 `inject()` 读取的均是全局上下文。
+- Mock 提供程序：如果没有注册 `MockProviderRule` 或 `MockProviderExtension`，`declareMock` 将会失败。
+- 重写在整个测试期间持续有效：使用测试模块、`declareMock` 或 `declare` 替换的定义仅在 Koin 停止时才会被重置。
 
-### 编写测试 {id="writing-tests"}
-你需要注册 `KoinTestExtension` 并提供你的模块配置。完成此操作后，你可以在测试中获取或注入你的组件。请记得在 `@RegisterExtension` 处配合使用 `@JvmField`。
+## 相关内容 {id="related"}
 
-```kotlin
-class ExtensionTests: KoinTest {
-
-    private val componentB by inject<Simple.ComponentB>()
-
-    @JvmField
-    @RegisterExtension
-    val koinTestExtension = KoinTestExtension.create {
-        modules(
-                module {
-            single { Simple.ComponentA() }
-            single { Simple.ComponentB(get()) }
-        })
-    }
-
-    @Test
-    fun contextIsCreatedForTheTest() {
-        Assertions.assertNotNull(get<Simple.ComponentA>())
-        Assertions.assertNotNull(componentB)
-    }
-}
-
-```
-
-### 在 JUnit5 中使用 Mock {id="mocking-with-junit5"}
-其工作方式与 JUnit4 相同，只是你需要使用 `@RegisterExtension`。
-
-```kotlin
-class MockExtensionTests: KoinTest {
-
-    val mock: Simple.UUIDComponent by inject()
-
-    @JvmField
-    @RegisterExtension
-    val koinTestExtension = KoinTestExtension.create {
-        modules(
-                module {
-                    single { Simple.UUIDComponent() }
-                })
-    }
-
-    @JvmField
-    @RegisterExtension
-    val mockProvider = MockProviderExtension.create { clazz ->
-        Mockito.mock(clazz.java)
-    }
-
-    @Test
-    fun mockProviderTest() {
-        val uuidValue = "UUID"
-        declareMock<Simple.UUIDComponent> {
-            BDDMockito.given(getUUID()).will { uuidValue }
-        }
-
-        Assertions.assertEquals(uuidValue, mock.getUUID())
-    }
-}
-```
-
-### 获取创建的 Koin 实例 {id="getting-the-created-koin-instances"}
-你也可以将创建的 Koin 上下文作为函数参数获取。这可以通过向测试函数添加函数参数来实现。
-
-```kotlin
-class ExtensionTests: KoinTest {
-    
-    @RegisterExtension
-    @JvmField
-    val koinTestExtension = KoinTestExtension.create {
-        modules(
-                module {
-                    single { Simple.ComponentA() }
-                })
-    }
-
-    @Test
-    fun contextIsCreatedForTheTest(koin: Koin) {
-        // get<SimpleComponentA>() == koin.get<Simple.ComponentA>()
-        Assertions.assertNotNull(koin.get<Simple.ComponentA>())
-    }
-}
-```
+- [验证你的配置](/docs/reference/koin-test/verify)：`verify()` 及其与编译时安全性的关系。
+- [Android 插桩测试](/docs/reference/koin-android/instrumented-testing)：由 `Application` 启动 Koin 的测试。
+- [测试 Composable](/docs/reference/koin-compose/compose-testing)：Compose UI 测试与预览。
+- [Ktor 测试](/docs/reference/koin-ktor/ktor-testing)：结合 Koin 使用 `testApplication`。
+- [上下文隔离](/docs/reference/koin-core/context-isolation)：适用于库和并行测试的专用 Koin 容器。
+- [JUnit 测试快速入门](/docs/quickstart/junit-test)：完整的示例项目。

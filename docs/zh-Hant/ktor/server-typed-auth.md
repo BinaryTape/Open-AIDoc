@@ -4,6 +4,7 @@
 <primary-label ref="experimental"/>
 
 <var name="artifact_name" value="ktor-server-auth"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.server.auth"/>
 
 <tldr>
 <p>
@@ -12,25 +13,33 @@
 </tldr>
 
 <link-summary>
-型別安全驗證方案 API 會將 principal 型別繫結到路由，因此您可以在不進行型別轉換或 null 檢查的情況下讀取非 null 的 principal。
+型別安全驗證方案 API 將 principal 型別繫結至路由，讓您無需進行轉換或 null 檢查即可讀取非 null 的 principal。
 </link-summary>
 
-Ktor 提供了型別安全驗證方案 API，可將驗證方案繫結至 principal 型別。您只需建立一次方案，將該方案傳遞給路由，便能讀取 principal 而無需進行型別轉換或 null 檢查。
+Ktor 提供了型別安全驗證方案 API，將驗證方案繫結至 principal 型別。您只需建立一次方案，將該方案傳遞給路由，便能在無需轉換或 null 檢查的情況下讀取 principal。
 
-> 此 API 是 [`install(Authentication)`](server-auth.md) 做法的替代方案。兩個 API 可以在同一個應用程式中並用，您也可以將使用其中一種 API 的路由巢狀嵌入到使用另一種 API 的路由中。
+> 此 API 是 [`install(Authentication)`](server-auth.md) 做法的替代方案。這兩種 API 均可在同一個應用程式中使用，且您可以將使用其中一種 API 的路由巢狀嵌入使用另一種 API 的路由中。
 > 
 {style="tip"}
 
 ## 新增相依性 {id="add_dependencies"}
 
-若要使用具型別的驗證，請將 `ktor-server-auth` 構件新增至您的建置指令碼中：
+若要使用型別化驗證，請將 `ktor-server-auth` 構件新增至您的建置指令碼：
 
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上述程式碼片段使用 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor version catalog</a> 來指定 Ktor 相依性。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上述程式碼片段使用 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor version catalog</a> 來指定 Ktor 相依性。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
@@ -40,12 +49,21 @@ Ktor 提供了型別安全驗證方案 API，可將驗證方案繫結至 princip
 如果使用 `jwt` 方案，請新增 `ktor-server-auth-jwt` 構件：
 
 <var name="artifact_name" value="ktor-server-auth-jwt"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.server.auth.jwt"/>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上述程式碼片段使用 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor version catalog</a> 來指定 Ktor 相依性。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上述程式碼片段使用 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor version catalog</a> 來指定 Ktor 相依性。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
@@ -55,21 +73,30 @@ Ktor 提供了型別安全驗證方案 API，可將驗證方案繫結至 princip
 如果使用 `apiKey` 方案，請新增 `ktor-server-auth-api-key` 構件：
 
 <var name="artifact_name" value="ktor-server-auth-api-key"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.server.auth.apiKey"/>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上述程式碼片段使用 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor version catalog</a> 來指定 Ktor 相依性。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上述程式碼片段使用 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor version catalog</a> 來指定 Ktor 相依性。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
     </TabItem>
 </Tabs>
 
-## 啟用 API {id="prerequisites"}
+## 啟用此 API {id="prerequisites"}
 
-此 API 標記有 `@ExperimentalKtorApi`，因此您必須明確選擇加入（opt in）：
+此 API 標記為 `@ExperimentalKtorApi`，因此您必須選擇加入 (opt in)：
 
 ```kotlin
 @OptIn(ExperimentalKtorApi::class)
@@ -78,7 +105,7 @@ fun Application.module() {
 }
 ```
 
-路由建置器使用 Kotlin [上下文參數 (context parameters)](https://kotlinlang.org/docs/context-parameters.html)。Kotlin 2.4.0 預設啟用上下文參數。若使用 Kotlin 2.2.x 或 2.3.x，請在您的建置指令碼中啟用它們：
+路由建構函式使用 Kotlin [上下文參數 (context parameters)](https://kotlinlang.org/docs/context-parameters.html)。Kotlin 2.4.0 預設啟用上下文參數。若使用 Kotlin 2.2.x 或 2.3.x，請在建置指令碼中啟用它們：
 
 ```kotlin
 kotlin {
@@ -88,7 +115,7 @@ kotlin {
 }
 ```
 
-## 定義 Principal {id="principal"}
+## 定義 principal {id="principal"}
 
 Principal 代表應用程式與已驗證呼叫者關聯的身分或其他資訊。Principal 型別必須為非 null。
 
@@ -101,7 +128,7 @@ data class User(
 
 ## 建立方案 {id="create-scheme"}
 
-每種驗證方法都提供一個工廠函式，接收 principal 型別、名稱以及設定區塊。`validate {}` 區塊會傳回您的 principal 型別，或在憑據被拒絕時傳回 `null`：
+每種驗證方法都提供一個工廠函式，該函式接受 principal 型別、名稱和設定區塊。`validate {}` 區塊會傳回您的 principal 型別，或在憑據被拒絕時傳回 `null`：
 
 ```kotlin
 val jwtAuth = jwt<User>("my-jwt") {
@@ -117,24 +144,24 @@ val jwtAuth = jwt<User>("my-jwt") {
 }
 ```
 
-工廠函式會傳回一個值。請儲存該值並將其傳遞給需要它的路由。
+此工廠會傳回一個值。將其儲存並傳遞給需要它的路由。
 
-| Factory                             | Artifact                   | Notes                                   |
+| 工廠函式 | 構件 | 備註 |
 |-------------------------------------|----------------------------|-----------------------------------------|
-| `basic<P>()`                        | `ktor-server-auth`         | 請參閱 [Ktor Server 中的 Basic 驗證](server-basic-auth.md)            |
-| `digest<P>()`                       | `ktor-server-auth`         | 僅限 JVM。請參閱 [Ktor Server 中的 Digest 驗證](server-digest-auth.md) |
-| `bearer<P>()`                       | `ktor-server-auth`         | 請參閱 [Ktor Server 中的 Bearer 驗證](server-bearer-auth.md)           |
-| `form<P>()`                         | `ktor-server-auth`         | 請參閱 [Ktor Server 中的表單驗證](server-form-based-auth.md)       |
-| `session<S, P>()`                   | `ktor-server-auth`         | 請參閱 [型別安全 Session 驗證](server-typed-session-auth.md)    |
-| `apiKey<P>()`                       | `ktor-server-auth-api-key` | 請參閱 [API Key 驗證](server-api-key-auth.md)          |
-| `jwt<P>()`                          | `ktor-server-auth-jwt`     | 僅限 JVM。請參閱 [JSON Web Token](server-jwt.md)         |
-| `oauth2()`, `oauth2Session<P, S>()` | `ktor-server-auth`         | 請參閱 [OAuth 2.0 流程](server-oauth2-flows.md)          |
+| `basic<P>()` | `ktor-server-auth` | 請參閱 [Ktor Server 中的基本驗證](server-basic-auth.md) |
+| `digest<P>()` | `ktor-server-auth` | 僅限 JVM。請參閱 [Ktor Server 中的摘要驗證](server-digest-auth.md) |
+| `bearer<P>()` | `ktor-server-auth` | 請參閱 [Ktor Server 中的 Bearer 驗證](server-bearer-auth.md) |
+| `form<P>()` | `ktor-server-auth` | 請參閱 [Ktor Server 中的表單驗證](server-form-based-auth.md) |
+| `session<S, P>()` | `ktor-server-auth` | 請參閱[型別安全工作階段驗證](server-typed-session-auth.md) |
+| `apiKey<P>()` | `ktor-server-auth-api-key` | 請參閱 [API 金鑰驗證](server-api-key-auth.md) |
+| `jwt<P>()` | `ktor-server-auth-jwt` | 僅限 JVM。請參閱 [JSON Web Tokens](server-jwt.md) |
+| `oauth2()`, `oauth2Session<P, S>()` | `ktor-server-auth` | 請參閱 [OAuth 2.0 流程](server-oauth2-flows.md) |
 
-方案名稱必須是唯一的。如果您建立了兩個名稱相同但不同的方案，第二個方案在路由嘗試使用時將會失敗。
+方案名稱必須是唯一的。如果您使用相同名稱建立了兩個不同的方案，當路由嘗試使用第二個方案時將會失敗。
 
 ## 保護路由 {id="protect-routes"}
 
-若要保護路由，請將方案傳遞給 `authenticateWith()` 函式。在該區塊內部，`call.principal` 具有方案所定義的 principal 型別，且保證為非 null：
+若要保護路由，請將方案傳遞至 `authenticateWith()` 函式。在該區塊內部，`call.principal` 具有該方案所定義的 principal 型別，且保證為非 null：
 
 ```kotlin
 routing {
@@ -149,7 +176,7 @@ routing {
 
 ## 將驗證設為選用 {id="optional"}
 
-當某個路由需要同時為已登入和匿名呼叫者提供服務時，請使用 `authenticateWithOptional()` 函式。在該區塊內部，使用 `call.principalOrNull` 來存取 principal：
+當路由需要同時為已登入和匿名呼叫者提供服務時，請使用 `authenticateWithOptional()` 函式。在該區塊內部，使用 `call.principalOrNull` 來存取 principal：
 
 ```kotlin
 routing {
@@ -162,13 +189,13 @@ routing {
 }
 ```
 
-沒有憑據的請求會成功，並將 `call.principalOrNull` 保留為 `null`。帶有無效憑據的請求仍會失敗。
+不帶憑據的請求會成功，並使 `call.principalOrNull` 保持為 `null`。帶有無效憑據的請求仍會失敗。
 
 ## 接受多個方案 {id="any-of"}
 
-使用 `authenticateWithAnyOf()` 函式在同一路由上接受多個方案。Ktor 會依照您列出的順序嘗試各個方案，並由第一個成功的方案提供 principal。
+使用 `authenticateWithAnyOf()` 函式在同一個路由上接受多個方案。Ktor 會依照您列出的順序嘗試各個方案，第一個成功的方案將提供 principal。
 
-所有方案產生的 principal 都必須符合某個通用型別，該型別在呼叫時宣告：
+所有方案產生的 principal 必須符合您在呼叫時宣告的通用型別：
 
 ```kotlin
 interface AppUser {
@@ -195,15 +222,15 @@ routing {
 }
 ```
 
-> 在 `authenticateWithAnyOf()` 內部，僅 `call.principal` 可用。屬於單一方案的額外屬性（例如 [Session 方案](server-typed-session-auth.md) 上的 `call.session`）則無法使用。
+> 在 `authenticateWithAnyOf()` 內部，僅有 `call.principal` 可用。屬於單一方案的額外功能（例如[工作階段方案](server-typed-session-auth.md)中的 `call.session`）則無法使用。
 >
 {style="note"}
 
 ## 允許匿名呼叫者 {id="anonymous"}
 
-使用 `orAnonymous()` 函式來建立可為無憑據呼叫者提供服務的方案。沒有憑據的請求將會獲得您區塊所傳回的 principal。帶有無效憑據的請求仍會失敗。
+使用 `orAnonymous()` 函式建構一個為無憑據呼叫者提供服務的方案。不帶憑據的請求將取得您的區塊所傳回的 principal。帶有無效憑據的請求仍會失敗。
 
-其結果是一個方案，其 principal 型別為這兩者的共同父型別（supertype）：
+結果會是一個其 principal 型別為兩者之通用超型別 (common supertype) 的方案：
 
 ```kotlin
 interface Identity
@@ -232,9 +259,9 @@ routing {
 }
 ```
 
-## 轉換 Principal {id="map-principal"}
+## 轉換 principal {id="map-principal"}
 
-使用 `mapPrincipal()` 函式將 principal 轉換為另一種型別，例如從資料庫中載入使用者記錄：
+使用 `mapPrincipal()` 函式將 principal 轉換為另一種型別，例如從資料庫載入使用者記錄：
 
 ```kotlin
 data class AppUser(val id: String, val email: String)
@@ -246,11 +273,11 @@ val appAuth = jwtAuth.mapPrincipal { jwtUser ->
 }
 ```
 
-此轉換僅在方案產生 principal 之後才會執行。如果轉換傳回 `null`，該請求將會被拒絕並傳回 `401 Unauthorized`。
+轉換僅在方案產生 principal 之後執行。如果轉換傳回 `null`，請求將會被拒絕並傳回 `401 Unauthorized`。
 
 ## 檢查角色 {id="roles"}
 
-角色檢查是選用機制（opt-in）。定義一個實作 `AuthenticationRole` 的角色型別，然後使用 `withRoles()` 建立具有角色感知（role-aware）的方案：
+角色檢查為自選啟用 (opt-in)。定義實作 `AuthenticationRole` 的角色型別，然後使用 `withRoles()` 建構具備角色感知能力的方案：
 
 ```kotlin
 enum class Role : AuthenticationRole {
@@ -262,7 +289,7 @@ val roleAuth = jwtAuth.withRoles { user ->
 }
 ```
 
-`withRoles {}` 區塊會在驗證成功後，於每個請求執行。可用它從資料庫、快取或 principal 本身載入角色。
+`withRoles {}` 區塊會在每次驗證成功的請求中執行。您可以用它從資料庫、快取或 principal 本身載入角色。
 
 使用 `roles` 參數宣告路由所需的角色：
 
@@ -277,9 +304,9 @@ routing {
 }
 ```
 
-通過驗證但缺少所需角色的呼叫者會收到 `403 Forbidden`。呼叫者必須具備集合中的每個角色，而不僅僅是其中之一。
+通過驗證但缺少所需角色的呼叫者會收到 `403 Forbidden`。呼叫者必須具備集合中的所有角色，而非僅具備其中之一。
 
-傳入 `roles = null` 可以在不要求任何角色的情況下解析角色。當處理常式自行決定時，這非常有用：
+傳入 `roles = null` 可解析角色但不強制要求任何角色。這在處理常式自行做出判斷時非常有用：
 
 ```kotlin
 authenticateWith(roleAuth, roles = null) {
@@ -293,11 +320,11 @@ authenticateWith(roleAuth, roles = null) {
 }
 ```
 
-`roles` 屬性僅存在於具有角色感知的路由內部。在由一般方案保護的路由上，它將無法通過編譯。
+`roles` 屬性僅存在於具備角色感知能力的路由內部。在由一般方案保護的路由上，它將無法通過編譯。
 
 ## 處理失敗情況 {id="failures"}
 
-可能發生兩種錯誤，它們會分開處理：
+可能發生兩種失敗情況，且它們是分開處理的：
 
 * `onUnauthorized` 在驗證失敗時執行。預設回應為 `401 Unauthorized`。
 * `onForbidden` 在驗證成功但呼叫者缺少所需角色時執行。預設回應為 `403 Forbidden`。
@@ -324,7 +351,7 @@ val roleAuth = jwtAuth.withRoles(
 }
 ```
 
-或者在單一路由上設定處理常式，這會覆寫方案層級的處理常式：
+或者在單一路由上設定處理常式，這將會覆寫方案層級的設定：
 
 ```kotlin
 authenticateWith(
@@ -346,11 +373,11 @@ Ktor 依以下順序尋找未授權處理常式：
 
 1. 傳遞給 `authenticateWith()` 的處理常式。
 2. 在方案上設定的 `onUnauthorized` 處理常式。
-3. 提供者的預設質詢（challenge）。
+3. 提供者的預設挑戰機制 (challenge)。
 
-如果皆未做出回應，該請求將失敗並傳回 `401 Unauthorized`。
+如果它們都未回應，請求將失敗並傳回 `401 Unauthorized`。
 
-對於 `authenticateWithAnyOf()`，處理常式會接收方案名稱對應失敗原因的 Map，讓您可以回報每個方案失敗的原因：
+對於 `authenticateWithAnyOf()`，處理常式會接收一個將方案名稱對應至失敗原因的 Map，讓您可以回報每個方案失敗的原因：
 
 ```kotlin
 authenticateWithAnyOf<AppUser>(
@@ -367,7 +394,7 @@ authenticateWithAnyOf<AppUser>(
 
 ## 與傳統 API 結合 {id="mixing"}
 
-兩種驗證 API 均可在同一個應用程式中使用。您可以將型別安全路由巢狀嵌入受具名提供者 API 保護的路由中，或是將基於提供者的路由巢狀嵌入型別安全路由中：
+這兩種驗證 API 均可在同一個應用程式中使用。您可以將型別安全路由巢狀嵌入由指定名稱的提供者 API 保護的路由中，或將基於提供者的路由巢狀嵌入型別安全路由中：
 
 ```kotlin
 routing {
@@ -395,11 +422,11 @@ routing {
 }
 ```
 
-巢狀驗證層會依序套用。
+巢狀驗證層會依順序套用。
 
 ## 限制 {id="limitations"}
 
-* 該 API 為實驗性功能。可能會在次要版本中變更。
-* 該 API 使用 Kotlin 上下文參數，需要 Kotlin 2.4.0 或 `-Xcontext-parameters` 編譯器選項。
-* `authenticateWithAnyOf()` 函式僅提供 `call.principal`。在其中無法使用特定方案的屬性（例如 `call.session`）。
-* 目前沒有與 LDAP 提供者對等的型別安全實作。請改為在具型別的 `validate {}` 區塊內部呼叫 [`ldapAuthenticate()`](server-ldap.md)。
+* 此 API 處於實驗階段。它可能會在次要版本中變更。
+* 此 API 使用 Kotlin 上下文參數 (context parameters)，需要 Kotlin 2.4.0 或 `-Xcontext-parameters` 編譯器選項。
+* `authenticateWithAnyOf()` 函式僅提供 `call.principal`。特定於方案的屬性（例如 `call.session`）在其中無法使用。
+* 目前沒有與 LDAP 提供者等效的型別安全版本。請改為在型別化的 `validate {}` 區塊內部呼叫 [`ldapAuthenticate()`](server-ldap.md)。

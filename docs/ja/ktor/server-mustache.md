@@ -8,54 +8,61 @@
 <var name="plugin_name" value="Mustache"/>
 <var name="package_name" value="io.ktor.server.mustache"/>
 <var name="artifact_name" value="ktor-server-mustache"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.server.mustache"/>
 
 <tldr>
 <p>
-<b>必須の依存関係</b>: <code>io.ktor:%artifact_name%</code>
+<b>必要な依存関係</b>: <code>io.ktor:%artifact_name%</code>
 </p>
 <var name="example_name" value="mustache"/>
 <p>
     <b>コード例</b>:
-    <a href="https://github.com/ktorio/ktor-documentation/tree/%ktor_version%/codeSnippets/snippets/%example_name%">
+    <a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/%example_name%">
         %example_name%
     </a>
 </p>
 <p>
-    <b><Links href="/ktor/server-native" summary="KtorはKotlin/Nativeをサポートしており、追加のランタイムや仮想マシンなしでサーバーを実行できます。">Nativeサーバー</Links>のサポート</b>: ✖️
+    <b><Links href="server-native.md" summary="Ktor supports Kotlin/Native and allows you to run a server without an additional runtime or virtual machine.">ネイティブサーバー</Links>のサポート</b>: ✖️
 </p>
 </tldr>
 
-Ktorでは、[Mustache](https://api.ktor.io/ktor-server-mustache/io.ktor.server.mustache/-mustache)プラグインをインストールすることで、アプリケーション内で[Mustacheテンプレート](https://github.com/spullara/mustache.java)をビューとして使用できます。
+Ktor では、[Mustache](https://api.ktor.io/ktor-server-mustache/io.ktor.server.mustache/-mustache) プラグインをインストールすることで、アプリケーション内で [Mustache テンプレート](https://github.com/spullara/mustache.java) をビューとして使用できます。
 
 ## 依存関係の追加 {id="add_dependencies"}
 
 <p>
-    <code>%plugin_name%</code>を使用するには、ビルドスクリプトに<code>%artifact_name%</code>アーティファクトを含める必要があります。
+    <code>%plugin_name%</code> を使用するには、ビルドスクリプトに <code>%artifact_name%</code> アーティファクトを追加します。
 </p>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上記のコードスニペットでは、Ktor の依存関係を指定するために <a href="server-dependencies.topic#using-version-catalog">Ktor バージョンカタログ</a> を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上記のコードスニペットでは、Ktor の依存関係を指定するために <a href="server-dependencies.topic#using-version-catalog">Ktor バージョンカタログ</a> を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
     </TabItem>
 </Tabs>
 
-## Mustacheのインストール {id="install_plugin"}
+## Mustache のインストール {id="install_plugin"}
 
 <p>
-    <code>%plugin_name%</code>プラグインをアプリケーションに<a href="server-plugins.md#install">インストール</a>するには、指定された<Links href="/ktor/server-modules" summary="モジュールを使用すると、ルートをグループ化してアプリケーションを構造化できます。">モジュール</Links>内の<code>install</code>関数に渡します。
-    以下のコードスニペットは、<code>%plugin_name%</code>をインストールする方法を示しています。
+    <code>%plugin_name%</code> プラグインをアプリケーションに<a href="server-plugins.md#install">インストール</a>するには、指定された<Links href="server-modules.md" summary="Modules allow you to structure your application by grouping routes.">モジュール</Links>内の <code>install</code> 関数に渡します。
+    次の例は、<code>%plugin_name%</code> をインストールする方法を示しています。
 </p>
 <list>
     <li>
-        ... <code>embeddedServer</code>関数の呼び出し内。
+        <code>embeddedServer()</code> 関数の呼び出し内。
     </li>
     <li>
-        ... 明示的に定義された<code>module</code>（<code>Application</code>クラスの拡張関数）内。
+        <code>Application</code> クラスで明示的に定義された <code>module()</code> 拡張関数内。
     </li>
 </list>
 <Tabs>
@@ -67,11 +74,11 @@ Ktorでは、[Mustache](https://api.ktor.io/ktor-server-mustache/io.ktor.server.
     </TabItem>
 </Tabs>
 
-`install`ブロック内では、Mustacheテンプレートを読み込むための[MustacheFactory][mustache_factory]を[設定](#template_loading)できます。
+`install` ブロック内で、Mustache テンプレートを読み込むための [MustacheFactory][mustache_factory] を[設定](#template_loading)できます。
 
-## Mustacheの設定 {id="configure"}
-### テンプレートの読み込み設定 {id="template_loading"}
-テンプレートを読み込むには、`mustacheFactory`プロパティに[MustacheFactory][mustache_factory]を割り当てる必要があります。例えば、以下のコードスニペットでは、Ktorが現在のクラスパスを基準とした`templates`パッケージからテンプレートを検索できるように設定しています。
+## Mustache の設定 {id="configure"}
+### テンプレート読み込みの設定 {id="template_loading"}
+テンプレートを読み込むには、[MustacheFactory][mustache_factory] を `mustacheFactory` プロパティに割り当てる必要があります。たとえば、以下のコードスニペットにより、Ktor は現在のクラスパスを基準として `templates` パッケージ内のテンプレートを検索できるようになります。
 ```kotlin
 import com.github.mustachejava.DefaultMustacheFactory
 import io.ktor.server.application.*
@@ -86,7 +93,7 @@ fun Application.module() {
 ```
 
 ### レスポンスでテンプレートを送信する {id="use_template"}
-`resources/templates`に`index.hbs`テンプレートがあると仮定します。
+`resources/templates` に `index.hbs` テンプレートがある場合を想定します。
 ```html
 <html>
     <body>
@@ -95,12 +102,12 @@ fun Application.module() {
 </html>
 ```
 
-ユーザーのデータモデルは以下の通りです。
+ユーザーのデータモデルは次のようになります。
 ```kotlin
 data class User(val id: Int, val name: String)
 ```
 
-指定された[ルート](server-routing.md)でテンプレートを使用するには、次のように`MustacheContent`を`call.respond`メソッドに渡します。
+指定した[ルート](server-routing.md)でテンプレートを使用するには、次のように `MustacheContent` を `call.respond` メソッドに渡します。
 ```kotlin
 get("/index") {
     val sampleUser = User(1, "John")

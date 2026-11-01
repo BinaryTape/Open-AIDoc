@@ -9,17 +9,17 @@
 <var name="example_name" value="server-di"/>
 <p>
     <b>コード例</b>:
-    <a href="https://github.com/ktorio/ktor-documentation/tree/%ktor_version%/codeSnippets/snippets/%example_name%">
+    <a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/%example_name%">
         %example_name%
     </a>
 </p>
 </tldr>
 
-アプリケーション設定ファイルで、[依存性注入 (DI) プラグイン](server-dependency-injection.md)を設定できます。これらの設定は、依存関係の解決動作にグローバルに影響し、登録されているすべての依存関係に適用されます。
+アプリケーション設定ファイルで[依存性注入（DI）プラグイン](server-dependency-injection.md)を設定できます。これらの設定は依存関係解決の動作にグローバルに影響し、登録されているすべての依存関係に適用されます。
 
 ### 依存関係キーのマッピング {id="dependency-key-mapping"}
 
-`ktor.di.keyMapping` プロパティは、解決時に依存関係キーをどのように一般化し、マッチさせるかを定義します。これにより、要求された型を解決する際に、登録されているどの依存関係が互換性があるとみなされるかが決まります。
+`ktor.di.keyMapping` プロパティは、依存関係の解決時にキーをどのように一般化し、マッチングするかを定義します。これにより、要求された型を解決する際に、どの登録済み依存関係が互換性があるとみなされるかが決定されます。
 
 ```yaml
 ktor:
@@ -34,20 +34,20 @@ ktor:
 <deflist>
 <def>
 <title><code>Default</code></title>
-以下のデフォルトの組み合わせを使用します。
+デフォルトの組み合わせを使用します:
 <code-block code="Supertypes * Nullables * OutTypeArgumentsSupertypes * RawTypes"/>
 </def>
 <def>
 <title><code>Supertypes</code></title>
-そのスーパータイプのいずれかを使用して依存関係を解決できるようにします。
+任意のスーパータイプを使用して依存関係を解決できるようにします。
 </def>
 <def>
 <title><code>Nullables</code></title>
-型のNull許容（nullable）バリアントとNull非許容（non-nullable）バリアントのマッチングを許可します。
+型のNullable（null許容）およびNon-Nullableのバリアントをマッチングできるようにします。
 </def>
 <def>
 <title><code>OutTypeArgumentsSupertypes</code></title>
-<code>out</code> 型パラメータの共変性（covariance）を許可します。
+<code>out</code> 型引数での共変性を許可します。
 </def>
 <def>
 <title><code>RawTypes</code></title>
@@ -63,7 +63,7 @@ ktor:
 
 集合演算子 `*`（積集合）、`+`（和集合）、および `()`（グループ化）を使用して、キーマッピングオプションを組み合わせることができます。
 
-次の例では、`List<String>` として登録された依存関係を、`Collection<String>`（`Supertypes`）、`List` または `List?`（`RawTypes` および `Nullables`）として解決できます。
+以下の例では、`List<String>` として登録された依存関係を、`Collection<String>`（`Supertypes`）、`List` または `List?`（`RawTypes` および `Nullables`）として解決できます。
 
 ```yaml
 ktor:
@@ -71,7 +71,7 @@ ktor:
     keyMapping: Supertypes + (Nullables * RawTypes)
 ```
 
-この組み合わせには含まれていないため、`Collection?` としては解決されません。
+その組み合わせが式に含まれていないため、`Collection?` としては解決されません。
 
 ### 競合解決ポリシー {id="conflict-resolution-policy"}
 
@@ -92,10 +92,10 @@ ktor:
 </def>
 <def>
 <title><code>OverridePrevious</code></title>
-以前の依存関係を、新しく提供されたもので上書きします。
+新しく提供された依存関係で以前の依存関係を上書きします。
 </def>
 <def>
 <title><code>IgnoreConflicts</code></title>
-テスト環境では、DIプラグインはデフォルトで <code>IgnoreConflicts</code> を使用します。これにより、テストコードがエラーを発生させることなく本番環境の依存関係をオーバーライドできるようになります。
+テスト環境では、DIプラグインはデフォルトで <code>IgnoreConflicts</code> を使用します。これにより、テストコードでエラーを発生させることなく本番環境の依存関係を上書きできます。
 </def>
 </deflist>

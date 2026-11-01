@@ -4,223 +4,112 @@ title: 什麼是 Koin？
 
 # 什麼是 Koin？
 
-### 務實的 Kotlin 相依注入架構 – 既簡單又強大 {id="the-pragmatic-kotlin-dependency-injection-framework-simple-and-powerful"}
+Koin 是一個適用於 Kotlin 的相依注入架構。本頁面將說明它的運作原理、其優缺點與代價，以及該專案的組織架構。如果你對相依注入還不熟悉，請先閱讀[什麼是相依注入？](/docs/intro/what-is-dependency-injection)。
 
-Koin 是一款專為 Kotlin 設計的輕量級相依注入架構。與依賴程式碼產生或反射的傳統 DI 架構不同，Koin 提供兩種同樣強大的方法：純淨的 **Kotlin DSL** 以及直覺的 **註解**。您可以根據團隊需求進行選擇——兩者都是一等公民。
+## Koin 如何運作 {id="how-koin-works"}
 
-## Koin 的核心價值 {id="koin-s-core-values"}
-
-| 價值 | 意義 |
-|-------|---------------|
-| **高效** | 易於學習，易於撰寫。在幾分鐘內完成 DI 設定，而非數小時 |
-| **開發者友善** | DSL 或註解任君選擇。錯誤訊息清晰、偵錯容易，提供最佳的 DX |
-| **可擴充性** | 為具有複雜相依圖的大型企業應用程式提供支援 |
-| **安全** | 透過 Koin Compiler Plugin 確保編譯期安全性 |
-| **動態** | 執行時彈性：動態載入模組、延遲載入、功能切換 (feature flags) |
-
-## 為什麼開發者喜愛 Koin {id="why-developers-love-koin"}
-
-- **幾分鐘內上手** – 沒有概念複雜的概念，只有直覺的 DSL 與簡單的註解
-- **撰寫更少程式碼** – 無論是 DSL 或註解，Compiler Plugin 都會自動裝配相依項
-- **選擇您的風格** – 為 Kotlin 純粹主義者提供 DSL，為熟悉模式的開發者提供註解 – 兩者同樣強大
-- **輕鬆偵錯** – 清晰的錯誤訊息，無需追蹤產生的程式碼
-- **自信地擴大規模** – 已被全球企業應用於生產環境
-- **保持安全** – 編譯期驗證可在執行前擷取錯誤
-- **保持彈性** – 基於執行時但效能優異。支援動態模組、延遲載入與功能切換
-- **IDE 支援** – 適用於 Android Studio 和 IntelliJ IDEA 的官方外掛程式 — 支援跳轉到定義、即時安全檢查與圖形化視覺化
-
-## 兩種風格，一個架構 – 兩者同樣強大 {id="two-styles-one-framework-both-equally-powerful"}
-
-Koin 支援兩種定義相依項的風格。兩者都是一等公民，功能完全對等。請選擇最適合您團隊的一種：
-
-### DSL 風格 {id="dsl-style"}
-
-使用 Kotlin DSL 語法定義相依項：
+你在模組中描述你的類別，啟動一次 Koin，然後在需要的地方請求執行個體：
 
 ```kotlin
+class ApiService
+class UserRepository(private val api: ApiService)
+
 val appModule = module {
-    single<Database>()
-    single<ApiClient>()
+    single<ApiService>()
     single<UserRepository>()
-    viewModel<UserViewModel>()
+}
+
+fun main() {
+    startKoin {
+        modules(appModule)
+    }
 }
 ```
 
-### 註解風格 {id="annotation-style"}
+這背後由兩個部分協同運作：
 
-使用註解定義相依項：
+- **執行階段容器 (Runtime container)**：`startKoin` 會將你的模組載入到容器中。每個定義都是一個用來建置單一型別的 Kotlin 函式。當有程式碼請求 `UserRepository` 時，Koin 會執行該函式，從容器中解析其建構函式參數，並依據定義型別（`single`、`factory`、`scoped`）保留或捨棄該執行個體。Koin 不會透過反射來建置物件。
+- **編譯期檢查（選用）**：[Koin Compiler Plugin](/docs/intro/koin-compiler-plugin) 是一個 Kotlin 編譯器外掛程式。它會讀取你的建構函式來產生連接程式碼，接著在建置時檢查組裝好的圖形中每個相依性是否都已宣告。遺漏的定義會變成建置錯誤，而不是在執行階段崩潰。
+
+[核心概念](/docs/intro/core-concepts)透過一個實際範例說明了模組、定義、作用域與注入。
+
+## 執行階段模型的代價與優勢 {id="what-the-runtime-model-costs-and-gives"}
+
+因為圖形存在於執行階段容器中，Koin 可以在應用程式執行期間對其進行修改：
+
+- **動態模組**：在啟動後透過 `loadKoinModules()` 與 `unloadKoinModules()` 載入和卸載模組，適用於功能旗標 (feature flags) 或隨選功能。請參閱[啟動 Koin](/docs/reference/koin-core/starting-koin)。
+- **延遲模組**：在背景載入圖形的一部分，以減少啟動時間。請參閱[延遲模組](/docs/reference/koin-core/lazy-modules)。
+- **執行階段建立的作用域**：為工作階段、畫面或請求開啟和關閉作用域。請參閱[作用域](/docs/reference/koin-core/scopes)。
+- **無產生的原始碼**：無需提交任何產生的檔案，也無需針對每個 Kotlin Multiplatform 目標進行額外配置。
+
+同樣的模型也有你應該了解的代價：
+
+- **啟動工作負擔**：模組在 Koin 啟動時註冊，且每次查詢都需經過容器。對大多數應用程式來說這項開銷很小，但預先載入定義（`createdAtStart`）會在啟動 Koin 的執行緒上執行。
+- **未使用外掛程式時的執行階段錯誤**：在使用建構函式 DSL 或傳統 DSL 且沒有外掛程式的情況下，遺漏的定義只有在程式碼執行時才會被發現。你可以在單元測試中使用 [`verify()`](/docs/reference/koin-test/verify) 來捕捉它，或是在建置時透過編譯器外掛程式來檢查。
+- **編譯期檢查的限制**：外掛程式只會驗證在 Koin 入口點（如 `startKoin`）組裝的圖形。稍後透過 `loadKoinModules()` 載入的模組無法在建置時被驗證，而沒有入口點的程式庫模組只有在應用程式將其組裝時才會被檢查。請參閱[編譯期安全性](/docs/reference/koin-compiler/compile-safety)。
+- **Kotlin 版本偶合**：編譯器外掛程式依賴於編譯器內部機制，因此每個外掛程式發行版本都會在指定的 Kotlin 版本清單上進行驗證。請參閱[編譯器外掛程式設定](/docs/setup/compiler-plugin)。
+
+## 建構函式注入與服務定位器 (Service Locator) {id="constructor-injection-and-service-locator"}
+
+你的類別透過建構函式接收其相依項。Koin 僅在無法自行建立物件的入口點處檢索執行個體：
 
 ```kotlin
-@Singleton
-class Database
-
-@Singleton
-class ApiClient
-
-@Singleton
-class UserRepository(
-    private val database: Database,
-    private val apiClient: ApiClient
-)
-
-@KoinViewModel
+// 由 Koin 建立這些物件：相依項透過建構函式傳入
+class UserRepository(private val api: UserApi)
 class UserViewModel(private val repository: UserRepository) : ViewModel()
-```
 
-這兩種風格都由 **Koin Compiler Plugin** 處理，以確保編譯期安全性。
-
-## Koin 的註解更簡單 {id="koin-s-annotations-are-simpler"}
-
-如果您使用過 Hilt 或 Dagger，您會發現 Koin 註解所需的繁瑣手續較少：
-
-| 任務 | Koin | Hilt |
-|------|------|------|
-| **Singleton** | `@Singleton class MyService` | `@Singleton class MyService @Inject constructor(...)` |
-| **介面繫結** | 自動（只需實作介面） | 需要在抽象模組中使用 `@Binds` |
-| **組件掃描** | `@ComponentScan("package")` | 不提供 |
-| **模組探索** | `@Configuration` - 自動探索 | 每個模組需手動使用 `@InstallIn` |
-
-**範例比較：**
-
-```kotlin
-// KOIN - 就這樣！
-@Singleton
-class MyRepository(val api: ApiService)
-
-@Module
-@ComponentScan("com.app")
-class AppModule
-```
-
-```kotlin
-// HILT - 更多繁瑣手續
-@Singleton
-class MyRepository @Inject constructor(val api: ApiService)
-
-@Module
-@InstallIn(SingletonComponent::class)
-abstract class AppModule {
-    @Binds
-    abstract fun bindRepository(impl: MyRepository): Repository
+// Android 建立 Activity：它從 Koin 檢索其 ViewModel
+class UserActivity : AppCompatActivity() {
+    private val viewModel: UserViewModel by viewModel()
 }
 ```
 
-## 由 Koin Compiler Plugin 提供支援 {id="powered-by-koin-compiler-plugin"}
+相依項在簽章中清晰可見，你可以在不依賴 Koin 的情況下測試 `UserRepository` 與 `UserViewModel`。像 `by inject()`、`by viewModel()` 或 `koinInject()` 這樣的檢索函式屬於入口點：`Activity`、`Fragment`、根 Composable、`main()`、Ktor 路由或測試。[什麼是相依注入？](/docs/intro/what-is-dependency-injection)比較了這兩種模式，而[檢索相依項](/docs/reference/koin-core/injection)則涵蓋了 `get()` 與 `inject()`。
 
-**Koin Compiler Plugin** 是所有新專案使用 Koin 的推薦方式：
+## 兩種風格，同一個容器 {id="two-styles-one-container"}
 
-- **原生 Kotlin 編譯器外掛程式 (K2)** – 並非 KSP，而是直接與編譯器整合
-- **自動偵測建構函式參數** – 減少手動裝配
-- **編譯期安全性** – 在建置期間擷取錯誤
-- **同時支援 DSL 與註解** – 任君選擇
-- **設定簡單** – 一個 Gradle 外掛程式
+| 風格 | 範例 | 需求 |
+|-------|---------|-------|
+| 編譯器外掛程式 DSL | `single<UserRepository>()` | Koin 編譯器外掛程式 |
+| 註解 (Annotations) | `@Singleton class UserRepository(...)` | Koin 編譯器外掛程式, `koin-annotations` |
+| 建構函式 DSL | `singleOf(::UserRepository)` | 無額外需求（外掛程式可增加編譯期檢查） |
+| 傳統 DSL | `single { UserRepository(get()) }` | 無額外需求（外掛程式可增加編譯期檢查） |
 
-### 使用 Compiler Plugin 獲得更簡潔的語法 {id="cleaner-syntax-with-compiler-plugin"}
+註解是一種風格；編譯器外掛程式 DSL、建構函式 DSL 與傳統 DSL 則是另一種風格（Koin DSL）的三種形式。它們都在同一個容器中產生相同的定義。建議每個專案選擇一種風格。[選擇你的風格](/docs/intro/choosing-your-style)對它們進行了比較並提供了預設建議。
 
-| 經典 DSL | Compiler Plugin DSL |
-|-------------|---------------------|
-| `singleOf(::MyService)` | `single<MyService>()` |
-| `single { MyService(get(), get()) }` | `single<MyService>()` |
-| `factoryOf(::MyRepo)` | `factory<MyRepo>()` |
-| `viewModelOf(::MyVM)` | `viewModel<MyVM>()` |
+## 註解支援現況 {id="annotations-status"}
 
-在 [Koin Compiler Plugin](/docs/intro/koin-compiler-plugin) 中了解更多資訊。
+`koin-annotations` 程式庫（`@Singleton`、`@Factory`、`@KoinViewModel`、`@Module`、`@ComponentScan`）是 Koin 主要專案的一部分：相同的存放庫、相同的版本、相同的 BOM。它**並未**被棄用。被棄用的是過去用來讀取這些註解的 KSP 處理器 `koin-ksp-compiler`。Koin 編譯器外掛程式取代了它，並支援相同的註解。請參閱[從 KSP 遷移至編譯器外掛程式](/docs/migration/from-ksp-to-compiler-plugin)。
 
-## 經典 DSL（完全支援） {id="classic-dsl-fully-supported"}
+## 支援平台 {id="platforms"}
 
-經典 DSL 在所有 Kotlin 版本中仍受到完全支援：
+Koin 是一個 Kotlin Multiplatform 程式庫。核心部分可在所有 Kotlin 目標上執行，而整合程式庫則新增了平台特定的 API：
 
-```kotlin
-val appModule = module {
-    singleOf(::Database)
-    singleOf(::ApiClient)
-    singleOf(::UserRepository)
-    viewModelOf(::UserViewModel)
-}
-```
+| 平台 | 主要構件 | 從這裡開始 |
+|----------|---------------|------------|
+| Kotlin/JVM | `koin-core` | [Kotlin 教學](/docs/quickstart/kotlin) |
+| Android | `koin-android` | [在 Android 上啟動 Koin](/docs/reference/koin-android/start) |
+| Jetpack Compose, Compose Multiplatform | `koin-compose`, `koin-compose-viewmodel` | [適用於 Compose 的 Koin](/docs/reference/koin-compose/compose) |
+| Kotlin Multiplatform (iOS, 桌面端, Web, 原生) | `koin-core` | [Kotlin Multiplatform 設定](/docs/reference/koin-core/kmp-setup) |
+| Ktor 伺服器 | `koin-ktor` | [適用於 Ktor 的 Koin](/docs/reference/koin-ktor/ktor) |
 
-或使用明確裝配：
+完整的構件清單請參閱 [Gradle 設定](/docs/setup/gradle)。
 
-```kotlin
-val appModule = module {
-    single { Database() }
-    single { ApiClient() }
-    single { UserRepository(get(), get()) }
-    viewModel { UserViewModel(get()) }
-}
-```
+## Koin 專案組織 {id="the-koin-project"}
 
-:::info
-經典 DSL 並未棄用。Koin 與其完美搭配。當您準備好遷移時，Compiler Plugin 會在此基礎上加入編譯期分析。
-:::
+Koin 是基於 Apache 2.0 授權條款的開源專案。它由以下部分組成：
 
-## Koin Annotations 現在是 Koin 專案的一部分 {id="koin-annotations-is-now-part-of-the-koin-project"}
+- **Koin 程式庫**：核心 (core)、Android、Compose、Ktor、測試與註解，皆在同一個版本下發布。原始碼：[InsertKoinIO/koin](https://github.com/InsertKoinIO/koin)。
+- **Koin 編譯器外掛程式**：Kotlin 編譯器外掛程式及其 Gradle 外掛程式，具有獨立的版本號。原始碼：[InsertKoinIO/koin-compiler-plugin](https://github.com/InsertKoinIO/koin-compiler-plugin)。
+- **Koin IDE 外掛程式**：在 Android Studio 與 IntelliJ IDEA 中提供導覽與檢查功能。請參閱 [IDE 外掛程式](/docs/tooling/ide-plugin)。
+- **範例專案**：每個教學對應的可執行應用程式，位於 [InsertKoinIO/koin-getting-started](https://github.com/InsertKoinIO/koin-getting-started)。
 
-`koin-annotations` 程式庫 — 包括 `@Singleton`、`@Factory`、`@KoinViewModel`、`@Module`、`@ComponentScan` 等 — 隨主要 Koin 版本發行並受到完全支援。它**並未**被棄用。
+如果你熟悉 Hilt 或 Dagger，[Koin vs Hilt](/docs/intro/koin-vs-hilt) 比較了這兩種不同的做法。
 
-```kotlin
-dependencies {
-    implementation(platform("io.insert-koin:koin-bom:$koin_version"))
-    implementation("io.insert-koin:koin-core")
-    implementation("io.insert-koin:koin-annotations") // 相同的 Koin 版本
-}
-```
+## 相關內容 {id="related"}
 
-您的註解將由 **Koin Compiler Plugin** 處理 — 請參閱 [Koin Compiler Plugin](/docs/intro/koin-compiler-plugin) 和 [Annotations 參考](/docs/reference/koin-annotations/start)。
-
-## Koin KSP Compiler 已棄用，建議改用 Koin Compiler Plugin {id="koin-ksp-compiler-is-deprecated-in-favor-of-koin-compiler-plugin"}
-
-:::info
-舊有的 KSP 處理器 `koin-ksp-compiler` 已**棄用**，並將在未來的 Koin 版本中移除。替代方案是 **Koin Compiler Plugin** — 原生 K2 編譯器整合、無產生檔案、更簡單的 KMP 設定。
-:::
-
-如果您正在搭配 `koin-ksp-compiler` 使用 Koin Annotations，請遷移至 Compiler Plugin：
-
-- **相同的註解** — 無需更改程式碼
-- **更好的處理** — 原生編譯器整合，無產生檔案
-- **更簡單的設定** — 無需 KSP 配置
-
-請參閱[從 KSP 遷移至 Compiler Plugin](/docs/migration/from-ksp-to-compiler-plugin)。
-
-## 執行時 + 編譯安全 = 兩全其美 {id="runtime-compile-safe-best-of-both-worlds"}
-
-Koin 是**基於執行時，但具備高效能且編譯安全**。這種獨特的結合實現了：
-
-**編譯期安全性**（搭配 Compiler Plugin）：
-- 在建置期間驗證您的相依圖
-- 自動偵測建構函式參數
-- 在執行前擷取缺失的相依項
-
-**執行時彈性**（僅限編譯期的架構無法提供）：
-- 動態模組載入/卸載
-- 延遲模組載入（背景）
-- 功能切換 (feature flag) 驅動的注入
-- 外掛程式架構
-- 使用不同實作進行 A/B 測試
-
-```kotlin
-// 動態模組載入 - Hilt 無法實現
-if (featureEnabled) {
-    loadKoinModules(premiumFeatureModule)
-}
-
-// 之後，如果功能停用
-unloadKoinModules(premiumFeatureModule)
-```
-
-## Koin 適合誰？ {id="who-is-koin-for"}
-
-Koin 是以下對象的理想選擇：
-
-- **重視生產力的團隊** – 更少的樣板程式碼，更快的開發速度
-- **想要比 Hilt/Dagger 更簡潔 DI 的 Android 開發者**
-- **Kotlin 多平台專案** – Android、iOS、桌面、Web、後端
-- **需要擴大規模的企業專案**
-- **任何認為 DI 不應該複雜的人**
-
-## 後續步驟 {id="next-steps"}
-
-- **[什麼是相依注入？](/docs/intro/what-is-dependency-injection)** – 學習 DI 基礎知識
-- **[Koin Compiler Plugin](/docs/intro/koin-compiler-plugin)** – 推薦的做法
-- **[設定指南](/docs/setup/gradle)** – 將 Koin 新增至您的專案
-- **[教學](/docs/tutorials/your-first-app)** – 使用 Koin 建立您的第一個應用程式
+- [核心概念](/docs/intro/core-concepts)：心智模型，透過單一範例逐步建構。
+- [選擇你的風格](/docs/intro/choosing-your-style)：該使用哪種宣告風格。
+- [Koin 編譯器外掛程式](/docs/intro/koin-compiler-plugin)：建置時發生的詳細機制。
+- [設定](/docs/setup)：將 Koin 新增至你的專案。
+- [教學](/docs/quickstart/kotlin)：建置你的第一個應用程式。

@@ -4,6 +4,7 @@
 <primary-label ref="server-plugin"/>
 
 <var name="artifact_name" value="ktor-server-cors"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.server.cors"/>
 <var name="package_name" value="io.ktor.server.plugins.cors"/>
 <var name="plugin_name" value="CORS"/>
 
@@ -19,26 +20,34 @@
     </a>
 </p>
 <p>
-    <b><Links href="/ktor/server-native" summary="Ktor supports Kotlin/Native and allows you to run a server without an additional runtime or virtual machine.">Native 伺服器</Links> 支援</b>：✅
+    <b><Links href="server-native.md" summary="Ktor 支援 Kotlin/Native，並允許你在沒有額外執行階段或虛擬機的情況下執行伺服器。">原生伺服器</Links> 支援</b>：✅
 </p>
 </tldr>
 
-如果您的伺服器需要處理[跨來源請求](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS)，
-您需要安裝並設定
+如果你的伺服器需要處理[跨來源請求 (cross-origin requests)](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS)，
+則需要安裝並設定
 [CORS](https://api.ktor.io/ktor-server-cors/io.ktor.server.plugins.cors.routing/-c-o-r-s.html)
-Ktor 外掛程式。此外掛程式可讓您設定允許的主機、HTTP 方法、用戶端設定的標頭等。
+Ktor 外掛程式。此外掛程式允許你設定允許的主機、HTTP 方法、用戶端設定的標頭等。
 
 ## 新增相依性 {id="add_dependencies"}
 
 <p>
-    要使用 <code>%plugin_name%</code>，您需要在組建指令碼中包含 <code>%artifact_name%</code> 構件：
+    若要使用 <code>%plugin_name%</code>，請將 <code>%artifact_name%</code> 構件新增至你的建置指令碼：
 </p>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上述程式碼片段使用 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 版本目錄 (version catalog)</a> 來指定 Ktor 相依性。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上述程式碼片段使用 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 版本目錄 (version catalog)</a> 來指定 Ktor 相依性。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
@@ -48,16 +57,16 @@ Ktor 外掛程式。此外掛程式可讓您設定允許的主機、HTTP 方法�
 ## 安裝 %plugin_name% {id="install_plugin"}
 
 <p>
-    要在應用程式中<a href="server-plugins.md#install">安裝</a> <code>%plugin_name%</code> 外掛程式，
-    請將其傳遞給指定<Links href="/ktor/server-modules" summary="Modules allow you to structure your application by grouping routes.">模組</Links>中的 <code>install</code> 函式。
-    以下程式碼片段顯示如何安裝 <code>%plugin_name%</code> ...
+    若要將 <code>%plugin_name%</code> 外掛程式<a href="server-plugins.md#install">安裝</a>至你的應用程式中，
+    請在指定的 <Links href="server-modules.md" summary="模組允許你透過分組路由來建構應用程式。">模組</Links> 中將其傳遞給 <code>install</code> 函式。
+    以下範例展示如何安裝 <code>%plugin_name%</code>：
 </p>
 <list>
     <li>
-        ... 在 <code>embeddedServer</code> 函式呼叫內。
+        在 <code>embeddedServer()</code> 函式呼叫中。
     </li>
     <li>
-        ... 在明確定義的 <code>module</code> 內，它是 <code>Application</code> 類別的擴充函式。
+        在 <code>Application</code> 類別上明確定義的 <code>module()</code> 擴充函式中。
     </li>
 </list>
 <Tabs>
@@ -69,24 +78,24 @@ Ktor 外掛程式。此外掛程式可讓您設定允許的主機、HTTP 方法�
     </TabItem>
 </Tabs>
 <p>
-    <code>%plugin_name%</code> 外掛程式也可以<a href="server-plugins.md#install-route">安裝到特定路由</a>。
-    如果您需要為不同的應用程式資源使用不同的 <code>%plugin_name%</code> 配置，這會很有用。
+    <code>%plugin_name%</code> 外掛程式也可以<a href="server-plugins.md#install-route">安裝至特定路由</a>。
+    如果你需要針對不同的應用程式資源使用不同的 <code>%plugin_name%</code> 設定，這會很有用。
 </p>
 
-> 如果您將 `CORS` 外掛程式安裝到特定路由，則需要為該路由新增
-`options` [處理常式](server-routing.md#define_route)。這可讓 Ktor 正確回應 CORS
-預檢請求。
+> 如果你將 `CORS` 外掛程式安裝至特定路由，則需要為該路由新增
+`options` [處理常式](server-routing.md#define_route)。這能讓 Ktor 正確回應 CORS
+預檢請求 (preflight request)。
 
 ## 設定 CORS {id="configure"}
 
-CORS 特定的設定是由
+CORS 特定的設定選項由
 [CORSConfig](https://api.ktor.io/ktor-server-cors/io.ktor.server.plugins.cors/-c-o-r-s-config/index.html)
-類別公開的。讓我們看看如何進行這些設定。
+類別公開。讓我們來看看如何進行這些設定。
 
-### 概覽 {id="overview"}
+### 概觀 {id="overview"}
 
-假設您有一個監聽 `8080` 埠號的伺服器，其 `/customer` [路由](server-routing.md)會以
-[JSON](server-serialization.md#send_data) 資料進行回應。以下程式碼片段顯示了使用 Fetch API 從在另一個埠號上運作的用戶端發出的範例請求，這使該請求成為跨來源請求：
+假設你有一個在 `8080` 連接埠監聽的伺服器，其 `/customer` [路由](server-routing.md)會回應
+[JSON](server-serialization.md#send_data) 資料。以下程式碼片段展示了從另一個連接埠上運作的用戶端使用 Fetch API 發出的範例請求，以使該請求成為跨來源請求：
 
 ```javascript
 function saveCustomer() {
@@ -110,8 +119,10 @@ function saveCustomer() {
 }
 
 ```
+{initial-collapse-state="collapsed" collapsed-title="
+fetch('http://0.0.0.0:8080/customer')"}
 
-為了在後端允許此類請求，您需要按照以下方式設定 `CORS` 外掛程式：
+若要在後端允許此類請求，你需要依下列方式設定 `CORS` 外掛程式：
 
 ```kotlin
 install(CORS) {
@@ -120,12 +131,12 @@ install(CORS) {
 }
 ```
 
-您可以在此處找到完整的範例：[cors](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/cors)。
+你可以在此處找到完整的範例：[cors](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/cors)。
 
 ### 主機 {id="hosts"}
 
-要指定可以發出跨來源請求的允許主機，請使用 `allowHost` 函式。除了主機名稱外，
-您還可以指定埠號、子網域列表或支援的 HTTP 協定 (schemes)。
+若要指定可以發起跨來源請求的允許主機，請使用 `allowHost` 函式。除了主機名稱之外，
+你還可以指定連接埠號、子網域清單或支援的 HTTP scheme。
 
 ```kotlin
 install(CORS) {
@@ -136,7 +147,7 @@ install(CORS) {
 }
 ```
 
-要允許來自任何主機的跨來源請求，請使用 `anyHost` 函式。
+若要允許來自任何主機的跨來源請求，請使用 `anyHost` 函式。
 
 ```kotlin
 install(CORS) {
@@ -146,7 +157,7 @@ install(CORS) {
 
 ### HTTP 方法 {id="methods"}
 
-預設情況下，`%plugin_name%` 外掛程式允許 `GET`、`POST` 和 `HEAD` HTTP 方法。要新增其他方法，請使用
+預設情況下，`%plugin_name%` 外掛程式允許 `GET`、`POST` 和 `HEAD` HTTP 方法。若要新增其他方法，請使用
 `allowMethod` 函式。
 
 ```kotlin
@@ -160,13 +171,13 @@ install(CORS) {
 
 ### 允許標頭 {id="headers"}
 
-預設情況下，`%plugin_name%` 外掛程式允許以下由 `Access-Control-Allow-Headers` 管理的用戶端標頭：
+預設情況下，`%plugin_name%` 外掛程式允許由 `Access-Control-Allow-Headers` 管理的下列用戶端標頭：
 
 * `Accept`
 * `Accept-Language`
 * `Content-Language`
 
-要允許額外的標頭，請使用 `allowHeader` 函式。
+若要允許其他標頭，請使用 `allowHeader` 函式。
 
 ```kotlin
 install(CORS) {
@@ -175,8 +186,8 @@ install(CORS) {
 }
 ```
 
-要允許自訂標頭，請使用 `allowHeaders` 或 `allowHeadersPrefixed` 函式。例如，以下程式碼片段
-顯示如何允許以 `custom-` 為前綴的標頭。
+若要允許自訂標頭，請使用 `allowHeaders` 或 `allowHeadersPrefixed` 函式。例如，以下程式碼片段
+展示了如何允許以 `custom-` 為前綴的標頭。
 
 ```kotlin
 install(CORS) {
@@ -184,14 +195,14 @@ install(CORS) {
 }
 ```
 
-> 請注意，對於非簡單內容類型，`allowHeaders` 或 `allowHeadersPrefixed` 需要將
+> 請注意，對於非簡單內容類型 (non-simple content types)，`allowHeaders` 或 `allowHeadersPrefixed` 需要將
 [allowNonSimpleContentTypes](https://api.ktor.io/ktor-server-cors/io.ktor.server.plugins.cors/-c-o-r-s-config/allow-non-simple-content-types.html)
 屬性設定為 `true`。
 
 ### 公開標頭 {id="expose-headers"}
 
 `Access-Control-Expose-Headers` 標頭會將指定的標頭新增至瀏覽器中 JavaScript 可以存取的允許清單中。
-要設定此類標頭，請使用 `exposeHeader` 函式。
+若要設定此類標頭，請使用 `exposeHeader` 函式。
 
 ```kotlin
 install(CORS) {
@@ -203,7 +214,7 @@ install(CORS) {
 
 ### 憑據 {id="credentials"}
 
-預設情況下，瀏覽器不會隨跨來源請求發送憑據資訊（例如 Cookie 或驗證資訊）。要允許傳遞此資訊，請使用
+預設情況下，瀏覽器不會在跨來源請求中發送憑據資訊（例如 Cookie 或身份驗證資訊）。若要允許傳遞此資訊，請使用
 `allowCredentials` 屬性將 `Access-Control-Allow-Credentials` 回應標頭設定為 `true`。
 
 ```kotlin
@@ -212,10 +223,11 @@ install(CORS) {
 }
 ```
 
-### 其他 {id="misc"}
+### 其他設定 {id="misc"}
 
-`%plugin_name%` 外掛程式還允許您指定其他 CORS 相關設定。例如，您可以
-使用 `maxAgeInSeconds` 來指定預檢請求的回應可以快取多長時間，而無需發送另一個預檢請求。
+`%plugin_name%` 外掛程式還允許你指定其他與 CORS 相關的設定。例如，你可以
+使用 `maxAgeInSeconds` 來指定預檢請求的回應可以快取多久，而無需再次發送
+預檢請求。
 
 ```kotlin
 install(CORS) {
@@ -223,4 +235,4 @@ install(CORS) {
 }
 ```
 
-您可以從 [CORSConfig](https://api.ktor.io/ktor-server-cors/io.ktor.server.plugins.cors/-c-o-r-s-config/index.html) 了解其他配置選項。
+你可以從 [CORSConfig](https://api.ktor.io/ktor-server-cors/io.ktor.server.plugins.cors/-c-o-r-s-config/index.html) 進一步了解其他設定選項。

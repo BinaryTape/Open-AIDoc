@@ -17,8 +17,8 @@ Ktor 用戶端可用於多平台專案，並支援 Android、JavaScript 及 Nati
 * [Native](https://kotlinlang.org/docs/native-overview.html)
 
 ## 新增相依性 {id="add-dependencies"}
-要在您的專案中使用 Ktor HTTP 用戶端，您至少需要新增兩個相依性：用戶端相依性與[引擎](client-engines.md)相依性。對於多平台專案，您需要按照以下方式新增這些相依性：
-1. 要在通用程式碼中使用 Ktor 用戶端，請將 `ktor-client-core` 相依性新增至 `build.gradle` 或 `build.gradle.kts` 檔案中的 `commonMain` 原始碼集：
+若要在專案中使用 Ktor HTTP 用戶端，你需要至少新增兩個相依性：用戶端相依性以及[引擎](client-engines.md)相依性。對於多平台專案，你需要依照以下方式新增這些相依性：
+1. 若要在通用程式碼中使用 Ktor 用戶端，請在 `build.gradle` 或 `build.gradle.kts` 檔案中將 `ktor-client-core` 的相依性新增至 `commonMain` 原始碼集：
    <var name="platform_name" value="common"/>
    <var name="artifact_name" value="ktor-client-core"/>
    <Tabs group="languages">
@@ -29,7 +29,7 @@ Ktor 用戶端可用於多平台專案，並支援 Android、JavaScript 及 Nati
            <code-block lang="Groovy" code="               %platform_name%Main {&#10;                   dependencies {&#10;                       implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;&#10;                   }&#10;               }"/>
        </TabItem>
    </Tabs>
-2. 將所需平台的[引擎相依性](client-engines.md#dependencies)新增至對應的原始碼集。對於 Android，您可以將 [Android](client-engines.md#android) 引擎相依性新增至 `androidMain` 原始碼集：
+2. 將所需平台的[引擎相依性](client-engines.md#dependencies)新增至對應的原始碼集。針對 Android，你可以將 [Android](client-engines.md#android) 引擎相依性新增至 `androidMain` 原始碼集：
    <var name="platform_name" value="android"/>
    <var name="artifact_name" value="ktor-client-android"/>
    <Tabs group="languages">
@@ -41,7 +41,7 @@ Ktor 用戶端可用於多平台專案，並支援 Android、JavaScript 及 Nati
        </TabItem>
    </Tabs>
    
-   對於 iOS，您需要將 [Darwin](client-engines.md#darwin) 引擎相依性新增至 `iosMain`：
+   針對 iOS，你需要將 [Darwin](client-engines.md#darwin) 引擎相依性新增至 `iosMain`：
    <var name="platform_name" value="ios"/>
    <var name="artifact_name" value="ktor-client-darwin"/>
    <Tabs group="languages">
@@ -53,7 +53,7 @@ Ktor 用戶端可用於多平台專案，並支援 Android、JavaScript 及 Nati
        </TabItem>
    </Tabs>
    
-   若要了解各平台支援哪些引擎，請參閱[新增引擎相依性](client-engines.md#dependencies)。
+   若要了解每個平台支援哪些引擎，請參閱[新增引擎相依性](client-engines.md#dependencies)。
 
 ## 建立用戶端 {id="create-client"}
 要在多平台專案中建立用戶端，請在專案的[通用程式碼](https://kotlinlang.org/docs/mpp-discover-project.html#source-sets)中呼叫 [HttpClient](https://api.ktor.io/ktor-client-core/io.ktor.client/-http-client/index.html) 建構函式：
@@ -64,9 +64,9 @@ import io.ktor.client.*
 val client = HttpClient()
 ```
 
-在此程式碼片段中，`HttpClient` 建構函式不接受引擎作為參數：用戶端將根據[建置指令碼](#add-dependencies)中新增的構件為所需平台選擇引擎。
+在此程式碼片段中，`HttpClient` 建構函式不接受引擎作為參數：用戶端將根據[在建置指令碼中新增](#add-dependencies)的產物為所需的平台選擇引擎。
 
-如果您需要針對特定平台調整引擎配置，請將對應的引擎類別作為引數傳遞給 `HttpClient` 建構函式，並使用 `engine` 方法配置引擎，例如：
+如果你需要針對特定平台調整引擎配置，請將對應的引擎類別作為引數傳遞給 `HttpClient` 建構函式，並使用 `engine` 方法來配置引擎，例如：
 ```kotlin
 import io.ktor.client.*
 import io.ktor.client.engine.android.*
@@ -83,8 +83,8 @@ val client = HttpClient(Android) {
 }
 ```
 
-您可以從[用戶端引擎](client-engines.md)中了解如何配置所有引擎類型。
+你可以從[用戶端引擎](client-engines.md)中了解如何配置所有引擎類型。
 
 ## 程式碼範例 {id="code-example"}
 
-[mpp/client-mpp](https://github.com/ktorio/ktor-samples/tree/main/client-mpp) 專案展示了如何在多平台應用程式中使用 Ktor 用戶端。此應用程式可在以下平台執行：`Android`、`iOS`、`JavaScript` 與 `macosX64`。
+[mpp/client-mpp](https://github.com/ktorio/ktor-samples/tree/main/client-mpp) 專案示範了如何在多平台應用程式中使用 Ktor 用戶端。此應用程式可在以下平台上運作：`Android`、`iOS`、`JavaScript` 和 `macosX64`。

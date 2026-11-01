@@ -8,54 +8,64 @@
 <var name="plugin_name" value="Pebble"/>
 <var name="package_name" value="io.ktor.server.pebble"/>
 <var name="artifact_name" value="ktor-server-pebble"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.server.pebble"/>
 
 <tldr>
 <p>
-<b>必須の依存関係</b>: <code>io.ktor:%artifact_name%</code>
+<b>必要な依存関係</b>: <code>io.ktor:%artifact_name%</code>
 </p>
 <var name="example_name" value="pebble"/>
 <p>
     <b>コード例</b>:
-    <a href="https://github.com/ktorio/ktor-documentation/tree/%ktor_version%/codeSnippets/snippets/%example_name%">
+    <a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/%example_name%">
         %example_name%
     </a>
 </p>
 <p>
-    <b><Links href="/ktor/server-native" summary="Ktor は Kotlin/Native をサポートしており、追加のランタイムや仮想マシンなしでサーバーを実行できます。">Native サーバー</Links>のサポート</b>: ✖️
+    <b><Links href="server-native.md" summary="Ktor supports Kotlin/Native and allows you to run a server without an additional runtime or virtual machine.">ネイティブサーバー</Links>のサポート</b>: ✖️
 </p>
 </tldr>
 
-Ktor では、[Pebble](https://api.ktor.io/ktor-server-pebble/io.ktor.server.pebble/-pebble) プラグインをインストールすることで、アプリケーション内のビューとして [Pebble テンプレート](https://pebbletemplates.io/)を使用できます。
+Ktorでは、[Pebble](https://api.ktor.io/ktor-server-pebble/io.ktor.server.pebble/-pebble)プラグインをインストールすることで、アプリケーション内のビューとして[Pebbleテンプレート](https://pebbletemplates.io/)を使用できます。
 
 ## 依存関係の追加 {id="add_dependencies"}
 
 <p>
-    <code>%plugin_name%</code> を使用するには、ビルドスクリプトに <code>%artifact_name%</code> アーティファクトを含める必要があります。
+    <code>%plugin_name%</code>を使用するには、ビルドスクリプトに<code>%artifact_name%</code>アーティファクトを追加します:
 </p>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上記のコードスニペットでは、Ktorの依存関係を指定するために<a href="server-dependencies.topic#using-version-catalog">
+            Ktorバージョンカタログ</a>を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上記のコードスニペットでは、Ktorの依存関係を指定するために<a href="server-dependencies.topic#using-version-catalog">
+            Ktorバージョンカタログ</a>を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
     </TabItem>
 </Tabs>
 
-## Pebble のインストール {id="install_plugin"}
+## Pebbleのインストール {id="install_plugin"}
 
 <p>
-    <code>%plugin_name%</code> プラグインをアプリケーションに<a href="server-plugins.md#install">インストール</a>するには、指定された <Links href="/ktor/server-modules" summary="モジュールを使用すると、ルートをグループ化してアプリケーションを構造化できます。">モジュール</Links>内の <code>install</code> 関数に渡します。
-    以下のコードスニペットは、<code>%plugin_name%</code> をインストールする方法を示しています。
+    アプリケーションに<code>%plugin_name%</code>プラグインを<a href="server-plugins.md#install">インストール</a>するには、
+    指定された<Links href="server-modules.md" summary="Modules allow you to structure your application by grouping routes.">モジュール</Links>内の<code>install</code>関数に渡します。
+    以下の例は、<code>%plugin_name%</code>をインストールする方法を示しています:
 </p>
 <list>
     <li>
-        ... <code>embeddedServer</code> 関数の呼び出し内。
+        <code>embeddedServer()</code>関数呼び出し内。
     </li>
     <li>
-        ... <code>Application</code> クラスの拡張関数である、明示的に定義された <code>module</code> 内。
+        <code>Application</code>クラスに明示的に定義された<code>module()</code>拡張関数内。
     </li>
 </list>
 <Tabs>
@@ -67,11 +77,11 @@ Ktor では、[Pebble](https://api.ktor.io/ktor-server-pebble/io.ktor.server.peb
     </TabItem>
 </Tabs>
 
-`install` ブロック内では、Pebble テンプレートをロードするための [PebbleEngine.Builder][pebble_engine_builder] を[設定](#configure)できます。
+`install`ブロック内では、Pebbleテンプレートを読み込むための[PebbleEngine.Builder][pebble_engine_builder]を[設定](#configure)できます。
 
-## Pebble の設定 {id="configure"}
-### テンプレートのロード設定 {id="template_loading"}
-テンプレートをロードするには、[PebbleEngine.Builder][pebble_engine_builder] を使用してテンプレートのロード方法を設定する必要があります。例えば、以下のコードスニペットは、Ktor が現在のクラスパスからの相対パスである `templates` パッケージ内でテンプレートを検索できるようにします。
+## Pebbleの設定 {id="configure"}
+### テンプレートの読み込み設定 {id="template_loading"}
+テンプレートを読み込むには、[PebbleEngine.Builder][pebble_engine_builder]を使用してテンプレートの読み込み方法を設定する必要があります。例えば、以下のコードスニペットは、Ktorが現在のクラスパスに対する相対パスである`templates`パッケージからテンプレートを検索できるようにします:
 
 ```kotlin
 import io.ktor.server.application.*
@@ -87,8 +97,8 @@ fun Application.module() {
 }
 ```
 
-### レスポンスでのテンプレート送信 {id="use_template"}
-`resources/templates` に `index.html` テンプレートがあると仮定します。
+### レスポンスでテンプレートを送信する {id="use_template"}
+`resources/templates`に`index.html`テンプレートがあると仮定します:
 
 ```html
 <html>
@@ -98,13 +108,13 @@ fun Application.module() {
 </html>
 ```
 
-ユーザーのデータモデルは以下の通りです。
+ユーザーのデータモデルは以下のようになります:
 
 ```kotlin
 data class User(val id: Int, val name: String)
 ```
 
-指定された[ルート](server-routing.md)に対してテンプレートを使用するには、次のように `PebbleContent` を `call.respond` メソッドに渡します。
+指定された[ルート](server-routing.md)でこのテンプレートを使用するには、次のように`PebbleContent`を`call.respond`メソッドに渡します:
 
 ```kotlin
 get("/index") {

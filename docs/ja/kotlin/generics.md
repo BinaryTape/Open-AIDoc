@@ -1,6 +1,6 @@
-[//]: # (title: ジェネリクス: in, out, where)
+[//]: # (title: ジェネリクス: in、out、where)
 
-Kotlinのクラスは、Javaと同じように型パラメータを持つことができます。
+Kotlin のクラスには、Java と同様に型パラメータを持たせることができます。
 
 ```kotlin
 class Box<T>(t: T) {
@@ -8,45 +8,47 @@ class Box<T>(t: T) {
 }
 ```
 
-このようなクラスのインスタンスを作成するには、単に型引数を指定します。
+このようなクラスのインスタンスを生成するには、型引数を指定するだけです。
 
 ```kotlin
 val box: Box<Int> = Box<Int>(1)
 ```
 
-しかし、例えばコンストラクタの引数などから型引数が推論できる場合は、明示的に指定する必要はありません。
+コンストラクタの引数などからコンパイラが型引数を推論できる場合は、明示的に指定する必要はありません。
 
 ```kotlin
-val box = Box(1) // 1はInt型なので、コンパイラはこれがBox<Int>であると判断します
+val box = Box(1) // 1 は Int 型なので、コンパイラはこれが Box<Int> であると推論します
 ```
 
-## 変位 (Variance) {id="variance"}
+## 変異性 (Variance) {id="variance"}
 
-Javaの型システムにおいて最も厄介な側面の1つが、ワイルドカード型です（[Java Generics FAQ](http://www.angelikalanger.com/GenericsFAQ/JavaGenericsFAQ.html)を参照）。
-Kotlinにはこれらがありません。代わりに、Kotlinには宣言区での変位（declaration-site variance）と型投影（type projections）があります。
+Java の型システムにおいて最も厄介な側面の 1 つがワイルドカード型です（[Java Generics FAQ](http://www.angelikalanger.com/GenericsFAQ/JavaGenericsFAQ.html) を参照してください）。
+Kotlin にはワイルドカード型はありません。代わりに、Kotlin には宣言側変異性（declaration-site variance）と型プロジェクション（type projections）が用意されています。
 
-### Javaにおける変位とワイルドカード {id="variance-and-wildcards-in-java"}
+### Java における変異性とワイルドカード {id="variance-and-wildcards-in-java"}
 
-なぜJavaにこれらの謎めいたワイルドカードが必要なのか考えてみましょう。まず、Javaのジェネリック型は*不変（invariant）*です。
-つまり、`List<String>` は `List<Object>` のサブタイプでは*ありません*。もし `List` が*不変*でなかったら、Javaの配列と大差ないものになっていたでしょう。というのも、以下のコードはコンパイルは通りますが、実行時に例外が発生してしまうからです。
+なぜ Java にこのような謎めいたワイルドカードが必要なのか考えてみましょう。まず、Java のジェネリック型は*不変（invariant）*です。
+つまり、`List<String>` は `List<Object>` のサブタイプでは*ありません*。もし `List` が*不変*でなければ、Java の配列と変わらないものになっていたでしょう。次のコードはコンパイルに通ってしまいますが、実行時に例外が発生してしまいます。
 
 ```java
 // Java
 List<String> strs = new ArrayList<String>();
 
-// Javaはここでコンパイル時に型不一致を報告します。
+// Java はコンパイル時にここで型の不一致（type mismatch）を報告します。
 List<Object> objs = strs;
 
-// もし報告されなかったら？
-// StringのリストにIntegerを入れることができてしまいます。
+// もし報告されなかったらどうなるでしょうか？
+// String のリストに Integer を入れることができてしまいます。
 objs.add(1);
 
-// そして実行時に、Javaは例外をスローします。
+// そして実行時に、Java は ClassCastException をスローします。
 // ClassCastException: Integer cannot be cast to String
 String s = strs.get(0); 
 ```
 
-Javaは実行時の安全性を保証するために、このような行為を禁止しています。しかし、これには影響があります。例えば、`Collection` インターフェースの `addAll()` メソッドを考えてみましょう。このメソッドのシグネチャはどうあるべきでしょうか？直感的には、次のように書くでしょう。
+Java では実行時の安全性を保証するためにこのような操作を禁止しています。しかし、これにはトレードオフがあります。例えば、
+`Collection` インターフェースの `addAll()` メソッドを考えてみましょう。このメソッドのシグネチャはどうなるでしょうか？直感的には、
+次のように書きたくなるはずです。
 
 ```java
 // Java
@@ -55,19 +57,19 @@ interface Collection<E> ... {
 }
 ```
 
-しかしこれでは、次のような操作（これは完全に安全です）ができなくなってしまいます。
+しかしこれでは、（完全に安全であるにもかかわらず）次のような操作ができなくなってしまいます。
 
 ```java
 // Java
 
-// addAllの素朴な宣言では、以下はコンパイルされません。
-// Collection<String> は Collection<Object> のサブタイプではないためです。
+// 素朴な addAll の宣言では、以下はコンパイルできません:
+// Collection<String> は Collection<Object> のサブタイプではないため
 void copyAll(Collection<Object> to, Collection<String> from) {
     to.addAll(from);
 }
 ```
 
-そのため、実際の `addAll()` のシグネチャは以下のようになっています。
+そのため、実際の `addAll()` のシグネチャは次のようになっています。
 
 ```java
 // Java
@@ -76,29 +78,37 @@ interface Collection<E> ... {
 }
 ```
 
-*ワイルドカード型引数* `? extends E` は、このメソッドが `E` 自体だけでなく、`E` *またはそのサブタイプ*のオブジェクトのコレクションを受け入れることを示しています。これは、itemsから安全に `E` を*読み取る*ことができる（このコレクションの要素はEのサブクラスのインスタンスであるため）一方で、その `E` の未知のサブタイプにどのオブジェクトが適合するか分からないため、そこへ*書き込むことはできない*ことを意味します。
-この制限と引き換えに、望ましい動作が得られます。すなわち、`Collection<String>` は `Collection<? extends Object>` のサブタイプに*なる*のです。
-言い換えれば、*extends*境界（上界）を持つワイルドカードは、型を*共変（covariant）*にします。
+*ワイルドカード型引数* `? extends E` は、このメソッドが単に `E` そのものだけでなく、`E` のオブジェクトのコレクション*または `E` のサブタイプのオブジェクトのコレクション*を受け入れることを示しています。つまり、items から安全に `E` を*読み取る*（このコレクションの要素は E のサブクラスのインスタンスであるため）ことはできますが、未知の `E` のサブタイプに準拠するオブジェクトが何かわからないため、コレクションへ*書き込むことはできません*。
+この制約と引き換えに、望んでいた振る舞い（`Collection<String>` *は* `Collection<? extends Object>` のサブタイプである）が得られます。
+言い換えれば、*extends* 境界（*上限境界*）を持つワイルドカードによって、その型は*共変（covariant）*になります。
 
-これがなぜ機能するのかを理解する鍵は極めてシンプルです。もしコレクションからアイテムを*取り出す*ことしかしないのであれば、`String` のコレクションを使ってそこから `Object` を読み取っても問題ありません。逆に、コレクションにアイテムを*入れる*ことしかしないのであれば、`Object` のコレクションを受け取ってそこに `String` を入れるのは問題ありません。Javaには `List<? super String>` があり、これは `String` またはその任意のスーパータイプを受け入れます。
+これが機能する理由を理解するための鍵は非常にシンプルです。コレクションからアイテムを*取り出す*ことしかしないのであれば、
+`String` のコレクションを使ってそこから `Object` を読み取っても問題ありません。逆に、コレクションへアイテムを*追加する*ことしかしないのであれば、
+`Object` のコレクションに `String` を追加しても問題ありません。Java には `List<? super String>` があり、これは `String` またはそのスーパータイプを受け入れます。
 
-後者は*反変（contravariant）*と呼ばれ、`List<? super String>` に対しては `String` を引数に取るメソッドのみを呼び出すことができます（例えば、`add(String)` や `set(int, String)` を呼び出すことができます）。`List<T>` において `T` を返すものを呼び出した場合、得られるのは `String` ではなく `Object` になります。
+後者は*反変（contravariance）*と呼ばれ、`List<? super String>` では `String` を引数に取るメソッドのみを呼び出すことができます
+（例えば、`add(String)` や `set(int, String)` を呼び出すことができます）。`List<T>` で `T` を返すようなメソッドを呼び出した場合、
+返ってくるのは `String` ではなく `Object` になります。
 
-Joshua Blochは、著書『[Effective Java 第3版](http://www.oracle.com/technetwork/java/effectivejava-136174.html)』の中で、この問題をうまく説明しています（項目31：「APIの柔軟性を高めるために境界ワイルドカードを使用する」）。彼は、*読み取り*専用のオブジェクトを「プロデューサー（Producer）」、*書き込み*専用のオブジェクトを「コンシューマー（Consumer）」と名付け、次のように推奨しています。
+Joshua Bloch は著書『[Effective Java 第3版](http://www.oracle.com/technetwork/java/effectivejava-136174.html)』でこの問題をうまく説明しています
+（項目31：「API の柔軟性を高めるために境界ワイルドカードを使用する」）。彼は、*読み取りのみを行う*オブジェクトを *Producer*（生産者）、
+*書き込みのみを行う*オブジェクトを *Consumer*（消費者）と名付けました。そして次のように推奨しています。
 
-> 「柔軟性を最大化するには、プロデューサーまたはコンシューマーを表す入力パラメータにワイルドカード型を使用しなさい。」
+>「最大限の柔軟性を得るために、Producer または Consumer を表す入力パラメータにはワイルドカード型を使用してください。」
 
-そして、彼は次のような記憶術（覚え方）を提案しています。*PECS* は *Producer-Extends, Consumer-Super* の略です。
+そして彼は、次の記憶法（ニーモニック）を提唱しています。*PECS* は *Producer-Extends, Consumer-Super* の略です。
 
-> プロデューサー・オブジェクト、例えば `List<? extends Foo>` を使用する場合、このオブジェクトに対して `add()` や `set()` を呼び出すことは許可されませんが、これはそのオブジェクトが*不変（immutable）*であることを意味するわけではありません。例えば、`clear()` は引数を一切取らないため、リストからすべてのアイテムを削除するために `clear()` を呼び出すことを妨げるものは何もありません。
+> Producer オブジェクト（例えば `List<? extends Foo>`）を使用する場合、そのオブジェクトに対して `add()` や `set()` を呼び出すことは許可されません。
+> ただし、これはそのオブジェクトが*イミュータブル（不変）*であることを意味するわけではありません。例えば、`clear()` は引数を一切取らないため、
+> リストからすべてのアイテムを削除するために `clear()` を呼び出すことを妨げるものは何もありません。
 >
-> ワイルドカード（または他の種類の変位）によって保証される唯一のことは、*型安全性*です。不変性は全く別の話です。
+> ワイルドカード（またはその他の種類の変異性）によって保証される唯一のものは*型安全性*です。イミュータビリティ（不変性）とはまったく別の話です。
 >
 {style="note"}
 
-### 宣言区での変位 (Declaration-site variance) {id="declaration-site-variance"}
+### 宣言側変異性 (Declaration-site variance) {id="declaration-site-variance"}
 
-`T` をパラメータとして受け取るメソッドを持たず、`T` を返すメソッドのみを持つジェネリックインターフェース `Source<T>` があると仮定しましょう。
+パラメータとして `T` を取るメソッドを持たず、`T` を返すメソッドのみを持つジェネリックインターフェース `Source<T>` があると仮定しましょう。
 
 ```java
 // Java
@@ -107,19 +117,24 @@ interface Source<T> {
 }
 ```
 
-この場合、`Source<String>` のインスタンスへの参照を `Source<Object>` 型の変数に格納することは完全に安全です。呼び出すべきコンシューマー・メソッドが存在しないからです。しかし、Javaはこれを知らず、依然としてそれを禁止します。
+この場合、Consumer メソッドは呼び出されないため、`Source<String>` のインスタンスへの参照を `Source<Object>` 型の変数に格納することは完全に安全です。
+しかし、Java はそれを認識せず、依然としてこれを禁止します。
 
 ```java
 // Java
 void demo(Source<String> strs) {
-    Source<Object> objects = strs; // !!! Javaでは許可されません
+    Source<Object> objects = strs; // !!! Java では許可されません
     // ...
 }
 ```
 
-これを修正するには、`Source<? extends Object>` 型のオブジェクトを宣言する必要があります。しかし、これを行うことはあまり意味がありません。なぜなら、そのような変数に対しても以前と同じメソッドをすべて呼び出すことができるため、複雑な型にすることによる付加価値がないからです。しかし、コンパイラはそれを知りません。
+これを修正するには、`Source<? extends Object>` 型のオブジェクトを宣言する必要があります。しかし、以前と同じメソッドをすべて呼び出せるため、
+型を複雑にしたところで何の価値も付加されておらず、このような宣言を行うことは無意味に感じられます。
+しかし、コンパイラにはそれが分かりません。
 
-Kotlinでは、このようなことをコンパイラに伝える方法があります。これは*宣言区での変位（declaration-site variance）*と呼ばれます。`Source` の*型パラメータ* `T` にアノテーションを付けて、それが `Source<T>` のメンバから*返される*（生産される）だけで、決して消費されないことを保証できます。
+Kotlin では、このようなことをコンパイラに伝える方法があります。これは*宣言側変異性（declaration-site variance）*と呼ばれます。
+`Source` の*型パラメータ* `T` にアノテーションを付加することで、`Source<T>` のメンバーから `T` が*返される*（生産される）だけで、
+決して消費されないことを保証できます。
 これを行うには、`out` 修飾子を使用します。
 
 ```kotlin
@@ -128,19 +143,20 @@ interface Source<out T> {
 }
 
 fun demo(strs: Source<String>) {
-    val objects: Source<Any> = strs // Tがoutパラメータなので、これはOKです
+    val objects: Source<Any> = strs // T は out パラメータであるため、これは問題ありません
     // ...
 }
 ```
 
-一般的なルールは次のとおりです。クラス `C` の型パラメータ `T` が `out` と宣言されている場合、それは `C` のメンバの中で *out* ポジションにのみ現れることができますが、その代わりに `C<Base>` は安全に `C<Derived>` のスーパータイプになることができます。
+一般的なルールは次のとおりです。クラス `C` の型パラメータ `T` が `out` として宣言されている場合、それは `C` のメンバーの *out* の位置にのみ出現できますが、その代わりに `C<Base>` は安全に `C<Derived>` のスーパータイプとなることができます。
 
-言い換えれば、クラス `C` はパラメータ `T` に対して*共変*である、あるいは `T` は*共変*な型パラメータである、と言うことができます。`C` は `T` の*プロデューサー*であり、`T` の*コンシューマー*では「ない」と考えることができます。
+言い換えると、クラス `C` はパラメータ `T` に対して*共変（covariant）*である、または `T` は*共変*な型パラメータであると言えます。
+`C` は `T` の *Producer* であり、`T` の *Consumer* ではないと考えることができます。
 
-`out` 修飾子は*変位アノテーション（variance annotation）*と呼ばれ、型パラメータの宣言箇所で提供されるため、*宣言区での変位*を提供します。
-これは、型を使用する際のワイルドカードによって型を共変にするJavaの*使用区での変位（use-site variance）*とは対照的です。
+`out` 修飾子は*変異性アノテーション（variance annotation）*と呼ばれ、型パラメータの宣言箇所で指定されるため、*宣言側変異性*を提供します。
+これは、型が使用される箇所のワイルドカードによって型を共変にする Java の*使用側変異性（use-site variance）*とは対照的です。
 
-`out` に加えて、Kotlinは補完的な変位アノテーションとして `in` を提供しています。これは型パラメータを*反変（contravariant）*にします。つまり、その型は消費されることしかできず、生産されることはありません。反変な型の良い例は `Comparable` です。
+`out` に加えて、Kotlin は補完的な変異性アノテーションとして `in` を提供しています。これは型パラメータを*反変（contravariant）*にします。つまり、消費されるだけで生産されることはありません。反変な型の代表的な例は `Comparable` です。
 
 ```kotlin
 interface Comparable<in T> {
@@ -148,22 +164,22 @@ interface Comparable<in T> {
 }
 
 fun demo(x: Comparable<Number>) {
-    x.compareTo(1.0) // 1.0はDouble型であり、これはNumberのサブタイプです
-    // したがって、xをComparable<Double>型の変数に代入できます
+    x.compareTo(1.0) // 1.0 は Double 型であり、これは Number のサブタイプです
+    // したがって、x を Comparable<Double> 型の変数に代入できます
     val y: Comparable<Double> = x // OK!
 }
 ```
 
-*in* と *out* という言葉は（C#ですでに長い間成功裏に使用されているように）それ自体で説明がつくように思われるため、前述の記憶術は実際には必要ありません。実際、それはより高い抽象化レベルで言い換えることができます。
+*in* と *out* という言葉は（C# でもすでに長い間うまく使われてきたため）自明であるように思われ、上述のニーモニックは実際には不要です。より高い抽象度で次のように言い換えることができます。
 
-**[実存的](https://ja.wikipedia.org/wiki/%E5%AE%9F%E5%AD%98%E4%B8%BB%E7%BE%A9)な転換: Consumerはin、Producerはout!** :-)
+**[実存主義的（Existential）](https://en.wikipedia.org/wiki/Existentialism) 変換: Consumer は in、Producer は out！** :-)
 
-## 型投影 (Type projections) {id="type-projections"}
+## 型プロジェクション (Type projections) {id="type-projections"}
 
-### 使用区での変位: 型投影 {id="use-site-variance-type-projections"}
+### 使用側変異性: 型プロジェクション {id="use-site-variance-type-projections"}
 
-型パラメータ `T` を `out` と宣言し、使用区でのサブタイピングに関するトラブルを避けるのは非常に簡単ですが、一部のクラスは実際には `T` を返すことだけに制限することが*できません*！
-その良い例が `Array` です。
+型パラメータ `T` を `out` として宣言し、使用箇所でのサブタイピングに関する問題を回避するのは非常に簡単ですが、一部のクラスは実際に `T` を返すことだけに制限するわけには*いきません*。
+その典型的な例が `Array` です。
 
 ```kotlin
 class Array<T>(val size: Int) {
@@ -172,7 +188,7 @@ class Array<T>(val size: Int) {
 }
 ```
 
-このクラスは `T` に対して共変でも反変でもありません。そして、これが特定の不便さを強いることになります。次の関数を考えてみましょう。
+このクラスは、`T` に対して共変にも反変にもできません。そしてこれは一定の不便さをもたらします。次の関数を考えてみましょう。
 
 ```kotlin
 fun copy(from: Array<Any>, to: Array<Any>) {
@@ -182,92 +198,94 @@ fun copy(from: Array<Any>, to: Array<Any>) {
 }
 ```
 
-この関数は、ある配列から別の配列へアイテムをコピーすることを目的としています。これを実際に適用してみましょう。
+この関数はある配列から別の配列へ要素をコピーすることを意図しています。これを実際に適用してみましょう。
 
 ```kotlin
 val ints: Array<Int> = arrayOf(1, 2, 3)
 val any = Array<Any>(3) { "" } 
 copy(ints, any)
-//   ^ 型は Array<Int> ですが、Array<Any> が期待されています
+//   ^ 型は Array<Int> ですが、期待されていたのは Array<Any> です
 ```
 
-ここで、おなじみの問題に直面します。`Array<T>` は `T` に対して*不変*であるため、`Array<Int>` と `Array<Any>` のどちらも他方のサブタイプではありません。なぜでしょうか？繰り返しになりますが、それは `copy` が予期しない動作をする可能性があるからです。例えば、`from` に `String` を書き込もうとするかもしれません。もしそこに実際に `Int` の配列を渡していたら、後で `ClassCastException` がスローされることになります。
+ここで、おなじみの同じ問題に直面します。`Array<T>` は `T` に対して*不変（invariant）*であるため、`Array<Int>` も `Array<Any>` も互いのサブタイプではありません。なぜでしょうか？これもまた、`copy` が予期しない動作をする可能性があるからです。例えば、`from` に `String` を書き込もうとするかもしれず、そこに実際に `Int` の配列を渡していた場合、後で `ClassCastException` がスローされてしまいます。
 
-`copy` 関数が `from` に*書き込む*ことを禁止するには、次のようにします。
+`copy` 関数が `from` へ*書き込む*ことを禁止するには、次のようにします。
 
 ```kotlin
 fun copy(from: Array<out Any>, to: Array<Any>) { ... }
 ```
 
-これは*型投影（type projection）*であり、`from` が単なる配列ではなく、制限された（*投影された*）ものであることを意味します。型パラメータ `T` を返すメソッドのみを呼び出すことができます。この場合、`get()` のみを呼び出すことができます。これがKotlinにおける*使用区での変位*へのアプローチであり、Javaの `Array<? extends Object>` に対応しますが、よりシンプルになっています。
+これが*型プロジェクション（type projection）*です。これは、`from` が単なる配列ではなく、制限された（*投影された / projected*）配列であることを意味します。
+型パラメータ `T` を返すメソッドのみを呼び出すことができ、この場合は `get()` のみを呼び出すことができることを意味します。
+これが*使用側変異性（use-site variance）*に対する Kotlin のアプローチであり、Java の `Array<? extends Object>` に対応しながらも、よりシンプルになっています。
 
-`in` を使って型を投影することもできます。
+同様に、`in` を使用して型をプロジェクションすることもできます。
 
 ```kotlin
 fun fill(dest: Array<in String>, value: String) { ... }
 ```
 
-`Array<in String>` は Java の `Array<? super String>` に対応します。これは、`fill()` 関数に `String` の配列、`CharSequence` の配列、または `Object` の配列を渡せることを意味します。
+`Array<in String>` は Java の `Array<? super String>` に対応します。これは、`fill()` 関数に `String`、`CharSequence`、または `Object` の配列を渡すことができることを意味します。
 
-### スター投影 (Star-projections) {id="star-projections"}
+### スタープロジェクション (Star-projections) {id="star-projections"}
 
-型引数について何も知らないが、それでも安全な方法でそれを使用したい場合があります。
-ここでの安全な方法とは、そのジェネリック型のすべての具体的なインスタンス化が、その投影のサブタイプになるような、ジェネリック型の投影を定義することです。
+型引数について何も知らないものの、安全な方法で使用したいという場合があります。
+ここでの安全な方法とは、そのジェネリック型のすべての具象インスタンスがそのプロジェクションのサブタイプとなるような、ジェネリック型のプロジェクションを定義することです。
 
-Kotlinは、このためにいわゆる*スター投影*構文を提供しています。
+Kotlin はこのために、いわゆる*スタープロジェクション（star-projection）*構文を提供しています。
 
-- `Foo<out T : TUpper>`（`T` は上界 `TUpper` を持つ共変な型パラメータ）において、`Foo<*>` は `Foo<out TUpper>` と同等です。これは、`T` が不明な場合でも、`Foo<*>` から `TUpper` の値を安全に*読み取る*ことができることを意味します。
-- `Foo<in T>`（`T` は反変な型パラメータ）において、`Foo<*>` は `Foo<in Nothing>` と同等です。これは、`T` が不明な場合、`Foo<*>` に安全に*書き込める*ものは何もないことを意味します。
-- `Foo<T : TUpper>`（`T` は上界 `TUpper` を持つ不変な型パラメータ）において、`Foo<*>` は、値を読み取る場合は `Foo<out TUpper>` と同等であり、値を書き込む場合は `Foo<in Nothing>` と同等です。
+- 上限境界 `TUpper` を持つ共変な型パラメータ `T` を持つ `Foo<out T : TUpper>` の場合、`Foo<*>` は `Foo<out TUpper>` と等価です。これは、`T` が不明な場合、`Foo<*>` から `TUpper` の値を安全に*読み取る*ことができることを意味します。
+- 反変な型パラメータ `T` を持つ `Foo<in T>` の場合、`Foo<*>` は `Foo<in Nothing>` と等価です。これは、`T` が不明な場合、`Foo<*>` に安全に*書き込む*ことができるものはないことを意味します。
+- 上限境界 `TUpper` を持つ不変な型パラメータ `T` を持つ `Foo<T : TUpper>` の場合、`Foo<*>` は値の読み取りに関しては `Foo<out TUpper>` と等価であり、値の書き込みに関しては `Foo<in Nothing>` と等価です。
 
-ジェネリック型が複数の型パラメータを持つ場合、それぞれを独立して投影できます。
-例えば、型が `interface Function<in T, out U>` と宣言されている場合、次のようなスター投影を使用できます。
+ジェネリック型に複数の型パラメータがある場合、それぞれを独立してプロジェクションできます。
+例えば、型が `interface Function<in T, out U>` として宣言されている場合、次のようなスタープロジェクションを使用できます。
 
 * `Function<*, String>` は `Function<in Nothing, String>` を意味します。
 * `Function<Int, *>` は `Function<Int, out Any?>` を意味します。
 * `Function<*, *>` は `Function<in Nothing, out Any?>` を意味します。
 
-> スター投影はJavaの生型（raw types）に非常によく似ていますが、安全です。
+> スタープロジェクションは Java の raw 型（原型）に非常によく似ていますが、安全です。
 >
 {style="note"}
 
 ### キャプチャされた型 (Captured types) {id="captured-types"}
 
-`out T` や `in T` のような型投影を使用する場合、コンパイラは内部的に未知の具体的な型を「[キャプチャされた型（captured type）](https://kotlinlang.org/spec/type-system.html#type-capturing)」として表現します。キャプチャされた型は、既知の上界と下界を持つ未知の型です。
+`out T` や `in T` などの型プロジェクションを使用すると、コンパイラは内部的に未知の具体的な型を [*captured type（キャプチャされた型）*](https://kotlinlang.org/spec/type-system.html#type-capturing) として表現します。キャプチャされた型とは、上限境界と下限境界が判明している未知の型のことです。
 
-キャプチャされた型は記述不可能（non-denotable）であるため、Kotlinのコード内で直接記述することはできません。代わりに、`CapturedType(out X)` のようなコンパイラの診断メッセージで目にすることが最も多いでしょう。例えば、次の型不一致の診断メッセージにはキャプチャされた型が含まれています。
+キャプチャされた型は非表記型（non-denotable）であるため、Kotlin コード内で直接記述することはできません。代わりに、`CapturedType(out X)` などのコンパイラ診断情報で最も頻繁に目にすることになります。例えば、次の型不一致の診断にはキャプチャされた型が含まれています。
 
 ```kotlin
 val array: Array<out CharSequence> = arrayOf("str")
 val item: Int = array.get(0)
-// 初期化子の型不一致: 期待されるのは 'Int'、実際は 'CapturedType(out CharSequence)'
+// Initializer type mismatch: expected 'Int', actual 'CapturedType(out CharSequence)'
 ```
 
-コンパイラは、読み取り操作にはキャプチャされた型の上界を使用し、書き込み操作にどの値が型安全であるかを判断するためにはその下界を使用します。
+コンパイラは、読み取り操作にはキャプチャされた型の上限境界を使用し、書き込み操作にどの値が型安全であるかを判断するためにはその下限境界を使用します。
 
 ```kotlin
-// 投影された型は Array<out CharSequence>
+// プロジェクションされた型は Array<out CharSequence>
 val array: Array<out CharSequence> = arrayOf("Kotlin")
 
-// get() の読み取り操作は、キャプチャされた型の上界である CharSequence を使用します
+// get() の読み取り操作は、キャプチャされた型の上限境界である CharSequence を使用します
 val item = array.get(0)
 
-// set() の書き込み操作は、キャプチャされた型の下界である Nothing を使用します。
-// Nothing のインスタンスは存在しないため、これはエラーになります。
+// set() の書き込み操作は、キャプチャされた型の下限境界である Nothing を使用するため、
+// エラーになります
 array.set(0, "New value")
-// レシーバー型 'Array<out CharSequence>' は out 投影を含んでいるため、
-// 'fun set(index: Int, value: T): Unit' の使用は禁止されています
+// Receiver type 'Array<out CharSequence>' contains out projection
+// which prohibits the use of 'fun set(index: Int, value: T): Unit'
 ```
 
-この例では：
+この例では以下のようになります。
 
-* 変数 `array` は投影された型 `Array<out CharSequence>` を持っています。コンパイラは投影された型引数 `out CharSequence` を、上界が `CharSequence` で下界が `Nothing` であるキャプチャされた型として表現します。
-* `get()` 操作において、コンパイラはキャプチャされた型をその上界である `CharSequence` に近似し、`item` の型を `CharSequence` と推論します。
-* `set()` 操作において、キャプチャされた型は下界として `Nothing` を持ちます。`Nothing` にはインスタンスが存在しないため、投影された型への値の書き込みは型安全ではなく、エラーになります。
+* 変数 `array` はプロジェクションされた型 `Array<out CharSequence>` を持ちます。コンパイラは、プロジェクションされた型引数 `out CharSequence` を、上限境界を `CharSequence`、下限境界を `Nothing` とするキャプチャされた型として表現します。
+* `get()` 操作では、コンパイラはキャプチャされた型をその上限境界である `CharSequence` に近似させ、`item` の型を `CharSequence` と推論します。
+* `set()` 操作では、キャプチャされた型の下限境界は `Nothing` です。`Nothing` にはインスタンスが存在しないため、プロジェクションされた型への値の書き込みは型安全ではなく、エラーになります。
 
 ## ジェネリック関数 {id="generic-functions"}
 
-クラスだけでなく、関数も型パラメータを持つことができます。型パラメータは関数の名前の*前*に置かれます。
+型パラメータを持つことができる宣言はクラスだけではありません。関数も持つことができます。型パラメータは関数名の*前*に配置します。
 
 ```kotlin
 fun <T> singletonList(item: T): List<T> {
@@ -279,13 +297,13 @@ fun <T> T.basicToString(): String { // 拡張関数
 }
 ```
 
-ジェネリック関数を呼び出すには、呼び出し側で関数の名前の*後*に型引数を指定します。
+ジェネリック関数を呼び出すには、呼び出し箇所で関数名の*後*に型引数を指定します。
 
 ```kotlin
 val l = singletonList<Int>(1)
 ```
 
-型引数がコンテキストから推論できる場合は省略可能です。したがって、次の例も動作します。
+文脈から推論できる場合は型引数を省略できるため、次の例も同様に機能します。
 
 ```kotlin
 val l = singletonList(1)
@@ -293,25 +311,25 @@ val l = singletonList(1)
 
 ## ジェネリック制約 (Generic constraints) {id="generic-constraints"}
 
-特定の型パラメータに代入できるすべての可能な型のセットは、*ジェネリック制約*によって制限される場合があります。
+特定の型パラメータに置き換えることができるすべての可能な型のセットは、*ジェネリック制約（generic constraints）*によって制限される場合があります。
 
-### 上界 (Upper bounds) {id="upper-bounds"}
+### 上限境界 (Upper bounds) {id="upper-bounds"}
 
-最も一般的な制約の種類は*上界*であり、これは Java の `extends` キーワードに対応します。
+最も一般的な制約の種類は*上限境界（upper bound）*であり、これは Java の `extends` キーワードに対応します。
 
 ```kotlin
 fun <T : Comparable<T>> sort(list: List<T>) {  ... }
 ```
 
-コロンの後に指定された型が*上界*であり、`Comparable<T>` のサブタイプのみを `T` に代入できることを示しています。例えば：
+コロンの後に指定された型が*上限境界*であり、`Comparable<T>` のサブタイプのみが `T` に代入可能であることを示します。例えば：
 
 ```kotlin
-sort(listOf(1, 2, 3)) // OK. IntはComparable<Int>のサブタイプです
-sort(listOf(HashMap<Int, String>())) // エラー: HashMap<Int, String>はComparable<HashMap<Int, String>>のサブタイプではありません
+sort(listOf(1, 2, 3)) // OK。Int は Comparable<Int> のサブタイプです
+sort(listOf(HashMap<Int, String>())) // エラー: HashMap<Int, String> は Comparable<HashMap<Int, String>> のサブタイプではありません
 ```
 
-デフォルトの上界（指定されていない場合）は `Any?` です。山括弧内には1つの上界のみを指定できます。
-同じ型パラメータに複数の上界が必要な場合は、別の *where* 句が必要です。
+デフォルトの上限境界（指定されていない場合）は `Any?` です。山括弧内には 1 つの上限境界のみを指定できます。
+同じ型パラメータに複数の上限境界が必要な場合は、個別の *where* 節が必要になります。
 
 ```kotlin
 fun <T> copyWhenGreater(list: List<T>, threshold: T): List<String>
@@ -321,17 +339,17 @@ fun <T> copyWhenGreater(list: List<T>, threshold: T): List<String>
 }
 ```
 
-渡される型は、`where` 句のすべての条件を同時に満たす必要があります。上記の例では、`T` 型は `CharSequence` と `Comparable` の*両方*を実装している必要があります。
+渡される型は、`where` 節のすべての条件を同時に満たす必要があります。上記の例では、`T` 型は `CharSequence` と `Comparable` の*両方*を実装していなければなりません。
 
-## 明示的な非 null 型 (Definitely non-nullable types) {id="definitely-non-nullable-types"}
+## 明示的非null型 (Definitely non-nullable types) {id="definitely-non-nullable-types"}
 
-ジェネリックなJavaクラスやインターフェースとの相互運用を容易にするために、Kotlinはジェネリック型パラメータを**明示的な非 null 型**として宣言することをサポートしています。
+ジェネリックな Java クラスやインターフェースとの相互運用を容易にするため、Kotlin はジェネリック型パラメータを**明示的非null（definitely non-nullable）**として宣言することをサポートしています。
 
-ジェネリック型 `T` を明示的な非 null 型として宣言するには、型を `& Any` で宣言します。例: `T & Any`。
+ジェネリック型 `T` を明示的非nullとして宣言するには、`& Any` を付けて宣言します。例えば `T & Any` です。
 
-明示的な non-nullable 型は、null 許容な[上界](#upper-bounds)を持っている必要があります。
+明示的非null型は、null許容の[上限境界](#upper-bounds)を持っていなければなりません。
 
-明示的な非 null 型を宣言する最も一般的なユースケースは、引数に `@NotNull` を含む Java メソッドをオーバーライドする場合です。例えば、次の `load()` メソッドを考えてみましょう。
+明示的非null型を宣言する最も一般的なユースケースは、引数に `@NotNull` を含む Java メソッドをオーバーライドする場合です。例えば、次の `load()` メソッドを考えてみましょう。
 
 ```java
 import org.jetbrains.annotations.*;
@@ -343,35 +361,35 @@ public interface Game<T> {
 }
 ```
 
-Kotlinで `load()` メソッドを正常にオーバーライドするには、`T1` を明示的な非 null 型として宣言する必要があります。
+Kotlin で `load()` メソッドを正常にオーバーライドするには、`T1` を明示的非nullとして宣言する必要があります。
 
 ```kotlin
 interface ArcadeGame<T1> : Game<T1> {
     override fun save(x: T1): T1
-    // T1は明示的な非 null 型
+    // T1 は明示的非nullです
     override fun load(x: T1 & Any): T1 & Any
 }
 ```
 
-Kotlinのみで作業している場合、Kotlinの型推論がこれを行ってくれるため、明示的な非 null 型を明示的に宣言する必要があることはほとんどありません。
+Kotlin のみを扱う場合、Kotlin の型推論がこれを処理してくれるため、明示的非null型を明示的に宣言する必要が生じる可能性は低いです。
 
 ## 型消去 (Type erasure) {id="type-erasure"}
 
-Kotlinがジェネリック宣言の使用に対して行う型安全性チェックは、コンパイル時に行われます。
+Kotlin がジェネリック宣言の使用に対して実行する型安全性チェックは、コンパイル時に行われます。
 実行時には、ジェネリック型のインスタンスは実際の型引数に関する情報を保持していません。
-型情報は*消去（erased）*されると言われます。例えば、`Foo<Bar>` と `Foo<Baz?>` のインスタンスは、どちらも単に `Foo<*>` として消去されます。
+この型情報は*消去（erased）*されていると言われます。例えば、`Foo<Bar>` と `Foo<Baz?>` のインスタンスは、単なる `Foo<*>` に消去されます。
 
 ### ジェネリクスの型チェックとキャスト {id="generics-type-checks-and-casts"}
 
-型消去のため、実行時にジェネリック型のインスタンスが特定の型引数で作成されたかどうかを確認する一般的な方法はありません。そのため、コンパイラは `ints is List<Int>` や `list is T`（型パラメータ）のような `is` チェックを禁止しています。ただし、スター投影された型に対してインスタンスをチェックすることはできます。
+型消去のため、実行時にジェネリック型のインスタンスが特定の型引数で生成されたかどうかをチェックする一般的な方法はなく、コンパイラは `ints is List<Int>` や `list is T`（型パラメータ）のような `is` チェックを禁止します。ただし、スタープロジェクションされた型に対してインスタンスをチェックすることはできます。
 
 ```kotlin
 if (something is List<*>) {
-    something.forEach { println(it) } // アイテムは `Any?` 型として扱われます
+    something.forEach { println(it) } // 要素は `Any?` 型として扱われます
 }
 ```
 
-同様に、インスタンスの型引数がすでに（コンパイル時に）静的にチェックされている場合は、型の非ジェネリック部分を含む `is` チェックやキャストを行うことができます。この場合、山括弧は省略されることに注意してください。
+同様に、インスタンスの型引数がすでに静的に（コンパイル時に）チェックされている場合は、型の非ジェネリック部分を含む `is` チェックやキャストを行うことができます。この場合、山括弧は省略されることに注意してください。
 
 ```kotlin
 fun handleStrings(list: MutableList<String>) {
@@ -381,12 +399,12 @@ fun handleStrings(list: MutableList<String>) {
 }
 ```
 
-型引数を考慮しないキャストにも、型引数を省略した同じ構文を使用できます： `list as ArrayList`。
+型引数を考慮しないキャストにも、型引数を省略した同じ構文を使用できます: `list as ArrayList`。
 
-ジェネリック関数の呼び出しの型引数も、コンパイル時にのみチェックされます。関数本体の内部では、型パラメータを型チェックに使用することはできず、型パラメータへの型キャスト（`foo as T`）はチェックされません。
-唯一の例外は、[実体化された型パラメータ](inline-functions.md#reified-type-parameters)（reified type parameters）を持つインライン関数です。これらは各呼び出し箇所で実際の型引数がインライン化されます。これにより、型パラメータに対する型チェックとキャストが可能になります。
-ただし、チェックやキャストの内部で使用されるジェネリック型のインスタンスには、前述の制限が依然として適用されます。
-例えば、型チェック `arg is T` において、`arg` 自体がジェネリック型のインスタンスである場合、その型引数は依然として消去されています。
+ジェネリック関数の呼び出しの型引数も、コンパイル時にのみチェックされます。関数本体の内部では、型パラメータを型チェックに使用することはできず、型パラメータへの型キャスト（`foo as T`）はチェックされません（unchecked）。
+唯一の例外は、[具現化された型パラメータ（reified type parameters）](inline-functions.md#reified-type-parameters)を持つインライン関数です。この場合、各呼び出し箇所で実際の型引数がインライン展開されます。これにより、型パラメータに対する型チェックやキャストが可能になります。
+ただし、チェックやキャストの内部で使用されるジェネリック型のインスタンスに対しては、上記で説明した制限が依然として適用されます。
+例えば、`arg is T` という型チェックにおいて、`arg` 自体がジェネリック型のインスタンスである場合、その型引数は依然として消去されています。
 
 ```kotlin
 //sampleStart
@@ -400,7 +418,7 @@ val somePair: Pair<Any?, Any?> = "items" to listOf(1, 2, 3)
 val stringToSomething = somePair.asPairOf<String, Any>()
 val stringToInt = somePair.asPairOf<String, Int>()
 val stringToList = somePair.asPairOf<String, List<*>>()
-val stringToStringList = somePair.asPairOf<String, List<String>>() // コンパイルは通りますが、型安全性が壊れます！
+val stringToStringList = somePair.asPairOf<String, List<String>>() // コンパイルは通りますが型安全性を破壊します！
 // 詳細についてはサンプルを展開してください
 
 //sampleEnd
@@ -410,34 +428,34 @@ fun main() {
     println("stringToInt = " + stringToInt)
     println("stringToList = " + stringToList)
     println("stringToStringList = " + stringToStringList)
-    //println(stringToStringList?.second?.forEach() {it.length}) // リストの要素がStringではないため、ClassCastExceptionをスローします
+    //println(stringToStringList?.second?.forEach() {it.length}) // リストの要素が String ではないため ClassCastException がスローされます
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-### チェックされないキャスト (Unchecked casts) {id="unchecked-casts"}
+### 未検査キャスト (Unchecked casts) {id="unchecked-casts"}
 
-`foo as List<String>` のような具体的な型引数を持つジェネリック型への型キャストは、実行時にチェックできません。
-これらのチェックされないキャストは、高レベルのプログラムロジックによって型安全性が暗示されているものの、コンパイラによって直接推論できない場合に使用できます。以下の例を参照してください。
+`foo as List<String>` のように具象型引数を持つジェネリック型への型キャストは、実行時にチェックできません。  
+これらの未検査キャスト（unchecked casts）は、上位レベルのプログラムロジックによって型安全性が暗示されているものの、コンパイラによって直接推論できない場合に使用できます。以下の例を参照してください。
 
 ```kotlin
 fun readDictionary(file: File): Map<String, *> = file.inputStream().use { 
-    TODO("文字列から任意の要素へのマッピングを読み込む。")
+    TODO("文字列から任意の要素へのマッピングを読み取ります。")
 }
 
-// このファイルに `Int` を含むマップを保存したとします
+// `Int` を含むマップをこのファイルに保存しました
 val intsFile = File("ints.dictionary")
 
-// 警告: Unchecked cast: `Map<String, *>` to `Map<String, Int>`
+// 警告: 未検査キャスト: `Map<String, *>` から `Map<String, Int>` へのキャスト
 val intsDictionary: Map<String, Int> = readDictionary(intsFile) as Map<String, Int>
 ```
-最後の行のキャストに対して警告が表示されます。コンパイラは実行時にこれを完全にチェックすることはできず、マップ内の値が `Int` であることを保証しません。
+最後の行のキャストに対して警告が表示されます。コンパイラは実行時にこれを完全にチェックすることができず、マップ内の値が `Int` であることを保証しません。
 
-チェックされないキャストを避けるために、プログラム構造を再設計することができます。上記の例では、異なる型に対して型安全な実装を持つ `DictionaryReader<T>` および `DictionaryWriter<T>` インターフェースを使用できます。妥当な抽象化を導入することで、呼び出し側から実装の詳細へとチェックされないキャストを移動させることができます。[ジェネリックの変位](#variance)を適切に使用することも役立ちます。
+未検査キャストを回避するために、プログラム構造を再設計することができます。上記の例では、異なる型に対して型安全な実装を持つ `DictionaryReader<T>` インターフェースと `DictionaryWriter<T>` インターフェースを使用できます。適切な抽象化を導入することで、未検査キャストを呼び出し元から実装の詳細へと移すことができます。[ジェネリクスの変異性](#variance)を適切に使用することも役立ちます。
 
-ジェネリック関数の場合、[実体化された型パラメータ](inline-functions.md#reified-type-parameters)を使用すると、`arg` の型が*それ自体*消去された型引数を持っていない限り、`arg as T` のようなキャストをチェックできるようになります。
+ジェネリック関数の場合、[具現化された型パラメータ](inline-functions.md#reified-type-parameters)を使用することで、`arg` の型が消去される*独自の*型引数を持っていない限り、`arg as T` のようなキャストをチェックされるものにできます。
 
-チェックされないキャストの警告は、それが発生する文または宣言に `@Suppress("UNCHECKED_CAST")` を[アノテーション](annotations.md)することで抑制できます。
+未検査キャストの警告は、それが発生する文または宣言に `@Suppress("UNCHECKED_CAST")` を[アノテーション](annotations.md)することで抑制できます。
 
 ```kotlin
 inline fun <reified T> List<*>.asListOfType(): List<T>? =
@@ -447,13 +465,13 @@ inline fun <reified T> List<*>.asListOfType(): List<T>? =
         null
 ```
 
->**JVMにおいて**: [配列型](arrays.md)（`Array<Foo>`）は要素の消去された型に関する情報を保持しており、配列型への型キャストは部分的にチェックされます。要素型の null 許容性と実際の型引数は依然として消去されています。例えば、`foo as Array<List<String>?>` というキャストは、`foo` が null 許容かどうかに関わらず、任意の `List<*>` を保持する配列であれば成功します。
+>**JVM において**: [配列型](arrays.md)（`Array<Foo>`）は、その要素の消去された型に関する情報を保持しており、配列型への型キャストは部分的にチェックされます。要素型のnull許容性と実際の型引数は依然として消去されます。例えば、キャスト `foo as Array<List<String>?>` は、`foo` が null 許容であるかどうかにかかわらず、任意の `List<*>` を保持する配列である場合に成功します。
 >
 {style="note"}
 
 ## 型引数のアンダースコア演算子 {id="underscore-operator-for-type-arguments"}
 
-型引数にアンダースコア演算子 `_` を使用できます。他の型が明示的に指定されている場合に、引数の型を自動的に推論させるために使用します。
+アンダースコア演算子 `_` は型引数に対して使用できます。他の型が明示的に指定されている場合に、引数の型を自動的に推論させるためにこれを使用します。
 
 ```kotlin
 abstract class SomeClass<T> {
@@ -475,11 +493,11 @@ object Runner {
 }
 
 fun main() {
-    // SomeImplementationがSomeClass<String>を継承しているため、TはStringと推論されます
+    // SomeImplementation は SomeClass<String> を継承しているため、T は String と推論されます
     val s = Runner.run<SomeImplementation, _>()
     assert(s == "Test")
 
-    // OtherImplementationがSomeClass<Int>を継承しているため、TはIntと推論されます
+    // OtherImplementation は SomeClass<Int> を継承しているため、T は Int と推論されます
     val n = Runner.run<OtherImplementation, _>()
     assert(n == 42)
 }

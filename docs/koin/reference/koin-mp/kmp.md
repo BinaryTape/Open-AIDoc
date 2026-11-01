@@ -1,460 +1,123 @@
 ---
-title: KMP 高级模式
+title: KMP 平台集成
 ---
 
-# KMP 高级模式
+# KMP 平台集成
 
-本指南涵盖了 Kotlin Multiplatform 项目中 Koin 的高级模式。
+本页介绍了使用 Koin 的 Kotlin Multiplatform 应用的平台细节：从共享代码中使用 Android `Context`、从 Swift 调用 Koin，以及桌面端和 Web 目标。本文假设你的项目遵循 [KMP 设置](/docs/reference/koin-core/kmp-setup)和 [KMP 共享模式](/docs/reference/koin-core/kmp-shared-modules)。
 
-:::info
-有关基础设置，请参阅 [KMP 设置](/docs/reference/koin-core/kmp-setup)。有关模块组织，请参阅 [共享模式](/docs/reference/koin-core/kmp-shared-modules)。有关 ViewModel，请参阅 [ViewModel](/docs/reference/koin-core/viewmodel)。
-:::
-
-## 源码项目 {id="source-project"}
-
-:::info
-您可以在这里找到 Kotlin Multiplatform 项目：https://github.com/InsertKoinIO/hello-kmp
-:::
-
-## 高级 expect/actual 模式 {id="advanced-expect-actual-patterns"}
-
-除了基础的 `expect val platformModule: Module` 模式之外，以下是处理平台特定代码的高级方法。
-
-### 模式 1：expect/actual 类 {id="pattern-1-expect-actual-classes"}
-
-当您需要平台特定 API（如 Android Context、iOS UIDevice 等）时使用：
-
-```kotlin
-// commonMain - 声明
-expect class PlatformContext
-
-expect fun createPlatformModule(): Module
-
-// androidMain - Android 实现
-actual class PlatformContext(val context: Context)
-
-actual fun createPlatformModule() = module {
-    single<PlatformContext>()  // 编译器插件 DSL
-}
-
-// iosMain - iOS 实现
-actual class PlatformContext
-
-actual fun createPlatformModule() = module {
-    single<PlatformContext>()
-}
-```
-
-### 模式 2：接口 + 平台实现 {id="pattern-2-interface-platform-implementations"}
-
-当您想为每个平台注入不同的实现时使用：
-
-```kotlin
-// commonMain - 接口
-interface Logger {
-    fun log(message: String)
-}
-
-// androidMain
-class AndroidLogger : Logger {
-    override fun log(message: String) {
-        android.util.Log.d("App", message)
-    }
-}
-
-val androidModule = module {
-    single<AndroidLogger>() bind Logger::class
-}
-
-// iosMain
-class IOSLogger : Logger {
-    override fun log(message: String) {
-        println("iOS: $message")
-    }
-}
-
-val iosModule = module {
-    single<IOSLogger>() bind Logger::class
-}
-```
-
-### 模式 3：带注解的 expect 模块 {id="pattern-3-expect-module-with-annotations"}
-
-将 expect/actual 与注解结合使用，使代码更整洁：
-
-```kotlin
-// commonMain
-expect val platformModule: Module
-
-// androidMain
-@Module
-@ComponentScan("com.myapp.android")
-class AndroidPlatformModule
-
-actual val platformModule = AndroidPlatformModule().module
-
-// iosMain
-@Module
-@ComponentScan("com.myapp.ios")
-class IosPlatformModule
-
-actual val platformModule = IosPlatformModule().module
-```
-
-:::info
-**如何选择模式：**
-- **expect/actual 类**：适用于平台 API（Context、UIDevice）和简单的平台差异。
-- **接口**：适用于因平台而异的业务逻辑和可测试的代码。
-- **expect 模块**：适用于复杂的平台特定依赖关系图。
-:::
+完整项目：[Compose Multiplatform 示例](https://github.com/InsertKoinIO/koin-getting-started/tree/main/compose)（编译器插件 DSL）和[注解示例](https://github.com/InsertKoinIO/koin-getting-started/tree/main/compose-annotations)。
 
 ## 共享代码中的 Android Context {id="android-context-in-shared-code"}
 
-在共享代码中访问 Android `Context` 是一个常见的需求。以下是推荐的模式：
+共享代码无法使用 `android.content.Context`，但在 Android 上某些共享类又需要它（用于打开文件、读取偏好设置）。可以将其封装在一个公共代码可依赖的平台类型中：
 
-### ContextWrapper 模式 {id="contextwrapper-pattern"}
-
-```kotlin
-// commonMain - 包装器接口
-interface AppContext
-
-// androidMain - Android 实现
-class AndroidAppContext(val context: Context) : AppContext
-
-val androidContextModule = module {
-    single<AndroidAppContext>() bind AppContext::class
-}
-
-// iosMain - 空实现
-class IOSAppContext : AppContext
-
-val iosContextModule = module {
-    single<IOSAppContext>() bind AppContext::class
-}
-```
-
-在共享代码中使用：
-
-```kotlin
-// commonMain - 仓库使用平台上下文
-class FileRepository(private val appContext: AppContext) {
-    fun saveFile(data: String) {
-        when (appContext) {
-            is AndroidAppContext -> {
-                val file = File(appContext.context.filesDir, "data.txt")
-                file.writeText(data)
-            }
-            is IOSAppContext -> {
-                // iOS 特定的文件操作
-            }
-        }
-    }
-}
-
-val sharedModule = module {
-    single<FileRepository>()
-}
-```
-
-:::note
-对于纯共享逻辑，首选将平台操作抽象为接口，而不是使用 `when` 语句。
-:::
-
-## 架构模式 {id="architecture-patterns"}
-
-### 结合 Ktor 的仓库模式 {id="repository-pattern-with-ktor"}
-
+**编译器插件 DSL**
 ```kotlin
 // commonMain
-interface UserRepository {
-    suspend fun getUser(id: String): User
-    suspend fun saveUser(user: User)
+interface ContextWrapper {
+    fun getContextInfo(): String
 }
 
-@Singleton
-class UserRepositoryImpl(
-    private val api: UserApi,
-    private val database: UserDatabase
-) : UserRepository {
-    override suspend fun getUser(id: String): User {
-        return try {
-            api.fetchUser(id).also { database.saveUser(it) }
-        } catch (e: Exception) {
-            database.getUser(id)
-        }
-    }
+class FileStore(private val ctx: ContextWrapper)
 
-    override suspend fun saveUser(user: User) {
-        database.saveUser(user)
-        api.updateUser(user)
-    }
-}
-
-val dataModule = module {
-    single<UserRepositoryImpl>() bind UserRepository::class
+val storageModule = module {
+    single<FileStore>()
 }
 ```
 
-### 网络层 (Ktor + Koin) {id="network-layer-ktor-koin"}
-
 ```kotlin
-// commonMain
-@Singleton
-class ApiClient(private val client: HttpClient) {
-    suspend fun fetchUser(id: String): User {
-        return client.get("https://api.example.com/users/$id").body()
-    }
-}
-
-val networkModule = module {
-    single {
-        HttpClient {
-            install(ContentNegotiation) {
-                json()
-            }
-        }
-    }
-    single<ApiClient>()
-}
-```
-
-### 数据库层 (SqlDelight) {id="database-layer-sqldelight"}
-
-```kotlin
-// commonMain
-expect class DriverFactory {
-    fun createDriver(): SqlDriver
-}
-
-val databaseModule = module {
-    single { DriverFactory().createDriver() }
-    single { AppDatabase(get()) }
-    single { get<AppDatabase>().userQueries }
-}
-
 // androidMain
-actual class DriverFactory(private val context: Context) {
-    actual fun createDriver(): SqlDriver {
-        return AndroidSqliteDriver(AppDatabase.Schema, context, "app.db")
-    }
+class AndroidContextWrapper(val context: Context) : ContextWrapper {
+    override fun getContextInfo() = "Android: ${context.packageName}"
+}
+
+actual fun platformModule(): Module = module {
+    single<AndroidContextWrapper>() bind ContextWrapper::class
+}
+```
+
+```kotlin
+// iosMain
+class IOSContextWrapper : ContextWrapper {
+    override fun getContextInfo() = "iOS"
+}
+
+actual fun platformModule(): Module = module {
+    single<IOSContextWrapper>() bind ContextWrapper::class
+}
+```
+
+**注解**
+```kotlin
+// commonMain
+interface ContextWrapper {
+    fun getContextInfo(): String
+}
+
+@Singleton
+class FileStore(private val ctx: ContextWrapper)
+```
+
+```kotlin
+// androidMain
+@Singleton
+class AndroidContextWrapper(val context: Context) : ContextWrapper {
+    override fun getContextInfo() = "Android: ${context.packageName}"
+}
+```
+
+```kotlin
+// iosMain
+@Singleton
+class IOSContextWrapper : ContextWrapper {
+    override fun getContextInfo() = "iOS"
+}
+```
+
+平台类由带有 `@ComponentScan` 的 `actual` 平台模块查找（参见 [KMP 共享模式](/docs/reference/koin-core/kmp-shared-modules)）。
+
+**构造函数 / 经典 DSL**
+```kotlin
+// commonMain
+interface ContextWrapper {
+    fun getContextInfo(): String
+}
+
+class FileStore(private val ctx: ContextWrapper)
+
+val storageModule = module {
+    singleOf(::FileStore)
+}
+```
+
+```kotlin
+// androidMain
+actual fun platformModule(): Module = module {
+    singleOf(::AndroidContextWrapper) bind ContextWrapper::class
 }
 
 // iosMain
-actual class DriverFactory {
-    actual fun createDriver(): SqlDriver {
-        return NativeSqliteDriver(AppDatabase.Schema, "app.db")
-    }
+actual fun platformModule(): Module = module {
+    singleOf(::IOSContextWrapper) bind ContextWrapper::class
 }
 ```
 
-## 测试 KMP 模块 {id="testing-kmp-modules"}
+`FileStore` 在 `commonMain` 中编译一次并接收平台包装器。仅有一个 Android 定义会涉及 `Context`，并且它在启动时设置了 `androidContext()` 后即可解析。请将特定于 Android 的操作置于 `ContextWrapper` 的方法之后，而不是在公共代码中检查平台类型。
 
-### 单元测试共享模块 {id="unit-testing-shared-modules"}
+## iOS 与 Swift {id="ios-and-swift"}
 
-```kotlin
-// commonTest
-class UserRepositoryTest : KoinTest {
+### 从 Swift 中获取依赖项 {id="retrieving-dependencies-from-swift"}
 
-    @Test
-    fun testGetUser() = runTest {
-        startKoin {
-            modules(module {
-                single<UserApi> { FakeUserApi() }
-                single<UserDatabase> { FakeUserDatabase() }
-                single<UserRepositoryImpl>() bind UserRepository::class
-            })
-        }
-
-        val repository: UserRepository = get()
-        val user = repository.getUser("123")
-
-        assertEquals("John", user.name)
-
-        stopKoin()
-    }
-}
-```
-
-### 测试平台特定依赖项 {id="testing-with-platform-specific-dependencies"}
+Swift 无法调用 Koin 的具体化函数（如 `get<T>()`）。在 Swift 边界处，可以在 `iosMain` 中编写一个实现 `KoinComponent` 的小型 Kotlin 帮助程序，并在 Swift 中使用它。这是一个互操作入口点：你的共享类仍通过其构造函数接收依赖项。
 
 ```kotlin
-// commonTest
-expect fun createTestPlatformModule(): Module
-
-// androidTest
-actual fun createTestPlatformModule() = module {
-    single<PlatformContext> { TestAndroidContext() }
-}
-
-// iosTest
-actual fun createTestPlatformModule() = module {
-    single<PlatformContext> { TestIOSContext() }
-}
-
-// commonTest - 使用平台模块进行测试
-class PlatformDependentTest : KoinTest {
-    @Test
-    fun testWithPlatformContext() {
-        startKoin {
-            modules(
-                createTestPlatformModule(),
-                module {
-                    single<MyService>()
-                }
-            )
-        }
-
-        val service: MyService = get()
-        // 测试服务
-
-        stopKoin()
-    }
-}
-```
-
-## 常见陷阱 {id="common-pitfalls"}
-
-### 推荐 (DO)：为可测试的共享代码使用接口 {id="do-use-interfaces-for-testable-shared-code"}
-
-```kotlin
-// 推荐 - 可测试
-interface Logger {
-    fun log(message: String)
-}
-
-val sharedModule = module {
-    single<UserService>()  // 依赖于 Logger 接口
-}
-```
-
-### 避免 (DON'T)：为业务逻辑使用 expect 类 {id="don-t-use-expect-classes-for-business-logic"}
-
-```kotlin
-// 避免 - 难以测试，与平台耦合紧密
-expect class Logger {
-    fun log(message: String)
-}
-```
-
-### 推荐 (DO)：保持平台模块独立 {id="do-keep-platform-modules-separate"}
-
-```kotlin
-// 推荐 - 职责分离清晰
-fun initKoin() {
-    startKoin {
-        modules(commonModules() + platformModule)
-    }
-}
-```
-
-### 避免 (DON'T)：在共享模块中混入平台特定代码 {id="don-t-mix-platform-specific-code-in-shared-modules"}
-
-```kotlin
-// 避免 - 在 commonMain 中包含平台特定代码
-val sharedModule = module {
-    single {
-        if (Platform.isAndroid) { /* ... */ } // 不要这样做！
-    }
-}
-```
-
-### 推荐 (DO)：大型应用使用延迟加载模块 {id="do-use-lazy-modules-for-large-apps"}
-
-```kotlin
-// 推荐 - 优化启动速度
-val lazyFeatureModule = lazyModule {
-    single<HeavyService>()
-}
-
-startKoin {
-    modules(coreModules)
-    lazyModules(lazyFeatureModule)
-}
-```
-
-### 避免 (DON'T)：忘记关闭作用域 {id="don-t-forget-to-close-scopes"}
-
-```kotlin
-// 避免 - 内存泄漏
-class FeatureScreen : KoinComponent {
-    val scope = getKoin().createScope<FeatureScreen>()
-    // 忘记关闭作用域了！
-}
-
-// 推荐 - 正确清理
-class FeatureScreen : KoinComponent {
-    val scope = getKoin().createScope<FeatureScreen>()
-
-    fun onDestroy() {
-        scope.close()
-    }
-}
-```
-
-## 桌面平台集成 {id="desktop-platform-integration"}
-
-对于 JVM 桌面应用 (Compose Desktop)：
-
-```kotlin
-// desktopMain
-fun main() = application {
-    startKoin {
-        modules(
-            sharedModule,
-            desktopModule
-        )
-    }
-
-    Window(onCloseRequest = ::exitApplication) {
-        App()
-    }
-}
-
-val desktopModule = module {
-    single<DesktopLogger>() bind Logger::class
-    single<DesktopFileManager>()
-}
-```
-
-## Web 平台集成（实验性） {id="web-platform-integration-experimental"}
-
-对于 Kotlin/JS 和 Kotlin/WASM：
-
-```kotlin
-// jsMain 或 wasmJsMain
-fun main() {
-    startKoin {
-        modules(
-            sharedModule,
-            webModule
-        )
-    }
-    // 您的 Web 应用初始化
-}
-
-val webModule = module {
-    single<ConsoleLogger>() bind Logger::class
-    single<BrowserStorage>()
-}
-```
-
-:::warning
-WASM 支持处于实验阶段。某些功能可能无法按预期工作。
-:::
-
-## iOS Swift 互操作 {id="ios-swift-interop"}
-
-### 适用于 Swift 的 KoinComponent {id="koincomponent-for-swift"}
-
-```kotlin
-// shared/src/iosMain/kotlin/Helper.kt
+// iosMain
 class GreetingHelper : KoinComponent {
     private val greeting: Greeting by inject()
     fun greet(): String = greeting.greeting()
 }
 ```
-
-在 Swift 中：
 
 ```swift
 struct ContentView: View {
@@ -466,14 +129,14 @@ struct ContentView: View {
 }
 ```
 
-### 从 Swift 声明依赖项 {id="declaring-dependencies-from-swift"}
+在使用该帮助程序之前必须先启动 Koin：请参阅 [KMP 设置](/docs/reference/koin-core/kmp-setup)中的 iOS 入口点。关于 `KoinComponent` 的说明，请参阅 [KoinComponent](/docs/reference/koin-core/koin-component)。
 
-在某些情况下，您可能需要直接从 Swift 声明依赖项 — 例如，当一个仅限 Swift 的类需要注册到 Koin 时。您可以使用 `declare` 函数结合 Kotlin/Native 互操作将 Objective-C 类型解析为 Kotlin `KClass`。
+### 在 Koin 中声明 Swift 实例 {id="declaring-a-swift-instance-in-koin"}
 
-在 `iosMain` 中添加此帮助程序：
+有时 Swift 类会实现 Kotlin 接口，而 Kotlin 代码需要从 Koin 中获取该接口。可以在运行时使用 `Koin.declare()` 注册该实例。Swift 将类型作为 Objective-C 类或协议传入，此 `iosMain` 帮助程序会将其转换为 Kotlin `KClass`：
 
 ```kotlin
-// shared/src/iosMain/kotlin/KoinSwiftHelper.kt
+// iosMain
 @OptIn(BetaInteropApi::class)
 fun Koin.declareFromSwift(
     instance: Any,
@@ -496,39 +159,69 @@ fun Koin.declareFromSwift(
 }
 ```
 
-然后在 Swift 中，使用类或协议引用调用它：
-
 ```swift
 koin.declareFromSwift(
-    instance: MyService(),
-    bindTo: MyServiceProtocol.self,
+    instance: SwiftAnalytics(),
+    bindTo: Analytics.self,
     qualifier: nil,
     allowOverride: true
 )
 ```
 
-:::note
-这使用来自 `kotlin.native` 的 `getOriginalKotlinClass()` 将 Objective-C 类型映射回它们的 Kotlin `KClass`。`bindTo` 形参接受 `ObjCClass`（类上的 `.self`）或 `ObjCProtocol`（协议上的 `.self`）。
+`getOriginalKotlinClass()` 来自 `kotlin.native`，可将类（类上的 `.self`）或协议（协议上的 `.self`）映射回其 Kotlin 类型。已声明的实例不会在编译时进行检查：如果 Swift 尚未声明该实例，Kotlin 消费者将在运行时失败。该帮助程序基于 [@SarahDelCastillo 的提议](https://github.com/InsertKoinIO/koin/issues/1108#issuecomment-3645990426)。
 
-最初由 [@SarahDelCastillo](https://github.com/InsertKoinIO/koin/issues/1108#issuecomment-3645990426) 提议。
-:::
+### 线程 {id="threading"}
 
-### 线程注意事项 {id="threading-considerations"}
+Koin 运行在当前的 Kotlin/Native 内存模型上（自 Kotlin 1.7.20 起的默认模型）。你可以从任意线程解析依赖项并使用作用域，无需进行冻结或使用 `@SharedImmutable` 注解。
 
-在 iOS 和其他 Native 目标上，Koin 实例可以与新的内存模型无缝协作：
+## 桌面端 (JVM) {id="desktop-jvm"}
 
-- Koin 定义是线程安全的
-- 作用域可以跨线程创建和使用
-- 如果需要，对全局 Koin 实例使用 `@SharedImmutable`
+在首个窗口出现之前的 `main()` 中启动 Koin：
 
-:::note
-新的 Kotlin/Native 内存模型（在 Kotlin 1.7.20+ 中为默认）使 Koin 的使用变得简单得多。
-:::
+```kotlin
+// jvmMain
+fun main() = application {
+    initKoin {
+        printLogger()
+        modules(desktopModule)
+    }
 
-## 后续步骤 {id="next-steps"}
+    Window(onCloseRequest = ::exitApplication) {
+        App()
+    }
+}
 
-- **[KMP 设置](/docs/reference/koin-core/kmp-setup)** - 基础 KMP 配置
-- **[共享模式](/docs/reference/koin-core/kmp-shared-modules)** - 模块组织
-- **[ViewModel](/docs/reference/koin-core/viewmodel)** - 多平台 ViewModel
-- **[Koin for Compose](/docs/reference/koin-compose/compose)** - Compose 集成
-- **[Annotations KMP](/docs/reference/koin-annotations/kmp)** - KMP 中基于注解的 DI
+val desktopModule = module {
+    single<DesktopFileManager>()
+}
+```
+
+共享 `initKoin` 的 `config` 形参添加了仅限桌面端的模块和记录器。桌面端是一个 JVM 目标，因此仅限 JVM 的功能（如 `fileProperties()`）均可用（参见[启动 Koin](/docs/reference/koin-core/starting-koin)）。
+
+## Web (JS 与 Wasm) {id="web-js-and-wasm"}
+
+在 `js` 或 `wasmJs` 源集的 `main()` 中启动 Koin：
+
+```kotlin
+// jsMain or wasmJsMain
+fun main() {
+    initKoin {
+        modules(webModule)
+    }
+    // start your UI
+}
+
+val webModule = module {
+    single<BrowserStorage>()
+}
+```
+
+对于面向 Web 的 Compose Multiplatform，你也可以使用 `KoinApplication` 从根 Composable 中启动 Koin（参见 [Koin for Compose](/docs/reference/koin-compose/compose)）。
+
+## 相关内容 {id="related"}
+
+- [KMP 设置](/docs/reference/koin-core/kmp-setup)：依赖项、`initKoin`、入口点。
+- [KMP 共享模式](/docs/reference/koin-core/kmp-shared-modules)：平台模块以及 `expect`/`actual` 定义。
+- [KoinComponent](/docs/reference/koin-core/koin-component)：从非 Koin 创建的类中获取依赖项。
+- [Koin for Compose](/docs/reference/koin-compose/compose)：Compose Multiplatform 集成。
+- [测试](/docs/reference/koin-test/testing)：在 `commonTest` 中测试共享模块。

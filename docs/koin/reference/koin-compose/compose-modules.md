@@ -2,178 +2,99 @@
 title: 动态模块
 ---
 
-# Compose 中的动态模块
+# 动态模块
 
-Koin 提供了 API 来动态加载和卸载与 Composable 生命周期绑定的模块。这对于功能模块、延迟加载和按需依赖项非常有用。
+本页面介绍了 `rememberKoinModules`，它会在 Composable 进入组合时加载 Koin 模块，并可以在其离开组合时将其卸载。使用它可仅在某个特性的屏幕显示时才加载其定义。你应该了解如何声明[模块](/docs/reference/koin-core/modules)。
+
+`rememberKoinModules` 位于 `io.insert-koin:koin-compose` 中，并被标记为 `@KoinExperimentalAPI`。
 
 ## rememberKoinModules {id="rememberkoinmodules"}
 
-在 Composable 进入组合 (composition) 时加载 Koin 模块：
-
 ```kotlin
-val featureModule = module {
-    factory<FeatureRepository>()
-    viewModel<FeatureViewModel>()
-}
+import org.koin.compose.module.rememberKoinModules
 
-@Composable
-fun FeatureScreen() {
-    // 当此 Composable 进入组合时加载模块
-    rememberKoinModules(featureModule)
-
-    val viewModel = koinViewModel<FeatureViewModel>()
-}
-```
-
-### 多个模块 {id="multiple-modules"}
-
-```kotlin
-@Composable
-fun FeatureScreen() {
-    rememberKoinModules(
-        featureDataModule,
-        featureDomainModule,
-        featureUiModule
-    )
-}
-```
-
-### 卸载模块 {id="unloading-modules"}
-
-控制模块卸载的时机：
-
-```kotlin
-@Composable
-fun FeatureScreen() {
-    rememberKoinModules(
-        featureModule,
-        unloadOnForgotten = true,  // 当 Composable 离开组合时卸载
-        unloadOnAbandoned = true   // 如果组合失败则卸载
-    )
-}
-```
-
-| 选项 | 触发时机 |
-|--------|----------------|
-| `unloadOnForgotten` | Composable 从组合中移除 |
-| `unloadOnAbandoned` | 组合失败或被放弃 |
-
-## 用例 {id="use-cases"}
-
-### 功能模块 {id="feature-modules"}
-
-按需加载特定功能的依赖项：
-
-```kotlin
-// 功能模块位于独立的 Gradle 模块中
 val checkoutModule = module {
-    factory<PaymentProcessor>()
     factory<CheckoutRepository>()
     viewModel<CheckoutViewModel>()
 }
 
+@OptIn(KoinExperimentalAPI::class)
 @Composable
 fun CheckoutScreen() {
-    rememberKoinModules(checkoutModule, unloadOnForgotten = true)
+    rememberKoinModules(unloadOnForgotten = true) { listOf(checkoutModule) }
 
     val viewModel = koinViewModel<CheckoutViewModel>()
-    CheckoutContent(viewModel)
 }
 ```
 
-### 延迟功能加载 {id="lazy-feature-loading"}
+该 lambda 会返回要加载的模块。在首次组合 `CheckoutScreen` 时，Koin 会将它们加载到该组合的 Koin 实例中。重组（Recomposition）不会再次加载它们。
 
-结合导航进行延迟功能加载：
+请在需要其定义的 `koinInject()` 或 `koinViewModel()` 调用之前调用 `rememberKoinModules`。
+
+## 卸载 {id="unloading"}
+
+默认情况下，在 Composable 离开组合后，模块仍会保持已加载状态。有三个形参可控制卸载：
+
+| 形参 | 默认值 | 效果 |
+|-----------|---------|--------|
+| `unloadOnForgotten` | `unloadModules` | 当 Composable 离开组合时卸载 |
+| `unloadOnAbandoned` | `unloadModules` | 如果组合被废弃则卸载 |
+| `unloadModules` | `false` | 上述两个形参的默认值 |
 
 ```kotlin
-NavHost(navController, startDestination = "home") {
-    composable("home") {
-        HomeScreen()  // 无需额外模块
+// 在两种情况下均卸载
+rememberKoinModules(unloadModules = true) { listOf(checkoutModule) }
+```
+
+卸载会移除这些定义并丢弃它们的 `single` 实例。仍然持有该实例引用的代码仍会保留它，但 Koin 将无法再解析该类型。请勿卸载另一个屏幕仍在使用的模块。
+
+## 按导航目标加载 {id="loading-per-destination"}
+
+在导航目标中调用 `rememberKoinModules`，以便在用户导航到某个特性时加载它：
+
+```kotlin
+NavHost(navController, startDestination = HomeRoute) {
+    composable<HomeRoute> {
+        HomeScreen()
     }
-    composable("checkout") {
-        // 仅在导航到此处时加载 checkout 模块
-        rememberKoinModules(checkoutModule, unloadOnForgotten = true)
+    composable<CheckoutRoute> {
+        rememberKoinModules(unloadOnForgotten = true) { listOf(checkoutModule) }
         CheckoutScreen()
     }
-    composable("profile") {
-        // 仅在导航到此处时加载 profile 模块
-        rememberKoinModules(profileModule, unloadOnForgotten = true)
-        ProfileScreen()
-    }
 }
 ```
 
-### 调试/预览模块 {id="debug-preview-modules"}
+## 模块风格 {id="module-styles"}
 
-为预览交换实现：
-
+**编译器插件 DSL**
 ```kotlin
-val debugModule = module {
-    single<ApiClient> { MockApiClient() }
-}
-
-@Preview
-@Composable
-fun FeatureScreenPreview() {
-    rememberKoinModules(debugModule)
-    FeatureScreen()
+val checkoutModule = module {
+    factory<CheckoutRepository>()
+    viewModel<CheckoutViewModel>()
 }
 ```
 
-### 条件模块 {id="conditional-modules"}
+**注解**
+`rememberKoinModules` 接收 `Module` 值。带有 `@Module` 注解的类在启动时通过 `@KoinApplication` 加载（参见[模块](/docs/reference/koin-core/modules)）。若要按需加载某个特性，请使用 DSL 声明其模块。
 
-根据条件加载模块：
-
+**构造函数 / 经典 DSL**
 ```kotlin
-@Composable
-fun App(isDebug: Boolean) {
-    if (isDebug) {
-        rememberKoinModules(debugModule)
-    }
-
-    MainScreen()
+val checkoutModule = module {
+    factoryOf(::CheckoutRepository)
+    viewModelOf(::CheckoutViewModel)
 }
 ```
 
-## 结合延迟模块 (Lazy Modules) {id="with-lazy-modules"}
+## 限制 {id="limits"}
 
-结合 Koin 的延迟模块加载以获得更好的性能：
+- **主线程**：模块在组合期间同步加载。庞大的模块会增加该帧的耗时。若要在启动时于后台加载模块，请参阅[惰性模块](/docs/reference/koin-core/lazy-modules)。
+- **重写**：后加载的模块会覆盖先前相同类型的定义（参见[定义](/docs/reference/koin-core/definitions)）。卸载该模块不会恢复先前的定义。
+- **预览**：`rememberKoinModules` 需要正在运行的 Koin 实例。对于预览，请使用 `KoinApplicationPreview`（参见 [Compose 测试](/docs/reference/koin-compose/compose-testing)）。
 
-```kotlin
-val featureModule = lazyModule {
-    // 模块加载时延迟解析定义
-    factory<HeavyService>()
-    viewModel<FeatureViewModel>()
-}
+## 相关内容 {id="related"}
 
-@Composable
-fun FeatureScreen() {
-    rememberKoinModules(featureModule, unloadOnForgotten = true)
-
-    val viewModel = koinViewModel<FeatureViewModel>()
-}
-```
-
-## 最佳做法 {id="best-practices"}
-
-1. **使用 `unloadOnForgotten = true`** - 防止内存泄漏
-   ```kotlin
-   rememberKoinModules(featureModule, unloadOnForgotten = true)
-   ```
-
-2. **每个功能一个模块** - 保持模块专注且独立
-
-3. **结合延迟模块** - 适用于具有许多功能的大型应用
-   ```kotlin
-   val featureModule = lazyModule { /* ... */ }
-   ```
-
-4. **在导航层级加载** - 在 `NavHost` 的 Composable 中加载模块
-
-5. **避免循环依赖** - 功能模块不应相互依赖
-
-## 后续步骤 {id="next-steps"}
-
-- **[Compose 中的作用域](/docs/reference/koin-compose/compose-scopes)** - Scope API
-- **[Compose 概览](/docs/reference/koin-compose/compose)** - 设置与基础注入
-- **[隔离上下文](/docs/reference/koin-compose/isolated-context)** - SDK 隔离
+- [模块](/docs/reference/koin-core/modules)：声明和组合模块。
+- [惰性模块](/docs/reference/koin-core/lazy-modules)：在启动时于后台加载模块。
+- [启动 Koin](/docs/reference/koin-core/starting-koin)：在 Compose 外部加载和卸载模块。
+- [Compose 中的作用域](/docs/reference/koin-compose/compose-scopes)：绑定到 Composable 的实例。
+- [生命周期与状态](/docs/reference/koin-compose/compose-lifecycle)：各 Compose API 释放的内容及其释放时机。

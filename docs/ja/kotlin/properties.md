@@ -1,14 +1,11 @@
 [//]: # (title: プロパティ)
 
-Kotlin では、プロパティを使用することで、データへのアクセスや変更のための関数を書くことなくデータを保存および管理できます。
-プロパティは、[クラス](classes.md)、[インターフェース](interfaces.md)、[オブジェクト](object-declarations.md)、[コンパニオンオブジェクト](object-declarations.md#companion-objects)のほか、
-これらの構造の外側でもトップレベルプロパティとして使用できます。
+Kotlin では、プロパティを使用することで、データへのアクセスや変更のための関数を記述することなく、データを保存および管理できます。
+プロパティは、[クラス](classes.md)、[インターフェース](interfaces.md)、[オブジェクト](object-declarations.md)、[コンパニオンオブジェクト](object-declarations.md#companion-objects)内だけでなく、これらの構造の外側でもトップレベルプロパティとして使用できます。
 
-すべてのプロパティには名前、型、そして自動的に生成されるゲッター（getter）と呼ばれる `get()` 関数があります。ゲッターを使用することで、
-プロパティの値を読み取ることができます。プロパティが可変（ミュータブル）な場合は、セッター（setter）と呼ばれる `set()` 関数も持ち、
-これによってプロパティの値を変更できます。
+すべてのプロパティには名前、型、そしてゲッター（getter）と呼ばれる自動生成される `get()` 関数があります。ゲッターを使用してプロパティの値を読み取ることができます。プロパティが可変（mutable）である場合は、セッター（setter）と呼ばれる `set()` 関数も持ち、プロパティの値を変更できます。
 
-> ゲッターとセッターは_アクセサ（accessors）_と呼ばれます。
+> ゲッターとセッターは*アクセサ（accessor）*と呼ばれます。
 > 
 {style="tip"}
 
@@ -25,7 +22,7 @@ val pi = 3.14159
 var counter = 0
 ```
 
-クラス、インターフェース、またはオブジェクトの内部でプロパティを宣言することもできます。
+また、クラス、インターフェース、またはオブジェクトの内部でプロパティを宣言することもできます。
 
 ```kotlin
 // プロパティを持つクラス
@@ -102,23 +99,21 @@ fun main() {
 }
 //sampleEnd
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-access-properties"}
+{kotlin-runnable="true" id="kotlin-access-properties"}
 
-Kotlin では、コードの安全性と可読性を保つために、宣言時にプロパティを初期化することを推奨しています。ただし、
-特別なケースでは[後から初期化する](#late-initialized-properties-and-variables)ことも可能です。
+Kotlin では、コードの安全性と可読性を保つために、プロパティを宣言時に初期化することを推奨しています。ただし、特別なケースでは[後から初期化](#late-initialized-properties-and-variables)することもできます。
 
-イニシャライザまたはゲッターの戻り値の型からコンパイラが型を推論できる場合、プロパティの型宣言は省略可能です。
+コンパイラが初期化子やゲッターの戻り値の型から型を推論できる場合、プロパティの型の宣言は省略可能です。
 
 ```kotlin
 var initialized = 1 // 推論される型は Int
-var allByDefault    // エラー: プロパティは初期化されている必要があります。
+var allByDefault    // エラー: Property must be initialized.
 ```
 {validate="false"}
 
 ## カスタムゲッターとセッター {id="custom-getters-and-setters"}
 
-デフォルトでは、Kotlin は自動的にゲッターとセッターを生成します。バリデーション、フォーマット、他のプロパティに基づく計算など、
-追加のロジックが必要な場合は、独自のカスタムアクセサを定義できます。
+デフォルトでは、Kotlin は自動的にゲッターとセッターを生成します。バリデーション、フォーマット、他のプロパティに基づいた計算などの追加ロジックが必要な場合は、独自のカスタムアクセサを定義できます。
 
 カスタムゲッターは、プロパティにアクセスされるたびに実行されます。
 
@@ -134,9 +129,9 @@ fun main() {
     println("Width=${rectangle.width}, height=${rectangle.height}, area=${rectangle.area}")
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-custom-getter"}
+{kotlin-runnable="true" id="kotlin-custom-getter"}
 
-ゲッターからコンパイラが型を推論できる場合は、型を省略できます。
+コンパイラがゲッターから型を推論できる場合は、型を省略できます。
 
 ```kotlin
 val area get() = this.width * this.height
@@ -166,14 +161,14 @@ fun main() {
     // 10, 20
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-custom-setter"}
+{kotlin-runnable="true" id="kotlin-custom-setter"}
 
 ### 可視性の変更またはアノテーションの追加 {id="changing-visibility-or-adding-annotations"}
 
 Kotlin では、デフォルトの実装を置き換えることなく、アクセサの可視性を変更したり[アノテーション](annotations.md)を追加したりできます。
 これらの変更をボディ `{}` 内で行う必要はありません。
 
-アクセサの可視性を変更するには、`get` または `set` キーワードの前に修飾子を置きます。
+アクセサの可視性を変更するには、`get` または `set` キーワードの前に修飾子を記述します。
 
 ```kotlin
 class BankAccount(initialBalance: Int) {
@@ -207,9 +202,9 @@ fun main() {
     // エラー: セッターが private であるため代入できません
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-private-setter"}
+{kotlin-runnable="true" id="kotlin-private-setter"}
 
-アクセサにアノテーションを付与するには、`get` または `set` キーワードの前にアノテーションを置きます。
+アクセサにアノテーションを付けるには、`get` または `set` キーワードの前にアノテーションを記述します。
 
 ```kotlin
 // ゲッターに適用可能なアノテーションを定義
@@ -218,7 +213,7 @@ annotation class Inject
 
 class Service {
     var dependency: String = "Default Service"
-        // ゲッターにアノテーションを付与
+        // ゲッターにアノテーションを付加
         @Inject get 
 }
 
@@ -234,29 +229,29 @@ fun main() {
 ```
 {validate="false"}
 
-この例では、[リフレクション](reflection.md)を使用して、ゲッターとセッターにどのアノテーションが存在するかを表示しています。
+この例では、[リフレクション](reflection.md)を使用してゲッターとセッターにどのアノテーションが存在するかを示しています。
 
 ## バッキングフィールド {id="backing-fields"}
 
-コンパイラは、値をメモリに保持する必要がある場合、プロパティ用のバッキングフィールド（Backing field）を自動的に生成します。
+メモリに値を保存する必要がある場合、コンパイラはプロパティに対して自動的にバッキングフィールド（Backing field）を生成します。
 
-たとえば、デフォルトの `get()` および `set()` 関数を使用する場合、これらは格納された値を読み書きするため、コンパイラはバッキングフィールドを作成します。
+例えば、デフォルトの `get()` および `set()` 関数を使用する場合、それらは保存された値を読み書きするため、コンパイラはバッキングフィールドを作成します。
 
 ```kotlin
 var count = 0
 ```
 
 バッキングフィールドには、[カスタム `get()` または `set()` 関数](#custom-getters-and-setters)内で `field` キーワードを使用してアクセスできます。
-たとえば、ゲッターやセッターに追加のロジックを加えたり、プロパティが変更されたときに追加のアクションをトリガーしたりできます。
+例えば、ゲッターやセッターに追加のロジックを加えたり、プロパティが変更されたときに追加入力をトリガーしたりできます。
 
-この例では、`score` プロパティの `set()` 関数内でバッキングフィールドを使用し、値の更新時にログイベントもトリガーされるようにしています。
+次の例では、`score` プロパティが `set()` 関数内でバッキングフィールドを使用しており、値を更新するとログ出力イベントもトリガーされます。
 
 ```kotlin
 class Scoreboard {
     var score: Int = 0
         set(value) {
             field = value
-            // 値の更新時にログ出力を追加
+            // 値の更新時にロギングを追加
             println("Score updated to $field")
         }
 }
@@ -269,9 +264,9 @@ fun main() {
     // Score updated to 20
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-backing-field"}
+{kotlin-runnable="true" id="kotlin-backing-field"}
 
-すべてのプロパティにバッキングフィールドがデフォルトで作成されるわけではありません。必要ない場合があるためです。たとえば、`isEmpty` プロパティは、アクセスされるたびに `size` プロパティから値が計算されるため、バッキングフィールドを持ちません。
+すべてのプロパティにバッキングフィールドがデフォルトで作成されるわけではありません。必要ない場合があるためです。例えば、`isEmpty` プロパティは、アクセスされるたびに `size` プロパティから値が計算されるため、バッキングフィールドを持ちません。
 
 ```kotlin
 val isEmpty: Boolean
@@ -280,14 +275,13 @@ val isEmpty: Boolean
 
 ### 明示的なバッキングフィールド {id="explicit-backing-fields"}
 
-内部的にはプロパティを変更できるようにしたいが、外部には公開したくない API がある場合など、より柔軟な対応が必要になることがあります。そのようなケースでは、_明示的なバッキングフィールド（Explicit backing field）_を使用できます。
+より高い柔軟性が必要になる場合もあります。例えば、内部的にはプロパティを変更可能にしつつ、外部に対しては変更できないようにしたい API があるとします。そのような場合は、*明示的なバッキングフィールド（explicit backing field）*を使用できます。
 
-次の例では、`ShoppingCart` クラスにショッピングカート内のすべてのアイテムを表す `items` プロパティがあります。
-このクラスは `items` プロパティを文字列の読み取り専用リストとして公開していますが、内部的には明示的なバッキングフィールドを持つミュータブルリストとしてデータを保持しています。
+次の例では、`ShoppingCart` クラスにショッピングカート内のすべてのアイテムを表す `items` プロパティがあります。このクラスは `items` プロパティを読み取り専用の文字列リストとして公開しますが、内部的には明示的なバッキングフィールドを持つ可変リストにデータを保存します。
 
 ```kotlin
 class ShoppingCart {
-    // 明示的なバッキングフィールドを持つパブリックな読み取り専用ビュー
+    // 明示的なバッキングフィールドを持つ公開された読み取り専用ビュー
     val items: List<String>
         field = mutableListOf()
     
@@ -315,8 +309,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="2.4" id="kotlin-explicit-backing-field"}
 
-この例では、コンパイラは `mutableListOf()` の呼び出しからバッキングフィールドの型（`MutableList<String>`）を推論します。
-バッキングフィールドの型を明示的に宣言することもできます。
+この例では、コンパイラは `mutableListOf()` の呼び出しからバッキングフィールドの型を `MutableList<String>` と推論します。バッキングフィールドの型を明示的に宣言することもできます。
 
 ```kotlin
 val items: List<String>
@@ -325,27 +318,27 @@ val items: List<String>
 ```
 {validate="false"}
 
-`ShoppingCart` クラスの例では、コンパイラが `items` プロパティを `MutableList<String>` 型にスマートキャストするため、クラスは `add()` および `remove()` 関数を通じてカートにアイテムを追加および削除できます。クラスの外部では、コンパイラは公開されているプロパティの型である `List<String>` を使用するため、API の利用者は `items` リストの内容を読み取ることしかできません。
+この `ShoppingCart` クラスの例では、コンパイラが `items` プロパティを `MutableList<String>` 型にスマートキャストするため、クラスは `add()` および `remove()` 関数を通じてカートにアイテムを追加および削除できます。クラスの外部では、コンパイラは公開されているプロパティの型である `List<String>` を使用するため、API の利用者は `items` リストの内容を読み取ることしかできません。
 
 #### 制限事項 {id="limitations"}
 
-明示的なバッキングフィールドを使用するには、プロパティとそのバッキングフィールド自体が特定のルールに従っている必要があります。プロパティが明示的なバッキングフィールドを持てるのは、以下を満たす場合のみです。
+明示的なバッキングフィールドを使用するには、そのプロパティおよびバッキングフィールド自体が特定のルールに従う必要があります。プロパティが明示的なバッキングフィールドを持てるのは、以下の条件を満たす場合のみです。
 
-* カスタムゲッターを持たないこと。
-* 読み取り専用（`val`）であること。
-* `open` でないこと。
-* [委譲プロパティ](delegated-properties.md)でないこと。
-* [コンパイル時定数](#compile-time-constants)でないこと。
+* カスタムゲッターを持たない。
+* 読み取り専用（`val`）である。
+* `open` ではない。
+* [委譲プロパティ](delegated-properties.md)ではない。
+* [コンパイル時定数](#compile-time-constants)ではない。
 
-さらに、バッキングフィールドの型はプロパティの型のサブタイプであり、[`private` な可視性](visibility-modifiers.md)を持つ必要があります。
+さらに、バッキングフィールドの型はプロパティの型のサブタイプであり、[`private` な可視性](visibility-modifiers.md)を持っていなければなりません。
 
 これらの制限は、代わりにバッキングプロパティを使用することで回避できます。
 
 ### バッキングプロパティ {id="backing-properties"}
 
-明示的なバッキングフィールドがユースケースに合わない場合は、_バッキングプロパティ（Backing property）_と呼ばれるコーディングパターンを試すことができます。
+明示的なバッキングフィールドがユースケースに合わない場合は、*バッキングプロパティ（backing property）*と呼ばれるコーディングパターンを試すことができます。
 
-たとえば、プロパティにカスタムゲッターが必要な場合です。
+例えば、プロパティにカスタムゲッターが必要な場合です。
 
 ```kotlin
 class UserDirectory {
@@ -371,19 +364,18 @@ fun main() {
     // [alex, emma, mike, sarah]
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-backing-property-custom-getter"}
+{kotlin-runnable="true" id="kotlin-backing-property-custom-getter"}
 
-> Kotlin の[コーディング規約](coding-conventions.md#names-for-backing-properties)に従い、バッキングプロパティに名前を付ける際は先頭にアンダースコアを使用してください。
+> Kotlin の[コーディング規約](coding-conventions.md#names-for-backing-properties)に従い、バッキングプロパティの名前には先頭にアンダースコアを使用してください。
 >
 {style="tip"}
 
-この例では、`UserDirectory` クラスにディレクトリ内のすべてのユーザーを一覧表示する読み取り専用の `users` プロパティがあります。
-`_users` 変数は、実際のリストを保持するプライベートなバッキングプロパティです。パブリックな `users` プロパティのゲッターは、エントリーをソートしてから返します。
+この例では、`UserDirectory` クラスにはディレクトリ内のすべてのユーザーをリストする読み取り専用の `users` プロパティがあります。`_users` 変数は、実際のリストを保持する private なバッキングプロパティです。公開されている `users` プロパティのゲッターは、エントリをソートしてから返します。
 
 ## コンパイル時定数 {id="compile-time-constants"}
 
-読み取り専用プロパティの値がコンパイル時に判明している場合は、`const` 修飾子を使用して_コンパイル時定数（compile-time constant）_としてマークします。
-コンパイル時定数はコンパイル時にインライン展開されるため、各参照はその実際の値に置き換えられます。ゲッターが呼び出されないため、より効率的にアクセスされます。
+読み取り専用プロパティの値がコンパイル時に判明している場合は、`const` 修飾子を使用して*コンパイル時定数（compile-time constant）*としてマークします。
+コンパイル時定数はコンパイル時にインライン化されるため、各参照はその実際の値に置き換えられます。ゲッターが呼び出されないため、より効率的にアクセスされます。
 
 ```kotlin
 // File: AppConfig.kt
@@ -399,7 +391,7 @@ const val MAX_LOGIN_ATTEMPTS = 3
 * `String` 型または[プリミティブ型](types-overview.md)の値で初期化されていること。
 * カスタムゲッターを持たないこと。
 
-コンパイル時定数には引き続きバッキングフィールドが存在するため、[リフレクション](reflection.md)を使用して操作できます。
+コンパイル時定数は依然としてバッキングフィールドを持つため、[リフレクション](reflection.md)を使用して操作できます。
 
 これらのプロパティはアノテーション内でも使用できます。
 
@@ -412,9 +404,9 @@ const val SUBSYSTEM_DEPRECATED: String = "This subsystem is deprecated"
 ## 遅延初期化プロパティと変数 {id="late-initialized-properties-and-variables"}
 
 通常、プロパティはコンストラクタで初期化する必要があります。
-しかし、これが常に便利であるとは限りません。たとえば、依存性注入（DI）を介してプロパティを初期化したり、ユニットテストのセットアップメソッド内で初期化したりする場合があります。
+しかし、これが常に都合が良いとは限りません。例えば、依存性注入（DI）を介してプロパティを初期化したり、ユニットテストのセットアップメソッド内で初期化したりすることがあります。
 
-このような状況に対応するには、プロパティに `lateinit` 修飾子を付けます。
+このような状況に対処するには、プロパティを `lateinit` 修飾子でマークします。
 
 ```kotlin
 public class OrderServiceTest {
@@ -425,7 +417,7 @@ public class OrderServiceTest {
     }
 
     @Test fun processesOrderSuccessfully() {
-        // null や初期化のチェックを行わずに
+        // null チェックや初期化チェックを行わずに
         // orderService を直接呼び出す
         orderService.processOrder()  
     }
@@ -436,16 +428,16 @@ public class OrderServiceTest {
 
 * トップレベルプロパティ
 * ローカル変数
-* クラス本体内のプロパティ
+* クラスのボディ内のプロパティ
 
 クラスプロパティの場合：
 
 * プライマリコンストラクタでは宣言できません。
-* カスタムゲッターまたはセッターを持っていてはなりません。
+* カスタムゲッターやセッターを持っていてはいけません。
 
-すべてのケースにおいて、プロパティまたは変数は null 非許容（non-nullable）でなければならず、[プリミティブ型](types-overview.md)であってはなりません。
+いずれの場合も、プロパティまたは変数は null 非許容（non-nullable）でなければならず、[プリミティブ型](types-overview.md)であってはなりません。
 
-`lateinit` プロパティを初期化前にアクセスすると、Kotlin はアクセスされた未初期化プロパティを特定する特定の例外をスローします。
+初期化する前に `lateinit` プロパティにアクセスした場合、Kotlin はアクセスされた未初期化プロパティを特定する特定の例外をスローします。
 
 ```kotlin
 class ReportGenerator {
@@ -464,7 +456,7 @@ fun main() {
     // Exception in thread "main" kotlin.UninitializedPropertyAccessException: lateinit property report has not been initialized
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-lateinit-property" validate="false"}
+{kotlin-runnable="true" id="kotlin-lateinit-property" validate="false"}
 
 `lateinit var` がすでに初期化されているかどうかを確認するには、その[プロパティへの参照](lambdas.md#property-references)に対して [`isInitialized`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/is-initialized.html) プロパティを使用します。
 
@@ -492,9 +484,9 @@ fun main() {
     // Latest reading: 22°C, sunny
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-lateinit-property-check-initialization"}
+{kotlin-runnable="true" id="kotlin-lateinit-property-check-initialization"}
 
-プロパティに対して `isInitialized` を使用できるのは、コード内でそのプロパティにすでにアクセス可能な場合のみです。そのプロパティは、同じクラス内、外側のクラス内、または同じファイル内のトップレベルプロパティとして宣言されている必要があります。
+`isInitialized` をプロパティに対して使用できるのは、コード内でそのプロパティにすでにアクセスできる場合のみです。そのプロパティは、同じクラス内、外側のクラス内、または同じファイル内のトップレベルプロパティとして宣言されている必要があります。
 
 ## プロパティのオーバーライド {id="overriding-properties"}
 
@@ -502,14 +494,14 @@ fun main() {
 
 ## 委譲プロパティ {id="delegated-properties"}
 
-ロジックを再利用し、コードの重複を減らすために、プロパティの取得と設定の責務を別のオブジェクトに委譲することができます。
+ロジックを再利用しコードの重複を減らすために、プロパティの取得および設定の責務を別のオブジェクトに委譲することができます。
 
-アクセサの振る舞いを委譲することで、プロパティのアクセサロジックが一元化され、再利用が容易になります。このアプローチは、次のような振る舞いを実装する場合に役立ちます。
+アクセサの振る舞いを委譲することで、プロパティのアクセサロジックが一箇所に集約され、再利用が容易になります。このアプローチは、以下のような振る舞いを実装する際に役立ちます。
 
-* 値を遅延評価（lazy）で計算する。
+* 値を遅延（lazy）計算する。
 * 指定されたキーによってマップから読み取る。
 * データベースにアクセスする。
 * プロパティがアクセスされたときにリスナーに通知する。
 
-これらの一般的な振る舞いは、ライブラリで独自に実装することも、外部ライブラリが提供する既存のデリゲートを使用することもできます。
+これらの一般的な振る舞いは、ライブラリ内で自身で実装することも、外部ライブラリが提供する既存のデリゲートを使用することもできます。
 詳細については、[委譲プロパティ](delegated-properties.md)を参照してください。

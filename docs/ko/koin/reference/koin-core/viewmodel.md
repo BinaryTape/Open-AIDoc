@@ -2,72 +2,70 @@
 title: ViewModel
 ---
 
-Koin은 `koin-core-viewmodel` 모듈을 통해 멀티플랫폼 ViewModel 지원을 제공합니다. 이를 통해 모든 Kotlin Multiplatform 타겟에서 [AndroidX ViewModel](https://developer.android.com/topic/libraries/architecture/viewmodel) 인스턴스를 선언하고 주입할 수 있습니다.
+# ViewModel
 
-## 설정 (Setup) {id="setup"}
+이 페이지에서는 AndroidX ViewModel을 지원하는 모든 플랫폼(Android, iOS, 데스크톱, 웹)의 Koin 모듈에서 ViewModel을 선언하는 방법을 다룹니다. 이 문서는 독자가 [정의(definitions)](/docs/reference/koin-core/definitions)에 대해 알고 있다고 가정합니다. ViewModel을 가져오는 방법은 각 플랫폼별 문서를 참조하세요. Activity 또는 Fragment에서의 `by viewModel()`은 [Android ViewModel](/docs/reference/koin-android/viewmodel), `koinViewModel()`은 [Compose에서의 ViewModel](/docs/reference/koin-compose/compose-viewmodel)을 확인하세요.
 
-핵심 ViewModel 의존성을 추가하세요:
+## 의존성 {id="dependencies"}
+
+선언 DSL은 멀티플랫폼 아티팩트인 `koin-core-viewmodel`에 포함되어 있습니다:
 
 ```kotlin
-// build.gradle.kts (commonMain)
-implementation("io.insert-koin:koin-core-viewmodel:$koin_version")
+// build.gradle.kts, commonMain
+implementation("io.insert-koin:koin-core-viewmodel")
 ```
 
-플랫폼별 주입 API를 사용하려면 다음을 추가하세요:
+주입 API는 플랫폼 아티팩트인 `io.insert-koin:koin-android`(`koin-core-viewmodel` 포함) 및 `io.insert-koin:koin-compose-viewmodel`과 함께 제공됩니다. 버전은 BOM을 통해 관리됩니다. 자세한 내용은 [Gradle 설정](/docs/setup/gradle)을 참조하세요.
 
+## ViewModel 선언하기 {id="declaring-a-viewmodel"}
+
+**컴파일러 플러그인 DSL**
 ```kotlin
-// Android
-implementation("io.insert-koin:koin-android:$koin_version")
+import org.koin.dsl.module
+import org.koin.plugin.module.dsl.viewModel
 
-// Compose Multiplatform
-implementation("io.insert-koin:koin-compose-viewmodel:$koin_version")
-```
-
-## ViewModel 선언하기 {id="declaring-viewmodels"}
-
-### 컴파일러 플러그인 DSL (Compiler Plugin DSL) {id="compiler-plugin-dsl"}
-
-```kotlin
-class UserViewModel(
-    private val repository: UserRepository
-) : ViewModel()
+class UserViewModel(private val repository: UserRepository) : ViewModel()
 
 val appModule = module {
     viewModel<UserViewModel>()
 }
 ```
 
-### 어노테이션 (Annotations) {id="annotations"}
-
+**어노테이션**
 ```kotlin
+import org.koin.core.annotation.KoinViewModel
+
 @KoinViewModel
-class UserViewModel(
-    private val repository: UserRepository
-) : ViewModel()
+class UserViewModel(private val repository: UserRepository) : ViewModel()
 ```
 
-### 클래식 DSL (Classic DSL) {id="classic-dsl"}
+컴파일러 플러그인을 사용하면 `@KoinViewModel`은 `org.koin.core.annotation`에 위치하며 공통(common) 코드에서 동작합니다. 이전 KSP 프로세서는 `org.koin.android.annotation.KoinViewModel`을 사용했습니다.
 
+**생성자 / 클래식 DSL**
 ```kotlin
+import org.koin.dsl.module
+import org.koin.core.module.dsl.viewModelOf
+import org.koin.core.module.dsl.viewModel
+
 val appModule = module {
-    // 생성자 참조 사용
     viewModelOf(::UserViewModel)
 
-    // 람다 사용
+    // 또는 생성자 호출을 직접 작성하는 방식
     viewModel { UserViewModel(get()) }
 }
 ```
 
-## 파라미터가 있는 ViewModel {id="viewmodel-with-parameters"}
+`viewModel` 정의는 `factory`와 마찬가지로 요청 시마다 새 인스턴스를 생성합니다. 플랫폼의 `ViewModelStore`(Activity, Fragment, 네비게이션 엔트리)가 이 인스턴스를 보관하므로, 동일한 소유자(owner)는 Android의 구성 변경(configuration change) 전반에서 동일한 ViewModel을 다시 받게 됩니다. ViewModel을 `single`로 선언하지 마세요. 모든 화면에서 공유되며 절대 정리(clear)되지 않습니다.
 
-`@InjectedParam`을 사용하여 주입 시점에 파라미터를 전달하세요:
+## 파라미터 전달하기 {id="passing-parameters"}
 
-### 컴파일러 플러그인 DSL (Compiler Plugin DSL)
+ViewModel은 종종 항목 ID(item id)와 같이 런타임에만 알 수 있는 값을 필요로 합니다. 이때는 생성자 파라미터에 주입된 파라미터(injected parameter) 표시를 합니다:
 
+**컴파일러 플러그인 DSL**
 ```kotlin
 class DetailViewModel(
     @InjectedParam val itemId: String,
-    private val repository: DetailRepository
+    private val repository: DetailRepository,
 ) : ViewModel()
 
 val appModule = module {
@@ -75,79 +73,114 @@ val appModule = module {
 }
 ```
 
-### 어노테이션 (Annotations)
-
+**어노테이션**
 ```kotlin
 @KoinViewModel
 class DetailViewModel(
     @InjectedParam val itemId: String,
-    private val repository: DetailRepository
+    private val repository: DetailRepository,
 ) : ViewModel()
 ```
 
-### 클래식 DSL (Classic DSL)
-
+**생성자 / 클래식 DSL**
 ```kotlin
 val appModule = module {
     viewModel { params ->
-        DetailViewModel(
-            itemId = params.get(),
-            repository = get()
-        )
+        DetailViewModel(itemId = params.get(), repository = get())
     }
 }
 ```
 
-## ViewModel 스코프 (ViewModel Scope) {id="viewmodel-scope"}
+`viewModelOf(::DetailViewModel)`도 동작합니다. 호출자가 전달한 값에서 타입별로 파라미터를 읽어옵니다.
 
-자신만의 스코프 의존성이 필요한 ViewModel은 `viewModelScope` 아키타입(archetype)을 사용합니다. `viewModelScope` 내부에 선언된 의존성은 ViewModel의 생명주기(lifecycle)에 묶입니다.
+선언 방식과 관계없이, 호출자는 `parametersOf`를 사용하여 값을 전달합니다:
 
-### 컴파일러 플러그인 DSL (Compiler Plugin DSL)
+```kotlin
+// Android
+val viewModel: DetailViewModel by viewModel { parametersOf("item_123") }
 
+// Compose
+val viewModel = koinViewModel<DetailViewModel> { parametersOf("item_123") }
+```
+
+파라미터는 ViewModel이 생성될 때 한 번만 읽힙니다. 동일한 소유자가 다른 값으로 다시 요청하더라도 기존 인스턴스를 반환받습니다. 파라미터에 대한 자세한 내용은 [주입된 파라미터(Injected Parameters)](/docs/reference/koin-core/injection-parameters)를 참조하세요.
+
+## SavedStateHandle {id="savedstatehandle"}
+
+생성자에 `SavedStateHandle` 파라미터를 추가하세요. Koin은 별도의 선언 없이 ViewModel의 `CreationExtras`로부터 이를 생성합니다:
+
+**컴파일러 플러그인 DSL**
+```kotlin
+class ProfileViewModel(
+    private val handle: SavedStateHandle,
+    private val repository: UserRepository,
+) : ViewModel() {
+    val userId: String? = handle["userId"]
+}
+
+val appModule = module {
+    viewModel<ProfileViewModel>()
+}
+```
+
+**어노테이션**
+```kotlin
+@KoinViewModel
+class ProfileViewModel(
+    private val handle: SavedStateHandle,
+    private val repository: UserRepository,
+) : ViewModel() {
+    val userId: String? = handle["userId"]
+}
+```
+
+**생성자 / 클래식 DSL**
+```kotlin
+val appModule = module {
+    viewModelOf(::ProfileViewModel)
+
+    // 또는: get()이 SavedStateHandle을 해결합니다
+    viewModel { ProfileViewModel(get(), get()) }
+}
+```
+
+Android에서는 네비게이션 인수(navigation arguments)와 Activity extras가 `SavedStateHandle`에 포함됩니다. 반드시 생성자에서만 주입하세요. ViewModel 소유자에게 `SavedStateRegistryOwner`가 없으면 Koin은 "Koin could not create a SavedStateHandle: the ViewModel's CreationExtras has no SavedStateRegistryOwner." 오류와 함께 실패합니다.
+
+## ViewModel 스코프 {id="viewmodel-scope"}
+
+ViewModel은 [스코프(scope)](/docs/reference/koin-core/scopes)를 소유할 수 있습니다. 스코프 내의 의존성은 ViewModel과 함께 생성되고, ViewModel이 정리(cleared)될 때 해제됩니다. `viewModelScope` 아키타입(archetype)을 사용하여 선언하세요:
+
+**컴파일러 플러그인 DSL**
 ```kotlin
 val appModule = module {
     viewModelScope {
         scoped<UserCache>()
-        scoped<UserRepository>()
         viewModel<UserViewModel>()
     }
 }
 ```
 
-### 어노테이션 (Annotations)
-
+**어노테이션**
 ```kotlin
 @ViewModelScope
 class UserCache
 
-@ViewModelScope
-class UserRepository(private val cache: UserCache)
-
 @KoinViewModel
 @ViewModelScope
-class UserViewModel(
-    private val repository: UserRepository
-) : ViewModel()
+class UserViewModel(private val cache: UserCache) : ViewModel()
 ```
 
-### 클래식 DSL (Classic DSL)
-
+**생성자 / 클래식 DSL**
 ```kotlin
 val appModule = module {
     viewModelScope {
-        scoped { UserCache() }
-        scoped { UserRepository(get()) }
-        viewModel { UserViewModel(get()) }
+        scopedOf(::UserCache)
+        viewModelOf(::UserViewModel)
     }
 }
 ```
 
-:::info
-`viewModelScope` 내부의 의존성은 ViewModel에 처음 접근할 때 생성되고, ViewModel이 클리어(cleared)될 때 소멸됩니다.
-:::
-
-:::caution `viewModelScopeFactory()` 옵션 필요
-`viewModelScope { }` 내부에 **ViewModel 자체**를 선언하여 Koin이 자동으로 스코프를 생성하도록 하려면, Koin 설정에서 `viewModelScopeFactory()` 옵션을 활성화해야 합니다.
+시작 시 해당 옵션을 활성화해야 합니다. 그렇지 않으면 ViewModel에 스코프가 할당되지 않습니다:
 
 ```kotlin
 startKoin {
@@ -156,86 +189,18 @@ startKoin {
 }
 ```
 
-이 옵션이 없으면 ViewModel을 확인할 때(resolving) 다음과 같은 오류와 함께 실패합니다:
+`viewModelScope`와 `viewModelScopeFactory()`를 사용하려면 `@KoinViewModelScopeApi` 및 `@KoinExperimentalAPI`에 대한 opt-in이 필요합니다. 생성자에서 스코프가 지정된 의존성(scoped dependencies)을 받는 ViewModel은 반드시 `viewModelScope { }` 내부에서 선언되어야 합니다. 각 ViewModel 인스턴스는 자신만의 `UserCache`를 가지며, 이 캐시는 ViewModel이 정리될 때 닫힙니다(closed).
 
-```
-No definition found for type 'MyViewModel' on scope '['_root_']'
-```
+## 제한 사항 {id="limits"}
 
-그 이유는 ViewModel이 ViewModel 스코프 아키타입으로 등록되었으며, 해당 스코프는 이 옵션이 활성화되었을 때만 생성되기 때문입니다. (이는 직접 자신의 스코프를 생성하며 해당 옵션이 필요하지 않은 수동 `ScopeViewModel` 패턴과는 별개입니다.)
-:::
+- **소유자당 하나의 인스턴스**: 해당 소유자에 대해 ViewModel이 이미 존재하는 경우 주입된 파라미터는 무시됩니다. 두 번째 인스턴스를 가져오려면 다른 키나 소유자를 사용하세요.
+- **`single` ViewModel 금지**: 싱글톤 ViewModel은 절대 정리되지 않으며 의존성 메모리 누수를 발생시킵니다.
+- **실험적 ViewModel 스코프**: `viewModelScope`는 실험적 기능(experimental)으로 표시되어 있으며 변경될 수 있습니다.
 
-## ViewModel 주입하기 {id="injecting-viewmodels"}
+## 관련 문서 {id="related"}
 
-### Compose (멀티플랫폼)에서 {id="in-compose-multiplatform"}
-
-Composable 함수에서 `koinViewModel()`을 사용하세요:
-
-```kotlin
-@Composable
-fun UserScreen() {
-    val viewModel = koinViewModel<UserViewModel>()
-    // 또는 파라미터와 함께 사용
-    val detailVM = koinViewModel<DetailViewModel> { parametersOf("item_123") }
-}
-```
-
-### Android에서 {id="in-android"}
-
-Activity 또는 Fragment에서 `by viewModel()` 델리게이트를 사용하세요:
-
-```kotlin
-class UserActivity : AppCompatActivity() {
-    private val viewModel: UserViewModel by viewModel()
-
-    // 파라미터와 함께 사용
-    private val detailVM: DetailViewModel by viewModel { parametersOf("item_123") }
-}
-```
-
-## SavedStateHandle {id="savedstatehandle"}
-
-ViewModel 생성자에 `SavedStateHandle`을 추가하면 Koin이 이를 자동으로 주입합니다:
-
-```kotlin
-@KoinViewModel
-class MyViewModel(
-    private val handle: SavedStateHandle,
-    private val repository: UserRepository
-) : ViewModel() {
-
-    val userId: String? = handle["userId"]
-}
-```
-
-```kotlin
-val appModule = module {
-    viewModel<MyViewModel>()  // 컴파일러 플러그인 DSL
-    // 또는
-    viewModelOf(::MyViewModel)  // 클래식 DSL
-}
-```
-
-## 빠른 참조 (Quick Reference) {id="quick-reference"}
-
-| 방식 | 모듈 선언 | 스코프 선언 |
-|----------|-------------------|-------------------|
-| 컴파일러 플러그인 DSL | `viewModel<MyVM>()` | `viewModelScope { viewModel<MyVM>() }` |
-| 어노테이션 | `@KoinViewModel` | `@KoinViewModel @ViewModelScope` |
-| 클래식 DSL | `viewModelOf(::MyVM)` | `viewModelScope { viewModelOf(::MyVM) }` |
-
-| 플랫폼 | 주입 API |
-|----------|---------------|
-| Compose | `koinViewModel<MyVM>()` |
-| Android | `by viewModel()` |
-
-## 플랫폼별 기능 {id="platform-specific-features"}
-
-- **Android**: Activity/Fragment 공유, Navigation Graph 스코핑 등에 대해서는 [Android ViewModel](/docs/reference/koin-android/viewmodel)을 참조하세요.
-- **Compose**: Compose 전용 API에 대해서는 [Compose ViewModel](/docs/reference/koin-compose/compose#viewmodel-for-composable)을 참조하세요.
-
-## 다음 단계 {id="next-steps"}
-
-- **[스코프 (Scopes)](/docs/reference/koin-core/scopes)** - 핵심 스코프 개념
-- **[Android ViewModel](/docs/reference/koin-android/viewmodel)** - Android 전용 기능
-- **[Compose](/docs/reference/koin-compose/compose)** - Compose 멀티플랫폼 통합
+- [Android ViewModel](/docs/reference/koin-android/viewmodel): `by viewModel()`, `activityViewModel()`, 네비게이션 그래프 ViewModel.
+- [Compose에서의 ViewModel](/docs/reference/koin-compose/compose-viewmodel): `koinViewModel()` 및 네비게이션 ViewModel.
+- [주입된 파라미터(Injected Parameters)](/docs/reference/koin-core/injection-parameters): `parametersOf` 및 `@InjectedParam`.
+- [스코프(Scopes)](/docs/reference/koin-core/scopes): 스코프 아키타입 및 스코프 수명 주기.
+- [정의(Definitions)](/docs/reference/koin-core/definitions): 기타 정의 유형.

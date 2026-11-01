@@ -1,17 +1,20 @@
 [//]: # (title: 屬性)
 
-在 Kotlin 中，屬性（Properties）讓你可以儲存並管理資料，而無需編寫存取或修改資料的函式。
-你可以在[類別](classes.md)、[介面](interfaces.md)、[物件](object-declarations.md)、[伴隨物件](object-declarations.md#companion-objects)中使用屬性，甚至可以在這些結構之外將它們宣告為頂層屬性。
+在 Kotlin 中，屬性讓你無需撰寫用於存取或變更資料的函式，即可儲存並管理資料。
+你可以在[類別](classes.md)、[介面](interfaces.md)、[物件](object-declarations.md)、[伴生物件](object-declarations.md#companion-objects)中使用屬性，
+甚至可以在這些結構之外作為頂層屬性使用。
 
-每個屬性都包含名稱、型別，以及一個自動產生的 `get()` 函式（稱為 getter）。你可以使用 getter 來讀取屬性的值。如果該屬性是可變的（mutable），它還會包含一個 `set()` 函式（稱為 setter），可讓你修改屬性的值。
+每個屬性都有名稱、型別，以及一個自動產生的 `get()` 函式（稱為 getter）。你可以使用 getter
+來讀取屬性的值。如果該屬性是可變的，它還會有一個名為 setter 的 `set()` 函式，允許
+你變更該屬性的值。
 
-> Getter 與 setter 被稱為*存取子（accessors）*。
+> Getter 和 setter 被稱為*存取子 (accessors)*。
 > 
 {style="tip"}
 
 ## 宣告屬性 {id="declaring-properties"}
 
-屬性可以是可變的（`var`）或唯讀的（`val`）。
+屬性可以是可變的 (`var`) 或唯讀的 (`val`)。
 你可以在 `.kt` 檔案中將它們宣告為頂層屬性。可以將頂層屬性視為屬於某個套件的全域變數：
 
 ```kotlin
@@ -25,19 +28,19 @@ var counter = 0
 你也可以在類別、介面或物件內部宣告屬性：
 
 ```kotlin
-// 包含屬性的類別
+// 具有屬性的類別
 class Address {
     var name: String = "Holmes, Sherlock"
     var street: String = "Baker"
     var city: String = "London"
 }
 
-// 包含屬性的介面
+// 具有屬性的介面
 interface ContactInfo {
     val email: String
 }
 
-// 包含屬性的物件
+// 具有屬性的物件
 object Company {
     var name: String = "Detective Inc."
     val country: String = "UK"
@@ -49,7 +52,7 @@ class PersonContact : ContactInfo {
 }
 ```
 
-要使用屬性，直接透過其名稱參照即可：
+若要使用屬性，直接透過其名稱參照即可：
 
 ```kotlin
 class Address {
@@ -99,11 +102,12 @@ fun main() {
 }
 //sampleEnd
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-access-properties"}
+{kotlin-runnable="true" id="kotlin-access-properties"}
 
-在 Kotlin 中，我們建議在宣告屬性時立即進行初始化，以確保程式碼的安全與可讀性。不過，在特殊情況下，你也可以[稍後進行初始化](#late-initialized-properties-and-variables)。
+在 Kotlin 中，我們建議在宣告屬性時就進行初始化，以確保程式碼的安全與易讀。然而，
+在特殊情況下，你可以[稍後再進行初始化](#late-initialized-properties-and-variables)。
 
-如果編譯器能從初始設定式或 getter 的傳回型別推論出屬性型別，則型別宣告是可選的：
+如果編譯器可以從初始設定式或 getter 的傳回型別推論出型別，則宣告屬性型別是選用的：
 
 ```kotlin
 var initialized = 1 // 推論型別為 Int
@@ -111,9 +115,10 @@ var allByDefault    // 錯誤：屬性必須初始化。
 ```
 {validate="false"}
 
-## 自訂 getter 與 setter {id="custom-getters-and-setters"}
+## 自訂 getter 和 setter {id="custom-getters-and-setters"}
 
-預設情況下，Kotlin 會自動產生 getter 與 setter。當你需要額外邏輯時（例如驗證、格式化或基於其他屬性進行計算），可以自行定義自訂存取子。
+預設情況下，Kotlin 會自動產生 getter 和 setter。當你需要額外的邏輯時（例如驗證、格式化或根據其他屬性進行計算），
+你可以定義自己的自訂存取子。
 
 每次存取屬性時，都會執行自訂 getter：
 
@@ -129,16 +134,16 @@ fun main() {
     println("Width=${rectangle.width}, height=${rectangle.height}, area=${rectangle.area}")
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-custom-getter"}
+{kotlin-runnable="true" id="kotlin-custom-getter"}
 
-如果編譯器可以從 getter 推論出型別，則可以省略該型別：
+如果編譯器可以從 getter 推論出型別，你可以省略型別宣告：
 
 ```kotlin
 val area get() = this.width * this.height
 ```
 
-每次為屬性指派值時（初始化期間除外），都會執行自訂 setter。
-按照慣例，setter 參數的名稱為 `value`，但你也可以選擇其他名稱：
+除了初始化期間之外，每次為屬性指派值時都會執行自訂 setter。
+依照慣例，setter 參數的名稱為 `value`，但你可以選擇其他名稱：
 
 ```kotlin
 class Point(var x: Int, var y: Int) {
@@ -161,19 +166,19 @@ fun main() {
     // 10, 20
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-custom-setter"}
+{kotlin-runnable="true" id="kotlin-custom-setter"}
 
 ### 變更可見性或新增註解 {id="changing-visibility-or-adding-annotations"}
 
 在 Kotlin 中，你可以變更存取子的可見性或新增[註解](annotations.md)，而無需取代預設實作。
 你不需要在主體花括號 `{}` 內進行這些變更。
 
-若要變更存取子的可見性，請在 `get` 或 `set` 關鍵字前加上修飾詞：
+若要變更存取子的可見性，請在 `get` 或 `set` 關鍵字前面加上修飾詞：
 
 ```kotlin
 class BankAccount(initialBalance: Int) {
     var balance: Int = initialBalance
-        // 僅類別內部可修改 balance
+        // 只有該類別可以修改餘額
         private set 
 
     fun deposit(amount: Int) {
@@ -199,12 +204,12 @@ fun main() {
     // 80
 
     // account.balance = 1000  
-    // 錯誤：由於 setter 為 private，無法指派值
+    // 錯誤：無法指派，因為 setter 是 private
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-private-setter"}
+{kotlin-runnable="true" id="kotlin-private-setter"}
 
-若要為存取子加上註解，請在 `get` 或 `set` 關鍵字前加上該註解：
+若要為存取子加上註解，請在 `get` 或 `set` 關鍵字之前使用該註解：
 
 ```kotlin
 // 定義可套用於 getter 的註解
@@ -213,7 +218,7 @@ annotation class Inject
 
 class Service {
     var dependency: String = "Default Service"
-        // 為 getter 加上註解
+        // 標註 getter
         @Inject get 
 }
 
@@ -233,25 +238,26 @@ fun main() {
 
 ## 支援欄位 {id="backing-fields"}
 
-當屬性需要在記憶體中儲存值時，編譯器會自動產生支援欄位（Backing fields）。
+當值需要儲存在記憶體中時，編譯器會自動為屬性產生支援欄位。
 
-例如，當你使用預設的 `get()` 和 `set()` 函式時，編譯器會建立支援欄位，因為它們需要讀取和寫入所儲存的值：
+例如，當你使用預設的 `get()` 和 `set()` 函式時，編譯器會建立支援欄位，因為它們
+會讀取並寫入儲存的值：
 
 ```kotlin
 var count = 0
 ```
 
 你可以在[自訂 `get()` 或 `set()` 函式](#custom-getters-and-setters)中使用 `field` 關鍵字來存取支援欄位。
-例如，你可以為 getter 或 setter 新增額外邏輯，或在屬性變更時觸發額外動作。
+例如，你可以為 getter 或 setter 新增額外邏輯，或是在屬性變更時觸發額外的操作。
 
-在此範例中，`score` 屬性在 `set()` 函式內使用支援欄位，以便在更新值時同時觸發記錄事件：
+在此範例中，`score` 屬性在 `set()` 函式內部使用支援欄位，以便在更新值時同時觸發記錄事件：
 
 ```kotlin
 class Scoreboard {
     var score: Int = 0
         set(value) {
             field = value
-            // 在更新值時新增記錄
+            // 更新值時加入記錄
             println("Score updated to $field")
         }
 }
@@ -264,9 +270,10 @@ fun main() {
     // Score updated to 20
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-backing-field"}
+{kotlin-runnable="true" id="kotlin-backing-field"}
 
-並非所有屬性都會預設建立支援欄位，因為它們可能不需要。例如，`isEmpty` 屬性就沒有支援欄位，因為每次存取時都是透過 `size` 屬性計算出來的值：
+並非所有屬性都會預設建立支援欄位，因為它們可能不需要。例如，`isEmpty`
+屬性就沒有支援欄位，因為每次存取時，其值都是從 `size` 屬性計算得出的：
 
 ```kotlin
 val isEmpty: Boolean
@@ -275,13 +282,14 @@ val isEmpty: Boolean
 
 ### 明確支援欄位 {id="explicit-backing-fields"}
 
-有時你可能會需要更大的靈活性。例如，當你的 API 希望屬性能在內部被修改，但不能在外部被修改時。在這種情況下，你可以使用*明確支援欄位（explicit backing field）*。
+有時你可能需要更大的靈活性。例如，在某個 API 中，你希望能夠在內部修改屬性，但禁止從外部修改。在這種情況下，你可以使用*明確支援欄位 (explicit backing field)*。
 
-在以下範例中，`ShoppingCart` 類別具有一個表示購物車中所有商品的 `items` 屬性。該類別將 `items` 屬性公開為唯讀的字串清單，但在內部則使用明確支援欄位將資料儲存在可變清單中：
+在以下範例中，`ShoppingCart` 類別具有一個代表購物車中所有項目的 `items` 屬性。
+該類別將 `items` 屬性公開為字串唯讀清單，但在內部透過明確支援欄位將資料儲存於可變清單中：
 
 ```kotlin
 class ShoppingCart {
-    // 具有明確支援欄位的公開唯讀檢視
+    // 具有明確支援欄位的 public 唯讀檢視
     val items: List<String>
         field = mutableListOf()
     
@@ -309,7 +317,8 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="2.4" id="kotlin-explicit-backing-field"}
 
-在此範例中，編譯器會從 `mutableListOf()` 呼叫推論支援欄位的型別：`MutableList<String>`。你也可以明確宣告支援欄位的型別：
+在此範例中，編譯器會從 `mutableListOf()` 呼叫推論支援欄位的型別：`MutableList<String>`。
+你也可以明確宣告支援欄位的型別：
 
 ```kotlin
 val items: List<String>
@@ -318,27 +327,30 @@ val items: List<String>
 ```
 {validate="false"}
 
-在 `ShoppingCart` 類別的範例中，編譯器會將 `items` 屬性智慧轉換為 `MutableList<String>` 型別，因此該類別可以透過 `add()` 和 `remove()` 函式向購物車新增和移除商品。在類別外部，編譯器則使用公開屬性型別 `List<String>`，因此 API 使用者只能讀取 `items` 清單中的內容。
+在 `ShoppingCart` 類別的範例中，編譯器會將 `items` 屬性智慧轉換為 `MutableList<String>` 型別，因此該
+類別可以透過 `add()` 和 `remove()` 函式向購物車新增和移除項目。在類別外部，編譯器
+會使用 public 屬性型別 `List<String>`，因此 API 使用者只能讀取 `items` 清單中的內容。
 
 #### 限制 {id="limitations"}
 
-若要使用明確支援欄位，其屬性以及支援欄位本身必須遵循特定規則。屬性只有在符合以下條件時才能擁有明確支援欄位：
+若要使用明確支援欄位，其屬性以及支援欄位本身必須遵循特定規則。屬性
+只有在符合以下條件時才能擁有明確支援欄位：
 
 * 沒有自訂 getter。
-* 為唯讀（`val`）。
+* 為唯讀 (`val`)。
 * 不是 `open`。
 * 不是[委託屬性](delegated-properties.md)。
 * 不是[編譯期常數](#compile-time-constants)。
 
-此外，支援欄位的型別必須是該屬性型別的子型別，且具有 [`private` 可見性](visibility-modifiers.md)。
+此外，支援欄位的型別必須是該屬性型別的子型別，並且具有 [`private` 可見性](visibility-modifiers.md)。
 
 你可以透過改用支援屬性來繞過這些限制。
 
 ### 支援屬性 {id="backing-properties"}
 
-如果明確支援欄位不符合你的使用案例，你可以嘗試使用稱為*支援屬性（backing property）*的編碼模式。
+如果明確支援欄位不符合你的使用案例，你可以嘗試使用稱為*支援屬性 (backing property)* 的編碼模式。
 
-例如，如果你的屬性需要自訂 getter：
+例如，當你的屬性需要自訂 getter 時：
 
 ```kotlin
 class UserDirectory {
@@ -364,18 +376,21 @@ fun main() {
     // [alex, emma, mike, sarah]
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-backing-property-custom-getter"}
+{kotlin-runnable="true" id="kotlin-backing-property-custom-getter"}
 
-> 在為支援屬性命名時使用前導底線，以遵循 Kotlin [程式碼規範](coding-conventions.md#names-for-backing-properties)。
+> 為支援屬性命名時請使用前導底線，以遵循 Kotlin [程式碼慣例](coding-conventions.md#names-for-backing-properties)。
 >
 {style="tip"}
 
-在此範例中，`UserDirectory` 類別具有唯讀的 `users` 屬性，用於列出目錄中的每位使用者。`_users` 變數是包含真實清單的 private 支援屬性。公開的 `users` 屬性的 getter 會在傳回條目之前對其進行排序。
+在此範例中，`UserDirectory` 類別具有一個唯讀的 `users` 屬性，列出目錄中的每個使用者。
+`_users` 變數是包含真實清單的 private 支援屬性。公開的 `users` 屬性的 getter
+會在傳回項目之前對其進行排序。
 
 ## 編譯期常數 {id="compile-time-constants"}
 
-如果唯讀屬性的值在編譯期就已確定，請使用 `const` 修飾詞將其標記為*編譯期常數*。
-編譯期常數會在編譯期內嵌，因此每個參照都會被取代為其常數值。它們的存取效率更高，因為不需要呼叫 getter：
+如果唯讀屬性的值在編譯期已知，請使用 `const` 修飾詞將其標記為*編譯期常數*。
+編譯期常數會在編譯期內嵌，因此每個參照都會被替換為其常值。由於不需要呼叫 getter，
+存取它們的效率更高：
 
 ```kotlin
 // 檔案：AppConfig.kt
@@ -387,11 +402,11 @@ const val MAX_LOGIN_ATTEMPTS = 3
 
 編譯期常數必須符合以下需求：
 
-* 它們必須是頂層屬性，或是 [`object` 宣告](object-declarations.md#object-declarations-overview)或[伴隨物件](object-declarations.md#companion-objects)的成員。
-* 它們必須以 `String` 型別或[基本型別](types-overview.md)的值進行初始化。
-* 它們不能擁有自訂 getter。
+* 它們必須是頂層屬性，或是 [`object` 宣告](object-declarations.md#object-declarations-overview)或[伴生物件](object-declarations.md#companion-objects)的成員。
+* 它們必須使用 `String` 型別或[基本型別](types-overview.md)的值進行初始化。
+* 它們不能有自訂 getter。
 
-編譯期常數仍具有支援欄位，因此你可以使用[反射](reflection.md)與其互動。
+編譯期常數仍然具有支援欄位，因此你可以使用[反射](reflection.md)與它們進行互動。
 
 你也可以在註解中使用這些屬性：
 
@@ -404,9 +419,10 @@ const val SUBSYSTEM_DEPRECATED: String = "This subsystem is deprecated"
 ## 延遲初始化屬性與變數 {id="late-initialized-properties-and-variables"}
 
 通常，你必須在建構函式中初始化屬性。
-然而，這並不總是方便的。例如，你可能會透過相依注入或在單元測試的 setup 方法中初始化屬性。
+然而，這並不總是方便的。例如，你可能會透過相依
+注入或在單元測試的 setup 方法中初始化屬性。
 
-為了處理這些情況，請使用 `lateinit` 修飾詞標記該屬性：
+為了處理這些情況，可以使用 `lateinit` 修飾詞標記該屬性：
 
 ```kotlin
 public class OrderServiceTest {
@@ -417,14 +433,14 @@ public class OrderServiceTest {
     }
 
     @Test fun processesOrderSuccessfully() {
-        // 直接呼叫 orderService，而無需檢查 null
-        // 或初始化狀態
+        // 直接呼叫 orderService，無需檢查 null
+        // 或初始化
         orderService.processOrder()  
     }
 }
 ```
 
-你可以在宣告為下列形式的 `var` 屬性上使用 `lateinit` 修飾詞：
+你可以對宣告為以下形式的 `var` 屬性使用 `lateinit` 修飾詞：
 
 * 頂層屬性。
 * 區域變數。
@@ -433,18 +449,18 @@ public class OrderServiceTest {
 對於類別屬性：
 
 * 不能在主建構函數中宣告它們。
-* 它們不得包含自訂 getter 或 setter。
+* 它們不能有自訂 getter 或 setter。
 
-在所有情況下，該屬性或變數都必須是非可空的（non-nullable），且不能是[基本型別](types-overview.md)。
+在所有情況下，該屬性或變數都必須是不可為 null 的，且不能是[基本型別](types-overview.md)。
 
-如果在初始化之前存取 `lateinit` 屬性，Kotlin 會擲出特定例外狀況，指明正在存取尚未初始化的屬性：
+如果在初始化之前存取 `lateinit` 屬性，Kotlin 會擲出一個特定的例外，指出存取了未初始化的屬性：
 
 ```kotlin
 class ReportGenerator {
     lateinit var report: String
 
     fun printReport() {
-        // 因在初始化之前存取而擲出例外狀況
+        // 因在初始化之前存取而擲出例外
         println(report)
     }
 }
@@ -455,9 +471,10 @@ fun main() {
     // Exception in thread "main" kotlin.UninitializedPropertyAccessException: lateinit property report has not been initialized
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-lateinit-property" validate="false"}
+{kotlin-runnable="true" id="kotlin-lateinit-property" validate="false"}
 
-若要檢查 `lateinit var` 是否已經初始化，請在[該屬性的參照](lambdas.md#property-references)上使用 [`isInitialized`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/is-initialized.html) 屬性：
+若要檢查 `lateinit var` 是否已初始化，請在[該屬性的參照](lambdas.md#property-references)上使用 [`isInitialized`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/is-initialized.html)
+屬性：
 
 ```kotlin
 class WeatherStation {
@@ -483,9 +500,10 @@ fun main() {
     // Latest reading: 22°C, sunny
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-lateinit-property-check-initialization"}
+{kotlin-runnable="true" id="kotlin-lateinit-property-check-initialization"}
 
-只有在你的程式碼中已經可以存取該屬性時，才能對其使用 `isInitialized`。該屬性必須宣告在同一個類別、外層類別中，或是作為同一個檔案中的頂層屬性。
+只有在你的程式碼中已經可以存取該屬性時，才能對該屬性使用 `isInitialized`。該屬性必須宣告
+在同一個類別、外層類別中，或是作為同一個檔案中的頂層屬性。
 
 ## 覆寫屬性 {id="overriding-properties"}
 
@@ -493,14 +511,16 @@ fun main() {
 
 ## 委託屬性 {id="delegated-properties"}
 
-為了重用邏輯並減少重複程式碼，你可以將取得和設定屬性的職責委託給單獨的物件。
+為了重複使用邏輯並減少程式碼重複，你可以將取得與設定屬性的責任委託給
+另一個物件。
 
-委託存取子行為可以使屬性的存取子邏輯保持集中，從而更容易重複使用。在實作以下行為時，此方法非常實用：
+委託存取子行為可以使屬性的存取子邏輯集中化，使其更容易重複使用。這種做法
+在實作以下行為時非常有用：
 
 * 延遲計算值。
-* 依據給定的鍵從 Map 中讀取。
+* 透過指定的鍵從映射 (map) 中讀取。
 * 存取資料庫。
 * 當屬性被存取時通知監聽器。
 
-你可以在程式庫中自行實作這些常見行為，也可以使用外部程式庫提供的現有委託。
+你可以在程式庫中自行實作這些常見行為，或使用外部程式庫提供的現有委託。
 如需更多資訊，請參閱[委託屬性](delegated-properties.md)。

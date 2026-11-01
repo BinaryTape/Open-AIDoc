@@ -8,20 +8,21 @@
 <var name="plugin_name" value="Velocity"/>
 <var name="package_name" value="io.ktor.server.velocity"/>
 <var name="artifact_name" value="ktor-server-velocity"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.server.velocity"/>
 
 <tldr>
 <p>
-<b>必須依存関係</b>: <code>io.ktor:%artifact_name%</code>
+<b>必要な依存関係</b>: <code>io.ktor:%artifact_name%</code>
 </p>
 <var name="example_name" value="velocity"/>
 <p>
     <b>コード例</b>:
-    <a href="https://github.com/ktorio/ktor-documentation/tree/%ktor_version%/codeSnippets/snippets/%example_name%">
+    <a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/%example_name%">
         %example_name%
     </a>
 </p>
 <p>
-    <b><Links href="/ktor/server-native" summary="Ktor は Kotlin/Native をサポートしており、追加のランタイムや仮想マシンなしでサーバーを実行できます。">Native サーバー</Links>のサポート</b>: ✖️
+    <b><Links href="server-native.md" summary="KtorはKotlin/Nativeをサポートしており、追加のランタイムや仮想マシンなしでサーバーを実行できます。">Native サーバー</Links>のサポート</b>: ✖️
 </p>
 </tldr>
 
@@ -30,14 +31,22 @@ Ktor では、[Velocity](https://api.ktor.io/ktor-server-velocity/io.ktor.server
 ## 依存関係の追加 {id="add_dependencies"}
 
 <p>
-    <code>%plugin_name%</code> を使用するには、ビルドスクリプトに <code>%artifact_name%</code> アーティファクトを含める必要があります。
+    <code>%plugin_name%</code> を使用するには、ビルドスクリプトに <code>%artifact_name%</code> アーティファクトを追加します。
 </p>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上記のコードスニペットでは、Ktor の依存関係を指定するために <a href="server-dependencies.topic#using-version-catalog">
+            Ktor バージョンカタログ</a> を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上記のコードスニペットでは、Ktor の依存関係を指定するために <a href="server-dependencies.topic#using-version-catalog">
+            Ktor バージョンカタログ</a> を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
@@ -47,15 +56,15 @@ Ktor では、[Velocity](https://api.ktor.io/ktor-server-velocity/io.ktor.server
 ## Velocity のインストール {id="install_plugin"}
 
 <p>
-    アプリケーションに <code>%plugin_name%</code> プラグインを<a href="server-plugins.md#install">インストール</a>するには、指定された<Links href="/ktor/server-modules" summary="モジュールを使用すると、ルートをグループ化してアプリケーションを構造化できます。">モジュール</Links>内の <code>install</code> 関数に渡します。
-    以下のコードスニペットは、<code>%plugin_name%</code> のインストール方法を示しています...
+    <code>%plugin_name%</code> プラグインをアプリケーションに<a href="server-plugins.md#install">インストール</a>するには、指定された<Links href="server-modules.md" summary="モジュールを使用すると、ルートをグループ化してアプリケーションを構造化できます。">モジュール</Links>内の <code>install</code> 関数に渡します。
+    以下の例は、<code>%plugin_name%</code> をインストールする方法を示しています。
 </p>
 <list>
     <li>
-        ... <code>embeddedServer</code> 関数の呼び出し内。
+        <code>embeddedServer()</code> 関数の呼び出し内。
     </li>
     <li>
-        ... 明示的に定義された <code>module</code>（<code>Application</code> クラスの拡張関数）内。
+        <code>Application</code> クラスに明示的に定義された <code>module()</code> 拡張関数内。
     </li>
 </list>
 <Tabs>
@@ -67,11 +76,11 @@ Ktor では、[Velocity](https://api.ktor.io/ktor-server-velocity/io.ktor.server
     </TabItem>
 </Tabs>
 
-オプションで、`VelocityTools` プラグインをインストールして、標準およびカスタムの [Velocity ツール](#velocity_tools)を追加する機能を利用することもできます。
+必要に応じて、`VelocityTools` プラグインをインストールすることで、標準およびカスタムの [Velocity ツール](#velocity_tools)を追加する機能を利用できます。
 
 ## Velocity の設定 {id="configure"}
 ### テンプレート読み込みの設定 {id="template_loading"}
-`install` ブロック内で、[VelocityEngine][velocity_engine] を設定できます。例えば、クラスパスからテンプレートを使用する場合は、`classpath` 用のリソースローダーを使用します。
+`install` ブロック内で、[VelocityEngine][velocity_engine] を設定できます。例えば、クラスパスからテンプレートを使用したい場合は、`classpath` 用のリソースローダーを使用します。
 ```kotlin
 import io.ktor.server.application.*
 import io.ktor.server.velocity.*
@@ -86,8 +95,8 @@ fun Application.module() {
 }
 ```
 
-### レスポンスでのテンプレート送信 {id="use_template"}
-`resources/templates` に `index.vl` テンプレートがあると仮定します。
+### レスポンスとしてテンプレートを送信する {id="use_template"}
+`resources/templates` に `index.vl` テンプレートがあるとします。
 ```html
 <html>
     <body>
@@ -101,7 +110,7 @@ fun Application.module() {
 data class User(val id: Int, val name: String)
 ```
 
-指定された[ルート](server-routing.md)に対してテンプレートを使用するには、以下のように `VelocityContent` を `call.respond` メソッドに渡します。
+指定された[ルート](server-routing.md)でテンプレートを使用するには、次のように `VelocityContent` を `call.respond` メソッドに渡します。
 ```kotlin
 get("/index") {
     val sampleUser = User(1, "John")
@@ -111,18 +120,18 @@ get("/index") {
 
 ### Velocity ツールの追加 {id="velocity_tools"}
 
-`VelocityTools` プラグインを[インストール](#install_plugin)している場合、`install` ブロック内で `EasyFactoryConfiguration` インスタンスにアクセスして、標準およびカスタムの Velocity ツールを追加できます。例えば以下のようになります。
+`VelocityTools` プラグインを[インストール](#install_plugin)している場合は、`install` ブロック内で `EasyFactoryConfiguration` インスタンスにアクセスして、標準およびカスタムの Velocity ツールを追加できます。例えば、次のようになります。
 
 ```kotlin
 install(VelocityTools) {
     engine {
-        // エンジン設定
+        // エンジンの設定
         setProperty("resource.loader", "string")
         addProperty("resource.loader.string.name", "myRepo")
         addProperty("resource.loader.string.class", StringResourceLoader::class.java.name)
         addProperty("resource.loader.string.repository.name", "myRepo")
     }
-    addDefaultTools() // デフォルトツールの追加
-    tool("foo", MyCustomTool::class.java) // カスタムツールの追加
+    addDefaultTools() // デフォルトツールを追加
+    tool("foo", MyCustomTool::class.java) // カスタムツールを追加
 }
 ```

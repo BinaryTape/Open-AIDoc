@@ -3,12 +3,13 @@
 <primary-label ref="server-plugin"/>
 
 <var name="artifact_name" value="ktor-server-conditional-headers"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.server.conditionalHeaders"/>
 <var name="package_name" value="io.ktor.server.plugins.conditionalheaders"/>
 <var name="plugin_name" value="ConditionalHeaders"/>
 
 <tldr>
 <p>
-<b>必須の依存関係</b>: <code>io.ktor:%artifact_name%</code>
+<b>必要な依存関係</b>: <code>io.ktor:%artifact_name%</code>
 </p>
 <var name="example_name" value="conditional-headers"/>
 <p>
@@ -18,25 +19,33 @@
     </a>
 </p>
 <p>
-    <b><Links href="/ktor/server-native" summary="KtorはKotlin/Nativeをサポートしており、追加のランタイムや仮想マシンなしでサーバーを実行できます。">ネイティブサーバー</Links>のサポート</b>: ✅
+    <b><Links href="server-native.md" summary="Ktor supports Kotlin/Native and allows you to run a server without an additional runtime or virtual machine.">Nativeサーバー</Links>のサポート</b>: ✅
 </p>
 </tldr>
 
-[ConditionalHeaders](https://api.ktor.io/ktor-server-conditional-headers/io.ktor.server.plugins.conditionalheaders/-conditional-headers.html)プラグインは、前回のリクエストからコンテンツが変更されていない場合に、コンテンツのボディの送信を回避します。これは、以下のヘッダーを使用することで実現されます：
-* `Last-Modified`レスポンスヘッダーには、リソースの更新日時が含まれます。例えば、クライアントのリクエストに`If-Modified-Since`値が含まれている場合、Ktorは指定された日付以降にリソースが変更された場合にのみ、完全なレスポンスを送信します。なお、[静的ファイル](server-static-content.md)の場合、ConditionalHeadersを[インストール](#install_plugin)すると、Ktorは自動的に`Last-Modified`ヘッダーを追加します。
-* `Etag`レスポンスヘッダーは、特定のリソースバージョンの識別子です。例えば、クライアントのリクエストに`If-None-Match`値が含まれている場合、この値が`Etag`と一致すれば、Ktorは完全なレスポンスを送信しません。`Etag`値は、ConditionalHeadersを[設定](#configure)する際に指定できます。
+[ConditionalHeaders](https://api.ktor.io/ktor-server-conditional-headers/io.ktor.server.plugins.conditionalheaders/-conditional-headers.html)プラグインは、前回のキエスト以降に変更されていない場合、コンテンツのボディの送信を回避します。これは以下のヘッダーを使用して実現されます。
+* `Last-Modified`レスポンスヘッダーには、リソースの変更日時が含まれます。例えば、クライアントリクエストに`If-Modified-Since`の値が含まれている場合、Ktorは指定された日付以降にリソースが変更されている場合にのみ完全なレスポンスを送信します。[静的ファイル](server-static-content.md)の場合、`ConditionalHeaders`を[インストール](#install_plugin)すると、Ktorが自動的に`Last-Modified`ヘッダーを追加することに注意してください。
+* `Etag`レスポンスヘッダーは、特定のリソースバージョンの識別子です。例えば、クライアントリクエストに`If-None-Match`の値が含まれている場合、その値が`Etag`と一致すれば、Ktorは完全なレスポンスを送信しません。`Etag`の値は`ConditionalHeaders`の[設定時](#configure)に指定できます。
 
 ## 依存関係の追加 {id="add_dependencies"}
 
 <p>
-    <code>%plugin_name%</code>を使用するには、ビルドスクリプトに<code>%artifact_name%</code>アーティファクトを含める必要があります：
+    <code>%plugin_name%</code>を使用するには、ビルドスクリプトに<code>%artifact_name%</code>アーティファクトを追加します。
 </p>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上記のコードスニペットでは、Ktorの依存関係を指定するために<a href="server-dependencies.topic#using-version-catalog">
+            Ktorバージョンカタログ</a>を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上記のコードスニペットでは、Ktorの依存関係を指定するために<a href="server-dependencies.topic#using-version-catalog">
+            Ktorバージョンカタログ</a>を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
@@ -46,15 +55,15 @@
 ## %plugin_name%のインストール {id="install_plugin"}
 
 <p>
-    <code>%plugin_name%</code>プラグインをアプリケーションに<a href="server-plugins.md#install">インストール</a>するには、指定された<Links href="/ktor/server-modules" summary="モジュールを使用すると、ルートをグループ化してアプリケーションを構造化できます。">モジュール</Links>内の<code>install</code>関数に渡します。
-    以下のコードスニペットは、<code>%plugin_name%</code>をインストールする方法を示しています...
+    <code>%plugin_name%</code>プラグインをアプリケーションに<a href="server-plugins.md#install">インストール</a>するには、指定した<Links href="server-modules.md" summary="モジュールを使用すると、ルートをグループ化してアプリケーションを構造化できます。">モジュール</Links>内の<code>install</code>関数に渡します。
+    以下の例は、<code>%plugin_name%</code>をインストールする方法を示しています。
 </p>
 <list>
     <li>
-        ... <code>embeddedServer</code>関数の呼び出し内。
+        <code>embeddedServer()</code>関数呼び出し内でのインストール。
     </li>
     <li>
-        ... 明示的に定義された<code>module</code>（<code>Application</code>クラスの拡張関数）内。
+        <code>Application</code>クラスの明示的に定義された<code>module()</code>拡張関数内でのインストール。
     </li>
 </list>
 <Tabs>
@@ -67,14 +76,14 @@
 </Tabs>
 <p>
     <code>%plugin_name%</code>プラグインは、<a href="server-plugins.md#install-route">特定のルートにインストール</a>することもできます。
-    これは、アプリケーションのリソースごとに異なる<code>%plugin_name%</code>設定が必要な場合に役立ちます。
+    これは、アプリケーションの異なるリソースに対して異なる<code>%plugin_name%</code>設定が必要な場合に役立ちます。
 </p>
 
 ## ヘッダーの設定 {id="configure"}
 
-`%plugin_name%`を設定するには、`install`ブロック内で[version](https://api.ktor.io/ktor-server-conditional-headers/io.ktor.server.plugins.conditionalheaders/-conditional-headers-config/version.html)関数を呼び出す必要があります。この関数は、指定された`ApplicationCall`および`OutgoingContent`に対するリソースバージョンのリストへのアクセスを提供します。[EntityTagVersion](https://api.ktor.io/ktor-http/io.ktor.http.content/-entity-tag-version/index.html)および[LastModifiedVersion](https://api.ktor.io/ktor-http/io.ktor.http.content/-last-modified-version/index.html)クラスのオブジェクトを使用して、必要なバージョンを指定できます。
+`%plugin_name%`を設定するには、`install`ブロック内で[version](https://api.ktor.io/ktor-server-conditional-headers/io.ktor.server.plugins.conditionalheaders/-conditional-headers-config/version.html)関数を呼び出す必要があります。この関数は、指定された`ApplicationCall`および`OutgoingContent`に対するリソースバージョンのリストへのアクセスを提供します。[EntityTagVersion](https://api.ktor.io/ktor-http/io.ktor.http.content/-entity-tag-version/index.html)および[LastModifiedVersion](https://api.ktor.io/ktor-http/io.ktor.http.content/-last-modified-version/index.html)クラスオブジェクトを使用して、必要なバージョンを指定できます。
 
-以下のコードスニペットは、CSSに対して`Etag`および`Last-Modified`ヘッダーを追加する方法を示しています：
+以下のコードスニペットは、CSSに`Etag`および`Last-Modified`ヘッダーを追加する方法を示しています。
 ```kotlin
 install(ConditionalHeaders) {
     val file = File("src/main/kotlin/com/example/Application.kt")
@@ -90,4 +99,4 @@ install(ConditionalHeaders) {
 }
 ```
 
-完全な例はこちらにあります：[conditional-headers](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/conditional-headers)。
+完全な例はこちらにあります: [conditional-headers](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/conditional-headers)。

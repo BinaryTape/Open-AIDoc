@@ -7,72 +7,83 @@
 
 <tldr>
 <p>
-<b>必需依赖项</b>：<code>io.ktor:ktor-network</code>, <code>io.ktor:ktor-network-tls</code>
+<b>必需依赖项</b>：<code>io.ktor:ktor-network</code>、<code>io.ktor:ktor-network-tls</code>
 </p>
 <p><b>代码示例</b>：
-<a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/sockets-server">sockets-server</a>,
-<a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/sockets-client">sockets-client</a>,
+<a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/sockets-server">sockets-server</a>、
+<a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/sockets-client">sockets-client</a>、
 <a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/sockets-client-tls">sockets-client-tls</a>
 </p>
 <p>
-    <b><Links href="/ktor/server-native" summary="Ktor supports Kotlin/Native and allows you to run a server without an additional runtime or virtual machine.">Native 服务器</Links>支持</b>：✅
+    <b><Links href="server-native.md" summary="Ktor 支持 Kotlin/Native，允许您在无需额外运行时或虚拟机的情况下运行服务器。">原生服务器</Links>支持</b>：✅
 </p>
 </tldr>
 
-除了服务器和客户端的 HTTP/WebSocket 处理外，Ktor 还支持 TCP 和 UDP 原始套接字。
-它公开了一个在底层使用 [java.nio](https://docs.oracle.com/javase/8/docs/api/java/nio/package-summary.html) 的挂起 API。
+除了为服务器和客户端提供 HTTP/WebSocket 处理之外，Ktor 还支持 TCP 和 UDP 原始套接字。
+它提供了一套在底层使用 [java.nio](https://docs.oracle.com/javase/8/docs/api/java/nio/package-summary.html) 的挂起 API。
 
-> Sockets 使用实验性 API，预计在后续更新中会不断演进，且可能包含破坏性更改。
+> 套接字使用的是实验性 API，预计会在后续更新中演进，并可能引入破坏性变更。
 >
 {type="note"}
 
 ## 添加依赖项 {id="add_dependencies"}
 
 <var name="artifact_name" value="ktor-network"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.network"/>
 <p>
-    要使用 <code>%plugin_name%</code>，您需要在构建脚本中包含 <code>%artifact_name%</code> 构件：
+    要使用 <code>%plugin_name%</code>，请将 <code>%artifact_name%</code> 工件添加到您的构建脚本中：
 </p>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上述代码段使用 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 版本目录</a> 来指定 Ktor 依赖项。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上述代码段使用 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 版本目录</a> 来指定 Ktor 依赖项。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
     </TabItem>
 </Tabs>
 
-要在客户端中使用[安全套接字](#secure)，您还需要添加 `io.ktor:ktor-network-tls`。
+若要在客户端中使用[安全套接字](#secure)，您还需要添加 `io.ktor:ktor-network-tls`。
 
 ## 服务器 {id="server"}
 
 ### 创建服务器套接字 {id="server_create_socket"}
 
-要构建服务器套接字，请创建 `SelectorManager` 实例，对其调用 `SocketBuilder.tcp()` 函数，然后使用 `bind` 将服务器套接字绑定到特定端口：
+要构建服务器套接字，请创建 `SelectorManager` 实例，对其调用 `SocketBuilder.tcp()` 函数，
+然后使用 `bind` 将服务器套接字绑定到特定端口：
 
 ```kotlin
 val selectorManager = SelectorManager(Dispatchers.IO)
 val serverSocket = aSocket(selectorManager).tcp().bind("127.0.0.1", 9002)
 ```
 
-上述代码片段创建了一个 TCP 套接字，即 [ServerSocket](https://api.ktor.io/ktor-network/io.ktor.network.sockets/-server-socket/index.html) 实例。
+上面的代码段创建了一个 TCP 套接字，它是 [ServerSocket](https://api.ktor.io/ktor-network/io.ktor.network.sockets/-server-socket/index.html) 实例。
 要创建 UDP 套接字，请使用 `SocketBuilder.udp()`。
 
 ### 接受传入连接 {id="accepts_connection"}
 
-创建服务器套接字后，您需要调用 `ServerSocket.accept` 函数，该函数接受套接字连接并返回一个已连接的套接字（[Socket](https://api.ktor.io/ktor-network/io.ktor.network.sockets/-socket/index.html) 实例）：
+创建服务器套接字后，需要调用 `ServerSocket.accept` 函数来接受套接字连接，
+并返回已连接的套接字（即 [Socket](https://api.ktor.io/ktor-network/io.ktor.network.sockets/-socket/index.html) 实例）：
 
 ```kotlin
 val socket = serverSocket.accept()
 ```
 
-拥有已连接的套接字后，您可以通过从套接字读取或向其写入来接收/发送数据。
+拥有已连接的套接字后，您可以通过对该套接字执行读写操作来接收/发送数据。
 
 ### 接收数据 {id="server_receive"}
 
-要从客户端接收数据，您需要调用 `Socket.openReadChannel` 函数，该函数返回 [ByteReadChannel](https://api.ktor.io/ktor-io/io.ktor.utils.io/-byte-read-channel/index.html)：
+要接收来自客户端的数据，需要调用 `Socket.openReadChannel` 函数，它会返回 [ByteReadChannel](https://api.ktor.io/ktor-io/io.ktor.utils.io/-byte-read-channel/index.html)：
 
 ```kotlin
 val receiveChannel = socket.openReadChannel()
@@ -82,12 +93,12 @@ val receiveChannel = socket.openReadChannel()
 例如，您可以使用 `ByteReadChannel.readUTF8Line` 读取一行 UTF-8 字符：
 
 ```kotlin
-val name = receiveChannel.readUTF8Line()
+val name = receiveChannel.readLine()
 ```
 
 ### 发送数据 {id="server_send"}
 
-要向客户端发送数据，请调用 `Socket.openWriteChannel` 函数，该函数返回 [ByteWriteChannel](https://api.ktor.io/ktor-io/io.ktor.utils.io/-byte-write-channel/index.html)：
+要向客户端发送数据，请调用 `Socket.openWriteChannel` 函数，它会返回 [ByteWriteChannel](https://api.ktor.io/ktor-io/io.ktor.utils.io/-byte-write-channel/index.html)：
 
 ```kotlin
 val sendChannel = socket.openWriteChannel(autoFlush = true)
@@ -97,9 +108,8 @@ val sendChannel = socket.openWriteChannel(autoFlush = true)
 例如，您可以使用 `ByteWriteChannel.writeStringUtf8` 写入一行 UTF-8 字符：
 
 ```kotlin
-val name = receiveChannel.readUTF8Line()
-sendChannel.writeStringUtf8("Hello, $name!
-")
+val name = receiveChannel.readLine()
+sendChannel.writeStringUtf8("Hello, $name!\n")
 ```
 
 ### 关闭套接字 {id="server_close"}
@@ -133,13 +143,11 @@ fun main(args: Array<String>) {
             launch {
                 val receiveChannel = socket.openReadChannel()
                 val sendChannel = socket.openWriteChannel(autoFlush = true)
-                sendChannel.writeStringUtf8("Please enter your name
-")
+                sendChannel.writeStringUtf8("Please enter your name\n")
                 try {
                     while (true) {
-                        val name = receiveChannel.readUTF8Line()
-                        sendChannel.writeStringUtf8("Hello, $name!
-")
+                        val name = receiveChannel.readLine()
+                        sendChannel.writeStringUtf8("Hello, $name!\n")
                     }
                 } catch (e: Throwable) {
                     socket.close()
@@ -151,20 +159,21 @@ fun main(args: Array<String>) {
 
 ```
 
-您可以在此处找到完整的示例：[sockets-server](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/sockets-server)。
+您可以在此处找到完整示例：[sockets-server](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/sockets-server)。
 
 ## 客户端 {id="client"}
 
 ### 创建套接字 {id="client_create_socket"}
 
-要构建客户端套接字，请创建 `SelectorManager` 实例，对其调用 `SocketBuilder.tcp()` 函数，然后使用 `connect` 建立连接并获取已连接的套接字（[Socket](https://api.ktor.io/ktor-network/io.ktor.network.sockets/-socket/index.html) 实例）：
+要构建客户端套接字，请创建 `SelectorManager` 实例，对其调用 `SocketBuilder.tcp()` 函数，
+然后使用 `connect` 建立连接并获取已连接的套接字（即 [Socket](https://api.ktor.io/ktor-network/io.ktor.network.sockets/-socket/index.html) 实例）：
 
 ```kotlin
 val selectorManager = SelectorManager(Dispatchers.IO)
 val socket = aSocket(selectorManager).tcp().connect("127.0.0.1", 9002)
 ```
 
-拥有已连接的套接字后，您可以通过从套接字读取或向其写入来接收/发送数据。
+拥有已连接的套接字后，您可以通过对该套接字执行读写操作来接收/发送数据。
 
 ### 创建安全套接字 (SSL/TLS) {id="secure"}
 
@@ -190,11 +199,11 @@ val socket = aSocket(selectorManager).tcp().connect("youtrack.jetbrains.com", po
 }
 ```
 
-您可以在此处找到完整的示例：[sockets-client-tls](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/sockets-client-tls)。
+您可以在此处找到完整示例：[sockets-client-tls](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/sockets-client-tls)。
 
 ### 接收数据 {id="client_receive"}
 
-要从服务器接收数据，您需要调用 `Socket.openReadChannel` 函数，该函数返回 [ByteReadChannel](https://api.ktor.io/ktor-io/io.ktor.utils.io/-byte-read-channel/index.html)：
+要接收来自服务器的数据，需要调用 `Socket.openReadChannel` 函数，它会返回 [ByteReadChannel](https://api.ktor.io/ktor-io/io.ktor.utils.io/-byte-read-channel/index.html)：
 
 ```kotlin
 val receiveChannel = socket.openReadChannel()
@@ -204,12 +213,12 @@ val receiveChannel = socket.openReadChannel()
 例如，您可以使用 `ByteReadChannel.readUTF8Line` 读取一行 UTF-8 字符：
 
 ```kotlin
-val greeting = receiveChannel.readUTF8Line()
+val greeting = receiveChannel.readLine()
 ```
 
 ### 发送数据 {id="client_send"}
 
-要向服务器发送数据，请调用 `Socket.openWriteChannel` 函数，该函数返回 [ByteWriteChannel](https://api.ktor.io/ktor-io/io.ktor.utils.io/-byte-write-channel/index.html)：
+要向服务器发送数据，请调用 `Socket.openWriteChannel` 函数，它会返回 [ByteWriteChannel](https://api.ktor.io/ktor-io/io.ktor.utils.io/-byte-write-channel/index.html)：
 
 ```kotlin
 val sendChannel = socket.openWriteChannel(autoFlush = true)
@@ -220,8 +229,7 @@ val sendChannel = socket.openWriteChannel(autoFlush = true)
 
 ```kotlin
 val myMessage = readln()
-sendChannel.writeStringUtf8("$myMessage
-")
+sendChannel.writeStringUtf8("$myMessage\n")
 ```
 
 ### 关闭连接 {id="client_close"}
@@ -256,7 +264,7 @@ fun main(args: Array<String>) {
 
         launch(Dispatchers.IO) {
             while (true) {
-                val greeting = receiveChannel.readUTF8Line()
+                val greeting = receiveChannel.readLine()
                 if (greeting != null) {
                     println(greeting)
                 } else {
@@ -270,12 +278,11 @@ fun main(args: Array<String>) {
 
         while (true) {
             val myMessage = readln()
-            sendChannel.writeStringUtf8("$myMessage
-")
+            sendChannel.writeStringUtf8("$myMessage\n")
         }
     }
 }
 
 ```
 
-您可以在此处找到完整的示例：[sockets-client](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/sockets-client)。
+您可以在此处找到完整示例：[sockets-client](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/sockets-client)。

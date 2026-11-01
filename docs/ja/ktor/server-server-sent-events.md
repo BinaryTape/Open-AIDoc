@@ -1,12 +1,13 @@
 <topic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:noNamespaceSchemaLocation="https://resources.jetbrains.com/writerside/1.0/topic.v2.xsd"
-       id="server-server-sent-events" title="Ktor Serverにおける Server-Sent Events" help-id="sse_server">
+       id="server-server-sent-events" title="Ktor Server における Server-Sent Events" help-id="sse_server">
 <show-structure for="chapter" depth="2"/>
 <primary-label ref="server-plugin"/>
 <var name="plugin_name" value="SSE"/>
 <var name="example_name" value="server-sse"/>
 <var name="package_name" value="io.ktor.server.sse"/>
 <var name="artifact_name" value="ktor-server-sse"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.server.sse"/>
 <tldr>
         <p>
             <b>必要な依存関係</b>: <code>io.ktor:%artifact_name%</code>
@@ -23,39 +24,47 @@
 </link-summary>
 <snippet id="sse-description">
         <p>
-            Server-Sent Events（SSE）は、サーバーが HTTP 接続を介してクライアントへ継続的にイベントをプッシュできるようにする技術です。クライアントが繰り返しサーバーをポーリングすることなく、サーバーからイベントベースの更新を送信する必要がある場合に特に役立ちます。
+            Server-Sent Events (SSE) は、サーバーが HTTP 接続を介してクライアントにイベントを継続的にプッシュできるようにする技術です。クライアントがサーバーに対して繰り返しポーリングを行う必要なく、サーバーがイベントベースの更新を送信する必要がある場合に特に有用です。
         </p>
         <p>
-            Ktor でサポートされている SSE プラグインは、サーバーとクライアント間に単方向接続を作成するためのわかりやすい方法を提供します。
+            Ktor がサポートする SSE プラグインは、サーバーとクライアント間に単方向の接続を作成するためのシンプルな方法を提供します。
         </p>
 </snippet>
 <tip>
-    <p>クライアント側のサポート向け SSE プラグインの詳細については、
-        <Links href="/ktor/client-server-sent-events" summary="The SSE plugin allows a client to receive event-based updates from a server over an HTTP connection.">SSE クライアントプラグイン</Links>
+    <p>クライアント側のサポートを目的とした SSE プラグインの詳細については、
+        <Links href="client-server-sent-events.topic" summary="SSE プラグインを使用すると、クライアントは HTTP 接続を介してサーバーからイベントベースの更新を受信できます。">SSE クライアントプラグイン</Links>
         を参照してください。
     </p>
 </tip>
 <note>
     <p>
-        双方向通信には、<Links href="/ktor/server-websockets" summary="The Websockets plugin allows you to create a multi-way communication session between a server and a client.">WebSockets</Links> の使用を検討してください。WebSocket プロトコルを使用して、サーバーとクライアント間の全二重通信を提供します。
+        双方向通信を行う場合は、<Links href="server-websockets.md" summary="Websockets プラグインを使用すると、サーバーとクライアント間で双方向の通信セッションを作成できます。">WebSockets</Links> の使用を検討してください。WebSocket プロトコルを使用して、サーバーとクライアント間の全二重通信を提供します。
     </p>
 </note>
 <chapter title="制限事項" id="limitations">
     <p>
         Ktor は SSE レスポンスのデータ圧縮をサポートしていません。
-        <Links href="/ktor/server-compression" summary="Required dependencies: io.ktor:%artifact_name% Code example: %example_name% Native server support: ✖️">Compression</Links> プラグインを使用している場合、デフォルトで SSE レスポンスの圧縮はスキップされます。
+        <Links href="server-compression.md" summary="必要な依存関係: io.ktor:%artifact_name% コード例: %example_name% ネイティブサーバーサポート: ✖️">Compression</Links> プラグインを使用している場合、デフォルトで SSE レスポンスの圧縮はスキップされます。
     </p>
 </chapter>
 <chapter title="依存関係の追加" id="add_dependencies">
     <p>
-        <code>%plugin_name%</code> を使用するには、ビルドスクリプトに <code>%artifact_name%</code> アーティファクトを追加します。
+        <code>%plugin_name%</code> を使用するには、ビルドスクリプトに <code>%artifact_name%</code> アーティファクトを追加します:
     </p>
     <tabs group="languages">
         <tab title="Gradle (Kotlin)" group-key="kotlin">
-            <code-block lang="Kotlin" code="                    implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+            <code-block lang="Kotlin" code="                    implementation(%ktor_version_catalog_name%)"/>
+            <note>
+                上記のコードスニペットでは、Ktor の依存関係を指定するために <a href="server-dependencies.topic#using-version-catalog">
+                Ktor バージョンカタログ</a> を使用しています。
+            </note>
         </tab>
         <tab title="Gradle (Groovy)" group-key="groovy">
-            <code-block lang="Groovy" code="                    implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+            <code-block lang="Groovy" code="                    implementation %ktor_version_catalog_name%"/>
+            <note>
+                上記のコードスニペットでは、Ktor の依存関係を指定するために <a href="server-dependencies.topic#using-version-catalog">
+                Ktor バージョンカタログ</a> を使用しています。
+            </note>
         </tab>
         <tab title="Maven" group-key="maven">
             <code-block lang="XML" code="                    &lt;dependency&gt;&#10;                        &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                        &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                        &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;                    &lt;/dependency&gt;"/>
@@ -64,15 +73,15 @@
 </chapter>
 <chapter title="SSE のインストール" id="install_plugin">
     <p>
-        <code>%plugin_name%</code> プラグインをアプリケーションに<a href="server-plugins.md#install">インストール</a>するには、指定された<Links href="/ktor/server-modules" summary="Modules allow you to structure your application by grouping routes.">モジュール</Links>内の <code>install</code> 関数に渡します。
-        以下の例は、<code>%plugin_name%</code> をインストールする方法を示しています。
+        アプリケーションに <code>%plugin_name%</code> プラグインを<a href="server-plugins.md#install">インストール</a>するには、指定された<Links href="server-modules.md" summary="モジュールを使用すると、ルートをグループ化してアプリケーションを構造化できます。">モジュール</Links>内の <code>install</code> 関数に渡します。
+        以下の例は、<code>%plugin_name%</code> をインストールする方法を示しています:
     </p>
     <list>
         <li>
-            <code>embeddedServer()</code> 関数呼び出し内でのインストール。
+            <code>embeddedServer()</code> 関数の呼び出し内。
         </li>
         <li>
-            <code>Application</code> クラスで明示的に定義された <code>module()</code> 拡張関数内でのインストール。
+            <code>Application</code> クラスに明示的に定義された <code>module()</code> 拡張関数内。
         </li>
     </list>
     <tabs>
@@ -87,7 +96,7 @@
 <chapter title="SSE セッションの処理" id="handle-sessions">
     <p>
         <code>SSE</code> プラグインをインストールしたら、SSE セッションを処理するルートを追加できます。
-        これを行うには、<a href="server-routing.md#define_route">routing</a> ブロック内で <code>sse()</code> 関数を呼び出します。SSE ルートを設定する方法は2つあります。
+        これを行うには、<a href="server-routing.md#define_route">routing</a> ブロック内で <code>sse()</code> 関数を呼び出します。SSE ルートを設定する方法は 2 つあります:
     </p>
     <list type="decimal">
         <li>
@@ -107,74 +116,73 @@
             <a href="https://api.ktor.io/ktor-server-sse/io.ktor.server.sse/-server-s-s-e-session/index.html">
                 <code>ServerSSESession</code>
             </a>
-            クラスによって表されます。ブロック内では以下の関数およびプロパティを使用できます。
-        </p>
+            クラスによって表されます。ブロック内では以下の関数やプロパティを使用できます:</p>
         <deflist>
             <def id="send">
                 <title><code>send()</code></title>
-                <code>ServerSentEvent</code> を作成し、クライアントへ送信します。
+                <code>ServerSentEvent</code> を作成し、クライアントに送信します。
             </def>
             <def id="call">
                 <title><code>call</code></title>
-                セッションを開始した、関連付けられた受信 <code>ApplicationCall</code> です。
+                セッションの起点となった、関連する受信 <code>ApplicationCall</code>。
             </def>
             <def id="close">
                 <title><code>close()</code></title>
-                セッションを閉じ、クライアントとの接続を切断します。すべての <code>send()</code> 操作が完了すると、<code>close()</code> メソッドは自動的に呼び出されます。
+                セッションをクローズし、クライアントとの接続を終了します。<code>close()</code> メソッドは、すべての <code>send()</code> 操作が完了したときに自動的に呼び出されます。
                 <note>
-                    <code>close()</code> 関数を使用してセッションを閉じても、クライアントへ終了イベントは送信されません。セッションを閉じる前に SSE ストリームの終了を示すには、<code>send()</code> 関数を使用して特定のイベントを送信してください。
+                    <code>close()</code> 関数を使用してセッションをクローズしても、終了イベントはクライアントに送信されません。セッションをクローズする前に SSE ストリームの終了を示すには、<code>send()</code> 関数を使用して特定のイベントを送信してください。
                 </note>
             </def>
         </deflist>
     </chapter>
     <chapter title="例: 単一セッションの処理" id="handle-single-session">
         <p>
-            以下の例は、<code>/events</code> エンドポイントで SSE セッションを設定し、それぞれ 1 秒（1000ms）の間隔を空けて SSE チャネル経由で 6 つの個別イベントを送信する方法を示しています。
+            以下の例は、<code>/events</code> エンドポイントに SSE セッションを設定し、各イベントの間に 1 秒（1000ms）の遅延を挟んで SSE チャネル経由で 6 つの個別のイベントを送信する方法を示しています:
         </p>
         <code-block lang="kotlin" code="    routing {&#10;        sse(&quot;/events&quot;) {&#10;            repeat(6) {&#10;                send(ServerSentEvent(&quot;this is SSE #$it&quot;))&#10;                delay(1000)&#10;            }&#10;        }&#10;    }"/>
-        <p>完全なサンプルコードについては、
+        <p>完全な例については、
             <a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/server-sse">server-sse</a> を参照してください。
         </p>
     </chapter>
     <chapter title="SSE ハートビート" id="heartbeat">
         <p>
-            ハートビートは、定期的にイベントを送信することで、無通信期間中も SSE 接続をアクティブに保ちます。セッションがアクティブである限り、サーバーは設定された間隔で指定されたイベントを送信します。
+            ハートビートは、定期的にイベントを送信することで、無通信状態の間も SSE 接続をアクティブに保ちます。セッションがアクティブである限り、サーバーは設定された間隔で指定されたイベントを送信します。
         </p>
         <p>
             ハートビートを有効にして設定するには、SSE ルートハンドラー内で
             <a href="https://api.ktor.io/ktor-server-sse/io.ktor.server.sse/heartbeat.html">
                 <code>.heartbeat()</code>
             </a>
-            関数を使用します。
+            関数を使用します:
         </p>
         <code-block lang="kotlin" code="        sse(&quot;/heartbeat&quot;) {&#10;            heartbeat {&#10;                period = 10.milliseconds&#10;                event = ServerSentEvent(&quot;heartbeat&quot;)&#10;            }&#10;            // ...&#10;        }"/>
         <p>
             この例では、接続を維持するために 10 ミリ秒ごとにハートビートイベントが送信されます。
         </p>
         <p>
-            <code>eventProvider</code> プロパティを使用して、ハートビートイベントを動的に生成することもできます。
+            <code>eventProvider</code> プロパティを使用して、ハートビートイベントを動的に生成することもできます:
         </p>
         <code-block lang="kotlin" code="        sse(&quot;/heartbeat-custom&quot;) {&#10;            heartbeat {&#10;                period = 30.milliseconds&#10;                eventProvider = {&#10;                    ServerSentEvent(data = &quot;ts=${Clock.System.now()}&quot;)&#10;                }&#10;            }&#10;            // ...&#10;        }"/>
         <p>
-            <code>eventProvider</code> が設定されている場合、各ハートビートのティック（発生時）に呼び出されて <code>ServerSentEvent</code> を生成します。これにより、ハートビートイベントにタイムスタンプやステータス情報などの動的コンテンツを含めることが可能になります。
+            設定されている場合、<code>eventProvider</code> はハートビートの各ティックで呼び出され、<code>ServerSentEvent</code> を生成します。これにより、タイムスタンプやステータス情報などの動的コンテンツをハートビートイベントに含めることができます。
         </p>
         <p>
-            <code>event</code> と <code>eventProvider</code> の両方が設定されている場合は、<code>eventProvider</code> が <code>event</code> よりも優先されます。
+            <code>event</code> と <code>eventProvider</code> の両方が設定されている場合、<code>eventProvider</code> が <code>event</code> よりも優先されます。
         </p>
     </chapter>
-    <chapter title="シリアライゼーション" id="serialization">
+    <chapter title="シリアライズ" id="serialization">
         <p>
-            シリアライゼーションを有効にするには、SSE ルートの <code>serialize</code> パラメーターを使用してカスタムのシリアライゼーション関数を指定します。ハンドラー内では、
+            シリアライズを有効にするには、SSE ルートの <code>serialize</code> パラメーターを使用してカスタムシリアライズ関数を指定します。ハンドラー内では、
             <a href="https://api.ktor.io/ktor-server-sse/io.ktor.server.sse/-server-s-s-e-session-with-serialization/index.html">
                 <code>ServerSSESessionWithSerialization</code>
             </a>
-            クラスを使用してシリアライズされたイベントを送信できます。
+            クラスを使用して、シリアライズされたイベントを送信できます:
         </p>
         <code-block lang="kotlin" code="@Serializable&#10;data class Customer(val id: Int, val firstName: String, val lastName: String)&#10;&#10;@Serializable&#10;data class Product(val id: Int, val prices: List&lt;Int&gt;)&#10;&#10;fun Application.module() {&#10;    install(SSE)&#10;&#10;    routing {&#10;        // example with serialization&#10;        sse(&quot;/json&quot;, serialize = { typeInfo, it -&gt;&#10;            val serializer = Json.serializersModule.serializer(typeInfo.kotlinType!!)&#10;            Json.encodeToString(serializer, it)&#10;        }) {&#10;            send(Customer(0, &quot;Jet&quot;, &quot;Brains&quot;))&#10;            send(Product(0, listOf(100, 200)))&#10;        }&#10;    }&#10;}"/>
         <p>
-            この例の <code>serialize</code> 関数は、データオブジェクトを JSON に変換する役割を持ち、その JSON が <code>ServerSentEvent</code> の <code>data</code> フィールドに配置されます。
+            この例の <code>serialize</code> 関数は、データオブジェクトを JSON に変換する役割を果たし、変換された JSON は <code>ServerSentEvent</code> の <code>data</code> フィールドに配置されます。
         </p>
-        <p>完全なサンプルコードについては、
+        <p>完全な例については、
             <a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/server-sse">server-sse</a> を参照してください。
         </p>
     </chapter>

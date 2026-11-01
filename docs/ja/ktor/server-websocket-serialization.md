@@ -1,4 +1,4 @@
-[//]: # (title: Ktor Server での WebSockets シリアライズ)
+[//]: # (title: Ktor ServerにおけるWebSocketsシリアライゼーション)
 
 <show-structure for="chapter" depth="2"/>
 
@@ -12,28 +12,35 @@
 </p>
 </tldr>
 
-[ContentNegotiation](server-serialization.md) プラグインと同様に、WebSockets では特定のフォーマットでテキストフレームをシリアライズ/デシリアライズできます。Ktor は、JSON、XML、CBOR、ProtoBuf の各形式を標準でサポートしています。
+[ContentNegotiation](server-serialization.md)プラグインと同様に、WebSocketsでは特定のフォーマットでテキストフレームをシリアライズ/デシリアライズできます。Ktorは初期状態で、JSON、XML、CBOR、ProtoBufのフォーマットをサポートしています。
 
 ## 依存関係の追加 {id="add_dependencies"}
 
-kotlinx.serialization コンバーターを使用する前に、[セットアップ](https://github.com/Kotlin/kotlinx.serialization#setup) セクションの説明に従って Kotlin シリアライズプラグインを追加する必要があります。
+kotlinx.serializationコンバーターを使用する前に、[Setup](https://github.com/Kotlin/kotlinx.serialization#setup)セクションの説明に従ってKotlinシリアライゼーションプラグインを追加する必要があります。
 
 #### JSON {id="add_json_dependency"}
 
-JSON データのシリアライズ/デシリアライズには、kotlinx.serialization、Gson、Jackson のいずれかのライブラリを選択できます。 
+JSONデータをシリアライズ/デシリアライズするには、kotlinx.serialization、Gson、Jacksonのいずれかのライブラリを選択できます。
 
 <Tabs group="json-libraries">
 <TabItem title="kotlinx.serialization" group-key="kotlinx">
 
-ビルドスクリプトに `ktor-serialization-kotlinx-json` アーティファクトを追加します。
+ビルドスクリプトに `ktor-serialization-kotlinx-json` アーティファクトを追加します:
 
 <var name="artifact_name" value="ktor-serialization-kotlinx-json"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.serialization.kotlinx.json"/>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上記のコードスニペットでは、Ktorの依存関係を指定するために<a href="server-dependencies.topic#using-version-catalog">Ktorバージョンカタログ</a>を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上記のコードスニペットでは、Ktorの依存関係を指定するために<a href="server-dependencies.topic#using-version-catalog">Ktorバージョンカタログ</a>を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
@@ -43,15 +50,22 @@ JSON データのシリアライズ/デシリアライズには、kotlinx.serial
 </TabItem>
 <TabItem title="Gson" group-key="gson">
 
-ビルドスクリプトに `ktor-serialization-gson` アーティファクトを追加します。
+ビルドスクリプトに `ktor-serialization-gson` アーティファクトを追加します:
 
 <var name="artifact_name" value="ktor-serialization-gson"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.serialization.gson"/>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上記のコードスニペットでは、Ktorの依存関係を指定するために<a href="server-dependencies.topic#using-version-catalog">Ktorバージョンカタログ</a>を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上記のコードスニペットでは、Ktorの依存関係を指定するために<a href="server-dependencies.topic#using-version-catalog">Ktorバージョンカタログ</a>を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
@@ -61,15 +75,22 @@ JSON データのシリアライズ/デシリアライズには、kotlinx.serial
 </TabItem>
 <TabItem title="Jackson" group-key="jackson">
 
-ビルドスクリプトに `ktor-serialization-jackson` アーティファクトを追加します。
+ビルドスクリプトに `ktor-serialization-jackson` アーティファクトを追加します:
 
 <var name="artifact_name" value="ktor-serialization-jackson"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.serialization.jackson"/>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上記のコードスニペットでは、Ktorの依存関係を指定するために<a href="server-dependencies.topic#using-version-catalog">Ktorバージョンカタログ</a>を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上記のコードスニペットでは、Ktorの依存関係を指定するために<a href="server-dependencies.topic#using-version-catalog">Ktorバージョンカタログ</a>を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
@@ -81,35 +102,46 @@ JSON データのシリアライズ/デシリアライズには、kotlinx.serial
 
 #### XML {id="add_xml_dependency"}
 
-XML をシリアライズ/デシリアライズするには、ビルドスクリプトに `ktor-serialization-kotlinx-xml` を追加します。
+XMLをシリアライズ/デシリアライズするには、ビルドスクリプトに `ktor-serialization-kotlinx-xml` を追加します:
 
 <var name="artifact_name" value="ktor-serialization-kotlinx-xml"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.serialization.kotlinx.xml"/>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上記のコードスニペットでは、Ktorの依存関係を指定するために<a href="server-dependencies.topic#using-version-catalog">Ktorバージョンカタログ</a>を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上記のコードスニペットでは、Ktorの依存関係を指定するために<a href="server-dependencies.topic#using-version-catalog">Ktorバージョンカタログ</a>を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
     </TabItem>
 </Tabs>
 
-> XML シリアライズは [`jsNode` ターゲットではサポートされていない](https://github.com/pdvrieze/xmlutil/issues/83) ことに注意してください。
-{style="note"}
-
 #### CBOR {id="add_cbor_dependency"}
 
-CBOR をシリアライズ/デシリアライズするには、ビルドスクリプトに `ktor-serialization-kotlinx-cbor` を追加します。
+CBORをシリアライズ/デシリアライズするには、ビルドスクリプトに `ktor-serialization-kotlinx-cbor` を追加します:
 
 <var name="artifact_name" value="ktor-serialization-kotlinx-cbor"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.serialization.kotlinx.cbor"/>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上記のコードスニペットでは、Ktorの依存関係を指定するために<a href="server-dependencies.topic#using-version-catalog">Ktorバージョンカタログ</a>を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上記のコードスニペットでは、Ktorの依存関係を指定するために<a href="server-dependencies.topic#using-version-catalog">Ktorバージョンカタログ</a>を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
@@ -118,15 +150,22 @@ CBOR をシリアライズ/デシリアライズするには、ビルドスク�
 
 #### ProtoBuf {id="add_protobuf_dependency"}
 
-ProtoBuf をシリアライズ/デシリアライズするには、ビルドスクリプトに `ktor-serialization-kotlinx-protobuf` を追加します。
+ProtoBufをシリアライズ/デシリアライズするには、ビルドスクリプトに `ktor-serialization-kotlinx-protobuf` を追加します:
 
 <var name="artifact_name" value="ktor-serialization-kotlinx-protobuf"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.serialization.kotlinx.protobuf"/>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上記のコードスニペットでは、Ktorの依存関係を指定するために<a href="server-dependencies.topic#using-version-catalog">Ktorバージョンカタログ</a>を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上記のコードスニペットでは、Ktorの依存関係を指定するために<a href="server-dependencies.topic#using-version-catalog">Ktorバージョンカタログ</a>を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
@@ -135,12 +174,12 @@ ProtoBuf をシリアライズ/デシリアライズするには、ビルドス�
 
 ## シリアライザーの設定 {id="configure_serializer"}
 
-### JSON シリアライザー {id="register_json"}
+### JSONシリアライザー {id="register_json"}
 
 <Tabs group="json-libraries">
 <TabItem title="kotlinx.serialization" group-key="kotlinx">
 
-WebSockets の[設定](server-websockets.md#configure)で JSON シリアライザーを登録するには、`Json` パラメーターを使用して `KotlinxWebsocketSerializationConverter` インスタンスを作成し、このインスタンスを `contentConverter` プロパティに割り当てます。
+WebSocketsの[設定](server-websockets.md#configure)でJSONシリアライザーを登録するには、`Json` パラメータを指定して `KotlinxWebsocketSerializationConverter` インスタンスを作成し、このインスタンスを `contentConverter` プロパティに割り当てます:
 
 ```kotlin
 import io.ktor.serialization.kotlinx.*
@@ -154,7 +193,7 @@ install(WebSockets) {
 </TabItem>
 <TabItem title="Gson" group-key="gson">
 
-Gson シリアライザーを登録するには、`GsonWebsocketContentConverter` を `contentConverter` プロパティに割り当てます。
+Gsonシリアライザーを登録するには、`contentConverter` プロパティに `GsonWebsocketContentConverter` を割り当てます:
 ```kotlin
 import io.ktor.serialization.gson.*
 
@@ -166,7 +205,7 @@ install(WebSockets) {
 </TabItem>
 <TabItem title="Jackson" group-key="jackson">
 
-Jackson シリアライザーを登録するには、`JacksonWebsocketContentConverter` を `contentConverter` プロパティに割り当てます。
+Jacksonシリアライザーを登録するには、`contentConverter` プロパティに `JacksonWebsocketContentConverter` を割り当てます:
 
 ```kotlin
 import io.ktor.serialization.jackson.*
@@ -179,9 +218,9 @@ install(WebSockets) {
 </TabItem>
 </Tabs>
 
-### XML シリアライザー {id="register_xml"}
+### XMLシリアライザー {id="register_xml"}
 
-WebSockets の[設定](server-websockets.md#configure)で XML シリアライザーを登録するには、`XML` パラメーターを使用して `KotlinxWebsocketSerializationConverter` インスタンスを作成し、このインスタンスを `contentConverter` プロパティに割り当てます。
+WebSocketsの[設定](server-websockets.md#configure)でXMLシリアライザーを登録するには、`XML` パラメータを指定して `KotlinxWebsocketSerializationConverter` インスタンスを作成し、このインスタンスを `contentConverter` プロパティに割り当てます:
 ```kotlin
 import nl.adaptivity.xmlutil.serialization.*
 
@@ -190,8 +229,8 @@ install(WebSockets) {
 }
 ```
 
-### CBOR シリアライザー {id="register_cbor"}
-WebSockets の[設定](server-websockets.md#configure)で CBOR シリアライザーを登録するには、`Cbor` パラメーターを使用して `KotlinxWebsocketSerializationConverter` インスタンスを作成し、このインスタンスを `contentConverter` プロパティに割り当てます。
+### CBORシリアライザー {id="register_cbor"}
+WebSocketsの[設定](server-websockets.md#configure)でCBORシリアライザーを登録するには、`Cbor` パラメータを指定して `KotlinxWebsocketSerializationConverter` インスタンスを作成し、このインスタンスを `contentConverter` プロパティに割り当てます:
 
 ```kotlin
 import io.ktor.serialization.kotlinx.cbor.*
@@ -201,8 +240,8 @@ install(WebSockets) {
 }
 ```
 
-### ProtoBuf シリアライザー {id="register_protobuf"}
-WebSockets の[設定](server-websockets.md#configure)で ProtoBuf シリアライザーを登録するには、`ProtoBuf` パラメーターを使用して `KotlinxWebsocketSerializationConverter` インスタンスを作成し、このインスタンスを `contentConverter` プロパティに割り当てます。
+### ProtoBufシリアライザー {id="register_protobuf"}
+WebSocketsの[設定](server-websockets.md#configure)でProtoBufシリアライザーを登録するには、`ProtoBuf` パラメータを指定して `KotlinxWebsocketSerializationConverter` インスタンスを作成し、このインスタンスを `contentConverter` プロパティに割り当てます:
 
 ```kotlin
 import kotlinx.serialization.protobuf.*
@@ -215,19 +254,19 @@ install(WebSockets) {
 ## データの受信と送信 {id="receive_send_data"}
 
 ### データクラスの作成 {id="create_data_class"}
-フレームをオブジェクトへとシリアライズ/デシリアライズするには、データクラスを作成する必要があります。例:
+フレームをオブジェクトと相互にシリアライズ/デシリアライズするには、データクラスを作成する必要があります。例えば次のようになります:
 ```kotlin
 data class Customer(val id: Int, val firstName: String, val lastName: String)
 ```
 
-kotlinx.serialization を使用する場合は、このクラスに `@Serializable` アノテーションが付いていることを確認してください。
+kotlinx.serializationを使用する場合は、このクラスに `@Serializable` アノテーションが付与されていることを確認してください:
 ```kotlin
 @Serializable
 data class Customer(val id: Int, val firstName: String, val lastName: String)
 ```
 
 ### データの受信 {id="receive_data"}
-テキストフレームの内容を受信して変換するには、データクラスをパラメーターとして受け取る `receiveDeserialized` 関数を呼び出します。
+テキストフレームのコンテンツを受信して変換するには、データクラスをパラメータとして受け取る `receiveDeserialized` 関数を呼び出します:
 ```kotlin
 webSocket("/customer") {
     val customer = receiveDeserialized<Customer>()
@@ -235,10 +274,10 @@ webSocket("/customer") {
 }
 ```
 
-[incoming](server-websockets.md#api-overview) チャネルからデシリアライズされたフレームを受信するには、[WebsocketContentConverter.deserialize](https://api.ktor.io/ktor-serialization/io.ktor.serialization/-websocket-content-converter/deserialize.html) 関数を使用します。`WebsocketContentConverter` は `WebSocketServerSession.converter` プロパティを介して利用可能です。
+デシリアライズされたフレームを[incoming](server-websockets.md#api-overview)チャネルから受信するには、[WebsocketContentConverter.deserialize](https://api.ktor.io/ktor-serialization/io.ktor.serialization/-websocket-content-converter/deserialize.html) 関数を使用します。`WebsocketContentConverter` は `WebSocketServerSession.converter` プロパティを介して利用できます。
 
 ### データの送信 {id="send_data"}
-[指定されたフォーマット](#configure_serializer)を使用してテキストフレームでデータオブジェクトを渡すには、`sendSerialized` 関数を使用できます。
+[指定したフォーマット](#configure_serializer)を使用してテキストフレームでデータオブジェクトを送信するには、`sendSerialized` 関数を使用できます:
 
 ```kotlin
 webSocket("/customer/1") {
@@ -246,4 +285,4 @@ webSocket("/customer/1") {
 }
 ```
 
-> 完全な例はこちらで確認できます: [server-websockets-serialization](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/server-websockets-serialization)。
+> 完全なサンプルはこちらで確認できます: [server-websockets-serialization](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/server-websockets-serialization)。

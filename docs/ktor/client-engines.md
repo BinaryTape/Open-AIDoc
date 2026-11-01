@@ -6,43 +6,43 @@
 了解处理网络请求的引擎。
 </link-summary>
 
-[Ktor HTTP client](client-create-and-configure.md) 是多平台的，运行在 JVM、[Android](https://kotlinlang.org/docs/android-overview.html)、[JavaScript](https://kotlinlang.org/docs/js-overview.html)（包括 WebAssembly）以及 [Native](https://kotlinlang.org/docs/native-overview.html) 目标平台上。每个平台都需要一个特定的客户端引擎来处理网络请求。
+[Ktor HTTP 客户端](client-create-and-configure.md)是多平台的，可运行在 JVM、[Android](https://kotlinlang.org/docs/android-overview.html)、[JavaScript](https://kotlinlang.org/docs/js-overview.html)（包括 WebAssembly）以及 [Native](https://kotlinlang.org/docs/native-overview.html) 目标上。每个平台都需要特定的客户端引擎来处理网络请求。
 
-Ktor 为不同平台提供了多个引擎。例如，您可以在 JVM 应用程序中使用 `Apache` 或 `Jetty`，在 Android 中使用 `OkHttp` 或 `Android`，在针对 Kotlin/Native 的桌面应用程序中使用 `Curl`。
+Ktor 为不同的平台提供了多种引擎。例如，对于 JVM 应用程序可以使用 `Apache` 或 `Jetty`，对于 Android 可以使用 `OkHttp` 或 `Android`，对于面向 Kotlin/Native 的桌面应用程序可以使用 `Curl`。
 
-每个引擎支持不同的功能和配置选项。对于多平台项目，您可以使用 Ktor 的默认引擎，也可以为各个目标选择特定的引擎。
+每个引擎都支持不同的功能和配置选项。对于多平台项目，你可以使用 Ktor 的默认引擎，也可以为各个目标选择特定的引擎。
 
-## 受支持的平台 {id="platforms"}
+## 支持的平台 {id="platforms"}
 
-下表列出了各引擎支持的[平台](client-supported-platforms.md)：
+下表列出了各个引擎支持的[平台](client-supported-platforms.md)：
 
-| 引擎 | 平台 |
+| 引擎      | 平台                                                                                                              |
 |-----------|-------------------------------------------------------------------------------------------------------------------|
-| `Apache5` | [JVM](#jvm) |
-| `Java` | [JVM](#jvm) |
-| `Jetty` | [JVM](#jvm) |
-| `Android` | [JVM](#jvm), [Android](#jvm-android) |
-| `OkHttp` | [JVM](#jvm), [Android](#jvm-android) |
-| `Darwin` | [Native](#native) |
-| `WinHttp` | [Native](#native) |
-| `Curl` | [Native](#native) |
-| `CIO` | [JVM](#jvm), [Android](#jvm-android), [Native](#native), [JavaScript](#js), [WasmJs](#jvm-android-native-wasm-js) |
-| `Js` | [JavaScript](#js) |
+| `Apache5` | [JVM](#jvm)                                                                                                       |
+| `Java`    | [JVM](#jvm)                                                                                                       |
+| `Jetty`   | [JVM](#jvm)                                                                                                       |
+| `Android` | [JVM](#jvm)、[Android](#jvm-android)                                                                              |
+| `OkHttp`  | [JVM](#jvm)、[Android](#jvm-android)                                                                              |
+| `Darwin`  | [Native](#native)                                                                                                 |
+| `WinHttp` | [Native](#native)                                                                                                 |
+| `Curl`    | [Native](#native)                                                                                                 |
+| `CIO`     | [JVM](#jvm)、[Android](#jvm-android)、[Native](#native)、[JavaScript](#js)、[WasmJs](#jvm-android-native-wasm-js) |
+| `Js`      | [JavaScript](#js)                                                                                                 |
 
-## 受支持的 Android/Java 版本 {id="minimum-version"}
+## 支持的 Android/Java 版本 {id="minimum-version"}
 
-针对 JVM 或同时针对 JVM 和 Android 的客户端引擎支持以下 Android/Java 版本：
+面向 JVM 或同时面向 JVM 和 Android 的客户端引擎支持以下 Android/Java 版本：
 
-| 引擎 | Android 版本 | Java 版本 |
-|-----------|-------------------|--------------|
-| `Apache5` | | 8+ |
-| `Java` | | 11+ |
-| `Jetty` | | 11+ |
-| `CIO` | 7.0+ <sup>*</sup> | 8+ |
-| `Android` | 1.x+ | 8+ |
-| `OkHttp` | 5.0+ | 8+ |
+| 引擎      | Android 版本      | Java 版本 |
+|-----------|-------------------|-----------|
+| `Apache5` |                   | 8+        |
+| `Java`    |                   | 11+       |
+| `Jetty`   |                   | 11+       |
+| `CIO`     | 7.0+ <sup>*</sup> | 8+        |
+| `Android` | 1.x+              | 8+        |
+| `OkHttp`  | 5.0+              | 8+        |
 
-_* 要在较旧的 Android 版本上使用 CIO 引擎，您需要启用 [Java 8 API 脱糖 (desugaring)](https://developer.android.com/studio/write/java8-support)。_
+_* 要在较早的 Android 版本上使用 CIO 引擎，你需要启用 [Java 8 API 脱糖](https://developer.android.com/studio/write/java8-support)。_
 
 ## 添加引擎依赖项 {id="dependencies"}
 
@@ -50,22 +50,23 @@ _* 要在较旧的 Android 版本上使用 CIO 引擎，您需要启用 [Java 8 
 
 ### 使用特定引擎 {id="use-a-specific-engine"}
 
-每个受支持平台都有一组可用的引擎，详见相应章节：
+每个受支持的平台都有一组可用的引擎，在相应小节中进行了介绍：
 
 * [JVM](#jvm)
 * [JVM 和 Android](#jvm-android)
 * [JavaScript](#js)
 * [Native](#native)
 
-> Ktor 提供了带有 `-jvm` 或 `-js` 等后缀的平台专用构件。例如，`ktor-client-cio-jvm`。依赖项解析因构建工具而异。虽然 Gradle 会解析适用于给定平台的构件，但 Maven 不支持此功能。这意味着对于 Maven，您需要手动指定平台后缀。
+> Ktor 提供了带有后缀（例如 `-jvm` 或 `-js`）的平台专属构件。例如 `ktor-client-cio-jvm`。
+> 依赖项解析因构建工具而异。Gradle 能够解析适用于给定平台的构件，而 Maven 则不支持此功能。这意味着对于 Maven，你需要手动指定平台后缀。
 >
 {type="note"}
 
 ### 在多平台项目中使用默认引擎 {id="default-engines"}
 
-对于大多数 Kotlin Multiplatform 项目，请使用 `ktor-client-engine-defaults` 构件。它为每个目标平台提供了一个精选的客户端引擎，因此您无需在平台专用源集中单独声明引擎依赖项。
+对于大多数 Kotlin 多平台项目，请使用 `ktor-client-engine-defaults` 构件。它为每个目标平台提供了精选的客户端引擎，因此你无需在特定于平台的源集中声明单独的引擎依赖项。
 
-将 `ktor-client-engine-defaults` 构件添加到您的 `commonMain` 源集中：
+将 `ktor-client-engine-defaults` 构件添加到你的 `commonMain` 源集中：
 
 ```kotlin
 kotlin {
@@ -92,7 +93,7 @@ val client = HttpClient(CIO)
 
 ## 自动选择引擎 {id="default"}
 
-如果省略引擎参数，客户端将根据[构建脚本中的可用引擎依赖项](#dependencies)自动选择引擎。
+如果省略引擎实参，客户端会自动从[构建脚本中](#dependencies)可用的引擎依赖项中选择引擎。
 
 ```kotlin
 import io.ktor.client.*
@@ -100,15 +101,15 @@ import io.ktor.client.*
 val client = HttpClient()
 ```
 
-如果目标平台只有一个可用引擎，Ktor 将使用该引擎。如果有多个可用引擎，Ktor 会选择优先级最高的引擎。
+如果目标平台只有一个可用引擎，Ktor 会使用该引擎。如果有多个可用引擎，Ktor 会选择优先级最高的引擎。
 
-默认情况下，`CIO` 优先级最低。这意味着如果同一平台上同时存在 `CIO` 和另一个受支持的引擎，Ktor 会选择另一个引擎。仅当没有更高优先级的引擎可用时，才会使用 `CIO`。
+默认情况下，`CIO` 的优先级最低。这意味着如果同一平台上有 `CIO` 和另一个受支持的引擎可用，Ktor 会选择另一个引擎。仅当没有更高优先级的引擎可用时，才会使用 `CIO`。
 
-对于 Kotlin Multiplatform 项目，[`ktor-client-engine-defaults` 依赖项](#default-engines)会为每个目标提供一个默认引擎。或者，您也可以将[特定引擎依赖项添加](#use-a-specific-engine)到相应的平台源集中。
+对于 Kotlin 多平台项目，[`ktor-client-engine-defaults` 依赖项](#default-engines)为每个目标提供了一个默认引擎。或者，你也可以向相应的平台源集中[添加特定引擎的依赖项](#use-a-specific-engine)。
 
 ## 配置引擎 {id="configure"}
 
-要配置引擎，请使用 `engine {}` 函数。所有引擎都可以使用 [`HttpClientEngineConfig`](https://api.ktor.io/ktor-client-core/io.ktor.client.engine/-http-client-engine-config/index.html) 中的通用选项进行配置：
+要配置引擎，请使用 `engine {}` 函数。所有引擎都可以使用来自 [`HttpClientEngineConfig`](https://api.ktor.io/ktor-client-core/io.ktor.client.engine/-http-client-engine-config/index.html) 的通用选项进行配置：
 
 ```kotlin
 HttpClient() {
@@ -120,7 +121,7 @@ HttpClient() {
 }
 ```
 
-在接下来的章节中，您可以了解如何为不同平台配置特定的引擎。
+在接下来的各节中，你可以了解如何针对不同平台配置特定引擎。
 
 ## JVM {id="jvm"}
 
@@ -128,28 +129,36 @@ JVM 目标支持 [`Apache5`](#apache5)、[`Java`](#java) 和 [`Jetty`](#jetty) �
 
 ### Apache5 {id="apache5"}
 
-`Apache5` 引擎同时支持 HTTP/1.1 和 HTTP/2，且默认启用 HTTP/2。这是针对新项目推荐的基于 Apache 的引擎。
+`Apache5` 引擎同时支持 HTTP/1.1 和 HTTP/2，其中 HTTP/2 默认启用。对于新项目，推荐使用该基于 Apache 的引擎。
 
-> 较旧的 `Apache` 引擎依赖于已弃用的 Apache HttpClient 4。保留它仅为了向后兼容。对于所有新项目，请使用 `Apache5`。
+> 较旧的 `Apache` 引擎依赖于已弃用的 Apache HttpClient 4。
+> 保留它仅为了向后兼容。对于所有新项目，请使用 `Apache5`。
 >
 {style="note"}
 
 1. 添加 `ktor-client-apache5` 依赖项：
 
    <var name="artifact_name" value="ktor-client-apache5"/>
+   <var name="ktor_version_catalog_name" value="ktorLibs.client.apache5"/>
    <Tabs group="languages">
        <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-           <code-block lang="Kotlin" code="               implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+           <code-block lang="Kotlin" code="               implementation(%ktor_version_catalog_name%)"/>
+           <note>
+               上述代码片段使用 <a href="server-dependencies.topic#using-version-catalog">Ktor 版本目录</a> 来指定 Ktor 依赖项。
+           </note>
        </TabItem>
        <TabItem title="Gradle (Groovy)" group-key="groovy">
-           <code-block lang="Groovy" code="               implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+           <code-block lang="Groovy" code="               implementation %ktor_version_catalog_name%"/>
+           <note>
+               上述代码片段使用 <a href="server-dependencies.topic#using-version-catalog">Ktor 版本目录</a> 来指定 Ktor 依赖项。
+           </note>
        </TabItem>
        <TabItem title="Maven" group-key="maven">
            <code-block lang="XML" code="               &lt;dependency&gt;&#10;                   &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                   &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                   &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;               &lt;/dependency&gt;"/>
        </TabItem>
    </Tabs>
 
-2. 将 `Apache5` 类作为参数传递给 `HttpClient` 构造函数：
+2. 将 `Apache5` 类作为实参传递给 `HttpClient` 构造函数：
 
    ```kotlin
    import io.ktor.client.*
@@ -179,14 +188,14 @@ JVM 目标支持 [`Apache5`](#apache5)、[`Java`](#java) 和 [`Jetty`](#jetty) �
                setMaxConnTotal(2_000)
            }
    
-           // 自定义底层 Apache 客户端的其他设置
+           // 自定义底层 Apache 客户端以配置其他设置
            customizeClient {
                // this: HttpAsyncClientBuilder
                setProxy(HttpHost("127.0.0.1", 8080))
                // ...
            }
    
-           // 自定义每个请求的设置
+           // 自定义针对单次请求的设置
            customizeRequest {
                // this: RequestConfig.Builder
            }
@@ -194,35 +203,42 @@ JVM 目标支持 [`Apache5`](#apache5)、[`Java`](#java) 和 [`Jetty`](#jetty) �
    }
    ```
 
-   - 使用 `configureConnectionManager` 进行连接管理器设置，例如最大连接数。这会保留 Ktor 管理的引擎行为。
+   - 将 `configureConnectionManager` 用于连接管理器设置，例如最大连接数。这可以保留 Ktor 管理的引擎行为。
    - 仅将 `customizeClient` 用于与连接管理器无关的设置，例如代理、拦截器或日志记录。
 
 ### Java {id="java"}
 
-`Java` 引擎使用 Java 11 中引入的 [Java HTTP Client](https://openjdk.java.net/groups/net/httpclient/intro.html)。要使用它，请按以下步骤操作：
+`Java` 引擎使用 Java 11 中引入的 [Java HTTP Client](https://openjdk.java.net/groups/net/httpclient/intro.html)。要使用它，请按照以下步骤操作：
 
 1. 添加 `ktor-client-java` 依赖项：
 
    <var name="artifact_name" value="ktor-client-java"/>
+   <var name="ktor_version_catalog_name" value="ktorLibs.client.java"/>
    <Tabs group="languages">
        <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-           <code-block lang="Kotlin" code="               implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+           <code-block lang="Kotlin" code="               implementation(%ktor_version_catalog_name%)"/>
+           <note>
+               上述代码片段使用 <a href="server-dependencies.topic#using-version-catalog">Ktor 版本目录</a> 来指定 Ktor 依赖项。
+           </note>
        </TabItem>
        <TabItem title="Gradle (Groovy)" group-key="groovy">
-           <code-block lang="Groovy" code="               implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+           <code-block lang="Groovy" code="               implementation %ktor_version_catalog_name%"/>
+           <note>
+               上述代码片段使用 <a href="server-dependencies.topic#using-version-catalog">Ktor 版本目录</a> 来指定 Ktor 依赖项。
+           </note>
        </TabItem>
        <TabItem title="Maven" group-key="maven">
            <code-block lang="XML" code="               &lt;dependency&gt;&#10;                   &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                   &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                   &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;               &lt;/dependency&gt;"/>
        </TabItem>
    </Tabs>
-2. 将 [Java](https://api.ktor.io/ktor-client-java/io.ktor.client.engine.java/-java/index.html) 类作为参数传递给 `HttpClient` 构造函数：
+2. 将 [Java](https://api.ktor.io/ktor-client-java/io.ktor.client.engine.java/-java/index.html) 类作为实参传递给 `HttpClient` 构造函数：
    ```kotlin
    import io.ktor.client.*
    import io.ktor.client.engine.java.*
    
    val client = HttpClient(Java)
    ```
-3. 要配置引擎，在 `engine {}` 块中设置 [`JavaHttpConfig`](https://api.ktor.io/ktor-client-java/io.ktor.client.engine.java/-java-http-config/index.html) 的属性：
+3. 要配置引擎，请在 `engine {}` 块中设置来自 [`JavaHttpConfig`](https://api.ktor.io/ktor-client-java/io.ktor.client.engine.java/-java-http-config/index.html) 的属性：
    ```kotlin
    import io.ktor.client.*
    import io.ktor.client.engine.*
@@ -241,30 +257,37 @@ JVM 目标支持 [`Apache5`](#apache5)、[`Java`](#java) 和 [`Jetty`](#jetty) �
 
 ### Jetty {id="jetty"}
 
-`Jetty` 引擎仅支持 HTTP/2，可以按以下方式配置：
+`Jetty` 引擎仅支持 HTTP/2，可以通过以下方式进行配置：
 
 1. 添加 `ktor-client-jetty-jakarta` 依赖项：
 
    <var name="artifact_name" value="ktor-client-jetty-jakarta"/>
+   <var name="ktor_version_catalog_name" value="ktorLibs.client.jetty"/>
    <Tabs group="languages">
        <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-           <code-block lang="Kotlin" code="               implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+           <code-block lang="Kotlin" code="               implementation(%ktor_version_catalog_name%)"/>
+           <note>
+               上述代码片段使用 <a href="server-dependencies.topic#using-version-catalog">Ktor 版本目录</a> 来指定 Ktor 依赖项。
+           </note>
        </TabItem>
        <TabItem title="Gradle (Groovy)" group-key="groovy">
-           <code-block lang="Groovy" code="               implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+           <code-block lang="Groovy" code="               implementation %ktor_version_catalog_name%"/>
+           <note>
+               上述代码片段使用 <a href="server-dependencies.topic#using-version-catalog">Ktor 版本目录</a> 来指定 Ktor 依赖项。
+           </note>
        </TabItem>
        <TabItem title="Maven" group-key="maven">
            <code-block lang="XML" code="               &lt;dependency&gt;&#10;                   &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                   &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                   &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;               &lt;/dependency&gt;"/>
        </TabItem>
    </Tabs>
-2. 将 [`Jetty`](https://api.ktor.io/ktor-client-jetty-jakarta/io.ktor.client.engine.jetty.jakarta/-jetty/index.html) 类作为参数传递给 `HttpClient` 构造函数：
+2. 将 [`Jetty`](https://api.ktor.io/ktor-client-jetty-jakarta/io.ktor.client.engine.jetty.jakarta/-jetty/index.html) 类作为实参传递给 `HttpClient` 构造函数：
    ```kotlin
    import io.ktor.client.*
    import io.ktor.client.engine.jetty.jakarta.*
    
    val client = HttpClient(Jetty)
    ```
-3. 要配置引擎，在 `engine {}` 块中设置 [`JettyEngineConfig`](https://api.ktor.io/ktor-client-jetty-jakarta/io.ktor.client.engine.jetty.jakarta/-jetty-engine-config/index.html) 的属性：
+3. 要配置引擎，请在 `engine {}` 块中设置来自 [`JettyEngineConfig`](https://api.ktor.io/ktor-client-jetty-jakarta/io.ktor.client.engine.jetty.jakarta/-jetty-engine-config/index.html) 的属性：
    ```kotlin
    import io.ktor.client.*
    import io.ktor.client.engine.jetty.jakarta.*
@@ -285,30 +308,37 @@ JVM 目标支持 [`Apache5`](#apache5)、[`Java`](#java) 和 [`Jetty`](#jetty) �
 
 ### Android {id="android"}
 
-`Android` 引擎针对 Android 平台，可以按以下方式配置：
+`Android` 引擎面向 Android，可以通过以下方式进行配置：
 
 1. 添加 `ktor-client-android` 依赖项：
 
    <var name="artifact_name" value="ktor-client-android"/>
+   <var name="ktor_version_catalog_name" value="ktorLibs.client.android"/>
    <Tabs group="languages">
        <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-           <code-block lang="Kotlin" code="               implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+           <code-block lang="Kotlin" code="               implementation(%ktor_version_catalog_name%)"/>
+           <note>
+               上述代码片段使用 <a href="server-dependencies.topic#using-version-catalog">Ktor 版本目录</a> 来指定 Ktor 依赖项。
+           </note>
        </TabItem>
        <TabItem title="Gradle (Groovy)" group-key="groovy">
-           <code-block lang="Groovy" code="               implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+           <code-block lang="Groovy" code="               implementation %ktor_version_catalog_name%"/>
+           <note>
+               上述代码片段使用 <a href="server-dependencies.topic#using-version-catalog">Ktor 版本目录</a> 来指定 Ktor 依赖项。
+           </note>
        </TabItem>
        <TabItem title="Maven" group-key="maven">
            <code-block lang="XML" code="               &lt;dependency&gt;&#10;                   &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                   &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                   &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;               &lt;/dependency&gt;"/>
        </TabItem>
    </Tabs>
-2. 将 [`Android`](https://api.ktor.io/ktor-client-android/io.ktor.client.engine.android/-android/index.html) 类作为参数传递给 `HttpClient` 构造函数：
+2. 将 [`Android`](https://api.ktor.io/ktor-client-android/io.ktor.client.engine.android/-android/index.html) 类作为实参传递给 `HttpClient` 构造函数：
    ```kotlin
    import io.ktor.client.*
    import io.ktor.client.engine.android.*
    
    val client = HttpClient(Android)
    ```
-3. 要配置引擎，在 `engine {}` 块中设置 [`AndroidEngineConfig`](https://api.ktor.io/ktor-client-android/io.ktor.client.engine.android/-android-engine-config/index.html) 的属性：
+3. 要配置引擎，请在 `engine {}` 块中设置来自 [`AndroidEngineConfig`](https://api.ktor.io/ktor-client-android/io.ktor.client.engine.android/-android-engine-config/index.html) 的属性：
    ```kotlin
    import io.ktor.client.*
    import io.ktor.client.engine.android.*
@@ -327,30 +357,37 @@ JVM 目标支持 [`Apache5`](#apache5)、[`Java`](#java) 和 [`Jetty`](#jetty) �
 
 ### OkHttp {id="okhttp"}
 
-`OkHttp` 引擎基于 OkHttp，可以按以下方式配置：
+`OkHttp` 引擎基于 OkHttp，可以通过以下方式进行配置：
 
 1. 添加 `ktor-client-okhttp` 依赖项：
 
    <var name="artifact_name" value="ktor-client-okhttp"/>
+   <var name="ktor_version_catalog_name" value="ktorLibs.client.okhttp"/>
    <Tabs group="languages">
        <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-           <code-block lang="Kotlin" code="               implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+           <code-block lang="Kotlin" code="               implementation(%ktor_version_catalog_name%)"/>
+           <note>
+               上述代码片段使用 <a href="server-dependencies.topic#using-version-catalog">Ktor 版本目录</a> 来指定 Ktor 依赖项。
+           </note>
        </TabItem>
        <TabItem title="Gradle (Groovy)" group-key="groovy">
-           <code-block lang="Groovy" code="               implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+           <code-block lang="Groovy" code="               implementation %ktor_version_catalog_name%"/>
+           <note>
+               上述代码片段使用 <a href="server-dependencies.topic#using-version-catalog">Ktor 版本目录</a> 来指定 Ktor 依赖项。
+           </note>
        </TabItem>
        <TabItem title="Maven" group-key="maven">
            <code-block lang="XML" code="               &lt;dependency&gt;&#10;                   &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                   &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                   &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;               &lt;/dependency&gt;"/>
        </TabItem>
    </Tabs>
-2. 将 [`OkHttp`](https://api.ktor.io/ktor-client-okhttp/io.ktor.client.engine.okhttp/-ok-http/index.html) 类作为参数传递给 `HttpClient` 构造函数：
+2. 将 [`OkHttp`](https://api.ktor.io/ktor-client-okhttp/io.ktor.client.engine.okhttp/-ok-http/index.html) 类作为实参传递给 `HttpClient` 构造函数：
    ```kotlin
    import io.ktor.client.*
    import io.ktor.client.engine.okhttp.*
    
    val client = HttpClient(OkHttp)
    ```
-3. 要配置引擎，在 `engine {}` 块中设置 [`OkHttpConfig`](https://api.ktor.io/ktor-client-okhttp/io.ktor.client.engine.okhttp/-ok-http-config/index.html) 的属性：
+3. 要配置引擎，请在 `engine {}` 块中设置来自 [`OkHttpConfig`](https://api.ktor.io/ktor-client-okhttp/io.ktor.client.engine.okhttp/-ok-http-config/index.html) 的属性：
    ```kotlin
    import io.ktor.client.*
    import io.ktor.client.engine.okhttp.*
@@ -374,15 +411,15 @@ JVM 目标支持 [`Apache5`](#apache5)、[`Java`](#java) 和 [`Jetty`](#jetty) �
 
 ## Native {id="native"}
 
-Ktor 为 [Kotlin/Native](https://kotlinlang.org/docs/native-overview.html) 目标平台提供了 [`Darwin`](#darwin)、[`WinHttp`](#winhttp) 和 [`Curl`](#curl) 引擎。
+Ktor 为 [Kotlin/Native](https://kotlinlang.org/docs/native-overview.html) 目标提供了 [`Darwin`](#darwin)、[`WinHttp`](#winhttp) 和 [`Curl`](#curl) 引擎。
 
-> 在 Kotlin/Native 项目中使用 Ktor 需要[新内存管理器](https://kotlinlang.org/docs/native-memory-manager.html)，从 Kotlin 1.7.20 开始默认启用。
+> 在 Kotlin/Native 项目中使用 Ktor 需要[新的内存管理器](https://kotlinlang.org/docs/native-memory-manager.html)，从 Kotlin 1.7.20 开始默认启用该管理器。
 >
 {id="newmm-note" style="note"}
 
 ### Darwin {id="darwin"}
 
-`Darwin` 引擎针对[基于 Darwin 的](https://en.wikipedia.org/wiki/Darwin_(operating_system))操作系统，如 macOS、iOS、tvOS 和 watchOS。它在底层使用 [`NSURLSession`](https://developer.apple.com/documentation/foundation/nsurlsession)。要使用 `Darwin` 引擎，请按以下步骤操作：
+`Darwin` 引擎面向[基于 Darwin 的](https://en.wikipedia.org/wiki/Darwin_(operating_system))操作系统，例如 macOS、iOS、tvOS 和 watchOS。其底层使用 [`NSURLSession`](https://developer.apple.com/documentation/foundation/nsurlsession)。要使用 `Darwin` 引擎，请按照以下步骤操作：
 
 1. 添加 `ktor-client-darwin` 依赖项：
 
@@ -399,14 +436,14 @@ Ktor 为 [Kotlin/Native](https://kotlinlang.org/docs/native-overview.html) 目�
            <code-block lang="XML" code="               &lt;dependency&gt;&#10;                   &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                   &lt;artifactId&gt;%artifact_name%%target%&lt;/artifactId&gt;&#10;                   &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;               &lt;/dependency&gt;"/>
        </TabItem>
    </Tabs>
-2. 将 `Darwin` 类作为参数传递给 `HttpClient` 构造函数：
+2. 将 `Darwin` 类作为实参传递给 `HttpClient` 构造函数：
    ```kotlin
    import io.ktor.client.*
    import io.ktor.client.engine.darwin.*
    
    val client = HttpClient(Darwin)
    ```
-3. 在 `engine {}` 块中使用 [`DarwinClientEngineConfig`](https://api.ktor.io/ktor-client-darwin/io.ktor.client.engine.darwin/-darwin-client-engine-config/index.html) 配置引擎。例如，您可以使用 `configureRequest` 自定义请求或使用 `configureSession` 自定义会话：
+3. 在 `engine {}` 块中使用 [`DarwinClientEngineConfig`](https://api.ktor.io/ktor-client-darwin/io.ktor.client.engine.darwin/-darwin-client-engine-config/index.html) 配置引擎。例如，你可以使用 `configureRequest` 自定义请求，或者使用 `configureSession` 自定义会话：
    ```kotlin
    val client = HttpClient(Darwin) {
        engine {
@@ -417,11 +454,11 @@ Ktor 为 [Kotlin/Native](https://kotlinlang.org/docs/native-overview.html) 目�
    }
    ```
 
-   完整示例请参阅 [client-engine-darwin](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-engine-darwin)。
+   有关完整示例，请参阅 [client-engine-darwin](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-engine-darwin)。
 
 ### WinHttp {id="winhttp"}
 
-`WinHttp` 引擎针对基于 Windows 的操作系统。要使用 `WinHttp` 引擎，请按以下步骤操作：
+`WinHttp` 引擎面向基于 Windows 的操作系统。要使用 `WinHttp` 引擎，请按照以下步骤操作：
 
 1. 添加 `ktor-client-winhttp` 依赖项：
 
@@ -438,14 +475,14 @@ Ktor 为 [Kotlin/Native](https://kotlinlang.org/docs/native-overview.html) 目�
            <code-block lang="XML" code="               &lt;dependency&gt;&#10;                   &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                   &lt;artifactId&gt;%artifact_name%%target%&lt;/artifactId&gt;&#10;                   &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;               &lt;/dependency&gt;"/>
        </TabItem>
    </Tabs>
-2. 将 `WinHttp` 类作为参数传递给 `HttpClient` 构造函数：
+2. 将 `WinHttp` 类作为实参传递给 `HttpClient` 构造函数：
    ```kotlin
    import io.ktor.client.*
    import io.ktor.client.engine.winhttp.*
    
    val client = HttpClient(WinHttp)
    ```
-3. 在 `engine {}` 块中使用 [`WinHttpClientEngineConfig`](https://api.ktor.io/ktor-client-winhttp/io.ktor.client.engine.winhttp/-win-http-client-engine-config/index.html) 配置引擎。例如，您可以使用 `protocolVersion` 属性更改 HTTP 版本：
+3. 在 `engine {}` 块中使用 [`WinHttpClientEngineConfig`](https://api.ktor.io/ktor-client-winhttp/io.ktor.client.engine.winhttp/-win-http-client-engine-config/index.html) 配置引擎。例如，你可以使用 `protocolVersion` 属性来更改 HTTP 版本：
    ```kotlin
    val client = HttpClient(WinHttp) {
        engine {
@@ -454,11 +491,11 @@ Ktor 为 [Kotlin/Native](https://kotlinlang.org/docs/native-overview.html) 目�
    }
    ```
 
-   完整示例请参阅 [client-engine-winhttp](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-engine-winhttp)。
+   有关完整示例，请参阅 [client-engine-winhttp](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-engine-winhttp).
 
 ### Curl {id="curl"}
 
-对于桌面平台，Ktor 提供了 `Curl` 引擎。它在 `linuxX64`、`linuxArm64`、`macosX64`、`macosArm64` 和 `mingwX64` 上受支持。要使用 `Curl` 引擎，请按以下步骤操作：
+对于桌面平台，Ktor 提供了 `Curl` 引擎。它在 `linuxX64`、`linuxArm64`、`macosX64`、`macosArm64` 和 `mingwX64` 上受支持。要使用 `Curl` 引擎，请按照以下步骤操作：
 
 1. 添加 `ktor-client-curl` 依赖项：
 
@@ -475,7 +512,7 @@ Ktor 为 [Kotlin/Native](https://kotlinlang.org/docs/native-overview.html) 目�
            <code-block lang="XML" code="               &lt;dependency&gt;&#10;                   &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                   &lt;artifactId&gt;%artifact_name%%target%&lt;/artifactId&gt;&#10;                   &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;               &lt;/dependency&gt;"/>
        </TabItem>
    </Tabs>
-2. 将 `Curl` 类作为参数传递给 `HttpClient` 构造函数：
+2. 将 `Curl` 类作为实参传递给 `HttpClient` 构造函数：
    ```kotlin
    import io.ktor.client.*
    import io.ktor.client.engine.curl.*
@@ -492,29 +529,36 @@ Ktor 为 [Kotlin/Native](https://kotlinlang.org/docs/native-overview.html) 目�
    }
    ```
 
-   完整示例请参阅 [client-engine-curl](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-engine-curl)。
+   有关完整示例，请参阅 [client-engine-curl](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-engine-curl)。
 
-## JVM, Android, Native, JS 和 WasmJs {id="jvm-android-native-wasm-js"}
+## JVM、Android、Native、JS 和 WasmJs {id="jvm-android-native-wasm-js"}
 
 ### CIO {id="cio"}
 
-CIO 引擎是一个完全异步的基于协程的引擎，可在 JVM、Android、Native、JavaScript 和 WebAssembly JavaScript (WasmJs) 平台上使用。它目前仅支持 HTTP/1.x。要使用它，请按以下步骤操作：
+CIO 引擎是一个完全异步、基于协程的引擎，可在 JVM、Android、Native、JavaScript 和 WebAssembly JavaScript (WasmJs) 平台上使用。它目前仅支持 HTTP/1.x。要使用它，请按照以下步骤操作：
 
 1. 添加 `ktor-client-cio` 依赖项：
 
    <var name="artifact_name" value="ktor-client-cio"/>
+   <var name="ktor_version_catalog_name" value="ktorLibs.client.cio"/>
    <Tabs group="languages">
        <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-           <code-block lang="Kotlin" code="               implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+           <code-block lang="Kotlin" code="               implementation(%ktor_version_catalog_name%)"/>
+           <note>
+               上述代码片段使用 <a href="server-dependencies.topic#using-version-catalog">Ktor 版本目录</a> 来指定 Ktor 依赖项。
+           </note>
        </TabItem>
        <TabItem title="Gradle (Groovy)" group-key="groovy">
-           <code-block lang="Groovy" code="               implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+           <code-block lang="Groovy" code="               implementation %ktor_version_catalog_name%"/>
+           <note>
+               上述代码片段使用 <a href="server-dependencies.topic#using-version-catalog">Ktor 版本目录</a> 来指定 Ktor 依赖项。
+           </note>
        </TabItem>
        <TabItem title="Maven" group-key="maven">
            <code-block lang="XML" code="               &lt;dependency&gt;&#10;                   &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                   &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                   &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;               &lt;/dependency&gt;"/>
        </TabItem>
    </Tabs>
-2. 将 [`CIO`](https://api.ktor.io/ktor-client-cio/io.ktor.client.engine.cio/-c-i-o/index.html) 类作为参数传递给 `HttpClient` 构造函数：
+2. 将 [`CIO`](https://api.ktor.io/ktor-client-cio/io.ktor.client.engine.cio/-c-i-o/index.html) 类作为实参传递给 `HttpClient` 构造函数：
    ```kotlin
    import io.ktor.client.*
    import io.ktor.client.engine.cio.*
@@ -560,7 +604,7 @@ CIO 引擎是一个完全异步的基于协程的引擎，可在 JVM、Android�
 
 `Js` 引擎可用于 [Kotlin/JS](https://kotlinlang.org/docs/js-overview.html) 项目。它在浏览器应用程序中使用 [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)，在 Node.js 中使用 `node-fetch`。
 
-要使用 `Js` 引擎，请按以下步骤操作：
+要使用 `Js` 引擎，请按照以下步骤操作：
 
 1. 添加 `ktor-client-js` 依赖项：
 
@@ -577,7 +621,7 @@ CIO 引擎是一个完全异步的基于协程的引擎，可在 JVM、Android�
            <code-block lang="XML" code="               &lt;dependency&gt;&#10;                   &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                   &lt;artifactId&gt;%artifact_name%%target%&lt;/artifactId&gt;&#10;                   &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;               &lt;/dependency&gt;"/>
        </TabItem>
    </Tabs>
-2. 将 `Js` 类作为参数传递给 `HttpClient()` 构造函数：
+2. 将 `Js` 类作为实参传递给 `HttpClient()` 构造函数：
    ```kotlin
    import io.ktor.client.*
    import io.ktor.client.engine.js.*
@@ -592,7 +636,7 @@ CIO 引擎是一个完全异步的基于协程的引擎，可在 JVM、Android�
    val client = JsClient()
    ```
 
-   > 完整示例请参阅 [client-engine-js](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-engine-js)。
+   > 有关完整示例，请参阅 [client-engine-js](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-engine-js)。
    > 
    {style="tip"}
 
@@ -612,30 +656,30 @@ val client = HttpClient(Js) {
 
 在与提供自定义 `fetch()` 实现或包装器的 JavaScript 库集成时，这非常有用。
 
-## 限制 {id="limitations"}
+## 局限性 {id="limitations"}
 
-### HTTP/2 和 WebSockets {id="http-2-and-websockets"}
+### HTTP/2 与 WebSockets {id="http-2-and-websockets"}
 
-并非所有引擎都支持 HTTP/2 协议。如果某个引擎支持 HTTP/2，您可以在该引擎的配置中启用它。例如，使用 [Java](#java) 引擎。
+并非所有引擎都支持 HTTP/2 协议。如果某个引擎支持 HTTP/2，你可以在该引擎的配置中启用它。例如 [Java](#java) 引擎。
 
-下表显示了特定引擎是否支持 HTTP/2 和 [WebSockets](client-websockets.topic)：
+下表展示了特定引擎是否支持 HTTP/2 和 [WebSockets](client-websockets.topic)：
 
-| 引擎 | HTTP/2 | WebSockets |
+| 引擎      | HTTP/2 | WebSockets |
 |-----------|--------|------------|
-| `Apache5` | ✅️ | ✖️ |
-| `Java` | ✅ | ✅️ |
-| `Jetty` | ✅ | ✖️ |
-| `CIO` | ✖️ | ✅ |
-| `Android` | ✖️ | ✖️ |
-| `OkHttp` | ✅ | ✅ |
-| `Js` | ✅ | ✅ |
-| `Darwin` | ✅ | ✅ |
-| `WinHttp` | ✅ | ✅ |
-| `Curl` | ✅ | ✅ |
+| `Apache5` | ✅️     | ✖️         |
+| `Java`    | ✅      | ✅️         |
+| `Jetty`   | ✅      | ✖️         |
+| `CIO`     | ✖️     | ✅          |
+| `Android` | ✖️     | ✖️         |
+| `OkHttp`  | ✅      | ✅          |
+| `Js`      | ✅      | ✅          |
+| `Darwin`  | ✅      | ✅          |
+| `WinHttp` | ✅      | ✅          |
+| `Curl`    | ✅      | ✅          |
 
 ### 安全性 {id="security"}
 
-[SSL](client-ssl.md) 必须针对每个引擎进行配置。每个引擎都提供自己的 SSL 配置选项。
+[SSL](client-ssl.md) 必须按引擎分别配置。每个引擎都提供了各自的 SSL 配置选项。
 
 ### 代理支持 {id="proxy-support"}
 
@@ -647,21 +691,21 @@ val client = HttpClient(Js) {
 
 ### 超时 {id="timeout"}
 
-[HttpTimeout](client-timeout.md) 插件在某些引擎上有一些限制。完整列表请参阅[超时限制](client-timeout.md#limitations)。
+[HttpTimeout](client-timeout.md) 插件在某些引擎上存在一些局限性。完整列表请参阅[超时局限性](client-timeout.md#limitations)。
 
-## 示例：如何在多平台移动项目中配置引擎 {id="mpp-config"}
+## 示例：如何在多平台移动端项目中配置引擎 {id="mpp-config"}
 
-在构建多平台项目时，您可以使用 [expect 和 actual 声明](https://kotlinlang.org/docs/multiplatform-mobile-connect-to-platform-specific-apis.html)为每个目标平台选择并配置引擎。这允许您在公共代码中共享大部分客户端配置，同时在平台代码中应用特定于引擎的选项。
-我们将使用在[创建跨平台移动应用程序](client-create-multiplatform-application.md)教程中创建的项目来演示如何实现这一点：
+在构建多平台项目时，你可以使用 [expect 与 actual 声明](https://kotlinlang.org/docs/multiplatform-mobile-connect-to-platform-specific-apis.html)为每个目标平台选择并配置引擎。这样你就可以在公共代码中共享大部分客户端配置，同时在平台代码中应用特定于引擎的选项。
+我们将演示如何使用在[创建跨平台移动应用程序](client-create-multiplatform-application.md)教程中创建的项目来实现这一点：
 
 <procedure>
 
-1. 打开 **shared/src/commonMain/kotlin/com/example/kmpktor/Platform.kt** 文件，添加一个顶层的 `httpClient()` 函数，该函数接受一个配置块并返回一个 `HttpClient`：
+1. 打开 **shared/src/commonMain/kotlin/com/example/kmpktor/Platform.kt** 文件，并添加一个接受配置块并返回 `HttpClient` 的顶层 `httpClient()` 函数：
    ```kotlin
    expect fun httpClient(config: HttpClientConfig<*>.() -> Unit = {}): HttpClient
    ```
 
-2. 打开 **shared/src/androidMain/kotlin/com/example/kmpktor/Platform.kt**，为 Android 模块添加 `httpClient()` 函数的 actual 声明：
+2. 打开 **shared/src/androidMain/kotlin/com/example/kmpktor/Platform.kt**，并为 Android 模块添加 `httpClient()` 函数的 actual 声明：
    ```kotlin
    import io.ktor.client.*
    import io.ktor.client.engine.okhttp.*
@@ -679,11 +723,11 @@ val client = HttpClient(Js) {
    }
    ```
 
-   > 此示例展示了如何配置 [`OkHttp`](#okhttp) 引擎，但您也可以使用[支持 Android 的其他引擎](#jvm-android)。
+   > 本示例演示了如何配置 [`OkHttp`](#okhttp) 引擎，但你也可以使用[针对 Android 受支持的其他引擎](#jvm-android)。
    >
    {style="tip"}
 
-3. 打开 **shared/src/iosMain/kotlin/com/example/kmpktor/Platform.kt**，为 iOS 模块添加 `httpClient()` 函数的 actual 声明：
+3. 打开 **shared/src/iosMain/kotlin/com/example/kmpktor/Platform.kt**，并为 iOS 模块添加 `httpClient()` 函数的 actual 声明：
    ```kotlin
    import io.ktor.client.*
    import io.ktor.client.engine.darwin.*
@@ -697,9 +741,9 @@ val client = HttpClient(Js) {
       }
    }
    ```
-   现在您可以在公共代码中调用 `httpClient()`，而无需担心使用了哪个引擎。
+   现在你可以在共享代码中调用 `httpClient()`，而无需关心使用的是哪个引擎。
 
-4. 要在公共代码中使用该客户端，请打开 **shared/src/commonMain/kotlin/com/example/kmpktor/Greeting.kt**，并将 `HttpClient()` 构造函数替换为 `httpClient()` 函数调用：
+4. 要在共享代码中使用该客户端，请打开 **shared/src/commonMain/kotlin/com/example/kmpktor/Greeting.kt**，并将 `HttpClient()` 构造函数替换为 `httpClient()` 函数调用：
    ```kotlin
    private val client = httpClient()
    ```

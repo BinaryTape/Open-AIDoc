@@ -15,37 +15,45 @@
 WARアーカイブを使用して、サーブレットコンテナ内でKtorアプリケーションを実行およびデプロイする方法を学びます。
 </link-summary>
 
-TomcatやJettyなどのサーブレットコンテナ内でKtorアプリケーションを実行できます。これを行うには、アプリケーションをWARアーカイブとしてパッケージ化し、WARデプロイをサポートするサーバーまたはクラウドサービスにデプロイする必要があります。
+Ktorアプリケーションは、TomcatやJettyなどのサーブレットコンテナ内で実行できます。これを行うには、アプリケーションをWARアーカイブとしてパッケージ化し、WARのデプロイに対応しているサーバーやクラウドサービスにデプロイする必要があります。
 
-このトピックでは、以下の方法について説明します。
-* [サーブレットアプリケーションで使用するためのKtorの設定](#configure-ktor)
-* WARアプリケーションの実行とパッケージ化のための[Gretty](#configure-gretty)および[War](#configure-war)プラグインの適用
-* [サーブレットコンテナでのKtorアプリケーションの実行](#run)
-* [WARアーカイブの生成とデプロイ](#generate-war)
+このトピックでは、以下の方法について説明します:
+* [サーブレットアプリケーションで使用するためのKtorの設定](#configure-ktor)。
+* WARアプリケーションの実行およびパッケージ化のための[Gretty](#configure-gretty)プラグインおよび[War](#configure-war)プラグインの適用。
+* [サーブレットコンテナでのKtorアプリケーションの実行](#run)。
+* [WARアーカイブの生成とデプロイ](#generate-war)。
 
 ## サーブレットアプリケーションでのKtorの設定 {id="configure-ktor"}
 
-Ktorでは、特定のエンジン（Netty、Jetty、Tomcatなど）を使用して[サーバーを作成および起動](server-create-and-configure.topic)プロセスを、アプリケーション内で直接行うことができます。このセットアップでは、アプリケーションがエンジンの構成、接続、SSL設定を制御します。
+Ktorでは、特定のエンジン（Netty、Jetty、Tomcatなど）を使用して、アプリケーション内で直接[サーバーを作成および起動](server-create-and-configure.topic)できます。この構成では、アプリケーションがエンジン構成、接続、SSL設定を制御します。
 
-サーブレットコンテナにデプロイする場合、コンテナがアプリケーションのライフサイクルと接続構成を制御します。このために、Ktorはアプリケーションの制御をサーブレットコンテナに委譲する[`ServletApplicationEngine`](https://api.ktor.io/ktor-server-servlet-jakarta/io.ktor.server.servlet.jakarta/-servlet-application-engine/index.html)エンジンを提供しています。
+サーブレットコンテナにデプロイする場合、コンテナ側がアプリケーションのライフサイクルと接続構成を制御します。
+このためにKtorは[`ServletApplicationEngine`](https://api.ktor.io/ktor-server-servlet-jakarta/io.ktor.server.servlet.jakarta/-servlet-application-engine/index.html)エンジンを提供しており、これによりアプリケーションの制御をサーブレットコンテナに委ねることができます。
 
-> サーブレットコンテナ内で実行する場合、[設定ファイルで定義された](server-configuration-file.topic)Ktorの接続およびSSL設定は適用されません。
+> サーブレットコンテナ内で実行する場合、[設定ファイルで定義されたKtorの接続およびSSL設定](server-configuration-file.topic)は適用されません。
 > 
-> TomcatでのSSL構成については、[tomcat-war-ssl](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/tomcat-war-ssl)サンプルを参照してください。
+> TomcatでのSSL設定については、[tomcat-war-ssl](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/tomcat-war-ssl)のサンプルを参照してください。
 > 
 {style="note"}
 
 ### 依存関係の追加 {id="add-dependencies"}
 
-サーブレットアプリケーションでKtorを使用するには、`ktor-server-servlet-jakarta`アーティファクトをビルドスクリプトに追加します。
+サーブレットアプリケーションでKtorを使用するには、ビルドスクリプトに `ktor-server-servlet-jakarta` アーティファクトを追加します。
 
 <var name="artifact_name" value="ktor-server-servlet-jakarta"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.server.servlet"/>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上記のコードスニペットでは、Ktorの依存関係を指定するために<a href="server-dependencies.topic#using-version-catalog">Ktorバージョンカタログ</a>を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上記のコードスニペットでは、Ktorの依存関係を指定するために<a href="server-dependencies.topic#using-version-catalog">Ktorバージョンカタログ</a>を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
@@ -54,9 +62,9 @@ Ktorでは、特定のエンジン（Netty、Jetty、Tomcatなど）を使用し
 
 サーブレットコンテナにデプロイする場合、個別の[JettyまたはTomcatエンジンの依存関係](server-engines.md#dependencies)を追加する必要はありません。
 
-### サーブレットの構成 {id="configure-servlet"}
+### サーブレットの設定 {id="configure-servlet"}
 
-アプリケーションにKtorサーブレットを登録するには、<Path>WEB-INF/web.xml</Path>ファイルを開き、`servlet-class`属性に`ServletApplicationEngine`を割り当てます。
+アプリケーションにKtorサーブレットを登録するには、<Path>WEB-INF/web.xml</Path> ファイルを開き、`servlet-class` 属性に `ServletApplicationEngine` を指定します。
 
 <Tabs>
 <TabItem title="Tomcat/Jetty v10.x+">
@@ -80,7 +88,7 @@ Ktorでは、特定のエンジン（Netty、Jetty、Tomcatなど）を使用し
 </TabItem>
 </Tabs>
 
-次に、このサーブレットのURLパターンを構成します。
+次に、このサーブレットのURLパターンを設定します。
 
 ```xml
 <servlet-mapping>
@@ -89,19 +97,29 @@ Ktorでは、特定のエンジン（Netty、Jetty、Tomcatなど）を使用し
 </servlet-mapping>
 ```
 
-## Grettyプラグインの構成 {id="configure-gretty"}
+## Grettyプラグインの設定 {id="configure-gretty"}
 
 [Gretty](https://plugins.gradle.org/plugin/org.gretty)プラグインを使用すると、JettyおよびTomcat上でサーブレットアプリケーションを[実行](#run)できます。
 
-プラグインを適用するには、<Path>build.gradle.kts</Path>ファイルを開き、`plugins`ブロックに次のエントリを追加します。
+まず、<Path>gradle/libs.versions.toml</Path> ファイルを開き、Grettyのバージョンとそのプラグインエイリアスを定義します。
+
+```toml
+[versions]
+gretty = "5.0.1"
+
+[plugins]
+gretty = { id = "org.gretty", version.ref = "gretty" }
+```
+
+<Path>build.gradle.kts</Path> ファイルの `plugins {}` ブロックに以下のエントリを追加します。
 
 ```groovy
 plugins {
-    id("org.gretty") version "5.0.1"
+    alias(libs.plugins.gretty)
 }
 ```
 
-その後、次のように`gretty`ブロックで構成できます。
+その後、`gretty {}` ブロックでGrettyを設定できます。
 
 <Tabs>
 <TabItem title="Jetty">
@@ -126,7 +144,7 @@ gretty {
 </TabItem>
 </Tabs>
 
-最後に、`run`タスクを構成します。
+最後に、`run` タスクを設定します。
 
 ```groovy
 afterEvaluate {
@@ -136,11 +154,11 @@ afterEvaluate {
 }
 ```
 
-## Warプラグインの構成 {id="configure-war"}
+## Warプラグインの設定 {id="configure-war"}
 
-Warプラグインを使用すると、サーブレットコンテナへのデプロイ用のWARアーカイブを[生成](#generate-war)できます。
+Warプラグインを使用すると、サーブレットコンテナにデプロイするためのWARアーカイブを[生成](#generate-war)できます。
 
-プラグインを適用するには、<Path>build.gradle.kts</Path>ファイルを開き、`plugins`ブロックに次のエントリを追加します。
+プラグインを適用するには、<Path>build.gradle.kts</Path> ファイルを開き、`plugins {}` ブロックに以下のエントリを追加します。
 
 ```groovy
 plugins {
@@ -150,7 +168,7 @@ plugins {
 
 ## アプリケーションの実行 {id="run"}
 
-[構成済みのGrettyプラグイン](#configure-gretty)を使用して、`run`タスクでサーブレットアプリケーションを実行できます。たとえば、[`jetty-war`](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/jetty-war)サンプルプロジェクトを実行するには、次のコマンドを実行します。
+[設定したGrettyプラグイン](#configure-gretty)を使用して、`run` タスクでサーブレットアプリケーションを実行できます。例えば、[`jetty-war`](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/jetty-war) サンプルプロジェクトを実行するには、次のコマンドを実行します。
 
 ```Bash
 ./gradlew :jetty-war:run
@@ -158,17 +176,17 @@ plugins {
 
 ## WARアーカイブの生成とデプロイ {id="generate-war"}
 
-[`War`](#configure-war)プラグインを使用してWARアーカイブを生成するには、`war`タスクを実行します。[`jetty-war`](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/jetty-war)サンプルプロジェクトの場合、コマンドは次のようになります。
+[`War`](#configure-war)プラグインを使用してWARアーカイブを生成するには、`war` タスクを実行します。[`jetty-war`](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/jetty-war) サンプルプロジェクトの場合、コマンドは次のようになります。
 
 ```Bash
 ./gradlew :jetty-war:war
 ```
 
-タスクが完了すると、対応するモジュールの<Path>build/libs</Path>ディレクトリに`jetty-war.war`が生成されます。
+タスクが完了すると、対応するモジュールの <Path>build/libs</Path> ディレクトリに `jetty-war.war` が生成されます。
 
-生成されたアーカイブをデプロイするには、ファイルをサーブレットコンテナの<Path>jetty/webapps</Path>ディレクトリにコピーします。
+生成されたアーカイブをデプロイするには、サーブレットコンテナの <Path>jetty/webapps</Path> ディレクトリにファイルをコピーします。
 
-次の`Dockerfile`の例は、生成されたWARファイルをJettyまたはTomcatサーブレットコンテナ内で実行する方法を示しています。
+以下の `Dockerfile` の例は、JettyまたはTomcatサーブレットコンテナ内で生成されたWARファイルを実行する方法を示しています。
 
 <Tabs>
 <TabItem title="Jetty">
@@ -197,4 +215,6 @@ CMD ["catalina.sh", "run"]
 </TabItem>
 </Tabs>
 
-完全な例については、[jetty-war](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/jetty-war)および[tomcat-war](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/tomcat-war)を参照してください。
+> 完全なコード例については、[jetty-war](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/jetty-war) および [tomcat-war](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/tomcat-war) を参照してください。
+>
+{style="tip"}

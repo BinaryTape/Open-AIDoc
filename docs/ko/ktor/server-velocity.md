@@ -8,6 +8,7 @@
 <var name="plugin_name" value="Velocity"/>
 <var name="package_name" value="io.ktor.server.velocity"/>
 <var name="artifact_name" value="ktor-server-velocity"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.server.velocity"/>
 
 <tldr>
 <p>
@@ -16,28 +17,36 @@
 <var name="example_name" value="velocity"/>
 <p>
     <b>코드 예제</b>:
-    <a href="https://github.com/ktorio/ktor-documentation/tree/%ktor_version%/codeSnippets/snippets/%example_name%">
+    <a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/%example_name%">
         %example_name%
     </a>
 </p>
 <p>
-    <b><Links href="/ktor/server-native" summary="Ktor는 Kotlin/Native를 지원하며 추가 런타임이나 가상 머신 없이 서버를 실행할 수 있게 해줍니다.">Native 서버</Links> 지원</b>: ✖️
+    <b><Links href="server-native.md" summary="Ktor는 Kotlin/Native를 지원하여 추가 런타임이나 가상 머신 없이 서버를 실행할 수 있도록 합니다.">네이티브 서버</Links> 지원</b>: ✖️
 </p>
 </tldr>
 
-Ktor에서는 [Velocity](https://api.ktor.io/ktor-server-velocity/io.ktor.server.velocity/-velocity) 플러그인을 설치하여 [Velocity 템플릿](https://velocity.apache.org/engine/)을 애플리케이션의 뷰(view)로 사용할 수 있습니다.
+Ktor에서는 [Velocity](https://api.ktor.io/ktor-server-velocity/io.ktor.server.velocity/-velocity) 플러그인을 설치하여 애플리케이션 내에서 [Velocity 템플릿](https://velocity.apache.org/engine/)을 뷰(view)로 사용할 수 있습니다.
 
 ## 의존성 추가 {id="add_dependencies"}
 
 <p>
-    <code>%plugin_name%</code>을(를) 사용하려면 빌드 스크립트에 <code>%artifact_name%</code> 아티팩트를 포함해야 합니다:
+    <code>%plugin_name%</code>을(를) 사용하려면 빌드 스크립트에 <code>%artifact_name%</code> 아티팩트를 추가합니다:
 </p>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            위 코드 스니펫은 Ktor 의존성을 지정하기 위해 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 버전 카탈로그</a>를 사용합니다.
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            위 코드 스니펫은 Ktor 의존성을 지정하기 위해 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 버전 카탈로그</a>를 사용합니다.
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
@@ -47,16 +56,16 @@ Ktor에서는 [Velocity](https://api.ktor.io/ktor-server-velocity/io.ktor.server
 ## Velocity 설치 {id="install_plugin"}
 
 <p>
-    애플리케이션에 <code>%plugin_name%</code> 플러그인을 <a href="server-plugins.md#install">설치</a>하려면, 
-    지정된 <Links href="/ktor/server-modules" summary="모듈을 사용하면 라우트를 그룹화하여 애플리케이션을 구조화할 수 있습니다.">모듈</Links> 내의 <code>install</code> 함수에 전달하세요.
-    아래 코드 스니펫은 <code>%plugin_name%</code>을(를) 설치하는 방법을 보여줍니다...
+    애플리케이션에 <code>%plugin_name%</code> 플러그인을 <a href="server-plugins.md#install">설치</a>하려면,
+    지정된 <Links href="server-modules.md" summary="모듈을 사용하면 라우트를 그룹화하여 애플리케이션을 구조화할 수 있습니다.">모듈</Links>의 <code>install</code> 함수에 전달하세요.
+    다음 예제는 <code>%plugin_name%</code>을(를) 설치하는 방법을 보여줍니다:
 </p>
 <list>
     <li>
-        ... <code>embeddedServer</code> 함수 호출 내부에서 설치.
+        <code>embeddedServer()</code> 함수 호출 내부에서 설치.
     </li>
     <li>
-        ... <code>Application</code> 클래스의 확장 함수로 명시적으로 정의된 <code>module</code> 내부에서 설치.
+        <code>Application</code> 클래스에 명시적으로 정의된 <code>module()</code> 확장 함수 내부에서 설치.
     </li>
 </list>
 <Tabs>
@@ -68,11 +77,11 @@ Ktor에서는 [Velocity](https://api.ktor.io/ktor-server-velocity/io.ktor.server
     </TabItem>
 </Tabs>
 
-선택적으로, 표준 및 사용자 정의 [Velocity 도구](#velocity_tools)를 추가할 수 있는 기능을 제공하는 `VelocityTools` 플러그인을 설치할 수 있습니다.
+선택 사항으로, `VelocityTools` 플러그인을 설치하여 표준 및 커스텀 [Velocity 도구](#velocity_tools)를 추가하는 기능을 활성화할 수도 있습니다.
 
 ## Velocity 설정 {id="configure"}
 ### 템플릿 로딩 설정 {id="template_loading"}
-`install` 블록 내부에서 [VelocityEngine][velocity_engine]을 설정할 수 있습니다. 예를 들어, 클래스패스(classpath)의 템플릿을 사용하려면 `classpath`용 리소스 로더를 사용하세요:
+`install` 블록 내에서 [VelocityEngine][velocity_engine]을 구성할 수 있습니다. 예를 들어 클래스패스(classpath)의 템플릿을 사용하려면 `classpath`용 리소스 로더를 사용합니다:
 ```kotlin
 import io.ktor.server.application.*
 import io.ktor.server.velocity.*
@@ -88,7 +97,7 @@ fun Application.module() {
 ```
 
 ### 응답으로 템플릿 전송 {id="use_template"}
-`resources/templates` 경로에 `index.vl` 템플릿이 있다고 가정해 보겠습니다:
+`resources/templates` 디렉터리에 다음과 같은 `index.vl` 템플릿이 있다고 가정해 보겠습니다:
 ```html
 <html>
     <body>
@@ -97,12 +106,12 @@ fun Application.module() {
 </html>
 ```
 
-사용자 데이터 모델은 다음과 같습니다:
+사용자를 위한 데이터 모델은 다음과 같습니다:
 ```kotlin
 data class User(val id: Int, val name: String)
 ```
 
-지정된 [라우트](server-routing.md)에 대해 템플릿을 사용하려면, 다음과 같이 `call.respond` 메서드에 `VelocityContent`를 전달하세요:
+지정된 [라우트(route)](server-routing.md)에 템플릿을 사용하려면 다음과 같이 `VelocityContent`를 `call.respond` 메서드에 전달합니다:
 ```kotlin
 get("/index") {
     val sampleUser = User(1, "John")
@@ -112,7 +121,7 @@ get("/index") {
 
 ### Velocity 도구 추가 {id="velocity_tools"}
 
-`VelocityTools` 플러그인을 [설치](#install_plugin)했다면, `install` 블록 내부에서 `EasyFactoryConfiguration` 인스턴스에 접근하여 표준 및 사용자 정의 Velocity 도구를 추가할 수 있습니다. 예:
+`VelocityTools` 플러그인을 [설치](#install_plugin)했다면, `install` 블록 내에서 `EasyFactoryConfiguration` 인스턴스에 접근하여 표준 및 커스텀 Velocity 도구를 추가할 수 있습니다. 예를 들면 다음과 같습니다:
 
 ```kotlin
 install(VelocityTools) {
@@ -124,6 +133,6 @@ install(VelocityTools) {
         addProperty("resource.loader.string.repository.name", "myRepo")
     }
     addDefaultTools() // 기본 도구 추가
-    tool("foo", MyCustomTool::class.java) // 사용자 정의 도구 추가
+    tool("foo", MyCustomTool::class.java) // 커스텀 도구 추가
 }
 ```

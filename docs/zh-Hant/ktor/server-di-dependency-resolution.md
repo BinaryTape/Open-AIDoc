@@ -4,7 +4,7 @@
 
 <tldr>
 <p>
-<b>必要的相依性</b>：<code>io.ktor:ktor-server-di</code>
+<b>必要相依性</b>：<code>io.ktor:ktor-server-di</code>
 </p>
 <var name="example_name" value="server-di"/>
 <p>
@@ -15,13 +15,13 @@
 </p>
 </tldr>
 
-在您[註冊相依性](server-di-dependency-registration.md)之後，您可以從相依性注入 (DI) 容器中解析它們並將其注入應用程式程式碼中。
+在你[註冊相依性](server-di-dependency-registration.md)之後，你可以從相依注入 (DI) 容器中解析它們，並將它們注入到應用程式程式碼中。
 
-您可以使用[屬性委託](#property-delegation)或[直接解析](#direct-resolution)從 DI 容器明確地解析相依性。
+你可以使用[屬性委託](#property-delegation)或[直接解析](#direct-resolution)，明確地從 DI 容器中解析相依性。
 
 ### 使用屬性委託 {id="property-delegation"}
 
-使用屬性委託時，相依性僅會在啟動驗證階段被解析：
+使用屬性委託時，相依性僅會在啟動驗證階段進行解析：
 
 ```kotlin
 val service: GreetingService by dependencies
@@ -29,7 +29,7 @@ val service: GreetingService by dependencies
 
 ### 使用直接解析 {id="direct-resolution"}
 
-直接解析會立即傳回相依性，或者掛起直到其可用為止：
+直接解析會立即傳回相依性，或者暫停直到其可用為止：
 
 ```kotlin
 val service = dependencies.resolve<GreetingService>()
@@ -37,9 +37,9 @@ val service = dependencies.resolve<GreetingService>()
 
 ### 參數解析 {id="parameter-resolution"}
 
-當解析建構函式或函式時，Ktor 會使用 DI 容器解析參數。預設情況下，參數是依型別解析的。
+解析建構函式或函式時，Ktor 會使用 DI 容器來解析參數。預設情況下，參數是依型別來解析的。
 
-如果基於型別的解析不足，您可以使用註解來明確綁定參數。
+如果基於型別的解析不足以滿足需求，你可以使用註解來明確綁定參數。
 
 #### 使用具名相依性 {id="resolve-named"}
 
@@ -53,7 +53,7 @@ fun Application.userRepository(@Named("mongo") database: Database) {
 
 #### 使用配置屬性 {id="use-configuration-properties"}
 
-使用 `@Property` 註解從應用程式配置中注入一個值：
+使用 `@Property` 註解從應用程式配置中注入值：
 
 ```kotlin
 package com.example
@@ -68,7 +68,7 @@ open class UserRepository(val db: Database)
 
 ```
 
-在上述範例中，`database.connectionUrl` 屬性是從應用程式配置中解析的：
+在上述範例中，`database.connectionUrl` 屬性是從應用程式配置中解析而來的：
 
 <Tabs>
 <TabItem title="application.yaml">
@@ -83,7 +83,7 @@ database:
 
 ### 非同步相依性解析 {id="async-dependency-resolution"}
 
-為了支援非同步載入，您可以使用掛起函式：
+為了支援非同步載入，你可以使用 suspend 函式：
 
 ```kotlin
 data class EventsConnection(val connected: Boolean)
@@ -101,13 +101,13 @@ suspend fun Application.loadEventsConnection() {
 }
 ```
 
-DI 外掛程式會自動掛起 `resolve()` 呼叫，直到所有相依性都就緒。
+DI 外掛程式會自動掛起 `resolve()` 呼叫，直到所有相依性準備就緒。
 
 ### 將相依性注入應用程式模組 {id="inject-into-modules"}
 
-您可以透過在模組函式中指定參數，將相依性直接注入應用程式模組。Ktor 會根據型別比對從 DI 容器中解析這些相依性。
+你可以透過在模組函式中指定參數，將相依性直接注入應用程式模組中。Ktor 將根據型別比對從 DI 容器中解析這些相依性。
 
-首先，在配置檔案中的 `ktor.application.dependencies` 群組中註冊您的相依性提供者：
+首先，在你的設定檔中的 `ktor.application.dependencies` 群組中註冊你的相依性提供者：
 
 <Tabs>
 <TabItem title="application.yaml">
@@ -124,7 +124,7 @@ ktor:
 </TabItem>
 </Tabs>
 
-為您想要注入的相依性定義具有參數的相依性提供者和模組函式。然後，您可以直接在模組函式中使用注入的相依性：
+定義相依性提供者以及帶有你欲注入相依性參數的模組函式。接著，你就可以直接在模組函式中使用已注入的相依性：
 
 <Tabs>
 <TabItem title="PrintStreamProvider.kt">
@@ -168,9 +168,9 @@ fun Application.logging(printStreamProvider: () -> PrintStream) {
 
 ## 進階相依性解析 {id="advanced-dependency-resolution"}
 
-### 選填與可為 null 的相依性 {id="optional-dependencies"}
+### 選用與可為 null 的相依性 {id="optional-dependencies"}
 
-使用可為 null 的型別來優雅地處理選填相依性：
+使用可為 null 的型別來從容處理選用相依性：
 
 ```kotlin
 // 使用屬性委託
@@ -180,35 +180,35 @@ val config: Config? by dependencies
 val config = dependencies.resolve<Config?>()
 ```
 
-### 協變泛型 {id="covariant-generics"}
+### 共變泛型 {id="covariant-generics"}
 
-Ktor 的 DI 系統支援型別協變，當型別參數是協變時，這允許將值作為其超型別之一注入。這對於處理子型別的集合和介面特別有用。
+Ktor 的 DI 系統支援型別共變性 (covariance)，當型別參數為共變時，允許將值作為其超型別之一進行注入。這對於處理子型別的集合和介面特別有用。
 
 ```kotlin
 dependencies {
   provide<List<String>> { listOf("one", "two") }
 }
 
-// 由於支援型別參數協變，這將可行
+// 由於支援型別參數共變性，這將可以正常運作
 val stringList: List<CharSequence> by dependencies
-// 這也將可行
+// 這也將可以正常運作
 val stringCollection: Collection<CharSequence> by dependencies
 ```
 
-協變也適用於非泛型超型別：
+共變性也適用於非泛型超型別：
 
 ```kotlin
 dependencies {
     provide<BufferedOutputStream> { BufferedOutputStream(System.out) }
 }
 
-// 這可行，因為 BufferedOutputStream 是 OutputStream 的子型別
+// 這是可行的，因為 BufferedOutputStream 是 OutputStream 的子型別
 val outputStream: OutputStream by dependencies
 ```
 
 #### 限制 {id="limitations"}
 
-雖然 DI 系統支援泛型型別的協變，但目前不支援跨型別引數子型別解析參數化型別。這意味著您無法使用比註冊時更具體或更通用的型別來擷取相依性。
+雖然 DI 系統支援泛型型別的共變性，但目前不支援跨型別引數子型別來解析參數化型別。這意味著你無法使用比已註冊型別更具體或更廣義的型別來取得相依性。
 
 例如，以下程式碼將無法解析：
 
@@ -217,6 +217,6 @@ dependencies {
     provide<Sink<CharSequence>> { CsqSink() }
 }
 
-// 將無法解析
+// 無法解析
 val charSequenceSink: Sink<String> by dependencies
 ```

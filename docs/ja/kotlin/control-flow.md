@@ -1,14 +1,14 @@
-[//]: # (title: 条件とループ)
+[//]: # (title: 条件分岐とループ)
 
-Kotlinは、プログラムのフローを制御するための柔軟なツールを提供します。`if`、`when`、およびループを使用して、条件に対する明確で表現力豊かなロジックを定義できます。
+Kotlin は、プログラムの制御フローを扱うための柔軟なツールを提供しています。`if`、`when`、そして各種ループを使用することで、条件に応じた明確で表現力豊かなロジックを定義できます。
 
 ## If 式 {id="if-expression"}
 
-Kotlinで `if` を使用するには、チェックする条件を括弧 `()` 内に追加し、結果が真（true）の場合に実行するアクションを中括弧 `{}` 内に追加します。追加の分岐やチェックには `else` や `else if` を使用できます。
+Kotlin で `if` を使用するには、チェックする条件を丸括弧 `()` 内に、結果が真（true）の場合に実行する処理を中括弧 `{}` 内に記述します。追加の分岐やチェックには `else` や `else if` を使用できます。
 
-また、`if` を式として記述することもでき、その戻り値を直接変数に代入できます。この形式では、`else` ブランチが必須となります。`if` 式は、他の言語にある三項演算子（`condition ? then : else`）と同じ目的を果たします。
+また、`if` は式（expression）としても記述でき、その戻り値を直接変数に代入できます。この形式では、`else` 分岐が必須となります。`if` 式は、他の言語にある三項演算子（`condition ? then : else`）と同じ役割を果たします。
 
-例えば以下のようになります：
+例:
 
 ```kotlin
 fun main() {
@@ -19,17 +19,17 @@ fun main() {
     var taller = heightAlice
     if (heightAlice < heightBob) taller = heightBob
 
-    // else ブランチを使用する場合
+    // else 分岐を使用
     if (heightAlice > heightBob) {
         taller = heightAlice
     } else {
         taller = heightBob
     }
 
-    // if を式として使用する場合
+    // if を式として使用
     taller = if (heightAlice > heightBob) heightAlice else heightBob
 
-    // else if を式として使用する場合：
+    // else if を式として使用:
     val heightLimit = 150
     val heightOrLimit = if (heightLimit > heightAlice) heightLimit else if (heightAlice > heightBob) heightAlice else heightBob
 
@@ -40,9 +40,9 @@ fun main() {
     //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="if-else-if-kotlin"}
+{kotlin-runnable="true" id="if-else-if-kotlin"}
 
-`if` 式の各ブランチはブロックにすることができ、その場合は最後の式の値が結果となります：
+`if` 式の各分岐はブロックにすることができ、その場合ブロック内の最後の式（last expression）の値が結果になります:
 
 ```kotlin
 fun main() {
@@ -62,11 +62,11 @@ fun main() {
     //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="if-else-blocks-kotlin"}
+{kotlin-runnable="true" id="if-else-blocks-kotlin"}
 
 ## When 式と文 {id="when-expressions-and-statements"}
 
-`when` は、複数の可能性のある値や条件に基づいてコードを実行する条件式です。これは Java や C、その他の言語における `switch` 文に似ています。`when` はその引数を評価し、いずれかのブランチ条件が満たされるまで、各ブランチと順番に結果を比較します。例えば：
+`when` は、複数の取りうる値や条件に基づいてコードを実行する条件式です。Java や C などの言語における `switch` 文に似ています。`when` は引数を評価し、いずれかの分岐条件が満たされるまで、各分岐を上から順に結果と比較していきます。例:
 
 ```kotlin
 fun main() {
@@ -81,9 +81,9 @@ fun main() {
     //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-conditions-when-statement"}
+{kotlin-runnable="true" id="kotlin-conditions-when-statement"}
 
-`when` は **式（expression）** としても **文（statement）** としても使用できます。式として使用する場合、`when` は後でコードで使用できる値を返します。文として使用する場合、`when` は結果を返さずにアクションを完了します。
+`when` は**式**としても**文**としても使用できます。式として使用した場合、`when` は後続のコードで利用できる値を返します。文として使用した場合、`when` は結果を返さずに処理を実行します:
 
 <table>
    <tr>
@@ -107,8 +107,8 @@ val text = when (x) {
 <td>
 
 ```kotlin
-// 結果は返さないが
-// print 文を実行する
+// 結果は返さず、
+// 出力処理を実行する
 when (x) {
     1 -> print("x == 1")
     2 -> print("x == 2")
@@ -120,12 +120,12 @@ when (x) {
 </tr>
 </table>
 
-次に、`when` は対象（subject）の有無にかかわらず使用できます。どちらの場合も動作は同じです。対象を使用すると、何をチェックしているかが明確になるため、通常はコードの可読性と保守性が向上します。
+また、`when` はサブジェクト（subject: 判定対象の引数）を指定して使うことも、指定せずに使うこともできます。どちらの方法でも動作は変わりません。通常、サブジェクトを指定した方が、何をチェックしているのかが明確になるため、コードの可読性と保守性が向上します。
 
 <table>
    <tr>
-       <td>対象 <code>x</code> がある場合</td>
-       <td>対象がない場合</td>
+       <td>サブジェクト <code>x</code> あり</td>
+       <td>サブジェクトなし</td>
    </tr>
    <tr>
 <td>
@@ -145,33 +145,33 @@ when { ... }
 </tr>
 </table>
 
-`when` をどのように使用するかによって、ブランチですべての可能なケースをカバーする必要があるかどうかが決まります。すべての可能なケースをカバーすることを、*網羅的（exhaustive）* であると言います。
+`when` をどのように使用するかによって、分岐ですべてのケースをカバーする必要があるかどうかが決まります。考えられるすべてのケースをカバーすることを、*網羅的（exhaustive）* であるといいます。
 
-### 文としての利用 {id="statements"}
+### 文（Statements） {id="statements"}
 
-`when` を文として使用する場合、すべての可能なケースをカバーする必要はありません。この例では、一部のケースがカバーされていないため、どのブランチも実行されません。しかし、エラーは発生しません。
+`when` を文として使用する場合は、すべてのケースをカバーする必要はありません。次の例では一部のケースがカバーされていないため、どの分岐も実行されません。しかし、エラーは発生しません:
 
 ```kotlin
 fun main() {
     //sampleStart
     val deliveryStatus = "OutForDelivery"
     when (deliveryStatus) {
-        // すべてのケースがカバーされていない
+        // すべてのケースがカバーされているわけではない
         "Pending" -> print("Your order is being prepared")
         "Shipped" -> print("Your order is on the way")
     }
     //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-when-statement"}
+{kotlin-runnable="true" id="kotlin-when-statement"}
 
-`if` と同様に、各ブランチはブロックにすることができ、その値はブロック内の最後の式の値となります。
+`if` と同様に、各分岐はブロックにすることができ、その値はブロック内の最後の式の値になります。
 
-### 式としての利用 {id="expressions"}
+### 式（Expressions） {id="expressions"}
 
-`when` を式として使用する場合、すべての可能なケースを **必ず** カバーしなければなりません。最初に一致したブランチの値が、式全体の値になります。すべてのケースをカバーしていない場合、コンパイラはエラーをスローします。
+`when` を式として使用する場合は、考えられるすべてのケースを**必ず**カバーしなければなりません。最初に一致した分岐の値が、式全体の値になります。すべてのケースをカバーしていない場合、コンパイラはエラーを発生させます。
 
-`when` 式に対象がある場合、`else` ブランチを使用してすべての可能なケースがカバーされていることを確認できますが、必須ではありません。例えば、対象が `Boolean`、[`enum` クラス](enum-classes.md)、[`sealed` クラス](sealed-classes.md)、またはそれらの null 許容型のいずれかである場合、`else` ブランチなしですべてのケースをカバーできます。
+`when` 式にサブジェクトがある場合、すべてのケースを確実にカバーするために `else` 分岐を使用できますが、必須ではありません。たとえば、サブジェクトが `Boolean`、[`enum` クラス](enum-classes.md)、[`sealed` クラス](sealed-classes.md)、またはそれらの null 許容型である場合、`else` 分岐なしですべてのケースをカバーできます:
 
 ```kotlin
 import kotlin.random.Random
@@ -186,7 +186,7 @@ fun getRandomBit(): Bit {
 
 fun main() {
     val numericValue = when (getRandomBit()) {
-        // すべてのケースがカバーされているため、else ブランチは不要
+        // すべてのケースがカバーされているため、else 分岐は不要
         Bit.ZERO -> 0
         Bit.ONE -> 1
     }
@@ -196,16 +196,16 @@ fun main() {
     //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-when-expression-subject"}
+{kotlin-runnable="true" id="kotlin-when-expression-subject"}
 
-> `when` 式を簡略化し、繰り返しを減らすために、コンテキスト依存解決（現在プレビュー中）を試してみてください。
-> この機能を使用すると、期待される型が既知である場合に、`when` 式内で列挙型のエントリやシールクラスのメンバを使用する際に型名を省略できます。
+> `when` 式を簡潔にし、重複を減らすために、コンテキスト依存の解決（Context-sensitive resolution、現在はプレビュー段階）を試してみてください。
+> この機能を使用すると、期待される型が既知である場合に、`when` 式で enum エントリや sealed クラスのメンバーを使用する際に型名を省略できます。
 > 
-> 詳細については、[Preview of context-sensitive resolution](whatsnew22.md#preview-of-context-sensitive-resolution) または関連する [KEEP 提案](https://github.com/Kotlin/KEEP/blob/improved-resolution-expected-type/proposals/context-sensitive-resolution.md) を参照してください。
+> 詳細については、[コンテキスト依存の解決のプレビュー](whatsnew22.md#preview-of-context-sensitive-resolution)または関連する [KEEP プロポーザル](https://github.com/Kotlin/KEEP/blob/improved-resolution-expected-type/proposals/context-sensitive-resolution.md)を参照してください。
 > 
 {style="tip"}
 
-`when` 式に対象が **ない** 場合、`else` ブランチが **必須** です。そうでないとコンパイラがエラーをスローします。`else` ブランチは、他のどのブランチ条件も満たされない場合に評価されます。
+`when` 式にサブジェクトが**ない**場合、`else` 分岐が**必須**であり、指定しないとコンパイラがエラーを発生させます。他の分岐条件がいずれも満たされない場合に `else` 分岐が評価されます:
 
 ```kotlin
 fun main() {
@@ -224,13 +224,13 @@ fun main() {
     //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-when-no-subject"}
+{kotlin-runnable="true" id="kotlin-when-no-subject"}
 
-### その他の when の活用方法 {id="other-ways-to-use-when"}
+### when のその他の使い方 {id="other-ways-to-use-when"}
 
-`when` 式と文は、コードを簡略化し、複数の条件を処理し、型チェックを実行するためのさまざまな方法を提供します。
+`when` の式や文は、コードを簡潔にし、複数の条件を処理し、型チェックを実行するためのさまざまな方法を提供します。
 
-カンマを使用して、複数の条件を単一のブランチにグループ化します：
+カンマを使用して、複数の条件を 1 つの分岐にまとめることができます:
 
 ```kotlin
 fun main() {
@@ -243,9 +243,9 @@ fun main() {
     //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-when-multiple-cases"}
+{kotlin-runnable="true" id="kotlin-when-multiple-cases"}
 
-ブランチ条件として `true` または `false` に評価される式を使用します：
+`true` または `false` に評価される式を分岐条件として使用できます:
 
 ```kotlin
 fun main() {
@@ -261,9 +261,9 @@ fun main() {
     //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-when-branch-expression"}
+{kotlin-runnable="true" id="kotlin-when-branch-expression"}
 
-`in` または `!in` キーワードを使用して、値が [範囲（range）](ranges.md) またはコレクションに含まれているか、含まれていないかをチェックします：
+`in` または `!in` キーワードを使用して、値が[範囲（range）](ranges.md)やコレクションに含まれているか（または含まれていないか）をチェックできます:
 
 ```kotlin
 fun main() {
@@ -280,9 +280,9 @@ fun main() {
     //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-when-ranges"}
+{kotlin-runnable="true" id="kotlin-when-ranges"}
 
-`is` または `!is` キーワードを使用して、値の型をチェックします。[スマートキャスト](typecasts.md#smart-casts) により、その型のメンバ関数やプロパティに直接アクセスできます：
+`is` または `!is` キーワードを使用して値の型をチェックできます。[スマートキャスト](typecasts.md#smart-casts)のおかげで、その型のメンバー関数やプロパティに直接アクセスできます:
 
 ```kotlin
 fun hasPrefix(input: Any): Boolean = when (input) {
@@ -296,10 +296,9 @@ fun main() {
     // true
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-when-type-checks"}
+{kotlin-runnable="true" id="kotlin-when-type-checks"}
 
-伝統的な `if`-`else if` チェーンの代わりに `when` を使用します。
-対象がない場合、ブランチ条件は単なるブール式になります。`true` 条件を持つ最初のブランチが実行されます：
+従来の `if`-`else if` チェーンの代わりに `when` を使用できます。サブジェクトを指定しない場合、分岐条件は単純なブール式になります。最初に条件が `true` となった分岐が実行されます:
 
 ```kotlin
 fun Int.isOdd() = this % 2 != 0
@@ -319,9 +318,9 @@ fun main() {
     //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-when-replace-if"}
+{kotlin-runnable="true" id="kotlin-when-replace-if"}
 
-最後に、以下の構文を使用して対象を変数にキャプチャできます：
+最後に、以下の構文を使用してサブジェクトを変数にキャプチャできます:
 
 ```kotlin
 fun main() {
@@ -335,15 +334,15 @@ fun main() {
     // You said yes
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-when-capture-subject"}
+{kotlin-runnable="true" id="kotlin-when-capture-subject"}
 
-対象として導入された変数のスコープは、その `when` 式または文の本体に限定されます。
+サブジェクトとして導入された変数のスコープは、その `when` 式または文の本体内に制限されます。
 
 ### ガード条件 {id="guard-conditions-in-when-expressions"}
 
-ガード条件を使用すると、`when` 式または文のブランチに複数の条件を含めることができ、複雑な制御フローをより明示的かつ簡潔に記述できます。ガード条件は、対象を持つ `when` で使用できます。
+ガード条件（Guard conditions）を使用すると、`when` 式や文の分岐に複数の条件を含めることができ、複雑な制御フローをより明示的かつ簡潔に記述できます。ガード条件は、`when` にサブジェクトがある場合に使用できます。
 
-同一ブランチ内のプライマリ条件の後に、`if` で区切ってガード条件を配置します：
+同じ分岐内で、主要な条件（primary condition）の後に `if` で区切ってガード条件を配置します:
 
 ```kotlin
 sealed interface Animal {
@@ -357,13 +356,13 @@ fun feedCat() = println("Feeding a cat")
 //sampleStart
 fun feedAnimal(animal: Animal) {
     when (animal) {
-        // プライマリ条件のみのブランチ
+        // 主要な条件のみの分岐
         // animal が Dog の場合に feedDog() を呼び出す
         is Animal.Dog -> feedDog()
-        // プライマリ条件とガード条件の両方を持つブランチ
-        // animal が Cat かつ mouseHunter でない場合に feedCat() を呼び出す
+        // 主要な条件とガード条件の両方を持つ分岐
+        // animal が Cat であり、かつ mouseHunter でない場合に feedCat() を呼び出す
         is Animal.Cat if !animal.mouseHunter -> feedCat()
-        // 上記の条件のいずれにも一致しない場合に "Unknown animal" を出力する
+        // 上記のどの条件にも一致しない場合は "Unknown animal" を出力
         else -> println("Unknown animal")
     }
 }
@@ -384,22 +383,19 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="2.2" id="kotlin-when-guard-conditions"}
 
-カンマで区切られた複数の条件がある場合は、ガード条件を使用できません。例えば：
+カンマで区切られた複数の条件がある場合は、ガード条件を使用できません。たとえば以下のような場合です:
 
 ```kotlin
 0, 1 -> print("x == 0 or x == 1")
 ```
 
-単一の `when` 式または文の中で、ガード条件のあるブランチとないブランチを混在させることができます。
-ガード条件のあるブランチのコードは、プライマリ条件とガード条件の両方が `true` と評価された場合にのみ実行されます。
-プライマリ条件が一致しない場合、ガード条件は評価されません。
+単一の `when` 式または文の中で、ガード条件を持つ分岐と持たない分岐を混在させることができます。ガード条件を持つ分岐のコードは、主要な条件とガード条件の両方が `true` と評価された場合にのみ実行されます。主要な条件が一致しない場合、ガード条件は評価されません。
 
-`when` 文はすべてのケースをカバーする必要がないため、`else` ブランチのない `when` 文でガード条件を使用し、どの条件も一致しない場合は、コードは実行されません。
+`when` 文はすべてのケースをカバーする必要がないため、`else` 分岐のない `when` 文でガード条件を使用した場合、どの条件にも一致しなければコードは何も実行されません。
 
-文とは異なり、`when` 式はすべてのケースをカバーする必要があります。`else` ブランチのない `when` 式でガード条件を使用する場合、実行時エラーを避けるために、コンパイラはすべての可能なケースを処理することを要求します。
+文とは異なり、`when` 式はすべてのケースをカバーしなければなりません。`else` 分岐のない `when` 式でガード条件を使用する場合、実行時エラーを防ぐために、コンパイラは考えられるすべてのケースを処理することを要求します。
 
-論理演算子 `&&` (AND) または `||` (OR) を使用して、単一のブランチ内で複数のガード条件を組み合わせることができます。
-[混乱を避けるために](coding-conventions.md#guard-conditions-in-when-expression)、論理式を括弧で囲んでください：
+論理演算子の `&&` (AND) または `||` (OR) を使用して、単一の分岐内で複数のガード条件を組み合わせることができます。[混乱を避けるため](coding-conventions.md#guard-conditions-in-when-expression)、論理式を丸括弧で囲んでください:
 
 ```kotlin
 when (animal) {
@@ -407,34 +403,34 @@ when (animal) {
 }
 ```
 
-ガード条件は `else if` もサポートしています：
+ガード条件は `else if` もサポートしています:
 
 ```kotlin
 when (animal) {
-    // `animal` が `Dog` であるかチェック
+    // `animal` が `Dog` であるかをチェック
     is Animal.Dog -> feedDog()
-    // `animal` が `Cat` かつ `mouseHunter` でないかチェックするガード条件
+    // `animal` が `Cat` であり、かつ `mouseHunter` でないかをチェックするガード条件
     is Animal.Cat if !animal.mouseHunter -> feedCat()
-    // 上記の条件がどれも一致せず、かつ animal.eatsPlants が true の場合に giveLettuce() を呼び出す
+    // 上記の条件がいずれも一致せず、かつ animal.eatsPlants が true の場合に giveLettuce() を呼び出す
     else if animal.eatsPlants -> giveLettuce()
-    // 上記の条件のいずれにも一致しない場合に "Unknown animal" を出力する
+    // 上記の条件がいずれも一致しない場合は "Unknown animal" を出力
     else -> println("Unknown animal")
 }
 ```
 
 ### JVM 上でのバイトコード生成 {id="bytecode-generation-on-the-jvm"}
 
-JVM 21 以降を対象として Kotlin コードをコンパイルする場合、コンパイラは対象となる `when` 式に対して [`invokedynamic`](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/invoke/package-summary.html) 命令を生成します。これにより、Java の `switch` 文で生成されるバイトコードと同様に、よりサイズの小さいバイトコードが生成されます。
+JVM 21 以降向けに Kotlin コードをコンパイルする場合、コンパイラは対象となる `when` 式に対して [`invokedynamic`](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/invoke/package-summary.html) 命令を生成します。これにより、Java の `switch` 文によって生成されるバイトコードと同様の、より小さなバイトコードが生成されます。
 
-以下の条件がすべて満たされる場合、コンパイラは [`SwitchBootstraps.typeSwitch()`](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/runtime/SwitchBootstraps.html) メソッドを伴う `invokedynamic` を使用します：
+コンパイラは、以下の条件がすべて満たされた場合に [`SwitchBootstraps.typeSwitch()`](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/runtime/SwitchBootstraps.html) メソッドを伴う `invokedynamic` を使用します:
 
-* `else` 以外のすべての条件が `is` または `null` チェックである。
-* `when` 式に [ガード条件（`if`）](#guard-conditions-in-when-expressions) が含まれていない。
-* 条件に、Kotlin のミュータブルコレクション（`MutableList`）や関数型（`kotlin.Function1`、`kotlin.Function2` など）のような、直接型チェックできない型が含まれていない。
-* `when` 式に `else` 以外の条件が少なくとも2つある。
-* すべてのブランチが `when` 式の同じ対象をチェックしている。
+* `else` を除くすべての条件が `is` または `null` チェックである。
+* `when` 式に[ガード条件（`if`）](#guard-conditions-in-when-expressions)が含まれていない。
+* 条件に、直接型チェックできない型（可変 Kotlin コレクション（`MutableList`）や関数型（`kotlin.Function1`、`kotlin.Function2` など））が含まれていない。
+* `when` 式に `else` 以外で少なくとも 2 つの条件がある。
+* すべての分岐が `when` 式の同じサブジェクトをチェックしている。
 
-例えば：
+例:
 
 ```kotlin
 open class Shape
@@ -451,11 +447,11 @@ fun countCorners(shape: Shape) = when (shape) {
 }
 ```
 
-ここでの `when (shape)` 式は、バイトコード内で複数の `instanceof` チェックを行う代わりに、単一の `invokedynamic` タイプスイッチにコンパイルされます。
+ここでの `when (shape)` 式は、バイトコード内で複数の `instanceof` チェックを行う代わりに、単一の `invokedynamic` 型スイッチへとコンパイルされます。
 
 ## For ループ {id="for-loops"}
 
-`for` ループを使用して、[コレクション](collections-overview.md)、[配列](arrays.md)、または [範囲（range）](ranges.md) を反復処理します：
+[コレクション](collections-overview.md)、[配列](arrays.md)、または[範囲（range）](ranges.md)を反復処理するには、`for` ループを使用します:
 
 ```kotlin
 for (item in collection) print(item)
@@ -478,27 +474,27 @@ fun main() {
     //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-for-loop"}
+{kotlin-runnable="true" id="kotlin-for-loop"}
 
-### 範囲 (Ranges) {id="ranges"}
+### 範囲（Ranges） {id="ranges"}
 
-数値の範囲を反復処理するには、`..` および `..<` 演算子を使用した [範囲式](ranges.md) を使用します：
+数値の範囲を反復処理するには、`..` および `..<` 演算子を使用した[範囲式（range expression）](ranges.md)を使用します:
 
 ```kotlin
 fun main() {
 //sampleStart
-    println("Closed-ended range:")
+    println("Range with an inclusive upper bound:")
     for (i in 1..6) {
         print(i)
     }
-    // Closed-ended range:
+    // Range with an inclusive upper bound:
     // 123456
   
-    println("\nOpen-ended range:")
+    println("\nRange with an exclusive upper bound:")
     for (i in 1..<6) {
         print(i)
     }
-    // Open-ended range:
+    // Range with an exclusive upper bound:
     // 12345
   
     println("\nReverse order in steps of 2:")
@@ -510,11 +506,11 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-for-loop-range"}
+{kotlin-runnable="true" id="kotlin-for-loop-range"}
 
-### 配列 (Arrays) {id="arrays"}
+### 配列（Arrays） {id="arrays"}
 
-配列またはリストをインデックス付きで反復処理したい場合は、`indices` プロパティを使用できます：
+インデックスを使って配列やリストを反復処理したい場合は、`indices` プロパティを使用できます:
 
 ```kotlin
 fun main() {
@@ -529,9 +525,9 @@ fun main() {
     //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-for-loop-array"}
+{kotlin-runnable="true" id="kotlin-for-loop-array"}
 
-または、標準ライブラリの [`.withIndex()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/with-index.html) 関数を使用することもできます：
+あるいは、標準ライブラリの [`.withIndex()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/with-index.html) 関数を使用することもできます:
 
 ```kotlin
 fun main() {
@@ -546,15 +542,15 @@ fun main() {
     //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-for-loop-array-index"}
+{kotlin-runnable="true" id="kotlin-for-loop-array-index"}
 
-### イテレータ (Iterators) {id="iterators"}
+### イテレータ（Iterators） {id="iterators"}
 
-`for` ループは、[イテレータ](iterators.md) を提供するあらゆるものを反復処理します。コレクションはデフォルトでイテレータを提供しますが、範囲と配列はインデックスベースのループにコンパイルされます。
+`for` ループは、[イテレータ（iterator）](iterators.md)を提供する任意のものに対して反復処理を行えます。コレクションはデフォルトでイテレータを提供しますが、範囲や配列はインデックスベースのループにコンパイルされます。
 
-`Iterator<>` を返す `iterator()` という名前のメンバ関数または拡張関数を提供することで、独自のイテレータを作成できます。`iterator()` 関数は、`next()` 関数と `Boolean` を返す `hasNext()` 関数を持つ必要があります。
+`Iterator<>` を返す `iterator()` という名前のメンバー関数または拡張関数を提供することで、独自のイテレータを作成できます。`iterator()` 関数は、`next()` 関数と、`Boolean` を返す `hasNext()` 関数を備えている必要があります。
 
-クラスに対して独自のイテレータを作成する最も簡単な方法は、[`Iterable<T>`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-iterable/) インターフェースを継承し、既存の `iterator()`、`next()`、`hasNext()` 関数をオーバーライドすることです。例えば：
+クラスに独自のイテレータを作成する最も簡単な方法は、[`Iterable<T>`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-iterable/) インターフェースを継承し、すでに定義されている `iterator()`、`next()`、`hasNext()` 関数をオーバーライドすることです。例:
 
 ```kotlin
 class Booklet(val totalPages: Int) : Iterable<Int> {
@@ -577,13 +573,13 @@ fun main() {
     // Reading page 3
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-for-loop-inherit-iterator"}
+{kotlin-runnable="true" id="kotlin-for-loop-inherit-iterator"}
 
-> [インターフェース](interfaces.md) と [継承](inheritance.md) について詳細を学ぶ。
+> [インターフェース](interfaces.md)と[継承](inheritance.md)の詳細についても参照してください。
 > 
 {style="tip"}
 
-あるいは、ゼロから関数を作成することもできます。この場合、関数に `operator` キーワードを追加します：
+あるいは、ゼロから関数を作成することもできます。この場合は、各関数に `operator` キーワードを追加します:
 
 ```kotlin
 //sampleStart
@@ -614,17 +610,16 @@ fun main() {
     // Reading page 3
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-for-loop-iterator-from-scratch"}
+{kotlin-runnable="true" id="kotlin-for-loop-iterator-from-scratch"}
 
 ## While ループ {id="while-loops"}
 
-`while` および `do-while` ループは、条件が満たされている間、その本体内のコードを継続的に実行します。
-両者の違いは、条件をチェックするタイミングです：
+`while` ループおよび `do-while` ループは、条件が満たされている間、本体のコードを繰り返し実行します。両者の違いは、条件をチェックするタイミングです:
 
-* `while` は条件をチェックし、満たされている場合は本体のコードを実行し、その後再び条件チェックに戻ります。
-* `do-while` は本体のコードを実行してから条件をチェックします。条件が満たされていればループが繰り返されます。したがって、`do-while` の本体は、条件にかかわらず少なくとも1回は実行されます。
+* `while` は条件をチェックし、それが満たされている場合に本体のコードを実行し、再び条件のチェックに戻ります。
+* `do-while` は本体のコードを実行してから条件をチェックします。条件が満たされていればループが繰り返されます。そのため、`do-while` の本体は条件に関係なく少なくとも 1 回は実行されます。
 
-`while` ループの場合、チェックする条件を括弧 `()` 内に、本体を中括弧 `{}` 内に記述します：
+`while` ループでは、チェックする条件を丸括弧 `()` 内に、本体を中括弧 `{}` 内に記述します:
 
 ```kotlin
 fun main() {
@@ -643,9 +638,9 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-while-loop"}
+{kotlin-runnable="true" id="kotlin-while-loop"}
 
-`do-while` ループの場合、括弧 `()` 内の条件チェックの前に、まず中括弧 `{}` 内に本体を記述します：
+`do-while` ループでは、チェックする条件を丸括弧 `()` 内に指定する前に、まず本体を中括弧 `{}` 内に記述します:
 
 ```kotlin
 import kotlin.random.Random
@@ -665,8 +660,8 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-do-while-loop"}
+{kotlin-runnable="true" id="kotlin-do-while-loop"}
 
-## ループ内の break と continue {id="break-and-continue-in-loops"}
+## ループにおける break と continue {id="break-and-continue-in-loops"}
 
-Kotlinは、ループ内での伝統的な `break` および `continue` 演算子をサポートしています。[リターンとジャンプ](returns.md) を参照してください。
+Kotlin は、ループ内での従来の `break` および `continue` 演算子をサポートしています。[リターンとジャンプ](returns.md)を参照してください。

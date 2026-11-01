@@ -4,223 +4,112 @@ title: Koin이란 무엇인가요?
 
 # Koin이란 무엇인가요?
 
-### 실용적인 Kotlin 의존성 주입(DI) 프레임워크 - 단순하면서도 강력합니다 {id="the-pragmatic-kotlin-dependency-injection-framework-simple-and-powerful"}
+Koin은 Kotlin을 위한 의존성 주입(Dependency Injection) 프레임워크입니다. 이 페이지에서는 Koin의 동작 방식, Koin이 제공하는 이점과 그에 따른 비용, 그리고 프로젝트의 구성 방식을 설명합니다. 의존성 주입이 처음이라면 [의존성 주입이란 무엇인가요?](/docs/intro/what-is-dependency-injection)를 먼저 읽어보세요.
 
-Koin은 Kotlin을 위해 특별히 설계된 경량 의존성 주입(Dependency Injection, DI) 프레임워크입니다. 코드 생성이나 리플렉션(reflection)에 의존하는 기존 DI 프레임워크와 달리, Koin은 두 가지 강력한 방식을 제공합니다: 깔끔한 **Kotlin DSL**과 직관적인 **애노테이션(Annotations)**입니다. 팀의 성격에 맞는 방식을 선택하세요 - 두 방식 모두 최고 수준으로 지원(first-class citizens)됩니다.
+## Koin 동작 방식 {id="how-koin-works"}
 
-## Koin의 핵심 가치 {id="koin-s-core-values"}
-
-| 가치 | 의미 |
-|-------|---------------|
-| **생산성(Productive)** | 배우기 쉽고 작성하기 쉽습니다. 몇 시간이 아닌 몇 분 만에 DI를 구축할 수 있습니다. |
-| **개발자 친화적(Developer-Friendly)** | DSL 또는 애노테이션 중 원하는 것을 선택하세요. 명확한 오류 메시지, 쉬운 디버깅, 최적의 개발자 경험(DX)을 제공합니다. |
-| **확장성(Scalable)** | 복잡한 의존성 그래프를 가진 대규모 엔터프라이즈 애플리케이션을 지원합니다. |
-| **안전성(Safe)** | Koin 컴파일러 플러그인을 통한 컴파일 타임 안전성을 보장합니다. |
-| **동적 유연성(Dynamic)** | 런타임 유연성: 모듈 동적 로드, 지연 로딩(lazy loading), 기능 플래그(feature flags) 등을 지원합니다. |
-
-## 개발자들이 Koin을 사랑하는 이유 {id="why-developers-love-koin"}
-
-- **몇 분 만에 익히기** - 복잡한 개념 없이 직관적인 DSL과 단순한 애노테이션만으로 충분합니다.
-- **더 적은 코드 작성** - DSL이나 애노테이션을 사용하면 컴파일러 플러그인이 의존성을 자동으로 연결해 줍니다.
-- **스타일 선택 가능** - Kotlin 순수주의자를 위한 DSL, 익숙한 패턴을 선호하는 이들을 위한 애노테이션 - 두 방식 모두 강력합니다.
-- **쉬운 디버깅** - 명확한 에러 메시지를 제공하며, 추적해야 할 생성된 코드가 없습니다.
-- **자신감 있는 확장** - 전 세계 엔터프라이즈 환경의 프로덕션에서 이미 검증되었습니다.
-- **안전 유지** - 컴파일 타임 검증을 통해 런타임 전에 에러를 잡아냅니다.
-- **유연성 유지** - 런타임 기반이면서도 성능이 뛰어납니다. 동적 모듈, 지연 로딩, 기능 플래그를 지원합니다.
-- **IDE 지원** - Android Studio 및 IntelliJ IDEA용 공식 플러그인 제공 — 정의 이동, 실시간 안전성 체크, 그래프 시각화가 가능합니다.
-
-## 두 가지 스타일, 하나의 프레임워크 - 모두 강력함 {id="two-styles-one-framework-both-equally-powerful"}
-
-Koin은 의존성을 정의하는 두 가지 스타일을 지원합니다. 두 방식 모두 모든 기능을 동등하게 지원하는 일급 객체(first-class citizens)입니다. 팀에 적합한 방식을 선택하세요.
-
-### DSL 스타일 {id="dsl-style"}
-
-Kotlin DSL 구문을 사용하여 의존성을 정의합니다.
+모듈에 클래스를 정의하고, Koin을 한 번 시작한 뒤 필요한 곳에서 인스턴스를 요청합니다.
 
 ```kotlin
+class ApiService
+class UserRepository(private val api: ApiService)
+
 val appModule = module {
-    single<Database>()
-    single<ApiClient>()
+    single<ApiService>()
     single<UserRepository>()
-    viewModel<UserViewModel>()
+}
+
+fun main() {
+    startKoin {
+        modules(appModule)
+    }
 }
 ```
 
-### 애노테이션 스타일 {id="annotation-style"}
+두 가지 부분이 함께 동작합니다.
 
-애노테이션을 사용하여 의존성을 정의합니다.
+- **런타임 컨테이너(Runtime container)**: `startKoin`은 모듈을 컨테이너에 로드합니다. 각 정의(definition)는 하나의 타입을 생성하는 Kotlin 함수입니다. 어딘가에서 `UserRepository`를 요청하면, Koin은 해당 함수를 실행하고 컨테이너로부터 생성자 매개변수를 확인(resolve)한 후, 정의 타입(`single`, `factory`, `scoped`)에 따라 인스턴스를 유지하거나 폐기합니다. Koin은 리플렉션(reflection)으로 객체를 생성하지 않습니다.
+- **컴파일 타임 검증(선택 사항)**: [Koin Compiler Plugin](/docs/intro/koin-compiler-plugin)은 Kotlin 컴파일러 플러그인입니다. 생성자를 읽어 의존성 연결 코드를 생성한 다음, 빌드 타임에 구성된 그래프의 모든 의존성이 선언되어 있는지 검사합니다. 누락된 정의가 있으면 런타임 크래시 대신 빌드 에러가 발생합니다.
+
+[핵심 개념(Core Concepts)](/docs/intro/core-concepts)에서는 모듈, 정의, 스코프 및 주입에 대해 하나의 실습 예제를 통해 설명합니다.
+
+## 런타임 모델이 제공하는 이점과 비용 {id="what-the-runtime-model-costs-and-gives"}
+
+의존성 그래프가 런타임 컨테이너에 존재하기 때문에, Koin은 앱이 실행되는 동안 그래프를 변경할 수 있습니다.
+
+- **동적 모듈(Dynamic modules)**: 기능 플래그(feature flags)나 온디맨드 기능(on-demand features)을 위해 `loadKoinModules()` 및 `unloadKoinModules()`를 사용하여 시작 후 모듈을 로드 및 언로드할 수 있습니다. [Koin 시작하기](/docs/reference/koin-core/starting-koin)를 참고하세요.
+- **지연 모듈(Lazy modules)**: 시작 시 작업을 줄이기 위해 그래프의 일부를 백그라운드에서 로드합니다. [지연 모듈](/docs/reference/koin-core/lazy-modules)을 참고하세요.
+- **런타임에 생성되는 스코프**: 세션, 화면 또는 요청에 맞춰 스코프를 열고 닫을 수 있습니다. [스코프](/docs/reference/koin-core/scopes)를 참고하세요.
+- **생성되는 소스 코드가 없음**: 소스 관리 도구에 커밋할 코드도 없고, Kotlin Multiplatform 타깃별로 설정할 것도 없습니다.
+
+동일한 모델에서 고려해야 할 비용(단점)도 있습니다.
+
+- **시작 시 작업 비용**: Koin이 시작될 때 모듈이 등록되며, 모든 조회(lookup)는 컨테이너를 거칩니다. 대부분의 앱에서는 이 작업이 사소하지만, 즉시 생성 정의(`createdAtStart`)는 Koin을 시작하는 스레드에서 실행됩니다.
+- **플러그인 미사용 시 런타임 에러 발생 가능성**: 플러그인 없이 Constructor DSL이나 Classic DSL을 사용하는 경우, 누락된 정의는 코드가 실행될 때만 발견됩니다. 이는 [`verify()`](/docs/reference/koin-test/verify)를 사용한 단위 테스트나 컴파일러 플러그인을 통한 빌드 타임 검사로 방지할 수 있습니다.
+- **컴파일 타임 검증의 한계**: 플러그인은 `startKoin`과 같은 Koin 진입점에서 조립된 그래프를 검증합니다. 나중에 `loadKoinModules()`로 로드되는 모듈은 빌드 타임에 검증할 수 없으며, 진입점이 없는 라이브러리 모듈은 앱이 이를 조립할 때만 검증됩니다. [컴파일 타임 안정성](/docs/reference/koin-compiler/compile-safety)을 참고하세요.
+- **Kotlin 버전 결합도**: 컴파일러 플러그인은 컴파일러 내부에 의존하므로, 각 플러그인 릴리스는 지원되는 Kotlin 버전 목록에 대해 검증됩니다. [컴파일러 플러그인 설정](/docs/setup/compiler-plugin)을 참고하세요.
+
+## 생성자 주입과 서비스 로케이터 {id="constructor-injection-and-service-locator"}
+
+클래스는 생성자를 통해 의존성을 전달받습니다. Koin은 객체를 직접 생성할 수 없는 진입점에서만 인스턴스를 가져옵니다.
 
 ```kotlin
-@Singleton
-class Database
-
-@Singleton
-class ApiClient
-
-@Singleton
-class UserRepository(
-    private val database: Database,
-    private val apiClient: ApiClient
-)
-
-@KoinViewModel
+// Koin이 생성하는 객체: 의존성은 생성자를 통해 전달됩니다.
+class UserRepository(private val api: UserApi)
 class UserViewModel(private val repository: UserRepository) : ViewModel()
-```
 
-두 스타일 모두 컴파일 타임 안전성을 위해 **Koin 컴파일러 플러그인(Koin Compiler Plugin)**에 의해 처리됩니다.
-
-## 더 간단한 Koin의 애노테이션 {id="koin-s-annotations-are-simpler"}
-
-Hilt나 Dagger를 사용해 보셨다면, Koin 애노테이션이 훨씬 적은 절차적 코드(ceremony)를 요구한다는 점을 느끼실 것입니다.
-
-| 작업 | Koin | Hilt |
-|------|------|------|
-| **Singleton** | `@Singleton class MyService` | `@Singleton class MyService @Inject constructor(...)` |
-| **인터페이스 바인딩** | 자동 (인터페이스만 구현하면 됨) | 추상 모듈에서 `@Binds` 필요 |
-| **컴포넌트 스캔** | `@ComponentScan("package")` | 지원 안 함 |
-| **모듈 탐색** | `@Configuration` - 자동 탐색 | 모듈마다 수동으로 `@InstallIn` 필요 |
-
-**예시 비교:**
-
-```kotlin
-// KOIN - 이게 전부입니다!
-@Singleton
-class MyRepository(val api: ApiService)
-
-@Module
-@ComponentScan("com.app")
-class AppModule
-```
-
-```kotlin
-// HILT - 더 많은 절차가 필요합니다
-@Singleton
-class MyRepository @Inject constructor(val api: ApiService)
-
-@Module
-@InstallIn(SingletonComponent::class)
-abstract class AppModule {
-    @Binds
-    abstract fun bindRepository(impl: MyRepository): Repository
+// Android가 Activity를 생성함: Koin으로부터 ViewModel을 가져옵니다.
+class UserActivity : AppCompatActivity() {
+    private val viewModel: UserViewModel by viewModel()
 }
 ```
 
-## Koin 컴파일러 플러그인 기반 {id="powered-by-koin-compiler-plugin"}
+의존성이 시그니처에 명확히 드러나므로 Koin 없이도 `UserRepository`와 `UserViewModel`을 테스트할 수 있습니다. `by inject()`, `by viewModel()`, `koinInject()`와 같은 인스턴스 조회 함수는 진입점(`Activity`, `Fragment`, 루트 Composable, `main()`, Ktor 라우트, 테스트 등)에서만 사용됩니다. [의존성 주입이란 무엇인가요?](/docs/intro/what-is-dependency-injection)에서 두 패턴을 비교하며, [의존성 가져오기](/docs/reference/koin-core/injection)에서 `get()`과 `inject()`를 다룹니다.
 
-**Koin 컴파일러 플러그인(Koin Compiler Plugin)**은 모든 신규 프로젝트에 권장되는 Koin 사용 방식입니다.
+## 두 가지 스타일, 하나의 컨테이너 {id="two-styles-one-container"}
 
-- **네이티브 Kotlin 컴파일러 플러그인 (K2)** - KSP가 아닌 직접적인 컴파일러 통합 방식입니다.
-- **생성자 파라미터 자동 감지** - 수동 연결 작업이 줄어듭니다.
-- **컴파일 타임 안전성** - 빌드 중에 에러를 잡아냅니다.
-- **DSL과 애노테이션 모두 지원** - 선택은 여러분의 몫입니다.
-- **간단한 설정** - 단 하나의 Gradle 플러그인으로 충분합니다.
+| 스타일 | 예시 | 요구 사항 |
+|---|---|---|
+| 컴파일러 플러그인 DSL | `single<UserRepository>()` | Koin Compiler Plugin |
+| 어노테이션 | `@Singleton class UserRepository(...)` | Koin Compiler Plugin, `koin-annotations` |
+| Constructor DSL | `singleOf(::UserRepository)` | 추가 요구 사항 없음 (플러그인 사용 시 컴파일 타임 검사 추가) |
+| Classic DSL | `single { UserRepository(get()) }` | 추가 요구 사항 없음 (플러그인 사용 시 컴파일 타임 검사 추가) |
 
-### 컴파일러 플러그인을 통한 더 깔끔한 구문 {id="cleaner-syntax-with-compiler-plugin"}
+어노테이션은 한 가지 스타일이며, 컴파일러 플러그인 DSL, Constructor DSL, Classic DSL은 또 다른 방식인 Koin DSL의 세 가지 형태입니다. 모든 스타일은 동일한 컨테이너에서 동일한 정의를 생성합니다. 프로젝트당 하나의 스타일을 선택해 사용하세요. [스타일 선택하기](/docs/intro/choosing-your-style)에서 각 스타일을 비교하고 기본 권장 사항을 제시합니다.
 
-| 기존 DSL (Classic DSL) | 컴파일러 플러그인 DSL |
-|-------------|---------------------|
-| `singleOf(::MyService)` | `single<MyService>()` |
-| `single { MyService(get(), get()) }` | `single<MyService>()` |
-| `factoryOf(::MyRepo)` | `factory<MyRepo>()` |
-| `viewModelOf(::MyVM)` | `viewModel<MyVM>()` |
+## 어노테이션 지원 현황 {id="annotations-status"}
 
-더 자세한 내용은 [Koin 컴파일러 플러그인](/docs/intro/koin-compiler-plugin)에서 확인하세요.
+`koin-annotations` 라이브러리(`@Singleton`, `@Factory`, `@KoinViewModel`, `@Module`, `@ComponentScan`)는 메인 Koin 프로젝트의 일부로, 동일한 저장소, 동일한 버전, 동일한 BOM을 사용합니다. 이는 지원 중단(deprecated)되지 않았습니다. 지원 중단된 것은 이러한 어노테이션을 읽는 데 사용되었던 KSP 프로세서인 `koin-ksp-compiler`입니다. Koin Compiler Plugin이 동일한 어노테이션을 지원하며 이를 대체합니다. [KSP에서 컴파일러 플러그인으로 마이그레이션하기](/docs/migration/from-ksp-to-compiler-plugin)를 참고하세요.
 
-## 클래식 DSL (완전 지원) {id="classic-dsl-fully-supported"}
+## 플랫폼 {id="platforms"}
 
-클래식 DSL은 모든 Kotlin 버전에 대해 계속해서 완전히 지원됩니다.
+Koin은 Kotlin Multiplatform 라이브러리입니다. 코어 모듈은 모든 Kotlin 타깃에서 실행되며, 연동 라이브러리를 통해 플랫폼별 API를 추가로 제공합니다.
 
-```kotlin
-val appModule = module {
-    singleOf(::Database)
-    singleOf(::ApiClient)
-    singleOf(::UserRepository)
-    viewModelOf(::UserViewModel)
-}
-```
+| 플랫폼 | 주요 아티팩트 | 시작하기 |
+|---|---|---|
+| Kotlin/JVM | `koin-core` | [Kotlin 튜토리얼](/docs/quickstart/kotlin) |
+| Android | `koin-android` | [Android에서 Koin 시작하기](/docs/reference/koin-android/start) |
+| Jetpack Compose, Compose Multiplatform | `koin-compose`, `koin-compose-viewmodel` | [Compose용 Koin](/docs/reference/koin-compose/compose) |
+| Kotlin Multiplatform (iOS, 데스크톱, 웹, 네이티브) | `koin-core` | [Kotlin Multiplatform 설정](/docs/reference/koin-core/kmp-setup) |
+| Ktor 서버 | `koin-ktor` | [Ktor용 Koin](/docs/reference/koin-ktor/ktor) |
 
-또는 명시적 연결 방식을 사용할 수 있습니다.
+전체 아티팩트 목록은 [Gradle 설정](/docs/setup/gradle)에서 확인할 수 있습니다.
 
-```kotlin
-val appModule = module {
-    single { Database() }
-    single { ApiClient() }
-    single { UserRepository(get(), get()) }
-    viewModel { UserViewModel(get()) }
-}
-```
+## Koin 프로젝트 {id="the-koin-project"}
 
-:::info
-클래식 DSL은 지원 중단(deprecated)되지 않았습니다. Koin은 이 방식과 완벽하게 작동합니다. 컴파일러 플러그인은 마이그레이션 준비가 되었을 때 컴파일 타임 분석 기능을 추가로 제공해 줍니다.
-:::
+Koin은 Apache 2.0 라이선스 기반의 오픈 소스입니다. 다음과 같이 구성되어 있습니다.
 
-## Koin Annotations는 이제 Koin 프로젝트의 일부입니다 {id="koin-annotations-is-now-part-of-the-koin-project"}
+- **Koin 라이브러리**: core, Android, Compose, Ktor, test, annotations 등 단일 버전으로 함께 릴리스됩니다. 소스 코드: [InsertKoinIO/koin](https://github.com/InsertKoinIO/koin).
+- **Koin Compiler Plugin**: Kotlin 컴파일러 플러그인 및 Gradle 플러그인으로, 독자적인 버전을 갖습니다. 소스 코드: [InsertKoinIO/koin-compiler-plugin](https://github.com/InsertKoinIO/koin-compiler-plugin).
+- **Koin IDE Plugin**: Android Studio 및 IntelliJ IDEA에서의 코드 탐색 및 검사 기능. [IDE 플러그인](/docs/tooling/ide-plugin)을 참고하세요.
+- **샘플**: [InsertKoinIO/koin-getting-started](https://github.com/InsertKoinIO/koin-getting-started)의 각 튜토리얼별 실행 가능한 앱.
 
-`@Singleton`, `@Factory`, `@KoinViewModel`, `@Module`, `@ComponentScan` 등을 포함한 `koin-annotations` 라이브러리는 메인 Koin 버전과 함께 릴리스되며 완전히 지원됩니다. 이 또한 지원 중단되지 **않았습니다**.
+Hilt나 Dagger에 익숙하다면 [Koin vs Hilt](/docs/intro/koin-vs-hilt)에서 두 접근 방식의 차이점을 비교해 보세요.
 
-```kotlin
-dependencies {
-    implementation(platform("io.insert-koin:koin-bom:$koin_version"))
-    implementation("io.insert-koin:koin-core")
-    implementation("io.insert-koin:koin-annotations") // Koin 버전과 동일
-}
-```
+## 관련 문서 {id="related"}
 
-여러분의 애노테이션은 **Koin 컴파일러 플러그인**에 의해 처리됩니다 — [Koin 컴파일러 플러그인](/docs/intro/koin-compiler-plugin) 및 [애노테이션 레퍼런스](/docs/reference/koin-annotations/start)를 참조하세요.
-
-## Koin KSP 컴파일러는 Koin 컴파일러 플러그인으로 대체되어 지원 중단되었습니다 {id="koin-ksp-compiler-is-deprecated-in-favor-of-koin-compiler-plugin"}
-
-:::info
-기존의 KSP 프로세서인 `koin-ksp-compiler`는 **지원 중단(deprecated)**되었으며 향후 Koin 버전에서 제거될 예정입니다. 대체 기술은 **Koin 컴파일러 플러그인**입니다 — 네이티브 K2 컴파일러 통합, 생성 파일 없음, 더 간단한 KMP 설정이 특징입니다.
-:::
-
-`koin-ksp-compiler`와 함께 Koin Annotations를 사용 중이라면 컴파일러 플러그인으로 마이그레이션하세요:
-
-- **동일한 애노테이션** — 코드 변경이 필요 없습니다.
-- **더 나은 처리 방식** — 네이티브 컴파일러 통합으로 생성 파일이 없습니다.
-- **더 간단한 설정** — KSP 설정이 필요 없습니다.
-
-[KSP에서 컴파일러 플러그인으로 마이그레이션하기](/docs/migration/from-ksp-to-compiler-plugin)를 확인하세요.
-
-## 런타임 유연성 + 컴파일 안전성 = 두 세계의 장점 결합 {id="runtime-compile-safe-best-of-both-worlds"}
-
-Koin은 **런타임 기반이면서도 성능이 뛰어나고 컴파일 시 안전**합니다. 이 독특한 조합은 다음을 가능하게 합니다:
-
-**컴파일 타임 안전성** (컴파일러 플러그인 사용 시):
-- 빌드 중에 의존성 그래프를 검증합니다.
-- 생성자 파라미터를 자동으로 감지합니다.
-- 런타임 전에 누락된 의존성을 잡아냅니다.
-
-**런타임 유연성** (컴파일 타임 전용 프레임워크가 제공할 수 없는 기능):
-- 동적 모듈 로드/언로드
-- 지연 모듈 로딩 (백그라운드)
-- 기능 플래그 기반의 주입
-- 플러그인 아키텍처
-- 다양한 구현체를 활용한 A/B 테스팅
-
-```kotlin
-// 동적 모듈 로딩 - Hilt에서는 불가능합니다.
-if (featureEnabled) {
-    loadKoinModules(premiumFeatureModule)
-}
-
-// 이후 기능이 비활성화될 경우
-unloadKoinModules(premiumFeatureModule)
-```
-
-## Koin은 누구를 위한 것인가요? {id="who-is-koin-for"}
-
-Koin은 다음과 같은 경우에 이상적입니다:
-
-- **생산성을 중요하게 생각하는 팀** - 보일러플레이트 코드를 줄이고 개발 속도를 높이고자 할 때
-- **Android 개발자** - Hilt/Dagger보다 깔끔한 DI를 원하는 경우
-- **Kotlin Multiplatform 프로젝트** - Android, iOS, 데스크톱, 웹, 백엔드 대응
-- **엔터프라이즈 프로젝트** - 확장이 필요한 대규모 프로젝트
-- **DI가 복잡해서는 안 된다고 믿는 모든 이들**
-
-## 다음 단계 {id="next-steps"}
-
-- **[의존성 주입이란 무엇인가요?](/docs/intro/what-is-dependency-injection)** - DI의 기본 개념 익히기
-- **[Koin 컴파일러 플러그인](/docs/intro/koin-compiler-plugin)** - 권장되는 접근 방식
-- **[설정 가이드](/docs/setup/gradle)** - 프로젝트에 Koin 추가하기
-- **[튜토리얼](/docs/tutorials/your-first-app)** - Koin으로 첫 번째 앱 만들기
+- [핵심 개념](/docs/intro/core-concepts): 단계별 예제를 통해 살펴보는 개념적 모델.
+- [스타일 선택하기](/docs/intro/choosing-your-style): 어떤 선언 스타일을 사용할 것인가.
+- [Koin Compiler Plugin](/docs/intro/koin-compiler-plugin): 빌드 타임에 일어나는 작업.
+- [설정](/docs/setup): 프로젝트에 Koin 추가하기.
+- [튜토리얼](/docs/quickstart/kotlin): 첫 번째 앱 만들기.

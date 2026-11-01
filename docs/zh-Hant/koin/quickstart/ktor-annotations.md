@@ -2,57 +2,94 @@
 title: Ktor 與註解
 ---
 
-> Ktor 是一個使用強大的 Kotlin 程式語言，在連網系統中建置非同步伺服器和用戶端的架構。我們將在此使用 Ktor 來建置一個簡單的 Web 應用程式。
+# Ktor 與註解
 
-出發吧 🚀
+在本教學中，你將建置一個具有 `/hello` 端點的 Ktor Web 應用程式，該端點會向清單中選取的使用者打招呼。你將學習如何為類別加上註解、將它們掃描至模組中，並透過 `@KoinApplication` 物件在 Koin Ktor 外掛程式中載入它們。這大約需要 10 分鐘，並需要 JDK 17 與 Gradle。
 
-:::note
-更新 - 2024-10-21
-:::
+本教學使用註解。若要查看使用 Compiler Plugin DSL 實作的相同應用程式，請參閱 [Ktor](/docs/quickstart/ktor)。若要比較不同風格，請參閱 [選擇你的風格](/docs/intro/choosing-your-style)。
 
 ## 取得程式碼 {id="get-the-code"}
 
-:::info
-[原始碼可以在 GitHub 上找到](https://github.com/InsertKoinIO/koin-getting-started/tree/main/ktor-annotations)
-:::
+完整的範例位於 [koin-getting-started/ktor-annotations](https://github.com/InsertKoinIO/koin-getting-started/tree/main/ktor-annotations)。複製存儲庫並從 `ktor-annotations` 資料夾中執行 `app` 模組。
 
 ## Gradle 設定 {id="gradle-setup"}
 
-首先，如下所示加入 Koin 相依性：
+此範例套用了 Koin Compiler Plugin 並新增了 `koin-ktor`、`koin-annotations` 與 `koin-logger-slf4j`。版本管理於版本目錄中：
+
+```toml
+# gradle/libs.versions.toml
+[versions]
+# Kotlin, Ktor and Logback entries omitted
+koin = "<KOIN_VERSION>"
+koin-plugin = "<KOIN_PLUGIN_VERSION>"
+
+[libraries]
+koin-ktor = { module = "io.insert-koin:koin-ktor", version.ref = "koin" }
+koin-annotations = { module = "io.insert-koin:koin-annotations", version.ref = "koin" }
+koin-logger-slf4j = { module = "io.insert-koin:koin-logger-slf4j", version.ref = "koin" }
+koin-test = { module = "io.insert-koin:koin-test", version.ref = "koin" }
+koin-test-junit4 = { module = "io.insert-koin:koin-test-junit4", version.ref = "koin" }
+
+[plugins]
+koin-compiler = { id = "io.insert-koin.compiler.plugin", version.ref = "koin-plugin" }
+```
 
 ```kotlin
+// app/build.gradle.kts
 plugins {
-
-    id("com.google.devtools.ksp") version kspVersion
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.koin.compiler)
+    application
 }
 
 dependencies {
-    // 適用於 Kotlin 應用程式的 Koin
-    implementation("io.insert-koin:koin-ktor:$koin_version")
-    implementation("io.insert-koin:koin-logger-slf4j:$koin_version")
+    implementation(libs.ktor.server)
+    implementation(libs.logback)
+    implementation(libs.koin.ktor)
+    implementation(libs.koin.annotations)
+    implementation(libs.koin.logger.slf4j)
 
-    implementation("io.insert-koin:koin-annotations:$koinAnnotationsVersion")
-    ksp("io.insert-koin:koin-ksp-compiler:$koinAnnotationsVersion")
+    testImplementation(libs.ktor.test)
+    testImplementation(libs.koin.test)
+    testImplementation(libs.koin.test.junit4)
 }
 ```
 
-## 應用程式概覽 {id="application-overview"}
+Compiler Plugin 會處理註解，並需要 Kotlin 2.3.20 或更高版本。`koin-annotations` 與 Koin 共用相同版本。如需詳細資訊，請參閱 [Gradle 設定](/docs/setup/gradle) 與 [Compiler Plugin 設定](/docs/setup/compiler-plugin)。
 
-此應用程式的想法是管理使用者列表，並將其顯示在我們的 `UserApplication` 類別中：
+## 應用程式架構 {id="the-application"}
 
-> Users -> UserRepository -> UserService -> UserApplication
+`/hello` 路由向 `UserService` 請求使用者，而 `UserService` 從 `UserRepository` 讀取資料：
 
-## 「User」資料 {id="the-user-data"}
+```
+User -> UserRepository -> UserService -> /hello route
+```
 
-我們將管理一個使用者集合。這是資料類別：
+## 編寫使用者資料 {id="let-s-write-the-user-data"}
+
+首先建立資料類別與預設的使用者清單：
 
 ```kotlin
 data class User(val name: String, val email: String)
+
+val DEFAULT_USER = User("Alice", "alice@example.com")
+
+val DEFAULT_USERS = listOf(
+    DEFAULT_USER,
+    User("Bob", "bob@example.com"),
+    User("Charlie", "charlie@example.com")
+)
 ```
 
-我們建立一個「Repository」組件來管理使用者列表（新增使用者或按名稱尋找）。以下是 `UserRepository` 介面及其實作：
+這些使用者即是存儲庫所儲存的資料。
+
+## 編寫存儲庫 {id="let-s-write-the-repository"}
+
+存儲庫將使用者保留在記憶體中。使用 `@Singleton` 為實作加上註解：
 
 ```kotlin
+import org.koin.core.annotation.Singleton
+
 interface UserRepository {
     fun findUserOrNull(name: String): User?
     fun addUsers(users: List<User>)
@@ -73,39 +110,15 @@ class UserRepositoryImpl : UserRepository {
 }
 ```
 
-## Koin 模組 {id="the-koin-module"}
+Koin 會將 `UserRepositoryImpl` 繫結至其父型別，因此請求 `UserRepository` 時將取得此執行個體。`@Singleton` 來自 `org.koin.core.annotation`，其等同於 `@Single`（請參閱 [定義](/docs/reference/koin-core/definitions)）。
 
-使用 `@Module` 註解從指定的 Kotlin 類別宣告 Koin 模組。Koin 模組是我們定義所有要被注入的組件的地方。
+## 編寫服務 {id="let-s-write-the-service"}
 
-```kotlin
-@Module
-@ComponentScan("org.koin.sample")
-@Configuration
-class AppModule
-```
-
-* `@Module` - 宣告此為 Koin 模組
-* `@ComponentScan("org.koin.sample")` - 掃描並註冊套件中帶有註解的類別
-* `@Configuration` - 透過 `@KoinApplication` 啟用自動模組發現
-
-:::note
-此專案使用 Koin 的 `@Singleton` 註解（來自 `org.koin.core.annotation`）來宣告單例組件。
-:::
-
-讓我們宣告第一個組件。我們想要一個 `UserRepository` 的單例，透過建立 `UserRepositoryImpl` 的執行個體。我們將其標記為 `@Singleton`：
-
-```kotlin
-@Singleton
-class UserRepositoryImpl : UserRepository
-```
-
-## UserService 組件 {id="the-userservice-component"}
-
-讓我們撰寫 `UserService` 組件來管理使用者操作：
+`UserService` 負責載入使用者並準備問候訊息。它同樣也是一個 `@Singleton`：
 
 ```kotlin
 interface UserService {
-    fun getUserOrNull(name: String): User?
+    fun getUserOrNull(name: String = DEFAULT_USER.name): User?
     fun loadUsers()
     fun prepareHelloMessage(user: User?): String
 }
@@ -118,51 +131,57 @@ class UserServiceImpl(
     override fun getUserOrNull(name: String): User? = userRepository.findUserOrNull(name)
 
     override fun loadUsers() {
-        userRepository.addUsers(listOf(
-            User("Alice", "alice@example.com"),
-            User("Bob", "bob@example.com"),
-            User("Charlie", "charlie@example.com")
-        ))
+        userRepository.addUsers(DEFAULT_USERS)
     }
 
     override fun prepareHelloMessage(user: User?): String {
-        return user?.let { "Hello '${user.name}' (${user.email})! 👋" } ?: "❌ User not found"
+        return user?.let { "Hello '${user.name}' (${user.email})!" } ?: "User not found"
     }
 }
 ```
 
-> `UserRepository` 在 `UserServiceImpl` 的建構函式中被引用
+Compiler Plugin 會讀取建構函式，並為你傳遞 `UserRepository` 執行個體。
 
-我們使用 `@Singleton` 註解宣告 `UserService`：
+## 宣告 Koin 模組 {id="let-s-declare-the-koin-module"}
 
-## HTTP 控制器與 Koin 應用程式 {id="http-controller-and-koin-application"}
-
-最後，我們需要建立一個 `@KoinApplication` 物件並配置我們的 HTTP 路由：
+模組用於將定義分組（請參閱 [核心概念](/docs/intro/core-concepts)）。宣告一個會掃描範例套件的模組類別：
 
 ```kotlin
-@KoinApplication
-object KoinUserApplication
+import org.koin.core.annotation.ComponentScan
+import org.koin.core.annotation.Configuration
+import org.koin.core.annotation.Module
+
+@Module
+@ComponentScan("org.koin.sample")
+@Configuration
+class AppModule
 ```
 
-`@KoinApplication` 註解將其標記為 Koin 基於註解配置的入口點。KSP 處理器會產生可用於 `withConfiguration<T>()` 的配置來初始化 Koin。
+`@ComponentScan` 會註冊 `org.koin.sample` 及其子套件中所有加上註解的類別。`@Configuration` 讓該模組能被 `@KoinApplication` 入口點探索到。這兩者均在 [模組](/docs/reference/koin-core/modules) 中有詳細說明。
 
-## 啟動與注入 {id="start-and-inject"}
+## 安裝 Koin 並編寫路由 {id="let-s-install-koin-and-write-the-route"}
 
-現在讓我們使用 Koin 配置 Ktor 應用程式：
+宣告一個 `@KoinApplication` 物件。安裝 `Koin` 外掛程式並使用 `withConfiguration<T>()` 載入配置，接著在 `/hello` 路由中注入 `UserService`：
 
 ```kotlin
+import org.koin.core.annotation.KoinApplication
+import org.koin.ktor.ext.inject
+import org.koin.ktor.plugin.Koin
+import org.koin.logger.slf4jLogger
+import org.koin.plugin.module.dsl.withConfiguration
+
+@KoinApplication
+object KoinUserApplication
+
 fun Application.main() {
-    // 使用產生的配置安裝 Koin
     install(Koin) {
         slf4jLogger()
         withConfiguration<KoinUserApplication>()
     }
 
-    // 延遲注入 UserService
     val service by inject<UserService>()
     service.loadUsers()
 
-    // 路由區段
     routing {
         get("/hello") {
             val userName = call.queryParameters["name"] ?: "Alice"
@@ -174,12 +193,11 @@ fun Application.main() {
 }
 ```
 
-**重點：**
-* `withConfiguration<KoinUserApplication>()` - 使用來自帶有註解的應用程式物件所產生的 Koin 配置
-* 無需手動呼叫 `modules(AppModule().module)` — 它已自動包含在內！
-* `/hello` 端點接受一個選用的 `name` 查詢參數
+`withConfiguration<KoinUserApplication>()` 會載入每個 `@Configuration` 模組，因此你不需要呼叫 `modules()`，且外掛程式會在組建期驗證完整的依賴關係圖。`slf4jLogger()` 會將 Koin 記錄傳送至 SLF4J。有關 Ktor 專屬的 API，請參閱 [適用於 Ktor 的 Koin](/docs/reference/koin-ktor/ktor)。
 
-讓我們啟動 Ktor：
+## 啟動伺服器 {id="let-s-start-the-server"}
+
+啟動執行你應用程式模組的內嵌 Netty 伺服器：
 
 ```kotlin
 fun main(args: Array<String>) {
@@ -189,10 +207,15 @@ fun main(args: Array<String>) {
 }
 ```
 
-就這樣！您已經準備就緒。請查看以下網址：
-- `http://localhost:8080/hello` - 向 Alice 打招呼（預設使用者）
-- `http://localhost:8080/hello?name=Bob` - 向 Bob 打招呼
+執行應用程式，然後開啟以下 URL：
 
-:::info
-帶有 `@Configuration` 的 `@KoinApplication` 註解會在編譯期自動發現並載入所有帶有註解的相依性。
-:::
+- `http://localhost:8080/hello`：向預設使用者 Alice 打招呼。
+- `http://localhost:8080/hello?name=Bob`：向 Bob 打招呼。
+
+## 後續步驟 {id="next-steps"}
+
+- [核心概念](/docs/intro/core-concepts)：模組、定義與注入背後的心智模型。
+- [適用於 Ktor 的 Koin](/docs/reference/koin-ktor/ktor)：安裝選項、路由中的注入以及 Ktor 事件。
+- [註解參考](/docs/reference/koin-annotations/annotations-inventory)：每個註解及其參數。
+- [Ktor 測試](/docs/reference/koin-ktor/ktor-testing)：使用 `testApplication` 和 Koin 測試你的路由。
+- [工具集](/docs/tooling)：適用於 Koin 的 IDE 外掛程式與監控工具。

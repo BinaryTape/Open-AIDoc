@@ -1,17 +1,16 @@
 [//]: # (title: 过滤集合)
 
 过滤是集合处理中最常见的任务之一。
-在 Kotlin 中，过滤条件由 *谓词* (predicates) 定义 —— 即接收一个集合元素并返回布尔值的 lambda 函数：`true` 表示给定元素与谓词匹配，`false` 则表示不匹配。
+在 Kotlin 中，过滤条件由*谓词*（predicate）定义——即接收一个集合元素并返回布尔值的 lambda 表达式：`true` 表示给定元素符合谓词条件，`false` 则表示不符合。
 
-标准库包含一组扩展函数，让你可以在单次调用中过滤集合。
-这些函数不会改变原始集合，因此它们既可用于[可变集合也可用于只读集合](collections-overview.md#collection-types)。
-要操作过滤结果，你应该将其赋值给一个变量，或者在过滤后进行链式函数调用。
+标准库包含一组扩展函数，让你可以通过单次调用来过滤集合。
+这些函数不会改变原始集合，因此它们既可用于[可变集合也可用于只读集合](collections-overview.md#collection-types)。要对过滤结果进行操作，你应该将其赋值给一个变量，或者在过滤后继续进行链式调用。
 
 ## 按谓词过滤 {id="filter-by-predicate"}
 
-基本的过滤函数是 [`filter()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/filter.html)。
-当调用并传入谓词时，`filter()` 会返回与其匹配的集合元素。
-对于 `List` 和 `Set`，结果集合都是 `List`；对于 `Map`，结果也是 `Map`。
+最基本的过滤函数是 [`filter()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/filter.html)。
+当使用谓词调用时，`filter()` 会返回符合该谓词的集合元素。
+无论对于 `List` 还是 `Set`，返回的结果集合都是 `List`；对于 `Map`，返回的结果依然是 `Map`。
 
 ```kotlin
 fun main() {
@@ -26,14 +25,14 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
 `filter()` 中的谓词只能检查元素的值。
-如果你想在过滤器中使用元素位置，请使用 [`filterIndexed()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/filter-indexed.html)。
-它接收一个带有两个实参的谓词：元素的索引和值。 
+如果你想在过滤中使用元素的位置，请使用 [`filterIndexed()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/filter-indexed.html)。
+它接收一个包含两个实参的谓词：元素的索引与元素的值。
 
-要根据否定条件过滤集合，请使用 [`filterNot()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/filter-not.html)。
-它返回一个列表，其中包含谓词返回 `false` 的元素。
+要通过否定条件过滤集合，请使用 [`filterNot()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/filter-not.html)。
+它会返回谓词计算结果为 `false` 的元素列表。
 
 ```kotlin
 fun main() {
@@ -48,12 +47,11 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-还有一些函数可以通过过滤给定类型的元素来缩小元素类型：
+还有一些函数可以通过过滤给定类型的元素来缩窄元素类型：
 
-* [`filterIsInstance()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/filter-is-instance.html) 返回给定类型的集合元素。
-    在 `List<Any>` 上调用时，`filterIsInstance<T>()` 返回一个 `List<T>`，从而允许你对其项调用 `T` 类型的函数。
+* [`filterIsInstance()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/filter-is-instance.html) 返回给定类型的集合元素。在 `List<Any>` 上调用时，`filterIsInstance<T>()` 会返回一个 `List<T>`，从而允许你对其元素调用 `T` 类型的方法。
 
     ```kotlin
     fun main() {
@@ -66,10 +64,9 @@ fun main() {
     //sampleEnd
     }
     ```
-    {kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+    {kotlin-runnable="true"}
 
-* [`filterNotNull()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/filter-not-null.html) 返回所有非 null 元素。
-    在 `List<T?>` 上调用时，`filterNotNull()` 返回一个 `List<T: Any>`，从而允许你将这些元素视为不可为 null 的对象。
+* [`filterNotNull()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/filter-not-null.html) 返回所有非 null 元素。在 `List<T?>` 上调用时，`filterNotNull()` 会返回 `List<T: Any>`，从而允许你将元素视为非 null 对象。
 
     ```kotlin
     fun main() {
@@ -81,12 +78,12 @@ fun main() {
     //sampleEnd
     }
     ```
-    {kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+    {kotlin-runnable="true"}
 
-## 分区 {id="partition"}
+## 双向划分 (Partition) {id="partition"}
 
-另一个过滤函数 —— [`partition()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/partition.html) —— 通过谓词过滤集合，并将不匹配的元素保留在一个单独的列表中。
-因此，你会得到一个由 `List` 组成的 `Pair` (对) 作为返回值：第一个列表包含与谓词匹配的元素，第二个列表包含原始集合中的其他所有元素。
+另一个过滤函数——[`partition()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/partition.html)——通过谓词过滤集合，并将不符合谓词的元素保留在单独的列表中。
+因此，你会得到一个包含两个 `List` 的 `Pair` 作为返回值：第一个列表包含符合谓词的元素，第二个列表则包含原始集合中的其余所有元素。
 
 ```kotlin
 fun main() {
@@ -99,16 +96,16 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-## 测试谓词 {id="test-predicates"}
+## 检测谓词 {id="test-predicates"}
 
-最后，还有一些函数只是简单地针对集合元素测试谓词：
+最后，还有一些函数仅用于针对集合元素检测谓词：
 
-* [`any()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/any.html) 如果至少有一个元素与给定谓词匹配，则返回 `true`。
-* [`none()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/none.html) 如果没有元素与给定谓词匹配，则返回 `true`。
-* [`all()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/all.html) 如果所有元素都与给定谓词匹配，则返回 `true`。
-    请注意，在空集合上使用任何有效的谓词调用 `all()` 都会返回 `true`。这种行为在逻辑学中被称为 *[空真](https://en.wikipedia.org/wiki/Vacuous_truth)* (vacuous truth)。
+* [`any()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/any.html)：如果至少有一个元素符合给定谓词，则返回 `true`。
+* [`none()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/none.html)：如果没有元素符合给定谓词，则返回 `true`。
+* [`all()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/all.html)：如果所有元素都符合给定谓词，则返回 `true`。
+    请注意，在空集合上使用任何有效谓词调用 `all()` 时都会返回 `true`。这种行为在逻辑学中被称为*[虚真 (vacuous truth)](https://en.wikipedia.org/wiki/Vacuous_truth)*。
 
 ```kotlin
 fun main() {
@@ -119,14 +116,14 @@ fun main() {
     println(numbers.none { it.endsWith("a") })
     println(numbers.all { it.endsWith("e") })
 
-    println(emptyList<Int>().all { it > 5 })   // 空真
+    println(emptyList<Int>().all { it > 5 })   // 虚真 (vacuous truth)
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-`any()` 和 `none()` 也可以在不传入谓词的情况下使用：在这种情况下，它们只是检查集合是否为空。
-如果有元素，`any()` 返回 `true`，否则返回 `false`；`none()` 则相反。
+`any()` 和 `none()` 也可以在不带谓词的情况下使用：此时它们仅用于检查集合是否为空。
+如果集合中存在元素，`any()` 返回 `true`，不存在则返回 `false`；`none()` 的作用则刚好相反。
 
 ```kotlin
 fun main() {
@@ -142,4 +139,4 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}

@@ -3,6 +3,7 @@
 <primary-label ref="client-plugin"/>
 
 <var name="artifact_name" value="ktor-client-encoding"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.client.encoding"/>
 
 <tldr>
 <p>
@@ -18,38 +19,46 @@
 </tldr>
 
 <link-summary>
-ContentEncodingプラグインを使用すると、指定した圧縮アルゴリズム（'gzip'や'deflate'など）を有効にし、その設定を構成できます。
+ContentEncoding プラグインを使用すると、指定した圧縮アルゴリズム（'gzip' や 'deflate' など）を有効にし、その設定を行うことができます。
 </link-summary>
 
-Ktorクライアントは、指定した圧縮アルゴリズム（`gzip`や`deflate`など）を有効にし、その設定を構成できるようにする[`ContentEncoding`](https://api.ktor.io/ktor-client-encoding/io.ktor.client.plugins.compression/-content-encoding)プラグインを提供します。
+Ktor クライアントは、指定した圧縮アルゴリズム（`gzip` や `deflate` など）を有効にしてそれらの設定を行える [`ContentEncoding`](https://api.ktor.io/ktor-client-encoding/io.ktor.client.plugins.compression/-content-encoding) プラグインを提供しています。 
 
-このプラグインは以下の機能を提供します：
-* 指定された品質値（quality value）を使用して`Accept-Encoding`ヘッダーを設定します。
-* 必要に応じてリクエストボディをエンコードします。
-* [サーバーから受信したコンテンツ](client-responses.md#body)をデコードして、オリジナルのペイロードを取得します。
+このプラグインは以下の機能を提供します:
+* 指定された品質値を持つ `Accept-Encoding` ヘッダーを設定します。
+* オプションでリクエストボディをエンコードします。
+* [サーバーから受信したコンテンツ](client-responses.md#body)をデコードして、元のペイロードを取得します。
 
 ## 依存関係の追加 {id="add_dependencies"}
 
-`ContentEncoding`を使用するには、ビルドスクリプトに`%artifact_name%`アーティファクトを含める必要があります：
+`ContentEncoding` を使用するには、ビルドスクリプトに `%artifact_name%` アーティファクトを追加します:
 
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上記のコードスニペットでは、Ktor の依存関係を指定するために <a href="server-dependencies.topic#using-version-catalog">
+            Ktor バージョンカタログ</a> を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上記のコードスニペットでは、Ktor の依存関係を指定するために <a href="server-dependencies.topic#using-version-catalog">
+            Ktor バージョンカタログ</a> を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
     </TabItem>
 </Tabs>
 <tip>
-    Ktorクライアントに必要なアーティファクトの詳細については、<Links href="/ktor/client-dependencies" summary="既存のプロジェクトにクライアントの依存関係を追加する方法を学びます。">クライアントの依存関係の追加</Links>を参照してください。
+    Ktor クライアントに必要なアーティファクトの詳細については、<Links href="client-dependencies.md" summary="Learn how to add client dependencies to an existing project.">クライアントの依存関係の追加</Links> を参照してください。
 </tip>
 
-## ContentEncodingのインストール {id="install_plugin"}
+## `ContentEncoding` のインストール {id="install_plugin"}
 
-`ContentEncoding`をインストールするには、[クライアント構成ブロック](client-create-and-configure.md#configure-client)内で`install`関数に渡します：
+`ContentEncoding` をインストールするには、[クライアント設定ブロック](client-create-and-configure.md#configure-client)内で `install` 関数に渡します:
 
 ```kotlin
 import io.ktor.client.*
@@ -61,13 +70,13 @@ val client = HttpClient(CIO) {
 }
 ```
 
-## ContentEncodingの構成 {id="configure_plugin"}
+## `ContentEncoding` の設定 {id="configure_plugin"}
 
 ### エンコーダーの有効化 {id="enable-encoders"}
 
-どのエンコーダーをサポートするかを構成し、それらの品質値（`Accept-Encoding`ヘッダーで使用）を指定できます。
+サポートするエンコーダーを設定し、それらの品質値（`Accept-Encoding` ヘッダーで使用されます）を指定できます。
 
-以下の[例](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-content-encoding)は、カスタム品質値を使用して`deflate`および`gzip`エンコーダーを有効にする方法を示しています：
+以下の[例](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-content-encoding)では、カスタムの品質値で `deflate` および `gzip` エンコーダーを有効にしています:
 
 ```kotlin
 val client = HttpClient(CIO) {
@@ -78,17 +87,17 @@ val client = HttpClient(CIO) {
 }
 ```
 
-必要に応じて、[`ContentEncoder`](https://api.ktor.io/ktor-utils/io.ktor.util/-content-encoder/index.html)インターフェースを実装してカスタムエンコーダーを作成し、それを`customEncoder()`関数を使用して登録できます。
+必要に応じて、[`ContentEncoder`](https://api.ktor.io/ktor-utils/io.ktor.util/-content-encoder/index.html) インターフェースを実装してカスタムエンコーダーを作成し、`customEncoder()` 関数を使用して登録することもできます。
 
-### modeプロパティの設定 {id="set-the-mode-property"}
+### `mode` プロパティの設定 {id="set-the-mode-property"}
 
-デフォルトでは、`ContentEncoding`はレスポンスのデコード（解凍）のみを処理します。`mode`プロパティを使用して、プラグインの動作を定義できます。
+デフォルトでは、`ContentEncoding` はレスポンスの解凍（decompression）のみを処理します。プラグインの動作方法を定義するには、`mode` プロパティを使用します。
 
-利用可能な値は以下の通りです：
+利用可能な値は以下のとおりです:
 <deflist>
 <def>
 <title><code>ContentEncodingConfig.Mode.DecompressResponse</code></title>
-レスポンスのデコードのみを行います。これがデフォルトのモードです。
+レスポンスの解凍のみを行います。これがデフォルトのモードです。
 </def>
 <def>
 <title><code>ContentEncodingConfig.Mode.CompressRequest</code></title>
@@ -96,13 +105,13 @@ val client = HttpClient(CIO) {
 </def>
 <def>
 <title><code>ContentEncodingConfig.Mode.All</code></title>
-レスポンスのデコードとリクエストの圧縮の両方を有効にします。
+レスポンスの解凍とリクエストの圧縮の両方を有効にします。
 </def>
 </deflist>
 
 ## リクエストボディのエンコード {id="encode_request_body"}
 
-リクエストの圧縮を有効にするには、`mode`プロパティを設定し、[`HttpRequestBuilder`](https://api.ktor.io/ktor-client-core/io.ktor.client.request/-http-request-builder/index.html)ブロック内で`compress()`関数を使用します。
+リクエスト圧縮を有効にするには、`mode` プロパティを設定し、[`HttpRequestBuilder`](https://api.ktor.io/ktor-client-core/io.ktor.client.request/-http-request-builder/index.html) ブロック内で `compress()` 関数を使用します:
 
 ```kotlin
 import io.ktor.client.*
@@ -121,13 +130,13 @@ client.post("/upload") {
 }
 ```
 
-この例では：
+この例では:
 
-* `mode = ContentEncodingConfig.Mode.CompressRequest` はリクエストの圧縮を有効にします。
-* `gzip()` はgzipエンコーダーを登録します。
-* `compress("gzip")` は、この特定のリクエストにgzip圧縮を適用します。
-* `Content-Encoding`ヘッダーは自動的に追加されます。
+* `mode = ContentEncodingConfig.Mode.CompressRequest` はリクエスト圧縮を有効にします。
+* `gzip()` は gzip エンコーダーを登録します。
+* `compress("gzip")` はこの特定のリクエストに gzip 圧縮を適用します。
+* `Content-Encoding` ヘッダーは自動的に追加されます。
 
-> レスポンスの処理に関する詳細は、[レスポンスの受信](client-responses.md)を参照してください。
+> レスポンスの処理に関する詳細については、[レスポンスの受信](client-responses.md)を参照してください。
 >
 {style="tip"}

@@ -6,10 +6,11 @@
 <var name="plugin_name" value="Resources"/>
 <var name="package_name" value="io.ktor.server.resources"/>
 <var name="artifact_name" value="ktor-server-resources"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.server.resources"/>
 
 <tldr>
 <p>
-<b>所需依赖项</b>: <code>io.ktor:%artifact_name%</code>
+<b>必需依赖项</b>: <code>io.ktor:%artifact_name%</code>
 </p>
 <var name="example_name" value="resource-routing"/>
 <p>
@@ -19,13 +20,13 @@
     </a>
 </p>
 <p>
-    <b><Links href="/ktor/server-native" summary="Ktor 支持 Kotlin/Native，允许您在没有额外运行时或虚拟机的情况下运行服务器。">原生服务器</Links>支持</b>: ✅
+    <b><Links href="server-native.md" summary="Ktor 支持 Kotlin/Native，允许您在无需额外运行时或虚拟机的情况下运行服务器。">原生服务器</Links>支持</b>: ✅
 </p>
 </tldr>
 
 <link-summary>Resources 插件允许您实现类型安全路由。</link-summary>
 
-Ktor 提供了 [Resources](https://api.ktor.io/ktor-resources/io.ktor.resources/-resources/index.html) 插件，允许您实现类型安全[路由](server-routing.md)。为此，您需要创建一个作为类型化路由的类，然后使用 `@Resource` 关键字为该类添加注解。请注意，`@Resource` 注解具有由 kotlinx.serialization 库提供的 `@Serializable` 行为。
+Ktor 提供了 [Resources](https://api.ktor.io/ktor-resources/io.ktor.resources/-resources/index.html) 插件，允许您实现类型安全的[路由](server-routing.md)。为此，您需要创建一个充当类型化路由的类，然后使用 `@Resource` 关键字对其进行注解。请注意，`@Resource` 注解具有由 kotlinx.serialization 库提供的 `@Serializable` 行为。
 
 > Ktor 客户端提供了向服务器发起[类型化请求](client-resources.md)的能力。
 
@@ -33,19 +34,27 @@ Ktor 提供了 [Resources](https://api.ktor.io/ktor-resources/io.ktor.resources/
 
 ### 添加 kotlinx.serialization {id="add_serialization"}
 
-鉴于[资源类](#resource_classes)应具有 `@Serializable` 行为，您需要按照 [设置 (Setup)](https://github.com/Kotlin/kotlinx.serialization#setup) 部分的说明添加 Kotlin 序列化插件。
+鉴于[资源类](#resource_classes)应具有 `@Serializable` 行为，您需要按照[设置](https://github.com/Kotlin/kotlinx.serialization#setup)部分中的说明添加 Kotlin 序列化插件。
 
 ### 添加 %plugin_name% 依赖项 {id="add_plugin_dependencies"}
 
 <p>
-    要使用 <code>%plugin_name%</code>，您需要在构建脚本中包含 <code>%artifact_name%</code> 构件：
+    要使用 <code>%plugin_name%</code>，请将 <code>%artifact_name%</code> 构件添加到您的构建脚本中：
 </p>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上述代码段使用 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 版本目录</a>来指定 Ktor 依赖项。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上述代码段使用 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 版本目录</a>来指定 Ktor 依赖项。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
@@ -55,15 +64,15 @@ Ktor 提供了 [Resources](https://api.ktor.io/ktor-resources/io.ktor.resources/
 ## 安装 %plugin_name% {id="install_plugin"}
 
 <p>
-    要将 <code>%plugin_name%</code> 插件<a href="server-plugins.md#install">安装</a>到应用程序，请在指定的<Links href="/ktor/server-modules" summary="模块允许您通过对路由进行分组来构建应用程序结构。">模块</Links>中将其传递给 <code>install</code> 函数。
-    下面的代码片段显示了如何安装 <code>%plugin_name%</code> ...
+    要在应用程序中<a href="server-plugins.md#install">安装</a> <code>%plugin_name%</code> 插件，请将其传递给指定 <Links href="server-modules.md" summary="模块允许您通过对路由进行分组来构建应用程序结构。">模块</Links>中的 <code>install</code> 函数。
+    以下示例展示了如何安装 <code>%plugin_name%</code>：
 </p>
 <list>
     <li>
-        ... 在 <code>embeddedServer</code> 函数调用内部。
+        在 <code>embeddedServer()</code> 函数调用中。
     </li>
     <li>
-        ... 在显式定义的 <code>module</code> 内部，该模块是 <code>Application</code> 类的扩展函数。
+        在 <code>Application</code> 类上显式定义的 <code>module()</code> 扩展函数中。
     </li>
 </list>
 <Tabs>
@@ -79,12 +88,12 @@ Ktor 提供了 [Resources](https://api.ktor.io/ktor-resources/io.ktor.resources/
 
 <snippet id="resource_classes_server">
 
-每个资源类都应带有 `@Resource` 注解。
-下面，我们将查看几个资源类示例 —— 定义单个路径段、查询参数和路径参数等等。
+每个资源类都应具有 `@Resource` 注解。
+下面，我们将查看几个资源类的示例——定义单个路径段、查询与路径形参等。
 
 ### 资源 URL {id="resource_url"}
 
-下面的示例显示了如何定义 `Articles` 类，该类指定了响应 `/articles` 路径的资源。
+下面的示例展示了如何定义 `Articles` 类，该类指定了响应 `/articles` 路径的资源。
 
 ```kotlin
 import io.ktor.resources.*
@@ -93,19 +102,19 @@ import io.ktor.resources.*
 class Articles()
 ```
 
-### 带查询参数的资源 {id="resource_query_param"}
+### 带查询形参的资源 {id="resource_query_param"}
 
-下面的 `Articles` 类具有 `sort` 字符串属性，该属性充当[查询参数](server-requests.md#query_parameters)，并允许您定义一个响应带有 `sort` 查询参数的路径的资源：`/articles?sort=new`。
+下面的 `Articles` 类具有 `sort` 字符串属性，该属性用作[查询形参](server-requests.md#query_parameters)，允许您定义一个在带有 `sort` 查询形参的路径 `/articles?sort=new` 上响应的资源。
 
 ```kotlin
 @Resource("/articles")
 class Articles(val sort: String? = "new")
 ```
 
-### 带嵌套类的资源 {id="resource_nested"}
+### 带有嵌套类的资源 {id="resource_nested"}
 
-您可以嵌套类以创建包含多个路径段的资源。请注意，在这种情况下，嵌套类应该具有一个外层类类型的属性。
-下面的示例显示了一个响应 `/articles/new` 路径的资源。
+您可以嵌套类以创建包含多个路径段的资源。请注意，在这种情况下，嵌套类应具有外部类类型的属性。
+下面的示例展示了一个在 `/articles/new` 路径上响应的资源。
 
 ```kotlin
 @Resource("/articles")
@@ -115,9 +124,9 @@ class Articles() {
 }
 ```
 
-### 带路径参数的资源 {id="resource_path_param"}
+### 带有路径形参的资源 {id="resource_path_param"}
 
-下面的示例演示了如何添加[嵌套](#resource_nested)的 `{id}` 整数[路径参数](server-routing.md#path_parameter)，它匹配一个路径段并将其捕获为名为 `id` 的参数。
+下面的示例演示了如何添加[嵌套](#resource_nested)的 `{id}` 整数[路径形参](server-routing.md#path_parameter)，该形参匹配一个路径段并将其捕获为名为 `id` 的形参。
 
 ```kotlin
 @Resource("/articles")
@@ -127,13 +136,13 @@ class Articles() {
 }
 ```
 
-例如，此资源可用于响应 `/articles/12`。
+例如，该资源可用于在 `/articles/12` 上响应。
 
 </snippet>
 
 ### 示例：用于 CRUD 操作的资源 {id="example_crud"}
 
-让我们总结上面的示例，并为 CRUD 操作创建 `Articles` 资源。
+让我们总结上述示例，并为 CRUD 操作创建 `Articles` 资源。
 
 ```kotlin
 @Resource("/articles")
@@ -149,14 +158,14 @@ class Articles(val sort: String? = "new") {
 }
 ```
 
-此资源可用于列出所有文章、发布新文章、编辑文章等。我们将在下一章中看到如何为此资源[定义路由处理程序](#define_route)。
+该资源可用于列出所有文章、发布新文章、编辑文章等。我们将在下一节中了解如何为此资源[定义路由处理程序](#define_route)。
 
 > 您可以在此处找到完整示例：[resource-routing](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/resource-routing)。
 
 ## 定义路由处理程序 {id="define_route"}
 
 要为类型化资源[定义路由处理程序](server-routing.md#define_route)，您需要将资源类传递给动词函数（`get`、`post`、`put` 等）。
-例如，下面的路由处理程序响应 `/articles` 路径。
+例如，下面的路由处理程序在 `/articles` 路径上响应。
 
 ```kotlin
 @Resource("/articles")
@@ -173,7 +182,7 @@ fun Application.module() {
 }
 ```
 
-下面的示例展示了如何为[示例：用于 CRUD 操作的资源](#example_crud)中创建的 `Articles` 资源定义路由处理程序。请注意，在路由处理程序内部，您可以将 `Article` 作为参数访问并获取其属性值。
+下面的示例展示了如何为在[示例：用于 CRUD 操作的资源](#example_crud)中创建的 `Articles` 资源定义路由处理程序。请注意，在路由处理程序内部，您可以将 `Article` 作为形参进行访问并获取其属性值。
 
 ```kotlin
 fun Application.module() {
@@ -184,7 +193,7 @@ fun Application.module() {
             call.respondText("List of articles sorted starting from ${article.sort}")
         }
         get<Articles.New> {
-            // 显示带有创建新文章字段的页面 ...
+            // 显示包含用于创建新文章的字段的页面 ...
             call.respondText("Create a new article")
         }
         post<Articles> {
@@ -192,11 +201,11 @@ fun Application.module() {
             call.respondText("An article is saved", status = HttpStatusCode.Created)
         }
         get<Articles.Id> { article ->
-            // 显示 ID 为 ${article.id} 的文章 ...
+            // 显示 id 为 ${article.id} 的文章 ...
             call.respondText("An article with id ${article.id}", status = HttpStatusCode.OK)
         }
         get<Articles.Id.Edit> { article ->
-            // 显示带有编辑文章字段的页面 ...
+            // 显示包含用于编辑文章的字段的页面 ...
             call.respondText("Edit an article with id ${article.parent.id}", status = HttpStatusCode.OK)
         }
         put<Articles.Id> { article ->
@@ -211,30 +220,30 @@ fun Application.module() {
 }
 ```
 
-以下是处理每个端点请求的一些提示：
+以下是处理每个端点请求的几点提示：
 
 - `get<Articles>`
 
-   此路由处理程序应该根据 `sort` 查询参数返回所有文章。
-   例如，这可能是一个包含所有文章的 [HTML 页面](server-responses.md#html)或 [JSON 对象](server-responses.md#object)。
+   此路由处理程序应该返回根据 `sort` 查询形参排序的所有文章。
+   例如，这可以是一个包含所有文章的 [HTML 页面](server-responses.md#html)或 [JSON 对象](server-responses.md#object)。
 
 - `get<Articles.New>`
 
-   此端点响应一个包含创建新文章字段的[表单](server-responses.md#html)。
+   此端点响应一个包含创建新文章所需字段的 [Web 表单](server-responses.md#html)。
 - `post<Articles>`
 
-   `post<Articles>` 端点应该接收使用表单发送的[参数](server-requests.md#form_parameters)。
+   `post<Articles>` 端点应该接收使用 Web 表单发送的[形参](server-requests.md#form_parameters)。
    Ktor 还允许您使用 `ContentNegotiation` 插件将 JSON 数据作为[对象](server-requests.md#objects)接收。
 - `get<Articles.Id>`
 
-   此路由处理程序应该返回具有指定标识符的文章。
-   这可能是一个显示文章的 [HTML 页面](server-responses.md#html)或带有文章数据的 [JSON 对象](server-responses.md#object)。
+   此路由处理程序应该返回带有指定标识符的文章。
+   这可以是一个展示文章的 [HTML 页面](server-responses.md#html)或包含文章数据的 [JSON 对象](server-responses.md#object)。
 - `get<Articles.Id.Edit>`
 
-  此端点响应一个包含编辑现有文章字段的[表单](server-responses.md#html)。
+  此端点响应一个包含用于编辑现有文章的字段的 [Web 表单](server-responses.md#html)。
 - `put<Articles.Id>`
 
-   与 `post<Articles>` 端点类似，`put` 处理程序接收使用表单发送的[表单参数](server-requests.md#form_parameters)。
+   与 `post<Articles>` 端点类似，`put` 处理程序接收使用 Web 表单发送的[表单形参](server-requests.md#form_parameters)。
 - `delete<Articles.Id>`
 
    此路由处理程序删除具有指定标识符的文章。
@@ -243,24 +252,24 @@ fun Application.module() {
 
 ## 从资源构建链接 {id="resource_links"}
 
-除了将资源定义用于路由外，它们还可用于构建链接。
-这有时被称为*反向路由*。
-如果您需要将这些链接添加到使用 [HTML DSL](server-html-dsl.md) 创建的 HTML 文档中，或者如果您需要生成[重定向响应](server-responses.md#redirect)，那么从资源构建链接可能会很有帮助。
+除了将资源定义用于路由之外，它们还可以用于构建链接。
+这有时被称为_反向路由_。
+如果您需要将这些链接添加到使用 [HTML DSL](server-html-dsl.md) 创建的 HTML 文档中，或者需要生成[重定向响应](server-responses.md#redirect)，那么从资源构建链接可能会很有帮助。
 
-`Resources` 插件使用重载的 [href](https://api.ktor.io/ktor-server-resources/io.ktor.server.resources/href.html) 方法扩展了 `Application`，该方法允许您从 `Resource` 生成链接。例如，下面的代码片段为[上面定义](#example_crud)的 `Edit` 资源创建了一个链接：
+`Resources` 插件通过重载的 [href](https://api.ktor.io/ktor-server-resources/io.ktor.server.resources/href.html) 方法扩展了 `Application`，该方法允许您从 `Resource` 生成链接。例如，下面的代码段为[上面定义的](#example_crud) `Edit` 资源创建了一个链接：
 
 ```kotlin
 val link: String = href(Articles.Id.Edit(Articles.Id(id = 123)))
 ```
 
-由于祖父级 `Articles` 资源定义了默认值为 `new` 的 `sort` 查询参数，因此 `link` 变量包含：
+由于祖父级 `Articles` 资源定义了带有默认值 `new` 的 `sort` 查询形参，因此 `link` 变量包含：
 
 ```
 /articles/123/edit?sort=new
 ```
 
 要生成指定主机和协议的 URL，您可以为 `href` 方法提供 `URLBuilder`。
-也可以使用 `URLBuilder` 指定额外的查询参数，如本例所示：
+还可以使用 `URLBuilder` 指定其他查询形参，如下例所示：
 
 ```kotlin
 val urlBuilder = URLBuilder(URLProtocol.HTTPS, "ktor.io", parameters = parametersOf("token", "123"))
@@ -276,7 +285,7 @@ https://ktor.io/articles?token=123
 
 ### 示例 {id="example_build_links"}
 
-下面的示例显示了如何将从资源构建的链接添加到 HTML 响应中：
+下面的示例展示了如何将从资源构建的链接添加到 HTML 响应中：
 
 ```kotlin
 get {

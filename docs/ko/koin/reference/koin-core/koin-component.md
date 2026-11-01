@@ -1,312 +1,46 @@
 ---
-title: Koin 컴포넌트
+title: KoinComponent
 ---
 
-`KoinComponent`는 모듈 정의 외부의 Koin 컨테이너에서 인스턴스를 가져올 수 있는 API를 제공합니다. 이는 안드로이드 액티비티(Activities)나 프레임워크 클래스와 같이 생성자 주입(constructor injection)을 사용할 수 없는 클래스에서 유용합니다.
+# KoinComponent
 
-## KoinComponent란 무엇인가요? {id="what-is-koincomponent"}
+`KoinComponent`는 클래스가 Koin 컨테이너에 접근하여 `get()` 및 `by inject()`를 호출할 수 있도록 해주는 인터페이스입니다. 이 문서에서는 언제 이것이 필요한지, 어떻게 사용하는지, 그리고 왜 생성자 주입(constructor injection)이 권장되는지 설명합니다. 의존성 조회 함수 자체에 대한 내용은 [Injection](/docs/reference/koin-core/injection)을 참고하세요.
 
-`KoinComponent`는 모든 클래스가 Koin 컨테이너 API에 접근할 수 있도록 해주는 인터페이스입니다. 생성자 주입 없이도 인스턴스를 가져올 수 있는 함수들을 제공합니다.
+## KoinComponent는 언제 사용하나요 {id="when-to-use-koincomponent"}
 
-:::info
-**가능하면 생성자 주입을 우선시하세요.** 모듈에 선언할 수 없는 클래스(프레임워크 클래스, UI 컴포넌트 등)에만 `KoinComponent`를 사용하십시오. 생성자 주입이 더 명확하고 테스트하기 쉬우며, 코드가 Koin에 결합되지 않습니다.
-:::
+Koin에 의해 생성되지 않으며 자체적인 Koin 확장 함수가 없는 클래스에 `KoinComponent`를 사용합니다:
 
-## 기본 사용법 {id="basic-usage"}
+- 진입점(Entry point): `main()` 클래스, CLI 명령어, 프레임워크나 리플렉션에 의해 생성되는 클래스.
+- Koin 확장이 없는 Android 클래스: `BroadcastReceiver`, `ContentProvider`, 커스텀 `View`. [Android Entry Points](/docs/reference/koin-android/entry-points)를 참고하세요.
+- 생성자를 직접 제어할 수 없는 콜백 및 리스너.
+- 아직 생성자 주입으로 전환할 수 없는 레거시 코드.
 
-### Koin 컴포넌트 생성하기 {id="creating-a-koin-component"}
+다음과 같은 경우에는 필요하지 않습니다:
 
-클래스를 `KoinComponent` 인터페이스로 태깅(Tag)하십시오.
+- 모듈에 선언된 클래스: 리포지토리(repository), 서비스, 유스케이스, ViewModel. Koin이 생성자를 통해 의존성을 전달합니다.
+- `Activity`, `Fragment`, `Service`: Koin Android가 이들 클래스에 직접 `by inject()` 및 `by viewModel()`을 제공합니다.
+- Composable 함수: `koinInject()`를 사용하세요. [Koin for Compose](/docs/reference/koin-compose/compose)를 참고하세요.
 
-```kotlin
-class MyService
+## KoinComponent 사용법 {id="use-koincomponent"}
 
-val myModule = module {
-    single { MyService() }
-}
-```
-
-```kotlin
-// Koin 시작
-fun main() {
-    startKoin {
-        modules(myModule)
-    }
-
-    // Koin을 사용하는 컴포넌트 생성
-    MyComponent()
-}
-```
+인터페이스를 구현한 다음 `get()` 또는 `by inject()`를 호출합니다:
 
 ```kotlin
-class MyComponent : KoinComponent {
-    // 지연 평가(Lazy evaluation) - 처음 접근할 때 인스턴스를 가져옴
-    val myService: MyService by inject()
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
+import org.koin.core.component.inject
 
-    // 또는
+class SyncCommand : KoinComponent {
 
-    // 즉각 평가(Eager evaluation) - 인스턴스를 즉시 가져옴
-    val myService: MyService = get()
-}
-```
+    // lazy: 최초 접근 시점에 주입됨
+    private val syncService: SyncService by inject()
 
-### 사용 가능한 함수들 {id="available-functions"}
-
-`KoinComponent`를 구현하면 다음 함수들에 접근할 수 있습니다.
-
-| 함수 | 설명 |
-|----------|-------------|
-| `get<T>()` | 인스턴스를 즉시(Eagerly) 가져옴 |
-| `by inject<T>()` | 인스턴스를 지연하여(Lazily) 가져옴 (위임) |
-| `getProperty()` | 설정 프로퍼티 가져오기 |
-| `setProperty()` | 설정 프로퍼티 설정하기 |
-| `getKoin()` | Koin 인스턴스에 접근 |
-
-## 인스턴스 가져오기 {id="retrieving-instances"}
-
-### 즉시 가져오기 vs 지연 가져오기 {id="eager-vs-lazy-retrieval"}
-
-**`get()`을 사용한 즉시(Eager) 가져오기:**
-```kotlin
-class MyComponent : KoinComponent {
-    // 생성 중에 인스턴스를 즉시 가져옴
-    val service: MyService = get()
-
-    init {
-        service.doSomething()  // 이미 사용 가능함
-    }
-}
-```
-
-**`by inject()`를 사용한 지연(Lazy) 가져오기:**
-```kotlin
-class MyComponent : KoinComponent {
-    // 처음 접근할 때만 인스턴스를 가져옴
-    val service: MyService by inject()
-
-    fun doWork() {
-        service.doSomething()  // 첫 접근 시 여기서 가져옴
-    }
-}
-```
-
-:::note
-항상 필요하지 않을 수 있는 프로퍼티에는 `by inject()`를 사용하세요. 이는 처음 접근할 때까지 인스턴스 생성을 늦춥니다.
-:::
-
-### 각각의 사용 시기 {id="when-to-use-each"}
-
-| `get()` 사용 시기 | `by inject()` 사용 시기 |
-|-------------|-------------------|
-| `init` 블록에서 즉시 인스턴스가 필요한 경우 | 프로퍼티가 사용되지 않을 수도 있는 경우 |
-| 단순하고 직접적인 접근 | 지연 초기화(lazy initialization)를 원하는 경우 |
-| 함수 내부에서 객체를 빌드할 때 | 클래스 프로퍼티를 선언할 때 |
-
-## 한정자 (Qualifiers) {id="qualifiers"}
-
-한정자를 사용하여 이름이 지정된 정의를 가져옵니다.
-
-```kotlin
-module {
-    single(named("local")) { LocalDatabase() }
-    single(named("remote")) { RemoteDatabase() }
-}
-```
-
-```kotlin
-class DataManager : KoinComponent {
-    val localDb: Database = get(named("local"))
-    val remoteDb: Database = get(named("remote"))
-
-    // 또는 지연 주입
-    val localDb: Database by inject(named("local"))
-}
-```
-
-### 한정자 타입 {id="qualifier-types"}
-
-**문자열 한정자:**
-```kotlin
-val service = get<ApiService>(named("production"))
-```
-
-**타입 한정자:**
-```kotlin
-val service = get<ApiService>(named<ProductionService>())
-```
-
-**열거형(Enum) 한정자:**
-```kotlin
-enum class Environment { DEV, PROD }
-
-val service = get<ApiService>(named(Environment.PROD))
-```
-
-## 주입 파라미터 {id="injection-parameters"}
-
-인스턴스를 가져올 때 런타임 파라미터를 전달할 수 있습니다.
-
-```kotlin
-module {
-    factory { (userId: String, sessionId: String) ->
-        UserSession(userId, sessionId)
-    }
-}
-```
-
-```kotlin
-class LoginController : KoinComponent {
-    fun login(userId: String) {
-        val session: UserSession = get { parametersOf(userId, "session-123") }
-        session.start()
-    }
-}
-```
-
-**지연 주입 시:**
-```kotlin
-class ProfileScreen : KoinComponent {
-    private val userId = "user-456"
-
-    // 처음 접근할 때 파라미터가 평가됨
-    val userSession: UserSession by inject { parametersOf(userId, "profile-session") }
-}
-```
-
-## 프로퍼티 (Properties) {id="properties"}
-
-컴포넌트에서 Koin 프로퍼티에 접근하고 수정할 수 있습니다.
-
-### 프로퍼티 가져오기 {id="get-properties"}
-
-```kotlin
-class ApiClientFactory : KoinComponent {
-    val apiUrl: String = getProperty("server_url")
-    val apiKey: String = getProperty("api_key", "default-key")  // 기본값 사용
-    val timeout: Int = getProperty("timeout", "30").toInt()
-}
-```
-
-### 프로퍼티 설정하기 {id="set-properties"}
-
-```kotlin
-class ConfigManager : KoinComponent {
-    fun updateServerUrl(url: String) {
-        setProperty("server_url", url)
-    }
-
-    fun enableDebugMode() {
-        setProperty("debug_mode", "true")
-    }
-}
-```
-
-### 프로퍼티 생명주기 {id="property-lifecycle"}
-
-`setProperty()`로 설정된 프로퍼티는 다음과 같습니다:
-- 모든 컴포넌트에서 사용 가능합니다.
-- Koin 인스턴스 생명주기 동안 유지됩니다.
-- `stopKoin()`이 호출되면 초기화됩니다.
-
-## Koin 인스턴스 접근하기 {id="accessing-the-koin-instance"}
-
-`Koin` 컨테이너에 직접 접근할 수 있습니다.
-
-```kotlin
-class AdvancedComponent : KoinComponent {
-    fun performComplexOperation() {
-        val koin = getKoin()
-
-        // 스코프 접근
-        val scope = koin.createScope<MyActivity>()
-
-        // 정의가 존재하는지 확인
-        val hasService = koin.getOrNull<MyService>() != null
-
-        // 해당 타입의 모든 인스턴스 가져오기
-        val allServices = koin.getAll<Service>()
-    }
-}
-```
-
-## 실제 활용 사례 {id="real-world-examples"}
-
-### 안드로이드 액티비티 (권장 방식) {id="android-activity-recommended-approach"}
-
-:::info
-안드로이드 액티비티는 **KoinComponent가 필요하지 않습니다.** Koin 안드로이드 확장 기능을 사용하세요.
-:::
-
-```kotlin
-// ✅ 권장 - KoinComponent가 필요 없음
-class MainActivity : AppCompatActivity() {
-    private val userRepository: UserRepository by inject()
-    private val viewModel: MainViewModel by viewModel()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        // Koin 안드로이드 확장을 통해 의존성 사용 가능
-        val user = userRepository.getCurrentUser()
-    }
-}
-```
-
-비교를 위한 이전 방식 (권장되지 않음):
-```kotlin
-// ❌ 불필요 - 액티비티에서 KoinComponent는 중복입니다
-class MainActivity : AppCompatActivity(), KoinComponent {
-    private val userRepository: UserRepository by inject()
-    // ...
-}
-```
-
-### 안드로이드 프래그먼트 (권장 방식) {id="android-fragment-recommended-approach"}
-
-```kotlin
-// ✅ 권장 - KoinComponent가 필요 없음
-class UserFragment : Fragment() {
-    private val viewModel: UserViewModel by viewModel()
-    private val userRepository: UserRepository by inject()
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        viewModel.loadUser()
-    }
-}
-```
-
-### 커스텀 안드로이드 뷰 (KoinComponent 필요) {id="custom-android-view-koincomponent-needed"}
-
-```kotlin
-// ✅ 여기서는 KoinComponent가 적절합니다
-class CustomChartView @JvmOverloads constructor(
-    context: Context,
-    attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
-) : View(context, attrs, defStyleAttr), KoinComponent {
-
-    private val dataFormatter: ChartDataFormatter by inject()
-    private val colorScheme: ColorScheme by inject()
-
-    fun setData(data: List<DataPoint>) {
-        val formatted = dataFormatter.format(data)
-        // 차트 렌더링...
-    }
-}
-```
-
-### 콘솔 애플리케이션 {id="console-application"}
-
-```kotlin
-class ConsoleApp : KoinComponent {
-    private val logger: Logger by inject()
-    private val dataProcessor: DataProcessor by inject()
+    // eager: SyncCommand가 생성될 때 주입됨
+    private val logger: Logger = get()
 
     fun run() {
-        logger.info("Starting application")
-        dataProcessor.process()
-        logger.info("Application finished")
+        logger.info("Starting sync")
+        syncService.sync()
     }
 }
 
@@ -314,193 +48,169 @@ fun main() {
     startKoin {
         modules(appModule)
     }
-
-    ConsoleApp().run()
-
-    stopKoin()
+    SyncCommand().run()
 }
 ```
 
-### 코틀린 멀티플랫폼 공통 코드 {id="kotlin-multiplatform-common-code"}
+어떤 방식을 사용하든 코드는 동일합니다. `KoinComponent`는 인스턴스를 조회하기만 할 뿐이며, 정의(definition)는 어떤 방식으로든 선언할 수 있습니다.
+
+`get()`과 `inject()`는 확장 함수이므로 `org.koin.core.component`에서 import해야 합니다. 모든 조회 함수와 마찬가지로 한정자(qualifier)와 파라미터 블록을 전달받을 수 있습니다([Injection](/docs/reference/koin-core/injection#qualifiers-and-parameters-at-the-call-site) 참고).
+
+`KoinComponent` 자체에는 `Koin` 인스턴스를 반환하는 단 하나의 함수 `getKoin()`이 있습니다. 그 외의 모든 작업에는 이를 사용합니다:
 
 ```kotlin
-// 플랫폼 간에 작동하는 공통 코드
-class FeatureManager : KoinComponent {
-    private val api: ApiClient by inject()
-    private val cache: Cache by inject()
+class FeatureLoader : KoinComponent {
 
-    suspend fun loadFeatures(): List<Feature> {
-        return cache.get() ?: api.fetchFeatures().also { cache.set(it) }
+    fun optionalTracker(): Tracker? = getKoin().getOrNull()
+
+    fun apiUrl(): String = getKoin().getProperty("server_url", "https://api.example.com")
+
+    fun allPlugins(): List<Plugin> = getKoin().getAll()
+}
+```
+
+Nullable 조회 및 `getAll()`에 대한 내용은 [Injection](/docs/reference/koin-core/injection)에서 다룹니다. 프로퍼티(Property)에 대한 내용은 [Starting Koin](/docs/reference/koin-core/starting-koin#properties)에서 다룹니다.
+
+### 커스텀 Android View {id="custom-android-view"}
+
+커스텀 `View`는 레이아웃 인플레이터(layout inflater)에 의해 생성되므로 Koin이 생성자 파라미터를 전달할 수 없습니다. 이럴 때 `KoinComponent`가 적합합니다:
+
+```kotlin
+class ChartView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+) : View(context, attrs), KoinComponent {
+
+    private val formatter: ChartFormatter by inject()
+
+    fun setData(points: List<DataPoint>) {
+        val formatted = formatter.format(points)
+        // draw
     }
 }
 ```
 
-## KoinComponent를 사용해야 하는 경우 {id="when-to-use-koincomponent"}
+`View`에서는 `by inject()`를 사용하세요. 레이아웃 에디터는 실행 중인 Koin 컨테이너 없이 뷰를 생성하므로, 즉시 초기화되는 `get()`을 사용하면 오류가 발생합니다.
 
-### 적합한 사용 사례 {id="good-use-cases"}
+## KoinComponent가 사용하는 컨테이너 {id="which-container-koincomponent-uses"}
 
-다음과 같은 경우 `KoinComponent`를 사용하세요:
+기본적으로 `getKoin()`은 `startKoin`으로 시작된 글로벌 컨테이너를 반환합니다. 아직 `startKoin`이 호출되지 않았다면 `get()`은 `IllegalStateException`("KoinApplication has not been started")을 던집니다.
 
-- **커스텀 UI 컴포넌트** - 커스텀 뷰(Custom Views), 위젯(Widgets) (액티비티/프래그먼트는 제외 - 아래 참고 사항 확인)
-- **진입점(Entry points)** - Main 함수, 애플리케이션(Application) 클래스
-- **콜백(Callbacks)** - 생성자 주입을 사용할 수 없는 리스너(Listeners), 핸들러(Handlers)
-- **레거시 코드(Legacy code)** - DI를 사용하도록 리팩터링할 수 없는 클래스
-- **안드로이드 이외의 플랫폼** - JVM, Native, JS 애플리케이션
-
-:::note
-**안드로이드 개발자 참고 사항:** 액티비티, 프래그먼트, 서비스는 전용 Koin 확장 기능이 있으므로 **KoinComponent가 필요하지 않습니다.** 인터페이스를 구현하지 않고 `by inject()`와 `by viewModel()`을 직접 사용하세요. 자세한 내용은 [Android 주입](/docs/reference/koin-android/get-instances)을 참조하십시오.
-:::
-
-### 사용을 피해야 하는 경우 {id="avoid-using-for"}
-
-다음과 같은 경우 `KoinComponent`를 사용하지 마세요:
-
-- **안드로이드 액티비티/프래그먼트/서비스** - 대신 Koin 안드로이드 확장 기능을 사용하세요.
-- **비즈니스 로직** - 대신 생성자 주입을 사용하세요.
-- **데이터 레이어** - 리포지토리(Repositories), 데이터 소스(Data sources)
-- **도메인 레이어** - 유스케이스(Use cases), 도메인 모델
-- **새로운 코드** - 생성자 주입을 사용하여 모듈에 선언하는 방식을 선호하세요.
-
-## 권장 사항 (Best Practices) {id="best-practices"}
-
-### 생성자 주입 우선 {id="prefer-constructor-injection"}
+자체적인 격리 컨테이너를 실행하는 라이브러리나 SDK는 `getKoin()`을 오버라이드하여 해당 컨테이너를 반환하도록 합니다:
 
 ```kotlin
-// ❌ 피하세요 - 비즈니스 로직에 KoinComponent 사용
+object SdkKoinContext {
+    val koinApp = koinApplication { modules(sdkModule) }
+}
+
+abstract class SdkComponent : KoinComponent {
+    override fun getKoin(): Koin = SdkKoinContext.koinApp.koin
+}
+
+class SdkClient : SdkComponent() {
+    private val api: SdkApi by inject() // SDK 컨테이너로부터 주입됨
+}
+```
+
+전체 패턴은 [Context Isolation](/docs/reference/koin-core/context-isolation)에서 확인할 수 있습니다.
+
+스코프(scope)를 소유하는 클래스의 경우 대신 `KoinScopeComponent`를 구현하세요. 그러면 `get()`과 `inject()`가 해당 스코프에서 의존성을 주입받습니다. [Scopes](/docs/reference/koin-core/scopes)를 참고하세요.
+
+## 생성자 주입이 권장되는 이유 {id="why-constructor-injection-is-preferred"}
+
+동일한 클래스의 두 가지 버전을 비교해 보세요:
+
+**Compiler Plugin DSL**
+```kotlin
+// Koin에 의존하며, 의존성이 클래스 본문에 숨겨져 있음
 class UserService : KoinComponent {
     private val repository: UserRepository by inject()
-    private val validator: UserValidator by inject()
-
-    fun createUser(name: String) { /* ... */ }
 }
 
-// ✅ 선호하세요 - 생성자 주입
-class UserService(
-    private val repository: UserRepository,
-    private val validator: UserValidator
-) {
-    fun createUser(name: String) { /* ... */ }
-}
+// 순수 Kotlin 클래스이며, 의존성이 생성자에 명시적으로 드러남
+class UserService(private val repository: UserRepository)
 
-// 모듈에 선언
-module {
-    single { UserRepository() }
-    single { UserValidator() }
-    single { UserService(get(), get()) }
+val appModule = module {
+    single<UserRepository>()
+    single<UserService>()
 }
 ```
 
-### 선택적 의존성에는 지연 주입 사용 {id="use-lazy-injection-for-optional-dependencies"}
-
+**Annotations**
 ```kotlin
-class FeatureController : KoinComponent {
-    // 모든 코드 경로에서 사용되지는 않을 수 있음
-    private val analyticsService: AnalyticsService by inject()
+// Koin에 의존하며, 의존성이 클래스 본문에 숨겨져 있음
+class UserService : KoinComponent {
+    private val repository: UserRepository by inject()
+}
 
-    fun performAction(trackAnalytics: Boolean) {
-        doWork()
+// 순수 Kotlin 클래스이며, 의존성이 생성자에 명시적으로 드러남
+@Singleton
+class UserService(private val repository: UserRepository)
+```
 
-        // 필요한 경우에만 분석 서비스 인스턴스를 가져옴
-        if (trackAnalytics) {
-            analyticsService.track("action_performed")
-        }
-    }
+**Constructor / Classic DSL**
+```kotlin
+// Koin에 의존하며, 의존성이 클래스 본문에 숨겨져 있음
+class UserService : KoinComponent {
+    private val repository: UserRepository by inject()
+}
+
+// 순수 Kotlin 클래스이며, 의존성이 생성자에 명시적으로 드러남
+class UserService(private val repository: UserRepository)
+
+val appModule = module {
+    singleOf(::UserRepository)
+    singleOf(::UserService)
 }
 ```
 
-### KoinComponent 범위 제한 {id="limit-koincomponent-scope"}
+생성자 주입 버전이 다음 네 가지 측면에서 더 우수합니다:
+
+- 명시적인 의존성: 클래스가 필요로 하는 의존성이 생성자에 나열됩니다. `KoinComponent`를 사용하면 본문을 직접 읽어보아야 합니다.
+- Koin 없는 테스트: `UserService(FakeUserRepository())`처럼 직접 생성할 수 있습니다. `KoinComponent` 버전은 가짜 정의(fake definition)가 포함된 실행 중인 컨테이너가 필요합니다.
+- 빌드 타임 검증: 컴파일러 플러그인이 선언된 클래스의 생성자 의존성을 그래프와 대조하여 검증합니다.
+- 프레임워크 결합도 없음: Koin 없이도 클래스가 컴파일되고 실행되므로, 공용 코드와 라이브러리에 매우 중요합니다.
+
+`KoinComponent`는 아키텍처의 최외곽 경계에만 유지하세요. 단 하나의 진입점이 최상위 객체를 조회하고, 그 아래의 모든 객체는 생성자 주입을 사용하는 방식이 좋습니다:
 
 ```kotlin
-// ❌ 나쁨 - Koin을 직접 사용하는 컴포넌트가 너무 많음
-class RepositoryA : KoinComponent {
-    val db: Database by inject()
+class SyncCommand : KoinComponent {
+    private val syncService: SyncService by inject()
 }
 
-class RepositoryB : KoinComponent {
-    val db: Database by inject()
-}
-
-class ServiceA : KoinComponent {
-    val repoA: RepositoryA by inject()
-}
-
-// ✅ 좋음 - 단일 진입점만 사용하고 나머지는 생성자 주입 사용
-class AppController : KoinComponent {
-    private val serviceA: ServiceA = get()
-    private val serviceB: ServiceB = get()
-}
-
-class ServiceA(private val repoA: RepositoryA)
-class ServiceB(private val repoB: RepositoryB)
-class RepositoryA(private val db: Database)
-class RepositoryB(private val db: Database)
+class SyncService(private val repository: UserRepository, private val api: ApiClient)
+class UserRepository(private val database: Database)
 ```
 
-### getProperty 과용 금지 {id="don-t-overuse-getproperty"}
+## KoinComponent 테스트하기 {id="testing-a-koincomponent"}
+
+`KoinComponent`를 구현하는 클래스는 글로벌 컨테이너에서 값을 읽어오므로, 테스트 실행 시 필요한 정의와 함께 Koin을 시작하고 완료 후 중지해야 합니다:
 
 ```kotlin
-// ❌ 피하세요 - 모든 곳에서 프로퍼티 가져오기
-class FeatureA : KoinComponent {
-    val apiUrl = getProperty("api_url")
-}
+class SyncCommandTest : KoinTest {
 
-class FeatureB : KoinComponent {
-    val apiUrl = getProperty("api_url")
-}
-
-// ✅ 좋음 - 설정 중앙 집중화
-class AppConfig(
-    val apiUrl: String,
-    val apiKey: String,
-    val timeout: Int
-)
-
-module {
-    single {
-        AppConfig(
-            apiUrl = getProperty("api_url"),
-            apiKey = getProperty("api_key"),
-            timeout = getProperty("timeout", "30").toInt()
-        )
-    }
-
-    single { ApiClient(get<AppConfig>().apiUrl) }
-}
-```
-
-## 테스트 {id="testing"}
-
-컴포넌트를 테스트할 때 Koin 설정을 오버라이드(override)할 수 있습니다.
-
-```kotlin
-class MyComponent : KoinComponent {
-    val service: MyService by inject()
-
-    fun doWork() = service.execute()
-}
-
-@Test
-fun testComponent() {
-    // 테스트용 Koin 인스턴스 설정
-    startKoin {
+    @get:Rule
+    val koinTestRule = KoinTestRule.create {
         modules(module {
-            single<MyService> { MockMyService() }
+            single<SyncService> { FakeSyncService() }
+            single<Logger> { TestLogger() }
         })
     }
 
-    val component = MyComponent()
-    val result = component.doWork()
-
-    assertEquals("mock result", result)
-
-    // 정리
-    stopKoin()
+    @Test
+    fun `run calls sync`() {
+        SyncCommand().run()
+        // FakeSyncService에 대한 단언문(assert) 수행
+    }
 }
 ```
 
-## 함께 보기 {id="see-also"}
+`KoinTestRule`은 각 테스트 전에 Koin을 시작하고 테스트 후에 중지합니다. 룰, 모킹(mocking), 모듈 검증은 [Testing](/docs/reference/koin-test/testing)에서 다룹니다.
 
-- [Koin 시작하기](/docs/reference/koin-core/start-koin) - Koin 초기화
-- [정의](/docs/reference/koin-core/definitions) - 정의 생성하기
-- [주입 파라미터](/docs/reference/koin-core/injection-parameters) - 런타임 파라미터
-- [안드로이드 주입](/docs/reference/koin-android/get-instances) - 안드로이드 전용 주입
+## 관련 문서 {id="related"}
+
+- [Injection](/docs/reference/koin-core/injection): `get()`, `inject()`, nullable 조회 및 `getAll()`.
+- [Android Entry Points](/docs/reference/koin-android/entry-points): `KoinComponent`가 필요한 Android 클래스와 그렇지 않은 클래스.
+- [Context Isolation](/docs/reference/koin-core/context-isolation): `KoinComponent`가 격리된 컨테이너를 가리키도록 설정하기.
+- [Scopes](/docs/reference/koin-core/scopes): 스코프를 소유하는 클래스를 위한 `KoinScopeComponent`.
+- [Testing](/docs/reference/koin-test/testing): Koin을 사용하는 클래스 테스트하기.

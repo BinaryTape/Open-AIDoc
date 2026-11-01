@@ -4,7 +4,7 @@
 
 <tldr>
 <p>
-<b>必須の依存関係</b>: <code>io.ktor:ktor-server-di</code>
+<b>必要な依存関係</b>: <code>io.ktor:ktor-server-di</code>
 </p>
 <var name="example_name" value="server-di"/>
 <p>
@@ -15,21 +15,21 @@
 </p>
 </tldr>
 
-[依存関係を登録](server-di-dependency-registration.md)した後、それらを依存関係注入（DI）コンテナから解決し、アプリケーションコードに注入できます。
+[依存関係を登録](server-di-dependency-registration.md)した後、DI（依存性注入）コンテナからそれらを解決し、アプリケーションコードに注入できます。
 
-DIコンテナから依存関係を明示的に解決するには、[プロパティ委譲](#property-delegation)または[直接解決](#direct-resolution)のいずれかを使用できます。
+DIコンテナからの明示的な依存関係の解決には、[プロパティ委譲](#property-delegation)または[直接解決](#direct-resolution)のいずれかを使用できます。
 
-### プロパティ委譲を使用する {id="property-delegation"}
+### プロパティ委譲の使用 {id="property-delegation"}
 
-プロパティ委譲を使用する場合、依存関係はスタートアップの検証（バリデーション）フェーズ中にのみ解決されます。
+プロパティ委譲を使用すると、依存関係は起動時の検証フェーズ中にのみ解決されます。
 
 ```kotlin
 val service: GreetingService by dependencies
 ```
 
-### 直接解決を使用する {id="direct-resolution"}
+### 直接解決の使用 {id="direct-resolution"}
 
-直接解決は、依存関係を即座に返すか、利用可能になるまでサスペンドします。
+直接解決は、依存関係を即座に返すか、利用可能になるまでサスペンド（中断）します。
 
 ```kotlin
 val service = dependencies.resolve<GreetingService>()
@@ -37,23 +37,23 @@ val service = dependencies.resolve<GreetingService>()
 
 ### パラメータの解決 {id="parameter-resolution"}
 
-コンストラクタまたは関数を解決する際、KtorはDIコンテナを使用してパラメータを解決します。デフォルトでは、パラメータは型によって解決されます。
+コンストラクタや関数を解決する際、KtorはDIコンテナを使用してパラメータを解決します。デフォルトでは、パラメータは型によって解決されます。
 
-型ベースの解決では不十分な場合、アノテーションを使用して明示的にパラメータをバインドできます。
+型ベースの解決では不十分な場合、アノテーションを使用してパラメータを明示的にバインドできます。
 
-#### 名前付き依存関係を使用する {id="resolve-named"}
+#### 名前付き依存関係の使用 {id="resolve-named"}
 
-`@Named` アノテーションを使用して、[指定された名前で登録された](server-di-dependency-registration.md#named-registration)依存関係を解決します。
+[指定された名前で登録された](server-di-dependency-registration.md#named-registration)依存関係を解決するには、`@Named` アノテーションを使用します。
 
 ```kotlin
 fun Application.userRepository(@Named("mongo") database: Database) {
-    // "mongo" という名前の依存関係を使用します
+    // "mongo" という名前の依存関係を使用
 }
 ```
 
-#### 設定プロパティを使用する {id="use-configuration-properties"}
+#### 設定プロパティの使用 {id="use-configuration-properties"}
 
-`@Property` アノテーションを使用して、アプリケーション設定から値を注入します。
+アプリケーション設定から値を注入するには、`@Property` アノテーションを使用します。
 
 ```kotlin
 package com.example
@@ -81,9 +81,9 @@ database:
 </TabItem>
 </Tabs>
 
-### 非同期の依存関係解決 {id="async-dependency-resolution"}
+### 非同期の依存関係の解決 {id="async-dependency-resolution"}
 
-非同期読み込みをサポートするために、サスペンド関数を使用できます。
+非同期読み込みをサポートするために、suspend関数を使用できます。
 
 ```kotlin
 data class EventsConnection(val connected: Boolean)
@@ -101,11 +101,11 @@ suspend fun Application.loadEventsConnection() {
 }
 ```
 
-DIプラグインは、すべての依存関係の準備ができるまで、`resolve()` の呼び出しを自動的にサスペンドします。
+DIプラグインは、すべての依存関係の準備が整うまで、`resolve()` の呼び出しを自動的にサスペンドします。
 
 ### アプリケーションモジュールへの依存関係の注入 {id="inject-into-modules"}
 
-モジュール関数でパラメータを指定することで、アプリケーションモジュールに依存関係を直接注入できます。Ktorは型の一致に基づいて、DIコンテナからこれらの依存関係を解決します。
+モジュール関数にパラメータを指定することで、アプリケーションモジュールに直接依存関係を注入できます。Ktorは型の一致に基づいて、DIコンテナからこれらの依存関係を解決します。
 
 まず、設定ファイルの `ktor.application.dependencies` グループに依存関係プロバイダーを登録します。
 
@@ -124,7 +124,7 @@ ktor:
 </TabItem>
 </Tabs>
 
-注入したい依存関係をパラメータとして持つ依存関係プロバイダーとモジュール関数を定義します。その後、注入された依存関係をモジュール関数内で直接使用できます。
+注入したい依存関係のパラメータを持つ依存関係プロバイダーとモジュール関数を定義します。これにより、注入された依存関係をモジュール関数内で直接使用できます。
 
 <Tabs>
 <TabItem title="PrintStreamProvider.kt">
@@ -166,57 +166,57 @@ fun Application.logging(printStreamProvider: () -> PrintStream) {
 </TabItem>
 </Tabs>
 
-## 高度な依存関係解決 {id="advanced-dependency-resolution"}
+## 高度な依存関係の解決 {id="advanced-dependency-resolution"}
 
-### オプションおよび Null 許容の依存関係 {id="optional-dependencies"}
+### オプションおよびnull許容の依存関係 {id="optional-dependencies"}
 
-オプションの依存関係を適切に処理するために、Null 許容型を使用します。
+オプション（任意）の依存関係を適切に処理するには、null許容型（nullable types）を使用します。
 
 ```kotlin
-// プロパティ委譲を使用する場合
+// プロパティ委譲を使用
 val config: Config? by dependencies
 
-// 直接解決を使用する場合
+// 直接解決を使用
 val config = dependencies.resolve<Config?>()
 ```
 
 ### 共変ジェネリクス {id="covariant-generics"}
 
-KtorのDIシステムは型の共変性（covariance）をサポートしており、型パラメータが共変である場合、値をそのスーパータイプの1つとして注入できます。これは、サブタイプを扱うコレクションやインターフェースにおいて特に便利です。
+KtorのDIシステムは型の共変性（covariance）をサポートしており、型パラメータが共変である場合、値をそのスーパータイプの1つとして注入できます。これは、コレクションやサブタイプを扱うインターフェースで特に便利です。
 
 ```kotlin
 dependencies {
   provide<List<String>> { listOf("one", "two") }
 }
 
-// 型パラメータの共変性サポートにより、これは動作します
+// 型パラメータの共変性サポートにより機能する
 val stringList: List<CharSequence> by dependencies
-// これも動作します
+// これも機能する
 val stringCollection: Collection<CharSequence> by dependencies
 ```
 
-共変性は、非ジェネリックなスーパータイプでも機能します。
+共変性は非ジェネリックなスーパータイプでも機能します。
 
 ```kotlin
 dependencies {
     provide<BufferedOutputStream> { BufferedOutputStream(System.out) }
 }
 
-// BufferedOutputStream は OutputStream のサブタイプであるため、これは動作します
+// BufferedOutputStreamはOutputStreamのサブタイプであるため機能する
 val outputStream: OutputStream by dependencies
 ```
 
 #### 制限事項 {id="limitations"}
 
-DIシステムはジェネリック型の共変性をサポートしていますが、現在は型引数のサブタイプを跨いだパラメータ化された型の解決はサポートしていません。つまり、登録されたものよりも特定の型、あるいはより一般的な型を使用して依存関係を取得することはできません。
+DIシステムはジェネリック型の共変性をサポートしていますが、現在のところ型引数のサブタイプをまたぐパラメータ化された型の解決はサポートしていません。つまり、登録されたものよりも具体的または一般的な型を使用して依存関係を取得することはできません。
 
-例えば、以下のコードは解決されません。
+例えば、次のコードは解決されません。
 
 ```kotlin
 dependencies {
     provide<Sink<CharSequence>> { CsqSink() }
 }
 
-// 解決されません
+// 解決されない
 val charSequenceSink: Sink<String> by dependencies
 ```

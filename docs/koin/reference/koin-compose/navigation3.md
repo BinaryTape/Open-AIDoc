@@ -4,324 +4,139 @@ title: Navigation 3
 
 # Navigation 3
 
-Koin 提供了与 [AndroidX Navigation 3](https://developer.android.com/guide/navigation/navigation-3) 的集成，用于通过依赖注入实现类型安全的多平台导航。
+本页介绍了如何在 Koin 模块中声明 [Navigation 3](https://developer.android.com/guide/navigation/navigation-3) 条目并将其传递给 `NavDisplay`。每个功能模块贡献各自的屏幕，应用程序则通过一个条目提供程序收集所有屏幕。本文假定你已了解 Navigation 3 的基础知识（返回堆栈、`NavDisplay`、`NavEntry`）以及 [ViewModel in Compose](/docs/reference/koin-compose/compose-viewmodel)。
 
-## 什么是 Navigation 3？ {id="what-is-navigation-3"}
+本页上的所有 API 均标记为 `@KoinExperimentalAPI`。
 
-Navigation 3 是 Jetpack 专为 Compose 设计的新导航库：
-
-- **完整的回退栈控制** - 通过从列表中添加/删除项来进行导航
-- **类型安全路由** - 路由是带有 `@Serializable` 注解的 Kotlin 类
-- **自适应布局** - 同时显示多个目的地（列表-详情）
-- **自动动画** - 内置过渡支持
-
-## 设置 {id="setup"}
-
-### 多平台项目 {id="multiplatform-projects"}
+## 安装 {id="setup"}
 
 ```kotlin
-// shared/build.gradle.kts
+// shared/build.gradle.kts，或 Android 上的 app/build.gradle.kts
+plugins {
+    kotlin("plugin.serialization")
+}
+
 commonMain.dependencies {
     implementation("io.insert-koin:koin-compose-navigation3:$koin_version")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$serialization_version")
 }
 ```
 
-### 仅限 Android 项目 {id="android-only-projects"}
+`koin-compose-navigation3` 支持 Android、iOS、JVM 桌面、JS 和 Wasm。
+
+## 声明条目 {id="declaring-entries"}
+
+路由是带有 `@Serializable` 的类：
 
 ```kotlin
-dependencies {
-    implementation("io.insert-koin:koin-compose-navigation3:$koin_version")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$serialization_version")
-}
+@Serializable data object HomeRoute
+@Serializable data class DetailRoute(val itemId: String)
 ```
 
-应用序列化插件：
+在模块中为每个路由声明一个 `navigation<T> { }`。该 lambda 是一个接收路由的 Composable：
 
 ```kotlin
-plugins {
-    kotlin("plugin.serialization")
-}
-```
+import org.koin.dsl.navigation3.navigation
 
-### 平台支持 {id="platform-support"}
-
-| 平台 | 状态 |
-|----------|--------|
-| Android | 完全支持 |
-| iOS | 完全支持 |
-| Desktop | 完全支持 |
-| Web | 完全支持 |
-
-## 核心概念 {id="core-concepts"}
-
-### 作为 Kotlin 类的路由 {id="routes-as-kotlin-classes"}
-
-使用 `@Serializable` 定义类型安全路由：
-
-```kotlin
-@Serializable
-data object HomeRoute
-
-@Serializable
-data object ProfileRoute
-
-@Serializable
-data class DetailRoute(val itemId: String)
-
-@Serializable
-data class SettingsRoute(val section: String? = null)
-```
-
-### 回退栈 {id="back-stack"}
-
-Navigation 3 使用简单的基于列表的回退栈：
-
-```kotlin
-// 基础回退栈
-val backStack = remember { mutableStateListOf<Any>(HomeRoute) }
-
-// 持久化回退栈（在配置更改后幸存）
-val backStack = rememberNavBackStack(HomeRoute)
-
-// 向前导航
-backStack.add(DetailRoute("123"))
-
-// 向后导航
-backStack.removeLastOrNull()
-```
-
-### NavDisplay {id="navdisplay"}
-
-`NavDisplay` 渲染带动画的回退栈：
-
-```kotlin
-NavDisplay(
-    backStack = backStack,
-    onBack = { backStack.removeLastOrNull() },
-    entryProvider = { route -> /* NavEntry */ }
-)
-```
-
-## Koin 集成 {id="koin-integration"}
-
-### 声明导航条目 {id="declaring-navigation-entries"}
-
-在您的模块中使用 `navigation<T>` DSL：
-
-```kotlin
-val appModule = module {
-    // 依赖项
-    single<ApiClient>()
+val homeModule = module {
     viewModel<HomeViewModel>()
-    viewModel<DetailViewModel>()
 
-    // 使用 Koin 注入的导航条目
-    navigation<HomeRoute> { route ->
+    navigation<HomeRoute> {
         HomeScreen(viewModel = koinViewModel())
     }
+}
+
+val detailModule = module {
+    viewModel<DetailViewModel>()
 
     navigation<DetailRoute> { route ->
-        DetailScreen(
-            itemId = route.itemId,
-            viewModel = koinViewModel { parametersOf(route.itemId) }
-        )
-    }
-
-    navigation<ProfileRoute> { route ->
-        ProfileScreen(viewModel = koinViewModel())
+        DetailScreen(viewModel = koinViewModel { parametersOf(route.itemId) })
     }
 }
 ```
 
-### 使用 koinEntryProvider {id="using-koinentryprovider"}
+每个 `navigation<T>` 都会作为一个以路由类型限定的定义进行存储。Lambda 在执行时以 Koin `Scope` 作为接收者，因此你可以在其中调用 `get<T>()` 以及诸如 `koinViewModel()` 等 Composable 函数。
 
-从 Koin 获取所有导航条目：
+## 构建条目提供程序 {id="building-the-entry-provider"}
+
+`koinEntryProvider()` 会将当前作用域中的每个 `navigation<T>` 条目收集到一个供 `NavDisplay` 使用的提供程序中：
 
 ```kotlin
+import org.koin.compose.navigation3.koinEntryProvider
+
 @Composable
 fun App() {
-    val backStack = rememberNavBackStack(HomeRoute)
-    val entryProvider = koinEntryProvider<Any>()
+    val backStack = remember { mutableStateListOf<Any>(HomeRoute) }
 
     NavDisplay(
         backStack = backStack,
         onBack = { backStack.removeLastOrNull() },
-        entryProvider = entryProvider
+        entryProvider = koinEntryProvider()
     )
 }
 ```
 
-:::tip 当 NavDisplay 为类型化时，请传递您的路由类型
-`koinEntryProvider<T>()` 是泛型函数 — `T` 是路由类型。如果您将其保留为 `koinEntryProvider<Any>()`，但 `NavDisplay` 变为类型化（例如通过类型化的 `SceneStrategy`，如 `rememberSupportingPaneSceneStrategy<Route>()`），编译器会推断为 `NavDisplay<Route>` 并期望 `(Route) -> NavEntry<Route>`，因此 `Any` 类型提供程序将无法匹配：
+如果使用 `rememberNavBackStack()`，你的路由需要实现 `NavKey`。使用 `koinEntryProvider<NavKey>()` 以匹配返回堆栈类型。
 
-```
-Argument type mismatch: actual type is 'Function1<Any, NavEntry<Any>>',
-but 'Function1<Route, NavEntry<Route>>' was expected.
-```
+### 从 Android Activity 中使用 {id="from-an-android-activity"}
 
-传递您的路由类型以进行匹配：
+在 Android 上，`ComponentCallbacks` 上的两个扩展可以从 Activity 或 Fragment 作用域构建提供程序：
 
-```kotlin
-val sceneStrategy = rememberSupportingPaneSceneStrategy<Route>()
-val entryProvider = koinEntryProvider<Route>()   // (Route) -> NavEntry<Route>
+| 函数 | 行为 |
+|----------|----------|
+| `entryProvider<T>()` | 惰性委托：`val provider by entryProvider<Any>()` |
+| `getEntryProvider<T>()` | 立即构建提供程序 |
 
-NavDisplay(
-    backStack = backStack,
-    onBack = onBack,
-    sceneStrategy = sceneStrategy,
-    entryProvider = entryProvider,               // ✅ 匹配 NavDisplay<Route>
-)
-```
+它们从组件的 Koin 作用域中解析：如果实现了 `AndroidScopeComponent` 则从 Activity 作用域中解析，否则从根作用域中解析。
 
-（等效地，`val entryProvider: EntryProvider<Route> = koinEntryProvider()` — 类型实参将从预期类型中推断出来。）
-:::
+## 作用域内的条目 {id="entries-in-a-scope"}
 
-### 完整示例 {id="complete-example"}
+当屏幕需要与某个作用域同生命周期的对象时，请在该作用域内声明条目。配合 `activityRetainedScope`，它们可以在配置变更中得以保留：
 
 ```kotlin
-// 路由
-@Serializable data object ConversationList
-@Serializable data class ConversationDetail(val id: Int)
-@Serializable data object Profile
-
-// 导航器类，用于更整洁的导航
-class Navigator(startDestination: Any) {
-    val backStack = mutableStateListOf(startDestination)
-
-    fun goTo(destination: Any) {
-        backStack.add(destination)
-    }
-
-    fun goBack() {
-        backStack.removeLastOrNull()
-    }
+class Navigator(start: Any) {
+    val backStack = mutableStateListOf(start)
+    fun goTo(route: Any) { backStack.add(route) }
+    fun goBack() { backStack.removeLastOrNull() }
 }
 
-// Koin 模块
 val appModule = module {
-    includes(conversationModule, profileModule)
-
     activityRetainedScope {
-        scoped { Navigator(startDestination = ConversationList) }
-    }
-}
+        scoped { Navigator(start = ConversationList) }
 
-val conversationModule = module {
-    activityRetainedScope {
         navigation<ConversationList> {
             val navigator = get<Navigator>()
-            ConversationListScreen(
-                onConversationClicked = { detail ->
-                    navigator.goTo(detail)
-                }
-            )
+            ConversationListScreen(onClick = { navigator.goTo(ConversationDetail(it)) })
         }
 
         navigation<ConversationDetail> { route ->
-            val navigator = get<Navigator>()
-            ConversationDetailScreen(
-                conversationId = route.id,
-                onProfileClicked = { navigator.goTo(Profile) }
-            )
+            ConversationDetailScreen(conversationId = route.id)
         }
     }
 }
 
-val profileModule = module {
-    activityRetainedScope {
-        navigation<Profile> {
-            ProfileScreen()
-        }
-    }
-}
-
-// Activity
 class MainActivity : ComponentActivity(), AndroidScopeComponent {
     override val scope: Scope by activityRetainedScope()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContent {
             val navigator: Navigator = get()
-
-            Scaffold { padding ->
-                NavDisplay(
-                    backStack = navigator.backStack,
-                    modifier = Modifier.padding(padding),
-                    onBack = { navigator.goBack() },
-                    entryProvider = getEntryProvider()
-                )
-            }
+            NavDisplay(
+                backStack = navigator.backStack,
+                onBack = { navigator.goBack() },
+                entryProvider = getEntryProvider()
+            )
         }
     }
 }
 ```
 
-## 作用域导航 {id="scoped-navigation"}
+`getEntryProvider()` 会从 Activity 作用域读取条目。在某个作用域内声明的条目仅在该作用域内可见。关于 `activityRetainedScope` 的说明，请参阅 [Android 作用域](/docs/reference/koin-android/scope)。
 
-在 Koin 作用域内声明导航条目：
+## 条目的 ViewModel {id="viewmodels-for-an-entry"}
 
-```kotlin
-val appModule = module {
-    // Activity-retained 作用域（在配置更改后幸存）
-    activityRetainedScope {
-        scoped { UserSession() }
-        viewModel<ProfileViewModel>()
-
-        navigation<ProfileRoute> { route ->
-            ProfileScreen(viewModel = koinViewModel())
-        }
-    }
-
-    // 自定义作用域
-    scope<CheckoutFlow> {
-        scoped { CheckoutState() }
-        viewModel<CheckoutViewModel>()
-
-        navigation<CartRoute> { route ->
-            CartScreen(viewModel = koinViewModel())
-        }
-
-        navigation<PaymentRoute> { route ->
-            PaymentScreen(viewModel = koinViewModel())
-        }
-    }
-}
-```
-
-## ViewModel 集成 {id="viewmodel-integration"}
-
-### 配合导航实参 {id="with-navigation-arguments"}
-
-将路由数据传递给 ViewModel：
-
-```kotlin
-@Serializable
-data class DetailRoute(val itemId: String, val fromSearch: Boolean = false)
-
-class DetailViewModel(
-    val route: DetailRoute,
-    private val repository: Repository
-) : ViewModel() {
-    val item = repository.getItem(route.itemId)
-}
-
-val appModule = module {
-    viewModelOf(::DetailViewModel)
-
-    navigation<DetailRoute> { route ->
-        DetailScreen(
-            viewModel = koinViewModel { parametersOf(route) }
-        )
-    }
-}
-```
-
-### 配合条目装饰器 {id="with-entry-decorators"}
-
-使用装饰器进行 ViewModel 状态保留：
+要将 ViewModel 的作用域限定为其条目，请向 `NavDisplay` 添加 ViewModel store 装饰器。如果不添加，`koinViewModel()` 将使用 Activity 的 store，并且相同路由的每个条目都会共享同一个实例：
 
 ```kotlin
 NavDisplay(
@@ -331,216 +146,108 @@ NavDisplay(
         rememberSaveableStateHolderNavEntryDecorator(),
         rememberViewModelStoreNavEntryDecorator()
     ),
-    entryProvider = entryProvider {
-        entry<DetailRoute> { route ->
-            val viewModel = koinViewModel<DetailViewModel> {
-                parametersOf(route)
-            }
-            DetailScreen(viewModel)
-        }
-    }
-)
-```
-
-## 动画 {id="animations"}
-
-### 默认过渡 {id="default-transitions"}
-
-```kotlin
-NavDisplay(
-    backStack = backStack,
-    onBack = { backStack.removeLastOrNull() },
-    entryProvider = entryProvider,
-    // 前进导航动画
-    transitionSpec = {
-        slideInHorizontally(initialOffsetX = { it }) togetherWith
-        slideOutHorizontally(targetOffsetX = { -it })
-    },
-    // 后退导航动画
-    popTransitionSpec = {
-        slideInHorizontally(initialOffsetX = { -it }) togetherWith
-        slideOutHorizontally(targetOffsetX = { it })
-    }
-)
-```
-
-### 单个路由动画 {id="per-route-animations"}
-
-```kotlin
-navigation<ModalRoute>(
-    metadata = NavDisplay.transitionSpec {
-        slideInVertically(initialOffsetY = { it }) togetherWith
-        ExitTransition.KeepUntilTransitionsFinished
-    } + NavDisplay.popTransitionSpec {
-        EnterTransition.None togetherWith
-        slideOutVertically(targetOffsetY = { it })
-    }
-) { route ->
-    ModalScreen()
-}
-```
-
-## 自适应布局 {id="adaptive-layouts"}
-
-### 列表-详情模式 {id="list-detail-pattern"}
-
-为自适应布局使用场景策略：
-
-```kotlin
-@Composable
-fun App() {
-    val backStack = rememberNavBackStack(ConversationList)
-    val listDetailStrategy = rememberListDetailSceneStrategy<Any>()
-
-    NavDisplay(
-        backStack = backStack,
-        onBack = { backStack.removeLastOrNull() },
-        sceneStrategy = listDetailStrategy,
-        entryProvider = entryProvider {
-            entry<ConversationList>(
-                metadata = ListDetailSceneStrategy.listPane()
-            ) {
-                ConversationListScreen()
-            }
-
-            entry<ConversationDetail>(
-                metadata = ListDetailSceneStrategy.detailPane()
-            ) { route ->
-                ConversationDetailScreen(route.id)
-            }
-        }
-    )
-}
-```
-
-### 使用 Koin 模块 {id="with-koin-modules"}
-
-```kotlin
-val appModule = module {
-    navigation<ConversationList>(
-        metadata = ListDetailSceneStrategy.listPane()
-    ) {
-        ConversationListScreen(
-            onItemClick = { get<Navigator>().goTo(it) }
-        )
-    }
-
-    navigation<ConversationDetail>(
-        metadata = ListDetailSceneStrategy.detailPane()
-    ) { route ->
-        ConversationDetailScreen(route.id)
-    }
-}
-```
-
-## Android 扩展 {id="android-extensions"}
-
-### 延迟加载条目提供程序 {id="lazy-entry-provider"}
-
-```kotlin
-class MainActivity : ComponentActivity() {
-    // 延迟初始化
-    private val entryProvider by entryProvider<Any>()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            val backStack = rememberNavBackStack(HomeRoute)
-
-            NavDisplay(
-                backStack = backStack,
-                onBack = { backStack.removeLastOrNull() },
-                entryProvider = entryProvider
-            )
-        }
-    }
-}
-```
-
-### 急速加载条目提供程序 {id="eager-entry-provider"}
-
-```kotlin
-class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        val entryProvider = getEntryProvider<Any>()
-
-        setContent {
-            NavDisplay(
-                backStack = backStack,
-                entryProvider = entryProvider,
-                onBack = { backStack.removeLastOrNull() }
-            )
-        }
-    }
-}
-```
-
-## API 参考 {id="api-reference"}
-
-### DSL 函数 {id="dsl-functions"}
-
-| 函数 | 描述 |
-|----------|-------------|
-| `Module.navigation<T> { }` | 在模块级别声明导航条目 |
-| `ScopeDSL.navigation<T> { }` | 在作用域内声明导航条目 |
-
-### Composable 函数 {id="composable-functions"}
-
-| 函数 | 描述 |
-|----------|-------------|
-| `koinEntryProvider<T>()` | 从 Koin 获取聚合后的条目提供程序 |
-
-### Android 扩展
-
-| 函数 | 描述 |
-|----------|-------------|
-| `entryProvider<T>()` | 延迟加载条目提供程序委托 |
-| `getEntryProvider<T>()` | 急速加载条目提供程序 |
-
-## 从 Navigation 2.x 迁移 {id="migration-from-navigation-2-x"}
-
-### 之前 (Navigation 2.x) {id="before-navigation-2-x"}
-
-```kotlin
-NavHost(navController, startDestination = "home") {
-    composable("home") {
-        HomeScreen(viewModel = koinViewModel())
-    }
-    composable("detail/{id}") { backStackEntry ->
-        val id = backStackEntry.arguments?.getString("id")
-        DetailScreen(id = id, viewModel = koinViewModel())
-    }
-}
-```
-
-### 之后 (Navigation 3) {id="after-navigation-3"}
-
-```kotlin
-// 类型安全路由
-@Serializable data object HomeRoute
-@Serializable data class DetailRoute(val id: String)
-
-// 模块声明
-val appModule = module {
-    navigation<HomeRoute> { HomeScreen(viewModel = koinViewModel()) }
-    navigation<DetailRoute> { route ->
-        DetailScreen(id = route.id, viewModel = koinViewModel())
-    }
-}
-
-// 用法
-val backStack = rememberNavBackStack(HomeRoute)
-NavDisplay(
-    backStack = backStack,
-    onBack = { backStack.removeLastOrNull() },
     entryProvider = koinEntryProvider()
 )
 ```
 
-## 资源 {id="resources"}
+将路由或其字段作为形参传入：
 
-- [Navigation 3 官方指南](https://developer.android.com/guide/navigation/navigation-3)
-- [Nav3 Recipes 仓库](https://github.com/android/nav3-recipes)
-- [Koin Compose 文档](/docs/reference/koin-compose/compose)
+**编译器插件 DSL**
+```kotlin
+class DetailViewModel(
+    @InjectedParam val route: DetailRoute,
+    private val repository: ItemRepository
+) : ViewModel()
+
+val detailModule = module {
+    viewModel<DetailViewModel>()
+
+    navigation<DetailRoute> { route ->
+        DetailScreen(viewModel = koinViewModel { parametersOf(route) })
+    }
+}
+```
+
+**注解**
+```kotlin
+@KoinViewModel
+class DetailViewModel(
+    @InjectedParam val route: DetailRoute,
+    private val repository: ItemRepository
+) : ViewModel()
+
+// navigation<T> 条目在 DSL 模块中声明
+val detailModule = module {
+    navigation<DetailRoute> { route ->
+        DetailScreen(viewModel = koinViewModel { parametersOf(route) })
+    }
+}
+```
+
+**构造函数 / 经典 DSL**
+```kotlin
+class DetailViewModel(
+    val route: DetailRoute,
+    private val repository: ItemRepository
+) : ViewModel()
+
+val detailModule = module {
+    viewModelOf(::DetailViewModel) // route 来自 parametersOf(route)
+
+    navigation<DetailRoute> { route ->
+        DetailScreen(viewModel = koinViewModel { parametersOf(route) })
+    }
+}
+```
+
+## 条目元数据 {id="entry-metadata"}
+
+`navigation<T>` 接受一个传递给 `NavEntry` 的 `metadata` 映射。可以用它来实现单个条目的过渡动画，或类似列表-详情的场景策略：
+
+```kotlin
+val conversationModule = module {
+    navigation<ConversationList>(metadata = ListDetailSceneStrategy.listPane()) {
+        ConversationListScreen()
+    }
+
+    navigation<ConversationDetail>(metadata = ListDetailSceneStrategy.detailPane()) { route ->
+        ConversationDetailScreen(route.id)
+    }
+
+    navigation<ModalRoute>(
+        metadata = NavDisplay.transitionSpec {
+            slideInVertically(initialOffsetY = { it }) togetherWith ExitTransition.KeepUntilTransitionsFinished
+        }
+    ) {
+        ModalScreen()
+    }
+}
+```
+
+然后将场景策略传递给 `NavDisplay`（`sceneStrategy = rememberListDetailSceneStrategy()`）。元数据的键来自 Navigation 3 和自适应库，而非来自 Koin。
+
+## 从 Navigation 2 迁移 {id="from-navigation-2"}
+
+| Navigation 2 | 结合 Koin 的 Navigation 3 |
+|--------------|------------------------|
+| `NavHost { composable(...) }` 中的字符串或类型化路由 | `@Serializable` 路由类 |
+| `NavHost` 中的 `composable<Route> { ... }` | Koin 模块中的 `navigation<Route> { ... }` |
+| `NavHost(navController, startDestination)` | `NavDisplay(backStack, entryProvider = koinEntryProvider())` |
+| 从 `SavedStateHandle` 读取实参 | 传递给 lambda 的路由对象 |
+
+## API 总结 {id="api-summary"}
+
+| API | 软件包 | 用途 |
+|-----|---------|---------|
+| `Module.navigation<T>(metadata) { }` | `org.koin.dsl.navigation3` | 在模块中声明条目 |
+| `ScopeDSL.navigation<T>(metadata) { }` | `org.koin.dsl.navigation3` | 在作用域中声明条目 |
+| `koinEntryProvider<T>(scope)` | `org.koin.compose.navigation3` | 来自当前 Compose 作用域的条目提供程序 |
+| `entryProvider<T>()`, `getEntryProvider<T>()` | `org.koin.androidx.compose.navigation3` | 来自 Activity 或 Fragment 的条目提供程序 (Android) |
+
+## 相关内容 {id="related"}
+
+- [ViewModel in Compose](/docs/reference/koin-compose/compose-viewmodel)：`koinViewModel()` 及其所有者。
+- [Android 作用域](/docs/reference/koin-android/scope)：`activityRetainedScope` 与 Activity 作用域。
+- [注入形参](/docs/reference/koin-core/injection-parameters)：`parametersOf` 与 `@InjectedParam`。
+- [Koin for Compose](/docs/reference/koin-compose/compose)：软件包与启动 Koin。
+- [Navigation 3 recipes](https://github.com/android/nav3-recipes)：Google 针对 Navigation 3 本身的示例。

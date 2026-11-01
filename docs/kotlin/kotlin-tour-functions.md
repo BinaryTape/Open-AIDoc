@@ -2,7 +2,7 @@
 
 <no-index/>
 
-你可以使用 `fun` 关键字在 Kotlin 中声明自己的函数。
+在 Kotlin 中，你可以使用 `fun` 关键字声明自己的函数。
 
 ```kotlin
 fun hello() {
@@ -14,7 +14,7 @@ fun main() {
     // Hello, world!
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-function-demo"}
+{kotlin-runnable="true" id="kotlin-tour-function-demo"}
 
 在 Kotlin 中：
 
@@ -22,9 +22,9 @@ fun main() {
 * 每个形参都必须指定类型，多个形参之间必须用逗号 `,` 分隔。
 * 返回值类型写在函数的圆括号 `()` 之后，用冒号 `:` 分隔。
 * 函数体写在花括号 `{}` 内。
-* `return` 关键字用于退出函数或从函数返回值。
+* `return` 关键字用于退出函数或从函数返回某个值。
 
-> 如果函数不返回任何有用的内容，则可以省略返回值类型和 `return` 关键字。有关详细信息，请参阅[无返回值的函数](#functions-without-return)。
+> 如果函数不返回任何有用的内容，可以省略返回值类型和 `return` 关键字。更多相关内容请参阅[无返回值的函数](#functions-without-return)。
 >
 {style="note"}
 
@@ -33,7 +33,7 @@ fun main() {
 * `x` 和 `y` 是函数形参。
 * `x` 和 `y` 的类型为 `Int`。
 * 该函数的返回值类型为 `Int`。
-* 调用该函数时会返回 `x` 和 `y` 的和。
+* 调用该函数时，会返回 `x` 与 `y` 之和。
 
 ```kotlin
 fun sum(x: Int, y: Int): Int {
@@ -45,17 +45,17 @@ fun main() {
     // 3
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-simple-function"}
+{kotlin-runnable="true" id="kotlin-tour-simple-function"}
 
-> 我们在[编码规范](coding-conventions.md#function-names)中建议：函数命名以小写字母开头，并采用不含下划线的骆驼拼写法。
+> 我们在[编码约定](coding-conventions.md#function-names)中建议，函数命名应以小写字母开头，并采用不带下划线的骆驼拼写法。
 > 
 {style="note"}
 
-## 命名实参 {id="named-arguments"}
+## 具名实参 {id="named-arguments"}
 
-为了使代码更简洁，调用函数时不必包含形参名称。但是，包含形参名称确实可以提高代码的可读性。这被称为使用**命名实参**。如果包含了形参名称，就可以按任意顺序书写实参。
+为了使代码更简洁，调用函数时不需要包含形参名称。不过，包含形参名称确实可以提高代码的可读性。这被称为使用**具名实参**。如果包含了形参名称，就可以按任意顺序书写实参。
 
-> 在以下示例中，使用[字符串模板](strings.md#string-templates)（`$`）来访问形参值，将其转换为 `String` 类型，然后串联成一个字符串进行打印。
+> 在以下示例中，使用[字符串模板](strings.md#string-templates)（`$`）访问形参的值，将其转换为 `String` 类型，然后串联为一个字符串进行输出。
 > 
 {style="tip"}
 
@@ -65,16 +65,16 @@ fun printMessageWithPrefix(message: String, prefix: String) {
 }
 
 fun main() {
-    // 使用命名实参并调换了实参顺序
+    // 使用具名实参并调换形参顺序
     printMessageWithPrefix(prefix = "Log", message = "Hello")
     // [Log] Hello
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-named-arguments-function"}
+{kotlin-runnable="true" id="kotlin-tour-named-arguments-function"}
 
 ## 默认形参值 {id="default-parameter-values"}
 
-你可以为函数形参定义默认值。在调用函数时，任何具有默认值的形参都可以省略。要声明默认值，请在类型之后使用赋值运算符 `=`：
+你可以为函数形参定义默认值。在调用函数时，任何带有默认值的形参都可以省略。要声明默认值，请在类型之后使用赋值运算符 `=`：
 
 ```kotlin
 fun printMessageWithPrefix(message: String, prefix: String = "Info") {
@@ -82,7 +82,7 @@ fun printMessageWithPrefix(message: String, prefix: String = "Info") {
 }
 
 fun main() {
-    // 传入全部两个实参调用函数
+    // 同时传入两个实参调用函数
     printMessageWithPrefix("Hello", "Log") 
     // [Log] Hello
     
@@ -94,15 +94,15 @@ fun main() {
     // [Log] Hello
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-default-param-function"}
+{kotlin-runnable="true" id="kotlin-tour-default-param-function"}
 
-> 你可以跳过带有默认值的特定形参，而不必省略所有形参。但是，在第一个跳过的形参之后，必须为后续的所有实参指定名称。
+> 你可以跳过带有默认值的特定形参，而无需省略所有形参。但是，在第一个被跳过的形参之后，必须为后续的所有实参指明名称。
 >
 {style="note"}
 
 ## 无返回值的函数 {id="functions-without-return"}
 
-如果你的函数不返回有用的值，其返回值类型就是 `Unit`。`Unit` 是一种只有一个值的类型——即 `Unit`。你无需在函数体中显式声明返回 `Unit`。这意味着你既不需要使用 `return` 关键字，也不需要声明返回值类型：
+如果你的函数不返回有用的值，那么它的返回值类型就是 `Unit`。`Unit` 是一种只有一个值的类型——即 `Unit`。你无需在函数体中显式声明返回 `Unit`。这意味着你不需要使用 `return` 关键字或声明返回值类型：
 
 ```kotlin
 fun printMessage(message: String) {
@@ -115,11 +115,11 @@ fun main() {
     // Hello
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-unit-function"}
+{kotlin-runnable="true" id="kotlin-tour-unit-function"}
 
 ## 单表达式函数 {id="single-expression-functions"}
 
-为了让代码更简洁，你可以使用单表达式函数。例如，可以简化 `sum()` 函数：
+为了让代码更简洁，你可以使用单表达式函数。例如，`sum()` 函数可以简写为：
 
 ```kotlin
 fun sum(x: Int, y: Int): Int {
@@ -131,9 +131,9 @@ fun main() {
     // 3
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-simple-function-before"}
+{kotlin-runnable="true" id="kotlin-tour-simple-function-before"}
 
-你可以移除花括号 `{}`，并使用赋值运算符 `=` 来声明函数体。当使用赋值运算符 `=` 时，Kotlin 会使用类型推断，因此你也可以省略返回值类型。此时 `sum()` 函数就变成了一行：
+你可以移除花括号 `{}`，并使用赋值运算符 `=` 来声明函数体。当你使用赋值运算符 `=` 时，Kotlin 会使用类型推断，因此你也可以省略返回值类型。这样 `sum()` 函数就变成了一行：
 
 ```kotlin
 fun sum(x: Int, y: Int) = x + y
@@ -143,17 +143,17 @@ fun main() {
     // 3
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-simple-function-after"}
+{kotlin-runnable="true" id="kotlin-tour-simple-function-after"}
 
-不过，如果你希望代码能够被其他开发者迅速理解，即使在使用赋值运算符 `=` 时，显式定义返回值类型也是一个好习惯。
+但是，如果你希望其他开发者能够快速理解你的代码，即使使用赋值运算符 `=`，显式定义返回值类型也是一个好习惯。
 
-> 如果使用 `{}` 花括号来声明函数体，则必须声明返回值类型，除非该类型为 `Unit`。
+> 如果使用 `{}` 花括号来声明函数体，则必须声明返回值类型，除非它是 `Unit` 类型。
 > 
 {style="note"}
 
 ## 函数中的提前返回 {id="early-returns-in-functions"}
 
-要阻止函数中的代码执行超过某个特定点，请使用 `return` 关键字。该示例使用 `if`，在条件表达式为 true 时提前从函数返回：
+如果想在某一点阻止函数中的代码继续执行，可以使用 `return` 关键字。此示例使用 `if` 在条件表达式为真时提前从函数返回：
 
 ```kotlin
 // 已注册用户名的列表
@@ -187,7 +187,7 @@ fun main() {
     // User registered successfully: new_user
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-function-early-return"}
+{kotlin-runnable="true" id="kotlin-tour-function-early-return"}
 
 ## 练习：函数 {id="practice-functions"}
 
@@ -196,7 +196,7 @@ fun main() {
 
 编写一个名为 `circleArea` 的函数，该函数接收以整数格式表示的圆半径作为形参，并输出该圆的面积。
 
-> 在本练习中，你将导入一个软件包，以便可以通过 `PI` 访问 <math>π</math> 的值。有关导入软件包的更多信息，请参阅[软件包与导入](packages.md)。
+> 在本练习中，你将导入一个软件包，以便可以通过 `PI` 访问 <math>π</math> 的值。有关导入软件包的更多信息，请参阅[软件包和导入](packages.md)。
 >
 {style="tip"}
 
@@ -215,7 +215,7 @@ fun main() {
     println(circleArea(2))
 }
 ```
-{validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-functions-exercise-1"}
+{validate="false" kotlin-runnable="true" kotlin-target-platform="exercise" kotlin-hidden-files="ExerciseUtils.kt,tour/basics/CircleAreaTest.kt" id="kotlin-tour-functions-exercise-1"}
 
 ```kotlin
 import kotlin.math.PI
@@ -228,7 +228,7 @@ fun main() {
     println(circleArea(2)) // 12.566370614359172
 }
 ```
-{initial-collapse-state="collapsed" collapsible="true" collapsed-title="参考解答" id="kotlin-tour-functions-solution-1"}
+{kotlin-runnable="true" kotlin-target-platform="exercise" kotlin-hidden-files="ExerciseUtils.kt,tour/basics/CircleAreaTest.kt" initial-collapse-state="collapsed" collapsible="true" collapsed-title="示例解决方案" id="kotlin-tour-functions-solution-1"}
 
 </def>
 <def title="将函数重写为单表达式" id="functions-exercise-2">
@@ -238,13 +238,15 @@ fun main() {
 ```kotlin
 import kotlin.math.PI
 
+//sampleStart
 // 在此处编写你的代码
+//sampleEnd
 
 fun main() {
     println(circleArea(2))
 }
 ```
-{validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-functions-exercise-2"}
+{validate="false" kotlin-runnable="true" kotlin-target-platform="exercise" kotlin-hidden-files="ExerciseUtils.kt,tour/basics/CircleAreaTest.kt" folded-button="false" id="kotlin-tour-functions-exercise-2"}
 
 ```kotlin
 import kotlin.math.PI
@@ -255,18 +257,20 @@ fun main() {
     println(circleArea(2)) // 12.566370614359172
 }
 ```
-{initial-collapse-state="collapsed" collapsible="true" collapsed-title="参考解答" id="kotlin-tour-functions-solution-2"}
+{kotlin-runnable="true" kotlin-target-platform="exercise" kotlin-hidden-files="ExerciseUtils.kt,tour/basics/CircleAreaTest.kt" folded-button="false" initial-collapse-state="collapsed" collapsible="true" collapsed-title="示例解决方案" id="kotlin-tour-functions-solution-2"}
 
 </def>
-<def title="使用默认形参和命名实参重构函数" id="functions-exercise-3">
+<def title="使用默认形参和具名实参重构函数" id="functions-exercise-3">
 
-你有一个函数，用于将以小时、分钟和秒给出的时间间隔转换为秒。在大多数情况下，你只需要传递一个或两个函数形参，而其余形参等于 0。请使用默认形参值和命名实参来改进该函数及调用它的代码，使代码更易于阅读。
+你有一个将以小时、分钟和秒给出的时间间隔转换为秒的函数。在大多数情况下，你只需要传递一到两个函数形参，其余形参都等于 0。通过使用默认形参值和具名实参来改进该函数及调用它的代码，使代码更易读。
 
 ```kotlin
+// 重构此函数：为 hours、minutes 和 seconds 提供默认值 0
 fun intervalInSeconds(hours: Int, minutes: Int, seconds: Int) =
     ((hours * 60) + minutes) * 60 + seconds
 
 fun main() {
+    // 尽可能使用具名实参简化这些调用
     println(intervalInSeconds(1, 20, 15))
     println(intervalInSeconds(0, 1, 25))
     println(intervalInSeconds(2, 0, 0))
@@ -274,7 +278,7 @@ fun main() {
     println(intervalInSeconds(1, 0, 1))
 }
 ```
-{validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-functions-exercise-3"}
+{validate="false" kotlin-runnable="true" kotlin-target-platform="exercise" kotlin-hidden-files="ExerciseUtils.kt,tour/basics/IntervalInSecondsTest.kt" id="kotlin-tour-functions-exercise-3"}
 
 ```kotlin
 fun intervalInSeconds(hours: Int = 0, minutes: Int = 0, seconds: Int = 0) =
@@ -288,12 +292,12 @@ fun main() {
     println(intervalInSeconds(hours = 1, seconds = 1))
 }
 ```
-{initial-collapse-state="collapsed" collapsible="true" collapsed-title="参考解答" id="kotlin-tour-functions-solution-3"}
+{kotlin-runnable="true" kotlin-target-platform="exercise" kotlin-hidden-files="ExerciseUtils.kt,tour/basics/IntervalInSecondsTest.kt" initial-collapse-state="collapsed" collapsible="true" collapsed-title="示例解决方案" id="kotlin-tour-functions-solution-3"}
 
 </def>
 </deflist>
 
-## lambda表达式 {id="lambda-expressions"}
+## Lambda 表达式 {id="lambda-expressions"}
 
 Kotlin 允许你通过使用 lambda 表达式来编写更加简洁的函数代码。
 
@@ -308,7 +312,7 @@ fun main() {
     // HELLO
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-lambda-function-before"}
+{kotlin-runnable="true" id="kotlin-tour-lambda-function-before"}
 
 也可以写成 lambda 表达式：
 
@@ -319,40 +323,40 @@ fun main() {
     // HELLO
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-lambda-variable"}
+{kotlin-runnable="true" id="kotlin-tour-lambda-variable"}
 
-lambda 表达式初看可能比较难理解，让我们逐步剖析。lambda 表达式写在花括号 `{}` 内。
+Lambda 表达式初看可能难以理解，因此让我们来分解一下。Lambda 表达式写在花括号 `{}` 内。
 
-在 lambda 表达式内部，你需要编写：
+在 lambda 表达式内部，需要书写：
 
-* 形参，后跟 `->`。
-* `->` 之后的函数体。
+* 形参后跟 `->`。
+* `->` 之后为函数体。
 
-在前面的示例中：
+在上一个示例中：
 
 * `text` 是函数形参。
 * `text` 的类型为 `String`。
 * 该函数返回在 `text` 上调用 [`.uppercase()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.text/uppercase.html) 函数的结果。
 * 整个 lambda 表达式通过赋值运算符 `=` 赋值给 `upperCaseString` 变量。
-* 通过像调用函数一样使用变量 `upperCaseString`，并将字符串 `"hello"` 作为实参来调用该 lambda 表达式。
-* `println()` 函数打印结果。
+* 通过像使用函数一样使用变量 `upperCaseString` 并传入字符串 `"hello"` 作为实参来调用该 lambda 表达式。
+* `println()` 函数输出结果。
 
-> 如果你声明的 lambda 没有形参，则无需使用 `->`。例如：
+> 如果声明不带形参的 lambda 表达式，则无需使用 `->`。例如：
 > ```kotlin
 > { println("Log message") }
 > ```
 >
 {style="note"}
 
-lambda 表达式有多种用法。你可以：
+Lambda 表达式可以用于多种场景。你可以：
 
 * [将 lambda 表达式作为形参传递给另一个函数](#pass-to-another-function)
-* [从函数中返回 lambda 表达式](#return-from-a-function)
+* [从函数返回 lambda 表达式](#return-from-a-function)
 * [单独调用 lambda 表达式](#invoke-separately)
 
 ### 传递给另一个函数 {id="pass-to-another-function"}
 
-将 lambda 表达式传递给函数的绝佳示例，是对集合使用 [`.filter()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/filter.html) 函数：
+将 lambda 表达式传递给函数的一个典型实用场景，是对集合使用 [`.filter()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/filter.html) 函数：
 
 ```kotlin
 fun main() {
@@ -371,19 +375,19 @@ fun main() {
     //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-lambda-filter"}
+{kotlin-runnable="true" id="kotlin-tour-lambda-filter"}
 
-`.filter()` 函数接受一个 lambda 表达式作为谓词，并将其应用于列表中的每个元素。该函数仅在谓词返回 `true` 时保留该元素：
+`.filter()` 函数接受一个 lambda 表达式作为谓词，并将其应用于列表中的每个元素。只有当谓词返回 `true` 时，该函数才会保留该元素：
 
-* `{ x -> x > 0 }` 在元素为正数时返回 `true`。
-* `{ x -> x < 0 }` 在元素为负数时返回 `true`。
+* 如果元素为正数，`{ x -> x > 0 }` 返回 `true`。
+* 如果元素为负数，`{ x -> x < 0 }` 返回 `true`。
 
-该示例展示了将 lambda 表达式传递给函数的两种方式：
+此示例演示了将 lambda 表达式传递给函数的两种方式：
 
-* 对于正数，示例直接在 `.filter()` 函数中添加 lambda 表达式。
-* 对于负数，示例将 lambda 表达式赋值给 `isNegative` 变量。然后将 `isNegative` 变量作为函数实参用在 `.filter()` 函数中。在这种情况下，必须在 lambda 表达式中指定函数形参（`x`）的类型。
+* 对于正数，该示例直接在 `.filter()` 函数中添加 lambda 表达式。
+* 对于负数，该示例将 lambda 表达式赋值给 `isNegative` 变量。然后将 `isNegative` 变量用作 `.filter()` 函数的实参。在这种情况下，必须在 lambda 表达式中指定函数形参（`x`）的类型。
 
-> 如果 lambda 表达式是唯一的函数实参，则可以省略函数的圆括号 `()`：
+> 如果 lambda 表达式是唯一的函数形参，可以省略函数的圆括号 `()`：
 > 
 > ```kotlin
 > val positives = numbers.filter { x -> x > 0 }
@@ -393,7 +397,7 @@ fun main() {
 >
 {style="note"}
 
-另一个很好的示例是使用 [`.map()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/map.html) 函数来转换集合中的元素：
+另一个很好的示例是使用 [`.map()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/map.html) 函数转换集合中的元素：
 
 ```kotlin
 fun main() {
@@ -411,18 +415,18 @@ fun main() {
     //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-lambda-map"}
+{kotlin-runnable="true" id="kotlin-tour-lambda-map"}
 
 `.map()` 函数接受一个 lambda 表达式作为转换函数：
 
-* `{ x -> x * 2 }` 获取列表的每个元素，并返回该元素乘以 2 的结果。
-* `{ x -> x * 3 }` 获取列表的每个元素，并返回该元素乘以 3 的结果。
+* `{ x -> x * 2 }` 获取列表中的每个元素，并返回该元素乘以 2 的结果。
+* `{ x -> x * 3 }` 获取列表中的每个元素，并返回该元素乘以 3 的结果。
 
 ### 函数类型 {id="function-types"}
 
-在从函数返回 lambda 表达式之前，你首先需要了解**函数类型**。
+在从函数返回 lambda 表达式之前，首先需要了解**函数类型**。
 
-你已经了解了基本类型，但函数本身也有类型。Kotlin 的类型推断可以根据形参类型推断出函数的类型。但有时你可能需要显式指定函数类型。编译器需要函数类型，以便明确该函数允许和不允许的操作。
+你已经了解了基本类型，但函数本身也是有类型的。Kotlin 的类型推断可以根据形参类型推断出函数的类型。但在某些情况下，你可能需要显式指定函数类型。编译器需要函数类型以便了解该函数允许和不允许的操作。
 
 函数类型的语法如下：
 
@@ -441,9 +445,9 @@ fun main() {
     // HELLO
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-lambda-function-type"}
+{kotlin-runnable="true" id="kotlin-tour-lambda-function-type"}
 
-如果你的 lambda 表达式没有形参，则圆括号 `()` 保持为空。例如：`() -> Unit`
+如果你的 lambda 表达式没有形参，则圆括号 `()` 为空。例如：`() -> Unit`
 
 > 必须在 lambda 表达式中或作为函数类型声明形参和返回值类型。否则，编译器将无法得知 lambda 表达式的类型。
 > 
@@ -455,11 +459,11 @@ fun main() {
 
 ### 从函数返回 {id="return-from-a-function"}
 
-lambda 表达式可以作为函数的返回值。为了让编译器理解返回的 lambda 表达式是什么类型，你必须声明一个函数类型。
+可以从函数返回 lambda 表达式。为了让编译器理解返回的 lambda 表达式是什么类型，必须声明函数类型。
 
-在以下示例中，`toSeconds()` 函数具有函数类型 `(Int) -> Int`，因为它总是返回一个接收 `Int` 类型形参并返回 `Int` 值的 lambda 表达式。
+在以下示例中，`toSeconds()` 函数的函数类型为 `(Int) -> Int`，因为它总是返回一个接受 `Int` 类型形参并返回 `Int` 值的 lambda 表达式。
 
-该示例使用 `when` 表达式来确定在调用 `toSeconds()` 时返回哪个 lambda 表达式：
+此示例使用 `when` 表达式来确定调用 `toSeconds()` 时返回哪个 lambda 表达式：
 
 ```kotlin
 fun toSeconds(time: String): (Int) -> Int = when (time) {
@@ -477,11 +481,11 @@ fun main() {
     // Total time is 1680 secs
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-lambda-return-from-function"}
+{kotlin-runnable="true" id="kotlin-tour-lambda-return-from-function"}
 
 ### 单独调用 {id="invoke-separately"}
 
-通过在花括号 `{}` 之后添加圆括号 `()` 并在圆括号内传入实参，可以单独调用 lambda 表达式：
+通过在花括号 `{}` 后添加圆括号 `()`，并将所有实参放入圆括号内，可以单独调用 lambda 表达式：
 
 ```kotlin
 fun main() {
@@ -491,19 +495,19 @@ fun main() {
     //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-lambda-standalone"}
+{kotlin-runnable="true" id="kotlin-tour-lambda-standalone"}
 
 ### 尾随 lambda {id="trailing-lambdas"}
 
-正如你之前所见，如果 lambda 表达式是唯一的函数实参，则可以省略函数的圆括号 `()`。如果 lambda 表达式作为函数的最后一个实参传递，则该表达式可以写在函数圆括号 `()` 的外部。这两种情况下的语法都称为**尾随 lambda**。
+正如前面所见，如果 lambda 表达式是唯一的函数形参，可以省略函数的圆括号 `()`。如果 lambda 表达式作为函数的最后一个形参传递，那么该表达式可以写在函数圆括号 `()` 之外。在这两种情况下，这种语法都称为**尾随 lambda**。
 
-例如，[`.fold()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.sequences/fold.html) 函数接收一个初始值和一个操作：
+例如，[`.fold()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.sequences/fold.html) 函数接受一个初始值和一个操作：
 
 ```kotlin
 fun main() {
     //sampleStart
-    // 初始值为零。 
-    // 该操作将初始值与列表中的每个元素进行累加。
+    // 初始值为 0。
+    // 该操作将初始值与列表中的每个项累加求和。
     println(listOf(1, 2, 3).fold(0, { x, item -> x + item })) // 6
 
     // 或者，采用尾随 lambda 的形式
@@ -511,47 +515,51 @@ fun main() {
     //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-trailing-lambda"}
+{kotlin-runnable="true" id="kotlin-tour-trailing-lambda"}
 
-有关 lambda 表达式的更多信息，请参阅 [lambda表达式与匿名函数](lambdas.md#lambda-expressions-and-anonymous-functions)。
+有关 lambda 表达式的更多信息，请参阅 [Lambda 表达式和匿名函数](lambdas.md#lambda-expressions-and-anonymous-functions)。
 
 我们教程的下一步是学习 Kotlin 中的[类](kotlin-tour-classes.md)。
 
-## 练习：lambda表达式 {completion-point="true" id="practice-lambda-expressions"}
+## 练习：Lambda 表达式 {completion-point="true" id="practice-lambda-expressions"}
 
 <deflist appearance="clear" collapsible="true" numbered="true">
 <def title="使用 lambda 表达式构建 URL 列表" id="lambdas-exercise-1">
 
-你有一个 Web 服务支持的操作列表、所有请求的通用前缀以及特定资源的 ID。
-若要针对 ID 为 5 的资源请求 `title` 操作，你需要创建以下 URL：`https://example.com/book-info/5/title`。
-请使用 lambda 表达式从操作列表中创建一个 URL 列表。
+你有一个 Web 服务支持的操作列表、所有请求的通用前缀，以及一个特定资源的 ID。
+若要对 ID 为 5 的资源请求 `title` 操作，需要创建以下 URL：`https://example.com/book-info/5/title`。
+使用 lambda 表达式从操作列表中创建 URL 列表。
 
 ```kotlin
+fun buildUrls(actions: List<String>, prefix: String, id: Int): List<String> {
+    return TODO() // 在此处编写你的代码
+}
+
 fun main() {
     val actions = listOf("title", "year", "author")
-    val prefix = "https://example.com/book-info"
-    val id = 5
-    val urls = // 在此处编写你的代码
+    val urls = buildUrls(actions, "https://example.com/book-info", 5)
     println(urls)
 }
 ```
-{validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-lambdas-exercise-1"}
+{validate="false" kotlin-runnable="true" kotlin-target-platform="exercise" kotlin-hidden-files="ExerciseUtils.kt,tour/basics/LambdasExercise1Test.kt" id="kotlin-tour-lambdas-exercise-1"}
 
 ```kotlin
+fun buildUrls(actions: List<String>, prefix: String, id: Int): List<String> {
+    return actions.map { action -> "$prefix/$id/$action" }
+}
+
 fun main() {
     val actions = listOf("title", "year", "author")
-    val prefix = "https://example.com/book-info"
-    val id = 5
-    val urls = actions.map { action -> "$prefix/$id/$action" }
+    val urls = buildUrls(actions, "https://example.com/book-info", 5)
     println(urls)
 }
 ```
-{initial-collapse-state="collapsed" collapsible="true" collapsed-title="参考解答" id="kotlin-tour-lambdas-solution-1"}
+{kotlin-runnable="true" kotlin-target-platform="exercise" kotlin-hidden-files="ExerciseUtils.kt,tour/basics/LambdasExercise1Test.kt" initial-collapse-state="collapsed" collapsible="true" collapsed-title="示例解决方案" id="kotlin-tour-lambdas-solution-1"}
 
 </def>
 <def title="多次重复执行操作" id="lambdas-exercise-2">
 
-编写一个接收 `Int` 值和一个操作（类型为 `() -> Unit` 的函数）的函数，该函数将重复执行该操作指定的次数。然后使用该函数打印 5 次 “Hello”。
+编写一个接收 `Int` 值和一个操作（类型为 `() -> Unit` 的函数）的函数，该函数将该操作重复执行指定的次数。然后使用此函数输出 5 次“Hello”。
 
 ```kotlin
 fun repeatN(n: Int, action: () -> Unit) {
@@ -562,7 +570,7 @@ fun main() {
     // 在此处编写你的代码
 }
 ```
-{validate="false" kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-tour-lambdas-exercise-2"}
+{validate="false" kotlin-runnable="true" kotlin-target-platform="exercise" kotlin-hidden-files="ExerciseUtils.kt,tour/basics/LambdasExercise2Test.kt" id="kotlin-tour-lambdas-exercise-2"}
 
 ```kotlin
 fun repeatN(n: Int, action: () -> Unit) {
@@ -577,7 +585,7 @@ fun main() {
     }
 }
 ```
-{initial-collapse-state="collapsed" collapsible="true" collapsed-title="参考解答" id="kotlin-tour-lambdas-solution-2"}
+{kotlin-runnable="true" kotlin-target-platform="exercise" kotlin-hidden-files="ExerciseUtils.kt,tour/basics/LambdasExercise2Test.kt" initial-collapse-state="collapsed" collapsible="true" collapsed-title="示例解决方案" id="kotlin-tour-lambdas-solution-2"}
 
 </def>
 </deflist>

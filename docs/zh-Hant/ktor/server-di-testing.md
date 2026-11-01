@@ -4,20 +4,20 @@
 
 <tldr>
 <p>
-<b>必要的相依性</b>：<code>io.ktor:ktor-server-di</code>
+<b>必要相依性</b>: <code>io.ktor:ktor-server-di</code>
 </p>
 <var name="example_name" value="server-di"/>
 <p>
-    <b>程式碼範例</b>：
-    <a href="https://github.com/ktorio/ktor-documentation/tree/%ktor_version%/codeSnippets/snippets/%example_name%">
+    <b>程式碼範例</b>:
+    <a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/%example_name%">
         %example_name%
     </a>
 </p>
 </tldr>
 
-[相依注入 (DI) 外掛程式](server-dependency-injection.md) 提供了解化測試的工具。
+[相依注入 (DI) 外掛程式](server-dependency-injection.md)提供工具來簡化測試。
 
-您可以在載入應用程式模組之前覆寫相依性：
+你可以在載入應用程式模組之前覆寫相依性：
 
 ```kotlin
 fun test() = testApplication {
@@ -30,11 +30,11 @@ fun test() = testApplication {
 }
 ```
 
-在上述範例中，`loadServices()` 是用於引導應用程式模組的函式 — 例如，註冊路由和服務的函式，等同於 `application.yaml` 中 `modules` 下方列出的內容。
+在上述範例中，`loadServices()` 是用於引導應用程式模組的函式——例如註冊路由與服務的函式，相當於 `application.yaml` 中 `modules` 下所列出的內容。
 
 ### 在測試中載入配置 {id="loading-configuration-in-tests"}
 
-在測試中使用 `configure()` 即可輕鬆載入配置檔案：
+使用 `configure()` 可在測試中輕鬆載入配置檔案：
 
 ```kotlin
 fun test() = testApplication {
@@ -45,4 +45,4 @@ fun test() = testApplication {
 }
 ```
 
-測試引擎會忽略衝突的宣告，讓您可以自由地進行覆寫。
+測試引擎會忽略衝突的宣告，以便讓你自由覆寫。

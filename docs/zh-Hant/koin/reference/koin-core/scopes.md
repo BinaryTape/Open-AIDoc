@@ -1,417 +1,383 @@
 ---
-title: Scopes
+title: 作用域
 ---
 
-# Scopes
+# 作用域
 
-Scopes 控制相依性的生命週期。本指南涵蓋如何定義、建立與管理 scope。
+作用域（scope）是用於存放執行個體的容器，其生命週期比 `factory` 長，但比 `single` 短。本頁面涵蓋宣告作用域與作用域定義、建立與關閉作用域執行個體、連結作用域以及作用域原型（scope archetypes）。本篇內容預設你已了解[定義（definitions）](/docs/reference/koin-core/definitions)。
 
-## 了解 Scopes {id="understanding-scopes"}
+以下平台 API 皆以此頁面為基礎：[Android 作用域](/docs/reference/koin-android/scope)（`ScopeActivity`、`AndroidScopeComponent`、`activityScope()`）、[Compose 中的作用域](/docs/reference/koin-compose/compose-scopes)以及 [Ktor 請求作用域](/docs/reference/koin-ktor/ktor-scopes)。
 
-| Scope 型別 | 生命週期 | 範例 |
-|------------|-----------|---------|
-| **Single** (單例) | 應用程式生命週期 | Database, ApiClient |
-| **Factory** | 每次請求 | Presenter, Use Case |
-| **Scoped** | 每個 scope | 與 Activity 繫結、與 Session 繫結 |
+## 作用域的運作方式 {id="how-scopes-work"}
 
-## 何時使用 Scopes {id="when-to-use-scopes"}
+作用域包含兩個部分：
 
-在以下情況下使用 scope：
-- 執行個體的存活時間比 factory 長，但比單例短。
-- 在特定內容（Activity、Fragment、Session）中共享狀態。
-- 在內容結束時自動進行清理。
+- **作用域宣告（Scope declaration）**：模組中的一個區塊，透過限定詞（型別或名稱）來識別。它列出了屬於該作用域的定義。
+- **作用域執行個體（Scope instance）**：在執行期根據宣告建立，具有唯一的作用域 ID。每個作用域執行個體都會持有自己專屬的各個 `scoped` 定義副本，直到你將其關閉為止。
 
-## 定義 Scoped 定義 {id="defining-scoped-definitions"}
+| 定義 | 執行個體 |
+|------------|----------|
+| `single` | 整個容器共用一個 |
+| `factory` | 每次請求建立一個新的 |
+| `scoped` | 每個作用域執行個體各有一個，在作用域執行個體關閉時釋放 |
 
-### DSL {id="dsl"}
+當多個物件必須在有限的時間內（例如登入工作階段、結帳流程、特定畫面）共用同一個執行個體，且該執行個體在此時間結束後必須被捨棄時，請使用作用域。
 
+## 宣告作用域 {id="declaring-a-scope"}
+
+**Compiler Plugin DSL**
 ```kotlin
-val appModule = module {
-    // MyActivity 的 scope
-    scope<MyActivity> {
-        scoped<Presenter>()
-        scoped<Navigator>()
-    }
+import org.koin.dsl.module
+import org.koin.plugin.module.dsl.*
 
-    // 具名 scope
-    scope(named("session")) {
+val sessionModule = module {
+    // scope identified by a type
+    scope<UserSession> {
         scoped<SessionData>()
-        scoped<UserPreferences>()
+        scoped<CartRepository>()
+        factory<CheckoutPresenter>()
+    }
+
+    // scope identified by a name
+    scope(named("checkout")) {
+        scoped<CheckoutNavigator>()
     }
 }
 ```
 
-### 註解 (Annotation) {id="annotations"}
-
-| 註解 | DSL 等效項 | 用途 |
-|------------|----------------|---------|
-| `@Scope` | `scope<T> { }` | 指定類別所屬的 scope |
-| `@Scoped` | `scoped<T>()` | 定義一個 scoped 繫結 |
-
-一個 scoped 類別同時需要 `@Scoped` 與 `@Scope`：
+**註解**
+使用 `@Scope` 標記類別以指定其所屬的作用域，並使用 `@Scoped` 將其宣告為作用域定義。兩者都需要：
 
 ```kotlin
-@Scope(MyActivityScope::class)
+@Scope(UserSession::class)
 @Scoped
-class Presenter(private val repository: UserRepository)
+class SessionData
 
-@Scope(MyActivityScope::class)
+@Scope(UserSession::class)
 @Scoped
-class Navigator
+class CartRepository(private val sessionData: SessionData)
+
+// scope identified by a name
+@Scope(name = "checkout")
+@Scoped
+class CheckoutNavigator
 ```
 
-或者對常見的 Android scope 使用 scope 原型 (archetype) 註解（不需要 `@Scoped`）：
+`@Scope(UserSession::class)` 等同於 `scope<UserSession> { }`，而 `@Scope(name = "checkout")` 則等同於 `scope(named("checkout")) { }`。這兩種註解也適用於 `@Module` 類別中的函式。
 
+**Constructor / Classic DSL**
 ```kotlin
-// ViewModel scope
-@ViewModelScope
-class UserCache
+import org.koin.dsl.module
+import org.koin.core.module.dsl.*
 
-// Activity scope
-@ActivityScope
-class ActivityPresenter
+val sessionModule = module {
+    scope<UserSession> {
+        scopedOf(::SessionData)
+        scopedOf(::CartRepository)
+        factoryOf(::CheckoutPresenter)
+    }
 
-@ActivityRetainedScope
-class RetainedPresenter
-
-// Fragment scope
-@FragmentScope
-class FragmentPresenter
-```
-
-## 建立與使用 Scopes {id="creating-and-using-scopes"}
-
-### 手動管理 Scope {id="manual-scope-management"}
-
-```kotlin
-// 建立一個 scope
-val myScope = getKoin().createScope("my_scope_id", named("session"))
-
-// 從 scope 取得執行個體
-val sessionData: SessionData = myScope.get()
-val prefs: UserPreferences = myScope.get()
-
-// 完成後關閉
-myScope.close()
-```
-
-### Android Activity Scope {id="android-activity-scope"}
-
-```kotlin
-class MyActivity : AppCompatActivity(), AndroidScopeComponent {
-    // 根據 Activity 生命週期自動建立與銷毀 Scope
-    override val scope: Scope by activityScope()
-
-    // Scoped 執行個體 - 每個 Activity 執行個體建立一個
-    private val presenter: Presenter by inject()
-
-    override fun onDestroy() {
-        super.onDestroy()
-        // Scope 會自動關閉
+    scope(named("checkout")) {
+        scoped { CheckoutNavigator() }
     }
 }
 ```
 
-### Android Fragment Scope {id="android-fragment-scope"}
+在作用域區塊內的 `factory` 會在每次請求時建立新的執行個體，但它可以相依於該作用域的作用域執行個體。
+
+當作用域與某個類別綁定時（例如 `UserSession`、`MainActivity`），請使用型別作為作用域限定詞。如果沒有合適的類別，請使用名稱。`scope(named<MyQualifier>())` 則接受型別限定詞。
+
+## 建立與關閉作用域 {id="creating-and-closing-a-scope"}
+
+從 `Koin` 執行個體建立作用域執行個體，並提供 ID 與作用域限定詞。這通常發生在生命週期的開始與結束處，特別是入口點（例如登入與登出畫面、請求處理常式）：
 
 ```kotlin
-class MyFragment : Fragment(), AndroidScopeComponent {
-    // 根據 Fragment 生命週期自動建立與銷毀 Scope
-    override val scope: Scope by fragmentScope()
+val koin = KoinPlatform.getKoin()
 
-    private val presenter: Presenter by inject()
+// on login
+val scope = koin.createScope<UserSession>(userId)
+val cart: CartRepository = scope.get()
+
+// on logout
+koin.getScopeOrNull(userId)?.close()
+```
+
+作用域類別本身（`CartRepository`、`SessionData`）與其他定義一樣，使用建構函式注入。
+
+| 函式 | 行為 |
+|----------|----------|
+| `createScope<T>(scopeId)` | 為型別限定詞 `T` 建立作用域執行個體 |
+| `createScope(scopeId, qualifier)` | 為任何限定詞建立作用域執行個體，例如 `named("checkout")` |
+| `getOrCreateScope(scopeId, qualifier)` | 回傳具有此 ID 的已開啟作用域，若不存在則建立它 |
+| `getScope(scopeId)` | 回傳已開啟的作用域。若不存在則擲出 `ScopeNotCreatedException`（"No scope found for id '...'"） |
+| `getScopeOrNull(scopeId)` | 回傳已開啟的作用域，或回傳 `null` |
+| `deleteScope(scopeId)` | 從註冊表中移除作用域執行個體 |
+
+作用域 ID 在所有開啟的作用域中必須是唯一的。同一個宣告的兩個作用域執行個體會持有不同的執行個體：
+
+```kotlin
+val first = getKoin().createScope<UserSession>("user_1")
+val second = getKoin().createScope<UserSession>("user_2")
+
+first.get<SessionData>() !== second.get<SessionData>() // true
+```
+
+當你呼叫 `scope.close()` 時：
+
+1. Koin 會呼叫每個作用域執行個體的 `onClose` 回呼，然後將其釋放。
+2. 作用域會從註冊表中移除。
+3. 後續對其進行的任何 `get()` 呼叫都會擲出 `ClosedScopeException`（"Scope '...' is closed"）。若不確定，可檢查 `scope.closed`。
+
+```kotlin
+val sessionModule = module {
+    scope<UserSession> {
+        scoped<SessionData>() onClose { it?.clear() }
+    }
 }
 ```
 
-## Scope 型別 {id="scope-types"}
+若要在作用域本身關閉時執行程式碼，請使用 `scope.registerCallback()` 註冊 `ScopeCallback`。
 
-### 基於型別的 Scope {id="type-based-scope"}
+:::warning
+手動建立的作用域會一直保持開啟，直到你將其關閉為止。它所持有的每個執行個體都會保留在記憶體中。請在其生命週期結束時（登出、流程結束）將其關閉。在 Android 上，`activityScope()` 和 `fragmentScope()` 會為你關閉作用域：請參閱 [Android 作用域](/docs/reference/koin-android/scope)。
+:::
+
+## 作用域元件 {id="scope-components"}
+
+擁有作用域生命週期的類別可以實作 `KoinScopeComponent`。這樣一來，其 `get()` 和 `inject()` 呼叫將會從其作用域中解析。這是僅適用於作用域擁有者的高階模式：作用域內部的定義仍透過建構函式接收其相依性。
 
 ```kotlin
-scope<MyActivity> {
-    scoped<ActivityPresenter>()
+class UserSession : KoinScopeComponent {
+    override val scope: Scope by lazy { createScope(this) }
+
+    // resolved from the UserSession scope
+    val cart: CartRepository by inject()
+
+    fun close() {
+        scope.close()
+    }
 }
 ```
 
-該 scope 由型別 `MyActivity` 識別。此 scope 僅由 `MyActivity` 觸發，而 `activityScope` 則是通用型。
+`createScope(this)` 使用類別型別作為作用域限定詞、使用由類別名稱與雜湊碼建構的 ID，並以 `this` 作為作用域來源。`newScope()` 與 `getOrCreateScope()` 是達到相同目的的延遲委託：`override val scope by newScope()`。
 
-### 具名 Scope {id="named-scope"}
+## 作用域內的解析 {id="resolution-inside-a-scope"}
 
+從作用域執行個體中，Koin 會依下列順序尋找定義：
+
+1. 該作用域的定義（或其原型的定義，見下文）。
+2. 作用域來源。
+3. 已連結的作用域（依序排列）。包含所有 `single` 和 `factory` 定義的根作用域一律排在最後連結。
+
+因此，具有作用域的類別可以相依於單例以及同一個作用域中的其他作用域類別：
+
+**Compiler Plugin DSL**
 ```kotlin
-scope(named("user_session")) {
-    scoped<SessionManager>()
+class CartRepository(
+    private val api: ApiService,        // single, from the root scope
+    private val sessionData: SessionData // scoped, from the same scope
+)
+
+val sessionModule = module {
+    single<ApiService>()
+    scope<UserSession> {
+        scoped<SessionData>()
+        scoped<CartRepository>()
+    }
 }
 ```
 
-當 scope 未與特定型別繫結時使用。
-
-### 基於限定詞 (Qualifier) 的 Scope {id="qualifier-based-scope"}
-
+**註解**
 ```kotlin
-scope(named<MyQualifier>()) {
-    scoped<ScopedService>()
+@Singleton
+class ApiService
+
+@Scope(UserSession::class)
+@Scoped
+class SessionData
+
+@Scope(UserSession::class)
+@Scoped
+class CartRepository(
+    private val api: ApiService,         // single, from the root scope
+    private val sessionData: SessionData // scoped, from the same scope
+)
+```
+
+**Constructor / Classic DSL**
+```kotlin
+val sessionModule = module {
+    singleOf(::ApiService)
+    scope<UserSession> {
+        scopedOf(::SessionData)
+        scopedOf(::CartRepository)
+    }
 }
 ```
 
-## Scope 原型 (Scope Archetypes) {id="scope-archetypes"}
+反之則不行：`single` 無法相依於 `scoped` 定義，且從根作用域呼叫 `get<SessionData>()` 會因 `NoDefinitionFoundException` 而失敗。請務必從其對應的作用域執行個體解析作用域執行個體。
 
-Koin 為常見的 Android scope 模式提供了專用 DSL。這些原型簡化了 ViewModel、Activity 和 Fragment 的 scope 定義。
+### 作用域來源 {id="scope-source"}
 
-### ViewModel Scope {id="viewmodel-scope"}
+作用域來源是建立該作用域的物件，在 `createScope(scopeId, qualifier, source)` 中以 `source` 傳入。作用域定義可以像要求其他相依性一樣，透過型別來索取它：
 
-定義與 ViewModel 生命週期繫結的相依性：
+```kotlin
+class SessionLogger(private val session: UserSession)
 
+val sessionModule = module {
+    scope<UserSession> {
+        scoped<SessionLogger>() // receives the UserSession that created the scope
+    }
+}
+```
+
+來源僅針對未指定限定詞的請求進行解析，並在作用域關閉時釋放。
+
+### 注入作用域 {id="injecting-the-scope"}
+
+作用域定義可以接收 `Scope` 本身作為建構函式參數，以便稍後解析更多執行個體或將其關閉。
+
+### 在 Koin 外部建立的執行個體 {id="instances-created-outside-koin"}
+
+`scope.declare(instance)` 可將你既有的物件新增至某個作用域執行個體中，無需在模組中提供定義：
+
+```kotlin
+val scope = getKoin().createScope<UserSession>(userId)
+scope.declare(UserProfile(userId, name))
+```
+
+## 從另一個作用域解析 {id="resolving-from-another-scope"}
+
+### 連結作用域 {id="linking-scopes"}
+
+`linkTo` 會將另一個作用域新增至解析鏈中。被連結的作用域會在目前作用域之後被搜尋：
+
+```kotlin
+val sessionScope = getKoin().createScope<UserSession>(userId)
+val checkoutScope = getKoin().createScope("checkout_$userId", named("checkout"))
+
+checkoutScope.linkTo(sessionScope)
+
+// resolved from checkoutScope first, then sessionScope, then root
+val cart: CartRepository = checkoutScope.get()
+```
+
+`unlink(scope)` 會移除連結。根作用域無法連結至任何項目。
+
+### 指向作用域 ID {id="pointing-at-a-scope-id"}
+
+使用註解時，`@ScopeId` 可以從指定 ID 或指定型別的作用域執行個體中解析某個建構函式參數：
+
+```kotlin
+@Factory
+class OrderSummary(
+    @ScopeId(name = "checkout_main") val navigator: CheckoutNavigator
+)
+
+@Factory
+class CartBadge(
+    @ScopeId(UserSession::class) val cart: CartRepository
+)
+```
+
+`@ScopeId(name = "checkout_main")` 等同於 DSL 中的 `getScope("checkout_main").get<CheckoutNavigator>()`。使用型別時，作用域 ID 為完全限定類名（`"com.example.UserSession"`）。在解析定義時，具有此 ID 的作用域執行個體必須已經存在，否則 `getScope()` 會擲出 `ScopeNotCreatedException`。
+
+## 作用域原型 {id="scope-archetypes"}
+
+使用型別宣告的作用域（`scope<MainActivity>`）僅適用於該型別。**作用域原型（scope archetype）** 是一種通用的作用域宣告，由同種類的所有元件（每個 ViewModel、每個 Activity、每個 Fragment）共用。你只需宣告一次定義，每個元件都會獲得各自的作用域執行個體。
+
+**Compiler Plugin DSL**
 ```kotlin
 val appModule = module {
     viewModelScope {
         scoped<UserCache>()
-        scoped<UserRepository>()
         viewModel<UserViewModel>()
     }
-}
-```
 
-ViewModel 會自動獲得其 scoped 相依性的存取權：
-
-```kotlin
-class UserViewModel(
-    private val cache: UserCache,      // 繫結至此 ViewModel 的 scope
-    private val repository: UserRepository
-) : ViewModel()
-```
-
-### Activity Scope {id="activity-scope"}
-
-定義與 Activity 生命週期繫結的相依性：
-
-```kotlin
-val appModule = module {
+    // Android only, koin-android
     activityScope {
         scoped<ActivityPresenter>()
-        scoped<ActivityNavigator>()
     }
-}
-```
-
-### Fragment Scope {id="fragment-scope"}
-
-定義與 Fragment 生命週期繫結的相依性：
-
-```kotlin
-val appModule = module {
     fragmentScope {
         scoped<FragmentPresenter>()
     }
 }
 ```
 
-### 比較 {id="comparison"}
+**註解**
+原型註解可取代 `@Scope` 與 `@Scoped`：
 
-| 原型 | DSL | 註解 | 生命週期 |
-|-----------|-----|------------|-----------|
-| ViewModel | `viewModelScope { }` | `@ViewModelScope` | ViewModel 已清除 |
-| Activity | `activityScope { }` | `@ActivityScope` | Activity 已銷毀 |
-| Activity Retained | `activityRetainedScope { }` | `@ActivityRetainedScope` | Activity 已完成 |
-| Fragment | `fragmentScope { }` | `@FragmentScope` | Fragment 已銷毀 |
+```kotlin
+import org.koin.core.annotation.ViewModelScope
+import org.koin.android.annotation.ActivityScope
+import org.koin.android.annotation.FragmentScope
 
-:::info
-Scope 原型自 Koin 4.0+ 起提供。與為常見 Android 元件手動定義 `scope<T> { }` 相比，它們提供了更簡潔的語法。
+@ViewModelScope
+class UserCache(private val api: ApiService)
+
+@ActivityScope
+class ActivityPresenter
+
+@FragmentScope
+class FragmentPresenter
+```
+
+原型註解也適用於 `@Module` 類別中的函式。
+
+**Constructor / Classic DSL**
+```kotlin
+val appModule = module {
+    viewModelScope {
+        scopedOf(::UserCache)
+        viewModelOf(::UserViewModel)
+    }
+
+    // Android only, koin-android
+    activityScope {
+        scopedOf(::ActivityPresenter)
+    }
+    fragmentScope {
+        scopedOf(::FragmentPresenter)
+    }
+}
+```
+
+| 原型 | DSL | 註解 | 關閉時機 | 平台 |
+|-----------|-----|------------|-------------|----------|
+| ViewModel | `viewModelScope { }` | `@ViewModelScope` | ViewModel 被清除時 | 全部（`koin-core-viewmodel`） |
+| Activity | `activityScope { }` | `@ActivityScope` | Activity 被銷毀時 | Android |
+| Activity retained | `activityRetainedScope { }` | `@ActivityRetainedScope` | Activity 結束時（在組態變更時仍保留） | Android |
+| Fragment | `fragmentScope { }` | `@FragmentScope` | Fragment 被銷毀時 | Android |
+
+原型僅用於宣告定義。元件會在執行期開啟其作用域執行個體：以 Android 為例，是透過 [Android 作用域](/docs/reference/koin-android/scope) 中介紹的 `activityScope()` 和 `fragmentScope()` 委託來開啟。
+
+ViewModel 原型需要在啟動時提供 `viewModelScopeFactory()` 選項，這樣 Koin 才會為每個 ViewModel 建立作用域。它被標記為 `@KoinViewModelScopeApi` 與 `@KoinExperimentalAPI`：
+
+```kotlin
+startKoin {
+    options(viewModelScopeFactory())
+    modules(appModule)
+}
+```
+
+在建構函式中接收作用域相依性的 ViewModel，必須宣告在 `viewModelScope { }` 內部。關於 ViewModel 的詳細資訊請參閱 [ViewModel](/docs/reference/koin-core/viewmodel)。
+
+:::tip
+從未關閉的作用域會使其持有的執行個體一直保持存活。若要在真實使用者工作階段中檢視開啟的作用域以及洩漏的執行個體，請參閱[生產環境監控](/docs/tooling/production-monitoring)。
 :::
 
-## Scope 連結 (Scope Linking) {id="scope-linking"}
+## 限制 {id="limits"}
 
-連結 scope 以存取父層 scope 定義：
+- **手動生命週期**：在原型與平台幫助程式之外，你必須自行建立與關閉作用域。Koin 不會偵測是否遺漏呼叫 `close()`。
+- **無法從根存取**：`single` 定義與根作用域無法看到 `scoped` 定義。
+- **關閉即結束**：已關閉的作用域執行個體無法重新開啟。請使用新的 ID 建立一個新的作用域執行個體。
+- **唯一 ID**：使用已開啟作用域的 ID 建立作用域將會失敗。若作用域可能已存在，請使用 `getOrCreateScope`。
 
-```kotlin
-val appModule = module {
-    // Activity scope
-    scope<MainActivity> {
-        scoped<ActivityData>()
-    }
+## 相關內容 {id="related"}
 
-    // 與 Activity 連結的 Fragment scope
-    scope<UserFragment> {
-        scoped<FragmentPresenter>()
-    }
-}
-```
-
-```kotlin
-class UserFragment : Fragment(), AndroidScopeComponent {
-    override val scope: Scope by fragmentScope()
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        // 連結到父層 Activity scope
-        scope.linkTo((requireActivity() as AndroidScopeComponent).scope)
-
-        // 現在可以存取 Fragment 與 Activity 的 scoped 執行個體
-        val fragmentPresenter: FragmentPresenter by inject()
-        val activityData: ActivityData by inject()  // 來自連結的 scope
-    }
-}
-```
-
-## Scope 來源 (Scope Source) {id="scope-source"}
-
-注入能感知其 scope 的相依性：
-
-```kotlin
-class Presenter(
-    val scope: Scope  // 由 Koin 注入
-) {
-    fun clearScope() {
-        scope.close()
-    }
-}
-
-scope<MyActivity> {
-    scoped { Presenter(get()) }  // 注入 scope
-}
-```
-
-## Scope 執行個體 ID {id="scope-instance-id"}
-
-每個 scope 執行個體都有一個唯一的 ID：
-
-```kotlin
-// 使用明確 ID 建立
-val scope1 = getKoin().createScope("scope_1", named("session"))
-val scope2 = getKoin().createScope("scope_2", named("session"))
-
-// 不同的執行個體，相同的 scope 型別
-scope1.get<SessionData>() !== scope2.get<SessionData>()
-```
-
-## 存取 Scoped 執行個體 {id="accessing-scoped-instances"}
-
-### 從 Scope 內部 {id="from-within-scope"}
-
-```kotlin
-class MyActivity : AppCompatActivity(), AndroidScopeComponent {
-    override val scope: Scope by activityScope()
-
-    // 直接注入 scoped 執行個體
-    private val presenter: Presenter by inject()
-}
-```
-
-### 從 Scope 外部 {id="from-outside-scope"}
-
-```kotlin
-// 取得或建立 scope
-val myScope = getKoin().getOrCreateScope("my_id", named("session"))
-
-// 取得執行個體
-val session: SessionData = myScope.get()
-```
-
-### 在 Compose 中 {id="in-compose"}
-
-```kotlin
-@Composable
-fun MyScreen() {
-    // 建立與 Composable 生命週期繫結的 scope
-    val scope = rememberKoinScope(named("screen_scope"))
-
-    // 取得 scoped 執行個體
-    val presenter: ScreenPresenter = scope.get()
-}
-```
-
-## Scope 生命週期 {id="scope-lifecycle"}
-
-### 關閉 Scopes {id="closing-scopes"}
-
-當 scope 關閉時：
-1. 所有 scoped 執行個體都會被釋放。
-2. `onClose` 回呼會被叫用。
-3. Scope 變為不可用狀態。
-
-```kotlin
-val scope = getKoin().createScope("my_scope", named("session"))
-
-// 使用 scope
-val data: SessionData = scope.get()
-
-// 完成後關閉
-scope.close()  // SessionData 執行個體被釋放
-
-// 這會拋出例外
-// scope.get<SessionData>()  // 錯誤：Scope 已關閉
-```
-
-### onClose 回呼 {id="onclose-callback"}
-
-```kotlin
-scope(named("session")) {
-    scoped {
-        SessionData()
-    } onClose {
-        it?.cleanup()  // 當 scope 關閉時呼叫
-    }
-}
-```
-
-## 常見模式 {id="common-patterns"}
-
-### Session Scope {id="session-scope"}
-
-```kotlin
-val appModule = module {
-    scope(named("user_session")) {
-        scoped { SessionManager() }
-        scoped { UserPreferences(get()) }
-        scoped { CartRepository(get()) }
-    }
-}
-
-// 登入
-fun onLogin(userId: String) {
-    val sessionScope = getKoin().createScope(userId, named("user_session"))
-    // Session 執行個體現在可用
-}
-
-// 登出
-fun onLogout(userId: String) {
-    getKoin().getScopeOrNull(userId)?.close()
-    // Session 執行個體被釋放
-}
-```
-
-### Feature Scope (功能作用域) {id="feature-scope"}
-
-```kotlin
-val appModule = module {
-    scope(named("checkout")) {
-        scoped { CheckoutNavigator() }
-        scoped { CheckoutPresenter(get()) }
-    }
-}
-
-class CheckoutActivity : AppCompatActivity(), AndroidScopeComponent {
-    override val scope: Scope by lazy {
-        getKoin().createScope("checkout_${hashCode()}", named("checkout"))
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        scope.close()
-    }
-}
-```
-
-## 最佳實務 {id="best-practices"}
-
-1. **謹慎使用單例** - 僅用於真正應用程式層級的相依性。
-2. **共用狀態的 Scope** - 當多個元件需要同一個執行個體時。
-3. **明確關閉 scope** - 不要依賴垃圾收集。
-4. **保持 scope 專注** - 不要把所有東西都放在同一個 scope 中。
-5. **使用 Android scope 元件** - 以實現自動化生命週期管理。
-
-## 下一步 {id="next-steps"}
-
-- **[Android 版 Koin](/docs/integrations/android/android-scopes)** - Android 特定的 scope
-- **[Compose 版 Koin](/docs/integrations/compose/compose-modules)** - Compose 中的 scope
-- **[最佳實務](/docs/best-practices/custom-scopes)** - Scope 模式
+- [Android 作用域](/docs/reference/koin-android/scope)：`ScopeActivity`、`AndroidScopeComponent`、`activityScope()` 與 `fragmentScope()`。
+- [Compose 中的作用域](/docs/reference/koin-compose/compose-scopes)：`KoinScope`、`rememberKoinScope` 與導覽作用域。
+- [Ktor 請求作用域](/docs/reference/koin-ktor/ktor-scopes)：每個 HTTP 請求一個作用域。
+- [ViewModel](/docs/reference/koin-core/viewmodel)：ViewModel 宣告與 ViewModel 作用域。
+- [定義](/docs/reference/koin-core/definitions)：`single`、`factory`、`scoped` 與 `onClose`。
+- [DSL 參考](/docs/reference/koin-core/dsl)：每個作用域 DSL 關鍵字。

@@ -2,34 +2,50 @@
 title: JUnit テスト
 ---
 
-> このチュートリアルでは、Kotlin アプリケーションをテストし、Koin を使用してコンポーネントを注入 (inject) および取得する方法を説明します。
+# JUnit テスト
 
-:::note
-更新 - 2025-01-28
-:::
+このチュートリアルでは、[Kotlin チュートリアル](/docs/quickstart/kotlin)のアプリに対して JUnit 4 テストを作成します。`KoinTestRule` を使用して各テストで Koin を起動する方法、`verify()` でモジュールをチェックする方法、そして依存関係を Mockito のモックに置き換える方法を学びます。所要時間は約10分です。まず Kotlin チュートリアルを完了するか、そのサンプルから開始してください。
+
+このチュートリアルは Compiler Plugin DSL アプリに準拠しています。すべてのテスト API については、[Unit Testing](/docs/reference/koin-test/testing) で解説されています。
 
 ## コードの取得 {id="get-the-code"}
 
-:::info
-[ソースコードは GitHub で公開されています](https://github.com/InsertKoinIO/koin-getting-started/tree/main/kotlin)
-:::
+テストは [koin-getting-started/kotlin](https://github.com/InsertKoinIO/koin-getting-started/tree/main/kotlin) サンプルの `app/src/test` に配置されています。リポジトリをクローンし、`kotlin` フォルダーからテストを実行してください。
 
-## Gradle の設定 {id="gradle-setup"}
+```bash
+./gradlew test
+```
 
-まず、以下のように Koin の依存関係を追加します。
+## Gradle のセットアップ {id="gradle-setup"}
 
-```groovy
+サンプルでは、テスト依存関係として `koin-test`、`koin-test-junit4`、および Mockito を追加しています。
+
+```toml
+# gradle/libs.versions.toml
+[versions]
+koin = "<KOIN_VERSION>"
+mockito = "<MOCKITO_VERSION>"
+
+[libraries]
+koin-test = { module = "io.insert-koin:koin-test", version.ref = "koin" }
+koin-test-junit4 = { module = "io.insert-koin:koin-test-junit4", version.ref = "koin" }
+mockito = { module = "org.mockito:mockito-inline", version.ref = "mockito" }
+```
+
+```kotlin
+// app/build.gradle.kts
 dependencies {
-    // Koin テストツール
-    testImplementation "io.insert-koin:koin-test:$koin_version"
-    // 必要な JUnit バージョン
-    testImplementation "io.insert-koin:koin-test-junit4:$koin_version"
+    testImplementation(libs.koin.test)
+    testImplementation(libs.koin.test.junit4)
+    testImplementation(libs.mockito)
 }
 ```
 
-## 宣言された依存関係 {id="declared-dependencies"}
+`koin-test` はモックライブラリに依存していないため、使用するものを個別に追加します。JUnit 5 の場合は、代わりに `koin-test-junit5` を使用してください（[Unit Testing](/docs/reference/koin-test/testing) を参照）。
 
-`koin-core` の入門プロジェクトを再利用して、Koin モジュールを使用します。
+## テスト対象のモジュール {id="the-module-under-test"}
+
+テストでは、Kotlin チュートリアルのモジュールを読み込みます。
 
 ```kotlin
 val appModule = module {
@@ -39,15 +55,16 @@ val appModule = module {
 }
 ```
 
-## モジュールの検証 {id="verifying-your-modules"}
+各テストはこのモジュールを使用して Koin を起動するため、アプリと同じ依存関係グラフに対して実行されます。
 
-:::tip
-Koin Compiler Plugin がコンパイル時の依存関係検証を提供し、テストコードを書かなくてもビルド時に不足している依存関係を検出できるようになりました。[コンパイル時の安全性 (Compile-Time Safety)](/docs/reference/koin-compiler/compile-safety) を参照してください。
-:::
+## モジュールを検証する {id="let-s-verify-the-module"}
 
-コンパイラプラグインを使用していない場合は、実行時にモジュールを検証できます。`verify()` 関数は、すべての依存関係が解決可能であることを確認するためのドライラン (dry-run) チェックを実行します。
+`verify()` は、インスタンスを一切生成することなく、モジュール内のすべてのコンストラクタパラメータに対応する定義が存在するかどうかをチェックします。
 
 ```kotlin
+import org.koin.test.AutoCloseKoinTest
+import org.koin.test.verify.verify
+
 class ModuleVerificationTest : AutoCloseKoinTest() {
 
     @Test
@@ -57,90 +74,67 @@ class ModuleVerificationTest : AutoCloseKoinTest() {
 }
 ```
 
-依存関係の定義が無効な場合や、必要な依存関係が不足している場合、このテストは失敗します。
+定義が不足しているか無効な場合、テストは失敗します。Compiler Plugin はすでにビルド時にこのチェックを実行するため、`verify()` はプラグインがカバーしていないモジュールで特に重要となります。これが必要かどうかを判断するには、[Verifying your Configuration](/docs/reference/koin-test/verify) を参照してください。
 
-## KoinTestRule を使用したテストの作成 {id="writing-tests-with-kointestrule"}
+## テストで Koin を起動する {id="let-s-start-koin-in-a-test"}
 
-依存関係を注入するテストを作成するには、`KoinTest` を継承し、`KoinTestRule` を使用します。
+`KoinTest` を実装し、`KoinTestRule` を追加します。このルールは各テストの前に Koin を起動し、テスト終了後に停止します。
 
 ```kotlin
-class UserAppTest : KoinTest {
+import org.koin.test.KoinTest
+import org.koin.test.KoinTestRule
 
-    val userService by inject<UserService>()
-    val userRepository by inject<UserRepository>()
+class HelloMockTest : KoinTest {
 
     @get:Rule
     val koinTestRule = KoinTestRule.create {
-        printLogger()
         modules(appModule)
-    }
-
-    @Test
-    fun `test user service`() {
-        // サービス経由でユーザーを読み込む
-        userService.loadUsers()
-
-        // ユーザーが見つかることを検証する
-        val user = userService.getUserOrNull("Alice")
-        assertNotNull(user)
-        assertEquals("Alice", user?.name)
     }
 }
 ```
 
-> Koin の `KoinTestRule` ルールを使用して、各テストで Koin コンテキストの開始と停止を行います。
+`KoinTest` により、テストクラスで `get()` や `by inject()`（例: `val userService: UserService by inject()`）が利用可能になります。テストごとに新しいコンテナを起動することで、テスト間でのインスタンスのリークを防ぎます。
 
-## 依存関係のモック {id="mocking-dependencies"}
+## 依存関係をモックする {id="let-s-mock-a-dependency"}
 
-`declareMock` を使用して、テスト内の依存関係をモック化できます。これにより、実際の実装がモックに置き換えられます。
+Koin にモックの作成方法を指示するための `MockProviderRule` を追加し、`declareMock` で `UserRepository` を置き換えます。
 
 ```kotlin
-class UserMockTest : KoinTest {
+import org.koin.test.mock.MockProviderRule
+import org.koin.test.mock.declareMock
+import org.mockito.ArgumentMatchers.anyString
+import org.mockito.BDDMockito.given
+import org.mockito.Mockito
+import org.mockito.Mockito.times
+
+class HelloMockTest : KoinTest {
 
     @get:Rule
     val koinTestRule = KoinTestRule.create {
-        printLogger(Level.DEBUG)
         modules(appModule)
     }
 
     @get:Rule
-    val mockProvider = MockProviderRule.create { clazz ->
-        Mockito.mock(clazz.java)
-    }
+    val mockProvider = MockProviderRule.create { clazz -> Mockito.mock(clazz.java) }
 
     @Test
     fun `mock test`() {
-        // UserRepository のモックを宣言
-        val repository = declareMock<UserRepository> {
-            given(findUserOrNull(anyString())).willReturn(
-                User("Mock", "mock@example.com")
-            )
+        val service = declareMock<UserRepository> {
+            given(findUserOrNull(anyString())).willReturn(User("Mock", "mock@example.com"))
         }
 
-        // モック化されたリポジトリを使用してアプリケーションを使用
         getKoin().get<UserApplication>().sayHello("Mock")
-
-        // モックが呼び出されたことを検証
-        Mockito.verify(repository, times(1)).findUserOrNull(anyString())
+        Mockito.verify(service, times(1)).findUserOrNull(anyString())
     }
 }
 ```
 
-`MockProviderRule` は Mockito をモックフレームワークとして設定し、`declareMock` は実際の `UserRepository` を制御されたデータを返すモックに置き換えます。
+`declareMock` は、このテストに限り `UserRepository` の定義を置き換えます。`UserApplication` と `UserService` は本物のインスタンスであるため、このテストでは呼び出しが `UserService` を経由してリポジトリに1回渡されることを検証します。
 
-## テストの主要な概念 {id="key-testing-concepts"}
+## 次のステップ {id="next-steps"}
 
-| 概念 | 説明 |
-|---------|-------------|
-| `KoinTest` | Koin テストをサポートするために継承するインターフェース |
-| `AutoCloseKoinTest` | 各テストの後に Koin を自動的にクローズする |
-| `KoinTestRule` | Koin コンテキストを開始・停止するための JUnit ルール |
-| `MockProviderRule` | モックフレームワークを設定する |
-| `verify()` | 実行せずにモジュール設定を検証する |
-| `declareMock<T>()` | 定義をモックに置き換える |
-| `by inject<T>()` | テスト内で依存関係を遅延注入 (lazy inject) する |
-
-## 関連項目 {id="see-also"}
-
-- **[テストリファレンス](/docs/reference/koin-test/testing)** - 完全なテストドキュメント
-- **[モジュールの検証](/docs/reference/koin-test/verify)** - `verify()` および `checkModules()` の詳細
+- [Unit Testing](/docs/reference/koin-test/testing): すべてのテスト API、JUnit 5、および定義のオーバーライド。
+- [Verifying your Configuration](/docs/reference/koin-test/verify): `verify()` のオプションと、Compiler Plugin が代替となるケースについて。
+- [Instrumented testing](/docs/reference/koin-android/instrumented-testing): Koin を使用した Android アプリのテスト。
+- [Ktor testing](/docs/reference/koin-ktor/ktor-testing): Koin を使用した Ktor ルートのテスト。
+- [Tooling](/docs/tooling): Koin 向けの IDE プラグインおよびモニタリングツール。

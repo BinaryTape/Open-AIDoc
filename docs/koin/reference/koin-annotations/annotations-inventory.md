@@ -1,934 +1,438 @@
-# Koin 注解清单
-
-本文档提供了所有 Koin 注解及其形参、行为和用法示例的详尽清单。
-
-## 目录 {id="table-of-contents"}
-
-- [定义注解](#definition-annotations)
-  - [@Single](#single)
-  - [@Factory](#factory)
-  - [@Scoped](#scoped)
-- [作用域注解](#scope-annotations)
-  - [@Scope](#scope)
-  - [@ViewModelScope](#viewmodelscope)
-  - [@ActivityScope](#activityscope)
-  - [@ActivityRetainedScope](#activityretainedscope)
-  - [@FragmentScope](#fragmentscope)
-  - [@ScopeId](#scopeid)
-- [ViewModel 与 Android 特定注解](#viewmodel--android-specific-annotations)
-  - [@KoinViewModel](#koinviewmodel)
-  - [@KoinWorker](#koinworker)
-- [限定符注解](#qualifier-annotations)
-  - [@Named](#named)
-  - [@Qualifier](#qualifier)
-- [形参注解](#parameter-annotations)
-  - [@InjectedParam](#injectedparam)
-  - [@Property](#property)
-  - [@PropertyValue](#propertyvalue)
-- [安全注解](#safety-annotations)
-  - [@Provided](#provided)
-- [模块与应用注解](#module--application-annotations)
-  - [@Module](#module)
-  - [@ComponentScan](#componentscan)
-  - [@Configuration](#configuration)
-  - [@KoinApplication](#koinapplication)
-- [监控注解](#monitoring-annotations)
-  - [@Monitor](#monitor)
-- [元注解（内部）](#meta-annotations-internal)
-  - [@ExternalDefinition](#externaldefinition)
-  - [@MetaDefinition](#metadefinition)
-  - [@MetaModule](#metamodule)
-  - [@MetaApplication](#metaapplication)
-
+---
+title: 注解参考
 ---
 
-## 定义注解 {id="definition-annotations"}
+# 注解参考
 
-### @Single / @Singleton {id="single-singleton"}
+本页列出了所有 Koin 注解及其所在软件包、可放置的位置、形参和一个示例。每个条目均链接到解释相应概念的页面。如需配置注解，请参阅[编译器插件设置](/docs/setup/compiler-plugin)。若要对比注解与 DSL，请参阅[选择你的风格](/docs/intro/choosing-your-style)。
 
-**软件包：** `org.koin.core.annotation`
+这些注解来自 `io.insert-koin:koin-annotations` 构件（版本与 Koin 相同）。Koin 编译器插件在构建时读取它们并生成相应定义。大部分注解位于 `org.koin.core.annotation` 中，仅限 Android 使用的注解位于 `org.koin.android.annotation` 中。
 
-**目标：** `CLASS`, `FUNCTION`
+## 速览 {id="at-a-glance"}
 
-**描述：** 在 Koin 中将类型或函数声明为 `single`（单例）定义。一个单例实例会被创建并在整个应用程序中共享。`@Singleton` 是首选名称（遵循标准命名约定）；`@Single` 是一个别名。
+| 注解 | 软件包 | 声明内容 |
+|------------|---------|----------|
+| [`@Singleton` / `@Single`](#singleton--single) | `org.koin.core.annotation` | 一个 `single` 定义 |
+| [`@Factory`](#factory) | `org.koin.core.annotation` | 一个 `factory` 定义 |
+| [`@Scoped`](#scoped) | `org.koin.core.annotation` | 一个 `scoped` 定义 |
+| [`@KoinViewModel`](#koinviewmodel) | `org.koin.core.annotation` | 一个 `viewModel` 定义 |
+| [`@KoinWorker`](#koinworker) | `org.koin.android.annotation` | 一个 WorkManager `worker` 定义 |
+| [`@Scope`](#scope) | `org.koin.core.annotation` | 定义所属的作用域 |
+| [`@ViewModelScope`](#viewmodelscope) | `org.koin.core.annotation` | ViewModel 作用域中的定义 |
+| [`@ActivityScope`](#activityscope) | `org.koin.android.annotation` | Activity 作用域中的定义 |
+| [`@ActivityRetainedScope`](#activityretainedscope) | `org.koin.android.annotation` | retained Activity 作用域中的定义 |
+| [`@FragmentScope`](#fragmentscope) | `org.koin.android.annotation` | Fragment 作用域中的定义 |
+| [`@ScopeId`](#scopeid) | `org.koin.core.annotation` | 从给定作用域解析的形参 |
+| [`@Named`](#named) | `org.koin.core.annotation` | 字符串限定符 |
+| [`@Qualifier`](#qualifier) | `org.koin.core.annotation` | 类型或字符串限定符 |
+| [`@InjectedParam`](#injectedparam) | `org.koin.core.annotation` | 由调用方传入的形参 |
+| [`@Property`](#property) | `org.koin.core.annotation` | 从 Koin 属性中读取的形参 |
+| [`@PropertyValue`](#propertyvalue) | `org.koin.core.annotation` | 属性的默认值 |
+| [`@Provided`](#provided) | `org.koin.core.annotation` | 在受检图之外提供的类型 |
+| [`@Module`](#module) | `org.koin.core.annotation` | 一个模块类 |
+| [`@ComponentScan`](#componentscan) | `org.koin.core.annotation` | 用于扫描定义的软件包 |
+| [`@Configuration`](#configuration) | `org.koin.core.annotation` | 模块的配置标签 |
+| [`@KoinApplication`](#koinapplication) | `org.koin.core.annotation` | 应用程序入口点 |
+| [`@Monitor`](#monitor) | `org.koin.core.annotation` | 由 Kotzilla SDK 跟踪的函数 |
 
-**形参：**
-- `binds: Array<KClass<*>> = [Unit::class]` - 要绑定到此定义的显式类型。父类型会被自动检测。
-- `createdAtStart: Boolean = false` - 如果为 `true`，则在 Koin 启动时创建实例。
+## 定义 {id="definitions"}
 
-**行为：**
-所有依赖项均通过构造函数注入填充。
+定义注解可置于类上（由 Koin 调用其构造函数）或函数上（由 Koin 调用顶层函数或 `@Module` 类内部的函数）。构造函数与函数形参均从容器中解析。关于每种形参类型的解析方式，请参阅：[定义](/docs/reference/koin-core/definitions#constructor-parameters)。
 
-**示例：**
+当 `binds` 为空时，定义将绑定到其自身类及所有超类型。在 `binds` 中列出具体类型可仅绑定这些类型。
+
+### @Singleton / @Single {id="singleton-single"}
+
+目标：`CLASS`、`FUNCTION`
+
+| 形参 | 类型 | 默认值 | 说明 |
+|-----------|------|---------|-------------|
+| `binds` | `Array<KClass<*>>` | `[]` | 要绑定的类型。为空时绑定所有超类型 |
+| `createdAtStart` | `Boolean` | `false` | 在 Koin 启动时创建实例 |
+
 ```kotlin
-@Single
-class MyClass(val d : MyDependency)
+@Singleton(binds = [UserRepository::class])
+class UserRepositoryImpl(private val api: ApiService) : UserRepository
 ```
 
-**生成的 Koin DSL：**
-```kotlin
-single { MyClass(get()) }
-```
-
-**使用显式绑定：**
-```kotlin
-@Single(binds = [MyInterface::class])
-class MyClass(val d : MyDependency) : MyInterface
-```
-
-**在启动时创建：**
-```kotlin
-@Single(createdAtStart = true)
-class MyClass(val d : MyDependency)
-```
-
----
+`@Singleton` 和 `@Single` 是等效的；推荐使用 JSR-330 名称 `@Singleton`。在容器的整个生命周期中只保留一个实例。相关概念：[定义](/docs/reference/koin-core/definitions)。
 
 ### @Factory {id="factory"}
 
-**软件包：** `org.koin.core.annotation`
+目标：`CLASS`、`FUNCTION`
 
-**目标：** `CLASS`, `FUNCTION`
+| 形参 | 类型 | 默认值 | 说明 |
+|-----------|------|---------|-------------|
+| `binds` | `Array<KClass<*>>` | `[]` | 要绑定的类型。为空时绑定所有超类型 |
 
-**描述：** 在 Koin 中将类型或函数声明为 `factory`（工厂）定义。每次请求时都会创建一个新实例。
-
-**形参：**
-- `binds: Array<KClass<*>> = [Unit::class]` - 要绑定到此定义的显式类型。父类型会被自动检测。
-
-**行为：**
-所有依赖项均通过构造函数注入填充。每次请求都会创建一个新实例。
-
-**示例：**
 ```kotlin
 @Factory
-class MyClass(val d : MyDependency)
+class UserPresenter(private val repository: UserRepository)
 ```
 
-**生成的 Koin DSL：**
-```kotlin
-factory { MyClass(get()) }
-```
-
----
+每次请求都会创建一个新实例。相关概念：[定义](/docs/reference/koin-core/definitions)。
 
 ### @Scoped {id="scoped"}
 
-**软件包：** `org.koin.core.annotation`
+目标：`CLASS`、`FUNCTION`
 
-**目标：** `CLASS`, `FUNCTION`
+| 形参 | 类型 | 默认值 | 说明 |
+|-----------|------|---------|-------------|
+| `binds` | `Array<KClass<*>>` | `[]` | 要绑定的类型。为空时绑定所有超类型 |
 
-**描述：** 在 Koin 中将类型或函数声明为 `scoped`（作用域）定义。必须与 `@Scope` 注解关联。实例在特定的作用域内共享。
-
-**形参：**
-- `binds: Array<KClass<*>> = [Unit::class]` - 要绑定到此定义的显式类型。父类型会被自动检测。
-
-**行为：**
-创建一个在定义的作用域生命周期内生存的作用域实例。
-
-**示例：**
 ```kotlin
-@Scope(MyScope::class)
+@Scope(UserSession::class)
 @Scoped
-class MyClass(val d : MyDependency)
+class SessionCache(private val repository: UserRepository)
 ```
 
-**另请参阅：** [@Scope](#scope)
-
----
-
-## 作用域注解 {id="scope-annotations"}
-
-### @Scope {id="scope"}
-
-**软件包：** `org.koin.core.annotation`
-
-**目标：** `CLASS`, `FUNCTION`
-
-**描述：** 在 Koin 作用域中声明一个类。作用域名称由值（类）或名称（字符串）描述。默认情况下，声明一个 `scoped` 定义。可以使用 `@Scoped`、`@Factory`、`@KoinViewModel` 注解进行重写以实现显式绑定。
-
-**形参：**
-- `value: KClass<*> = Unit::class` - 作用域类值
-- `name: String = ""` - 作用域字符串值
-
-**行为：**
-创建一个与指定的作用域类型或名称关联的作用域定义。
-
-**使用类的示例：**
-```kotlin
-@Scope(MyScope::class)
-class MyClass(val d : MyDependency)
-```
-
-**生成的 Koin DSL：**
-```kotlin
-scope<MyScope> {
-    scoped { MyClass(get()) }
-}
-```
-
-**使用字符串名称的示例：**
-```kotlin
-@Scope(name = "my_custom_scope")
-class MyClass(val d : MyDependency)
-```
-
----
-
-### @ViewModelScope {id="viewmodelscope"}
-
-**软件包：** `org.koin.core.annotation`
-
-**目标：** `CLASS`, `FUNCTION`
-
-**描述：** 在 ViewModelScope Koin 作用域中声明一个类。这是应在 ViewModel 生命周期内生存的组件的作用域原型。
-
-**形参：** 无
-
-**行为：**
-在 `viewModelScope` 内创建一个作用域定义。
-
-**示例：**
-```kotlin
-@ViewModelScope
-class MyClass(val d : MyDependency)
-```
-
-**生成的 Koin DSL：**
-```kotlin
-viewModelScope {
-    scoped { MyClass(get()) }
-}
-```
-
-**用法：**
-被标记的类旨在与 ViewModel 和 `viewModelScope` 函数一起使用以激活作用域。
-
----
-
-### @ActivityScope {id="activityscope"}
-
-**软件包：** `org.koin.android.annotation`
-
-**目标：** `CLASS`, `FUNCTION`
-
-**描述：** 在 Activity Koin 作用域中声明一个类。
-
-**形参：** 无
-
-**行为：**
-在 `activityScope` 内创建一个作用域定义。
-
-**示例：**
-```kotlin
-@ActivityScope
-class MyClass(val d : MyDependency)
-```
-
-**生成的 Koin DSL：**
-```kotlin
-activityScope {
-    scoped { MyClass(get()) }
-}
-```
-
-**用法：**
-被标记的类旨在与 Activity 和 `activityScope` 函数一起使用以激活作用域。
-
----
-
-### @ActivityRetainedScope {id="activityretainedscope"}
-
-**软件包：** `org.koin.android.annotation`
-
-**目标：** `CLASS`, `FUNCTION`
-
-**描述：** 在 Activity Koin 作用域中声明一个类，但在配置更改后仍保留。
-
-**形参：** 无
-
-**行为：**
-在 `activityRetainedScope` 内创建一个作用域定义。
-
-**示例：**
-```kotlin
-@ActivityRetainedScope
-class MyClass(val d : MyDependency)
-```
-
-**生成的 Koin DSL：**
-```kotlin
-activityRetainedScope {
-    scoped { MyClass(get()) }
-}
-```
-
-**用法：**
-被标记的类旨在与 Activity 和 `activityRetainedScope` 函数一起使用以激活作用域。
-
----
-
-### @FragmentScope {id="fragmentscope"}
-
-**软件包：** `org.koin.android.annotation`
-
-**目标：** `CLASS`, `FUNCTION`
-
-**描述：** 在 Fragment Koin 作用域中声明一个类。
-
-**形参：** 无
-
-**行为：**
-在 `fragmentScope` 内创建一个作用域定义。
-
-**示例：**
-```kotlin
-@FragmentScope
-class MyClass(val d : MyDependency)
-```
-
-**生成的 Koin DSL：**
-```kotlin
-fragmentScope {
-    scoped { MyClass(get()) }
-}
-```
-
-**用法：**
-被标记的类旨在与 Fragment 和 `fragmentScope` 函数一起使用以激活作用域。
-
----
-
-### @ScopeId {id="scopeid"}
-
-**软件包：** `org.koin.core.annotation`
-
-**目标：** `VALUE_PARAMETER`
-
-**描述：** 注解类构造函数或函数中的形参，以请求使用作用域 ID 对给定作用域进行解析。
-
-**形参：**
-- `value: KClass<*> = Unit::class` - 作用域类型
-- `name: String = ""` - 作用域字符串标识符
-
-**行为：**
-从由类型或名称标识的特定作用域中解析依赖项。
-
-**使用字符串名称的示例：**
-```kotlin
-@Factory
-class MyClass(@ScopeId(name = "my_scope_id") val d : MyDependency)
-```
-
-**生成的 Koin DSL：**
-```kotlin
-factory { MyClass(getScope("my_scope_id").get()) }
-```
-
-**使用类型的示例：**
-```kotlin
-@Factory
-class MyClass(@ScopeId(MyScope::class) val d : MyDependency)
-```
-
----
-
-## ViewModel 与 Android 特定注解 {id="viewmodel-android-specific-annotations"}
+每个作用域对应一个实例，并在作用域关闭时释放。配合 `@Scope` 或作用域原型（`@ViewModelScope`、`@ActivityScope` 等）一起使用。相关概念：[作用域](/docs/reference/koin-core/scopes)。
 
 ### @KoinViewModel {id="koinviewmodel"}
 
-**软件包：** `org.koin.android.annotation`
+目标：`CLASS`、`FUNCTION`
 
-**目标：** `CLASS`, `FUNCTION`
+| 形参 | 类型 | 默认值 | 说明 |
+|-----------|------|---------|-------------|
+| `binds` | `Array<KClass<*>>` | `[]` | 要绑定的类型。为空时绑定所有超类型 |
 
-**描述：** Koin 定义的 ViewModel 注解。在 Koin 中将类型或函数声明为 `viewModel` 定义。
-
-**平台支持：**
-- ✅ Android
-- ✅ Kotlin 多平台 (KMP)
-- ✅ Compose 多平台 (CMP)
-
-**形参：**
-- `binds: Array<KClass<*>> = []` - 要绑定到此定义的显式类型。父类型会被自动检测。
-
-**行为：**
-所有依赖项均通过构造函数注入填充。创建一个由 Koin 管理的 ViewModel 实例。在使用 Compose 多平台时，适用于包括 Android、iOS、桌面和 Web 在内的所有平台。
-
-**示例 (Android/CMP)：**
 ```kotlin
 @KoinViewModel
-class MyViewModel(val d : MyDependency) : ViewModel()
+class UserViewModel(private val repository: UserRepository) : ViewModel()
 ```
 
-**示例 (KMP/CMP 共享)：**
-```kotlin
-@KoinViewModel
-class SharedViewModel(
-    val repository: Repository,
-    val analytics: Analytics
-) : ViewModel()
-```
+适用于 Android 和 Compose Multiplatform 目标。类路径中需要引入 `io.insert-koin:koin-core-viewmodel`（否则构建将因 `KOIN-A001` 失败）。相关概念：[ViewModel](/docs/reference/koin-core/viewmodel)。
 
-**生成的 Koin DSL：**
-```kotlin
-viewModel { MyViewModel(get()) }
-```
-
----
+:::note
+使用编译器插件时，`@KoinViewModel` 位于 `org.koin.core.annotation` 中。KSP 处理器此前使用的是 `org.koin.android.annotation.KoinViewModel`：迁移时请更新导入（参阅[从 KSP 迁移](/docs/migration/from-ksp-to-compiler-plugin)）。
+:::
 
 ### @KoinWorker {id="koinworker"}
 
-**软件包：** `org.koin.android.annotation`
+软件包：`org.koin.android.annotation`（仅限 Android）。目标：`CLASS`、`FUNCTION`
 
-**目标：** `CLASS`, `FUNCTION`
+| 形参 | 类型 | 默认值 | 说明 |
+|-----------|------|---------|-------------|
+| `binds` | `Array<KClass<*>>` | `[]` | 要绑定的类型 |
 
-**描述：** Koin 定义的 Worker 注解。将类型声明为 WorkManager worker 的 `worker` 定义。
-
-**形参：**
-- `binds: Array<KClass<*>> = []` - 要绑定到此定义的显式类型。
-
-**行为：**
-为 Android WorkManager 集成创建一个 worker 定义。
-
-**示例：**
 ```kotlin
 @KoinWorker
-class MyWorker() : Worker()
+class SyncWorker(
+    context: Context,
+    params: WorkerParameters,
+    private val repository: UserRepository,
+) : CoroutineWorker(context, params)
 ```
 
----
+需要依赖 `io.insert-koin:koin-android-workmanager`（否则构建将因 `KOIN-A002` 失败）。相关概念：[WorkManager](/docs/reference/koin-android/workmanager)。
 
-## 限定符注解 {id="qualifier-annotations"}
+## 作用域 {id="scopes"}
+
+### @Scope {id="scope"}
+
+目标：`CLASS`、`FUNCTION`
+
+| 形参 | 类型 | 默认值 | 说明 |
+|-----------|------|---------|-------------|
+| `value` | `KClass<*>` | `Unit::class` | 作用域类型 |
+| `name` | `String` | `""` | 作用域名称，用于替代类型 |
+
+```kotlin
+@Scope(UserSession::class)
+class SessionCache(private val repository: UserRepository)
+
+@Scope(name = "checkout")
+class CheckoutState
+```
+
+将定义放入给定的作用域中。单独使用时，`@Scope` 会声明一个 `scoped` 定义。添加 `@Scoped`、`@Factory` 或 `@KoinViewModel` 可选择其他类型或设置 `binds`。相关概念：[作用域](/docs/reference/koin-core/scopes)。
+
+### @ViewModelScope {id="viewmodelscope"}
+
+目标：`CLASS`、`FUNCTION`。无形参。
+
+```kotlin
+@ViewModelScope
+class UserSessionCache(private val repository: UserRepository)
+```
+
+在 ViewModel 的作用域中声明一个 scoped 定义，该定义随 ViewModel 一起创建，并在 ViewModel 被清除时关闭。相关概念：[作用域](/docs/reference/koin-core/scopes)。
+
+### @ActivityScope {id="activityscope"}
+
+软件包：`org.koin.android.annotation`（仅限 Android）。目标：`CLASS`、`FUNCTION`。无形参。
+
+```kotlin
+@ActivityScope
+class ScreenTracker(private val analytics: Analytics)
+```
+
+在 Activity 作用域中声明一个 scoped 定义。该 Activity 必须提供相应作用域（参阅 [Android 作用域](/docs/reference/koin-android/scope)）。
+
+### @ActivityRetainedScope {id="activityretainedscope"}
+
+软件包：`org.koin.android.annotation`（仅限 Android）。目标：`CLASS`、`FUNCTION`。无形参。
+
+```kotlin
+@ActivityRetainedScope
+class FormState
+```
+
+在 retained Activity 作用域中声明一个 scoped 定义，该作用域在配置更改后仍然有效。参阅 [Android 作用域](/docs/reference/koin-android/scope)。
+
+### @FragmentScope {id="fragmentscope"}
+
+软件包：`org.koin.android.annotation`（仅限 Android）。目标：`CLASS`、`FUNCTION`。无形参。
+
+```kotlin
+@FragmentScope
+class ListAdapterFactory
+```
+
+在 Fragment 作用域中声明一个 scoped 定义。参阅 [Android 作用域](/docs/reference/koin-android/scope)。
+
+### @ScopeId {id="scopeid"}
+
+目标：`VALUE_PARAMETER`
+
+| 形参 | 类型 | 默认值 | 说明 |
+|-----------|------|---------|-------------|
+| `value` | `KClass<*>` | `Unit::class` | 作用域类型。作用域 ID 为该类的完整类名 |
+| `name` | `String` | `""` | 作用域 ID |
+
+```kotlin
+@Factory
+class ProfileService(@ScopeId(name = "user_session") val session: UserSession)
+```
+
+从具有该 ID 的作用域（而非当前作用域）解析形参（生成的代码形如 `getScope("user_session").get()`）。由于该作用域仅在运行时存在，编译时安全性检查不会对其进行校验。相关概念：[作用域](/docs/reference/koin-core/scopes)。
+
+## 限定符 {id="qualifiers"}
 
 ### @Named {id="named"}
 
-**软件包：** `org.koin.core.annotation`
+目标：`CLASS`、`FUNCTION`、`VALUE_PARAMETER`
 
-**目标：** `CLASS`, `FUNCTION`, `VALUE_PARAMETER`
+| 形参 | 类型 | 默认值 | 说明 |
+|-----------|------|---------|-------------|
+| `value` | `String` | `""` | 字符串限定符 |
+| `type` | `KClass<*>` | `Unit::class` | 类型限定符。使用编译器插件时，请改用 `@Qualifier(Type::class)` |
 
-**描述：** 为给定定义定义限定符。生成 `StringQualifier("...")` 或基于类型的限定符。
-
-**形参：**
-- `value: String = ""` - 字符串限定符
-- `type: KClass<*> = Unit::class` - 类限定符
-
-**行为：**
-用于区分相同类型的多个定义。
-
-**使用字符串的示例：**
 ```kotlin
-@Single
-@Named("special")
-class MyClass(val d : MyDependency)
+@Singleton
+@Named("local")
+class LocalDatabase : Database
+
+@Singleton
+class UserRepository(@Named("local") private val database: Database)
 ```
 
-**在形参中的用法：**
-```kotlin
-@Single
-class Consumer(@Named("special") val myClass: MyClass)
-```
-
-**使用类型的示例：**
-```kotlin
-@Single
-@Named(type = MyType::class)
-class MyClass(val d : MyDependency)
-```
-
----
+定义处和形参处使用相同的字符串即可将它们关联起来。`jakarta.inject.Named` 和 `javax.inject.Named` 的读取方式相同。相关概念：[限定符](/docs/reference/koin-core/qualifiers)。
 
 ### @Qualifier {id="qualifier"}
 
-**软件包：** `org.koin.core.annotation`
+目标：`CLASS`、`FUNCTION`、`VALUE_PARAMETER`
 
-**目标：** `CLASS`, `FUNCTION`, `VALUE_PARAMETER`
+| 形参 | 类型 | 默认值 | 说明 |
+|-----------|------|---------|-------------|
+| `value` | `KClass<*>` | `Unit::class` | 类型限定符 |
+| `name` | `String` | `""` | 字符串限定符 |
 
-**描述：** 为给定定义定义限定符。与 `@Named` 类似，但形参优先级相反。
-
-**形参：**
-- `value: KClass<*> = Unit::class` - 类限定符
-- `name: String = ""` - 字符串限定符
-
-**行为：**
-用于区分相同类型的多个定义。
-
-**示例：**
 ```kotlin
-@Single
-@Qualifier(name = "special")
-class MyClass(val d : MyDependency)
+@Singleton
+@Qualifier(Remote::class)
+class RemoteDataSource : DataSource
+
+@Singleton
+class UserRepository(@Qualifier(Remote::class) private val source: DataSource)
 ```
 
----
+`@Qualifier` 还用于标记自定义限定符注解。所有带有 `@Qualifier` 或 `@Named`（以及 `jakarta.inject.Qualifier`、`javax.inject.Qualifier`）注解的注解类都会变成限定符：
 
-## 形参注解 {id="parameter-annotations"}
+```kotlin
+@Qualifier
+annotation class IoDispatcher
+
+@Singleton
+@IoDispatcher
+fun ioDispatcher(): CoroutineDispatcher = Dispatchers.IO
+```
+
+没有实参的自定义限定符是以该注解类作为类型限定符。带有字符串或枚举实参（`@Dispatcher(AppDispatchers.IO)`）时，该实参值即为限定符。相关概念：[限定符](/docs/reference/koin-core/qualifiers)。
+
+## 形参 {id="parameters"}
 
 ### @InjectedParam {id="injectedparam"}
 
-**软件包：** `org.koin.core.annotation`
+目标：`VALUE_PARAMETER`。无形参。
 
-**目标：** `VALUE_PARAMETER`
-
-**描述：** 将构造函数或函数形参标记为从 `ParametersHolder`（在调用站点通过 `parametersOf()` 传递）而非 DI 容器进行解析。
-
-**形参：** 无
-
-**行为：**
-在运行时从 `ParametersHolder.get()` 解析形参值，而不是从 Koin 定义中解析。编译安全验证会跳过带有 `@InjectedParam` 的形参。
-
-**示例：**
 ```kotlin
 @Factory
-class MyClass(@InjectedParam val id: Int, val service: Service)
+class UserPresenter(@InjectedParam val userId: String, private val repository: UserRepository)
+
+// 调用方
+val presenter: UserPresenter = get { parametersOf("user-42") }
 ```
 
-**生成的 Koin DSL：**
-```kotlin
-factory { params -> MyClass(params.get(), get()) }
-```
-
-**用法：**
-```kotlin
-val instance = koin.get<MyClass> { parametersOf(42) }
-```
-
----
+该值来自调用站点的 `parametersOf(...)`，而非来自容器。编译时安全性会检查调用站点传入的值数量和类型是否正确（`KOIN-D005`、`KOIN-D006`）。相关概念：[注入形参](/docs/reference/koin-core/injection-parameters)。
 
 ### @Property {id="property"}
 
-**软件包：** `org.koin.core.annotation`
+目标：`VALUE_PARAMETER`
 
-**目标：** `VALUE_PARAMETER`
+| 形参 | 类型 | 默认值 | 说明 |
+|-----------|------|---------|-------------|
+| `value` | `String` | 必填 | 属性键 |
 
-**描述：** 注解构造函数形参或函数形参，以作为 Koin 属性进行解析。
-
-**形参：**
-- `value: String` - 属性名称
-
-**行为：**
-从 Koin 属性而非依赖项注入中解析形参值。
-
-**示例：**
 ```kotlin
 @Factory
-class MyClass(@Property("name") val name : String)
+class ApiClient(@Property("api_url") val url: String)
 ```
 
-**生成的 Koin DSL：**
-```kotlin
-factory { MyClass(getProperty("name")) }
-```
-
-**带有默认值：**
-```kotlin
-@PropertyValue("name")
-val defaultName = "MyName"
-
-@Factory
-class MyClass(@Property("name") val name : String)
-```
-
-**生成的 Koin DSL：**
-```kotlin
-factory { MyClass(getProperty("name", defaultName)) }
-```
-
----
+使用 `getProperty("api_url")` 解析该形参。如果存在具有相同键的 `@PropertyValue`，则将其作为回退值。如果没有回退值，构建时会显示警告 `KOIN-P001`，且必须在启动时设置该属性。相关概念：[属性](/docs/reference/koin-core/starting-koin#properties)。
 
 ### @PropertyValue {id="propertyvalue"}
 
-**软件包：** `org.koin.core.annotation`
+目标：`FIELD`
 
-**目标：** `FIELD`
+| 形参 | 类型 | 默认值 | 说明 |
+|-----------|------|---------|-------------|
+| `value` | `String` | 必填 | 属性键 |
 
-**描述：** 注解将作为属性默认值的字段值。
-
-**形参：**
-- `value: String` - 属性名称
-
-**行为：**
-为属性定义一个默认值，可在找不到该属性时使用。
-
-**示例：**
 ```kotlin
-@PropertyValue("name")
-val defaultName = "MyName"
+@PropertyValue("api_url")
+val defaultApiUrl = "https://api.example.com"
 
 @Factory
-class MyClass(@Property("name") val name : String)
+class ApiClient(@Property("api_url") val url: String)
 ```
 
-**生成的 Koin DSL：**
-```kotlin
-factory { MyClass(getProperty("name", defaultName)) }
-```
-
----
-
-## 安全注解 {id="safety-annotations"}
+声明未设置该属性时使用的默认值（生成的代码形如 `getProperty("api_url", defaultApiUrl)`）。
 
 ### @Provided {id="provided"}
 
-**软件包：** `org.koin.core.annotation`
+目标：`CLASS`、`FUNCTION`、`VALUE_PARAMETER`。无形参。
 
-**目标：** `CLASS`, `VALUE_PARAMETER`
-
-**描述：** 将类型或形参标记为在运行时由外部提供（例如 Android 框架类型、第三方 SDK）。编译时安全性验证会跳过这些类型。
-
-**形参：** 无
-
-**行为：**
-- 在 **类** 上：该类型的所有用法都会跳过编译安全验证。
-- 在 **形参** 上：仅该特定形参跳过验证。
-- 类型在运行时仍通过 `scope.get<T>()` 解析 —— `@Provided` 仅影响编译时检查。
-
-**类上的示例：**
 ```kotlin
-@Provided
-class FirebaseAnalytics  // 所有用法都会跳过验证
-
 @Singleton
-class AnalyticsService(val analytics: FirebaseAnalytics)
-// 无编译错误 —— FirebaseAnalytics 已标记为 @Provided
+class AnalyticsService(@Provided val firebase: FirebaseAnalytics)
 ```
 
-**形参上的示例：**
-```kotlin
-@Factory
-class PaymentProcessor(@Provided val gateway: PaymentGateway)
-// 无编译错误 —— 仅此形参会跳过验证
-```
+告知编译时安全性检查：该类型在运行时可用，无需其可见的声明（平台对象、SDK、稍后加载的模块）。置于类上时，将跳过该类型的所有使用处。置于形参上时，仅跳过该形参。运行时解析不受影响。常见的 Android 类型（`Context`、`Activity`、`Fragment`、`SavedStateHandle`、`WorkerParameters` 等）不需要此注解。相关概念：[编译时安全性](/docs/reference/koin-compiler/compile-safety#external-types-provided)。
 
-**注意：** 常见的 Android 框架类型（`Context`, `Application`, `Activity`, `Fragment`, `SavedStateHandle`, `WorkerParameters`）会自动列入白名单，无需使用 `@Provided`。
-
-**另请参阅：** [编译时安全性](/docs/reference/koin-compiler/compile-safety#external-types-provided)
-
----
-
-## 模块与应用注解 {id="module-application-annotations"}
+## 模块与应用程序 {id="modules-and-application"}
 
 ### @Module {id="module"}
 
-**软件包：** `org.koin.core.annotation`
+目标：`CLASS`
 
-**目标：** `CLASS`
+| 形参 | 类型 | 默认值 | 说明 |
+|-----------|------|---------|-------------|
+| `includes` | `Array<KClass<*>>` | `[]` | 要包含的其他 `@Module` 类 |
+| `createdAtStart` | `Boolean` | `false` | 在 Koin 启动时创建该模块的 `single` 定义 |
 
-**描述：** 类注解，辅助收集 Koin 模块内定义的定义。每个函数都可以使用 Koin 定义注解进行注解。
-
-**形参：**
-- `includes: Array<KClass<*>> = []` - 要包含的模块类
-- `createdAtStart: Boolean = false` - 如果为 `true`，则在启动时创建模块实例
-
-**行为：**
-收集模块内所有带有注解的函数和类。
-
-**示例：**
 ```kotlin
-@Module
-class MyModule {
-    @Single
-    fun myClass(d : MyDependency) = MyClass(d)
+@Module(includes = [NetworkModule::class])
+class DataModule {
+
+    @Singleton
+    fun database(context: Context): AppDatabase =
+        Room.databaseBuilder(context, AppDatabase::class.java, "app-db").build()
 }
 ```
 
-**生成的 Koin DSL：**
-```kotlin
-val MyModule.module = module {
-    val moduleInstance = MyModule()
-    single { moduleInstance.myClass(get()) }
-}
-```
-
-**包含其他模块：**
-```kotlin
-@Module(includes = [OtherModule::class])
-class MyModule {
-    // 定义
-}
-```
-
----
+对定义进行分组：包含类内部带注解的函数，以及由 `@ComponentScan` 发现的带注解的类。相关概念：[模块](/docs/reference/koin-core/modules)。
 
 ### @ComponentScan {id="componentscan"}
 
-**软件包：** `org.koin.core.annotation`
+目标：`CLASS`、`FIELD`
 
-**目标：** `CLASS`, `FIELD`
+| 形参 | 类型 | 默认值 | 说明 |
+|-----------|------|---------|-------------|
+| `value` | `vararg String` | 为空 | 要扫描的软件包。为空时扫描带注解的类所在的软件包 |
 
-**描述：** 收集使用 Koin 定义注解声明的定义。扫描当前软件包或显式软件包名称。
-
-**形参：**
-- `value: vararg String = []` - 要扫描的软件包（支持通配符模式）
-
-**行为：**
-扫描指定软件包中带有注解的类。支持精确软件包名称和通配符 (Glob) 模式。
-
-**通配符 (Glob) 模式支持：**
-
-1. **精确软件包名称（无通配符）：**
-   - `com.example.service` - 扫描软件包及其所有子软件包（等同于 `com.example**`）
-
-2. **包含根的多级扫描：**
-   - `com.example**` - 扫描 `com.example` 及其所有子软件包
-
-3. **排除根的多级扫描：**
-   - `com.example.**` - 仅扫描 `com.example` 的子软件包，排除根
-
-4. **单级通配符：**
-   - `com.example.*.service` - 精确匹配一级（例如：`com.example.user.service`）
-
-5. **组合通配符：**
-   - `com.**.service.*data` - 复杂的模式匹配
-   - `com.*.service.**` - 扫描模式下的子软件包
-
-**示例 - 扫描当前软件包：**
 ```kotlin
-@ComponentScan
-class MyApp
+@Module
+@ComponentScan("com.myapp.data", "com.myapp.domain")
+class AppModule
 ```
 
-**示例 - 扫描特定软件包：**
-```kotlin
-@ComponentScan("com.example.services", "com.example.repositories")
-class MyApp
-```
+跨 Gradle 模块将给定软件包及其子包中所有带注解的类和顶层函数添加到该模块中。相关概念：[模块](/docs/reference/koin-core/modules)。
 
-**示例 - 使用通配符模式：**
-```kotlin
-@ComponentScan("com.example.**", "org.app.*.services")
-class MyApp
-```
-
----
+:::note
+编译器插件按包名及其子包进行匹配。不支持 KSP 处理器的通配符模式（`com.example.**`、`com.*.service`）：请改为明确列出各个软件包。
+:::
 
 ### @Configuration {id="configuration"}
 
-**软件包：** `org.koin.core.annotation`
+目标：`CLASS`、`FIELD`
 
-**目标：** `CLASS`, `FIELD`
+| 形参 | 类型 | 默认值 | 说明 |
+|-----------|------|---------|-------------|
+| `value` | `vararg String` | 为空 | 配置标签。为空表示 `"default"` |
 
-**描述：** 应用于 `@Module` 类，以将其与一个或多个配置（标签/变体）关联。
-
-**形参：**
-- `value: vararg String = []` - 配置名称
-
-**行为：**
-模块可以分组到配置中，以便进行条件加载。
-
-**默认配置：**
 ```kotlin
 @Module
+@ComponentScan
 @Configuration
-class MyModule
-```
-此模块是 "default" 配置的一部分。
+class CoreModule            // 标签 "default"
 
-**多个配置：**
-```kotlin
-@Module
-@Configuration("prod", "test")
-class MyModule
-```
-此模块在 "prod" 和 "test" 配置中均可用。
-
-**带有默认配置：**
-```kotlin
 @Module
 @Configuration("default", "test")
-class MyModule
+class FakeDataModule        // 标签 "default" 和 "test"
 ```
-在默认配置和测试配置中可用。
 
-**注意：** `@Configuration("default")` 等同于 `@Configuration`
-
----
+`@KoinApplication` 会加载带有其任一配置标签的所有模块（包括来自其他 Gradle 模块的模块），无需逐一列出。`@Configuration("default")` 与 `@Configuration` 等效。相关概念：[模块](/docs/reference/koin-core/modules)。
 
 ### @KoinApplication {id="koinapplication"}
 
-**软件包：** `org.koin.core.annotation`
+目标：`CLASS`
 
-**目标：** `CLASS`
+| 形参 | 类型 | 默认值 | 说明 |
+|-----------|------|---------|-------------|
+| `configurations` | `Array<String>` | `[]` | 要加载的配置标签。为空时加载 `"default"` |
+| `modules` | `Array<KClass<*>>` | `[Unit::class]`（无） | 额外要加载的 `@Module` 类 |
 
-**描述：** 将类标记为 Koin 应用程序入口点。通过 `startKoin()` 或 `koinApplication()` 函数生成 Koin 应用程序引导程序。
-
-**形参：**
-- `configurations: Array<String> = []` - 要扫描的配置名称列表
-- `modules: Array<KClass<*>> = [Unit::class]` - 除配置外要加载的模块列表
-
-**行为：**
-生成扫描配置和所含模块的引导函数。
-
-**示例 - 默认配置：**
 ```kotlin
-@KoinApplication
-class MyApp
-```
+@KoinApplication(modules = [AppModule::class])
+object MyApp
 
-**生成的函数：**
-```kotlin
-MyApp.startKoin()
-MyApp.koinApplication()
-```
-
-**示例 - 特定配置：**
-```kotlin
-@KoinApplication(configurations = ["default", "prod"])
-class MyApp
-```
-
-**示例 - 带有模块：**
-```kotlin
-@KoinApplication(
-    configurations = ["default"],
-    modules = [CoreModule::class, ApiModule::class]
-)
-class MyApp
-```
-
-**使用自定义配置：**
-```kotlin
-MyApp.startKoin {
-    printLogger()
-    // 额外配置
+fun main() {
+    startKoin<MyApp> {
+        printLogger()
+    }
 }
 ```
 
----
+标记入口点。使用 `startKoin<MyApp>()`、`koinApplication<MyApp>()` 或 `koinConfiguration<MyApp>()`（软件包 `org.koin.plugin.module.dsl`）启动它。编译时安全性在此处检查完整的依赖图。来自 `@Configuration` 的模块会先加载，然后按顺序加载 `modules` 列表，因此显式列表在发生重写时胜出。相关概念：[启动 Koin](/docs/reference/koin-core/starting-koin)。
 
-## 监控注解 {id="monitoring-annotations"}
+## 监视 {id="monitoring"}
 
 ### @Monitor {id="monitor"}
 
-**软件包：** `org.koin.core.annotation`
+目标：`CLASS`、`FUNCTION`。无形参。
 
-**目标：** `CLASS`, `FUNCTION`
-
-**描述：** 将类或函数标记为通过 Kotzilla 平台（Koin 的官方工具平台）进行自动监控和性能跟踪。
-
-**形参：** 无
-
-**行为：**
-- 应用于类时：生成一个 Koin 代理，监控所有公开方法调用。
-- 应用于函数时：在 Koin 管理的组件中监控该特定方法。
-- 自动捕获性能指标、错误率和使用模式。
-- 将数据发送到 Kotzilla 工作区进行实时分析。
-
-**要求：**
-- `implementation 'io.kotzilla:kotzilla-core:latest.version'`
-- 有效的 Kotzilla 平台帐户和 API 密钥
-
-**示例：**
 ```kotlin
 @Monitor
-class UserService(private val userRepository: UserRepository) {
-    fun findUser(id: String): User? = userRepository.findById(id)
+class UserService(private val repository: UserRepository) {
+    fun findUser(id: String): User? = repository.findById(id)
 }
 ```
 
-**资源：**
-- [Kotzilla Platform](https://kotzilla.io)
-- [完整文档](https://doc.kotzilla.io)
-- [最新版本](https://doc.kotzilla.io/docs/releaseNotes/changelogSDK)
+编译器插件使用 Kotzilla SDK 跟踪包装函数体（或该类的所有公共函数）。它需要类路径中包含 Kotzilla SDK（`io.kotzilla:kotzilla-core`）。若缺少该依赖项，构建时会显示警告 `KOIN-M001`，且不会跟踪任何内容。配置和收集的数据说明：[Monitor](/docs/tooling/monitor)。
 
-**始于：** Kotzilla 1.2.1
+## JSR-330 注解 {id="jsr-330-annotations"}
 
----
+编译器插件还支持读取 `jakarta.inject` 和 `javax.inject` 注解：`@Singleton`、`@Named`、`@Inject` 和 `@Qualifier`。参阅 [JSR-330](/docs/reference/koin-android/jsr330)。
 
-## 元注解（内部） {id="meta-annotations-internal"}
+## 已移除的注解 {id="removed-annotations"}
 
-这些注解仅供 Koin 编译器和代码生成内部使用。
+`@ExternalDefinition`、`@MetaDefinition`、`@MetaModule` 和 `@MetaApplication`（软件包 `org.koin.meta.annotations`）曾由 KSP 处理器生成供其内部使用。编译器插件不再使用它们，且你永远不需要手动编写它们。
 
-### @ExternalDefinition {id="externaldefinition"}
+## 相关内容 {id="related"}
 
-**软件包：** `org.koin.meta.annotations`
-
-**目标：** `CLASS`, `FIELD`, `FUNCTION`
-
-**描述：** 内部使用，用于在生成的软件包中发现组件。
-
-**形参：**
-- `value: String = ""` - 声明定义的软件包
-
----
-
-### @MetaDefinition {id="metadefinition"}
-
-**软件包：** `org.koin.meta.annotations`
-
-**目标：** `CLASS`, `FUNCTION`, `PROPERTY`
-
-**描述：** 元定义注解，辅助表示定义元数据。
-
-**形参：**
-- `value: String = ""` - 定义完整路径
-- `moduleTagId: String = ""` - 模块标签 + ID（格式："module_id:module_tag"）
-- `dependencies: Array<String> = []` - 要检查的形参标签
-- `binds: Array<String> = []` - 绑定类型
-- `qualifier: String = ""` - 限定符
-- `scope: String = ""` - 声明它的作用域
-
----
-
-### @MetaModule {id="metamodule"}
-
-**软件包：** `org.koin.meta.annotations`
-
-**目标：** `CLASS`
-
-**描述：** 元模块注解，辅助表示模块元数据。
-
-**形参：**
-- `value: String = ""` - 模块完整路径
-- `id: String = ""` - 模块 ID
-- `includes: Array<String> = []` - 要检查的包含模块标签
-- `configurations: Array<String> = []` - 要检查的模块配置
-- `isObject: Boolean = false` - 模块是否为对象
-
----
-
-### @MetaApplication {id="metaapplication"}
-
-**软件包：** `org.koin.meta.annotations`
-
-**目标：** `CLASS`
-
-**描述：** 元应用注解，辅助表示应用程序元数据。
-
-**形参：**
-- `value: String = ""` - 应用程序完整路径
-- `includes: Array<String> = []` - 要检查的所用模块标签
-- `configurations: Array<String> = []` - 要检查的所用配置模块
-
----
-
-## 摘要表 {id="summary-table"}
-
-| 注解 | 软件包 | 用途 | 常见用例 |
-|------------|---------|---------|-----------------|
-| `@Singleton` / `@Single` | `org.koin.core.annotation` | 单例定义 | 共享的应用程序服务 |
-| `@Factory` | `org.koin.core.annotation` | 工厂定义 | 每次请求的实例 |
-| `@Scoped` | `org.koin.core.annotation` | 作用域定义 | 作用域特定的实例 |
-| `@Scope` | `org.koin.core.annotation` | 作用域声明 | 自定义作用域 |
-| `@ViewModelScope` | `org.koin.core.annotation` | ViewModel 作用域 | ViewModel 作用域内的依赖项 |
-| `@ActivityScope` | `org.koin.android.annotation` | Activity 作用域 | Activity 作用域内的依赖项 |
-| `@ActivityRetainedScope` | `org.koin.android.annotation` | 保留的 Activity 作用域 | 在配置更改后存续的依赖项 |
-| `@FragmentScope` | `org.koin.android.annotation` | Fragment 作用域 | Fragment 作用域内的依赖项 |
-| `@ScopeId` | `org.koin.core.annotation` | 作用域解析 | 从特定作用域解析 |
-| `@KoinViewModel` | `org.koin.android.annotation` | ViewModel 定义 | Android/KMP/CMP ViewModels |
-| `@KoinWorker` | `org.koin.android.annotation` | Worker 定义 | WorkManager worker |
-| `@Named` | `org.koin.core.annotation` | 字符串/类型限定符 | 区分同类型的 bean |
-| `@Qualifier` | `org.koin.core.annotation` | 类型/字符串限定符 | 区分同类型的 bean |
-| `@InjectedParam` | `org.koin.core.annotation` | 运行时参数 | `parametersOf()` 的值 |
-| `@Property` | `org.koin.core.annotation` | 属性注入 | 配置值 |
-| `@PropertyValue` | `org.koin.core.annotation` | 属性默认值 | 默认配置值 |
-| `@Provided` | `org.koin.core.annotation` | 跳过安全性验证 | 外部/框架类型 |
-| `@Module` | `org.koin.core.annotation` | 模块声明 | 分组定义 |
-| `@ComponentScan` | `org.koin.core.annotation` | 软件包扫描 | 自动发现定义 |
-| `@Configuration` | `org.koin.core.annotation` | 模块配置 | 构建变体/变体 |
-| `@KoinApplication` | `org.koin.core.annotation` | 应用入口点 | 引导 Koin |
-| `@Monitor` | `org.koin.core.annotation` | 性能监控 | 生产环境监控 |
-
----
-
-**文档版本：** 1.0
-**最后更新：** 2025-10-20
-**Koin Annotations 版本：** 2.2.x+
+- [定义](/docs/reference/koin-core/definitions)：定义类型、绑定、构造函数形参。
+- [模块](/docs/reference/koin-core/modules)：实战中的 `@Module`、`@ComponentScan` 与 `@Configuration`。
+- [编译时安全性](/docs/reference/koin-compiler/compile-safety)：插件从这些注解中检查的内容。
+- [编译器插件选项](/docs/reference/koin-annotations/options)：插件的 Gradle 选项。
+- [DSL 参考](/docs/reference/koin-core/dsl)：各个注解对应的 DSL 等效写法。

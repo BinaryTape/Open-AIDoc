@@ -2,51 +2,92 @@
 title: Ktor
 ---
 
-> Ktor 是一個使用強大的 Kotlin 程式語言，在連網系統中建置非同步伺服器與用戶端的架構。我們將在這裡使用 Ktor 建置一個簡單的 Web 應用程式。
+# Ktor
 
-出發吧 🚀
+在本教學中，你將建置一個具有 `/hello` 端點的 Ktor Web 應用程式，該端點會向從清單中選出的使用者發送問候。你將學習如何宣告 Koin 模組、將 Koin 作為 Ktor 外掛程式安裝，並在應用程式中注入服務。此教學約需 10 分鐘，並需要 JDK 17 與 Gradle。
 
-:::note
-更新 - 2024-10-21
-:::
-
-:::tip
-正在尋找此教學的 **註解版本 (annotations version)** 嗎？請查看 [Ktor & Annotations](./ktor-annotations.md)，它使用 Koin Annotations 搭配 Jakarta `@Singleton` 進行編譯期驗證。
-:::
+本教學使用編譯器外掛程式 DSL。若要查看使用註解的相同應用程式，請參閱 [Ktor & Annotations](/docs/quickstart/ktor-annotations)。若要比較不同風格，請參閱 [Choosing your style](/docs/intro/choosing-your-style)。
 
 ## 取得程式碼 {id="get-the-code"}
 
-:::info
-[原始碼已發佈於 GitHub](https://github.com/InsertKoinIO/koin-getting-started/tree/main/ktor)
-:::
+完整範例位於 [koin-getting-started/ktor](https://github.com/InsertKoinIO/koin-getting-started/tree/main/ktor)。Clone 該存儲庫並從 `ktor` 資料夾中執行：
+
+```bash
+./gradlew run
+```
 
 ## Gradle 設定 {id="gradle-setup"}
 
-首先，如下所示加入 Koin 相依性：
+範例套用了 Koin 編譯器外掛程式，並新增了 `koin-ktor` 與 `koin-logger-slf4j`。版本資訊定義在版本目錄（version catalog）中：
+
+```toml
+# gradle/libs.versions.toml
+[versions]
+# Kotlin, Ktor and Logback entries omitted
+koin = "<KOIN_VERSION>"
+koin-plugin = "<KOIN_PLUGIN_VERSION>"
+
+[libraries]
+koin-ktor = { module = "io.insert-koin:koin-ktor", version.ref = "koin" }
+koin-logger-slf4j = { module = "io.insert-koin:koin-logger-slf4j", version.ref = "koin" }
+koin-test = { module = "io.insert-koin:koin-test", version.ref = "koin" }
+koin-test-junit4 = { module = "io.insert-koin:koin-test-junit4", version.ref = "koin" }
+
+[plugins]
+koin-compiler = { id = "io.insert-koin.compiler.plugin", version.ref = "koin-plugin" }
+```
 
 ```kotlin
+// app/build.gradle.kts
+plugins {
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.koin.compiler)
+    application
+}
+
 dependencies {
-    // Koin for Kotlin apps
-    implementation("io.insert-koin:koin-ktor:$koin_version")
-    implementation("io.insert-koin:koin-logger-slf4j:$koin_version")
+    implementation(libs.ktor.server)
+    implementation(libs.logback)
+    implementation(libs.koin.ktor)
+    implementation(libs.koin.logger.slf4j)
+
+    testImplementation(libs.ktor.test)
+    testImplementation(libs.koin.test)
+    testImplementation(libs.koin.test.junit4)
 }
 ```
 
-## 應用程式概覽 {id="application-overview"}
+編譯器外掛程式需要 Kotlin 2.3.20 或更新版本。有關目前版本和 BOM，請參閱 [Gradle setup](/docs/setup/gradle)。有關外掛程式選項，請參閱 [Compiler Plugin setup](/docs/setup/compiler-plugin)。
 
-此應用程式的想法是管理使用者列表，並在我們的 `UserApplication` 類別中顯示：
+## 應用程式架構 {id="the-application"}
 
-> Users -> UserRepository -> UserService -> UserApplication
+`/hello` 路由向 `UserService` 請求使用者資料，而 `UserService` 則從 `UserRepository` 讀取資料：
 
-## "User" 資料 {id="the-user-data"}
+```
+User -> UserRepository -> UserService -> /hello route
+```
 
-我們將管理一個使用者集合。這是其資料類別：
+## 撰寫使用者資料 {id="let-s-write-the-user-data"}
+
+首先建立資料類別（data class）與預設的使用者清單：
 
 ```kotlin
 data class User(val name: String, val email: String)
+
+val DEFAULT_USER = User("Alice", "alice@example.com")
+
+val DEFAULT_USERS = listOf(
+    DEFAULT_USER,
+    User("Bob", "bob@example.com"),
+    User("Charlie", "charlie@example.com")
+)
 ```
 
-我們建立一個「Repository」組建來管理使用者列表（新增使用者或依名稱尋找一個）。以下是 `UserRepository` 介面及其實作：
+這些使用者就是存儲庫所儲存的資料。
+
+## 撰寫存儲庫 {id="let-s-write-the-repository"}
+
+存儲庫將使用者保留在記憶體中，並能依名稱尋找使用者：
 
 ```kotlin
 interface UserRepository {
@@ -68,35 +109,15 @@ class UserRepositoryImpl : UserRepository {
 }
 ```
 
-## Koin 模組 {id="the-koin-module"}
+`UserRepositoryImpl` 沒有任何相依性，因此 Koin 不需要額外資訊即可建立它。
 
-使用 `module` 函式來宣告 Koin 模組。Koin 模組是我們定義所有要注入的組建的地方。
+## 撰寫服務 {id="let-s-write-the-service"}
 
-```kotlin
-val appModule = module {
-
-}
-```
-
-讓我們宣告第一個組建。我們想要一個 `UserRepository` 的單例，透過建立一個 `UserRepositoryImpl` 的執行個體：
-
-```kotlin
-val appModule = module {
-    single<UserRepositoryImpl>() bind UserRepository::class
-}
-```
-
-:::info
-本教學使用 **Koin 編譯器外掛程式 DSL** (`single<T>()`)，其提供編譯時的自動連結 (auto-wiring)。請參閱 [編譯器外掛程式設定](/docs/setup/compiler-plugin) 以進行配置。
-:::
-
-## UserService 組建 {id="the-userservice-component"}
-
-讓我們撰寫 `UserService` 組建來管理使用者操作：
+`UserService` 負責載入使用者並準備問候訊息：
 
 ```kotlin
 interface UserService {
-    fun getUserOrNull(name: String): User?
+    fun getUserOrNull(name: String = DEFAULT_USER.name): User?
     fun loadUsers()
     fun prepareHelloMessage(user: User?): String
 }
@@ -108,86 +129,50 @@ class UserServiceImpl(
     override fun getUserOrNull(name: String): User? = userRepository.findUserOrNull(name)
 
     override fun loadUsers() {
-        userRepository.addUsers(listOf(
-            User("Alice", "alice@example.com"),
-            User("Bob", "bob@example.com"),
-            User("Charlie", "charlie@example.com")
-        ))
+        userRepository.addUsers(DEFAULT_USERS)
     }
 
     override fun prepareHelloMessage(user: User?): String {
-        return user?.let { "Hello '${user.name}' (${user.email})! 👋" } ?: "❌ User not found"
+        return user?.let { "Hello '${user.name}' (${user.email})!" } ?: "User not found"
     }
 }
 ```
 
-> `UserRepository` 在 `UserServiceImpl` 的建構函式中被參照
+`UserServiceImpl` 相依於 `UserRepository`。Koin 會透過建構函式將其傳入。
 
-我們在 Koin 模組中宣告 `UserService`。我們將其宣告為 `single` 定義：
+## 宣告 Koin 模組 {id="let-s-declare-the-koin-module"}
+
+模組是你宣告 Koin 所建立組建的地方（請參閱 [Core Concepts](/docs/intro/core-concepts)）。將這兩個組建宣告為單例（singleton），並繫結至它們的介面：
 
 ```kotlin
+import org.koin.dsl.bind
+import org.koin.dsl.module
+import org.koin.plugin.module.dsl.single
+
 val appModule = module {
     single<UserRepositoryImpl>() bind UserRepository::class
     single<UserServiceImpl>() bind UserService::class
 }
 ```
 
-## HTTP 控制器 {id="http-controller"}
+現在任何請求 `UserService` 的組建都會取得相同的 `UserServiceImpl` 執行個體。關於 `single` 與 `bind` 的說明，請參閱 [Definitions](/docs/reference/koin-core/definitions)。
 
-最後，我們需要一個 HTTP 控制器來建立 HTTP 路由。在 Ktor 中，這將透過 Ktor 擴充函式來表達：
+## 安裝 Koin 並撰寫路由 {id="let-s-install-koin-and-write-the-route"}
+
+在你的 Ktor 應用程式中安裝帶有該模組的 `Koin` 外掛程式，接著注入 `UserService` 並在 `/hello` 路由中使用它：
 
 ```kotlin
+import org.koin.ktor.ext.inject
+import org.koin.ktor.plugin.Koin
+
 fun Application.main() {
-
-    // Lazy inject UserService
-    val service by inject<UserService>()
-    service.loadUsers()
-
-    // Routing section
-    routing {
-        get("/hello") {
-            val userName = call.queryParameters["name"] ?: "Alice"
-            val user = service.getUserOrNull(userName)
-            val message = service.prepareHelloMessage(user)
-            call.respondText(message)
-        }
-    }
-}
-```
-
-`/hello` 端點接受一個選用的 `name` 查詢參數。如果未提供，則預設為 "Alice"。
-
-範例請求：
-- `http://localhost:8080/hello` - 向 Alice 打招呼（預設）
-- `http://localhost:8080/hello?name=Bob` - 向 Bob 打招呼
-
-## 宣告您的相依性 {id="declare-your-dependencies"}
-
-讓我們使用 Koin 模組來組合我們的組建：
-
-```kotlin
-val appModule = module {
-    single<UserRepositoryImpl>() bind UserRepository::class
-    single<UserServiceImpl>() bind UserService::class
-}
-```
-
-## 啟動與注入 {id="start-and-inject"}
-
-最後，讓我們從 Ktor 啟動 Koin：
-
-```kotlin
-fun Application.main() {
-    // Install Koin
     install(Koin) {
         modules(appModule)
     }
 
-    // Lazy inject UserService
     val service by inject<UserService>()
     service.loadUsers()
 
-    // Routing section
     routing {
         get("/hello") {
             val userName = call.queryParameters["name"] ?: "Alice"
@@ -199,7 +184,11 @@ fun Application.main() {
 }
 ```
 
-讓我們啟動 Ktor：
+`install(Koin)` 會隨 Ktor 應用程式一同啟動 Koin，而 `inject()` 則可在 `Application`、`Route` 以及 `ApplicationCall` 上使用。若要將 Koin 記錄傳送至 SLF4J，請在 `install(Koin)` 內部加入 `slf4jLogger()`。有關 Ktor 專屬的 API，請參閱 [Koin for Ktor](/docs/reference/koin-ktor/ktor)。
+
+## 啟動伺服器 {id="let-s-start-the-server"}
+
+啟動內嵌的 Netty 伺服器來執行你的應用程式模組：
 
 ```kotlin
 fun main(args: Array<String>) {
@@ -209,6 +198,15 @@ fun main(args: Array<String>) {
 }
 ```
 
-就是這樣！您已經準備就緒。請查看這些網址：
-- `http://localhost:8080/hello` - 向 Alice 打招呼（預設使用者）
-- `http://localhost:8080/hello?name=Bob` - 向 Bob 打招呼
+執行 `./gradlew run`，然後開啟以下 URL：
+
+- `http://localhost:8080/hello`：向預設使用者 Alice 發送問候。
+- `http://localhost:8080/hello?name=Bob`：向 Bob 發送問候。
+
+## 後續步驟 {id="next-steps"}
+
+- [Core Concepts](/docs/intro/core-concepts)：模組、定義與注入背後的心智模型。
+- [Koin for Ktor](/docs/reference/koin-ktor/ktor)：安裝選項、路由中的注入以及 Ktor 事件。
+- [Request Scopes](/docs/reference/koin-ktor/ktor-scopes)：生命週期僅限於單一 HTTP 請求的執行個體。
+- [Ktor testing](/docs/reference/koin-ktor/ktor-testing)：使用 `testApplication` 與 Koin 測試你的路由。
+- [Tooling](/docs/tooling)：適用於 Koin 的 IDE 外掛程式與監控工具。

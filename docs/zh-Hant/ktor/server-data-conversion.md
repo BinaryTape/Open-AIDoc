@@ -3,6 +3,7 @@
 <primary-label ref="server-plugin"/>
 
 <var name="artifact_name" value="ktor-server-data-conversion"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.server.dataConversion"/>
 <var name="package_name" value="io.ktor.server.plugins.dataconversion"/>
 <var name="plugin_name" value="DataConversion"/>
 <var name="example_name" value="data-conversion"/>
@@ -15,32 +16,40 @@
     </a>
 </p>
 <p>
-<b>必要的相依性</b>：<code>io.ktor:%artifact_name%</code>
+<b>必要相依性</b>：<code>io.ktor:%artifact_name%</code>
 </p>
 <p>
-    <b><Links href="/ktor/server-native" summary="Ktor 支援 Kotlin/Native，並允許您在沒有額外執行階段或虛擬機的情況下執行伺服器。">Native 伺服器</Links> 支援</b>：✅
+    <b><Links href="server-native.md" summary="Ktor 支援 Kotlin/Native，可讓您在無需額外執行階段或虛擬機器的情況下執行伺服器。">Native 伺服器</Links> 支援</b>：✅
 </p>
 </tldr>
 
 <link-summary>
-Ktor 伺服器的 %plugin_name% 外掛程式可讓您針對值的清單序列化與反序列化，新增自訂的轉換器。
+適用於 Ktor 伺服器的 %plugin_name% 外掛程式可讓您新增自訂轉換器，以序列化和還原序列化值清單。
 </link-summary>
 
-[%plugin_name%](https://api.ktor.io/ktor-utils/io.ktor.util.converters/-data-conversion/index.html) 外掛程式可讓您序列化與反序列化值的清單。預設情況下，Ktor 透過 [`DefaultConversionService`](https://api.ktor.io/ktor-utils/io.ktor.util.converters/-default-conversion-service/index.html) 處理字串與常見型別，包括數值型別、無正負號整數型別、`Uuid` 以及列舉。
+[%plugin_name%](https://api.ktor.io/ktor-utils/io.ktor.util.converters/-data-conversion/index.html) 外掛程式可讓您序列化和還原序列化值清單。預設情況下，Ktor 透過 [`DefaultConversionService`](https://api.ktor.io/ktor-utils/io.ktor.util.converters/-default-conversion-service/index.html) 處理字串和常見型別，包括數值型別、無正負號整數型別、`Uuid` 以及列舉。
 
-您可以透過安裝與配置 `%plugin_name%` 外掛程式來擴充此服務，以處理額外的型別。
+您可以透過安裝並配置 `%plugin_name%` 外掛程式來擴充此服務，以處理其他型別。
 
 ## 新增相依性 {id="add_dependencies"}
 
 <p>
-    若要使用 <code>%plugin_name%</code>，請在組建指令碼中新增 <code>%artifact_name%</code> 構件：
+    若要使用 <code>%plugin_name%</code>，請在建置指令碼中新增 <code>%artifact_name%</code> 構件：
 </p>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上述程式碼片段使用 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor version catalog</a> 來指定 Ktor 相依性。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上述程式碼片段使用 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor version catalog</a> 來指定 Ktor 相依性。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
@@ -50,15 +59,14 @@ Ktor 伺服器的 %plugin_name% 外掛程式可讓您針對值的清單序列化
 ## 安裝 %plugin_name% {id="install_plugin"}
 
 <p>
-    若要將 <code>%plugin_name%</code> 外掛程式<a href="server-plugins.md#install">安裝</a>至您的應用程式，請將其傳遞給指定 <Links href="/ktor/server-modules" summary="模組允許您透過分組路由來建構您的應用程式。">模組</Links> 中的 <code>install</code> 函式。
-    以下範例展示如何安裝 <code>%plugin_name%</code>：
+    若要將 <code>%plugin_name%</code> 外掛程式<a href="server-plugins.md#install">安裝</a>至您的應用程式，請將其傳遞給指定<Links href="server-modules.md" summary="模組可讓您透過分組路由來結構化應用程式。">模組</Links>中的 <code>install</code> 函式。以下範例展示了如何安裝 <code>%plugin_name%</code>：
 </p>
 <list>
     <li>
-        在 <code>embeddedServer()</code> 函式呼叫內。
+        在 <code>embeddedServer()</code> 函式呼叫中。
     </li>
     <li>
-        在 <code>Application</code> 類別上明確定義的 <code>module()</code> 擴充函式內。
+        在 <code>Application</code> 類別上明確定義的 <code>module()</code> 擴充函式中。
     </li>
 </list>
 <Tabs>
@@ -72,17 +80,17 @@ Ktor 伺服器的 %plugin_name% 外掛程式可讓您針對值的清單序列化
 
 ## 新增轉換器 {id="add-converters"}
 
-您可以在 `%plugin_name%` 配置中定義型別轉換。為指定的型別提供 `convert<T>` 方法，並使用可用的函式來序列化與反序列化值的清單：
+您可以在 `%plugin_name%` 配置中定義型別轉換。為指定的型別提供 `convert<T>` 方法，並使用可用的函式來序列化和還原序列化值清單：
 
-* 使用 `decode()` 函式來反序列化值的清單。它接收一個字串清單（代表 URL 中重複的值），並回傳解碼後的值。
+* 使用 `decode()` 函式還原序列化值清單。它接收代表 URL 中重複值的字串清單，並傳回解碼後的值。
 
   ```kotlin
   decode { values -> // converter: (values: List<String>) -> Any?
-    // 反序列化值
+    // 還原序列化值
   }
   ```
 
-* 使用 `encode()` 函式來序列化一個值。該函式接收一個任意的值，並回傳代表它的字串清單。
+* 使用 `encode()` 函式序列化值。該函式接收任意值，並傳回代表該值的字串清單。
 
   ```kotlin
      encode { value -> // converter: (value: Any?) -> List<String>
@@ -92,20 +100,20 @@ Ktor 伺服器的 %plugin_name% 外掛程式可讓您針對值的清單序列化
 
 ## 存取服務 {id="service"}
 
-您可以從目前的上下文中存取 `%plugin_name%` 服務：
+您可以從目前的上下文存取 `%plugin_name%` 服務：
 
 ```kotlin
 val dataConversion = application.conversionService
 ```
 
-接著，您可以使用轉換器服務來呼叫回呼函式：
+接著，您可以使用該轉換器服務來呼叫回呼函式：
 
-* `fromValues(values: List<String>, type: TypeInfo)` 回呼函式接受 `values` 作為字串清單，以及要將值轉換成的 `TypeInfo`，並回傳解碼後的值。
-* `toValues(value: Any?)` 回呼函式接受一個任意的值，並回傳代表它的字串清單。
+* `fromValues(values: List<String>, type: TypeInfo)` 回呼函式接受字串清單形式的 `values`，以及值要轉換成的 `TypeInfo`，並傳回解碼後的值。
+* `toValues(value: Any?)` 回呼函式接受任意值，並傳回代表該值的字串清單。
 
 ## 範例 {id="example"}
 
-在以下範例中，定義了 `LocalDate` 型別的轉換器，並配置為序列化與反序列化值。當呼叫 `encode` 函式時，服務將使用 `SimpleDateFormat` 轉換該值，並回傳包含格式化後值的清單。當呼叫 `decode` 函式時，服務將日期格式化為 `LocalDate` 並將其回傳。
+在以下範例中，定義並配置了 `LocalDate` 型別的轉換器，以序列化和還原序列化值。當呼叫 `encode` 函式時，服務將使用 `SimpleDateFormat` 轉換該值，並傳回包含格式化後的值的清單。當呼叫 `decode` 函式時，服務會將日期格式化為 `LocalDate` 並傳回。
 
 ```kotlin
     install(DataConversion) {
@@ -127,11 +135,11 @@ val dataConversion = application.conversionService
     }
 ```
 
-接著可以手動呼叫轉換服務來取得編碼與解碼後的值：
+隨後可以手動呼叫轉換服務，以擷取編碼與解碼後的值：
 
 ```kotlin
 val encodedDate = application.conversionService.toValues(call.parameters["date"])
 val decodedDate = application.conversionService.fromValues(encodedDate, typeInfo<LocalDate>())
 ```
 
-如需完整範例，請參閱 [%example_name%](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/%example_name%)
+有關完整範例，請參閱 [%example_name%](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/%example_name%)

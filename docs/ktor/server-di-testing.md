@@ -1,21 +1,21 @@
-[//]: # (title: 使用依赖注入进行测试)
+[//]: # (title: 使用 SQL 注入进行测试)
 
 <show-structure for="chapter" depth="2"/>
 
 <tldr>
 <p>
-<b>所需依赖项</b>：<code>io.ktor:ktor-server-di</code>
+<b>必需的依赖项</b>：<code>io.ktor:ktor-server-di</code>
 </p>
 <var name="example_name" value="server-di"/>
 <p>
     <b>代码示例</b>：
-    <a href="https://github.com/ktorio/ktor-documentation/tree/%ktor_version%/codeSnippets/snippets/%example_name%">
+    <a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/%example_name%">
         %example_name%
     </a>
 </p>
 </tldr>
 
-[依赖注入 (DI) 插件](server-dependency-injection.md)提供了简化测试的工具。
+[SQL 注入 (DI) 插件](server-dependency-injection.md)提供了简化测试的工具。
 
 您可以在加载应用程序模块之前重写依赖项：
 
@@ -30,11 +30,11 @@ fun test() = testApplication {
 }
 ```
 
-在上面的示例中，`loadServices()` 是引导应用程序模块的函数 — 例如，注册路由和服务的函数，相当于 `application.yaml` 中 `modules` 下列出的内容。
+在上述示例中，`loadServices()` 是用于引导应用程序模块的函数——例如注册路由和服务的函数，等同于 `application.yaml` 中 `modules` 下列出的内容。
 
 ### 在测试中加载配置 {id="loading-configuration-in-tests"}
 
-使用 `configure()` 在测试中轻松加载配置文件：
+在测试中使用 `configure()` 可以轻松加载配置文件：
 
 ```kotlin
 fun test() = testApplication {
@@ -45,4 +45,4 @@ fun test() = testApplication {
 }
 ```
 
-测试引擎会忽略冲突的声明，以便您可以自由重写。
+测试引擎会忽略存在冲突的声明，以便您可以自由重写。

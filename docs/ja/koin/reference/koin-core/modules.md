@@ -4,31 +4,13 @@ title: モジュール
 
 # モジュール
 
-Koin モジュールは、依存性注入（DI）の設定を整理するための構成要素です。
+モジュールは、機能ごとまたはレイヤーごとに関連する定義をグループ化します。このページでは、モジュールの宣言方法、モジュールの合成、アノテーションが付与されたクラスをパッケージからスキャンする方法、Gradleモジュールをまたいでモジュールを検出する方法、およびモジュールがロードされる順序について説明します。モジュール内の定義については、[Definitions](/docs/reference/koin-core/definitions) を参照してください。
 
-## モジュールとは何か？ {id="what-is-a-module"}
+## モジュールの宣言 {id="declare-a-module"}
 
-モジュールは、関連する定義をグループ化するための論理的なコンテナです。
-
+**Compiler Plugin DSL**
 ```kotlin
-val appModule = module {
-    single<Database>()
-    single<UserRepository>()
-    viewModel<UserViewModel>()
-}
-```
-
-モジュールは以下のことに役立ちます：
-- 機能またはレイヤーごとに定義を**整理する**
-- 関連する依存関係を**カプセル化する**
-- コンテキスト間で設定を**再利用する**
-- モジュール化されたプロジェクトで**可視性を制御する**
-
-## モジュールの作成 {id="creating-modules"}
-
-### コンパイラプラグイン DSL を使用する場合 {id="with-compiler-plugin-dsl"}
-
-```kotlin
+import org.koin.dsl.module
 import org.koin.plugin.module.dsl.*
 
 val networkModule = module {
@@ -36,76 +18,48 @@ val networkModule = module {
     single<TokenManager>()
 }
 
-val databaseModule = module {
+val dataModule = module {
     single<Database>()
-    single<UserDao>()
+    single<UserRepository>()
 }
 ```
 
-### アノテーションを使用する場合 {id="with-annotations"}
-
+**Annotations**
 ```kotlin
 @Module
 @ComponentScan("com.myapp.network")
 class NetworkModule
 
 @Module
-@ComponentScan("com.myapp.database")
-class DatabaseModule
+@ComponentScan("com.myapp.data")
+class DataModule
 ```
 
-### クラシック DSL を使用する場合 {id="with-classic-dsl"}
+`@Module` クラスは、`@ComponentScan` によって検出されたアノテーション付きクラスと、その内部で宣言されたプロバイダー関数をまとめます（[Classes you don't own](/docs/reference/koin-core/definitions#classes-you-dont-own) を参照）。
 
+**Constructor / Classic DSL**
 ```kotlin
+import org.koin.dsl.module
+import org.koin.core.module.dsl.*
+
 val networkModule = module {
     singleOf(::ApiClient)
     singleOf(::TokenManager)
 }
-```
 
-## 複数のモジュールの使用 {id="using-multiple-modules"}
-
-依存関係は、他のモジュールで宣言された定義を参照できます：
-
-```kotlin
-// データレイヤー
 val dataModule = module {
-    single<Database>()
-    single<UserRepository>()  // このモジュールの Database を使用可能
-}
-
-// プレゼンテーションレイヤー
-val viewModelModule = module {
-    viewModel<UserViewModel>()  // dataModule の UserRepository を使用可能
-}
-
-// 両方をロード
-startKoin {
-    modules(dataModule, viewModelModule)
+    singleOf(::Database)
+    singleOf(::UserRepository)
 }
 ```
 
-:::info 
-Koin は、ロードされたすべてのモジュール間で依存関係を自動的に解決します。明示的なインポート（import）は不要です。
-:::
+ある定義が別のモジュールの定義に依存することも可能です。Koinはロードされたすべてのモジュールを横断して解決を行うため、`dataModule` 内の `UserRepository` はモジュール間のインポートなしに `networkModule` の `ApiClient` を使用できます。両方のモジュールがロードされている必要があります。詳細については [Starting Koin](/docs/reference/koin-core/starting-koin) を参照してください。
 
-:::note
-モジュールを直接リストアップすることも可能ですが、構造を改善しロードを最適化するために、[`includes()`](#includes-によるモジュールの構成) を使用してモジュールを階層構造に整理することを検討してください。
-:::
+## `includes()` によるモジュールの合成 {id="module-composition-with-includes"}
 
-## `includes()` によるモジュールの構成 {id="module-composition-with-includes"}
+モジュールは他のモジュールを含める（インクルードする）ことができます。親モジュールをロードすると、ツリー全体がロードされます。
 
-`includes()` 関数は、モジュールを整理するための**推奨される方法**です。以下の利点があります：
-
-- **モジュールの階層構造** - 親子関係を明確にしてモジュールを構成できます。
-- **ロードの最適化** - Koin はインクルードされたモジュールの重複を排除し、冗長な登録を防ぎます。
-- **よりクリーンな起動** - 長いリストの代わりに、単一のルートモジュールをロードするだけで済みます。
-- **カプセル化** - 内部（internal）モジュールを公開 API モジュールの背後に隠すことができます。
-
-:::tip
-**ベストプラクティス:** `startKoin` ですべてのモジュールを列挙するのではなく、`includes()` を使用してモジュール階層を構築してください。これにより、整理が容易になり、効率的なモジュールロードが保証されます。
-:::
-
+**Compiler Plugin DSL**
 ```kotlin
 val networkModule = module {
     single<ApiClient>()
@@ -115,26 +69,55 @@ val storageModule = module {
     single<Database>()
 }
 
-// 親モジュールが子モジュールをインクルード
 val dataModule = module {
     includes(networkModule, storageModule)
     single<UserRepository>()
 }
 
-// ✅ 推奨：includes を使用してルートモジュールをロード
 startKoin {
     modules(dataModule)
 }
+```
 
-// ❌ 非推奨：フラットなモジュールリスト
+**Annotations**
+```kotlin
+@Module
+class NetworkModule
+
+@Module
+class StorageModule
+
+@Module(includes = [NetworkModule::class, StorageModule::class])
+@ComponentScan("com.myapp.data")
+class DataModule
+
+@KoinApplication(modules = [DataModule::class])
+class MyApp
+```
+
+**Constructor / Classic DSL**
+```kotlin
+val networkModule = module {
+    singleOf(::ApiClient)
+}
+
+val storageModule = module {
+    singleOf(::Database)
+}
+
+val dataModule = module {
+    includes(networkModule, storageModule)
+    singleOf(::UserRepository)
+}
+
 startKoin {
-    modules(networkModule, storageModule, dataModule)
+    modules(dataModule)
 }
 ```
 
-### `includes()` によるロードの最適化 {id="how-includes-optimizes-loading"}
+`startKoin` 内でフラットな長いリストを記述するよりも、1つのルートモジュールを持つ `includes()` のツリー構造を優先してください。そうすることでモジュールの構造がコードの構造と一致し、スタートアップの呼び出しも簡潔に保たれます。
 
-モジュールが複数回インクルードされた場合でも、Koin はそれらを一度だけロードします：
+Koinはツリーをフラット化し、複数の親がインクルードしている場合でも、各モジュールを1回だけロードします。
 
 ```kotlin
 val commonModule = module {
@@ -147,221 +130,194 @@ val featureAModule = module {
 }
 
 val featureBModule = module {
-    includes(commonModule)  // ここでも commonModule をインクルード
+    includes(commonModule)
     single<FeatureB>()
 }
 
 val appModule = module {
-    includes(featureAModule, featureBModule)
-}
-
-// commonModule は 2 回インクルードされていますが、一度だけロードされます
-startKoin {
-    modules(appModule)
+    includes(featureAModule, featureBModule) // commonModule は1回だけロードされる
 }
 ```
 
-### マルチモジュールプロジェクト {id="multi-module-projects"}
+### マルチモジュールプロジェクトにおける可視性 {id="visibility-in-multi-module-projects"}
 
-可視性修飾子を使用して、公開する内容を制御します：
+Gradleのマルチモジュールプロジェクトでは、機能ごとに1つの公開モジュールを公開し、その他は `private` または `internal` に保ちます。
 
 ```kotlin
-// :feature:user モジュール
-
-// Private - 他のモジュールからは隠される
+// Gradleモジュール "feature-user"
 private val userDataModule = module {
     single<UserDao>()
     single<UserCache>()
 }
 
-// 公開 API
 val userFeatureModule = module {
     includes(userDataModule)
     viewModel<UserViewModel>()
 }
 ```
 
+アプリモジュールは `userFeatureModule` をロードし、内部モジュールを参照することはありません。Gradleモジュールに分割されたAndroidアプリの全体的な構成については、[Multi-Module Apps](/docs/reference/koin-android/multi-module) を参照してください。
+
+## @ComponentScan によるパッケージのスキャン {id="scan-packages-with-componentscan"}
+
+`@ComponentScan` はアノテーション専用です。パッケージおよびそのサブパッケージ内のすべてのアノテーション付きクラスとトップレベル関数を収集します。
+
 ```kotlin
-// :app モジュール
-startKoin {
-    modules(userFeatureModule)  // これだけがアクセス可能
+@Module
+@ComponentScan
+class AppModule // AppModule のパッケージをスキャン
+
+@Module
+@ComponentScan("com.myapp.features")
+class FeatureModule
+
+@Module
+@ComponentScan("com.myapp.data", "com.myapp.network")
+class InfraModule
+```
+
+値を指定しない場合、アノテーションが付与されたクラスのパッケージをスキャンします。このスキャンはGradleモジュールをまたいで行われるため、同一パッケージ内にある別のGradleモジュールのクラスも検出されます。
+
+DSLスタイルを使用する場合、モジュール内の各定義は自分で記述して列挙します。両方を混在させるには、アノテーション付きモジュールの横にあるスタートブロックにDSLモジュールを含めます（[Typed startup with @KoinApplication](/docs/reference/koin-core/starting-koin#typed-startup-with-koinapplication) を参照）。
+
+## @Configuration による自動検出 {id="auto-discovery-with-configuration"}
+
+`@Configuration` は `@Module` に付与することで、リストに明示的に記述しなくても `@KoinApplication` がそのモジュールを検出できるようにします。モジュールはクラスパス上の任意のGradleモジュール内に配置できます。
+
+```kotlin
+// Gradleモジュール "feature-user"
+@Module
+@Configuration
+@ComponentScan("com.myapp.feature.user")
+class UserFeatureModule
+
+// Gradleモジュール "app"
+@KoinApplication
+class MyApp
+
+fun main() {
+    startKoin<MyApp>() // UserFeatureModule をロード
 }
 ```
 
-## モジュールのオーバーライド {id="module-override"}
+これにより、機能の追加は単にGradleの依存関係を追加することを意味し、アプリのモジュールリストを変更する必要がなくなります。その反面、ロードされるモジュールのリストが1か所に明記されなくなるというトレードオフがあります。明示的にしたい場合は、代わりに `@KoinApplication(modules = [...])` にモジュールを列挙してください。
 
-### デフォルトの挙動 {id="default-behavior"}
+`@Configuration` はラベルを受け取ることができるため、環境やフレーバー（flavor）ごとに異なるモジュールをロードできます。詳細なルールは [Configuration labels](/docs/reference/koin-core/starting-koin#configuration-labels) にあります。
 
-デフォルトでは、**最後にロードされた定義が優先**されます：
+`@Configuration` はアノテーション専用であり、型指定されたスタートアップ（`startKoin<MyApp>()`）を伴う `@KoinApplication` が必要です。
 
-```kotlin
-val productionModule = module {
-    single<ApiService> { ProductionApi() }
-}
+## ロード順序とオーバーライド {id="load-order-and-overrides"}
 
-val debugModule = module {
-    single<ApiService> { DebugApi() }
-}
-
-startKoin {
-    modules(productionModule, debugModule)  // DebugApi が優先される
-}
-```
-
-### ストリクト（厳格）モード {id="strict-mode"}
-
-プロダクション環境でオーバーライドを無効にする：
+ロードされた2つのモジュールが同じ型を宣言している場合、最後にロードされたモジュールが優先されます。DSLのスタートブロックでは、これは `modules(...)` の順序になります。
 
 ```kotlin
 startKoin {
-    allowOverride(false)  // オーバーライドしようとすると例外をスローする
-    modules(productionModule)
+    modules(productionModule, debugModule) // debugModule の ApiService が優先される
 }
 ```
 
-### 明示的なオーバーライド {id="explicit-override"}
+`@KoinApplication` を使用する場合、Compiler Plugin は次の順序でモジュールリストを構築します。
 
-ストリクトモードで特定のオーバーライドを許可する：
+1. コードおよび依存関係から検出された `@Configuration` モジュール。
+2. `@KoinApplication(modules = [...])` にリストされているモジュール（宣言順）。
+
+そのため、アプリのモジュールはライブラリのデフォルトをオーバーライドします。
 
 ```kotlin
-val testModule = module {
-    single<ApiService> { MockApi() }.override()  // 許可される
+// ライブラリ内
+@Module
+@Configuration
+class CoreModule {
+    @Singleton
+    fun feature(): Feature = DefaultFeature()
 }
 
-startKoin {
-    allowOverride(false)
-    modules(productionModule, testModule)
+// アプリ内
+@Module
+class AppModule {
+    @Singleton
+    fun feature(): Feature = AppFeature()
 }
+
+@KoinApplication(modules = [AppModule::class])
+class MyApp // get<Feature>() は AppFeature を返す
 ```
 
-## モジュールの先行作成 (Eager Module Creation) {id="eager-module-creation"}
+明示的なリスト内では、`modules = [A::class, B::class, C::class]` は A、B、C の順にロードされ、各モジュールの `includes` はそのモジュールと一緒にグループ化されたままになります。明示的にリストされていると同時に `@Configuration` によっても検出されるモジュールは、明示的なリスト内の位置で1回だけロードされます。複数の `@Configuration` モジュール間の順序を制御したい場合は、それらを明示的にリストしてください。
 
-起動時にシングルトンを即座に作成します：
+意図しないオーバーライドが発生した場合に起動時に失敗させるには、`allowOverride(false)` を使用します。単一の定義をオーバーライドする際のルールについては、[Overriding a definition](/docs/reference/koin-core/definitions#overriding-a-definition) を参照してください。
 
+## Eager モジュール {id="eager-modules"}
+
+モジュール全体をマークして、Koinの起動時にそのすべての `single` 定義を生成するようにできます。
+
+**Compiler Plugin DSL**
 ```kotlin
 val coreModule = module(createdAtStart = true) {
     single<ConfigManager>()
-    single<LoggingSystem>()
+    single<CrashReporter>()
 }
 ```
 
+**Annotations**
+```kotlin
+@Module(createdAtStart = true)
+@ComponentScan("com.myapp.core")
+class CoreModule
+```
+
+**Constructor / Classic DSL**
+```kotlin
+val coreModule = module(createdAtStart = true) {
+    singleOf(::ConfigManager)
+    singleOf(::CrashReporter)
+}
+```
+
+先行生成される各定義は起動時間を増加させます。定義ごとのフラグとその影響については、[Eager creation](/docs/reference/koin-core/definitions#eager-creation) を参照してください。
+
 ## パラメータ化されたモジュール {id="parameterized-modules"}
 
-動的にモジュールを作成します：
+DSLモジュールは値であるため、関数が引数からモジュールを構築できます。
 
+**Compiler Plugin DSL**
 ```kotlin
-fun featureModule(debug: Boolean) = module {
-    single<Logger> {
-        if (debug) DebugLogger() else ProductionLogger()
+fun loggingModule(debug: Boolean) = module {
+    if (debug) {
+        single<DebugLogger>() bind Logger::class
+    } else {
+        single<ReleaseLogger>() bind Logger::class
     }
 }
 
 startKoin {
-    modules(featureModule(debug = BuildConfig.DEBUG))
+    modules(loggingModule(debug = BuildConfig.DEBUG))
 }
 ```
 
-## ストラテジーパターン {id="strategy-pattern"}
+**Annotations**
+`@Module` クラスは引数を取ることができません。このような場合はDSLモジュールを使用するか、[configuration labels](/docs/reference/koin-core/starting-koin#configuration-labels) で選択されるバリアントごとに1つの `@Module` を用意してください。
 
-モジュールを使用して実装を切り替えます：
-
+**Constructor / Classic DSL**
 ```kotlin
-val repositoryModule = module {
-    single<UserRepository>()  // Datasource に依存
+fun loggingModule(debug: Boolean) = module {
+    single<Logger> {
+        if (debug) DebugLogger() else ReleaseLogger()
+    }
 }
 
-// ストラテジーのオプション
-val localDatasourceModule = module {
-    single<Datasource> { LocalDatasource() }
-}
-
-val remoteDatasourceModule = module {
-    single<Datasource> { RemoteDatasource() }
-}
-
-// プロダクション
 startKoin {
-    modules(repositoryModule, remoteDatasourceModule)
-}
-
-// オフラインモード
-startKoin {
-    modules(repositoryModule, localDatasourceModule)
+    modules(loggingModule(debug = BuildConfig.DEBUG))
 }
 ```
 
-## アノテーション付きモジュール {id="annotated-modules"}
+同じ考え方で実装の切り替えも可能です。`repositoryModule` は固定したまま、その横でそれぞれ `Datasource` を宣言する `localDatasourceModule` または `remoteDatasourceModule` のいずれかをロードします。条件付きモジュールリストはランタイム時に解決されるため、Compiler Plugin はビルド時にすべての組み合わせを検証することはできません。
 
-Koin は、DSL の代替としてアノテーションベースのモジュール構成をサポートしています。
+## 関連情報 {id="related"}
 
-```kotlin
-@Module
-@ComponentScan("com.myapp.data")
-class DataModule
-
-@Module
-@ComponentScan("com.myapp.network")
-class NetworkModule
-
-// 他のモジュールをインクルード
-@Module(includes = [DataModule::class, NetworkModule::class])
-class AppModule
-```
-
-主な機能：
-- `@Module` はクラスを Koin モジュールとしてマークします
-- `@ComponentScan` はパッケージ内のアノテーション付きクラスを自動検出します
-- `@Configuration` は起動時の自動検出を有効にします
-- モジュール関数は外部ライブラリのインスタンスを提供します
-
-:::info
-アノテーション付きモジュールの詳細なドキュメントについては、[アノテーションリファレンス - モジュール](/docs/reference/koin-annotations/modules) を参照してください。
-:::
-
-## ベストプラクティス {id="best-practices"}
-
-### 整理 {id="organization"}
-
-1. **機能/レイヤーごとにグループ化する**
-   ```kotlin
-   val authModule = module { /* 認証機能 */ }
-   val networkModule = module { /* ネットワークレイヤー */ }
-   ```
-
-2. **`includes()` を使用してモジュール階層を構築する**（推奨）
-   ```kotlin
-   // すべての機能を含むルートモジュールを作成する
-   val appModule = module {
-       includes(
-           coreModule,
-           networkModule,
-           featureAModule,
-           featureBModule
-       )
-   }
-
-   // 単一モジュールによるクリーンな起動
-   startKoin {
-       modules(appModule)
-   }
-   ```
-
-3. **モジュールの責務を絞る** - 1 つのモジュールにつき 1 つの責務を持たせる。
-
-### 命名 {id="naming"}
-
-- わかりやすい名前を使用する： `networkModule`, `userFeatureModule`
-- 関連するものをグループ化する： `authDataModule`, `authDomainModule`
-
-### マルチモジュールプロジェクト
-
-1. **1 つの機能につき 1 つの公開モジュールを用意する**
-2. **実装モジュールには `private`/`internal` を使用する**
-3. **共有モジュールは `:core` に配置する**
-
-## 次のステップ {id="next-steps"}
-
-- **[定義](/docs/reference/koin-core/definitions)** - 定義を作成する
-- **[クオリファイア](/docs/reference/koin-core/qualifiers)** - 名前付きおよび型付きのクオリファイア
-- **[スコープ](/docs/reference/koin-core/scopes)** - スコープでライフサイクルを管理する
-- **[トラブルシューティング](/docs/reference/koin-core/troubleshooting)** - 一般的な問題のデバッグと修正
+- [Definitions](/docs/reference/koin-core/definitions): モジュールの中身について。
+- [Starting Koin](/docs/reference/koin-core/starting-koin): モジュールのロード、型指定されたスタートアップ、および configuration labels（設定ラベル）。
+- [Lazy Modules](/docs/reference/koin-core/lazy-modules): バックグラウンドでのモジュールのロード。
+- [KMP Shared Modules](/docs/reference/koin-core/kmp-shared-modules): プラットフォーム間でのモジュールの共有。
+- [Multi-Module Apps](/docs/reference/koin-android/multi-module): AndroidにおけるGradleモジュールをまたいだモジュールの整理。
+- [Annotations Reference](/docs/reference/koin-annotations/annotations-inventory): `@Module`、`@ComponentScan`、および `@Configuration` のすべてのパラメータ。

@@ -1,49 +1,97 @@
 ---
-title: Android - Jetpack Compose
+title: Android Jetpack Compose
 ---
 
-> 本教程将引导您编写一个使用 Jetpack Compose UI 的 Android 应用程序，并使用 Koin 依赖注入来检索您的组件。
-> 完成本教程大约需要 **10 分钟**。
+# Android Jetpack Compose
 
-:::note
-更新 - 2024-11-28
-:::
+在本教程中，您将构建一个带有 Jetpack Compose UI 的 Android 应用，向从列表中选出的用户展示问候信息。您将学习如何在 Koin 模块中声明 ViewModel，使用 `koinViewModel()` 将其注入到可组合项中，以及如何从 `Application` 类启动 Koin。本教程大约需要 10 分钟，并需要使用 Android Studio。
+
+本教程使用编译器插件 DSL。如果需要了解使用注解的 Android 应用，请参阅 [Android & Annotations](/docs/quickstart/android-annotations)。如需对比不同风格，请参阅 [Choosing your style](/docs/intro/choosing-your-style)。
 
 ## 获取代码 {id="get-the-code"}
 
-:::info
-[源代码可在 Github 上找到](https://github.com/InsertKoinIO/koin-getting-started/tree/main/android-compose)
-:::
+完整示例位于 [koin-getting-started/android-compose](https://github.com/InsertKoinIO/koin-getting-started/tree/main/android-compose)。克隆仓库并在 Android Studio 中打开 `android-compose` 文件夹。
 
-## Gradle 设置 {id="gradle-setup"}
+## Gradle 配置 {id="gradle-setup"}
 
-如下所示添加 Koin Android 和 Koin Compose 依赖项：
+该示例应用了 Koin 编译器插件，并添加了 `koin-android` 和 `koin-androidx-compose`。版本信息保存在版本目录（version catalog）中：
 
-```groovy
+```toml
+# gradle/libs.versions.toml
+[versions]
+# Kotlin, Android Gradle Plugin, AndroidX and Compose entries omitted
+koin = "<KOIN_VERSION>"
+koin-plugin = "<KOIN_PLUGIN_VERSION>"
+
+[libraries]
+koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
+koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin" }
+koin-test-junit4 = { module = "io.insert-koin:koin-test-junit4", version.ref = "koin" }
+koin-android-test = { module = "io.insert-koin:koin-android-test", version.ref = "koin" }
+
+[plugins]
+koin-compiler = { id = "io.insert-koin.compiler.plugin", version.ref = "koin-plugin" }
+```
+
+```kotlin
+// app/build.gradle.kts
+plugins {
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.koin.compiler)
+}
+
+android {
+    buildFeatures {
+        compose = true
+    }
+}
+
 dependencies {
+    implementation(libs.koin.android)
+    implementation(libs.koin.androidx-compose)
 
-    // 针对 Android 的 Koin
-    implementation("io.insert-koin:koin-android:$koin_version")
-    // 针对 Jetpack Compose 的 Koin
-    implementation("io.insert-koin:koin-androidx-compose:$koin_version")
+    // Compose BOM, ui, material3, activity-compose, lifecycle-viewmodel-compose
+    implementation(platform(libs.compose.bom))
+    ...
+
+    testImplementation(libs.koin.test.junit4)
+    testImplementation(libs.koin.android.test)
 }
 ```
 
-## 应用程序概览 {id="application-overview"}
+编译器插件需要 Kotlin 2.3.20 或更高版本。有关当前版本和 BOM，请参阅 [Gradle setup](/docs/setup/gradle)。有关插件选项，请参阅 [Compiler Plugin setup](/docs/setup/compiler-plugin)。
 
-该应用程序的想法是管理一个用户列表，并在我们的 `MainActivity` 类中使用 ViewModel 和 Jetpack Compose UI 显示它：
+## 应用程序 {id="the-application"}
 
-> Users -> UserRepository -> UserService -> UserViewModel -> MainActivity (Compose UI)
+主屏幕向 ViewModel 请求问候语。ViewModel 使用 `UserService`，而该服务从 `UserRepository` 读取数据：
 
-## “User”数据 {id="the-user-data"}
+```
+User -> UserRepository -> UserService -> UserViewModel -> MainScreen
+```
 
-我们将管理一个 User 集合。以下是数据类：
+## 编写用户数据 {id="let-s-write-the-user-data"}
+
+首先从数据类和默认用户列表开始：
 
 ```kotlin
 data class User(val name: String, val email: String)
+
+val DEFAULT_USER = User("Alice", "alice@example.com")
+
+val DEFAULT_USERS = listOf(
+    DEFAULT_USER,
+    User("Bob", "bob@example.com"),
+    User("Charlie", "charlie@example.com")
+)
 ```
 
-我们创建一个“仓库”组件来管理用户列表（添加用户或按名称查找）。下面是 `UserRepository` 接口及其实现：
+这些用户就是仓库所存储的数据。
+
+## 编写仓库 {id="let-s-write-the-repository"}
+
+仓库将用户保留在内存中，并按名称查找用户：
 
 ```kotlin
 interface UserRepository {
@@ -65,13 +113,15 @@ class UserRepositoryImpl : UserRepository {
 }
 ```
 
-## UserService 组件 {id="the-userservice-component"}
+`UserRepositoryImpl` 没有依赖项，因此 Koin 无需额外信息即可创建它。
 
-让我们编写一个服务组件来管理用户操作：
+## 编写服务 {id="let-s-write-the-service"}
+
+`UserService` 在创建时加载用户并准备问候语：
 
 ```kotlin
 interface UserService {
-    fun getUserOrNull(name: String): User?
+    fun getUserOrNull(name: String = DEFAULT_USER.name): User?
     fun loadUsers()
     fun prepareHelloMessage(user: User?): String
 }
@@ -80,51 +130,32 @@ class UserServiceImpl(
     private val userRepository: UserRepository
 ) : UserService {
 
+    init {
+        loadUsers()
+    }
+
     override fun getUserOrNull(name: String): User? = userRepository.findUserOrNull(name)
 
     override fun loadUsers() {
-        userRepository.addUsers(listOf(
-            User("Alice", "alice@example.com"),
-            User("Bob", "bob@example.com"),
-            User("Charlie", "charlie@example.com")
-        ))
+        userRepository.addUsers(DEFAULT_USERS)
     }
 
     override fun prepareHelloMessage(user: User?): String {
-        return user?.let { "Hello '${user.name}' (${user.email})! 👋" } ?: "❌ User not found"
+        return user?.let { "Hello '${user.name}' (${user.email})!" } ?: "User not found"
     }
 }
 ```
 
-## Koin 模块 {id="the-koin-module"}
+`UserServiceImpl` 依赖于 `UserRepository`。Koin 会通过构造函数将其传入。
 
-使用 `module` 函数来声明一个 Koin 模块。Koin 模块是我们定义所有要注入组件的地方。
+## 编写 ViewModel {id="let-s-write-the-viewmodel"}
 
-```kotlin
-val appModule = module {
-
-}
-```
-
-让我们声明我们的组件。我们希望获得 `UserRepository` 和 `UserService` 的单例：
+ViewModel 将名称转换为问候语：
 
 ```kotlin
-val appModule = module {
-    single<UserRepositoryImpl>() bind UserRepository::class
-    single<UserServiceImpl>() bind UserService::class
-}
-```
-
-:::info
-本教程使用 **Koin 编译器插件 DSL** (`single<T>()`、`viewModel<T>()`)，它在编译时提供自动装配。有关配置，请参阅[编译器插件设置](/docs/setup/compiler-plugin)。
-:::
-
-## 使用 ViewModel 显示用户 {id="displaying-user-with-viewmodel"}
-
-让我们编写一个 ViewModel 组件来显示用户：
-
-```kotlin
-class UserViewModel(private val userService: UserService) : ViewModel() {
+class UserViewModel(
+    private val userService: UserService
+) : ViewModel() {
 
     fun sayHello(name: String): String {
         val user = userService.getUserOrNull(name)
@@ -134,11 +165,18 @@ class UserViewModel(private val userService: UserService) : ViewModel() {
 }
 ```
 
-> UserService 在 UserViewModel 的构造函数中被引用
+与其他组件一样，它通过其构造函数接收 `UserService`。
 
-我们在 Koin 模块中声明 `UserViewModel`。我们将其声明为 `viewModel` 定义，以避免在内存中保留任何实例（避免 Android 生命周期的任何内存泄漏）：
+## 声明 Koin 模块 {id="let-s-declare-the-koin-module"}
+
+模块是您声明由 Koin 创建的组件的地方（请参阅 [Core Concepts](/docs/intro/core-concepts)）。将仓库和服务声明为绑定到其接口的单例，并使用 `viewModel` 声明 ViewModel：
 
 ```kotlin
+import org.koin.dsl.bind
+import org.koin.dsl.module
+import org.koin.plugin.module.dsl.single
+import org.koin.plugin.module.dsl.viewModel
+
 val appModule = module {
     single<UserRepositoryImpl>() bind UserRepository::class
     single<UserServiceImpl>() bind UserService::class
@@ -146,13 +184,15 @@ val appModule = module {
 }
 ```
 
-## 在 Jetpack Compose 中注入 ViewModel {id="injecting-viewmodel-in-jetpack-compose"}
+编译器插件会读取每个构造函数，并在构建时检查每个依赖项是否均已声明。定义类型在 [Definitions](/docs/reference/koin-core/definitions) 中进行了说明。
 
-在 Jetpack Compose 中，我们使用 `ComponentActivity` 而不是 `AppCompatActivity`，并且我们使用可组合函数来构建 UI，而不是 XML 布局。
+## 在可组合项中注入 ViewModel {id="let-s-inject-the-viewmodel-in-a-composable"}
 
-`UserViewModel` 组件将被创建，并随之解析 `UserService` 实例。为了将其引入我们的 Compose UI，我们使用 `koinViewModel()` 函数：
+在 `ComponentActivity` 中设置 Compose 内容，并在 `MainScreen` 的默认形参中使用 `koinViewModel()` 获取 ViewModel：
 
 ```kotlin
+import org.koin.androidx.compose.koinViewModel
+
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -174,11 +214,7 @@ fun MainScreen(
     var greetingMessage by remember { mutableStateOf("") }
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Koin Sample") }
-            )
-        }
+        topBar = { TopAppBar(title = { Text("Koin Sample") }) }
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -218,31 +254,22 @@ fun MainScreen(
 }
 ```
 
-就这样，您的 Compose 应用准备就绪了！
+`koinViewModel()` 从 Koin 获取 ViewModel，并将其绑定到最近的 `ViewModelStoreOwner`（在此处为 Activity）。将其作为默认形参，允许您在预览和测试中传入其他实例。其他 Compose API（例如 `koinInject()`）请参阅 [Compose ViewModel](/docs/reference/koin-compose/compose-viewmodel) 和 [Koin for Compose](/docs/reference/koin-compose/compose)。
 
-:::info
-`koinViewModel()` 函数从 Koin 检索 ViewModel 实例，并自动将其绑定到 Compose 生命周期。这是 Compose 特有的注入 ViewModel 的方式，取代了传统 Android View 中使用的 `by viewModel()` 委托。
-:::
+## 启动 Koin {id="let-s-start-koin"}
 
-### Compose 核心概念 {id="key-compose-concepts"}
-
-- **ComponentActivity**: Compose 应用的基类（取代 AppCompatActivity）
-- **setContent**: 将可组合内容设置为 Activity 的 UI
-- **@Composable**: 以声明方式构建 UI 的函数
-- **remember & mutableStateOf**: 用于响应式 UI 更新的 Compose 状态管理
-- **koinViewModel()**: 用于 ViewModel 注入的 Koin Compose 集成
-
-## 启动 Koin {id="start-koin"}
-
-我们需要在 Android 应用程序中启动 Koin。只需在应用程序的主入口点，即我们的 `MainApplication` 类中调用 `startKoin()` 函数：
+在您的 `Application` 类中启动 Koin，并在 `AndroidManifest.xml` 中注册该类：
 
 ```kotlin
-class MainApplication : Application(){
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.context.startKoin
+
+class MainApplication : Application() {
+
     override fun onCreate() {
         super.onCreate()
 
-        startKoin{
-            androidLogger()
+        startKoin {
             androidContext(this@MainApplication)
             modules(appModule)
         }
@@ -250,48 +277,12 @@ class MainApplication : Application(){
 }
 ```
 
-:::info
-`startKoin` 中的 `modules()` 函数用于加载给定的模块列表
-:::
+`androidContext()` 使 Android `Context` 可供您的定义使用。运行应用，输入名称并点击按钮即可查看问候语。有关其他选项，请参阅 [Starting Koin on Android](/docs/reference/koin-android/start)。
 
-## Koin 模块：DSL 对比 {id="koin-module-dsl-comparison"}
+## 后续步骤 {id="next-steps"}
 
-这是使用**传统 DSL**（手动装配）的 Koin 模块声明：
-
-```kotlin
-val appModule = module {
-    single<UserRepository> { UserRepositoryImpl() }
-    single<UserService> { UserServiceImpl(get()) }
-    viewModel { UserViewModel(get()) }
-}
-```
-
-使用**编译器插件 DSL**（在编译时自动装配）：
-
-```kotlin
-val appModule = module {
-    single<UserRepositoryImpl>() bind UserRepository::class
-    single<UserServiceImpl>() bind UserService::class
-    viewModel<UserViewModel>()
-}
-```
-
-:::tip
-编译器插件 DSL 需要使用 [Koin 编译器插件](/docs/setup/compiler-plugin)。它提供编译时依赖解析和更简洁的语法。
-:::
-
-## Compose 与 XML View 对比 {id="compose-vs-xml-views"}
-
-本教程演示了与 [Android ViewModel 教程](./android-viewmodel.md)相同的功能，但使用的是 Jetpack Compose 而不是 XML 布局：
-
-| 维度 | XML View | Jetpack Compose |
-|--------|-----------|-----------------|
-| Activity 基类 | `AppCompatActivity` | `ComponentActivity` |
-| UI 定义 | XML 布局文件 | `@Composable` 函数 |
-| ViewModel 注入 | `by viewModel()` 委托 | `koinViewModel()` 函数 |
-| 状态管理 | LiveData/StateFlow | `remember` + `mutableStateOf` |
-| UI 更新 | 视图绑定 + 观察者 | 自动重组 |
-
-:::tip
-有关在 Compose 中使用 Koin 注解的版本，请参阅 [Compose Multiplatform Annotations 教程](./compose-multiplatform-annotations.md)。
-:::
+- [Core Concepts](/docs/intro/core-concepts)：模块、定义和注入背后的心智模型。
+- [Koin for Compose](/docs/reference/koin-compose/compose)：`koinInject()`、`KoinApplication` 和 Compose 配置。
+- [Compose Multiplatform](/docs/quickstart/cmp)：与 iOS 共享 Compose UI 和 Koin 模块。
+- [Compose testing](/docs/reference/koin-compose/compose-testing)：测试使用 Koin 的可组合项。
+- [Tooling](/docs/tooling)：适用于 Koin 的 IDE 插件和监控工具。

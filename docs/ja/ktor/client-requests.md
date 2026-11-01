@@ -15,41 +15,37 @@
 </tldr>
 
 <link-summary>
-リクエストの送信方法と、リクエストURL、HTTPメソッド、ヘッダー、リクエストボディなどの各種リクエストパラメータの指定方法について学びます。
+リクエストの送信方法と、リクエストURL、HTTPメソッド、ヘッダー、リクエストボディなどのさまざまなリクエストパラメータの指定方法について学びます。
 </link-summary>
 
-[クライアントの設定](client-create-and-configure.md)が完了したら、HTTPリクエストの送信を開始できます。これを行う主な方法は、URLをパラメータとして受け取る
-[`.request()`](https://api.ktor.io/ktor-client-core/io.ktor.client.request/request.html)
-関数を使用することです。この関数内では、さまざまなリクエストパラメータを設定できます。
+[クライアントの設定](client-create-and-configure.md)が完了したら、HTTPリクエストの送信を開始できます。これを行う主な方法は、URLをパラメータとして受け取る[`.request()`](https://api.ktor.io/ktor-client-core/io.ktor.client.request/request.html)関数を使用することです。この関数内では、さまざまなリクエストパラメータを設定できます。
 
 * `GET`、`POST`、`PUT`、`DELETE`、`HEAD`、`OPTIONS`、`PATCH`などのHTTPメソッドを指定する。
 * URLを文字列として設定するか、その構成要素（ドメイン、パス、クエリパラメータなど）を個別に設定する。
 * Unixドメインソケットを使用する。
-* ヘッダーとクッキーを追加する。
+* ヘッダーやCookieを追加する。
 * リクエストボディ（プレーンテキスト、データオブジェクト、フォームパラメータなど）を含める。
 
-これらのパラメータは
-[`HttpRequestBuilder`](https://api.ktor.io/ktor-client-core/io.ktor.client.request/-http-request-builder/index.html)
-クラスによって提供されます。
+これらのパラメータは、[`HttpRequestBuilder`](https://api.ktor.io/ktor-client-core/io.ktor.client.request/-http-request-builder/index.html)クラスによって提供されます。
 
 ```kotlin
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 
 val response: HttpResponse = client.request("https://ktor.io/") {
-  // HttpRequestBuilderによって公開されているリクエストパラメータを設定する
+  // HttpRequestBuilderが提供するリクエストパラメータを設定
 }
 ```
 
 {interpolate-variables="true" disable-links="false"}
 
-`.request()`関数は、レスポンスを`HttpResponse`オブジェクトとして返します。`HttpResponse`は、文字列やJSONオブジェクトなどのさまざまな形式でレスポンスボディを取得するために必要なAPIや、ステータスコード、コンテンツタイプ、ヘッダーなどのレスポンスパラメータを取得するためのAPIを提供します。詳細については、[レスポンスの受信](client-responses.md)を参照してください。
+`.request()`関数はレスポンスを`HttpResponse`オブジェクトとして返します。`HttpResponse`は、文字列やJSONオブジェクトなどのさまざまな形式でレスポンスボディを取得するためのAPIや、ステータスコード、コンテンツタイプ、ヘッダーなどのレスポンスパラメータを取得するためのAPIを提供します。詳細については、[レスポンスの受信](client-responses.md)を参照してください。
 
-> `.request()`はサスペンド関数（suspending function）であるため、コルーチンまたは別のサスペンド関数内から呼び出す必要があります。サスペンド関数の詳細については、[コルーチンの基本](https://kotlinlang.org/docs/coroutines-basics.html)を参照してください。
+> `.request()`は中断関数（suspending function）であり、コルーチン内または他の中断関数から呼び出す必要があります。中断関数の詳細については、[Coroutines basics](https://kotlinlang.org/docs/coroutines-basics.html)を参照してください。
 
 ### HTTPメソッドの指定 {id="http-method"}
 
-`.request()`関数を呼び出す際、`method`プロパティを使用して目的のHTTPメソッドを指定できます。
+`.request()`関数を呼び出す際、`method`プロパティを使用して任意のHTTPメソッドを指定できます。
 
 ```kotlin
 import io.ktor.client.request.*
@@ -61,11 +57,7 @@ val response: HttpResponse = client.request("https://ktor.io/") {
 }
 ```
 
-`.request()`に加えて、`HttpClient`は
-[`.get()`](https://api.ktor.io/ktor-client-core/io.ktor.client.request/get.html)、
-[`.post()`](https://api.ktor.io/ktor-client-core/io.ktor.client.request/post.html)、
-[`.put()`](https://api.ktor.io/ktor-client-core/io.ktor.client.request/put.html)
-などの基本的なHTTPメソッドのための特定の関数を提供しています。上記の例は、`.get()`関数を使用して簡略化できます。
+`.request()`に加えて、`HttpClient`は[`.get()`](https://api.ktor.io/ktor-client-core/io.ktor.client.request/get.html)、[`.post()`](https://api.ktor.io/ktor-client-core/io.ktor.client.request/post.html)、[`.put()`](https://api.ktor.io/ktor-client-core/io.ktor.client.request/put.html)といった基本的なHTTPメソッド専用の関数も提供しています。上記の例は、`.get()`関数を使用して簡略化できます。
 
 ```kotlin
 val response: HttpResponse = client.get("https://ktor.io/docs/welcome.html")
@@ -83,7 +75,7 @@ Ktorクライアントでは、いくつかの方法でリクエストURLを設�
 val response: HttpResponse = client.get("https://ktor.io/docs/welcome.html")
 ```
 
-### URLコンポーネントを個別に設定する {id="configure-url-components-separately"}
+### URLの構成要素を個別に設定する {id="configure-url-components-separately"}
 
 ```kotlin
 client.get {
@@ -95,13 +87,13 @@ client.get {
 }
 ```
 
-この場合、`HttpRequestBuilder`によって提供される`url`パラメータが使用されます。これは[`URLBuilder`](https://api.ktor.io/ktor-http/io.ktor.http/-u-r-l-builder/index.html)のインスタンスを受け取り、複雑なURLを構築するためのより柔軟な方法を提供します。
+この場合、`HttpRequestBuilder`によって提供される`url`パラメータが使用されます。これは[`URLBuilder`](https://api.ktor.io/ktor-http/io.ktor.http/-u-r-l-builder/index.html)のインスタンスを受け取り、複雑なURLを構築する際の柔軟性を高めます。
 
-> すべてのリクエストに対してベースURLを設定するには、[`DefaultRequest`](client-default-request.md#url)プラグインを使用します。
+> すべてのリクエストに対するベースURLを設定するには、[`DefaultRequest`](client-default-request.md#url)プラグインを使用します。
 
 ### パスセグメント {id="path_segments"}
 
-前の例では、URLパス全体が`URLBuilder.path`プロパティを使用して指定されていました。あるいは、`appendPathSegments()`関数を使用して個々のパスセグメントを渡すこともできます。
+前の例では、URLパス全体が`URLBuilder.path`プロパティを使用して指定されていました。あるいは、`appendPathSegments()`関数を使用して個別のパスセグメントを渡すこともできます。
 
 ```kotlin
 client.get("https://ktor.io") {
@@ -131,7 +123,7 @@ client.get("https://ktor.io") {
 
 ### URLフラグメント {id="url-fragment"}
 
-ハッシュ記号`#`は、URLの末尾付近にオプションのフラグメントを導入します。`fragment`プロパティを使用してURLフラグメントを設定できます。
+ハッシュマーク`#`は、URLの末尾近くにある省略可能なフラグメントを示します。URLフラグメントは`fragment`プロパティを使用して設定できます。
 
 ```kotlin
 client.get("https://ktor.io") {
@@ -160,19 +152,19 @@ val response: HttpResponse = client.get("/") {
 }
 ```
 
-Unixドメインソケットは、[デフォルトリクエスト](client-default-request.md#unix-domain-sockets)の一部としても設定できます。
+また、[デフォルトリクエスト](client-default-request.md#unix-domain-sockets)の一部としてUnixドメインソケットを設定することもできます。
 
 ## リクエストパラメータの設定 {id="parameters"}
 
-HTTPメソッド、ヘッダー、クッキーなど、さまざまなリクエストパラメータを指定できます。特定のクライアントのすべてのリクエストに対してデフォルトのパラメータを設定する必要がある場合は、[`DefaultRequest`](client-default-request.md)プラグインを使用してください。
+HTTPメソッド、ヘッダー、Cookieなど、さまざまなリクエストパラメータを指定できます。特定のクライアントのすべてのリクエストに対してデフォルトパラメータを設定する必要がある場合は、[`DefaultRequest`](client-default-request.md)プラグインを使用します。
 
 ### ヘッダー {id="headers"}
 
-リクエストにヘッダーを追加するには、いくつかの方法があります。
+リクエストにヘッダーを追加する方法はいくつかあります。
 
 #### 複数のヘッダーを追加する {id="add-multiple-headers"}
 
-[`headers`](https://api.ktor.io/ktor-client-core/io.ktor.client.request/headers.html)関数を使用すると、複数のヘッダーを一度に追加できます。
+[`headers`](https://api.ktor.io/ktor-client-core/io.ktor.client.request/headers.html)関数を使用すると、一度に複数のヘッダーを追加できます。
 
 ```kotlin
 client.get("https://ktor.io") {
@@ -184,22 +176,22 @@ client.get("https://ktor.io") {
 }
 ```
 
-また、`appendAll()`関数を`Map`または`vararg Pair`と共に使用して、複数のヘッダーを便利に追加することもできます。
+また、`Map`または`vararg Pair`を指定して`appendAll()`関数を使用すると、複数のヘッダーを簡単に追加できます。
 
 ```kotlin
         client.get("https://ktor.io") {
             headers {
-                // vararg Pairsを使用する場合
+                // vararg Pairを使用
                 appendAll(
                     HttpHeaders.Accept to "text/html",
                     HttpHeaders.Authorization to "abc123"
                 )
 
-                // Mapを使用する場合
+                // Mapを使用
                 appendAll(mapOf("foo" to "bar", "baz" to "qux"))
                 appendAll(mapOf("test" to listOf("1", "2", "3")))
 
-                // 複数の値を持つカスタムヘッダーを使用する場合
+                // 複数の値を持つカスタムヘッダーを使用
                 appendAll("X-Custom-Header" to listOf("val1", "val2"))
             }
         }
@@ -209,15 +201,15 @@ client.get("https://ktor.io") {
 
 [`header`](https://api.ktor.io/ktor-client-core/io.ktor.client.request/header.html)関数を使用すると、単一のヘッダーを追加できます。
 
-#### 認証に basicAuth または bearerAuth を使用する {id="use-basicauth-or-bearerauth-for-authorization"}
+#### 認証に`basicAuth`または`bearerAuth`を使用する {id="use-basicauth-or-bearerauth-for-authorization"}
 
-`basicAuth`および`bearerAuth`関数は、対応するHTTPスキームを使用して`Authorization`ヘッダーを追加します。
+`basicAuth`関数と`bearerAuth`関数は、対応するHTTPスキームで`Authorization`ヘッダーを追加します。
 
-> 高度な認証設定については、[Ktor Clientにおける認証と認可](client-auth.md)を参照してください。
+> 高度な認証設定については、[Authentication and authorization in Ktor Client](client-auth.md)を参照してください。
 
-### クッキー {id="cookies"}
+### Cookie {id="cookies"}
 
-クッキーを送信するには、[`cookie()`](https://api.ktor.io/ktor-client-core/io.ktor.client.request/cookie.html)関数を使用します。
+Cookieを送信するには、[`cookie()`](https://api.ktor.io/ktor-client-core/io.ktor.client.request/cookie.html)関数を使用します。
 
 ```kotlin
 client.get("https://ktor.io") {
@@ -232,7 +224,7 @@ client.get("https://ktor.io") {
 }
 ```
 
-Ktorは、呼び出し間でクッキーを保持できる[`HttpCookies`](client-cookies.md)プラグインも提供しています。このプラグインがインストールされている場合、`cookie()`関数を使用して追加されたクッキーは無視されます。
+Ktorには、呼び出し間でCookieを保持できる[`HttpCookies`](client-cookies.md)プラグインも用意されています。このプラグインがインストールされている場合、`cookie()`関数を使用して追加されたCookieは無視されます。
 
 ## リクエストボディの設定 {id="body"}
 
@@ -240,7 +232,7 @@ Ktorは、呼び出し間でクッキーを保持できる[`HttpCookies`](client
 
 ### テキスト {id="text"}
 
-プレーンテキストをボディとして送信するには、次のように実装できます。
+プレーンテキストをボディとして送信するには、次のように実装します。
 
 ```kotlin
 import io.ktor.client.request.*
@@ -263,11 +255,11 @@ val response: HttpResponse = client.post("http://localhost:8080/customer") {
 }
 ```
 
-詳細については、[Ktor Clientにおけるコンテンツネゴシエーションとシリアライズ](client-serialization.md)を参照してください。
+詳細については、[Content negotiation and serialization in Ktor Client](client-serialization.md)を参照してください。
 
 ### フォームパラメータ {id="form_parameters"}
 
-Ktorクライアントは、`application/x-www-form-urlencoded`タイプでフォームパラメータを送信するための[`submitForm()`](https://api.ktor.io/ktor-client-core/io.ktor.client.request.forms/submit-form.html)関数を提供しています。次の例にその使用方法を示します。
+Ktorクライアントは、`application/x-www-form-urlencoded`タイプでフォームパラメータを送信するための[`submitForm()`](https://api.ktor.io/ktor-client-core/io.ktor.client.request.forms/submit-form.html)関数を提供しています。次の例でその使い方を示します。
 
 ```kotlin
 val client = HttpClient(CIO)
@@ -282,25 +274,25 @@ val response: HttpResponse = client.submitForm(
 )
 ```
 
-* `url` はリクエストを行うためのURLを指定します。
-* `formParameters` は`parameters`を使用して構築されたフォームパラメータのセットです。
+* `url`は、リクエストを送信するURLを指定します。
+* `formParameters`は、`parameters`を使用して構築されたフォームパラメータのセットです。
 
 完全な例については、[client-submit-form](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-submit-form)を参照してください。
 
-> URLにエンコードされたフォームパラメータを送信するには、`encodeInQuery`を`true`に設定してください。
+> URLにエンコードされたフォームパラメータを送信するには、`encodeInQuery`を`true`に設定します。
 
 ### ファイルのアップロード {id="upload_file"}
 
-フォームと共にファイルを送信する必要がある場合は、次のアプローチを使用できます。
+フォームと一緒にファイルを送信する必要がある場合は、以下のアプローチを使用できます。
 
 * [`.submitFormWithBinaryData()`](https://api.ktor.io/ktor-client-core/io.ktor.client.request.forms/submit-form-with-binary-data.html)関数を使用する。この場合、バウンダリ（boundary）は自動的に生成されます。
-* `post`関数を呼び出し、[`MultiPartFormDataContent`](https://api.ktor.io/ktor-client-core/io.ktor.client.request.forms/-multi-part-form-data-content/index.html)インスタンスを`setBody`関数に渡す。`MultiPartFormDataContent`コンストラクタでは、バウンダリ値を渡すこともできます。
+* `post`関数を呼び出し、[`MultiPartFormDataContent`](https://api.ktor.io/ktor-client-core/io.ktor.client.request.forms/-multi-part-form-data-content/index.html)インスタンスを`setBody`関数に渡す。`MultiPartFormDataContent`コンストラクタでは、バウンダリの値を渡すこともできます。
 
 どちらのアプローチでも、[`formData {}`](https://api.ktor.io/ktor-client-core/io.ktor.client.request.forms/form-data.html)関数を使用してフォームデータを構築する必要があります。
 
-#### `.submitFormWithBinaryData()` を使用する {id="using-submitformwithbinarydata"}
+#### `.submitFormWithBinaryData()`の使用 {id="using-submitformwithbinarydata"}
 
-`.submitFormWithBinaryData()`関数は自動的にバウンダリを生成し、ファイルの内容が十分に小さく、`.readBytes()`を使用して安全にメモリに読み込める単純なユースケースに適しています。
+`.submitFormWithBinaryData()`関数はバウンダリを自動的に生成し、`.readBytes()`を使用して安全にメモリに読み込める程度にファイルコンテンツが小さい単純なユースケースに適しています。
 
 ```kotlin
         val client = HttpClient(CIO)
@@ -319,9 +311,9 @@ val response: HttpResponse = client.submitForm(
 
 完全な例については、[client-upload](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-upload)を参照してください。
 
-#### `MultiPartFormDataContent` を使用する {id="using-multipartformdatacontent"}
+#### `MultiPartFormDataContent`の使用 {id="using-multipartformdatacontent"}
 
-大容量または動的なコンテンツを効率的にストリーミングするには、`InputProvider`を備えた`MultiPartFormDataContent`を使用できます。`InputProvider`を使用すると、ファイルデータを完全にメモリに読み込むのではなく、バッファ付きストリームとして提供できるため、大きなファイルに適しています。`MultiPartFormDataContent`を使用すると、`onUpload`コールバックを使用してアップロードの進行状況を監視することもできます。
+大容量または動的なコンテンツを効率的にストリーミングするには、`InputProvider`とともに`MultiPartFormDataContent`を使用できます。`InputProvider`を使用すると、ファイルデータをメモリにすべてロードするのではなく、バッファされたストリームとして供給できるため、大きなファイルに適しています。`MultiPartFormDataContent`を使用すると、`onUpload`コールバックを利用してアップロードの進行状況を監視することもできます。
 
 ```kotlin
         val client = HttpClient(CIO)
@@ -357,7 +349,7 @@ val response: HttpResponse = client.submitForm(
 InputProvider { SystemFileSystem.source(Path("ktor_logo.png")).buffered() }
 ```
 
-また、カスタムバウンダリとコンテンツタイプを使用して、`MultiPartFormDataContent`を手動で構築することもできます。
+また、カスタムのバウンダリとコンテンツタイプを手動で設定して`MultiPartFormDataContent`を構築することもできます。
 
 ```kotlin
 fun customMultiPartMixedDataContent(parts: List<PartData>): MultiPartFormDataContent {
@@ -371,8 +363,7 @@ fun customMultiPartMixedDataContent(parts: List<PartData>): MultiPartFormDataCon
 
 ### バイナリデータ {id="binary"}
 
-`application/octet-stream`コンテンツタイプでバイナリデータを送信するには、[`ByteReadChannel`](https://api.ktor.io/ktor-io/io.ktor.utils.io/-byte-read-channel/index.html)インスタンスを`setBody()`関数に渡します。
-たとえば、[`File.readChannel()`](https://api.ktor.io/ktor-utils/io.ktor.util.cio/read-channel.html)関数を使用してファイルの読み取りチャネルを開くことができます。
+コンテンツタイプ`application/octet-stream`でバイナリデータを送信するには、[`ByteReadChannel`](https://api.ktor.io/ktor-io/io.ktor.utils.io/-byte-read-channel/index.html)インスタンスを`setBody()`関数に渡します。例えば、[`File.readChannel()`](https://api.ktor.io/ktor-utils/io.ktor.util.cio/read-channel.html)関数を使用してファイルの読み取りチャネルを開くことができます。
 
 ```kotlin
 val response = client.post("http://0.0.0.0:8080/upload") {
@@ -384,10 +375,7 @@ val response = client.post("http://0.0.0.0:8080/upload") {
 
 ## 並列リクエスト {id="parallel_requests"}
 
-デフォルトでは、複数のリクエストを順番に送信する場合、クライアントは前のリクエストが完了するまで各呼び出しを一時停止（サスペンド）します。複数のリクエストを並行して実行するには、
-[`launch()`](https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/launch.html)
-または [`async()`](https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/async.html)
-関数を使用します。次の例は、`async()`を使用して2つのリクエストを並列に実行する方法を示しています。
+デフォルトでは、複数のリクエストを順番に送信する場合、クライアントは前の呼び出しが完了するまで各呼び出しを中断（サスペンド）します。複数のリクエストを並行して実行するには、[`launch()`](https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/launch.html)関数または[`async()`](https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/async.html)関数を使用します。次の例は、`async()`を使用して2つのリクエストを並列に実行する方法を示しています。
 
 ```kotlin
 coroutineScope {
@@ -403,9 +391,7 @@ coroutineScope {
 
 ## リクエストのキャンセル {id="cancel-request"}
 
-リクエストをキャンセルするには、そのリクエストを実行しているコルーチンをキャンセルします。
-[`launch()`](https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/launch.html)
-関数は、実行中のコルーチンをキャンセルするために使用できる`Job`を返します。
+リクエストをキャンセルするには、そのリクエストを実行しているコルーチンをキャンセルします。[`launch()`](https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/launch.html)関数は、実行中のコルーチンをキャンセルするために使用できる`Job`を返します。
 
 ```kotlin
 import kotlinx.coroutines.*

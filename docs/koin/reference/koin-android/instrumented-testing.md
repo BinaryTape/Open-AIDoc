@@ -1,71 +1,87 @@
 ---
-title: Android 仪器化测试
+title: Android 插桩测试
 ---
 
-## 概览 {id="overview"}
+# Android 插桩测试
 
-仪器化测试在 Android 设备或模拟器上运行，并测试应用与 Android 框架的集成。与您控制 Koin 生命周期的单元测试不同，仪器化测试需要特殊处理，因为 Koin 是由您的 `Application` 类启动的。
+插桩测试运行在设备或模拟器上，且运行在真实的 `Application` 内部。当测试开始时，Koin 已经由 `Application.onCreate()` 启动，因此关键问题在于如何使用测试定义替换生产定义。本指南介绍了为此所需的配置方案，随后涵盖 Activity、Fragment 和作用域测试。通用技术（`KoinTest`、`KoinTestRule`、`declareMock`）已在[单元测试](/docs/reference/koin-test/testing)中进行了解释。
 
-### 与单元测试的主要区别 {id="key-differences-from-unit-tests"}
+## 依赖项 {id="dependencies"}
 
-| 维度 | 单元测试 | 仪器化测试 |
-|--------|------------|-------------------|
-| **执行** | 仅 JVM | Android 设备/模拟器 |
-| **Koin 启动** | 在测试类中 (`startKoin`) | 在 `Application.onCreate()` 中 |
-| **速度** | 快 | 较慢 |
-| **Android API** | 模拟 (Mocked) | 真实 |
-| **测试隔离** | 容易（每个测试都重新开始） | 需要仔细设置 |
-| **用例** | 业务逻辑、ViewModel | UI、Android 组件集成 |
-
-### 哪些内容适合仪器化测试 {id="what-to-test-with-instrumented-tests"}
-
-✅ **适合仪器化测试：**
-- UI 行为和交互
-- Android 组件集成 (Activity, Fragment, Service)
-- 导航流
-- 使用 Room 的数据库操作
-- Shared preferences 和文件 I/O
-- Compose UI 测试
-
-❌ **更适合作为单元测试：**
-- 业务逻辑
-- ViewModel（可以进行单元测试）
-- 仓库（可以使用模拟对象进行单元测试）
-- 纯 Kotlin 函数
-
-## 测试策略 {id="test-strategies"}
-
-### 策略 1：自定义测试 Application {id="strategy-1-custom-test-application"}
-
-为测试创建一个单独的 Application 类，并配置测试专用的模块。
-
-### 策略 2：测试规则 {id="strategy-2-test-rules"}
-
-使用 JUnit 规则来为每个测试类或测试方法配置 Koin。
-
-### 策略 3：模块重写 {id="strategy-3-module-override"}
-
-保留生产环境的 Application，但针对测试重写特定的定义。
-
-让我们详细探讨每种策略。
-
-## 在自定义 Application 类中重写生产环境模块 {id="override-production-modules-in-a-custom-application-class"}
-
-与[单元测试](/docs/reference/koin-test/testing)不同（在单元测试中，您实际上是在每个测试类中调用启动 Koin，即 `startKoin` 或 `KoinTestExtension`），在仪器化测试中，Koin 是由您的 `Application` 类启动的。
-
-为了重写生产环境的 Koin 模块，使用 `loadModules` 和 `unloadModules` 通常是不安全的，因为更改不会立即生效。相反，推荐的方法是将重写定义的 `module` 添加到 `Application` 类中 `startKoin` 所使用的 `modules` 中。
-如果您想保持应用中继承自 `Application` 的类不被改动，您可以在 `AndroidTest` 软件包中创建另一个类，例如：
 ```kotlin
+dependencies {
+    androidTestImplementation("io.insert-koin:koin-test-junit4")
+}
+```
+
+`koin-test-junit4` 会引入 `koin-test`。版本来自 Koin BOM，请参阅 [Gradle 设置](/docs/setup/gradle)。
+
+## 选择配置方案 {id="choose-a-setup"}
+
+| 配置方案 | Koin 启动方式 | 适用场景 |
+|-------|--------------------|-------------|
+| [测试 Application](#use-a-test-application) | 测试 `Application` 类 | 所有测试共享相同的测试配置 |
+| [测试规则](#restart-koin-with-a-test-rule) | `KoinTestRule`，在每次测试之前 | 每个测试类都需要自己的模块 |
+| [加载覆盖](#load-overrides-into-the-running-container) | 生产环境的 `Application` | 仅替换少数定义 |
+
+## 使用测试 Application {id="use-a-test-application"}
+
+在 `androidTest` 中创建一个 `Application`，使用生产模块加上测试模块来启动 Koin。测试模块最后加载，因此其定义会替换生产定义：
+
+**编译器插件 DSL**
+```kotlin
+// in src/androidTest
 class TestApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         startKoin {
-            modules(productionModule, instrumentedTestModule)
+            androidContext(this@TestApplication)
+            modules(appModule, instrumentedTestModule)
         }
     }
 }
 ```
-为了在您的仪器化测试中使用此自定义 `Application`，您可能需要创建一个自定义 [AndroidJUnitRunner](https://developer.android.com/training/testing/instrumented-tests/androidx-test-libraries/runner)，如下所示：
+
+**注解**
+```kotlin
+// in src/androidTest
+class TestApplication : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        startKoin<MyApp> {
+            androidContext(this@TestApplication)
+            modules(instrumentedTestModule)
+        }
+    }
+}
+```
+
+`startKoin<MyApp>` 会先加载 `@KoinApplication` 类的模块，然后再加载 lambda 中声明的模块。
+
+**构造函数 / 经典 DSL**
+```kotlin
+// in src/androidTest
+class TestApplication : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        startKoin {
+            androidContext(this@TestApplication)
+            modules(appModule, instrumentedTestModule)
+        }
+    }
+}
+```
+
+```kotlin
+val instrumentedTestModule = module {
+    single<ApiService> { FakeApiService() }
+}
+```
+
+像 `single<ApiService> { FakeApiService() }` 这样的 lambda 定义适用于所有风格。
+
+要使用此 `Application` 运行测试，请创建一个自定义 [AndroidJUnitRunner](https://developer.android.com/training/testing/instrumented-tests/androidx-test-libraries/runner)：
+
 ```kotlin
 class InstrumentationTestRunner : AndroidJUnitRunner() {
     override fun newApplication(
@@ -77,963 +93,252 @@ class InstrumentationTestRunner : AndroidJUnitRunner() {
     }
 }
 ```
-然后在您的 gradle 文件中通过以下方式注册它：
-```groovy
-testInstrumentationRunner "com.example.myapplication.InstrumentationTestRunner"
-```
 
-## 使用测试规则重写生产环境模块 {id="override-production-modules-with-a-test-rule"}
+在 `build.gradle.kts` 中进行注册：
 
-如果您需要更高的灵活性，您仍需要创建自定义 `AndroidJUnitRunner`，但不再将 `startKoin { ... }` 放在自定义应用程序中，而是可以将其放在自定义测试规则中，如下所示：
 ```kotlin
-class KoinTestRule(
-    private val modules: List<Module>
-) : TestWatcher() {
-    override fun starting(description: Description) {
-
-        if (getKoinApplicationOrNull() == null) {
-            startKoin {
-                androidContext(InstrumentationRegistry.getInstrumentation().targetContext.applicationContext)
-                modules(modules)
-            }
-        } else {
-            loadKoinModules(modules)
-        }
-    }
-
-    override fun finished(description: Description) {
-        unloadKoinModules(modules)
+android {
+    defaultConfig {
+        testInstrumentationRunner = "com.example.app.InstrumentationTestRunner"
     }
 }
 ```
-通过这种方式，我们可以直接从测试类中重写定义，例如：
-```kotlin
-private val instrumentedTestModule = module {
-    factory<Something> { FakeSomething() }
-}
 
-@get:Rule
-val koinTestRule = KoinTestRule(
-    modules = listOf(productionModule, instrumentedTestModule)
-)
-```
+## 使用测试规则重启 Koin {id="restart-koin-with-a-test-rule"}
 
-## 模拟 (Mocking) 与虚假对象 (Fakes) {id="mocking-and-fakes"}
-
-### 使用 `declareMock()`（推荐） {id="using-declaremock-recommended"}
-
-:::info
-**Koin 4.2+：** 使用 `declareMock()` 在测试中动态快速地模拟依赖项，无需创建单独的测试模块。
-:::
+`KoinTestRule` 会关闭正在运行的 Koin 容器，在每次测试前启动一个新容器，并在测试后将其停止。需要自行传递 Android context，因为该容器不是由 `Application` 启动的：
 
 ```kotlin
-class UserViewModelTest : KoinTest {
+import androidx.test.core.app.ApplicationProvider
+import org.koin.android.ext.koin.androidContext
+import org.koin.test.KoinTestRule
+
+@RunWith(AndroidJUnit4::class)
+class LoginActivityTest : KoinTest {
 
     @get:Rule
     val koinTestRule = KoinTestRule.create {
-        modules(
-            module {
-                viewModelOf(::UserViewModel)
-                // 其他生产环境依赖项
-            }
-        )
-    }
-
-    @Test
-    fun `test user loading`() {
-        // 动态声明模拟对象
-        declareMock<UserRepository> {
-            coEvery { getUser(any()) } returns User("1", "Test User")
-        }
-
-        val viewModel: UserViewModel by inject()
-        // 使用模拟的仓库进行测试
+        androidContext(ApplicationProvider.getApplicationContext())
+        modules(appModule, loginTestModule)
     }
 }
 ```
 
-**`declareMock()` 的优势：**
-- ✅ 无需创建单独的测试模块
-- ✅ 仅模拟每个测试所需的内容
-- ✅ 测试代码更简洁
-- ✅ 开箱即用地支持 MockK
+使用注解时，请使用 `withConfiguration<MyApp>()` 代替 `modules(appModule)`，如[单元测试](/docs/reference/koin-test/testing#junit-4-kointestrule)中所述。
 
-### 使用测试替身 (Test Doubles) {id="using-test-doubles"}
+生产环境的 `Application` 在进程启动时仍会执行一次 `startKoin`。测试规则会替换该容器，因此 `Application` 在 `onCreate()` 中解析的任何内容都会持有来自已关闭容器的实例。如果你的 `Application` 在启动时解析依赖项，请优先选择不解析依赖项的[测试 Application](#use-a-test-application)。
 
-在测试中使用模拟对象或虚假对象替换真实实现：
+## 将覆盖定义加载到正在运行的容器中 {id="load-overrides-into-the-running-container"}
+
+若要保留生产环境的 `Application` 且仅更改少数定义，可以在待测屏幕启动前将测试模块加载到正在运行的容器中：
 
 ```kotlin
-// 生产环境模块
-val productionModule = module {
-    single<UserRepository> { UserRepositoryImpl(get()) }
-    single { ApiService.create() }
-}
+@RunWith(AndroidJUnit4::class)
+class ProfileFragmentTest : KoinTest {
 
-// 带有虚假对象的测试模块
-val testModule = module {
-    single<UserRepository> { FakeUserRepository() }
-    single<ApiService> { FakeApiService() }
-}
-
-// 虚假实现
-class FakeUserRepository : UserRepository {
-    private val users = mutableListOf<User>()
-
-    override suspend fun getUser(id: String): User {
-        return users.find { it.id == id } ?: throw UserNotFoundException()
+    private val profileTestModule = module {
+        single<UserRepository> { FakeUserRepository() }
     }
 
-    override suspend fun saveUser(user: User) {
-        users.add(user)
-    }
-
-    // 测试专用方法
-    fun clearUsers() {
-        users.clear()
+    @Before
+    fun before() {
+        loadKoinModules(profileTestModule)
     }
 }
 ```
 
-### 使用 MockK {id="using-mockk"}
+这是最轻量的配置方案，但陷阱也最多：
+
+- 无重置：覆盖定义将在进程中后续的所有测试中持续生效。
+- 卸载是移除而不是恢复：`unloadKoinModules(profileTestModule)` 会删除 `UserRepository` 定义，生产定义不会恢复。
+- 已创建的实例会被保留：已经接收了生产版 `UserRepository` 的 `single` 会继续保留它。
+
+如果每次测试都需要干净的依赖图，请改用[测试规则](#restart-koin-with-a-test-rule)。
+
+## Mock 与 Fake {id="mocks-and-fakes"}
+
+`declareMock` 在插桩测试中的用法与在单元测试中相同：实现 `KoinTest` 并注册 `MockProviderRule`（参阅[使用 declareMock 进行 Mock](/docs/reference/koin-test/testing#mocking-with-declaremock)）。若使用 MockK，请在设备上使用 `io.mockk:mockk-android` 工件。
+
+在设备上使用 Fake 通常更简单：它们不需要 Mock 库，且行为与真实类相同。可以在测试模块中声明它们。对于 Room，请使用内存数据库，以便每次测试都从空数据库开始：
 
 ```kotlin
-// 使用 MockK 的测试模块
-val mockModule = module {
-    single<UserRepository> {
-        mockk<UserRepository> {
-            coEvery { getUser(any()) } returns User("1", "Test User")
-            coEvery { saveUser(any()) } just Runs
-        }
+val testDatabaseModule = module {
+    single {
+        Room.inMemoryDatabaseBuilder(androidContext(), AppDatabase::class.java).build()
     }
-}
-
-// 测试 Application
-class TestApplication : Application() {
-    override fun onCreate() {
-        super.onCreate()
-        startKoin {
-            androidContext(this@TestApplication)
-            modules(mockModule)
-        }
-    }
+    single { get<AppDatabase>().userDao() }
 }
 ```
 
-### 部分模拟 (Partial Mocking) {id="partial-mocking"}
+## Activity 与 Fragment 测试 {id="activity-and-fragment-tests"}
 
-仅替换特定的依赖项：
-
-```kotlin
-val testModule = module {
-    // 保留真实实现
-    single { Database.create(androidContext()) }
-
-    // 模拟网络层
-    single<ApiService> { mockk<ApiService>() }
-
-    // 使用带有模拟 API 的真实仓库
-    single<UserRepository> { UserRepositoryImpl(get()) }
-}
-```
-
-## 测试 Activity 和 Fragment {id="testing-activities-and-fragments"}
-
-### 使用 Koin 测试 Activity {id="testing-activity-with-koin"}
+Activity 和 Fragment 通过 `by inject()` 和 `by viewModel()` 解析其依赖项（参阅[入口点](/docs/reference/koin-android/entry-points)）。在测试中，它们会接收测试容器中所持有的任何内容，因此请在配置好 Koin 之后再启动它们：
 
 ```kotlin
 @RunWith(AndroidJUnit4::class)
 class LoginActivityTest {
 
     @get:Rule
-    val koinTestRule = KoinTestRule(
-        modules = listOf(
-            module {
-                viewModel { LoginViewModel(get()) }
-                single<AuthService> { FakeAuthService() }
-            }
-        )
-    )
+    val koinTestRule = KoinTestRule.create {
+        androidContext(ApplicationProvider.getApplicationContext())
+        modules(appModule, module {
+            single<AuthService> { FakeAuthService(acceptedEmail = "user@example.com") }
+        })
+    }
 
     @Test
-    fun testSuccessfulLogin() {
-        val scenario = ActivityScenario.launch(LoginActivity::class.java)
+    fun successfulLoginShowsWelcomeMessage() {
+        ActivityScenario.launch(LoginActivity::class.java).use {
+            onView(withId(R.id.email)).perform(typeText("user@example.com"))
+            onView(withId(R.id.loginButton)).perform(click())
 
-        onView(withId(R.id.email)).perform(typeText("user@example.com"))
-        onView(withId(R.id.password)).perform(typeText("password123"))
-        onView(withId(R.id.loginButton)).perform(click())
-
-        onView(withId(R.id.successMessage)).check(matches(isDisplayed()))
-
-        scenario.close()
-    }
-}
-```
-
-### 使用 Koin 测试 Fragment {id="testing-fragment-with-koin"}
-
-```kotlin
-@RunWith(AndroidJUnit4::class)
-class ProfileFragmentTest {
-
-    @get:Rule
-    val koinTestRule = KoinTestRule(
-        modules = listOf(
-            module {
-                viewModel { ProfileViewModel(get()) }
-                single<UserRepository> {
-                    mockk {
-                        coEvery { getUser(any()) } returns User("1", "Test User")
-                    }
-                }
-            }
-        )
-    )
-
-    @Test
-    fun testProfileDisplaysUserInfo() {
-        val scenario = launchFragmentInContainer<ProfileFragment>()
-
-        onView(withId(R.id.userName)).check(matches(withText("Test User")))
-
-        scenario.close()
-    }
-}
-```
-
-## 在仪器化测试中测试 ViewModel {id="testing-viewmodels-in-instrumented-tests"}
-
-### 在测试中注入 ViewModel {id="injecting-viewmodel-in-tests"}
-
-```kotlin
-@RunWith(AndroidJUnit4::class)
-class HomeViewModelTest : KoinTest {
-
-    @get:Rule
-    val koinTestRule = KoinTestRule(
-        modules = listOf(
-            module {
-                viewModelOf(::HomeViewModel)
-                single<UserRepository> { FakeUserRepository() }
-            }
-        )
-    )
-
-    private val viewModel: HomeViewModel by inject()
-
-    @Test
-    fun testLoadUserData() = runTest {
-        viewModel.loadUser("123")
-
-        val state = viewModel.userState.value
-        assertEquals("Test User", state.name)
-    }
-}
-```
-
-### 结合 Activity 测试 ViewModel {id="testing-viewmodel-with-activity"}
-
-```kotlin
-@Test
-fun testViewModelStateReflectsInUI() {
-    val scenario = ActivityScenario.launch(HomeActivity::class.java)
-
-    scenario.onActivity { activity ->
-        val viewModel: HomeViewModel = activity.viewModel
-
-        // 触发 ViewModel 操作
-        viewModel.loadUser("123")
-
-        // 验证 UI 已更新
-        onView(withId(R.id.userName)).check(matches(withText("Test User")))
-    }
-}
-```
-
-## 使用 Jetpack Compose 进行测试 {id="testing-with-jetpack-compose"}
-
-### 结合 Koin 进行 Compose UI 测试 {id="compose-ui-test-with-koin"}
-
-```kotlin
-@RunWith(AndroidJUnit4::class)
-class LoginScreenTest {
-
-    @get:Rule
-    val composeTestRule = createComposeRule()
-
-    @get:Rule
-    val koinTestRule = KoinTestRule(
-        modules = listOf(
-            module {
-                viewModelOf(::LoginViewModel)
-                single<AuthService> { FakeAuthService() }
-            }
-        )
-    )
-
-    @Test
-    fun testLoginFlow() {
-        composeTestRule.setContent {
-            KoinContext {
-                LoginScreen()
-            }
-        }
-
-        composeTestRule.onNodeWithTag("email_field")
-            .performTextInput("user@example.com")
-
-        composeTestRule.onNodeWithTag("password_field")
-            .performTextInput("password123")
-
-        composeTestRule.onNodeWithTag("login_button")
-            .performClick()
-
-        composeTestRule.onNodeWithTag("success_message")
-            .assertIsDisplayed()
-    }
-}
-```
-
-### 使用 koinViewModel 测试 Composable {id="testing-composables-with-koinviewmodel"}
-
-```kotlin
-@Composable
-fun HomeScreen(viewModel: HomeViewModel = koinViewModel()) {
-    val user by viewModel.user.collectAsState()
-
-    Text(text = user?.name ?: "Loading...")
-}
-
-// 测试
-@Test
-fun testHomeScreenDisplaysUser() {
-    composeTestRule.setContent {
-        KoinContext {
-            HomeScreen()
+            onView(withId(R.id.successMessage)).check(matches(isDisplayed()))
         }
     }
-
-    composeTestRule.onNodeWithText("Test User")
-        .assertIsDisplayed()
 }
 ```
 
-## 测试作用域 (Scopes) {id="testing-scopes"}
+对于 Fragment，使用来自 `androidx.fragment:fragment-testing` 的 `launchFragmentInContainer<ProfileFragment>()` 也是同样的效果。`LoginActivity` 通过 `by viewModel()` 获取的 `LoginViewModel` 是由 Koin 使用 `FakeAuthService` 创建的。
 
-### 测试 Activity 作用域 (Scope) {id="testing-activity-scope"}
+要从正在运行的组件中读取 ViewModel 或依赖项，请使用 `scenario.onActivity { activity -> ... }` 并在其中进行访问。在代码块之外，Activity 可能尚不存在。
+
+## 作用域 {id="scopes"}
+
+[Android 作用域](/docs/reference/koin-android/scope)仅在其 Activity 或 Fragment 存活期间存在。可以通过该组件对其进行测试：
 
 ```kotlin
-@RunWith(AndroidJUnit4::class)
-class CheckoutActivityTest {
+val checkoutTestModule = module {
+    activityScope {
+        scoped { CheckoutState() }
+    }
+}
 
-    @get:Rule
-    val koinTestRule = KoinTestRule(
-        modules = listOf(
-            module {
-                activityScope {
-                    scoped { CheckoutState() }
-                }
-            }
-        )
-    )
-
-    @Test
-    fun testActivityScopeSharedAcrossFragments() {
-        val scenario = ActivityScenario.launch(CheckoutActivity::class.java)
-
+@Test
+fun fragmentSharesTheActivityScope() {
+    ActivityScenario.launch(CheckoutActivity::class.java).use { scenario ->
         scenario.onActivity { activity ->
-            val state1 = activity.scope.get<CheckoutState>()
-            state1.selectedAddress = Address("123 Main St")
+            val activityState = activity.scope.get<CheckoutState>()
 
-            // 导航到下一个 fragment
-            activity.supportFragmentManager.commit {
+            activity.supportFragmentManager.commitNow {
                 replace(R.id.container, PaymentFragment())
             }
-
-            // 在 fragment 中可以访问相同的作用域
             val fragment = activity.supportFragmentManager
                 .findFragmentById(R.id.container) as PaymentFragment
 
-            val state2 = fragment.scope.get<CheckoutState>()
-            assertEquals(state1, state2)
-            assertEquals("123 Main St", state2.selectedAddress?.street)
+            assertSame(activityState, fragment.scope.get<CheckoutState>())
         }
     }
 }
 ```
 
-### 测试自定义作用域 (Scopes) {id="testing-custom-scopes"}
+当组件实现 `AndroidScopeComponent`（例如 `ScopeActivity` 和 `ScopeFragment`）时，`activity.scope` 和 `fragment.scope` 可用。在 Activity 创建之前或销毁之后调用 `scope.get()` 会失败：作用域尚不存在或已关闭。
+
+对于未绑定到 Android 组件的作用域，JVM 单元测试即可满足要求：参阅[单元测试](/docs/reference/koin-test/testing#test-scoped-definitions)。
+
+## 多模块应用 {id="multi-module-apps"}
+
+在[多模块应用](/docs/reference/koin-android/multi-module)中，将待测功能模块与其所需的核心模块一同加载，最后加载测试覆盖模块：
 
 ```kotlin
-@Test
-fun testCustomScopeLifecycle() {
-    val testModule = module {
-        scope(named("session")) {
-            scoped { UserSession() }
-        }
-    }
-
-    koinApplication {
-        modules(testModule)
-
-        // 创建作用域
-        val sessionScope = koin.createScope("test_session", named("session"))
-        val session = sessionScope.get<UserSession>()
-
-        session.login("user@example.com")
-        assertTrue(session.isLoggedIn)
-
-        // 关闭作用域
-        sessionScope.close()
-
-        // 作用域已关闭，无法访问
-        assertThrows<ClosedScopeException> {
-            sessionScope.get<UserSession>()
-        }
-    }
-}
-```
-
-## 测试多模块应用 {id="testing-multi-module-apps"}
-
-### 结合功能模块 (Feature Modules) 进行测试 {id="testing-with-feature-modules"}
-
-```kotlin
-@RunWith(AndroidJUnit4::class)
-class MultiModuleTest {
-
-    @get:Rule
-    val koinTestRule = KoinTestRule(
-        modules = listOf(
-            // 核心模块
-            networkModule,
-            databaseModule,
-
-            // 功能模块
-            loginModule,
-            homeModule,
-
-            // 测试重写
-            module {
-                single<ApiService>(override = true) { FakeApiService() }
-            }
-        )
+@get:Rule
+val koinTestRule = KoinTestRule.create {
+    androidContext(ApplicationProvider.getApplicationContext())
+    modules(
+        networkModule,
+        databaseModule,
+        loginModule,
+        homeModule,
+        module { single<ApiService> { FakeApiService() } }
     )
-
-    @Test
-    fun testFeatureIntegration() {
-        // 测试登录功能与主页功能是否协同工作
-        val loginViewModel: LoginViewModel by inject()
-        val homeViewModel: HomeViewModel by inject()
-
-        runBlocking {
-            loginViewModel.login("user@example.com", "password")
-            homeViewModel.loadUserData()
-        }
-
-        assertEquals("user@example.com", homeViewModel.userState.value.email)
-    }
 }
 ```
 
-### 测试中的模块验证 {id="module-verification-in-tests"}
+共享的 `androidTest` 源集或 `:core:testing` Gradle 模块是存放多个功能共用的 Fake 和测试模块的好地方。
 
-```kotlin
-class ModuleVerificationTest {
+如果仅加载应用的一部分，某个定义可能会缺失完整应用所提供的依赖项。[编译器插件](/docs/reference/koin-compiler/compile-safety)会在构建时检查生产依赖图，而不是你的测试模块。要检查测试配置，请在 JVM 测试中使用 [verify()](/docs/reference/koin-test/verify)。
 
-    @Test
-    fun verifyAllModules() {
-        // 验证所有定义是否都已满足
-        appModule.verify()  // appModule 包含了其他模块
-    }
+## Espresso 与规则顺序 {id="espresso-and-rule-order"}
 
-    @Test
-    fun verifyTestModules() {
-        testAppModule.verify()
-    }
-}
-```
-
-:::tip
-Koin 编译器插件现在提供编译时依赖项验证，取代了对 `verify()` 和 `checkModules()` 的需求。详见[编译时安全性](/docs/reference/koin-compiler/compile-safety)。
-:::
-
-## 使用 Espresso 进行 UI 测试 {id="ui-tests-with-espresso"}
-
-### 完整的 UI 流程测试 {id="complete-ui-flow-test"}
+`ActivityScenarioRule` 会在测试方法运行前启动 Activity。如果它在 `KoinTestRule` 之前运行，Activity 将从错误的容器中解析其依赖项。请显式设置顺序：
 
 ```kotlin
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 class CheckoutFlowTest {
 
-    @get:Rule
-    val koinTestRule = KoinTestRule(
-        modules = listOf(
-            module {
-                viewModel { CheckoutViewModel(get(), get()) }
-                single<CartRepository> { FakeCartRepository() }
-                single<PaymentService> { FakePaymentService() }
-            }
-        )
-    )
+    @get:Rule(order = 0)
+    val koinTestRule = KoinTestRule.create {
+        androidContext(ApplicationProvider.getApplicationContext())
+        modules(appModule, module {
+            single<CartRepository> { FakeCartRepository() }
+            single<PaymentService> { FakePaymentService() }
+        })
+    }
 
-    @get:Rule
+    @get:Rule(order = 1)
     val activityRule = ActivityScenarioRule(MainActivity::class.java)
 
     @Test
-    fun testCompleteCheckoutFlow() {
-        // 导航到购物车
+    fun completeCheckout() {
         onView(withId(R.id.cartButton)).perform(click())
-
-        // 向购物车添加商品
-        onView(withId(R.id.addItemButton)).perform(click())
-        onView(withId(R.id.cartItemCount)).check(matches(withText("1")))
-
-        // 继续结账
         onView(withId(R.id.checkoutButton)).perform(click())
-
-        // 填写收货地址
-        onView(withId(R.id.addressField))
-            .perform(typeText("123 Main St"))
-
-        onView(withId(R.id.nextButton)).perform(click())
-
-        // 输入支付信息
-        onView(withId(R.id.cardNumberField))
-            .perform(typeText("4111111111111111"))
-
         onView(withId(R.id.completeOrderButton)).perform(click())
 
-        // 验证订单确认
-        onView(withId(R.id.confirmationMessage))
-            .check(matches(isDisplayed()))
+        onView(withId(R.id.confirmationMessage)).check(matches(isDisplayed()))
     }
 }
 ```
 
-### 测试导航 {id="testing-navigation"}
+`@get:Rule(order = ...)` 需要 JUnit 4.13 或更高版本。对于更低版本，请使用 `RuleChain.outerRule(koinTestRule).around(activityRule)`。
+
+## Compose UI 测试 {id="compose-ui-tests"}
+
+关于 Compose 屏幕，请参阅[测试 Composable](/docs/reference/koin-compose/compose-testing)。
+
+## 测试之间的隔离 {id="isolation-between-tests"}
+
+单独运行时能通过、一起运行时却失败的测试，通常是通过 Koin 共享了状态：
+
+- 每次测试时重启：`KoinTestRule` 为每次测试提供一个新容器，其中包含新的 `single` 实例。
+- 重置 Fake：使用[测试 Application](#use-a-test-application) 时，容器在整个运行期间一直存在。声明为 `single` 的 Fake 会在测试之间保留其数据，因此请为其提供 `reset()` 方法并在 `@Before` 中调用它。
+- 不要堆叠覆盖模块：使用 `loadKoinModules` 加载的模块将保持加载状态（参阅[将覆盖定义加载到正在运行的容器中](#load-overrides-into-the-running-container)）。
 
 ```kotlin
-@Test
-fun testNavigationWithSharedState() {
-    onView(withId(R.id.loginButton)).perform(click())
-
-    // 登录屏幕
-    onView(withId(R.id.emailField)).perform(typeText("user@example.com"))
-    onView(withId(R.id.passwordField)).perform(typeText("password"))
-    onView(withId(R.id.submitButton)).perform(click())
-
-    // 应该导航到主页
-    onView(withId(R.id.homeTitle)).check(matches(isDisplayed()))
-
-    // 用户数据应该是可用的（通过 Koin 共享）
-    onView(withId(R.id.welcomeMessage))
-        .check(matches(withText("Welcome, user@example.com")))
-}
-```
-
-## 测试隔离 {id="test-isolation"}
-
-### 确保测试之间的状态干净 {id="ensuring-clean-state-between-tests"}
-
-```kotlin
-class KoinIsolationTestRule : TestWatcher() {
-
-    override fun starting(description: Description) {
-        // 启动全新的 Koin 实例
-        startKoin {
-            androidContext(InstrumentationRegistry.getInstrumentation().targetContext)
-            modules(emptyList())
-        }
-    }
-
-    override fun finished(description: Description) {
-        // 每个测试后进行清理
-        stopKoin()
-    }
-}
-
 @RunWith(AndroidJUnit4::class)
-class IsolatedTest {
+class UserListTest : KoinTest {
 
-    @get:Rule
-    val isolationRule = KoinIsolationTestRule()
-
-    @Test
-    fun test1() {
-        loadKoinModules(module { single { "Test1" } })
-        assertEquals("Test1", get<String>())
-    }
-
-    @Test
-    fun test2() {
-        // 全新的 Koin 实例，不受 test1 的污染
-        loadKoinModules(module { single { "Test2" } })
-        assertEquals("Test2", get<String>())
-    }
-}
-```
-
-### 在测试之间重置虚假对象 (Fakes) {id="resetting-fakes-between-tests"}
-
-```kotlin
-class FakeUserRepository : UserRepository {
-    private val users = mutableListOf<User>()
-
-    override suspend fun getUser(id: String): User =
-        users.find { it.id == id } ?: throw UserNotFoundException()
-
-    fun reset() {
-        users.clear()
-    }
-}
-
-@RunWith(AndroidJUnit4::class)
-class UserTest {
-
-    private val fakeRepo = FakeUserRepository()
-
-    @get:Rule
-    val koinTestRule = KoinTestRule(
-        modules = listOf(
-            module {
-                single<UserRepository> { fakeRepo }
-            }
-        )
-    )
+    private val fakeRepository: FakeUserRepository by inject()
 
     @Before
-    fun setup() {
-        fakeRepo.reset()
-    }
-
-    @Test
-    fun test1() {
-        // 使用干净的仓库进行测试
-    }
-
-    @Test
-    fun test2() {
-        // 使用干净的仓库进行测试（已调用 reset）
+    fun before() {
+        fakeRepository.reset()
     }
 }
 ```
 
-## 常见模式 {id="common-patterns"}
-
-### 模式 1：共享测试模块 {id="pattern-1-shared-test-module"}
-
-```kotlin
-// androidTest 软件包中的 TestModules.kt
-object TestModules {
-
-    val fakeNetworkModule = module {
-        single<ApiService> { FakeApiService() }
-        single { OkHttpClient() }
-    }
-
-    val fakeDatabaseModule = module {
-        single { createInMemoryDatabase() }
-        single<UserDao> { get<AppDatabase>().userDao() }
-    }
-
-    val fakeDataModule = module {
-        single<UserRepository> { FakeUserRepository() }
-    }
-
-    fun createInMemoryDatabase(): AppDatabase {
-        return Room.inMemoryDatabaseBuilder(
-            InstrumentationRegistry.getInstrumentation().targetContext,
-            AppDatabase::class.java
-        ).build()
-    }
-}
-
-// 在测试中使用
-@get:Rule
-val koinTestRule = KoinTestRule(
-    modules = TestModules.fakeNetworkModule + TestModules.fakeDataModule
-)
-```
-
-### 模式 2：测试专用配置 {id="pattern-2-test-specific-configuration"}
-
-```kotlin
-class TestConfig {
-    companion object {
-        const val TEST_API_URL = "http://localhost:8080"
-        const val TEST_TIMEOUT_MS = 1000L
-    }
-}
-
-val testConfigModule = module {
-    single {
-        OkHttpClient.Builder()
-            .connectTimeout(TestConfig.TEST_TIMEOUT_MS, TimeUnit.MILLISECONDS)
-            .build()
-    }
-
-    single {
-        Retrofit.Builder()
-            .baseUrl(TestConfig.TEST_API_URL)
-            .client(get())
-            .build()
-    }
-}
-```
-
-### 模式 3：针对每个测试进行重写 {id="pattern-3-per-test-override"}
-
-```kotlin
-@RunWith(AndroidJUnit4::class)
-class FlexibleTest : KoinTest {
-
-    @get:Rule
-    val koinTestRule = KoinTestRule(modules = emptyList())
-
-    @Test
-    fun testWithFakeRepo() {
-        loadKoinModules(module {
-            single<UserRepository> { FakeUserRepository() }
-        })
-
-        // 测试代码
-    }
-
-    @Test
-    fun testWithMockRepo() {
-        loadKoinModules(module {
-            single<UserRepository> { mockk<UserRepository>() }
-        })
-
-        // 测试代码
-    }
-
-    @After
-    fun cleanup() {
-        unloadKoinModules(/* 测试中加载的模块 */)
-    }
-}
-```
+仅当测试模块也将 Fake 绑定到其自身类型时，`by inject<FakeUserRepository>()` 才能正常工作：`single { FakeUserRepository() } bind UserRepository::class`。
 
 ## 故障排除 {id="troubleshooting"}
 
-### 问题：Koin 已启动 {id="issue-koin-already-started"}
+### KoinApplicationAlreadyStartedException {id="koinapplicationalreadystartedexception"}
 
-**问题：**
-```
-org.koin.core.error.KoinAppAlreadyStartedException: A Koin Application has already been started
-```
+在容器已在运行时执行了第二次 `startKoin` 调用。在插桩测试中，你的 `Application` 已经启动了 Koin。请使用 `KoinTestRule`（它会先关闭正在运行的容器），或使用[测试 Application](#use-a-test-application)。不要在 `@Before` 中调用 `startKoin`。
 
-**解决方案：**
-```kotlin
-class SafeKoinTestRule : TestWatcher() {
-    override fun starting(description: Description) {
-        // 检查 Koin 是否已经启动
-        if (getKoinApplicationOrNull() == null) {
-            startKoin {
-                modules(testModules)
-            }
-        } else {
-            // 将模块加载到现有的 Koin 实例中
-            loadKoinModules(testModules)
-        }
-    }
+### 未使用测试定义 {id="the-test-definition-is-not-used"}
 
-    override fun finished(description: Description) {
-        // 不要停止 Koin，只需卸载测试模块
-        unloadKoinModules(testModules)
-    }
-}
-```
+- 加载顺序：测试模块必须在声明相同类型的生产模块之后加载。
+- 禁用覆盖：如果 Koin 在启动时设置了 `allowOverride(false)`，请使用 `.override()` 标记测试定义（参阅[定义](/docs/reference/koin-core/definitions#overriding-a-definition)）。
+- 实例已创建：在覆盖之前创建的 `single` 会保留旧的依赖项。请使用测试规则重启 Koin。
+- 规则顺序：Activity 在 Koin 配置完成之前就已启动（参阅 [Espresso 与规则顺序](#espresso-and-rule-order)）。
 
-### 问题：定义重写未生效 {id="issue-definition-override-doesn-t-work"}
+### 作用域定义出现 NoDefinitionFoundException {id="nodefinitionfoundexception-for-a-scoped-definition"}
 
-**问题：**
-测试定义没有替换生产环境定义。
+在解析作用域定义时，作用域尚未开启。请在 Activity 处于存活状态时在 `scenario.onActivity { }` 中解析作用域定义，并检查该定义是否声明在正确的作用域（`activityScope`、`fragmentScope`）中。
 
-**解决方案：**
-```kotlin
-// 使用 override = true
-val testModule = module {
-    single<UserRepository>(override = true) { FakeUserRepository() }
-}
+## 相关内容 {id="related"}
 
-// 或使用 includes 进行替换
-val testModule = module {
-    includes(productionModule)
-} + module {
-    single<UserRepository>(override = true) { FakeUserRepository() }
-}
-```
-
-### 问题：未找到作用域 (Scope) {id="issue-scope-not-found"}
-
-**问题：**
-```
-org.koin.core.error.NoBeanDefFoundException: No definition found for class X
-```
-
-**解决方案：**
-```kotlin
-// 确保在访问之前已创建作用域
-val scenario = ActivityScenario.launch(MyActivity::class.java)
-
-scenario.onActivity { activity ->
-    // 作用域在此处存在
-    val dependency = activity.scope.get<MyDependency>()
-}
-```
-
-### 问题：测试互相影响 {id="issue-tests-affecting-each-other"}
-
-**问题：**
-测试单独运行时通过，但一起运行时失败。
-
-**解决方案：**
-```kotlin
-// 测试之间的妥善清理
-@After
-fun tearDown() {
-    // 关闭作用域
-    getKoin().scopeRegistry.deleteScope("test_scope")
-
-    // 重置虚假对象
-    fakeRepository.reset()
-
-    // 卸载测试模块
-    unloadKoinModules(testModules)
-}
-```
-
-### 问题：ViewModel 未更新 UI {id="issue-viewmodel-not-updating-ui"}
-
-**问题：**
-ViewModel 状态发生了变化，但在测试中 UI 未更新。
-
-**解决方案：**
-```kotlin
-// 对于异步操作，使用 Espresso 的 IdlingResource
-@get:Rule
-val activityRule = ActivityScenarioRule(MyActivity::class.java)
-
-@Test
-fun testViewModelUpdatesUI() = runTest {
-    activityRule.scenario.onActivity { activity ->
-        val viewModel: MyViewModel = activity.viewModel
-
-        // 触发异步操作
-        viewModel.loadData()
-
-        // 等待 LiveData/StateFlow 发射
-        advanceUntilIdle()
-
-        // 然后验证 UI
-        onView(withId(R.id.dataText))
-            .check(matches(withText("Data Loaded")))
-    }
-}
-```
-
-## 最佳做法 {id="best-practices"}
-
-### 1. 为测试使用内存数据库 {id="1-use-in-memory-database-for-tests"}
-
-```kotlin
-val testDatabaseModule = module {
-    single {
-        Room.inMemoryDatabaseBuilder(
-            androidContext(),
-            AppDatabase::class.java
-        ).build()
-    }
-}
-```
-
-### 2. 保持测试模块专注 {id="2-keep-test-modules-focused"}
-
-```kotlin
-// ✅ 推荐 - 专注的测试模块
-val loginTestModule = module {
-    viewModel { LoginViewModel(get()) }
-    single<AuthService> { FakeAuthService() }
-}
-
-// ❌ 不推荐 - 范围过广
-val hugeTestModule = module {
-    // 50 多个定义...
-}
-```
-
-### 3. 共享通用的虚假对象 (Fakes) {id="3-share-common-fakes"}
-
-```kotlin
-// 创建可重用的测试替身
-object TestDoubles {
-    fun createFakeUserRepository() = FakeUserRepository().apply {
-        addUser(User("1", "Test User"))
-    }
-
-    fun createMockApiService() = mockk<ApiService> {
-        coEvery { getUser(any()) } returns User("1", "Test User")
-    }
-}
-```
-
-### 4. 测试真实的集成点 {id="4-test-real-integration-points"}
-
-```kotlin
-// 测试真实的 Room + Repository 集成
-@Test
-fun testDatabaseIntegration() = runTest {
-    val database = Room.inMemoryDatabaseBuilder(
-        context,
-        AppDatabase::class.java
-    ).build()
-
-    val repo = UserRepositoryImpl(database.userDao())
-
-    repo.saveUser(User("1", "Test"))
-    val user = repo.getUser("1")
-
-    assertEquals("Test", user.name)
-}
-```
-
-### 5. 使用描述性的测试名称 {id="5-use-descriptive-test-names"}
-
-```kotlin
-// ✅ 推荐
-@Test
-fun loginWithValidCredentials_navigatesToHomeScreen()
-
-@Test
-fun loginWithInvalidEmail_showsEmailError()
-
-// ❌ 不推荐
-@Test
-fun test1()
-
-@Test
-fun testLogin()
-```
-
-## 总结 {id="summary"}
-
-使用 Koin 进行仪器化测试的关键点：
-
-- 使用**自定义测试 Application** 或**测试规则**进行 Koin 配置
-- 使用 `override = true` 或测试专用模块来**重写模块**
-- 在仪器化测试中，**使用虚假对象 (Fakes) 优于模拟对象 (Mocks)**，以获得更好的性能
-- **测试隔离**至关重要 - 在测试之间进行清理
-- 使用**内存数据库**进行快速、隔离的数据库测试
-- **Compose 测试**可以与 `KoinContext` 无缝协作
-- **作用域测试**验证了生命周期绑定的依赖项
-- 使用 Koin 编译器插件进行**模块验证**（编译时）或使用 `verify()`（运行时）可以尽早发现配置错误
-
-## 下一步 {id="next-steps"}
-
-- **[单元测试](/docs/reference/koin-test/testing)** - 单元测试的测试策略
-- **[模块验证](/docs/reference/koin-test/verify)** - 验证模块配置
-- **[多模块应用](/docs/reference/koin-android/multi-module)** - 测试多模块架构
-- **[最佳做法](/docs/reference/koin-android/best-practices)** - Koin 总体最佳做法
+- [单元测试](/docs/reference/koin-test/testing)：`KoinTest`、`KoinTestRule`、`declareMock` 与覆盖。
+- [测试 Composable](/docs/reference/koin-compose/compose-testing)：Compose UI 测试和预览。
+- [验证配置](/docs/reference/koin-test/verify)：`verify()` 与 `androidVerify()`。
+- [Android 作用域](/docs/reference/koin-android/scope)：Activity、Fragment 与 ViewModel 作用域。
+- [在 Android 上启动 Koin](/docs/reference/koin-android/start)：在 `Application` 中使用 `startKoin`。

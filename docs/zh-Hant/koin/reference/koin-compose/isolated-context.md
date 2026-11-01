@@ -1,289 +1,138 @@
 ---
-title: 隔離上下文
+title: Compose 中的隔離上下文
 ---
 
 # Compose 中的隔離上下文
 
-Koin 的隔離上下文 (Isolated Context) 允許您執行一個獨立的 Koin 執行個體，該執行個體不會干擾宿主應用程式 (host application) 的 Koin 配置。這對於 SDK、程式庫和白牌 (white-label) 應用程式至關重要。
+本頁面將介紹如何使用 `KoinIsolatedContext`，讓 Compose 函式從隔離的 Koin 執行個體中解析相依性。當您建置提供 Composable 且不得與宿主應用程式共用 Koin 容器的 SDK 或程式庫時，請使用此功能。關於什麼是隔離上下文以及如何建立它，請參閱[上下文隔離](/docs/reference/koin-core/context-isolation)。
 
-## 使用案例 {id="use-cases"}
+## KoinIsolatedContext {id="koinisolatedcontext"}
 
-- **SDK 開發**：您的 SDK 擁有自己的相依性，且不會影響到宿主應用程式。
-- **白牌應用程式**：具有不同配置的多個應用程式變體。
-- **測試**：隔離的測試配置。
-- **功能模組**：帶有自有 DI 的自包含功能模組。
+如[上下文隔離](/docs/reference/koin-core/context-isolation)中所述，將隔離的 `KoinApplication` 保存在靜態持有者中：
 
-## 建立隔離上下文 {id="creating-an-isolated-context"}
-
-### 定義上下文持有者 {id="define-the-context-holder"}
-
-建立一個物件來持有您的隔離 Koin 執行個體：
-
+**編譯器外掛程式 DSL**
 ```kotlin
-object MySDKKoinContext {
+object PaymentSdkKoin {
     val koinApp = koinApplication {
-        // 您的 SDK 模組
-        modules(
-            sdkCoreModule,
-            sdkNetworkModule,
-            sdkRepositoryModule
-        )
+        modules(paymentModule)
     }
+}
 
-    // 便利存取子
-    val koin: Koin get() = koinApp.koin
+internal val paymentModule = module {
+    single<PaymentProcessor>()
+    viewModel<PaymentViewModel>()
 }
 ```
 
-### SDK 模組範例 {id="sdk-module-example"}
+**註解**
+```kotlin
+import org.koin.plugin.module.dsl.koinApplication
+
+@Module
+@ComponentScan("com.example.paymentsdk")
+internal class PaymentModule
+
+@KoinApplication(modules = [PaymentModule::class])
+internal object PaymentSdkApp
+
+object PaymentSdkKoin {
+    val koinApp = koinApplication<PaymentSdkApp>()
+}
+```
+
+**建構函式 / 傳統 DSL**
+```kotlin
+object PaymentSdkKoin {
+    val koinApp = koinApplication {
+        modules(paymentModule)
+    }
+}
+
+internal val paymentModule = module {
+    singleOf(::PaymentProcessor)
+    viewModelOf(::PaymentViewModel)
+}
+```
+
+使用 `KoinIsolatedContext` 包裝 SDK UI：
 
 ```kotlin
-val sdkCoreModule = module {
-    single<SDKConfiguration>()
-    single<SDKLogger>()
+import org.koin.compose.KoinIsolatedContext
+
+@Composable
+fun PaymentScreen(amount: Double, onDone: (PaymentResult) -> Unit) {
+    KoinIsolatedContext(context = PaymentSdkKoin.koinApp) {
+        PaymentFlow(amount, onDone)
+    }
 }
 
-val sdkNetworkModule = module {
-    single<SDKApiClient>()
-    single<SDKAuthManager>()
-}
-
-val sdkRepositoryModule = module {
-    single<SDKDataRepository>()
+@Composable
+private fun PaymentFlow(amount: Double, onDone: (PaymentResult) -> Unit) {
+    val viewModel = koinViewModel<PaymentViewModel>() // 從 SDK 的 Koin 解析
+    // ...
 }
 ```
 
-## 在 Compose 中使用 {id="using-with-compose"}
+在區塊內部，`koinInject()`、`koinViewModel()`、`getKoin()`、`currentKoinScope()` 和 `rememberKoinModules()` 都會使用該隔離執行個體。在區塊外部，宿主應用程式則保留其自身的 Koin。
 
-### KoinIsolatedContext {id="koinisolatedcontext"}
+## 同一畫面中的宿主與 SDK {id="host-and-sdk-in-the-same-screen"}
 
-使用 `KoinIsolatedContext` 包裝您 SDK 的 Compose UI：
+在區塊外部解析宿主的相依性，並在區塊內部解析 SDK 的相依性：
 
 ```kotlin
 @Composable
-fun MySDKScreen() {
-    KoinIsolatedContext(context = MySDKKoinContext.koinApp) {
-        // 所有 Koin API 都會使用隔離上下文
-        SDKContent()
-    }
-}
+fun CheckoutScreen() {
+    val analytics = koinInject<HostAnalytics>() // 宿主應用程式的 Koin
 
-@Composable
-private fun SDKContent() {
-    // 這些會從隔離上下文中解析
-    val config = koinInject<SDKConfiguration>()
-    val viewModel = koinViewModel<SDKViewModel>()
-
-    Column {
-        Text("SDK Version: ${config.version}")
-        SDKFeatureScreen(viewModel)
+    KoinIsolatedContext(context = PaymentSdkKoin.koinApp) {
+        val processor = koinInject<PaymentProcessor>() // SDK 的 Koin
+        PaymentButton(processor, onEvent = { analytics.track(it) })
     }
 }
 ```
 
-### 巢狀上下文 {id="nested-contexts"}
+這兩個容器互不可見。請透過參數與回呼跨邊界傳遞值。
 
-您可以巢狀隔離上下文：
+## 初始化與關閉 {id="initialization-and-shutdown"}
 
-```kotlin
-@Composable
-fun HostApp() {
-    // 宿主應用程式的 Koin 上下文 (來自 startKoin)
-    val hostService = koinInject<HostService>()
-
-    Column {
-        Text("Host App")
-
-        // SDK 使用其自有的隔離上下文
-        KoinIsolatedContext(context = MySDKKoinContext.koinApp) {
-            MySDKScreen()
-        }
-
-        // 回到宿主上下文
-        AnotherHostScreen()
-    }
-}
-```
-
-## 生命週期管理 {id="lifecycle-management"}
-
-### 手動初始化 {id="manual-initialization"}
-
-在需要時初始化您的 SDK 上下文：
+當 SDK 需要來自宿主的設定時，請在 `initialize` 函式中建立 `KoinApplication`，並在關閉時將其關閉：
 
 ```kotlin
-object MySDK {
-    private var _koinContext: KoinApplication? = null
-    val koinContext: KoinApplication
-        get() = _koinContext ?: error("SDK not initialized")
+object PaymentSdk {
+    private var koinApp: KoinApplication? = null
 
-    fun initialize(config: SDKConfig) {
-        _koinContext = koinApplication {
-            modules(
-                module {
-                    single { config }
-                },
-                sdkCoreModule,
-                sdkNetworkModule
-            )
+    fun initialize(config: PaymentConfig) {
+        koinApp = koinApplication {
+            modules(module { single { config } }, paymentModule)
         }
     }
 
     fun shutdown() {
-        _koinContext?.close()
-        _koinContext = null
-    }
-}
-```
-
-### 搭配手動生命週期使用 {id="usage-with-manual-lifecycle"}
-
-```kotlin
-// 宿主應用程式初始化 SDK
-class HostApplication : Application() {
-    override fun onCreate() {
-        super.onCreate()
-
-        // 宿主應用程式的 Koin
-        startKoin {
-            androidContext(this@HostApplication)
-            modules(hostAppModule)
-        }
-
-        // SDK 的隔離 Koin
-        MySDK.initialize(SDKConfig(apiKey = "xxx"))
-    }
-
-    override fun onTerminate() {
-        super.onTerminate()
-        MySDK.shutdown()
-    }
-}
-
-// 在 Compose 中
-@Composable
-fun SDKFeature() {
-    KoinIsolatedContext(context = MySDK.koinContext) {
-        SDKScreen()
-    }
-}
-```
-
-## 存取兩個上下文 {id="accessing-both-contexts"}
-
-有時您需要同時存取宿主和 SDK 的相依性：
-
-```kotlin
-@Composable
-fun BridgeScreen() {
-    // 從宿主上下文取得 (在 KoinIsolatedContext 之外)
-    val hostAnalytics = koinInject<HostAnalytics>()
-
-    KoinIsolatedContext(context = MySDKKoinContext.koinApp) {
-        // 從 SDK 上下文取得 (在 KoinIsolatedContext 之內)
-        val sdkService = koinInject<SDKService>()
-
-        // 同時使用兩者
-        SDKFeature(
-            service = sdkService,
-            onEvent = { hostAnalytics.track(it) }
-        )
-    }
-}
-```
-
-## 完整的 SDK 範例 {id="complete-sdk-example"}
-
-```kotlin
-// SDK 公開 API
-object PaymentSDK {
-    private lateinit var koinApp: KoinApplication
-
-    fun initialize(config: PaymentConfig) {
-        koinApp = koinApplication {
-            modules(
-                module { single { config } },
-                paymentCoreModule,
-                paymentUIModule
-            )
-        }
+        koinApp?.close()
+        koinApp = null
     }
 
     @Composable
-    fun PaymentScreen(
-        amount: Double,
-        onSuccess: (PaymentResult) -> Unit,
-        onCancel: () -> Unit
-    ) {
-        KoinIsolatedContext(context = koinApp) {
-            PaymentFlow(
-                amount = amount,
-                onSuccess = onSuccess,
-                onCancel = onCancel
-            )
-        }
-    }
-}
-
-// SDK 內部模組
-private val paymentCoreModule = module {
-    single<PaymentProcessor>()
-    single<PaymentValidator>()
-}
-
-private val paymentUIModule = module {
-    viewModel<PaymentViewModel>()
-}
-
-// SDK 內部 UI
-@Composable
-private fun PaymentFlow(
-    amount: Double,
-    onSuccess: (PaymentResult) -> Unit,
-    onCancel: () -> Unit
-) {
-    val viewModel = koinViewModel<PaymentViewModel>()
-
-    PaymentUI(
-        amount = amount,
-        state = viewModel.state,
-        onPay = { viewModel.processPayment(amount, onSuccess) },
-        onCancel = onCancel
-    )
-}
-
-// 宿主應用程式使用方式
-@Composable
-fun CheckoutScreen() {
-    var showPayment by remember { mutableStateOf(false) }
-
-    if (showPayment) {
-        PaymentSDK.PaymentScreen(
-            amount = 99.99,
-            onSuccess = { result ->
-                showPayment = false
-                // 處理成功
-            },
-            onCancel = { showPayment = false }
-        )
-    } else {
-        Button(onClick = { showPayment = true }) {
-            Text("Pay Now")
+    fun PaymentScreen(amount: Double, onDone: (PaymentResult) -> Unit) {
+        val app = koinApp ?: error("PaymentSdk.initialize() was not called")
+        KoinIsolatedContext(context = app) {
+            PaymentFlow(amount, onDone)
         }
     }
 }
 ```
 
-## 最佳實務 {id="best-practices"}
+宿主在顯示任何 SDK 畫面之前呼叫一次 `PaymentSdk.initialize(...)`，例如在 `Application.onCreate()` 中。
 
-1.  **提早初始化**：在 Compose 渲染之前設定好隔離上下文。
-2.  **清理資源**：完成後在 `KoinApplication` 上呼叫 `close()`。
-3.  **不要共用執行個體**：保持 SDK 和宿主相依性相互分離。
-4.  **使用介面邊界**：透過回呼 (callback) 或介面進行通訊，而非共用 Koin 執行個體。
-5.  **記錄初始化文件**：向宿主應用程式開發人員清楚說明 SDK 的設定需求。
+## 限制 {id="limits"}
 
-## 下一步 {id="next-steps"}
+- **KoinNavigationScope**：它會在全域 Koin 執行個體中建立其作用域，因此不會遵循 `KoinIsolatedContext`。請改為在隔離區塊內部使用 `KoinScope`（請參閱 [Compose 中的作用域](/docs/reference/koin-compose/compose-scopes)）。
+- **Compose 外部的程式碼**：SDK 類別透過其建構函式從隔離執行個體接收其相依性。若 Compose 外部的 SDK 入口點（`Service`、宿主呼叫的回呼）必須自行擷取相依性，則應使用覆寫 `getKoin()` 的 `KoinComponent`。請參閱[上下文隔離](/docs/reference/koin-core/context-isolation)。
+- **生命週期**：`KoinIsolatedContext` 不會啟動或停止該執行個體。您必須自行管理其生命週期。
 
-- **[Compose 概覽](/docs/reference/koin-compose/compose)** – 基本 Compose 設定
-- **[上下文隔離](/docs/reference/koin-core/context-isolation)** – 核心隔離概念
-- **[作用域](/docs/reference/koin-compose/compose-scopes)** – Compose 中的作用域管理
+## 相關內容 {id="related"}
+
+- [上下文隔離](/docs/reference/koin-core/context-isolation)：建立隔離的 Koin 執行個體與自訂 `KoinComponent`。
+- [Koin for Compose](/docs/reference/koin-compose/compose)：`KoinApplication` 與 `koinInject()`。
+- [Compose 中的作用域](/docs/reference/koin-compose/compose-scopes)：隔離區塊內部的作用域。
+- [Ktor 中的隔離上下文](/docs/reference/koin-ktor/ktor-isolated)：適用於 Ktor 伺服器的相同概念。

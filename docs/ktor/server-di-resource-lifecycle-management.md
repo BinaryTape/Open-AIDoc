@@ -4,12 +4,12 @@
 
 <tldr>
 <p>
-<b>所需依赖项</b>：<code>io.ktor:ktor-server-di</code>
+<b>所需依赖项</b>: <code>io.ktor:ktor-server-di</code>
 </p>
 <var name="example_name" value="server-di"/>
 <p>
-    <b>代码示例</b>：
-    <a href="https://github.com/ktorio/ktor-documentation/tree/%ktor_version%/codeSnippets/snippets/%example_name%">
+    <b>代码示例</b>:
+    <a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/%example_name%">
         %example_name%
     </a>
 </p>
@@ -19,7 +19,7 @@
 
 ### AutoCloseable 支持 {id="autocloseable-support"}
 
-默认情况下，任何实现 `AutoCloseable` 的依赖项都会在应用程序停止时自动关闭：
+默认情况下，任何实现了 `AutoCloseable` 的依赖项都会在应用程序停止时自动关闭：
 
 ```kotlin
 class DatabaseConnection : AutoCloseable {
@@ -35,7 +35,7 @@ dependencies {
 
 ### 自定义清理逻辑 {id="custom-cleanup-logic"}
 
-您可以通过指定 `cleanup` 函数来定义自定义清理逻辑：
+您可以通过指定 `cleanup` 函数来自定义清理逻辑：
 
 ```kotlin
 dependencies {
@@ -47,7 +47,7 @@ dependencies {
 
 ### 使用 key 进行作用域清理 {id="scoped-cleanup-with-key"}
 
-使用 `key` 来管理命名资源及其清理：
+使用 `key` 管理指定名称的资源及其清理：
 
 ```kotlin
 dependencies {
@@ -58,4 +58,4 @@ dependencies {
 }
 ```
 
-依赖项按照声明的相反顺序进行清理，以确保正确拆卸。
+依赖项按声明的相反顺序进行清理，以确保正确拆卸。

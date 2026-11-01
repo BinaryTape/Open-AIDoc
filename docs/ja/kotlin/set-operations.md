@@ -1,16 +1,16 @@
 [//]: # (title: Set固有の操作)
 
-Kotlinのコレクションパッケージには、積集合（intersection）の取得、マージ、またはコレクション同士の差集合（subtraction）の算出といった、Set（集合）でよく使われる操作のための拡張関数が含まれています。
+Kotlinのコレクションパッケージには、共通部分（積集合）の取得、コレクション同士のマージ（和集合）、またはコレクション間の差分（差集合）の取得といった、セットに対する一般的な操作のための拡張関数が含まれています。
 
-2つのコレクションを1つにマージするには、[`union()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/union.html) 関数を使用します。これは中置形式（infix form）の `a union b` としても使用できます。
-順序のあるコレクションの場合、オペランド（被演算子）の順序が重要になることに注意してください。結果のコレクションでは、最初のオペランドの要素が2番目のオペランドの要素よりも前に配置されます。
+2つのコレクションを1つにマージするには、[`union()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/union.html) 関数を使用します。この関数は、中置構文（infix形式）`a union b` としても使用できます。
+順序付けられたコレクションの場合、オペランドの順序が重要になる点に注意してください。結果として得られるコレクションでは、第1オペランドの要素が第2オペランドの要素よりも前に配置されます。
 
 ```kotlin
 fun main() {
 //sampleStart
     val numbers = setOf("one", "two", "three")
 
-    // 順序に従って出力される
+    // 順序に従って出力
     println(numbers union setOf("four", "five"))
     // [one, two, three, four, five]
     println(setOf("four", "five") union numbers)
@@ -18,11 +18,11 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-2つのコレクション間の積集合（両方に存在する要素）を見つけるには、[`intersect()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/intersect.html) 関数を使用します。
-別のコレクションに存在しないコレクション要素を見つけるには、[`subtract()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/subtract.html) 関数を使用します。
-これらの関数はどちらも、例えば `a intersect b` のように中置形式で呼び出すことも可能です。
+2つのコレクション間の共通部分（両方に存在する要素）を見つけるには、[`intersect()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/intersect.html) 関数を使用します。
+別のコレクションに存在しない要素を見つけるには、[`subtract()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/subtract.html) 関数を使用します。
+これらの関数も両方とも、例えば `a intersect b` のように中置構文で呼び出すことができます。
 
 ```kotlin
 fun main() {
@@ -39,10 +39,10 @@ fun main() {
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-2つのコレクションのいずれかに存在するが、その積集合には含まれない要素を見つけるために、`union()` 関数を使用することもできます。
-この操作（対称差（symmetric difference）として知られています）を行うには、2つのコレクション間の差をそれぞれ計算し、その結果をマージします。
+2つのコレクションのいずれか一方にのみ存在し、共通部分には存在しない要素を見つけるためにも、`union()` 関数を使用できます。
+この操作（対称差として知られています）を行うには、2つのコレクション間のそれぞれの差分を計算し、その結果をマージします。
 
 ```kotlin
 fun main() {
@@ -50,16 +50,16 @@ fun main() {
     val numbers = setOf("one", "two", "three")
     val numbers2 = setOf("three", "four")
 
-    // 差集合をマージする
+    // 差分をマージ
     println((numbers - numbers2) union (numbers2 - numbers))
     // [one, two, four]
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}
 
-`union()`、`intersect()`、および `subtract()` 関数はリストに対しても適用できます。
-ただし、その結果は*常に* `Set` になります。この結果では、重複するすべての要素は1つにまとめられ、インデックスによるアクセスは利用できなくなります。
+`union()`、`intersect()`、`subtract()` 関数はリストに対しても適用できます。
+ただし、その結果は_常に_ `Set` になります。この結果では、重複する要素はすべて1つにまとめられ、インデックスによるアクセスはできなくなります。
 
 ```kotlin
 fun main() {
@@ -67,14 +67,14 @@ fun main() {
     val list1 = listOf(1, 1, 2, 3, 5, 8, -1)
     val list2 = listOf(1, 1, 2, 2, 3, 5)
 
-    // 2つのリストの積集合の結果は Set になる
+    // 2つのリストの積集合（intersect）の結果はSetになる
     println(list1 intersect list2)
     // [1, 2, 3, 5]
 
-    // 同一の要素は1つにまとめられる
+    // 等しい要素は1つにマージされる
     println(list1 union list2)
     // [1, 2, 3, 5, 8, -1]
 //sampleEnd
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
+{kotlin-runnable="true"}

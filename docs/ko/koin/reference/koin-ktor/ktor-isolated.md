@@ -1,24 +1,20 @@
 ---
-title: 격리된 컨텍스트
+title: Ktor의 격리된 컨텍스트
 ---
 
-# Ktor에서의 격리된 컨텍스트
+# Ktor의 격리된 컨텍스트
 
-`KoinIsolated` 플러그인은 전역 Koin 인스턴스와는 별개로 격리된 컨텍스트(isolated context)에서 Koin을 실행합니다. 이는 테스트, 멀티 테넌트(multi-tenant) 애플리케이션, 그리고 여러 Koin 인스턴스를 실행하는 데 유용합니다.
+이 페이지에서는 Koin을 글로벌 컨텍스트(Global Context)에 등록하지 않고 단일 Ktor 애플리케이션을 위해 시작하는 `KoinIsolated` 플러그인을 다룹니다. 이렇게 하면 각 애플리케이션이 고유한 컨테이너를 갖게 됩니다. 격리된 컨텍스트의 개념과 사용 시점에 대한 설명은 [Context Isolation](/docs/reference/koin-core/context-isolation)을 참고하세요. 일반적인 `Koin` 플러그인에 대한 설명은 [Koin for Ktor](/docs/reference/koin-ktor/ktor)에 나와 있습니다.
 
-## 격리된 컨텍스트를 사용하는 경우 {id="when-to-use-isolated-context"}
+## KoinIsolated 설치 {id="installing-koinisolated"}
 
-- **테스트** - 각 테스트는 자신만의 격리된 Koin 인스턴스를 가집니다.
-- **멀티 테넌트 애플리케이션** - 서로 다른 설정을 가진 다양한 테넌트들을 지원할 때 유용합니다.
-- **플러그인/모듈 시스템** - 자체 의존성을 가진 독립적인 모듈을 구성할 때 유용합니다.
-- **내장형(Embedded) Ktor 서버** - 동일한 JVM 내에서 여러 Ktor 인스턴스를 실행할 때 유용합니다.
+`Koin` 대신 `KoinIsolated`를 설치합니다. 설정 블록은 동일합니다:
 
-## 기본 설정 {id="basic-setup"}
-
-`Koin` 대신 `KoinIsolated`를 설치합니다:
-
+**Compiler Plugin DSL**
 ```kotlin
-fun Application.main() {
+import org.koin.ktor.plugin.KoinIsolated
+
+fun Application.module() {
     install(KoinIsolated) {
         slf4jLogger()
         modules(appModule)
@@ -26,246 +22,100 @@ fun Application.main() {
 }
 ```
 
-## 전역 컨텍스트 vs 격리된 컨텍스트 {id="global-vs-isolated-context"}
-
-### 전역 컨텍스트 (기본값) {id="global-context-default"}
-
+**Annotations**
 ```kotlin
-// GlobalContext를 사용하며, 애플리케이션 전체에서 공유됩니다.
-install(Koin) {
-    modules(appModule)
-}
+import org.koin.ktor.plugin.KoinIsolated
+import org.koin.plugin.module.dsl.withConfiguration
 
-// GlobalContext를 통해 어디서나 Koin에 접근할 수 있습니다.
-val service = GlobalContext.get().get<UserService>()
-```
-
-### 격리된 컨텍스트 {id="isolated-context"}
-
-```kotlin
-// 격리된 컨텍스트를 사용하며, GlobalContext를 통해 접근할 수 없습니다.
-install(KoinIsolated) {
-    modules(appModule)
-}
-
-// GlobalContext.get()은 이 Koin 인스턴스를 반환하지 않습니다.
-// 오직 Ktor 애플리케이션 스코프 내에서만 접근 가능합니다.
-```
-
-:::warning
-`KoinIsolated`를 사용할 때는 `GlobalContext`를 통해 Koin에 접근할 수 없습니다. 모든 주입(injection)은 `inject()` 또는 `get()`을 사용하여 Ktor 애플리케이션 스코프 내에서 이루어져야 합니다.
-:::
-
-## 전체 예제 {id="complete-example"}
-
-```kotlin
-val appModule = module {
-    singleOf(::UserRepository)
-    singleOf(::UserService)
-
-    requestScope {
-        scopedOf(::RequestLogger)
+fun Application.module() {
+    install(KoinIsolated) {
+        slf4jLogger()
+        withConfiguration<KoinUserApplication>()
     }
 }
+```
 
-fun Application.main() {
-    // 격리 모드로 Koin 설치
+**Constructor / Classic DSL**
+```kotlin
+import org.koin.ktor.plugin.KoinIsolated
+
+fun Application.module() {
     install(KoinIsolated) {
         slf4jLogger()
         modules(appModule)
     }
+}
+```
 
-    // Application 스코프 내에서 주입이 작동함
+## Koin과 비교하여 달라지는 점 {id="what-changes-compared-to-koin"}
+
+| | `install(Koin)` | `install(KoinIsolated)` |
+|---|---|---|
+| 글로벌 컨텍스트에 등록 여부 | 예 | 아니요 |
+| `Application`, `Route`, `Routing`, `ApplicationCall`에서의 `inject()` / `get()` | 예 | 예 (해당 애플리케이션의 인스턴스로부터) |
+| 요청 스코프(Request scope) 및 `call.scope` | 예 | 예 |
+| 수명 주기 이벤트(Lifecycle events), `ApplicationStopping` 시 종료 | 예 | 예 |
+| Ktor DI로의 `bridge { }` | 예 | Koin 4.2에서는 적용되지 않음 |
+| `KoinComponent` 클래스, `KoinPlatform.getKoin()` | 이 인스턴스를 참조함 | 이 인스턴스를 참조하지 못함 |
+
+Ktor 확장 함수는 애플리케이션 어트리뷰트(attributes)에 저장된 Koin 인스턴스를 읽으므로 라우트(route)에서의 주입은 동일하게 작동합니다:
+
+```kotlin
+fun Application.module() {
+    install(KoinIsolated) {
+        modules(appModule)
+    }
+
     val userService by inject<UserService>()
+    val koin = getKoin() // 이 애플리케이션의 Koin 인스턴스
 
     routing {
         get("/users/{id}") {
             val logger = call.scope.get<RequestLogger>()
-            val id = call.parameters["id"]!!
-
-            logger.log("Fetching user $id")
-            val user = userService.getUser(id)
-
-            call.respond(user)
+            call.respond(userService.getUser(call.parameters["id"]!!))
         }
     }
 }
 ```
 
-## DI 브리지 사용 시 {id="with-di-bridge"}
+:::warning
+Ktor 리시버 외부의 코드는 격리된 인스턴스에 접근할 수 없습니다. `KoinComponent`를 구현하는 클래스나 `KoinPlatform.getKoin()` 호출은 글로벌 컨텍스트를 사용하므로 "KoinApplication has not been started" 오류와 함께 실패합니다. 클래스의 의존성은 격리된 모듈에 선언하고 생성자 파라미터를 통해 전달하세요. 직접 의존성을 가져와야 하는 상호 운용(interop) 진입점의 경우, [Context Isolation](/docs/reference/koin-core/context-isolation)에 나온 대로 `getKoin()`을 오버라이드하세요.
+:::
 
-격리된 컨텍스트는 Ktor DI 브리지(DI Bridge)도 지원합니다:
+## 하나의 JVM 내 여러 서버 {id="several-servers-in-one-jvm"}
 
-```kotlin
-fun Application.main() {
-    // Ktor DI - 인프라스트럭처
-    val database = Database(environment.config)
-    dependencies {
-        provide<Database> { database }
-    }
-
-    // 브리지가 포함된 Koin Isolated
-    install(KoinIsolated) {
-        slf4jLogger()
-
-        bridge {
-            koinToKtor()  // Koin이 Ktor DI로부터 의존성을 해결할 수 있도록 허용
-        }
-
-        modules(appModule)
-    }
-
-    routing {
-        userRoutes()
-    }
-}
-
-val appModule = module {
-    // 브리지를 통해 Ktor DI로부터 Database를 주입받을 수 있음
-    singleOf(::UserRepository)
-    singleOf(::UserService)
-}
-```
-
-## 격리된 컨텍스트를 사용한 테스트 {id="testing-with-isolated-context"}
-
-격리된 컨텍스트는 특히 테스트에 유용합니다:
-
-```kotlin
-class UserServiceTest {
-    @Test
-    fun `test user endpoint`() = testApplication {
-        application {
-            // 각 테스트는 자신만의 격리된 Koin 인스턴스를 가짐
-            install(KoinIsolated) {
-                modules(testModule)
-            }
-            configureRouting()
-        }
-
-        client.get("/users/123").apply {
-            assertEquals(HttpStatusCode.OK, status)
-        }
-    }
-}
-
-val testModule = module {
-    single<UserRepository> { MockUserRepository() }
-    singleOf(::UserService)
-}
-```
-
-### 병렬 테스트 실행 {id="parallel-test-execution"}
-
-격리된 컨텍스트를 사용하면 간섭 없이 테스트를 병렬로 실행할 수 있습니다:
-
-```kotlin
-class ParallelTests {
-    @Test
-    fun `test A`() = testApplication {
-        application {
-            install(KoinIsolated) {
-                modules(moduleA)  // 자체 격리 인스턴스
-            }
-        }
-        // ...
-    }
-
-    @Test
-    fun `test B`() = testApplication {
-        application {
-            install(KoinIsolated) {
-                modules(moduleB)  // 다른 격리 인스턴스
-            }
-        }
-        // ...
-    }
-}
-```
-
-## 여러 Ktor 서버 {id="multiple-ktor-servers"}
-
-독립적인 Koin 인스턴스를 가진 여러 Ktor 서버를 실행할 수 있습니다:
+각 임베디드 서버는 고유한 컨테이너를 가집니다:
 
 ```kotlin
 fun main() {
-    // 서버 1 - 사용자 서비스
     val userServer = embeddedServer(Netty, port = 8080) {
-        install(KoinIsolated) {
-            modules(userServiceModule)
-        }
+        install(KoinIsolated) { modules(userServiceModule) }
         userRouting()
     }
 
-    // 서버 2 - 주문 서비스 (다른 Koin 인스턴스)
     val orderServer = embeddedServer(Netty, port = 8081) {
-        install(KoinIsolated) {
-            modules(orderServiceModule)
-        }
+        install(KoinIsolated) { modules(orderServiceModule) }
         orderRouting()
     }
 
-    // 두 서버 모두 독립적인 Koin 컨테이너를 가짐
     userServer.start(wait = false)
     orderServer.start(wait = true)
 }
 ```
 
-## 생명주기(Lifecycle) {id="lifecycle"}
+`install(Koin)`을 사용할 경우 플러그인이 시작되기 전에 실행 중인 글로벌 인스턴스를 중지하므로, 두 번째 서버가 첫 번째 서버의 글로벌 Koin을 중지하게 됩니다.
 
-격리된 Koin 인스턴스는 Ktor 애플리케이션의 생명주기를 따릅니다:
+## 테스트 {id="tests"}
 
-```kotlin
-fun Application.main() {
-    install(KoinIsolated) {
-        slf4jLogger()
-        modules(appModule)
-    }
+`KoinIsolated`를 설치하는 각 `testApplication`은 고유한 컨테이너를 가지므로, 테스트가 글로벌 컨텍스트를 통해 상태를 공유하지 않고 병렬로 실행될 수 있습니다. 테스트 설정 방법은 [Ktor Testing](/docs/reference/koin-ktor/ktor-testing)에서 다룹니다.
 
-    // Koin 생명주기 모니터링
-    environment.monitor.subscribe(KoinApplicationStarted) {
-        log.info("Isolated Koin started")
-    }
+## 글로벌 컨텍스트를 유지해야 하는 경우 {id="when-to-keep-the-global-context"}
 
-    environment.monitor.subscribe(KoinApplicationStopped) {
-        log.info("Isolated Koin stopped")
-    }
-}
-```
+프로세스 내에서 하나의 Ktor 애플리케이션만 실행되고 해당 프로세스의 다른 진입점(예: `main()`에서 시작된 스케줄링 작업)이 동일한 컨테이너를 사용해야 하거나, Ktor DI 브리지가 필요한 경우에는 `install(Koin)`을 계속 사용하세요.
 
-## 격리된 Koin 인스턴스 접근하기 {id="accessing-the-isolated-koin-instance"}
+## 관련 문서 {id="related"}
 
-Ktor 애플리케이션 내에서 격리된 Koin 인스턴스에 접근할 수 있습니다:
-
-```kotlin
-fun Application.main() {
-    install(KoinIsolated) {
-        modules(appModule)
-    }
-
-    // Application에서 Koin 인스턴스 접근
-    val koin = getKoin()
-
-    // 또는 플러그인 속성(attribute)을 통해 접근
-    val koinApp = attributes[KoinPluginKey]
-}
-```
-
-## 격리된 컨텍스트를 사용하지 않아야 하는 경우 {id="when-not-to-use-isolated-context"}
-
-- **단일 Ktor 애플리케이션** - 전역 컨텍스트가 더 간단합니다.
-- **모듈 간에 공유되는 의존성** - 전역 컨텍스트를 사용해야 공유가 가능합니다.
-- **Koin에 접근해야 하는 백그라운드 작업** - 이러한 작업에는 `GlobalContext`가 필요합니다.
-
-## 권장 사항(Best Practices) {id="best-practices"}
-
-1. **테스트에 사용하세요** - 격리된 컨텍스트는 테스트 간의 간섭을 방지합니다.
-2. **멀티 테넌트에 사용하세요** - 각 테넌트는 서로 다른 설정을 가질 수 있습니다.
-3. **단순한 앱에서는 피하세요** - 대부분의 일반적인 사용 사례에서는 전역 컨텍스트가 더 간단합니다.
-4. **선택 이유를 기록하세요** - 격리된 컨텍스트를 사용하는 이유를 팀원들이 알 수 있도록 명확히 문서화하세요.
-
-## 참고 항목 {id="see-also"}
-
-- **[Ktor 통합](/docs/reference/koin-ktor/ktor)** - 메인 Ktor 문서
-- **[컨텍스트 격리](/docs/reference/koin-core/context-isolation)** - 핵심 격리 개념
-- **[테스트](/docs/reference/koin-test/testing)** - Koin을 사용한 테스트 방법
+- [Context Isolation](/docs/reference/koin-core/context-isolation): 격리된 컨텍스트 개념 및 커스텀 `KoinComponent`.
+- [Koin for Ktor](/docs/reference/koin-ktor/ktor): `Koin` 플러그인 및 라우트에서의 주입.
+- [Ktor Testing](/docs/reference/koin-ktor/ktor-testing): Koin을 사용한 Ktor 애플리케이션 테스트.
+- [Ktor DI Bridge](/docs/reference/koin-ktor/ktor-bridge): Ktor DI와 의존성 공유.

@@ -1,63 +1,89 @@
 ---
-title: Android とアノテーション
+title: Android & Annotations
 ---
 
-> このチュートリアルでは、Android アプリケーションを作成し、Koin の依存性の注入（DI）を使用してコンポーネントを取得する方法を学びます。
-> 所要時間は約 **10 分** です。
+# Android & Annotations
 
-:::note
-更新 - 2024-10-21
-:::
+このチュートリアルでは、リストから選択したユーザーに挨拶を表示するAndroidアプリを作成します。クラスへのアノテーションの付与、モジュールへのスキャン、ViewModelへの独自のスコープ付き依存関係の付与、そして`@KoinApplication`クラスからのKoinの起動方法を学びます。所要時間は約10分で、Android Studioが必要です。
+
+このチュートリアルではアノテーションを使用します。Compiler Plugin DSLを使用した同じアプリについては、[Android](/docs/quickstart/android)および[Android ViewModel](/docs/quickstart/android-viewmodel)を参照してください。スタイルの比較については、[Choosing your style](/docs/intro/choosing-your-style)を参照してください。
 
 ## コードの取得 {id="get-the-code"}
 
-:::info
-[ソースコードは GitHub で公開されています](https://github.com/InsertKoinIO/koin-getting-started/tree/main/android-annotations)
-:::
+完全なサンプルコードは [koin-getting-started/android-annotations](https://github.com/InsertKoinIO/koin-getting-started/tree/main/android-annotations) にあります。リポジトリをクローンし、Android Studioで`android-annotations`フォルダを開いてください。
 
-## Gradle の設定 {id="gradle-setup"}
+## Gradleのセットアップ {id="gradle-setup"}
 
-KSP プラグインと以下の依存関係を次のように設定しましょう。
+このサンプルでは、Koin Compiler Pluginを適用し、`koin-android`と`koin-annotations`を追加します。バージョンはバージョンカタログで管理されます。
 
-```groovy
+```toml
+# gradle/libs.versions.toml
+[versions]
+# Kotlin、Android Gradle Plugin、AndroidXのエントリは省略
+koin = "<KOIN_VERSION>"
+koin-plugin = "<KOIN_PLUGIN_VERSION>"
+
+[libraries]
+koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
+koin-annotations = { module = "io.insert-koin:koin-annotations", version.ref = "koin" }
+koin-test-junit4 = { module = "io.insert-koin:koin-test-junit4", version.ref = "koin" }
+
+[plugins]
+koin-compiler = { id = "io.insert-koin.compiler.plugin", version.ref = "koin-plugin" }
+```
+
+```kotlin
+// app/build.gradle.kts
 plugins {
-    alias(libs.plugins.ksp)
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.koin.compiler)
 }
 
 dependencies {
-    // ...
-
+    implementation(libs.android.appcompat)
+    implementation(libs.koin.android)
     implementation(libs.koin.annotations)
-    ksp(libs.koin.ksp)
-}
 
-// コンパイル時のチェック
-ksp {
-    arg("KOIN_CONFIG_CHECK","true")
+    testImplementation(libs.koin.test.junit4)
 }
 ```
 
-:::note
-現在のバージョンについては `libs.versions.toml` を参照してください。
-:::
+Compiler Pluginはアノテーションを処理し、Kotlin 2.3.20以降が必要です。`koin-annotations`はKoinと同じバージョンを使用します。コンパイル時の安全性（Compile-time safety）はデフォルトで有効になっています。詳細については、[Gradle setup](/docs/setup/gradle)および[Compiler Plugin setup](/docs/setup/compiler-plugin)を参照してください。
 
-## アプリケーションの概要 {id="application-overview"}
+## アプリケーションの概要 {id="the-application"}
 
-このアプリケーションの構成は、ユーザーのリストを管理し、Presenter または ViewModel を使用して `MainActivity` クラスに表示するというものです。
+ActivityはViewModelに挨拶を要求します。ViewModelは`UserRepository`からデータを読み取る`UserService`を使用し、自身のライフサイクルにスコープが限定された`UserPresenter`を保持します。
 
-> Users -> UserRepository -> UserService -> (Presenter または ViewModel) -> MainActivity
+```
+User -> UserRepository -> UserService -> UserViewModel (+ UserPresenter) -> MainActivity
+```
 
-## 「User」データ {id="the-user-data"}
+## ユーザーデータの作成 {id="let-s-write-the-user-data"}
 
-ユーザーのコレクションを管理します。データクラスは以下の通りです。
+まずはデータクラスとデフォルトのユーザーリストを作成します。
 
 ```kotlin
 data class User(val name: String, val email: String)
+
+val DEFAULT_USER = User("Alice", "alice@example.com")
+
+val DEFAULT_USERS = listOf(
+    DEFAULT_USER,
+    User("Bob", "bob@example.com"),
+    User("Charlie", "charlie@example.com")
+)
 ```
 
-ユーザーリストを管理する（ユーザーの追加や名前による検索を行う）「Repository」コンポーネントを作成します。以下に `UserRepository` インターフェースとその実装を示します。
+これらのユーザーが、リポジトリに保存されるデータとなります。
+
+## リポジトリの作成 {id="let-s-write-the-repository"}
+
+リポジトリはユーザーをメモリ内に保持します。実装クラスに`@Singleton`アノテーションを付与します。
 
 ```kotlin
+import org.koin.core.annotation.Singleton
+
 interface UserRepository {
     fun findUserOrNull(name: String): User?
     fun addUsers(users: List<User>)
@@ -78,13 +104,15 @@ class UserRepositoryImpl : UserRepository {
 }
 ```
 
-## UserService コンポーネント {id="the-userservice-component"}
+Koinは`UserRepositoryImpl`をそのスーパータイプにバインドするため、`UserRepository`のリクエストに対してこのインスタンスが提供されます。`@Singleton`は`@Single`と同等です（[Definitions](/docs/reference/koin-core/definitions)を参照）。
 
-ユーザー操作を管理するためのサービスコンポーネントを作成しましょう。
+## サービスの作成 {id="let-s-write-the-service"}
+
+`UserService`は作成時にユーザーを読み込み、挨拶メッセージを準備します。
 
 ```kotlin
 interface UserService {
-    fun getUserOrNull(name: String): User?
+    fun getUserOrNull(name: String = DEFAULT_USER.name): User?
     fun loadUsers()
     fun prepareHelloMessage(user: User?): String
 }
@@ -101,57 +129,28 @@ class UserServiceImpl(
     override fun getUserOrNull(name: String): User? = userRepository.findUserOrNull(name)
 
     override fun loadUsers() {
-        userRepository.addUsers(listOf(
-            User("Alice", "alice@example.com"),
-            User("Bob", "bob@example.com"),
-            User("Charlie", "charlie@example.com")
-        ))
+        userRepository.addUsers(DEFAULT_USERS)
     }
 
     override fun prepareHelloMessage(user: User?): String {
-        return user?.let { "Hello '${user.name}' (${user.email})! 👋" } ?: "❌ User not found"
+        return user?.let { "Hello '${user.name}' (${user.email})!" } ?: "User not found"
     }
 }
 ```
 
-## Koin モジュール {id="the-koin-module"}
+Compiler Pluginがコンストラクタを読み取り、`UserRepository`インスタンスを自動で渡します。
 
-以下のように `AppModule` モジュールクラスを宣言しましょう。
+## PresenterとViewModelの作成 {id="let-s-write-the-presenter-and-the-viewmodel"}
 
-```kotlin
-@Module
-@ComponentScan("org.koin.sample")
-@Configuration
-class AppModule
-```
-
-* `@Module` - このクラスを Koin モジュールとして宣言します。
-* `@ComponentScan("org.koin.sample")` - `"org.koin.sample"` パッケージ内のすべての Koin 定義を自動的にスキャンして登録します。
-* `@Configuration` - `@KoinApplication` と併用した際に、モジュールの自動検出を有効にします。
-
-コンポーネントスキャンが有効になっているため、クラスにアノテーションを追加するだけで済みます。
+Presenterは挨拶をフォーマットします。各ViewModelが独自のインスタンスを取得できるように、`@ViewModelScope`アノテーションを付与します。
 
 ```kotlin
-@Singleton
-class UserRepositoryImpl : UserRepository {
-    // ...
-}
+import org.koin.core.annotation.ViewModelScope
 
-@Singleton
-class UserServiceImpl(private val userRepository: UserRepository) : UserService {
-    // ...
-}
-```
-
-`@Singleton` アノテーションは、これらのクラスを Koin のシングルトンとして宣言します。
-
-## Presenter によるユーザーの表示 {id="displaying-user-with-presenter"}
-
-ユーザーを表示するための Presenter コンポーネントを作成しましょう。
-
-```kotlin
-@Factory
-class UserPresenter(private val userService: UserService) {
+@ViewModelScope
+class UserPresenter(
+    private val userService: UserService
+) {
 
     fun sayHello(name: String): String {
         val user = userService.getUserOrNull(name)
@@ -161,79 +160,18 @@ class UserPresenter(private val userService: UserService) {
 }
 ```
 
-> `UserService` は `UserPresenter` のコンストラクタで参照されています。
-
-Android のライフサイクルによるメモリリークを避けるため、リクエストされるたびに新しいインスタンスを作成するように、`UserPresenter` を `@Factory` アノテーションで宣言します。
+ViewModelには`@KoinViewModel`を付与し、さらにスコープ付きPresenterを受け取れるように`@ViewModelScope`を付与します。
 
 ```kotlin
-@Factory
-class UserPresenter(private val userService: UserService) {
-    // ...
-}
-```
+import org.koin.core.annotation.KoinViewModel
+import org.koin.core.annotation.ViewModelScope
 
-## Android での依存性の注入 {id="injecting-dependencies-in-android"}
-
-`UserPresenter` コンポーネントが作成され、その際に `UserService` インスタンスが解決されます。これを Activity で取得するには、`by inject()` デリゲート関数を使用して注入します。
-
-```kotlin
-class MainActivity : AppCompatActivity() {
-
-    private val presenter: UserPresenter by inject()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        
-        //...
-    }
-}
-```
-
-これで、アプリの準備が整いました。
-
-:::info
-`by inject()` 関数を使用すると、Android コンポーネントの実行時（Activity、Fragment、Service など）に Koin インスタンスを取得できます。
-:::
-
-## Koin の開始 {id="start-koin"}
-
-Android アプリケーションで Koin を開始する必要があります。`@KoinApplication` アノテーションを使用すると、Koin は `@Configuration` が付与されたすべてのモジュールを自動的に検出し、ロードします。
-
-```kotlin
-import org.koin.android.ext.koin.androidContext
-import org.koin.core.annotation.KoinApplication
-import org.koin.ksp.generated.*
-
-@KoinApplication
-class MainApplication : Application() {
-
-    override fun onCreate() {
-        super.onCreate()
-
-        startKoin {
-            androidContext(this@MainApplication)
-        }
-    }
-}
-```
-
-**重要なポイント:**
-* `@KoinApplication` - `@Module` および `@Configuration` アノテーションが付いたすべてのモジュールを自動的に検出します。
-* `modules(AppModule().module)` を手動で呼び出す必要はありません。モジュールは自動的にロードされます！
-* 生成された Koin の内容を使用するには、`import org.koin.ksp.generated.*` のインポートが必要です。
-* `androidContext` のような Android 固有の設定のみを行う必要があります。
-
-:::info
-`@KoinApplication` アノテーションはモジュールの `@Configuration` と連携し、KSP を通じてコンパイル時にすべての依存関係を自動的に検出し、ロードします。
-:::
-
-## ViewModel によるユーザーの表示 {id="displaying-user-with-viewmodel"}
-
-ユーザーを表示するための ViewModel コンポーネントを作成しましょう。
-
-```kotlin
+@ViewModelScope
 @KoinViewModel
-class UserViewModel(private val userService: UserService) : ViewModel() {
+class UserViewModel(
+    private val userService: UserService,
+    private val userPresenter: UserPresenter
+) : ViewModel() {
 
     fun sayHello(name: String): String {
         val user = userService.getUserOrNull(name)
@@ -243,37 +181,95 @@ class UserViewModel(private val userService: UserService) : ViewModel() {
 }
 ```
 
-> `UserService` は `UserViewModel` のコンストラクタで参照されています。
+PresenterはViewModelと同じ期間生存し、ViewModelが破棄（クリア）されると解放されます。ViewModelスコープについては[ViewModel](/docs/reference/koin-core/viewmodel)で、スコープ全般については[Scopes](/docs/reference/koin-core/scopes)で解説されています。
 
-`UserViewModel` は、`@KoinViewModel` アノテーションでタグ付けされ、Koin の ViewModel 定義として宣言されます。これにより、適切なライフサイクル管理が行われ、メモリリークが回避されます。
+## Koinモジュールの宣言 {id="let-s-declare-the-koin-module"}
 
-## Android での ViewModel の注入 {id="injecting-viewmodel-in-android"}
-
-`UserViewModel` コンポーネントが作成され、その際に `UserService` インスタンスが解決されます。これを Activity で取得するには、`by viewModel()` デリゲート関数を使用して注入します。
+モジュールは定義をグループ化します（[Core Concepts](/docs/intro/core-concepts)を参照）。サンプルのパッケージをスキャンするモジュールクラスを宣言します。
 
 ```kotlin
+import org.koin.core.annotation.ComponentScan
+import org.koin.core.annotation.Configuration
+import org.koin.core.annotation.Module
+
+@Module
+@ComponentScan("org.koin.sample")
+@Configuration
+class AppModule
+```
+
+`@ComponentScan`は、`org.koin.sample`とそのサブパッケージ内のすべてのアノテーション付きクラスを登録します。`@Configuration`は、モジュールを`@KoinApplication`エントリポイントから検出可能にします。どちらについても[Modules](/docs/reference/koin-core/modules)で説明されています。
+
+## ActivityへのViewModelの注入 {id="let-s-inject-the-viewmodel-in-the-activity"}
+
+`MainActivity`で`by viewModel()`デリゲートを使用します。
+
+```kotlin
+import org.koin.androidx.viewmodel.ext.android.viewModel
+
 class MainActivity : AppCompatActivity() {
 
     private val viewModel: UserViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        
-        //...
+        setContentView(R.layout.activity_simple)
+
+        val nameInput = findViewById<EditText>(R.id.nameInput)
+        val sayHelloButton = findViewById<Button>(R.id.sayHelloButton)
+        val textField = findViewById<TextView>(R.id.text)
+
+        sayHelloButton.setOnClickListener {
+            val userName = nameInput.text.toString().trim().ifEmpty { "Alice" }
+            textField.text = viewModel.sayHello(userName)
+        }
     }
 }
 ```
 
-## コンパイル時のチェック {id="compile-time-checks"}
+`by viewModel()`はViewModelファクトリを自動生成し、インスタンスをActivityのライフサイクルにバインドします。その他のデリゲートについては[Android ViewModel](/docs/reference/koin-android/viewmodel)を参照してください。
 
-Koin Annotations を使用すると、コンパイル時に Koin の設定をチェックできます。これは、以下の Gradle オプションを使用することで利用可能です。
+## Koinの起動 {id="let-s-start-koin"}
 
-```groovy
-ksp {
-    arg("KOIN_CONFIG_CHECK","true")
+`Application`クラスに`@KoinApplication`アノテーションを付与し、型付きの`startKoin<T>()`でKoinを起動します。このクラスを`AndroidManifest.xml`に登録してください。
+
+```kotlin
+import org.koin.android.ext.koin.androidContext
+import org.koin.android.ext.koin.androidLogger
+import org.koin.core.annotation.KoinApplication
+import org.koin.core.annotation.KoinViewModelScopeApi
+import org.koin.core.logger.Level
+import org.koin.core.option.viewModelScopeFactory
+import org.koin.plugin.module.dsl.startKoin
+
+@OptIn(KoinViewModelScopeApi::class)
+@KoinApplication
+class MainApplication : Application() {
+
+    override fun onCreate() {
+        super.onCreate()
+
+        startKoin<MainApplication> {
+            androidContext(this@MainApplication)
+            androidLogger(level = Level.DEBUG)
+            options(viewModelScopeFactory())
+        }
+    }
 }
 ```
 
-:::tip
-この KSP ベースのオプションは、ネイティブなコンパイル時の安全性を提供する **Koin Compiler Plugin** に置き換えられました。[コンパイル時の安全性](/docs/reference/koin-compiler/compile-safety) および [Compiler Plugin のセットアップ](/docs/setup/compiler-plugin) を参照してください。
-:::
+`startKoin<MainApplication>`はすべての`@Configuration`モジュールを読み込むため、`modules()`を呼び出す必要はありません。`viewModelScopeFactory()`は、`@ViewModelScope`に必要なスコープをViewModelごとに作成するようKoinに指示します。これはオプトインAPI（`@KoinViewModelScopeApi`）です。その他のオプションについては[Starting Koin on Android](/docs/reference/koin-android/start)を参照してください。
+
+## ビルド時のグラフ検証 {id="let-s-check-the-graph-at-build-time"}
+
+プロジェクトをビルドします。Compiler Pluginがグラフ全体を検証します。依存関係の不足、クォリファイアの不一致、あるいは未宣言のViewModelに対する`by viewModel()`の呼び出しがある場合、該当するファイルと行番号とともにビルドが失敗します。
+
+アプリを実行し、名前を入力してボタンをタップすると、挨拶が表示されます。プラグインがチェックする内容については[Compile-Time Safety](/docs/reference/koin-compiler/compile-safety)に記載されています。
+
+## 次のステップ {id="next-steps"}
+
+- [Core Concepts](/docs/intro/core-concepts): モジュール、定義、注入の背後にあるメンタルモデル。
+- [Android scopes](/docs/reference/koin-android/scope): AndroidにおけるActivity、Fragment、ViewModelのスコープ。
+- [Annotations Reference](/docs/reference/koin-annotations/annotations-inventory): 各アノテーションとそのパラメータの一覧。
+- [Instrumented testing](/docs/reference/koin-android/instrumented-testing): Koinを使用したAndroidアプリのインストルメンテーションテスト。
+- [Tooling](/docs/tooling): Koin向けのIDEプラグインと監視ツール。

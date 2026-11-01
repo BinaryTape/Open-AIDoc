@@ -4,31 +4,13 @@ title: 모듈
 
 # 모듈
 
-Koin 모듈은 의존성 주입 설정을 구성하는 기본 단위입니다.
+모듈은 기능별 또는 계층(layer)별로 관련된 정의들을 그룹화합니다. 이 페이지에서는 모듈을 선언하고 결합하는 방법, 어노테이션이 지정된 클래스를 패키지에서 스캔하는 방법, 여러 Gradle 모듈에 걸쳐 모듈을 검색하는 방법, 그리고 모듈이 로드되는 순서를 다룹니다. 모듈 내부의 정의에 대해서는 [Definitions](/docs/reference/koin-core/definitions)를 참조하세요.
 
-## 모듈이란 무엇인가요? {id="what-is-a-module"}
+## 모듈 선언하기 {id="declare-a-module"}
 
-모듈은 관련된 정의(definition)들을 그룹화하는 논리적인 컨테이너입니다:
-
+**컴파일러 플러그인 DSL (Compiler Plugin DSL)**
 ```kotlin
-val appModule = module {
-    single<Database>()
-    single<UserRepository>()
-    viewModel<UserViewModel>()
-}
-```
-
-모듈은 다음과 같은 이점을 제공합니다:
-- 기능이나 계층별로 정의를 **정리**할 수 있습니다.
-- 관련된 의존성을 **캡슐화**합니다.
-- 다양한 컨텍스트에서 설정을 **재사용**할 수 있습니다.
-- 모듈화된 프로젝트에서 **가시성(visibility)을 제어**할 수 있습니다.
-
-## 모듈 생성하기 {id="creating-modules"}
-
-### 컴파일러 플러그인 DSL 사용 {id="with-compiler-plugin-dsl"}
-
-```kotlin
+import org.koin.dsl.module
 import org.koin.plugin.module.dsl.*
 
 val networkModule = module {
@@ -36,76 +18,48 @@ val networkModule = module {
     single<TokenManager>()
 }
 
-val databaseModule = module {
+val dataModule = module {
     single<Database>()
-    single<UserDao>()
+    single<UserRepository>()
 }
 ```
 
-### 애노테이션 사용 {id="with-annotations"}
-
+**어노테이션 (Annotations)**
 ```kotlin
 @Module
 @ComponentScan("com.myapp.network")
 class NetworkModule
 
 @Module
-@ComponentScan("com.myapp.database")
-class DatabaseModule
+@ComponentScan("com.myapp.data")
+class DataModule
 ```
 
-### 클래식 DSL 사용 {id="with-classic-dsl"}
+`@Module` 클래스는 `@ComponentScan`으로 찾은 어노테이션 지정 클래스들과 내부에 선언된 프로바이더 함수들을 모읍니다([직접 소유하지 않은 클래스(Classes you don't own)](/docs/reference/koin-core/definitions#classes-you-dont-own) 참조).
 
+**생성자 / 클래식 DSL (Constructor / Classic DSL)**
 ```kotlin
+import org.koin.dsl.module
+import org.koin.core.module.dsl.*
+
 val networkModule = module {
     singleOf(::ApiClient)
     singleOf(::TokenManager)
 }
-```
 
-## 여러 모듈 사용하기 {id="using-multiple-modules"}
-
-의존성은 다른 모듈에 있는 정의를 참조할 수 있습니다:
-
-```kotlin
-// 데이터 계층
 val dataModule = module {
-    single<Database>()
-    single<UserRepository>()  // 이 모듈의 Database를 사용할 수 있음
-}
-
-// 프레젠테이션 계층
-val viewModelModule = module {
-    viewModel<UserViewModel>()  // dataModule의 UserRepository를 사용할 수 있음
-}
-
-// 둘 다 로드
-startKoin {
-    modules(dataModule, viewModelModule)
+    singleOf(::Database)
+    singleOf(::UserRepository)
 }
 ```
 
-:::info
-Koin은 로드된 모든 모듈에 걸쳐 의존성을 자동으로 해결(resolve)합니다. 명시적인 임포트(import)는 필요하지 않습니다.
-:::
+하나의 정의는 다른 모듈의 정의에 의존할 수 있습니다. Koin은 로드된 모든 모듈을 통틀어 의존성을 해결(resolve)하므로, `dataModule`의 `UserRepository`는 모듈 간의 별도 import 없이도 `networkModule`의 `ApiClient`를 사용할 수 있습니다. 단, 두 모듈이 모두 로드되어 있어야 합니다([Koin 시작하기(Starting Koin)](/docs/reference/koin-core/starting-koin) 참조).
 
-:::note
-모듈을 직접 나열하는 방식도 작동하지만, 더 나은 구조와 최적화된 로딩을 위해 [`includes()`](#includes를-사용한-모듈-구성)를 사용하여 모듈을 계층 구조로 구성하는 것을 고려해 보세요.
-:::
+## `includes()`를 통한 모듈 결합 {id="module-composition-with-includes"}
 
-## `includes()`를 사용한 모듈 구성 {id="module-composition-with-includes"}
+하나의 모듈이 다른 모듈들을 포함할 수 있습니다. 부모 모듈을 로드하면 전체 트리가 함께 로드됩니다:
 
-`includes()` 함수는 모듈을 구성하는 **권장되는 방식**입니다. 다음과 같은 기능을 제공합니다:
-
-- **모듈 계층 구조** - 명확한 부모-자식 관계로 모듈을 구조화합니다.
-- **최적화된 로딩** - Koin은 포함된 모듈의 중복을 제거하여 불필요한 등록을 방지합니다.
-- **깔끔한 시작 절차** - 긴 리스트 대신 단일 루트 모듈만 로드하면 됩니다.
-- **캡슐화** - 내부(internal) 모듈을 퍼블릭 API 모듈 뒤로 숨길 수 있습니다.
-
-:::tip
-**Best Practice:** `startKoin`에서 모든 모듈을 나열하는 대신 `includes()`를 사용하여 모듈 계층을 구축하세요. 이는 조직화 수준을 높이고 효율적인 모듈 로딩을 보장합니다.
-:::
-
+**컴파일러 플러그인 DSL (Compiler Plugin DSL)**
 ```kotlin
 val networkModule = module {
     single<ApiClient>()
@@ -115,26 +69,55 @@ val storageModule = module {
     single<Database>()
 }
 
-// 부모 모듈이 자식 모듈들을 포함함
 val dataModule = module {
     includes(networkModule, storageModule)
     single<UserRepository>()
 }
 
-// ✅ 권장: includes가 포함된 루트 모듈 로드
 startKoin {
     modules(dataModule)
 }
+```
 
-// ❌ 지양: 모듈을 평탄한 리스트로 나열
+**어노테이션 (Annotations)**
+```kotlin
+@Module
+class NetworkModule
+
+@Module
+class StorageModule
+
+@Module(includes = [NetworkModule::class, StorageModule::class])
+@ComponentScan("com.myapp.data")
+class DataModule
+
+@KoinApplication(modules = [DataModule::class])
+class MyApp
+```
+
+**생성자 / 클래식 DSL (Constructor / Classic DSL)**
+```kotlin
+val networkModule = module {
+    singleOf(::ApiClient)
+}
+
+val storageModule = module {
+    singleOf(::Database)
+}
+
+val dataModule = module {
+    includes(networkModule, storageModule)
+    singleOf(::UserRepository)
+}
+
 startKoin {
-    modules(networkModule, storageModule, dataModule)
+    modules(dataModule)
 }
 ```
 
-### `includes()`의 로딩 최적화 방식 {id="how-includes-optimizes-loading"}
+`startKoin`에 긴 플랫(flat) 리스트를 나열하는 것보다 하나의 루트 모듈을 가진 `includes()` 트리를 구성하는 것을 권장합니다. 이렇게 하면 모듈의 구조가 코드 구조를 자연스럽게 따르게 되며, 시작 호출부도 간결하게 유지됩니다.
 
-모듈이 여러 번 포함되더라도 Koin은 이를 한 번만 로드합니다:
+Koin은 트리를 평탄화(flatten)하여 여러 부모 모듈이 동일한 모듈을 포함하더라도 각 모듈을 한 번만 로드합니다:
 
 ```kotlin
 val commonModule = module {
@@ -147,221 +130,194 @@ val featureAModule = module {
 }
 
 val featureBModule = module {
-    includes(commonModule)  // 여기서도 commonModule을 포함함
+    includes(commonModule)
     single<FeatureB>()
 }
 
 val appModule = module {
-    includes(featureAModule, featureBModule)
-}
-
-// commonModule은 두 번 포함되었지만, 실제로는 단 '한 번'만 로드됩니다.
-startKoin {
-    modules(appModule)
+    includes(featureAModule, featureBModule) // commonModule은 한 번만 로드됩니다
 }
 ```
 
-### 멀티 모듈 프로젝트 {id="multi-module-projects"}
+### 멀티 모듈 프로젝트에서의 가시성 (Visibility) {id="visibility-in-multi-module-projects"}
 
-가시성 수정자(visibility modifiers)를 사용하여 노출되는 내용을 제어하세요:
+Gradle 멀티 모듈 프로젝트에서는 기능(feature)당 하나의 공개 모듈만 노출하고 나머지는 `private` 또는 `internal`로 유지하세요:
 
 ```kotlin
-// :feature:user 모듈
-
-// Private - 다른 모듈에서 숨겨짐
+// Gradle 모듈 "feature-user"
 private val userDataModule = module {
     single<UserDao>()
     single<UserCache>()
 }
 
-// 퍼블릭 API
 val userFeatureModule = module {
     includes(userDataModule)
     viewModel<UserViewModel>()
 }
 ```
 
+앱 모듈은 `userFeatureModule`만 로드하며 내부 모듈은 볼 수 없습니다. 여러 Gradle 모듈로 분할된 Android 앱의 전체적인 레이아웃은 [Multi-Module Apps](/docs/reference/koin-android/multi-module)를 참조하세요.
+
+## @ComponentScan으로 패키지 스캔하기 {id="scan-packages-with-componentscan"}
+
+`@ComponentScan`은 어노테이션 전용 기능입니다. 지정된 패키지 및 그 하위 패키지에 있는 어노테이션이 달린 모든 클래스와 최상위 함수를 수집합니다:
+
 ```kotlin
-// :app 모듈
-startKoin {
-    modules(userFeatureModule)  // 이것만 접근 가능함
+@Module
+@ComponentScan
+class AppModule // AppModule이 속한 패키지를 스캔합니다
+
+@Module
+@ComponentScan("com.myapp.features")
+class FeatureModule
+
+@Module
+@ComponentScan("com.myapp.data", "com.myapp.network")
+class InfraModule
+```
+
+값을 전달하지 않으면 어노테이션이 붙은 클래스가 위치한 패키지를 스캔합니다. 스캔은 Gradle 모듈 경계를 넘나들 수 있어서, 동일한 패키지에 속해 있다면 다른 Gradle 모듈의 클래스도 함께 찾아냅니다.
+
+DSL 스타일에서는 모듈 내에 각 정의를 직접 나열해야 합니다. 두 가지 방식을 혼용하려면 시작 블록에서 어노테이션 기반 모듈과 함께 DSL 모듈을 포함시키면 됩니다([@KoinApplication을 사용한 타입 안전한 시작(Typed startup with @KoinApplication)](/docs/reference/koin-core/starting-koin#typed-startup-with-koinapplication) 참조).
+
+## @Configuration을 통한 자동 검색 (Auto-discovery) {id="auto-discovery-with-configuration"}
+
+`@Configuration`은 `@KoinApplication`이 모듈을 일일이 나열하지 않아도 찾을 수 있도록 `@Module`에 표시하는 어노테이션입니다. 이 모듈은 클래스패스에 있는 어떤 Gradle 모듈에든 위치할 수 있습니다:
+
+```kotlin
+// Gradle 모듈 "feature-user"
+@Module
+@Configuration
+@ComponentScan("com.myapp.feature.user")
+class UserFeatureModule
+
+// Gradle 모듈 "app"
+@KoinApplication
+class MyApp
+
+fun main() {
+    startKoin<MyApp>() // UserFeatureModule을 로드합니다
 }
 ```
 
-## 모듈 재정의 (Module Override) {id="module-override"}
+따라서 기능을 추가할 때 Gradle 의존성만 추가하면 되며, 앱의 모듈 목록을 수정할 필요가 없습니다. 단점은 로드되는 모듈 목록이 한곳에 명시적으로 작성되지 않는다는 점입니다. 명시적인 관리를 원한다면 `@KoinApplication(modules = [...])`에 모듈을 직접 나열하세요.
 
-### 기본 동작 {id="default-behavior"}
+`@Configuration`은 라벨(label)을 받을 수 있으므로, 환경이나 플레이버(flavor)마다 다른 모듈을 로드할 수 있습니다. 자세한 규칙은 [Configuration labels](/docs/reference/koin-core/starting-koin#configuration-labels)를 참조하세요.
 
-기본적으로 **마지막에 로드된 정의가 우선**합니다:
+`@Configuration`은 어노테이션 전용이며, 타입 기반 시작 방식(`startKoin<MyApp>()`)과 함께 `@KoinApplication`을 필요로 합니다.
 
-```kotlin
-val productionModule = module {
-    single<ApiService> { ProductionApi() }
-}
+## 로드 순서 및 오버라이드 (Load order and overrides) {id="load-order-and-overrides"}
 
-val debugModule = module {
-    single<ApiService> { DebugApi() }
-}
-
-startKoin {
-    modules(productionModule, debugModule)  // DebugApi가 적용됨
-}
-```
-
-### 엄격 모드 (Strict Mode) {id="strict-mode"}
-
-프로덕션 환경에서는 재정의를 비활성화할 수 있습니다:
+로드된 두 모듈이 동일한 타입을 선언하는 경우, 마지막에 로드된 모듈이 우선합니다. DSL 시작 블록에서는 `modules(...)`에 나열된 순서가 이에 해당합니다:
 
 ```kotlin
 startKoin {
-    allowOverride(false)  // 재정의 시도 시 예외 발생
-    modules(productionModule)
+    modules(productionModule, debugModule) // debugModule의 ApiService가 우선 적용됩니다
 }
 ```
 
-### 명시적 재정의 {id="explicit-override"}
+`@KoinApplication`을 사용할 때 컴파일러 플러그인은 다음 순서로 모듈 목록을 빌드합니다:
 
-엄격 모드에서도 특정 정의에 대해 재정의를 허용할 수 있습니다:
+1. 코드 및 의존성에서 발견된 `@Configuration` 모듈.
+2. `@KoinApplication(modules = [...])`에 선언된 순서대로 나열된 모듈.
+
+따라서 앱의 모듈이 라이브러리의 기본값을 오버라이드할 수 있습니다:
 
 ```kotlin
-val testModule = module {
-    single<ApiService> { MockApi() }.override()  // 허용됨
+// 라이브러리 내부
+@Module
+@Configuration
+class CoreModule {
+    @Singleton
+    fun feature(): Feature = DefaultFeature()
 }
 
-startKoin {
-    allowOverride(false)
-    modules(productionModule, testModule)
+// 앱 내부
+@Module
+class AppModule {
+    @Singleton
+    fun feature(): Feature = AppFeature()
 }
+
+@KoinApplication(modules = [AppModule::class])
+class MyApp // get<Feature>()는 AppFeature를 반환합니다
 ```
 
-## 즉시 생성 모듈 (Eager Module Creation) {id="eager-module-creation"}
+명시적 목록 내부에서 `modules = [A::class, B::class, C::class]`는 A, B, C 순서로 로드되며, 각 모듈의 `includes`는 해당 모듈과 함께 그룹화된 상태를 유지합니다. 명시적으로 나열되면서 동시에 `@Configuration`에 의해 발견된 모듈은 명시적 목록에서의 위치에 따라 한 번만 로드됩니다. 여러 `@Configuration` 모듈 간의 순서를 제어하려면 명시적으로 나열하세요.
 
-시작 시 싱글톤을 즉시 생성하도록 설정합니다:
+의도치 않은 오버라이드가 발생했을 때 시작 시점에 실패하도록 하려면 `allowOverride(false)`를 사용하세요. 단일 정의를 오버라이드하는 규칙은 [Overriding a definition](/docs/reference/koin-core/definitions#overriding-a-definition)을 참조하세요.
 
+## 즉시 로딩 모듈 (Eager modules) {id="eager-modules"}
+
+Koin이 시작될 때 전체 모듈의 모든 `single` 정의가 즉시 생성되도록 지정할 수 있습니다:
+
+**컴파일러 플러그인 DSL (Compiler Plugin DSL)**
 ```kotlin
 val coreModule = module(createdAtStart = true) {
     single<ConfigManager>()
-    single<LoggingSystem>()
+    single<CrashReporter>()
 }
 ```
 
-## 파라미터화된 모듈 {id="parameterized-modules"}
-
-동적으로 모듈을 생성할 수 있습니다:
-
+**어노테이션 (Annotations)**
 ```kotlin
-fun featureModule(debug: Boolean) = module {
-    single<Logger> {
-        if (debug) DebugLogger() else ProductionLogger()
+@Module(createdAtStart = true)
+@ComponentScan("com.myapp.core")
+class CoreModule
+```
+
+**생성자 / 클래식 DSL (Constructor / Classic DSL)**
+```kotlin
+val coreModule = module(createdAtStart = true) {
+    singleOf(::ConfigManager)
+    singleOf(::CrashReporter)
+}
+```
+
+즉시 생성되는 정의가 많아질수록 시작 시간이 늘어납니다. 정의별 플래그 설정 및 비용에 대해서는 [Eager creation](/docs/reference/koin-core/definitions#eager-creation)을 참조하세요.
+
+## 매개변수화된 모듈 (Parameterized modules) {id="parameterized-modules"}
+
+DSL 모듈은 하나의 값(value)이므로 함수를 통해 인자로부터 모듈을 생성할 수 있습니다:
+
+**컴파일러 플러그인 DSL (Compiler Plugin DSL)**
+```kotlin
+fun loggingModule(debug: Boolean) = module {
+    if (debug) {
+        single<DebugLogger>() bind Logger::class
+    } else {
+        single<ReleaseLogger>() bind Logger::class
     }
 }
 
 startKoin {
-    modules(featureModule(debug = BuildConfig.DEBUG))
+    modules(loggingModule(debug = BuildConfig.DEBUG))
 }
 ```
 
-## 전략 패턴 (Strategy Pattern) {id="strategy-pattern"}
+**어노테이션 (Annotations)**
+`@Module` 클래스는 인자를 받을 수 없습니다. 이 경우에는 DSL 모듈을 사용하거나, [configuration labels](/docs/reference/koin-core/starting-koin#configuration-labels)를 사용해 변형(variant)별로 하나의 `@Module`을 선택하도록 구성하세요.
 
-모듈을 사용하여 구현체를 교체할 수 있습니다:
-
+**생성자 / 클래식 DSL (Constructor / Classic DSL)**
 ```kotlin
-val repositoryModule = module {
-    single<UserRepository>()  // Datasource에 의존함
+fun loggingModule(debug: Boolean) = module {
+    single<Logger> {
+        if (debug) DebugLogger() else ReleaseLogger()
+    }
 }
 
-// 전략 옵션들
-val localDatasourceModule = module {
-    single<Datasource> { LocalDatasource() }
-}
-
-val remoteDatasourceModule = module {
-    single<Datasource> { RemoteDatasource() }
-}
-
-// 프로덕션
 startKoin {
-    modules(repositoryModule, remoteDatasourceModule)
-}
-
-// 오프라인 모드
-startKoin {
-    modules(repositoryModule, localDatasourceModule)
+    modules(loggingModule(debug = BuildConfig.DEBUG))
 }
 ```
 
-## 애노테이션 기반 모듈 {id="annotated-modules"}
+동일한 개념으로 구현체를 교체할 수도 있습니다. `repositoryModule`은 그대로 두고, 각각 `Datasource`를 선언하는 `localDatasourceModule`이나 `remoteDatasourceModule` 중 하나를 함께 로드하는 방식입니다. 조건부 모듈 목록은 런타임에 결정되므로, 컴파일러 플러그인이 빌드 시점에 모든 조합을 검증할 수는 없습니다.
 
-Koin은 DSL의 대안으로 애노테이션 기반 모듈 설정을 지원합니다.
+## 관련 문서 {id="related"}
 
-```kotlin
-@Module
-@ComponentScan("com.myapp.data")
-class DataModule
-
-@Module
-@ComponentScan("com.myapp.network")
-class NetworkModule
-
-// 다른 모듈 포함하기
-@Module(includes = [DataModule::class, NetworkModule::class])
-class AppModule
-```
-
-주요 특징:
-- `@Module`은 클래스를 Koin 모듈로 지정합니다.
-- `@ComponentScan`은 패키지 내의 애노테이션이 달린 클래스들을 자동으로 탐색합니다.
-- `@Configuration`은 시작 시 자동 탐색을 활성화합니다.
-- 모듈 함수를 통해 외부 라이브러리 인스턴스를 제공할 수 있습니다.
-
-:::info
-애노테이션 기반 모듈에 대한 자세한 문서는 [애노테이션 레퍼런스 - 모듈](/docs/reference/koin-annotations/modules)을 참조하세요.
-:::
-
-## 모범 사례 (Best Practices) {id="best-practices"}
-
-### 조직화 {id="organization"}
-
-1. **기능/계층별 그룹화**
-   ```kotlin
-   val authModule = module { /* 인증 기능 */ }
-   val networkModule = module { /* 네트워크 계층 */ }
-   ```
-
-2. **`includes()`를 사용하여 모듈 계층 구조 구축** (권장)
-   ```kotlin
-   // 모든 기능을 포함하는 루트 모듈 생성
-   val appModule = module {
-       includes(
-           coreModule,
-           networkModule,
-           featureAModule,
-           featureBModule
-       )
-   }
-
-   // 단일 모듈로 깔끔하게 시작
-   startKoin {
-       modules(appModule)
-   }
-   ```
-
-3. **모듈의 집중도 유지** - 모듈당 하나의 책임만 갖도록 합니다.
-
-### 명명 규칙 {id="naming"}
-
-- 서술적인 이름을 사용하세요: `networkModule`, `userFeatureModule`
-- 관련된 것끼리 그룹화하세요: `authDataModule`, `authDomainModule`
-
-### 멀티 모듈 프로젝트
-
-1. **기능당 하나의 퍼블릭 모듈**을 둡니다.
-2. **구현 모듈에는 `private` 또는 `internal`을 사용**하세요.
-3. **공유 모듈은 `:core`에 배치**합니다.
-
-## 다음 단계 {id="next-steps"}
-
-- **[정의(Definitions)](/docs/reference/koin-core/definitions)** - 정의 생성하기
-- **[한정자(Qualifiers)](/docs/reference/koin-core/qualifiers)** - 이름 및 타입 한정자
-- **[스코프(Scopes)](/docs/reference/koin-core/scopes)** - 스코프를 이용한 수명 주기 관리
-- **[트러블슈팅](/docs/reference/koin-core/troubleshooting)** - 일반적인 문제 디버깅 및 해결
+- [Definitions](/docs/reference/koin-core/definitions): 모듈 내부에 들어가는 항목들.
+- [Starting Koin](/docs/reference/koin-core/starting-koin): 모듈 로드, 타입 안전한 시작 및 구성 라벨.
+- [Lazy Modules](/docs/reference/koin-core/lazy-modules): 백그라운드에서 모듈 로드하기.
+- [KMP Shared Modules](/docs/reference/koin-core/kmp-shared-modules): 플랫폼 간 모듈 공유.
+- [Multi-Module Apps](/docs/reference/koin-android/multi-module): Android에서 여러 Gradle 모듈에 걸쳐 모듈 구성하기.
+- [Annotations Reference](/docs/reference/koin-annotations/annotations-inventory): `@Module`, `@ComponentScan`, `@Configuration`의 모든 매개변수 목록.

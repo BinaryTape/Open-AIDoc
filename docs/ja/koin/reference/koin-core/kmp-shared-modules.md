@@ -1,236 +1,293 @@
 ---
-title: 共有パターン
+title: KMP 共有パターン
 ---
 
-# 共有パターン
+# KMP 共有パターン
 
-このガイドでは、Kotlin Multiplatform プロジェクトにおける Koin モジュールの構成パターンについて説明します。
+このページでは、Kotlin Multiplatformプロジェクトにおいてプラットフォームごとに異なる定義を宣言する方法について説明します。これには、`expect`/`actual` を使用したプラットフォームモジュール、`expect`/`actual` クラス、プラットフォームごとに1つの実装を持つインターフェースが含まれます。プロジェクトが [KMP Setup](/docs/reference/koin-core/kmp-setup) に従ってセットアップされていることを前提としています。`expect`/`actual` に関するKotlinのルールについては、[Kotlin ドキュメント](https://kotlinlang.org/docs/multiplatform/multiplatform-expect-actual.html)を参照してください。
 
-:::info
-基本的な KMP のセットアップについては、[KMP セットアップ](/docs/reference/koin-core/kmp-setup) を参照してください。定義の種類については、[定義](/docs/reference/koin-core/definitions) を参照してください。
-:::
+## 共有モジュールの整理 {id="organizing-shared-modules"}
 
-## 共有モジュールパターン {id="the-shared-module-pattern"}
-
-各プラットフォームによって拡張可能な、共通の初期化関数を作成します。
+プラットフォームに依存しないものはすべて `commonMain` モジュールに配置し、レイヤー別または機能別に分割して、`includes()` で組み立てます。
 
 ```kotlin
-// commonMain/kotlin/di/KoinHelper.kt
-fun initKoin(config: KoinAppDeclaration? = null): KoinApplication {
-    return startKoin {
-        includes(config)  // プラットフォーム固有の拡張
-        modules(
-            sharedModule,
-            dataModule,
-            domainModule,
-            platformModule
-        )
-    }
-}
-```
-
-## モジュールの構成 {id="module-organization"}
-
-例ではコンパイラプラグイン DSL を使用していますが、アノテーションやクラシック DSL も使用できます。
-
-### レイヤー別 {id="by-layer"}
-
-```kotlin
-// commonMain/kotlin/di/modules/
-
-// データレイヤー
+// commonMain
 val dataModule = module {
     single<ApiClient>()
     single<UserRepository>()
-    single<ProductRepository>()
 }
 
-// ドメインレイヤー
 val domainModule = module {
     factory<GetUserUseCase>()
-    factory<GetProductsUseCase>()
-    factory<CreateOrderUseCase>()
 }
 
-// 共有モジュールですべてを集約
-val sharedModule = module {
-    includes(dataModule, domainModule)
+val appModule = module {
+    includes(dataModule, domainModule, platformModule())
 }
 ```
 
-### 機能別 {id="by-feature"}
+モジュールの構成については [Modules](/docs/reference/koin-core/modules) で説明されています。このページの残りの部分では、プラットフォームごとに異なる部分である `platformModule()` について解説します。
 
+## プラットフォームモジュール {id="platform-module"}
+
+`commonMain` で `expect` を使ってモジュールを宣言し、プラットフォームごとに1つの `actual` を記述します。各プラットフォームモジュールはそれぞれのクラスを宣言します。
+
+**Compiler Plugin DSL**
 ```kotlin
-// ユーザー機能
-val userModule = module {
-    single<UserRepository>()
-    factory<GetUserUseCase>()
-    factory<UpdateUserUseCase>()
+// commonMain
+interface PlatformComponent {
+    fun getInfo(): String
 }
 
-// 製品機能
-val productModule = module {
-    single<ProductRepository>()
-    factory<GetProductsUseCase>()
-    factory<SearchProductsUseCase>()
-}
-
-// 注文機能
-val orderModule = module {
-    single<OrderRepository>()
-    factory<CreateOrderUseCase>()
-    factory<GetOrderHistoryUseCase>()
-}
+expect fun platformModule(): Module
 ```
-
-## プラットフォーム拡張 {id="platform-extensions"}
-
-カスタムの構築ロジックが必要な場合、プラットフォームモジュールはラムダを伴うクラシック DSL を使用します。
-
-### Android 拡張 {id="android-extension"}
-
-```kotlin
-// androidMain/kotlin/di/KoinAndroid.kt
-fun initKoinAndroid(context: Context) {
-    initKoin {
-        androidContext(context)
-        androidLogger()
-        modules(androidModule)
-    }
-}
-
-val androidModule = module {
-    single<PlatformContext> { AndroidContext(get()) }
-    single<FileStorage> { AndroidFileStorage(get()) }
-    single<NetworkMonitor> { AndroidNetworkMonitor(get()) }
-}
-```
-
-### iOS 拡張 {id="ios-extension"}
-
-```kotlin
-// iosMain/kotlin/di/KoinIos.kt
-fun initKoinIos() {
-    initKoin {
-        modules(iosModule)
-    }
-}
-
-val iosModule = module {
-    single<PlatformContext> { IosContext() }
-    single<FileStorage> { IosFileStorage() }
-    single<NetworkMonitor> { IosNetworkMonitor() }
-}
-```
-
-### デスクトップ拡張 {id="desktop-extension"}
-
-```kotlin
-// desktopMain/kotlin/di/KoinDesktop.kt
-fun initKoinDesktop() {
-    initKoin {
-        printLogger()
-        modules(desktopModule)
-    }
-}
-
-val desktopModule = module {
-    single<PlatformContext> { DesktopContext() }
-    single<FileStorage> { DesktopFileStorage() }
-}
-```
-
-## Expect/Actual モジュールパターン {id="expect-actual-module-pattern"}
-
-### 共通の定義 {id="common-definition"}
-
-```kotlin
-// commonMain/kotlin/di/PlatformModule.kt
-expect val platformModule: Module
-```
-
-### プラットフォームごとの実装 {id="platform-implementations"}
 
 ```kotlin
 // androidMain
-actual val platformModule = module {
-    single<DatabaseDriver> { AndroidSqliteDriver(AppDatabase.Schema, get(), "app.db") }
-    single<HttpEngine> { Android.create() }
-    single<Settings> { AndroidSettings(get()) }
+class AndroidComponent(private val context: Context) : PlatformComponent {
+    override fun getInfo() = "Android ${context.packageName}"
+}
+
+actual fun platformModule(): Module = module {
+    single<AndroidComponent>() bind PlatformComponent::class
+}
+```
+
+```kotlin
+// iosMain
+class IOSComponent : PlatformComponent {
+    override fun getInfo() = "iOS"
+}
+
+actual fun platformModule(): Module = module {
+    single<IOSComponent>() bind PlatformComponent::class
+}
+```
+
+**Annotations**
+```kotlin
+// commonMain
+interface PlatformComponent {
+    fun getInfo(): String
+}
+
+@Module
+expect class PlatformModule
+```
+
+```kotlin
+// androidMain
+@Module
+@ComponentScan
+actual class PlatformModule
+
+@Singleton
+class AndroidComponent(private val context: Context) : PlatformComponent {
+    override fun getInfo() = "Android ${context.packageName}"
+}
+```
+
+```kotlin
+// iosMain
+@Module
+@ComponentScan
+actual class PlatformModule
+
+@Singleton
+class IOSComponent : PlatformComponent {
+    override fun getInfo() = "iOS"
+}
+```
+
+各 `actual` モジュールは自身のソースセットをスキャンするため、そのプラットフォームのクラスのみを検出します。`@Singleton` はクラスをそのスーパータイプにバインドするため、`PlatformComponent` はプラットフォームのクラスへと解決されます。共通モジュールから `PlatformModule` を含めるには、`@Module(includes = [PlatformModule::class])` を使用します。
+
+**Constructor / Classic DSL**
+```kotlin
+// commonMain
+interface PlatformComponent {
+    fun getInfo(): String
+}
+
+expect fun platformModule(): Module
+```
+
+```kotlin
+// androidMain
+actual fun platformModule(): Module = module {
+    singleOf(::AndroidComponent) bind PlatformComponent::class
+}
+```
+
+```kotlin
+// iosMain
+actual fun platformModule(): Module = module {
+    singleOf(::IOSComponent) bind PlatformComponent::class
+}
+```
+
+プラットフォームの実装で異なるコンストラクタパラメータが必要な場合は、このパターンを使用します。共通コードは `PlatformComponent` インターフェースにのみ依存し、各プラットフォームは必要なもの（ここではAndroidの `Context`）を自由に注入できます。Androidでは、起動時に `androidContext()` が設定されると `Context` が解決されます（[KMP Setup](/docs/reference/koin-core/kmp-setup) を参照）。
+
+### プラットフォームライブラリ {id="platform-libraries"}
+
+プラットフォームのドライバやエンジン（SQLDelight、Ktorクライアントエンジン、設定など）は、関数呼び出しによって構築されます。プラットフォームモジュール内でラムダを使用してこれらを宣言します。
+
+```kotlin
+// androidMain
+actual fun platformModule(): Module = module {
+    single<SqlDriver> { AndroidSqliteDriver(AppDatabase.Schema, androidContext(), "app.db") }
+    single<HttpClientEngine> { OkHttp.create() }
 }
 
 // iosMain
-actual val platformModule = module {
-    single<DatabaseDriver> { NativeSqliteDriver(AppDatabase.Schema, "app.db") }
-    single<HttpEngine> { Darwin.create() }
-    single<Settings> { NSUserDefaultsSettings(NSUserDefaults.standardUserDefaults) }
-}
-
-// jsMain
-actual val platformModule = module {
-    single<DatabaseDriver> { JsSqliteDriver() }
-    single<HttpEngine> { Js.create() }
-    single<Settings> { LocalStorageSettings() }
+actual fun platformModule(): Module = module {
+    single<SqlDriver> { NativeSqliteDriver(AppDatabase.Schema, "app.db") }
+    single<HttpClientEngine> { Darwin.create() }
 }
 ```
 
-## Compose Multiplatform {id="compose-multiplatform"}
+これにより、共通モジュールはプラットフォームを意識することなく、それらを基盤として構築できます: `single { AppDatabase(get()) }`、`single { HttpClient(get<HttpClientEngine>()) }`。自身が所有していないクラスを宣言するその他の方法については、[Definitions](/docs/reference/koin-core/definitions) を参照してください。
 
-マルチプラットフォーム向けの ViewModel については、[ViewModel](/docs/reference/koin-core/viewmodel) を参照してください。
+## expect/actual クラス {id="expect-actual-class"}
 
-### 共有 ViewModel {id="shared-viewmodel"}
+すべてのプラットフォームでクラスが同じコンストラクタを持つ場合は、共通コードで一度宣言し、各プラットフォームでそれを実装させます。
+
+**Compiler Plugin DSL**
+```kotlin
+// commonMain
+expect class NativeComponent() {
+    fun getInfo(): String
+}
+
+val nativeComponentModule = module {
+    single<NativeComponent>()
+}
+```
+
+```kotlin
+// androidMain
+actual class NativeComponent actual constructor() {
+    actual fun getInfo() = "Android NativeComponent"
+}
+
+// iosMain
+actual class NativeComponent actual constructor() {
+    actual fun getInfo() = "iOS NativeComponent"
+}
+```
+
+**Annotations**
+```kotlin
+// commonMain
+@Module
+@ComponentScan
+class NativeComponentModule
+
+@Singleton
+expect class NativeComponent() {
+    fun getInfo(): String
+}
+```
+
+```kotlin
+// androidMain
+@Singleton
+actual class NativeComponent actual constructor() {
+    actual fun getInfo() = "Android NativeComponent"
+}
+
+// iosMain
+@Singleton
+actual class NativeComponent actual constructor() {
+    actual fun getInfo() = "iOS NativeComponent"
+}
+```
+
+共通の `@Module` クラスのプロバイダ関数を通じて `expect` クラスを宣言することもできます。
 
 ```kotlin
 // commonMain
-@KoinViewModel
-class UserViewModel(
-    private val getUserUseCase: GetUserUseCase
-) : ViewModel() {
-    private val _state = MutableStateFlow<UserState>(UserState.Loading)
-    val state = _state.asStateFlow()
-
-    fun loadUser(id: String) {
-        viewModelScope.launch {
-            _state.value = UserState.Success(getUserUseCase(id))
-        }
-    }
+@Module
+class NativeModule {
+    @Factory
+    fun nativeComponent(): NativeComponent = NativeComponent()
 }
 ```
 
-### 共有 UI {id="shared-ui"}
-
+**Constructor / Classic DSL**
 ```kotlin
 // commonMain
-@Composable
-fun UserScreen(
-    viewModel: UserViewModel = koinViewModel()
-) {
-    val state by viewModel.state.collectAsState()
+expect class NativeComponent() {
+    fun getInfo(): String
+}
 
-    when (val s = state) {
-        is UserState.Loading -> LoadingIndicator()
-        is UserState.Success -> UserContent(s.user)
-        is UserState.Error -> ErrorMessage(s.message)
-    }
+val nativeComponentModule = module {
+    singleOf(::NativeComponent)
 }
 ```
 
-## テスト {id="testing"}
+`actual` クラスは他のタブと同様です。
 
-KMP のテストパターンについては、[テスト](/docs/reference/koin-test/testing) を参照してください。
+`expect` クラスは、すべてのプラットフォームに対して単一のコンストラクタ規約を持ちます。あるプラットフォームで別の依存関係（例えばAndroidの `Context`）が必要な場合、そのプラットフォームにのみ追加することはできません。代わりに、インターフェースを使用した[プラットフォームモジュール](#platform-module)パターン、またはプラットフォームラッパー（[KMP Platform Integration](/docs/reference/koin-mp/kmp) を参照）を使用してください。
 
-## ベストプラクティス {id="best-practices"}
+## 単一プラットフォームのみのコンポーネント {id="components-on-one-platform-only"}
 
-1. **単一の初期化関数** - `commonMain` に 1 つの `initKoin()` を配置する
-2. **config によるプラットフォーム拡張** - `includes(config)` パターンを使用する
-3. **プラットフォームモジュールを最小限にする** - 真にプラットフォーム固有のコードのみに限定する
-4. **ViewModel ロジックの共有** - ビジネスロジックを `commonMain` に配置する
-5. **ファクトリに expect/actual を使用する** - プラットフォーム固有のインスタンス生成に利用する
-6. **commonTest でテストする** - ほとんどのテストは共有可能である
+プラットフォームモジュールは、特定のプラットフォームにのみ存在し、他の場所には存在しないクラスを宣言できます。他のプラットフォームは空のモジュールのままにしておきます。
 
-## 次のステップ {id="next-steps"}
+**Compiler Plugin DSL**
+```kotlin
+// androidMain
+actual fun platformModule(): Module = module {
+    single<NotificationHelper>()
+}
 
-- **[KMP セットアップ](/docs/reference/koin-core/kmp-setup)** - 基本的な KMP 構成
-- **[ViewModel](/docs/reference/koin-core/viewmodel)** - マルチプラットフォーム ViewModel
-- **[高度なパターン](/docs/reference/koin-mp/kmp)** - アーキテクチャパターン、テスト、プラットフォーム統合
-- **[Koin for Compose](/docs/reference/koin-compose/compose)** - Compose Multiplatform
+// iosMain
+actual fun platformModule(): Module = module { }
+```
+
+**Annotations**
+```kotlin
+// androidMain
+@Module
+@ComponentScan("com.example.app.android")
+actual class PlatformModule
+
+// iosMain: 宣言なし
+@Module
+actual class PlatformModule
+```
+
+**Constructor / Classic DSL**
+```kotlin
+// androidMain
+actual fun platformModule(): Module = module {
+    singleOf(::NotificationHelper)
+}
+
+// iosMain
+actual fun platformModule(): Module = module { }
+```
+
+これにより、Androidのコードのみが `NotificationHelper` を使用できるようになります。このクラスは `commonMain` に存在しないため、共通コードから参照することはできません。
+
+## パターンの選択 {id="choosing-a-pattern"}
+
+| 状況 | パターン |
+|-----------|---------|
+| すべてのプラットフォームで同じコンストラクタ | `expect`/`actual` クラス |
+| プラットフォームごとにコンストラクタパラメータが異なる | 共通コード内のインターフェース、プラットフォームモジュール内の実装 |
+| 関数で構築されるプラットフォームライブラリ（ドライバ、エンジン） | プラットフォームモジュール内のラムダ |
+| 1つのプラットフォームにのみ存在するクラス | プラットフォームモジュール（他のプラットフォームでは空） |
+| 共有コードでAndroidの `Context` が必要 | プラットフォームラッパー（[KMP Platform Integration](/docs/reference/koin-mp/kmp) を参照） |
+
+## 制限事項 {id="limits"}
+
+- **手動での依存関係解決（Manual wiring）**: プロバイダ関数がKoinの `Scope` を受け取り、自身で `scope.get()` を呼び出す場合、その呼び出しは動的となり、[コンパイル時安全性（compile-time safety）](/docs/reference/koin-compiler/compile-safety)の対象外となります。コンストラクタパラメータの使用を推奨します。
+- **テスト**: 共有モジュールは `commonTest` でテストできます。[Testing](/docs/reference/koin-test/testing) を参照してください。
+
+## 関連情報 {id="related"}
+
+- [KMP Setup](/docs/reference/koin-core/kmp-setup): 依存関係と共有の `initKoin` 関数。
+- [KMP Platform Integration](/docs/reference/koin-mp/kmp): 共有コードでのAndroid Context、Swiftとの相互運用性、デスクトップおよびWeb。
+- [Modules](/docs/reference/koin-core/modules): `includes()`、`@Module`、`@ComponentScan`、`@Configuration`。
+- [Definitions](/docs/reference/koin-core/definitions): バインディング、プロバイダ関数、自身が所有していないクラス。
+- [ViewModel](/docs/reference/koin-core/viewmodel): `commonMain` で宣言されたViewModel。

@@ -1,9 +1,10 @@
-[//]: # (title: 전달된 헤더 (Forwarded headers))
+[//]: # (title: Forwarded 헤더)
 
 <show-structure for="chapter" depth="2"/>
 <primary-label ref="server-plugin"/>
 
 <var name="artifact_name" value="ktor-server-forwarded-header"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.server.forwardedHeader"/>
 <var name="package_name" value="io.ktor.server.plugins.forwardedheaders"/>
 
 <tldr>
@@ -18,21 +19,21 @@
     </a>
 </p>
 <p>
-    <b><Links href="/ktor/server-native" summary="Ktor는 Kotlin/Native를 지원하며 추가 런타임이나 가상 머신 없이 서버를 실행할 수 있게 해줍니다.">네이티브 서버</Links> 지원</b>: ✅
+    <b><Links href="server-native.md" summary="Ktor는 Kotlin/Native를 지원하여 추가 런타임이나 가상 머신 없이 서버를 실행할 수 있습니다.">Native 서버</Links> 지원</b>: ✅
 </p>
 </tldr>
 
-[ForwardedHeaders](https://api.ktor.io/ktor-server-forwarded-header/io.ktor.server.plugins.forwardedheaders/-forwarded-headers.html) 및 [XForwardedHeaders](https://api.ktor.io/ktor-server-forwarded-header/io.ktor.server.plugins.forwardedheaders/-x-forwarded-headers.html) 플러그인을 사용하면 Ktor 서버가 리버스 프록시(reverse proxy) 뒤에 배치되었을 때 원본 [요청(request)](server-requests.md)에 대한 정보를 얻기 위해 리버스 프록시 헤더를 처리할 수 있습니다. 이는 [로깅(logging)](server-logging.md) 목적으로 유용할 수 있습니다.
+[ForwardedHeaders](https://api.ktor.io/ktor-server-forwarded-header/io.ktor.server.plugins.forwardedheaders/-forwarded-headers.html) 및 [XForwardedHeaders](https://api.ktor.io/ktor-server-forwarded-header/io.ktor.server.plugins.forwardedheaders/-x-forwarded-headers.html) 플러그인을 사용하면 Ktor 서버가 리버스 프록시(reverse proxy) 뒤에 배치되었을 때 리버스 프록시 헤더를 처리하여 원래의 [요청](server-requests.md)에 대한 정보를 얻을 수 있습니다. 이는 [로깅](server-logging.md) 목적으로 유용할 수 있습니다.
 
 * `ForwardedHeaders`는 `Forwarded` 헤더([RFC 7239](https://tools.ietf.org/html/rfc7239))를 처리합니다.
-* `XForwardedHeaders`는 다음과 같은 `X-Forwarded-` 헤더들을 처리합니다:
+* `XForwardedHeaders`는 다음 `X-Forwarded-` 헤더들을 처리합니다:
    - `X-Forwarded-Host`/`X-Forwarded-Server` 
    - `X-Forwarded-For` 
    - `X-Forwarded-By`
    - `X-Forwarded-Proto`/`X-Forwarded-Protocol`
    - `X-Forwarded-SSL`/`Front-End-Https`
 
-> `Forwarded` 헤더 조작을 방지하려면, 애플리케이션이 리버스 프록시 연결만 허용하는 경우에만 이 플러그인들을 설치하세요.
+> `Forwarded` 헤더의 위변조를 방지하려면 애플리케이션이 리버스 프록시 연결만 허용하는 경우에만 이 플러그인들을 설치하세요.
 > 
 {type="note"}
 
@@ -41,10 +42,18 @@
 
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            위 코드 스니펫은 Ktor 의존성을 지정하기 위해 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 버전 카탈로그</a>를 사용합니다.
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            위 코드 스니펫은 Ktor 의존성을 지정하기 위해 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 버전 카탈로그</a>를 사용합니다.
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
@@ -59,15 +68,15 @@
 <var name="plugin_name" value="ForwardedHeaders"/>
 <p>
     애플리케이션에 <code>%plugin_name%</code> 플러그인을 <a href="server-plugins.md#install">설치</a>하려면,
-    지정된 <Links href="/ktor/server-modules" summary="모듈을 사용하면 라우트를 그룹화하여 애플리케이션을 구성할 수 있습니다.">모듈</Links>에서 <code>install</code> 함수에 전달하세요.
-    아래 코드 스니펫은 <code>%plugin_name%</code>을 설치하는 방법을 보여줍니다...
+    지정된 <Links href="server-modules.md" summary="모듈을 사용하면 라우트를 그룹화하여 애플리케이션을 구조화할 수 있습니다.">모듈</Links>의 <code>install</code> 함수에 전달하세요.
+    다음 예제는 <code>%plugin_name%</code>을 설치하는 방법을 보여줍니다:
 </p>
 <list>
     <li>
-        ... <code>embeddedServer</code> 함수 호출 내부에서 설치.
+        <code>embeddedServer()</code> 함수 호출 내부에서 설치.
     </li>
     <li>
-        ... <code>Application</code> 클래스의 확장 함수인 명시적으로 정의된 <code>module</code> 내부에서 설치.
+        <code>Application</code> 클래스에 명시적으로 정의된 <code>module()</code> 확장 함수 내부에서 설치.
     </li>
 </list>
 <Tabs>
@@ -86,15 +95,15 @@
 <var name="plugin_name" value="XForwardedHeaders"/>
 <p>
     애플리케이션에 <code>%plugin_name%</code> 플러그인을 <a href="server-plugins.md#install">설치</a>하려면,
-    지정된 <Links href="/ktor/server-modules" summary="모듈을 사용하면 라우트를 그룹화하여 애플리케이션을 구성할 수 있습니다.">모듈</Links>에서 <code>install</code> 함수에 전달하세요.
-    아래 코드 스니펫은 <code>%plugin_name%</code>을 설치하는 방법을 보여줍니다...
+    지정된 <Links href="server-modules.md" summary="모듈을 사용하면 라우트를 그룹화하여 애플리케이션을 구조화할 수 있습니다.">모듈</Links>의 <code>install</code> 함수에 전달하세요.
+    다음 예제는 <code>%plugin_name%</code>을 설치하는 방법을 보여줍니다:
 </p>
 <list>
     <li>
-        ... <code>embeddedServer</code> 함수 호출 내부에서 설치.
+        <code>embeddedServer()</code> 함수 호출 내부에서 설치.
     </li>
     <li>
-        ... <code>Application</code> 클래스의 확장 함수인 명시적으로 정의된 <code>module</code> 내부에서 설치.
+        <code>Application</code> 클래스에 명시적으로 정의된 <code>module()</code> 확장 함수 내부에서 설치.
     </li>
 </list>
 <Tabs>
@@ -109,14 +118,14 @@
 </TabItem>
 </Tabs>
 
-`ForwardedHeaders`/`XForwardedHeaders`를 설치한 후, [call.request.origin](#request_info) 속성을 사용하여 원본 요청에 대한 정보를 얻을 수 있습니다.
+`ForwardedHeaders`/`XForwardedHeaders`를 설치한 후에는 [call.request.origin](#request_info) 프로퍼티를 사용하여 원래 요청에 대한 정보를 가져올 수 있습니다.
 
 ## 요청 정보 가져오기 {id="request_info"}
 
 ### 프록시 요청 정보 {id="proxy_request_info"}
 
-프록시 요청에 대한 정보를 얻으려면 [라우트 핸들러(route handler)](server-routing.md#define_route) 내부에서 [call.request.local](https://api.ktor.io/ktor-server-core/io.ktor.server.request/-application-request/local.html) 속성을 사용하세요.
-아래 코드 스니펫은 프록시 주소와 요청이 전달된 호스트에 대한 정보를 얻는 방법을 보여줍니다:
+프록시 요청에 대한 정보를 가져오려면 [라우트 핸들러](server-routing.md#define_route) 내부에서 [call.request.local](https://api.ktor.io/ktor-server-core/io.ktor.server.request/-application-request/local.html) 프로퍼티를 사용하세요.
+아래 코드 스니펫은 프록시 주소와 요청이 전송된 대상 호스트에 대한 정보를 가져오는 방법을 보여줍니다:
 
 ```kotlin
 get("/hello") {
@@ -125,9 +134,9 @@ get("/hello") {
 }
 ```
 
-### 원본 요청 정보 {id="original-request-information"}
+### 원래 요청 정보 {id="original-request-information"}
 
-원본 요청에 대한 정보를 읽으려면 [call.request.origin](https://api.ktor.io/ktor-server-core/io.ktor.server.plugins/origin.html) 속성을 사용하세요:
+원래 요청에 대한 정보를 읽으려면 [call.request.origin](https://api.ktor.io/ktor-server-core/io.ktor.server.plugins/origin.html) 프로퍼티를 사용하세요:
 
 ```kotlin
 get("/hello") {
@@ -136,11 +145,11 @@ get("/hello") {
 }
 ```
 
-아래 표는 `ForwardedHeaders`/`XForwardedHeaders` 설치 여부에 따라 `call.request.origin`에 의해 노출되는 다양한 속성들의 값을 보여줍니다.
+아래 표는 `ForwardedHeaders`/`XForwardedHeaders` 설치 여부에 따라 `call.request.origin`이 제공하는 다양한 프로퍼티의 값을 보여줍니다.
 
 ![요청 다이어그램](forwarded-headers.png){width="706"}
 
-| 속성 | ForwardedHeaders 없음 | ForwardedHeaders 포함 |
+| 프로퍼티                   | ForwardedHeaders 미사용 | ForwardedHeaders 사용 |
 |------------------------|--------------------------|-----------------------|
 | `origin.localHost`     | _web-server_             | _web-server_          |
 | `origin.localPort`     | _8080_                   | _8080_                |
@@ -151,28 +160,28 @@ get("/hello") {
 
 > 전체 예제는 여기에서 확인할 수 있습니다: [forwarded-header](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/forwarded-header).
 
-## ForwardedHeaders 설정 {id="configure"}
+## ForwardedHeaders 구성하기 {id="configure"}
 
-요청이 여러 프록시를 거치는 경우 `ForwardedHeaders`/`XForwardedHeaders`를 설정해야 할 수도 있습니다.
-이 경우, `X-Forwarded-For`는 각 연속된 프록시의 모든 IP 주소를 포함합니다. 예:
+요청이 여러 프록시를 통과하는 경우 `ForwardedHeaders`/`XForwardedHeaders`를 구성해야 할 수 있습니다.
+이 경우 `X-Forwarded-For`에는 연속된 각 프록시의 모든 IP 주소가 포함됩니다. 예를 들면 다음과 같습니다:
 
 ```HTTP
 X-Forwarded-For: <client>, <proxy1>, <proxy2>
 ```
 
-기본적으로 `XForwardedHeader`는 `X-Forward-For`의 첫 번째 항목을 `call.request.origin.remoteHost` 속성에 할당합니다.
-[IP 주소 선택](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For#selecting_an_ip_address)을 위한 사용자 정의 로직을 제공할 수도 있습니다.
-[XForwardedHeadersConfig](https://api.ktor.io/ktor-server-forwarded-header/io.ktor.server.plugins.forwardedheaders/-x-forwarded-headers-config/index.html)는 이를 위해 다음과 같은 API를 노출합니다:
+기본적으로 `XForwardedHeader`는 `X-Forwarded-For`의 첫 번째 항목을 `call.request.origin.remoteHost` 프로퍼티에 할당합니다.
+또한 [IP 주소 선택](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For#selecting_an_ip_address)을 위한 커스텀 로직을 제공할 수도 있습니다.
+[XForwardedHeadersConfig](https://api.ktor.io/ktor-server-forwarded-header/io.ktor.server.plugins.forwardedheaders/-x-forwarded-headers-config/index.html)는 이를 위해 다음과 같은 API를 제공합니다:
 
-- `useFirstProxy` 및 `useLastProxy`는 각각 IP 주소 목록에서 첫 번째 또는 마지막 값을 가져올 수 있게 합니다.
-- `skipLastProxies`는 오른쪽부터 지정된 수의 항목을 건너뛰고 다음 항목을 가져옵니다.
-   예를 들어, `proxiesCount` 매개변수가 `3`인 경우, 아래 헤더에 대해 `origin.remoteHost`는 `10.0.0.123`을 반환합니다:
+- `useFirstProxy` 및 `useLastProxy`를 사용하면 IP 주소 목록에서 각각 첫 번째 또는 마지막 값을 가져올 수 있습니다.
+- `skipLastProxies`는 오른쪽 끝부터 지정된 개수의 항목을 건너뛰고 그다음 항목을 가져옵니다.
+   예를 들어 `proxiesCount` 매개변수가 `3`인 경우, 아래 헤더에 대해 `origin.remoteHost`는 `10.0.0.123`을 반환합니다:
    ```HTTP
    X-Forwarded-For: 10.0.0.123, proxy-1, proxy-2, proxy-3
    ```
 - `skipKnownProxies`는 목록에서 지정된 항목들을 제거하고 마지막 항목을 가져옵니다.
-   예를 들어, 이 함수에 `listOf("proxy-1", "proxy-3")`을 전달하면, 아래 헤더에 대해 `origin.remoteHost`는 `proxy-2`를 반환합니다:
+   예를 들어 이 함수에 `listOf("proxy-1", "proxy-3")`을 전달하면, 아래 헤더에 대해 `origin.remoteHost`는 `proxy-2`를 반환합니다:
    ```HTTP
    X-Forwarded-For: 10.0.0.123, proxy-1, proxy-2, proxy-3
    ```
-- `extractEdgeProxy`를 사용하면 `X-Forward-*` 헤더에서 값을 추출하기 위한 사용자 정의 로직을 제공할 수 있습니다.
+- `extractEdgeProxy`를 사용하면 `X-Forward-*` 헤더에서 값을 추출하기 위한 커스텀 로직을 제공할 수 있습니다.

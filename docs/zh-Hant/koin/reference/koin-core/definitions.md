@@ -4,41 +4,38 @@ title: 定義
 
 # 定義
 
-定義宣告了 Koin 如何建立與管理您的相依性。本指南涵蓋了使用 DSL 和註解 (Annotation) 的所有定義型別。
+定義會告訴 Koin 如何建立某個型別，以及該執行個體應保留多久。本頁面涵蓋定義型別、介面繫結、建構函式參數的解析方式，以及非自有的類別之定義。本文假設你已經了解什麼是模組（請參閱[核心概念](/docs/intro/core-concepts)）。
+
+程式碼範例提供三種分頁標籤：Compiler Plugin DSL、Annotations、Constructor / Classic DSL。請選擇你偏好的方式，該選擇將套用至所有頁面。若你不確定該使用哪種風格，請閱讀[選擇你的風格](/docs/intro/choosing-your-style)。
 
 ## 定義型別 {id="definition-types"}
 
-| 型別 | DSL | 註解 | 生命週期 | 使用案例 |
-|------|-----|------------|-----------|----------|
-| Singleton | `single()` | `@Singleton` | 在應用程式生命週期內僅有一個執行個體 | Service、存儲庫 (repository)、資料庫 |
-| Factory | `factory()` | `@Factory` | 每次請求時建立新執行個體 | Presenter、使用案例 (use case)、具狀態的物件 |
-| Scoped | `scoped()` | `@Scoped` | 每個作用域 (scope) 一個執行個體 | 繫結至 Activity 或工作階段 (session) 的物件 |
-| ViewModel | `viewModel()` | `@KoinViewModel` | Android ViewModel 生命週期 | ViewModel |
+| 型別 | 執行個體 | 一般用途 |
+|------|----------|-------------|
+| `single` | 單一執行個體，在 Koin 容器的生命週期內持續保留 | Repository、API 用戶端、資料庫 |
+| `factory` | 每次被請求時建立新的執行個體 | Presenter、使用案例、短期的物件 |
+| `scoped` | 每個作用域單一執行個體，當作用域關閉時釋放 | 繫結至 Activity、工作階段 (session)、請求的物件 |
+| `viewModel` | 由 ViewModel 生命週期管理 | ViewModel（Android 與 Compose Multiplatform） |
+| `worker` | 由 WorkManager 建立 | Android `ListenableWorker` |
 
-## 宣告定義 {id="declaring-definitions"}
+宣告方式：
 
-### 編譯器外掛程式 DSL（推薦） {id="compiler-plugin-dsl-recommended"}
-
+**Compiler Plugin DSL**
 ```kotlin
+import org.koin.dsl.module
 import org.koin.plugin.module.dsl.*
 
 val appModule = module {
-    // Singleton
     single<Database>()
     single<UserRepository>()
-
-    // Factory - 每次請求時建立新執行個體
     factory<UserPresenter>()
-
-    // ViewModel
     viewModel<UserViewModel>()
 }
 ```
 
-### 註解 {id="annotations"}
-
+**Annotations**
 ```kotlin
-@Singleton  // 或 @Single
+@Singleton
 class Database
 
 @Singleton
@@ -51,17 +48,25 @@ class UserPresenter(private val repository: UserRepository)
 class UserViewModel(private val repository: UserRepository) : ViewModel()
 ```
 
-### 經典 DSL {id="classic-dsl"}
+`@Singleton` 與 `@Single` 是等價的。建議優先使用 JSR-330 名稱 `@Singleton`。
 
+**Constructor / Classic DSL**
 ```kotlin
+import org.koin.dsl.module
+import org.koin.core.module.dsl.*
+
 val appModule = module {
-    // 使用建構函式參照（自動裝配）
     singleOf(::Database)
     singleOf(::UserRepository)
     factoryOf(::UserPresenter)
     viewModelOf(::UserViewModel)
+}
+```
 
-    // 使用 Lambda（手動裝配）
+你也可以自己撰寫建構函式呼叫，為每個相依性使用 `get()`：
+
+```kotlin
+val appModule = module {
     single { Database() }
     single { UserRepository(get()) }
     factory { UserPresenter(get()) }
@@ -69,356 +74,223 @@ val appModule = module {
 }
 ```
 
-## 定義比較 {id="definition-comparison"}
+使用 Compiler Plugin DSL 與註解時，你完全不需要撰寫 `get()`。[Koin 編譯器外掛程式](/docs/intro/koin-compiler-plugin)會讀取建構函式並為你產生呼叫，隨後在建置階段檢查是否已宣告每個相依性。
 
-| 概念 | 編譯器外掛程式 DSL | 經典 DSL | 註解 |
-|---------|---------------------|-------------|------------|
-| Singleton | `single<MyClass>()` | `singleOf(::MyClass)` | `@Singleton` / `@Single` |
-| Factory | `factory<MyClass>()` | `factoryOf(::MyClass)` | `@Factory` |
-| Scoped | `scoped<MyClass>()` | `scopedOf(::MyClass)` | `@Scoped` |
-| ViewModel | `viewModel<MyVM>()` | `viewModelOf(::MyVM)` | `@KoinViewModel` |
-| Worker | `worker<MyWorker>()` | `workerOf(::MyWorker)` | `@KoinWorker` |
+`single` 與 `factory` 如上所述。`scoped` 需要宣告作用域：請參閱[作用域](/docs/reference/koin-core/scopes)。`viewModel` 有其專屬頁面：請參閱 [ViewModel](/docs/reference/koin-core/viewmodel)。`worker` 則在 [WorkManager](/docs/reference/koin-android/workmanager) 中介紹。
 
-:::info
-編譯器外掛程式正在分析您的類別和函式參數，以產生對 Koin 的正確呼叫並使用 `get()` 函式，您不再需要手動撰寫。
-:::
+### Single 還是 factory？ {id="single-or-factory"}
 
-## Single (Singleton) {id="single-singleton"}
-
-建立一個在整個應用程式中重複使用的執行個體：
-
-```kotlin
-// DSL
-single<DatabaseHelper>()
-
-// 註解
-@Singleton
-class DatabaseHelper
-```
-
-兩者產生的結果相同：一個在所有取用者之間共用的單一執行個體。
-
-## Factory {id="factory"}
-
-每次都建立一個新執行個體：
-
-```kotlin
-// DSL
-factory<UserPresenter>()
-
-// 註解
-@Factory
-class UserPresenter(private val repository: UserRepository)
-```
-
-## Scoped {id="scoped"}
-
-每個作用域建立一個執行個體：
-
-```kotlin
-// DSL
-scope<MyActivity> {
-    scoped<ActivityPresenter>()
-}
-
-// 註解
-@Scoped(MyActivityScope::class)
-class ActivityPresenter
-```
-
-## ViewModel {id="viewmodel"}
-
-具備適當生命週期的 Android ViewModel：
-
-```kotlin
-// DSL
-viewModel<UserViewModel>()
-
-// 註解
-@KoinViewModel
-class UserViewModel(private val repository: UserRepository) : ViewModel()
-```
+當物件沒有個別呼叫者專屬的狀態，且建立成本較高（如資料庫、HTTP 用戶端）時，請使用 `single`。當每個呼叫者需要自己的執行個體，或是物件持有的狀態不得共用時，請使用 `factory`。如果某個執行個體的存活時間應比 factory 長，但比整個應用程式短，則你需要[作用域](/docs/reference/koin-core/scopes)。
 
 ## 介面繫結 {id="interface-binding"}
 
-### 編譯器外掛程式 DSL {id="compiler-plugin-dsl"}
+多數情況下，取用端相依於介面，而非實作。將實作繫結至介面：
 
+**Compiler Plugin DSL**
 ```kotlin
-single<UserRepositoryImpl>() bind UserRepository::class
+val dataModule = module {
+    single<UserRepositoryImpl>() bind UserRepository::class
 
-// 多重繫結
-single<MyServiceImpl>() binds arrayOf(ServiceA::class, ServiceB::class)
-```
-
-### 經典 DSL
-
-```kotlin
-singleOf(::UserRepositoryImpl) bind UserRepository::class
-
-// 或使用 Lambda
-single<UserRepository> { UserRepositoryImpl(get()) }
-```
-
-### 註解
-
-當您的類別實作介面時，**介面繫結是自動進行的**：
-
-```kotlin
-@Singleton
-class UserRepositoryImpl(
-    private val database: Database
-) : UserRepository  // 自動繫結至 UserRepository
-```
-
-對於明確繫結：
-
-```kotlin
-@Singleton
-@Binds(UserRepository::class)
-class UserRepositoryImpl : UserRepository
-```
-
-## 限定詞（命名定義） {id="qualifiers-named-definitions"}
-
-當您有相同型別的多個定義時。有關檢索方式，請參閱 [使用限定詞進行注入](/docs/reference/koin-core/injection#injection-with-qualifiers)。
-
-### 編譯器外掛程式 DSL
-
-使用編譯器外掛程式 DSL 時，您需要使用 `@Named` 進行註解以使用字串限定詞（就像您之前使用 `named()` 一樣）
-
-```kotlin
-@Named("local")
-class LocalDatabase : Database
-
-@Named("remote")
-class RemoteDatabase : Database
-
-class UserRepository(
-    @Named("local") private val localDb: Database,
-    @Named("remote") private val remoteDb: Database
-)
-
-single<LocalDatabase>()
-single<RemoteDatabase>()
-single<UserRepository>()
-
-// 用法
-val localDb: Database = get(named("local"))
-```
-
-### 經典 DSL
-
-```kotlin
-single<Database>(named("local")) { LocalDatabase() }
-single<Database>(named("remote")) { RemoteDatabase() }
-
-// 用法
-val localDb: Database = get(named("local"))
-```
-
-### 註解
-
-```kotlin
-@Singleton
-@Named("local")
-class LocalDatabase : Database
-
-@Singleton
-@Named("remote")
-class RemoteDatabase : Database
-
-// 在取用者中
-@Singleton
-class UserRepository(
-    @Named("local") private val localDb: Database,
-    @Named("remote") private val remoteDb: Database
-)
-```
-
-## 注入參數 {id="injected-parameters"}
-
-在注入時傳遞參數：
-
-### 編譯器外掛程式 DSL
-
-使用 `@InjectedParam` 來表示參數將由注入參數提供。
-
-```kotlin
-class UserPresenter(
-    @InjectedParam userId : String,
-    repository : UserRepository
-)
-
-factory<UserPresenter>()
-```
-
-### 經典 DSL
-
-```kotlin
-class UserPresenter(
-    userId : String,
-    repository : UserRepository
-)
-
-factory { params ->
-    UserPresenter(
-        userId = params.get(),
-        repository = get()
-    )
+    // several types at once
+    single<MyServiceImpl>() binds arrayOf(ServiceA::class, ServiceB::class)
 }
 ```
 
-### 註解
-
+**Annotations**
 ```kotlin
-@Factory
-class UserPresenter(
-    @InjectedParam val userId: String,
-    val repository: UserRepository  // 自動注入
-)
-
-// 用法
-val presenter: UserPresenter = get { parametersOf("user123") }
+@Singleton
+class UserRepositoryImpl(private val database: Database) : UserRepository
 ```
 
-## 選用相依性 {id="optional-dependencies"}
-
-### 編譯器外掛程式 DSL
+繫結是自動的：Koin 會將類別繫結至其所有超型別。若只要繫結其中的部分型別，請將它們列出：
 
 ```kotlin
-class MyService(
-    val required: RequiredDep,
-    val optional: OptionalDep?  // 使用 getOrNull() 解析
-)
-
-single<MyService>()
+@Singleton(binds = [UserRepository::class])
+class UserRepositoryImpl(private val database: Database) : UserRepository, Closeable
 ```
 
-### 經典 DSL
-
+**Constructor / Classic DSL**
 ```kotlin
-single {
-    MyService(
-        required = get(),
-        optional = getOrNull()
-    )
+val dataModule = module {
+    singleOf(::UserRepositoryImpl) bind UserRepository::class
+
+    // or declare the interface type directly
+    single<UserRepository> { UserRepositoryImpl(get()) }
 }
 ```
 
-### 註解
+取用端隨後請求 `UserRepository`，即可取得 `UserRepositoryImpl` 的執行個體。當有兩個定義繫結至同一個型別時，你需要一個[限定詞](/docs/reference/koin-core/qualifiers)來區分它們。
 
-可為 null 的參數會自動處理：
+## 建構函式參數 {id="constructor-parameters"}
+
+Koin 會從容器中解析每個建構函式參數。參數型別決定了解析的方式：
+
+| 參數 | 解析為 | 詳細資訊 |
+|-----------|-------------|--------|
+| `repository: UserRepository` | `UserRepository` 定義。若缺失則失敗 | |
+| `logger: Logger?` | 若定義存在則解析該定義，否則為 `null` | |
+| `heavy: Lazy<HeavyService>` | 在首次存取 `heavy.value` 時建立 | [注入](/docs/reference/koin-core/injection) |
+| `loggers: List<Logger>` | 所有繫結至 `Logger` 的定義 | [進階模式](/docs/reference/koin-core/advanced-patterns#collections-of-dependencies) |
+| `@Named("local") db: Database` | 帶有該限定詞的定義 | [限定詞](/docs/reference/koin-core/qualifiers) |
+| `@InjectedParam userId: String` | 呼叫者在解析時傳入的值 | [注入參數](/docs/reference/koin-core/injection-parameters) |
+| `@Property("api_url") url: String` | Koin 屬性 | [啟動 Koin](/docs/reference/koin-core/starting-koin#properties) |
+
+使用 Compiler Plugin DSL 與註解時，僅需根據建構函式簽章即可運作：
+
+**Compiler Plugin DSL**
+```kotlin
+class SyncService(
+    private val repository: UserRepository,
+    private val analytics: Analytics?,
+    private val uploader: Lazy<Uploader>,
+)
+
+val appModule = module {
+    single<SyncService>()
+}
+```
+
+**Annotations**
+```kotlin
+@Singleton
+class SyncService(
+    private val repository: UserRepository,
+    private val analytics: Analytics?,
+    private val uploader: Lazy<Uploader>,
+)
+```
+
+**Constructor / Classic DSL**
+`singleOf(::SyncService)` 會透過 `get()` 解析每個參數。對於可為 null、lazy 或清單 (list) 參數，請使用相符的函式自行撰寫呼叫：
+
+```kotlin
+val appModule = module {
+    single {
+        SyncService(
+            repository = get(),
+            analytics = getOrNull(),
+            uploader = inject(),
+        )
+    }
+}
+```
+
+`getAll()` 會傳回 `List`，`getProperty("key")` 會讀取屬性，而 `params.get()` 則會讀取注入的參數。
+
+## 非自有的類別 {id="classes-you-don-t-own"}
+
+來自程式庫（Room、Retrofit、OkHttp）的類別無法加上註解，且通常由 builder 建立。請使用由 Koin 解析其參數的函式來宣告它們：
+
+**Compiler Plugin DSL**
+```kotlin
+import org.koin.plugin.module.dsl.create
+
+fun database(context: Context): AppDatabase =
+    Room.databaseBuilder(context, AppDatabase::class.java, "app-db").build()
+
+fun topicDao(db: AppDatabase): TopicDao = db.topicDao()
+
+val databaseModule = module {
+    single { create(::database) }
+    single { create(::topicDao) }
+}
+```
+
+`create(::function)` 會像建構函式一樣解析函式參數，並享有相同的編譯期檢查。函式及其參數上的限定詞註解也能正常運作。
+
+**Annotations**
+為頂層函式加上註解。`@ComponentScan` 會像尋找類別一樣找到它：
 
 ```kotlin
 @Singleton
-class MyService(
-    val required: RequiredDep,
-    val optional: OptionalDep?  // 使用 getOrNull() 解析
-)
-```
+fun database(context: Context): AppDatabase =
+    Room.databaseBuilder(context, AppDatabase::class.java, "app-db").build()
 
-## 延遲注入 {id="lazy-injection"}
-
-推遲執行個體建立：
-
-### 編譯器外掛程式 DSL
-
-```kotlin
-class MyService(
-    val lazyDep: Lazy<HeavyDependency>  // 延遲建立
-)
-
-single<MyService>()
-```
-
-### 經典 DSL
-
-```kotlin
-single {
-    MyService(
-        lazyDep = inject()  // Lazy<Dependency>
-    )
-}
-```
-
-### 註解
-
-```kotlin
 @Singleton
-class MyService(
-    val lazyDep: Lazy<HeavyDependency>  // 延遲建立
-)
+fun topicDao(db: AppDatabase): TopicDao = db.topicDao()
 ```
 
-## 屬性 {id="properties"}
-
-注入組態值：
-
-### 編譯器外掛程式 DSL
+或者將 provider 函式組織在 `@Module` 類別中：
 
 ```kotlin
-class ApiClient(
-    @Property("api_url") val url: String,
-    @Property("api_key") val key: String
-)
+@Module
+class DatabaseModule {
 
-single<ApiClient>()
-```
+    @Singleton
+    fun database(context: Context): AppDatabase =
+        Room.databaseBuilder(context, AppDatabase::class.java, "app-db").build()
 
-### 經典 DSL
-
-```kotlin
-single {
-    ApiClient(
-        url = getProperty("api_url"),
-        key = getProperty("api_key", "default")
-    )
+    @Singleton
+    fun topicDao(db: AppDatabase): TopicDao = db.topicDao()
 }
 ```
 
-### 註解
-
+**Constructor / Classic DSL**
 ```kotlin
-@Singleton
-class ApiClient(
-    @Property("api_url") val url: String,
-    @Property("api_key") val key: String
-)
-```
-
-## 回呼 {id="callbacks"}
-
-### onClose 回呼 {id="onclose-callback"}
-
-執行個體釋放時執行程式碼：
-
-```kotlin
-single {
-    Database()
-} onClose {
-    it?.close()  // 當 Koin 停止或作用域關閉時呼叫
+val databaseModule = module {
+    single {
+        Room.databaseBuilder(androidContext(), AppDatabase::class.java, "app-db").build()
+    }
+    single { get<AppDatabase>().topicDao() }
 }
 ```
 
-### createdAtStart {id="createdatstart"}
+有關在 Android 上完整的 Retrofit、Room 與序列化設定，請參閱 [Android 程式庫整合](/docs/reference/koin-android/binding-patterns)。
 
-在啟動時積極地建立執行個體：
+## 預先建立 {id="eager-creation"}
 
+Koin 會在首次有人請求時建立 `single`。若要改為在 Koin 啟動時建立它，請將其標記為 `createdAtStart`：
+
+**Compiler Plugin DSL**
 ```kotlin
-// 編譯器外掛程式 DSL
-single<ConfigManager>() withOptions {
-    createdAtStart()
-}
-
-// 經典 DSL
-single(createdAtStart = true) {
-    ConfigManager()
+val appModule = module {
+    single<ConfigManager>() withOptions {
+        createdAtStart()
+    }
 }
 ```
 
-## 定義覆寫 {id="definition-override"}
+**Annotations**
+```kotlin
+@Singleton(createdAtStart = true)
+class ConfigManager
+```
 
-### 預設：最後一個勝出 {id="default-last-wins"}
+**Constructor / Classic DSL**
+```kotlin
+val appModule = module {
+    single(createdAtStart = true) { ConfigManager() }
+}
+```
+
+預先建立會在啟動 Koin 的執行緒上執行。在 Android 上，這是在 `Application.onCreate()` 期間的主執行緒，因此每個預先建立的定義都會增加應用程式啟動時間。請僅將其保留給在第一個畫面出現前必須存在的物件。若要將工作移出啟動階段，請參閱 [Lazy 模組](/docs/reference/koin-core/lazy-modules)。
+
+## 釋放回呼 {id="release-callback"}
+
+`onClose` 會在執行個體被釋放時執行：對於 `single` 是在 Koin 停止時，對於 `scoped` 則是在其作用域關閉時。
+
+**Compiler Plugin DSL**
+```kotlin
+val appModule = module {
+    single<Database>() onClose { it?.close() }
+}
+```
+
+**Annotations**
+註解沒有 `onClose` 參數。請在 DSL 模組中宣告此定義。
+
+**Constructor / Classic DSL**
+```kotlin
+val appModule = module {
+    single { Database() } onClose { it?.close() }
+}
+```
+
+`factory` 永遠不會呼叫 `onClose`：因為 Koin 不會保留 factory 執行個體。
+
+## 覆寫定義 {id="overriding-a-definition"}
+
+當兩個模組宣告相同的型別時，最後載入的模組優先：
 
 ```kotlin
 val prodModule = module {
@@ -426,21 +298,19 @@ val prodModule = module {
 }
 
 val testModule = module {
-    single<ApiService> { MockApi() }  // 覆寫生產環境
+    single<ApiService> { FakeApi() }
 }
 
 startKoin {
-    modules(prodModule, testModule)
+    modules(prodModule, testModule) // ApiService resolves to FakeApi
 }
 ```
 
-### 明確覆寫 {id="explicit-override"}
-
-在嚴格模式下，請明確標記覆寫：
+這在測試中很有用，但若非刻意為之，則可能是錯誤的根源。若要明確指定覆寫，請在全域停用覆寫功能，並明確標記你想要覆寫的項目：
 
 ```kotlin
 val testModule = module {
-    single<ApiService> { MockApi() }.override()
+    single<ApiService> { FakeApi() }.override()
 }
 
 startKoin {
@@ -449,157 +319,13 @@ startKoin {
 }
 ```
 
-## 安全 DSL 模式 {id="safe-dsl-patterns"}
+使用 `allowOverride(false)` 時，未標記的重複項目會在啟動時失敗。
 
-Koin 編譯器外掛程式會在編譯期轉換 DSL 定義 —— 自動裝配建構函式參數並對其進行驗證。以下是關鍵模式：
+## 相關內容 {id="related"}
 
-### 使用 create() 的函式建置器 {id="function-builders-with-create"}
-
-使用 `create(::function)` 來封裝您不擁有的外部程式庫。函式參數會自動從 DI 容器中解析：
-
-```kotlin
-import org.koin.dsl.module
-import org.koin.plugin.module.dsl.create
-
-// 建置器函式 — 參數由 Koin 解析
-fun database(context: Context): AppDatabase =
-    Room.databaseBuilder(context, AppDatabase::class.java, "my-db").build()
-
-fun topicDao(db: AppDatabase): TopicDao = db.topicDao()
-fun newsDao(db: AppDatabase): NewsResourceDao = db.newsResourceDao()
-
-val databaseModule = module {
-    single { create(::database) }
-    single { create(::topicDao) }
-    single { create(::newsDao) }
-}
-```
-
-這是推薦用於 Room 資料庫、Retrofit service、OkHttp 用戶端以及其他外部程式庫的模式。
-
-### 使用 includes() 的模組組合 {id="module-composition-with-includes"}
-
-按層級組織模組並組合它們：
-
-```kotlin
-import org.koin.dsl.module
-import org.koin.plugin.module.dsl.*
-
-val networkModule = module {
-    includes(dispatchersModule)
-
-    single { create(::json) }
-    single<AppHttpClient>()
-    single<DemoNetworkDataSource>() bind NetworkDataSource::class
-}
-
-private fun json(): Json = Json { ignoreUnknownKeys = true }
-```
-
-### App 模組 — 組合一切 {id="app-module-composing-everything"}
-
-App 模組包含所有功能模組，並宣告 ViewModel 和使用案例：
-
-```kotlin
-import org.koin.dsl.module
-import org.koin.plugin.module.dsl.*
-import org.koin.androidx.scope.dsl.activityScope
-
-val appModule = module {
-    includes(
-        dispatchersModule,
-        databaseModule,
-        dataStoreModule,
-        networkModule,
-        dataModule,
-        syncModule
-    )
-
-    // 網域使用案例 — factory（每次請求時建立新執行個體）
-    factory<GetFollowableTopicsUseCase>()
-    factory<GetSearchContentsUseCase>()
-
-    // ViewModel
-    viewModel<MainActivityViewModel>()
-    viewModel<HomeViewModel>()
-    viewModel<BookmarksViewModel>()
-
-    // Activity 作用域定義
-    activityScope {
-        scoped<ActivityTracker>()
-    }
-}
-```
-
-### DSL 中的自訂限定詞 {id="custom-qualifiers-in-dsl"}
-
-限定詞註解也可以與 `create(::function)` 搭配使用：
-
-```kotlin
-import org.koin.dsl.module
-import org.koin.plugin.module.dsl.create
-
-val dispatchersModule = module {
-    single { create(::dispatcherIO) }
-    single { create(::dispatcherDefault) }
-    single { create(::coroutineScope) }
-}
-
-@Dispatcher(NiaDispatchers.IO)
-fun dispatcherIO(): CoroutineDispatcher = Dispatchers.IO
-
-@Dispatcher(NiaDispatchers.Default)
-fun dispatcherDefault(): CoroutineDispatcher = Dispatchers.Default
-
-fun coroutineScope(
-    @Dispatcher(NiaDispatchers.Default) default: CoroutineDispatcher
-) = CoroutineScope(SupervisorJob() + default)
-```
-
-### 搭配 DSL 使用 Worker {id="worker-with-dsl"}
-
-```kotlin
-import org.koin.dsl.module
-import org.koin.plugin.module.dsl.*
-import org.koin.dsl.bind
-
-val syncModule = module {
-    single<WorkManagerSyncManager>() bind SyncManager::class
-    worker<SyncWorker>()
-}
-```
-
-### 完整模式：具備介面繫結的存儲庫 {id="complete-pattern-repository-with-interface-binding"}
-
-```kotlin
-import org.koin.dsl.module
-import org.koin.dsl.bind
-import org.koin.plugin.module.dsl.single
-
-val dataModule = module {
-    includes(databaseModule, dataStoreModule, networkModule)
-
-    single<OfflineFirstNewsRepository>() bind NewsRepository::class
-    single<OfflineFirstTopicsRepository>() bind TopicsRepository::class
-    single<OfflineFirstUserDataRepository>() bind UserDataRepository::class
-}
-```
-
-所有這些定義都會在編譯期由 Koin 編譯器外掛程式驗證 —— 缺失的相依性、限定詞不匹配以及損壞的呼叫點都會在組建時被捕獲。請參閱 [編譯期安全](/docs/reference/koin-compiler/compile-safety)。
-
-## 最佳實務 {id="best-practices"}
-
-1. **偏好建構函式注入** – 讓程式碼在不依賴 Koin 的情況下即可進行測試
-2. **對無狀態 Service 使用 `single`** – 存儲庫、用戶端、幫助程式 (helper)
-3. **對具狀態物件使用 `factory`** – Presenter、具狀態的使用案例
-4. **對生命週期繫結物件使用 `scoped`** – Activity、Fragment、工作階段
-5. **盡量減少限定詞的使用** – 可行時改用不同的介面
-6. **繫結至介面** – 依賴於抽象而非實作
-7. **對外部程式庫使用 `create(::builder)`** – 更安全的相依性解析
-
-## 後續步驟 {id="next-steps"}
-
-- **[注入](/docs/reference/koin-core/injection)** – 檢索相依性
-- **[限定詞](/docs/reference/koin-core/qualifiers)** – 命名與具型別的限定詞
-- **[進階模式](/docs/reference/koin-core/advanced-patterns)** – 集合、裝飾器、外部程式庫
-- **[作用域](/docs/reference/koin-core/scopes)** – 管理生命週期
+- [模組](/docs/reference/koin-core/modules)：群組定義並使用 `includes()` 組合模組。
+- [限定詞](/docs/reference/koin-core/qualifiers)：同一個型別的多個定義。
+- [注入](/docs/reference/koin-core/injection)：在建構函式之外擷取執行個體。
+- [作用域](/docs/reference/koin-core/scopes)：繫結至生命週期的執行個體。
+- [編譯期安全性](/docs/reference/koin-compiler/compile-safety)：編譯器外掛程式在你的定義中檢查的內容。
+- [DSL 參考](/docs/reference/koin-core/dsl)與[註解參考](/docs/reference/koin-annotations/annotations-inventory)：每個關鍵字與註解。

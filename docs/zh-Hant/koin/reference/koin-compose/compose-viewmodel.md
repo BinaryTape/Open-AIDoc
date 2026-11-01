@@ -4,317 +4,144 @@ title: Compose 中的 ViewModel
 
 # Compose 中的 ViewModel
 
-Koin 提供了多種 API 用於在 Compose 應用程式中注入 ViewModel。本指南涵蓋了所有的 ViewModel 注入模式。
+本頁涵蓋用於取得 ViewModel 的 Compose 函式：`koinViewModel()`、`sharedKoinViewModel()` 以及 `koinActivityViewModel()`。在模組中宣告帶有參數、`SavedStateHandle` 或 ViewModel 作用域的 ViewModel，在每個平台上都完全相同：請參閱 [ViewModel](/docs/reference/koin-core/viewmodel)。
 
-:::info
-關於在模組中宣告 ViewModel，請參閱 [Core ViewModel](/docs/reference/koin-core/viewmodel)。本頁面著重於在 Compose 中擷取 ViewModel。
-:::
+本頁中的所有函式均位於 `io.insert-koin:koin-compose-viewmodel` 中，但 `sharedKoinViewModel()` 除外，它位於 `io.insert-koin:koin-compose-viewmodel-navigation` 中。有關軟件包資訊，請參閱 [Koin for Compose](/docs/reference/koin-compose/compose)。
 
-## 安裝 {id="setup"}
+## koinViewModel {id="koinviewmodel"}
 
 ```kotlin
-// Compose Multiplatform (或 Android)
-implementation("io.insert-koin:koin-compose-viewmodel:$koin_version")
+import org.koin.compose.viewmodel.koinViewModel
 
-// Android 便利套件 (包含 koin-compose + koin-compose-viewmodel)
-implementation("io.insert-koin:koin-androidx-compose:$koin_version")
-
-// 與 Navigation 整合
-implementation("io.insert-koin:koin-compose-viewmodel-navigation:$koin_version")
-```
-
-:::info
-所有的 ViewModel API 都在 `koin-compose-viewmodel` 中。`koin-androidx-compose` 套件已自動包含它。
-:::
-
-## 宣告 ViewModel {id="declaring-viewmodels"}
-
-### 編譯器外掛程式 DSL {id="compiler-plugin-dsl"}
-
-```kotlin
-class UserViewModel(
-    private val repository: UserRepository
-) : ViewModel()
-
-val appModule = module {
-    viewModel<UserViewModel>()
-}
-```
-
-### 註解 {id="annotations"}
-
-```kotlin
-@KoinViewModel
-class UserViewModel(
-    private val repository: UserRepository
-) : ViewModel()
-```
-
-### 經典 DSL {id="classic-dsl"}
-
-```kotlin
-val appModule = module {
-    viewModelOf(::UserViewModel)
-    // 或使用 lambda
-    viewModel { UserViewModel(get()) }
-}
-```
-
-## ViewModel 注入 API {id="viewmodel-injection-apis"}
-
-### koinViewModel() - 基本注入 {id="koinviewmodel-basic-injection"}
-
-在 Compose 中注入 ViewModel 的主要 API：
-
-```kotlin
 @Composable
-fun UserScreen() {
-    val viewModel = koinViewModel<UserViewModel>()
-    // 使用 viewModel...
-}
-```
-
-**最佳實務** - 注入為預設參數以提高測試可能性：
-
-```kotlin
-@Composable
-fun UserScreen(
-    viewModel: UserViewModel = koinViewModel()
-) {
+fun UserScreen(viewModel: UserViewModel = koinViewModel()) {
     val state by viewModel.state.collectAsState()
-    // UI...
+    // ...
 }
 ```
 
-### koinNavViewModel() - 搭配 Navigation 引數 {id="koinnavviewmodel-with-navigation-arguments"}
+`koinViewModel()` 會從目前的 `ViewModelStoreOwner`（`LocalViewModelStoreOwner`）取得 ViewModel，並在第一次使用 Koin 建立它。該執行個體的生命週期與該 owner 相同：Activity、Fragment 或導覽目的地。
 
-使用 Navigation Compose 時，使用 `koinNavViewModel()` 可透過 `SavedStateHandle` 自動接收導覽引數：
+將其宣告為預設參數可保持 Composable 的可測試性：測試或預覽可以傳入自訂的執行個體。
 
-```kotlin
-// 帶有引數的路由
-NavHost(navController, startDestination = "list") {
-    composable("detail/{itemId}") { backStackEntry ->
-        DetailScreen()
-    }
-}
+`koinViewModel()` 是一個 Composable 函式。請在 Composable 的主體中呼叫它，而不要在像是 `onClick` 這類回呼中呼叫。
 
-// ViewModel 自動接收引數
-class DetailViewModel(
-    private val savedStateHandle: SavedStateHandle
-) : ViewModel() {
-    val itemId: String = savedStateHandle["itemId"] ?: ""
-}
+### 參數 {id="parameters"}
 
-@Composable
-fun DetailScreen(
-    viewModel: DetailViewModel = koinNavViewModel()
-) {
-    // viewModel.itemId 已從導覽引數填入
-}
-```
+| 參數 | 預設值 | 用途 |
+|-----------|---------|-----|
+| `qualifier` | `null` | 選擇[具名](/docs/reference/koin-core/qualifiers) ViewModel 定義 |
+| `viewModelStoreOwner` | `LocalViewModelStoreOwner.current` | 將 ViewModel 儲存在另一個 owner 中 |
+| `key` | `null` | 在同一個 owner 中保留同一個類別的多個執行個體 |
+| `extras` | owner 的 Extras | 用於建置 `SavedStateHandle` 的 `CreationExtras` |
+| `scope` | `currentKoinScope()` | 用於解析 ViewModel 的 Koin 作用域 |
+| `parameters` | `null` | 回傳[注入參數](/docs/reference/koin-core/injection-parameters)的 Lambda |
 
-### koinActivityViewModel() - Activity 作用域 (Android) {id="koinactivityviewmodel-activity-scoped-android"}
-
-在同一個 Activity 內的所有 Composable 之間共用一個 ViewModel：
-
-```kotlin
-@Composable
-fun ScreenA() {
-    // Activity 內相同的執行個體
-    val sharedVM = koinActivityViewModel<SharedViewModel>()
-}
-
-@Composable
-fun ScreenB() {
-    // 與 ScreenA 相同的執行個體
-    val sharedVM = koinActivityViewModel<SharedViewModel>()
-}
-```
-
-:::note
-自 4.1 版本起在 `koin-androidx-compose` 中提供。
-:::
-
-### sharedKoinViewModel() - Navigation Graph 作用域 {id="sharedkoinviewmodel-navigation-graph-scoped"}
-
-在導覽圖中共用一個 ViewModel (實驗性)：
-
-```kotlin
-navigation<Route.BookGraph>(startDestination = Route.BookList) {
-    composable<Route.BookList> { backStackEntry ->
-        val sharedVM = backStackEntry.sharedKoinViewModel<BookSharedViewModel>(navController)
-        BookListScreen(sharedVM)
-    }
-    composable<Route.BookDetail> { backStackEntry ->
-        // BookGraph 內相同的執行個體
-        val sharedVM = backStackEntry.sharedKoinViewModel<BookSharedViewModel>(navController)
-        BookDetailScreen(sharedVM)
-    }
-}
-```
-
-## 帶有參數的 ViewModel {id="viewmodel-with-parameters"}
-
-### 使用 @InjectedParam {id="using-injectedparam"}
-
-使用 `@InjectedParam` 標記執行期參數：
-
-```kotlin
-class DetailViewModel(
-    @InjectedParam val itemId: String,
-    private val repository: DetailRepository
-) : ViewModel()
-
-// 編譯器外掛程式 DSL
-val appModule = module {
-    viewModel<DetailViewModel>()
-}
-```
-
-透過參數注入：
+### 傳遞參數 {id="passing-parameters"}
 
 ```kotlin
 @Composable
 fun DetailScreen(itemId: String) {
-    val viewModel = koinViewModel<DetailViewModel> {
+    val viewModel = koinViewModel<DetailViewModel> { parametersOf(itemId) }
+}
+```
+
+參數僅在建立 ViewModel 時使用。如果同一個 owner 已經持有 `DetailViewModel`，即使傳入不同的 `itemId`，你仍會取得該既有的執行個體。當一個 owner 必須為每個值持有一個 ViewModel 時，請新增 `key`：
+
+```kotlin
+@Composable
+fun DetailScreen(itemId: String) {
+    val viewModel = koinViewModel<DetailViewModel>(key = itemId) {
         parametersOf(itemId)
     }
 }
 ```
 
-使用 `key` 參數為每個識別符號（例如：導覽引數）建立不同的 ViewModel 執行個體：
+在使用 Navigation Compose 時，每個目的地都有自己的 owner，因此你不需要為返回堆疊上的畫面設定 `key`。
+
+## 搭配 Navigation Compose {id="with-navigation-compose"}
+
+在 `composable { }` 目的地內部，目前的 `ViewModelStoreOwner` 即為 `NavBackStackEntry`。`koinViewModel()` 會為每個目的地建立一個 ViewModel，並在該目的地從堆疊中彈出時清除。其 `SavedStateHandle` 會保存導覽引數：
 
 ```kotlin
+@Serializable
+data class DetailRoute(val itemId: String)
+
+class DetailViewModel(handle: SavedStateHandle) : ViewModel() {
+    val itemId: String = handle.toRoute<DetailRoute>().itemId
+}
+
+NavHost(navController, startDestination = HomeRoute) {
+    composable<DetailRoute> {
+        DetailScreen(viewModel = koinViewModel())
+    }
+}
+```
+
+Koin 會為你注入 `SavedStateHandle`：將其宣告為建構函式參數即可。宣告方面請參閱 [ViewModel](/docs/reference/koin-core/viewmodel)。
+
+:::warning
+`koinNavViewModel()` 在 `koin-compose-viewmodel-navigation` 與 `koin-androidx-compose-navigation` 中皆已被棄用。請改用 `koinViewModel()` 並傳入相同的參數：導覽引數會以相同的方式傳遞至 `SavedStateHandle`。
+:::
+
+### 在導覽圖中共享 ViewModel {id="sharing-a-viewmodel-in-a-navigation-graph"}
+
+`sharedKoinViewModel()` 會將 ViewModel 儲存在父導覽圖的返回堆疊項目（back stack entry）中。該導覽圖中的每個目的地都會取得相同的執行個體：
+
+```kotlin
+import org.koin.compose.viewmodel.sharedKoinViewModel
+
+navigation<BookGraph>(startDestination = BookList) {
+    composable<BookList> { entry ->
+        val shared = entry.sharedKoinViewModel<BookSharedViewModel>(navController)
+        BookListScreen(shared)
+    }
+    composable<BookDetail> { entry ->
+        val shared = entry.sharedKoinViewModel<BookSharedViewModel>(navController)
+        BookDetailScreen(shared)
+    }
+}
+```
+
+預設情況下，父導覽圖為 `destination.parent?.route`。傳入 `navGraphRoute` 則可指定另一個導覽圖。如果目的地沒有父導覽圖，`sharedKoinViewModel()` 會備援採用 `koinViewModel()`。
+
+## Activity 範圍的 ViewModel (Android) {id="activity-wide-viewmodel-android"}
+
+`koinActivityViewModel()` 會將 ViewModel 儲存在目前的 `ComponentActivity` 中。該 Activity 中的每個 Composable 無論處於哪個導覽目的地，都會取得相同的執行個體：
+
+```kotlin
+import org.koin.compose.viewmodel.koinActivityViewModel
+
 @Composable
-fun DetailScreen(newsId: String) {
-    val viewModel = koinViewModel<DetailViewModel>(key = newsId) {
-        parametersOf(newsId)
-    }
+fun CartBadge() {
+    val cart = koinActivityViewModel<CartViewModel>()
+}
+
+@Composable
+fun CartScreen() {
+    val cart = koinActivityViewModel<CartViewModel>() // 與 CartBadge 中的執行個體相同
 }
 ```
 
-`key` 可確保每個唯一的 `newsId` 都有自己的 ViewModel 執行個體，這對於在返回堆疊中可能具有不同引數的螢幕非常重要。
+它僅適用於 Android，且如果 `LocalActivity` 不是 `ComponentActivity` 則會失敗。它接受與 `koinViewModel()` 相同的 `qualifier`、`key`、`scope` 和 `parameters` 引數。
 
-### 帶有參數的 經典 DSL {id="classic-dsl-with-parameters"}
+## 具作用域的相依性 {id="scoped-dependencies"}
 
-```kotlin
-val appModule = module {
-    viewModel { params ->
-        DetailViewModel(
-            itemId = params.get(),
-            repository = get()
-        )
-    }
-}
-```
+ViewModel 可以為其相依性擁有一個作用域（`viewModelScope { }` 或 `@ViewModelScope`）。Compose 端沒有任何改變：`koinViewModel()` 會建立 ViewModel 及其作用域。宣告方式請參閱 [ViewModel](/docs/reference/koin-core/viewmodel)。
 
-## SavedStateHandle {id="savedstatehandle"}
+## API 摘要 {id="api-summary"}
 
-Koin 會自動為 ViewModel 提供 `SavedStateHandle`：
+| API | 執行個體的 Owner | 軟件包 |
+|-----|-----------------------|---------|
+| `koinViewModel()` | `LocalViewModelStoreOwner`（Activity、Fragment、目的地） | `koin-compose-viewmodel` |
+| `NavBackStackEntry.sharedKoinViewModel()` | 父導覽圖項目 | `koin-compose-viewmodel-navigation` |
+| `koinActivityViewModel()` | 目前的 `ComponentActivity` (Android) | `koin-compose-viewmodel` |
+| `koinNavViewModel()` | 已棄用，請改用 `koinViewModel()` | `koin-compose-viewmodel-navigation` |
 
-```kotlin
-@KoinViewModel
-class MyViewModel(
-    private val handle: SavedStateHandle,
-    private val repository: UserRepository
-) : ViewModel() {
-    // 存取導覽引數
-    val userId: String? = handle["userId"]
+## 相關內容 {id="related"}
 
-    // 跨程序終止保持狀態
-    var query by handle.saveable { mutableStateOf("") }
-}
-```
-
-```kotlin
-val appModule = module {
-    viewModel<MyViewModel>()  // 自動注入 SavedStateHandle
-}
-```
-
-:::info
-`SavedStateHandle` 是從 ViewModel `CreationExtras` 或 Navigation `BackStackEntry` 注入，具體取決於上下文。
-:::
-
-## ViewModel 作用域 {id="viewmodel-scope"}
-
-使用 `viewModelScope` 將相依性設定在 ViewModel 生命週期的作用域內：
-
-### 編譯器外掛程式 DSL
-
-```kotlin
-val appModule = module {
-    viewModelScope {
-        scoped<UserCache>()
-        scoped<UserRepository>()
-        viewModel<UserViewModel>()
-    }
-}
-```
-
-### 註解
-
-```kotlin
-@ViewModelScope
-class UserCache
-
-@ViewModelScope
-class UserRepository(private val cache: UserCache)
-
-@KoinViewModel
-@ViewModelScope
-class UserViewModel(private val repository: UserRepository) : ViewModel()
-```
-
-### 經典 DSL
-
-```kotlin
-val appModule = module {
-    viewModelScope {
-        scoped { UserCache() }
-        scoped { UserRepository(get()) }
-        viewModel { UserViewModel(get()) }
-    }
-}
-```
-
-:::caution 需要 viewModelScopeFactory() 選項
-在 `viewModelScope { }` 內宣告 ViewModel 需要在 Koin 設定中啟用 `options(viewModelScopeFactory())` — 否則 `koinViewModel()` 會失敗並顯示 `No definition found … on scope '['_root_']'`。詳情請參閱 [ViewModel 作用域](/docs/reference/koin-core/viewmodel#viewmodel-scope)。
-:::
-
-## 快速參考 {id="quick-reference"}
-
-| API | 使用案例 | 套件 |
-|-----|----------|---------|
-| `koinViewModel()` | 基本 ViewModel 注入 | `koin-compose-viewmodel` |
-| `koinNavViewModel()` | 搭配 Navigation 引數 | `koin-compose-viewmodel-navigation` |
-| `koinActivityViewModel()` | 跨 Activity 共用 (Android) | `koin-androidx-compose` |
-| `sharedKoinViewModel()` | 在導覽圖內共用 | `koin-compose-viewmodel-navigation` |
-
-## 最佳實務 {id="best-practices"}
-
-1. **注入為預設參數** - 實現無需 Koin 的測試
-   ```kotlin
-   @Composable
-   fun MyScreen(viewModel: MyViewModel = koinViewModel())
-   ```
-
-2. **搭配 Navigation 使用 koinNavViewModel()** - 自動處理引數
-
-3. **優先對 ViewModel 特定的相依性使用 viewModelScope** - 乾淨的生命週期管理
-
-4. **不要在回呼中注入 ViewModel** - 請在 Composable 層級注入
-   ```kotlin
-   // 不良做法
-   Button(onClick = { val vm = koinViewModel<MyVM>() })
-
-   // 良好做法
-   val vm = koinViewModel<MyVM>()
-   Button(onClick = { vm.doSomething() })
-   ```
-
-## 後續步驟 {id="next-steps"}
-
-- **[Compose 生命週期](/docs/reference/koin-compose/compose-lifecycle)** - 狀態與重組
-- **[Core ViewModel](/docs/reference/koin-core/viewmodel)** - ViewModel 宣告 DSL
-- **[Android ViewModel](/docs/reference/koin-android/viewmodel)** - Android 特定功能
+- [ViewModel](/docs/reference/koin-core/viewmodel)：宣告 ViewModel、參數、`SavedStateHandle`、ViewModel 作用域。
+- [Android ViewModel](/docs/reference/koin-android/viewmodel)：在 Activity 與 Fragment 中使用 `by viewModel()`。
+- [Navigation 3](/docs/reference/koin-compose/navigation3)：搭配 Navigation 3 項目的 ViewModel。
+- [Lifecycle and State](/docs/reference/koin-compose/compose-lifecycle)：Compose 中各項目的生命週期。
+- [Compose Testing](/docs/reference/koin-compose/compose-testing)：測試使用 `koinViewModel()` 的 Composable。

@@ -6,43 +6,50 @@
 <var name="plugin_name" value="Jte"/>
 <var name="package_name" value="io.ktor.server.jte"/>
 <var name="artifact_name" value="ktor-server-jte"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.server.jte"/>
 
 <tldr>
 <p>
-<b>必須の依存関係</b>: <code>io.ktor:%artifact_name%</code>
+<b>必要な依存関係</b>: <code>io.ktor:%artifact_name%</code>
 </p>
 <var name="example_name" value="jte"/>
 <p>
     <b>コード例</b>:
-    <a href="https://github.com/ktorio/ktor-documentation/tree/%ktor_version%/codeSnippets/snippets/%example_name%">
+    <a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/%example_name%">
         %example_name%
     </a>
 </p>
 <p>
-    <b><Links href="/ktor/server-native" summary="Ktor supports Kotlin/Native and allows you to run a server without an additional runtime or virtual machine.">Nativeサーバー</Links>のサポート</b>: ✖️
+    <b><Links href="server-native.md" summary="KtorはKotlin/Nativeをサポートしており、追加のランタイムや仮想マシンなしでサーバーを実行できます。">ネイティブサーバー</Links>のサポート</b>: ✖️
 </p>
 </tldr>
 
-Ktorでは、[%plugin_name%](https://api.ktor.io/ktor-server-jte/io.ktor.server.jte/-jte.html)プラグインをインストールすることで、アプリケーション内のビューとして[JTEテンプレート](https://github.com/casid/jte)を使用できます。
+Ktorでは、[%plugin_name%](https://api.ktor.io/ktor-server-jte/io.ktor.server.jte/-jte.html)プラグインをインストールすることで、アプリケーション内で[JTEテンプレート](https://github.com/casid/jte)をビューとして使用できます。
 
 ## 依存関係の追加 {id="add_dependencies"}
 
 <p>
-    <code>%plugin_name%</code>を使用するには、ビルドスクリプトに<code>%artifact_name%</code>アーティファクトを含める必要があります。
+    <code>%plugin_name%</code>を使用するには、ビルドスクリプトに<code>%artifact_name%</code>アーティファクトを追加します:
 </p>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上記のコードスニペットでは、Ktorの依存関係を指定するために<a href="server-dependencies.topic#using-version-catalog">Ktorバージョンカタログ</a>を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上記のコードスニペットでは、Ktorの依存関係を指定するために<a href="server-dependencies.topic#using-version-catalog">Ktorバージョンカタログ</a>を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
     </TabItem>
 </Tabs>
 
-`.kte`ファイルを処理するには、プロジェクトに`gg.jte:jte-kotlin`アーティファクトを追加します。
+`.kte`ファイルを処理するには、プロジェクトに`gg.jte:jte-kotlin`アーティファクトを追加します:
 
 <var name="group_id" value="gg.jte"/>
 <var name="artifact_name" value="jte-kotlin"/>
@@ -59,25 +66,25 @@ Ktorでは、[%plugin_name%](https://api.ktor.io/ktor-server-jte/io.ktor.server.
     </TabItem>
 </Tabs>
 
-> 現在の`jte-kotlin`コンパイラプラグインはKotlin 2.3.xと互換性がありません。
-> Ktor 3.4.0はKotlin 2.3ツールチェーンを使用しているため、`jte-kotlin`プラグインがKotlin 2.3のサポートを追加するまで、Ktor JTEプラグインは使用できません。
+> 現在の`jte‑kotlin`コンパイラープラグインはKotlin 2.3.xと互換性がありません。
+> Ktor 3.4.0はKotlin 2.3ツールチェーンを使用しているため、`jte‑kotlin`プラグインがKotlin 2.3のサポートを追加するまで、Ktor JTEプラグインは使用できません。
 > 
-> JTEに依存している場合は、`jte-kotlin`がKotlin 2.3用に更新されるまで、Kotlin 2.2.xと互換性のあるKtorバージョンを使用してください。
+> JTEに依存している場合は、`jte‑kotlin`がKotlin 2.3向けに更新されるまで、Kotlin 2.2.xおよび互換性のあるKtorバージョンを使用してください。
 > 
 {style="warning"}
 
 ## %plugin_name%のインストール {id="install_plugin"}
 
 <p>
-    <code>%plugin_name%</code>プラグインをアプリケーションに<a href="server-plugins.md#install">インストール</a>するには、指定された<Links href="/ktor/server-modules" summary="Modules allow you to structure your application by grouping routes.">モジュール</Links>内の<code>install</code>関数に渡します。
-    以下のコードスニペットは、<code>%plugin_name%</code>をインストールする方法を示しています...
+    アプリケーションに<code>%plugin_name%</code>プラグインを<a href="server-plugins.md#install">インストール</a>するには、指定した<Links href="server-modules.md" summary="モジュールを使用すると、ルートをグループ化してアプリケーションを構造化できます。">モジュール</Links>内の<code>install</code>関数に渡します。
+    以下の例は、<code>%plugin_name%</code>をインストールする方法を示しています:
 </p>
 <list>
     <li>
-        ... <code>embeddedServer</code>関数の呼び出し内。
+        <code>embeddedServer()</code>関数呼び出し内。
     </li>
     <li>
-        ... <code>Application</code>クラスの拡張関数である、明示的に定義された<code>module</code>内。
+        <code>Application</code>クラスに明示的に定義された<code>module()</code>拡張関数内。
     </li>
 </list>
 <Tabs>
@@ -89,15 +96,15 @@ Ktorでは、[%plugin_name%](https://api.ktor.io/ktor-server-jte/io.ktor.server.
     </TabItem>
 </Tabs>
 
-`install`ブロック内では、JTEテンプレートをロードする方法を[設定](#configure)できます。
+`install`ブロック内で、JTEテンプレートの読み込み方法を[設定](#configure)できます。
 
 ## %plugin_name%の設定 {id="configure"}
 ### テンプレート読み込みの設定 {id="template_loading"}
-JTEテンプレートをロードするには、以下を行う必要があります：
-1. テンプレートコードを解決するために使用される`CodeResolver`を作成します。例えば、特定のディレクトリからテンプレートをロードするように`DirectoryCodeResolver`を設定したり、アプリケーションリソースからテンプレートをロードするように`ResourceCodeResolver`を設定したりできます。
-2. `templateEngine`プロパティを使用してテンプレートエンジンを指定します。これは、作成された`CodeResolver`を使用してテンプレートをネイティブのJava/Kotlinコードに変換します。
+JTEテンプレートを読み込むには、以下の手順を実行する必要があります:
+1. テンプレートコードを解決するために使用される`CodeResolver`を作成します。例えば、指定されたディレクトリからテンプレートを読み込むように`DirectoryCodeResolver`を設定したり、アプリケーションリソースからテンプレートを読み込むように`ResourceCodeResolver`を設定したりできます。
+2. `templateEngine`プロパティを使用してテンプレートエンジンを指定します。これにより、作成された`CodeResolver`を使用してテンプレートがネイティブのJava/Kotlinコードに変換されます。
 
-例えば、以下のコードスニペットにより、Ktorは`templates`ディレクトリ内でJTEテンプレートを探すようになります。
+例えば、以下のコードスニペットは、Ktorが`templates`ディレクトリ内のJTEテンプレートを検索できるように設定します:
 
 ```kotlin
 import gg.jte.TemplateEngine
@@ -114,8 +121,8 @@ fun Application.module() {
 }
 ```
 
-### レスポンスでのテンプレート送信 {id="use_template"}
-`templates`ディレクトリに`index.kte`テンプレートがあるとします。
+### レスポンスでテンプレートを送信する {id="use_template"}
+`templates`ディレクトリに`index.kte`テンプレートがあるとします:
 ```html
 @param id: Int
 @param name: String
@@ -126,7 +133,7 @@ fun Application.module() {
 </html>
 ```
 
-指定された[ルート](server-routing.md)に対してテンプレートを使用するには、次のように`JteContent`を`call.respond`メソッドに渡します。
+指定した[ルート](server-routing.md)でテンプレートを使用するには、次のように`JteContent`を`call.respond`メソッドに渡します:
 ```kotlin
 get("/index") {
     val params = mapOf("id" to 1, "name" to "John")

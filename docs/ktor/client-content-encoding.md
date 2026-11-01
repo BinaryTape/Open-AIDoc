@@ -3,6 +3,7 @@
 <primary-label ref="client-plugin"/>
 
 <var name="artifact_name" value="ktor-client-encoding"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.client.encoding"/>
 
 <tldr>
 <p>
@@ -18,38 +19,46 @@
 </tldr>
 
 <link-summary>
-ContentEncoding 插件允许您启用指定的压缩算法（例如 'gzip' 和 'deflate'）并配置其设置。
+ContentEncoding 插件允许你启用指定的压缩算法（例如 'gzip' 和 'deflate'）并配置其设置。
 </link-summary>
 
-Ktor 客户端提供了 [`ContentEncoding`](https://api.ktor.io/ktor-client-encoding/io.ktor.client.plugins.compression/-content-encoding) 插件，该插件允许您启用指定的压缩算法（例如 `gzip` 和 `deflate`）并配置其设置。
+Ktor 客户端提供了 [`ContentEncoding`](https://api.ktor.io/ktor-client-encoding/io.ktor.client.plugins.compression/-content-encoding) 插件，允许你启用指定的压缩算法（例如 `gzip` 和 `deflate`）并配置其设置。 
 
-此插件提供以下功能：
-* 设置带有指定质量值的 `Accept-Encoding` 标头。
-* 可选地对请求主体进行编码。
-* 解码 [从服务器接收的内容](client-responses.md#body) 以获取原始负载。
+该插件提供以下功能：
+* 设置带有指定品质值的 `Accept-Encoding` 请求头。
+* 可选地对请求体进行编码。
+* 解码[从服务器接收到的内容](client-responses.md#body)以获取原始有效负载。
 
 ## 添加依赖项 {id="add_dependencies"}
 
-要使用 `ContentEncoding`，请在构建脚本中添加 `%artifact_name%` 构件：
+要使用 `ContentEncoding`，请将 `%artifact_name%` 构件添加到你的构建脚本中：
 
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上述代码段使用 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 版本目录</a>来指定 Ktor 依赖项。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上述代码段使用 <a href="server-dependencies.topic#using-version-catalog">
+            Ktor 版本目录</a>来指定 Ktor 依赖项。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
     </TabItem>
 </Tabs>
 <tip>
-    要了解更多关于 Ktor 客户端所需构件的信息，请参阅 <Links href="/ktor/client-dependencies" summary="了解如何将客户端依赖项添加到现有项目。">添加客户端依赖项</Links>。
+    要详细了解 Ktor 客户端所需的构件，请参阅<Links href="client-dependencies.md" summary="了解如何向现有项目添加客户端依赖项。">添加客户端依赖项</Links>。
 </tip>
 
-## 安装 ContentEncoding {id="install_plugin"}
+## 安装 `ContentEncoding` {id="install_plugin"}
 
-要安装 `ContentEncoding`，请将其传递给 [客户端配置块](client-create-and-configure.md#configure-client) 中的 `install` 函数：
+要安装 `ContentEncoding`，请在[客户端配置块](client-create-and-configure.md#configure-client)中将其传递给 `install` 函数：
 
 ```kotlin
 import io.ktor.client.*
@@ -61,13 +70,13 @@ val client = HttpClient(CIO) {
 }
 ```
 
-## 配置 ContentEncoding {id="configure_plugin"}
+## 配置 `ContentEncoding` {id="configure_plugin"}
 
 ### 启用编码器 {id="enable-encoders"}
 
-您可以配置支持哪些编码器，并指定它们的质量值（用于 `Accept-Encoding` 标头）。
+你可以配置支持哪些编码器，并指定它们的品质值（用于 `Accept-Encoding` 请求头中）。
 
-下面的 [示例](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-content-encoding) 展示了如何启用具有自定义质量值的 `deflate` 和 `gzip` 编码器：
+下面的[示例](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/client-content-encoding)启用了带有自定义品质值的 `deflate` 和 `gzip` 编码器：
 
 ```kotlin
 val client = HttpClient(CIO) {
@@ -78,11 +87,11 @@ val client = HttpClient(CIO) {
 }
 ```
 
-如有需要，您可以实现 [`ContentEncoder`](https://api.ktor.io/ktor-utils/io.ktor.util/-content-encoder/index.html) 接口以创建自定义编码器，并使用 `customEncoder()` 函数对其进行注册。
+如有必要，你可以实现 [`ContentEncoder`](https://api.ktor.io/ktor-utils/io.ktor.util/-content-encoder/index.html) 接口以创建自定义编码器，并使用 `customEncoder()` 函数进行注册。
 
-### 设置 mode 属性 {id="set-the-mode-property"}
+### 设置 `mode` 属性 {id="set-the-mode-property"}
 
-默认情况下，`ContentEncoding` 仅处理响应解压缩。您可以使用 `mode` 属性来定义插件的操作方式。
+默认情况下，`ContentEncoding` 仅处理响应解压缩。你可以使用 `mode` 属性来定义插件的工作方式。
 
 可用值如下：
 <deflist>
@@ -92,17 +101,17 @@ val client = HttpClient(CIO) {
 </def>
 <def>
 <title><code>ContentEncodingConfig.Mode.CompressRequest</code></title>
-仅启用请求主体压缩。
+仅启用请求体压缩。
 </def>
 <def>
 <title><code>ContentEncodingConfig.Mode.All</code></title>
-同时启用响应解压缩和请求压缩。
+同时启用响应解压缩与请求压缩。
 </def>
 </deflist>
 
-## 对请求主体进行编码 {id="encode_request_body"}
+## 编码请求体 {id="encode_request_body"}
 
-要启用请求压缩，请设置 `mode` 属性，并在 [`HttpRequestBuilder`](https://api.ktor.io/ktor-client-core/io.ktor.client.request/-http-request-builder/index.html) 块中使用 `compress()` 函数：
+要启用请求压缩，请设置 `mode` 属性并在 [`HttpRequestBuilder`](https://api.ktor.io/ktor-client-core/io.ktor.client.request/-http-request-builder/index.html) 块中使用 `compress()` 函数：
 
 ```kotlin
 import io.ktor.client.*
@@ -123,11 +132,11 @@ client.post("/upload") {
 
 在此示例中：
 
-* `mode = ContentEncodingConfig.Mode.CompressRequest` 启用请求压缩。
-* `gzip()` 注册 gzip 编码器。
-* `compress("gzip")` 将 gzip 压缩应用于此特定请求。
-* `Content-Encoding` 标头会自动添加。
+* `mode = ContentEncodingConfig.Mode.CompressRequest` 启用了请求压缩。
+* `gzip()` 注册了 gzip 编码器。
+* `compress("gzip")` 对该特定请求应用 gzip 压缩。
+* `Content-Encoding` 请求头会自动添加。
 
-> 有关处理响应的更多详细信息，请参阅 [接收响应](client-responses.md)。
+> 有关处理响应的更多详情，请参阅[接收响应](client-responses.md)。
 >
 {style="tip"}

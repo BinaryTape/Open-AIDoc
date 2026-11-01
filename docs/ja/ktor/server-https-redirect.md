@@ -5,10 +5,11 @@
 <var name="plugin_name" value="HttpsRedirect"/>
 <var name="package_name" value="io.ktor.server.plugins.httpsredirect"/>
 <var name="artifact_name" value="ktor-server-http-redirect"/>
+<var name="ktor_version_catalog_name" value="ktorLibs.server.httpRedirect"/>
 
 <tldr>
 <p>
-<b>必須依存関係</b>: <code>io.ktor:%artifact_name%</code>
+<b>必要な依存関係</b>: <code>io.ktor:%artifact_name%</code>
 </p>
 <var name="example_name" value="ssl-engine-main-redirect"/>
 <p>
@@ -18,23 +19,31 @@
     </a>
 </p>
 <p>
-    <b><Links href="/ktor/server-native" summary="Ktor supports Kotlin/Native and allows you to run a server without an additional runtime or virtual machine.">Native サーバー</Links>のサポート</b>: ✅
+    <b><Links href="server-native.md" summary="KtorはKotlin/Nativeをサポートしており、追加のランタイムや仮想マシンなしでサーバーを実行できます。">ネイティブサーバー</Links>のサポート</b>: ✅
 </p>
 </tldr>
 
-[%plugin_name%](https://api.ktor.io/ktor-server-http-redirect/io.ktor.server.plugins.httpsredirect/-https-redirect.html) プラグインは、呼び出しを処理する前に、すべての HTTP リクエストを [HTTPS の対応するリクエスト](server-ssl.md)にリダイレクトします。デフォルトでは、リソースは `301 Moved Permanently` を返しますが、`302 Found` を返すように構成することも可能です。
+[%plugin_name%](https://api.ktor.io/ktor-server-http-redirect/io.ktor.server.plugins.httpsredirect/-https-redirect.html) プラグインは、呼び出しを処理する前にすべてのHTTPリクエストを[対応するHTTPS](server-ssl.md)へリダイレクトします。デフォルトでは、リソースは `301 Moved Permanently` を返しますが、`302 Found` に設定することも可能です。
 
 ## 依存関係の追加 {id="add_dependencies"}
 
 <p>
-    <code>%plugin_name%</code> を使用するには、ビルドスクリプトに <code>%artifact_name%</code> アーティファクトを含める必要があります：
+    <code>%plugin_name%</code> を使用するには、ビルドスクリプトに <code>%artifact_name%</code> アーティファクトを追加します:
 </p>
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-        <code-block lang="Kotlin" code="            implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+        <code-block lang="Kotlin" code="            implementation(%ktor_version_catalog_name%)"/>
+        <note>
+            上記のコードスニペットでは、Ktorの依存関係を指定するために <a href="server-dependencies.topic#using-version-catalog">
+            Ktor バージョンカタログ</a> を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Gradle (Groovy)" group-key="groovy">
-        <code-block lang="Groovy" code="            implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+        <code-block lang="Groovy" code="            implementation %ktor_version_catalog_name%"/>
+        <note>
+            上記のコードスニペットでは、Ktorの依存関係を指定するために <a href="server-dependencies.topic#using-version-catalog">
+            Ktor バージョンカタログ</a> を使用しています。
+        </note>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
         <code-block lang="XML" code="            &lt;dependency&gt;&#10;                &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;            &lt;/dependency&gt;"/>
@@ -44,15 +53,15 @@
 ## %plugin_name% のインストール {id="install_plugin"}
 
 <p>
-    <code>%plugin_name%</code> プラグインをアプリケーションに<a href="server-plugins.md#install">インストール</a>するには、指定された <Links href="/ktor/server-modules" summary="Modules allow you to structure your application by grouping routes.">モジュール</Links> 内で <code>install</code> 関数に渡します。
-    以下のコードスニペットは、<code>%plugin_name%</code> をインストールする方法を示しています...
+    アプリケーションに <code>%plugin_name%</code> プラグインを<a href="server-plugins.md#install">インストール</a>するには、指定した <Links href="server-modules.md" summary="モジュールを使用すると、ルートをグループ化してアプリケーションを構造化できます。">モジュール</Links> 内で <code>install</code> 関数に渡します。
+    以下の例は、<code>%plugin_name%</code> をインストールする方法を示しています:
 </p>
 <list>
     <li>
-        ... <code>embeddedServer</code> 関数の呼び出し内。
+        <code>embeddedServer()</code> 関数の呼び出し内。
     </li>
     <li>
-        ... <code>Application</code> クラスの拡張関数である、明示的に定義された <code>module</code> 内。
+        <code>Application</code> クラスに明示的に定義された <code>module()</code> 拡張関数内。
     </li>
 </list>
 <Tabs>
@@ -64,15 +73,15 @@
     </TabItem>
 </Tabs>
 
-上記のコードは、デフォルトの構成で `%plugin_name%` プラグインをインストールします。
+上記のコードは、デフォルト設定で `%plugin_name%` プラグインをインストールします。
 
->リバースプロキシの背後にある場合、HTTPS リクエストを正しく検出するには `ForwardedHeader` または `XForwardedHeader` プラグインをインストールする必要があります。これらのプラグインのいずれかをインストールした後に無限リダイレクトが発生する場合は、詳細について[この FAQ エントリ](FAQ.topic#infinite-redirect)を確認してください。
+>リバースプロキシの背後にある場合は、HTTPSリクエストを適切に検出するために `ForwardedHeader` または `XForwardedHeader` プラグインをインストールする必要があります。これらのプラグインのいずれかをインストールした後に無限リダイレクトが発生する場合は、詳細について[こちらのFAQ項目](FAQ.topic#infinite-redirect)を確認してください。
 >
 {type="note"}
 
-## %plugin_name% の構成 {id="configure"}
+## %plugin_name% の設定 {id="configure"}
 
-以下のコードスニペットは、目的の HTTPS ポートを構成し、リクエストされたリソースに対して `301 Moved Permanently` を返す方法を示しています：
+以下のコードスニペットは、目的のHTTPSポートを設定し、リクエストされたリソースに対して `301 Moved Permanently` を返すように設定する方法を示しています:
 
 ```kotlin
 install(HttpsRedirect) {
@@ -81,4 +90,4 @@ install(HttpsRedirect) {
 }
 ```
 
-完全な例はこちらにあります：[ssl-engine-main-redirect](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/ssl-engine-main-redirect)
+完全なサンプルはこちらで確認できます: [ssl-engine-main-redirect](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/ssl-engine-main-redirect)。

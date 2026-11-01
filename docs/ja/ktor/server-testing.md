@@ -1,4 +1,4 @@
-[//]: # (title: Ktor サーバーのテスト)
+[//]: # (title: Ktor Serverでのテスト)
 
 <show-structure for="chapter" depth="3"/>
 
@@ -12,13 +12,13 @@
 特別なテストエンジンを使用してサーバーアプリケーションをテストする方法を学びます。
 </link-summary>
 
-Ktor は、実際の Web サーバーを起動したりソケットにバインドしたりすることなく、アプリケーションの呼び出しを直接実行するテストエンジンを提供します。リクエストは内部で処理されるため、フルサーバーを実行する場合と比較して、テストが高速かつ信頼性の高いものになります。
+Ktorは、実際のWebサーバーを起動したりソケットにバインドしたりすることなく、アプリケーション呼び出しを直接実行するテストエンジンを提供します。リクエストは内部で処理されるため、フルサーバーを実行する場合と比較して、テストがより高速かつ高信頼になります。
 
 ## 依存関係の追加 {id="add-dependencies"}
 
-Ktor サーバーアプリケーションをテストするには、ビルドスクリプトに以下の依存関係を含めます。
+Ktorサーバーアプリケーションをテストするには、ビルドスクリプトに以下の依存関係を含めます。
 
-* `ktor-server-test-host` 依存関係は、テストエンジンを提供します。
+* `ktor-server-test-host` 依存関係はテストエンジンを提供します:
 
    <var name="artifact_name" value="ktor-server-test-host"/>
    <Tabs group="languages">
@@ -33,7 +33,7 @@ Ktor サーバーアプリケーションをテストするには、ビルドス
        </TabItem>
    </Tabs>
 
-* `kotlin-test` 依存関係は、アサーションを実行するための一連のユーティリティ関数を提供します。
+* `kotlin-test` 依存関係はアサーションを実行するためのユーティリティ関数セットを提供します:
 
   <var name="group_id" value="org.jetbrains.kotlin"/>
   <var name="artifact_name" value="kotlin-test"/>
@@ -50,19 +50,19 @@ Ktor サーバーアプリケーションをテストするには、ビルドス
       </TabItem>
   </Tabs>
 
-> [Native サーバー](server-native.md#add-dependencies)のテストでは、これらのアーティファクトを `nativeTest` ソースセットに追加してください。
+> [Nativeサーバー](server-native.md#add-dependencies)のテストでは、これらのアーティファクトを `nativeTest` ソースセットに追加してください。
 
 ## テストの概要 {id="overview"}
 
-[`testApplication {}`](https://api.ktor.io/ktor-server-test-host/io.ktor.server.testing/test-application.html) 関数と、提供される [HTTP クライアント](client-create-and-configure.md)を使用して Ktor アプリケーションをテストできます。一般的なワークフローは以下のステップで構成されます。
+[`testApplication {}`](https://api.ktor.io/ktor-server-test-host/io.ktor.server.testing/test-application.html) 関数と提供されている [HTTPクライアント](client-create-and-configure.md) を使用して、Ktorアプリケーションをテストできます。典型的なワークフローには以下のステップが含まれます。
 
-1. `testApplication {}` を使用して[テストを定義](#junit-test-class)します。
-2. アプリケーションの[テストインスタンスを設定して実行](#configure-test-app)します。
-3. 必要に応じて [HTTP クライアントを設定](#configure-client)します。
-4. クライアントを使用してテストアプリケーションに [HTTP リクエストを送信](#make-request)し、レスポンスを受け取ります。
-5. ステータスコード、ヘッダー、ボディの内容など、`kotlin.test` のアサーションを使用して[レスポンスを検証](#assert)します。
+1. `testApplication {}` を使用して[テストを定義します](#junit-test-class)。
+2. アプリケーションの[テストインスタンスを設定して実行します](#configure-test-app)。
+3. 必要に応じて、[HTTPクライアントを設定します](#configure-client)。
+4. クライアントを使用してテストアプリケーションへ[HTTPリクエストを送信し](#make-request)、レスポンスを受信します。
+5. ステータスコード、ヘッダー、ボディコンテンツなどを含め、`kotlin.test` のアサーションを使用して[レスポンスを検証します](#assert)。
 
-以下の例は、`GET /` リクエストに対してプレーンテキストで応答するシンプルな Ktor アプリケーションをテストするものです。
+以下の例では、`GET /` リクエストに対してプレーンテキストで応答するシンプルなKtorアプリケーションをテストします。
 
 <Tabs>
 <TabItem title="ApplicationTest.kt">
@@ -119,21 +119,21 @@ fun Application.module() {
 
 > 完全なコード例については、[engine-main](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/engine-main) を参照してください。
 
-## JUnit テストクラスのセットアップ {id="junit-test-class"}
+## JUnitテストクラスのセットアップ {id="junit-test-class"}
 
-Ktor アプリケーションのテストを作成する前に、テストファイルと JUnit テストクラスを作成します。
+Ktorアプリケーションのテストを作成する前に、テストファイルとJUnitテストクラスを作成します。
 
 <procedure>
 
-1. プロジェクト内の `src/test/kotlin` ディレクトリを探すか、作成します。
-2. 新しい Kotlin ファイル（例：`ApplicationTest.kt`）を作成します。
-3. テストを含む Kotlin クラスを定義します。
+1. プロジェクト内の `src/test/kotlin` ディレクトリを見つけるか、作成します。
+2. 新しいKotlinファイル（例: `ApplicationTest.kt`）を作成します。
+3. テストを含むKotlinクラスを定義します:
     ```kotlin 
     class ApplicationTest {
-        // テスト関数をここに記述します
+        // ここにテスト関数を記述します
     }
     ```
-4. `@Test` アノテーションを付けたテスト関数を追加します。テスト内では、`testApplication {}` 関数を使用してテスト環境でアプリケーションを実行します。
+4. `@Test` アノテーションが付いたテスト関数を追加します。テストの内部で `testApplication {}` 関数を使用して、テスト環境でアプリケーションを実行します:
    ```kotlin 
     class ApplicationTest {
         @Test
@@ -144,32 +144,32 @@ Ktor アプリケーションのテストを作成する前に、テストファ
     ```
 </procedure>
 
-`testApplication {}` 関数は、Ktor におけるサーバーテストのエントリポイントです。これは隔離されたテスト環境を作成し、実際の Web サーバーを起動せずにアプリケーションを実行し、リクエストの送信やレスポンスの検証を行うための事前設定済み HTTP クライアントを提供します。
+`testApplication {}` 関数は、Ktorでのサーバーテストのエントリポイントです。隔離されたテスト環境を作成し、実際のWebサーバーを起動せずにアプリケーションを実行し、リクエストの送信やレスポンスのアサーションを行うための事前設定されたHTTPクライアントを提供します。
 
-`testApplication {}` ブロック内では、ロードするモジュール、公開するルート、環境のセットアップ、モック化する外部サービスなど、テストアプリケーションの動作を設定します。
+`testApplication {}` ブロック内では、ロードするモジュール、公開するルート、環境のセットアップ方法、モックする外部サービスなど、テストアプリケーションがどのように動作するかを設定します。
 
 次のセクションでは、利用可能な設定オプションについて説明します。
 
 ## テストアプリケーションの設定 {id="configure-test-app"}
 
-テストアプリケーションの設定では、以下のことが可能です。
+テストアプリケーションを設定する際、以下のことが可能です。
 
 - [アプリケーションモジュールの追加](#add-modules)
 - [ルートの追加](#add-routing)
 - [環境のカスタマイズ](#environment)
 - [外部サービスのモック](#external-services)
 
-> デフォルトでは、設定されたテストアプリケーションは[最初のクライアント呼び出し](#make-request)時に開始されます。
-> 必要に応じて、`startApplication()` 関数を呼び出してアプリケーションを手動で開始することもできます。
+> デフォルトでは、設定されたテストアプリケーションは[最初のクライアント呼び出し](#make-request)時に起動します。
+> オプションとして、`startApplication()` 関数を呼び出して手動でアプリケーションを起動することもできます。
 > これは、アプリケーションの[ライフサイクルイベント](server-events.md#predefined-events)をテストする必要がある場合に便利です。
 
 ### アプリケーションモジュールの追加 {id="add-modules"}
 
-[モジュール](server-modules.md)は、[明示的にロードする](#explicit-module-loading)か、[環境を設定する](#configure-env)かのいずれかの方法でテストアプリケーションにロードする必要があります。
+[モジュール](server-modules.md)は、[明示的にロードする](#explicit-module-loading)か、[環境を設定する](#configure-env)かのいずれかによって、テストアプリケーションにロードする必要があります。
 
 #### 明示的なモジュールのロード {id="explicit-module-loading"}
 
-テストアプリケーションに手動でモジュールを追加するには、`application {}` ブロックを使用します。
+テストアプリケーションに手動でモジュールを追加するには、`application {}` ブロックを使用します:
 
 ```kotlin
 package com.example
@@ -203,18 +203,18 @@ class ApplicationTest {
 
         startApplication()
 
-        // application プロパティにアクセスします
+        // application プロパティにアクセス
         val app: Application = application
 
-        // 同じインスタンスであることを確認します
+        // 同じインスタンスであることをアサート
         assertSame(configuredApplication, app)
     }
 }
 ```
 
-#### 設定ファイルからのモジュールのロード {id="configure-env"}
+#### 設定ファイルからモジュールをロードする {id="configure-env"}
 
-設定ファイルからモジュールをロードするには、`environment {}` ブロックを使用してテスト用の設定ファイルを指定します。
+設定ファイルからモジュールをロードするには、`environment {}` ブロックを使用してテスト用の設定ファイルを指定します:
 
 ```kotlin
 @Test
@@ -227,11 +227,11 @@ fun testHello() = testApplication {
 }
 ```
 
-このメソッドは、異なる環境を模倣したり、テスト中にカスタム設定設定を使用したりする必要がある場合に便利です。
+この方法は、テスト中にさまざまな環境を模倣したり、カスタム設定を使用したりする必要がある場合に便利です。
 
 ### アプリケーションインスタンスへのアクセス {id="access-application"}
 
-`application {}` ブロック内では、設定中の `Application` インスタンスにアクセスできます。
+`application {}` ブロック内では、設定中の `Application` インスタンスにアクセスできます:
 
 ```kotlin
 testApplication {
@@ -241,7 +241,7 @@ testApplication {
     }
 }
 ```
-さらに、`testApplication` スコープは `application` プロパティを公開しており、テストで使用されるのと同じ `Application` インスタンスを返します。これにより、テストコードからアプリケーションを直接検査または操作できます。
+さらに、`testApplication` スコープは `application` プロパティを公開しており、これはテストで使用されているのと同じ `Application` インスタンスを返します。これにより、テストコードからアプリケーションを直接調査または操作できます。
 
 ```kotlin
 package com.example
@@ -275,24 +275,24 @@ class ApplicationTest {
 
         startApplication()
 
-        // application プロパティにアクセスします
+        // application プロパティにアクセス
         val app: Application = application
 
-        // 同じインスタンスであることを確認します
+        // 同じインスタンスであることをアサート
         assertSame(configuredApplication, app)
     }
 }
 ```
 
-> `startApplication()` を呼び出す前、または最初のクライアントリクエストを作成する前に `application` プロパティにアクセスすると、`Application` インスタンスは返されますが、まだ開始されていない可能性があります。
+> `startApplication()` を呼び出す前、または最初のクライアントリクエストを行う前に `application` プロパティにアクセスすると `Application` インスタンスが返されますが、まだ起動していない可能性があります。
 > 
 {style="note"}
 
 ### ルートの追加 {id="add-routing"}
 
-`routing {}` ブロックを使用して、テストアプリケーションにルートを追加できます。この方法は、完全なモジュールをロードせずにルートをテストする場合や、テスト専用のエンドポイントを追加する場合に便利です。
+`routing {}` ブロックを使用して、テストアプリケーションにルートを追加できます。このアプローチは、完全なモジュールをロードせずにルートをテストする場合や、テスト固有のエンドポイントを追加する場合に役立ちます。
 
-以下の例では、テストでユーザーセッションを初期化するために使用される `/login-test` エンドポイントを追加しています。
+以下の例では、テストでユーザーセッションを初期化するために使用される `/login-test` エンドポイントを追加します:
 
 ```kotlin
 fun testHello() = testApplication {
@@ -311,7 +311,7 @@ fun testHello() = testApplication {
 
 テストアプリケーションにカスタム環境を設定するには、`environment {}` 関数を使用します。
 
-例えば、`test/resources` フォルダから設定ファイルをロードする場合：
+例えば、`test/resources` フォルダから設定ファイルをロードするには:
 
 ```kotlin
 @Test
@@ -324,7 +324,7 @@ fun testHello() = testApplication {
 }
 ```
 
-あるいは、[`MapApplicationConfig`](https://api.ktor.io/ktor-server-core/io.ktor.server.config/-map-application-config/index.html) を使用してプログラムで設定プロパティを提供することもできます。これは、アプリケーションが開始される前にアプリケーション設定にアクセスする必要がある場合に便利です。
+あるいは、[`MapApplicationConfig`](https://api.ktor.io/ktor-server-core/io.ktor.server.config/-map-application-config/index.html) を使用してプログラムから設定プロパティを提供することもできます。これは、アプリケーションが起動する前にアプリケーション設定にアクセスする必要がある場合に役立ちます。
 
 ```kotlin
 @Test
@@ -337,9 +337,9 @@ fun testDevEnvironment() = testApplication {
 
 ### 外部サービスのモック {id="external-services"}
 
-`externalServices {}` 関数を使用して外部サービスをシミュレートできます。そのブロック内で、モック化したい各サービスに対して `hosts() {}` 関数を使用します。`hosts() {}` ブロック内では、ルートを定義しプラグインをインストールすることで、モックサービスとして機能する `Application` を設定できます。
+`externalServices {}` 関数を使用して、外部サービスをシミュレートできます。そのブロック内で、モックしたい各サービスに対して `hosts() {}` 関数を使用します。`hosts() {}` ブロック内では、ルートを定義したりプラグインをインストールしたりすることで、モックサービスとして機能する `Application` を設定できます。
 
-以下の例では、Google API からの JSON レスポンスをシミュレートしています。
+以下の例では、Google API からの JSON レスポンスをシミュレートします:
 
 ```kotlin
 @Test
@@ -368,9 +368,9 @@ fun testHello() = testApplication {
 
 ## クライアントの設定 {id="configure-client"}
 
-`testApplication {}` 関数は、`client` プロパティを通じて設定済みの HTTP クライアントを提供します。クライアントをカスタマイズして追加のプラグインをインストールするには、`createClient {}` 関数を使用します。
+`testApplication {}` 関数は、`client` プロパティを通じて設定済みのHTTPクライアントを提供します。クライアントをカスタマイズして追加のプラグインをインストールするには、`createClient {}` 関数を使用します。
 
-例えば、`POST/PUT` リクエストで [JSON データを送信](#json-data)するために [`ContentNegotiation`](client-serialization.md) プラグインをインストールできます。
+例えば、`POST/PUT` リクエストで[JSONデータを送信する](#json-data)ために、[`ContentNegotiation`](client-serialization.md) プラグインをインストールできます:
 
 ```kotlin
 @Test
@@ -386,11 +386,11 @@ fun testPostCustomer() = testApplication {
 }
 ```
 
-## リクエストの作成 {id="make-request"}
+## リクエストの送信 {id="make-request"}
 
-設定されたクライアントを使用して、[リクエストの作成](client-requests.md)と[レスポンスの受信](client-responses.md)を行います。
+設定されたクライアントを使用して、[リクエストを送信](client-requests.md)し、[レスポンスを受信](client-responses.md)します。
 
-以下の例では、`POST` リクエストを処理する `/customer` エンドポイントをテストしています。
+以下の例では、`POST` リクエストを処理する `/customer` エンドポイントをテストします:
 
 ```kotlin
 @Test
@@ -412,9 +412,9 @@ fun testPostCustomer() = testApplication {
 
 > 完全なテスト例については、[json-kotlinx](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/json-kotlinx) を参照してください。
 
-## 結果の検証 (Assert) {id="assert"}
+## 結果のアサーション {id="assert"}
 
-レスポンスを受け取った後、[`kotlin.test`](https://kotlinlang.org/api/latest/kotlin.test/) ライブラリのアサーションを使用して結果を検証できます。
+レスポンスを受信した後、[`kotlin.test`](https://kotlinlang.org/api/latest/kotlin.test/) ライブラリのアサーションを使用して結果を検証できます:
 
 ```kotlin
 @Test
@@ -436,15 +436,15 @@ fun testPostCustomer() = testApplication {
 }
 ```
 
-## POST/PUT リクエストのテスト {id="test-post-put"}
+## POST/PUTリクエストのテスト {id="test-post-put"}
 
 ### フォームデータの送信 {id="form-data"}
 
-テストリクエストでフォームデータを送信するには、[`header()`](client-requests.md#headers) 関数と [`setBody()`](client-requests.md#body) 関数を使用して `Content-Type` ヘッダーとリクエストボディを設定します。
+テストリクエストでフォームデータを送信するには、[`header()`](client-requests.md#headers) および [`setBody()`](client-requests.md#body) 関数を使用して `Content-Type` ヘッダーとリクエストボディを設定します。
 
 #### キー/値ペア {id="x-www-form-urlencoded"}
 
-POST リクエストでキー/値のフォームパラメータを送信するには、`Content-Type` ヘッダーを `application/x-www-form-urlencoded` に設定し、[`formUrlEncode()`](https://api.ktor.io/ktor-http/io.ktor.http/form-url-encode.html) 関数を使用してパラメータをエンコードします。
+POSTリクエストでキー/値のフォームパラメータを送信するには、`Content-Type` ヘッダーを `application/x-www-form-urlencoded` に設定し、[`formUrlEncode()`](https://api.ktor.io/ktor-http/io.ktor.http/form-url-encode.html) 関数を使用してパラメータをエンコードします:
 
 <Tabs>
 <TabItem title="ApplicationTest.kt">
@@ -502,9 +502,9 @@ fun Application.main() {
 
 > 完全なコード例については、[post-form-parameters](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/post-form-parameters) を参照してください。
 
-#### マルチパートフォームデータ (Multipart form data) {id="multipart-form-data"}
+#### マルチパートフォームデータ {id="multipart-form-data"}
 
-`multipart/form-data` コンテンツタイプを使用してマルチパートフォームデータを構築し、ファイルのアップロードをテストできます。
+`multipart/form-data` コンテンツタイプを使用してマルチパートフォームデータを構築し、ファイルのアップロードをテストできます:
 
 <Tabs>
 <TabItem title="ApplicationTest.kt">
@@ -607,9 +607,9 @@ fun Application.main() {
 
 > 完全なコード例については、[upload-file](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/upload-file) を参照してください。
 
-### JSON データの送信 {id="json-data"}
+### JSONデータの送信 {id="json-data"}
 
-`POST/PUT` リクエストで JSON データをシリアライズおよびデシリアライズするには、新しいクライアントに [`ContentNegotiation`](client-serialization.md) プラグインをインストールします。
+`POST/PUT` リクエストでJSONデータをシリアライズおよびデシリアライズするには、新しいクライアントに [`ContentNegotiation`](client-serialization.md) プラグインをインストールします。
 
 リクエスト内では、`contentType()` 関数を使用して `Content-Type` ヘッダーを、`setBody()` 関数を使用してリクエストボディを指定できます。
 
@@ -685,11 +685,11 @@ data class Customer(val id: Int, val firstName: String, val lastName: String)
 
 > 完全な例については、[json-kotlinx](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/json-kotlinx) を参照してください。
 
-## テスト中のクッキーの保持 {id="preserving-cookies"}
+## テスト中のCookieの保持 {id="preserving-cookies"}
 
-リクエスト間でクッキーを保持するには、新しいクライアントに [`HttpCookies`](client-cookies.md) プラグインをインストールします。
+リクエスト間でCookieを保持するには、新しいクライアントに [`HttpCookies`](client-cookies.md) プラグインをインストールします。
 
-以下の例では、クッキーが保持されるため、各リクエストの後にリロードカウントが増加します。
+以下の例では、Cookieが保持されるため、リクエストごとにリロード回数が増加します:
 
 <Tabs>
 <TabItem title="ApplicationTest.kt">
@@ -775,9 +775,9 @@ fun Application.main() {
 
 > 完全な例については、[session-cookie-client](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/session-cookie-client) を参照してください。
 
-## HTTPS のテスト {id="https"}
+## HTTPSのテスト {id="https"}
 
-[HTTPS エンドポイント](server-ssl.md)をテストするには、[`URLBuilder.protocol`](client-requests.md#url) プロパティを使用してリクエストプロトコルを設定します。
+[HTTPSエンドポイント](server-ssl.md)をテストするには、[`URLBuilder.protocol`](client-requests.md#url) プロパティを使用してリクエストプロトコルを設定します:
 
 ```kotlin
 package com.example
@@ -807,9 +807,9 @@ class ApplicationTest {
 
 > 完全な例については、[ssl-engine-main](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/ssl-engine-main) を参照してください。
 
-## WebSocket のテスト {id="testing-ws"}
+## WebSocketのテスト {id="testing-ws"}
 
-[`WebSockets`](client-websockets.topic) クライアントプラグインを使用することで、[WebSocket の会話](server-websockets.md)をテストできます。
+[`WebSockets`](client-websockets.topic) クライアントプラグインを使用して、[WebSocket通信](server-websockets.md)をテストできます:
 
 ```kotlin
 package com.example
@@ -843,11 +843,11 @@ class ModuleTest {
 }
 ```
 
-## HttpClient を使用したエンドツーエンドテスト {id="end-to-end"}
+## HttpClientを使用したエンドツーエンドテスト {id="end-to-end"}
 
-[Ktor HTTP クライアント](client-create-and-configure.md)を使用して、サーバーアプリケーションの完全なエンドツーエンドテストを実行できます。
+[Ktor HTTPクライアント](client-create-and-configure.md)を使用して、サーバーアプリケーションの完全なエンドツーエンドテストを実行できます。
 
-以下の例では、HTTP クライアントが `TestServer` に対してテストリクエストを作成しています。
+以下の例では、HTTPクライアントが `TestServer` に対してテストリクエストを行います:
 
 ```kotlin
 import e2e.TestServer
@@ -868,4 +868,5 @@ class EmbeddedServerTest: TestServer() {
 }
 ```
 
-> 完全なエンドツーエンドテストの例については、[embedded-server](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/embedded-server) および [e2e](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/e2e) を参照してください。
+> 完全なエンドツーエンドテストの例については、[embedded-server](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/embedded-server)
+> および [e2e](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/e2e) を参照してください。

@@ -1,333 +1,258 @@
 ---
-title: Androidのスコープ
+title: Android スコープ
 ---
 
-このガイドでは、Android固有のスコープ実装について説明します。
+# Android スコープ
 
-:::info
-コアスコープの概念については、[スコープ](/docs/reference/koin-core/scopes)を参照してください。
-:::
+Android スコープは、あるコンポーネント（Activity、Fragment、Service、または ViewModel）が存在する間インスタンスを生存させ、そのコンポーネントと共にクローズします。このページでは、Android スコープ API（スコープアーキタイプ、`ScopeActivity`、`ScopeFragment`、`AndroidScopeComponent`、Retained スコープ、および Service スコープ）について説明します。スコープの概要、`scoped`、一般的なリンクやクローズについては、[Scopes](/docs/reference/koin-core/scopes) で解説されています。
 
-## 概要 {id="overview"}
+## スコープのライフタイム {id="scope-lifetimes"}
 
-Koinのスコープを使用すると、Androidコンポーネントのライフサイクルに合わせて依存関係のライフサイクルを管理できます。これにより、メモリリークを防ぎ、適切なリソース管理を確実に行うことができます。
+| スコープ | 開始（オープン） | 終了（クローズ） | 画面回転時の維持 |
+|-------|--------|--------|-------------------|
+| `activityScope` | Activity 内での初回アクセス | Activity の `ON_DESTROY` | なし |
+| `activityRetainedScope` | Activity 内での初回アクセス | Activity の終了（ViewModel により保持） | あり |
+| `fragmentScope` | Fragment 内での初回アクセス | Fragment の `ON_DESTROY` | なし |
+| Service scope | `Service.onCreate()` | `Service.onDestroy()` | 該当なし |
+| `viewModelScope` | ViewModel の生成 | ViewModel の破棄（cleared） | あり |
 
-### スコープの階層 {id="scope-hierarchy"}
+`single` はアプリと同じ期間生存するため、これらすべてにとって最も外側のレベルとなります。
 
-| スコープの種類 | 生存期間 | 画面回転後も保持されるか | DSL | アノテーション |
-|------------|----------|-------------------|-----|------------|
-| **Application** | アプリ全体 | ✅ はい | `single { }` | `@Singleton` |
-| **Activity** | Activityのライフサイクル | ❌ いいえ | `activityScope { }` | `@ActivityScope` |
-| **Activity Retained** | finish()まで | ✅ はい | `activityRetainedScope { }` | `@ActivityRetainedScope` |
-| **Fragment** | Fragmentのライフサイクル | ❌ いいえ | `fragmentScope { }` | `@FragmentScope` |
-| **ViewModel** | ViewModelのライフサイクル | ✅ はい | `viewModelScope { }` | `@ViewModelScope` |
+## スコープ定義の宣言 {id="declaring-scoped-definitions"}
 
-### スコープの関係性 {id="scope-relationships"}
+Android には、コンポーネントタイプごとに1つのスコープアーキタイプが存在します。アーキタイプとは、スコープを持つすべての Activity（または Fragment）が使用できるスコープ宣言のことであり、クラスごとに個別のスコープを記述する必要がなくなります。
 
-```
-Application Scope (single { })
-    └── Activity Retained Scope (画面回転後も保持)
-            └── Activity Scope
-                    ├── Fragment Scope 1
-                    └── Fragment Scope 2
-            └── ViewModel Scope (Activity/Fragmentスコープにはアクセス不可)
-```
-
-:::info
-**重要な原則:** 子スコープは親スコープの定義にアクセスできますが、その逆はできません。
-:::
-
-## スコープされた依存関係の宣言 {id="declaring-scoped-dependencies"}
-
-### コンパイラプラグインDSL {id="compiler-plugin-dsl"}
-
+**Compiler Plugin DSL**
 ```kotlin
-val appModule = module {
-    // Activityスコープ
+import org.koin.androidx.scope.dsl.activityRetainedScope
+import org.koin.androidx.scope.dsl.activityScope
+import org.koin.androidx.scope.dsl.fragmentScope
+
+val screenModule = module {
     activityScope {
-        scoped<ActivityPresenter>()
-        scoped<ActivityNavigator>()
+        scoped<ScreenNavigator>()
     }
-
-    // Fragmentスコープ
+    activityRetainedScope {
+        scoped<FormState>()
+    }
     fragmentScope {
-        scoped<FragmentPresenter>()
-    }
-
-    // ViewModelスコープ
-    viewModelScope {
-        scoped<UserCache>()
-        viewModel<UserViewModel>()
+        scoped<DetailPresenter>()
     }
 }
 ```
 
-### アノテーション {id="annotations"}
-
+**Annotations**
 ```kotlin
-// Activityスコープ
-@ActivityScope
-class ActivityPresenter(private val repository: UserRepository)
+import org.koin.android.annotation.ActivityRetainedScope
+import org.koin.android.annotation.ActivityScope
+import org.koin.android.annotation.FragmentScope
 
 @ActivityScope
-class ActivityNavigator
+class ScreenNavigator(private val activity: Activity)
 
-// Activityリテインスコープ (画面回転後も保持)
 @ActivityRetainedScope
-class RetainedPresenter
+class FormState
 
-// Fragmentスコープ
 @FragmentScope
-class FragmentPresenter
-
-// ViewModelスコープ
-@ViewModelScope
-class UserCache
-
-@KoinViewModel
-@ViewModelScope
-class UserViewModel(private val cache: UserCache) : ViewModel()
+class DetailPresenter(private val repository: UserRepository)
 ```
 
-### 従来のDSL {id="classic-dsl"}
-
+**Constructor / Classic DSL**
 ```kotlin
-val appModule = module {
+import org.koin.androidx.scope.dsl.activityRetainedScope
+import org.koin.androidx.scope.dsl.activityScope
+import org.koin.androidx.scope.dsl.fragmentScope
+
+val screenModule = module {
     activityScope {
-        scoped { ActivityPresenter(get()) }
-        scoped { ActivityNavigator() }
+        scopedOf(::ScreenNavigator)
     }
-
+    activityRetainedScope {
+        scopedOf(::FormState)
+    }
     fragmentScope {
-        scoped { FragmentPresenter(get()) }
-    }
-
-    viewModelScope {
-        scoped { UserCache() }
-        viewModel { UserViewModel(get()) }
+        scopedOf(::DetailPresenter)
     }
 }
 ```
 
-## Androidコンポーネントでのスコープの使用 {id="using-scopes-in-android-components"}
+定義を特定の Activity クラスに制限したい場合は、代わりに型ベースのスコープを宣言します（DSL では `scope<UserActivity> { }`、アノテーションでは `@Scope(UserActivity::class)` と `@Scoped` を使用）。Koin は最初に型ベースのスコープを検索し、次にアーキタイプを検索します。型ベースのスコープについては、[Scopes](/docs/reference/koin-core/scopes) で解説されています。
 
-### Activityスコープ {id="activity-scope"}
+## Activity スコープ {id="activity-scope"}
+
+`ScopeActivity` を継承するか、`AndroidScopeComponent` を実装して `activityScope()` でスコープを作成します。
 
 ```kotlin
-class MyActivity : AppCompatActivity(), AndroidScopeComponent {
+import org.koin.androidx.scope.ScopeActivity
 
-    // Activityのライフサイクルに紐付いたスコープを作成
+class UserActivity : ScopeActivity() {
+
+    private val navigator: ScreenNavigator by inject()
+}
+```
+
+```kotlin
+import org.koin.android.scope.AndroidScopeComponent
+import org.koin.androidx.scope.activityScope
+
+class UserActivity : AppCompatActivity(), AndroidScopeComponent {
+
     override val scope: Scope by activityScope()
 
-    // スコープから注入
-    private val presenter: ActivityPresenter by inject()
+    private val navigator: ScreenNavigator by inject()
 }
 ```
 
-または、便利なベースクラスを使用します：
+スコープを使用すると、Activity 内の `inject()`、`get()`、および `viewModel()` は、まず Activity スコープから解決され、次にルートスコープから解決されます。スコープは Activity の `ON_DESTROY` ライフサイクルイベントでクローズされるため、`onDestroy()` のコードが実行される時点ですでにクローズされています。
+
+Activity はそのスコープのソース（生成元）です。スコープ定義内で `Activity` や `Context` を要求すると、現在の Activity を受け取ることができます。
 
 ```kotlin
-class MyActivity : ScopeActivity() {
-
-    // スコープはすでにセットアップされています
-    private val presenter: ActivityPresenter by inject()
+@ActivityScope
+class ScreenNavigator(private val activity: Activity) {
+    fun openSettings() = activity.startActivity(Intent(activity, SettingsActivity::class.java))
 }
 ```
 
-### Activityリテインスコープ {id="activity-retained-scope"}
+`activityScope()`（`org.koin.androidx.scope` 内のデリゲート）と `activityScope { }`（`org.koin.androidx.scope.dsl` 内のモジュール DSL）は同じ名前を共有しています。コンパイラが誤った方を選択した場合は、import 文を確認してください。
 
-設定変更（回転、テーマの変更など）後も保持されます：
+### Retained Activity スコープ {id="retained-activity-scope"}
+
+`activityRetainedScope()` は、構成変更（configuration changes）をまたいで同じスコープを保持します。Koin はこれを Activity の ViewModel に保持し、その ViewModel がクリアされたとき、つまり Activity が終了したときにクローズします。
 
 ```kotlin
-class MyActivity : AppCompatActivity(), AndroidScopeComponent {
+import org.koin.androidx.scope.RetainedScopeActivity
 
-    // ViewModelのライフサイクルに支えられており、画面回転後も保持されます
-    override val scope: Scope by activityRetainedScope()
+class FormActivity : RetainedScopeActivity() {
 
-    private val presenter: RetainedPresenter by inject()
+    private val formState: FormState by inject()
 }
 ```
 
-または、便利なベースクラスを使用します：
+または、`AndroidScopeComponent` を使用する場合は `override val scope: Scope by activityRetainedScope()` とします。
+
+Retained スコープ内の定義は、Activity インスタンスよりも長く生存します。そのため、Activity やその View、Fragment への参照を保持してはなりません。Retained スコープにはソースがないため、そこでの `Context` は `Application` に解決されます。
+
+## Fragment スコープ {id="fragment-scope"}
+
+`ScopeFragment` を継承するか、`fragmentScope()` を使用して `AndroidScopeComponent` を実装します。
 
 ```kotlin
-class MyActivity : RetainedScopeActivity() {
+import org.koin.androidx.scope.ScopeFragment
 
-    private val presenter: RetainedPresenter by inject()
+class DetailFragment : ScopeFragment() {
+
+    private val presenter: DetailPresenter by inject()
+
+    // 親 Activity スコープから解決される
+    private val navigator: ScreenNavigator by inject()
 }
 ```
 
-### Fragmentスコープ {id="fragment-scope"}
-
-Fragmentスコープは自動的に親Activityのスコープにリンクされます：
-
 ```kotlin
-class MyFragment : Fragment(), AndroidScopeComponent {
+import org.koin.androidx.scope.fragmentScope
+
+class DetailFragment : Fragment(), AndroidScopeComponent {
 
     override val scope: Scope by fragmentScope()
-
-    // Fragmentスコープから取得
-    private val presenter: FragmentPresenter by inject()
-
-    // Activityスコープの依存関係にもアクセス可能
-    private val activityPresenter: ActivityPresenter by inject()
 }
 ```
 
-または、便利なベースクラスを使用します：
-
-```kotlin
-class MyFragment : ScopeFragment() {
-
-    private val presenter: FragmentPresenter by inject()
-}
-```
-
-## 型ベース vs アーキタイプスコープ {id="type-based-vs-archetype-scopes"}
-
-### アーキタイプスコープ (推奨) {id="archetype-scope-recommended"}
-
-任意のActivity/Fragmentで動作する汎用的なスコープです：
-
-```kotlin
-module {
-    activityScope {
-        scoped<MyPresenter>()
-    }
-}
-
-// 任意のActivityで使用可能
-class ActivityA : ScopeActivity() {
-    private val presenter: MyPresenter by inject()
-}
-
-class ActivityB : ScopeActivity() {
-    private val presenter: MyPresenter by inject()
-}
-```
-
-### 型ベースのスコープ {id="type-based-scope"}
-
-特定のクラスに紐付いたスコープです：
-
-```kotlin
-module {
-    scope<MyActivity> {
-        scoped<MyPresenter>()
-    }
-}
-
-// MyActivityでのみ動作します
-class MyActivity : AppCompatActivity(), AndroidScopeComponent {
-    override val scope: Scope by activityScope()
-    private val presenter: MyPresenter by inject()
-}
-```
-
-## ViewModelスコープ {id="viewmodel-scope"}
-
-ViewModelは（メモリリークを防ぐために）ActivityやFragmentのスコープにアクセスできません。スコープされた依存関係にはViewModelスコープを使用してください：
-
-```kotlin
-module {
-    viewModelScope {
-        scoped<UserCache>()
-        scoped<UserRepository>()
-        viewModel<UserViewModel>()
-    }
-}
-```
-
-```kotlin
-@ViewModelScope
-class UserCache
-
-@ViewModelScope
-class UserRepository(private val cache: UserCache)
-
-@KoinViewModel
-@ViewModelScope
-class UserViewModel(
-    private val repository: UserRepository
-) : ViewModel()
-```
-
-ViewModelスコープの詳細な使用方法については、[スコープ - ViewModelスコープ](/docs/reference/koin-core/scopes#viewmodel-scope)を参照してください。
-
-## スコープのライフサイクル {id="scope-lifecycle"}
-
-### スコープ終了の処理 {id="handling-scope-close"}
-
-スコープが破棄される前にクリーンアップを実行するには、`onCloseScope()` をオーバーライドします：
-
-```kotlin
-class MyActivity : AppCompatActivity(), AndroidScopeComponent {
-
-    override val scope: Scope by activityScope()
-
-    override fun onCloseScope() {
-        // scope.close() の直前に呼び出されます
-        // ここではまだスコープにアクセス可能です
-    }
-}
-```
+Fragment スコープはホスト Activity のスコープにリンクされているため、Activity スコープのインスタンスを参照できます。これは、ホスト Activity がスコープを持っている場合（`ScopeActivity` または `AndroidScopeComponent`）にのみ機能します。それ以外の場合、リンクはスキップされ、Koin によってログが出力されます。意図的にリンクをスキップするには、`fragmentScope(useParentActivityScope = false)` を渡します。
 
 :::warning
-`onDestroy()` 内でスコープにアクセスしないでください。その時点ですでにスコープは閉じられています。
+Fragment スコープは View のライフサイクルではなく、Fragment のライフサイクル（`ON_DESTROY`）に従います。View やバインディングを保持するスコープインスタンスは、`onDestroyView()` の後も Fragment が破棄されるまでそれを保持し続けます。View への参照は `onDestroyView()` で解放してください。
 :::
 
-## スコープのリンク {id="scope-links"}
+## Service スコープ {id="service-scope"}
 
-カスタムスコープを使用して、コンポーネント間でインスタンスを共有します：
+`ScopeService` を継承します。そのスコープは `onCreate()` でオープンされ、`onDestroy()` でクローズされます。Service アーキタイプは存在しないため、Service クラス用の型ベースのスコープを宣言します。
 
+**Compiler Plugin DSL**
 ```kotlin
-module {
-    scope(named("session")) {
-        scoped<UserSession>()
+val playerModule = module {
+    scope<MusicService> {
+        scoped<PlaybackSession>()
+    }
+}
+```
+
+**Annotations**
+```kotlin
+@Scope(MusicService::class)
+@Scoped
+class PlaybackSession
+```
+
+**Constructor / Classic DSL**
+```kotlin
+val playerModule = module {
+    scope<MusicService> {
+        scopedOf(::PlaybackSession)
     }
 }
 ```
 
 ```kotlin
-class MyActivity : ScopeActivity() {
+import org.koin.android.scope.ScopeService
 
-    fun startSession() {
-        val sessionScope = getKoin().createScope("session", named("session"))
+class MusicService : ScopeService() {
 
-        // 現在のスコープにリンク
-        scope.linkTo(sessionScope)
+    private val session: PlaybackSession by inject()
 
-        // これでUserSessionにアクセス可能になります
-        val session: UserSession = get()
+    override fun onBind(intent: Intent?): IBinder? = null
+}
+```
+
+Service で `ScopeService` を継承できない場合は、`override val scope: Scope by serviceScope()` で `AndroidScopeComponent` を実装し、`onDestroy()` で `destroyServiceScope()` を呼び出します。
+
+## ViewModel スコープ {id="viewmodel-scope"}
+
+ViewModel スコープは、特定の ViewModel とまったく同じ期間だけ生存するインスタンスを保持します。それらは `viewModelScope { }` または `@ViewModelScope` で宣言します。その後、Koin が各 ViewModel ごとにスコープを作成できるように `viewModelScopeFactory()` オプションを有効にするか、`ScopeViewModel` を継承します。
+
+```kotlin
+import org.koin.core.option.viewModelScopeFactory
+
+startKoin {
+    androidContext(this@MainApplication)
+    options(viewModelScopeFactory())
+    modules(appModule)
+}
+```
+
+宣言、オプション、および `ScopeViewModel` については [Scopes](/docs/reference/koin-core/scopes) で解説されています。Android では、通常どおり `by viewModel()` を使用して ViewModel を取得します（[Android ViewModel](/docs/reference/koin-android/viewmodel) を参照）。
+
+`activityScope` 内で `scoped` を使用して ViewModel を宣言しないでください。そうすると `ViewModelStore` によって管理されないプレーンなオブジェクトとなり、画面回転のたびに再作成されてしまいます。ViewModel は `viewModel` で宣言し、`by viewModel()` で取得してください。
+
+## スコープがクローズする前のクリーンアップ {id="cleaning-up-before-the-scope-closes"}
+
+`AndroidScopeComponent` で `onCloseScope()` をオーバーライドします。Koin は Activity または Fragment スコープをクローズする直前、スコープインスタンスがまだ利用可能な状態のときにこれを呼び出します。
+
+```kotlin
+class UserActivity : ScopeActivity() {
+
+    override fun onCloseScope() {
+        get<ScreenNavigator>().clear()
     }
 }
 ```
 
-## クイックリファレンス {id="quick-reference"}
+`onCloseScope()` は Retained スコープや Service スコープでは呼び出されません。単一の定義に紐づくクリーンアップを行うには、その定義で `onClose { }` を使用します（[Definitions](/docs/reference/koin-core/definitions#release-callback) を参照）。
 
-| コンポーネント | デリゲート | ベースクラス |
-|-----------|----------|------------|
-| Activity | `by activityScope()` | `ScopeActivity` |
-| Activity (retained) | `by activityRetainedScope()` | `RetainedScopeActivity` |
-| Fragment | `by fragmentScope()` | `ScopeFragment` |
+## 制限事項 {id="limits"}
 
-| スコープ | 画面回転後も保持されるか | ユースケース |
-|-------|-------------------|----------|
-| `activityScope` | ❌ いいえ | UI状態、Presenter |
-| `activityRetainedScope` | ✅ はい | フォームの状態、保留中のリクエスト |
-| `fragmentScope` | ❌ いいえ | Fragment固有のPresenter |
-| `viewModelScope` | ✅ はい | ViewModelの依存関係 |
+- スコープが必要: スコープ定義を注入するクラスは、スコープ（`ScopeActivity`、`ScopeFragment`、`ScopeService`、または `AndroidScopeComponent`）を持つ必要があります。これがない場合、`inject()` はルートスコープから解決しようとし、`NoDefinitionFoundException` で失敗します。
+- メインスレッド: Activity および Fragment のスコープはメインスレッドから作成してください（プロパティデリゲートは `onCreate()` 内またはそれ以降に読み取られます）。
+- カスタムスコープ: `getKoin().createScope()` を使用して自身で作成したスコープは、どのライフサイクルにも紐づきません。ご自身でクローズしてください。
 
-## ベストプラクティス {id="best-practices"}
+:::tip
+実際のユーザーセッションにおけるスコープのライフタイムやリークしたインスタンスを確認するには、[Production Monitoring](/docs/tooling/production-monitoring) を参照してください。
+:::
 
-1. **アーキタイプを使用する** - 再利用性のために、`scope<MyActivity> { }` よりも `activityScope { }` を優先してください。
-2. **回転時はリテインを使用する** - 画面回転後も保持すべき状態には `activityRetainedScope` を使用してください。
-3. **リークさせない** - SingletonにActivityやFragmentを注入しないでください。
-4. **カスタムスコープを閉じる** - 手動で作成したスコープは必ず閉じてください。
-5. **onCloseScopeを使用する** - スコープ破棄前のクリーンアップに使用してください。
+## 関連情報 {id="related"}
 
-## 次のステップ {id="next-steps"}
-
-- **[コアスコープ](/docs/reference/koin-core/scopes)** - スコープの基本とViewModelスコープ
-- **[ViewModel](/docs/reference/koin-android/viewmodel)** - ViewModelの注入
-- **[テスト](/docs/reference/koin-test/testing)** - スコープされた依存関係のテスト
+- [Scopes](/docs/reference/koin-core/scopes): スコープの概念、リンク、`@Scope`、および ViewModel スコープ。
+- [Android ViewModel](/docs/reference/koin-android/viewmodel): Activity および Fragment スコープを持つ ViewModel。
+- [Android Entry Points](/docs/reference/koin-android/entry-points): Android コンポーネントでの注入。
+- [Fragment Factory](/docs/reference/koin-android/fragment-factory): Activity スコープからの Fragment の作成。
+- [Android Best Practices](/docs/reference/koin-android/best-practices): Context および Activity のリーク防止。

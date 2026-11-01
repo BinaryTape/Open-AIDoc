@@ -7,7 +7,7 @@
 
 <tldr>
 <p>
-<b>必須の依存関係</b>: <code>io.ktor:ktor-server-auth</code>, <code>io.ktor:ktor-server-auth-jwt</code>
+<b>必要な依存関係</b>: <code>io.ktor:ktor-server-auth</code>, <code>io.ktor:ktor-server-auth-jwt</code>
 </p>
 <p>
 <b>コード例</b>: 
@@ -15,7 +15,7 @@
 <a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/auth-jwt-rs256">auth-jwt-rs256</a>
 </p>
 <p>
-    <b><Links href="/ktor/server-native" summary="Ktor は Kotlin/Native をサポートしており、追加のランタイムや仮想マシンなしでサーバーを実行できます。">Native サーバー</Links> のサポート</b>: ✖️
+    <b><Links href="server-native.md" summary="Ktor supports Kotlin/Native and allows you to run a server without an additional runtime or virtual machine.">Native サーバー</Links>のサポート</b>: ✖️
 </p>
 </tldr>
 
@@ -23,20 +23,20 @@
 %plugin_name% プラグインを使用すると、JSON Web Token を使用してクライアントを認証できます。
 </link-summary>
 
-[JSON Web Token (JWT)](https://jwt.io/) は、情報を JSON オブジェクトとして関係者間で安全に送信するための方法を定義したオープン標準です。この情報は、共有シークレット（`HS256` アルゴリズムを使用）または公開鍵/秘密鍵のペア（例：`RS256`）を使用して署名されているため、検証および信頼することができます。
+[JSON Web Token (JWT)](https://jwt.io/) は、当事者間で情報を JSON オブジェクトとして安全に送信する方法を定義したオープン標準です。この情報は、共有シークレット（`HS256` アルゴリズムなど）または公開鍵/秘密鍵のペア（`RS256` など）を使用して署名されているため、検証および信頼することができます。
 
-Ktor は、`Bearer` スキーマを使用して `Authorization` ヘッダーで渡される JWT を処理し、以下のことを可能にします。
-* JSON Web Token の署名を検証する。
-* JWT ペイロードに対して追加の検証を実行する。
+Ktor は、`Bearer` スキームを使用して `Authorization` ヘッダーで渡された JWT を処理し、以下の操作を実行できます。
+* JSON Web Token の署名を検証する
+* JWT ペイロードに対して追加の検証を実行する
 
-> Ktor における認証と認可に関する一般的な情報は、[Ktor サーバーにおける認証と認可](server-auth.md) セクションで確認できます。
+> Ktor における認証と認可の一般的な情報については、[Ktor Server での認証と認可](server-auth.md)セクションを参照してください。
 
-> トークンが OpenID Connect プロバイダーからのものである場合、`Oidc` プラグインは issuer の URL から JWKS エンドポイントを解決し、キーのローテーション時にリフレッシュするため、`JwkProvider` を手動で構成する必要はありません。また、アクセストークンとして提示された ID トークンを拒否します。[OpenID Connect リソースサーバー](server-oidc-resource-server.md) を参照してください。
+> トークンが OpenID Connect プロバイダーからのものである場合、`Oidc` プラグインは発行者 URL から JWKS エンドポイントを解決し、キーのローテーション時に更新するため、`JwkProvider` を手動で構成する必要はありません。また、アクセストークンとして提示された ID トークンを拒否します。[OpenID Connect リソースサーバー](server-oidc-resource-server.md)を参照してください。
 >
 {style="tip"}
 
 ## 依存関係の追加 {id="add_dependencies"}
-`JWT` 認証を有効にするには、ビルドスクリプトに `ktor-server-auth` と `ktor-server-auth-jwt` アーティファクトを含める必要があります。
+`JWT` 認証を有効にするには、ビルドスクリプトに `ktor-server-auth` および `ktor-server-auth-jwt` アーティファクトを含める必要があります。
 
 <Tabs group="languages">
     <TabItem title="Gradle (Kotlin)" group-key="kotlin">
@@ -51,8 +51,8 @@ Ktor は、`Bearer` スキーマを使用して `Authorization` ヘッダーで�
 </Tabs>
 
 ## JWT 認可フロー {id="flow"}
-Ktor における JWT 認可フローは以下のようになります。
-1. クライアントは、サーバーアプリケーション内の特定の認証 [ルート (route)](server-routing.md) に対して、資格情報を含む `POST` リクエストを送信します。以下の例は、JSON で渡された資格情報を使用した [HTTP クライアント](https://www.jetbrains.com/help/idea/http-client-in-product-code-editor.html) の `POST` リクエストを示しています。
+Ktor における JWT 認可フローは次のようになります。
+1. クライアントは、サーバーアプリケーション内の特定の認証[ルート](server-routing.md)に対してクレデンシャルを含む `POST` リクエストを送信します。以下の例は、JSON でクレデンシャルを渡す [HTTP クライアント](https://www.jetbrains.com/help/idea/http-client-in-product-code-editor.html)の `POST` リクエストを示しています。
    ```HTTP
    POST http://localhost:8080/login
    Content-Type: application/json
@@ -62,17 +62,17 @@ Ktor における JWT 認可フローは以下のようになります。
      "password": "foobar"
    }
    ```
-2. 資格情報が有効な場合、サーバーは JSON Web Token を生成し、指定されたアルゴリズムで署名します。たとえば、これは特定の共有シークレットを使用した `HS256` や、公開鍵/秘密鍵のペアを使用した `RS256` などです。
+2. クレデンシャルが有効な場合、サーバーは JSON Web Token を生成し、指定されたアルゴリズムで署名します。たとえば、特定の共有シークレットを使用する `HS256` や、公開鍵/秘密鍵のペアを使用する `RS256` などです。
 3. サーバーは生成された JWT をクライアントに送信します。
-4. クライアントは、`Bearer` スキーマを使用して `Authorization` ヘッダーに JSON Web Token を含めることで、保護されたリソースにリクエストを送信できるようになります。
+4. クライアントは、`Bearer` スキームを使用して `Authorization` ヘッダーに JSON Web Token を含め、保護されたリソースにリクエストを送信できるようになります。
    ```HTTP
    GET http://localhost:8080/hello
    Authorization: Bearer {{auth_token}}
    ```
-5. サーバーはリクエストを受信し、以下の検証を実行します。
-   * トークンの署名を検証します。[検証方法](#configure-verifier) は、トークンの署名に使用されたアルゴリズムによって異なることに注意してください。
-   * JWT ペイロードに対して [追加の検証](#validate-payload) を実行します。
-6. 検証後、サーバーは保護されたリソースの内容を応答として返します。
+5. サーバーはリクエストを受信し、次の検証を実行します。
+   * トークンの署名を検証します。[検証方法](#configure-verifier)はトークンの署名に使用されたアルゴリズムによって異なる点に注意してください。
+   * JWT ペイロードに対して[追加の検証](#validate-payload)を実行します。
+6. 検証後、サーバーは保護されたリソースのコンテンツで応答します。
 
 ## JWT のインストール {id="install"}
 `jwt` 認証プロバイダーをインストールするには、`install` ブロック内で [jwt](https://api.ktor.io/ktor-server-auth-jwt/io.ktor.server.auth.jwt/jwt.html) 関数を呼び出します。
@@ -84,22 +84,22 @@ import io.ktor.server.auth.jwt.*
 //...
 install(Authentication) {
     jwt {
-        // jwt 認証を構成する
+        // Configure jwt authentication
     }
 }
 ```
-オプションで、[特定のルートを認証する](#authenticate-route) ために使用できる [プロバイダー名](server-auth.md#provider-name) を指定することもできます。
+オプションで、[指定したルートを認証](#authenticate-route)するために使用できる[プロバイダー名](server-auth.md#provider-name)を指定できます。
 
 ## JWT の構成 {id="configure-jwt"}
-このセクションでは、Ktor サーバーアプリケーションで JSON Web Token を使用する方法を見ていきます。トークンの検証方法が若干異なるため、トークンの署名に関する 2 つのアプローチを示します。
-* 指定された共有シークレットを使用して `HS256` を使用する。
-* 公開鍵/秘密鍵のペアを使用して `RS256` を使用する。
+このセクションでは、Ktor サーバーアプリケーションで JSON Web Token を使用する方法について説明します。トークンの検証方法が少し異なるため、トークンの署名に関する2つのアプローチを示します。
+* 指定された共有シークレットで `HS256` を使用する。
+* 公開鍵/秘密鍵のペアで `RS256` を使用する。
 
-完全なプロジェクトはこちらで見つけることができます: [auth-jwt-hs256](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/auth-jwt-hs256), [auth-jwt-rs256](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/auth-jwt-rs256)。
+完全なプロジェクトはこちらで確認できます: [auth-jwt-hs256](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/auth-jwt-hs256)、[auth-jwt-rs256](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/auth-jwt-rs256)。
 
 ### ステップ 1: JWT 設定の構成 {id="jwt-settings"}
 
-JWT 関連の設定を構成するために、[設定ファイル](server-configuration-file.topic) にカスタムの `jwt` グループを作成できます。たとえば、`application.conf` ファイルは以下のようになります。
+JWT 関連の設定を構成するには、[設定ファイル](server-configuration-file.topic)内にカスタムの `jwt` グループを作成できます。たとえば、`application.conf` ファイルは次のようになります。
 
 <Tabs group="sign-alg">
 <TabItem title="HS256" group-key="hs256">
@@ -128,11 +128,11 @@ jwt {
 </TabItem>
 </Tabs>
 
-> 秘密情報は設定ファイルにプレーンテキストで保存しないでください。これらのパラメータを指定するには、[環境変数](server-configuration-file.topic#environment-variables) の使用を検討してください。
+> シークレット情報を設定ファイルにプレーンテキストで保存しないでください。このようなパラメータを指定するには、[環境変数](server-configuration-file.topic#environment-variables)の使用を検討してください。
 >
 {type="warning"}
 
-これらの設定には、次のようにして [コード内でアクセス](server-configuration-file.topic#read-configuration-in-code) できます。
+コード内で[これらの設定にアクセス](server-configuration-file.topic#read-configuration-in-code)するには、次のように記述します。
 
 <Tabs group="sign-alg">
 <TabItem title="HS256" group-key="hs256">
@@ -172,7 +172,7 @@ JSON Web Token を生成するには、[JWTCreator.Builder](https://javadoc.io/d
 ```kotlin
 post("/login") {
     val user = call.receive<User>()
-    // ユーザー名とパスワードをチェック
+    // Check username and password
     // ...
     val expiresAt = System.currentTimeMillis() + 60000
     val token = JWT.create()
@@ -191,7 +191,7 @@ post("/login") {
 ```kotlin
 post("/login") {
     val user = call.receive<User>()
-    // ユーザー名とパスワードをチェック
+    // Check username and password
     // ...
     val keyId = "6f8856ed-9189-488f-9011-0ff4b6c08edc"
     val publicKey = jwkProvider.get(keyId).publicKey
@@ -218,15 +218,15 @@ post("/login") {
 </TabItem>
 </Tabs>
 
-1. `post("/login")` は、`POST` リクエストを受信するための認証 [ルート](server-routing.md) を定義します。
-2. `call.receive<User>()` は、JSON オブジェクトとして送信されたユーザー資格情報を [受信](server-serialization.md#receive_data) し、`User` クラスオブジェクトに変換します。
-3. `JWT.create()` は、指定された JWT 設定でトークンを生成し、受信したユーザー名を含むカスタムクレームを追加し、指定されたアルゴリズムでトークンに署名します。
-   * `HS256` の場合、トークンの署名には共有シークレットが使用されます。
+1. `post("/login")` は、`POST` リクエストを受信するための認証[ルート](server-routing.md)を定義します。
+2. `call.receive<User>()` は、JSON オブジェクトとして送信されたユーザークレデンシャルを[受信](server-serialization.md#receive_data)し、`User` クラスオブジェクトに変換します。
+3. `JWT.create()` は、指定された JWT 設定でトークンを生成し、受信したユーザー名を含むカスタムクレームを追加して、指定されたアルゴリズムでトークンに署名します。
+   * `HS256` の場合、トークンの署名に共有シークレットが使用されます。
    * `RS256` の場合、公開鍵/秘密鍵のペアが使用されます。
-4. `call.respond` は、トークンを JSON オブジェクトとしてクライアントに [送信](server-serialization.md#send_data) します。
+4. `call.respond` は、トークンを JSON オブジェクトとしてクライアントに[送信](server-serialization.md#send_data)します。
 
-### ステップ 3: realm の構成 {id="realm"}
-`realm` プロパティを使用すると、[保護されたルート](#authenticate-route) にアクセスしたときに `WWW-Authenticate` ヘッダーで渡される realm を設定できます。
+### ステップ 3: レルムの構成 {id="realm"}
+`realm` プロパティを使用すると、[保護されたルート](#authenticate-route)へのアクセス時に `WWW-Authenticate` ヘッダーで渡されるレルムを設定できます。
 
 ```kotlin
 val myRealm = jwtConfig.property("jwt.realm").getString()
@@ -237,11 +237,11 @@ install(Authentication) {
 }
 ```
 
-### ステップ 4: トークン検証機能（verifier）の構成 {id="configure-verifier"}
+### ステップ 4: トークン検証機能の構成 {id="configure-verifier"}
 
 `verifier` 関数を使用すると、トークンの形式とその署名を検証できます。
 * `HS256` の場合、トークンを検証するために [JWTVerifier](https://www.javadoc.io/doc/com.auth0/java-jwt/latest/com/auth0/jwt/JWTVerifier.html) インスタンスを渡す必要があります。
-* `RS256` の場合、[JwkProvider](https://www.javadoc.io/doc/com.auth0/jwks-rsa/latest/com/auth0/jwk/JwkProvider.html) を渡す必要があります。これは、トークンの検証に使用される公開鍵にアクセスするための JWKS エンドポイントを指定します。今回の例では、issuer が `http://0.0.0.0:8080` であるため、JWKS エンドポイントのアドレスは `http://0.0.0.0:8080/.well-known/jwks.json` になります。
+* `RS256` の場合、トークンの検証に使用される公開鍵にアクセスするための JWKS エンドポイントを指定する [JwkProvider](https://www.javadoc.io/doc/com.auth0/jwks-rsa/latest/com/auth0/jwk/JwkProvider.html) を渡す必要があります。この例では発行者が `http://0.0.0.0:8080` であるため、JWKS エンドポイントのアドレスは `http://0.0.0.0:8080/.well-known/jwks.json` になります。
 
 <Tabs group="sign-alg">
 <TabItem title="HS256" group-key="hs256">
@@ -295,7 +295,7 @@ install(Authentication) {
 <Tabs group="auth-dsl">
 <TabItem title="Classic" group-key="classic">
 
-1. `validate` 関数を使用すると、JWT ペイロードに対して検証を実行できます。この関数は必須です。構成しない場合、プロバイダーの初期化時に `IllegalArgumentException` がスローされます。`credential` パラメーターをチェックしてください。これは [JWTCredential](https://api.ktor.io/ktor-server-auth-jwt/io.ktor.server.auth.jwt/-j-w-t-credential/index.html) オブジェクトを表し、JWT ペイロードを含んでいます。以下の例では、カスタムクレーム `username` の値をチェックしています。
+1. `validate` 関数を使用すると、JWT ペイロードの検証を実行できます。この関数は必須です。構成しない場合、プロバイダーの初期化時に `IllegalArgumentException` がスローされます。JWT ペイロードを含み [JWTCredential](https://api.ktor.io/ktor-server-auth-jwt/io.ktor.server.auth.jwt/-j-w-t-credential/index.html) オブジェクトを表す `credential` パラメータをチェックします。以下の例では、カスタムの `username` クレームの値がチェックされています。
    ```kotlin
    install(Authentication) {
        jwt("auth-jwt") {
@@ -331,17 +331,15 @@ install(Authentication) {
 
 <note>
     <p>
-        型安全な認証スキーム API は実験的です。いつでも廃止または変更される可能性があります。
+        型安全な認証スキーム API は試験的なものです。いつでも廃止または変更される可能性があります。
         オプトインが必要です。詳細については、
-        <a href="server-typed-auth.md#prerequisites">API を有効にする</a> を参照してください。
+        <a href="server-typed-auth.md#prerequisites">型安全な認証のドキュメント</a>を参照してください。
     </p>
 </note>
 
-`jwt()` 関数は、選択したプリンシパル型のスキームを作成します。`install(Authentication)`
-ステップはありません。スキームは、それを必要とするルートに渡す値です。
+`jwt()` 関数は、任意のプリンシパル型のスキームを作成します。`install(Authentication)` のステップはありません。スキームは、それを必要とするルートに渡す値です。
 
-`validate` 内で必要なクレームを読み取り、独自の型を返します。これにより、ルートハンドラーは
-`JWTPrincipal` の代わりにその型を操作します。
+`validate` の内部で必要なクレームを読み取り、独自の型を返します。これにより、ルートハンドラーは `JWTPrincipal` の代わりにその型を操作できるようになります。
 
 ```kotlin
 data class User(val username: String, val expiresAt: Long?)
@@ -370,7 +368,7 @@ val jwtAuth = jwt<User>("auth-jwt") {
 }
 ```
 
-失敗ハンドラーは `challenge` ではなく `onUnauthorized` です。完全な API については、[型安全な認証](server-typed-auth.md) を参照してください。
+失敗ハンドラーは `challenge` ではなく `onUnauthorized` です。完全な API については、[型安全な認証](server-typed-auth.md)を参照してください。
 
 </TabItem>
 </Tabs>
@@ -380,7 +378,7 @@ val jwtAuth = jwt<User>("auth-jwt") {
 <Tabs group="auth-dsl">
 <TabItem title="Classic" group-key="classic">
 
-`jwt` プロバイダーを構成した後、**[authenticate](server-auth.md#authenticate-route)** 関数を使用してアプリケーション内の特定のリソースを保護できます。認証に成功した場合は、ルートハンドラー内で `call.principal` 関数を使用して認証済みの [JWTPrincipal](https://api.ktor.io/ktor-server-auth-jwt/io.ktor.server.auth.jwt/-j-w-t-principal/index.html) を取得し、JWT ペイロードを取得できます。以下の例では、カスタムクレーム `username` の値とトークンの有効期限を取得しています。
+`jwt` プロバイダーを構成した後、**[authenticate](server-auth.md#authenticate-route)** 関数を使用してアプリケーション内の特定のリソースを保護できます。認証に成功した場合、ルートハンドラー内で `call.principal` 関数を使用して認証済みの [JWTPrincipal](https://api.ktor.io/ktor-server-auth-jwt/io.ktor.server.auth.jwt/-j-w-t-principal/index.html) を取得し、JWT ペイロードを取得できます。以下の例では、カスタムの `username` クレームの値とトークンの有効期限が取得されています。
 
 ```kotlin
 routing {
@@ -405,7 +403,7 @@ routing {
 </TabItem>
 <TabItem title="Type-safe" group-key="typed">
 
-スキームを `authenticateWith()` に渡します。クレームは `validate` 内で既に読み取られているため、ハンドラーは独自の型を操作でき、null チェックは不要です。
+スキームを `authenticateWith()` に渡します。クレームはすでに `validate` で読み取られているため、ハンドラーは独自の型を操作でき、null チェックは不要です。
 
 ```kotlin
 routing {

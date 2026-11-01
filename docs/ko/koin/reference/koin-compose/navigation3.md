@@ -4,324 +4,139 @@ title: Navigation 3
 
 # Navigation 3
 
-Koin은 의존성 주입을 포함한 타입 안전(type-safe) 멀티플랫폼 내비게이션을 위해 [AndroidX Navigation 3](https://developer.android.com/guide/navigation/navigation-3)와의 통합을 지원합니다.
+이 페이지에서는 Koin 모듈에서 [Navigation 3](https://developer.android.com/guide/navigation/navigation-3) 엔트리를 선언하고 이를 `NavDisplay`에 전달하는 방법을 설명합니다. 각 피처(feature) 모듈은 자체 화면을 제공하며, 앱은 단일 엔트리 프로바이더(entry provider)로 이를 모두 수집합니다. 이 문서는 독자가 Navigation 3의 기본 사항(백스택, `NavDisplay`, `NavEntry`)과 [ViewModel in Compose](/docs/reference/koin-compose/compose-viewmodel)에 대해 이미 알고 있다고 가정합니다.
 
-## Navigation 3란 무엇인가요? {id="what-is-navigation-3"}
-
-Navigation 3는 Compose를 위해 특별히 설계된 Jetpack의 새로운 내비게이션 라이브러리입니다:
-
-- **전체 백 스택 제어** - 리스트에서 항목을 추가하거나 제거하여 내비게이션을 수행합니다.
-- **타입 안전한 라우트** - 라우트는 `@Serializable`이 적용된 Kotlin 클래스로 정의됩니다.
-- **적응형 레이아웃(Adaptive layouts)** - 여러 목적지를 동시에 표시할 수 있습니다(리스트-상세 구조 등).
-- **자동 애니메이션** - 기본적으로 트랜지션 지원이 내장되어 있습니다.
+이 페이지의 모든 API에는 `@KoinExperimentalAPI`가 지정되어 있습니다.
 
 ## 설정 {id="setup"}
 
-### 멀티플랫폼 프로젝트 {id="multiplatform-projects"}
-
 ```kotlin
-// shared/build.gradle.kts
+// shared/build.gradle.kts 또는 Android의 app/build.gradle.kts
+plugins {
+    kotlin("plugin.serialization")
+}
+
 commonMain.dependencies {
     implementation("io.insert-koin:koin-compose-navigation3:$koin_version")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$serialization_version")
 }
 ```
 
-### Android 전용 프로젝트 {id="android-only-projects"}
+`koin-compose-navigation3`은 Android, iOS, JVM 데스크톱, JS 및 Wasm을 지원합니다.
+
+## 엔트리 선언 {id="declaring-entries"}
+
+경로(Route)는 `@Serializable` 클래스입니다:
 
 ```kotlin
-dependencies {
-    implementation("io.insert-koin:koin-compose-navigation3:$koin_version")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$serialization_version")
-}
+@Serializable data object HomeRoute
+@Serializable data class DetailRoute(val itemId: String)
 ```
 
-serialization 플러그인을 적용합니다:
+모듈에서 경로당 하나의 `navigation<T> { }`를 선언하세요. 람다는 경로를 전달받는 Composable입니다:
 
 ```kotlin
-plugins {
-    kotlin("plugin.serialization")
-}
-```
+import org.koin.dsl.navigation3.navigation
 
-### 플랫폼 지원 {id="platform-support"}
-
-| 플랫폼 | 상태 |
-|----------|--------|
-| Android | 전체 지원 |
-| iOS | 전체 지원 |
-| Desktop | 전체 지원 |
-| Web | 전체 지원 |
-
-## 핵심 개념 {id="core-concepts"}
-
-### Kotlin 클래스로 정의하는 라우트 {id="routes-as-kotlin-classes"}
-
-`@Serializable`을 사용하여 타입 안전한 라우트를 정의합니다:
-
-```kotlin
-@Serializable
-data object HomeRoute
-
-@Serializable
-data object ProfileRoute
-
-@Serializable
-data class DetailRoute(val itemId: String)
-
-@Serializable
-data class SettingsRoute(val section: String? = null)
-```
-
-### 백 스택 (Back Stack) {id="back-stack"}
-
-Navigation 3는 간단한 리스트 기반의 백 스택을 사용합니다:
-
-```kotlin
-// 기본 백 스택
-val backStack = remember { mutableStateListOf<Any>(HomeRoute) }
-
-// 지속성 백 스택 (구성 변경 시에도 유지됨)
-val backStack = rememberNavBackStack(HomeRoute)
-
-// 앞으로 가기 (Navigate forward)
-backStack.add(DetailRoute("123"))
-
-// 뒤로 가기 (Navigate back)
-backStack.removeLastOrNull()
-```
-
-### NavDisplay {id="navdisplay"}
-
-`NavDisplay`는 애니메이션과 함께 백 스택을 렌더링합니다:
-
-```kotlin
-NavDisplay(
-    backStack = backStack,
-    onBack = { backStack.removeLastOrNull() },
-    entryProvider = { route -> /* NavEntry */ }
-)
-```
-
-## Koin 통합 {id="koin-integration"}
-
-### 내비게이션 엔트리 선언 {id="declaring-navigation-entries"}
-
-모듈에서 `navigation<T>` DSL을 사용합니다:
-
-```kotlin
-val appModule = module {
-    // 의존성
-    single<ApiClient>()
+val homeModule = module {
     viewModel<HomeViewModel>()
-    viewModel<DetailViewModel>()
 
-    // Koin 주입을 포함한 내비게이션 엔트리
-    navigation<HomeRoute> { route ->
+    navigation<HomeRoute> {
         HomeScreen(viewModel = koinViewModel())
     }
+}
+
+val detailModule = module {
+    viewModel<DetailViewModel>()
 
     navigation<DetailRoute> { route ->
-        DetailScreen(
-            itemId = route.itemId,
-            viewModel = koinViewModel { parametersOf(route.itemId) }
-        )
-    }
-
-    navigation<ProfileRoute> { route ->
-        ProfileScreen(viewModel = koinViewModel())
+        DetailScreen(viewModel = koinViewModel { parametersOf(route.itemId) })
     }
 }
 ```
 
-### koinEntryProvider 사용하기 {id="using-koinentryprovider"}
+각 `navigation<T>`는 경로 타입으로 한정(qualified)된 정의로 저장됩니다. 람다는 Koin `Scope`를 수신 객체(receiver)로 하여 실행되므로 내부에서 `get<T>()`뿐만 아니라 `koinViewModel()`과 같은 Composable 함수도 호출할 수 있습니다.
 
-Koin에서 모든 내비게이션 엔트리를 가져옵니다:
+## 엔트리 프로바이더 빌드 {id="building-the-entry-provider"}
+
+`koinEntryProvider()`는 현재 스코프의 모든 `navigation<T>` 엔트리를 수집하여 `NavDisplay`를 위한 단일 프로바이더로 만듭니다:
 
 ```kotlin
+import org.koin.compose.navigation3.koinEntryProvider
+
 @Composable
 fun App() {
-    val backStack = rememberNavBackStack(HomeRoute)
-    val entryProvider = koinEntryProvider<Any>()
+    val backStack = remember { mutableStateListOf<Any>(HomeRoute) }
 
     NavDisplay(
         backStack = backStack,
         onBack = { backStack.removeLastOrNull() },
-        entryProvider = entryProvider
+        entryProvider = koinEntryProvider()
     )
 }
 ```
 
-:::tip NavDisplay가 타입화된 경우 라우트 타입을 전달하세요
-`koinEntryProvider<T>()`는 제네릭 함수이며, `T`는 라우트 타입입니다. 만약 `koinEntryProvider<Any>()`로 두었으나 `NavDisplay`가 타입화된다면(예: `rememberSupportingPaneSceneStrategy<Route>()`와 같은 타입이 지정된 `SceneStrategy`를 사용하는 경우), 컴파일러는 `NavDisplay<Route>`로 추론하고 `(Route) -> NavEntry<Route>`를 기대하게 됩니다. 따라서 `Any` 타입의 프로바이더는 일치하지 않게 됩니다:
+`rememberNavBackStack()`을 사용하는 경우 경로는 `NavKey`를 구현해야 합니다. 백스택 타입과 일치하도록 `koinEntryProvider<NavKey>()`를 사용하세요.
 
-```
-Argument type mismatch: actual type is 'Function1<Any, NavEntry<Any>>',
-but 'Function1<Route, NavEntry<Route>>' was expected.
-```
+### Android Activity에서 사용하기 {id="from-an-android-activity"}
 
-타입을 일치시키려면 라우트 타입을 전달하세요:
+Android에서는 `ComponentCallbacks`의 두 가지 확장 함수를 통해 Activity 또는 Fragment 스코프에서 프로바이더를 빌드할 수 있습니다:
 
-```kotlin
-val sceneStrategy = rememberSupportingPaneSceneStrategy<Route>()
-val entryProvider = koinEntryProvider<Route>()   // (Route) -> NavEntry<Route>
+| 함수 | 동작 |
+|----------|----------|
+| `entryProvider<T>()` | 지연 대리자(Lazy delegate): `val provider by entryProvider<Any>()` |
+| `getEntryProvider<T>()` | 프로바이더를 즉시 빌드 |
 
-NavDisplay(
-    backStack = backStack,
-    onBack = onBack,
-    sceneStrategy = sceneStrategy,
-    entryProvider = entryProvider,               // ✅ NavDisplay<Route>와 일치함
-)
-```
+이들은 컴포넌트의 Koin 스코프로부터 인스턴스를 해석(resolve)합니다. 컴포넌트가 `AndroidScopeComponent`를 구현한 경우에는 Activity 스코프에서, 그렇지 않은 경우에는 루트(root) 스코프에서 해석합니다.
 
-(마찬가지로, `val entryProvider: EntryProvider<Route> = koinEntryProvider()`와 같이 작성하면 타입 인자가 기대되는 타입으로부터 추론됩니다.)
-:::
+## 스코프 내의 엔트리 {id="entries-in-a-scope"}
 
-### 전체 예제 {id="complete-example"}
+화면에 특정 스코프와 생명주기를 같이하는 객체가 필요한 경우, 스코프 내부에서 엔트리를 선언하세요. `activityRetainedScope`를 사용하면 구성 변경(configuration changes) 시에도 유지됩니다:
 
 ```kotlin
-// 라우트
-@Serializable data object ConversationList
-@Serializable data class ConversationDetail(val id: Int)
-@Serializable data object Profile
-
-// 더 깔끔한 내비게이션을 위한 Navigator 클래스
-class Navigator(startDestination: Any) {
-    val backStack = mutableStateListOf(startDestination)
-
-    fun goTo(destination: Any) {
-        backStack.add(destination)
-    }
-
-    fun goBack() {
-        backStack.removeLastOrNull()
-    }
+class Navigator(start: Any) {
+    val backStack = mutableStateListOf(start)
+    fun goTo(route: Any) { backStack.add(route) }
+    fun goBack() { backStack.removeLastOrNull() }
 }
 
-// Koin 모듈
 val appModule = module {
-    includes(conversationModule, profileModule)
-
     activityRetainedScope {
-        scoped { Navigator(startDestination = ConversationList) }
-    }
-}
+        scoped { Navigator(start = ConversationList) }
 
-val conversationModule = module {
-    activityRetainedScope {
         navigation<ConversationList> {
             val navigator = get<Navigator>()
-            ConversationListScreen(
-                onConversationClicked = { detail ->
-                    navigator.goTo(detail)
-                }
-            )
+            ConversationListScreen(onClick = { navigator.goTo(ConversationDetail(it)) })
         }
 
         navigation<ConversationDetail> { route ->
-            val navigator = get<Navigator>()
-            ConversationDetailScreen(
-                conversationId = route.id,
-                onProfileClicked = { navigator.goTo(Profile) }
-            )
+            ConversationDetailScreen(conversationId = route.id)
         }
     }
 }
 
-val profileModule = module {
-    activityRetainedScope {
-        navigation<Profile> {
-            ProfileScreen()
-        }
-    }
-}
-
-// Activity
 class MainActivity : ComponentActivity(), AndroidScopeComponent {
     override val scope: Scope by activityRetainedScope()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContent {
             val navigator: Navigator = get()
-
-            Scaffold { padding ->
-                NavDisplay(
-                    backStack = navigator.backStack,
-                    modifier = Modifier.padding(padding),
-                    onBack = { navigator.goBack() },
-                    entryProvider = getEntryProvider()
-                )
-            }
+            NavDisplay(
+                backStack = navigator.backStack,
+                onBack = { navigator.goBack() },
+                entryProvider = getEntryProvider()
+            )
         }
     }
 }
 ```
 
-## 스코프 내비게이션 (Scoped Navigation) {id="scoped-navigation"}
+`getEntryProvider()`는 Activity 스코프에서 엔트리를 읽어옵니다. 스코프 내에 선언된 엔트리는 해당 스코프 내에서만 접근할 수 있습니다. `activityRetainedScope`에 대한 자세한 내용은 [Android Scopes](/docs/reference/koin-android/scope)를 참고하세요.
 
-Koin 스코프 내에서 내비게이션 엔트리를 선언합니다:
+## 엔트리를 위한 ViewModel {id="viewmodels-for-an-entry"}
 
-```kotlin
-val appModule = module {
-    // Activity-retained 스코프 (구성 변경 시에도 유지됨)
-    activityRetainedScope {
-        scoped { UserSession() }
-        viewModel<ProfileViewModel>()
-
-        navigation<ProfileRoute> { route ->
-            ProfileScreen(viewModel = koinViewModel())
-        }
-    }
-
-    // 커스텀 스코프
-    scope<CheckoutFlow> {
-        scoped { CheckoutState() }
-        viewModel<CheckoutViewModel>()
-
-        navigation<CartRoute> { route ->
-            CartScreen(viewModel = koinViewModel())
-        }
-
-        navigation<PaymentRoute> { route ->
-            PaymentScreen(viewModel = koinViewModel())
-        }
-    }
-}
-```
-
-## ViewModel 통합 {id="viewmodel-integration"}
-
-### 내비게이션 인자 포함하기 {id="with-navigation-arguments"}
-
-라우트 데이터를 ViewModel에 전달합니다:
-
-```kotlin
-@Serializable
-data class DetailRoute(val itemId: String, val fromSearch: Boolean = false)
-
-class DetailViewModel(
-    val route: DetailRoute,
-    private val repository: Repository
-) : ViewModel() {
-    val item = repository.getItem(route.itemId)
-}
-
-val appModule = module {
-    viewModelOf(::DetailViewModel)
-
-    navigation<DetailRoute> { route ->
-        DetailScreen(
-            viewModel = koinViewModel { parametersOf(route) }
-        )
-    }
-}
-```
-
-### 엔트리 데코레이터 사용하기 {id="with-entry-decorators"}
-
-ViewModel 상태 유지를 위해 데코레이터를 사용합니다:
+ViewModel의 스코프를 엔트리로 한정하려면 `NavDisplay`에 ViewModel 스토어 데코레이터를 추가하세요. 데코레이터가 없으면 `koinViewModel()`은 Activity의 스토어를 사용하므로 동일한 경로의 모든 엔트리가 하나의 인스턴스를 공유하게 됩니다:
 
 ```kotlin
 NavDisplay(
@@ -331,216 +146,108 @@ NavDisplay(
         rememberSaveableStateHolderNavEntryDecorator(),
         rememberViewModelStoreNavEntryDecorator()
     ),
-    entryProvider = entryProvider {
-        entry<DetailRoute> { route ->
-            val viewModel = koinViewModel<DetailViewModel> {
-                parametersOf(route)
-            }
-            DetailScreen(viewModel)
-        }
-    }
-)
-```
-
-## 애니메이션 {id="animations"}
-
-### 기본 트랜지션 (Default Transitions) {id="default-transitions"}
-
-```kotlin
-NavDisplay(
-    backStack = backStack,
-    onBack = { backStack.removeLastOrNull() },
-    entryProvider = entryProvider,
-    // 정방향 내비게이션 애니메이션
-    transitionSpec = {
-        slideInHorizontally(initialOffsetX = { it }) togetherWith
-        slideOutHorizontally(targetOffsetX = { -it })
-    },
-    // 뒤로 가기 애니메이션
-    popTransitionSpec = {
-        slideInHorizontally(initialOffsetX = { -it }) togetherWith
-        slideOutHorizontally(targetOffsetX = { it })
-    }
-)
-```
-
-### 라우트별 애니메이션 {id="per-route-animations"}
-
-```kotlin
-navigation<ModalRoute>(
-    metadata = NavDisplay.transitionSpec {
-        slideInVertically(initialOffsetY = { it }) togetherWith
-        ExitTransition.KeepUntilTransitionsFinished
-    } + NavDisplay.popTransitionSpec {
-        EnterTransition.None togetherWith
-        slideOutVertically(targetOffsetY = { it })
-    }
-) { route ->
-    ModalScreen()
-}
-```
-
-## 적응형 레이아웃 (Adaptive Layouts) {id="adaptive-layouts"}
-
-### 리스트-상세 패턴 (List-Detail Pattern) {id="list-detail-pattern"}
-
-적응형 레이아웃을 위해 씬 전략(scene strategies)을 사용합니다:
-
-```kotlin
-@Composable
-fun App() {
-    val backStack = rememberNavBackStack(ConversationList)
-    val listDetailStrategy = rememberListDetailSceneStrategy<Any>()
-
-    NavDisplay(
-        backStack = backStack,
-        onBack = { backStack.removeLastOrNull() },
-        sceneStrategy = listDetailStrategy,
-        entryProvider = entryProvider {
-            entry<ConversationList>(
-                metadata = ListDetailSceneStrategy.listPane()
-            ) {
-                ConversationListScreen()
-            }
-
-            entry<ConversationDetail>(
-                metadata = ListDetailSceneStrategy.detailPane()
-            ) { route ->
-                ConversationDetailScreen(route.id)
-            }
-        }
-    )
-}
-```
-
-### Koin 모듈과 함께 사용하기 {id="with-koin-modules"}
-
-```kotlin
-val appModule = module {
-    navigation<ConversationList>(
-        metadata = ListDetailSceneStrategy.listPane()
-    ) {
-        ConversationListScreen(
-            onItemClick = { get<Navigator>().goTo(it) }
-        )
-    }
-
-    navigation<ConversationDetail>(
-        metadata = ListDetailSceneStrategy.detailPane()
-    ) { route ->
-        ConversationDetailScreen(route.id)
-    }
-}
-```
-
-## Android 확장 기능 {id="android-extensions"}
-
-### 지연 엔트리 프로바이더 (Lazy Entry Provider) {id="lazy-entry-provider"}
-
-```kotlin
-class MainActivity : ComponentActivity() {
-    // 지연 초기화
-    private val entryProvider by entryProvider<Any>()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            val backStack = rememberNavBackStack(HomeRoute)
-
-            NavDisplay(
-                backStack = backStack,
-                onBack = { backStack.removeLastOrNull() },
-                entryProvider = entryProvider
-            )
-        }
-    }
-}
-```
-
-### 즉시 엔트리 프로바이더 (Eager Entry Provider) {id="eager-entry-provider"}
-
-```kotlin
-class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        val entryProvider = getEntryProvider<Any>()
-
-        setContent {
-            NavDisplay(
-                backStack = backStack,
-                entryProvider = entryProvider,
-                onBack = { backStack.removeLastOrNull() }
-            )
-        }
-    }
-}
-```
-
-## API 레퍼런스 {id="api-reference"}
-
-### DSL 함수 {id="dsl-functions"}
-
-| 함수 | 설명 |
-|----------|-------------|
-| `Module.navigation<T> { }` | 모듈 수준에서 내비게이션 엔트리 선언 |
-| `ScopeDSL.navigation<T> { }` | 특정 스코프 내에서 내비게이션 엔트리 선언 |
-
-### Composable 함수 {id="composable-functions"}
-
-| 함수 | 설명 |
-|----------|-------------|
-| `koinEntryProvider<T>()` | Koin에서 집계된 엔트리 프로바이더를 가져옴 |
-
-### Android 확장 기능
-
-| 함수 | 설명 |
-|----------|-------------|
-| `entryProvider<T>()` | 지연 엔트리 프로바이더 위임(delegate) |
-| `getEntryProvider<T>()` | 즉시 엔트리 프로바이더 |
-
-## Navigation 2.x에서 마이그레이션 {id="migration-from-navigation-2-x"}
-
-### 이전 (Navigation 2.x) {id="before-navigation-2-x"}
-
-```kotlin
-NavHost(navController, startDestination = "home") {
-    composable("home") {
-        HomeScreen(viewModel = koinViewModel())
-    }
-    composable("detail/{id}") { backStackEntry ->
-        val id = backStackEntry.arguments?.getString("id")
-        DetailScreen(id = id, viewModel = koinViewModel())
-    }
-}
-```
-
-### 이후 (Navigation 3) {id="after-navigation-3"}
-
-```kotlin
-// 타입 안전한 라우트
-@Serializable data object HomeRoute
-@Serializable data class DetailRoute(val id: String)
-
-// 모듈 선언
-val appModule = module {
-    navigation<HomeRoute> { HomeScreen(viewModel = koinViewModel()) }
-    navigation<DetailRoute> { route ->
-        DetailScreen(id = route.id, viewModel = koinViewModel())
-    }
-}
-
-// 사용 예시
-val backStack = rememberNavBackStack(HomeRoute)
-NavDisplay(
-    backStack = backStack,
-    onBack = { backStack.removeLastOrNull() },
     entryProvider = koinEntryProvider()
 )
 ```
 
-## 참고 자료 {id="resources"}
+경로 또는 경로의 프로퍼티를 매개변수로 전달하세요:
 
-- [Navigation 3 공식 가이드](https://developer.android.com/guide/navigation/navigation-3)
-- [Nav3 Recipes 저장소](https://github.com/android/nav3-recipes)
-- [Koin Compose 문서](/docs/reference/koin-compose/compose)
+**컴파일러 플러그인 DSL**
+```kotlin
+class DetailViewModel(
+    @InjectedParam val route: DetailRoute,
+    private val repository: ItemRepository
+) : ViewModel()
+
+val detailModule = module {
+    viewModel<DetailViewModel>()
+
+    navigation<DetailRoute> { route ->
+        DetailScreen(viewModel = koinViewModel { parametersOf(route) })
+    }
+}
+```
+
+**어노테이션**
+```kotlin
+@KoinViewModel
+class DetailViewModel(
+    @InjectedParam val route: DetailRoute,
+    private val repository: ItemRepository
+) : ViewModel()
+
+// navigation<T> 엔트리는 DSL 모듈에서 선언됩니다
+val detailModule = module {
+    navigation<DetailRoute> { route ->
+        DetailScreen(viewModel = koinViewModel { parametersOf(route) })
+    }
+}
+```
+
+**생성자 / 기본 DSL**
+```kotlin
+class DetailViewModel(
+    val route: DetailRoute,
+    private val repository: ItemRepository
+) : ViewModel()
+
+val detailModule = module {
+    viewModelOf(::DetailViewModel) // route는 parametersOf(route)에서 전달됩니다
+
+    navigation<DetailRoute> { route ->
+        DetailScreen(viewModel = koinViewModel { parametersOf(route) })
+    }
+}
+```
+
+## 엔트리 메타데이터 {id="entry-metadata"}
+
+`navigation<T>`는 `NavEntry`로 전달되는 `metadata` 맵을 지원합니다. 엔트리별 전환 효과(transition)나 목록-세부정보(list-detail)와 같은 씬 전략(scene strategy)을 지정하는 데 사용하세요:
+
+```kotlin
+val conversationModule = module {
+    navigation<ConversationList>(metadata = ListDetailSceneStrategy.listPane()) {
+        ConversationListScreen()
+    }
+
+    navigation<ConversationDetail>(metadata = ListDetailSceneStrategy.detailPane()) { route ->
+        ConversationDetailScreen(route.id)
+    }
+
+    navigation<ModalRoute>(
+        metadata = NavDisplay.transitionSpec {
+            slideInVertically(initialOffsetY = { it }) togetherWith ExitTransition.KeepUntilTransitionsFinished
+        }
+    ) {
+        ModalScreen()
+    }
+}
+```
+
+그런 다음 해당 씬 전략을 `NavDisplay`에 전달합니다 (`sceneStrategy = rememberListDetailSceneStrategy()`). 메타데이터 키는 Koin이 아닌 Navigation 3 및 adaptive 라이브러리에서 제공됩니다.
+
+## Navigation 2와의 차이점 {id="from-navigation-2"}
+
+| Navigation 2 | Koin을 사용하는 Navigation 3 |
+|--------------|------------------------|
+| `NavHost { composable(...) }` 내의 문자열 또는 타입 세이프 경로 | `@Serializable` 경로 클래스 |
+| `NavHost` 내의 `composable<Route> { ... }` | Koin 모듈 내의 `navigation<Route> { ... }` |
+| `NavHost(navController, startDestination)` | `NavDisplay(backStack, entryProvider = koinEntryProvider())` |
+| `SavedStateHandle`에서 인수를 읽어옴 | 람다로 전달되는 경로 객체 |
+
+## API 요약 {id="api-summary"}
+
+| API | 패키지 | 용도 |
+|-----|---------|---------|
+| `Module.navigation<T>(metadata) { }` | `org.koin.dsl.navigation3` | 모듈에 엔트리 선언 |
+| `ScopeDSL.navigation<T>(metadata) { }` | `org.koin.dsl.navigation3` | 스코프에 엔트리 선언 |
+| `koinEntryProvider<T>(scope)` | `org.koin.compose.navigation3` | 현재 Compose 스코프에서 엔트리 프로바이더 생성 |
+| `entryProvider<T>()`, `getEntryProvider<T>()` | `org.koin.androidx.compose.navigation3` | Activity 또는 Fragment(Android)에서 엔트리 프로바이더 생성 |
+
+## 관련 문서 {id="related"}
+
+- [ViewModel in Compose](/docs/reference/koin-compose/compose-viewmodel): `koinViewModel()` 및 해당 소유자(owner).
+- [Android Scopes](/docs/reference/koin-android/scope): `activityRetainedScope` 및 Activity 스코프.
+- [Injected Parameters](/docs/reference/koin-core/injection-parameters): `parametersOf` 및 `@InjectedParam`.
+- [Koin for Compose](/docs/reference/koin-compose/compose): 패키지 구성 및 Koin 시작하기.
+- [Navigation 3 레시피](https://github.com/android/nav3-recipes): Navigation 3에 대한 Google 공식 샘플 코드.

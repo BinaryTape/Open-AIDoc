@@ -13,29 +13,38 @@
 </p>
 </tldr>
 
-CSS DSLは[HTML DSL](server-html-dsl.md)を拡張したもので、[kotlin-css](https://github.com/JetBrains/kotlin-wrappers/blob/master/kotlin-css/README.md)ラッパーを使用してKotlinでスタイルシートを記述できるようにします。
+CSS DSL は [HTML DSL](server-html-dsl.md) を拡張し、[kotlin-css](https://github.com/JetBrains/kotlin-wrappers/blob/master/kotlin-css/README.md) ラッパーを使用して Kotlin でスタイルシートを作成できるようにします。
 
-> スタイルシートを静的コンテンツとして配信する方法については、[静的コンテンツの配信](server-static-content.md)を参照してください。
+> 静的コンテンツとしてスタイルシートを配信する方法については、[静的コンテンツの配信](server-static-content.md) を参照してください。
 
 ## 依存関係の追加 {id="add_dependencies"}
-CSS DSLは[インストール](server-plugins.md#install)の必要はありませんが、ビルドスクリプトに以下のアーティファクトを含める必要があります。
+CSS DSL は [インストール](server-plugins.md#install) の必要はありませんが、ビルドスクリプトに以下のアーティファクトを含める必要があります:
 
-1. HTML DSL用の `ktor-server-html-builder` アーティファクト:
+1. HTML DSL 用の `ktor-server-html-builder` アーティファクト:
 
    <var name="artifact_name" value="ktor-server-html-builder"/>
+   <var name="ktor_version_catalog_name" value="ktorLibs.server.htmlBuilder"/>
    <Tabs group="languages">
        <TabItem title="Gradle (Kotlin)" group-key="kotlin">
-           <code-block lang="Kotlin" code="               implementation(&quot;io.ktor:%artifact_name%:$ktor_version&quot;)"/>
+           <code-block lang="Kotlin" code="               implementation(%ktor_version_catalog_name%)"/>
+           <note>
+               上記のスニペットは、Ktor の依存関係を指定するために <a href="server-dependencies.topic#using-version-catalog">
+               Ktor バージョンカタログ</a> を使用しています。
+           </note>
        </TabItem>
        <TabItem title="Gradle (Groovy)" group-key="groovy">
-           <code-block lang="Groovy" code="               implementation &quot;io.ktor:%artifact_name%:$ktor_version&quot;"/>
+           <code-block lang="Groovy" code="               implementation %ktor_version_catalog_name%"/>
+           <note>
+               上記のスニペットは、Ktor の依存関係を指定するために <a href="server-dependencies.topic#using-version-catalog">
+               Ktor バージョンカタログ</a> を使用しています。
+           </note>
        </TabItem>
        <TabItem title="Maven" group-key="maven">
            <code-block lang="XML" code="               &lt;dependency&gt;&#10;                   &lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;                   &lt;artifactId&gt;%artifact_name%-jvm&lt;/artifactId&gt;&#10;                   &lt;version&gt;${ktor_version}&lt;/version&gt;&#10;               &lt;/dependency&gt;"/>
        </TabItem>
    </Tabs>
    
-2. CSS作成用の `kotlin-css-jvm` アーティファクト:
+2. CSS を構築するための `kotlin-css-jvm` アーティファクト:
 
    <var name="group_id" value="org.jetbrains.kotlin-wrappers"/>
    <var name="artifact_name" value="kotlin-css"/>
@@ -52,11 +61,11 @@ CSS DSLは[インストール](server-plugins.md#install)の必要はありま�
        </TabItem>
    </Tabs>
    
-   `$kotlin_css_version` は、`kotlin-css` アーティファクトの必要なバージョン（例: `%kotlin_css_version%`）に置き換えることができます。
+   `$kotlin_css_version` は、必要な `kotlin-css` アーティファクトのバージョン（例: `%kotlin_css_version%`）に置き換えることができます。
 
-## CSSの配信 {id="serve_css"}
+## CSS の配信 {id="serve_css"}
 
-CSSレスポンスを送信するには、`ApplicationCall` を拡張して `respondCss` メソッドを追加し、スタイルシートを文字列にシリアライズして `CSS` コンテンツタイプでクライアントに送信する必要があります。
+CSS レスポンスを送信するには、`ApplicationCall` を拡張して `respondCss` メソッドを追加し、スタイルシートを文字列にシリアライズして `CSS` コンテンツタイプでクライアントに送信できるようにします:
 
 ```kotlin
 suspend inline fun ApplicationCall.respondCss(builder: CssBuilder.() -> Unit) {
@@ -64,7 +73,7 @@ suspend inline fun ApplicationCall.respondCss(builder: CssBuilder.() -> Unit) {
 }
 ```
 
-次に、必要な[ルート](server-routing.md)内でCSSを提供できます。
+その後、必要な[ルート (route)](server-routing.md) 内で CSS を提供できます:
 
 ```kotlin
 get("/styles.css") {
@@ -80,7 +89,7 @@ get("/styles.css") {
 }
 ```
 
-最後に、[HTML DSL](server-html-dsl.md)で作成されたHTMLドキュメントに対して、指定したCSSを使用できます。
+最後に、[HTML DSL](server-html-dsl.md) で作成した HTML ドキュメントに対して、指定した CSS を使用できます:
 
 ```kotlin
 get("/html-dsl") {
@@ -97,4 +106,4 @@ get("/html-dsl") {
 }
 ```
 
-完全な例はこちらで見つけることができます: [css-dsl](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/css-dsl)。
+完全なサンプルはこちらで確認できます: [css-dsl](https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/css-dsl)。
