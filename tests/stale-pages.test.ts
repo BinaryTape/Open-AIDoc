@@ -62,6 +62,11 @@ describe('pagesOf', () => {
     const ktor = { ...repo('ktor', ktorStrategy, 'ktor'), sourceDocRoot: './topics' }
     upstream(ktor, ['topics/lib.topic', 'topics/server-cors.md', 'topics/welcome.topic'])
     expect(await pagesOf(ktor, ktor.cloneDir)).toEqual(['server-cors.md', 'welcome.md'])
+    // ktor.io publishes the topics of ktor.tree only
+    upstream(ktor, ['topics/server-cors.md', 'topics/welcome.topic', 'topics/db-persistence.md'], {
+      'ktor.tree': '<instance-profile><toc-element topic="welcome.topic"><toc-element topic="server-cors.md"/></toc-element></instance-profile>',
+    })
+    expect(await pagesOf(ktor, ktor.cloneDir)).toEqual(['server-cors.md', 'welcome.md'])
 
     const coil = repo('coil', coilStrategy, 'coil')
     upstream(coil, ['README.md', 'docs/faq.md', '.github/ISSUE_TEMPLATE/CONTRIBUTING.md'])
@@ -149,6 +154,26 @@ describe('removeStalePages', () => {
     upstream(demo, ['docs/a.md', 'docs/c.md', 'docs/x.md'])
     await sync(demo)
     expect(redirects()).toEqual([{ from: 'demo/b.md', to: 'demo/c.md' }])
+  })
+
+  it('removes a ktor topic left out of ktor.tree, redirecting it where the tree accepts its name', async () => {
+    const ktor = { ...repo('ktor', ktorStrategy, 'ktor'), sourceDocRoot: './topics' }
+    upstream(ktor, ['topics/server-integrate-database.topic', 'topics/db-persistence.md', 'topics/client-multiplatform.md', 'topics/a.md'])
+    await sync(ktor)
+    ;['db-persistence.md', 'client-multiplatform.md'].forEach((page) => publish(page, 'ktor'))
+
+    upstream(ktor, ['topics/server-integrate-database.topic', 'topics/db-persistence.md', 'topics/client-multiplatform.md', 'topics/a.md'], {
+      'ktor.tree': '<instance-profile><toc-element topic="a.md"/><toc-element topic="server-integrate-database.topic" accepts-web-file-names="db-persistence.html, interactive-website-add-persistence.html"/></instance-profile>',
+    })
+    const result = await sync(ktor)
+
+    expect(result.removed).toEqual([
+      { page: 'client-multiplatform.md', movedTo: null },
+      { page: 'db-persistence.md', movedTo: 'server-integrate-database.md' },
+    ])
+    expect([...translations('db-persistence.md', 'ktor'), ...translations('client-multiplatform.md', 'ktor')].some(existsSync)).toBe(false)
+    expect(JSON.parse(readFileSync('docs/.vitepress/redirects/ktor.json', 'utf8')))
+      .toEqual([{ from: 'ktor/db-persistence.md', to: 'ktor/server-integrate-database.md' }])
   })
 
   it('does not redirect to a page upstream does not produce', async () => {

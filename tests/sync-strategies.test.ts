@@ -67,6 +67,17 @@ describe('ktor strategy', () => {
     expect(task.files).toEqual(['topics/server-cors.md'])
     expect(existsSync(join(clone, 'topics/lib.md'))).toBe(false)
   })
+
+  it('does not translate a topic ktor.tree leaves out (a retired tutorial)', async () => {
+    write('ktor.tree', '<instance-profile><toc-element topic="server-cors.md"/></instance-profile>\n')
+    write('topics/server-cors.md', '[//]: # (title: CORS)\n\nText.\n')
+    write('topics/db-persistence.md', '[//]: # (title: Database persistence)\n\nText.\n')
+
+    const task = { files: ['topics/server-cors.md', 'topics/db-persistence.md'] }
+    await ktorStrategy.postDetect({ cloneDir: clone, sidebarId: 'ktor' }, task)
+
+    expect(task.files).toEqual(['topics/server-cors.md'])
+  })
 })
 
 describe('generated sidebars', () => {

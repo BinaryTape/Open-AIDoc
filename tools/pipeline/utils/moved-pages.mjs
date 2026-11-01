@@ -34,6 +34,22 @@ export async function movedPagesFromTree(treeFile) {
 }
 
 /**
+ * The pages a Writerside tree publishes: its topics, as .md.
+ * @param {string} treeFile - A Writerside .tree file
+ * @returns {Promise<Set<string> | null>} null without the tree
+ */
+export async function pagesOfTree(treeFile) {
+  if (!(await fs.pathExists(treeFile))) return null;
+  const xml = await fs.readFile(treeFile, "utf8");
+  const pages = new Set();
+  for (const [tag] of xml.matchAll(/<toc-element\b[^>]*>/g)) {
+    const topic = /\btopic\s*=\s*"([^"]*)"/.exec(tag)?.[1];
+    if (topic) pages.add(asPage(topic));
+  }
+  return pages;
+}
+
+/**
  * @param {string} mkdocsFile - mkdocs.yml
  * @returns {Promise<Map<string, string>>}
  */
