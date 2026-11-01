@@ -8,6 +8,7 @@ import { loadPageCheck } from "./utils/page-check.mjs";
 import { applySourceAnchors } from "./utils/heading-anchors.mjs";
 import { applySourceLinkAnchors } from "./utils/link-anchors.mjs";
 import { restoreTitleComment } from "./utils/title-comment.mjs";
+import { unwrapCodedTags } from "./utils/coded-tags.mjs";
 import { stripWrapperFence } from "./utils/wrapper-fence.mjs";
 import { checkTranslation } from "./utils/translation-check.mjs";
 import { FatalApiError, TranslationRejected, withRetry } from "./utils/llm-retry.mjs";
@@ -437,6 +438,8 @@ async function translateUnit(filePath, targetLang, source, pageCheck = null) {
   // A Writerside title comment rewritten as YAML frontmatter leaves the
   // page with no H1 at all.
   translated = restoreTitleComment(translated, source).content;
+  // ...and a <path> wrapped in backticks shows the tag instead of the path.
+  translated = unwrapCodedTags(translated, source).content;
 
   // A summary, a truncated page or an invented stub is not written; the
   // current translation, if any, stays until a complete one arrives.

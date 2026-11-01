@@ -8,6 +8,8 @@
  *    page with no H1 at all.
  *  - a ```xml / ```html fence wrapping the whole document with its closing
  *    fence stripped, which renders the page as one unclosed code block.
+ *  - a Writerside inline tag wrapped in backticks (`<Path>…</Path>`), which
+ *    shows the tag itself.
  *
  *   node --import tsx scripts/repair-translated-markdown.mjs [--dry-run] [--doc-type kotlin]
  *
@@ -18,6 +20,7 @@ import fs from "fs";
 import { eachTranslatedDoc } from "../tools/pipeline/utils/upstream-pairs.mjs";
 import { restoreEscapedNewlines } from "../tools/pipeline/utils/escaped-newlines.mjs";
 import { restoreTitleComment } from "../tools/pipeline/utils/title-comment.mjs";
+import { unwrapCodedTags } from "../tools/pipeline/utils/coded-tags.mjs";
 import { repairUnclosedWrapper } from "../tools/pipeline/utils/wrapper-fence.mjs";
 
 const args = process.argv.slice(2);
@@ -25,7 +28,7 @@ const dryRun = args.includes("--dry-run");
 const docTypeFlag = args.indexOf("--doc-type");
 const onlyDocType = docTypeFlag === -1 ? null : args[docTypeFlag + 1];
 
-const totals = { files: 0, newlines: 0, titles: 0, wrappers: 0, overshot: 0 };
+const totals = { files: 0, newlines: 0, titles: 0, wrappers: 0, tags: 0, overshot: 0 };
 const overshot = [];
 
 for await (const { targetPath, sourcePath } of eachTranslatedDoc({
@@ -71,17 +74,21 @@ for await (const { targetPath, sourcePath } of eachTranslatedDoc({
   const titled = restoreTitleComment(content, source);
   content = titled.content;
 
+  const tagged = unwrapCodedTags(content, source);
+  content = tagged.content;
+
   if (content === before) continue;
   if (!dryRun) fs.writeFileSync(targetPath, content);
   totals.files++;
   totals.newlines += newlines;
   if (titled.changed) totals.titles++;
+  totals.tags += tagged.unwrapped;
 }
 
 console.log(
   `\n${dryRun ? "[dry run] " : ""}${totals.files} files: ` +
     `${totals.newlines} escaped newlines restored, ${totals.titles} title headers restored, ` +
-    `${totals.wrappers} document-wrapping fences removed` +
+    `${totals.wrappers} document-wrapping fences removed, ${totals.tags} inline tags taken out of backticks` +
     (totals.overshot ? `; ${totals.overshot} files left alone (repair exceeded the upstream count)` : "")
 );
 if (overshot.length) {
