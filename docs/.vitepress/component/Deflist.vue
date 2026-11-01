@@ -5,11 +5,16 @@ const props = defineProps({
   collapsible: {
     type: String,
     required: false
+  },
+  type: {
+    type: String,
+    required: false
   }
 })
 
 const isExpanded = ref(props.collapsible != null)
 provide('isExpanded', isExpanded)
+provide('deflistType', props.type)
 
 </script>
 
