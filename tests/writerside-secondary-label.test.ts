@@ -52,6 +52,21 @@ describe('syncLabels', () => {
     expect(await syncLabels(join(root, 'clone'), { gitAddPaths: new Set() }, 'kotlin', join(root, 'out'))).toBeNull()
     expect(readFileSync(join(root, 'out/kotlin.json'), 'utf8')).toBe('{"kept":true}')
   })
+
+  it('keeps the labels other repositories of the doc type wrote (api-guidelines after kotlin-web-site)', async () => {
+    mkdirSync(join(root, 'clone/docs'), { recursive: true })
+    writeFileSync(join(root, 'clone/docs/labels.list'), LIST)
+    await syncLabels(join(root, 'clone'), { gitAddPaths: new Set() }, 'kotlin', join(root, 'out'))
+    writeFileSync(join(root, 'clone/docs/labels.list'), '<labels><primary-label id="eap" name="EAP" color="red"></primary-label><secondary-label id="maven" name="Maven" color="black"></secondary-label></labels>')
+
+    const file = await syncLabels(join(root, 'clone'), { gitAddPaths: new Set() }, 'kotlin', join(root, 'out'))
+
+    const labels = JSON.parse(readFileSync(file!, 'utf8'))
+    expect(Object.keys(labels.primary)).toEqual(['alpha', 'eap'])
+    expect(Object.keys(labels.secondary)).toEqual(['maven', 'IntelliJ IDEA', 'Desktop'])
+    // The repository synced last wins for an id both define
+    expect(labels.secondary.maven).toEqual({ name: 'Maven', color: 'black' })
+  })
 })
 
 describe('secondary labels on a page', () => {

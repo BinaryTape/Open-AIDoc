@@ -31,6 +31,16 @@ export const defaultStrategy = {
   mapDocPath: (file) => file,
 
   /**
+   * The pages upstream publishes, as mapDocPath gives them, when not every
+   * document file is one: a Writerside site publishes the topics of its .tree
+   * only. Other pages are neither translated nor kept in the inventory, so a
+   * sync removes them. null: every page mapDocPath gives.
+   * @param {string} repoPath - Path to the cloned repository
+   * @returns {Promise<Set<string> | null>}
+   */
+  getPublishedPages: async (repoPath) => null,
+
+  /**
    * Pages upstream declares as moved, read from the clone: old page → new
    * page, both relative to sourceDocRoot. A page removed upstream is
    * redirected to its new page when there is one.

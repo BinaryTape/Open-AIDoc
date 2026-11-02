@@ -43,11 +43,12 @@ const docRoot = (repoConfig) => path.posix.normalize(repoConfig.sourceDocRoot.re
 export async function pagesOf(repoConfig, cloneDir) {
   const strategy = repoConfig.syncStrategy;
   const found = await Promise.all(strategy.getDocPatterns().map((pattern) => glob(pattern, { cwd: cloneDir, nodir: true, dot: true })));
+  const published = await strategy.getPublishedPages?.(cloneDir);
   const root = docRoot(repoConfig);
   const pages = new Set();
   for (const file of found.flat().map((f) => f.replaceAll("\\", "/"))) {
     const mapped = strategy.mapDocPath(file);
-    if (!mapped) continue;
+    if (!mapped || (published && !published.has(mapped))) continue;
     const page = path.posix.relative(root, mapped);
     if (!page.startsWith("..")) pages.add(page);
   }

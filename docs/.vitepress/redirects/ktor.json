@@ -1,0 +1,10 @@
+[
+  {
+    "from": "ktor/db-connection-pooling-caching.md",
+    "to": "ktor/server-integrate-database.md"
+  },
+  {
+    "from": "ktor/db-persistence.md",
+    "to": "ktor/server-integrate-database.md"
+  }
+]
