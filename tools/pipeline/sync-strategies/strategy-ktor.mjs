@@ -6,7 +6,7 @@ import {processTopicFileAsync} from "../processors/TopicProcessor.mjs";
 import {syncSidebar} from "../processors/SidebarProcessor.mjs";
 import {processMarkdownFile} from "../processors/MarkdownProcessor.mjs";
 import {expandIncludesForTask} from "../utils/writerside-include.mjs";
-import {movedPagesFromTree} from "../utils/moved-pages.mjs";
+import {movedPagesFromTree, pagesOfTree} from "../utils/moved-pages.mjs";
 import {syncLabels} from "../utils/writerside-labels.mjs";
 
 // lib*.topic files are libraries of snippets included by other topics, not pages.
@@ -34,6 +34,16 @@ export const ktorStrategy = {
      * @override
      */
     getMovedPages: async (repoPath) => movedPagesFromTree(path.join(repoPath, "ktor.tree")),
+
+    /**
+     * @override
+     * ktor.io publishes the topics of ktor.tree; topics/ also keeps a few
+     * retired tutorials, whose snippets are gone.
+     */
+    getPublishedPages: async (repoPath) => {
+        const pages = await pagesOfTree(path.join(repoPath, "ktor.tree"));
+        return pages && new Set([...pages].map((page) => `topics/${page}`));
+    },
 
     postSync: async (repoPath, context, repoConfig) => {
         await syncSidebar(path.join(repoPath, "ktor.tree"), repoConfig.sidebarId);
@@ -70,7 +80,8 @@ export const ktorStrategy = {
 
         console.log(` Running Ktor postDetect: Change file extension - ${repoPath}`);
         // Map to flattened doc path, convert .topic -> .md
-        task.files = task.files.map(mapKtorDocPath).filter(Boolean);
+        const published = await ktorStrategy.getPublishedPages(repoPath);
+        task.files = task.files.map(mapKtorDocPath).filter((file) => file && (!published || published.has(file)));
         console.log(`  Mapped files: ${task.files.join("\n")}`);
         console.log(`  Change file extension finished - ${repoPath}`);
     },

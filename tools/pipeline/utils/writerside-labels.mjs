@@ -45,8 +45,11 @@ export function parseLabels(xml) {
 
 /**
  * Write the labels of the clone for its doc type, when it has a labels.list.
- * A repository without one (kotlinx.coroutines, which shares the kotlin doc
- * type with kotlin-web-site) leaves the file alone.
+ * Several repositories share a doc type (kotlin-web-site, kotlinx.coroutines,
+ * dokka and api-guidelines all have a labels.list for kotlin, the latter with
+ * a single label), so the labels are merged into the file rather than replace
+ * it; for an id two repositories define, the one synced last wins. A
+ * repository without labels.list leaves the file alone.
  * @param {string} [dir] - Where to write, LABELS_DIR in the site repository
  * @returns {Promise<string | null>} The file written, if any
  */
@@ -62,7 +65,12 @@ export async function syncLabels(repoPath, context, docType, dir = LABELS_DIR) {
       return null;
     }
     const file = labelsFileFor(docType, dir);
-    await fs.outputFile(file, JSON.stringify(labels, null, 2) + "\n");
+    const written = (await fs.pathExists(file)) ? await fs.readJson(file) : {};
+    const merged = {
+      primary: { ...written.primary, ...labels.primary },
+      secondary: { ...written.secondary, ...labels.secondary },
+    };
+    await fs.outputFile(file, JSON.stringify(merged, null, 2) + "\n");
     context?.gitAddPaths?.add(file);
     console.log(`  Labels: ${count} from ${candidate}`);
     return file;
