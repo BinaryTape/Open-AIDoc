@@ -326,6 +326,45 @@ describe('docs pipeline', () => {
     expect(originHas('docs/branchy/old.md')).toBe(false)
   })
 
+  // Upstream rewrote kotlinx.serialization's docs branch, dropping the commit
+  // the checkpoint names from it; a fresh clone (as on CI) does not have it.
+  // Cloned over file://, as a plain path copies every object, dropped or not.
+  const fileUrl = (r: { id: string }) => `file:///${repoUrl(r).replaceAll('\\', '/').replace(/^\//, '')}`
+  function rewriteDemoHistory() {
+    const dir = join(root, 'upstream', 'demo')
+    write(dir, { 'docs/guide.md': doc('Guide', ['Install', 'Configure', 'Run', 'Upgrade']) })
+    git(dir, 'add', '-A')
+    git(dir, 'commit', '-q', '--amend', '-m', 'initial docs, rewritten')
+    rmSync(siteFile('demo-repo'), { recursive: true, force: true })
+    return git(dir, 'rev-parse', 'HEAD')
+  }
+
+  it('fetches a checkpoint upstream dropped from its branch, and translates only what changed since', async () => {
+    await run()
+    const checkpoint = readSite('.github/last_check_demo.txt')
+    const newSha = rewriteDemoHistory()
+    generateContent.mockClear()
+
+    await run({ repoUrl: fileUrl })
+
+    expect(markdownCalls()).toHaveLength(LANGS.length)
+    expect(markdownCalls().every(([{ contents }]) => contents.includes('## Upgrade'))).toBe(true)
+    expect(readSite('.github/last_check_demo.txt')).toBe(newSha)
+  })
+
+  it('says which checkpoint to fix when upstream no longer has it', async () => {
+    await run()
+    const checkpoint = readSite('.github/last_check_demo.txt')
+    rewriteDemoHistory()
+    // ...and has since garbage-collected the dropped commit
+    git(join(root, 'upstream', 'demo'), 'reflog', 'expire', '--expire=now', '--all')
+    git(join(root, 'upstream', 'demo'), 'gc', '-q', '--prune=now')
+    generateContent.mockClear()
+
+    await expect(run({ repoUrl: fileUrl })).rejects.toThrow(`Checkpoint ${checkpoint} (.github/last_check_demo.txt) is no longer upstream`)
+    expect(markdownCalls()).toHaveLength(0)
+  })
+
   it('removes the pages deleted or moved upstream, and redirects the moved one', async () => {
     await run()
     deleteAndMovePages()
