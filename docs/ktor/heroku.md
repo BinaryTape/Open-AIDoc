@@ -25,7 +25,7 @@
 ### 第 1 步：配置端口 {id="port"}
 
 首先，指定一个用于侦听传入请求的端口。由于 Heroku 使用 `PORT` 环境变量，因此您需要将应用程序配置为使用该变量的值。根据[配置 Ktor 服务器](server-create-and-configure.topic)的方式，执行以下操作之一：
-* 如果在代码中指定服务器配置，可以使用 `System.getenv` 获取环境变量值。打开位于 `<Path>src/main/kotlin/com/example</Path>` 文件夹中的 `<Path>Application.kt</Path>` 文件，并更改 `embeddedServer()` 函数的 `port` 形参值：
+* 如果在代码中指定服务器配置，可以使用 `System.getenv` 获取环境变量值。打开位于 <Path>src/main/kotlin/com/example</Path> 文件夹中的 <Path>Application.kt</Path> 文件，并更改 `embeddedServer()` 函数的 `port` 形参值：
 
    ```kotlin
    fun main() {
@@ -35,7 +35,7 @@
    }
     ```
 
-* 如果在 `<Path>application.conf</Path>` 文件中指定服务器配置，可以使用 `${ENV}` 语法将环境变量分配给 `port` 形参。打开位于 `<Path>src/main/resources</Path>` 中的 `<Path>application.conf</Path>` 文件，并按如下所示进行更新：
+* 如果在 <Path>application.conf</Path> 文件中指定服务器配置，可以使用 `${ENV}` 语法将环境变量分配给 `port` 形参。打开位于 <Path>src/main/resources</Path> 中的 <Path>application.conf</Path> 文件，并按如下所示进行更新：
 
    ```
    ktor {
@@ -48,7 +48,7 @@
 
 ### 第 2 步：添加 stage 任务 {id="stage"}
 
-打开 `<Path>build.gradle.kts</Path>` 文件并添加一个自定义的 `stage` 任务。Heroku 使用 `stage` 任务来制作一个在 Heroku 平台上运行的可执行文件：
+打开 <Path>build.gradle.kts</Path> 文件并添加一个自定义的 `stage` 任务。Heroku 使用 `stage` 任务来制作一个在 Heroku 平台上运行的可执行文件：
 
 ```kotlin
 tasks {
@@ -75,7 +75,7 @@ web: ./build/install/ktor-get-started-sample/bin/ktor-get-started-sample
 
 默认情况下，Heroku 使用 Java 25 运行您的应用程序。如果您的 Ktor 应用程序是使用其他 Java 版本编译的，则需要显式指定该版本以避免部署失败。
 
-要指定 Java 版本，请在项目的根文件夹中创建一个 `<Path>system.properties</Path>` 文件，内容如下：
+要指定 Java 版本，请在项目的根文件夹中创建一个 <Path>system.properties</Path> 文件，内容如下：
 
 ```bash
 java.runtime.version=21

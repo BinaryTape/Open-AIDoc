@@ -25,7 +25,7 @@
 ### ステップ1：ポートの構成 {id="port"}
 
 まず、着信リクエストを待機するために使用するポートを指定する必要があります。Herokuは `PORT` 環境変数を使用するため、この変数の値を使用するようにアプリケーションを構成する必要があります。[Ktorサーバーを構成する](server-create-and-configure.topic)方法に応じて、以下のいずれかを行ってください。
-* サーバーの構成がコード内で指定されている場合は、`System.getenv` を使用して環境変数の値を取得できます。`<Path>src/main/kotlin/com/example</Path>` フォルダにある `<Path>Application.kt</Path>` ファイルを開き、以下に示すように `embeddedServer()` 関数の `port` パラメータの値を変更します。
+* サーバーの構成がコード内で指定されている場合は、`System.getenv` を使用して環境変数の値を取得できます。<Path>src/main/kotlin/com/example</Path> フォルダにある <Path>Application.kt</Path> ファイルを開き、以下に示すように `embeddedServer()` 関数の `port` パラメータの値を変更します。
 
    ```kotlin
    fun main() {
@@ -35,7 +35,7 @@
    }
     ```
 
-* サーバーの構成が `<Path>application.conf</Path>` ファイルで指定されている場合は、`${ENV}` 構文を使用して環境変数を `port` パラメータに割り当てることができます。`<Path>src/main/resources</Path>` にある `<Path>application.conf</Path>` ファイルを開き、以下のように更新します。
+* サーバーの構成が <Path>application.conf</Path> ファイルで指定されている場合は、`${ENV}` 構文を使用して環境変数を `port` パラメータに割り当てることができます。<Path>src/main/resources</Path> にある <Path>application.conf</Path> ファイルを開き、以下のように更新します。
 
    ```
    ktor {
@@ -48,7 +48,7 @@
 
 ### ステップ2：stageタスクの追加 {id="stage"}
 
-`<Path>build.gradle.kts</Path>` ファイルを開き、カスタム `stage` タスクを追加します。Herokuは `stage` タスクを使用して、Herokuのプラットフォームで実行される実行ファイルを作成します。
+<Path>build.gradle.kts</Path> ファイルを開き、カスタム `stage` タスクを追加します。Herokuは `stage` タスクを使用して、Herokuのプラットフォームで実行される実行ファイルを作成します。
 
 ```kotlin
 tasks {
@@ -75,7 +75,7 @@ web: ./build/install/ktor-get-started-sample/bin/ktor-get-started-sample
 
 デフォルトでは、Herokuはアプリケーションの実行にJava 25を使用します。Ktorアプリケーションが別のJavaバージョンでコンパイルされている場合は、デプロイの失敗を避けるために明示的に指定する必要があります。
 
-Javaバージョンを指定するには、プロジェクトのルートフォルダに以下の内容で `<Path>system.properties</Path>` ファイルを作成します。
+Javaバージョンを指定するには、プロジェクトのルートフォルダに以下の内容で <Path>system.properties</Path> ファイルを作成します。
 
 ```bash
 java.runtime.version=21
