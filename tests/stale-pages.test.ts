@@ -122,6 +122,25 @@ describe('removeStalePages', () => {
     expect(translations('shared.md').every(existsSync)).toBe(true)
   })
 
+  it('asks where pages moved while their translations are still there (Koin reads them)', async () => {
+    // As koinStrategy: the pages the site translated that upstream no longer has
+    const getMovedPages = async () => new Map(
+      [['old.md', 'a.md']].filter(([page]) => existsSync(join('docs', 'demo', page)))
+    )
+    const demo = repo('demo', { ...defaultStrategy, getMovedPages })
+    upstream(demo, ['docs/old.md', 'docs/a.md'])
+    await sync(demo)
+    publish('old.md')
+
+    upstream(demo, ['docs/a.md'])
+    const result = await sync(demo)
+
+    expect(result.removed).toEqual([{ page: 'old.md', movedTo: 'a.md' }])
+    expect(translations('old.md').some(existsSync)).toBe(false)
+    expect(JSON.parse(readFileSync('docs/.vitepress/redirects/demo.json', 'utf8')))
+      .toEqual([{ from: 'demo/old.md', to: 'demo/a.md' }])
+  })
+
   it('redirects a page moved upstream to its new page', async () => {
     const demo = repo('demo', { ...defaultStrategy, getMovedPages: async () => new Map([['old.md', 'new/index.md']]) })
     upstream(demo, ['docs/old.md', 'docs/a.md'])

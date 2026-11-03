@@ -1,0 +1,66 @@
+[
+  {
+    "from": "koin/intro/what-is-koin-annotations.md",
+    "to": "koin/intro/choosing-your-style.md"
+  },
+  {
+    "from": "koin/reference/koin-android/get-instances.md",
+    "to": "koin/reference/koin-android/entry-points.md"
+  },
+  {
+    "from": "koin/reference/koin-android/modules-android.md",
+    "to": "koin/reference/koin-android/start.md"
+  },
+  {
+    "from": "koin/reference/koin-android/qualifiers.md",
+    "to": "koin/reference/koin-android/start.md"
+  },
+  {
+    "from": "koin/reference/koin-annotations/definitions.md",
+    "to": "koin/reference/koin-core/definitions.md"
+  },
+  {
+    "from": "koin/reference/koin-annotations/kmp.md",
+    "to": "koin/reference/koin-core/kmp-setup.md"
+  },
+  {
+    "from": "koin/reference/koin-annotations/modules.md",
+    "to": "koin/reference/koin-core/modules.md"
+  },
+  {
+    "from": "koin/reference/koin-annotations/monitor.md",
+    "to": "koin/tooling/monitor.md"
+  },
+  {
+    "from": "koin/reference/koin-annotations/scope.md",
+    "to": "koin/reference/koin-core/scopes.md"
+  },
+  {
+    "from": "koin/reference/koin-annotations/start.md",
+    "to": "koin/reference/koin-core/starting-koin.md"
+  },
+  {
+    "from": "koin/reference/koin-core/dsl-update.md",
+    "to": "koin/reference/koin-core/dsl.md"
+  },
+  {
+    "from": "koin/reference/koin-core/start-koin.md",
+    "to": "koin/reference/koin-core/starting-koin.md"
+  },
+  {
+    "from": "koin/setup/annotations.md",
+    "to": "koin/setup/compiler-plugin.md"
+  },
+  {
+    "from": "koin/setup/koin.md",
+    "to": "koin/setup/gradle.md"
+  },
+  {
+    "from": "koin/setup/migrate.md",
+    "to": "koin/support/releases.md"
+  },
+  {
+    "from": "koin/setup/why.md",
+    "to": "koin/intro/what-is-koin.md"
+  }
+]

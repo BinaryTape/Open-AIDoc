@@ -115,6 +115,10 @@ export async function removeStalePages(repoConfig, cloneDir, { repos, languages 
     return result;
   }
 
+  // Where upstream moved them, asked before their translations go: Koin
+  // finds its removed pages among the translations the site still has.
+  const moved = await repoConfig.syncStrategy.getMovedPages(cloneDir);
+
   // Remove the translations of every stale page
   for (const page of stale) {
     for (const lang of languages) {
@@ -144,7 +148,6 @@ export async function removeStalePages(repoConfig, cloneDir, { repos, languages 
   }
 
   // Redirect each stale page upstream moved to a page it still produces
-  const moved = await repoConfig.syncStrategy.getMovedPages(cloneDir);
   const finalTarget = (page) => {
     const seen = new Set([page]);
     let target = moved.get(page);
