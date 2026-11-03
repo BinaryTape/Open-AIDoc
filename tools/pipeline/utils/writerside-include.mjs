@@ -30,6 +30,7 @@ const ATTR_RE = /([\w-]+)\s*=\s*"([^"]*)"/g;
 const VAR_RE = /<var\s+name\s*=\s*"([^"]+)"\s+value\s*=\s*"([^"]*)"\s*\/?>/g;
 const FENCE_RE = /^[ \t]*(`{3,}|~{3,})/;
 const HEADING_RE = /^(#{1,6})\s+.*$/;
+const LIST_MARKER_RE = /^[ \t]*(?:[-*+]|\d+[.)])$/;
 
 /** Files the expansion reads and writes: Writerside pages. */
 export const isPage = (file) => /\.(md|topic)$/.test(file);
@@ -219,11 +220,12 @@ function applyVars(content, vars) {
   return content;
 }
 
-function reindent(content, indent) {
+/** @param {string} [rest] - Indentation of the lines after the first */
+function reindent(content, indent, rest = indent) {
   const lines = content.replace(/^\s*\n/, "").replace(/\s+$/, "").split("\n");
   const indents = lines.filter((l) => l.trim()).map((l) => /^[ \t]*/.exec(l)[0].length);
   const min = indents.length ? Math.min(...indents) : 0;
-  return lines.map((l) => (l.trim() ? indent + l.slice(min) : "")).join("\n");
+  return lines.map((l, i) => (l.trim() ? (i === 0 ? indent : rest) + l.slice(min) : "")).join("\n");
 }
 
 /**
@@ -252,7 +254,12 @@ export function expandIncludes(content, file, readPage, unresolved = [], stack =
         if (include.filters) element = applyFilters(element, include.filters);
         element = applyVars(element, include.vars);
         element = expandIncludes(element, file, readPage, unresolved, [...stack, key]);
-        replacement = reindent(element, include.indent);
+        // An include after a list marker (`1. <include …/>`) is the item's
+        // content: its other lines go to the column of the tag.
+        const lead = content.slice(content.lastIndexOf("\n", include.start - 1) + 1, include.start);
+        replacement = LIST_MARKER_RE.test(lead)
+          ? reindent(element, include.indent, " ".repeat(lead.length + include.indent.length))
+          : reindent(element, include.indent);
       }
     }
 

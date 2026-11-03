@@ -126,6 +126,15 @@ describe('expandIncludes', () => {
     expect(unresolved).toEqual([])
   })
 
+  it('keeps a snippet included as a list item inside the item', () => {
+    // ktor's server-integrate-database: the closing </p> fell out of the list
+    const { content } = expand({
+      'page.md': md('<procedure>', '', '1. <include from="lib.topic" element-id="s"/>', '2. Next step.'),
+      'lib.topic': md('<topic>', '    <snippet id="s">', '        <p>', '            Navigate to the', '            generator.', '        </p>', '    </snippet>', '</topic>'),
+    })
+    expect(content).toBe(md('<procedure>', '', '1. <p>', '       Navigate to the', '       generator.', '   </p>', '2. Next step.'))
+  })
+
   it('expands includes inside included content', () => {
     const { content } = expand({
       'page.md': '<include from="a.md" element-id="a"/>',
