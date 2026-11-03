@@ -2,8 +2,9 @@
 import { useData } from 'vitepress';
 import { computed } from 'vue';
 import DocCard from '../../component/DocCard.vue';
-import { t } from '../../utils/i18n-utils';
+import { useI18n } from '../../utils/i18n-utils';
 const { site } = useData();
+const { t } = useI18n();
 const docCardConfig = computed(() => [
     {
         href: 'kotlin/home',
