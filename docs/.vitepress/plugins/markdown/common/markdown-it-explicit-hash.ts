@@ -52,7 +52,7 @@ function explicitHash(href: string, env: any): string | null {
 }
 
 /** The Markdown source of the page a link path points to (an empty path: this page). */
-function targetSource(linkPath: string, env: any): string | null {
+export function targetSource(linkPath: string, env: any): string | null {
   if (!env?.relativePath) return null
   const srcDir = env.path ? env.path.slice(0, -env.relativePath.length) : path.resolve('docs')
   const page = !linkPath
