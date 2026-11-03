@@ -13,6 +13,7 @@ import {
 import { applySeoMetadata } from './config/seo.config'
 import { writeRedirectsFile } from './config/redirects.config'
 import { vueCompilerOptions } from './config/vue-template.config'
+import { NOSCRIPT_AOS } from './config/noscript.config'
 
 // ===== Vite plugins =====
 import liquidIncludePlugin from "./plugins/vite/vite-liquid-include"
@@ -60,7 +61,8 @@ export default defineConfig({
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
       gtag('config', 'G-HLCXSW4HH1');`
-    ]
+    ],
+    NOSCRIPT_AOS
   ],
 
   // Vue template compiler (pages and theme components)
