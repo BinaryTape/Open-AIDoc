@@ -21,8 +21,7 @@ import { useKotlinPlayground } from './kotlin-playground'
 import { useOpenAnchorTarget } from './open-anchor-target'
 import { useLinkedTabs } from './linked-tabs'
 import HomeLayout from './layout/Home.vue' // 调整路径，如果它在子目录，例如 './layouts/MyHomeLayout.vue'
-import { SiteLocaleConfig } from '../locales.config'
-import { createI18n, setLocale } from '../utils/i18n-utils'
+import { createI18n } from '../utils/i18n-utils'
 import Deflist from '../component/Deflist.vue'
 import Def from '../component/Def.vue'
 import List from "../component/List.vue";
@@ -123,7 +122,7 @@ export default {
     app.component('YouTubeVideo', YouTubeVideo)
 
     // Use our custom i18n implementation
-    app.use(createI18n())
+    app.use(createI18n(router))
 
     // Only for testing
     // document.addEventListener('keydown', handleKeyPress)
@@ -138,12 +137,6 @@ export default {
             once: true
           });
         })
-      }
-
-      if (typeof location !== 'undefined') {
-        const path = location.pathname
-        const locale = Object.keys(SiteLocaleConfig).find(locale => path.startsWith(`/${locale}/`)) || 'zh-Hans';
-        setLocale(locale);
       }
     }
   }

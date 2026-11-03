@@ -1,54 +1,38 @@
-import { ref, computed, reactive } from 'vue'
+import { computed, inject, type App, type ComputedRef } from 'vue'
+import type { Router } from 'vitepress'
 import { SiteLocaleConfig, SITE_LOCALES } from '../locales.config'
 import { DEFAULT_LOCALE } from '../../../shared/locales'
 
-// Create a reactive state for the current locale
-const currentLocale = ref(DEFAULT_LOCALE)
-
-// Create a computed property for the current messages
-const messages = computed(() => {
-  return SiteLocaleConfig[currentLocale.value]?.messages || {}
-})
-
-// Translation function
-function t(key: string): string {
-  return messages.value[key] || key
+export type I18n = {
+  /** The site's message for a key (locales/*.json), in the page's locale */
+  t: (key: string) => string
+  locale: ComputedRef<string>
 }
 
-// Function to set the locale
-function setLocale(locale: string): void {
-  if (SITE_LOCALES.includes(locale)) {
-    currentLocale.value = locale
-  }
+/** The locale of a page path: its first segment when that is a locale (/ja/…), else the default. */
+export function localeOfPath(path: string): string {
+  const first = path.split('/')[1]
+  return first && SITE_LOCALES.includes(first) ? first : DEFAULT_LOCALE
 }
 
-// Function to get the current locale
-function getLocale(): string {
-  return currentLocale.value
-}
-
-// Create a simple i18n plugin
-export function createI18n() {
+/**
+ * The site's own messages, in the locale of the current page. The locale is
+ * read from the app's router rather than kept in module state: the build
+ * renders pages concurrently, each with its own app, and a page rendered on
+ * the server has to be in its own language (P2-21).
+ */
+export function createI18n(router: Router) {
+  const locale = computed(() => localeOfPath(router.route.path))
+  const t = (key: string) => SiteLocaleConfig[locale.value]?.messages[key] || key
+  const i18n: I18n = { t, locale }
   return {
-    install: (app: any) => {
-      // Add global properties
+    install(app: App) {
       app.config.globalProperties.$t = t
-      app.config.globalProperties.$i18n = {
-        locale: currentLocale,
-        setLocale,
-        getLocale
-      }
-      
-      // Provide the i18n functions to components
-      app.provide('i18n', {
-        t,
-        locale: currentLocale,
-        setLocale,
-        getLocale
-      })
-    }
+      app.provide('i18n', i18n)
+    },
   }
 }
 
-// Export individual functions for composition API usage
-export { t, currentLocale, setLocale, getLocale }
+export function useI18n(): I18n {
+  return inject<I18n>('i18n')!
+}
