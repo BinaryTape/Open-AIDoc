@@ -27,12 +27,23 @@ const git = {
     await execa("git", ["reset", "--hard", b], { cwd: p });
     await execa("git", ["clean", "-fd"], { cwd: p });
   },
-  getChangedFiles: async (p, sha) =>
-    (
-      await execa("git", ["diff", "--name-only", sha, "HEAD"], { cwd: p })
-    ).stdout
+  getChangedFiles: async (p, sha, checkpointFile) => {
+    // A checkpoint no branch has any more (upstream rewrote its history) is
+    // not in a fresh clone; GitHub still serves it by id.
+    const known = await execa("git", ["cat-file", "-e", `${sha}^{commit}`], { cwd: p, reject: false });
+    if (known.exitCode !== 0) {
+      const fetched = await execa("git", ["fetch", "-q", "origin", sha], { cwd: p, reject: false });
+      if (fetched.exitCode !== 0) {
+        throw new Error(
+          `Checkpoint ${sha} (${checkpointFile}) is no longer upstream: ${fetched.stderr.trim()}. ` +
+            `Check the upstream branch, then set ${checkpointFile} to a commit of it whose docs the translations match.`
+        );
+      }
+    }
+    return (await execa("git", ["diff", "--name-only", sha, "HEAD"], { cwd: p })).stdout
       .split("\n")
-      .filter(Boolean),
+      .filter(Boolean);
+  },
 };
 const files = {
   getLastCommitSha: async (p) =>
@@ -64,7 +75,8 @@ const gitSource = {
     }
   },
   version: async (repoConfig) => git.getCurrentSha(repoConfig.cloneDir),
-  changedFiles: async (repoConfig, lastVersion) => git.getChangedFiles(repoConfig.cloneDir, lastVersion),
+  changedFiles: async (repoConfig, lastVersion) =>
+    git.getChangedFiles(repoConfig.cloneDir, lastVersion, repoConfig.lastCheckFile),
   checkpoint: async () => [],
 };
 

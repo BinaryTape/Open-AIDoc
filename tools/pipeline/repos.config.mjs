@@ -124,13 +124,13 @@ export const REPOS = [
     syncStrategy: kotlinStrategy,
   },
   {
-    // The docs kotlinlang.org publishes for kotlinx.serialization are on this
-    // branch, in docs-website/ (master has only the older GitHub guide).
+    // The docs kotlinlang.org publishes for kotlinx.serialization, in
+    // docs-website/; on master since Kotlin/kotlinx.serialization#3055.
     id: "kotlinx-serialization",
     docType: "kotlin",
     sidebarId: "serialization",
     repo: "Kotlin/kotlinx.serialization",
-    branch: "origin/doc-restructuring-master",
+    branch: "origin/master",
     cloneDir: "serialization-repo",
     sourceDocRoot: "./docs-website",
     lastCheckFile: ".github/last_check_serialization.txt",
