@@ -75,7 +75,11 @@ export default defineConfig({
   // Vite configuration
   vite: {
     resolve: {
-      alias: { '@': resolve(__dirname, '../.vitepress') }
+      alias: [
+        { find: '@', replacement: resolve(__dirname, '../.vitepress') },
+        // The outline, with the primary labels of headings (P2-26)
+        { find: /^.*\/VPDocOutlineItem\.vue$/, replacement: resolve(__dirname, 'theme/OutlineItem.vue') }
+      ]
     },
     plugins: [liquidIncludePlugin(), releaseSfcAstPlugin()],
     build: {

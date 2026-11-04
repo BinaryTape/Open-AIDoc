@@ -29,6 +29,7 @@ const {page} = useData()
 const label = computed(() => findLabel('primary', labelsDocType(page.value.relativePath), props.labelRef))
 const labelText = computed(() => label.value?.name ?? props.labelRef)
 const colorClass = computed(() => labelColorClass(label.value))
+// The heading carries the label too (data-ws-label*), for the outline: theme/OutlineItem.vue only sees the heading
 
 const levelClass = computed(() => props.level ? `ws-topic-title--h${props.level}` : '')
 </script>
@@ -42,6 +43,9 @@ const levelClass = computed(() => props.level ? `ws-topic-title--h${props.level}
     <component
         :is="props.level ? 'h' + props.level : 'h1'"
         :id="props.id"
+        :data-ws-label="labelRef ? labelText : undefined"
+        :data-ws-label-class="labelRef ? colorClass : undefined"
+        :data-ws-label-description="label?.description"
     >{{ props.title }}</component>
   </div>
 </template>
