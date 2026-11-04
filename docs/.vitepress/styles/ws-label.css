@@ -44,3 +44,17 @@
   line-height: 20px;
   white-space: nowrap;
 }
+
+/* A primary label in the outline, before its heading's title (theme/OutlineItem.vue):
+   .label__content--mode-pale on kotlinlang.org, the label's colour on itself at 20% */
+.ws-outline-label {
+  display: inline-block;
+  margin-right: 5px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  color: var(--ws-label-color, #8e8e93);
+  background-color: color-mix(in srgb, var(--ws-label-color, #8e8e93) 20%, transparent);
+  font-size: 13px;
+  line-height: 20px;
+  cursor: default;
+}
