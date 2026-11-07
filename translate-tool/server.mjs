@@ -5,6 +5,7 @@ import crypto from 'crypto';
 import { fileURLToPath } from 'url';
 import { GoogleGenAI } from '@google/genai';
 import { toContentRelPath } from '../shared/content-paths.ts';
+import { protectCodeBlocks } from '../tools/pipeline/utils/code-protection.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -26,7 +27,7 @@ if (fs.existsSync(envPath)) {
   console.log('  📄 已加载 .env');
 }
 
-const app = express();
+export const app = express();
 app.use(express.json({ limit: '50mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -274,7 +275,7 @@ import {
   processFullMarkdownContent,
 } from '../tools/pipeline/processors/MarkdownProcessor.mjs';
 import {
-  cleanupTranslation,
+  finishDocumentTranslation,
   getPromptTemplate,
   getLocalePromptTemplate,
   getLangDisplayName,
@@ -374,7 +375,7 @@ const uploadedFiles = [];
 const customPrompts = {};
 
 // ─── Prompt Templates ───────────────────────────────────────────────────────
-// cleanupTranslation, getPromptTemplate, getLocalePromptTemplate,
+// finishDocumentTranslation, getPromptTemplate, getLocalePromptTemplate,
 // getLangDisplayName, fillPromptTemplate are imported from translate.mjs
 
 function getDefaultPrompt(targetLang) {
@@ -549,7 +550,8 @@ app.post('/api/translate', async (req, res) => {
     const terms = useTerminology !== false ? getTerminologyForLang(targetLang) : '';
 
     const promptTemplate = customPrompt || getDefaultPrompt(targetLang);
-    const prompt = fillPromptTemplate(promptTemplate, targetLang, content, terms);
+    const protection = protectCodeBlocks(content);
+    const prompt = protection.instructions + fillPromptTemplate(promptTemplate, targetLang, protection.content, terms);
 
     const response = await ai.models.generateContent({
       model: model || 'gemini-3.8-flash',
@@ -557,7 +559,7 @@ app.post('/api/translate', async (req, res) => {
       config: { temperature: 1 },
     });
 
-    const translated = cleanupTranslation(response.text, content);
+    const translated = finishDocumentTranslation(response.text, protection);
     res.json({ success: true, content: translated });
   } catch (error) {
     console.error('Translation error:', error);
@@ -630,13 +632,14 @@ async function processQueueAsync(apiKey) {
         sourceText = await preprocessContent(sourceText, item.fileName, item.projectName || 'unknown', item.options.preprocessMode);
       }
       const promptTemplate = item.options.customPrompt || getDefaultPrompt(item.targetLang);
-      const prompt = fillPromptTemplate(promptTemplate, item.targetLang, sourceText, terms);
+      const protection = protectCodeBlocks(sourceText);
+      const prompt = protection.instructions + fillPromptTemplate(promptTemplate, item.targetLang, protection.content, terms);
       const response = await ai.models.generateContent({
         model: item.model,
         contents: prompt,
         config: { temperature: 1 },
       });
-      item.result = cleanupTranslation(response.text, sourceText);
+      item.result = finishDocumentTranslation(response.text, protection);
       item.status = 'completed';
     } catch (error) {
       item.error = error.message;
@@ -710,10 +713,12 @@ app.get('/{*path}', (req, res) => {
 });
 
 // ─── Start ──────────────────────────────────────────────────────────────────
-const PORT = process.env.PORT || 3456;
-app.listen(PORT, () => {
-  console.log(`\n  🌐 Open AIDoc 翻译平台已启动`);
-  console.log(`  📍 地址: http://localhost:${PORT}`);
-  console.log(`  🔑 API Key: ${currentApiKey ? '已设置 ✅' : '未设置 ❌ (可在界面中设置)'}`);
-  console.log(`  🐙 GitHub Token: ${process.env.GITHUB_TOKEN ? '已设置 ✅ (5000 req/hr)' : '未设置 (60 req/hr)'}\n`);
-});
+if (process.argv[1] && path.resolve(process.argv[1]) === __filename) {
+  const PORT = process.env.PORT || 3456;
+  app.listen(PORT, () => {
+    console.log(`\n  🌐 Open AIDoc 翻译平台已启动`);
+    console.log(`  📍 地址: http://localhost:${PORT}`);
+    console.log(`  🔑 API Key: ${currentApiKey ? '已设置 ✅' : '未设置 ❌ (可在界面中设置)'}`);
+    console.log(`  🐙 GitHub Token: ${process.env.GITHUB_TOKEN ? '已设置 ✅ (5000 req/hr)' : '未设置 (60 req/hr)'}\n`);
+  });
+}
