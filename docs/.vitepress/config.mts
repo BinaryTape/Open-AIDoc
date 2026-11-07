@@ -14,6 +14,7 @@ import { applySeoMetadata } from './config/seo.config'
 import { writeRedirectsFile } from './config/redirects.config'
 import { vueCompilerOptions } from './config/vue-template.config'
 import { NOSCRIPT_AOS } from './config/noscript.config'
+import { WS_INLINE_TAGS } from './config/inline-tags.config'
 
 // ===== Vite plugins =====
 import liquidIncludePlugin from "./plugins/vite/vite-liquid-include"
@@ -118,6 +119,9 @@ export default defineConfig({
       leftDelimiter: '{',
       rightDelimiter: '}',
       allowedAttributes: []
+    },
+    component: {
+      inlineTags: WS_INLINE_TAGS
     },
     preConfig: (md) => {
       md.use(markdownItMkLiquidCondition)
