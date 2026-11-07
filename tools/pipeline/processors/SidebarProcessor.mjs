@@ -20,10 +20,10 @@ async function writeJson(file, data) {
 }
 
 export async function generateSidebar(source, docType, baseUrl = '', mapHref = null) {
-    let sidebarNodes, translateKeys;
+    let sidebarNodes, translateKeys, untitledKeys;
 
     if (source.endsWith('tree')) {
-        ({ sidebarNodes, translateKeys } = await parseWSSidebar(source, docType));
+        ({ sidebarNodes, translateKeys, untitledKeys } = await parseWSSidebar(source, docType));
     } else if (source.includes('mkdocs')) {
         ({ sidebarNodes, translateKeys } = await parseMKSidebar(source, docType, baseUrl));
     } else {
@@ -32,7 +32,7 @@ export async function generateSidebar(source, docType, baseUrl = '', mapHref = n
     }
 
     if (mapHref) mapHrefs(sidebarNodes, mapHref);
-    await writeSidebar(docType, sidebarNodes, translateKeys);
+    await writeSidebar(docType, sidebarNodes, translateKeys, untitledKeys);
 }
 
 function mapHrefs(nodes, mapHref) {
@@ -68,10 +68,11 @@ export async function syncSidebar(source, docType, baseUrl = '', mapHref = null)
  * @param {string} docType - Sidebar id → docs/.vitepress/sidebar/{docType}.sidebar.json
  * @param {object[]} sidebarNodes
  * @param {Map<string, string>} translateKeys - Locale key → English label
+ * @param {Set<string>} [untitledKeys] - Keys of entries that take their page's title
  */
-export async function writeSidebar(docType, sidebarNodes, translateKeys) {
+export async function writeSidebar(docType, sidebarNodes, translateKeys, untitledKeys = new Set()) {
     await generateSidebarJson(docType, sidebarNodes);
-    await generateLocaleJson(translateKeys);
+    await generateLocaleJson(translateKeys, untitledKeys);
 }
 
 async function generateSidebarJson(prefix, sidebarNodes) {
@@ -79,8 +80,11 @@ async function generateSidebarJson(prefix, sidebarNodes) {
     await writeJson(sidebarFile, sidebarNodes)
 }
 
-async function generateLocaleJson(translateKeys) {
+async function generateLocaleJson(translateKeys, untitledKeys = new Set()) {
     const LOCALE_DIR = 'docs/.vitepress/locales';
+    // An entry upstream no longer gives a toc-title shows its page's title
+    // (config/sidebar.config.ts), unless a label left from before is still there (P3-17)
+    const dropped = [...untitledKeys].filter(key => !translateKeys.has(key));
     /* ---------- ① 处理英文 en.json ---------- */
     const enFile = path.join(LOCALE_DIR, 'en.json');
     const enDict = await readJson(enFile);
@@ -99,6 +103,7 @@ async function generateLocaleJson(translateKeys) {
             enDict[key] = text;
         }
     }
+    for (const key of dropped) delete enDict[key];
     await writeJson(enFile, enDict);
 
     /* ---------- ② 更新其他语言 ---------- */
@@ -110,6 +115,7 @@ async function generateLocaleJson(translateKeys) {
             // 若已有则替换，没有则添加
             dict[key] = text
         }
+        for (const key of dropped) delete dict[key];
         await writeJson(file, dict);
     }
 
@@ -119,6 +125,7 @@ async function parseWSSidebar(source, docType) {
     const xml = await fs.readFile(source, 'utf8');
     const parsed = await parseStringPromise(xml, {explicitArray: false});
     const translateKeys = new Map();
+    const untitledKeys = new Set();
 
     /** 找到真正包含 toc‑element 的数组（或对象） */
     function locateToc(container) {
@@ -147,6 +154,8 @@ async function parseWSSidebar(source, docType) {
         let baseText = a['toc-title'];
         if (baseText) {
             translateKeys.set(key, baseText);
+        } else if (a.topic) {
+            untitledKeys.add(key);
         }
 
         const out = {text: key};
@@ -175,7 +184,8 @@ async function parseWSSidebar(source, docType) {
 
     return {
         sidebarNodes,
-        translateKeys
+        translateKeys,
+        untitledKeys
     }
 }
 
