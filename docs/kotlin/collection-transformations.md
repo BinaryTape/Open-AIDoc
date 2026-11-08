@@ -1,16 +1,16 @@
-[//]: # (title: 集合转换操作)
+[//]: # (title: 转换集合)
 
-Kotlin 标准库提供了一组用于集合*转换*的扩展函数。
-这些函数会根据提供的转换规则，从现有集合构建出新的集合。
-在本页中，我们将概述可用的集合转换函数。
+Kotlin 标准库提供了一组用于集合*转换*（transformation）的扩展函数。
+这些函数根据提供的转换规则，从现有集合构建出新的集合。
+在本页中，我们将简要介绍可用的集合转换函数。
 
 ## Map {id="map"}
 
-*映射*（mapping）转换会根据对另一个集合中元素调用函数的结果来创建集合。
-基本的映射函数是 [`map()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/map.html)。
+*映射*（mapping）转换会根据对另一个集合中的元素应用函数所产生的结果来创建新集合。
+最基本的映射函数是 [`map()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/map.html)。
 它将给定的 lambda 表达式应用于后续的每个元素，并返回 lambda 结果构成的列表。
-结果的顺序与元素的原始顺序相同。
-如果要在转换中额外使用元素索引作为参数，请使用 [`mapIndexed()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/map-indexed.html)。  
+结果的顺序与元素的原始顺序保持一致。 
+如果要在转换中将元素索引额外作为实参传入，请使用 [`mapIndexed()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/map-indexed.html)。  
 
 ```kotlin
 
@@ -24,7 +24,7 @@ fun main() {
 ```
 {kotlin-runnable="true"}
 
-如果转换对某些元素生成了 `null`，你可以通过调用 [`mapNotNull()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/map-not-null.html) 函数代替 `map()`，或者调用 [`mapIndexedNotNull()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/map-indexed-not-null.html) 代替 `mapIndexed()`，从而从结果集合中过滤掉 `null`。
+如果转换在某些元素上生成了 `null`，你可以通过调用 [`mapNotNull()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/map-not-null.html) 函数代替 `map()`，或者调用 [`mapIndexedNotNull()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/map-indexed-not-null.html) 代替 `mapIndexed()`，从而从结果集合中过滤掉这些 `null` 值。
 
 ```kotlin
 
@@ -38,10 +38,10 @@ fun main() {
 ```
 {kotlin-runnable="true"}
 
-转换 Map 时，你有两种选择：转换键而保持值不变，反之亦然。
+在转换 Map 时，有两种选择：转换键而保持值不变，反之亦然。
 要对键应用给定的转换，请使用 [`mapKeys()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/map-keys.html)；
-相应地，[`mapValues()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/map-values.html) 用于转换值。
-这两个函数使用的转换都以 Map 条目作为参数，因此你可以同时对其键和值进行操作。
+反过来，[`mapValues()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/map-values.html) 用于转换值。
+这两个函数使用的转换操作都接受一个 Map 条目作为实参，因此你可以同时操作其键和值。
 
 ```kotlin
 
@@ -57,14 +57,14 @@ fun main() {
 
 ## Zip {id="zip"}
 
-*压缩*（zipping）转换是指由两个集合中相同位置的元素构建键值对。
-在 Kotlin 标准库中，这是通过 [`zip()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/zip.html) 扩展函数完成的。
+*Zip*（双路合并）转换是指由两个集合中处于相同位置的元素来构建二元组（Pair）。
+在 Kotlin 标准库中，这可以通过 [`zip()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/zip.html) 扩展函数完成。
 
-当在某个集合或数组上调用该函数并将另一个集合（或数组）作为参数传入时，`zip()` 会返回由 `Pair` 对象构成的 `List`。接收者集合的元素将作为这些键值对中的第一个元素。
+当在某个集合或数组上调用，并以另一个集合（或数组）作为实参时，`zip()` 会返回一个包含 `Pair` 对象的 `List`。接收者集合的元素将作为这些对中的第一个元素。
 
-如果集合的大小不同，则 `zip()` 的结果大小为较小集合的大小；较大集合的末尾元素将不会包含在结果中。
+如果集合的大小不同，`zip()` 的结果大小将取决于较小的集合；较大集合中超出部分的末尾元素将不会包含在结果中。
 
-`zip()` 还可以使用中缀形式 `a zip b` 调用。
+`zip()` 也可以以中缀形式 `a zip b` 调用。
 
 ```kotlin
 
@@ -81,7 +81,7 @@ fun main() {
 ```
 {kotlin-runnable="true"}
 
-你还可以使用带有转换函数的 `zip()`，该函数接受两个形参：接收者元素和实参元素。在这种情况下，结果 `List` 包含对具有相同位置的接收者元素与实参元素构成的每对元素调用转换函数的返回值。
+你还可以在调用 `zip()` 时传入一个带有两个形参的转换函数：接收者元素与实参元素。在这种情况下，结果 `List` 将包含在相同位置的接收者元素与实参元素对上调用转换函数的返回值。
 
 ```kotlin
 
@@ -96,12 +96,12 @@ fun main() {
 ```
 {kotlin-runnable="true"}
 
-当你拥有一个 `Pair` 的 `List` 时，你可以执行反向转换——*解压*（unzipping）——从这些键值对中构建出两个列表：
+当你拥有一个 `Pair` 的 `List` 时，你可以执行反向转换——*解压*（unzipping）——从这些对中构建出两个列表：
 
 * 第一个列表包含原始列表中每个 `Pair` 的第一个元素。 
 * 第二个列表包含第二个元素。
 
-要解压键值对列表，请调用 [`unzip()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/unzip.html)。
+要解压一个由对构成的列表，请调用 [`unzip()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/unzip.html)。
 
 ```kotlin
 
@@ -116,10 +116,10 @@ fun main() {
 
 ## Associate {id="associate"}
 
-*关联*（association）转换允许根据集合元素以及与其关联的某些值构建 Map。
+*关联*（Association）转换允许基于集合元素以及与之关联的特定值来构建 Map。
 在不同的关联类型中，元素既可以作为关联 Map 中的键，也可以作为值。
 
-基本关联函数 [`associateWith()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/associate-with.html) 会创建一个 `Map`，其中原始集合的元素作为键，并通过给定的转换函数根据这些元素生成相应的值。如果两个元素相等，则只有最后一个元素会保留在 Map 中。
+基本的关联函数 [`associateWith()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/associate-with.html) 会创建一个 `Map`，其中原始集合的元素作为键，而值则由给定的转换函数根据元素生成。如果两个元素相等，则只有最后一个元素会保留在 Map 中。
 
 ```kotlin
 
@@ -132,10 +132,10 @@ fun main() {
 ```
 {kotlin-runnable="true"}
 
-对于以集合元素作为值来构建 Map，可以使用函数 [`associateBy()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/associate-by.html)。
-它接受一个根据元素的值返回键的函数。如果两个元素的键相等，则只有最后一个元素会保留在 Map 中。
+为了构建以集合元素作为值的 Map，可以使用 [`associateBy()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/associate-by.html) 函数。
+它接受一个基于元素的值返回键的函数。如果两个元素的键相等，则只有最后一个会保留在 Map 中。
 
-调用 `associateBy()` 时还可以传入一个值转换函数。
+`associateBy()` 在调用时也可以传入一个值转换函数。
 
 ```kotlin
 
@@ -150,13 +150,13 @@ fun main() {
 ```
 {kotlin-runnable="true"}
 
-另一种构建键和值都以某种方式从集合元素生成的 Map 的方法是函数 [`associate()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/associate.html)。 
-它接受一个返回 `Pair` 的 lambda 表达式：对应 Map 条目的键和值。
+另一种构建 Map 的方式是使用 [`associate()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/associate.html) 函数，此时键和值都以某种方式从集合元素中生成。
+它接受一个返回 `Pair` 的 lambda 表达式，该二元组对应 Map 条目的键与值。
 
-请注意，`associate()` 会生成短期的 `Pair` 对象，这可能会影响性能。
-因此，应在性能要求不苛刻或相比其他选项更合适时使用 `associate()`。
+请注意，`associate()` 会产生短生命周期的 `Pair` 对象，这可能会影响性能。
+因此，当性能不是关键考量因素，或者相比其他选项更为适用时，才应使用 `associate()`。
 
-后者的一个示例是键和对应的值需要一起从某个元素生成时。 
+后者的一个例子是从一个元素中同时生成键和对应的值。 
 
 ```kotlin
 
@@ -178,15 +178,15 @@ fun parseFullName(fullName: String): FullName {
 ```
 {kotlin-runnable="true"}
 
-在此示例中，我们首先对元素调用转换函数，然后通过该函数结果的属性构建键值对。
+在这里，我们首先对元素调用转换函数，然后根据该函数结果的属性构建一个二元组。
 
 ## Flatten {id="flatten"}
 
 如果你在操作嵌套集合，可能会发现标准库中用于平铺访问嵌套集合元素的函数非常有用。
 
 第一个函数是 [`flatten()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/flatten.html)。
-你可以在集合的集合上调用它，例如由 `Set` 组成的 `List`。
-该函数返回包含所有嵌套集合元素的一个单独的 `List`。
+你可以在由集合组成的集合上调用它，例如由 `Set` 组成的 `List`。
+该函数返回一个包含嵌套集合中所有元素的单一 `List`。
 
 ```kotlin
 
@@ -199,9 +199,9 @@ fun main() {
 ```
 {kotlin-runnable="true"}
 
-另一个函数——[`flatMap()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/flat-map.html) 提供了处理嵌套集合的灵活方式。它接受一个将集合元素映射到另一个集合的函数。
-因此，`flatMap()` 返回对所有元素应用该函数后的返回值构成的单个列表。
-也就是说，`flatMap()` 的行为相当于依次调用 `map()`（映射结果为一个集合）和 `flatten()`。
+另一个函数——[`flatMap()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/flat-map.html) 提供了一种灵活的处理嵌套集合的方法。它接受一个将集合元素映射为另一个集合的函数。
+因此，`flatMap()` 返回对所有元素应用该函数后的返回值组成的单一列表。
+所以，`flatMap()` 的行为相当于依次调用 `map()`（映射结果为一个集合）和 `flatten()`。
 
 ```kotlin
 
@@ -225,10 +225,10 @@ fun main() {
 
 如果你需要以可读格式检索集合内容，请使用将集合转换为字符串的函数：[`joinToString()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/join-to-string.html) 和 [`joinTo()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/join-to.html)。
 
-`joinToString()` 会根据提供的实参，从集合元素构建出单个 `String`。
-`joinTo()` 执行相同操作，但将结果附加到给定的 [`Appendable`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.text/-appendable/index.html) 对象。
+`joinToString()` 会根据提供的实参从集合元素中构建单个 `String`。
+`joinTo()` 执行相同的操作，但会将结果追加到给定的 [`Appendable`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.text/-appendable/index.html) 对象中。
 
-当使用形参的默认值调用时，这些函数返回的结果类似于在集合上调用 `toString()`：由逗号加空格分隔的各元素字符串表示形式构成的 `String`。
+当使用形参的默认值调用时，这些函数返回的结果类似于对集合调用 `toString()`：由逗号加空格分隔的各元素字符串表示形式构成的 `String`。
 
 ```kotlin
 
@@ -247,7 +247,7 @@ fun main() {
 ```
 {kotlin-runnable="true"}
 
-要构建自定义的字符串表示形式，你可以在函数实参 `separator`、`prefix` 和 `postfix` 中指定其参数。生成的字符串将以 `prefix` 开头，以 `postfix` 结尾。除最后一个元素外，每个元素后面都会跟着 `separator`。
+要构建自定义的字符串表示，可以在函数实参中指定其形参 `separator`、`prefix` 与 `postfix`。生成的字符串将以 `prefix` 开头，以 `postfix` 结尾。除了最后一个元素外，每个元素后面都会跟着 `separator`。
 
 ```kotlin
 
@@ -260,8 +260,8 @@ fun main() {
 ```
 {kotlin-runnable="true"}
 
-对于较大的集合，你可能需要指定 `limit`——包含在结果中的元素数量。
-如果集合大小超过了 `limit`，则所有其他元素将被 `truncated` 实参的单个值替换。
+对于较大的集合，你可能需要指定 `limit`——即包含在结果中的元素数量。
+如果集合大小超过了 `limit`，所有其余元素将被替换为 `truncated` 实参指定的单个值。
 
 ```kotlin
 
@@ -274,7 +274,7 @@ fun main() {
 ```
 {kotlin-runnable="true"}
 
-最后，若要自定义元素本身的表示形式，请提供 `transform` 函数。 
+最后，要自定义元素本身的表示形式，请提供 `transform` 函数。 
 
 ```kotlin
 

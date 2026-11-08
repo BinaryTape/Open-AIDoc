@@ -1,43 +1,112 @@
-[//]: # (title: Kotlin/JS コンパイラの機能)
+[//]: # (title: Kotlin/JSコンパイラの機能)
 
-Kotlin/JS には、パフォーマンス、サイズ、および開発スピードのためにコードを最適化するコンパイラ機能が含まれています。
-これは、JavaScript コードを生成する前に Kotlin コードを中間表現 (IR) に変換するコンパイルプロセスを通じて機能します。
+Kotlin/JSコンパイラは、JavaScriptコードを生成する前にKotlinコードを中間表現（IR）へと変換します。
+この中間ステップにより、コンパイラはパフォーマンス、サイズ、開発速度の面で出力を最適化できるほか、ターゲットとするJavaScriptバージョン、モジュールシステム、TypeScript宣言ファイル、出力の粒度など、生成されるJavaScriptを細かく制御できるようになります。
+
+## ターゲットJavaScriptバージョンの設定 {id="set-the-target-javascript-version"}
+
+Kotlin/JSコンパイラは、ECMAScript標準のES5、ES2015、ES2020バージョン向けのJavaScriptを生成できます。
+ターゲット環境でサポートされている最新のバージョンを選択してください。
+`build.gradle.kts`ファイルで`target`プロパティを設定します。例えば、ES2020をターゲットにするには次のように記述します。
+
+```kotlin
+tasks.withType<KotlinJsCompile>().configureEach {
+    compilerOptions {
+        target = "es2020"
+    }
+}
+```
+
+各ターゲットで利用可能な機能については、[ECMAScriptターゲットの設定](js-project-setup.md#set-an-ecmascript-target)を参照してください。
+
+## モジュールシステムの設定 {id="configure-the-module-system"}
+
+Kotlin/JSコンパイラは、UMD、CommonJS、AMD、ES modulesなどのさまざまなモジュールシステム用のコードを生成できます。
+ターゲットのモジュールシステムを選択するには、`build.gradle.kts`ファイルで`moduleKind`コンパイラオプションを設定します。
+
+```kotlin
+tasks.withType<org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrLink> {
+    compilerOptions.moduleKind.set(org.jetbrains.kotlin.gradle.dsl.JsModuleKind.MODULE_COMMONJS)
+}
+```
+
+サポートされている`moduleKind`の値や設定の詳細については、[JavaScriptモジュール](js-modules.md)を参照してください。
+
+## TypeScript宣言ファイル（`d.ts`）の生成 {id="generate-typescript-declaration-files-d-ts"}
+<primary-label ref="experimental-opt-in"/>
+
+Kotlin/JSコンパイラは、KotlinコードからTypeScript定義を生成できます。これらの定義は、JavaScriptツールやIDEでのコード補完や静的解析のための型情報を提供し、JavaScriptおよびTypeScriptプロジェクトでKotlin APIを利用しやすくします。
+
+定義ファイルを生成するには、Kotlinの宣言に[`@JsExport`](js-to-kotlin-interop.md#jsexport-annotation)アノテーションを付与し、`build.gradle.kts`ファイルの`js {}`ブロックに`generateTypeScriptDefinitions()`関数を追加します。
+
+```kotlin
+kotlin {
+    js {
+        binaries.executable()
+        browser {
+        }
+        generateTypeScriptDefinitions()
+    }
+}
+```
+
+コンパイラは`@JsExport`でマークされたトップレベル宣言を収集し、`.d.ts`ファイル内にTypeScript定義を生成します。
+
+詳細については、[TypeScript宣言ファイル（`d.ts`）の生成](js-project-setup.md#generation-of-typescript-declaration-files-d-ts)を参照してください。
+
+## 出力の粒度の設定 {id="configure-output-granularity"}
+
+コンパイラがプロジェクト内の`.js`ファイルをどのように出力するかを選択できます。
+
+* **モジュールごと（Per module）**: プロジェクトのモジュールごとに個別の`.js`ファイルを生成します（デフォルト）。
+* **プログラム全体（Whole program）**: プログラム全体に対して単一の`.js`ファイルを生成します。
+* **ファイルごと（Per file）**: Kotlinファイルごとに1つの`.js`ファイルを生成します。エクスポートされた宣言がファイルに含まれる場合は2つのファイルを生成します（ターゲットJavaScriptバージョンが`es2015`および`es2020`の場合に利用可能）。
+
+粒度を変更するには、`gradle.properties`ファイルで`kotlin.js.ir.output.granularity`プロパティを設定します。
+
+```properties
+# デフォルト: per-module
+kotlin.js.ir.output.granularity=whole-program
+```
+
+ファイルごとの要件を含む設定の詳細については、[出力の粒度の設定](js-project-setup.md#configure-output-granularity)を参照してください。
 
 ## トップレベルプロパティの遅延初期化 {id="lazy-initialization-of-top-level-properties"}
 
-アプリケーションの起動パフォーマンスを向上させるため、Kotlin/JS コンパイラはトップレベルプロパティを遅延初期化（レイジー初期化）します。これにより、アプリケーションのコードで使用されているすべてのトップレベルプロパティを初期化することなく、アプリケーションをロードできます。起動時に必要なものだけが初期化され、その他のプロパティは、それらを使用するコードが実際に実行されるときに値を受け取ります。
+アプリケーションの起動パフォーマンスを向上させるため、Kotlin/JSコンパイラはトップレベルプロパティを遅延初期化（lazy initialization）します。これにより、コード内で使用されているすべてのトップレベルプロパティを初期化することなくアプリケーションを読み込むことができます。起動時に必要なものだけが初期化され、その他のプロパティはそれらを使用するコードが実際に実行されたときに値を受け取ります。
 
 ```kotlin
 val a = run {
-    val result = // 重い計算
+    val result = // 重い計算処理
     println(result)
     result
-} // 最初に使用されたときに値が計算される
+} // 初回使用時に値が計算される
 ```
 
-何らかの理由でプロパティを即時（アプリケーションの開始時）に初期化する必要がある場合は、[`@EagerInitialization`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.js/-eager-initialization/){nullable="true"} アノテーションを付けてください。
+何らかの理由でプロパティを即時初期化（アプリケーション起動時に初期化）する必要がある場合は、[`@EagerInitialization`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.js/-eager-initialization/){nullable="true"}アノテーションを付与してください。
 
 ## 開発用バイナリのインクリメンタルコンパイル {id="incremental-compilation-for-development-binaries"}
 
-Kotlin/JS コンパイラは、開発プロセスを高速化する「開発用バイナリのインクリメンタルコンパイルモード」を提供しています。
-このモードでは、コンパイラは `compileDevelopmentExecutableKotlinJs` Gradle タスクの結果をモジュールレベルでキャッシュします。
-次回のコンパイル時に、変更されていないソースファイルに対してキャッシュされたコンパイル結果を使用するため、特に小さな変更の場合にコンパイルがより速く完了します。
+Kotlin/JSコンパイラには、開発プロセスを高速化する「開発用バイナリのインクリメンタルコンパイルモード」が用意されています。
+このモードでは、コンパイラはモジュールレベルで`compileDevelopmentExecutableKotlinJs` Gradleタスクの結果をキャッシュします。
+その後のコンパイルでは、変更されていないソースファイルに対してキャッシュされたコンパイル結果が再利用されるため、特に小さな変更を加えた場合のコンパイルがより高速に完了します。
 
-インクリメンタルコンパイルはデフォルトで有効になっています。開発用バイナリのインクリメンタルコンパイルを無効にするには、プロジェクトの `gradle.properties` または `local.properties` に以下の行を追加してください。
+インクリメンタルコンパイルはデフォルトで有効になっています。開発用バイナリのインクリメンタルコンパイルを無効にするには、プロジェクトの`gradle.properties`または`local.properties`に以下の行を追加してください。
 
 ```none
-kotlin.incremental.js.ir=false // デフォルトは true
+# デフォルト: true
+kotlin.incremental.js.ir=false
 ```
 
-> インクリメンタルコンパイルモードでのクリーンビルドは、キャッシュを作成して保存する必要があるため、通常は遅くなります。
+> キャッシュを作成して格納する必要があるため、インクリメンタルコンパイルモードでのクリーンビルドは通常よりも遅くなります。
 >
 {style="note"}
 
-## プロダクションにおけるメンバー名のミニファイ {id="minification-of-member-names-in-production"}
+## 本番環境におけるメンバー名の最小化 {id="minification-of-member-names-in-production"}
 
-Kotlin/JS コンパイラは、Kotlin のクラスや関数の関係に関する内部情報を使用して、より効率的なミニファイ（縮小化）を適用し、関数、プロパティ、クラスの名前を短縮します。これにより、生成されるバンドルされたアプリケーションのサイズが削減されます。
+Kotlin/JSコンパイラは、Kotlinのクラスや関数に関する内部的な関係情報を利用してより効率的な最小化（minification）を適用し、関数、プロパティ、クラスの名前を短縮します。これにより、結果として生成されるバンドルアプリケーションのサイズを削減できます。
 
-このタイプのミニファイは、Kotlin/JS アプリケーションを [プロダクション](js-project-setup.md#building-executables) モードでビルドする際に自動的に適用され、デフォルトで有効になっています。メンバー名のミニファイを無効にするには、`-Xir-minimized-member-names` コンパイラオプションを使用します。
+このメンバー名の最小化は、Kotlin/JSアプリケーションを[本番（production）](js-project-setup.md#building-executables)モードでビルドする際に自動的に適用され、デフォルトで有効になっています。メンバー名の最小化を無効にするには、`-Xir-minimized-member-names`コンパイラオプションを使用します。
 
 ```kotlin
 kotlin {
@@ -53,31 +122,30 @@ kotlin {
 
 ## デッドコード削除 {id="dead-code-elimination"}
 
-[デッドコード削除](https://wikipedia.org/wiki/Dead_code_elimination) (DCE) は、未使用のプロパティ、関数、およびクラスを削除することで、生成される JavaScript コードのサイズを削減します。
+[デッドコード削除](https://wikipedia.org/wiki/Dead_code_elimination)（DCE: Dead code elimination）は、使用されていないプロパティ、関数、クラスを削除することで、生成されるJavaScriptコードのサイズを削減します。
 
-未使用の宣言は、以下のようなケースで発生する可能性があります。
+未使用の宣言は、以下のようなケースで発生します。
 
-* 関数がインライン化され、直接呼び出されることがなくなった場合（いくつかの例外を除き、常に発生します）。
-* モジュールが共有ライブラリを使用している場合。DCE がないと、ライブラリのうち使用していない部分も生成されたバンドルに含まれたままになります。
-  例えば、Kotlin 標準ライブラリには、リスト、配列、文字列の操作、DOM 用のアダプターなどのための関数が含まれています。これらの機能すべてを JavaScript ファイルにすると約 1.3 MB 必要になります。シンプルな "Hello, world" アプリケーションに必要なのはコンソールのルーチンだけであり、ファイル全体では数キロバイトにしかなりません。
+* 関数がインライン化され、直接呼び出されることがない場合（ごく一部のケースを除き、常に発生します）。
+* モジュールが共有ライブラリを使用している場合。DCEがないと、使用していないライブラリの部分もバンドル結果に含まれたままになります。例えば、Kotlin標準ライブラリにはリスト、配列、文字列操作用の関数やDOM用のアダプターなどが含まれています。この全機能はJavaScriptファイルとして約1.3 MBを占めます。単純な「Hello, world」アプリケーションが必要とするのはコンソールルーチンだけであり、ファイル全体でもわずか数キロバイトで済みます。
 
-Kotlin/JS コンパイラでは、DCE は自動的に処理されます。
+Kotlin/JSコンパイラでは、DCEは自動的に処理されます。
 
-* DCE は「開発用」のバンドルタスクでは無効になっています。これには以下の Gradle タスクが含まれます。
+* 以下のGradleタスクに対応する「開発（development）」バンドルタスクでは、DCEが無効になります。
 
   * `jsBrowserDevelopmentRun`
   * `jsBrowserDevelopmentWebpack`
   * `jsNodeDevelopmentRun`
   * `compileDevelopmentExecutableKotlinJs`
   * `compileDevelopmentLibraryKotlinJs`
-  * 名前に "development" を含むその他の Gradle タスク
+  * 名前に「development」が含まれるその他のGradleタスク
 
-* DCE は「プロダクション用」のバンドルをビルドする場合に有効になります。これには以下の Gradle タスクが含まれます。
+* 以下のGradleタスクに対応する「本番（production）」バンドルをビルドする場合、DCEが有効になります。
 
   * `jsBrowserProductionRun`
   * `jsBrowserProductionWebpack`
   * `compileProductionExecutableKotlinJs`
   * `compileProductionLibraryKotlinJs`
-  * 名前に "production" を含むその他の Gradle タスク
+  * 名前に「production」が含まれるその他のGradleタスク
 
-[`@JsExport`](js-to-kotlin-interop.md#jsexport-annotation) アノテーションを使用すると、DCE にルートとして扱わせたい宣言を指定できます。
+[`@JsExport`](js-to-kotlin-interop.md#jsexport-annotation)アノテーションを使用すると、DCEにルート（削除対象外の基点）として扱わせたい宣言を指定できます。

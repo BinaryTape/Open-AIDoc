@@ -1,5 +1,5 @@
 {
-  "version": "0171f373f0976e8e253d811e1de67eddc8989ec9",
+  "version": "7f3d793980c8d01df3d67193488a9d58c7add5c0",
   "files": {
     "docs/intro/choosing-your-style.md": "dd3d783339255f14efeecac61bfc6c918d01c6e534f23bee35124a12b351ccef",
     "docs/intro/core-concepts.md": "2955ee870bf74830913c238628a18136df1d5ed8b64ef6c53411b774dbef40ea",
@@ -29,6 +29,7 @@
     "docs/reference/koin-android/instrumented-testing.md": "1c72708d29791c0b4277112d2862ebe61880810aba5f577c5b228e5d255d2c95",
     "docs/reference/koin-android/jsr330.md": "4fdb42c3f6d58fb08652cd79c498d64c3cee0586a2e27e226c9328e982f279b7",
     "docs/reference/koin-android/multi-module.md": "517315c4a513d3f0c827d9086dae24649345c387a5b9d0a35a483e4bcd637352",
+    "docs/reference/koin-android/r8-proguard.md": "e7bb46335be4023027a93954cf944e7200ffe02e3fbbcd52465060fd2dd389de",
     "docs/reference/koin-android/scope.md": "39857471e2a7926638c616693331fe7a11011d8cfac4f0f0e9b6b6bd1cc003a7",
     "docs/reference/koin-android/start.md": "367ea220345bcf1d4775368f3b96b3a00bb9e31e88e412777604e73eb95f5fac",
     "docs/reference/koin-android/viewmodel.md": "548267af025aadc9ee9267c065b43a904faca85d07183fb4e33adeeca8289abf",
@@ -43,7 +44,7 @@
     "docs/reference/koin-compose/compose-viewmodel.md": "c8576e3347ee2469d3729261e324356296b65c2b3aca832b1844b63dc3efb9e3",
     "docs/reference/koin-compose/compose.md": "271ebd27198afebcc0b147e3eb35aef501abbc0d083aa91eeac2d20e327fa8fd",
     "docs/reference/koin-compose/isolated-context.md": "7103a4d1561237320ed6b96a799d3caa66c99d23de75504252f8ee2c17125683",
-    "docs/reference/koin-compose/navigation3.md": "4c4c9e49e485dff91db7d166ebac98c92f86c17127f9d7e2e647f64881a9486a",
+    "docs/reference/koin-compose/navigation3.md": "84edd45c75131b5318bc2fcc597e14bcdb43f5144135fc0d48cdb5ef6b346add",
     "docs/reference/koin-core/advanced-patterns.md": "33d2c8b638d1b01d7c386f56593fb7d2a4a3b287dd0221821da87d2510f2905b",
     "docs/reference/koin-core/context-isolation.md": "582185aa0ec65a40ff9a7aa1e4ff1c1eb0319f00a7ecbf5d8d4d64eabd78bbb9",
     "docs/reference/koin-core/definitions.md": "7a4c7e96f2fa89188eea74b21b7cd21cd4c224be34193e0b4a4b91f266d5d0db",
@@ -82,6 +83,6 @@
     "docs/tooling/index.md": "f19ecd694eb3bd30aa4f83b3bffce209bbb83542c56f2ec3026fc3d033936ce7",
     "docs/tooling/monitor.md": "0bd40240712ae2c2e7d0712d8490b82ee534ddb8f25687082aa1c1c5d8656c4b",
     "docs/tooling/production-monitoring.md": "4db03b5c7239aa5a063501800037bed934271516684a85b441d2f403268dbaea",
-    "llms.txt": "b806571ef3d5916a6b9a6b7790a396e8c9ced9350f4a729a35059bda7ef7cc8d"
+    "llms.txt": "de26bf3f3c27ae04f972a53bf64499614b653f2344033e8818dd9b36855d5658"
   }
 }

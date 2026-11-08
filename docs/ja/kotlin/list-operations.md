@@ -1,17 +1,17 @@
 [//]: # (title: List固有の操作)
 
-[`List`](collections-overview.md#list) は、Kotlinで最もよく使われる組み込みコレクション型です。リストの要素に対するインデックスアクセスにより、強力な一連の操作が提供されます。
+[`List`](collection-types.md#list) は、Kotlin で最もよく使われる組み込みコレクション型です。リストの要素へのインデックスアクセスにより、リストに対する強力な一連の操作が提供されます。
 
 ## インデックスによる要素の取得 {id="retrieve-elements-by-index"}
 
-リストは要素取得のための共通操作をすべてサポートしています：`elementAt()`、`first()`、`last()`、および [単一要素の取得](collection-elements.md) に記載されているその他の操作です。
-リスト固有の機能は要素へのインデックスアクセスであり、要素を読み取る最も簡単な方法はインデックスによる取得です。
-これは、引数にインデックスを渡す [`get()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/get.html) 関数、または短縮形の構文 `[index]` を使用して行われます。
+リストは要素取得のための一般的な操作をすべてサポートしています：`elementAt()`、`first()`、`last()`、および [単一要素の取得](collection-elements.md) に記載されているその他の操作です。
+リストに特有なのは要素へのインデックスアクセスであり、要素を読み取る最も簡単な方法はインデックスによって取得することです。
+これは、引数にインデックスを渡す [`get()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/get.html) 関数、または短縮構文である `[index]` を使って行われます。
 
-リストのサイズが指定されたインデックス以下の場合、例外がスローされます。
+リストのサイズが指定されたインデックス以下の場合は、例外がスローされます。
 このような例外を回避するのに役立つ関数が他に2つあります：
 
-* [`getOrElse()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/get-or-else.html) は、コレクション内にインデックスが存在しない場合に返すデフォルト値を計算するための関数を指定できます。
+* [`getOrElse()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/get-or-else.html) は、コレクション内にインデックスが存在しない場合に返すデフォルト値を計算するための関数を提供できます。
 * [`getOrNull()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/get-or-null.html) は、デフォルト値として `null` を返します。
 
 ```kotlin
@@ -31,8 +31,8 @@ fun main() {
 
 ## リストの一部の取得 {id="retrieve-list-parts"}
 
-[コレクションの一部の取得](collection-parts.md) にある共通操作に加え、リストには指定された要素範囲のビューをリストとして返す [`subList()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/sub-list.html) 関数が用意されています。
-そのため、元のコレクションの要素が変更されると、事前に作成されたサブリスト内でも変更され、その逆も同様です。
+[コレクションの一部の取得](collection-parts.md) にある一般的な操作に加えて、リストは指定された要素の範囲のビュー（view）をリストとして返す [`subList()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/sub-list.html) 関数を提供します。
+したがって、元のコレクションの要素が変更されると、以前に作成されたサブリスト内の要素も変更され、その逆も同様です。
 
 ```kotlin
 
@@ -45,13 +45,13 @@ fun main() {
 ```
 {kotlin-runnable="true"}
 
-## 要素の位置を検索 {id="find-element-positions"}
+## 要素の位置の検索 {id="find-element-positions"}
 
 ### 線形探索 {id="linear-search"}
 
-どのリストでも、[`indexOf()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/index-of.html) および [`lastIndexOf()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/last-index-of.html) 関数を使用して要素の位置を検索できます。
+任意のリストにおいて、[`indexOf()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/index-of.html) および [`lastIndexOf()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/last-index-of.html) 関数を使用して要素の位置を検索できます。
 これらは、リスト内で指定された引数と等しい要素の最初および最後の位置を返します。
-該当する要素が存在しない場合、どちらの関数も `-1` を返します。
+そのような要素が存在しない場合、両関数とも `-1` を返します。
 
 ```kotlin
 
@@ -65,10 +65,10 @@ fun main() {
 ```
 {kotlin-runnable="true"}
 
-また、述語（predicate）を受け取り、それに一致する要素を検索する関数のペアもあります：
+また、述語（predicate）を受け取り、それに一致する要素を検索する一対の関数もあります：
 
-* [`indexOfFirst()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/index-of-first.html) は、述語に一致する*最初の要素のインデックス*を返します。該当する要素がない場合は `-1` を返します。
-* [`indexOfLast()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/index-of-last.html) は、述語に一致する*最後の要素のインデックス*を返します。該当する要素がない場合は `-1` を返します。
+* [`indexOfFirst()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/index-of-first.html) は述語に一致する*最初の要素のインデックス*を返します。そのような要素がない場合は `-1` を返します。
+* [`indexOfLast()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/index-of-last.html) は述語に一致する*最後の要素のインデックス*を返します。そのような要素がない場合は `-1` を返します。
 
 ```kotlin
 
@@ -84,15 +84,15 @@ fun main() {
 
 ### ソート済みリストでの二分探索 {id="binary-search-in-sorted-lists"}
 
-リスト内の要素を検索する方法がもう1つあります — [二分探索（binary search）](https://en.wikipedia.org/wiki/Binary_search_algorithm) です。
-これは他の組み込み検索関数よりも大幅に高速に動作しますが、特定の順序（自然順序、または関数のパラメータで指定された順序）に従ってリストが昇順に [ソート](collection-ordering.md) されている*必要があります*。
-そうでない場合、結果は未定義になります。
+リスト内の要素を検索するもう1つの方法として、[二分探索（binary search）](https://en.wikipedia.org/wiki/Binary_search_algorithm) があります。
+これは他の組み込み検索関数よりも大幅に高速に動作しますが、リストが特定の順序（自然順序または関数のパラメータで指定された順序）に従って昇順に [ソート](collection-ordering.md) されている*必要があります*。
+そうでない場合、結果は未定義（undefined）となります。
 
-ソートされたリストで要素を検索するには、値を引数として渡して [`binarySearch()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/binary-search.html) 関数を呼び出します。
-該当する要素が存在する場合、関数はそのインデックスを返します。存在しない場合は `(-insertionPoint - 1)` を返します。ここで `insertionPoint` は、リストのソート順を維持するためにこの要素を挿入すべき位置のインデックスです。
-指定された値を持つ要素が複数ある場合、検索はそのうちのいずれかのインデックスを返す可能性があります。
+ソート済みのリストで要素を検索するには、値を引数として渡して [`binarySearch()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/binary-search.html) 関数を呼び出します。
+そのような要素が存在する場合、関数はそのインデックスを返します。存在しない場合は `(-insertionPoint - 1)` を返します。ここで `insertionPoint` は、リストのソート順が維持されるようにこの要素を挿入すべきインデックスです。
+指定された値を持つ要素が複数ある場合、検索はそのいずれかのインデックスを返す可能性があります。
 
-また、検索するインデックス範囲を指定することもできます。この場合、関数は指定された2つのインデックスの間のみを検索します。
+検索するインデックスの範囲を指定することもできます。この場合、関数は指定された2つのインデックスの間のみを検索します。
 
 ```kotlin
 
@@ -109,10 +109,10 @@ fun main() {
 ```
 {kotlin-runnable="true"}
 
-#### Comparatorを用いた二分探索 {id="comparator-binary-search"}
+#### Comparator による二分探索 {id="comparator-binary-search"}
 
-リストの要素が `Comparable` ではない場合、二分探索で使用する [`Comparator`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-comparator/) を指定する必要があります。
-リストはこの `Comparator` に従って昇順にソートされていなければなりません。例を見てみましょう：
+リストの要素が `Comparable` でない場合は、二分探索で使用する [`Comparator`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-comparator/) を指定する必要があります。
+リストはこの `Comparator` に従って昇順にソートされている必要があります。例を見てみましょう：
 
 ```kotlin
 
@@ -132,10 +132,10 @@ fun main() {
 ```
 {kotlin-runnable="true"}
 
-上記は、`Comparable` ではない `Product` インスタンスのリストと、順序を定義する `Comparator` です（製品 `p1` の価格が製品 `p2` の価格より低い場合、`p1` が `p2` より前になります）。
-そのため、この順序に従って昇順ソートされたリストを用意し、`binarySearch()` を使用して指定された `Product` のインデックスを見つけます。
+以下は、`Comparable` ではない `Product` インスタンスのリストと、順序を定義する `Comparator` です。`p1` の価格が `p2` の価格より小さい場合、製品 `p1` は製品 `p2` の前に配置されます。
+したがって、この順序に従って昇順にソートされたリストがあれば、`binarySearch()` を使って指定された `Product` のインデックスを見つけることができます。
 
-カスタムの Comparator は、リストが自然順序とは異なる順序を使用している場合（たとえば、`String` 要素に対する大文字と小文字を区別しない順序など）にも便利です。
+カスタム Comparator は、リストが自然順序とは異なる順序を使用している場合（たとえば `String` 要素の大文字・小文字を区別しない順序など）にも便利です。
 
 ```kotlin
 
@@ -148,11 +148,11 @@ fun main() {
 ```
 {kotlin-runnable="true"}
 
-#### 比較関数（comparison）による二分探索 {id="comparison-binary-search"}
+#### 比較関数（Comparison）による二分探索 {id="comparison-binary-search"}
 
 _比較（comparison）_ 関数を使用した二分探索では、明示的な検索値を指定せずに要素を見つけることができます。
 代わりに、要素を `Int` 値にマッピングする比較関数を受け取り、その関数がゼロを返す要素を検索します。
-リストは指定された関数に従って昇順にソートされている必要があります。言い換えると、比較の戻り値はリストの要素が進むにつれて増加していかなければなりません。
+リストは提供された関数に従って昇順にソートされている必要があります。言い換えると、比較の戻り値はリストの要素が進むにつれて増加する必要があります。
 
 ```kotlin
 
@@ -175,17 +175,17 @@ fun main() {
 ```
 {kotlin-runnable="true"}
 
-Comparator および比較関数を用いた二分探索は、どちらもリストの範囲に対しても実行できます。
+Comparator による二分探索も比較関数による二分探索も、リストの範囲を指定して実行できます。
 
 ## リストの書き込み操作 {id="list-write-operations"}
 
-[コレクションの書き込み操作](collection-write.md) で説明されているコレクション変更操作に加えて、[可変（mutable）](collections-overview.md#collection-types) リストは固有の書き込み操作をサポートしています。
-これらの操作は、インデックスを使用して要素にアクセスし、リストの変更機能を拡張します。
+[コレクションの書き込み操作](collection-write.md) で説明されているコレクション変更操作に加えて、[可変（mutable）](collections-overview.md#read-only-and-mutable-collections) なリストは固有の書き込み操作をサポートしています。
+このような操作では、インデックスを使用して要素にアクセスし、リストの変更機能を拡張します。
 
 ### 追加 {id="add"}
 
-リストの特定の位置に要素を追加するには、要素を挿入する位置を追加の引数として指定して、[`add()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-list/add.html) および [`addAll()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/add-all.html) を使用します。
-その位置より後ろにあるすべての要素は右にシフトします。
+リスト内の特定の位置に要素を追加するには、要素を挿入する位置を追加の引数として指定して、[`add()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-list/add.html) および [`addAll()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/add-all.html) を使用します。
+その位置以降にあるすべての要素は右にシフトします。
 
 ```kotlin
 
@@ -216,7 +216,7 @@ fun main() {
 ```
 {kotlin-runnable="true"}
 
-[`fill()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/fill.html) は、単にコレクションのすべての要素を指定された値で置き換えます。
+[`fill()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/fill.html) は、コレクション内のすべての要素を指定された値で単純に置き換えます。
 
 ```kotlin
 
@@ -232,8 +232,8 @@ fun main() {
 
 ### 削除 {id="remove"}
 
-リストから特定の位置にある要素を削除するには、位置を引数として渡して [`removeAt()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-list/remove-at.html) 関数を使用します。
-削除される要素より後ろにある要素のインデックスは、すべて1つ小さくなります。
+リスト内の特定の位置から要素を削除するには、位置を引数として指定して [`removeAt()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-list/remove-at.html) 関数を使用します。
+削除された要素の後にある要素のすべてのインデックスは 1 つ減少します。
 
 ```kotlin
 
@@ -249,18 +249,18 @@ fun main() {
 
 ### ソート {id="sort"}
 
-[コレクションの順序付け](collection-ordering.md) では、特定の順序でコレクションの要素を取得する操作について説明しています。
-可変リストに対しては、標準ライブラリが同じ順序付け操作をインプレース（その場）で実行する同様の拡張関数を提供しています。
+[コレクションの並び替え](collection-ordering.md) では、特定の順序でコレクション要素を取得する操作について説明しています。
+可変リストに対しては、標準ライブラリは同様の並び替え操作をインプレース（in-place）で実行する同様の拡張関数を提供しています。
 このような操作をリストのインスタンスに適用すると、そのインスタンス自体の要素の順序が変更されます。
 
-インプレースのソート関数は、読み取り専用リストに適用される関数と似た名前を持ちますが、`ed/d` の接尾辞がありません：
+インプレースのソート関数には、読み取り専用リストに適用される関数と似た名前が付けられていますが、`ed/d` の接尾辞がありません：
 
-* すべてのソート関数の名前で `sorted*` の代わりに `sort*`：[`sort()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/sort.html)、[`sortDescending()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/sort-descending.html)、[`sortBy()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/sort-by.html) など。
+* すべてのソート関数の名前において `sorted*` の代わりに `sort*`: [`sort()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/sort.html)、[`sortDescending()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/sort-descending.html)、[`sortBy()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/sort-by.html) など。
 * `shuffled()` の代わりに [`shuffle()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/shuffle.html)。
 * `reversed()` の代わりに [`reverse()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/reverse.html)。
 
-可変リストに対して呼び出された [`asReversed()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/as-reversed.html) は、元のリストの逆順ビューである別の可変リストを返します。そのビューでの変更は元のリストに反映されます。
-以下の例は、可変リスト向けのソート関数を示しています：
+可変リストに対して呼び出された [`asReversed()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/as-reversed.html) は、元のリストの反転ビューである別の可変リストを返します。そのビューへの変更は元のリストにも反映されます。
+次の例は、可変リストのソート関数を示しています。
 
 ```kotlin
 

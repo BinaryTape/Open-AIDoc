@@ -1,117 +1,118 @@
-[//]: # (title: JavaとKotlinのコレクション)
+[//]: # (title: Java と Kotlin におけるコレクション)
 
-<web-summary>JavaのコレクションからKotlinのコレクションへ移行する方法を学びます。このガイドでは、KotlinとJavaのList、ArrayList、Map、Setなどのデータ構造をカバーしています。</web-summary>
+<web-summary>Java コレクションから Kotlin コレクションへの移行方法を学びます。このガイドでは、Kotlin と Java の List、ArrayList、Map、Set などのデータ構造を取り上げます。</web-summary>
 
-「コレクション（Collections）」とは、解決しようとしている問題にとって重要な、一般的に操作される可変個（ゼロ個の場合もあります）のアイテムのグループです。
-このガイドでは、JavaとKotlinにおけるコレクションの概念と操作を説明し、比較します。
-これは、JavaからKotlinへの移行を助け、Kotlinらしい慣用的な方法でコードを書くのに役立ちます。
+_コレクション（Collections）_ とは、解決すべき課題にとって意味を持ち、共通の操作が行われる可変個（0 個の場合もあります）のアイテムの集まりです。
+このガイドでは、Java と Kotlin におけるコレクションの概念と操作を説明し、比較します。
+Java から Kotlin への移行を支援し、本物の Kotlin らしい方法でコードを書けるようにすることを目的としています。
 
-このガイドの最初の部分には、JavaとKotlinで同じコレクションに対する操作のクイック用語集が含まれています。
-これは、[JavaとKotlinで同じ操作](#operations-that-are-the-same-in-java-and-kotlin)と、[Kotlinにのみ存在する操作](#operations-that-don-t-exist-in-java-s-standard-library)に分かれています。
-ガイドの後半部分では、[ミュータビリティ](#mutability)から始まり、具体的なケースを見ていくつかの違いを説明します。
+このガイドの最初のパートには、Java と Kotlin で同じコレクションに対する操作のクイック用語集（対応表）が含まれています。
+これは、[Java と Kotlin で同じ操作](#operations-that-are-the-same-in-java-and-kotlin) と 
+[Kotlin にのみ存在する操作](#operations-that-don-t-exist-in-java-s-standard-library) に分かれています。
+[可変性（Mutability）](#mutability) から始まるガイドの第 2 パートでは、具体的なケースを見ながらいくつかの違いを説明します。
 
-コレクションの概要については、[コレクションの概要](collections-overview.md)を参照するか、KotlinデベロッパーアドボケイトのSebastian Aignerによるこの[動画](https://www.youtube.com/watch?v=F8jj7e-_jFA)を視聴してください。
+コレクションの概要については、[コレクションの概要](collections-overview.md) を参照するか、Kotlin デベロッパーアドボケイトの Sebastian Aigner によるこちらの [ビデオ](https://www.youtube.com/watch?v=F8jj7e-_jFA) をご覧ください。
 
-> 以下の例はすべて、JavaおよびKotlinの標準ライブラリAPIのみを使用しています。
+> 以下の例はすべて、Java および Kotlin の標準ライブラリ API のみを使用しています。
 >
 {style="note"}
 
-## JavaとKotlinで同じ操作 {id="operations-that-are-the-same-in-java-and-kotlin"}
+## Java と Kotlin で同じ操作 {id="operations-that-are-the-same-in-java-and-kotlin"}
 
-Kotlinには、Javaの対応するものとまったく同じように見えるコレクション操作が数多くあります。
+Kotlin には、Java の対応するものとまったく同じように見えるコレクション操作が多数あります。
 
-### List、Set、Queue、Dequeに対する操作 {id="operations-on-lists-sets-queues-and-deques"}
+### List、Set、Queue、Deque に対する操作 {id="operations-on-lists-sets-queues-and-deques"}
 
-| 説明 | 一般的な操作 | よりKotlinらしい代替案 |
-|-------------|-----------|---------------------|
-| 要素の追加 | `add()`, `addAll()` | [`plusAssign`(`+=`) 演算子](collection-plus-minus.md)を使用します： `collection += element`, `collection += anotherCollection` |
-| コレクションに要素が含まれているか確認 | `contains()`, `containsAll()` | [`in` キーワード](collection-elements.md#check-element-existence)を使用して、演算子形式で `contains()` を呼び出します： `element in collection` |
-| コレクションが空かどうかを確認 | `isEmpty()` | [`isNotEmpty()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/is-not-empty.html) を使用して、コレクションが空でないことを確認します。 |
-| 特定の条件下で削除 | `removeIf()` | |
-| 選択した要素のみを残す | `retainAll()` | |
-| コレクションからすべての要素を削除 | `clear()` | |
-| コレクションからストリームを取得 | `stream()` | Kotlinにはストリームを処理するための独自の方法があります：[シーケンス](#sequences)や、[`map()`](collection-filtering.md) や [`filter()`](#filter-elements) のようなメソッドです。 |
-| コレクションからイテレータを取得 | `iterator()` | |
+| 説明                                                        | 一般的な操作                  | より Kotlin らしい代替手段                                                                                                                                 |
+|------------------------------------------------------------|-------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 要素を追加する                                             | `add()`, `addAll()`           | [`plusAssign` (`+=`) 演算子](collection-combine.md#add-and-remove-elements) を使用: `collection += element`, `collection += anotherCollection`。          |
+| コレクションに要素が含まれているか確認する                 | `contains()`, `containsAll()` | [`in` キーワード](collection-elements.md#check-element-existence) を使用して演算子の形式で `contains()` を呼び出す: `element in collection`。                 |
+| コレクションが空かどうかを確認する                         | `isEmpty()`                   | コレクションが空でないことを確認するには [`isNotEmpty()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/is-not-empty.html) を使用。        |
+| 特定の条件で削除する                                       | `removeIf()`                  |                                                                                                                                                            |
+| 選択した要素のみを残す                                     | `retainAll()`                 |                                                                                                                                                            |
+| コレクションからすべての要素を削除する                     | `clear()`                     |                                                                                                                                                            |
+| コレクションからストリームを取得する                       | `stream()`                    | Kotlin にはストリームを処理する独自の方法があります: [シーケンス（sequences）](#sequences) や [`map()`](collection-filtering.md)、[`filter()`](#filter-elements) などのメソッド。 |
+| コレクションからイテレータを取得する                       | `iterator()`                  |                                                                                                                                                            |
 
-### Mapに対する操作 {id="operations-on-maps"}
+### Map に対する操作 {id="operations-on-maps"}
 
-| 説明 | 一般的な操作 | よりKotlinらしい代替案 |
-|-------------|-----------|---------------------|
-| 要素の追加 | `put()`, `putAll()`, `putIfAbsent()`| Kotlinでは、代入 `map[key] = value` は `put(key, value)` と同じように動作します。また、[`plusAssign`(`+=`) 演算子](collection-plus-minus.md)を使用することもできます： `map += Pair(key, value)` または `map += anotherMap` |
-| 要素の置換 | `put()`, `replace()`, `replaceAll()` | `put()` や `replace()` の代わりに、インデックス演算子 `map[key] = value` を使用します。 |
-| 要素の取得 | `get()` | インデックス演算子を使用して要素を取得します： `map[index]` |
-| Mapに要素が含まれているか確認 | `containsKey()`, `containsValue()` | [`in` キーワード](collection-elements.md#check-element-existence)を使用して、演算子形式で `contains()` を呼び出します： `element in map` |
-| Mapが空かどうかを確認 | `isEmpty()` | [`isNotEmpty()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/is-not-empty.html) を使用して、Mapが空でないことを確認します。 |
-| 要素の削除 | `remove(key)`, `remove(key, value)` | [`minusAssign`(`-=`) 演算子](collection-plus-minus.md)を使用します： `map -= key` |
-| Mapからすべての要素を削除 | `clear()` | |
-| Mapからストリームを取得 | エントリ、キー、または値に対する `stream()` | |
+| 説明                                                | 一般的な操作                           | より Kotlin らしい代替手段                                                                                                                                                                                           |
+|-----------------------------------------------------|----------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 要素を追加する                                      | `put()`, `putAll()`, `putIfAbsent()`   | Kotlin では、代入 `map[key] = value` は `put(key, value)` と同じように動作します。また、[`plusAssign` (`+=`) 演算子](collection-combine.md#add-and-remove-elements) を使用することもできます: `map += Pair(key, value)` または `map += anotherMap`。 |
+| 要素を置き換える                                    | `put()`, `replace()`, `replaceAll()`   | `put()` や `replace()` の代わりにインデックス演算子 `map[key] = value` を使用。                                                                                                                                     |
+| 要素を取得する                                      | `get()`                                | 要素を取得するためにインデックス演算子を使用: `map[index]`。                                                                                                                                                           |
+| Map に要素が含まれているか確認する                  | `containsKey()`, `containsValue()`     | [`in` キーワード](collection-elements.md#check-element-existence) を使用して演算子の形式で `contains()` を呼び出す: `element in map`。                                                                                  |
+| Map が空かどうかを確認する                          | `isEmpty()`                            | Map が空でないことを確認するには [`isNotEmpty()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/is-not-empty.html) を使用。                                                                         |
+| 要素を削除する                                      | `remove(key)`, `remove(key, value)`    | [`minusAssign` (`-=`) 演算子](collection-combine.md#add-and-remove-elements) を使用: `map -= key`。                                                                                                                                         |
+| Map からすべての要素を削除する                      | `clear()`                              |                                                                                                                                                                                                                      |
+| Map からストリームを取得する                        | エントリ、キー、または値に対する `stream()` |                                                                                                                                                                                                                      |
 
-### Listにのみ存在する操作 {id="operations-that-exist-only-for-lists"}
+### List にのみ存在する操作 {id="operations-that-exist-only-for-lists"}
 
-| 説明 | 一般的な操作 | よりKotlinらしい代替案 |
-|-------------|-----------|---------------------|
-| 要素のインデックスを取得 | `indexOf()` | |
-| 要素の最後のインデックスを取得 | `lastIndexOf()` | |
-| 要素の取得 | `get()` | インデックス演算子を使用して要素を取得します： `list[index]` |
-| サブリストの取得 | `subList()` | |
-| 要素の置換 | `set()`, `replaceAll()` | `set()` の代わりにインデックス演算子を使用します： `list[index] = value` |
+| 説明                             | 一般的な操作             | より Kotlin らしい代替手段                                                  |
+|----------------------------------|--------------------------|----------------------------------------------------------------------------|
+| 要素のインデックスを取得する     | `indexOf()`              |                                                                            |
+| 要素の最後のインデックスを取得する | `lastIndexOf()`          |                                                                            |
+| 要素を取得する                   | `get()`                  | 要素を取得するためにインデックス演算子を使用: `list[index]`。              |
+| サブリストを取得する             | `subList()`              |                                                                            |
+| 要素を置き換える                 | `set()`,  `replaceAll()` | `set()` の代わりにインデックス演算子を使用: `list[index] = value`。        |
 
 ## 少し異なる操作 {id="operations-that-differ-a-bit"}
 
-### すべてのコレクション型に対する操作 {id="operations-on-any-collection-type"}
+### 任意のコレクション型に対する操作 {id="operations-on-any-collection-type"}
 
-| 説明 | Java | Kotlin |
-|-------------|------|--------|
-| コレクションのサイズを取得 | `size()` | `count()`, `size` |
-| ネストされたコレクション要素へのフラットなアクセス | `collectionOfCollections.forEach(flatCollection::addAll)` または `collectionOfCollections.stream().flatMap().collect()` | [`flatten()`](collection-transformations.md#flatten) または [`flatMap()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/flat-map.html) |
-| すべての要素に指定された関数を適用 | `stream().map().collect()` | [`map()`](collection-filtering.md) |
-| コレクション要素に順次操作を適用し、累積された結果を返す | `stream().reduce()` | [`reduce()`, `fold()`](collection-aggregate.md#fold-and-reduce) |
-| 分類子によって要素をグループ化し、それらをカウントする | `stream().collect(Collectors.groupingBy(classifier, counting()))` | [`eachCount()`](collection-grouping.md) |
-| 条件によるフィルタリング | `stream().filter().collect()` | [`filter()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/filter.html) |
-| コレクション要素が条件を満たすか確認 | `stream().noneMatch()`, `stream().anyMatch()`, `stream().allMatch()` | [`none()`, `any()`, `all()`](collection-filtering.md) |
-| 要素のソート | `stream().sorted().collect()` | [`sorted()`](collection-ordering.md#natural-order) |
-| 最初のN個の要素を取得 | `stream().limit(N).collect()` | [`take(N)`](collection-parts.md#take-and-drop) |
-| 述語を用いて要素を取得 | `stream().takeWhile().collect()` | [`takeWhile()`](collection-parts.md#take-and-drop) |
-| 最初のN個の要素をスキップ | `stream().skip(N).collect()` | [`drop(N)`](collection-parts.md#take-and-drop) |
-| 述語を用いて要素をスキップ | `stream().dropWhile().collect()` | [`dropWhile()`](collection-parts.md#take-and-drop) |
-| コレクション要素とそれに関連付けられた特定の値からMapを構築 | `stream().collect(toMap(keyMapper, valueMapper))` | [`associate()`](collection-transformations.md#associate) |
+| 説明                                                                                | Java                                                                                | Kotlin                                                                                                                                               |
+|------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|
+| コレクションのサイズを取得する                                                     | `size()`                                                                            | `count()`, `size`                                                                                                                                    |
+| ネストされたコレクション要素へフラットにアクセスする                               | `collectionOfCollections.forEach(flatCollection::addAll)` または `collectionOfCollections.stream().flatMap().collect()` | [`flatten()`](collection-transformations.md#flatten) または [`flatMap()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/flat-map.html) |
+| 指定された関数をすべての要素に適用する                                             | `stream().map().collect()`                                                           | [`map()`](collection-filtering.md)                                                                                                                   |
+| コレクション要素に指定された操作を順次適用し、蓄積された結果を返す                  | `stream().reduce()`                                                                 | [`reduce()`, `fold()`](collection-aggregate.md#fold-and-reduce)                                                                                      |
+| 分類基準（classifier）によって要素をグループ化し、カウントする                     | `stream().collect(Collectors.groupingBy(classifier, counting()))`                   | [`eachCount()`](collection-grouping.md)                                                                                                              |
+| 条件でフィルタリングする                                                           | `stream().filter().collect()`                                                       | [`filter()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/filter.html)                                                            |
+| コレクション要素が条件を満たしているか確認する                                     | `stream().noneMatch()`, `stream().anyMatch()`, `stream().allMatch()`                | [`none()`, `any()`, `all()`](collection-filtering.md)                                                                                                |
+| 要素をソートする                                                                   | `stream().sorted().collect()`                                                       | [`sorted()`](collection-ordering.md#natural-order)                                                                                                   |
+| 最初の N 個の要素を取得する                                                        | `stream().limit(N).collect()`                                                       | [`take(N)`](collection-parts.md#take-and-drop)                                                                                                       |
+| 述語（predicate）に基づいて要素を取得する                                          | `stream().takeWhile().collect()`                                                    | [`takeWhile()`](collection-parts.md#take-and-drop)                                                                                                   |
+| 最初の N 個の要素をスキップする                                                    | `stream().skip(N).collect()`                                                        | [`drop(N)`](collection-parts.md#take-and-drop)                                                                                                       |
+| 述語（predicate）に基づいて要素をスキップする                                      | `stream().dropWhile().collect()`                                                    | [`dropWhile()`](collection-parts.md#take-and-drop)                                                                                                   |
+| コレクション要素とそれに関連付けられた特定の値から Map を構築する                  | `stream().collect(toMap(keyMapper, valueMapper))`                                   | [`associate()`](collection-transformations.md#associate)                                                                                             |
 
-Mapに対して上記のすべての操作を実行するには、まずMapの `entrySet` を取得する必要があります。
+上記のすべての操作を Map に対して実行するには、まず Map の `entrySet` を取得する必要があります。
 
-### Listに対する操作 {id="operations-on-lists"}
+### List に対する操作 {id="operations-on-lists"}
 
-| 説明 | Java | Kotlin |
-|-------------|------|--------|
-| リストを自然順序でソートする | `sort(null)` | `sort()` |
-| リストを降順でソートする | `sort(comparator)` | `sortDescending()` |
-| リストから要素を削除する | `remove(index)`, `remove(element)`| `removeAt(index)`, `remove(element)` または [`collection -= element`](collection-plus-minus.md) |
-| リストのすべての要素を特定の値で埋める | `Collections.fill()` | [`fill()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/fill.html) |
-| リストから一意の要素を取得する | `stream().distinct().toList()` | [`distinct()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/distinct.html) |
+| 説明                                             | Java                               | Kotlin                                                                                        |
+|--------------------------------------------------|------------------------------------|-----------------------------------------------------------------------------------------------|
+| リストを自然順序でソートする                     | `sort(null)`                       | `sort()`                                                                                      |
+| リストを降順でソートする                         | `sort(comparator)`                 | `sortDescending()`                                                                            |
+| リストから要素を削除する                         | `remove(index)`, `remove(element)` | `removeAt(index)`, `remove(element)` または [`collection -= element`](collection-combine.md#add-and-remove-elements) |
+| リストのすべての要素を特定の値で埋める           | `Collections.fill()`               | [`fill()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/fill.html)         |
+| リストから重複しない要素（一意な要素）を取得する | `stream().distinct().toList()`     | [`distinct()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/distinct.html) |
 
-## Javaの標準ライブラリには存在しない操作 {id="operations-that-don-t-exist-in-java-s-standard-library"}
+## Java の標準ライブラリに存在しない操作 {id="operations-that-don-t-exist-in-java-s-standard-library"}
 
-* [`zip()`, `unzip()`](collection-transformations.md) – コレクションを変換します。
-* [`aggregate()`](collection-grouping.md) – 条件でグループ化します。
-* [`takeLast()`, `takeLastWhile()`, `dropLast()`, `dropLastWhile()`](collection-parts.md#take-and-drop) – 述語によって要素を取得または破棄します。
-* [`slice()`, `chunked()`, `windowed()`](collection-parts.md) – コレクションの一部を取得します。
-* [プラス (`+`) とマイナス (`-`) 演算子](collection-plus-minus.md) – 要素を追加または削除します。
+* [`zip()`, `unzip()`](collection-transformations.md) – コレクションを変換する。
+* [`aggregate()`](collection-grouping.md) – 条件によってグループ化する。
+* [`takeLast()`, `takeLastWhile()`, `dropLast()`, `dropLastWhile()`](collection-parts.md#take-and-drop) – 述語に基づいて要素を取得または除外する。
+* [`slice()`, `chunked()`, `windowed()`](collection-parts.md) – コレクションの一部を抽出する。
+* [プラス（`+`）およびマイナス（`-`）演算子](collection-combine.md#add-and-remove-elements) – 要素を追加または削除する。
 
-`zip()`、`chunked()`、`windowed()`、およびその他の操作について詳しく知りたい場合は、Sebastian AignerによるKotlinでの高度なコレクション操作に関するこのビデオをご覧ください。
+`zip()`、`chunked()`、`windowed()`、およびその他の操作について詳しく知りたい場合は、Sebastian Aigner による Kotlin の高度なコレクション操作に関するこちらのビデオをご覧ください:
 
-<video src="https://www.youtube.com/v/N4CpLxGJlq0" title="高度なコレクション操作"/>
+<video src="https://www.youtube.com/v/N4CpLxGJlq0" title="Advanced Collection Operations"/>
 
-## ミュータビリティ（可変性） {id="mutability"}
+## 可変性 (Mutability) {id="mutability"}
 
-Javaには、ミュータブル（可変）なコレクションがあります：
+Java には、可変（mutable）なコレクションがあります:
 
 ```java
 // Java
-// このリストはミュータブルです！
+// このリストは可変です！
 public List<Customer> getCustomers() { ... }
 ```
 {id="mutability-java"}
 
-部分的にミュータブルなもの：
+部分的に可変なものもあります:
 
 ```java
 // Java
@@ -120,39 +121,39 @@ numbers.add("five"); // 実行時に `UnsupportedOperationException` で失敗�
 ```
 {id="mutability-partly-java"}
 
-そしてイミュータブル（不変）なもの：
+そして不変（immutable）なものもあります:
 
 ```java
 // Java
 List<String> numbers = new LinkedList<>();
-// このリストはイミュータブルです！
+// このリストは不変です！
 List<String> immutableCollection = Collections.unmodifiableList(numbers);
 immutableCollection.add("five"); // 実行時に `UnsupportedOperationException` で失敗します
 ```
 {id="immutable-java"}
 
-IntelliJ IDEAで最後の2つのコードを書くと、イミュータブルなオブジェクトを変更しようとしているという警告がIDEから表示されます。
-このコードはコンパイルは通りますが、実行時に `UnsupportedOperationException` で失敗します。型を見ただけでは、コレクションがミュータブルかどうかを判断することはできません。
+IntelliJ IDEA で最後の 2 つのコードを書くと、不変なオブジェクトを変更しようとしているという警告が IDE から表示されます。
+このコードはコンパイルは通りますが、実行時に `UnsupportedOperationException` で失敗します。型を見るだけでは、コレクションが可変かどうかを判断することはできません。
 
-Javaとは異なり、Kotlinでは必要に応じてミュータブルなコレクションまたは読み取り専用のコレクションを明示的に宣言します。
-読み取り専用のコレクションを変更しようとすると、コードはコンパイルされません。
+Java とは異なり、Kotlin ではニーズに応じて可変コレクションまたは読み取り専用（read-only）コレクションを明示的に宣言します。
+読み取り専用コレクションを変更しようとすると、コードはコンパイルされません:
 
 ```kotlin
 // Kotlin
 val numbers = mutableListOf("one", "two", "three", "four")
-numbers.add("five")            // これはOKです
+numbers.add("five")            // これは OK
 val immutableNumbers = listOf("one", "two")
 //immutableNumbers.add("five") // コンパイルエラー - Unresolved reference: add
 ```
 {id="mutability-kotlin"}
 
-不変性についての詳細は、[Kotlinコーディング規約](coding-conventions.md#immutability)のページを読んでください。
+不変性についての詳細は、[Kotlin コーディング規約](coding-conventions.md#immutability) ページをご覧ください。
 
-## 共変性（Covariance） {id="covariance"}
+## 共変性 (Covariance) {id="covariance"}
 
-Javaでは、子孫型のコレクションを、祖先型のコレクションを受け取る関数に渡すことはできません。
-例えば、`Rectangle` が `Shape` を継承している場合、`Rectangle` 要素のコレクションを `Shape` 要素のコレクションを受け取る関数に渡すことはできません。
-コードをコンパイル可能にするには、`? extends Shape` 型を使用して、関数が `Shape` の継承者のコレクションを受け取れるようにします。
+Java では、子孫（派生）型のコレクションを、祖先（基底）型のコレクションを受け取る関数に渡すことはできません。
+たとえば、`Rectangle` が `Shape` を拡張している場合、`Rectangle` 要素のコレクションを `Shape` 要素のコレクションを受け取る関数に渡すことはできません。
+コードをコンパイルできるようにするには、関数が `Shape` の任意の後継クラスのコレクションを受け取れるように、`? extends Shape` 型を使用します:
 
 ```java
 // Java
@@ -161,8 +162,8 @@ class Shape {}
 class Rectangle extends Shape {}
 
 public void doSthWithShapes(List<? extends Shape> shapes) {
-/* 単に List<Shape> を使用すると、後述のように List<Rectangle> を
-引数としてこの関数を呼び出すときにコードがコンパイルされません */
+/* 単に List<Shape> を使用した場合、以下のように List<Rectangle> を
+引数としてこの関数を呼び出すとコードはコンパイルされません */
 }
 
 public void main() {
@@ -172,9 +173,9 @@ public void main() {
 ```
 {id="covariance-java"}
 
-Kotlinでは、読み取り専用のコレクション型は[共変](generics.md#variance)です。これは、`Rectangle` クラスが `Shape` クラスを継承している場合、`List<Shape>` 型が必要な場所で `List<Rectangle>` 型を使用できることを意味します。
-言い換えれば、コレクション型は要素型と同じサブタイプ関係を持ちます。Mapは値の型については共変ですが、キーの型については共変ではありません。
-ミュータブルなコレクションは共変ではありません。これは実行時の失敗につながるためです。
+Kotlin では、読み取り専用コレクション型は[共変（covariant）](generics.md#variance)です。つまり、`Rectangle` クラスが `Shape` クラスを継承している場合、`List<Shape>` 型が必要とされる場所ならどこでも `List<Rectangle>` 型を使用できます。
+言い換えると、コレクション型は要素型と同じサブタイプ関係を持ちます。Map は値の型に対しては共変ですが、キーの型に対しては共変ではありません。
+可変コレクションは共変ではありません。共変にしてしまうと実行時エラーにつながるためです。
 
 ```kotlin
 // Kotlin
@@ -183,7 +184,7 @@ open class Shape(val name: String)
 class Rectangle(private val rectangleName: String) : Shape(rectangleName)
 
 fun doSthWithShapes(shapes: List<Shape>) {
-    println("図形は次のとおりです: ${shapes.joinToString { it.name }}")
+    println("The shapes are: ${shapes.joinToString { it.name }}")
 }
 
 fun main() {
@@ -193,14 +194,14 @@ fun main() {
 ```
 {kotlin-runnable="true" id="covariance-kotlin"}
 
-[コレクション型](collections-overview.md#collection-types)についての詳細はこちらを読んでください。
+[コレクション型](collection-types.md) の詳細についてはこちらをご覧ください。
 
-## 範囲（Range）と進行（Progression） {id="ranges-and-progressions"}
+## 範囲と数列 (Ranges and progressions) {id="ranges-and-progressions"}
 
-Kotlinでは、[範囲（Range）](ranges.md)を使用して区間を作成できます。例えば、`Version(1, 11)..Version(1, 30)` には `1.11` から `1.30` までのすべてのバージョンが含まれます。
-`in` 演算子を使用して、特定のバージョンが範囲内にあるかどうかを確認できます：`Version(0, 9) in versionRange`。
+Kotlin では、[範囲（ranges）](ranges.md) を使用して区間を作成できます。たとえば、`Version(1, 11)..Version(1, 30)` には `1.11` から `1.30` までのすべてのバージョンが含まれます。
+`in` 演算子を使用して、指定したバージョンが範囲内にあるかどうかを確認できます: `Version(0, 9) in versionRange`。
 
-Javaでは、`Version` が両方の境界に適合するかどうかを手動で確認する必要があります。
+Java では、`Version` が両方の境界に適合しているかどうかを手動で確認する必要があります:
 
 ```java
 // Java
@@ -241,7 +242,7 @@ public Boolean versionIsInRange(Version versionToCheck, Version minVersion,
 ```
 {id="ranges-java"}
 
-Kotlinでは、範囲を一つのオブジェクト全体として操作します。2つの変数を作成して、それらと `Version` を比較する必要はありません。
+Kotlin では、範囲を 1 つのオブジェクトとして操作します。2 つの変数を作成して `Version` と比較する必要はありません:
 
 ```kotlin
 // Kotlin
@@ -263,12 +264,14 @@ fun main() {
 ```
 {kotlin-runnable="true" id="ranges-kotlin"}
 
-「バージョンが最小バージョン以上（`>=`）かつ最大バージョン未満（`<`）」であるかどうかを確認する場合など、境界のいずれかを除外する必要がある場合、これらの包含的な範囲は役に立ちません。
+バージョンが最小バージョン以上（`>=`）かつ最大バージョン未満（`<`）であるかを確認するなど、境界のいずれかを除外する必要がある場合、これらの両端を含む（inclusive な）範囲は利用できません。
 
 ## 複数の基準による比較 {id="comparison-by-several-criteria"}
 
-Javaでオブジェクトを複数の基準で比較するには、[`Comparator`](https://docs.oracle.com/javase/8/docs/api/java/util/Comparator.html) インターフェースの [`comparing()`](https://docs.oracle.com/javase/8/docs/api/java/util/Comparator.html#comparing-java.util.function.Function-) および [`thenComparingX()`](https://docs.oracle.com/javase/8/docs/api/java/util/Comparator.html#thenComparing-java.util.Comparator-) 関数を使用できます。
-例えば、名前と年齢で人を比較する場合：
+Java で複数の基準によってオブジェクトを比較するには、[`Comparator`](https://docs.oracle.com/javase/8/docs/api/java/util/Comparator.html) インターフェースの [`comparing()`](https://docs.oracle.com/javase/8/docs/api/java/util/Comparator.html#comparing-java.util.function.Function-) 
+および [`thenComparingX()`](https://docs.oracle.com/javase/8/docs/api/java/util/Comparator.html#thenComparing-java.util.Comparator-) 
+関数を使用できます。
+たとえば、名前と年齢で人を比較するには次のようにします:
 
 ```java
 class Person implements Comparable<Person> {
@@ -304,7 +307,7 @@ public void comparePersons() {
 ```
 {id="comparison-java"}
 
-Kotlinでは、比較したいフィールドを列挙するだけです。
+Kotlin では、比較したいフィールドを列挙するだけです:
 
 ```kotlin
 data class Person(
@@ -320,9 +323,9 @@ fun main() {
 ```
 {kotlin-runnable="true" id="comparison-kotlin"}
 
-## シーケンス（Sequences） {id="sequences"}
+## シーケンス (Sequences) {id="sequences"}
 
-Javaでは、次のように数値のシーケンスを生成できます。
+Java では、次のようにして数列を生成できます:
 
 ```java
 // Java
@@ -332,7 +335,7 @@ System.out.println(sum); // 145 を出力
 ```
 {id="sequences-java"}
 
-Kotlinでは、_[シーケンス](sequences.md)_ を使用します。シーケンスの多段階処理は、可能な限り遅延実行されます。
+Kotlin では、_[シーケンス](sequences.md)_ を使用します。シーケンスの複数ステップの処理は、可能な限り遅延（lazy）実行されます。
 実際の計算は、処理チェーン全体の結果が要求されたときにのみ行われます。
 
 ```kotlin
@@ -348,14 +351,15 @@ fun main() {
 ```
 {kotlin-runnable="true" id="sequences-kotlin"}
 
-シーケンスは、一部のフィルタリング操作を実行するために必要なステップ数を減らすことができます。
-`Iterable` と `Sequence` の違いを示す [シーケンス処理の例](sequences.md#sequence-processing-example) を参照してください。
+シーケンスを使用すると、一部のフィルタリング操作の実行に必要なステップ数を減らすことができます。
+`Iterable` と `Sequence` の違いを示す [シーケンスの処理例](sequences.md#sequence-processing-example) をご覧ください。
 
 ## リストからの要素の削除 {id="removal-of-elements-from-a-list"}
 
-Javaの [`remove()`](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html#remove(int)) 関数は、削除する要素のインデックスを受け取ります。
+Java では、[`remove()`](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html#remove(int)) 
+関数は削除する要素のインデックスを受け取ります。
 
-整数の要素を削除する場合、`remove()` 関数の引数として `Integer.valueOf()` 関数を使用します。
+整数の要素を削除する場合は、`remove()` 関数の引数として `Integer.valueOf()` 関数を使用します:
 
 ```java
 // Java
@@ -373,8 +377,8 @@ public void remove() {
 ```
 {id="remove-elements-java"}
 
-Kotlinには、2種類の要素削除があります。
-[`removeAt()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-list/remove-at.html) によるインデックス指定の削除と、[`remove()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-list/remove.html) による値指定の削除です。
+Kotlin では、[`removeAt()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-list/remove-at.html) によるインデックス指定の削除と、
+[`remove()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-list/remove.html) による値指定の削除の 2 種類があります。
 
 ```kotlin
 fun main() {
@@ -390,9 +394,9 @@ fun main() {
 ```
 {kotlin-runnable="true" id="remove-elements-kotlin"}
 
-## Mapのトラバース（走査） {id="traverse-a-map"}
+## Map の走査 (Traverse a map) {id="traverse-a-map"}
 
-Javaでは、[`forEach`](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html#forEach(java.util.function.BiConsumer)) を介してMapを走査できます。
+Java では、[`forEach`](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html#forEach(java.util.function.BiConsumer)) を使用して Map を走査できます:
 
 ```java
 // Java
@@ -400,7 +404,7 @@ numbers.forEach((k,v) -> System.out.println("Key = " + k + ", Value = " + v));
 ```
 {id="traverse-map-java"}
 
-Kotlinでは、`for` ループまたは Javaの `forEach` に似た `forEach` を使用してMapを走査します。
+Kotlin では、Java の `forEach` と同様の `forEach` や `for` ループを使用して Map を走査します:
 
 ```kotlin
 // Kotlin
@@ -412,9 +416,9 @@ numbers.forEach { (k, v) -> println("Key = $k, Value = $v") }
 ```
 {id="traverse-map-kotlin"}
 
-## 空である可能性のあるコレクションの最初と最後のアイテムを取得する {id="get-the-first-and-the-last-items-of-a-possibly-empty-collection"}
+## 空の可能性があるコレクションから最初と最後のアイテムを取得する {id="get-the-first-and-the-last-items-of-a-possibly-empty-collection"}
 
-Javaでは、コレクションのサイズを確認し、インデックスを使用することで、最初と最後のアイテムを安全に取得できます。
+Java では、コレクションのサイズを確認してインデックスを使用することで、最初と最後のアイテムを安全に取得できます:
 
 ```java
 // Java
@@ -427,8 +431,11 @@ if (list.size() > 0) {
 ```
 {id="list-get-first-last-java"}
 
-JDK 21以降では、すべての [`SequencedCollection`](https://docs.oracle.com/en/java/javase/21/api/java.base/java/util/SequencedCollection.html) 実装で利用可能な [`getFirst()`](https://docs.oracle.com/en/java/javase/21/api/java.base/java/util/SequencedCollection.html#getFirst()) および [`getLast()`](https://docs.oracle.com/en/java/javase/21/api/java.base/java/util/SequencedCollection.html#getLast()) メソッドを使用することもできます。これには、すべての `List` 実装や、`LinkedHashSet` などの他のコレクションも含まれます。
-例えば、`ArrayList` の場合は次のようになります:
+JDK 21 以降では、すべての [`SequencedCollection`](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/SequencedCollection.html) 実装で利用可能な 
+[`getFirst()`](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/SequencedCollection.html#getFirst()) および 
+[`getLast()`](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/SequencedCollection.html#getLast()) 
+メソッドを使用することもできます。これには、すべての `List` 実装や `LinkedHashSet` などの他のコレクションが含まれます。
+たとえば、`ArrayList` の場合は次のようになります:
 
 ```java
 // Java
@@ -441,22 +448,23 @@ if (!list.isEmpty()) {
 ```
 {id="deque-get-first-last-java"}
 
-Kotlinには、特別な関数 [`firstOrNull()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/first-or-null.html)
-および [`lastOrNull()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/last-or-null.html) があります。
-[`Elvis 演算子`](null-safety.md#elvis-operator) を使用すると、関数の結果に応じてすぐに追加のアクションを実行できます。
-例えば、`firstOrNull()` の場合：
+Kotlin には、特別な関数 [`firstOrNull()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/first-or-null.html) と 
+[`lastOrNull()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/last-or-null.html) があります。
+[`Elvis 演算子`](null-safety.md#elvis-operator) を使用すると、関数の結果に応じて即座に以降のアクションを実行できます。たとえば、`firstOrNull()` の場合:
 
 ```kotlin
 // Kotlin
-val emails = listOf<String>() // 空である可能性があります
+val emails = listOf<String>() // 空の可能性あり
 val theOldestEmail = emails.firstOrNull() ?: ""
 val theFreshestEmail = emails.lastOrNull() ?: ""
 ```
 {id="get-first-last-kotlin"}
 
-## リストからセットを作成する {id="create-a-set-from-a-list"}
+## List から Set を作成する {id="create-a-set-from-a-list"}
 
-Javaで [`List`](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html) から [`Set`](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Set.html) を作成するには、[`Set.copyOf`](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Set.html#copyOf(java.util.Collection)) 関数を使用できます。
+Java で [`List`](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html) から 
+[`Set`](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Set.html) を作成するには、
+[`Set.copyOf`](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Set.html#copyOf(java.util.Collection)) 関数を使用できます:
 
 ```java
 // Java
@@ -468,7 +476,7 @@ public void listToSet() {
 ```
 {id="list-to-set-java"}
 
-Kotlinでは、`toSet()` 関数を使用します。
+Kotlin では、`toSet()` 関数を使用します:
 
 ```kotlin
 fun main() {
@@ -484,7 +492,8 @@ fun main() {
 
 ## 要素のグループ化 {id="group-elements"}
 
-Javaでは、[Collectors](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/stream/Collectors.html) 関数 `groupingBy()` を使用して要素をグループ化できます。
+Java では、[Collectors](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/stream/Collectors.html) の 
+`groupingBy()` 関数を使用して要素をグループ化できます:
 
 ```java
 // Java
@@ -501,7 +510,7 @@ public void analyzeLogs() {
 ```
 {id="group-elements-java"}
 
-Kotlinでは、[`groupBy()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/group-by.html) 関数を使用します。
+Kotlin では、[`groupBy()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/group-by.html) 関数を使用します:
 
 ```kotlin
 data class Request(
@@ -525,10 +534,10 @@ fun main() {
 
 ## 要素のフィルタリング {id="filter-elements"}
 
-Javaでコレクションから要素をフィルタリングするには、[Stream API](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/stream/package-summary.html) を使用する必要があります。
-Stream APIには `intermediate`（中間）操作と `terminal`（終端）操作があります。`filter()` は中間操作であり、ストリームを返します。
-コレクションとして出力を受け取るには、`collect()` のような終端操作を使用する必要があります。
-例えば、キーが `1` で終わり、値が `10` より大きいペアのみを残す場合：
+Java でコレクションから要素をフィルタリングするには、[Stream API](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/stream/package-summary.html) を使用する必要があります。
+Stream API には「中間操作」と「終端操作」があります。`filter()` は中間操作であり、ストリームを返します。
+出力としてコレクションを受け取るには、`collect()` などの終端操作を使用する必要があります。
+たとえば、キーが `1` で終わり、かつ値が `10` より大きいペアのみを残すには次のようにします:
 
 ```java
 // Java
@@ -542,8 +551,8 @@ public void filterEndsWith() {
 ```
 {id="filter-elements-java"}
 
-Kotlinでは、フィルタリングはコレクションに組み込まれており、`filter()` はフィルタリングされたのと同じコレクション型を返します。
-したがって、書く必要があるのは `filter()` とその述語だけです。
+Kotlin ではフィルタリング機能がコレクションに組み込まれており、`filter()` はフィルタリングされたものと同じコレクション型を返します。
+そのため、記述する必要があるのは `filter()` とその述語（条件式）だけです:
 
 ```kotlin
 fun main() {
@@ -557,11 +566,11 @@ fun main() {
 ```
 {kotlin-runnable="true" id="filter-elements-kotlin"}
 
-[Mapのフィルタリング](map-operations.md#filter)についての詳細はこちら。
+[Map のフィルタリング](map-operations.md#filter) の詳細についてはこちらをご覧ください。
 
 ### 型による要素のフィルタリング {id="filter-elements-by-type"}
 
-Javaで型によって要素をフィルタリングし、それらに対してアクションを実行するには、[`instanceof`](https://docs.oracle.com/en/java/javase/17/language/pattern-matching-instanceof-operator.html) 演算子で型を確認してから型キャストを行う必要があります。
+Java で型によって要素をフィルタリングし、それらに対してアクションを実行するには、[`instanceof`](https://docs.oracle.com/en/java/javase/17/language/pattern-matching-instanceof-operator.html) 演算子で型を確認してから型キャストを行う必要があります:
 
 ```java
 // Java
@@ -572,14 +581,14 @@ public void objectIsInstance() {
     numbers.add("two");
     numbers.add(3.0);
     numbers.add("four");
-    System.out.println("大文字のすべての String 要素:");
+    System.out.println("All String elements in upper case:");
     numbers.stream().filter(it -> it instanceof String)
         .forEach( it -> System.out.println(((String) it).toUpperCase()));
 }
 ```
 {id="filter-by-type-java"}
 
-Kotlinでは、コレクションに対して [`filterIsInstance<必要な型>()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/filter-is-instance.html) を呼び出すだけで、型キャストは[スマートキャスト](typecasts.md#smart-casts)によって行われます。
+Kotlin では、コレクションに対して [`filterIsInstance<NEEDED_TYPE>()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/filter-is-instance.html) を呼び出すだけで、[スマートキャスト](typecasts.md#smart-casts) によって型キャストが行われます:
 
 ```kotlin
 // Kotlin
@@ -587,7 +596,7 @@ fun main() {
 //sampleStart
     // Kotlin
     val numbers = listOf(null, 1, "two", 3.0, "four")
-    println("大文字のすべての String 要素:")
+    println("All String elements in upper case:")
     numbers.filterIsInstance<String>().forEach {
         println(it.uppercase())
     }
@@ -596,10 +605,14 @@ fun main() {
 ```
 {kotlin-runnable="true" id="filter-by-type-kotlin"}
 
-### 述語のテスト {id="test-predicates"}
+### 条件のテスト (Test predicates) {id="test-predicates"}
 
-一部のタスクでは、すべて、なし、または任意の要素が条件を満たすかどうかを確認する必要があります。
-Javaでは、[Stream API](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/stream/package-summary.html) 関数である [`allMatch()`](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/stream/Stream.html#allMatch(java.util.function.Predicate))、[`noneMatch()`](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/stream/Stream.html#noneMatch(java.util.function.Predicate))、および [`anyMatch()`](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/stream/Stream.html#anyMatch(java.util.function.Predicate)) を介してこれらすべてのチェックを実行できます。
+タスクによっては、すべての要素、いずれの要素も満たさない、またはいずれかの要素が条件を満たしているかを確認する必要があります。
+Java では、[Stream API](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/stream/package-summary.html) の関数である 
+[`allMatch()`](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/stream/Stream.html#allMatch(java.util.function.Predicate))、
+[`noneMatch()`](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/stream/Stream.html#noneMatch(java.util.function.Predicate))、および 
+[`anyMatch()`](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/stream/Stream.html#anyMatch(java.util.function.Predicate)) 
+を通じてこれらのチェックをすべて行えます:
 
 ```java
 // Java
@@ -612,7 +625,7 @@ public void testPredicates() {
 ```
 {id="test-predicates-java"}
 
-Kotlinでは、すべての [Iterable](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-iterable/#kotlin.collections.Iterable) オブジェクトに対して [拡張関数](extensions.md) `none()`、`any()`、および `all()` が利用可能です。
+Kotlin では、すべての [Iterable](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-iterable/#kotlin.collections.Iterable) オブジェクトで [拡張関数](extensions.md) の `none()`、`any()`、および `all()` が使用可能です:
 
 ```kotlin
 fun main() {
@@ -627,13 +640,13 @@ fun main() {
 ```
 {kotlin-runnable="true" id="test-predicates-kotlin"}
 
-[述語のテスト](collection-filtering.md#test-predicates)についての詳細。
+[条件のテスト](collection-filtering.md#test-predicates) の詳細をご覧ください。
 
-## コレクション変換操作 {id="collection-transformation-operations"}
+## コレクションの変換操作 {id="collection-transformation-operations"}
 
-### 要素の結合（Zip） {id="zip-elements"}
+### 要素の結合 (Zip elements) {id="zip-elements"}
 
-Javaでは、2つのコレクションの同じ位置にある要素から、それらを同時に反復処理することでペアを作成できます。
+Java では、2 つのコレクションを同時に反復処理することで、同じ位置にある要素からペアを作成できます:
 
 ```java
 // Java
@@ -650,10 +663,10 @@ public void zip() {
 ```
 {id="zip-elements-java"}
 
-単に要素のペアを出力するよりも複雑なことをしたい場合は、[レコード（Records）](https://docs.oracle.com/en/java/javase/17/language/records.html)を使用できます。
-上記の例では、レコードは `record AnimalDescription(String animal, String color) {}` になります。
+要素のペアを出力するだけでなく、より複雑な処理を行いたい場合は、[レコード（Records）](https://docs.oracle.com/en/java/javase/17/language/records.html) を使用できます。
+上記の例では、レコードは `record AnimalDescription(String animal, String color) {}` のようになります。
 
-Kotlinでは、[`zip()`](collection-transformations.md#zip) 関数を使用して同じことができます。
+Kotlin では、同じことを行うために [`zip()`](collection-transformations.md#zip) 関数を使用します:
 
 ```kotlin
 fun main() {
@@ -671,13 +684,13 @@ fun main() {
 
 `zip()` は [Pair](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-pair/) オブジェクトの List を返します。
 
-> コレクションのサイズが異なる場合、`zip()` の結果は小さい方のサイズになります。大きい方のコレクションの最後の要素は結果に含まれません。
+> コレクションのサイズが異なる場合、`zip()` の結果は小さい方のサイズになります。大きい方のコレクションの末尾の要素は結果に含まれません。
 >
 {style="note"}
 
-### 要素の関連付け（Associate） {id="associate-elements"}
+### 要素の関連付け (Associate elements) {id="associate-elements"}
 
-Javaでは、[Stream API](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/stream/package-summary.html) を使用して要素を特性に関連付けることができます。
+Java では、[Stream API](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/stream/package-summary.html) を使用して要素を特性に関連付けることができます:
 
 ```java
 // Java
@@ -690,7 +703,7 @@ public void associate() {
 ```
 {id="associate-elements-java"}
 
-Kotlinでは、[`associate()`](collection-transformations.md#associate) 関数を使用します。
+Kotlin では、[`associate()`](collection-transformations.md#associate) （または `associateWith()`）関数を使用します:
 
 ```kotlin
 fun main() {
@@ -705,9 +718,9 @@ fun main() {
 
 ## 次のステップ {id="what-s-next"}
 
-* [Kotlin Koans](koans.md) にアクセスする – Kotlinの構文を学ぶための練習問題を完了してください。各練習問題は失敗するユニットテストとして作成されており、あなたの仕事はそれをパスさせることです。
-* 他の [Kotlinのイディオム](idioms.md) を調べる。
-* [JavaからKotlinへの変換ツール](mixing-java-kotlin-intellij.md#convert-java-files-to-kotlin)を使用して、既存のJavaコードをKotlinに変換する方法を学ぶ。
-* [Kotlinのコレクション](collections-overview.md)を発見する。
+* [Kotlin Koans](koans.md) を確認する – 演習を完了して Kotlin の構文を学びます。各演習は失敗する単体テストとして作成されており、それをパスさせることが目標です。
+* その他の [Kotlin のイディオム](idioms.md) を確認する。
+* [Java から Kotlin へのコンバーター](mixing-java-kotlin-intellij.md#convert-java-files-to-kotlin) を使用して、既存の Java コードを Kotlin に変換する方法を学ぶ。
+* [Kotlin のコレクション](collections-overview.md) をさらに詳しく知る。
 
-お気に入りのイディオムがあれば、プルリクエストを送って共有してください。
+お気に入りのイディオムがあれば、プルリクエストを送ってぜひ共有してください。

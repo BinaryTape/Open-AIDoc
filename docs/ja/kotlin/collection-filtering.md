@@ -1,15 +1,15 @@
 [//]: # (title: コレクションのフィルタリング)
 
 フィルタリングは、コレクション処理において最も一般的なタスクの1つです。
-Kotlinでは、フィルタリング条件は_述語（predicate）_によって定義されます。述語とは、コレクションの要素を受け取ってブール値を返すラムダ関数です。`true` は渡された要素が述語に一致することを意味し、`false` は一致しないことを意味します。
+Kotlinにおいて、フィルタリング条件は_述語（predicate）_によって定義されます。これはコレクションの要素を受け取ってブール値を返すラムダ関数です。`true` は渡された要素が述語に一致することを意味し、`false` はその逆を意味します。
 
-標準ライブラリには、1回の呼び出しでコレクションをフィルタリングできる一連の拡張関数が含まれています。
-これらの関数は元のコレクションを変更しないため、[可変（mutable）と読み取り専用（read-only）](collections-overview.md#collection-types)の両方のコレクションで使用できます。フィルタリング結果を操作するには、結果を変数に代入するか、フィルタリング後に関数をチェーンします。
+標準ライブラリには、コレクションを1回の呼び出しでフィルタリングできる一連の拡張関数が含まれています。
+これらの関数は元のコレクションを変更しないため、[読み取り専用とミュータブル（可変）](collections-overview.md#read-only-and-mutable-collections)の両方のコレクションで利用できます。フィルタリング結果を操作するには、変数に代入するか、フィルタリング後に関数をチェーン（連結）します。
 
 ## 述語によるフィルタリング {id="filter-by-predicate"}
 
 基本的なフィルタリング関数は [`filter()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/filter.html) です。
-述語を指定して呼び出すと、`filter()` はそれに一致するコレクション要素を返します。
+述語を指定して呼び出すと、`filter()` はそれに一致するコレクションの要素を返します。
 `List` と `Set` のいずれの場合も、結果のコレクションは `List` になり、`Map` の場合は結果も `Map` になります。
 
 ```kotlin
@@ -27,8 +27,8 @@ fun main() {
 ```
 {kotlin-runnable="true"}
 
-`filter()` の述語は要素の値のみをチェックできます。
-フィルター内で要素の位置（インデックス）を使用したい場合は、[`filterIndexed()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/filter-indexed.html) を使用します。
+`filter()` 内の述語は要素の値しかチェックできません。
+フィルタで要素の位置（インデックス）を使用したい場合は、[`filterIndexed()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/filter-indexed.html) を使用します。
 これはインデックスと要素の値という2つの引数を取る述語を受け取ります。
 
 否定条件でコレクションをフィルタリングするには、[`filterNot()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/filter-not.html) を使用します。
@@ -49,9 +49,9 @@ fun main() {
 ```
 {kotlin-runnable="true"}
 
-また、特定の型の要素をフィルタリングして要素の型を絞り込む関数もあります：
+特定の型の要素をフィルタリングして要素の型を絞り込む関数もあります。
 
-* [`filterIsInstance()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/filter-is-instance.html) は、指定された型のコレクション要素を返します。`List<Any>` に対して呼び出された場合、`filterIsInstance<T>()` は `List<T>` を返すため、その要素に対して `T` 型の関数を呼び出すことができます。
+* [`filterIsInstance()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/filter-is-instance.html) は、指定された型のコレクション要素を返します。`List<Any>` に対して呼び出すと、`filterIsInstance<T>()` は `List<T>` を返すため、その要素に対して `T` 型の関数を呼び出すことができます。
 
     ```kotlin
     fun main() {
@@ -66,14 +66,14 @@ fun main() {
     ```
     {kotlin-runnable="true"}
 
-* [`filterNotNull()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/filter-not-null.html) は、すべての non-nullable（null 非許容）要素を返します。`List<T?>` に対して呼び出された場合、`filterNotNull()` は `List<T: Any>` を返すため、要素を null 非許容のオブジェクトとして扱うことができます。
+* [`filterNotNull()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/filter-not-null.html) は、すべての非null（non-nullable）要素を返します。`List<T?>` に対して呼び出すと、`filterNotNull()` は `List<T: Any>` を返すため、要素を非nullオブジェクトとして扱うことができます。
 
     ```kotlin
     fun main() {
     //sampleStart
         val numbers = listOf(null, "one", "two", null)
         numbers.filterNotNull().forEach {
-            println(it.length)   // nullable な String では length は使用できない
+            println(it.length)   // null許容Stringではlengthは使用できません
         }
     //sampleEnd
     }
@@ -83,7 +83,7 @@ fun main() {
 ## パーティション {id="partition"}
 
 もう1つのフィルタリング関数である [`partition()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/partition.html) は、述語によってコレクションをフィルタリングし、一致しなかった要素を別のリストに保持します。
-そのため、戻り値として `List` の `Pair` が得られます。1つ目のリストには述語に一致した要素が含まれ、2つ目のリストには元のコレクションのそれ以外のすべての要素が含まれます。
+そのため、戻り値として `List` の `Pair` が得られます。最初のリストには述語に一致した要素が含まれ、2番目のリストには元のコレクションの残りのすべての要素が含まれます。
 
 ```kotlin
 fun main() {
@@ -100,12 +100,12 @@ fun main() {
 
 ## 述語のテスト {id="test-predicates"}
 
-最後に、コレクション要素に対して単純に述語をテスト（判定）する関数があります：
+最後に、コレクションの要素に対して述語を単にテストする関数があります。
 
-* [`any()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/any.html) は、少なくとも1つの要素が指定された述語に一致する場合に `true` を返します。
-* [`none()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/none.html) は、どの要素も指定された述語に一致しない場合に `true` を返します。
+* [`any()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/any.html) は、指定された述語に一致する要素が少なくとも1つある場合に `true` を返します。
+* [`none()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/none.html) は、指定された述語に一致する要素が1つもない場合に `true` を返します。
 * [`all()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/all.html) は、すべての要素が指定された述語に一致する場合に `true` を返します。
-    空のコレクションに対して有効な述語を指定して `all()` を呼び出すと、`true` が返されることに注意してください。このような挙動は論理学では_[空虚な真（vacuous truth）](https://en.wikipedia.org/wiki/Vacuous_truth)_として知られています。
+    空のコレクションに対して有効な述語を指定して `all()` を呼び出した場合、`true` を返すことに注意してください。このような振る舞いは論理学において_[空虚な真（vacuous truth）](https://en.wikipedia.org/wiki/Vacuous_truth)_として知られています。
 
 ```kotlin
 fun main() {
@@ -116,14 +116,14 @@ fun main() {
     println(numbers.none { it.endsWith("a") })
     println(numbers.all { it.endsWith("e") })
 
-    println(emptyList<Int>().all { it > 5 })   // 空虚な真 (vacuous truth)
+    println(emptyList<Int>().all { it > 5 })   // 空虚な真（vacuous truth）
 //sampleEnd
 }
 ```
 {kotlin-runnable="true"}
 
-`any()` と `none()` は述語なしで使用することもできます。その場合、コレクションが空であるかどうかを単にチェックします。
-`any()` は要素が存在すれば `true`、存在しなければ `false` を返します。`none()` はその逆です。
+`any()` と `none()` は述語なしで使用することもできます。この場合、単にコレクションが空かどうかをチェックします。
+`any()` は要素が存在する場合は `true`、存在しない場合は `false` を返します。`none()` はその逆を行います。
 
 ```kotlin
 fun main() {
