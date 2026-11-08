@@ -212,6 +212,10 @@
             "link": "reference/koin-android/advanced-patterns"
           },
           {
+            "text": "koin.reference.koin-android.r8-proguard",
+            "link": "reference/koin-android/r8-proguard"
+          },
+          {
             "text": "koin.reference.koin-android.best-practices",
             "link": "reference/koin-android/best-practices"
           }

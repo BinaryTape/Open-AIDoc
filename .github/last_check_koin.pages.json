@@ -27,6 +27,7 @@
   "reference/koin-android/instrumented-testing.md",
   "reference/koin-android/jsr330.md",
   "reference/koin-android/multi-module.md",
+  "reference/koin-android/r8-proguard.md",
   "reference/koin-android/scope.md",
   "reference/koin-android/start.md",
   "reference/koin-android/viewmodel.md",

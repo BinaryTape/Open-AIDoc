@@ -1,429 +1,626 @@
-<topic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:noNamespaceSchemaLocation="https://resources.jetbrains.com/writerside/1.0/topic.v2.xsd"
-       title="Kotlin RPC 入門指南" id="tutorial-first-steps-with-kotlin-rpc">
+[//]: # (title: Kotlin RPC 入門)
+
 <show-structure for="chapter" depth="2"/>
+
 <web-summary>
-    在這份完整指南中探索 RPC 的基礎知識，並深入比較 RPC 與 REST 之間的差異。了解如何使用 Kotlin RPC 建立你的第一個應用程式。
+在這份完整的指南中，發掘 RPC 的基本概念，並探索 RPC 與 REST 之間的詳細比較。學習如何使用 Kotlin RPC 建立你的第一個應用程式。
 </web-summary>
+
 <link-summary>
-    了解如何使用 Kotlin RPC 與 Ktor 建立你的第一個應用程式。
+學習如何使用 Kotlin RPC 和 Ktor 建立你的第一個應用程式。
 </link-summary>
+
 <card-summary>
-    了解如何使用 Kotlin RPC 與 Ktor 建立你的第一個應用程式。
+學習如何使用 Kotlin RPC 和 Ktor 建立你的第一個應用程式。
 </card-summary>
+
 <tldr>
-    <var name="example_name" value="tutorial-kotlin-rpc-app"/>
-    <p>
-        <b>程式碼範例</b>：
-        <a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/%example_name%">
-            %example_name%
-        </a>
-    </p>
-    <p>
-        <b>使用的外掛程式</b>：<Links href="/ktor/server-routing" summary="Routing 是伺服器應用程式中用於處理傳入請求的核心外掛程式。">Routing</Links>、
-        <a href="https://kotlinlang.org/api/kotlinx.serialization/">kotlinx.serialization</a>、
-        <a href="https://kotlin.github.io/kotlinx-rpc/get-started.html">kotlinx.rpc</a>
-    </p>
+<var name="example_name" value="tutorial-kotlin-rpc-app"/>
+<p>
+    <b>程式碼範例</b>：
+    <a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/%example_name%">
+        %example_name%
+    </a>
+</p>
+<p>
+<b>使用的外掛程式</b>：<Links href="server-routing.md" summary="Routing is a core plugin for handling incoming requests in a server application.">Routing</Links>、
+<a href="https://kotlinlang.org/api/kotlinx.serialization/">kotlinx.serialization</a>、
+<a href="https://kotlin.github.io/kotlinx-rpc/get-started.html">kotlinx.rpc</a>
+</p>
 </tldr>
-<p>
-    Kotlin RPC（遠端程序呼叫）是 Kotlin 生態系統中令人興奮的新成員，它建立在成熟穩固的基礎上，並透過 <code>kotlinx.rpc</code> 程式庫執行。
-</p>
-<p>
-    <code>kotlinx.rpc</code> 程式庫讓你可以僅使用常規的 Kotlin 語言結構，就能跨越網路邊界進行程序呼叫。因此，它提供了除 REST 和 Google RPC (gRPC) 之外的另一種選擇。
-</p>
-<p>
-    在本文中，我們將介紹 Kotlin RPC 的核心概念，並建置一個簡單的應用程式。隨後你就可以在自己的專案中評估並使用該程式庫。
-</p>
-<chapter title="先決條件" id="prerequisites">
-    <p>
-        本教學假設你已具備 Kotlin 程式設計的基礎知識。如果你剛接觸 Kotlin，建議先閱讀一些<a href="https://kotlinlang.org/docs/getting-started.html">入門資料</a>。
-    </p>
-    <p>為了獲得最佳體驗，我們建議使用 <a
-            href="https://www.jetbrains.com/idea/download">IntelliJ
-        IDEA Ultimate</a> 作為整合開發環境 (IDE)，因為它提供了全面的支援與工具，能大幅提升你的開發效率。
-    </p>
-</chapter>
-<chapter title="什麼是 RPC？" id="what-is-rpc">
-    <chapter title="本機程序呼叫 vs. 遠端程序呼叫" id="local-vs-remote">
-        <p>
-            任何有程式設計經驗的人都熟悉程序呼叫的概念。這是任何程式語言中的基本概念。從技術上講，這些都屬於本機程序呼叫，因為它們始終在同一個程式內執行。
-        </p>
-        <p>
-            遠端程序呼叫是指函式呼叫與參數透過某種方式在網路上傳輸，從而使其能在獨立的虛擬機／可執行檔中執行實作。傳回值則循相反路徑返回發起呼叫的電腦。
-        </p>
-        <p>
-            最簡單的理解方式是將發起呼叫的電腦視為用戶端，將存放實作的電腦視為伺服器。然而，情況並不一定總是如此。RPC 呼叫可以在兩個方向上進行，作為點對點架構的一部分。但為了簡化說明，我們先假設為用戶端／伺服器部署。
-        </p>
-    </chapter>
-    <chapter title="RPC 架構基礎" id="rpc-framework-fundamentals">
-        <p>
-            任何 RPC 架構都必須提供某些基礎功能。在傳統的 IT 基礎結構中實作遠端程序呼叫時，這些是不可或缺的。術語可能會有所不同，責任的劃分方式也可能不同，但每個 RPC 架構都必須提供：
-        </p>
-        <list type="decimal">
-            <li>
-                一種宣告將被遠端叫用程序的方式。在物件導向程式設計中，介面是合理的選擇。這可以是目前語言提供的介面結構，或者是某種與語言無關的標準，例如 <a
-                    href="https://webidl.spec.whatwg.org/">W3C 使用的 Web IDL</a>。
-            </li>
-            <li>
-                一種指定用於參數和傳回值之型別的方法。同樣地，你可以使用與語言無關的標準。然而，在目前語言中直接為標準資料型別宣告加上註解可能更簡單。
-            </li>
-            <li>
-                稱為<format style="italic">客戶端虛設常式 (client stubs)</format>的幫助程式類別，用於將程序叫用轉換為可透過網路傳送的格式，並解包傳回的結果值。這些虛設常式既可以在編譯過程中建立，也可以在執行階段動態產生。
-            </li>
-            <li>
-                管理這些幫助程式類別並監督遠端程序呼叫生命週期的底層<format style="italic">RPC 執行時期 (RPC Runtime)</format>。在伺服器端，該執行時期需要嵌入在某種伺服器中，以便持續處理請求。
-            </li>
-            <li>
-                需要選擇（或定義）協定來表示被呼叫的程序、序列化正在傳送的資料，並在網路上轉換資訊。過去，某些技術從頭開始定義了新協定（CORBA 中的 IIOP），而另一些技術則側重於重複使用（SOAP 中的 HTTP POST）。
-            </li>
-        </list>
-    </chapter>
-    <chapter title="編組 (Marshaling) vs. 序列化 (Serialization)" id="marshaling-vs-serialization">
-        <p>
-            在 RPC 架構中，我們常說<format style="italic">編組 (marshaling)</format>與<format style="italic">解組 (unmarshaling)</format>。這是打包與解包要透過網路傳送之資訊的過程。它可以被視為序列化的超集。在編組過程中，我們不僅序列化物件，還需要打包有關被呼叫程序以及該呼叫所在上下文的資訊。
-        </p>
-    </chapter>
-    <p>
-        介紹了 RPC 的核心概念後，讓我們透過建置一個範例應用程式，來看看它們如何在 <code>kotlinx.rpc</code> 中發揮作用。
-    </p>
-</chapter>
-<chapter title="Hello, kotlinx.rpc" id="hello-kotlinx-rpc">
-    <p>
-        讓我們建立一個透過網路訂購披薩的應用程式。為了讓程式碼盡可能保持簡潔，我們將使用基於主控台的用戶端。
-    </p>
-    <chapter title="建立專案" id="create-project">
-        <p>首先，你將建立一個同時包含用戶端與伺服器端實作的專案。</p>
-        <p>
-            在較複雜的應用程式中，最佳實務是為用戶端和伺服器端使用獨立的模組。然而，為了本教學的簡潔起見，我們將對兩者使用單一模組。
-        </p>
-        <procedure id="create-project-procedure">
-            <step>
-                啟動 <a href="https://www.jetbrains.com/idea/download/">IntelliJ IDEA</a>。
-            </step>
-            <step>
-                <p>
-                    在歡迎畫面中，點擊 <control>New Project</control>。
-                </p>
-                <p>
-                    或者，從主選單中選擇 <ui-path>File | New | Project</ui-path>。
-                </p>
-            </step>
-            <step>
-                在
-                <control>Name</control>
-                欄位中，輸入
-                <Path>KotlinRpcPizzaApp</Path>
-                作為你的專案名稱。
-                <img src="tutorial_kotlin_rpc_intellij_project.png" alt="IntelliJ New Kotlin Project window"
-                     style="block" width="706" border-effect="rounded"/>
-            </step>
-            <step>
-                保留其餘預設設定，然後點擊
-                <control>Create</control>
-                。
-            </step>
-        </procedure>
-        <p>
-            通常情況下，你會立即設定專案的建置檔案。然而，那屬於實作細節，並不會增加你對該技術的理解，因此我們將在最後回到該步驟。
-        </p>
-    </chapter>
-    <chapter title="新增共用型別" id="shared-types">
-        <p>
-            任何 RPC 專案的核心都是定義遠端呼叫程序的介面，以及定義這些程序時所使用的型別。
-        </p>
-        <p>
-            在多模組專案中，這些型別需要共用。不過在當前範例中，並不需要額外進行這個步驟。
-        </p>
-        <procedure id="shared-types-procedure">
-            <step>
-                瀏覽至
-                <Path>src/main/kotlin</Path>
-                資料夾，並建立一個名為
-                <Path>model</Path>
-                的新子套件。
-            </step>
-            <step>
-                在
-                <Path>model</Path>
-                套件內，建立一個具有以下實作的新
-                <Path>PizzaShop.kt</Path>
-                檔案：
-                <code-block lang="kotlin" code="package com.example.model&#10;&#10;import kotlinx.coroutines.flow.Flow&#10;import kotlinx.serialization.Serializable&#10;import kotlinx.rpc.annotations.Rpc&#10;&#10;@Rpc&#10;interface PizzaShop {&#10;    suspend fun orderPizza(pizza: Pizza): Receipt&#10;}&#10;&#10;@Serializable&#10;class Pizza(val name: String)&#10;&#10;@Serializable&#10;class Receipt(val amount: Double)"/>
-                <p>
-                    該介面需要具有來自 <code>kotlinx.rpc</code> 程式庫的 <code>@Rpc</code> 註解。
-                </p>
-                <p>
-                    因為你正在使用 <a href="https://github.com/Kotlin/kotlinx.serialization"><code>kotlinx.serialization</code></a>
-                    來協助在網路上傳輸資訊，所以參數中使用的型別必須標記 <code>Serializable</code> 註解。
-                </p>
-            </step>
-        </procedure>
-    </chapter>
-    <chapter title="實作用戶端" id="client-implementation">
-        <procedure id="client-impl-procedure">
-            <step>
-                瀏覽至
-                <Path>src/main/kotlin</Path>
-                並建立一個新的
-                <Path>Client.kt</Path>
-                檔案。
-            </step>
-            <step>
-                開啟
-                <Path>Client.kt</Path>
-                並新增以下實作：
-                <code-block lang="kotlin" code="package com.example&#10;&#10;import com.example.model.Pizza&#10;import com.example.model.PizzaShop&#10;import io.ktor.client.*&#10;import io.ktor.http.*&#10;import kotlinx.coroutines.runBlocking&#10;import kotlinx.rpc.withService&#10;import kotlinx.rpc.krpc.serialization.json.json&#10;import kotlinx.rpc.krpc.ktor.client.KtorRpcClient&#10;import kotlinx.rpc.krpc.ktor.client.installKrpc&#10;import kotlinx.rpc.krpc.ktor.client.rpc&#10;import kotlinx.rpc.krpc.ktor.client.rpcConfig&#10;import kotlinx.rpc.krpc.serialization.json.json&#10;&#10;fun main() = runBlocking {&#10;    val ktorClient = HttpClient {&#10;        installKrpc {&#10;            serialization { json() }&#10;        }&#10;    }&#10;&#10;    val client: KtorRpcClient = ktorClient.rpc {&#10;        url {&#10;            host = &quot;localhost&quot;&#10;            port = 8080&#10;            encodedPath = &quot;pizza&quot;&#10;        }&#10;&#10;        rpcConfig {&#10;            serialization {&#10;                json()&#10;            }&#10;        }&#10;    }&#10;&#10;    val pizzaShop: PizzaShop = client.withService&lt;PizzaShop&gt;()&#10;&#10;    val receipt = pizzaShop.orderPizza(Pizza(&quot;Pepperoni&quot;))&#10;    println(&quot;Your pizza cost ${receipt.amount}&quot;)&#10;    ktorClient.close()&#10;}"/>
-            </step>
-        </procedure>
-        <p>
-            只需 25 行程式碼即可準備並執行 RPC 呼叫。顯然這裡面包含了許多處理，讓我們將程式碼拆解分段說明。
-        </p>
-        <p>
-            <code>kotlinx.rpc</code> 程式庫使用 <Links href="/ktor/client-create-new-application" summary="建立你的第一個用於發送請求和接收回應的用戶端應用程式。">Ktor 用戶端</Links> 在用戶端裝載其執行時期。該執行時期並未與 Ktor 強綁定，也可以選擇其他方案，但這樣做能促進重複使用，並讓 <code>kotlinx.rpc</code> 能夠輕鬆整合至現有的 KMP 應用程式中。
-        </p>
-        <p>
-            Ktor 用戶端與 Kotlin RPC 都是圍繞協同程式建構的，因此你可以使用 <code>runBlocking</code> 來建立初始協同程式，並在其中執行用戶端的其餘程式碼：
-        </p>
-        <code-block lang="kotlin" code="fun main() = runBlocking {&#10;}"/>
-        <tip>
-            請注意，<code>runBlocking</code> 是為探針測試 (spike) 與測試而設計的，而非用於正式環境的生產程式碼。
-        </tip>
-        <p>
-            接下來，你以標準方式建立 Ktor 用戶端執行個體。<code>kotlinx.rpc</code> 在底層使用 <Links href="/ktor/client-websockets" summary="WebSockets 外掛程式可讓你在伺服器與用戶端之間建立多向通訊工作階段。">WebSockets</Links> 外掛程式來傳輸資訊。你只需使用 <code>installKrpc()</code> 函式確保它已被載入：
-        </p>
-        <code-block lang="kotlin" code="    val ktorClient = HttpClient {&#10;        installKrpc {&#10;            serialization { json() }&#10;        }&#10;    }"/>
-        <p>
-            建立此 Ktor 用戶端後，接著建立用於叫用遠端程序的 <code>KtorRpcClient</code> 物件。你將需要設定伺服器的位置以及用於傳輸資訊的機制：
-        </p>
-        <code-block lang="kotlin" code="    val client: KtorRpcClient = ktorClient.rpc {&#10;        url {&#10;            host = &quot;localhost&quot;&#10;            port = 8080&#10;            encodedPath = &quot;pizza&quot;&#10;        }&#10;&#10;        rpcConfig {&#10;            serialization {&#10;                json()&#10;            }&#10;        }&#10;    }"/>
-        <p>
-            至此，標準設定已完成，你已準備好使用該問題領域專屬的功能。你可以使用該用戶端建立實作 <code>PizzaShop</code> 介面方法的客戶端代理物件：
-        </p>
-        <code-block lang="kotlin"
-                    include-symbol="pizzaShop" code="package com.example&#10;&#10;import com.example.model.Pizza&#10;import com.example.model.PizzaShop&#10;import io.ktor.client.*&#10;import io.ktor.http.*&#10;import kotlinx.coroutines.runBlocking&#10;import kotlinx.rpc.withService&#10;import kotlinx.rpc.krpc.serialization.json.json&#10;import kotlinx.rpc.krpc.ktor.client.KtorRpcClient&#10;import kotlinx.rpc.krpc.ktor.client.installKrpc&#10;import kotlinx.rpc.krpc.ktor.client.rpc&#10;import kotlinx.rpc.krpc.ktor.client.rpcConfig&#10;import kotlinx.rpc.krpc.serialization.json.json&#10;&#10;fun main() = runBlocking {&#10;    val ktorClient = HttpClient {&#10;        installKrpc {&#10;            serialization { json() }&#10;        }&#10;    }&#10;&#10;    val client: KtorRpcClient = ktorClient.rpc {&#10;        url {&#10;            host = &quot;localhost&quot;&#10;            port = 8080&#10;            encodedPath = &quot;pizza&quot;&#10;        }&#10;&#10;        rpcConfig {&#10;            serialization {&#10;                json()&#10;            }&#10;        }&#10;    }&#10;&#10;    val pizzaShop: PizzaShop = client.withService&lt;PizzaShop&gt;()&#10;&#10;    /*&#10;    val receipt = pizzaShop.orderPizza(Pizza(&quot;Pepperoni&quot;))&#10;    println(&quot;Your pizza cost ${receipt.amount}&quot;)&#10;    */&#10;&#10;    pizzaShop.orderPizza(&quot;AB12&quot;, Pizza(&quot;Pepperoni&quot;))&#10;    pizzaShop.orderPizza(&quot;AB12&quot;, Pizza(&quot;Hawaiian&quot;))&#10;    pizzaShop.orderPizza(&quot;AB12&quot;, Pizza(&quot;Calzone&quot;))&#10;&#10;    pizzaShop.orderPizza(&quot;CD34&quot;, Pizza(&quot;Margherita&quot;))&#10;    pizzaShop.orderPizza(&quot;CD34&quot;, Pizza(&quot;Sicilian&quot;))&#10;    pizzaShop.orderPizza(&quot;CD34&quot;, Pizza(&quot;California&quot;))&#10;&#10;    pizzaShop.viewOrders(&quot;AB12&quot;).collect {&#10;        println(&quot;AB12 ordered ${it.name}&quot;)&#10;    }&#10;&#10;    pizzaShop.viewOrders(&quot;CD34&quot;).collect {&#10;        println(&quot;CD34 ordered ${it.name}&quot;)&#10;    }&#10;&#10;    ktorClient.close()&#10;}"/>
-        <p>
-            接著你便可以發起遠端程序呼叫並使用結果：
-        </p>
-        <code-block lang="kotlin" code="    val receipt = pizzaShop.orderPizza(Pizza(&quot;Pepperoni&quot;))&#10;    println(&quot;Your pizza cost ${receipt.amount}&quot;)"/>
-        <p>
-            請注意，此時系統已在後台為你完成了龐大的工作。呼叫的詳細資訊以及所有參數都必須轉換為訊息並透過網路傳送，然後接收並解碼傳回值。這一切能夠以透明的方式進行，就是前期設定帶來的回報。
-        </p>
-        <p>
-            最後，我們需要像平常一樣關閉用戶端：
-        </p>
-        <code-block lang="kotlin" code="    ktorClient.close()"/>
-    </chapter>
-    <chapter title="實作伺服器端" id="server-implementation">
-        <p>
-            伺服器端的實作分為兩部分。首先，你需要建立介面的實作；其次，你需要將其裝載於伺服器中。
-        </p>
-        <procedure id="create-interface">
-            <step>
-                瀏覽至
-                <Path>src/main/kotlin</Path>
-                並建立一個新的
-                <Path>Server.kt</Path>
-                檔案。
-            </step>
-            <step>
-                開啟
-                <Path>Server.kt</Path>
-                並新增以下介面實作：
-                <code-block lang="kotlin" code="package com.example&#10;&#10;import com.example.model.*&#10;import io.ktor.server.application.*&#10;import io.ktor.server.netty.*&#10;import io.ktor.server.engine.*&#10;import io.ktor.server.routing.*&#10;import kotlinx.rpc.krpc.ktor.server.Krpc&#10;import kotlinx.rpc.krpc.ktor.server.rpc&#10;import kotlinx.rpc.krpc.serialization.json.json&#10;&#10;class PizzaShopImpl : PizzaShop {&#10;    override suspend fun orderPizza(pizza: Pizza): Receipt {&#10;        return Receipt(7.89)&#10;    }&#10;}"/>
-                <p>
-                    顯然，這不是真實環境的實作，但足以讓我們的範例順利運作。
-                </p>
-                <p>
-                    實作的第二部分建置在 Ktor 之上。
-                </p>
-            </step>
-            <step>
-                <p>
-                    在同一個檔案中新增以下程式碼：
-                </p>
-                <code-block lang="kotlin" code="fun main() {&#10;    embeddedServer(Netty, port = 8080) {&#10;        module()&#10;        println(&quot;Server running&quot;)&#10;    }.start(wait = true)&#10;}&#10;&#10;fun Application.module() {&#10;    install(Krpc)&#10;&#10;    routing {&#10;        rpc(&quot;/pizza&quot;) {&#10;            rpcConfig {&#10;                serialization {&#10;                    json()&#10;                }&#10;            }&#10;&#10;            registerService&lt;PizzaShop&gt; { PizzaShopImpl() }&#10;        }&#10;    }&#10;}"/>
-                <p>以下是程式碼分析：</p>
-                <p>
-                    首先，你建立一個 Ktor/Netty 執行個體，並使用指定的擴充函式進行配置：
-                </p>
-                <code-block lang="kotlin" code="    embeddedServer(Netty, port = 8080) {&#10;        module()&#10;        println(&quot;Server running&quot;)&#10;    }.start(wait = true)"/>
-                <p>
-                    接著，你宣告一個擴充自 Ktor Application 型別的設定函式。這會安裝 <code>kotlinx.rpc</code> 外掛程式並宣告一個或多個路由：
-                </p>
-                <code-block lang="kotlin" code="fun Application.module() {&#10;    install(Krpc)&#10;&#10;    routing {&#10;    }&#10;}"/>
-                <p>
-                    在 routing 區塊內部，你使用 <code>kotlinx.rpc</code> 對 Ktor Routing DSL 的擴充來宣告一個端點。與用戶端一樣，你指定 URL 並設定序列化。但在這種情況下，我們的實作將在該 URL 監聽傳入的請求：
-                </p>
-                <code-block lang="kotlin" code="        rpc(&quot;/pizza&quot;) {&#10;            rpcConfig {&#10;                serialization {&#10;                    json()&#10;                }&#10;            }&#10;&#10;            registerService&lt;PizzaShop&gt; { PizzaShopImpl() }&#10;        }"/>
-                <p>
-                    請注意，你使用 <code>registerService</code> 向 RPC 執行時期提供介面的實作。你可能會希望有多個執行個體，但那是後續文章要探討的主題。
-                </p>
-            </step>
-        </procedure>
-    </chapter>
-    <chapter title="新增相依性" id="add-dependencies">
-        <p>
-            現在你已經具備執行應用程式所需的所有程式碼，但目前它甚至無法編譯，更不用說執行了。
-            你可以使用搭配 <a href="https://kotlin.github.io/kotlinx-rpc/get-started.html">kotlinx.rpc</a> 外掛程式的 Ktor Project Generator，也可以手動設定建置檔案。
-            這其實也不太複雜。
-        </p>
-        <procedure id="configure-build-files">
-            <step>
-                在
-                <Path>build.gradle.kts</Path>
-                檔案中，新增以下外掛程式：
-                <code-block lang="kotlin" code="plugins {&#10;    kotlin(&quot;jvm&quot;) version &quot;2.3.0&quot;&#10;    kotlin(&quot;plugin.serialization&quot;) version &quot;2.3.0&quot;&#10;    id(&quot;io.ktor.plugin&quot;) version &quot;3.6.0&quot;&#10;    id(&quot;org.jetbrains.kotlinx.rpc.plugin&quot;) version &quot;0.10.1&quot;&#10;}"/>
-                <p>
-                    使用 Kotlin 外掛程式的原因不言而喻。其他外掛程式說明如下：
-                </p>
-                <list>
-                    <li>
-                        需要 <code>kotlinx.serialization</code> 外掛程式來產生用於將 Kotlin 物件轉換為 JSON 的幫助程式型別。請記住，<code>kotlinx.serialization</code> 完全不使用反射。
-                    </li>
-                    <li>
-                        Ktor 外掛程式用於建置包含應用程式及其所有相依性的 fat JAR。
-                    </li>
-                    <li>
-                        RPC 外掛程式是用於產生用戶端虛設常式所必需的。
-                    </li>
-                </list>
-            </step>
-            <step>
-                新增以下相依性：
-                <code-block lang="kotlin" code="    implementation(&quot;io.ktor:ktor-client-cio-jvm&quot;)&#10;    implementation(&quot;org.jetbrains.kotlinx:kotlinx-rpc-krpc-client:0.10.1&quot;)&#10;    implementation(&quot;org.jetbrains.kotlinx:kotlinx-rpc-krpc-ktor-client:0.10.1&quot;)&#10;    implementation(&quot;io.ktor:ktor-server-netty-jvm&quot;)&#10;    implementation(&quot;org.jetbrains.kotlinx:kotlinx-rpc-krpc-server:0.10.1&quot;)&#10;    implementation(&quot;org.jetbrains.kotlinx:kotlinx-rpc-krpc-ktor-server:0.10.1&quot;)&#10;    implementation(&quot;org.jetbrains.kotlinx:kotlinx-rpc-krpc-serialization-json:0.10.1&quot;)&#10;    implementation(&quot;ch.qos.logback:logback-classic:1.5.33&quot;)&#10;    testImplementation(kotlin(&quot;test&quot;))&#10;}"/>
-                <p>
-                    這會新增 Ktor 用戶端與伺服器端、<code>kotlinx.rpc</code> 執行時期的用戶端和伺服器端部分，以及用於整合 <code>kotlinx.rpc</code> 和 <code>kotlinx-serialization</code> 的程式庫。
-                </p>
-                <p>
-                    完成這些之後，你現在可以執行專案並開始發起 RPC 呼叫。
-                </p>
-            </step>
-        </procedure>
-    </chapter>
-    <chapter title="執行應用程式" id="run-application">
-        <p>
-            若要執行示範，請依照下列步驟操作：
-        </p>
-        <procedure id="run-app-procedure">
-            <step>
-                瀏覽至
-                <Path>Server.kt</Path>
-                檔案。
-            </step>
-            <step>
-                <p>在 IntelliJ IDEA 中，點擊 <code>main()</code> 函式旁的執行按鈕
-                    (<img src="intellij_idea_gutter_icon.svg"
-                          style="inline" height="16" width="16"
-                          alt="intelliJ IDEA run icon"/>)
-                    來啟動應用程式。</p>
-                <p>
-                    你應該會在
-                    <control>Run</control>
-                    工具視窗中看到輸出：
-                </p>
-                <img src="tutorial_kotlin_rpc_run_server.png" alt="Run server output in intelliJ IDEA"
-                     style="block" width="706" border-effect="line"/>
-            </step>
-            <step>
-                瀏覽至
-                <Path>Client.kt</Path>
-                檔案並執行應用程式。你應該會在主控台中看到以下輸出：
-                <code-block lang="shell" code="                        Your pizza cost 7.89&#10;&#10;                        Process finished with exit code 0"/>
-            </step>
-        </procedure>
-    </chapter>
-</chapter>
-<chapter title="擴充範例" id="extend-the-example">
-    <p>
-        最後，讓我們增加範例應用程式的複雜度，為未來的開發奠定堅實的基礎。
-    </p>
-    <procedure id="extend-server">
-        <step>
-            在
-            <Path>PizzaShop.kt</Path>
-            檔案中，透過加入用戶端的 ID 來擴充 <code>orderPizza</code> 方法，並新增一個 <code>viewOrders</code> 方法以傳回指定用戶端的所有待處理訂單：
-            <code-block lang="kotlin" code="package com.example.model&#10;&#10;import kotlinx.coroutines.flow.Flow&#10;import kotlinx.serialization.Serializable&#10;import kotlinx.rpc.annotations.Rpc&#10;&#10;@Rpc&#10;interface PizzaShop {&#10;    suspend fun orderPizza(clientID: String, pizza: Pizza): Receipt&#10;    fun viewOrders(clientID: String): Flow&lt;Pizza&gt;&#10;}"/>
-            <p>
-                你可以透過傳回 <code>Flow</code> 而不是 <code>List</code> 或 <code>Set</code> 來充分利用協同程式程式庫。這將使你能夠將披薩資訊逐一串流傳輸給用戶端。
-            </p>
-        </step>
-        <step>
-            瀏覽至
-            <Path>Server.kt</Path>
-            檔案，並透過將當前訂單儲存在列表對應表 (map of lists) 中來實作此功能：
-            <code-block lang="kotlin" code="class PizzaShopImpl : PizzaShop {&#10;    private val openOrders = mutableMapOf&lt;String, MutableList&lt;Pizza&gt;&gt;()&#10;&#10;    override suspend fun orderPizza(clientID: String, pizza: Pizza): Receipt {&#10;        if(openOrders.containsKey(clientID)) {&#10;            openOrders[clientID]?.add(pizza)&#10;        } else {&#10;            openOrders[clientID] = mutableListOf(pizza)&#10;        }&#10;        return Receipt(3.45)&#10;    }&#10;&#10;    override fun viewOrders(clientID: String): Flow&lt;Pizza&gt; {&#10;        val orders = openOrders[clientID]&#10;        if (orders != null) {&#10;            return flow {&#10;                for (order in orders) {&#10;                    emit(order)&#10;                    delay(1000)&#10;                }&#10;            }&#10;        }&#10;        return flow {}&#10;    }&#10;}"/>
-            <p>
-                請注意，系統會為每個用戶端執行個體建立一個新的 <code>PizzaShopImpl</code> 執行個體。這透過隔離它們的狀態來避免用戶端之間的衝突。然而，這並不能解決單一伺服器執行個體內部的執行緒安全性問題，特別是在同一個執行個體被多個服務同時並行存取的情況下。
-            </p>
-        </step>
-        <step>
-            在
-            <Path>Client.kt</Path>
-            檔案中，使用兩個不同的客戶端 ID 提交多個訂單：
-            <code-block lang="kotlin" code="    val pizzaShop: PizzaShop = client.withService&lt;PizzaShop&gt;()&#10;&#10;    pizzaShop.orderPizza(&quot;AB12&quot;, Pizza(&quot;Pepperoni&quot;))&#10;    pizzaShop.orderPizza(&quot;AB12&quot;, Pizza(&quot;Hawaiian&quot;))&#10;    pizzaShop.orderPizza(&quot;AB12&quot;, Pizza(&quot;Calzone&quot;))&#10;&#10;    pizzaShop.orderPizza(&quot;CD34&quot;, Pizza(&quot;Margherita&quot;))&#10;    pizzaShop.orderPizza(&quot;CD34&quot;, Pizza(&quot;Sicilian&quot;))&#10;    pizzaShop.orderPizza(&quot;CD34&quot;, Pizza(&quot;California&quot;))"/>
-            <p>
-                接著你使用 <code>Coroutines</code> 程式庫和 <code>collect</code> 方法反覆運算結果：
-            </p>
-            <code-block lang="kotlin" code="    pizzaShop.viewOrders(&quot;AB12&quot;).collect {&#10;        println(&quot;AB12 ordered ${it.name}&quot;)&#10;    }&#10;&#10;    pizzaShop.viewOrders(&quot;CD34&quot;).collect {&#10;        println(&quot;CD34 ordered ${it.name}&quot;)&#10;    }"/>
-        </step>
-        <step>
-            執行伺服器和用戶端。當你執行用戶端時，你將看到結果以遞增方式顯示：
-            <img src="tutorial_kotlin_rpc_run_client.gif" alt="Client output incrementally displaying results"
-                 style="block" width="706" border-effect="line"/>
-        </step>
-    </procedure>
-    <p>
-        在建立了這個運作正常的範例後，讓我們深入了解所有元件是如何協同運作的。特別是，讓我們將 Kotlin RPC 與兩個主要的替代方案——REST 和 gRPC 進行比較與對照。
-    </p>
-</chapter>
-<chapter title="RPC vs. REST" id="rpc-vs-rest">
-    <p>
-        RPC 的概念比 REST 早得多，<a
-            href="https://en.wikipedia.org/wiki/Remote_procedure_call">至少可以追溯到 1981 年</a>。與 REST 相比，基於 RPC 的方法不會將你限制在統一介面（例如 HTTP 請求類型）內，在程式碼中使用起來更加簡單，並且得益於二進制傳訊，效能可能更高。
-    </p>
-    <p>
-        然而，REST 擁有三大優勢：
-    </p>
-    <list type="decimal">
-        <li>
-            它可以直接被瀏覽器中的 JavaScript 客戶端使用，從而可作為單頁應用程式的一部分。由於 RPC 架構依賴產生的虛設常式和二進制傳訊，因此它們不太適合 JavaScript 生態系統。
-        </li>
-        <li>
-            REST 使得某項功能何時涉及網路變得一目了然。這有助於避免 Martin Fowler 所指出的<a
-                href="https://martinfowler.com/articles/distributed-objects-microservices.html">分散式物件反模式 (distributed objects antipattern)</a>。當團隊將其物件導向設計拆分為兩個或多個部分，卻未考慮將本機程序呼叫轉為遠端呼叫時所帶來的效能與可靠性影響，就會發生這種情況。
-        </li>
-        <li>
-            REST API 建立在一系列慣例之上，這使得它們相對容易建立、編寫文件、監控、偵錯以及測試。目前有龐大的工具生態系統來為此提供支援。
-        </li>
-    </list>
-    <p>
-        這些取捨意味著 Kotlin RPC 最適合在兩種情境下使用：首先，在使用 <a
-            href="https://www.jetbrains.com/lp/compose-multiplatform/">Compose Multiplatform</a> 的 KMP 客戶端中；其次，在雲端中相互協作的微服務之間。未來在 <a
-            href="https://kotlinlang.org/docs/wasm-overview.html">Kotlin/Wasm</a> 上的發展可能會讓 <code>kotlinx.rpc</code> 更加適用於基於瀏覽器的應用程式。
-    </p>
-</chapter>
-<chapter title="Kotlin RPC vs. Google RPC" id="kotlin-rpc-vs-google-rpc">
-    <p>
-        Google RPC 是目前軟體產業中佔主導地位的 RPC 技術。它使用名為 Protocol Buffers (protobuf) 的標準，透過與語言無關的介面定義語言 (IDL) 來定義資料結構和訊息有效負載。這些 IDL 定義可以轉換為多種程式語言，並使用緊湊且高效的二進制格式進行序列化。諸如 Quarkus 和 Micronaut 之類的微框架已經具備對 gRPC 的支援。
-    </p>
-    <p>
-        Kotlin RPC 很難與 gRPC 競爭，而且這對 Kotlin 社群也沒有任何好處。值得慶幸的是，官方並沒有打算這樣做。相反地，目標是讓 kotlinx.rpc 能與 gRPC 相容並互通。未來將支援 kotlinx.rpc 服務使用 gRPC 作為其網路通訊協定，以及支援 kotlinx.rpc 用戶端呼叫 gRPC 服務。<code>kotlinx.rpc</code> 將使用<a
-            href="https://kotlin.github.io/kotlinx-rpc/transport.html">其自有的 kRPC 協定</a>作為預設選項（如我們目前的範例所示），但這不會妨礙你選擇使用 gRPC。
-    </p>
-</chapter>
-<chapter title="後續步驟" id="next-steps">
-    <p>
-        Kotlin RPC 將 Kotlin 生態系統拓展到了新的方向，為建立和取用服務提供了 REST 和 GraphQL 之外的另一種選擇。它建置在經過驗證的程式庫和架構之上，例如 Ktor、Coroutines 以及 <code>kotlinx-serialization</code>。對於尋求利用 Kotlin Multiplatform 和 Compose Multiplatform 的團隊來說，它將為分散式傳訊提供一個簡單且高效的選項。
-    </p>
-    <p>
-        如果這篇簡介激起了你的興趣，請務必查看 <a href="https://kotlin.github.io/kotlinx-rpc/get-started.html">官方 <code>kotlinx.rpc</code> 文件</a> 與 <a
-            href="https://github.com/Kotlin/kotlinx-rpc/tree/main/samples">範例</a>。
-    </p>
-    <p>
-        <code>kotlinx.rpc</code> 程式庫目前處於早期階段，因此我們鼓勵你探索並分享你的回饋。
-        錯誤與功能需求可在 <a href="https://youtrack.jetbrains.com/issues/KRPC">YouTrack</a> 上提出，一般討論則在 <a
-            href="https://kotlinlang.slack.com/archives/C072YJ3Q91V">Slack</a> 上進行（<a
-            href="https://surveys.jetbrains.com/s3/kotlin-slack-sign-up">申請加入</a>）。
-    </p>
-</chapter>
-</topic>
+
+Kotlin RPC（遠端程序呼叫）建立在成熟的基礎之上，並執行於 [`kotlinx.rpc`](https://kotlin.github.io/kotlinx-rpc/get-started.html) 程式庫。
+
+`kotlinx.rpc` 程式庫讓你能使用一般的 Kotlin 語言結構進行跨網路邊界的程序呼叫。因此，它提供了 REST 和 Google RPC (gRPC) 之外的另一種選擇。
+
+在本文中，你將學習 Kotlin RPC 的核心概念並建置一個簡單的應用程式。隨後你便可以在自己的專案中評估使用此程式庫。
+
+## 先決條件 {id="prerequisites"}
+
+本教學假設你對 Kotlin 程式設計已有基本了解。如果你剛接觸 Kotlin，建議先閱讀一些[入門資料](https://kotlinlang.org/docs/getting-started.html)。
+
+為了獲得最佳體驗，我們建議使用 [IntelliJ IDEA Ultimate](https://www.jetbrains.com/idea/download) 作為你的整合開發環境 (IDE)，因為它提供了全面的支援和工具來提升你的生產力。
+
+## 什麼是 RPC？ {id="what-is-rpc"}
+
+### 本機與遠端程序呼叫 {id="local-vs-remote"}
+
+程序呼叫是任何程式語言中的基本概念。從技術上來說，它們都是本機程序呼叫，因為它們一律在同一個程式內部進行。
+
+遠端程序呼叫是指將函式呼叫及其參數以某種方式透過網路傳輸，以便在獨立的虛擬機或可執行檔中執行實作。傳回值則循相反路徑傳回發起叫用的機器。
+
+最簡單的理解方式是將發起叫用的機器視為用戶端，將實作所在的機器視為伺服器。然而，情況不一定總是如此。RPC 呼叫可以在對等架構中雙向進行。為了讓本教學保持簡單，你可以假設採用用戶端／伺服器的部署架構。
+
+### RPC 架構基礎概念 {id="rpc-framework-fundamentals"}
+
+任何 RPC 架構都必須提供某些基礎功能。在傳統 IT 基礎結構中實作遠端程序呼叫時，這些都是不可或缺的。雖然術語可能有所不同，職責劃分的方式也各異，但每個 RPC 架構都必須提供：
+
+1. 一種宣告將在遠端叫用的程序的方法。在物件導向程式設計中，介面是順理成章的選擇。這可以是當前語言提供的介面建構，也可以是某種與語言無關的標準，例如 [W3C 使用的 Web IDL](https://webidl.spec.whatwg.org/)。
+2. 一種指定用於參數和傳回值之型別的方法。同樣地，你可以使用與語言無關的標準。不過，更簡單的方式可能是在當前語言中為標準資料型別宣告加上註解。
+3. 被稱為「用戶端虛設常式 (client stubs)」的幫助程式類別，用於將程序叫用轉換為可透過網路傳送的格式，並解包傳回的結果值。這些虛設常式可以在編譯過程中建立，也可以在執行時期動態建立。
+4. 一個底層的「RPC 執行時期 (RPC Runtime)」，用來管理幫助程式類別並監督遠端程序呼叫的生命週期。在伺服器端，該執行時期需要嵌入在某種伺服器中，以便持續處理連入的請求。
+5. 需要選擇（或定義）通訊協定，用來表示被呼叫的程序、將傳送的資料序列化，以及在網路中傳輸資訊。過去，某些技術從頭定義了全新的協定（如 CORBA 中的 IIOP），而其他技術則專注於重複利用現有協定（如 SOAP 中的 HTTP POST）。
+
+### 編組 (Marshaling) 與序列化 (Serialization) {id="marshaling-vs-serialization"}
+
+在 RPC 架構中，我們會提到「編組 (marshaling)」與「解組 (unmarshaling)」。這是將要透過網路傳送的資訊進行打包與解包的過程。它可以被視為序列化的超集。在編組中，你不僅要序列化物件，還需要封裝有關被呼叫程序以及進行該呼叫之上下文的資訊。
+
+介紹完 RPC 的核心概念後，讓我們透過建置一個範例應用程式，來看看它們如何應用在 `kotlinx.rpc` 中。
+
+## Hello, kotlinx.rpc {id="hello-kotlinx-rpc"}
+
+你現在將建立一個用於透過網路訂購披薩的應用程式。為了盡可能讓程式碼保持簡單，你將使用以主控台為基礎的用戶端。
+
+### 建立專案 {id="create-project"}
+
+首先，你將建立一個包含用戶端與伺服器端實作的專案。
+
+在較複雜的應用程式中，最佳實務是為用戶端和伺服器使用獨立的模組。然而，為了簡化本教學，我們將在單一模組中同時實作兩者。
+
+<procedure id="create-project-procedure">
+
+1. 啟動 [IntelliJ IDEA](https://www.jetbrains.com/idea/download/)。
+2. <p>
+       在歡迎畫面中，點擊 <control>New Project</control>。
+   </p>
+   <p>
+       或者，從主選單中選取 <ui-path>File | New | Project</ui-path>。
+   </p>
+3. 在 **Name** 欄位中，輸入 <Path>KotlinRpcPizzaApp</Path> 作為專案名稱。
+
+   ![IntelliJ New Kotlin Project 視窗](tutorial_kotlin_rpc_intellij_project.png){style="block" width="706" border-effect="rounded"}
+4. 保留其餘預設設定，然後點擊 **Create**。
+
+</procedure>
+
+一般情況下，你會立即設定專案建置檔。不過，這屬於實作細節，並不會增加你對這項技術的理解，因此我們留到最後再來進行該步驟。
+
+### 新增共享型別 {id="shared-types"}
+
+任何 RPC 專案的核心都是定義遠端呼叫程序的介面，以及在這些程序定義中使用的型別。
+
+在多模組專案中，這些型別需要共享。但在本範例中，並不需要額外處理這個步驟。
+
+<procedure id="shared-types-procedure">
+
+1. 導覽至 <Path>src/main/kotlin</Path> 資料夾並建立名為 <Path>model</Path> 的新子套件。
+2. 在 <Path>model</Path> 套件內，建立一個新的 <Path>PizzaShop.kt</Path> 檔案，內容如下：
+
+   ```kotlin
+   package com.example.model
+   
+   import kotlinx.coroutines.flow.Flow
+   import kotlinx.serialization.Serializable
+   import kotlinx.rpc.annotations.Rpc
+   
+   @Rpc
+   interface PizzaShop {
+       suspend fun orderPizza(pizza: Pizza): Receipt
+   }
+   
+   @Serializable
+   class Pizza(val name: String)
+   
+   @Serializable
+   class Receipt(val amount: Double)
+   ```
+
+   該介面必須包含來自 `kotlinx.rpc` 程式庫的 `@Rpc` 註解。
+
+   因為你使用的是 [`kotlinx.serialization`](https://github.com/Kotlin/kotlinx.serialization) 來協助透過網路傳輸資訊，所以參數中使用的型別必須標記 `@Serializable` 註解。
+
+</procedure>
+
+### 實作用戶端 {id="client-implementation"}
+
+<procedure id="client-impl-procedure">
+
+1. 導覽至 <Path>src/main/kotlin</Path> 並建立新的 <Path>Client.kt</Path> 檔案。
+2. 開啟 <Path>Client.kt</Path> 並新增以下實作：
+
+   ```kotlin
+   package com.example
+   
+   import com.example.model.Pizza
+   import com.example.model.PizzaShop
+   import io.ktor.client.*
+   import io.ktor.http.*
+   import kotlinx.coroutines.runBlocking
+   import kotlinx.rpc.withService
+   import kotlinx.rpc.krpc.serialization.json.json
+   import kotlinx.rpc.krpc.ktor.client.KtorRpcClient
+   import kotlinx.rpc.krpc.ktor.client.installKrpc
+   import kotlinx.rpc.krpc.ktor.client.rpc
+   import kotlinx.rpc.krpc.ktor.client.rpcConfig
+   import kotlinx.rpc.krpc.serialization.json.json
+   
+   fun main() = runBlocking {
+       val ktorClient = HttpClient {
+           installKrpc {
+               serialization { json() }
+           }
+       }
+   
+       val client: KtorRpcClient = ktorClient.rpc {
+           url {
+               host = "localhost"
+               port = 8080
+               encodedPath = "pizza"
+           }
+   
+           rpcConfig {
+               serialization {
+                   json()
+               }
+           }
+       }
+   
+       val pizzaShop: PizzaShop = client.withService<PizzaShop>()
+   
+       val receipt = pizzaShop.orderPizza(Pizza("Pepperoni"))
+       println("Your pizza cost ${receipt.amount}")
+       ktorClient.close()
+   }
+   ```
+
+</procedure>
+
+透過上述程式碼，你已準備好並執行了一次 RPC 呼叫。
+
+`kotlinx.rpc` 程式庫使用 [Ktor 用戶端](client-create-new-application.topic) 在用戶端裝載其執行時期。該執行時期並未與 Ktor 緊密耦合，也可以選擇其他方案，但這樣做有助於重複利用現有架構，並讓 `kotlinx.rpc` 能輕鬆整合到現有的 Kotlin Multiplatform 應用程式中。
+
+Ktor 用戶端與 Kotlin RPC 都是圍繞協同程式 (coroutines) 建構的，因此你使用 `runBlocking {}` 區塊來建立初始協同程式，並在其中執行用戶端的其餘程式碼：
+
+```kotlin
+fun main() = runBlocking {
+}
+```
+
+> 請注意，`runBlocking {}` 是專為探索實驗 (spikes) 與測試設計的，不建議用於正式生產環境程式碼。
+>
+{style="tip"}
+
+接著，你以標準方式建立 Ktor 用戶端的執行個體。`kotlinx.rpc` 使用 [WebSockets](client-websockets.topic) 外掛程式來傳輸資訊。你可以使用 `installKrpc()` 函式來確保該外掛程式已載入：
+
+```kotlin
+val ktorClient = HttpClient {
+    installKrpc {
+        serialization { json() }
+    }
+}
+```
+
+建立 Ktor 用戶端後，接著建立用於叫用遠端程序的 `KtorRpcClient` 物件。你需要設定伺服器的位置以及用於傳輸資訊的機制：
+
+```kotlin
+    val client: KtorRpcClient = ktorClient.rpc {
+        url {
+            host = "localhost"
+            port = 8080
+            encodedPath = "pizza"
+        }
+
+        rpcConfig {
+            serialization {
+                json()
+            }
+        }
+    }
+```
+
+至此，標準設定已完成，你隨時可以使用特定於問題領域的功能。你可以使用該用戶端建立實作 `PizzaShop` 介面方法的用戶端代理物件：
+
+```kotlin
+package com.example
+
+import com.example.model.Pizza
+import com.example.model.PizzaShop
+import io.ktor.client.*
+import io.ktor.http.*
+import kotlinx.coroutines.runBlocking
+import kotlinx.rpc.withService
+import kotlinx.rpc.krpc.serialization.json.json
+import kotlinx.rpc.krpc.ktor.client.KtorRpcClient
+import kotlinx.rpc.krpc.ktor.client.installKrpc
+import kotlinx.rpc.krpc.ktor.client.rpc
+import kotlinx.rpc.krpc.ktor.client.rpcConfig
+import kotlinx.rpc.krpc.serialization.json.json
+
+fun main() = runBlocking {
+    val ktorClient = HttpClient {
+        installKrpc {
+            serialization { json() }
+        }
+    }
+
+    val client: KtorRpcClient = ktorClient.rpc {
+        url {
+            host = "localhost"
+            port = 8080
+            encodedPath = "pizza"
+        }
+
+        rpcConfig {
+            serialization {
+                json()
+            }
+        }
+    }
+
+    val pizzaShop: PizzaShop = client.withService<PizzaShop>()
+
+    /*
+    val receipt = pizzaShop.orderPizza(Pizza("Pepperoni"))
+    println("Your pizza cost ${receipt.amount}")
+    */
+
+    pizzaShop.orderPizza("AB12", Pizza("Pepperoni"))
+    pizzaShop.orderPizza("AB12", Pizza("Hawaiian"))
+    pizzaShop.orderPizza("AB12", Pizza("Calzone"))
+
+    pizzaShop.orderPizza("CD34", Pizza("Margherita"))
+    pizzaShop.orderPizza("CD34", Pizza("Sicilian"))
+    pizzaShop.orderPizza("CD34", Pizza("California"))
+
+    pizzaShop.viewOrders("AB12").collect {
+        println("AB12 ordered ${it.name}")
+    }
+
+    pizzaShop.viewOrders("CD34").collect {
+        println("CD34 ordered ${it.name}")
+    }
+
+    ktorClient.close()
+}
+
+```
+
+接著你便可以發起遠端程序呼叫並使用傳回的結果：
+
+```kotlin
+val receipt = pizzaShop.orderPizza(Pizza("Pepperoni"))
+println("Your pizza cost ${receipt.amount}")
+```
+
+在此步驟中，底層執行了大量工作。呼叫的詳細資訊和所有參數都會被轉換為訊息，透過網路傳送，然後接收並解碼傳回值。
+
+最後，關閉用戶端：
+
+```kotlin
+ktorClient.close()
+```
+
+### 實作伺服器端 {id="server-implementation"}
+
+伺服器端的實作分為兩個部分。首先，建立介面的實作，然後將其裝載於伺服器中。
+
+<procedure id="create-interface">
+
+1. 導覽至 <Path>src/main/kotlin</Path> 並建立新的 <Path>Server.kt</Path> 檔案。
+2. 開啟 <Path>Server.kt</Path> 並新增以下介面實作：
+
+   ```kotlin
+   package com.example
+   
+   import com.example.model.*
+   import io.ktor.server.application.*
+   
+   class PizzaShopImpl : PizzaShop {
+       override suspend fun orderPizza(pizza: Pizza): Receipt {
+           return Receipt(7.89)
+       }
+   }
+   ```
+
+   雖然這不是一個功能完備的實作，但已足夠讓我們的示範程式順利運作。
+
+   第二部分的實作則建立在 Ktor 之上。
+3. 將以下程式碼新增至同一個檔案中：
+
+   ```kotlin
+   fun main() {
+       embeddedServer(Netty, port = 8080) {
+           module()
+           println("Server running")
+       }.start(wait = true)
+   }
+   
+   fun Application.module() {
+       install(Krpc)
+   
+       routing {
+           rpc("/pizza") {
+               rpcConfig {
+                   serialization {
+                       json()
+                   }
+               }
+   
+               registerService<PizzaShop> { PizzaShopImpl() }
+           }
+       }
+   }
+   ```
+
+   各部分細節如下：
+
+   首先，使用 Netty 建立 Ktor 伺服器的執行個體，並使用指定的擴充函式進行設定：
+
+   ```kotlin
+   embeddedServer(Netty, port = 8080) {
+       module()
+       println("Server running")
+   }.start(wait = true)
+   ```
+
+   然後，宣告一個擴充 Ktor `Application` 型別的設定函式。這會安裝 `kotlinx.rpc` 外掛程式並宣告一或多個路由：
+
+   ```kotlin
+   fun Application.module() {
+       install(Krpc)
+   
+       routing {
+       }
+   }
+   ```
+
+   在路由區段內，你使用 `kotlinx.rpc` 對 Ktor Routing DSL 的擴充功能來宣告端點。就像在用戶端上一樣，你需要指定 URL 並設定序列化。但在這裡，我們的實作將在該 URL 監聽傳入的請求：
+
+   ```kotlin
+           rpc("/pizza") {
+               rpcConfig {
+                   serialization {
+                       json()
+                   }
+               }
+   
+               registerService<PizzaShop> { PizzaShopImpl() }
+           }
+   ```
+
+   你使用 `registerService {}` 將介面的實作提供給 RPC 執行時期。
+
+</procedure>
+
+### 新增相依性 {id="add-dependencies"}
+
+現在你已經具備執行應用程式所需的所有程式碼，但此時它甚至還無法編譯。
+
+雖然你可以使用帶有 [`kotlinx.rpc`](https://kotlin.github.io/kotlinx-rpc/get-started.html) 外掛程式的 Ktor Project Generator，但也可以手動設定建置檔：
+
+<procedure id="configure-build-files">
+
+1. 開啟或建立 <Path>gradle/libs.versions.toml</Path> 檔案，並定義 Kotlin、`kotlinx.rpc` 和 Logback 的版本，以及程式庫與外掛程式別名：
+
+   ```toml
+   [versions]
+   kotlin = "2.4.20"
+   kotlinx-rpc = "0.10.4"
+   logback = "1.6.3"
+   
+   [libraries]
+   kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+   kotlinx-rpc-krpc-client = { module = "org.jetbrains.kotlinx:kotlinx-rpc-krpc-client", version.ref = "kotlinx-rpc" }
+   kotlinx-rpc-krpc-ktor-client = { module = "org.jetbrains.kotlinx:kotlinx-rpc-krpc-ktor-client", version.ref = "kotlinx-rpc" }
+   kotlinx-rpc-krpc-ktor-server = { module = "org.jetbrains.kotlinx:kotlinx-rpc-krpc-ktor-server", version.ref = "kotlinx-rpc" }
+   kotlinx-rpc-krpc-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-rpc-krpc-serialization-json", version.ref = "kotlinx-rpc" }
+   kotlinx-rpc-krpc-server = { module = "org.jetbrains.kotlinx:kotlinx-rpc-krpc-server", version.ref = "kotlinx-rpc" }
+   logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
+   
+   [plugins]
+   kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+   kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+   kotlinx-rpc = { id = "org.jetbrains.kotlinx.rpc.plugin", version.ref = "kotlinx-rpc" }
+   
+   ```
+
+   Gradle 會自動在建置檔中透過 `libs` 提供這些別名。
+2. 開啟 <Path>settings.gradle.kts</Path> 檔案並匯入 Ktor 版本目錄 (version catalog)：
+
+   ```kotlin
+   dependencyResolutionManagement {
+       repositories {
+           mavenCentral()
+       }
+       versionCatalogs {
+           create("ktorLibs").from("io.ktor:ktor-version-catalog:3.6.1")
+       }
+   }
+   ```
+
+   此目錄會透過 `ktorLibs` 提供 Ktor 外掛程式和相依性別名。目錄座標中的版本決定了這些別名所使用的 Ktor 版本。
+3. 在 <Path>build.gradle.kts</Path> 檔案中，新增下列外掛程式：
+
+   ```kotlin
+   plugins {
+       alias(libs.plugins.kotlin.jvm)
+       alias(libs.plugins.kotlin.serialization)
+       alias(ktorLibs.plugins.ktor)
+       alias(libs.plugins.kotlinx.rpc)
+   }
+   ```
+
+   * 需要 `kotlinx.serialization` 外掛程式來產生將 Kotlin 物件轉換為 JSON 的幫助程式型別。請記住，`kotlinx.serialization` 完全不使用反射。
+   * Ktor 外掛程式用於建置將應用程式及其所有相依性打包在一起的 fat JAR。
+   * 需要 RPC 外掛程式來產生用戶端虛設常式。
+4. 新增下列相依性：
+
+   ```kotlin
+   dependencies {
+       implementation(ktorLibs.client.cio)
+       implementation(libs.kotlinx.rpc.krpc.client)
+       implementation(libs.kotlinx.rpc.krpc.ktor.client)
+       implementation(ktorLibs.server.netty)
+       implementation(libs.kotlinx.rpc.krpc.server)
+       implementation(libs.kotlinx.rpc.krpc.ktor.server)
+       implementation(libs.kotlinx.rpc.krpc.serialization.json)
+       implementation(libs.logback.classic)
+       testImplementation(libs.kotlin.test)
+   }
+   ```
+
+   這會新增 Ktor 用戶端與伺服器端、`kotlinx.rpc` 執行時期的用戶端與伺服器端元件，以及用於整合 `kotlinx.rpc` 與 `kotlinx-serialization` 的程式庫。
+
+   完成這些後，你現在就可以執行專案並開始進行 RPC 呼叫了。
+
+</procedure>
+
+### 執行應用程式 {id="run-application"}
+
+若要執行應用程式，請遵循以下步驟：
+
+<procedure id="run-app-procedure">
+
+1. 導覽至 <Path>Server.kt</Path> 檔案。
+2. 在 IntelliJ IDEA 中，點擊 `main()` 函式旁邊的執行按鈕
+   (![IntelliJ IDEA 執行圖示](intellij_idea_gutter_icon.svg){style="inline" height="16" width="16"})
+   以啟動應用程式。
+
+   你應該會在 **Run** 工具面板中看到輸出：
+
+   ![IntelliJ IDEA 中的執行伺服器輸出](tutorial_kotlin_rpc_run_server.png){style="block" width="706" border-effect="line"}
+3. 導覽至 <Path>Client.kt</Path> 檔案並執行應用程式。你應該會在主控台中看到以下輸出：
+
+   ```shell
+   Your pizza cost 7.89
+
+   Process finished with exit code 0
+   ```
+
+</procedure>
+
+## 擴充範例 {id="extend-the-example"}
+
+最後，你可以增加範例應用程式的複雜度，為未來的開發奠定堅實的基礎。
+
+<procedure id="extend-server">
+
+1. 在 <Path>PizzaShop.kt</Path> 檔案中，擴充 `orderPizza` 方法以納入用戶端 ID，並新增一個傳回指定用戶端所有待處理訂單的 `viewOrders()` 方法：
+
+   ```kotlin
+   package com.example.model
+   
+   import kotlinx.coroutines.flow.Flow
+   import kotlinx.serialization.Serializable
+   import kotlinx.rpc.annotations.Rpc
+   
+   @Rpc
+   interface PizzaShop {
+       suspend fun orderPizza(clientID: String, pizza: Pizza): Receipt
+       fun viewOrders(clientID: String): Flow<Pizza>
+   }
+   ```
+
+   你可以傳回 `Flow` 而不是 `List` 或 `Set`，藉此利用協同程式程式庫的優勢。這將允許你一次一份披薩訂單將資訊串流傳輸到用戶端。
+2. 導覽至 <Path>Server.kt</Path> 檔案，並透過將目前的訂單儲存在列表的映射（map of lists）中來實作此功能：
+
+   ```kotlin
+   class PizzaShopImpl : PizzaShop {
+       private val openOrders = mutableMapOf<String, MutableList<Pizza>>()
+   
+       override suspend fun orderPizza(clientID: String, pizza: Pizza): Receipt {
+           if(openOrders.containsKey(clientID)) {
+               openOrders[clientID]?.add(pizza)
+           } else {
+               openOrders[clientID] = mutableListOf(pizza)
+           }
+           return Receipt(3.45)
+       }
+   
+       override fun viewOrders(clientID: String): Flow<Pizza> {
+           val orders = openOrders[clientID]
+           if (orders != null) {
+               return flow {
+                   for (order in orders) {
+                       emit(order)
+                       delay(1000)
+                   }
+               }
+           }
+           return flow {}
+       }
+   }
+   ```
+
+   伺服器會為每個連線的用戶端建立一個新的 `PizzaShopImpl` 執行個體。這能藉由隔離個別用戶端的狀態來避免衝突。
+   > 此實作並非執行緒安全 (thread-safe)。如果同一個 `PizzaShopImpl` 執行個體接收到並行呼叫，它們可能會同時修改 `openOrders` 並造成資料損毀。在正式生產環境程式碼中，請使用執行緒安全的結構。
+   > 
+   {style="warning"}
+3. 在 <Path>Client.kt</Path> 檔案中，使用兩個不同的用戶端 ID 提交多筆訂單：
+
+   ```kotlin
+       val pizzaShop: PizzaShop = client.withService<PizzaShop>()
+   
+       pizzaShop.orderPizza("AB12", Pizza("Pepperoni"))
+       pizzaShop.orderPizza("AB12", Pizza("Hawaiian"))
+       pizzaShop.orderPizza("AB12", Pizza("Calzone"))
+   
+       pizzaShop.orderPizza("CD34", Pizza("Margherita"))
+       pizzaShop.orderPizza("CD34", Pizza("Sicilian"))
+       pizzaShop.orderPizza("CD34", Pizza("California"))
+   ```
+
+   然後使用 `Coroutines` 程式庫和 `collect` 方法對結果進行反覆運算：
+
+   ```kotlin
+       pizzaShop.viewOrders("AB12").collect {
+           println("AB12 ordered ${it.name}")
+       }
+   
+       pizzaShop.viewOrders("CD34").collect {
+           println("CD34 ordered ${it.name}")
+       }
+   ```
+4. 執行伺服器和用戶端。當你執行用戶端時，將會看到結果以遞增方式顯示：
+
+   ![用戶端輸出以遞增方式顯示結果](tutorial_kotlin_rpc_run_client.gif){style="block" width="706" border-effect="line"}
+
+</procedure>
+
+建立好可運作的範例後，現在讓我們深入探討背後的運作機制。特別是，讓我們比較並對照 Kotlin RPC 與兩大主流替代方案——REST 和 gRPC。
+
+## RPC vs. REST {id="rpc-vs-rest"}
+
+RPC 的概念比 REST 早得多，[至少可以追溯至 1981 年](https://en.wikipedia.org/wiki/Remote_procedure_call)。與 REST 相比，採用 RPC 的方法不受限於統一介面（例如 HTTP 請求類型），在程式碼中使用起來簡單得多，且得益於二進位傳訊，效能也可能更佳。
+
+然而，REST 具備三大優勢：
+
+1. 它可以直接供瀏覽器中的 JavaScript 用戶端使用，進而作為單頁應用程式 (SPA) 的一部分。由於 RPC 架構仰賴產生的虛設常式和二進位傳訊，因此不太容易與 JavaScript 生態系統良好契合。
+2. REST 能讓人一眼看出某項功能涉及網路傳輸。這有助於避免 Martin Fowler 所指出的[分散式物件反模式 (distributed objects antipattern)](https://martinfowler.com/articles/distributed-objects-microservices.html)。當團隊將其物件導向設計拆分為兩個或多個部分，卻沒有考量將本機程序呼叫轉變為遠端呼叫對效能與可靠性造成的影響時，就會發生這種情況。
+3. REST API 建構於一系列慣例之上，這讓它們相對容易建立、編寫文件、監控、偵錯與測試。並且有龐大的工具生態系統來提供支援。
+
+這些權衡取捨意味著 Kotlin RPC 最適合在兩種情境下使用：第一，在採用 [Compose Multiplatform](https://www.jetbrains.com/lp/compose-multiplatform/) 的 KMP 用戶端中；第二，在雲端中協作的微服務之間。未來 [Kotlin/Wasm](https://kotlinlang.org/docs/wasm-overview.html) 的發展可能會讓 `kotlinx.rpc` 更適合應用於瀏覽器架構的應用程式。
+
+## Kotlin RPC vs. Google RPC {id="kotlin-rpc-vs-google-rpc"}
+
+Google RPC 是目前軟體產業中佔主導地位的 RPC 技術。它使用名為 Protocol Buffers (protobuf) 的標準，透過與語言無關的介面定義語言 (IDL) 來定義資料結構與訊息酬載。這些 IDL 定義可以轉換成各種程式語言，並使用緊湊且高效的二進位格式進行序列化。Quarkus 和 Micronaut 等微服務架構已經支援 gRPC。
+
+對 Kotlin RPC 來說，與 gRPC 競爭是困難的，且這對 Kotlin 社群也沒有任何好處。慶幸的是，團隊並無此打算。相反地，其目標是讓 kotlinx.rpc 與 gRPC 相容並具備互通性。未來 kotlinx.rpc 服務將可以使用 gRPC 作為其網路通訊協定，而 kotlinx.rpc 用戶端也可以呼叫 gRPC 服務。`kotlinx.rpc` 將使用[其自有的 kRPC 協定](https://kotlin.github.io/kotlinx-rpc/transport.html)作為預設選項（就像我們目前的範例一樣），但沒有任何限制妨礙你選擇改用 gRPC。
+
+## 後續步驟 {id="next-steps"}
+
+Kotlin RPC 將 Kotlin 生態系統擴展到一個新的方向，為建立與取用服務提供了 REST 和 GraphQL 之外的替代選擇。它建立在成熟的程式庫與架構之上，例如 Ktor、Coroutines 以及 `kotlinx-serialization`。對於尋求利用 Kotlin Multiplatform 和 Compose Multiplatform 的團隊來說，它將為分散式傳訊提供簡單且高效的選擇。
+
+如果本篇介紹引起了你的興趣，請務必參閱[官方 `kotlinx.rpc` 文件](https://kotlin.github.io/kotlinx-rpc/get-started.html)與[範例](https://github.com/Kotlin/kotlinx-rpc/tree/main/samples)。
+
+`kotlinx.rpc` 程式庫仍處於早期階段，因此我們鼓勵你探索並分享你的回饋。問題回報與功能請求可以在 [YouTrack](https://youtrack.jetbrains.com/issues/KRPC) 上找到，而一般的討論則在 [Slack](https://kotlinlang.slack.com/archives/C072YJ3Q91V) 上進行（[申請加入權限](https://surveys.jetbrains.com/s3/kotlin-slack-sign-up)）。

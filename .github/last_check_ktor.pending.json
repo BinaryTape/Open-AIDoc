@@ -1,13 +1,4 @@
 {
-  "topics/client-create-multiplatform-application.md": {
-    "langs": [
-      "ja",
-      "ko",
-      "zh-Hans",
-      "zh-Hant"
-    ],
-    "reason": "does not build: Vue: Duplicate attribute."
-  },
   "topics/server-integrate-database.md": {
     "langs": [
       "ja",
@@ -15,15 +6,6 @@
       "zh-Hans",
       "zh-Hant"
     ],
-    "reason": "does not build: Vue: Element is missing end tag.; Vue: Invalid end tag.; Vue: Invalid end tag. (+4 more)"
-  },
-  "topics/tutorial-first-steps-with-kotlin-rpc.md": {
-    "langs": [
-      "ja",
-      "ko",
-      "zh-Hans",
-      "zh-Hant"
-    ],
-    "reason": "does not build: Vue: Element is missing end tag.; Vue: Invalid end tag."
+    "reason": "does not build: Vue: Invalid end tag.; Vue: Invalid end tag.; Vue: Invalid end tag."
   }
 }

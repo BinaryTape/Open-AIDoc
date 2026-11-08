@@ -4,9 +4,9 @@ title: Navigation 3
 
 # Navigation 3
 
-本頁介紹如何在 Koin 模組中宣告 [Navigation 3](https://developer.android.com/guide/navigation/navigation-3) 項目（entries）並將它們傳遞給 `NavDisplay`。每個功能模組都會提供自己的畫面，而應用程式則透過單一 entry provider 收集所有畫面。本頁假設你已了解 Navigation 3 的基礎知識（back stack、`NavDisplay`、`NavEntry`）以及 [ViewModel in Compose](/docs/reference/koin-compose/compose-viewmodel)。
+本頁面介紹如何在 Koin 模組中宣告 [Navigation 3](https://developer.android.com/guide/navigation/navigation-3) 項目 (entries) 並將它們傳遞給 `NavDisplay`。每個功能模組各自提供自己的畫面，而應用程式則透過單一 entry provider 收集所有畫面。本頁假設您已了解 Navigation 3 的基本概念（返回堆疊 (back stack)、`NavDisplay`、`NavEntry`）以及 [Compose 中的 ViewModel](/docs/reference/koin-compose/compose-viewmodel)。
 
-本頁中的所有 API 均標註為 `@KoinExperimentalAPI`。
+本頁面中的所有 API 均標記為 `@KoinExperimentalAPI`。
 
 ## 設定 {id="setup"}
 
@@ -22,18 +22,18 @@ commonMain.dependencies {
 }
 ```
 
-`koin-compose-navigation3` 支援 Android、iOS、JVM 桌面端、JS 與 Wasm。
+`koin-compose-navigation3` 支援 Android、iOS、JVM 桌面版、JS 與 Wasm。
 
-## 宣告項目 {id="declaring-entries"}
+## 宣告項目 (entries) {id="declaring-entries"}
 
-路由（Routes）為 `@Serializable` 類別：
+Route 為標有 `@Serializable` 的類別：
 
 ```kotlin
 @Serializable data object HomeRoute
 @Serializable data class DetailRoute(val itemId: String)
 ```
 
-在模組中為每個路由宣告一個 `navigation<T> { }`。該 Lambda 運算式是一個接收該路由的 Composable：
+在您的模組中為每個 route 宣告一個 `navigation<T> { }`。該 Lambda 是一個接收該 route 的 Composable：
 
 ```kotlin
 import org.koin.dsl.navigation3.navigation
@@ -55,11 +55,11 @@ val detailModule = module {
 }
 ```
 
-每個 `navigation<T>` 都會儲存為由路由型別限定的定義。該 Lambda 運算式以 Koin `Scope` 作為接收器執行，因此你可以在其中呼叫 `get<T>()`，以及呼叫如 `koinViewModel()` 等 Composable 函式。
+每個 `navigation<T>` 都儲存為由 route 型別限定的定義。此 Lambda 以 Koin `Scope` 作為接收者 (receiver) 執行，因此您可以在其中呼叫 `get<T>()` 以及 Composable 函式（例如 `koinViewModel()`）。
 
 ## 建置 entry provider {id="building-the-entry-provider"}
 
-`koinEntryProvider()` 會將目前作用域中的每個 `navigation<T>` 項目收集到單一提供者中，以供 `NavDisplay` 使用：
+`koinEntryProvider()` 會將目前作用域中的每個 `navigation<T>` 項目收集至單一 provider 中供 `NavDisplay` 使用：
 
 ```kotlin
 import org.koin.compose.navigation3.koinEntryProvider
@@ -76,22 +76,22 @@ fun App() {
 }
 ```
 
-搭配 `rememberNavBackStack()` 使用時，你的路由需實作 `NavKey`。請使用 `koinEntryProvider<NavKey>()` 來符合 back stack 的型別。
+`koinEntryProvider<T>()` 接收您返回堆疊 (back stack) 的 route 型別：配合 `rememberNavBackStack()` 使用 `NavKey`，或當 `NavDisplay` 具有明確型別時使用您自訂的 route 型別（具型別的 `SceneStrategy`，例如 `rememberSupportingPaneSceneStrategy<Route>()`，會使其成為 `NavDisplay<Route>`）。若保留為 `Any`，組建將會失敗並顯示：`Argument type mismatch: actual type is 'Function1<Any, NavEntry<Any>>', but 'Function1<Route, NavEntry<Route>>' was expected.`。
 
-### 從 Android Activity 取得 {id="from-an-android-activity"}
+### 從 Android Activity 中使用 {id="from-an-android-activity"}
 
-在 Android 上，`ComponentCallbacks` 上的兩個擴充函式可從 Activity 或 Fragment 作用域建置提供者：
+在 Android 上，`ComponentCallbacks` 上的兩個擴充函式可從 Activity 或 Fragment 作用域建置 provider：
 
 | 函式 | 行為 |
 |----------|----------|
-| `entryProvider<T>()` | Lazy 委派：`val provider by entryProvider<Any>()` |
-| `getEntryProvider<T>()` | 立即建置提供者 |
+| `entryProvider<T>()` | 延遲委派 (lazy delegate)：`val provider by entryProvider<Any>()` |
+| `getEntryProvider<T>()` | 立即建置 provider |
 
-它們會從該組件的 Koin 作用域進行解析：若實作了 `AndroidScopeComponent` 則為 Activity 作用域，否則為根作用域。
+它們會從該元件的 Koin 作用域進行解析：若實作了 `AndroidScopeComponent` 則為 Activity 作用域，否則為根 (root) 作用域。
 
-## 作用域中的項目 {id="entries-in-a-scope"}
+## 作用域中的項目 (entries) {id="entries-in-a-scope"}
 
-當畫面需要與特定作用域生命週期相同的物件時，請在該作用域內宣告項目。使用 `activityRetainedScope`，它們能在配置變更中存活：
+當畫面需要與特定作用域生命週期相同的物件時，請在該作用域內宣告項目。使用 `activityRetainedScope`，它們能在組態變更 (configuration changes) 後保留下來：
 
 ```kotlin
 class Navigator(start: Any) {
@@ -132,11 +132,11 @@ class MainActivity : ComponentActivity(), AndroidScopeComponent {
 }
 ```
 
-`getEntryProvider()` 會從 Activity 作用域讀取項目。在某個作用域中宣告的項目僅在該作用域內可見。`activityRetainedScope` 的詳細說明請參閱 [Android 作用域](/docs/reference/koin-android/scope)。
+`getEntryProvider()` 會從 Activity 作用域讀取項目。在某個作用域內宣告的項目僅對該作用域可見。`activityRetainedScope` 的詳細說明請參閱 [Android 作用域](/docs/reference/koin-android/scope)。
 
-## 項目的 ViewModel {id="viewmodels-for-an-entry"}
+## 針對項目的 ViewModel {id="viewmodels-for-an-entry"}
 
-若要將 ViewModel 的作用域限定在其項目內，請在 `NavDisplay` 中加入 ViewModel store 裝飾器。若沒有它，`koinViewModel()` 將會使用 Activity 的 store，且相同路由的每個項目將共享同一個執行個體：
+若要將 ViewModel 的作用域限定於其對應的項目，請將 ViewModel store 裝飾器新增至 `NavDisplay`。若未新增，`koinViewModel()` 將會使用 Activity 的 store，且相同 route 的每個項目都會共用同一個執行個體：
 
 ```kotlin
 NavDisplay(
@@ -150,7 +150,7 @@ NavDisplay(
 )
 ```
 
-將路由或其欄位作為參數傳遞：
+將 route 或其欄位作為參數傳遞：
 
 **編譯器外掛程式 DSL**
 ```kotlin
@@ -168,7 +168,7 @@ val detailModule = module {
 }
 ```
 
-**註解**
+**註解 (Annotations)**
 ```kotlin
 @KoinViewModel
 class DetailViewModel(
@@ -176,7 +176,7 @@ class DetailViewModel(
     private val repository: ItemRepository
 ) : ViewModel()
 
-// navigation<T> 項目宣告於 DSL 模組中
+// navigation<T> 項目是在 DSL 模組中宣告的
 val detailModule = module {
     navigation<DetailRoute> { route ->
         DetailScreen(viewModel = koinViewModel { parametersOf(route) })
@@ -200,9 +200,9 @@ val detailModule = module {
 }
 ```
 
-## 項目元資料 {id="entry-metadata"}
+## 項目中繼資料 (Entry metadata) {id="entry-metadata"}
 
-`navigation<T>` 接受一個傳遞給 `NavEntry` 的 `metadata` Map。可用於個別項目的轉場效果或場景策略（例如清單-詳細資訊）：
+`navigation<T>` 接收一個會傳遞給 `NavEntry` 的 `metadata` map。可用於個別項目的轉場動畫或場景策略 (scene strategies)，例如清單-詳細資訊 (list-detail)：
 
 ```kotlin
 val conversationModule = module {
@@ -224,16 +224,16 @@ val conversationModule = module {
 }
 ```
 
-接著將場景策略傳遞給 `NavDisplay`（`sceneStrategy = rememberListDetailSceneStrategy()`）。元資料的鍵值來自 Navigation 3 與 adaptive 程式庫，而非來自 Koin。
+接著將場景策略傳遞給 `NavDisplay`（`sceneStrategy = rememberListDetailSceneStrategy()`）。中繼資料的鍵值來自 Navigation 3 與 adaptive 程式庫，而非來自 Koin。
 
 ## 從 Navigation 2 遷移 {id="from-navigation-2"}
 
 | Navigation 2 | 搭配 Koin 的 Navigation 3 |
 |--------------|------------------------|
-| `NavHost { composable(...) }` 中的字串或具型別路由 | `@Serializable` 路由類別 |
+| `NavHost { composable(...) }` 中的字串或具型別 route | 標有 `@Serializable` 的 route 類別 |
 | `NavHost` 中的 `composable<Route> { ... }` | Koin 模組中的 `navigation<Route> { ... }` |
 | `NavHost(navController, startDestination)` | `NavDisplay(backStack, entryProvider = koinEntryProvider())` |
-| 從 `SavedStateHandle` 讀取引數 | 傳遞給 Lambda 運算式的路由物件 |
+| 從 `SavedStateHandle` 讀取引數 | 傳遞給 Lambda 的 Route 物件 |
 
 ## API 摘要 {id="api-summary"}
 
@@ -242,12 +242,12 @@ val conversationModule = module {
 | `Module.navigation<T>(metadata) { }` | `org.koin.dsl.navigation3` | 在模組中宣告項目 |
 | `ScopeDSL.navigation<T>(metadata) { }` | `org.koin.dsl.navigation3` | 在作用域中宣告項目 |
 | `koinEntryProvider<T>(scope)` | `org.koin.compose.navigation3` | 來自目前 Compose 作用域的 entry provider |
-| `entryProvider<T>()`、`getEntryProvider<T>()` | `org.koin.androidx.compose.navigation3` | 來自 Activity 或 Fragment 的 entry provider（Android） |
+| `entryProvider<T>()`、`getEntryProvider<T>()` | `org.koin.androidx.compose.navigation3` | 來自 Activity 或 Fragment 的 entry provider (Android) |
 
-## 相關資源 {id="related"}
+## 相關主題 {id="related"}
 
 - [Compose 中的 ViewModel](/docs/reference/koin-compose/compose-viewmodel)：`koinViewModel()` 及其擁有者。
 - [Android 作用域](/docs/reference/koin-android/scope)：`activityRetainedScope` 與 Activity 作用域。
 - [注入參數](/docs/reference/koin-core/injection-parameters)：`parametersOf` 與 `@InjectedParam`。
 - [Koin for Compose](/docs/reference/koin-compose/compose)：套件與啟動 Koin。
-- [Navigation 3 範例指南 (recipes)](https://github.com/android/nav3-recipes)：Google 針對 Navigation 3 本身的範例。
+- [Navigation 3 recipes](https://github.com/android/nav3-recipes)：Google 針對 Navigation 3 本身提供的範例。

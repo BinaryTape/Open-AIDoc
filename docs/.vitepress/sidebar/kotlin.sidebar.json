@@ -853,73 +853,79 @@
                 "link": "collections-overview"
               },
               {
-                "text": "kotlin.constructing-collections",
-                "link": "constructing-collections"
+                "text": "kotlin.collection-types",
+                "link": "collection-types"
               },
               {
-                "text": "kotlin.iterators",
-                "link": "iterators"
-              },
-              {
-                "text": "kotlin.collection-ordering",
-                "link": "collection-ordering"
-              },
-              {
-                "text": "kotlin.collection-grouping",
-                "link": "collection-grouping"
-              },
-              {
-                "text": "kotlin.collection-transformations",
-                "link": "collection-transformations"
-              },
-              {
-                "text": "kotlin.collection-filtering",
-                "link": "collection-filtering"
-              },
-              {
-                "text": "kotlin.retrieve",
+                "text": "kotlin.collections-basics",
                 "items": [
                   {
-                    "text": "kotlin.collection-parts",
-                    "link": "collection-parts"
+                    "text": "kotlin.constructing-collections",
+                    "link": "constructing-collections"
                   },
                   {
-                    "text": "kotlin.collection-elements",
-                    "link": "collection-elements"
+                    "text": "kotlin.iterators",
+                    "link": "iterators"
+                  },
+                  {
+                    "text": "kotlin.collection-write",
+                    "link": "collection-write"
                   }
                 ],
                 "collapsed": true
               },
               {
-                "text": "kotlin.operations-and-operators",
+                "text": "kotlin.collections-operations",
                 "items": [
                   {
                     "text": "kotlin.collection-operations",
                     "link": "collection-operations"
                   },
                   {
+                    "text": "kotlin.collection-filtering",
+                    "link": "collection-filtering"
+                  },
+                  {
+                    "text": "kotlin.collection-ordering",
+                    "link": "collection-ordering"
+                  },
+                  {
+                    "text": "kotlin.collection-transformations",
+                    "link": "collection-transformations"
+                  },
+                  {
+                    "text": "kotlin.collection-grouping",
+                    "link": "collection-grouping"
+                  },
+                  {
                     "text": "kotlin.collection-aggregate",
                     "link": "collection-aggregate"
                   },
                   {
-                    "text": "kotlin.collection-write",
-                    "link": "collection-write"
+                    "text": "kotlin.collection-combine",
+                    "link": "collection-combine"
                   },
+                  {
+                    "text": "kotlin.collection-elements",
+                    "link": "collection-elements"
+                  },
+                  {
+                    "text": "kotlin.collection-parts",
+                    "link": "collection-parts"
+                  }
+                ],
+                "collapsed": true
+              },
+              {
+                "text": "kotlin.type-specific-operations",
+                "items": [
                   {
                     "text": "kotlin.list-operations",
                     "link": "list-operations"
                   },
                   {
-                    "text": "kotlin.set-operations",
-                    "link": "set-operations"
-                  },
-                  {
                     "text": "kotlin.map-operations",
                     "link": "map-operations"
-                  },
-                  {
-                    "text": "kotlin.collection-plus-minus",
-                    "link": "collection-plus-minus"
                   }
                 ],
                 "collapsed": true

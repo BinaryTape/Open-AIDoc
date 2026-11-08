@@ -87,6 +87,11 @@
     "multiplatform": {
       "name": "Kotlin Multiplatform",
       "color": "green"
+    },
+    "eap": {
+      "name": "EAP",
+      "color": "red",
+      "description": "This functionality is available only in the latest EAP version."
     }
   }
 }
