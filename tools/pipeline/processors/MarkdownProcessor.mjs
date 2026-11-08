@@ -28,6 +28,54 @@ export async function processMarkdownFile(filePath) {
     fs.writeFileSync(filePath, processedContent, "utf-8");
 }
 
+// A fence opens a code block at any indent: blocks in list items are indented
+const FENCE = /^\s*(`{3,}|~{3,})/;
+
+/**
+ * Where the fenced code blocks of a page are, fences included.
+ * @param {string} content
+ * @returns {Array<[number, number]>} Start and end offsets of each block
+ */
+export function codeBlockRanges(content) {
+    const ranges = [];
+    let offset = 0;
+    let fence = null;
+    let start = 0;
+    for (const line of content.split("\n")) {
+        const match = line.match(FENCE);
+        if (!fence && match) {
+            fence = match[1];
+            start = offset;
+        } else if (fence && match && match[1][0] === fence[0] && match[1].length >= fence.length
+            && !line.slice(line.indexOf(match[1]) + match[1].length).trim()) {
+            ranges.push([start, offset + line.length]);
+            fence = null;
+        }
+        offset += line.length + 1;
+    }
+    // An unclosed block runs to the end of the page, as in Markdown
+    if (fence) ranges.push([start, content.length]);
+    return ranges;
+}
+
+/**
+ * `content.replace(pattern, replacer)`, leaving alone every match that
+ * starts inside a fenced code block. A match may still span one: a table
+ * row whose cell holds a code block is a row of the text.
+ * @param {string} content
+ * @param {RegExp} pattern - A global pattern
+ * @param {(match: string, ...groups: string[]) => string} replacer
+ * @returns {string}
+ */
+export function replaceOutsideCodeBlocks(content, pattern, replacer) {
+    const ranges = codeBlockRanges(content);
+    return content.replace(pattern, (match, ...args) => {
+        const offset = args.at(-2);
+        if (ranges.some(([start, end]) => offset >= start && offset < end)) return match;
+        return replacer(match, ...args);
+    });
+}
+
 // Attributes kept on the expanded block: the site folds it (code-block-attrs.ts).
 // The others (src, include-lines, style, …) only shaped the block upstream.
 const KEPT_ATTRS = /\b(?:collapsible|initial-collapse-state|default-state|collapsed-title|collapsed-title-line-number)=(?:"[^"]*"|'[^']*')/g;
@@ -120,7 +168,11 @@ export async function processMarkdownContent(filePath, content) {
         }
     );
 
-    content = content.replace(
+    // Only the rows of tables in the text: a row in a code block (an expanded
+    // index.html, say) taken out of its indent would end the list item the
+    // block is in, and the block with it (P3-25).
+    content = replaceOutsideCodeBlocks(
+        content,
         /(<tr>)([\s\S]*?)(<\/tr>)/g,
         (match, open, content, close) => {
             const normalized = content.trim();
