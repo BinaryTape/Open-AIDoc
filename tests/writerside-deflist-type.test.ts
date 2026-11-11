@@ -21,7 +21,7 @@ describe('<deflist type>', () => {
 
   it('leaves collapsible lists alone', async () => {
     const html = await render({ collapsible: 'true', type: 'wide' })
-    expect(html).toMatch(/<details class="details custom-block"[^>]*><summary[^>]*>t<\/summary>/)
+    expect(html).toMatch(/<details class="ws-def-collapse ws-def-collapse--card"[^>]*><summary[^>]*>.*<span class="ws-def-collapse-text"[^>]*>t<\/span><\/summary>/)
     expect(html).not.toMatch(/ws-def--/)
   })
 })
