@@ -58,15 +58,20 @@ describe('collapsible definition lists, as on kotlinlang.org', () => {
     expect(rule(style, '.ws-def-collapse--card > .ws-def-collapse-title')).toEqual({
       padding: '16px 32px', 'font-size': '17px', 'line-height': '24px',
     })
-    expect(rule(style, '.ws-def-collapse--card .ws-def-collapse-icon')).toMatchObject({
+    expect(rule(style, '.ws-def-collapse--card > .ws-def-collapse-title > .ws-def-collapse-icon')).toMatchObject({
       top: '16px', left: '-12px', width: '24px', height: '24px', transform: 'rotate(-45deg)',
     })
     expect(rule(style, '.ws-def-collapse--card > .ws-def-collapse-content')).toEqual({ padding: '0 32px 16px' })
     expect(rule(style, '.ws-def-collapse--clear > .ws-def-collapse-title')).toEqual({
       padding: '24px 0 24px 40px', 'font-size': '20px', 'line-height': '28px',
     })
-    expect(rule(style, '.ws-def-collapse--clear[open] .ws-def-collapse-icon')).toEqual({ transform: 'rotate(180deg)' })
+    expect(rule(style, '.ws-def-collapse--clear[open] > .ws-def-collapse-title > .ws-def-collapse-icon')).toEqual({ transform: 'rotate(180deg)' })
     expect(rule(sfc('Deflist'), '.ws-deflist--numbered')).toEqual({ 'counter-reset': 'ws-deflist-item' })
+  })
+
+  it('style only their own icon, not that of a list nested in them (the hints in the Kotlin tour exercises)', () => {
+    const selectors = [...style.matchAll(/([^{}]+)\{/g)].map(([, s]) => s.trim())
+    expect(selectors.filter((s) => /--(card|clear)(\[open\])? \.ws-def-collapse-icon/.test(s))).toEqual([])
   })
 
   it('take Writerside\'s colours, light and dark', () => {

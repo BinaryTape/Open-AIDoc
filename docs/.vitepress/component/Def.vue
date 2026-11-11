@@ -200,7 +200,7 @@ export default defineComponent({
   line-height: 24px;
 }
 
-.ws-def-collapse--card .ws-def-collapse-icon {
+.ws-def-collapse--card > .ws-def-collapse-title > .ws-def-collapse-icon {
   top: 16px;
   left: -12px;
   width: 24px;
@@ -209,7 +209,7 @@ export default defineComponent({
 }
 
 /* Fills the cross cut out of the circle */
-.ws-def-collapse--card .ws-def-collapse-icon::before {
+.ws-def-collapse--card > .ws-def-collapse-title > .ws-def-collapse-icon::before {
   position: absolute;
   top: 3px;
   left: 3px;
@@ -220,7 +220,7 @@ export default defineComponent({
   background-color: var(--vp-c-bg);
 }
 
-.ws-def-collapse--card[open] .ws-def-collapse-icon {
+.ws-def-collapse--card[open] > .ws-def-collapse-title > .ws-def-collapse-icon {
   transform: none;
 }
 
@@ -244,18 +244,18 @@ export default defineComponent({
   line-height: 28px;
 }
 
-.ws-def-collapse--clear .ws-def-collapse-icon {
+.ws-def-collapse--clear > .ws-def-collapse-title > .ws-def-collapse-icon {
   top: 24px;
   left: 0;
   width: 28px;
   height: 28px;
 }
 
-.ws-def-collapse--clear .ws-def-collapse-icon svg {
+.ws-def-collapse--clear > .ws-def-collapse-title > .ws-def-collapse-icon svg {
   fill: var(--vp-c-text-1);
 }
 
-.ws-def-collapse--clear[open] .ws-def-collapse-icon {
+.ws-def-collapse--clear[open] > .ws-def-collapse-title > .ws-def-collapse-icon {
   transform: rotate(180deg);
 }
 
