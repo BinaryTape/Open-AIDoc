@@ -59,20 +59,25 @@ export default defineComponent({
 </script>
 
 <style scoped>
+/* Writerside's .definition-list__group: square cards 12px apart, with a
+   border; the colours are in styles/ws-def.css (P3-19) */
 .ws-def {
-  margin-top: 16px;
+  margin-top: 12px;
   padding: 16px;
-  border-radius: 8px;
-  border-color: var(--vp-custom-block-details-border);
-  color: var(--vp-custom-block-details-text);
-  background-color: var(--vp-custom-block-details-bg);
+  border: 1px solid var(--ws-def-border);
+  color: var(--vp-c-text-1);
+  background-color: var(--ws-def-bg);
   /* Holds the floated title when it is taller than the definition. */
   display: flow-root;
 }
 
+.ws-def:first-child {
+  margin-top: 0;
+}
+
 .ws-def-title {
   font-weight: 530;
-  font-size: 1em;
+  font-size: 17px;
   /* Long code names have no break opportunity and ran over the definition. */
   overflow-wrap: anywhere;
 }

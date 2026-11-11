@@ -1,0 +1,16 @@
+/* --------------------------------------------------------------------------
+ * Definition list cards (component/Def.vue)
+ *
+ * The colours of Writerside's .definition-list__group on ktor.io and
+ * kotlinlang.org, light and dark (P3-19).
+ * -------------------------------------------------------------------------- */
+
+:root {
+  --ws-def-border: #e8e8e8;
+  --ws-def-bg: #f9f9f9;
+}
+
+.dark {
+  --ws-def-border: #474749;
+  --ws-def-bg: #1f1f21;
+}
