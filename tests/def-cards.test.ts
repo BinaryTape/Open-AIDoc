@@ -36,8 +36,8 @@ describe('definition list cards, as on ktor.io and kotlinlang.org', () => {
   })
 
   it('take the upstream colours, light and dark', () => {
-    expect(rule(colours, ':root')).toEqual({ '--ws-def-border': '#e8e8e8', '--ws-def-bg': '#f9f9f9' })
-    expect(rule(colours, '.dark')).toEqual({ '--ws-def-border': '#474749', '--ws-def-bg': '#1f1f21' })
+    expect(rule(colours, ':root')).toMatchObject({ '--ws-def-border': '#e8e8e8', '--ws-def-bg': '#f9f9f9' })
+    expect(rule(colours, '.dark')).toMatchObject({ '--ws-def-border': '#474749', '--ws-def-bg': '#1f1f21' })
     expect(theme).toContain("import '../styles/ws-def.css'")
   })
 })

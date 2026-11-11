@@ -2,15 +2,27 @@
  * Definition list cards (component/Def.vue)
  *
  * The colours of Writerside's .definition-list__group on ktor.io and
- * kotlinlang.org, light and dark (P3-19).
+ * kotlinlang.org, light and dark (P3-19), and of its collapsible variants
+ * (P3-27). Writerside's own dark values (.theme-dark) are used for the dark
+ * theme, as kotlinlang.org has none to look at.
  * -------------------------------------------------------------------------- */
 
 :root {
   --ws-def-border: #e8e8e8;
   --ws-def-bg: #f9f9f9;
+  /* --wh-color-border-default, --wh-color-trigger-default, --wh-color-border-hover,
+     --wh-color-border-hairline */
+  --ws-def-collapse-border: #d1d1d2;
+  --ws-def-icon: #5e5e60;
+  --ws-def-hover: #19191c;
+  --ws-def-hairline: rgba(25, 25, 28, 0.2);
 }
 
 .dark {
   --ws-def-border: #474749;
   --ws-def-bg: #1f1f21;
+  --ws-def-collapse-border: #474749;
+  --ws-def-icon: #bababb;
+  --ws-def-hover: #fff;
+  --ws-def-hairline: rgba(255, 255, 255, 0.2);
 }
