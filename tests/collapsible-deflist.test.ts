@@ -49,6 +49,7 @@ describe('collapsible definition lists, as on kotlinlang.org', () => {
   })
 
   it('take the measured sizes', () => {
+    expect(rule(style, '.ws-def-collapse-title')).toMatchObject({ margin: '0' })
     expect(rule(style, '.ws-def-collapse--card')).toMatchObject({
       'margin-top': '12px',
       border: '1px solid var(--ws-def-collapse-border)',

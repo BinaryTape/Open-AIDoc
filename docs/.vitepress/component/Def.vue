@@ -158,6 +158,8 @@ export default defineComponent({
 .ws-def-collapse-title {
   position: relative;
   display: flex;
+  /* VitePress gives .vp-doc summary 16px above and below */
+  margin: 0;
   list-style: none;
   cursor: pointer;
   color: var(--vp-c-text-1);
