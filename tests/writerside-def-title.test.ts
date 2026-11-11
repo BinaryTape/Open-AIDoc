@@ -42,7 +42,7 @@ describe('Writerside definition titles', () => {
 
   it('renders the code in a collapsible definition’s summary', async () => {
     const html = await renderPage(websockets.replace('<deflist>', '<deflist collapsible="true">'))
-    expect(html).toContain('<summary><code>maxFrameSize</code></summary>')
+    expect(html).toMatch(/<span class="ws-def-collapse-text"[^>]*><code>maxFrameSize<\/code><\/span><\/summary>/)
     expect(html).not.toContain('&lt;code&gt;')
   })
 
