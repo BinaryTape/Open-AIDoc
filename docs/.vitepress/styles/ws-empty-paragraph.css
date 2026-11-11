@@ -1,0 +1,14 @@
+/*
+ * Writerside pages keep empty paragraphs: `<p></p>` before a list or panels
+ * (a workaround for its MRK057 check), or at the top of a list item before
+ * an image, followed by a `<br/>`. Writerside gives such a paragraph no
+ * margins and leaves the `<br/>` out; with ours the image of a column list
+ * sat 56px down instead of 16px (kotlin/custom-compiler-plugins, P3-18).
+ */
+.vp-doc p:empty {
+  margin: 0;
+}
+
+.vp-doc p:empty + br {
+  display: none;
+}
