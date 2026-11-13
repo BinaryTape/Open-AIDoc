@@ -12,5 +12,9 @@
  * hence both spellings of path.
  *
  * Keep in step with TAGS in tools/pipeline/utils/coded-tags.mjs.
+ *
+ * <math> (TeX, rendered by markdown-it-ws-math.ts) is here too: a formula on
+ * a line of its own is a paragraph on kotlinlang.org (P3-28). It is not a
+ * label, so coded-tags.mjs does not list it.
  */
-export const WS_INLINE_TAGS = ['Path', 'path', 'ui-path', 'control', 'shortcut', 'emphasis']
+export const WS_INLINE_TAGS = ['Path', 'path', 'ui-path', 'control', 'shortcut', 'emphasis', 'math']

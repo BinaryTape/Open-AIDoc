@@ -23,6 +23,7 @@ import markdownItWsButtonLink from "../plugins/markdown/writerside/markdown-it-w
 import markdownItWsCompare from "../plugins/markdown/writerside/markdown-it-ws-compare"
 import markdownItWsRunnable from "../plugins/markdown/writerside/markdown-it-ws-runnable"
 import markdownItWsCollapsibleSection from "../plugins/markdown/writerside/markdown-it-ws-collapsible-section"
+import markdownItWsMath from "../plugins/markdown/writerside/markdown-it-ws-math"
 import { markdownItRewriteLinks } from '../plugins/markdown/writerside/markdown-it-ws-inline-link'
 
 // ===== MkDocs plugins =====
@@ -115,6 +116,8 @@ export function registerMarkdownPlugins(md: any) {
   // whose <details> then goes around it.
   md.use(markdownItWsRunnable)
   md.use(markdownItWsCollapsibleSection)
+  // A core rule before `inline`: the TeX is gone before markdown parses the text.
+  md.use(markdownItWsMath)
 
   // MkDocs plugins
   md.use(markdownItMkAdmonition)

@@ -1,0 +1,16 @@
+/* --------------------------------------------------------------------------
+ * Formulas (plugins/markdown/writerside/markdown-it-ws-math.ts, P3-28)
+ *
+ * MathJax's SVG sits in the line of text, lowered by its own inline
+ * vertical-align, as on kotlinlang.org. VitePress makes every svg a block,
+ * which would put each formula on a line of its own; its own rule for
+ * MathJax (mjx-container > svg) does not reach this span.
+ * -------------------------------------------------------------------------- */
+
+.ws-math > svg {
+  display: inline-block;
+  /* MathJax's own: glyphs may reach past the box */
+  overflow: visible;
+  min-width: 1px;
+  min-height: 1px;
+}
