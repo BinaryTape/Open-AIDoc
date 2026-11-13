@@ -244,11 +244,11 @@
         <div v-if="sidebarTab === 'files'">
           <!-- Level 1: Project list -->
           <div v-if="navLevel === 'projects'" style="padding:4px 0">
-            <div class="nav-section">GitHub 项目</div>
+            <div class="nav-section">项目</div>
             <div v-for="p in projects" :key="p.name" class="nav-item" @click="selectProject(p)">
               <span class="icon">📦</span>
               <span class="name">{{ p.displayName }}</span>
-              <span class="badge-sm">{{ p.repos.length }} repo</span>
+              <span class="badge-sm">{{ p.repos.length }} 个上游</span>
             </div>
           </div>
 
@@ -257,20 +257,20 @@
             <div class="nav-back" @click="navLevel = 'projects'; currentProject = null">
               ← 返回项目列表
             </div>
-            <div class="nav-section">{{ currentProject.displayName }} · 仓库</div>
-            <div v-for="(r, idx) in currentProject.repos" :key="r.repo" class="nav-item" @click="selectRepo(idx)">
+            <div class="nav-section">{{ currentProject.displayName }} · 上游</div>
+            <div v-for="(r, idx) in currentProject.repos" :key="r.id" class="nav-item" @click="selectRepo(idx)">
               <span class="icon">🐙</span>
-              <span class="name" style="font-size:12px">{{ r.repo }}</span>
+              <span class="name" style="font-size:12px">{{ r.source }}</span>
             </div>
           </div>
 
-          <!-- Level 3: File tree from GitHub -->
+          <!-- Level 3: Page tree of the upstream, laid out as on the site -->
           <div v-if="navLevel === 'tree'">
             <div class="nav-back" @click="navLevel = 'repos'; currentRepoData = null">
               ← {{ currentProject.displayName }}
             </div>
             <div style="padding:6px 14px;font-size:11px;color:var(--text-4);display:flex;justify-content:space-between;align-items:center">
-              <span class="github-link">{{ currentRepoConfig.repo }}@{{ currentRepoConfig.branch }}</span>
+              <span class="github-link">{{ currentRepoConfig.source }}</span>
               <button class="btn btn-sm" style="padding:2px 6px;font-size:10px" @click="refreshTree" title="刷新">🔄</button>
             </div>
             <div v-if="loadingTree" class="loading-center"><span class="spinner"></span> 加载中...</div>
@@ -388,12 +388,12 @@
             </div>
           </div>
           <div class="panel-content">
-            <div v-if="loadingFile" class="loading-center"><span class="spinner"></span> 从 GitHub 加载中...</div>
+            <div v-if="loadingFile" class="loading-center"><span class="spinner"></span> 原文加载中...</div>
             <div v-else-if="sourceView === 'code'" class="code-editor" ref="sourceEditorWrap">
               <div class="line-numbers" ref="sourceLineNums"><span class="ln" v-for="n in Math.max(sourceLineCount, 1)" :key="n">{{ n }}</span></div>
               <textarea v-model="sourceContent" @scroll="syncScroll($event, 'source')" spellcheck="false" placeholder="从左侧选择文件、上传文档，或直接粘贴内容..."></textarea>
             </div>
-            <div v-else-if="!sourceContent" class="panel-empty"><span class="icon">📂</span><span>从左侧选择 GitHub 文件或上传文档</span></div>
+            <div v-else-if="!sourceContent" class="panel-empty"><span class="icon">📂</span><span>从左侧选择上游文件或上传文档</span></div>
             <div v-else class="md-preview" v-html="renderedSource"></div>
           </div>
         </div>
@@ -650,7 +650,7 @@ const app = createApp({
     }
 
     async function refreshTree() {
-      await api('/api/github/refresh', { method: 'POST' });
+      await api('/api/source/refresh', { method: 'POST' });
       await loadTree();
       toast('已刷新', 'success');
     }
@@ -660,14 +660,13 @@ const app = createApp({
       loadingFile.value = true;
       translatedContent.value = '';
       try {
-        const data = await api(`/api/github/file?repo=${encodeURIComponent(currentRepoConfig.value.repo)}&branch=${encodeURIComponent(currentRepoConfig.value.branch)}&path=${encodeURIComponent(node.path)}`);
+        const data = await api(`/api/source/file?id=${encodeURIComponent(currentRepoConfig.value.id)}&path=${encodeURIComponent(node.path)}`);
         sourceContent.value = data.content;
         const baseName = node.path.split('/').pop();
         selectedFile.value = {
           name: baseName,
           githubPath: node.path,
-          repo: currentRepoConfig.value.repo,
-          branch: currentRepoConfig.value.branch,
+          sourceId: currentRepoConfig.value.id,
           projectName: currentProject.value.name,
         };
       } catch (e) {
@@ -785,7 +784,7 @@ const app = createApp({
     // ── Save ──
     async function saveTranslation() {
       if (!translatedContent.value || !selectedFile.value?.projectName) {
-        toast('无法保存：需要从 GitHub 项目选择的文件', 'error'); return;
+        toast('无法保存：需要从项目选择的文件', 'error'); return;
       }
       try {
         const data = await api('/api/save', {
@@ -795,6 +794,9 @@ const app = createApp({
             projectName: selectedFile.value.projectName,
             fileName: selectedFile.value.name,
             targetLang: targetLang.value,
+            // A page of an upstream is saved where the pipeline writes it
+            sourceId: selectedFile.value.sourceId,
+            sourcePath: selectedFile.value.githubPath,
           }
         });
         if (data.success) toast(`已保存到: docs/${data.targetPath}`, 'success');
