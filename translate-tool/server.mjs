@@ -4,7 +4,7 @@ import fs from 'fs';
 import crypto from 'crypto';
 import { fileURLToPath } from 'url';
 import { GoogleGenAI } from '@google/genai';
-import { toContentRelPath } from '../shared/content-paths.ts';
+import { PROJECTS, buildPageTree, clearSourceCache, listSourcePages, readSourceFile, saveTargetPath } from './sources.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -41,65 +41,6 @@ try {
   terminologyContentRaw = fs.readFileSync(path.join(ROOT, config.terminologyPath), 'utf8');
 } catch { terminologyContentRaw = ''; }
 
-// ─── Projects: GitHub repos with doc paths ──────────────────────────────────
-// Mirrors tools/pipeline/repos.config.mjs — branches strip "origin/", docPaths from patterns
-const PROJECTS = [
-  {
-    name: 'kotlin', displayName: 'Kotlin',
-    repos: [
-      // kotlinStrategy: getDocPatterns → docs/**/*.md, docs/**/*.topic
-      { repo: 'JetBrains/kotlin-web-site', branch: 'master', docPaths: ['docs/topics'] },
-      { repo: 'Kotlin/kotlinx.coroutines', branch: 'master', docPaths: ['docs/topics'] },
-      { repo: 'Kotlin/dokka', branch: 'master', docPaths: ['docs/topics'] },
-      { repo: 'JetBrains/lincheck', branch: 'master', docPaths: ['docs/topics'] },
-      { repo: 'Kotlin/api-guidelines', branch: 'main', docPaths: ['docs/topics'] },
-      { repo: 'Kotlin/kotlinx.serialization', branch: 'doc-restructuring-master', docPaths: ['docs-website/topics'] },
-    ],
-  },
-  {
-    // kmpStrategy: getDocPatterns → topics/**/*.md, topics/**/*.topic
-    name: 'kmp', displayName: 'Kotlin Multiplatform',
-    repos: [
-      { repo: 'JetBrains/kotlin-multiplatform-dev-docs', branch: 'master', docPaths: ['topics'] },
-    ],
-  },
-  {
-    // ktorStrategy: getDocPatterns → topics/*.md
-    name: 'ktor', displayName: 'Ktor',
-    repos: [
-      { repo: 'ktorio/ktor-documentation', branch: 'main', docPaths: ['topics'] },
-    ],
-  },
-  {
-    // koinStrategy (defaultStrategy): getDocPatterns → docs/**/*.md
-    name: 'koin', displayName: 'Koin',
-    repos: [
-      { repo: 'InsertKoinIO/koin', branch: 'main', docPaths: ['docs'] },
-    ],
-  },
-  {
-    // sqlDelightStrategy: getDocPatterns → docs/**/*.md
-    name: 'sqldelight', displayName: 'SQLDelight',
-    repos: [
-      { repo: 'sqldelight/sqldelight', branch: 'main', docPaths: ['docs'] },
-    ],
-  },
-  {
-    // koogStrategy: getDocPatterns → docs/docs/**/*.md
-    name: 'koog', displayName: 'Koog',
-    repos: [
-      { repo: 'JetBrains/koog', branch: 'develop', docPaths: ['docs/docs'] },
-    ],
-  },
-  {
-    // coilStrategy: getDocPatterns → docs/**/*.md
-    name: 'coil', displayName: 'Coil',
-    repos: [
-      { repo: 'coil-kt/coil', branch: 'main', docPaths: ['docs'] },
-    ],
-  },
-];
-
 const LANGUAGES = config.targetLanguages;
 const LANGUAGE_NAMES = config.languageNames;
 const MODELS = [
@@ -120,144 +61,6 @@ function getGenAI(apiKey) {
     genAI = new GoogleGenAI({ apiKey: key });
   }
   return genAI;
-}
-
-// ─── GitHub API ─────────────────────────────────────────────────────────────
-const githubCache = new Map();
-const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
-
-function githubHeaders() {
-  const h = { Accept: 'application/vnd.github.v3+json' };
-  const token = process.env.GITHUB_TOKEN;
-  if (token) h.Authorization = `token ${token}`;
-  return h;
-}
-
-/**
- * 获取仓库的文档文件列表。
- * 优先用 Trees API（每仓库 1 次请求），失败则降级为 Contents API（逐目录递归）。
- */
-async function fetchDocFiles(repoFullName, branch, docPaths) {
-  const cacheKey = `docs:${repoFullName}@${branch}:${docPaths.join(',')}`;
-  const cached = githubCache.get(cacheKey);
-  if (cached && Date.now() - cached.ts < CACHE_TTL) return cached.data;
-
-  console.log(`  Fetching docs: ${repoFullName}@${branch} [${docPaths.join(', ')}]`);
-  const headers = githubHeaders();
-
-  // 方法 1: Trees API — 1 次请求拿到完整文件树
-  let allFiles = await fetchViaTreesAPI(repoFullName, branch, docPaths, headers);
-
-  // 方法 2: 降级到 Contents API — 逐目录递归（更多请求但更可靠）
-  if (allFiles === null) {
-    console.log(`    Falling back to Contents API for ${repoFullName}`);
-    allFiles = [];
-    for (const dp of docPaths) {
-      const files = await listDirRecursive(repoFullName, branch, dp, headers);
-      allFiles.push(...files);
-    }
-  }
-
-  githubCache.set(cacheKey, { data: allFiles, ts: Date.now() });
-  return allFiles;
-}
-
-/** Trees API: 一次请求获取整棵树，然后按 docPaths 过滤 */
-async function fetchViaTreesAPI(repo, branch, docPaths, headers) {
-  try {
-    const url = `https://api.github.com/repos/${repo}/git/trees/${branch}?recursive=1`;
-    const res = await fetch(url, { headers });
-    if (!res.ok) {
-      console.warn(`    Trees API ${res.status} for ${repo}@${branch}`);
-      return null; // 触发降级
-    }
-    const data = await res.json();
-    const tree = data.tree || [];
-    // 过滤出 docPaths 下的 .md / .topic 文件
-    return tree.filter(item => {
-      if (item.type !== 'blob') return false;
-      if (!/\.(md|topic)$/i.test(item.path)) return false;
-      return docPaths.some(dp => item.path.startsWith(dp + '/'));
-    });
-  } catch (e) {
-    console.warn(`    Trees API error for ${repo}: ${e.message}`);
-    return null;
-  }
-}
-
-/** Contents API 降级: 递归列出目录 */
-async function listDirRecursive(repo, branch, dirPath, headers) {
-  const url = `https://api.github.com/repos/${repo}/contents/${dirPath}?ref=${branch}`;
-  let res;
-  try { res = await fetch(url, { headers }); }
-  catch (e) { return []; }
-  if (!res.ok) return [];
-
-  const items = await res.json();
-  if (!Array.isArray(items)) return [];
-
-  const result = [];
-  for (const item of items) {
-    if (item.type === 'file' && /\.(md|topic)$/i.test(item.name)) {
-      result.push({ path: item.path, type: 'blob' });
-    } else if (item.type === 'dir') {
-      const sub = await listDirRecursive(repo, branch, item.path, headers);
-      result.push(...sub);
-    }
-  }
-  return result;
-}
-
-/** 从 GitHub raw 获取文件内容 */
-async function fetchGitHubFile(repoFullName, branch, filePath) {
-  const cacheKey = `file:${repoFullName}@${branch}:${filePath}`;
-  const cached = githubCache.get(cacheKey);
-  if (cached && Date.now() - cached.ts < CACHE_TTL) return cached.data;
-
-  const url = `https://raw.githubusercontent.com/${repoFullName}/${branch}/${filePath}`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`Failed to fetch file (${res.status})`);
-
-  const content = await res.text();
-  githubCache.set(cacheKey, { data: content, ts: Date.now() });
-  return content;
-}
-
-/** 将文件列表构建为前端树形结构 */
-function buildTreeFromFiles(allFiles, docPaths) {
-  const tree = [];
-
-  for (const file of allFiles) {
-    const matchDP = docPaths.find(dp => file.path.startsWith(dp + '/'));
-    if (!matchDP) continue;
-    const relPath = file.path.slice(matchDP.length + 1);
-    const parts = relPath.split('/');
-
-    let current = tree;
-    for (let i = 0; i < parts.length; i++) {
-      const name = parts[i];
-      if (i === parts.length - 1) {
-        current.push({ name, type: 'file', path: file.path });
-      } else {
-        let dir = current.find(n => n.name === name && n.type === 'directory');
-        if (!dir) {
-          dir = { name, type: 'directory', children: [] };
-          current.push(dir);
-        }
-        current = dir.children;
-      }
-    }
-  }
-
-  (function sortTree(nodes) {
-    nodes.sort((a, b) => {
-      if (a.type !== b.type) return a.type === 'directory' ? -1 : 1;
-      return a.name.localeCompare(b.name);
-    });
-    nodes.forEach(n => n.children && sortTree(n.children));
-  })(tree);
-
-  return tree;
 }
 
 // ─── Pre-processing（直接复用 tools/pipeline/processors） ──────────────────
@@ -382,18 +185,6 @@ function getDefaultPrompt(targetLang) {
   return getPromptTemplate(targetLang, getLangDisplayName(targetLang));
 }
 
-// ─── Translation Helpers ────────────────────────────────────────────────────
-
-/**
- * Calculate the local target path for saving a translated file.
- * @param {string} projectName - e.g. "kotlin"
- * @param {string} fileName - basename of the file
- * @param {string} targetLang
- */
-function calculateTargetPath(projectName, fileName, targetLang) {
-  return toContentRelPath(targetLang, projectName, fileName);
-}
-
 // ─── SSE Clients ────────────────────────────────────────────────────────────
 const sseClients = new Set();
 
@@ -430,9 +221,9 @@ app.get('/api/config', (req, res) => {
   });
 });
 
-// ─── GitHub file browsing ───────────────────────────────────────────────────
+// ─── Source browsing ────────────────────────────────────────────────────────
 
-// Get file tree for a project (all repos)
+// Get the page tree of a project (all its upstreams)
 app.get('/api/files/:project', async (req, res) => {
   const project = PROJECTS.find(p => p.name === req.params.project);
   if (!project) return res.status(404).json({ error: '项目不存在' });
@@ -440,44 +231,34 @@ app.get('/api/files/:project', async (req, res) => {
   const repos = [];
   for (const rc of project.repos) {
     try {
-      const allFiles = await fetchDocFiles(rc.repo, rc.branch, rc.docPaths);
-      const tree = buildTreeFromFiles(allFiles, rc.docPaths);
-      repos.push({
-        repo: rc.repo,
-        branch: rc.branch,
-        docPaths: rc.docPaths,
-        tree,
-        fileCount: allFiles.length,
-      });
+      const pages = await listSourcePages(rc.id);
+      repos.push({ ...rc, tree: buildPageTree(pages), fileCount: pages.length });
     } catch (error) {
-      console.warn(`  ⚠️ Failed to fetch ${rc.repo}@${rc.branch}: ${error.message}`);
-      repos.push({
-        repo: rc.repo, branch: rc.branch, docPaths: rc.docPaths,
-        tree: [], fileCount: 0, error: error.message,
-      });
+      console.warn(`  ⚠️ Failed to fetch ${rc.source}: ${error.message}`);
+      repos.push({ ...rc, tree: [], fileCount: 0, error: error.message });
     }
   }
   res.json({ project: project.name, repos });
 });
 
-// Get file content from GitHub
-app.get('/api/github/file', async (req, res) => {
-  const { repo, branch, path: filePath } = req.query;
-  if (!repo || !branch || !filePath) {
-    return res.status(400).json({ error: '缺少参数: repo, branch, path' });
+// Get the content of a source file
+app.get('/api/source/file', async (req, res) => {
+  const { id, path: filePath } = req.query;
+  if (!id || !filePath) {
+    return res.status(400).json({ error: '缺少参数: id, path' });
   }
   try {
-    const content = await fetchGitHubFile(repo, branch, filePath);
-    res.json({ content, repo, branch, path: filePath });
+    const content = await readSourceFile(id, filePath);
+    res.json({ content, id, path: filePath });
   } catch (error) {
-    console.error('GitHub file error:', error);
+    console.error('Source file error:', error);
     res.status(502).json({ error: error.message });
   }
 });
 
-// Clear GitHub cache
-app.post('/api/github/refresh', (req, res) => {
-  githubCache.clear();
+// Clear the source cache
+app.post('/api/source/refresh', (req, res) => {
+  clearSourceCache();
   res.json({ success: true, message: '缓存已清除' });
 });
 
@@ -682,12 +463,12 @@ app.delete('/api/upload/:id', (req, res) => {
 // ─── Save ───────────────────────────────────────────────────────────────────
 
 app.post('/api/save', (req, res) => {
-  const { content, projectName, fileName, targetLang } = req.body;
+  const { content, projectName, fileName, targetLang, sourceId, sourcePath } = req.body;
   if (!content || !projectName || !fileName || !targetLang) {
     return res.status(400).json({ error: '缺少必要参数 (content, projectName, fileName, targetLang)' });
   }
   try {
-    const targetRelPath = calculateTargetPath(projectName, fileName, targetLang);
+    const targetRelPath = saveTargetPath({ projectName, fileName, targetLang, sourceId, sourcePath });
     const targetFullPath = path.join(ROOT, 'docs', targetRelPath);
     fs.mkdirSync(path.dirname(targetFullPath), { recursive: true });
     fs.writeFileSync(targetFullPath, content, 'utf8');
