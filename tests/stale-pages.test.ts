@@ -195,6 +195,40 @@ describe('removeStalePages', () => {
       .toEqual([{ from: 'ktor/db-persistence.md', to: 'ktor/server-integrate-database.md' }])
   })
 
+  it('removes the stubs kotlinx.coroutines keeps out of kc.tree, redirecting them where kotlinlang.org does', async () => {
+    const coroutines = repo('kotlinx-coroutines', kotlinStrategy, 'kotlin')
+    const files = ['docs/basics.md', 'docs/compatibility.md', 'docs/topics/coroutines-basics.md', 'docs/topics/channels.md']
+    upstream(coroutines, files)
+    await sync(coroutines)
+    ;['basics.md', 'compatibility.md', 'coroutines-basics.md', 'channels.md'].forEach((page) => publish(page, 'kotlin'))
+
+    // basics.md: "The documentation has been moved to …/coroutines-basics.html"
+    upstream(coroutines, files, {
+      'docs/kc.tree': '<instance-profile id="kc"><toc-element toc-title="Coroutines">' +
+        '<toc-element topic="coroutines-basics.md" accepts-web-file-names="basics.html,coroutines-basic-jvm.html"/>' +
+        '<toc-element topic="channels.md"/></toc-element></instance-profile>',
+    })
+    const result = await sync(coroutines)
+
+    expect(result.removed).toEqual([
+      { page: 'basics.md', movedTo: 'coroutines-basics.md' },
+      { page: 'compatibility.md', movedTo: null },
+    ])
+    expect([...translations('basics.md', 'kotlin'), ...translations('compatibility.md', 'kotlin')].some(existsSync)).toBe(false)
+    expect([...translations('coroutines-basics.md', 'kotlin'), ...translations('channels.md', 'kotlin')].every(existsSync)).toBe(true)
+    expect(JSON.parse(readFileSync('docs/.vitepress/redirects/kotlinx-coroutines.json', 'utf8')))
+      .toEqual([{ from: 'kotlin/basics.md', to: 'kotlin/coroutines-basics.md' }])
+  })
+
+  it('keeps every Kotlin page while the tree lists none', async () => {
+    const dokka = repo('dokka', kotlinStrategy, 'kotlin')
+    upstream(dokka, ['docs/topics/dokka-introduction.md', 'docs/README.md'])
+    await sync(dokka)
+    upstream(dokka, ['docs/topics/dokka-introduction.md', 'docs/README.md'], { 'docs/dokka.tree': '<instance-profile id="dokka"/>' })
+
+    expect((await sync(dokka)).removed).toEqual([])
+  })
+
   it('does not redirect to a page upstream does not produce', async () => {
     const demo = repo('demo', { ...defaultStrategy, getMovedPages: async () => new Map([['old.md', 'gone.md']]) })
     upstream(demo, ['docs/old.md', 'docs/a.md'])

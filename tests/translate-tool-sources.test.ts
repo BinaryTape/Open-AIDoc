@@ -92,7 +92,9 @@ describe('translate tool: the upstreams of the pipeline', () => {
       'docs/channels.md',
       'docs/topics/channels.md',
       'docs/topics/coroutines-basics.md',
-      'docs/basics.md', // a placeholder alone: published as it is (P3-5)
+      // A stub alone; the pipeline leaves it out (it is not in kc.tree), the
+      // tool does not read the tree yet (P3-29)
+      'docs/basics.md',
       'docs/debugging.md', // left out by the pipeline
       'docs/topics/debugging.md',
     ])

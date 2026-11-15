@@ -247,4 +247,20 @@ describe('kotlin strategy', () => {
       '# Execution strategy\n\n## Configure in Maven\n\nSet `kotlin.compiler.daemon` to false.\n'
     )
   })
+
+  it('does not translate a file the tree leaves out (a stub of a moved page)', async () => {
+    write('docs/kc.tree', '<instance-profile id="kc"><toc-element topic="coroutines-basics.md" accepts-web-file-names="basics.html"/></instance-profile>\n')
+    write('docs/basics.md', 'The documentation has been moved to [coroutines-basics](https://kotlinlang.org/docs/coroutines-basics.html).\n')
+    write('docs/topics/coroutines-basics.md', '[//]: # (title: Coroutines basics)\n\nText.\n')
+
+    const task = { files: ['docs/basics.md', 'docs/topics/coroutines-basics.md'] }
+    await kotlinStrategy.postDetect({ id: 'kotlinx-coroutines', cloneDir: clone }, task)
+
+    expect(task.files.map((f: string) => f.replaceAll('\\', '/'))).toEqual(['docs/coroutines-basics.md'])
+    expect(await kotlinStrategy.getPublishedPages(clone)).toEqual(new Set(['docs/coroutines-basics.md']))
+  })
+
+  it('publishes every page without a tree', async () => {
+    expect(await kotlinStrategy.getPublishedPages(clone)).toBe(null)
+  })
 })

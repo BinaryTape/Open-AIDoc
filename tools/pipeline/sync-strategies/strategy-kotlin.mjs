@@ -5,7 +5,7 @@ import fs from "fs-extra";
 import {processTopicFileAsync} from "../processors/TopicProcessor.mjs";
 import {syncSidebar} from "../processors/SidebarProcessor.mjs";
 import {expandIncludesForTask} from "../utils/writerside-include.mjs";
-import {movedPagesFromTree} from "../utils/moved-pages.mjs";
+import {movedPagesFromTree, pagesOfTree} from "../utils/moved-pages.mjs";
 import {syncLabels} from "../utils/writerside-labels.mjs";
 import {expandCodeSnippets} from "../processors/MarkdownProcessor.mjs";
 
@@ -35,6 +35,14 @@ export function kotlinFamilyStrategy(root, versionFile = () => null) {
         if (!(await fs.pathExists(docsPath))) return null;
         const tree = (await fs.readdir(docsPath)).find(doc => doc.endsWith(".tree"));
         return tree ? path.join(docsPath, tree) : null;
+    };
+
+    const getPublishedPages = async (repoPath) => {
+        const tree = await findTree(repoPath);
+        const pages = tree ? await pagesOfTree(tree) : null;
+        // A tree without topics is broken or reshaped, not a site without pages
+        if (!pages || pages.size === 0) return null;
+        return new Set([...pages].map((page) => `${root}/${page}`));
     };
 
     const copyVersionFile = async (context, repoConfig) => {
@@ -73,6 +81,16 @@ export function kotlinFamilyStrategy(root, versionFile = () => null) {
             const tree = await findTree(repoPath);
             return tree ? movedPagesFromTree(tree) : new Map();
         },
+
+        /**
+         * @override
+         * kotlinlang.org publishes the topics of the repository's tree. The
+         * docs directory also keeps files it no longer publishes: the stubs
+         * kotlinx.coroutines left where its guide's chapters were (basics.md:
+         * "The documentation has been moved to …", served as a redirect),
+         * Dokka's README.md.
+         */
+        getPublishedPages,
 
         postSync: async (repoPath, context, repoConfig) => {
             await copyVersionFile(context, repoConfig);
@@ -138,7 +156,8 @@ export function kotlinFamilyStrategy(root, versionFile = () => null) {
 
             console.log(` Running Kotlin postDetect: Change detected path - ${repoPath}`);
             // Map to flattened doc path, convert .topic -> .md
-            task.files = task.files.map(mapDocPath).filter(Boolean);
+            const published = await getPublishedPages(repoPath);
+            task.files = task.files.map(mapDocPath).filter((file) => file && (!published || published.has(file)));
             console.log(`  Mapped ${task.files.length} files: ${task.files.join("\n")}`);
             console.log(`  Change detected path finished - ${repoPath}`);
         },
