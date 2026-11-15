@@ -1,18 +1,18 @@
-[//]: # (title: UIKit フレームワークとの統合)
+[//]: # (title: UIKitフレームワークとの統合)
 
 <show-structure depth="3"/>
 
-Compose Multiplatform は [UIKit](https://developer.apple.com/documentation/uikit) フレームワークと相互運用可能です。
-UIKit アプリケーション内に Compose Multiplatform を埋め込むことも、Compose Multiplatform UI 内にネイティブの UIKit コンポーネントを埋め込むこともできます。このページでは、UIKit アプリケーション内での Compose Multiplatform の使用と、Compose Multiplatform UI 内への UIKit コンポーネントの埋め込みの両方の例を紹介します。
+Compose Multiplatformは[UIKit](https://developer.apple.com/documentation/uikit)フレームワークと相互運用性があります。
+UIKitアプリケーション内にCompose Multiplatformを埋め込むことも、Compose Multiplatform内にネイティブのUIKitコンポーネントを埋め込むこともできます。このページでは、UIKitアプリケーション内でCompose Multiplatformを使用する例と、Compose Multiplatform UI内にUIKitコンポーネントを埋め込む例の両方を紹介します。
 
-> SwiftUI の相互運用性については、[SwiftUI フレームワークとの統合](compose-swiftui-integration.md)の記事を参照してください。
+> SwiftUIとの相互運用性については、[SwiftUIフレームワークとの統合](compose-swiftui-integration.md)の記事を参照してください。
 >
 {style="tip"}
 
-## UIKit アプリケーション内で Compose Multiplatform を使用する {id="use-compose-multiplatform-inside-a-uikit-application"}
+## UIKitアプリケーション内でCompose Multiplatformを使用する {id="use-compose-multiplatform-inside-a-uikit-application"}
 
-UIKit アプリケーション内で Compose Multiplatform を使用するには、任意の [コンテナビューコントローラ（container view controller）](https://developer.apple.com/documentation/uikit/view_controllers) に Compose Multiplatform のコードを追加します。
-この例では、`UITabBarController` クラス内で Compose Multiplatform を使用しています。
+UIKitアプリケーション内でCompose Multiplatformを使用するには、任意の[コンテナビューコントローラ](https://developer.apple.com/documentation/uikit/view_controllers)にCompose Multiplatformコードを追加します。
+この例では、`UITabBarController`クラス内でCompose Multiplatformを使用しています。
 
 ```swift
 let composeViewController = Main_iosKt.ComposeOnly()
@@ -21,10 +21,10 @@ composeViewController.title = "Compose Multiplatform inside UIKit"
 let anotherViewController = UIKitViewController()
 anotherViewController.title = "UIKit"
 
-// UITabBarController をセットアップする
+// UITabBarControllerのセットアップ
 let tabBarController = UITabBarController()
 tabBarController.viewControllers = [
-    // タイトルを設定するために、作成した ViewController を UINavigationController でラップする
+    // タイトルを設定するために、作成したViewControllerをUINavigationControllerでラップする
     UINavigationController(rootViewController: composeViewController),
     UINavigationController(rootViewController: anotherViewController)
 ]
@@ -32,25 +32,101 @@ tabBarController.tabBar.items?[0].title = "Compose"
 tabBarController.tabBar.items?[1].title = "UIKit"
 ```
 
-このコードにより、アプリケーションは以下のようになります。
+このコードを使用すると、アプリケーションは次のようになります。
 
 ![UIKit](uikit.png){width=300}
 
-> Compose Multiplatform のレンダリングには、高リフレッシュレートを明示的に有効にする必要があります：
-> アプリの `Info.plist` ファイルに `CADisableMinimumFrameDurationOnPhone` キーを追加してください。
-> これがないと、アプリは実行時にクラッシュします。
+> Compose Multiplatformのレンダリングでは、高リフレッシュレートを明示的に有効にする必要があります。
+> アプリの`Info.plist`ファイルに`CADisableMinimumFrameDurationOnPhone`キーを追加してください。
+> これがないと、実行時にアプリがクラッシュします。
 >
 {style="note"}
 
-このコードの詳細は [サンプルプロジェクト](https://github.com/JetBrains/compose-multiplatform/tree/master/examples/interop/ios-compose-in-uikit) で確認できます。
+このコードは[サンプルプロジェクト](https://github.com/JetBrains/compose-multiplatform/tree/master/examples/interop/ios-compose-in-uikit)で確認できます。
 
-## Compose Multiplatform 内で UIKit を使用する {id="use-uikit-inside-compose-multiplatform"}
+### コンテンツに合わせてComposeビューのサイズを調整する {id="size-compose-views-to-fit-their-content"}
+<primary-label ref="EAP"/>
 
-Compose Multiplatform 内で UIKit 要素を使用するには、使用したい UIKit 要素を Compose Multiplatform の [UIKitView](https://github.com/JetBrains/compose-multiplatform-core/blob/47c012bfe2d4570fb08432253298b8e2b6e38ade/compose/ui/ui/src/uikitMain/kotlin/androidx/compose/ui/interop/UIKitView.uikit.kt) に追加します。このコードは完全に Kotlin で記述することも、Swift を併用することもできます。
+Composeビューは`sizeThatFits()`を介して優先サイズ（preferred size）を報告できます。
+サイズ調整を別途設定する必要はありません。
+
+このサイズ調整の例では、`main.ios.kt`で定義されたKotlin関数`MainComposeView()`を使用します。
+
+```kotlin
+fun MainComposeView(): UIView = ComposeUIView {
+    Text(
+        "This Compose view wraps text to fit the available width",
+        modifier = Modifier.fillMaxWidth().padding(16.dp)
+    )
+}
+```
+
+Swiftコードでは、[Auto Layout](https://developer.apple.com/library/archive/documentation/UserExperience/Conceptual/AutolayoutPG/index.html)を使用してビューの幅を制約し、その幅を`sizeThatFits()`に渡します。
+高さには`UIView.noIntrinsicMetric`を使用してComposeがコンテンツから高さを決定できるようにし、返された高さをビューの高さ制約（height constraint）を通じて適用します。
+
+利用可能なスペースやコンテンツが変更された場合は、別のレイアウトパスをスケジュールして再計測し、制約を更新します。
+アプリがComposeコンテンツを変更した場合は、Composeが変更を処理した後に`view.setNeedsLayout()`を呼び出します。
+
+```swift
+import UIKit
+
+class ComposeContentViewController: UIViewController {
+    // Kotlinファイル用に生成されたブリッジ名を使用
+    // 例: main.ios.kt -> Main_iosKt
+    private let composeView = Main_iosKt.MainComposeView()
+    private var heightConstraint: NSLayoutConstraint!
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        composeView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(composeView)
+
+        // Composeがコンテンツを計測するまでの暫定的な高さ
+        heightConstraint = composeView.heightAnchor.constraint(equalToConstant: 1)
+
+        NSLayoutConstraint.activate([
+            composeView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            composeView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+            composeView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            heightConstraint
+        ])
+    }
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        guard composeView.bounds.width > 0 else { return }
+
+        // 初回結果はフォールバックの場合があるため、後続のレイアウトパスで再計測する
+        let preferredSize = composeView.sizeThatFits(
+            CGSize(
+                // 固定の高さにする場合は、こことレイアウト制約で幅と高さを入れ替える
+                width: composeView.bounds.width,
+                height: UIView.noIntrinsicMetric
+            )
+        )
+
+        if heightConstraint.constant != preferredSize.height {
+            heightConstraint.constant = preferredSize.height
+            view.setNeedsLayout()
+        }
+    }
+}
+```
+{initial-collapse-state="collapsed" collapsible="true" collapsed-title="override func viewDidLayoutSubviews()"}
+
+> Kotlin関数が`UIViewController`を返す場合は、それをコンテナビューコントローラに追加し、
+> その`view`で`sizeThatFits()`を呼び出します。
+>
+{style="note"}
+
+## Compose Multiplatform内でUIKitを使用する {id="use-uikit-inside-compose-multiplatform"}
+
+Compose Multiplatform内でUIKit要素を使用するには、使用したいUIKit要素をCompose Multiplatformの[UIKitView](https://github.com/JetBrains/compose-multiplatform-core/blob/47c012bfe2d4570fb08432253298b8e2b6e38ade/compose/ui/ui/src/uikitMain/kotlin/androidx/compose/ui/interop/UIKitView.uikit.kt)に追加します。このコードは純粋にKotlinで記述することも、Swiftを併用することもできます。
 
 ### マップビュー {id="map-view"}
 
-UIKit の [`MKMapView`](https://developer.apple.com/documentation/mapkit/mkmapview) コンポーネントを使用して、Compose Multiplatform でマップビューを実装できます。コンポーネントのサイズは、Compose Multiplatform の `Modifier.size()` または `Modifier.fillMaxSize()` 関数を使用して設定します。
+UIKitの[`MKMapView`](https://developer.apple.com/documentation/mapkit/mkmapview)コンポーネントを使用して、Compose Multiplatformでマップビューを実装できます。コンポーネントのサイズは、Compose Multiplatformの`Modifier.size()`または`Modifier.fillMaxSize()`関数を使用して設定します。
 
 ```kotlin
 UIKitView(
@@ -59,30 +135,30 @@ UIKitView(
 )
 ```
 
-このコードにより、アプリケーションは以下のようになります。
+このコードを使用すると、アプリケーションは次のようになります。
 
 ![MapView](mapview.png){width=300}
 
-次に、高度な例を見てみましょう。このコードは、UIKit の [`UITextField`](https://developer.apple.com/documentation/uikit/uitextfield/) を Compose Multiplatform でラップします。
+次に、より高度な例を見てみましょう。このコードはUIKitの[`UITextField`](https://developer.apple.com/documentation/uikit/uitextfield/)をCompose Multiplatformでラップしています。
 
 ```kotlin
 @OptIn(ExperimentalForeignApi::class)
 @Composable
 fun UseUITextField(modifier: Modifier = Modifier) {
-    // Compose 内のテキストの状態を保持します
+    // Compose内のテキスト状態を保持する
     var message by remember { mutableStateOf("Hello, World!") }
 
     UIKitView(
         factory = {
-            // Compose の状態と統合された UITextField を作成します
+            // Composeの状態と統合されたUITextFieldを作成する
             val textField = object : UITextField(CGRectMake(0.0, 0.0, 0.0, 0.0)) {
                 @ObjCAction
                 fun editingChanged() {
-                    // UITextField でテキストが変更されたときに Compose の状態を更新します
+                    // UITextFieldのテキストが変更されたときにComposeの状態を更新する
                     message = text ?: ""
                 }
             }
-            // UITextField 内のテキスト変更を検知するためのリスナーを追加します
+            // UITextField内のテキスト変更リスナーを追加する
             textField.addTarget(
                 target = textField,
                 action = NSSelectorFromString(textField::editingChanged.name),
@@ -92,28 +168,28 @@ fun UseUITextField(modifier: Modifier = Modifier) {
         },
         modifier = modifier.fillMaxWidth().height(30.dp),
         update = { textField ->
-            // Compose の状態から UITextField のテキストを更新します
+            // Composeの状態からUITextFieldのテキストを更新する
             textField.text = message
         }
     )
 }
 ```
 
-* `factory` パラメータには、`editingChanged()` 関数と、`UITextField` への変更を検出するための `textField.addTarget()` リスナーが含まれています。
-* `editingChanged()` 関数には `@ObjCAction` アノテーションが付与されており、Objective-C コードと相互運用できるようになっています。
-* `addTarget()` 関数の `action` パラメータは `editingChanged()` 関数の名前を渡し、`UIControlEventEditingChanged` イベントに応じてそれをトリガーします。
-* `UIKitView()` の `update` パラメータは、監視可能な `message` 状態の値が変更されたときに呼び出されます。
-* この関数は `UITextField` の `text` 属性を更新し、ユーザーに更新された値が表示されるようにします。
+* `factory`パラメータには、`UITextField`への変更を検知するための`editingChanged()`関数と`textField.addTarget()`リスナーが含まれています。
+* `editingChanged()`関数には、Objective-Cコードと相互運用できるように`@ObjCAction`アノテーションが付与されています。
+* `addTarget()`関数の`action`パラメータは`editingChanged()`関数の名前を渡し、`UIControlEventEditingChanged`イベントに応じてトリガーします。
+* `UIKitView()`の`update`パラメータは、監視可能な`message`状態の値が変更されたときに呼び出されます。
+* この関数は`UITextField`の`text`属性を更新し、ユーザーに更新後の値が表示されるようにします。
 
-この例のコードは、[サンプルプロジェクト](https://github.com/JetBrains/compose-multiplatform/tree/master/examples/interop/ios-uikit-in-compose) で確認できます。
+この例のコードは、[サンプルプロジェクト](https://github.com/JetBrains/compose-multiplatform/tree/master/examples/interop/ios-uikit-in-compose)で確認できます。
 
 ### カメラビュー {id="camera-view"}
 
-UIKit の [`AVCaptureSession`](https://developer.apple.com/documentation/avfoundation/avcapturesession) および [`AVCaptureVideoPreviewLayer`](https://developer.apple.com/documentation/avfoundation/avcapturevideopreviewlayer) コンポーネントを使用して、Compose Multiplatform でカメラビューを実装できます。
+Compose Multiplatformでは、UIKitの[`AVCaptureSession`](https://developer.apple.com/documentation/avfoundation/avcapturesession)および[`AVCaptureVideoPreviewLayer`](https://developer.apple.com/documentation/avfoundation/avcapturevideopreviewlayer)コンポーネントを使用してカメラビューを実装できます。
 
-これにより、アプリケーションでデバイスのカメラにアクセスし、ライブプレビューを表示できるようになります。
+これにより、アプリケーションはデバイスのカメラにアクセスし、ライブプレビューを表示できるようになります。
 
-基本的なカメラビューの実装例を以下に示します。
+基本的なカメラビューの実装例は以下のとおりです。
 
 ```kotlin
 UIKitView(
@@ -139,7 +215,7 @@ UIKitView(
 )
 ```
 
-次に、高度な例を見てみましょう。このコードは写真を撮影し、GPS メタデータを付加し、ネイティブの `UIView` を使用してライブプレビューを表示します。
+次に、より高度な例を見てみましょう。このコードは写真を撮影し、GPSメタデータを付加し、ネイティブの`UIView`を使用してライブプレビューを表示します。
 
 ```kotlin
 @OptIn(ExperimentalForeignApi::class)
@@ -148,10 +224,10 @@ fun RealDeviceCamera(
     camera: AVCaptureDevice,
     onCapture: (picture: PictureData.Camera, image: PlatformStorableImage) -> Unit
 ) {
-    // 写真撮影用に AVCapturePhotoOutput を初期化します
+    // 写真撮影用にAVCapturePhotoOutputを初期化
     val capturePhotoOutput = remember { AVCapturePhotoOutput() }
     // ...
-    // キャプチャコールバック用のデリゲートを定義します：画像データの処理、GPS の付加、onCapture のセットアップ
+    // 撮影コールバックのデリゲートを定義：画像データの処理、GPSの付加、onCaptureのセットアップ
     val photoCaptureDelegate = remember {
         object : NSObject(), AVCapturePhotoCaptureDelegateProtocol {
             override fun captureOutput(
@@ -177,7 +253,7 @@ fun RealDeviceCamera(
         }
     }
     // ...
-    // 写真撮影用に AVCaptureSession をセットアップします
+    // 写真撮影用のAVCaptureSessionをセットアップ
     val captureSession: AVCaptureSession = remember {
         AVCaptureSession().also { captureSession ->
             captureSession.sessionPreset = AVCaptureSessionPresetPhoto
@@ -187,12 +263,12 @@ fun RealDeviceCamera(
             captureSession.addOutput(capturePhotoOutput)
         }
     }
-    // ライブカメラプレビュー用に AVCaptureVideoPreviewLayer をセットアップします
+    // カメラのライブプレビュー用のAVCaptureVideoPreviewLayerをセットアップ
     val cameraPreviewLayer = remember {
         AVCaptureVideoPreviewLayer(session = captureSession)
     }
     // ...
-    // ネイティブのカメラプレビューレイヤーを持つネイティブの UIView を作成します
+    // ネイティブのカメラプレビューレイヤーを持つネイティブUIViewを作成
     UIKitView(
         modifier = Modifier.fillMaxSize().background(Color.Black),
         factory = {
@@ -212,7 +288,7 @@ fun RealDeviceCamera(
         },
     )
     // ...
-    // 押されたときに capturePhotoWithSettings コールバックを実行する Compose ボタンを作成します
+    // 押下時にcapturePhotoWithSettingsコールバックを実行するComposeボタンを作成
     CircularButton(
         imageVector = IconPhotoCamera,
         modifier = Modifier.align(Alignment.BottomCenter).padding(36.dp),
@@ -237,28 +313,28 @@ fun RealDeviceCamera(
 ```
 {initial-collapse-state="collapsed" collapsible="true" collapsed-title="val capturePhotoOutput = remember { AVCapturePhotoOutput() }"}
 
-`RealDeviceCamera` コンポーザブルは以下のタスクを実行します。
+`RealDeviceCamera`コンポーザブルは次のタスクを実行します。
 
-* `AVCaptureSession` と `AVCaptureVideoPreviewLayer` を使用してネイティブのカメラプレビューをセットアップします。
-* カスタム `UIView` サブクラスをホストする `UIKitView` を作成し、レイアウトの更新を管理してプレビューレイヤーを埋め込みます。
-* `AVCapturePhotoOutput` を初期化し、写真撮影を処理するためのデリゲートを構成します。
-* `CLLocationManager`（`locationManager` 経由）を使用して、撮影時の GPS 座標を取得します。
-* 撮影した画像を `UIImage` に変換し、`PlatformStorableImage` としてラップし、名前、説明、GPS 位置などのメタデータを `onCapture` を介して提供します。
-* 撮影をトリガーするための円形の Compose ボタンを表示します。
-* フロントカメラを使用する場合、自然な自撮りの挙動に合わせるためにミラーリング設定を適用します。
-* `layoutSubviews()` 内で `CATransaction` を使用してアニメーションを回避し、プレビューレイアウトを動的に更新します。
+* `AVCaptureSession`と`AVCaptureVideoPreviewLayer`を使用してネイティブのカメラプレビューをセットアップします。
+* カスタム`UIView`サブクラスをホストする`UIKitView`を作成します。このサブクラスはレイアウトの更新を管理し、プレビューレイヤーを埋め込みます。
+* `AVCapturePhotoOutput`を初期化し、写真撮影を処理するデリゲートを設定します。
+* 撮影時のGPS座標を取得するために、`CLLocationManager`（`locationManager`経由）を使用します。
+* 撮影した画像を`UIImage`に変換し、`PlatformStorableImage`としてラップして、名前、説明、GPS位置などのメタデータを`onCapture`経由で提供します。
+* 撮影をトリガーするための円形のコンポーザブルボタンを表示します。
+* フロントカメラ使用時に自然な自撮り動作となるよう、ミラーリング設定を適用します。
+* アニメーションを回避するために`CATransaction`を使用して、`layoutSubviews()`内でプレビューレイアウトを動的に更新します。
 
-> 実機でテストするには、アプリの `Info.plist` ファイルに `NSCameraUsageDescription` キーを追加する必要があります。
-> これがないと、アプリは実行時にクラッシュします。
+> 実機でテストするには、アプリの`Info.plist`ファイルに`NSCameraUsageDescription`キーを追加する必要があります。
+> これがないと、実行時にアプリがクラッシュします。
 >
 {style="note"}
 
-この例の完全なコードは [ImageViewer サンプルプロジェクト](https://github.com/JetBrains/compose-multiplatform/tree/master/examples/imageviewer) で確認できます。
+この例の完全なコードは、[ImageViewerサンプルプロジェクト](https://github.com/JetBrains/compose-multiplatform/tree/master/examples/imageviewer)で確認できます。
 
 ### ウェブビュー {id="web-view"}
 
-UIKit の [`WKWebView`](https://developer.apple.com/documentation/webkit/wkwebview) コンポーネントを使用して、Compose Multiplatform でウェブビューを実装できます。これにより、UI 内でウェブコンテンツを表示し、操作できるようになります。
-コンポーネントのサイズは、Compose Multiplatform の `Modifier.size()` または `Modifier.fillMaxSize()` 関数を使用して設定します。
+Compose Multiplatformでは、UIKitの[`WKWebView`](https://developer.apple.com/documentation/webkit/wkwebview)コンポーネントを使用してウェブビューを実装できます。これにより、アプリケーションはUI内でウェブコンテンツを表示し、操作できるようになります。
+コンポーネントのサイズは、Compose Multiplatformの`Modifier.size()`または`Modifier.fillMaxSize()`関数を使用して設定します。
 
 ```kotlin
 UIKitView(
@@ -270,7 +346,7 @@ UIKitView(
     modifier = Modifier.size(300.dp)
 )
 ```
-次に、高度な例を見てみましょう。このコードは、ナビゲーションデリゲートを使用してウェブビューを構成し、Kotlin と JavaScript 間の通信を可能にします。
+次に、より高度な例を見てみましょう。このコードはナビゲーションデリゲートを使用してウェブビューを設定し、KotlinとJavaScript間の通信を可能にします。
 
 ```kotlin
 @Composable
@@ -279,14 +355,14 @@ fun WebViewWithDelegate(
     initialUrl: String = "https://www.jetbrains.com",
     onNavigationChange: (String) -> Unit = {}
 ) {
-    // ナビゲーションイベントをリッスンするためのデリゲートを作成します
+    // ナビゲーションイベントをリッスンするデリゲートを作成
     val delegate = remember {
         object : NSObject(), WKNavigationDelegateProtocol {
             override fun webView(
                 webView: WKWebView,
                 didFinishNavigation: WKNavigation?
             ) {
-                // ナビゲーション完了後に現在の URL を更新します
+                // ナビゲーション完了後に現在のURLを更新
                 onNavigationChange(webView.URL?.absoluteString ?: "")
             }
         }
@@ -294,7 +370,7 @@ fun WebViewWithDelegate(
     UIKitView(
         modifier = modifier,
         factory = {
-            // WKWebView をインスタンス化し、デリゲートを設定します
+            // WKWebViewをインスタンス化してデリゲートを設定
             val webView = WKWebView().apply {
                 navigationDelegate = delegate
                 loadRequest(NSURLRequest(uRL = NSURL(string = initialUrl)))
@@ -302,7 +378,7 @@ fun WebViewWithDelegate(
             webView
         },
         update = { webView ->
-            // URL が変更された場合にウェブページをリロードします
+            // URLが変更された場合にウェブページをリロード
             if (webView.URL?.absoluteString != initialUrl) {
                 webView.loadRequest(NSURLRequest(uRL = NSURL(string = initialUrl)))
             }
@@ -311,14 +387,14 @@ fun WebViewWithDelegate(
 }
 ```
 
-`WebViewWithDelegate` コンポーザブルは以下のタスクを実行します。
+`WebViewWithDelegate`コンポーザブルは次のタスクを実行します。
 
-* `WKNavigationDelegateProtocol` インターフェースを実装する安定したデリゲートオブジェクトを作成します。このオブジェクトは Compose の `remember` を使用して再構成後も保持されます。
-* `WKWebView` をインスタンス化し、`UIKitView` を使用して埋め込み、保持されているデリゲートを割り当てて構成します。
-* `initialUrl` パラメータで指定された初期ウェブページを読み込みます。
-* デリゲートを介してナビゲーションの変更を監視し、`onNavigationChange` コールバックを通じて現在の URL を渡します。
-* `update` パラメータを使用してリクエストされた URL の変更を監視し、それに応じてウェブページをリロードします。
+* `WKNavigationDelegateProtocol`インターフェースを実装する安定したデリゲートオブジェクトを作成します。このオブジェクトは、Composeの`remember`を使用して再コンポジション間で保持されます。
+* `WKWebView`をインスタンス化し、`UIKitView`を使用して埋め込み、記憶されたデリゲートを割り当てて設定します。
+* `initialUrl`パラメータによって提供される初期ウェブページを読み込みます。
+* デリゲート経由でナビゲーションの変更を監視し、`onNavigationChange`コールバックを通じて現在のURLを渡します。
+* `update`パラメータを使用して要求されたURLの変更を監視し、それに応じてウェブページをリロードします。
 
 ## 次のステップ {id="what-s-next"}
 
-Compose Multiplatform を [SwiftUI フレームワークと統合する](compose-swiftui-integration.md) 方法についても確認できます。
+Compose Multiplatformを[SwiftUIフレームワークと統合する](compose-swiftui-integration.md)方法についても確認できます。

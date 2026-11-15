@@ -2,9 +2,9 @@
 
 Androidは標準で多くの[画像フォーマット](https://developer.android.com/guide/topics/media/media-formats#image-formats)をサポートしていますが、サポートしていないフォーマットも数多く存在します（例: GIF、SVG、MP4など）。
 
-幸いなことに、[ImageLoader](image_loaders.md)はプラガブルなコンポーネントをサポートしており、新しいキャッシュレイヤー、新しいデータ型、新しいフェッチ動作、新しい画像エンコーディングの追加や、ベースとなる画像読み込み動作の上書きが可能です。Coilの画像パイプラインは主に5つのパートで構成され、以下の順序で実行されます: [Interceptors](/coil/api/coil-core/coil3.intercept/-interceptor)、[Mappers](/coil/api/coil-core/coil3.map/-mapper)、[Keyers](/coil/api/coil-core/coil3.key/-keyer)、[Fetchers](/coil/api/coil-core/coil3.fetch/-fetcher)、そして[Decoders](/coil/api/coil-core/coil3.decode/-decoder)。
+幸いなことに、[ImageLoader](image_loaders.md)はプラグ可能なコンポーネントをサポートしており、新しいキャッシュ層、新しいデータ型、新しいフェッチ動作、新しい画像エンコーディングの追加や、ベースとなる画像読み込み動作の上書きが可能です。Coilの画像パイプラインは、主に次の順序で実行される5つの部分で構成されています: [Interceptors](/coil/api/coil-core/coil3.intercept/-interceptor)、[Mappers](/coil/api/coil-core/coil3.map/-mapper)、[Keyers](/coil/api/coil-core/coil3.key/-keyer)、[Fetchers](/coil/api/coil-core/coil3.fetch/-fetcher)、[Decoders](/coil/api/coil-core/coil3.decode/-decoder)。
 
-カスタムコンポーネントは、`ImageLoader`の構築時にその[ComponentRegistry](/coil/api/coil-core/coil3/-component-registry)を通じて追加する必要があります:
+カスタムコンポーネントは、`ImageLoader`を構築する際に[ComponentRegistry](/coil/api/coil-core/coil3/-component-registry)を通じて追加する必要があります。
 
 ```kotlin
 val imageLoader = ImageLoader.Builder(context)
@@ -18,9 +18,9 @@ val imageLoader = ImageLoader.Builder(context)
     .build()
 ```
 
-## Interceptors {id="interceptors"}
+## Interceptor {id="interceptors"}
 
-Interceptorを使用すると、`ImageLoader`の画像エンジンへのリクエストを監視、変換、ショートサーキット（短絡）、またはリトライできます。たとえば、以下のようにカスタムキャッシュレイヤーを追加できます:
+Interceptorを使用すると、`ImageLoader`の画像エンジンへのリクエストを監視（observe）、変換（transform）、ショートサーキット（short circuit）、または再試行（retry）できます。例えば、次のようにカスタムキャッシュ層を追加できます。
 
 ```kotlin
 class CustomCacheInterceptor(
@@ -32,7 +32,7 @@ class CustomCacheInterceptor(
         val value = cache.get(chain.request.data.toString())
         if (value != null) {
             return SuccessResult(
-                image = value.bitmap.asImage(),
+                image = value,
                 request = chain.request,
                 dataSource = DataSource.MEMORY_CACHE,
             )
@@ -46,9 +46,9 @@ Interceptorは、`ImageLoader`の画像パイプラインをカスタムロジ�
 
 詳細については、[Interceptor](/coil/api/coil-core/coil3.intercept/-interceptor)を参照してください。
 
-## Mappers {id="mappers"}
+## Mapper {id="mappers"}
 
-Mapperを使用すると、カスタムデータ型のサポートを追加できます。たとえば、サーバーから以下のようなモデルを取得するとします:
+Mapperを使用すると、カスタムデータ型のサポートを追加できます。例えば、サーバーから次のようなモデルを取得するとします。
 
 ```kotlin
 data class Item(
@@ -59,7 +59,7 @@ data class Item(
 )
 ```
 
-これをパイプラインの後続で処理されるURLへとマッピングする、カスタムMapperを作成できます:
+パイプラインの後続で処理されるように、モデルをURLへとマッピングするカスタムMapperを作成できます。
 
 ```kotlin
 class ItemMapper : Mapper<Item, String> {
@@ -67,7 +67,7 @@ class ItemMapper : Mapper<Item, String> {
 }
 ```
 
-`ImageLoader`の構築時にこれを登録（上記参照）した後は、安全に`Item`を読み込むことができます:
+`ImageLoader`の構築時にこれを登録（上記参照）した後は、安全に`Item`を読み込むことができます。
 
 ```kotlin
 val request = ImageRequest.Builder(context)
@@ -79,32 +79,32 @@ imageLoader.enqueue(request)
 
 詳細については、[Mapper](/coil/api/coil-core/coil3.map/-mapper)を参照してください。
 
-## Keyers {id="keyers"}
+## Keyer {id="keyers"}
 
-Keyerは、データをキャッシュキーの一部へと変換します。この値は、このリクエストの出力が`MemoryCache`に書き込まれる場合（書き込まれるタイミング）に`MemoryCache.Key.key`として使用されます。
+Keyerはデータをキャッシュキーの一部に変換します。この値は、リクエストの出力結果が`MemoryCache`に書き込まれる際に`MemoryCache.Key.key`として使用されます。
 
 詳細については、[Keyers](/coil/api/coil-core/coil3.key/-keyer)を参照してください。
 
-## Fetchers {id="fetchers"}
+## Fetcher {id="fetchers"}
 
-Fetcherは、データ（例: URL、URI、Fileなど）を`ImageSource`または`Image`のいずれかに変換します。通常、入力データを`Decoder`で処理可能な形式に変換します。このインターフェースを使用して、カスタムのフェッチメカニズム（例: Cronet、カスタムURIスキームなど）のサポートを追加します。
+Fetcherはデータ（例: URL、URI、Fileなど）を`ImageSource`または`Image`のいずれかに変換します。通常、入力データを`Decoder`で処理可能なフォーマットへと変換します。このインターフェースを使用して、カスタムのフェッチメカニズム（例: Cronet、カスタムURIスキームなど）のサポートを追加します。
 
 詳細については、[Fetcher](/coil/api/coil-core/coil3.fetch/-fetcher)を参照してください。
 
 !!! Note
-    カスタムデータ型を使用する`Fetcher`を追加する場合、それを使用するリクエストの結果をメモリキャッシュ可能にするために、カスタム`Keyer`も提供する必要があります。たとえば、`Fetcher.Factory<MyDataType>`を追加する場合、`Keyer<MyDataType>`も追加する必要があります。
+    カスタムデータ型を使用する`Fetcher`を追加する場合、それを使用するリクエストの結果がメモリキャッシュ可能であることを保証するために、カスタム`Keyer`も提供する必要があります。例えば、`Fetcher.Factory<MyDataType>`を追加する場合、`Keyer<MyDataType>`も追加する必要があります。
 
-## Decoders {id="decoders"}
+## Decoder {id="decoders"}
 
-Decoderは`ImageSource`を読み取り、`Image`を返します。このインターフェースを使用して、カスタムファイルフォーマット（例: GIF、SVG、TIFFなど）のサポートを追加します。
+Decoderは`ImageSource`を読み込み、`Image`を返します。このインターフェースを使用して、カスタムファイルフォーマット（例: GIF、SVG、TIFFなど）のサポートを追加します。
 
 詳細については、[Decoder](/coil/api/coil-core/coil3.decode/-decoder)を参照してください。
 
 ## ImageLoaderとImageRequestのカスタムプロパティ {id="custom-imageloader-and-imagerequest-properties"}
 
-Coilは、`Extras`を介して`ImageRequest`や`ImageLoader`にカスタムデータを添付することをサポートしています。`Extras`は、`Extras.Key`を介して参照される追加プロパティのマップです。
+Coilは、`Extras`を介して`ImageRequest`や`ImageLoader`にカスタムデータを付加することをサポートしています。`Extras`は、`Extras.Key`を介して参照される追加プロパティのマップです。
 
-たとえば、各`ImageRequest`に対してカスタムタイムアウトを設定できるようにしたいとします。その場合、以下のようにカスタム拡張関数を追加できます:
+例えば、各`ImageRequest`でカスタムタイムアウトをサポートしたいとします。次のように拡張関数を追加できます。
 
 ```kotlin
 fun ImageRequest.Builder.timeout(timeout: Duration) = apply {
@@ -121,11 +121,11 @@ val ImageRequest.timeout: Duration
 val Options.timeout: Duration
     get() = getExtra(timeoutKey)
 
-// NOTE: Extras.Keyのインスタンスはインスタンスの同一性（参照等価性）で比較されるため、静的に宣言する必要があります。
+// 注意: Extras.Keyインスタンスは参照等価性で比較されるため、静的（static）に宣言する必要があります。
 private val timeoutKey = Extras.Key(default = Duration.INFINITE)
 ```
 
-その後、`ImageLoader`に登録するカスタム`Interceptor`の内部でこのプロパティを読み取ることができます:
+次に、`ImageLoader`に登録するカスタム`Interceptor`内でそのプロパティを読み取ることができます。
 
 ```kotlin
 class TimeoutInterceptor : Interceptor {
@@ -142,7 +142,7 @@ class TimeoutInterceptor : Interceptor {
 }
 ```
 
-最後に、`ImageRequest`の作成時にこのプロパティを設定できます:
+最後に、`ImageRequest`を作成する際にそのプロパティを設定できます。
 
 ```kotlin
 AsyncImage(
@@ -154,18 +154,18 @@ AsyncImage(
 )
 ```
 
-さらに:
+補足:
 
 - 定義した`ImageLoader.Builder.timeout`拡張関数を介して、デフォルトのタイムアウト値を設定できます。
-- 定義した`Options.timeout`拡張関数を介して、`Mapper`、`Fetcher`、`Decoder`の内部でタイムアウトを読み取ることができます。
+- 定義した`Options.timeout`拡張関数を介して、`Mapper`、`Fetcher`、`Decoder`の内部でタイムアウト値を読み取ることができます。
 
-[Coil自身もこのパターンを使用して](https://github.com/coil-kt/coil/blob/main/coil-gif/src/main/java/coil3/gif/imageRequests.kt)、`coil-gif`でのGIFやその他の拡張ライブラリ用のカスタムリクエストプロパティをサポートしています。
+[Coil自体もこのパターンを使用して](https://github.com/coil-kt/coil/blob/main/coil-gif/src/main/java/coil3/gif/imageRequests.kt)、`coil-gif`でのGIF用のカスタムリクエストプロパティや、その他の拡張ライブラリをサポートしています。
 
-## コンポーネントの連鎖（Chaining components） {id="chaining-components"}
+## コンポーネントの連鎖（Chaining） {id="chaining-components"}
 
-Coilの画像ローダーコンポーネントの便利な特性として、内部で連鎖させることができる点が挙げられます。たとえば、読み込む画像URLを取得するためにネットワークリクエストを実行する必要がある場合を考えてみましょう。
+Coilの画像ローダーコンポーネントの便利な特徴として、内部で連鎖（チェーン）させることができる点が挙げられます。例えば、読み込む画像URLを取得するためにネットワークリクエストを実行する必要があるケースを考えます。
 
-まず、独自のFetcherのみが処理するカスタムデータ型を作成します:
+まず、作成するFetcherのみが処理するカスタムデータ型を作成します。
 
 ```kotlin
 data class PartialUrl(
@@ -173,7 +173,7 @@ data class PartialUrl(
 )
 ```
 
-次に、画像URLを取得して内部のネットワークFetcherに委任するカスタム`Fetcher`を作成します:
+次に、画像URLを取得して内部のネットワークFetcherに委譲するカスタム`Fetcher`を作成します。
 
 ```kotlin
 class PartialUrlFetcher(
@@ -192,7 +192,7 @@ class PartialUrlFetcher(
         // 画像URLを読み取る。
         val imageUrl: String = readImageUrl(response.body)
 
-        // これにより内部のネットワークFetcherに処理が委任される。
+        // 内部のネットワークFetcherに処理を委譲する。
         val data = imageLoader.components.map(imageUrl, options)
         val output = imageLoader.components.newFetcher(data, options, imageLoader)
         val (fetcher) = checkNotNull(output) { "no supported fetcher" }
@@ -209,7 +209,7 @@ class PartialUrlFetcher(
 }
 ```
 
-最後に、この`Fetcher`を`ComponentRegistry`に登録し、`model`/`data`として`PartialUrl`を渡すだけです:
+最後に、`ComponentRegistry`にその`Fetcher`を登録し、`model`/`data`として`PartialUrl`を渡すだけです。
 
 ```kotlin
 AsyncImage(
@@ -218,4 +218,4 @@ AsyncImage(
 )
 ```
 
-このパターンは、`Mapper`、`Keyer`、および`Decoder`にも同様に適用できます。
+このパターンは、`Mapper`、`Keyer`、`Decoder`にも同様に適用できます。

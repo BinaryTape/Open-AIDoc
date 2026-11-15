@@ -1,6 +1,6 @@
 # Glide/Picasso からの移行
 
-Glide または Picasso の呼び出しを Coil の呼び出しに移行する方法の例をいくつか紹介します。
+Glide/Picasso の呼び出しを Coil の呼び出しに移行する方法の例をいくつか紹介します。
 
 ### 基本的な使い方 {id="basic-usage"}
 
@@ -38,7 +38,7 @@ Picasso.get()
     .fit()
     .into(imageView)
 
-// Coil (スケールタイプを自動的に検出します)
+// Coil (scaleType を自動的に検出)
 imageView.load(url) {
     placeholder(placeholder)
 }
@@ -47,12 +47,12 @@ imageView.load(url) {
 ### View 以外のターゲット {id="non-view-targets"}
 
 ```kotlin
-// Glide (start と error のオプションのコールバックがあります)
+// Glide (start と error のコールバックはオプション)
 Glide.with(context)
     .load(url)
     .into(object : CustomTarget<Drawable>() {
         override fun onResourceReady(resource: Drawable, transition: Transition<Drawable>) {
-            // 成功した結果を処理します。
+            // 成功時の結果を処理します。
         }
 
         override fun onLoadCleared(placeholder: Drawable) {
@@ -65,15 +65,15 @@ Picasso.get()
     .load(url)
     .into(object : BitmapTarget {
         override fun onBitmapLoaded(bitmap: Bitmap, from: Picasso.LoadedFrom) {
-            // 成功した結果を処理します。
+            // 成功時の結果を処理します。
         }
 
         override fun onBitmapFailed(e: Exception, errorDrawable: Drawable?) {
-            // エラー時の Drawable を処理します。
+            // エラー Drawable を処理します。
         }
 
         override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
-            // プレースホルダーの Drawable を処理します。
+            // プレースホルダー Drawable を処理します。
         }
     })
 
@@ -85,7 +85,7 @@ val request = ImageRequest.Builder(context)
             // プレースホルダー画像を処理します。
         },
         onSuccess = { result ->
-            // 成功した結果を処理します。
+            // 成功時の結果を処理します。
         },
         onError = { error ->
             // エラー画像を処理します。
@@ -98,22 +98,22 @@ context.imageLoader.enqueue(request)
 ### バックグラウンドスレッド {id="background-thread"}
 
 ```kotlin
-// Glide (現在のスレッドをブロックします。メインスレッドから呼び出さないでください)
+// Glide (現在のスレッドをブロックします。メインスレッドから呼び出してはいけません)
 val drawable = Glide.with(context)
     .load(url)
     .submit(width, height)
     .get()
 
-// Picasso (現在のスレッドをブロックします。メインスレッドから呼び出さないでください)
+// Picasso (現在のスレッドをブロックします。メインスレッドから呼び出してはいけません)
 val drawable = Picasso.get()
     .load(url)
     .resize(width, height)
     .get()
 
-// Coil (中断可能 (suspend) で、非ブロッキング、かつスレッドセーフです)
+// Coil (サスペンドし、ノンブロッキングで、スレッドセーフ)
 val request = ImageRequest.Builder(context)
     .data(url)
     .size(width, height)
     .build()
-val drawable = context.imageLoader.execute(request).image.asDrawable(resources)
+val drawable = context.imageLoader.execute(request).image?.asDrawable(context.resources)
 ```

@@ -2,17 +2,17 @@
 
 <show-structure depth="3"/>
 
-Compose Multiplatform 与 [UIKit](https://developer.apple.com/documentation/uikit) 框架具有互操作性。
-您既可以将 Compose Multiplatform 嵌入 UIKit 应用程序中，也可以在 Compose Multiplatform 中嵌入原生的 UIKit 组件。本页面提供了在 UIKit 应用程序中使用 Compose Multiplatform 以及在 Compose Multiplatform UI 中嵌入 UIKit 组件的示例。
+Compose Multiplatform 可与 [UIKit](https://developer.apple.com/documentation/uikit) 框架互操作。
+你既可以在 UIKit 应用程序中嵌入 Compose Multiplatform，也可以在 Compose Multiplatform 中嵌入原生 UIKit 组件。本页面提供了在 UIKit 应用程序中使用 Compose Multiplatform 以及在 Compose Multiplatform UI 中嵌入 UIKit 组件的示例。
 
-> 要了解 SwiftUI 的互操作性，请参阅[与 SwiftUI 框架集成](compose-swiftui-integration.md)文章。
+> 要详细了解 SwiftUI 互操作性，请参阅[与 SwiftUI 框架集成](compose-swiftui-integration.md)一文。
 >
 {style="tip"}
 
 ## 在 UIKit 应用程序中使用 Compose Multiplatform {id="use-compose-multiplatform-inside-a-uikit-application"}
 
-要在 UIKit 应用程序中使用 Compose Multiplatform，请将您的 Compose Multiplatform 代码添加到任何[容器视图控制器](https://developer.apple.com/documentation/uikit/view_controllers)中。
-以下示例在 `UITabBarController` 类中使用了 Compose Multiplatform：
+要在 UIKit 应用程序中使用 Compose Multiplatform，请将你的 Compose Multiplatform 代码添加到任意[容器视图控制器](https://developer.apple.com/documentation/uikit/view_controllers)中。
+本示例在 `UITabBarController` 类中使用 Compose Multiplatform：
 
 ```swift
 let composeViewController = Main_iosKt.ComposeOnly()
@@ -24,7 +24,7 @@ anotherViewController.title = "UIKit"
 // 设置 UITabBarController
 let tabBarController = UITabBarController()
 tabBarController.viewControllers = [
-    // 将创建的 ViewControllers 包装在 UINavigationController 中以设置标题
+    // 将创建的 ViewController 包装在 UINavigationController 中以设置标题
     UINavigationController(rootViewController: composeViewController),
     UINavigationController(rootViewController: anotherViewController)
 ]
@@ -32,25 +32,100 @@ tabBarController.tabBar.items?[0].title = "Compose"
 tabBarController.tabBar.items?[1].title = "UIKit"
 ```
 
-使用这段代码后，您的应用程序应该如下所示：
+运行此代码后，你的应用程序应该如下所示：
 
 ![UIKit](uikit.png){width=300}
 
 > Compose Multiplatform 渲染需要显式启用高刷新率：
-> 在应用的 `Info.plist` 文件中添加 `CADisableMinimumFrameDurationOnPhone` 键。
-> 如果不添加该键，应用将在运行时崩溃。
+> 请在应用的 `Info.plist` 文件中添加 `CADisableMinimumFrameDurationOnPhone` 键。
+> 如果未添加，应用在运行时将会崩溃。
 >
 {style="note"}
 
-在[示例项目](https://github.com/JetBrains/compose-multiplatform/tree/master/examples/interop/ios-compose-in-uikit)中探索此代码。
+可在[示例项目](https://github.com/JetBrains/compose-multiplatform/tree/master/examples/interop/ios-compose-in-uikit)中探索此代码。
+
+### 调整 Compose 视图大小以适应其内容 {id="size-compose-views-to-fit-their-content"}
+<primary-label ref="EAP"/>
+
+Compose 视图可以通过 `sizeThatFits()` 报告其首选大小。
+你无需单独配置尺寸计算。
+
+此调整大小的示例使用了定义在 `main.ios.kt` 中的 Kotlin 函数 `MainComposeView()`：
+
+```kotlin
+fun MainComposeView(): UIView = ComposeUIView {
+    Text(
+        "This Compose view wraps text to fit the available width",
+        modifier = Modifier.fillMaxWidth().padding(16.dp)
+    )
+}
+```
+
+在你的 Swift 代码中，使用 [Auto Layout](https://developer.apple.com/library/archive/documentation/UserExperience/Conceptual/AutolayoutPG/index.html) 约束视图的宽度，并将该宽度传递给 `sizeThatFits()`。
+高度使用 `UIView.noIntrinsicMetric`，让 Compose 根据内容自行确定，然后通过视图的高度约束应用返回的高度。
+
+当可用空间或内容发生变化时，安排另一次布局过程以重新测量并更新约束。
+如果你的应用更改了 Compose 内容，请在 Compose 处理完更改后调用 `view.setNeedsLayout()`。
+
+```swift
+import UIKit
+
+class ComposeContentViewController: UIViewController {
+    // 使用为你的 Kotlin 文件生成的桥接名称
+    // 例如：main.ios.kt -> Main_iosKt
+    private let composeView = Main_iosKt.MainComposeView()
+    private var heightConstraint: NSLayoutConstraint!
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        composeView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(composeView)
+
+        // 临时高度，直到 Compose 完成其内容的测量
+        heightConstraint = composeView.heightAnchor.constraint(equalToConstant: 1)
+
+        NSLayoutConstraint.activate([
+            composeView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            composeView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+            composeView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            heightConstraint
+        ])
+    }
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        guard composeView.bounds.width > 0 else { return }
+
+        // 初始结果可能是回退值；在后续的布局过程中重新测量
+        let preferredSize = composeView.sizeThatFits(
+            CGSize(
+                // 对于固定高度，在此处和布局约束中交换宽度与高度
+                width: composeView.bounds.width,
+                height: UIView.noIntrinsicMetric
+            )
+        )
+
+        if heightConstraint.constant != preferredSize.height {
+            heightConstraint.constant = preferredSize.height
+            view.setNeedsLayout()
+        }
+    }
+}
+```
+{initial-collapse-state="collapsed" collapsible="true" collapsed-title="override func viewDidLayoutSubviews()"}
+
+> 如果你的 Kotlin 函数返回 `UIViewController`，请将其添加到容器视图控制器中，并在其 `view` 上调用 `sizeThatFits()`。
+>
+{style="note"}
 
 ## 在 Compose Multiplatform 中使用 UIKit {id="use-uikit-inside-compose-multiplatform"}
 
-要在 Compose Multiplatform 中使用 UIKit 元素，请将您想要使用的 UIKit 元素添加到 Compose Multiplatform 的 [UIKitView](https://github.com/JetBrains/compose-multiplatform-core/blob/47c012bfe2d4570fb08432253298b8e2b6e38ade/compose/ui/ui/src/uikitMain/kotlin/androidx/compose/ui/interop/UIKitView.uikit.kt) 中。您可以完全使用 Kotlin 编写此代码，也可以配合 Swift 使用。
+要在 Compose Multiplatform 中使用 UIKit 元素，请将你想使用的 UIKit 元素添加到 Compose Multiplatform 的 [UIKitView](https://github.com/JetBrains/compose-multiplatform-core/blob/47c012bfe2d4570fb08432253298b8e2b6e38ade/compose/ui/ui/src/uikitMain/kotlin/androidx/compose/ui/interop/UIKitView.uikit.kt) 中。你可以完全使用 Kotlin 编写此代码，也可以同时使用 Swift。
 
 ### 地图视图 {id="map-view"}
 
-您可以使用 UIKit 的 [`MKMapView`](https://developer.apple.com/documentation/mapkit/mkmapview) 组件在 Compose Multiplatform 中实现地图视图。通过使用 Compose Multiplatform 的 `Modifier.size()` 或 `Modifier.fillMaxSize()` 函数来设置组件大小：
+你可以在 Compose Multiplatform 中使用 UIKit 的 [`MKMapView`](https://developer.apple.com/documentation/mapkit/mkmapview) 组件来实现地图视图。使用 Compose Multiplatform 中的 `Modifier.size()` 或 `Modifier.fillMaxSize()` 函数来设置组件大小：
 
 ```kotlin
 UIKitView(
@@ -59,30 +134,30 @@ UIKitView(
 )
 ```
 
-使用这段代码后，您的应用程序应该如下所示：
+运行此代码后，你的应用程序应该如下所示：
 
 ![MapView](mapview.png){width=300}
 
-现在，让我们看一个进阶示例。这段代码在 Compose Multiplatform 中封装了 UIKit 的 [`UITextField`](https://developer.apple.com/documentation/uikit/uitextfield/)：
+现在，让我们看一个进阶示例。此代码在 Compose Multiplatform 中包装了 UIKit 的 [`UITextField`](https://developer.apple.com/documentation/uikit/uitextfield/)：
 
 ```kotlin
 @OptIn(ExperimentalForeignApi::class)
 @Composable
 fun UseUITextField(modifier: Modifier = Modifier) {
-    // 在 Compose 中持有文本状态
+    // 在 Compose 中保存文本状态
     var message by remember { mutableStateOf("Hello, World!") }
 
     UIKitView(
         factory = {
-            // 创建一个与 Compose 状态集成的 UITextField
+            // 创建与 Compose 状态集成的 UITextField
             val textField = object : UITextField(CGRectMake(0.0, 0.0, 0.0, 0.0)) {
                 @ObjCAction
                 fun editingChanged() {
-                    // 当 UITextField 中的文本改变时更新 Compose 状态
+                    // 当 UITextField 中的文本更改时更新 Compose 状态
                     message = text ?: ""
                 }
             }
-            // 为 UITextField 内的文本更改添加侦听器
+            // 为 UITextField 内的文本更改添加监听器
             textField.addTarget(
                 target = textField,
                 action = NSSelectorFromString(textField::editingChanged.name),
@@ -99,21 +174,21 @@ fun UseUITextField(modifier: Modifier = Modifier) {
 }
 ```
 
-* `factory` 参数包含 `editingChanged()` 函数和 `textField.addTarget()` 侦听器，用于检测 `UITextField` 的任何更改。
-* `editingChanged()` 函数使用了 `@ObjCAction` 注解，以便它可以与 Objective-C 代码互操作。
-* `addTarget()` 函数的 `action` 参数传递了 `editingChanged()` 函数的名称，从而响应 `UIControlEventEditingChanged` 事件并触发该函数。
-* 当可观察的 `message` 状态值发生变化时，会调用 `UIKitView()` 的 `update` 参数。
-* 该函数更新 `UITextField` 的 `text` 属性，以便用户看到更新后的值。
+* `factory` 形参包含 `editingChanged()` 函数和 `textField.addTarget()` 监听器，用于检测对 `UITextField` 的任何更改。
+* `editingChanged()` 函数带有 `@ObjCAction` 注解，以便它可以与 Objective-C 代码进行互操作。
+* `addTarget()` 函数的 `action` 形参传递了 `editingChanged()` 函数的名称，在响应 `UIControlEventEditingChanged` 事件时触发该函数。
+* 当可观察的 message 状态改变其值时，将调用 `UIKitView()` 的 `update` 形参。
+* 该函数会更新 `UITextField` 的 `text` 特性，以便用户看到更新后的值。
 
-在我们的[示例项目](https://github.com/JetBrains/compose-multiplatform/tree/master/examples/interop/ios-uikit-in-compose)中探索此示例的代码。
+可在我们的[示例项目](https://github.com/JetBrains/compose-multiplatform/tree/master/examples/interop/ios-uikit-in-compose)中探索本示例的代码。
 
 ### 相机视图 {id="camera-view"}
 
-您可以使用 UIKit 的 [`AVCaptureSession`](https://developer.apple.com/documentation/avfoundation/avcapturesession) 和 [`AVCaptureVideoPreviewLayer`](https://developer.apple.com/documentation/avfoundation/avcapturevideopreviewlayer) 组件在 Compose Multiplatform 中实现相机视图。
+你可以在 Compose Multiplatform 中使用 UIKit 的 [`AVCaptureSession`](https://developer.apple.com/documentation/avfoundation/avcapturesession) 和 [`AVCaptureVideoPreviewLayer`](https://developer.apple.com/documentation/avfoundation/avcapturevideopreviewlayer) 组件来实现相机视图。
 
-这允许您的应用程序访问设备的相机并显示实时预览。
+这允许你的应用程序访问设备的相机并显示实时预览。
 
-这是一个如何实现基础相机视图的示例：
+以下是实现基本相机视图的示例：
 
 ```kotlin
 UIKitView(
@@ -139,7 +214,7 @@ UIKitView(
 )
 ```
 
-现在，让我们看一个进阶示例。这段代码捕获照片，附加 GPS 元数据，并使用原生 `UIView` 显示实时预览：
+现在，让我们看一个进阶示例。此代码使用原生 `UIView` 拍照、附加 GPS 元数据并显示实时预览：
 
 ```kotlin
 @OptIn(ExperimentalForeignApi::class)
@@ -148,10 +223,10 @@ fun RealDeviceCamera(
     camera: AVCaptureDevice,
     onCapture: (picture: PictureData.Camera, image: PlatformStorableImage) -> Unit
 ) {
-    // 初始化用于拍照的 AVCapturePhotoOutput
+    // 初始化 AVCapturePhotoOutput 用于拍照
     val capturePhotoOutput = remember { AVCapturePhotoOutput() }
     // ...
-    // 定义捕获回调的代理：处理图像数据、附加 GPS、设置 onCapture
+    // 定义用于捕获回调的代理：处理图像数据、附加 GPS、设置 onCapture
     val photoCaptureDelegate = remember {
         object : NSObject(), AVCapturePhotoCaptureDelegateProtocol {
             override fun captureOutput(
@@ -192,7 +267,7 @@ fun RealDeviceCamera(
         AVCaptureVideoPreviewLayer(session = captureSession)
     }
     // ...
-    // 创建一个带有原生相机预览层的原生 UIView
+    // 创建带有原生相机预览层的原生 UIView
     UIKitView(
         modifier = Modifier.fillMaxSize().background(Color.Black),
         factory = {
@@ -212,7 +287,7 @@ fun RealDeviceCamera(
         },
     )
     // ...
-    // 创建一个 Compose 按钮，按下时执行 capturePhotoWithSettings 回调
+    // 创建一个 Compose 按钮，在按下时执行 capturePhotoWithSettings 回调
     CircularButton(
         imageVector = IconPhotoCamera,
         modifier = Modifier.align(Alignment.BottomCenter).padding(36.dp),
@@ -240,23 +315,25 @@ fun RealDeviceCamera(
 `RealDeviceCamera` 可组合项执行以下任务：
 
 * 使用 `AVCaptureSession` 和 `AVCaptureVideoPreviewLayer` 设置原生相机预览。
-* 创建一个 `UIKitView` 来承载自定义的 `UIView` 子类，该子类管理布局更新并嵌入预览层。
-* 初始化 `AVCapturePhotoOutput` 并配置一个代理来处理照片捕获。
-* 使用 `CLLocationManager`（通过 `locationManager`）在捕获瞬间检索 GPS 坐标。
+* 创建一个承载自定义 `UIView` 子类的 `UIKitView`，该子类管理布局更新并嵌入预览层。
+* 初始化 `AVCapturePhotoOutput` 并配置代理以处理拍照。
+* 在拍摄瞬间使用 `CLLocationManager`（通过 `locationManager`）获取 GPS 坐标。
 * 将捕获的图像转换为 `UIImage`，将其包装为 `PlatformStorableImage`，并通过 `onCapture` 提供名称、描述和 GPS 位置等元数据。
-* 显示一个圆形的 Compose 按钮用于触发捕获。
-* 在使用前置摄像头时应用镜像设置，以匹配自然的自拍效果。
-* 使用 `CATransaction` 在 `layoutSubviews()` 中动态更新预览布局，以避免动画。
+* 显示一个圆形的 Compose 可组合按钮以触发拍照。
+* 在使用前置摄像头时应用镜像设置，以符合自然的自拍行为。
+* 在 `layoutSubviews()` 中使用 `CATransaction` 动态更新预览布局以避免动画。
 
-> 要在真实设备上进行测试，您需要在应用的 `Info.plist` 文件中添加 `NSCameraUsageDescription` 键。如果没有它，应用在运行时将崩溃。
+> 要在真机上进行测试，你需要在应用的 `Info.plist` 文件中添加 `NSCameraUsageDescription` 键。
+> 如果未添加，应用在运行时将会崩溃。
 >
 {style="note"}
 
-在 [ImageViewer 示例项目](https://github.com/JetBrains/compose-multiplatform/tree/master/examples/imageviewer)中探索此示例的完整代码。
+可在 [ImageViewer 示例项目](https://github.com/JetBrains/compose-multiplatform/tree/master/examples/imageviewer)中探索本示例的完整代码。
 
 ### Web 视图 {id="web-view"}
 
-您可以使用 UIKit 的 [`WKWebView`](https://developer.apple.com/documentation/webkit/wkwebview) 组件在 Compose Multiplatform 中实现 Web 视图。这允许您的应用程序在 UI 中显示 Web 内容并与之交互。通过使用 Compose Multiplatform 的 `Modifier.size()` 或 `Modifier.fillMaxSize()` 函数来设置组件大小：
+你可以在 Compose Multiplatform 中使用 UIKit 的 [`WKWebView`](https://developer.apple.com/documentation/webkit/wkwebview) 组件来实现 Web 视图。这允许你的应用程序在 UI 中显示 Web 内容并与之交互。
+使用 Compose Multiplatform 中的 `Modifier.size()` 或 `Modifier.fillMaxSize()` 函数来设置组件大小：
 
 ```kotlin
 UIKitView(
@@ -268,7 +345,8 @@ UIKitView(
     modifier = Modifier.size(300.dp)
 )
 ```
-现在，让我们看一个进阶示例。这段代码为 Web 视图配置了导航代理，并允许 Kotlin 与 JavaScript 之间进行通信：
+
+现在，让我们看一个进阶示例。此代码通过导航代理配置 Web 视图，并允许 Kotlin 与 JavaScript 之间进行通信：
 
 ```kotlin
 @Composable
@@ -292,7 +370,7 @@ fun WebViewWithDelegate(
     UIKitView(
         modifier = modifier,
         factory = {
-            // 实例化 WKWebView并设置其代理
+            // 实例化 WKWebView 并设置其代理
             val webView = WKWebView().apply {
                 navigationDelegate = delegate
                 loadRequest(NSURLRequest(uRL = NSURL(string = initialUrl)))
@@ -311,12 +389,12 @@ fun WebViewWithDelegate(
 
 `WebViewWithDelegate` 可组合项执行以下任务：
 
-* 创建一个实现 `WKNavigationDelegateProtocol` 接口的稳定代理对象。使用 Compose 的 `remember` 跨重组记住该对象。
-* 实例化一个 `WKWebView`，使用 `UIKitView` 嵌入它，并配置它以分配记住的代理。
-* 加载由 `initialUrl` 参数提供的初始网页。
+* 创建一个实现 `WKNavigationDelegateProtocol` 接口的稳定代理对象。使用 Compose 的 `remember` 可以在重组之间记住该对象。
+* 实例化 `WKWebView`，使用 `UIKitView` 将其嵌入，并通过分配已记住的代理对其进行配置。
+* 加载由 `initialUrl` 形参提供的初始网页。
 * 通过代理观察导航更改，并通过 `onNavigationChange` 回调传递当前 URL。
-* 使用 `update` 参数观察请求 URL 的更改，并相应地重新加载网页。
+* 使用 `update` 形参观察请求 URL 的更改，并相应地重新加载网页。
 
 ## 下一步 {id="what-s-next"}
 
-您还可以探索 Compose Multiplatform [与 SwiftUI 框架集成](compose-swiftui-integration.md)的方式。
+你还可以了解 Compose Multiplatform [与 SwiftUI 框架集成](compose-swiftui-integration.md)的方式。

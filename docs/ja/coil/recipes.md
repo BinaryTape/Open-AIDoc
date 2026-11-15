@@ -1,18 +1,18 @@
 # レシピ
 
-このページでは、Coil を使用した一般的なユースケースの処理方法に関するガイダンスを提供します。実際の要件に合わせてコードを変更する必要があるかもしれませんが、実装の足がかりとして役立つはずです。
+このページでは、Coilを使用した一般的なユースケースの処理方法について案内します。要件に合わせてコードを変更する必要があるかもしれませんが、実装の足がかりとして役立つはずです。
 
-まだカバーされていない一般的なユースケースにお気づきですか？新しいセクションを追加する PR をお気軽に提出してください。
+カバーされていない一般的なユースケースにお気づきですか？新しいセクションを追加するPRをぜひ気軽に送信してください。
 
 ## Palette {id="palette"}
 
-[Palette](https://developer.android.com/training/material/palette-colors?hl=ja) を使用すると、画像から特徴的な色を抽出できます。`Palette` を作成するには、画像の `Bitmap` にアクセスする必要があります。これにはいくつかの方法があります。
+[Palette](https://developer.android.com/training/material/palette-colors?hl=en) を使用すると、画像から主要な色を抽出できます。`Palette` を作成するには、画像の `Bitmap` にアクセスする必要があります。これにはいくつかの方法があります。
 
-`ImageRequest.Listener` を設定し、`ImageRequest` をエンキュー（enqueue）することで、画像のビットマップにアクセスできます。
+`ImageRequest.Listener` を設定し、`ImageRequest` をエンキューすることで、画像のビットマップにアクセスできます。
 
 ```kotlin
 imageView.load("https://example.com/image.jpg") {
-    // Palette は画像のピクセルを読み取る必要があるため、ハードウェアビットマップを無効にします。
+    // Paletteが画像のピクセルを読み取る必要があるため、ハードウェアビットマップを無効化します。
     allowHardware(false)
     listener(
         onSuccess = { _, result ->
@@ -27,9 +27,9 @@ imageView.load("https://example.com/image.jpg") {
 
 ## メモリキャッシュキーをプレースホルダーとして使用する {id="using-a-memory-cache-key-as-a-placeholder"}
 
-同じ画像が異なるサイズで読み込まれる場合、前のリクエストの `MemoryCache.Key` を後続のリクエストのプレースホルダーとして使用すると便利です。たとえば、最初のリクエストで 100x100 の画像を読み込み、2 回目のリクエストで 500x500 の画像を読み込む場合、最初の画像を 2 回目のリクエストの同期的なプレースホルダーとして使用できます。
+以前のリクエストの `MemoryCache.Key` を後続のリクエストのプレースホルダーとして使用することは、サイズが異なるだけで同じ2つの画像を読み込む場合に役立ちます。例えば、最初のリクエストが画像を 100x100 で読み込み、2番目のリクエストが画像を 500x500 で読み込む場合、最初の画像を2番目のリクエストの同期的なプレースホルダーとして使用できます。
 
-サンプルアプリでのこの効果の見た目は次のとおりです。
+サンプルアプリでは、この効果は次のようになります。
 
 <p style="text-align: center;">
     <video width="360" height="640" autoplay loop muted playsinline>
@@ -37,23 +37,23 @@ imageView.load("https://example.com/image.jpg") {
     </video>
 </p>
 
-*リスト内の画像は意図的に非常に低いディテールで読み込まれており、視覚的効果を強調するためにクロスフェードを遅くしています。*
+*視覚効果を強調するため、リスト内の画像は意図的に非常に低いディテールで読み込まれ、クロスフェードは遅く設定されています。*
 
-この効果を実現するには、1 回目のリクエストの `MemoryCache.Key` を、2 回目のリクエストの `ImageRequest.placeholderMemoryCacheKey` として使用します。以下に例を示します。
+この効果を実現するには、最初のリクエストの `MemoryCache.Key` を2番目のリクエストの `ImageRequest.placeholderMemoryCacheKey` として使用します。以下に例を示します。
 
 ```kotlin
-// 1 回目のリクエスト
+// 最初のリクエスト
 listImageView.load("https://example.com/image.jpg")
 
-// 2 回目のリクエスト（1 回目のリクエストが完了した後）
+// 2番目のリクエスト（最初のリクエストが完了した後）
 detailImageView.load("https://example.com/image.jpg") {
-    placeholderMemoryCacheKey(listImageView.result.memoryCacheKey)
+    placeholderMemoryCacheKey((listImageView.result as? SuccessResult)?.memoryCacheKey)
 }
 ```
 
 ## Compose AnimatedContent {id="compose-animatedcontent"}
 
-`rememberAsyncImagePainter` と `AnimatedContent` を使用して、プレースホルダーと読み込まれた画像の間のアニメーションを作成します。
+プレースホルダーと読み込まれた画像の間をアニメーションさせるには、`rememberAsyncImagePainter` と `AnimatedContent` を使用します。
 
 ```kotlin
 val sizeResolver = rememberConstraintsSizeResolver()
@@ -75,7 +75,7 @@ AnimatedContent(
         is AsyncImagePainter.State.Empty,
         is AsyncImagePainter.State.Loading -> PlaceholderContent()
         is AsyncImagePainter.State.Success -> {
-            // モデル変更後に古い画像がアニメーションで消える間も、表示を維持します。
+            // モデルが変更された後、古い画像がアニメーションしながら消える間も表示を維持します。
             Image(
                 painter = targetState.painter,
                 contentDescription = stringResource(R.string.description),
@@ -86,29 +86,29 @@ AnimatedContent(
 }
 ```
 
-モデル変更後に古い画像がアニメーションしながら消える間も表示を維持するために、`targetState.painter` を `Image` に渡します。
+モデル変更後に古い画像がアニメーションしながら消える間も表示が維持されるよう、`targetState.painter` を `Image` に渡します。
 
-最終的な画像サイズは読み込みが完了するまで不明です。スペースを確保するために、固定の制約または既知のアスペクト比を使用してください。
+最終的な画像サイズは読み込みが完了するまで不明です。スペースを確保するには、固定の制約（constraints）または既知のアスペクト比を使用してください。
 
-`rememberAsyncImagePainter` は、画像がメモリキャッシュにある場合でも `State.Empty` から開始します。必要に応じて `state.result.dataSource` を使用して、メモリキャッシュされた画像のアニメーションをスキップしてください。
+`rememberAsyncImagePainter` は、画像がメモリキャッシュにある場合でも `State.Empty` から開始します。必要に応じて、`state.result.dataSource` を使用してメモリキャッシュされた画像のアニメーションをスキップしてください。
 
-**注意**: `AnimatedContent` は Painter のクロスフェードよりも大幅に負荷が高く、アニメーションが終了するまで古い画像をメモリ内に保持します。遅延リスト（Lazy lists）内や単純なフェードの場合は、`ImageRequest.Builder.crossfade` を優先して使用してください。
+注意: `AnimatedContent` はペインターのクロスフェードよりもはるかに負荷が高く、アニメーションが終了するまで古い画像をメモリに保持します。Lazy リストや単純なフェードの場合は、`ImageRequest.Builder.crossfade` を優先して使用してください。
 
 ## 共有要素遷移（Shared Element Transitions） {id="shared-element-transitions"}
 
-[共有要素遷移（Shared element transitions）](https://developer.android.com/training/transitions/start-activity?hl=ja)を使用すると、`Activity` 間や `Fragment` 間でアニメーションを実行できます。Coil でこれらを機能させるための推奨事項は以下のとおりです。
+[共有要素遷移（Shared element transitions）](https://developer.android.com/training/transitions/start-activity) を使用すると、`Activities` と `Fragments` の間をアニメーション化できます。Coilでこれらを適切に機能させるための推奨事項は以下のとおりです。
 
-- **共有要素遷移はハードウェアビットマップと互換性がありません。** 遷移元のアニメーション対象となる `ImageView` と遷移先のアニメーション対象となるビューの両方で、`allowHardware(false)` を設定してハードウェアビットマップを無効にする必要があります。設定しない場合、遷移時に `java.lang.IllegalArgumentException: Software rendering doesn't support hardware bitmaps` 例外がスローされます。
+- **共有要素遷移はハードウェアビットマップと互換性がありません。** アニメーション元の `ImageView` とアニメーション先のビューの両方で `allowHardware(false)` を設定し、ハードウェアビットマップを無効にする必要があります。設定しない場合、遷移時に `java.lang.IllegalArgumentException: Software rendering doesn't support hardware bitmaps` 例外がスローされます。
 
-- 開始画像の `MemoryCache.Key` を、終了画像の [`placeholderMemoryCacheKey`](/coil/api/coil-core/coil3.request/-image-request/-builder/placeholder-memory-cache-key.html) として使用します。これにより、終了画像のプレースホルダーとして開始画像が確実に使用され、画像がメモリキャッシュにある場合は白いちらつきのないスムーズな遷移が実現します。
+- 開始画像の `MemoryCache.Key` を、終了画像の [`placeholderMemoryCacheKey`](/coil/api/coil-core/coil3.request/-image-request/-builder/placeholder-memory-cache-key.html) として使用します。これにより、開始画像が終了画像のプレースホルダーとして使用され、画像がメモリキャッシュにある場合に白いちらつき（フラッシュ）のないスムーズな遷移が実現します。
 
-- 最適な結果を得るには、[`ChangeImageTransform`](https://developer.android.com/reference/android/transition/ChangeImageTransform) と [`ChangeBounds`](https://developer.android.com/reference/android/transition/ChangeBounds) を組み合わせて使用します。
+- 最適な結果を得るには、[`ChangeImageTransform`](https://developer.android.com/reference/android/transition/ChangeImageTransform) と [`ChangeBounds`](https://developer.android.com/reference/android/transition/ChangeBounds) を組み合わせて使用してください。
 
-Compose を使用していますか？[`AsyncImage` で共有要素遷移を実行する方法については、こちらの記事を確認してください](https://www.tunjid.com/articles/animating-contentscale-during-image-shared-element-transitions-65fba03537c67f8df0161c31)。
+Composeを使用していますか？[`AsyncImage` で共有要素遷移を実行する方法については、こちらの記事を確認してください](https://www.tunjid.com/articles/animating-contentscale-during-image-shared-element-transitions-65fba03537c67f8df0161c31)。
 
-## RemoteViews {id="remote-views"}
+## Remote Views {id="remote-views"}
 
-Coil はそのまま使える [`RemoteViews`](https://developer.android.com/reference/android/widget/RemoteViews) 用の `Target` を提供していませんが、以下のように作成できます。
+Coilは [`RemoteViews`](https://developer.android.com/reference/android/widget/RemoteViews) 用の `Target` を標準では提供していませんが、次のように作成できます。
 
 ```kotlin
 class RemoteViewsTarget(
@@ -131,7 +131,7 @@ class RemoteViewsTarget(
 }
 ```
 
-その後、通常通りリクエストを `enqueue` / `execute` します。
+その後、通常どおりリクエストを `enqueue` / `execute` します。
 
 ```kotlin
 val request = ImageRequest.Builder(context)
@@ -141,9 +141,9 @@ val request = ImageRequest.Builder(context)
 imageLoader.enqueue(request)
 ```
 
-## Painter の変換 {id="transforming-painters"}
+## Painterの変形（Transforming Painters） {id="transforming-painters"}
 
-`AsyncImage` と `AsyncImagePainter` は両方とも、`Painter` を受け取る `placeholder` / `error` / `fallback` 引数を持っています。Painter はコンポーザブルを使用するよりも柔軟性には劣りますが、Coil がサブコンポジション（subcomposition）を使用する必要がないため高速です。ただし、目的の UI を実現するために、Painter のインセット、拡大・縮小、色合い変更（ティント）、または変換が必要になる場合があります。これを実現するには、[この Gist をプロジェクトにコピー](https://gist.github.com/colinrtwhite/c2966e0b8584b4cdf0a5b05786b20ae1)し、次のように Painter をラップします。
+`AsyncImage` と `AsyncImagePainter` の両方に、`Painter` を受け取る `placeholder` / `error` / `fallback` 引数があります。Painterはコンポーザブルを使用するよりも柔軟性に欠けますが、Coilがサブコンポジション（subcomposition）を使用する必要がないため高速です。とはいえ、目的のUIを実現するために、Painterのインセット、拡大・縮小、色合い変更（tint）、または変形が必要になる場合があります。これを実現するには、[このGistをプロジェクトにコピー](https://gist.github.com/colinrtwhite/c2966e0b8584b4cdf0a5b05786b20ae1)し、次のようにPainterをラップします。
 
 ```kotlin
 AsyncImage(
@@ -157,7 +157,7 @@ AsyncImage(
 )
 ```
 
-`onDraw` は末尾のラムダを使用してオーバーライドできます。
+末尾のラムダを使用して `onDraw` を上書きできます。
 
 ```kotlin
 AsyncImage(
@@ -175,7 +175,7 @@ AsyncImage(
 
 ## リクエストの変換 {id="transforming-requests"}
 
-画像の取得に使用される HTTP リクエストの変換が必要になる場合があります。この例では、[Interceptor](https://coil-kt.github.io/coil/api/coil-core/coil3.intercept/-interceptor) を使用して、リクエスト URL に `width` と `height` のクエリパラメータを追加します。
+画像の取得に使用されるHTTPリクエストを変換（変更）する必要がある場合があります。この例では、[Interceptor](https://coil-kt.github.io/coil/api/coil-core/coil3.intercept/-interceptor) を使用してリクエストURLに `width` と `height` のクエリパラメータを追加します。
 
 ```kotlin
 class UrlSizeInterceptor : Interceptor {
@@ -185,7 +185,7 @@ class UrlSizeInterceptor : Interceptor {
         val uri = request.uri
 
         if (uri == null || uri.scheme !in setOf("https", "http")) {
-            // HTTP リクエスト以外は無視します。
+            // HTTP以外のリクエストは無視します。
             return chain.proceed()
         }
 
@@ -200,7 +200,7 @@ class UrlSizeInterceptor : Interceptor {
                 .build()
             return chain.withRequest(transformedRequest).proceed()
         } else {
-            // 無限の制約などの理由で幅と高さが利用できない場合。
+            // 幅と高さが利用できません（例: 無限の制約によるものなど）。
             chain.proceed()
         }
     }
@@ -215,7 +215,7 @@ class UrlSizeInterceptor : Interceptor {
 }
 ```
 
-作成したインターセプターを `ImageLoader` に追加・登録することを忘れないでください。
+作成したインターセプターを `ImageLoader` に追加して登録することを忘れないでください。
 
 ```kotlin
 ImageLoader.Builder(context)

@@ -1,41 +1,42 @@
-[//]: # (title: Kotlin プロジェクトでアノテーションプロセッサを使用する)
+[//]: # (title: Kotlinプロジェクトでアノテーションプロセッサを使用する)
 
 <tldr>
 
-* 次の場合は **[kapt](kapt.md)** を使用してください：
-  * Maven プロジェクトを使用している。
-  * Gradle プロジェクトを使用しているが、必要な Java アノテーションプロセッサがまだ KSP をサポートしていない。[サポートされているライブラリのリストを確認する](ksp-overview.md#supported-libraries)。
-* 次の場合は **[KSP](ksp-overview.md)** を使用してください：
-  * Gradle プロジェクトを使用しており、必要な Java アノテーションプロセッサが KSP をサポートしている。
-  * 独自のアノテーションプロセッサを作成したい。
+* 次の場合は **[kapt](kapt.md)** を使用してください:
+  * Mavenプロジェクトの場合。
+  * Gradleプロジェクトだが、必要なJavaアノテーションプロセッサがまだKSPをサポートしていない場合。[サポートされているライブラリのリスト](ksp-overview.md#supported-libraries)を参照してください。
+* 次の場合は **[KSP](ksp-overview.md)** を使用してください:
+  * Gradleプロジェクトであり、必要なJavaアノテーションプロセッサがKSPをサポートしている場合。
+  * 独自のアノテーションプロセッサを作成したい場合。
 
 </tldr>
 
-アノテーションプロセッサは、コンパイル時にソースコードを分析して、ボイラープレートコード（定型コード）を生成したり、使用方法を検証したり、その他のアーティファクトを生成したりします。
-Kotlin は、アノテーションプロセッサを操作する 2 つの方法をサポートしています。
+アノテーションプロセッサは、コンパイル時にソースコードを解析して、ボイラープレートコードの生成、使い方の検証、またはその他のアーティファクトの生成を行います。
+Kotlinは、アノテーションプロセッサを扱うための2つの方法をサポートしています:
 
-* [kapt コンパイラプラグイン](#use-kapt-with-java-annotation-processors)は、Kotlin ソースコードからスタブファイルを生成し、そのスタブに対して Java アノテーションプロセッサを実行することで動作します。この追加のスタブ生成ステップによりビルド時間が遅くなり、また kapt は[拡張関数](extensions.md)や [Null 安全](null-safety.md)などの Kotlin 特有の構造を理解できません。
+* [kaptコンパイラプラグイン](#use-kapt-with-java-annotation-processors)は、Kotlinソースコードからスタブファイルを生成し、それらのスタブに対してJavaアノテーションプロセッサを実行することで機能します。このスタブ生成の余分なステップによりビルド時間が遅くなり、またkaptは[拡張関数](extensions.md)や[null安全](null-safety.md)などのKotlin固有の構造を理解できません。
 
-  kapt は Maven と Gradle の両方をサポートしています。すべての Maven プロジェクト、および [MapStruct](https://mapstruct.org/) のように KSP をまだ採用していないプロセッサライブラリを使用する Gradle プロジェクトに推奨されます。
+  kaptはMavenとGradleの両方をサポートしています。すべてのMavenプロジェクト、および[MapStruct](https://mapstruct.org/)など、まだKSPを採用していないプロセッサライブラリを使用するGradleプロジェクトで推奨されます。
 
-* [KSP フレームワーク](#use-ksp-in-gradle-projects)は、スタブを生成することなく、Kotlin ファーストな API を通じて Kotlin ソースコードを直接読み取ります。Kotlin 特有の機能をネイティブに理解し、kapt よりも高速にビルドを実行します。
+* [KSPフレームワーク](#use-ksp-in-gradle-projects)は、スタブを生成することなく、KotlinファーストのAPIを通じてKotlinソースコードを直接読み取ります。Kotlin固有の機能をネイティブに理解し、kaptよりも高速にビルドを実行します。
 
-  現在、KSP は Gradle のみを公式にサポートしています。独自のプロセッサを作成する場合や、[Dagger](https://dagger.dev/) のような KSP 対応ライブラリを使用する場合に推奨されます。
+  現在、KSPの公式サポートはGradleのみです。独自のプロセッサを作成する場合や、[Dagger](https://dagger.dev/)のようなKSP互換ライブラリと連携する場合に推奨されます。
 
-## Java アノテーションプロセッサで kapt を使用する {id="use-kapt-with-java-annotation-processors"}
+## Javaアノテーションプロセッサでkaptを使用する {id="use-kapt-with-java-annotation-processors"}
 
-[kapt](kapt.md) を使用すると、プロセッサ自体に変更を加えることなく、既存の Java アノテーションプロセッサを Kotlin プロジェクトで使用できます。
+[kapt](kapt.md)を使用すると、プロセッサ自体に変更を加えることなく、Kotlinプロジェクトで既存のJavaアノテーションプロセッサを使用できます。
 
-以下の例は、コンパイル時に Java Beans 間の型安全なマッパー実装を生成する [MapStruct](https://mapstruct.org/) アノテーションプロセッサの使用方法を示しています。
+以下の例は、コンパイル時にJava beans間の型安全なマッパー実装を生成する[MapStruct](https://mapstruct.org/)アノテーションプロセッサの使用方法を示しています。
 
-1. ビルドファイルで `kapt` プラグインを適用し、`dependencies` セクションに MapStruct を追加します。
+1. ビルドファイルで`kapt`プラグインを適用し、`dependencies`セクションにMapStructを追加します:
 
    <tabs group="build-tool">
    <tab title="Maven" group-key="maven">
    
    ```xml
    <properties>
-       <kotlin.compiler.jvmTarget>11</kotlin.compiler.jvmTarget>
+       <kotlin.version>%kotlinVersion%</kotlin.version>
+       <maven.compiler.release>17</maven.compiler.release>
        <mapstruct.version>1.6.3</mapstruct.version>
    </properties>
    
@@ -52,33 +53,20 @@ Kotlin は、アノテーションプロセッサを操作する 2 つの方法�
        <artifactId>kotlin-maven-plugin</artifactId>
        <version>${kotlin.version}</version>
        <extensions>true</extensions>
-       <executions>
-           <execution>
-               <id>kapt</id>
-               <goals>
-                   <goal>kapt</goal>
-               </goals>
-               <configuration>
-                   <sourceDirs>
-                       <sourceDir>src/main/kotlin</sourceDir>
-                       <sourceDir>src/main/java</sourceDir>
-                   </sourceDirs>
-                   <aptMode>stubs</aptMode>
-                   <annotationProcessorPaths>
-                       <annotationProcessorPath>
-                           <groupId>org.mapstruct</groupId>
-                           <artifactId>mapstruct-processor</artifactId>
-                           <version>${mapstruct.version}</version>
-                       </annotationProcessorPath>
-                   </annotationProcessorPaths>
-               </configuration>
-           </execution>
-       </executions>
+       <configuration>
+           <annotationProcessorPaths>
+               <annotationProcessorPath>
+                   <groupId>org.mapstruct</groupId>
+                   <artifactId>mapstruct-processor</artifactId>
+                   <version>${mapstruct.version}</version>
+               </annotationProcessorPath>
+           </annotationProcessorPaths>
+       </configuration>
    </plugin>
    ```
    
-   * `kotlin-maven-plugin` の `kapt` ゴールの実行を、`compile` 実行の**前**に追加します。
-   * `aptMode` オプションを使用して、[アノテーション処理のモード](kapt.md#set-up-in-maven)を設定します。
+   * `<extensions>true</extensions>`オプションは、kaptを[自動的](maven-configure-project.md#automatic-configuration)に設定します。これにより、`src/main/kotlin`および`src/test/kotlin`のソースルートが登録され、適切なライフサイクルフェーズにバインドされた`kapt`および`compile`の実行が追加されるため、コンパイル前に`kapt`ゴールが実行されます。
+   * `maven.compiler.release`プロパティはJavaとKotlin両方のコンパイラを設定するため、kaptによって生成されたJavaソースは同じJVMターゲットに対してコンパイルされます。
 
    </tab>
    <tab title="Gradle Kotlin" group-key="kotlin">
@@ -111,7 +99,7 @@ Kotlin は、アノテーションプロセッサを操作する 2 つの方法�
    </tab>
    </tabs>
 
-2. データクラスとマッパーインターフェースを定義します。
+2. データクラスとマッパーインターフェースを定義します:
 
    ```kotlin
    import org.mapstruct.Mapper
@@ -130,8 +118,8 @@ Kotlin は、アノテーションプロセッサを操作する 2 つの方法�
    }
    ```
 
-3. プロジェクトをビルドします。MapStruct は、生成されたソースのディレクトリに `UserMapperImpl` クラスを生成します。
-   `UserMapper` コンパニオンオブジェクトを使用して、生成された実装を呼び出します。
+3. プロジェクトをビルドします。MapStructは生成されたソースのディレクトリに`UserMapperImpl`クラスを生成します。
+   生成された実装を呼び出すには、`UserMapper`のコンパニオンオブジェクトを使用します:
 
    ```kotlin
    fun main() {
@@ -142,17 +130,17 @@ Kotlin は、アノテーションプロセッサを操作する 2 つの方法�
    }
    ```
 
-## Gradle プロジェクトで KSP を使用する {id="use-ksp-in-gradle-projects"}
+## GradleプロジェクトでKSPを使用する {id="use-ksp-in-gradle-projects"}
 
-[KSP](ksp-overview.md) を使用すると、Gradle プロジェクトで既存のアノテーションプロセッサを使用したり、ソースコード内のアノテーションに基づいてコードを生成する独自のプロセッサを作成したりできます。
+[KSP](ksp-overview.md)を使用すると、Gradleプロジェクトで既存のアノテーションプロセッサを使用したり、ソースコード内のアノテーションに基づいてコードを生成する独自のプロセッサを作成したりできます。
 
-### Java アノテーションプロセッサで KSP を使用する {id="use-ksp-with-java-annotation-processors"}
+### JavaアノテーションプロセッサでKSPを使用する {id="use-ksp-with-java-annotation-processors"}
 
-Gradle プロジェクトでは、互換性のあるアノテーションプロセッサで KSP を使用してください。KSP は kapt よりも高速で、Kotlin 特有の機能をネイティブに理解できます。[すでに KSP をサポートしているライブラリ](ksp-overview.md#supported-libraries)のリストを参照してください。
+Gradleプロジェクトでは、互換性のあるアノテーションプロセッサとともにKSPを使用してください。KSPはkaptよりも高速で、Kotlin固有の機能をネイティブに理解できます。[すでにKSPをサポートしているライブラリ](ksp-overview.md#supported-libraries)のリストを参照してください。
 
-以下の例は、依存関係グラフの構築コードを生成するコンパイル時の依存関係注入（DI）フレームワークである [Dagger](https://dagger.dev/) の使用方法を示しています。
+以下の例は、依存関係グラフの配線コードを生成するコンパイル時依存性注入フレームワークである[Dagger](https://dagger.dev/)の使用方法を示しています。
 
-1. `build.gradle(.kts)` ファイルで KSP プラグインを適用し、`dependencies` ブロックに Dagger を追加します。
+1. `build.gradle(.kts)`ファイルでKSPプラグインを適用し、`dependencies`ブロックにDaggerを追加します:
  
    <tabs group="build-script">
    <tab title="Kotlin" group-key="kotlin">
@@ -191,11 +179,11 @@ Gradle プロジェクトでは、互換性のあるアノテーションプロ�
    </tab>
    </tabs>
 
-   > KSP の最新バージョンを確認するには、GitHub の [Releases](https://github.com/google/ksp/releases) ページをチェックしてください。
+   > KSPの最新バージョンを確認するには、GitHubの[Releases](https://github.com/google/ksp/releases)ページを確認してください。
    >
    {style="tip"}
 
-2. Kotlin クラスに Dagger アノテーションを付与します。
+2. KotlinクラスにDaggerアノテーションを付与します:
 
    ```kotlin
    import javax.inject.Inject
@@ -223,8 +211,7 @@ Gradle プロジェクトでは、互換性のあるアノテーションプロ�
    }
    ```
 
-3. プロジェクトをビルドします。Dagger は `build/generated/ksp` ディレクトリに `DaggerAppComponent` などの実装クラスを生成します。
-   コード内で生成されたクラスを使用します。
+3. プロジェクトをビルドします。Daggerは`build/generated/ksp`ディレクトリ内に`DaggerAppComponent`などの実装クラスを生成します。コード内で生成されたクラスを使用します:
 
     ```kotlin
     fun main() {
@@ -235,21 +222,21 @@ Gradle プロジェクトでは、互換性のあるアノテーションプロ�
     }
     ```
 
-Dagger の KSP サポートに関する詳細は、その[ドキュメント](https://dagger.dev/dev-guide/ksp.html)を参照してください。
+DaggerのKSPサポートに関する詳細については、その[ドキュメント](https://dagger.dev/dev-guide/ksp.html)を参照してください。
 
 ### 独自のアノテーションプロセッサを作成する {id="create-your-own-annotation-processor"}
 
-KSP API を使用して、コンパイル時にコードを生成する独自のアノテーションプロセッサを作成できます。
-新しいプロセッサには 3 つのモジュールが必要です。
+KSP APIを使用して、コンパイル時にコードを生成する独自のアノテーションプロセッサを作成できます。
+新しいプロセッサには3つのモジュールが必要です:
 
-* カスタムアノテーションを宣言する `annotation` モジュール。
-* `SymbolProcessor` および `SymbolProcessorProvider` ファクトリを実装する `processor` モジュール。`SymbolProcessor` には主要なロジックが含まれ、`SymbolProcessorProvider` はプロセッサを作成し、`META-INF/services/` パスにプロバイダーを登録します。
-* KSP プラグインを適用し、プロセッサに依存し、アノテーションを使用する `app` モジュール。
+* カスタムアノテーションを宣言する`annotation`モジュール。
+* `SymbolProcessor`および`SymbolProcessorProvider`ファクトリを実装する`processor`モジュール。`SymbolProcessor`にはメインロジックが含まれ、`SymbolProcessorProvider`はプロセッサを作成してプロバイダを`META-INF/services/`パスに登録します。
+* KSPプラグインを適用し、プロセッサに依存して、アノテーションを使用する`app`モジュール。
 
-完全なステップバイステップの手順については、[KSP クイックスタート](ksp-quickstart.md#create-your-own-processor)を参照してください。
+完全なステップバイステップの手順については、[KSPクイックスタート](ksp-quickstart.md#create-your-own-processor)を参照してください。
 
 ## 次のステップ {id="what-s-next"}
 
-* [kapt の設定について詳しく学ぶ](kapt.md)
-* [KSP を使い始める](ksp-quickstart.md)
-* [kapt から KSP への移行方法を確認する](ksp-kapt-migration.md)
+* [kaptの設定について詳しく学ぶ](kapt.md)
+* [KSPを使ってみる](ksp-quickstart.md)
+* [kaptからKSPへの移行方法を確認する](ksp-kapt-migration.md)
