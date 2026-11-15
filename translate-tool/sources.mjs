@@ -6,11 +6,16 @@
  * - repository, branch, document patterns and doc root are the pipeline's;
  * - a page is saved where the pipeline writes its translation (the strategy's
  *   mapDocPath: Writerside topics are flattened, .topic becomes .md, ...);
+ * - only the pages the pipeline publishes are listed: a Writerside upstream
+ *   publishes the topics of its .tree (the strategy's getPublishedPages);
  * - an upstream without a git source (Koin publishes llms-full.txt) is read
  *   from the same snapshot the pipeline syncs.
  */
 import path from 'node:path';
+import os from 'node:os';
+import fs from 'node:fs/promises';
 import { REPOS } from '../tools/pipeline/repos.config.mjs';
+import { defaultStrategy } from '../tools/pipeline/sync-strategies/strategy.mjs';
 import { fetchKoinSnapshot } from '../tools/pipeline/utils/koin-llms.mjs';
 import { toContentRelPath } from '../shared/content-paths.ts';
 
@@ -148,7 +153,52 @@ async function githubFiles(repoConfig, branch, fetchImpl) {
   const dirs = [...new Set(repoConfig.syncStrategy.getDocPatterns().map(patternBase))];
   const files = [];
   for (const dir of dirs) files.push(...await githubDir(repoConfig.repo, branch, dir, fetchImpl));
-  return files;
+  // ktor.tree and mpd.tree are at the root, outside the doc directories
+  files.push(...await githubRootTrees(repoConfig.repo, branch, fetchImpl));
+  return [...new Set(files)];
+}
+
+/** The .tree files at the root of a repository (Contents API, that directory only). */
+async function githubRootTrees(repo, branch, fetchImpl) {
+  try {
+    const res = await fetchImpl(`https://api.github.com/repos/${repo}/contents/?ref=${branch}`, { headers: githubHeaders() });
+    const items = res.ok ? await res.json() : [];
+    return Array.isArray(items) ? items.filter((item) => item.type === 'file' && item.path.endsWith('.tree')).map((item) => item.path) : [];
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * The pages the pipeline publishes, as its strategy's getPublishedPages gives
+ * them (`docs/x.md`, `topics/x.md`: mapDocPath paths), or null for all.
+ * getPublishedPages reads the .tree of a clone, so the upstream's .tree files
+ * are put in a directory as they are in the clone, and it reads that.
+ * @returns {Promise<Set<string> | null | undefined>} undefined: the tree could not be read (try again)
+ */
+async function publishedPagesOf(repoConfig, branch, files, fetchImpl) {
+  const strategy = repoConfig.syncStrategy;
+  if (strategy.getPublishedPages === defaultStrategy.getPublishedPages) return null;
+  const trees = files.filter((file) => file.endsWith('.tree'));
+  if (trees.length === 0) {
+    console.warn(`  ⚠️  ${repoConfig.id}: no .tree found, listing every page`);
+    return null;
+  }
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'translate-tool-tree-'));
+  try {
+    for (const tree of trees) {
+      const res = await fetchImpl(`https://raw.githubusercontent.com/${repoConfig.repo}/${branch}/${tree}`);
+      if (!res.ok) throw new Error(`${tree}: HTTP ${res.status}`);
+      await fs.mkdir(path.dirname(path.join(dir, tree)), { recursive: true });
+      await fs.writeFile(path.join(dir, tree), await res.text());
+    }
+    return await strategy.getPublishedPages(dir);
+  } catch (e) {
+    console.warn(`  ⚠️  ${repoConfig.id}: cannot read its tree (${e.message}), listing every page this time`);
+    return undefined;
+  } finally {
+    await fs.rm(dir, { recursive: true, force: true });
+  }
 }
 
 // ─── Source pages ───────────────────────────────────────────────────────────
@@ -161,16 +211,20 @@ async function githubFiles(repoConfig, branch, fetchImpl) {
 export async function listSourcePages(id, { repos = REPOS, fetchImpl = globalThis.fetch } = {}) {
   const repoConfig = repoConfigOf(id, repos);
   const branch = repoConfig.branch.replace(/^origin\//, '');
-  const files = await cached(`files:${id}`, async () => {
+  const { files, published } = await cached(`files:${id}`, async () => {
     console.log(`  Fetching docs: ${id}`);
-    return SNAPSHOTS[id]
-      ? Object.keys(await snapshotOf(id, fetchImpl))
-      : githubFiles(repoConfig, branch, fetchImpl);
+    if (SNAPSHOTS[id]) return { files: Object.keys(await snapshotOf(id, fetchImpl)), published: null };
+    const files = await githubFiles(repoConfig, branch, fetchImpl);
+    return { files, published: await publishedPagesOf(repoConfig, branch, files, fetchImpl) };
   });
+  // Not kept: a tree that failed to download (a network error) is tried again next time
+  if (published === undefined) cache.delete(`files:${id}`);
   const byPage = new Map();
   for (const file of files.filter((f) => isDocFile(repoConfig, f))) {
     const page = pageOf(repoConfig, file);
     if (!page) continue;
+    // Left out of the .tree: a retired tutorial of ktor, a stub of a moved page
+    if (published && !published.has(repoConfig.syncStrategy.mapDocPath(file))) continue;
     // Two files for one page (kotlinx.coroutines: docs/channels.md and
     // docs/topics/channels.md): the pipeline copies the moved one over the
     // one already in place (copyFlatten, copyExtraFiles), so it is the page.
@@ -217,8 +271,13 @@ export function targetPathOf(id, file, targetLang, { repos = REPOS } = {}) {
  * upstream, goes to the root of its project, by its file name.
  * @param {{projectName: string, fileName: string, targetLang: string, sourceId?: string, sourcePath?: string}} file
  */
-export function saveTargetPath({ projectName, fileName, targetLang, sourceId, sourcePath }, options) {
-  if (sourceId && sourcePath) return targetPathOf(sourceId, sourcePath, targetLang, options);
+export async function saveTargetPath({ projectName, fileName, targetLang, sourceId, sourcePath }, options) {
+  if (sourceId && sourcePath) {
+    // A page the pipeline no longer publishes would come back, until its next sync removes it again
+    const pages = await listSourcePages(sourceId, options);
+    if (!pages.some((entry) => entry.path === sourcePath)) throw new Error(`流水线不发布这个文件: ${sourcePath}`);
+    return targetPathOf(sourceId, sourcePath, targetLang, options);
+  }
   const name = path.posix.basename(fileName.replaceAll('\\', '/'));
   if (!name || name === '..' || ![projectName, targetLang].every((part) => /^[\w-]+$/.test(part))) throw new Error(`无效的保存路径: ${projectName}/${fileName}`);
   return toContentRelPath(targetLang, projectName, name);

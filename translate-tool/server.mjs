@@ -462,13 +462,13 @@ app.delete('/api/upload/:id', (req, res) => {
 
 // ─── Save ───────────────────────────────────────────────────────────────────
 
-app.post('/api/save', (req, res) => {
+app.post('/api/save', async (req, res) => {
   const { content, projectName, fileName, targetLang, sourceId, sourcePath } = req.body;
   if (!content || !projectName || !fileName || !targetLang) {
     return res.status(400).json({ error: '缺少必要参数 (content, projectName, fileName, targetLang)' });
   }
   try {
-    const targetRelPath = saveTargetPath({ projectName, fileName, targetLang, sourceId, sourcePath });
+    const targetRelPath = await saveTargetPath({ projectName, fileName, targetLang, sourceId, sourcePath });
     const targetFullPath = path.join(ROOT, 'docs', targetRelPath);
     fs.mkdirSync(path.dirname(targetFullPath), { recursive: true });
     fs.writeFileSync(targetFullPath, content, 'utf8');
