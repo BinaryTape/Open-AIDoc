@@ -1,20 +1,21 @@
 # 网络图片
 
-默认情况下，Coil 3.x 不包含从网络加载图片的支持。这是为了避免向希望使用自己的网络解决方案或不需要网络 URL 支持（例如，仅从磁盘加载图片）的用户强制引入庞大的网络依赖项。
+默认情况下，Coil 3.x 不包含从网络加载图片的支持。这是为了避免向希望使用自己的网络解决方案或不需要网络 URL 支持（例如仅从磁盘加载图片）的用户强加庞大的网络依赖项。
 
 要添加从网络获取图片的支持，**仅需导入以下依赖项之一**：
 
 ```kotlin
-implementation("io.coil-kt.coil3:coil-network-okhttp:3.6.3") // 仅适用于 Android/JVM。
+implementation("io.coil-kt.coil3:coil-network-okhttp:3.6.3") // 仅在 Android/JVM 上可用。
 implementation("io.coil-kt.coil3:coil-network-ktor2:3.6.3")
 implementation("io.coil-kt.coil3:coil-network-ktor3:3.6.3")
+implementation("io.coil-kt.coil3:coil-network-httpengine:3.6.3") // 仅在 Android API 34+ 上可用。
 ```
 
-如果使用 OkHttp，到这里就可以了。导入后，将自动支持类似 `https://example.com/image.jpg` 的网络 URL。如果使用 Ktor，则需要为每个平台添加受支持的引擎（见下文）。
+如果你使用 OkHttp 或 HttpEngine，到这里就配置完成了。导入后，将自动支持类似 `https://example.com/image.jpg` 的网络 URL。如果你使用 Ktor，则需要为每个平台添加受支持的引擎（见下文）。
 
 ## Ktor 网络引擎 {id="ktor-network-engines"}
 
-如果你依赖 `coil-network-ktor2` 或 `coil-network-ktor3`，则需要为每个平台（JavaScript 除外）导入一个 [Ktor 引擎](https://ktor.io/docs/client-engines.html)。以下是一组快速入门引擎配置：
+如果你依赖 `coil-network-ktor2` 或 `coil-network-ktor3`，你需要为每个平台（JavaScript 除外）导入一个 [Ktor 引擎](https://ktor.io/docs/client-engines.html)。以下是一组快速入门引擎：
 
 ```kotlin
 androidMain {
@@ -34,11 +35,11 @@ jvmMain {
 }
 ```
 
-如果你想使用自定义网络库，可以导入 `io.coil-kt.coil3:coil-network-core`，实现 `NetworkClient`，并在 `ImageLoader` 中使用该自定义 `NetworkClient` 注册 `NetworkFetcher`。
+如果你想使用自定义网络库，可以导入 `io.coil-kt.coil3:coil-network-core`，实现 `NetworkClient`，并在你的 `ImageLoader` 中使用自定义的 `NetworkClient` 注册 `NetworkFetcher`。
 
 ## 使用自定义 OkHttpClient {id="using-a-custom-okhttpclient"}
 
-如果你使用 `io.coil-kt.coil3:coil-network-okhttp`，可以在创建 `ImageLoader` 时指定自定义的 `OkHttpClient`：
+如果你使用 `io.coil-kt.coil3:coil-network-okhttp`，可以在创建 `ImageLoader` 时指定自定义 `OkHttpClient`：
 
 ```kotlin
 val imageLoader = ImageLoader.Builder(context)
@@ -55,11 +56,31 @@ val imageLoader = ImageLoader.Builder(context)
 ```
 
 !!! Note
-    如果你已经构建了一个 `OkHttpClient`，请使用 [`newBuilder()`](https://lysine.dev/okhttp/5.x/okhttp/okhttp3/-ok-http-client/#customize-your-client-with-newbuilder) 构建一个与原始客户端共享资源的新客户端。
+    如果你已经有一个构建好的 `OkHttpClient`，请使用 [`newBuilder()`](https://lysine.dev/okhttp/5.x/okhttp/okhttp3/-ok-http-client/#customize-your-client-with-newbuilder) 来构建一个与原始客户端共享资源的新客户端。
+
+## 在 ImageLoader 中使用 HttpEngine {id="using-httpengine-with-an-imageloader"}
+
+要在 Android API 34 及更高版本上使用 `HttpEngine`，请添加 `coil-network-httpengine` 并在你的 `ImageLoader` 中注册其 fetcher：
+
+```kotlin
+import android.os.Build.VERSION.SDK_INT
+import coil3.ImageLoader
+import coil3.network.httpengine.HttpEngineNetworkFetcherFactory
+
+val imageLoader = ImageLoader.Builder(context)
+    .components {
+        if (SDK_INT >= 34) {
+            add(HttpEngineNetworkFetcherFactory())
+        }
+    }
+    .build()
+```
+
+如果你没有手动注册网络 fetcher，Coil 的服务加载器（ServiceLoader）会按 OkHttp、Ktor 3、Ktor 2 和 HttpEngine 的顺序选取首个可用的网络客户端。
 
 ## Cache-Control 支持 {id="cache-control-support"}
 
-默认情况下，Coil 3.x 不遵循 `Cache-Control` 标头，并且总是将响应保存到其磁盘缓存中。
+默认情况下，Coil 3.x 不会遵循 `Cache-Control` 标头，并且总是将响应保存到其磁盘缓存中。
 
 `io.coil-kt.coil3:coil-network-cache-control` 包含一个 `CacheStrategy` 实现，可确保 `NetworkFetcher` 遵循网络响应的 [`Cache-Control` 标头](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control)。
 
@@ -72,11 +93,11 @@ OkHttpNetworkFetcherFactory(
 ```
 
 !!! Note
-    你需要启用 `coreLibraryDesugaring` 才能支持 Android API 级别 25 或更低版本。请遵循[此处文档](https://developer.android.com/studio/write/java8-support#library-desugaring)启用它。
+    要支持 Android API 级别 25 或更低版本，你需要启用 `coreLibraryDesugaring`。请遵循[此处](https://developer.android.com/studio/write/java8-support#library-desugaring)的文档进行启用。
 
 #### 标头 {id="headers"}
 
-可以通过以下两种方式之一向图片请求添加标头。你可以为单个请求设置标头：
+可以通过以下两种方式之一为你的图片请求添加标头。你可以为单个请求设置标头：
 
 ```kotlin
 val headers = NetworkHeaders.Builder()
@@ -90,7 +111,7 @@ val request = ImageRequest.Builder(context)
 imageLoader.execute(request)
 ```
 
-或者，你可以创建一个 OkHttp [`Interceptor`](https://lysine.dev/okhttp/interceptors/)，为 `ImageLoader` 执行的每个请求都设置标头：
+或者，你也可以创建一个 OkHttp [`Interceptor`](https://lysine.dev/okhttp/interceptors/)，为你的 `ImageLoader` 执行的每个请求设置标头：
 
 ```kotlin
 class RequestHeaderInterceptor(
@@ -99,11 +120,8 @@ class RequestHeaderInterceptor(
 ) : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
-        val headers = Headers.Builder()
-            .set("Cache-Control", "no-cache")
-            .build()
         val request = chain.request().newBuilder()
-            .headers(headers)
+            .header(name, value)
             .build()
         return chain.proceed(request)
     }
@@ -112,10 +130,9 @@ class RequestHeaderInterceptor(
 val imageLoader = ImageLoader.Builder(context)
     .components {
         add(
-            OkHttpNetworkFetcher(
+            OkHttpNetworkFetcherFactory(
                 callFactory = {
                     OkHttpClient.Builder()
-                        // 此标头将添加到每个图片请求中。
                         .addNetworkInterceptor(RequestHeaderInterceptor("Cache-Control", "no-cache"))
                         .build()
                 },

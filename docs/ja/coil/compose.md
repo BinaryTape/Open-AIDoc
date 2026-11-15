@@ -1,12 +1,12 @@
 # Compose
 
-[Compose UI](https://www.jetbrains.com/compose-multiplatform/) のサポートを追加するには、以下の拡張ライブラリをインポートします：
+[Compose UI](https://www.jetbrains.com/compose-multiplatform/) のサポートを追加するには、拡張ライブラリをインポートします。
 
 ```kotlin
 implementation("io.coil-kt.coil3:coil-compose:3.6.3")
 ```
 
-次に、`AsyncImage` コンポーザブルを使用して画像を読み込み、表示します：
+次に、`AsyncImage` コンポーザブルを使用して画像を読み込み、表示します。
 
 ```kotlin
 AsyncImage(
@@ -15,11 +15,11 @@ AsyncImage(
 )
 ```
 
-`model` には `ImageRequest.data` の値、または `ImageRequest` 自体を指定できます。`contentDescription` は、アクセシビリティサービスがこの画像が何を表しているかを説明するために使用するテキストを設定します。
+`model` には、`ImageRequest.data` の値または `ImageRequest` 自体を指定できます。`contentDescription` は、アクセシビリティサービスがこの画像が何を表しているかを説明するために使用するテキストを設定します。
 
 ## AsyncImage {id="asyncimage"}
 
-`AsyncImage` は、画像リクエストを非同期に実行し、結果をレンダリングするコンポーザブルです。標準の `Image` コンポーザブルと同じ引数をサポートしているほか、`placeholder`/`error`/`fallback` の painter や、`onLoading`/`onSuccess`/`onError` コールバックの設定もサポートしています。以下は、画像を円形に切り抜き、クロスフェードを適用し、プレースホルダーを設定して読み込む例です：
+`AsyncImage` は、画像リクエストを非同期で実行し、結果を描画するコンポーザブルです。標準の `Image` コンポーザブルと同じ引数をサポートしているほか、`placeholder`/`error`/`fallback` ペインターや `onLoading`/`onSuccess`/`onError` コールバックの設定もサポートしています。以下は、画像を円形に切り抜き（circle crop）、クロスフェードを適用し、プレースホルダーを設定して読み込む例です。
 
 ```kotlin
 AsyncImage(
@@ -34,25 +34,25 @@ AsyncImage(
 )
 ```
 
-**この関数をいつ使用するか:**
+**この関数を使用するケース:**
 
-ほとんどの場合、`AsyncImage` の使用を推奨します。コンポーザブルの制約（constraints）と指定された `ContentScale` に基づいて、画像を読み込むべきサイズを正しく決定します。
+ほとんどのケースで `AsyncImage` の使用を推奨します。コンポーザブルの制約（constraints）と指定された `ContentScale` に基づいて、画像を読み込むべき適切なサイズを正しく決定します。
 
 ## rememberAsyncImagePainter {id="rememberasyncimagepainter"}
 
-内部的には、`AsyncImage` と `SubcomposeAsyncImage` は `rememberAsyncImagePainter` を使用して `model` を読み込みます。コンポーザブルではなく `Painter` が必要な場合は、`rememberAsyncImagePainter` を使用して画像を読み込むことができます：
+内部的には、`AsyncImage` と `SubcomposeAsyncImage` は `model` を読み込むために `rememberAsyncImagePainter` を使用しています。コンポーザブルではなく `Painter` が必要な場合は、`rememberAsyncImagePainter` を使用して画像を読み込むことができます。
 
 ```kotlin
 val painter = rememberAsyncImagePainter("https://example.com/image.jpg")
 ```
 
-`rememberAsyncImagePainter` は `AsyncImage` や `SubcomposeAsyncImage` よりも柔軟ですが、いくつか欠点があります（後述）。
+`rememberAsyncImagePainter` は `AsyncImage` や `SubcomposeAsyncImage` よりも柔軟ですが、いくつかの欠点があります（後述）。
 
-**この関数をいつ使用するか:**
+**この関数を使用するケース:**
 
-コンポーザブルではなく `Painter` が必要な場合や、`AsyncImagePainter.state` を監視してそれに基づいて別のコンポーザブルを描画する必要がある場合、または `AsyncImagePainter.restart` を使用して手動で画像リクエストを再開する必要がある場合に便利です。
+コンポーザブルの代わりに `Painter` が必要な場合や、`AsyncImagePainter.state` を監視してそれに基づいて異なるコンポーザブルを描画する必要がある場合、または `AsyncImagePainter.restart` を使用して画像リクエストを手動で再開する必要がある場合に役立ちます。
 
-この関数の主な欠点は、画像が画面上で表示されるサイズを検出せず、常に元のディメンション（寸法）で画像を読み込むことです。これを解決するには、カスタムの `SizeResolver` を渡すか、`rememberConstraintsSizeResolver`（`AsyncImage` が内部で使用しているもの）を使用します。例：
+この関数の主な欠点は、画面上で画像が読み込まれるサイズを検出せず、常に元の寸法で画像を読み込む点です。これを解決するために、カスタムの `SizeResolver` を渡すか、（`AsyncImage` が内部で使用している）`rememberConstraintsSizeResolver` を使用できます。例:
 
 ```kotlin
 val sizeResolver = rememberConstraintsSizeResolver()
@@ -70,11 +70,11 @@ Image(
 )
 ```
 
-もう一つの欠点は、`rememberAsyncImagePainter` を使用する場合、たとえ画像がメモリキャッシュに存在し、最初のフレームで描画されるとしても、最初のコンポジション（composition）において `AsyncImagePainter.state` が常に `AsyncImagePainter.State.Empty` になることです。
+もう 1 つの欠点は、`rememberAsyncImagePainter` を使用する場合、たとえ画像がメモリキャッシュに存在し最初のフレームで描画されるとしても、初回のコンポジション（composition）では `AsyncImagePainter.state` が常に `AsyncImagePainter.State.Empty` になることです。
 
 ## SubcomposeAsyncImage {id="subcomposeasyncimage"}
 
-`SubcomposeAsyncImage` は `AsyncImage` のバリエーションで、`Painter` を使用する代わりに、サブコンポジション（subcomposition）を使用して `AsyncImagePainter` の状態に応じたスロット API を提供します。例：
+`SubcomposeAsyncImage` は `AsyncImage` のバリアント（派生版）であり、`Painter` を使用する代わりにサブコンポジション（subcomposition）を使用して `AsyncImagePainter` の状態に対するスロット API を提供します。以下に例を示します。
 
 ```kotlin
 SubcomposeAsyncImage(
@@ -86,7 +86,7 @@ SubcomposeAsyncImage(
 )
 ```
 
-さらに、`content` 引数と、現在の状態をレンダリングする `SubcomposeAsyncImageContent` を使用して、より複雑なロジックを実装することもできます：
+さらに、`content` 引数と現在の状態を描画する `SubcomposeAsyncImageContent` を使用して、より複雑なロジックを実装することもできます。
 
 ```kotlin
 SubcomposeAsyncImage(
@@ -103,15 +103,15 @@ SubcomposeAsyncImage(
 ```
 
 !!! Note
-    サブコンポジションは通常のコンポジションよりも低速なため、このコンポーザブルは UI のパフォーマンスが重要な部分（例：`LazyList`）には適さない場合があります。
+    サブコンポジションは通常のコンポジションよりも低速であるため、このコンポーザブルは UI のパフォーマンスが重要となる部分（例: `LazyList`）には適さない場合があります。
 
-**この関数をいつ使用するか:**
+**この関数を使用するケース:**
 
-サブコンポジションを使用しないため、`AsyncImagePainter.state` を監視する必要がある場合は、通常この関数の代わりに `rememberAsyncImagePainter` を使用することを推奨します。
+`AsyncImagePainter.state` を監視する必要がある場合は、サブコンポジションを使用しないため、通常はこの関数の代わりに `rememberAsyncImagePainter` を使用することをお勧めします。
 
-具体的には、`AsyncImagePainter.state` を監視する必要があり、かつ `rememberAsyncImagePainter` のように最初のコンポジションや最初のフレームで状態を `Empty` にしたくない場合にのみ、この関数は有用です。`SubcomposeAsyncImage` はサブコンポジションを使用して画像の制約を取得するため、`AsyncImagePainter.state` は即座に最新の状態になります。
+具体的には、この関数は `AsyncImagePainter.state` を監視する必要があり、かつ `rememberAsyncImagePainter` のように初回コンポジションおよび初回フレームで `Empty` になってほしくない場合にのみ有用です。`SubcomposeAsyncImage` はサブコンポジションを使用して画像の制約を取得するため、`AsyncImagePainter.state` が即座に最新の状態になります。
 
-## AsyncImagePainter.state の監視 {id="observing-asyncimagepainter-state"}
+## Observing AsyncImagePainter.state {id="observing-asyncimagepainter-state"}
 
 ```kotlin
 val painter = rememberAsyncImagePainter("https://example.com/image.jpg")
@@ -129,14 +129,14 @@ when (state) {
         )
     }
     is AsyncImagePainter.State.Error -> {
-        // 何らかのエラー UI を表示する
+        // Show some error UI.
     }
 }
 ```
 
-## 遷移 (Transitions) {id="transitions"}
+## Transitions {id="transitions"}
 
-`ImageRequest.Builder.crossfade` を使用して、組み込みのクロスフェード遷移（crossfade transition）を有効にできます：
+`ImageRequest.Builder.crossfade` を使用して、組み込みのクロスフェードトランジションを有効にできます。
 
 ```kotlin
 AsyncImage(
@@ -148,16 +148,16 @@ AsyncImage(
 )
 ```
 
-カスタムの [`Transition`](/coil/api/coil-core/coil3.transition/-transition) は、`View` の参照を必要とするため、`AsyncImage`、`SubcomposeAsyncImage`、または `rememberAsyncImagePainter` では動作しません。`CrossfadeTransition` は内部的な特別なサポートにより動作します。
+カスタムの [`Transition`](/coil/api/coil-core/coil3.transition/-transition) は、`View` の参照を必要とするため、`AsyncImage`、`SubcomposeAsyncImage`、`rememberAsyncImagePainter` では動作しません。`CrossfadeTransition` は内部的な特別なサポートがあるため動作します。
 
-とはいえ、`AsyncImagePainter.state` を監視することで、Compose でカスタム遷移を作成することは可能です：
+とはいえ、`AsyncImagePainter.state` を監視することで、Compose でカスタムトランジションを作成することは可能です。
 
 ```kotlin
 val painter = rememberAsyncImagePainter("https://example.com/image.jpg")
 
-val state by painter.state.collectAsState()
+val state = painter.state.collectAsState().value
 if (state is AsyncImagePainter.State.Success && state.result.dataSource != DataSource.MEMORY_CACHE) {
-    // 遷移アニメーションを実行する
+    // Perform the transition animation.
 }
 
 Image(
@@ -168,11 +168,11 @@ Image(
 
 完全な `AnimatedContent` の例については、[Compose AnimatedContent](/coil/recipes#compose-animatedcontent) を参照してください。
 
-## プレビュー (Previews) {id="previews"}
+## Previews {id="previews"}
 
-`AsyncImage`/`rememberAsyncImagePainter`/`SubcomposeAsyncImage` の Android Studio プレビュー時の動作は、`LocalAsyncImagePreviewHandler` によって制御されます。デフォルトでは、プレビュー環境内でも通常通りリクエストの実行を試みます。プレビュー環境ではネットワークアクセスが無効になっているため、ネットワーク URL は常に失敗します。
+`AsyncImage`/`rememberAsyncImagePainter`/`SubcomposeAsyncImage` に対する Android Studio のプレビューの挙動は、`LocalAsyncImagePreviewHandler` によって制御されます。デフォルトでは、プレビュー環境内で通常どおりリクエストを実行しようとします。プレビュー環境ではネットワークアクセスが無効になっているため、ネットワーク URL の読み込みは常に失敗します。
 
-プレビューの動作は以下のようにオーバーライドできます：
+プレビューの挙動は次のようにオーバーライドできます。
 
 ```kotlin
 val previewHandler = AsyncImagePreviewHandler {
@@ -191,7 +191,7 @@ CompositionLocalProvider(LocalAsyncImagePreviewHandler provides previewHandler) 
 
 ## Compose Multiplatform Resources {id="compose-multiplatform-resources"}
 
-Coil は、`model` パラメータとして `Res.getUri` を使用することで、[Compose Multiplatform Resources](https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-multiplatform-resources.html) の読み込みをサポートしています。例：
+Coil は、`model` パラメータとして `Res.getUri` を使用することで、[Compose Multiplatform Resources](https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-multiplatform-resources.html) の読み込みをサポートしています。例:
 
 ```kotlin
 AsyncImage(
@@ -201,4 +201,4 @@ AsyncImage(
 ```
 
 !!! Note
-    `Res.drawable.image` やその他のコンパイルセーフな参照は、Coil ではサポートされていません。代わりに `Res.getUri("drawable/image")` を使用する必要があります。[更新情報については、この issue を確認してください](https://github.com/coil-kt/coil/issues/2812)。
+    `Res.drawable.image` などのコンパイル時に安全な参照（compile-safe references）は Coil ではサポートされていません。代わりに `Res.getUri("drawable/image")` を使用する必要があります。最新情報は [この Issue を確認してください](https://github.com/coil-kt/coil/issues/2812)。

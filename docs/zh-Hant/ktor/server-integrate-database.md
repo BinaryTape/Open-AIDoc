@@ -1,730 +1,1085 @@
-<topic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:noNamespaceSchemaLocation="https://resources.jetbrains.com/writerside/1.0/topic.v2.xsd"
-       title="使用 Kotlin、Ktor 和 Exposed 整合資料庫" id="server-integrate-database">
-    <show-structure for="chapter" depth="2"/>
-    <tldr>
-        <var name="example_name" value="tutorial-server-db-integration"/>
-        <p>
-            <b>程式碼範例</b>:
-            <a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/%example_name%">
-                %example_name%
-            </a>
-        </p>
-        <p>
-            <b>使用的外掛程式</b>: <Links href="/ktor/server-static-content" summary="Learn how to serve static content, such as stylesheets, scripts, images, and so on.">Static Content</Links>,
-            <Links href="/ktor/server-serialization" summary="The ContentNegotiation plugin serves two primary purposes: negotiating media types between the client and server and serializing/deserializing the content in a specific format.">Content Negotiation</Links>, <Links href="/ktor/server-status-pages" summary="%plugin_name% allows Ktor applications to respond appropriately to any failure state based on a thrown exception or status code.">Status pages</Links>,
-            <Links href="/ktor/server-serialization" summary="The ContentNegotiation plugin serves two primary purposes: negotiating media types between the client and server and serializing/deserializing the content in a specific format.">kotlinx.serialization</Links>,
-            <Links href="/ktor/server-dependency-injection" summary="Required dependencies: io.ktor:ktor-server-di Code example: %example_name%">Dependency Injection</Links>
-            <a href="https://github.com/ktorio/ktor-plugin-registry/tree/main/repository/org.jetbrains/server-exposed">Exposed</a>,
-            <a href="https://github.com/ktorio/ktor-plugin-registry/tree/main/repository/org.jetbrains/server-postgres">PostgreSQL</a>
-        </p>
-    </tldr>
-    <card-summary>
-        了解使用 Exposed SQL 程式庫將 Ktor 服務連接至資料庫儲存機制的程序。
-    </card-summary>
-    <link-summary>
-        了解使用 Exposed SQL 程式庫將 Ktor 服務連接至資料庫儲存機制的程序。
-    </link-summary>
-    <web-summary>
-        了解如何使用 Kotlin 和 Ktor 建置單頁應用程式 (SPA)，其中 RESTful 服務連接至資料庫儲存機制。它使用 Exposed SQL 程式庫，並允許你偽造儲存機制以進行測試。
-    </web-summary>
-    <p>
-        在本文中，你將學習如何使用 Kotlin 的 SQL 程式庫 <a
-            href="https://www.jetbrains.com/exposed/">Exposed</a>，將你的 Ktor 服務與關聯式資料庫進行整合。
-    </p>
-    <p>完成本教學後，你將學會以下內容：</p>
-    <list>
-        <li>建立使用 JSON 序列化的 RESTful 服務。</li>
-        <li>將不同的儲存機制注入至這些服務中。</li>
-        <li>使用記憶體內部儲存機制為你的服務建立單元測試。</li>
-        <li>使用 Exposed 和相依注入 (DI) 建置可運作的儲存機制。</li>
-        <li>部署存取外部資料庫的服務。</li>
-    </list>
-    <p>
-        在先前的教學中，我們使用了任務管理器範例來介紹基礎知識，例如<Links href="/ktor/server-requests-and-responses" summary="Learn the basics of routing, handling requests, and parameters in Kotlin with Ktor by
-        building a task manager application.">處理請求</Links>、
-        <Links href="/ktor/server-create-restful-apis" summary="Learn how to build a backend service using Kotlin and Ktor, featuring an example of a
-        RESTful API that generates JSON files.">建立 RESTful API</Links>，或
-        <Links href="/ktor/server-create-website" summary="Learn how to build a website in Kotlin with Ktor and Thymeleaf templates.">使用 Thymeleaf 範本建置 Web 應用程式</Links>。
-    </p>
-    <p>
-        雖然這些教學著重於使用簡單記憶體內部 <code>TaskRepository</code> 的前端功能，但本指南將重點轉移到展示你的 Ktor 服務如何透過 Exposed SQL 程式庫與關聯式資料庫互動。
-    </p>
-    <p>
-        即使這份指南篇幅較長且更為複雜，你仍然能夠快速產出可運行的程式碼，並逐步引入新功能。
-    </p>
-    <p>本指南包含兩個部分：</p>
-    <list type="decimal">
-        <li>
-            <a href="#create-restful-service-and-repository">使用記憶體內部儲存機制建立應用程式。</a>
-        </li>
-        <li>
-            <a href="#add-postgresql-repository">將記憶體內部儲存機制替換為使用 PostgreSQL 的儲存機制。</a>
-        </li>
-    </list>
-    <chapter title="先決條件" id="prerequisites">
-        <p>
-            你可以獨立完成本教學，不過我們建議你先完成<Links href="/ktor/server-create-restful-apis" summary="Learn how to build a backend service using Kotlin and Ktor, featuring an example of a
-        RESTful API that generates JSON files.">建立 RESTful API</Links>教學，以熟悉內容協商與 REST。
-        </p>
-        <p>我們建議安裝 <a href="https://www.jetbrains.com/help/idea/installation-guide.html">IntelliJ
-            IDEA</a>，但你也可以使用其他自選的 IDE。
-        </p>
-    </chapter>
-    <chapter title="建立 RESTful 服務和記憶體內部儲存機制" id="create-restful-service-and-repository">
-        <p>
-            首先，你將重新建立任務管理器的 RESTful 服務。一開始你將使用記憶體內部儲存機制，但會建構一個允許以極小代價進行替換的架構設計。
-        </p>
-        <p>你將分六個階段進行：</p>
-        <list type="decimal">
-            <li>
-                <a href="#create-project">建立初始專案。</a>
-            </li>
-            <li>
-                <a href="#add-starter-code">新增入門程式碼。</a>
-            </li>
-            <li>
-                <a href="#add-routes">新增 CRUD 路由。</a>
-            </li>
-            <li>
-                <a href="#add-client-page">新增單頁應用程式 (SPA)。</a>
-            </li>
-            <li>
-                <a href="#test-manually">手動測試應用程式。</a>
-            </li>
-            <li>
-                <a href="#add-automated-tests">新增自動化測試。</a>
-            </li>
-        </list>
-        <chapter title="使用外掛程式建立新專案" id="create-project">
-            <p>
-                若要使用 Ktor 專案產生器建立新專案，請遵循以下步驟：
-            </p>
-            <procedure id="create-project-procedure">
-                <step>
-                    <p>
-                        前往
-                        <a href="https://start.ktor.io/">Ktor 專案產生器</a>
-                        。
-                    </p>
-                </step>
-                <step>
-                    <p>在
-                        <control>Project artifact</control>
-                        欄位中，輸入
-                        <Path>com.example.ktor-exposed-task-app</Path>
-                        作為你的專案產物名稱。
-                        <img src="tutorial_server_db_integration_project_artifact.png"
-                             alt="在 Ktor 專案產生器中命名專案產物"
-                             border-effect="line"
-                             style="block"
-                             width="706"/>
-                    </p>
-                </step>
-                <step>
-                    <p>
-                        在外掛程式區段中搜尋並點擊
-                        <control>Add</control>
-                        按鈕以新增以下外掛程式：
-                    </p>
-                    <list type="bullet">
-                        <li>Content Negotiation</li>
-                        <li>kotlinx.serialization</li>
-                        <li>Static Content</li>
-                        <li>Status Pages</li>
-                        <li>Dependency Injection</li>
-                        <li>Exposed</li>
-                        <li>PostgreSQL</li>
-                    </list>
-                    <p>
-                        <img src="ktor_project_generator_add_plugins.gif"
-                             alt="在 Ktor 專案產生器中新增外掛程式"
-                             border-effect="line"
-                             style="block"
-                             width="706"/>
-                    </p>
-                </step>
-                <step>
-                    <p>
-                        新增外掛程式後，點擊外掛程式區段右上角的
-                        <control>7 plugins</control>
-                        按鈕以檢視已新增的外掛程式。
-                    </p>
-                    <p>接著你將看到所有將新增至專案的外掛程式清單：
-                        <img src="tutorial_server_db_integration_plugin_list.png"
-                             alt="Ktor 專案產生器中的外掛程式下拉選單"
-                             border-effect="line"
-                             style="block"
-                             width="706"/>
-                    </p>
-                </step>
-                <step>
-                    <p>
-                        點擊
-                        <control>Download</control>
-                        按鈕以產生並下載你的 Ktor 專案。
-                    </p>
-                </step>
-                <step>
-                    <p>
-                        在
-                        <a href="https://www.jetbrains.com/help/idea/installation-guide.html">IntelliJ
-                            IDEA</a> 或其他自選的 IDE 中開啟產生的專案。
-                    </p>
-                </step>
-                <step>
-                    <p>
-                        導覽至
-                        <Path>src/main/kotlin</Path>
-                        並刪除
-                        <Path>CitySchema.kt</Path>、
-                        <Path>UsersService.kt</Path>、
-                        <Path>GreetingService.kt</Path>
-                        與 <Path>Postgres.kt</Path>
-                        檔案。
-                    </p>
-                </step>
-                <step id="delete-function">
-                    <p>
-                        開啟
-                        <Path>Exposed.kt</Path>
-                        檔案並移除 <code>.configureExposed()</code> 函式的內容。
-                    </p>
-                    <code-block lang="kotlin" code="                        suspend fun Application.configureExposed() {&#10;                        }"/>
-                    <p>
-                        移除此功能的原因在於 Ktor 專案產生器新增了範例程式碼，展示如何將使用者和城市的資料保存至 HSQLDB 或 PostgreSQL。在本教學中你不需要這些範例程式碼。
-                    </p>
-                </step>
-                <step>
-                    開啟 <Path>gradle/libs.versions.toml</Path> 檔案並確保指定了最新的 Exposed 版本：
-                    <code-block lang="kotlin" code="                        [versions]&#10;                        #...&#10;                        exposed = %exposed_version%"/>
-                </step>
-            </procedure>
-        </chapter>
-        <chapter title="新增入門程式碼" id="add-starter-code">
-            <procedure id="add-starter-code-procedure">
-                <step>
-                    導覽至
-                    <Path>src/main/kotlin</Path>
-                    並建立名為
-                    <Path>model</Path>
-                    的子套件。
-                </step>
-                <step>
-                    在
-                    <Path>model</Path>
-                    套件內，建立一個新的
-                    <Path>Task.kt</Path>
-                    檔案。
-                </step>
-                <step>
-                    <p>
-                        開啟
-                        <Path>Task.kt</Path>
-                        並新增一個代表優先順序的列舉以及一個代表任務的類別。
-                    </p>
-                    <code-block lang="kotlin" code="package com.example.model&#10;&#10;import kotlinx.serialization.Serializable&#10;&#10;enum class Priority {&#10;    Low, Medium, High, Vital&#10;}&#10;&#10;@Serializable&#10;data class Task(&#10;    val name: String,&#10;    val description: String,&#10;    val priority: Priority&#10;)"/>
-                    <p>
-                        <code>Task</code> 類別使用來自 <Links href="/ktor/server-serialization" summary="The ContentNegotiation plugin serves two primary purposes: negotiating media types between the client and server and serializing/deserializing the content in a specific format."><code>kotlinx.serialization</code></Links> 程式庫的 <code>Serializable</code> 型別進行標註。
-                    </p>
-                    <p>
-                        正如在先前的教學中一樣，你將建立一個記憶體內部儲存機制。然而這一次，該儲存機制將實作一個介面，以便你日後可以輕鬆替換。
-                    </p>
-                </step>
-                <step>
-                    在
-                    <Path>model</Path>
-                    子套件中，建立一個新的
-                    <Path>TaskRepository.kt</Path>
-                    檔案。
-                </step>
-                <step>
-                    <p>
-                        開啟
-                        <Path>TaskRepository.kt</Path>
-                        並新增以下介面：
-                    </p>
-                    <code-block lang="kotlin" code="                        package com.example.model&#10;&#10;                        interface TaskRepository {&#10;                            fun allTasks(): List&lt;Task&gt;&#10;                            fun tasksByPriority(priority: Priority): List&lt;Task&gt;&#10;                            fun taskByName(name: String): Task?&#10;                            fun addTask(task: Task)&#10;                            fun removeTask(name: String): Boolean&#10;                        }"/>
-                </step>
-                <step>
-                    在相同目錄中建立一個新的
-                    <Path>FakeTaskRepository.kt</Path>
-                    檔案。
-                </step>
-                <step>
-                    <p>
-                        開啟
-                        <Path>FakeTaskRepository.kt</Path>
-                        並新增以下類別：
-                    </p>
-                    <code-block lang="kotlin" code="                        package com.example.model&#10;&#10;                        class FakeTaskRepository : TaskRepository {&#10;                            private val tasks = mutableListOf(&#10;                                Task(&quot;cleaning&quot;, &quot;Clean the house&quot;, Priority.Low),&#10;                                Task(&quot;gardening&quot;, &quot;Mow the lawn&quot;, Priority.Medium),&#10;                                Task(&quot;shopping&quot;, &quot;Buy the groceries&quot;, Priority.High),&#10;                                Task(&quot;painting&quot;, &quot;Paint the fence&quot;, Priority.Medium)&#10;                            )&#10;&#10;                            override fun allTasks(): List&lt;Task&gt; = tasks&#10;&#10;                            override fun tasksByPriority(priority: Priority) = tasks.filter {&#10;                                it.priority == priority&#10;                            }&#10;&#10;                            override fun taskByName(name: String) = tasks.find {&#10;                                it.name.equals(name, ignoreCase = true)&#10;                            }&#10;&#10;                            override fun addTask(task: Task) {&#10;                                if (taskByName(task.name) != null) {&#10;                                    throw IllegalStateException(&quot;Cannot duplicate task names!&quot;)&#10;                                }&#10;                                tasks.add(task)&#10;                            }&#10;&#10;                            override fun removeTask(name: String): Boolean {&#10;                                return tasks.removeIf { it.name == name }&#10;                            }&#10;                        }"/>
-                </step>
-            </procedure>
-        </chapter>
-        <chapter title="新增路由" id="add-routes">
-            <procedure id="add-routes-procedure">
-                <step>
-                    開啟
-                    <Path>src/main/kotlin</Path>
-                    中的
-                    <Path>Serialization.kt</Path>
-                    檔案。
-                </step>
-                <step>
-                    <p>
-                        將現有的 <code>Application.configureSerialization()</code> 函式替換為以下實作：
-                    </p>
-                    <code-block lang="kotlin" code="package com.example&#10;&#10;import com.example.model.Priority&#10;import com.example.model.Task&#10;import com.example.model.TaskRepository&#10;import io.ktor.http.*&#10;import io.ktor.serialization.*&#10;import io.ktor.serialization.kotlinx.json.*&#10;import io.ktor.server.application.*&#10;import io.ktor.server.plugins.contentnegotiation.*&#10;import io.ktor.server.plugins.di.dependencies&#10;import io.ktor.server.request.*&#10;import io.ktor.server.response.*&#10;import io.ktor.server.routing.*&#10;&#10;suspend fun Application.configureSerialization() {&#10;    val repository = dependencies.resolve&lt;TaskRepository&gt;()&#10;&#10;    install(ContentNegotiation) {&#10;        json()&#10;    }&#10;    routing {&#10;        route(&quot;/tasks&quot;) {&#10;            get {&#10;                val tasks = repository.allTasks()&#10;                call.respond(tasks)&#10;            }&#10;&#10;            get(&quot;/byName/{taskName}&quot;) {&#10;                val name = call.parameters[&quot;taskName&quot;]&#10;                if (name == null) {&#10;                    call.respond(HttpStatusCode.BadRequest)&#10;                    return@get&#10;                }&#10;                val task = repository.taskByName(name)&#10;                if (task == null) {&#10;                    call.respond(HttpStatusCode.NotFound)&#10;                    return@get&#10;                }&#10;                call.respond(task)&#10;            }&#10;&#10;            get(&quot;/byPriority/{priority}&quot;) {&#10;                val priorityAsText = call.parameters[&quot;priority&quot;]&#10;                if (priorityAsText == null) {&#10;                    call.respond(HttpStatusCode.BadRequest)&#10;                    return@get&#10;                }&#10;                try {&#10;                    val priority = Priority.valueOf(priorityAsText)&#10;                    val tasks = repository.tasksByPriority(priority)&#10;&#10;&#10;                    if (tasks.isEmpty()) {&#10;                        call.respond(HttpStatusCode.NotFound)&#10;                        return@get&#10;                    }&#10;                    call.respond(tasks)&#10;                } catch (ex: IllegalArgumentException) {&#10;                    call.respond(HttpStatusCode.BadRequest)&#10;                }&#10;            }&#10;&#10;            post {&#10;                try {&#10;                    val task = call.receive&lt;Task&gt;()&#10;                    repository.addTask(task)&#10;                    call.respond(HttpStatusCode.NoContent)&#10;                } catch (ex: IllegalStateException) {&#10;                    call.respond(HttpStatusCode.BadRequest)&#10;                } catch (ex: JsonConvertException) {&#10;                    call.respond(HttpStatusCode.BadRequest)&#10;                }&#10;            }&#10;&#10;            delete(&quot;/{taskName}&quot;) {&#10;                val name = call.parameters[&quot;taskName&quot;]&#10;                if (name == null) {&#10;                    call.respond(HttpStatusCode.BadRequest)&#10;                    return@delete&#10;                }&#10;                if (repository.removeTask(name)) {&#10;                    call.respond(HttpStatusCode.NoContent)&#10;                } else {&#10;                    call.respond(HttpStatusCode.NotFound)&#10;                }&#10;            }&#10;        }&#10;    }&#10;}"/>
-                    <p>
-                        這與你在<Links href="/ktor/server-create-restful-apis" summary="Learn how to build a backend service using Kotlin and Ktor, featuring an example of a
-        RESTful API that generates JSON files.">建立 RESTful API</Links>教學中實作的路由相同，不同之處在於你現在是從 Ktor 的相依注入容器中解析出儲存機制。由於相依性的型別是 <code>interface</code>，因此可以注入許多不同的實作。
-                    </p>
-                    <p>
-                        因為 <code>dependencies.resolve()</code> 是一個 suspend 函式，所以 <code>.configureSerialization()</code> 也必須宣告為 suspend。
-                    </p>
-                    <p>
-                        現在你已將相依性新增至 <code>.configureSerialization()</code>，現有的呼叫將無法編譯。所幸該函式只會被呼叫一次。
-                    </p>
-                </step>
-                <step>
-                    開啟
-                    <Path>src/main/kotlin</Path>
-                    內的
-                    <Path>DI.kt</Path>
-                    檔案。
-                </step>
-                <step>
-                    <p>
-                        將 <code>.configureDependencyInjection()</code> 函式的內容替換為以下實作：
-                    </p>
-                    <code-block lang="kotlin" code="                    import com.example.model.FakeTaskRepository&#10;                    import com.example.model.TaskRepository&#10;                    // ...&#10;&#10;                    fun Application.configureDependencyInjection() {&#10;                        dependencies {&#10;                            provide&lt;TaskRepository&gt; {&#10;                                FakeTaskRepository()&#10;                            }&#10;                        }&#10;                    }"/>
-                    <p>
-                        你現在將 <code>FakeTaskRepository</code> 註冊為 <code>TaskRepository</code> 的實作。長遠目標是能夠將其替換為 <code>PostgresTaskRepository</code>。
-                    </p>
-                </step>
-                <step>
-                    開啟位於 <Path>src/main/resources</Path> 資料夾內的 <Path>application.yaml</Path> 檔案，確保 <code>.configureDependencyInjection()</code> 函式列在 <code>.configureSerialization()</code> 之前：
-                    <code-block lang="yaml" code="                        ktor:&#10;                        deployment:&#10;                            port: 8080&#10;                        application:&#10;                            modules:&#10;                                - com.example.DIKt.configureDependencyInjection&#10;                                - com.example.SerializationKt.configureSerialization&#10;                                - com.example.ExposedKt.configureExposed&#10;                                - com.example.StatusPagesKt.configureStatusPages&#10;                                - com.example.RoutingKt.configureRouting"/>
-                </step>
-            </procedure>
-        </chapter>
-        <chapter title="新增用戶端頁面" id="add-client-page">
-            <procedure id="add-client-page-procedure">
-                <step>
-                    開啟
-                    <Path>src/main/resources/static</Path>
-                    中的
-                    <Path>index.html</Path>
-                    檔案。
-                </step>
-                <step>
-                    <p>
-                        將目前的內容替換為以下實作：
-                    </p>
-                    <code-block lang="html" code="&lt;html&gt;&#10;&lt;head&gt;&#10;    &lt;title&gt;A Simple SPA For Tasks&lt;/title&gt;&#10;    &lt;script type=&quot;application/javascript&quot;&gt;&#10;        function displayAllTasks() {&#10;            clearTasksTable();&#10;            fetchAllTasks().then(displayTasks)&#10;        }&#10;&#10;        function displayTasksWithPriority() {&#10;            clearTasksTable();&#10;            const priority = readTaskPriority();&#10;            fetchTasksWithPriority(priority).then(displayTasks)&#10;        }&#10;&#10;        function displayTask(name) {&#10;            fetchTaskWithName(name).then(t =&gt;&#10;                taskDisplay().innerHTML&#10;                    = `${t.priority} priority task ${t.name} with description &quot;${t.description}&quot;`&#10;            )&#10;        }&#10;&#10;        function deleteTask(name) {&#10;            deleteTaskWithName(name).then(() =&gt; {&#10;                clearTaskDisplay();&#10;                displayAllTasks();&#10;            })&#10;        }&#10;&#10;        function deleteTaskWithName(name) {&#10;            return sendDELETE(`/tasks/${name}`)&#10;        }&#10;&#10;        function addNewTask() {&#10;            const task = buildTaskFromForm();&#10;            sendPOST(&quot;/tasks&quot;, task).then(displayAllTasks);&#10;        }&#10;&#10;        function buildTaskFromForm() {&#10;            return {&#10;                name: getTaskFormValue(&quot;newTaskName&quot;),&#10;                description: getTaskFormValue(&quot;newTaskDescription&quot;),&#10;                priority: getTaskFormValue(&quot;newTaskPriority&quot;)&#10;            }&#10;        }&#10;&#10;        function getTaskFormValue(controlName) {&#10;            return document.addTaskForm[controlName].value;&#10;        }&#10;&#10;        function taskDisplay() {&#10;            return document.getElementById(&quot;currentTaskDisplay&quot;);&#10;        }&#10;&#10;        function readTaskPriority() {&#10;            return document.priorityForm.priority.value&#10;        }&#10;&#10;        function fetchTasksWithPriority(priority) {&#10;            return sendGET(`/tasks/byPriority/${priority}`);&#10;        }&#10;&#10;        function fetchTaskWithName(name) {&#10;            return sendGET(`/tasks/byName/${name}`);&#10;        }&#10;&#10;        function fetchAllTasks() {&#10;            return sendGET(&quot;/tasks&quot;)&#10;        }&#10;&#10;        function sendGET(url) {&#10;            return fetch(&#10;                url,&#10;                {headers: {'Accept': 'application/json'}}&#10;            ).then(response =&gt; {&#10;                if (response.ok) {&#10;                    return response.json()&#10;                }&#10;                return [];&#10;            });&#10;        }&#10;&#10;        function sendPOST(url, data) {&#10;            return fetch(url, {&#10;                method: 'POST',&#10;                headers: {'Content-Type': 'application/json'},&#10;                body: JSON.stringify(data)&#10;            });&#10;        }&#10;&#10;        function sendDELETE(url) {&#10;            return fetch(url, {&#10;                method: &quot;DELETE&quot;&#10;            });&#10;        }&#10;&#10;        function tasksTable() {&#10;            return document.getElementById(&quot;tasksTableBody&quot;);&#10;        }&#10;&#10;        function clearTasksTable() {&#10;            tasksTable().innerHTML = &quot;&quot;;&#10;        }&#10;&#10;        function clearTaskDisplay() {&#10;            taskDisplay().innerText = &quot;None&quot;;&#10;        }&#10;&#10;        function displayTasks(tasks) {&#10;            const tasksTableBody = tasksTable()&#10;            tasks.forEach(task =&gt; {&#10;                const newRow = taskRow(task);&#10;                tasksTableBody.appendChild(newRow);&#10;            });&#10;        }&#10;&#10;        function taskRow(task) {&#10;            return tr([&#10;                td(task.name),&#10;                td(task.priority),&#10;                td(viewLink(task.name)),&#10;                td(deleteLink(task.name)),&#10;            ]);&#10;        }&#10;&#10;        function tr(children) {&#10;            const node = document.createElement(&quot;tr&quot;);&#10;            children.forEach(child =&gt; node.appendChild(child));&#10;            return node;&#10;        }&#10;&#10;        function td(content) {&#10;            const node = document.createElement(&quot;td&quot;);&#10;            if (content instanceof Element) {&#10;                node.appendChild(content)&#10;            } else {&#10;                node.appendChild(document.createTextNode(content));&#10;            }&#10;            return node;&#10;        }&#10;&#10;        function viewLink(taskName) {&#10;            const node = document.createElement(&quot;a&quot;);&#10;            node.setAttribute(&#10;                &quot;href&quot;, `javascript:displayTask(&quot;${taskName}&quot;)`&#10;            )&#10;            node.appendChild(document.createTextNode(&quot;view&quot;));&#10;            return node;&#10;        }&#10;&#10;        function deleteLink(taskName) {&#10;            const node = document.createElement(&quot;a&quot;);&#10;            node.setAttribute(&#10;                &quot;href&quot;, `javascript:deleteTask(&quot;${taskName}&quot;)`&#10;            )&#10;            node.appendChild(document.createTextNode(&quot;delete&quot;));&#10;            return node;&#10;        }&#10;    &lt;/script&gt;&#10;&lt;/head&gt;&#10;&lt;body onload=&quot;displayAllTasks()&quot;&gt;&#10;&lt;h1&gt;Task Manager Client&lt;/h1&gt;&#10;&lt;form action=&quot;javascript:displayAllTasks()&quot;&gt;&#10;    &lt;span&gt;View all the tasks&lt;/span&gt;&#10;    &lt;input type=&quot;submit&quot; value=&quot;Go&quot;&gt;&#10;&lt;/form&gt;&#10;&lt;form name=&quot;priorityForm&quot; action=&quot;javascript:displayTasksWithPriority()&quot;&gt;&#10;    &lt;span&gt;View tasks with priority&lt;/span&gt;&#10;    &lt;select name=&quot;priority&quot;&gt;&#10;        &lt;option name=&quot;Low&quot;&gt;Low&lt;/option&gt;&#10;        &lt;option name=&quot;Medium&quot;&gt;Medium&lt;/option&gt;&#10;        &lt;option name=&quot;High&quot;&gt;High&lt;/option&gt;&#10;        &lt;option name=&quot;Vital&quot;&gt;Vital&lt;/option&gt;&#10;    &lt;/select&gt;&#10;    &lt;input type=&quot;submit&quot; value=&quot;Go&quot;&gt;&#10;&lt;/form&gt;&#10;&lt;form name=&quot;addTaskForm&quot; action=&quot;javascript:addNewTask()&quot;&gt;&#10;    &lt;span&gt;Create new task with&lt;/span&gt;&#10;    &lt;label for=&quot;newTaskName&quot;&gt;name&lt;/label&gt;&#10;    &lt;input type=&quot;text&quot; id=&quot;newTaskName&quot; name=&quot;newTaskName&quot; size=&quot;10&quot;&gt;&#10;    &lt;label for=&quot;newTaskDescription&quot;&gt;description&lt;/label&gt;&#10;    &lt;input type=&quot;text&quot; id=&quot;newTaskDescription&quot; name=&quot;newTaskDescription&quot; size=&quot;20&quot;&gt;&#10;    &lt;label for=&quot;newTaskPriority&quot;&gt;priority&lt;/label&gt;&#10;    &lt;select id=&quot;newTaskPriority&quot; name=&quot;newTaskPriority&quot;&gt;&#10;        &lt;option name=&quot;Low&quot;&gt;Low&lt;/option&gt;&#10;        &lt;option name=&quot;Medium&quot;&gt;Medium&lt;/option&gt;&#10;        &lt;option name=&quot;High&quot;&gt;High&lt;/option&gt;&#10;        &lt;option name=&quot;Vital&quot;&gt;Vital&lt;/option&gt;&#10;    &lt;/select&gt;&#10;    &lt;input type=&quot;submit&quot; value=&quot;Go&quot;&gt;&#10;&lt;/form&gt;&#10;&lt;hr&gt;&#10;&lt;div&gt;&#10;    Current task is &lt;em id=&quot;currentTaskDisplay&quot;&gt;None&lt;/em&gt;&#10;&lt;/div&gt;&#10;&lt;hr&gt;&#10;&lt;table&gt;&#10;    &lt;thead&gt;&#10;    &lt;tr&gt;&#10;        &lt;th&gt;Name&lt;/th&gt;&#10;        &lt;th&gt;Priority&lt;/th&gt;&#10;        &lt;th&gt;&lt;/th&gt;&#10;        &lt;th&gt;&lt;/th&gt;&#10;    &lt;/tr&gt;&#10;    &lt;/thead&gt;&#10;    &lt;tbody id=&quot;tasksTableBody&quot;&gt;&#10;    &lt;/tbody&gt;&#10;&lt;/table&gt;&#10;&lt;/body&gt;&#10;&lt;/html&gt;"/>
-                    <p>
-                        這與先前教學中使用的 SPA 相同。由於它是用 JavaScript 編寫的，並且僅使用瀏覽器內可用的程式庫，因此你無需擔心用戶端相依性。
-                    </p>
-                </step>
-            </procedure>
-        </chapter>
-        <chapter title="手動測試應用程式" id="test-manually">
-            <procedure id="test-manually-procedure">
-                <step>
-                    <p>在 IntelliJ IDEA 中，點擊執行按鈕
-                        (<img src="intellij_idea_gutter_icon.svg"
-                              style="inline" height="16" width="16"
-                              alt="intelliJ IDEA run icon"/>)
-                        以啟動應用程式。</p>
-                </step>
-                <step>
-                    <p>
-                        在瀏覽器中導覽至 <a
-                            href="http://0.0.0.0:8080/static/index.html">http://0.0.0.0:8080/static/index.html</a>。你應該會看到由三個表單和一個顯示篩選結果的表格所組成的用戶端頁面。
-                    </p>
-                    <img src="tutorial_server_db_integration_index_page.png"
-                         alt="顯示任務管理器用戶端的瀏覽器視窗"
-                         border-effect="rounded"
-                         width="706"/>
-                </step>
-                <step>
-                    <p>
-                        透過填寫並使用
-                        <control>Go</control>
-                        按鈕送出表單來測試應用程式。使用表格項目上的
-                        <control>View</control>
-                        和
-                        <control>Delete</control>
-                        按鈕。
-                    </p>
-                    <img src="tutorial_server_db_integration_manual_test.gif"
-                         alt="顯示任務管理器用戶端的瀏覽器視窗"
-                         border-effect="rounded"
-                         width="706"/>
-                </step>
-            </procedure>
-        </chapter>
-        <chapter title="新增自動化單元測試" id="add-automated-tests">
-            <procedure id="add-automated-tests-procedure">
-                <step>
-                    <p>
-                        開啟
-                        <Path>src/test/kotlin</Path>
-                        中的
-                        <Path>ServerTest.kt</Path>
-                        檔案，並新增以下測試：
-                    </p>
-                    <code-block lang="kotlin" code="package com.example&#10;&#10;import com.example.model.Priority&#10;import com.example.model.Task&#10;import com.example.model.TaskRepository&#10;import io.ktor.client.call.*&#10;import io.ktor.client.plugins.contentnegotiation.*&#10;import io.ktor.server.plugins.di.dependencies&#10;import io.ktor.client.request.*&#10;import io.ktor.http.*&#10;import io.ktor.serialization.kotlinx.json.*&#10;import io.ktor.server.application.*&#10;import io.ktor.server.testing.*&#10;import kotlin.test.*&#10;&#10;suspend fun Application.configureTestApp() {&#10;    dependencies {&#10;        provide&lt;TaskRepository&gt; {&#10;            FakeTaskRepository()&#10;        }&#10;    }&#10;    configureSerialization()&#10;    configureStatusPages()&#10;    configureRouting()&#10;}&#10;&#10;class ServerTest {&#10;    @Test&#10;    fun tasksCanBeFoundByPriority() = testApplication {&#10;        application {&#10;            configureTestApp()&#10;        }&#10;&#10;        val client = createClient {&#10;            install(ContentNegotiation) {&#10;                json()&#10;            }&#10;        }&#10;&#10;        val response = client.get(&quot;/tasks/byPriority/Medium&quot;)&#10;        val results = response.body&lt;List&lt;Task&gt;&gt;()&#10;&#10;        assertEquals(HttpStatusCode.OK, response.status)&#10;&#10;        val expectedTaskNames = listOf(&quot;gardening&quot;, &quot;painting&quot;)&#10;        val actualTaskNames = results.map(Task::name)&#10;        assertContentEquals(expectedTaskNames, actualTaskNames)&#10;    }&#10;&#10;    @Test&#10;    fun invalidPriorityProduces400() = testApplication {&#10;        application {&#10;            configureTestApp()&#10;        }&#10;        val response = client.get(&quot;/tasks/byPriority/Invalid&quot;)&#10;        assertEquals(HttpStatusCode.BadRequest, response.status)&#10;    }&#10;&#10;    @Test&#10;    fun unusedPriorityProduces404() = testApplication {&#10;        application {&#10;            configureTestApp()&#10;        }&#10;&#10;        val response = client.get(&quot;/tasks/byPriority/Vital&quot;)&#10;        assertEquals(HttpStatusCode.NotFound, response.status)&#10;    }&#10;&#10;    @Test&#10;    fun newTasksCanBeAdded() = testApplication {&#10;        application {&#10;            configureTestApp()&#10;        }&#10;&#10;        val client = createClient {&#10;            install(ContentNegotiation) {&#10;                json()&#10;            }&#10;        }&#10;&#10;        val task = Task(&quot;swimming&quot;, &quot;Go to the beach&quot;, Priority.Low)&#10;        val response1 = client.post(&quot;/tasks&quot;) {&#10;            header(&#10;                HttpHeaders.ContentType,&#10;                ContentType.Application.Json&#10;            )&#10;&#10;            setBody(task)&#10;        }&#10;        assertEquals(HttpStatusCode.NoContent, response1.status)&#10;&#10;        val response2 = client.get(&quot;/tasks&quot;)&#10;        assertEquals(HttpStatusCode.OK, response2.status)&#10;&#10;        val taskNames = response2&#10;            .body&lt;List&lt;Task&gt;&gt;()&#10;            .map { it.name }&#10;&#10;        assertContains(taskNames, &quot;swimming&quot;)&#10;    }&#10;}"/>
-                    <p>
-                        為了編譯並執行這些測試，你需要新增對 Ktor Client 的 <a
-                            href="https://api.ktor.io/ktor-server-content-negotiation/io.ktor.server.plugins.contentnegotiation/-content-negotiation.html">Content
-                        Negotiation</a> 外掛程式的相依性。
-                    </p>
-                </step>
-                <step>
-                    <p>
-                        開啟
-                        <Path>build.gradle.kts</Path>
-                        並新增以下相依性：
-                    </p>
-                    <code-block lang="kotlin" code="                        dependencies {&#10;                            //...&#10;                            testImplementation(ktorLibs.client.contentNegotiation)&#10;                        }"/>
-                </step>
-                <step>
-                    <p>在 IntelliJ IDEA 中，點擊編輯器右側的通知 Gradle 圖示
-                        (<img alt="intelliJ IDEA gradle icon"
-                              src="intellij_idea_gradle_icon.svg" width="16" height="26"/>)
-                        以載入 Gradle 變更。</p>
-                </step>
-                <step>
-                    <p>在 IntelliJ IDEA 中，點擊測試類別定義旁的執行按鈕
-                        (<img src="intellij_idea_gutter_icon.svg"
-                              style="inline" height="16" width="16"
-                              alt="intelliJ IDEA run icon"/>)
-                        來執行測試。</p>
-                    <p>接著你應該會在
-                        <control>Run</control>
-                        窗格中看到測試已成功執行。
-                    </p>
-                    <img src="tutorial_server_db_integration_test_results.png"
-                         alt="在 IntelliJ IDEA 的 Run 窗格中顯示成功的測試結果"
-                         border-effect="line"
-                         width="706"/>
-                </step>
-            </procedure>
-        </chapter>
-    </chapter>
-    <chapter title="新增 PostgreSQL 儲存機制" id="add-postgresql-repository">
-        <p>
-            現在你已經擁有一個使用記憶體內部資料的可運作應用程式，下一步是將資料儲存外部化至 PostgreSQL 資料庫。
-        </p>
-        <p>
-            你將透過執行以下操作來實現：
-        </p>
-        <list type="decimal">
-            <li><a href="#create-schema">在 PostgreSQL 中建立資料庫架構。</a></li>
-            <li><a href="#adapt-repo">改造 <code>TaskRepository</code> 以進行非同步存取。</a></li>
-            <li><a href="#config-db-connection">在應用程式內設定資料庫連線。</a></li>
-            <li><a href="#create-mapping">將 <code>Task</code> 型別對應至關聯的資料庫表格。</a></li>
-            <li><a href="#create-new-repo">根據該對應建立新的儲存機制。</a></li>
-            <li><a href="#switch-repo">在啟動程式碼中切換至新的儲存機制。</a></li>
-        </list>
-        <chapter title="建立資料庫架構" id="create-schema">
-            <procedure id="create-schema-procedure">
-                <step>
-                    <p>
-                        使用你選擇的資料庫管理工具，在 PostgreSQL 中建立一個新資料庫。名稱只要記得住即可，並不影響操作。在此範例中，我們將使用
-                        <Path>ktor_tutorial_db</Path>。
-                    </p>
-                    <tip>
-                        <p>
-                            有關 PostgreSQL 的更多資訊，請參閱<a
-                                href="https://www.postgresql.org/docs/current/">官方文件</a>。
-                        </p>
-                        <p>
-                            在 IntelliJ IDEA 中，你可以利用資料庫工具來<a
-                                href="https://www.jetbrains.com/help/idea/postgresql.html">連線並管理你的 PostgreSQL
-                            資料庫。</a>
-                        </p>
-                    </tip>
-                </step>
-                <step>
-                    <p>
-                        對你的資料庫執行以下 SQL 指令。這些指令將建立並填入資料庫架構：
-                    </p>
-                    <code-block lang="sql" code="                        DROP TABLE IF EXISTS task;&#10;                        CREATE TABLE task(id SERIAL PRIMARY KEY, name VARCHAR(50), description VARCHAR(50), priority VARCHAR(50));&#10;&#10;                        INSERT INTO task (name, description, priority) VALUES ('cleaning', 'Clean the house', 'Low');&#10;                        INSERT INTO task (name, description, priority) VALUES ('gardening', 'Mow the lawn', 'Medium');&#10;                        INSERT INTO task (name, description, priority) VALUES ('shopping', 'Buy the groceries', 'High');&#10;                        INSERT INTO task (name, description, priority) VALUES ('painting', 'Paint the fence', 'Medium');&#10;                        INSERT INTO task (name, description, priority) VALUES ('exercising', 'Walk the dog', 'Medium');&#10;                        INSERT INTO task (name, description, priority) VALUES ('meditating', 'Contemplate the infinite', 'High');"/>
-                    <p>
-                        請注意以下事項：
-                    </p>
-                    <list>
-                        <li>
-                            你正在建立一個名為
-                            <code>task</code>
-                            的單一表格，包含
-                            <code>name</code>、
-                            <code>description</code>
-                            與
-                            <code>priority</code>
-                            欄位。這些欄位需要對應至 <code>Task</code> 類別的屬性。
-                        </li>
-                        <li>
-                            如果表格已存在，你將重新建立該表格，因此你可以重複執行該指令嗎。
-                        </li>
-                        <li>
-                            還有一個額外名為
-                            <code>id</code>
-                            的欄位，其型別為 <code>SERIAL</code>。這將是一個整數值，用於為每一列提供其主鍵。這些值將由資料庫代為指派。
-                        </li>
-                    </list>
-                </step>
-            </procedure>
-        </chapter>
-        <chapter title="改造現有儲存機制" id="adapt-repo">
-            <procedure id="adapt-repo-procedure">
-                <p>
-                    對資料庫執行查詢時，最好非同步執行它們，以避免阻塞處理 HTTP 請求的執行緒。在 Kotlin 中，這最好透過<a
-                        href="https://kotlinlang.org/docs/coroutines-overview.html">協同程式</a>來管理。
-                </p>
-                <step>
-                    <p>
-                        開啟
-                        <Path>src/main/kotlin/model</Path>
-                        中的
-                        <Path>TaskRepository.kt</Path>
-                        檔案。
-                    </p>
-                </step>
-                <step>
-                    <p>
-                        為所有介面方法新增 <code>suspend</code> 關鍵字：
-                    </p>
-                    <code-block lang="kotlin" code="                    interface TaskRepository {&#10;                        suspend fun allTasks(): List&lt;Task&gt;&#10;                        suspend fun tasksByPriority(priority: Priority): List&lt;Task&gt;&#10;                        suspend fun taskByName(name: String): Task?&#10;                        suspend fun addTask(task: Task)&#10;                        suspend fun removeTask(name: String): Boolean&#10;                    }"/>
-                    <p>
-                        這將允許介面方法的實作在不同的協同程式調度器上啟動工作任務。
-                    </p>
-                    <p>
-                        你現在需要調整 <code>FakeTaskRepository</code> 的方法以相互符合，儘管在該實作中你不需要切換調度器。
-                    </p>
-                </step>
-                <step>
-                    <p>
-                        開啟
-                        <Path>FakeTaskRepository.kt</Path>
-                        檔案，並為所有方法新增 <code>suspend</code> 關鍵字：
-                    </p>
-                    <code-block lang="kotlin" code="                    class FakeTaskRepository : TaskRepository {&#10;                        //...&#10;&#10;                        override suspend fun allTasks(): List&lt;Task&gt; = tasks&#10;&#10;                        override suspend fun tasksByPriority(priority: Priority) = tasks.filter {&#10;                            //...&#10;                        }&#10;&#10;                        override suspend fun taskByName(name: String) = tasks.find {&#10;                            //...&#10;                        }&#10;&#10;                        override suspend fun addTask(task: Task) {&#10;                            //...&#10;                        }&#10;&#10;                        override suspend fun removeTask(name: String): Boolean {&#10;                            //...&#10;                        }&#10;                    }"/>
-                    <p>
-                        到目前為止，你尚未引入任何新功能。相反地，你已經為建立將對資料庫非同步執行查詢的 <code>PostgresTaskRepository</code> 奠定了基礎。
-                    </p>
-                </step>
-            </procedure>
-        </chapter>
-        <chapter title="設定資料庫連線" id="config-db-connection">
-            <procedure id="config-db-connection-procedure">
-                <p>
-                    在<a href="#delete-function">本教學的第一部分</a>中，你刪除了
-                    <Path>Exposed.kt</Path>
-                    內 <code>.configureExposed()</code> 函式中的範例程式碼。現在你已準備好新增自己的實作。
-                </p>
-                <p>
-                    Ktor 專案產生器並未新增對 DAO 型別的支援，因此你首先需要在 Gradle 建置檔案中新增相關相依性。
-                </p>
-                <step>
-                    在你的 <Path>gradle/libs.versions.toml</Path> 檔案中，新增 <code>exposed-jdbc</code> 與
-                    <code>exposed-dao</code> 程式庫：
-                    <code-block lang="kotlin" code="                        [libraries]&#10;                        exposed-jdbc = { module = &quot;org.jetbrains.exposed:exposed-jdbc&quot;, version.ref = &quot;exposed&quot; }&#10;                        exposed-dao = { module = &quot;org.jetbrains.exposed:exposed-dao&quot;, version.ref = &quot;exposed&quot; }"/>
-                    這將允許你使用 Exposed 資料存取物件 (DAO) 模式。
-                </step>
-                <step>
-                    在你的 <Path>build.gradle.kts</Path> 檔案中，新增以下相依性：
-                    <code-block lang="kotlin" code="                    dependencies {&#10;                        // ...&#10;                        implementation(libs.exposed.jdbc)&#10;                        implementation(libs.exposed.dao)&#10;                    }"/>
-                </step>
-                <step>
-                    <p>在 IntelliJ IDEA 中，點擊編輯器右側的通知 Gradle 圖示
-                        (<img alt="intelliJ IDEA gradle icon"
-                              src="intellij_idea_gradle_icon.svg" width="16" height="26"/>)
-                        以載入 Gradle 變更。</p>
-                </step>
-                <step>
-                    開啟
-                    <Path>src/main/kotlin</Path>
-                    中的
-                    <Path>Exposed.kt</Path>
-                    檔案。
-                </step>
-                <step>
-                    <p>
-                        使用 <code>Database.connect()</code> 函式連接至你的資料庫，調整設定值以符合你的環境：
-                    </p>
-                    <code-block lang="kotlin" code="                        suspend fun Application.configureExposed() {&#10;                            Database.connect(&#10;                                &quot;jdbc:postgresql://localhost:5432/ktor_tutorial_db&quot;,&#10;                                user = &quot;postgres&quot;,&#10;                                password = &quot;password&quot;&#10;                            )&#10;                        }"/>
-                    <p>請注意 <code>url</code> 包含以下組成部分：</p>
-                    <list>
-                        <li>
-                            <code>localhost:5432</code> 是 PostgreSQL 資料庫執行的主機與連接埠。
-                        </li>
-                        <li>
-                            <code>ktor_tutorial_db</code> 是執行服務時建立的資料庫名稱。
-                        </li>
-                    </list>
-                    <tip>
-                        欲了解更多資訊，請參閱
-                        <a href="https://www.jetbrains.com/help/exposed/working-with-database.html">
-                            在 Exposed 中使用資料庫</a>。
-                    </tip>
-                </step>
-            </procedure>
-        </chapter>
-        <chapter title="建立物件／關聯對應" id="create-mapping">
-            <procedure id="create-mapping-procedure">
-                <step>
-                    導覽至
-                    <Path>src/main/kotlin</Path>
-                    並建立名為
-                    <Path>db</Path>
-                    的新套件。
-                </step>
-                <step>
-                    在
-                    <Path>db</Path>
-                    套件內，建立一個新的
-                    <Path>mapping.kt</Path>
-                    檔案。
-                </step>
-                <step>
-                    <p>
-                        開啟
-                        <Path>mapping.kt</Path>
-                        並新增 <code>TaskTable</code> 與 <code>TaskDAO</code> 型別：
-                    </p>
-                    <code-block lang="kotlin" code="package com.example.db&#10;&#10;import org.jetbrains.exposed.v1.core.dao.id.EntityID&#10;import org.jetbrains.exposed.v1.core.dao.id.IntIdTable&#10;import org.jetbrains.exposed.v1.dao.IntEntity&#10;import org.jetbrains.exposed.v1.dao.IntEntityClass&#10;&#10;object TaskTable : IntIdTable(&quot;task&quot;) {&#10;    val name = varchar(&quot;name&quot;, 50)&#10;    val description = varchar(&quot;description&quot;, 50)&#10;    val priority = varchar(&quot;priority&quot;, 50)&#10;}&#10;&#10;class TaskDAO(id: EntityID&lt;Int&gt;) : IntEntity(id) {&#10;    companion object : IntEntityClass&lt;TaskDAO&gt;(TaskTable)&#10;&#10;    var name by TaskTable.name&#10;    var description by TaskTable.description&#10;    var priority by TaskTable.priority&#10;}"/>
-                    <p>
-                        這些型別使用 Exposed 程式庫將 <code>Task</code> 型別中的屬性對應到資料庫中
-                        <code>task</code>
-                        表格的欄位。<code>TaskTable</code> 型別定義了基本對應，而
-                        <code>TaskDAO</code> 型別則新增了幫助程式方法來建立、尋找、更新與刪除任務。
-                    </p>
-                </step>
-                <step>
-                    <p>
-                        在同一個
-                        <Path>mapping.kt</Path>
-                        檔案中，新增以下幫助程式函式：
-                    </p>
-                    <code-block include-symbol="withTransaction, daoToModel"
-                            lang="kotlin" code="package com.example.db&#10;&#10;import com.example.model.Priority&#10;import com.example.model.Task&#10;import kotlinx.coroutines.Dispatchers&#10;import kotlinx.coroutines.withContext&#10;import org.jetbrains.exposed.v1.core.dao.id.EntityID&#10;import org.jetbrains.exposed.v1.core.dao.id.IntIdTable&#10;import org.jetbrains.exposed.v1.dao.IntEntity&#10;import org.jetbrains.exposed.v1.dao.IntEntityClass&#10;import org.jetbrains.exposed.v1.jdbc.JdbcTransaction&#10;import org.jetbrains.exposed.v1.jdbc.transactions.inTopLevelSuspendTransaction&#10;&#10;object TaskTable : IntIdTable(&quot;task&quot;) {&#10;    val name = varchar(&quot;name&quot;, 50)&#10;    val description = varchar(&quot;description&quot;, 50)&#10;    val priority = varchar(&quot;priority&quot;, 50)&#10;}&#10;&#10;class TaskDAO(id: EntityID&lt;Int&gt;) : IntEntity(id) {&#10;    companion object : IntEntityClass&lt;TaskDAO&gt;(TaskTable)&#10;&#10;    var name by TaskTable.name&#10;    var description by TaskTable.description&#10;    var priority by TaskTable.priority&#10;}&#10;&#10;suspend fun &lt;T&gt; withTransaction(block: suspend JdbcTransaction.() -&gt; T): T = withContext(Dispatchers.IO) {&#10;    inTopLevelSuspendTransaction { block() }&#10;}&#10;&#10;fun daoToModel(dao: TaskDAO) = Task(&#10;    dao.name,&#10;    dao.description,&#10;    Priority.valueOf(dao.priority)&#10;)"/>
-                    <list>
-                        <li>
-                            <code>withTransaction()</code> 函式在新的最上層資料庫交易中執行一個掛起區塊。協同程式上下文切換至 <code>Dispatchers.IO</code>，以便阻塞式 JDBC 操作在針對 IO 任務最佳化的執行緒集區上執行。
-                        </li>
-                        <li>
-                            <code>daoToModel()</code> 函式將 <code>TaskDAO</code> 型別的執行個體轉換為 <code>Task</code> 物件。
-                        </li>
-                    </list>
-                </step>
-                <step>
-                    <p>
-                        新增以下缺少的匯入：
-                    </p>
-                    <code-block lang="kotlin" code="import com.example.model.Priority&#10;import com.example.model.Task&#10;import kotlinx.coroutines.Dispatchers&#10;import kotlinx.coroutines.withContext&#10;import org.jetbrains.exposed.v1.jdbc.JdbcTransaction&#10;import org.jetbrains.exposed.v1.jdbc.transactions.inTopLevelSuspendTransaction"/>
-                </step>
-            </procedure>
-        </chapter>
-        <chapter title="編寫新的儲存機制" id="create-new-repo">
-            <procedure id="create-new-repo-procedure">
-                <p>你現在已經擁有建立特定資料庫儲存機制所需的所有資源。</p>
-                <step>
-                    導覽至
-                    <Path>src/main/kotlin/model</Path>
-                    並建立一個新的
-                    <Path>PostgresTaskRepository.kt</Path>
-                    檔案。
-                </step>
-                <step>
-                    <p>
-                        開啟
-                        <Path>PostgresTaskRepository.kt</Path>
-                        檔案，並透過以下實作建立一個新型別：
-                    </p>
-                    <code-block lang="kotlin" code="package com.example.model&#10;&#10;import com.example.db.TaskDAO&#10;import com.example.db.TaskTable&#10;import com.example.db.daoToModel&#10;import com.example.db.withTransaction&#10;import org.jetbrains.exposed.v1.core.eq&#10;import org.jetbrains.exposed.v1.jdbc.deleteWhere&#10;&#10;class PostgresTaskRepository : TaskRepository {&#10;    override suspend fun allTasks(): List&lt;Task&gt; = withTransaction {&#10;        TaskDAO.all().map(::daoToModel)&#10;    }&#10;&#10;    override suspend fun tasksByPriority(priority: Priority): List&lt;Task&gt; = withTransaction {&#10;        TaskDAO&#10;            .find { (TaskTable.priority eq priority.toString()) }&#10;            .map(::daoToModel)&#10;    }&#10;&#10;    override suspend fun taskByName(name: String): Task? = withTransaction {&#10;        TaskDAO&#10;            .find { (TaskTable.name eq name) }&#10;            .limit(1)&#10;            .map(::daoToModel)&#10;            .firstOrNull()&#10;    }&#10;&#10;    override suspend fun addTask(task: Task): Unit = withTransaction {&#10;        TaskDAO.new {&#10;            name = task.name&#10;            description = task.description&#10;            priority = task.priority.toString()&#10;        }&#10;    }&#10;&#10;    override suspend fun removeTask(name: String): Boolean = withTransaction {&#10;        val rowsDeleted = TaskTable.deleteWhere {&#10;            TaskTable.name eq name&#10;        }&#10;        rowsDeleted == 1&#10;    }&#10;}"/>
-                    <p>
-                        在此實作中，你使用 <code>TaskDAO</code> 和 <code>TaskTable</code> 型別的幫助程式方法與資料庫互動。建立此新儲存機制後，唯一剩下的任務就是切換為在你的路由中使用它。
-                    </p>
-                </step>
-            </procedure>
-        </chapter>
-        <chapter title="切換至新的儲存機制" id="switch-repo">
-            <procedure id="switch-repo-procedure">
-                <p>若要切換至外部資料庫，你只需要變更儲存機制型別。</p>
-                <step>
-                    開啟
-                    <Path>src/main/kotlin</Path>
-                    中的
-                    <Path>main.kt</Path>
-                    檔案。
-                </step>
-                <step>
-                    <p>
-                        在 <code>Application.configureDependencies()</code> 函式中，將 <code>FakeTaskRepository</code> 替換為 <code>PostgresTaskRepository</code>：
-                    </p>
-                    <code-block lang="kotlin" code="                    //...&#10;                    import com.example.model.PostgresTaskRepository&#10;&#10;                    //...&#10;&#10;                    fun Application.configureDependencies() {&#10;                        dependencies {&#10;                            provide&lt;TaskRepository&gt; {&#10;                                PostgresTaskRepository()&#10;                            }&#10;                        }&#10;                    }"/>
-                    <p>
-                        因為你是透過介面注入相依性，所以實作的切換對管理路由的程式碼而言是完全透明的。
-                    </p>
-                </step>
-                <step>
-                    <p>
-                        在 IntelliJ IDEA 中，點擊重新執行按鈕 (<img src="intellij_idea_rerun_icon.svg"
-                                                                       style="inline" height="16" width="16"
-                                                                       alt="intelliJ IDEA rerun icon"/>) 以重新啟動應用程式。
-                    </p>
-                </step>
-                <step>
-                    導覽至 <a
-                        href="http://0.0.0.0:8080/static/index.html">http://0.0.0.0:8080/static/index.html</a>。UI 保持不變，但現在會從資料庫擷取資料。
-                </step>
-                <step>
-                    <p>
-                        若要驗證這一點，請使用表單新增一個新任務，並查詢 PostgreSQL 中的 tasks 表格所保留的資料。
-                    </p>
-                    <tip>
-                        <p>
-                            在 IntelliJ IDEA 中，你可以使用<a href="https://www.jetbrains.com/help/idea/query-consoles.html#create_console">查詢主控台</a>和 <code>SELECT</code> SQL 陳述式來查詢表格資料：
-                        </p>
-                        <code-block lang="SQL" code="                            SELECT * FROM task;"/>
-                        <p>
-                            查詢完成後，資料應該會顯示在
-                            <ui-path>Service</ui-path>
-                            窗格中，包含新任務：
-                        </p>
-                        <img src="tutorial_server_db_integration_task_table.png"
-                             alt="在 IntelliJ IDEA 的 Service 窗格中顯示的任務表格"
-                             border-effect="line"
-                             width="706"/>
-                    </tip>
-                </step>
-            </procedure>
-        </chapter>
-        <p>
-            至此，你已成功完成將資料庫整合至應用程式的工作。
-        </p>
-        <p>
-            由於正式環境程式碼中不再需要 <code>FakeTaskRepository</code> 型別，你可以將其移至
-            <Path>src/test</Path>
-            中的測試原始碼集。
-        </p>
-        <p>
-            最終的專案結構應如下所示：
-        </p>
-        <img src="tutorial_server_db_integration_src_folder.png"
-             alt="IntelliJ IDEA 的專案檢視中顯示的 src 資料夾"
-             border-effect="line"
-             width="400"/>
-    </chapter>
-    <chapter title="後續步驟" id="next-steps">
-        <p>
-            現在你擁有一個與 Ktor RESTful 服務通訊的應用程式。此服務進而使用以 <a href="https://github.com/JetBrains/Exposed">Exposed</a> 編寫的儲存機制來存取 <a href="https://www.postgresql.org/docs/">PostgreSQL</a>。你還擁有一套用來驗證核心功能的<a href="#add-automated-tests">測試套件</a>，而且無需 Web 伺服器或資料庫。
-        </p>
-        <p>
-            你可以根據需要擴充此結構以支援任意的功能，但你可能希望先考慮設計的非功能性層面，例如容錯能力、安全性和可擴展性。你可以從將<a href="docker-compose.topic#extract-db-settings">資料庫連線設定擷取</a>至<Links href="/ktor/server-configuration-file" summary="Learn how to configure various server parameters in a configuration file.">設定檔</Links>開始。
-        </p>
-    </chapter>
-</topic>
+[//]: # (title: 使用 Kotlin、Ktor 和 Exposed 整合資料庫)
+
+<show-structure for="chapter" depth="2"/>
+
+<tldr>
+<var name="example_name" value="tutorial-server-db-integration"/>
+<p>
+    <b>程式碼範例</b>：
+    <a href="https://github.com/ktorio/ktor-documentation/tree/main/codeSnippets/snippets/%example_name%">
+        %example_name%
+    </a>
+</p>
+<p>
+<b>使用的外掛程式</b>：<Links href="server-static-content.md" summary="了解如何提供靜態內容，例如樣式表、指令碼、圖片等。">Static Content</Links>、
+<Links href="server-serialization.md" summary="ContentNegotiation 外掛程式主要有兩個用途：在用戶端與伺服器之間交涉媒體類型，以及以特定格式序列化/反序列化內容。">Content Negotiation</Links>、<Links href="server-status-pages.md" summary="%plugin_name% 允許 Ktor 應用程式根據擲出的例外狀況或狀態碼，對任何失敗狀態做出適當的回應。">Status Pages</Links>、
+<Links href="server-serialization.md" summary="ContentNegotiation 外掛程式主要有兩個用途：在用戶端與伺服器之間交涉媒體類型，以及以特定格式序列化/反序列化內容。">kotlinx.serialization</Links>、
+<Links href="server-dependency-injection.md" summary="必要的相依項：io.ktor:ktor-server-di 程式碼範例：%example_name%">Dependency Injection</Links>、
+<a href="https://github.com/ktorio/ktor-plugin-registry/tree/main/repository/org.jetbrains/server-exposed">Exposed</a>、
+<a href="https://github.com/ktorio/ktor-plugin-registry/tree/main/repository/org.jetbrains/server-postgres">PostgreSQL</a>
+</p>
+</tldr>
+
+<card-summary>
+了解使用 Exposed SQL 程式庫將 Ktor 服務連接到資料庫存儲庫的過程。
+</card-summary>
+
+<link-summary>
+了解使用 Exposed SQL 程式庫將 Ktor 服務連接到資料庫存儲庫的過程。
+</link-summary>
+
+<web-summary>
+了解如何使用 Kotlin 和 Ktor 建置單頁應用程式 (SPA)，其中 RESTful 服務會連結到資料庫存儲庫。它使用 Exposed SQL 程式庫，並允許你偽造存儲庫以進行測試。
+</web-summary>
+
+在本文中，你將學習如何使用 Kotlin 的 SQL 程式庫 [Exposed](https://www.jetbrains.com/exposed/)，將 Ktor 服務與關聯式資料庫進行整合。
+
+完成本教學後，你將學會如何執行以下操作：
+
+* 建立使用 JSON 序列化的 RESTful 服務。
+* 將不同的存儲庫注入到這些服務中。
+* 使用記憶體內存儲庫為你的服務建立單元測試。
+* 使用 Exposed 和相依注入 (DI) 建置可運作的存儲庫。
+* 部署存取外部資料庫的服務。
+
+在先前的教學中，我們使用工作管理員範例介紹了基礎知識，例如[處理請求](server-requests-and-responses.topic)、[建立 RESTful API](server-create-restful-apis.topic) 或[使用 Thymeleaf 範本建置 Web 應用程式](server-create-website.topic)。
+
+雖然這些教學重點放在使用簡單的記憶體內 `TaskRepository` 實現前端功能，但本指南將重點轉移到展示 Ktor 服務如何透過 Exposed SQL 程式庫與關聯式資料庫進行互動。
+
+即使本指南篇幅較長且更為複雜，你仍然可以快速產出可執行的程式碼，並逐步引入新功能。
+
+本指南包含兩個部分：
+
+1. [使用記憶體內存儲庫建立應用程式。](#create-restful-service-and-repository)
+2. [將記憶體內存儲庫替換為使用 PostgreSQL 的存儲庫。](#add-postgresql-repository)
+
+## 先決條件 {id="prerequisites"}
+
+你可以獨立完成本教學，但我們建議你先完成[建立 RESTful API](server-create-restful-apis.topic) 教學，以熟悉內容交涉與 REST。
+
+我們建議你安裝 [IntelliJ IDEA](https://www.jetbrains.com/help/idea/installation-guide.html)，但你也可以使用自選的其他 IDE。
+
+## 建立 RESTful 服務和記憶體內存儲庫 {id="create-restful-service-and-repository"}
+
+首先，你將重新建立工作管理員的 RESTful 服務。一開始你將使用記憶體內存儲庫，但你會構建一個易於替換的架構設計。
+
+你將分六個階段進行：
+
+1. [建立初始專案。](#create-project)
+2. [新增入門程式碼。](#add-starter-code)
+3. [新增 CRUD 路由。](#add-routes)
+4. [新增單頁應用程式 (SPA)。](#add-client-page)
+5. [手動測試應用程式。](#test-manually)
+6. [新增自動化測試。](#add-automated-tests)
+
+### 使用外掛程式建立新專案 {id="create-project"}
+
+若要使用 Ktor 專案產生器建立新專案，請遵循以下步驟：
+
+<procedure id="create-project-procedure">
+
+1. <p>
+       前往
+       <a href="https://start.ktor.io/">Ktor 專案產生器</a>
+       。
+   </p>
+2. 在 **Project artifact** 欄位中，輸入 `com.example.ktor-exposed-task-app` 作為專案產物的名稱。
+
+   ![在 Ktor 專案產生器中為專案產物命名](tutorial_server_db_integration_project_artifact.png){width="706" border-effect="line" style="block"}
+3. 在外掛程式區段中，搜尋並點擊 **Add** 按鈕新增以下外掛程式：
+   * Content Negotiation
+   * kotlinx.serialization
+   * Static Content
+   * Status Pages
+   * Dependency Injection
+   * Exposed
+   * PostgreSQL
+
+   ![在 Ktor 專案產生器中新增外掛程式](ktor_project_generator_add_plugins.gif){width="706" border-effect="line" style="block"}
+4. 新增外掛程式後，點擊外掛程式區段右上角的 **7 plugins** 按鈕以檢視已新增的外掛程式。
+
+   接著你將看到所有將新增至專案的外掛程式清單：
+   ![Ktor 專案產生器中的外掛程式下拉選單](tutorial_server_db_integration_plugin_list.png){width="706" border-effect="line" style="block"}
+5. <p>
+       點擊
+       <control>Download</control>
+       按鈕以產生並下載你的 Ktor 專案。
+   </p>
+6. 在 [IntelliJ IDEA](https://www.jetbrains.com/help/idea/installation-guide.html) 或自選的其他 IDE 中開啟產生的專案。
+7. 巡覽至 <Path>src/main/kotlin</Path> 並刪除 <Path>CitySchema.kt</Path>、<Path>UsersService.kt</Path>、<Path>GreetingService.kt</Path> 和 <Path>Postgres.kt</Path> 檔案。
+8. 開啟 <Path>Exposed.kt</Path> 檔案並移除 `.configureExposed()` 函式的內容：{id="delete-function"}
+
+   ```kotlin
+   suspend fun Application.configureExposed() {
+   }
+   ```
+
+   移除此功能的原因在於 Ktor 專案產生器新增了範例程式碼，用於展示如何將使用者與城市的資料保存到 HSQLDB 或 PostgreSQL。在本教學中你不需要這些範例程式碼。
+9. 開啟 <Path>gradle/libs.versions.toml</Path> 檔案，並確認指定了最新的 Exposed 版本：
+
+   ```kotlin
+   [versions]
+   #...
+   exposed = %exposed_version%
+   ```
+
+</procedure>
+
+### 新增入門程式碼 {id="add-starter-code"}
+
+<procedure id="add-starter-code-procedure">
+
+1. 巡覽至 <Path>src/main/kotlin</Path> 並建立名為 <Path>model</Path> 的子套件。
+2. 在 <Path>model</Path> 套件中，建立新的 <Path>Task.kt</Path> 檔案。
+3. 開啟 <Path>Task.kt</Path> 並新增代表優先級的列舉以及代表任務的類別：
+
+   ```kotlin
+   package com.example.model
+   
+   import kotlinx.serialization.Serializable
+   
+   enum class Priority {
+       Low, Medium, High, Vital
+   }
+   
+   @Serializable
+   data class Task(
+       val name: String,
+       val description: String,
+       val priority: Priority
+   )
+   ```
+
+   `Task` 類別使用來自 [`kotlinx.serialization`](server-serialization.md) 程式庫的 `Serializable` 型別加上註解。
+
+   如同先前的教學，你將建立一個記憶體內存儲庫。不過，這次存儲庫將實作一個介面，以便你日後輕鬆替換。
+4. 在 <Path>model</Path> 子套件中，建立新的 <Path>TaskRepository.kt</Path> 檔案。
+5. 開啟 <Path>TaskRepository.kt</Path> 並新增以下介面：
+
+   ```kotlin
+   package com.example.model
+
+   interface TaskRepository {
+       fun allTasks(): List<Task>
+       fun tasksByPriority(priority: Priority): List<Task>
+       fun taskByName(name: String): Task?
+       fun addTask(task: Task)
+       fun removeTask(name: String): Boolean
+   }
+   ```
+6. 在同一個目錄中建立新的 <Path>FakeTaskRepository.kt</Path> 檔案。
+7. 開啟 <Path>FakeTaskRepository.kt</Path> 並新增以下類別：
+
+   ```kotlin
+   package com.example.model
+
+   class FakeTaskRepository : TaskRepository {
+       private val tasks = mutableListOf(
+           Task("cleaning", "Clean the house", Priority.Low),
+           Task("gardening", "Mow the lawn", Priority.Medium),
+           Task("shopping", "Buy the groceries", Priority.High),
+           Task("painting", "Paint the fence", Priority.Medium)
+       )
+
+       override fun allTasks(): List<Task> = tasks
+
+       override fun tasksByPriority(priority: Priority) = tasks.filter {
+           it.priority == priority
+       }
+
+       override fun taskByName(name: String) = tasks.find {
+           it.name.equals(name, ignoreCase = true)
+       }
+
+       override fun addTask(task: Task) {
+           if (taskByName(task.name) != null) {
+               throw IllegalStateException("Cannot duplicate task names!")
+           }
+           tasks.add(task)
+       }
+
+       override fun removeTask(name: String): Boolean {
+           return tasks.removeIf { it.name == name }
+       }
+   }
+   ```
+
+</procedure>
+
+### 新增路由 {id="add-routes"}
+
+<procedure id="add-routes-procedure">
+
+1. 開啟 <Path>src/main/kotlin</Path> 中的 <Path>Serialization.kt</Path> 檔案。
+2. 將現有的 `Application.configureSerialization()` 函式替換為以下實作：
+
+   ```kotlin
+   package com.example
+   
+   import com.example.model.Priority
+   import com.example.model.Task
+   import com.example.model.TaskRepository
+   import io.ktor.http.*
+   import io.ktor.serialization.*
+   import io.ktor.serialization.kotlinx.json.*
+   import io.ktor.server.application.*
+   import io.ktor.server.plugins.contentnegotiation.*
+   import io.ktor.server.plugins.di.dependencies
+   import io.ktor.server.request.*
+   import io.ktor.server.response.*
+   import io.ktor.server.routing.*
+   
+   suspend fun Application.configureSerialization() {
+       val repository = dependencies.resolve<TaskRepository>()
+   
+       install(ContentNegotiation) {
+           json()
+       }
+       routing {
+           route("/tasks") {
+               get {
+                   val tasks = repository.allTasks()
+                   call.respond(tasks)
+               }
+   
+               get("/byName/{taskName}") {
+                   val name = call.parameters["taskName"]
+                   if (name == null) {
+                       call.respond(HttpStatusCode.BadRequest)
+                       return@get
+                   }
+                   val task = repository.taskByName(name)
+                   if (task == null) {
+                       call.respond(HttpStatusCode.NotFound)
+                       return@get
+                   }
+                   call.respond(task)
+               }
+   
+               get("/byPriority/{priority}") {
+                   val priorityAsText = call.parameters["priority"]
+                   if (priorityAsText == null) {
+                       call.respond(HttpStatusCode.BadRequest)
+                       return@get
+                   }
+                   try {
+                       val priority = Priority.valueOf(priorityAsText)
+                       val tasks = repository.tasksByPriority(priority)
+   
+   
+                       if (tasks.isEmpty()) {
+                           call.respond(HttpStatusCode.NotFound)
+                           return@get
+                       }
+                       call.respond(tasks)
+                   } catch (ex: IllegalArgumentException) {
+                       call.respond(HttpStatusCode.BadRequest)
+                   }
+               }
+   
+               post {
+                   try {
+                       val task = call.receive<Task>()
+                       repository.addTask(task)
+                       call.respond(HttpStatusCode.NoContent)
+                   } catch (ex: IllegalStateException) {
+                       call.respond(HttpStatusCode.BadRequest)
+                   } catch (ex: JsonConvertException) {
+                       call.respond(HttpStatusCode.BadRequest)
+                   }
+               }
+   
+               delete("/{taskName}") {
+                   val name = call.parameters["taskName"]
+                   if (name == null) {
+                       call.respond(HttpStatusCode.BadRequest)
+                       return@delete
+                   }
+                   if (repository.removeTask(name)) {
+                       call.respond(HttpStatusCode.NoContent)
+                   } else {
+                       call.respond(HttpStatusCode.NotFound)
+                   }
+               }
+           }
+       }
+   }
+   ```
+
+   這與你在[建立 RESTful API](server-create-restful-apis.topic) 教學中實作的路由相同，不同之處在於你現在是從 Ktor 的相依注入容器中解析存儲庫。由於相依項的型別是 `interface`，因此可以注入許多不同的實作。
+
+   因為 `dependencies.resolve()` 是一個 suspend 函式，所以 `.configureSerialization()` 也必須宣告為 suspend。
+
+   現在你已為 `.configureSerialization()` 新增了相依項，現有的呼叫將無法編譯。幸運的是，這個函式只會被呼叫一次。
+3. 開啟 <Path>src/main/kotlin</Path> 中的 <Path>DI.kt</Path> 檔案。
+4. 將 `.configureDependencyInjection()` 函式的內容替換為以下實作：
+
+   ```kotlin
+   import com.example.model.FakeTaskRepository
+   import com.example.model.TaskRepository
+   // ...
+
+   fun Application.configureDependencyInjection() {
+       dependencies {
+           provide<TaskRepository> {
+               FakeTaskRepository()
+           }
+       }
+   }
+   ```
+
+   你現在將 `FakeTaskRepository` 註冊為 `TaskRepository` 的實作。長遠目標是能夠將其替換為 `PostgresTaskRepository`。
+5. 開啟位於 <Path>src/main/resources</Path> 資料夾中的 <Path>application.yaml</Path> 檔案，並確認 `.configureDependencyInjection()` 函式列在 `.configureSerialization()` 之前：
+
+   ```yaml
+   ktor:
+       deployment:
+           port: 8080
+       application:
+           modules:
+               - com.example.DIKt.configureDependencyInjection
+               - com.example.SerializationKt.configureSerialization
+               - com.example.ExposedKt.configureExposed
+               - com.example.StatusPagesKt.configureStatusPages
+               - com.example.RoutingKt.configureRouting
+   ```
+
+</procedure>
+
+### 新增用戶端頁面 {id="add-client-page"}
+
+<procedure id="add-client-page-procedure">
+
+1. 開啟 <Path>src/main/resources/static</Path> 中的 <Path>index.html</Path> 檔案。
+2. 將目前內容替換為以下實作：
+
+   ```html
+   <html>
+   <head>
+       <title>A Simple SPA For Tasks</title>
+       <script type="application/javascript">
+           function displayAllTasks() {
+               clearTasksTable();
+               fetchAllTasks().then(displayTasks)
+           }
+   
+           function displayTasksWithPriority() {
+               clearTasksTable();
+               const priority = readTaskPriority();
+               fetchTasksWithPriority(priority).then(displayTasks)
+           }
+   
+           function displayTask(name) {
+               fetchTaskWithName(name).then(t =>
+                   taskDisplay().innerHTML
+                       = `${t.priority} priority task ${t.name} with description "${t.description}"`
+               )
+           }
+   
+           function deleteTask(name) {
+               deleteTaskWithName(name).then(() => {
+                   clearTaskDisplay();
+                   displayAllTasks();
+               })
+           }
+   
+           function deleteTaskWithName(name) {
+               return sendDELETE(`/tasks/${name}`)
+           }
+   
+           function addNewTask() {
+               const task = buildTaskFromForm();
+               sendPOST("/tasks", task).then(displayAllTasks);
+           }
+   
+           function buildTaskFromForm() {
+               return {
+                   name: getTaskFormValue("newTaskName"),
+                   description: getTaskFormValue("newTaskDescription"),
+                   priority: getTaskFormValue("newTaskPriority")
+               }
+           }
+   
+           function getTaskFormValue(controlName) {
+               return document.addTaskForm[controlName].value;
+           }
+   
+           function taskDisplay() {
+               return document.getElementById("currentTaskDisplay");
+           }
+   
+           function readTaskPriority() {
+               return document.priorityForm.priority.value
+           }
+   
+           function fetchTasksWithPriority(priority) {
+               return sendGET(`/tasks/byPriority/${priority}`);
+           }
+   
+           function fetchTaskWithName(name) {
+               return sendGET(`/tasks/byName/${name}`);
+           }
+   
+           function fetchAllTasks() {
+               return sendGET("/tasks")
+           }
+   
+           function sendGET(url) {
+               return fetch(
+                   url,
+                   {headers: {'Accept': 'application/json'}}
+               ).then(response => {
+                   if (response.ok) {
+                       return response.json()
+                   }
+                   return [];
+               });
+           }
+   
+           function sendPOST(url, data) {
+               return fetch(url, {
+                   method: 'POST',
+                   headers: {'Content-Type': 'application/json'},
+                   body: JSON.stringify(data)
+               });
+           }
+   
+           function sendDELETE(url) {
+               return fetch(url, {
+                   method: "DELETE"
+               });
+           }
+   
+           function tasksTable() {
+               return document.getElementById("tasksTableBody");
+           }
+   
+           function clearTasksTable() {
+               tasksTable().innerHTML = "";
+           }
+   
+           function clearTaskDisplay() {
+               taskDisplay().innerText = "None";
+           }
+   
+           function displayTasks(tasks) {
+               const tasksTableBody = tasksTable()
+               tasks.forEach(task => {
+                   const newRow = taskRow(task);
+                   tasksTableBody.appendChild(newRow);
+               });
+           }
+   
+           function taskRow(task) {
+               return tr([
+                   td(task.name),
+                   td(task.priority),
+                   td(viewLink(task.name)),
+                   td(deleteLink(task.name)),
+               ]);
+           }
+   
+           function tr(children) {
+               const node = document.createElement("tr");
+               children.forEach(child => node.appendChild(child));
+               return node;
+           }
+   
+           function td(content) {
+               const node = document.createElement("td");
+               if (content instanceof Element) {
+                   node.appendChild(content)
+               } else {
+                   node.appendChild(document.createTextNode(content));
+               }
+               return node;
+           }
+   
+           function viewLink(taskName) {
+               const node = document.createElement("a");
+               node.setAttribute(
+                   "href", `javascript:displayTask("${taskName}")`
+               )
+               node.appendChild(document.createTextNode("view"));
+               return node;
+           }
+   
+           function deleteLink(taskName) {
+               const node = document.createElement("a");
+               node.setAttribute(
+                   "href", `javascript:deleteTask("${taskName}")`
+               )
+               node.appendChild(document.createTextNode("delete"));
+               return node;
+           }
+       </script>
+   </head>
+   <body onload="displayAllTasks()">
+   <h1>Task Manager Client</h1>
+   <form action="javascript:displayAllTasks()">
+       <span>View all the tasks</span>
+       <input type="submit" value="Go">
+   </form>
+   <form name="priorityForm" action="javascript:displayTasksWithPriority()">
+       <span>View tasks with priority</span>
+       <select name="priority">
+           <option name="Low">Low</option>
+           <option name="Medium">Medium</option>
+           <option name="High">High</option>
+           <option name="Vital">Vital</option>
+       </select>
+       <input type="submit" value="Go">
+   </form>
+   <form name="addTaskForm" action="javascript:addNewTask()">
+       <span>Create new task with</span>
+       <label for="newTaskName">name</label>
+       <input type="text" id="newTaskName" name="newTaskName" size="10">
+       <label for="newTaskDescription">description</label>
+       <input type="text" id="newTaskDescription" name="newTaskDescription" size="20">
+       <label for="newTaskPriority">priority</label>
+       <select id="newTaskPriority" name="newTaskPriority">
+           <option name="Low">Low</option>
+           <option name="Medium">Medium</option>
+           <option name="High">High</option>
+           <option name="Vital">Vital</option>
+       </select>
+       <input type="submit" value="Go">
+   </form>
+   <hr>
+   <div>
+       Current task is <em id="currentTaskDisplay">None</em>
+   </div>
+   <hr>
+   <table>
+       <thead>
+       <tr>
+           <th>Name</th>
+           <th>Priority</th>
+           <th></th>
+           <th></th>
+       </tr>
+       </thead>
+       <tbody id="tasksTableBody">
+       </tbody>
+   </table>
+   </body>
+   </html>
+   ```
+
+   這與先前教學中使用的 SPA 相同。由於它是用 JavaScript 編寫的，並且僅使用瀏覽器內可用的程式庫，因此你不需要擔心用戶端相依性的問題。
+
+</procedure>
+
+### 手動測試應用程式 {id="test-manually"}
+
+<procedure id="test-manually-procedure">
+
+1. <p>在 IntelliJ IDEA 中，點擊執行按鈕
+       (<img src="intellij_idea_gutter_icon.svg"
+             style="inline" height="16" width="16"
+             alt="intelliJ IDEA run icon"/>)
+       以啟動應用程式。</p>
+2. 在瀏覽器中前往 [http://0.0.0.0:8080/static/index.html](http://0.0.0.0:8080/static/index.html)。你應該會看到由三個表單和一個顯示篩選結果的表格所組成的用戶端頁面。
+
+   ![顯示工作管理員用戶端的瀏覽器視窗](tutorial_server_db_integration_index_page.png){width="706" border-effect="rounded"}
+3. 填寫表單並使用 **Go** 按鈕送出以測試應用程式。使用表格項目上的 **View** 和 **Delete** 按鈕。
+
+   ![顯示工作管理員用戶端的瀏覽器視窗](tutorial_server_db_integration_manual_test.gif){width="706" border-effect="rounded"}
+
+</procedure>
+
+### 新增自動化單元測試 {id="add-automated-tests"}
+
+<procedure id="add-automated-tests-procedure">
+
+1. 開啟 <Path>src/test/kotlin</Path> 中的 <Path>ServerTest.kt</Path> 檔案並新增以下測試：
+
+   ```kotlin
+   package com.example
+   
+   import com.example.model.Priority
+   import com.example.model.Task
+   import com.example.model.TaskRepository
+   import io.ktor.client.call.*
+   import io.ktor.client.plugins.contentnegotiation.*
+   import io.ktor.server.plugins.di.dependencies
+   import io.ktor.client.request.*
+   import io.ktor.http.*
+   import io.ktor.serialization.kotlinx.json.*
+   import io.ktor.server.application.*
+   import io.ktor.server.testing.*
+   import kotlin.test.*
+   
+   suspend fun Application.configureTestApp() {
+       dependencies {
+           provide<TaskRepository> {
+               FakeTaskRepository()
+           }
+       }
+       configureSerialization()
+       configureStatusPages()
+       configureRouting()
+   }
+   
+   class ServerTest {
+       @Test
+       fun tasksCanBeFoundByPriority() = testApplication {
+           application {
+               configureTestApp()
+           }
+   
+           val client = createClient {
+               install(ContentNegotiation) {
+                   json()
+               }
+           }
+   
+           val response = client.get("/tasks/byPriority/Medium")
+           val results = response.body<List<Task>>()
+   
+           assertEquals(HttpStatusCode.OK, response.status)
+   
+           val expectedTaskNames = listOf("gardening", "painting")
+           val actualTaskNames = results.map(Task::name)
+           assertContentEquals(expectedTaskNames, actualTaskNames)
+       }
+   
+       @Test
+       fun invalidPriorityProduces400() = testApplication {
+           application {
+               configureTestApp()
+           }
+           val response = client.get("/tasks/byPriority/Invalid")
+           assertEquals(HttpStatusCode.BadRequest, response.status)
+       }
+   
+       @Test
+       fun unusedPriorityProduces404() = testApplication {
+           application {
+               configureTestApp()
+           }
+   
+           val response = client.get("/tasks/byPriority/Vital")
+           assertEquals(HttpStatusCode.NotFound, response.status)
+       }
+   
+       @Test
+       fun newTasksCanBeAdded() = testApplication {
+           application {
+               configureTestApp()
+           }
+   
+           val client = createClient {
+               install(ContentNegotiation) {
+                   json()
+               }
+           }
+   
+           val task = Task("swimming", "Go to the beach", Priority.Low)
+           val response1 = client.post("/tasks") {
+               header(
+                   HttpHeaders.ContentType,
+                   ContentType.Application.Json
+               )
+   
+               setBody(task)
+           }
+           assertEquals(HttpStatusCode.NoContent, response1.status)
+   
+           val response2 = client.get("/tasks")
+           assertEquals(HttpStatusCode.OK, response2.status)
+   
+           val taskNames = response2
+               .body<List<Task>>()
+               .map { it.name }
+   
+           assertContains(taskNames, "swimming")
+       }
+   }
+   ```
+
+   為了讓這些測試能夠編譯並執行，你需要為 Ktor Client 新增對 [Content Negotiation](https://api.ktor.io/ktor-server-content-negotiation/io.ktor.server.plugins.contentnegotiation/-content-negotiation.html) 外掛程式的相依性。
+2. 開啟 <Path>build.gradle.kts</Path> 檔案並新增以下相依性：
+
+   ```kotlin
+   dependencies {
+       //...
+       testImplementation(ktorLibs.client.contentNegotiation)
+   }
+   ```
+3. <p>在 IntelliJ IDEA 中，點擊編輯器右側的通知 Gradle 圖示
+       (<img alt="intelliJ IDEA gradle icon"
+             src="intellij_idea_gradle_icon.svg" width="16" height="26"/>)
+       以載入 Gradle 變更。</p>
+4. <p>在 IntelliJ IDEA 中，點擊測試類別定義旁邊的執行按鈕
+       (<img src="intellij_idea_gutter_icon.svg"
+             style="inline" height="16" width="16"
+             alt="intelliJ IDEA run icon"/>)
+       以執行測試。</p>
+
+   接著你應該會在 **Run** 窗格中看到測試已成功執行：
+
+   ![IntelliJ IDEA 的 Run 窗格中顯示成功的測試結果](tutorial_server_db_integration_test_results.png){width="706" border-effect="line"}
+
+</procedure>
+
+## 新增 PostgreSQL 存儲庫 {id="add-postgresql-repository"}
+
+現在你已經擁有一個使用記憶體內資料且可運作的應用程式，下一步是將資料儲存外部化到 PostgreSQL 資料庫中。
+
+你將透過以下步驟實現此目標：
+
+1. [在 PostgreSQL 中建立資料庫架構。](#create-schema)
+2. [調整 `TaskRepository` 以支援非同步存取。](#adapt-repo)
+3. [在應用程式中設定資料庫連線。](#config-db-connection)
+4. [將 `Task` 型別對應到關聯的資料庫資料表。](#create-mapping)
+5. [根據對應建立新的存儲庫。](#create-new-repo)
+6. [在啟動程式碼中切換到新的存儲庫。](#switch-repo)
+
+### 建立資料庫架構 {id="create-schema"}
+
+<procedure id="create-schema-procedure">
+
+1. 使用你選擇的資料庫管理工具，在 PostgreSQL 中建立一個新的資料庫。只要你能記住，名稱並不重要。在此範例中，我們將使用 `ktor_tutorial_db`。
+
+   > 如需有關 PostgreSQL 的詳細資訊，請參閱[官方文件](https://www.postgresql.org/docs/current/)。
+   >
+   > 在 IntelliJ IDEA 中，你可以使用資料庫工具[連接並管理你的 PostgreSQL 資料庫](https://www.jetbrains.com/help/idea/postgresql.html)。
+   >
+   {style="tip"}
+2. 針對你的資料庫執行以下 SQL 指令。這些指令將建立並填入資料庫架構：
+
+   ```sql
+   DROP TABLE IF EXISTS task;
+   CREATE TABLE task(id SERIAL PRIMARY KEY, name VARCHAR(50), description VARCHAR(50), priority VARCHAR(50));
+
+   INSERT INTO task (name, description, priority) VALUES ('cleaning', 'Clean the house', 'Low');
+   INSERT INTO task (name, description, priority) VALUES ('gardening', 'Mow the lawn', 'Medium');
+   INSERT INTO task (name, description, priority) VALUES ('shopping', 'Buy the groceries', 'High');
+   INSERT INTO task (name, description, priority) VALUES ('painting', 'Paint the fence', 'Medium');
+   INSERT INTO task (name, description, priority) VALUES ('exercising', 'Walk the dog', 'Medium');
+   INSERT INTO task (name, description, priority) VALUES ('meditating', 'Contemplate the infinite', 'High');
+   ```
+
+   請注意以下事項：
+   * 你正在建立一個名為 `task` 的單一資料表，其中包含 `name`、`description` 和 `priority` 欄位。這些欄位需要對應到 `Task` 類別的屬性。
+   * 若資料表已存在則會重新建立，因此你可以重複執行此指令碼。
+   * 還有一個名為 `id` 的額外欄位，其型別為 `SERIAL`。這是一個整數值，用於為每一列提供主鍵。這些值將由資料庫代為指派。
+
+</procedure>
+
+### 調整現有存儲庫 {id="adapt-repo"}
+
+針對資料庫執行查詢時，最好非同步執行，以避免阻塞處理 HTTP 請求的執行緒。在 Kotlin 中，最好透過[協同程式](https://kotlinlang.org/docs/coroutines-overview.html)來進行管理。
+
+<procedure id="adapt-repo-procedure">
+
+1. 開啟 <Path>src/main/kotlin/model</Path> 中的 <Path>TaskRepository.kt</Path> 檔案。
+2. 為所有介面方法新增 `suspend` 關鍵字：
+
+   ```kotlin
+   interface TaskRepository {
+       suspend fun allTasks(): List<Task>
+       suspend fun tasksByPriority(priority: Priority): List<Task>
+       suspend fun taskByName(name: String): Task?
+       suspend fun addTask(task: Task)
+       suspend fun removeTask(name: String): Boolean
+   }
+   ```
+
+   這將允許介面方法的實作在不同的協同程式發送器 (coroutine dispatcher) 上啟動工作。
+
+   你現在需要調整 `FakeTaskRepository` 的方法以相符合，儘管在該實作中你不需要切換發送器。
+3. 開啟 <Path>FakeTaskRepository.kt</Path> 檔案，並為所有方法新增 `suspend` 關鍵字：
+
+   ```kotlin
+   class FakeTaskRepository : TaskRepository {
+       //...
+
+       override suspend fun allTasks(): List<Task> = tasks
+
+       override suspend fun tasksByPriority(priority: Priority) = tasks.filter {
+           //...
+       }
+
+       override suspend fun taskByName(name: String) = tasks.find {
+           //...
+       }
+
+       override suspend fun addTask(task: Task) {
+           //...
+       }
+
+       override suspend fun removeTask(name: String): Boolean {
+           //...
+       }
+   }
+   ```
+
+   到目前為止，你尚未引入任何新功能。相反地，你已經為建立能夠對資料庫非同步執行查詢的 `PostgresTaskRepository` 奠定了基礎。
+
+</procedure>
+
+### 設定資料庫連線 {id="config-db-connection"}
+
+在[本教學的第一部分](#delete-function)中，你刪除了 <Path>Exposed.kt</Path> 中 `.configureExposed()` 函式內的範例程式碼。現在你已準備好新增自己的實作。
+
+Ktor 專案產生器尚未新增對 DAO 型別的支援，因此你首先需要在 Gradle 建置檔案中新增相關相依性。
+
+<procedure id="config-db-connection-procedure">
+
+1. 在你的 <Path>gradle/libs.versions.toml</Path> 檔案中，新增 `exposed-jdbc` 和 `exposed-dao` 程式庫：
+
+   ```toml
+   [libraries]
+   exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "exposed" }
+   exposed-dao = { module = "org.jetbrains.exposed:exposed-dao", version.ref = "exposed" }
+   ```
+
+   這將使你能夠使用 Exposed 資料存取物件 (DAO) 模式。
+2. 在你的 <Path>build.gradle.kts</Path> 檔案中，新增以下相依性：
+
+   ```kotlin
+   dependencies {
+       // ...
+       implementation(libs.exposed.jdbc)
+       implementation(libs.exposed.dao)
+   }
+   ```
+   > 你只需要一個傳輸模組 – `exposed-jdbc` 或 `exposed-r2dbc`。如果 Ktor 專案產生器新增了 `exposed-r2dbc` 相依性，請在繼續之前將其移除。
+   >
+   {style="note"}
+3. <p>在 IntelliJ IDEA 中，點擊編輯器右側的通知 Gradle 圖示
+       (<img alt="intelliJ IDEA gradle icon"
+             src="intellij_idea_gradle_icon.svg" width="16" height="26"/>)
+       以載入 Gradle 變更。</p>
+4. 開啟 <Path>src/main/kotlin</Path> 中的 <Path>Exposed.kt</Path> 檔案。
+5. 使用 `Database.connect()` 函式連接到你的資料庫，並調整設定值以符合你的環境：
+
+   ```kotlin
+   suspend fun Application.configureExposed() {
+       Database.connect(
+           "jdbc:postgresql://localhost:5432/ktor_tutorial_db",
+           user = "postgres",
+           password = "password"
+       )
+   }
+   ```
+
+   請注意，`url` 包含以下組成部分：
+   * `localhost:5432` 是執行 PostgreSQL 資料庫的主機與連接埠。
+   * `ktor_tutorial_db` 是執行服務時所建立的資料庫名稱。
+
+   > 如需詳細資訊，請參閱[在 Exposed 中使用資料庫](https://www.jetbrains.com/help/exposed/working-with-database.html)。
+   >
+   {style="tip"}
+
+</procedure>
+
+### 建立物件/關聯對應 {id="create-mapping"}
+
+<procedure id="create-mapping-procedure">
+
+1. 巡覽至 <Path>src/main/kotlin</Path> 並建立名為 <Path>db</Path> 的新套件。
+2. 在 <Path>db</Path> 套件中，建立新的 <Path>mapping.kt</Path> 檔案。
+3. 開啟 <Path>mapping.kt</Path> 並新增 `TaskTable` 和 `TaskDAO` 型別：
+
+   ```kotlin
+   package com.example.db
+   
+   import org.jetbrains.exposed.v1.core.dao.id.EntityID
+   import org.jetbrains.exposed.v1.core.dao.id.IntIdTable
+   import org.jetbrains.exposed.v1.dao.IntEntity
+   import org.jetbrains.exposed.v1.dao.IntEntityClass
+   
+   object TaskTable : IntIdTable("task") {
+       val name = varchar("name", 50)
+       val description = varchar("description", 50)
+       val priority = varchar("priority", 50)
+   }
+   
+   class TaskDAO(id: EntityID<Int>) : IntEntity(id) {
+       companion object : IntEntityClass<TaskDAO>(TaskTable)
+   
+       var name by TaskTable.name
+       var description by TaskTable.description
+       var priority by TaskTable.priority
+   }
+   ```
+
+   這些型別使用 Exposed 程式庫將 `Task` 型別中的屬性對應到資料庫中 `task` 資料表的資料欄。`TaskTable` 型別定義了基本對應，而 `TaskDAO` 型別則新增了用於建立、尋找、更新和刪除任務的幫助程式方法。
+4. 在同一個 <Path>mapping.kt</Path> 檔案中，新增以下幫助程式函式：
+
+   ```kotlin
+   package com.example.db
+   
+   import com.example.model.Priority
+   import com.example.model.Task
+   import kotlinx.coroutines.Dispatchers
+   import kotlinx.coroutines.withContext
+   import org.jetbrains.exposed.v1.core.dao.id.EntityID
+   import org.jetbrains.exposed.v1.core.dao.id.IntIdTable
+   import org.jetbrains.exposed.v1.dao.IntEntity
+   import org.jetbrains.exposed.v1.dao.IntEntityClass
+   import org.jetbrains.exposed.v1.jdbc.JdbcTransaction
+   import org.jetbrains.exposed.v1.jdbc.transactions.inTopLevelSuspendTransaction
+   
+   object TaskTable : IntIdTable("task") {
+       val name = varchar("name", 50)
+       val description = varchar("description", 50)
+       val priority = varchar("priority", 50)
+   }
+   
+   class TaskDAO(id: EntityID<Int>) : IntEntity(id) {
+       companion object : IntEntityClass<TaskDAO>(TaskTable)
+   
+       var name by TaskTable.name
+       var description by TaskTable.description
+       var priority by TaskTable.priority
+   }
+   
+   suspend fun <T> withTransaction(block: suspend JdbcTransaction.() -> T): T = withContext(Dispatchers.IO) {
+       inTopLevelSuspendTransaction { block() }
+   }
+   
+   fun daoToModel(dao: TaskDAO) = Task(
+       dao.name,
+       dao.description,
+       Priority.valueOf(dao.priority)
+   )
+   ```
+
+   * `withTransaction()` 函式會在新的最上層資料庫交易中執行一個暫停區塊 (suspending block)。協同程式上下文會切換至 `Dispatchers.IO`，以便阻塞式 JDBC 操作在針對 IO 任務最佳化的執行緒池上執行。
+   * `daoToModel()` 函式將 `TaskDAO` 型別的執行個體轉換為 `Task` 物件。
+5. 新增以下缺少的匯入陳述式：
+
+   ```kotlin
+   import com.example.model.Priority
+   import com.example.model.Task
+   import kotlinx.coroutines.Dispatchers
+   import kotlinx.coroutines.withContext
+   import org.jetbrains.exposed.v1.jdbc.JdbcTransaction
+   import org.jetbrains.exposed.v1.jdbc.transactions.inTopLevelSuspendTransaction
+   ```
+
+</procedure>
+
+### 編寫新的存儲庫 {id="create-new-repo"}
+
+你現在已經擁有了建立特定資料庫存儲庫所需的所有資源。
+
+<procedure id="create-new-repo-procedure">
+
+1. 巡覽至 <Path>src/main/kotlin/model</Path> 並建立新的 <Path>PostgresTaskRepository.kt</Path> 檔案。
+2. 開啟 <Path>PostgresTaskRepository.kt</Path> 檔案，並使用以下實作建立一個新型別：
+
+   ```kotlin
+   package com.example.model
+   
+   import com.example.db.TaskDAO
+   import com.example.db.TaskTable
+   import com.example.db.daoToModel
+   import com.example.db.withTransaction
+   import org.jetbrains.exposed.v1.core.eq
+   import org.jetbrains.exposed.v1.jdbc.deleteWhere
+   
+   class PostgresTaskRepository : TaskRepository {
+       override suspend fun allTasks(): List<Task> = withTransaction {
+           TaskDAO.all().map(::daoToModel)
+       }
+   
+       override suspend fun tasksByPriority(priority: Priority): List<Task> = withTransaction {
+           TaskDAO
+               .find { (TaskTable.priority eq priority.toString()) }
+               .map(::daoToModel)
+       }
+   
+       override suspend fun taskByName(name: String): Task? = withTransaction {
+           TaskDAO
+               .find { (TaskTable.name eq name) }
+               .limit(1)
+               .map(::daoToModel)
+               .firstOrNull()
+       }
+   
+       override suspend fun addTask(task: Task): Unit = withTransaction {
+           TaskDAO.new {
+               name = task.name
+               description = task.description
+               priority = task.priority.toString()
+           }
+       }
+   
+       override suspend fun removeTask(name: String): Boolean = withTransaction {
+           val rowsDeleted = TaskTable.deleteWhere {
+               TaskTable.name eq name
+           }
+           rowsDeleted == 1
+       }
+   }
+   ```
+
+   在此實作中，你使用 `TaskDAO` 和 `TaskTable` 型別的幫助程式方法與資料庫進行互動。建立好這個新的存儲庫後，剩下的唯一任務就是在你的路由中切換使用它。
+
+</procedure>
+
+### 切換至新的存儲庫 {id="switch-repo"}
+
+若要切換到外部資料庫，你只需要變更存儲庫型別即可。
+
+<procedure id="switch-repo-procedure">
+
+1. 開啟 <Path>src/main/kotlin</Path> 中的 <Path>DI.kt</Path> 檔案。
+2. 在 `Application.configureDependencyInjection()` 函式中，將 `FakeTaskRepository` 替換為 `PostgresTaskRepository`：
+
+   ```kotlin
+   //...
+   import com.example.model.PostgresTaskRepository
+
+   //...
+
+   fun Application.configureDependencyInjection() {
+       dependencies {
+           provide<TaskRepository> {
+               PostgresTaskRepository()
+           }
+       }
+   }
+   ```
+
+   因為你是透過介面注入相依性，所以實作的切換對管理路由的程式碼是透明的。
+3. <p>
+       在 IntelliJ IDEA 中，點擊重新執行按鈕 (<img src="intellij_idea_rerun_icon.svg"
+                                                      style="inline" height="16" width="16"
+                                                      alt="intelliJ IDEA rerun icon"/>) 以重新啟動應用程式。
+   </p>
+4. 前往 [http://0.0.0.0:8080/static/index.html](http://0.0.0.0:8080/static/index.html)。UI 保持不變，但現在它會從資料庫中擷取資料。
+5. 若要驗證這一點，請使用表單新增一個新任務，並查詢 PostgreSQL 中任務資料表內保存的資料。
+
+   > 在 IntelliJ IDEA 中，你可以使用[查詢主控台](https://www.jetbrains.com/help/idea/query-consoles.html#create_console)與 `SELECT` SQL 陳述式來查詢表格資料：
+   >
+   > ```sql
+   > SELECT * FROM task;
+   > ```
+   >
+   > 查詢後，資料應顯示在 **Service** 窗格中，包含新任務：
+   >
+   > ![IntelliJ IDEA 的 Service 窗格中顯示的任務資料表](tutorial_server_db_integration_task_table.png){width="706" border-effect="line"}
+   >
+   {style="tip"}
+
+</procedure>
+
+至此，你已成功完成將資料庫整合到應用程式中。
+
+由於正式環境程式碼中不再需要 `FakeTaskRepository` 型別，你可以將它移至 <Path>src/test</Path> 中的測試原始碼集。
+
+最終的專案結構應如下所示：
+
+![在 IntelliJ IDEA 的 Project 檢視中顯示的 src 資料夾](tutorial_server_db_integration_src_folder.png){width="400" border-effect="line"}
+
+## 後續步驟 {id="next-steps"}
+
+你現在擁有一個與 Ktor RESTful 服務進行通訊的應用程式。該服務進而使用以 [Exposed](https://github.com/JetBrains/Exposed) 編寫的存儲庫來存取 [PostgreSQL](https://www.postgresql.org/docs/)。你還擁有一[套測試](#add-automated-tests)，無需 Web 伺服器或資料庫即可驗證核心功能。
+
+此架構可根據需要進行擴充以支援任意功能，但你可能需要先考慮設計的非功能性層面，例如容錯性、安全性和擴充性。你可以先從[將資料庫連線設定擷取](docker-compose.topic#extract-db-settings)到[設定檔](server-configuration-file.topic)開始。
