@@ -45,7 +45,9 @@ describe('Koog snippet expansion', () => {
 
 async function render(markdown: string, relativePath: string) {
   const md = await createMarkdownRenderer('docs', { config: (md) => registerMarkdownPlugins(md) })
-  return md.renderAsync(markdown, { relativePath, cleanUrls: true })
+  const html = await md.renderAsync(markdown, { relativePath, cleanUrls: true })
+  // A part of a page: without the H1 MkDocs gives a page without one
+  return /^# /m.test(markdown) ? html : html.replace(/^<h1>[^<]*<\/h1>\n?/, '')
 }
 
 describe('MkDocs code blocks', () => {

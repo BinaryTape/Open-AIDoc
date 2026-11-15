@@ -44,6 +44,10 @@ export default defineConfig({
   // Localhost URLs are runnable examples, not public-site routes. All other
   // dead links remain build-breaking.
   ignoreDeadLinks: 'localhostLinks',
+  // Koog's snippets are parts of pages (--8<--, expanded from these files by
+  // plugins/vite/mkdocs-snippets.ts), not pages: its mkdocs.yml has
+  // `exclude_docs: /snippets/`.
+  srcExclude: ['koog/snippets/**', '*/koog/snippets/**'],
   metaChunk: true,
   buildConcurrency: resolveBuildConcurrency(),
   // Default content locale is zh-Hans (root; no URL prefix). See shared/locales.ts.
