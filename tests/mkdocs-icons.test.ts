@@ -11,7 +11,7 @@ async function render(markdown: string, relativePath = 'koog/example.md') {
   })
   const html = await md.renderAsync(markdown, { relativePath, cleanUrls: true })
   // A part of a page: without the H1 MkDocs gives a page without one
-  return /^# /m.test(markdown) ? html : html.replace(/^<h1 [^>]*>[^<]*<a [^>]*>[^<]*<\/a><\/h1>\n?/, '')
+  return /^# /m.test(markdown) ? html : html.replace(/^<h1>[^<]*<\/h1>\n?/, '')
 }
 
 describe('MkDocs icon sets', () => {

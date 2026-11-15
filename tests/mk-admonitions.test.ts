@@ -20,7 +20,7 @@ async function render(markdown: string, relativePath = 'koog/example.md') {
   expect(crlf).toBe(lf)
   expect(parse(`<template><div>${lf}</div></template>`).errors).toEqual([])
   // A part of a page: without the H1 MkDocs gives a page without one
-  return /^# /m.test(markdown) ? lf : lf.replace(/^<h1 [^>]*>[^<]*<a [^>]*>[^<]*<\/a><\/h1>\n?/, '')
+  return /^# /m.test(markdown) ? lf : lf.replace(/^<h1>[^<]*<\/h1>\n?/, '')
 }
 
 const boxes = (html: string) =>

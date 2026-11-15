@@ -38,6 +38,14 @@ describe('MkDocs pages without an H1, titled as MkDocs does', () => {
     expect(h1s(await render(body, 'ko/sqldelight/common/androidx_paging_usage.md'))).toEqual(['Androidx paging usage'])
   })
 
+  it('gives that heading no id, as Material does, so it takes no anchor of the page', async () => {
+    // common/custom_column_types.md: ## 自定义列类型 {id="custom-column-types"}
+    const env = { relativePath: 'sqldelight/common/custom_column_types.md', cleanUrls: true } as any
+    const html = await md.renderAsync('## 自定义列类型 {id="custom-column-types"}\n\nText.\n', env)
+    expect(html).toMatch(/^<h1>Custom column types<\/h1>\n<h2 id="custom-column-types"/)
+    expect(env.title).toBe('Custom column types')
+  })
+
   it('leaves a page with an H1 alone', async () => {
     expect(h1s(await render('# AndroidX Paging\n\nText.\n', 'sqldelight/common/androidx_paging_multiplatform.md'))).toEqual(['AndroidX Paging'])
   })
