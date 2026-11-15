@@ -264,3 +264,25 @@ describe('kotlin strategy', () => {
     expect(await kotlinStrategy.getPublishedPages(clone)).toBe(null)
   })
 })
+
+describe('kmp strategy', () => {
+  it('does not translate a topic mpd.tree leaves out (a page now redirected)', async () => {
+    write('mpd.tree', '<instance-profile id="mpd"><toc-element topic="quickstart.md" accepts-web-file-names="multiplatform-setup.html"/>' +
+      '<toc-element hidden="true" topic="shipathon-starter-guide.md"/></instance-profile>\n')
+    write('topics/multiplatform-setup.md', '[//]: # (title: Set up an environment)\n\nText.\n')
+    write('topics/getting-started/quickstart.md', '[//]: # (title: Quickstart)\n\nText.\n')
+    write('topics/shipathon-starter-guide.md', '[//]: # (title: Shipathon)\n\nText.\n')
+
+    const task = { files: ['topics/multiplatform-setup.md', 'topics/getting-started/quickstart.md', 'topics/shipathon-starter-guide.md'] }
+    await kmpStrategy.postDetect({ id: 'kmp', cloneDir: clone, sidebarId: 'kmp' }, task)
+
+    // a hidden topic is still a page there
+    expect(task.files).toEqual(['topics/quickstart.md', 'topics/shipathon-starter-guide.md'])
+  })
+
+  it('publishes every page without a tree, or with one listing none', async () => {
+    expect(await kmpStrategy.getPublishedPages(clone)).toBe(null)
+    write('mpd.tree', '<instance-profile id="mpd"/>\n')
+    expect(await kmpStrategy.getPublishedPages(clone)).toBe(null)
+  })
+})

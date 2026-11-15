@@ -6,7 +6,7 @@ import {processTopicFileAsync} from "../processors/TopicProcessor.mjs";
 import {syncSidebar} from "../processors/SidebarProcessor.mjs";
 import {processMarkdownFile} from "../processors/MarkdownProcessor.mjs";
 import {expandIncludesForTask} from "../utils/writerside-include.mjs";
-import {movedPagesFromTree} from "../utils/moved-pages.mjs";
+import {movedPagesFromTree, pagesOfTree} from "../utils/moved-pages.mjs";
 import {syncLabels} from "../utils/writerside-labels.mjs";
 
 /** topics/**\/x.md or .topic → topics/x.md: the pages are flattened into topics/. */
@@ -46,6 +46,18 @@ export const kmpStrategy = {
      * @override
      */
     getMovedPages: async (repoPath) => movedPagesFromTree(path.join(repoPath, "mpd.tree")),
+
+    /**
+     * @override
+     * kotlinlang.org/docs/multiplatform/ publishes the topics of mpd.tree;
+     * topics/ also keeps pages it no longer publishes (multiplatform-setup.md,
+     * now a redirect to quickstart). A tree without topics filters nothing.
+     */
+    getPublishedPages: async (repoPath) => {
+        const pages = await pagesOfTree(path.join(repoPath, "mpd.tree"));
+        if (!pages || pages.size === 0) return null;
+        return new Set([...pages].map((page) => `topics/${page}`));
+    },
 
     postSync: async (repoPath, context, repoConfig) => {
         await syncSidebar(path.join(repoPath, "mpd.tree"), repoConfig.sidebarId, "", kotlinlangHref);
@@ -101,7 +113,8 @@ export const kmpStrategy = {
 
         console.log(` Running KMP postDetect: Change detected path - ${repoPath}`);
         // Map to flattened doc path, convert .topic -> .md
-        task.files = task.files.map(mapKmpDocPath);
+        const published = await kmpStrategy.getPublishedPages(repoPath);
+        task.files = task.files.map(mapKmpDocPath).filter((file) => !published || published.has(file));
         console.log(`  Mapped files: ${task.files.join("\n")}`);
         console.log(`  Change detected path finished - ${repoPath}`);
     },
