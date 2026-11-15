@@ -19,7 +19,8 @@ async function render(markdown: string, relativePath = 'koog/example.md') {
   const crlf = await md.renderAsync(markdown.replace(/\n/g, '\r\n'), { relativePath, cleanUrls: true })
   expect(crlf).toBe(lf)
   expect(parse(`<template><div>${lf}</div></template>`).errors).toEqual([])
-  return lf
+  // A part of a page: without the H1 MkDocs gives a page without one
+  return /^# /m.test(markdown) ? lf : lf.replace(/^<h1 [^>]*>[^<]*<a [^>]*>[^<]*<\/a><\/h1>\n?/, '')
 }
 
 const boxes = (html: string) =>
