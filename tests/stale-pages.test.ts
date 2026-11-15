@@ -7,6 +7,7 @@ import { movedPagesFromMkDocs, movedPagesFromTree } from '../tools/pipeline/util
 import { defaultStrategy } from '../tools/pipeline/sync-strategies/strategy.mjs'
 import { kotlinStrategy } from '../tools/pipeline/sync-strategies/strategy-kotlin.mjs'
 import { ktorStrategy } from '../tools/pipeline/sync-strategies/strategy-ktor.mjs'
+import { kmpStrategy } from '../tools/pipeline/sync-strategies/strategy-kmp.mjs'
 import { coilStrategy } from '../tools/pipeline/sync-strategies/strategy-coil.mjs'
 
 const LANGS = ['zh-Hans', 'zh-Hant', 'ja', 'ko']
@@ -218,6 +219,32 @@ describe('removeStalePages', () => {
     expect([...translations('coroutines-basics.md', 'kotlin'), ...translations('channels.md', 'kotlin')].every(existsSync)).toBe(true)
     expect(JSON.parse(readFileSync('docs/.vitepress/redirects/kotlinx-coroutines.json', 'utf8')))
       .toEqual([{ from: 'kotlin/basics.md', to: 'kotlin/coroutines-basics.md' }])
+  })
+
+  it('removes the KMP topics mpd.tree leaves out, redirecting where kotlinlang.org does', async () => {
+    const kmp = { ...repo('kmp', kmpStrategy, 'kmp'), sourceDocRoot: './topics' }
+    const files = ['topics/multiplatform-setup.md', 'topics/multiplatform-intro.md', 'topics/kotlin-multiplatform-roadmap.md', 'topics/start/quickstart.md']
+    upstream(kmp, files)
+    await sync(kmp)
+    ;['multiplatform-setup.md', 'multiplatform-intro.md', 'quickstart.md'].forEach((page) => publish(page, 'kmp'))
+
+    upstream(kmp, files, {
+      'mpd.tree': '<instance-profile id="mpd"><toc-element topic="quickstart.md" accepts-web-file-names="compose-multiplatform-setup.html,multiplatform-setup.html"/>' +
+        // a redirect to another site: no page of this one
+        '<toc-element toc-title="Redirect to blog post" hidden="true" accepts-web-file-names="kotlin-multiplatform-roadmap.html" target-for-accept-web-file-names="https://blog.jetbrains.com/kotlin/"/>' +
+        '</instance-profile>',
+    })
+    const result = await sync(kmp)
+
+    expect(result.removed).toEqual([
+      { page: 'kotlin-multiplatform-roadmap.md', movedTo: null },
+      { page: 'multiplatform-intro.md', movedTo: null },
+      { page: 'multiplatform-setup.md', movedTo: 'quickstart.md' },
+    ])
+    expect([...translations('multiplatform-setup.md', 'kmp'), ...translations('multiplatform-intro.md', 'kmp')].some(existsSync)).toBe(false)
+    expect(translations('quickstart.md', 'kmp').every(existsSync)).toBe(true)
+    expect(JSON.parse(readFileSync('docs/.vitepress/redirects/kmp.json', 'utf8')))
+      .toEqual([{ from: 'kmp/multiplatform-setup.md', to: 'kmp/quickstart.md' }])
   })
 
   it('keeps every Kotlin page while the tree lists none', async () => {
