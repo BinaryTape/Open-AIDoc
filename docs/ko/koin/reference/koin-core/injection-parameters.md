@@ -10,7 +10,9 @@ title: 주입된 파라미터
 
 어떤 생성자 파라미터가 호출자로부터 오는지 표시합니다. 나머지 파라미터는 평소와 같이 컨테이너에서 확인(resolve)됩니다:
 
-**컴파일러 플러그인 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.core.annotation.InjectedParam
 
@@ -27,7 +29,9 @@ val appModule = module {
 
 `@InjectedParam`은 `koin-annotations` 아티팩트에서 제공됩니다. 컴파일러 플러그인에 `userId`가 정의가 아님을 알려주므로, 빌드 시점 검사에서 누락된 것으로 보고되지 않습니다.
 
-**어노테이션**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Factory
 class UserPresenter(
@@ -38,7 +42,9 @@ class UserPresenter(
 
 `@InjectedParam`은 프로바이더(provider) 함수 파라미터에서도 동작합니다.
 
-**생성자 / 클래식 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 정의 람다는 파라미터를 `params`로 받습니다:
 
 ```kotlin
@@ -47,6 +53,9 @@ val appModule = module {
     factory { params -> UserPresenter(userId = params.get(), repository = get()) }
 }
 ```
+
+</tab>
+</tabs>
 
 호출자는 파라미터 순서와 동일하게 `parametersOf()`를 사용하여 값을 전달합니다:
 
@@ -67,7 +76,9 @@ val presenter: UserPresenter by inject { parametersOf("user-42") }
 
 ## 여러 개의 파라미터 {id="several-parameters"}
 
-**컴파일러 플러그인 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 class OrderPresenter(
     @InjectedParam val userId: String,
@@ -80,7 +91,9 @@ val appModule = module {
 }
 ```
 
-**어노테이션**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Factory
 class OrderPresenter(
@@ -90,7 +103,9 @@ class OrderPresenter(
 )
 ```
 
-**생성자 / 클래식 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 람다에서 파라미터를 구조 분해(destructure)합니다:
 
 ```kotlin
@@ -110,6 +125,9 @@ val appModule = module {
 ```
 
 구조 분해는 최대 5개의 값으로 제한되며, 선언된 타입은 호출자가 전달한 값과 비교하여 검사되지 않습니다. 순서가 잘못되면 런타임에 캐스팅 오류가 발생합니다.
+
+</tab>
+</tabs>
 
 ```kotlin
 val presenter: OrderPresenter = get { parametersOf("user-42", 1001L) }

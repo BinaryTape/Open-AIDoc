@@ -23,7 +23,9 @@ dependencies {
 
 애플리케이션 모듈에 `Koin`을 설치합니다. 구성 블록은 `startKoin { }`과 동일합니다:
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.ktor.plugin.Koin
 import org.koin.logger.slf4jLogger
@@ -41,7 +43,9 @@ fun Application.module() {
 }
 ```
 
-**어노테이션**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 import org.koin.ktor.plugin.Koin
 import org.koin.logger.slf4jLogger
@@ -65,7 +69,9 @@ fun Application.module() {
 
 `withConfiguration<T>()`는 `@KoinApplication` 클래스에 의해 조합된 모듈을 로드합니다.
 
-**생성자 / 클래식 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.ktor.plugin.Koin
 import org.koin.logger.slf4jLogger
@@ -82,6 +88,9 @@ fun Application.module() {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 플러그인이 수행하는 작업:
 

@@ -22,7 +22,9 @@ Android 스코프(Scope)는 단일 컴포넌트(Activity, Fragment, Service 또�
 
 Android에는 컴포넌트 타입당 하나의 스코프 아키타입이 있습니다. 아키타입은 스코프가 있는 모든 Activity(또는 Fragment)에서 사용할 수 있는 스코프 선언이므로, 클래스마다 스코프를 따로 작성할 필요가 없습니다.
 
-**컴파일러 플러그인 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.androidx.scope.dsl.activityRetainedScope
 import org.koin.androidx.scope.dsl.activityScope
@@ -41,7 +43,9 @@ val screenModule = module {
 }
 ```
 
-**애노테이션**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 import org.koin.android.annotation.ActivityRetainedScope
 import org.koin.android.annotation.ActivityScope
@@ -57,7 +61,9 @@ class FormState
 class DetailPresenter(private val repository: UserRepository)
 ```
 
-**생성자 / 클래식 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.androidx.scope.dsl.activityRetainedScope
 import org.koin.androidx.scope.dsl.activityScope
@@ -75,6 +81,9 @@ val screenModule = module {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 정의를 특정 단일 Activity 클래스로 제한하려면, 대신 타입 기반 스코프를 선언하세요(DSL에서는 `scope<UserActivity> { }`, 애노테이션에서는 `@Scoped`와 함께 `@Scope(UserActivity::class)` 사용). Koin은 타입 기반 스코프를 먼저 확인한 후 아키타입을 확인합니다. 타입 기반 스코프에 대한 설명은 [Scopes](/docs/reference/koin-core/scopes)를 참조하세요.
 
@@ -168,7 +177,9 @@ Fragment 스코프는 뷰(View) 수명 주기가 아닌 Fragment 수명 주기(`
 
 `ScopeService`를 상속받습니다. 이 스코프는 `onCreate()`에서 열리고 `onDestroy()`에서 닫힙니다. Service에는 아키타입이 없으므로 Service 클래스에 대한 타입 기반 스코프를 선언해야 합니다.
 
-**컴파일러 플러그인 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 val playerModule = module {
     scope<MusicService> {
@@ -177,14 +188,18 @@ val playerModule = module {
 }
 ```
 
-**애노테이션**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Scope(MusicService::class)
 @Scoped
 class PlaybackSession
 ```
 
-**생성자 / 클래식 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val playerModule = module {
     scope<MusicService> {
@@ -192,6 +207,9 @@ val playerModule = module {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 ```kotlin
 import org.koin.android.scope.ScopeService

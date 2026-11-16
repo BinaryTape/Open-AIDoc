@@ -25,7 +25,9 @@ title: 스코프 (Scopes)
 
 ## 스코프 선언하기 {id="declaring-a-scope"}
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.dsl.module
 import org.koin.plugin.module.dsl.*
@@ -45,7 +47,9 @@ val sessionModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 어떤 스코프에 속하는지 지정하기 위해 클래스에 `@Scope`를 추가하고, scoped 정의로 선언하기 위해 `@Scoped`를 추가합니다. 두 애너테이션 모두 필요합니다:
 
 ```kotlin
@@ -65,7 +69,9 @@ class CheckoutNavigator
 
 `@Scope(UserSession::class)`는 `scope<UserSession> { }`와 동일하며, `@Scope(name = "checkout")`는 `scope(named("checkout")) { }`와 동일합니다. 두 애너테이션 모두 `@Module` 클래스의 함수에서도 작동합니다.
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.dsl.module
 import org.koin.core.module.dsl.*
@@ -82,6 +88,9 @@ val sessionModule = module {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 스코프 섹션 내부의 `factory`는 매 요청마다 새 인스턴스를 생성하지만, 해당 스코프의 scoped 인스턴스에 의존할 수 있습니다.
 
@@ -171,7 +180,9 @@ class UserSession : KoinScopeComponent {
 
 따라서 scoped 클래스는 싱글톤 및 동일한 스코프의 다른 scoped 클래스에 의존할 수 있습니다:
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 class CartRepository(
     private val api: ApiService,        // single, from the root scope
@@ -187,7 +198,9 @@ val sessionModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton
 class ApiService
@@ -204,7 +217,9 @@ class CartRepository(
 )
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val sessionModule = module {
     singleOf(::ApiService)
@@ -214,6 +229,9 @@ val sessionModule = module {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 그 반대는 동작하지 않습니다. `single`은 `scoped` 정의에 의존할 수 없으며, 루트 스코프에서 `get<SessionData>()`를 호출하면 `NoDefinitionFoundException`이 발생하며 실패합니다. scoped 인스턴스는 해당 스코프 인스턴스에서 의존성을 해결해야 합니다.
 
@@ -286,7 +304,9 @@ class CartBadge(
 
 타입으로 선언된 스코프(`scope<MainActivity>`)는 해당 타입에만 적용됩니다. **스코프 아키타입(scope archetype)**은 특정 종류의 모든 컴포넌트(모든 ViewModel, 모든 Activity, 모든 Fragment)가 공유하는 일반화된 스코프 선언입니다. 정의를 한 번만 선언해 두면 각 컴포넌트가 자체 스코프 인스턴스를 갖게 됩니다.
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 val appModule = module {
     viewModelScope {
@@ -304,7 +324,9 @@ val appModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 아키타입 애너테이션은 `@Scope`와 `@Scoped`를 대체합니다:
 
 ```kotlin
@@ -324,7 +346,9 @@ class FragmentPresenter
 
 아키타입 애너테이션은 `@Module` 클래스의 함수에서도 작동합니다.
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val appModule = module {
     viewModelScope {
@@ -341,6 +365,9 @@ val appModule = module {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 | 아키타입 | DSL | 애너테이션 | 닫히는 시점 | 플랫폼 |
 |-----------|-----|------------|-------------|----------|

@@ -20,7 +20,9 @@ title: 정의
 
 선언 방법:
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.dsl.module
 import org.koin.plugin.module.dsl.*
@@ -33,7 +35,9 @@ val appModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton
 class Database
@@ -50,7 +54,9 @@ class UserViewModel(private val repository: UserRepository) : ViewModel()
 
 `@Singleton`과 `@Single`은 동일합니다. JSR-330 명칭인 `@Singleton`을 권장합니다.
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.dsl.module
 import org.koin.core.module.dsl.*
@@ -74,6 +80,9 @@ val appModule = module {
 }
 ```
 
+</tab>
+</tabs>
+
 컴파일러 플러그인 DSL과 애너테이션을 사용하면 `get()`을 작성할 필요가 없습니다. [Koin 컴파일러 플러그인](/docs/intro/koin-compiler-plugin)이 생성자를 읽어 자동으로 호출 코드를 생성하고, 빌드 시점에 모든 의존성이 선언되어 있는지 검사합니다.
 
 `single`과 `factory`는 위에서 설명했습니다. `scoped`는 스코프 선언이 필요합니다. [Scopes](/docs/reference/koin-core/scopes)를 참조하세요. `viewModel`은 별도의 페이지가 있습니다. [ViewModel](/docs/reference/koin-core/viewmodel)을 참조하세요. `worker`는 [WorkManager](/docs/reference/koin-android/workmanager)에서 다룹니다.
@@ -86,7 +95,9 @@ val appModule = module {
 
 대부분의 경우, 소비자는 구현체가 아닌 인터페이스에 의존합니다. 다음과 같이 구현체를 인터페이스에 바인딩합니다:
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 val dataModule = module {
     single<UserRepositoryImpl>() bind UserRepository::class
@@ -96,7 +107,9 @@ val dataModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton
 class UserRepositoryImpl(private val database: Database) : UserRepository
@@ -109,7 +122,9 @@ class UserRepositoryImpl(private val database: Database) : UserRepository
 class UserRepositoryImpl(private val database: Database) : UserRepository, Closeable
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val dataModule = module {
     singleOf(::UserRepositoryImpl) bind UserRepository::class
@@ -118,6 +133,9 @@ val dataModule = module {
     single<UserRepository> { UserRepositoryImpl(get()) }
 }
 ```
+
+</tab>
+</tabs>
 
 그러면 소비자가 `UserRepository`를 요청할 때 `UserRepositoryImpl` 인스턴스를 받게 됩니다. 두 정의가 동일한 타입을 바인딩하는 경우, 이를 구분하기 위해 [한정자(qualifier)](/docs/reference/koin-core/qualifiers)가 필요합니다.
 
@@ -137,7 +155,9 @@ Koin은 컨테이너에서 각 생성자 파라미터를 확인(resolve)합니�
 
 컴파일러 플러그인 DSL과 애너테이션을 사용하면 생성자 시그니처만으로 이 작업이 처리됩니다:
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 class SyncService(
     private val repository: UserRepository,
@@ -150,7 +170,9 @@ val appModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton
 class SyncService(
@@ -160,7 +182,9 @@ class SyncService(
 )
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 `singleOf(::SyncService)`는 `get()`을 사용하여 모든 파라미터를 확인합니다. nullable, lazy 또는 list 파라미터의 경우 일치하는 함수를 사용하여 직접 호출을 작성하세요:
 
 ```kotlin
@@ -177,11 +201,16 @@ val appModule = module {
 
 `getAll()`은 `List`를 반환하고, `getProperty("key")`는 프로퍼티를 읽으며, `params.get()`은 주입된 파라미터를 읽습니다.
 
+</tab>
+</tabs>
+
 ## 직접 소유하지 않은 클래스 {id="classes-you-don-t-own"}
 
 라이브러리 클래스(Room, Retrofit, OkHttp)는 애너테이션을 추가할 수 없으며 보통 빌더를 통해 생성됩니다. Koin이 파라미터를 확인하는 함수를 통해 이를 선언할 수 있습니다:
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.plugin.module.dsl.create
 
@@ -198,7 +227,9 @@ val databaseModule = module {
 
 `create(::function)`은 생성자와 마찬가지로 동일한 컴파일 타임 검사를 거쳐 함수 파라미터를 확인합니다. 함수 및 해당 파라미터에 한정자 애너테이션을 사용하는 것도 가능합니다.
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 최상위(top-level) 함수에 애너테이션을 추가하세요. `@ComponentScan`이 클래스와 마찬가지로 함수를 찾아냅니다:
 
 ```kotlin
@@ -225,7 +256,9 @@ class DatabaseModule {
 }
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val databaseModule = module {
     single {
@@ -235,13 +268,18 @@ val databaseModule = module {
 }
 ```
 
+</tab>
+</tabs>
+
 Android에서의 완전한 Retrofit, Room 및 직렬화 설정에 대해서는 [Android Library Integration](/docs/reference/koin-android/binding-patterns)을 참조하세요.
 
 ## 즉시 생성 {id="eager-creation"}
 
 Koin은 누군가 처음 요청할 때 `single`을 생성합니다. 대신 Koin이 시작될 때 생성하려면 `createdAtStart`로 표시하세요:
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 val appModule = module {
     single<ConfigManager>() withOptions {
@@ -250,18 +288,25 @@ val appModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton(createdAtStart = true)
 class ConfigManager
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val appModule = module {
     single(createdAtStart = true) { ConfigManager() }
 }
 ```
+
+</tab>
+</tabs>
 
 즉시 생성은 Koin을 시작하는 스레드에서 실행됩니다. Android에서는 `Application.onCreate()` 중의 메인 스레드에 해당하므로, 모든 즉시 생성 정의는 앱 시작 시간을 증가시킵니다. 첫 화면이 표시되기 전에 반드시 존재해야 하는 객체에만 사용하세요. 시작 시점의 작업을 줄이려면 [지연 모듈](/docs/reference/koin-core/lazy-modules)을 참조하세요.
 
@@ -269,22 +314,31 @@ val appModule = module {
 
 `onClose`는 인스턴스가 해제될 때 실행됩니다. `single`의 경우 Koin이 중지될 때, `scoped`의 경우 스코프가 닫힐 때 실행됩니다.
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 val appModule = module {
     single<Database>() onClose { it?.close() }
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 애너테이션에는 `onClose` 파라미터가 없습니다. 이 정의는 DSL 모듈에 선언하세요.
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val appModule = module {
     single { Database() } onClose { it?.close() }
 }
 ```
+
+</tab>
+</tabs>
 
 `factory`에 대해서는 `onClose`가 호출되지 않습니다. Koin은 팩토리 인스턴스를 유지하지 않기 때문입니다.
 

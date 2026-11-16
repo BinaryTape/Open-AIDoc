@@ -16,7 +16,9 @@ Koin 通过其类型来查找定义。如果两个定义提供了相同的类型
 
 声明每个定义时指定一个名称，然后在注入它的位置请求该名称：
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.core.annotation.Named
 import org.koin.core.qualifier.named
@@ -36,7 +38,9 @@ val dataModule = module {
 
 `single<UserRepository>()` 会读取构造函数形参上的 `@Named` 并解析带限定符的定义。你也可以将 `@Named("local")` 直接置于 `LocalDatabase` 类本身：随后 `single<LocalDatabase>()` 便会使用该名称进行注册。`@Named` 注解来自 `koin-annotations` 构件。
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 import org.koin.core.annotation.Named
 import org.koin.core.annotation.Singleton
@@ -58,7 +62,9 @@ class UserRepository(
 
 `@Named` 可用于类、提供程序函数以及形参。
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.core.qualifier.named
 
@@ -76,6 +82,9 @@ val dataModule = module {
 
 `singleOf(::UserRepository)` 仅按类型解析形参，因此无法传递限定符。请如示例所示，使用 `get(named(...))` 编写构造函数调用。
 
+</tab>
+</tabs>
+
 在定义之外，将限定符传递给 `get()` 或 `inject()`：
 
 ```kotlin
@@ -89,7 +98,9 @@ val remoteDb: Database = get(named("remote"))
 
 类型也可以充当限定符。拼写错误会变为编译错误，并且在 IDE 中重命名该类型会自动更新所有使用之处：
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.core.annotation.Qualifier
 
@@ -108,7 +119,9 @@ val dataModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 object LocalDb
 object RemoteDb
@@ -130,7 +143,9 @@ class UserRepository(
 
 `@Qualifier(name = "local")` 是字符串形式，等同于 `@Named("local")`。
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 object LocalDb
 object RemoteDb
@@ -141,6 +156,9 @@ val dataModule = module {
     single { UserRepository(get(named<LocalDb>()), get(named<RemoteDb>())) }
 }
 ```
+
+</tab>
+</tabs>
 
 在调用站点：`get<Database>(named<LocalDb>())`。`qualifier<LocalDb>()` 是 `named<LocalDb>()` 的别名。
 

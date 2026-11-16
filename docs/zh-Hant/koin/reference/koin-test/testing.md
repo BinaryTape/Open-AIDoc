@@ -57,7 +57,9 @@ class UserServiceTest : KoinTest {
 
 載入與你的應用程式相同的配置：
 
-**編譯器外掛程式 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 class UserServiceTest : KoinTest {
 
@@ -73,7 +75,9 @@ class UserServiceTest : KoinTest {
 }
 ```
 
-**註解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 使用型別化 API 啟動應用程式的 `@KoinApplication` 類別：
 
 ```kotlin
@@ -95,7 +99,9 @@ class UserServiceTest : KoinTest {
 
 若只要載入部分模組，可在一般的 `startKoin { }` 內使用 `module<DataModule>()` 或 `modules(DataModule::class, CacheModule::class)`。
 
-**建構函式 / 傳統 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 class UserServiceTest : KoinTest {
 
@@ -110,6 +116,9 @@ class UserServiceTest : KoinTest {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 若要在不編寫 `@After` 的情況下停止 Koin，可以繼承 `AutoCloseKoinTest` 或實作 `ClosingKoinTest`。兩者都會在每個測試結束後呼叫 `stopKoin()`。JUnit 5 版本位於 `org.koin.test.junit5` 中。
 

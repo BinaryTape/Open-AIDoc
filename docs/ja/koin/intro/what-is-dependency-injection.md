@@ -147,7 +147,9 @@ class MainActivity : AppCompatActivity() {
 
 DIライブラリはコンテナの役割を自動化します。どのクラスが存在し、どのくらいの期間生存するかを宣言するだけで、ライブラリがオブジェクトグラフを構築します。Koinを使用した場合：
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 val appModule = module {
     single<Database>()
@@ -159,7 +161,9 @@ val appModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton
 class UserRepository(private val database: Database, private val apiClient: ApiClient)
@@ -177,7 +181,9 @@ class UserViewModel(private val userService: UserService) : ViewModel()
 class AppModule
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val appModule = module {
     singleOf(::Database)
@@ -188,6 +194,9 @@ val appModule = module {
     viewModelOf(::UserViewModel)
 }
 ```
+
+</tab>
+</tabs>
 
 その後、Activityはオブジェクトグラフのトップレベルの要素を要求します：
 

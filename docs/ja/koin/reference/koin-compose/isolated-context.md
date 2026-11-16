@@ -10,7 +10,9 @@ title: Composeにおける分離コンテキスト (Isolated Context)
 
 [Context Isolation](/docs/reference/koin-core/context-isolation) で説明されているように、分離された `KoinApplication` を静的ホルダーに保持します:
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 object PaymentSdkKoin {
     val koinApp = koinApplication {
@@ -24,7 +26,9 @@ internal val paymentModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 import org.koin.plugin.module.dsl.koinApplication
 
@@ -40,7 +44,9 @@ object PaymentSdkKoin {
 }
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 object PaymentSdkKoin {
     val koinApp = koinApplication {
@@ -53,6 +59,9 @@ internal val paymentModule = module {
     viewModelOf(::PaymentViewModel)
 }
 ```
+
+</tab>
+</tabs>
 
 SDKのUIを `KoinIsolatedContext` でラップします:
 

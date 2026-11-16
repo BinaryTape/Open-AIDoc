@@ -16,7 +16,9 @@ title: コンテキストの分離 (Context Isolation)
 
 `koinApplication` は、グローバルに登録することなく、`startKoin` と同じ DSL でコンテナを構築します。これを SDK の `object` 内に保持します。
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.dsl.koinApplication
 import org.koin.dsl.module
@@ -35,7 +37,9 @@ internal object SdkKoinContext {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 import org.koin.plugin.module.dsl.koinApplication
 
@@ -54,7 +58,9 @@ internal object SdkKoinContext {
 
 `koinApplication<T>()` は、`startKoin<T>()` と同様に `@KoinApplication` クラスのモジュールをロードしますが、コンテナをグローバルには登録しません。SDK コンテナがホストアプリの `@Configuration` モジュールを取り込まないように、SDK モジュールを明示的に指定してください。
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.dsl.koinApplication
 import org.koin.dsl.module
@@ -72,6 +78,9 @@ internal object SdkKoinContext {
     val koin = koinApp.koin
 }
 ```
+
+</tab>
+</tabs>
 
 この `object` は、初回アクセス時にコンテナを作成します。起動と停止のタイミングを制御したい場合（SDK API に `init()` や `shutdown()` を用意する場合など）、関数内で作成し、シャットダウン時に `koinApp.close()` を呼び出します。
 

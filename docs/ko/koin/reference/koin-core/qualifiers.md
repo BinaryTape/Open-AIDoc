@@ -16,7 +16,9 @@ Koin은 타입을 기반으로 정의를 찾습니다. 만약 두 개의 `Databa
 
 각 정의를 이름과 함께 선언한 다음, 주입받는 위치에서 해당 이름을 요청합니다:
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.core.annotation.Named
 import org.koin.core.qualifier.named
@@ -36,7 +38,9 @@ val dataModule = module {
 
 `single<UserRepository>()`는 생성자 매개변수의 `@Named`를 읽고 한정자가 지정된 정의를 해결합니다. 또한 `LocalDatabase` 클래스 자체에 `@Named("local")`을 추가할 수도 있습니다. 이 경우 `single<LocalDatabase>()`는 해당 이름으로 클래스를 등록합니다. `@Named` 어노테이션은 `koin-annotations` 아티팩트에서 제공됩니다.
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 import org.koin.core.annotation.Named
 import org.koin.core.annotation.Singleton
@@ -58,7 +62,9 @@ class UserRepository(
 
 `@Named`는 클래스, 프로바이더 함수 및 매개변수에 사용할 수 있습니다.
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.core.qualifier.named
 
@@ -76,6 +82,9 @@ val dataModule = module {
 
 `singleOf(::UserRepository)`는 오직 타입으로만 매개변수를 해결하므로 한정자를 전달할 수 없습니다. 코드 예제처럼 `get(named(...))`을 사용하여 생성자 호출을 직접 작성하세요.
 
+</tab>
+</tabs>
+
 정의 외부에서는 `get()` 또는 `inject()`에 한정자를 전달합니다:
 
 ```kotlin
@@ -89,7 +98,9 @@ val remoteDb: Database = get(named("remote"))
 
 타입을 한정자로 사용할 수 있습니다. 이 경우 오타는 컴파일 에러가 되며, IDE에서 타입 이름을 변경하면 사용된 모든 곳에 자동으로 업데이트됩니다:
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.core.annotation.Qualifier
 
@@ -108,7 +119,9 @@ val dataModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 object LocalDb
 object RemoteDb
@@ -130,7 +143,9 @@ class UserRepository(
 
 `@Qualifier(name = "local")`은 문자열 형태이며, `@Named("local")`과 동일합니다.
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 object LocalDb
 object RemoteDb
@@ -141,6 +156,9 @@ val dataModule = module {
     single { UserRepository(get(named<LocalDb>()), get(named<RemoteDb>())) }
 }
 ```
+
+</tab>
+</tabs>
 
 호출 위치에서는 `get<Database>(named<LocalDb>())`와 같이 사용합니다. `qualifier<LocalDb>()`는 `named<LocalDb>()`의 별칭입니다.
 

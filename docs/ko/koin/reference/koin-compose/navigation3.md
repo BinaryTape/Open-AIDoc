@@ -152,7 +152,9 @@ NavDisplay(
 
 라우트 또는 라우트의 필드를 파라미터로 전달하세요:
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 class DetailViewModel(
     @InjectedParam val route: DetailRoute,
@@ -168,7 +170,9 @@ val detailModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @KoinViewModel
 class DetailViewModel(
@@ -184,7 +188,9 @@ val detailModule = module {
 }
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 class DetailViewModel(
     val route: DetailRoute,
@@ -199,6 +205,9 @@ val detailModule = module {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 ## 엔트리 메타데이터 {id="entry-metadata"}
 

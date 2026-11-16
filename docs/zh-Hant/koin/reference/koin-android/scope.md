@@ -22,7 +22,9 @@ Android 作用域能讓執行個體在與單一組建（Activity、Fragment、Se
 
 每種組建類型在 Android 中都有一個作用域原型。原型是一種作用域宣告，任何具備作用域的 Activity（或 Fragment）都可以使用它，因此你不需要為每個類別各寫一個作用域：
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.androidx.scope.dsl.activityRetainedScope
 import org.koin.androidx.scope.dsl.activityScope
@@ -41,7 +43,9 @@ val screenModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 import org.koin.android.annotation.ActivityRetainedScope
 import org.koin.android.annotation.ActivityScope
@@ -57,7 +61,9 @@ class FormState
 class DetailPresenter(private val repository: UserRepository)
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.androidx.scope.dsl.activityRetainedScope
 import org.koin.androidx.scope.dsl.activityScope
@@ -75,6 +81,9 @@ val screenModule = module {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 若要將定義限制在單一 Activity 類別，請改為宣告基於型別的作用域（在 DSL 中使用 `scope<UserActivity> { }`，在註解中使用 `@Scope(UserActivity::class)` 搭配 `@Scoped`）。Koin 會先在基於型別的作用域中尋找，接著才在原型中尋找。基於型別的作用域在 [Scopes](/docs/reference/koin-core/scopes) 中有詳細說明。
 
@@ -168,7 +177,9 @@ Fragment 作用域遵循 Fragment 的生命週期（`ON_DESTROY`），而非檢�
 
 繼承 `ScopeService`。其作用域會在 `onCreate()` 中開啟，並在 `onDestroy()` 中關閉。Service 沒有原型：請為 Service 類別宣告基於型別的作用域。
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 val playerModule = module {
     scope<MusicService> {
@@ -177,14 +188,18 @@ val playerModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Scope(MusicService::class)
 @Scoped
 class PlaybackSession
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val playerModule = module {
     scope<MusicService> {
@@ -192,6 +207,9 @@ val playerModule = module {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 ```kotlin
 import org.koin.android.scope.ScopeService

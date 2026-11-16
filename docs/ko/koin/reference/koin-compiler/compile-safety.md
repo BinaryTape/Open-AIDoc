@@ -77,7 +77,9 @@ startKoin {
 
 모든 스타일과 DSL 형태는 동일한 그래프를 기준으로 검사됩니다. 이들은 한 프로젝트 내에 공존할 수 있으며, DSL 정의가 애너테이션이 적용된 클래스에 의존하거나 그 반대의 경우도 가능합니다.
 
-**컴파일러 플러그인 DSL (Compiler Plugin DSL)**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 val appModule = module {
     single<Database>()
@@ -96,7 +98,9 @@ val appModule = module {
 }
 ```
 
-**애너테이션 (Annotations)**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton
 class Database
@@ -124,7 +128,9 @@ fun provideCache(db: Database): CacheService = RedisCache(db)    // 검사됨: D
 
 `@Configuration` 태그가 지정된 모듈은 여러 Gradle 모듈에 걸쳐 해당 라벨을 요청하는 `@KoinApplication`과 함께 수집되어 함께 검사됩니다.
 
-**생성자 / 클래식 DSL (Constructor / Classic DSL)**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 생성자 참조는 컴파일러 플러그인 DSL과 동일하게 검사됩니다:
 
 ```kotlin
@@ -147,6 +153,9 @@ val appModule = module {
     single { UserRepository(get()) }  // 검사됨: get() 호출에 Database가 필요한지 확인
 }
 ```
+
+</tab>
+</tabs>
 
 :::warning
 컴파일러 플러그인 1.2.0부터 `singleOf`, `factoryOf`, `scopedOf`, `viewModelOf`가 검사됩니다. 이러한 함수에서 누락된 의존성에 의존하던 코드는 더 이상 컴파일되지 않습니다. 이전 빌드에서는 런타임 크래시가 숨겨져 있었습니다.

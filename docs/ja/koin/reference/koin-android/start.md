@@ -10,7 +10,9 @@ title: AndroidでKoinを開始する
 
 `Application.onCreate()` 内で、Koinを1回だけ開始します：
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -32,7 +34,9 @@ class MainApplication : Application() {
 
 `appModule` は、Compiler Plugin DSL（`single<UserRepository>()`、`viewModel<UserViewModel>()`）で宣言された `module { }` です。
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -55,7 +59,9 @@ class MainApplication : Application() {
 
 `startKoin<MainApplication>()` は、`@Configuration` でタグ付けされたすべての `@Module` クラスを読み込みます。モジュールを手動で列挙する必要はありません。明示的にモジュールを選択するには、`@KoinApplication(modules = [AppModule::class])` を使用します。モジュールの検出については [Modules](/docs/reference/koin-core/modules) で説明されています。
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -75,6 +81,9 @@ class MainApplication : Application() {
 }
 ```
 
+</tab>
+</tabs>
+
 `<application>` タグに `android:name=".MainApplication"` を指定して `AndroidManifest.xml` にこのクラスを登録してください。登録しない場合、Androidはこれを実行しません。
 
 `androidContext()` は、`Application` インスタンスをKoinに追加し、`Application` と `Context` の両方にバインドします。`androidFileProperties()` や `workManagerFactory()` など、`Context` を必要とするオプションの前に呼び出してください。
@@ -83,7 +92,9 @@ class MainApplication : Application() {
 
 `Context` を必要とするクラスは、コンストラクタでそれを宣言します。修飾子（qualifier）は不要です。Koinは `Context` を `androidContext()` に渡されたインスタンスに解決します。
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 class PreferencesStore(private val context: Context)
 class NotificationHelper(private val application: Application)
@@ -94,7 +105,9 @@ val androidModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton
 class PreferencesStore(private val context: Context)
@@ -103,7 +116,9 @@ class PreferencesStore(private val context: Context)
 class NotificationHelper(private val application: Application)
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val androidModule = module {
     singleOf(::PreferencesStore)
@@ -112,6 +127,9 @@ val androidModule = module {
 ```
 
 ラムダ定義内では、`androidContext()` および `androidApplication()` を使って取得します：`single { PreferencesStore(androidContext()) }`。
+
+</tab>
+</tabs>
 
 | 関数 | 戻り値 | 失敗するケース |
 |----------|---------|------------|
@@ -148,7 +166,9 @@ class MainActivity : AppCompatActivity() {
 
 2つの `SharedPreferences` ファイルのように、2つの定義が同じ型を共有している場合は、[修飾子（qualifier）](/docs/reference/koin-core/qualifiers)を使用して区別します：
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 val preferencesModule = module {
     single(named("settings")) {
@@ -160,7 +180,9 @@ val preferencesModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Module
 class PreferencesModule {
@@ -177,7 +199,9 @@ class PreferencesModule {
 }
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val preferencesModule = module {
     single(named("settings")) {
@@ -188,6 +212,9 @@ val preferencesModule = module {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 ## ロギング {id="logging"}
 
@@ -246,7 +273,9 @@ class PremiumActivity : AppCompatActivity() {
 
 [AndroidX App Startup](https://developer.android.com/topic/libraries/app-startup) は、`Application.onCreate()` の前に1つのContentProviderからイニシャライザを実行します。`io.insert-koin:koin-androidx-startup` アーティファクトは、それらのイニシャライザの1つとしてKoinを開始します。`Application` で `KoinStartup` を実装し、`onKoinStartup()` から設定を返します：
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.androix.startup.KoinStartup
 import org.koin.dsl.koinConfiguration
@@ -261,7 +290,9 @@ class MainApplication : Application(), KoinStartup {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 import org.koin.androix.startup.KoinStartup
 import org.koin.plugin.module.dsl.koinConfiguration
@@ -276,7 +307,9 @@ class MainApplication : Application(), KoinStartup {
 }
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.androix.startup.KoinStartup
 import org.koin.dsl.koinConfiguration
@@ -290,6 +323,9 @@ class MainApplication : Application(), KoinStartup {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 `KoinStartup` は `onCreate()` 内の `startKoin` 呼び出しを置き換えるため、両方を呼び出さないでください。パッケージ名は `org.koin.androix.startup`（この綴りの通り）であり、APIには `@KoinExperimentalAPI` が付けられています。
 

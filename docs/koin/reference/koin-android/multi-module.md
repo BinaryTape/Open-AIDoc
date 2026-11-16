@@ -20,7 +20,9 @@ title: 多模块应用
 
 ## 声明并加载功能模块 {id="declaring-and-loading-feature-modules"}
 
-**编译器插件 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 // Gradle 模块 ":feature:login"
 internal class LoginUseCase(private val auth: AuthService)
@@ -50,7 +52,9 @@ class MainApplication : Application() {
 }
 ```
 
-**注解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 // Gradle 模块 ":feature:login"
 @Module
@@ -81,7 +85,9 @@ class MainApplication : Application() {
 
 `startKoin<MainApplication>()` 会在应用的类路径上查找每个 `@Configuration` 模块，包括来自功能 Gradle 模块的模块。添加新功能只需添加 Gradle 依赖项即可，无需额外操作。如果希望显式列出模块，请使用 `@KoinApplication(modules = [LoginModule::class, ProfileModule::class])`。
 
-**构造函数 / 经典 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 // Gradle 模块 ":feature:login"
 internal class LoginUseCase(private val auth: AuthService)
@@ -111,6 +117,9 @@ class MainApplication : Application() {
 }
 ```
 
+</tab>
+</tabs>
+
 ## 在功能之间共享类型 {id="sharing-types-between-features"}
 
 一个功能模块不应依赖另一个功能模块。当 `:feature:profile` 需要当前用户时，它会依赖核心模块中的某个接口，而实现则绑定在其定义所在的位置：
@@ -122,7 +131,9 @@ interface UserRepository {
 }
 ```
 
-**编译器插件 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 // Gradle 模块 ":core:data"
 internal class UserRepositoryImpl(private val api: ApiService) : UserRepository
@@ -132,14 +143,18 @@ val dataModule = module {
 }
 ```
 
-**注解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 // Gradle 模块 ":core:data"
 @Singleton
 internal class UserRepositoryImpl(private val api: ApiService) : UserRepository
 ```
 
-**构造函数 / 经典 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 // Gradle 模块 ":core:data"
 internal class UserRepositoryImpl(private val api: ApiService) : UserRepository
@@ -148,6 +163,9 @@ val dataModule = module {
     singleOf(::UserRepositoryImpl) bind UserRepository::class
 }
 ```
+
+</tab>
+</tabs>
 
 随后，`:feature:profile` 中的 `ProfileViewModel(private val users: UserRepository)` 即可在运行时解析出 `UserRepositoryImpl`。只要每个 Koin 模块都已加载，Koin 就能跨 Gradle 模块进行解析：功能模块只需要能够引用该接口类型。你不需要为每个功能模块额外定义入口点接口或组件。
 

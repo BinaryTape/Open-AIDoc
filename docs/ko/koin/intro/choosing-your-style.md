@@ -10,7 +10,9 @@ Koin은 정의(definition)를 선언하는 두 가지 스타일을 제공하며,
 
 각 스타일로 작성한 동일한 모듈입니다.
 
-**컴파일러 플러그인 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.dsl.module
 import org.koin.plugin.module.dsl.*
@@ -24,7 +26,9 @@ val appModule = module {
 
 타입만 명시하면 됩니다. [Koin 컴파일러 플러그인](/docs/intro/koin-compiler-plugin)이 생성자를 읽고 의존성 연결(wiring)을 자동으로 생성합니다.
 
-**애너테이션**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton
 class ApiService
@@ -42,7 +46,9 @@ class AppModule
 
 각 클래스에 애너테이션을 추가합니다. `@ComponentScan`이 이들을 모듈로 수집하고, 컴파일러 플러그인이 의존성 연결 코드를 생성합니다. 인터페이스는 자동으로 바인딩됩니다.
 
-**생성자 / 클래식 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 생성자 참조를 사용하는 생성자 DSL:
 
 ```kotlin
@@ -67,6 +73,9 @@ val appModule = module {
 ```
 
 두 형태 모두 컴파일러 플러그인 없이도 동작합니다. 플러그인이 적용되면 빌드 시점에 유효성 검증도 함께 수행됩니다.
+
+</tab>
+</tabs>
 
 ## 요구 사항 {id="requirements"}
 

@@ -41,7 +41,9 @@ class MainActivity : AppCompatActivity() {
 
 ## Fragment 선언하기 {id="declaring-a-fragment"}
 
-**컴파일러 플러그인 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 컴파일러 플러그인 DSL에는 `fragment<T>()` 함수가 없습니다. 동일한 모듈에서 클래식 DSL인 `fragment { }` 또는 생성자 DSL인 `fragmentOf()`를 사용하세요:
 
 ```kotlin
@@ -53,7 +55,9 @@ val uiModule = module {
 }
 ```
 
-**어노테이션**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 Fragment 전용 어노테이션은 없습니다. 어노테이션이 지정된 클래스와 함께 DSL 모듈에 Fragment를 선언하세요([DSL 레퍼런스](/docs/reference/koin-core/dsl) 참고):
 
 ```kotlin
@@ -62,7 +66,9 @@ val uiModule = module {
 }
 ```
 
-**생성자 / 클래식 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.androidx.fragment.dsl.fragment
 import org.koin.androidx.fragment.dsl.fragmentOf
@@ -77,6 +83,9 @@ val uiModule = module {
     fragment { UserFragment(get()) }
 }
 ```
+
+</tab>
+</tabs>
 
 `fragment` 정의는 `factory`입니다. 즉, 트랜잭션마다 새로운 Fragment 인스턴스가 생성됩니다. Fragment 클래스와 일치하는 정의가 없으면 Koin 팩토리는 기본 AndroidX 동작으로 대체(fallback)됩니다.
 

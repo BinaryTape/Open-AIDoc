@@ -10,7 +10,9 @@ Koin 提供兩種宣告定義的風格，兩者都會填入相同的容器：類
 
 以每種風格呈現的同一個模組：
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.dsl.module
 import org.koin.plugin.module.dsl.*
@@ -24,7 +26,9 @@ val appModule = module {
 
 你指定型別。[Koin Compiler Plugin](/docs/intro/koin-compiler-plugin) 會讀取其建構函式並自動產生裝配程式碼。
 
-**註解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton
 class ApiService
@@ -42,7 +46,9 @@ class AppModule
 
 你為每個類別加上註解。`@ComponentScan` 會將它們收集至模組中，並由 Compiler Plugin 產生裝配程式碼。介面則會自動綁定。
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 使用建構函式參照的 Constructor DSL：
 
 ```kotlin
@@ -67,6 +73,9 @@ val appModule = module {
 ```
 
 兩種形式在沒有編譯器外掛程式的情況下皆可運作。套用該外掛程式後，它們也會在建置期接受檢查。
+
+</tab>
+</tabs>
 
 ## 需求 {id="requirements"}
 

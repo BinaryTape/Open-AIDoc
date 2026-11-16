@@ -16,7 +16,9 @@ Koin は型によって定義を検索します。2つの定義が同じ型を�
 
 各定義を名前付きで宣言し、インジェクションする場所でその名前を指定して要求します：
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.core.annotation.Named
 import org.koin.core.qualifier.named
@@ -36,7 +38,9 @@ val dataModule = module {
 
 `single<UserRepository>()` はコンストラクタパラメータの `@Named` を読み取り、修飾された定義を解決します。`LocalDatabase` クラス自体に `@Named("local")` を付与することもできます。その場合、`single<LocalDatabase>()` はその名前で登録します。`@Named` アノテーションは `koin-annotations` アーティファクトから提供されます。
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 import org.koin.core.annotation.Named
 import org.koin.core.annotation.Singleton
@@ -58,7 +62,9 @@ class UserRepository(
 
 `@Named` はクラス、プロバイダ関数、パラメータで使用できます。
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.core.qualifier.named
 
@@ -76,6 +82,9 @@ val dataModule = module {
 
 `singleOf(::UserRepository)` は型のみによってパラメータを解決するため、クオリファイアを渡すことができません。上記のように `get(named(...))` を使用してコンストラクタ呼び出しを記述してください。
 
+</tab>
+</tabs>
+
 定義の外部では、`get()` や `inject()` にクオリファイアを渡します：
 
 ```kotlin
@@ -89,7 +98,9 @@ Compose の `koinInject(named("local"))` など、すべてのインジェクシ
 
 型をクオリファイアとして使用できます。タイポはコンパイルエラーになり、IDE で型名を変更すれば使用箇所がすべて更新されます：
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.core.annotation.Qualifier
 
@@ -108,7 +119,9 @@ val dataModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 object LocalDb
 object RemoteDb
@@ -130,7 +143,9 @@ class UserRepository(
 
 `@Qualifier(name = "local")` は文字列形式であり、`@Named("local")` と同等です。
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 object LocalDb
 object RemoteDb
@@ -141,6 +156,9 @@ val dataModule = module {
     single { UserRepository(get(named<LocalDb>()), get(named<RemoteDb>())) }
 }
 ```
+
+</tab>
+</tabs>
 
 呼び出し側では `get<Database>(named<LocalDb>())` とします。`qualifier<LocalDb>()` は `named<LocalDb>()` のエイリアスです。
 

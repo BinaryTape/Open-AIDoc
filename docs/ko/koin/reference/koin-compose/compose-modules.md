@@ -66,7 +66,9 @@ NavHost(navController, startDestination = HomeRoute) {
 
 ## 모듈 스타일 {id="module-styles"}
 
-**컴파일러 플러그인 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 val checkoutModule = module {
     factory<CheckoutRepository>()
@@ -74,16 +76,23 @@ val checkoutModule = module {
 }
 ```
 
-**어노테이션**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 `rememberKoinModules`는 `Module` 값을 받습니다. `@Module` 어노테이션이 달린 클래스는 시작 시 `@KoinApplication`을 통해 로드됩니다([모듈](/docs/reference/koin-core/modules) 참조). 필요할 때 기능을 동적으로 로드하려면 DSL을 사용해 모듈을 선언하세요.
 
-**생성자 / 클래식 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val checkoutModule = module {
     factoryOf(::CheckoutRepository)
     viewModelOf(::CheckoutViewModel)
 }
 ```
+
+</tab>
+</tabs>
 
 ## 제한 사항 {id="limits"}
 

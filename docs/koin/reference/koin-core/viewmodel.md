@@ -19,7 +19,9 @@ implementation("io.insert-koin:koin-core-viewmodel")
 
 ## 声明 ViewModel {id="declaring-a-viewmodel"}
 
-**编译器插件 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.dsl.module
 import org.koin.plugin.module.dsl.viewModel
@@ -31,7 +33,9 @@ val appModule = module {
 }
 ```
 
-**注解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 import org.koin.core.annotation.KoinViewModel
 
@@ -41,7 +45,9 @@ class UserViewModel(private val repository: UserRepository) : ViewModel()
 
 使用编译器插件时，`@KoinViewModel` 位于 `org.koin.core.annotation` 中，并可在公共代码中生效。KSP 处理器则使用 `org.koin.android.annotation.KoinViewModel`。
 
-**构造函数 / 经典 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.dsl.module
 import org.koin.core.module.dsl.viewModelOf
@@ -55,13 +61,18 @@ val appModule = module {
 }
 ```
 
+</tab>
+</tabs>
+
 `viewModel` 定义类似于 `factory`，在每次请求时都会创建一个新实例。平台层的 `ViewModelStore`（Activity、Fragment、导航条目）会保留该实例，因此在 Android 上的配置发生变更时，相同的所有者会取回相同的 ViewModel。请勿将 ViewModel 声明为 `single`：否则它将被所有屏幕共享且永远不会被清除。
 
 ## 传递参数 {id="passing-parameters"}
 
 ViewModel 通常需要仅在运行时才知道的值（例如条目 ID）。将构造函数形参标记为注入参数：
 
-**编译器插件 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 class DetailViewModel(
     @InjectedParam val itemId: String,
@@ -73,7 +84,9 @@ val appModule = module {
 }
 ```
 
-**注解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @KoinViewModel
 class DetailViewModel(
@@ -82,7 +95,9 @@ class DetailViewModel(
 ) : ViewModel()
 ```
 
-**构造函数 / 经典 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val appModule = module {
     viewModel { params ->
@@ -92,6 +107,9 @@ val appModule = module {
 ```
 
 `viewModelOf(::DetailViewModel)` 同样适用：它会根据调用方传入的值，按类型读取形参。
+
+</tab>
+</tabs>
 
 无论采用何种声明风格，调用方均通过 `parametersOf` 传递该值：
 
@@ -109,7 +127,9 @@ val viewModel = koinViewModel<DetailViewModel> { parametersOf("item_123") }
 
 在构造函数中添加 `SavedStateHandle` 形参。Koin 会直接从 ViewModel 的 `CreationExtras` 中创建它，无需额外声明：
 
-**编译器插件 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 class ProfileViewModel(
     private val handle: SavedStateHandle,
@@ -123,7 +143,9 @@ val appModule = module {
 }
 ```
 
-**注解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @KoinViewModel
 class ProfileViewModel(
@@ -134,7 +156,9 @@ class ProfileViewModel(
 }
 ```
 
-**构造函数 / 经典 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val appModule = module {
     viewModelOf(::ProfileViewModel)
@@ -144,13 +168,18 @@ val appModule = module {
 }
 ```
 
+</tab>
+</tabs>
+
 在 Android 上，导航实参和 Activity extras 都保存在 `SavedStateHandle` 中。请仅在构造函数中注入它。如果 ViewModel 的所有者没有 `SavedStateRegistryOwner`，Koin 将抛出错误："Koin could not create a SavedStateHandle: the ViewModel's CreationExtras has no SavedStateRegistryOwner."。
 
 ## ViewModel 作用域 {id="viewmodel-scope"}
 
 ViewModel 可以拥有一个[作用域](/docs/reference/koin-core/scopes)：依赖项随它一同创建，并在其被清除时一同释放。使用 `viewModelScope` 原型声明它们：
 
-**编译器插件 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 val appModule = module {
     viewModelScope {
@@ -160,7 +189,9 @@ val appModule = module {
 }
 ```
 
-**注解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @ViewModelScope
 class UserCache
@@ -170,7 +201,9 @@ class UserCache
 class UserViewModel(private val cache: UserCache) : ViewModel()
 ```
 
-**构造函数 / 经典 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val appModule = module {
     viewModelScope {
@@ -179,6 +212,9 @@ val appModule = module {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 在启动时需启用该选项，否则 ViewModel 将无法获得作用域：
 

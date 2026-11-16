@@ -77,7 +77,9 @@ startKoin {
 
 每种风格和 DSL 形式都会针对同一个图进行检查。它们可以共存于同一个项目中：DSL 定义可以依赖注解类，反之亦然。
 
-**编译器插件 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 val appModule = module {
     single<Database>()
@@ -96,7 +98,9 @@ val appModule = module {
 }
 ```
 
-**注解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton
 class Database
@@ -124,7 +128,9 @@ fun provideCache(db: Database): CacheService = RedisCache(db)    // 已检查：
 
 带有 `@Configuration` 标签的模块会与请求其标签的 `@KoinApplication` 一同装配（跨 Gradle 模块），并一起进行检查。
 
-**构造函数 / 经典 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 构造函数引用会像编译器插件 DSL 一样被检查：
 
 ```kotlin
@@ -147,6 +153,9 @@ val appModule = module {
     single { UserRepository(get()) }  // 已检查：get() 调用需要 Database
 }
 ```
+
+</tab>
+</tabs>
 
 :::warning
 自编译器插件 1.2.0 起，`singleOf`、`factoryOf`、`scopedOf` 和 `viewModelOf` 均会进行检查。依赖这些函数中缺失依赖项的代码将不再能够编译。以前的构建掩盖了运行时的崩溃。

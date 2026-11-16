@@ -16,7 +16,9 @@ title: 上下文隔离
 
 `koinApplication` 使用与 `startKoin` 相同的 DSL 来构建容器，但不会将其注册到全局。可以将其保存在 SDK 的单例对象（`object`）中：
 
-**编译器插件 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.dsl.koinApplication
 import org.koin.dsl.module
@@ -35,7 +37,9 @@ internal object SdkKoinContext {
 }
 ```
 
-**注解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 import org.koin.plugin.module.dsl.koinApplication
 
@@ -54,7 +58,9 @@ internal object SdkKoinContext {
 
 `koinApplication<T>()` 会像 `startKoin<T>()` 一样加载 `@KoinApplication` 类的模块，但不会在全局注册该容器。请显式列出 SDK 模块，这样 SDK 容器就不会获取来自宿主应用程序的 `@Configuration` 模块。
 
-**构造函数 / 经典 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.dsl.koinApplication
 import org.koin.dsl.module
@@ -72,6 +78,9 @@ internal object SdkKoinContext {
     val koin = koinApp.koin
 }
 ```
+
+</tab>
+</tabs>
 
 该 `object` 会在首次访问时创建容器。如果想要控制其启动和停止时机（例如在 SDK API 中提供 `init()` 和 `shutdown()`），请在函数中创建它，并在关闭时调用 `koinApp.close()`。
 

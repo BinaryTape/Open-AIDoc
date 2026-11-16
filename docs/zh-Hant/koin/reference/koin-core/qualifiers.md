@@ -16,7 +16,9 @@ Koin 透過型別來尋找定義。如果兩個定義提供相同的型別，例
 
 為每個定義宣告一個名稱，然後在注入時請求該名稱：
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.core.annotation.Named
 import org.koin.core.qualifier.named
@@ -36,7 +38,9 @@ val dataModule = module {
 
 `single<UserRepository>()` 會讀取建構函式參數上的 `@Named`，並解析具限定詞的定義。你也可以直接在 `LocalDatabase` 類別本身加上 `@Named("local")`：這樣 `single<LocalDatabase>()` 就會以該名稱註冊它。`@Named` 註解來自 `koin-annotations` 構件。
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 import org.koin.core.annotation.Named
 import org.koin.core.annotation.Singleton
@@ -58,7 +62,9 @@ class UserRepository(
 
 `@Named` 可用於類別、提供者函式以及參數。
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.core.qualifier.named
 
@@ -76,6 +82,9 @@ val dataModule = module {
 
 `singleOf(::UserRepository)` 僅依型別解析參數，因此無法傳遞限定詞。請如範例所示，改用 `get(named(...))` 撰寫建構函式呼叫。
 
+</tab>
+</tabs>
+
 在定義之外，請將限定詞傳遞給 `get()` 或 `inject()`：
 
 ```kotlin
@@ -89,7 +98,9 @@ val remoteDb: Database = get(named("remote"))
 
 型別也可以作為限定詞。打錯字會變成編譯錯誤，而且在 IDE 中重命名該型別時會同步更新每一處使用：
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.core.annotation.Qualifier
 
@@ -108,7 +119,9 @@ val dataModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 object LocalDb
 object RemoteDb
@@ -130,7 +143,9 @@ class UserRepository(
 
 `@Qualifier(name = "local")` 是字串形式，等同於 `@Named("local")`。
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 object LocalDb
 object RemoteDb
@@ -141,6 +156,9 @@ val dataModule = module {
     single { UserRepository(get(named<LocalDb>()), get(named<RemoteDb>())) }
 }
 ```
+
+</tab>
+</tabs>
 
 在呼叫點：`get<Database>(named<LocalDb>())`。`qualifier<LocalDb>()` 是 `named<LocalDb>()` 的別名。
 

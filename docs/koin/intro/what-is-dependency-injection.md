@@ -147,7 +147,9 @@ class MainActivity : AppCompatActivity() {
 
 DI 库可以实现容器的自动化。你只需声明存在哪些类以及它们的存活周期，库便会自动构建对象图。在 Koin 中：
 
-**编译器插件 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 val appModule = module {
     single<Database>()
@@ -159,7 +161,9 @@ val appModule = module {
 }
 ```
 
-**注解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton
 class UserRepository(private val database: Database, private val apiClient: ApiClient)
@@ -177,7 +181,9 @@ class UserViewModel(private val userService: UserService) : ViewModel()
 class AppModule
 ```
 
-**构造函数 / 经典 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val appModule = module {
     singleOf(::Database)
@@ -188,6 +194,9 @@ val appModule = module {
     viewModelOf(::UserViewModel)
 }
 ```
+
+</tab>
+</tabs>
 
 随后 Activity 只需请求对象图的顶层对象：
 

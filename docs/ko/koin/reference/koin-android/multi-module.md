@@ -20,7 +20,9 @@ title: 멀티 모듈 앱
 
 ## 기능 모듈 선언 및 로드 {id="declaring-and-loading-feature-modules"}
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 // Gradle 모듈 ":feature:login"
 internal class LoginUseCase(private val auth: AuthService)
@@ -50,7 +52,9 @@ class MainApplication : Application() {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 // Gradle 모듈 ":feature:login"
 @Module
@@ -81,7 +85,9 @@ class MainApplication : Application() {
 
 `startKoin<MainApplication>()`은 기능 Gradle 모듈의 모듈을 포함하여 앱 클래스패스에 있는 모든 `@Configuration` 모듈을 찾습니다. 새로운 기능을 추가할 때는 Gradle 의존성만 추가하면 되며, 다른 작업은 필요하지 않습니다. 모듈을 명시적으로 나열하려면 `@KoinApplication(modules = [LoginModule::class, ProfileModule::class])`을 대신 사용하세요.
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 // Gradle 모듈 ":feature:login"
 internal class LoginUseCase(private val auth: AuthService)
@@ -111,6 +117,9 @@ class MainApplication : Application() {
 }
 ```
 
+</tab>
+</tabs>
+
 ## 기능 간 타입 공유 {id="sharing-types-between-features"}
 
 한 기능이 다른 기능에 직접 의존해서는 안 됩니다. 예를 들어 `:feature:profile`에 현재 사용자가 필요한 경우, core 모듈의 인터페이스에 의존하도록 하고 구현체는 해당 구현체가 위치한 모듈에서 바인딩합니다.
@@ -122,7 +131,9 @@ interface UserRepository {
 }
 ```
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 // Gradle 모듈 ":core:data"
 internal class UserRepositoryImpl(private val api: ApiService) : UserRepository
@@ -132,14 +143,18 @@ val dataModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 // Gradle 모듈 ":core:data"
 @Singleton
 internal class UserRepositoryImpl(private val api: ApiService) : UserRepository
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 // Gradle 모듈 ":core:data"
 internal class UserRepositoryImpl(private val api: ApiService) : UserRepository
@@ -148,6 +163,9 @@ val dataModule = module {
     singleOf(::UserRepositoryImpl) bind UserRepository::class
 }
 ```
+
+</tab>
+</tabs>
 
 그러면 `:feature:profile`의 `ProfileViewModel(private val users: UserRepository)`은 런타임에 `UserRepositoryImpl`을 주입받아 해결(resolve)합니다. 모든 Koin 모듈이 로드되어 있는 한 Koin은 Gradle 모듈 전반에 걸쳐 의존성을 해결할 수 있으므로, 기능 모듈은 인터페이스 타입만 알고 있으면 됩니다. 기능별로 별도의 진입점 인터페이스나 컴포넌트를 만들 필요가 없습니다.
 

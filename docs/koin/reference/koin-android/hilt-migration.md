@@ -67,7 +67,9 @@ class MyApplication : Application()
 
 Koin：
 
-**编译器插件 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 class MyApplication : Application() {
     override fun onCreate() {
@@ -81,7 +83,9 @@ class MyApplication : Application() {
 }
 ```
 
-**注解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 import org.koin.plugin.module.dsl.startKoin
 
@@ -99,7 +103,9 @@ class MyApplication : Application() {
 
 `@KoinApplication` 会加载每个标记有 `@Configuration` 的模块。如需显式列出模块，请使用 `@KoinApplication(modules = [AppModule::class])`。
 
-**构造函数 / 经典 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 class MyApplication : Application() {
     override fun onCreate() {
@@ -112,6 +118,9 @@ class MyApplication : Application() {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 `androidContext()` 使 `Context` 对每个定义均可用。请参阅[在 Android 上启动 Koin](/docs/reference/koin-android/start)。
 
@@ -141,7 +150,9 @@ object NetworkModule {
 
 Koin：
 
-**编译器插件 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.plugin.module.dsl.create
 
@@ -160,7 +171,9 @@ val networkModule = module {
 }
 ```
 
-**注解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Module
 class NetworkModule {
@@ -178,7 +191,9 @@ class NetworkModule {
 }
 ```
 
-**构造函数 / 经典 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val networkModule = module {
     single { OkHttpClient.Builder().build() }
@@ -191,6 +206,9 @@ val networkModule = module {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 这里没有 `@InstallIn`：定义的生命周期取决于其类型（`single`、`factory`、`scoped`），而不是安装它的组件。带有 `@Inject constructor` 的类将转换为 `single<T>()` / `factory<T>()`、类上的注解，或 `singleOf(::T)`。有关库对象的更多内容，请参阅[定义](/docs/reference/koin-core/definitions#classes-you-dont-own)。
 
@@ -210,14 +228,18 @@ abstract class DataModule {
 
 Koin：
 
-**编译器插件 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 val dataModule = module {
     single<UserRepositoryImpl>() bind UserRepository::class
 }
 ```
 
-**注解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton
 class UserRepositoryImpl(private val api: ApiService) : UserRepository
@@ -225,12 +247,17 @@ class UserRepositoryImpl(private val api: ApiService) : UserRepository
 
 该类会自动绑定到其所有的超类型。若只需绑定部分类型，请使用 `@Singleton(binds = [UserRepository::class])`。
 
-**构造函数 / 经典 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val dataModule = module {
     singleOf(::UserRepositoryImpl) bind UserRepository::class
 }
 ```
+
+</tab>
+</tabs>
 
 ## 第 5 步：ViewModel {id="step-5-viewmodels"}
 
@@ -246,7 +273,9 @@ class UserViewModel @Inject constructor(
 
 Koin：
 
-**编译器插件 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 class UserViewModel(
     private val repository: UserRepository,
@@ -258,7 +287,9 @@ val appModule = module {
 }
 ```
 
-**注解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @KoinViewModel
 class UserViewModel(
@@ -267,7 +298,9 @@ class UserViewModel(
 ) : ViewModel()
 ```
 
-**构造函数 / 经典 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 class UserViewModel(
     private val repository: UserRepository,
@@ -278,6 +311,9 @@ val appModule = module {
     viewModelOf(::UserViewModel)
 }
 ```
+
+</tab>
+</tabs>
 
 Koin 会向 ViewModel 定义提供 `SavedStateHandle`。在 Activity 或 Fragment 中，将 `by viewModels()` 替换为 `by viewModel()`。在 Compose 中，将 `hiltViewModel()` 替换为 `koinViewModel()`。请参阅 [Android ViewModel](/docs/reference/koin-android/viewmodel)。
 
@@ -336,7 +372,9 @@ class SyncRepository @Inject constructor(
 
 Koin：
 
-**编译器插件 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.core.annotation.Named
 
@@ -350,7 +388,9 @@ val dispatcherModule = module {
 }
 ```
 
-**注解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 保留你的限定符注解。Koin 支持读取标有 `@Qualifier` 的自定义注解（Koin 的、`jakarta.inject` 或 `javax.inject`）：
 
 ```kotlin
@@ -373,13 +413,18 @@ class SyncRepository(
 )
 ```
 
-**构造函数 / 经典 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val dispatcherModule = module {
     single<CoroutineDispatcher>(named("io")) { Dispatchers.IO }
     single { SyncRepository(get(named("io"))) }
 }
 ```
+
+</tab>
+</tabs>
 
 类型限定符（`named<IoDispatcher>()`）及所有其他选项详见[限定符](/docs/reference/koin-core/qualifiers)。Hilt 的 `@ApplicationContext` 不需要限定符：`Context` 形参会自动接收传递给 `androidContext()` 的上下文。
 
@@ -447,7 +492,9 @@ Hilt 的 `@TestInstallIn` 和 `@UninstallModules` 会转换为在生产模块之
 
 Hilt 的 `@AssistedInject` 和 `@AssistedFactory` 会转换为注入形参。由调用方传入运行时值：
 
-**编译器插件 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 class UserDetailViewModel(
     @InjectedParam private val userId: String,
@@ -459,7 +506,9 @@ val appModule = module {
 }
 ```
 
-**注解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @KoinViewModel
 class UserDetailViewModel(
@@ -468,7 +517,9 @@ class UserDetailViewModel(
 ) : ViewModel()
 ```
 
-**构造函数 / 经典 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 class UserDetailViewModel(
     private val userId: String,
@@ -479,6 +530,9 @@ val appModule = module {
     viewModel { (userId: String) -> UserDetailViewModel(userId, get()) }
 }
 ```
+
+</tab>
+</tabs>
 
 ```kotlin
 val viewModel: UserDetailViewModel by viewModel { parametersOf("user-42") }

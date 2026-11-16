@@ -15,7 +15,9 @@ interface ApiService {
 }
 ```
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.plugin.module.dsl.create
 
@@ -44,7 +46,9 @@ val networkModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Module
 class NetworkModule {
@@ -72,7 +76,9 @@ class NetworkModule {
 }
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val networkModule = module {
     single {
@@ -95,11 +101,16 @@ val networkModule = module {
 }
 ```
 
+</tab>
+</tabs>
+
 `OkHttpClient` と `Retrofit` は `single` として宣言します。それぞれがコネクションプールとスレッドプールを保持するため、複数インスタンスを生成するとリソースの浪費につながります。`BuildConfig.API_URL` はビルドタイプごとに定義する `buildConfigField` です。`Json` インスタンスは次のセクションから取得します。
 
 ## JSON シリアライゼーション {id="json-serialization"}
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 fun json(): Json = Json {
     ignoreUnknownKeys = true
@@ -111,7 +122,9 @@ val serializationModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Module
 class SerializationModule {
@@ -124,7 +137,9 @@ class SerializationModule {
 }
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val serializationModule = module {
     single {
@@ -135,6 +150,9 @@ val serializationModule = module {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 同様のパターンは Gson（`single { create(::gson) }` と `fun gson(): Gson = GsonBuilder().create()`）や Moshi にも適用できます。共有インスタンスを 1 つにすることで、シリアライザーの設定を一元管理できます。
 
@@ -147,7 +165,9 @@ abstract class AppDatabase : RoomDatabase() {
 }
 ```
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 fun appDatabase(context: Context): AppDatabase =
     Room.databaseBuilder(context, AppDatabase::class.java, "app-database").build()
@@ -160,7 +180,9 @@ val databaseModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Module
 class DatabaseModule {
@@ -174,7 +196,9 @@ class DatabaseModule {
 }
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val databaseModule = module {
     single {
@@ -183,6 +207,9 @@ val databaseModule = module {
     single { get<AppDatabase>().userDao() }
 }
 ```
+
+</tab>
+</tabs>
 
 データベースは `single` として宣言します。`RoomDatabase` のインスタンス生成はコストが高く、Room のドキュメントでもプロセスごとにデータベースにつき 1 つのインスタンスとすることが求められています。ここでの `Context` は起動時に `androidContext()` によって提供される `Application` です（[Android での Koin の起動](/docs/reference/koin-android/start) を参照）。DAO は軽量であり、Room は呼び出しごとに同じインスタンスを返すため、`single` と `factory` のどちらでも動作します。
 
@@ -200,7 +227,9 @@ Worker は専用の `WorkerFactory` を通じて依存関係を取得します�
 | ドメイン | ユースケース（状態を持たないもの） | `factory` |
 | UI | ViewModel | `viewModel` |
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 val dataModule = module {
     includes(networkModule, databaseModule, serializationModule)
@@ -218,7 +247,9 @@ val uiModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton
 class UserRemoteDataSource(private val api: ApiService)
@@ -244,7 +275,9 @@ class UserViewModel(
 ) : ViewModel()
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val dataModule = module {
     includes(networkModule, databaseModule, serializationModule)
@@ -261,6 +294,9 @@ val uiModule = module {
     viewModelOf(::UserViewModel)
 }
 ```
+
+</tab>
+</tabs>
 
 ViewModel はユースケースに依存し、ユースケースは `UserRepository` インターフェースに依存しており、`UserRepositoryImpl` の存在を知っているのはデータモジュールのみです。テスト時にデータソースを差し替えるには、`UserRepository` のバインディングをオーバーライドします（[単体テスト（Unit Testing）](/docs/reference/koin-test/testing) を参照）。各レイヤーが別個の Gradle モジュールに分割されている場合は、[マルチモジュールアプリ（Multi-Module Apps）](/docs/reference/koin-android/multi-module) を参照してください。
 

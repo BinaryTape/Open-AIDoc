@@ -77,7 +77,9 @@ startKoin {
 
 每一種樣式和 DSL 形式都會針對同一個圖進行檢查。它們可以共存於同一個專案中：DSL 定義可以相依於帶有註解的類別，反之亦然。
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 val appModule = module {
     single<Database>()
@@ -96,7 +98,9 @@ val appModule = module {
 }
 ```
 
-**註解（Annotations）**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton
 class Database
@@ -124,7 +128,9 @@ fun provideCache(db: Database): CacheService = RedisCache(db)    // 已檢查：
 
 標記為 `@Configuration` 的模組會跨 Gradle 模組與請求其標籤的 `@KoinApplication` 一起組裝並進行聯合檢查。
 
-**建構函式 / 傳統 DSL（Constructor / Classic DSL）**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 建構函式參照會如同 Compiler Plugin DSL 一樣受到檢查：
 
 ```kotlin
@@ -147,6 +153,9 @@ val appModule = module {
     single { UserRepository(get()) }  // 已檢查：get() 呼叫需要 Database
 }
 ```
+
+</tab>
+</tabs>
 
 :::warning
 自 Compiler Plugin 1.2.0 起，`singleOf`、`factoryOf`、`scopedOf` 和 `viewModelOf` 也會受到檢查。依賴這些函式中遺漏相依項的程式碼將無法再編譯。過往的組建隱藏了執行時期的當機問題。

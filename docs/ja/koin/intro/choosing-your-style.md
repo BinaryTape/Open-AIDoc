@@ -10,7 +10,9 @@ Koinには定義（definition）を宣言するための2つのスタイルが�
 
 同じモジュールを各スタイルで記述した例：
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.dsl.module
 import org.koin.plugin.module.dsl.*
@@ -24,7 +26,9 @@ val appModule = module {
 
 型名を指定するだけです。[Koin Compiler Plugin](/docs/intro/koin-compiler-plugin) がそのコンストラクタを読み取り、ワイヤリング（依存関係の解決コード）を生成します。
 
-**アノテーション**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton
 class ApiService
@@ -42,7 +46,9 @@ class AppModule
 
 各クラスにアノテーションを付与します。`@ComponentScan` がそれらをモジュールへとまとめ、Compiler Plugin がワイヤリングを生成します。インターフェースは自動的にバインドされます。
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 コンストラクタ参照を使用するConstructor DSL：
 
 ```kotlin
@@ -67,6 +73,9 @@ val appModule = module {
 ```
 
 どちらの形式もコンパイラプラグインなしで動作します。プラグインを適用すると、これらもビルド時にチェックされます。
+
+</tab>
+</tabs>
 
 ## 要件 {id="requirements"}
 

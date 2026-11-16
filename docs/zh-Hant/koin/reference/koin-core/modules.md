@@ -8,7 +8,9 @@ title: 模組
 
 ## 宣告模組 {id="declare-a-module"}
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.dsl.module
 import org.koin.plugin.module.dsl.*
@@ -24,7 +26,9 @@ val dataModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Module
 @ComponentScan("com.myapp.network")
@@ -37,7 +41,9 @@ class DataModule
 
 `@Module` 類別會收集由 `@ComponentScan` 找到的註解類別，以及在其中宣告的提供者函式（請參閱 [Classes you don't own](/docs/reference/koin-core/definitions#classes-you-dont-own)）。
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.dsl.module
 import org.koin.core.module.dsl.*
@@ -53,13 +59,18 @@ val dataModule = module {
 }
 ```
 
+</tab>
+</tabs>
+
 定義可以相依於另一個模組中的定義。Koin 會跨所有已載入的模組進行解析，因此 `dataModule` 中的 `UserRepository` 可以使用 `networkModule` 中的 `ApiClient`，而不需要在模組之間進行任何匯入。兩個模組都必須載入，請參閱 [Starting Koin](/docs/reference/koin-core/starting-koin)。
 
 ## 使用 `includes()` 組合模組 {id="module-composition-with-includes"}
 
 模組可以包含其他模組。載入父模組時會載入整個樹狀結構：
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 val networkModule = module {
     single<ApiClient>()
@@ -79,7 +90,9 @@ startKoin {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Module
 class NetworkModule
@@ -95,7 +108,9 @@ class DataModule
 class MyApp
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val networkModule = module {
     singleOf(::ApiClient)
@@ -114,6 +129,9 @@ startKoin {
     modules(dataModule)
 }
 ```
+
+</tab>
+</tabs>
 
 與其在 `startKoin` 中使用冗長的扁平清單，不如建議使用以單一根模組為基礎的 `includes()` 樹狀結構。這樣模組的結構就能遵循程式碼的結構，且啟動呼叫也能保持簡潔。
 
@@ -251,7 +269,9 @@ class MyApp // get<Feature>() 回傳 AppFeature
 
 將整個模組標記為在 Koin 啟動時建立其所有 `single` 定義：
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 val coreModule = module(createdAtStart = true) {
     single<ConfigManager>()
@@ -259,14 +279,18 @@ val coreModule = module(createdAtStart = true) {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Module(createdAtStart = true)
 @ComponentScan("com.myapp.core")
 class CoreModule
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val coreModule = module(createdAtStart = true) {
     singleOf(::ConfigManager)
@@ -274,13 +298,18 @@ val coreModule = module(createdAtStart = true) {
 }
 ```
 
+</tab>
+</tabs>
+
 每個 eager 定義都會增加啟動時間。有關各個定義的旗標及其開銷，請參閱 [Eager creation](/docs/reference/koin-core/definitions#eager-creation)。
 
 ## 參數化模組 {id="parameterized-modules"}
 
 DSL 模組是一個值，因此函式可以根據引數來建置它：
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 fun loggingModule(debug: Boolean) = module {
     if (debug) {
@@ -295,10 +324,14 @@ startKoin {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 `@Module` 類別不接受引數。在這種情況下，請使用 DSL 模組，或是透過 [設定標籤 (configuration labels)](/docs/reference/koin-core/starting-koin#configuration-labels) 為每個變體選擇對應的 `@Module`。
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 fun loggingModule(debug: Boolean) = module {
     single<Logger> {
@@ -310,6 +343,9 @@ startKoin {
     modules(loggingModule(debug = BuildConfig.DEBUG))
 }
 ```
+
+</tab>
+</tabs>
 
 相同的構想也可以用來替換實作：保持 `repositoryModule` 不變，並在旁邊載入 `localDatasourceModule` 或 `remoteDatasourceModule`（兩者各宣告一個 `Datasource`）。條件式模組清單是在執行階段解析的，因此 Compiler Plugin 無法在建置時期驗證每種組合。
 

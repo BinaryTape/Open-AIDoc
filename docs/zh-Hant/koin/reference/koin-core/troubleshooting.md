@@ -145,7 +145,9 @@ class AuthService(private val sessionManager: SessionManager)
 
 將其中一端設為延遲載入 (Lazy)，使其在初次使用時才進行解析，而非在建構過程中：
 
-**編譯器外掛程式 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 class AuthService(private val sessionManager: Lazy<SessionManager>)
 
@@ -155,7 +157,9 @@ val authModule = module {
 }
 ```
 
-**註解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton
 class SessionManager(private val authService: AuthService)
@@ -164,7 +168,9 @@ class SessionManager(private val authService: AuthService)
 class AuthService(private val sessionManager: Lazy<SessionManager>)
 ```
 
-**建構函式 / 經典 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 class AuthService(private val sessionManager: Lazy<SessionManager>)
 
@@ -173,6 +179,9 @@ val authModule = module {
     single { AuthService(inject()) }
 }
 ```
+
+</tab>
+</tabs>
 
 `AuthService` 絕不可在其建構函式或 `init` 區塊中讀取 `sessionManager.value`，否則循環仍會重現。
 

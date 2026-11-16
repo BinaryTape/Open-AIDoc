@@ -10,7 +10,9 @@ title: 在 Android 上啟動 Koin
 
 在 `Application.onCreate()` 中啟動一次 Koin：
 
-**編譯器外掛程式 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -32,7 +34,9 @@ class MainApplication : Application() {
 
 `appModule` 是一個使用編譯器外掛程式 DSL 所宣告的 `module { }`（如 `single<UserRepository>()`、`viewModel<UserViewModel>()`）。
 
-**註解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -55,7 +59,9 @@ class MainApplication : Application() {
 
 `startKoin<MainApplication>()` 會載入所有標記有 `@Configuration` 的 `@Module` 類別。您不需要自行列出模組。若要明確挑選模組，請使用 `@KoinApplication(modules = [AppModule::class])`。模組探索機制的詳細說明請參閱[模組](/docs/reference/koin-core/modules)。
 
-**建構函式 / 傳統 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -75,6 +81,9 @@ class MainApplication : Application() {
 }
 ```
 
+</tab>
+</tabs>
+
 請在 `AndroidManifest.xml` 的 `<application>` 標籤中透過 `android:name=".MainApplication"` 註冊該類別，否則 Android 永遠不會執行它。
 
 `androidContext()` 會將 `Application` 執行個體新增至 Koin，並同時繫結至 `Application` 與 `Context`。請在任何需要 `Context` 的選項之前呼叫它，例如 `androidFileProperties()` 或 `workManagerFactory()`。
@@ -83,7 +92,9 @@ class MainApplication : Application() {
 
 需要 `Context` 的類別可以直接在其建構函式中宣告它。不需要任何限定詞：Koin 會將 `Context` 解析為傳遞給 `androidContext()` 的執行個體。
 
-**編譯器外掛程式 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 class PreferencesStore(private val context: Context)
 class NotificationHelper(private val application: Application)
@@ -94,7 +105,9 @@ val androidModule = module {
 }
 ```
 
-**註解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton
 class PreferencesStore(private val context: Context)
@@ -103,7 +116,9 @@ class PreferencesStore(private val context: Context)
 class NotificationHelper(private val application: Application)
 ```
 
-**建構函式 / 傳統 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val androidModule = module {
     singleOf(::PreferencesStore)
@@ -112,6 +127,9 @@ val androidModule = module {
 ```
 
 在 Lambda 定義中，可以使用 `androidContext()` 和 `androidApplication()` 來讀取它們：`single { PreferencesStore(androidContext()) }`。
+
+</tab>
+</tabs>
 
 | 函式 | 傳回值 | 失敗情況 |
 |----------|---------|------------|
@@ -148,7 +166,9 @@ class MainActivity : AppCompatActivity() {
 
 當兩個定義共用同一型別時（例如兩個 `SharedPreferences` 檔案），可以使用[限定詞](/docs/reference/koin-core/qualifiers)來區分它們：
 
-**編譯器外掛程式 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 val preferencesModule = module {
     single(named("settings")) {
@@ -160,7 +180,9 @@ val preferencesModule = module {
 }
 ```
 
-**註解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Module
 class PreferencesModule {
@@ -177,7 +199,9 @@ class PreferencesModule {
 }
 ```
 
-**建構函式 / 傳統 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val preferencesModule = module {
     single(named("settings")) {
@@ -188,6 +212,9 @@ val preferencesModule = module {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 ## 記錄日誌 {id="logging"}
 
@@ -246,7 +273,9 @@ class PremiumActivity : AppCompatActivity() {
 
 [AndroidX App Startup](https://developer.android.com/topic/libraries/app-startup) 會在 `Application.onCreate()` 之前，從單一 ContentProvider 執行初始設定式。`io.insert-koin:koin-androidx-startup` 成品可將 Koin 作為其中一個初始設定式來啟動。請在您的 `Application` 中實作 `KoinStartup`，並從 `onKoinStartup()` 傳回設定：
 
-**編譯器外掛程式 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.androix.startup.KoinStartup
 import org.koin.dsl.koinConfiguration
@@ -261,7 +290,9 @@ class MainApplication : Application(), KoinStartup {
 }
 ```
 
-**註解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 import org.koin.androix.startup.KoinStartup
 import org.koin.plugin.module.dsl.koinConfiguration
@@ -276,7 +307,9 @@ class MainApplication : Application(), KoinStartup {
 }
 ```
 
-**建構函式 / 傳統 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.androix.startup.KoinStartup
 import org.koin.dsl.koinConfiguration
@@ -290,6 +323,9 @@ class MainApplication : Application(), KoinStartup {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 `KoinStartup` 取代了 `onCreate()` 中的 `startKoin` 呼叫：請勿同時呼叫兩者。套件名稱為 `org.koin.androix.startup`（此為正確拼法），且該 API 標記為 `@KoinExperimentalAPI`。
 

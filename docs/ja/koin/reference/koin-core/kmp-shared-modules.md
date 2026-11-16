@@ -32,7 +32,9 @@ val appModule = module {
 
 `commonMain` で `expect` を使ってモジュールを宣言し、プラットフォームごとに1つの `actual` を記述します。各プラットフォームモジュールはそれぞれのクラスを宣言します。
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 // commonMain
 interface PlatformComponent {
@@ -64,7 +66,9 @@ actual fun platformModule(): Module = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 // commonMain
 interface PlatformComponent {
@@ -101,7 +105,9 @@ class IOSComponent : PlatformComponent {
 
 各 `actual` モジュールは自身のソースセットをスキャンするため、そのプラットフォームのクラスのみを検出します。`@Singleton` はクラスをそのスーパータイプにバインドするため、`PlatformComponent` はプラットフォームのクラスへと解決されます。共通モジュールから `PlatformModule` を含めるには、`@Module(includes = [PlatformModule::class])` を使用します。
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 // commonMain
 interface PlatformComponent {
@@ -124,6 +130,9 @@ actual fun platformModule(): Module = module {
     singleOf(::IOSComponent) bind PlatformComponent::class
 }
 ```
+
+</tab>
+</tabs>
 
 プラットフォームの実装で異なるコンストラクタパラメータが必要な場合は、このパターンを使用します。共通コードは `PlatformComponent` インターフェースにのみ依存し、各プラットフォームは必要なもの（ここではAndroidの `Context`）を自由に注入できます。Androidでは、起動時に `androidContext()` が設定されると `Context` が解決されます（[KMP Setup](/docs/reference/koin-core/kmp-setup) を参照）。
 
@@ -151,7 +160,9 @@ actual fun platformModule(): Module = module {
 
 すべてのプラットフォームでクラスが同じコンストラクタを持つ場合は、共通コードで一度宣言し、各プラットフォームでそれを実装させます。
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 // commonMain
 expect class NativeComponent() {
@@ -175,7 +186,9 @@ actual class NativeComponent actual constructor() {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 // commonMain
 @Module
@@ -213,7 +226,9 @@ class NativeModule {
 }
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 // commonMain
 expect class NativeComponent() {
@@ -227,13 +242,18 @@ val nativeComponentModule = module {
 
 `actual` クラスは他のタブと同様です。
 
+</tab>
+</tabs>
+
 `expect` クラスは、すべてのプラットフォームに対して単一のコンストラクタ規約を持ちます。あるプラットフォームで別の依存関係（例えばAndroidの `Context`）が必要な場合、そのプラットフォームにのみ追加することはできません。代わりに、インターフェースを使用した[プラットフォームモジュール](#platform-module)パターン、またはプラットフォームラッパー（[KMP Platform Integration](/docs/reference/koin-mp/kmp) を参照）を使用してください。
 
 ## 単一プラットフォームのみのコンポーネント {id="components-on-one-platform-only"}
 
 プラットフォームモジュールは、特定のプラットフォームにのみ存在し、他の場所には存在しないクラスを宣言できます。他のプラットフォームは空のモジュールのままにしておきます。
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 // androidMain
 actual fun platformModule(): Module = module {
@@ -244,7 +264,9 @@ actual fun platformModule(): Module = module {
 actual fun platformModule(): Module = module { }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 // androidMain
 @Module
@@ -256,7 +278,9 @@ actual class PlatformModule
 actual class PlatformModule
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 // androidMain
 actual fun platformModule(): Module = module {
@@ -266,6 +290,9 @@ actual fun platformModule(): Module = module {
 // iosMain
 actual fun platformModule(): Module = module { }
 ```
+
+</tab>
+</tabs>
 
 これにより、Androidのコードのみが `NotificationHelper` を使用できるようになります。このクラスは `commonMain` に存在しないため、共通コードから参照することはできません。
 

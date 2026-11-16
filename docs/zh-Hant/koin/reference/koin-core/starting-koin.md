@@ -10,7 +10,9 @@ title: 啟動 Koin
 
 ## 啟動 Koin {id="start-koin"}
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.core.context.startKoin
 
@@ -22,7 +24,9 @@ fun main() {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 import org.koin.plugin.module.dsl.startKoin
 
@@ -38,7 +42,9 @@ fun main() {
 
 Koin 編譯器外掛程式會將 `startKoin<MyApp>()` 替換為 `startKoin { }` 呼叫，該呼叫會載入 `@KoinApplication` 中列出的模組，以及其探索到的 `@Configuration` 模組。請參閱[使用 @KoinApplication 的型別化啟動](#typed-startup-with-koinapplication)。
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.core.context.startKoin
 
@@ -49,6 +55,9 @@ fun main() {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 `startKoin` 會建立容器並將其註冊在 `GlobalContext`（您行程的預設上下文）中。一旦它回傳，每個 `get()`、`by inject()` 或平台 API（`by viewModel()`、`koinInject()`）都會從這個容器中解析。
 
@@ -308,7 +317,9 @@ val token: String? = koin.getProperty("session_token")
 
 ### 注入屬性 {id="injecting-properties"}
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 在建構函式參數上加上 `@Property` 註解（來自 `koin-annotations`）：
 
 ```kotlin
@@ -319,7 +330,9 @@ val networkModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton
 class ApiClient(@Property("server_url") val url: String)
@@ -334,7 +347,9 @@ val defaultServerUrl = "https://api.example.com"
 
 產生的程式碼會讀取 `getProperty("server_url", defaultServerUrl)`，因此在未設定該屬性時，`ApiClient` 會取得預設值。
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val networkModule = module {
     single { ApiClient(url = getProperty("server_url")) }
@@ -345,6 +360,9 @@ val networkModule = module {
 ```
 
 如果屬性不存在，`getProperty(key)` 會擲出例外狀況。而 `getPropertyOrNull(key)` 則會改為傳回 `null`。
+
+</tab>
+</tabs>
 
 建議在單一配置類別中讀取屬性並注入該類別，而不是在多個地方呼叫 `getProperty`。這樣一來，金鑰便能集中在同一個檔案中。
 

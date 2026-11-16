@@ -12,7 +12,9 @@ title: KMP 平台集成
 
 共享代码无法使用 `android.content.Context`，但在 Android 上某些共享类又需要它（用于打开文件、读取偏好设置）。可以将其封装在一个公共代码可依赖的平台类型中：
 
-**编译器插件 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 // commonMain
 interface ContextWrapper {
@@ -48,7 +50,9 @@ actual fun platformModule(): Module = module {
 }
 ```
 
-**注解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 // commonMain
 interface ContextWrapper {
@@ -77,7 +81,9 @@ class IOSContextWrapper : ContextWrapper {
 
 平台类由带有 `@ComponentScan` 的 `actual` 平台模块查找（参见 [KMP 共享模式](/docs/reference/koin-core/kmp-shared-modules)）。
 
-**构造函数 / 经典 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 // commonMain
 interface ContextWrapper {
@@ -102,6 +108,9 @@ actual fun platformModule(): Module = module {
     singleOf(::IOSContextWrapper) bind ContextWrapper::class
 }
 ```
+
+</tab>
+</tabs>
 
 `FileStore` 在 `commonMain` 中编译一次并接收平台包装器。仅有一个 Android 定义会涉及 `Context`，并且它在启动时设置了 `androidContext()` 后即可解析。请将特定于 Android 的操作置于 `ContextWrapper` 的方法之后，而不是在公共代码中检查平台类型。
 

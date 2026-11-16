@@ -20,7 +20,9 @@ title: 定義
 
 宣告方式：
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.dsl.module
 import org.koin.plugin.module.dsl.*
@@ -33,7 +35,9 @@ val appModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton
 class Database
@@ -50,7 +54,9 @@ class UserViewModel(private val repository: UserRepository) : ViewModel()
 
 `@Singleton` 與 `@Single` 是等價的。建議優先使用 JSR-330 名稱 `@Singleton`。
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.dsl.module
 import org.koin.core.module.dsl.*
@@ -74,6 +80,9 @@ val appModule = module {
 }
 ```
 
+</tab>
+</tabs>
+
 使用 Compiler Plugin DSL 與註解時，你完全不需要撰寫 `get()`。[Koin 編譯器外掛程式](/docs/intro/koin-compiler-plugin)會讀取建構函式並為你產生呼叫，隨後在建置階段檢查是否已宣告每個相依性。
 
 `single` 與 `factory` 如上所述。`scoped` 需要宣告作用域：請參閱[作用域](/docs/reference/koin-core/scopes)。`viewModel` 有其專屬頁面：請參閱 [ViewModel](/docs/reference/koin-core/viewmodel)。`worker` 則在 [WorkManager](/docs/reference/koin-android/workmanager) 中介紹。
@@ -86,7 +95,9 @@ val appModule = module {
 
 多數情況下，取用端相依於介面，而非實作。將實作繫結至介面：
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 val dataModule = module {
     single<UserRepositoryImpl>() bind UserRepository::class
@@ -96,7 +107,9 @@ val dataModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton
 class UserRepositoryImpl(private val database: Database) : UserRepository
@@ -109,7 +122,9 @@ class UserRepositoryImpl(private val database: Database) : UserRepository
 class UserRepositoryImpl(private val database: Database) : UserRepository, Closeable
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val dataModule = module {
     singleOf(::UserRepositoryImpl) bind UserRepository::class
@@ -118,6 +133,9 @@ val dataModule = module {
     single<UserRepository> { UserRepositoryImpl(get()) }
 }
 ```
+
+</tab>
+</tabs>
 
 取用端隨後請求 `UserRepository`，即可取得 `UserRepositoryImpl` 的執行個體。當有兩個定義繫結至同一個型別時，你需要一個[限定詞](/docs/reference/koin-core/qualifiers)來區分它們。
 
@@ -137,7 +155,9 @@ Koin 會從容器中解析每個建構函式參數。參數型別決定了解析
 
 使用 Compiler Plugin DSL 與註解時，僅需根據建構函式簽章即可運作：
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 class SyncService(
     private val repository: UserRepository,
@@ -150,7 +170,9 @@ val appModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton
 class SyncService(
@@ -160,7 +182,9 @@ class SyncService(
 )
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 `singleOf(::SyncService)` 會透過 `get()` 解析每個參數。對於可為 null、lazy 或清單 (list) 參數，請使用相符的函式自行撰寫呼叫：
 
 ```kotlin
@@ -177,11 +201,16 @@ val appModule = module {
 
 `getAll()` 會傳回 `List`，`getProperty("key")` 會讀取屬性，而 `params.get()` 則會讀取注入的參數。
 
+</tab>
+</tabs>
+
 ## 非自有的類別 {id="classes-you-don-t-own"}
 
 來自程式庫（Room、Retrofit、OkHttp）的類別無法加上註解，且通常由 builder 建立。請使用由 Koin 解析其參數的函式來宣告它們：
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.plugin.module.dsl.create
 
@@ -198,7 +227,9 @@ val databaseModule = module {
 
 `create(::function)` 會像建構函式一樣解析函式參數，並享有相同的編譯期檢查。函式及其參數上的限定詞註解也能正常運作。
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 為頂層函式加上註解。`@ComponentScan` 會像尋找類別一樣找到它：
 
 ```kotlin
@@ -225,7 +256,9 @@ class DatabaseModule {
 }
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val databaseModule = module {
     single {
@@ -235,13 +268,18 @@ val databaseModule = module {
 }
 ```
 
+</tab>
+</tabs>
+
 有關在 Android 上完整的 Retrofit、Room 與序列化設定，請參閱 [Android 程式庫整合](/docs/reference/koin-android/binding-patterns)。
 
 ## 預先建立 {id="eager-creation"}
 
 Koin 會在首次有人請求時建立 `single`。若要改為在 Koin 啟動時建立它，請將其標記為 `createdAtStart`：
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 val appModule = module {
     single<ConfigManager>() withOptions {
@@ -250,18 +288,25 @@ val appModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton(createdAtStart = true)
 class ConfigManager
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val appModule = module {
     single(createdAtStart = true) { ConfigManager() }
 }
 ```
+
+</tab>
+</tabs>
 
 預先建立會在啟動 Koin 的執行緒上執行。在 Android 上，這是在 `Application.onCreate()` 期間的主執行緒，因此每個預先建立的定義都會增加應用程式啟動時間。請僅將其保留給在第一個畫面出現前必須存在的物件。若要將工作移出啟動階段，請參閱 [Lazy 模組](/docs/reference/koin-core/lazy-modules)。
 
@@ -269,22 +314,31 @@ val appModule = module {
 
 `onClose` 會在執行個體被釋放時執行：對於 `single` 是在 Koin 停止時，對於 `scoped` 則是在其作用域關閉時。
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 val appModule = module {
     single<Database>() onClose { it?.close() }
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 註解沒有 `onClose` 參數。請在 DSL 模組中宣告此定義。
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val appModule = module {
     single { Database() } onClose { it?.close() }
 }
 ```
+
+</tab>
+</tabs>
 
 `factory` 永遠不會呼叫 `onClose`：因為 Koin 不會保留 factory 執行個體。
 

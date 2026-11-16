@@ -19,7 +19,9 @@ implementation("io.insert-koin:koin-core-coroutines")
 
 `lazyModule` は `module` と同様の内容を受け取ります。Koinが読み込むまで、何も作成または割り当てられません。
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.dsl.lazyModule
 import org.koin.plugin.module.dsl.*
@@ -30,10 +32,14 @@ val analyticsModule = lazyModule {
 }
 ```
 
-**アノテーション**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 アノテーションモジュール（`@Module`）は起動時に読み込まれ、遅延（lazy）として宣言することはできません。一部の定義をバックグラウンドで読み込むには、いずれかのDSL形式（Compiler Plugin、Constructor、またはClassic DSL）を使用して `lazyModule` 内で宣言してください。
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.dsl.lazyModule
 import org.koin.core.module.dsl.*
@@ -43,6 +49,9 @@ val analyticsModule = lazyModule {
     singleOf(::EventTracker)
 }
 ```
+
+</tab>
+</tabs>
 
 Lazyモジュールには、他のLazyモジュールを含めることができます。
 

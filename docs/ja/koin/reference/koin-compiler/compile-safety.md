@@ -77,7 +77,9 @@ startKoin {
 
 あらゆるスタイルやDSL形式が同じグラフに対してチェックされます。これらは1つのプロジェクト内に混在させることができます。DSL定義がアノテーション付きクラスに依存することも、その逆も可能です。
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 val appModule = module {
     single<Database>()
@@ -96,7 +98,9 @@ val appModule = module {
 }
 ```
 
-**アノテーション**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton
 class Database
@@ -124,7 +128,9 @@ fun provideCache(db: Database): CacheService = RedisCache(db)    // チェック
 
 `@Configuration` でタグ付けされたモジュールは、Gradleモジュールをまたいでそのラベルを要求する `@KoinApplication` と共に組み立てられ、一括してチェックされます。
 
-**コンストラクタ / クラシックDSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 コンストラクタ参照は、Compiler Plugin DSLと同様にチェックされます。
 
 ```kotlin
@@ -147,6 +153,9 @@ val appModule = module {
     single { UserRepository(get()) }  // チェック対象: get() の呼び出しに Database が必要
 }
 ```
+
+</tab>
+</tabs>
 
 :::warning
 Compiler Plugin 1.2.0以降、`singleOf`、`factoryOf`、`scopedOf`、`viewModelOf` がチェックされるようになりました。これらの関数で依存関係が不足していたコードはコンパイルできなくなります。以前のビルドでは実行時クラッシュが隠蔽されていました。

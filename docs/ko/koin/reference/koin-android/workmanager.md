@@ -78,7 +78,9 @@ class SyncWorker(
 
 Worker로 선언합니다:
 
-**컴파일러 플러그인 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.plugin.module.dsl.worker
 
@@ -88,7 +90,9 @@ val workModule = module {
 }
 ```
 
-**어노테이션**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 import org.koin.android.annotation.KoinWorker
 
@@ -102,7 +106,9 @@ class SyncWorker(
 }
 ```
 
-**생성자 / 클래식 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.androidx.workmanager.dsl.worker
 import org.koin.androidx.workmanager.dsl.workerOf
@@ -117,6 +123,9 @@ val workModule = module {
 ```
 
 `WorkerParameters`는 유일하게 주입되는 매개변수입니다. `params.get()` 또는 `get()`으로 읽어오고, `Context`는 `androidContext()`로 가져옵니다.
+
+</tab>
+</tabs>
 
 worker 정의는 Worker 클래스의 이름을 따르고 `ListenableWorker`에 바인딩된 `factory`입니다. WorkManager가 Worker 클래스를 요청하면 Koin 팩토리가 해당 이름을 조회합니다. 일치하는 정의가 없으면 Koin은 `null`을 반환하고 WorkManager는 기본 팩토리로 대체(fallback)하여 동작합니다.
 

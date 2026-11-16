@@ -10,7 +10,9 @@ Koin 提供了两种声明定义（definition）的风格，两者填充的是�
 
 以下是使用每种风格编写的同一个模块：
 
-**编译器插件 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.dsl.module
 import org.koin.plugin.module.dsl.*
@@ -24,7 +26,9 @@ val appModule = module {
 
 你只需指定类型。[Koin 编译器插件](/docs/intro/koin-compiler-plugin)会读取其构造函数并生成装配代码。
 
-**注解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton
 class ApiService
@@ -42,7 +46,9 @@ class AppModule
 
 你只需为每个类添加注解。`@ComponentScan` 会将它们收集到一个模块中，然后编译器插件生成装配代码。接口会自动进行绑定。
 
-**构造函数 / 传统 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 构造函数 DSL，使用构造函数引用：
 
 ```kotlin
@@ -67,6 +73,9 @@ val appModule = module {
 ```
 
 这两种形式均可在没有编译器插件的情况下工作。当应用了该插件后，它们在构建期同样会接受检查。
+
+</tab>
+</tabs>
 
 ## 要求 {id="requirements"}
 

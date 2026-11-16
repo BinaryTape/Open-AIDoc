@@ -12,7 +12,9 @@ title: 高级 Android 模式
 
 在 provider 函数中选择实现：
 
-**编译器插件 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.plugin.module.dsl.create
 
@@ -24,7 +26,9 @@ val analyticsModule = module {
 }
 ```
 
-**注解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Module
 class AnalyticsModule {
@@ -35,7 +39,9 @@ class AnalyticsModule {
 }
 ```
 
-**构造函数 / 经典 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val analyticsModule = module {
     single<Analytics> {
@@ -43,6 +49,9 @@ val analyticsModule = module {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 `ENABLE_ANALYTICS` 是按构建类型或 flavor 设置的 `buildConfigField`。`BuildConfig.DEBUG` 的工作方式与之相同。两种实现都会编译到每个变体中；但只会创建其中一个。
 
@@ -80,7 +89,9 @@ startKoin {
 
 某些帮助程序需要的是当前的 Activity，而不是 Application：例如对话框、权限请求，以及任何使用 Activity 主题的组件。使用 Application 上下文构建的 `AlertDialog` 在显示时会失败。请在 Activity 作用域中声明这些帮助程序，在该作用域内 `Context` 会解析为 Activity：
 
-**编译器插件 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 class DialogProvider(private val context: Context) {
 
@@ -98,7 +109,9 @@ val uiModule = module {
 }
 ```
 
-**注解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @ActivityScope
 class DialogProvider(private val context: Context) {
@@ -111,7 +124,9 @@ class DialogProvider(private val context: Context) {
 }
 ```
 
-**构造函数 / 经典 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val uiModule = module {
     activityScope {
@@ -119,6 +134,9 @@ val uiModule = module {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 ```kotlin
 class SettingsActivity : ScopeActivity() {

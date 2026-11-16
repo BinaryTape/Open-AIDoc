@@ -13,6 +13,7 @@
  *   A definition tells Koin how to create one type...
  */
 import { slugify } from "@mdit-vue/shared";
+import { applyKoinTabs, hasTabLabels, officialTabSets } from "./koin-tabs.mjs";
 
 export const KOIN_SITE = "https://insert-koin.io";
 const DOCS_URL = `${KOIN_SITE}/docs/`;
@@ -162,10 +163,11 @@ async function fetchText(fetchImpl, url) {
 /**
  * The Koin docs, as files of the clone: every page under docs/, and llms.txt
  * (the sidebar). Throws when the export cannot be read or has too few pages.
- * @param {{fetchImpl?: typeof fetch}} [options]
+ * Pages with code tabs get them back from the site's pages (koin-tabs.mjs).
+ * @param {{fetchImpl?: typeof fetch, retryDelayMs?: number}} [options]
  * @returns {Promise<Record<string, string>>}
  */
-export async function fetchKoinSnapshot({ fetchImpl = globalThis.fetch } = {}) {
+export async function fetchKoinSnapshot({ fetchImpl = globalThis.fetch, retryDelayMs = 2000 } = {}) {
   const [full, index] = await Promise.all([
     fetchText(fetchImpl, `${KOIN_SITE}/llms-full.txt`),
     fetchText(fetchImpl, `${KOIN_SITE}/llms.txt`),
@@ -178,9 +180,57 @@ export async function fetchKoinSnapshot({ fetchImpl = globalThis.fetch } = {}) {
   if (duplicates.length > 0) throw new Error(`${KOIN_SITE}/llms-full.txt lists pages twice: ${duplicates.join(", ")}`);
 
   const files = pageFiles(pages.map((page) => page.url));
+  const bodies = await mapLimit(pages, PAGE_CONCURRENCY, (page) => withTabs(page, fetchImpl, retryDelayMs));
   const snapshot = { "llms.txt": index };
-  for (const page of pages) snapshot[files.get(page.url)] = toMarkdown(page.title, page.body);
+  pages.forEach((page, i) => { snapshot[files.get(page.url)] = toMarkdown(page.title, bodies[i]); });
   return snapshot;
+}
+
+// Pages of the site read at a time, and attempts at each
+const PAGE_CONCURRENCY = 6;
+const PAGE_ATTEMPTS = 3;
+
+async function mapLimit(items, limit, fn) {
+  const results = new Array(items.length);
+  let next = 0;
+  const worker = async () => {
+    while (next < items.length) {
+      const index = next++;
+      results[index] = await fn(items[index]);
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(limit, items.length) }, worker));
+  return results;
+}
+
+/** A page of the site, tried again after a network error or a server error. */
+async function fetchPage(fetchImpl, url, retryDelayMs) {
+  for (let attempt = 1; ; attempt++) {
+    let response;
+    try {
+      response = await fetchImpl(url, { signal: AbortSignal.timeout(60000) });
+    } catch (error) {
+      if (attempt >= PAGE_ATTEMPTS) throw new Error(`${url}: ${error.message}`, { cause: error });
+    }
+    if (response?.ok) return response.text();
+    if (response && (response.status < 500 || attempt >= PAGE_ATTEMPTS)) throw new Error(`${url}: HTTP ${response.status}`);
+    await new Promise((resolve) => setTimeout(resolve, retryDelayMs * attempt));
+  }
+}
+
+/**
+ * The page's body with its code tabs put back (koin-tabs.mjs), read from the
+ * page on the site. Throws when the page cannot be read: the snapshot would
+ * otherwise flatten the tabs of pages already translated with them, and they
+ * would all be translated again. A page whose tabs do not match the site's is
+ * left flattened, with a warning: its content is complete either way.
+ */
+async function withTabs(page, fetchImpl, retryDelayMs) {
+  if (!hasTabLabels(page.body)) return page.body;
+  const html = await fetchPage(fetchImpl, `${DOCS_URL}${page.url}`, retryDelayMs);
+  const result = applyKoinTabs(page.body, officialTabSets(html));
+  if (result.problem) console.warn(`  ⚠️  Koin ${page.url}: code tabs left flattened, ${result.problem}`);
+  return result.markdown;
 }
 
 /**

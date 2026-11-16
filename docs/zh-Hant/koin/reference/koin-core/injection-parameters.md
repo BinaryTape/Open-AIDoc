@@ -10,7 +10,9 @@ title: 注入參數
 
 標記哪些建構函式參數來自呼叫端。其他參數則一如往常從容器中解析：
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.core.annotation.InjectedParam
 
@@ -27,7 +29,9 @@ val appModule = module {
 
 `@InjectedParam` 來自 `koin-annotations` 構件。它會告訴編譯器外掛程式 `userId` 不是一個定義，因此建置期檢查不會將其回報為遺失。
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Factory
 class UserPresenter(
@@ -38,7 +42,9 @@ class UserPresenter(
 
 `@InjectedParam` 也適用於提供者函式的參數。
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 定義的 Lambda 運算式會以 `params` 接收這些參數：
 
 ```kotlin
@@ -47,6 +53,9 @@ val appModule = module {
     factory { params -> UserPresenter(userId = params.get(), repository = get()) }
 }
 ```
+
+</tab>
+</tabs>
 
 呼叫端使用 `parametersOf()` 傳遞值，其順序與參數相同：
 
@@ -67,7 +76,9 @@ val presenter: UserPresenter by inject { parametersOf("user-42") }
 
 ## 多個參數 {id="several-parameters"}
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 class OrderPresenter(
     @InjectedParam val userId: String,
@@ -80,7 +91,9 @@ val appModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Factory
 class OrderPresenter(
@@ -90,7 +103,9 @@ class OrderPresenter(
 )
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 在 Lambda 運算式中解構參數：
 
 ```kotlin
@@ -110,6 +125,9 @@ val appModule = module {
 ```
 
 解構最多限制為五個值，且宣告的型別不會與呼叫端傳遞的內容進行比對檢查。如果順序錯誤，在執行階段的轉換將會失敗。
+
+</tab>
+</tabs>
 
 ```kotlin
 val presenter: OrderPresenter = get { parametersOf("user-42", 1001L) }

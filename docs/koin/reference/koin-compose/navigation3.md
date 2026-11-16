@@ -152,7 +152,9 @@ NavDisplay(
 
 将路由或其字段作为形参传递：
 
-**编译器插件 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 class DetailViewModel(
     @InjectedParam val route: DetailRoute,
@@ -168,7 +170,9 @@ val detailModule = module {
 }
 ```
 
-**注解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @KoinViewModel
 class DetailViewModel(
@@ -184,7 +188,9 @@ val detailModule = module {
 }
 ```
 
-**构造函数 / 经典 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 class DetailViewModel(
     val route: DetailRoute,
@@ -199,6 +205,9 @@ val detailModule = module {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 ## 条目元数据 {id="entry-metadata"}
 

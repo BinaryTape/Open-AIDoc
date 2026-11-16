@@ -19,7 +19,9 @@ implementation("io.insert-koin:koin-core-viewmodel")
 
 ## ViewModel 선언하기 {id="declaring-a-viewmodel"}
 
-**컴파일러 플러그인 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.dsl.module
 import org.koin.plugin.module.dsl.viewModel
@@ -31,7 +33,9 @@ val appModule = module {
 }
 ```
 
-**어노테이션**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 import org.koin.core.annotation.KoinViewModel
 
@@ -41,7 +45,9 @@ class UserViewModel(private val repository: UserRepository) : ViewModel()
 
 컴파일러 플러그인을 사용하면 `@KoinViewModel`은 `org.koin.core.annotation`에 위치하며 공통(common) 코드에서 동작합니다. 이전 KSP 프로세서는 `org.koin.android.annotation.KoinViewModel`을 사용했습니다.
 
-**생성자 / 클래식 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.dsl.module
 import org.koin.core.module.dsl.viewModelOf
@@ -55,13 +61,18 @@ val appModule = module {
 }
 ```
 
+</tab>
+</tabs>
+
 `viewModel` 정의는 `factory`와 마찬가지로 요청 시마다 새 인스턴스를 생성합니다. 플랫폼의 `ViewModelStore`(Activity, Fragment, 네비게이션 엔트리)가 이 인스턴스를 보관하므로, 동일한 소유자(owner)는 Android의 구성 변경(configuration change) 전반에서 동일한 ViewModel을 다시 받게 됩니다. ViewModel을 `single`로 선언하지 마세요. 모든 화면에서 공유되며 절대 정리(clear)되지 않습니다.
 
 ## 파라미터 전달하기 {id="passing-parameters"}
 
 ViewModel은 종종 항목 ID(item id)와 같이 런타임에만 알 수 있는 값을 필요로 합니다. 이때는 생성자 파라미터에 주입된 파라미터(injected parameter) 표시를 합니다:
 
-**컴파일러 플러그인 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 class DetailViewModel(
     @InjectedParam val itemId: String,
@@ -73,7 +84,9 @@ val appModule = module {
 }
 ```
 
-**어노테이션**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @KoinViewModel
 class DetailViewModel(
@@ -82,7 +95,9 @@ class DetailViewModel(
 ) : ViewModel()
 ```
 
-**생성자 / 클래식 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val appModule = module {
     viewModel { params ->
@@ -92,6 +107,9 @@ val appModule = module {
 ```
 
 `viewModelOf(::DetailViewModel)`도 동작합니다. 호출자가 전달한 값에서 타입별로 파라미터를 읽어옵니다.
+
+</tab>
+</tabs>
 
 선언 방식과 관계없이, 호출자는 `parametersOf`를 사용하여 값을 전달합니다:
 
@@ -109,7 +127,9 @@ val viewModel = koinViewModel<DetailViewModel> { parametersOf("item_123") }
 
 생성자에 `SavedStateHandle` 파라미터를 추가하세요. Koin은 별도의 선언 없이 ViewModel의 `CreationExtras`로부터 이를 생성합니다:
 
-**컴파일러 플러그인 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 class ProfileViewModel(
     private val handle: SavedStateHandle,
@@ -123,7 +143,9 @@ val appModule = module {
 }
 ```
 
-**어노테이션**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @KoinViewModel
 class ProfileViewModel(
@@ -134,7 +156,9 @@ class ProfileViewModel(
 }
 ```
 
-**생성자 / 클래식 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val appModule = module {
     viewModelOf(::ProfileViewModel)
@@ -144,13 +168,18 @@ val appModule = module {
 }
 ```
 
+</tab>
+</tabs>
+
 Android에서는 네비게이션 인수(navigation arguments)와 Activity extras가 `SavedStateHandle`에 포함됩니다. 반드시 생성자에서만 주입하세요. ViewModel 소유자에게 `SavedStateRegistryOwner`가 없으면 Koin은 "Koin could not create a SavedStateHandle: the ViewModel's CreationExtras has no SavedStateRegistryOwner." 오류와 함께 실패합니다.
 
 ## ViewModel 스코프 {id="viewmodel-scope"}
 
 ViewModel은 [스코프(scope)](/docs/reference/koin-core/scopes)를 소유할 수 있습니다. 스코프 내의 의존성은 ViewModel과 함께 생성되고, ViewModel이 정리(cleared)될 때 해제됩니다. `viewModelScope` 아키타입(archetype)을 사용하여 선언하세요:
 
-**컴파일러 플러그인 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 val appModule = module {
     viewModelScope {
@@ -160,7 +189,9 @@ val appModule = module {
 }
 ```
 
-**어노테이션**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @ViewModelScope
 class UserCache
@@ -170,7 +201,9 @@ class UserCache
 class UserViewModel(private val cache: UserCache) : ViewModel()
 ```
 
-**생성자 / 클래식 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val appModule = module {
     viewModelScope {
@@ -179,6 +212,9 @@ val appModule = module {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 시작 시 해당 옵션을 활성화해야 합니다. 그렇지 않으면 ViewModel에 스코프가 할당되지 않습니다:
 

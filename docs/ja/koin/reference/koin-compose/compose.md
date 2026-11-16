@@ -65,7 +65,9 @@ Compose の外部のコード（`Service`、`WorkManager` の Worker、iOS の S
 
 `KoinApplication` はルートの Composable から Koin を開始し、すべての子コンポーネントに提供します：
 
-**コンパイラプラグイン DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.compose.KoinApplication
 import org.koin.dsl.koinConfiguration
@@ -80,7 +82,9 @@ fun App() {
 }
 ```
 
-**アノテーション**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 // di/Koin.kt
 import org.koin.core.annotation.KoinApplication
@@ -106,7 +110,9 @@ fun App() {
 
 `koinConfiguration<KoinApp>()` は `@KoinApplication` クラスのモジュールを読み込みます。オプションを追加するにはラムダを渡します: `koinConfiguration<KoinApp> { printLogger() }`。
 
-**コンストラクタ / クラシック DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.compose.KoinApplication
 import org.koin.dsl.koinConfiguration
@@ -120,6 +126,9 @@ fun App() {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 `KoinApplication` が自動的に行う処理：
 

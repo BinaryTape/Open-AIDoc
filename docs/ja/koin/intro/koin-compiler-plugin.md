@@ -10,7 +10,9 @@ Koin Compiler Pluginは、Kotlinコンパイラ（K2）の内部で動作するK
 
 開発者が型を記述すると、プラグインがコンストラクタ呼び出しを記述します。
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 class UserRepository(private val api: ApiService, private val cache: UserCache)
 
@@ -19,13 +21,17 @@ val appModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton
 class UserRepository(private val api: ApiService, private val cache: UserCache)
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 Classic DSLにはプラグインは不要です。ワイヤリングは開発者自身が記述します。Constructor DSL（`singleOf(::T)`）にもプラグインは不要です。
 
 ```kotlin
@@ -35,6 +41,9 @@ val appModule = module {
 ```
 
 プラグインが適用されている場合でも、これらの `get()` 呼び出しや `singleOf(::T)` 定義はビルド時に検証されます。
+
+</tab>
+</tabs>
 
 コンパイル中、プラグインは `single<UserRepository>()`（または `@Singleton` クラス）を以下と同等のコードに置き換えます。
 

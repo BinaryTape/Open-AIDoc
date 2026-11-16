@@ -66,7 +66,9 @@ NavHost(navController, startDestination = HomeRoute) {
 
 ## モジュールの記述スタイル {id="module-styles"}
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 val checkoutModule = module {
     factory<CheckoutRepository>()
@@ -74,16 +76,23 @@ val checkoutModule = module {
 }
 ```
 
-**アノテーション**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 `rememberKoinModules` は `Module` の値を受け取ります。アノテーションが付与された `@Module` クラスは、`@KoinApplication` 経由で起動時に読み込まれます（[モジュール](/docs/reference/koin-core/modules)を参照）。機能をオンデマンドで読み込むには、DSL を使用してモジュールを宣言してください。
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val checkoutModule = module {
     factoryOf(::CheckoutRepository)
     viewModelOf(::CheckoutViewModel)
 }
 ```
+
+</tab>
+</tabs>
 
 ## 制限事項 {id="limits"}
 

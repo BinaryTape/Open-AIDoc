@@ -16,7 +16,9 @@ title: 컨텍스트 격리
 
 `koinApplication`은 컨테이너를 전역적으로 등록하지 않고 `startKoin`과 동일한 DSL을 사용하여 컨테이너를 빌드합니다. 이를 SDK의 `object` 내에 보관하세요:
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.dsl.koinApplication
 import org.koin.dsl.module
@@ -35,7 +37,9 @@ internal object SdkKoinContext {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 import org.koin.plugin.module.dsl.koinApplication
 
@@ -54,7 +58,9 @@ internal object SdkKoinContext {
 
 `koinApplication<T>()`는 `startKoin<T>()`와 마찬가지로 `@KoinApplication` 클래스의 모듈을 로드하지만, 컨테이너를 전역적으로 등록하지는 않습니다. SDK 컨테이너가 호스트 앱의 `@Configuration` 모듈을 가져오지 않도록 SDK 모듈을 명시적으로 나열하세요.
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.dsl.koinApplication
 import org.koin.dsl.module
@@ -72,6 +78,9 @@ internal object SdkKoinContext {
     val koin = koinApp.koin
 }
 ```
+
+</tab>
+</tabs>
 
 이 `object`는 처음 접근할 때 컨테이너를 생성합니다. 컨테이너의 시작과 중지 시점을 제어하려면(SDK API의 `init()` 및 `shutdown()`), 함수 내에서 컨테이너를 생성하고 종료 시 `koinApp.close()`를 호출하세요.
 

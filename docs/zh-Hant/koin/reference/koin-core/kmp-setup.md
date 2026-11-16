@@ -81,7 +81,9 @@ iosApp/       // Swift App 呼叫 initKoin()
 
 在 `commonMain` 中撰寫一個啟動 Koin 的函式。各平台呼叫該函式，並可透過 `config` 參數新增各自的配置：
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 // commonMain/kotlin/di/Koin.kt
 import org.koin.core.context.startKoin
@@ -107,7 +109,9 @@ fun initKoin(config: KoinAppDeclaration? = null) {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 // commonMain/kotlin/di/Koin.kt
 import org.koin.core.annotation.*
@@ -132,7 +136,9 @@ fun initKoin(config: KoinAppDeclaration? = null) {
 
 `@Configuration` 模組會在建置期由 `@KoinApplication` 尋找。`PlatformModule` 是一個 `expect` 模組類別，請參閱 [KMP 共享模式](/docs/reference/koin-core/kmp-shared-modules)。
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 // commonMain/kotlin/di/Koin.kt
 import org.koin.core.context.startKoin
@@ -157,6 +163,9 @@ fun initKoin(config: KoinAppDeclaration? = null) {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 `includes(config)` 會將平台配置（Android context、記錄器、額外模組）套用至同一個 Koin 啟動流程。`platformModule()` 是一個 `expect` 函式，請參閱 [KMP 共享模式](/docs/reference/koin-core/kmp-shared-modules)。
 
@@ -238,7 +247,9 @@ fun main() {
 
 使用 Compose Multiplatform 時，你可以透過 `KoinApplication` 直接從根 Composable 啟動 Koin，而無需在各平台上呼叫 `initKoin`。在 Android 上，它會自動為你設定 Android context：
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 // commonMain
 @Composable
@@ -249,7 +260,9 @@ fun App() {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 // commonMain
 @Composable
@@ -262,7 +275,9 @@ fun App() {
 
 `koinConfiguration<T>()` 來自於 `org.koin.plugin.module.dsl`。
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 // commonMain
 @Composable
@@ -272,6 +287,9 @@ fun App() {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 如果 Compose 之外的程式碼在第一個畫面顯示前就需要使用 Koin（背景服務、Swift 程式碼），請保留 `initKoin`。這兩種選項的比較請參閱 [Koin for Compose](/docs/reference/koin-compose/compose)。
 

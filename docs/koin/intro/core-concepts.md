@@ -26,14 +26,18 @@ Koin 的工作就是创建 `ApiService`，将其传递给 `UserRepository`，再
 
 **定义**会告诉 Koin 如何创建某个类型以及该实例的保留时间：
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 single<ApiService>()
 single<UserRepository>()
 viewModel<UserViewModel>()
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton
 class ApiService
@@ -45,12 +49,17 @@ class UserRepository(private val api: ApiService)
 class UserViewModel(private val repository: UserRepository) : ViewModel()
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 singleOf(::ApiService)
 singleOf(::UserRepository)
 viewModelOf(::UserViewModel)
 ```
+
+</tab>
+</tabs>
 
 关键字用于设置生命周期。`single` 在整个容器中只保留一个实例。`factory` 在每次请求时都会创建一个新实例。`viewModel` 遵循 ViewModel 生命周期。Koin 读取 `UserRepository` 的构造函数，发现它需要一个 `ApiService`，并从容器中解析它。
 
@@ -60,7 +69,9 @@ viewModelOf(::UserViewModel)
 
 **模块**用于对定义进行分组。通常每个功能或每个层对应一个模块：
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.dsl.module
 import org.koin.plugin.module.dsl.*
@@ -72,7 +83,9 @@ val appModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Module
 @ComponentScan("com.example.app")
@@ -81,7 +94,9 @@ class AppModule
 
 `@ComponentScan` 会收集 `com.example.app` 软件包及其子包中所有带有注解的类。
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.dsl.module
 import org.koin.core.module.dsl.*
@@ -93,6 +108,9 @@ val appModule = module {
 }
 ```
 
+</tab>
+</tabs>
+
 模块只是一种描述。在 Koin 启动并且有人请求实例之前，不会创建任何内容。模块可以包含其他模块，因此大型应用是由小型模块构成的树。
 
 详情：[模块](/docs/reference/koin-core/modules)。
@@ -101,7 +119,9 @@ val appModule = module {
 
 `startKoin` 会创建**容器**（一个 `KoinApplication`）并将你的模块加载到其中。你在应用的入口点调用它一次：
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 fun main() {
     startKoin {
@@ -110,7 +130,9 @@ fun main() {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 import org.koin.plugin.module.dsl.startKoin
 
@@ -122,7 +144,9 @@ fun main() {
 }
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 fun main() {
     startKoin {
@@ -130,6 +154,9 @@ fun main() {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 在 Android 上，你在 `Application.onCreate()` 中调用它，并通过 `androidContext(this)` 传递 Android 上下文。容器持有已有的定义以及到目前为止创建的实例。`stopKoin()` 会关闭容器并释放所有的 `single`。
 
@@ -186,7 +213,9 @@ UserActivity ── by viewModel() ──> UserViewModel
 
 假设 `CartRepository` 应该仅在用户登录期间存在：
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 class UserSession
 class CartRepository(private val api: ApiService)
@@ -198,7 +227,9 @@ val sessionModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 class UserSession
 
@@ -207,7 +238,9 @@ class UserSession
 class CartRepository(private val api: ApiService)
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 class UserSession
 class CartRepository(private val api: ApiService)
@@ -218,6 +251,9 @@ val sessionModule = module {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 你在会话开始时打开该作用域，并在会话结束时将其关闭：
 
@@ -237,7 +273,9 @@ sessionScope.close() // releases CartRepository
 
 Koin 通过类型查找定义。当两个定义提供相同的类型时，**限定符**会为每个定义指定一个名称：
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 interface NetworkClient
 
@@ -256,7 +294,9 @@ val networkModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton
 @Named("auth")
@@ -270,7 +310,9 @@ class PublicClient : NetworkClient
 class UserRepository(@Named("auth") private val client: NetworkClient)
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val networkModule = module {
     single<NetworkClient>(named("auth")) { AuthClient() }
@@ -278,6 +320,9 @@ val networkModule = module {
     single { UserRepository(get(named("auth"))) }
 }
 ```
+
+</tab>
+</tabs>
 
 详情：[限定符](/docs/reference/koin-core/qualifiers)。
 

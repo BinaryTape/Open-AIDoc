@@ -12,7 +12,9 @@ title: 高度なAndroidパターン
 
 プロバイダー関数内で実装を選択します。
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.plugin.module.dsl.create
 
@@ -24,7 +26,9 @@ val analyticsModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Module
 class AnalyticsModule {
@@ -35,7 +39,9 @@ class AnalyticsModule {
 }
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val analyticsModule = module {
     single<Analytics> {
@@ -43,6 +49,9 @@ val analyticsModule = module {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 `ENABLE_ANALYTICS` は、ビルドタイプまたはフレーバーごとに設定される `buildConfigField` です。`BuildConfig.DEBUG` も同様に機能します。両方の実装がすべてのバリアントにコンパイルされますが、生成されるのは一方のみです。
 
@@ -80,7 +89,9 @@ startKoin {
 
 ダイアログ、パーミッションのリクエスト、Activityテーマを使用するものなど、一部のヘルパーは Application ではなく現在の Activity を必要とします。Application コンテキストで作成された `AlertDialog` は、表示時にエラーが発生します。これらのヘルパーは、`Context` が Activity として解決される Activity スコープで宣言してください。
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 class DialogProvider(private val context: Context) {
 
@@ -98,7 +109,9 @@ val uiModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @ActivityScope
 class DialogProvider(private val context: Context) {
@@ -111,7 +124,9 @@ class DialogProvider(private val context: Context) {
 }
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val uiModule = module {
     activityScope {
@@ -119,6 +134,9 @@ val uiModule = module {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 ```kotlin
 class SettingsActivity : ScopeActivity() {

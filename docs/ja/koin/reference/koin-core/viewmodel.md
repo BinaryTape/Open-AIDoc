@@ -19,7 +19,9 @@ implementation("io.insert-koin:koin-core-viewmodel")
 
 ## ViewModel の宣言 {id="declaring-a-viewmodel"}
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.dsl.module
 import org.koin.plugin.module.dsl.viewModel
@@ -31,7 +33,9 @@ val appModule = module {
 }
 ```
 
-**アノテーション**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 import org.koin.core.annotation.KoinViewModel
 
@@ -41,7 +45,9 @@ class UserViewModel(private val repository: UserRepository) : ViewModel()
 
 Compiler Plugin を使用する場合、`@KoinViewModel` は `org.koin.core.annotation` にあり、共通コード（common code）で動作します。以前の KSP プロセッサでは `org.koin.android.annotation.KoinViewModel` を使用していました。
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.dsl.module
 import org.koin.core.module.dsl.viewModelOf
@@ -55,13 +61,18 @@ val appModule = module {
 }
 ```
 
+</tab>
+</tabs>
+
 `viewModel` 定義は、`factory` のようにリクエストごとに新しいインスタンスを作成します。プラットフォームの `ViewModelStore`（Activity、Fragment、ナビゲーションエントリなど）がそのインスタンスを保持するため、Android の構成変更（Configuration Changes）をまたいでも、同じオーナーは同じ ViewModel を取得します。ViewModel を `single` として宣言しないでください。すべての画面で共有されてしまい、破棄（クリア）されなくなります。
 
 ## パラメータの受け渡し {id="passing-parameters"}
 
 ViewModel では、アイテム ID など実行時にしかわからない値が必要になることがよくあります。コンストラクタパラメータを注入パラメータ（Injected Parameter）としてマークします。
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 class DetailViewModel(
     @InjectedParam val itemId: String,
@@ -73,7 +84,9 @@ val appModule = module {
 }
 ```
 
-**アノテーション**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @KoinViewModel
 class DetailViewModel(
@@ -82,7 +95,9 @@ class DetailViewModel(
 ) : ViewModel()
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val appModule = module {
     viewModel { params ->
@@ -92,6 +107,9 @@ val appModule = module {
 ```
 
 `viewModelOf(::DetailViewModel)` も動作します。呼び出し元から渡された値から、型に基づいてパラメータを読み取ります。
+
+</tab>
+</tabs>
 
 呼び出し側は、宣言スタイルにかかわらず `parametersOf` を使用して値を渡します。
 
@@ -109,7 +127,9 @@ val viewModel = koinViewModel<DetailViewModel> { parametersOf("item_123") }
 
 コンストラクタに `SavedStateHandle` パラメータを追加します。Koin は宣言なしで、ViewModel の `CreationExtras` から自動的にこれを作成します。
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 class ProfileViewModel(
     private val handle: SavedStateHandle,
@@ -123,7 +143,9 @@ val appModule = module {
 }
 ```
 
-**アノテーション**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @KoinViewModel
 class ProfileViewModel(
@@ -134,7 +156,9 @@ class ProfileViewModel(
 }
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val appModule = module {
     viewModelOf(::ProfileViewModel)
@@ -144,13 +168,18 @@ val appModule = module {
 }
 ```
 
+</tab>
+</tabs>
+
 Android では、ナビゲーション引数や Activity の extras は `SavedStateHandle` 内に保持されます。コンストラクタでのみ注入してください。ViewModel のオーナーが `SavedStateRegistryOwner` を持たない場合、Koin は「Koin could not create a SavedStateHandle: the ViewModel's CreationExtras has no SavedStateRegistryOwner.」というエラーで失敗します。
 
 ## ViewModel スコープ {id="viewmodel-scope"}
 
 ViewModel は[スコープ（Scope）](/docs/reference/koin-core/scopes)を所有できます。これは ViewModel と一緒に作成され、ViewModel が破棄（クリア）されるときに解放される依存関係です。これらは `viewModelScope` アーキタイプを使用して宣言します。
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 val appModule = module {
     viewModelScope {
@@ -160,7 +189,9 @@ val appModule = module {
 }
 ```
 
-**アノテーション**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @ViewModelScope
 class UserCache
@@ -170,7 +201,9 @@ class UserCache
 class UserViewModel(private val cache: UserCache) : ViewModel()
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val appModule = module {
     viewModelScope {
@@ -179,6 +212,9 @@ val appModule = module {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 起動時にこのオプションを有効にしてください。そうしないと、ViewModel にスコープが割り当てられません。
 

@@ -28,7 +28,9 @@ dependencies {
 
 `androidTest`에 프로덕션 모듈과 테스트 모듈을 함께 사용하여 Koin을 시작하는 `Application`을 생성합니다. 테스트 모듈이 마지막에 로드되므로 해당 정의가 프로덕션 정의를 대체하게 됩니다.
 
-**컴파일러 플러그인 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 // src/androidTest 내부
 class TestApplication : Application() {
@@ -42,7 +44,9 @@ class TestApplication : Application() {
 }
 ```
 
-**애노테이션**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 // src/androidTest 내부
 class TestApplication : Application() {
@@ -58,7 +62,9 @@ class TestApplication : Application() {
 
 `startKoin<MyApp>`은 먼저 `@KoinApplication` 클래스의 모듈을 로드한 다음, 람다에 선언된 모듈을 로드합니다.
 
-**생성자 / 클래식 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 // src/androidTest 내부
 class TestApplication : Application() {
@@ -71,6 +77,9 @@ class TestApplication : Application() {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 ```kotlin
 val instrumentedTestModule = module {
