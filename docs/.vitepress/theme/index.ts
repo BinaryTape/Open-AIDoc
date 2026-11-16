@@ -50,6 +50,7 @@ import Note from "../component/Note.vue";
 import Tip from "../component/Tip.vue";
 import Warning from "../component/Warning.vue";
 import YouTubeVideo from "../component/YouTubeVideo.vue";
+import Breadcrumbs from "../component/Breadcrumbs.vue";
 
 // The start page section tags share TopicCardSection, told which tag they are.
 const cardSection = (kind: string) => defineComponent({
@@ -68,6 +69,7 @@ export default {
       useLinkedTabs()
       return () => h(DefaultTheme.Layout, null, {
         // https://vitepress.dev/guide/extending-default-theme#layout-slots
+        'doc-before': () => h(Breadcrumbs),
       })
     },
   }),
