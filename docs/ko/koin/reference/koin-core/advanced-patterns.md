@@ -10,7 +10,9 @@ title: 고급 패턴
 
 인터페이스의 모든 구현체를 주입하려면, 각 구현체를 인터페이스에 바인딩하고 `List`로 요청합니다:
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 interface PaymentProcessor {
     fun process(amount: Double): Boolean
@@ -28,7 +30,9 @@ val paymentModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 interface PaymentProcessor {
     fun process(amount: Double): Boolean
@@ -45,7 +49,9 @@ class PayPalProcessor : PaymentProcessor { ... }
 class PaymentManager(private val processors: List<PaymentProcessor>)
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val paymentModule = module {
     singleOf(::CreditCardProcessor) bind PaymentProcessor::class
@@ -53,6 +59,9 @@ val paymentModule = module {
     single { PaymentManager(getAll()) }
 }
 ```
+
+</tab>
+</tabs>
 
 `List<T>` 파라미터는 `getAll<T>()`로 확인(resolve)됩니다. 한정자 유무와 관계없이 해당 타입 또는 바인딩된 타입 중 하나가 `T`인 모든 정의를 가져옵니다. 생성자 외부에서는 `Scope`나 `getKoin()`에서 `getAll<PaymentProcessor>()`를 호출하세요.
 
@@ -101,7 +110,9 @@ val repositoryModule = module {
 - **구체적인 타입(Concrete types)**: `UserRepository`와 `ProductRepository`를 직접 주입합니다. 각 클래스는 고유한 키를 갖습니다.
 - **한정자**: 제네릭 인터페이스를 유지하면서 한정자로 정의를 구분합니다.
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 @Qualifier(User::class)
 class UserRepository : Repository<User> { ... }
@@ -117,7 +128,9 @@ val repositoryModule = module {
 class UserService(@Qualifier(User::class) private val repository: Repository<User>)
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton
 @Qualifier(User::class)
@@ -131,7 +144,9 @@ class ProductRepository : Repository<Product> { ... }
 class UserService(@Qualifier(User::class) private val repository: Repository<User>)
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val repositoryModule = module {
     single<Repository<User>>(named<User>()) { UserRepository() }
@@ -139,6 +154,9 @@ val repositoryModule = module {
     single { UserService(get(named<User>())) }
 }
 ```
+
+</tab>
+</tabs>
 
 `named<User>()`는 `User` 클래스로부터 생성된 타입 한정자입니다. `@Qualifier(User::class)`는 이에 해당하는 애너테이션 형태입니다.
 
@@ -189,7 +207,9 @@ class LoggingNotificationService(
 }
 ```
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.plugin.module.dsl.create
 
@@ -205,7 +225,9 @@ val notificationModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Module
 class NotificationModule {
@@ -218,7 +240,9 @@ class NotificationModule {
 
 `PushNotificationService`는 `@Singleton(binds = [])`로 선언하여 `NotificationService`에도 함께 바인딩되지 않도록 합니다.
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val notificationModule = module {
     singleOf(::Logger)
@@ -228,6 +252,9 @@ val notificationModule = module {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 사용자(Consumer)는 `NotificationService`를 요청하여 데코레이트된 인스턴스를 받습니다. 여러 데코레이터를 중첩하려면 동일한 함수 내에 다음과 같이 중첩하세요: `RateLimitedNotificationService(LoggingNotificationService(push, logger), limiter)`.
 

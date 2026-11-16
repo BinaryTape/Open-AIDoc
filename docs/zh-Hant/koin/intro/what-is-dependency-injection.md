@@ -147,7 +147,9 @@ class MainActivity : AppCompatActivity() {
 
 DI 程式庫可將容器自動化。您宣告存在哪些類別以及它們的存活時間，程式庫會建構出物件圖。在 Koin 中：
 
-**編譯器外掛程式 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 val appModule = module {
     single<Database>()
@@ -159,7 +161,9 @@ val appModule = module {
 }
 ```
 
-**註解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton
 class UserRepository(private val database: Database, private val apiClient: ApiClient)
@@ -177,7 +181,9 @@ class UserViewModel(private val userService: UserService) : ViewModel()
 class AppModule
 ```
 
-**建構函式 / 經典 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val appModule = module {
     singleOf(::Database)
@@ -188,6 +194,9 @@ val appModule = module {
     viewModelOf(::UserViewModel)
 }
 ```
+
+</tab>
+</tabs>
 
 接著 Activity 索取物件圖的頂層：
 

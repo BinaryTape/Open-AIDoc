@@ -20,7 +20,9 @@ dependencies {
 
 `install(Koin)` 在 `testApplication` 内部的工作方式与生产环境中相同。将其与你的测试模块一起安装，然后添加路由：
 
-**编译器插件 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 class UserRoutesTest {
 
@@ -39,7 +41,9 @@ class UserRoutesTest {
 }
 ```
 
-**注解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 import org.koin.plugin.module.dsl.withConfiguration
 
@@ -61,7 +65,9 @@ class UserRoutesTest {
 }
 ```
 
-**构造函数 / 经典 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 class UserRoutesTest {
 
@@ -79,6 +85,9 @@ class UserRoutesTest {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 ```kotlin
 val testModule = module {

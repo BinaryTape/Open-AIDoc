@@ -41,7 +41,9 @@ class MainActivity : AppCompatActivity() {
 
 ## Fragmentの宣言 {id="declaring-a-fragment"}
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 Compiler Plugin DSLには `fragment<T>()` 関数がありません。同じモジュール内でClassic DSLの `fragment { }` またはConstructor DSLの `fragmentOf()` を使用してください:
 
 ```kotlin
@@ -53,7 +55,9 @@ val uiModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 Fragment用のアノテーションはありません。アノテーションを付けたクラスと並べて、DSLモジュール内でFragmentを宣言してください（[DSL Reference](/docs/reference/koin-core/dsl) を参照）:
 
 ```kotlin
@@ -62,7 +66,9 @@ val uiModule = module {
 }
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.androidx.fragment.dsl.fragment
 import org.koin.androidx.fragment.dsl.fragmentOf
@@ -77,6 +83,9 @@ val uiModule = module {
     fragment { UserFragment(get()) }
 }
 ```
+
+</tab>
+</tabs>
 
 `fragment` 定義は `factory` です。トランザクションごとに新しいFragmentインスタンスが取得されます。Fragmentクラスに一致する定義がない場合、KoinファクトリはデフォルトのAndroidXの動作にフォールバックします。
 

@@ -12,7 +12,9 @@ title: 고급 Android 패턴
 
 프로바이더 함수 내에서 구현체를 선택합니다.
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.plugin.module.dsl.create
 
@@ -24,7 +26,9 @@ val analyticsModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Module
 class AnalyticsModule {
@@ -35,7 +39,9 @@ class AnalyticsModule {
 }
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val analyticsModule = module {
     single<Analytics> {
@@ -43,6 +49,9 @@ val analyticsModule = module {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 `ENABLE_ANALYTICS`는 빌드 타입 또는 플레이버별로 설정된 `buildConfigField`입니다. `BuildConfig.DEBUG`도 동일한 방식으로 동작합니다. 두 구현체 모두 모든 변체에 컴파일되지만, 인스턴스는 하나만 생성됩니다.
 
@@ -80,7 +89,9 @@ startKoin {
 
 다이얼로그, 권한 요청, Activity 테마를 사용하는 기능 등 일부 헬퍼는 Application이 아닌 현재 Activity를 필요로 합니다. Application 컨텍스트로 생성된 `AlertDialog`는 화면에 표시될 때 오류가 발생합니다. 이러한 헬퍼는 `Context`가 Activity로 확인(resolve)되는 Activity 스코프에 선언해야 합니다.
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 class DialogProvider(private val context: Context) {
 
@@ -98,7 +109,9 @@ val uiModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @ActivityScope
 class DialogProvider(private val context: Context) {
@@ -111,7 +124,9 @@ class DialogProvider(private val context: Context) {
 }
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val uiModule = module {
     activityScope {
@@ -119,6 +134,9 @@ val uiModule = module {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 ```kotlin
 class SettingsActivity : ScopeActivity() {

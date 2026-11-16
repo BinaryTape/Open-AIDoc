@@ -57,7 +57,9 @@ class UserServiceTest : KoinTest {
 
 アプリと同じ設定を読み込みます。
 
-**コンパイラプラグイン DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 class UserServiceTest : KoinTest {
 
@@ -73,7 +75,9 @@ class UserServiceTest : KoinTest {
 }
 ```
 
-**アノテーション**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 型付けされた API を使用して、アプリの `@KoinApplication` クラスを起動します。
 
 ```kotlin
@@ -95,7 +99,9 @@ class UserServiceTest : KoinTest {
 
 一部のモジュールのみを読み込むには、通常の `startKoin { }` 内で `module<DataModule>()` または `modules(DataModule::class, CacheModule::class)` を使用します。
 
-**コンストラクタ / クラシック DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 class UserServiceTest : KoinTest {
 
@@ -110,6 +116,9 @@ class UserServiceTest : KoinTest {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 `@After` を記述せずに Koin を停止するには、`AutoCloseKoinTest` を継承するか、`ClosingKoinTest` を実装します。どちらも各テストの後に `stopKoin()` を呼び出します。JUnit 5 バージョンは `org.koin.test.junit5` に配置されています。
 

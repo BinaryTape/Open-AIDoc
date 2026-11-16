@@ -10,7 +10,9 @@ title: 注入形参
 
 标记哪些构造函数形参来自调用方。其他形参则像往常一样从容器中解析：
 
-**编译器插件 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.core.annotation.InjectedParam
 
@@ -27,7 +29,9 @@ val appModule = module {
 
 `@InjectedParam` 来自 `koin-annotations` 构件。它告知编译器插件 `userId` 不是一个定义，因此构建期检查不会将其报告为缺失。
 
-**注解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Factory
 class UserPresenter(
@@ -38,7 +42,9 @@ class UserPresenter(
 
 `@InjectedParam` 同样适用于提供者函数（provider function）形参。
 
-**构造函数 / 传统 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 定义 lambda 会将形参作为 `params` 接收：
 
 ```kotlin
@@ -47,6 +53,9 @@ val appModule = module {
     factory { params -> UserPresenter(userId = params.get(), repository = get()) }
 }
 ```
+
+</tab>
+</tabs>
 
 调用方使用 `parametersOf()` 传递值，顺序与形参保持一致：
 
@@ -67,7 +76,9 @@ val presenter: UserPresenter by inject { parametersOf("user-42") }
 
 ## 多个形参 {id="several-parameters"}
 
-**编译器插件 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 class OrderPresenter(
     @InjectedParam val userId: String,
@@ -80,7 +91,9 @@ val appModule = module {
 }
 ```
 
-**注解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Factory
 class OrderPresenter(
@@ -90,7 +103,9 @@ class OrderPresenter(
 )
 ```
 
-**构造函数 / 传统 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 在 lambda 中对形参进行析构：
 
 ```kotlin
@@ -110,6 +125,9 @@ val appModule = module {
 ```
 
 析构最多支持 5 个值，并且不会针对调用方传递的内容检查声明的类型。如果顺序有误，类型转换将在运行时失败。
+
+</tab>
+</tabs>
 
 ```kotlin
 val presenter: OrderPresenter = get { parametersOf("user-42", 1001L) }

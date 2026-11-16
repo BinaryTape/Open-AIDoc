@@ -10,7 +10,9 @@ title: 高级模式
 
 要注入某个接口的每个实现，请将每个实现绑定到该接口并请求一个 `List`：
 
-**编译器插件 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 interface PaymentProcessor {
     fun process(amount: Double): Boolean
@@ -28,7 +30,9 @@ val paymentModule = module {
 }
 ```
 
-**注解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 interface PaymentProcessor {
     fun process(amount: Double): Boolean
@@ -45,7 +49,9 @@ class PayPalProcessor : PaymentProcessor { ... }
 class PaymentManager(private val processors: List<PaymentProcessor>)
 ```
 
-**构造函数 / 经典 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val paymentModule = module {
     singleOf(::CreditCardProcessor) bind PaymentProcessor::class
@@ -53,6 +59,9 @@ val paymentModule = module {
     single { PaymentManager(getAll()) }
 }
 ```
+
+</tab>
+</tabs>
 
 `List<T>` 形参通过 `getAll<T>()` 进行解析：包括其类型（或其绑定的类型之一）为 `T` 的每个定义，无论是否带有限定符。在构造函数之外，可以在 `Scope` 或 `getKoin()` 上调用 `getAll<PaymentProcessor>()`。
 
@@ -101,7 +110,9 @@ val repositoryModule = module {
 - **具体类型**：直接注入 `UserRepository` 和 `ProductRepository`。每个类都有自己独立的键。
 - **限定符**：保留泛型接口，并通过限定符区分这些定义。
 
-**编译器插件 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 @Qualifier(User::class)
 class UserRepository : Repository<User> { ... }
@@ -117,7 +128,9 @@ val repositoryModule = module {
 class UserService(@Qualifier(User::class) private val repository: Repository<User>)
 ```
 
-**注解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton
 @Qualifier(User::class)
@@ -131,7 +144,9 @@ class ProductRepository : Repository<Product> { ... }
 class UserService(@Qualifier(User::class) private val repository: Repository<User>)
 ```
 
-**构造函数 / 经典 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val repositoryModule = module {
     single<Repository<User>>(named<User>()) { UserRepository() }
@@ -139,6 +154,9 @@ val repositoryModule = module {
     single { UserService(get(named<User>())) }
 }
 ```
+
+</tab>
+</tabs>
 
 `named<User>()` 是根据类 `User` 构建的类型限定符。`@Qualifier(User::class)` 是其注解形式。
 
@@ -189,7 +207,9 @@ class LoggingNotificationService(
 }
 ```
 
-**编译器插件 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.plugin.module.dsl.create
 
@@ -205,7 +225,9 @@ val notificationModule = module {
 }
 ```
 
-**注解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Module
 class NotificationModule {
@@ -218,7 +240,9 @@ class NotificationModule {
 
 使用 `@Singleton(binds = [])` 声明 `PushNotificationService`，使其不会同时绑定到 `NotificationService`。
 
-**构造函数 / 经典 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val notificationModule = module {
     singleOf(::Logger)
@@ -228,6 +252,9 @@ val notificationModule = module {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 消费者请求 `NotificationService` 时将获取到经过装饰的实例。若要叠加多个装饰器，请在同一个函数中进行嵌套：`RateLimitedNotificationService(LoggingNotificationService(push, logger), limiter)`。
 

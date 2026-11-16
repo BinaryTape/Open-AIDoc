@@ -65,7 +65,9 @@ fun App() {
 
 `KoinApplication` 會從根 Composable 啟動 Koin，並將其提供給所有子層：
 
-**編譯器外掛程式 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.compose.KoinApplication
 import org.koin.dsl.koinConfiguration
@@ -80,7 +82,9 @@ fun App() {
 }
 ```
 
-**註解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 // di/Koin.kt
 import org.koin.core.annotation.KoinApplication
@@ -106,7 +110,9 @@ fun App() {
 
 `koinConfiguration<KoinApp>()` 會載入標記了 `@KoinApplication` 的類別模組。傳遞 Lambda 運算式以加入更多選項：`koinConfiguration<KoinApp> { printLogger() }`。
 
-**建構函式 / 傳統 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.compose.KoinApplication
 import org.koin.dsl.koinConfiguration
@@ -120,6 +126,9 @@ fun App() {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 `KoinApplication` 為你處理的事項：
 

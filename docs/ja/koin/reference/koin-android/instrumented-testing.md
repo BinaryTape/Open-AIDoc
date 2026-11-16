@@ -28,7 +28,9 @@ dependencies {
 
 `androidTest`内に、本番用モジュールに加えてテスト用モジュールを含めてKoinを起動する`Application`を作成します。テストモジュールは最後にロードされるため、その定義が本番用の定義を置き換えます。
 
-**コンパイラプラグインDSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 // src/androidTest 内
 class TestApplication : Application() {
@@ -42,7 +44,9 @@ class TestApplication : Application() {
 }
 ```
 
-**アノテーション**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 // src/androidTest 内
 class TestApplication : Application() {
@@ -58,7 +62,9 @@ class TestApplication : Application() {
 
 `startKoin<MyApp>`は、まず`@KoinApplication`クラスのモジュールをロードし、次にラムダ内で宣言されたモジュールをロードします。
 
-**コンストラクタ / クラシックDSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 // src/androidTest 内
 class TestApplication : Application() {
@@ -71,6 +77,9 @@ class TestApplication : Application() {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 ```kotlin
 val instrumentedTestModule = module {

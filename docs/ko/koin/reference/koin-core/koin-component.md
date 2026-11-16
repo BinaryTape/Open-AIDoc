@@ -120,7 +120,9 @@ class SdkClient : SdkComponent() {
 
 동일한 클래스의 두 가지 버전을 비교해 보세요:
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 // Koin에 의존하며, 의존성이 클래스 본문에 숨겨져 있음
 class UserService : KoinComponent {
@@ -136,7 +138,9 @@ val appModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 // Koin에 의존하며, 의존성이 클래스 본문에 숨겨져 있음
 class UserService : KoinComponent {
@@ -148,7 +152,9 @@ class UserService : KoinComponent {
 class UserService(private val repository: UserRepository)
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 // Koin에 의존하며, 의존성이 클래스 본문에 숨겨져 있음
 class UserService : KoinComponent {
@@ -163,6 +169,9 @@ val appModule = module {
     singleOf(::UserService)
 }
 ```
+
+</tab>
+</tabs>
 
 생성자 주입 버전이 다음 네 가지 측면에서 더 우수합니다:
 

@@ -10,7 +10,9 @@ title: Android에서 Koin 시작하기
 
 `Application.onCreate()`에서 Koin을 한 번 시작합니다:
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -32,7 +34,9 @@ class MainApplication : Application() {
 
 `appModule`은 컴파일러 플러그인 DSL(`single<UserRepository>()`, `viewModel<UserViewModel>()`)로 선언된 `module { }`입니다.
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -55,7 +59,9 @@ class MainApplication : Application() {
 
 `startKoin<MainApplication>()`은 `@Configuration`으로 태그 지정된 모든 `@Module` 클래스를 로드합니다. 모듈을 직접 나열할 필요가 없습니다. 모듈을 명시적으로 선택하려면 `@KoinApplication(modules = [AppModule::class])`을 사용하세요. 모듈 탐색에 대한 설명은 [모듈](/docs/reference/koin-core/modules)을 참조하세요.
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -75,6 +81,9 @@ class MainApplication : Application() {
 }
 ```
 
+</tab>
+</tabs>
+
 `AndroidManifest.xml`의 `<application>` 태그에 `android:name=".MainApplication"`으로 클래스를 등록해야 합니다. 등록하지 않으면 Android에서 이 클래스를 실행하지 않습니다.
 
 `androidContext()`는 `Application` 인스턴스를 Koin에 추가하여 `Application`과 `Context` 모두에 바인딩합니다. `androidFileProperties()`나 `workManagerFactory()`와 같이 `Context`가 필요한 옵션을 호출하기 전에 먼저 호출해야 합니다.
@@ -83,7 +92,9 @@ class MainApplication : Application() {
 
 `Context`가 필요한 클래스는 생성자에 이를 선언합니다. 한정자(Qualifier)는 필요하지 않습니다. Koin은 `Context`를 `androidContext()`에 전달된 인스턴스로 해석(resolve)합니다.
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 class PreferencesStore(private val context: Context)
 class NotificationHelper(private val application: Application)
@@ -94,7 +105,9 @@ val androidModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton
 class PreferencesStore(private val context: Context)
@@ -103,7 +116,9 @@ class PreferencesStore(private val context: Context)
 class NotificationHelper(private val application: Application)
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val androidModule = module {
     singleOf(::PreferencesStore)
@@ -112,6 +127,9 @@ val androidModule = module {
 ```
 
 람다 정의에서는 `androidContext()` 및 `androidApplication()`으로 이를 읽어옵니다: `single { PreferencesStore(androidContext()) }`.
+
+</tab>
+</tabs>
 
 | 함수 | 반환값 | 실패하는 경우 |
 |----------|---------|------------|
@@ -148,7 +166,9 @@ class MainActivity : AppCompatActivity() {
 
 두 개의 `SharedPreferences` 파일처럼 두 정의가 동일한 타입을 공유하는 경우, [한정자(qualifier)](/docs/reference/koin-core/qualifiers)를 사용하여 구분합니다:
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 val preferencesModule = module {
     single(named("settings")) {
@@ -160,7 +180,9 @@ val preferencesModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Module
 class PreferencesModule {
@@ -177,7 +199,9 @@ class PreferencesModule {
 }
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val preferencesModule = module {
     single(named("settings")) {
@@ -188,6 +212,9 @@ val preferencesModule = module {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 ## 로깅 {id="logging"}
 
@@ -246,7 +273,9 @@ class PremiumActivity : AppCompatActivity() {
 
 [AndroidX App Startup](https://developer.android.com/topic/libraries/app-startup)은 `Application.onCreate()` 이전에 단일 ContentProvider에서 초기화 프로그램을 실행합니다. `io.insert-koin:koin-androidx-startup` 아티팩트는 이러한 초기화 프로그램 중 하나로 Koin을 시작합니다. `Application`에서 `KoinStartup`을 구현하고 `onKoinStartup()`에서 설정을 반환하세요:
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.androix.startup.KoinStartup
 import org.koin.dsl.koinConfiguration
@@ -261,7 +290,9 @@ class MainApplication : Application(), KoinStartup {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 import org.koin.androix.startup.KoinStartup
 import org.koin.plugin.module.dsl.koinConfiguration
@@ -276,7 +307,9 @@ class MainApplication : Application(), KoinStartup {
 }
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.androix.startup.KoinStartup
 import org.koin.dsl.koinConfiguration
@@ -290,6 +323,9 @@ class MainApplication : Application(), KoinStartup {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 `KoinStartup`은 `onCreate()`의 `startKoin` 호출을 대체하므로 둘 다 호출하지 마세요. 패키지명은 `org.koin.androix.startup`(철자 주의)이며, 해당 API에는 `@KoinExperimentalAPI`가 지정되어 있습니다.
 

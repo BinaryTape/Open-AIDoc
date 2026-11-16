@@ -25,7 +25,9 @@ title: 作用域
 
 ## 宣告作用域 {id="declaring-a-scope"}
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.dsl.module
 import org.koin.plugin.module.dsl.*
@@ -45,7 +47,9 @@ val sessionModule = module {
 }
 ```
 
-**註解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 使用 `@Scope` 標記類別以指定其所屬的作用域，並使用 `@Scoped` 將其宣告為作用域定義。兩者都需要：
 
 ```kotlin
@@ -65,7 +69,9 @@ class CheckoutNavigator
 
 `@Scope(UserSession::class)` 等同於 `scope<UserSession> { }`，而 `@Scope(name = "checkout")` 則等同於 `scope(named("checkout")) { }`。這兩種註解也適用於 `@Module` 類別中的函式。
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.dsl.module
 import org.koin.core.module.dsl.*
@@ -82,6 +88,9 @@ val sessionModule = module {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 在作用域區塊內的 `factory` 會在每次請求時建立新的執行個體，但它可以相依於該作用域的作用域執行個體。
 
@@ -171,7 +180,9 @@ class UserSession : KoinScopeComponent {
 
 因此，具有作用域的類別可以相依於單例以及同一個作用域中的其他作用域類別：
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 class CartRepository(
     private val api: ApiService,        // single, from the root scope
@@ -187,7 +198,9 @@ val sessionModule = module {
 }
 ```
 
-**註解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton
 class ApiService
@@ -204,7 +217,9 @@ class CartRepository(
 )
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val sessionModule = module {
     singleOf(::ApiService)
@@ -214,6 +229,9 @@ val sessionModule = module {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 反之則不行：`single` 無法相依於 `scoped` 定義，且從根作用域呼叫 `get<SessionData>()` 會因 `NoDefinitionFoundException` 而失敗。請務必從其對應的作用域執行個體解析作用域執行個體。
 
@@ -286,7 +304,9 @@ class CartBadge(
 
 使用型別宣告的作用域（`scope<MainActivity>`）僅適用於該型別。**作用域原型（scope archetype）** 是一種通用的作用域宣告，由同種類的所有元件（每個 ViewModel、每個 Activity、每個 Fragment）共用。你只需宣告一次定義，每個元件都會獲得各自的作用域執行個體。
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 val appModule = module {
     viewModelScope {
@@ -304,7 +324,9 @@ val appModule = module {
 }
 ```
 
-**註解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 原型註解可取代 `@Scope` 與 `@Scoped`：
 
 ```kotlin
@@ -324,7 +346,9 @@ class FragmentPresenter
 
 原型註解也適用於 `@Module` 類別中的函式。
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val appModule = module {
     viewModelScope {
@@ -341,6 +365,9 @@ val appModule = module {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 | 原型 | DSL | 註解 | 關閉時機 | 平台 |
 |-----------|-----|------------|-------------|----------|

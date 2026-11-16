@@ -20,7 +20,9 @@ dependencies {
 
 `install(Koin)` は、本番環境と同様に `testApplication` 内でも動作します。テストモジュールとともにインストールし、ルートを追加します。
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 class UserRoutesTest {
 
@@ -39,7 +41,9 @@ class UserRoutesTest {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 import org.koin.plugin.module.dsl.withConfiguration
 
@@ -61,7 +65,9 @@ class UserRoutesTest {
 }
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 class UserRoutesTest {
 
@@ -79,6 +85,9 @@ class UserRoutesTest {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 ```kotlin
 val testModule = module {

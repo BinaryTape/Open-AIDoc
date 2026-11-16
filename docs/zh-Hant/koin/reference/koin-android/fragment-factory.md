@@ -41,7 +41,9 @@ class MainActivity : AppCompatActivity() {
 
 ## 宣告 Fragment {id="declaring-a-fragment"}
 
-**編譯器外掛程式 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 編譯器外掛程式 DSL 沒有 `fragment<T>()` 函式。請在同一個模組中使用傳統 DSL（Classic DSL）`fragment { }` 或建構函式 DSL（Constructor DSL）`fragmentOf()`：
 
 ```kotlin
@@ -53,7 +55,9 @@ val uiModule = module {
 }
 ```
 
-**註解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 目前沒有 Fragment 專屬的註解。請在 DSL 模組中宣告 Fragment，並與你的已註解類別並列（參閱 [DSL 參考](/docs/reference/koin-core/dsl)）：
 
 ```kotlin
@@ -62,7 +66,9 @@ val uiModule = module {
 }
 ```
 
-**建構函式 / 傳統 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.androidx.fragment.dsl.fragment
 import org.koin.androidx.fragment.dsl.fragmentOf
@@ -77,6 +83,9 @@ val uiModule = module {
     fragment { UserFragment(get()) }
 }
 ```
+
+</tab>
+</tabs>
 
 `fragment` 定義屬於 `factory`：每一次交易（transaction）都會取得一個新的 Fragment 執行個體。如果沒有與 Fragment 類別相符的定義，Koin 工廠將回退至預設的 AndroidX 行為。
 

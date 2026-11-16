@@ -12,7 +12,9 @@ title: KMP 플랫폼 통합
 
 공유 코드에서는 `android.content.Context`를 직접 사용할 수 없지만, 일부 공유 클래스는 Android 환경에서 이 객체를 필요로 합니다(파일 열기, 환경설정 읽기 등). 공통 코드가 의존할 수 있는 플랫폼 타입으로 감싸서 사용하세요:
 
-**컴파일러 플러그인 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 // commonMain
 interface ContextWrapper {
@@ -48,7 +50,9 @@ actual fun platformModule(): Module = module {
 }
 ```
 
-**어노테이션**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 // commonMain
 interface ContextWrapper {
@@ -77,7 +81,9 @@ class IOSContextWrapper : ContextWrapper {
 
 플랫폼 클래스는 `@ComponentScan`이 적용된 `actual` 플랫폼 모듈에 의해 탐색됩니다([KMP 공유 패턴](/docs/reference/koin-core/kmp-shared-modules) 참조).
 
-**생성자 / 클래식 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 // commonMain
 interface ContextWrapper {
@@ -102,6 +108,9 @@ actual fun platformModule(): Module = module {
     singleOf(::IOSContextWrapper) bind ContextWrapper::class
 }
 ```
+
+</tab>
+</tabs>
 
 `FileStore`는 `commonMain`에서 한 번만 컴파일되며 플랫폼 래퍼를 주입받습니다. 오직 하나의 Android 정의만이 `Context`를 다루며, 시작 시점에 `androidContext()`가 설정되면 정상적으로 의존성이 해결(resolve)됩니다. 공통 코드에서 플랫폼 타입을 직접 확인하기보다는 Android 전용 작업을 `ContextWrapper`의 메서드 뒤로 숨겨 추상화하세요.
 

@@ -28,7 +28,9 @@ dependencies {
 
 在 `androidTest` 中创建一个 `Application`，使用生产模块加上测试模块来启动 Koin。测试模块最后加载，因此其定义会替换生产定义：
 
-**编译器插件 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 // in src/androidTest
 class TestApplication : Application() {
@@ -42,7 +44,9 @@ class TestApplication : Application() {
 }
 ```
 
-**注解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 // in src/androidTest
 class TestApplication : Application() {
@@ -58,7 +62,9 @@ class TestApplication : Application() {
 
 `startKoin<MyApp>` 会先加载 `@KoinApplication` 类的模块，然后再加载 lambda 中声明的模块。
 
-**构造函数 / 经典 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 // in src/androidTest
 class TestApplication : Application() {
@@ -71,6 +77,9 @@ class TestApplication : Application() {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 ```kotlin
 val instrumentedTestModule = module {

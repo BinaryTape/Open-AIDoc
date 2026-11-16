@@ -66,7 +66,9 @@ NavHost(navController, startDestination = HomeRoute) {
 
 ## 模組樣式 {id="module-styles"}
 
-**編譯器外掛程式 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 val checkoutModule = module {
     factory<CheckoutRepository>()
@@ -74,16 +76,23 @@ val checkoutModule = module {
 }
 ```
 
-**註解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 `rememberKoinModules` 接受 `Module` 值。帶有 `@Module` 註解的類別會在啟動時透過 `@KoinApplication` 載入（請參閱[模組](/docs/reference/koin-core/modules)）。若要隨需載入某個功能，請使用 DSL 宣告其模組。
 
-**建構函式 / 傳統 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val checkoutModule = module {
     factoryOf(::CheckoutRepository)
     viewModelOf(::CheckoutViewModel)
 }
 ```
+
+</tab>
+</tabs>
 
 ## 限制 {id="limits"}
 

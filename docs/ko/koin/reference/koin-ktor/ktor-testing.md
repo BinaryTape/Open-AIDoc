@@ -20,7 +20,9 @@ dependencies {
 
 `install(Koin)`은 프로덕션 환경과 마찬가지로 `testApplication` 내부에서도 동작합니다. 테스트 모듈과 함께 설치한 후 라우트를 추가하세요:
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 class UserRoutesTest {
 
@@ -39,7 +41,9 @@ class UserRoutesTest {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 import org.koin.plugin.module.dsl.withConfiguration
 
@@ -61,7 +65,9 @@ class UserRoutesTest {
 }
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 class UserRoutesTest {
 
@@ -79,6 +85,9 @@ class UserRoutesTest {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 ```kotlin
 val testModule = module {

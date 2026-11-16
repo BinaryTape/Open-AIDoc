@@ -65,7 +65,9 @@ Compose 외부의 코드(`Service`, `WorkManager` 워커, iOS Swift 코드) 또�
 
 `KoinApplication`은 루트 Composable에서 Koin을 시작하고 이를 모든 하위 컴포넌트에 제공합니다:
 
-**컴파일러 플러그인 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.compose.KoinApplication
 import org.koin.dsl.koinConfiguration
@@ -80,7 +82,9 @@ fun App() {
 }
 ```
 
-**어노테이션**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 // di/Koin.kt
 import org.koin.core.annotation.KoinApplication
@@ -106,7 +110,9 @@ fun App() {
 
 `koinConfiguration<KoinApp>()`은 `@KoinApplication` 클래스의 모듈을 로드합니다. 옵션을 추가하려면 람다를 전달하세요: `koinConfiguration<KoinApp> { printLogger() }`.
 
-**생성자 / 클래식 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.compose.KoinApplication
 import org.koin.dsl.koinConfiguration
@@ -120,6 +126,9 @@ fun App() {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 `KoinApplication`이 자동으로 처리해 주는 작업:
 

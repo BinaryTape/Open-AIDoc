@@ -25,7 +25,9 @@ title: スコープ
 
 ## スコープの宣言 {id="declaring-a-scope"}
 
-**コンパイラプラグイン DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.dsl.module
 import org.koin.plugin.module.dsl.*
@@ -45,7 +47,9 @@ val sessionModule = module {
 }
 ```
 
-**アノテーション**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 クラスにどのスコープに属するかを指定する `@Scope` と、スコープ付き定義として宣言する `@Scoped` を付与します。両方のアノテーションが必要です:
 
 ```kotlin
@@ -65,7 +69,9 @@ class CheckoutNavigator
 
 `@Scope(UserSession::class)` は `scope<UserSession> { }` と同じであり、`@Scope(name = "checkout")` は `scope(named("checkout")) { }` と同じです。どちらのアノテーションも `@Module` クラス内の関数に対しても使用できます。
 
-**コンストラクタ / クラシック DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.dsl.module
 import org.koin.core.module.dsl.*
@@ -82,6 +88,9 @@ val sessionModule = module {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 スコープセクション内の `factory` はリクエストごとに新しいインスタンスを作成しますが、そのスコープのスコープ付きインスタンスに依存することができます。
 
@@ -171,7 +180,9 @@ class UserSession : KoinScopeComponent {
 
 そのため、スコープ付きクラスはシングルトンや、同じスコープ内の他のスコープ付きクラスに依存できます:
 
-**コンパイラプラグイン DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 class CartRepository(
     private val api: ApiService,        // single、ルートスコープから
@@ -187,7 +198,9 @@ val sessionModule = module {
 }
 ```
 
-**アノテーション**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton
 class ApiService
@@ -204,7 +217,9 @@ class CartRepository(
 )
 ```
 
-**コンストラクタ / クラシック DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val sessionModule = module {
     singleOf(::ApiService)
@@ -214,6 +229,9 @@ val sessionModule = module {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 逆は機能しません: `single` は `scoped` 定義に依存できず、ルートスコープから `get<SessionData>()` を呼び出すと `NoDefinitionFoundException` で失敗します。スコープ付きインスタンスは、そのスコープインスタンスから解決してください。
 
@@ -286,7 +304,9 @@ class CartBadge(
 
 型で宣言されたスコープ（`scope<MainActivity>`）は、その型にのみ適用されます。**スコープアーキタイプ (scope archetype)** は、特定の種類のすべてのコンポーネント（すべてのViewModel、すべてのActivity、すべてのFragmentなど）で共有される汎用的なスコープ宣言です。定義は一度だけ宣言すればよく、コンポーネントごとに固有のスコープインスタンスが作成されます。
 
-**コンパイラプラグイン DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 val appModule = module {
     viewModelScope {
@@ -304,7 +324,9 @@ val appModule = module {
 }
 ```
 
-**アノテーション**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 アーキタイプアノテーションは、`@Scope` および `@Scoped` を置き換えます:
 
 ```kotlin
@@ -324,7 +346,9 @@ class FragmentPresenter
 
 アーキタイプアノテーションは、`@Module` クラス内の関数に対しても機能します。
 
-**コンストラクタ / クラシック DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val appModule = module {
     viewModelScope {
@@ -341,6 +365,9 @@ val appModule = module {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 | アーキタイプ | DSL | アノテーション | クローズされるタイミング | プラットフォーム |
 |-----------|-----|------------|-------------|----------|

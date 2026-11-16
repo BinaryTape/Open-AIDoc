@@ -23,7 +23,9 @@ dependencies {
 
 アプリケーションモジュール内で `Koin` をインストールします。その設定ブロックは `startKoin { }` と同じです。
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.ktor.plugin.Koin
 import org.koin.logger.slf4jLogger
@@ -41,7 +43,9 @@ fun Application.module() {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 import org.koin.ktor.plugin.Koin
 import org.koin.logger.slf4jLogger
@@ -65,7 +69,9 @@ fun Application.module() {
 
 `withConfiguration<T>()` は、`@KoinApplication` クラスによって組み立てられたモジュールをロードします。
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.ktor.plugin.Koin
 import org.koin.logger.slf4jLogger
@@ -82,6 +88,9 @@ fun Application.module() {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 プラグインの動作：
 

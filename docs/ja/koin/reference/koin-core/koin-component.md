@@ -120,7 +120,9 @@ class SdkClient : SdkComponent() {
 
 同じクラスの 2 つのバージョンを比較してみましょう：
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 // Koin に依存しており、依存関係がクラス本体内に隠れている
 class UserService : KoinComponent {
@@ -136,7 +138,9 @@ val appModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 // Koin に依存しており、依存関係がクラス本体内に隠れている
 class UserService : KoinComponent {
@@ -148,7 +152,9 @@ class UserService : KoinComponent {
 class UserService(private val repository: UserRepository)
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 // Koin に依存しており、依存関係がクラス本体内に隠れている
 class UserService : KoinComponent {
@@ -163,6 +169,9 @@ val appModule = module {
     singleOf(::UserService)
 }
 ```
+
+</tab>
+</tabs>
 
 コンストラクタバージョンには、次の 4 つの優れた点があります：
 

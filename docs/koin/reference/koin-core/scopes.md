@@ -25,7 +25,9 @@ title: 作用域
 
 ## 声明作用域 {id="declaring-a-scope"}
 
-**编译器插件 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.dsl.module
 import org.koin.plugin.module.dsl.*
@@ -45,7 +47,9 @@ val sessionModule = module {
 }
 ```
 
-**注解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 使用 `@Scope` 标记类以指明它所属的作用域，并使用 `@Scoped` 将其声明为作用域定义。两者都需要：
 
 ```kotlin
@@ -65,7 +69,9 @@ class CheckoutNavigator
 
 `@Scope(UserSession::class)` 与 `scope<UserSession> { }` 效果相同，而 `@Scope(name = "checkout")` 与 `scope(named("checkout")) { }` 效果相同。这两个注解也适用于 `@Module` 类中的函数。
 
-**构造函数 / 经典 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.dsl.module
 import org.koin.core.module.dsl.*
@@ -82,6 +88,9 @@ val sessionModule = module {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 作用域区块内的 `factory` 会在每次请求时创建一个新实例，但它可以依赖该作用域的作用域实例。
 
@@ -171,7 +180,9 @@ class UserSession : KoinScopeComponent {
 
 因此，作用域类可以依赖单例以及同一作用域中的其他作用域类：
 
-**编译器插件 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 class CartRepository(
     private val api: ApiService,        // single，来自根作用域
@@ -187,7 +198,9 @@ val sessionModule = module {
 }
 ```
 
-**注解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton
 class ApiService
@@ -204,7 +217,9 @@ class CartRepository(
 )
 ```
 
-**构造函数 / 经典 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val sessionModule = module {
     singleOf(::ApiService)
@@ -214,6 +229,9 @@ val sessionModule = module {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 反之则不行：`single` 不能依赖 `scoped` 定义，且从根作用域调用 `get<SessionData>()` 会因 `NoDefinitionFoundException` 失败。请从作用域实例中解析作用域实例。
 
@@ -286,7 +304,9 @@ class CartBadge(
 
 通过类型声明的作用域（`scope<MainActivity>`）仅适用于该类型。**作用域原型**（Scope Archetype）是一种通用作用域声明，由同一种类的每个组件共享：每个 ViewModel、每个 Activity、每个 Fragment。你只需声明一次定义，每个组件都会获取自己的作用域实例。
 
-**编译器插件 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 val appModule = module {
     viewModelScope {
@@ -304,7 +324,9 @@ val appModule = module {
 }
 ```
 
-**注解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 原型注解替代了 `@Scope` 和 `@Scoped`：
 
 ```kotlin
@@ -324,7 +346,9 @@ class FragmentPresenter
 
 原型注解也适用于 `@Module` 类中的函数。
 
-**构造函数 / 经典 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val appModule = module {
     viewModelScope {
@@ -341,6 +365,9 @@ val appModule = module {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 | 原型 | DSL | 注解 | 关闭时机 | 平台 |
 |-----------|-----|------------|-------------|----------|

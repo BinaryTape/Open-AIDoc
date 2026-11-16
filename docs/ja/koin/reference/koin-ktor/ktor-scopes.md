@@ -8,7 +8,9 @@ title: リクエストスコープ
 
 ## リクエストスコープ定義の宣言 {id="declaring-request-scoped-definitions"}
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.module.requestScope
 
@@ -22,7 +24,9 @@ val appModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 import org.koin.ktor.plugin.RequestScope
 
@@ -35,7 +39,9 @@ class UserSessionHandler(private val call: ApplicationCall)
 
 `requestScope { }` は `RequestScope` 型によって修飾されたスコープであるため、`@Scope(RequestScope::class)` も同じスコープを対象とします。
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.module.requestScope
 
@@ -48,6 +54,9 @@ val appModule = module {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 ## ハンドラー内での解決 {id="resolving-in-a-handler"}
 

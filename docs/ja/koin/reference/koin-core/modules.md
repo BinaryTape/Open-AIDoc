@@ -8,7 +8,9 @@ title: モジュール
 
 ## モジュールの宣言 {id="declare-a-module"}
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.dsl.module
 import org.koin.plugin.module.dsl.*
@@ -24,7 +26,9 @@ val dataModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Module
 @ComponentScan("com.myapp.network")
@@ -37,7 +41,9 @@ class DataModule
 
 `@Module` クラスは、`@ComponentScan` によって検出されたアノテーション付きクラスと、その内部で宣言されたプロバイダー関数をまとめます（[Classes you don't own](/docs/reference/koin-core/definitions#classes-you-dont-own) を参照）。
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.dsl.module
 import org.koin.core.module.dsl.*
@@ -53,13 +59,18 @@ val dataModule = module {
 }
 ```
 
+</tab>
+</tabs>
+
 ある定義が別のモジュールの定義に依存することも可能です。Koinはロードされたすべてのモジュールを横断して解決を行うため、`dataModule` 内の `UserRepository` はモジュール間のインポートなしに `networkModule` の `ApiClient` を使用できます。両方のモジュールがロードされている必要があります。詳細については [Starting Koin](/docs/reference/koin-core/starting-koin) を参照してください。
 
 ## `includes()` によるモジュールの合成 {id="module-composition-with-includes"}
 
 モジュールは他のモジュールを含める（インクルードする）ことができます。親モジュールをロードすると、ツリー全体がロードされます。
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 val networkModule = module {
     single<ApiClient>()
@@ -79,7 +90,9 @@ startKoin {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Module
 class NetworkModule
@@ -95,7 +108,9 @@ class DataModule
 class MyApp
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val networkModule = module {
     singleOf(::ApiClient)
@@ -114,6 +129,9 @@ startKoin {
     modules(dataModule)
 }
 ```
+
+</tab>
+</tabs>
 
 `startKoin` 内でフラットな長いリストを記述するよりも、1つのルートモジュールを持つ `includes()` のツリー構造を優先してください。そうすることでモジュールの構造がコードの構造と一致し、スタートアップの呼び出しも簡潔に保たれます。
 
@@ -251,7 +269,9 @@ class MyApp // get<Feature>() は AppFeature を返す
 
 モジュール全体をマークして、Koinの起動時にそのすべての `single` 定義を生成するようにできます。
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 val coreModule = module(createdAtStart = true) {
     single<ConfigManager>()
@@ -259,14 +279,18 @@ val coreModule = module(createdAtStart = true) {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Module(createdAtStart = true)
 @ComponentScan("com.myapp.core")
 class CoreModule
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val coreModule = module(createdAtStart = true) {
     singleOf(::ConfigManager)
@@ -274,13 +298,18 @@ val coreModule = module(createdAtStart = true) {
 }
 ```
 
+</tab>
+</tabs>
+
 先行生成される各定義は起動時間を増加させます。定義ごとのフラグとその影響については、[Eager creation](/docs/reference/koin-core/definitions#eager-creation) を参照してください。
 
 ## パラメータ化されたモジュール {id="parameterized-modules"}
 
 DSLモジュールは値であるため、関数が引数からモジュールを構築できます。
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 fun loggingModule(debug: Boolean) = module {
     if (debug) {
@@ -295,10 +324,14 @@ startKoin {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 `@Module` クラスは引数を取ることができません。このような場合はDSLモジュールを使用するか、[configuration labels](/docs/reference/koin-core/starting-koin#configuration-labels) で選択されるバリアントごとに1つの `@Module` を用意してください。
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 fun loggingModule(debug: Boolean) = module {
     single<Logger> {
@@ -310,6 +343,9 @@ startKoin {
     modules(loggingModule(debug = BuildConfig.DEBUG))
 }
 ```
+
+</tab>
+</tabs>
 
 同じ考え方で実装の切り替えも可能です。`repositoryModule` は固定したまま、その横でそれぞれ `Datasource` を宣言する `localDatasourceModule` または `remoteDatasourceModule` のいずれかをロードします。条件付きモジュールリストはランタイム時に解決されるため、Compiler Plugin はビルド時にすべての組み合わせを検証することはできません。
 

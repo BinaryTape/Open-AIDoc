@@ -67,7 +67,9 @@ class MyApplication : Application()
 
 Koin:
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 class MyApplication : Application() {
     override fun onCreate() {
@@ -81,7 +83,9 @@ class MyApplication : Application() {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 import org.koin.plugin.module.dsl.startKoin
 
@@ -99,7 +103,9 @@ class MyApplication : Application() {
 
 `@KoinApplication` は、`@Configuration` がタグ付けされたすべてのモジュールを読み込みます。モジュールを明示的に指定する場合は、`@KoinApplication(modules = [AppModule::class])` を使用します。
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 class MyApplication : Application() {
     override fun onCreate() {
@@ -112,6 +118,9 @@ class MyApplication : Application() {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 `androidContext()` は、すべての定義で `Context` を利用できるようにします。[Starting Koin on Android](/docs/reference/koin-android/start) を参照してください。
 
@@ -141,7 +150,9 @@ object NetworkModule {
 
 Koin:
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.plugin.module.dsl.create
 
@@ -160,7 +171,9 @@ val networkModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Module
 class NetworkModule {
@@ -178,7 +191,9 @@ class NetworkModule {
 }
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val networkModule = module {
     single { OkHttpClient.Builder().build() }
@@ -191,6 +206,9 @@ val networkModule = module {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 `@InstallIn` は存在しません。定義のライフタイムは、インストールされるコンポーネントからではなく、その定義の型（`single`、`factory`、`scoped`）によって決まります。`@Inject constructor` を持つクラスは、`single<T>()` / `factory<T>()`、クラスへのアノテーション、または `singleOf(::T)` に置き換わります。ライブラリオブジェクトの詳細は [Definitions](/docs/reference/koin-core/definitions#classes-you-dont-own) を参照してください。
 
@@ -210,14 +228,18 @@ abstract class DataModule {
 
 Koin:
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 val dataModule = module {
     single<UserRepositoryImpl>() bind UserRepository::class
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton
 class UserRepositoryImpl(private val api: ApiService) : UserRepository
@@ -225,12 +247,17 @@ class UserRepositoryImpl(private val api: ApiService) : UserRepository
 
 クラスはそのすべてのスーパータイプにバインドされます。一部のみをバインドする場合は、`@Singleton(binds = [UserRepository::class])` を使用します。
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val dataModule = module {
     singleOf(::UserRepositoryImpl) bind UserRepository::class
 }
 ```
+
+</tab>
+</tabs>
 
 ## ステップ 5: ViewModel {id="step-5-viewmodels"}
 
@@ -246,7 +273,9 @@ class UserViewModel @Inject constructor(
 
 Koin:
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 class UserViewModel(
     private val repository: UserRepository,
@@ -258,7 +287,9 @@ val appModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @KoinViewModel
 class UserViewModel(
@@ -267,7 +298,9 @@ class UserViewModel(
 ) : ViewModel()
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 class UserViewModel(
     private val repository: UserRepository,
@@ -278,6 +311,9 @@ val appModule = module {
     viewModelOf(::UserViewModel)
 }
 ```
+
+</tab>
+</tabs>
 
 KoinはViewModelの定義に `SavedStateHandle` を提供します。ActivityやFragmentでは、`by viewModels()` を `by viewModel()` に置き換えてください。Composeでは、`hiltViewModel()` を `koinViewModel()` に置き換えます。[Android ViewModel](/docs/reference/koin-android/viewmodel) を参照してください。
 
@@ -336,7 +372,9 @@ class SyncRepository @Inject constructor(
 
 Koin:
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.core.annotation.Named
 
@@ -350,7 +388,9 @@ val dispatcherModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 既存のクォリファイアアノテーションをそのまま保持できます。Koinは `@Qualifier`（Koin独自、`jakarta.inject`、または `javax.inject`）が付与されたカスタムアノテーションを読み取ります:
 
 ```kotlin
@@ -373,13 +413,18 @@ class SyncRepository(
 )
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val dispatcherModule = module {
     single<CoroutineDispatcher>(named("io")) { Dispatchers.IO }
     single { SyncRepository(get(named("io"))) }
 }
 ```
+
+</tab>
+</tabs>
 
 型クォリファイア（`named<IoDispatcher>()`）やすべてのオプションについては、[Qualifiers](/docs/reference/koin-core/qualifiers) に記載されています。Hiltの `@ApplicationContext` に対応するクォリファイアは不要です。`Context` パラメータは `androidContext()` に渡されたコンテキストを受け取ります。
 
@@ -447,7 +492,9 @@ Hiltの `@TestInstallIn` や `@UninstallModules` は、本番モジュールの�
 
 Hiltの `@AssistedInject` と `@AssistedFactory` は、注入パラメータ（Injected parameters）に置き換わります。呼び出し元が実行時の値を渡します:
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 class UserDetailViewModel(
     @InjectedParam private val userId: String,
@@ -459,7 +506,9 @@ val appModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @KoinViewModel
 class UserDetailViewModel(
@@ -468,7 +517,9 @@ class UserDetailViewModel(
 ) : ViewModel()
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 class UserDetailViewModel(
     private val userId: String,
@@ -479,6 +530,9 @@ val appModule = module {
     viewModel { (userId: String) -> UserDetailViewModel(userId, get()) }
 }
 ```
+
+</tab>
+</tabs>
 
 ```kotlin
 val viewModel: UserDetailViewModel by viewModel { parametersOf("user-42") }

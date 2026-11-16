@@ -10,7 +10,9 @@ title: Ktor 中的隔離上下文
 
 安裝 `KoinIsolated` 來取代 `Koin`。配置區塊完全相同：
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.ktor.plugin.KoinIsolated
 
@@ -22,7 +24,9 @@ fun Application.module() {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 import org.koin.ktor.plugin.KoinIsolated
 import org.koin.plugin.module.dsl.withConfiguration
@@ -35,7 +39,9 @@ fun Application.module() {
 }
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.ktor.plugin.KoinIsolated
 
@@ -46,6 +52,9 @@ fun Application.module() {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 ## 與 Koin 相比的變化 {id="what-changes-compared-to-koin"}
 

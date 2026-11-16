@@ -28,7 +28,9 @@ dependencies {
 
 在 `androidTest` 中建立一個 `Application`，用您的正式環境模組加上一個測試模組來啟動 Koin。測試模組會在最後載入，因此其定義會替換正式環境的定義：
 
-**編譯器外掛程式 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 // in src/androidTest
 class TestApplication : Application() {
@@ -42,7 +44,9 @@ class TestApplication : Application() {
 }
 ```
 
-**註解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 // in src/androidTest
 class TestApplication : Application() {
@@ -58,7 +62,9 @@ class TestApplication : Application() {
 
 `startKoin<MyApp>` 會先載入 `@KoinApplication` 類別的模組，接著載入 Lambda 中宣告的模組。
 
-**建構函式 / 傳統 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 // in src/androidTest
 class TestApplication : Application() {
@@ -71,6 +77,9 @@ class TestApplication : Application() {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 ```kotlin
 val instrumentedTestModule = module {

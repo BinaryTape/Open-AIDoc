@@ -10,7 +10,9 @@ title: Compose 中的隔离上下文
 
 按照[上下文隔离](/docs/reference/koin-core/context-isolation)中的说明，将隔离的 `KoinApplication` 保存在静态持有者中：
 
-**编译器插件 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 object PaymentSdkKoin {
     val koinApp = koinApplication {
@@ -24,7 +26,9 @@ internal val paymentModule = module {
 }
 ```
 
-**注解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 import org.koin.plugin.module.dsl.koinApplication
 
@@ -40,7 +44,9 @@ object PaymentSdkKoin {
 }
 ```
 
-**构造函数 / 传统 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 object PaymentSdkKoin {
     val koinApp = koinApplication {
@@ -53,6 +59,9 @@ internal val paymentModule = module {
     viewModelOf(::PaymentViewModel)
 }
 ```
+
+</tab>
+</tabs>
 
 使用 `KoinIsolatedContext` 包裹 SDK 的 UI：
 

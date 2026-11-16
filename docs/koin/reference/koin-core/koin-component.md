@@ -120,7 +120,9 @@ class SdkClient : SdkComponent() {
 
 比较同一个类的两个版本：
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 // 依赖于 Koin，依赖项隐藏在类体中
 class UserService : KoinComponent {
@@ -136,7 +138,9 @@ val appModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 // 依赖于 Koin，依赖项隐藏在类体中
 class UserService : KoinComponent {
@@ -148,7 +152,9 @@ class UserService : KoinComponent {
 class UserService(private val repository: UserRepository)
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 // 依赖于 Koin，依赖项隐藏在类体中
 class UserService : KoinComponent {
@@ -163,6 +169,9 @@ val appModule = module {
     singleOf(::UserService)
 }
 ```
+
+</tab>
+</tabs>
 
 构造函数版本在四个方面更具优势：
 

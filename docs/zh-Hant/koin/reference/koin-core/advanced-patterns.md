@@ -10,7 +10,9 @@ title: 進階模式
 
 若要注入某個介面的所有實作，請將每個實作繫結至該介面，並請求一個 `List`：
 
-**編譯器外掛程式 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 interface PaymentProcessor {
     fun process(amount: Double): Boolean
@@ -28,7 +30,9 @@ val paymentModule = module {
 }
 ```
 
-**註解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 interface PaymentProcessor {
     fun process(amount: Double): Boolean
@@ -45,7 +49,9 @@ class PayPalProcessor : PaymentProcessor { ... }
 class PaymentManager(private val processors: List<PaymentProcessor>)
 ```
 
-**建構函式 / 傳統 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val paymentModule = module {
     singleOf(::CreditCardProcessor) bind PaymentProcessor::class
@@ -53,6 +59,9 @@ val paymentModule = module {
     single { PaymentManager(getAll()) }
 }
 ```
+
+</tab>
+</tabs>
 
 `List<T>` 參數會透過 `getAll<T>()` 解析：包含型別本身或其繫結型別之一為 `T` 的每個定義（無論是否帶限定詞）。在建構函式之外，可在 `Scope` 或 `getKoin()` 上呼叫 `getAll<PaymentProcessor>()`。
 
@@ -101,7 +110,9 @@ val repositoryModule = module {
 - **具體型別**：直接注入 `UserRepository` 與 `ProductRepository`。每個類別本身就是獨立的索引鍵。
 - **限定詞**：保留泛型介面，並使用限定詞來區分不同的定義。
 
-**編譯器外掛程式 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 @Qualifier(User::class)
 class UserRepository : Repository<User> { ... }
@@ -117,7 +128,9 @@ val repositoryModule = module {
 class UserService(@Qualifier(User::class) private val repository: Repository<User>)
 ```
 
-**註解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton
 @Qualifier(User::class)
@@ -131,7 +144,9 @@ class ProductRepository : Repository<Product> { ... }
 class UserService(@Qualifier(User::class) private val repository: Repository<User>)
 ```
 
-**建構函式 / 傳統 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val repositoryModule = module {
     single<Repository<User>>(named<User>()) { UserRepository() }
@@ -139,6 +154,9 @@ val repositoryModule = module {
     single { UserService(get(named<User>())) }
 }
 ```
+
+</tab>
+</tabs>
 
 `named<User>()` 是從 `User` 類別建置的型別限定詞。`@Qualifier(User::class)` 是其註解形式。
 
@@ -189,7 +207,9 @@ class LoggingNotificationService(
 }
 ```
 
-**編譯器外掛程式 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.plugin.module.dsl.create
 
@@ -205,7 +225,9 @@ val notificationModule = module {
 }
 ```
 
-**註解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Module
 class NotificationModule {
@@ -218,7 +240,9 @@ class NotificationModule {
 
 使用 `@Singleton(binds = [])` 宣告 `PushNotificationService`，這樣它就不會同時被繫結至 `NotificationService`。
 
-**建構函式 / 傳統 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val notificationModule = module {
     singleOf(::Logger)
@@ -228,6 +252,9 @@ val notificationModule = module {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 使用端請求 `NotificationService` 並取得裝飾後的執行個體。若要疊加多個裝飾器，請在同一個函式中將它們巢狀組合：`RateLimitedNotificationService(LoggingNotificationService(push, logger), limiter)`。
 

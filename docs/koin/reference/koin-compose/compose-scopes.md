@@ -14,7 +14,9 @@ title: Compose 中的作用域
 
 声明作用域：
 
-**编译器插件 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 class FeatureScope
 
@@ -26,7 +28,9 @@ val featureModule = module {
 }
 ```
 
-**注解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 class FeatureScope
 
@@ -37,7 +41,9 @@ class FeatureCache
 class FeatureRepository(private val cache: FeatureCache)
 ```
 
-**构造函数 / 传统 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 class FeatureScope
 
@@ -48,6 +54,9 @@ val featureModule = module {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 在 Compose 中打开它：
 

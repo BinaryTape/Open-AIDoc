@@ -15,7 +15,9 @@ interface ApiService {
 }
 ```
 
-**컴파일러 플러그인 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.plugin.module.dsl.create
 
@@ -44,7 +46,9 @@ val networkModule = module {
 }
 ```
 
-**어노테이션**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Module
 class NetworkModule {
@@ -72,7 +76,9 @@ class NetworkModule {
 }
 ```
 
-**생성자 / 클래식 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val networkModule = module {
     single {
@@ -95,11 +101,16 @@ val networkModule = module {
 }
 ```
 
+</tab>
+</tabs>
+
 `OkHttpClient`와 `Retrofit`은 `single`로 선언합니다. 각각 연결 풀(connection pool)과 스레드 풀(thread pool)을 유지하므로, 여러 인스턴스를 생성하면 자원이 낭비됩니다. `BuildConfig.API_URL`은 빌드 타입별로 정의하는 `buildConfigField`입니다. `Json` 인스턴스는 다음 섹션에서 가져옵니다.
 
 ## JSON 직렬화 {id="json-serialization"}
 
-**컴파일러 플러그인 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 fun json(): Json = Json {
     ignoreUnknownKeys = true
@@ -111,7 +122,9 @@ val serializationModule = module {
 }
 ```
 
-**어노테이션**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Module
 class SerializationModule {
@@ -124,7 +137,9 @@ class SerializationModule {
 }
 ```
 
-**생성자 / 클래식 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val serializationModule = module {
     single {
@@ -135,6 +150,9 @@ val serializationModule = module {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 동일한 패턴이 Gson(`fun gson(): Gson = GsonBuilder().create()`과 함께 `single { create(::gson) }`)이나 Moshi에도 적용됩니다. 하나의 공유 인스턴스를 사용하면 직렬화기(serializer) 설정을 한 곳에서 관리할 수 있습니다.
 
@@ -147,7 +165,9 @@ abstract class AppDatabase : RoomDatabase() {
 }
 ```
 
-**컴파일러 플러그인 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 fun appDatabase(context: Context): AppDatabase =
     Room.databaseBuilder(context, AppDatabase::class.java, "app-database").build()
@@ -160,7 +180,9 @@ val databaseModule = module {
 }
 ```
 
-**어노테이션**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Module
 class DatabaseModule {
@@ -174,7 +196,9 @@ class DatabaseModule {
 }
 ```
 
-**생성자 / 클래식 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val databaseModule = module {
     single {
@@ -183,6 +207,9 @@ val databaseModule = module {
     single { get<AppDatabase>().userDao() }
 }
 ```
+
+</tab>
+</tabs>
 
 데이터베이스는 `single`로 선언합니다. `RoomDatabase` 인스턴스는 생성 비용이 크며, Room 문서에서도 프로세스당 데이터베이스 인스턴스를 하나만 유지하도록 권장합니다. 여기서 `Context`는 시작 시 `androidContext()`에 의해 제공되는 `Application`입니다([Android에서 Koin 시작하기](/docs/reference/koin-android/start) 참조). DAO는 생성 비용이 적고 Room이 호출할 때마다 동일한 인스턴스를 반환하므로 `single`과 `factory` 둘 다 사용할 수 있습니다.
 
@@ -200,7 +227,9 @@ Worker는 전용 `WorkerFactory`를 통해 의존성을 주입받습니다. 설�
 | 도메인 | 상태를 가지지 않는 유스케이스 | `factory` |
 | UI | ViewModel | `viewModel` |
 
-**컴파일러 플러그인 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 val dataModule = module {
     includes(networkModule, databaseModule, serializationModule)
@@ -218,7 +247,9 @@ val uiModule = module {
 }
 ```
 
-**어노테이션**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton
 class UserRemoteDataSource(private val api: ApiService)
@@ -244,7 +275,9 @@ class UserViewModel(
 ) : ViewModel()
 ```
 
-**생성자 / 클래식 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val dataModule = module {
     includes(networkModule, databaseModule, serializationModule)
@@ -261,6 +294,9 @@ val uiModule = module {
     viewModelOf(::UserViewModel)
 }
 ```
+
+</tab>
+</tabs>
 
 ViewModel은 유스케이스에 의존하고, 유스케이스는 `UserRepository` 인터페이스에 의존하며, 데이터 모듈만이 `UserRepositoryImpl`을 알고 있습니다. 테스트에서 데이터 소스를 교체하려면 `UserRepository` 바인딩을 재정의(override)하면 됩니다([단위 테스트](/docs/reference/koin-test/testing) 참조). 각 계층이 별도의 Gradle 모듈로 분리되어 있는 경우는 [멀티 모듈 앱](/docs/reference/koin-android/multi-module)을 참조하세요.
 

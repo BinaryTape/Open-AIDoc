@@ -23,7 +23,9 @@ dependencies {
 
 在应用程序模块中安装 `Koin`。其配置块与 `startKoin { }` 相同：
 
-**编译器插件 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.ktor.plugin.Koin
 import org.koin.logger.slf4jLogger
@@ -41,7 +43,9 @@ fun Application.module() {
 }
 ```
 
-**注解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 import org.koin.ktor.plugin.Koin
 import org.koin.logger.slf4jLogger
@@ -65,7 +69,9 @@ fun Application.module() {
 
 `withConfiguration<T>()` 会加载由 `@KoinApplication` 类组装的模块。
 
-**构造函数 / 经典 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.ktor.plugin.Koin
 import org.koin.logger.slf4jLogger
@@ -82,6 +88,9 @@ fun Application.module() {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 该插件的作用：
 

@@ -147,7 +147,9 @@ class MainActivity : AppCompatActivity() {
 
 DI 라이브러리는 컨테이너를 자동화합니다. 어떤 클래스가 존재하고 수명이 얼마나 유지되는지만 선언하면, 라이브러리가 객체 그래프를 빌드합니다. Koin을 사용하는 예는 다음과 같습니다.
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 val appModule = module {
     single<Database>()
@@ -159,7 +161,9 @@ val appModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton
 class UserRepository(private val database: Database, private val apiClient: ApiClient)
@@ -177,7 +181,9 @@ class UserViewModel(private val userService: UserService) : ViewModel()
 class AppModule
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val appModule = module {
     singleOf(::Database)
@@ -188,6 +194,9 @@ val appModule = module {
     viewModelOf(::UserViewModel)
 }
 ```
+
+</tab>
+</tabs>
 
 그런 다음 Activity는 객체 그래프의 최상위 요소를 요청합니다.
 

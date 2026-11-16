@@ -15,7 +15,9 @@ interface ApiService {
 }
 ```
 
-**编译器插件 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.plugin.module.dsl.create
 
@@ -44,7 +46,9 @@ val networkModule = module {
 }
 ```
 
-**注解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Module
 class NetworkModule {
@@ -72,7 +76,9 @@ class NetworkModule {
 }
 ```
 
-**构造函数 / 经典 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val networkModule = module {
     single {
@@ -95,11 +101,16 @@ val networkModule = module {
 }
 ```
 
+</tab>
+</tabs>
+
 将 `OkHttpClient` 与 `Retrofit` 声明为 `single`：它们各自持有连接池和线程池，重复创建会造成资源浪费。`BuildConfig.API_URL` 是针对每个构建类型定义的 `buildConfigField`。`Json` 实例则来自下一节。
 
 ## JSON 序列化 {id="json-serialization"}
 
-**编译器插件 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 fun json(): Json = Json {
     ignoreUnknownKeys = true
@@ -111,7 +122,9 @@ val serializationModule = module {
 }
 ```
 
-**注解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Module
 class SerializationModule {
@@ -124,7 +137,9 @@ class SerializationModule {
 }
 ```
 
-**构造函数 / 经典 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val serializationModule = module {
     single {
@@ -135,6 +150,9 @@ val serializationModule = module {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 相同的模式也适用于 Gson（结合 `fun gson(): Gson = GsonBuilder().create()` 使用 `single { create(::gson) }`）或 Moshi。通过单个共享实例，可以将序列化器的配置集中在一处。
 
@@ -147,7 +165,9 @@ abstract class AppDatabase : RoomDatabase() {
 }
 ```
 
-**编译器插件 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 fun appDatabase(context: Context): AppDatabase =
     Room.databaseBuilder(context, AppDatabase::class.java, "app-database").build()
@@ -160,7 +180,9 @@ val databaseModule = module {
 }
 ```
 
-**注解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Module
 class DatabaseModule {
@@ -174,7 +196,9 @@ class DatabaseModule {
 }
 ```
 
-**构造函数 / 经典 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val databaseModule = module {
     single {
@@ -183,6 +207,9 @@ val databaseModule = module {
     single { get<AppDatabase>().userDao() }
 }
 ```
+
+</tab>
+</tabs>
 
 将数据库声明为 `single`：`RoomDatabase` 实例开销很大，而且 Room 文档要求在一个进程中每个数据库只保留一个实例。此处的 `Context` 为 `Application`，在启动时通过 `androidContext()` 提供（请参阅[在 Android 上启动 Koin](/docs/reference/koin-android/start)）。DAO 开销较小，并且 Room 在每次调用时都会返回相同的实例，因此使用 `single` 或 `factory` 均可。
 
@@ -200,7 +227,9 @@ Worker 通过专用的 `WorkerFactory` 获取其依赖项。相关设置和 `wor
 | 领域层 | 无状态的用例 | `factory` |
 | UI 层 | ViewModel | `viewModel` |
 
-**编译器插件 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 val dataModule = module {
     includes(networkModule, databaseModule, serializationModule)
@@ -218,7 +247,9 @@ val uiModule = module {
 }
 ```
 
-**注解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton
 class UserRemoteDataSource(private val api: ApiService)
@@ -244,7 +275,9 @@ class UserViewModel(
 ) : ViewModel()
 ```
 
-**构造函数 / 经典 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val dataModule = module {
     includes(networkModule, databaseModule, serializationModule)
@@ -261,6 +294,9 @@ val uiModule = module {
     viewModelOf(::UserViewModel)
 }
 ```
+
+</tab>
+</tabs>
 
 ViewModel 依赖于用例，用例依赖于 `UserRepository` 接口，并且只有数据模块感知 `UserRepositoryImpl`。若要在测试中替换数据源，请重写 `UserRepository` 绑定（请参阅[单元测试](/docs/reference/koin-test/testing)）。当各个层分别位于各自的 Gradle 模块中时，请参阅[多模块应用](/docs/reference/koin-android/multi-module)。
 

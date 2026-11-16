@@ -81,7 +81,9 @@ iosApp/       // Swift App 调用 initKoin()
 
 在 `commonMain` 中编写一个启动 Koin 的函数。每个平台调用该函数，并可通过 `config` 形参添加自己的配置：
 
-**编译器插件 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 // commonMain/kotlin/di/Koin.kt
 import org.koin.core.context.startKoin
@@ -107,7 +109,9 @@ fun initKoin(config: KoinAppDeclaration? = null) {
 }
 ```
 
-**注解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 // commonMain/kotlin/di/Koin.kt
 import org.koin.core.annotation.*
@@ -132,7 +136,9 @@ fun initKoin(config: KoinAppDeclaration? = null) {
 
 `@Configuration` 模块会在构建时被 `@KoinApplication` 发现。`PlatformModule` 是一个 `expect` 模块类，请参阅 [KMP 共享模式](/docs/reference/koin-core/kmp-shared-modules)。
 
-**构造函数 / 经典 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 // commonMain/kotlin/di/Koin.kt
 import org.koin.core.context.startKoin
@@ -157,6 +163,9 @@ fun initKoin(config: KoinAppDeclaration? = null) {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 `includes(config)` 会将平台配置（Android 上下文、记录器、额外模块）应用到同一个 Koin 启动过程中。`platformModule()` 是一个 `expect` 函数，请参阅 [KMP 共享模式](/docs/reference/koin-core/kmp-shared-modules)。
 
@@ -238,7 +247,9 @@ fun main() {
 
 使用 Compose Multiplatform 时，你可以通过根 Composable 中的 `KoinApplication` 来启动 Koin，而无需在每个平台上调用 `initKoin`。在 Android 上，它会自动为你设置 Android 上下文：
 
-**编译器插件 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 // commonMain
 @Composable
@@ -249,7 +260,9 @@ fun App() {
 }
 ```
 
-**注解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 // commonMain
 @Composable
@@ -262,7 +275,9 @@ fun App() {
 
 `koinConfiguration<T>()` 来自 `org.koin.plugin.module.dsl`。
 
-**构造函数 / 经典 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 // commonMain
 @Composable
@@ -272,6 +287,9 @@ fun App() {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 如果 Compose 外部的代码在显示第一个屏幕之前需要使用 Koin（例如后台服务、Swift 代码），请保留 `initKoin`。这两种方式在 [Koin for Compose](/docs/reference/koin-compose/compose) 中进行了对比。
 

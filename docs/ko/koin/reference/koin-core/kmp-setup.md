@@ -81,7 +81,9 @@ iosApp/       // Swift App에서 initKoin() 호출
 
 `commonMain`에 Koin을 시작하는 함수를 하나 작성합니다. 각 플랫폼은 이 함수를 호출하며, `config` 매개변수를 통해 자체 설정을 추가할 수 있습니다:
 
-**컴파일러 플러그인 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 // commonMain/kotlin/di/Koin.kt
 import org.koin.core.context.startKoin
@@ -107,7 +109,9 @@ fun initKoin(config: KoinAppDeclaration? = null) {
 }
 ```
 
-**어노테이션**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 // commonMain/kotlin/di/Koin.kt
 import org.koin.core.annotation.*
@@ -132,7 +136,9 @@ fun initKoin(config: KoinAppDeclaration? = null) {
 
 `@Configuration` 모듈은 빌드 시점에 `@KoinApplication`에 의해 감지됩니다. `PlatformModule`은 `expect` 모듈 클래스이며, 자세한 내용은 [KMP 공유 패턴](/docs/reference/koin-core/kmp-shared-modules)을 참조하세요.
 
-**생성자 / 클래식 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 // commonMain/kotlin/di/Koin.kt
 import org.koin.core.context.startKoin
@@ -157,6 +163,9 @@ fun initKoin(config: KoinAppDeclaration? = null) {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 `includes(config)`는 플랫폼 설정(Android context, 로거, 추가 모듈)을 동일한 Koin 시작 프로세스에 적용합니다. `platformModule()`은 `expect` 함수이며, 자세한 내용은 [KMP 공유 패턴](/docs/reference/koin-core/kmp-shared-modules)을 참조하세요.
 
@@ -238,7 +247,9 @@ fun main() {
 
 Compose Multiplatform을 사용할 때는 각 플랫폼에서 `initKoin`을 호출하는 대신 루트 Composable에서 `KoinApplication`으로 Koin을 시작할 수 있습니다. Android의 경우 Android context가 자동으로 설정됩니다:
 
-**컴파일러 플러그인 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 // commonMain
 @Composable
@@ -249,7 +260,9 @@ fun App() {
 }
 ```
 
-**어노테이션**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 // commonMain
 @Composable
@@ -262,7 +275,9 @@ fun App() {
 
 `koinConfiguration<T>()`는 `org.koin.plugin.module.dsl`에서 제공됩니다.
 
-**생성자 / 클래식 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 // commonMain
 @Composable
@@ -272,6 +287,9 @@ fun App() {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 첫 번째 화면이 표시되기 전에 Compose 외부의 코드(백그라운드 서비스, Swift 코드 등)에서 Koin을 사용해야 한다면 `initKoin` 방식을 유지하세요. 두 옵션의 비교는 [Koin for Compose](/docs/reference/koin-compose/compose)에서 확인할 수 있습니다.
 

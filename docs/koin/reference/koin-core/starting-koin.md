@@ -10,7 +10,9 @@ title: 启动 Koin
 
 ## 启动 Koin {id="start-koin"}
 
-**编译器插件 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.core.context.startKoin
 
@@ -22,7 +24,9 @@ fun main() {
 }
 ```
 
-**注解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 import org.koin.plugin.module.dsl.startKoin
 
@@ -38,7 +42,9 @@ fun main() {
 
 Koin 编译器插件会将 `startKoin<MyApp>()` 替换为一个 `startKoin { }` 调用，用于加载 `@KoinApplication` 中列出的模块以及它所发现的 `@Configuration` 模块。参见[使用 @KoinApplication 的类型化启动](#typed-startup-with-koinapplication)。
 
-**构造函数 / 经典 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.core.context.startKoin
 
@@ -49,6 +55,9 @@ fun main() {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 `startKoin` 会创建容器并将其注册到 `GlobalContext` 中，这是进程的默认上下文。一旦它返回，所有的 `get()`、`by inject()` 或平台 API（`by viewModel()`、`koinInject()`）都会从该容器中解析依赖。
 
@@ -308,7 +317,9 @@ val token: String? = koin.getProperty("session_token")
 
 ### 注入属性 {id="injecting-properties"}
 
-**编译器插件 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 使用 `@Property`（来自 `koin-annotations`）注解构造函数形参：
 
 ```kotlin
@@ -319,7 +330,9 @@ val networkModule = module {
 }
 ```
 
-**注解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton
 class ApiClient(@Property("server_url") val url: String)
@@ -334,7 +347,9 @@ val defaultServerUrl = "https://api.example.com"
 
 生成的代码会读取 `getProperty("server_url", defaultServerUrl)`，因此当未设置该属性时，`ApiClient` 将获取默认值。
 
-**构造函数 / 经典 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val networkModule = module {
     single { ApiClient(url = getProperty("server_url")) }
@@ -345,6 +360,9 @@ val networkModule = module {
 ```
 
 如果属性不存在，`getProperty(key)` 会抛出异常。而 `getPropertyOrNull(key)` 则返回 `null`。
+
+</tab>
+</tabs>
 
 建议在一个配置类中统一读取属性并注入该类，而不是在多处调用 `getProperty`。这样键名便能集中保存在一个文件中。
 

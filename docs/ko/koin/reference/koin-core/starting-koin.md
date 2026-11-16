@@ -10,7 +10,9 @@ title: Koin 시작하기
 
 ## Koin 시작 {id="start-koin"}
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.core.context.startKoin
 
@@ -22,7 +24,9 @@ fun main() {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 import org.koin.plugin.module.dsl.startKoin
 
@@ -38,7 +42,9 @@ fun main() {
 
 Koin 컴파일러 플러그인은 `startKoin<MyApp>()`을 `@KoinApplication`에 나열된 모듈과 자동으로 발견된 `@Configuration` 모듈들을 로드하는 `startKoin { }` 호출로 대체합니다. 자세한 내용은 [@KoinApplication을 사용한 타입 안전한 시작](#typed-startup-with-koinapplication)을 참조하세요.
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.core.context.startKoin
 
@@ -49,6 +55,9 @@ fun main() {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 `startKoin`은 컨테이너를 생성하고 프로세스의 기본 컨텍스트인 `GlobalContext`에 등록합니다. 호출이 완료되면 모든 `get()`, `by inject()` 또는 플랫폼 API(`by viewModel()`, `koinInject()`)가 이 컨테이너로부터 의존성을 해결(resolve)합니다.
 
@@ -308,7 +317,9 @@ val token: String? = koin.getProperty("session_token")
 
 ### 프로퍼티 주입 {id="injecting-properties"}
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 생성자 파라미터에 (`koin-annotations`의) `@Property` 애너테이션을 추가합니다:
 
 ```kotlin
@@ -319,7 +330,9 @@ val networkModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton
 class ApiClient(@Property("server_url") val url: String)
@@ -334,7 +347,9 @@ val defaultServerUrl = "https://api.example.com"
 
 생성된 코드는 `getProperty("server_url", defaultServerUrl)`을 읽으므로, 아무도 프로퍼티를 설정하지 않았을 때 `ApiClient`가 기본값을 받게 됩니다.
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val networkModule = module {
     single { ApiClient(url = getProperty("server_url")) }
@@ -345,6 +360,9 @@ val networkModule = module {
 ```
 
 `getProperty(key)`는 프로퍼티가 없으면 예외를 발생시킵니다. `getPropertyOrNull(key)`는 대신 `null`을 반환합니다.
+
+</tab>
+</tabs>
 
 여러 곳에서 `getProperty`를 호출하는 대신, 하나의 설정 클래스에서 프로퍼티를 읽고 해당 클래스를 주입하는 방식을 권장합니다. 이렇게 하면 키들을 하나의 파일에서 관리할 수 있습니다.
 

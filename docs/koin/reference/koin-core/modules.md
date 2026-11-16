@@ -8,7 +8,9 @@ title: 模块
 
 ## 声明模块 {id="declare-a-module"}
 
-**编译器插件 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.dsl.module
 import org.koin.plugin.module.dsl.*
@@ -24,7 +26,9 @@ val dataModule = module {
 }
 ```
 
-**注解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Module
 @ComponentScan("com.myapp.network")
@@ -37,7 +41,9 @@ class DataModule
 
 `@Module` 类会收集由 `@ComponentScan` 发现的带注解类，以及在其内部声明的提供者函数（请参阅[非自有的类](/docs/reference/koin-core/definitions#classes-you-dont-own)）。
 
-**构造函数 / 经典 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.dsl.module
 import org.koin.core.module.dsl.*
@@ -53,13 +59,18 @@ val dataModule = module {
 }
 ```
 
+</tab>
+</tabs>
+
 一个定义可以依赖于来自另一个模块的定义。Koin 会跨所有已加载的模块进行解析，因此 `dataModule` 中的 `UserRepository` 可以使用 `networkModule` 中的 `ApiClient`，而无需在模块之间进行任何导入。但两个模块都必须已被加载，请参阅[启动 Koin](/docs/reference/koin-core/starting-koin)。
 
 ## 使用 `includes()` 组合模块 {id="module-composition-with-includes"}
 
 模块可以包含其他模块。加载父模块即可加载整棵树：
 
-**编译器插件 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 val networkModule = module {
     single<ApiClient>()
@@ -79,7 +90,9 @@ startKoin {
 }
 ```
 
-**注解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Module
 class NetworkModule
@@ -95,7 +108,9 @@ class DataModule
 class MyApp
 ```
 
-**构造函数 / 经典 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val networkModule = module {
     singleOf(::ApiClient)
@@ -114,6 +129,9 @@ startKoin {
     modules(dataModule)
 }
 ```
+
+</tab>
+</tabs>
 
 相比在 `startKoin` 中传入冗长的扁平列表，更推荐使用带有单个根模块的 `includes()` 树形结构。这样模块的结构就可以契合代码的结构，且启动调用也保持简洁。
 
@@ -251,7 +269,9 @@ class MyApp // get<Feature>() 返回 AppFeature
 
 可以标记整个模块，使其在 Koin 启动时创建其所有的 `single` 定义：
 
-**编译器插件 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 val coreModule = module(createdAtStart = true) {
     single<ConfigManager>()
@@ -259,14 +279,18 @@ val coreModule = module(createdAtStart = true) {
 }
 ```
 
-**注解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Module(createdAtStart = true)
 @ComponentScan("com.myapp.core")
 class CoreModule
 ```
 
-**构造函数 / 经典 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val coreModule = module(createdAtStart = true) {
     singleOf(::ConfigManager)
@@ -274,13 +298,18 @@ val coreModule = module(createdAtStart = true) {
 }
 ```
 
+</tab>
+</tabs>
+
 每个预加载定义都会增加启动时间。有关单个定义的标志及其开销，请参阅[预加载创建](/docs/reference/koin-core/definitions#eager-creation)。
 
 ## 参数化模块 {id="parameterized-modules"}
 
 DSL 模块是一个值，因此可以通过函数传入实参来构建它：
 
-**编译器插件 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 fun loggingModule(debug: Boolean) = module {
     if (debug) {
@@ -295,10 +324,14 @@ startKoin {
 }
 ```
 
-**注解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 `@Module` 类不接受实参。对于这种情况，请使用 DSL 模块，或者为每个变体定义一个 `@Module` 并通过[配置标签](/docs/reference/koin-core/starting-koin#configuration-labels)进行选择。
 
-**构造函数 / 经典 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 fun loggingModule(debug: Boolean) = module {
     single<Logger> {
@@ -310,6 +343,9 @@ startKoin {
     modules(loggingModule(debug = BuildConfig.DEBUG))
 }
 ```
+
+</tab>
+</tabs>
 
 同样的思路也可用于替换实现：保持 `repositoryModule` 不变，并根据需要在其旁边加载 `localDatasourceModule` 或 `remoteDatasourceModule`，两者各自声明一个 `Datasource`。条件模块列表是在运行时解析的，因此编译器插件无法在构建时验证所有组合。
 

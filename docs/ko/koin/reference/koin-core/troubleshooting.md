@@ -145,7 +145,9 @@ class AuthService(private val sessionManager: SessionManager)
 
 한쪽을 지연(Lazy) 초기화하도록 변경하여, 객체 생성 시점이 아닌 처음 사용할 때 해결되도록 합니다:
 
-**컴파일러 플러그인 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 class AuthService(private val sessionManager: Lazy<SessionManager>)
 
@@ -155,7 +157,9 @@ val authModule = module {
 }
 ```
 
-**애너테이션**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton
 class SessionManager(private val authService: AuthService)
@@ -164,7 +168,9 @@ class SessionManager(private val authService: AuthService)
 class AuthService(private val sessionManager: Lazy<SessionManager>)
 ```
 
-**생성자 / 클래식 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 class AuthService(private val sessionManager: Lazy<SessionManager>)
 
@@ -173,6 +179,9 @@ val authModule = module {
     single { AuthService(inject()) }
 }
 ```
+
+</tab>
+</tabs>
 
 `AuthService` 생성자나 `init` 블록에서 `sessionManager.value`를 읽어서는 안 됩니다. 그렇게 하면 다시 순환이 발생합니다.
 

@@ -145,7 +145,9 @@ Compiler Pluginを使用している場合、ビルドは失敗します。
 
 一方をLazyにして、コンストラクタの実行時ではなく初回使用時に解決されるようにします。
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 class AuthService(private val sessionManager: Lazy<SessionManager>)
 
@@ -155,7 +157,9 @@ val authModule = module {
 }
 ```
 
-**アノテーション**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton
 class SessionManager(private val authService: AuthService)
@@ -164,7 +168,9 @@ class SessionManager(private val authService: AuthService)
 class AuthService(private val sessionManager: Lazy<SessionManager>)
 ```
 
-**コンストラクタ / クラシックDSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 class AuthService(private val sessionManager: Lazy<SessionManager>)
 
@@ -173,6 +179,9 @@ val authModule = module {
     single { AuthService(inject()) }
 }
 ```
+
+</tab>
+</tabs>
 
 `AuthService` は、コンストラクタや `init` ブロック内で `sessionManager.value` を読み取ってはなりません。そうすると循環が再発します。
 

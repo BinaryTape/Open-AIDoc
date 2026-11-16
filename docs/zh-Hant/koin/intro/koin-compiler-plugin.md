@@ -10,7 +10,9 @@ Koin Compiler Plugin 是一個在 Kotlin 編譯器 (K2) 內部執行的 Kotlin �
 
 您只需編寫型別，外掛程式就會為您編寫建構函式呼叫：
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 class UserRepository(private val api: ApiService, private val cache: UserCache)
 
@@ -19,13 +21,17 @@ val appModule = module {
 }
 ```
 
-**註解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton
 class UserRepository(private val api: ApiService, private val cache: UserCache)
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 Classic DSL 不需要外掛程式：您需要自行撰寫裝配程式碼。Constructor DSL (`singleOf(::T)`) 也不需要它。
 
 ```kotlin
@@ -35,6 +41,9 @@ val appModule = module {
 ```
 
 若套用了外掛程式，它仍會在組建期檢查這些 `get()` 呼叫與 `singleOf(::T)` 定義。
+
+</tab>
+</tabs>
 
 在編譯期間，外掛程式會將 `single<UserRepository>()`（或 `@Singleton` 類別）取代為等價的：
 

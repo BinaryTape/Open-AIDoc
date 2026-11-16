@@ -26,14 +26,18 @@ Koin의 역할은 개발자가 직접 연결 코드를 작성하지 않아도 `A
 
 **정의(definition)**는 Koin에게 특정 타입을 생성하는 방법과 해당 인스턴스를 얼마나 오래 유지할지를 알려줍니다:
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 single<ApiService>()
 single<UserRepository>()
 viewModel<UserViewModel>()
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton
 class ApiService
@@ -45,12 +49,17 @@ class UserRepository(private val api: ApiService)
 class UserViewModel(private val repository: UserRepository) : ViewModel()
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 singleOf(::ApiService)
 singleOf(::UserRepository)
 viewModelOf(::UserViewModel)
 ```
+
+</tab>
+</tabs>
 
 키워드는 생명주기(lifetime)를 설정합니다. `single`은 전체 컨테이너에 대해 단 하나의 인스턴스만 유지합니다. `factory`는 요청할 때마다 새로운 인스턴스를 생성합니다. `viewModel`은 ViewModel의 수명주기를 따릅니다. Koin은 `UserRepository`의 생성자를 확인하여 `ApiService`가 필요함을 파악하고, 컨테이너에서 이를 찾아 주입합니다.
 
@@ -60,7 +69,9 @@ viewModelOf(::UserViewModel)
 
 **모듈(module)**은 정의들을 그룹화합니다. 보통 기능(feature) 또는 계층(layer)당 하나의 모듈을 둡니다:
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.dsl.module
 import org.koin.plugin.module.dsl.*
@@ -72,7 +83,9 @@ val appModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Module
 @ComponentScan("com.example.app")
@@ -81,7 +94,9 @@ class AppModule
 
 `@ComponentScan`은 `com.example.app` 패키지 및 그 하위 패키지에 있는 어노테이션이 붙은 모든 클래스를 수집합니다.
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.dsl.module
 import org.koin.core.module.dsl.*
@@ -93,6 +108,9 @@ val appModule = module {
 }
 ```
 
+</tab>
+</tabs>
+
 모듈은 단순한 기술서(설명서)일 뿐입니다. Koin이 시작되고 누군가 인스턴스를 요청하기 전까지는 아무것도 생성되지 않습니다. 모듈은 다른 모듈을 포함할 수 있으므로, 규모가 큰 앱은 작은 모듈들의 트리 구조로 이루어집니다.
 
 자세한 내용: [Modules](/docs/reference/koin-core/modules).
@@ -101,7 +119,9 @@ val appModule = module {
 
 `startKoin`은 **컨테이너**( `KoinApplication`)를 생성하고 여기에 모듈을 로드합니다. 앱의 진입점(entry point)에서 한 번만 호출하면 됩니다:
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 fun main() {
     startKoin {
@@ -110,7 +130,9 @@ fun main() {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 import org.koin.plugin.module.dsl.startKoin
 
@@ -122,7 +144,9 @@ fun main() {
 }
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 fun main() {
     startKoin {
@@ -130,6 +154,9 @@ fun main() {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 Android에서는 `Application.onCreate()`에서 호출하며, `androidContext(this)`를 통해 Android Context를 전달합니다. 컨테이너는 정의들과 지금까지 생성된 인스턴스들을 보유합니다. `stopKoin()`을 호출하면 컨테이너가 닫히고 모든 `single` 인스턴스가 해제됩니다.
 
@@ -186,7 +213,9 @@ UserActivity ── by viewModel() ──> UserViewModel
 
 예를 들어 `CartRepository`가 사용자가 로그인해 있는 동안에만 존재해야 한다고 가정해 보겠습니다:
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 class UserSession
 class CartRepository(private val api: ApiService)
@@ -198,7 +227,9 @@ val sessionModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 class UserSession
 
@@ -207,7 +238,9 @@ class UserSession
 class CartRepository(private val api: ApiService)
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 class UserSession
 class CartRepository(private val api: ApiService)
@@ -218,6 +251,9 @@ val sessionModule = module {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 세션이 시작될 때 스코프를 열고, 세션이 종료될 때 닫습니다:
 
@@ -237,7 +273,9 @@ sessionScope.close() // releases CartRepository
 
 Koin은 타입을 기준으로 정의를 찾습니다. 두 개의 정의가 동일한 타입을 제공할 때, **한정자(qualifier)**를 사용하여 각 정의에 이름을 부여할 수 있습니다:
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 interface NetworkClient
 
@@ -256,7 +294,9 @@ val networkModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton
 @Named("auth")
@@ -270,7 +310,9 @@ class PublicClient : NetworkClient
 class UserRepository(@Named("auth") private val client: NetworkClient)
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val networkModule = module {
     single<NetworkClient>(named("auth")) { AuthClient() }
@@ -278,6 +320,9 @@ val networkModule = module {
     single { UserRepository(get(named("auth"))) }
 }
 ```
+
+</tab>
+</tabs>
 
 자세한 내용: [Qualifiers](/docs/reference/koin-core/qualifiers).
 

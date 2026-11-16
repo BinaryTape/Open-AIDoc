@@ -8,7 +8,9 @@ title: 請求作用域
 
 ## 宣告請求作用域定義 {id="declaring-request-scoped-definitions"}
 
-**編譯器外掛程式 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.module.requestScope
 
@@ -22,7 +24,9 @@ val appModule = module {
 }
 ```
 
-**註解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 import org.koin.ktor.plugin.RequestScope
 
@@ -35,7 +39,9 @@ class UserSessionHandler(private val call: ApplicationCall)
 
 `requestScope { }` 是一個由 `RequestScope` 型別限定的作用域，因此 `@Scope(RequestScope::class)` 會以同一個作用域為目標。
 
-**建構函式 / 經典 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.module.requestScope
 
@@ -48,6 +54,9 @@ val appModule = module {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 ## 在處理常式中解析 {id="resolving-in-a-handler"}
 

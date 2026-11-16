@@ -10,7 +10,9 @@ title: Ktor의 격리된 컨텍스트
 
 `Koin` 대신 `KoinIsolated`를 설치합니다. 설정 블록은 동일합니다:
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.ktor.plugin.KoinIsolated
 
@@ -22,7 +24,9 @@ fun Application.module() {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 import org.koin.ktor.plugin.KoinIsolated
 import org.koin.plugin.module.dsl.withConfiguration
@@ -35,7 +39,9 @@ fun Application.module() {
 }
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.ktor.plugin.KoinIsolated
 
@@ -46,6 +52,9 @@ fun Application.module() {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 ## Koin과 비교하여 달라지는 점 {id="what-changes-compared-to-koin"}
 

@@ -145,7 +145,9 @@ class AuthService(private val sessionManager: SessionManager)
 
 将其中一方设为延迟加载，使其在首次使用时才进行解析，而不是在构造期间：
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 class AuthService(private val sessionManager: Lazy<SessionManager>)
 
@@ -155,7 +157,9 @@ val authModule = module {
 }
 ```
 
-**注解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton
 class SessionManager(private val authService: AuthService)
@@ -164,7 +168,9 @@ class SessionManager(private val authService: AuthService)
 class AuthService(private val sessionManager: Lazy<SessionManager>)
 ```
 
-**构造函数 / 经典 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 class AuthService(private val sessionManager: Lazy<SessionManager>)
 
@@ -173,6 +179,9 @@ val authModule = module {
     single { AuthService(inject()) }
 }
 ```
+
+</tab>
+</tabs>
 
 `AuthService` 绝不能在其构造函数或 `init` 代码块中读取 `sessionManager.value`，否则循环依赖仍会发生。
 

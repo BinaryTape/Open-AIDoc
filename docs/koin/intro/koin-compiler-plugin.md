@@ -10,7 +10,9 @@ Koin 编译器插件（Koin Compiler Plugin）是一个运行在 Kotlin 编译�
 
 你只需编写类型，插件负责编写构造函数调用：
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 class UserRepository(private val api: ApiService, private val cache: UserCache)
 
@@ -19,13 +21,17 @@ val appModule = module {
 }
 ```
 
-**注解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton
 class UserRepository(private val api: ApiService, private val cache: UserCache)
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 Classic DSL 不需要该插件：装配代码由你自行编写。Constructor DSL (`singleOf(::T)`) 同样也不需要它。
 
 ```kotlin
@@ -35,6 +41,9 @@ val appModule = module {
 ```
 
 如果应用了该插件，它仍会在构建期检查这些 `get()` 调用和 `singleOf(::T)` 定义。
+
+</tab>
+</tabs>
 
 在编译期间，插件会将 `single<UserRepository>()`（或带有 `@Singleton` 的类）替换为等效的以下代码：
 

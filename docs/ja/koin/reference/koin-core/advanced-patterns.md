@@ -10,7 +10,9 @@ title: 高度なパターン
 
 インターフェースのすべての実装を注入するには、それぞれをそのインターフェースにバインドし、`List` を要求します。
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 interface PaymentProcessor {
     fun process(amount: Double): Boolean
@@ -28,7 +30,9 @@ val paymentModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 interface PaymentProcessor {
     fun process(amount: Double): Boolean
@@ -45,7 +49,9 @@ class PayPalProcessor : PaymentProcessor { ... }
 class PaymentManager(private val processors: List<PaymentProcessor>)
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val paymentModule = module {
     singleOf(::CreditCardProcessor) bind PaymentProcessor::class
@@ -53,6 +59,9 @@ val paymentModule = module {
     single { PaymentManager(getAll()) }
 }
 ```
+
+</tab>
+</tabs>
 
 `List<T>` パラメータは `getAll<T>()` を使って解決されます。これにより、修飾子の有無にかかわらず、その型またはバインドされた型の1つが `T` であるすべての定義が取得されます。コンストラクタの外部では、`Scope` または `getKoin()` 上で `getAll<PaymentProcessor>()` を呼び出します。
 
@@ -101,7 +110,9 @@ val repositoryModule = module {
 - **具象型**: `UserRepository` と `ProductRepository` を直接注入します。各クラスがそれぞれ固有のキーになります。
 - **修飾子**: ジェネリックインターフェースを維持したまま、修飾子によって定義を区別します。
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 @Qualifier(User::class)
 class UserRepository : Repository<User> { ... }
@@ -117,7 +128,9 @@ val repositoryModule = module {
 class UserService(@Qualifier(User::class) private val repository: Repository<User>)
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton
 @Qualifier(User::class)
@@ -131,7 +144,9 @@ class ProductRepository : Repository<Product> { ... }
 class UserService(@Qualifier(User::class) private val repository: Repository<User>)
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val repositoryModule = module {
     single<Repository<User>>(named<User>()) { UserRepository() }
@@ -139,6 +154,9 @@ val repositoryModule = module {
     single { UserService(get(named<User>())) }
 }
 ```
+
+</tab>
+</tabs>
 
 `named<User>()` は `User` クラスから構築された型修飾子です。`@Qualifier(User::class)` はそのアノテーション形式です。
 
@@ -189,7 +207,9 @@ class LoggingNotificationService(
 }
 ```
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.plugin.module.dsl.create
 
@@ -205,7 +225,9 @@ val notificationModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Module
 class NotificationModule {
@@ -218,7 +240,9 @@ class NotificationModule {
 
 `PushNotificationService` を `@Singleton(binds = [])` で宣言し、`NotificationService` にもバインドされてしまわないようにします。
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val notificationModule = module {
     singleOf(::Logger)
@@ -228,6 +252,9 @@ val notificationModule = module {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 コンシューマ（利用者）は `NotificationService` を要求し、デコレートされたインスタンスを受け取ります。複数のデコレータを重ねる場合は、同じ関数内でそれらをネストさせます：`RateLimitedNotificationService(LoggingNotificationService(push, logger), limiter)`。
 

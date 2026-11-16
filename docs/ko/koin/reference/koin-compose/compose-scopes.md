@@ -14,7 +14,9 @@ title: Compose에서의 스코프
 
 스코프 선언:
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 class FeatureScope
 
@@ -26,7 +28,9 @@ val featureModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 class FeatureScope
 
@@ -37,7 +41,9 @@ class FeatureCache
 class FeatureRepository(private val cache: FeatureCache)
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 class FeatureScope
 
@@ -48,6 +54,9 @@ val featureModule = module {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 Compose에서 스코프 열기:
 

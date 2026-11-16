@@ -10,7 +10,9 @@ title: 注入パラメータ (Injected Parameters)
 
 どのコンストラクタパラメータが呼び出し元から渡されるかを指定します。その他のパラメータは通常どおりコンテナから解決されます。
 
-**コンパイラプラグインDSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.core.annotation.InjectedParam
 
@@ -27,7 +29,9 @@ val appModule = module {
 
 `@InjectedParam` は `koin-annotations` アーティファクトから提供されます。これにより、`userId` が定義ではないことをコンパイラプラグインに伝え、ビルド時のチェックで不足していると報告されないようにします。
 
-**アノテーション**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Factory
 class UserPresenter(
@@ -38,7 +42,9 @@ class UserPresenter(
 
 `@InjectedParam` はプロバイダ関数のパラメータに対しても機能します。
 
-**コンストラクタ / クラシックDSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 定義ラムダはパラメータを `params` として受け取ります。
 
 ```kotlin
@@ -47,6 +53,9 @@ val appModule = module {
     factory { params -> UserPresenter(userId = params.get(), repository = get()) }
 }
 ```
+
+</tab>
+</tabs>
 
 呼び出し元は、パラメータと同じ順序で `parametersOf()` を使用して値を渡します。
 
@@ -67,7 +76,9 @@ val presenter: UserPresenter by inject { parametersOf("user-42") }
 
 ## 複数のパラメータ {id="several-parameters"}
 
-**コンパイラプラグインDSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 class OrderPresenter(
     @InjectedParam val userId: String,
@@ -80,7 +91,9 @@ val appModule = module {
 }
 ```
 
-**アノテーション**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Factory
 class OrderPresenter(
@@ -90,7 +103,9 @@ class OrderPresenter(
 )
 ```
 
-**コンストラクタ / クラシックDSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ラムダ内でパラメータを分割代入します。
 
 ```kotlin
@@ -110,6 +125,9 @@ val appModule = module {
 ```
 
 分割代入は最大5つの値に制限されており、宣言された型は呼び出し元が渡した値に対してチェックされません。順序が間違っている場合、キャストは実行時に失敗します。
+
+</tab>
+</tabs>
 
 ```kotlin
 val presenter: OrderPresenter = get { parametersOf("user-42", 1001L) }

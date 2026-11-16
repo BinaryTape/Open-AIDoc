@@ -78,7 +78,9 @@ class SyncWorker(
 
 将其声明为 worker：
 
-**编译器插件 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.plugin.module.dsl.worker
 
@@ -88,7 +90,9 @@ val workModule = module {
 }
 ```
 
-**注解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 import org.koin.android.annotation.KoinWorker
 
@@ -102,7 +106,9 @@ class SyncWorker(
 }
 ```
 
-**构造函数 / 经典 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.androidx.workmanager.dsl.worker
 import org.koin.androidx.workmanager.dsl.workerOf
@@ -117,6 +123,9 @@ val workModule = module {
 ```
 
 `WorkerParameters` 是唯一注入的形参：通过 `params.get()` 或 `get()` 读取它，并通过 `androidContext()` 获取 `Context`。
+
+</tab>
+</tabs>
 
 worker 定义是一个以 Worker 类命名并绑定到 `ListenableWorker` 的 `factory`。当 WorkManager 请求 Worker 类时，Koin 工厂会查找该名称。如果没有匹配的定义，Koin 将返回 `null`，WorkManager 则会回退到其默认工厂。
 

@@ -120,7 +120,9 @@ class SdkClient : SdkComponent() {
 
 比較同一個類別的兩種版本：
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 // 相依於 Koin，相依性隱藏在主體中
 class UserService : KoinComponent {
@@ -136,7 +138,9 @@ val appModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 // 相依於 Koin，相依性隱藏在主體中
 class UserService : KoinComponent {
@@ -148,7 +152,9 @@ class UserService : KoinComponent {
 class UserService(private val repository: UserRepository)
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 // 相依於 Koin，相依性隱藏在主體中
 class UserService : KoinComponent {
@@ -163,6 +169,9 @@ val appModule = module {
     singleOf(::UserService)
 }
 ```
+
+</tab>
+</tabs>
 
 建構函式版本在以下四個方面更具優勢：
 

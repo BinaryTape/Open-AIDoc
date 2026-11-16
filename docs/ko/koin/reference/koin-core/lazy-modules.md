@@ -19,7 +19,9 @@ implementation("io.insert-koin:koin-core-coroutines")
 
 `lazyModule`은 `module`과 동일한 내용을 전달받습니다. Koin이 모듈을 로드하기 전까지는 아무것도 생성되거나 할당되지 않습니다.
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.dsl.lazyModule
 import org.koin.plugin.module.dsl.*
@@ -30,10 +32,14 @@ val analyticsModule = lazyModule {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 어노테이션 모듈(`@Module`)은 시작 시점에 로드되며 지연 모듈로 선언할 수 없습니다. 일부 정의를 백그라운드에서 로드하려면 원하는 DSL 형태(Compiler Plugin, Constructor 또는 Classic DSL)로 `lazyModule` 안에 선언하세요.
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.dsl.lazyModule
 import org.koin.core.module.dsl.*
@@ -43,6 +49,9 @@ val analyticsModule = lazyModule {
     singleOf(::EventTracker)
 }
 ```
+
+</tab>
+</tabs>
 
 지연 모듈은 다른 지연 모듈을 포함할 수 있습니다:
 

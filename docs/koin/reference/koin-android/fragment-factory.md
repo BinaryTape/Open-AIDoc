@@ -41,7 +41,9 @@ class MainActivity : AppCompatActivity() {
 
 ## 声明 Fragment {id="declaring-a-fragment"}
 
-**编译器插件 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 编译器插件 DSL 没有 `fragment<T>()` 函数。请在同一个模块中使用经典 DSL 的 `fragment { }` 或构造函数 DSL 的 `fragmentOf()`：
 
 ```kotlin
@@ -53,7 +55,9 @@ val uiModule = module {
 }
 ```
 
-**注解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 不存在针对 Fragment 的注解。请在 DSL 模块中声明该 Fragment，并放置在带注解的类旁边（参见 [DSL 参考](/docs/reference/koin-core/dsl)）：
 
 ```kotlin
@@ -62,7 +66,9 @@ val uiModule = module {
 }
 ```
 
-**构造函数 / 经典 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.androidx.fragment.dsl.fragment
 import org.koin.androidx.fragment.dsl.fragmentOf
@@ -77,6 +83,9 @@ val uiModule = module {
     fragment { UserFragment(get()) }
 }
 ```
+
+</tab>
+</tabs>
 
 `fragment` 定义是一个 `factory`：每个事务都会获取一个新的 Fragment 实例。如果没有与 Fragment 类相匹配的定义，Koin 工厂将回退到默认的 AndroidX 行为。
 

@@ -10,7 +10,9 @@ title: Koinの開始
 
 ## Koinの起動 {id="start-koin"}
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.core.context.startKoin
 
@@ -22,7 +24,9 @@ fun main() {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 import org.koin.plugin.module.dsl.startKoin
 
@@ -38,7 +42,9 @@ fun main() {
 
 Koin Compiler Pluginは、`startKoin<MyApp>()` を、`@KoinApplication` に記載されたモジュールおよび自動検出された `@Configuration` モジュールをロードする `startKoin { }` の呼び出しに置き換えます。[@KoinApplicationによる型付き起動](#typed-startup-with-koinapplication) を参照してください。
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.core.context.startKoin
 
@@ -49,6 +55,9 @@ fun main() {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 `startKoin` はコンテナを作成し、プロセスのデフォルトコンテキストである `GlobalContext` に登録します。この処理が完了すると、すべての `get()`、`by inject()`、またはプラットフォームAPI（`by viewModel()`、`koinInject()`）がこのコンテナから解決されるようになります。
 
@@ -308,7 +317,9 @@ val token: String? = koin.getProperty("session_token")
 
 ### プロパティのインジェクション {id="injecting-properties"}
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 コンストラクタパラメータに `@Property`（`koin-annotations` 提供）を付与します:
 
 ```kotlin
@@ -319,7 +330,9 @@ val networkModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton
 class ApiClient(@Property("server_url") val url: String)
@@ -334,7 +347,9 @@ val defaultServerUrl = "https://api.example.com"
 
 生成されたコードは `getProperty("server_url", defaultServerUrl)` を読み出すため、プロパティが設定されていない場合は `ApiClient` にデフォルト値が渡されます。
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val networkModule = module {
     single { ApiClient(url = getProperty("server_url")) }
@@ -345,6 +360,9 @@ val networkModule = module {
 ```
 
 `getProperty(key)` はプロパティが存在しない場合に例外をスローします。代わりに `getPropertyOrNull(key)` を使用すると `null` が返されます。
+
+</tab>
+</tabs>
 
 さまざまな場所で `getProperty` を呼び出すのではなく、1つの設定クラスでプロパティを読み込み、そのクラスをインジェクトするようにしてください。そうすることでキーを1つのファイルに集約できます。
 

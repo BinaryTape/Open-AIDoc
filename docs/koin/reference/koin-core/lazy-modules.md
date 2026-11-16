@@ -19,7 +19,9 @@ implementation("io.insert-koin:koin-core-coroutines")
 
 `lazyModule` 接收与 `module` 相同的内容。在 Koin 加载它之前，不会创建或分配任何内容。
 
-**编译器插件 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.dsl.lazyModule
 import org.koin.plugin.module.dsl.*
@@ -30,10 +32,14 @@ val analyticsModule = lazyModule {
 }
 ```
 
-**注解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 注解模块（`@Module`）在启动时加载，无法声明为延迟模块。若要在后台加载某些定义，请在 `lazyModule` 中使用任意 DSL 形式（编译器插件、构造函数或经典 DSL）进行声明。
 
-**构造函数 / 经典 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.dsl.lazyModule
 import org.koin.core.module.dsl.*
@@ -43,6 +49,9 @@ val analyticsModule = lazyModule {
     singleOf(::EventTracker)
 }
 ```
+
+</tab>
+</tabs>
 
 延迟模块可以包含其他延迟模块：
 

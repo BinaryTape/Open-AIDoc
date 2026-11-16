@@ -10,7 +10,9 @@ Koin Compiler Plugin은 Kotlin 컴파일러(K2) 내부에서 실행되는 Kotlin
 
 개발자가 타입을 작성하면, 플러그인이 생성자 호출 코드를 작성합니다.
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 class UserRepository(private val api: ApiService, private val cache: UserCache)
 
@@ -19,13 +21,17 @@ val appModule = module {
 }
 ```
 
-**애너테이션**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Singleton
 class UserRepository(private val api: ApiService, private val cache: UserCache)
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 Classic DSL은 플러그인이 필요하지 않으며, 직접 연결 코드를 작성합니다. Constructor DSL(`singleOf(::T)`) 역시 플러그인이 필요하지 않습니다.
 
 ```kotlin
@@ -35,6 +41,9 @@ val appModule = module {
 ```
 
 플러그인이 적용된 경우, 이러한 `get()` 호출과 `singleOf(::T)` 정의도 빌드 시점에 검증합니다.
+
+</tab>
+</tabs>
 
 컴파일 중에 플러그인은 `single<UserRepository>()`(또는 `@Singleton` 클래스)을 다음과 동등한 코드로 대체합니다.
 

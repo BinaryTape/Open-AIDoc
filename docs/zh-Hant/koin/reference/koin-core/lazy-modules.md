@@ -19,7 +19,9 @@ implementation("io.insert-koin:koin-core-coroutines")
 
 `lazyModule` 接收與 `module` 相同的內容。在 Koin 載入它之前，不會建立或分配任何內容。
 
-**編譯器外掛程式 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.dsl.lazyModule
 import org.koin.plugin.module.dsl.*
@@ -30,10 +32,14 @@ val analyticsModule = lazyModule {
 }
 ```
 
-**註解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 註解模組（`@Module`）會在啟動時載入，無法宣告為 Lazy 模組。若要在背景載入某些定義，請使用任何一種 DSL 形式（編譯器外掛程式、建構函式或傳統 DSL）在 `lazyModule` 中宣告它們。
 
-**建構函式／傳統 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.dsl.lazyModule
 import org.koin.core.module.dsl.*
@@ -43,6 +49,9 @@ val analyticsModule = lazyModule {
     singleOf(::EventTracker)
 }
 ```
+
+</tab>
+</tabs>
 
 Lazy 模組可以包含其他 Lazy 模組：
 

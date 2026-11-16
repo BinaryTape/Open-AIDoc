@@ -32,7 +32,9 @@ val appModule = module {
 
 在 `commonMain` 中使用 `expect` 宣告模組，並為每個平台撰寫一個 `actual`。每個平台模組宣告各自的類別：
 
-**編譯器外掛程式 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 // commonMain
 interface PlatformComponent {
@@ -64,7 +66,9 @@ actual fun platformModule(): Module = module {
 }
 ```
 
-**註解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 // commonMain
 interface PlatformComponent {
@@ -101,7 +105,9 @@ class IOSComponent : PlatformComponent {
 
 每個 `actual` 模組都會掃描自己的原始碼集，因此只會找到該平台的類別。`@Singleton` 會將該類別繫結至其超型別，因此 `PlatformComponent` 會解析為該平台類別。在通用模組中使用 `@Module(includes = [PlatformModule::class])` 即可引入 `PlatformModule`。
 
-**建構函式 / 經典 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 // commonMain
 interface PlatformComponent {
@@ -124,6 +130,9 @@ actual fun platformModule(): Module = module {
     singleOf(::IOSComponent) bind PlatformComponent::class
 }
 ```
+
+</tab>
+</tabs>
 
 當不同平台的實作需要不同的建構函式參數時，請使用此模式。通用程式碼僅相依於 `PlatformComponent` 介面，而各平台可以自由注入各自需要的相依項（此處以 Android 上的 `Context` 為例）。在 Android 上，一旦在啟動時設定了 `androidContext()`，`Context` 便會解析完成（請參閱 [KMP 設定](/docs/reference/koin-core/kmp-setup)）。
 
@@ -151,7 +160,9 @@ actual fun platformModule(): Module = module {
 
 當類別在所有平台上具有相同的建構函式時，只需在通用程式碼中宣告一次，並讓各個平台進行實作即可：
 
-**編譯器外掛程式 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 // commonMain
 expect class NativeComponent() {
@@ -175,7 +186,9 @@ actual class NativeComponent actual constructor() {
 }
 ```
 
-**註解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 // commonMain
 @Module
@@ -213,7 +226,9 @@ class NativeModule {
 }
 ```
 
-**建構函式 / 經典 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 // commonMain
 expect class NativeComponent() {
@@ -227,13 +242,18 @@ val nativeComponentModule = module {
 
 `actual` 類別與其他標籤頁中的實作相同。
 
+</tab>
+</tabs>
+
 `expect` 類別對所有平台共用同一套建構函式規格。若某個平台需要額外的相依項（例如 Android 的 `Context`），你將無法僅將其新增至該單一平台。此時請改用搭配介面的[平台模組](#platform-module)模式，或是使用平台包裝函式（請參閱 [KMP 平台整合](/docs/reference/koin-mp/kmp)）。
 
 ## 僅存在於單一平台的組建 {id="components-on-one-platform-only"}
 
 平台模組可以宣告僅存在於單一平台、在其他平台上不存在的類別。其他平台則保留一個空白模組：
 
-**編譯器外掛程式 DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 // androidMain
 actual fun platformModule(): Module = module {
@@ -244,7 +264,9 @@ actual fun platformModule(): Module = module {
 actual fun platformModule(): Module = module { }
 ```
 
-**註解**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 // androidMain
 @Module
@@ -256,7 +278,9 @@ actual class PlatformModule
 actual class PlatformModule
 ```
 
-**建構函式 / 經典 DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 // androidMain
 actual fun platformModule(): Module = module {
@@ -266,6 +290,9 @@ actual fun platformModule(): Module = module {
 // iosMain
 actual fun platformModule(): Module = module { }
 ```
+
+</tab>
+</tabs>
 
 這樣一來，便只有 Android 程式碼可以使用 `NotificationHelper`。通用程式碼無法參照它，因為該類別並不存在於 `commonMain` 中。
 

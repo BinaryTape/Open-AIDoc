@@ -8,7 +8,9 @@ title: 요청 스코프 (Request Scopes)
 
 ## 요청 스코프 정의 선언하기 {id="declaring-request-scoped-definitions"}
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.module.requestScope
 
@@ -22,7 +24,9 @@ val appModule = module {
 }
 ```
 
-**어노테이션(Annotations)**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 import org.koin.ktor.plugin.RequestScope
 
@@ -35,7 +39,9 @@ class UserSessionHandler(private val call: ApplicationCall)
 
 `requestScope { }`는 `RequestScope` 타입으로 한정(qualified)된 스코프이므로, `@Scope(RequestScope::class)`도 동일한 스코프를 대상으로 지정합니다.
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.module.requestScope
 
@@ -48,6 +54,9 @@ val appModule = module {
     }
 }
 ```
+
+</tab>
+</tabs>
 
 ## 핸들러에서 해결하기 (Resolving in a handler) {id="resolving-in-a-handler"}
 

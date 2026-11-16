@@ -8,7 +8,9 @@ title: 모듈
 
 ## 모듈 선언하기 {id="declare-a-module"}
 
-**컴파일러 플러그인 DSL (Compiler Plugin DSL)**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 import org.koin.dsl.module
 import org.koin.plugin.module.dsl.*
@@ -24,7 +26,9 @@ val dataModule = module {
 }
 ```
 
-**어노테이션 (Annotations)**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Module
 @ComponentScan("com.myapp.network")
@@ -37,7 +41,9 @@ class DataModule
 
 `@Module` 클래스는 `@ComponentScan`으로 찾은 어노테이션 지정 클래스들과 내부에 선언된 프로바이더 함수들을 모읍니다([직접 소유하지 않은 클래스(Classes you don't own)](/docs/reference/koin-core/definitions#classes-you-dont-own) 참조).
 
-**생성자 / 클래식 DSL (Constructor / Classic DSL)**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 import org.koin.dsl.module
 import org.koin.core.module.dsl.*
@@ -53,13 +59,18 @@ val dataModule = module {
 }
 ```
 
+</tab>
+</tabs>
+
 하나의 정의는 다른 모듈의 정의에 의존할 수 있습니다. Koin은 로드된 모든 모듈을 통틀어 의존성을 해결(resolve)하므로, `dataModule`의 `UserRepository`는 모듈 간의 별도 import 없이도 `networkModule`의 `ApiClient`를 사용할 수 있습니다. 단, 두 모듈이 모두 로드되어 있어야 합니다([Koin 시작하기(Starting Koin)](/docs/reference/koin-core/starting-koin) 참조).
 
 ## `includes()`를 통한 모듈 결합 {id="module-composition-with-includes"}
 
 하나의 모듈이 다른 모듈들을 포함할 수 있습니다. 부모 모듈을 로드하면 전체 트리가 함께 로드됩니다:
 
-**컴파일러 플러그인 DSL (Compiler Plugin DSL)**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 val networkModule = module {
     single<ApiClient>()
@@ -79,7 +90,9 @@ startKoin {
 }
 ```
 
-**어노테이션 (Annotations)**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Module
 class NetworkModule
@@ -95,7 +108,9 @@ class DataModule
 class MyApp
 ```
 
-**생성자 / 클래식 DSL (Constructor / Classic DSL)**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val networkModule = module {
     singleOf(::ApiClient)
@@ -114,6 +129,9 @@ startKoin {
     modules(dataModule)
 }
 ```
+
+</tab>
+</tabs>
 
 `startKoin`에 긴 플랫(flat) 리스트를 나열하는 것보다 하나의 루트 모듈을 가진 `includes()` 트리를 구성하는 것을 권장합니다. 이렇게 하면 모듈의 구조가 코드 구조를 자연스럽게 따르게 되며, 시작 호출부도 간결하게 유지됩니다.
 
@@ -251,7 +269,9 @@ class MyApp // get<Feature>()는 AppFeature를 반환합니다
 
 Koin이 시작될 때 전체 모듈의 모든 `single` 정의가 즉시 생성되도록 지정할 수 있습니다:
 
-**컴파일러 플러그인 DSL (Compiler Plugin DSL)**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 val coreModule = module(createdAtStart = true) {
     single<ConfigManager>()
@@ -259,14 +279,18 @@ val coreModule = module(createdAtStart = true) {
 }
 ```
 
-**어노테이션 (Annotations)**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 @Module(createdAtStart = true)
 @ComponentScan("com.myapp.core")
 class CoreModule
 ```
 
-**생성자 / 클래식 DSL (Constructor / Classic DSL)**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 val coreModule = module(createdAtStart = true) {
     singleOf(::ConfigManager)
@@ -274,13 +298,18 @@ val coreModule = module(createdAtStart = true) {
 }
 ```
 
+</tab>
+</tabs>
+
 즉시 생성되는 정의가 많아질수록 시작 시간이 늘어납니다. 정의별 플래그 설정 및 비용에 대해서는 [Eager creation](/docs/reference/koin-core/definitions#eager-creation)을 참조하세요.
 
 ## 매개변수화된 모듈 (Parameterized modules) {id="parameterized-modules"}
 
 DSL 모듈은 하나의 값(value)이므로 함수를 통해 인자로부터 모듈을 생성할 수 있습니다:
 
-**컴파일러 플러그인 DSL (Compiler Plugin DSL)**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 fun loggingModule(debug: Boolean) = module {
     if (debug) {
@@ -295,10 +324,14 @@ startKoin {
 }
 ```
 
-**어노테이션 (Annotations)**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 `@Module` 클래스는 인자를 받을 수 없습니다. 이 경우에는 DSL 모듈을 사용하거나, [configuration labels](/docs/reference/koin-core/starting-koin#configuration-labels)를 사용해 변형(variant)별로 하나의 `@Module`을 선택하도록 구성하세요.
 
-**생성자 / 클래식 DSL (Constructor / Classic DSL)**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 fun loggingModule(debug: Boolean) = module {
     single<Logger> {
@@ -310,6 +343,9 @@ startKoin {
     modules(loggingModule(debug = BuildConfig.DEBUG))
 }
 ```
+
+</tab>
+</tabs>
 
 동일한 개념으로 구현체를 교체할 수도 있습니다. `repositoryModule`은 그대로 두고, 각각 `Datasource`를 선언하는 `localDatasourceModule`이나 `remoteDatasourceModule` 중 하나를 함께 로드하는 방식입니다. 조건부 모듈 목록은 런타임에 결정되므로, 컴파일러 플러그인이 빌드 시점에 모든 조합을 검증할 수는 없습니다.
 

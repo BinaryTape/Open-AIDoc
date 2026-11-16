@@ -20,7 +20,9 @@ title: マルチモジュールアプリ
 
 ## 機能モジュールの宣言とロード {id="declaring-and-loading-feature-modules"}
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 // Gradle module ":feature:login"
 internal class LoginUseCase(private val auth: AuthService)
@@ -50,7 +52,9 @@ class MainApplication : Application() {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 // Gradle module ":feature:login"
 @Module
@@ -81,7 +85,9 @@ class MainApplication : Application() {
 
 `startKoin<MainApplication>()`は、機能のGradleモジュールからのものを含め、アプリのクラスパス上にあるすべての`@Configuration`モジュールを検出します。機能を追加する作業は、Gradleの依存関係を追加するだけで済み、それ以外の作業は不要です。代わりにモジュールを明示的に指定してリストアップするには、`@KoinApplication(modules = [LoginModule::class, ProfileModule::class])`を使用します。
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 // Gradle module ":feature:login"
 internal class LoginUseCase(private val auth: AuthService)
@@ -111,6 +117,9 @@ class MainApplication : Application() {
 }
 ```
 
+</tab>
+</tabs>
+
 ## 機能間での型の共有 {id="sharing-types-between-features"}
 
 機能が別の機能に依存するべきではありません。`:feature:profile`が現在のユーザー（current user）を必要とする場合、coreモジュール内のインターフェースに依存し、その実装はそのクラスが存在する場所でバインドされます。
@@ -122,7 +131,9 @@ interface UserRepository {
 }
 ```
 
-**Compiler Plugin DSL**
+<tabs group="koin-style">
+<tab title="Compiler Plugin DSL" group-key="compiler-plugin">
+
 ```kotlin
 // Gradle module ":core:data"
 internal class UserRepositoryImpl(private val api: ApiService) : UserRepository
@@ -132,14 +143,18 @@ val dataModule = module {
 }
 ```
 
-**Annotations**
+</tab>
+<tab title="Annotations" group-key="annotations">
+
 ```kotlin
 // Gradle module ":core:data"
 @Singleton
 internal class UserRepositoryImpl(private val api: ApiService) : UserRepository
 ```
 
-**Constructor / Classic DSL**
+</tab>
+<tab title="Constructor / Classic DSL" group-key="classic">
+
 ```kotlin
 // Gradle module ":core:data"
 internal class UserRepositoryImpl(private val api: ApiService) : UserRepository
@@ -148,6 +163,9 @@ val dataModule = module {
     singleOf(::UserRepositoryImpl) bind UserRepository::class
 }
 ```
+
+</tab>
+</tabs>
 
 これにより、`:feature:profile`内の`ProfileViewModel(private val users: UserRepository)`は、実行時に`UserRepositoryImpl`を解決します。すべてのKoinモジュールがロードされている限り、KoinはGradleモジュールをまたいで解決するため、機能側はインターフェース型を参照できるだけで十分です。機能ごとに追加のエントリポイントインターフェースやコンポーネントを用意する必要はありません。
 
