@@ -67,7 +67,7 @@ const label = computed(() => LABELS[lang.value] ?? 'Breadcrumbs')
 .ws-breadcrumbs li:not(:last-child)::after {
   content: '/';
   margin: 0 6px 0 4px;
-  color: var(--vp-c-text-3);
+  color: var(--vp-c-gray-1);
 }
 
 .ws-breadcrumbs li:last-child {
@@ -80,13 +80,17 @@ const label = computed(() => LABELS[lang.value] ?? 'Breadcrumbs')
   text-overflow: ellipsis;
 }
 
+/* A crumb with its own page is underlined by a thin line at the bottom of
+   its line, in the colour of the separators (ktor.io "Templating") */
 .ws-breadcrumbs a {
   color: inherit;
   text-decoration: none;
-  transition: color 0.25s;
+  box-shadow: inset 0 -1px 0 var(--vp-c-gray-1);
+  transition: color 0.25s, box-shadow 0.25s;
 }
 
 .ws-breadcrumbs a:hover {
   color: var(--vp-c-brand-1);
+  box-shadow: inset 0 -1px 0 var(--vp-c-brand-1);
 }
 </style>
