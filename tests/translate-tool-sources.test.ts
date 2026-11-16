@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { REPOS } from '../tools/pipeline/repos.config.mjs'
 import {
   PROJECTS,
@@ -21,15 +21,31 @@ const LLMS_FULL = KOIN_URLS.map((url) => `# Title of ${url}\n\nSource: https://i
 const LLMS_INDEX = '# Koin\n\n## Documentation\n\n### Intro\n- [Intro](https://insert-koin.io/docs/intro)\n'
 
 /** A fetch that answers insert-koin.io and GitHub, and records what was asked. */
-function fakeFetch(githubTree: string[] = []) {
+function fakeFetch(githubTree: string[] = [], contents: Record<string, string> = {}, { treesApi = true } = {}) {
   const asked: string[] = []
   const fetchImpl = async (url: string) => {
     asked.push(url)
     const text = (body: string) => ({ ok: true, status: 200, text: async () => body, json: async () => JSON.parse(body) })
     if (url === 'https://insert-koin.io/llms-full.txt') return text(LLMS_FULL)
     if (url === 'https://insert-koin.io/llms.txt') return text(LLMS_INDEX)
-    if (url.includes('/git/trees/')) return text(JSON.stringify({ truncated: false, tree: githubTree.map((path) => ({ path, type: 'blob' })) }))
-    if (url.startsWith('https://raw.githubusercontent.com/')) return text(`raw ${url}`)
+    if (url.includes('/git/trees/') && treesApi) return text(JSON.stringify({ truncated: false, tree: githubTree.map((path) => ({ path, type: 'blob' })) }))
+    // Contents API: the files and directories right in a directory
+    const listed = /\/contents\/(.*?)\?ref=/.exec(url)
+    if (listed && !treesApi) {
+      const dir = listed[1].replace(/\/$/, '')
+      const inDir = githubTree.filter((p) => (dir ? p.startsWith(dir + '/') : true)).map((p) => (dir ? p.slice(dir.length + 1) : p))
+      const names = [...new Set(inDir.map((p) => p.split('/')[0]))]
+      return text(JSON.stringify(names.map((name) => {
+        const full = dir ? `${dir}/${name}` : name
+        return { name, path: full, type: githubTree.includes(full) ? 'file' : 'dir' }
+      })))
+    }
+    if (url.startsWith('https://raw.githubusercontent.com/')) {
+      const file = url.split('/').slice(6).join('/')
+      if (file in contents) return text(contents[file])
+      if (file.endsWith('.tree')) return { ok: false, status: 404, text: async () => '', json: async () => ({}) }
+      return text(`raw ${url}`)
+    }
     return { ok: false, status: 404, text: async () => '', json: async () => ({}) }
   }
   return { fetchImpl: fetchImpl as unknown as typeof fetch, asked }
@@ -139,14 +155,72 @@ describe('translate tool: where a translation is saved', () => {
     expect(() => targetPathOf('koin', 'docs/../../README.md', 'ja')).toThrow('流水线不发布这个文件')
   })
 
-  it('saves an uploaded file at the root of its project, and nowhere outside docs/', () => {
+  it('saves an uploaded file at the root of its project, and nowhere outside docs/', async () => {
+    clearSourceCache()
     const save = (projectName: string, fileName: string, targetLang = 'ja') => saveTargetPath({ projectName, fileName, targetLang })
-    expect(save('kotlin', 'getting-started.md')).toBe('ja/kotlin/getting-started.md')
-    expect(save('kotlin', '../../package.json')).toBe('ja/kotlin/package.json')
-    expect(save('kotlin', '..\\..\\x.md')).toBe('ja/kotlin/x.md')
-    expect(() => save('../tools', 'x.md')).toThrow('无效的保存路径')
-    expect(() => save('kotlin', 'x.md', '../..')).toThrow('无效的保存路径')
-    expect(saveTargetPath({ projectName: 'koin', fileName: 'index.md', targetLang: 'ko', sourceId: 'koin', sourcePath: 'docs/intro/index.md' }))
+    expect(await save('kotlin', 'getting-started.md')).toBe('ja/kotlin/getting-started.md')
+    expect(await save('kotlin', '../../package.json')).toBe('ja/kotlin/package.json')
+    expect(await save('kotlin', '..\\..\\x.md')).toBe('ja/kotlin/x.md')
+    await expect(save('../tools', 'x.md')).rejects.toThrow('无效的保存路径')
+    await expect(save('kotlin', 'x.md', '../..')).rejects.toThrow('无效的保存路径')
+    const { fetchImpl } = fakeFetch()
+    expect(await saveTargetPath({ projectName: 'koin', fileName: 'index.md', targetLang: 'ko', sourceId: 'koin', sourcePath: 'docs/intro/index.md' }, { fetchImpl }))
       .toBe('ko/koin/intro/index.md')
+  })
+})
+
+describe('translate tool: only the pages a Writerside tree publishes', () => {
+  beforeEach(() => clearSourceCache())
+
+  const KTOR_TREE = '<instance-profile id="ktor"><toc-element topic="server-cors.md"/><toc-element topic="welcome.topic"/></instance-profile>'
+  const ktorFiles = ['ktor.tree', 'topics/server-cors.md', 'topics/welcome.topic', 'topics/db-persistence.md']
+
+  it('leaves out a ktor topic ktor.tree does not list (a retired tutorial), and does not save it', async () => {
+    const { fetchImpl } = fakeFetch(ktorFiles, { 'ktor.tree': KTOR_TREE })
+    expect((await listSourcePages('ktor', { fetchImpl })).map((p) => p.page)).toEqual(['server-cors.md', 'welcome.md'])
+
+    const save = (sourcePath: string) => saveTargetPath({ projectName: 'ktor', fileName: 'x.md', targetLang: 'ja', sourceId: 'ktor', sourcePath }, { fetchImpl })
+    expect(await save('topics/server-cors.md')).toBe('ja/ktor/server-cors.md')
+    await expect(save('topics/db-persistence.md')).rejects.toThrow('流水线不发布这个文件')
+  })
+
+  it('leaves out the stubs of kotlinx.coroutines and the KMP pages their trees do not list', async () => {
+    const coroutines = fakeFetch(['docs/kc.tree', 'docs/basics.md', 'docs/channels.md', 'docs/topics/channels.md', 'docs/topics/coroutines-basics.md'], {
+      'docs/kc.tree': '<instance-profile id="kc"><toc-element topic="coroutines-basics.md" accepts-web-file-names="basics.html"/><toc-element topic="channels.md"/></instance-profile>',
+    })
+    expect(await listSourcePages('kotlinx-coroutines', { fetchImpl: coroutines.fetchImpl })).toEqual([
+      { path: 'docs/topics/channels.md', page: 'channels.md' },
+      { path: 'docs/topics/coroutines-basics.md', page: 'coroutines-basics.md' },
+    ])
+
+    const kmp = fakeFetch(['mpd.tree', 'topics/start/quickstart.md', 'topics/multiplatform-setup.md', 'topics/shipathon-starter-guide.md'], {
+      'mpd.tree': '<instance-profile id="mpd"><toc-element topic="quickstart.md" accepts-web-file-names="multiplatform-setup.html"/>' +
+        '<toc-element hidden="true" topic="shipathon-starter-guide.md"/></instance-profile>',
+    })
+    // a hidden topic is still a page there
+    expect((await listSourcePages('kmp', { fetchImpl: kmp.fetchImpl })).map((p) => p.page)).toEqual(['quickstart.md', 'shipathon-starter-guide.md'])
+  })
+
+  it('finds a tree at the root when GitHub only lists directories one by one', async () => {
+    const { fetchImpl, asked } = fakeFetch(ktorFiles, { 'ktor.tree': KTOR_TREE }, { treesApi: false })
+    expect((await listSourcePages('ktor', { fetchImpl })).map((p) => p.page)).toEqual(['server-cors.md', 'welcome.md'])
+    expect(asked.some((url) => url.includes('/contents/?ref='))).toBe(true)
+  })
+
+  it('lists every page when the tree is missing or cannot be read, and says so', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const missing = fakeFetch(['topics/server-cors.md', 'topics/db-persistence.md'])
+    expect(await listSourcePages('ktor', { fetchImpl: missing.fetchImpl })).toHaveLength(2)
+    clearSourceCache()
+    const unreadable = fakeFetch(ktorFiles) // ktor.tree: 404
+    expect(await listSourcePages('ktor', { fetchImpl: unreadable.fetchImpl })).toHaveLength(3)
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('ktor'))
+    // not kept: the tree is asked for again next time, and read once it answers
+    const treeAsked = () => unreadable.asked.filter((url) => url.endsWith('/ktor.tree')).length
+    await listSourcePages('ktor', { fetchImpl: unreadable.fetchImpl })
+    expect(treeAsked()).toBe(2)
+    const answering = fakeFetch(ktorFiles, { 'ktor.tree': KTOR_TREE })
+    expect(await listSourcePages('ktor', { fetchImpl: answering.fetchImpl })).toHaveLength(2)
+    warn.mockRestore()
   })
 })
