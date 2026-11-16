@@ -39,6 +39,11 @@ slots.default?.().forEach((vnode: VNode) => {
 
 // 判断插槽里是否有 title
 const hasTitleSlot = computed(() => !!titleContent.value)
+
+const isTitle = (vnode: VNode) => typeof vnode.type === 'string' && vnode.type.toLowerCase() === 'title'
+// The slot as written (e.g. <Links> components), without the <title> shown above as the <h3>:
+// a <title> element is not valid in the page body (P2-27).
+const SlotWithoutTitle = () => slots.default?.().filter((vnode) => !isTitle(vnode))
 // Three columns from 640px wide, set in CSS (see Card.vue).
 </script>
 
@@ -49,7 +54,7 @@ const hasTitleSlot = computed(() => !!titleContent.value)
       <template v-if="links.length > 0" v-for="(link, index) in links">
         <Link :href="link.href" :summary="link.summary">{{ link.content }}</Link>
       </template>
-      <slot v-else/>
+      <SlotWithoutTitle v-else/>
     </div>
   </div>
 </template>
