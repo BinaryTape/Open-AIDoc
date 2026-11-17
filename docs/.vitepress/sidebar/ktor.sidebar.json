@@ -827,7 +827,7 @@
     "link": "io-interoperability"
   },
   {
-    "text": "ktor.releases",
+    "text": "ktor.releases.group",
     "items": [
       {
         "text": "ktor.releases",

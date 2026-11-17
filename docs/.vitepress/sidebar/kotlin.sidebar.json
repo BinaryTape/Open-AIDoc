@@ -119,7 +119,7 @@
     "text": "kotlin.language-guide",
     "items": [
       {
-        "text": "kotlin.basic-syntax",
+        "text": "kotlin.basic-syntax.group",
         "items": [
           {
             "text": "kotlin.basic-syntax",
@@ -195,7 +195,7 @@
         "collapsed": true
       },
       {
-        "text": "kotlin.control-flow",
+        "text": "kotlin.control-flow.group",
         "items": [
           {
             "text": "kotlin.control-flow",
@@ -213,7 +213,7 @@
         "link": "exceptions"
       },
       {
-        "text": "kotlin.functions",
+        "text": "kotlin.functions.group",
         "items": [
           {
             "text": "kotlin.functions",
@@ -318,7 +318,7 @@
             "collapsed": true
           },
           {
-            "text": "kotlin.properties",
+            "text": "kotlin.properties.group",
             "items": [
               {
                 "text": "kotlin.properties",
@@ -683,7 +683,7 @@
     "text": "kotlin.interoperability",
     "items": [
       {
-        "text": "kotlin.java-interop",
+        "text": "kotlin.java-interop.group",
         "items": [
           {
             "text": "kotlin.comparison-to-java",
@@ -1102,7 +1102,7 @@
     "text": "kotlin.build-tools",
     "items": [
       {
-        "text": "kotlin.gradle",
+        "text": "kotlin.gradle.group",
         "items": [
           {
             "text": "kotlin.gradle",
@@ -1144,7 +1144,7 @@
         "collapsed": true
       },
       {
-        "text": "kotlin.maven",
+        "text": "kotlin.maven.group",
         "items": [
           {
             "text": "kotlin.maven",
