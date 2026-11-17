@@ -8,11 +8,10 @@ import {expandIncludesForTask} from "../utils/writerside-include.mjs";
 import {movedPagesFromTree, pagesOfTree} from "../utils/moved-pages.mjs";
 import {syncLabels} from "../utils/writerside-labels.mjs";
 import {expandCodeSnippets} from "../processors/MarkdownProcessor.mjs";
+import {copyVersionFile as copyVariables} from "../utils/version-file.mjs";
 
 // Upstream pages the site leaves out
 const REDUNDANT_FILES = ["kotlin-mascot.md", "debugging.md"];
-
-const VARIABLES_DIR = "docs/.vitepress/variables";
 
 /**
  * SyncStrategy of the Kotlin documentation family: Writerside docs whose
@@ -46,19 +45,8 @@ export function kotlinFamilyStrategy(root, versionFile = () => null) {
     };
 
     const copyVersionFile = async (context, repoConfig) => {
-        const versions = context ? versionFile(repoConfig) : null;
-        if (!versions) return;
-        const source = versions.candidates
-            .map((candidate) => path.join(repoConfig.cloneDir, candidate))
-            .find((candidate) => fs.pathExistsSync(candidate));
-        if (!source) {
-            console.warn(`  Warning: ${repoConfig.id} version file not found in ${versions.candidates.join(", ")}.`);
-            return;
-        }
-        const target = `${VARIABLES_DIR}/${versions.target}`;
-        await fs.copy(source, target, {overwrite: true});
-        context.gitAddPaths.add(target);
-        console.log(`  Copied ${repoConfig.id} version file to ${target}`);
+        const versions = versionFile(repoConfig);
+        if (versions) await copyVariables(context, repoConfig, versions.candidates, versions.target);
     };
 
     return {

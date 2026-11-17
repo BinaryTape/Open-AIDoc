@@ -120,6 +120,32 @@ describe('generated sidebars', () => {
     expect(sidebar[1].items[0]).toMatchObject({ link: 'first' })
   })
 
+  // The copy read variables/<clone>/v.list, a path that does not exist, so the
+  // versions stayed those of February: Ktor 3.3.3 while ktor.io showed 3.6.1 (P0-21).
+  it.each([
+    { strategy: ktorStrategy, id: 'ktor', tree: 'ktor.tree', target: 'ktor.v.list' },
+    { strategy: kmpStrategy, id: 'kmp', tree: 'mpd.tree', target: 'kmp.v.list' },
+  ])('$id: copies the v.list at the root of the clone on every sync', async ({ strategy, id, tree, target }) => {
+    write(tree, '<instance-profile id="x"><toc-element topic="start.md"/></instance-profile>\n')
+    write('v.list', '<vars><var name="ktor_version" value="3.6.1"/></vars>\n')
+    const context = { gitAddPaths: new Set<string>() }
+
+    await strategy.postSync(clone, context, { id, docType: id, sidebarId: id, cloneDir: clone })
+
+    expect(readFileSync(join(site, `docs/.vitepress/variables/${target}`), 'utf8')).toContain('value="3.6.1"')
+    expect([...context.gitAddPaths]).toContain(`docs/.vitepress/variables/${target}`)
+  })
+
+  it('ktor, kmp: a clone without v.list leaves the variables as they are', async () => {
+    write('ktor.tree', '<instance-profile id="x"><toc-element topic="start.md"/></instance-profile>\n')
+    const context = { gitAddPaths: new Set<string>() }
+
+    await ktorStrategy.postSync(clone, context, { id: 'ktor', docType: 'ktor', sidebarId: 'ktor', cloneDir: clone })
+
+    expect(existsSync(join(site, 'docs/.vitepress/variables/ktor.v.list'))).toBe(false)
+    expect([...context.gitAddPaths]).not.toContain('docs/.vitepress/variables/ktor.v.list')
+  })
+
   it('kmp: kotlinlang.org paths point at this site\'s Kotlin docs, or kotlinlang.org', async () => {
     mkdirSync(join(site, 'docs/kotlin'), { recursive: true })
     writeFileSync(join(site, 'docs/kotlin/wasm-get-started.md'), '# Wasm')

@@ -8,6 +8,7 @@ import {processMarkdownFile} from "../processors/MarkdownProcessor.mjs";
 import {expandIncludesForTask} from "../utils/writerside-include.mjs";
 import {movedPagesFromTree, pagesOfTree} from "../utils/moved-pages.mjs";
 import {syncLabels} from "../utils/writerside-labels.mjs";
+import {copyVersionFile} from "../utils/version-file.mjs";
 
 // lib*.topic files are libraries of snippets included by other topics, not pages.
 const isIncludeLibrary = (file) => /^lib.*\.topic$/.test(path.basename(file));
@@ -47,6 +48,8 @@ export const ktorStrategy = {
 
     postSync: async (repoPath, context, repoConfig) => {
         await syncSidebar(path.join(repoPath, "ktor.tree"), repoConfig.sidebarId);
+        // The versions its pages show (%ktor_version% …), in v.list at the root of the clone
+        await copyVersionFile(context, repoConfig, ["v.list"], "ktor.v.list");
         await syncLabels(repoPath, context, repoConfig.docType);
     },
 
@@ -90,14 +93,6 @@ export const ktorStrategy = {
      * @override
      */
     postTranslate: async (context, repoConfig) => {
-        console.log(`  Copying Ktor version file... `);
-        const versionFile = `variables/${repoConfig.cloneDir}/v.list`;
-        if (await fs.pathExists(versionFile)) {
-            await fs.copy(versionFile, "docs/.vitepress/variables/ktor.v.list", { overwrite: true });
-            context.gitAddPaths.add("docs/.vitepress/variables/ktor.v.list")
-            console.log(`  Copying Ktor version file finished - ${repoConfig.cloneDir}`);
-        }
-
         console.log(`  Handling Ktor assets: Copying images - ${repoConfig.cloneDir}... `);
         const { src, dest } = repoConfig.assets;
         const srcPath = path.join(repoConfig.cloneDir, src);
