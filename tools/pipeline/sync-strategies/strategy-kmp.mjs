@@ -8,6 +8,7 @@ import {processMarkdownFile} from "../processors/MarkdownProcessor.mjs";
 import {expandIncludesForTask} from "../utils/writerside-include.mjs";
 import {movedPagesFromTree, pagesOfTree} from "../utils/moved-pages.mjs";
 import {syncLabels} from "../utils/writerside-labels.mjs";
+import {copyVersionFile} from "../utils/version-file.mjs";
 
 /** topics/**\/x.md or .topic → topics/x.md: the pages are flattened into topics/. */
 function mapKmpDocPath(file) {
@@ -61,6 +62,8 @@ export const kmpStrategy = {
 
     postSync: async (repoPath, context, repoConfig) => {
         await syncSidebar(path.join(repoPath, "mpd.tree"), repoConfig.sidebarId, "", kotlinlangHref);
+        // The versions its pages show (%kotlinVersion% …), in v.list at the root of the clone
+        await copyVersionFile(context, repoConfig, ["v.list"], "kmp.v.list");
         await syncLabels(repoPath, context, repoConfig.docType);
     },
 
@@ -123,14 +126,6 @@ export const kmpStrategy = {
      * @override
      */
     postTranslate: async (context, repoConfig) => {
-        console.log(`  Copying KMP version file... `);
-        const versionFile = `variables/${repoConfig.cloneDir}/v.list`;
-        if (await fs.pathExists(versionFile)) {
-            await fs.copy(versionFile, "docs/.vitepress/variables/kmp.v.list", {overwrite: true});
-            context.gitAddPaths.add("docs/.vitepress/variables/kmp.v.list")
-            console.log(`  Copying Kotlin version file finished - ${repoConfig.cloneDir}`);
-        }
-
         console.log(`  Handling KMP assets: Copying images - ${repoConfig.cloneDir}... `);
         const {src, dest} = repoConfig.assets;
         const srcPath = path.join(repoConfig.cloneDir, src);
