@@ -54,4 +54,19 @@ describe('the sidebar labels of a Writerside tree', () => {
     await tree('<toc-element topic="setup.md" toc-title="Set up"/><toc-element topic="other.md"/>')
     expect(locale('zh-Hans')['kmp.setup']).toBe('设置')
   })
+
+  // A sync translated the locale files whole and one run lost a key, which
+  // the sidebar then showed as it is ("kotlin.native-development") (P0-22).
+  it('put back a label a language lost, for the next step to translate', async () => {
+    await tree('<toc-element toc-title="Native development"><toc-element topic="native-overview.md"/></toc-element>')
+    const zh = locale('zh-Hans'); delete zh['kmp.native-development']
+    writeFileSync(join(dir, 'docs/.vitepress/locales/zh-Hans.json'), JSON.stringify(zh))
+    const ja = locale('ja'); ja['kmp.native-development'] = 'Native開発'
+    writeFileSync(join(dir, 'docs/.vitepress/locales/ja.json'), JSON.stringify(ja))
+
+    await tree('<toc-element toc-title="Native development"><toc-element topic="native-overview.md"/></toc-element>')
+    expect(locale('zh-Hans')['kmp.native-development']).toBe('Native development')
+    expect(locale('zh-Hans')['site.other']).toBe('zh-Hans')
+    expect(locale('ja')['kmp.native-development']).toBe('Native開発')
+  })
 })

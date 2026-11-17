@@ -776,5 +776,6 @@
   "kotlin.collection-combine": "결합",
   "kotlin.type-specific-operations": "타입별 연산",
   "ktor.releases.group": "릴리스",
-  "kmp.compose-share-feature": "콘텐츠 공유"
+  "kmp.compose-share-feature": "콘텐츠 공유",
+  "kmp.multiplatform-reasons-to-try": "Kotlin Multiplatform을 도입하는 이유"
 }

@@ -94,4 +94,27 @@ describe('the site sidebars', () => {
     }
     expect(shared).toEqual([])
   })
+
+  // Without a label an entry without a page shows its key, and a page the
+  // title of its page instead of its toc-title (P0-22)
+  it('have every label in every locale file', async () => {
+    const { CONTENT_LOCALES } = await import('../shared/locales')
+    const dict = (lang: string) => JSON.parse(readFileSync(`docs/.vitepress/locales/${lang}.json`, 'utf8'))
+    const en = dict('en')
+    const missing: string[] = []
+    const used = new Set<string>()
+    const walk = (nodes: { text: string; link?: string; items?: unknown[] }[]) => {
+      for (const node of nodes) {
+        used.add(node.text)
+        if (!node.link && !(node.text in en)) missing.push(`en ${node.text}`)
+        if (node.items) walk(node.items as typeof nodes)
+      }
+    }
+    for (const file of readdirSync('docs/.vitepress/sidebar')) walk(JSON.parse(readFileSync(join('docs/.vitepress/sidebar', file), 'utf8')))
+    for (const lang of CONTENT_LOCALES) {
+      const translated = dict(lang)
+      for (const key of used) if (key in en && !(key in translated)) missing.push(`${lang} ${key}`)
+    }
+    expect(missing).toEqual([])
+  })
 })
