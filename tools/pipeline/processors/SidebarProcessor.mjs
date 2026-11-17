@@ -143,16 +143,42 @@ async function parseWSSidebar(source, docType) {
     const tocRoot = locateToc(parsed);
     if (!tocRoot) throw new Error('<toc-element> not found in ' + source);
 
+    const childrenOf = node => {
+        const children = node['toc-element'];
+        return children ? (Array.isArray(children) ? children : [children]) : [];
+    };
+
+    // An entry without a page (a group, or a link elsewhere) is keyed by its
+    // title, so a group titled like one of the pages would share that page's
+    // key, and one label would overwrite the other: kotlinlang's "Basic
+    // syntax" group, whose first page basic-syntax.md is "Overview", showed
+    // as "Overview > Overview" (P2-30). Such an entry takes `<key>.group`.
+    const pageKeys = new Set();
+    (function collectPages(nodes) {
+        for (const node of nodes) {
+            const a = node?.$ || {};
+            if (a.hidden === 'true') continue;
+            if (a.topic) pageKeys.add(`${docType}.${stripExt(a.topic)}`);
+            collectPages(childrenOf(node));
+        }
+    })(Array.isArray(tocRoot) ? tocRoot : [tocRoot]);
+
     async function walk(node) {
         if (!node || typeof node !== 'object') return null;
         const a = node.$ || {};
         if (a.hidden === 'true') return null;
 
         const slug = stripExt(a.topic || slugify(a['toc-title']));
-        const key = `${docType}.${slug}`;
+        let key = `${docType}.${slug}`;
+        if (!a.topic && pageKeys.has(key)) key += '.group';
 
         let baseText = a['toc-title'];
         if (baseText) {
+            // Two titles that slugify alike still share a key
+            const known = translateKeys.get(key);
+            if (known !== undefined && known !== baseText) {
+                console.warn(`  ⚠️  Warning: ${docType} sidebar labels "${known}" and "${baseText}" share the key ${key}`);
+            }
             translateKeys.set(key, baseText);
         } else if (a.topic) {
             untitledKeys.add(key);
@@ -170,7 +196,7 @@ async function parseWSSidebar(source, docType) {
 
         const children = node['toc-element'];
         if (children) {
-            const arr = Array.isArray(children) ? children : [children];
+            const arr = childrenOf(node);
             out.items = (await Promise.all(arr.map(walk))).filter(Boolean);
             out.collapsed = out.items.length > 0 ? true : undefined;
             out.items = out.items.length > 0 ? out.items : undefined;
