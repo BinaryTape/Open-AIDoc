@@ -63,12 +63,64 @@ function linkTarget(relativePath: string, href: string): string {
   return path.posix.join(path.posix.dirname(relativePath), `${target}.md`)
 }
 
+/** Text out of Writerside or Markdown markup, for an attribute. */
+function plainText(markup: string): string {
+  return markup
+    .replace(/<[^>]+>/g, '')
+    .replace(/!?\[([^\]]*)]\([^)]*\)/g, '$1')
+    .replace(/(\*\*|__)(.+?)\1/g, '$2')
+    .replace(/(^|\s)[*_]([^*_\s][^*_]*?)[*_](?=\s|$|[.,;:!?)])/g, '$1$2')
+    .replace(/`([^`]*)`/g, '$1')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .replace(/"/g, '&quot;')
+}
+
+/** The first paragraph of a page's text, past its metadata, or null. */
+function firstParagraph(source: string): string | null {
+  const body = source
+    .replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, '')
+    .replace(/<(tldr|link-summary|card-summary|web-summary)\b[\s\S]*?<\/\1>/g, '\n\n')
+    .replace(/```[\s\S]*?```/g, '\n\n')
+    .replace(/^\[\/\/\]: #.*$/gm, '')
+    .replace(/<(topic|show-structure|primary-label|secondary-label|var)\b[^>]*>/g, '\n\n')
+  for (const block of body.split(/\n\s*\n/)) {
+    const text = block.trim()
+    if (!text) continue
+    const p = text.match(/^<p>([\s\S]*?)<\/p>/)?.[1]
+    if (p !== undefined) return p
+    // A heading, another element, an attribute line, a list, a quote, a table
+    if (/^(#|<|\{|[-*+]\s|\d+\.\s|>|\|)/.test(text)) continue
+    // The paragraph ends where a list starts
+    const lines = text.split('\n')
+    const end = lines.findIndex((line) => /^\s*([-*+]|\d+\.)\s/.test(line))
+    return (end < 0 ? lines : lines.slice(0, end)).join('\n').replace(/\{[^}\n]*}\s*$/, '')
+  }
+  return null
+}
+
 /**
- * Fill in the variables of a `<Links summary>` tooltip from the page it links
- * to. The sync pipeline copied the summary from that page with its own
- * variables, which the linking page does not define: ktor.io shows
- * "Required dependencies: io.ktor:ktor-server-forwarded-header" where the
- * tooltip showed "io.ktor:%artifact_name%" (P2-32).
+ * The tooltip ktor.io shows for a link to a page: its `<link-summary>`, else
+ * the first paragraph of its `<tldr>`, else its first paragraph (checked
+ * against all 823 tooltips of ktor.io), with its variables filled in. Null
+ * for a page with no text for it.
+ */
+export function linkSummaryOf(page: string): string | null {
+  const variables = pageVariables(page)
+  const markup = page.match(/<link-summary>([\s\S]*?)<\/link-summary>/)?.[1]
+    ?? page.match(/<tldr>([\s\S]*?)<\/tldr>/)?.[1]?.match(/<p>([\s\S]*?)<\/p>/)?.[1]
+    ?? firstParagraph(page)
+  const text = markup === null || markup === undefined ? '' : plainText(substituteVariables(markup, variables))
+  return text || null
+}
+
+/**
+ * The tooltip of each `<Links>` of a page, taken from the page it links to as
+ * ktor.io takes it (linkSummaryOf). The sync pipeline wrote it in from that
+ * page when it translated the linking one: the whole `<tldr>` ("Required
+ * dependencies … Code example … Native server support …", P2-33), nothing for
+ * a page without one, and the page's variables left as they were
+ * ("io.ktor:%artifact_name%", P2-32). Kept when the linked page has no text.
  * @param source - A page
  * @param relativePath - Its path under docs/ (`ja/ktor/FAQ.md`)
  * @param readPage - The source of a page under docs/, or null
@@ -81,11 +133,12 @@ export function resolveLinkSummaries(
   return source.replace(/<Links\b[^>]*>/g, (tag) => {
     const summary = tag.match(/\ssummary="([^"]*)"/)
     const href = tag.match(/\shref="([^"]*)"/)?.[1]
-    if (!summary || !href || !/%[\w.-]+%/.test(summary[1]) || /^[a-z]+:/i.test(href)) return tag
+    if (!summary || !href || /^[a-z]+:/i.test(href)) return tag
     const target = readPage(linkTarget(relativePath, href))
     if (!target) return tag
     // A value holds no '"' (pageVariables), so the attribute stays well-formed
-    return tag.replace(summary[0], () => ` summary="${substituteVariables(summary[1], pageVariables(target))}"`)
+    const text = linkSummaryOf(target) ?? substituteVariables(summary[1], pageVariables(target))
+    return tag.replace(summary[0], () => ` summary="${text}"`)
   })
 }
 
