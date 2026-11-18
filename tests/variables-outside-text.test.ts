@@ -63,6 +63,15 @@ describe('a <Links> tooltip', () => {
     expect(resolveLinkSummaries(tags, 'ktor/FAQ.md', read(asked))).toBe(tags)
   })
 
+  it('takes the value the page opens with, not one it sets again for a later section', () => {
+    // server-compression sets artifact_name again for its zstd section; ktor.io
+    // shows "Required dependencies: io.ktor:ktor-server-compression"
+    const source = readFileSync('docs/ktor/server-compression.md', 'utf8')
+    expect(source.match(/<var name="artifact_name"/g)?.length).toBeGreaterThan(1)
+    expect(resolveLinkSummaries('<Links href="server-compression.md" summary="io.ktor:%artifact_name%">x</Links>', 'ktor/server-server-sent-events.md'))
+      .toBe('<Links href="server-compression.md" summary="io.ktor:ktor-server-compression">x</Links>')
+  })
+
   it('keeps the attribute well-formed', () => {
     expect(resolveLinkSummaries('<Links href="//server-forward-headers" summary="%note%">x</Links>', 'ktor/FAQ.md', read([])))
       .toBe('<Links href="//server-forward-headers" summary="a &quot;b&quot;">x</Links>')

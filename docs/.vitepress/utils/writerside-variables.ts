@@ -38,10 +38,17 @@ export function substituteVariables(text: string, variables: Record<string, stri
     Object.prototype.hasOwnProperty.call(variables, name) ? variables[name] : whole)
 }
 
-/** The variables a page defines itself (`<var name="plugin_name" value="CallId"/>`); a later one wins, as in the page. */
+/**
+ * The variables a page defines itself (`<var name="plugin_name" value="CallId"/>`),
+ * as its opening text (title, first paragraph, `<tldr>`) uses them: a page
+ * can define one again further down for a section of its own, as
+ * server-compression does for its zstd artifact, so the first one wins.
+ */
 export function pageVariables(source: string): Record<string, string> {
   const variables: Record<string, string> = Object.create(null)
-  for (const m of source.matchAll(/<var\s+name="([^"]+)"\s+value="([^"]+)"[^>]*>/gi)) variables[m[1]] = m[2]
+  for (const m of source.matchAll(/<var\s+name="([^"]+)"\s+value="([^"]+)"[^>]*>/gi)) {
+    if (!(m[1] in variables)) variables[m[1]] = m[2]
+  }
   return variables
 }
 
