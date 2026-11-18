@@ -4,7 +4,7 @@ import MarkdownIt from 'markdown-it'
 import { createMarkdownRenderer } from 'vitepress'
 import { registerMarkdownPlugins } from '../docs/.vitepress/config/markdown.config'
 import markdownItWsVars from '../docs/.vitepress/plugins/markdown/writerside/markdown-it-ws-vars'
-import { extractDescription, extractTitle, withVariables } from '../docs/.vitepress/config/seo.config'
+import { extractDescription, extractTitle, seoVariables } from '../docs/.vitepress/config/seo.config'
 import { pageVariables, resolveLinkSummaries, writersideVariables } from '../docs/.vitepress/utils/writerside-variables'
 
 // The page text gets its Writerside variables at build time
@@ -13,16 +13,19 @@ import { pageVariables, resolveLinkSummaries, writersideVariables } from '../doc
 describe('the title and description of a page', () => {
   it('show the doc type\'s variables', () => {
     const eap = writersideVariables('kotlin').kotlinEapVersion
-    const source = withVariables('[//]: # (title: Kotlin %kotlinEapVersion% 的最新变化)\n', 'kotlin/whatsnew-eap.md')
-    expect(extractTitle(source)).toBe(`Kotlin ${eap} 的最新变化`)
+    const source = '[//]: # (title: Kotlin %kotlinEapVersion% 的最新变化)\n'
+    expect(extractTitle(source, seoVariables(source, 'kotlin/whatsnew-eap.md'))).toBe(`Kotlin ${eap} 的最新变化`)
   })
 
   it('show the page\'s own variables, underscores and all', () => {
-    const source = withVariables(
-      '[//]: # (title: Ktor Client 中的调用 ID)\n\n<var name="plugin_name" value="CallId"/>\n\n%plugin_name% 客户端插件允许你使用唯一的调用 ID 来跟踪客户端请求。\n',
-      'ktor/client-call-id.md',
-    )
-    expect(extractDescription(source)).toBe('CallId 客户端插件允许你使用唯一的调用 ID 来跟踪客户端请求。')
+    const source = '[//]: # (title: Ktor Client 中的调用 ID)\n\n<var name="plugin_name" value="CallId"/>\n\n%plugin_name% 客户端插件允许你使用唯一的调用 ID 来跟踪客户端请求。\n'
+    expect(extractDescription(source, seoVariables(source, 'ktor/client-call-id.md'))).toBe('CallId 客户端插件允许你使用唯一的调用 ID 来跟踪客户端请求。')
+  })
+
+  it('still leave out a start page\'s version line', () => {
+    const source = readFileSync('docs/ja/kotlin/home.md', 'utf8')
+    expect(source).toMatch(/<description>[^<]*%kotlinVersion%/)
+    expect(extractDescription(source, seoVariables(source, 'kotlin/home.md'))).toBe('')
   })
 })
 
