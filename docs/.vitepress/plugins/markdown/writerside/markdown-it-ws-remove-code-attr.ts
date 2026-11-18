@@ -1,4 +1,5 @@
 import { parseCodeBlockAttrs } from '../../../utils/code-block-attrs'
+import { substituteVariables } from '../../../utils/writerside-variables'
 
 // What an attribute line becomes before parsing: an HTML comment, which
 // markdown-it parses as a block of its own right after the fence.
@@ -56,7 +57,14 @@ export default function markdownItWsRemoveCodeAttr(md) {
             if (!match) continue
             const fence = tokens[i - 1]
             if (fence?.type === 'fence') {
-                fence.meta = { ...fence.meta, wsAttrs: JSON.parse(decodeURIComponent(match[1])) }
+                // The line left the source before the variables were filled in
+                // (markdown-it-ws-vars.ts): a collapsed-title showed
+                // "navigation-compose:%org.jetbrains.androidx.navigation%" (P2-32)
+                const variables = state.env?.wsVariables ?? {}
+                const attrs = Object.fromEntries(
+                    Object.entries(JSON.parse(decodeURIComponent(match[1])))
+                        .map(([name, value]) => [name, typeof value === 'string' ? substituteVariables(value, variables) : value]))
+                fence.meta = { ...fence.meta, wsAttrs: attrs }
             }
             tokens.splice(i--, 1)
         }

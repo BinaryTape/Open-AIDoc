@@ -13,6 +13,7 @@ import {
   DEFAULT_LOCALE,
   type ContentLocale,
 } from '../../../shared/locales'
+import { pageVariables, substituteVariables, writersideVariables } from '../utils/writerside-variables'
 
 const SITE_ORIGIN = 'https://openaidoc.org'
 const docsRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
@@ -31,10 +32,11 @@ export function applySeoMetadata(pageData: PageData) {
 
   if (!existsSync(sourcePath)) return
 
-  const source = readFileSync(sourcePath, 'utf8')
-  const title = extractTitle(source)
   const { locale, contentPath } = splitLocalePath(relativePath)
-  const description = extractDescription(source) ||
+  const source = readFileSync(sourcePath, 'utf8')
+  const variables = seoVariables(source, contentPath)
+  const title = extractTitle(source, variables)
+  const description = extractDescription(source, variables) ||
     fallbackDescription(locale, contentPath)
 
   if (title) pageData.title = title
@@ -66,6 +68,16 @@ export function applySeoMetadata(pageData: PageData) {
   }
 }
 
+/**
+ * The Writerside variables the page shows filled in: the doc type's
+ * (docs/.vitepress/variables/) and its own `<var>`s. The title and
+ * description showed "Kotlin %kotlinEapVersion%", and "%pluginname%" with
+ * the underscore cleaned away (P2-32).
+ */
+export function seoVariables(source: string, contentPath: string): Record<string, string> {
+  return { ...writersideVariables(contentPath.split('/')[0]), ...pageVariables(source) }
+}
+
 function fallbackDescription(locale: SupportedLocale, contentPath: string) {
   return contentPath === 'kotlin/home.md'
     ? KOTLIN_HOME_DESCRIPTIONS[locale]
@@ -91,7 +103,8 @@ function localePageExists(locale: SupportedLocale, contentPath: string) {
   return existsSync(resolve(docsRoot, localePageRelPath(locale, contentPath)))
 }
 
-export function extractTitle(source: string) {
+export function extractTitle(source: string, variables: Record<string, string> = {}) {
+  const cleanText = (value: string) => cleanTextOf(substituteVariables(value, variables))
   const parsed = matter(source)
   if (typeof parsed.data.title === 'string') {
     return cleanText(parsed.data.title)
@@ -114,7 +127,8 @@ export function extractTitle(source: string) {
   return topicTitle ? cleanText(topicTitle) : ''
 }
 
-export function extractDescription(source: string) {
+export function extractDescription(source: string, variables: Record<string, string> = {}) {
+  const cleanText = (value: string) => cleanTextOf(substituteVariables(value, variables))
   const parsed = matter(source)
   if (typeof parsed.data.description === 'string') {
     return truncateDescription(cleanText(parsed.data.description))
@@ -123,6 +137,8 @@ export function extractDescription(source: string) {
   const startingPageDescription = parsed.content.match(
     /<section-starting-page\b[^>]*>[\s\S]*?<description\b[^>]*>\s*([\s\S]*?)\s*<\/description>/i
   )?.[1]
+  // A start page's description with a variable is a version line
+  // ("Latest stable: %kotlinVersion%"), no description of the page
   if (startingPageDescription && !startingPageDescription.includes('%')) {
     return truncateDescription(cleanText(startingPageDescription))
   }
@@ -150,7 +166,7 @@ export function extractDescription(source: string) {
   return ''
 }
 
-function cleanText(value: string) {
+function cleanTextOf(value: string) {
   return value
     .replace(/!\[([^\]]*)]\([^)]*\)/g, '$1')
     .replace(/\[([^\]]+)]\([^)]*\)/g, '$1')
