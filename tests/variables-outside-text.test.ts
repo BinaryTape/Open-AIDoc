@@ -5,7 +5,7 @@ import { createMarkdownRenderer } from 'vitepress'
 import { registerMarkdownPlugins } from '../docs/.vitepress/config/markdown.config'
 import markdownItWsVars from '../docs/.vitepress/plugins/markdown/writerside/markdown-it-ws-vars'
 import { extractDescription, extractTitle, seoVariables } from '../docs/.vitepress/config/seo.config'
-import { pageVariables, resolveLinkSummaries, writersideVariables } from '../docs/.vitepress/utils/writerside-variables'
+import { linkSummaryOf, pageVariables, resolveLinkSummaries, writersideVariables } from '../docs/.vitepress/utils/writerside-variables'
 
 // The page text gets its Writerside variables at build time
 // (markdown-it-ws-vars.ts); what is built from the page another way did not (P2-32).
@@ -68,8 +68,8 @@ describe('a <Links> tooltip', () => {
     // shows "Required dependencies: io.ktor:ktor-server-compression"
     const source = readFileSync('docs/ktor/server-compression.md', 'utf8')
     expect(source.match(/<var name="artifact_name"/g)?.length).toBeGreaterThan(1)
-    expect(resolveLinkSummaries('<Links href="server-compression.md" summary="io.ktor:%artifact_name%">x</Links>', 'ktor/server-server-sent-events.md'))
-      .toBe('<Links href="server-compression.md" summary="io.ktor:ktor-server-compression">x</Links>')
+    const tag = resolveLinkSummaries('<Links href="server-compression.md" summary="io.ktor:%artifact_name%">x</Links>', 'ktor/server-server-sent-events.md')
+    expect(tag).toContain('io.ktor:ktor-server-compression"')
   })
 
   it('keeps the attribute well-formed', () => {
@@ -82,7 +82,7 @@ describe('a <Links> tooltip', () => {
     const html = md.render('<Links href="//server-forward-headers" summary="io.ktor:%artifact_name%">ForwardedHeader</Links>', { relativePath: 'ja/ktor/FAQ.md' })
     const artifact = pageVariables(readFileSync('docs/ja/ktor/server-forward-headers.md', 'utf8')).artifact_name
     expect(artifact).toBe('ktor-server-forwarded-header')
-    expect(html).toContain(`summary="io.ktor:${artifact}"`)
+    expect(html).toContain(`io.ktor:${artifact}"`)
   })
 
   it('has the variables of every tooltip of the site', () => {
@@ -125,5 +125,93 @@ describe('the collapsed title of a code block', () => {
     ].join('\n'))
     expect(html).toContain(`navigation-compose:${navigation} lib:1.2.3`)
     expect(html).not.toMatch(/%(org\.jetbrains\.androidx\.navigation|lib_version)%/)
+  })
+})
+
+// ktor.io shows a page's <link-summary>, else the first paragraph of its
+// <tldr>, else its first paragraph; the pipeline took the whole <tldr>, or
+// nothing (P2-33)
+describe('the tooltip of a link to a page', () => {
+  const lines = (...text: string[]) => text.join('\n')
+
+  it('is its link summary first, with its variables', () => {
+    const page = lines(
+      '<var name="plugin_name" value="CachingHeaders"/>',
+      '<tldr>',
+      '<p><b>Required dependencies</b>: <code>io.ktor:x</code></p>',
+      '</tldr>',
+      '',
+      '<link-summary>The %plugin_name% plugin adds the "Cache-Control" header.</link-summary>',
+    )
+    expect(linkSummaryOf(page)).toBe('The CachingHeaders plugin adds the &quot;Cache-Control&quot; header.')
+  })
+
+  it('is else the first paragraph of its tldr, not the rest of it', () => {
+    const page = lines(
+      '<var name="artifact_name" value="ktor-server-caching-headers"/>',
+      '<tldr>',
+      '<p>',
+      '<b>所需依赖项</b>：<code>io.ktor:%artifact_name%</code>',
+      '</p>',
+      '<p><b>代码示例</b>：<a href="https://github.com/x">caching-headers</a></p>',
+      '<p><b>原生服务器</b>支持：✅</p>',
+      '</tldr>',
+    )
+    expect(linkSummaryOf(page)).toBe('所需依赖项：io.ktor:ktor-server-caching-headers')
+  })
+
+  it('is else the first paragraph of a Markdown page, up to a list', () => {
+    const page = lines(
+      '[//]: # (title: User agent)',
+      '',
+      '<show-structure for="chapter" depth="2"/>',
+      '<primary-label ref="client-plugin"/>',
+      '',
+      'The [UserAgent](https://x) plugin adds a **User-Agent** header to all requests:',
+      '- one',
+      '- two',
+      '',
+      '## Add dependencies',
+    )
+    expect(linkSummaryOf(page)).toBe('The UserAgent plugin adds a User-Agent header to all requests:')
+  })
+
+  it('is else the first <p> of a topic page', () => {
+    const page = lines(
+      '<topic xmlns="" id="server-development-mode"',
+      '       title="开发模式">',
+      '<show-structure for="chapter" depth="2"/>',
+      '<p>',
+      '    Ktor 提供了一种专门针对开发的特殊模式。',
+      '</p>',
+      '<list>',
+      '    <li>自动重载</li>',
+      '</list>',
+    )
+    expect(linkSummaryOf(page)).toBe('Ktor 提供了一种专门针对开发的特殊模式。')
+  })
+
+  it('is nothing for a page without text for one', () => {
+    expect(linkSummaryOf(lines('[//]: # (title: X)', '', '## Heading', '', '<note>A note</note>'))).toBeNull()
+  })
+
+  it('replaces what the pipeline wrote, and fills an empty one', () => {
+    const page = lines('[//]: # (title: What is new)', '', 'Released: _September 17, 2026_')
+    const tags = '<Links href="whats-new-360.md" summary="">3.6.0</Links> <Links href="whats-new-360.md" summary="Old text">3.6.0</Links>'
+    expect(resolveLinkSummaries(tags, 'ktor/releases.md', () => page)).toBe(
+      '<Links href="whats-new-360.md" summary="Released: September 17, 2026">3.6.0</Links> ' +
+      '<Links href="whats-new-360.md" summary="Released: September 17, 2026">3.6.0</Links>',
+    )
+  })
+
+  it('leaves out the rest of the tldr on the site', () => {
+    const long: string[] = []
+    for (const file of readdirSync('docs/ktor').filter((f) => f.endsWith('.md'))) {
+      const resolved = resolveLinkSummaries(readFileSync(`docs/ktor/${file}`, 'utf8'), `ktor/${file}`)
+      for (const [, summary] of resolved.matchAll(/<Links\b[^>]*\ssummary="([^"]*)"/g)) {
+        if (/依赖项/.test(summary) && /代码示例|原生服务器/.test(summary)) long.push(`${file}: ${summary}`)
+      }
+    }
+    expect(long).toEqual([])
   })
 })

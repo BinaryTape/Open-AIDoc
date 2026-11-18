@@ -16,7 +16,8 @@ const props = defineProps({
 <template>
   <span class="ws-tooltip-wrapper">
     <a :href="props.href" class="ws-link"><slot/></a>
-    <span class="ws-tooltip">
+    <!-- No tooltip, rather than an empty box, for a page with no text for one (as ktor.io) -->
+    <span v-if="props.summary" class="ws-tooltip">
       {{ props.summary }}
     </span>
   </span>
