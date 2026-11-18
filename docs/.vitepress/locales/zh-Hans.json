@@ -774,5 +774,8 @@
   "kotlin.collection-combine": "组合",
   "kotlin.type-specific-operations": "特定类型的操作",
   "ktor.releases.group": "发布",
-  "kmp.compose-share-feature": "共享内容"
+  "kmp.compose-share-feature": "共享内容",
+  "kotlin.native-development": "原生开发",
+  "kotlin.collection-grouping": "分组",
+  "kotlin.maven-set-dependencies": "设置仓库与依赖项"
 }

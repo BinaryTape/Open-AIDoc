@@ -775,5 +775,8 @@
   "kotlin.collection-combine": "結合",
   "kotlin.type-specific-operations": "型固有の操作",
   "ktor.releases.group": "リリース",
-  "kmp.compose-share-feature": "コンテンツの共有"
+  "kmp.compose-share-feature": "コンテンツの共有",
+  "kotlin.native-llvm-passes": "LLVMパスをカスタマイズする",
+  "kotlin.maven-set-dependencies": "リポジトリと依存関係を設定する",
+  "kmp.multiplatform-reasons-to-try": "Kotlin Multiplatformを採用する理由"
 }

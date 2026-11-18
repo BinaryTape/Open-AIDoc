@@ -85,6 +85,8 @@ async function generateLocaleJson(translateKeys, untitledKeys = new Set()) {
     // An entry upstream no longer gives a toc-title shows its page's title
     // (config/sidebar.config.ts), unless a label left from before is still there (P3-17)
     const dropped = [...untitledKeys].filter(key => !translateKeys.has(key));
+    // Every label of the sidebar; the loop below leaves in translateKeys only the new and changed ones
+    const labels = new Map(translateKeys);
     /* ---------- ① 处理英文 en.json ---------- */
     const enFile = path.join(LOCALE_DIR, 'en.json');
     const enDict = await readJson(enFile);
@@ -111,9 +113,13 @@ async function generateLocaleJson(translateKeys, untitledKeys = new Set()) {
         const file = path.join(LOCALE_DIR, `${lang}.json`);
         const dict = await readJson(file);
 
-        for (const [key, text] of translateKeys) {
-            // 若已有则替换，没有则添加
-            dict[key] = text
+        for (const [key, text] of labels) {
+            // A new or changed label replaces the translation; a label this
+            // language lost is put back too: the locale files were translated
+            // whole, and a run that dropped a key left the sidebar showing it
+            // ("kotlin.native-development" in zh-Hans from April, P0-22).
+            // The English text is translated with the rest of the file.
+            if (translateKeys.has(key) || !(key in dict)) dict[key] = text
         }
         for (const key of dropped) delete dict[key];
         await writeJson(file, dict);
