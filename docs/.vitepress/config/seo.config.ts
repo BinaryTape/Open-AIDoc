@@ -13,6 +13,7 @@ import {
   DEFAULT_LOCALE,
   type ContentLocale,
 } from '../../../shared/locales'
+import { pageVariables, substituteVariables, writersideVariables } from '../utils/writerside-variables'
 
 const SITE_ORIGIN = 'https://openaidoc.org'
 const docsRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
@@ -31,9 +32,9 @@ export function applySeoMetadata(pageData: PageData) {
 
   if (!existsSync(sourcePath)) return
 
-  const source = readFileSync(sourcePath, 'utf8')
-  const title = extractTitle(source)
   const { locale, contentPath } = splitLocalePath(relativePath)
+  const source = withVariables(readFileSync(sourcePath, 'utf8'), contentPath)
+  const title = extractTitle(source)
   const description = extractDescription(source) ||
     fallbackDescription(locale, contentPath)
 
@@ -64,6 +65,17 @@ export function applySeoMetadata(pageData: PageData) {
       href: absolutePageUrl(SITE_ORIGIN, DEFAULT_LOCALE, contentPath)
     }])
   }
+}
+
+/**
+ * The page with its Writerside variables filled in, as it shows them: the
+ * doc type's (docs/.vitepress/variables/) and its own `<var>`s. The title and
+ * description showed "Kotlin %kotlinEapVersion%", and "%pluginname%" with
+ * the underscore cleaned away (P2-32).
+ */
+export function withVariables(source: string, contentPath: string) {
+  const variables = { ...writersideVariables(contentPath.split('/')[0]), ...pageVariables(source) }
+  return substituteVariables(source, variables)
 }
 
 function fallbackDescription(locale: SupportedLocale, contentPath: string) {

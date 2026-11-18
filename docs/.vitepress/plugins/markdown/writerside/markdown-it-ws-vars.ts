@@ -1,9 +1,10 @@
 import { DOCS_TYPES } from "../../../docs.config";
-import { writersideVariables } from "../../../utils/writerside-variables";
+import { resolveLinkSummaries, writersideVariables } from "../../../utils/writerside-variables";
 
 export default function markdownItWsVars(md) {
   function substituteGlobalVariables(state) {
-    let currentSrc = state.src;
+    // A <Links> tooltip first takes the variables of the page it links to
+    let currentSrc = state.env?.relativePath ? resolveLinkSummaries(state.src, state.env.relativePath) : state.src;
 
     // The doc type's variables (docs/.vitepress/variables/), then the page's own <var>s
     const docType = state.env?.relativePath?.split('/').find(p => DOCS_TYPES.includes(p));
@@ -72,6 +73,9 @@ export default function markdownItWsVars(md) {
 
     out += currentSrc.slice(last);
     state.src = out;
+    // For what is read out of the source before this rule: the attributes
+    // after a code block (markdown-it-ws-remove-code-attr.ts)
+    if (state.env) state.env.wsVariables = variables;
   }
 
   md.core.ruler.before('block', 'global_variable_replacer', substituteGlobalVariables);
