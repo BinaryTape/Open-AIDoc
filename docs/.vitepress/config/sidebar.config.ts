@@ -4,24 +4,29 @@ import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
 import { parseTitleComment } from "../utils/title-comment";
+import { substituteVariables, writersideVariables } from "../utils/writerside-variables";
 
 // `withStatus: false` gives plain-text titles (no beta mark), for page headings.
 export default function generateSidebar(localeConfig: SideLocaleConfig, docsConfig: DocsItemConfig, { withStatus = true } = {}) {
     let sidebarPrefixDir = localeConfig.lang === "zh-Hans" ? docsConfig.path : path.posix.join(localeConfig.lang, docsConfig.path);
     const relativePrefixDir = path.posix.join("docs", sidebarPrefixDir);
     sidebarPrefixDir = path.posix.join("/", sidebarPrefixDir);
-    return generateSidebarNode(localeConfig.lang, docsConfig.framework, docsConfig.type, sidebarPrefixDir, relativePrefixDir, withStatus);
+    // A Writerside label can hold %variables%, as the page text does: KMP's
+    // "Compose Multiplatform %org.jetbrains.compose-eap%" (P2-31)
+    const variables = writersideVariables(docsConfig.type);
+    return generateSidebarNode(localeConfig.lang, docsConfig.framework, docsConfig.type, sidebarPrefixDir, relativePrefixDir, withStatus, variables);
 }
 
-function generateSidebarNode(lang: string, framework: string, type: string, sidebarPrefixDir: string, relativePrefixDir: string, withStatus: boolean) {
+function generateSidebarNode(lang: string, framework: string, type: string, sidebarPrefixDir: string, relativePrefixDir: string, withStatus: boolean, variables: Record<string, string>) {
     const sidebarPath = `docs/.vitepress/sidebar/${type}.sidebar.json`;
     const sidebar = JSON.parse(fs.readFileSync(sidebarPath, 'utf8'));
     const locale: Record<string, string> = JSON.parse(fs.readFileSync(`docs/.vitepress/locales/${lang}.json`, 'utf8'));
 
     const localizeNode = (node): any => {
-        const localizedText =
+        const label =
             (node.text && locale[node.text]) ??
             (node.link ? getTitleFromMarkdown(framework, relativePrefixDir, node.link) : node.text);
+        const localizedText = label && substituteVariables(label, variables);
 
         const status = withStatus && node.link && framework === 'MKDocs' ? getPageStatus(relativePrefixDir, node.link, locale) : '';
 
@@ -37,7 +42,8 @@ function generateSidebarNode(lang: string, framework: string, type: string, side
             const fallbackDocPath = path.join(relativePrefixDir, `${node.include}.md`);
 
             if (fs.existsSync(includedSidebarPath)) {
-                out.items = generateSidebarNode(lang, framework, node.include, sidebarPrefixDir, relativePrefixDir, withStatus);
+                // The included pages are in this doc type's directory, with its variables
+                out.items = generateSidebarNode(lang, framework, node.include, sidebarPrefixDir, relativePrefixDir, withStatus, variables);
             } else if (fs.existsSync(fallbackDocPath)) {
                 // Some upstream Writerside trees reference an optional child
                 // documentation set that is not part of this repository. Keep
