@@ -228,6 +228,40 @@ function reindent(content, indent, rest = indent) {
   return lines.map((l, i) => (l.trim() ? (i === 0 ? indent : rest) + l.slice(min) : "")).join("\n");
 }
 
+/** The `<var>` definitions of a page, by name; the first definition wins. */
+function definitions(content) {
+  const vars = {};
+  for (const [, name, value] of content.matchAll(VAR_RE)) if (!(name in vars)) vars[name] = value;
+  return vars;
+}
+
+/**
+ * The variables an included fragment uses that neither the including page
+ * nor the fragment itself defines, with their value in the page the fragment
+ * comes from, where the fragment is: the last definition before it (a page
+ * can set one again for a later section), else its first. Writerside takes a
+ * variable from the including page, else from the page the content is in:
+ * ktor.io's client-opentelemetry includes a section of server-opentelemetry,
+ * and shows its own %plugin_name% (KtorClientTelemetry) with
+ * server-opentelemetry's %artifact_name% (opentelemetry-ktor-3.0) (P3-34).
+ * @param {string} fragment - The fragment, its includes expanded
+ * @param {string} source - The page it comes from
+ * @param {string} element - The fragment as it is in that page
+ * @param {Set<string>} pageVars - Variables the including page defines
+ */
+function sourceVars(fragment, source, element, pageVars) {
+  const at = source.indexOf(element);
+  const before = at < 0 ? "" : source.slice(0, at);
+  const defined = { ...definitions(source) };
+  for (const [, name, value] of before.matchAll(VAR_RE)) defined[name] = value;
+  const own = definitions(fragment);
+  const vars = {};
+  for (const [, name] of fragment.matchAll(/%([\w.-]+)%/g)) {
+    if (!pageVars.has(name) && !Object.hasOwn(own, name) && Object.hasOwn(defined, name)) vars[name] = defined[name];
+  }
+  return vars;
+}
+
 /**
  * Replace the includes of a page with the content they point at.
  * @param {string} content - The page
@@ -235,8 +269,10 @@ function reindent(content, indent, rest = indent) {
  * @param {(name: string) => string | null} readPage - Original content of a page by file name
  * @param {{file: string, from: string, elementId: string, reason: string}[]} [unresolved] - Collects failures
  * @param {string[]} [stack] - Includes being expanded (cycle detection)
+ * @param {Set<string>} [pageVars] - Variables the including page defines (of the page itself when left out)
+ * @param {{from: string, name: string, value: string}[]} [filled] - Collects the variables taken from the page a fragment comes from
  */
-export function expandIncludes(content, file, readPage, unresolved = [], stack = []) {
+export function expandIncludes(content, file, readPage, unresolved = [], stack = [], pageVars = new Set(Object.keys(definitions(content))), filled = []) {
   let out = "";
   let last = 0;
   for (const include of findIncludes(content)) {
@@ -248,12 +284,17 @@ export function expandIncludes(content, file, readPage, unresolved = [], stack =
     if (stack.includes(key)) fail("include cycle");
     else if (target === null) fail("page not found");
     else {
-      let element = findElement(target, include.elementId);
+      const found = findElement(target, include.elementId);
+      let element = found;
       if (element === null) fail("element not found");
       else {
         if (include.filters) element = applyFilters(element, include.filters);
         element = applyVars(element, include.vars);
-        element = expandIncludes(element, file, readPage, unresolved, [...stack, key]);
+        element = expandIncludes(element, file, readPage, unresolved, [...stack, key], pageVars, filled);
+        // After the includes inside it, which may leave variables of this source
+        const fallback = sourceVars(element, target, found, pageVars);
+        for (const [name, value] of Object.entries(fallback)) filled.push({ from: include.from, name, value });
+        element = applyVars(element, fallback);
         // An include after a list marker (`1. <include …/>`) is the item's
         // content: its other lines go to the column of the tag.
         const lead = content.slice(content.lastIndexOf("\n", include.start - 1) + 1, include.start);

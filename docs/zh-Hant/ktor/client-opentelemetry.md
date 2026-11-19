@@ -26,7 +26,7 @@ Ktor 與 [OpenTelemetry](https://opentelemetry.io/) 整合——這是一個開�
 ## 新增相依性 {id="add_dependencies"}
 
 <p>
-    若要使用 <code>%plugin_name%</code>，請將 <code>%artifact_name%</code> 構件新增至您的組建指令碼中：
+    若要使用 <code>%plugin_name%</code>，請將 <code>opentelemetry-ktor-3.0</code> 構件新增至您的組建指令碼中：
 </p>
 
 <Tabs group="languages">

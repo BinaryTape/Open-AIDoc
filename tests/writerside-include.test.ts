@@ -219,6 +219,79 @@ describe('expandIncludes', () => {
   })
 })
 
+// ktor.io's client-opentelemetry includes a section of server-opentelemetry and
+// shows its own %plugin_name% with server-opentelemetry's %artifact_name%; the
+// expansion left %artifact_name% on the page (P3-34)
+describe('the variables of an included fragment', () => {
+  const pages: Record<string, string> = {
+    'client.md': md('<var name="plugin_name" value="KtorClientTelemetry"/>', '', '<include from="server.md" element-id="deps"/>'),
+    'server.md': md(
+      '<var name="plugin_name" value="KtorServerTelemetry"/>',
+      '<var name="artifact_name" value="opentelemetry-ktor-3.0"/>',
+      '',
+      '## Add dependencies {id="deps"}',
+      '',
+      'To use %plugin_name%, add the %artifact_name% artifact.',
+    ),
+  }
+
+  it('come from the including page, else from the page the fragment comes from', () => {
+    const filled: { from: string; name: string; value: string }[] = []
+    const content = expandIncludes(pages['client.md'], 'client.md', (name: string) => pages[name] ?? null, [], [], undefined, filled)
+    expect(content).toContain('To use %plugin_name%, add the opentelemetry-ktor-3.0 artifact.')
+    expect(filled).toEqual([{ from: 'server.md', name: 'artifact_name', value: 'opentelemetry-ktor-3.0' }])
+  })
+
+  it('come from the page the fragment comes from through an include inside it too', () => {
+    const { content } = expand({
+      'page.md': md('<var name="plugin_name" value="KtorClientTelemetry"/>', '<include from="server.md" element-id="deps"/>'),
+      'server.md': md(
+        '<var name="plugin_name" value="KtorServerTelemetry"/>',
+        '<var name="artifact_name" value="opentelemetry-ktor-3.0"/>',
+        '## Add dependencies {id="deps"}',
+        '<include from="lib.topic" element-id="intro"/>',
+      ),
+      'lib.topic': md('<snippet id="intro">', 'To use %plugin_name%, add the %artifact_name% artifact.', '</snippet>'),
+    })
+    expect(content).toContain('To use %plugin_name%, add the opentelemetry-ktor-3.0 artifact.')
+  })
+
+  it('keep those the fragment defines itself, for the page to fill in', () => {
+    const { content } = expand({
+      'page.md': '<include from="auth.md" element-id="deps"/>',
+      'auth.md': md(
+        '<var name="artifact_name" value="ktor-client-core"/>',
+        '## Deps {id="deps"}',
+        '<var name="artifact_name" value="ktor-client-auth"/>',
+        'Add %artifact_name%.',
+      ),
+    })
+    expect(content).toContain(md('<var name="artifact_name" value="ktor-client-auth"/>', 'Add %artifact_name%.'))
+  })
+
+  it('take the value set last before the fragment in the page it comes from', () => {
+    const { content } = expand({
+      'page.md': '<include from="compression.md" element-id="zstd"/>',
+      'compression.md': md(
+        '<var name="artifact_name" value="ktor-server-compression"/>',
+        '## Compression',
+        '<var name="artifact_name" value="ktor-server-compression-zstd"/>',
+        '## Zstd {id="zstd"}',
+        'Add %artifact_name%.',
+      ),
+    })
+    expect(content).toContain('Add ktor-server-compression-zstd.')
+  })
+
+  it('keep the variables of the include itself, and those no page defines', () => {
+    const { content } = expand({
+      'page.md': md('<include from="server.md" element-id="deps">', '<var name="artifact_name" value="given"/>', '</include>'),
+      'server.md': md('<var name="artifact_name" value="opentelemetry-ktor-3.0"/>', '## Deps {id="deps"}', '%artifact_name% and %ktor_version%'),
+    })
+    expect(content).toContain('given and %ktor_version%')
+  })
+})
+
 describe('includes across a directory', () => {
   let dir: string
   const write = (name: string, content: string) => writeFileSync(join(dir, name), content)

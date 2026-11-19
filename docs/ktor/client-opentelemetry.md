@@ -26,7 +26,7 @@ Ktor 与 [OpenTelemetry](https://opentelemetry.io/) 相集成，后者是一个�
 ## 添加依赖项 {id="add_dependencies"}
 
 <p>
-    要使用 <code>%plugin_name%</code>，请将 <code>%artifact_name%</code> 构件添加到你的构建脚本中：
+    要使用 <code>%plugin_name%</code>，请将 <code>opentelemetry-ktor-3.0</code> 构件添加到你的构建脚本中：
 </p>
 
 <Tabs group="languages">

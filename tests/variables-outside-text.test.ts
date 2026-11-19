@@ -215,3 +215,29 @@ describe('the tooltip of a link to a page', () => {
     expect(long).toEqual([])
   })
 })
+
+// A variable neither the page nor its doc type defines shows as it is:
+// client-opentelemetry showed "%artifact_name%", which an included section
+// takes from the page it comes from (P3-34)
+describe('the Writerside pages of the site', () => {
+  it('use no variable neither they nor their doc type define', () => {
+    // Not variables: Logback's %msg% pattern; URL-encoded text (%E3%81…)
+    const notVariables = new Set(['msg'])
+    const left: string[] = []
+    for (const docType of ['kotlin', 'ktor', 'kmp']) {
+      const global = writersideVariables(docType)
+      for (const lang of ['', 'zh-Hant/', 'ja/', 'ko/']) {
+        for (const file of readdirSync(`docs/${lang}${docType}`).filter((f) => f.endsWith('.md'))) {
+          const text = readFileSync(`docs/${lang}${docType}/${file}`, 'utf8')
+            .replace(/<Links\b[^>]*>/g, '') // filled in from the page they link to
+            .replace(/```[\s\S]*?```/g, '')
+          const own = new Set([...text.matchAll(/<var\s+name="([^"]+)"/g)].map((m) => m[1]))
+          for (const [, name] of text.matchAll(/%([A-Za-z][\w.-]*)%/g)) {
+            if (!(name in global) && !own.has(name) && !notVariables.has(name) && !/^[0-9A-F]{2}/.test(name)) left.push(`${lang}${docType}/${file}: %${name}%`)
+          }
+        }
+      }
+    }
+    expect([...new Set(left)]).toEqual([])
+  })
+})
