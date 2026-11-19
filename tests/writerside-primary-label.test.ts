@@ -2,7 +2,10 @@ import { describe, expect, it, vi } from 'vitest'
 import { createSSRApp, h } from 'vue'
 import { renderToString } from 'vue/server-renderer'
 import TopicTitle from '../docs/.vitepress/component/TopicTitle.vue'
-import { findLabel, labelColorClass, labelsDocType } from '../docs/.vitepress/utils/writerside-labels'
+import { readFileSync } from 'node:fs'
+import { findLabel, LABEL_VARIABLES, labelColorClass, labelsDocType } from '../docs/.vitepress/utils/writerside-labels'
+import { labelWithVariables } from '../docs/.vitepress/utils/variable-text'
+import { writersideVariables } from '../docs/.vitepress/utils/writerside-variables'
 
 // TopicTitle reads the page path from VitePress to pick the doc type's labels.
 const page = vi.hoisted(() => ({ relativePath: '' }))
@@ -49,5 +52,46 @@ describe('primary labels', () => {
     expect(labelColorClass(findLabel('secondary', 'kotlin', 'maven'))).toBe('ws-label--red')
     expect(labelsDocType('ja/kmp/compose-test.md')).toBe('kmp')
     expect(labelsDocType('koin/setup.md')).toBeNull()
+  })
+})
+
+// KMP's EAP label is "Compose Multiplatform %org.jetbrains.compose-eap%";
+// kotlinlang.org shows "Compose Multiplatform 1.13.0-beta02" (P2-34)
+describe('label variables', () => {
+  it('are filled in, in the label and in the heading the outline reads', async () => {
+    const eap = writersideVariables('kmp')['org.jetbrains.compose-eap']
+    const html = await render('ja/kmp/compose-swiftui-integration.md', 'EAP')
+    expect(labelOf(html)?.text).toBe(`Compose Multiplatform ${eap}`)
+    expect(html).toContain(`data-ws-label="Compose Multiplatform ${eap}"`)
+  })
+
+  it('in the browser are those the server reads', () => {
+    for (const docType of ['kotlin', 'kmp', 'ktor']) {
+      expect({ ...LABEL_VARIABLES[docType] }).toEqual({ ...writersideVariables(docType) })
+    }
+  })
+
+  it('go into the name and the description, and leave a name without a variable', () => {
+    const variables = { version: '1.2.3' }
+    expect(labelWithVariables({ name: 'Lib %version%', description: 'In %version% and %other%' }, variables))
+      .toEqual({ name: 'Lib 1.2.3', description: 'In 1.2.3 and %other%' })
+    expect(labelWithVariables({ name: 'Beta', color: 'tangerine' }, variables)).toEqual({ name: 'Beta', color: 'tangerine' })
+  })
+
+  it('leave no label of the site with a variable its doc type defines', () => {
+    const left: string[] = []
+    for (const docType of ['kotlin', 'kmp', 'ktor']) {
+      const labels = JSON.parse(readFileSync(`docs/.vitepress/labels/${docType}.json`, 'utf8'))
+      const variables = writersideVariables(docType)
+      for (const kind of ['primary', 'secondary'] as const) {
+        for (const ref of Object.keys(labels[kind] ?? {})) {
+          const label = findLabel(kind, docType, ref)!
+          for (const [, name] of `${label.name} ${label.description ?? ''}`.matchAll(/%([\w.-]+)%/g)) {
+            if (name in variables) left.push(`${docType} ${kind} ${ref}: %${name}%`)
+          }
+        }
+      }
+    }
+    expect(left).toEqual([])
   })
 })

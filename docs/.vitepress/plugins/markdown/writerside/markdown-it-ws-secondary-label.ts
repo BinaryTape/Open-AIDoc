@@ -1,6 +1,8 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { getDocType } from '../../../utils/doctype-utils'
+import { writersideVariables } from '../../../utils/writerside-variables'
+import { labelWithVariables } from '../../../utils/variable-text'
 
 /**
  * Writerside marks a topic or a section with secondary labels, each on a line
@@ -30,7 +32,14 @@ function labelsOf(docType: string | null): Labels {
   if (!docType) return {}
   if (!cache.has(docType)) {
     const file = path.join(LABELS_DIR, `${docType}.json`)
-    cache.set(docType, fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')) : {})
+    const labels: Labels = fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')) : {}
+    // A label's name can hold a variable, as the page text does (P2-34)
+    const variables = writersideVariables(docType)
+    cache.set(docType, {
+      ...labels,
+      secondary: labels.secondary && Object.fromEntries(
+        Object.entries(labels.secondary).map(([id, label]) => [id, labelWithVariables(label, variables)])),
+    })
   }
   return cache.get(docType)!
 }
