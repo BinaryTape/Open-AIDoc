@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import {
@@ -141,7 +141,7 @@ describe('expandIncludes', () => {
       'a.md': md('<snippet id="a">', 'A then:', '<include from="b.md" element-id="b"/>', '</snippet>'),
       'b.md': md('<snippet id="b">', 'B.', '</snippet>'),
     })
-    expect(content).toBe('A then:\nB.')
+    expect(content).toBe('A then:\n\nB.')
   })
 
   it('includes from the page itself', () => {
@@ -190,7 +190,7 @@ describe('expandIncludes', () => {
         '<include element-id="rows" use-filter="empty,beginner" from="page.md"/>',
       ),
     })
-    expect(content.split('</snippet>\n')[1]).toBe(md(
+    expect(content.split('</snippet>\n\n')[1]).toBe(md(
       '<table>',
       '<tr><td>Header</td></tr>',
       '<tr filter="beginner">',
@@ -216,6 +216,97 @@ describe('expandIncludes', () => {
     })
     expect(content).toBe('A\n<include from="a.md" element-id="a"/>')
     expect(unresolved).toEqual([{ file: 'page.md', from: 'a.md', elementId: 'a', reason: 'include cycle' }])
+  })
+})
+
+// ktor.io's client-opentelemetry has two includes on consecutive lines; the
+// heading the second one starts with ran on from the HTML block ending the
+// first and showed as text (P2-20)
+describe('an included block', () => {
+  const server = md(
+    '## Add dependencies {id="deps"}',
+    '<tabs>',
+    '<tab title="Gradle">implementation(…)</tab>',
+    '</tabs>',
+    '',
+    '## Configure OpenTelemetry {id="configure-otel"}',
+    'Set up an instance.',
+  )
+
+  it('stands apart from the lines around it, as in Writerside', () => {
+    const { content } = expand({
+      'page.md': md(
+        'Intro.',
+        '<include from="server.md" element-id="deps"/>',
+        '<include from="server.md" element-id="configure-otel"/>',
+        '## Install',
+      ),
+      'server.md': server,
+    })
+    expect(content).toBe(md(
+      'Intro.',
+      '',
+      '## Add dependencies {id="deps"}',
+      '<tabs>',
+      '<tab title="Gradle">implementation(…)</tab>',
+      '</tabs>',
+      '',
+      '## Configure OpenTelemetry {id="configure-otel"}',
+      'Set up an instance.',
+      '',
+      '## Install',
+    ))
+    // No second blank line, none at the start and end of the page
+    const page = md('Intro.', '', '<include from="server.md" element-id="configure-otel"/>', '', '<include from="server.md" element-id="configure-otel"/>')
+    expect(expand({ 'page.md': page, 'server.md': server }).content).toBe(md(
+      'Intro.', '', '## Configure OpenTelemetry {id="configure-otel"}', 'Set up an instance.',
+      '', '## Configure OpenTelemetry {id="configure-otel"}', 'Set up an instance.',
+    ))
+  })
+
+  it('is one on a line of its own, unindented, in a Markdown page', () => {
+    const lib = md('<topic>', '<snippet id="s">', '<p>One</p>', '</snippet>', '</topic>')
+    const pages = {
+      'page.md': md(
+        '<list>',
+        '<include from="lib.topic" element-id="s"/>',
+        '    <include from="lib.topic" element-id="s"/>',
+        '</list>',
+        'Text <include from="lib.topic" element-id="s"/> text',
+        '1. <include from="lib.topic" element-id="s"/>',
+        '2. Next',
+      ),
+      'page.topic': md('<chapter>', '<include from="lib.topic" element-id="s"/>', '</chapter>'),
+      'lib.topic': lib,
+    }
+    expect(expand(pages).content).toBe(md('<list>', '', '<p>One</p>', '', '    <p>One</p>', '</list>', 'Text <p>One</p> text', '1. <p>One</p>', '2. Next'))
+    expect(expand(pages, 'page.topic').content).toBe(md('<chapter>', '<p>One</p>', '</chapter>'))
+  })
+})
+
+describe('the translated Writerside pages', () => {
+  // A heading right after a line closing an HTML block is part of the block,
+  // and shows as text: an include expanded without a blank line before the
+  // pipeline kept included blocks apart (P2-20)
+  it('have no heading right after a line closing an HTML block', () => {
+    const found: string[] = []
+    for (const lang of ['', 'zh-Hant/', 'ja/', 'ko/']) {
+      for (const docType of ['kotlin', 'ktor', 'kmp']) {
+        const dir = `docs/${lang}${docType}`
+        for (const file of readdirSync(dir).filter((f) => f.endsWith('.md'))) {
+          const lines = readFileSync(join(dir, file), 'utf8').split(/\r?\n/)
+          let fence: string | null = null
+          lines.forEach((line, i) => {
+            const marker = /^\s*(`{3,}|~{3,})/.exec(line)?.[1]
+            if (marker && (!fence || (marker[0] === fence[0] && marker.length >= fence.length))) fence = fence ? null : marker
+            else if (!fence && i > 0 && /^#{1,6}\s/.test(line) && /^\s*<\/[\w-]+\s*>\s*$/.test(lines[i - 1])) {
+              found.push(`${dir}/${file}:${i + 1}: ${line}`)
+            }
+          })
+        }
+      }
+    }
+    expect(found).toEqual([])
   })
 })
 

@@ -263,6 +263,25 @@ function sourceVars(fragment, source, element, pageVars) {
 }
 
 /**
+ * Blank lines between an included block and the lines around it. In
+ * Writerside an include on a line of its own is a block of its own; in
+ * Markdown a block runs on into the next line: ktor.io's client-opentelemetry
+ * has two includes on consecutive lines, and the heading of the second
+ * ("## Configure OpenTelemetry") was taken into the HTML block ending the
+ * first (`</tabs>`), showing as text (P2-20).
+ * @param {string} replacement - The included content
+ * @param {string} before - The page before the include, includes expanded
+ * @param {string} after - The page after it
+ */
+function separateBlock(replacement, before, after) {
+  const rest = /^[ \t]*(\n|$)/.exec(after);
+  if (!rest) return replacement; // more on the line of the include
+  if (/\S[ \t]*\n$/.test(before)) replacement = "\n" + replacement;
+  if (rest[1] && /^[ \t]*\S/.test(after.slice(rest[0].length))) replacement += "\n";
+  return replacement;
+}
+
+/**
  * Replace the includes of a page with the content they point at.
  * @param {string} content - The page
  * @param {string} file - Its file name, for messages and cycle detection
@@ -301,6 +320,9 @@ export function expandIncludes(content, file, readPage, unresolved = [], stack =
         replacement = LIST_MARKER_RE.test(lead)
           ? reindent(element, include.indent, " ".repeat(lead.length + include.indent.length))
           : reindent(element, include.indent);
+        if (lead === "" && include.indent === "" && file.endsWith(".md")) {
+          replacement = separateBlock(replacement, out + content.slice(last, include.start), content.slice(include.end));
+        }
       }
     }
 

@@ -40,6 +40,7 @@ Ktor는 트레이스(trace), 메트릭(metric), 로그와 같은 텔레메트리
         <code-block lang="XML" code="             &lt;dependencies&gt;&#10;              &lt;dependency&gt;&#10;                &lt;groupId&gt;io.opentelemetry.instrumentation&lt;/groupId&gt;&#10;                &lt;artifactId&gt;opentelemetry-ktor-3.0&lt;/artifactId&gt;&#10;                &lt;version&gt;%opentelemetry_version%&lt;/version&gt;&#10;              &lt;/dependency&gt;&#10;            &lt;/dependencies&gt;"/>
     </TabItem>
 </Tabs>
+
 ## OpenTelemetry 구성 {id="configure-otel"}
 
 Ktor 애플리케이션에 `%plugin_name%` 플러그인을 설치하기 전에 `OpenTelemetry` 인스턴스를 구성하고 초기화해야 합니다. 이 인스턴스는 트레이스와 메트릭을 포함한 텔레메트리 데이터를 관리하는 역할을 합니다.

@@ -40,6 +40,7 @@ Ktor 與 [OpenTelemetry](https://opentelemetry.io/) 整合——這是一個開�
         <code-block lang="XML" code="             &lt;dependencies&gt;&#10;              &lt;dependency&gt;&#10;                &lt;groupId&gt;io.opentelemetry.instrumentation&lt;/groupId&gt;&#10;                &lt;artifactId&gt;opentelemetry-ktor-3.0&lt;/artifactId&gt;&#10;                &lt;version&gt;%opentelemetry_version%&lt;/version&gt;&#10;              &lt;/dependency&gt;&#10;            &lt;/dependencies&gt;"/>
     </TabItem>
 </Tabs>
+
 ## 配置 OpenTelemetry {id="configure-otel"}
 
 在 Ktor 應用程式中安裝 `%plugin_name%` 外掛程式之前，您需要配置並初始化一個 `OpenTelemetry` 執行個體。該執行個體負責管理遙測資料，包括追蹤和指標。
