@@ -26,7 +26,7 @@ Ktorは、トレース、メトリクス、ログなどのテレメトリデー�
 ## 依存関係の追加 {id="add_dependencies"}
 
 <p>
-    <code>%plugin_name%</code> を使用するには、ビルドスクリプトに <code>%artifact_name%</code> アーティファクトを追加します。
+    <code>%plugin_name%</code> を使用するには、ビルドスクリプトに <code>opentelemetry-ktor-3.0</code> アーティファクトを追加します。
 </p>
 
 <Tabs group="languages">

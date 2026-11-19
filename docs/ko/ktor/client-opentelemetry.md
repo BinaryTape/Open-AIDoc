@@ -26,7 +26,7 @@ Ktor는 트레이스(trace), 메트릭(metric), 로그와 같은 텔레메트리
 ## 종속성 추가 {id="add_dependencies"}
 
 <p>
-    <code>%plugin_name%</code>을 사용하려면 빌드 스크립트에 <code>%artifact_name%</code> 아티팩트를 추가하세요.
+    <code>%plugin_name%</code>을 사용하려면 빌드 스크립트에 <code>opentelemetry-ktor-3.0</code> 아티팩트를 추가하세요.
 </p>
 
 <Tabs group="languages">
