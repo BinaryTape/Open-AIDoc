@@ -81,6 +81,56 @@ describe('Writerside chapters', () => {
     const headings = [...html.matchAll(/<(h\d) id="(\w+)"/g)].map((m) => `${m[1]} ${m[2]}`)
     expect(headings).toEqual(['h2 prepare', 'h3 build', 'h4 run', 'h3 test', 'h2 deploy'])
   })
+
+  // ktor.io's server-engines: chapters Netty, Jetty… under the h3 "In code"
+  // are h4s; they were h2s (P2-20)
+  it('go one level below the Markdown heading they follow', async () => {
+    const chapter = (props: Record<string, unknown>, children?: () => unknown) => h(Chapter, props, children)
+    const html = await renderToString(createSSRApp(() => h('div', [
+      chapter({ title: 'Netty', id: 'netty', baseLevel: '3' }, () => [chapter({ title: 'Options', id: 'options' })]),
+    ])))
+    const headings = [...html.matchAll(/<(h\d) id="(\w+)"/g)].map((m) => `${m[1]} ${m[2]}`)
+    expect(headings).toEqual(['h4 netty', 'h5 options'])
+  })
+
+  it('without an id have no anchor link, rather than "#undefined"', async () => {
+    const html = await renderToString(createSSRApp(() => h(Chapter, { title: 'BOM' })))
+    expect(html).not.toContain('#undefined')
+    expect(html).not.toContain('header-anchor')
+  })
+
+  it('are given the level of the Markdown heading before them, and an id from their title', async () => {
+    const html = await render([
+      '[//]: # (title: Engines)',
+      '',
+      '<chapter title="First" id="first">',
+      'Before any heading.',
+      '</chapter>',
+      '',
+      '### In code {id="in-code"}',
+      '',
+      '<chapter title="Netty" id="netty">',
+      '<chapter title="Inner" id="inner">',
+      'Inside.',
+      '</chapter>',
+      '</chapter>',
+      '',
+      '## Ensure version consistency {id="ensure"}',
+      '',
+      '<chapter title="使用 Ktor BOM 依赖项">',
+      '',
+      'BOM.',
+      '',
+      '</chapter>',
+    ].join('\n'), 'ktor/server-engines.md')
+    const tags = [...html.matchAll(/<chapter\b[^>]*>/g)].map((m) => m[0])
+    expect(tags).toEqual([
+      '<chapter title="First" id="first">',
+      '<chapter base-level="3" title="Netty" id="netty">',
+      '<chapter title="Inner" id="inner">',
+      '<chapter base-level="2" id="使用-ktor-bom-依赖项" title="使用 Ktor BOM 依赖项">',
+    ])
+  })
 })
 
 describe('title comments', () => {
