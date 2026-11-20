@@ -1,3 +1,4 @@
+import { slugify } from '@mdit-vue/shared'
 import { getDocType, isWritersideDoc } from '../../../utils/doctype-utils'
 
 /**
@@ -19,9 +20,11 @@ import { getDocType, isWritersideDoc } from '../../../utils/doctype-utils'
 const DOCS_DEPTH: Record<string, number> = { ktor: 1 }
 const SITE_DEPTH = 2
 
-// Plugins render bits of a page (a title with its label) with the page's env:
-// the page is the first source rendered with it.
+// ws_render_inline renders the content of a <tldr> and the like with the
+// page's env: the page is the first source rendered with it.
 const DONE = Symbol('ws-show-structure')
+// Whether the page's <show-structure for> names "procedure"
+const PROCEDURES = Symbol('ws-show-structure-procedures')
 
 /** The first <show-structure> tag in the source, not in a fenced code block */
 function showStructure(src: string): string | undefined {
@@ -44,12 +47,44 @@ export default function markdownItWsShowStructure(md) {
     const env = state.env
     if (!isWritersideDoc(env) || env[DONE]) return
     env[DONE] = true
+    const tag = showStructure(state.src)
+    env[PROCEDURES] = !!tag && /\sfor="[^"]*\bprocedure\b/.test(tag)
+
     const frontmatter = (env.frontmatter ??= {})
     if ('outline' in frontmatter) return
-
-    const tag = showStructure(state.src)
     const depthAttr = tag && /\sdepth="(\d+)"/.exec(tag)?.[1]
     const depth = depthAttr ? Number(depthAttr) : tag ? SITE_DEPTH : DOCS_DEPTH[getDocType(env)!] ?? SITE_DEPTH
     if (depth !== SITE_DEPTH && depth >= 1) frontmatter.outline = [2, Math.min(depth + 1, 6)]
+  })
+
+  /**
+   * A procedure's title is an h3 on ktor.io (Procedure.vue), in the outline
+   * only when <show-structure for> names "procedure": server-create-website
+   * lists "Create the initial project with plugins", server-create-a-new-project
+   * (for="chapter") does not list "Add a new dependency" (P2-37). The outline
+   * takes the headings that have an id: `in-toc` tells Procedure.vue to put
+   * the id on the title. A title without an id gets one from its text, as a
+   * chapter does.
+   */
+  md.core.ruler.after('inline', 'ws_procedure_title', (state) => {
+    if (!isWritersideDoc(state.env) || !state.src.includes('<procedure')) return
+    const inToc = state.env[PROCEDURES]
+    // A tag may span lines: <procedure title="…"\n    id="…">
+    const rewrite = (content: string) => content.replace(/<procedure\b([^>]*)>/g, (tag: string, attrs: string) => {
+      const title = /\stitle="([^"]*)"/.exec(attrs)?.[1]
+      if (!title) return tag
+      let added = ''
+      if (!/\sid=/.test(attrs)) added += ` id="${slugify(md.utils.unescapeAll(title))}"`
+      if (inToc && !/\sin-toc\b/.test(attrs)) added += ' in-toc'
+      return added ? `<procedure${added}${attrs}>` : tag
+    })
+    for (const token of state.tokens) {
+      if (token.type === 'html_block' || token.type === 'html_inline') token.content = rewrite(token.content)
+      else if (token.type === 'inline') {
+        for (const child of token.children ?? []) {
+          if (child.type === 'html_inline') child.content = rewrite(child.content)
+        }
+      }
+    }
   })
 }
