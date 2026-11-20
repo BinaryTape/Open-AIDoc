@@ -40,6 +40,7 @@ Ktorは、トレース、メトリクス、ログなどのテレメトリデー�
         <code-block lang="XML" code="             &lt;dependencies&gt;&#10;              &lt;dependency&gt;&#10;                &lt;groupId&gt;io.opentelemetry.instrumentation&lt;/groupId&gt;&#10;                &lt;artifactId&gt;opentelemetry-ktor-3.0&lt;/artifactId&gt;&#10;                &lt;version&gt;%opentelemetry_version%&lt;/version&gt;&#10;              &lt;/dependency&gt;&#10;            &lt;/dependencies&gt;"/>
     </TabItem>
 </Tabs>
+
 ## OpenTelemetryの構成 {id="configure-otel"}
 
 Ktorアプリケーションに `%plugin_name%` プラグインをインストールする前に、`OpenTelemetry` インスタンスを構成して初期化する必要があります。このインスタンスは、トレースやメトリクスを含むテレメトリデータの管理を担当します。

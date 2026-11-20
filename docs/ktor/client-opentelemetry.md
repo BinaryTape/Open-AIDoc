@@ -40,6 +40,7 @@ Ktor 与 [OpenTelemetry](https://opentelemetry.io/) 相集成，后者是一个�
         <code-block lang="XML" code="             &lt;dependencies&gt;&#10;              &lt;dependency&gt;&#10;                &lt;groupId&gt;io.opentelemetry.instrumentation&lt;/groupId&gt;&#10;                &lt;artifactId&gt;opentelemetry-ktor-3.0&lt;/artifactId&gt;&#10;                &lt;version&gt;%opentelemetry_version%&lt;/version&gt;&#10;              &lt;/dependency&gt;&#10;            &lt;/dependencies&gt;"/>
     </TabItem>
 </Tabs>
+
 ## 配置 OpenTelemetry {id="configure-otel"}
 
 在 Ktor 应用程序中安装 `%plugin_name%` 插件之前，你需要配置并初始化一个 `OpenTelemetry` 实例。该实例负责管理包括跟踪和指标在内的遥测数据。
