@@ -29,6 +29,8 @@ const props = defineProps<{
 }
 
 .ws-procedure {
+  /* A link to a procedure whose id is here shows its title below the nav bar, as for a heading (vp-doc.css) */
+  scroll-margin-top: calc(var(--vp-nav-height) + var(--vp-layout-top-height, 0px) + 24px);
   box-sizing: border-box;
   padding: 0 16px;
   margin-bottom: 16px;
