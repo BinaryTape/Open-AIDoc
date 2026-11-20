@@ -19,26 +19,37 @@ import { getDocType, isWritersideDoc } from '../../../utils/doctype-utils'
 const DOCS_DEPTH: Record<string, number> = { ktor: 1 }
 const SITE_DEPTH = 2
 
+// Plugins render bits of a page (a title with its label) with the page's env:
+// the page is the first source rendered with it.
+const DONE = Symbol('ws-show-structure')
+
+/** The first <show-structure> tag in the source, not in a fenced code block */
+function showStructure(src: string): string | undefined {
+  let fence: string | undefined
+  for (const line of src.split('\n')) {
+    const marker = /^\s*(`{3,}|~{3,})/.exec(line)?.[1]
+    if (fence) {
+      if (marker && marker[0] === fence[0] && marker.length >= fence.length && !line.slice(line.indexOf(marker) + marker.length).trim()) fence = undefined
+    } else if (marker) {
+      fence = marker
+    } else {
+      const tag = /<show-structure\b[^>]*>/.exec(line)?.[0]
+      if (tag) return tag
+    }
+  }
+}
+
 export default function markdownItWsShowStructure(md) {
-  md.core.ruler.push('ws_show_structure', (state) => {
-    if (!isWritersideDoc(state.env)) return
-    const frontmatter = (state.env.frontmatter ??= {})
+  md.core.ruler.before('normalize', 'ws_show_structure', (state) => {
+    const env = state.env
+    if (!isWritersideDoc(env) || env[DONE]) return
+    env[DONE] = true
+    const frontmatter = (env.frontmatter ??= {})
     if ('outline' in frontmatter) return
 
-    // The first <show-structure> in the page's HTML, not in a code sample.
-    // One on a line of its own is a top-level html_inline (VitePress's
-    // component rule), one inside a paragraph an html_inline child.
-    let tag: string | undefined
-    for (const token of state.tokens) {
-      const html = token.type === 'html_block' || token.type === 'html_inline' ? [token.content]
-        : token.type === 'inline' ? (token.children ?? []).filter((t) => t.type === 'html_inline').map((t) => t.content)
-          : []
-      tag = html.map((s) => /<show-structure\b[^>]*>/.exec(s)?.[0]).find(Boolean)
-      if (tag) break
-    }
-
+    const tag = showStructure(state.src)
     const depthAttr = tag && /\sdepth="(\d+)"/.exec(tag)?.[1]
-    const depth = depthAttr ? Number(depthAttr) : tag ? SITE_DEPTH : DOCS_DEPTH[getDocType(state.env)!] ?? SITE_DEPTH
+    const depth = depthAttr ? Number(depthAttr) : tag ? SITE_DEPTH : DOCS_DEPTH[getDocType(env)!] ?? SITE_DEPTH
     if (depth !== SITE_DEPTH && depth >= 1) frontmatter.outline = [2, Math.min(depth + 1, 6)]
   })
 }

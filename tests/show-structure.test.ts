@@ -43,6 +43,14 @@ describe('the outline of a Writerside page', () => {
     expect(await outline(page(sample), 'ktor/server-docs.md')).toEqual([2, 2])
   })
 
+  it('is the page\'s, not that of a bit of it rendered on its own', async () => {
+    // The content of a <tldr> is rendered on its own, with the page's env (ws_render_inline)
+    const tldr = (structure: string) => `[//]: # (title: 身份验证)\n\n${structure}\n<primary-label ref="client-plugin"/>\n\n<tldr>\n<p><b>必需依赖项</b>：<code>io.ktor:ktor-client-auth</code></p>\n</tldr>\n\n## A\n\n### B\n`
+    expect(await outline(tldr('<show-structure for="chapter" depth="2"/>'), 'ktor/client-auth.md')).toBeUndefined()
+    expect(await outline(tldr('<show-structure for="chapter"/>'), 'zh-Hant/ktor/client-auth.md')).toBeUndefined()
+    expect(await outline(tldr('<show-structure depth="3"/>'), 'ktor/client-auth.md')).toEqual([2, 4])
+  })
+
   it('reads a <show-structure> inside a paragraph, and leaves an outline the page sets and other docs alone', async () => {
     expect(await outline('[//]: # (title: Engines)\n<show-structure depth="3"/>\nText.\n\n## A\n', 'ktor/x.md')).toEqual([2, 4])
     expect(await outline(`---\noutline: deep\n---\n\n${page('<show-structure depth="1"/>')}`, 'kotlin/x.md')).toBe('deep')
