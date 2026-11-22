@@ -3,41 +3,45 @@
 
 [//]: # (title: 協同程式上下文與分派器)
 
-協同程式總是在由 Kotlin 標準函式庫中定義的 [CoroutineContext](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.coroutines/-coroutine-context/) 型別值所代表的某種上下文中執行。
+協同程式總是在由 Kotlin 標準函式庫中定義的 
+[CoroutineContext](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.coroutines/-coroutine-context/) 
+型別值所表示的某個上下文中執行。
 
-協同程式上下文是一組各種元素的集合。主要元素是協同程式的 [Job]（我們之前見過）以及它的分派器（本節將介紹）。
+協同程式上下文是各種元素的集合。主要元素包含我們先前見過的協同程式 [Job]，以及本節涵蓋的分派器。
 
 ## 分派器與執行緒 {id="dispatchers-and-threads"}
 
-協同程式上下文包含一個 *協同程式分派器*（參見 [CoroutineDispatcher]），它決定了對應的協同程式使用哪個或哪些執行緒來執行。協同程式分派器可以將協同程式的執行限制在特定的執行緒中、將其分派到執行緒池中，或讓其不受限地執行。
+協同程式上下文包含一個 *協同程式分派器*（參見 [CoroutineDispatcher]），它決定了相應的協同程式使用哪個或哪些執行緒來執行。協同程式分派器可以將協同程式的執行限制在特定執行緒、分派給執行緒池，或是讓它不受限制地執行。
 
-所有協同程式建置器（如 [launch] 和 [async]）都接受一個選用的 [CoroutineContext](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.coroutines/-coroutine-context/) 參數，該參數可用於為新協同程式顯式指定分派器和其他上下文元素。
+所有協同程式建構器（如 [launch] 和 [async]）都接受一個可選的 
+[CoroutineContext](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.coroutines/-coroutine-context/) 
+參數，可用於為新協同程式明確指定分派器與其他上下文元素。
 
-嘗試以下範例：
+請嘗試以下範例：
 
 ```kotlin
 import kotlinx.coroutines.*
 
-fun main() = runBlocking<Unit> {
 //sampleStart
-    launch { // context of the parent, main runBlocking coroutine
+fun main() = runBlocking<Unit> {
+    launch { // 父級上下文，main runBlocking 協同程式
         println("main runBlocking      : I'm working in thread ${Thread.currentThread().name}")
     }
-    launch(Dispatchers.Unconfined) { // not confined -- will work with main thread
+    launch(Dispatchers.Unconfined) { // 未受限制 -- 將在 main 執行緒中工作
         println("Unconfined            : I'm working in thread ${Thread.currentThread().name}")
     }
-    launch(Dispatchers.Default) { // will get dispatched to DefaultDispatcher 
+    launch(Dispatchers.Default) { // 將被分派到 DefaultDispatcher 
         println("Default               : I'm working in thread ${Thread.currentThread().name}")
     }
-    launch(newSingleThreadContext("MyOwnThread")) { // will get its own new thread
+    launch(newSingleThreadContext("MyOwnThread")) { // 將獲得自己專屬的新執行緒
         println("newSingleThreadContext: I'm working in thread ${Thread.currentThread().name}")
     }
-//sampleEnd    
 }
+//sampleEnd
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
 <!--- KNIT example-context-01.kt -->
-> 您可以在[此處](https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/test/guide/example-context-01.kt)獲取完整程式碼。
+> 您可以在[此處](https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/test/guide/example-context-01.kt)取得完整程式碼。
 >
 {style="note"}
 
@@ -52,45 +56,45 @@ main runBlocking      : I'm working in thread main
 
 <!--- TEST LINES_START_UNORDERED -->
 
-當 `launch { ... }` 不帶參數使用時，它會從啟動它的 [CoroutineScope] 繼承上下文（以及分派器）。在這種情況下，它繼承了在 `main` 執行緒中執行的 `runBlocking` 主協同程式的上下文。
+當 `launch { ... }` 未帶參數使用時，它會從啟動它的 [CoroutineScope] 繼承上下文（從而繼承分派器）。在這種情況下，它繼承了在 `main` 執行緒中執行的主 `runBlocking` 協同程式的上下文。
 
-[Dispatchers.Unconfined] 是一個特殊的分派器，它似乎也在 `main` 執行緒中執行，但實際上，它是一種稍後會解釋的不同機制。
+[Dispatchers.Unconfined] 是一個特殊的分派器，它看起來似乎也在 `main` 執行緒中執行，但事實上這是一種不同的機制，稍後會進行說明。
 
-當作用域中沒有顯式指定其他分派器時，會使用預設分派器。它由 [Dispatchers.Default] 表示，並使用共享的背景執行緒池。
+當作用域中未明確指定其他分派器時，將使用預設分派器。它由 [Dispatchers.Default] 表示，並使用共享的背景執行緒池。
   
-[newSingleThreadContext] 會為協同程式建立一個執行緒來執行。專用執行緒是非常昂貴的資源。在實際應用程式中，當不再需要時，必須使用 [close][ExecutorCoroutineDispatcher.close] 函式將其釋放，或者將其儲存在頂層變數中並在整個應用程式中重複使用。
+[newSingleThreadContext] 會為協同程式建立一個執行緒以供執行。專屬執行緒是非常昂貴的資源。在實際應用程式中，當不再需要時，必須使用 [close][ExecutorCoroutineDispatcher.close] 函式將其釋放，或者將其儲存在頂層變數中並在整個應用程式中重複使用。
 
-## 不受限與受限分派器 {id="unconfined-vs-confined-dispatcher"}
+## 非受限分派器 vs 受限分派器 {id="unconfined-vs-confined-dispatcher"}
  
-[Dispatchers.Unconfined] 協同程式分派器會在呼叫者執行緒中啟動協同程式，但僅持續到第一個掛起點。掛起之後，它會在由所調用的掛起函式完全決定的執行緒中恢復協同程式。不受限分派器適用於既不消耗 CPU 時間，也不更新受限於特定執行緒的任何共享資料（如 UI）的協同程式。
+[Dispatchers.Unconfined] 協同程式分派器會在呼叫者執行緒中啟動協同程式，但僅持續到第一個暫停點。暫停後，它會在完全由所呼叫的暫停函式決定的執行緒中恢復協同程式。非受限分派器適用於既不消耗 CPU 時間、也不更新受限於特定執行緒的任何共享資料（例如 UI）的協同程式。
 
-另一方面，分派器預設是從外部 [CoroutineScope] 繼承的。特別是 [runBlocking] 協同程式的預設分派器受限於呼叫者執行緒，因此繼承它會產生將執行限制在該執行緒的效果，並具有可預測的 FIFO 排程。
+另一方面，預設情況下分派器會從外層 [CoroutineScope] 繼承。特別是 [runBlocking] 協同程式的預設分派器受限於調用者執行緒，因此繼承它具有將執行限制在該執行緒並具備可預測的 FIFO 排程的效果。
 
 ```kotlin
 import kotlinx.coroutines.*
 
-fun main() = runBlocking<Unit> {
 //sampleStart
-    launch(Dispatchers.Unconfined) { // not confined -- will work with main thread
+fun main() = runBlocking<Unit> {
+    launch(Dispatchers.Unconfined) { // 未受限制 -- 將在 main 執行緒中工作
         println("Unconfined      : I'm working in thread ${Thread.currentThread().name}")
         delay(500)
         println("Unconfined      : After delay in thread ${Thread.currentThread().name}")
     }
-    launch { // context of the parent, main runBlocking coroutine
+    launch { // 父級上下文，main runBlocking 協同程式
         println("main runBlocking: I'm working in thread ${Thread.currentThread().name}")
         delay(1000)
         println("main runBlocking: After delay in thread ${Thread.currentThread().name}")
     }
-//sampleEnd    
 }
+//sampleEnd
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
 <!--- KNIT example-context-02.kt -->
-> 您可以在[此處](https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/test/guide/example-context-02.kt)獲取完整程式碼。
+> 您可以在[此處](https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/test/guide/example-context-02.kt)取得完整程式碼。
 >
 {style="note"}
 
-產生的輸出為： 
+產生以下輸出：
  
 ```text
 Unconfined      : I'm working in thread main
@@ -101,41 +105,41 @@ main runBlocking: After delay in thread main
 
 <!--- TEST LINES_START -->
  
-因此，繼承自 `runBlocking {...}` 上下文的協同程式會繼續在 `main` 執行緒中執行，而不受限的協同程式則在 [delay] 函式使用的預設執行器執行緒中恢復。
+因此，繼承自 `runBlocking {...}` 上下文的協同程式會繼續在 `main` 執行緒中執行，而非受限的協同程式則在 [delay] 函式使用的預設執行器執行緒中恢復執行。
 
-> 不受限分派器是一種進階機制，在某些不需要為以後執行而分派協同程式或會產生不良副作用的邊緣情況下可能會有所幫助，因為協同程式中的某些操作必須立即執行。在一般程式碼中不應使用不受限分派器。
+> 非受限分派器是一種進階機制，在某些特定邊緣情況下可能會有所幫助：當協同程式中的某些操作必須立即執行，因而不需要將協同程式分派至稍後執行，或者分派會產生不希望出現的副作用時。非受限分派器不應在一般程式碼中使用。
 >
 {style="note"}
 
 ## 偵錯協同程式與執行緒 {id="debugging-coroutines-and-threads"}
 
-協同程式可以在一個執行緒上掛起，並在另一個執行緒上恢復。如果沒有專門的工具，即使使用單執行緒分派器，也可能很難弄清楚協同程式在何時、何地、正在做什麼。
+協同程式可以在一個執行緒上暫停，並在另一個執行緒上恢復。如果沒有專門的工具，即使使用單執行緒分派器，也很難弄清楚協同程式在做什麼、在哪裡以及何時進行。
 
-### 使用 IDEA 偵錯 {id="debugging-with-idea"}
+### 使用 IDEA 進行偵錯 {id="debugging-with-idea"}
 
 Kotlin 外掛程式的協同程式偵錯工具簡化了在 IntelliJ IDEA 中偵錯協同程式的過程。
 
-> 偵錯功能適用於 `kotlinx-coroutines-core` 1.3.8 或更高版本。
+> 偵錯功能適用於 1.3.8 或更新版本的 `kotlinx-coroutines-core`。
 >
 {style="note"}
 
-**Debug** 工具視窗包含 **Coroutines** 頁籤。在此頁籤中，您可以找到有關當前正在執行和已掛起的協同程式的資訊。協同程式會根據它們執行的分派器進行分組。
+**Debug** 工具視窗包含 **Coroutines** 標籤頁。在此標籤頁中，您可以找到有關目前正在執行和已暫停的協同程式的資訊。這些協同程式會依據其執行的分派器進行分組。
 
 ![偵錯協同程式](coroutine-idea-debugging-1.png){width=700}
 
 使用協同程式偵錯工具，您可以：
 * 檢查每個協同程式的狀態。
-* 查看正在執行和已掛起的協同程式的局部變數和擷取變數的值。
-* 查看完整的協同程式建立堆疊，以及協同程式內部的呼叫堆疊。該堆疊包含所有帶有變數值的框架，甚至是那些在標準偵錯期間會丟失的框架。
-* 獲取包含每個協同程式狀態及其堆疊的完整報告。要獲取該報告，請在 **Coroutines** 頁籤內按右鍵，然後點擊 **Get Coroutines Dump**。
+* 查看正在執行與已暫停的協同程式之區域變數和擷取變數的值。
+* 查看完整的協同程式建立堆疊，以及協同程式內部的呼叫堆疊。該堆疊包含所有帶有變數值的框架，甚至包含在標準偵錯期間會遺失的框架。
+* 取得包含每個協同程式狀態及其堆疊的完整報告。若要取得該報告，請在 **Coroutines** 標籤頁內按一下滑鼠右鍵，然後點擊 **Get Coroutines Dump**。
 
-要開始協同程式偵錯，您只需要設置中斷點並在偵錯模式下執行應用程式。
+若要開始協同程式偵錯，您只需設定中斷點並在偵錯模式下執行應用程式。
 
 在[教學](https://kotlinlang.org/docs/tutorials/coroutines/debug-coroutines-with-idea.html)中進一步了解協同程式偵錯。
 
-### 使用日誌偵錯 {id="debugging-using-logging"}
+### 使用記錄檔進行偵錯 {id="debugging-using-logging"}
 
-在沒有協同程式偵錯工具的情況下，另一種偵錯帶有執行緒的應用程式的方法是在每條日誌陳述式的日誌檔案中印出執行緒名稱。日誌架構普遍支援此功能。在使用協同程式時，僅憑執行緒名稱無法提供太多上下文，因此 `kotlinx.coroutines` 包含了一些偵錯功能使其更容易。
+在沒有協同程式偵錯工具的情況下，偵錯帶有執行緒的應用程式的另一種方法是在每個記錄陳述式中將執行緒名稱列印到記錄檔中。此功能受到記錄架構的普遍支援。在使用協同程式時，單憑執行緒名稱並不能提供太多上下文資訊，因此 `kotlinx.coroutines` 包含了除錯設施以簡化此過程。
 
 使用 `-Dkotlinx.coroutines.debug` JVM 選項執行以下程式碼：
 
@@ -144,8 +148,8 @@ import kotlinx.coroutines.*
 
 fun log(msg: String) = println("[${Thread.currentThread().name}] $msg")
 
-fun main() = runBlocking<Unit> {
 //sampleStart
+fun main() = runBlocking<Unit> {
     val a = async {
         log("I'm computing a piece of the answer")
         6
@@ -155,16 +159,16 @@ fun main() = runBlocking<Unit> {
         7
     }
     log("The answer is ${a.await() * b.await()}")
-//sampleEnd    
 }
+//sampleEnd    
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
 <!--- KNIT example-context-03.kt -->
-> 您可以在[此處](https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/test/guide/example-context-03.kt)獲取完整程式碼。
+> 您可以在[此處](https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/test/guide/example-context-03.kt)取得完整程式碼。
 >
 {style="note"}
 
-這裡有三個協同程式。在 `runBlocking` 內部的主要協同程式 (#1)，以及計算延遲值 `a` (#2) 和 `b` (#3) 的兩個協同程式。它們都在 `runBlocking` 的上下文中執行，並受限於主執行緒。這段程式碼的輸出是：
+這裡有三個協同程式：`runBlocking` 內部的主協同程式 (#1)，以及計算延遲值 `a` (#2) 和 `b` (#3) 的兩個協同程式。它們都在 `runBlocking` 的上下文中執行，並且受限於 main 執行緒。此程式碼的輸出為：
 
 ```text
 [main @coroutine#2] I'm computing a piece of the answer
@@ -174,15 +178,16 @@ fun main() = runBlocking<Unit> {
 
 <!--- TEST FLEXIBLE_THREAD -->
 
-`log` 函式在方括號中印出執行緒名稱，您可以看到它是 `main` 執行緒，後面附加了當前執行的協同程式識別碼。當開啟偵錯模式時，該識別碼會連續分配給所有建立的協同程式。
+`log` 函式會在方括號中列印執行緒名稱，您可以看到它是 `main` 執行緒，並附加了目前正在執行的協同程式識別碼。開啟偵錯模式時，該識別碼會連續指派給所有已建立的協同程式。
 
-> 當 JVM 使用 `-ea` 選項執行時，偵錯模式也會開啟。您可以在 [DEBUG_PROPERTY_NAME] 屬性的文件中閱讀更多關於偵錯功能的資訊。
+> 當 JVM 使用 `-ea` 選項執行時，偵錯模式也會開啟。
+> 您可以在 [DEBUG_PROPERTY_NAME] 屬性的文件中閱讀有關偵錯功能的更多資訊。
 >
 {style="note"}
 
-## 在執行緒之間跳轉 {id="jumping-between-threads"}
+## 在執行緒之間切換 {id="jumping-between-threads"}
 
-使用 `-Dkotlinx.coroutines.debug` JVM 選項執行以下程式碼（參見[偵錯](#debugging-coroutines-and-threads)）：
+使用 `-Dkotlinx.coroutines.debug` JVM 選項執行以下程式碼（請參閱[偵錯](#debugging-coroutines-and-threads)）：
 
 ```kotlin
 import kotlinx.coroutines.*
@@ -204,16 +209,16 @@ fun main() {
 }
 ```
 <!--- KNIT example-context-04.kt -->
-> 您可以在[此處](https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/test/guide/example-context-04.kt)獲取完整程式碼。
+> 您可以在[此處](https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/test/guide/example-context-04.kt)取得完整程式碼。
 >
 {style="note"}
 
-上面的範例展示了協同程式用法中的新技術。
+上述範例展示了協同程式使用中的新技術。
 
-第一種技術展示了如何使用帶有指定內容的 [runBlocking]。
-第二種技術涉及呼叫 [withContext]，它可能會掛起當前協同程式並切換到新上下文——前提是新上下文與現有上下文不同。具體來說，如果您指定不同的 [CoroutineDispatcher]，則需要額外的分派：區塊被排程在新的分派器上，一旦完成，執行就會返回到原始分派器。
+第一個技術展示如何使用帶有指定上下文的 [runBlocking]。  
+第二個技術涉及呼叫 [withContext]，如果新上下文與現有上下文不同，它可能會暫停目前的協同程式並切換到新上下文。具體來說，如果您指定了不同的 [CoroutineDispatcher]，則需要進行額外的分派：程式碼區塊會在新的分派器上進行排程，一旦完成，執行就會返回到原始分派器。
 
-結果，上述程式碼的輸出為：
+因此，上述程式碼的輸出為：
 
 ```text
 [Ctx1 @coroutine#1] Started in ctx1
@@ -223,11 +228,11 @@ fun main() {
 
 <!--- TEST -->
 
-上面的範例使用了 Kotlin 標準函式庫中的 `use` 函式，以便在不再需要時正確釋放由 [newSingleThreadContext] 建立的執行緒資源。
+上述範例使用 Kotlin 標準函式庫中的 `use` 函式，以便在不再需要時妥善釋放由 [newSingleThreadContext] 建立的執行緒資源。
 
 ## 上下文中的 Job {id="job-in-the-context"}
 
-協同程式的 [Job] 是其上下文的一部分，可以使用 `coroutineContext[Job]` 運算式從中檢索：
+協同程式的 [Job] 是其上下文的一部分，可以使用 `coroutineContext[Job]` 運算式從中擷取：
 
 ```kotlin
 import kotlinx.coroutines.*
@@ -240,11 +245,11 @@ fun main() = runBlocking<Unit> {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
 <!--- KNIT example-context-05.kt -->
-> 您可以在[此處](https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/test/guide/example-context-05.kt)獲取完整程式碼。
+> 您可以在[此處](https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/test/guide/example-context-05.kt)取得完整程式碼。
 > 
 {style="note"}
 
-在[偵錯模式](#debugging-coroutines-and-threads)下，它會輸出如下內容：
+在[偵錯模式](#debugging-coroutines-and-threads)下，它會輸出類似以下內容：
 
 ```
 My job is "coroutine#1":BlockingCoroutine{Active}@6d311334
@@ -252,33 +257,33 @@ My job is "coroutine#1":BlockingCoroutine{Active}@6d311334
 
 <!--- TEST lines.size == 1 && lines[0].startsWith("My job is \"coroutine#1\":BlockingCoroutine{Active}@") -->
 
-請注意，[CoroutineScope] 中的 [isActive] 只是 `coroutineContext[Job]?.isActive == true` 的便捷簡寫。
+請注意，[CoroutineScope] 中的 [isActive] 只是 `coroutineContext[Job]?.isActive == true` 的便利捷徑。
 
-## 協同程式的子協同程式 {id="children-of-a-coroutine"}
+## 協同程式的子代 {id="children-of-a-coroutine"}
 
-當一個協同程式在另一個協同程式的 [CoroutineScope] 中啟動時，它會透過 [CoroutineScope.coroutineContext] 繼承其上下文，並且新協同程式的 [Job] 會成為父協同程式 Job 的 *子項*。當父協同程式被取消時，它的所有子項也會被遞歸取消。
+當一個協同程式在另一個協同程式的 [CoroutineScope] 中啟動時，它會透過 [CoroutineScope.coroutineContext] 繼承其上下文，並且新協同程式的 [Job] 會成為父協同程式 Job 的*子代*。當父協同程式被取消時，其所有子代也會被遞迴取消。
 
-然而，這種父子關係可以透過以下兩種方式之一顯式覆寫：
+然而，這種父子關係可以透過以下兩種方式之一明確覆寫：
 
-1. 當啟動協同程式時顯式指定了不同的作用域（例如 `GlobalScope.launch`），它不會從父作用域繼承 `Job`。
-2. 當一個不同的 `Job` 物件被作為新協同程式的上下文傳遞時（如下例所示），它會覆寫父作用域的 `Job`。
+1. 啟動協同程式時明確指定了不同的作用域（例如 `GlobalScope.launch`），它不會從父作用域繼承 `Job`。
+2. 當傳入另一個 `Job` 物件作為新協同程式的上下文時（如下例所示），它會覆寫父作用域的 `Job`。
    
-在上述兩種情況下，啟動的協同程式都不會與啟動它的作用域綁定，並獨立執行。
+在這兩種情況下，啟動的協同程式均不繫結至啟動它的作用域，並且獨立運作。
 
 ```kotlin
 import kotlinx.coroutines.*
 
 fun main() = runBlocking<Unit> {
 //sampleStart
-    // launch a coroutine to process some kind of incoming request
+    // 啟動一個協同程式以處理某種傳入請求
     val request = launch {
-        // it spawns two other jobs
+        // 它衍生出另外兩個工作
         launch(Job()) { 
             println("job1: I run in my own Job and execute independently!")
             delay(1000)
             println("job1: I am not affected by cancellation of the request")
         }
-        // and the other inherits the parent context
+        // 另一個則繼承父級上下文
         launch {
             delay(100)
             println("job2: I am a child of the request coroutine")
@@ -287,19 +292,19 @@ fun main() = runBlocking<Unit> {
         }
     }
     delay(500)
-    request.cancel() // cancel processing of the request
+    request.cancel() // 取消請求的處理
     println("main: Who has survived request cancellation?")
-    delay(1000) // delay the main thread for a second to see what happens
+    delay(1000) // 延遲 main 執行緒一秒以觀察結果
 //sampleEnd
 }
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
 <!--- KNIT example-context-06.kt -->
-> 您可以在[此處](https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/test/guide/example-context-06.kt)獲取完整程式碼。
+> 您可以在[此處](https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/test/guide/example-context-06.kt)取得完整程式碼。
 >
 {style="note"}
 
-這段程式碼的輸出是：
+此程式碼的輸出為：
 
 ```text
 job1: I run in my own Job and execute independently!
@@ -310,33 +315,33 @@ job1: I am not affected by cancellation of the request
 
 <!--- TEST -->
 
-## 父協同程式的職責 {id="parental-responsibilities"}
+## 父級職責 {id="parental-responsibilities"}
 
-父協同程式總是等待其所有子項完成。父協同程式不必顯式追蹤它啟動的所有子項，也不必在結束時使用 [Job.join] 來等待它們：
+父協同程式總是會等待其所有子代完成。父級不必明確追蹤它啟動的所有子代，也不必在最後使用 [Job.join] 來等待它們：
 
 ```kotlin
 import kotlinx.coroutines.*
 
 fun main() = runBlocking<Unit> {
 //sampleStart
-    // launch a coroutine to process some kind of incoming request
+    // 啟動一個協同程式以處理某種傳入請求
     val request = launch {
-        repeat(3) { i -> // launch a few children jobs
+        repeat(3) { i -> // 啟動幾個子工作
             launch  {
-                delay((i + 1) * 200L) // variable delay 200ms, 400ms, 600ms
+                delay((i + 1) * 200L) // 變動延遲 200 ms、400 ms、600 ms
                 println("Coroutine $i is done")
             }
         }
         println("request: I'm done and I don't explicitly join my children that are still active")
     }
-    request.join() // wait for completion of the request, including all its children
+    request.join() // 等待請求完成，包括其所有子代
     println("Now processing of the request is complete")
 //sampleEnd
 }
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
 <!--- KNIT example-context-07.kt -->
-> 您可以在[此處](https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/test/guide/example-context-07.kt)獲取完整程式碼。
+> 您可以在[此處](https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/test/guide/example-context-07.kt)取得完整程式碼。
 >
 {style="note"}
 
@@ -352,11 +357,11 @@ Now processing of the request is complete
 
 <!--- TEST -->
 
-## 為偵錯命名的協同程式 {id="naming-coroutines-for-debugging"}
+## 為偵錯命名協同程式 {id="naming-coroutines-for-debugging"}
 
-當協同程式頻繁記錄日誌，而您只需要關聯來自同一個協同程式的日誌記錄時，自動分配的 ID 很好用。然而，當協同程式與特定請求的處理相關聯或執行某些特定的背景任務時，最好為了偵錯目的顯式命名它。[CoroutineName] 上下文元素與執行緒名稱具有相同的作用。當[偵錯模式](#debugging-coroutines-and-threads)開啟時，它會包含在執行此協同程式的執行緒名稱中。
+當協同程式經常輸出記錄，而您只需要關聯來自同一協同程式的記錄項目時，自動指派的識別碼很方便。但是，當協同程式與特定請求的處理繫結或執行某些特定背景工作時，為了偵錯目的最好明確命名它。[CoroutineName] 上下文元素具有與執行緒名稱相同的作用。開啟[偵錯模式](#debugging-coroutines-and-threads)時，它會包含在執行此協同程式的執行緒名稱中。
 
-以下範例示範了這個概念：
+以下範例示範了此概念：
 
 ```kotlin
 import kotlinx.coroutines.*
@@ -366,7 +371,7 @@ fun log(msg: String) = println("[${Thread.currentThread().name}] $msg")
 fun main() = runBlocking(CoroutineName("main")) {
 //sampleStart
     log("Started main coroutine")
-    // run two background value computations
+    // 執行兩個背景數值計算
     val v1 = async(CoroutineName("v1coroutine")) {
         delay(500)
         log("Computing v1")
@@ -383,7 +388,7 @@ fun main() = runBlocking(CoroutineName("main")) {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
 <!--- KNIT example-context-08.kt -->
-> 您可以在[此處](https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/test/guide/example-context-08.kt)獲取完整程式碼。
+> 您可以在[此處](https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/test/guide/example-context-08.kt)取得完整程式碼。
 >
 {style="note"}
 
@@ -400,7 +405,7 @@ fun main() = runBlocking(CoroutineName("main")) {
 
 ## 組合上下文元素 {id="combining-context-elements"}
 
-有時我們需要為協同程式上下文定義多個元素。我們可以使用 `+` 運算子來實現這一點。例如，我們可以同時啟動一個具有顯式指定分派器和顯式指定名稱的協同程式：
+有時我們需要為協同程式上下文定義多個元素。我們可以使用 `+` 運算子來達成此目的。例如，我們可以同時啟動一個具有明確指定分派器和明確指定名稱的協同程式：
 
 ```kotlin
 import kotlinx.coroutines.*
@@ -415,11 +420,11 @@ fun main() = runBlocking<Unit> {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
 <!--- KNIT example-context-09.kt -->
-> 您可以在[此處](https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/test/guide/example-context-09.kt)獲取完整程式碼。
+> 您可以在[此處](https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/test/guide/example-context-09.kt)取得完整程式碼。
 >
 {style="note"}
 
-使用 `-Dkotlinx.coroutines.debug` JVM 選項執行的程式碼輸出為：
+此程式碼在帶有 `-Dkotlinx.coroutines.debug` JVM 選項下的輸出為：
 
 ```text
 I'm working in thread DefaultDispatcher-worker-1 @test#2
@@ -429,11 +434,9 @@ I'm working in thread DefaultDispatcher-worker-1 @test#2
 
 ## 協同程式作用域 {id="coroutine-scope"}
 
-讓我們將關於上下文、子項和 Job 的知識放在一起。假設我們的應用程式有一個具有生命週期的物件，但該物件不是協同程式。例如，我們正在編寫一個 Android 應用程式，並在 Android activity 的上下文中啟動各種協同程式，以執行非同步操作來獲取和更新資料、執行動畫等。當 activity 被銷毀時，必須取消這些協同程式，以避免記憶體洩漏。
+讓我們將關於上下文、子代和 Job 的知識整合在一起。假設我們的應用程式有一個具有生命週期的物件，但該物件並非協同程式。例如，我們正在編寫一個 Android 應用程式，並在 Android activity 的上下文中啟動各種協同程式以執行非同步操作來擷取與更新資料、執行動畫等。當 activity 被銷毀時，必須取消這些協同程式以避免記憶體洩漏。我們當然可以手動操作上下文和 Job 來繫結 activity 及其協同程式的生命週期，但 `kotlinx.coroutines` 提供了一個將其封裝的抽象概念：[CoroutineScope]。您應該已經熟悉協同程式作用域，因為所有協同程式建構器都被宣告為其擴充。
 
-當然，我們可以手動操作上下文和 Job 來綁定 activity 及其協同程式的生命週期，但 `kotlinx.coroutines` 提供了一個封裝該操作的抽象：[CoroutineScope]。您應該已經熟悉協同程式作用域，因為所有協同程式建置器都被宣告為它的擴充功能。
-
-我們透過建立一個與 activity 生命週期綁定的 [CoroutineScope] 執行個體來管理協同程式的生命週期。`CoroutineScope` 執行個體可以透過 [CoroutineScope()] 或 [MainScope()] 工廠函式建立。前者建立一個通用作用域，而後者為 UI 應用程式建立一個作用域，並使用 [Dispatchers.Main] 作為預設分派器：
+我們透過建立與 activity 生命週期繫結的 [CoroutineScope] 執行個體來管理協同程式的生命週期。`CoroutineScope` 執行個體可透過 [CoroutineScope()] 或 [MainScope()] 工廠函式建立。前者建立通用作用域，而後者為 UI 應用程式建立作用域，並使用 [Dispatchers.Main] 作為預設分派器：
 
 ```kotlin
 class Activity {
@@ -445,23 +448,23 @@ class Activity {
     // to be continued ...
 ```
 
-現在，我們可以使用定義的 `mainScope` 在此 `Activity` 的作用域內啟動協同程式。為了演示，我們啟動了十個延遲時間不同的協同程式：
+現在，我們可以使用定義好的 `mainScope` 在此 `Activity` 的作用域內啟動協同程式。為了進行示範，我們啟動了十個延遲不同時間的協同程式：
 
 ```kotlin
-    // class Activity continues
+    // class Activity 繼續
     fun doSomething() {
-        // launch ten coroutines for a demo, each working for a different time
+        // 啟動十個協同程式用於示範，每個執行不同的時間
         repeat(10) { i ->
             mainScope.launch {
-                delay((i + 1) * 200L) // variable delay 200ms, 400ms, ... etc
+                delay((i + 1) * 200L) // 變動延遲 200 ms、400 ms、...等
                 println("Coroutine $i is done")
             }
         }
     }
-} // class Activity ends
+} // class Activity 結束
 ``` 
 
-在我們的主函式中，我們建立 activity，呼叫我們的測試 `doSomething` 函式，並在 500 ms 後銷毀 activity。這會取消所有從 `doSomething` 啟動的協同程式。我們可以看到這一點，因為在銷毀 activity 之後，即使我們再等一會兒，也不會再印出訊息。
+在我們的 main 函式中，我們建立了 activity，呼叫我們的測試 `doSomething` 函式，並在 500 ms 後銷毀 activity。這會取消所有從 `doSomething` 啟動的協同程式。我們可以觀察到這一點，因為在 activity 銷毀後，即使我們多等一會兒，也不會再列印任何訊息。
 
 <!--- CLEAR -->
 
@@ -469,42 +472,42 @@ class Activity {
 import kotlinx.coroutines.*
 
 class Activity {
-    private val mainScope = CoroutineScope(Dispatchers.Default) // use Default for test purposes
+    private val mainScope = CoroutineScope(Dispatchers.Default) // 基於測試目的使用 Default
     
     fun destroy() {
         mainScope.cancel()
     }
 
     fun doSomething() {
-        // launch ten coroutines for a demo, each working for a different time
+        // 啟動十個協同程式用於示範，每個執行不同的時間
         repeat(10) { i ->
             mainScope.launch {
-                delay((i + 1) * 200L) // variable delay 200ms, 400ms, ... etc
+                delay((i + 1) * 200L) // 變動延遲 200 ms、400 ms、...等
                 println("Coroutine $i is done")
             }
         }
     }
-} // class Activity ends
+} // class Activity 結束
 
 fun main() = runBlocking<Unit> {
 //sampleStart
     val activity = Activity()
-    activity.doSomething() // run test function
+    activity.doSomething() // 執行測試函式
     println("Launched coroutines")
-    delay(500L) // delay for half a second
+    delay(500L) // 延遲半秒
     println("Destroying activity!")
-    activity.destroy() // cancels all coroutines
-    delay(1000) // visually confirm that they don't work
+    activity.destroy() // 取消所有協同程式
+    delay(1000) // 目視確認它們不再運作
 //sampleEnd    
 }
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
 <!--- KNIT example-context-10.kt -->
-> 您可以在[此處](https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/test/guide/example-context-10.kt)獲取完整程式碼。
+> 您可以在[此處](https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/test/guide/example-context-10.kt)取得完整程式碼。
 >
 {style="note"}
 
-這個範例的輸出是：
+此範例的輸出為：
 
 ```text
 Launched coroutines
@@ -515,24 +518,25 @@ Destroying activity!
 
 <!--- TEST -->
 
-如您所見，只有前兩個協同程式印出了訊息，其他協同程式都被 `Activity.destroy()` 中對 [`mainScope.cancel()`][CoroutineScope.cancel] 的單次調用取消了。
+如您所見，只有前兩個協同程式列印了訊息，其他協同程式都透過 `Activity.destroy()` 中對 [`mainScope.cancel()`][CoroutineScope.cancel] 的單次呼叫而被取消了。
 
-> 請注意，Android 在所有具有生命週期的實體中都對協同程式作用域提供了一方支援。參見[對應的文件](https://developer.android.com/topic/libraries/architecture/coroutines#lifecyclescope)。
+> 請注意，Android 在所有具備生命週期的實體中都對協同程式作用域提供第一方支援。
+> 請參閱[相應文件](https://developer.android.com/topic/libraries/architecture/coroutines#lifecyclescope)。
 >
 {style="note"}
 
 ### 執行緒區域資料 {id="thread-local-data"}
 
-有時能夠將某些執行緒區域資料傳遞給協同程式或在協同程式之間傳遞是很方便的。然而，由於它們不綁定到任何特定的執行緒，如果手動完成，這可能會導致樣板程式碼。
+有時能夠將某些執行緒區域資料傳遞給協同程式或在協同程式之間傳遞是很方便的。然而，由於它們未繫結至任何特定執行緒，如果手動進行這項工作，很可能會產生大量的樣板程式碼。
 
-對於 [`ThreadLocal`](https://docs.oracle.com/javase/8/docs/api/java/lang/ThreadLocal.html)，[asContextElement] 擴充函式可以提供幫助。它建立一個額外的上下文元素，該元素保留給定的 `ThreadLocal` 的值，並在協同程式每次切換其上下文時還原它。
+對於 [`ThreadLocal`](https://docs.oracle.com/javase/8/docs/api/java/lang/ThreadLocal.html)，[asContextElement] 擴充函式前來解決這個問題。它建立一個額外的上下文元素，用於保存給定 `ThreadLocal` 的值，並在協同程式每次切換其上下文時將其還原。
 
-這很容易在實踐中演示：
+很容易透過實際操作來示範：
 
 ```kotlin
 import kotlinx.coroutines.*
 
-val threadLocal = ThreadLocal<String?>() // declare thread-local variable
+val threadLocal = ThreadLocal<String?>() // 宣告執行緒區域變數
 
 fun main() = runBlocking<Unit> {
 //sampleStart
@@ -550,11 +554,11 @@ fun main() = runBlocking<Unit> {
 ```  
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3"}
 <!--- KNIT example-context-11.kt -->
-> 您可以在[此處](https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/test/guide/example-context-11.kt)獲取完整程式碼。
+> 您可以在[此處](https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/test/guide/example-context-11.kt)取得完整程式碼。
 >
 {style="note"}
 
-在此範例中，我們使用 [Dispatchers.Default] 在背景執行緒池中啟動一個新協同程式，因此它在執行緒池的不同執行緒上運作，但它仍然具有我們使用 `threadLocal.asContextElement(value = "launch")` 指定的執行緒區域變數的值，無論協同程式在哪个執行緒上執行。因此，輸出（帶有[偵錯](#debugging-coroutines-and-threads)）為：
+在此範例中，我們使用 [Dispatchers.Default] 在背景執行緒池中啟動一個新的協同程式，因此它在來自執行緒池的不同執行緒上運作，但無論該協同程式在哪個執行緒上執行，它仍然擁有我們使用 `threadLocal.asContextElement(value = "launch")` 所指定的執行緒區域變數值。因此，其輸出（包含[偵錯](#debugging-coroutines-and-threads)）為：
 
 ```text
 Pre-main, current thread: Thread[main @coroutine#1,5,main], thread local value: 'main'
@@ -565,13 +569,13 @@ Post-main, current thread: Thread[main @coroutine#1,5,main], thread local value:
 
 <!--- TEST FLEXIBLE_THREAD -->
 
-很容易忘記設置對應的上下文元素。如果執行協同程式的執行緒不同，從協同程式訪問的執行緒區域變數可能會具有非預期的值。為了避免這種情況，建議使用 [ensurePresent] 方法並在不當使用時快速失敗。
+很容易忘記設定對應的上下文元素。如果執行協同程式的執行緒不同，那麼從協同程式存取的執行緒區域變數可能會具有非預期的值。為避免此類情況，建議使用 [ensurePresent] 方法並在不當使用時快速失敗。
 
-`ThreadLocal` 具有一等支持，可以與 `kotlinx.coroutines` 提供的任何原語一起使用。不過，它有一個關鍵限制：當執行緒區域變數被變更時，新值不會傳播到協同程式呼叫者（因為上下文元素無法追蹤所有 `ThreadLocal` 物件訪問），並且更新後的值會在下一次掛起時丟失。使用 [withContext] 在協同程式中更新執行緒區域變數的值，詳見 [asContextElement]。
+`ThreadLocal` 擁有一級支援，並且可以與 `kotlinx.coroutines` 提供的任何原語一起使用。但它有一個關鍵限制：當執行緒區域變數被變更時，新值不會傳播給協同程式呼叫者（因為上下文元素無法追蹤所有 `ThreadLocal` 物件的存取），並且更新後的值會在下一次暫停時遺失。請使用 [withContext] 在協同程式中更新執行緒區域變數的值，詳細資訊請參閱 [asContextElement]。
 
-或者，值可以儲存在像 `class Counter(var i: Int)` 這樣的可變盒子中，而該盒子又儲存在執行緒區域變數中。然而，在這種情況下，您需要完全負責同步對此可變盒子中變數的潛在並行修改。
+或者，值可以儲存在可變容器中（例如 `class Counter(var i: Int)`），而該容器本身則儲存在執行緒區域變數中。然而在這種情況下，您需要完全負責同步對此可變容器中變數的潛在並行修改。
 
-對於進階用法，例如與日誌 MDC 整合、事務上下文或內部使用執行緒區域變數傳遞資料的任何其他程式庫整合，請參閱應實作的 [ThreadContextElement] 介面文件。
+對於進階用法，例如與記錄 MDC、交易上下文或內部使用執行緒區域變數傳遞資料的任何其他程式庫整合，請參閱應該實作的 [ThreadContextElement] 介面文件。
 
 <!--- MODULE kotlinx-coroutines-core -->
 <!--- INDEX kotlinx.coroutines -->

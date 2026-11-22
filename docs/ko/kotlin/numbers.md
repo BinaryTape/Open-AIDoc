@@ -1,25 +1,25 @@
 [//]: # (title: 숫자)
-[//]: # (description: 숫자 타입, 리터럴, 변환, 산술 연산, 오버플로 및 JVM 관련 동작을 포함하여 Kotlin에서 숫자를 사용하는 방법을 알아봅니다.)
+<web-summary>숫자 타입, 리터럴, 변환, 산술 연산, 오버플로, JVM 관련 동작 방식을 포함하여 Kotlin에서 숫자를 사용하는 방법을 알아봅니다.</web-summary>
 
-Kotlin의 숫자 타입은 다음을 나타냅니다.
+Kotlin의 숫자 타입은 다음을 나타냅니다:
 * 정수 값 ([Byte](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-byte/),
   [Short](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-short/),
   [Int](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/),
-  및 [Long](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/))
+  그리고 [Long](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/))
 * 부동소수점 값 ([Float](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/)
-  및 [Double](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-double/))
+  그리고 [Double](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-double/))
 
-숫자 타입은 산술 연산, 카운터, 측정값 및 기타 계산 등 수치 데이터를 저장하고 처리하는 데 사용됩니다.
+숫자 타입을 사용하여 산술 연산, 카운터, 측정값 및 기타 계산 등에서 숫자 데이터를 저장하고 처리할 수 있습니다.
 
 ## 숫자 타입 선택하기 {id="choose-a-number-type"}
 
-대부분의 경우 다음 규칙을 참조하여 작업에 적합한 숫자 타입을 결정할 수 있습니다.
+대부분의 경우 다음 규칙을 참고하여 작업에 적합한 숫자 타입을 결정할 수 있습니다:
 
 * 정수에는 `Int`를 사용합니다.
 * `Int` 범위를 벗어나는 정수에는 `Long`을 사용합니다.
 * 소수점이 있는 숫자(실수)에는 `Double`을 사용합니다.
-* 더 낮은 정밀도로 충분하거나 필요한 경우에는 `Float`을 사용합니다.
-* API 또는 데이터 형식에서 요구하는 경우 `Byte` 및 `Short`를 사용합니다.
+* 더 낮은 정밀도로 충분하거나 필요한 경우에는 `Float`를 사용합니다.
+* API나 데이터 포맷에서 요구할 때는 `Byte`와 `Short`를 사용합니다.
 
 > Kotlin은 베타 기능으로 [](unsigned-integer-types.md)도 제공합니다.
 >
@@ -27,18 +27,18 @@ Kotlin의 숫자 타입은 다음을 나타냅니다.
 
 ## 정수 타입 {id="integer-types"}
 
-Kotlin은 크기와 값의 범위가 서로 다른 네 가지 정수 타입을 제공합니다.
+Kotlin은 크기와 값의 범위가 서로 다른 네 가지 정수 타입을 제공합니다:
 
-| 타입      | 크기 (비트) | 최솟값                                         | 최댓값                                           |
-|----------|-------------|----------------------------------------------|------------------------------------------------|
-| `Byte`   | 8           | -128                                         | 127                                            |
-| `Short`  | 16          | -32768                                       | 32767                                          |
-| `Int`    | 32          | -2,147,483,648 (-2<sup>31</sup>)             | 2,147,483,647 (2<sup>31</sup> - 1)             |
-| `Long`   | 64          | -9,223,372,036,854,775,808 (-2<sup>63</sup>) | 9,223,372,036,854,775,807 (2<sup>63</sup> - 1) |
+| 타입       | 크기 (비트) | 최솟값                                           | 최댓값                                           |
+|----------|---------|-----------------------------------------------|-----------------------------------------------|
+| `Byte`   | 8       | -128                                          | 127                                           |
+| `Short`  | 16      | -32768                                        | 32767                                         |
+| `Int`    | 32      | -2,147,483,648 (-2<sup>31</sup>)              | 2,147,483,647 (2<sup>31</sup> - 1)            |
+| `Long`   | 64      | -9,223,372,036,854,775,808 (-2<sup>63</sup>)  | 9,223,372,036,854,775,807 (2<sup>63</sup> - 1) |
 
 ### 정수 값 선언하기 {id="declare-integer-values"}
 
-Kotlin은 정수 값에 대해 다음과 같은 리터럴 형식을 지원합니다.
+Kotlin은 정수 값에 대해 다음과 같은 리터럴 형식을 지원합니다:
 
 * 10진수: `123`
 * 16진수: `0x0F`
@@ -48,12 +48,12 @@ Kotlin은 정수 값에 대해 다음과 같은 리터럴 형식을 지원합니
 >
 {style="note"}
 
-숫자 값을 선언할 때는 타입을 명시적으로 지정할 수 있습니다.
+숫자 값을 선언할 때는 타입을 명시적으로 지정할 수 있습니다: 
 
 ```kotlin
 val one: Int = 1
 
-// 가독성을 높이기 위해 언더스코어(_) 사용
+// 가독성을 높이기 위해 밑줄(underscore) 사용 가능
 val oneBillion: Long = 1_000_000_000
 val hexBytes: Int = 0x7F_EC_DE_5E
 val bytes: Int = 0b01010010_01101001_10010100_10010010
@@ -62,30 +62,30 @@ val oneByte: Byte = 1
 val oneShort: Short = 1
 ```
 
-`Long` 값을 선언하기 위해 `L` 접미사를 붙일 수도 있습니다.
+`Long` 값을 선언하기 위해 `L` 접미사를 붙일 수도 있습니다:
 
 ```kotlin
 val oneLong = 1L
 ```
 
-숫자 타입을 명시적으로 선언하면, 컴파일러는 해당 값이 해당 타입의 범위에 맞는지 확인합니다.
+숫자 타입을 명시적으로 선언하면 컴파일러는 값이 해당 타입의 범위에 맞는지 확인합니다:
 
 ```kotlin
-// 값이 Byte 범위에 맞음
+// Byte 범위에 맞는 값
 val oneByte: Byte = 1
 
-// 오류: 값이 Byte 범위에 맞지 않음
+// 오류: Byte 범위에 맞지 않는 값
 val tooBig: Byte = 128
 ```
 
-숫자 타입을 지정하지 않으면, 값이 `Int` 범위에 맞는 경우 Kotlin은 `Int`로 추론합니다. 그렇지 않으면 `Long`으로 추론합니다.
+숫자 타입을 명시하지 않으면 값이 `Int` 범위에 들어맞는 경우 Kotlin은 `Int`로 추론합니다. 그렇지 않으면 `Long`으로 추론합니다:
 
 ```kotlin
 val million = 1_000_000 // Int
 val threeBillion = 3_000_000_000 // Long
 ```
 
-값이 없을 수 있는 경우에는 널 가능(nullable) 타입을 사용합니다.
+값이 없을 수도 있는(null일 수 있는) 경우에는 널 가능 타입(nullable types)을 사용합니다:
 
 ```kotlin
 val maybeAbsent: Int? = null
@@ -93,21 +93,21 @@ val maybeAbsent: Int? = null
 
 ## 부동소수점 타입 {id="floating-point-types"}
 
-소수부가 있는 숫자를 위해 Kotlin은 `Float`과 `Double`을 제공합니다.
+소수 부분이 있는 숫자의 경우 Kotlin은 `Float`와 `Double`을 제공합니다.
 
 부동소수점 타입은 [IEEE 754 표준](https://en.wikipedia.org/wiki/IEEE_754)을 따릅니다.
-`Float`은 *단정밀도(single precision)*를, `Double`은 *배정밀도(double precision)*를 나타냅니다.
+`Float`는 _단정밀도(single precision)_를 나타내며, `Double`은 _배정밀도(double precision)_를 나타냅니다.
 
-부동소수점 타입은 크기와 정밀도가 다릅니다.
+부동소수점 타입은 크기와 정밀도에서 차이가 있습니다:
 
-| 타입      | 크기 (비트) | 유효 자릿수 비트 | 지수 비트 | 10진수 자릿수 |
-|----------|-------------|------------------|---------------|----------------|
-| `Float`  | 32          | 24               | 8             | 6-7            |
-| `Double` | 64          | 53               | 11            | 15-16          |    
+| 타입       | 크기 (비트) | 유효 비트 수 | 지수 비트 수 | 10진수 자릿수 |
+|----------|---------|---------|--------|----------|
+| `Float`  | 32      | 24      | 8      | 6-7      |
+| `Double` | 64      | 53      | 11     | 15-16    |    
 
 ### 부동소수점 값 선언하기 {id="declare-floating-point-values"}
 
-부동소수점 리터럴을 선언하려면 소수점(`.`)을 포함하거나 지수 표기법을 사용합니다.
+부동소수점 리터럴을 선언하려면 소수점(`.`)을 포함하거나 지수 표기법을 사용합니다:
 
 ```kotlin
 val pi = 3.14
@@ -115,18 +115,18 @@ val avogadro = 6.02214076e23
 ```
 
 기본적으로 Kotlin은 부동소수점 리터럴을 `Double`로 추론합니다.
-`Float`으로 선언하려면 `f` 또는 `F` 접미사를 추가합니다.
+`Float`로 선언하려면 `f` 또는 `F` 접미사를 붙입니다:
 
 ```kotlin
 val pi = 3.14 // Double
 val eFloat = 2.7182817f // Float
 ```
 
-> Kotlin은 `Float`이 저장할 수 있는 것보다 정밀도가 높은 `Float` 리터럴을 반올림합니다.
+> Kotlin은 `Float`에 저장할 수 있는 정밀도보다 더 많은 정밀도를 포함하는 `Float` 리터럴을 반올림합니다.
 >
 {style="note"}
 
-값이 없을 수 있는 경우에는 널 가능(nullable) 타입을 사용합니다.
+값이 없을 수도 있는 경우에는 널 가능 타입을 사용합니다:
 
 ```kotlin
 val maybeAbsent: Double? = null
@@ -134,9 +134,9 @@ val maybeAbsent: Double? = null
 
 ## 산술 연산 {id="arithmetic-operations"}
 
-Kotlin은 숫자에 대한 표준 산술 연산(`+`, `-`, `*`, `/`, `%`)을 지원합니다.
+Kotlin은 숫자에 대한 표준 산술 연산인 `+`, `-`, `*`, `/`, `%`를 지원합니다.
 
-이러한 연산자를 사용하여 일반적인 계산을 수행할 수 있습니다.
+이러한 연산자를 사용하여 일반적인 계산을 수행할 수 있습니다:
 
 ```kotlin
 fun main() {
@@ -153,13 +153,13 @@ fun main() {
 결과 타입은 피연산자의 타입에 따라 결정됩니다. 자세한 내용은 [](#mixed-numeric-expressions)에서 확인할 수 있습니다.
 
 > 커스텀 숫자 클래스에서 이러한 연산자를 재정의할 수 있습니다.
-> 자세한 내용은 [연산자 오버로딩 (Operator overloading)](operator-overloading.md)을 참조하세요.
+> 자세한 내용은 [연산자 오버로딩(Operator overloading)](operator-overloading.md)을 참고하세요.
 >
 {style="tip"}
 
 ### 정수 나눗셈 {id="integer-division"}
 
-정수 값 사이의 나눗셈은 항상 정수 결과를 반환합니다. 컴파일러는 소수부를 버립니다.
+정수 값 사이의 나눗셈은 항상 정수 결과를 반환합니다. 소수 부분은 컴파일러에 의해 버려집니다:
 
 ```kotlin
 fun main() {
@@ -174,7 +174,7 @@ fun main() {
 ```
 {kotlin-runnable="true"}
 
-부동소수점 결과를 얻으려면 최소 하나의 피연산자를 `Float` 또는 `Double`로 지정해야 합니다.
+부동소수점 결과를 얻으려면 피연산자 중 적어도 하나를 `Float` 또는 `Double`로 지정해야 합니다:
 
 ```kotlin
 fun main() {
@@ -191,9 +191,9 @@ fun main() {
 
 ## 타입 변환 {id="type-conversion"}
 
-숫자 타입은 서로의 서브타입이 아닙니다. Kotlin은 암시적인 데이터 손실과 예기치 않은 동작을 방지하기 위해 명시적 변환을 요구합니다.
+숫자 타입들은 서로 하위 타입(subtype) 관계가 아닙니다. Kotlin은 암시적인 데이터 손실과 예상치 못한 동작을 방지하기 위해 명시적인 변환을 요구합니다.
 
-예를 들어, `Double`을 예상하는 함수는 변환 없이 `Int` 또는 `Float` 값을 허용할 수 없습니다.
+예를 들어, `Double`을 매개변수로 받는 함수는 변환 없이는 `Int`나 `Float` 값을 전달받을 수 없습니다:
 
 ```kotlin
 fun main() {
@@ -205,18 +205,18 @@ fun main() {
     val x = 1.0
     val xInt = 1
     val xFloat = 1.0f
-    val one: Double = 1 // Error: initializer type mismatch
+    val one: Double = 1 // 오류: initializer type mismatch
 
-    printDouble(x) // OK
-    printDouble(xInt) // Error: argument type mismatch
-    printDouble(xFloat) // Error: argument type mismatch
+    printDouble(x) // 정상
+    printDouble(xInt) // 오류: argument type mismatch
+    printDouble(xFloat) // 오류: argument type mismatch
 //sampleEnd
 }
 ```
 {kotlin-runnable="true" validate="false"}
 
 모든 숫자 타입은 다른 숫자 타입으로의 변환을 지원합니다.
-숫자를 다른 타입으로 변환하려면 명시적 변환 함수를 사용합니다.
+숫자를 다른 타입으로 변환하려면 명시적 변환 함수를 사용합니다:
 
 * `toByte()`
 * `toShort()`
@@ -225,7 +225,7 @@ fun main() {
 * `toFloat()`
 * `toDouble()`
 
-예를 들어, 다음 코드는 `Int` 값을 `Double`로 변환합니다.
+예를 들어, 다음 코드는 `Int` 값을 `Double`로 변환합니다:
 
 ```kotlin
 fun main() {
@@ -239,7 +239,7 @@ fun main() {
 ```
 {kotlin-runnable="true"}
 
-부동소수점 값을 정수 타입으로 변환할 때 컴파일러는 소수부를 버립니다.
+부동소수점 값을 정수 타입으로 변환할 때 소수 부분은 버려집니다:
 
 ```kotlin
 fun main() {
@@ -253,12 +253,10 @@ fun main() {
 ```
 {kotlin-runnable="true"}
 
-### 혼합 숫자 표현식 {id="mixed-numeric-expressions"}
+### 혼합된 숫자 표현식 {id="mixed-numeric-expressions"}
 
 Kotlin은 대입이나 함수 인자 전달 시 암시적 변환을 지원하지 않습니다.
-그러나 산술 표현식에서는 서로 다른 숫자 타입을 결합할 수 있습니다. 이러한 경우
-Kotlin은 피연산자 타입을 기반으로 결과 타입을 결정하며,
-산술 연산자가 변환을 자동으로 처리합니다.
+하지만 산술 표현식에서는 서로 다른 숫자 타입을 결합하여 사용할 수 있습니다. 이러한 경우 Kotlin은 피연산자의 타입을 기반으로 결과 타입을 결정하며, 산술 연산자가 변환을 자동으로 처리합니다:
 
 ```kotlin
 val intNumber: Int = 1
@@ -266,18 +264,18 @@ val longNumber: Long = 1000
 val result = intNumber + longNumber // 1001, Long
 ```
 
-결과를 더 작은 타입에 대입하려고 하면 컴파일러가 오류를 보고합니다.
+더 작은 크기의 타입에 결과를 대입하려고 하면 컴파일러 오류가 발생합니다:
 
 ```kotlin
 val intNumber: Int = 1
 val longNumber: Long = 1000
 val result: Int = intNumber + longNumber 
-// Error: Initializer type mismatch
+// 오류: Initializer type mismatch
 ```
 
 ### 정수 리터럴 타입 {id="integer-literal-types"}
 
-타입 추론 과정에서 Kotlin은 접미사가 없는 정수 리터럴을 주변 컨텍스트가 특정 타입을 결정할 때까지 특수한 [정수 리터럴 타입 (Integer Literal Type, ILT)](https://kotlinlang.org/spec/type-system.html#integer-literal-types)으로 취급합니다.
+타입 추론 과정에서 Kotlin은 주변 컨텍스트를 통해 특정 타입이 결정될 때까지 접미사가 없는 정수 리터럴을 특수한 [정수 리터럴 타입(Integer Literal Type, ILT)](https://kotlinlang.org/spec/type-system.html#integer-literal-types)으로 처리합니다:
 
 ```kotlin
 //sampleStart
@@ -304,7 +302,7 @@ fun main() {
 ```
 {kotlin-runnable="true"}
 
-`Int`와 `Long` 값은 런타임에 동일한 문자열 표현을 가지므로 혼동하기 특히 쉽습니다. 이를 방지하려면 기대하는 타입을 명시하거나 값을 명시적으로 변환하세요.
+`Int`와 `Long` 값은 런타임에 문자열 표현이 동일하므로 특히 놓치기 쉽습니다. 이를 방지하려면 기대하는 타입을 명시하거나 값을 명시적으로 변환하세요:
 
 ```kotlin
 //sampleStart
@@ -325,19 +323,19 @@ fun main() {
 ```
 {kotlin-runnable="true"}
 
-명시적 타입을 사용하여 의도하지 않은 타입 추론을 방지할 수도 있습니다.
+명시적 타입을 사용하여 의도치 않은 타입 추론을 방지할 수도 있습니다:
 
 ```kotlin
 fun main() {
 //sampleStart
     val intValues: List<Int> = listOf(1, 2L)
-    // Error: initializer type mismatch
+    // 오류: initializer type mismatch
 //sampleEnd
 }
 ```
 {kotlin-runnable="true" validate="false"}
 
-> [정수 리터럴 타입](https://kotlinlang.org/spec/type-system.html#integer-literal-types)에 대해 자세히 알아보세요.
+> [정수 리터럴 타입(Integer literal types)](https://kotlinlang.org/spec/type-system.html#integer-literal-types)에 대해 자세히 알아보세요.
 > 
 {style="tip"}
 
@@ -345,28 +343,27 @@ fun main() {
 
 숫자 타입은 정의된 범위 내의 값만 표현할 수 있습니다.
 
-연산 결과가 해당 범위를 벗어나면 오버플로가 발생합니다.
-값을 더 작은 숫자 타입으로 변환하는 경우, 변환된 값이 원래의 숫자 값을 유지하지 못할 수 있습니다.
+연산 결과가 해당 범위를 벗어나면 오버플로(overflow)가 발생합니다.
+값을 더 작은 숫자 타입으로 변환할 경우, 변환된 값은 원래의 숫자 값을 유지하지 못할 수 있습니다.
 
-이러한 동작은 컴파일러가 코드를 허용하더라도 코드의 실행 결과에 영향을 미칠 수 있습니다.
+이러한 동작은 컴파일러가 허용하는 코드라 하더라도 실행 결과에 영향을 미칠 수 있습니다.
 
 ### 연산에서의 오버플로 {id="overflow-in-operations"}
 
-각 정수 타입은 정의된 범위 내의 값만 저장할 수 있습니다. 산술 연산의 결과가
-해당 범위를 초과하면 *데이터 오버플로*가 발생합니다.
+각 정수 타입은 정의된 범위 내의 값만 저장할 수 있습니다. 산술 연산의 결과가 해당 범위를 초과하면 _데이터 오버플로(data overflow)_가 발생합니다:
 
 ```kotlin
 fun main(){
 //sampleStart
     val intNumber: Int = 2147483647
-    // Int의 최댓값은 2147483647입니다
+    // Int의 최댓값은 2147483647
     println(intNumber + 1) // -2147483648
 //sampleEnd    
 }
 ```
 {kotlin-runnable="true"}
 
-여기서는 값이 더 이상 `Int`에 들어맞지 않기 때문에 결과가 순환(wrap around)됩니다.
+여기서 결과값이 `Int`에 더 이상 들어가지 않기 때문에 최솟값으로 순환(wrap around)됩니다.
 
 > 정수 오버플로가 발생해도 컴파일러가 자동으로 오류를 발생시키지는 않습니다.
 >
@@ -374,8 +371,8 @@ fun main(){
 
 ### 부호 반전에서의 오버플로 {id="overflow-in-negation"}
 
-부호 반전(Negation) 중에도 오버플로가 발생할 수 있습니다.
-예를 들어 `Int.MIN_VALUE`의 양수 대응값은 `Int`로 표현할 수 없습니다.
+부호 반전(negation) 중에도 오버플로가 발생할 수 있습니다.
+예를 들어, `Int.MIN_VALUE`의 양수 대응값은 `Int`로 표현할 수 없습니다.
 
 ```kotlin
 fun main(){
@@ -389,8 +386,7 @@ fun main(){
 
 ### 축소 변환 {id="narrowing-conversions"}
 
-값을 더 작은 정수 타입으로 변환할 때,
-결과가 원래의 숫자 값을 보존하지 못할 수 있습니다.
+값을 더 작은 정수 타입으로 변환할 때, 결과값에 원래의 숫자 값이 유지되지 않을 수 있습니다:
 
 ```kotlin
 fun main() {
@@ -404,7 +400,7 @@ fun main() {
 ```
 {kotlin-runnable="true"}
 
-하지만 부동소수점 타입은 [IEEE 754 표준](https://en.wikipedia.org/wiki/IEEE_754)을 따르기 때문에 매우 큰 결과는 `Infinity`가 될 수 있습니다.
+반면, 부동소수점 타입은 [IEEE 754 표준](https://en.wikipedia.org/wiki/IEEE_754)을 따르므로 매우 큰 결과값은 `Infinity`가 될 수 있습니다:
 
 ```kotlin
 fun main() {
@@ -417,7 +413,7 @@ fun main() {
 
 ## 비트 연산 {id="bitwise-operations"}
 
-Kotlin은 `Int`와 `Long`을 위한 *비트 연산(bitwise operations)*을 제공합니다. 이러한 연산은 일련의 [중위 함수 (infix functions)](functions.md#infix-notation)와 `inv()`로 표현됩니다.
+Kotlin은 `Int`와 `Long`에 대해 _비트 연산(bitwise operations)_을 제공합니다. 이러한 연산은 일련의 [중위 함수(infix functions)](functions.md#infix-notation) 및 `inv()`로 표현됩니다.
 
 ```kotlin
 fun main() {
@@ -431,32 +427,31 @@ fun main() {
 ```
 {kotlin-runnable="true"}
 
-비트 연산에는 다음이 포함됩니다.
+비트 연산에는 다음이 포함됩니다:
 
-* `shl()` – 부호 있는 왼쪽 시프트 (signed shift left)
-* `shr()` – 부호 있는 오른쪽 시프트 (signed shift right)
-* `ushr()` – 부호 없는 오른쪽 시프트 (unsigned shift right)
-* `and()` – 비트 AND
-* `or()` – 비트 OR
-* `xor()` – 비트 XOR
-* `inv()` – 비트 반전 (bitwise inversion)
+* `shl()` – 부호 있는 왼쪽 시프트(signed shift left)
+* `shr()` – 부호 있는 오른쪽 시프트(signed shift right)
+* `ushr()` – 부호 없는 오른쪽 시프트(unsigned shift right)
+* `and()` – 비트 단위 AND
+* `or()` – 비트 단위 OR
+* `xor()` – 비트 단위 XOR
+* `inv()` – 비트 반전
 
-## 부동소수점 수 비교 {id="floating-point-number-comparison"}
+## 부동소수점 숫자 비교 {id="floating-point-number-comparison"}
 
-Kotlin에서 부동소수점 비교는 피연산자의 정적 타입(static type)에 따라 달라집니다.
+Kotlin에서 부동소수점 비교는 피연산자의 정적 타입에 따라 달라집니다.
 
-피연산자가 정적으로 `Float` 또는 `Double`로 알려져 있는 경우,
-숫자에 대한 연산 및 숫자가 형성하는 범위는 [IEEE 754 부동소수점 산술 표준](https://en.wikipedia.org/wiki/IEEE_754)을 따릅니다.
+피연산자가 정적으로 `Float` 또는 `Double`로 알려져 있는 경우, 해당 숫자들에 대한 연산 및 이들이 이루는 범위는 [부동소수점 산술에 대한 IEEE 754 표준](https://en.wikipedia.org/wiki/IEEE_754)을 따릅니다.
 
-그러나 제네릭 사용 사례(`Any`, `Comparable<...>`, 또는 `Collection<T>` 등)에서는 정적으로 부동소수점 숫자로 타입 지정되지 않은 피연산자의 경우 동작이 다릅니다. 이러한 경우 Kotlin은 `Float` 및 `Double`에 대한 `equals()` 및 `compareTo()` 구현을 사용합니다.
+그러나 제네릭 사용 사례(`Any`, `Comparable<...>`, 또는 `Collection<T>` 등)와 같이 피연산자의 정적 타입이 부동소수점 숫자가 아닌 경우에는 동작이 달라집니다. 이 경우 Kotlin은 `Float`와 `Double`에 대한 `equals()` 및 `compareTo()` 구현을 사용합니다.
 
-이에 따라 다음과 같이 동작합니다.
+이에 따라 다음과 같이 동작합니다:
 
 * `NaN`은 자기 자신과 같은 것으로 간주됩니다.
 * `NaN`은 `POSITIVE_INFINITY`를 포함한 다른 모든 요소보다 큰 것으로 간주됩니다.
 * `-0.0`은 `0.0`보다 작은 것으로 간주됩니다.
 
-다음 예제는 정적으로 부동소수점 숫자로 타입이 지정된 피연산자와 제네릭 타입을 통해 사용된 피연산자 간의 차이점을 보여줍니다.
+다음 예제는 정적으로 부동소수점 타입이 지정된 피연산자와 제네릭 타입을 통해 사용된 피연산자의 차이를 보여줍니다:
 
 ```kotlin
 //sampleStart  
@@ -469,7 +464,7 @@ fun main() {
     println(Double.NaN == Double.NaN) // false
     println(0.0 == -0.0) // true
 
-    // 부동소수점이 아닌 정적 타입을 통해 사용된 피연산자
+    // 비부동소수점 정적 타입을 통해 사용된 피연산자
     println(generalizedEquals(Double.NaN, Double.NaN)) // true
     println(generalizedEquals(0.0, -0.0)) // false
 }
@@ -479,13 +474,12 @@ fun main() {
 
 ## JVM에서의 숫자 박싱 및 캐싱 {id="boxing-and-caching-numbers-on-the-jvm"}
 
-JVM에서 널 불가능(non-nullable) 숫자 값은 대개 `int`, `long`, `double`과 같은 원시 타입(primitive type)으로 저장됩니다.
-하지만 [제네릭 타입](generics.md)이나 `Int?`와 같은 널 가능 숫자 타입을 사용하는 경우 값은 박싱(boxed)되어 객체로 표현됩니다.
+JVM에서 널 불가능(non-nullable) 숫자 값은 대개 `int`, `long`, `double`과 같은 원시 타입(primitive types)으로 저장됩니다.
+하지만 [제네릭 타입](generics.md)이나 `Int?`와 같은 널 가능 숫자 타입을 사용하면 값이 박싱(boxing)되어 객체로 표현됩니다.
 
-JVM은 작은 숫자에 대해 박싱된 표현을 캐싱하는 [메모리 최적화 기법](https://docs.oracle.com/javase/specs/jls/se22/html/jls-5.html#jls-5.1.7)을 적용합니다. 그 결과,
-값이 같은 박싱된 숫자는 [참조 동일성(referentially equal)](equality.md#referential-equality)을 가질 수 있습니다.
+JVM은 작은 숫자의 박싱된 표현을 캐싱하는 [메모리 최적화 기법](https://docs.oracle.com/javase/specs/jls/se22/html/jls-5.html#jls-5.1.7)을 적용합니다. 그 결과, 동일한 값을 갖는 박싱된 숫자들이 [참조 동등(referentially equal)](equality.md#referential-equality)할 수 있습니다.
 
-예를 들어 JVM은 `-128`에서 `127` 범위의 박싱된 `Integer` 값을 캐싱합니다. 따라서 다음 코드는 `true`를 반환합니다.
+예를 들어 JVM은 `-128`부터 `127` 범위의 박싱된 `Integer` 값을 캐싱합니다. 따라서 다음 코드는 `true`를 반환합니다:
 
 ```kotlin
 fun main() {
@@ -500,9 +494,8 @@ fun main() {
 ```
 {kotlin-runnable="true" validate="false"}
 
-캐시 범위를 벗어나는 값의 경우 박싱된 값은 서로 다른 객체입니다. 이 경우
-값이 [구조적으로 동일(structurally equal)](equality.md#structural-equality)하더라도 참조 동일성은 성립하지 않습니다.
-이러한 이유로 숫자 값을 비교할 때는 `==`를 사용해야 합니다.
+캐시 범위를 벗어나는 값의 경우, 박싱된 값은 서로 다른 객체가 됩니다. 이 경우 두 값은 [구조적 동등(structurally equal)](equality.md#structural-equality)하더라도 참조 동등하지는 않습니다.
+따라서 숫자 값을 비교할 때는 `==`를 사용해야 합니다:
 
 ```kotlin
 fun main() {

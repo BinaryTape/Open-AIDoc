@@ -12,6 +12,10 @@
     "to": "kotlin/ksp-overview.md"
   },
   {
+    "from": "kotlin/ksp-why-ksp.md",
+    "to": "kotlin/ksp-overview.md"
+  },
+  {
     "from": "kotlin/multiplatform.md",
     "to": "kmp/get-started.md"
   }

@@ -1,0 +1,14 @@
+[
+  {
+    "from": "kotlin/basics.md",
+    "to": "kotlin/coroutines-basics.md"
+  },
+  {
+    "from": "kotlin/cancellation-and-timeouts.md",
+    "to": "kotlin/coroutines-cancellation.md"
+  },
+  {
+    "from": "kotlin/flow.md",
+    "to": "kotlin/coroutines-flow.md"
+  }
+]

@@ -1,15 +1,15 @@
-[//]: # (title: KSP を使い始める)
-[//]: # (description: Kotlin Symbol Processing (KSP) に基づくアノテーションプロセッサーをプロジェクトに追加する方法、または KSP API を使用して独自のプロセッサーを作成する方法について説明します。)
+[//]: # (title: KSP 入門)
+<web-summary>Kotlin Symbol Processing（KSP）ベースのアノテーションプロセッサをプロジェクトに追加するか、KSP API を使用して独自のアノテーションプロセッサを作成します。</web-summary>
 
-このガイドでは、以下の内容について学びます：
+このガイドでは、以下の内容について説明します。
 
-* KSP ベースのアノテーションプロセッサーをプロジェクトに追加する方法。
-* KSP API を使用して独自のアノテーションプロセッサーを作成する方法。
-* プロセッサーによって生成されたコードがどこにあるか。
+* プロジェクトに KSP ベースのアノテーションプロセッサを追加する方法。
+* KSP API を使用して独自のアノテーションプロセッサを作成する方法。
+* プロセッサによって生成されたコードの確認場所。
 
-## KSP ベースのプロセッサーをプロジェクトに追加する {id="add-a-ksp-based-processor-to-your-project"}
+## プロジェクトに KSP ベースのプロセッサを追加する {id="add-a-ksp-based-processor-to-your-project"}
 
-プロジェクトで外部プロセッサーを使用するには、`build.gradle(.kts)` ファイルの [`plugins {}` ブロック](https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block)に KSP を追加します。プロセッサーが特定のモジュールでのみ必要な場合は、代わりにそのモジュールの `build.gradle(.kts)` ファイルに追加してください。
+プロジェクトで外部プロセッサを使用するには、`build.gradle(.kts)` ファイルの [`plugins {}` ブロック](https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block) に KSP を追加します。プロセッサが特定のモジュールでのみ必要な場合は、代わりにそのモジュールの `build.gradle(.kts)` ファイルに追加します。
 
 <tabs group="build-script">
 <tab title="Kotlin" group-key="kotlin">
@@ -38,11 +38,11 @@ plugins {
 </tab>
 </tabs>
 
-> KSP の最新バージョンを確認するには、GitHub の [Releases](https://github.com/google/ksp/releases) をチェックしてください。
+> KSP の最新バージョンについては、GitHub の [Releases](https://github.com/google/ksp/releases) を確認してください。
 > 
 {style="tip"}
 
-トップレベルの `dependencies {}` ブロックに、使用したいプロセッサーを追加します。この例では [Moshi](https://github.com/square/moshi?tab=readme-ov-file#codegen) を使用していますが、他のプロセッサーでも手順は同じです。
+トップレベルの `dependencies {}` ブロックで、使用したいプロセッサを追加します。この例では [Moshi](https://github.com/square/moshi?tab=readme-ov-file#codegen) を使用していますが、他のプロセッサでも同様の手順となります。
 
 <tabs group="build-script">
 <tab title="Kotlin" group-key="kotlin">
@@ -69,22 +69,22 @@ dependencies {
 </tab>
 </tabs>
 
-`ksp(...)` 設定は、アプリケーションのソースコードにのみプロセッサーを適用します。テストソースを処理するには、`kspTest(...)` 設定を使用してプロセッサーを追加してください。
+`ksp(...)` 設定は、アプリケーションのソースにのみプロセッサを適用します。テストソースを処理するには、`kspTest(...)` 設定でプロセッサを追加してください。
 
 > `ksp(...)` 設定はシングルプラットフォームプロジェクトでのみ利用可能です。
-> Kotlin マルチプラットフォームの個々のターゲットおよびコンパイル用にプロセッサーを設定する方法については、[Kotlin マルチプラットフォームでの KSP](ksp-multiplatform.md) を参照してください。
+> 個々の Kotlin Multiplatform ターゲットおよびコンパイルに対してプロセッサを設定する方法については、[Kotlin Multiplatform での KSP](ksp-multiplatform.md) を参照してください。
 > 
 {style="note"}
 
-## 独自のプロセッサーを作成する {id="create-your-own-processor"}
+## 独自のプロセッサを作成する {id="create-your-own-processor"}
 
-以下の手順に従って、`helloWorld()` 関数を生成するシンプルなアノテーションプロセッサーを作成します。実用的ではありませんが、独自のプロセッサーとアノテーションを作成するための基本を理解できます。
+以下の手順に従って、`helloWorld()` 関数を生成するシンプルなアノテーションプロセッサを作成します。実際にはあまり実用的ではありませんが、独自のプロセッサやアノテーションを作成する基本を学ぶことができます。
 
 ### プロジェクトに KSP を追加する {id="add-ksp-to-the-project"}
 
 新しい Kotlin プロジェクトを作成し、KSP プラグインを追加します。
 
-1. IntelliJ IDEA で、**File** | **New** | **Project** を選択します。 
+1. IntelliJ IDEA で、**File** | **New** | **Project** を選択します。
 2. 左側のリストで **Kotlin** を選択します。
 3. ビルドシステムとして **Gradle** を選択し、**Create** をクリックします。
 
@@ -123,9 +123,9 @@ dependencies {
 
 プロジェクトのルートに新しいモジュールを作成し、アノテーションを宣言します。
 
-1. **File** | **New** | **Module** を選択します。 
+1. **File** | **New** | **Module** を選択します。
 2. 左側のリストで **Kotlin** を選択します。
-3. 以下のフィールドを指定して **Create** をクリックします。
+3. 以下の項目を指定し、**Create** をクリックします。
 
     * **Name**: annotations
     * **Build system**: Gradle
@@ -142,10 +142,10 @@ dependencies {
     annotation class HelloWorldAnnotation
     ```
 
-### プロセッサーを作成して登録する {id="create-and-register-a-processor"}
+### プロセッサを作成して登録する {id="create-and-register-a-processor"}
 
 1. プロジェクトのルートに **processor** という名前の別のモジュールを作成します。
-2. モジュールの `build.gradle(.kts)` ファイルに、KSP API と宣言したアノテーションを依存関係として追加します。
+2. モジュールの `build.gradle(.kts)` ファイルに、KSP API と先ほど宣言したアノテーションを依存関係として追加します。
 
     <tabs group="build-script">
     <tab title="Kotlin" group-key="kotlin">
@@ -181,7 +181,7 @@ dependencies {
 
     </tab>
     </tabs>
-3. processor モジュール内に新しい `HelloWorldProcessor.kt` ファイルを作成し、以下のコードを追加します。
+3. processor モジュール内に `HelloWorldProcessor.kt` ファイルを作成し、以下のコードを追加します。
 
     ```kotlin
     // processor/src/main/kotlin/HelloWorldProcessor.kt
@@ -198,7 +198,7 @@ dependencies {
            return emptyList()
         }
         
-       // 2️⃣ ビジター
+       // 2️⃣ Visitor
        inner class HelloWorldVisitor : KSVisitorVoid() {
            override fun visitFunctionDeclaration(function: KSFunctionDeclaration, data: Unit) {
                createNewFileFrom(function).use { file ->
@@ -234,7 +234,7 @@ dependencies {
     }
     ```
 
-    IDE で提案されるインポートを追加してください。`com.google.devtools.ksp.processing` から `Resolver` と `Dependencies` クラスをインポートするようにしてください。または、`HelloWorldProcessor.kt` の冒頭に以下の行をコピーしてください。
+    IDE から提案されたインポートを追加します。`Resolver` クラスと `Dependencies` クラスは必ず `com.google.devtools.ksp.processing` からインポートしてください。または、以下の行を `HelloWorldProcessor.kt` の先頭にコピーしてください。
 
     ```kotlin
     // processor/src/main/kotlin/HelloWorldProcessor.kt
@@ -251,22 +251,22 @@ dependencies {
     ```
     {collapsible="true" collapsed-title="インポート文"}
 
-   コードの内容を見ていきましょう：
+   コードの内容を確認してみましょう。
 
-    * 1️⃣ `process()` 関数にはプロセッサーのメインロジックが含まれています。`HelloWorldAnnotation` でアノテーションされたすべてのシンボルを取得し、それぞれに対して `HelloWorldVisitor` を呼び出します。
+    * 1️⃣ `process()` 関数には、プロセッサのメインロジックが含まれています。`HelloWorldAnnotation` でアノテーションされたすべてのシンボルを取得し、それぞれに対して `HelloWorldVisitor` を呼び出します。
 
-       `process()` 関数は、後のラウンドで処理するために、未処理のシンボルのリストを返します。この例では、安全に `emptyList()` を返しています。詳細については、[複数ラウンドの処理](ksp-multi-round.md)を参照してください。
+       `process()` 関数は、以降のラウンドで処理するための未処理シンボルのリストを返します。この例では、安全に `emptyList()` を返しています。詳細については、[複数ラウンド処理](ksp-multi-round.md) を参照してください。
 
-    * 2️⃣ プロセッサーは、ビジターを使用して KSP が提供する Kotlin 抽象構文木 (AST) のビューをトラバースします。`HelloWorldProcessor` クラスの中にある `HelloWorldVisitor` クラスがそのビジターです。`HelloWorldAnnotation` は関数にのみ使用されるため、`visitFunctionDeclaration()` のみをオーバーライドしています。
+    * 2️⃣ プロセッサは、ビジターを使用して KSP が提供する Kotlin の抽象構文木（AST）のビューを巡回します。`HelloWorldProcessor` クラス内では、`HelloWorldVisitor` クラスがビジターとなります。`HelloWorldAnnotation` は関数に対してのみ使用されるため、`visitFunctionDeclaration()` のみがオーバーライドされています。
    
-       > `KSVisitorVoid` は KSP が提供するビジタークラスの 1 つで、オーバーライドして調整できます。
-       > [`KSVisitor<D, R>` インターフェース](https://github.com/google/ksp/blob/main/api/src/main/kotlin/com/google/devtools/ksp/symbol/KSVisitor.kt)を実装して、独自のビジターを作成することもできます。
+       > `KSVisitorVoid` は、オーバーライドしてカスタマイズできる KSP 提供のビジタークラスの 1 つです。
+       > また、[`KSVisitor<D, R>` インターフェース](https://github.com/google/ksp/blob/main/api/src/main/kotlin/com/google/devtools/ksp/symbol/KSVisitor.kt) を実装して独自のビジターを作成することもできます。
        >
        {style="tip"}
 
-    * 3️⃣ `createNewFileFrom()` は、KSP がコードを生成するファイルを作成します。`createDependencyOn()` は、生成された出力ファイルが、アノテーションが使用されているソースファイルに依存するようにします。
+    * 3️⃣ `createNewFileFrom()` は、KSP がコードを生成するファイルを作成します。`createDependencyOn()` は、生成される出力ファイルをアノテーションが使用されているソースファイルに依存させます。
 
-       > KSP がファイルを生成・管理する方法について詳しく知るには、[`CodeGenerator` インターフェース](https://github.com/google/ksp/blob/main/api/src/main/kotlin/com/google/devtools/ksp/processing/CodeGenerator.kt)のソースコードを参照してください。
+       > KSP がファイルを作成・管理する方法の詳細については、[`CodeGenerator` インターフェース](https://github.com/google/ksp/blob/main/api/src/main/kotlin/com/google/devtools/ksp/processing/CodeGenerator.kt) のソースコードを参照してください。
        >
        {style="tip"}
 4. `HelloWorldProcessorProvider.kt` ファイルを作成します。その中で、`SymbolProcessorProvider` を継承する `HelloWorldProcessorProvider` クラスを宣言します。
@@ -284,7 +284,7 @@ dependencies {
         }  
     }
     ```
-5. プロセッサープロバイダーを登録します。`resources/META-INF/services` ディレクトリに `com.google.devtools.ksp.processing.SymbolProcessorProvider` という名前のファイルを作成し、プロバイダーの完全修飾名を追加します。
+5. プロセッサプロバイダを登録します。`resources/META-INF/services` ディレクトリに `com.google.devtools.ksp.processing.SymbolProcessorProvider` という名前のファイルを作成し、プロバイダの完全修飾名を追加します。
 
     ```text
     ## processor/src/main/resources/META-INF/services/com.google.devtools.ksp.processing.SymbolProcessorProvider
@@ -292,15 +292,15 @@ dependencies {
     HelloWorldProcessorProvider
     ```
 
-### プロセッサーを使用する {id="use-your-processor"}
+### プロセッサを使用する {id="use-your-processor"}
 
-これでプロセッサーをテストする準備が整いました。以下の手順に従ってクライアントモジュールを作成し、アノテーションが付いた要素に基づいてプロセッサーにコードを生成させます。
+これで、プロセッサをテストする準備が整いました。以下の手順に従ってクライアントモジュールを作成し、アノテーションが付与された要素に基づいてプロセッサにコードを生成させます。
 
-1. プロジェクトのルートに `app` という名前のモジュールを作成します。 
-2. モジュールの `build.gradle(.kts)` ファイルで：
+1. プロジェクトのルートに `app` というモジュールを作成します。
+2. そのモジュールの `build.gradle(.kts)` ファイルで以下を行います。
 
     * `plugins {}` ブロックに KSP プラグインを追加します。
-    * `dependencies {}` ブロックに作成したプロセッサーとアノテーションを追加します。
+    * `dependencies {}` ブロックにプロセッサとアノテーションを追加します。
 
     例：
 
@@ -340,7 +340,7 @@ dependencies {
     </tab>
     </tabs>
 
-3. プロジェクトレベルの `settings.gradle(.kts)` ファイルで、すべてのサブモジュールが自動的に含まれていることを確認します。
+3. プロジェクトレベルの `settings.gradle(.kts)` ファイルで、すべてのサブモジュールが自動的にインクルードされていることを確認します。
     
     <tabs group="build-script">
     <tab title="Kotlin" group-key="kotlin">
@@ -380,7 +380,7 @@ dependencies {
     }
     ```
 
-    > `main()` 関数は `helloWorld()` を呼び出していますが、この関数はまだ存在しません。IDE は `helloWorld()` を未定義の参照としてハイライトします。これは想定通りです。プロジェクトをビルドして実行すると、KSP が `helloWorld()` 関数を生成します。
+    > `helloWorld()` 関数はまだ存在しないにもかかわらず、`main()` 関数から呼び出されています。IDE では `helloWorld()` が未定義の参照としてハイライトされますが、これは想定通りの挙動です。プロジェクトをビルドして実行すると、KSP が `helloWorld()` 関数を生成します。
     >
     {style="note"}
 
@@ -390,7 +390,7 @@ dependencies {
     Hello world from function generated by KSP
     ```
 
-    KSP は `GeneratedHelloWorld.kt` ファイルにコードを生成します：
+    KSP は `GeneratedHelloWorld.kt` ファイル内にコードを生成します。
    
     ```text
     app/build/generated/ksp/main/kotlin/GeneratedHelloWorld.kt
@@ -398,7 +398,7 @@ dependencies {
 
 ### プロジェクト構造を確認する {id="explore-the-project-structure"}
 
-プロジェクトの最終的なファイル構造は以下のようになるはずです。
+プロジェクトの最終的なファイル構造は以下のようになります。
 
 ```text
 .
@@ -432,12 +432,12 @@ dependencies {
 ```
 {collapsible="true" collapsed-title="プロジェクト構造"}
 
-> 追加のファイルやディレクトリがある場合があります。
+> 追加のファイルやディレクトリが存在する場合もあります。
 > 
 {style="tip"}
 
 ## 次のステップ {id="what-s-next"}
 
-* この例の完全なコードは [KSP リポジトリ](https://github.com/google/ksp/tree/main/examples/hello-world)で確認できます。
-* より複雑で実践的な例については、[KSP リポジトリ](https://github.com/google/ksp/tree/main/examples)を参照してください。
-* [KSP サポートライブラリ](ksp-overview.md#supported-libraries)のリストを確認してください。
+* このサンプルの完全なコードは [KSP リポジトリ](https://github.com/google/ksp/tree/main/examples/hello-world) で確認できます。
+* より複雑で実践的なサンプルは [KSP リポジトリ](https://github.com/google/ksp/tree/main/examples) を参照してください。
+* [KSP 対応ライブラリ一覧](ksp-overview.md#supported-libraries) をご覧ください。

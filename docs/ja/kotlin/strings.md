@@ -1,20 +1,20 @@
 [//]: # (title: 文字列)
-[//]: # (description: 文字列リテラル、文字列テンプレート、複数行文字列、一般的なテキスト操作など、Kotlin における文字列の扱い方について学びます。)
+<web-summary>文字列リテラル、文字列テンプレート、複数行文字列、一般的なテキスト操作など、Kotlin で文字列を扱う方法について学びます。</web-summary>
 
-[`String`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/) 型は、一連の[文字](characters.md)のシーケンスを表します。単語、文、メッセージ、構造化テキストなどのテキスト値に使用できます。
+[`String`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/) 型は、[文字 (character)](characters.md) のシーケンスを表します。単語、文、メッセージ、構造化テキストなどのテキスト値に使用できます。
 
-`String` 型はイミュータブル（不変）です。一度 `String` オブジェクトを作成すると、その内容は存続期間中に変更されることはありません。文字列を変更するように見える操作は、実際にはすべて新しい文字列を作成しています。
+`String` 型はイミュータブル（不変）です。一度 `String` オブジェクトを作成すると、その内容はライフタイム全体を通じて同じ状態を保ちます。文字列を変更しているように見える操作は、実際には新しい文字列を作成しています。
 
 ## 文字列の宣言 {id="declare-strings"}
 
-`String` リテラルを宣言するには、値をダブルクォート（`""`）で囲みます。`String` 型を明示的に指定することも、Kotlin に値から型推論させることもできます。
+`String` リテラルを宣言するには、値を二重引用符 (`""`) で囲みます。`String` 型を明示的に指定することも、値から Kotlin に型推論させることもできます。
 
 ```kotlin
 val name: String = "Kotlin"
 val message = "Hello, world!" // Kotlin が String を推論
 ```
 
-ダブルクォートで囲まれた文字列リテラルは、`\n` や `\t` などの[エスケープシーケンス](characters.md#escape-sequences)をサポートしています。
+二重引用符で囲まれた文字列リテラルは、`\n` や `\t` などの[エスケープシーケンス](characters.md#escape-sequences)をサポートしています。
 
 ```kotlin
 val message = "Hello,\nworld!"
@@ -23,7 +23,7 @@ val quote = "Kotlin says, \"Hi\"."
 
 ### 複数行文字列 {id="multiline-strings"}
 
-複数行で構成されるテキストや、エスケープしたくない引用符を含むテキストを保持するには、トリプルクォート（`""" """`）で囲まれた複数行文字列を使用します。
+複数行で構成されるテキストや、エスケープしたくない引用符を含むテキストを保存するには、三重引用符 (`""" """`) で囲まれた複数行文字列を使用します。
 
 ```kotlin
 val text = """
@@ -35,14 +35,14 @@ val quote = """Kotlin says, "Hi"."""
 ```
 
 > 複数行文字列はエスケープシーケンスをサポートしていません。
-> Kotlin はそれらの文字を通常のテキストとして扱います。
+> Kotlin はこれらの文字を通常のテキストとして扱います。
 >
 {style="note"}
 
-複数行文字列は、ソースコードに記述された改行やインデントをそのまま保持します。
-この挙動は、実行時の値をファイル内のテキストのレイアウトと一致させたい場合に便利です。
+複数行文字列は、ソースコードに記述されたとおりの改行とインデントを保持します。
+この動作は、ランタイム時の値をファイル内のテキストレイアウトと一致させたい場合に便利です。
 
-以下の例では、各行の前のスペースが結果の文字列の一部になります。
+次の例では、各行の前のスペースが結果の文字列の一部になります。
 
 ```kotlin
 val text = """
@@ -51,7 +51,7 @@ val text = """
 """
 ```
 
-行頭の共通インデントを削除するには、[`trimIndent()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/trim-indent.html) 関数を使用します。空行を除く行の共通する最小インデントを検出し、それを削除します。
+共通する先頭のインデントを削除するには、[`trimIndent()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/trim-indent.html) 関数を使用します。この関数は、空行以外の行に共通する最小のインデントを検出し、それを削除します。
 
 ```kotlin
 fun main() {
@@ -67,7 +67,7 @@ fun main() {
 ```
 {kotlin-runnable="true"}
 
-インデントの削除をより明示的に制御するには、[`trimMargin()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/trim-margin.html) 関数を使用します。各行のマージンプレフィックス（接頭辞）とその前にあるすべての文字を削除します。
+インデントの削除をより明示的に制御するには、[`trimMargin()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/trim-margin.html) 関数を使用します。この関数は、各行のマージンプレフィックス（余白の接頭辞）およびそれより前にあるすべての文字を削除します。
 
 ```kotlin
 fun main() {
@@ -83,16 +83,16 @@ fun main() {
 ```
 {kotlin-runnable="true"}
 
-デフォルトでは、`trimMargin()` 関数はパイプ記号（`|`）をマージンプレフィックスとして使用しますが、パラメータとして別の文字を渡すこともできます。例: `trimMargin(">")`
+デフォルトでは、`trimMargin()` 関数はパイプ記号 (`|`) をマージンプレフィックスとして使用しますが、パラメータとして別の文字を渡すこともできます。例: `trimMargin(">")`。
 
-> `trimIndent()` や `trimMargin()` などの関数で文字列を処理すると、プラットフォームに関係なく、結果の文字列には改行文字（`\n`）のみが使用されます。
+> `trimIndent()` や `trimMargin()` などの関数で文字列を処理すると、プラットフォームに関係なく、結果の文字列には改行コードとしてラインフィード (`\n`) のみが使用されます。
 >
 {style="note"}
 
 ## 文字列テンプレート {id="string-templates"}
 
 文字列テンプレートを使用すると、変数や式を `String` リテラル内に直接埋め込むことができます。
-この処理は*文字列補間（interpolation）*と呼ばれます。文字列テンプレートは、通常の文字列と複数行文字列の両方で使用できます。
+この処理は*文字列補間 (interpolation)* と呼ばれます。文字列テンプレートは、通常の文字列と複数行文字列の両方で使用できます。
 
 文字列に変数を挿入するには、`$` 記号を使用します。
 
@@ -107,7 +107,7 @@ fun main() {
 ```
 {kotlin-runnable="true"}
 
-文字列に式を挿入する場合や、変数を他のテキストの直後に配置する場合は、`${}` を使用します。
+文字列に式を挿入したり、変数の直後に他のテキストを配置したりするには、`${}` を使用します。
 
 ```kotlin
 fun main() {
@@ -124,14 +124,14 @@ fun main() {
 ```
 {kotlin-runnable="true"}
 
-> 文字列は `+` 演算子で結合することもできます。しかし、通常は文字列テンプレートの方が読みやすく、よりイディオマティックです。
+> `+` 演算子を使用して文字列を連結することもできます。ただし、通常は文字列テンプレートの方が読みやすく、よりイディオマティック（Kotlin らしい書き方）です。
 >
 {style="tip"}
 
-テンプレート式には、エスケープなしでダブルクォート文字列を含めることもできます。
+テンプレート式には、エスケープせずに二重引用符で囲んだ文字列を含めることもできます。
 
 ```kotlin
-// ダブルクォート文字列
+// 二重引用符の文字列
 val test = "${"test".uppercase()}"
 
 // 複数行文字列
@@ -142,7 +142,7 @@ Result: ${"OK".lowercase()}
 
 ### 文字列テンプレートでの Null 許容値 {id="nullable-values-in-string-templates"}
 
-補間された式または変数が `null` と評価された場合、Kotlin コンパイラは結果の文字列に `null` というテキストを挿入します。`null` を別の値に置き換えるには、[Elvis 演算子](null-safety.md#elvis-operator)（`?:`）を使用します。
+補間された式や変数が `null` と評価された場合、Kotlin コンパイラは結果の文字列にテキストとして `null` を挿入します。`null` を別の値に置き換えるには、[Elvis 演算子](null-safety.md#elvis-operator) (`?:`) を使用します。
 
 ```kotlin 
 fun main(){
@@ -159,13 +159,13 @@ fun main(){
 ```
 {kotlin-runnable="true"}
 
-### マルチドル文字列補間 {id="multi-dollar-string-interpolation"}
+### マルチドル文字列補間 (Multi-dollar string interpolation) {id="multi-dollar-string-interpolation"}
 
-通常の文字列テンプレートでは、単一のドル記号（`$`）で補間が始まります。文字列にリテラルとしてドル記号を含める必要がある場合は、**マルチドル文字列補間（Multi-dollar string interpolation）**を使用します。
+通常の文字列テンプレートでは、単一のドル記号 (`$`) で補間が始まります。文字列内にリテラルのドル記号を含める必要がある場合は、**マルチドル文字列補間**を使用します。
 
-マルチドル文字列補間を使用すると、補間をトリガーするために必要な連続したドル記号の数を指定できます。その数未満のドル記号はリテラル文字として扱われます。
+マルチドル文字列補間を使用すると、補間をトリガーするために必要な連続したドル記号の数を指定できます。その数未満のドル記号は、リテラル文字として扱われます。
 
-たとえば、文字列リテラルの前に `$$` を使用すると、2 つ連続したドル記号でのみ補間が開始されます。
+たとえば、文字列リテラルの前に `$$` を使用すると、ドル記号が2つ連続した場合にのみ補間が開始されます。
 
 ```kotlin
 val KClass<*>.jsonSchema : String
@@ -180,15 +180,15 @@ val KClass<*>.jsonSchema : String
     """
 ```
 
-> 1つのドル記号による文字列補間を使用している場合、マルチドル文字列補間が既存のコードに影響を与えることはありません。引き続き単一の `$` を使用でき、必要に応じて複数のドル記号を適用できます。
+> 単一ドルの文字列補間を使用している場合、マルチドル文字列補間が既存のコードに影響を与えることはありません。引き続き単一の `$` を使用でき、必要な場合にのみマルチドル記号を適用できます。
 >
 {style="tip"}
 
 ## 基本的な文字列操作 {id="basic-string-operations"}
 
-Kotlin には、文字列を操作するためのさまざまな操作が用意されています。このセクションでは、最も一般的に使用される操作をいくつか紹介します。
+Kotlin には、文字列を操作するためのさまざまな操作が用意されています。このセクションでは、最も頻繁に使用される操作のいくつかを紹介します。
 
-> 利用可能なすべての関数についての詳細は、[API リファレンス](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/)をご覧ください。
+> 使用可能なすべての関数の詳細については、[API リファレンス](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/)を参照してください。
 >
 {style="tip"}
 
@@ -209,7 +209,7 @@ fun main (){
 
 ### 文字へのアクセス {id="access-characters"}
 
-インデックス演算子（`[]`）を使用して、文字列内の個々の文字にアクセスできます。
+インデックス演算子 (`[]`) を使用して、文字列内の個々の文字にアクセスできます。
 
 ```kotlin 
 fun main (){
@@ -230,7 +230,7 @@ fun main (){
 >
 {style="tip"}
 
-文字列内の文字をイテレート（反復処理）することもできます。
+文字列内の文字を反復処理することもできます。
 
 ```kotlin
 fun main(){
@@ -247,8 +247,8 @@ fun main(){
 
 文字列の一部分を抽出するには、次のいずれかの関数を使用します。
 
-* [`substring()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/substring.html): 元のテキストの選択された部分を含む新しい文字列を返します。
-* [`subSequence()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/sub-sequence.html): 元のテキストの選択された部分を含む `CharSequence` を返します。
+* 元のテキストの選択された部分を含む新しい文字列を返すには [`substring()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/substring.html)。
+* 元のテキストの選択された部分を含む `CharSequence` を返すには [`subSequence()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/sub-sequence.html)。
 
 例:
 
@@ -271,7 +271,7 @@ fun main() {
 
 ### 文字列の比較 {id="compare-strings"}
 
-2 つの文字列が同じ内容を持っているかどうかは、`==` 演算子で確認できます。
+2つの文字列が同じ内容を持っているかどうかは、`==` 演算子で確認できます。
 
 ```kotlin
 fun main(){
@@ -286,7 +286,7 @@ fun main(){
 ```
 {kotlin-runnable="true"}
 
-[`compareTo()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/compare-to.html) 関数を使用して、文字列を辞書順（文字単位）で比較することもできます。この関数は、両方の文字列を最初の異なる文字のペアが見つかるまで走査し、以下を返します。
+また、[`compareTo()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/compare-to.html) 関数を使用して、辞書順（文字単位）で文字列を比較することもできます。この関数は、異なる文字のペアが最初に見つかるまで両方の文字列をスキャンし、以下を返します。
 
 * 文字列が等しい場合は `0`。
 * レシーバが引数より小さい場合は `0` 未満の値。
@@ -301,7 +301,7 @@ fun main() {
     println("abc".compareTo("ABC") > 0)
     // true
     
-    // 大文字小文字の違いを無視するには true を渡す
+    // 大文字と小文字の違いを無視するには true を渡す
     println("abc".compareTo("ABC", ignoreCase = true) == 0)
     // true
 //sampleEnd  
@@ -334,7 +334,7 @@ fun main() {
 ```
 {kotlin-runnable="true"}
 
-また、[`contains()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/contains.html)、[`startsWith()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/starts-with.html)、[`endsWith()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/ends-with.html) 関数を使用して文字列の内容を検査することもできます。
+また、[`contains()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/contains.html)、[`startsWith()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/starts-with.html)、[`endsWith()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/ends-with.html) 関数を使用して、文字列の内容を検査することもできます。
 
 ```kotlin
 fun main() { 
@@ -359,7 +359,7 @@ fun main() {
 
 ### 文字列の分割 {id="split-strings"}
 
-[`split()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/split.html) 関数を使用すると、区切り文字に基づいて文字列を複数の部分に分割できます。
+区切り文字を基準にして文字列を分割するには、[`split()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/split.html) 関数を使用できます。
 
 ```kotlin
 fun main() { 
@@ -372,7 +372,7 @@ fun main() {
 ```
 {kotlin-runnable="true"}
 
-文字列を個々の行に分割したい場合は、[`lines()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/lines.html) 関数を使用します。
+文字列を行ごとに分割したい場合は、[`lines()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/lines.html) 関数を使用します。
 
 ```kotlin
 fun main() { 
@@ -391,10 +391,11 @@ fun main() {
 >
 {style="tip"}
 
-`+` 演算子で文字列を連結すると、Kotlin は操作ごとに新しい `String` オブジェクトを作成します。しかし、このアプローチはループ内や多くの断片を組み立てる場合には効率的ではない可能性があります。
-このような問題を回避するために、`buildString()` 関数または `StringBuilder` を使用できます。これらはすべての断片を単一のミュータブル（可変）バッファに収集し、最後に1つの文字列だけを生成します。
+`+` 演算子を使用して文字列を連結すると、Kotlin は操作ごとに新しい `String` オブジェクトを作成します。しかし、ループ内や多数のピースを結合する場合には、このアプローチは効率的でない場合があります。
+このような問題を回避するために、`buildString()` 関数または `StringBuilder` を使用できます。これらはすべてのピースを単一のミュータブル（可変）バッファに収集し、最後に1つの文字列のみを生成します。
 
-追加する内容を決定するロジックが複雑な場合は、[`buildString()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/build-string.html) 関数を使用します。たとえば、異なる断片を提供する複数の条件がある場合などです。`buildString()` を使用すると、バッファを直接処理する必要がありません。この関数は内部で `StringBuilder` を作成し、渡されたブロックを実行して、結果の文字列を返します。
+何を追加するかを決定するロジックが複雑な場合は、[`buildString()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/build-string.html) 関数を使用します。たとえば、異なるフラグメントを寄与する複数の条件がある場合です。`buildString()` を使用すると、バッファを直接処理する必要がありません。
+この関数は内部で `StringBuilder` を作成し、ブロックを実行して、結果の文字列を返します。
 
 ```kotlin
 fun main() {
@@ -404,12 +405,12 @@ fun main() {
     val hasWarnings = true
     val isComplete = false
     
-    // buildString が空のバッファを作成
+    // buildString は空のバッファを作成する
     val status = buildString {
         // バッファに "Errors found" を追加
         if (hasErrors) append("Errors found")
         if (hasWarnings) {
-            // バッファが空ではないため、"; " を追加
+            // バッファが空ではない場合、"; " を追加
             if (isNotEmpty()) append("; ")
             // "Warnings found" を追加
             append("Warnings found")
@@ -430,7 +431,8 @@ fun main() {
 ```
 {kotlin-runnable="true"}
 
-バッファを明示的な値として必要とする場合は、[`StringBuilder`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/-string-builder/) を使用します。たとえば、既存のテキストを変更する場合などです。
+バッファを明示的な値として必要とする場合は、[`StringBuilder`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/-string-builder/) を使用します。
+たとえば、既存のテキストを変更する場合などです。
 
 ```kotlin
 fun main() {
@@ -452,17 +454,17 @@ JVM では、[`String.format()`](https://kotlinlang.org/api/latest/jvm/stdlib/ko
 val text = String.format("Hello, %s", "Kotlin") 
 ```  
 
-> JVM 上でフォーマッタ形式の指定子（specifier）が明示的に必要な場合にのみ、`String.format()` 関数を使用してください。
-> フォーマット指定子の詳細については、[Java の Formatter クラスのドキュメント](https://docs.oracle.com/javase/8/docs/api/java/util/Formatter.html#summary)を参照してください。
+> JVM 上でフォーマッタ形式の指定子（フォーマット指定子）が明確に必要な場合にのみ、`String.format()` 関数を使用してください。
+> フォーマット指定子の詳細については、[Java Class Formatter のドキュメント](https://docs.oracle.com/javase/8/docs/api/java/util/Formatter.html#summary)を参照してください。
 >
 {style="note"}
 
-## 文字列の型変換 {id="string-conversion"}
+## 文字列の変換 {id="string-conversion"}
 
-文字列を使用して、数値、`Boolean` 値、入力からの識別子など、他の型の値を表すことがよくあります。
-Kotlin には、値を文字列に変換したり、文字列を他の型にパースしたりするための関数が用意されています。
+数値、`Boolean` 値、入力からの識別子など、他の型の値を表すために文字列を使用することがよくあります。
+Kotlin は、値を文字列に変換したり、文字列を他の型にパース（解析）したりするための関数を提供しています。
 
-値の文字列表現を取得するには、[`toString()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/to-string.html) 関数を使用します。
+値の文字列表現を返すには、[`toString()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/to-string.html) 関数を使用します。
 
 ```kotlin
 val number = 10
@@ -478,12 +480,12 @@ val text = number.toString()
 * ブール値の場合: [`toBoolean()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/to-boolean.html)、[`toBooleanStrict()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/to-boolean-strict.html)
 
 これらの関数は、文字列が有効なフォーマットである場合に、要求された型の値を返します。
-入力が無効である可能性がある場合は、`OrNull` バリアントを使用してください。これらの関数は、例外をスローする代わりに `null` を返すため、ユーザー入力や完全に制御できないデータを扱う際に安全です。
+入力が無効である可能性がある場合は、`OrNull` バリアントを使用してください。これらの関数は、例外をスローする代わりに `null` を返すため、ユーザー入力や完全には制御できないデータを安全に扱うことができます。
 
 ```kotlin
 val toInt = "10".toInt() // 10
 
-// 1000000000000 は Int の最大値を超えています
+// 1000000000000 は Int の最大値を超えている
 val toIntInvalid = "1000000000000".toIntOrNull()
 
 val toBoolean = "true".toBooleanStrict() // true

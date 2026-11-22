@@ -1,97 +1,97 @@
 [//]: # (title: Kotlin Notebook)
-[//]: # (description: 在 IntelliJ IDEA 中建立與編輯互動式 Kotlin notebook，以執行程式碼、視覺化資料、原型設計想法並分享結果。)
+<web-summary>在 IntelliJ IDEA 中建立並編輯互動式 Kotlin 筆記本，以執行程式碼、視覺化呈現資料、進行構想原型設計並分享成果。</web-summary>
 
-> 從 IntelliJ IDEA 2026.2 開始，Kotlin Notebook 將不再隨 IDE 隨附，JetBrains 也將不再正式提供支援。
-> 原始碼將繼續保留在 [GitHub](https://github.com/Kotlin/kotlin-notebook) 上。
+> 自 IntelliJ IDEA 2026.2 起，Kotlin Notebook 將不再隨附於 IDE 中，JetBrains 也將不再提供官方支援。
+> 原始碼仍可在 [GitHub](https://github.com/Kotlin/kotlin-notebook) 上取得。
 >
-> 若要進一步了解，請參閱 [部落格文章](https://blog.jetbrains.com/idea/2026/06/kotlin-notebook-sunset/)。
+> 詳情請參閱[部落格文章](https://blog.jetbrains.com/idea/2026/06/kotlin-notebook-sunset/)。
 >
 {style="note"}
 
-Kotlin Notebook 提供了一個互動式環境來建立和編輯 notebook，充分發揮 Kotlin 的所有潛能。
+Kotlin Notebook 提供了一個互動式環境來建立與編輯筆記本，充分發揮 Kotlin 的強大功能。
 
-Notebook 是一種互動式文件，您可以在其中將可執行的 Kotlin 程式碼與文字、結果和視覺化內容結合在一起。
-您可以將其視為 Kotlin REPL 的延伸，具備將程式碼整理成程式碼資料格、使用 Markdown 編寫文件，並在產生程式碼的旁邊立即顯示輸出（從文字到圖表）的能力。
+筆記本是一種互動式文件，你可以在其中將可執行的 Kotlin 程式碼與文字、執行結果以及視覺化圖表結合在一起。
+可以將它視為一個延伸擴充的 Kotlin REPL，讓你能夠將程式碼組織到儲存格中，使用 Markdown 撰寫說明文件，並在產生結果的程式碼旁立即顯示輸出（從純文字到圖表）。
 
-準備好享受無縫的編碼體驗，您可以在 IntelliJ IDEA 生態系統中開發和實驗 Kotlin 程式碼、接收即時輸出，並整合程式碼、視覺效果和文字。
+準備好享受流暢的編碼體驗，在 IntelliJ IDEA 生態系統中開發並實驗 Kotlin 程式碼、獲得即時輸出，並整合程式碼、視覺效果與文字。
 
 ![Kotlin Notebook](data-analysis-notebook.gif){width=700}
 
-Kotlin Notebook 外掛程式配備了[各種功能](https://www.jetbrains.com/help/idea/kotlin-notebook.html)來提升您的開發流程，例如： 
+Kotlin Notebook 外掛程式隨附[多種功能](https://www.jetbrains.com/help/idea/kotlin-notebook.html)，可大幅提升你的開發流程效率，例如：
 
-* 在程式碼資料格中存取 API
-* 點擊幾下即可匯入和匯出檔案
-* 使用 REPL 指令快速探索專案
-* 獲得豐富的輸出格式
-* 使用註解或類似 Gradle 的語法直觀地管理相依性
-* 僅需一行程式碼即可匯入各種程式庫，甚至為您的專案新增程式庫
-* 透過錯誤訊息和追蹤獲得偵錯洞察
+* 在儲存格內存取 API
+* 點擊幾下即可匯入與匯出檔案
+* 使用 REPL 指令進行快速專案探索
+* 獲得豐富多樣的輸出格式
+* 透過註解或類似 Gradle 的語法直觀地管理相依性
+* 僅需一行程式碼即可匯入各種程式庫，甚至為專案新增程式庫
+* 透過錯誤訊息與追蹤回溯獲得用於偵錯的洞察
 
-Kotlin Notebook 基於我們的 [Kotlin Kernel for Jupyter Notebooks](https://github.com/Kotlin/kotlin-jupyter?tab=readme-ov-file#kotlin-kernel-for-ipythonjupyter)，使其易於與其他 Kotlin notebook 解決方案整合。
-在沒有相容性問題的情況下，您可以毫不費力地在 Kotlin Notebook、[Datalore](https://datalore.jetbrains.com/) 和 [Kotlin-Jupyter Notebook](https://github.com/Kotlin/kotlin-jupyter) 之間分享您的工作。
+Kotlin Notebook 基於我們的 [Jupyter Notebook Kotlin Kernel](https://github.com/Kotlin/kotlin-jupyter?tab=readme-ov-file#kotlin-kernel-for-ipythonjupyter) 建置，因此能輕鬆與其他 Kotlin 筆記本解決方案整合。
+在沒有相容性問題的情況下，你可以毫不費力地在 Kotlin Notebook、[Datalore](https://datalore.jetbrains.com/) 以及 [Kotlin-Jupyter Notebook](https://github.com/Kotlin/kotlin-jupyter) 之間分享你的工作成果。
 
-憑藉這些功能，您可以執行各種任務，從簡單的程式碼實驗到全面的數據專案。
+憑藉這些功能，你可以著手進行廣泛的任務，從簡單的程式碼實驗到全面的資料專案皆可涵蓋。
 
 ## 資料分析與視覺化 {id="data-analytics-and-visualization"}
 
-無論您是進行初步資料探索還是完成端到端資料分析專案，Kotlin Notebook 都有適合您的工具。
+無論你是在進行初步的資料探索，還是完成一個端到端的資料分析專案，Kotlin Notebook 都能為你提供合適的工具。
 
-在 Kotlin Notebook 中，您可以直觀地整合[程式庫](data-analysis-libraries.md)，讓您擷取、轉換、繪製和建模資料，同時獲得操作的即時輸出。
+在 Kotlin Notebook 中，你可以直觀地整合各類[程式庫](data-analysis-libraries.md)，在取得操作即時輸出的同時，擷取、轉換、繪製並建立資料模型。
 
-對於分析相關任務，[Kotlin DataFrame](https://kotlin.github.io/dataframe/overview.html) 程式庫提供了強大的解決方案。此程式庫有助於載入、建立、篩選和清理結構化資料。
+針對分析相關的任務，[Kotlin DataFrame](https://kotlin.github.io/dataframe/overview.html) 程式庫提供了強大的解決方案。此程式庫有助於載入、建立、篩選與清理結構化資料。
 
-Kotlin DataFrame 還支援與 SQL 資料庫的無縫連接，並能直接在 IDE 中讀取來自不同資料來源的資料，包括 CSV、JSON 和 TXT。 
-請參閱 [DataFrame 文件](https://kotlin.github.io/dataframe/data-sources.html)以了解所有支援的格式。
+Kotlin DataFrame 還支援與 SQL 資料庫無縫連線，並直接在 IDE 中讀取來自不同資料來源的資料，包括 CSV、JSON 和 TXT。
+如需查看所有支援的格式，請參閱 [DataFrame 文件](https://kotlin.github.io/dataframe/data-sources.html)。
 
-[Kandy](https://kotlin.github.io/kandy/welcome.html) 是一個開源 Kotlin 程式庫，可讓您建立各種類型的圖表。
-Kandy 的慣用法、易讀且型別安全的特性讓您可以有效地視覺化資料並獲得寶貴的洞察。
+[Kandy](https://kotlin.github.io/kandy/welcome.html) 是一個開源的 Kotlin 程式庫，可讓你建立各種類型的圖表。
+Kandy 具備慣用語法、易讀性以及型別安全的特性，讓你能夠有效地將資料視覺化並獲得寶貴的洞察。
 
 ![data-analytics-and-visualization](data-analysis-kandy-example.png){width=700}
 
 ## 原型設計 {id="prototyping"}
 
-Kotlin Notebook 提供了一個互動式環境，可以用小區塊執行程式碼並即時查看結果。 
-這種動手操作的方法能夠在原型設計階段進行快速的實驗和迭代。
+Kotlin Notebook 提供了一個互動式環境，可將程式碼分成小塊區塊執行並即時檢視結果。
+這種實作方式使得在原型設計階段能夠進行快速的實驗與迭代。
 
-在 Kotlin Notebook 的幫助下，您可以在構思階段早期測試解決方案的概念。此外，Kotlin Notebook 支援協作和可重現的工作，能夠產生和評估新想法。
+藉由 Kotlin Notebook 的協助，你可以在構想發想階段儘早測試解決方案的概念。此外，Kotlin Notebook 支援協作與可重現的工作流程，有助於激發並評估新的構想。
 
 ![kotlin-notebook-prototyping](kotlin-notebook-prototyping.png){width=700}
 
 ## 後端開發 {id="backend-development"}
 
-Kotlin Notebook 提供了在程式碼資料格中呼叫 API 以及使用 OpenAPI 等協定的能力。它與外部服務和 API 互動的能力，使其在某些後端開發情境中非常有用，例如直接在您的 notebook 環境中擷取資訊和讀取 JSON 檔案。
+Kotlin Notebook 提供在儲存格內呼叫 API 以及使用 OpenAPI 等協定的能力。它與外部服務及 API 互動的功能，使其在某些後端開發情境中非常實用，例如直接在筆記本環境中擷取資訊與讀取 JSON 檔案。
 
 ![kotlin-notebook-backend-development](kotlin-notebook-backend-development.png){width=700}
 
-## 程式碼文件 {id="code-documentation"}
+## 程式碼文件化 {id="code-documentation"}
 
-在 Kotlin Notebook 中，您可以在程式碼資料格中包含內嵌註解和文字註解，以提供與程式碼片段相關的額外上下文、說明和指示。
+在 Kotlin Notebook 中，你可以在程式碼儲存格內加入內嵌註解與文字註解，為相關的程式碼片段提供額外的上下文、說明與操作指示。
 
-您也可以在 Markdown 程式碼資料格中編寫文字，這些資料格支援豐富的格式選項，如標題、清單、連結、圖片等。 
-要渲染 Markdown 程式碼資料格並查看格式化後的文字，只需像執行程式碼資料格一樣執行它即可。
+你也可以在 Markdown 儲存格中撰寫文字，這些儲存格支援豐富的格式設定選項，例如標題、清單、連結、圖片等。
+若要轉譯 Markdown 儲存格並檢視格式化後的文字，只需像執行程式碼儲存格一樣執行它即可。
 
 ![kotlin-notebook-documenting](kotlin-notebook-documentation.png){width=700}
 
-## 分享程式碼與輸出 {id="sharing-code-and-outputs"}
+## 分享程式碼與輸出結果 {id="sharing-code-and-outputs"}
 
-鑑於 Kotlin Notebook 遵循通用的 Jupyter 格式，您可以在不同的 notebook 之間分享程式碼和輸出。
-您可以使用任何 Jupyter 用戶端（如 [Jupyter Notebook](https://jupyter.org/) 或 [Jupyter Lab](https://jupyterlab.readthedocs.io/en/latest/)）開啟、編輯和執行您的 Kotlin Notebook。 
+由於 Kotlin Notebook 遵循通用的 Jupyter 格式，因此可以在不同的筆記本之間分享程式碼與輸出成果。
+你可以使用任何 Jupyter 用戶端（例如 [Jupyter Notebook](https://jupyter.org/) 或 [Jupyter Lab](https://jupyterlab.readthedocs.io/en/latest/)）開啟、編輯與執行你的 Kotlin Notebook。
 
-您還可以透過與任何 notebook Web 檢視器分享 `.ipynb` notebook 檔案來發佈您的工作。其中一個選擇是 [GitHub](https://github.com/)，它原生支援渲染此格式。另一個選擇是 [JetBrains 的 Datalore](https://datalore.jetbrains.com/) 平台，它具有排程執行 notebook 等進階功能，便於分享、執行和編輯 notebook。 
+你也可以透過與任何筆記本 Web 檢視器分享 `.ipynb` 筆記本檔案來發佈你的作品。其中一個選擇是 [GitHub](https://github.com/)，它原生支援轉譯此格式。另一個選擇是 [JetBrains 的 Datalore](https://datalore.jetbrains.com/) 平台，該平台具備筆記本排程執行等進階功能，便於分享、執行與編輯筆記本。
 
 ![kotlin-notebook-sharing-datalore](kotlin-notebook-sharing-datalore.png){width=700}
 
-或者，您可以快速將目前的 notebook 分享為 [GitHub 程式片段 (gist)](https://gist.github.com/)。 
-點擊工具列上的 **Create Gist** 按鈕。 
+此外，你還可以快速將目前的筆記本以 [GitHub Gist](https://gist.github.com/) 的形式分享。
+點擊工具列上的 **Create Gist** 按鈕。
 
 ![notebook-github-gist](notebook-github-gist.png){width=400}
 
-IntelliJ IDEA 會將您的 notebook 匯出到您的 GitHub 帳戶中的 Gist，並提供一個 URL 用於分享、檢視和下載 notebook。 
+IntelliJ IDEA 會將你的筆記本匯出至你的 GitHub 帳戶下的 Gist，並提供一個可用於分享、檢視與下載該筆記本的 URL。
 
-Gist 以 JSON 格式保留 notebook 中的所有程式碼、輸出和 Markdown，GitHub 可以對其進行預覽渲染。 
+Gist 會以 JSON 格式保留筆記本中的所有程式碼、輸出與 Markdown，GitHub 可對其進行轉譯以供預覽。
 
-## 下一步 {id="what-s-next"}
+## 後續步驟 {id="what-s-next"}
 
-* [瞭解 Kotlin Notebook 的用法與主要功能。](https://www.jetbrains.com/help/idea/kotlin-notebook.html)
-* [嘗試使用 Kotlin Notebook。](get-started-with-kotlin-notebooks.md)
-* [深入了解用於資料分析的 Kotlin。](data-analysis-overview.md)
+* [了解 Kotlin Notebook 的用法與主要功能。](https://www.jetbrains.com/help/idea/kotlin-notebook.html)
+* [立即試用 Kotlin Notebook。](get-started-with-kotlin-notebooks.md)
+* [深入探索 Kotlin 資料分析。](data-analysis-overview.md)

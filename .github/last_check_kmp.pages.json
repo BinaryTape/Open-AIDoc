@@ -73,7 +73,6 @@
   "kmp-overview.md",
   "kotlin-multiplatform-flutter.md",
   "kotlin-multiplatform-react-native.md",
-  "kotlin-multiplatform-roadmap.md",
   "kotlin-toolchain.md",
   "migrate-from-android.md",
   "multiplatform-add-dependencies.md",
@@ -96,7 +95,6 @@
   "multiplatform-expect-actual.md",
   "multiplatform-hierarchy.md",
   "multiplatform-integrate-in-existing-app.md",
-  "multiplatform-intro.md",
   "multiplatform-introduce-your-team.md",
   "multiplatform-ios-dependencies.md",
   "multiplatform-ios-integration-overview.md",
@@ -113,7 +111,6 @@
   "multiplatform-reasons-to-try.md",
   "multiplatform-run-tests.md",
   "multiplatform-samples.md",
-  "multiplatform-setup.md",
   "multiplatform-share-on-platforms.md",
   "multiplatform-spm-export.md",
   "multiplatform-spm-import.md",
@@ -134,6 +131,5 @@
   "whats-new-compose-1610.md",
   "whats-new-compose-170.md",
   "whats-new-compose-180.md",
-  "whats-new-compose-190.md",
-  "whats-new-compose-eap.md"
+  "whats-new-compose-190.md"
 ]

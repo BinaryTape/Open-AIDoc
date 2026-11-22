@@ -1,11 +1,11 @@
 [//]: # (title: 文字)
-[//]: # (description: 構文、Unicodeサポート、エスケープシーケンス、文字に対する一般的な操作など、KotlinにおけるChar型の使い方を学びます。)
+<web-summary>構文、Unicodeサポート、エスケープシーケンス、文字に対する一般的な操作など、KotlinでのChar型の使用方法を学びます。</web-summary>
 
 [`Char`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-char/) 型は、単一の文字をUTF-16コードユニットとして表します。
 
-文字、数字、句読点、空白などの個別の文字の値には `Char` を使用します。一連の文字の並びには [`String`](strings.md) を使用します。
+文字、数字、句読点、空白などの個々の文字値には `Char` を使用します。一連の文字列には [`String`](strings.md) を使用します。
 
-> `Char` は数値型ではありませんが、各文字にはアクセス可能なUnicodeの数値が存在します。
+> `Char` は数値型ではありませんが、各文字にはアクセス可能な数値のUnicode値があります。
 > [](#character-conversion) を参照してください。
 > 
 {style="tip"}
@@ -34,27 +34,27 @@ val invalidEmpty = '' // エラー
 
 ### Null許容値 {id="nullable-values"}
 
-null許容値を格納するには、`Char?` を使用します：
+null許容の値を格納するには、`Char?` を使用します：
 
 ```kotlin
 val maybeAbsent: Char? = null
 ```
 
-> JVM上では、null許容の `Char` 値は必要に応じてボックス化されます。これは
-> [数値型](numbers.md#boxing-and-caching-numbers-on-the-jvm)にも同様に適用されます。
+> JVM上では、必要に応じてnull許容の `Char` 値がボックス化（box）されます。これは
+> [数値型](numbers.md#boxing-and-caching-numbers-on-the-jvm)にも同様に当てはまります。
 >
 {style="note"}
 
-## Unicodeのサポート {id="unicode-support"}
+## Unicodeサポート {id="unicode-support"}
 
-Kotlinは `Char` 値をUTF-16コードユニットとして表現します。これは、単一の `Char` が1つのUTF-16コードユニットを格納するのであって、必ずしも1つの完全なUnicode文字を表すわけではないことを意味します。
+Kotlinは `Char` 値をUTF-16コードユニットとして表します。これは、単一の `Char` が1つのUTF-16コードユニットを格納することを意味し、必ずしも1つの完全なUnicode文字を表すとは限りません。
 
 ### 基本多言語面 {id="basic-multilingual-plane"}
 
 単一の `Char` は、`\u0000` から `\uFFFF` の範囲の値を格納できます。
-この範囲は、ほぼすべての現代言語の文字と多数の記号を含む基本多言語面（BMP: Basic Multilingual Plane）をカバーしています。
+この範囲は、ほぼすべての現代言語の文字と多数の記号を含む基本多言語面（Basic Multilingual Plane: BMP）をカバーしています。
 
-Unicode値で文字を指定するには、`\u` の後に [Unicodeテーブル](https://www.unicode.org/charts/) の4桁の16進数値を続けます：
+Unicode値によって文字を指定するには、`\u` の後に[Unicode表](https://www.unicode.org/charts/)の4桁の16進数値を指定します：
 
 ```kotlin
 val unicodeNumber = '\u0031' // '1' と同等
@@ -62,7 +62,7 @@ val unicodeNumber = '\u0031' // '1' と同等
 
 ### 補助文字 {id="supplementary-characters"}
 
-絵文字や一部の歴史的な文字など、BMPの範囲外にあるUnicode文字は、単一の `Char` では表現できません。UTF-16ではこれらは_サロゲートペア_としてエンコードされ、`String` 内で2つの `Char` 値が組み合わさって1つのUnicode文字を表します：
+絵文字や一部の歴史的な文字など、BMP外のUnicode文字は単一の `Char` では表現できません。UTF-16ではこれらはサロゲートペア（_surrogate pair_）としてエンコードされ、`String` 内で2つの `Char` 値が合わさって1つのUnicode文字を表します：
 
 ```kotlin
 fun main() {
@@ -86,16 +86,16 @@ fun main() {
 
 すべてのエスケープシーケンスはバックスラッシュ（`\`）で始まります。
 
-| **サポートされているシーケンス** | **説明**              | 
-|----------------------------------|-----------------------|
-| `\t`                             | タブ                  | 
-| `\b`                             | バックスペース        | 
-| `\n`                             | 改行（LF）            | 
-| `\r`                             | 復帰（CR）            | 
-| `\'`                             | シングルクォーテーション | 
-| `\"`                             | ダブルクォーテーション |
-| `\\`                             | バックスラッシュ      | 
-| `\$`                             | ドル記号              | 
+| **サポートされているシーケンス** | **説明**               | 
+|------------------------|-----------------------|
+| `\t`                   | タブ                   | 
+| `\b`                   | バックスペース          | 
+| `\n`                   | 改行 (LF)             | 
+| `\r`                   | 復帰 (CR)             | 
+| `\'`                   | シングルクォーテーション | 
+| `\"`                   | ダブルクォーテーション   |
+| `\\`                   | バックスラッシュ        | 
+| `\$`                   | ドル記号               | 
 
 例：
 
@@ -107,13 +107,13 @@ val backslash = '\\'
 
 ## 操作 {id="operations"}
 
-`Char` は比較、判定、大文字・小文字の変換、および明示的な数値変換をサポートしています。
+`Char` は、比較、検査、大文字・小文字の変換、および明示的な数値変換をサポートしています。
 
 ### 文字の比較 {id="character-comparison"}
 
 `Char` 値を比較するには、`==`、`!=`、`<`、`>`、`<=`、`>=` などの標準的な[比較演算子](keyword-reference.md#operators-and-special-symbols)を使用します。
 
-Kotlinは `Char` 値をそれぞれのUnicode数値によって比較し、`Boolean` 値を返します：
+Kotlinは `Char` 値をその数値Unicode値によって比較し、`Boolean` 値を返します：
 
 ```kotlin
 val before = 'a' < 'b' // true
@@ -124,30 +124,29 @@ val equal = 'A' == 'A' // true
 
 ### 文字の処理 {id="character-processing"}
 
-Kotlinは文字値の判定や大文字・小文字の変換を行う関数を提供しています。
+Kotlinは、文字値の検査や大文字・小文字の変換を行うための関数を提供しています。
 例えば：
 
 ```kotlin
 fun main() {
 //sampleStart
     val myChar = 'A'
-    // 文字が数字を表しているかチェック
+    // 文字が数字を表しているかどうかを確認
     println(myChar.isDigit()) // false
-    // 文字が大文字を表しているかチェック
+    // 文字が大文字を表しているかどうかを確認
     println(myChar.isUpperCase()) // true
-    // 小文字に変換したものを返す
+    // 小文字の文字を返す
     println(myChar.lowercaseChar()) // 'a'
 //sampleEnd
 }
 ```
 {kotlin-runnable="true"}
 
-> 利用可能な関数の詳細については、
-> [APIリファレンス](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-char/)を参照してください。
+> 利用可能な関数の詳細については、[APIリファレンス](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-char/)を参照してください。
 >
 {style="note"}
 
-### 文字の演算 {id="character-arithmetic"}
+### 文字の算術演算 {id="character-arithmetic"}
 
 整数を加算または減算することで、別の文字値を作成できます：
 
@@ -164,11 +163,11 @@ fun main() {
 ```
 {kotlin-runnable="true"}
 
-> これらの演算は、言語固有のアルファベットの規則ではなく、Unicode値に基づきます。
+> これらの演算は、言語固有のアルファベット規則ではなく、Unicode値に従います。
 >
 {style="note"}
 
-また、可変変数に対して前置および後置形式のインクリメント（`++`）演算子やデクリメント（`--`）演算子を使用することもできます：
+可変変数に対して、前置および後置形式のインクリメント演算子（`++`）とデクリメント演算子（`--`）を使用することもできます：
 
 ```kotlin
 fun main() {
@@ -194,7 +193,7 @@ fun main() {
 
 `Char` を数値型に変換するには、明示的な変換を使用します：
 
-* 文字のUnicode数値を取得するには `.code` を使用します：
+* 文字の数値Unicode値を取得するには `.code` を使用します：
 
   ```kotlin
   fun main() { 
@@ -217,6 +216,6 @@ fun main() {
   ```
   {kotlin-runnable="true"}
 
-  > 文字が有効な数字でない可能性がある場合は、`digitToIntOrNull()` を使用してください。
+  > 文字が有効な数字ではない可能性がある場合は、`digitToIntOrNull()` を使用してください。
   >
   {style="tip"}

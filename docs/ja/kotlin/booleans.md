@@ -1,11 +1,11 @@
-[//]: # (title: ブール値（Booleans）)
-[//]: # (description: 宣言、論理演算子、条件分岐など、Kotlin での Boolean 値の使用方法について学びます。)
+[//]: # (title: ブール値)
+<web-summary>宣言、論理演算子、条件分岐など、Kotlin での Boolean 値の使い方を学びます。</web-summary>
 
 <show-structure depth="1"/>
 
-[`Boolean`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/) 型は、論理値である `true` と `false` を表します。
+[`Boolean`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/) 型は、論理値である `true` および `false` を表します。
 
-Yes/No の質問に答える関数や、`while`、`if`、`when` の条件式で `Boolean` 値を使用します。
+`Boolean` 値は、Yes/No の質問に答える関数や、`while`、`if`、`when` の条件式で使用します。
 
 ## `Boolean` 変数を宣言する {id="declare-a-boolean-variable"}
 
@@ -48,7 +48,7 @@ fun main() {
 ```
 {kotlin-runnable="true"}
 
-結果は、条件分岐やその他の式でも使用できます：
+その結果を条件式や他の式でも使用できます：
 
 ```kotlin
 fun main() {
@@ -64,14 +64,14 @@ fun main() {
 ```
 {kotlin-runnable="true"}
 
-## `Boolean` の演算 {id="boolean-operations"}
+## `Boolean` 演算 {id="boolean-operations"}
 
-Kotlin には、`Boolean` 値を扱うための演算子と中置関数（infix function）が用意されています。
-これらを使用して、`Boolean` 値を反転したり、複数の `Boolean` 値を組み合わせて単一の結果にしたりできます。
+Kotlin は、`Boolean` 値を操作するための演算子や中置関数（infix function）を提供しています。
+これらを使用して、`Boolean` 値を反転させたり、複数の `Boolean` 値を結合して単一の結果にしたりできます。
 
 ### 否定（NOT） {id="negation-not"}
 
-NOT 演算子は `Boolean` 値を反転します。
+NOT 演算子は `Boolean` 値を反転させます。
 
 NOT を使用するには、`Boolean` 値の前に `!` 演算子を置きます：
 
@@ -94,7 +94,7 @@ val d = true && true  // true
 ```
 
 > 最初のオペランドが `false` の場合、`&&` 演算子は2番目のオペランドの評価をスキップします。
-> 両方のオペランドを評価したい場合は、代わりに `and` [中置関数](functions.md#infix-notation)を使用してください。
+> 両方のオペランドを評価するには、代わりに `and` [中置関数](functions.md#infix-notation) を使用してください。
 >
 {style="note"}
 
@@ -112,7 +112,7 @@ val d = true || true   // true
 ```
 
 > 最初のオペランドが `true` の場合、`||` 演算子は2番目のオペランドの評価をスキップします。
-> 両方のオペランドを評価したい場合は、代わりに `or` [中置関数](functions.md#infix-notation)を使用してください。
+> 両方のオペランドを評価するには、代わりに `or` [中置関数](functions.md#infix-notation) を使用してください。
 >
 {style="note"}
 
@@ -129,15 +129,15 @@ val c = true xor false  // true
 val d = true xor true   // false
 ```
 
-> `xor` は演算子ではなく、[中置関数](functions.md#infix-notation)です。
+> `xor` は演算子ではなく、[中置関数](functions.md#infix-notation) です。
 >
-> `Boolean` 関数の詳細については、[API リファレンス](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/)を参照してください。
+> `Boolean` 関数の詳細については、[API リファレンス](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/) を参照してください。
 >
 {style="note"}
 
 ## 演算子の優先順位 {id="operator-precedence"}
 
-式に複数の論理演算が含まれており、評価順序を指定する括弧がない場合、Kotlin は優先順位の規則を適用します。優先順位の高い演算が、優先順位の低い演算よりも先に評価されます。
+式に複数の論理演算が含まれており、評価順序を指定する括弧がない場合、Kotlin は優先順位の規則を適用します。優先順位の高い演算は、優先順位の低い演算よりも先に評価されます。
 
 このセクションで説明した `Boolean` 演算の優先順位は次のとおりです：
 
@@ -158,7 +158,7 @@ fun main() {
 ```
 {kotlin-runnable="true" validate="false"}
 
-評価順序を明示的にするには、括弧を使用します：
+評価順序を明示するには、括弧を使用します：
 
 ```kotlin
 fun main() {
@@ -172,7 +172,7 @@ fun main() {
 
 ## 条件式における `Boolean` {id="boolean-in-conditions"}
 
-[`if`](control-flow.md#if-expression)、[`when`](control-flow.md#when-expressions-and-statements)、[`while`](control-flow.md#while-loops) は、プログラムの流れを制御するために `Boolean` 式を評価します。
+[`if`](control-flow.md#if-expression)、[`when`](control-flow.md#when-expressions-and-statements)、および [`while`](control-flow.md#while-loops) は、プログラムの制御フローを導くために `Boolean` 式を評価します。
 
 ### `if` 式 {id="if-expressions"}
 
@@ -182,7 +182,7 @@ fun main() {
     val number = 4
     val isEven = number % 2 == 0
 
-    // 条件はすでに `Boolean` 型を持っています
+    // 条件はすでに `Boolean` 型です
     // `true` や `false` と比較する必要はありません
     if (isEven) { 
         println("The number is even.")

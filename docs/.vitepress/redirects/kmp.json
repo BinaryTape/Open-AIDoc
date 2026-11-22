@@ -32,11 +32,19 @@
     "to": "kmp/multiplatform-publish-libraries-to-maven.md"
   },
   {
+    "from": "kmp/multiplatform-setup.md",
+    "to": "kmp/quickstart.md"
+  },
+  {
     "from": "kmp/multiplatform-update-ui.md",
     "to": "kmp/multiplatform-upgrade-app.md"
   },
   {
     "from": "kmp/multiplatform-wrap-up.md",
     "to": "kmp/multiplatform-upgrade-app.md"
+  },
+  {
+    "from": "kmp/whats-new-compose-eap.md",
+    "to": "kmp/whats-new-compose-113.md"
   }
 ]

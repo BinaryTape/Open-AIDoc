@@ -1,30 +1,30 @@
 [//]: # (title: 字元)
-[//]: # (description: 了解如何在 Kotlin 中使用 Char 型別，包括語法、Unicode 支援、轉義序列以及字元的常見操作。)
+<web-summary>了解如何在 Kotlin 中使用 Char 型別，包括語法、Unicode 支援、轉義序列以及常見的字元操作。</web-summary>
 
-[`Char`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-char/) 型別將單一字元表示為 UTF-16 編碼單元。
+[`Char`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-char/) 型別將單一字元表示為一個 UTF-16 編碼單元。
 
-對於個別字元值（例如字母、數字、標點符號或空白字元），請使用 `Char`。對於字元序列，請使用 [`String`](strings.md)。
+針對個別字元值（例如字母、數字、標點符號或空白字元），請使用 `Char`。針對字元序列，請使用 [`String`](strings.md)。
 
-> `Char` 並非數值型別，但每個字元都有一個可存取的數值 Unicode 值。
+> `Char` 不是數值型別，但每個字元都有一個可存取的 Unicode 數值。
 > 請參閱 [](#character-conversion)。
 > 
 {style="tip"}
 
 ## 語法 {id="syntax"}
 
-若要宣告字元，請將其值用單引號（`' '`）括起來。你可以明確指定 `Char` 型別，或讓 Kotlin 從值中推論型別：
+若要宣告字元，請將值用單引號（`' '`）括起來。你可以明確指定 `Char` 型別，或是讓 Kotlin 根據值推論型別：
 
 ```kotlin
 val letter: Char = 'a'
 
-// Kotlin 會推論為 Char，因為這些值是用單引號撰寫的
+// 由於值寫在單引號中，Kotlin 會推論為 Char
 val digit = '1'
 val symbol = '!'
 val space = ' '
 val separator = ':'
 ```
 
-字元常值必須剛好包含一個字元。否則，Kotlin 編譯器會回報錯誤：
+字元常值必須恰好包含一個字元。否則，Kotlin 編譯器會回報錯誤：
 
 ```kotlin
 val invalid = 'AB' // 錯誤
@@ -32,7 +32,7 @@ val invalidEmpty = '' // 錯誤
 ```
 {validate="false"}
 
-### 可為 null 的值 {id="nullable-values"}
+### 可為 Null 的值 {id="nullable-values"}
 
 若要儲存可為 null 的值，請使用 `Char?`：
 
@@ -47,15 +47,14 @@ val maybeAbsent: Char? = null
 
 ## Unicode 支援 {id="unicode-support"}
 
-Kotlin 將 `Char` 值表示為 UTF-16 編碼單元。這表示單一 `Char` 儲存的是一個 UTF-16 編碼單元，不一定是一個完整的 Unicode 字元。
+Kotlin 將 `Char` 值表示為 UTF-16 編碼單元。這表示單一 `Char` 儲存一個 UTF-16 編碼單元，而不一定是完整的單一 Unicode 字元。
 
 ### 基本多語言平面 {id="basic-multilingual-plane"}
 
-單一 `Char` 可以儲存範圍在 `\u0000` 到 `\uFFFF` 之間的值。
-此範圍涵蓋了基本多語言平面 (Basic Multilingual Plane, BMP)，其中包含幾乎所有現代語言的字元以及大量的符號。
+單一 `Char` 可以儲存從 `\u0000` 到 `\uFFFF` 範圍內的值。
+此範圍涵蓋了基本多語言平面 (BMP)，其中包含幾乎所有現代語言的字元以及大量符號。
 
-若要透過 Unicode 值指定字元，請使用 `\u` 後接來自
-[Unicode 表格](https://www.unicode.org/charts/) 的四位十六進位數值：
+若要透過 Unicode 值指定字元，請使用 `\u` 後接來自 [Unicode 表](https://www.unicode.org/charts/) 的四位十六進位數值：
 
 ```kotlin
 val unicodeNumber = '\u0031' // 等於 '1'
@@ -63,7 +62,7 @@ val unicodeNumber = '\u0031' // 等於 '1'
 
 ### 增補字元 {id="supplementary-characters"}
 
-BMP 之外的 Unicode 字元（例如 Emoji 表情符號和某些歷史文字）無法用單一 `Char` 表示。在 UTF-16 中，它們被編碼為_代理對 (surrogate pair)_，其中兩個 `Char` 值在 `String` 中共同表示一個 Unicode 字元：
+BMP 之外的 Unicode 字元（例如 Emoji 和某些歷史文字）無法由單一 `Char` 表示。在 UTF-16 中，它們被編碼為*代理對 (surrogate pair)*，其中兩個 `Char` 值在 `String` 中共同表示一個 Unicode 字元：
 
 ```kotlin
 fun main() {
@@ -77,13 +76,13 @@ fun main() {
 }
 ```
 
-> 若要個別處理 32 位元符號，請使用儲存為 `Int` 值的 Unicode 碼位 (code points)。
+> 若要單獨處理 32 位元符號，請使用儲存為 `Int` 值的 Unicode 碼位 (code point)。
 >
 {style="tip"}
 
 ## 轉義序列 {id="escape-sequences"}
 
-對於難以直接在原始碼中撰寫或具有特殊含義的特殊字元，請使用轉義序列。
+對於難以直接寫入原始碼或具有特殊意義的特殊字元，請使用轉義序列。
 
 每個轉義序列都以反斜線（`\`）開頭。
 
@@ -114,7 +113,7 @@ val backslash = '\\'
 
 若要比較 `Char` 值，請使用標準的[比較運算子](keyword-reference.md#operators-and-special-symbols)，例如 `==`、`!=`、`<`、`>`、`<=` 和 `>=`。
 
-Kotlin 依據字元的數值 Unicode 值來比較 `Char` 值，並傳回一個 `Boolean` 值：
+Kotlin 依據其 Unicode 數值來比較 `Char` 值，並傳回一個 `Boolean` 值：
 
 ```kotlin
 val before = 'a' < 'b' // true
@@ -125,7 +124,7 @@ val equal = 'A' == 'A' // true
 
 ### 字元處理 {id="character-processing"}
 
-Kotlin 提供了用於檢查字元值及轉換其大小寫的函式。
+Kotlin 提供了用於檢查及大小寫轉換字元值的函式。
 例如：
 
 ```kotlin
@@ -136,21 +135,20 @@ fun main() {
     println(myChar.isDigit()) // false
     // 檢查該字元是否表示大寫字母
     println(myChar.isUpperCase()) // true
-    // 回傳小寫版本
+    // 傳回小寫版本
     println(myChar.lowercaseChar()) // 'a'
 //sampleEnd
 }
 ```
 {kotlin-runnable="true"}
 
-> 進一步了解可用函式，請參閱 
-> [API 參考](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-char/)。
+> 請在 [API 參考](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-char/)中深入了解可用函式。
 >
 {style="note"}
 
 ### 字元算術運算 {id="character-arithmetic"}
 
-你可以透過加上或減去一個整數來建立另一個字元值：
+你可以透過加上或減去整數來建立另一個字元值：
 
 ```kotlin
 fun main() {
@@ -165,11 +163,11 @@ fun main() {
 ```
 {kotlin-runnable="true"}
 
-> 這些運算遵循 Unicode 數值，而非特定語言的字母表規則。
+> 這些運算遵循 Unicode 數值，而非特定語言的字母順序規則。
 >
 {style="note"}
 
-你也可以在可變變數上使用前綴和後綴形式的遞增（`++`）與遞減（`--`）運算子：
+你也可以在可變變數上使用前綴和後綴形式的遞增（`++`）和遞減（`--`）運算子：
 
 ```kotlin
 fun main() {
@@ -195,7 +193,7 @@ fun main() {
 
 若要將 `Char` 轉換為數值型別，請使用明確轉換：
 
-* 使用 `.code` 來取得字元的數值 Unicode 值：
+* 使用 `.code` 取得字元的 Unicode 數值：
 
   ```kotlin
   fun main() { 
@@ -218,6 +216,6 @@ fun main() {
   ```
   {kotlin-runnable="true"}
 
-  > 如果該字元可能不是有效的數字，請使用 `digitToIntOrNull()`。
+  > 如果該字元可能不是有效數字，請使用 `digitToIntOrNull()`。
   >
   {style="tip"}

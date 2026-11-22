@@ -1,20 +1,20 @@
-[//]: # (title: Dokka Gradle の設定オプション)
+[//]: # (title: DokkaのGradle設定オプション)
 
-Dokka には、あなた自身および読者のエクスペリエンスをカスタマイズするための多くの設定オプションが用意されています。
+Dokkaには、作成者と読者の体験をカスタマイズするための多くの設定オプションがあります。
 
-以下では、各設定セクションの詳細な説明といくつかの例を示します。
-また、[すべての設定オプションを適用した例](#complete-configuration)も確認できます。
+以下に、各設定セクションの詳細な説明といくつかの例を示します。[すべての設定オプション](#complete-configuration)を適用した例も確認できます。
 
-シングルプロジェクトおよびマルチプロジェクトのビルドに設定ブロックを適用する方法の詳細については、[設定例](dokka-gradle.md#configuration-examples)を参照してください。
+単一プロジェクトおよびマルチプロジェクトのビルドで設定ブロックを適用する方法の詳細については、[設定例](dokka-gradle.md#configuration-examples)を参照してください。
 
-### 一般設定 (General configuration) {id="general-configuration"}
+### 一般設定 {id="general-configuration"}
 
-以下は、一般的な Dokka Gradle プラグイン設定の例です：
+Dokka Gradleプラグインの一般的な設定例は以下のとおりです。
 
-* トップレベルの `dokka {}` DSL 設定を使用します。
-* DGP では、`dokkaPublications{}` ブロックで Dokka パブリケーション設定を宣言します。
-* デフォルトのパブリケーションは [`html`](dokka-html.md) および [`javadoc`](dokka-javadoc.md) です。
-* Gradle の Kotlin DSL では型安全なアクセサ（type-safe accessors）が使用されるため、`build.gradle.kts` ファイルの構文は通常の `.kt` ファイル（Kotlin カスタムプラグインに使用されるファイルなど）とは異なります。
+* トップレベルの `dokka {}` DSL設定を使用します。
+* DGPでは、Dokka publication（公開）設定を `dokkaPublications{}` ブロックで宣言します。
+* デフォルトのpublicationは [`html`](dokka-html.md) と [`javadoc`](dokka-javadoc.md) です。
+
+* GradleのKotlin DSLはタイプセーフアクセサー（type-safe accessors）を使用するため、`build.gradle.kts` ファイルの構文は通常の `.kt` ファイル（Kotlinカスタムプラグインなどで使用されるものなど）とは異なります。
 
 <tabs group="build-script">
 <tab title="Gradle Kotlin DSL" group-key="kotlin">
@@ -28,7 +28,7 @@ dokka {
     dokkaPublications.html {
         moduleName.set(project.name)
         moduleVersion.set(project.version.toString())
-        // Standard output directory for HTML documentation
+        // HTMLドキュメントの標準出力ディレクトリ
         outputDirectory.set(layout.buildDirectory.dir("dokka/html"))
         failOnWarning.set(false)
         suppressInheritedMembers.set(false)
@@ -36,12 +36,12 @@ dokka {
         offlineMode.set(false)
         includes.from("packages.md", "extra.md")
         
-        // Output directory for additional files
-        // Use this block instead of the standard when you 
-        // want to change the output directory and include extra files
+        // 追加ファイルの出力ディレクトリ
+        // 出力ディレクトリを変更して追加ファイルを含めたい場合は、
+        // 標準ブロックの代わりにこれを使用します
         outputDirectory.set(rootDir.resolve("docs/api/0.x"))
         
-        // Use fileTree to add multiple files
+        // 複数のファイルを追加するにはfileTreeを使用します
         includes.from(
             fileTree("docs") {
                 include("**/*.md")
@@ -51,7 +51,7 @@ dokka {
 }
 ```
 
-ファイルの操作に関する詳細については、[Gradle のドキュメント](https://docs.gradle.org/current/userguide/working_with_files.html#sec:file_trees)を参照してください。
+ファイルの操作に関する詳細については、[Gradleドキュメント](https://docs.gradle.org/current/userguide/working_with_files.html#sec:file_trees)を参照してください。
 
 </tab>
 <tab title="Kotlin custom plugin" group-key="kotlin custom">
@@ -73,7 +73,7 @@ abstract class CustomPlugin : Plugin<Project> {
             dokka.moduleVersion.set(project.version.toString())
 
             dokka.dokkaPublications.named("html") { publication ->
-                // Standard output directory for HTML documentation
+                // HTMLドキュメントの標準出力ディレクトリ
                 publication.outputDirectory.set(project.layout.buildDirectory.dir("dokka/html"))
                 publication.failOnWarning.set(true)
                 publication.suppressInheritedMembers.set(true)
@@ -81,9 +81,9 @@ abstract class CustomPlugin : Plugin<Project> {
                 publication.suppressObviousFunctions.set(true)
                 publication.includes.from("packages.md", "extra.md")
 
-                // Output directory for additional files
-                // Use this instead of the standard block when you 
-                // want to change the output directory and include extra files
+                // 追加ファイルの出力ディレクトリ
+                // 出力ディレクトリを変更して追加ファイルを含めたい場合は、
+                // 標準ブロックの代わりにこれを使用します
                 html.outputDirectory.set(project.rootDir.resolve("docs/api/0.x"))
             }
         }
@@ -102,23 +102,23 @@ plugins {
 dokka {
     dokkaPublications {
         html {
-            // Sets general module information
+            // モジュールの基本情報を設定
             moduleName.set(project.name)
             moduleVersion.set(project.version.toString())
 
-            // Standard output directory for HTML documentation
+            // HTMLドキュメントの標準出力ディレクトリ
             outputDirectory.set(layout.buildDirectory.dir("dokka/html"))
 
-            // Core Dokka options
+            // Dokkaのコアオプション
             failOnWarning.set(false)
             suppressInheritedMembers.set(false)
             suppressObviousFunctions.set(true)
             offlineMode.set(false)
             includes.from(files("packages.md", "extra.md"))
 
-            // Output directory for additional files
-            // Use this block instead of the standard when you want to 
-            // change the output directory and include extra files
+            // 追加ファイルの出力ディレクトリ
+            // 出力ディレクトリを変更して追加ファイルを含めたい場合は、
+            // 標準ブロックの代わりにこれを使用します
             outputDirectory.set(file("$rootDir/docs/api/0.x"))
         }
     }
@@ -131,84 +131,77 @@ dokka {
 <deflist collapsible="true">
     <def title="moduleName">
         <p>
-           プロジェクトドキュメントの表示名です。目次、ナビゲーション、ヘッダー、ログメッセージに表示されます。マルチプロジェクトビルドでは、集約されたドキュメント内で各サブプロジェクトの <code>moduleName</code> がセクションタイトルとして使用されます。
+           プロジェクトドキュメントの表示名です。目次、ナビゲーション、ヘッダー、ログメッセージに表示されます。マルチプロジェクトビルドでは、各サブプロジェクトの <code>moduleName</code> が集約ドキュメント内のセクションタイトルとして使用されます。
         </p>
-        <p>デフォルト：Gradle プロジェクト名</p>
+        <p>デフォルト: Gradleプロジェクト名</p>
     </def>
     <def title="moduleVersion">
         <p>
-            生成されたドキュメントに表示されるサブプロジェクトのバージョンです。
-            シングルプロジェクトビルドでは、プロジェクトのバージョンとして使用されます。
-            マルチプロジェクトビルドでは、ドキュメントを集約する際に各サブプロジェクトの <code>moduleVersion</code> が使用されます。
+            生成されたドキュメントに表示されるサブプロジェクトのバージョンです。単一プロジェクトビルドでは、プロジェクトのバージョンとして使用されます。マルチプロジェクトビルドでは、ドキュメントを集約する際に各サブプロジェクトの <code>moduleVersion</code> が使用されます。
         </p>
-        <p>デフォルト：Gradle プロジェクトのバージョン</p>
+        <p>デフォルト: Gradleプロジェクトのバージョン</p>
     </def>
     <def title="outputDirectory">
         <p>生成されたドキュメントが保存されるディレクトリです。</p>
-        <p>この設定は、<code>dokkaGenerate</code> タスクによって生成されるすべてのドキュメントフォーマット（HTML、Javadoc など）に適用されます。</p>
-        <p>デフォルト：<code>build/dokka/html</code></p>
-        <p><b>追加ファイル用の出力ディレクトリ</b></p>
-        <p>シングルプロジェクトビルドとマルチプロジェクトビルドの両方で、出力ディレクトリを指定し、追加ファイルを含めることができます。
-           マルチプロジェクトビルドの場合は、ルートプロジェクトの設定で出力ディレクトリを設定し、追加ファイルを含めてください。
+        <p>この設定は、<code>dokkaGenerate</code> タスクによって生成されるすべてのドキュメント形式（HTML、Javadocなど）に適用されます。</p>
+        <p>デフォルト: <code>build/dokka/html</code></p>
+        <p><b>追加ファイルの出力ディレクトリ</b></p>
+        <p>単一プロジェクトおよびマルチプロジェクトビルドの両方で、出力ディレクトリを指定して追加ファイルを含めることができます。マルチプロジェクトビルドの場合は、ルートプロジェクトの設定で出力ディレクトリを設定し、追加ファイルを含めてください。
         </p>
     </def>
     <def title="failOnWarning">
         <p>
-            ドキュメント生成中に警告が発生した場合に、Dokka がビルドを失敗させるかどうかを決定します。
-            処理は、まずすべてのエラーと警告が出力されるまで待機します。
+            ドキュメント生成中に警告が発生した際に、Dokkaがビルドを失敗させるかどうかを決定します。処理はまずすべてのエラーと警告が出力されるまで待機します。
         </p>
         <p>この設定は <code>reportUndocumented</code> と併用すると効果的です。</p>
-        <p>デフォルト：<code>false</code></p>
+        <p>デフォルト: <code>false</code></p>
     </def>
     <def title="suppressInheritedMembers">
-        <p>特定のクラスで明示的にオーバーライドされていない継承メンバーを除外（抑制）するかどうかを設定します。</p>
+        <p>特定のクラスで明示的にオーバーライドされていない継承メンバーを除外するかどうか。</p>
         <p>
-            注意：
-            これにより <code>equals</code>、<code>hashCode</code>、<code>toString</code> などの関数は除外されますが、<code>dataClass.componentN</code> や <code>dataClass.copy</code> などの合成関数（synthetic functions）は除外されません。
-            これらを除外するには <code>suppressObviousFunctions</code> を使用してください。
+            注意: これにより <code>equals</code>、<code>hashCode</code>、<code>toString</code> などの関数は除外されますが、<code>dataClass.componentN</code> や <code>dataClass.copy</code> などの合成（synthetic）関数は除外されません。それらを除外するには <code>suppressObviousFunctions</code> を使用してください。
         </p>
-        <p>デフォルト：<code>false</code></p>
+        <p>デフォルト: <code>false</code></p>
     </def>
     <def title="suppressObviousFunctions">
-        <p>自明な関数（obvious functions）を除外（抑制）するかどうかを設定します。</p>
+        <p>自明な（obvious）関数を除外するかどうか。</p>
         <p>
-            以下のいずれかに該当する場合、自明な関数とみなされます：</p>
+            関数が以下のいずれかに該当する場合、自明であるとみなされます:</p>
             <list>
                 <li>
-                    <code>kotlin.Any</code>、<code>Kotlin.Enum</code>、<code>java.lang.Object</code>、または <code>java.lang.Enum</code> から継承されたもの（例：<code>equals</code>、<code>hashCode</code>、<code>toString</code>）。
+                    <code>equals</code>、<code>hashCode</code>、<code>toString</code> のように、<code>kotlin.Any</code>、<code>Kotlin.Enum</code>、<code>java.lang.Object</code>、または <code>java.lang.Enum</code> から継承されている。
                 </li>
                 <li>
-                    合成されたもの（コンパイラによって生成されたもの）で、ドキュメントが存在しないもの（例：<code>dataClass.componentN</code>、<code>dataClass.copy</code>）。
+                    <code>dataClass.componentN</code> や <code>dataClass.copy</code> のように、合成された（コンパイラによって生成された）ものであり、ドキュメントが存在しない。
                 </li>
             </list>
-        <p>デフォルト：<code>true</code></p>
+        <p>デフォルト: <code>true</code></p>
     </def>
     <def title="offlineMode">
-        <p>ネットワーク経由でリモートファイルやリンクを解決するかどうかを設定します。</p>
+        <p>ネットワーク経由でリモートファイルやリンクを解決するかどうか。</p>
         <p>
-            これには、外部ドキュメントへのリンク生成に使用される package-list が含まれます。
-            たとえば、これによりドキュメント内で標準ライブラリのクラスをクリック可能にすることができます。
+            これには、外部ドキュメントへのリンク生成に使用される package-list が含まれます。たとえば、これにより標準ライブラリのクラスをドキュメント内でクリック可能にできます。
         </p>
         <p>
-            これを <code>true</code> に設定すると、場合によってはビルド時間を大幅に短縮できますが、標準ライブラリを含む依存関係からのクラスやメンバーのリンクが解決されなくなるなど、ユーザーエクスペリエンスが低下する可能性もあります。
+            これを <code>true</code> に設定すると、場合によってはビルド時間を大幅に短縮できますが、標準ライブラリを含む依存関係のクラスやメンバーへのリンクが解決されなくなるなど、ユーザー体験が悪化する可能性もあります。
         </p>
-        <p>注意：取得したファイルをローカルにキャッシュし、ローカルパスとして Dokka に指定することもできます。<code>&lt;a href="#external-documentation-links-configuration"&gt;externalDocumentationLinks&lt;/a&gt;</code> セクションを参照してください。</p>
-        <p>デフォルト：<code>false</code></p>
+        <p>注意: 取得したファイルをローカルにキャッシュし、ローカルパスとしてDokkaに提供することができます。<code>&lt;a href="#external-documentation-links-configuration"&gt;externalDocumentationLinks&lt;/a&gt;</code> セクションを参照してください。</p>
+        <p>デフォルト: <code>false</code></p>
     </def>
      <def title="includes">
         <p>
-            <a href="dokka-module-and-package-docs.md">サブプロジェクトおよびパッケージのドキュメント</a>を含む Markdown ファイルのリストです。Markdown ファイルは<a href="dokka-module-and-package-docs.md#file-format">必要な形式</a>に一致している必要があります。
+            <a href="dokka-module-and-package-docs.md">サブプロジェクトおよびパッケージのドキュメント</a>を含むMarkdownファイルのリストです。Markdownファイルは<a href="dokka-module-and-package-docs.md#file-format">必要な形式</a>に一致している必要があります。
         </p>
-        <p>指定されたファイルの内容は解析され、サブプロジェクトやパッケージの説明としてドキュメントに埋め込まれます。</p>
+        <p>指定されたファイルの内容が解析され、サブプロジェクトやパッケージの説明としてドキュメントに埋め込まれます。</p>
         <p>
-            どのような形式でどのように使用するかの例については、<a href="https://github.com/Kotlin/dokka/blob/master/examples/gradle-v2/basic-gradle-example/build.gradle.kts">Dokka Gradle の例</a>を参照してください。
+            外観や使用方法の例については、<a href="https://github.com/Kotlin/dokka/blob/master/examples/gradle-v2/basic-gradle-example/build.gradle.kts">Dokka Gradleの例</a>を参照してください。
         </p>
     </def>
 </deflist>
 
-### ソースセット設定 (Source set configuration) {id="source-set-configuration"}
+### ソースセット設定 {id="source-set-configuration"}
 
-Dokka では、[Kotlin ソースセット](https://kotlinlang.org/docs/multiplatform-discover-project.html#source-sets)に対していくつかのオプションを設定できます：
+Dokkaでは、[Kotlinソースセット](https://kotlinlang.org/docs/multiplatform-discover-project.html#source-sets)のいくつかのオプションを設定できます。
 
 <tabs group="build-script">
 <tab title="Gradle Kotlin DSL" group-key="kotlin">
@@ -218,12 +211,12 @@ import org.jetbrains.dokka.gradle.engine.parameters.VisibilityModifier
 
 dokka {
     // ..
-    // General configuration section
+    // 一般設定セクション
     // ..
 
-    // Source sets configuration
+    // ソースセット設定
     dokkaSourceSets {
-        // Example: Configuration exclusive to the 'linux' source set
+        // 例: 'linux' ソースセット専用の設定
         named("linux") {
             dependentSourceSets{named("native")}
             sourceRoots.from(file("linux/src"))
@@ -232,7 +225,7 @@ dokka {
         configureEach {
             suppress.set(false)
             displayName.set(name)
-            documentedVisibilities.set(setOf(VisibilityModifier.Public)) // OR documentedVisibilities(VisibilityModifier.Public)
+            documentedVisibilities.set(setOf(VisibilityModifier.Public)) // または documentedVisibilities(VisibilityModifier.Public)
             reportUndocumented.set(false)
             skipEmptyPackages.set(true)
             skipDeprecated.set(false)
@@ -245,13 +238,13 @@ dokka {
             samples.from("samples/Basic.kt", "samples/Advanced.kt")
            
             sourceLink {
-                // Source link section
+                // ソースリンクセクション
             }
             perPackageOption {
-                // Package options section
+                // パッケージオプションセクション
             }
             externalDocumentationLinks {
-                // External documentation links section
+                // 外部ドキュメントリンクセクション
             }
         }
     }
@@ -266,11 +259,12 @@ import org.jetbrains.dokka.gradle.engine.parameters.VisibilityModifier
 
 dokka {
     // ..
-    // General configuration section
+    // 一般設定セクション
     // ..
 
+    // ソースセット設定
     dokkaSourceSets {
-        // Example: Configuration exclusive to the 'linux' source set
+        // 例: 'linux' ソースセット専用の設定
         named("linux") {
             dependentSourceSets { named("native") }
             sourceRoots.from(file("linux/src"))
@@ -279,7 +273,7 @@ dokka {
         configureEach {
             suppress.set(false)
             displayName.set(name)
-            documentedVisibilities.set([VisibilityModifier.Public] as Set) // OR documentedVisibilities(VisibilityModifier.Public)
+            documentedVisibilities.set([VisibilityModifier.Public] as Set) // または documentedVisibilities(VisibilityModifier.Public)
             reportUndocumented.set(false)
             skipEmptyPackages.set(true)
             skipDeprecated.set(false)
@@ -292,13 +286,13 @@ dokka {
             samples.from("samples/Basic.kt", "samples/Advanced.kt")
 
             sourceLink {
-                // Source link section
+                // ソースリンクセクション
             }
             perPackageOption {
-                // Package options section
+                // パッケージオプションセクション
             }
             externalDocumentationLinks {
-                // External documentation links section
+                // 外部ドキュメントリンクセクション
             }
         }
     }
@@ -310,115 +304,121 @@ dokka {
 
 <deflist collapsible="true">
     <def title="suppress">
-        <p>ドキュメント生成時にこのソースセットをスキップするかどうかを設定します。</p>
-        <p>デフォルト：<code>false</code></p>
+        <p>ドキュメント生成時にこのソースセットをスキップするかどうか。</p>
+        <p>デフォルト: <code>false</code></p>
     </def>
     <def title="displayName">
-        <p>このソースセットを参照するために使用される表示名です。</p>
+        <p>このソースセットを参照するために使用される表示名。</p>
         <p>
             この名前は、外部向け（ドキュメントの読者に表示されるソースセット名など）と内部向け（<code>reportUndocumented</code> のログメッセージなど）の両方で使用されます。
         </p>
-        <p>デフォルトでは、Kotlin Gradle プラグインから提供される情報に基づいて推測されます。</p>
+        <p>デフォルトでは、Kotlin Gradleプラグインから提供される情報に基づいて推測されます。</p>
     </def>
     <def title="documentedVisibilities">
-        <p>生成されるドキュメントに Dokka が含めるべき可視性修飾子（visibility modifiers）を定義します。</p>
+        <p>生成されるドキュメントにDokkaが含める可視性修飾子を定義します。</p>
         <p>
-            <code>protected</code>、<code>internal</code>、<code>private</code> の宣言をドキュメント化したい場合や、<code>public</code> の宣言を除外して内部 API のみをドキュメント化したい場合に使用します。
+            <code>protected</code>、<code>internal</code>、<code>private</code> の宣言をドキュメント化したい場合や、<code>public</code> 宣言を除外して内部APIのみをドキュメント化したい場合に使用します。
         </p>
         <p>
-            さらに、Dokka の <a href="https://github.com/Kotlin/dokka/blob/v2.3.0/dokka-runners/dokka-gradle-plugin/src/main/kotlin/engine/parameters/HasConfigurableVisibilityModifiers.kt"><code>documentedVisibilities()</code> 関数</a>を使用して、ドキュメント化する可視性を追加することもできます。
+            さらに、Dokkaの 
+            <a href="https://github.com/Kotlin/dokka/blob/v2.3.0/dokka-runners/dokka-gradle-plugin/src/main/kotlin/engine/parameters/HasConfigurableVisibilityModifiers.kt"><code>documentedVisibilities()</code> 関数</a> 
+            を使用して、ドキュメント対象の可視性を追加することもできます。
         </p>
         <p>これは個々のパッケージごとに設定できます。</p>
-        <p>デフォルト：<code>VisibilityModifier.Public</code></p>
+        <p>デフォルト: <code>VisibilityModifier.Public</code></p>
     </def>
     <def title="reportUndocumented">
         <p>
-            可視状態にあるドキュメント化されていない宣言（<code>documentedVisibilities</code> やその他のフィルタによってフィルタリングされた後、KDoc を持たない宣言）について警告を出力するかどうかを設定します。
+            <code>documentedVisibilities</code> やその他のフィルターでフィルタリングされた後、ドキュメントのない（KDocがない）可視宣言について警告を出力するかどうか。
         </p>
         <p>この設定は <code>failOnWarning</code> と併用すると効果的です。</p>
         <p>これは個々のパッケージごとに設定できます。</p>
-        <p>デフォルト：<code>false</code></p>
+        <p>デフォルト: <code>false</code></p>
     </def>
     <def title="skipEmptyPackages">
         <p>
-            各種フィルタが適用された後に、可視状態の宣言が含まれていないパッケージをスキップするかどうかを設定します。
+            各種フィルターが適用された後に、可視宣言を含まないパッケージをスキップするかどうか。
         </p>
         <p>
             たとえば、<code>skipDeprecated</code> が <code>true</code> に設定されており、パッケージに非推奨の宣言しか含まれていない場合、そのパッケージは空であるとみなされます。
         </p>
-        <p>デフォルト：<code>true</code></p>
+        <p>デフォルト: <code>true</code></p>
     </def>
     <def title="skipDeprecated">
-        <p><code>@Deprecated</code> でアノテーションが付けられた宣言をドキュメント化するかどうかを設定します。</p>
+        <p><code>@Deprecated</code> でアノテーションが付けられた宣言をドキュメント化するかどうか。</p>
         <p>これは個々のパッケージごとに設定できます。</p>
-        <p>デフォルト：<code>false</code></p>
+        <p>デフォルト: <code>false</code></p>
     </def>
     <def title="suppressGeneratedFiles">
-        <p>生成されたファイルをドキュメント化するかどうかを設定します。</p>
+        <p>生成されたファイルをドキュメント化するかどうか。</p>
         <p>
-            生成されたファイルは、<code>{project}/{buildDir}/generated</code> ディレクトリ配下に存在することが想定されています。
+            生成されたファイルは <code>{project}/{buildDir}/generated</code> ディレクトリの下に存在することが想定されています。
         </p>
         <p>
-            <code>true</code> に設定すると、そのディレクトリ内のすべてのファイルが事実上 <code>suppressedFiles</code> オプションに追加されるため、手動で設定することも可能です。
+            <code>true</code> に設定すると、そのディレクトリのすべてのファイルが事実上 <code>suppressedFiles</code> オプションに追加されるため、手動で設定することも可能です。
         </p>
-        <p>デフォルト：<code>true</code></p>
+        <p>デフォルト: <code>true</code></p>
     </def>
     <def title="suppressAnnotatedWith">
-        <p>ドキュメントから除外する宣言に付けられたアノテーションの完全修飾名（FQN）のセットです。</p>
+        <p>宣言を除外するためのアノテーションの完全修飾名（FQN）のセット。</p>
         <p>
             これらのアノテーションのいずれかが付与されている宣言は、生成されるドキュメントから除外されます。
         </p>
     </def>
     <def title="jdkVersion">
-        <p>Java の型に対する外部ドキュメントリンクを生成する際に使用する JDK バージョンです。</p>
+        <p>Java型に対する外部ドキュメントリンクを生成する際に使用するJDKバージョン。</p>
         <p>
-            たとえば、公開宣言のシグネチャで <code>java.util.UUID</code> を使用しており、このオプションが <code>8</code> に設定されている場合、Dokka はそれに対して <a href="https://docs.oracle.com/javase/8/docs/api/java/util/UUID.html">JDK 8 Javadoc</a> への外部ドキュメントリンクを生成します。
+            たとえば、公開宣言のシグネチャで <code>java.util.UUID</code> を使用しており、このオプションが <code>8</code> に設定されている場合、Dokkaはそれに対して <a href="https://docs.oracle.com/javase/8/docs/api/java/util/UUID.html">JDK 8 Javadocs</a> への外部ドキュメントリンクを生成します。
         </p>
-        <p>デフォルト：`8`</p>
+        <p>デフォルト: `8`</p>
     </def>
     <def title="languageVersion">
         <p>
-            解析環境および <a href="https://kotlinlang.org/docs/kotlin-doc.html#sample-identifier">@sample</a> 環境の設定に使用される <a href="https://kotlinlang.org/docs/compatibility-modes.html">Kotlin 言語バージョン</a>です。
+            解析および <a href="https://kotlinlang.org/docs/kotlin-doc.html#sample-identifier">@sample</a>
+            環境のセットアップに使用される <a href="https://kotlinlang.org/docs/compatibility-modes.html">Kotlin言語バージョン</a>。
         </p>
-        <p>デフォルトでは、Dokka の組み込みコンパイラで利用可能な最新の言語バージョンが使用されます。</p>
+        <p>デフォルトでは、Dokkaの組み込みコンパイラで利用可能な最新の言語バージョンが使用されます。</p>
     </def>
     <def title="apiVersion">
         <p>
-            解析環境および <a href="https://kotlinlang.org/docs/kotlin-doc.html#sample-identifier">@sample</a> 環境の設定に使用される <a href="https://kotlinlang.org/docs/compatibility-modes.html">Kotlin API バージョン</a>です。
+            解析および <a href="https://kotlinlang.org/docs/kotlin-doc.html#sample-identifier">@sample</a>
+            環境のセットアップに使用される <a href="https://kotlinlang.org/docs/compatibility-modes.html">Kotlin APIバージョン</a>。
         </p>
         <p>デフォルトでは、<code>languageVersion</code> から推測されます。</p>
     </def>
     <def title="sourceRoots">
         <p>
-            解析およびドキュメント化の対象となるソースコードのルートです。
-            ディレクトリ、および個別の <code>.kt</code> ファイルと <code>.java</code> ファイルを指定できます。
+            解析およびドキュメント化の対象となるソースコードのルート。
+            受け入れ可能な入力は、ディレクトリならびに個別の <code>.kt</code> および <code>.java</code> ファイルです。
         </p>
-        <p>デフォルトでは、Kotlin Gradle プラグインから提供される情報に基づいてソースルートが推測されます。</p>
+        <p>デフォルトでは、ソースルートはKotlin Gradleプラグインから提供される情報に基づいて推測されます。</p>
     </def>
     <def title="classpath">
-        <p>解析および対話型サンプルのためのクラスパスです。</p>
-        <p>これは、依存関係から取得される一部の型が自動的に解決されない、または認識されない場合に役立ちます。</p>
-        <p>このオプションは、<code>.jar</code> ファイルと <code>.klib</code> ファイルの両方を受け入れます。</p>
-        <p>デフォルトでは、Kotlin Gradle プラグインから提供される情報に基づいてクラスパスが推測されます。</p>
+        <p>解析およびインタラクティブなサンプルのためのクラスパス。</p>
+        <p>依存関係に由来する一部の型が自動的に解決または検出されない場合に役立ちます。</p>
+        <p>このオプションは <code>.jar</code> ファイルと <code>.klib</code> ファイルの両方を受け入れます。</p>
+        <p>デフォルトでは、クラスパスはKotlin Gradleプラグインから提供される情報に基づいて推測されます。</p>
     </def>
     <def title="samples">
         <p>
-            <a href="https://kotlinlang.org/docs/kotlin-doc.html#sample-identifier">@sample</a> KDoc タグを介して参照されるサンプル関数を含むディレクトリまたはファイルのリストです。
+            <a href="https://kotlinlang.org/docs/kotlin-doc.html#sample-identifier">@sample</a> KDocタグを通じて参照されるサンプル関数を含むディレクトリまたはファイルのリスト。
         </p>
     </def>
 </deflist>
 
-### ソースリンク設定 (Source link configuration) {id="source-link-configuration"}
+### ソースリンク設定 {id="source-link-configuration"}
 
-読者がリモートリポジトリ内で各宣言のソースコードを見つけられるように、ソースリンクを設定します。
+読者がリモートリポジトリ内の各宣言のソースを見つけられるように、ソースリンクを設定します。
 この設定には `dokkaSourceSets.main {}` ブロックを使用します。
 
-`sourceLinks {}` 設定ブロックを使用すると、各シグネチャに特定の行番号が付いた `remoteUrl` への `source` リンクを追加できます。
-行番号は `remoteLineSuffix` を設定することでカスタマイズ可能です。
+`sourceLinks {}` 設定ブロックを使用すると、各シグネチャに特定の行番号付きで `remoteUrl` にリンクする `source` リンクを追加できます。
+行番号は `remoteLineSuffix` を設定することで構成可能です。
 
-例として、`kotlinx.coroutines` 内の [`count()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/count.html) 関数のドキュメントを参照してください。
+例については、`kotlinx.coroutines` の
+[`count()`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/count.html)
+関数のドキュメントを参照してください。
 
-Gradle の Kotlin DSL では型安全なアクセサが使用されるため、`build.gradle.kts` ファイルの構文は通常の `.kt` ファイル（カスタム Gradle プラグインに使用されるファイルなど）とは異なります：
+GradleのKotlin DSLはタイプセーフアクセサーを使用するため、`build.gradle.kts` ファイルの構文は通常の `.kt` ファイル（カスタムGradleプラグインなどで使用されるものなど）とは異なります。
 
 <tabs group="dokka-configuration">
 <tab title="Gradle Kotlin DSL" group-key="kotlin">
@@ -487,35 +487,35 @@ dokka {
 <deflist collapsible="true">
     <def title="localDirectory">
         <p>
-            ローカルのソースディレクトリへのパスです。パスは現在のプロジェクトのルートからの相対パスである必要があります。
+            ローカルのソースディレクトリへのパス。パスは現在のプロジェクトのルートからの相対パスである必要があります。
         </p>
     </def>
     <def title="remoteUrl">
         <p>
-            ドキュメントの読者がアクセスできるソースコードホスティングサービス（GitHub、GitLab、Bitbucket、またはソースファイルの安定した URL を提供する任意のホスティングサービスなど）の URL です。この URL は、宣言のソースコードリンクを生成するために使用されます。
+            GitHub、GitLab、Bitbucket、またはソースファイルに対して安定したURLを提供するホスティングサービスなど、ドキュメントの読者がアクセスできるソースコードホスティングサービスのURL。このURLは、宣言のソースコードリンクを生成するために使用されます。
         </p>
     </def>
     <def title="remoteLineSuffix">
         <p>
-            URL にソースコードの行番号を追加するために使用されるサフィックスです。これにより、読者はファイルだけでなく、宣言の特定の行番号へ直接移動できるようになります。
+            URLにソースコードの行番号を追加するために使用されるサフィックス。これにより、読者はファイルだけでなく、宣言の特定の行番号に移動できます。
         </p>
         <p>
-            番号自体は、指定されたサフィックスの後に追加されます。たとえば、このオプションが <code>#L</code> に設定されており、行番号が 10 の場合、生成される URL サフィックスは <code>#L10</code> になります。
+            番号自体は指定されたサフィックスに追加されます。たとえば、このオプションが <code>#L</code> に設定されており、行番号が 10 の場合、結果のURLサフィックスは <code>#L10</code> になります。
         </p>
         <p>
-            主要なサービスで使用されているサフィックス：</p>
+            一般的なサービスで使用されるサフィックス:</p>
             <list>
-                <li>GitHub：<code>#L</code></li>
-                <li>GitLab：<code>#L</code></li>
-                <li>Bitbucket：<code>#lines-</code></li>
+                <li>GitHub: <code>#L</code></li>
+                <li>GitLab: <code>#L</code></li>
+                <li>Bitbucket: <code>#lines-</code></li>
             </list>
-        <p>デフォルト：<code>#L</code></p>
+        <p>デフォルト: <code>#L</code></p>
     </def>
 </deflist>
 
-### パッケージオプション (Package options) {id="package-options"}
+### パッケージオプション {id="package-options"}
 
-`perPackageOption` 設定ブロックを使用すると、`matchingRegex` に一致する特定のパッケージに対してオプションを設定できます：
+`perPackageOption` 設定ブロックを使用すると、`matchingRegex` に一致する特定のパッケージに対していくつかのオプションを設定できます。
 
 <tabs group="build-script">
 <tab title="Gradle Kotlin DSL" group-key="kotlin">
@@ -531,7 +531,7 @@ dokka {
                 suppress.set(false)
                 skipDeprecated.set(false)
                 reportUndocumented.set(false)
-                documentedVisibilities.set(setOf(VisibilityModifier.Public)) // OR documentedVisibilities(VisibilityModifier.Public)
+                documentedVisibilities.set(setOf(VisibilityModifier.Public)) // または documentedVisibilities(VisibilityModifier.Public)
             }
         }
     }
@@ -566,49 +566,52 @@ dokka {
 
 <deflist collapsible="true">
     <def title="matchingRegex">
-        <p>パッケージの一致判定に使用される正規表現です。</p>
-        <p>デフォルト：<code>.&#42;</code></p>
+        <p>パッケージの一致判定に使用される正規表現。</p>
+        <p>デフォルト: <code>.&#42;</code></p>
     </def>
     <def title="suppress">
-        <p>ドキュメント生成時にこのパッケージをスキップするかどうかを設定します。</p>
-        <p>デフォルト：<code>false</code></p>
+        <p>ドキュメント生成時にパッケージをスキップするかどうか。</p>
+        <p>デフォルト: <code>false</code></p>
     </def>
     <def title="skipDeprecated">
-        <p><code>@Deprecated</code> でアノテーションが付けられた宣言をドキュメント化するかどうかを設定します。</p>
+        <p><code>@Deprecated</code> でアノテーションが付けられた宣言をドキュメント化するかどうか。</p>
         <p>これはソースセットレベルで設定できます。</p>
-        <p>デフォルト：<code>false</code></p>
+        <p>デフォルト: <code>false</code></p>
     </def>
     <def title="reportUndocumented">
         <p>
-            可視状態にあるドキュメント化されていない宣言（<code>documentedVisibilities</code> やその他のフィルタによってフィルタリングされた後、KDoc を持たない宣言）について警告を出力するかどうかを設定します。
+            <code>documentedVisibilities</code> やその他のフィルターでフィルタリングされた後、ドキュメントのない（KDocがない）可視宣言について警告を出力するかどうか。
         </p>
         <p>この設定は <code>failOnWarning</code> と併用すると効果的です。</p>
         <p>これはソースセットレベルで設定できます。</p>
-        <p>デフォルト：<code>false</code></p>
+        <p>デフォルト: <code>false</code></p>
     </def>
     <def title="documentedVisibilities">
-        <p>生成されるドキュメントに Dokka が含めるべき可視性修飾子を定義します。</p>
+        <p>生成されるドキュメントにDokkaが含める可視性修飾子を定義します。</p>
         <p>
-            このパッケージ内の <code>protected</code>、<code>internal</code>、<code>private</code> の宣言をドキュメント化したい場合や、<code>public</code> の宣言を除外して内部 API のみをドキュメント化したい場合に使用します。
+            このパッケージ内の <code>protected</code>、<code>internal</code>、<code>private</code> の宣言をドキュメント化したい場合や、<code>public</code> 宣言を除外して内部APIのみをドキュメント化したい場合に使用します。
         </p>
         <p>
-            さらに、Dokka の <a href="https://github.com/Kotlin/dokka/blob/v2.0.0/dokka-runners/dokka-gradle-plugin/src/main/kotlin/engine/parameters/HasConfigurableVisibilityModifiers.kt#L14-L16"><code>documentedVisibilities()</code> 関数</a>を使用して、ドキュメント化する可視性を追加することもできます。
+            さらに、Dokkaの 
+            <a href="https://github.com/Kotlin/dokka/blob/v2.0.0/dokka-runners/dokka-gradle-plugin/src/main/kotlin/engine/parameters/HasConfigurableVisibilityModifiers.kt#L14-L16"><code>documentedVisibilities()</code> 関数</a> 
+            を使用して、ドキュメント対象の可視性を追加することもできます。
         </p>
         <p>これはソースセットレベルで設定できます。</p>
-        <p>デフォルト：<code>VisibilityModifier.Public</code></p>
+        <p>デフォルト: <code>VisibilityModifier.Public</code></p>
     </def>
 </deflist>
 
-### 外部ドキュメントリンク設定 (External documentation links configuration) {id="external-documentation-links-configuration"}
+### 外部ドキュメントリンク設定 {id="external-documentation-links-configuration"}
 
-`externalDocumentationLinks {}` ブロックを使用すると、依存関係の外部でホストされているドキュメントへのリンクを作成できます。
+`externalDocumentationLinks {}`
+ブロックを使用すると、依存関係の外部ホストされているドキュメントへのリンクを作成できます。
 
-たとえば、`kotlinx.serialization` の型を使用している場合、デフォルトではドキュメント内でクリックできず、未解決であるかのように扱われます。しかし、`kotlinx.serialization` の API リファレンスドキュメントは Dokka によってビルドされ、[kotlinlang.org で公開](https://kotlinlang.org/api/kotlinx.serialization/)されているため、それに対する外部ドキュメントリンクを設定できます。これにより、Dokka はそのライブラリの型に対するリンクを生成し、正常に解決されてクリック可能になります。
+たとえば、`kotlinx.serialization` の型を使用している場合、デフォルトでは未解決であるかのようにドキュメント内でクリックできません。しかし、`kotlinx.serialization` のAPIリファレンスドキュメントはDokkaによって構築され、[kotlinlang.orgで公開](https://kotlinlang.org/api/kotlinx.serialization/)されているため、それに対する外部ドキュメントリンクを設定できます。これにより、Dokkaはそのライブラリの型に対するリンクを生成し、正常に解決されてクリック可能になります。
 
-デフォルトでは、Kotlin 標準ライブラリ、JDK、Android SDK、および AndroidX への外部ドキュメントリンクが設定されています。
+デフォルトでは、Kotlin標準ライブラリ、JDK、Android SDK、およびAndroidXの外部ドキュメントリンクが設定されています。
 
 各リンクを定義するには、`register()` メソッドを使用して外部ドキュメントリンクを登録します。
-`externalDocumentationLinks` API は、Gradle DSL の慣例に沿ってこのメソッドを使用します：
+`externalDocumentationLinks` APIは、Gradle DSLの規則に合わせてこのメソッドを使用します。
 
 <tabs group="build-script">
 <tab title="Gradle Kotlin DSL" group-key="kotlin">
@@ -643,28 +646,28 @@ dokka {
 
 <deflist collapsible="true">
     <def title="url">
-        <p>リンク先ドキュメントのルート URL です。末尾にはスラッシュが<b>必須</b>です。</p>
+        <p>リンク先となるドキュメントのルートURL。末尾にスラッシュを含める<b>必要があります</b>。</p>
         <p>
-            Dokka は指定された URL に対して <code>package-list</code> を自動的に検索し、宣言同士をリンクしようと試みます。
+            Dokkaは、指定されたURLの <code>package-list</code> を自動的に見つけて宣言同士をリンクしようと試みます。
         </p>
         <p>
-            自動解決が失敗する場合や、代わりにローカルにキャッシュされたファイルを使用したい場合は、<code>packageListUrl</code> オプションの設定を検討してください。
+            自動解決に失敗した場合や、代わりにローカルにキャッシュされたファイルを使用したい場合は、<code>packageListUrl</code> オプションの設定を検討してください。
         </p>
     </def>
     <def title="packageListUrl">
         <p>
-            <code>package-list</code> の正確な場所です。これは、Dokka による自動解決に依存する代わりの方法です。
+            <code>package-list</code> の正確な場所。これはDokkaによる自動解決に依存する代替手段です。
         </p>
         <p>
             パッケージリストには、サブプロジェクト名やパッケージ名など、ドキュメントおよびプロジェクト自体に関する情報が含まれています。
         </p>
-        <p>ネットワーク呼び出しを回避するために、ローカルにキャッシュされたファイルを指定することもできます。</p>
+        <p>ネットワーク呼び出しを回避するために、ローカルにキャッシュされたファイルにすることもできます。</p>
     </def>
 </deflist>
 
-### 完全な設定例 (Complete configuration) {id="complete-configuration"}
+### 完全な設定 {id="complete-configuration"}
 
-以下は、設定可能なすべてのオプションを同時に適用した例です：
+以下は、可能なすべての設定オプションを同時に適用した例です。
 
 <tabs group="build-script">
 <tab title="Gradle Kotlin DSL" group-key="kotlin">
@@ -689,7 +692,7 @@ dokka {
    }
 
     dokkaSourceSets {
-        // Example: Configuration exclusive to the 'linux' source set
+        // 例: 'linux' ソースセット専用の設定
         named("linux") {
             dependentSourceSets{named("native")}
             sourceRoots.from(file("linux/src"))
@@ -698,7 +701,7 @@ dokka {
         configureEach {
             suppress.set(false)
             displayName.set(name)
-            documentedVisibilities.set(setOf(VisibilityModifier.Public)) // OR documentedVisibilities(VisibilityModifier.Public)
+            documentedVisibilities.set(setOf(VisibilityModifier.Public)) // または documentedVisibilities(VisibilityModifier.Public)
             reportUndocumented.set(false)
             skipEmptyPackages.set(true)
             skipDeprecated.set(false)
@@ -766,7 +769,7 @@ dokka {
     }
 
     dokkaSourceSets {
-        // Example: Configuration exclusive to the 'linux' source set
+        // 例: 'linux' ソースセット専用の設定
         named("linux") {
             dependentSourceSets { named("native") }
             sourceRoots.from(file("linux/src"))

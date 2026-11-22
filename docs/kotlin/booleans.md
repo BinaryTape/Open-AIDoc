@@ -1,21 +1,21 @@
 [//]: # (title: 布尔值)
-[//]: # (description: 了解如何在 Kotlin 中使用布尔值，包括声明、逻辑运算符和条件。)
+<web-summary>了解如何在 Kotlin 中使用布尔值，包括声明、逻辑运算符以及条件。</web-summary>
 
 <show-structure depth="1"/>
 
 [`Boolean`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/) 类型表示逻辑值：`true` 和 `false`。
 
-在用于判断是非问题的函数中，以及在 `while`、`if` 和 `when` 的条件中，可以使用 `Boolean` 值。
+可在用于回答是非问题的函数中，以及 `while`、`if` 和 `when` 条件中使用 `Boolean` 值。
 
 ## 声明 `Boolean` 变量 {id="declare-a-boolean-variable"}
 
 要声明 `Boolean` 变量，为其赋值 `true` 或 `false` 即可。
 
-你可以显式指定 `Boolean` 类型，也可以让 Kotlin 根据值自动进行类型推断：
+你可以显式指定 `Boolean` 类型，也可以让 Kotlin 根据值自动推断：
 
 ```kotlin
 val isTrue: Boolean = true
-val isFalse = false // Kotlin 会推断为 Boolean
+val isFalse = false // Kotlin 推断出 Boolean 类型
 ```
 
 如果值可能为 `null`，请使用 `Boolean?`：
@@ -31,7 +31,7 @@ val isEnabled: Boolean? = null
 
 ## 生成 `Boolean` 值 {id="produce-boolean-values"}
 
-可以使用比较表达式和函数来生成 `Boolean` 值：
+你可以使用比较表达式和函数来生成 `Boolean` 值：
 
 ```kotlin
 fun main() {
@@ -48,7 +48,7 @@ fun main() {
 ```
 {kotlin-runnable="true"}
 
-你还可以将结果用于条件和其他表达式中：
+你也可以在条件和其他表达式中使用这些结果：
 
 ```kotlin
 fun main() {
@@ -64,14 +64,14 @@ fun main() {
 ```
 {kotlin-runnable="true"}
 
-## `Boolean` 操作 {id="boolean-operations"}
+## `Boolean` 运算 {id="boolean-operations"}
 
 Kotlin 提供了用于处理 `Boolean` 值的运算符和中缀函数。
-你可以使用它们来对 `Boolean` 值求反，或将多个 `Boolean` 值合并为一个结果。
+你可以使用它们来反转 `Boolean` 值，或将多个 `Boolean` 值组合为一个结果。
 
 ### 逻辑非 (NOT) {id="negation-not"}
 
-NOT 运算符用于对 `Boolean` 值求反。
+NOT 运算符用于反转 `Boolean` 值。
 
 要使用 NOT，请在 `Boolean` 值前放置 `!` 运算符：
 
@@ -82,7 +82,7 @@ val isOff = !isOn // isOff 为 false
 
 ### 逻辑与 (AND) {id="logical-and"}
 
-仅当两个操作数都为 `true` 时，AND 运算符才会返回 `true`。
+仅当两个操作数都为 `true` 时，AND 运算符才返回 `true`。
 
 要使用逻辑与，请在操作数之间放置 `&&` 运算符：
 
@@ -94,13 +94,13 @@ val d = true && true  // true
 ```
 
 > 如果第一个操作数为 `false`，则 `&&` 运算符会跳过第二个操作数。
-> 如需计算两个操作数的值，请改用 `and` [中缀函数](functions.md#infix-notation)。
+> 若要对两个操作数都进行求值，请改用 `and` [中缀函数](functions.md#infix-notation)。
 >
 {style="note"}
 
 ### 逻辑或 (OR) {id="logical-or"}
 
-只要至少有一个操作数为 `true`，OR 运算符就会返回 `true`。
+如果至少有一个操作数为 `true`，则 OR 运算符返回 `true`。
 
 要使用逻辑或，请在操作数之间放置 `||` 运算符：
 
@@ -112,13 +112,13 @@ val d = true || true   // true
 ```
 
 > 如果第一个操作数为 `true`，则 `||` 运算符会跳过第二个操作数。
-> 如需计算两个操作数的值，请改用 `or` [中缀函数](functions.md#infix-notation)。
+> 若要对两个操作数都进行求值，请改用 `or` [中缀函数](functions.md#infix-notation)。
 >
 {style="note"}
 
-### 异或 (XOR) {id="exclusive-or-xor"}
+### 逻辑异或 (XOR) {id="exclusive-or-xor"}
 
-如果操作数具有不同的值，则异或 (XOR) 操作返回 `true`。
+如果操作数具有不同的值，则异或 (XOR) 运算返回 `true`。
 
 要使用 XOR，请在操作数之间写入 `xor`：
 
@@ -137,16 +137,16 @@ val d = true xor true   // false
 
 ## 运算符优先级 {id="operator-precedence"}
 
-如果表达式中包含多个逻辑运算且没有使用圆括号指定求值顺序，Kotlin 将应用优先级规则。具有较高优先级的运算会先于具有较低优先级的运算执行。
+如果表达式中包含多个逻辑运算且未使用圆括号指定求值顺序，Kotlin 将应用优先级规则。具有较高优先级的运算将在具有较低优先级的运算之前求值。
 
-对于本节中介绍的 `Boolean` 操作，优先级顺序如下：
+对于本节中介绍的 `Boolean` 运算，优先级顺序如下：
 
 1. `!`
 2. `xor`（以及其他中缀函数）
 3. `&&`
 4. `||`
 
-在以下示例中，编译器会先计算 `&&`，然后再计算 `||`：
+在以下示例中，编译器会先对 `&&` 求值，然后再对 `||` 求值：
 
 ```kotlin
 fun main() {
@@ -158,7 +158,7 @@ fun main() {
 ```
 {kotlin-runnable="true" validate="false"}
 
-如需明确指定求值顺序，请使用圆括号：
+要明确指定求值顺序，请使用圆括号：
 
 ```kotlin
 fun main() {
@@ -172,7 +172,7 @@ fun main() {
 
 ## 条件中的 `Boolean` {id="boolean-in-conditions"}
 
-[`if`](control-flow.md#if-expression)、[`when`](control-flow.md#when-expressions-and-statements) 和 [`while`](control-flow.md#while-loops) 会对 `Boolean` 表达式进行求值，以控制程序流程。
+[`if`](control-flow.md#if-expression)、[`when`](control-flow.md#when-expressions-and-statements) 以及 [`while`](control-flow.md#while-loops) 通过对 `Boolean` 表达式求值来控制程序流程。
 
 ### `if` 表达式 {id="if-expressions"}
 
@@ -182,7 +182,7 @@ fun main() {
     val number = 4
     val isEven = number % 2 == 0
 
-    // 条件本身已经是 `Boolean` 类型
+    // 条件已具有 `Boolean` 类型
     // 无需将其与 `true` 或 `false` 进行比较
     if (isEven) { 
         println("The number is even.")

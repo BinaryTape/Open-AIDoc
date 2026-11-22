@@ -1,7 +1,7 @@
 [//]: # (title: データベースへの接続とデータの取得)
-[//]: # (description: SQLデータベースへの接続、テーブルスキーマの検査、Kotlin DataFrameを使用したデータ取得の方法について説明します。)
+<web-summary>Kotlin DataFrame を使用して SQL データベースに接続し、テーブルスキーマを調査し、データを取得する方法を学びます。</web-summary>
 
-[Kotlin DataFrameライブラリ](https://kotlin.github.io/dataframe/home.html)は、最も一般的なSQLデータベースをサポートしています：
+[Kotlin DataFrame ライブラリ](https://kotlin.github.io/dataframe/home.html)は、最も一般的な以下の SQL データベースをサポートしています：
 
 * [DuckDB](https://kotlin.github.io/dataframe/duckdb.html)
 * [H2](https://kotlin.github.io/dataframe/h2.html)
@@ -11,42 +11,42 @@
 * [PostgreSQL](https://kotlin.github.io/dataframe/postgresql.html)
 * [SQLite](https://kotlin.github.io/dataframe/sqlite.html)
 
-[GitHubにあるKotlin DataFrame SQLの例](https://github.com/zaleslaw/KotlinDataFrame-SQL-Examples/tree/master/src/main/kotlin)を参照してください。
+GitHub 上の [Kotlin DataFrame SQL Examples](https://github.com/zaleslaw/KotlinDataFrame-SQL-Examples/tree/master/src/main/kotlin) も確認してください。
 
 ## 始める前に {id="before-you-start"}
 
-> IntelliJ IDEA 2026.2以降、Kotlin NotebookはIDEに同梱されなくなり、JetBrainsによる公式サポートも終了します。
-> ソースコードは引き続き[GitHub](https://github.com/Kotlin/kotlin-notebook)で利用可能です。
+> IntelliJ IDEA 2026.2 以降、Kotlin Notebook は IDE にバンドルされなくなり、JetBrains による公式サポートも終了します。
+> ソースコードは引き続き [GitHub](https://github.com/Kotlin/kotlin-notebook) で利用可能です。
 >
-> 詳細は[ブログ記事](https://blog.jetbrains.com/idea/2026/06/kotlin-notebook-sunset/)を参照してください。
+> 詳細については[ブログ記事](https://blog.jetbrains.com/idea/2026/06/kotlin-notebook-sunset/)を参照してください。
 >
 {style="note"}
 
-このチュートリアルに従うには：
+このチュートリアルを進めるには：
 
-1. **File** | **New** | **Kotlin Notebook**を選択します。
-2. Notebookの最初のセルで、使用するデータベースのJDBC（Java Database Connectivity）ドライバの依存関係を追加します。
+1. **File** | **New** | **Kotlin Notebook** を選択します。
+2. ノートブックの最初のセルに、使用するデータベース用の Java Database Connectivity (JDBC) ドライバの依存関係を追加します。
 
-   例えば、MariaDBデータベースに接続するには、以下を追加します：
+   例えば、MariaDB データベースに接続するには、次のように追加します：
 
    ```kotlin 
    USE {
       dependencies("org.mariadb.jdbc:mariadb-java-client:$version")
    }
    ```
-3. Kotlin DataFrameをインポートします：
+3. Kotlin DataFrame をインポートします：
 
    ```kotlin
    %use dataframe
    ```
 
-   DataFrameライブラリとそのAPIをNotebookで利用できるようにするため、他のどのコードセルよりも先に`%use dataframe`の行を含むコードセルを実行してください。
+   ノートブックで DataFrame ライブラリとその API を確実に利用できるようにするため、他のコードセルよりも前に `%use dataframe` の行を含むコードセルを実行してください。
 
-このチュートリアルに従うために、DataFrameを[Gradle](https://kotlin.github.io/dataframe/setupgradle.html)または[Maven](https://kotlin.github.io/dataframe/setupmaven.html)の依存関係として使用することもできます。
+チュートリアルを進めるにあたり、[Gradle](https://kotlin.github.io/dataframe/setupgradle.html) または [Maven](https://kotlin.github.io/dataframe/setupmaven.html) の依存関係として DataFrame を使用することもできます。
 
 ## データベースへの接続 {id="connect-to-a-database"}
 
-データベースに接続するには、`DbConnectionConfig()`関数を使用して接続設定を作成します。
+データベースに接続するには、`DbConnectionConfig()` 関数を使用して接続設定を作成します：
 
 1. 以下の機能をインポートします：
 
@@ -55,7 +55,7 @@
    import org.jetbrains.kotlinx.dataframe.schema.DataFrameSchema
    ```
 
-2. `DbConnectionConfig()`関数を使用して、接続パラメータ（URL、ユーザー名、パスワード）を定義します：
+2. `DbConnectionConfig()` 関数を使用して接続パラメータ（URL、ユーザー名、パスワード）を定義します：
 
    ```kotlin
    val URL = "YOUR_URL"
@@ -65,15 +65,15 @@
    val dbConfig = DbConnectionConfig(URL, USER_NAME, PASSWORD)
    ```
 
-> SQLデータベースへの接続の詳細については、[Kotlin DataFrameドキュメントの「Read from SQL databases」](https://kotlin.github.io/dataframe/readsqldatabases.html)を参照してください。
+> SQL データベースへの接続に関する詳細については、Kotlin DataFrame ドキュメントの [Read from SQL databases](https://kotlin.github.io/dataframe/readsqldatabases.html) を参照してください。
 >
 {style="tip"}
 
-## データベーススキーマの検査 {id="inspect-database-schema"}
+## データベーススキーマの調査 {id="inspect-database-schema"}
 
-データを読み込む前に、データベーススキーマを検査して、どのようなテーブルがあり、どのような列が含まれているかを把握します。スキーマを確認することで、どのテーブルをDataFrameに読み込むかを決定できます。
+データを読み込む前に、どのようなテーブルがあり、どのようなカラムが含まれているかを把握するために、データベーススキーマを調査します。このスキーマを参考にして、どのテーブルを DataFrame に読み込むかを決定できます。
 
-データベース内のすべてのユーザー作成テーブルのスキーマを取得するには、`DataFrameSchema.readAllSqlTables()`関数を使用します：
+データベース内のユーザーが作成したすべてのテーブルのスキーマを取得するには、`DataFrameSchema.readAllSqlTables()` 関数を使用します：
 
 ```kotlin
 val dataSchemas = DataFrameSchema.readAllSqlTables(dbConfig)
@@ -87,20 +87,20 @@ dataSchemas.forEach { (tableName, schema) ->
 
 ## データの読み込み {id="load-data"}
 
-データベーススキーマを検査してデータを選択したら、そのデータをDataFrameに読み込みます。
+データベーススキーマを調査してデータを選択したら、そのデータを DataFrame に読み込みます。
 
-Kotlin DataFrameは、データベースからデータを読み込むための2つの方法を提供しています：
+Kotlin DataFrame は、データベースからデータを読み込むための 2 つの方法を提供しています：
 
 * テーブルから直接データを読み込む。
-* カスタムSQLクエリの結果を読み込む。
+* カスタム SQL クエリの結果を読み込む。
 
-どちらのアプローチも、Kotlin Notebookで検査、変換、分析が可能なDataFrameを返します。
+どちらのアプローチでも、調査、変換、分析が可能な DataFrame が返されます。
 
-### テーブルからデータを読み込む {id="load-data-from-a-table"}
+### テーブルからのデータ読み込み {id="load-data-from-a-table"}
 
-テーブルからデータを読み込むには、[`DataFrame.readSqlTable()`](https://kotlin.github.io/dataframe/readsqldatabases.html#reading-specific-tables)関数を使用します。
+テーブルからデータを読み込むには、[`DataFrame.readSqlTable()`](https://kotlin.github.io/dataframe/readsqldatabases.html#reading-specific-tables) 関数を使用します。
 
-以下の例では、`movies`テーブルから最初の100行を読み込みます：
+以下の例では、`movies` テーブルから最初の 100 行を読み込みます：
 
 ```kotlin
 val moviesDf = DataFrame.readSqlTable(
@@ -112,13 +112,13 @@ val moviesDf = DataFrame.readSqlTable(
 moviesDf
 ```
 
-### SQLクエリでデータを読み込む {id="load-data-with-an-sql-query"}
+### SQL クエリによるデータの読み込み {id="load-data-with-an-sql-query"}
 
-データベースに対して特定のSQLクエリを実行するには、[`DataFrame.readSqlQuery()`](https://kotlin.github.io/dataframe/readsqldatabases.html#executing-sql-queries)関数を使用します。
-このアプローチは、特定の列の読み込み、テーブルの結合、行のフィルタリング、またはデータベース内でのデータの集計が必要な場合に便利です。
+データベースに対して特定の SQL クエリを実行するには、[`DataFrame.readSqlQuery()`](https://kotlin.github.io/dataframe/readsqldatabases.html#executing-sql-queries) 関数を使用します。
+このアプローチは、特定のカラムの読み込み、テーブルの結合、行のフィルタリング、またはデータベース内でのデータの集約が必要な場合に便利です。
 
-クエンティン・タランティーノが監督した映画に関する特定のデータセットを取得してみましょう。
-このクエリは映画の詳細を選択し、各映画のジャンルを結合します：
+クエンティン・タランティーノ監督の映画に関連する特定のデータセットを取得してみましょう。
+このクエリは映画の詳細を選択し、映画ごとにジャンルを結合します：
 
 ```kotlin
 val TARANTINO_FILMS_SQL_QUERY = """
@@ -137,12 +137,12 @@ tarantinoMoviesDf
 
 ## データの処理 {id="process-data"}
 
-データベースをDataFrameに読み込んだ後、DataFrameの操作を使用して取得したデータを処理できます。
+データベースから DataFrame にデータを読み込んだ後は、DataFrame の操作を使用して取得したデータを処理できます。
 
 例えば、前のセクションのデータを操作してみましょう。以下のコードは：
-1. [`.fillNA()`](https://kotlin.github.io/dataframe/fill.html#fillna)関数を使用して`year`列の欠損値を置き換えます。
-2. [`.convert()`](https://kotlin.github.io/dataframe/convert.html)関数を使用して列を`Int`に変換します。
-3. [`.filter()`](https://kotlin.github.io/dataframe/filter.html)関数を使用して、2000年以降に公開された映画のみを保持します。
+1. [`.fillNA()`](https://kotlin.github.io/dataframe/fill.html#fillna) 関数を使用して、`year` カラムの欠損値を置換します。
+2. [`.convert()`](https://kotlin.github.io/dataframe/convert.html) 関数を使用して、カラムを `Int` に変換します。
+3. [`.filter()`](https://kotlin.github.io/dataframe/filter.html) 関数を使用して、2000 年以降に公開された映画のみを保持します。
 
 ```kotlin
 val filteredTarantinoMovies = tarantinoMoviesDf
@@ -155,29 +155,29 @@ filteredTarantinoMovies
 
 ## データの分析 {id="analyze-data"}
 
-[DataFrameライブラリ](https://kotlin.github.io/dataframe/home.html)を使用して、データのグループ化、ソート、集計を行い、データ内のパターンを発見し理解することができます。
+[DataFrame ライブラリ](https://kotlin.github.io/dataframe/home.html)を使用してデータのグループ化、ソート、集約を行い、データ内のパターンを発見して理解することができます。
 
-例えば、`actors`テーブルからアクターデータを読み込み、最も一般的なアクターの名前（first name）の上位20個を見つけてみましょう：
+例えば、`actors` テーブルから俳優のデータを読み込み、最も一般的な上位 20 個の名（first name）を見つけてみましょう：
 
 ```kotlin
-// actorsテーブルからデータを抽出
+// actors テーブルからデータを抽出
 val actorDf = DataFrame.readSqlTable(dbConfig, "actors", 10000)
 val top20ActorNames = actorDf
-   // first_name列でデータをグループ化
+   // first_name カラムでデータをグループ化
    .groupBy { first_name }
    
-   // 各ユニークな名前の出現回数をカウント
+   // 一意な各名（first name）の出現回数をカウント
    .count()
    
     // カウントの降順で結果をソート
    .sortByDesc("count")
     
-   // 分析のために上位20個の最も頻繁な名前を選択
+   // 分析用に最も頻度の高い上位 20 件を選択
    .take(20)
 ```
 
 ## 次のステップ {id="what-s-next"}
 
-* [Kandyライブラリ](https://kotlin.github.io/kandy/examples.html)を使用したデータの可視化を試す
-* [Kandyを使用したデータの可視化](data-analysis-visualization.md)でデータの可視化に関する追加情報を見つける
-* Kotlinでのデータサイエンスと分析に利用可能なツールとリソースの広範な概要については、[データ分析用のKotlinおよびJavaライブラリ](data-analysis-libraries.md)を参照してください
+* [Kandy ライブラリ](https://kotlin.github.io/kandy/examples.html)を使用したデータの可視化を試す
+* データ可視化の詳細については、[Kandy によるデータ可視化](data-analysis-visualization.md)を参照してください
+* Kotlin でのデータサイエンスおよびデータ分析に利用可能なツールやリソースの包括的な概要については、[データ分析のための Kotlin および Java ライブラリ](data-analysis-libraries.md)を参照してください

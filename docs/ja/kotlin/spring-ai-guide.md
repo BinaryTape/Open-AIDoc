@@ -1,30 +1,30 @@
-[//]: # (title: Spring AIを使用して質問に答えるKotlinアプリを作成する — チュートリアル)
-[//]: # (description: Kotlin、Spring AI、Spring Boot、OpenAI、Qdrant、およびRAGを使用してドキュメント質問応答アプリケーションを構築する方法を学びます。)
+[//]: # (title: Spring AI で質問に応答する Kotlin アプリを作成する — チュートリアル)
+<web-summary>Kotlin、Spring AI、Spring Boot、OpenAI、Qdrant、および RAG を使用して、ドキュメント質問応答アプリケーションを構築する方法を学びます。</web-summary>
 
-<web-summary>Spring AIを使用して質問に答えるKotlinアプリを作成する方法を学びます。</web-summary>
+<web-summary>Spring AI を使用して質問に応答する Kotlin アプリを作成する方法を学びます。</web-summary>
 
-このチュートリアルでは、[Spring AI](https://spring.io/projects/spring-ai)を介してLLMに接続し、ベクトルデータベースにドキュメントを保存して、それらのドキュメントのコンテキストを使用して質問に答えるKotlinアプリを構築する方法を学びます。
+このチュートリアルでは、[Spring AI](https://spring.io/projects/spring-ai) 経由で LLM に接続し、ベクターデータベースにドキュメントを保存し、それらのドキュメントのコンテキストを使用して質問に回答する Kotlin アプリを構築する方法を学びます。
 
 このチュートリアルでは、以下のツールを使用します。
 
-* Webアプリケーションを構成および実行するためのベースとして [Spring Boot](https://spring.io/projects/spring-boot) を使用。
-* LLMとのやり取りおよびコンテキストに基づく検索を行うために [Spring AI](https://spring.io/projects/spring-ai) を使用。
-* プロジェクトの生成およびアプリケーションロジックの実装に [IntelliJ IDEA](https://www.jetbrains.com/idea/) を使用。
-* 類似性検索のためのベクトルデータベースとして [Qdrant](https://qdrant.tech/) を使用。
-* Qdrantをローカルで実行するために [Docker](https://www.docker.com/) を使用。
-* LLMプロバイダーとして [OpenAI](https://platform.openai.com) を使用。
+* Web アプリケーションの設定および実行のベースとしての [Spring Boot](https://spring.io/projects/spring-boot)
+* LLM との対話およびコンテキストベースの検索を行うための [Spring AI](https://spring.io/projects/spring-ai)
+* プロジェクトの生成およびアプリケーションロジックの実装を行うための [IntelliJ IDEA](https://www.jetbrains.com/idea/)
+* 類似度検索用のベクターデータベースとしての [Qdrant](https://qdrant.tech/)
+* Qdrant をローカルで実行するための [Docker](https://www.docker.com/)
+* LLM プロバイダーとしての [OpenAI](https://platform.openai.com)
 
-## 始める前に {id="before-you-start"}
+## 開始する前に {id="before-you-start"}
 
-1. [IntelliJ IDEA](https://www.jetbrains.com/idea/download/)の最新バージョンをダウンロードしてインストールし、Ultimateサブスクリプションを使用してください。
+1. 最新バージョンの [IntelliJ IDEA](https://www.jetbrains.com/idea/download/) をダウンロードしてインストールし、Ultimate サブスクリプションを使用します。
 
-    > IntelliJ IDEA Ultimateサブスクリプションを使用していない場合、または別のIDEを使用している場合は、[Webベースのプロジェクトジェネレーター](https://start.spring.io/#!language=kotlin&type=gradle-project-kotlin)を使用してSpring Bootプロジェクトを生成できます。
+    > Ultimate サブスクリプションのない IntelliJ IDEA を使用している場合や、別の IDE を使用している場合は、[Web ベースのプロジェクトジェネレーター](https://start.spring.io/#!language=kotlin&type=gradle-project-kotlin) を使用して Spring Boot プロジェクトを生成できます。
     >
     {style="tip"}
 
-2. APIにアクセスするために、[OpenAIプラットフォーム](https://platform.openai.com/api-keys)でOpenAI APIキーを作成してください。
-3. Qdrantベクトルデータベースをローカルで実行するために [Docker](https://www.docker.com/) をインストールしてください。
-4. Dockerをインストールした後、ターミナルを開き、次のコマンドを実行してコンテナを起動します。
+2. [OpenAI プラットフォーム](https://platform.openai.com/api-keys) で OpenAI API キーを作成し、API へのアクセス権を取得します。
+3. Qdrant ベクターデータベースをローカルで実行するために [Docker](https://www.docker.com/) をインストールします。
+4. Docker のインストール後、ターミナルを開き、以下のコマンドを実行してコンテナを起動します。
 
     ```bash
     docker run -p 6333:6333 -p 6334:6334 qdrant/qdrant
@@ -32,13 +32,13 @@
 
 ## プロジェクトの作成 {id="create-the-project"}
 
-> プロジェクトを生成する別の方法として、[Spring Boot Webベースプロジェクトジェネレーター](https://start.spring.io/)を使用することもできます。
+> 代替手段として、[Spring Boot の Web ベースのプロジェクトジェネレーター](https://start.spring.io/) を使用してプロジェクトを生成することもできます。
 >
 {style="note"}
 
-IntelliJ IDEA Ultimateサブスクリプションで新しいSpring Bootプロジェクトを作成します。
+Ultimate サブスクリプションが有効な IntelliJ IDEA で、新しい Spring Boot プロジェクトを作成します。
 
-1. IntelliJ IDEAで、**File** | **New** | **Project** を選択します。
+1. IntelliJ IDEA で、**File** | **New** | **Project** を選択します。
 2. 左側のパネルで、**New Project** | **Spring Boot** を選択します。
 3. **New Project** ウィンドウで以下のフィールドとオプションを指定します。
 
@@ -46,28 +46,28 @@ IntelliJ IDEA Ultimateサブスクリプションで新しいSpring Bootプロ�
     * **Language**: Kotlin
     * **Type**: Gradle - Kotlin
 
-      > このオプションは、ビルドシステムとDSLを指定します。
+      > このオプションはビルドシステムと DSL を指定します。
       >
       {style="tip"}
 
     * **Package name**: org.example.springaidemo
     * **JDK**: Java JDK
 
-      > このチュートリアルでは **Oracle OpenJDK version 21.0.1** を使用しています。
-      > JDKがインストールされていない場合は、ドロップダウンリストからダウンロードできます。
+      > このチュートリアルでは **Oracle OpenJDK バージョン 21.0.1** を使用します。
+      > JDK がインストールされていない場合は、ドロップダウンリストからダウンロードできます。
       >
       {style="note"}
 
     * **Java**: 17
 
-      > Java 17がインストールされていない場合は、JDKドロップダウンリストからダウンロードできます。
+      > Java 17 がインストールされていない場合は、JDK ドロップダウンリストからダウンロードできます。
       >
       {style="tip"}
 
-   ![Create Spring Boot project](create-spring-ai-project.png){width=800}
+   ![Spring Boot プロジェクトの作成](create-spring-ai-project.png){width=800}
 
 4. すべてのフィールドを指定したことを確認し、**Next** をクリックします。
-5. **Spring Boot** フィールドで最新の安定したSpring Bootバージョンを選択します。
+5. **Spring Boot** フィールドで、最新の安定版 Spring Boot バージョンを選択します。
 
 6. このチュートリアルに必要な以下の依存関係を選択します。
 
@@ -75,32 +75,32 @@ IntelliJ IDEA Ultimateサブスクリプションで新しいSpring Bootプロ�
     * **AI | OpenAI**
     * **SQL | Qdrant Vector Database**
 
-   ![Set up Spring Boot project](spring-ai-dependencies.png){width=800}
+   ![Spring Boot プロジェクトのセットアップ](spring-ai-dependencies.png){width=800}
 
 7. **Create** をクリックしてプロジェクトを生成し、セットアップします。
 
-   > IDEが新しいプロジェクトを生成して開きます。プロジェクトの依存関係のダウンロードとインポートには時間がかかる場合があります。
+   > IDE が新しいプロジェクトを生成して開きます。プロジェクトの依存関係のダウンロードとインポートには少し時間がかかる場合があります。
    >
    {style="tip"}
 
-その後、**Projectビュー**に以下の構造が表示されます。
+この後、**Project** ビューに以下のような構造が表示されます。
 
-![Spring Boot project view](spring-ai-project-view.png){width=400}
+![Spring Boot プロジェクトビュー](spring-ai-project-view.png){width=400}
 
-生成されたGradleプロジェクトは、Mavenの標準ディレクトリレイアウトに対応しています。
+生成された Gradle プロジェクトは、Maven の標準ディレクトリレイアウトに対応しています。
 
-* `main/kotlin` フォルダの下に、アプリケーションに属するパッケージとクラスがあります。
-* アプリケーションの開始点は、`SpringAiDemoApplication.kt` ファイルの `main()` メソッドです。
+* アプリケーションに属するパッケージとクラスは `main/kotlin` フォルダの下に配置されます。
+* アプリケーションのエントリポイントは `SpringAiDemoApplication.kt` ファイルの `main()` メソッドです。
 
-## プロジェクト構成の更新 {id="update-the-project-configuration"}
+## プロジェクト設定の更新 {id="update-the-project-configuration"}
 
-1. `build.gradle.kts` Gradleビルドファイルを以下のように更新します。
+1. `build.gradle.kts` Gradle ビルドファイルを以下のように更新します。
 
     ```kotlin
     plugins {
         kotlin("jvm") version "%kotlinVersion%"
         kotlin("plugin.spring") version "%kotlinVersion%"
-        // 残りのプラグイン
+        // Rest of the plugins
     }
    ```
 
@@ -110,7 +110,7 @@ IntelliJ IDEA Ultimateサブスクリプションで新しいSpring Bootプロ�
    extra["springAiVersion"] = "2.0.0"
    ```
 
-3. **Sync Gradle Changes** ボタンをクリックして、Gradleファイルを同期します。
+3. **Sync Gradle Changes** ボタンをクリックして Gradle ファイルを同期します。
 4. `src/main/resources/application.properties` ファイルを以下のように更新します。
 
    ```text
@@ -125,25 +125,25 @@ IntelliJ IDEA Ultimateサブスクリプションで新しいSpring Bootプロ�
    spring.ai.vectorstore.qdrant.initialize-schema=true
    ```
    
-   > `spring.ai.openai.api-key` プロパティにOpenAI APIキーを設定してください。
+   > `spring.ai.openai.api-key` プロパティにはご自身の OpenAI API キーを設定してください。
    >
    {style="note"}
 
-5. `SpringAiDemoApplication.kt` ファイルを実行してSpring Bootアプリケーションを起動します。
-   起動したら、ブラウザで [Qdrant collections](http://localhost:6333/dashboard#/collections) ページを開いて結果を確認します。
+5. `SpringAiDemoApplication.kt` ファイルを実行して Spring Boot アプリケーションを起動します。
+   起動したら、ブラウザで [Qdrant コレクション](http://localhost:6333/dashboard#/collections) ページを開いて結果を確認します。
 
-   ![Qdrant collections](qdrant-collections.png){width=700}
+   ![Qdrant コレクション](qdrant-collections.png){width=700}
 
-## ドキュメントをロードおよび検索するためのコントローラーの作成 {id="create-a-controller-to-load-and-search-documents"}
+## ドキュメントの読み込みと検索を行うコントローラーの作成 {id="create-a-controller-to-load-and-search-documents"}
 
-ドキュメントを検索し、Qdrantコレクションに保存するためのSpring `@RestController` を作成します。
+ドキュメントを検索し、Qdrant コレクションに保存するための Spring `@RestController` を作成します。
 
 1. `src/main/kotlin/org/example/springaidemo` ディレクトリに `KotlinSTDController.kt` という名前の新しいファイルを作成し、以下のコードを追加します。
 
     ```kotlin
     package org.example.springaidemo
 
-    // 必要なSpringおよびユーティリティクラスをインポートします
+    // 必要な Spring およびユーティリティクラスをインポート
     import org.slf4j.LoggerFactory
     import org.springframework.ai.document.Document
     import org.springframework.ai.vectorstore.SearchRequest
@@ -168,7 +168,7 @@ IntelliJ IDEA Ultimateサブスクリプションで新しいSpring Bootプロ�
         @OptIn(ExperimentalUuidApi::class)
         @PostMapping("/load-docs")
         fun load() {
-            // Kotlinドキュメントからドキュメントのリストをロードします
+            // Kotlin ドキュメントからドキュメントのリストを読み込む
             val kotlinStdTopics = listOf(
                 "collections-overview", "constructing-collections", "iterators", "ranges", "sequences",
                 "collection-operations", "collection-transformations", "collection-filtering", "collection-plus-minus",
@@ -176,14 +176,14 @@ IntelliJ IDEA Ultimateサブスクリプションで新しいSpring Bootプロ�
                 "collection-aggregate", "collection-write", "list-operations", "set-operations",
                 "map-operations", "read-standard-input", "opt-in-requirements", "scope-functions", "time-measurement",
             )
-            // ドキュメントのベースURL
+            // ドキュメントのベース URL
             val url = "https://raw.githubusercontent.com/JetBrains/kotlin-web-site/refs/heads/master/docs/topics/"
-            // URLから各ドキュメントを取得し、ベクトルストアに追加します
+            // 各ドキュメントを URL から取得してベクターストアに追加する
             kotlinStdTopics.forEach { topic ->
                 val data = restTemplate.getForObject("$url$topic.md", String::class.java)
                 data?.let { it ->
                     val doc = Document.builder()
-                        // ランダムなUUIDでドキュメントを構築します
+                        // ランダムな UUID でドキュメントを構築する
                         .id(Uuid.random().toString())
                         .text(it)
                         .metadata("topic", topic)
@@ -211,7 +211,7 @@ IntelliJ IDEA Ultimateサブスクリプションで新しいSpring Bootプロ�
     ```
    {collapsible="true"}
 
-2. `SpringAiDemoApplication.kt` ファイルを更新して、`RestTemplate` ビーンを宣言します。
+2. `SpringAiDemoApplication.kt` ファイルを更新して、`RestTemplate` Bean を宣言します。
 
    ```kotlin
    package org.example.springaidemo
@@ -234,27 +234,27 @@ IntelliJ IDEA Ultimateサブスクリプションで新しいSpring Bootプロ�
    {collapsible="true"}
 
 3. アプリケーションを実行します。
-4. ターミナルで、ドキュメントをロードするために `/kotlin/load-docs` エンドポイントにPOSTリクエストを送信します。
+4. ターミナルで `/kotlin/load-docs` エンドポイントに POST リクエストを送信し、ドキュメントを読み込みます。
 
    ```bash
    curl -X POST http://localhost:8080/kotlin/load-docs
    ```
 
-5. ドキュメントがロードされたら、GETリクエストで検索できます。
+5. ドキュメントが読み込まれたら、GET リクエストでドキュメントを検索できます。
 
    ```Bash
    curl -X GET http://localhost:8080/kotlin/docs
    ```
 
-   ![GET request results](spring-ai-get-results.png){width="700"}
+   ![GET リクエストの結果](spring-ai-get-results.png){width="700"}
 
-> 結果は [Qdrant collections](http://localhost:6333/dashboard#/collections) ページでも確認できます。
+> 結果は [Qdrant コレクション](http://localhost:6333/dashboard#/collections) ページでも確認できます。
 >
 {style="tip"}
 
-## AIチャットエンドポイントの実装 {id="implement-an-ai-chat-endpoint"}
+## AI チャットエンドポイントの実装 {id="implement-an-ai-chat-endpoint"}
 
-ドキュメントがロードされたら、最後のステップは、Spring AIの検索拡張生成 (Retrieval-Augmented Generation: RAG) サポートを通じてQdrant内のドキュメントを使用して質問に答えるエンドポイントを追加することです。
+ドキュメントが読み込まれたら、最後のステップとして、Spring AI の検索拡張生成 (RAG: Retrieval-Augmented Generation) サポートを通じて Qdrant 内のドキュメントを使用して質問に回答するエンドポイントを追加します。
 
 1. `KotlinSTDController.kt` ファイルを開き、以下のクラスをインポートします。
 
@@ -270,7 +270,7 @@ IntelliJ IDEA Ultimateサブスクリプションで新しいSpring Bootプロ�
 2. `ChatRequest` データクラスを定義します。
 
    ```kotlin
-   // チャットクエリのリクエストペイロードを表します
+   // チャットクエリのリクエストペイロードを表す
    data class ChatRequest(val query: String, val topK: Int = 3)
    ```
 
@@ -278,7 +278,7 @@ IntelliJ IDEA Ultimateサブスクリプションで新しいSpring Bootプロ�
 
    ```kotlin
    class KotlinSTDController(
-       // ChatClientを作成するためのビルダーを提供します
+       // ChatClient を作成するためのビルダーを提供
        private val chatClientBuilder: ChatClient.Builder,
    
        private val restTemplate: RestTemplate,
@@ -286,19 +286,19 @@ IntelliJ IDEA Ultimateサブスクリプションで新しいSpring Bootプロ�
    )
    ```
 
-4. コントローラークラス内で、`ChatClient` インスタンスを作成します。
+4. コントローラークラス内に `ChatClient` インスタンスを作成します。
 
    ```kotlin
-   // シンプルなロギングアドバイザーを使用してチャットクライアントを構築します
+   // シンプルなロギングアドバイザーでチャットクライアントを構築
    private val chatClient = chatClientBuilder.defaultAdvisors(SimpleLoggerAdvisor()).build()
    ```
 
-5. `KotlinSTDController.kt` ファイルの最後に、以下のロジックで新しい `chatAsk()` エンドポイントを追加します。
+5. `KotlinSTDController.kt` ファイルの末尾に、以下のロジックを持つ新しい `chatAsk()` エンドポイントを追加します。
 
    ```kotlin
    @PostMapping("/chat/ask")
    fun chatAsk(@RequestBody request: ChatRequest): String? {
-       // プレースホルダーを使用してプロンプトテンプレートを定義します
+       // プレースホルダーを含むプロンプトテンプレートを定義
        val promptTemplate = PromptTemplate(
            """
            {query}.
@@ -306,11 +306,11 @@ IntelliJ IDEA Ultimateサブスクリプションで新しいSpring Bootプロ�
        """.trimIndent()
        )
 
-       // プレースホルダーを実際の値で置き換えてプロンプトを作成します
+       // プレースホルダーを実際の値に置き換えてプロンプトを作成
        val prompt: Prompt =
            promptTemplate.create(mapOf("query" to request.query))
 
-       // クエリを関連ドキュメントで拡張するための検索アドバイザーを構成します
+       // 関連ドキュメントでクエリを拡張するリトリーバルアドバイザーを設定
        val retrievalAdvisor = QuestionAnswerAdvisor.builder(vectorStore)
            .searchRequest(
                SearchRequest.builder()
@@ -321,7 +321,7 @@ IntelliJ IDEA Ultimateサブスクリプションで新しいSpring Bootプロ�
            .promptTemplate(promptTemplate)
            .build()
 
-       // 検索アドバイザーと共にプロンプトをLLMに送信し、生成されたコンテンツを取得します
+       // リトリーバルアドバイザーと共にプロンプトを LLM に送信し、生成されたコンテンツを取得
        val response = chatClient.prompt(prompt)
            .advisors(retrievalAdvisor)
            .call()
@@ -332,7 +332,7 @@ IntelliJ IDEA Ultimateサブスクリプションで新しいSpring Bootプロ�
    ```
 
 6. アプリケーションを実行します。
-7. ターミナルで、新しいエンドポイントにPOSTリクエストを送信して結果を確認します。
+7. ターミナルで、新しいエンドポイントに POST リクエストを送信して結果を確認します。
 
    ```bash
    curl -X POST "http://localhost:8080/kotlin/chat/ask" \
@@ -340,14 +340,14 @@ IntelliJ IDEA Ultimateサブスクリプションで新しいSpring Bootプロ�
         -d '{"query": "What are the performance implications of using lazy sequences in Kotlin for large datasets?", "topK": 3}'
    ```
 
-   ![OpenAI answer to chat request](open-ai-chat-endpoint.png){width="700"}
+   ![チャットリクエストに対する OpenAI の回答](open-ai-chat-endpoint.png){width="700"}
 
-おめでとうございます！これで、OpenAIに接続し、Qdrantに保存されたドキュメントから取得したコンテキストを使用して質問に答えるKotlinアプリが完成しました。
-別のクエリを試したり、他のドキュメントをインポートしたりして、さらなる可能性を探ってみてください。
+これで完了です！OpenAI に接続し、Qdrant に保存されたドキュメントから取得したコンテキストを使用して質問に回答する Kotlin アプリが完成しました。
+さまざまなクエリを試したり、他のドキュメントをインポートしたりして、さらなる可能性を探ってみてください。
 
-完成したプロジェクトは、[Spring AI demo GitHubリポジトリ](https://github.com/Kotlin/Kotlin-AI-Examples/tree/master/projects/spring-ai/springAI-demo)で確認できます。
+完成したプロジェクトは、[Spring AI デモの GitHub リポジトリ](https://github.com/Kotlin/Kotlin-AI-Examples/tree/master/projects/spring-ai/springAI-demo) で確認できます。
 
 ## 次のステップ {id="what-s-next"}
 
-* [Kotlin AI Examples](https://github.com/Kotlin/Kotlin-AI-Examples/tree/master) で他のSpring AIの例を探索する
-* [Spring BootとClaudeを使用したタスク管理アプリケーションの作成](spring-boot-claude.md)
+* [Kotlin AI Examples](https://github.com/Kotlin/Kotlin-AI-Examples/tree/master) で他の Spring AI サンプルを探索する
+* [Spring Boot と Claude を使用してタスクマネージャーアプリケーションを作成する](spring-boot-claude.md)

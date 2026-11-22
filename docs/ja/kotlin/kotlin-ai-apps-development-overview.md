@@ -1,15 +1,15 @@
-[//]: # (title: AI 駆動アプリ開発のための Kotlin)
-[//]: # (description: Koog、MCP Kotlin SDK、主要な LLM プロバイダー、RAG パイプライン、AI エージェント、Spring AI、LangChain4j を使用して、Kotlin で AI 駆動アプリケーションを構築する方法について学びます。)
+[//]: # (title: AI搭載アプリ開発のためのKotlin)
+<web-summary>Koog、MCP Kotlin SDK、主要なLLMプロバイダー、RAGパイプライン、AIエージェント、Spring AI、LangChain4jを使用して、KotlinでAI搭載アプリケーションを構築する方法を学びます。</web-summary>
 
-<web-summary>Kotlin を使用して AI 駆動のアプリケーションを構築するために、Koog がどのように役立つかを確認しましょう。</web-summary>
+<web-summary>Koogを使用してKotlinでAI搭載アプリケーションを構築する方法を学びます。</web-summary>
 
-Kotlin は、AI 駆動のアプリケーションを構築するためのモダンで実践的な基盤を提供します。  
-プラットフォームを問わず使用でき、確立された AI フレームワークと適切に統合され、一般的な AI 開発パターンをサポートします。
+Kotlinは、AI搭載アプリケーションを構築するためのモダンで実用的な基盤を提供します。  
+マルチプラットフォームで利用でき、実績のあるAIフレームワークとうまく連携し、一般的なAI開発パターンをサポートします。
 
 ## Koog {id="koog"}
 
-[Koog](https://koog.ai) は、シンプルから複雑なものまで、AI エージェントを構築するための JetBrains によるオープンソースフレームワークです。
-マルチプラットフォームのサポート、Spring Boot および Ktor との統合、慣用的な DSL、そしてすぐに使用できるプロダクション対応の機能を提供します。
+[Koog](https://koog.ai) は、シンプルなものから複雑なものまで、AIエージェントを構築するためのJetBrains発のオープンソースフレームワークです。
+マルチプラットフォームのサポート、Spring BootおよびKtorとの連携、イディオマティックなDSL、そして本番環境ですぐに使える機能を標準で提供します。
 
 ### 数行でシンプルなエージェントを作成する {id="create-a-simple-agent-in-a-few-lines"}
 
@@ -29,64 +29,65 @@ fun main() {
 }
 ```
 
-<a href="https://docs.koog.ai/quickstart/" as="button" mode="rock" icon="arrow-right" icon-position="right">Koog を使ってみる</a>
+<a href="https://docs.koog.ai/quickstart/" as="button" mode="rock" icon="arrow-right" icon-position="right">Get started with Koog</a>
 
 ### 主な機能 {id="key-features"}
 
-* **マルチプラットフォーム開発のサポート**。マルチプラットフォームのサポートにより、JVM、JavaScript、WebAssembly、Android、および iOS 向けのエイジェンティック（agentic）なアプリケーション開発が可能になります。
-* **信頼性とフォールトトレランス**。組み込みのリトライ機能により、タイムアウトやツールエラーなどの失敗を開発者が処理できるようになります。エージェントの永続化により、チャットメッセージだけでなく、エージェントの完全な状態マシンを復元することが可能です。
-* **長いコンテキストのための組み込み履歴圧縮技術**。Koog には、追加の設定なしで、長期にわたる会話を圧縮および管理するための高度な戦略が備わっています。
-* **エンタープライズ対応の統合**。Koog は、[Spring Boot](https://spring.io/projects/spring-boot) や [Ktor](https://ktor.io) などの人気のある JVM フレームワークと統合します。
-* **OpenTelemetry エクスポーターによるオブザーバビリティ**。Koog は、AI アプリケーションの監視とデバッグのために、W&B Weave や Langfuse などの主要なオブザーバビリティプロバイダーとのすぐに使える統合機能を提供します。
-* **LLM の切り替えとシームレスな履歴適応**。Koog では、既存の会話履歴を失うことなく、任意の時点で新しいツールセットを持つ別の LLM に切り替えることができます。また、OpenAI、Anthropic、Google など、複数の LLM プロバイダー間の再ルーティングも可能です。Koog と Ollama の統合により、ローカルモデルを使用してローカルでエージェントを実行することもできます。
-* **JVM および Kotlin アプリケーションとの統合**。Koog は、JVM および Kotlin 開発者向けに特別に設計された、慣用的で型安全な DSL を提供します。
-* **Model Context Protocol (MCP) との統合**。Koog では、エージェントで MCP ツールを使用できます。
-* **知識の検索とメモリ**。エンベディング、ランク付けされたドキュメントストレージ、共有エージェントメモリにより、Koog 自体が会話を通じて能動的に知識を保持します。
-* **ストリーミング機能**。Koog は、ストリーミングサポートとツールの並列呼び出しにより、開発者がレスポンスをリアルタイムで処理できるようにします。
+* **マルチプラットフォーム開発のサポート**。マルチプラットフォームサポートにより、JVM、JavaScript、WebAssembly、Android、iOS向けの自律型（agentic）アプリケーション開発が可能になります。
+* **信頼性と耐障害性**。組み込みのリトライ機能により、Koogはタイムアウトやツールのエラーなどの障害への対処を容易にします。エージェントの永続化により、チャットメッセージだけでなくエージェントの完全なステートマシンを復元できます。
+* **長いコンテキスト向けの組み込み履歴圧縮技術**。Koogには、追加の設定なしで長時間の会話を圧縮・管理するための高度な戦略が備わっています。
+* **エンタープライズ対応の統合**。Koogは、[Spring Boot](https://spring.io/projects/spring-boot) や [Ktor](https://ktor.io) などの人気のあるJVMフレームワークと統合できます。
+* **OpenTelemetryエクスポーターによる可観測性**。Koogは、AIアプリケーションの監視やデバッグのために、W&B WeaveやLangfuseなどの人気のある可観測性プロバイダーとの統合をすぐに利用できる形で提供します。
+* **LLMの切り替えとシームレスな履歴適応**。Koogを使用すると、既存の会話履歴を失うことなく、任意の時点で新しいツールセットを備えた別のLLMに切り替えることができます。また、OpenAI、Anthropic、Googleなど、複数のLLMプロバイダー間での再ルーティングも可能です。KoogとOllamaの連携により、ローカルモデルを使用してローカルでエージェントを実行することもできます。
+* **JVMおよびKotlinアプリケーションとの統合**。Koogは、JVMおよびKotlin開発者向けに特別に設計された、イディオマティックで型安全なDSLを提供します。
+* **Model Context Protocol (MCP) の統合**。Koogを使用すると、エージェント内でMCPツールを利用できます。
+* **知識の検索とメモリ**。埋め込み（embeddings）、ランク付けされたドキュメントストレージ、共有エージェントメモリにより、Koog自体が会話をまたいで能動的に知識を保持します。
+* **ストリーミング機能**。Koogを使用すると、ストリーミングのサポートと並列ツール呼び出しによって、開発者はリアルタイムで応答を処理できます。
 
-### どこから始めるか {id="where-to-start"}
+### はじめに {id="where-to-start"}
 
-* [概要](https://docs.koog.ai/)で Koog の機能を確認する。
-* [スタートガイド](https://docs.koog.ai/quickstart/)で最初の Koog エージェントを作成する。
-* [Koog リリースノート](https://github.com/JetBrains/koog/releases)で最新のアップデートを確認する。
+* [概要（Overview）](https://docs.koog.ai/)でKoogの機能を確認する。
+* [クイックスタートガイド](https://docs.koog.ai/quickstart/)で最初のエージェントを作成する。
+* [Koogリリースノート](https://github.com/JetBrains/koog/releases)で最新の更新情報を確認する。
 * [サンプル](https://docs.koog.ai/examples/)から学ぶ。
 
 ## Model Context Protocol (MCP) Kotlin SDK {id="model-context-protocol-mcp-kotlin-sdk"}
 
-[MCP Kotlin SDK](https://github.com/modelcontextprotocol/kotlin-sdk) は、Model Context Protocol の Kotlin マルチプラットフォーム実装です。
-この SDK を使用すると、開発者は Kotlin で AI 駆動のアプリケーションを構築し、JVM、WebAssembly、iOS にわたる LLM サーフェスと統合できます。
+[MCP Kotlin SDK](https://github.com/modelcontextprotocol/kotlin-sdk) は、Model Context ProtocolのKotlin Multiplatform実装です。 
+このSDKを使用することで、開発者はKotlinでAI搭載アプリケーションを構築し、JVM、WebAssembly、iOSにわたるLLMの利用環境と連携させることができます。
 
-MCP Kotlin SDK を使用すると、以下のことが可能になります。
+MCP Kotlin SDKを使用すると、次のことができます。
 
-* コンテキストの処理を LLM の対話から分離することで、構造化および標準化された方法で LLM にコンテキストを提供できます。
-* 既存のサーバーのリソースを消費する MCP クライアントを構築できます。
-* プロンプト、ツール、リソースを LLM に公開する MCP サーバーを作成できます。
-* stdio、SSE、WebSocket などの標準的な通信トランスポートを使用できます。
-* すべての MCP プロトコルメッセージとライフサイクルイベントを処理できます。
+* コンテキスト処理をLLMとの対話から分離することで、構造化かつ標準化された方法でコンテキストをLLMに提供する。
+* 既存のサーバーからリソースを利用するMCPクライアントを構築する。
+* プロンプト、ツール、リソースをLLMに公開するMCPサーバーを作成する。
+* stdio、SSE、WebSocketなどの標準的な通信トランスポートを使用する。
+* すべてのMCPプロトコルメッセージとライフサイクルイベントを処理する。
 
-## その他の AI 駆動アプリケーションシナリオを探索する {id="explore-other-ai-powered-application-scenarios"}
+## その他のAI搭載アプリケーションのシナリオを探索する {id="explore-other-ai-powered-application-scenarios"}
 
-シームレスな Java 相互運用性と Kotlin マルチプラットフォームにより、Kotlin を確立された AI SDK やフレームワークと組み合わせ、バックエンドやデスクトップ/モバイル UI を構築し、RAG やエージェントベースのワークフローなどのパターンを採用できます。
+シームレスなJavaとの相互運用性とKotlin Multiplatformのおかげで、Kotlinを既存のAI SDKやフレームワークと組み合わせたり、バックエンドやデスクトップ/モバイルUIを構築したり、RAGやエージェントベースのワークフローなどのパターンを採用したりできます。
 
-> [Kotlin-AI-Examples](https://github.com/Kotlin/Kotlin-AI-Examples) リポジトリのサンプルを探索して実行できます。各プロジェクトは自己完結しています。各プロジェクトを、Kotlin ベースの AI アプリケーションを構築するためのリファレンスやテンプレートとして使用できます。
+> [Kotlin-AI-Examples](https://github.com/Kotlin/Kotlin-AI-Examples) リポジトリのサンプルを探索して実行できます。
+> 各プロジェクトは自己完結しています。KotlinベースのAIアプリケーションを構築するためのリファレンスまたはテンプレートとして各プロジェクトを使用できます。
 
 ### 主要なモデルプロバイダーに接続する {id="connect-to-major-model-providers"}
 
-Kotlin を使用して、OpenAI、Anthropic、Google などの主要なモデルプロバイダーに接続します。
+Kotlinを使用して、OpenAI、Anthropic、Googleなどの主要なモデルプロバイダーに接続します。
 
-* [OpenAI](https://github.com/openai/openai-java) — OpenAI API 用の公式 Java SDK。レスポンス、チャット、画像、オーディオをカバーしています。
-* [Anthropic (Claude)](https://github.com/anthropics/anthropic-sdk-java) — Claude Messages API 用の公式 Java SDK。Vertex AI および Bedrock 統合用のモジュールが含まれています。
-* [Google AI (Gemini / Vertex AI)](https://github.com/googleapis/java-genai) — Gemini API と Vertex AI を切り替える単一のクライアントを備えた公式 Java SDK。
-* [Azure OpenAI](https://github.com/Azure/azure-sdk-for-java/tree/main/sdk/openai/azure-ai-openai) — Azure OpenAI Service 用の公式 Java クライアント。チャットの補完とエンベディングをサポートしています。
-* [AWS Bedrock](https://github.com/aws/aws-sdk-kotlin) — 基盤モデルを呼び出すための公式 SDK。Bedrock および Bedrock Runtime 用の Kotlin SDK と Java SDK が含まれています。
+* [OpenAI](https://github.com/openai/openai-java) — OpenAI APIの公式Java SDK。レスポンス、チャット、画像、音声をカバーしています。
+* [Anthropic (Claude)](https://github.com/anthropics/anthropic-sdk-java) — Claude Messages APIの公式Java SDK。Vertex AIおよびBedrock連携用のモジュールを含みます。 
+* [Google AI (Gemini / Vertex AI)](https://github.com/googleapis/java-genai) — Gemini APIとVertex AIを切り替えられる単一のクライアントを提供する公式Java SDK。
+* [Azure OpenAI](https://github.com/Azure/azure-sdk-for-java/tree/main/sdk/openai/azure-ai-openai) — Azure OpenAI Serviceの公式Javaクライアント。チャット補完と埋め込みをサポートしています。
+* [AWS Bedrock](https://github.com/aws/aws-sdk-kotlin) — 基底モデルを呼び出すための公式SDK。BedrockおよびBedrock Runtime用のKotlin SDKとJava SDKが含まれています。
 
-### RAG パイプラインとエージェントベースのアプリを作成する {id="create-rag-pipelines-and-agent-based-apps"}
+### RAGパイプラインとエージェントベースのアプリを作成する {id="create-rag-pipelines-and-agent-based-apps"}
 
-* [Spring AI](https://github.com/spring-projects/spring-ai) — プロンプト、チャット、エンベディング、ツールと関数の呼び出し、およびベクトルストアのためのマルチプロバイダー抽象化。
-* [LangChain4j](https://docs.langchain4j.dev/tutorials/kotlin/) — プロンプト、ツール、検索拡張生成（RAG）パイプライン、およびエージェントのための Kotlin 拡張機能を備えた JVM ツールキット。
+* [Spring AI](https://github.com/spring-projects/spring-ai) — プロンプト、チャット、埋め込み、ツール、ファンクションコーリング、ベクトルストア向けのマルチプロバイダー抽象化。
+* [LangChain4j](https://docs.langchain4j.dev/tutorials/kotlin/) — プロンプト、ツール、検索拡張生成（RAG: Retrieval-Augmented Generation）パイプライン、エージェント向けのKotlin拡張を備えたJVMツールキット。
 
 ## 次のステップ {id="what-s-next"}
 
-* [Spring AI を使用して質問に答える Kotlin アプリを作成する](spring-ai-guide.md)チュートリアルを完了し、IntelliJ IDEA で Kotlin と Spring AI を使用する方法について詳しく学びましょう。
-* [Kotlin コミュニティ](https://kotlinlang.org/community/)に参加して、Kotlin で AI アプリケーションを構築している他の開発者とつながりましょう。
-* [Kotlin 開発に役立つ AI ツール](ai-for-development.md)について学びましょう。
+* [Spring AIを使用して質問に回答するKotlinアプリを作成する](spring-ai-guide.md) チュートリアルを完了して、IntelliJ IDEAでKotlinとSpring AIを使用する方法についてさらに詳しく学ぶ
+* [Kotlinコミュニティ](https://kotlinlang.org/community/) に参加して、KotlinでAIアプリケーションを構築している他の開発者とつながる
+* [Kotlin開発に役立つAIツール](ai-for-development.md) について学ぶ

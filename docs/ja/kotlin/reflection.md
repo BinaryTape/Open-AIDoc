@@ -1,32 +1,32 @@
-[//]: # (title: リフレクション（Reflection）)
-[//]: # (description: Kotlinの組み込みリフレクションサポートと、完全なランタイムイントロスペクションのための独立したkotlin-reflectライブラリの使用方法について説明します。)
+[//]: # (title: リフレクション)
+<web-summary>Kotlinの組み込みリフレクションサポートと、完全なランタイムイントロスペクションのために独立したkotlin-reflectライブラリを使用する方法について学びます。</web-summary>
 
-リフレクション（_Reflection_）は、プログラムの構造を実行時（ランタイム）に内省（イントロスペクト）できるようにする言語およびライブラリ機能のセットです。
-例えば、プロパティの読み取りや更新、関数の呼び出し、クラスのコンストラクタを呼び出してインスタンスを生成することなどが可能です。これは、コンパイル時に宣言がわからない場合に役立ちます。
+_リフレクション_（Reflection）は、実行時にプログラムの構造を調査（イントロスペクト）できるようにする言語およびライブラリ機能のセットです。
+たとえば、プロパティの読み書き、関数の呼び出し、クラスコンストラクタを呼び出してインスタンスを生成することなどが可能です。これは、コンパイル時に宣言がわからない場合に役立ちます。
 
-リフレクションは、コンパイルされた宣言を記述するランタイムオブジェクトを提供します。例えば、クラスは [`KClass`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/-k-class/)、型は [`KType`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/-k-type/)、プロパティや関数は [`KCallable`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/-k-callable/) のサブタイプによって表されます。
-これらのオブジェクトをインスペクト（検査）し、値へのアクセスや関数の呼び出しに使用できます。
+リフレクションは、コンパイルされた宣言を記述するランタイムオブジェクトを提供します。たとえば、クラスは [`KClass`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/-k-class/)、型は [`KType`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/-k-type/)、プロパティや関数は [`KCallable`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/-k-callable/) のサブタイプによって表されます。
+これらのオブジェクトを調査し、値にアクセスしたり関数を呼び出したりするために使用できます。
 
 ## リフレクションの仕組み {id="how-reflection-works"}
 
 [リフレクションAPI](https://kotlinlang.org/api/core/kotlin-reflect/) は、コンパイルされた宣言を `KClass` や `KFunction` などのKotlinの型を通して表現します。
-リフレクションオブジェクトは宣言自体を表し、宣言されたオブジェクトの値を表すわけではありません。例えば、`KProperty` を使用すると、オブジェクトからそのプロパティを読み取ることなく、プロパティの名前を取得したり、その型を返したりできます。
+リフレクションオブジェクトは宣言されたオブジェクトの値ではなく、宣言そのものを表します。たとえば、オブジェクトからそのプロパティを読み取ることなく、`KProperty` を使用してプロパティ名を取得し、その型を返すことができます。
 
-Kotlinは、言語および標準ライブラリの一部として、クラスリテラルや[呼び出し可能参照（callable references）](lambdas.md#callable-reference)などの基本的な機能を提供しています。より広範なランタイムイントロスペクションにアクセスするには、[`kotlin-reflect`](https://kotlinlang.org/api/core/kotlin-reflect/) ライブラリをインポートします。
+Kotlinは、クラスリテラルや[呼び出し可能参照](lambdas.md#callable-reference)などのいくつかの基本機能を、言語および標準ライブラリの一部として提供しています。より広範なランタイムイントロスペクションを利用するには、[`kotlin-reflect`](https://kotlinlang.org/api/core/kotlin-reflect/) ライブラリをインポートしてください。
 
-リフレクションAPIは以下のパッケージで構成されています：
+リフレクションAPIは以下のパッケージで構成されています:
 
-* [`kotlin.reflect`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/)：標準ライブラリの一部であり、コアとなるリフレクションの型と関数を含みます。
-* [`kotlin.reflect.full`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.full/)：Kotlinの宣言をインスペクトするための拡張機能を含みます。
-* [`kotlin.reflect.jvm`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.jvm/)：KotlinとJavaのリフレクションを橋渡しするJVM固有の拡張機能を含みます。
+* [`kotlin.reflect`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/): 標準ライブラリの一部であり、コアとなるリフレクションの型と関数が含まれています。
+* [`kotlin.reflect.full`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.full/): Kotlinの宣言を調査するための拡張機能を含みます。
+* [`kotlin.reflect.jvm`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.jvm/): KotlinとJavaのリフレクションを連携させるJVM固有の拡張機能を含みます。
 
-> リフレクションのサポート状況はプラットフォームによって異なる場合があります。このページの内容はKotlin/JVMのリフレクションAPIに準拠しています。[Kotlin/JSにおけるリフレクション](js-reflection.md)についての詳細も参照してください。
+> プラットフォームによってリフレクションのサポートが異なる場合があります。このページはKotlin/JVMのリフレクションAPIに準拠しています。[Kotlin/JSでのリフレクション](js-reflection.md)について詳しく確認してください。
 > 
 {style="note"}
 
 ### Javaリフレクションとの相互運用性 {id="interoperability-with-java-reflection"}
 
-JVM上では、`kotlin-reflect` ライブラリの [`kotlin.reflect.jvm`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.jvm/) パッケージにある拡張機能によって、KotlinとJavaのリフレクションオブジェクト間の変換が提供されます。例えば、Kotlinプロパティのゲッターを実装するJavaメソッドや、プロパティのバッキングフィールドを見つけることができます：
+JVMでは、`kotlin-reflect` ライブラリの [`kotlin.reflect.jvm`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.jvm/) パッケージで、KotlinとJavaのリフレクションオブジェクトを相互に変換する拡張機能が提供されています。たとえば、Kotlinプロパティのゲッターを実装するJavaメソッドや、プロパティのバッキングフィールドを見つけることができます:
 
 ```kotlin
 import kotlin.reflect.jvm.*
@@ -42,9 +42,9 @@ fun main() {
 }
 ```
 
-Kotlinのプロパティには対応するJavaフィールドやゲッターが常に存在するとは限らないため、一致するJavaリフレクションオブジェクトが存在しない場合、両プロパティは `null` を返します。
+Kotlinのプロパティには必ずしも対応するJavaのフィールドやゲッターが存在するとは限らないため、一致するJavaリフレクションオブジェクトが存在しない場合、どちらのプロパティも `null` を返します。
 
-また、Kotlinの `KClass` とJavaの `Class` オブジェクトを相互に変換することもできます。Javaクラスに対応するKotlinクラスを取得するには、`.kotlin` 拡張プロパティを使用します：
+Kotlinの `KClass` オブジェクトとJavaの `Class` オブジェクトの間で変換を行うこともできます。Javaクラスに対応するKotlinクラスを取得するには、`.kotlin` 拡張プロパティを使用します:
 
 ```kotlin
 fun getKClass(o: Any): KClass<Any> = value.javaClass.kotlin
@@ -52,10 +52,10 @@ fun getKClass(o: Any): KClass<Any> = value.javaClass.kotlin
 
 ## ランタイムクラスの取得 {id="obtain-a-runtime-class"}
 
-ほとんどのリフレクション操作は [`KClass`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/-k-class/) から始まります。その取得方法は、クラスがコンパイル時に既知であるかどうかによって異なります：
+ほとんどのリフレクション操作は [`KClass`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/-k-class/) から始まります。その取得方法は、コンパイル時にクラスが判明しているかどうかによって異なります:
 
-* コンパイル時に既知のクラスを参照するには、`ClassName::class` を使用します。
-* 宣言された型よりも具体的である可能性がある、ランタイム値の実際のクラスを取得するには、`value::class` を使用します。
+* コンパイル時に判明しているクラスを参照するには、`ClassName::class` を使用します。
+* 実行時の値の実際のクラスを取得するには、`value::class` を使用します。これは宣言された型よりも具体的な場合があります。
 
 ```kotlin
 import kotlin.reflect.KClass
@@ -66,7 +66,7 @@ open class Language
 class Kotlin : Language()
 
 fun main() {
-    // Userを表すKClassを返す
+    // User を表す KClass を返す
     val userClass: KClass<User> = User::class
     println(userClass.simpleName)
     // User
@@ -74,7 +74,7 @@ fun main() {
     val language: Language = Kotlin()
 
     // 実行時の値の具象クラスを表す
-    // KClassを返す
+    // KClass を返す
     val runtimeClass: KClass<out Language> = language::class
     println(runtimeClass.simpleName)
     // Kotlin
@@ -82,13 +82,13 @@ fun main() {
 ```
 {kotlin-runnable="true"}
 
-Kotlin標準ライブラリは、クラスをインスペクトするための基本的なツールを提供します。より広範なランタイムイントロスペクションを行うには、`kotlin-reflect` の依存関係を追加し、そのAPIを使用してください。
+Kotlin標準ライブラリは、クラスを調査するための基本的なツールを提供しています。より広範なランタイムイントロスペクションを行うには、`kotlin-reflect` の依存関係を追加してそのAPIを使用してください。
 
 ## JVM依存関係の追加 {id="add-the-jvm-dependency"}
 
-JVMプラットフォームでは、リフレクション機能を使用するために必要なランタイムコンポーネントが、Kotlinコンパイラの配布物において個別のアーティファクトである `kotlin-reflect.jar` として提供されています。これにより、リフレクション機能を使用しないアプリケーションではこのアーティファクトを除外して、ランタイムのクラスパスサイズを削減できます。
+JVMプラットフォームでは、Kotlinコンパイラのディストリビューションに、リフレクション機能を使用するために必要なランタイムコンポーネントが別個のアーティファクト `kotlin-reflect.jar` として含まれています。これにより、リフレクション機能を使用しないアプリケーションはこのアーティファクトを除外して、ランタイムクラスパスのサイズを削減できます。
 
-GradleまたはMavenプロジェクトでリフレクションを使用するには、`kotlin-reflect` への依存関係を追加します：
+GradleまたはMavenプロジェクトでリフレクションを使用するには、`kotlin-reflect` への依存関係を追加します:
 
 <tabs group="build-system">
 <tab title="Gradle" group-key="gradle">
@@ -117,11 +117,11 @@ dependencies {
 
 GradleやMavenを使用していない場合は、プロジェクトのクラスパスに `kotlin-reflect.jar` が含まれていることを確認してください。コマンドラインコンパイラはデフォルトでこのライブラリを追加します。クラスパスから除外するには、`-no-reflect` [コンパイラオプション](compiler-reference.md#compiler-options)を使用します。
 
-## 型のインスペクト {id="inspect-types"}
+## 型の調査 {id="inspect-types"}
 
-`KClass` と `KType` は異なる情報を表します。`KClass` は、型引数やnull可能性（nullability）を保持せずにクラスを表します。例えば、`List<String>` と `List<Int>` は同じ `List::class` 表現を共有し、`String` と `String?` は `String::class` を共有します。したがって、静的に既知の型 `T` に対する型引数やnull可能性を含む `KType` を取得するには、[`typeOf<T>()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/type-of.html) 関数を使用します。
+`KClass` と `KType` は異なる情報を表します。`KClass` は、型引数やnull許容性（nullability）を保持せずにクラスを表します。たとえば、`List<String>` と `List<Int>` は同じ `List::class` という表現を共有し、`String` と `String?` は `String::class` を共有します。そのため、静的に判明している型 `T` の型引数やnull許容性を含んだ `KType` を取得するには、[`typeOf<T>()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/type-of.html) 関数を使用します。
 
-以下の例では、`classifier` プロパティが型をそのクラスまたは型パラメータに関連付けます。`arguments` コレクションにはその型引数が含まれます。これにより、コードは `String?` を `List` とは別にインスペクトできます：
+以下の例では、`classifier` プロパティが型をそのクラスまたは型パラメータに関連付けます。`arguments` コレクションにはその型引数が含まれます。これにより、コードは `List` とは別に `String?` を調査することができます:
 
 ```kotlin
 import kotlin.reflect.typeOf
@@ -136,17 +136,17 @@ fun main() {
 }
 ```
 
-> JVM上では、ソースコード内で型にアノテーションを付与していても、作成された型にはアノテーションが含まれません。型アノテーションのサポートは、将来のバージョンの `kotlin-reflect` ライブラリで追加される可能性があります。
+> JVM上では、ソースコードで型にアノテーションを付与していても、作成された型にはアノテーションが含まれません。型アノテーションのサポートは、`kotlin-reflect` ライブラリの将来のバージョンで追加される可能性があります。
 >
 {style="note"}
 
 ## 値のチェック {id="check-values"}
 
-[`is`、`as`、および `as?` 演算子](typecasts.md)は、コード内にターゲットの型を直接記述する場合に機能します。しかし、ターゲットのクラスを `KClass` 内に格納している場合は、以下を使用します：
+コード内にターゲットの型を直接記述する場合は、[`is`、`as`、`as?` 演算子](typecasts.md)が機能します。しかし、ターゲットのクラスを `KClass` に保持している場合は、以下を使用します:
 
-* [`isInstance()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/-k-class/is-instance.html) 関数：値がそのクラスのインスタンスであるかどうかをチェックします。`true` または `false` を返します。
-* [`cast()`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.full/cast.html) 関数：ターゲットの型を持つ値を返します。値が `null` であるか、互換性のない型を持つ場合は例外をスローします。
-* [`safeCast()`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.full/safe-cast.html) 関数：ターゲットの型を持つ値を返します。値が `null` であるか、互換性のない型を持つ場合は `null` を返します。
+* [`isInstance()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/-k-class/is-instance.html) 関数: 値がそのクラスのインスタンスであるかどうかをチェックします。`true` または `false` を返します。
+* [`cast()`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.full/cast.html) 関数: 値をターゲットの型として返します。値が `null` または互換性のない型である場合は例外をスローします。
+* [`safeCast()`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.full/safe-cast.html) 関数: 値をターゲットの型として返します。値が `null` または互換性のない型である場合は `null` を返します。
 
 ```kotlin
 import kotlin.reflect.cast
@@ -156,11 +156,11 @@ fun main() {
     val expectedClass = String::class
     val value: Any = "Kotlin"
 
-    // キャストせずに値をチェック
+    // キャストせずに値をチェックする
     println(expectedClass.isInstance(value))
     // true
 
-    // 値をStringとして返す
+    // 値を String として返す
     val text = expectedClass.cast(value)
     println(text.length)
     // 6
@@ -172,7 +172,7 @@ fun main() {
     println(failedCast.isFailure)
     // true
 
-    // セーフキャストは同じ不一致をnullで表す
+    // セーフキャストは同じ不一致を null で表す
     val number = Int::class.safeCast(value)
     println(number)
     // null
@@ -180,12 +180,12 @@ fun main() {
 ```
 {kotlin-runnable="true"}
 
-## クラスのインスペクト {id="inspect-a-class"}
+## クラスの調査 {id="inspect-a-class"}
 
-`KClass` を取得した後は、そのメンバーをインスペクトできます。これにより、宣言を使用する前にどのような宣言が存在するかを知ることができます。
-クラスの関数やプロパティをインスペクトするには、[`members`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/-k-class/members.html) プロパティを使用します。これには、継承された宣言を含め、そのクラスでアクセス可能なすべての宣言を持つ `KCallable` オブジェクトのコレクションが含まれます。
+`KClass` を取得した後は、そのメンバーを調査できます。これにより、使用する前にどのような宣言が存在するかを確認できます。
+クラスの関数やプロパティを調査するには、[`members`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/-k-class/members.html) プロパティを使用します。これには、継承された宣言を含め、そのクラスでアクセス可能なすべての宣言の `KCallable` オブジェクトのコレクションが含まれます。
 
-例えば、次のコードはデータクラスでアクセス可能な関数とプロパティを一覧表示します：
+たとえば、次のコードはデータクラスでアクセス可能な関数とプロパティを一覧表示します:
 
 ```kotlin
 data class User(val name: String, val age: Int)
@@ -196,33 +196,33 @@ fun main() {
 }
 ```
 
-`kotlin.reflect.full` パッケージは、種類、スコープ、レシーバによって宣言を選択するための、より具体的なプロパティを提供します：
+`kotlin.reflect.full` パッケージは、種類、スコープ、レシーバーによって宣言を選択するためのより具体的なプロパティを提供します:
 
-| プロパティ | 戻り値 |
-|---|---|
-| [`declaredMembers`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.full/declared-members.html) | 継承された宣言を除き、そのクラスで直接宣言されている関数とプロパティ |
-| [`functions`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.full/functions.html) | そのクラスから利用可能なすべての関数：クラスおよびそのスーパークラスの非静的関数、ならびにクラスで宣言された静的関数 |
-| [`declaredFunctions`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.full/declared-functions.html) | そのクラスで宣言されているすべての関数 |
-| [`memberFunctions`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.full/member-functions.html) | クラスおよびそのスーパークラスで宣言されている非拡張、非静的関数 |
-| [`declaredMemberFunctions`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.full/declared-member-functions.html) | そのクラスで宣言されている非拡張、非静的関数 |
-| [`memberExtensionFunctions`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.full/member-extension-functions.html) | クラスまたはそのスーパークラスのメンバーとして宣言されている拡張関数 |
-| [`declaredMemberExtensionFunctions`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.full/declared-member-extension-functions.html) | そのクラスで宣言されている拡張関数 |
-| [`staticFunctions`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.full/static-functions.html) | そのクラスで宣言されている静的関数 |
-| [`memberProperties`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.full/member-properties.html) | クラスおよびそのスーパークラスで宣言されている非拡張プロパティ |
-| [`declaredMemberProperties`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.full/declared-member-properties.html) | そのクラスで宣言されている非拡張プロパティ |
-| [`memberExtensionProperties`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.full/member-extension-properties.html) | クラスまたはそのスーパークラスのメンバーとして宣言されている拡張プロパティ |
-| [`declaredMemberExtensionProperties`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.full/declared-member-extension-properties.html) | そのクラスでメンバーとして宣言されている拡張プロパティ |
-| [`staticProperties`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.full/static-properties.html) | Javaクラスで宣言された静的フィールドを表すプロパティ |
+| プロパティ                                                                                                                                           | 戻り値                                                                                                                                      |
+|-----------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------|
+| [`declaredMembers`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.full/declared-members.html)                                       | 継承された宣言を除き、クラスで直接宣言された関数およびプロパティ                                                                                    |
+| [`functions`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.full/functions.html)                                                    | クラスから利用可能なすべての関数: クラスおよびそのスーパークラスの非静的関数、ならびにクラスで宣言された静的関数                                |
+| [`declaredFunctions`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.full/declared-functions.html)                                   | クラスで宣言されたすべての関数                                                                                                          |
+| [`memberFunctions`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.full/member-functions.html)                                       | クラスおよびそのスーパークラスで宣言された、非拡張かつ非静的な関数                                                                               |
+| [`declaredMemberFunctions`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.full/declared-member-functions.html)                      | クラスで宣言された、非拡張かつ非静的な関数                                                                                                    |
+| [`memberExtensionFunctions`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.full/member-extension-functions.html)                    | クラスまたはそのスーパークラスのメンバーとして宣言された拡張関数                                                                                     |
+| [`declaredMemberExtensionFunctions`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.full/declared-member-extension-functions.html)   | クラスで宣言された拡張関数                                                                                                                    |
+| [`staticFunctions`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.full/static-functions.html)                                       | クラスで宣言された静的関数                                                                                                       |
+| [`memberProperties`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.full/member-properties.html)                                     | クラスおよびそのスーパークラスで宣言された、非拡張プロパティ                                                                                          |
+| [`declaredMemberProperties`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.full/declared-member-properties.html)                    | クラスで宣言された、非拡張プロパティ                                                                                               |
+| [`memberExtensionProperties`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.full/member-extension-properties.html)                  | クラスまたはそのスーパークラスのメンバーとして宣言された拡張プロパティ                                                                                    |
+| [`declaredMemberExtensionProperties`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.full/declared-member-extension-properties.html) | クラスのメンバーとして宣言された拡張プロパティ                                                                                                       |
+| [`staticProperties`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.full/static-properties.html)                                     | Javaクラスで宣言された静的フィールドを表すプロパティ                                                                               |
 
-コードが必要とする宣言に一致する、最も絞り込まれたプロパティを選択してください。例えば、シリアライザは特定のクラスによって導入されたプロパティのみを処理するために `declaredMemberProperties` を使用するかもしれませんが、呼び出し可能なAPIを検索するフレームワークでは継承された `memberFunctions` も必要になる場合があります。
+コードが必要とする宣言に合致する、最も限定的なプロパティを選択してください。たとえば、シリアライザーは特定のクラスで導入されたプロパティのみを処理するために `declaredMemberProperties` を使用するかもしれませんが、呼び出し可能なAPIを検索するフレームワークは継承された `memberFunctions` も必要とする場合があります。
 
-また、リフレクションを使用して [sealed サブクラスをインスペクト](sealed-classes.md#inspect-sealed-subclasses-with-reflection) することもできます。
+リフレクションを使用して[sealedサブクラスを調査](sealed-classes.md#inspect-sealed-subclasses-with-reflection)することもできます。
 
 ## プロパティの読み取り {id="read-a-property"}
 
 リフレクションを使用すると、実行時に選択されたプロパティを読み取ることができます。
-例えば、`User` オブジェクトから表示するプロパティとして `name` を指定するUI設定があるとします。
-そのために、アプリケーションは一致するプロパティ宣言を見つけ、そのゲッターを呼び出す必要があります：
+たとえば、`User` オブジェクトから表示するプロパティとして `name` を指定するUI構成があるとします。
+そのためには、アプリケーションは一致するプロパティ宣言を見つけてから、そのゲッターを呼び出す必要があります:
 
 ```kotlin
 import kotlin.reflect.full.memberProperties
@@ -230,15 +230,15 @@ import kotlin.reflect.full.memberProperties
 data class User(val name: String, val age: Int)
 
 fun readProperty(instance: Any, propertyName: String): Any? {
-    // ランタイムクラスをインスペクト
+    // ランタイムクラスを調査する
     val runtimeClass = instance::class
 
-    // プロパティ宣言を検索
+    // プロパティ宣言を見つける
     val property = runtimeClass.memberProperties
         .firstOrNull { it.name == propertyName }
         ?: error("Unknown property: $propertyName")
 
-    // オブジェクトをレシーバとしてゲッターを呼び出す
+    // オブジェクトをレシーバーとしてゲッターを呼び出す
     return property.getter.call(instance)
 }
 
@@ -252,15 +252,15 @@ fun main() {
 }
 ```
 
-この例では、[`memberProperties`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.full/member-properties.html) を使用してアンバウンド（未束縛）なプロパティオブジェクトを返しています。これらのオブジェクトはクラスに属しているものの、特定のインスタンスにはアタッチされていないプロパティを表します。そのため、`getter.call()` にはレシーバとして `instance` が必要です。実行時に選択されるプロパティは任意の型を返す可能性があるため、結果は `Any?` 型になります。
+この例では、[`memberProperties`](https://kotlinlang.org/api/core/kotlin-reflect/kotlin.reflect.full/member-properties.html) を使用してバインドされていない（unbound）プロパティオブジェクトを返します。これらのオブジェクトは、クラスに属しているものの特定のインスタンスには紐付けられていないプロパティを表します。そのため、`getter.call()` にはレシーバーとして `instance` が必要になります。実行時に選択されるプロパティは任意の型を返す可能性があるため、結果は `Any?` 型になります。
 
-> プロパティがコンパイル時に既知である場合は、リフレクションの代わりに直接のプロパティアクセスまたは[呼び出し可能参照](lambdas.md#callable-reference)を使用してください。
+> プロパティがコンパイル時に判明している場合は、リフレクションの代わりに、プロパティへの直接アクセスまたは[呼び出し可能参照](lambdas.md#callable-reference)を使用してください。
 > 
 {style="tip"}
 
 ## 関数の呼び出し {id="call-a-function"}
 
-動的な関数の呼び出しも、[プロパティ](#read-a-property)と同じパターンに従います。すべての引数が宣言された順序で揃っている場合は、[`call()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/-k-callable/call.html) を使用できます。アンバウンドなメンバー関数を宣言する場合、最初にそのオブジェクトインスタンスを指定し、その後に通常の引数を追加します：
+動的な関数呼び出しは、[プロパティ](#read-a-property)と同じパターンに従います。すべての引数が宣言された順序で利用可能な場合は、[`call()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/-k-callable/call.html) を使用できます。バインドされていないメンバー関数を呼び出す際は、最初にそのオブジェクトインスタンスを指定し、その後に通常の引数を追加します:
 
 ```kotlin
 import kotlin.reflect.full.memberFunctions
@@ -273,11 +273,11 @@ class Formatter {
 fun main() {
     val formatter = Formatter()
 
-    // 実行時に関数をその名前で検索
+    // 実行時に名前で関数を見つける
     val function = Formatter::class.memberFunctions
         .single { it.name == "format" }
 
-    // レシーバを最初に渡し、宣言された引数を順番に渡す
+    // レシーバーを最初に渡し、次に宣言された引数を順番に渡す
     val result = function.call(formatter, "Kotlin", true)
 
     println(result)
@@ -285,9 +285,9 @@ fun main() {
 }
 ```
 
-この例では、呼び出しに `Formatter` レシーバ、`text`、`uppercase` の3つの値が含まれています。これも `Any?` 型を返し、互換性のないレシーバや引数がある場合は実行時にエラーを報告します。
+この例では、呼び出しに3つの値（`Formatter` レシーバー、`text`、`uppercase`）が含まれています。また、戻り値は `Any?` 型となり、互換性のないレシーバーや引数は実行時にエラーとして報告されます。
 
-また、位置によって引数を渡す代わりに、値を `KParameter` オブジェクトに関連付けることもできます。そのためには、[`callBy()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/-k-callable/call-by.html) 関数を使用します：
+位置（引数の順序）で値を渡す代わりに、値を `KParameter` オブジェクトに関連付けることもできます。そのためには、[`callBy()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/-k-callable/call-by.html) 関数を使用します:
 
 ```kotlin
 import kotlin.reflect.full.instanceParameter
@@ -304,14 +304,14 @@ fun main() {
     val function = Greeter::class.memberFunctions
         .single { it.name == "greet" }
 
-    // valueParametersにはgreet()で宣言されたパラメータが含まれるが、
-    // Greeterレシーバは含まれない
+    // valueParameters には greet() で宣言されたパラメータが含まれるが、
+    // Greeter レシーバーは含まれない
     val nameParameter = function.valueParameters
         .single { it.name == "name" }
 
     val result = function.callBy(
         mapOf(
-            // メンバー関数にはインスタンスレシーバが必要
+            // メンバー関数にはインスタンスレシーバーが必要
             function.instanceParameter!! to greeter,
             nameParameter to "Kotlin"
         )
@@ -322,10 +322,10 @@ fun main() {
 }
 ```
 
-この例では、`instanceParameter` がメンバー関数のレシーバを特定し、`valueParameters` には関数のシグネチャで宣言されたパラメータのみが含まれます。
+この例では、`instanceParameter` がメンバー関数のレシーバーを特定し、`valueParameters` には関数のシグネチャで宣言されたパラメータのみが含まれます。
 
-> 順序通りの完全な引数リストがすでに用意されている場合は、`call()` を使用してください。
+> 順序付けられた完全な引数リストがすでに揃っている場合は、`call()` を使用してください。
 > 
-> 引数をパラメータオブジェクトに対応付ける場合や、オプショナルなパラメータにデフォルト値を使用させる場合は、`callBy()` を使用してください。
+> 引数をパラメータオブジェクトに対応付ける場合や、省略可能なパラメータでデフォルト値を使用する場合は、`callBy()` を使用してください。
 > 
 {style="tip"}

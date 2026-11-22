@@ -1,40 +1,40 @@
 [//]: # (title: Compose Multiplatform %org.jetbrains.compose-eap%의 새로운 기능)
 
-이번 EAP 릴리스의 주요 변경 사항은 다음과 같습니다:
+이번 EAP 릴리스의 주요 변경 사항은 다음과 같습니다.
 
 * [SwiftUI 및 UIKit에서 Compose Multiplatform 뷰의 콘텐츠 기반 크기 조정](#content-based-sizing-for-compose-multiplatform-views-in-swiftui-and-uikit)
 * [iOS에서 비밀번호 저장 및 자동 완성](#saving-and-autofilling-passwords)
-* [WebGL 상호 운용성(interop)](#webgl-interop)
+* [WebGL 상호 운용성(Interop)](#webgl-interop)
 * [AppCDS 및 AOT 옵션을 통한 데스크톱 시작 속도 향상](#faster-desktop-startup-with-appcds-or-aot)
 
 이번 릴리스의 전체 변경 사항 목록은 [GitHub](https://github.com/JetBrains/compose-multiplatform/releases/tag/v1.13.0-beta01)에서 확인할 수 있습니다.
 
-특정 컴포넌트 버전에 대한 자세한 내용은 [종속성](#dependencies) 섹션을 참조하세요.
+특정 컴포넌트 버전에 대한 자세한 내용은 [종속성](#dependencies) 섹션을 참고하세요.
 이번 릴리스에 포함된 AndroidX Compose 런타임 버전의 변경 사항은 [`androidx.compose.runtime` 릴리스 노트](https://developer.android.com/jetpack/androidx/releases/compose-runtime#version_113_2)를 참조하세요.
 
 ## 플랫폼 공통 {id="across-platforms"}
 
-이전 Compose Multiplatform 릴리스에서 실험적(Experimental)이었던 몇 가지 기능이 이제 안정화(Stable)되었습니다.
-더 이상 해당 기능을 사용하기 위해 별도의 opt-in을 할 필요가 없습니다:
+이전 Compose Multiplatform 릴리스에서 [실험적(Experimental)](supported-platforms.md#general-kotlin-stability-levels)이었던 여러 기능이 이제 [안정화(Stable)](supported-platforms.md#general-kotlin-stability-levels)되었습니다.
+더 이상 해당 기능을 사용하기 위해 opt-in할 필요가 없습니다.
 
-* iOS에서 `ComposeUIView()`를 생성하고 `ComposeUIViewportConfiguration`으로 구성하는 기능.
-* [웹용 `ComposeViewportConfiguration`을 사용한 `ComposeViewport()` 구성](compose-css-styles.md).
-* [`preload` API를 사용한 웹 리소스 사전 로드](compose-web-resources.md#preload-resources-using-the-compose-multiplatform-preload-api).
+* iOS에서 `ComposeUIView()`를 생성하고 `ComposeUIViewportConfiguration`으로 설정하는 기능.
+* [웹용 `ComposeViewport()`를 `ComposeViewportConfiguration`으로 설정하는 기능](compose-css-styles.md).
+* [`preload` API를 사용한 웹 리소스 사전 로드 기능](compose-web-resources.md#preload-resources-using-the-compose-multiplatform-preload-api).
 
 ## iOS {id="ios"}
 
 ### SwiftUI 및 UIKit에서 Compose Multiplatform 뷰의 콘텐츠 기반 크기 조정 {id="content-based-sizing-for-compose-multiplatform-views-in-swiftui-and-uikit"}
 
-SwiftUI 또는 UIKit 레이아웃에 임베드된 Compose Multiplatform 뷰가 사용 가능한 공간을 기반으로 기본 선호 크기(preferred size)를 보고할 수 있게 되었습니다.
-네이티브 컨테이너는 이 크기를 사용하여 Compose 콘텐츠에 맞출 수 있습니다. 예를 들어 너비를 고정한 채 뷰의 높이를 조정하거나 그 반대로 조정할 수 있습니다.
+SwiftUI 또는 UIKit 레이아웃에 임베드된 Compose Multiplatform 뷰가 이제 사용 가능한 공간을 기반으로 기본 설정 크기(preferred size)를 보고할 수 있습니다.
+네이티브 컨테이너는 이 크기를 사용하여 너비를 고정한 채 뷰의 높이를 조정하거나 그 반대로 조정하는 등 Compose 콘텐츠에 맞출 수 있습니다.
 
 Compose Multiplatform 뷰는 기본적으로 `PreferredSizeReportingStrategy.SizeThatFits`를 사용합니다.
-UIKit에서는 추가적인 크기 조정 설정이 필요하지 않습니다.
+UIKit에서는 추가적인 크기 설정이 필요하지 않습니다.
 
-SwiftUI에서는 iOS 16 이상을 실행하는 기기의 경우 이 기본값을 유지하세요.
-이전 iOS 버전의 SwiftUI에서는 `PreferredSizeReportingStrategy.IntrinsicContentSize`를 사용하고 수동으로 크기 제안(sizing proposal)을 제공해야 합니다.
+SwiftUI에서는 iOS 16 이상을 실행하는 기기에서 이 기본값을 유지하세요.
+이전 iOS 버전의 SwiftUI에서는 `PreferredSizeReportingStrategy.IntrinsicContentSize`를 사용하고 크기 제안(sizing proposals)을 수동으로 제공해야 합니다.
 
-설정 방법과 예제는 다음을 참조하세요:
+설정 방법과 예제는 다음을 참조하세요.
 
 * [SwiftUI에서의 콘텐츠 기반 크기 조정](compose-swiftui-integration.md#size-compose-views-to-fit-their-content)
 * [UIKit에서의 콘텐츠 기반 크기 조정](compose-uikit-integration.md#size-compose-views-to-fit-their-content)
@@ -42,12 +42,12 @@ SwiftUI에서는 iOS 16 이상을 실행하는 기기의 경우 이 기본값을
 ### 비밀번호 저장 및 자동 완성 {id="saving-and-autofilling-passwords"}
 <primary-label ref="Experimental"/>
 
-iOS에서 Compose Multiplatform은 이제 로그인 자격 증명을 저장하고 Compose 텍스트 필드를 자동으로 완성하는 네이티브 프롬프트를 표시할 수 있습니다.
-iOS가 양식을 로그인 양식으로 인식할 수 있도록 사용자 이름 필드와 비밀번호 필드를 모두 화면에 유지하세요.
+iOS에서 Compose Multiplatform은 이제 로그인 자격 증명을 저장하고 Compose 텍스트 필드를 자동 완성하기 위한 네이티브 프롬프트를 표시할 수 있습니다.
+iOS가 양식을 로그인 양식으로 인식할 수 있도록 사용자 이름과 비밀번호 필드를 모두 화면에 유지하세요.
 
-필드를 구성하려면 iOS 소스 세트에서 `PlatformImeOptions`를 사용합니다.
-사용자 이름에는 `textContentType(UITextContentTypeUsername)`을 설정하고, 비밀번호에는 `isSecureTextEntry(true)`를 설정하세요.
-예를 들어 `@OptIn(ExperimentalComposeUiApi::class)` 어노테이션이 달린 composable 내부에서 다음과 같이 사용할 수 있습니다:
+필드를 설정하려면 iOS 소스 세트에서 `PlatformImeOptions`를 사용하세요.
+사용자 이름에는 `textContentType(UITextContentTypeUsername)`을 설정하고, 비밀번호에는 `isSecureTextEntry(true)`를 설정합니다.
+예를 들어, `@OptIn(ExperimentalComposeUiApi::class)` 애너테이션이 지정된 Composable 내에서 다음과 같이 작성할 수 있습니다.
 
 ```kotlin
 var username by remember { mutableStateOf("") }
@@ -87,8 +87,8 @@ Column {
 Compose Multiplatform은 이제 [WebGL](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API) 텍스처를 렌더링하기 위한 실험적 API를 제공합니다.
 `WebGLRenderTarget`은 다른 Compose UI 요소와 함께 WebGL 그래픽을 표시하는 Compose `Painter`를 노출합니다.
 
-`rememberWebGLRenderTarget()`을 사용하여 대상을 생성하고, `render {}`로 그 안에 그린 다음, 해당 `painter`를 `Image`에 표시합니다.
-예를 들어 다음 코드 조각은 `@OptIn(ExperimentalComposeUiApi::class)`가 지정된 composable 내부에서 파란색 텍스처를 렌더링합니다:
+`rememberWebGLRenderTarget()`을 사용하여 대상을 생성하고, `render {}`로 대상에 그린 후, 해당 `painter`를 `Image`에 표시합니다.
+예를 들어, 다음 코드는 `@OptIn(ExperimentalComposeUiApi::class)`가 지정된 Composable 내부에서 파란색 텍스처를 렌더링합니다.
 
 ```kotlin
 val target = rememberWebGLRenderTarget(IntSize(64, 64))
@@ -112,16 +112,16 @@ if (target != null) {
 }
 ```
 
-더 고급 사용 사례의 경우, `target`을 통해 기본 WebGL 렌더링 컨텍스트에 직접 접근할 수도 있습니다.
+더 고급 사용 사례의 경우 `target`은 기본 WebGL 렌더링 컨텍스트에 대한 접근도 제공합니다.
 
 ### 웹에서의 시스템 윈도우 인셋 {id="system-window-insets-on-web"}
 <primary-label ref="Experimental"/>
 
-웹용 Compose Multiplatform은 이제 표준 `WindowInsets` API를 통한 시스템 윈도우 인셋(System window insets)을 지원합니다.
-UI는 디스플레이 컷아웃 및 화면상 가상 키보드를 포함한 안전 영역(safe area)을 준수하면서 전체 화면(edge-to-edge)으로 그릴 수 있습니다.
+웹용 Compose Multiplatform이 이제 표준 `WindowInsets` API를 통해 시스템 윈도우 인셋(System window insets)을 지원합니다.
+디스플레이 컷아웃 및 화면 키보드를 포함한 안전 영역(Safe area)을 준수하면서 에지 투 에지(Edge-to-edge)로 UI를 그릴 수 있습니다.
 
 이 기능을 활성화하려면 `ComposeViewport` 구성에서 `enableBrowserWindowInsets`를 `true`로 설정하세요.
-레이아웃을 조정하려면 표준 인셋 수정자(modifier)를 사용합니다:
+표준 인셋 한정자(modifier)를 사용하여 레이아웃을 조정할 수 있습니다.
 
 ```kotlin
 ComposeViewport(configure = { enableBrowserWindowInsets = true }) {
@@ -133,22 +133,22 @@ ComposeViewport(configure = { enableBrowserWindowInsets = true }) {
 
 `WindowInsets.safeDrawing` 및 `WindowInsets.ime`과 같은 API를 통해 인셋에 직접 접근할 수도 있습니다.
 
-edge-to-edge 렌더링을 위해서는 페이지의 뷰포트 `meta` 태그에 `viewport-fit=cover`를 추가하세요:
+에지 투 에지 렌더링을 적용하려면 페이지의 뷰포트 `meta` 태그에 `viewport-fit=cover`를 추가하세요.
 
 ```html
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 ```
 
-> `viewport-fit=cover`가 없으면 브라우저가 안전 영역 패딩을 자체 적용하고 안전 영역 인셋을 0으로 보고합니다.
-> 이 설정 없이 브라우저 윈도우 인셋이 활성화된 경우 Compose Multiplatform은 경고를 기록합니다.
+> `viewport-fit=cover`가 없으면 브라우저가 안전 영역 패딩을 적용하고 안전 영역 인셋을 0으로 보고합니다.
+> 이 설정 없이 브라우저 윈도우 인셋을 활성화하면 Compose Multiplatform에서 경고를 기록합니다.
 
-### 웹에서의 폰트 폴백(Font Fallback) 설정 지원 {id="configurable-font-fallback-on-web"}
+### 웹에서의 폴백 폰트 설정 지원 {id="configurable-font-fallback-on-web"}
 
-이전 릴리스에서는 애플리케이션의 폰트에 포함되지 않은 문자를 위한 [자동 폰트 폴백](compose-web-resources.md#automatic-font-fallback)을 도입했습니다.
+이전 릴리스에서는 애플리케이션의 폰트에서 지원하지 않는 문자를 위한 [자동 폰트 폴백(Automatic font fallback)](compose-web-resources.md#automatic-font-fallback) 기능을 도입했습니다.
 이번 릴리스에서는 폴백 폰트의 소스를 직접 선택하거나 자동 다운로드를 비활성화할 수 있습니다.
 
 기본적으로 Compose Multiplatform은 [Google Fonts](https://fonts.gstatic.com/s/)에서 폴백 폰트를 다운로드합니다.
-다른 소스를 사용하려면 윈도우 구성에서 `fontFallbackUrl`을 설정하세요:
+다른 소스를 사용하려면 윈도우 구성에서 `fontFallbackUrl`을 설정하세요.
 
 ```kotlin
 createComposeWindow(
@@ -158,7 +158,7 @@ createComposeWindow(
 }
 ```
 
-자동 폰트 폴백을 비활성화하려면 `fontFallbackUrl`을 `null`로 설정합니다:
+자동 폰트 폴백을 비활성화하려면 `fontFallbackUrl`을 `null`로 설정합니다.
 
 ```kotlin
 createComposeWindow(
@@ -172,19 +172,18 @@ createComposeWindow(
 
 ### AppCDS 또는 AOT를 통한 데스크톱 시작 속도 향상 {id="faster-desktop-startup-with-appcds-or-aot"}
 
-Compose Multiplatform은 이제 데스크톱 애플리케이션에 대해 [애플리케이션 클래스 데이터 공유(AppCDS, Application Class-Data Sharing)](https://openjdk.org/jeps/310) 및 
-[AOT(Ahead-of-Time) 캐싱](https://openjdk.org/jeps/514)을 지원합니다. 두 옵션 모두 아카이브를 사용하여 시작 시간을 단축합니다.
+Compose Multiplatform은 이제 데스크톱 애플리케이션을 위한 [Application Class-Data Sharing(AppCDS)](https://openjdk.org/jeps/310) 및 [Ahead-of-Time(AOT) 캐싱](https://openjdk.org/jeps/514)을 지원합니다. 두 옵션 모두 아카이브를 사용하여 시작 시간을 단축합니다.
 
-소규모 데모 애플리케이션의 벤치마크에서 사전 빌드된 AOT 캐시는 콜드 스타트(cold startup) 시간을 다음과 같이 단축했습니다:
+소규모 데모 애플리케이션에 대한 벤치마크 결과, 사전 빌드된 AOT 캐시를 통해 콜드 스타트업 시간이 단축되었습니다.
 
-* macOS(M1 Ultra): 2017 ms에서 424 ms로 단축 — 4.8배 향상.
-* Windows(Dell Precision 5690): 1356 ms에서 650 ms로 단축 — 2.1배 향상.
+* macOS(M1 Ultra): 2017ms에서 424ms로 감소 (4.8배 빨라짐)
+* Windows(Dell Precision 5690): 1356ms에서 650ms로 감소 (2.1배 빨라짐)
 
 이 측정값은 프로세스 실행부터 창이 표시될 때까지의 시간을 포함합니다.
-결과는 애플리케이션 및 환경에 따라 다릅니다.
-AOT 시작 최적화를 위해서는 최신 [JetBrains Runtime (JBR) 25](https://github.com/JetBrains/JetBrainsRuntime) 릴리스를 권장합니다.
+결과는 애플리케이션과 환경에 따라 달라질 수 있습니다.
+AOT 시작 최적화를 위해서는 최신 [JetBrains Runtime(JBR) 25](https://github.com/JetBrains/JetBrainsRuntime) 릴리스를 사용하는 것을 권장합니다.
 
-이러한 시작 옵션을 활성화하려면 `build.gradle.kts` 파일에서 `aot {}` 블록을 구성하세요:
+이러한 시작 옵션을 활성화하려면 `build.gradle.kts` 파일에서 `aot {}` 블록을 구성하세요.
 
 ```kotlin
 compose.desktop {
@@ -196,42 +195,42 @@ compose.desktop {
 }
 ```
 
-JDK 버전과 패키징 요구 사항에 따라 모드를 선택하세요:
+JDK 버전 및 패키징 요구사항에 따라 모드를 선택하세요.
 
-| 모드             | 최소 JDK 버전 | 동작                                                                                           |
+| 모드 | 최소 JDK | 동작 |
 |------------------|-------------|------------------------------------------------------------------------------------------------|
-| `None`           | —           | 기본값, 시작 최적화 없음.                                                                      |
-| `AppCdsAuto`     | 19          | 사용자의 첫 번째 세션이 종료될 때 AppCDS 아카이브를 생성하여 이후 실행 속도를 높입니다.        |
-| `AppCdsPrebuild` | 21          | 패키징 전에 AppCDS 아카이브를 생성하여 첫 실행부터 시작 속도를 높입니다.                      |
-| `AotPrebuild`    | 25          | 패키징 전에 AOT 캐시를 생성하며, 링킹 및 JIT 웜업 성능도 향상시킵니다.                        |
+| `None`           | —           | 기본값이며, 시작 최적화를 수행하지 않습니다. |
+| `AppCdsAuto`     | 19          | 사용자의 첫 번째 세션이 종료될 때 AppCDS 아카이브를 생성하여 이후 실행 속도를 높입니다. |
+| `AppCdsPrebuild` | 21          | 패키징 전에 AppCDS 아카이브를 생성하여 첫 실행부터 시작 속도를 높입니다. |
+| `AotPrebuild`    | 25          | 패키징 전에 AOT 캐시를 생성하며, 링킹 및 JIT 웜업도 개선합니다. |
 
-두 prebuild 모드는 아카이브를 생성하기 위해 패키징 중에 애플리케이션을 실행합니다.
+두 가지 사전 빌드(Prebuild) 모드는 패키징 중에 애플리케이션을 실행하여 아카이브를 생성합니다.
 이 캐시 생성 실행 동안 플러그인은 `compose.aot.training-run` 시스템 속성을 `true`로 설정합니다.
 
-prebuild 모드는 애플리케이션에 아카이브가 포함되므로 배포 가능한 바이너리 크기가 증가한다는 점에 유의하세요.
+사전 빌드 모드는 애플리케이션에 아카이브가 포함되므로 배포 패키지 크기가 증가한다는 점에 유의하세요.
 
-### macOS 및 Windows에서의 더 부드러운 창 크기 조절 {id="smoother-window-resizing-on-macos-and-windows"}
+### macOS 및 Windows에서 더 부드러워진 윈도우 크기 조절 {id="smoother-window-resizing-on-macos-and-windows"}
 
-Compose Multiplatform은 이제 macOS의 Metal 또는 Windows의 DirectX를 사용할 때 더욱 부드러운 반응형 창 크기 조절을 지원합니다.
-렌더링이 창 크기 조절과 동기화되어 유지되므로 끊김 현상이 줄어들고 창 가장자리에 흰색 바가 생기는 현상을 방지합니다.
+Compose Multiplatform은 이제 macOS의 Metal 또는 Windows의 DirectX를 사용할 때 더욱 부드러운 대화형 윈도우 크기 조절을 지원합니다.
+렌더링이 윈도우 크기 조절과 동기화되어 끊김 현상이 줄어들고 창 가장자리를 따라 흰색 줄이 나타나는 것을 방지합니다.
 
-이 동작을 활성화하려면 창을 표시하기 전에 해당 렌더러에 대한 시스템 속성을 `true`로 설정하세요.
-`System.setProperty()` 또는 JVM `-D` 플래그를 사용하여 설정할 수 있습니다:
+이 동작을 활성화하려면 창을 표시하기 전에 사용하는 렌더러에 대한 시스템 속성을 `true`로 설정하세요.
+`System.setProperty()` 또는 JVM `-D` 플래그로 설정할 수 있습니다.
 
-* Metal을 사용하는 macOS: `skiko.rendering.macos.metalSynchronousLiveResize`
-* DirectX를 사용하는 Windows: `skiko.rendering.windows.direct3DSynchronousLiveResize`
+* macOS(Metal): `skiko.rendering.macos.metalSynchronousLiveResize`
+* Windows(DirectX): `skiko.rendering.windows.direct3DSynchronousLiveResize`
 
-이 기능을 사용하려면 Compose 콘텐츠가 창 전체를 채워야 합니다.
+이 기능을 사용하려면 Compose 콘텐츠가 전체 창을 채워야 합니다.
 
 ## 종속성 {id="dependencies"}
 
-| 라이브러리         | Maven 좌표                                                             | 기반 Jetpack 버전                                                                                                                    |
+| 라이브러리 | Maven 좌표 | 기반 Jetpack 버전 |
 |--------------------|------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
-| Runtime            | `org.jetbrains.compose.runtime:runtime*:1.13.0-beta02`                 | [Runtime 1.13.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.13.0-beta02)                       |
-| UI                 | `org.jetbrains.compose.ui:ui*:1.13.0-beta02`                           | [UI 1.13.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.13.0-beta02)                                 |
-| Foundation         | `org.jetbrains.compose.foundation:foundation*:1.13.0-beta02`           | [Foundation 1.13.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.13.0-beta02)                 |
-| Material           | `org.jetbrains.compose.material:material*:1.13.0-beta02`               | [Material 1.13.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-material#1.13.0-beta02)                     |
-| Material3          | `org.jetbrains.compose.material3:material3*:1.13.0-beta02`             | [Material3 1.5.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.5.0-beta02)                     |
+| Runtime            | `org.jetbrains.compose.runtime:runtime*:1.13.0-rc01`                   | [Runtime 1.13.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.13.0-rc01)                           |
+| UI                 | `org.jetbrains.compose.ui:ui*:1.13.0-rc01`                             | [UI 1.13.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.13.0-rc01)                                     |
+| Foundation         | `org.jetbrains.compose.foundation:foundation*:1.13.0-rc01`             | [Foundation 1.13.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.13.0-rc01)                     |
+| Material           | `org.jetbrains.compose.material:material*:1.13.0-rc01`                 | [Material 1.13.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-material#1.13.0-rc01)                         |
+| Material3          | `org.jetbrains.compose.material3:material3*:1.13.0-rc01`               | [Material3 1.5.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.5.0-rc01)                         |
 | Material3 Adaptive | `org.jetbrains.compose.material3.adaptive:adaptive*:1.4.0-alpha01`     | [Material3 Adaptive 1.4.0-alpha03](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.4.0-alpha03) |
 | Lifecycle          | `org.jetbrains.androidx.lifecycle:lifecycle-*:2.11.0`                  | [Lifecycle 2.11.0](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.11.0)                                         |
 | Navigation         | `org.jetbrains.androidx.navigation:navigation-*:2.10.0`                | [Navigation 2.10.0](https://developer.android.com/jetpack/androidx/releases/navigation#2.10.0)                                       |

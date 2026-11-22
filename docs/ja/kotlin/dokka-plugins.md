@@ -1,28 +1,28 @@
 [//]: # (title: Dokkaプラグイン)
 
-> このガイドは Dokka Gradle プラグイン (DGP) v2 モードに適用されます。DGP v1 モードはサポートされなくなりました。
-> v1 から v2 モードにアップグレードするには、[移行ガイド](dokka-migration.md)に従ってください。
+> このガイドは Dokka Gradle プラグイン（DGP）v2 モードに適用されます。DGP v1 モードはサポートが終了しました。
+> v1 から v2 モードにアップグレードするには、[マイグレーションガイド](dokka-migration.md)に従ってください。
 >
 {style="note"}
 
-Dokka は、簡単に拡張でき高度にカスタマイズできるようにゼロから構築されているため、標準では提供されていない機能や非常に特殊な機能に対応するプラグインをコミュニティで実装できます。
+Dokka は、簡単に拡張でき、高度にカスタマイズできるようにゼロから構築されています。これにより、標準では提供されていない不足している機能や、非常に特殊な要件のためのプラグインをコミュニティが実装できます。
 
-Dokka プラグインの適用範囲は、他のプログラミング言語のソースコードのサポートから、一般的ではない出力フォーマットのサポートまで多岐にわたります。独自の KDoc タグやアノテーションのサポートを追加したり、KDoc の説明に含まれるさまざまな DSL を Dokka にレンダリングさせたり、Dokka のページを自社のウェブサイトとシームレスに統合できるように視覚的にリデザインしたり、他のツールと連携させたりなど、他にも多くのことが可能です。
+Dokka プラグインの対象範囲は、他のプログラミング言語のソースサポートから珍しい出力フォーマットまで多岐にわたります。独自の KDoc タグやアノテーションのサポートを追加したり、KDoc の記述に含まれるさまざまな DSL をレンダリングする方法を Dokka に教えたり、組織の Web サイトにシームレスに統合できるように Dokka のページを視覚的に再設計したり、他のツールと連携させたりなど、さまざまなことが可能です。
 
 Dokka プラグインの作成方法を学びたい場合は、[開発者ガイド](https://kotlin.github.io/dokka/%dokkaVersion%/developer_guide/introduction/)を参照してください。
 
 ## Dokkaプラグインの適用 {id="apply-dokka-plugins"}
 
-Dokka プラグインは個別のアーティファクトとして公開されているため、Dokka プラグインを適用するには依存関係として追加するだけです。プラグインは自律的に Dokka を拡張するため、それ以上のアクションは必要ありません。
+Dokka プラグインは個別のアーティファクトとして公開されているため、Dokka プラグインを適用するには依存関係として追加するだけです。その後はプラグイン自身によって Dokka が拡張されるため、それ以上のアクションは必要ありません。
 
-> 同じ拡張ポイントを使用したり、同様の方法で動作したりするプラグイン同士は、互いに干渉する可能性があります。
-> これにより、表示の不具合や一般的な未定義の動作、さらにはビルドの失敗につながる可能性があります。ただし、Dokka は可変 (mutable) なデータ構造やオブジェクトを公開しないため、並行性の問題 (concurrency issues) が発生することはありません。
+> 同じ拡張ポイントを使用したり、同様の方法で動作したりするプラグイン同士は、互いに干渉し合う可能性があります。
+> これにより、視覚的なバグ、一般的な予期しない動作、あるいはビルドの失敗につながるおそれがあります。ただし、Dokka は変更可能なデータ構造やオブジェクトを公開していないため、並行性の問題にはつながりません。
 >
 > このような問題に気づいた場合は、どのプラグインが適用されていて、それらが何を行っているかを確認することをお勧めします。
 > 
 {style="note"}
 
-プロジェクトに [mathjax プラグイン](https://github.com/Kotlin/dokka/tree/%dokkaVersion%/dokka-subprojects/plugin-mathjax)を適用する方法を見てみましょう。
+プロジェクトに [mathjax プラグイン](https://github.com/Kotlin/dokka/tree/%dokkaVersion%/dokka-subprojects/plugin-mathjax) を適用する方法を見てみましょう。
 
 <tabs group="build-script">
 <tab title="Gradle Kotlin DSL" group-key="kotlin">
@@ -37,9 +37,9 @@ dependencies {
 }
 ```
 
-> * 組み込みプラグイン (HTML や Javadoc など) は常に自動的に適用されます。これらは設定を行うだけでよく、依存関係を宣言する必要はありません。
+> * 組み込みプラグイン（HTML や Javadoc など）は常に自動的に適用されます。設定を行うだけでよく、それらに対する依存関係を宣言する必要はありません。
 >
-> * マルチモジュールプロジェクト (マルチプロジェクトビルド) をドキュメント化する場合は、[サブプロジェクト間で Dokka の設定とプラグインを共有](dokka-gradle.md#multi-project-configuration)する必要があります。
+> * マルチモジュールプロジェクト（マルチプロジェクトビルド）のドキュメントを生成する場合は、[サブプロジェクト間で Dokka の設定とプラグインを共有](dokka-gradle.md#multi-project-configuration)する必要があります。
 > 
 {style="note"}
 
@@ -56,7 +56,7 @@ dependencies {
 }
 ```
 
-> [マルチプロジェクト](dokka-gradle.md#multi-project-configuration)ビルドをドキュメント化する場合は、[サブプロジェクト間で Dokka の設定を共有](dokka-gradle.md#multi-project-configuration)する必要があります。
+> [マルチプロジェクト](dokka-gradle.md#multi-project-configuration) ビルドのドキュメントを生成する場合は、[サブプロジェクト間で Dokka の設定とプラグインを共有](dokka-gradle.md#multi-project-configuration)する必要があります。
 >
 {style="note"}
 
@@ -83,7 +83,7 @@ dependencies {
 </tab>
 <tab title="CLI" group-key="cli">
 
-[CLI](dokka-cli.md) ランナーを[コマンドラインオプション](dokka-cli.md#run-with-command-line-options)と一緒に使用している場合、Dokka プラグインは `.jar` ファイルとして `-pluginsClasspath` に渡す必要があります。
+[CLI](dokka-cli.md) ランナーを [コマンドラインオプション](dokka-cli.md#run-with-command-line-options) で使用している場合、Dokka プラグインは `.jar` ファイルとして `-pluginsClasspath` に渡す必要があります。
 
 ```Shell
 java -jar dokka-cli-%dokkaVersion%.jar \
@@ -91,7 +91,7 @@ java -jar dokka-cli-%dokkaVersion%.jar \
      ...
 ```
 
-[JSON 設定](dokka-cli.md#run-with-json-configuration)を使用している場合、Dokka プラグインは `pluginsClasspath` の下で指定する必要があります。
+[JSON 設定](dokka-cli.md#run-with-json-configuration) を使用している場合、Dokka プラグインは `pluginsClasspath` の下に指定する必要があります。
 
 ```json
 {
@@ -110,14 +110,14 @@ java -jar dokka-cli-%dokkaVersion%.jar \
 
 ## Dokkaプラグインの設定 {id="configure-dokka-plugins"}
 
-Dokka プラグインには、独自の設定オプションを用意することもできます。利用可能なオプションを確認するには、使用しているプラグインのドキュメントを参照してください。
+Dokka プラグインは、それぞれ独自の設定オプションを持つこともできます。利用可能なオプションを確認するには、使用しているプラグインのドキュメントを参照してください。
 
-組み込みの HTML プラグインを設定する例として、アセットへのカスタム画像の追加 (`customAssets` オプション)、カスタムスタイルシートの追加 (`customStyleSheets` オプション)、変更されたフッターメッセージの追加 (`footerMessage` オプション) を見てみましょう。
+組み込みの HTML プラグインを設定する例として、アセットへのカスタム画像の追加（`customAssets` オプション）、カスタムスタイルシートの追加（`customStyleSheets` オプション）、変更されたフッターメッセージ（`footerMessage` オプション）を設定する方法を見てみましょう。
 
 <tabs group="build-script">
 <tab title="Gradle Kotlin DSL" group-key="kotlin">
 
-型安全な方法で Dokka プラグインを設定するには、`dokka.pluginsConfiguration {}` ブロックを使用します。
+Dokka プラグインをタイプセーフな方法で設定するには、`dokka.pluginsConfiguration {}` ブロックを使用します。
 
 ```kotlin
 dokka {
@@ -129,9 +129,9 @@ dokka {
 }
 ```
 
-Dokka プラグインの設定例については、[Dokka のバージョニングプラグイン](https://github.com/Kotlin/dokka/tree/master/examples/gradle-v2/versioning-multimodule-example)を参照してください。
+Dokka プラグインの設定例については、[Dokka のバージョニングプラグイン](https://github.com/Kotlin/dokka/tree/master/examples/gradle-v2/versioning-multimodule-example) を参照してください。
 
-Dokka では、[カスタムプラグインの設定](https://github.com/Kotlin/dokka/blob/v2.3.0/examples/gradle-v2/custom-dokka-plugin-example/demo-library/build.gradle.kts)により、その機能を拡張し、ドキュメント生成プロセスを変更することができます。
+Dokka では、[カスタムプラグインの設定](https://github.com/Kotlin/dokka/blob/v2.3.0/examples/gradle-v2/custom-dokka-plugin-example/demo-library/build.gradle.kts) を行うことで、機能を拡張し、ドキュメント生成プロセスを変更できます。
 
 </tab>
 <tab title="Gradle Groovy DSL" group-key="groovy">
@@ -158,9 +158,9 @@ dokka {
     ...
     <configuration>
         <pluginsConfiguration>
-            <!-- Fully qualified plugin name -->
+            <!-- プラグインの完全修飾名 -->
             <org.jetbrains.dokka.base.DokkaBase>
-                <!-- Options by name -->
+                <!-- 名前別のオプション -->
                 <customAssets>
                     <asset>${project.basedir}/my-image.png</asset>
                 </customAssets>
@@ -177,7 +177,7 @@ dokka {
 </tab>
 <tab title="CLI" group-key="cli">
 
-[CLI](dokka-cli.md) ランナーを[コマンドラインオプション](dokka-cli.md#run-with-command-line-options)と一緒に使用している場合は、`fullyQualifiedPluginName=json` の形式で JSON 設定を受け取る `-pluginsConfiguration` オプションを使用します。
+[CLI](dokka-cli.md) ランナーを [コマンドラインオプション](dokka-cli.md#run-with-command-line-options) で使用している場合は、`fullyQualifiedPluginName=json` の形式で JSON 設定を受け付ける `-pluginsConfiguration` オプションを使用します。
 
 複数のプラグインを設定する必要がある場合は、`^^` で区切って複数の値を渡すことができます。
 
@@ -187,7 +187,7 @@ java -jar dokka-cli-%dokkaVersion%.jar \
      -pluginsConfiguration "org.jetbrains.dokka.base.DokkaBase={\"customAssets\": [\"my-image.png\"], \"customStyleSheets\": [\"my-styles.css\"], \"footerMessage\": \"(c) 2022 MyOrg CLI\"}"
 ```
 
-[JSON 設定](dokka-cli.md#run-with-json-configuration)を使用している場合、同様に `values` で JSON 設定を受け取る `pluginsConfiguration` 配列が存在します。
+[JSON 設定](dokka-cli.md#run-with-json-configuration) を使用している場合、同様の `pluginsConfiguration` 配列が存在し、`values` で JSON 設定を受け付けます。
 
 ```json
 {
@@ -207,16 +207,16 @@ java -jar dokka-cli-%dokkaVersion%.jar \
 
 ## 主なプラグイン {id="notable-plugins"}
 
-以下は、役立つ可能性のある Dokka の主なプラグインです。
+以下は、役立つ可能性のある代表的な Dokka プラグインです。
 
-| **名前**                                                                                                                           | **説明**                                                                                                     |
+| **名前**                                                                                                                            | **説明**                                                                                                       |
 |------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------|
-| [Android documentation plugin](https://github.com/Kotlin/dokka/tree/%dokkaVersion%/dokka-subprojects/plugin-android-documentation) | Android におけるドキュメンテーション体験を向上させます                                                       |
-| [Versioning plugin](https://github.com/Kotlin/dokka/tree/%dokkaVersion%/dokka-subprojects/plugin-versioning)                       | バージョンセレクターを追加し、アプリケーション/ライブラリの異なるバージョン向けのドキュメント整理を支援します |
-| [MermaidJS HTML plugin](https://github.com/glureau/dokka-mermaid)                                                                  | KDoc 内にある [MermaidJS](https://mermaid-js.github.io/mermaid/#/) ダイアグラムと視覚化をレンダリングします   |
-| [Mathjax HTML plugin](https://github.com/Kotlin/dokka/tree/%dokkaVersion%/dokka-subprojects/plugin-mathjax)                        | KDoc 内にある数式を整形して表示します                                                                       |
-| [Kotlin as Java plugin](https://github.com/Kotlin/dokka/tree/%dokkaVersion%/dokka-subprojects/plugin-kotlin-as-java)               | Java の視点から見た Kotlin のシグネチャをレンダリングします                                                 |
-| [GFM plugin](https://github.com/Kotlin/dokka/tree/master/dokka-subprojects/plugin-gfm)                                              | GitHub Flavored Markdown 形式でドキュメントを生成する機能を追加します                                       |
-| [Jekyll plugin](https://github.com/Kotlin/dokka/tree/master/dokka-subprojects/plugin-jekyll)                                       | Jekyll Flavored Markdown 形式でドキュメントを生成する機能を追加します                                       |
+| [Android documentation plugin](https://github.com/Kotlin/dokka/tree/%dokkaVersion%/dokka-subprojects/plugin-android-documentation) | Android におけるドキュメント生成体験を向上させます                                                             |
+| [Versioning plugin](https://github.com/Kotlin/dokka/tree/%dokkaVersion%/dokka-subprojects/plugin-versioning)                       | バージョンセレクターを追加し、アプリケーション/ライブラリの異なるバージョンのドキュメント整理に役立ちます       |
+| [MermaidJS HTML plugin](https://github.com/glureau/dokka-mermaid)                                                                  | KDoc 内の [MermaidJS](https://mermaid-js.github.io/mermaid/#/) ダイアグラムやビジュアライゼーションをレンダリングします |
+| [Mathjax HTML plugin](https://github.com/Kotlin/dokka/tree/%dokkaVersion%/dokka-subprojects/plugin-mathjax)                        | KDoc 内の数式を綺麗に整形して表示（pretty print）します                                                        |
+| [Kotlin as Java plugin](https://github.com/Kotlin/dokka/tree/%dokkaVersion%/dokka-subprojects/plugin-kotlin-as-java)               | Java から見た視点で Kotlin のシグネチャをレンダリングします                                                     |
+| [GFM plugin](https://github.com/Kotlin/dokka/tree/master/dokka-subprojects/plugin-gfm)                                              | GitHub Flavored Markdown 形式でドキュメントを生成する機能を追加します                                          |
+| [Jekyll plugin](https://github.com/Kotlin/dokka/tree/master/dokka-subprojects/plugin-jekyll)                                       | Jekyll Flavored Markdown 形式でドキュメントを生成する機能を追加します                                          |
 
-Dokka プラグインの作者で、このリストにプラグインを追加したい場合は、[Slack](dokka-introduction.md#community) または [GitHub](https://github.com/Kotlin/dokka/) 経由でメンテナーにご連絡ください。
+Dokka プラグインの作者の方で、このリストに自身のプラグインを追加したい場合は、[Slack](dokka-introduction.md#community) または [GitHub](https://github.com/Kotlin/dokka/) 経由でメンテナーにお問い合わせください。

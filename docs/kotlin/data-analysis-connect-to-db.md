@@ -1,7 +1,7 @@
-[//]: # (title: 连接数据库并获取数据)
-[//]: # (description: 了解如何连接到 SQL 数据库、检查表架构，并使用 Kotlin DataFrame 获取数据。)
+[//]: # (title: 连接数据库并检索数据)
+<web-summary>了解如何使用 Kotlin DataFrame 连接到 SQL 数据库、检查表架构以及检索数据。</web-summary>
 
-[Kotlin DataFrame 库](https://kotlin.github.io/dataframe/home.html)为最常见的 SQL 数据库提供支持：
+[Kotlin DataFrame 库](https://kotlin.github.io/dataframe/home.html)提供了对最常见 SQL 数据库的支持：
 
 * [DuckDB](https://kotlin.github.io/dataframe/duckdb.html)
 * [H2](https://kotlin.github.io/dataframe/h2.html)
@@ -15,17 +15,17 @@
 
 ## 开始之前 {id="before-you-start"}
 
-> 从 IntelliJ IDEA 2026.2 开始，Kotlin Notebook 将不再与 IDE 捆绑，也不再由 JetBrains 官方支持。
-> 源代码将继续在 [GitHub](https://github.com/Kotlin/kotlin-notebook) 上提供。
+> 从 IntelliJ IDEA 2026.2 开始，Kotlin Notebook 将不再随 IDE 一同捆绑，也不再由 JetBrains 官方提供支持。
+> 源代码仍可在 [GitHub](https://github.com/Kotlin/kotlin-notebook) 上获取。
 >
-> 在[博客文章](https://blog.jetbrains.com/idea/2026/06/kotlin-notebook-sunset/)中了解更多信息。
+> 欲了解详情，请参阅[博客文章](https://blog.jetbrains.com/idea/2026/06/kotlin-notebook-sunset/)。
 >
 {style="note"}
 
-要学习本教程，请执行以下操作：
+按照本教程操作：
 
 1. 选择 **File** | **New** | **Kotlin Notebook**。
-2. 在 Notebook 的第一个单元格中为您的数据库添加 Java Database Connectivity (JDBC) 驱动程序依赖项。
+2. 在笔记本的第一个单元格中添加适用于您数据库的 Java 数据库连接（JDBC 驱动程序）依赖项。
 
    例如，要连接到 MariaDB 数据库，请添加：
 
@@ -40,22 +40,23 @@
    %use dataframe
    ```
 
-   在运行任何其他代码单元之前，先运行包含 `%use dataframe` 行的代码单元，以确保 DataFrame 库及其 API 在 Notebook 中可用。
+   请在运行任何其他代码单元之前运行包含 `%use dataframe` 行的代码单元，
+   以确保 DataFrame 库及其 API 在笔记本中可用。
 
-要学习本教程，您还可以将 DataFrame 作为 [Gradle](https://kotlin.github.io/dataframe/setupgradle.html) 或 [Maven](https://kotlin.github.io/dataframe/setupmaven.html) 依赖项使用。
+要学习本教程，您也可以将 DataFrame 作为 [Gradle](https://kotlin.github.io/dataframe/setupgradle.html) 或 [Maven](https://kotlin.github.io/dataframe/setupmaven.html) 依赖项使用。
 
-## 连接数据库 {id="connect-to-a-database"}
+## 连接到数据库 {id="connect-to-a-database"}
 
 要连接到数据库，请使用 `DbConnectionConfig()` 函数创建连接配置：
 
-1. 导入以下功能：
+1. 导入以下功能性组件：
 
    ```kotlin
    import org.jetbrains.kotlinx.dataframe.io.DbConnectionConfig
    import org.jetbrains.kotlinx.dataframe.schema.DataFrameSchema
    ```
 
-2. 使用 `DbConnectionConfig()` 函数定义连接参数（URL、用户名、密码）：
+2. 使用 `DbConnectionConfig()` 函数定义连接形参（URL、用户名、密码）：
 
    ```kotlin
    val URL = "YOUR_URL"
@@ -65,15 +66,18 @@
    val dbConfig = DbConnectionConfig(URL, USER_NAME, PASSWORD)
    ```
 
-> 有关连接 SQL 数据库的更多信息，请参阅 [Kotlin DataFrame 文档中的从 SQL 数据库读取](https://kotlin.github.io/dataframe/readsqldatabases.html)。
+> 有关连接到 SQL 数据库的更多信息，请参阅 [Kotlin DataFrame 文档中的从 SQL 数据库读取](https://kotlin.github.io/dataframe/readsqldatabases.html)。
 >
 {style="tip"}
 
 ## 检查数据库架构 {id="inspect-database-schema"}
 
-在加载数据之前，请检查数据库架构以了解您拥有哪些表以及它们包含哪些列。您可以使用这些架构来决定将哪个表加载到 DataFrame 中。
+在加载数据之前，请先检查数据库架构，
+以了解您有哪些表以及它们包含哪些列。
+您可以使用这些架构来决定将哪个表加载到 DataFrame 中。
 
-要获取数据库中所有用户创建表的架构，请使用 `DataFrameSchema.readAllSqlTables()` 函数：
+要检索数据库中所有用户创建表的架构，请使用 `DataFrameSchema.readAllSqlTables()`
+函数：
 
 ```kotlin
 val dataSchemas = DataFrameSchema.readAllSqlTables(dbConfig)
@@ -87,18 +91,19 @@ dataSchemas.forEach { (tableName, schema) ->
 
 ## 加载数据 {id="load-data"}
 
-在检查数据库架构并选择数据后，将数据加载到 DataFrame 中。
+在检查数据库架构并选择数据之后，将数据
+加载到 DataFrame 中。
 
-Kotlin DataFrame 提供了两种从数据库加载数据的方法：
+Kotlin DataFrame 提供了两种从数据库加载数据的方式：
 
-* 直接从表加载数据。
+* 直接从表中加载数据。
 * 加载自定义 SQL 查询的结果。
 
-这两种方法都会返回一个 DataFrame，您可以在其中对其进行检查、转换和分析。
+这两种方法都会返回一个 DataFrame，供您检查、转换和分析。
 
-### 从表加载数据 {id="load-data-from-a-table"}
+### 从表中加载数据 {id="load-data-from-a-table"}
 
-要从表加载数据，请使用 [`DataFrame.readSqlTable()`](https://kotlin.github.io/dataframe/readsqldatabases.html#reading-specific-tables) 函数。
+要从表中加载数据，请使用 [`DataFrame.readSqlTable()`](https://kotlin.github.io/dataframe/readsqldatabases.html#reading-specific-tables) 函数。
 
 以下示例从 `movies` 表中加载前 100 行：
 
@@ -114,9 +119,11 @@ moviesDf
 
 ### 使用 SQL 查询加载数据 {id="load-data-with-an-sql-query"}
 
-要对数据库执行特定的 SQL 查询，请使用 [`DataFrame.readSqlQuery()`](https://kotlin.github.io/dataframe/readsqldatabases.html#executing-sql-queries) 函数。当您需要加载特定列、连接表、筛选行或在数据库中聚合数据时，此方法非常有用。
+要在数据库上执行特定的 SQL 查询，请使用 [`DataFrame.readSqlQuery()`](https://kotlin.github.io/dataframe/readsqldatabases.html#executing-sql-queries) 函数。
+当您需要加载特定列、联接表、过滤行或在数据库中聚合数据时，此方法非常有用。
 
-让我们获取一个与 Quentin Tarantino 导演的电影相关的特定数据集。此查询选择电影详细信息并合并每部电影的类型：
+我们来检索与昆汀·塔伦蒂诺（Quentin Tarantino）执导的电影相关的特定数据集。
+此查询选择电影详细信息并合并每部电影的类型：
 
 ```kotlin
 val TARANTINO_FILMS_SQL_QUERY = """
@@ -135,12 +142,13 @@ tarantinoMoviesDf
 
 ## 处理数据 {id="process-data"}
 
-将数据库加载到 DataFrame 后，您可以使用 DataFrame 操作来处理获取的数据。
+将数据库加载到 DataFrame 后，您可以使用 DataFrame
+操作来处理检索到的数据。
 
-例如，让我们操作上一节中的数据。以下代码：
+例如，让我们对上一节中的数据进行操作。以下代码：
 1. 使用 [`.fillNA()`](https://kotlin.github.io/dataframe/fill.html#fillna) 函数替换 `year` 列中的缺失值。
 2. 使用 [`.convert()`](https://kotlin.github.io/dataframe/convert.html) 函数将该列转换为 `Int`。
-3. 使用 [`.filter()`](https://kotlin.github.io/dataframe/filter.html) 函数仅保留 2000 年以后上映的电影。
+3. 使用 [`.filter()`](https://kotlin.github.io/dataframe/filter.html) 函数仅保留 2000 年之后上映的电影。
 
 ```kotlin
 val filteredTarantinoMovies = tarantinoMoviesDf
@@ -153,9 +161,11 @@ filteredTarantinoMovies
 
 ## 分析数据 {id="analyze-data"}
 
-使用 [DataFrame 库](https://kotlin.github.io/dataframe/home.html)对数据进行分组、排序和聚合，以便您可以发现并理解数据中的模式。
+使用 [DataFrame 库](https://kotlin.github.io/dataframe/home.html)
+对数据进行分组、排序和聚合，以便发现和理解
+数据中的模式。
 
-例如，让我们从 `actors` 表中读取演员数据并找出 20 个最常见的名字：
+例如，让我们从 `actors` 表中读取演员数据，并找出 20 个最常见的名字：
 
 ```kotlin
 // 从 actors 表中提取数据
@@ -164,18 +174,18 @@ val top20ActorNames = actorDf
    // 按 first_name 列对数据进行分组
    .groupBy { first_name }
    
-   // 计算每个唯一名字的出现次数
+   // 统计每个唯一名字的出现次数
    .count()
    
     // 按计数降序对结果进行排序
    .sortByDesc("count")
     
-   // 选择出现频率最高的前 20 个名字进行分析。
+   // 选取出现频率最高的前 20 个名字进行分析。
    .take(20)
 ```
 
-## 下一步 {id="what-s-next"}
+## 后续步骤 {id="what-s-next"}
 
-* 使用 [Kandy 库](https://kotlin.github.io/kandy/examples.html)探索数据可视化
+* 探索使用 [Kandy 库](https://kotlin.github.io/kandy/examples.html)进行数据可视化
 * 在[使用 Kandy 进行数据可视化](data-analysis-visualization.md)中查找有关数据可视化的更多信息
-* 有关 Kotlin 中可用于数据科学和分析的工具和资源的广泛概述，请参阅[用于数据分析的 Kotlin 和 Java 库](data-analysis-libraries.md)
+* 有关 Kotlin 中可用于数据科学和分析的工具与资源的详尽概述，请参阅[用于数据分析的 Kotlin 和 Java 库](data-analysis-libraries.md)
