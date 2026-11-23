@@ -57,23 +57,20 @@ function parts(): (VNode | VNode[])[] {
   top: 0;
 }
 
-/* As on ktor.io: 16px inside the border all round, the title at the top,
-   24px between the title and what follows */
 .ws-procedure {
   /* A link to a procedure whose id is here shows its title below the nav bar, as for a heading (vp-doc.css) */
   scroll-margin-top: calc(var(--vp-nav-height) + var(--vp-layout-top-height, 0px) + 24px);
   box-sizing: border-box;
-  padding: 16px;
+  /* Above and below, the 16px margins of the content, of the paragraphs in
+     its first and last steps too, keep it off the border, as ktor.io's 16px padding does */
+  padding: 0 16px;
   margin-bottom: 16px;
   border: 1px solid var(--vp-c-divider);
 }
 
-.ws-procedure > :deep(:first-child) {
-  margin-top: 0;
-}
-
-.ws-procedure > :deep(:last-child) {
-  margin-bottom: 0;
+/* As on ktor.io: the title 16px below the border, 24px above what follows */
+.ws-procedure > h3 {
+  margin-top: 16px;
 }
 
 .ws-procedure > h3 + :deep(*) {
