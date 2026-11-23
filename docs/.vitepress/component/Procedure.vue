@@ -15,24 +15,34 @@ const props = defineProps<{
 
 // ktor.io lists the <step>s of a procedure and leaves the rest as it is: a
 // paragraph before the steps, an image after them, a procedure written as a
-// Markdown list of steps (P2-40). All of it was in one <ol>.
+// Markdown list of steps (P2-40). All of it was in one <ol>. A single step is
+// in a bullet list there (P2-41).
 const slots = useSlots()
 const flatten = (nodes: VNode[]): VNode[] =>
   nodes.flatMap((node) => (node.type === Fragment && Array.isArray(node.children) ? flatten(node.children as VNode[]) : [node]))
 // A comment or a space between two steps does not end the list
 const blank = (node: VNode) => node.type === Comment || (node.type === Text && !String(node.children).trim())
-/** The content, with each run of steps in an array */
-function parts(): (VNode | VNode[])[] {
-  const result: (VNode | VNode[])[] = []
+/** A run of steps, with what is blank between them */
+interface Steps {
+  list: 'ol' | 'ul'
+  nodes: VNode[]
+}
+/** The content, with each run of steps together */
+function parts(): (VNode | Steps)[] {
+  const result: (VNode | Steps)[] = []
+  let count = 0
   for (const node of flatten(slots.default?.() ?? [])) {
-    const steps = result.at(-1)
-    if (node.type === Step || (blank(node) && Array.isArray(steps))) {
-      if (Array.isArray(steps)) steps.push(node)
-      else result.push([node])
+    const last = result.at(-1)
+    const steps = last && 'nodes' in last ? last : undefined
+    if (node.type === Step || (blank(node) && steps)) {
+      if (node.type === Step) count++
+      if (steps) steps.nodes.push(node)
+      else result.push({ list: 'ol', nodes: [node] })
     } else {
       result.push(node)
     }
   }
+  if (count === 1) for (const part of result) if ('nodes' in part) part.list = 'ul'
   return result
 }
 </script>
@@ -44,10 +54,13 @@ function parts(): (VNode | VNode[])[] {
       <a v-if="props.id" class="header-anchor" :href="`#${props.id}`"></a>
     </h3>
     <template v-for="part in parts()">
-      <ol v-if="Array.isArray(part)">
-        <component :is="step" v-for="step in part" />
+      <component :is="part" v-if="!('nodes' in part)" />
+      <ul v-else-if="part.list === 'ul'">
+        <component :is="node" v-for="node in part.nodes" />
+      </ul>
+      <ol v-else>
+        <component :is="node" v-for="node in part.nodes" />
       </ol>
-      <component :is="part" v-else />
     </template>
   </div>
 </template>

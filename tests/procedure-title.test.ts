@@ -8,7 +8,7 @@ import Step from '../docs/.vitepress/component/Step.vue'
 
 // A procedure's title is an h3 on ktor.io, in the outline when the page's
 // <show-structure for> names "procedure" (P2-37). It was only a tooltip.
-// Only its steps are in a list (P2-40).
+// Only its steps are in a list (P2-40), a bullet list for a single step (P2-41).
 let md: MarkdownRenderer
 
 beforeAll(async () => {
@@ -32,6 +32,15 @@ describe('a Writerside procedure', () => {
   it('lists its steps, and leaves what comes before and after them out of the list', async () => {
     const html = await content(() => [h('p', 'Before'), h(Step, () => 'One'), ' ', h(Step, () => 'Two'), h('p', 'After'), h(Step, () => 'Three')])
     expect(html).toBe('<div class="ws-procedure"><p>Before</p><ol><li>One</li> <li>Two</li></ol><p>After</p><ol><li>Three</li></ol></div>')
+  })
+
+  // server-create-a-new-project, "Write sample code to trigger the handler":
+  // ktor.io lists a single step with a bullet, two or more with numbers
+  it('lists a single step with a bullet', async () => {
+    expect(await content(() => [h('p', 'Before'), h(Step, () => 'One'), ' ']))
+      .toBe('<div class="ws-procedure"><p>Before</p><ul><li>One</li> </ul></div>')
+    expect(await content(() => [h(Step, () => 'One'), h(Step, () => 'Two')]))
+      .toBe('<div class="ws-procedure"><ol><li>One</li><li>Two</li></ol></div>')
   })
 
   // client-create-multiplatform-application: steps written as a Markdown list
