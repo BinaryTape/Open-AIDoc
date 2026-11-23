@@ -26,6 +26,7 @@ import markdownItWsCollapsibleSection from "../plugins/markdown/writerside/markd
 import markdownItWsChapterLevel from "../plugins/markdown/writerside/markdown-it-ws-chapter-level"
 import markdownItWsShowStructure from "../plugins/markdown/writerside/markdown-it-ws-show-structure"
 import markdownItWsMath from "../plugins/markdown/writerside/markdown-it-ws-math"
+import markdownItWsInlineIcon from "../plugins/markdown/writerside/markdown-it-ws-inline-icon"
 import { markdownItRewriteLinks } from '../plugins/markdown/writerside/markdown-it-ws-inline-link'
 
 // ===== MkDocs plugins =====
@@ -122,6 +123,8 @@ export function registerMarkdownPlugins(md: any) {
   md.use(markdownItWsShowStructure)
   // A core rule before `inline`: the TeX is gone before markdown parses the text.
   md.use(markdownItWsMath)
+  // A core rule pushed after the link rewriter's: reads each image's file from its rewritten src.
+  md.use(markdownItWsInlineIcon)
 
   // MkDocs plugins
   md.use(markdownItMkAdmonition)

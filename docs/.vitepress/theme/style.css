@@ -219,9 +219,11 @@ html:not(.dark) .vp-doc [class*="language-text"] code {
  * Component: Writerside
  * -------------------------------------------------------------------------- */
 
-img[type="joined"] {
-  vertical-align: middle !important;
-  display: inline-block !important;
+/* An icon in the line of text (markdown-it-ws-inline-icon), as on kotlinlang.org and ktor.io */
+.vp-doc img.ws-inline-icon {
+  display: inline;
+  vertical-align: middle;
+  margin: 0;
 }
 
 [class*="ws-col-"] {
