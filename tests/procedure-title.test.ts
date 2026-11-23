@@ -4,9 +4,11 @@ import { createSSRApp, h } from 'vue'
 import { renderToString } from 'vue/server-renderer'
 import { registerMarkdownPlugins } from '../docs/.vitepress/config/markdown.config'
 import Procedure from '../docs/.vitepress/component/Procedure.vue'
+import Step from '../docs/.vitepress/component/Step.vue'
 
 // A procedure's title is an h3 on ktor.io, in the outline when the page's
 // <show-structure for> names "procedure" (P2-37). It was only a tooltip.
+// Only its steps are in a list (P2-40).
 let md: MarkdownRenderer
 
 beforeAll(async () => {
@@ -17,9 +19,27 @@ beforeAll(async () => {
 })
 
 const procedure = (props: Record<string, unknown>) =>
-  renderToString(createSSRApp(() => h(Procedure, props, () => [h('li', 'Step')])))
+  renderToString(createSSRApp(() => h(Procedure, props, () => [h(Step, () => 'Step')])))
+
+/** The procedure's markup, without Vue's comments and scope attributes */
+const content = async (children: () => unknown[]) =>
+  (await renderToString(createSSRApp(() => h(Procedure, {}, children))))
+    .replace(/<!--[^]*?-->/g, '').replace(/ data-v-\w+(="")?/g, '')
 
 describe('a Writerside procedure', () => {
+  // server-create-a-new-project: "In the Project tool window, …" before the
+  // steps, "Downloading should start automatically." after them
+  it('lists its steps, and leaves what comes before and after them out of the list', async () => {
+    const html = await content(() => [h('p', 'Before'), h(Step, () => 'One'), ' ', h(Step, () => 'Two'), h('p', 'After'), h(Step, () => 'Three')])
+    expect(html).toBe('<div class="ws-procedure"><p>Before</p><ol><li>One</li> <li>Two</li></ol><p>After</p><ol><li>Three</li></ol></div>')
+  })
+
+  // client-create-multiplatform-application: steps written as a Markdown list
+  it('leaves a Markdown list of steps as it is, not in a list of its own', async () => {
+    const html = await content(() => [h('ol', [h('li', 'Launch IntelliJ IDEA.'), h('li', 'Select File | New | Project.')])])
+    expect(html).toBe('<div class="ws-procedure"><ol><li>Launch IntelliJ IDEA.</li><li>Select File | New | Project.</li></ol></div>')
+  })
+
   it('shows its title as an h3, the id on the procedure', async () => {
     const html = await procedure({ title: '添加新依赖项', id: 'add-dependency' })
     expect(html).toMatch(/^<div class="ws-procedure" id="add-dependency"[^>]*><h3[^>]*>添加新依赖项 <a class="header-anchor" href="#add-dependency"/)
