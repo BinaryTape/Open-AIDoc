@@ -13,12 +13,20 @@ const props = defineProps({
 })
 
 const columnCount = computed(() => Math.max(1, parseInt(props.columns ?? '', 10) || 1))
+
+// As on kotlinlang.org and ktor.io: only decimal and alpha-lower lists are numbered; a bullet
+// list has bullets, a none list no marker.
+const numbered = computed(() => props.type === 'decimal' || props.type === 'alpha-lower')
 </script>
 
 <template>
-  <ol v-if="props.type">
+  <ol v-if="numbered" :type="props.type === 'alpha-lower' ? 'a' : undefined">
     <slot/>
   </ol>
+
+  <ul v-else-if="props.type === 'none'" class="ws-list-none">
+    <slot/>
+  </ul>
 
   <ul
       v-else-if="columns"
@@ -35,6 +43,11 @@ const columnCount = computed(() => Math.max(1, parseInt(props.columns ?? '', 10)
 </template>
 
 <style scoped>
+/* The items keep the indent of other lists, as there */
+.ws-list-none {
+  list-style: none;
+}
+
 /* As on kotlinlang.org: .list[data-columns] — items share the row equally, the first row has no top margin,
    and an item wider than its column (a long code block) wraps onto its own row, as there */
 .ws-flex-list {

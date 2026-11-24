@@ -19,6 +19,38 @@ export default function markdownItWsRename(md) {
     md.core.ruler.push('ws_def_title', (state) => {
         if (isWritersideDoc(state.env)) renameDefinitionTitles(state.tokens);
     });
+
+    md.core.ruler.push('ws_list_style', (state) => {
+        if (isWritersideDoc(state.env)) forEachHtml(state.tokens, listStyleAsType);
+    });
+}
+
+function forEachHtml(tokens: any[], rewrite: (html: string) => string): void {
+    for (const token of tokens) {
+        if (token.type === 'html_block' || token.type === 'html_inline') {
+            token.content = rewrite(token.content);
+        } else if (token.type === 'inline' && token.children) {
+            for (const child of token.children) {
+                if (child.type === 'html_inline') child.content = rewrite(child.content);
+            }
+        }
+    }
+}
+
+const LIST_TYPES = new Set(['bullet', 'decimal', 'none', 'alpha-lower']);
+
+/**
+ * A list can name its type as a style, `<list style="decimal">`
+ * (ktor server-auto-reload), which ktor.io numbers as it does
+ * `<list type="decimal">`. Vue drops a style that is no CSS, so List.vue
+ * would never see it: write it as the type (P2-47).
+ */
+export function listStyleAsType(html: string): string {
+    return html.replace(/<list\b[^>]*>/gi, (tag) => {
+        if (/\stype\s*=/i.test(tag)) return tag;
+        return tag.replace(/\sstyle\s*=\s*(["'])([\w-]+)\1/i, (attr, quote, value) =>
+            LIST_TYPES.has(value) ? ` type=${quote}${value}${quote}` : attr);
+    });
 }
 
 const TAG = /<(\/?)([a-zA-Z][\w-]*)(?:\s[^>]*?)?(\/?)>/g;
