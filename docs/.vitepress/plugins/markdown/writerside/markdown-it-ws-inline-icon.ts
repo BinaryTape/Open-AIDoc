@@ -89,7 +89,7 @@ function readSize(file: string): [number, number] | undefined {
 }
 
 /** The file of an image on the site: /ktor/icon.svg is docs/public/ktor/icon.svg. */
-function imageFile(src: string | undefined, env: any): string | undefined {
+export function imageFile(src: string | undefined, env: any): string | undefined {
   if (!src || /^(?:[a-z]+:|\/\/)/i.test(src)) return undefined
   const srcDir = env.path ? env.path.slice(0, -env.relativePath.length) : path.resolve('docs')
   const file = decodeURI(src.replace(/[?#].*$/, ''))

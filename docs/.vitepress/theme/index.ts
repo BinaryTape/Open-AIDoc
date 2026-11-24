@@ -23,6 +23,7 @@ import '../styles/ws-math.css'
 import { useKotlinPlayground } from './kotlin-playground'
 import { useOpenAnchorTarget } from './open-anchor-target'
 import { useLinkedTabs } from './linked-tabs'
+import { useDarkImages } from './dark-images'
 import HomeLayout from './layout/Home.vue' // 调整路径，如果它在子目录，例如 './layouts/MyHomeLayout.vue'
 import { createI18n } from '../utils/i18n-utils'
 import Deflist from '../component/Deflist.vue'
@@ -67,6 +68,7 @@ export default {
       useKotlinPlayground()
       useOpenAnchorTarget()
       useLinkedTabs()
+      useDarkImages()
       return () => h(DefaultTheme.Layout, null, {
         // https://vitepress.dev/guide/extending-default-theme#layout-slots
         'doc-before': () => h(Breadcrumbs),

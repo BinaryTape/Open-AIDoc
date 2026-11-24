@@ -78,7 +78,7 @@ describe('markdown-it-ws-inline-icon', () => {
       '<procedure>\n<step>\n<p>点击重新运行按钮（<img alt="intelliJ IDEA rerun button icon"\n    src="intellij_idea_rerun_icon.svg" height="16" width="16"/>）以重新启动应用程序。</p>\n</step>\n</procedure>\n',
       'ktor/server-create-a-new-project.md',
     )
-    expect(images(html)).toEqual(['<img class="ws-inline-icon" alt="intelliJ IDEA rerun button icon"\n    src="/ktor/intellij_idea_rerun_icon.svg" height="16" width="16"/>'])
+    expect(images(html)).toEqual(['<img class="ws-inline-icon" alt="intelliJ IDEA rerun button icon"\n    src="/ktor/intellij_idea_rerun_icon.svg" data-dark-src="/ktor/intellij_idea_rerun_icon_dark.svg" height="16" width="16"/>'])
   })
 
   it('sizes a Markdown image from its file in docs/public (kmp compose-hot-reload)', async () => {
@@ -98,7 +98,7 @@ describe('markdown-it-ws-inline-icon', () => {
 
   it('adds to a class the image has, once though a tldr renders its content again', async () => {
     const html = await render('<tldr>\n<p>A <img src="intellij_idea_rerun_icon.svg" class="icon" height="16"/> B</p>\n</tldr>\n', 'ktor/a.md')
-    expect(images(html)).toEqual(['<img src="/ktor/intellij_idea_rerun_icon.svg" class="ws-inline-icon icon" height="16"/>'])
+    expect(images(html)).toEqual(['<img src="/ktor/intellij_idea_rerun_icon.svg" data-dark-src="/ktor/intellij_idea_rerun_icon_dark.svg" class="ws-inline-icon icon" height="16"/>'])
   })
 
   it('leaves other docs alone', async () => {

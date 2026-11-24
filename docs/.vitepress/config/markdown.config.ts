@@ -27,6 +27,7 @@ import markdownItWsChapterLevel from "../plugins/markdown/writerside/markdown-it
 import markdownItWsShowStructure from "../plugins/markdown/writerside/markdown-it-ws-show-structure"
 import markdownItWsMath from "../plugins/markdown/writerside/markdown-it-ws-math"
 import markdownItWsInlineIcon from "../plugins/markdown/writerside/markdown-it-ws-inline-icon"
+import markdownItWsDarkImage from "../plugins/markdown/writerside/markdown-it-ws-dark-image"
 import { markdownItRewriteLinks } from '../plugins/markdown/writerside/markdown-it-ws-inline-link'
 
 // ===== MkDocs plugins =====
@@ -125,6 +126,8 @@ export function registerMarkdownPlugins(md: any) {
   md.use(markdownItWsMath)
   // A core rule pushed after the link rewriter's: reads each image's file from its rewritten src.
   md.use(markdownItWsInlineIcon)
+  // Also after the link rewriter: finds the _dark file next to the rewritten src.
+  md.use(markdownItWsDarkImage)
 
   // MkDocs plugins
   md.use(markdownItMkAdmonition)
