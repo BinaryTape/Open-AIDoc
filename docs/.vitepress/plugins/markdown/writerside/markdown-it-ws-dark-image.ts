@@ -7,9 +7,10 @@ import { imageFile } from './markdown-it-ws-inline-icon'
  * Writerside shows the dark version of an image in dark mode: the file of the
  * same name with `_dark` before the extension, such as
  * intellij_idea_rerun_icon_dark.svg next to intellij_idea_rerun_icon.svg.
- * ktor.io names it in `data-dark-src` on every image that has one, and a
- * script shows it in dark mode (P2-43). Checked against the 107 such images on
- * the 12 Ktor and KMP pages found on those sites: none more, none fewer.
+ * ktor.io names it in `data-dark-src` on every image that has one (in
+ * `data-dark-gif-src` on a GIF), and a script shows it in dark mode (P2-43).
+ * Checked against the 671 Kotlin, Ktor and KMP pages found on those sites: the
+ * same 111 images on 12 pages have a dark version, none more, none fewer.
  *
  * theme/dark-images.ts swaps the src in dark mode.
  */
