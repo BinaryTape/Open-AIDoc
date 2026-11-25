@@ -18,7 +18,7 @@
 
 kotlinx.serialization 컨버터를 사용하기 전에, [Setup](https://github.com/Kotlin/kotlinx.serialization#setup) 섹션의 설명에 따라 Kotlin serialization 플러그인을 추가해야 합니다.
 
-#### JSON {id="add_json_dependency"}
+### JSON {id="add_json_dependency"}
 
 JSON 데이터를 직렬화/역직렬화하려면 kotlinx.serialization, Gson, Jackson 라이브러리 중 하나를 선택할 수 있습니다.
 
@@ -106,7 +106,7 @@ JSON 데이터를 직렬화/역직렬화하려면 kotlinx.serialization, Gson, J
 </TabItem>
 </Tabs>
 
-#### XML {id="add_xml_dependency"}
+### XML {id="add_xml_dependency"}
 
 XML을 직렬화/역직렬화하려면 빌드 스크립트에 `ktor-serialization-kotlinx-xml`을 추가합니다:
 
@@ -132,7 +132,7 @@ XML을 직렬화/역직렬화하려면 빌드 스크립트에 `ktor-serializatio
     </TabItem>
 </Tabs>
 
-#### CBOR {id="add_cbor_dependency"}
+### CBOR {id="add_cbor_dependency"}
 
 CBOR을 직렬화/역직렬화하려면 빌드 스크립트에 `ktor-serialization-kotlinx-cbor`를 추가합니다:
 
@@ -158,7 +158,7 @@ CBOR을 직렬화/역직렬화하려면 빌드 스크립트에 `ktor-serializati
     </TabItem>
 </Tabs>
 
-#### ProtoBuf {id="add_protobuf_dependency"}
+### ProtoBuf {id="add_protobuf_dependency"}
 
 ProtoBuf를 직렬화/역직렬화하려면 빌드 스크립트에 `ktor-serialization-kotlinx-protobuf`를 추가합니다:
 

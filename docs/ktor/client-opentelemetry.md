@@ -164,7 +164,7 @@ install(%plugin_name%) {
 }
 ```
 
-### 添加自定义特性 {id="config-custom-attributes"}
+#### 添加自定义特性 {id="config-custom-attributes"}
 
 要在 span 的开始或结束处附加自定义特性，请使用 `attributesExtractor` 属性：
 

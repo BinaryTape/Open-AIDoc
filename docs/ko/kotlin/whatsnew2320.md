@@ -373,7 +373,7 @@ fun main() {
 
 또한 Kotlin 2.3.20에서는 확인 및 코드 완성 시 과도한 오버로드 후보를 줄이기 위해 `kotlin.context` 오버로드 수를 22개에서 6개로 줄였습니다.
 
-### 이름 기반 구조 분해 {id="language-name-based-destructuring"}
+#### 이름 기반 구조 분해 {id="language-name-based-destructuring"}
 <primary-label ref="experimental-opt-in"/>
 <secondary-label ref="language"/>
 
@@ -431,7 +431,7 @@ fun main() {
 ```kotlin
 val (email, username) = user
 ```
-#### 활성화 방법 {id="language-name-based-destructuring-how-to-enable"}
+##### 활성화 방법 {id="language-name-based-destructuring-how-to-enable"}
 
 프로젝트에서 이름 기반 구조 분해를 사용하려면 빌드 구성 파일에 컴파일러 옵션을 추가하세요.
 
@@ -554,7 +554,7 @@ Kotlin 2.3.20부터는 다음과 같이 변경됩니다.
 >
 {style="tip"}
 
-### Lombok Alpha 단계 진입 {id="compiler-lombok-is-now-alpha"}
+#### Lombok Alpha 단계 진입 {id="compiler-lombok-is-now-alpha"}
 <primary-label ref="alpha"/>
 <secondary-label ref="compiler"/>
 
@@ -700,7 +700,7 @@ kotlin {
 
 컴파일 시간 단축에 대한 자세한 팁은 [Kotlin/Native 설명서](native-improving-compilation-time.md)를 참조하세요.
 
-### C 또는 Objective-C 라이브러리를 위한 새로운 상호 운용성 모드 {id="native-new-interoperability-mode-for-c-or-objective-c-libraries"}
+#### C 또는 Objective-C 라이브러리를 위한 새로운 상호 운용성 모드 {id="native-new-interoperability-mode-for-c-or-objective-c-libraries"}
 <primary-label ref="experimental-opt-in"/>
 <secondary-label ref="native"/>
 
@@ -714,7 +714,7 @@ Kotlin Multiplatform(KMP) 라이브러리나 애플리케이션에서 C 또는 O
 이 문제와 기타 문제를 해결하기 위해 Kotlin 팀은 내부에서 사용되는 상호 운용성 메커니즘을 개선해 왔습니다.
 Kotlin 2.3.20부터 컴파일러 옵션을 통해 새로운 모드를 사용해 볼 수 있습니다.
 
-#### 활성화 방법 {id="native-new-interoperability-mode-for-c-or-objective-c-libraries-how-to-enable"}
+##### 활성화 방법 {id="native-new-interoperability-mode-for-c-or-objective-c-libraries-how-to-enable"}
 
 1. Gradle 빌드 파일에서 `cinterops {}` 블록이나 `pod()` 의존성이 있는지 확인합니다.
    이 항목들이 있다면 프로젝트에서 C 또는 Objective-C 라이브러리를 사용하는 것입니다.
@@ -741,7 +741,7 @@ Kotlin 2.3.20부터 컴파일러 옵션을 통해 새로운 모드를 사용해 
 >
 {style="warning"}
 
-#### 결과 공유하기 {id="native-new-interoperability-mode-for-c-or-objective-c-libraries-report-your-results"}
+##### 결과 공유하기 {id="native-new-interoperability-mode-for-c-or-objective-c-libraries-report-your-results"}
 
 새로운 상호 운용성 모드는 대부분의 경우 바로 대체하여 사용할 수 있도록 설계되었습니다.
 궁극적으로는 기본적으로 활성화할 계획이지만, 이를 달성하려면 최대한 원활하게 작동하는지 확인하고 다음과 같은 이유로 다양한 프로젝트에서 테스트해야 합니다.
