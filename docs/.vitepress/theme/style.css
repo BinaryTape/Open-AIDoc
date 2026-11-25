@@ -226,6 +226,12 @@ html:not(.dark) .vp-doc [class*="language-text"] code {
   margin: 0;
 }
 
+/* A lettered list (Writerside alpha-lower, as on kotlinlang.org): VitePress
+   numbers every .vp-doc ol, over the list's own type="a" (P2-48). */
+.vp-doc ol[type="a"] {
+  list-style-type: lower-alpha;
+}
+
 [class*="ws-col-"] {
   --ws-horizontal-layout-gutter: 16px;
   flex-basis: calc(((100% / 12) * var(--ws-col-count)) - var(--ws-horizontal-layout-gutter));
