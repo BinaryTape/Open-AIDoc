@@ -1,0 +1,11 @@
+{
+  "docs/contributing.md": {
+    "langs": [
+      "ja",
+      "ko",
+      "zh-Hans",
+      "zh-Hant"
+    ],
+    "reason": "audit: Markdown headings lost once parsed 1"
+  }
+}
