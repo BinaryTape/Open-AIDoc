@@ -28,6 +28,7 @@ import markdownItWsShowStructure from "../plugins/markdown/writerside/markdown-i
 import markdownItWsMath from "../plugins/markdown/writerside/markdown-it-ws-math"
 import markdownItWsInlineIcon from "../plugins/markdown/writerside/markdown-it-ws-inline-icon"
 import markdownItWsDarkImage from "../plugins/markdown/writerside/markdown-it-ws-dark-image"
+import markdownItWsImageRatio from "../plugins/markdown/writerside/markdown-it-ws-image-ratio"
 import { markdownItRewriteLinks } from '../plugins/markdown/writerside/markdown-it-ws-inline-link'
 
 // ===== MkDocs plugins =====
@@ -128,6 +129,8 @@ export function registerMarkdownPlugins(md: any) {
   md.use(markdownItWsInlineIcon)
   // Also after the link rewriter: finds the _dark file next to the rewritten src.
   md.use(markdownItWsDarkImage)
+  // After the inline-icon rule, which reads Writerside's style="inline" before this one adds to it.
+  md.use(markdownItWsImageRatio)
 
   // MkDocs plugins
   md.use(markdownItMkAdmonition)

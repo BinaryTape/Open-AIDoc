@@ -20,7 +20,7 @@ describe('markdown-it-ws-dark-image', () => {
       '<procedure>\n<step>\n<p>点击重新运行按钮（<img alt="intelliJ IDEA rerun button icon"\n    src="intellij_idea_rerun_icon.svg" height="16" width="16"/>）以重新启动应用程序。</p>\n</step>\n</procedure>\n',
       'ktor/server-create-a-new-project.md',
     )
-    expect(images(html)).toEqual(['<img class="ws-inline-icon" alt="intelliJ IDEA rerun button icon"\n    src="/ktor/intellij_idea_rerun_icon.svg" data-dark-src="/ktor/intellij_idea_rerun_icon_dark.svg" height="16" width="16"/>'])
+    expect(images(html)).toEqual(['<img class="ws-inline-icon" alt="intelliJ IDEA rerun button icon"\n    src="/ktor/intellij_idea_rerun_icon.svg" data-dark-src="/ktor/intellij_idea_rerun_icon_dark.svg" height="16" width="16" style="aspect-ratio: 16 / 16"/>'])
   })
 
   it('names the dark file of a Markdown image (ktor client-create-multiplatform-application)', async () => {
