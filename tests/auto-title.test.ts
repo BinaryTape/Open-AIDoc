@@ -107,6 +107,9 @@ describe('Writerside chapters', () => {
       'Before any heading.',
       '</chapter>',
       '',
+      // In its section, as on the page: right below the page title the `###` would be an h2 (P2-39)
+      '## Configure an engine {id="configure-engine"}',
+      '',
       '### In code {id="in-code"}',
       '',
       '<chapter title="Netty" id="netty">',

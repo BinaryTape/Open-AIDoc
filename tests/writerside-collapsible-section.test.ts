@@ -23,6 +23,8 @@ async function render(markdown: string, relativePath = 'kotlin/gradle-configure-
 }
 
 const COLLAPSED = '{initial-collapse-state="collapsed" collapsible="true" id="earlier-kgp-versions"}'
+// The section the `###` headings are in: right below the page title, one would be an h2 (P2-39).
+const SECTION = '## Apply the plugin\n\nText.\n\n'
 
 describe('Writerside collapsible sections', () => {
   it('folds a section up to the next heading of the same level', async () => {
@@ -39,13 +41,13 @@ describe('Writerside collapsible sections', () => {
   })
 
   it('keeps lower headings inside, and ends at a higher one or the end of the page', async () => {
-    const html = await render(`### A ${COLLAPSED}\n\nOne.\n\n#### Inside\n\nTwo.\n\n## Higher\n\nThree.\n\n### B {collapsible="true" initial-collapse-state="collapsed"}\n\nLast.\n`)
+    const html = await render(`${SECTION}### A ${COLLAPSED}\n\nOne.\n\n#### Inside\n\nTwo.\n\n## Higher\n\nThree.\n\n### B {collapsible="true" initial-collapse-state="collapsed"}\n\nLast.\n`)
     expect(html).toMatch(/<details class="ws-collapse">.*<h4 id="inside".*<p>Two\.<\/p><\/details><h2 id="higher"/)
     expect(html).toMatch(/<p>Last\.<\/p><\/details>$/)
   })
 
   it('nests sections', async () => {
-    const html = await render(`### Outer ${COLLAPSED}\n\nOne.\n\n#### Inner {collapsible="true" initial-collapse-state="collapsed"}\n\nTwo.\n\n### Next\n`)
+    const html = await render(`${SECTION}### Outer ${COLLAPSED}\n\nOne.\n\n#### Inner {collapsible="true" initial-collapse-state="collapsed"}\n\nTwo.\n\n### Next\n`)
     expect(html).toMatch(/<details class="ws-collapse">.*<h3 id="earlier-kgp-versions".*<p>One\.<\/p><details class="ws-collapse">.*<h4 id="inner".*<p>Two\.<\/p><\/details><\/details><h3 id="next"/)
   })
 
@@ -60,7 +62,7 @@ describe('Writerside collapsible sections', () => {
   })
 
   it('drops the state attributes from the heading and keeps its id', async () => {
-    const html = await render(`### Earlier ${COLLAPSED}\n\nText.\n`)
+    const html = await render(`${SECTION}### Earlier ${COLLAPSED}\n\nText.\n`)
     expect(html).toContain('<h3 id="earlier-kgp-versions" tabindex="-1">Earlier</h3>')
     expect(html).not.toMatch(/collapsible=|initial-collapse-state=/)
   })
