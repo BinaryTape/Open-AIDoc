@@ -375,7 +375,7 @@ fun main() {
 
 此外，Kotlin 2.3.20 将 `kotlin.context` 重载的数量从 22 个减少到 6 个，以减少在解析和代码补全过程中过多的重载候选。
 
-### 基于名称的析构 {id="language-name-based-destructuring"}
+#### 基于名称的析构 {id="language-name-based-destructuring"}
 <primary-label ref="experimental-opt-in"/>
 <secondary-label ref="language"/>
 
@@ -434,7 +434,7 @@ fun main() {
 ```kotlin
 val (email, username) = user
 ```
-#### 如何启用 {id="language-name-based-destructuring-how-to-enable"}
+##### 如何启用 {id="language-name-based-destructuring-how-to-enable"}
 
 要在项目中使用基于名称的析构，请将编译器选项添加到您的构建配置文件中：
 
@@ -556,7 +556,7 @@ Kotlin 2.3.20 为 Lombok 和 `kotlin.plugin.jpa` 编译器插件带来了重要�
 >
 {style="tip"}
 
-### Lombok 现已进入 Alpha 阶段 {id="compiler-lombok-is-now-alpha"}
+#### Lombok 现已进入 Alpha 阶段 {id="compiler-lombok-is-now-alpha"}
 <primary-label ref="alpha"/>
 <secondary-label ref="compiler"/>
 
@@ -702,7 +702,7 @@ kotlin {
 
 有关提高编译时间的更多技巧，请参阅 [Kotlin/Native 文档](native-improving-compilation-time.md)。
 
-### 针对 C 或 Objective-C 库的新互操作模式 {id="native-new-interoperability-mode-for-c-or-objective-c-libraries"}
+#### 针对 C 或 Objective-C 库的新互操作模式 {id="native-new-interoperability-mode-for-c-or-objective-c-libraries"}
 <primary-label ref="experimental-opt-in"/>
 <secondary-label ref="native"/>
 
@@ -716,7 +716,7 @@ kotlin {
 为了解决这一问题以及其他问题，Kotlin 团队一直在重构底层使用的互操作机制。
 从 Kotlin 2.3.20 开始，您可以通过编译器选项试用新模式。
 
-#### 如何启用 {id="native-new-interoperability-mode-for-c-or-objective-c-libraries-how-to-enable"}
+##### 如何启用 {id="native-new-interoperability-mode-for-c-or-objective-c-libraries-how-to-enable"}
 
 1. 在您的 Gradle 构建文件中，检查是否存在 `cinterops {}` 块或 `pod()` 依赖项。
    如果存在，则表示您的项目使用了 C 或 Objective-C 库。
@@ -743,7 +743,7 @@ kotlin {
 >
 {style="warning"}
 
-#### 反馈您的测试结果 {id="native-new-interoperability-mode-for-c-or-objective-c-libraries-report-your-results"}
+##### 反馈您的测试结果 {id="native-new-interoperability-mode-for-c-or-objective-c-libraries-report-your-results"}
 
 在大多数情况下，新的互操作模式应可作为直接替代方案。
 我们计划最终将其默认启用。但为了实现这一目标，我们需要确保它尽可能良好地工作，并在广泛的项目中进行测试，因为：

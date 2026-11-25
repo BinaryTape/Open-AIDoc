@@ -164,7 +164,7 @@ install(%plugin_name%) {
 }
 ```
 
-### 新增自訂屬性 {id="config-custom-attributes"}
+#### 新增自訂屬性 {id="config-custom-attributes"}
 
 若要在 span 的開始或結束時附加自訂屬性，請使用 `attributesExtractor` 屬性：
 

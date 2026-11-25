@@ -161,12 +161,15 @@ describe('expandIncludes', () => {
         '%other%',
         '</snippet>',
         '',
+        // In a section of its own, as on the page: right after the snippet it would go below its heading (P3-36)
+        '## Language',
+        '',
         '<include from="page.md" element-id="s">',
         '<var name="id4" value="language-name-based-destructuring"/>',
         '</include>',
       ),
     })
-    expect(content.split('\n').slice(7)).toEqual([
+    expect(content.split('\n').slice(9)).toEqual([
       '<var name="other" value="kept"/>',
       '### Name-based destructuring {id="language-name-based-destructuring"}',
       '%other%',
@@ -281,6 +284,125 @@ describe('an included block', () => {
     }
     expect(expand(pages).content).toBe(md('<list>', '', '<p>One</p>', '', '    <p>One</p>', '</list>', 'Text <p>One</p> text', '1. <p>One</p>', '2. Next'))
     expect(expand(pages, 'page.topic').content).toBe(md('<chapter>', '<p>One</p>', '</chapter>'))
+  })
+})
+
+// kotlinlang.org and ktor.io put an included section one level below the
+// heading of the including page it follows, as written there: its own
+// headings, not those included before it, nor the level the section is
+// written at (P3-36).
+describe('the headings of an included section', () => {
+  // The heading lines, outside code blocks
+  const headings = (content: string) => {
+    let fenced = false
+    return content.split('\n').filter((line) => {
+      if (/^\s*```/.test(line)) fenced = !fenced
+      return !fenced && /^#{1,6} /.test(line)
+    })
+  }
+
+  it('go one level below the heading of the page before them (ktor client-opentelemetry)', () => {
+    const { content } = expand({
+      'page.md': md(
+        '[//]: # (title: OpenTelemetry in Ktor Client)',
+        '',
+        '<include from="server-opentelemetry.md" element-id="add_dependencies"/>',
+        '<include from="server-opentelemetry.md" element-id="configure-otel"/>',
+        '',
+        '## Configure tracing',
+        '',
+        '<include from="server-opentelemetry.md" element-id="config-known-methods"/>',
+        '',
+        '### Capture response headers',
+        '',
+        'To capture specific HTTP response headers as span attributes, use the `capturedResponseHeaders` property.',
+        '',
+        '<include from="server-opentelemetry.md" element-id="config-custom-attributes"/>',
+        '',
+        '## Next steps',
+      ),
+      'server-opentelemetry.md': md(
+        '## Add dependencies {id="add_dependencies"}',
+        '',
+        'To use OpenTelemetry, add its dependencies.',
+        '',
+        '## Configure OpenTelemetry {id="configure-otel"}',
+        '',
+        'Set up an OpenTelemetry instance.',
+        '',
+        '## Configure tracing',
+        '',
+        '### Trace additional HTTP methods {id="config-known-methods"}',
+        '',
+        'By default, the plugin traces the standard HTTP methods.',
+        '',
+        '### Add custom attributes {id="config-custom-attributes"}',
+        '',
+        'To add custom attributes to spans, use the `attributeExtractor` property.',
+      ),
+    })
+    expect(headings(content)).toEqual([
+      '## Add dependencies {id="add_dependencies"}',
+      // Not below the section included right before it
+      '## Configure OpenTelemetry {id="configure-otel"}',
+      '## Configure tracing',
+      '### Trace additional HTTP methods {id="config-known-methods"}',
+      '### Capture response headers',
+      // Written `###`, after this page's h3
+      '#### Add custom attributes {id="config-custom-attributes"}',
+      '## Next steps',
+    ])
+  })
+
+  it('keep their levels to one another, and leave the snippet where it is (kotlin whatsnew2320)', () => {
+    const { content } = expand({
+      'page.md': md(
+        '## New features {id=new-experimental-features}',
+        '',
+        '<snippet id="name-based-destructuring-content">',
+        '',
+        '<var name="id4" value="name-based-destructuring"/>',
+        '',
+        '<var name="id5" value="name-based-destructuring-how-to-enable"/>',
+        '',
+        '### Name-based destructuring {id="%id4%"}',
+        '',
+        'Kotlin 2.3.20 introduces name-based destructuring.',
+        '',
+        '#### How to enable {id="%id5%"}',
+        '',
+        '```bash',
+        '# Not a heading: a comment in a shell script',
+        '-Xname-based-destructuring=only-syntax',
+        '```',
+        '',
+        '</snippet>',
+        '',
+        '## Language',
+        '',
+        '### Changes to overload resolution for context parameters',
+        '',
+        'Kotlin 2.3.20 changes overload resolution.',
+        '',
+        '<include from="page.md" element-id="name-based-destructuring-content">',
+        '<var name="id4" value="language-name-based-destructuring"/>',
+        '<var name="id5" value="language-name-based-destructuring-how-to-enable"/>',
+        '</include>',
+        '',
+        '## Standard library',
+      ),
+    })
+    expect(headings(content)).toEqual([
+      '## New features {id=new-experimental-features}',
+      '### Name-based destructuring {id="%id4%"}',
+      '#### How to enable {id="%id5%"}',
+      '## Language',
+      '### Changes to overload resolution for context parameters',
+      '#### Name-based destructuring {id="language-name-based-destructuring"}',
+      '##### How to enable {id="language-name-based-destructuring-how-to-enable"}',
+      '## Standard library',
+    ])
+    expect(content.match(/^# Not a heading: a comment in a shell script$/gm)).toHaveLength(2)
   })
 })
 

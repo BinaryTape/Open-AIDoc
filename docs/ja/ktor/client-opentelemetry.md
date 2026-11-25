@@ -164,7 +164,7 @@ install(%plugin_name%) {
 }
 ```
 
-### カスタム属性の追加 {id="config-custom-attributes"}
+#### カスタム属性の追加 {id="config-custom-attributes"}
 
 スパンの開始時または終了時にカスタム属性を付加するには、`attributesExtractor` プロパティを使用します。
 

@@ -169,7 +169,7 @@ install(%plugin_name%) {
 }
 ```
 
-### 커스텀 속성 추가 {id="config-custom-attributes"}
+#### 커스텀 속성 추가 {id="config-custom-attributes"}
 
 스팬의 시작 또는 종료 시점에 커스텀 속성을 부여하려면 `attributesExtractor` 프로퍼티를 사용하세요.
 

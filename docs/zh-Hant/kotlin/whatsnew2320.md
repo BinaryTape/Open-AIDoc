@@ -375,7 +375,7 @@ fun main() {
 
 此外，Kotlin 2.3.20 將 `kotlin.context` 多載的數量從 22 個減少到 6 個，以減少解析和程式碼補全期間過多的多載候選項目。
 
-### 基於名稱的解構 {id="language-name-based-destructuring"}
+#### 基於名稱的解構 {id="language-name-based-destructuring"}
 <primary-label ref="experimental-opt-in"/>
 <secondary-label ref="language"/>
 
@@ -434,7 +434,7 @@ fun main() {
 ```kotlin
 val (email, username) = user
 ```
-#### 如何啟用 {id="language-name-based-destructuring-how-to-enable"}
+##### 如何啟用 {id="language-name-based-destructuring-how-to-enable"}
 
 要在您的專案中使用基於名稱的解構，請在組建組態檔案中新增編譯器選項：
 
@@ -557,7 +557,7 @@ Kotlin 2.3.20 為 Lombok 與 `kotlin.plugin.jpa` 編譯器外掛程式帶來了�
 >
 {style="tip"}
 
-### Lombok 現已進入 Alpha 階段 {id="compiler-lombok-is-now-alpha"}
+#### Lombok 現已進入 Alpha 階段 {id="compiler-lombok-is-now-alpha"}
 <primary-label ref="alpha"/>
 <secondary-label ref="compiler"/>
 
@@ -703,7 +703,7 @@ kotlin {
 
 有關改善編譯時間的更多提示，請參閱 [Kotlin/Native 文件](native-improving-compilation-time.md)。
 
-### 適用於 C 或 Objective-C 程式庫的新互通模式 {id="native-new-interoperability-mode-for-c-or-objective-c-libraries"}
+#### 適用於 C 或 Objective-C 程式庫的新互通模式 {id="native-new-interoperability-mode-for-c-or-objective-c-libraries"}
 <primary-label ref="experimental-opt-in"/>
 <secondary-label ref="native"/>
 
@@ -717,7 +717,7 @@ kotlin {
 為了解決這個問題及其他問題，Kotlin 團隊一直在重新設計底層使用的互通機制。
 從 Kotlin 2.3.20 開始，您可以透過編譯器選項嘗試新的模式。
 
-#### 如何啟用 {id="native-new-interoperability-mode-for-c-or-objective-c-libraries-how-to-enable"}
+##### 如何啟用 {id="native-new-interoperability-mode-for-c-or-objective-c-libraries-how-to-enable"}
 
 1. 在您的 Gradle 組建檔案中，檢查是否包含 `cinterops {}` 區塊或 `pod()` 相依性。
    如果存在這些內容，表示您的專案使用了 C 或 Objective-C 程式庫。
@@ -744,7 +744,7 @@ kotlin {
 >
 {style="warning"}
 
-#### 回報您的結果 {id="native-new-interoperability-mode-for-c-or-objective-c-libraries-report-your-results"}
+##### 回報您的結果 {id="native-new-interoperability-mode-for-c-or-objective-c-libraries-report-your-results"}
 
 在大多數情況下，新的互通模式旨在成為一個直接替代方案。
 我們計畫最終將其設為預設啟用。但為了實現這一目標，我們需要確保其盡可能穩定運行並在廣泛的專案中進行測試，原因如下：

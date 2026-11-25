@@ -18,7 +18,7 @@
 
 在使用 kotlinx.serialization 轉換器之前，您需要按照 [Setup](https://github.com/Kotlin/kotlinx.serialization#setup) 區段中的說明新增 Kotlin 序列化外掛程式。
 
-#### JSON {id="add_json_dependency"}
+### JSON {id="add_json_dependency"}
 
 若要序列化／反序列化 JSON 資料，您可以選擇以下程式庫之一：kotlinx.serialization、Gson 或 Jackson。
 
@@ -106,7 +106,7 @@
 </TabItem>
 </Tabs>
 
-#### XML {id="add_xml_dependency"}
+### XML {id="add_xml_dependency"}
 
 若要序列化／反序列化 XML，請在建置指令碼中新增 `ktor-serialization-kotlinx-xml`：
 
@@ -132,7 +132,7 @@
     </TabItem>
 </Tabs>
 
-#### CBOR {id="add_cbor_dependency"}
+### CBOR {id="add_cbor_dependency"}
 
 若要序列化／反序列化 CBOR，請在建置指令碼中新增 `ktor-serialization-kotlinx-cbor`：
 
@@ -158,7 +158,7 @@
     </TabItem>
 </Tabs>
 
-#### ProtoBuf {id="add_protobuf_dependency"}
+### ProtoBuf {id="add_protobuf_dependency"}
 
 若要序列化／反序列化 ProtoBuf，請在建置指令碼中新增 `ktor-serialization-kotlinx-protobuf`：
 

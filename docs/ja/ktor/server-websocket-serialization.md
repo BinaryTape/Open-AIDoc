@@ -18,7 +18,7 @@
 
 kotlinx.serializationコンバーターを使用する前に、[Setup](https://github.com/Kotlin/kotlinx.serialization#setup)セクションの説明に従ってKotlinシリアライゼーションプラグインを追加する必要があります。
 
-#### JSON {id="add_json_dependency"}
+### JSON {id="add_json_dependency"}
 
 JSONデータをシリアライズ/デシリアライズするには、kotlinx.serialization、Gson、Jacksonのいずれかのライブラリを選択できます。
 
@@ -100,7 +100,7 @@ JSONデータをシリアライズ/デシリアライズするには、kotlinx.s
 </TabItem>
 </Tabs>
 
-#### XML {id="add_xml_dependency"}
+### XML {id="add_xml_dependency"}
 
 XMLをシリアライズ/デシリアライズするには、ビルドスクリプトに `ktor-serialization-kotlinx-xml` を追加します:
 
@@ -124,7 +124,7 @@ XMLをシリアライズ/デシリアライズするには、ビルドスクリ�
     </TabItem>
 </Tabs>
 
-#### CBOR {id="add_cbor_dependency"}
+### CBOR {id="add_cbor_dependency"}
 
 CBORをシリアライズ/デシリアライズするには、ビルドスクリプトに `ktor-serialization-kotlinx-cbor` を追加します:
 
@@ -148,7 +148,7 @@ CBORをシリアライズ/デシリアライズするには、ビルドスクリ
     </TabItem>
 </Tabs>
 
-#### ProtoBuf {id="add_protobuf_dependency"}
+### ProtoBuf {id="add_protobuf_dependency"}
 
 ProtoBufをシリアライズ/デシリアライズするには、ビルドスクリプトに `ktor-serialization-kotlinx-protobuf` を追加します:
 

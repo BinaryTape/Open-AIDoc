@@ -358,7 +358,7 @@ fun main() {
 
 さらに、Kotlin 2.3.20 では解決時およびコード補完時の過度なオーバーロード候補を減らすため、`kotlin.context` のオーバーロード数が 22 個から 6 個に削減されました。
 
-### 名前ベースの分割宣言 {id="language-name-based-destructuring"}
+#### 名前ベースの分割宣言 {id="language-name-based-destructuring"}
 <primary-label ref="experimental-opt-in"/>
 <secondary-label ref="language"/>
 
@@ -415,7 +415,7 @@ fun main() {
 ```kotlin
 val (email, username) = user
 ```
-#### 有効化する方法 {id="language-name-based-destructuring-how-to-enable"}
+##### 有効化する方法 {id="language-name-based-destructuring-how-to-enable"}
 
 プロジェクトで名前ベースの分割を使用するには、ビルド構成ファイルに以下のコンパイラーオプションを追加します。
 
@@ -534,7 +534,7 @@ Kotlin 2.3.20 以降:
 >
 {style="tip"}
 
-### Lombok が Alpha に昇格 {id="compiler-lombok-is-now-alpha"}
+#### Lombok が Alpha に昇格 {id="compiler-lombok-is-now-alpha"}
 <primary-label ref="alpha"/>
 <secondary-label ref="compiler"/>
 
@@ -673,7 +673,7 @@ kotlin {
 
 コンパイル時間を短縮するためのその他のヒントについては、[Kotlin/Native のドキュメント](native-improving-compilation-time.md)を参照してください。
 
-### C または Objective-C ライブラリ向けの新しい相互運用モード {id="native-new-interoperability-mode-for-c-or-objective-c-libraries"}
+#### C または Objective-C ライブラリ向けの新しい相互運用モード {id="native-new-interoperability-mode-for-c-or-objective-c-libraries"}
 <primary-label ref="experimental-opt-in"/>
 <secondary-label ref="native"/>
 
@@ -685,7 +685,7 @@ Kotlin Multiplatform (KMP) ライブラリまたはアプリケーションで C
 
 この問題やその他の課題に対処するため、Kotlin チームは内部で使用されている相互運用メカニズムの見直しを進めてきました。Kotlin 2.3.20 以降では、コンパイラーオプションを介してこの新しいモードを試すことができます。
 
-#### 有効化する方法 {id="native-new-interoperability-mode-for-c-or-objective-c-libraries-how-to-enable"}
+##### 有効化する方法 {id="native-new-interoperability-mode-for-c-or-objective-c-libraries-how-to-enable"}
 
 1. Gradle ビルドファイルで、`cinterops {}` ブロックまたは `pod()` 依存関係があるかどうかを確認します。これらが存在する場合、プロジェクトは C または Objective-C ライブラリを使用しています。
 2. プロジェクトが `2.3.20` 以降のバージョンを使用していることを確認します。
@@ -709,7 +709,7 @@ Kotlin Multiplatform (KMP) ライブラリまたはアプリケーションで C
 >
 {style="warning"}
 
-#### 結果の報告 {id="native-new-interoperability-mode-for-c-or-objective-c-libraries-report-your-results"}
+##### 結果の報告 {id="native-new-interoperability-mode-for-c-or-objective-c-libraries-report-your-results"}
 
 新しい相互運用モードは、ほとんどのケースでそのまま置き換えて使用できる（ドロップインの代替となる）ことが意図されています。最終的にはデフォルトで有効にする予定です。しかし、それを実現するためには可能な限り正常に動作することを確認し、幅広いプロジェクトでテストする必要があります。理由は以下のとおりです。
 
