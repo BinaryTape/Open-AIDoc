@@ -24,6 +24,7 @@ import markdownItWsCompare from "../plugins/markdown/writerside/markdown-it-ws-c
 import markdownItWsRunnable from "../plugins/markdown/writerside/markdown-it-ws-runnable"
 import markdownItWsCollapsibleSection from "../plugins/markdown/writerside/markdown-it-ws-collapsible-section"
 import markdownItWsChapterLevel from "../plugins/markdown/writerside/markdown-it-ws-chapter-level"
+import markdownItWsHeadingLevel from "../plugins/markdown/writerside/markdown-it-ws-heading-level"
 import markdownItWsShowStructure from "../plugins/markdown/writerside/markdown-it-ws-show-structure"
 import markdownItWsMath from "../plugins/markdown/writerside/markdown-it-ws-math"
 import markdownItWsInlineIcon from "../plugins/markdown/writerside/markdown-it-ws-inline-icon"
@@ -121,6 +122,8 @@ export function registerMarkdownPlugins(md: any) {
   // whose <details> then goes around it.
   md.use(markdownItWsRunnable)
   md.use(markdownItWsCollapsibleSection)
+  // A core rule right after `block`: the rules below read the heading levels it sets.
+  md.use(markdownItWsHeadingLevel)
   md.use(markdownItWsChapterLevel)
   md.use(markdownItWsShowStructure)
   // A core rule before `inline`: the TeX is gone before markdown parses the text.

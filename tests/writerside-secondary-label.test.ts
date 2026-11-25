@@ -81,7 +81,8 @@ describe('secondary labels on a page', () => {
 
   // Labels from docs/.vitepress/labels/*.json, written by the pipeline
   it('renders a row of labels under a section heading', async () => {
-    const html = await render('### 简化设置 {id="simplified"}\n<secondary-label ref="maven"/>\n\nKotlin 2.3.20 让设置更简单。\n')
+    // In its section, as on the page: right below the page title the `###` would be an h2 (P2-39)
+    const html = await render('## 新功能 {id=new-stable-features}\n\n### 简化设置 {id="simplified"}\n<secondary-label ref="maven"/>\n\nKotlin 2.3.20 让设置更简单。\n')
     expect(html).toContain('</h3>\n<div class="ws-labels"><span class="ws-label ws-label--red">Maven</span></div>')
     expect(html).toContain('<p>Kotlin 2.3.20 让设置更简单。</p>')
     expect(html).not.toContain('<secondary-label')
@@ -94,7 +95,7 @@ describe('secondary labels on a page', () => {
   })
 
   it('keeps a primary label heading as it is, the row under it', async () => {
-    const html = await render('### Lombok 现已进入 Alpha 阶段 {id="lombok"}\n\n<primary-label ref="alpha"/>\n<secondary-label ref="compiler"/>\n\n正文。\n')
+    const html = await render('## 新功能 {id=new-experimental-features}\n\n### Lombok 现已进入 Alpha 阶段 {id="lombok"}\n\n<primary-label ref="alpha"/>\n<secondary-label ref="compiler"/>\n\n正文。\n')
     expect(html).toContain('<TopicTitle id="lombok" level="3" title="Lombok 现已进入 Alpha 阶段" labelRef="alpha"/><div class="ws-labels"><span class="ws-label ws-label--black">Compiler</span></div>')
   })
 

@@ -15,7 +15,8 @@ async function renderAsVueTemplate(markdown: string) {
 describe('Writerside titled headings', () => {
   it('turns a heading with a primary label into a TopicTitle', async () => {
     const { html, errors } = await renderAsVueTemplate(
-      '### -Xallow-kotlin-package {id="xallow"}\n<primary-label ref="experimental-general"/>\n\nText.'
+      // Under its section, as on kotlin/compiler-reference: right below the page title it would be an h2 (P2-39)
+      '## 通用选项 {id="common-options"}\n\n### -Xallow-kotlin-package {id="xallow"}\n<primary-label ref="experimental-general"/>\n\nText.'
     )
     expect(errors).toEqual([])
     expect(html).toContain('<TopicTitle id="xallow" level="3" title="-Xallow-kotlin-package" labelRef="experimental-general"/>')
