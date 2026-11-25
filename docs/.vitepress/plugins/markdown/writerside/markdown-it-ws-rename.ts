@@ -23,6 +23,15 @@ export default function markdownItWsRename(md) {
     md.core.ruler.push('ws_list_style', (state) => {
         if (isWritersideDoc(state.env)) forEachHtml(state.tokens, listStyleAsType);
     });
+
+    // After the attributes of `{type="alpha-lower"}` are set (VitePress's
+    // curly_attributes rule): HTML letters a list with type="a" (P2-48).
+    md.core.ruler.push('ws_markdown_list_type', (state) => {
+        if (!isWritersideDoc(state.env)) return;
+        for (const token of state.tokens) {
+            if (token.type === 'ordered_list_open' && token.attrGet('type') === 'alpha-lower') token.attrSet('type', 'a');
+        }
+    });
 }
 
 function forEachHtml(tokens: any[], rewrite: (html: string) => string): void {
