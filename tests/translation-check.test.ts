@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { checkTranslation, nestedLinks, structureOf, undefinedLeftovers } from '../tools/pipeline/utils/translation-check.mjs'
+import { checkTranslation, lostHeadings, nestedLinks, structureOf, undefinedLeftovers } from '../tools/pipeline/utils/translation-check.mjs'
 
 const section = (n: number) => [
   `## Section ${n}`,
@@ -143,5 +143,84 @@ describe('nestedLinks', () => {
   it('accepts a link the source nests too', () => {
     const source = '<a href="a">see <a href="b">b</a></a>'
     expect(checkTranslation('<a href="a">参见 <a href="b">b</a></a>', source)).toEqual([])
+  })
+})
+
+// Every heading line was there, but not every heading was one on the page (P3-35, P3-11, P3-37).
+describe('lostHeadings', () => {
+  // ktor/azure-app-service: upstream's list items, and zh-Hans written `*   `. The
+  // code blocks indented three spaces then left the list, and the closing fence,
+  // indented four, no longer closed one: "Step 2" ended up in a code block.
+  const port = (marker: string, text: [string, string, string]) => [
+    `### ${text[0]} {id="port"}`,
+    '',
+    `${marker}${text[1]}`,
+    '',
+    '   ```kotlin',
+    '   fun runBasicServer() {',
+    '      val port = System.getenv("PORT")?.toIntOrNull() ?: 8080',
+    '   }',
+    '    ```',
+    `${marker}${text[2]}`,
+    '',
+    '   ```',
+    '   ktor {',
+    '       deployment {',
+    '           port = ${PORT:8080}',
+    '       }',
+    '   }',
+    '   ```',
+    '   {style="block"}',
+    '',
+  ].join('\n')
+  const portSource = port('* ', ['Step 1: Set up the port', 'If you used the example with port configuration **in code**:', 'If the server configuration is defined **in the config file**:']) +
+    '\n### Step 2: Add plugins {id="plugins"}\nOpen the `build.gradle.kts` file.\n'
+  const portZh = (marker: string) => port(marker, ['第 1 步：设置端口', '如果您使用的是**在代码中**配置端口的示例：', '如果服务器配置定义在**配置文件**中：']) +
+    '\n### 第 2 步：添加插件 {id="plugins"}\n打开 `build.gradle.kts` 文件。\n'
+
+  // kotlin/whatsnew16: ja moved the `//sampleEnd` of a code block in a list item
+  // to the start of its line, which ended the list item and the code block with
+  // it; the closing fence then opened another, which ran on over the next heading.
+  const duration = (sampleEnd: string, text: [string, string]) => [
+    `* ${text[0]}`,
+    '',
+    '  ```kotlin',
+    '  fun main() {',
+    '  //sampleStart',
+    '      val duration = 10000',
+    sampleEnd,
+    '  }',
+    '  ```',
+    '  {kotlin-runnable="true" kotlin-min-compiler-version="1.5" validate="false"}',
+    '',
+    `### ${text[1]} {id="splitting-regex-into-a-sequence"}`,
+    '',
+  ].join('\n')
+  const durationSource = duration('  //sampleEnd', ['We are bringing back extension properties like `Int.seconds`.', 'Splitting Regex into a sequence'])
+
+  it('counts a heading a code block that does not end takes in (zh-Hans ktor/azure-app-service)', () => {
+    expect(lostHeadings(portZh('*   '), portSource)).toBe(1)
+    expect(checkTranslation(portZh('*   '), portSource)).toEqual(['Markdown headings lost once parsed 1'])
+  })
+
+  it('counts a heading after a code line moved out of its list item (ja kotlin/whatsnew16)', () => {
+    const ja = duration('//sampleEnd', ['`Int.seconds` のような拡張プロパティを復活させます。', 'Regex をシーケンスに分割'])
+    expect(lostHeadings(ja, durationSource)).toBe(1)
+  })
+
+  it('counts a heading written as HTML (ja kotlin/whatsnew1430)', () => {
+    const source = '## Serialization updates\n\nWith Kotlin 1.4.30, we are releasing `kotlinx.serialization` 1.1.0-RC.\n'
+    expect(lostHeadings('<h2>Serialization の更新</h2>\n\nKotlin 1.4.30 と共に、`kotlinx.serialization` 1.1.0-RC をリリースします。\n', source)).toBe(1)
+  })
+
+  it('accepts the same pages translated with the structure kept', () => {
+    expect(checkTranslation(portZh('* '), portSource)).toEqual([])
+    const ja = duration('  //sampleEnd', ['`Int.seconds` のような拡張プロパティを復活させます。', 'Regex をシーケンスに分割'])
+    expect(lostHeadings(ja, durationSource)).toBe(0)
+  })
+
+  it('leaves a heading line inside a code block, in the source as in the translation', () => {
+    const source = '## Markdown\n\n```markdown\n## Not a heading\n```\n'
+    expect(lostHeadings('## Markdown\n\n```markdown\n## 不是标题\n```\n', source)).toBe(0)
   })
 })

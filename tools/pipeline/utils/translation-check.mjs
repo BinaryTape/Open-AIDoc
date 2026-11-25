@@ -8,6 +8,7 @@
  * them is rejected. Thresholds leave room for legitimate differences (a merged
  * paragraph, a reworded link) and only flag losses a reader would notice.
  */
+import MarkdownIt from 'markdown-it'
 
 const FENCE_LINE = /^\s*(```|~~~)/
 
@@ -87,6 +88,10 @@ export function checkTranslation(translated, source) {
   if (nested > 0) {
     strong.push(`link inside a link ${nested}`)
   }
+  const lost = lostHeadings(translated, source)
+  if (lost > 0) {
+    strong.push(`Markdown headings lost once parsed ${lost}`)
+  }
 
   // One weak signal alone is too noisy: a translation may legitimately merge
   // paragraphs or drop a duplicated link.
@@ -131,6 +136,28 @@ export function nestedLinks(text) {
     if (end >= 0 && LINK_INSIDE.test(prose.slice(start, end))) nested++
   }
   return nested
+}
+
+const markdown = new MarkdownIt({ html: true })
+
+/**
+ * How many fewer Markdown headings the translation has than its source once
+ * parsed as the site parses it. The headings line by line can all be there
+ * and still not be headings on the page (P3-35, P3-11, P3-37):
+ *
+ *   - zh-Hans ktor/azure-app-service wrote its list items `*   `, so the code
+ *     blocks indented three spaces under them left the list; the closing
+ *     fence, indented four, then no longer closed one, and the code block ran
+ *     on over the next heading;
+ *   - ja kotlin/whatsnew16 indented a code block in a list item four spaces
+ *     more, which made it indented code and its fences text, with the same end;
+ *   - ja kotlin/whatsnew1430 wrote a heading as an HTML <h2>, with no id.
+ *
+ * A translation never drops a heading on purpose, so one is enough.
+ */
+export function lostHeadings(translated, source) {
+  const headings = (text) => markdown.parse(text, {}).filter((token) => token.type === 'heading_open').length
+  return Math.max(0, headings(source) - headings(translated))
 }
 
 /** The text outside fenced code blocks. */

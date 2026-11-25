@@ -1,0 +1,14 @@
+{
+  "docs/whatsnew1430.md": {
+    "langs": [
+      "ja"
+    ],
+    "reason": "audit: Markdown headings lost once parsed 1"
+  },
+  "docs/whatsnew16.md": {
+    "langs": [
+      "ja"
+    ],
+    "reason": "audit: Markdown headings lost once parsed 1"
+  }
+}
