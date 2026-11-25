@@ -281,6 +281,46 @@ function separateBlock(replacement, before, after) {
   return replacement;
 }
 
+/** The Markdown headings of a text, outside code blocks: line number and level. */
+function headingLines(lines) {
+  const headings = [];
+  let open = null;
+  for (const [i, line] of lines.entries()) {
+    const fence = FENCE_RE.exec(line);
+    if (fence && (open === null || (fence[1][0] === open[0] && fence[1].length >= open.length))) {
+      open = open === null ? fence[1] : null;
+    } else if (open === null) {
+      const heading = HEADING_RE.exec(line);
+      if (heading) headings.push({ line: i, level: heading[1].length });
+    }
+  }
+  return headings;
+}
+
+/**
+ * kotlinlang.org and ktor.io put an included section one level below the
+ * heading of the including page it follows: that page's own headings, not
+ * those included before it, nor the level the section is written at. Ktor's
+ * client-opentelemetry includes server-opentelemetry's `### Add custom
+ * attributes` after its own `### Capture response headers`: an h4 there
+ * (P3-36). The included headings keep their levels to one another.
+ * @param {string} element - The included content
+ * @param {string} before - The including page before the include, includes not expanded
+ * @param {boolean} page - Whether it is the page itself, whose title is the h1 above every heading
+ */
+function nestHeadings(element, before, page) {
+  const above = headingLines(before.split("\n")).at(-1)?.level ?? (page ? 1 : null);
+  const lines = element.split("\n");
+  const headings = headingLines(lines);
+  if (above === null || headings.length === 0) return element;
+  const shift = above + 1 - Math.min(...headings.map((h) => h.level));
+  if (shift === 0) return element;
+  for (const { line, level } of headings) {
+    lines[line] = "#".repeat(Math.min(6, Math.max(1, level + shift))) + lines[line].slice(level);
+  }
+  return lines.join("\n");
+}
+
 /**
  * Replace the includes of a page with the content they point at.
  * @param {string} content - The page
@@ -314,6 +354,9 @@ export function expandIncludes(content, file, readPage, unresolved = [], stack =
         const fallback = sourceVars(element, target, found, pageVars);
         for (const [name, value] of Object.entries(fallback)) filled.push({ from: include.from, name, value });
         element = applyVars(element, fallback);
+        // Inside included content with no heading before the include, the
+        // levels are set when that content is put in the page.
+        if (file.endsWith(".md")) element = nestHeadings(element, content.slice(0, include.start), stack.length === 0);
         // An include after a list marker (`1. <include …/>`) is the item's
         // content: its other lines go to the column of the tag.
         const lead = content.slice(content.lastIndexOf("\n", include.start - 1) + 1, include.start);
