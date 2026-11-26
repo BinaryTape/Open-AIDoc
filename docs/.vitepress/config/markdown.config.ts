@@ -31,6 +31,7 @@ import markdownItWsInlineIcon from "../plugins/markdown/writerside/markdown-it-w
 import markdownItWsDarkImage from "../plugins/markdown/writerside/markdown-it-ws-dark-image"
 import markdownItWsImageRatio from "../plugins/markdown/writerside/markdown-it-ws-image-ratio"
 import markdownItWsGif from "../plugins/markdown/writerside/markdown-it-ws-gif"
+import markdownItWsVideo from "../plugins/markdown/writerside/markdown-it-ws-video"
 import { markdownItRewriteLinks } from '../plugins/markdown/writerside/markdown-it-ws-inline-link'
 
 // ===== MkDocs plugins =====
@@ -137,6 +138,7 @@ export function registerMarkdownPlugins(md: any) {
   md.use(markdownItWsImageRatio)
   // Last of the image rules: takes the dark version the one above found to the player.
   md.use(markdownItWsGif)
+  md.use(markdownItWsVideo)
 
   // MkDocs plugins
   md.use(markdownItMkAdmonition)
