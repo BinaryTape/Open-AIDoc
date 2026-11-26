@@ -19,7 +19,7 @@ export const GLOBAL_COMPONENTS = [
   'topic', 'TopicTitle', 'section-starting-page', 'show-structure', 'link-summary', 'card-summary',
   'web-summary', 'snippet', 'description', 'spotlight', 'primary', 'secondary', 'misc', 'cards',
   'card', 'links', 'group', 'Links', 'chapter', 'procedure', 'step', 'control', 'Path', 'ui-path',
-  'emphasis', 'note', 'tip', 'warning', 'YouTubeVideo',
+  'emphasis', 'note', 'tip', 'warning', 'YouTubeVideo', 'GifPlayer',
 ]
 
 const registered = new Set(GLOBAL_COMPONENTS)

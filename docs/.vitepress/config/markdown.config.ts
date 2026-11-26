@@ -30,6 +30,7 @@ import markdownItWsMath from "../plugins/markdown/writerside/markdown-it-ws-math
 import markdownItWsInlineIcon from "../plugins/markdown/writerside/markdown-it-ws-inline-icon"
 import markdownItWsDarkImage from "../plugins/markdown/writerside/markdown-it-ws-dark-image"
 import markdownItWsImageRatio from "../plugins/markdown/writerside/markdown-it-ws-image-ratio"
+import markdownItWsGif from "../plugins/markdown/writerside/markdown-it-ws-gif"
 import { markdownItRewriteLinks } from '../plugins/markdown/writerside/markdown-it-ws-inline-link'
 
 // ===== MkDocs plugins =====
@@ -134,6 +135,8 @@ export function registerMarkdownPlugins(md: any) {
   md.use(markdownItWsDarkImage)
   // After the inline-icon rule, which reads Writerside's style="inline" before this one adds to it.
   md.use(markdownItWsImageRatio)
+  // Last of the image rules: takes the dark version the one above found to the player.
+  md.use(markdownItWsGif)
 
   // MkDocs plugins
   md.use(markdownItMkAdmonition)

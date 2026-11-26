@@ -51,6 +51,7 @@ import Note from "../component/Note.vue";
 import Tip from "../component/Tip.vue";
 import Warning from "../component/Warning.vue";
 import YouTubeVideo from "../component/YouTubeVideo.vue";
+import GifPlayer from "../component/GifPlayer.vue";
 import Breadcrumbs from "../component/Breadcrumbs.vue";
 
 // The start page section tags share TopicCardSection, told which tag they are.
@@ -127,6 +128,8 @@ export default {
     app.component('warning', Warning)
 
     app.component('YouTubeVideo', YouTubeVideo)
+    // A GIF still until clicked (markdown-it-ws-gif)
+    app.component('GifPlayer', GifPlayer)
 
     // Use our custom i18n implementation
     app.use(createI18n(router))
