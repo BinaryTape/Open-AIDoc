@@ -1,0 +1,26 @@
+/* Writerside's border-effect="line" and "rounded" on an image
+   (markdown-it-ws-image-border, P2-50). Measured on kotlinlang.org and
+   ktor.io (.article__bordered-element): a 1px border, #d1d1d2, rgb(71, 71, 73)
+   in dark mode; rounded 9px. */
+:root {
+  --ws-bordered-color: #d1d1d2;
+}
+
+.dark {
+  --ws-bordered-color: #474749;
+}
+
+.vp-doc img.ws-bordered {
+  border: 1px solid var(--ws-bordered-color);
+}
+
+.vp-doc img.ws-bordered--rounded {
+  border-radius: 9px;
+}
+
+/* ktor.io adds the border outside the image's width: a 400px image is 402px
+   wide there. Ours still fits the column. */
+.vp-doc img.ws-bordered--outside {
+  box-sizing: content-box;
+  max-width: calc(100% - 2px);
+}
