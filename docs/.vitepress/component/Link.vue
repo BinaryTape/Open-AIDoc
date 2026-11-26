@@ -26,6 +26,7 @@ const props = defineProps({
  * as its description, so that a screen reader still reads it.
  */
 const id = useId()
+const wrapper = ref<HTMLElement>()
 const link = ref<HTMLElement>()
 const tip = ref<HTMLElement>()
 const open = ref(false)
@@ -52,17 +53,15 @@ function onFocus(event: FocusEvent) {
 
 /** Puts the shown tooltip over the line of the link under the pointer (the first one from the keyboard). */
 function place() {
-  const t = tip.value, a = link.value
-  if (!t || !a) return
+  const t = tip.value, a = link.value, box = wrapper.value
+  if (!t || !a || !box) return
   const lines = [...a.getClientRects()]
   const line = (pointerY !== undefined && lines.find((r) => pointerY! >= r.top && pointerY! <= r.bottom)) || lines[0]
   if (!line) return
-  // The tooltip's box at left: 0, top: 0 of its containing block, before it slides in.
-  t.style.left = t.style.top = '0px'
-  t.style.transform = 'none'
-  const origin = t.getBoundingClientRect()
-  t.style.transform = ''
-  const { x, y, below } = tooltipPosition(line, origin, document.documentElement.clientWidth)
+  // Its size without the slide it starts with; its left and top are from the wrapper's corner.
+  const size = { width: t.offsetWidth, height: t.offsetHeight }
+  const { x, y, below } = tooltipPosition(line, size, document.documentElement.clientWidth)
+  const origin = box.getBoundingClientRect()
   t.dataset.placement = below ? 'bottom' : 'top'
   t.style.left = `${x - origin.left}px`
   t.style.top = `${y - origin.top}px`
@@ -70,7 +69,7 @@ function place() {
 </script>
 
 <template>
-  <span class="ws-tooltip-wrapper">
+  <span ref="wrapper" class="ws-tooltip-wrapper">
     <a
       ref="link"
       :href="props.href"
