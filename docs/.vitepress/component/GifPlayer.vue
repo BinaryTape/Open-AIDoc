@@ -92,7 +92,7 @@ onBeforeUnmount(() => {
 </template>
 
 <style>
-/* Measured on kotlinlang.org and ktor.io (.gif-player): a 1px border, 11px
+/* Measured on kotlinlang.org and ktor.io (.gif-player): a 1px border, 9px
    round with border-effect="rounded"; a 50px "Gif" disc in the site's purple,
    80% opaque under the pointer, with black text in dark mode. */
 .ws-gif {
@@ -130,7 +130,7 @@ onBeforeUnmount(() => {
 }
 
 .ws-gif--rounded .ws-gif__image {
-  border-radius: 11px;
+  border-radius: 9px;
 }
 
 .ws-gif__badge {

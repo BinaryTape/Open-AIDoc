@@ -31,6 +31,7 @@ import markdownItWsInlineIcon from "../plugins/markdown/writerside/markdown-it-w
 import markdownItWsDarkImage from "../plugins/markdown/writerside/markdown-it-ws-dark-image"
 import markdownItWsImageRatio from "../plugins/markdown/writerside/markdown-it-ws-image-ratio"
 import markdownItWsGif from "../plugins/markdown/writerside/markdown-it-ws-gif"
+import markdownItWsImageBorder from "../plugins/markdown/writerside/markdown-it-ws-image-border"
 import markdownItWsVideo from "../plugins/markdown/writerside/markdown-it-ws-video"
 import { markdownItRewriteLinks } from '../plugins/markdown/writerside/markdown-it-ws-inline-link'
 
@@ -136,8 +137,10 @@ export function registerMarkdownPlugins(md: any) {
   md.use(markdownItWsDarkImage)
   // After the inline-icon rule, which reads Writerside's style="inline" before this one adds to it.
   md.use(markdownItWsImageRatio)
-  // Last of the image rules: takes the dark version the one above found to the player.
+  // Takes the dark version the one above found to the player.
   md.use(markdownItWsGif)
+  // After the GIF rule, which reads border-effect for a GIF before this one turns it into classes.
+  md.use(markdownItWsImageBorder)
   md.use(markdownItWsVideo)
 
   // MkDocs plugins

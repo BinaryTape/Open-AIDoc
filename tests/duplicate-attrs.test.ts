@@ -18,6 +18,6 @@ describe('an attribute written twice', () => {
     const img = /<img[^>]*>/.exec(html)![0]
     expect(img.match(/\bwidth="/g)).toHaveLength(1)
     expect(img).toContain('width="706"')
-    expect(img).toContain('border-effect="rounded"')
+    expect(img).toContain('ws-bordered--rounded')
   })
 })
