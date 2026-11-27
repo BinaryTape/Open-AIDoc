@@ -1,6 +1,9 @@
+import { codeBlockBodyText } from '../../../../../shared/writerside-code-block'
+
 /**
  * Convert Writerside <code-block> bodies (including XML CDATA) into a Vue-safe
- * self-closing tag with an escaped `code` attribute.
+ * self-closing tag with an escaped `code` attribute. A body outside CDATA is
+ * XML text, so its entities are decoded first (P3-39).
  *
  * VitePress compiles Markdown HTML with the Vue template compiler, which
  * rejects `<![CDATA[...]]>` outside XML. Leaving raw XML tags inside
@@ -17,7 +20,7 @@ export function normalizeWritersideCodeBlocks(content: string): string {
         return match
       }
 
-      let rawCode = inner.replace(/^\s*<!\[CDATA\[/, '').replace(/\]\]>\s*$/, '')
+      let rawCode = codeBlockBodyText(inner)
       rawCode = rawCode.replace(/^\s*\n/, '').replace(/\n\s*$/, '')
       const space = rawAttrs ? ' ' : ''
       return `<code-block${space}${rawAttrs} code="${escapeCodeBlockText(rawCode)}"/>`

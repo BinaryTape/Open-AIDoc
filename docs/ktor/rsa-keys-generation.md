@@ -33,7 +33,7 @@ RS256 是 RSA 加密算法的一部分，它利用 SHA-256 进行哈希计算，
 
 在新的终端窗口中，运行以下命令：
 
-<code-block lang="shell" code="openssl genpkey -algorithm rsa -pkeyopt rsa_keygen_bits:2048 &amp;gt; ktor.pk8"/>
+<code-block lang="shell" code="openssl genpkey -algorithm rsa -pkeyopt rsa_keygen_bits:2048 &gt; ktor.pk8"/>
 
 [openssl genpkey](https://www.openssl.org/docs/man3.0/man1/openssl-genpkey.html) 命令使用 RSA 算法生成一个 2048 位的私钥，并将其存储在指定的文件中（此处为 `ktor.pk8`）。该文件的内容采用 [Base64](https://en.wikipedia.org/wiki/Base64) 编码，因此在派生公钥之前需要进行解码。
 

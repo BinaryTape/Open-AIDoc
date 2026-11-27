@@ -33,7 +33,7 @@ RSA 暗号アルゴリズムの一部である RS256 は、ハッシュ化に SH
 
 新しいターミナルウィンドウで、次のコマンドを実行します。
 
-<code-block lang="shell" code="openssl genpkey -algorithm rsa -pkeyopt rsa_keygen_bits:2048 &amp;gt; ktor.pk8"/>
+<code-block lang="shell" code="openssl genpkey -algorithm rsa -pkeyopt rsa_keygen_bits:2048 &gt; ktor.pk8"/>
 
 [openssl genpkey](https://www.openssl.org/docs/man3.0/man1/openssl-genpkey.html) コマンドは、RSA アルゴリズムを使用して 2048 ビットの秘密鍵を生成し、指定されたファイル（ここでは `ktor.pk8`）に保存します。このファイルの内容は [Base64](https://en.wikipedia.org/wiki/Base64) でエンコードされているため、公開鍵を導出する前にデコードする必要があります。
 

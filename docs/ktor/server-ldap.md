@@ -33,7 +33,7 @@ LDAP 是一种用于与各种可存储用户信息的目录服务配合使用的
         <code-block lang="Groovy" title="Sample" code="            implementation &quot;io.ktor:ktor-server-auth:$ktor_version&quot;&#10;            implementation &quot;io.ktor:ktor-server-auth-ldap:$ktor_version&quot;"/>
     </TabItem>
     <TabItem title="Maven" group-key="maven">
-        <code-block lang="XML" title="Sample" code="&amp;lt;dependency&amp;gt;&#10;&amp;lt;groupId&amp;gt;io.ktor&amp;lt;/groupId&amp;gt;&#10;&amp;lt;artifactId&amp;gt;ktor-server-auth&amp;lt;/artifactId&amp;gt;&#10;&amp;lt;version&amp;gt;${ktor_version}&amp;lt;/version&amp;gt;&#10;&amp;lt;/dependency&amp;gt;&#10;&amp;lt;dependency&amp;gt;&#10;&amp;lt;groupId&amp;gt;io.ktor&amp;lt;/groupId&amp;gt;&#10;&amp;lt;artifactId&amp;gt;ktor-server-auth-ldap&amp;lt;/artifactId&amp;gt;&#10;&amp;lt;version&amp;gt;${ktor_version}&amp;lt;/version&amp;gt;&#10;&amp;lt;/dependency&amp;gt;"/>
+        <code-block lang="XML" title="Sample" code="&lt;dependency&gt;&#10;&lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;&lt;artifactId&gt;ktor-server-auth&lt;/artifactId&gt;&#10;&lt;version&gt;${ktor_version}&lt;/version&gt;&#10;&lt;/dependency&gt;&#10;&lt;dependency&gt;&#10;&lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;&lt;artifactId&gt;ktor-server-auth-ldap&lt;/artifactId&gt;&#10;&lt;version&gt;${ktor_version}&lt;/version&gt;&#10;&lt;/dependency&gt;"/>
    </TabItem>
 </Tabs>
 

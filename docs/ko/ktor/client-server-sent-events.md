@@ -139,7 +139,7 @@
                 각각 지정합니다.
             </li>
         </list>
-        <code-block lang="kotlin" code="                runBlocking {&#10;                    client.sse(host = &amp;quot;127.0.0.1&amp;quot;, port = 8080, path = &amp;quot;/events&amp;quot;) {&#10;                        // this: ClientSSESession&#10;                    }&#10;                }"/>
+        <code-block lang="kotlin" code="                runBlocking {&#10;                    client.sse(host = &quot;127.0.0.1&quot;, port = 8080, path = &quot;/events&quot;) {&#10;                        // this: ClientSSESession&#10;                    }&#10;                }"/>
         <note>
             <code>ClientSSESession</code> 및 <code>ClientSSESessionWithDeserialization</code> 인스턴스는 세션이 유지되는 동안에만 유효합니다.
             이들의 스코프는 <code>serverSentEvents { ... }</code> 블록이 완료되거나 연결이 닫힐 때 자동으로 취소됩니다.

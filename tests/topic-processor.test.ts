@@ -3,6 +3,7 @@ import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { processFullMarkdownContent } from '../tools/pipeline/processors/MarkdownProcessor.mjs'
+import { extractTopicContent } from '../tools/pipeline/processors/TopicProcessor.mjs'
 
 // Every case here once came out as the word "undefined" on the site.
 describe('Writerside Markdown processing', () => {
@@ -81,5 +82,74 @@ describe('Writerside Markdown processing', () => {
   it('keeps the target of a card as written', async () => {
     const out = await process('<a href="other.topic" summary="About it.">Other</a>')
     expect(out).toContain('<card href="other.topic" summary="About it.">Other</card>')
+  })
+})
+
+// P3-39: Writerside reads a <code-block> body outside CDATA as XML text and a
+// CDATA body as written. Escaping the body's `&` again showed `&lt;dependency&gt;`.
+describe('Writerside code-block bodies', () => {
+  let dir: string
+
+  beforeEach(() => {
+    dir = mkdtempSync(join(tmpdir(), 'topics-'))
+  })
+
+  afterEach(() => {
+    rmSync(dir, { recursive: true, force: true })
+  })
+
+  it('decodes the entities of a body in a Markdown page (ktor server-jwt)', async () => {
+    const maven = [
+      '<code-block lang="XML" title="Sample">',
+      '&lt;dependency&gt;',
+      '&lt;groupId&gt;io.ktor&lt;/groupId&gt;',
+      '&lt;/dependency&gt;',
+      '</code-block>',
+    ].join('\n')
+    writeFileSync(join(dir, 'server-jwt.md'), maven)
+
+    expect(await processFullMarkdownContent(join(dir, 'server-jwt.md'), maven)).toContain(
+      '<code-block lang="XML" title="Sample" code="&lt;dependency&gt;&#10;&lt;groupId&gt;io.ktor&lt;/groupId&gt;&#10;&lt;/dependency&gt;"/>'
+    )
+  })
+
+  it('decodes the entities of a body in a .topic page (ktor client-server-sent-events)', async () => {
+    const topic = [
+      '<topic id="client-server-sent-events" title="Server-Sent Events">',
+      '<code-block lang="kotlin">',
+      '    client.sse(host = &quot;127.0.0.1&quot;, port = 8080) {',
+      '    }',
+      '</code-block>',
+      '</topic>',
+    ].join('\n')
+
+    expect(await extractTopicContent(topic, true, join(dir, 'client-server-sent-events.topic'), dir)).toContain(
+      'code="    client.sse(host = &quot;127.0.0.1&quot;, port = 8080) {&#10;    }"'
+    )
+  })
+
+  it('keeps a CDATA body as written (ktor server-configuration-code)', async () => {
+    const block = [
+      '<code-block lang="kotlin">',
+      '<![CDATA[',
+      'configureServer = { // this: Server -&gt;',
+      '}',
+      ']]>',
+      '</code-block>',
+    ].join('\n')
+    writeFileSync(join(dir, 'page.md'), block)
+
+    expect(await processFullMarkdownContent(join(dir, 'page.md'), block)).toContain(
+      'code="configureServer = { // this: Server -&amp;gt;&#10;}"'
+    )
+  })
+
+  it('keeps an & that starts no XML entity', async () => {
+    const block = '<code-block lang="shell">\ntest -f a && echo &nbsp;\n</code-block>'
+    writeFileSync(join(dir, 'page.md'), block)
+
+    expect(await processFullMarkdownContent(join(dir, 'page.md'), block)).toContain(
+      'code="test -f a &amp;&amp; echo &amp;nbsp;"'
+    )
   })
 })

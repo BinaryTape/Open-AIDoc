@@ -133,7 +133,7 @@
             <li>分别使用 <code>schema</code>、<code>host</code>、<code>port</code> 和 <code>path</code> 形参来指定协议方案、域名、端口号和路径名称。
             </li>
         </list>
-        <code-block lang="kotlin" code="                runBlocking {&#10;                    client.sse(host = &amp;quot;127.0.0.1&amp;quot;, port = 8080, path = &amp;quot;/events&amp;quot;) {&#10;                        // this: ClientSSESession&#10;                    }&#10;                }"/>
+        <code-block lang="kotlin" code="                runBlocking {&#10;                    client.sse(host = &quot;127.0.0.1&quot;, port = 8080, path = &quot;/events&quot;) {&#10;                        // this: ClientSSESession&#10;                    }&#10;                }"/>
         <note>
             <code>ClientSSESession</code> 和 <code>ClientSSESessionWithDeserialization</code> 实例仅在会话持续期间有效。当 <code>serverSentEvents { ... }</code> 块完成或连接关闭时，它们的作用域会自动取消。
         </note>

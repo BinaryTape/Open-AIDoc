@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { codeBlockBodyText } from "../../../shared/writerside-code-block.ts";
 
 export async function replaceAsync(str, regex, asyncReplacer) {
     const matches = [];
@@ -252,7 +253,7 @@ export async function processTopicContentAsync(currentFilePath, docsPath, topicC
                     .replace(/\s+include-lines="[^"]+"/, '')
                     .trim();
             } else {
-                rawCode = inner.replace(/^\s*<!\[CDATA\[/, '').replace(/\]\]>\s*$/, '');
+                rawCode = codeBlockBodyText(inner);
             }
 
             rawCode = rawCode.replace(/^\s*\n/, '').replace(/\n\s*$/, '');
@@ -275,6 +276,7 @@ export async function processTopicContentAsync(currentFilePath, docsPath, topicC
 /**
  * Convert Writerside <code-block> bodies (including XML CDATA) into a Vue-safe
  * self-closing tag. Idempotent for blocks that already have a `code` attribute.
+ * A body outside CDATA is XML text, so its entities are decoded first (P3-39).
  */
 export function normalizeWritersideCodeBlocks(content) {
     content = content.replace(
@@ -287,7 +289,7 @@ export function normalizeWritersideCodeBlocks(content) {
                 return match;
             }
 
-            let rawCode = inner.replace(/^\s*<!\[CDATA\[/, '').replace(/\]\]>\s*$/, '');
+            let rawCode = codeBlockBodyText(inner);
             rawCode = rawCode.replace(/^\s*\n/, '').replace(/\n\s*$/, '');
             const escaped = rawCode
                 .replace(/&/g, '&amp;')
