@@ -189,6 +189,20 @@ em {
   scrollbar-width: thin;
 }
 
+/* kotlinlang.org, ktor.io and the MkDocs sites (Koog, Coil, SQLDelight) break a
+   word in inline code that is longer than the line (word-break: break-word).
+   VitePress breaks long words only in paragraphs, list items and headings, with
+   overflow-wrap: break-word, which does not make a flex item narrower: in a
+   callout or a TL;DR box a long name made a phone's page wider than its screen
+   (P2-55). In a table kotlinlang.org keeps the normal breaks. */
+.vp-doc :not(pre) > code {
+  word-break: break-word;
+}
+
+.vp-doc table :not(pre) > code {
+  word-break: normal;
+}
+
 html:not(.dark) .vp-doc [class*="language-none"] code {
   color: black !important;
 }
