@@ -52,6 +52,7 @@ import markdownItRemoveComments from "../plugins/markdown/common/markdown-it-rem
 import markdownItHtmlLinkLevel from "../plugins/markdown/common/markdown-it-html-link-level"
 import markdownItExplicitHash from "../plugins/markdown/common/markdown-it-explicit-hash"
 import markdownItFenceInfoTrim from "../plugins/markdown/common/markdown-it-fence-info-trim"
+import markdownItIndentedCode from "../plugins/markdown/common/markdown-it-indented-code"
 import markdownItDedupeAttrs from "../plugins/markdown/common/markdown-it-dedupe-attrs"
 import { markdownItCollapsed } from "../plugins/markdown/common/markdownItCollapsed.mts"
 import markdownItAutoTitle from "../plugins/markdown/common/markdown-it-auto-title"
@@ -162,6 +163,9 @@ export function registerMarkdownPlugins(md: any) {
   // Wraps VitePress's link renderer, which slugifies link hashes.
   md.use(markdownItExplicitHash)
   md.use(markdownItFenceInfoTrim)
+  // Changes the block rule that parses an indented code block, so every rule
+  // registered before or after this one sees it as a fence.
+  md.use(markdownItIndentedCode)
   md.use(markdownItDedupeAttrs)
   // After every other fence renderer (MkDocs hl_lines, diff titles): the
   // <details> wraps their output.
