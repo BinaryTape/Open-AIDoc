@@ -1,4 +1,16 @@
 {
+  "docs/context-parameters.md": {
+    "langs": [
+      "zh-Hans"
+    ],
+    "reason": "terminology.json gave \"dependency injection\" as \"SQL 注入\" (P3-31)"
+  },
+  "docs/ksp-overview.md": {
+    "langs": [
+      "zh-Hans"
+    ],
+    "reason": "terminology.json gave \"dependency injection\" as \"SQL 注入\" (P3-31)"
+  },
   "docs/whatsnew1430.md": {
     "langs": [
       "ja"
@@ -10,5 +22,11 @@
       "ja"
     ],
     "reason": "audit: Markdown headings lost once parsed 1"
+  },
+  "docs/whatsnew2320.md": {
+    "langs": [
+      "zh-Hans"
+    ],
+    "reason": "terminology.json gave \"dependency injection\" as \"SQL 注入\" (P3-31)"
   }
 }

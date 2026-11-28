@@ -1,0 +1,8 @@
+{
+  "docs/intro/core-concepts.md": {
+    "langs": [
+      "zh-Hans"
+    ],
+    "reason": "terminology.json gave \"dependency injection\" as \"SQL 注入\" (P3-31)"
+  }
+}
