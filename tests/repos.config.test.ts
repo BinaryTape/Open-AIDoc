@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { REPOS, validateRepos } from '../tools/pipeline/repos.config.mjs'
 
@@ -46,6 +47,14 @@ describe('REPOS config', () => {
     // whichever changed last (koin-annotations once did this to koin).
     const sidebarIds = REPOS.map((r) => r.sidebarId)
     expect(new Set(sidebarIds).size).toBe(sidebarIds.length)
+  })
+
+  it('keeps every clone out of git (P3-15)', () => {
+    // The pipeline clones each repository at the repo root.
+    const ignored = readFileSync('.gitignore', 'utf8').split(/\r?\n/).map((line) => line.trim())
+    for (const entry of REPOS) {
+      expect(ignored, entry.id).toContain(`${entry.cloneDir}/`)
+    }
   })
 
   it('rejects duplicate ids', () => {
