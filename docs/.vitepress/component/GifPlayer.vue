@@ -129,6 +129,14 @@ onBeforeUnmount(() => {
   background-clip: padding-box;
 }
 
+/* ktor.io adds the border outside a GIF's width, as it does an image's
+   (P2-50): a 300px GIF is 302px wide there (P2-52). Ours still fits the
+   column. The aspect-ratio is then the picture's, not the border box's. */
+.vp-doc .ws-gif[data-site="ktor"] .ws-gif__image {
+  box-sizing: content-box;
+  max-width: calc(100% - 2px);
+}
+
 .ws-gif--rounded .ws-gif__image {
   border-radius: 9px;
 }
