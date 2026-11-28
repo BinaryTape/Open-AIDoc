@@ -12,6 +12,13 @@
   display: none;
 }
 
+/* The code the editor is made from. Playground hides it once its script has
+   loaded; until then it would show under the block, its lines run together
+   as inline code (P2-28). */
+.vp-doc .ws-runnable__editor > code {
+  display: none;
+}
+
 .vp-doc .ws-runnable .executable-fragment-wrapper {
   position: relative;
   margin: 16px 0;

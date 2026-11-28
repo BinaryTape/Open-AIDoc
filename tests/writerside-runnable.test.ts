@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs'
 import { beforeAll, describe, expect, it } from 'vitest'
 import { createMarkdownRenderer, type MarkdownRenderer } from 'vitepress'
 import { parse } from 'vue/compiler-sfc'
@@ -85,5 +86,14 @@ describe('sample markers', () => {
       .toBe('class A\n//sampleStart\nval a = 1\n//sampleEnd\nval b = 2\n//sampleStart\nval c = 3\nval d = 4\n//sampleEnd')
     expect(withSampleMarkers('val a = 1', [[0, 1]])).toBe('//sampleStart\nval a = 1\n//sampleEnd')
     expect(withSampleMarkers('val a = 1', [])).toBe('val a = 1')
+  })
+})
+
+describe('a runnable sample while Kotlin Playground loads', () => {
+  it('shows the highlighted block only, not the code given to Playground as well (P2-28)', () => {
+    // theme/kotlin-playground.ts puts that code in .ws-runnable__editor before
+    // fetching the script, which hides it once it has read it.
+    const css = readFileSync('docs/.vitepress/styles/ws-runnable.css', 'utf8')
+    expect(/\.vp-doc \.ws-runnable__editor > code\s*\{([^}]*)\}/.exec(css)?.[1]).toContain('display: none')
   })
 })
