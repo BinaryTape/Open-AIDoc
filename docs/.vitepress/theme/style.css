@@ -189,6 +189,13 @@ em {
   scrollbar-width: thin;
 }
 
+/* What a code block's copy button says once pressed: VitePress has one text
+   for Chinese, in simplified characters (P2-13). Its title is set per page by
+   markdown-it-code-copy-title. */
+:lang(zh-Hant) {
+  --vp-code-copy-copied-text-content: '已複製';
+}
+
 /* kotlinlang.org, ktor.io and the MkDocs sites (Koog, Coil, SQLDelight) break a
    word in inline code that is longer than the line (word-break: break-word).
    VitePress breaks long words only in paragraphs, list items and headings, with

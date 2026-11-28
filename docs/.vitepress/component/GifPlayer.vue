@@ -33,6 +33,15 @@ const gif = computed(() => (dark.value && props.darkSrc) || props.src)
 const still = computed(() => (gif.value === props.src && props.preview) || frames.value[gif.value])
 const shown = computed(() => (playing.value ? gif.value : still.value ?? BLANK))
 const ratio = computed(() => (props.naturalWidth && props.naturalHeight ? `aspect-ratio:${props.naturalWidth} / ${props.naturalHeight};` : undefined))
+// The border is outside the image's width (content-box, below), so that the
+// aspect-ratio is the picture's. kotlinlang.org has it inside a written width:
+// the picture is then 2px narrower than it (P2-57). ktor.io has it outside, as
+// ours (P2-52). With no width written, both add it outside the GIF's own.
+const shownWidth = computed(() => {
+  const written = Number(props.width)
+  if (props.site !== 'ktor' && written > 2) return String(written - 2)
+  return props.width ?? props.naturalWidth
+})
 
 /** The first frame of a GIF, as a PNG: what an image not yet shown draws. */
 function drawFirstFrame(url: string) {
@@ -86,7 +95,7 @@ onBeforeUnmount(() => {
     :aria-pressed="playing"
     @click="playing = !playing"
   >
-    <img class="ws-gif__image" :src="shown" :alt="alt" :width="width ?? naturalWidth" :style="ratio">
+    <img class="ws-gif__image" :src="shown" :alt="alt" :width="shownWidth" :style="ratio">
     <span v-if="!playing" class="ws-gif__badge" aria-hidden="true"><span>Gif</span></span>
   </button>
 </template>
@@ -122,19 +131,17 @@ onBeforeUnmount(() => {
   --ws-gif-border: #474749;
 }
 
+/* The border outside the width, so that the aspect-ratio is the picture's,
+   not the border box's (P2-52, P2-57): the width on a kotlinlang.org page is
+   2px less (shownWidth). A GIF still fits the column, as on kotlinlang.org;
+   ktor.io's runs 2px past it. */
 .vp-doc .ws-gif__image {
   display: block;
+  box-sizing: content-box;
+  max-width: calc(100% - 2px);
   margin: 0;
   border: 1px solid var(--ws-gif-border);
   background-clip: padding-box;
-}
-
-/* ktor.io adds the border outside a GIF's width, as it does an image's
-   (P2-50): a 300px GIF is 302px wide there (P2-52). Ours still fits the
-   column. The aspect-ratio is then the picture's, not the border box's. */
-.vp-doc .ws-gif[data-site="ktor"] .ws-gif__image {
-  box-sizing: content-box;
-  max-width: calc(100% - 2px);
 }
 
 .ws-gif--rounded .ws-gif__image {

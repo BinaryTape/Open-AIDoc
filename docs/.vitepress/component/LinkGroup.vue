@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useSlots, type VNode, ref, computed } from 'vue'
+import { useSlots, type VNode, ref, computed, Text } from 'vue'
 import Link from "./Link.vue";
 
 export interface SectionLink {
@@ -41,9 +41,12 @@ slots.default?.().forEach((vnode: VNode) => {
 const hasTitleSlot = computed(() => !!titleContent.value)
 
 const isTitle = (vnode: VNode) => typeof vnode.type === 'string' && vnode.type.toLowerCase() === 'title'
+// Text between two links, such as the " / " of ktor/welcome's "Swagger UI / OpenAPI":
+// ktor.io shows the links only, one under the other (P2-29).
+const isSeparator = (vnode: VNode) => vnode.type === Text && /^[\s/|,·•-]*$/.test(String(vnode.children ?? ''))
 // The slot as written (e.g. <Links> components), without the <title> shown above as the <h3>:
 // a <title> element is not valid in the page body (P2-27).
-const SlotWithoutTitle = () => slots.default?.().filter((vnode) => !isTitle(vnode))
+const SlotWithoutTitle = () => slots.default?.().filter((vnode) => !isTitle(vnode) && !isSeparator(vnode))
 // Three columns from 640px wide, set in CSS (see Card.vue).
 </script>
 

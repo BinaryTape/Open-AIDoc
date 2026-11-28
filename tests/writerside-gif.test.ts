@@ -64,7 +64,7 @@ describe('GifPlayer', () => {
 
   it('starts still, on the preview, with the "Gif" button', async () => {
     const html = await ssr({ src: '/kmp/a.animated.gif', preview: '/kmp/a.png', alt: 'A', width: '600', naturalWidth: '1200', naturalHeight: '544', site: 'kmp' })
-    expect(html).toContain('<img class="ws-gif__image" src="/kmp/a.png" alt="A" width="600" style="aspect-ratio:1200 / 544;">')
+    expect(html).toContain('<img class="ws-gif__image" src="/kmp/a.png" alt="A" width="598" style="aspect-ratio:1200 / 544;">')
     expect(html).toMatch(/^<button type="button" class="ws-gif" data-site="kmp" aria-pressed="false">/)
     expect(html).toContain('<span class="ws-gif__badge" aria-hidden="true"><span>Gif</span></span>')
     expect(html).not.toContain('a.animated.gif')
@@ -74,5 +74,18 @@ describe('GifPlayer', () => {
     const html = await ssr({ src: '/ktor/b.gif', alt: 'B', width: '706', naturalWidth: '1266', naturalHeight: '634', site: 'ktor' })
     expect(html).toMatch(/<img class="ws-gif__image" src="data:image\/gif;base64,[^"]+" alt="B" width="706" style="aspect-ratio:1266 \/ 634;">/)
     expect(html).not.toContain('b.gif')
+  })
+
+  // The border is outside the image's width, so that the aspect-ratio is the
+  // picture's; kotlinlang.org has it inside a written width (P2-57), ktor.io
+  // outside (P2-52).
+  it('is as wide as the width written, with its border, on a kotlinlang.org page', async () => {
+    const width = async (props: Record<string, unknown>) => /<img [^>]*width="(\d+)"/.exec(await ssr({ src: '/x.gif', naturalWidth: '1000', naturalHeight: '520', ...props }))?.[1]
+    expect(await width({ width: '600', site: 'kmp' })).toBe('598')
+    expect(await width({ width: '500', site: 'kotlin' })).toBe('498')
+    expect(await width({ width: '300', site: 'ktor' })).toBe('300')
+    // No width written: the GIF's own, the border outside it, on both sites.
+    expect(await width({ site: 'kmp' })).toBe('1000')
+    expect(await width({ site: 'ktor' })).toBe('1000')
   })
 })

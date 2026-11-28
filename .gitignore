@@ -64,6 +64,7 @@ dokka-repo/
 kotlin-repo/
 lincheck-repo/
 api-guidelines-repo/
+serialization-repo/
 ktor-repo/
 kmp-repo/
 koog-repo/

@@ -54,6 +54,7 @@ import markdownItExplicitHash from "../plugins/markdown/common/markdown-it-expli
 import markdownItFenceInfoTrim from "../plugins/markdown/common/markdown-it-fence-info-trim"
 import markdownItIndentedCode from "../plugins/markdown/common/markdown-it-indented-code"
 import markdownItDedupeAttrs from "../plugins/markdown/common/markdown-it-dedupe-attrs"
+import markdownItCodeCopyTitle from "../plugins/markdown/common/markdown-it-code-copy-title"
 import { markdownItCollapsed } from "../plugins/markdown/common/markdownItCollapsed.mts"
 import markdownItAutoTitle from "../plugins/markdown/common/markdown-it-auto-title"
 import { isDocType } from '../utils/doctype-utils'
@@ -170,6 +171,8 @@ export function registerMarkdownPlugins(md: any) {
   // After every other fence renderer (MkDocs hl_lines, diff titles): the
   // <details> wraps their output.
   md.use(markdownItWsCollapsibleCode)
+  // Around all of the fence renderers above: titles the copy button of every code block.
+  md.use(markdownItCodeCopyTitle)
   // After every other HTML renderer: they see the <code-block> tag, which
   // this one then replaces with a code block from the fence renderer above.
   md.use(markdownItWsCodeBlock)

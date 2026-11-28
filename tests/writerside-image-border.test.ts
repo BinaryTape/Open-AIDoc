@@ -107,9 +107,9 @@ describe('the border of a bordered image or GIF', () => {
     expect(rule(read('docs/.vitepress/component/GifPlayer.vue'), '.ws-gif--rounded .ws-gif__image')).toContain('border-radius: 9px')
   })
 
-  it('of a Ktor GIF is outside its width, as on ktor.io, and still in the column (P2-52)', () => {
-    const ktor = rule(read('docs/.vitepress/component/GifPlayer.vue'), '.vp-doc .ws-gif[data-site="ktor"] .ws-gif__image')
-    expect(ktor).toContain('box-sizing: content-box')
-    expect(ktor).toContain('max-width: calc(100% - 2px)')
+  it('of a GIF is outside its width, so that the aspect-ratio is the picture\'s, and still in the column (P2-52, P2-57)', () => {
+    const gif = rule(read('docs/.vitepress/component/GifPlayer.vue'), '.vp-doc .ws-gif__image')
+    expect(gif).toContain('box-sizing: content-box')
+    expect(gif).toContain('max-width: calc(100% - 2px)')
   })
 })
