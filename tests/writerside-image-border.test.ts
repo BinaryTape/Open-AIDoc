@@ -106,4 +106,10 @@ describe('the border of a bordered image or GIF', () => {
   it('of a rounded GIF is 9px too, as on ktor.io (P2-51)', () => {
     expect(rule(read('docs/.vitepress/component/GifPlayer.vue'), '.ws-gif--rounded .ws-gif__image')).toContain('border-radius: 9px')
   })
+
+  it('of a Ktor GIF is outside its width, as on ktor.io, and still in the column (P2-52)', () => {
+    const ktor = rule(read('docs/.vitepress/component/GifPlayer.vue'), '.vp-doc .ws-gif[data-site="ktor"] .ws-gif__image')
+    expect(ktor).toContain('box-sizing: content-box')
+    expect(ktor).toContain('max-width: calc(100% - 2px)')
+  })
 })
