@@ -30,6 +30,20 @@ describe('a link group', () => {
     )
   })
 
+  it('shows two links written with a " / " between them one under the other, as ktor.io does (P2-29)', async () => {
+    const html = await renderGroup(() => [
+      h('title', null, 'Plugins'),
+      h(Links, { href: 'server-swagger-ui.md' }, () => 'Swagger UI'),
+      ' / ',
+      h(Links, { href: 'server-openapi.md' }, () => 'OpenAPI'),
+    ])
+    expect(html).toBe(
+      '<div class="ws-link-group ws-col-12 ws-col-sm-4"><h3>Plugins</h3><div class="ws-link-container">'
+        + '<a href="server-swagger-ui.md">Swagger UI</a><a href="server-openapi.md">OpenAPI</a>'
+        + '</div></div>',
+    )
+  })
+
   it('still turns plain <a> links into the site links', async () => {
     const html = await renderGroup(() => [
       h('title', null, 'Deployment'),
