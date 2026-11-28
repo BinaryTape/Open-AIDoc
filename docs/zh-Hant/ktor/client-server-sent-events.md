@@ -132,7 +132,7 @@
                 <li>使用 <code>urlString</code> 參數將整個 URL 指定為字串。</li>
                 <li>分別使用 <code>schema</code>、<code>host</code>、<code>port</code> 和 <code>path</code> 參數來指定通訊協定配置 (scheme)、網域名稱、連接埠號碼與路徑名稱。</li>
             </list>
-            <code-block lang="kotlin" code="                runBlocking {&#10;                    client.sse(host = &amp;quot;127.0.0.1&amp;quot;, port = 8080, path = &amp;quot;/events&amp;quot;) {&#10;                        // this: ClientSSESession&#10;                    }&#10;                }"/>
+            <code-block lang="kotlin" code="                runBlocking {&#10;                    client.sse(host = &quot;127.0.0.1&quot;, port = 8080, path = &quot;/events&quot;) {&#10;                        // this: ClientSSESession&#10;                    }&#10;                }"/>
             <note>
                 <code>ClientSSESession</code> 和 <code>ClientSSESessionWithDeserialization</code> 執行個體僅在該工作階段期間有效。當 <code>serverSentEvents { ... }</code> 區塊完成或連線關閉時，它們的作用域會自動取消。
             </note>

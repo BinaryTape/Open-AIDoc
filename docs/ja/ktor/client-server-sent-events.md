@@ -117,7 +117,7 @@
             <li><code>schema</code>、<code>host</code>、<code>port</code>、および <code>path</code> パラメータを使用して、プロトコルスキーム、ドメイン名、ポート番号、パス名をそれぞれ個別に指定します。
             </li>
         </list>
-        <code-block lang="kotlin" code="                runBlocking {&#10;                    client.sse(host = &amp;quot;127.0.0.1&amp;quot;, port = 8080, path = &amp;quot;/events&amp;quot;) {&#10;                        // this: ClientSSESession&#10;                    }&#10;                }"/>
+        <code-block lang="kotlin" code="                runBlocking {&#10;                    client.sse(host = &quot;127.0.0.1&quot;, port = 8080, path = &quot;/events&quot;) {&#10;                        // this: ClientSSESession&#10;                    }&#10;                }"/>
         <note>
             <code>ClientSSESession</code> および <code>ClientSSESessionWithDeserialization</code> インスタンスは、セッションの継続期間中のみ有効です。これらのスコープは、<code>serverSentEvents { ... }</code> ブロックが完了するか接続が閉じられると自動的にキャンセルされます。
         </note>

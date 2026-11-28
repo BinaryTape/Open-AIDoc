@@ -101,7 +101,7 @@
     <list type="decimal">
         <li>
             <p>特定の URL パスを指定する場合:</p>
-            <code-block lang="kotlin" code="                    routing {&#10;                        sse(&amp;quot;/events&amp;quot;) {&#10;                            // send events to clients&#10;                        }&#10;                    }"/>
+            <code-block lang="kotlin" code="                    routing {&#10;                        sse(&quot;/events&quot;) {&#10;                            // send events to clients&#10;                        }&#10;                    }"/>
         </li>
         <li>
             <p>

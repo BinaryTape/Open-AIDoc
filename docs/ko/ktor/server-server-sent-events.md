@@ -103,7 +103,7 @@
         <list type="decimal">
             <li>
                 <p>특정 URL 경로 사용:</p>
-                <code-block lang="kotlin" code="                    routing {&#10;                        sse(&amp;quot;/events&amp;quot;) {&#10;                            // send events to clients&#10;                        }&#10;                    }"/>
+                <code-block lang="kotlin" code="                    routing {&#10;                        sse(&quot;/events&quot;) {&#10;                            // send events to clients&#10;                        }&#10;                    }"/>
             </li>
             <li>
                 <p>

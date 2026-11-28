@@ -33,7 +33,7 @@ RSA 암호화 알고리즘의 일부인 RS256은 해싱에 SHA-256을 사용하�
 
 새 터미널 창에서 다음 명령을 실행합니다:
 
-<code-block lang="shell" code="openssl genpkey -algorithm rsa -pkeyopt rsa_keygen_bits:2048 &amp;gt; ktor.pk8"/>
+<code-block lang="shell" code="openssl genpkey -algorithm rsa -pkeyopt rsa_keygen_bits:2048 &gt; ktor.pk8"/>
 
 [openssl genpkey](https://www.openssl.org/docs/man3.0/man1/openssl-genpkey.html) 명령은 RSA 알고리즘을 사용하여 2048비트 개인 키를 생성하고 지정된 파일(여기서는 `ktor.pk8`)에 저장합니다. 파일의 내용은 [Base64](https://en.wikipedia.org/wiki/Base64)로 인코딩되어 있으므로 공개 키를 도출하기 전에 디코딩해야 합니다.
 
